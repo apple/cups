@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in,v 1.13.2.20 2003/06/14 13:35:49 mike Exp $"
+# "$Id: cups.list.in,v 1.13.2.21 2003/06/20 02:48:48 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -374,25 +374,25 @@ f 0444 root sys $AMANDIR/cat$MAN8DIR/lpc.$CAT8EXT man/lpc.$CAT8EXT
 f 0444 root sys $AMANDIR/cat$MAN8DIR/lpinfo.$CAT8EXT man/lpinfo.$CAT8EXT
 f 0444 root sys $AMANDIR/cat$MAN8DIR/lpmove.$CAT8EXT man/lpmove.$CAT8EXT
 
-f 0444 root sys $MANDIR/man1/backend.$MAN1EXT man/backend.man
-f 0444 root sys $MANDIR/man1/cupstestppd.$MAN1EXT man/cupstestppd.man
-f 0444 root sys $MANDIR/man1/filter.$MAN1EXT man/filter.man
-f 0444 root sys $MANDIR/man1/lpoptions.$MAN1EXT man/lpoptions.man
-f 0444 root sys $MANDIR/man1/lppasswd.$MAN1EXT man/lppasswd.man
-f 0444 root sys $MANDIR/man1/lpq.$MAN1EXT man/lpq.man
-f 0444 root sys $MANDIR/man1/lprm.$MAN1EXT man/lprm.man
-f 0444 root sys $MANDIR/man1/lpr.$MAN1EXT man/lpr.man
-f 0444 root sys $MANDIR/man1/lpstat.$MAN1EXT man/lpstat.man
-f 0444 root sys $MANDIR/man1/lp.$MAN1EXT man/lp.man
-l 0444 root sys $MANDIR/man1/cancel.$MAN1EXT lp.$MAN1EXT
+f 0444 root sys $MANDIR/man1/backend.1 man/backend.man
+f 0444 root sys $MANDIR/man1/cupstestppd.1 man/cupstestppd.man
+f 0444 root sys $MANDIR/man1/filter.1 man/filter.man
+f 0444 root sys $MANDIR/man1/lpoptions.1 man/lpoptions.man
+f 0444 root sys $MANDIR/man1/lppasswd.1 man/lppasswd.man
+f 0444 root sys $MANDIR/man1/lpq.1 man/lpq.man
+f 0444 root sys $MANDIR/man1/lprm.1 man/lprm.man
+f 0444 root sys $MANDIR/man1/lpr.1 man/lpr.man
+f 0444 root sys $MANDIR/man1/lpstat.1 man/lpstat.man
+f 0444 root sys $MANDIR/man1/lp.1 man/lp.man
+l 0444 root sys $MANDIR/man1/cancel.1 lp.1
 
-f 0444 root sys $PMANDIR/man3/cups-config.$MAN3EXT man/cups-config.man
+f 0444 root sys $PMANDIR/man3/cups-config.3 man/cups-config.man
 
-f 0444 root sys $MANDIR/man5/classes.conf.$MAN5EXT man/classes.conf.man
-f 0444 root sys $MANDIR/man5/cupsd.conf.$MAN5EXT man/cupsd.conf.man
-f 0444 root sys $MANDIR/man5/mime.convs.$MAN5EXT man/mime.convs.man
-f 0444 root sys $MANDIR/man5/mime.types.$MAN5EXT man/mime.types.man
-f 0444 root sys $MANDIR/man5/printers.conf.$MAN5EXT man/printers.conf.man
+f 0444 root sys $MANDIR/man5/classes.conf.5 man/classes.conf.man
+f 0444 root sys $MANDIR/man5/cupsd.conf.5 man/cupsd.conf.man
+f 0444 root sys $MANDIR/man5/mime.convs.5 man/mime.convs.man
+f 0444 root sys $MANDIR/man5/mime.types.5 man/mime.types.man
+f 0444 root sys $MANDIR/man5/printers.conf.5 man/printers.conf.man
 
 f 0444 root sys $AMANDIR/man$MAN8DIR/accept.$MAN8EXT man/accept.man
 l 0444 root sys $AMANDIR/man$MAN8DIR/reject.$MAN8EXT accept.$MAN8EXT
@@ -412,5 +412,5 @@ f 0444 root sys $AMANDIR/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list.in,v 1.13.2.20 2003/06/14 13:35:49 mike Exp $".
+# End of "$Id: cups.list.in,v 1.13.2.21 2003/06/20 02:48:48 mike Exp $".
 #
