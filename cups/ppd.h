@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.24.2.17 2003/04/10 03:01:49 mike Exp $"
+ * "$Id: ppd.h,v 1.24.2.18 2003/08/01 15:00:29 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -120,8 +120,15 @@ typedef enum			/**** Status Codes ****/
   PPD_ILLEGAL_CHARACTER,	/* Illegal control character */
   PPD_ILLEGAL_MAIN_KEYWORD,	/* Illegal main keyword string */
   PPD_ILLEGAL_OPTION_KEYWORD,	/* Illegal option keyword string */
-  PPD_ILLEGAL_TRANSLATION	/* Illegal translation string */
+  PPD_ILLEGAL_TRANSLATION,	/* Illegal translation string */
+  PPD_ILLEGAL_WHITESPACE	/* Illegal whitespace character */
 } ppd_status_t;
+
+typedef enum			/**** Conformance Levels ****/
+{
+  PPD_CONFORM_RELAXED,		/* Relax whitespace and control char */
+  PPD_CONFORM_STRICT		/* Require strict conformance */
+} ppd_conform_t;
 
 typedef struct			/**** PPD Attribute Structure ****/
 {
@@ -402,6 +409,9 @@ extern int		ppdMarkXYArray(ppd_file_t *ppd, const char *keyword,
 			               const char *param, int num_values,
 				       const float *values);
 
+/**** New in CUPS 1.1.20 ****/
+extern void		ppdSetConformance(ppd_conform_t c);
+
 /**** New in CUPS 1.2 ****/
 extern int		ppdSave(ppd_file_t *ppd, FILE *fp);
 extern int		ppdSaveFd(ppd_file_t *ppd, int fd);
@@ -418,5 +428,5 @@ extern int		ppdSaveFile(ppd_file_t *ppd, const char *filename);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.24.2.17 2003/04/10 03:01:49 mike Exp $".
+ * End of "$Id: ppd.h,v 1.24.2.18 2003/08/01 15:00:29 mike Exp $".
  */

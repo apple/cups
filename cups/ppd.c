@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.56 2003/07/20 12:51:41 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.57 2003/08/01 15:00:28 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -41,6 +41,7 @@
  *   ppdOpen()             - Read a PPD file into memory.
  *   ppdOpenFd()           - Read a PPD file into memory.
  *   ppdOpenFile()         - Read a PPD file into memory.
+ *   ppdSetConformance()   - Set the conformance level for PPD files.
  *   ppd_add_attr()        - Add an attribute to the PPD data.
  *   ppd_add_choice()      - Add a choice to an option.
  *   ppd_add_size()        - Add a page size.
@@ -98,6 +99,8 @@
 static ppd_status_t	ppd_status = PPD_OK;
 					/* Status of last ppdOpen*() */
 static int		ppd_line = 0;	/* Current line number */
+static ppd_conform_t	ppd_conform = PPD_CONFORM_RELAXED;
+					/* Level of conformance required */
 
 
 /*
@@ -332,11 +335,12 @@ ppdErrorString(ppd_status_t status)	/* I - PPD status */
 		  "Illegal control character",
 		  "Illegal main keyword string",
 		  "Illegal option keyword string",
-		  "Illegal translation string"
+		  "Illegal translation string",
+		  "Illegal whitespace character"
 		};
 
 
-  if (status < PPD_OK || status > PPD_ILLEGAL_TRANSLATION)
+  if (status < PPD_OK || status > PPD_ILLEGAL_WHITESPACE)
     return ("Unknown");
   else
     return (messages[status]);
@@ -2002,6 +2006,17 @@ ppdOpenFile(const char *filename)	/* I - File to read from */
 
 
 /*
+ * 'ppdSetConformance()' - Set the conformance level for PPD files.
+ */
+
+void
+ppdSetConformance(ppd_conform_t c)	/* I - Conformance level */
+{
+  ppd_conform = c;
+}
+
+
+/*
  * 'ppd_add_attr()' - Add an attribute to the PPD data.
  */
 
@@ -2613,7 +2628,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 	*lineptr++ = '\n';
       }
-      else if (ch < ' ' && ch != '\t' && ch != 0x1a)
+      else if (ch < ' ' && ch != '\t' && ppd_conform == PPD_CONFORM_STRICT)
       {
        /*
         * Other control characters...
@@ -2681,7 +2696,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 	  ch = '\n';
 	}
-	else if (ch < ' ' && ch != '\t' && ch != 0x1a)
+	else if (ch < ' ' && ch != '\t' && ppd_conform == PPD_CONFORM_STRICT)
 	{
 	 /*
           * Other control characters...
@@ -2740,7 +2755,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 	  break;
 	}
-	else if (ch < ' ' && ch != '\t' && ch != 0x1a)
+	else if (ch < ' ' && ch != '\t' && ppd_conform == PPD_CONFORM_STRICT)
 	{
 	 /*
           * Other control characters...
@@ -2791,7 +2806,6 @@ ppd_read(FILE *fp,			/* I - File to read from */
     *string    = NULL;
 
     if (!line[0] ||			/* Blank line */
-        strcmp(line, "*") == 0 ||	/* (Bad) comment line */
         strncmp(line, "*%", 2) == 0 ||	/* Comment line */
         strcmp(line, "*End") == 0)	/* End of multi-line string */
     {
@@ -2799,8 +2813,30 @@ ppd_read(FILE *fp,			/* I - File to read from */
       continue;
     }
 
+    if (strcmp(line, "*") == 0)		/* (Bad) comment line */
+    {
+      if (ppd_conform == PPD_CONFORM_RELAXED)
+      {
+	startline = ppd_line + 1;
+	continue;
+      }
+      else
+      {
+        ppd_line   = startline;
+        ppd_status = PPD_ILLEGAL_MAIN_KEYWORD;
+
+        return (0);
+      }
+    }
+
     if (line[0] != '*')			/* All lines start with an asterisk */
     {
+      if (ppd_conform == PPD_CONFORM_STRICT)
+      {
+        ppd_status = PPD_MISSING_ASTERISK;
+        return (0);
+      }
+
      /*
       * Allow lines consisting of just whitespace...
       */
@@ -2870,6 +2906,13 @@ ppd_read(FILE *fp,			/* I - File to read from */
       }
 
       *optptr = '\0';
+
+      if (!option[0] && ppd_conform == PPD_CONFORM_STRICT)
+      {
+        ppd_status = PPD_ILLEGAL_WHITESPACE;
+	return (0);
+      }
+
       mask |= PPD_OPTION;
 
 /*      DEBUG_printf(("option = \"%s\", lineptr = \"%s\"\n", option, lineptr));*/
@@ -2905,13 +2948,23 @@ ppd_read(FILE *fp,			/* I - File to read from */
 /*      DEBUG_printf(("text = \"%s\", lineptr = \"%s\"\n", text, lineptr));*/
     }
 
+    if (isspace(*lineptr) && ppd_conform == PPD_CONFORM_STRICT)
+    {
+      ppd_status = PPD_ILLEGAL_WHITESPACE;
+      return (0);
+    }
+
+    while (isspace(*lineptr))
+      lineptr ++;
+
     if (*lineptr == ':')
     {
      /*
       * Get string after triming leading and trailing whitespace...
       */
 
-      while (*lineptr == ':' || isspace(*lineptr))
+      lineptr ++;
+      while (isspace(*lineptr))
         lineptr ++;
 
       strptr = lineptr + strlen(lineptr) - 1;
@@ -2949,5 +3002,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.56 2003/07/20 12:51:41 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.57 2003/08/01 15:00:28 mike Exp $".
  */

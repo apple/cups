@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.24 2003/07/20 02:34:29 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.25 2003/08/01 15:00:30 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -93,11 +93,11 @@ main(int  argc,			/* I - Number of command-line arguments */
                                 "JCL", "PAGE", "PROLOG" };
 
 
-  setbuf(stdout, NULL);
-
  /*
   * Display PPD files for each file listed on the command-line...
   */
+
+  ppdSetConformance(PPD_CONFORM_STRICT);
 
   verbose = 0;
   ppd     = NULL;
@@ -110,7 +110,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       for (opt = argv[i] + 1; *opt; opt ++)
         switch (*opt)
 	{
-	  case 'q' :
+	  case 'q' :			/* Quiet mode */
 	      if (verbose > 0)
 	      {
         	fputs("cupstestppd: The -q option is incompatible with the -v option.\n",
@@ -121,7 +121,11 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      verbose --;
 	      break;
 
-	  case 'v' :
+	  case 'r' :			/* Relaxed mode */
+              ppdSetConformance(PPD_CONFORM_RELAXED);
+	      break;
+
+	  case 'v' :			/* Verbose mode */
 	      if (verbose < 0)
 	      {
         	fputs("cupstestppd: The -v option is incompatible with the -q option.\n",
@@ -1008,13 +1012,13 @@ show_conflicts(ppd_file_t *ppd)		/* I - PPD to check */
 void
 usage(void)
 {
-  puts("Usage: cupstestppd [-q] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd[.gz]]");
-  puts("       program | cupstestppd [-q] [-v[v]] -");
+  puts("Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd[.gz]]");
+  puts("       program | cupstestppd [-q] [-r] [-v[v]] -");
 
   exit(ERROR_USAGE);
 }
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.24 2003/07/20 02:34:29 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.25 2003/08/01 15:00:30 mike Exp $".
  */
