@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.42 2000/09/07 19:54:05 mike Exp $"
+ * "$Id: main.c,v 1.43 2000/09/07 20:33:21 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -59,7 +59,6 @@ main(int  argc,			/* I - Number of command-line arguments */
      char *argv[])		/* I - Command-line arguments */
 {
   int			i;		/* Looping var */
-  int			max_fds;	/* Max number of files */
   char			*opt;		/* Option character */
   int			fg;		/* Run in the foreground */
   fd_set		input,		/* Input set for select() */
@@ -180,7 +179,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   */
 
   getrlimit(RLIMIT_NOFILE, &limit);
-  max_fds = limit.rlim_cur = limit.rlim_max;
+  MaxFDs = limit.rlim_cur = limit.rlim_max;
   setrlimit(RLIMIT_NOFILE, &limit);
 
  /*
@@ -291,7 +290,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	break;
       }
 
-    if ((i = select(max_fds, &input, &output, NULL, &timeout)) < 0)
+    if ((i = select(MaxFDs, &input, &output, NULL, &timeout)) < 0)
     {
       char	s[16384],	/* String buffer */
 		*sptr;		/* Pointer into buffer */
@@ -315,7 +314,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       slen = 9;
       sptr = s + 9;
 
-      for (i = 0; i < max_fds; i ++)
+      for (i = 0; i < MaxFDs; i ++)
         if (FD_ISSET(i, &InputSet))
           snprintf(sptr, sizeof(s) - slen, " %d", i);
 
@@ -325,23 +324,23 @@ main(int  argc,			/* I - Number of command-line arguments */
       slen = 10;
       sptr = s + 10;
 
-      for (i = 0; i < max_fds; i ++)
+      for (i = 0; i < MaxFDs; i ++)
         if (FD_ISSET(i, &OutputSet))
           snprintf(sptr, sizeof(s) - slen, " %d", i);
 
       LogMessage(L_ERROR, s);
 
       for (i = 0, con = Clients; i < NumClients; i ++, con ++)
-        LogMessage(L_ERROR, "Clients[%d] = %d, file = %d, state = %d\n",
+        LogMessage(L_ERROR, "Clients[%d] = %d, file = %d, state = %d",
 	        i, con->http.fd, con->file, con->http.state);
 
       for (i = 0, lis = Listeners; i < NumListeners; i ++, lis ++)
-        LogMessage(L_ERROR, "Listeners[%d] = %d\n", i, lis->fd);
+        LogMessage(L_ERROR, "Listeners[%d] = %d", i, lis->fd);
 
-      LogMessage(L_ERROR, "BrowseSocket = %d\n", BrowseSocket);
+      LogMessage(L_ERROR, "BrowseSocket = %d", BrowseSocket);
 
       for (job = Jobs; job != NULL; job = job->next)
-        LogMessage(L_ERROR, "Jobs[%d] = %d\n", job->id, job->pipe);
+        LogMessage(L_ERROR, "Jobs[%d] = %d", job->id, job->pipe);
 
       break;
     }
@@ -626,5 +625,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.42 2000/09/07 19:54:05 mike Exp $".
+ * End of "$Id: main.c,v 1.43 2000/09/07 20:33:21 mike Exp $".
  */

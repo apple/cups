@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.24 2000/06/28 14:00:48 mike Exp $"
+ * "$Id: cupsd.h,v 1.25 2000/09/07 20:33:20 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -149,6 +149,7 @@ typedef struct direct DIRENT;
  * Globals...
  */
 
+VAR int			MaxFDs;		/* Maximum number of files */
 VAR fd_set		InputSet,	/* Input files for select() */
 			OutputSet;	/* Output files for select() */
 
@@ -171,5 +172,5 @@ extern void	LoadDevices(const char *d);
 extern void	LoadPPDs(const char *d);
 
 /*
- * End of "$Id: cupsd.h,v 1.24 2000/06/28 14:00:48 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.25 2000/09/07 20:33:20 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.86 2000/08/30 22:00:37 mike Exp $"
+ * "$Id: job.c,v 1.87 2000/09/07 20:33:20 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -418,7 +418,7 @@ LoadAllJobs(void)
 
       if ((job = calloc(sizeof(job_t), 1)) == NULL)
       {
-        LogMessage(L_ERROR, "LoadAddJobs: Ran out of memory for jobs!");
+        LogMessage(L_ERROR, "LoadAllJobs: Ran out of memory for jobs!");
 	closedir(dir);
 	return;
       }
@@ -426,7 +426,7 @@ LoadAllJobs(void)
       if ((job->attrs = ippNew()) == NULL)
       {
         free(job);
-        LogMessage(L_ERROR, "LoadAddJobs: Ran out of memory for job attributes!");
+        LogMessage(L_ERROR, "LoadAllJobs: Ran out of memory for job attributes!");
 	closedir(dir);
 	return;
       }
@@ -582,7 +582,7 @@ LoadAllJobs(void)
 
       if ((job = FindJob(jobid)) == NULL)
       {
-        LogMessage(L_ERROR, "LoadAddJobs: Orphaned print file \"%s\"!",
+        LogMessage(L_ERROR, "LoadAllJobs: Orphaned print file \"%s\"!",
 	           filename);
         unlink(filename);
 	continue;
@@ -598,7 +598,7 @@ LoadAllJobs(void)
 
         if (filetypes == NULL)
 	{
-          LogMessage(L_ERROR, "LoadAddJobs: Ran out of memory for job file types!");
+          LogMessage(L_ERROR, "LoadAllJobs: Ran out of memory for job file types!");
 	  continue;
 	}
 
@@ -976,7 +976,6 @@ StartJob(int       id,		/* I - Job ID */
 
   DEBUG_printf(("StartJob(%d, %08x)\n", id, printer));
 
-
   for (current = Jobs; current != NULL; current = current->next)
     if (current->id == id)
       break;
@@ -984,9 +983,12 @@ StartJob(int       id,		/* I - Job ID */
   if (current == NULL)
     return;
 
+  LogMessage(L_DEBUG, "StartJob() id = %d, file = %d", id,
+             current->current_file);
+
   if (current->num_files == 0)
   {
-    LogMessage(L_ERROR, "StartJob: Job ID %d has no files!  Cancelling it!", id);
+    LogMessage(L_ERROR, "Job ID %d has no files!  Cancelling it!", id);
     CancelJob(id, 0);
     return;
   }
@@ -1018,9 +1020,13 @@ StartJob(int       id,		/* I - Job ID */
 
     if (num_filters == 0)
     {
-      LogMessage(L_ERROR, "Unable to convert file to printable format for job %s-%d!",
-	         printer->name, current->id);
-      CancelJob(current->id, 0);
+      LogMessage(L_ERROR, "Unable to convert file %d to printable format for job %d!",
+	         current->current_file, current->id);
+      current->current_file ++;
+
+      if (current->current_file == current->num_files)
+        CancelJob(current->id, 0);
+
       return;
     }
 
@@ -1041,9 +1047,10 @@ StartJob(int       id,		/* I - Job ID */
     if (filters != NULL)
       free(filters);
 
-    LogMessage(L_DEBUG, "StartJob(): Postponing job ID %d: "
-                        "cost is %d, level is %d, limit is %d",
-               id, current->cost, FilterLevel, FilterLimit);
+    LogMessage(L_DEBUG, "StartJob() id = %d, file = %d, "
+                        "cost = %d, level = %d, limit = %d",
+               id, current->current_file, current->cost, FilterLevel,
+	       FilterLimit);
     return;
   }
 
@@ -1053,15 +1060,14 @@ StartJob(int       id,		/* I - Job ID */
   * Update the printer and job state to "processing"...
   */
 
-  DEBUG_puts("StartJob: found job in list.");
-
   current->state->values[0].integer = IPP_JOB_PROCESSING;
   current->status  = 0;
   current->printer = printer;
   printer->job     = current;
   SetPrinterState(printer, IPP_PRINTER_PROCESSING);
 
-  set_time(current, "time-at-processing");
+  if (current->current_file == 0)
+    set_time(current, "time-at-processing");
 
  /*
   * Building the options string is harder than it needs to be, but
@@ -1217,8 +1223,8 @@ StartJob(int       id,		/* I - Job ID */
   argv[6] = filename;
   argv[7] = NULL;
 
-  DEBUG_printf(("StartJob: args = \'%s\',\'%s\',\'%s\',\'%s\',\'%s\',\'%s\',\'%s\'\n",
-                argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], argv[6]));
+  LogMessage(L_DEBUG, "StartJob() argv = \"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"",
+             argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], argv[6]);
 
  /*
   * Create environment variable strings for the filters...
@@ -1275,22 +1281,13 @@ StartJob(int       id,		/* I - Job ID */
   envp[15] = ldpath;
   envp[16] = NULL;
 
-  DEBUG_puts(envp[0]);
-  DEBUG_puts(envp[1]);
-  DEBUG_puts(envp[2]);
-  DEBUG_puts(envp[3]);
-  DEBUG_puts(envp[4]);
-  DEBUG_puts(envp[5]);
-  DEBUG_puts(envp[6]);
-  DEBUG_puts(envp[7]);
-  DEBUG_puts(envp[8]);
-  DEBUG_puts(envp[9]);
-  DEBUG_puts(envp[10]);
-  DEBUG_puts(envp[11]);
-  DEBUG_puts(envp[12]);
-  DEBUG_puts(envp[13]);
-  DEBUG_puts(envp[14]);
-  DEBUG_puts(envp[15]);
+  LogMessage(L_DEBUG, "StartJob(): envp = \"%s\",\"%s\",\"%s\",\"%s\","
+                      "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\","
+		      "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"",
+	     envp[0], envp[1], envp[2], envp[3], envp[4],
+	     envp[5], envp[6], envp[7], envp[8], envp[9],
+	     envp[10], envp[11], envp[12], envp[13], envp[14],
+	     envp[15]);
 
   current->current_file ++;
 
@@ -1300,7 +1297,7 @@ StartJob(int       id,		/* I - Job ID */
 
   if (pipe(statusfds))
   {
-    LogMessage(L_ERROR, "StartJob: unable to create status pipes - %s.",
+    LogMessage(L_ERROR, "Unable to create job status pipes - %s.",
 	       strerror(errno));
     StopPrinter(printer);
     sprintf(printer->state_message, "Unable to create status pipes - %s.",
@@ -1308,7 +1305,8 @@ StartJob(int       id,		/* I - Job ID */
     return;
   }
 
-  DEBUG_printf(("statusfds = %d, %d\n", statusfds[0], statusfds[1]));
+  LogMessage(L_DEBUG, "StartJob() statusfds = %d, %d",
+             statusfds[0], statusfds[1]);
 
   current->pipe   = statusfds[0];
   current->status = 0;
@@ -1319,8 +1317,9 @@ StartJob(int       id,		/* I - Job ID */
 
   filterfds[1][0] = open("/dev/null", O_RDONLY);
   filterfds[1][1] = -1;
-  DEBUG_printf(("filterfds[%d] = %d, %d\n", 1, filterfds[1][0],
-                filterfds[1][1]));
+
+  LogMessage(L_DEBUG, "StartJob() filterfds[%d] = %d, %d", 1, filterfds[1][0],
+             filterfds[1][1]);
 
   for (i = 0; i < num_filters; i ++)
   {
@@ -1331,9 +1330,6 @@ StartJob(int       id,		/* I - Job ID */
       sprintf(command, "%s/filter/%s", ServerBin, filters[i].filter);
     else
       strcpy(command, filters[i].filter);
-
-    DEBUG_printf(("%s: %s %s %s %s %s %s %s\n", command, argv[0],
-	          argv[1], argv[2], argv[3], argv[4], argv[5], argv[6]));
 
     if (i < (num_filters - 1) ||
 	strncmp(printer->device_uri, "file:", 5) != 0)
@@ -1349,8 +1345,9 @@ StartJob(int       id,		/* I - Job ID */
 	                           O_WRONLY | O_CREAT, 0666);
     }
 
-    DEBUG_printf(("filterfds[%d] = %d, %d\n", i & 1, filterfds[i & 1][0],
-         	  filterfds[i & 1][1]));
+    LogMessage(L_DEBUG, "StartJob() filter = \"%s\"", command);
+    LogMessage(L_DEBUG, "StartJob() filterfds[%d] = %d, %d",
+               i & 1, filterfds[i & 1][0], filterfds[i & 1][1]);
 
     pid = start_process(command, argv, envp, filterfds[!(i & 1)][0],
                         filterfds[i & 1][1], statusfds[1], 0);
@@ -1371,8 +1368,8 @@ StartJob(int       id,		/* I - Job ID */
     {
       current->procs[i] = pid;
 
-      LogMessage(L_INFO, "Started %s (PID %d) for job %d.", command, pid,
-                 current->id);
+      LogMessage(L_INFO, "Started filter %s (PID %d) for job %d.",
+                 command, pid, current->id);
     }
   }
 
@@ -1392,14 +1389,12 @@ StartJob(int       id,		/* I - Job ID */
     if (num_filters)
       argv[6] = NULL;
 
-    DEBUG_printf(("%s: %s %s %s %s %s %s %s\n", command, argv[0],
-	          argv[1], argv[2], argv[3], argv[4], argv[5], argv[6]));
-
     filterfds[i & 1][0] = -1;
     filterfds[i & 1][1] = open("/dev/null", O_WRONLY);
 
-    DEBUG_printf(("filterfds[%d] = %d, %d\n", i & 1, filterfds[i & 1][0],
-        	  filterfds[i & 1][1]));
+    LogMessage(L_DEBUG, "StartJob() backend = \"%s\"", command);
+    LogMessage(L_DEBUG, "StartJob() filterfds[%d] = %d, %d",
+               i & 1, filterfds[i & 1][0], filterfds[i & 1][1]);
 
     pid = start_process(command, argv, envp, filterfds[!(i & 1)][0],
 			filterfds[i & 1][1], statusfds[1], 1);
@@ -1420,7 +1415,7 @@ StartJob(int       id,		/* I - Job ID */
     {
       current->procs[i] = pid;
 
-      LogMessage(L_INFO, "Started %s (PID %d) for job %d.", command, pid,
+      LogMessage(L_INFO, "Started backend %s (PID %d) for job %d.", command, pid,
                  current->id);
     }
   }
@@ -1649,7 +1644,8 @@ UpdateJob(job_t *job)		/* I - Job to check */
 
   if (bytes <= 0)
   {
-    DEBUG_printf(("UpdateJob: job %d is complete.\n", job->id));
+    LogMessage(L_DEBUG, "UpdateJob() job %d, file %d is complete.",
+               job->id, job->current_file - 1);
 
     if (job->pipe)
     {
@@ -1696,7 +1692,10 @@ UpdateJob(job_t *job)		/* I - Job to check */
       */
 
       if (job->current_file < job->num_files)
+      {
+        FilterLevel -= job->cost;
         StartJob(job->id, job->printer);
+      }
       else
       {
 	CancelJob(job->id, 0);
@@ -2533,7 +2532,7 @@ start_process(const char *command,	/* I - Full path to command */
     * Close extra file descriptors...
     */
 
-    for (fd = 3; fd < 1024; fd ++)
+    for (fd = 3; fd < MaxFDs; fd ++)
       close(fd);
 
    /*
@@ -2569,8 +2568,7 @@ start_process(const char *command,	/* I - Full path to command */
     * Error - couldn't fork a new process!
     */
 
-    DEBUG_printf(("StartJob: unable to fork() %s - %s.\n", command,
-	          strerror(errno)));
+    LogMessage(L_ERROR, "Unable to fork() %s - %s.", command, strerror(errno));
 
     return (0);
   }
@@ -2580,5 +2578,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.86 2000/08/30 22:00:37 mike Exp $".
+ * End of "$Id: job.c,v 1.87 2000/09/07 20:33:20 mike Exp $".
  */
