@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.22 1999/05/26 20:05:04 mike Exp $"
+ * "$Id: job.c,v 1.23 1999/06/03 19:12:03 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -796,9 +796,24 @@ UpdateJob(job_t *job)		/* I - Job to check */
     DEBUG_printf(("UpdateJob: job %d is complete.\n", job->id));
     FD_CLR(job->pipe, &InputSet);
 
-    job->printer->state_message[0] = '\0';
+    if (job->status)
+    {
+     /*
+      * Job had errors; stop it...
+      */
 
-    CancelJob(job->id);
+      StopJob(job->id);
+    }
+    else
+    {
+     /*
+      * Job printed successfully; cancel it...
+      */
+
+      job->printer->state_message[0] = '\0';
+
+      CancelJob(job->id);
+    }
   }
 }
 
@@ -882,5 +897,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.22 1999/05/26 20:05:04 mike Exp $".
+ * End of "$Id: job.c,v 1.23 1999/06/03 19:12:03 mike Exp $".
  */
