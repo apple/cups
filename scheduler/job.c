@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.60 2000/04/11 18:16:48 mike Exp $"
+ * "$Id: job.c,v 1.61 2000/04/11 21:02:10 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -770,21 +770,6 @@ StartJob(int       id,		/* I - Job ID */
 
   num_filters = 0;
 
-#ifdef DEBUG
-  printf("Filtering from %s/%s to %s/%s...\n",
-         current->filetype->super, current->filetype->type,
-         printer->filetype->super, printer->filetype->type);
-  printf("num_filters = %d\n", MimeDatabase->num_filters);
-  for (i = 0; i < MimeDatabase->num_filters; i ++)
-    printf("filters[%d] = %s/%s to %s/%s using \"%s\" (cost %d)\n",
-	   i, MimeDatabase->filters[i].src->super,
-	   MimeDatabase->filters[i].src->type,
-	   MimeDatabase->filters[i].dst->super,
-	   MimeDatabase->filters[i].dst->type,
-	   MimeDatabase->filters[i].filter,
-	   MimeDatabase->filters[i].cost);
-#endif /* DEBUG */	       
-
   if (printer->type & CUPS_PRINTER_REMOTE)
   {
    /*
@@ -847,12 +832,24 @@ StartJob(int       id,		/* I - Job ID */
     else if (attr->group_tag == IPP_TAG_JOB &&
 	     (optptr - options) < (sizeof(options) - 128))
     {
+     /*
+      * Filter out other unwanted attributes...
+      */
+
       if (attr->value_tag == IPP_TAG_MIMETYPE ||
 	  attr->value_tag == IPP_TAG_NAMELANG ||
 	  attr->value_tag == IPP_TAG_TEXTLANG ||
 	  attr->value_tag == IPP_TAG_URI ||
 	  attr->value_tag == IPP_TAG_URISCHEME)
 	continue;
+
+      if (strncmp(attr->name, "job-", 4) == 0 ||
+          strncmp(attr->name, "time-", 5) == 0)
+	continue;
+
+     /*
+      * Otherwise add them to the list...
+      */
 
       if (optptr > options)
 	strcat(optptr, " ");
@@ -1176,7 +1173,7 @@ StopAllJobs(void)
   job_t	*current;		/* Current job */
 
 
-  DEBUG_puts(("StopAllJobs()\n", id));
+  DEBUG_puts("StopAllJobs()");
 
   for (current = Jobs; current != NULL; current = current->next)
     if (current->state->values[0].integer == IPP_JOB_PROCESSING)
@@ -2308,5 +2305,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.60 2000/04/11 18:16:48 mike Exp $".
+ * End of "$Id: job.c,v 1.61 2000/04/11 21:02:10 mike Exp $".
  */
