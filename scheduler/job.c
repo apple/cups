@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.133 2001/06/28 19:29:44 mike Exp $"
+ * "$Id: job.c,v 1.134 2001/07/17 12:38:49 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1110,8 +1110,35 @@ StartJob(int       id,		/* I - Job ID */
       return;
     }
 
-    for (i = 0; i < num_filters; i ++)
-      current->cost += filters[i].cost;
+   /*
+    * Remove NULL ("-") filters...
+    */
+
+    for (i = 0; i < num_filters;)
+      if (strcmp(filters[i].filter, "-") == 0)
+      {
+        num_filters --;
+	if (i < num_filters)
+	  memcpy(filters + i, filters + i + 1,
+	         (num_filters - i) * sizeof(mime_filter_t));
+      }
+      else
+        i ++;
+
+    if (num_filters == 0)
+    {
+      free(filters);
+      filters = NULL;
+    }
+    else
+    {
+     /*
+      * Compute filter cost...
+      */
+
+      for (i = 0; i < num_filters; i ++)
+	current->cost += filters[i].cost;
+    }
   }
 
  /*
@@ -1475,9 +1502,6 @@ StartJob(int       id,		/* I - Job ID */
 
   for (i = 0, slot = 0; i < num_filters; i ++)
   {
-    if (strcmp(filters[i].filter, "-") == 0)
-      continue; /* Skip nul filter... */
-
     if (filters[i].filter[0] != '/')
       snprintf(command, sizeof(command), "%s/filter/%s", ServerBin,
                filters[i].filter);
@@ -2910,5 +2934,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.133 2001/06/28 19:29:44 mike Exp $".
+ * End of "$Id: job.c,v 1.134 2001/07/17 12:38:49 mike Exp $".
  */

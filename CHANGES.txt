@@ -11,6 +11,9 @@ CHANGES IN CUPS V1.1.10
 	- The httpWrite() function did not transition the PUT
 	  request to the HTTP_STATUS state to get the status
 	  from the server.
+	- The scheduler did not properly handle trailing null
+	  ("-") filters when testing a driver that sent data
+	  to the file: pseudo-backend.
 
 
 CHANGES IN CUPS V1.1.9-1

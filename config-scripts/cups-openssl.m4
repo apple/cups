@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-openssl.m4,v 1.1 2001/06/27 19:06:46 mike Exp $"
+dnl "$Id: cups-openssl.m4,v 1.2 2001/07/17 12:38:48 mike Exp $"
 dnl
 dnl   OpenSSL stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -30,37 +30,39 @@ AC_ARG_WITH(openssl-includes, [  --with-openssl-includes    set directory for Op
     CFLAGS="-I$withval $CFLAGS"
     CXXFLAGS="-I$withval $CXXFLAGS",)
 
-dnl Save the current libraries so the crypto stuff isn't always
-dnl included...
-SAVELIBS="$LIBS"
-
-dnl Some ELF systems can't resolve all the symbols in libcrypto
-dnl if libcrypto was linked against RSAREF, and fail to link the
-dnl test program correctly, even though a correct installation
-dnl of OpenSSL exists.  So we test the linking three times in
-dnl case the RSAREF libraries are needed.
-
 SSLLIBS=""
 
-for libcrypto in \
-    "-lcrypto" \
-    "-lcrypto -lrsaref" \
-    "-lcrypto -lRSAglue -lrsaref"
-do
-    AC_CHECK_LIB(ssl,SSL_new,
-	[SSLLIBS="-lssl $libcrypto"
-	 AC_DEFINE(HAVE_LIBSSL)],,
-	$libcrypto)
+if test x$enable_ssl != xno; then
+    dnl Save the current libraries so the crypto stuff isn't always
+    dnl included...
+    SAVELIBS="$LIBS"
 
-    if test "x${SSLLIBS}" != "x"; then
-	break
-    fi
-done
+    dnl Some ELF systems can't resolve all the symbols in libcrypto
+    dnl if libcrypto was linked against RSAREF, and fail to link the
+    dnl test program correctly, even though a correct installation
+    dnl of OpenSSL exists.  So we test the linking three times in
+    dnl case the RSAREF libraries are needed.
 
-LIBS="$SAVELIBS"
+    for libcrypto in \
+	"-lcrypto" \
+	"-lcrypto -lrsaref" \
+	"-lcrypto -lRSAglue -lrsaref"
+    do
+	AC_CHECK_LIB(ssl,SSL_new,
+	    [SSLLIBS="-lssl $libcrypto"
+	     AC_DEFINE(HAVE_LIBSSL)],,
+	    $libcrypto)
+
+	if test "x${SSLLIBS}" != "x"; then
+	    break
+	fi
+    done
+
+    LIBS="$SAVELIBS"
+fi
 
 AC_SUBST(SSLLIBS)
 
 dnl
-dnl End of "$Id: cups-openssl.m4,v 1.1 2001/06/27 19:06:46 mike Exp $".
+dnl End of "$Id: cups-openssl.m4,v 1.2 2001/07/17 12:38:48 mike Exp $".
 dnl
