@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.87 2001/02/07 19:41:37 mike Exp $"
+ * "$Id: printers.c,v 1.88 2001/02/09 18:40:34 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -317,6 +317,19 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
 #endif /* __sgi */
 
  /*
+  * If p is the default printer, assign the next one...
+  */
+
+  if (p == DefaultPrinter)
+    DefaultPrinter = Printers;
+
+ /*
+  * Remove this printer from any classes...
+  */
+
+  DeletePrinterFromClasses(p);
+
+ /*
   * Free all memory used by the printer...
   */
 
@@ -331,13 +344,6 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
   FreeQuotas(p);
 
   free(p);
-
- /*
-  * If p is the default printer, assign the next one...
-  */
-
-  if (p == DefaultPrinter)
-    DefaultPrinter = Printers;
 
  /*
   * Write a new /etc/printcap file...
@@ -1705,5 +1711,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.87 2001/02/07 19:41:37 mike Exp $".
+ * End of "$Id: printers.c,v 1.88 2001/02/09 18:40:34 mike Exp $".
  */
