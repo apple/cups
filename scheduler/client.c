@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.37 1999/10/10 15:41:08 mike Exp $"
+ * "$Id: client.c,v 1.38 1999/10/22 18:30:18 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -775,7 +775,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
             snprintf(con->filename, sizeof(con->filename), "%s/requests/XXXXXX", ServerRoot);
 	    con->file = mkstemp(con->filename);
-	    fchmod(con->file, 0644);
+	    fchmod(con->file, 0640);
 
             LogMessage(LOG_DEBUG, "ReadClient() %d REQUEST %s", con->http.fd,
 	               con->filename);
@@ -1515,5 +1515,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.37 1999/10/10 15:41:08 mike Exp $".
+ * End of "$Id: client.c,v 1.38 1999/10/22 18:30:18 mike Exp $".
  */

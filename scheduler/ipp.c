@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.31 1999/10/15 18:27:51 mike Exp $"
+ * "$Id: ipp.c,v 1.32 1999/10/22 18:30:19 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -807,8 +807,15 @@ add_printer(client_t        *con,	/* I - Client connection */
       * interfaces directory and make it executable...
       */
 
-      rename(con->filename, filename);
-      chmod(filename, 0755);
+      if (rename(con->filename, filename))
+      {
+        LogMessage(LOG_ERROR, "add_printer: Unable to rename interface script - %s!",
+	           strerror(errno));
+        SendIPPError(con, IPP_INTERNAL_ERROR);
+	return;
+      }
+      else
+        chmod(filename, 0755);
     }
 
     sprintf(filename, "%s/ppd/%s.ppd", ServerRoot, printer->name);
@@ -820,8 +827,15 @@ add_printer(client_t        *con,	/* I - Client connection */
       * ppd directory and make it readable by all...
       */
 
-      rename(con->filename, filename);
-      chmod(filename, 0644);
+      if (rename(con->filename, filename))
+      {
+        LogMessage(LOG_ERROR, "add_printer: Unable to rename PPD file - %s!",
+	           strerror(errno));
+        SendIPPError(con, IPP_INTERNAL_ERROR);
+	return;
+      }
+      else
+        chmod(filename, 0644);
     }
     else
     {
@@ -953,6 +967,7 @@ cancel_job(client_t        *con,	/* I - Client connection */
 			resource[HTTP_MAX_URI];
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
+  job_t			*job;		/* Job information */
 
 
   DEBUG_printf(("cancel_job(%08x, %08x)\n", con, uri));
@@ -1017,14 +1032,36 @@ cancel_job(client_t        *con,	/* I - Client connection */
   * See if the job exists...
   */
 
-  if (FindJob(jobid) == NULL)
+  if ((job = FindJob(jobid)) == NULL)
   {
    /*
     * Nope - return a "not found" error...
     */
 
-    DEBUG_printf(("cancel_job: job #%d doesn't exist!\n", jobid));
+    LogMessage(LOG_ERROR, "cancel_job: job #%d doesn't exist!", jobid);
     send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * See if the job is owned by the requesting user...
+  */
+
+  if ((attr = ippFindAttribute(con->request, IPP_TAG_NAME, "requesting-user-name")) != NULL)
+  {
+    strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
+    username[sizeof(username) - 1] = '\0';
+  }
+  else if (con->username[0])
+    strcpy(username, con->username);
+  else
+    username[0] = '\0';
+
+  if (strcmp(username, job->username) != 0 && strcmp(username, "root") != 0)
+  {
+    LogMessage(LOG_ERROR, "cancel_job: \"%s\" not authorized to delete job id %d owned by \"%s\"!",
+               username, jobid, job->username);
+    send_ipp_error(con, IPP_FORBIDDEN);
     return;
   }
 
@@ -2539,5 +2576,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.31 1999/10/15 18:27:51 mike Exp $".
+ * End of "$Id: ipp.c,v 1.32 1999/10/22 18:30:19 mike Exp $".
  */
