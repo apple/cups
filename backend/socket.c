@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.35 2003/01/29 15:35:54 mike Exp $"
+ * "$Id: socket.c,v 1.36 2003/02/12 16:32:42 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -86,7 +86,7 @@ cups_hstrerror(int error)			/* I - Error number */
  * Local functions...
  */
 
-void	print_backchannel(const unsigned char *buffer, size_t nbytes);
+void	print_backchannel(const unsigned char *buffer, int nbytes);
 
 
 /*
@@ -97,9 +97,9 @@ void	print_backchannel(const unsigned char *buffer, size_t nbytes);
  *    printer-uri job-id user title copies options [file]
  */
 
-int			/* O - Exit status */
-main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
-     char *argv[])	/* I - Command-line arguments */
+int				/* O - Exit status */
+main(int  argc,			/* I - Number of command-line arguments (6 or 7) */
+     char *argv[])		/* I - Command-line arguments */
 {
   char		method[255],	/* Method in URI */
 		hostname[1024],	/* Hostname */
@@ -114,8 +114,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   struct sockaddr_in addr;	/* Socket address */
   struct hostent *hostaddr;	/* Host address */
   int		wbytes;		/* Number of bytes written */
-  size_t	nbytes,		/* Number of bytes read */
-		tbytes;		/* Total number of bytes written */
+  int		nbytes;		/* Number of bytes read */
+  size_t	tbytes;		/* Total number of bytes written */
   char		buffer[8192],	/* Output buffer */
 		*bufptr;	/* Pointer into buffer */
   struct timeval timeout;	/* Timeout for select() */
@@ -329,8 +329,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 	if ((nbytes = recv(fd, buffer, sizeof(buffer), 0)) > 0)
 	{
-	  fprintf(stderr, "INFO: Received %lu bytes of back-channel data!\n",
-	          (unsigned long)nbytes);
+	  fprintf(stderr, "INFO: Received %d bytes of back-channel data!\n",
+	          nbytes);
           print_backchannel((unsigned char *)buffer, nbytes);
         }
       }
@@ -372,8 +372,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 	if ((nbytes = recv(fd, buffer, sizeof(buffer), 0)) > 0)
 	{
-	  fprintf(stderr, "INFO: Received %lu bytes of back-channel data!\n",
-	          (unsigned long)nbytes);
+	  fprintf(stderr, "INFO: Received %d bytes of back-channel data!\n",
+	          nbytes);
           print_backchannel((unsigned char *)buffer, nbytes);
         }
 	else
@@ -409,7 +409,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 void
 print_backchannel(const unsigned char *buffer,	/* I - Data buffer */
-                  size_t              nbytes)	/* I - Number of bytes */
+                  int                 nbytes)	/* I - Number of bytes */
 {
   char	line[255],				/* Formatted line */
 	*lineptr;				/* Pointer into line */
@@ -442,5 +442,5 @@ print_backchannel(const unsigned char *buffer,	/* I - Data buffer */
 
 
 /*
- * End of "$Id: socket.c,v 1.35 2003/01/29 15:35:54 mike Exp $".
+ * End of "$Id: socket.c,v 1.36 2003/02/12 16:32:42 mike Exp $".
  */
