@@ -1,5 +1,5 @@
 /*
- * "$Id: gconfig.h,v 1.8 2000/03/10 21:04:35 mike Exp $"
+ * "$Id: gconfig.h,v 1.9 2000/03/13 19:05:23 mike Exp $"
  *
  *   GNU GhostScript configuration file for the Common UNIX Printing
  *   System (CUPS).
@@ -206,7 +206,7 @@ oper_(ztrap_op_defs)
 #ifdef psfile_
 psfile_("gs_ll3.ps",9)
 #endif
-#ifdef(oper_)
+#ifdef oper_
 #  ifdef HAVE_LIBZ
 oper_(zfzlib_op_defs)
 #  endif /* HAVE_LIBZ */
@@ -253,5 +253,5 @@ init_(gs_gximono_init)
 #define SEARCH_HERE_FIRST 1
 
 /*
- * End of "$Id: gconfig.h,v 1.8 2000/03/10 21:04:35 mike Exp $".
+ * End of "$Id: gconfig.h,v 1.9 2000/03/13 19:05:23 mike Exp $".
  */
