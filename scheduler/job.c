@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.164 2002/08/12 16:20:05 mike Exp $"
+ * "$Id: job.c,v 1.165 2002/08/21 02:04:03 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -3032,10 +3032,25 @@ start_process(const char *command,	/* I - Full path to command */
 {
   int	fd;				/* Looping var */
   int	pid;				/* Process ID */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  sigset_t	oldmask,		/* POSIX signal masks */
+		newmask;
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
   LogMessage(L_DEBUG, "start_process(\"%s\", %p, %p, %d, %d, %d)",
              command, argv, envp, infd, outfd, errfd);
+
+ /*
+  * Block signals before forking...
+  */
+
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  sigemptyset(&newmask);
+  sigaddset(&newmask, SIGTERM);
+  sigaddset(&newmask, SIGCHLD);
+  sigprocmask(SIG_BLOCK, &newmask, &oldmask);
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
   if ((pid = fork()) == 0)
   {
@@ -3121,10 +3136,14 @@ start_process(const char *command,	/* I - Full path to command */
     return (0);
   }
 
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  sigprocmask(SIG_SETMASK, &oldmask, NULL);
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+
   return (pid);
 }
 
 
 /*
- * End of "$Id: job.c,v 1.164 2002/08/12 16:20:05 mike Exp $".
+ * End of "$Id: job.c,v 1.165 2002/08/21 02:04:03 mike Exp $".
  */

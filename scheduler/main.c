@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.76 2002/07/22 12:22:29 mike Exp $"
+ * "$Id: main.c,v 1.77 2002/08/21 02:04:04 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -277,6 +277,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   sigemptyset(&action.sa_mask);
   sigaddset(&action.sa_mask, SIGTERM);
+  sigaddset(&action.sa_mask, SIGCHLD);
   action.sa_handler = sigterm_handler;
   sigaction(SIGTERM, &action, NULL);
 #else
@@ -630,6 +631,7 @@ CatchChildSignals(void)
   memset(&action, 0, sizeof(action));
 
   sigemptyset(&action.sa_mask);
+  sigaddset(&action.sa_mask, SIGTERM);
   sigaddset(&action.sa_mask, SIGCHLD);
   action.sa_handler = sigchld_handler;
   sigaction(SIGCHLD, &action, NULL);
@@ -717,7 +719,8 @@ sigchld_handler(int sig)	/* I - Signal number */
     }
 
     for (job = Jobs; job != NULL; job = job->next)
-      if (job->state->values[0].integer == IPP_JOB_PROCESSING)
+      if (job->state != NULL &&
+          job->state->values[0].integer == IPP_JOB_PROCESSING)
       {
 	for (i = 0; job->procs[i]; i ++)
           if (job->procs[i] == pid)
@@ -876,5 +879,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.76 2002/07/22 12:22:29 mike Exp $".
+ * End of "$Id: main.c,v 1.77 2002/08/21 02:04:04 mike Exp $".
  */

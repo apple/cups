@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.164 2002/08/19 18:46:17 mike Exp $"
+ * "$Id: ipp.c,v 1.165 2002/08/21 02:04:03 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2122,6 +2122,21 @@ create_job(client_t        *con,	/* I - Client connection */
   }
 
  /*
+  * Validate job template attributes; for now just copies...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "copies", IPP_TAG_INTEGER)) != NULL)
+  {
+    if (attr->values[0].integer < 1 || attr->values[0].integer > 100)
+    {
+      LogMessage(L_INFO, "create_job: bad copies value %d.",
+                 attr->values[0].integer);
+      send_ipp_error(con, IPP_ATTRIBUTES);
+      return;
+    }
+  }
+
+ /*
   * Make sure we aren't over our limit...
   */
 
@@ -3821,6 +3836,21 @@ print_job(client_t        *con,		/* I - Client connection */
                con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
+  }
+
+ /*
+  * Validate job template attributes; for now just copies...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "copies", IPP_TAG_INTEGER)) != NULL)
+  {
+    if (attr->values[0].integer < 1 || attr->values[0].integer > 100)
+    {
+      LogMessage(L_INFO, "print_job: bad copies value %d.",
+                 attr->values[0].integer);
+      send_ipp_error(con, IPP_ATTRIBUTES);
+      return;
+    }
   }
 
  /*
@@ -5764,5 +5794,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.164 2002/08/19 18:46:17 mike Exp $".
+ * End of "$Id: ipp.c,v 1.165 2002/08/21 02:04:03 mike Exp $".
  */
