@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.162 2002/07/18 15:39:22 mike Exp $"
+ * "$Id: ipp.c,v 1.163 2002/07/23 21:16:26 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -502,7 +502,7 @@ accept_jobs(client_t        *con,	/* I - Client connection */
   * Accept jobs sent to the printer...
   */
 
-  if (dtype == CUPS_PRINTER_CLASS)
+  if (dtype & CUPS_PRINTER_CLASS)
     printer = FindClass(name);
   else
     printer = FindPrinter(name);
@@ -510,7 +510,7 @@ accept_jobs(client_t        *con,	/* I - Client connection */
   printer->accepting        = 1;
   printer->state_message[0] = '\0';
 
-  if (dtype == CUPS_PRINTER_CLASS)
+  if (dtype & CUPS_PRINTER_CLASS)
     SaveAllClasses();
   else
     SaveAllPrinters();
@@ -786,7 +786,7 @@ add_class(client_t        *con,		/* I - Client connection */
       * Add it to the class...
       */
 
-      if (dtype == CUPS_PRINTER_CLASS)
+      if (dtype & CUPS_PRINTER_CLASS)
       {
         AddPrinterToClass(pclass, FindClass(dest));
 
@@ -2099,7 +2099,7 @@ create_job(client_t        *con,	/* I - Client connection */
   * See if the printer is accepting jobs...
   */
 
-  if (dtype == CUPS_PRINTER_CLASS)
+  if (dtype & CUPS_PRINTER_CLASS)
   {
     printer = FindClass(dest);
     snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/classes/%s",
@@ -2809,7 +2809,7 @@ delete_printer(client_t        *con,	/* I - Client connection */
   * Find the printer or class and delete it...
   */
 
-  if (dtype == CUPS_PRINTER_CLASS)
+  if (dtype & CUPS_PRINTER_CLASS)
     printer = FindClass(dest);
   else
     printer = FindPrinter(dest);
@@ -2830,7 +2830,7 @@ delete_printer(client_t        *con,	/* I - Client connection */
   snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd", ServerRoot, dest);
   unlink(filename);
 
-  if (dtype == CUPS_PRINTER_CLASS)
+  if (dtype & CUPS_PRINTER_CLASS)
   {
     LogMessage(L_INFO, "Class \'%s\' deleted by \'%s\'.", dest,
                con->username);
@@ -3264,7 +3264,7 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
     return;
   }
 
-  if (dtype == CUPS_PRINTER_CLASS)
+  if (dtype & CUPS_PRINTER_CLASS)
     printer = FindClass(dest);
   else
     printer = FindPrinter(dest);
@@ -3944,7 +3944,7 @@ print_job(client_t        *con,		/* I - Client connection */
   * See if the printer is accepting jobs...
   */
 
-  if (dtype == CUPS_PRINTER_CLASS)
+  if (dtype & CUPS_PRINTER_CLASS)
   {
     printer = FindClass(dest);
     snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/classes/%s",
@@ -4363,7 +4363,7 @@ reject_jobs(client_t        *con,	/* I - Client connection */
   * Reject jobs sent to the printer...
   */
 
-  if (dtype == CUPS_PRINTER_CLASS)
+  if (dtype & CUPS_PRINTER_CLASS)
     printer = FindClass(name);
   else
     printer = FindPrinter(name);
@@ -4377,17 +4377,20 @@ reject_jobs(client_t        *con,	/* I - Client connection */
     strlcpy(printer->state_message, attr->values[0].string.text,
             sizeof(printer->state_message));
 
-  if (dtype == CUPS_PRINTER_CLASS)
+  if (dtype & CUPS_PRINTER_CLASS)
+  {
     SaveAllClasses();
-  else
-    SaveAllPrinters();
 
-  if (dtype == CUPS_PRINTER_CLASS)
     LogMessage(L_INFO, "Class \'%s\' rejecting jobs (\'%s\').", name,
                con->username);
+  }
   else
+  {
+    SaveAllPrinters();
+
     LogMessage(L_INFO, "Printer \'%s\' rejecting jobs (\'%s\').", name,
                con->username);
+  }
 
  /*
   * Everything was ok, so return OK status...
@@ -5108,7 +5111,7 @@ set_default(client_t        *con,	/* I - Client connection */
   * Set it as the default...
   */
 
-  if (dtype == CUPS_PRINTER_CLASS)
+  if (dtype & CUPS_PRINTER_CLASS)
     DefaultPrinter = FindClass(name);
   else
     DefaultPrinter = FindPrinter(name);
@@ -5415,7 +5418,7 @@ start_printer(client_t        *con,	/* I - Client connection */
   * Start the printer...
   */
 
-  if (dtype == CUPS_PRINTER_CLASS)
+  if (dtype & CUPS_PRINTER_CLASS)
     printer = FindClass(name);
   else
     printer = FindPrinter(name);
@@ -5424,17 +5427,20 @@ start_printer(client_t        *con,	/* I - Client connection */
 
   printer->state_message[0] = '\0';
 
-  if (dtype == CUPS_PRINTER_CLASS)
+  if (dtype & CUPS_PRINTER_CLASS)
+  {
     SaveAllClasses();
-  else
-    SaveAllPrinters();
 
-  if (dtype == CUPS_PRINTER_CLASS)
     LogMessage(L_INFO, "Class \'%s\' started by \'%s\'.", name,
                con->username);
+  }
   else
+  {
+    SaveAllPrinters();
+
     LogMessage(L_INFO, "Printer \'%s\' started by \'%s\'.", name,
                con->username);
+  }
 
   CheckJobs();
 
@@ -5505,7 +5511,7 @@ stop_printer(client_t        *con,	/* I - Client connection */
   * Stop the printer...
   */
 
-  if (dtype == CUPS_PRINTER_CLASS)
+  if (dtype & CUPS_PRINTER_CLASS)
     printer = FindClass(name);
   else
     printer = FindPrinter(name);
@@ -5521,17 +5527,20 @@ stop_printer(client_t        *con,	/* I - Client connection */
             sizeof(printer->state_message));
   }
 
-  if (dtype == CUPS_PRINTER_CLASS)
+  if (dtype & CUPS_PRINTER_CLASS)
+  {
     SaveAllClasses();
-  else
-    SaveAllPrinters();
 
-  if (dtype == CUPS_PRINTER_CLASS)
     LogMessage(L_INFO, "Class \'%s\' stopped by \'%s\'.", name,
                con->username);
+  }
   else
+  {
+    SaveAllPrinters();
+
     LogMessage(L_INFO, "Printer \'%s\' stopped by \'%s\'.", name,
                con->username);
+  }
 
  /*
   * Everything was ok, so return OK status...
@@ -5748,5 +5757,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.162 2002/07/18 15:39:22 mike Exp $".
+ * End of "$Id: ipp.c,v 1.163 2002/07/23 21:16:26 mike Exp $".
  */
