@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.3 2001/12/26 16:52:52 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.4 2001/12/27 00:04:52 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -672,6 +672,7 @@ StartBrowsing(void)
 
     BrowseSLPRefresh = 0;
   }
+#endif /* HAVE_LIBSLP */
 }
 
 
@@ -748,7 +749,6 @@ StartPolling(void)
                  poll->hostname, poll->port, pid);
     }
   }
->>>>>>> 1.86
 }
 
 
@@ -1584,5 +1584,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.3 2001/12/26 16:52:52 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.4 2001/12/27 00:04:52 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.2 2001/12/26 16:52:51 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.3 2001/12/27 00:04:52 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -614,13 +614,6 @@ read_configuration(FILE *fp)		/* I - File to read from */
   location_t	*location;		/* Browse location */
   FILE		*incfile;		/* Include file */
   char		incname[1024];		/* Include filename */
-  static unsigned netmasks[4] =		/* Standard netmasks... */
-  {
-    0xff000000,
-    0xffff0000,
-    0xffffff00,
-    0xffffffff
-  };
 
 
  /*
@@ -1995,5 +1988,5 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.2 2001/12/26 16:52:51 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.3 2001/12/27 00:04:52 mike Exp $".
  */

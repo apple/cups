@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.36.2.3 2001/12/26 16:52:12 mike Exp $"
+ * "$Id: ipp.h,v 1.36.2.4 2001/12/27 00:04:50 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -105,8 +105,8 @@ typedef enum			/**** Format tags for attribute formats... ****/
   IPP_TAG_LANGUAGE,
   IPP_TAG_MIMETYPE,
   IPP_TAG_MEMBERNAME,
-  IPP_TAG_MASK = 0x3fffffff,	/* Mask for copied attribute values */
-  IPP_TAG_COPY = 0x40000000	/* Bitflag for copied attribute values */
+  IPP_TAG_MASK = 0x7fffffff,	/* Mask for copied attribute values */
+  IPP_TAG_COPY = -0x7fffffff-1	/* Bitflag for copied attribute values */
 } ipp_tag_t;
 
 typedef enum			/**** Resolution units... ****/
@@ -402,16 +402,17 @@ extern ipp_attribute_t	*ippAddStrings(ipp_t *ipp, ipp_tag_t group, ipp_tag_t typ
 extern time_t		ippDateToTime(const ipp_uchar_t *date);
 extern void		ippDelete(ipp_t *ipp);
 extern const char	*ippErrorString(ipp_status_t error);
-extern ipp_attribute_t	*ippFindAttribute(ipp_t *ipp, const char *name, ipp_tag_t type);
+extern ipp_attribute_t	*ippFindAttribute(ipp_t *ipp, const char *name,
+			                  ipp_tag_t type);
+extern ipp_attribute_t	*ippFindNextAttribute(ipp_t *ipp, const char *name,
+			                      ipp_tag_t type);
 extern size_t		ippLength(ipp_t *ipp);
 extern ipp_t		*ippNew(void);
-extern int		ippPort(void);
 extern ipp_state_t	ippRead(http_t *http, ipp_t *ipp);
-extern ipp_state_t	ippReadFile(int fd, ipp_t *ipp);
-extern void		ippSetPort(int p);
 extern const ipp_uchar_t *ippTimeToDate(time_t t);
 extern ipp_state_t	ippWrite(http_t *http, ipp_t *ipp);
-extern ipp_state_t	ippWriteFile(int fd, ipp_t *ipp);
+extern int		ippPort(void);
+extern void		ippSetPort(int p);
 
 extern ipp_attribute_t	*_ipp_add_attr(ipp_t *, int);
 extern void		_ipp_free_attr(ipp_attribute_t *);
@@ -427,5 +428,5 @@ extern void		_ipp_free_attr(ipp_attribute_t *);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.36.2.3 2001/12/26 16:52:12 mike Exp $".
+ * End of "$Id: ipp.h,v 1.36.2.4 2001/12/27 00:04:50 mike Exp $".
  */

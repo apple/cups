@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.4 2001/12/26 16:52:55 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.5 2001/12/27 00:04:53 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -97,23 +97,20 @@ AddPrinter(const char *name)	/* I - Name of printer */
   snprintf(p->uri, sizeof(p->uri), "ipp://%s:%d/printers/%s", ServerName,
            ntohs(Listeners[0].address.ipv4.sin_port), name);
 
- /*
-  * Since uri and more_info are URIs and use the HTTP_MAX_URI constant
-  * to determine the size of the strings, this copy is safe.
-  */
-
-  strcpy(p->more_info, p->uri);
-
   p->state     = IPP_PRINTER_STOPPED;
   p->accepting = 0;
   p->filetype  = mimeAddType(MimeDatabase, "printer", name);
 
   if (Classification[0])
+  {
     strcpy(p->job_sheets[0], Classification);
+    strcpy(p->job_sheets[1], Classification);
+  }
   else
+  {
     strcpy(p->job_sheets[0], "none");
-
-  strcpy(p->job_sheets[1], "none");
+    strcpy(p->job_sheets[1], "none");
+  }
 
  /*
   * Setup required filters and IPP attributes...
@@ -474,7 +471,7 @@ LoadAllPrinters(void)
 
 
  /*
-  * Open the printer.conf file...
+  * Open the printers.conf file...
   */
 
   snprintf(line, sizeof(line), "%s/printers.conf", ServerRoot);
@@ -626,28 +623,31 @@ LoadAllPrinters(void)
     }
     else if (strcmp(name, "JobSheets") == 0)
     {
-     /*
-      * Set the initial job sheets...
-      */
-
-      for (valueptr = value; *valueptr && !isspace(*valueptr); valueptr ++);
-
-      if (*valueptr)
-        *valueptr++ = '\0';
-
-      strncpy(p->job_sheets[0], value, sizeof(p->job_sheets[0]) - 1);
-
-      while (isspace(*valueptr))
-        valueptr ++;
-
-      if (*valueptr)
+      if (!Classification[0])
       {
-        for (value = valueptr; *valueptr && !isspace(*valueptr); valueptr ++);
+       /*
+	* Set the initial job sheets...
+	*/
+
+	for (valueptr = value; *valueptr && !isspace(*valueptr); valueptr ++);
 
 	if (*valueptr)
           *valueptr++ = '\0';
 
-	strncpy(p->job_sheets[1], value, sizeof(p->job_sheets[1]) - 1);
+	strncpy(p->job_sheets[0], value, sizeof(p->job_sheets[0]) - 1);
+
+	while (isspace(*valueptr))
+          valueptr ++;
+
+	if (*valueptr)
+	{
+          for (value = valueptr; *valueptr && !isspace(*valueptr); valueptr ++);
+
+	  if (*valueptr)
+            *valueptr++ = '\0';
+
+	  strncpy(p->job_sheets[1], value, sizeof(p->job_sheets[1]) - 1);
+	}
       }
     }
     else if (strcmp(name, "AllowUser") == 0)
@@ -692,6 +692,7 @@ SaveAllPrinters(void)
   int		i;			/* Looping var */
   FILE		*fp;			/* printers.conf file */
   char		temp[1024];		/* Temporary string */
+  char		backup[1024];		/* printers.conf.O file */
   printer_t	*printer;		/* Current printer class */
   time_t	curtime;		/* Current time */
   struct tm	*curdate;		/* Current date */
@@ -702,9 +703,17 @@ SaveAllPrinters(void)
   */
 
   snprintf(temp, sizeof(temp), "%s/printers.conf", ServerRoot);
+  snprintf(backup, sizeof(backup), "%s/printers.conf.O", ServerRoot);
+
+  if (rename(temp, backup))
+    LogMessage(L_ERROR, "Unable to backup printers.conf - %s", strerror(errno));
+
   if ((fp = fopen(temp, "w")) == NULL)
   {
     LogMessage(L_ERROR, "Unable to save printers.conf - %s", strerror(errno));
+
+    if (rename(backup, temp))
+      LogMessage(L_ERROR, "Unable to restore printers.conf - %s", strerror(errno));
     return;
   }
   else
@@ -932,33 +941,13 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
     else
       snprintf(resource, sizeof(resource), "/printers/%s", p->name);
 
-    for (i = NumLocations, auth = Locations; i > 0; i --, auth ++)
-      if (strcmp(auth->location, resource) == 0)
-      {
-       /*
-        * Exact match...
-	*/
-
-	if (auth->type == AUTH_BASIC)
-	  auth_supported = "basic";
-	else if (auth->type == AUTH_DIGEST)
-	  auth_supported = "digest";
-	break;
-      }
-      else if (strcmp(auth->location, "/") == 0 ||
-               (strncmp(auth->location, resource, auth_len) == 0 &&
-                (strlen(auth->location) == auth_len ||
-	         strlen(auth->location) == (auth_len + 1))))
-      {
-       /*
-        * Matches base printer or class resources...
-	*/
-
-	if (auth->type == AUTH_BASIC)
-	  auth_supported = "basic";
-	else if (auth->type == AUTH_DIGEST)
-	  auth_supported = "digest";
-      }
+    if ((auth = FindBest(resource, HTTP_POST)) != NULL)
+    {
+      if (auth->type == AUTH_BASIC)
+	auth_supported = "basic";
+      else if (auth->type == AUTH_DIGEST)
+	auth_supported = "digest";
+    }
   }
 
  /*
@@ -1071,13 +1060,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
     {
       attr->values[0].string.text = strdup("none");
 
-      if (Classification[0])
-	attr->values[1].string.text = strdup(Classification);
-      else
-      {
-	for (i = 0; i < NumBanners; i ++)
-	  attr->values[i + 1].string.text = strdup(Banners[i].name);
-      }
+      for (i = 0; i < NumBanners; i ++)
+	attr->values[i + 1].string.text = strdup(Banners[i].name);
     }
 
     if (!(p->type & CUPS_PRINTER_REMOTE))
@@ -1835,5 +1819,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.4 2001/12/26 16:52:55 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.5 2001/12/27 00:04:53 mike Exp $".
  */

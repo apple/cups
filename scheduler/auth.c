@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.41.2.3 2001/12/26 16:52:50 mike Exp $"
+ * "$Id: auth.c,v 1.41.2.4 2001/12/27 00:04:51 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -528,6 +528,9 @@ FindBest(const char   *path,	/* I - Resource path */
          http_state_t state)	/* I - HTTP state/request */
 {
   int		i;		/* Looping var */
+  char		uri[HTTP_MAX_URI],
+				/* URI in request... */
+		*uriptr;	/* Pointer into URI */
   location_t	*loc,		/* Current location */
 		*best;		/* Best match for location so far */
   int		bestlen;	/* Length of best match */
@@ -589,7 +592,7 @@ FindBest(const char   *path,	/* I - Resource path */
                loc->location, loc->limit);
 
     if (loc->length > bestlen &&
-        strncmp(con->uri, loc->location, loc->length) == 0 &&
+        strncmp(uri, loc->location, loc->length) == 0 &&
 	loc->location[0] == '/' &&
 	(limit & loc->limit) != 0)
     {
@@ -840,8 +843,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
   pw = NULL;
 
-  if ((address != 0x7f000001 &&
-       strcasecmp(con->http.hostname, "localhost") != 0) ||
+  if (strcasecmp(con->http.hostname, "localhost") != 0 ||
       strncmp(con->http.fields[HTTP_FIELD_AUTHORIZATION], "Local", 5) != 0)
   {
    /*
@@ -1543,5 +1545,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.41.2.3 2001/12/26 16:52:50 mike Exp $".
+ * End of "$Id: auth.c,v 1.41.2.4 2001/12/27 00:04:51 mike Exp $".
  */
