@@ -1102,6 +1102,7 @@ determine how the server operates:
 	<LI><A HREF="#DocumentRoot"><CODE>DocumentRoot</CODE></A>
 	<LI><A HREF="#Encryption"><CODE>Encryption</CODE></A>
 	<LI><A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A>
+	<LI><A HREF="#FaxRetryInterval"><CODE>FaxRetryInterval</CODE></A>
 
 </TD>
 <TD VALIGN="TOP">
@@ -1109,7 +1110,6 @@ determine how the server operates:
 </TD>
 <TD VALIGN="TOP">
 
-	<LI><A HREF="#FaxRetryInterval"><CODE>FaxRetryInterval</CODE></A>
 	<LI><A HREF="#FaxRetryLimit"><CODE>FaxRetryLimit</CODE></A>
 	<LI><A HREF="#FileDevice"><CODE>FileDevice</CODE></A>
 	<LI><A HREF="#FilterLimit"><CODE>FilterLimit</CODE></A>
@@ -1137,6 +1137,8 @@ determine how the server operates:
 	<LI><A HREF="#MaxJobsPerPrinter"><CODE>MaxJobsPerPrinter</CODE></A>
 	<LI><A HREF="#MaxJobsPerUser"><CODE>MaxJobsPerUser</CODE></A>
 	<LI><A HREF="#MaxLogSize"><CODE>MaxLogSize</CODE></A>
+	<LI><A HREF="#MaxRequestSize"><CODE>MaxRequestSize</CODE></A>
+	<LI><A HREF="#Order"><CODE>Order</CODE></A>
 
 </TD>
 <TD VALIGN="TOP">
@@ -1144,8 +1146,6 @@ determine how the server operates:
 </TD>
 <TD VALIGN="TOP">
 
-	<LI><A HREF="#MaxRequestSize"><CODE>MaxRequestSize</CODE></A>
-	<LI><A HREF="#Order"><CODE>Order</CODE></A>
 	<LI><A HREF="#PageLog"><CODE>PageLog</CODE></A>
 	<LI><A HREF="#Port"><CODE>Port</CODE></A>
 	<LI><A HREF="#PreserveJobFiles"><CODE>PreserveJobFiles</CODE></A>
@@ -1153,6 +1153,7 @@ determine how the server operates:
 	<LI><A HREF="#Printcap"><CODE>Printcap</CODE></A>
 	<LI><A HREF="#PrintcapFormat"><CODE>PrintcapFormat</CODE></A>
 	<LI><A HREF="#PrintcapGUI"><CODE>PrintcapGUI</CODE></A>
+	<LI><A HREF="#ReloadTimeout"><CODE>ReloadTimeout</CODE></A>
 	<LI><A HREF="#RemoteRoot"><CODE>RemoteRoot</CODE></A>
 	<LI><A HREF="#RequestRoot"><CODE>RequestRoot</CODE></A>
 	<LI><A HREF="#Require"><CODE>Require</CODE></A>
@@ -2909,6 +2910,24 @@ a printer and the <CODE>-o</CODE> option to specify one or more
 options. After allowing the user to select/change options, the
 program must then write the list of printing options without the
 <CODE>-o</CODE> to the standard output.
+
+<!-- NEED 3in -->
+<H3><A NAME="ReloadTimeout">ReloadTimeout</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+ReloadTimeout 60
+ReloadTimeout 3600
+ReloadTimeout 0
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>ReloadTimeout</CODE> directive sets how long the
+scheduler waits for jobs to complete before reloading the server
+configuration. The default timeout is 60 seconds.
 
 <!-- NEED 3in -->
 <H3><A NAME="RemoteRoot">RemoteRoot</A></H3>
