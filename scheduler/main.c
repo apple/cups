@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.24 1999/07/07 18:32:00 mike Exp $"
+ * "$Id: main.c,v 1.25 1999/07/08 14:22:58 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -99,15 +99,6 @@ main(int  argc,			/* I - Number of command-line arguments */
       fprintf(stderr, "cupsd: Unknown argument \'%s\' - aborting!\n", argv[i]);
       usage();
     }
-
- /*
-  * Run in the background...
-  */
-
-  errno = 0;
-
-  if (fork())
-    return (errno);
 
  /*
   * Set the timezone info...
@@ -427,5 +418,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.24 1999/07/07 18:32:00 mike Exp $".
+ * End of "$Id: main.c,v 1.25 1999/07/08 14:22:58 mike Exp $".
  */
