@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c,v 1.8 1999/06/29 11:53:17 mike Exp $"
+ * "$Id: options.c,v 1.9 1999/07/12 13:16:43 mike Exp $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -279,6 +279,9 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 {
   int	i;					/* Looping var */
   int	conflict;				/* Option conflicts */
+  char	*val,					/* Pointer into value */
+	*ptr,					/* Pointer into string */
+	s[255];					/* Temporary string */
 
 
   conflict = 0;
@@ -286,17 +289,40 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
   for (i = num_options; i > 0; i --, options ++)
     if (strcmp(options->name, "media") == 0)
     {
-      if (ppdMarkOption(ppd, "PageSize", options->value))
-        conflict = 1;
-      if (ppdMarkOption(ppd, "InputSlot", options->value))
-        conflict = 1;
-      if (ppdMarkOption(ppd, "MediaType", options->value))
-        conflict = 1;
-      if (ppdMarkOption(ppd, "EFMediaQualityMode", options->value))	/* EFI */
-        conflict = 1;
-      if (strcasecmp(options->value, "manual") == 0)
-        if (ppdMarkOption(ppd, "ManualFeed", "True"))
-	  conflict = 1;
+     /*
+      * Loop through the option string, separating it at commas and
+      * marking each individual option.
+      */
+
+      for (val = options->value; *val;)
+      {
+       /*
+        * Extract the sub-option from the string...
+	*/
+
+        for (ptr = s; *val && *val != ',' && (ptr - s) < (sizeof(s) - 1);)
+	  *ptr++ = *val++;
+	*ptr++ = '\0';
+
+	if (*val == ',')
+	  val ++;
+
+       /*
+        * Mark it...
+	*/
+
+	if (ppdMarkOption(ppd, "PageSize", s))
+          conflict = 1;
+	if (ppdMarkOption(ppd, "InputSlot", s))
+          conflict = 1;
+	if (ppdMarkOption(ppd, "MediaType", s))
+          conflict = 1;
+	if (ppdMarkOption(ppd, "EFMediaQualityMode", s))	/* EFI */
+          conflict = 1;
+	if (strcasecmp(s, "manual") == 0)
+          if (ppdMarkOption(ppd, "ManualFeed", "True"))
+	    conflict = 1;
+      }
     }
     else if (strcmp(options->name, "sides") == 0)
     {
@@ -348,5 +374,5 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: options.c,v 1.8 1999/06/29 11:53:17 mike Exp $".
+ * End of "$Id: options.c,v 1.9 1999/07/12 13:16:43 mike Exp $".
  */
