@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4,v 1.3 2001/06/29 14:19:09 mike Exp $"
+dnl "$Id: cups-compiler.m4,v 1.4 2001/07/03 13:55:11 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -37,7 +37,12 @@ if test -n "$GCC"; then
 	CXX="$CC"
 
 	if test -z "$OPTIM"; then
-	       	OPTIM="-O2"
+		if test $uname = HP-UX
+			# GCC under HP-UX has bugs with -O2
+			OPTIM="-O1"
+		else
+		       	OPTIM="-O2"
+		fi
 	fi
 	if test $PICFLAG = 1 -a $uname != AIX; then
     		OPTIM="-fPIC $OPTIM"
@@ -109,5 +114,5 @@ else
 fi
 
 dnl
-dnl End of "$Id: cups-compiler.m4,v 1.3 2001/06/29 14:19:09 mike Exp $".
+dnl End of "$Id: cups-compiler.m4,v 1.4 2001/07/03 13:55:11 mike Exp $".
 dnl
