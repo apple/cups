@@ -21,7 +21,7 @@
 % Ghostscript, as distributed by Aladdin Enterprises, does not require any
 % GNU software to build or run it.
 
-% $Id: gs_statd.ps,v 1.3 2000/06/23 14:48:47 mike Exp $
+% $Id: gs_statd.ps,v 1.4 2000/09/29 13:31:48 mike Exp $
 % This file provides statusdict, serverdict, and assorted LaserWriter
 % operators, mostly for the benefit of poorly designed PostScript programs
 % that 'know' they are running on a LaserWriter.
@@ -46,11 +46,11 @@ end
 userdict begin
 		% Page sizes defined by Adobe documentation
  /11x17 {792 1224 //.setpagesize exec} bind def  % 11x17 portrait
- /a3 {842 1190 //.setpagesize exec} bind def
+ /a3 {842 1191 //.setpagesize exec} bind def
  /a4 {595 842 //.setpagesize exec} bind def
 % a4small should be a4 with an ImagingBBox of [25 25 570 817].
  /a4small /a4 load def
- /b5 {501 709 //.setpagesize exec} bind def
+ /b5 {516 729 //.setpagesize exec} bind def
  /ledger {1224 792 //.setpagesize exec} bind def  % 11x17 landscape
  /legal {612 1008 //.setpagesize exec} bind def
  /letter {612 792 //.setpagesize exec} bind def
@@ -63,30 +63,35 @@ userdict begin
 STRICT { (%END) .skipeof } if
 		% Other page sizes
 	% ISO standard paper sizes
- /a0 {2380 3368 //.setpagesize exec} bind def
- /a1 {1684 2380 //.setpagesize exec} bind def
- /a2 {1190 1684 //.setpagesize exec} bind def
-% /a3 {842 1190 //.setpagesize exec} bind def	% defined by Adobe
+ /a0 {2384 3370 //.setpagesize exec} bind def
+ /a1 {1684 2384 //.setpagesize exec} bind def
+ /a2 {1191 1684 //.setpagesize exec} bind def
+% /a3 {842 1191 //.setpagesize exec} bind def	% defined by Adobe
 % /a4 {595 842 //.setpagesize exec} bind def	% defined by Adobe
- /a5 {421 595 //.setpagesize exec} bind def
- /a6 {297 421 //.setpagesize exec} bind def
+ /a5 {420 595 //.setpagesize exec} bind def
+ /a6 {297 420 //.setpagesize exec} bind def
  /a7 {210 297 //.setpagesize exec} bind def
  /a8 {148 210 //.setpagesize exec} bind def
  /a9 {105 148 //.setpagesize exec} bind def
- /a10 {74 105 //.setpagesize exec} bind def
- /b0 {2836 4008 //.setpagesize exec} bind def
- /b1 {2004 2836 //.setpagesize exec} bind def
- /b2 {1418 2004 //.setpagesize exec} bind def
- /b3 {1002 1418 //.setpagesize exec} bind def
- /b4 {709 1002 //.setpagesize exec} bind def
-% /b5 {501 709 //.setpagesize exec} bind def	% defined by Adobe
- /c0 {2600 3677 //.setpagesize exec} bind def
- /c1 {1837 2600 //.setpagesize exec} bind def
+ /a10 {73 105 //.setpagesize exec} bind def
+ /b0 {2920 4127 //.setpagesize exec} bind def
+ /b1 {2064 2920 //.setpagesize exec} bind def
+ /b2 {1460 2064 //.setpagesize exec} bind def
+ /b3 {1032 1460 //.setpagesize exec} bind def
+ /b4 {729 1032 //.setpagesize exec} bind def
+% /b5 {516 729 //.setpagesize exec} bind def	% defined by Adobe
+ /b6 {363 516 //.setpagesize exec} bind def
+ /b7 {258 363 //.setpagesize exec} bind def
+ /b8 {181 258 //.setpagesize exec} bind def
+ /b9 {127 181 //.setpagesize exec} bind def
+ /b10 {91 127 //.setpagesize exec} bind def
+ /c0 {2599 3676 //.setpagesize exec} bind def
+ /c1 {1837 2599 //.setpagesize exec} bind def
  /c2 {1298 1837 //.setpagesize exec} bind def
  /c3 {918 1298 //.setpagesize exec} bind def
  /c4 {649 918 //.setpagesize exec} bind def
  /c5 {459 649 //.setpagesize exec} bind def
- /c6 {323 459 //.setpagesize exec} bind def
+ /c6 {324 459 //.setpagesize exec} bind def
 	% U.S. CAD standard paper sizes
  /archE {2592 3456 //.setpagesize exec} bind def
  /archD {1728 2592 //.setpagesize exec} bind def
