@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.39 2000/01/20 13:05:39 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.40 2000/01/20 14:56:28 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -3185,7 +3185,7 @@ format_YMC(cups_page_header_t *header,	/* I - Page header */
     bitoffset = 0;
 
   ptr       = row + bitoffset / 8;
-  bandwidth = header->cupsBytesPerLine / 4;
+  bandwidth = header->cupsBytesPerLine / 3;
 
   switch (header->cupsColorOrder)
   {
@@ -3971,5 +3971,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.39 2000/01/20 13:05:39 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.40 2000/01/20 14:56:28 mike Exp $".
  */
