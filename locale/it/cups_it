@@ -1,123 +1,123 @@
 iso-8859-1
-GIUSTO 
-Annullamento 
+Procedi 
+Annulla
 Aiuto 
-Rinunciato 
-Vicino 
+Esci 
+Chiudi 
 Sì 
 No 
-Su 
-Fuori di 
-Risparmi 
-Scarto 
-Difetto 
+Attivo 
+Inattivo
+Salva 
+Scarta 
+Standard 
 Opzioni 
-Più Info 
+Più Informazioni 
 Nero 
 Colore 
 Ciano 
-Fucsina 
-Colore giallo 
-Copyright 1993-1999 da di Easy Software Products, tutti radrizza riservato. 
-Generalità 
+Fucsia 
+Giallo 
+Copyright 1993-1999 di Easy Software Products, tutti i diritti riservati. 
+Generale
 Stampante 
-Opzioni Di Immagine 
-Opzioni Di HP-GL/2
-Supplemento 
+Opzioni per immagini
+Opzioni per HP-GL/2
+Extra 
 Documento 
 Altro 
-Pagine Della Stampa: 
+Stampa delle pagine: 
 Intero Documento 
-Gamma Di Pagina: 
-Ordine D'inversione: 
-Formato Della Pagina: 
+Stampa intervallo: 
+Ordine inverso: 
+Formato della pagina: 
  1-Up 
  2-Up 
  4-Up 
-Scaling Di Immagine: 
-Formato Naturale Di Immagine Di Uso 
-Zoom da Percent 
-Zoom da PPI 
-Immagine Dello Specchio: 
-Saturazione Di Colore: 
-Tonalità Di Colore: 
-Adattare per paginare: 
-Proteggendo: 
-Larghezza Della Penna: 
+Scaling dell'immagine: 
+Usa formato naturale dell'immagine
+Zoom in percentuale 
+Zoom in PPI 
+Immagine riflessa: 
+Saturazione del colore: 
+Tonalità del colore: 
+Adatta alla pagina: 
+Ombreggiatura: 
+Larghezza della penna: 
 Correzione Gamma: 
 Luminosità: 
-Aggiungere 
-Cancellazione 
-Modificare 
-URI Della Stampante 
-Nome Della Stampante 
-Posizione Della Stampante 
-Stampante Info 
-Stampante fa e modella 
+Aggiungi 
+Cancella 
+Modifica 
+URI della stampante 
+Nome della stampante 
+Collocazione della stampante 
+Informazioni sulla stampante 
+Produttore e modello della stampante 
 URI Del Dispositivo 
-Pagina Di Formattazione 
-Stampando Pagina 
-D' Inizializzazione Stampante 
-Condizione Della Stampante 
-Accettando I Lavori 
-Non accettando I Lavori 
-Lavori Di Stampa 
+Preparazione della pagina 
+Stampa della  Pagina 
+Inizializzazione Stampante 
+Condizione della stampante 
+Sto accettando le richieste di stampa
+Non sto accettando le richieste di stampa 
+Richieste di stampa 
 Codice categoria 
 Locale 
-Periferico 
-Utilizzazione per due usi 
-Cucendo con punti metallici 
-Veloci Copie 
-Fascicolate Copie 
-Perforazione Del Foro 
-Covering 
-Legandosi 
+Remoto 
+Fronte-retro
+Sto cucendo con punti metallici 
+Copie veloci
+Copie fascicolate
+Perforazione delle pagine (per fascicolatura)
+Inserendo copertina 
+Applicando fascicolatura 
 Ordinando 
 Piccolo (fino a 9.5x1în) 
-Media (9.5x1în - 13x19in) 
+Medio (9.5x1în - 13x19in) 
 Grande (13x19in e più grande) 
-Su ordinazione Formato 
+Formato personalizzato 
 Idle 
 Elaborando 
 Arrestato 
 Tutto 
 Dispari 
-Anche Pagine 
+Pagine pari
 Più Scuro       Più Luminoso 
-Formato Di Media 
-Tipo Di Media 
-Sorgente Di Media 
+Formato del supporto 
+Tipo del supporto 
+Sorgente del supporto 
 Orientamento: 
-Portrait 
-Paesaggio 
+Verticale 
+Orizzontale 
 Job State
 Job Name
 User Name
-Priority
-Copies
-File Size
-Pending
+Priorita'
+Copie
+Dimensioni del file
+In attesa
 Output Mode
-Resolution
-400 Il vostro browser ha trasmesso una richiesta che questo server non potrebbe capire. 
-Questo server non potrebbe verificare che siete autorizzati ad accedere alla risorsa. 
+Risoluzione
+400 Il vostro browser ha trasmesso una richiesta che questo server non ha capito 
+Questo server non ha potuto verificare che siete autorizzati ad accedere alla risorsa. 
 Dovete pagare accedere a questo server. 
-Non avete permesso accedere alla risorsa su questo server. 
+Non avete il permesso di accedere alla risorsa richiesta su questo server. 
 La risorsa chiesta non è stata trovata su questo server. 
-Il metodo chiesto non è permesso con la risorsa. 
+Il metodo richiesto non è consentito con la risorsa desiderata. 
 Una rappresentazione adatta per la risorsa non è stata trovata su questo server. 
-Non avete permesso utilizzare questo server come calcolatore centrale di procura. 
-La richiesta ha preso troppo lungamente per completare ed è stata abbandonata. 
+Non avete il permesso utilizzare questo server come proxy.
+La richiesta ha impiegato troppo tempo per essere completata ed è stata abbandonata. 
 La risorsa chiesta ha più di un valore. 
-La risorsa chiesta è andata e non è stata sostituita. 
-Il metodo chiesto richiede un Content-Length valido. 
-Il presupposto sulla richiesta ha valutato a falso. 
-La richiesta è troppo grande affinchè questo server elabori. 
-Il URI di richiesta è troppo grande affinchè questo server elabori. 
-Il formato di richiesta non è capito da questo server. 
-500 Il server ha rilevato un errore unrecoverable e non può elaborare la vostra richiesta. 
-Il metodo chiesto non è effettuato da questo server. 
-Il proxy server ha ricevuto una risposta non valida da un server verso l'alto. 
+La risorsa chiesta non e' piu' disponibile e non è stata ancora rimpiazzata. 
+Il metodo chiesto richiede un campo "Content-Length"  valido.
+I prerequisiti per la richiesta non sono soddisfatti.
+La richiesta è troppo grande per essere elaborata da questo server.
+L'URI della richiesta è troppo grande per essere elaborato da questo server.
+Il formato della richiesta non è capito da questo server. 
+500 Il server ha rilevato un errore non recuperabile e non può elaborare la vostra richiesta. 
+Il metodo chiesto non è implementato da questo server. 
+Il proxy server ha ricevuto una risposta non valida da un server di livello superiore.
 La risorsa chiesta è attualmente non disponibile su questo server. 
-Il proxy server ha preso troppo lungamente per rispondere a questo server. 
-Questo server non sostiene la versione del HTTP richiesta dal vostro browser. 
+Il proxy server ha impiegato troppo tempo per rispondere a questo server. 
+Questo server non supporta la versione HTTP richiesta dal vostro browser. 
