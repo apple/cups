@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.4 2000/02/11 05:04:14 mike Exp $"
+ * "$Id: ppds.c,v 1.5 2000/03/11 16:19:12 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -83,6 +83,7 @@ static ppd_info_t	*ppds;		/* PPD file info */
  * Local functions...
  */
 
+static int	check_ppds(const char *d, time_t mtime);
 static int	compare_ppds(const ppd_info_t *p0, const ppd_info_t *p1);
 static void	load_ppds(const char *d, const char *p);
 
@@ -96,25 +97,76 @@ LoadPPDs(const char *d)		/* I - Directory to scan... */
 {
   int		i;		/* Looping var */
   ppd_info_t	*ppd;		/* Current PPD file */
+  FILE		*fp;		/* ppds.dat file */
+  struct stat	fileinfo;	/* ppds.dat information */
+  char		filename[1024];	/* ppds.dat filename */
 
 
  /*
-  * Load all PPDs in the specified directory and below...
+  * See if we need to reload the PPD files...
   */
 
-  num_ppds   = 0;
-  alloc_ppds = 0;
-  ppds       = (ppd_info_t *)0;
+  snprintf(filename, sizeof(filename), "%s/ppds.dat", ServerRoot);
+  if (stat(filename, &fileinfo))
+    i = 1;
+  else
+    i = check_ppds(d, fileinfo.st_mtime);
 
-  load_ppds(d, "");
+  if (i)
+  {
+   /*
+    * Load all PPDs in the specified directory and below...
+    */
 
- /*
-  * Sort the PPDs...
-  */
+    num_ppds   = 0;
+    alloc_ppds = 0;
+    ppds       = (ppd_info_t *)0;
 
-  if (num_ppds > 1)
-    qsort(ppds, num_ppds, sizeof(ppd_info_t),
-          (int (*)(const void *, const void *))compare_ppds);
+    load_ppds(d, "");
+
+   /*
+    * Sort the PPDs...
+    */
+
+    if (num_ppds > 1)
+      qsort(ppds, num_ppds, sizeof(ppd_info_t),
+            (int (*)(const void *, const void *))compare_ppds);
+
+   /*
+    * Write the new ppds.dat file...
+    */
+
+    if ((fp = fopen(filename, "wb")) != NULL)
+    {
+      fwrite(ppds, num_ppds, sizeof(ppd_info_t), fp);
+      fclose(fp);
+      LogMessage(L_INFO, "LoadPPDs: Wrote %s...", filename);
+    }
+    else
+      LogMessage(L_ERROR, "LoadPPDs: Unable to write %s...", filename);
+  }
+  else
+  {
+   /*
+    * Load the ppds.dat file instead...
+    */
+
+    num_ppds = fileinfo.st_size / sizeof(ppd_info_t);
+    if ((ppds = malloc(sizeof(ppd_info_t) * num_ppds)) == NULL)
+    {
+      LogMessage(L_ERROR, "LoadPPDs: Unable to allocate memory for %d PPD files!",
+                 num_ppds);
+      num_ppds = 0;
+    }
+    else if ((fp = fopen(filename, "rb")) != NULL)
+    {
+      fread(ppds, num_ppds, sizeof(ppd_info_t), fp);
+      fclose(fp);
+      LogMessage(L_INFO, "LoadPPDs: Read %s...", filename);
+    }
+    else
+      LogMessage(L_ERROR, "LoadPPDs: Unable to read %s...", filename);
+  }
 
  /*
   * Create the list of PPDs...
@@ -143,6 +195,72 @@ LoadPPDs(const char *d)		/* I - Directory to scan... */
 
   if (alloc_ppds)
     free(ppds);
+}
+
+
+/*
+ * 'check_ppds()' - Check to see if we need to regenerate the PPD file
+ *                  list...
+ */
+
+static int			/* O - 1 if reload needed, 0 otherwise */
+check_ppds(const char *d,	/* I - Directory to scan */
+           time_t     mtime)	/* I - Modification time of ppds.dat */
+{
+  DIR		*dir;		/* Directory pointer */
+  DIRENT	*dent;		/* Directory entry */
+  struct stat	fileinfo;	/* File information */
+  char		filename[1024];	/* Name of file */
+
+
+  if ((dir = opendir(d)) == NULL)
+  {
+    LogMessage(L_ERROR, "LoadPPDs: Unable to open PPD directory \"%s\": %s",
+               d, strerror(errno));
+    return (1);
+  }
+
+  while ((dent = readdir(dir)) != NULL)
+  {
+   /*
+    * Skip "." and ".."...
+    */
+
+    if (dent->d_name[0] == '.')
+      continue;
+
+   /*
+    * Check the modification time of the file or directory...
+    */
+
+    snprintf(filename, sizeof(filename), "%s/%s", d, dent->d_name);
+
+    if (stat(filename, &fileinfo))
+      continue;
+
+    if (fileinfo.st_mtime >= mtime)
+    {
+      closedir(dir);
+      return (1);
+    }
+
+    if (S_ISDIR(fileinfo.st_mode))
+    {
+     /*
+      * Do subdirectory...
+      */
+
+      if (check_ppds(filename, mtime))
+      {
+        closedir(dir);
+        return (1);
+      }
+    }
+  }
+
+  closedir(dir);
+
+  return (0);
 }
 
 
@@ -289,7 +407,7 @@ load_ppds(const char *d,		/* I - Actual directory */
   DIR		*dir;			/* Directory pointer */
   DIRENT	*dent;			/* Directory entry */
   struct stat	fileinfo;		/* File information */
-  char		filename[1024],		/* Name of backend */
+  char		filename[1024],		/* Name of PPD or directory */
 		line[1024],		/* Line from backend */
 		*ptr,			/* Pointer into name */
 		name[128],		/* Name of PPD file */
@@ -537,5 +655,5 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * End of "$Id: ppds.c,v 1.4 2000/02/11 05:04:14 mike Exp $".
+ * End of "$Id: ppds.c,v 1.5 2000/03/11 16:19:12 mike Exp $".
  */
