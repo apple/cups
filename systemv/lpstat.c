@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.37.2.16 2003/04/10 18:41:49 mike Exp $"
+ * "$Id: lpstat.c,v 1.37.2.17 2003/06/14 14:08:46 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -1716,17 +1716,20 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	      cups_dest_t *dests,	/* I - User-defined destinations */
               int         long_status)	/* I - Show long status? */
 {
-  int		i;			/* Looping var */
+  int		i, j;			/* Looping vars */
   ipp_t		*request,		/* IPP Request */
 		*response,		/* IPP Response */
 		*jobs;			/* IPP Get Jobs response */
-  ipp_attribute_t *attr;		/* Current attribute */
-  ipp_attribute_t *jobattr;		/* Job ID attribute */
+  ipp_attribute_t *attr,		/* Current attribute */
+		*jobattr,		/* Job ID attribute */
+		*reasons;		/* Job state reasons attribute */
   cups_lang_t	*language;		/* Default language */
   const char	*printer,		/* Printer name */
 		*message,		/* Printer state message */
 		*description,		/* Description of printer */
-		*location;		/* Location of printer */
+		*location,		/* Location of printer */
+		*make_model,		/* Make and model of printer */
+		*uri;			/* URI of printer */
   ipp_pstate_t	pstate;			/* Printer state */
   cups_ptype_t	ptype;			/* Printer type */
   int		jobid;			/* Job ID of current job */
@@ -1741,9 +1744,12 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 		  "printer-name",
 		  "printer-state",
 		  "printer-state-message",
+		  "printer-state-reasons",
 		  "printer-type",
 		  "printer-info",
-                   "printer-location"
+                  "printer-location",
+		  "printer-make-and-model",
+		  "printer-uri-supported"
 		};
   static const char *jattrs[] =		/* Attributes we need for jobs... */
 		{
@@ -1830,7 +1836,10 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
       pstate      = IPP_PRINTER_IDLE;
       message     = NULL;
       description = NULL;
-      location = NULL;
+      location    = NULL;
+      make_model  = NULL;
+      reasons     = NULL;
+      uri         = NULL;
       jobid       = 0;
 
       while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
@@ -1838,26 +1847,30 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
         if (strcmp(attr->name, "printer-name") == 0 &&
 	    attr->value_tag == IPP_TAG_NAME)
 	  printer = attr->values[0].string.text;
-
-        if (strcmp(attr->name, "printer-state") == 0 &&
-	    attr->value_tag == IPP_TAG_ENUM)
+        else if (strcmp(attr->name, "printer-state") == 0 &&
+	         attr->value_tag == IPP_TAG_ENUM)
 	  pstate = (ipp_pstate_t)attr->values[0].integer;
-
-        if (strcmp(attr->name, "printer-type") == 0 &&
-	    attr->value_tag == IPP_TAG_ENUM)
+        else if (strcmp(attr->name, "printer-type") == 0 &&
+	         attr->value_tag == IPP_TAG_ENUM)
 	  ptype = (cups_ptype_t)attr->values[0].integer;
-
-        if (strcmp(attr->name, "printer-state-message") == 0 &&
-	    attr->value_tag == IPP_TAG_TEXT)
+        else if (strcmp(attr->name, "printer-state-message") == 0 &&
+	         attr->value_tag == IPP_TAG_TEXT)
 	  message = attr->values[0].string.text;
-
-        if (strcmp(attr->name, "printer-info") == 0 &&
-	    attr->value_tag == IPP_TAG_TEXT)
+        else if (strcmp(attr->name, "printer-info") == 0 &&
+	         attr->value_tag == IPP_TAG_TEXT)
 	  description = attr->values[0].string.text;
-
-        if (strcmp(attr->name, "printer-location") == 0 &&
-	    attr->value_tag == IPP_TAG_TEXT)
+        else if (strcmp(attr->name, "printer-location") == 0 &&
+	         attr->value_tag == IPP_TAG_TEXT)
 	  location = attr->values[0].string.text;
+        else if (strcmp(attr->name, "printer-make-and-model") == 0 &&
+	         attr->value_tag == IPP_TAG_TEXT)
+	  make_model = attr->values[0].string.text;
+        else if (strcmp(attr->name, "printer-uri-supported") == 0 &&
+	         attr->value_tag == IPP_TAG_URI)
+	  uri = attr->values[0].string.text;
+        else if (strcmp(attr->name, "printer-state-reasons") == 0 &&
+	         attr->value_tag == IPP_TAG_KEYWORD)
+	  reasons = attr;
 
         attr = attr->next;
       }
@@ -1995,10 +2008,13 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	      printf("printer %s now printing %s-%d.  enabled since Jan 01 00:00\n", printer, printer, jobid);
 	      break;
 	  case IPP_PRINTER_STOPPED :
-	      printf("printer %s disabled since Jan 01 00:00 -\n\t%s\n", printer,
-	             message == NULL ? "reason unknown" : message);
+	      printf("printer %s disabled since Jan 01 00:00 -\n", printer);
 	      break;
 	}
+
+        if ((message && *message) || pstate == IPP_PRINTER_STOPPED)
+	  printf("\t%s\n", message == NULL || !*message ? "reason unknown" :
+	                                                  message);
 
         if (long_status > 1)
 	{
@@ -2007,14 +2023,32 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	  puts("\tPrinter types: unknown");
 	}
         if (long_status)
+	{
 	  printf("\tDescription: %s\n", description ? description : "");
+	  if (reasons)
+	  {
+	    printf("\tAlerts:");
+	    for (i = 0; i < reasons->num_values; i ++)
+	      printf(" %s", reasons->values[i].string.text);
+	    putchar('\n');
+	  }
+	}
         if (long_status > 1)
 	{
 	  printf("\tLocation: %s\n", location ? location : "");
 	  printf("\tConnection: %s\n",
 	         (ptype & CUPS_PRINTER_REMOTE) ? "remote" : "direct");
 	  if (!(ptype & CUPS_PRINTER_REMOTE))
-	    printf("\tInterface: %s/ppd/%s.ppd\n", root, printer);
+	  {
+	    if (make_model && strstr(make_model, "System V Printer"))
+	      printf("\tInterface: %s/ppd/%s.ppd\n", root, printer);
+	    else if (make_model && !strstr(make_model, "Raw Printer"))
+	      printf("\tInterface: %s/ppd/%s.ppd\n", root, printer);
+          }
+	  else if (make_model && !strstr(make_model, "System V Printer") &&
+	           !strstr(make_model, "Raw Printer") && uri)
+	    printf("\tInterface: %s.ppd\n", uri);
+
 	  puts("\tOn fault: no alert");
 	  puts("\tAfter fault: continue");
 	  puts("\tUsers allowed:");
@@ -2042,11 +2076,14 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 		         dests[i].instance, printer, jobid);
 		  break;
 	      case IPP_PRINTER_STOPPED :
-		  printf("printer %s/%s disabled since Jan 01 00:00 -\n\t%s\n", printer,
-		         dests[i].instance,
-			 message == NULL ? "reason unknown" : message);
+		  printf("printer %s/%s disabled since Jan 01 00:00 -\n", printer,
+		         dests[i].instance);
 		  break;
 	    }
+
+            if ((message && *message) || pstate == IPP_PRINTER_STOPPED)
+	      printf("\t%s\n", message == NULL || !*message ? "reason unknown" :
+	                                                      message);
 
             if (long_status > 1)
 	    {
@@ -2055,14 +2092,31 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	      puts("\tPrinter types: unknown");
 	    }
             if (long_status)
+	    {
 	      printf("\tDescription: %s\n", description ? description : "");
+	      if (reasons)
+	      {
+	        printf("\tAlerts:");
+		for (j = 0; j < reasons->num_values; j ++)
+		  printf(" %s", reasons->values[j].string.text);
+		putchar('\n');
+	      }
+	    }
             if (long_status > 1)
 	    {
 	      printf("\tLocation: %s\n", location ? location : "");
 	      printf("\tConnection: %s\n",
 	             (ptype & CUPS_PRINTER_REMOTE) ? "remote" : "direct");
 	      if (!(ptype & CUPS_PRINTER_REMOTE))
-		printf("\tInterface: %s/ppd/%s.ppd\n", root, printer);
+	      {
+		if (make_model && strstr(make_model, "System V Printer"))
+		  printf("\tInterface: %s/ppd/%s.ppd\n", root, printer);
+		else if (make_model && !strstr(make_model, "Raw Printer"))
+		  printf("\tInterface: %s/ppd/%s.ppd\n", root, printer);
+              }
+	      else if (make_model && !strstr(make_model, "System V Printer") &&
+	               !strstr(make_model, "Raw Printer") && uri)
+		printf("\tInterface: %s.ppd\n", uri);
 	      puts("\tOn fault: no alert");
 	      puts("\tAfter fault: continue");
 	      puts("\tUsers allowed:");
@@ -2108,5 +2162,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.37.2.16 2003/04/10 18:41:49 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.37.2.17 2003/06/14 14:08:46 mike Exp $".
  */
