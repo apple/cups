@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.28 1999/07/24 11:03:35 mike Exp $"
+ * "$Id: util.c,v 1.29 1999/08/05 20:46:59 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -889,6 +889,56 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
 
 
 /*
+ * 'cupsTempFile()' - Generate a temporary filename.
+ */
+
+char *					/* O - Filename */
+cupsTempFile(char *filename,		/* I - Pointer to buffer */
+             int  len)			/* I - Size of buffer */
+{
+  char		*tmpdir;		/* TMPDIR environment var */
+  static char	buf[1024] = "";		/* Buffer if you pass in NULL and 0 */
+
+
+ /*
+  * See if a filename was specified...
+  */
+
+  if (filename == NULL)
+  {
+    filename = buf;
+    len      = sizeof(buf);
+  }
+
+ /*
+  * See if TMPDIR is defined...
+  */
+
+  if ((tmpdir = getenv("TMPDIR")) == NULL)
+    tmpdir = "/var/tmp";
+
+  if ((strlen(tmpdir) + 8) > len)
+  {
+   /*
+    * The specified directory exceeds the size of the buffer; default it...
+    */
+
+    strcpy(buf, "/var/tmp/XXXXXX");
+    return (mktemp(buf));
+  }
+  else
+  {
+   /*
+    * Make the temporary name using the specified directory...
+    */
+
+    sprintf(filename, "%s/XXXXXX", tmpdir);
+    return (mktemp(filename));
+  }
+}
+
+
+/*
  * 'cups_connect()' - Connect to the specified host...
  */
 
@@ -935,5 +985,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.28 1999/07/24 11:03:35 mike Exp $".
+ * End of "$Id: util.c,v 1.29 1999/08/05 20:46:59 mike Exp $".
  */
