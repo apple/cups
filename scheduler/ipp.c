@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.123 2001/03/15 17:48:07 mike Exp $"
+ * "$Id: ipp.c,v 1.124 2001/03/27 14:26:26 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3071,7 +3071,7 @@ get_printers(client_t *con,		/* I - Client connection */
   char			*location;	/* Location string */
 
 
-  LogMessage(L_DEBUG2, "get_printers(%d, %s)\n", con->http.fd);
+  LogMessage(L_DEBUG2, "get_printers(%d, %x)\n", con->http.fd, type);
 
  /*
   * See if they want to limit the number of printers reported...
@@ -5338,5 +5338,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.123 2001/03/15 17:48:07 mike Exp $".
+ * End of "$Id: ipp.c,v 1.124 2001/03/27 14:26:26 mike Exp $".
  */
