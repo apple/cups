@@ -120,9 +120,14 @@ CHANGES IN CUPS v1.1.3
 	- Fixed a memory leak in the scheduler - wasn't
 	  freeing old filters when deleting or renaming
 	  printers.
-	- The web interfaces now correctly link to the
-	  localhost address when accessing printers from
-	  the local system.
+	- The scheduler now queries the primary IP address
+	  for the name of the server and maps any incoming
+	  requests from that address to the server name.
+	  This fixes web admin mapping problems from
+	  server.domain.com to localhost.
+	- The web printer modify interface now remembers
+	  the previous device and driver settings (except
+	  for serial ports.)
 
 
 CHANGES IN CUPS v1.1.2

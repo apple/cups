@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.75 2000/09/14 16:38:36 mike Exp $"
+ * "$Id: printers.c,v 1.76 2000/09/14 20:34:50 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -180,7 +180,7 @@ AddPrinterFilter(printer_t *p,		/* I - Printer to add to */
          strcmp((*temptype)->super, super) == 0) &&
         (type[0] == '*' || strcmp((*temptype)->type, type) == 0))
     {
-      LogMessage(L_DEBUG, "Adding filter %s/%s %s/%s %d %s",
+      LogMessage(L_DEBUG2, "Adding filter %s/%s %s/%s %d %s",
                  (*temptype)->super, (*temptype)->type,
 		 p->filetype->super, p->filetype->type,
                  cost, program);
@@ -1560,5 +1560,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.75 2000/09/14 16:38:36 mike Exp $".
+ * End of "$Id: printers.c,v 1.76 2000/09/14 20:34:50 mike Exp $".
  */

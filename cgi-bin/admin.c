@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.12 2000/08/29 18:45:04 mike Exp $"
+ * "$Id: admin.c,v 1.13 2000/09/14 20:34:47 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -486,7 +486,8 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
   ipp_attribute_t *attr,		/* Current attribute */
 		*last;			/* Last attribute */
   ipp_t		*request,		/* IPP request */
-		*response;		/* IPP response */
+		*response,		/* IPP response */
+		*oldinfo;		/* Old printer information */
   ipp_status_t	status;			/* Request status */
   const char	*var;			/* CGI variable */
   char		uri[HTTP_MAX_URI],	/* Device or printer URI */
@@ -510,48 +511,50 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 		};
 
 
+  if (modify)
+  {
+   /*
+    * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the
+    * following attributes:
+    *
+    *    attributes-charset
+    *    attributes-natural-language
+    *    printer-uri
+    */
+
+    request = ippNew();
+
+    request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+    request->request.op.request_id   = 1;
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	 "attributes-charset", NULL, cupsLangEncoding(language));
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+        	 "attributes-natural-language", NULL, language->language);
+
+    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s",
+             cgiGetVariable("PRINTER_NAME"));
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+                 NULL, uri);
+
+   /*
+    * Do the request and get back a response...
+    */
+
+    oldinfo = cupsDoRequest(http, request, "/");
+  }
+
   if (cgiGetVariable("PRINTER_LOCATION") == NULL)
   {
     if (modify)
     {
      /*
-      * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the
-      * following attributes:
-      *
-      *    attributes-charset
-      *    attributes-natural-language
-      *    printer-uri
-      */
-
-      request = ippNew();
-
-      request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-      request->request.op.request_id   = 1;
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	   "attributes-charset", NULL, cupsLangEncoding(language));
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	   "attributes-natural-language", NULL, language->language);
-
-      snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s",
-               cgiGetVariable("PRINTER_NAME"));
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-                   NULL, uri);
-
-     /*
-      * Do the request and get back a response...
-      */
-
-      if ((response = cupsDoRequest(http, request, "/")) != NULL)
-      {
-	ippSetCGIVars(response, NULL, NULL);
-	ippDelete(response);
-      }
-
-     /*
       * Update the location and description of an existing printer...
       */
+
+      if (oldinfo)
+	ippSetCGIVars(oldinfo, NULL, NULL);
 
       cgiCopyTemplateLang(stdout, TEMPLATES, "modify-printer.tmpl", getenv("LANG"));
     }
@@ -563,6 +566,9 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 
       cgiCopyTemplateLang(stdout, TEMPLATES, "add-printer.tmpl", getenv("LANG"));
     }
+
+    if (oldinfo)
+      ippDelete(oldinfo);
 
     return;
   }
@@ -622,10 +628,32 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     * Let the user choose...
     */
 
+    if (oldinfo &&
+        (attr = ippFindAttribute(oldinfo, "device-uri", IPP_TAG_URI)) != NULL)
+    {
+      strncpy(uri, attr->values[0].string.text, sizeof(uri) - 1);
+      uri[sizeof(uri) - 1] = '\0';
+      if ((uriptr = strchr(uri, ':')) != NULL && strncmp(uriptr, "://", 3) == 0)
+        *uriptr = '\0';
+
+      cgiSetVariable("CURRENT_DEVICE_URI", uri);
+    }
+
     cgiCopyTemplateLang(stdout, TEMPLATES, "choose-device.tmpl", getenv("LANG"));
   }
   else if (strchr(var, '/') == NULL)
   {
+    if (oldinfo &&
+        (attr = ippFindAttribute(response, "device-uri", IPP_TAG_URI)) != NULL)
+    {
+     /*
+      * Set the current device URI for the form to the old one...
+      */
+
+      if (strncmp(attr->values[0].string.text, var, strlen(var)) == 0)
+	cgiSetVariable("DEVICE_URI", attr->values[0].string.text);
+    }
+
    /*
     * User needs to set the full URI...
     */
@@ -657,6 +685,50 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
   }
   else if ((var = cgiGetVariable("PPD_NAME")) == NULL)
   {
+    if (modify)
+    {
+     /*
+      * Get the PPD file...
+      */
+
+      FILE		*fp;			/* PPD file */
+      char		filename[1024];		/* PPD filename */
+      ppd_file_t	*ppd;			/* PPD information */
+      char		buffer[1024];		/* Buffer */
+      int		bytes;			/* Number of bytes */
+
+
+      sprintf(uri, "/printers/%s.ppd", name);
+      cupsTempFile(filename, sizeof(filename));
+
+      if (httpGet(http, uri))
+        httpGet(http, uri);
+
+      while (httpUpdate(http) == HTTP_CONTINUE);
+
+      if ((fp = fopen(filename, "w")) != NULL)
+      {
+	while ((bytes = httpRead(http, buffer, sizeof(buffer))) > 0)
+          fwrite(buffer, 1, bytes, fp);
+
+	fclose(fp);
+
+        if ((ppd = ppdOpenFile(filename)) != NULL)
+	{
+	  if (ppd->manufacturer)
+	    cgiSetVariable("CURRENT_MAKE", ppd->manufacturer);
+	  if (ppd->nickname)
+	    cgiSetVariable("CURRENT_MAKE_AND_MODEL", ppd->nickname);
+
+          ppdClose(ppd);
+	}
+      }
+      else
+        httpFlush(http);
+
+      unlink(filename);
+    }
+
    /*
     * Build a CUPS_GET_PPDS request, which requires the following
     * attributes:
@@ -810,6 +882,9 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     else
       cgiCopyTemplateLang(stdout, TEMPLATES, "printer-added.tmpl", getenv("LANG"));
   }
+
+  if (oldinfo)
+    ippDelete(oldinfo);
 }
 
 
@@ -1493,5 +1568,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.12 2000/08/29 18:45:04 mike Exp $".
+ * End of "$Id: admin.c,v 1.13 2000/09/14 20:34:47 mike Exp $".
  */
