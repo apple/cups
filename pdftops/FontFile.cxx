@@ -3399,7 +3399,11 @@ static int cmpTrueTypeLocaIdx(const void *p1, const void *p2) {
 }
 
 static int cmpTrueTypeLocaPos(const void *p1, const void *p2) {
-  return ((TrueTypeLoca *)p1)->pos - ((TrueTypeLoca *)p2)->pos;
+  if (((TrueTypeLoca *)p1)->pos == ((TrueTypeLoca *)p2)->pos) {
+    return ((TrueTypeLoca *)p1)->idx - ((TrueTypeLoca *)p2)->idx;
+  } else {
+    return ((TrueTypeLoca *)p1)->pos - ((TrueTypeLoca *)p2)->pos;
+  }
 }
 
 void TrueTypeFontFile::cvtSfnts(FontFileOutputFunc outputFunc,
