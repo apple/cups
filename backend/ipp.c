@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.35 2004/08/26 18:28:52 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.36 2004/10/08 20:27:12 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -215,11 +215,12 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Extract the hostname and printer name from the URI...
   */
 
-  if (strchr(argv[0], ':') != NULL)
-    httpSeparate(argv[0], method, username, hostname, &port, resource);
-  else if (getenv("DEVICE_URI") != NULL)
+  if (getenv("DEVICE_URI") != NULL)
+    /* authentication information is only available in the env var */
     httpSeparate(getenv("DEVICE_URI"), method, username, hostname, &port,
                  resource);
+  else if (strchr(argv[0], ':') != NULL)
+    httpSeparate(argv[0], method, username, hostname, &port, resource);
   else
   {
     fputs("ERROR: Missing device URI on command-line and no DEVICE_URI environment variable!\n",
@@ -1378,5 +1379,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.35 2004/08/26 18:28:52 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.36 2004/10/08 20:27:12 mike Exp $".
  */
