@@ -24,19 +24,16 @@ information for the Common UNIX Printing System<SUP>TM</SUP>
 <UL>
 	<LI><A HREF="#OVERVIEW">1 - Printing System Overview</A>
 	<LI><A HREF="#BUILDING_INSTALLING">2 - Building and Installing CUPS</A>
-	<LI><A HREF="#GETTING_STARTED">3 - Getting Started</A>
-	<LI><A HREF="#MANAGING_PRINTERS">4 - Managing Printers</A>
-	<LI><A HREF="#PRINTER_CLASSES">5 - Printer Classes</A>
-	<LI><A HREF="#CLIENT_SETUP">6 - Client Setup</A>
+	<LI><A HREF="#MANAGING_PRINTERS">3 - Managing Printers</A>
+	<LI><A HREF="#PRINTER_CLASSES">4 - Printer Classes</A>
+	<LI><A HREF="#CLIENT_SETUP">5 - Client Setup</A>
+	<LI><A HREF="#PRINTING_MANAGEMENT">6 - Printing System Management</A>
 	<LI><A HREF="#PRINTING_OTHER">7 - Printing with Other Systems</A>
-	<LI><A HREF="#PRINTING_MANAGEMENT">8 - Printing System Management</A>
-	<LI><A HREF="#PRINTING_SECURITY">9 - Printing System Security</A>
-	<LI><A HREF="#PRINTER_ACCOUNTING">10 - Printer Accounting</A>
-	<LI><A HREF="#PRINTER_ACCOUNTING">11 - File Types and Filtering</A>
 	<LI><A HREF="#LICENSE">A - Software License Agreement</A>
 	<LI><A HREF="#COMMON_NETWORK">B - Common Network Settings</A>
 	<LI><A HREF="#PRINTER_DRIVERS">C - Printer Drivers</A>
-	<LI><A HREF="#FAQ">D - Troubleshooting Common Problems</A>
+	<LI><A HREF="#FILES">D - List of Files</A>
+	<LI><A HREF="#FAQ">E - Troubleshooting Common Problems</A>
 </UL>
 
 <EMBED SRC="printing-overview.shtml">
@@ -100,7 +97,7 @@ your system. Use the <CODE>--prefix</CODE> option to install the CUPS
 software in another location:
 
 <UL><PRE>
-<B>./configure --prefix=/usr/local ENTER</B>
+<B>./configure --prefix=/some/directory ENTER</B>
 </PRE></UL>
 
 <P>If the PNG, JPEG, TIFF, and ZLIB libraries are not installed in a
@@ -122,6 +119,7 @@ system default location (typically <VAR>/usr/include</VAR> and
 
 <P>to build the software.
 
+<!-- NEED 4in -->
 <H3><A NAME="INSTALLING">Installing the Software</A></H3>
 
 <P>Use the "install" target to install the software:
@@ -130,28 +128,29 @@ system default location (typically <VAR>/usr/include</VAR> and
 <B>make install ENTER</B>
 </PRE></UL>
 
-<BLOCKQUOTE>
-
+<CENTER><TABLE WIDTH="80%" BORDER="1" BGCOLOR="#cccccc" CELLPADDING="5">
+<TR>
+	<TD>
 	<B>WARNING:</B>
 	
 	<P>Installing CUPS will overwrite your existing printing
 	system. If you experience difficulties with the CUPS software
 	and need to go back to your old printing system, you will need
 	to reinstall the printing system from your operating system CDs.
-
-</BLOCKQUOTE>
+	</TD>
+</TR>
+</TABLE></CENTER>
 
 <H3><A NAME="RUNNING">Running the Software</A></A></H3>
 
-<P>Once you have installed the software you can start the CUPS daemon by
+<P>Once you have installed the software you can start the CUPS server by
 typing:
 
 <UL><PRE>
 <B>/usr/sbin/cupsd ENTER</B>
 </PRE></UL>
 
-<!-- NEW PAGE -->
-
+<!-- NEED 4in -->
 <H2><A NAME="BINARY">Installing a Binary Distribution</A></H2>
 
 <P>CUPS comes in a variety of binary distribution formats. Easy
@@ -161,8 +160,9 @@ for Red Hat and Debian-based distributions.  Portable distributions are
 available for all platforms, while the RPM and DPKG distributions are
 only available for Linux.
 
-<BLOCKQUOTE>
-
+<CENTER><TABLE WIDTH="80%" BORDER="1" BGCOLOR="#cccccc" CELLPADDING="5">
+<TR>
+	<TD>
 	<B>WARNING:</B>
 	
 	<P>Installing CUPS will overwrite your existing printing
@@ -170,8 +170,10 @@ only available for Linux.
 	and need to go back to your old printing system, you will need
 	to remove the CUPS software with the provided script and/or
 	reinstall the printing system from your operating system CDs.
+	</TD>
+</TR>
+</TABLE></CENTER>
 
-</BLOCKQUOTE>
 
 <H3><A NAME="PORTABLE-BINARY">Installing a Portable Distribution</A></H3>
 
@@ -214,24 +216,10 @@ Once you are the root user, run dpkg with:
 scheduler will be started automatically.
 
 
-<H1 ALIGN="RIGHT"><A NAME="GETTING_STARTED">3 - Getting Started</A></H1>
+<H1 ALIGN="RIGHT"><A NAME="PRINTER_MANAGEMENT">3 - Printer Management</A></H1>
 
-<P>This chapter describes how to add your first printer.
-
-<H2>The Interfaces</H2>
-
-<P>CUPS provides two methods for adding printers - a command-line
-program called <CODE>lpadmin(1m)</CODE> and a Web interface. The
-<CODE>lpadmin</CODE> command allows you to perform most printer
-administration tasks from the command-line and is located in
-<VAR>/usr/sbin</VAR>. The Web interface is located at:
-
-<UL><PRE>
-<A HREF="http://localhost:631/admin">http://localhost:631/admin</A>
-</PRE></UL>
-
-<P>and steps you through printer configuration. If you don't like
-command-line interfaces, try the <A HREF="#ADD_WEB">Web interface</A> instead.
+<P>This chapter describes how to add your first printer and how to
+manage your printers.
 
 <H2>The Basics</H2>
 
@@ -247,6 +235,7 @@ Uniform Resource Locators ("URLs") that are used in your web browser. For
 example, the first parallel port in Linux usually uses a device URI of
 <CODE>parallel:/dev/lp1</CODE>.
 
+<!-- NEED 2.5in -->
 <P>You can see a complete list of supported devices by running the
 <CODE>lpinfo(1m)</CODE> command:
 
@@ -278,27 +267,42 @@ each printer, the page sizes supported, etc., and are used for PostScript
 and non-PostScript printers. CUPS includes PPD files for HP LaserJet, HP
 DeskJet, EPSON 9-pin, EPSON 24-pin, and EPSON Stylus printers.
 
-<H2>Adding Your First Printer from the Command-Line</H2>
+<H2>Adding Your First Printer</H2>
+
+<P>CUPS provides two methods for adding printers: a command-line
+program called <CODE>lpadmin(1m)</CODE> and a Web interface. The
+<CODE>lpadmin</CODE> command allows you to perform most printer
+administration tasks from the command-line and is located in
+<VAR>/usr/sbin</VAR>. The Web interface is located at:
+
+<UL><PRE>
+<A HREF="http://localhost:631/admin">http://localhost:631/admin</A>
+</PRE></UL>
+
+<P>and steps you through printer configuration. If you don't like
+command-line interfaces, try the <A HREF="#ADD_WEB">Web interface</A> instead.
+
+<H3>Adding Your First Printer from the Command-Line</H3>
 
 <P>Run the <CODE>lpadmin</CODE> command with the <CODE>-p</CODE> option to add a
 printer to CUPS:
 
 <UL><PRE>
-<B>/usr/lib/lpadmin -p <I>printer</I> -E -v <I>device</I> -m <I>ppd</I> ENTER</B>
+<B>/usr/sbin/lpadmin -p <I>printer</I> -E -v <I>device</I> -m <I>ppd</I> ENTER</B>
 </PRE></UL>
 
 <P>For an HP DeskJet printer connected to the parallel port this would look
 like:
 
 <UL><PRE>
-<B>/usr/lib/lpadmin -p DeskJet -E -v parallel:/dev/lp1 -m deskjet.ppd ENTER</B>
+<B>/usr/sbin/lpadmin -p DeskJet -E -v parallel:/dev/lp1 -m deskjet.ppd ENTER</B>
 </PRE></UL>
 
 <P>Similarly, an HP LaserJet printer using a JetDirect network interface at
 IP address 11.22.33.44 would be added with the command:
 
 <UL><PRE>
-<B>/usr/lib/lpadmin -p LaserJet -E -v socket://11.22.33.44 -m laserjet.ppd ENTER</B>
+<B>/usr/sbin/lpadmin -p LaserJet -E -v socket://11.22.33.44 -m laserjet.ppd ENTER</B>
 </PRE></UL>
 
 <P>As you can see, <CODE>deskjet.ppd</CODE> and <CODE>laserjet.ppd</CODE> are
@@ -306,7 +310,7 @@ the PPD files for the HP DeskJet and HP LaserJet drivers included with CUPS.
 You'll find a complete list of PPD files and the printers they will work with
 in <A HREF="#PRINTER_DRIVERS">Appendix C, "Printer Drivers"</A>.
 
-<H2><A NAME="ADD_WEB">Adding Your First Printer from the Web</A></H2>
+<H3><A NAME="ADD_WEB">Adding Your First Printer from the Web</A></H3>
 
 <P>The CUPS web server provides a user-friendly "wizard" interface for
 adding your printers. Rather than figuring out which device URI and PPD file
@@ -319,14 +323,9 @@ simple information. Enter the following URL in your web browser to begin:
 
 <P>Click on the <VAR>Add Printer</VAR> button to add a printer.
 
-
-<H1 ALIGN="RIGHT"><A NAME="MANAGING_PRINTERS">4 - Managing Printers</A></H1>
-
-<P>This chapter discusses how to manage print queues on your system.
-
 <H2>Managing Printers from the Command-Line</H2>
 
-<P>The <CODE>lpadmin</CODE> command allows you to perform most printer
+<P>The <CODE>lpadmin</CODE> command enables you to perform most printer
 administration tasks from the command-line. You'll find <CODE>lpadmin</CODE>
 in the <VAR>/usr/sbin</VAR> directory.
 
@@ -336,7 +335,7 @@ in the <VAR>/usr/sbin</VAR> directory.
 to add or modify a printer:
 
 <UL><PRE>
-<B>/usr/lib/lpadmin -p <I>printer</I> <I>options</I> ENTER</B>
+<B>/usr/sbin/lpadmin -p <I>printer</I> <I>options</I> ENTER</B>
 </PRE></UL>
 
 <P>The <I>options</I> arguments can be any of the following:
@@ -405,7 +404,7 @@ to add or modify a printer:
 to delete a printer:
 
 <UL><PRE>
-<B>/usr/lib/lpadmin -x <I>printer</I> ENTER</B>
+<B>/usr/sbin/lpadmin -x <I>printer</I> ENTER</B>
 </PRE></UL>
 
 <H3>Setting the Default Printer</H3>
@@ -414,7 +413,7 @@ to delete a printer:
 to set a default printer:
 
 <UL><PRE>
-<B>/usr/lib/lpadmin -d <I>printer</I> ENTER</B>
+<B>/usr/sbin/lpadmin -d <I>printer</I> ENTER</B>
 </PRE></UL>
 
 <P>The default printer can be overridden by the user using the
@@ -432,7 +431,7 @@ printer queues, respectively:
 
 <P>Printers that are disabled may still accept jobs for printing, but won't
 actually print any files until they are restarted. This is useful if the
-printer malfunctions and you need time to correct the problem. Any queues
+printer malfunctions and you need time to correct the problem. Any queued
 jobs are printed after the printer is enabled (started).
 
 <H3>Accepting and Rejecting Print Jobs</H3>
@@ -441,8 +440,8 @@ jobs are printed after the printer is enabled (started).
 print jobs for the named printer, respectively:
 
 <UL><PRE>
-<B>/usr/lib/accept <I>printer</I> ENTER</B>
-<B>/usr/lib/reject <I>printer</I> ENTER</B>
+<B>/usr/sbin/accept <I>printer</I> ENTER</B>
+<B>/usr/sbin/reject <I>printer</I> ENTER</B>
 </PRE></UL>
 
 <P>As noted above, a printer can be stopped but accepting new print
@@ -463,7 +462,7 @@ a long period of time.
 simple mouse clicks.
 
 
-<H1 ALIGN="RIGHT"><A NAME="PRINTER_CLASSES">5 - Printer Classes</A></H1>
+<H1 ALIGN="RIGHT"><A NAME="PRINTER_CLASSES">4 - Printer Classes</A></H1>
 
 <P>This chapter describes what printer classes are and how to manage them.
 
@@ -489,20 +488,20 @@ servers that are running, providing fail-safe printing.
 to add a printer to a class:
 
 <UL><PRE>
-<B>/usr/lib/lpadmin -p <I>printer</I> -c <I>class</I> ENTER</B>
+<B>/usr/sbin/lpadmin -p <I>printer</I> -c <I>class</I> ENTER</B>
 </PRE></UL>
 
 <P>The <I>class</I> is created automatically if it doesn't exist. To remove a
 printer from a class use the <CODE>-r</CODE> option:
 
 <UL><PRE>
-<B>/usr/lib/lpadmin -p <I>printer</I> -r <I>class</I> ENTER</B>
+<B>/usr/sbin/lpadmin -p <I>printer</I> -r <I>class</I> ENTER</B>
 </PRE></UL>
 
 <P>To remove the entire class just use the <CODE>-x</CODE> option:
 
 <UL><PRE>
-<B>/usr/lib/lpadmin -x <I>class</I> ENTER</B>
+<B>/usr/sbin/lpadmin -x <I>class</I> ENTER</B>
 </PRE></UL>
 
 <H2>Managing Printer Classes from the Web Interface</H2>
@@ -520,28 +519,28 @@ the class.
 <H2>Implicit Classes</H2>
 
 <P>A noted earlier, implicit classes are created automatically from the
-available network printers and classes. To disable this functionality, set
-the <CODE>ImplicitClasses</CODE> directive to <CODE>Off</CODE> in the
-<CODE>cupsd.conf</CODE> file. You will find more information on doing this
-in <A HREF="#PRINTING_MANAGEMENT">Chapter 7, "Printing System Management"</A>.
+available network printers and classes. To disable this functionality,
+set the <A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>
+directive to <CODE>Off</CODE> in the <CODE>cupsd.conf</CODE> file. You
+will find more information on doing this in
+<A HREF="#PRINTING_MANAGEMENT">Chapter 6, "Printing System
+Management"</A>.
 
 
-<H1 ALIGN="RIGHT"><A NAME="CLIENT_SETUP">6 - Client Setup</A></H1>
+<H1 ALIGN="RIGHT"><A NAME="CLIENT_SETUP">5 - Client Setup</A></H1>
 
 <P>This chapter discusses several ways to configure CUPS clients for
 printing.
 
-<H2>What is a Client?</H2>
+<H2>The Basics</H2>
 
 <P>A client is any machine that sends print jobs to another machine for
 final printing. Clients can also be servers if they communicate directly with
 any printers of their own.
 
-<H2>Setup Methods</H2>
-
 <P>CUPS supports several methods of configuring client machines:
 
-<OL>
+<UL>
 
 	<LI><A HREF="#CLIENT_MANUAL">Manual configuration of print queues.</A>
 
@@ -551,7 +550,7 @@ any printers of their own.
 
 	<LI><A HREF="#CLIENT_POLL">Specifying multiple servers for printing.</A>
 
-</OL>
+</UL>
 
 <H3><A NAME="CLIENT_MANUAL">Manual Configuration of Print Queues</A></H3>
 
@@ -562,8 +561,8 @@ each remote queue by hand using the <CODE>lpadmin</CODE> command:
 <B>lpadmin -p <I>printer</I> -E -v ipp://<I>server</I>/printers/<I>printer</I> ENTER</B>
 </PRE></UL>
 
-<P>The <VAR>printer</VAR> name is the name of the printer on the server
-machine. The <VAR>server</VAR> name is the hostname or IP address of the
+<P>The <CODE>printer</CODE> name is the name of the printer on the server
+machine. The <CODE>server</CODE> name is the hostname or IP address of the
 server machine. Repeat the <CODE>lpadmin</CODE> command for each remote
 printer you wish to use.
 
@@ -585,7 +584,7 @@ ServerName <I>server</I>
 of the default server.
 
 <P>The default server can also be customized on a per-user basis. To set a
-user-specific server create a file named <VAR>.cupsrc</VAR> and add a line
+user-specific server create a file named <VAR>~/.cupsrc</VAR> and add a line
 reading:
 
 <UL><PRE>
@@ -598,13 +597,14 @@ hostname or IP address of the default server.
 <H3><A NAME="CLIENT_AUTO">Automatic Configuration of Print Queues</A></H3>
 
 <P>CUPS supports automatic client configuration of printers on the same
-subnet. To configure printers on the same subnet, do nothing. Each client
-should see the available printers within 30 seconds automatically. The
-printer and class lists are updated automatically as printers and servers
-are added or removed.
+subnet. To configure printers on the same subnet, <I>do nothing</I>.
+Each client should see the available printers within 30 seconds
+automatically. The printer and class lists are updated automatically as
+printers and servers are added or removed.
 
-<P>If you want to see printers on other subnets as well you can
-poll one or more servers on the other subnets as described next.
+<P>If you want to see printers on other subnets as well, use the
+<A HREF="#BrowsePoll"><CODE>BrowsePoll</CODE></A> directive as
+described next.
 
 <H3><A NAME="CLIENT_POLL">Specifying Multiple Servers for Printing</A></H3>
 
@@ -616,273 +616,67 @@ clients on the same subnet can share the same configuration information.
 <P>Polling is enabled by specifying one or more
 <A HREF="#BrowsePoll"><CODE>BrowsePoll</CODE></A> directives in the
 <VAR>/etc/cups/cupsd.conf</VAR> file. For information on making these
-changes, see <A HREF="PRINTING_MANAGEMENT">Chapter 7, "Printing System
+changes, see <A HREF="PRINTING_MANAGEMENT">Chapter 6, "Printing System
 Management"</A>.
 
 
-<H1 ALIGN="RIGHT"><A NAME="PRINTING_OTHER">7 - Printing with Other Systems</A></H1>
-
-<P>This chapter describes how to print from client systems that use the
-LPD, Mac OS, or Windows printing protocols.
-
-<H2>Printing from LPD Clients</H2>
-
-<P>CUPS supports limited functionality for LPD-based clients. With LPD you can
-print files to specific printers, list the queue status, and so forth. However,
-the automatic client configuration and printer options are not supported by
-the LPD protocol, so you must manually configure each client for the printers
-it needs to access.
-
-<P>The <CODE>cups-lpd(1m)</CODE> program provides support for LPD clients.
-To enable LPD support on your server, edit the <VAR>/etc/inetd.conf</VAR>
-file and add a line reading:
-
-<UL><PRE>
-printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd
-</PRE></UL>
-
-<P>The path to the <CODE>cups-lpd</CODE> may vary depending on your
-installation.
-
-<P>Once you have added this line, send the <CODE>inetd(1m)</CODE> process
-a <CODE>HUP</CODE> signal or reboot the system:
-
-<UL><PRE>
-<B>killall -HUP inetd ENTER</B> [IRIX and some versions of Linux]
-<B>kill -HUP <I>pid</I> ENTER</B>
-<B>reboot ENTER</B>
-</PRE></UL>
-
-<H2>Printing to LPD Servers</H2>
-
-<P>CUPS provides the <CODE>lpd</CODE> backend for printing to LPD-based
-servers and printers. To print to a printer on an LPD server use a
-device URI of <CODE>lpd://server/name</CODE>, where <CODE>server</CODE>
-is the hostname or IP address of the server and <CODE>name</CODE> is
-the queue name.
-
-<P>Microsoft Windows NT provides an LPD service under the name "TCP/IP
-Printing Services". To enable LPD printing on NT, open the "Services"
-control panel, select the "TCP/IP Printing Services" service, and click
-on the "Start" button. Any shared printer will then be available via
-the LPD protocol.
-
-<H2>Printing from Mac OS Clients</H2>
-
-<P>CUPS does not provide Mac OS support directly. However, there are several
-free and commercial software packages that do.
-
-<H3>Columbia Appletalk Package (CAP)</H3>
-
-<P>Because the CAP LaserWriter server (<CODE>lwsrv(1m)</CODE>) does
-not support specification of PPD files, we do not recommend that you
-use CAP with CUPS. However, you can run the <CODE>lpsrv</CODE> program
-for limited printing with the command:
-
-<UL><PRE>
-lwsrv -n "Name" -p printer -a /usr/lib/adicts -f /usr/lib/LW+Fonts
-</PRE></UL>
-
-<H3>XINET KA/Spool</H3>
-
-<P>To use your system as a print server for Mac OS clients,
-configure each printer using a <CODE>papserver(1m)</CODE> in the
-<VAR>/usr/adm/appletalk/services</VAR> file, specifying the
-corresponding PPD file in the <VAR>/etc/cups/ppd</VAR> directory for
-each printer.  For a printer named <CODE>MyPrinter</CODE> the entry
-would look like:
-
-<UL><PRE>
-/usr/etc/appletalk/papserver -I -L -P /etc/cups/ppd/MyPrinter.ppd \
-"Printer Description" MyPrinter
-</PRE></UL>
-
-<B>Note:</B> Enter the text above on a single line without the backslash (\)
-character.
-
-<H3>NetATalk</H3>
-
-<P>To use your system as a print server for Mac OS clients,
-configure each printer in the <VAR>papd.conf</VAR> file, specifying the
-corresponding PPD file in the <VAR>/etc/cups/ppd</VAR> directory for
-each printer. For a printer named <CODE>MyPrinter</CODE> the entry
-would look like:
-
-<UL><PRE>
-Printer Description:MyPrinter@MyServer:\
-        :pr=|/usr/bin/lp -d MyPrinter:\
-        :op=daemon:\
-        :pd=/etc/cups/ppd/MyPrinter.ppd
-</PRE></UL>
-
-<H2>Printing to Mac OS Servers</H2>
-
-<P>CUPS currently does not provide a backend to communicate with a Mac OS
-server. However, you should be able to write and install a short shell script
-in the <VAR>/usr/lib/cups/backend</VAR> directory that sends a print file
-using the appropriate command. The following is a short script that will
-run the <CODE>papif</CODE> command provided with CAP:
-
-<UL>
-<P><I>"/usr/lib/cups/backend/cap"</I>
-<PRE>
-#!/bin/sh
-#
-# Usage: cap job user title copies options [filename]
-#
-
-# No arguments means show available devices...
-
-if test ${#argv} = 0; then
-	echo "network cap \"Unknown\" \"Mac OS Printer via CAP\""
-	exit 0
-fi
-
-# Collect arguments...
-
-user=$2
-copies=$4
-
-if test ${#argv} = 5; then
-	# Get print file from stdin; copies have already been handled...
-	file=/var/tmp/$$.prn
-	copies=1
-	cat &gt; $file
-else
-	# Print file is on command-line...
-	file=$6
-fi
-
-# Create a dummy cap.printers file for this printer based
-# upon a device URI of "cap://server/printer"...
-
-echo $PRINTER/$DEVICE_URI | \
-	awk -F/ '{print $1 "=" $5 ":LaserWriter@" $4}' &gt; /var/tmp/$$.cap
-
-CAPPRINTERS=/var/tmp/$$.cap; export CAPPRINTERS
-
-# Send the file to the printer, once for each copy. This assumes that you
-# have properly initialized the cap.printers file...
-
-while [ $copies -gt 0 ]; do
-	papif -n $user &lt; $file
-
-        copies=`expr $copies - 1`
-done
-
-# Remove any temporary files...
-if test ${#argv} = 5; then
-	/bin/rm -f $file
-fi
-
-/bin/rm -f /var/tmp/$$.cap
-
-exit 0
-</PRE></UL>
-
-<P>To use this backend with a print queue, specify a device URI of
-<CODE>cap://server/printer</CODE>.
-
-<H2>Printing from Windows Clients</H2>
-
-<P>CUPS does not provide Windows support directly. However, the free
-SAMBA software package does. SAMBA version 2.0.6 is the first release
-of SAMBA that supports CUPS. You can download SAMBA from:
-
-<P ALIGN="CENTER"><A HREF="http://www.samba.org">http://www.samba.org</A></P>
-
-<P>To configure SAMBA for CUPS, edit the <VAR>smb.conf</VAR> file and
-replace the existing printing commands and options with the line:
-
-<UL><PRE>
-printing = cups
-</PRE></UL>
-
-<P>That's all there is to it!  Remote users will now be able to browse and
-print to printers on your system.
-
-<H2>Printing to Windows Servers</H2>
-
-<P>CUPS can print to Windows servers in one of two ways. The first way uses
-the LPD protocol on the CUPS system and the "TCP/IP Printing Services" on
-the Windows system. You can find out more about this configuration in the
-<A HREF="#LPD">LPD</A> section earlier in this chapter.
-
-<P>The second way is through the Microsoft Server Message Block ("SMB")
-protocol. Support for this protocol is provided with the free SAMBA
-software package. You can download SAMBA from:
-
-<P ALIGN="CENTER"><A HREF="http://www.samba.org">http://www.samba.org</A></P>
-
-<P>To configure CUPS for SAMBA, run the following command:
-
-<UL><PRE>
-<B>ln -s `which smbspool` /usr/lib/cups/backend/smb ENTER</B>
-</PRE></UL>
-
-<P>The <CODE>smbspool(1)</CODE> program is provided with SAMBA starting with
-SAMBA 2.0.6. Once you have made the link you can configure your printers with
-a device URI of <CODE>smb://workgroup/server/sharename</CODE> or
-<CODE>smb://server/sharename</CODE> if you are in the same workgroup.
-
-<P>When printing to Windows NT servers or to shares with passwords
-enabled under Windows 95 and 98, you will also need to specify the
-username and password in the device URI -
-<CODE>smb://user:pass@workgroup/server/sharename</CODE> or
-<CODE>smb://user:pass@server/sharename</CODE>.
-
-
-<H1 ALIGN="RIGHT"><A NAME="PRINTING_MANAGEMENT">8 - Printing System Management</A></H1>
+<H1 ALIGN="RIGHT"><A NAME="PRINTING_MANAGEMENT">6 - Printing System Management</A></H1>
 
 <P>This chapter shows how you can configure the CUPS server.
 
 <H2>The Basics</H2>
 
-<P>All of the server configuration files are located in the
-<VAR>/etc/cups</VAR> directory:
+<P>Several text files are used to configure CUPS. All of the server
+configuration files are located in the <VAR>/etc/cups</VAR> directory:
 
 <UL>
 <DL>
 
+	<!-- NEED 1in -->
 	<DT>classes.conf
 
 	<DD>This file contains information on each printer class.
 	Normally you manipulate this file using the
-	<CODE>lpadmin</CODE> command or the Web interface.
+	<CODE>lpadmin</CODE> command or the Web interface.<BR>&nbsp;
 
+	<!-- NEED 1in -->
 	<DT>client.conf
 
 	<DD>This file provides the default server name for client
-	machines. See <A HREF="#CLIENT_SETUP">Chapter 6, "Client
-	Setup"<A> for more information.
+	machines. See <A HREF="#CLIENT_SETUP">Chapter 5, "Client
+	Setup"</A> for more information.<BR>&nbsp;
 
+	<!-- NEED 1in -->
 	<DT>cupsd.conf
 
 	<DD>This file controls how the CUPS server
 	(<VAR>/usr/sbin/cupsd</VAR>) operates and is normally edited by
-	hand.
+	hand.<BR>&nbsp;
 
+	<!-- NEED 1in -->
 	<DT>mime.convs
 
 	<DD>This file contains a list of standard file conversion filters
-	and their costs. You normally do not edit this file.
+	and their costs. You normally do not edit this file.<BR>&nbsp;
 
+	<!-- NEED 1in -->
 	<DT>mime.types
 
 	<DD>This file contains a list of standard file formats and how to
-	recognize them. You normally do not edit this file.
+	recognize them. You normally do not edit this file.<BR>&nbsp;
 
+	<!-- NEED 1in -->
 	<DT>printers.conf
 
 	<DD>This file contains information on each printer. Normally
 	you manipulate this file using the <CODE>lpadmin</CODE> command
-	or the Web Interface.
+	or the Web Interface.<BR>&nbsp;
 
 </DL>
 </UL>
 
 <P>Once you have made a change to a configuration file you need to
-restart the CUPS server by sending it a HUP signal or using the
+restart the CUPS server by sending it a <CODE>HUP</CODE> signal or using the
 supplied initialization script. The CUPS distributions install the
 script in the <VAR>init.d</VAR> directory with the name
 <VAR>cups</VAR>. The location varies based upon the operating system:
@@ -904,6 +698,7 @@ a line.
 <P>Since the server configuration file consists of plain text, you can
 use your favorite text editor to make changes to it.
 
+<!-- NEED 4in -->
 <H2>Server Directives</H2>
 
 <P>The <VAR>cupsd.conf</VAR> file contains many directives that
@@ -1006,7 +801,7 @@ to the system log instead of a plain file.
 
 <P>The default access log file is <VAR>/var/log/cups/access_log</VAR>.
 
-<!-- NEED 3in -->
+<!-- NEED 5in -->
 <H3><A NAME="Allow">Allow</A></H3>
 <HR>
 
@@ -1036,34 +831,34 @@ can be used to allow access for multiple hosts or networks.  The
 
 <CENTER><TABLE BORDER="1">
 <TR>
-	<TH>mm</TH>
-	<TH>netmask</TH>
-	<TH>mm</TH>
-	<TH>netmask</TH>
+	<TH WIDTH="10%">mm</TH>
+	<TH WIDTH="20%">netmask</TH>
+	<TH WIDTH="10%">mm</TH>
+	<TH WIDTH="20%">netmask</TH>
 </TR>
 <TR>
-	<TD>0</TD>
-	<TD>0.0.0.0</TD>
-	<TD>8</TD>
-	<TD>255.0.0.0</TD>
+	<TD ALIGN="CENTER">0</TD>
+	<TD ALIGN="CENTER">0.0.0.0</TD>
+	<TD ALIGN="CENTER">8</TD>
+	<TD ALIGN="CENTER">255.0.0.0</TD>
 </TR>
 <TR>
-	<TD>1</TD>
-	<TD>128.0.0.0</TD>
-	<TD>16</TD>
-	<TD>255.255.0.0</TD>
+	<TD ALIGN="CENTER">1</TD>
+	<TD ALIGN="CENTER">128.0.0.0</TD>
+	<TD ALIGN="CENTER">16</TD>
+	<TD ALIGN="CENTER">255.255.0.0</TD>
 </TR>
 <TR>
-	<TD>2</TD>
-	<TD>192.0.0.0</TD>
-	<TD>24</TD>
-	<TD>255.255.255.0</TD>
+	<TD ALIGN="CENTER">2</TD>
+	<TD ALIGN="CENTER">192.0.0.0</TD>
+	<TD ALIGN="CENTER">24</TD>
+	<TD ALIGN="CENTER">255.255.255.0</TD>
 </TR>
 <TR>
-	<TD>...</TD>
-	<TD>...</TD>
-	<TD>32</TD>
-	<TD>255.255.255.255</TD>
+	<TD ALIGN="CENTER">...</TD>
+	<TD ALIGN="CENTER">...</TD>
+	<TD ALIGN="CENTER">32</TD>
+	<TD ALIGN="CENTER">255.255.255.255</TD>
 </TR>
 </TABLE></CENTER>
 
@@ -1085,8 +880,8 @@ AuthClass Group
 
 <H4>Description</H4>
 
-<P>The <CODE>AuthClass</CODE> directive defines what level of <CODE>Basic</CODE>
-access is required:
+<P>The <CODE>AuthClass</CODE> directive defines what level of authentication
+is required:
 
 <UL>
 
@@ -1096,9 +891,9 @@ access is required:
 	<LI><CODE>User</CODE> - A valid username and password is required.
 
 	<LI><CODE>System</CODE> - A valid username and password is
-	required, and the username must belong to the "sys" group (this
-	can be changed using the <CODE>SystemGroup</CODE> directive,
-	below.
+	required, and the username must belong to the "sys" group; this
+	can be changed using the
+	<A HREF="#SystemGroup"><CODE>SystemGroup</CODE></A> directive.
 
 	<LI><CODE>Group</CODE> - A valid username and password is
 	required, and the username must belong to the group named by
@@ -1117,6 +912,7 @@ access is required:
 
 <UL><PRE>
 AuthGroupName mygroup
+AuthGroupName lp
 </PRE></UL>
 
 <H4>Description</H4>
@@ -1164,7 +960,7 @@ authenticate using <A HREF="#CERTIFICATES">certificates</A>.
 <P>The <CODE>AuthType</CODE> directive must appear inside a
 <A HREF="#Location"><CODE>Location</CODE></A> directive.
 
-<!-- NEED 3in -->
+<!-- NEED 5in -->
 <H3><A NAME="BrowseAddress">BrowseAddress</A></H3>
 <HR>
 
@@ -1173,6 +969,7 @@ authenticate using <A HREF="#CERTIFICATES">certificates</A>.
 <UL><PRE>
 BrowseAddress 255.255.255.255:631
 BrowseAddress 192.0.2.255:631
+BrowseAddress host.domain.com:631
 </PRE></UL>
 
 <H4>Description</H4>
@@ -1185,18 +982,20 @@ networks or systems.
 <P>The default address is <CODE>255.255.255.255:631</CODE> which will
 broadcast the information to all networks the server is connected to.
 
-<UL>
-
+<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
+<TR>
+	<TD>
 	<B>NOTE:</B>
 
 	<P>If you are using HP-UX 10.20 and a subnet that is not 24,
 	16, or 8 bits, printer browsing (and in fact all broadcast
 	reception) will not work. This problem appears to be fixed in
 	HP-UX 11.0.
+	</TD>
+</TR>
+</TABLE></CENTER>
 
-</UL>
-
-<!-- NEED 3in -->
+<!-- NEED 4in -->
 <H3><A NAME="BrowseAllow">BrowseAllow</A></H3>
 <HR>
 
@@ -1217,14 +1016,14 @@ BrowseAllow from *.domain.com
 to accept browse packets from. The default is to accept browse packets
 from all hosts.
 
-<P>Host and domain name matching requires that you enable the
+<P>Host and domain name matching require that you enable the
 <A HREF="#HostNameLookups"><CODE>HostNameLookups</CODE></A> directive.
 
 <P>IP address matching supports exact matches, partial addresses that
 match networks using netmasks of 255.0.0.0, 255.255.0.0, and 255.255.255.0,
 or network addresses using the specified netmask or bit count.
 
-<!-- NEED 3in -->
+<!-- NEED 4in -->
 <H3><A NAME="BrowseDeny">BrowseDeny</A></H3>
 <HR>
 
@@ -1245,7 +1044,7 @@ BrowseDeny from *.domain.com
 to reject browse packets from. The default is to deny browse packets
 from no hosts.
 
-<P>Host and domain name matching requires that you enable the
+<P>Host and domain name matching require that you enable the
 <A HREF="#HostNameLookups"><CODE>HostNameLookups</CODE></A> directive.
 
 <P>IP address matching supports exact matches, partial addresses that
@@ -1338,16 +1137,18 @@ BrowsePort 9999
 <P>The <CODE>BrowsePort</CODE> directive specifies the UDP port number
 used for browse packets. The default port number is 631.
 
-<UL>
-
+<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
+<TR>
+	<TD>
 	<B>NOTE:</B>
 
 	<P>You must set the <CODE>BrowsePort</CODE> to the same value
 	on all of the systems that you want to see.
+	</TD>
+</TR>
+</TABLE></CENTER>
 
-</UL>
-
-<!-- NEED 3in -->
+<!-- NEED 4in -->
 <H3><A NAME="BrowseRelay">BrowseRelay</A></H3>
 <HR>
 
@@ -1377,7 +1178,7 @@ BrowseRelay 127.0.0.1 255.255.255.255
 </PRE></UL>
 
 <P>This effectively provides access to printers on a WAN for all clients
-on the LAN(s) connected to the server.
+on the LAN(s).
 
 <!-- NEED 3in -->
 <H3><A NAME="BrowseTimeout">BrowseTimeout</A></H3>
@@ -1417,16 +1218,18 @@ Browsing Off
 <P>The <CODE>Browsing</CODE> directive controls whether or not network printer
 browsing is enabled. The default setting is <CODE>On</CODE>.
 
-<UL>
-
+<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
+<TR>
+	<TD>
 	<B>NOTE:</B>
 
 	<P>If you are using HP-UX 10.20 and a subnet that is not 24,
 	16, or 8 bits, printer browsing (and in fact all broadcast
 	reception) will not work. This problem appears to be fixed in
 	HP-UX 11.0.
-
-</UL>
+	</TD>
+</TR>
+</TABLE></CENTER>
 
 <!-- NEED 3in -->
 <H3><A NAME="DefaultCharset">DefaultCharset</A></H3>
@@ -1468,7 +1271,7 @@ to use for client connections. Setting the default language also sets the
 default character set if a language localization file exists for it.  The
 default language is "en" for English.
 
-<!-- NEED 3in -->
+<!-- NEED 5in -->
 <H3><A NAME="Deny">Deny</A></H3>
 <HR>
 
@@ -1498,34 +1301,34 @@ can be used to allow access for multiple hosts or networks. The
 
 <CENTER><TABLE BORDER="1">
 <TR>
-	<TH>mm</TH>
-	<TH>netmask</TH>
-	<TH>mm</TH>
-	<TH>netmask</TH>
+	<TH WIDTH="10%">mm</TH>
+	<TH WIDTH="20%">netmask</TH>
+	<TH WIDTH="10%">mm</TH>
+	<TH WIDTH="20%">netmask</TH>
 </TR>
 <TR>
-	<TD>0</TD>
-	<TD>0.0.0.0</TD>
-	<TD>8</TD>
-	<TD>255.0.0.0</TD>
+	<TD ALIGN="CENTER">0</TD>
+	<TD ALIGN="CENTER">0.0.0.0</TD>
+	<TD ALIGN="CENTER">8</TD>
+	<TD ALIGN="CENTER">255.0.0.0</TD>
 </TR>
 <TR>
-	<TD>1</TD>
-	<TD>128.0.0.0</TD>
-	<TD>16</TD>
-	<TD>255.255.0.0</TD>
+	<TD ALIGN="CENTER">1</TD>
+	<TD ALIGN="CENTER">128.0.0.0</TD>
+	<TD ALIGN="CENTER">16</TD>
+	<TD ALIGN="CENTER">255.255.0.0</TD>
 </TR>
 <TR>
-	<TD>2</TD>
-	<TD>192.0.0.0</TD>
-	<TD>24</TD>
-	<TD>255.255.255.0</TD>
+	<TD ALIGN="CENTER">2</TD>
+	<TD ALIGN="CENTER">192.0.0.0</TD>
+	<TD ALIGN="CENTER">24</TD>
+	<TD ALIGN="CENTER">255.255.255.0</TD>
 </TR>
 <TR>
-	<TD>...</TD>
-	<TD>...</TD>
-	<TD>32</TD>
-	<TD>255.255.255.255</TD>
+	<TD ALIGN="CENTER">...</TD>
+	<TD ALIGN="CENTER">...</TD>
+	<TD ALIGN="CENTER">32</TD>
+	<TD ALIGN="CENTER">255.255.255.255</TD>
 </TR>
 </TABLE></CENTER>
 
@@ -1720,8 +1523,8 @@ access to specific interfaces or networks.
 
 <P>The <CODE>Location</CODE> directive specifies access control and
 authentication options for the specified HTTP resource or path. More
-information can be found in <A HREF="#PRINTING_SECURITY">Chapter 8,
-"Printing System Security"</A>.
+information can be found later in this chapter in
+<A HREF="#PRINTING_SECURITY">"Printing System Security"</A>.
 
 <!-- NEED 3in -->
 <H3><A NAME="LogLevel">LogLevel</A></H3>
@@ -1739,14 +1542,15 @@ LogLevel warn
 
 <H4>Description</H4>
 
-<P>The <CODE>LogLevel</CODE> directive specifies the level of logging for
-the <CODE>ErrorLog</CODE> file. The following values are recognized:
+<P>The <CODE>LogLevel</CODE> directive specifies the level of logging
+for the <A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A> file. The
+following values are recognized:
 
 <UL>
 
 	<LI><CODE>debug</CODE> - Log everything.
 
-	<LI><CODE>info</CODE> - Log all requests and state changes.
+	<LI><CODE>info</CODE> - Log all requests and state changes (default).
 
 	<LI><CODE>warn</CODE> - Log errors and warnings.
 
@@ -1755,8 +1559,6 @@ the <CODE>ErrorLog</CODE> file. The following values are recognized:
 	<LI><CODE>none</CODE> - Log nothing.
 
 </UL>
-
-<P>The default log level is <CODE>info</CODE>.
 
 <!-- NEED 3in -->
 <H3><A NAME="MaxClients">MaxClients</A></H3>
@@ -1775,10 +1577,18 @@ MaxClients 1024
 simultaneous clients that will be allowed by the server. The default is
 100 clients.
 
-<P><B>Note:</B> Since each print job requires a file descriptor for the
-status pipe, the CUPS server internally limits the
-<CODE>MaxClients</CODE> value to 1/3 of the available file descriptors
-to avoid possible problems when printing large numbers of jobs.
+<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
+<TR>
+	<TD>
+	<B>NOTE:</B>
+
+	<P>Since each print job requires a file descriptor for the
+	status pipe, the CUPS server internally limits the
+	<CODE>MaxClients</CODE> value to 1/3 of the available file descriptors
+	to avoid possible problems when printing large numbers of jobs.
+	</TD>
+</TR>
+</TABLE></CENTER>
 
 <!-- NEED 3in -->
 <H3><A NAME="MaxLogSize">MaxLogSize</A></H3>
@@ -1788,6 +1598,7 @@ to avoid possible problems when printing large numbers of jobs.
 
 <UL><PRE>
 MaxLogSize 1048576
+MaxLogSize 1m
 MaxLogSize 0
 </PRE></UL>
 
@@ -1807,8 +1618,9 @@ automatically. The default size is 1048576 bytes (1MB).
 <H4>Examples</H4>
 
 <UL><PRE>
-MaxRequestSize 0
 MaxRequestSize 10485760
+MaxRequestSize 10m
+MaxRequestSize 0
 </PRE></UL>
 
 <H4>Description</H4>
@@ -1835,11 +1647,11 @@ The following values are supported:
 
 <UL>
 
-	<LI><CODE>Order Allow,Deny</CODE> - Allow requests from all
+	<LI><CODE>Allow,Deny</CODE> - Allow requests from all
 	systems <I>except</I> for those listed in a <CODE>Deny</CODE>
 	directive.
 
-	<LI><CODE>Order Deny,Allow</CODE> - Allow requests only from
+	<LI><CODE>Deny,Allow</CODE> - Allow requests only from
 	those listed in an <CODE>Allow</CODE> directive.
 
 </UL>
@@ -2089,8 +1901,8 @@ SystemGroup root
 
 <P>The <CODE>SystemGroup</CODE> directive specifies the system
 administration group for <CODE>System</CODE> authentication. More
-information can be found in <A HREF="#PRINTING_SECURITY">Chapter 8,
-"Printing System Security"</A>.
+information can be found later in this chapter in
+<A HREF="#PRINTING_SECURITY">"Printing System Security"</A>.
 
 <!-- NEED 3in -->
 <H3><A NAME="TempDir">TempDir</A></H3>
@@ -2152,12 +1964,8 @@ User guest
 <P>The <CODE>User</CODE> directive specifies the UNIX user that
 filter and CGI programs run as. The default user is <CODE>lp</CODE>.
 
-<H1 ALIGN="RIGHT"><A NAME="PRINTING_SECURITY">9 - Printing System Security</A></H1>
-
-<P>This chapter shows the different type of access control and authentication
-that are available in CUPS.
-
-<H2>The Basics</H2>
+<!-- NEW PAGE -->
+<H2><A NAME="PRINTING_SECURITY">Printing System Security</A></H2>
 
 <P>CUPS provides support for address, certificate, and password (Basic and
 Digest) based authentication and access control.
@@ -2229,7 +2037,7 @@ and printers:
 </TR>
 </TABLE></CENTER>
 
-<H2><A NAME="CERTIFICATES">Authentication Using Certificates</A></H2>
+<H3><A NAME="CERTIFICATES">Authentication Using Certificates</A></H3>
 
 <P>CUPS supports a local certificate-based authentication scheme that
 can be used in place of <CODE>Basic</CODE> or <CODE>Digest</CODE>
@@ -2263,15 +2071,16 @@ or another user that is part of the group defined by the
 <A HREF="#SystemGroup"><CODE>SystemGroup</CODE></A> directive. The
 root certificate is automatically regenerated every 5 minutes.
 
-<H2>Using Basic Authentication</H2>
+<H3>Using Basic Authentication</H3>
 
 <P>Basic authentication uses UNIX users and passwords to authenticate
 access to resources such as printers and classes, and to limit access
 to administrative functions.
 
-<UL>
-
-	<B>Note:</B>
+<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
+<TR>
+	<TD>
+	<B>NOTE:</B>
 
 	<P>Basic authentication sends the username and password Base64
 	encoded from the client to the server, so it offers no
@@ -2279,8 +2088,9 @@ to administrative functions.
 	user can monitor network packets and discover valid users and
 	passwords that could result in a serious compromise in network
 	security. Use Basic authentication with extreme care.
-
-</UL>
+	</TD>
+</TR>
+</TABLE></CENTER>
 
 <P>The CUPS implementation of Basic authentication does not allow access
 through user accounts without a password. If you try to authenticate
@@ -2290,31 +2100,35 @@ blocked.
 <P>Once a valid username and password is authenticated by CUPS, any
 additional group membership requirements are checked.
 
-<UL>
-
-	<B>Note:</B>
+<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
+<TR>
+	<TD>
+	<B>NOTE:</B>
 
 	<P>The root user is considered by CUPS to be a member of every
 	group.
+	</TD>
+</TR>
+</TABLE></CENTER>
 
-</UL>
-
+<!-- NEED 1in -->
 <P>Use the <CODE>AuthType</CODE> directive to enable Basic authentication:
 
 <UL><PRE>
 AuthType Basic
 </PRE></UL>
 
-<H2>Using Digest Authentication</H2>
+<H3>Using Digest Authentication</H3>
 
 <P>Digest authentication uses users and passwords defined in the
 <VAR>/etc/cups/passwd.md5</VAR> file to authenticate access to
 resources such as printers and classes, and to limit access to
 administrative functions.
 
-<UL>
-
-	<B>Note:</B>
+<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
+<TR>
+	<TD>
+	<B>NOTE:</B>
 
 	<P>Unlike Basic authentication, Digest passes the MD5 sum
 	(basically a complicated checksum) of the username and password
@@ -2340,9 +2154,11 @@ administrative functions.
 	authentication whenever possible. <B>Support for Digest
 	authentication in web browsers is not yet universally
 	available.</B>
+	</TD>
+</TR>
+</TABLE></CENTER>
 
-</UL>
-
+<!-- NEED 2in -->
 <P>The <CODE>lppasswd(1)</CODE> command is used to add, change, or
 remove accounts from the <VAR>passwd.md5</VAR> file. To add a
 user to the default system group, type:
@@ -2353,6 +2169,7 @@ Password: <B>(password) ENTER</B> [password is not echoed]
 Password again: <B>(password) ENTER</B> [password is not echoed]
 </PRE></UL>
 
+<!-- NEED 2in -->
 <P>Once added, a user can change his/her password by typing:
 
 <UL><PRE>
@@ -2362,6 +2179,7 @@ Password: <B>(password) ENTER</B> [password is not echoed]
 Password again: <B>(password) ENTER</B> [password is not echoed]
 </PRE></UL>
 
+<!-- NEED 1in -->
 <P>To remove a user from the password file, type:
 
 <UL><PRE>
@@ -2371,14 +2189,16 @@ Password again: <B>(password) ENTER</B> [password is not echoed]
 <P>Once a valid username and password is authenticated by CUPS, any
 additional group membership requirements are checked.
 
-<UL>
-
-	<B>Note:</B>
+<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
+<TR>
+	<TD>
+	<B>NOTE:</B>
 
 	<P>The root user is considered by CUPS to be a member of every
 	group.
-
-</UL>
+	</TD>
+</TR>
+</TABLE></CENTER>
 
 <P>Use the <CODE>AuthType</CODE> directive to enable Digest authentication:
 
@@ -2386,7 +2206,7 @@ additional group membership requirements are checked.
 AuthType Digest
 </PRE></UL>
 
-<H2>System and Group Authentication</H2>
+<H3>System and Group Authentication</H3>
 
 <P>The <A HREF="#AuthClass"><CODE>AuthClass</CODE></A> directive controls
 the level of authentication to perform. <CODE>System</CODE> and
@@ -2418,18 +2238,16 @@ Password: <B>(password) ENTER</B> [password is not echoed]
 Password again: <B>(password) ENTER</B> [password is not echoed]
 </PRE></UL>
 
+<!-- NEW PAGE -->
+<H2><A NAME="PRINTER_ACCOUNTING">Printer Accounting</A></H2>
 
-<H1 ALIGN="RIGHT"><A NAME="PRINTER_ACCOUNTING">10 - Printer Accounting</A></H1>
-
-<P>This chapter describes the CUPS log files.
-
-<H2>Where to Find the Log Files</H2>
+<P>CUPS maintains a log of all accesses, errors, and pages that are
 
 <P>The log files are normally stored in the <VAR>/var/log/cups</VAR>
 directory. You can change this by editing the
 <VAR>/etc/cups/cupsd.conf</VAR> configuration file.
 
-<H2>The access_log File</H2>
+<H3>The access_log File</H3>
 
 <P>The <VAR>access_log</VAR> file lists each HTTP resource that is accessed
 by a web browser or CUPS/IPP client. Each line is in the so-called "Common
@@ -2475,7 +2293,7 @@ above.
 For POST requests the <I>bytes</I> field contains the number of bytes
 of non-IPP data that is received from the client.
 
-<H2>The error_log File</H2>
+<H3>The error_log File</H3>
 
 <P>The <VAR>error_log</VAR> file lists messages from the scheduler (errors,
 warnings, etc.):
@@ -2508,7 +2326,7 @@ field in the <VAR>access_log</VAR> file.
 
 <P>The <I>message</I> fields contains a free-form textual message.
 
-<H2>The page_log File</H2>
+<H3>The page_log File</H3>
 
 <P>The <VAR>page_log</VAR> file lists each page that is sent to a printer.
 Each line contains the following information:
@@ -2541,15 +2359,11 @@ produce copies on their own, the <I>num-pages</I> field will always be 1.
 
 <P>The <I>job-billing</I> field contains a copy of the
 <CODE>job-billing</CODE> attribute provided with the IPP
-<CODE>create-job</CODE> or <CODE>print-job</CODE> requests.
+<CODE>create-job</CODE> or <CODE>print-job</CODE> requests or "-" if none
+was provided.
 
-
-<H1 ALIGN="RIGHT">11 - File Typing and Filtering</H1>
-
-<P>This chapter shows how print files are filtered and how to add support
-for your own file formats and filters.
-
-<H2>The Basics</H2>
+<!-- NEW PAGE -->
+<H2><A NAME="FILE_TYPING_FILTERING">File Typing and Filtering</A></H2>
 
 <P>CUPS provides a MIME-based file typing and filtering mechanism to
 convert files to a printable format for each printer. On startup the
@@ -2629,7 +2443,10 @@ file type based upon the contents of the file instead.
 </UL>
 
 <P>All numeric values can be in decimal (123), octal (0123), or hexadecimal
-(0x123) as desired. Strings can be in quotes, all by themselves, as a string
+(0x123) as desired.
+
+<!-- NEED 2.5in -->
+<P>Strings can be in quotes, all by themselves, as a string
 of hexadecimal values, or some combination:
 
 <UL><PRE>
@@ -2701,7 +2518,8 @@ program job user title options [filename]
 when filtering, otherwise the filter must read from the standard input.
 All filtered output must go to the standard output.
 
-<H2>Adding Filetypes and Filters</H2>
+<!-- NEED 4in -->
+<H3>Adding Filetypes and Filters</H3>
 
 <P>Adding a new file type or filter is fairly straight-forward. Rather
 than adding the new type and filter to the <VAR>mime.types</VAR> and
@@ -2733,7 +2551,7 @@ have created the files, restart the <CODE>cupsd</CODE> process as
 described in <A HREF="#PRINTING_MANAGEMENT">Chapter N, "Printing System
 Configuration"</A>.
 
-<H2>Printer Drivers and PPD Files</H2>
+<H3>Printer Drivers and PPD Files</H3>
 
 <P>Most CUPS printer drivers utilize one or more printer-specific filters
 and a PPD file for each printer model. Printer driver filters are registered
@@ -2747,12 +2565,258 @@ via the PPD file using <CODE>cupsFilter</CODE> attributes:
 file type is assumed to be <CODE>printer/name</CODE> - suitable for sending
 to the printer.
 
-<H2>Writing Your Own Filter or Printer Driver</H2>
+<H3>Writing Your Own Filter or Printer Driver</H3>
 
 <P>CUPS supports an unlimited number of file formats and filters, and can
 handle any printer. If you'd like to write a filter or printer driver for
 your favorite file format or printer, consult the CUPS Software Programmers
 Manual for step-by-step instructions.
+
+
+<H1 ALIGN="RIGHT"><A NAME="PRINTING_OTHER">7 - Printing with Other Systems</A></H1>
+
+<P>This chapter describes how to print from client systems that use the
+LPD, Mac OS, or Windows printing protocols.
+
+<H2>The Basics</H2>
+
+<P>CUPS is based on the IPP protocol, so any system that supports IPP
+can send jobs to and receive jobs from CUPS automatically. However, not
+all systems support IPP yet. This chapter will show you how to connect
+these systems to your CUPS server, either to accept jobs from your
+server for printing, or to send jobs to your server.
+
+<H2>Printing from LPD Clients</H2>
+
+<P>CUPS supports limited functionality for LPD-based clients. With LPD you can
+print files to specific printers, list the queue status, and so forth. However,
+the automatic client configuration and printer options are not supported by
+the LPD protocol, so you must manually configure each client for the printers
+it needs to access.
+
+<P>The <CODE>cups-lpd(1m)</CODE> program provides support for LPD clients.
+To enable LPD support on your server, edit the <VAR>/etc/inetd.conf</VAR>
+file and add a line reading:
+
+<UL><PRE>
+printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd
+</PRE></UL>
+
+<P>The path to the <CODE>cups-lpd</CODE> may vary depending on your
+installation.
+
+<P>Once you have added this line, send the <CODE>inetd(1m)</CODE> process
+a <CODE>HUP</CODE> signal or reboot the system:
+
+<UL><PRE>
+<B>killall -HUP inetd ENTER</B> [IRIX and some versions of Linux]
+<B>kill -HUP <I>pid</I> ENTER</B>
+<B>reboot ENTER</B>
+</PRE></UL>
+
+<H2>Printing to LPD Servers</H2>
+
+<P>CUPS provides the <CODE>lpd</CODE> backend for printing to LPD-based
+servers and printers. Use a device URI of <CODE>lpd://server/name</CODE>
+to print to a printer on an LPD server, where <CODE>server</CODE>
+is the hostname or IP address of the server and <CODE>name</CODE> is
+the queue name.
+
+<P>Microsoft Windows NT provides an LPD service under the name "TCP/IP
+Printing Services". To enable LPD printing on NT, open the "Services"
+control panel, select the "TCP/IP Printing Services" service, and click
+on the "Start" button. Any shared printer will then be available via
+the LPD protocol.
+
+<H2>Printing from Mac OS Clients</H2>
+
+<P>CUPS does not provide Mac OS support directly. However, there are several
+free and commercial software packages that do.
+
+<H3>Columbia Appletalk Package (CAP)</H3>
+
+<P>Because the CAP LaserWriter server (<CODE>lwsrv(1m)</CODE>) does
+not support specification of PPD files, we do not recommend that you
+use CAP with CUPS. However, you can run the <CODE>lpsrv</CODE> program
+for limited printing with the command:
+
+<UL><PRE>
+lwsrv -n "<I>Name</I>" -p <I>printer</I> -a /usr/lib/adicts -f /usr/lib/LW+Fonts
+</PRE></UL>
+
+<P>where <CODE>Name</CODE> is the name you want to use when sharing the
+printer, and <CODE>printer</CODE> is the name of the CUPS print queue.
+
+<!-- NEED 3in -->
+<H3>XINET KA/Spool</H3>
+
+<P>To use your system as a print server for Mac OS clients,
+configure each printer using a <CODE>papserver(1m)</CODE> in the
+<VAR>/usr/adm/appletalk/services</VAR> file, specifying the
+corresponding PPD file in the <VAR>/etc/cups/ppd</VAR> directory for
+each printer.  For a printer named <CODE>MyPrinter</CODE> the entry
+would look like:
+
+<UL><PRE>
+/usr/etc/appletalk/papserver -I -L -P /etc/cups/ppd/MyPrinter.ppd \
+"Printer Description" MyPrinter
+</PRE></UL>
+
+<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
+<TR>
+	<TD>
+	<B>NOTE:</B>
+
+	<P>Enter the text above on a single line without the backslash (\)
+	character.
+	</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>NetATalk</H3>
+
+<P>To use your system as a print server for Mac OS clients,
+configure each printer in the <VAR>papd.conf</VAR> file, specifying the
+corresponding PPD file in the <VAR>/etc/cups/ppd</VAR> directory for
+each printer. For a printer named <CODE>MyPrinter</CODE> the entry
+would look like:
+
+<UL><PRE>
+Printer Description:MyPrinter@MyServer:\
+        :pr=|/usr/bin/lp -d MyPrinter:\
+        :op=daemon:\
+        :pd=/etc/cups/ppd/MyPrinter.ppd
+</PRE></UL>
+
+<!-- NEED 2in -->
+
+<H2>Printing to Mac OS Servers</H2>
+
+<P>CUPS currently does not provide a backend to communicate with a Mac OS
+server. However, you can write and install a short shell script
+in the <VAR>/usr/lib/cups/backend</VAR> directory that sends a print file
+using the appropriate command. The following is a short script that will
+run the <CODE>papif</CODE> command provided with CAP.
+
+<P>After copying this script to <VAR>/usr/lib/cups/backend/cap</VAR>,
+specify a device URI of <CODE>cap://server/printer</CODE> to use this
+backend with a print queue.
+
+<!-- NEED 8in -->
+<UL>
+<PRE>
+<I>"/usr/lib/cups/backend/cap"</I>
+#!/bin/sh
+#
+# Usage: cap job user title copies options [filename]
+#
+
+# No arguments means show available devices...
+
+if test ${#argv} = 0; then
+	echo "network cap \"Unknown\" \"Mac OS Printer via CAP\""
+	exit 0
+fi
+
+# Collect arguments...
+
+user=$2
+copies=$4
+
+if test ${#argv} = 5; then
+	# Get print file from stdin; copies have already been handled...
+	file=/var/tmp/$$.prn
+	copies=1
+	cat &gt; $file
+else
+	# Print file is on command-line...
+	file=$6
+fi
+
+# Create a dummy cap.printers file for this printer based
+# upon a device URI of "cap://server/printer"...
+
+echo $PRINTER/$DEVICE_URI | \
+	awk -F/ '{print $1 "=" $5 ":LaserWriter@" $4}' &gt; /var/tmp/$$.cap
+
+CAPPRINTERS=/var/tmp/$$.cap; export CAPPRINTERS
+
+# Send the file to the printer, once for each copy. This assumes that you
+# have properly initialized the cap.printers file...
+
+while [ $copies -gt 0 ]; do
+	papif -n $user &lt; $file
+
+        copies=`expr $copies - 1`
+done
+
+# Remove any temporary files...
+if test ${#argv} = 5; then
+	/bin/rm -f $file
+fi
+
+/bin/rm -f /var/tmp/$$.cap
+
+exit 0
+</PRE></UL>
+
+<!-- NEED 2in -->
+<H2>Printing from Windows Clients</H2>
+
+<P>While CUPS does not provide Windows support directly, the free
+SAMBA software package does. SAMBA version 2.0.6 is the first release
+of SAMBA that supports CUPS. You can download SAMBA from:
+
+<UL><PRE>
+<A HREF="http://www.samba.org">http://www.samba.org</A>
+</PRE></UL>
+
+<P>To configure SAMBA for CUPS, edit the <VAR>smb.conf</VAR> file and
+replace the existing printing commands and options with the line:
+
+<UL><PRE>
+printing = cups
+</PRE></UL>
+
+<P>That's all there is to it!  Remote users will now be able to browse and
+print to printers on your system.
+
+<H2>Printing to Windows Servers</H2>
+
+<P>CUPS can print to Windows servers in one of two ways. The first way uses
+the LPD protocol on the CUPS system and the "TCP/IP Printing Services" on
+the Windows system. You can find out more about this configuration in the
+<A HREF="#LPD">LPD</A> section earlier in this chapter.
+
+<P>The second way is through the Microsoft Server Message Block ("SMB")
+protocol. Support for this protocol is provided with the free SAMBA
+software package. You can download SAMBA from:
+
+<UL><PRE>
+<A HREF="http://www.samba.org">http://www.samba.org</A>
+</PRE></UL>
+
+<P>To configure CUPS for SAMBA, run the following command:
+
+<UL><PRE>
+<B>ln -s `which smbspool` /usr/lib/cups/backend/smb ENTER</B>
+</PRE></UL>
+
+<P>The <CODE>smbspool(1)</CODE> program is provided with SAMBA starting
+with SAMBA 2.0.6. Once you have made the link you can configure your
+printers with one of the following device URIs:
+
+<UL><PRE>
+smb://workgroup/server/sharename
+smb://server/sharename
+smb://user:pass@workgroup/server/sharename
+smb://user:pass@server/sharename
+</PRE></UL>
+
+<P>The <CODE>workgroup</CODE> name need only be specified if your
+system is using a different workgroup. The <CODE>user:pass</CODE>
+strings are required when printing to Windows NT servers or to shares
+with passwords enabled under Windows 95 and 98.
 
 
 <H1 ALIGN="RIGHT"><A NAME="LICENSE">A - Software License Agreement</A></H1>
@@ -2780,6 +2844,7 @@ sometimes called a node address, and the IP address you want to use for
 the device. The Ethernet MAC address can often be found on the printer
 test page or bottom of the print server.
 
+<!-- NEED 3in -->
 <H3>Configuring the IP Address Using ARP</H3>
 
 <P>The easiest way to set the IP address of a network device is to use
@@ -2834,6 +2899,7 @@ an IP address or hostname like:
 <P>Add a line to this file and cycle the power on the printer or print
 server to set its address.
 
+<!-- NEED 2in -->
 <H3>Configuring the IP Address Using BOOTP</H3>
 
 <P>The BOOTP protocol is used when you need to provide additional information
@@ -2845,6 +2911,7 @@ add a line to the <VAR>/etc/bootptab</VAR> file; for IRIX:
 myprinter 08:00:69:00:12:34 192.0.2.2 <VAR>myprinter.boot</VAR>
 </PRE></UL>
 
+<!-- NEED 1in -->
 <P>Newer versions of <CODE>bootpd</CODE> use a different format:
 
 <UL><PRE>
@@ -2855,16 +2922,19 @@ myprinter:ha=080069001234:ip=192.0.2.2:<VAR>t144=myprinter.boot</VAR>
 directory by default. If you do not need to provide a boot file you may leave
 the last part of the line blank.
 
-<UL>
-
-	<B>Note:</B>
+<!-- NEED 2in -->
+<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
+<TR>
+	<TD>
+	<B>NOTE:</B>
 
 	<P>Some versions of UNIX do not enable the BOOTP service by
 	default. The <VAR>/etc/inetd.conf</VAR> usually contains a
 	line for the BOOTP service that can be uncommented if
 	needed.
-
-</UL>
+	</TD>
+</TR>
+</TABLE></CENTER>
 
 <H2>Verifying the Printer Connection</H2>
 
@@ -2891,6 +2961,7 @@ LAN, it is powered on, the LAN cabling is good, and the IP address is
 set correctly. You can usually see the current IP address and network
 status by printing a configuration or test page on the device.
 
+<!-- NEED 4in -->
 <H2>Common Network Interface Settings</H2>
 
 <P>Once you have set the IP address you can access the printer or print
@@ -2908,6 +2979,7 @@ CUPS:
 	<TD>Apple LaserWriter</TD>
 	<TD>lpd://<I>address</I>/PASSTHRU</TD>
 </TR>
+<!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP">
 	<TD>Axis w/o IPP<BR>
 	<A HREF="#AXIS">(see directions)</A></TD>
@@ -2915,18 +2987,21 @@ CUPS:
 	socket://<I>address</I>:9101<BR>
 	socket://<I>address</I>:9102</TD>
 </TR>
+<!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP">
 	<TD>Axis w/IPP</TD>
 	<TD>ipp://<I>address</I>/LPT1<BR>
 	ipp://<I>address</I>/LPT2<BR>
 	ipp://<I>address</I>/COM1</TD>
 </TR>
+<!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP">
 	<TD>Castelle LANpress<SUP>TM</SUP></TD>
 	<TD>lpd://<I>address</I>/pr1<BR>
 	lpd://<I>address</I>/pr2<BR>
 	lpd://<I>address</I>/pr3</TD>
 </TR>
+<!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP">
 	<TD>DPI NETPrint</TD>
 	<TD>lpd://<I>address</I>/pr1<BR>
@@ -2941,18 +3016,21 @@ CUPS:
 	<TD>EPSON&reg; Multiprotocol Ethernet Interface Board</TD>
 	<TD>socket://<I>address</I></TD>
 </TR>
+<!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP">
 	<TD>Extended System ExtendNET</TD>
 	<TD>lpd://<I>address</I>/pr1<BR>
 	lpd://<I>address</I>/pr2<BR>
 	lpd://<I>address</I>/pr3</TD>
 </TR>
+<!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP">
 	<TD>Hewlett Packard JetDirect w/o IPP</TD>
 	<TD>socket://<I>address</I>:9100<BR>
 	socket://<I>address</I>:9101<BR>
 	socket://<I>address</I>:9102</TD>
 </TR>
+<!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP">
 	<TD>Hewlett Packard JetDirect w/IPP</TD>
 	<TD>ipp://<I>address</I>/ipp<BR>
@@ -2960,6 +3038,7 @@ CUPS:
 	ipp://<I>address</I>/ipp/port2<BR>
 	ipp://<I>address</I>/ipp/port3</TD>
 </TR>
+<!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP">
 	<TD>Intel® NetportExpress XL, PRO/100</TD>
 	<TD>lpd://<I>address</I>/LPT1_PASSTHRU<BR>
@@ -2970,6 +3049,7 @@ CUPS:
 	<TD>Lexmark<SUP>TM</SUP> MarkNet</TD>
 	<TD>lpd://<I>address</I>/ps</TD>
 </TR>
+<!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP">
 	<TD>Linksys EtherFast&reg;</TD>
 	<TD>socket://<I>address</I>:4010<BR>
@@ -3001,6 +3081,7 @@ However, on models that do not provide IPP support an additional step
 must be performed to configure the TCP/IP portion of the print server
 for use with CUPS.
 
+<!-- NEED 3in -->
 <P>Each print server contains a configuration file named
 <VAR>config</VAR> that contains a list of network parameters used by
 the server. To modify this file you must first download it from the
@@ -3025,6 +3106,7 @@ ftp> <B>quit ENTER</B>
 221 Goodbye.
 </PRE></UL>
 
+<!-- NEED 2in -->
 <P>Next, edit the file with your favorite text editor and locate the
 lines beginning with:
 
@@ -3040,12 +3122,14 @@ RTEL_PR7.    : 0
 RTEL_PR8.    : 0
 </PRE></UL>
 
+<!-- NEED 1in -->
 Change the <CODE>RTN_OPT</CODE> line to read:
 
 <UL><PRE>
 RTN_OPT.     : <B>NO</B>
 </PRE></UL>
 
+<!-- NEED 2in -->
 <P>This disables the Reverse TELNET protocol and enables the standard
 TELNET protocol on the print server. Next, assign a port number for
 each parallel and serial port on the server as follows:
@@ -3061,9 +3145,10 @@ RTEL_PR7.    : <B>9106</B>
 RTEL_PR8.    : <B>9107</B>
 </PRE></UL>
 
+<!-- NEED 4in -->
 <P>This essentially makes the Axis print server look like a Hewlett
 Packard JetDirect EX print server. Save the file and then upload the
-new config using the <CODE>ftp</CODE> command:
+new <VAR>config</VAR> file using the <CODE>ftp</CODE> command:
 
 <UL><PRE>
 <B>ftp ip-address ENTER</B>
@@ -3169,10 +3254,10 @@ Hewlett Packard.
 <P>This appendix lists the files and directories that are installed for
 the Common UNIX Printing System.
 
-<CENTER><TABLE BORDER="1">
+<CENTER><TABLE BORDER="1" WIDTH="80%">
 <TR VALIGN="TOP">
-	<TH WIDTH="50%">Pathname</TH>
-	<TH WIDTH="30%">Description</TH>
+	<TH>Pathname</TH>
+	<TH>Description</TH>
 </TR>
 
 <TR VALIGN="TOP">
@@ -3401,7 +3486,7 @@ For more information please contact us at:
 
 </UL>
 
-<H2>The Printing Tools Don't Recognize My Username or Password!</H2>
+<H2>CUPS Doesn't Recognize My Username or Password!</H2>
 
 <P>CUPS will ask you for a UNIX username and password when you perform
 printer administration tasks remotely or via a web browser. The default
@@ -3413,6 +3498,7 @@ with an account that has no password for security reasons. If you do
 not have a password on your <CODE>root</CODE> account then you won't be
 able to add printers remotely or via the web interface!
 
+<!-- NEED 2in -->
 <P>To disable password authentication you need to edit the
 <VAR>/etc/cups/cupsd.conf</VAR> file and comment out the
 lines reading:
@@ -3426,9 +3512,17 @@ for the <VAR>/admin</VAR> location. Then restart the CUPS server as
 described in <A HREF="PRINTING_MANAGEMENT">Chapter 8, "Printing System
 Management"</A>.
 
-<P><B>Note:</B> Disabling password checks will allow any local
-user to change your printer and class configuration, but remote
-administration from another machine will still not be allowed.
+<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
+<TR>
+	<TD>
+	<B>NOTE:</B>
+
+	<P>Disabling password checks will allow any local user to
+	change your printer and class configuration, but remote
+	administration from another machine will still not be allowed.
+	</TD>
+</TR>
+</TABLE></CENTER>
 
 <H2>I Can't Do Administration Tasks from Another Machine!</H2>
 
@@ -3446,11 +3540,20 @@ for the <VAR>/admin</VAR> location. Then restart the CUPS server as
 described in <A HREF="PRINTING_MANAGEMENT">Chapter 8, "Printing System
 Management"</A>.
 
-<P><B>Note:</B> Allowing administration access from all hosts is a
-potential security risk. Please read <A HREF="PRINTING_SECURITY">Chapter
-9, "Printing System Security"</A> for a description of these risks and
-ways to minimize them.
+<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
+<TR>
+	<TD>
+	<B>NOTE:</B>
 
+	<P>Allowing administration access from all hosts is a potential
+	security risk. Please read <A HREF="PRINTING_SECURITY">Chapter
+	6, "Printing System Management"</A> for a description of these
+	risks and ways to minimize them.
+	</TD>
+</TR>
+</TABLE></CENTER>
+
+<!-- NEED 4in -->
 <H2>I Can't Do Administration Tasks from My Web Browser!</H2>
 
 <P>This problem is usually caused by:
@@ -3485,7 +3588,8 @@ ways to minimize them.
 networked printer should be expected from time to time. Most network
 interfaces only allow a single connection to be made at any given time
 (one job at a time) and will refuse access to all other systems while
-the first connection is active.
+the first connection is active. CUPS automatically retries the
+connection once every 30 seconds.
 
 <P>If the problem persists and you are unable to print any jobs to the printer,
 verify that another machine is not maintaining a connection with the printer,
@@ -3505,6 +3609,7 @@ and reset the network connection from your workstation.
 of the printer or plotter and the first page of print data that is
 sent.
 
+<!-- NEED 3in -->
 <P>To correct the problem, change the idle timeout on the interface to at least
 180 seconds or 3 minutes. To change the timeout on a Hewlett Packard
 JetDirect interface, type:

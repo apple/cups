@@ -61,36 +61,34 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#DPKG-BINARY">Installing an Debian Distribution</A></LI>
 </UL>
 </UL>
-<B><A HREF="#GETTING_STARTED">3 - Getting Started</A></B>
+<B><A HREF="#PRINTER_MANAGEMENT">3 - Printer Management</A></B>
 <UL>
-<LI><A HREF="#4_1">The Interfaces</A></LI>
-<LI><A HREF="#4_2">The Basics</A></LI>
-<LI><A HREF="#4_3">Adding Your First Printer from the Command-Line</A></LI>
+<LI><A HREF="#4_1">The Basics</A></LI>
+<LI><A HREF="#4_2">Adding Your First Printer</A></LI>
+<UL>
+<LI><A HREF="#4_2_1">Adding Your First Printer from the Command-Line</A></LI>
 <LI><A HREF="#ADD_WEB">Adding Your First Printer from the Web</A></LI>
 </UL>
-<B><A HREF="#MANAGING_PRINTERS">4 - Managing Printers</A></B>
+<LI><A HREF="#4_3">Managing Printers from the Command-Line</A></LI>
 <UL>
-<LI><A HREF="#5_1">Managing Printers from the Command-Line</A></LI>
+<LI><A HREF="#4_3_1">Adding and Modifying Printers</A></LI>
+<LI><A HREF="#4_3_2">Deleting Printers</A></LI>
+<LI><A HREF="#4_3_3">Setting the Default Printer</A></LI>
+<LI><A HREF="#4_3_4">Starting and Stopping Printers</A></LI>
+<LI><A HREF="#4_3_5">Accepting and Rejecting Print Jobs</A></LI>
+</UL>
+<LI><A HREF="#4_4">Managing Printers from the Web</A></LI>
+</UL>
+<B><A HREF="#PRINTER_CLASSES">4 - Printer Classes</A></B>
 <UL>
-<LI><A HREF="#5_1_1">Adding and Modifying Printers</A></LI>
-<LI><A HREF="#5_1_2">Deleting Printers</A></LI>
-<LI><A HREF="#5_1_3">Setting the Default Printer</A></LI>
-<LI><A HREF="#5_1_4">Starting and Stopping Printers</A></LI>
-<LI><A HREF="#5_1_5">Accepting and Rejecting Print Jobs</A></LI>
+<LI><A HREF="#5_1">The Basics</A></LI>
+<LI><A HREF="#5_2">Managing Printer Classes from the Command-Line</A></LI>
+<LI><A HREF="#5_3">Managing Printer Classes from the Web Interface</A></LI>
+<LI><A HREF="#5_4">Implicit Classes</A></LI>
 </UL>
-<LI><A HREF="#5_2">Managing Printers from the Web</A></LI>
-</UL>
-<B><A HREF="#PRINTER_CLASSES">5 - Printer Classes</A></B>
+<B><A HREF="#CLIENT_SETUP">5 - Client Setup</A></B>
 <UL>
 <LI><A HREF="#6_1">The Basics</A></LI>
-<LI><A HREF="#6_2">Managing Printer Classes from the Command-Line</A></LI>
-<LI><A HREF="#6_3">Managing Printer Classes from the Web Interface</A></LI>
-<LI><A HREF="#6_4">Implicit Classes</A></LI>
-</UL>
-<B><A HREF="#CLIENT_SETUP">6 - Client Setup</A></B>
-<UL>
-<LI><A HREF="#7_1">What is a Client?</A></LI>
-<LI><A HREF="#7_2">Setup Methods</A></LI>
 <UL>
 <LI><A HREF="#CLIENT_MANUAL">Manual Configuration of Print Queues</A></LI>
 <LI><A HREF="#CLIENT_SERVER">Specifying a Single Server for Printing</A></LI>
@@ -98,25 +96,11 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#CLIENT_POLL">Specifying Multiple Servers for Printing</A></LI>
 </UL>
 </UL>
-<B><A HREF="#PRINTING_OTHER">7 - Printing with Other Systems</A></B>
+<B><A HREF="#PRINTING_MANAGEMENT">6 - Printing System Management</A></B>
 <UL>
-<LI><A HREF="#8_1">Printing from LPD Clients</A></LI>
-<LI><A HREF="#8_2">Printing to LPD Servers</A></LI>
-<LI><A HREF="#8_3">Printing from Mac OS Clients</A></LI>
-<UL>
-<LI><A HREF="#8_3_1">Columbia Appletalk Package (CAP)</A></LI>
-<LI><A HREF="#8_3_2">XINET KA/Spool</A></LI>
-<LI><A HREF="#8_3_3">NetATalk</A></LI>
-</UL>
-<LI><A HREF="#8_4">Printing to Mac OS Servers</A></LI>
-<LI><A HREF="#8_5">Printing from Windows Clients</A></LI>
-<LI><A HREF="#8_6">Printing to Windows Servers</A></LI>
-</UL>
-<B><A HREF="#PRINTING_MANAGEMENT">8 - Printing System Management</A></B>
-<UL>
-<LI><A HREF="#9_1">The Basics</A></LI>
-<LI><A HREF="#9_2">Changing the Server Configuration</A></LI>
-<LI><A HREF="#9_3">Server Directives</A></LI>
+<LI><A HREF="#7_1">The Basics</A></LI>
+<LI><A HREF="#7_2">Changing the Server Configuration</A></LI>
+<LI><A HREF="#7_3">Server Directives</A></LI>
 <UL>
 <LI><A HREF="#AccessLog">AccessLog</A></LI>
 <LI><A HREF="#Allow">Allow</A></LI>
@@ -166,53 +150,70 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#Timeout">Timeout</A></LI>
 <LI><A HREF="#User">User</A></LI>
 </UL>
-</UL>
-<B><A HREF="#PRINTING_SECURITY">9 - Printing System Security</A></B>
+<LI><A HREF="#PRINTING_SECURITY">Printing System Security</A></LI>
 <UL>
-<LI><A HREF="#10_1">The Basics</A></LI>
 <LI><A HREF="#CERTIFICATES">Authentication Using Certificates</A></LI>
-<LI><A HREF="#10_3">Using Basic Authentication</A></LI>
-<LI><A HREF="#10_4">Using Digest Authentication</A></LI>
-<LI><A HREF="#10_5">System and Group Authentication</A></LI>
+<LI><A HREF="#7_4_2">Using Basic Authentication</A></LI>
+<LI><A HREF="#7_4_3">Using Digest Authentication</A></LI>
+<LI><A HREF="#7_4_4">System and Group Authentication</A></LI>
 </UL>
-<B><A HREF="#PRINTER_ACCOUNTING">10 - Printer Accounting</A></B>
+<LI><A HREF="#PRINTER_ACCOUNTING">Printer Accounting</A></LI>
 <UL>
-<LI><A HREF="#11_1">Where to Find the Log Files</A></LI>
-<LI><A HREF="#11_2">The access_log File</A></LI>
-<LI><A HREF="#11_3">The error_log File</A></LI>
-<LI><A HREF="#11_4">The page_log File</A></LI>
+<LI><A HREF="#7_5_1">The access_log File</A></LI>
+<LI><A HREF="#7_5_2">The error_log File</A></LI>
+<LI><A HREF="#7_5_3">The page_log File</A></LI>
 </UL>
-<B><A HREF="#12">11 - File Typing and Filtering</A></B>
+<LI><A HREF="#FILE_TYPING_FILTERING">File Typing and Filtering</A></LI>
 <UL>
-<LI><A HREF="#12_1">The Basics</A></LI>
-<UL>
-<LI><A HREF="#12_1_1">mime.types</A></LI>
-<LI><A HREF="#12_1_2">mime.convs</A></LI>
+<LI><A HREF="#7_6_1">mime.types</A></LI>
+<LI><A HREF="#7_6_2">mime.convs</A></LI>
+<LI><A HREF="#7_6_3">Adding Filetypes and Filters</A></LI>
+<LI><A HREF="#7_6_4">Printer Drivers and PPD Files</A></LI>
+<LI><A HREF="#7_6_5">Writing Your Own Filter or Printer Driver</A></LI>
 </UL>
-<LI><A HREF="#12_2">Adding Filetypes and Filters</A></LI>
-<LI><A HREF="#12_3">Printer Drivers and PPD Files</A></LI>
-<LI><A HREF="#12_4">Writing Your Own Filter or Printer Driver</A></LI>
+</UL>
+<B><A HREF="#PRINTING_OTHER">7 - Printing with Other Systems</A></B>
+<UL>
+<LI><A HREF="#8_1">The Basics</A></LI>
+<LI><A HREF="#8_2">Printing from LPD Clients</A></LI>
+<LI><A HREF="#8_3">Printing to LPD Servers</A></LI>
+<LI><A HREF="#8_4">Printing from Mac OS Clients</A></LI>
+<UL>
+<LI><A HREF="#8_4_1">Columbia Appletalk Package (CAP)</A></LI>
+<LI><A HREF="#8_4_2">XINET KA/Spool</A></LI>
+<LI><A HREF="#8_4_3">NetATalk</A></LI>
+</UL>
+<LI><A HREF="#8_5">Printing to Mac OS Servers</A></LI>
+<LI><A HREF="#8_6">Printing from Windows Clients</A></LI>
+<LI><A HREF="#8_7">Printing to Windows Servers</A></LI>
 </UL>
 <B><A HREF="#LICENSE">A - Software License Agreement</A></B>
 <UL>
-<LI><A HREF="#13_1">Common UNIX Printing System License Agreement</A></LI>
-<LI><A HREF="#13_2">GNU General Public License</A></LI>
+<LI><A HREF="#9_1">Common UNIX Printing System License Agreement</A></LI>
+<UL>
+<LI><A HREF="#9_1_1">Introduction</A></LI>
+<LI><A HREF="#9_1_2">Trademarks</A></LI>
+<LI><A HREF="#9_1_3">Binary Distribution Rights</A></LI>
+<LI><A HREF="#9_1_4">Support</A></LI>
+</UL>
+<LI><A HREF="#9_2">GNU GENERAL PUBLIC LICENSE</A></LI>
+<LI><A HREF="#9_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A></LI>
 </UL>
 <B><A HREF="#COMMON_NETWORK">B - Common Network Settings</A></B>
 <UL>
-<LI><A HREF="#14_1">Configuring a Network Interface</A></LI>
+<LI><A HREF="#10_1">Configuring a Network Interface</A></LI>
 <UL>
-<LI><A HREF="#14_1_1">Configuring the IP Address Using ARP</A></LI>
-<LI><A HREF="#14_1_2">Configuring the IP Address Using RARP</A></LI>
-<LI><A HREF="#14_1_3">Configuring the IP Address Using BOOTP</A></LI>
+<LI><A HREF="#10_1_1">Configuring the IP Address Using ARP</A></LI>
+<LI><A HREF="#10_1_2">Configuring the IP Address Using RARP</A></LI>
+<LI><A HREF="#10_1_3">Configuring the IP Address Using BOOTP</A></LI>
 </UL>
-<LI><A HREF="#14_2">Verifying the Printer Connection</A></LI>
-<LI><A HREF="#14_3">Common Network Interface Settings</A></LI>
+<LI><A HREF="#10_2">Verifying the Printer Connection</A></LI>
+<LI><A HREF="#10_3">Common Network Interface Settings</A></LI>
 <LI><A HREF="#AXIS">Configuring Axis Print Servers</A></LI>
 </UL>
 <B><A HREF="#PRINTER_DRIVERS">C - Printer Drivers</A></B>
 <UL>
-<LI><A HREF="#15_1">Printer Drivers</A></LI>
+<LI><A HREF="#11_1">Printer Drivers</A></LI>
 <LI><A HREF="#EPSON9">EPSON 9-pin Dot Matrix</A></LI>
 <LI><A HREF="#EPSON24">EPSON 24-pin Dot Matrix</A></LI>
 <LI><A HREF="#STCOLOR">EPSON Stylus Color</A></LI>
@@ -224,14 +225,13 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <BR>
 <BR><B><A HREF="#FAQ">E - Troubleshooting Common Problems</A></B>
 <UL>
-<LI><A HREF="#17_1">The Printing Tools Don't Recognize My Username or 
-Password!</A></LI>
-<LI><A HREF="#17_2">I Can't Do Administration Tasks from Another 
+<LI><A HREF="#13_1">CUPS Doesn't Recognize My Username or Password!</A></LI>
+<LI><A HREF="#13_2">I Can't Do Administration Tasks from Another 
 Machine!</A></LI>
-<LI><A HREF="#17_3">I Can't Do Administration Tasks from My Web Browser!</A>
+<LI><A HREF="#13_3">I Can't Do Administration Tasks from My Web Browser!</A>
 </LI>
-<LI><A HREF="#17_4">Connection Refused Messages</A></LI>
-<LI><A HREF="#17_5">Write Error Messages</A></LI>
+<LI><A HREF="#13_4">Connection Refused Messages</A></LI>
+<LI><A HREF="#13_5">Write Error Messages</A></LI>
 </UL>
 <HR>
 <H1 ALIGN="RIGHT"><A NAME="1">Preface</A></H1>
@@ -262,15 +262,11 @@ sections:</P>
 <UL>
 <LI><A HREF="#OVERVIEW">1 - Printing System Overview</A></LI>
 <LI><A HREF="#BUILDING_INSTALLING">2 - Building and Installing CUPS</A></LI>
-<LI><A HREF="#GETTING_STARTED">3 - Getting Started</A></LI>
-<LI><A HREF="#MANAGING_PRINTERS">4 - Managing Printers</A></LI>
-<LI><A HREF="#PRINTER_CLASSES">5 - Printer Classes</A></LI>
-<LI><A HREF="#CLIENT_SETUP">6 - Client Setup</A></LI>
+<LI><A HREF="#MANAGING_PRINTERS">3 - Managing Printers</A></LI>
+<LI><A HREF="#PRINTER_CLASSES">4 - Printer Classes</A></LI>
+<LI><A HREF="#CLIENT_SETUP">5 - Client Setup</A></LI>
+<LI><A HREF="#PRINTING_MANAGEMENT">6 - Printing System Management</A></LI>
 <LI><A HREF="#PRINTING_OTHER">7 - Printing with Other Systems</A></LI>
-<LI><A HREF="#PRINTING_MANAGEMENT">8 - Printing System Management</A></LI>
-<LI><A HREF="#PRINTING_SECURITY">9 - Printing System Security</A></LI>
-<LI><A HREF="#PRINTER_ACCOUNTING">10 - Printer Accounting</A></LI>
-<LI><A HREF="#PRINTER_ACCOUNTING">11 - File Types and Filtering</A></LI>
 <LI><A HREF="#LICENSE">A - Software License Agreement</A></LI>
 <LI><A HREF="#COMMON_NETWORK">B - Common Network Settings</A></LI>
 <LI><A HREF="#PRINTER_DRIVERS">C - Printer Drivers</A></LI>
@@ -429,7 +425,7 @@ the <CODE>--prefix</CODE> option to install the CUPS software in
 another location: </P>
 <UL>
 <PRE>
-<B>./configure --prefix=/usr/local ENTER</B>
+<B>./configure --prefix=/some/directory ENTER</B>
 </PRE>
 </UL>
 <P>If the PNG, JPEG, TIFF, and ZLIB libraries are not installed in a 
@@ -457,14 +453,18 @@ LDFLAGS</CODE> environment variables prior to running configure: </P>
 <B>make install ENTER</B>
 </PRE>
 </UL>
-<BLOCKQUOTE><B>WARNING:</B>
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B>WARNING:</B>
 <P>Installing CUPS will overwrite your existing printing  system. If 
 you experience difficulties with the CUPS software  and need to go back 
 to your old printing system, you will need  to reinstall the printing 
 system from your operating system CDs. </P>
-</BLOCKQUOTE>
+</TD></TR>
+</TABLE>
+</CENTER>
 <H3><A NAME="RUNNING">Running the Software</A></H3>
-<P>Once you have installed the software you can start the CUPS daemon 
+<P>Once you have installed the software you can start the CUPS server 
 by typing: </P>
 <UL>
 <PRE>
@@ -479,13 +479,19 @@ Software Products provides binaries in TAR format with installation and
 removal scripts (&quot;portable&quot; distributions), and in RPM and DPKG formats 
 for Red Hat and Debian-based distributions.  Portable distributions are 
 available for all platforms, while the RPM and DPKG distributions are 
-only available for Linux. <BLOCKQUOTE><B>WARNING:</B>
+only available for Linux. 
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B>WARNING:</B>
 <P>Installing CUPS will overwrite your existing printing  system. If 
 you experience difficulties with the CUPS software  and need to go back 
 to your old printing system, you will need  to remove the CUPS software 
 with the provided script and/or  reinstall the printing system from 
 your operating system CDs. </P>
-</BLOCKQUOTE></P>
+</TD></TR>
+</TABLE>
+</CENTER>
+</P>
 <H3><A NAME="PORTABLE-BINARY">Installing a Portable Distribution</A></H3>
 <P>To install the CUPS software from a portable distribution you will 
 need to be logged in as root; doing an <CODE>su</CODE> is good enough. 
@@ -520,23 +526,11 @@ Once you are the root user, run dpkg with: </P>
 </UL>
 <P>After a short delay the CUPS software will be installed and the 
 scheduler will be started automatically. </P>
-<H1 ALIGN="RIGHT"><A NAME="GETTING_STARTED">3 - Getting Started</A></H1>
-<P>This chapter describes how to add your first printer. </P>
-<H2><A NAME="4_1">The Interfaces</A></H2>
-<P>CUPS provides two methods for adding printers - a command-line 
-program called <CODE>lpadmin(1m)</CODE> and a Web interface. The <CODE>
-lpadmin</CODE> command allows you to perform most printer 
-administration tasks from the command-line and is located in <VAR>
-/usr/sbin</VAR>. The Web interface is located at: </P>
-<UL>
-<PRE>
-<A HREF="http://localhost:631/admin">http://localhost:631/admin</A>
-</PRE>
-</UL>
-<P>and steps you through printer configuration. If you don't like 
-command-line interfaces, try the <A HREF="#ADD_WEB">Web interface</A>
- instead. </P>
-<H2><A NAME="4_2">The Basics</A></H2>
+<H1 ALIGN="RIGHT"><A NAME="PRINTER_MANAGEMENT">3 - Printer Management</A>
+</H1>
+<P>This chapter describes how to add your first printer and how to 
+manage your printers. </P>
+<H2><A NAME="4_1">The Basics</A></H2>
 <P>Each printer queue has a name associated with it; the printer name 
 must start with a letter and can contain up to 127 letters, numbers, 
 and the underscore (_). Case is not significant, e.g. &quot;PRINTER&quot;, 
@@ -546,7 +540,9 @@ can be a parallel port, a network interface, and so forth. Devices
 within CUPS use Uniform Resource Identifiers (&quot;URIs&quot;) which are a more 
 general form of Uniform Resource Locators (&quot;URLs&quot;) that are used in 
 your web browser. For example, the first parallel port in Linux usually 
-uses a device URI of <CODE>parallel:/dev/lp1</CODE>. </P>
+uses a device URI of <CODE>parallel:/dev/lp1</CODE>. 
+<!-- NEED 2.5in ---->
+</P>
 <P>You can see a complete list of supported devices by running the <CODE>
 lpinfo(1m)</CODE> command: </P>
 <UL>
@@ -577,26 +573,40 @@ capabilities of each printer, the page sizes supported, etc., and are
 used for PostScript and non-PostScript printers. CUPS includes PPD 
 files for HP LaserJet, HP DeskJet, EPSON 9-pin, EPSON 24-pin, and EPSON 
 Stylus printers. </P>
-<H2><A NAME="4_3">Adding Your First Printer from the Command-Line</A></H2>
+<H2><A NAME="4_2">Adding Your First Printer</A></H2>
+<P>CUPS provides two methods for adding printers: a command-line 
+program called <CODE>lpadmin(1m)</CODE> and a Web interface. The <CODE>
+lpadmin</CODE> command allows you to perform most printer 
+administration tasks from the command-line and is located in <VAR>
+/usr/sbin</VAR>. The Web interface is located at: </P>
+<UL>
+<PRE>
+<A HREF="http://localhost:631/admin">http://localhost:631/admin</A>
+</PRE>
+</UL>
+<P>and steps you through printer configuration. If you don't like 
+command-line interfaces, try the <A HREF="#ADD_WEB">Web interface</A>
+ instead. </P>
+<H3><A NAME="4_2_1">Adding Your First Printer from the Command-Line</A></H3>
 <P>Run the <CODE>lpadmin</CODE> command with the <CODE>-p</CODE> option 
 to add a printer to CUPS: </P>
 <UL>
 <PRE>
-<B>/usr/lib/lpadmin -p <I>printer</I> -E -v <I>device</I> -m <I>ppd</I> ENTER</B>
+<B>/usr/sbin/lpadmin -p <I>printer</I> -E -v <I>device</I> -m <I>ppd</I> ENTER</B>
 </PRE>
 </UL>
 <P>For an HP DeskJet printer connected to the parallel port this would 
 look like: </P>
 <UL>
 <PRE>
-<B>/usr/lib/lpadmin -p DeskJet -E -v parallel:/dev/lp1 -m deskjet.ppd ENTER</B>
+<B>/usr/sbin/lpadmin -p DeskJet -E -v parallel:/dev/lp1 -m deskjet.ppd ENTER</B>
 </PRE>
 </UL>
 <P>Similarly, an HP LaserJet printer using a JetDirect network 
 interface at IP address 11.22.33.44 would be added with the command: </P>
 <UL>
 <PRE>
-<B>/usr/lib/lpadmin -p LaserJet -E -v socket://11.22.33.44 -m laserjet.ppd ENTER</B>
+<B>/usr/sbin/lpadmin -p LaserJet -E -v socket://11.22.33.44 -m laserjet.ppd ENTER</B>
 </PRE>
 </UL>
 <P>As you can see, <CODE>deskjet.ppd</CODE> and <CODE>laserjet.ppd</CODE>
@@ -604,7 +614,7 @@ interface at IP address 11.22.33.44 would be added with the command: </P>
 with CUPS. You'll find a complete list of PPD files and the printers 
 they will work with in <A HREF="#PRINTER_DRIVERS">Appendix C, &quot;Printer 
 Drivers&quot;</A>. </P>
-<H2><A NAME="ADD_WEB">Adding Your First Printer from the Web</A></H2>
+<H3><A NAME="ADD_WEB">Adding Your First Printer from the Web</A></H3>
 <P>The CUPS web server provides a user-friendly &quot;wizard&quot; interface for 
 adding your printers. Rather than figuring out which device URI and PPD 
 file to use, you can instead click on the appropriate listings and fill 
@@ -616,18 +626,16 @@ to begin: </P>
 </PRE>
 </UL>
 <P>Click on the <VAR>Add Printer</VAR> button to add a printer. </P>
-<H1 ALIGN="RIGHT"><A NAME="MANAGING_PRINTERS">4 - Managing Printers</A></H1>
-<P>This chapter discusses how to manage print queues on your system. </P>
-<H2><A NAME="5_1">Managing Printers from the Command-Line</A></H2>
-<P>The <CODE>lpadmin</CODE> command allows you to perform most printer 
+<H2><A NAME="4_3">Managing Printers from the Command-Line</A></H2>
+<P>The <CODE>lpadmin</CODE> command enables you to perform most printer 
 administration tasks from the command-line. You'll find <CODE>lpadmin</CODE>
  in the <VAR>/usr/sbin</VAR> directory. </P>
-<H3><A NAME="5_1_1">Adding and Modifying Printers</A></H3>
+<H3><A NAME="4_3_1">Adding and Modifying Printers</A></H3>
 <P>Run the <CODE>lpadmin</CODE> command with the <CODE>-p</CODE> option 
 to add or modify a printer: </P>
 <UL>
 <PRE>
-<B>/usr/lib/lpadmin -p <I>printer</I> <I>options</I> ENTER</B>
+<B>/usr/sbin/lpadmin -p <I>printer</I> <I>options</I> ENTER</B>
 </PRE>
 </UL>
 <P>The <I>options</I> arguments can be any of the following: </P>
@@ -669,25 +677,25 @@ on the printer. </DD>
 <DD>Specifies a local PPD file for the printer driver. </DD>
 </DL>
 </UL>
-<H3><A NAME="5_1_2">Deleting Printers</A></H3>
+<H3><A NAME="4_3_2">Deleting Printers</A></H3>
 <P>Run the <CODE>lpadmin</CODE> command with the <CODE>-x</CODE> option 
 to delete a printer: </P>
 <UL>
 <PRE>
-<B>/usr/lib/lpadmin -x <I>printer</I> ENTER</B>
+<B>/usr/sbin/lpadmin -x <I>printer</I> ENTER</B>
 </PRE>
 </UL>
-<H3><A NAME="5_1_3">Setting the Default Printer</A></H3>
+<H3><A NAME="4_3_3">Setting the Default Printer</A></H3>
 <P>Run the <CODE>lpadmin</CODE> command with the <CODE>-d</CODE> option 
 to set a default printer: </P>
 <UL>
 <PRE>
-<B>/usr/lib/lpadmin -d <I>printer</I> ENTER</B>
+<B>/usr/sbin/lpadmin -d <I>printer</I> ENTER</B>
 </PRE>
 </UL>
 <P>The default printer can be overridden by the user using the <CODE>
 lpoptions(1)</CODE> command. </P>
-<H3><A NAME="5_1_4">Starting and Stopping Printers</A></H3>
+<H3><A NAME="4_3_4">Starting and Stopping Printers</A></H3>
 <P>The <CODE>enable</CODE> and <CODE>disable</CODE> commands start and 
 stop printer queues, respectively: </P>
 <UL>
@@ -699,14 +707,14 @@ stop printer queues, respectively: </P>
 <P>Printers that are disabled may still accept jobs for printing, but 
 won't actually print any files until they are restarted. This is useful 
 if the printer malfunctions and you need time to correct the problem. 
-Any queues jobs are printed after the printer is enabled (started). </P>
-<H3><A NAME="5_1_5">Accepting and Rejecting Print Jobs</A></H3>
+Any queued jobs are printed after the printer is enabled (started). </P>
+<H3><A NAME="4_3_5">Accepting and Rejecting Print Jobs</A></H3>
 <P>The <CODE>accept</CODE> and <CODE>reject</CODE> commands accept and 
 reject print jobs for the named printer, respectively: </P>
 <UL>
 <PRE>
-<B>/usr/lib/accept <I>printer</I> ENTER</B>
-<B>/usr/lib/reject <I>printer</I> ENTER</B>
+<B>/usr/sbin/accept <I>printer</I> ENTER</B>
+<B>/usr/sbin/reject <I>printer</I> ENTER</B>
 </PRE>
 </UL>
 <P>As noted above, a printer can be stopped but accepting new print 
@@ -714,7 +722,7 @@ jobs. A printer can also be rejecting new print jobs while it finishes
 those that have been queued. This is useful for when you must perform 
 maintenance on the printer and will not have it available to users for 
 a long period of time. </P>
-<H2><A NAME="5_2">Managing Printers from the Web</A></H2>
+<H2><A NAME="4_4">Managing Printers from the Web</A></H2>
 <P>The Web interface is located at: </P>
 <UL>
 <PRE>
@@ -723,10 +731,10 @@ a long period of time. </P>
 </UL>
 <P>From there you can perform all printer management tasks with a few 
 simple mouse clicks. </P>
-<H1 ALIGN="RIGHT"><A NAME="PRINTER_CLASSES">5 - Printer Classes</A></H1>
+<H1 ALIGN="RIGHT"><A NAME="PRINTER_CLASSES">4 - Printer Classes</A></H1>
 <P>This chapter describes what printer classes are and how to manage 
 them. </P>
-<H2><A NAME="6_1">The Basics</A></H2>
+<H2><A NAME="5_1">The Basics</A></H2>
 <P>CUPS provides collections of printers called <I>printer classes</I>. 
 Jobs sent to a class are forwarded to the first available printer in 
 the class. Classes can themselves be members of other classes, so it is 
@@ -740,28 +748,28 @@ and have the client machines send their print jobs to the first
 available server. If one or more servers go down, the jobs are 
 automatically redirected to the servers that are running, providing 
 fail-safe printing. </P>
-<H2><A NAME="6_2">Managing Printer Classes from the Command-Line</A></H2>
+<H2><A NAME="5_2">Managing Printer Classes from the Command-Line</A></H2>
 <P>Run the <CODE>lpadmin</CODE> command with the <CODE>-p</CODE> and <CODE>
 -c</CODE> options to add a printer to a class: </P>
 <UL>
 <PRE>
-<B>/usr/lib/lpadmin -p <I>printer</I> -c <I>class</I> ENTER</B>
+<B>/usr/sbin/lpadmin -p <I>printer</I> -c <I>class</I> ENTER</B>
 </PRE>
 </UL>
 <P>The <I>class</I> is created automatically if it doesn't exist. To 
 remove a printer from a class use the <CODE>-r</CODE> option: </P>
 <UL>
 <PRE>
-<B>/usr/lib/lpadmin -p <I>printer</I> -r <I>class</I> ENTER</B>
+<B>/usr/sbin/lpadmin -p <I>printer</I> -r <I>class</I> ENTER</B>
 </PRE>
 </UL>
 <P>To remove the entire class just use the <CODE>-x</CODE> option: </P>
 <UL>
 <PRE>
-<B>/usr/lib/lpadmin -x <I>class</I> ENTER</B>
+<B>/usr/sbin/lpadmin -x <I>class</I> ENTER</B>
 </PRE>
 </UL>
-<H2><A NAME="6_3">Managing Printer Classes from the Web Interface</A></H2>
+<H2><A NAME="5_3">Managing Printer Classes from the Web Interface</A></H2>
 <P>The Web interface is located at: </P>
 <UL>
 <PRE>
@@ -771,29 +779,28 @@ remove a printer from a class use the <CODE>-r</CODE> option: </P>
 <P>The <VAR>Add Class</VAR> and <VAR>Modify Class</VAR> interfaces 
 provide a list of available printers; click on the printers of interest 
 to add them to the class. </P>
-<H2><A NAME="6_4">Implicit Classes</A></H2>
+<H2><A NAME="5_4">Implicit Classes</A></H2>
 <P>A noted earlier, implicit classes are created automatically from the 
 available network printers and classes. To disable this functionality, 
-set the <CODE>ImplicitClasses</CODE> directive to <CODE>Off</CODE> in 
-the <CODE>cupsd.conf</CODE> file. You will find more information on 
-doing this in <A HREF="#PRINTING_MANAGEMENT">Chapter 7, &quot;Printing 
-System Management&quot;</A>. </P>
-<H1 ALIGN="RIGHT"><A NAME="CLIENT_SETUP">6 - Client Setup</A></H1>
+set the <A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>
+ directive to <CODE>Off</CODE> in the <CODE>cupsd.conf</CODE> file. You 
+will find more information on doing this in <A HREF="#PRINTING_MANAGEMENT">
+Chapter 6, &quot;Printing System Management&quot;</A>. </P>
+<H1 ALIGN="RIGHT"><A NAME="CLIENT_SETUP">5 - Client Setup</A></H1>
 <P>This chapter discusses several ways to configure CUPS clients for 
 printing. </P>
-<H2><A NAME="7_1">What is a Client?</A></H2>
+<H2><A NAME="6_1">The Basics</A></H2>
 <P>A client is any machine that sends print jobs to another machine for 
 final printing. Clients can also be servers if they communicate 
 directly with any printers of their own. </P>
-<H2><A NAME="7_2">Setup Methods</A></H2>
 <P>CUPS supports several methods of configuring client machines: </P>
-<OL>
+<UL>
 <LI><A HREF="#CLIENT_MANUAL">Manual configuration of print queues.</A></LI>
 <LI><A HREF="#CLIENT_SERVER">Specifying a single server for printing.</A>
 </LI>
 <LI><A HREF="#CLIENT_AUTO">Automatic configuration of print queues.</A></LI>
 <LI><A HREF="#CLIENT_POLL">Specifying multiple servers for printing.</A></LI>
-</OL>
+</UL>
 <H3><A NAME="CLIENT_MANUAL">Manual Configuration of Print Queues</A></H3>
 <P>The most tedious method of configuring client machines is to 
 configure each remote queue by hand using the <CODE>lpadmin</CODE>
@@ -803,10 +810,10 @@ configure each remote queue by hand using the <CODE>lpadmin</CODE>
 <B>lpadmin -p <I>printer</I> -E -v ipp://<I>server</I>/printers/<I>printer</I> ENTER</B>
 </PRE>
 </UL>
-<P>The <VAR>printer</VAR> name is the name of the printer on the server 
-machine. The <VAR>server</VAR> name is the hostname or IP address of 
-the server machine. Repeat the <CODE>lpadmin</CODE> command for each 
-remote printer you wish to use. </P>
+<P>The <CODE>printer</CODE> name is the name of the printer on the 
+server machine. The <CODE>server</CODE> name is the hostname or IP 
+address of the server machine. Repeat the <CODE>lpadmin</CODE> command 
+for each remote printer you wish to use. </P>
 <H3><A NAME="CLIENT_SERVER">Specifying a Single Server for Printing</A></H3>
 <P>CUPS can be configured to run without a local spooler and send all 
 jobs to a single server. However, if that server goes down then all 
@@ -823,7 +830,7 @@ ServerName <I>server</I>
 <P>to the file. The <VAR>server</VAR> name can be the hostname or IP 
 address of the default server. </P>
 <P>The default server can also be customized on a per-user basis. To 
-set a user-specific server create a file named <VAR>.cupsrc</VAR> and 
+set a user-specific server create a file named <VAR>~/.cupsrc</VAR> and 
 add a line reading: </P>
 <UL>
 <PRE>
@@ -834,12 +841,12 @@ ServerName <I>server</I>
 hostname or IP address of the default server. </P>
 <H3><A NAME="CLIENT_AUTO">Automatic Configuration of Print Queues</A></H3>
 <P>CUPS supports automatic client configuration of printers on the same 
-subnet. To configure printers on the same subnet, do nothing. Each 
-client should see the available printers within 30 seconds 
+subnet. To configure printers on the same subnet, <I>do nothing</I>. 
+Each client should see the available printers within 30 seconds 
 automatically. The printer and class lists are updated automatically as 
 printers and servers are added or removed. </P>
-<P>If you want to see printers on other subnets as well you can poll 
-one or more servers on the other subnets as described next. </P>
+<P>If you want to see printers on other subnets as well, use the <A HREF="#BrowsePoll">
+<CODE>BrowsePoll</CODE></A> directive as described next. </P>
 <H3><A NAME="CLIENT_POLL">Specifying Multiple Servers for Printing</A></H3>
 <P>If you have CUPS servers on different subnets, then you should 
 configure CUPS to poll those servers. Polling provides the benefits of 
@@ -849,232 +856,61 @@ configuration information. </P>
 <P>Polling is enabled by specifying one or more <A HREF="#BrowsePoll"><CODE>
 BrowsePoll</CODE></A> directives in the <VAR>/etc/cups/cupsd.conf</VAR>
  file. For information on making these changes, see <A HREF="PRINTING_MANAGEMENT">
-Chapter 7, &quot;Printing System Management&quot;</A>. </P>
-<H1 ALIGN="RIGHT"><A NAME="PRINTING_OTHER">7 - Printing with Other 
-Systems</A></H1>
-<P>This chapter describes how to print from client systems that use the 
-LPD, Mac OS, or Windows printing protocols. </P>
-<H2><A NAME="8_1">Printing from LPD Clients</A></H2>
-<P>CUPS supports limited functionality for LPD-based clients. With LPD 
-you can print files to specific printers, list the queue status, and so 
-forth. However, the automatic client configuration and printer options 
-are not supported by the LPD protocol, so you must manually configure 
-each client for the printers it needs to access. </P>
-<P>The <CODE>cups-lpd(1m)</CODE> program provides support for LPD 
-clients. To enable LPD support on your server, edit the <VAR>
-/etc/inetd.conf</VAR> file and add a line reading: </P>
-<UL>
-<PRE>
-printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd
-</PRE>
-</UL>
-<P>The path to the <CODE>cups-lpd</CODE> may vary depending on your 
-installation. </P>
-<P>Once you have added this line, send the <CODE>inetd(1m)</CODE>
- process a <CODE>HUP</CODE> signal or reboot the system: </P>
-<UL>
-<PRE>
-<B>killall -HUP inetd ENTER</B> [IRIX and some versions of Linux]
-<B>kill -HUP <I>pid</I> ENTER</B>
-<B>reboot ENTER</B>
-</PRE>
-</UL>
-<H2><A NAME="8_2">Printing to LPD Servers</A></H2>
-<P>CUPS provides the <CODE>lpd</CODE> backend for printing to LPD-based 
-servers and printers. To print to a printer on an LPD server use a 
-device URI of <CODE>lpd://server/name</CODE>, where <CODE>server</CODE>
- is the hostname or IP address of the server and <CODE>name</CODE> is 
-the queue name. </P>
-<P>Microsoft Windows NT provides an LPD service under the name &quot;TCP/IP 
-Printing Services&quot;. To enable LPD printing on NT, open the &quot;Services&quot; 
-control panel, select the &quot;TCP/IP Printing Services&quot; service, and click 
-on the &quot;Start&quot; button. Any shared printer will then be available via 
-the LPD protocol. </P>
-<H2><A NAME="8_3">Printing from Mac OS Clients</A></H2>
-<P>CUPS does not provide Mac OS support directly. However, there are 
-several free and commercial software packages that do. </P>
-<H3><A NAME="8_3_1">Columbia Appletalk Package (CAP)</A></H3>
-<P>Because the CAP LaserWriter server (<CODE>lwsrv(1m)</CODE>) does not 
-support specification of PPD files, we do not recommend that you use 
-CAP with CUPS. However, you can run the <CODE>lpsrv</CODE> program for 
-limited printing with the command: </P>
-<UL>
-<PRE>
-lwsrv -n &quot;Name&quot; -p printer -a /usr/lib/adicts -f /usr/lib/LW+Fonts
-</PRE>
-</UL>
-<H3><A NAME="8_3_2">XINET KA/Spool</A></H3>
-<P>To use your system as a print server for Mac OS clients, configure 
-each printer using a <CODE>papserver(1m)</CODE> in the <VAR>
-/usr/adm/appletalk/services</VAR> file, specifying the corresponding 
-PPD file in the <VAR>/etc/cups/ppd</VAR> directory for each printer. 
- For a printer named <CODE>MyPrinter</CODE> the entry would look like: </P>
-<UL>
-<PRE>
-/usr/etc/appletalk/papserver -I -L -P /etc/cups/ppd/MyPrinter.ppd \
-&quot;Printer Description&quot; MyPrinter
-</PRE>
-</UL>
-<B>Note:</B> Enter the text above on a single line without the 
-backslash (\) character. 
-<H3><A NAME="8_3_3">NetATalk</A></H3>
-<P>To use your system as a print server for Mac OS clients, configure 
-each printer in the <VAR>papd.conf</VAR> file, specifying the 
-corresponding PPD file in the <VAR>/etc/cups/ppd</VAR> directory for 
-each printer. For a printer named <CODE>MyPrinter</CODE> the entry 
-would look like: </P>
-<UL>
-<PRE>
-Printer Description:MyPrinter@MyServer:\
-        :pr=|/usr/bin/lp -d MyPrinter:\
-        :op=daemon:\
-        :pd=/etc/cups/ppd/MyPrinter.ppd
-</PRE>
-</UL>
-<H2><A NAME="8_4">Printing to Mac OS Servers</A></H2>
-<P>CUPS currently does not provide a backend to communicate with a Mac 
-OS server. However, you should be able to write and install a short 
-shell script in the <VAR>/usr/lib/cups/backend</VAR> directory that 
-sends a print file using the appropriate command. The following is a 
-short script that will run the <CODE>papif</CODE> command provided with 
-CAP: </P>
-<UL>
-<P><I>&quot;/usr/lib/cups/backend/cap&quot;</I></P>
-<PRE>
-#!/bin/sh
-#
-# Usage: cap job user title copies options [filename]
-#
-
-# No arguments means show available devices...
-
-if test ${#argv} = 0; then
-	echo &quot;network cap \&quot;Unknown\&quot; \&quot;Mac OS Printer via CAP\&quot;&quot;
-	exit 0
-fi
-
-# Collect arguments...
-
-user=$2
-copies=$4
-
-if test ${#argv} = 5; then
-	# Get print file from stdin; copies have already been handled...
-	file=/var/tmp/$$.prn
-	copies=1
-	cat &gt; $file
-else
-	# Print file is on command-line...
-	file=$6
-fi
-
-# Create a dummy cap.printers file for this printer based
-# upon a device URI of &quot;cap://server/printer&quot;...
-
-echo $PRINTER/$DEVICE_URI | \
-	awk -F/ '{print $1 &quot;=&quot; $5 &quot;:LaserWriter@&quot; $4}' &gt; /var/tmp/$$.cap
-
-CAPPRINTERS=/var/tmp/$$.cap; export CAPPRINTERS
-
-# Send the file to the printer, once for each copy. This assumes that you
-# have properly initialized the cap.printers file...
-
-while [ $copies -gt 0 ]; do
-	papif -n $user &lt; $file
-
-        copies=`expr $copies - 1`
-done
-
-# Remove any temporary files...
-if test ${#argv} = 5; then
-	/bin/rm -f $file
-fi
-
-/bin/rm -f /var/tmp/$$.cap
-
-exit 0
-</PRE>
-</UL>
-<P>To use this backend with a print queue, specify a device URI of <CODE>
-cap://server/printer</CODE>. </P>
-<H2><A NAME="8_5">Printing from Windows Clients</A></H2>
-<P>CUPS does not provide Windows support directly. However, the free 
-SAMBA software package does. SAMBA version 2.0.6 is the first release 
-of SAMBA that supports CUPS. You can download SAMBA from: </P>
-<P ALIGN="CENTER"><A HREF="http://www.samba.org">http://www.samba.org</A>
-</P>
-<P>To configure SAMBA for CUPS, edit the <VAR>smb.conf</VAR> file and 
-replace the existing printing commands and options with the line: </P>
-<UL>
-<PRE>
-printing = cups
-</PRE>
-</UL>
-<P>That's all there is to it!  Remote users will now be able to browse 
-and print to printers on your system. </P>
-<H2><A NAME="8_6">Printing to Windows Servers</A></H2>
-<P>CUPS can print to Windows servers in one of two ways. The first way 
-uses the LPD protocol on the CUPS system and the &quot;TCP/IP Printing 
-Services&quot; on the Windows system. You can find out more about this 
-configuration in the <A HREF="#LPD">LPD</A> section earlier in this 
-chapter. </P>
-<P>The second way is through the Microsoft Server Message Block (&quot;SMB&quot;) 
-protocol. Support for this protocol is provided with the free SAMBA 
-software package. You can download SAMBA from: </P>
-<P ALIGN="CENTER"><A HREF="http://www.samba.org">http://www.samba.org</A>
-</P>
-<P>To configure CUPS for SAMBA, run the following command: </P>
-<UL>
-<PRE>
-<B>ln -s `which smbspool` /usr/lib/cups/backend/smb ENTER</B>
-</PRE>
-</UL>
-<P>The <CODE>smbspool(1)</CODE> program is provided with SAMBA starting 
-with SAMBA 2.0.6. Once you have made the link you can configure your 
-printers with a device URI of <CODE>smb://workgroup/server/sharename</CODE>
- or <CODE>smb://server/sharename</CODE> if you are in the same 
-workgroup. </P>
-<P>When printing to Windows NT servers or to shares with passwords 
-enabled under Windows 95 and 98, you will also need to specify the 
-username and password in the device URI - <CODE>
-smb://user:pass@workgroup/server/sharename</CODE> or <CODE>
-smb://user:pass@server/sharename</CODE>. </P>
-<H1 ALIGN="RIGHT"><A NAME="PRINTING_MANAGEMENT">8 - Printing System 
+Chapter 6, &quot;Printing System Management&quot;</A>. </P>
+<H1 ALIGN="RIGHT"><A NAME="PRINTING_MANAGEMENT">6 - Printing System 
 Management</A></H1>
 <P>This chapter shows how you can configure the CUPS server. </P>
-<H2><A NAME="9_1">The Basics</A></H2>
-<P>All of the server configuration files are located in the <VAR>
-/etc/cups</VAR> directory: </P>
+<H2><A NAME="7_1">The Basics</A></H2>
+<P>Several text files are used to configure CUPS. All of the server 
+configuration files are located in the <VAR>/etc/cups</VAR> directory: </P>
 <UL>
 <DL>
+<!-- NEED 1in ---->
+
 <DT>classes.conf </DT>
 <DD>This file contains information on each printer class.  Normally you 
 manipulate this file using the <CODE>lpadmin</CODE> command or the Web 
-interface. </DD>
+interface.
+<BR>&nbsp; 
+<!-- NEED 1in ---->
+</DD>
 <DT>client.conf </DT>
 <DD>This file provides the default server name for client  machines. 
-See <A HREF="#CLIENT_SETUP">Chapter 6, &quot;Client  Setup&quot;<A> for more 
-information. </A></A></DD>
+See <A HREF="#CLIENT_SETUP">Chapter 5, &quot;Client  Setup&quot;</A> for more 
+information.
+<BR>&nbsp; 
+<!-- NEED 1in ---->
+</DD>
 <DT>cupsd.conf </DT>
 <DD>This file controls how the CUPS server  (<VAR>/usr/sbin/cupsd</VAR>
-) operates and is normally edited by  hand. </DD>
+) operates and is normally edited by  hand.
+<BR>&nbsp; 
+<!-- NEED 1in ---->
+</DD>
 <DT>mime.convs </DT>
 <DD>This file contains a list of standard file conversion filters  and 
-their costs. You normally do not edit this file. </DD>
+their costs. You normally do not edit this file.
+<BR>&nbsp; 
+<!-- NEED 1in ---->
+</DD>
 <DT>mime.types </DT>
 <DD>This file contains a list of standard file formats and how to 
- recognize them. You normally do not edit this file. </DD>
+ recognize them. You normally do not edit this file.
+<BR>&nbsp; 
+<!-- NEED 1in ---->
+</DD>
 <DT>printers.conf </DT>
 <DD>This file contains information on each printer. Normally  you 
 manipulate this file using the <CODE>lpadmin</CODE> command  or the Web 
-Interface. </DD>
+Interface.
+<BR>&nbsp; </DD>
 </DL>
 </UL>
 <P>Once you have made a change to a configuration file you need to 
-restart the CUPS server by sending it a HUP signal or using the 
-supplied initialization script. The CUPS distributions install the 
-script in the <VAR>init.d</VAR> directory with the name <VAR>cups</VAR>
-. The location varies based upon the operating system: </P>
+restart the CUPS server by sending it a <CODE>HUP</CODE> signal or 
+using the supplied initialization script. The CUPS distributions 
+install the script in the <VAR>init.d</VAR> directory with the name <VAR>
+cups</VAR>. The location varies based upon the operating system: </P>
 <UL>
 <PRE>
 <B>/etc/rc.d/init.d/cups restart ENTER</B>
@@ -1082,7 +918,7 @@ script in the <VAR>init.d</VAR> directory with the name <VAR>cups</VAR>
 <B>/sbin/init.d/cups restart ENTER</B>
 </PRE>
 </UL>
-<H2><A NAME="9_2">Changing the Server Configuration</A></H2>
+<H2><A NAME="7_2">Changing the Server Configuration</A></H2>
 <P>The <VAR>/etc/cups/cupsd.conf</VAR> file contains configuration <I>
 directives</I> that control how the server functions. Each directive is 
 listed on a line by itself followed by its value. Comments are 
@@ -1090,7 +926,7 @@ introduced using the number sign (&quot;#&quot;) character at the beginning of a
 line. </P>
 <P>Since the server configuration file consists of plain text, you can 
 use your favorite text editor to make changes to it. </P>
-<H2><A NAME="9_3">Server Directives</A></H2>
+<H2><A NAME="7_3">Server Directives</A></H2>
 <P>The <VAR>cupsd.conf</VAR> file contains many directives that 
 determine how the server operates: </P>
 <UL>
@@ -1148,8 +984,9 @@ determine how the server operates: </P>
 </TD></TR>
 </TABLE>
 </UL>
-
+<P>&nbsp;
 <!-- NEED 3in ---->
+</P>
 <H3><A NAME="AccessLog">AccessLog</A></H3>
 <HR>
 <H4>Examples</H4>
@@ -1167,7 +1004,8 @@ access log file is stored in &quot;common log format&quot; and can be used by an
 web access reporting tool to generate a report on CUPS server activity. </P>
 <P>The special name &quot;syslog&quot; can be used to send the access information 
 to the system log instead of a plain file. </P>
-<P>The default access log file is <VAR>/var/log/cups/access_log</VAR>. 
+<P>The default access log file is <VAR>/var/log/cups/access_log</VAR>. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="Allow">Allow</A></H3>
@@ -1196,16 +1034,22 @@ can be used to allow access for multiple hosts or networks.  The <CODE>
 /mm</CODE> notation specifies a CIDR netmask: 
 <CENTER>
 <TABLE BORDER="1">
-<TR><TH>mm</TH><TH>netmask</TH><TH>mm</TH><TH>netmask</TH></TR>
-<TR><TD>0</TD><TD>0.0.0.0</TD><TD>8</TD><TD>255.0.0.0</TD></TR>
-<TR><TD>1</TD><TD>128.0.0.0</TD><TD>16</TD><TD>255.255.0.0</TD></TR>
-<TR><TD>2</TD><TD>192.0.0.0</TD><TD>24</TD><TD>255.255.255.0</TD></TR>
-<TR><TD>...</TD><TD>...</TD><TD>32</TD><TD>255.255.255.255</TD></TR>
+<TR><TH WIDTH="10%">mm</TH><TH WIDTH="20%">netmask</TH><TH WIDTH="10%">
+mm</TH><TH WIDTH="20%">netmask</TH></TR>
+<TR><TD ALIGN="CENTER">0</TD><TD ALIGN="CENTER">0.0.0.0</TD><TD ALIGN="CENTER">
+8</TD><TD ALIGN="CENTER">255.0.0.0</TD></TR>
+<TR><TD ALIGN="CENTER">1</TD><TD ALIGN="CENTER">128.0.0.0</TD><TD ALIGN="CENTER">
+16</TD><TD ALIGN="CENTER">255.255.0.0</TD></TR>
+<TR><TD ALIGN="CENTER">2</TD><TD ALIGN="CENTER">192.0.0.0</TD><TD ALIGN="CENTER">
+24</TD><TD ALIGN="CENTER">255.255.255.0</TD></TR>
+<TR><TD ALIGN="CENTER">...</TD><TD ALIGN="CENTER">...</TD><TD ALIGN="CENTER">
+32</TD><TD ALIGN="CENTER">255.255.255.255</TD></TR>
 </TABLE>
 </CENTER>
 </P>
 <P>The <CODE>Allow</CODE> directive must appear inside a <A HREF="#Location">
-<CODE>Location</CODE></A> directive. 
+<CODE>Location</CODE></A> directive. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="AuthClass">AuthClass</A></H3>
@@ -1220,21 +1064,23 @@ AuthClass Group
 </PRE>
 </UL>
 <H4>Description</H4>
-<P>The <CODE>AuthClass</CODE> directive defines what level of <CODE>
-Basic</CODE> access is required: </P>
+<P>The <CODE>AuthClass</CODE> directive defines what level of 
+authentication is required: </P>
 <UL>
 <LI><CODE>Anonymous</CODE> - No authentication should be performed 
  (default.) </LI>
 <LI><CODE>User</CODE> - A valid username and password is required. </LI>
 <LI><CODE>System</CODE> - A valid username and password is  required, 
-and the username must belong to the &quot;sys&quot; group (this  can be changed 
-using the <CODE>SystemGroup</CODE> directive,  below. </LI>
+and the username must belong to the &quot;sys&quot; group; this  can be changed 
+using the <A HREF="#SystemGroup"><CODE>SystemGroup</CODE></A>
+ directive. </LI>
 <LI><CODE>Group</CODE> - A valid username and password is  required, 
 and the username must belong to the group named by  the <CODE>
 AuthGroupName</CODE> directive. </LI>
 </UL>
 <P>The <CODE>AuthClass</CODE> directive must appear inside a <A HREF="#Location">
-<CODE>Location</CODE></A> directive. 
+<CODE>Location</CODE></A> directive. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="AuthGroupName">AuthGroupName</A></H3>
@@ -1243,13 +1089,15 @@ AuthGroupName</CODE> directive. </LI>
 <UL>
 <PRE>
 AuthGroupName mygroup
+AuthGroupName lp
 </PRE>
 </UL>
 <H4>Description</H4>
 <P>The <CODE>AuthGroupName</CODE> directive sets the group to use for <CODE>
 Group</CODE> authentication. </P>
 <P>The <CODE>AuthGroupName</CODE> directive must appear inside a <A HREF="#Location">
-<CODE>Location</CODE></A> directive. 
+<CODE>Location</CODE></A> directive. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="AuthType">AuthType</A></H3>
@@ -1277,7 +1125,8 @@ using the <VAR>/etc/cups/passwd.md5</VAR> file. </LI>
 clients connecting through the <CODE>localhost</CODE> interface can 
 also authenticate using <A HREF="#CERTIFICATES">certificates</A>. </P>
 <P>The <CODE>AuthType</CODE> directive must appear inside a <A HREF="#Location">
-<CODE>Location</CODE></A> directive. 
+<CODE>Location</CODE></A> directive. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="BrowseAddress">BrowseAddress</A></H3>
@@ -1287,6 +1136,7 @@ also authenticate using <A HREF="#CERTIFICATES">certificates</A>. </P>
 <PRE>
 BrowseAddress 255.255.255.255:631
 BrowseAddress 192.0.2.255:631
+BrowseAddress host.domain.com:631
 </PRE>
 </UL>
 <H4>Description</H4>
@@ -1295,14 +1145,20 @@ send browsing information to. Multiple <CODE>BrowseAddress</CODE>
  directives can be specified to send browsing information to different 
 networks or systems. </P>
 <P>The default address is <CODE>255.255.255.255:631</CODE> which will 
-broadcast the information to all networks the server is connected to. </P>
-<UL><B>NOTE:</B>
+broadcast the information to all networks the server is connected to. 
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B>NOTE:</B>
 <P>If you are using HP-UX 10.20 and a subnet that is not 24,  16, or 8 
 bits, printer browsing (and in fact all broadcast  reception) will not 
 work. This problem appears to be fixed in  HP-UX 11.0. </P>
-</UL>
-
+</TD></TR>
+</TABLE>
+</CENTER>
+</P>
+<P>&nbsp;
 <!-- NEED 3in ---->
+</P>
 <H3><A NAME="BrowseAllow">BrowseAllow</A></H3>
 <HR>
 <H4>Examples</H4>
@@ -1320,12 +1176,13 @@ BrowseAllow from *.domain.com
 <P>The <CODE>BrowseAllow</CODE> directive specifies a system or network 
 to accept browse packets from. The default is to accept browse packets 
 from all hosts. </P>
-<P>Host and domain name matching requires that you enable the <A HREF="#HostNameLookups">
+<P>Host and domain name matching require that you enable the <A HREF="#HostNameLookups">
 <CODE>HostNameLookups</CODE></A> directive. </P>
 <P>IP address matching supports exact matches, partial addresses that 
 match networks using netmasks of 255.0.0.0, 255.255.0.0, and 
 255.255.255.0, or network addresses using the specified netmask or bit 
-count. 
+count. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="BrowseDeny">BrowseDeny</A></H3>
@@ -1345,12 +1202,13 @@ BrowseDeny from *.domain.com
 <P>The <CODE>BrowseDeny</CODE> directive specifies a system or network 
 to reject browse packets from. The default is to deny browse packets 
 from no hosts. </P>
-<P>Host and domain name matching requires that you enable the <A HREF="#HostNameLookups">
+<P>Host and domain name matching require that you enable the <A HREF="#HostNameLookups">
 <CODE>HostNameLookups</CODE></A> directive. </P>
 <P>IP address matching supports exact matches, partial addresses that 
 match networks using netmasks of 255.0.0.0, 255.255.0.0, and 
 255.255.255.0, or network addresses using the specified netmask or bit 
-count. 
+count. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="BrowseOrder">BrowseOrder</A></H3>
@@ -1371,8 +1229,9 @@ allow/deny processing. The default order is <CODE>deny,allow</CODE>: </P>
 <LI><CODE>deny,allow</CODE> - Browse packets are rejected unless 
  specifically allowed. </LI>
 </UL>
-
+<P>&nbsp;
 <!-- NEED 3in ---->
+</P>
 <H3><A NAME="BrowseInterval">BrowseInterval</A></H3>
 <HR>
 <H4>Examples</H4>
@@ -1390,7 +1249,8 @@ printer information from other hosts. </P>
 <P>The <CODE>BrowseInterval</CODE> value should always be less than the <A
 HREF="#BrowseTimeout"><CODE>BrowseTimeout</CODE></A> value. Otherwise 
 printers and classes will disappear from client systems between 
-updates. 
+updates. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="BrowsePoll">BrowsePoll</A></H3>
@@ -1408,7 +1268,8 @@ printers once every <A HREF="#BrowseInterval"><CODE>BrowseInterval</CODE>
 </A> seconds. Multiple <CODE>BrowsePoll</CODE> directives can be 
 specified to poll multiple servers. </P>
 <P>If <CODE>BrowseInterval</CODE> is set to 0 then the server is polled 
-once every 30 seconds. 
+once every 30 seconds. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="BrowsePort">BrowsePort</A></H3>
@@ -1422,13 +1283,19 @@ BrowsePort 9999
 </UL>
 <H4>Description</H4>
 <P>The <CODE>BrowsePort</CODE> directive specifies the UDP port number 
-used for browse packets. The default port number is 631. </P>
-<UL><B>NOTE:</B>
+used for browse packets. The default port number is 631. 
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B>NOTE:</B>
 <P>You must set the <CODE>BrowsePort</CODE> to the same value  on all 
 of the systems that you want to see. </P>
-</UL>
-
+</TD></TR>
+</TABLE>
+</CENTER>
+</P>
+<P>&nbsp;
 <!-- NEED 3in ---->
+</P>
 <H3><A NAME="BrowseRelay">BrowseRelay</A></H3>
 <HR>
 <H4>Examples</H4>
@@ -1455,7 +1322,8 @@ BrowseRelay 127.0.0.1 255.255.255.255
 </PRE>
 </UL>
 <P>This effectively provides access to printers on a WAN for all 
-clients on the LAN(s) connected to the server. 
+clients on the LAN(s) connected to the server. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="BrowseTimeout">BrowseTimeout</A></H3>
@@ -1475,7 +1343,8 @@ destinations. </P>
 <P>The <CODE>BrowseTimeout</CODE> value should always be greater than 
 the <A HREF="#BrowseInterval"><CODE>BrowseInterval</CODE></A> value. 
 Otherwise printers and classes will disappear from client systems 
-between updates. 
+between updates. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="Browsing">Browsing</A></H3>
@@ -1489,14 +1358,20 @@ Browsing Off
 </UL>
 <H4>Description</H4>
 <P>The <CODE>Browsing</CODE> directive controls whether or not network 
-printer browsing is enabled. The default setting is <CODE>On</CODE>. </P>
-<UL><B>NOTE:</B>
+printer browsing is enabled. The default setting is <CODE>On</CODE>. 
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B>NOTE:</B>
 <P>If you are using HP-UX 10.20 and a subnet that is not 24,  16, or 8 
 bits, printer browsing (and in fact all broadcast  reception) will not 
 work. This problem appears to be fixed in  HP-UX 11.0. </P>
-</UL>
-
+</TD></TR>
+</TABLE>
+</CENTER>
+</P>
+<P>&nbsp;
 <!-- NEED 3in ---->
+</P>
 <H3><A NAME="DefaultCharset">DefaultCharset</A></H3>
 <HR>
 <H4>Examples</H4>
@@ -1511,7 +1386,8 @@ DefaultCharset windows-1251
 <P>The <CODE>DefaultCharset</CODE> directive sets the default character 
 set to use for client connections. The default character set is <CODE>
 utf-8</CODE> but is overridden by the character set for the language 
-specified by the client or the <CODE>DefaultLanguage</CODE> directive. 
+specified by the client or the <CODE>DefaultLanguage</CODE> directive. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="DefaultLanguage">DefaultLanguage</A></H3>
@@ -1530,7 +1406,8 @@ DefaultLanguage it
 <P>The <CODE>DefaultLanguage</CODE> directive specifies the default 
 language to use for client connections. Setting the default language 
 also sets the default character set if a language localization file 
-exists for it.  The default language is &quot;en&quot; for English. 
+exists for it.  The default language is &quot;en&quot; for English. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="Deny">Deny</A></H3>
@@ -1559,16 +1436,22 @@ can be used to allow access for multiple hosts or networks. The <CODE>
 /mm</CODE> notation specifies a CIDR netmask: 
 <CENTER>
 <TABLE BORDER="1">
-<TR><TH>mm</TH><TH>netmask</TH><TH>mm</TH><TH>netmask</TH></TR>
-<TR><TD>0</TD><TD>0.0.0.0</TD><TD>8</TD><TD>255.0.0.0</TD></TR>
-<TR><TD>1</TD><TD>128.0.0.0</TD><TD>16</TD><TD>255.255.0.0</TD></TR>
-<TR><TD>2</TD><TD>192.0.0.0</TD><TD>24</TD><TD>255.255.255.0</TD></TR>
-<TR><TD>...</TD><TD>...</TD><TD>32</TD><TD>255.255.255.255</TD></TR>
+<TR><TH WIDTH="10%">mm</TH><TH WIDTH="20%">netmask</TH><TH WIDTH="10%">
+mm</TH><TH WIDTH="20%">netmask</TH></TR>
+<TR><TD ALIGN="CENTER">0</TD><TD ALIGN="CENTER">0.0.0.0</TD><TD ALIGN="CENTER">
+8</TD><TD ALIGN="CENTER">255.0.0.0</TD></TR>
+<TR><TD ALIGN="CENTER">1</TD><TD ALIGN="CENTER">128.0.0.0</TD><TD ALIGN="CENTER">
+16</TD><TD ALIGN="CENTER">255.255.0.0</TD></TR>
+<TR><TD ALIGN="CENTER">2</TD><TD ALIGN="CENTER">192.0.0.0</TD><TD ALIGN="CENTER">
+24</TD><TD ALIGN="CENTER">255.255.255.0</TD></TR>
+<TR><TD ALIGN="CENTER">...</TD><TD ALIGN="CENTER">...</TD><TD ALIGN="CENTER">
+32</TD><TD ALIGN="CENTER">255.255.255.255</TD></TR>
 </TABLE>
 </CENTER>
 </P>
 <P>The <CODE>Deny</CODE> directive must appear inside a <A HREF="#Location">
-<CODE>Location</CODE></A> directive. 
+<CODE>Location</CODE></A> directive. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="DocumentRoot">DocumentRoot</A></H3>
@@ -1590,7 +1473,8 @@ specified then it is assumed to be relative to the <A HREF="#ServerRoot">
 language requested by the client (e.g. <VAR>/usr/share/doc/cups/fr/...</VAR>
 ) and then directly under the <CODE>DocumentRoot</CODE> directory (e.g. <VAR>
 /usr/share/doc/cups/...</VAR>), so it is possible to localize the web 
-content by providing subdirectories for each language needed. 
+content by providing subdirectories for each language needed. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="ErrorLog">ErrorLog</A></H3>
@@ -1608,7 +1492,8 @@ file. If the filename is not absolute then it is assumed to be relative
 to the <A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The 
 default error log file is <VAR>/var/log/cups/error_log</VAR>. </P>
 <P>The special name &quot;syslog&quot; can be used to send the error information 
-to the system log instead of a plain file. 
+to the system log instead of a plain file. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="Group">Group</A></H3>
@@ -1624,7 +1509,8 @@ Group root
 <H4>Description</H4>
 <P>The <CODE>Group</CODE> directive specifies the UNIX group that 
 filter and CGI programs run as. The default group is <CODE>sys</CODE>, <CODE>
-system</CODE>, or <CODE>root</CODE> depending on the operating system. 
+system</CODE>, or <CODE>root</CODE> depending on the operating system. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="HostNameLookups">HostNameLookups</A></H3>
@@ -1641,7 +1527,8 @@ HostNameLookups Off
 CUPS looks up the hostname for connecting clients. The default is <CODE>
 Off</CODE> to avoid the potential server performance problems with 
 hostname lookups. Turn this option <CODE>On</CODE> only if absolutely 
-required. 
+required. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="ImplicitClasses">ImplicitClasses</A></H3>
@@ -1658,7 +1545,8 @@ ImplicitClasses Off
 classes are created based upon the available network printers and 
 classes. The default setting is <CODE>On</CODE> but is automatically 
 turned <CODE>Off</CODE> if <A HREF="#Browsing"><CODE>Browsing</CODE></A>
- is turned <CODE>Off</CODE>. 
+ is turned <CODE>Off</CODE>. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="KeepAlive">KeepAlive</A></H3>
@@ -1676,7 +1564,8 @@ support persistent HTTP connections. The default is <CODE>On</CODE>. </P>
 <P>HTTP/1.1 clients automatically support persistent connections, while 
 HTTP/1.0 clients must specifically request them using the <CODE>
 Keep-Alive</CODE> attribute in the <CODE>Connection:</CODE> field of 
-each request. 
+each request. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="KeepAliveTimeout">KeepAliveTimeout</A></H3>
@@ -1691,7 +1580,8 @@ KeepAliveTimeout 30
 <H4>Description</H4>
 <P>The <CODE>KeepAliveTimeout</CODE> directive controls how long a 
 persistent HTTP connection will remain open after the last request. The 
-default is 60 seconds. 
+default is 60 seconds. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="Listen">Listen</A></H3>
@@ -1710,7 +1600,8 @@ can be provided to listen on multiple addresses. </P>
 <H4>Description</H4>
 <P>The <CODE>Listen</CODE> directive is similar to the <A HREF="#Port"><CODE>
 Port</CODE></A> directive but allows you to restrict access to specific 
-interfaces or networks. 
+interfaces or networks. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="Location">Location</A></H3>
@@ -1734,8 +1625,9 @@ interfaces or networks.
 <H4>Description</H4>
 <P>The <CODE>Location</CODE> directive specifies access control and 
 authentication options for the specified HTTP resource or path. More 
-information can be found in <A HREF="#PRINTING_SECURITY">Chapter 8, 
-&quot;Printing System Security&quot;</A>. 
+information can be found later in this chapter in <A HREF="#PRINTING_SECURITY">
+&quot;Printing System Security&quot;</A>. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="LogLevel">LogLevel</A></H3>
@@ -1752,8 +1644,8 @@ LogLevel warn
 </UL>
 <H4>Description</H4>
 <P>The <CODE>LogLevel</CODE> directive specifies the level of logging 
-for the <CODE>ErrorLog</CODE> file. The following values are 
-recognized: </P>
+for the <A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A> file. The 
+following values are recognized: </P>
 <UL>
 <LI><CODE>debug</CODE> - Log everything. </LI>
 <LI><CODE>info</CODE> - Log all requests and state changes. </LI>
@@ -1761,7 +1653,8 @@ recognized: </P>
 <LI><CODE>error</CODE> - Log only errors. </LI>
 <LI><CODE>none</CODE> - Log nothing. </LI>
 </UL>
-<P>The default log level is <CODE>info</CODE>. 
+<P>The default log level is <CODE>info</CODE>. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="MaxClients">MaxClients</A></H3>
@@ -1776,11 +1669,19 @@ MaxClients 1024
 <H4>Description</H4>
 <P>The <CODE>MaxClients</CODE> directive controls the maximum number of 
 simultaneous clients that will be allowed by the server. The default is 
-100 clients. </P>
-<P><B>Note:</B> Since each print job requires a file descriptor for the 
-status pipe, the CUPS server internally limits the <CODE>MaxClients</CODE>
- value to 1/3 of the available file descriptors to avoid possible 
-problems when printing large numbers of jobs. 
+100 clients. 
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B>NOTE:</B>
+<P>Since each print job requires a file descriptor for the  status 
+pipe, the CUPS server internally limits the <CODE>MaxClients</CODE>
+ value to 1/3 of the available file descriptors  to avoid possible 
+problems when printing large numbers of jobs. </P>
+</TD></TR>
+</TABLE>
+</CENTER>
+</P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="MaxLogSize">MaxLogSize</A></H3>
@@ -1789,6 +1690,7 @@ problems when printing large numbers of jobs.
 <UL>
 <PRE>
 MaxLogSize 1048576
+MaxLogSize 1m
 MaxLogSize 0
 </PRE>
 </UL>
@@ -1797,7 +1699,8 @@ MaxLogSize 0
 each log file. Once a log file reaches or exceeds the maximum size it 
 is closed and renamed to <VAR>filename.O</VAR>. This allows you to 
 rotate the logs automatically. The default size is 1048576 bytes (1MB). </P>
-<P>Setting the maximum size to 0 disables log rotation. 
+<P>Setting the maximum size to 0 disables log rotation. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="MaxRequestSize">MaxRequestSize</A></H3>
@@ -1805,14 +1708,16 @@ rotate the logs automatically. The default size is 1048576 bytes (1MB). </P>
 <H4>Examples</H4>
 <UL>
 <PRE>
-MaxRequestSize 0
 MaxRequestSize 10485760
+MaxRequestSize 10m
+MaxRequestSize 0
 </PRE>
 </UL>
 <H4>Description</H4>
 <P>The <CODE>MaxRequestSize</CODE> directive controls the maximum size 
 of print files, IPP requests, and HTML form data in HTTP POST requests. 
-The default limit is 0 which disables the limit check. 
+The default limit is 0 which disables the limit check. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="Order">Order</A></H3>
@@ -1828,13 +1733,14 @@ Order Deny,Allow
 <P>The <CODE>Order</CODE> directive defines the default access control. 
 The following values are supported: </P>
 <UL>
-<LI><CODE>Order Allow,Deny</CODE> - Allow requests from all  systems <I>
-except</I> for those listed in a <CODE>Deny</CODE> directive. </LI>
-<LI><CODE>Order Deny,Allow</CODE> - Allow requests only from  those 
-listed in an <CODE>Allow</CODE> directive. </LI>
+<LI><CODE>Allow,Deny</CODE> - Allow requests from all  systems <I>except</I>
+ for those listed in a <CODE>Deny</CODE> directive. </LI>
+<LI><CODE>Deny,Allow</CODE> - Allow requests only from  those listed in 
+an <CODE>Allow</CODE> directive. </LI>
 </UL>
 <P>The <CODE>Order</CODE> directive must appear inside a <A HREF="#Location">
-<CODE>Location</CODE></A> directive. 
+<CODE>Location</CODE></A> directive. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="PageLog">PageLog</A></H3>
@@ -1852,7 +1758,8 @@ file. If the filename is not absolute then it is assumed to be relative
 to the <A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The 
 default page log file is <VAR>/var/log/cups/page_log</VAR>. </P>
 <P>The special name &quot;syslog&quot; can be used to send the page information 
-to the system log instead of a plain file. 
+to the system log instead of a plain file. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="Port">Port</A></H3>
@@ -1872,7 +1779,8 @@ ports. The default port is 631. </P>
 <P>The <CODE>Port</CODE> directive will listen for connections on all 
 network interfaces. To limit connections to a single interface use the <A
 HREF="#Listen"><CODE>Listen</CODE></A> directive with the interface 
-address. 
+address. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="PreserveJobHistory">PreserveJobHistory</A></H3>
@@ -1891,7 +1799,8 @@ disk. </P>
 <P>A value of <CODE>On</CODE> (the default) preserves job information 
 until the administrator purges it with the <CODE>cancel</CODE> command. </P>
 <P>A value of <CODE>Off</CODE> removes the job information as soon as 
-each job is completed, cancelled, or aborted. 
+each job is completed, cancelled, or aborted. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="PreserveJobFiles">PreserveJobFiles</A></H3>
@@ -1911,7 +1820,8 @@ stored on disk. </P>
 administrator purges them with the <CODE>cancel</CODE> command. Jobs 
 can be restarted (and reprinted) as desired until they are purged. </P>
 <P>A value of <CODE>Off</CODE> (the default) removes the job files as 
-soon as each job is completed, cancelled, or aborted. 
+soon as each job is completed, cancelled, or aborted. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="Printcap">Printcap</A></H3>
@@ -1931,7 +1841,8 @@ printcap file will be generated. </P>
 <P>When a filename is specified (e.g. <VAR>/etc/printcap</VAR>), the 
 printcap file is written whenever a printer is added or removed. The 
 printcap file can then be used by applications that are hardcoded to 
-look at the printcap file for the available printers. 
+look at the printcap file for the available printers. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="RequestRoot">RequestRoot</A></H3>
@@ -1948,7 +1859,8 @@ RequestRoot /foo/bar/spool/cups
 incoming IPP requests and HTML forms. If an absolute path is not 
 provided then it is assumed to be relative to the <A HREF="#ServerRoot"><CODE>
 ServerRoot</CODE></A> directory. The default request directory is <VAR>
-/var/spool/cups</VAR>. 
+/var/spool/cups</VAR>. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="RIPCache">RIPCache</A></H3>
@@ -1966,7 +1878,8 @@ RIPCache 2048k
 cache used by Raster Image Processor (&quot;RIP&quot;) filters such as <CODE>
 imagetoraster</CODE> and <CODE>pstoraster</CODE>. The size can be 
 suffixed with a &quot;k&quot; for kilobytes, &quot;m&quot; for megabytes, or &quot;g&quot; for 
-gigabytes. The default cache size is &quot;8m&quot;, or 8 megabytes. 
+gigabytes. The default cache size is &quot;8m&quot;, or 8 megabytes. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="ServerAdmin">ServerAdmin</A></H3>
@@ -1982,7 +1895,8 @@ ServerAdmin root@foo.bar.com
 <P>The <CODE>ServerAdmin</CODE> directive identifies the email address 
 for the administrator on the system. By default the administrator email 
 address is <CODE>root@server</CODE>, where <CODE>server</CODE> is the 
-server name. 
+server name. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="ServerBin">ServerBin</A></H3>
@@ -1999,7 +1913,8 @@ ServerBin /foo/bar/lib/cups
 server-run executables. If an absolute path is not provided then it is 
 assumed to be relative to the <A HREF="#ServerRoot"><CODE>ServerRoot</CODE>
 </A> directory. The default executable directory is <VAR>/usr/lib/cups</VAR>
- or <VAR>/usr/lib32/cups</VAR> (IRIX 6.5). 
+ or <VAR>/usr/lib32/cups</VAR> (IRIX 6.5). </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="ServerName">ServerName</H3>
@@ -2013,7 +1928,8 @@ ServerName myserver.domain.com
 </UL>
 <H4>Description</H4>
 <P>The <CODE>ServerName</CODE> directive specifies the hostname that is 
-reported to clients. By default the server name is the hostname. 
+reported to clients. By default the server name is the hostname. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="ServerRoot">ServerRoot</A></H3>
@@ -2029,7 +1945,8 @@ ServerRoot /foo/bar/cups
 <P>The <CODE>ServerRoot</CODE> directive specifies the absolute path to 
 the server configuration and state files. It is also used to resolve 
 relative paths in the <VAR>cupsd.conf</VAR> file. The default server 
-directory is <VAR>/etc/cups</VAR>. 
+directory is <VAR>/etc/cups</VAR>. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="SystemGroup">SystemGroup</A></H3>
@@ -2045,8 +1962,9 @@ SystemGroup root
 <H4>Description</H4>
 <P>The <CODE>SystemGroup</CODE> directive specifies the system 
 administration group for <CODE>System</CODE> authentication. More 
-information can be found in <A HREF="#PRINTING_SECURITY">Chapter 8, 
-&quot;Printing System Security&quot;</A>. 
+information can be found later in this chapter in <A HREF="#PRINTING_SECURITY">
+&quot;Printing System Security&quot;</A>. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="TempDir">TempDir</A></H3>
@@ -2072,8 +1990,9 @@ appropriate temporary directory called <VAR>/foo/bar/tmp</VAR>: </P>
 <B>chmod a+rwxt /foo/bar/tmp ENTER</B>
 </PRE>
 </UL>
-
+<P>&nbsp;
 <!-- NEED 3in ---->
+</P>
 <H3><A NAME="Timeout">Timeout</A></H3>
 <HR>
 <H4>Examples</H4>
@@ -2086,7 +2005,8 @@ Timeout 90
 <H4>Description</H4>
 <P>The <CODE>Timeout</CODE> directive controls the amount of time to 
 wait before an active HTTP or IPP request times out. The default 
-timeout is 300 seconds. 
+timeout is 300 seconds. </P>
+<P>&nbsp;
 <!-- NEED 3in ---->
 </P>
 <H3><A NAME="User">User</A></H3>
@@ -2100,12 +2020,10 @@ User guest
 </UL>
 <H4>Description</H4>
 <P>The <CODE>User</CODE> directive specifies the UNIX user that filter 
-and CGI programs run as. The default user is <CODE>lp</CODE>. </P>
-<H1 ALIGN="RIGHT"><A NAME="PRINTING_SECURITY">9 - Printing System 
-Security</A></H1>
-<P>This chapter shows the different type of access control and 
-authentication that are available in CUPS. </P>
-<H2><A NAME="10_1">The Basics</A></H2>
+and CGI programs run as. The default user is <CODE>lp</CODE>. 
+<!-- NEW PAGE ---->
+</P>
+<H2><A NAME="PRINTING_SECURITY">Printing System Security</A></H2>
 <P>CUPS provides support for address, certificate, and password (Basic 
 and Digest) based authentication and access control. </P>
 <P>Certificate and password authentication provide ways to limit access 
@@ -2150,7 +2068,7 @@ name</CODE>.</TD></TR>
 </TABLE>
 </CENTER>
 </P>
-<H2><A NAME="CERTIFICATES">Authentication Using Certificates</A></H2>
+<H3><A NAME="CERTIFICATES">Authentication Using Certificates</A></H3>
 <P>CUPS supports a local certificate-based authentication scheme that 
 can be used in place of <CODE>Basic</CODE> or <CODE>Digest</CODE>
  authentication by clients connecting through the <CODE>localhost</CODE>
@@ -2179,27 +2097,37 @@ certificate</I> which can be used by any client running as the
 super-user or another user that is part of the group defined by the <A HREF="#SystemGroup">
 <CODE>SystemGroup</CODE></A> directive. The root certificate is 
 automatically regenerated every 5 minutes. </P>
-<H2><A NAME="10_3">Using Basic Authentication</A></H2>
+<H3><A NAME="7_4_2">Using Basic Authentication</A></H3>
 <P>Basic authentication uses UNIX users and passwords to authenticate 
 access to resources such as printers and classes, and to limit access 
-to administrative functions. </P>
-<UL><B>Note:</B>
+to administrative functions. 
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B>NOTE:</B>
 <P>Basic authentication sends the username and password Base64  encoded 
 from the client to the server, so it offers no  protection against 
 eavesdropping. This means that a malicious  user can monitor network 
 packets and discover valid users and  passwords that could result in a 
 serious compromise in network  security. Use Basic authentication with 
 extreme care. </P>
-</UL>
+</TD></TR>
+</TABLE>
+</CENTER>
+</P>
 <P>The CUPS implementation of Basic authentication does not allow 
 access through user accounts without a password. If you try to 
 authenticate using an account without a password, your access will be 
 immediately blocked. </P>
 <P>Once a valid username and password is authenticated by CUPS, any 
-additional group membership requirements are checked. </P>
-<UL><B>Note:</B>
+additional group membership requirements are checked. 
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B>NOTE:</B>
 <P>The root user is considered by CUPS to be a member of every  group. </P>
-</UL>
+</TD></TR>
+</TABLE>
+</CENTER>
+</P>
 <P>Use the <CODE>AuthType</CODE> directive to enable Basic 
 authentication: </P>
 <UL>
@@ -2207,12 +2135,14 @@ authentication: </P>
 AuthType Basic
 </PRE>
 </UL>
-<H2><A NAME="10_4">Using Digest Authentication</A></H2>
+<H3><A NAME="7_4_3">Using Digest Authentication</A></H3>
 <P>Digest authentication uses users and passwords defined in the <VAR>
 /etc/cups/passwd.md5</VAR> file to authenticate access to resources 
 such as printers and classes, and to limit access to administrative 
-functions. </P>
-<UL><B>Note:</B>
+functions. 
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B>NOTE:</B>
 <P>Unlike Basic authentication, Digest passes the MD5 sum  (basically a 
 complicated checksum) of the username and password  instead of the 
 strings themselves. Also, Digest authentication  does not use the UNIX 
@@ -2233,7 +2163,10 @@ gain unauthorized access, but it is safer than Basic  authentication
 and should be used in place of Basic  authentication whenever possible. <B>
 Support for Digest  authentication in web browsers is not yet 
 universally  available.</B></P>
-</UL>
+</TD></TR>
+</TABLE>
+</CENTER>
+</P>
 <P>The <CODE>lppasswd(1)</CODE> command is used to add, change, or 
 remove accounts from the <VAR>passwd.md5</VAR> file. To add a user to 
 the default system group, type: </P>
@@ -2260,10 +2193,15 @@ Password again: <B>(password) ENTER</B> [password is not echoed]
 </PRE>
 </UL>
 <P>Once a valid username and password is authenticated by CUPS, any 
-additional group membership requirements are checked. </P>
-<UL><B>Note:</B>
+additional group membership requirements are checked. 
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B>NOTE:</B>
 <P>The root user is considered by CUPS to be a member of every  group. </P>
-</UL>
+</TD></TR>
+</TABLE>
+</CENTER>
+</P>
 <P>Use the <CODE>AuthType</CODE> directive to enable Digest 
 authentication: </P>
 <UL>
@@ -2271,7 +2209,7 @@ authentication: </P>
 AuthType Digest
 </PRE>
 </UL>
-<H2><A NAME="10_5">System and Group Authentication</A></H2>
+<H3><A NAME="7_4_4">System and Group Authentication</A></H3>
 <P>The <A HREF="#AuthClass"><CODE>AuthClass</CODE></A> directive 
 controls the level of authentication to perform. <CODE>System</CODE>
  and <CODE>Group</CODE> authentication extend the normal user-based 
@@ -2302,14 +2240,14 @@ Password: <B>(password) ENTER</B> [password is not echoed]
 Password again: <B>(password) ENTER</B> [password is not echoed]
 </PRE>
 </UL>
-<H1 ALIGN="RIGHT"><A NAME="PRINTER_ACCOUNTING">10 - Printer Accounting</A>
-</H1>
-<P>This chapter describes the CUPS log files. </P>
-<H2><A NAME="11_1">Where to Find the Log Files</A></H2>
+
+<!-- NEW PAGE ---->
+<H2><A NAME="PRINTER_ACCOUNTING">Printer Accounting</A></H2>
+<P>CUPS maintains a log of all accesses, errors, and pages that are </P>
 <P>The log files are normally stored in the <VAR>/var/log/cups</VAR>
  directory. You can change this by editing the <VAR>/etc/cups/cupsd.conf</VAR>
  configuration file. </P>
-<H2><A NAME="11_2">The access_log File</A></H2>
+<H3><A NAME="7_5_1">The access_log File</A></H3>
 <P>The <VAR>access_log</VAR> file lists each HTTP resource that is 
 accessed by a web browser or CUPS/IPP client. Each line is in the 
 so-called &quot;Common Log Format&quot; used by many web servers and web 
@@ -2348,7 +2286,7 @@ above. </P>
 <P>The <I>bytes</I> field contains the number of bytes in the request. 
 For POST requests the <I>bytes</I> field contains the number of bytes 
 of non-IPP data that is received from the client. </P>
-<H2><A NAME="11_3">The error_log File</A></H2>
+<H3><A NAME="7_5_2">The error_log File</A></H3>
 <P>The <VAR>error_log</VAR> file lists messages from the scheduler 
 (errors, warnings, etc.): </P>
 <UL>
@@ -2371,7 +2309,7 @@ I [20/May/1999:19:22:24 +0000] Job 2 was cancelled by 'mike'.
 page started printing. The format of this field is identical to the <I>
 data-time</I> field in the <VAR>access_log</VAR> file. </P>
 <P>The <I>message</I> fields contains a free-form textual message. </P>
-<H2><A NAME="11_4">The page_log File</A></H2>
+<H3><A NAME="7_5_3">The page_log File</A></H3>
 <P>The <VAR>page_log</VAR> file lists each page that is sent to a 
 printer. Each line contains the following information: </P>
 <UL>
@@ -2399,11 +2337,10 @@ that can not produce copies on their own, the <I>num-pages</I> field
 will always be 1. </P>
 <P>The <I>job-billing</I> field contains a copy of the <CODE>job-billing</CODE>
  attribute provided with the IPP <CODE>create-job</CODE> or <CODE>
-print-job</CODE> requests. </P>
-<H1 ALIGN="RIGHT"><A NAME="12">11 - File Typing and Filtering</A></H1>
-<P>This chapter shows how print files are filtered and how to add 
-support for your own file formats and filters. </P>
-<H2><A NAME="12_1">The Basics</A></H2>
+print-job</CODE> requests or &quot;-&quot; if none was provided. 
+<!-- NEW PAGE ---->
+</P>
+<H2><A NAME="FILE_TYPING_FILTERING">File Typing and Filtering</A></H2>
 <P>CUPS provides a MIME-based file typing and filtering mechanism to 
 convert files to a printable format for each printer. On startup the 
 CUPS server reads MIME database files from the <VAR>/etc/cups</VAR>
@@ -2413,7 +2350,7 @@ database in memory. These database files are plain ASCII text and can
 be edited with your favorite text editor. </P>
 <P>The <VAR>mime.types</VAR> and <VAR>mime.convs</VAR> files define the 
 standard file types and filters that are available on the system. </P>
-<H3><A NAME="12_1_1">mime.types</A></H3>
+<H3><A NAME="7_6_1">mime.types</A></H3>
 <P>The <VAR>mime.types</VAR> file defines the known file types. Each 
 line of the file starts with the MIME type and may be followed by one 
 or more file type recognition rules. For example, the <CODE>text/html</CODE>
@@ -2460,8 +2397,11 @@ identical (network or &quot;big-endian&quot; byte order) </LI>
 string </LI>
 </UL>
 <P>All numeric values can be in decimal (123), octal (0123), or 
-hexadecimal (0x123) as desired. Strings can be in quotes, all by 
-themselves, as a string of hexadecimal values, or some combination: </P>
+hexadecimal (0x123) as desired. 
+<!-- NEED 2.5in ---->
+</P>
+<P>Strings can be in quotes, all by themselves, as a string of 
+hexadecimal values, or some combination: </P>
 <UL>
 <PRE>
 &quot;string&quot;
@@ -2488,7 +2428,7 @@ image/jpeg      jpeg jpg jpe string(0,&lt;FFD8FF&gt;) &amp;&amp;\
 file starting with the hexadecimal string <CODE>&lt;FFD8FF&gt;</CODE> (JPEG 
 Start-Of-Image) followed by a character between and including <CODE>0xe0</CODE>
  and <CODE>0xef</CODE> (JPEG APPn markers) is also a JPEG file. </P>
-<H3><A NAME="12_1_2">mime.convs</A></H3>
+<H3><A NAME="7_6_2">mime.convs</A></H3>
 <P>The <VAR>mime.convs</VAR> file defines all of the filter programs 
 that are known to the system. Each line consists of: </P>
 <UL>
@@ -2525,8 +2465,10 @@ program job user title options [filename]
 </UL>
 <P>If specified, the <I>filename</I> argument defines a file to read 
 when filtering, otherwise the filter must read from the standard input. 
-All filtered output must go to the standard output. </P>
-<H2><A NAME="12_2">Adding Filetypes and Filters</A></H2>
+All filtered output must go to the standard output. 
+<!-- NEED 4in ---->
+</P>
+<H3><A NAME="7_6_3">Adding Filetypes and Filters</A></H3>
 <P>Adding a new file type or filter is fairly straight-forward. Rather 
 than adding the new type and filter to the <VAR>mime.types</VAR> and <VAR>
 mime.convs</VAR> files which are overwritten when you upgrade to a new 
@@ -2554,7 +2496,7 @@ favorite text editor as described earlier in this chapter.  Once you
 have created the files, restart the <CODE>cupsd</CODE> process as 
 described in <A HREF="#PRINTING_MANAGEMENT">Chapter N, &quot;Printing System 
 Configuration&quot;</A>. </P>
-<H2><A NAME="12_3">Printer Drivers and PPD Files</A></H2>
+<H3><A NAME="7_6_4">Printer Drivers and PPD Files</A></H3>
 <P>Most CUPS printer drivers utilize one or more printer-specific 
 filters and a PPD file for each printer model. Printer driver filters 
 are registered via the PPD file using <CODE>cupsFilter</CODE>
@@ -2567,27 +2509,255 @@ are registered via the PPD file using <CODE>cupsFilter</CODE>
 <P>The filter is specified using the source file type only; the 
 destination file type is assumed to be <CODE>printer/name</CODE> - 
 suitable for sending to the printer. </P>
-<H2><A NAME="12_4">Writing Your Own Filter or Printer Driver</A></H2>
+<H3><A NAME="7_6_5">Writing Your Own Filter or Printer Driver</A></H3>
 <P>CUPS supports an unlimited number of file formats and filters, and 
 can handle any printer. If you'd like to write a filter or printer 
 driver for your favorite file format or printer, consult the CUPS 
 Software Programmers Manual for step-by-step instructions. </P>
+<H1 ALIGN="RIGHT"><A NAME="PRINTING_OTHER">7 - Printing with Other 
+Systems</A></H1>
+<P>This chapter describes how to print from client systems that use the 
+LPD, Mac OS, or Windows printing protocols. </P>
+<H2><A NAME="8_1">The Basics</A></H2>
+<P>CUPS is based on the IPP protocol, so any system that supports IPP 
+can send jobs to and receive jobs from CUPS automatically. However, not 
+all systems support IPP yet. This chapter will show you how to connect 
+these systems to your CUPS server, either to accept jobs from your 
+server for printing, or to send jobs to your server. </P>
+<H2><A NAME="8_2">Printing from LPD Clients</A></H2>
+<P>CUPS supports limited functionality for LPD-based clients. With LPD 
+you can print files to specific printers, list the queue status, and so 
+forth. However, the automatic client configuration and printer options 
+are not supported by the LPD protocol, so you must manually configure 
+each client for the printers it needs to access. </P>
+<P>The <CODE>cups-lpd(1m)</CODE> program provides support for LPD 
+clients. To enable LPD support on your server, edit the <VAR>
+/etc/inetd.conf</VAR> file and add a line reading: </P>
+<UL>
+<PRE>
+printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd
+</PRE>
+</UL>
+<P>The path to the <CODE>cups-lpd</CODE> may vary depending on your 
+installation. </P>
+<P>Once you have added this line, send the <CODE>inetd(1m)</CODE>
+ process a <CODE>HUP</CODE> signal or reboot the system: </P>
+<UL>
+<PRE>
+<B>killall -HUP inetd ENTER</B> [IRIX and some versions of Linux]
+<B>kill -HUP <I>pid</I> ENTER</B>
+<B>reboot ENTER</B>
+</PRE>
+</UL>
+<H2><A NAME="8_3">Printing to LPD Servers</A></H2>
+<P>CUPS provides the <CODE>lpd</CODE> backend for printing to LPD-based 
+servers and printers. Use a device URI of <CODE>lpd://server/name</CODE>
+ to print to a printer on an LPD server, where <CODE>server</CODE> is 
+the hostname or IP address of the server and <CODE>name</CODE> is the 
+queue name. </P>
+<P>Microsoft Windows NT provides an LPD service under the name &quot;TCP/IP 
+Printing Services&quot;. To enable LPD printing on NT, open the &quot;Services&quot; 
+control panel, select the &quot;TCP/IP Printing Services&quot; service, and click 
+on the &quot;Start&quot; button. Any shared printer will then be available via 
+the LPD protocol. </P>
+<H2><A NAME="8_4">Printing from Mac OS Clients</A></H2>
+<P>CUPS does not provide Mac OS support directly. However, there are 
+several free and commercial software packages that do. </P>
+<H3><A NAME="8_4_1">Columbia Appletalk Package (CAP)</A></H3>
+<P>Because the CAP LaserWriter server (<CODE>lwsrv(1m)</CODE>) does not 
+support specification of PPD files, we do not recommend that you use 
+CAP with CUPS. However, you can run the <CODE>lpsrv</CODE> program for 
+limited printing with the command: </P>
+<UL>
+<PRE>
+lwsrv -n &quot;<I>Name</I>&quot; -p <I>printer</I> -a /usr/lib/adicts -f /usr/lib/LW+Fonts
+</PRE>
+</UL>
+<P>where <CODE>Name</CODE> is the name you want to use when sharing the 
+printer, and <CODE>printer</CODE> is the name of the CUPS print queue. </P>
+<H3><A NAME="8_4_2">XINET KA/Spool</A></H3>
+<P>To use your system as a print server for Mac OS clients, configure 
+each printer using a <CODE>papserver(1m)</CODE> in the <VAR>
+/usr/adm/appletalk/services</VAR> file, specifying the corresponding 
+PPD file in the <VAR>/etc/cups/ppd</VAR> directory for each printer. 
+ For a printer named <CODE>MyPrinter</CODE> the entry would look like: </P>
+<UL>
+<PRE>
+/usr/etc/appletalk/papserver -I -L -P /etc/cups/ppd/MyPrinter.ppd \
+&quot;Printer Description&quot; MyPrinter
+</PRE>
+</UL>
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B>NOTE:</B>
+<P>Enter the text above on a single line without the backslash (\) 
+ character. </P>
+</TD></TR>
+</TABLE>
+</CENTER>
+<H3><A NAME="8_4_3">NetATalk</A></H3>
+<P>To use your system as a print server for Mac OS clients, configure 
+each printer in the <VAR>papd.conf</VAR> file, specifying the 
+corresponding PPD file in the <VAR>/etc/cups/ppd</VAR> directory for 
+each printer. For a printer named <CODE>MyPrinter</CODE> the entry 
+would look like: </P>
+<UL>
+<PRE>
+Printer Description:MyPrinter@MyServer:\
+        :pr=|/usr/bin/lp -d MyPrinter:\
+        :op=daemon:\
+        :pd=/etc/cups/ppd/MyPrinter.ppd
+</PRE>
+</UL>
+
+<!-- NEED 2in ---->
+<H2><A NAME="8_5">Printing to Mac OS Servers</A></H2>
+<P>CUPS currently does not provide a backend to communicate with a Mac 
+OS server. However, you can write and install a short shell script in 
+the <VAR>/usr/lib/cups/backend</VAR> directory that sends a print file 
+using the appropriate command. The following is a short script that 
+will run the <CODE>papif</CODE> command provided with CAP. </P>
+<P>After copying this script to <VAR>/usr/lib/cups/backend/cap</VAR>, 
+specify a device URI of <CODE>cap://server/printer</CODE> to use this 
+backend with a print queue. 
+<!-- NEED 8in ---->
+</P>
+<UL>
+<P><I>&quot;/usr/lib/cups/backend/cap&quot;</I></P>
+<PRE>
+#!/bin/sh
+#
+# Usage: cap job user title copies options [filename]
+#
+
+# No arguments means show available devices...
+
+if test ${#argv} = 0; then
+	echo &quot;network cap \&quot;Unknown\&quot; \&quot;Mac OS Printer via CAP\&quot;&quot;
+	exit 0
+fi
+
+# Collect arguments...
+
+user=$2
+copies=$4
+
+if test ${#argv} = 5; then
+	# Get print file from stdin; copies have already been handled...
+	file=/var/tmp/$$.prn
+	copies=1
+	cat &gt; $file
+else
+	# Print file is on command-line...
+	file=$6
+fi
+
+# Create a dummy cap.printers file for this printer based
+# upon a device URI of &quot;cap://server/printer&quot;...
+
+echo $PRINTER/$DEVICE_URI | \
+	awk -F/ '{print $1 &quot;=&quot; $5 &quot;:LaserWriter@&quot; $4}' &gt; /var/tmp/$$.cap
+
+CAPPRINTERS=/var/tmp/$$.cap; export CAPPRINTERS
+
+# Send the file to the printer, once for each copy. This assumes that you
+# have properly initialized the cap.printers file...
+
+while [ $copies -gt 0 ]; do
+	papif -n $user &lt; $file
+
+        copies=`expr $copies - 1`
+done
+
+# Remove any temporary files...
+if test ${#argv} = 5; then
+	/bin/rm -f $file
+fi
+
+/bin/rm -f /var/tmp/$$.cap
+
+exit 0
+</PRE>
+</UL>
+
+<!-- NEED 2in ---->
+<H2><A NAME="8_6">Printing from Windows Clients</A></H2>
+<P>While CUPS does not provide Windows support directly, the free SAMBA 
+software package does. SAMBA version 2.0.6 is the first release of 
+SAMBA that supports CUPS. You can download SAMBA from: </P>
+<UL>
+<PRE>
+<A HREF="http://www.samba.org">http://www.samba.org</A>
+</PRE>
+</UL>
+<P>To configure SAMBA for CUPS, edit the <VAR>smb.conf</VAR> file and 
+replace the existing printing commands and options with the line: </P>
+<UL>
+<PRE>
+printing = cups
+</PRE>
+</UL>
+<P>That's all there is to it!  Remote users will now be able to browse 
+and print to printers on your system. </P>
+<H2><A NAME="8_7">Printing to Windows Servers</A></H2>
+<P>CUPS can print to Windows servers in one of two ways. The first way 
+uses the LPD protocol on the CUPS system and the &quot;TCP/IP Printing 
+Services&quot; on the Windows system. You can find out more about this 
+configuration in the <A HREF="#LPD">LPD</A> section earlier in this 
+chapter. </P>
+<P>The second way is through the Microsoft Server Message Block (&quot;SMB&quot;) 
+protocol. Support for this protocol is provided with the free SAMBA 
+software package. You can download SAMBA from: </P>
+<UL>
+<PRE>
+<A HREF="http://www.samba.org">http://www.samba.org</A>
+</PRE>
+</UL>
+<P>To configure CUPS for SAMBA, run the following command: </P>
+<UL>
+<PRE>
+<B>ln -s `which smbspool` /usr/lib/cups/backend/smb ENTER</B>
+</PRE>
+</UL>
+<P>The <CODE>smbspool(1)</CODE> program is provided with SAMBA starting 
+with SAMBA 2.0.6. Once you have made the link you can configure your 
+printers with one of the following device URIs: </P>
+<UL>
+<PRE>
+smb://workgroup/server/sharename
+smb://server/sharename
+smb://user:pass@workgroup/server/sharename
+smb://user:pass@server/sharename
+</PRE>
+</UL>
+<P>The <CODE>workgroup</CODE> name need only be specified if your 
+system is using a different workgroup. The <CODE>user:pass</CODE>
+ strings are required when printing to Windows NT servers or to shares 
+with passwords enabled under Windows 95 and 98. </P>
 <H1 ALIGN="RIGHT"><A NAME="LICENSE">A - Software License Agreement</A></H1>
-<H2 ALIGN="CENTER"><A NAME="13_1">Common UNIX Printing System License 
+<H2 ALIGN="CENTER"><A NAME="9_1">Common UNIX Printing System License 
 Agreement</A></H2>
-<P ALIGN="CENTER">Copyright 1997-1999 by Easy Software Products
+<P ALIGN="CENTER">Copyright 1997-2000 by Easy Software Products
 <BR> 44141 AIRPORT VIEW DR STE 204
 <BR> HOLLYWOOD, MARYLAND 20636-3111 USA
 <BR>
 <BR> Voice: +1.301.373.9603
-<BR> Email: cups-info@cups.org
-<BR> WWW: http://www.cups.org </P>
-<P><B><BIG>Introduction</BIG></B></P>
+<BR> Email: <A HREF="mailto:cups-info@cups.org">cups-info@cups.org</A>
+<BR> WWW: <A HREF="http://www.cups.org">http://www.cups.org</A></P>
+<H3><A NAME="9_1_1">Introduction</A></H3>
 <P>The Common UNIX Printing System<SUP>TM</SUP>, or CUPS<SUP>TM</SUP>, 
-is provided under the GNU General Public License, Version 2. A copy of 
-this license follows this introduction. </P>
-<P>For those not familiar with the GNU General Public License, the 
-license basically allows you to: </P>
+is provided under the GNU General Public License (&quot;GPL&quot;) and GNU 
+Library General Public License (&quot;LGPL&quot;), Version 2. A copy of these 
+licenses follow this introduction. </P>
+<P>The GNU LGPL applies to the CUPS API library, located in the &quot;cups&quot; 
+subdirectory of the CUPS source distribution and in the 
+&quot;/usr/include/cups&quot; directory and &quot;/usr/lib/libcups.so&quot; or 
+&quot;/usr/lib32/libcups.so&quot; files in the binary distributions. </P>
+<P>The GNU GPL applies to the remainder of the CUPS distribution, 
+including the &quot;pstoraster&quot; filter which is based upon GNU Ghostscript 
+5.50. </P>
+<P>For those not familiar with the GNU GPL, the license basically 
+allows you to: </P>
 <UL>
 <LI>Use the CUPS software at no charge. </LI>
 <LI>Distribute verbatim copies of the software in source or  binary 
@@ -2599,21 +2769,29 @@ API so long as source code is made available under the GPL. </LI>
 </UL>
 <P>What this license <B>does not</B> allow you to do is make changes or 
 add features to CUPS and then sell a binary distribution without source 
-code. You have to provide source for any new drivers, changes, or 
+code. You must provide source for any new drivers, changes, or 
 additions to the software, and all code must be provided under the GPL. </P>
-<P>Also, since we have trademarked the Common UNIX Printing System, 
-CUPS, and CUPS logo, you may not release a derivative product using 
-those names without permission from Easy Software Products. </P>
-<P><B><BIG>Binary Distribution Rights</BIG></B></P>
+<P>The GNU LGPL relaxes the &quot;link-to&quot; restriction, allowing you to 
+develop applications that use the CUPS API library under other licenses 
+and/or conditions as appropriate for your application. </P>
+<H3><A NAME="9_1_2">Trademarks</A></H3>
+<P>Easy Software Products has trademarked the Common UNIX Printing 
+System, CUPS, and CUPS logo. These names and logos may be used freely 
+in any direct port or binary distribution of CUPS. To use them in 
+derivative products, please contract Easy Software Products for written 
+permission. Our intention is to protect the value of these trademarks 
+and ensure that any derivative product meets the same high-quality 
+standards as the original. </P>
+<H3><A NAME="9_1_3">Binary Distribution Rights</A></H3>
 <P>Easy Software Products also sells rights to the CUPS source code 
 under a binary distribution license for vendors that are unable to 
-release source code for their drivers or additions and modifications to 
-CUPS under the GPL. For pricing information please contact us at the 
-address shown above. </P>
-<P>The Common UNIX Printing System utilizes GNU GhostScript 4.03 to 
-convert PostScript files into a stream of raster images. For binary 
-distribution licensing of this software, please contact: <BLOCKQUOTE>
-Miles Jones
+release source code for their drivers, additions, and modifications to 
+CUPS under the GNU GPL. For pricing information please contact us at 
+the address shown above. </P>
+<P>The Common UNIX Printing System provides a &quot;pstoraster&quot; filter that 
+utilizes GNU GhostScript 5.50 to convert PostScript files into a stream 
+of raster images. For binary distribution licensing of this software, 
+please contact: <BLOCKQUOTE>Miles Jones
 <BR> Director of Marketing
 <BR> Artifex Software Inc.
 <BR> 454 Las Gallinas Ave., Suite 108
@@ -2621,23 +2799,30 @@ Miles Jones
 <BR> Voice: +1.415.492.9861
 <BR> Fax: +1.415.492.9862
 <BR> EMail: info@arsoft.com </BLOCKQUOTE></P>
-<P><B><BIG>Support</BIG></B></P>
-<P>Easy Software Products sells software support for distributors and 
-resellers of CUPS. Support for users of CUPS is available from Easy 
-Software Products through our ESP Print software. </P>
-<P><B><BIG>Trademarks</BIG></B></P>
-<P>The Common UNIX Printing System, CUPS, and the CUPS logo are the 
-trademark property of Easy Software Products. Any derivative of this 
-software may not use any of these trademarks without the expressed 
-written consent of Easy Software Products. </P>
-<H2 ALIGN="CENTER"><A NAME="13_2">GNU General Public License</A></H2>
-<P ALIGN="CENTER">Version 2, June 1991
-<BR>
-<BR> Copyright 1989, 1991 Free Software Foundation, Inc.
-<BR> 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA </P>
-<P ALIGN="CENTER">Everyone is permitted to copy and distribute verbatim 
-copies of this license document, but changing it is not allowed. </P>
-<P><B><BIG>Preamble</BIG></B></P>
+<H3><A NAME="9_1_4">Support</A></H3>
+<P>Easy Software Products sells software support for CUPS as well as a 
+commercial printing product based on CUPS called ESP Print Pro. You can 
+find out more at our web site: </P>
+<UL>
+<PRE>
+<A HREF="http://www.easysw.com">http://www.easysw.com</A>
+</PRE>
+</UL>
+
+<!-- NEW PAGE ---->
+<H2><A NAME="9_2">GNU GENERAL PUBLIC LICENSE</A></H2>
+<P>Version 2, June 1991 </P>
+<PRE>
+Copyright 1989, 1991 Free Software Foundation, Inc.
+59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+Everyone is permitted to copy and distribute verbatim
+copies of this license document, but changing it is not allowed.
+</PRE>
+<PRE>
+
+</PRE>
+<H4>Preamble</H4>
 <P>The licenses for most software are designed to take away your 
 freedom to share and change it.  By contrast, the GNU General Public 
 License is intended to guarantee your freedom to share and change free 
@@ -2678,9 +2863,8 @@ program proprietary.  To prevent this, we have made it clear that any
 patent must be licensed for everyone's free use or not licensed at all. </P>
 <P>The precise terms and conditions for copying, distribution and 
 modification follow. </P>
-<P><B><BIG>GNU GENERAL PUBLIC LICENSE
-<BR> TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION</BIG>
-</B></P>
+<H4>GNU GENERAL PUBLIC LICENSE
+<BR> TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION</H4>
 <OL START="0">
 <LI>This License applies to any program or other work which contains a 
 notice placed by the copyright holder saying it may be distributed 
@@ -2858,7 +3042,7 @@ sometimes make exceptions for this.  Our decision will be guided by the
 two goals of preserving the free status of all derivatives of our free 
 software and of promoting the sharing and reuse of software generally. </LI>
 </OL>
-<P><B><BIG>NO WARRANTY</BIG></B></P>
+<H4>NO WARRANTY</H4>
 <OL START="11">
 <LI>BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO 
 WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. 
@@ -2880,12 +3064,397 @@ FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF
 SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH 
 DAMAGES. </LI>
 </OL>
-<P><B><BIG>END OF TERMS AND CONDITIONS</BIG></B></P>
+<H4>END OF TERMS AND CONDITIONS</H4>
+
+<!-- NEW PAGE ---->
+<H2><A NAME="9_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A></H2>
+<P>Version 2, June 1991 </P>
+<PRE>
+Copyright (C) 1991 Free Software Foundation, Inc.
+59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
+Everyone is permitted to copy and distribute verbatim copies
+of this license document, but changing it is not allowed.
+
+[This is the first released version of the library GPL.  It is
+ numbered 2 because it goes with version 2 of the ordinary GPL.]
+</PRE>
+<H4>Preamble</H4>
+<P>The licenses for most software are designed to take away your 
+freedom to share and change it.  By contrast, the GNU General Public 
+Licenses are intended to guarantee your freedom to share and change 
+free software--to make sure the software is free for all its users. </P>
+<P>This license, the Library General Public License, applies to some 
+specially designated Free Software Foundation software, and to any 
+other libraries whose authors decide to use it.  You can use it for 
+your libraries, too. </P>
+<P>When we speak of free software, we are referring to freedom, not 
+price.  Our General Public Licenses are designed to make sure that you 
+have the freedom to distribute copies of free software (and charge for 
+this service if you wish), that you receive source code or can get it 
+if you want it, that you can change the software or use pieces of it in 
+new free programs; and that you know you can do these things. </P>
+<P>To protect your rights, we need to make restrictions that forbid 
+anyone to deny you these rights or to ask you to surrender the rights. 
+These restrictions translate to certain responsibilities for you if you 
+distribute copies of the library, or if you modify it. </P>
+<P>For example, if you distribute copies of the library, whether gratis 
+or for a fee, you must give the recipients all the rights that we gave 
+you.  You must make sure that they, too, receive or can get the source 
+code.  If you link a program with the library, you must provide 
+complete object files to the recipients so that they can relink them 
+with the library, after making changes to the library and recompiling 
+it.  And you must show them these terms so they know their rights. </P>
+<P>Our method of protecting your rights has two steps: (1) copyright 
+the library, and (2) offer you this license which gives you legal 
+permission to copy, distribute and/or modify the library. </P>
+<P>Also, for each distributor's protection, we want to make certain 
+that everyone understands that there is no warranty for this free 
+library.  If the library is modified by someone else and passed on, we 
+want its recipients to know that what they have is not the original 
+version, so that any problems introduced by others will not reflect on 
+the original authors' reputations. </P>
+<P>Finally, any free program is threatened constantly by software 
+patents.  We wish to avoid the danger that companies distributing free 
+software will individually obtain patent licenses, thus in effect 
+transforming the program into proprietary software.  To prevent this, 
+we have made it clear that any patent must be licensed for everyone's 
+free use or not licensed at all. </P>
+<P>Most GNU software, including some libraries, is covered by the 
+ordinary GNU General Public License, which was designed for utility 
+programs.  This license, the GNU Library General Public License, 
+applies to certain designated libraries.  This license is quite 
+different from the ordinary one; be sure to read it in full, and don't 
+assume that anything in it is the same as in the ordinary license. </P>
+<P>The reason we have a separate public license for some libraries is 
+that they blur the distinction we usually make between modifying or 
+adding to a program and simply using it.  Linking a program with a 
+library, without changing the library, is in some sense simply using 
+the library, and is analogous to running a utility program or 
+application program.  However, in a textual and legal sense, the linked 
+executable is a combined work, a derivative of the original library, 
+and the ordinary General Public License treats it as such. </P>
+<P>Because of this blurred distinction, using the ordinary General 
+Public License for libraries did not effectively promote software 
+sharing, because most developers did not use the libraries.  We 
+concluded that weaker conditions might promote sharing better. </P>
+<P>However, unrestricted linking of non-free programs would deprive the 
+users of those programs of all benefit from the free status of the 
+libraries themselves.  This Library General Public License is intended 
+to permit developers of non-free programs to use free libraries, while 
+preserving your freedom as a user of such programs to change the free 
+libraries that are incorporated in them.  (We have not seen how to 
+achieve this as regards changes in header files, but we have achieved 
+it as regards changes in the actual functions of the Library.)  The 
+hope is that this will lead to faster development of free libraries. </P>
+<P>The precise terms and conditions for copying, distribution and 
+modification follow.  Pay close attention to the difference between a 
+&quot;work based on the library&quot; and a &quot;work that uses the library&quot;.  The 
+former contains code derived from the library, while the latter only 
+works together with the library. </P>
+<P>Note that it is possible for a library to be covered by the ordinary 
+General Public License rather than by this special one. </P>
+<H4>TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION</H4>
+<P><STRONG>0.</STRONG> This License Agreement applies to any software 
+library which contains a notice placed by the copyright holder or other 
+authorized party saying it may be distributed under the terms of this 
+Library General Public License (also called &quot;this License&quot;).  Each 
+licensee is addressed as &quot;you&quot;. </P>
+<P>A &quot;library&quot; means a collection of software functions and/or data 
+prepared so as to be conveniently linked with application programs 
+(which use some of those functions and data) to form executables. </P>
+<P>The &quot;Library&quot;, below, refers to any such software library or work 
+which has been distributed under these terms.  A &quot;work based on the 
+Library&quot; means either the Library or any derivative work under 
+copyright law: that is to say, a work containing the Library or a 
+portion of it, either verbatim or with modifications and/or translated 
+straightforwardly into another language.  (Hereinafter, translation is 
+included without limitation in the term &quot;modification&quot;.) </P>
+<P>&quot;Source code&quot; for a work means the preferred form of the work for 
+making modifications to it.  For a library, complete source code means 
+all the source code for all modules it contains, plus any associated 
+interface definition files, plus the scripts used to control 
+compilation and installation of the library. </P>
+<P>Activities other than copying, distribution and modification are not 
+covered by this License; they are outside its scope.  The act of 
+running a program using the Library is not restricted, and output from 
+such a program is covered only if its contents constitute a work based 
+on the Library (independent of the use of the Library in a tool for 
+writing it).  Whether that is true depends on what the Library does and 
+what the program that uses the Library does. </P>
+<P><STRONG>1.</STRONG> You may copy and distribute verbatim copies of 
+the Library's complete source code as you receive it, in any medium, 
+provided that you conspicuously and appropriately publish on each copy 
+an appropriate copyright notice and disclaimer of warranty; keep intact 
+all the notices that refer to this License and to the absence of any 
+warranty; and distribute a copy of this License along with the Library. </P>
+<P>You may charge a fee for the physical act of transferring a copy, 
+and you may at your option offer warranty protection in exchange for a 
+fee. </P>
+<P><STRONG>2.</STRONG> You may modify your copy or copies of the 
+Library or any portion of it, thus forming a work based on the Library, 
+and copy and distribute such modifications or work under the terms of 
+Section 1 above, provided that you also meet all of these conditions: </P>
+<OL TYPE="a">
+<LI>The modified work must itself be a software library. </LI>
+<P>
+<LI>You must cause the files modified to carry prominent notices 
+ stating that you changed the files and the date of any change. </LI>
+<P>
+<LI>You must cause the whole of the work to be licensed at no  charge 
+to all third parties under the terms of this License. </LI>
+<P>
+<LI>If a facility in the modified Library refers to a function or a 
+ table of data to be supplied by an application program that uses  the 
+facility, other than as an argument passed when the facility  is 
+invoked, then you must make a good faith effort to ensure that,  in the 
+event an application does not supply such function or  table, the 
+facility still operates, and performs whatever part of  its purpose 
+remains meaningful. </LI>
+<P>(For example, a function in a library to compute square roots has  a 
+purpose that is entirely well-defined independent of the  application. 
+ Therefore, Subsection 2d requires that any  application-supplied 
+function or table used by this function must  be optional: if the 
+application does not supply it, the square  root function must still 
+compute square roots.) </P>
+</OL>
+<P>These requirements apply to the modified work as a whole.  If 
+identifiable sections of that work are not derived from the Library, 
+and can be reasonably considered independent and separate works in 
+themselves, then this License, and its terms, do not apply to those 
+sections when you distribute them as separate works.  But when you 
+distribute the same sections as part of a whole which is a work based 
+on the Library, the distribution of the whole must be on the terms of 
+this License, whose permissions for other licensees extend to the 
+entire whole, and thus to each and every part regardless of who wrote 
+it. </P>
+<P>Thus, it is not the intent of this section to claim rights or 
+contest your rights to work written entirely by you; rather, the intent 
+is to exercise the right to control the distribution of derivative or 
+collective works based on the Library. </P>
+<P>In addition, mere aggregation of another work not based on the 
+Library with the Library (or with a work based on the Library) on a 
+volume of a storage or distribution medium does not bring the other 
+work under the scope of this License. </P>
+<P><STRONG>3.</STRONG> You may opt to apply the terms of the ordinary 
+GNU General Public License instead of this License to a given copy of 
+the Library.  To do this, you must alter all the notices that refer to 
+this License, so that they refer to the ordinary GNU General Public 
+License, version 2, instead of to this License.  (If a newer version 
+than version 2 of the ordinary GNU General Public License has appeared, 
+then you can specify that version instead if you wish.)  Do not make 
+any other change in these notices. </P>
+<P>Once this change is made in a given copy, it is irreversible for 
+that copy, so the ordinary GNU General Public License applies to all 
+subsequent copies and derivative works made from that copy. </P>
+<P>This option is useful when you wish to copy part of the code of the 
+Library into a program that is not a library. </P>
+<P><STRONG>4.</STRONG> You may copy and distribute the Library (or a 
+portion or derivative of it, under Section 2) in object code or 
+executable form under the terms of Sections 1 and 2 above provided that 
+you accompany it with the complete corresponding machine-readable 
+source code, which must be distributed under the terms of Sections 1 
+and 2 above on a medium customarily used for software interchange. </P>
+<P>If distribution of object code is made by offering access to copy 
+from a designated place, then offering equivalent access to copy the 
+source code from the same place satisfies the requirement to distribute 
+the source code, even though third parties are not compelled to copy 
+the source along with the object code. </P>
+<P><STRONG>5.</STRONG> A program that contains no derivative of any 
+portion of the Library, but is designed to work with the Library by 
+being compiled or linked with it, is called a &quot;work that uses the 
+Library&quot;.  Such a work, in isolation, is not a derivative work of the 
+Library, and therefore falls outside the scope of this License. </P>
+<P>However, linking a &quot;work that uses the Library&quot; with the Library 
+creates an executable that is a derivative of the Library (because it 
+contains portions of the Library), rather than a &quot;work that uses the 
+library&quot;.  The executable is therefore covered by this License. Section 
+6 states terms for distribution of such executables. </P>
+<P>When a &quot;work that uses the Library&quot; uses material from a header file 
+that is part of the Library, the object code for the work may be a 
+derivative work of the Library even though the source code is not. 
+Whether this is true is especially significant if the work can be 
+linked without the Library, or if the work is itself a library.  The 
+threshold for this to be true is not precisely defined by law. </P>
+<P>If such an object file uses only numerical parameters, data 
+structure layouts and accessors, and small macros and small inline 
+functions (ten lines or less in length), then the use of the object 
+file is unrestricted, regardless of whether it is legally a derivative 
+work.  (Executables containing this object code plus portions of the 
+Library will still fall under Section 6.) </P>
+<P>Otherwise, if the work is a derivative of the Library, you may 
+distribute the object code for the work under the terms of Section 6. 
+Any executables containing that work also fall under Section 6, whether 
+or not they are linked directly with the Library itself. </P>
+<P><STRONG>6.</STRONG> As an exception to the Sections above, you may 
+also compile or link a &quot;work that uses the Library&quot; with the Library to 
+produce a work containing portions of the Library, and distribute that 
+work under terms of your choice, provided that the terms permit 
+modification of the work for the customer's own use and reverse 
+engineering for debugging such modifications. </P>
+<P>You must give prominent notice with each copy of the work that the 
+Library is used in it and that the Library and its use are covered by 
+this License.  You must supply a copy of this License.  If the work 
+during execution displays copyright notices, you must include the 
+copyright notice for the Library among them, as well as a reference 
+directing the user to the copy of this License.  Also, you must do one 
+of these things: </P>
+<OL TYPE="a">
+<LI>Accompany the work with the complete corresponding 
+ machine-readable source code for the Library including whatever 
+ changes were used in the work (which must be distributed under 
+ Sections 1 and 2 above); and, if the work is an executable linked 
+ with the Library, with the complete machine-readable &quot;work that  uses 
+the Library&quot;, as object code and/or source code, so that the  user can 
+modify the Library and then relink to produce a modified  executable 
+containing the modified Library.  (It is understood  that the user who 
+changes the contents of definitions files in the  Library will not 
+necessarily be able to recompile the application  to use the modified 
+definitions.) </LI>
+<P>
+<LI>Accompany the work with a written offer, valid for at  least three 
+years, to give the same user the materials  specified in Subsection 6a, 
+above, for a charge no more  than the cost of performing this 
+distribution. </LI>
+<P>
+<LI>If distribution of the work is made by offering access to copy 
+ from a designated place, offer equivalent access to copy the above 
+ specified materials from the same place. </LI>
+<P>
+<LI>Verify that the user has already received a copy of these 
+ materials or that you have already sent this user a copy. </LI>
+</OL>
+<P>For an executable, the required form of the &quot;work that uses the 
+Library&quot; must include any data and utility programs needed for 
+reproducing the executable from it.  However, as a special exception, 
+the source code distributed need not include anything that is normally 
+distributed (in either source or binary form) with the major components 
+(compiler, kernel, and so on) of the operating system on which the 
+executable runs, unless that component itself accompanies the 
+executable. </P>
+<P>It may happen that this requirement contradicts the license 
+restrictions of other proprietary libraries that do not normally 
+accompany the operating system.  Such a contradiction means you cannot 
+use both them and the Library together in an executable that you 
+distribute. </P>
+<P><STRONG>7.</STRONG> You may place library facilities that are a work 
+based on the Library side-by-side in a single library together with 
+other library facilities not covered by this License, and distribute 
+such a combined library, provided that the separate distribution of the 
+work based on the Library and of the other library facilities is 
+otherwise permitted, and provided that you do these two things: </P>
+<OL TYPE="a">
+<LI>Accompany the combined library with a copy of the same work  based 
+on the Library, uncombined with any other library  facilities.  This 
+must be distributed under the terms of the  Sections above. </LI>
+<P>
+<LI>Give prominent notice with the combined library of the fact  that 
+part of it is a work based on the Library, and explaining  where to 
+find the accompanying uncombined form of the same work. </LI>
+</OL>
+<P><STRONG>8.</STRONG> You may not copy, modify, sublicense, link with, 
+or distribute the Library except as expressly provided under this 
+License.  Any attempt otherwise to copy, modify, sublicense, link with, 
+or distribute the Library is void, and will automatically terminate 
+your rights under this License.  However, parties who have received 
+copies, or rights, from you under this License will not have their 
+licenses terminated so long as such parties remain in full compliance. </P>
+<P><STRONG>9.</STRONG> You are not required to accept this License, 
+since you have not signed it.  However, nothing else grants you 
+permission to modify or distribute the Library or its derivative works. 
+ These actions are prohibited by law if you do not accept this License. 
+ Therefore, by modifying or distributing the Library (or any work based 
+on the Library), you indicate your acceptance of this License to do so, 
+and all its terms and conditions for copying, distributing or modifying 
+the Library or works based on it. </P>
+<P><STRONG>10.</STRONG> Each time you redistribute the Library (or any 
+work based on the Library), the recipient automatically receives a 
+license from the original licensor to copy, distribute, link with or 
+modify the Library subject to these terms and conditions.  You may not 
+impose any further restrictions on the recipients' exercise of the 
+rights granted herein. You are not responsible for enforcing compliance 
+by third parties to this License. </P>
+<P><STRONG>11.</STRONG> If, as a consequence of a court judgment or 
+allegation of patent infringement or for any other reason (not limited 
+to patent issues), conditions are imposed on you (whether by court 
+order, agreement or otherwise) that contradict the conditions of this 
+License, they do not excuse you from the conditions of this License. 
+ If you cannot distribute so as to satisfy simultaneously your 
+obligations under this License and any other pertinent obligations, 
+then as a consequence you may not distribute the Library at all.  For 
+example, if a patent license would not permit royalty-free 
+redistribution of the Library by all those who receive copies directly 
+or indirectly through you, then the only way you could satisfy both it 
+and this License would be to refrain entirely from distribution of the 
+Library. </P>
+<P>If any portion of this section is held invalid or unenforceable 
+under any particular circumstance, the balance of the section is 
+intended to apply, and the section as a whole is intended to apply in 
+other circumstances. </P>
+<P>It is not the purpose of this section to induce you to infringe any 
+patents or other property right claims or to contest validity of any 
+such claims; this section has the sole purpose of protecting the 
+integrity of the free software distribution system which is implemented 
+by public license practices.  Many people have made generous 
+contributions to the wide range of software distributed through that 
+system in reliance on consistent application of that system; it is up 
+to the author/donor to decide if he or she is willing to distribute 
+software through any other system and a licensee cannot impose that 
+choice. </P>
+<P>This section is intended to make thoroughly clear what is believed 
+to be a consequence of the rest of this License. </P>
+<P><STRONG>12.</STRONG> If the distribution and/or use of the Library 
+is restricted in certain countries either by patents or by copyrighted 
+interfaces, the original copyright holder who places the Library under 
+this License may add an explicit geographical distribution limitation 
+excluding those countries, so that distribution is permitted only in or 
+among countries not thus excluded.  In such case, this License 
+incorporates the limitation as if written in the body of this License. </P>
+<P><STRONG>13.</STRONG> The Free Software Foundation may publish 
+revised and/or new versions of the Library General Public License from 
+time to time. Such new versions will be similar in spirit to the 
+present version, but may differ in detail to address new problems or 
+concerns. </P>
+<P>Each version is given a distinguishing version number.  If the 
+Library specifies a version number of this License which applies to it 
+and &quot;any later version&quot;, you have the option of following the terms and 
+conditions either of that version or of any later version published by 
+the Free Software Foundation.  If the Library does not specify a 
+license version number, you may choose any version ever published by 
+the Free Software Foundation. </P>
+<P><STRONG>14.</STRONG> If you wish to incorporate parts of the Library 
+into other free programs whose distribution conditions are incompatible 
+with these, write to the author to ask for permission.  For software 
+which is copyrighted by the Free Software Foundation, write to the Free 
+Software Foundation; we sometimes make exceptions for this.  Our 
+decision will be guided by the two goals of preserving the free status 
+of all derivatives of our free software and of promoting the sharing 
+and reuse of software generally. </P>
+<P><STRONG>NO WARRANTY</STRONG></P>
+<P><STRONG>15.</STRONG> BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, 
+THERE IS NO WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY 
+APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT 
+HOLDERS AND/OR OTHER PARTIES PROVIDE THE LIBRARY &quot;AS IS&quot; WITHOUT 
+WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT 
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
+PARTICULAR PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE 
+OF THE LIBRARY IS WITH YOU.  SHOULD THE LIBRARY PROVE DEFECTIVE, YOU 
+ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION. </P>
+<P><STRONG>16.</STRONG> IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW 
+OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY 
+WHO MAY MODIFY AND/OR REDISTRIBUTE THE LIBRARY AS PERMITTED ABOVE, BE 
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL 
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE 
+LIBRARY (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING 
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A 
+FAILURE OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF 
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH 
+DAMAGES. </P>
+<H4>END OF TERMS AND CONDITIONS</H4>
 <H1 ALIGN="RIGHT"><A NAME="COMMON_NETWORK">B - Common Network Settings</A>
 </H1>
 <P>This appendix covers many of the popular TCP/IP network interfaces 
 and printer servers available on the market today. </P>
-<H2><A NAME="14_1">Configuring a Network Interface</A></H2>
+<H2><A NAME="10_1">Configuring a Network Interface</A></H2>
 <P>When you first install a network printer or print server on your 
 LAN, you need to set the Internet Protocol (&quot;IP&quot;) address. On most 
 higher-end &quot;workgroup&quot; printers, you can set the address through the 
@@ -2896,8 +3465,10 @@ a bit easier and avoids assigning duplicate addresses accidentally. </P>
 you'll need the Ethernet Media Access Control (&quot;MAC&quot;) address, also 
 sometimes called a node address, and the IP address you want to use for 
 the device. The Ethernet MAC address can often be found on the printer 
-test page or bottom of the print server. </P>
-<H3><A NAME="14_1_1">Configuring the IP Address Using ARP</A></H3>
+test page or bottom of the print server. 
+<!-- NEED 3in ---->
+</P>
+<H3><A NAME="10_1_1">Configuring the IP Address Using ARP</A></H3>
 <P>The easiest way to set the IP address of a network device is to use 
 the <CODE>arp(1m)</CODE> command.  The <CODE>arp</CODE> sends an 
 Address Resolution Protocol (&quot;ARP&quot;) packet to the specified Ethernet 
@@ -2909,7 +3480,7 @@ MAC address, setting the network device's IP address: </P>
 <B>arp -s 192.0.2.2 08:00:69:00:12:34 ENTER</B>
 </PRE>
 </UL>
-<H3><A NAME="14_1_2">Configuring the IP Address Using RARP</A></H3>
+<H3><A NAME="10_1_2">Configuring the IP Address Using RARP</A></H3>
 <P>The most flexible way to remotely assign IP addresses under UNIX is 
 through the Reverse Address Resolution Protocol (&quot;RARP&quot;). RARP allows a 
 network device to request an IP address using its Ethernet MAC address, 
@@ -2946,7 +3517,7 @@ an IP address or hostname like: </P>
 </UL>
 <P>Add a line to this file and cycle the power on the printer or print 
 server to set its address. </P>
-<H3><A NAME="14_1_3">Configuring the IP Address Using BOOTP</A></H3>
+<H3><A NAME="10_1_3">Configuring the IP Address Using BOOTP</A></H3>
 <P>The BOOTP protocol is used when you need to provide additional 
 information such as the location of a configuration file to the network 
 interface. Using the standard <CODE>bootpd(1m)</CODE> program supplied 
@@ -2965,13 +3536,20 @@ myprinter:ha=080069001234:ip=192.0.2.2:<VAR>t144=myprinter.boot</VAR>
 </UL>
 <P>The <VAR>myprinter.boot</VAR> file resides in the <VAR>
 /usr/local/boot</VAR> directory by default. If you do not need to 
-provide a boot file you may leave the last part of the line blank. </P>
-<UL><B>Note:</B>
+provide a boot file you may leave the last part of the line blank. 
+<!-- NEED 2in ---->
+
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B>NOTE:</B>
 <P>Some versions of UNIX do not enable the BOOTP service by  default. 
 The <VAR>/etc/inetd.conf</VAR> usually contains a  line for the BOOTP 
 service that can be uncommented if  needed. </P>
-</UL>
-<H2><A NAME="14_2">Verifying the Printer Connection</A></H2>
+</TD></TR>
+</TABLE>
+</CENTER>
+</P>
+<H2><A NAME="10_2">Verifying the Printer Connection</A></H2>
 <P>To test that the IP address has been successfully assigned and that 
 the printer is properly connected to your LAN, type: </P>
 <UL>
@@ -2994,7 +3572,7 @@ PING myprinter (192.0.2.2): 56 data bytes
 LAN, it is powered on, the LAN cabling is good, and the IP address is 
 set correctly. You can usually see the current IP address and network 
 status by printing a configuration or test page on the device. </P>
-<H2><A NAME="14_3">Common Network Interface Settings</A></H2>
+<H2><A NAME="10_3">Common Network Interface Settings</A></H2>
 <P>Once you have set the IP address you can access the printer or print 
 server using the <CODE>ipp</CODE>, <CODE>lpd</CODE>, or <CODE>socket</CODE>
  backends. The following is a list of common network interfaces and 
@@ -3030,6 +3608,8 @@ Interface Board</TD><TD>socket://<I>address</I></TD></TR>
 lpd://<I>address</I>/pr1
 <BR> lpd://<I>address</I>/pr2
 <BR> lpd://<I>address</I>/pr3</TD></TR>
+
+<!-- NEED 1in ---->
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Hewlett Packard JetDirect w/o IPP</TD><TD>
 socket://<I>address</I>:9100
 <BR> socket://<I>address</I>:9101
@@ -3064,7 +3644,9 @@ socket://<I>address</I>:9100</TD></TR>
 <P>The Axis print servers can be configured using ARP, RARP, or BOOTP. 
 However, on models that do not provide IPP support an additional step 
 must be performed to configure the TCP/IP portion of the print server 
-for use with CUPS. </P>
+for use with CUPS. 
+<!-- NEED 3in ---->
+</P>
 <P>Each print server contains a configuration file named <VAR>config</VAR>
  that contains a list of network parameters used by the server. To 
 modify this file you must first download it from the print server using 
@@ -3089,6 +3671,8 @@ ftp&gt; <B>quit ENTER</B>
 221 Goodbye.
 </PRE>
 </UL>
+
+<!-- NEED 2in ---->
 <P>Next, edit the file with your favorite text editor and locate the 
 lines beginning with: </P>
 <UL>
@@ -3104,12 +3688,16 @@ RTEL_PR7.    : 0
 RTEL_PR8.    : 0
 </PRE>
 </UL>
+
+<!-- NEED 1in ---->
  Change the <CODE>RTN_OPT</CODE> line to read: 
 <UL>
 <PRE>
 RTN_OPT.     : <B>NO</B>
 </PRE>
 </UL>
+
+<!-- NEED 2in ---->
 <P>This disables the Reverse TELNET protocol and enables the standard 
 TELNET protocol on the print server. Next, assign a port number for 
 each parallel and serial port on the server as follows: </P>
@@ -3125,9 +3713,11 @@ RTEL_PR7.    : <B>9106</B>
 RTEL_PR8.    : <B>9107</B>
 </PRE>
 </UL>
+
+<!-- NEED 4in ---->
 <P>This essentially makes the Axis print server look like a Hewlett 
 Packard JetDirect EX print server. Save the file and then upload the 
-new config using the <CODE>ftp</CODE> command: </P>
+new <VAR>config</VAR> file using the <CODE>ftp</CODE> command: </P>
 <UL>
 <PRE>
 <B>ftp ip-address ENTER</B>
@@ -3154,7 +3744,7 @@ ftp&gt; <B>quit ENTER</B>
 <P>Your Axis print server is now ready for use! </P>
 <H1 ALIGN="RIGHT"><A NAME="PRINTER_DRIVERS">C - Printer Drivers</A></H1>
 <P>This appendix lists the printer drivers that are provided with CUPS. </P>
-<H2><A NAME="15_1">Printer Drivers</A></H2>
+<H2><A NAME="11_1">Printer Drivers</A></H2>
 <P>CUPS includes the following printer drivers: </P>
 <UL>
 <LI><A HREF="#EPSON9">EPSON 9-pin Dot Matrix</A>, <VAR>epson9.ppd</VAR></LI>
@@ -3320,8 +3910,7 @@ Products. For more information please contact us at: </P>
 <LI>EMail: <A HREF="mailto:support@easysw.com">support@easysw.com</A></LI>
 <LI>Telephone (M-F, 9-5 EST): +1.301.373.9603 </LI>
 </UL>
-<H2><A NAME="17_1">The Printing Tools Don't Recognize My Username or 
-Password!</A></H2>
+<H2><A NAME="13_1">CUPS Doesn't Recognize My Username or Password!</A></H2>
 <P>CUPS will ask you for a UNIX username and password when you perform 
 printer administration tasks remotely or via a web browser. The default 
 configuration requires that you use the <CODE>root</CODE> username and 
@@ -3329,7 +3918,9 @@ the corresponding password to authenticate the request. </P>
 <P>CUPS does not allow you to authenticate an administration request 
 with an account that has no password for security reasons. If you do 
 not have a password on your <CODE>root</CODE> account then you won't be 
-able to add printers remotely or via the web interface! </P>
+able to add printers remotely or via the web interface! 
+<!-- NEED 2in ---->
+</P>
 <P>To disable password authentication you need to edit the <VAR>
 /etc/cups/cupsd.conf</VAR> file and comment out the lines reading: </P>
 <UL>
@@ -3341,10 +3932,16 @@ AuthClass System
  for the <VAR>/admin</VAR> location. Then restart the CUPS server as 
 described in <A HREF="PRINTING_MANAGEMENT">Chapter 8, &quot;Printing System 
 Management&quot;</A>. 
-<P><B>Note:</B> Disabling password checks will allow any local user to 
-change your printer and class configuration, but remote administration 
-from another machine will still not be allowed. </P>
-<H2><A NAME="17_2">I Can't Do Administration Tasks from Another Machine!</A>
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B>NOTE:</B>
+<P>Disabling password checks will allow any local user to  change your 
+printer and class configuration, but remote  administration from 
+another machine will still not be allowed. </P>
+</TD></TR>
+</TABLE>
+</CENTER>
+<H2><A NAME="13_2">I Can't Do Administration Tasks from Another Machine!</A>
 </H2>
 <P>The default CUPS configuration limits administration to the local 
 machine. To open up access, edit the <VAR>/etc/cups/cupsd.conf</VAR>
@@ -3359,11 +3956,17 @@ Allow from 127.0.0.1
  for the <VAR>/admin</VAR> location. Then restart the CUPS server as 
 described in <A HREF="PRINTING_MANAGEMENT">Chapter 8, &quot;Printing System 
 Management&quot;</A>. 
-<P><B>Note:</B> Allowing administration access from all hosts is a 
-potential security risk. Please read <A HREF="PRINTING_SECURITY">
-Chapter 9, &quot;Printing System Security&quot;</A> for a description of these 
-risks and ways to minimize them. </P>
-<H2><A NAME="17_3">I Can't Do Administration Tasks from My Web Browser!</A>
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B>NOTE:</B>
+<P>Allowing administration access from all hosts is a potential 
+ security risk. Please read <A HREF="PRINTING_SECURITY">Chapter  7, 
+&quot;Printing System Management&quot;</A> for a description of these  risks and 
+ways to minimize them. </P>
+</TD></TR>
+</TABLE>
+</CENTER>
+<H2><A NAME="13_3">I Can't Do Administration Tasks from My Web Browser!</A>
 </H2>
 <P>This problem is usually caused by: </P>
 <OL>
@@ -3381,12 +3984,13 @@ you are using is not a member of the system group. </LI>
 <LI>configuring CUPS to use Digest authentication, but  your web 
 browser does not support Digest authentication. </LI>
 </OL>
-<H2><A NAME="17_4">Connection Refused Messages</A></H2>
+<H2><A NAME="13_4">Connection Refused Messages</A></H2>
 <P>Under normal circumstances, &quot;connection refused&quot; messages for a 
 networked printer should be expected from time to time. Most network 
 interfaces only allow a single connection to be made at any given time 
 (one job at a time) and will refuse access to all other systems while 
-the first connection is active. </P>
+the first connection is active. CUPS automatically retries the 
+connection once every 30 seconds. </P>
 <P>If the problem persists and you are unable to print any jobs to the 
 printer, verify that another machine is not maintaining a connection 
 with the printer, and that you have selected the proper port or printer 
@@ -3394,7 +3998,7 @@ name for the printer. </P>
 <P>Also, most external print servers will refuse connections if the 
 connected printer is turned off or is off-line. Verify that the 
 affected printer is turned on and is online. </P>
-<H2><A NAME="17_5">Write Error Messages</A></H2>
+<H2><A NAME="13_5">Write Error Messages</A></H2>
 <P>If you get &quot;write error&quot; messages on a printer queue the printer 
 interface (usually a Hewlett Packard JetDirect interface) has timed out 
 and reset the network connection from your workstation. </P>

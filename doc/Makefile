@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.22 2000/05/08 21:13:34 mike Exp $"
+# "$Id: Makefile,v 1.23 2000/05/10 19:27:18 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -96,6 +96,14 @@ all:	$(DOCUMENTS:.shtml=.pdf) $(DOCUMENTS:.shtml=.html) overview.pdf
 
 
 #
+# Make manuals for printing...
+#
+
+print:	sam-7x8.pdf spm-7x8.pdf sum-7x8.pdf \
+	sam-7x8.ps spm-7x8.ps sum-7x8.ps
+
+
+#
 # Remove all generated files...
 #
 
@@ -164,6 +172,40 @@ sum.pdf:	sum.shtml
 sum.ps:		sum.shtml
 	echo Formatting $@...
 	htmldoc --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
+
+sam-7x8.pdf:	sam.shtml
+	echo Formatting $@...
+	htmldoc --titleimage images/cups-large.gif --duplex --compression=9 \
+		--pagelayout tworight --pagemode document \
+		--jpeg --size 7x8.5in --left 0.5in --right 0.25in \
+		--top 0.25in --bottom 0.25in --fontsize 10 --headfootsize 10 -f $@ sam.shtml
+sam-7x8.ps:		sam.shtml
+	echo Formatting $@...
+	htmldoc --titleimage images/cups-large.gif --duplex --jpeg \
+		--size 7x8.5in --left 0.5in --right 0.25in \
+		--top 0.25in --bottom 0.25in --fontsize 10 --headfootsize 10 -f $@ sam.shtml
+spm-7x8.pdf:	spm.shtml
+	echo Formatting $@...
+	htmldoc --titleimage images/cups-large.gif --duplex --compression=9 \
+		--pagelayout tworight --pagemode document \
+		--jpeg --size 7x8.5in --left 0.5in --right 0.25in \
+		--top 0.25in --bottom 0.25in --fontsize 10 --headfootsize 10 -f $@ spm.shtml
+spm-7x8.ps:		spm.shtml
+	echo Formatting $@...
+	htmldoc --titleimage images/cups-large.gif --duplex --jpeg \
+		--size 7x8.5in --left 0.5in --right 0.25in \
+		--top 0.25in --bottom 0.25in --fontsize 10 --headfootsize 10 -f $@ spm.shtml
+sum-7x8.pdf:	sum.shtml
+	echo Formatting $@...
+	htmldoc --titleimage images/cups-large.gif --duplex --compression=9 \
+		--pagelayout tworight --pagemode document \
+		--jpeg --size 7x8.5in --left 0.5in --right 0.25in \
+		--top 0.25in --bottom 0.25in --fontsize 10 --headfootsize 10 -f $@ sum.shtml
+sum-7x8.ps:		sum.shtml
+	echo Formatting $@...
+	htmldoc --titleimage images/cups-large.gif --duplex --jpeg \
+		--size 7x8.5in --left 0.5in --right 0.25in \
+		--top 0.25in --bottom 0.25in --fontsize 10 --headfootsize 10 -f $@ sum.shtml
 
 #
 # End of Makefile.

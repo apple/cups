@@ -32,7 +32,8 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <BR><B><A HREF="#1">1 Scope</A></B>
 <UL>
 <LI><A HREF="#1_1">1.1 Identification</A></LI>
-<LI><A HREF="#1_2">1.2 Document Overview</A></LI>
+<LI><A HREF="#1_2">1.2 System Overview</A></LI>
+<LI><A HREF="#1_3">1.3 Document Overview</A></LI>
 </UL>
 <B><A HREF="#2">2 References</A></B>
 <UL>
@@ -145,7 +146,7 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#5_2_5">5.2.5 fitplot (boolean)</A></LI>
 <LI><A HREF="#5_2_6">5.2.6 gamma (integer(1:10000))</A></LI>
 <LI><A HREF="#5_2_7">5.2.7 hue (integer(-180:180))</A></LI>
-<LI><A HREF="#5_2_8">5.2.8 job-billing (name(MAX))</A></LI>
+<LI><A HREF="#5_2_8">5.2.8 job-billing (text(MAX))</A></LI>
 <LI><A HREF="#5_2_9">5.2.9 job-sheets (1setof type3 keyword | name(MAX))</A>
 </LI>
 <LI><A HREF="#5_2_10">5.2.10 lpi (type2 enum)</A></LI>
@@ -187,13 +188,34 @@ name(127))</A></LI>
 <LI><A HREF="#5_5_2">5.5.2 member-uris (1setof uri)</A></LI>
 </UL>
 </UL>
+<B><A HREF="#6">A Glossary</A></B>
+<UL>
+<LI><A HREF="#6_1">A.1 Terms</A></LI>
+<LI><A HREF="#6_2">A.2 Acronyms</A></LI>
+</UL>
 <HR>
 <H1><A NAME="1">1 Scope</A></H1>
 <H2><A NAME="1_1">1.1 Identification</A></H2>
 <P>This document provides an overview of the Internet Printing Protocol 
 (&quot;IPP&quot;) version 1.1 as implemented in the Common UNIX Printing System 
 (&quot;CUPS&quot;) version 1.1. </P>
-<H2><A NAME="1_2">1.2 Document Overview</A></H2>
+<H2><A NAME="1_2">1.2 System Overview</A></H2>
+<P>CUPS provides a portable printing layer for UNIX&reg;-based operating 
+systems. It has been developed by <A HREF="http://www.easysw.com">Easy 
+Software Products</A> to promote a standard printing solution for all 
+UNIX vendors and users. CUPS provides the System V and Berkeley 
+command-line interfaces. </P>
+<P>CUPS uses the Internet Printing Protocol (&quot;IPP&quot;) as the basis for 
+managing print jobs and queues. The Line Printer Daemon (&quot;LPD&quot;) Server 
+Message Block (&quot;SMB&quot;), and AppSocket (a.k.a. JetDirect) protocols are 
+also supported with reduced functionality. CUPS adds network printer 
+browsing and PostScript Printer Description (&quot;PPD&quot;) based printing 
+options to support real-world printing under UNIX. </P>
+<P>CUPS also includes a customized version of GNU Ghostscript 
+(currently based off GNU Ghostscript 5.50) and an image file RIP that 
+are used to support non-PostScript printers. Sample drivers for HP and 
+EPSON printers are included that use these filters. </P>
+<H2><A NAME="1_3">1.3 Document Overview</A></H2>
 <P>This document is organized into the following sections: </P>
 <UL>
 <LI><A HREF="#1">1 - Scope</A></LI>
@@ -353,7 +375,7 @@ Print-Job request: </P>
 </UL>
 <P>Group 2: Job Template Attributes </P>
 <UL>
-<P>&quot;job-billing&quot; (name(MAX)): </P>
+<P>&quot;job-billing&quot; (text(MAX)): </P>
 <P><I>(CUPS 1.1 and higher)</I></P>
 <P>The client OPTIONALLY supplies a billing string that is logged  with 
 the page accounting information. </P>
@@ -408,7 +430,7 @@ Create-Job request: </P>
 </UL>
 <P>Group 2: Job Template Attributes </P>
 <UL>
-<P>&quot;job-billing&quot; (name(MAX)): </P>
+<P>&quot;job-billing&quot; (text(MAX)): </P>
 <P><I>(CUPS 1.1 and higher)</I></P>
 <P>The client OPTIONALLY supplies a billing string that is logged  with 
 the page accounting information. </P>
@@ -1125,9 +1147,9 @@ for grayscale output) using the function &quot;f(x) = x<SUP>(1000/gamma)</SUP>
 <H3><A NAME="5_2_7">5.2.7 hue (integer(-180:180))</A></H3>
 <P>The hue attribute specifies a color hue rotation when printing image 
 files. The default value is 0. </P>
-<H3><A NAME="5_2_8">5.2.8 job-billing (name(MAX))</A></H3>
+<H3><A NAME="5_2_8">5.2.8 job-billing (text(MAX))</A></H3>
 <P><I>(CUPS 1.1 and higher)</I></P>
-<P>The job-billing attribute provides a name value to associate with a 
+<P>The job-billing attribute provides a text value to associate with a 
 job for billing purposes. </P>
 <H3><A NAME="5_2_9">5.2.9 job-sheets (1setof type3 keyword | name(MAX))</A>
 </H3>
@@ -1297,5 +1319,54 @@ the same element of the member-uris attribute. </P>
 <P>The member-uris attribute specifies each of the printer-uri 
 attributes of the member printers and classes. Each URI corresponds to 
 the same element of the member-names attribute. </P>
+<H1 TYPE="A" VALUE="1"><A NAME="6">A Glossary</A></H1>
+<H2><A NAME="6_1">A.1 Terms</A></H2>
+<DL>
+<DT>C </DT>
+<DD>A computer language. </DD>
+<DT>parallel </DT>
+<DD>Sending or receiving data more than 1 bit at a time. </DD>
+<DT>pipe </DT>
+<DD>A one-way communications channel between two programs. </DD>
+<DT>serial </DT>
+<DD>Sending or receiving data 1 bit at a time. </DD>
+<DT>socket </DT>
+<DD>A two-way network communications channel. </DD>
+</DL>
+<H2><A NAME="6_2">A.2 Acronyms</A></H2>
+<DL>
+<DT>ASCII </DT>
+<DD>American Standard Code for Information Interchange </DD>
+<DT>CUPS </DT>
+<DD>Common UNIX Printing System </DD>
+<DT>ESC/P </DT>
+<DD>EPSON Standard Code for Printers </DD>
+<DT>FTP </DT>
+<DD>File Transfer Protocol </DD>
+<DT>HP-GL </DT>
+<DD>Hewlett-Packard Graphics Language </DD>
+<DT>HP-PCL </DT>
+<DD>Hewlett-Packard Printer Control Language </DD>
+<DT>HP-PJL </DT>
+<DD>Hewlett-Packard Printer Job Language </DD>
+<DT>IETF </DT>
+<DD>Internet Engineering Task Force </DD>
+<DT>IPP </DT>
+<DD>Internet Printing Protocol </DD>
+<DT>ISO </DT>
+<DD>International Standards Organization </DD>
+<DT>LPD </DT>
+<DD>Line Printer Daemon </DD>
+<DT>MIME </DT>
+<DD>Multimedia Internet Mail Exchange </DD>
+<DT>PCL </DT>
+<DD>Page Control Language </DD>
+<DT>PPD </DT>
+<DD>PostScript Printer Description </DD>
+<DT>SMB </DT>
+<DD>Server Message Block </DD>
+<DT>TFTP </DT>
+<DD>Trivial File Transfer Protocol </DD>
+</DL>
 </BODY>
 </HTML>
