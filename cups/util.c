@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.13 1999/05/01 13:14:27 mike Exp $"
+ * "$Id: util.c,v 1.14 1999/05/03 18:34:03 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -828,11 +828,9 @@ cupsPrintFile(char          *name,	/* I - Printer or class name */
 	return (0);
       }
 
-    httpWrite(cups_server, buffer, 0);
-
     if (httpUpdate(cups_server) == HTTP_ERROR)
     {
-      DEBUG_printf(("httpUpdate() failed (%d).\n", status));
+      DEBUG_puts("httpUpdate() failed.");
       jobid = 0;
     }
     else if ((ippRead(cups_server, response)) == IPP_ERROR)
@@ -910,5 +908,5 @@ cups_connect(char *name,	/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.13 1999/05/01 13:14:27 mike Exp $".
+ * End of "$Id: util.c,v 1.14 1999/05/03 18:34:03 mike Exp $".
  */
