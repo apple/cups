@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.73 2001/02/06 23:40:07 mike Exp $"
+ * "$Id: util.c,v 1.74 2001/02/07 01:25:39 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -814,6 +814,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 
     if (httpGet(cups_server, resource))
     {
+      httpReconnect(cups_server);
       status = HTTP_UNAUTHORIZED;
       continue;
     }
@@ -1503,5 +1504,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.73 2001/02/06 23:40:07 mike Exp $".
+ * End of "$Id: util.c,v 1.74 2001/02/07 01:25:39 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.76 2001/01/24 14:15:26 mike Exp $"
+ * "$Id: http.c,v 1.77 2001/02/07 01:25:39 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -104,7 +104,9 @@
 static http_field_t	http_field(const char *name);
 static int		http_send(http_t *http, http_state_t request,
 			          const char *uri);
+#ifdef HAVE_LIBSSL
 static int		http_upgrade(http_t *http);
+#endif /* HAVE_LIBSSL */
 
 
 /*
@@ -1998,5 +2000,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.76 2001/01/24 14:15:26 mike Exp $".
+ * End of "$Id: http.c,v 1.77 2001/02/07 01:25:39 mike Exp $".
  */

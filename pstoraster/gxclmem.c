@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gxclmem.c,v 1.4 2000/06/22 20:33:31 mike Exp $ */
+/*$Id: gxclmem.c,v 1.5 2001/02/07 01:25:40 mike Exp $ */
 /* RAM-based command list implementation */
 #include "memory_.h"
 #include "gx.h"
@@ -276,7 +276,11 @@ memfile_fopen(char fname[gp_file_name_sizeof], const char *fmode,
      * Disregard the ok_to_compress flag, since the size threshold gives us
      * a much better criterion for deciding when compression is appropriate.
      */
+#ifdef HAVE_LIBZ
     f->ok_to_compress = /*ok_to_compress */ true;
+#else
+    f->ok_to_compress = false;
+#endif /* HAVE_LIBZ */
     f->compress_state = 0;	/* make clean for GC */
     f->decompress_state = 0;
     if (f->ok_to_compress) {

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.115 2001/01/23 16:26:21 mike Exp $"
+ * "$Id: ipp.c,v 1.116 2001/02/07 01:25:40 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -558,7 +558,7 @@ add_class(client_t        *con,		/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if (strncmp(resource, "/classes/", 9) != 0)
+  if (strncmp(resource, "/classes/", 9) != 0 || strlen(resource) == 9)
   {
    /*
     * No, return an error...
@@ -964,7 +964,7 @@ add_printer(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if (strncmp(resource, "/printers/", 10) != 0)
+  if (strncmp(resource, "/printers/", 10) != 0 || strlen(resource) == 10)
   {
    /*
     * No, return an error...
@@ -5129,5 +5129,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.115 2001/01/23 16:26:21 mike Exp $".
+ * End of "$Id: ipp.c,v 1.116 2001/02/07 01:25:40 mike Exp $".
  */
