@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.99 2001/07/12 18:10:13 mike Exp $"
+ * "$Id: client.c,v 1.100 2001/07/16 16:23:32 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2142,6 +2142,13 @@ install_conf_file(client_t *con)	/* I - Connection */
   }
 
  /*
+  * Remove the request file...
+  */
+
+  unlink(con->filename);
+  con->filename[0] = '\0';
+
+ /*
   * Unlink the old backup, rename the current config file to the backup
   * filename, and rename the new config file to the config file name...
   */
@@ -2464,5 +2471,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.99 2001/07/12 18:10:13 mike Exp $".
+ * End of "$Id: client.c,v 1.100 2001/07/16 16:23:32 mike Exp $".
  */
