@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.24.2.18 2004/03/15 17:55:40 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.24.2.19 2004/03/19 11:35:39 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -90,24 +90,24 @@ char	*smart_gets(char *s, int len, FILE *fp);
  * 'main()' - Process an incoming LPD request...
  */
 
-int				/* O - Exit status */
-main(int  argc,			/* I - Number of command-line arguments */
-     char *argv[])		/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  int		i;		/* Looping var */
-  int		num_defaults;	/* Number of default options */
-  cups_option_t	*defaults;	/* Default options */
-  char		line[256],	/* Command string */
-		command,	/* Command code */
-		*dest,		/* Pointer to destination */
-		*list,		/* Pointer to list */
-		*agent,		/* Pointer to user */
-		status;		/* Status for client */
-  int		hostlen;	/* Size of client address */
-  http_addr_t	hostaddr;	/* Address of client */
-  char		hostname[256],	/* Name of client */
-		hostip[256],	/* IP address */
-		*hostfamily;	/* Address family */
+  int		i;			/* Looping var */
+  int		num_defaults;		/* Number of default options */
+  cups_option_t	*defaults;		/* Default options */
+  char		line[256],		/* Command string */
+		command,		/* Command code */
+		*dest,			/* Pointer to destination */
+		*list,			/* Pointer to list */
+		*agent,			/* Pointer to user */
+		status;			/* Status for client */
+  int		hostlen;		/* Size of client address */
+  http_addr_t	hostaddr;		/* Address of client */
+  char		hostname[256],		/* Name of client */
+		hostip[256],		/* IP address */
+		*hostfamily;		/* Address family */
 
 
  /*
@@ -503,7 +503,8 @@ print_file(const char    *name,		/* I - Printer or class name */
 
 int					/* O - Command status */
 recv_print_job(const char    *dest,	/* I - Destination */
-               int           num_defaults,/* I - Number of default options */
+               int           num_defaults,
+					/* I - Number of default options */
 	       cups_option_t *defaults)	/* I - Default options */
 {
   int		i;			/* Looping var */
@@ -602,6 +603,7 @@ recv_print_job(const char    *dest,	/* I - Destination */
       case 0x01 : /* Abort */
           status = 1;
 	  break;
+
       case 0x02 : /* Receive control file */
           if (strlen(name) < 2)
 	  {
@@ -645,6 +647,7 @@ recv_print_job(const char    *dest,	/* I - Destination */
 	    strcpy(filename, control);
 	  }
 	  break;
+
       case 0x03 : /* Receive data file */
           if (strlen(name) < 2)
 	  {
@@ -760,7 +763,7 @@ recv_print_job(const char    *dest,	/* I - Destination */
       title[0]   = '\0';
       user[0]    = '\0';
       docname[0] = '\0';
-      banner     = 0;
+      banner     = cupsGetOption("job-sheets", num_options, options) != NULL;
 
       while (smart_gets(line, sizeof(line), fp) != NULL)
       {
@@ -773,12 +776,15 @@ recv_print_job(const char    *dest,	/* I - Destination */
 	  case 'J' : /* Job name */
 	      strlcpy(title, line + 1, sizeof(title));
 	      break;
+
 	  case 'N' : /* Document name */
 	      strlcpy(docname, line + 1, sizeof(docname));
 	      break;
+
 	  case 'P' : /* User identification */
 	      strlcpy(user, line + 1, sizeof(user));
 	      break;
+
 	  case 'L' : /* Print banner page */
 	      banner = 1;
 	      break;
@@ -1362,14 +1368,14 @@ send_state(const char *dest,		/* I - Destination */
  * 'smart_gets()' - Get a line of text, removing the trailing CR and/or LF.
  */
 
-char *			/* O - Line read or NULL */
-smart_gets(char *s,	/* I - Pointer to line buffer */
-           int  len,	/* I - Size of line buffer */
-	   FILE *fp)	/* I - File to read from */
+char *					/* O - Line read or NULL */
+smart_gets(char *s,			/* I - Pointer to line buffer */
+           int  len,			/* I - Size of line buffer */
+	   FILE *fp)			/* I - File to read from */
 {
-  char	*ptr,		/* Pointer into line */
-	*end;		/* End of line */
-  int	ch;		/* Character from file */
+  char	*ptr,				/* Pointer into line */
+	*end;				/* End of line */
+  int	ch;				/* Character from file */
 
 
  /*
@@ -1413,5 +1419,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.24.2.18 2004/03/15 17:55:40 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.24.2.19 2004/03/19 11:35:39 mike Exp $".
  */

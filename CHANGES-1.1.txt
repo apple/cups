@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The LPD mini-daemon did not allow the administrator to
+	  force banner pages on (STR #605)
 	- Added PAM support for Darwin/MacOS X (STR #550)
 	- The web interface now provides a "Set As Default"
 	  button to set the default printer or class on a server
