@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.6 2000/03/09 17:51:27 mike Exp $"
+ * "$Id: log.c,v 1.7 2000/03/11 15:48:41 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -58,7 +58,8 @@ LogMessage(int        level,	/* I - Log level */
 	   ...)			/* I - Additional args as needed */
 {
   char		filename[1024],	/* Name of error log file */
-		backname[1024];	/* Backup filename */
+		backname[1024],	/* Backup filename */
+		line[1024];	/* Line for output file */
   va_list	ap;		/* Argument pointer */
   static char	levels[] =	/* Log levels... */
 		{
@@ -161,14 +162,17 @@ LogMessage(int        level,	/* I - Log level */
   */
 
   va_start(ap, message);
-  vfprintf(ErrorFile, message, ap);
+  vsnprintf(line, sizeof(line), message, ap);
   va_end(ap);
 
  /*
   * Then a newline...
   */
 
-  fputs("\n", ErrorFile);
+  if (line[strlen(line) - 1] != '\n')
+    strcat(line, "\n");
+
+  fputs(line, ErrorFile);
   fflush(ErrorFile);
 
   return (1);
@@ -428,5 +432,5 @@ get_datetime(time_t t)		/* I - Time value */
 
 
 /*
- * End of "$Id: log.c,v 1.6 2000/03/09 17:51:27 mike Exp $".
+ * End of "$Id: log.c,v 1.7 2000/03/11 15:48:41 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.46 2000/03/11 15:31:28 mike Exp $"
+ * "$Id: conf.c,v 1.47 2000/03/11 15:48:41 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -863,8 +863,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
         if (relay->from.type == AUTH_NAME)
 	  free(relay->from.mask.name.name);
 
-        LogMessage(L_ERROR, "Bad relay address %s at line %d.", name,
-	           value, linenum);
+        LogMessage(L_ERROR, "Bad relay address %s at line %d.", value, linenum);
       }
     }
     else if (strcmp(name, "BrowsePoll") == 0)
@@ -884,7 +883,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
       * Get poll address and port...
       */
 
-      if (get_address(value, INADDR_ANY, ippPort(), &polladdr))
+      if (get_address(value, INADDR_NONE, ippPort(), &polladdr))
       {
         LogMessage(L_INFO, "Polling %x:%d", ntohl(polladdr.sin_addr.s_addr),
                    ntohs(polladdr.sin_port));
@@ -900,8 +899,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
         poll->port = ntohs(polladdr.sin_port);
       }
       else
-        LogMessage(L_ERROR, "Bad poll address %s at line %d.", name,
-	           value, linenum);
+        LogMessage(L_ERROR, "Bad poll address %s at line %d.", value, linenum);
     }
     else if (strcmp(name, "User") == 0)
     {
@@ -1320,7 +1318,7 @@ get_address(char               *value,		/* I - Value string */
   switch (sscanf(value, "%255[^:]:%255s", hostname, portname))
   {
     case 1 :
-        if (strchr(hostname, '.') == NULL)
+        if (strchr(hostname, '.') == NULL && defaddress == INADDR_ANY)
 	{
 	 /*
 	  * Hostname is a port number...
@@ -1383,5 +1381,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.46 2000/03/11 15:31:28 mike Exp $".
+ * End of "$Id: conf.c,v 1.47 2000/03/11 15:48:41 mike Exp $".
  */
