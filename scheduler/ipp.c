@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.18 1999/06/19 12:56:53 mike Exp $"
+ * "$Id: ipp.c,v 1.19 1999/06/19 13:15:17 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -586,7 +586,18 @@ add_printer(client_t        *con,	/* I - Client connection */
     printer->accepting = attr->values[0].boolean;
   if ((attr = ippFindAttribute(con->request, "printer-state", IPP_TAG_ENUM)) != NULL)
   {
-    printer->state       = (ipp_pstate_t)attr->values[0].integer;
+    if (printer->state == IPP_PRINTER_STOPPED &&
+        attr->values[0].integer != IPP_PRINTER_STOPPED)
+      printer->state = IPP_PRINTER_IDLE;
+    else if (printer->state != IPP_PRINTER_STOPPED &&
+             attr->values[0].integer == IPP_PRINTER_STOPPED)
+    {
+      if (printer->state == IPP_PRINTER_PROCESSING)
+        StopJob(((job_t *)printer->job)->id);
+
+      printer->state = IPP_PRINTER_STOPPED;
+    }
+
     printer->browse_time = 0;
   }
   if ((attr = ippFindAttribute(con->request, "printer-state-message", IPP_TAG_TEXT)) != NULL)
@@ -2247,5 +2258,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.18 1999/06/19 12:56:53 mike Exp $".
+ * End of "$Id: ipp.c,v 1.19 1999/06/19 13:15:17 mike Exp $".
  */
