@@ -26,6 +26,9 @@ CHANGES IN CUPS V1.1.6-3
 	  the /#copies variable anymore.
 	- The man page for cups-lpd did not mention the "-o"
 	  option.
+	- The IPP backend didn't handle version-not-supported
+	  errors and revert to IPP/1.0 (previously it only checked
+	  for a bad-request error)
 	- Caldera fix: lpc now reports unimplemented commands as
 	  unimplemented, not invalid.
 	- Caldera fix: lpq didn't recognize BSD lpq "-a" option.

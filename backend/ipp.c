@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.37 2001/02/06 23:40:05 mike Exp $"
+ * "$Id: ipp.c,v 1.38 2001/02/14 13:59:45 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -317,7 +317,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	    fputs("INFO: Printer busy; will retry in 10 seconds...\n", stderr);
 	    sleep(10);
 	  }
-	  else if (ipp_status == IPP_BAD_REQUEST && version == 1)
+	  else if ((ipp_status == IPP_BAD_REQUEST ||
+	            ipp_status == IPP_VERSION_NOT_SUPPORTED) && version == 1)
 	  {
 	   /*
 	    * Switch to IPP/1.0...
@@ -690,5 +691,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.37 2001/02/06 23:40:05 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38 2001/02/14 13:59:45 mike Exp $".
  */
