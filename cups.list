@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.19 1999/08/31 14:32:14 mike Exp $"
+# "$Id: cups.list,v 1.20 1999/09/02 20:12:50 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -38,7 +38,7 @@
 # Server files
 f 0555 root sys /var/cups/backend/ipp backend/ipp
 l 0555 root sys /var/cups/backend/http ipp
-f 4555 root sys /var/cups/backend/lpd backend/lpd
+f 4550 root sys /var/cups/backend/lpd backend/lpd
 f 0555 root sys /var/cups/backend/parallel backend/parallel
 f 0555 root sys /var/cups/backend/serial backend/serial
 f 0555 root sys /var/cups/backend/smb backend/smb
@@ -309,5 +309,5 @@ f 0444 root sys /usr/man/man5/printers.conf.5 man/printers.conf.5
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.19 1999/08/31 14:32:14 mike Exp $".
+# End of "$Id: cups.list,v 1.20 1999/09/02 20:12:50 mike Exp $".
 #
