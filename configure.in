@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.74 2001/02/07 01:25:38 mike Exp $"
+dnl "$Id: configure.in,v 1.75 2001/02/08 14:57:38 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -395,11 +395,11 @@ if test "$DSO" != ":"; then
 			# NetBSD's linker won't resolve symbols in a shared
 			# libraries unless their enclosing shared libraries
 			# are explicitly listed.
-			DSOLIBS="\$(LIBJPEG) \$(LIBPNG) \$(LIBTIFF) \$(LIBZ)"
-			IMGLIBS="\$(LIBJPEG) \$(LIBPNG) \$(LIBTIFF) \$(LIBZ)"
+			DSOLIBS="\$(LIBPNG) \$(LIBTIFF) \$(LIBJPEG) \$(LIBZ)"
+			IMGLIBS="\$(LIBPNG) \$(LIBTIFF) \$(LIBJPEG) \$(LIBZ)"
 			;;
 		*)
-			DSOLIBS="\$(LIBJPEG) \$(LIBPNG) \$(LIBTIFF) \$(LIBZ)"
+			DSOLIBS="\$(LIBPNG) \$(LIBTIFF) \$(LIBJPEG) \$(LIBZ)"
 			IMGLIBS=""
 			;;
 	esac
@@ -426,7 +426,7 @@ if test "$DSO" != ":"; then
 	esac
 else
 	DSOLIBS=""
-	IMGLIBS="\$(LIBJPEG) \$(LIBPNG) \$(LIBTIFF) \$(LIBZ)"
+	IMGLIBS="\$(LIBPNG) \$(LIBTIFF) \$(LIBJPEG) \$(LIBZ)"
 fi
 
 AC_SUBST(DSO)
@@ -664,5 +664,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.74 2001/02/07 01:25:38 mike Exp $".
+dnl End of "$Id: configure.in,v 1.75 2001/02/08 14:57:38 mike Exp $".
 dnl
