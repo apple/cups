@@ -3641,9 +3641,11 @@ the automatic client configuration and printer options are not supported by
 the LPD protocol, so you must manually configure each client for the printers
 it needs to access.
 
-<P>The <CODE>cups-lpd(8)</CODE> program provides support for LPD clients.
-To enable LPD support on your server, edit the <VAR>/etc/inetd.conf</VAR>
-file and add a line reading:
+<P>The <CODE>cups-lpd(8)</CODE> program provides support for LPD
+clients and can be used from either the <CODE>inetd(8)</CODE> or
+<CODE>xinetd(8)</CODE> programs. Add the following line to the
+<VAR>/etc/inetd.conf</VAR> file to enable LPD support on your
+server through the <CODE>inetd</CODE> program:
 
 <UL><PRE>
 printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd
@@ -3652,14 +3654,54 @@ printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd
 <P>The path to the <CODE>cups-lpd</CODE> may vary depending on your
 installation.
 
-<P>Once you have added this line, send the <CODE>inetd(8)</CODE> process
-a <CODE>HUP</CODE> signal or reboot the system:
+<P>Once you have added this line, send the <CODE>inetd</CODE>
+process a <CODE>HUP</CODE> signal or reboot the system:
 
 <UL><PRE>
 <B>killall -HUP inetd ENTER</B> [IRIX and some versions of Linux]
 <B>kill -HUP <I>pid</I> ENTER [Others]</B>
 <B>reboot ENTER [For all systems if the HUP signal fails]</B>
 </PRE></UL>
+
+<P>If you are using the <CODE>xinetd</CODE> program, create a
+file named <VAR>/etc/xinetd.d/printer</VAR> containing the
+following lines:
+
+<UL><PRE>
+service printer
+{
+    socket_type = stream
+    protocol = tcp
+    wait = no
+    user = lp
+    server = /usr/lib/cups/daemon/cups-lpd
+}
+</PRE></UL>
+
+<P>The <CODE>xinetd</CODE> program automatically reads the new
+configuration file and enables LPD printing support.
+
+<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
+<TR>
+	<TD><B>Warning:</B>
+
+	<P><CODE>cups-lpd</CODE> currently does not perform any
+	access control based on the settings in
+	<VAR>cupsd.conf</VAR> or in the <VAR>hosts.allow</VAR>
+	or <VAR>hosts.deny</VAR> files used by TCP wrappers.
+	Therefore, running <CODE>cups-lpd</CODE> on your server
+	will allow any computer on your network (and perhaps the
+	entire Internet) to print to your server.
+
+	<P>While <CODE>xinetd</CODE> has built-in access control
+	support, you should use the TCP wrappers package with
+	<CODE>inetd</CODE> to limit access to only those
+	computers that should be able to print through your
+	server.
+
+	</TD>
+</TR>
+</TABLE></CENTER>
 
 <H2>Printing to LPD Servers</H2>
 
