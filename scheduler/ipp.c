@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.219 2003/09/15 19:40:45 mike Exp $"
+ * "$Id: ipp.c,v 1.220 2003/09/17 19:08:35 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3099,6 +3099,12 @@ create_job(client_t        *con,	/* I - Client connection */
 	  */
 
           SetString(&attr->values[0].string.text, Classification);
+
+	  LogMessage(L_NOTICE, "[Job %d] CLASSIFICATION FORCED "
+	                       "job-sheets=\"%s,none\", "
+			       "job-originating-user-name=\"%s\"",
+	             job->id, Classification,
+		     job->username);
 	}
 	else if (attr->num_values == 2 &&
 	         strcmp(attr->values[0].string.text, attr->values[1].string.text) != 0 &&
@@ -3110,17 +3116,62 @@ create_job(client_t        *con,	/* I - Client connection */
 	  */
 
           SetString(&attr->values[1].string.text, attr->values[0].string.text);
+
+	  LogMessage(L_NOTICE, "[Job %d] CLASSIFICATION FORCED "
+	                       "job-sheets=\"%s,%s\", "
+			       "job-originating-user-name=\"%s\"",
+	             job->id, attr->values[0].string.text,
+		     attr->values[1].string.text,
+		     job->username);
 	}
+	else if (strcmp(attr->values[0].string.text, Classification) &&
+	         strcmp(attr->values[0].string.text, "none") &&
+		 (attr->num_values == 1 ||
+	          (strcmp(attr->values[1].string.text, Classification) &&
+	           strcmp(attr->values[1].string.text, "none"))))
+        {
+	  if (attr->num_values == 1)
+            LogMessage(L_NOTICE, "[Job %d] CLASSIFICATION OVERRIDDEN "
+	                         "job-sheets=\"%s\", "
+			         "job-originating-user-name=\"%s\"",
+	               job->id, attr->values[0].string.text,
+		       job->username);
+          else
+            LogMessage(L_NOTICE, "[Job %d] CLASSIFICATION OVERRIDDEN "
+	                         "job-sheets=\"%s,%s\", "
+			         "job-originating-user-name=\"%s\"",
+	               job->id, attr->values[0].string.text,
+		       attr->values[1].string.text,
+		       job->username);
+        }
       }
       else if (strcmp(attr->values[0].string.text, Classification) != 0 &&
                (attr->num_values == 1 ||
 	       strcmp(attr->values[1].string.text, Classification) != 0))
       {
        /*
-        * Force the leading banner to have the classification on it...
+        * Force the banner to have the classification on it...
 	*/
 
-        SetString(&attr->values[0].string.text, Classification);
+        if (attr->num_values == 1 || strcmp(attr->values[0].string.text, "none"))
+          SetString(&attr->values[0].string.text, Classification);
+
+        if (attr->num_values > 1 && strcmp(attr->values[1].string.text, "none"))
+          SetString(&attr->values[1].string.text, Classification);
+
+        if (attr->num_values > 1)
+	  LogMessage(L_NOTICE, "[Job %d] CLASSIFICATION FORCED "
+	                       "job-sheets=\"%s,%s\", "
+			       "job-originating-user-name=\"%s\"",
+	             job->id, attr->values[0].string.text,
+		     attr->values[1].string.text,
+		     job->username);
+        else
+	  LogMessage(L_NOTICE, "[Job %d] CLASSIFICATION FORCED "
+	                       "job-sheets=\"%s\", "
+			       "job-originating-user-name=\"%s\"",
+	             job->id, Classification,
+		     job->username);
       }
     }
 
@@ -4853,6 +4904,12 @@ print_job(client_t        *con,		/* I - Client connection */
 	  */
 
           SetString(&attr->values[0].string.text, Classification);
+
+	  LogMessage(L_NOTICE, "[Job %d] CLASSIFICATION FORCED "
+	                       "job-sheets=\"%s,none\", "
+			       "job-originating-user-name=\"%s\"",
+	             job->id, Classification,
+		     job->username);
 	}
 	else if (attr->num_values == 2 &&
 	         strcmp(attr->values[0].string.text, attr->values[1].string.text) != 0 &&
@@ -4864,17 +4921,59 @@ print_job(client_t        *con,		/* I - Client connection */
 	  */
 
           SetString(&attr->values[1].string.text, attr->values[0].string.text);
+
+	  LogMessage(L_NOTICE, "[Job %d] CLASSIFICATION FORCED "
+	                       "job-sheets=\"%s,%s\", "
+			       "job-originating-user-name=\"%s\"",
+	             job->id, attr->values[0].string.text,
+		     attr->values[1].string.text,
+		     job->username);
 	}
+	else if (strcmp(attr->values[0].string.text, Classification) &&
+	         strcmp(attr->values[0].string.text, "none") &&
+		 (attr->num_values == 1 ||
+	          (strcmp(attr->values[1].string.text, Classification) &&
+	           strcmp(attr->values[1].string.text, "none"))))
+        {
+	  if (attr->num_values == 1)
+            LogMessage(L_NOTICE, "[Job %d] CLASSIFICATION OVERRIDDEN "
+	                         "job-sheets=\"%s\", "
+			         "job-originating-user-name=\"%s\"",
+	               job->id, attr->values[0].string.text,
+		       job->username);
+          else
+            LogMessage(L_NOTICE, "[Job %d] CLASSIFICATION OVERRIDDEN "
+	                         "job-sheets=\"%s,%s\", "
+			         "job-originating-user-name=\"%s\"",
+	               job->id, attr->values[0].string.text,
+		       attr->values[1].string.text,
+		       job->username);
+        }
       }
       else if (strcmp(attr->values[0].string.text, Classification) != 0 &&
                (attr->num_values == 1 ||
 	       strcmp(attr->values[1].string.text, Classification) != 0))
       {
        /*
-        * Force the leading banner to have the classification on it...
+        * Force the banner to have the classification on it...
 	*/
 
-        SetString(&attr->values[0].string.text, Classification);
+        if (attr->num_values == 1 || strcmp(attr->values[0].string.text, "none"))
+          SetString(&attr->values[0].string.text, Classification);
+
+        if (attr->num_values > 1)
+	  LogMessage(L_NOTICE, "[Job %d] CLASSIFICATION FORCED "
+	                       "job-sheets=\"%s,%s\", "
+			       "job-originating-user-name=\"%s\"",
+	             job->id, attr->values[0].string.text,
+		     attr->values[1].string.text,
+		     job->username);
+        else
+	  LogMessage(L_NOTICE, "[Job %d] CLASSIFICATION FORCED "
+	                       "job-sheets=\"%s\", "
+			       "job-originating-user-name=\"%s\"",
+	             job->id, Classification,
+		     job->username);
       }
     }
 
@@ -6707,5 +6806,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.219 2003/09/15 19:40:45 mike Exp $".
+ * End of "$Id: ipp.c,v 1.220 2003/09/17 19:08:35 mike Exp $".
  */
