@@ -22,8 +22,8 @@
 class SFontEngine {
 public:
 
-  SFontEngine(Display *display, Visual *visual, int depth,
-	      Colormap colormap);
+  SFontEngine(Display *displayA, Visual *visualA, int depthA,
+	      Colormap colormapA);
   virtual ~SFontEngine();
 
   // Use a TrueColor visual.  Pixel values are computed as:
@@ -32,8 +32,8 @@ public:
   //
   // where r, g, and b are scaled to the ranges [0,rMax], [0,gMax],
   // and [0,bMax], respectively.
-  virtual void useTrueColor(int rMax, int rShift, int gMax, int gShift,
-			    int bMax, int bShift);
+  virtual void useTrueColor(int rMaxA, int rShiftA, int gMaxA, int gShiftA,
+			    int bMaxA, int bShiftA);
 
   // Use an RGB color cube.  <colors> is an array containing
   // <nRGB>*<nRGB>*<nRGB> pixel values in red,green,blue order, e.g.,
@@ -53,7 +53,7 @@ public:
   //
   // The <colors> array is not copied and must remain valid for the
   // lifetime of this SFont object.
-  virtual void useColorCube(Gulong *colors, int nRGB);
+  virtual void useColorCube(Gulong *colorsA, int nRGBA);
 
 protected:
 

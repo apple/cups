@@ -37,7 +37,8 @@
 // PDFDoc
 //------------------------------------------------------------------------
 
-PDFDoc::PDFDoc(GString *fileName1, GString *userPassword) {
+PDFDoc::PDFDoc(GString *fileNameA, GString *ownerPassword,
+	       GString *userPassword, GBool printCommandsA) {
   Object obj;
   GString *fileName2;
 
@@ -48,9 +49,10 @@ PDFDoc::PDFDoc(GString *fileName1, GString *userPassword) {
   xref = NULL;
   catalog = NULL;
   links = NULL;
+  printCommands = printCommandsA;
 
   // try to open file
-  fileName = fileName1;
+  fileName = fileNameA;
   fileName2 = NULL;
 #ifdef VMS
   if (!(file = fopen(fileName->getCString(), "rb", "ctx=stm"))) {
@@ -77,36 +79,35 @@ PDFDoc::PDFDoc(GString *fileName1, GString *userPassword) {
   obj.initNull();
   str = new FileStream(file, 0, -1, &obj);
 
-  ok = setup(userPassword);
+  ok = setup(ownerPassword, userPassword);
 }
 
-PDFDoc::PDFDoc(BaseStream *nstr, GString *userPassword) {
+PDFDoc::PDFDoc(BaseStream *strA, GString *ownerPassword,
+	       GString *userPassword, GBool printCommandsA) {
   ok = gFalse;
   fileName = NULL;
   file = NULL;
-  str = nstr;
+  str = strA;
   xref = NULL;
   catalog = NULL;
   links = NULL;
-  ok = setup(userPassword);
+  printCommands = printCommandsA;
+  ok = setup(ownerPassword, userPassword);
 }
 
-GBool PDFDoc::setup(GString *userPassword) {
-  Object catObj;
-
+GBool PDFDoc::setup(GString *ownerPassword, GString *userPassword) {
   // check header
   checkHeader();
 
   // read xref table
-  xref = new XRef(str, userPassword);
+  xref = new XRef(str, ownerPassword, userPassword);
   if (!xref->isOk()) {
     error(-1, "Couldn't read xref table");
     return gFalse;
   }
 
   // read catalog
-  catalog = new Catalog(xref->getCatalog(&catObj));
-  catObj.free();
+  catalog = new Catalog(xref, printCommands);
   if (!catalog->isOk()) {
     error(-1, "Couldn't read page catalog");
     return gFalse;
@@ -203,8 +204,8 @@ GBool PDFDoc::isLinearized() {
 
   lin = gFalse;
   obj1.initNull();
-  parser = new Parser(new Lexer(str->makeSubStream(str->getStart(),
-						   -1, &obj1)));
+  parser = new Parser(xref, new Lexer(xref, str->makeSubStream(str->getStart(),
+							       -1, &obj1)));
   parser->getObj(&obj1);
   parser->getObj(&obj2);
   parser->getObj(&obj3);
@@ -248,4 +249,3 @@ void PDFDoc::getLinks(Page *page) {
   links = new Links(page->getAnnots(&obj), catalog->getBaseURI());
   obj.free();
 }
-

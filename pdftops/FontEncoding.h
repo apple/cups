@@ -28,7 +28,7 @@ public:
   FontEncoding();
 
   // Construct an encoding from an array of char names.
-  FontEncoding(const char **encoding, int size);
+  FontEncoding(char **encodingA, int sizeA);
 
   // Destructor.
   ~FontEncoding();
@@ -40,21 +40,21 @@ public:
   int getSize() { return size; }
 
   // Add a char to the encoding.
-  void addChar(int code, const char *name);
+  void addChar(int code, char *name);
 
   // Return the character name associated with <code>.
-  const char *getCharName(int code) { return encoding[code]; }
+  char *getCharName(int code) { return encoding[code]; }
 
   // Return the code associated with <name>.
-  int getCharCode(const char *name);
+  int getCharCode(char *name);
 
 private:
 
   FontEncoding(FontEncoding *fontEnc);
-  int hash(const char *name);
-  void addChar1(int code, const char *name);
+  int hash(char *name);
+  void addChar1(int code, char *name);
 
-  const char **encoding;	// code --> name mapping
+  char **encoding;		// code --> name mapping
   int size;			// number of codes
   GBool freeEnc;		// should we free the encoding array?
   short				// name --> code hash table

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.8 2001/06/27 21:53:16 mike Exp $"
+# "$Id: Makefile,v 1.9 2001/12/07 21:02:11 mike Exp $"
 #
 #   pdftops filter Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -16,7 +16,7 @@ include ../Makedefs
 
 LIBOBJS	=	Decrypt.o GString.o gfile.o gmempp.o gmem.o parseargs.o \
 		Array.o Catalog.o Dict.o Error.o FontEncoding.o \
-		FontFile.o FormWidget.o Gfx.o GfxFont.o GfxState.o \
+		FontFile.o FormWidget.o Function.o Gfx.o GfxFont.o GfxState.o \
 		Lexer.o Link.o Object.o OutputDev.o Page.o Params.o \
 		Parser.o PDFDoc.o PSOutputDev.o Stream.o XRef.o
 OBJS	=	pdftops.o $(LIBOBJS)
@@ -86,6 +86,7 @@ FontEncoding.o:	gmem.h FontEncoding.h gtypes.h
 FontFile.o:	gmem.h Error.h config.h FontFile.h gtypes.h GString.h \
 		FontEncoding.h StdFontInfo.h CompactFontInfo.h
 FormWidget.o:	FormWidget.h gmem.h Object.h Gfx.h
+Function.o:	gmem.h Object.h Dict.h Stream.h Error.h Function.h
 Gfx.o:		gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h \
 		Lexer.h Parser.h GfxFont.h FontEncoding.h GfxState.h \
 		OutputDev.h Params.h Error.h config.h Gfx.h
@@ -127,5 +128,5 @@ XRef.o:		gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h \
 $(OBJS):	../config.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.8 2001/06/27 21:53:16 mike Exp $".
+# End of "$Id: Makefile,v 1.9 2001/12/07 21:02:11 mike Exp $".
 #

@@ -22,7 +22,7 @@
 // Object
 //------------------------------------------------------------------------
 
-const char *objTypeNames[numObjTypes] = {
+char *objTypeNames[numObjTypes] = {
   "boolean",
   "integer",
   "real",
@@ -44,21 +44,21 @@ int Object::numAlloc[numObjTypes] =
   {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 #endif
 
-Object *Object::initArray() {
+Object *Object::initArray(XRef *xref) {
   initObj(objArray);
-  array = new Array();
+  array = new Array(xref);
   return this;
 }
 
-Object *Object::initDict() {
+Object *Object::initDict(XRef *xref) {
   initObj(objDict);
-  dict = new Dict();
+  dict = new Dict(xref);
   return this;
 }
 
-Object *Object::initStream(Stream *stream1) {
+Object *Object::initStream(Stream *streamA) {
   initObj(objStream);
-  stream = stream1;
+  stream = streamA;
   return this;
 }
 
@@ -92,7 +92,7 @@ Object *Object::copy(Object *obj) {
   return obj;
 }
 
-Object *Object::fetch(Object *obj) {
+Object *Object::fetch(XRef *xref, Object *obj) {
   return (type == objRef && xref) ?
          xref->fetch(ref.num, ref.gen, obj) : copy(obj);
 }
@@ -103,7 +103,7 @@ void Object::free() {
     delete string;
     break;
   case objName:
-    gfree((void *)name);
+    gfree(name);
     break;
   case objArray:
     if (!array->decRef()) {
@@ -121,7 +121,7 @@ void Object::free() {
     }
     break;
   case objCmd:
-    gfree((void *)cmd);
+    gfree(cmd);
     break;
   default:
     break;
@@ -132,7 +132,7 @@ void Object::free() {
   type = objNone;
 }
 
-const char *Object::getTypeName() {
+char *Object::getTypeName() {
   return objTypeNames[type];
 }
 
@@ -216,7 +216,5 @@ void Object::memCheck(FILE *f) {
 	fprintf(f, "  %-20s: %6d\n", objTypeNames[i], numAlloc[i]);
     }
   }
-#else
-  (void)f;
 #endif
 }

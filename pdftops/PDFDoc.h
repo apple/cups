@@ -14,13 +14,13 @@
 #endif
 
 #include <stdio.h>
+#include "XRef.h"
 #include "Link.h"
 #include "Catalog.h"
 #include "Page.h"
 
 class GString;
 class BaseStream;
-class XRef;
 class OutputDev;
 class Links;
 class LinkAction;
@@ -33,8 +33,10 @@ class LinkDest;
 class PDFDoc {
 public:
 
-  PDFDoc(GString *fileName1, GString *userPassword = NULL);
-  PDFDoc(BaseStream *str, GString *userPassword = NULL);
+  PDFDoc(GString *fileNameA, GString *ownerPassword = NULL,
+	 GString *userPassword = NULL, GBool printCommandsA = gFalse);
+  PDFDoc(BaseStream *strA, GString *ownerPassword = NULL,
+	 GString *userPassword = NULL, GBool printCommandsA = gFalse);
   ~PDFDoc();
 
   // Was PDF document successfully opened?
@@ -42,6 +44,9 @@ public:
 
   // Get file name.
   GString *getFileName() { return fileName; }
+
+  // Get the xref table.
+  XRef *getXRef() { return xref; }
 
   // Get catalog.
   Catalog *getCatalog() { return catalog; }
@@ -88,10 +93,14 @@ public:
   GBool isEncrypted() { return xref->isEncrypted(); }
 
   // Check various permissions.
-  GBool okToPrint() { return xref->okToPrint(); }
-  GBool okToChange() { return xref->okToChange(); }
-  GBool okToCopy() { return xref->okToCopy(); }
-  GBool okToAddNotes() { return xref->okToAddNotes(); }
+  GBool okToPrint(GBool ignoreOwnerPW = gFalse)
+    { return xref->okToPrint(ignoreOwnerPW); }
+  GBool okToChange(GBool ignoreOwnerPW = gFalse)
+    { return xref->okToChange(ignoreOwnerPW); }
+  GBool okToCopy(GBool ignoreOwnerPW = gFalse)
+    { return xref->okToCopy(ignoreOwnerPW); }
+  GBool okToAddNotes(GBool ignoreOwnerPW = gFalse)
+    { return xref->okToAddNotes(ignoreOwnerPW); }
 
   // Is this document linearized?
   GBool isLinearized();
@@ -107,7 +116,7 @@ public:
 
 private:
 
-  GBool setup(GString *userPassword);
+  GBool setup(GString *ownerPassword, GString *userPassword);
   void checkHeader();
   void getLinks(Page *page);
 
@@ -118,6 +127,7 @@ private:
   XRef *xref;
   Catalog *catalog;
   Links *links;
+  GBool printCommands;
 
   GBool ok;
 };

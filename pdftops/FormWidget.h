@@ -13,6 +13,7 @@
 #pragma interface
 #endif
 
+class XRef;
 class Gfx;
 
 //------------------------------------------------------------------------
@@ -22,17 +23,18 @@ class Gfx;
 class FormWidget {
 public:
 
-  FormWidget(Dict *dict);
+  FormWidget(XRef *xrefA, Dict *dict);
   ~FormWidget();
   GBool isOk() { return ok; }
 
   void draw(Gfx *gfx);
 
   // Get appearance object.
-  Object *getAppearance(Object *obj) { return appearance.fetch(obj); }
+  Object *getAppearance(Object *obj) { return appearance.fetch(xref, obj); }
 
 private:
 
+  XRef *xref;			// the xref table for this PDF file
   Object appearance;		// a reference to the Form XObject stream
 				//   for the normal appearance
   double xMin, yMin,		// widget rectangle
@@ -48,7 +50,7 @@ class FormWidgets {
 public:
 
   // Extract widgets from array of annotations.
-  FormWidgets(Object *annots);
+  FormWidgets(XRef *xref, Object *annots);
 
   ~FormWidgets();
 

@@ -16,7 +16,7 @@
 //------------------------------------------------------------------------
 
 #define type1StdEncodingSize 256
-static const char *type1StdEncodingNames[type1StdEncodingSize] = {
+static char *type1StdEncodingNames[type1StdEncodingSize] = {
   NULL,
   NULL,
   NULL,
@@ -282,7 +282,7 @@ static FontEncoding type1StdEncoding(type1StdEncodingNames,
 //------------------------------------------------------------------------
 
 #define type1ExpertEncodingSize 256
-static const char *type1ExpertEncodingNames[type1ExpertEncodingSize] = {
+static char *type1ExpertEncodingNames[type1ExpertEncodingSize] = {
   NULL,
   NULL,
   NULL,

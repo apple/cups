@@ -13,6 +13,7 @@
 #include <stddef.h>
 #include "gmem.h"
 #include "Object.h"
+#include "XRef.h"
 #include "Array.h"
 #include "Dict.h"
 #include "Page.h"
@@ -24,24 +25,27 @@
 // Catalog
 //------------------------------------------------------------------------
 
-Catalog::Catalog(Object *catDict) {
-  Object pagesDict;
+Catalog::Catalog(XRef *xrefA, GBool printCommands) {
+  Object catDict, pagesDict;
   Object obj, obj2;
   int numPages0;
   int i;
 
   ok = gTrue;
+  xref = xrefA;
   pages = NULL;
   pageRefs = NULL;
   numPages = pagesSize = 0;
+  baseURI = NULL;
 
-  if (!catDict->isDict()) {
-    error(-1, "Catalog object is wrong type (%s)", catDict->getTypeName());
+  xref->getCatalog(&catDict);
+  if (!catDict.isDict()) {
+    error(-1, "Catalog object is wrong type (%s)", catDict.getTypeName());
     goto err1;
   }
 
   // read page tree
-  catDict->dictLookup("Pages", &pagesDict);
+  catDict.dictLookup("Pages", &pagesDict);
   // This should really be isDict("Pages"), but I've seen at least one
   // PDF file where the /Type entry is missing.
   if (!pagesDict.isDict()) {
@@ -64,25 +68,24 @@ Catalog::Catalog(Object *catDict) {
     pageRefs[i].num = -1;
     pageRefs[i].gen = -1;
   }
-  numPages = readPageTree(pagesDict.getDict(), NULL, 0);
+  numPages = readPageTree(pagesDict.getDict(), NULL, 0, printCommands);
   if (numPages != numPages0) {
     error(-1, "Page count in top-level pages object is incorrect");
   }
   pagesDict.free();
 
   // read named destination dictionary
-  catDict->dictLookup("Dests", &dests);
+  catDict.dictLookup("Dests", &dests);
 
   // read root of named destination tree
-  if (catDict->dictLookup("Names", &obj)->isDict())
+  if (catDict.dictLookup("Names", &obj)->isDict())
     obj.dictLookup("Dests", &nameTree);
   else
     nameTree.initNull();
   obj.free();
 
   // read base URI
-  baseURI = NULL;
-  if (catDict->dictLookup("URI", &obj)->isDict()) {
+  if (catDict.dictLookup("URI", &obj)->isDict()) {
     if (obj.dictLookup("Base", &obj2)->isString()) {
       baseURI = obj2.getString()->copy();
     }
@@ -90,6 +93,7 @@ Catalog::Catalog(Object *catDict) {
   }
   obj.free();
 
+  catDict.free();
   return;
 
  err3:
@@ -97,6 +101,7 @@ Catalog::Catalog(Object *catDict) {
  err2:
   pagesDict.free();
  err1:
+  catDict.free();
   dests.initNull();
   nameTree.initNull();
   ok = gFalse;
@@ -121,7 +126,8 @@ Catalog::~Catalog() {
   }
 }
 
-int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, int start) {
+int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, int start,
+			  GBool printCommands) {
   Object kids;
   Object kid;
   Object kidRef;
@@ -140,7 +146,7 @@ int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, int start) {
     kids.arrayGet(i, &kid);
     if (kid.isDict("Page")) {
       attrs2 = new PageAttrs(attrs1, kid.getDict());
-      page = new Page(start+1, kid.getDict(), attrs2);
+      page = new Page(xref, start+1, kid.getDict(), attrs2, printCommands);
       if (!page->isOk()) {
 	++start;
 	goto err3;
@@ -166,7 +172,8 @@ int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, int start) {
     // This should really be isDict("Pages"), but I've seen at least one
     // PDF file where the /Type entry is missing.
     } else if (kid.isDict()) {
-      if ((start = readPageTree(kid.getDict(), attrs1, start)) < 0)
+      if ((start = readPageTree(kid.getDict(), attrs1, start, printCommands))
+	  < 0)
 	goto err2;
     } else {
       error(-1, "Kid object (page %d) is wrong type (%s)",

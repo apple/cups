@@ -20,29 +20,30 @@
 // OutputDev
 //------------------------------------------------------------------------
 
-void OutputDev::setDefaultCTM(double *ctm1) {
+void OutputDev::setDefaultCTM(double *ctm) {
   int i;
   double det;
 
-  for (i = 0; i < 6; ++i)
-    ctm[i] = ctm1[i];
-  det = 1 / (ctm[0] * ctm[3] - ctm[1] * ctm[2]);
-  ictm[0] = ctm[3] * det;
-  ictm[1] = -ctm[1] * det;
-  ictm[2] = -ctm[2] * det;
-  ictm[3] = ctm[0] * det;
-  ictm[4] = (ctm[2] * ctm[5] - ctm[3] * ctm[4]) * det;
-  ictm[5] = (ctm[1] * ctm[4] - ctm[0] * ctm[5]) * det;
+  for (i = 0; i < 6; ++i) {
+    defCTM[i] = ctm[i];
+  }
+  det = 1 / (defCTM[0] * defCTM[3] - defCTM[1] * defCTM[2]);
+  defICTM[0] = defCTM[3] * det;
+  defICTM[1] = -defCTM[1] * det;
+  defICTM[2] = -defCTM[2] * det;
+  defICTM[3] = defCTM[0] * det;
+  defICTM[4] = (defCTM[2] * defCTM[5] - defCTM[3] * defCTM[4]) * det;
+  defICTM[5] = (defCTM[1] * defCTM[4] - defCTM[0] * defCTM[5]) * det;
 }
 
 void OutputDev::cvtDevToUser(int dx, int dy, double *ux, double *uy) {
-  *ux = ictm[0] * dx + ictm[2] * dy + ictm[4];
-  *uy = ictm[1] * dx + ictm[3] * dy + ictm[5];
+  *ux = defICTM[0] * dx + defICTM[2] * dy + defICTM[4];
+  *uy = defICTM[1] * dx + defICTM[3] * dy + defICTM[5];
 }
 
 void OutputDev::cvtUserToDev(double ux, double uy, int *dx, int *dy) {
-  *dx = (int)(ctm[0] * ux + ctm[2] * uy + ctm[4] + 0.5);
-  *dy = (int)(ctm[1] * ux + ctm[3] * uy + ctm[5] + 0.5);
+  *dx = (int)(defCTM[0] * ux + defCTM[2] * uy + defCTM[4] + 0.5);
+  *dy = (int)(defCTM[1] * ux + defCTM[3] * uy + defCTM[5] + 0.5);
 }
 
 void OutputDev::updateAll(GfxState *state) {
@@ -62,9 +63,6 @@ void OutputDev::drawImageMask(GfxState *state, Object *ref, Stream *str,
 			      GBool inlineImg) {
   int i, j;
 
-  (void)state;
-  (void)invert;
-
   if (inlineImg) {
     str->reset();
     j = height * ((width + 7) / 8);
@@ -75,10 +73,8 @@ void OutputDev::drawImageMask(GfxState *state, Object *ref, Stream *str,
 
 void OutputDev::drawImage(GfxState *state, Object *ref, Stream *str,
 			  int width, int height, GfxImageColorMap *colorMap,
-			  GBool inlineImg) {
+			  int *maskColors, GBool inlineImg) {
   int i, j;
-
-  (void)state;
 
   if (inlineImg) {
     str->reset();

@@ -28,11 +28,11 @@ static GString *getFileSpecName(Object *fileSpecObj);
 // LinkDest
 //------------------------------------------------------------------------
 
-LinkDest::LinkDest(Array *a, GBool pageIsRef1) {
+LinkDest::LinkDest(Array *a, GBool pageIsRefA) {
   Object obj1, obj2;
 
   // initialize fields
-  pageIsRef = pageIsRef1;
+  pageIsRef = pageIsRefA;
   left = bottom = right = top = zoom = 0;
   ok = gFalse;
 
@@ -384,8 +384,8 @@ LinkNamed::~LinkNamed() {
 // LinkUnknown
 //------------------------------------------------------------------------
 
-LinkUnknown::LinkUnknown(const char *action1) {
-  action = new GString(action1);
+LinkUnknown::LinkUnknown(char *actionA) {
+  action = new GString(actionA);
 }
 
 LinkUnknown::~LinkUnknown() {
@@ -447,11 +447,14 @@ Link::Link(Dict *dict, GString *baseURI) {
   // get border
   borderW = 0;
   if (!dict->lookup("Border", &obj1)->isNull()) {
-    if (obj1.isArray() && obj1.arrayGet(2, &obj2)->isNum())
-      borderW = obj2.getNum();
-    else
-      error(-1, "Bad annotation border");
-    obj2.free();
+    if (obj1.isArray() && obj1.arrayGetLength() >= 3) {
+      if (obj1.arrayGet(2, &obj2)->isNum()) {
+	borderW = obj2.getNum();
+      } else {
+	error(-1, "Bad annotation border");
+      }
+      obj2.free();
+    }
   }
   obj1.free();
 

@@ -16,6 +16,7 @@
 #include "gtypes.h"
 
 class GString;
+class XRef;
 class Array;
 class Stream;
 class Parser;
@@ -25,8 +26,11 @@ class GfxFontDict;
 class GfxFont;
 struct GfxFontEncoding16;
 class GfxPattern;
+class GfxShading;
+class GfxAxialShading;
 class GfxState;
 class Gfx;
+struct PDFRectangle;
 
 //------------------------------------------------------------------------
 // Gfx
@@ -62,15 +66,16 @@ struct Operator {
 class GfxResources {
 public:
 
-  GfxResources(Dict *resDict, GfxResources *next);
+  GfxResources(XRef *xref, Dict *resDict, GfxResources *nextA);
   ~GfxResources();
 
-  GfxFont *lookupFont(const char *name);
-  GBool lookupXObject(const char *name, Object *obj);
-  GBool lookupXObjectNF(const char *name, Object *obj);
-  void lookupColorSpace(const char *name, Object *obj);
-  GfxPattern *lookupPattern(const char *name);
-  GBool lookupGState(const char *name, Object *obj);
+  GfxFont *lookupFont(char *name);
+  GBool lookupXObject(char *name, Object *obj);
+  GBool lookupXObjectNF(char *name, Object *obj);
+  void lookupColorSpace(char *name, Object *obj);
+  GfxPattern *lookupPattern(char *name);
+  GfxShading *lookupShading(char *name);
+  GBool lookupGState(char *name, Object *obj);
 
   GfxResources *getNext() { return next; }
 
@@ -80,6 +85,7 @@ private:
   Object xObjDict;
   Object colorSpaceDict;
   Object patternDict;
+  Object shadingDict;
   Object gStateDict;
   GfxResources *next;
 };
@@ -88,10 +94,9 @@ class Gfx {
 public:
 
   // Constructor for regular output.
-  Gfx(OutputDev *out1, int pageNum, Dict *resDict,
-      double dpi, double x1, double y1, double x2, double y2, GBool crop,
-      double cropX1, double cropY1, double cropX2, double cropY2,
-      int rotate);
+  Gfx(XRef *xrefA, OutputDev *outA, int pageNum, Dict *resDict, double dpi,
+      PDFRectangle *box, GBool crop, PDFRectangle *cropBox, int rotate,
+      GBool printCommandsA);
 
   // Destructor.
   ~Gfx();
@@ -104,7 +109,9 @@ public:
 
 private:
 
+  XRef *xref;			// the xref table for this PDF file
   OutputDev *out;		// output device
+  GBool printCommands;		// print the drawing commands (for debugging)
   GfxResources *res;		// resource stack
 
   GfxState *state;		// current graphics state
@@ -120,7 +127,7 @@ private:
 
   void go(GBool topLevel);
   void execOp(Object *cmd, Object args[], int numArgs);
-  Operator *findOp(const char *name);
+  Operator *findOp(char *name);
   GBool checkArg(Object *arg, TchkType type);
   int getPos();
 
@@ -170,8 +177,9 @@ private:
   void opCloseFillStroke(Object args[], int numArgs);
   void opEOFillStroke(Object args[], int numArgs);
   void opCloseEOFillStroke(Object args[], int numArgs);
-  void opShFill(Object args[], int numArgs);
   void doPatternFill(GBool eoFill);
+  void opShFill(Object args[], int numArgs);
+  void doAxialShFill(GfxAxialShading *shading);
   void doEndPath();
 
   // path clipping operators

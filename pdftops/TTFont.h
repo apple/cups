@@ -9,20 +9,18 @@
 #ifndef TTFONT_H
 #define TTFONT_H
 
-#if HAVE_FREETYPE_FREETYPE_H
+#if !FREETYPE2 && (HAVE_FREETYPE_FREETYPE_H || HAVE_FREETYPE_H)
 
 #ifdef __GNUC__
 #pragma interface
 #endif
 
-#ifdef VMS
-#include <freetype.h>
-#include <ftxpost.h>
-#else
-//~ This will be going away; the configure script will add
-//~ -I<something>/freetype to CFLAGS.
+#if HAVE_FREETYPE_FREETYPE_H
 #include <freetype/freetype.h>
 #include <freetype/ftxpost.h>
+#else
+#include <freetype.h>
+#include <ftxpost.h>
 #endif
 #include "SFont.h"
 
@@ -31,8 +29,8 @@
 class TTFontEngine: public SFontEngine {
 public:
 
-  TTFontEngine(Display *display, Visual *visual, int depth,
-	       Colormap colormap, GBool aa);
+  TTFontEngine(Display *displayA, Visual *visualA, int depthA,
+	       Colormap colormapA, GBool aaA);
   GBool isOk() { return ok; }
   virtual ~TTFontEngine();
 
@@ -52,7 +50,7 @@ private:
 class TTFontFile: public SFontFile {
 public:
 
-  TTFontFile(TTFontEngine *engine, char *fontFileName);
+  TTFontFile(TTFontEngine *engineA, char *fontFileName);
   GBool isOk() { return ok; }
   virtual ~TTFontFile();
 
@@ -77,7 +75,7 @@ struct TTFontCacheTag {
 class TTFont: public SFont {
 public:
 
-  TTFont(TTFontFile *fontFile, double *m);
+  TTFont(TTFontFile *fontFileA, double *m);
   GBool isOk() { return ok; }
   virtual ~TTFont();
   virtual GBool drawChar(Drawable d, int w, int h, GC gc,
@@ -101,6 +99,6 @@ private:
   GBool ok;
 };
 
-#endif // HAVE_FREETYPE_FREETYPE_H
+#endif // !FREETYPE2 && (HAVE_FREETYPE_FREETYPE_H || HAVE_FREETYPE_H)
 
 #endif

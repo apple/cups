@@ -33,7 +33,7 @@ class XRef {
 public:
 
   // Constructor.  Read xref table from stream.
-  XRef(BaseStream *str, GString *userPassword);
+  XRef(BaseStream *strA, GString *ownerPassword, GString *userPassword);
 
   // Destructor.
   ~XRef();
@@ -49,10 +49,10 @@ public:
 #endif
 
   // Check various permissions.
-  GBool okToPrint();
-  GBool okToChange();
-  GBool okToCopy();
-  GBool okToAddNotes();
+  GBool okToPrint(GBool ignoreOwnerPW = gFalse);
+  GBool okToChange(GBool ignoreOwnerPW = gFalse);
+  GBool okToCopy(GBool ignoreOwnerPW = gFalse);
+  GBool okToAddNotes(GBool ignoreOwnerPW = gFalse);
 
   // Get catalog object.
   Object *getCatalog(Object *obj) { return fetch(rootNum, rootGen, obj); }
@@ -75,7 +75,7 @@ public:
 
   // Get end position for a stream in a damaged file.
   // Returns -1 if unknown or file is not damaged.
-  int getStreamEnd(int start);
+  int getStreamEnd(int streamStart);
 
 private:
 
@@ -93,20 +93,18 @@ private:
   int streamEndsLen;		// number of valid entries in streamEnds
 #ifndef NO_DECRYPTION
   GBool encrypted;		// true if file is encrypted
+  int encVersion;		// encryption algorithm
+  int encRevision;		// security handler revision
+  int keyLength;		// length of key, in bytes
   int permFlags;		// permission bits
   Guchar fileKey[16];		// file decryption key
+  GBool ownerPasswordOk;	// true if owner password is correct
 #endif
 
   int readTrailer();
   GBool readXRef(int *pos);
   GBool constructXRef();
-  GBool checkEncrypted(GString *userPassword);
+  GBool checkEncrypted(GString *ownerPassword, GString *userPassword);
 };
-
-//------------------------------------------------------------------------
-// The global xref table
-//------------------------------------------------------------------------
-
-extern XRef *xref;
 
 #endif
