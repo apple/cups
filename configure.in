@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.41 2000/06/19 16:25:22 mike Exp $"
+dnl "$Id: configure.in,v 1.42 2000/06/20 16:56:43 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -41,6 +41,7 @@ OPTIM=""
 AC_SUBST(OPTIM)
 PICFLAG=1
 CFLAGS="${CFLAGS:=}"
+CXXFLAGS="${CXXFLAGS:=}"
 
 AC_ARG_ENABLE(debug, [  --enable-debug        turn on debugging [default=no]],[if eval "test x$enable_debug = xyes"; then
 	OPTIM="-g "
@@ -115,6 +116,7 @@ AC_ARG_ENABLE(pam, [  --enable-pam        turn on PAM support [default=yes]])
 dnl Checks for programs...
 AC_PROG_AWK
 AC_PROG_CC
+AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_RANLIB
 AC_PATH_PROG(AR,ar)
@@ -418,5 +420,5 @@ AC_SUBST(CUPS_DOCROOT)
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.41 2000/06/19 16:25:22 mike Exp $".
+dnl End of "$Id: configure.in,v 1.42 2000/06/20 16:56:43 mike Exp $".
 dnl

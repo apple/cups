@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.22 2000/04/20 19:56:34 mike Exp $"
+# "$Id: Makedefs.in,v 1.23 2000/06/20 16:56:43 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -31,6 +31,7 @@ AWK	=	@AWK@
 CC	=	@LIBTOOL@ @CC@
 CHMOD	=	@CHMOD@
 CP	=	@CP@
+CXX	=	@LIBTOOL@ @CXX@
 DSO	=	@DSO@
 HTMLDOC	=	@HTMLDOC@
 LIBTOOL	=	@LIBTOOL@
@@ -134,15 +135,18 @@ SERVERROOT	= 	@CUPS_SERVERROOT@
 #
 
 .SILENT:
-.SUFFIXES:	.a .c .h .man .o .1 .5 .8
+.SUFFIXES:	.a .c .cxx .h .man .o .1 .5 .8
 .c.o:
 	echo Compiling $<...
 	$(CC) $(CFLAGS) -c $<
+.cxx.o:
+	echo Compiling $<...
+	$(CXX) $(CXXFLAGS) -c $<
 .man.1 .man.5 .man.8:
 	echo Formatting $<...
 	$(RM) $@
 	$(NROFF) -man $< >$@
 
 #
-# End of "$Id: Makedefs.in,v 1.22 2000/04/20 19:56:34 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.23 2000/06/20 16:56:43 mike Exp $"
 #
