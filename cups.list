@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.14 1999/07/30 14:18:19 mike Exp $"
+# "$Id: cups.list,v 1.15 1999/08/06 16:03:26 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -199,11 +199,11 @@ f 0444 root sys /usr/share/cups/model/deskjet.ppd ppd/deskjet.ppd
 f 0444 root sys /usr/share/cups/model/laserjet.ppd ppd/laserjet.ppd
 
 # Config files
-c 0600 root sys /var/cups/conf/classes.conf conf/classes.conf
-c 0600 root sys /var/cups/conf/cupsd.conf conf/cupsd.conf
-f 0600 root sys /var/cups/conf/mime.convs conf/mime.convs
-f 0600 root sys /var/cups/conf/mime.types conf/mime.types
-c 0600 root sys /var/cups/conf/printers.conf conf/printers.conf
+c 0644 root sys /var/cups/conf/classes.conf conf/classes.conf
+c 0644 root sys /var/cups/conf/cupsd.conf conf/cupsd.conf
+f 0644 root sys /var/cups/conf/mime.convs conf/mime.convs
+f 0644 root sys /var/cups/conf/mime.types conf/mime.types
+c 0644 root sys /var/cups/conf/printers.conf conf/printers.conf
 
 # Developer files
 f 0444 root sys /usr/include/cups/cups.h cups/cups.h
@@ -343,5 +343,5 @@ l 0555 root sys /etc/rc0.d/K20cups ../init.d/cups
 l 0555 root sys /etc/rc2.d/S80cups ../init.d/cups
 
 #
-# End of "$Id: cups.list,v 1.14 1999/07/30 14:18:19 mike Exp $".
+# End of "$Id: cups.list,v 1.15 1999/08/06 16:03:26 mike Exp $".
 #
