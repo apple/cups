@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.148 2002/03/14 19:35:01 mike Exp $"
+ * "$Id: job.c,v 1.149 2002/03/25 17:28:42 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -150,7 +150,8 @@ CancelJob(int id,		/* I - Job to cancel */
 
       current->current_file = 0;
 
-      if (!JobHistory || !JobFiles || purge)
+      if (!JobHistory || !JobFiles || purge ||
+          (current->dtype & CUPS_PRINTER_REMOTE))
         for (i = 1; i <= current->num_files; i ++)
 	{
 	  snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
@@ -158,7 +159,7 @@ CancelJob(int id,		/* I - Job to cancel */
           unlink(filename);
 	}
 
-      if (JobHistory && !purge)
+      if (JobHistory && !purge && !(current->dtype & CUPS_PRINTER_REMOTE))
       {
        /*
         * Save job state info...
@@ -725,7 +726,7 @@ MoveJob(int        id,		/* I - Job ID */
         break;
 
       strncpy(current->dest, dest, sizeof(current->dest) - 1);
-      current->dtype = p->type & CUPS_PRINTER_CLASS;
+      current->dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_REMOTE);
 
       if ((attr = ippFindAttribute(current->attrs, "job-printer-uri", IPP_TAG_URI)) != NULL)
       {
@@ -3041,5 +3042,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.148 2002/03/14 19:35:01 mike Exp $".
+ * End of "$Id: job.c,v 1.149 2002/03/25 17:28:42 mike Exp $".
  */
