@@ -1,5 +1,5 @@
 /*
- * "$Id: testlang.c,v 1.1.2.3 2003/01/24 20:45:15 mike Exp $"
+ * "$Id: testlang.c,v 1.1.2.4 2003/10/30 15:45:29 mike Exp $"
  *
  *   HTTP test program for the Common UNIX Printing System (CUPS).
  *
@@ -45,6 +45,7 @@ main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
   cups_lang_t		*language;	/* Message catalog */
+  cups_lang_t		*language2;	/* Message catalog */
   static const char * const charsets[] =/* Character sets */
 			{
 			  "us-ascii",
@@ -78,9 +79,18 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
   if (argc == 1)
-    language = cupsLangDefault();
+  {
+    language  = cupsLangDefault();
+    language2 = cupsLangDefault();
+  }
   else
-    language = cupsLangGet(argv[1]);
+  {
+    language  = cupsLangGet(argv[1]);
+    language2 = cupsLangGet(argv[1]);
+  }
+
+  if (language != language2)
+    puts("**** ERROR: Language cache did not work! ****");
 
   printf("Language = \"%s\"\n", language->language);
   printf("Encoding = \"%s\"\n", charsets[language->encoding]);
@@ -92,5 +102,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testlang.c,v 1.1.2.3 2003/01/24 20:45:15 mike Exp $".
+ * End of "$Id: testlang.c,v 1.1.2.4 2003/10/30 15:45:29 mike Exp $".
  */

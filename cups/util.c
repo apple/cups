@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.81.2.28 2003/10/22 03:17:35 mike Exp $"
+ * "$Id: util.c,v 1.81.2.29 2003/10/30 15:45:29 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -125,6 +125,8 @@ cupsCancelJob(const char *name,		/* I - Name of printer or class */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL,
                language != NULL ? language->language : "C");
+
+  cupsLangFree(language);
 
   snprintf(uri, sizeof(uri), "ipp://%s:%d/printers/%s", hostname, ippPort(), printer);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
@@ -543,6 +545,8 @@ cupsGetClasses(char ***classes)		/* O - Classes */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
 
+  cupsLangFree(language);
+
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                "requested-attributes", NULL, "printer-name");
 
@@ -657,6 +661,8 @@ cupsGetDefault(void)
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
 
+  cupsLangFree(language);
+
  /*
   * Do the request and get back a response...
   */
@@ -767,6 +773,8 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
+
+  cupsLangFree(language);
 
   if (mydest)
     snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", mydest);
@@ -1013,6 +1021,8 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
 
+  cupsLangFree(language);
+
   snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, uri);
@@ -1076,8 +1086,6 @@ cupsGetPPD(const char *name)		/* I - Printer name */
     if (strcasecmp(uri, hostname) == 0)
       strcpy(hostname, "localhost");
   }
-
-  cupsLangFree(language);
 
   if (!printer[0])
   {
@@ -1220,6 +1228,8 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
+
+  cupsLangFree(language);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                "requested-attributes", NULL, "printer-name");
@@ -1483,6 +1493,8 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
 	ippDelete(response);
     }
 
+  cupsLangFree(language);
+
   return (jobid);
 }
 
@@ -1548,5 +1560,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.81.2.28 2003/10/22 03:17:35 mike Exp $".
+ * End of "$Id: util.c,v 1.81.2.29 2003/10/30 15:45:29 mike Exp $".
  */
