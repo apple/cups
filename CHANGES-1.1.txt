@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc3
 
+	- The scheduler would write 0-length job control files
+	  (STR #46)
 	- Updated the French man pages (translation provided by
 	  Gilles QUERRET)
 	- The scheduler would delete all printers from
