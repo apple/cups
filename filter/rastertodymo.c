@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertodymo.c,v 1.4.2.5 2003/02/11 18:23:33 mike Exp $"
+ * "$Id: rastertodymo.c,v 1.4.2.6 2003/03/05 19:28:26 mike Exp $"
  *
  *   DYMO label printer filter for the Common UNIX Printing System (CUPS).
  *
@@ -102,6 +102,9 @@ Setup(void)
 void
 StartPage(cups_page_header_t *header)	/* I - Page header */
 {
+  int	length;				/* Actual label length */
+
+
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -128,7 +131,9 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
   * Setup printer/job attributes...
   */
 
-  printf("\033L%c%c", header->cupsHeight, header->cupsHeight >> 8);
+  length = header->PageSize[1] * header->HWResolution[1] / 72;
+
+  printf("\033L%c%c", length, length >> 8);
   printf("\033D%c", header->cupsBytesPerLine);
 
   printf("\033%c", header->cupsCompression + 'c'); /* Darkness */
@@ -338,6 +343,18 @@ main(int  argc,		/* I - Number of command-line arguments */
 
         putchar(0x16);
 	fwrite(Buffer, header.cupsBytesPerLine, 1, stdout);
+	fflush(stdout);
+
+#ifdef __sgi
+       /*
+        * This hack works around a bug in the IRIX serial port driver when
+	* run at high baud rates (e.g. 115200 baud)...  This results in
+	* slightly slower label printing, but at least the labels come
+	* out properly.
+	*/
+
+	usleep(1);
+#endif /* __sgi */
       }
       else
         Feed ++;
@@ -372,5 +389,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertodymo.c,v 1.4.2.5 2003/02/11 18:23:33 mike Exp $".
+ * End of "$Id: rastertodymo.c,v 1.4.2.6 2003/03/05 19:28:26 mike Exp $".
  */
