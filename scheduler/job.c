@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.74 2000/06/27 21:07:11 mike Exp $"
+ * "$Id: job.c,v 1.75 2000/06/27 21:10:53 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -902,7 +902,7 @@ StartJob(int       id,		/* I - Job ID */
 		cache[255],	/* RIP_MAX_CACHE environment variable */
 		tmpdir[1024],	/* TMPDIR environment variable */
 		ldpath[1024],	/* LD_LIBRARY_PATH environment variable */
-		datadir[1024];	/* DATADIR environment variable */
+		datadir[1024];	/* CUPS_DATADIR environment variable */
 
 
   DEBUG_printf(("StartJob(%d, %08x)\n", id, printer));
@@ -1155,7 +1155,7 @@ StartJob(int       id,		/* I - Job ID */
   snprintf(cache, sizeof(cache), "RIP_MAX_CACHE=%s", RIPCache);
   snprintf(root, sizeof(root), "SERVER_ROOT=%s", ServerRoot);
   snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
-  snprintf(datadir, sizeof(datadir), "DATADIR=%s", DataDir);
+  snprintf(datadir, sizeof(datadir), "CUPS_DATADIR=%s", DataDir);
 
   if (getenv("LD_LIBRARY_PATH") != NULL)
     snprintf(ldpath, sizeof(ldpath), "LD_LIBRARY_PATH=%s", getenv("LD_LIBRARY_PATH"));
@@ -2521,5 +2521,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.74 2000/06/27 21:07:11 mike Exp $".
+ * End of "$Id: job.c,v 1.75 2000/06/27 21:10:53 mike Exp $".
  */
