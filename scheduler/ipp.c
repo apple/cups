@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.10 1999/05/01 13:16:46 mike Exp $"
+ * "$Id: ipp.c,v 1.11 1999/05/13 20:41:11 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -23,6 +23,27 @@
  *
  * Contents:
  *
+ *   ProcessIPPRequest() - Process an incoming IPP request...
+ *   accept_jobs()       - Accept print jobs to a printer.
+ *   add_class()         - Add a class to the system.
+ *   add_printer()       - Add a printer to the system.
+ *   cancel_all_jobs()   - Cancel all print jobs.
+ *   cancel_job()        - Cancel a print job.
+ *   copy_attrs()        - Copy attributes from one request to another.
+ *   delete_class()      - Remove a class from the system.
+ *   delete_printer()    - Remove a printer from the system.
+ *   get_default()       - Get the default destination.
+ *   get_jobs()          - Get a list of jobs for the specified printer.
+ *   get_job_attrs()     - Get job attributes.
+ *   get_printers()      - Get a list of printers.
+ *   get_printer_attrs() - Get printer attributes.
+ *   print_job()         - Print a file to a printer or class.
+ *   reject_jobs()       - Reject print jobs to a printer.
+ *   send_ipp_error()    - Send an error status back to the IPP client.
+ *   start_printer()     - Start a printer.
+ *   stop_printer()      - Stop a printer.
+ *   validate_dest()     - Validate a printer class destination.
+ *   validate_job()      - Validate printer options and destination.
  */
 
 /*
@@ -44,11 +65,10 @@ static void	cancel_job(client_t *con, ipp_attribute_t *uri);
 static void	copy_attrs(ipp_t *to, ipp_t *from, ipp_attribute_t *req);
 static void	delete_class(client_t *con);
 static void	delete_printer(client_t *con);
-static void	get_classes(client_t *con);
 static void	get_default(client_t *con);
 static void	get_jobs(client_t *con, ipp_attribute_t *uri);
 static void	get_job_attrs(client_t *con, ipp_attribute_t *uri);
-static void	get_printers(client_t *con);
+static void	get_printers(client_t *con, int type);
 static void	get_printer_attrs(client_t *con, ipp_attribute_t *uri);
 static void	print_job(client_t *con, ipp_attribute_t *uri);
 static void	reject_jobs(client_t *con, ipp_attribute_t *uri);
@@ -226,7 +246,11 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
               break;
 
 	  case CUPS_GET_PRINTERS :
-              get_printers(con);
+              get_printers(con, 0);
+              break;
+
+	  case CUPS_GET_CLASSES :
+              get_printers(con, CUPS_PRINTER_CLASS);
               break;
 
 #if 0
@@ -236,10 +260,6 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 
 	  case CUPS_DELETE_PRINTER :
               delete_printer(con);
-              break;
-
-	  case CUPS_GET_CLASSES :
-              get_classes(con);
               break;
 
 	  case CUPS_ADD_CLASS :
@@ -717,32 +737,15 @@ delete_printer(client_t *con)		/* I - Client connection */
 
 
 /*
- * 'get_classes()' - Get a list of classes.
- */
-
-static void
-get_classes(client_t *con)		/* I - Client connection */
-{
-  send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
-}
-
-
-/*
  * 'get_default()' - Get the default destination.
  */
 
 static void
 get_default(client_t *con)		/* I - Client connection */
 {
-  printer_t	*printer;		/* Printer information */
-
-
   DEBUG_printf(("get_default(%08x)\n", con));
 
-  if ((printer = FindPrinter(DefaultPrinter)) == NULL)
-    printer = Printers;
-
-  copy_attrs(con->response, printer->attrs,
+  copy_attrs(con->response, DefaultPrinter->attrs,
              ippFindAttribute(con->request, "requested-attributes",
 	                      IPP_TAG_KEYWORD));
 
@@ -1044,7 +1047,8 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
  */
 
 static void
-get_printers(client_t *con)		/* I - Client connection */
+get_printers(client_t *con,		/* I - Client connection */
+             int      type)		/* I - 0 or CUPS_PRINTER_CLASS */
 {
   ipp_attribute_t	*attr;		/* Current attribute */
   int			limit;		/* Maximum number of printers to return */
@@ -1074,41 +1078,42 @@ get_printers(client_t *con)		/* I - Client connection */
   for (count = 0, printer = Printers;
        count < limit && printer != NULL;
        printer = printer->next)
-  {
-   /*
-    * Send the following attributes for each printer:
-    *
-    *    printer-state
-    *    printer-state-message
-    *    printer-is-accepting-jobs
-    *    printer-device-uri
-    *    + all printer attributes
-    */
+    if ((printer->type & CUPS_PRINTER_CLASS) == type)
+    {
+     /*
+      * Send the following attributes for each printer:
+      *
+      *    printer-state
+      *    printer-state-message
+      *    printer-is-accepting-jobs
+      *    printer-device-uri
+      *    + all printer attributes
+      */
 
-    ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-                  "printer-state", printer->state);
+      ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM,
+                    "printer-state", printer->state);
 
-    if (printer->state_message[0])
-      ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                   "printer-state-message", NULL, printer->state_message);
+      if (printer->state_message[0])
+	ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                     "printer-state-message", NULL, printer->state_message);
 
-    ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs",
-                  printer->accepting);
+      ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs",
+                    printer->accepting);
 
-    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_URI,
-                 "printer-device-uri", NULL, printer->device_uri);
+      ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_URI,
+                   "printer-device-uri", NULL, printer->device_uri);
 
-    ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                  "printer-up-time", curtime - StartTime);
-    ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
-               ippTimeToDate(curtime));
+      ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                    "printer-up-time", curtime - StartTime);
+      ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
+        	 ippTimeToDate(curtime));
 
-    copy_attrs(con->response, printer->attrs,
-               ippFindAttribute(con->request, "requested-attributes",
-	                	IPP_TAG_KEYWORD));
+      copy_attrs(con->response, printer->attrs,
+        	 ippFindAttribute(con->request, "requested-attributes",
+	                	  IPP_TAG_KEYWORD));
 
-    ippAddSeparator(con->response);
-  }
+      ippAddSeparator(con->response);
+    }
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -1133,8 +1138,7 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
 			resource[HTTP_MAX_URI];
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
-  printer_t		*printer;	/* Printer */
-  class_t		*pclass;	/* Printer class */
+  printer_t		*printer;	/* Printer/class */
   time_t		curtime;	/* Current time */
 
 
@@ -1159,15 +1163,7 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
   }
 
   if (dtype == CUPS_PRINTER_CLASS)
-  {
-   /*
-    * For classes, return the attributes supported by the first printer
-    * in the class.
-    */
-
-    pclass  = FindClass(dest);
-    printer = pclass->printers[0];
-  }
+    printer = FindClass(dest);
   else
     printer = FindPrinter(dest);
 
@@ -1326,17 +1322,14 @@ print_job(client_t        *con,		/* I - Client connection */
   */
 
   if (dtype == CUPS_PRINTER_CLASS)
-  {
-  }
+    printer = FindClass(dest);
   else
-  {
     printer = FindPrinter(dest);
 
-    if (!printer->accepting)
-    {
-      send_ipp_error(con, IPP_NOT_ACCEPTING);
-      return;
-    }
+  if (!printer->accepting)
+  {
+    send_ipp_error(con, IPP_NOT_ACCEPTING);
+    return;
   }
 
  /*
@@ -1467,7 +1460,11 @@ reject_jobs(client_t        *con,	/* I - Client connection */
   * Reject jobs sent to the printer...
   */
 
-  printer = FindPrinter(name);
+  if (dtype == CUPS_PRINTER_CLASS)
+    printer = FindClass(name);
+  else
+    printer = FindPrinter(name);
+
   printer->accepting = 0;
 
   if ((attr = ippFindAttribute(con->request, "printer-state-message",
@@ -1562,7 +1559,10 @@ start_printer(client_t        *con,	/* I - Client connection */
   * Start the printer...
   */
 
-  printer = FindPrinter(name);
+  if (dtype == CUPS_PRINTER_CLASS)
+    printer = FindClass(name);
+  else
+    printer = FindPrinter(name);
 
   StartPrinter(printer);
 
@@ -1633,7 +1633,10 @@ stop_printer(client_t        *con,	/* I - Client connection */
   * Stop the printer...
   */
 
-  printer = FindPrinter(name);
+  if (dtype == CUPS_PRINTER_CLASS)
+    printer = FindClass(name);
+  else
+    printer = FindPrinter(name);
 
   StopPrinter(printer);
 
@@ -1795,5 +1798,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.10 1999/05/01 13:16:46 mike Exp $".
+ * End of "$Id: ipp.c,v 1.11 1999/05/13 20:41:11 mike Exp $".
  */

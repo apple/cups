@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h,v 1.9 1999/04/22 20:20:52 mike Exp $"
+ * "$Id: printers.h,v 1.10 1999/05/13 20:41:13 mike Exp $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -23,7 +23,7 @@
  */
 
 /*
- * Printer information structure...
+ * Printer/class information structure...
  */
 
 typedef struct printer_str
@@ -34,9 +34,7 @@ typedef struct printer_str
 		name[IPP_MAX_NAME],	/* Printer name */
 		location[IPP_MAX_NAME],	/* Location code */
 		info[IPP_MAX_NAME],	/* Description */
-		more_info[HTTP_MAX_URI],/* URL for site-specific info */
-		username[MAX_USERPASS],	/* Username for remote system */
-		password[MAX_USERPASS];	/* Password for remote system */
+		more_info[HTTP_MAX_URI];/* URL for site-specific info */
   int		accepting;		/* Accepting jobs? */
   ipp_pstate_t	state;			/* Printer state */
   char		state_message[1024];	/* Printer state message */
@@ -48,6 +46,8 @@ typedef struct printer_str
   mime_type_t	*filetype;		/* Pseudo-filetype for printer */
   void		*job;			/* Current job in queue */
   ipp_t		*attrs;			/* Attributes supported by this printer */
+  int		num_printers;		/* Number of printers in class */
+  struct printer_str **printers;	/* Printers in class */
 } printer_t;
 
 
@@ -56,7 +56,7 @@ typedef struct printer_str
  */
 
 VAR printer_t		*Printers VALUE(NULL);	/* Printer list */
-VAR char		DefaultPrinter[IPP_MAX_NAME] VALUE("");
+VAR printer_t		*DefaultPrinter VALUE(NULL);
 						/* Default printer */
 
 /*
@@ -69,11 +69,12 @@ extern void		DeletePrinter(printer_t *p);
 extern printer_t	*FindPrinter(char *name);
 extern void		LoadAllPrinters(void);
 extern void		SaveAllPrinters(void);
+extern void		SetPrinterAttrs(printer_t *p);
 extern void		SetPrinterState(printer_t *p, ipp_pstate_t s);
 #define			StartPrinter(p) SetPrinterState((p), IPP_PRINTER_IDLE)
 extern void		StopPrinter(printer_t *p);
 
 
 /*
- * End of "$Id: printers.h,v 1.9 1999/04/22 20:20:52 mike Exp $".
+ * End of "$Id: printers.h,v 1.10 1999/05/13 20:41:13 mike Exp $".
  */

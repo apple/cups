@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.15 1999/04/27 19:59:24 mike Exp $"
+ * "$Id: dirsvc.c,v 1.16 1999/05/13 20:41:11 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,7 +23,10 @@
  *
  * Contents:
  *
- *
+ *   StartBrowsing()    - Start sending and receiving broadcast information.
+ *   StopBrowsing()     - Stop sending and receiving broadcast information.
+ *   UpdateBrowseList() - Update the browse lists for any new browse data.
+ *   SendBrowseList()   - Send new browsing information.
  */
 
 /*
@@ -301,5 +304,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.15 1999/04/27 19:59:24 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.16 1999/05/13 20:41:11 mike Exp $".
  */

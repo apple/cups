@@ -1,7 +1,7 @@
 /*
- * "$Id: printers.c,v 1.14 1999/04/29 19:28:47 mike Exp $"
+ * "$Id: printers.c,v 1.15 1999/05/13 20:41:12 mike Exp $"
  *
- *   for the Common UNIX Printing System (CUPS).
+ *   Printer routines for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
  *
@@ -28,6 +28,10 @@
  *   DeletePrinter()     - Delete a printer from the system.
  *   FindPrinter()       - Find a printer in the list.
  *   LoadAllPrinters()   - Load printers from the printers.conf file.
+ *   SaveAllPrinters()   - Save all printer definitions to the printers.conf
+ *   SetPrinterAttrs()   - Set printer attributes based upon the PPD file.
+ *   SetPrinterState()   - Update the current state of a printer.
+ *   StopPrinter()       - Stop a printer from printing any jobs...
  */
 
 /*
@@ -35,13 +39,6 @@
  */
 
 #include "cupsd.h"
-
-
-/*
- * Local functions...
- */
-
-static void	set_printer_attrs(printer_t *);
 
 
 /*
@@ -73,7 +70,7 @@ AddPrinter(char *name)		/* I - Name of printer */
   strcpy(p->name, name);
   p->state     = IPP_PRINTER_STOPPED;
   p->accepting = 1;
-  set_printer_attrs(p);
+  SetPrinterAttrs(p);
 
  /*
   * Insert the printer in the printer list alphabetically...
@@ -107,8 +104,17 @@ AddPrinter(char *name)		/* I - Name of printer */
 void
 DeleteAllPrinters(void)
 {
-  while (Printers != NULL)
-    DeletePrinter(Printers);
+  printer_t	*p,	/* Pointer to current printer/class */
+		*next;	/* Pointer to next printer in list */
+
+
+  for (p = Printers; p != NULL; p = next)
+  {
+    next = p->next;
+
+    if (!(p->type & CUPS_PRINTER_CLASS))
+      DeletePrinter(p);
+  }
 }
 
 
@@ -174,10 +180,11 @@ FindPrinter(char *name)		/* I - Name of printer to find */
   for (p = Printers; p != NULL; p = p->next)
     switch (strcasecmp(name, p->name))
     {
+      case 0 : /* name == p->name */
+          if (!(p->type & CUPS_PRINTER_CLASS))
+	    return (p);
       case 1 : /* name > p->name */
           break;
-      case 0 : /* name == p->name */
-          return (p);
       case -1 : /* name < p->name */
           return (NULL);
     }
@@ -222,8 +229,6 @@ LoadAllPrinters(void)
  /*
   * Read printer configurations until we hit EOF...
   */
-
-  DefaultPrinter[0] = '\0';
 
   linenum = 0;
   p       = NULL;
@@ -280,13 +285,30 @@ LoadAllPrinters(void)
 
       if (line[len - 1] == '>' && p == NULL)
       {
+       /*
+        * Add the printer and a base file type...
+	*/
+
         line[len - 1] = '\0';
 
         p           = AddPrinter(value);
 	p->filetype = mimeAddType(MimeDatabase, "printer", value);
 
+       /*
+        * Add a filter from application/vnd.cups-raw to printer/name to
+	* handle "raw" printing by users.
+	*/
+
+        mimeAddFilter(MimeDatabase,
+	              mimeType(MimeDatabase, "application", "vnd.cups-raw"),
+		      p->filetype, 0, "-");
+
+       /*
+        * Set the default printer as needed...
+	*/
+
         if (strcmp(name, "<DefaultPrinter") == 0)
-	  strcpy(DefaultPrinter, value);
+	  DefaultPrinter = p;
       }
       else
       {
@@ -299,7 +321,7 @@ LoadAllPrinters(void)
     {
       if (p != NULL)
       {
-        set_printer_attrs(p);
+        SetPrinterAttrs(p);
         p = NULL;
       }
       else
@@ -324,10 +346,6 @@ LoadAllPrinters(void)
       strncpy(p->location, value, sizeof(p->location) - 1);
     else if (strcmp(name, "DeviceURI") == 0)
       strncpy(p->device_uri, value, sizeof(p->device_uri) - 1);
-    else if (strcmp(name, "Username") == 0)
-      strncpy(p->username, value, sizeof(p->username) - 1);
-    else if (strcmp(name, "Password") == 0)
-      strncpy(p->password, value, sizeof(p->password) - 1);
     else if (strcmp(name, "AddFilter") == 0)
     {
      /*
@@ -402,12 +420,7 @@ LoadAllPrinters(void)
       else if (strcasecmp(value, "stopped") == 0)
         p->state = IPP_PRINTER_STOPPED;
     }
-
-    /**** Add Order, Deny, Allow, AuthType, and AuthClass stuff! ****/
   }
-
-  if (DefaultPrinter[0] == '\0')
-    strcpy(DefaultPrinter, Printers->name);
 
   fclose(fp);
 }
@@ -424,60 +437,12 @@ SaveAllPrinters(void)
 }
 
 
-void
-SetPrinterState(printer_t    *p,	/* I - Printer to change */
-                ipp_pstate_t s)		/* I - New state */
-{
-  ipp_pstate_t	old_state;		/* Old printer state */
-
-
- /*
-  * Set the new state...
-  */
-
-  old_state      = p->state;
-  p->state       = s;
-  p->state_time  = time(NULL);
-
-  if (old_state != s)
-    p->browse_time = 0;
-
- /*
-  * Save the printer configuration if a printer goes from idle or processing
-  * to stopped (or visa-versa)...
-  */
-
-  if ((old_state == IPP_PRINTER_STOPPED) != (s == IPP_PRINTER_STOPPED))
-    SaveAllPrinters();
-
- /*
-  * Check to see if any pending jobs can now be printed...
-  */
-
-  CheckJobs();
-}
-
-
 /*
- * 'StopPrinter()' - Stop a printer from printing any jobs...
+ * 'SetPrinterAttrs()' - Set printer attributes based upon the PPD file.
  */
 
 void
-StopPrinter(printer_t *p)	/* I - Printer to stop */
-{
-  if (p->job)
-    StopJob(((job_t *)p->job)->id);
-
-  p->state = IPP_PRINTER_STOPPED;
-}
-
-
-/*
- * 'set_printer_attrs()' - Set printer attributes based upon the PPD file.
- */
-
-static void
-set_printer_attrs(printer_t *p)	/* I - Printer to setup */
+SetPrinterAttrs(printer_t *p)	/* I - Printer to setup */
 {
   char		uri[HTTP_MAX_URI];/* URI for printer */
   int		i;		/* Looping var */
@@ -553,8 +518,12 @@ set_printer_attrs(printer_t *p)	/* I - Printer to setup */
 
   p->attrs = ippNew();
 
-  sprintf(p->uri, "ipp://%s:%d/printers/%s", ServerName,
-          ntohs(Listeners[0].address.sin_port), p->name);
+  if (p->type & CUPS_PRINTER_CLASS)
+    sprintf(p->uri, "ipp://%s:%d/classes/%s", ServerName,
+            ntohs(Listeners[0].address.sin_port), p->name);
+  else
+    sprintf(p->uri, "ipp://%s:%d/printers/%s", ServerName,
+            ntohs(Listeners[0].address.sin_port), p->name);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-uri-supported",
                NULL, p->uri);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
@@ -599,117 +568,207 @@ set_printer_attrs(printer_t *p)	/* I - Printer to setup */
                  "orientation-requested-supported", 4, (int *)orients);
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                 "orientation-requested-default", IPP_PORTRAIT);
-  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "device-uri", NULL,
-               p->device_uri);
 
  /*
-  * Assign additional attributes from the PPD file (if any)...
+  * Assign additional attributes depending on whether this is a printer
+  * or class...
   */
 
-  p->type        = CUPS_PRINTER_LOCAL + CUPS_PRINTER_BW + CUPS_PRINTER_SMALL;
-  finishings[0]  = IPP_FINISH_NONE;
-  num_finishings = 1;
-
-  sprintf(filename, "%s/ppd/%s.ppd", ServerRoot, p->name);
-  if ((ppd = ppdOpenFile(filename)) != NULL)
+  if (p->type & CUPS_PRINTER_CLASS)
   {
    /*
-    * Add make/model and other various attributes...
+    * Add class-specific attributes...
     */
 
-    if (ppd->color_device)
-      p->type += CUPS_PRINTER_COLOR;
-    if (ppd->variable_sizes)
-      p->type += CUPS_PRINTER_VARIABLE;
-    if (!ppd->manual_copies)
-      p->type += CUPS_PRINTER_COPIES;
+    if (p->num_printers > 0)
+    {
+     /*
+      * Add a list of member URIs and names...
+      */
 
-    ippAddBoolean(p->attrs, IPP_TAG_PRINTER, "color-supported",
-                  ppd->color_device);
-    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                 "printer-make-and-model", NULL, ppd->nickname);
+      attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
+                           "member-uris", p->num_printers, NULL, NULL);
+
+      for (i = 0; i < p->num_printers; i ++)
+        attr->values[i].string.text = strdup(p->printers[i]->uri);
+
+      attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                           "member-names", p->num_printers, NULL, NULL);
+
+      for (i = 0; i < p->num_printers; i ++)
+        attr->values[i].string.text = strdup(p->printers[i]->name);
+    }
+  }
+  else
+  {
+   /*
+    * Add printer-specific attributes...
+    */
+
+    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "device-uri", NULL,
+        	 p->device_uri);
 
    /*
-    * Add media options from the PPD file...
+    * Assign additional attributes from the PPD file (if any)...
     */
 
-    if ((input_slot = ppdFindOption(ppd, "InputSlot")) != NULL)
-      num_media = input_slot->num_choices;
-    else
-      num_media = 0;
+    p->type        = CUPS_PRINTER_LOCAL + CUPS_PRINTER_BW + CUPS_PRINTER_SMALL;
+    finishings[0]  = IPP_FINISH_NONE;
+    num_finishings = 1;
 
-    if ((media_type = ppdFindOption(ppd, "MediaType")) != NULL)
-      num_media += media_type->num_choices;
-
-    if ((page_size = ppdFindOption(ppd, "PageSize")) != NULL)
-      num_media += page_size->num_choices;
-
-    attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-                         "media-supported", num_media, NULL, NULL);
-    val  = attr->values;
-
-    if (input_slot != NULL)
-      for (i = 0; i < input_slot->num_choices; i ++, val ++)
-	val->string.text = strdup(input_slot->choices[i].choice);
-
-    if (media_type != NULL)
-      for (i = 0; i < media_type->num_choices; i ++, val ++)
-	val->string.text = strdup(media_type->choices[i].choice);
-
-    if (page_size != NULL)
-      for (i = 0; i < page_size->num_choices; i ++, val ++)
-	val->string.text = strdup(page_size->choices[i].choice);
-
-    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
-                 NULL, page_size->defchoice);
-
-    if (ppdFindOption(ppd, "Duplex") != NULL)
+    sprintf(filename, "%s/ppd/%s.ppd", ServerRoot, p->name);
+    if ((ppd = ppdOpenFile(filename)) != NULL)
     {
-      p->type += CUPS_PRINTER_DUPLEX;
+     /*
+      * Add make/model and other various attributes...
+      */
 
-      ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "sides-supported",
-                    3, NULL, sides);
-      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "sides-default",
-                   NULL, "one");
-    }
+      if (ppd->color_device)
+	p->type += CUPS_PRINTER_COLOR;
+      if (ppd->variable_sizes)
+	p->type += CUPS_PRINTER_VARIABLE;
+      if (!ppd->manual_copies)
+	p->type += CUPS_PRINTER_COPIES;
 
-    if (ppdFindOption(ppd, "Collate") != NULL)
-      p->type += CUPS_PRINTER_COLLATE;
+      ippAddBoolean(p->attrs, IPP_TAG_PRINTER, "color-supported",
+                    ppd->color_device);
+      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                   "printer-make-and-model", NULL, ppd->nickname);
 
-    if (ppdFindOption(ppd, "StapleLocation") != NULL)
-    {
-      p->type += CUPS_PRINTER_STAPLE;
-      finishings[num_finishings++] = IPP_FINISH_STAPLE;
-    }
+     /*
+      * Add media options from the PPD file...
+      */
 
-    if (ppdFindOption(ppd, "BindEdge") != NULL)
-    {
-      p->type += CUPS_PRINTER_BIND;
-      finishings[num_finishings++] = IPP_FINISH_BIND;
-    }
-
-    p->type -= CUPS_PRINTER_SMALL;
-
-    for (i = 0; i < ppd->num_sizes; i ++)
-      if (ppd->sizes[i].length > 1728)
-        p->type += CUPS_PRINTER_LARGE;
-      else if (ppd->sizes[i].length > 1008)
-        p->type += CUPS_PRINTER_MEDIUM;
+      if ((input_slot = ppdFindOption(ppd, "InputSlot")) != NULL)
+	num_media = input_slot->num_choices;
       else
-        p->type += CUPS_PRINTER_SMALL;
+	num_media = 0;
 
-    ppdClose(ppd);
+      if ((media_type = ppdFindOption(ppd, "MediaType")) != NULL)
+	num_media += media_type->num_choices;
+
+      if ((page_size = ppdFindOption(ppd, "PageSize")) != NULL)
+	num_media += page_size->num_choices;
+
+      attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                           "media-supported", num_media, NULL, NULL);
+      val  = attr->values;
+
+      if (input_slot != NULL)
+	for (i = 0; i < input_slot->num_choices; i ++, val ++)
+	  val->string.text = strdup(input_slot->choices[i].choice);
+
+      if (media_type != NULL)
+	for (i = 0; i < media_type->num_choices; i ++, val ++)
+	  val->string.text = strdup(media_type->choices[i].choice);
+
+      if (page_size != NULL)
+	for (i = 0; i < page_size->num_choices; i ++, val ++)
+	  val->string.text = strdup(page_size->choices[i].choice);
+
+      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
+                   NULL, page_size->defchoice);
+
+      if (ppdFindOption(ppd, "Duplex") != NULL)
+      {
+	p->type += CUPS_PRINTER_DUPLEX;
+
+	ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "sides-supported",
+                      3, NULL, sides);
+	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "sides-default",
+                     NULL, "one");
+      }
+
+      if (ppdFindOption(ppd, "Collate") != NULL)
+	p->type += CUPS_PRINTER_COLLATE;
+
+      if (ppdFindOption(ppd, "StapleLocation") != NULL)
+      {
+	p->type += CUPS_PRINTER_STAPLE;
+	finishings[num_finishings++] = IPP_FINISH_STAPLE;
+      }
+
+      if (ppdFindOption(ppd, "BindEdge") != NULL)
+      {
+	p->type += CUPS_PRINTER_BIND;
+	finishings[num_finishings++] = IPP_FINISH_BIND;
+      }
+
+      p->type -= CUPS_PRINTER_SMALL;
+
+      for (i = 0; i < ppd->num_sizes; i ++)
+	if (ppd->sizes[i].length > 1728)
+          p->type += CUPS_PRINTER_LARGE;
+	else if (ppd->sizes[i].length > 1008)
+          p->type += CUPS_PRINTER_MEDIUM;
+	else
+          p->type += CUPS_PRINTER_SMALL;
+
+      ppdClose(ppd);
+    }
+
+    ippAddIntegers(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
+                   "finishings-supported", num_finishings, (int *)finishings);
+    ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
+                  "finishings-default", IPP_FINISH_NONE);
   }
-
-  ippAddIntegers(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-                 "finishings-supported", num_finishings, (int *)finishings);
-  ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-                "finishings-default", IPP_FINISH_NONE);
 
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-type", p->type);
 }
 
 
 /*
- * End of "$Id: printers.c,v 1.14 1999/04/29 19:28:47 mike Exp $".
+ * 'SetPrinterState()' - Update the current state of a printer.
+ */
+
+void
+SetPrinterState(printer_t    *p,	/* I - Printer to change */
+                ipp_pstate_t s)		/* I - New state */
+{
+  ipp_pstate_t	old_state;		/* Old printer state */
+
+
+ /*
+  * Set the new state...
+  */
+
+  old_state      = p->state;
+  p->state       = s;
+  p->state_time  = time(NULL);
+
+  if (old_state != s)
+    p->browse_time = 0;
+
+ /*
+  * Save the printer configuration if a printer goes from idle or processing
+  * to stopped (or visa-versa)...
+  */
+
+  if ((old_state == IPP_PRINTER_STOPPED) != (s == IPP_PRINTER_STOPPED))
+    SaveAllPrinters();
+
+ /*
+  * Check to see if any pending jobs can now be printed...
+  */
+
+  CheckJobs();
+}
+
+
+/*
+ * 'StopPrinter()' - Stop a printer from printing any jobs...
+ */
+
+void
+StopPrinter(printer_t *p)	/* I - Printer to stop */
+{
+  if (p->job)
+    StopJob(((job_t *)p->job)->id);
+
+  p->state = IPP_PRINTER_STOPPED;
+}
+
+
+/*
+ * End of "$Id: printers.c,v 1.15 1999/05/13 20:41:12 mike Exp $".
  */

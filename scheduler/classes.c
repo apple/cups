@@ -1,7 +1,7 @@
 /*
- * "$Id: classes.c,v 1.3 1999/01/24 14:25:11 mike Exp $"
+ * "$Id: classes.c,v 1.4 1999/05/13 20:41:10 mike Exp $"
  *
- *   for the Common UNIX Printing System (CUPS).
+ *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
  *
@@ -23,7 +23,15 @@
  *
  * Contents:
  *
- *
+ *   AddClass()                 - Add a class to the system.
+ *   AddPrinterToClass()        - Add a printer to a class...
+ *   DeletePrinterFromClass()   - Delete a printer from a class.
+ *   DeletePrinterFromClasses() - Delete a printer from all classes.
+ *   DeleteAllClasses()         - Remove all classes from the system.
+ *   FindAvailablePrinter()     - Find an available printer in a class.
+ *   FindClass()                - Find the named class.
+ *   LoadAllClasses()           - Load classes from the classes.conf file.
+ *   SaveAllClasses()           - Save classes to the classes.conf file.
  */
 
 /*
@@ -33,51 +41,403 @@
 #include "cupsd.h"
 
 
-class_t *
-AddClass(char *name)
+/*
+ * 'AddClass()' - Add a class to the system.
+ */
+
+printer_t *			/* O - New class */
+AddClass(char *name)		/* I - Name of class */
 {
-  return (NULL);
+  printer_t	*c;		/* New class */
+
+
+ /*
+  * Add the printer and set the type to "class"...
+  */
+
+  if ((c = AddPrinter(name)) != NULL)
+    c->type = CUPS_PRINTER_CLASS;
+
+  return (c);
 }
 
+
+/*
+ * 'AddPrinterToClass()' - Add a printer to a class...
+ */
 
 void
-AddPrinterToClass(class_t   *c,
-                  printer_t *p)
+AddPrinterToClass(printer_t *c,	/* I - Class to add to */
+                  printer_t *p)	/* I - Printer to add */
 {
+  printer_t	**temp;		/* Pointer to printer array */
+
+
+ /*
+  * Allocate memory as needed...
+  */
+
+  if (c->num_printers == 0)
+    temp = malloc(sizeof(printer_t *));
+  else
+    temp = realloc(c->printers, sizeof(printer_t *) * (c->num_printers + 1));
+
+  if (temp == NULL)
+  {
+    LogMessage(LOG_ERROR, "Unable to add printer %s to class %s!",
+               p->name, c->name);
+    return;
+  }
+
+ /*
+  * Add the printer to the end of the array and update the number of printers.
+  */
+
+  c->printers = temp;
+  temp        += c->num_printers;
+  c->num_printers ++;
+
+  *temp = p;
+
+ /*
+  * Update the printer type mask...
+  */
+
+  if (c->num_printers == 1)
+    c->type = p->type & ~CUPS_PRINTER_REMOTE;
+  else
+    c->type &= p->type;
+
+  c->type |= CUPS_PRINTER_CLASS;
+
+ /*
+  * Update the IPP attributes...
+  */
+
+  SetPrinterAttrs(c);
 }
 
+
+/*
+ * 'DeletePrinterFromClass()' - Delete a printer from a class.
+ */
+
+void
+DeletePrinterFromClass(printer_t *c,	/* I - Class to delete from */
+                       printer_t *p)	/* I - Printer to delete */
+{
+  int	i;				/* Looping var */
+
+
+ /*
+  * See if the printer is in the class...
+  */
+
+  for (i = 0; i < c->num_printers; i ++)
+    if (p == c->printers[i])
+      break;
+
+ /*
+  * If it is, remove it from the list...
+  */
+
+  if (i < c->num_printers)
+  {
+   /*
+    * Yes, remove the printer...
+    */
+
+    c->num_printers --;
+    if (i < c->num_printers)
+      memcpy(c->printers + i, c->printers + i + 1,
+             (c->num_printers - i) * sizeof(printer_t *));
+  }
+
+ /*
+  * If there are no more printers in this class, delete the class...
+  */
+
+  if (c->num_printers == 0)
+  {
+    DeletePrinter(c);
+    return;
+  }
+
+ /*
+  * Recompute the printer type mask...
+  */
+
+  c->type = ~CUPS_PRINTER_REMOTE;
+
+  for (i = 0; i < c->num_printers; i ++)
+    c->type &= c->printers[i]->type;
+
+  c->type |= CUPS_PRINTER_CLASS;
+
+ /*
+  * Update the IPP attributes...
+  */
+
+  SetPrinterAttrs(c);
+}
+
+
+/*
+ * 'DeletePrinterFromClasses()' - Delete a printer from all classes.
+ */
+
+void
+DeletePrinterFromClasses(printer_t *p)	/* I - Printer to delete */
+{
+  printer_t	*c;			/* Pointer to current class */
+
+
+ /*
+  * Loop through the printer/class list and remove the printer
+  * from each class listed...
+  */
+
+  for (c = Printers; c != NULL; c = c->next)
+    if (c->type & CUPS_PRINTER_CLASS)
+      DeletePrinterFromClass(c, p);
+}
+
+
+/*
+ * 'DeleteAllClasses()' - Remove all classes from the system.
+ */
 
 void
 DeleteAllClasses(void)
 {
+  printer_t	*c,	/* Pointer to current printer/class */
+		*next;	/* Pointer to next printer in list */
+
+
+  for (c = Printers; c != NULL; c = next)
+  {
+    next = c->next;
+
+    if (c->type & CUPS_PRINTER_CLASS)
+      DeletePrinter(c);
+  }
 }
 
 
-void
-DeleteClass(class_t *c)
+/*
+ * 'FindAvailablePrinter()' - Find an available printer in a class.
+ */
+
+printer_t *				/* O - Available printer or NULL */
+FindAvailablePrinter(char *name)	/* I - Class to check */
 {
-}
+  int		i;			/* Looping var */
+  printer_t	*c;			/* Printer class */
 
 
-printer_t *
-FindAvailablePrinter(char *name)
-{
+ /*
+  * Find the class...
+  */
+
+  if ((c = FindClass(name)) == NULL)
+    return (NULL);
+
+ /*
+  * Loop through the printers in the class and return the first idle
+  * printer... [MRS - might want to rotate amongst the available
+  * printers in a future incarnation]
+  */
+
+  for (i = 0; i < c->num_printers; i ++)
+    if (c->printers[i]->state == IPP_PRINTER_IDLE)
+      return (c->printers[i]);
+
   return (NULL);
 }
 
 
-class_t *
-FindClass(char *name)
+/*
+ * 'FindClass()' - Find the named class.
+ */
+
+printer_t *		/* O - Matching class or NULL */
+FindClass(char *name)	/* I - Name of class */
 {
+  printer_t	*c;	/* Current class/printer */
+
+
+  for (c = Printers; c != NULL; c = c->next)
+    switch (strcasecmp(name, c->name))
+    {
+      case 0 : /* name == c->name */
+          if (c->type & CUPS_PRINTER_CLASS)
+	    return (c);
+      case 1 : /* name > c->name */
+          break;
+      case -1 : /* name < c->name */
+          return (NULL);
+    }
+
   return (NULL);
 }
 
+
+/*
+ * 'LoadAllClasses()' - Load classes from the classes.conf file.
+ */
 
 void
 LoadAllClasses(void)
 {
+  FILE		*fp;			/* classes.conf file */
+  int		i;			/* Looping var */
+  int		linenum;		/* Current line number */
+  int		len;			/* Length of line */
+  char		line[HTTP_MAX_BUFFER],	/* Line from file */
+		name[256],		/* Parameter name */
+		*nameptr,		/* Pointer into name */
+		*value,			/* Pointer to value */
+		*lineptr;		/* Pointer in line */
+  printer_t	*p,			/* Current printer class */
+		*temp;			/* Temporary pointer to printer */
+
+
+ /*
+  * Open the printer.conf file...
+  */
+
+  sprintf(line, "%s/conf/classes.conf", ServerRoot);
+  if ((fp = fopen(line, "r")) == NULL)
+    return;
+
+ /*
+  * Read printer configurations until we hit EOF...
+  */
+
+  linenum = 0;
+  p       = NULL;
+
+  while (fgets(line, sizeof(line), fp) != NULL)
+  {
+    linenum ++;
+
+   /*
+    * Skip comment lines...
+    */
+
+    if (line[0] == '#')
+      continue;
+
+   /*
+    * Strip trailing newline, if any...
+    */
+
+    len = strlen(line);
+
+    if (line[len - 1] == '\n')
+    {
+      len --;
+      line[len] = '\0';
+    }
+
+   /*
+    * Extract the name from the beginning of the line...
+    */
+
+    for (value = line; isspace(*value); value ++);
+
+    for (nameptr = name; *value != '\0' && !isspace(*value);)
+      *nameptr++ = *value++;
+    *nameptr = '\0';
+
+    while (isspace(*value))
+      value ++;
+
+    if (name[0] == '\0')
+      continue;
+
+   /*
+    * Decode the directive...
+    */
+
+    if (strcmp(name, "<Class") == 0 ||
+        strcmp(name, "<DefaultClass") == 0)
+    {
+     /*
+      * <Class name> or <DefaultClass name>
+      */
+
+      if (line[len - 1] == '>' && p == NULL)
+      {
+        line[len - 1] = '\0';
+
+        p = AddClass(value);
+
+        if (strcmp(name, "<DefaultClass") == 0)
+	  DefaultPrinter = p;
+      }
+      else
+      {
+        LogMessage(LOG_ERROR, "Syntax error on line %d of classes.conf.",
+	           linenum);
+        return;
+      }
+    }
+    else if (strcmp(name, "</Class>") == 0)
+    {
+      if (p != NULL)
+      {
+        SetPrinterAttrs(p);
+        p = NULL;
+      }
+      else
+      {
+        LogMessage(LOG_ERROR, "Syntax error on line %d of classes.conf.",
+	           linenum);
+        return;
+      }
+    }
+    else if (p == NULL)
+    {
+      LogMessage(LOG_ERROR, "Syntax error on line %d of classes.conf.",
+	         linenum);
+      return;
+    }
+    
+    else if (strcmp(name, "Info") == 0)
+      strncpy(p->info, value, sizeof(p->info) - 1);
+    else if (strcmp(name, "MoreInfo") == 0)
+      strncpy(p->more_info, value, sizeof(p->more_info) - 1);
+    else if (strcmp(name, "Location") == 0)
+      strncpy(p->location, value, sizeof(p->location) - 1);
+    else if (strcmp(name, "Printer") == 0)
+    {
+      if ((temp = FindPrinter(value)) != NULL)
+        AddPrinterToClass(p, temp);
+      else
+	LogMessage(LOG_WARN, "Unknown printer %s on line %d of classes.conf.",
+	           value, linenum);
+    }
+    else if (strcmp(name, "State") == 0)
+    {
+     /*
+      * Set the initial queue state...
+      */
+
+      if (strcasecmp(value, "idle") == 0)
+        p->state = IPP_PRINTER_IDLE;
+      else if (strcasecmp(value, "stopped") == 0)
+        p->state = IPP_PRINTER_STOPPED;
+    }
+  }
+
+  fclose(fp);
 }
 
+
+/*
+ * 'SaveAllClasses()' - Save classes to the classes.conf file.
+ */
 
 void
 SaveAllClasses(void)
@@ -86,5 +446,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.3 1999/01/24 14:25:11 mike Exp $".
+ * End of "$Id: classes.c,v 1.4 1999/05/13 20:41:10 mike Exp $".
  */

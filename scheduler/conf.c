@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.17 1999/05/10 21:35:41 mike Exp $"
+ * "$Id: conf.c,v 1.18 1999/05/13 20:41:11 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -189,6 +189,8 @@ ReadConfiguration(void)
   NumBrowsers      = 0;
 
   NumListeners     = 0;
+
+  DefaultPrinter   = NULL;
 
   DeleteAllPrinters();
 
@@ -1060,5 +1062,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.17 1999/05/10 21:35:41 mike Exp $".
+ * End of "$Id: conf.c,v 1.18 1999/05/13 20:41:11 mike Exp $".
  */
