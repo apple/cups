@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.h,v 1.5.2.2 2003/01/07 18:26:19 mike Exp $"
+ * "$Id: ipp-var.h,v 1.5.2.3 2003/03/21 17:09:51 mike Exp $"
  *
  *   IPP variable definitions for the Common UNIX Printing System (CUPS).
  *
@@ -26,7 +26,6 @@
  * Include necessary headers...
  */
 
-#include <ctype.h>
 #include <cups/cups.h>
 #include <cups/debug.h>
 #include <cups/language.h>
@@ -47,9 +46,9 @@
 
 extern char	*ippGetTemplateDir(void);
 extern void	ippSetServerVersion(void);
-extern void	ippSetCGIVars(ipp_t *, const char *, const char *);
+extern void	ippSetCGIVars(ipp_t *, const char *, const char *, const char *);
 
 
 /*
- * End of "$Id: ipp-var.h,v 1.5.2.2 2003/01/07 18:26:19 mike Exp $".
+ * End of "$Id: ipp-var.h,v 1.5.2.3 2003/03/21 17:09:51 mike Exp $".
  */

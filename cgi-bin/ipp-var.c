@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.23.2.8 2003/03/14 21:43:29 mike Exp $"
+ * "$Id: ipp-var.c,v 1.23.2.9 2003/03/21 17:09:50 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -86,13 +86,15 @@ ippSetServerVersion(void)
 void
 ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
               const char *filter_name,	/* I - Filter name */
-	      const char *filter_value)	/* I - Filter value */
+	      const char *filter_value,	/* I - Filter value */
+	      const char *prefix)	/* I - Prefix for name or NULL */
 {
   int			element;	/* Element in CGI array */
   ipp_attribute_t	*attr,		/* Attribute in response... */
 			*filter;	/* Filtering attribute */
   int			i;		/* Looping var */
   char			name[1024],	/* Name of attribute */
+			*nameptr,	/* Pointer into name */
 			value[16384],	/* Value(s) */
 			*valptr;	/* Pointer into value */
   char			method[HTTP_MAX_URI],
@@ -175,13 +177,21 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
       if (attr->name == NULL)
         continue;
 
-      for (i = 0; attr->name[i]; i ++)
-        if (attr->name[i] == '-')
-	  name[i] = '_';
-	else
-          name[i] = attr->name[i];
+      if (prefix)
+      {
+        snprintf(name, sizeof(name), "%s.", prefix);
+	nameptr = name + strlen(name);
+      }
+      else
+        nameptr = name;
 
-      name[i] = '\0';
+      for (i = 0; attr->name[i] && nameptr < (name + sizeof(name) - 1); i ++)
+        if (attr->name[i] == '-')
+	  *nameptr++ = '_';
+	else
+          *nameptr++ = attr->name[i];
+
+      *nameptr = '\0';
 
      /*
       * Add "job_printer_name" variable if we have a "job_printer_uri"
@@ -303,6 +313,11 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 	              sizeof(value) - (valptr - value));
 	      break;
 
+          case IPP_TAG_BEGIN_COLLECTION :
+              ippSetCGIVars(attr->values[i].collection, filter_name,
+	                    filter_value, name);
+              break;
+
           default :
 	      break; /* anti-compiler-warning-code */
 	}
@@ -312,7 +327,8 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
       * Add the element...
       */
 
-      cgiSetArray(name, element, value);
+      if (attr->value_tag != IPP_TAG_BEGIN_COLLECTION)
+        cgiSetArray(name, element, value);
 
 /*      fprintf(stderr, "DEBUG: %s[%d]=\"%s\"\n", name, element, value);*/
     }
@@ -324,5 +340,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.23.2.8 2003/03/14 21:43:29 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.23.2.9 2003/03/21 17:09:50 mike Exp $".
  */

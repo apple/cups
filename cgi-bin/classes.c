@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.18.2.6 2003/01/07 18:26:19 mike Exp $"
+ * "$Id: classes.c,v 1.18.2.7 2003/03/21 17:09:50 mike Exp $"
  *
  *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -202,13 +202,16 @@ main(int  argc,			/* I - Number of command-line arguments */
                    uri);
     }
 
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+        	 "requested-attributes", NULL, "all");
+
    /*
     * Do the request and get back a response...
     */
 
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
-      ippSetCGIVars(response, NULL, NULL);
+      ippSetCGIVars(response, NULL, NULL, NULL);
       ippDelete(response);
     }
 
@@ -259,7 +262,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       if ((response = cupsDoRequest(http, request, "/")) != NULL)
       {
-	ippSetCGIVars(response, NULL, NULL);
+	ippSetCGIVars(response, NULL, NULL, NULL);
 	ippDelete(response);
 
 	cgiCopyTemplateLang(stdout, TEMPLATES, "jobs.tmpl", getenv("LANG"));
@@ -320,7 +323,7 @@ main(int  argc,			/* I - Number of command-line arguments */
                                       CUPS_DATADIR "/data/testprint.ps")) != NULL)
     {
       status = response->request.status.status_code;
-      ippSetCGIVars(response, NULL, NULL);
+      ippSetCGIVars(response, NULL, NULL, NULL);
 
       ippDelete(response);
     }
@@ -356,5 +359,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: classes.c,v 1.18.2.6 2003/01/07 18:26:19 mike Exp $".
+ * End of "$Id: classes.c,v 1.18.2.7 2003/03/21 17:09:50 mike Exp $".
  */
