@@ -1,8 +1,10 @@
-CHANGES.txt - 11/19/2003
+CHANGES.txt - 11/21/2003
 ------------------------
 
 CHANGES IN CUPS V1.1.20
 
+	- The French web interface localization did not use
+	  absolute paths for the navigation bar (STR #428)
 	- The CUPS test suite did not undefine the PRINTER and
 	  LPDEST environment variables. This could lead to bogus
 	  test results (STR #380)
