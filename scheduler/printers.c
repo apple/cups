@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.103 2001/07/24 14:00:07 mike Exp $"
+ * "$Id: printers.c,v 1.104 2001/09/17 20:03:26 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -779,12 +779,9 @@ SaveAllPrinters(void)
     fprintf(fp, "JobSheets %s %s\n", printer->job_sheets[0],
             printer->job_sheets[1]);
 
-    if (printer->quota_period)
-    {
-      fprintf(fp, "QuotaPeriod %d\n", printer->quota_period);
-      fprintf(fp, "PageLimit %d\n", printer->page_limit);
-      fprintf(fp, "KLimit %d\n", printer->k_limit);
-    }
+    fprintf(fp, "QuotaPeriod %d\n", printer->quota_period);
+    fprintf(fp, "PageLimit %d\n", printer->page_limit);
+    fprintf(fp, "KLimit %d\n", printer->k_limit);
 
     for (i = 0; i < printer->num_users; i ++)
       fprintf(fp, "%sUser %s\n", printer->deny_users ? "Deny" : "Allow",
@@ -1807,5 +1804,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.103 2001/07/24 14:00:07 mike Exp $".
+ * End of "$Id: printers.c,v 1.104 2001/09/17 20:03:26 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.38 2001/07/23 21:17:48 mike Exp $"
+ * "$Id: classes.c,v 1.39 2001/09/17 20:03:26 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -678,12 +678,9 @@ SaveAllClasses(void)
     for (i = 0; i < pclass->num_printers; i ++)
       fprintf(fp, "Printer %s\n", pclass->printers[i]->name);
 
-    if (pclass->quota_period)
-    {
-      fprintf(fp, "QuotaPeriod %d\n", pclass->quota_period);
-      fprintf(fp, "PageLimit %d\n", pclass->page_limit);
-      fprintf(fp, "KLimit %d\n", pclass->k_limit);
-    }
+    fprintf(fp, "QuotaPeriod %d\n", pclass->quota_period);
+    fprintf(fp, "PageLimit %d\n", pclass->page_limit);
+    fprintf(fp, "KLimit %d\n", pclass->k_limit);
 
     for (i = 0; i < pclass->num_users; i ++)
       fprintf(fp, "%sUser %s\n", pclass->deny_users ? "Deny" : "Allow",
@@ -697,5 +694,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.38 2001/07/23 21:17:48 mike Exp $".
+ * End of "$Id: classes.c,v 1.39 2001/09/17 20:03:26 mike Exp $".
  */
