@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.37 2003/04/10 12:57:40 mike Exp $"
+ * "$Id: socket.c,v 1.38 2003/08/30 23:12:10 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -313,6 +313,9 @@ main(int  argc,			/* I - Number of command-line arguments (6 or 7) */
 	bufptr += wbytes;
       }
 
+      if (wbytes < 0)
+        break;
+
      /*
       * Check for possible data coming back from the printer...
       */
@@ -443,5 +446,5 @@ print_backchannel(const unsigned char *buffer,	/* I - Data buffer */
 
 
 /*
- * End of "$Id: socket.c,v 1.37 2003/04/10 12:57:40 mike Exp $".
+ * End of "$Id: socket.c,v 1.38 2003/08/30 23:12:10 mike Exp $".
  */

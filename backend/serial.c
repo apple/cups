@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.50 2002/12/17 18:56:34 swdev Exp $"
+ * "$Id: serial.c,v 1.51 2003/08/30 23:12:10 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -508,6 +508,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	bufptr += wbytes;
       }
 
+      if (wbytes < 0)
+        break;
+
       if (argc > 6)
 	fprintf(stderr, "INFO: Sending print file, %lu bytes...\n",
 	        (unsigned long)tbytes);
@@ -987,5 +990,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.50 2002/12/17 18:56:34 swdev Exp $".
+ * End of "$Id: serial.c,v 1.51 2003/08/30 23:12:10 mike Exp $".
  */

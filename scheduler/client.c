@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.169 2003/08/01 20:00:52 mike Exp $"
+ * "$Id: client.c,v 1.170 2003/08/30 23:12:10 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1498,6 +1498,20 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
 	      break;
             }
+	    else if (atoi(con->http.fields[HTTP_FIELD_CONTENT_LENGTH]) < 0)
+	    {
+	     /*
+	      * Negative content lengths are invalid!
+	      */
+
+              if (!SendError(con, HTTP_BAD_REQUEST))
+	      {
+		CloseClient(con);
+		return (0);
+	      }
+
+	      break;
+	    }
 
            /*
 	    * Open a temporary file to hold the request...
@@ -3329,5 +3343,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.169 2003/08/01 20:00:52 mike Exp $".
+ * End of "$Id: client.c,v 1.170 2003/08/30 23:12:10 mike Exp $".
  */
