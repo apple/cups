@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.13
 
+	- The serial backend didn't drain the output queue, nor
+	  did it restore the original settings.
 	- Updated the default system group under MacOS X.
 	- If no SystemGroup was defined in cupsd.conf, the
 	  system default group was not used.
