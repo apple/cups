@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.36 2004/10/08 20:27:12 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.37 2004/11/18 15:02:03 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -820,13 +820,13 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     else if ((job_id_attr = ippFindAttribute(response, "job-id",
                                              IPP_TAG_INTEGER)) == NULL)
     {
-      fputs("INFO: Print file accepted - job ID unknown.\n", stderr);
+      fputs("NOTICE: Print file accepted - job ID unknown.\n", stderr);
       job_id = 0;
     }
     else
     {
       job_id = job_id_attr->values[0].integer;
-      fprintf(stderr, "INFO: Print file accepted - job ID %d.\n", job_id);
+      fprintf(stderr, "NOTICE: Print file accepted - job ID %d.\n", job_id);
     }
 
     if (response)
@@ -1379,5 +1379,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.36 2004/10/08 20:27:12 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.37 2004/11/18 15:02:03 mike Exp $".
  */

@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.22
 
+	- The lpstat man page incorrectly listed the "-s" option
+	  as using the equivalent of the "-p" option to list the
+	  printers; it uses the "-v" option to list the printers
+	  (STR #986)
 	- Now allow 0-length reads in the CUPS file API (STR
 	  #985)
 	- cupsDoFileRequest() now sets cupsLastError() to
