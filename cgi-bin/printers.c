@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.21.2.3 2002/03/22 15:47:18 mike Exp $"
+ * "$Id: printers.c,v 1.21.2.4 2002/04/08 16:28:59 mike Exp $"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -87,7 +87,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   ippSetServerVersion();
 
   printer = argv[0];
-  if (strcmp(printer, "/") == 0 || strcmp(printer, "printers.cgi") == 0)
+  if (strcmp(printer, "/") == 0 || strstr(printer, "printers.cgi") != NULL)
   {
     printer = NULL;
     cgiSetVariable("TITLE", cupsLangString(language, CUPS_MSG_PRINTER));
@@ -356,5 +356,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: printers.c,v 1.21.2.3 2002/03/22 15:47:18 mike Exp $".
+ * End of "$Id: printers.c,v 1.21.2.4 2002/04/08 16:28:59 mike Exp $".
  */
