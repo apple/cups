@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.61 2001/05/31 11:48:28 mike Exp $"
+ * "$Id: pstops.c,v 1.62 2001/06/06 14:54:59 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -93,6 +93,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		number;		/* Page number */
   int		slowcollate;	/* 1 if we need to collate manually */
   int		sloworder;	/* 1 if we need to order manually */
+  int		slowduplex;	/* 1 if we need an even number of pages */
   char		line[8192];	/* Line buffer */
   float		g;		/* Gamma correction value */
   float		b;		/* Brightness factor */
@@ -101,6 +102,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 		tbytes;		/* Total bytes to read for binary data */
   int		page;		/* Current page sequence number */
   int		page_count;	/* Page count for NUp */
+  int		basepage;	/* Base page number */
   int		subpage;	/* Sub-page number */
   int		copy;		/* Current copy */
   int		saweof;		/* Did we see a %%EOF tag? */
@@ -196,6 +198,22 @@ main(int  argc,			/* I - Number of command-line arguments */
  /*
   * See if we have to filter the fast or slow way...
   */
+
+  if (ppd && ppd->manual_copies && Duplex && Copies > 1)
+  {
+   /*
+    * Force collated copies when printing a duplexed document to
+    * a non-PS printer that doesn't do hardware copy generation.
+    * Otherwise the copies will end up on the front/back side of
+    * each page.  Also, set the "slowduplex" option to make sure
+    * that we output an even number of pages...
+    */
+
+    Collate    = 1;
+    slowduplex = 1;
+  }
+  else
+    slowduplex = 0;
 
   if (ppdFindOption(ppd, "Collate") == NULL && Collate && Copies > 1)
     slowcollate = 1;
@@ -479,6 +497,24 @@ main(int  argc,			/* I - Number of command-line arguments */
 	start_nup(NUp - 1);
         end_nup(NUp - 1);
       }
+
+      if (slowduplex && !(page & 1))
+      {
+       /*
+        * Make sure we have an even number of pages...
+	*/
+
+	if (ppd == NULL || ppd->num_filters == 0)
+	  fprintf(stderr, "PAGE: %d %d\n", page, Copies);
+
+        printf("%%%%Page: %d %d\n", page, page);
+	page ++;
+	ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
+
+	start_nup(NUp - 1);
+	puts("showpage");
+        end_nup(NUp - 1);
+      }
     }
 
     if (slowcollate || sloworder)
@@ -515,6 +551,24 @@ main(int  argc,			/* I - Number of command-line arguments */
             end_nup(NUp - 1);
 	  }
 
+	  if (slowduplex && !(page & 1))
+	  {
+	   /*
+            * Make sure we have an even number of pages...
+	    */
+
+	    if (ppd == NULL || ppd->num_filters == 0)
+	      fprintf(stderr, "PAGE: %d 1\n", page);
+
+            printf("%%%%Page: %d %d\n", page, page);
+	    page ++;
+	    ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
+
+	    start_nup(NUp - 1);
+	    puts("showpage");
+            end_nup(NUp - 1);
+	  }
+
 	  Copies --;
 	}
       }
@@ -522,24 +576,44 @@ main(int  argc,			/* I - Number of command-line arguments */
       {
         page_count = (NumPages + NUp - 1) / NUp;
 	copy       = 0;
+	page       = 1;
 
         do
 	{
-	  for (page = page_count - 1; page >= 0; page --)
+	  if (slowduplex && (page_count & 1))
+	  {
+	   /*
+            * Make sure we have an even number of pages...
+	    */
+
+	    if (ppd == NULL || ppd->num_filters == 0)
+	      fprintf(stderr, "PAGE: %d %d\n", page, slowcollate ? 1 : Copies);
+
+            printf("%%%%Page: %d %d\n", page, page);
+	    page ++;
+	    ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
+
+	    start_nup(NUp - 1);
+	    puts("showpage");
+            end_nup(NUp - 1);
+
+            basepage = page_count - 2;
+	  }
+	  else
+	    basepage = page_count - 1;
+
+	  for (; basepage >= 0; basepage -= 1 + slowduplex)
 	  {
 	    if (ppd == NULL || ppd->num_filters == 0)
-	      fprintf(stderr, "PAGE: %d %d\n", page + 1,
+	      fprintf(stderr, "PAGE: %d %d\n", page,
 	              slowcollate ? 1 : Copies);
 
-            if (slowcollate)
-              printf("%%%%Page: %d %d\n", page + 1,
-	             page_count - page + copy * page_count);
-            else
-	      printf("%%%%Page: %d %d\n", page + 1, page_count - page);
+            printf("%%%%Page: %d %d\n", page, page);
+	    page ++;
 
 	    ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
 
-	    for (subpage = 0, number = page * NUp;
+	    for (subpage = 0, number = basepage * NUp;
 	         subpage < NUp && number < NumPages;
 		 subpage ++, number ++)
 	    {
@@ -554,6 +628,34 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      start_nup(NUp - 1);
               end_nup(NUp - 1);
 	    }
+
+            if (slowduplex)
+	    {
+	      if (ppd == NULL || ppd->num_filters == 0)
+		fprintf(stderr, "PAGE: %d %d\n", page,
+	        	slowcollate ? 1 : Copies);
+
+              printf("%%%%Page: %d %d\n", page, page);
+	      page ++;
+
+	      ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
+
+	      for (subpage = 0, number = (basepage + 1) * NUp;
+	           subpage < NUp && number < NumPages;
+		   subpage ++, number ++)
+	      {
+		start_nup(number);
+		fseek(temp, Pages[number], SEEK_SET);
+		copy_bytes(temp, Pages[number + 1] - Pages[number]);
+		end_nup(number);
+	      }
+
+              if (number & (NUp - 1))
+	      {
+		start_nup(NUp - 1);
+        	end_nup(NUp - 1);
+	      }
+            }
 	  }
 
 	  copy ++;
@@ -993,5 +1095,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.61 2001/05/31 11:48:28 mike Exp $".
+ * End of "$Id: pstops.c,v 1.62 2001/06/06 14:54:59 mike Exp $".
  */
