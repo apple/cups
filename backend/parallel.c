@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c,v 1.36 2002/02/12 19:05:36 mike Exp $"
+ * "$Id: parallel.c,v 1.37 2002/02/12 19:31:39 mike Exp $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -331,7 +331,16 @@ list_devices(void)
 	  strcpy(basedevice, "/dev/par");
 	}
 	else
-	  strcpy(basedevice, "/dev/unknown-parallel");
+	{
+	  sprintf(device, "/dev/printers/%d", i);
+	  if ((fd = open(device, O_WRONLY)) >= 0)
+	  {
+	    close(fd);
+	    strcpy(basedevice, "/dev/printers/");
+	  }
+	  else
+	    strcpy(basedevice, "/dev/unknown-parallel");
+	}
       }
     }
 
@@ -640,5 +649,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c,v 1.36 2002/02/12 19:05:36 mike Exp $".
+ * End of "$Id: parallel.c,v 1.37 2002/02/12 19:31:39 mike Exp $".
  */
