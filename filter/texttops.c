@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.4 1998/08/10 17:14:06 mike Exp $"
+ * "$Id: texttops.c,v 1.5 1998/08/14 19:07:45 mike Exp $"
  *
  *   PostScript text output filter for espPrint, a collection of printer
  *   drivers.
@@ -17,7 +17,11 @@
  * Revision History:
  *
  *   $Log: texttops.c,v $
- *   Revision 1.4  1998/08/10 17:14:06  mike
+ *   Revision 1.5  1998/08/14 19:07:45  mike
+ *   Fixed bug in multi-column output - second (& third) column were being
+ *   positioned off the page.
+ *
+ *   Revision 1.4  1998/08/10  17:14:06  mike
  *   Added wrap/nowrap option.
  *
  *   Revision 1.3  1998/07/28  17:42:01  mike
@@ -247,11 +251,13 @@ Setup(FILE  *out,
 
   fprintf(out, "/S { setfont /y exch %f mul %f sub neg def %f mul %f add exch %f mul add /x exch def "
                "x y moveto show } bind def\n",
-          fontsize, length - top - fontsize, 72.0 / CharsPerInch, left, width);
+          fontsize, length - top - fontsize, 72.0 / CharsPerInch, left,
+	  left + 72.0 * SizeColumns / CharsPerInch);
 
   fprintf(out, "/U { setfont /y exch %f mul %f sub neg def %f mul %f add exch %f mul add /x exch def "
                "x y moveto dup show x y moveto stringwidth rlineto } bind def\n",
-          fontsize, length - top - fontsize, 72.0 / CharsPerInch, left, width);
+          fontsize, length - top - fontsize, 72.0 / CharsPerInch, left,
+	  left + 72.0 * SizeColumns / CharsPerInch);
 
   fputs("%%EndProlog\n", out);
 
@@ -764,5 +770,5 @@ main(int  argc,    /* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: texttops.c,v 1.4 1998/08/10 17:14:06 mike Exp $".
+ * End of "$Id: texttops.c,v 1.5 1998/08/14 19:07:45 mike Exp $".
  */
