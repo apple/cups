@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.4 2001/12/29 00:28:15 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.5 2001/12/29 00:32:28 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -1668,6 +1668,13 @@ read_location(FILE *fp,		/* I - Configuration file */
       {
         loc->level = AUTH_GROUP;
 
+       /*
+        * Use the default system group if none is defined so far...
+	*/
+
+        if (NumSystemGroups == 0)
+	  NumSystemGroups = 1;
+
 	for (i = 0; i < NumSystemGroups; i ++)
 	  AddName(loc, SystemGroups[i]);
       }
@@ -1995,5 +2002,5 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.4 2001/12/29 00:28:15 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.5 2001/12/29 00:32:28 mike Exp $".
  */
