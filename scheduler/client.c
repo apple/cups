@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.71 2003/09/15 20:11:08 mike Exp $"
+ * "$Id: client.c,v 1.91.2.72 2003/09/17 19:24:09 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2714,18 +2714,15 @@ decode_auth(client_t *con)		/* I - Client to decode to */
 }
 
 
-/*
- * 'get_file()' - Get a filename and state info.
- */
-
-static char *			/* O  - Real filename */
-get_file(client_t    *con,	/* I  - Client connection */
-         struct stat *filestats,/* O  - File information */
-         char        *filename,	/* IO - Filename buffer */
-         int         len)	/* I  - Buffer length */
+static char *				/* O  - Real filename */
+get_file(client_t    *con,		/* I  - Client connection */
+         struct stat *filestats,	/* O  - File information */
+         char        *filename,		/* IO - Filename buffer */
+         int         len)		/* I  - Buffer length */
 {
-  int		status;		/* Status of filesystem calls */
-  char		*params;	/* Pointer to parameters in URI */
+  int		status;			/* Status of filesystem calls */
+  char		*ptr;			/* Pointer info filename */
+  int		plen;			/* Remaining length after pointer */
 
 
  /*
@@ -2742,8 +2739,8 @@ get_file(client_t    *con,	/* I  - Client connection */
   else
     snprintf(filename, len, "%s%s", DocumentRoot, con->uri);
 
-  if ((params = strchr(filename, '?')) != NULL)
-    *params = '\0';
+  if ((ptr = strchr(filename, '?')) != NULL)
+    *ptr = '\0';
 
  /*
   * Grab the status for this language; if there isn't a language-specific file
@@ -2761,6 +2758,9 @@ get_file(client_t    *con,	/* I  - Client connection */
     {
       snprintf(filename, len, "%s%s", DocumentRoot, con->uri);
 
+      if ((ptr = strchr(filename, '?')) != NULL)
+	*ptr = '\0';
+
       status = stat(filename, filestats);
     }
   }
@@ -2771,12 +2771,52 @@ get_file(client_t    *con,	/* I  - Client connection */
 
   if (!status && S_ISDIR(filestats->st_mode))
   {
-    if (filename[strlen(filename) - 1] == '/')
-      strlcat(filename, "index.html", len);
-    else
-      strlcat(filename, "/index.html", len);
+    if (filename[strlen(filename) - 1] != '/')
+      strlcat(filename, "/", len);
 
+    ptr  = filename + strlen(filename);
+    plen = len - (ptr - filename);
+
+    strlcpy(ptr, "index.html", plen);
     status = stat(filename, filestats);
+
+#ifdef HAVE_JAVA
+    if (status)
+    {
+      strlcpy(ptr, "index.class", plen);
+      status = stat(filename, filestats);
+    }
+#endif /* HAVE_JAVA */
+
+#ifdef HAVE_PERL
+    if (status)
+    {
+      strlcpy(ptr, "index.pl", plen);
+      status = stat(filename, filestats);
+    }
+#endif /* HAVE_PERL */
+
+#ifdef HAVE_PHP
+    if (status)
+    {
+      strlcpy(ptr, "index.php", plen);
+      status = stat(filename, filestats);
+    }
+#endif /* HAVE_PHP */
+
+#ifdef HAVE_PYTHON
+    if (status)
+    {
+      strlcpy(ptr, "index.pyc", plen);
+      status = stat(filename, filestats);
+    }
+
+    if (status)
+    {
+      strlcpy(ptr, "index.py", plen);
+      status = stat(filename, filestats);
+    }
+#endif /* HAVE_PYTHON */
   }
 
   LogMessage(L_DEBUG2, "get_file() %d filename=%s size=%d",
@@ -3455,5 +3495,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.71 2003/09/15 20:11:08 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.72 2003/09/17 19:24:09 mike Exp $".
  */

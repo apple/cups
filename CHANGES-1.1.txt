@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc2
 
+	- The scheduler didn't support scripted index files
+	  (index.php, index.pl, etc. - STR #290)
+	- The scheduler did not correctly localize script files
+	  with "GET" variables (STR #268)
 	- Changes in job classification are now logged (STR
 	  #289)
 	- Fixed a few more SLP-related bugs (STR #259)
