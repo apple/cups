@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.54 2000/09/14 15:36:25 mike Exp $"
+dnl "$Id: configure.in,v 1.55 2000/09/14 18:04:09 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -154,7 +154,9 @@ LIBMALLOC=""
 AC_CHECK_LIB(c,mallinfo,LIBS="$LIBS",LIBS="$LIBS")
 if test "$ac_cv_lib_c_mallinfo" = "no"; then
 	AC_CHECK_LIB(malloc,mallinfo,
-	             LIBS="$LIBS";LIBMALLOC="-lmalloc",
+	             LIBS="$LIBS"
+		     LIBMALLOC="-lmalloc"
+		     AC_DEFINE(HAVE_LIBMALLOC),
 		     LIBS="$LIBS")
 fi
 AC_SUBST(LIBMALLOC)
@@ -553,5 +555,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.54 2000/09/14 15:36:25 mike Exp $".
+dnl End of "$Id: configure.in,v 1.55 2000/09/14 18:04:09 mike Exp $".
 dnl
