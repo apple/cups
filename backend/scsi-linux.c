@@ -1,9 +1,9 @@
 /*
- * "$Id: scsi-linux.c,v 1.1.2.1 2002/05/27 14:47:11 mike Exp $"
+ * "$Id: scsi-linux.c,v 1.1.2.2 2004/05/13 15:13:52 mike Exp $"
  *
  *   Linux SCSI printer support for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2002 by Easy Software Products, all rights reserved.
+ *   Copyright 2003-2004 by Easy Software Products, all rights reserved.
  *
  *   Redistribution and use in source and binary forms, with or
  *   without modification, are permitted provided that the
@@ -210,5 +210,5 @@ print_device(const char *resource,	/* I - SCSI device */
 
 
 /*
- * End of "$Id: scsi-linux.c,v 1.1.2.1 2002/05/27 14:47:11 mike Exp $".
+ * End of "$Id: scsi-linux.c,v 1.1.2.2 2004/05/13 15:13:52 mike Exp $".
  */

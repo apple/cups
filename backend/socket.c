@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.17.2.16 2003/10/09 19:13:48 mike Exp $"
+ * "$Id: socket.c,v 1.17.2.17 2004/05/13 15:13:52 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -180,6 +180,8 @@ main(int  argc,			/* I - Number of command-line arguments (6 or 7) */
   addr.sin_family = hostaddr->h_addrtype;
   addr.sin_port   = htons(port);
 
+  wbytes = 0;
+
   while (copies > 0)
   {
     for (delay = 5;;)
@@ -352,12 +354,10 @@ main(int  argc,			/* I - Number of command-line arguments (6 or 7) */
   if (fp != 0)
     close(fp);
 
-  fputs("INFO: Ready to print.\n", stderr);
-
-  return (0);
+  return (wbytes < 0);
 }
 
 
 /*
- * End of "$Id: socket.c,v 1.17.2.16 2003/10/09 19:13:48 mike Exp $".
+ * End of "$Id: socket.c,v 1.17.2.17 2004/05/13 15:13:52 mike Exp $".
  */

@@ -3,6 +3,17 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The parallel, serial, socket, and USB backends did not
+	  return a non-zero exit status when a job failed to
+	  print in the middle of sending it (STR #715)
+	- Location directives in the cupsd.conf file were
+	  case-sensitive for printer and class names, so
+	  queue-specific access control was not reliable (STR
+	  #700)
+	- cupsDoFileRequest() did not handle HTTP continue
+	  status messages in all cases, causing sporatic
+	  problems with IPP printers from some vendors (STR
+	  #716)
 	- The rastertodymo driver now supports the Zebra ZPL
 	  language (STR #713)
 	- The test suite no longer generates a printcap file,

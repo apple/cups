@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.29 2003/10/09 19:13:47 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.30 2004/05/13 15:13:52 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -99,7 +99,11 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   char		method[255],	/* Method in URI */
 		hostname[1024],	/* Hostname */
 		username[255],	/* Username info */
-		resource[1024];	/* Resource info (printer name) */
+		resource[1024],	/* Resource info (printer name) */
+		*optptr,	/* Pointer to URI options */
+		name[255],	/* Name of option */
+		value[255],	/* Value of option */
+		*ptr;		/* Pointer into name or value */
   char		*filename;	/* File to print */
   int		port;		/* Port number (not used) */
   char		uri[HTTP_MAX_URI];/* Updated URI without user/pass */
@@ -108,6 +112,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   ipp_t		*request,	/* IPP request */
 		*response,	/* IPP response */
 		*supported;	/* get-printer-attributes response */
+  int		waitjob,	/* Wait for job complete? */
+		waitprinter;	/* Wait for printer ready? */
   ipp_attribute_t *job_id_attr;	/* job-id attribute */
   int		job_id;		/* job-id value */
   ipp_attribute_t *job_sheets;	/* job-media-sheets-completed attribute */
@@ -251,6 +257,112 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   httpSeparate(argv[0], method, username, hostname, &port, resource);
 
  /*
+  * See if there are any options...
+  */
+
+  waitjob     = 1;
+  waitprinter = 1;
+
+  if ((optptr = strchr(resource, '?')) != NULL)
+  {
+   /*
+    * Yup, terminate the device name string and move to the first
+    * character of the optptr...
+    */
+
+    *optptr++ = '\0';
+
+   /*
+    * Then parse the optptr...
+    */
+
+    while (*optptr)
+    {
+     /*
+      * Get the name...
+      */
+
+      for (ptr = name; *optptr && *optptr != '=';)
+        if (ptr < (name + sizeof(name) - 1))
+          *ptr++ = *optptr++;
+      *ptr = '\0';
+
+      if (*optptr == '=')
+      {
+       /*
+        * Get the value...
+	*/
+
+        optptr ++;
+
+	for (ptr = value; *optptr && *optptr != '+';)
+          if (ptr < (value + sizeof(value) - 1))
+            *ptr++ = *optptr++;
+	*ptr = '\0';
+
+	if (*optptr == '+')
+	  optptr ++;
+      }
+      else
+        value[0] = '\0';
+
+     /*
+      * Process the option...
+      */
+
+      if (!strcasecmp(name, "waitjob"))
+      {
+       /*
+        * Wait for job completion?
+	*/
+
+        waitjob = !strcasecmp(value, "on") ||
+	          !strcasecmp(value, "yes") ||
+	          !strcasecmp(value, "true");
+      }
+      else if (!strcasecmp(name, "waitprinter"))
+      {
+       /*
+        * Wait for printer idle?
+	*/
+
+        waitprinter = !strcasecmp(value, "on") ||
+	              !strcasecmp(value, "yes") ||
+	              !strcasecmp(value, "true");
+      }
+      else if (!strcasecmp(name, "encryption"))
+      {
+       /*
+        * Enable/disable encryption?
+	*/
+
+        if (!strcasecmp(value, "always"))
+	  cupsSetEncryption(HTTP_ENCRYPT_ALWAYS);
+        else if (!strcasecmp(value, "required"))
+	  cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
+        else if (!strcasecmp(value, "never"))
+	  cupsSetEncryption(HTTP_ENCRYPT_NEVER);
+        else if (!strcasecmp(value, "ifrequested"))
+	  cupsSetEncryption(HTTP_ENCRYPT_IF_REQUESTED);
+	else
+	{
+	  fprintf(stderr, "ERROR: Unknown encryption option value \"%s\"!\n",
+	          value);
+        }
+      }
+      else
+      {
+       /*
+        * Unknown option...
+	*/
+
+	fprintf(stderr, "ERROR: Unknown option \"%s\" with value \"%s\"!\n",
+	        name, value);
+      }
+    }
+  }
+
+ /*
   * Set the authentication info, if any...
   */
 
@@ -283,7 +395,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	* available printer in the class.
 	*/
 
-        fprintf(stderr, "INFO: Unable to queue job on %s, queuing on next printer in class...\n",
+        fprintf(stderr, "INFO: Unable to connect to %s, queuing on next printer in class...\n",
 	        hostname);
 
         if (argc == 6 || strcmp(filename, argv[6]))
@@ -463,7 +575,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
                                 	 IPP_TAG_BOOLEAN);
 
     if (printer_state == NULL ||
-	printer_state->values[0].integer > IPP_PRINTER_PROCESSING ||
+	(printer_state->values[0].integer > IPP_PRINTER_PROCESSING && waitprinter) ||
 	printer_accepting == NULL ||
 	!printer_accepting->values[0].boolean)
     {
@@ -569,8 +681,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     fprintf(stderr, "DEBUG: printer-uri = \"%s\"\n", uri);
 
     if (argv[2][0])
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-        	   NULL, argv[2]);
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                   "requesting-user-name", NULL, argv[2]);
 
     fprintf(stderr, "DEBUG: requesting-user-name = \"%s\"\n", argv[2]);
 
@@ -708,7 +820,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     * Wait for the job to complete...
     */
 
-    if (!job_id)
+    if (!job_id || !waitjob)
       continue;
 
     fputs("INFO: Waiting for job to complete...\n", stderr);
@@ -738,8 +850,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
         	    job_id);
 
       if (argv[2][0])
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-        	     NULL, argv[2]);
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+	             "requesting-user-name", NULL, argv[2]);
 
       ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                     "requested-attributes", sizeof(jattrs) / sizeof(jattrs[0]),
@@ -879,9 +991,6 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
  /*
   * Return the queue status...
   */
-
-  if (ipp_status <= IPP_OK_CONFLICT && reasons == 0)
-    fputs("INFO: Ready to print.\n", stderr);
 
   return (ipp_status > IPP_OK_CONFLICT);
 }
@@ -1207,5 +1316,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.29 2003/10/09 19:13:47 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.30 2004/05/13 15:13:52 mike Exp $".
  */

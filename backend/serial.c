@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.32.2.16 2003/09/17 19:26:32 mike Exp $"
+ * "$Id: serial.c,v 1.32.2.17 2004/05/13 15:13:52 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -251,7 +251,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       */
 
       for (ptr = name; *options && *options != '=';)
-        *ptr++ = *options++;
+        if (ptr < (name + sizeof(name) - 1))
+          *ptr++ = *options++;
       *ptr = '\0';
 
       if (*options == '=')
@@ -263,7 +264,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
         options ++;
 
 	for (ptr = value; *options && *options != '+';)
-          *ptr++ = *options++;
+          if (ptr < (value + sizeof(value) - 1))
+            *ptr++ = *options++;
 	*ptr = '\0';
 
 	if (*options == '+')
@@ -442,6 +444,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   if (bufsize > sizeof(buffer))
     bufsize = sizeof(buffer);
 
+  wbytes = 0;
+
   while (copies > 0)
   {
     copies --;
@@ -527,9 +531,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   if (fp != 0)
     close(fp);
 
-  fputs("INFO: Ready to print.\n", stderr);
-
-  return (0);
+  return (wbytes < 0);
 }
 
 
@@ -990,5 +992,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.32.2.16 2003/09/17 19:26:32 mike Exp $".
+ * End of "$Id: serial.c,v 1.32.2.17 2004/05/13 15:13:52 mike Exp $".
  */

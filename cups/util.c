@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.81.2.32 2004/02/24 21:36:59 mike Exp $"
+ * "$Id: util.c,v 1.81.2.33 2004/05/13 15:13:52 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -278,6 +278,8 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     DEBUG_puts("cupsDoFileRequest: ipp write...");
 
     request->state = IPP_IDLE;
+    status         = HTTP_CONTINUE;
+
     if (ippWrite(http, request) != IPP_ERROR)
       if (filename != NULL)
       {
@@ -292,7 +294,10 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
         while ((bytes = fread(buffer, 1, sizeof(buffer), file)) > 0)
 	{
 	  if (httpCheck(http))
-	    break;
+	  {
+	    if ((status = httpUpdate(http)) != HTTP_CONTINUE)
+	      break;
+          }
 
   	  if (httpWrite(http, buffer, bytes) < bytes)
             break;
@@ -305,7 +310,8 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 
     DEBUG_puts("cupsDoFileRequest: update...");
 
-    while ((status = httpUpdate(http)) == HTTP_CONTINUE);
+    while (status == HTTP_CONTINUE)
+      status = httpUpdate(http);
 
     DEBUG_printf(("cupsDoFileRequest: status = %d\n", status));
 
@@ -1560,5 +1566,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.81.2.32 2004/02/24 21:36:59 mike Exp $".
+ * End of "$Id: util.c,v 1.81.2.33 2004/05/13 15:13:52 mike Exp $".
  */
