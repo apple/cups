@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.54 2003/11/19 16:54:07 mike Exp $"
+ * "$Id: main.c,v 1.57.2.55 2004/02/25 16:22:01 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -430,6 +430,11 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   while (!stop_scheduler)
   {
+#ifdef DEBUG
+    LogMessage(L_DEBUG2, "main: Top of loop, dead_children=%d, NeedReload=%d",
+               dead_children, NeedReload);
+#endif /* DEBUG */
+
    /*
     * Check if there are dead children to handle...
     */
@@ -606,8 +611,29 @@ main(int  argc,				/* I - Number of command-line arguments */
       * Write data as needed...
       */
 
+      if (con->pipe_pid && FD_ISSET(con->file, input))
+      {
+       /*
+        * Keep track of pending input from the file/pipe separately
+	* so that we don't needlessly spin on select() when the web
+	* client is not ready to receive data...
+	*/
+
+        con->file_ready = 1;
+
+#ifdef DEBUG
+        LogMessage(L_DEBUG2, "main: Data ready file %d!", con->file);
+#endif /* DEBUG */
+
+	if (!FD_ISSET(con->http.fd, output))
+	{
+	  LogMessage(L_DEBUG2, "main: Removing fd %d from InputSet...", con->file);
+	  FD_CLR(con->file, InputSet);
+	}
+      }
+
       if (FD_ISSET(con->http.fd, output) &&
-          (!con->pipe_pid || FD_ISSET(con->file, input)))
+          (!con->pipe_pid || con->file_ready))
         if (!WriteClient(con))
 	{
 	  con --;
@@ -1134,5 +1160,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.54 2003/11/19 16:54:07 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.55 2004/02/25 16:22:01 mike Exp $".
  */

@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The scheduler could use excess amounts of CPU if a CGI
+	  program was sending data faster than the client could
+	  take it (STR #595)
 	- Updated the Ghostscript 8.x integration stuff (STR
 	  #484)
 	- The lpd backend used a source port of 732 by default,

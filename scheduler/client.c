@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.75 2004/02/05 20:54:44 mike Exp $"
+ * "$Id: client.c,v 1.91.2.76 2004/02/25 16:22:01 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -92,7 +92,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 				/* Time of last DoS attack */
 
 
-  LogMessage(L_DEBUG2, "AcceptClient(%p) %d NumClients = %d",
+  LogMessage(L_DEBUG2, "AcceptClient(lis=%p) %d NumClients = %d",
              lis, lis->fd, NumClients);
 
  /*
@@ -471,34 +471,22 @@ CloseClient(client_t *con)	/* I - Client to close */
     LogMessage(L_DEBUG2, "CloseClient: %d Killing process ID %d...",
                con->http.fd, con->pipe_pid);
     kill(con->pipe_pid, SIGKILL);
-
-    LogMessage(L_DEBUG2, "CloseClient: %d Removing fd %d from InputSet...",
-               con->http.fd, con->file);
-    FD_CLR(con->file, InputSet);
-
-    LogMessage(L_DEBUG2, "CloseClient: %d Closing data file %d.",
-               con->http.fd, con->file);
-
-    close(con->file);
-    con->file = 0;
   }
-  else if (con->file)
+
+  if (con->file >= 0)
   {
-   /*
-    * Close the open data file...
-    */
-
-
-    LogMessage(L_DEBUG2, "CloseClient: %d Removing fd %d from InputSet.",
-               con->http.fd, con->file);
-
-    FD_CLR(con->file, InputSet);
+    if (FD_ISSET(con->file, InputSet))
+    {
+      LogMessage(L_DEBUG2, "CloseClient: %d Removing fd %d from InputSet...",
+        	 con->http.fd, con->file);
+      FD_CLR(con->file, InputSet);
+    }
 
     LogMessage(L_DEBUG2, "CloseClient: %d Closing data file %d.",
                con->http.fd, con->file);
 
     close(con->file);
-    con->file = 0;
+    con->file = -1;
   }
 
   if (!partial)
@@ -930,7 +918,8 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	con->http.data_remaining = 0;
 	con->operation           = HTTP_WAITING;
 	con->bytes               = 0;
-	con->file                = 0;
+	con->file                = -1;
+	con->file_ready          = 0;
 	con->pipe_pid            = 0;
 	con->username[0]         = '\0';
 	con->password[0]         = '\0';
@@ -1806,7 +1795,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
         	       con->file);
 
 	    close(con->file);
-	    con->file = 0;
+	    con->file = -1;
 	    unlink(con->filename);
 	    ClearString(&con->filename);
 
@@ -1830,7 +1819,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
                      con->http.fd, con->file, (int)filestats.st_size);
 
 	  close(con->file);
-	  con->file = 0;
+	  con->file = -1;
 
           if (filestats.st_size > MaxRequestSize &&
 	      MaxRequestSize > 0)
@@ -1901,7 +1890,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	    con->bytes += ippLength(con->request);
 	}
 
-        if (con->file == 0 && con->http.state != HTTP_POST_SEND)
+        if (con->file < 0 && con->http.state != HTTP_POST_SEND)
 	{
          /*
 	  * Create a file as needed for the request data...
@@ -1948,7 +1937,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
         		 con->file);
 
 	      close(con->file);
-	      con->file = 0;
+	      con->file = -1;
 	      unlink(con->filename);
 	      ClearString(&con->filename);
 
@@ -1972,7 +1961,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 
 	if (con->http.state == HTTP_POST_SEND)
 	{
-	  if (con->file)
+	  if (con->file >= 0)
 	  {
 	    fstat(con->file, &filestats);
 
@@ -1980,7 +1969,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
                        con->http.fd, con->file, (int)filestats.st_size);
 
 	    close(con->file);
-	    con->file = 0;
+	    con->file = -1;
 
             if (filestats.st_size > MaxRequestSize &&
 	        MaxRequestSize > 0)
@@ -2068,7 +2057,7 @@ SendCommand(client_t      *con,
 
   LogMessage(L_INFO, "Started \"%s\" (pid=%d)", command, con->pipe_pid);
 
-  LogMessage(L_DEBUG, "SendCommand() %d file=%d", con->http.fd, con->file);
+  LogMessage(L_DEBUG, "SendCommand: %d file=%d", con->http.fd, con->file);
 
   if (con->pipe_pid == 0)
     return (0);
@@ -2093,6 +2082,7 @@ SendCommand(client_t      *con,
       return (0);
   }
 
+  con->file_ready = 0;
   con->got_fields = 0;
   con->field_col  = 0;
 
@@ -2443,6 +2433,11 @@ WriteClient(client_t *con)		/* I - Client connection */
   ipp_state_t	ipp_state;		/* IPP state value */
 
 
+#ifdef DEBUG
+  LogMessage(L_DEBUG2, "WriteClient(con=%p) %d response=%p, file=%d pipe_pid=%d",
+             con, con->http.fd, con->response, con->file, con->pipe_pid);
+#endif /* DEBUG */
+
   if (con->http.state != HTTP_GET_SEND &&
       con->http.state != HTTP_POST_SEND)
     return (1);
@@ -2454,6 +2449,11 @@ WriteClient(client_t *con)		/* I - Client connection */
   }
   else if ((bytes = read(con->file, buf, HTTP_MAX_BUFFER)) > 0)
   {
+#ifdef DEBUG
+    LogMessage(L_DEBUG2, "WriteClient: Read %d bytes from file %d...",
+               bytes, con->file);
+#endif /* DEBUG */
+
     if (con->pipe_pid && !con->got_fields)
     {
      /*
@@ -2474,14 +2474,14 @@ WriteClient(client_t *con)		/* I - Client connection */
 	  *bufptr++ = '\0';
 
 	  httpPrintf(HTTP(con), "%s\r\n", buf);
-	  LogMessage(L_DEBUG2, "WriteClient() %d %s", con->http.fd, buf);
+	  LogMessage(L_DEBUG2, "WriteClient: %d %s", con->http.fd, buf);
 
          /*
 	  * Update buffer...
 	  */
 
 	  bytes -= (bufptr - buf);
-	  memcpy(buf, bufptr, bytes + 1);
+	  memmove(buf, bufptr, bytes + 1);
 	  bufptr = buf - 1;
 
          /*
@@ -2538,17 +2538,20 @@ WriteClient(client_t *con)		/* I - Client connection */
 
     con->http.state = HTTP_WAITING;
 
-    LogMessage(L_DEBUG2, "WriteClient() Removing fd %d from OutputSet...",
+    LogMessage(L_DEBUG2, "WriteClient: Removing fd %d from OutputSet...",
                con->http.fd);
 
     FD_CLR(con->http.fd, OutputSet);
 
-    if (con->file)
+    if (con->file >= 0)
     {
-      LogMessage(L_DEBUG2, "WriteClient() Removing fd %d from InputSet...",
-                 con->file);
-      FD_CLR(con->file, InputSet);
-
+      if (FD_ISSET(con->file, InputSet))
+      {
+	LogMessage(L_DEBUG2, "WriteClient: Removing fd %d from InputSet...",
+                   con->file);
+	FD_CLR(con->file, InputSet);
+      }
+  
       if (con->pipe_pid)
 	kill(con->pipe_pid, SIGTERM);
 
@@ -2556,7 +2559,7 @@ WriteClient(client_t *con)		/* I - Client connection */
                  con->http.fd, con->file);
 
       close(con->file);
-      con->file     = 0;
+      con->file     = -1;
       con->pipe_pid = 0;
     }
 
@@ -2589,9 +2592,19 @@ WriteClient(client_t *con)		/* I - Client connection */
       return (0);
     }
   }
+  else
+  {
+    con->file_ready = 0;
+
+    if (con->pipe_pid && !FD_ISSET(con->file, InputSet))
+    {
+      LogMessage(L_DEBUG2, "WriteClient: Adding fd %d to InputSet...", con->file);
+      FD_SET(con->file, InputSet);
+    }
+  }
 
   if (bytes >= 1024)
-    LogMessage(L_DEBUG2, "WriteClient() %d %d bytes", con->http.fd, bytes);
+    LogMessage(L_DEBUG2, "WriteClient: %d %d bytes", con->http.fd, bytes);
 
   con->http.activity = time(NULL);
 
@@ -3508,5 +3521,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.75 2004/02/05 20:54:44 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.76 2004/02/25 16:22:01 mike Exp $".
  */
