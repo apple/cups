@@ -1,5 +1,5 @@
 #
-# "$Id: mime.types,v 1.9 2000/04/30 22:03:56 mike Exp $"
+# "$Id: mime.types,v 1.10 2000/06/22 18:25:29 mike Exp $"
 #
 #   MIME types file for the Common UNIX Printing System (CUPS).
 #
@@ -39,7 +39,7 @@
 #   ascii(offset,length)		True if bytes are valid printable ASCII
 #					(CR, NL, TAB, BS, 32-126)
 #   printable(offset,length)		True if bytes are printable 8-bit chars
-#					(CR, NL, TAB, BS, 32-126, 160-254)
+#					(CR, NL, TAB, BS, 32-126, 128-254)
 #   string(offset,"string")		True if bytes are identical to string
 #   char(offset,value)			True if byte is identical
 #   short(offset,value)			True if 16-bit integer is identical
@@ -123,5 +123,5 @@ application/vnd.cups-raster	string(0,"RaSt") string(0,"tSaR")
 application/vnd.cups-raw
 
 #
-# End of "$Id: mime.types,v 1.9 2000/04/30 22:03:56 mike Exp $".
+# End of "$Id: mime.types,v 1.10 2000/06/22 18:25:29 mike Exp $".
 #

@@ -3166,7 +3166,15 @@ CUPS:
 	<TD>socket://<I>address</I>:9100</TD>
 </TR>
 <TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>XEROX&reg;</TD>
+	<TD>XEROX&reg; 4512 NIC</TD>
+	<TD>lpd://<I>address</I>/PORT1</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+	<TD>XEROX&reg; XNIC</TD>
+	<TD>lpd://<I>address</I>/PASSTHRU</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+	<TD>XEROX&reg; (most others)</TD>
 	<TD>socket://<I>address</I>:5503</TD>
 </TR>
 </TABLE></CENTER>
