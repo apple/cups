@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The setgroups() calls now pass in 1 group (the
+	  configured group) instead of 0 for compatibility with
+	  BSD and Darwin (STR #213)
 	- The scheduler's built-in broadcast throttling was
 	  ineffective since incoming packets would cause the
 	  next group of outgoing packets to be sent immediately
