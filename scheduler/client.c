@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.33 2003/01/13 20:38:37 mike Exp $"
+ * "$Id: client.c,v 1.91.2.34 2003/01/14 22:09:45 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1393,8 +1393,15 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  {
             LogMessage(L_ERROR, "ReadClient() %d IPP Read Error!",
 	               con->http.fd);
-	    CloseClient(con);
-	    return (0);
+
+	    if (!SendError(con, HTTP_BAD_REQUEST))
+	    {
+	      CloseClient(con);
+	      return (0);
+	    }
+
+	    ShutdownClient(con);
+	    return (1);
 	  }
 	  else if (ipp_state != IPP_DATA)
 	    break;
@@ -2704,5 +2711,5 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.33 2003/01/13 20:38:37 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.34 2003/01/14 22:09:45 mike Exp $".
  */
