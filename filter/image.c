@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.3 1998/07/07 12:56:23 mike Exp $"
+ * "$Id: image.c,v 1.4 1998/07/07 13:04:52 mike Exp $"
  *
  *   Base image support for espPrint, a collection of printer drivers.
  *
@@ -16,6 +16,10 @@
  * Revision History:
  *
  *   $Log: image.c,v $
+ *   Revision 1.4  1998/07/07 13:04:52  mike
+ *   OK, updated ImageSetMaxTiles() again, but this time we look at the
+ *   IMAGE_MAX_CACHE environment variable and compute things that way.
+ *
  *   Revision 1.3  1998/07/07 12:56:23  mike
  *   Updated ImageSetMaxTiles() to ignore the image depth so that images < 64MB
  *   won't be cached...
@@ -33,6 +37,7 @@
 
 #include "image.h"
 #include <unistd.h>
+#include <ctype.h>
 
 
 /*
@@ -186,6 +191,12 @@ void
 ImageSetMaxTiles(image_t *img,		/* I - Image to set */
                  int     max_tiles)	/* I - Number of tiles to cache */
 {
+  int	cache_size,			/* Size of tile cache in bytes */
+	max_size;			/* Maximum cache size in bytes */
+  char	*cache_env,			/* Cache size environment variable */
+	cache_units[255];		/* Cache size units */
+
+
   if (max_tiles == 0)
   {
     max_tiles = ((img->xsize + TILE_SIZE - 1) / TILE_SIZE) *
@@ -193,9 +204,37 @@ ImageSetMaxTiles(image_t *img,		/* I - Image to set */
 
     if (max_tiles < TILE_DEFAULT)
       max_tiles = TILE_DEFAULT;
-    else if (max_tiles > 512)
-      max_tiles = 512;
   };
+
+  cache_size = max_tiles * TILE_SIZE * TILE_SIZE * ImageGetDepth(img);
+
+  if ((cache_env = getenv("IMAGE_MAX_CACHE")) != NULL)
+  {
+    switch (sscanf(cache_env, "%d%s", &max_size, cache_units))
+    {
+      case 0 :
+          max_size = 32 * 1024 * 1024;
+	  break;
+      case 1 :
+          max_size *= 4 * TILE_SIZE * TILE_SIZE;
+	  break;
+      case 2 :
+          if (tolower(cache_units[0]) == 'g')
+	    max_size *= 1024 * 1024 * 1024;
+          else if (tolower(cache_units[0]) == 'm')
+	    max_size *= 1024 * 1024;
+	  else if (tolower(cache_units[0]) == 'k')
+	    max_size *= 1024;
+	  else if (tolower(cache_units[0]) == 't')
+	    max_size *= 4 * TILE_SIZE * TILE_SIZE;
+	  break;
+    };
+  }
+  else
+    max_size = 32 * 1024 * 1024;
+
+  if (cache_size > max_size)
+    max_tiles = max_size / TILE_SIZE / TILE_SIZE / ImageGetDepth(img);
 
   img->max_ics = max_tiles;
 }
@@ -572,5 +611,5 @@ flush_tile(image_t *img)
 
 
 /*
- * End of "$Id: image.c,v 1.3 1998/07/07 12:56:23 mike Exp $".
+ * End of "$Id: image.c,v 1.4 1998/07/07 13:04:52 mike Exp $".
  */
