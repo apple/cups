@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertoepson.c,v 1.4 2000/06/07 16:54:29 mike Exp $"
+ * "$Id: rastertoepson.c,v 1.5 2000/06/07 17:03:41 mike Exp $"
  *
  *   EPSON ESC/P and ESC/P2 filter for the Common UNIX Printing System
  *   (CUPS).
@@ -294,14 +294,12 @@ EndPage(const cups_page_header_t *header)	/* I - Page header */
       OutputRows(header, 1);
     }
   }
-  else
-  {
-   /*
-    * Eject the current page...
-    */
 
-    putchar(12);		/* Form feed */
-  }
+ /*
+  * Eject the current page...
+  */
+
+  putchar(12);		/* Form feed */
 
  /*
   * Free memory...
@@ -953,5 +951,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertoepson.c,v 1.4 2000/06/07 16:54:29 mike Exp $".
+ * End of "$Id: rastertoepson.c,v 1.5 2000/06/07 17:03:41 mike Exp $".
  */
