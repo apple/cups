@@ -437,6 +437,7 @@ time_t getModTime(char *fileName) {
 #endif
 }
 
+#if 0 // Not needed for PS output
 GBool openTempFile(GString **name, FILE **f, char *mode, char *ext) {
 #if defined(WIN32)
   //---------- Win32 ----------
@@ -529,6 +530,7 @@ GBool executeCommand(char *cmd) {
   return system(cmd) ? gFalse : gTrue;
 #endif
 }
+#endif // 0
 
 char *getLine(char *buf, int size, FILE *f) {
   int c, i;
