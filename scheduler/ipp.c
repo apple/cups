@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.195 2003/03/19 06:06:02 mike Exp $"
+ * "$Id: ipp.c,v 1.196 2003/03/19 18:08:09 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3407,6 +3407,7 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
   int			i;		/* Looping var */
   ipp_attribute_t	*requested,	/* requested-attributes */
 			*history;	/* History collection */
+  int			need_history;	/* Need to send history collection? */
 
 
   LogMessage(L_DEBUG2, "get_printer_attrs(%p[%d], %s)\n", con, con->http.fd,
@@ -3467,7 +3468,20 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
   copy_attrs(con->response, printer->attrs, requested, IPP_TAG_ZERO, 0);
   copy_attrs(con->response, CommonData, requested, IPP_TAG_ZERO, IPP_TAG_COPY);
 
-  if (MaxPrinterHistory > 0 && printer->num_history > 0)
+  need_history = 0;
+
+  if (MaxPrinterHistory > 0 && printer->num_history > 0 && requested)
+  {
+    for (i = 0; i < requested->num_values; i ++)
+      if (!strcmp(requested->values[i].string.text, "all") ||
+          !strcmp(requested->values[i].string.text, "printer-state-history"))
+      {
+        need_history = 1;
+        break;
+      }
+  }
+
+  if (need_history)
   {
     history = ippAddCollections(con->response, IPP_TAG_PRINTER,
                                 "printer-state-history",
@@ -3494,6 +3508,7 @@ get_printers(client_t *con,		/* I - Client connection */
   ipp_attribute_t	*requested,	/* requested-attributes */
 			*history,	/* History collection */
 			*attr;		/* Current attribute */
+  int			need_history;	/* Need to send history collection? */
   int			limit;		/* Maximum number of printers to return */
   int			count;		/* Number of printers that match */
   printer_t		*printer;	/* Current printer pointer */
@@ -3539,6 +3554,19 @@ get_printers(client_t *con,		/* I - Client connection */
 
   requested = ippFindAttribute(con->request, "requested-attributes",
 	                       IPP_TAG_KEYWORD);
+
+  need_history = 0;
+
+  if (MaxPrinterHistory > 0 && printer->num_history > 0 && requested)
+  {
+    for (i = 0; i < requested->num_values; i ++)
+      if (!strcmp(requested->values[i].string.text, "all") ||
+          !strcmp(requested->values[i].string.text, "printer-state-history"))
+      {
+        need_history = 1;
+        break;
+      }
+  }
 
  /*
   * OK, build a list of printers for this printer...
@@ -3629,7 +3657,7 @@ get_printers(client_t *con,		/* I - Client connection */
       copy_attrs(con->response, CommonData, requested, IPP_TAG_ZERO,
                  IPP_TAG_COPY);
 
-      if (MaxPrinterHistory > 0 && printer->num_history > 0)
+      if (need_history)
       {
 	history = ippAddCollections(con->response, IPP_TAG_PRINTER,
                                     "printer-state-history",
@@ -6179,5 +6207,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.195 2003/03/19 06:06:02 mike Exp $".
+ * End of "$Id: ipp.c,v 1.196 2003/03/19 18:08:09 mike Exp $".
  */
