@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-# "$Id: 5.2-lpc.sh,v 1.1 2001/03/01 20:40:16 mike Exp $"
+# "$Id: 5.2-lpc.sh,v 1.1.2.1 2002/01/11 18:06:29 mike Exp $"
 #
 #   Test the lpc command.
 #
-#   Copyright 1997-2001 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2002 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -36,5 +36,5 @@ fi
 echo ""
 
 #
-# End of "$Id: 5.2-lpc.sh,v 1.1 2001/03/01 20:40:16 mike Exp $".
+# End of "$Id: 5.2-lpc.sh,v 1.1.2.1 2002/01/11 18:06:29 mike Exp $".
 #

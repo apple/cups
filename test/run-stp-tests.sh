@@ -1,11 +1,11 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.4 2001/03/02 17:35:05 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.4.2.1 2002/01/11 18:06:30 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
 #
-#   Copyright 1997-2001 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2002 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -108,7 +108,7 @@ TempDir /tmp/$user/spool/temp
 AccessLog /tmp/$user/log/access_log
 ErrorLog /tmp/$user/log/error_log
 PageLog /tmp/$user/log/page_log
-LogLevel info
+LogLevel debug2
 PreserveJobHistory Yes
 <Location />
 Order deny,allow
@@ -133,7 +133,14 @@ cp $root/conf/mime.convs /tmp/$user/mime.convs
 # Setup the paths...
 #
 
-LD_LIBRARY_PATH=$root/cups:$root/filter; export LD_LIBRARY_PATH
+if test "x$LD_LIBRARY_PATH" = x; then
+	LD_LIBRARY_PATH="$root/cups:$root/filter"
+else
+	LD_LIBRARY_PATH="$root/cups:$root/filter:$LD_LIBRARY_PATH"
+fi
+
+export LD_LIBRARY_PATH
+
 CUPS_SERVERROOT=/tmp/$user; export CUPS_SERVERROOT
 CUPS_DATADIR=/tmp/$user/share; export CUPS_DATADIR
 
@@ -153,6 +160,11 @@ echo "Starting scheduler..."
 ../scheduler/cupsd -c /tmp/$user/cupsd.conf -f &
 cupsd=$!
 
+echo "Scheduler is PID $cupsd; run debugger now if you need to."
+echo ""
+echo "Press ENTER to continue..."
+read junk
+
 IPP_PORT=$port; export IPP_PORT
 
 while true; do
@@ -169,7 +181,7 @@ done
 # Create the test report source file...
 #
 
-strfile=cups-str-1.1-`date +%Y-%m-%d`-`whoami`.shtml
+strfile=cups-str-1.2-`date +%Y-%m-%d`-`whoami`.shtml
 
 rm -f $strfile
 cat str-header.html >$strfile
@@ -196,7 +208,7 @@ for file in 4*.test; do
 
 	if test $status != 0; then
 		echo Test failed.
-		fail=1
+		fail=`expr $fail + 1`
 	fi
 done
 
@@ -214,7 +226,6 @@ echo "outlined in the CUPS Software Test Plan. These tests were run on" >>$strfi
 echo `date "+%Y-%m-%d"` by `whoami` on `hostname`. >>$strfile
 echo "<PRE>" >>$strfile
 
-fail=0
 for file in 5*.sh; do
 	echo "Performing $file..."
 	echo "" >>$strfile
@@ -225,7 +236,7 @@ for file in 5*.sh; do
 
 	if test $status != 0; then
 		echo Test failed.
-		fail=1
+		fail=`expr $fail + 1`
 	fi
 done
 
@@ -288,14 +299,12 @@ htmldoc --numbered --verbose --titleimage ../doc/images/cups-large.gif \
 htmldoc --numbered --verbose --titleimage ../doc/images/cups-large.gif \
 	-f $pdffile $strfile
 
-rm $strfile
-
 echo ""
 
 if test $fail != 0; then
-	echo "One or more tests failed."
+	echo "$fail tests failed."
 else
-	echo "All tests passed."
+	echo "All tests were successful."
 fi
 
 echo ""
@@ -306,5 +315,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.4 2001/03/02 17:35:05 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.4.2.1 2002/01/11 18:06:30 mike Exp $"
 #
