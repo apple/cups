@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.10 1999/03/21 02:10:11 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.11 1999/03/21 16:26:58 mike Exp $"
  *
  *   HP-GL/2 configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -39,14 +39,17 @@
 void
 update_transform(void)
 {
-  float p1[2], p2[2];
-  float	width, height;
-  float	page_width, page_length;
-  float	xoff, yoff;
-  float	plotsize[2];
-  float	scaling,
-	pen_scaling;
+  float	width,		/* Plot width */
+	height;		/* Plot height */
+  float	page_width,	/* Actual page width in points */
+	page_length;	/* Actual page length in points */
+  float	scaling,	/* Scaling factor */
+	pen_scaling;	/* Pen width scaling factor */
 
+
+ /*
+  * Get the page and input window sizes...
+  */
 
   width       = IW2[0] - IW1[0];
   height      = IW2[1] - IW1[1];
@@ -55,6 +58,10 @@ update_transform(void)
 
   if (width == 0 || height == 0)
     return;
+
+ /*
+  * Scale the plot as needed...
+  */
 
   if (FitPlot)
   {
@@ -75,49 +82,14 @@ update_transform(void)
         scaling = page_length / width;
       else if ((page_length / width * height) <= page_width)
         scaling = page_length / width;
-    };
-
-    plotsize[0] = width * scaling;
-    plotsize[1] = height * scaling;
+    }
   }
   else
-  {
-    plotsize[0] = width * 72.0 / 1016.0;
-    plotsize[1] = height * 72.0 / 1016.0;
-    scaling     = 72.0 / 1016.0;
-  };
+    scaling = 72.0 / 1016.0;
 
-  switch (ScalingType)
-  {
-    case 2 :
-        if (Scaling2[0] != 0.0 && Scaling2[1] != 0.0)
-        {
-          p1[0] = P1[0] / fabs(Scaling2[0]);
-          p1[1] = P1[1] / fabs(Scaling2[1]);
-          p2[0] = P2[0] / fabs(Scaling2[0]);
-          p2[1] = P2[1] / fabs(Scaling2[1]);
-  	  break;
-  	};
-
-    case -1 :
-        p1[0] = P1[0];
-        p1[1] = P1[1];
-        p2[0] = P2[0];
-        p2[1] = P2[1];
-	break;
-
-    default :
-        p1[0] = Scaling1[0];
-        p1[1] = Scaling1[1];
-        p2[0] = Scaling2[0];
-        p2[1] = Scaling2[1];
-	break;
-  };
-
-  if (p2[0] == p1[0])
-    p2[0] ++;
-  if (p2[1] == p1[1])
-    p2[1] ++;
+ /*
+  * Generate a new transformation matrix...
+  */
 
   switch (Rotation)
   {
@@ -173,15 +145,30 @@ update_transform(void)
 }
 
 
+/*
+ * 'BP_begin_plot()' - Start a plot...
+ */
+
 void
-BP_begin_plot(int num_params, param_t *params)
+BP_begin_plot(int     num_params,	/* I - Number of parameters */
+              param_t *params)		/* I - Parameters */
 {
+  (void)num_params;
+  (void)params;
 }
 
 
+/*
+ * 'DF_default_values()' - Set all state info to the default values.
+ */
+
 void
-DF_default_values(int num_params, param_t *params)
+DF_default_values(int     num_params,	/* I - Number of parameters */
+                  param_t *params)	/* I - Parameters */
 {
+  (void)num_params;
+  (void)params;
+
   AC_anchor_corner(0, NULL);
   AD_define_alternate(0, NULL);
   SD_define_standard(0, NULL);
@@ -206,9 +193,17 @@ DF_default_values(int num_params, param_t *params)
 }
 
 
+/*
+ * 'IN_initialize()' - Initialize the plotter.
+ */
+
 void
-IN_initialize(int num_params, param_t *params)
+IN_initialize(int     num_params,	/* I - Number of parameters */
+              param_t *params)		/* I - Parameters */
 {
+  (void)num_params;
+  (void)params;
+
   DF_default_values(0, NULL);
   PU_pen_up(0, NULL);
   RO_rotate(0, NULL);
@@ -221,8 +216,13 @@ IN_initialize(int num_params, param_t *params)
 }
 
 
+/*
+ * 'IP_input_absolute()' - Set P1 and P2 values for the plot.
+ */
+
 void
-IP_input_absolute(int num_params, param_t *params)
+IP_input_absolute(int     num_params,	/* I - Number of parameters */
+                  param_t *params)	/* I - Parameters */
 {
   if (num_params == 0)
   {
@@ -246,7 +246,7 @@ IP_input_absolute(int num_params, param_t *params)
     P1[1] = params[1].value.number;
     P2[0] = params[2].value.number;
     P2[1] = params[3].value.number;
-  };
+  }
 
   IW1[0] = P1[0];
   IW1[1] = P1[1];
@@ -257,8 +257,13 @@ IP_input_absolute(int num_params, param_t *params)
 }
 
 
+/*
+ * 'IR_input_relative()' - Update P1 and P2.
+ */
+
 void
-IR_input_relative(int num_params, param_t *params)
+IR_input_relative(int     num_params,	/* I - Number of parameters */
+                  param_t *params)	/* I - Parameters */
 {
   if (num_params == 0)
   {
@@ -282,7 +287,7 @@ IR_input_relative(int num_params, param_t *params)
     P1[1] = params[1].value.number * (PageTop - PageBottom) / 72.0 * 1016.0 / 100.0;
     P2[0] = params[2].value.number * (PageRight - PageLeft) / 72.0 * 1016.0 / 100.0;
     P2[1] = params[3].value.number * (PageTop - PageBottom) / 72.0 * 1016.0 / 100.0;
-  };
+  }
 
   IW1[0] = P1[0];
   IW1[1] = P1[1];
@@ -293,8 +298,13 @@ IR_input_relative(int num_params, param_t *params)
 }
 
 
+/*
+ * 'IW_input_window()' - Setup an input window.
+ */
+
 void
-IW_input_window(int num_params, param_t *params)
+IW_input_window(int     num_params,	/* I - Number of parameters */
+                param_t *params)	/* I - Parameters */
 {
   if (num_params == 0)
   {
@@ -309,14 +319,19 @@ IW_input_window(int num_params, param_t *params)
     IW1[1] = params[1].value.number;
     IW2[0] = params[2].value.number;
     IW2[1] = params[3].value.number;
-  };
+  }
 
   update_transform();
 }
 
 
+/*
+ * 'PG_advance_page()' - Eject the current page.
+ */
+
 void
-PG_advance_page(int num_params, param_t *params)
+PG_advance_page(int     num_params,	/* I - Number of parameters */
+                param_t *params)	/* I - Parameters */
 {
   if (PageDirty)
   {
@@ -329,8 +344,13 @@ PG_advance_page(int num_params, param_t *params)
 }
 
 
+/*
+ * 'PS_plot_size()' - Set the plot size.
+ */
+
 void
-PS_plot_size(int num_params, param_t *params)
+PS_plot_size(int     num_params,	/* I - Number of parameters */
+             param_t *params)		/* I - Parameters */
 {
   switch (num_params)
   {
@@ -352,7 +372,7 @@ PS_plot_size(int num_params, param_t *params)
         {
           PlotSize[0] = 72.0 * params[0].value.number / 1016.0;
           PlotSize[1] = 0.75 * PlotSize[0];
-        };
+        }
         break;
     case 2 :
         if (Rotation == 0 || Rotation == 180)
@@ -364,9 +384,9 @@ PS_plot_size(int num_params, param_t *params)
         {
           PlotSize[0] = 72.0 * params[0].value.number / 1016.0;
           PlotSize[1] = 72.0 * params[1].value.number / 1016.0;
-        };
+        }
         break;
-  };
+  }
 
  /*
   * This is required for buggy files that don't set the input window.
@@ -376,8 +396,13 @@ PS_plot_size(int num_params, param_t *params)
 }
 
 
+/*
+ * 'RO_rotate()' - Rotate the plot.
+ */
+
 void
-RO_rotate(int num_params, param_t *params)
+RO_rotate(int     num_params,	/* I - Number of parameters */
+          param_t *params)	/* I - Parameters */
 {
   if (num_params == 0)
     Rotation = 0;
@@ -388,14 +413,26 @@ RO_rotate(int num_params, param_t *params)
 }
 
 
+/*
+ * 'RP_replot()' - Replot the current page.
+ */
+
 void
-RP_replot(int num_params, param_t *params)
+RP_replot(int     num_params,	/* I - Number of parameters */
+          param_t *params)	/* I - Parameters */
 {
+  (void)num_params;
+  (void)params;
 }
 
 
+/*
+ * 'SC_scale()' - Set user-defined scaling.
+ */
+
 void
-SC_scale(int num_params, param_t *params)
+SC_scale(int     num_params,	/* I - Number of parameters */
+         param_t *params)	/* I - Parameters */
 {
   if (num_params == 0)
     ScalingType = -1;
@@ -410,12 +447,12 @@ SC_scale(int num_params, param_t *params)
       ScalingType = params[4].value.number;
     else
       ScalingType = 0;
-  };
+  }
 
   update_transform();
 }
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.10 1999/03/21 02:10:11 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.11 1999/03/21 16:26:58 mike Exp $".
  */

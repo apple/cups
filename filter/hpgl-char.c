@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-char.c,v 1.4 1999/03/21 02:10:11 mike Exp $"
+ * "$Id: hpgl-char.c,v 1.5 1999/03/21 16:26:58 mike Exp $"
  *
  *   HP-GL/2 character processing for the Common UNIX Printing System (CUPS).
  *
@@ -32,18 +32,33 @@
 #include "hpgltops.h"
 
 
-void
-AD_define_alternate(int num_params, param_t *params)
-{
-  int i;
-  int typeface, posture, weight;
-  float height;
+/*
+ * 'AD_define_alternate()' - Define the alternate font.
+ */
 
+void
+AD_define_alternate(int     num_params,	/* I - Number of parameters */
+                    param_t *params)	/* I - Parameters */
+{
+  int	i;				/* Looping var */
+  int	typeface,			/* Typeface number */
+	posture,			/* Posture number */
+	weight;				/* Weight number */
+  float	height;				/* Height/size of font */
+
+
+ /*
+  * Set default font attributes...
+  */
 
   typeface = 48;
   posture  = 0;
   weight   = 0;
   height   = 11.5;
+
+ /*
+  * Loop through parameter value pairs...
+  */
 
   for (i = 0; i < (num_params - 1); i += 2)
     switch ((int)params[i].value.number)
@@ -60,9 +75,13 @@ AD_define_alternate(int num_params, param_t *params)
       case 7 :
           typeface = params[i + 1].value.number;
           break;
-    };
+    }
 
-  fprintf(OutputFile, "/SA { /%s%s%s%s findfont %.1f scalefont setfont } def\n",
+ /*
+  * Define the font...
+  */
+
+  Outputf("/SA { /%s%s%s%s findfont %.1f scalefont setfont } def\n",
           typeface == 48 ? "Courier" : "Helvetica",
           (weight != 0 || posture != 0) ? "-" : "",
           weight != 0 ? "Bold" : "",
@@ -73,8 +92,13 @@ AD_define_alternate(int num_params, param_t *params)
 }
 
 
+/*
+ * 'CF_character_fill()' - Set whether or not to fill or outline characters.
+ */
+
 void
-CF_character_fill(int num_params, param_t *params)
+CF_character_fill(int     num_params,	/* I - Number of parameters */
+                  param_t *params)	/* I - Parameters */
 {
   if (num_params == 0)
     CharFillMode = 0;
@@ -86,8 +110,14 @@ CF_character_fill(int num_params, param_t *params)
 }
 
 
+/*
+ * 'CP_character_plot()' - Move the current pen position for the given number
+ *                         of columns and rows.
+ */
+
 void
-CP_character_plot(int num_params, param_t *params)
+CP_character_plot(int     num_params,
+                  param_t *params)
 {
   if (num_params < 2)
     return;
@@ -110,30 +140,47 @@ CP_character_plot(int num_params, param_t *params)
 	PenPosition[0] += params[1].value.number * 1.2 / CharHeight[CharFont];
 	PenPosition[1] -= params[0].value.number * CharHeight[CharFont];
 	break;
-  };
+  }
 }
 
 
+/*
+ * 'DI_absolute_direction()' - Set the direction vector for text.
+ */
+
 void
-DI_absolute_direction(int num_params, param_t *params)
+DI_absolute_direction(int     num_params,	/* I - Number of parameters */
+                      param_t *params)		/* I - Parameters */
 {
-  fputs(CharFont == 0 ? "SS\n" : "SA\n", OutputFile);
+  Outputf(CharFont == 0 ? "SS\n" : "SA\n");
 
   if (num_params == 2)
-    fprintf(OutputFile, "currentfont [ %f %f %f %f 0.0 0.0 ] makefont setfont\n",
+    Outputf("currentfont [ %f %f %f %f 0.0 0.0 ] makefont setfont\n",
             params[0].value.number, -params[1].value.number,
             params[1].value.number, params[0].value.number);
 }
 
 
+/*
+ * 'DR_relative_direction()' - Set the relative direction vector for text.
+ */
+
 void
-DR_relative_direction(int num_params, param_t *params)
+DR_relative_direction(int     num_params,	/* I - Number of parameters */
+                      param_t *params)		/* I - Parameters */
 {
+  (void)num_params;
+  (void)params;
 }
 
 
+/*
+ * 'DT_define_label_term()' - Set the label string terminator.
+ */
+
 void
-DT_define_label_term(int num_params, param_t *params)
+DT_define_label_term(int     num_params,	/* I - Number of parameters */
+                     param_t *params)		/* I - Parameters */
 {
   if (num_params == 0)
     StringTerminator = '\003';
@@ -142,78 +189,122 @@ DT_define_label_term(int num_params, param_t *params)
 }
 
 
+/*
+ * 'DV_define_variable_path()' - Define a path for text.
+ */
+
 void
-DV_define_variable_path(int num_params, param_t *params)
+DV_define_variable_path(int     num_params,	/* I - Number of parameters */
+                        param_t *params)	/* I - Parameters */
 {
+  (void)num_params;
+  (void)params;
 }
 
 
+/*
+ * 'ES_extra_space()' - Set extra spacing (kerning) between characters.
+ */
+
 void
-ES_extra_space(int num_params, param_t *params)
+ES_extra_space(int     num_params,	/* I - Number of parameters */
+               param_t *params)		/* I - Parameters */
 {
+  (void)num_params;
+  (void)params;
 }
 
 
+/*
+ * 'LB_label()' - Display a label string.
+ */
+
 void
-LB_label(int num_params, param_t *params)
+LB_label(int     num_params,		/* I - Number of parameters */
+         param_t *params)		/* I - Parameters */
 {
-  char *s;
+  char	*s;				/* Pointer into string */
 
 
   if (num_params == 0)
     return;
 
-  fputs("gsave\n", OutputFile);
-  fputs("currentmiterlimit 1.0 setmiterlimit\n", OutputFile);
-  fputs("MP\n", OutputFile);
-  fprintf(OutputFile, "%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+  Outputf("gsave\n");
+  Outputf("currentmiterlimit 1.0 setmiterlimit\n");
+  Outputf("MP\n");
+  Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
 
-  fputs("(", OutputFile);
+  Outputf("(");
   for (s = params[0].value.string; *s != '\0'; s ++)
     if (strchr("()\\", *s) != NULL)
-      fprintf(OutputFile, "\\%c", *s);
+      Outputf("\\%c", *s);
     else
       putc(*s, OutputFile);
-  fputs(") true charpath\n", OutputFile);
+  Outputf(") true charpath\n");
 
   if (CharFillMode != 1)
-    fputs("FI\n", OutputFile);
+    Outputf("FI\n");
   if (CharFillMode == 1 || CharFillMode == 3)
-    fprintf(OutputFile, "P%d ST\n", CharPen);
+    Outputf("P%d ST\n", CharPen);
 
-  fputs("setmiterlimit\n", OutputFile);
-  fputs("grestore\n", OutputFile);
-
-  PageDirty = 1;
+  Outputf("setmiterlimit\n");
+  Outputf("grestore\n");
 }
 
 
+/*
+ * 'LO_label_origin()' - Set the label origin.
+ */
+
 void
-LO_label_origin(int num_params, param_t *params)
+LO_label_origin(int     num_params,	/* I - Number of parameters */
+                param_t *params)	/* I - Parameters */
 {
+  (void)num_params;
+  (void)params;
 }
 
 
+/*
+ * 'SA_select_alternate()' - Select the alternate font.
+ */
+
 void
-SA_select_alternate(int num_params, param_t *params)
+SA_select_alternate(int     num_params,	/* I - Number of parameters */
+                    param_t *params)	/* I - Parameters */
 {
-  fputs("SA\n", OutputFile);
+  Outputf("SA\n");
   CharFont = 1;
 }
 
 
+/*
+ * 'SD_define_standard()' - Define the standard font...
+ */
+ 
 void
-SD_define_standard(int num_params, param_t *params)
+SD_define_standard(int     num_params,	/* I - Number of parameters */
+                   param_t *params)	/* I - Parameters */
 {
-  int i;
-  int typeface, posture, weight;
-  float height;
+  int	i;				/* Looping var */
+  int	typeface,			/* Typeface number */
+	posture,			/* Posture number */
+	weight;				/* Weight number */
+  float	height;				/* Height/size of font */
 
+
+ /*
+  * Set default font attributes...
+  */
 
   typeface = 48;
   posture  = 0;
   weight   = 0;
   height   = 11.5;
+
+ /*
+  * Loop through parameter value pairs...
+  */
 
   for (i = 0; i < (num_params - 1); i += 2)
     switch ((int)params[i].value.number)
@@ -230,9 +321,13 @@ SD_define_standard(int num_params, param_t *params)
       case 7 :
           typeface = params[i + 1].value.number;
           break;
-    };
+    }
 
-  fprintf(OutputFile, "/SS { /%s%s%s%s findfont %.1f scalefont setfont } def\n",
+ /*
+  * Define the font...
+  */
+
+  Outputf("/SS { /%s%s%s%s findfont %.1f scalefont setfont } def\n",
           typeface == 48 ? "Courier" : "Helvetica",
           (weight != 0 || posture != 0) ? "-" : "",
           weight != 0 ? "Bold" : "",
@@ -243,39 +338,71 @@ SD_define_standard(int num_params, param_t *params)
 }
 
 
-void
-SI_absolute_size(int num_params, param_t *params)
-{
-}
-
+/*
+ * 'SI_absolute_size()' - Set the absolute size of text.
+ */
 
 void
-SL_character_slant(int num_params, param_t *params)
+SI_absolute_size(int     num_params,	/* I - Number of parameters */
+                 param_t *params)	/* I - Parameters */
 {
-}
-
-
-void
-SR_relative_size(int num_params, param_t *params)
-{
-}
-
-
-void
-SS_select_standard(int num_params, param_t *params)
-{
-  fputs("SS\n", OutputFile);
-  CharFont = 0;
-}
-
-
-void
-TD_transparent_data(int num_params, param_t *params)
-{
+  (void)num_params;
+  (void)params;
 }
 
 
 /*
- * End of "$Id: hpgl-char.c,v 1.4 1999/03/21 02:10:11 mike Exp $".
+ * 'SL_character_slant()' - Set the slant of text.
  */
 
+void
+SL_character_slant(int     num_params,	/* I - Number of parameters */
+                   param_t *params)	/* I - Parameters */
+{
+  (void)num_params;
+  (void)params;
+}
+
+
+/*
+ * 'SR_relative_size()' - Set the relative size of text.
+ */
+
+void
+SR_relative_size(int     num_params,	/* I - Number of parameters */
+                 param_t *params)	/* I - Parameters */
+{
+  (void)num_params;
+  (void)params;
+}
+
+
+/*
+ * 'SS_select_standard()' - Select the standard font for text.
+ */
+
+void
+SS_select_standard(int     num_params,	/* I - Number of parameters */
+                   param_t *params)	/* I - Parameters */
+{
+  Outputf("SS\n");
+  CharFont = 0;
+}
+
+
+/*
+ * 'TD_transparent_data()' - Send transparent print data.
+ */
+
+void
+TD_transparent_data(int     num_params,	/* I - Number of parameters */
+                    param_t *params)	/* I - Parameters */
+{
+  (void)num_params;
+  (void)params;
+}
+
+
+/*
+ * End of "$Id: hpgl-char.c,v 1.5 1999/03/21 16:26:58 mike Exp $".
+ */
