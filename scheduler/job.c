@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.110 2001/02/09 16:23:36 mike Exp $"
+ * "$Id: job.c,v 1.111 2001/02/09 19:51:42 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2196,7 +2196,7 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 		{
                   if ((sizeof(buffer) - (bufptr - buffer)) < 9)
 		  {
-                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+                    if (write(fd, (char *)buffer, bufptr - buffer) < 0)
 	            {
 	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	              return (IPP_ERROR);
@@ -2231,7 +2231,7 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 		{
                   if ((sizeof(buffer) - (bufptr - buffer)) < 6)
 		  {
-                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+                    if (write(fd, (char *)buffer, bufptr - buffer) < 0)
 	            {
 	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	              return (IPP_ERROR);
@@ -2282,7 +2282,7 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 
                     if ((sizeof(buffer) - (bufptr - buffer)) < 3)
 		    {
-                      if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+                      if (write(fd, (char *)buffer, bufptr - buffer) < 0)
 	              {
 	        	DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	        	return (IPP_ERROR);
@@ -2328,7 +2328,7 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 		{
                   if ((sizeof(buffer) - (bufptr - buffer)) < 16)
 		  {
-                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+                    if (write(fd, (char *)buffer, bufptr - buffer) < 0)
 	            {
 	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	              return (IPP_ERROR);
@@ -2361,7 +2361,7 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 		{
                   if ((sizeof(buffer) - (bufptr - buffer)) < 14)
 		  {
-                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+                    if (write(fd, (char *)buffer, bufptr - buffer) < 0)
 	            {
 	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	              return (IPP_ERROR);
@@ -2401,7 +2401,7 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 		{
                   if ((sizeof(buffer) - (bufptr - buffer)) < 13)
 		  {
-                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+                    if (write(fd, (char *)buffer, bufptr - buffer) < 0)
 	            {
 	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	              return (IPP_ERROR);
@@ -2448,7 +2448,7 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 
                     if ((sizeof(buffer) - (bufptr - buffer)) < 3)
 		    {
-                      if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+                      if (write(fd, (char *)buffer, bufptr - buffer) < 0)
 	              {
 	        	DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	        	return (IPP_ERROR);
@@ -2516,7 +2516,7 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 
                     if ((sizeof(buffer) - (bufptr - buffer)) < 3)
 		    {
-                      if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+                      if (write(fd, (char *)buffer, bufptr - buffer) < 0)
 	              {
 	        	DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	        	return (IPP_ERROR);
@@ -2726,5 +2726,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.110 2001/02/09 16:23:36 mike Exp $".
+ * End of "$Id: job.c,v 1.111 2001/02/09 19:51:42 mike Exp $".
  */
