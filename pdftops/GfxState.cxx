@@ -532,11 +532,6 @@ GfxImageColorMap::GfxImageColorMap(int bits1, Object *decode,
   colorSpace = colorSpace1;
   mode = colorSpace->getMode();
 
-  // work around a bug in Distiller (?)
-  if (colorSpace->isIndexed() && maxPixel > colorSpace->getIndexHigh()) {
-    maxPixel = colorSpace->getIndexHigh();
-  }
-
   // get decode map
   if (decode->isNull()) {
     if (colorSpace->isIndexed()) {
@@ -571,6 +566,13 @@ GfxImageColorMap::GfxImageColorMap(int bits1, Object *decode,
     }
   } else {
     goto err1;
+  }
+
+  // handle the case where fewer than 2^n palette entries of an n-bit
+  // indexed color space are populated (this happens, e.g., in files
+  // optimized by Distiller)
+  if (colorSpace->isIndexed() && maxPixel > colorSpace->getIndexHigh()) {
+    maxPixel = colorSpace->getIndexHigh();
   }
 
   // construct lookup table
