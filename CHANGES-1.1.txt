@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The reinterpret_cast keyword was not highlighted when
+	  printing C/C++ source files in prettyprint mode (STR
+	  #694)
 	- Fixed a segfault problem with some of the client
 	  programs (STR #668)
 	- When using RunAsUser, the scheduler did not correctly
