@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.28.2.30 2004/02/25 20:01:36 mike Exp $"
+ * "$Id: lpd.c,v 1.28.2.31 2004/03/19 22:07:34 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -120,7 +120,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 {
   char			method[255],	/* Method in URI */
 			hostname[1024],	/* Hostname */
-			username[255],	/* Username info (not used) */
+			username[255],	/* Username info */
 			resource[1024],	/* Resource info (printer name) */
 			*options,	/* Pointer to options */
 			name[255],	/* Name of option */
@@ -229,6 +229,15 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   */
 
   httpSeparate(argv[0], method, username, hostname, &port, resource);
+
+  if (!username[0])
+  {
+   /*
+    * If no username is in the device URI, then use the print job user...
+    */
+
+    strlcpy(username, argv[2], sizeof(username));
+  }
 
  /*
   * See if there are any options...
@@ -414,7 +423,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     }
 
     status = lpd_queue(hostname, port, resource + 1, filename,
-                       argv[2] /* user */, title, copies,
+                       username, title, copies,
 		       banner, format, order, reserve, manual_copies, timeout);
 
     if (!status)
@@ -422,7 +431,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   }
   else
     status = lpd_queue(hostname, port, resource + 1, filename,
-                       argv[2] /* user */, title, 1,
+                       username, title, 1,
 		       banner, format, order, reserve, 1, timeout);
 
  /*
@@ -1028,5 +1037,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: lpd.c,v 1.28.2.30 2004/02/25 20:01:36 mike Exp $".
+ * End of "$Id: lpd.c,v 1.28.2.31 2004/03/19 22:07:34 mike Exp $".
  */
