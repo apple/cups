@@ -1,5 +1,14 @@
-CHANGES.txt - 10/07/2002
+CHANGES.txt - 10/11/2002
 ------------------------
+
+CHANGES IN CUPS V1.1.17
+
+	- The serial backend now enumerates serial ports under
+	  MacOS X.
+	- The pdftops filter contained font rasterizer code that
+	  wasn't being used and that depended on X11.  This code
+	  has been removed.
+
 
 CHANGES IN CUPS V1.1.16
 
