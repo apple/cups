@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.123 2003/09/05 20:55:42 mike Exp $"
+ * "$Id: dirsvc.c,v 1.124 2003/09/16 20:38:19 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1507,12 +1507,11 @@ SendSLPBrowse(printer_t *p)		/* I - Printer to register */
     strcpy(finishings, "none");
 
  /*
-  * Quote any commas in the make and model, location, and info strings
-  * (local strings are twice the size of the ones in the printer_t
-  * structure, so no buffer overflow is possible...)
+  * Quote any commas in the make and model, location, and info strings...
   */
 
-  for (src = p->make_model, dst = make_model; src && *src;)
+  for (src = p->make_model, dst = make_model;
+       src && *src && dst < (make_model + sizeof(make_model) - 2);)
   {
     if (*src == ',' || *src == '\\' || *src == ')')
       *dst++ = '\\';
@@ -1525,7 +1524,8 @@ SendSLPBrowse(printer_t *p)		/* I - Printer to register */
   if (!make_model[0])
     strcpy(make_model, "Unknown");
 
-  for (src = p->location, dst = location; src && *src;)
+  for (src = p->location, dst = location;
+       src && *src && dst < (location + sizeof(location) - 2);)
   {
     if (*src == ',' || *src == '\\' || *src == ')')
       *dst++ = '\\';
@@ -1538,7 +1538,8 @@ SendSLPBrowse(printer_t *p)		/* I - Printer to register */
   if (!location[0])
     strcpy(location, "Unknown");
 
-  for (src = p->info, dst = info; src && *src;)
+  for (src = p->info, dst = info;
+       src && *src && dst < (info + sizeof(info) - 2);)
   {
     if (*src == ',' || *src == '\\' || *src == ')')
       *dst++ = '\\';
@@ -1659,8 +1660,8 @@ GetSlpAttrVal(const char *attrlist,	/* I - Attribute list string */
       * Copy the value...
       */
 
-      *valbuf = malloc(ptr2 - ptr1 + 1);
-      strcpy(*valbuf, ptr1);
+      *valbuf = calloc(ptr2 - ptr1 + 1, 1);
+      strncpy(*valbuf, ptr1, ptr2 - ptr1);
 
      /*
       * Dequote the value...
@@ -1682,11 +1683,11 @@ GetSlpAttrVal(const char *attrlist,	/* I - Attribute list string */
  * 'AttrCallback()' - SLP attribute callback 
  */
 
-SLPBoolean
-AttrCallback(SLPHandle  hslp, 
-             const char *attrlist, 
-             SLPError   errcode, 
-             void       *cookie)
+SLPBoolean				/* O - SLP_TRUE for success */
+AttrCallback(SLPHandle  hslp,		/* I - SLP handle */
+             const char *attrlist,	/* I - Attribute list */
+             SLPError   errcode,	/* I - Parsing status for this attr */
+             void       *cookie)	/* I - Current printer */
 {
   char         *tmp = 0;
   printer_t    *p = (printer_t*)cookie;
@@ -1901,5 +1902,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.123 2003/09/05 20:55:42 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.124 2003/09/16 20:38:19 mike Exp $".
  */
