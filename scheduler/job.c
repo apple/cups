@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.9 2002/03/14 19:36:19 mike Exp $"
+ * "$Id: job.c,v 1.124.2.10 2002/03/21 02:34:27 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -66,8 +66,8 @@
 
 static void		set_time(job_t *job, const char *name);
 static int		start_process(const char *command, char *argv[],
-			              char *envp[], int in, int out, int err,
-				      int root);
+			              char *envp[], int infd, int outfd,
+				      int errfd, int backfd, int root);
 
 
 /*
@@ -821,7 +821,7 @@ SaveJob(int id)			/* I - Job ID */
   {
     LogMessage(L_ERROR, "SaveJob: Unable to create job control file \"%s\" - %s.",
                filename, strerror(errno));
-    return (IPP_ERROR);
+    return;
   }
 
   fchmod(fd, 0600);
@@ -1211,7 +1211,10 @@ StartJob(int       id,		/* I - Job ID */
   SetPrinterState(printer, IPP_PRINTER_PROCESSING);
 
   if (current->current_file == 0)
+  {
     set_time(current, "time-at-processing");
+    pipe(current->back_pipes);
+  }
 
  /*
   * Determine if we are printing a banner page or not...
@@ -1576,9 +1579,9 @@ StartJob(int       id,		/* I - Job ID */
   LogMessage(L_DEBUG, "StartJob: statusfds = %d, %d",
              statusfds[0], statusfds[1]);
 
-  current->pipe   = statusfds[0];
-  current->status = 0;
-  memset(current->procs, 0, sizeof(current->procs));
+  current->status_pipe = statusfds[0];
+  current->status      = 0;
+  memset(current->filters, 0, sizeof(current->filters));
 
   filterfds[1][0] = open("/dev/null", O_RDONLY);
   filterfds[1][1] = -1;
@@ -1597,18 +1600,28 @@ StartJob(int       id,		/* I - Job ID */
       command[sizeof(command) - 1] = '\0';
     }
 
-    if (i < (num_filters - 1) ||
-	strncmp(printer->device_uri, "file:", 5) != 0)
+    if (i < (num_filters - 1))
       pipe(filterfds[slot]);
     else
     {
-      filterfds[slot][0] = -1;
-      if (strncmp(printer->device_uri, "file:/dev/", 10) == 0)
-	filterfds[slot][1] = open(printer->device_uri + 5,
-	                          O_WRONLY | O_EXCL);
-      else
-	filterfds[slot][1] = open(printer->device_uri + 5,
-	                          O_WRONLY | O_CREAT | O_TRUNC, 0600);
+      if (current->current_file == 0)
+      {
+	if (strncmp(printer->device_uri, "file:", 5) != 0)
+	  pipe(current->print_pipes);
+	else
+	{
+	  current->print_pipes[0] = -1;
+	  if (strncmp(printer->device_uri, "file:/dev/", 10) == 0)
+	    current->print_pipes[1] = open(printer->device_uri + 5,
+	                                   O_WRONLY | O_EXCL);
+	  else
+	    current->print_pipes[1] = open(printer->device_uri + 5,
+	                                   O_WRONLY | O_CREAT | O_TRUNC, 0600);
+	}
+      }
+
+      filterfds[slot][0] = current->print_pipes[0];
+      filterfds[slot][1] = current->print_pipes[1];
     }
 
     LogMessage(L_DEBUG, "StartJob: filter = \"%s\"", command);
@@ -1616,7 +1629,8 @@ StartJob(int       id,		/* I - Job ID */
                slot, filterfds[slot][0], filterfds[slot][1]);
 
     pid = start_process(command, argv, envp, filterfds[!slot][0],
-                        filterfds[slot][1], statusfds[1], 0);
+                        filterfds[slot][1], statusfds[1],
+			current->back_pipes[0], 0);
 
     close(filterfds[!slot][0]);
     close(filterfds[!slot][1]);
@@ -1631,7 +1645,7 @@ StartJob(int       id,		/* I - Job ID */
       return;
     }
 
-    current->procs[i] = pid;
+    current->filters[i] = pid;
 
     LogMessage(L_INFO, "Started filter %s (PID %d) for job %d.",
                command, pid, current->id);
@@ -1649,38 +1663,61 @@ StartJob(int       id,		/* I - Job ID */
 
   if (strncmp(printer->device_uri, "file:", 5) != 0)
   {
-    sscanf(printer->device_uri, "%254[^:]", method);
-    snprintf(command, sizeof(command), "%s/backend/%s", ServerBin, method);
-
-    argv[0] = printer->device_uri;
-
-    filterfds[slot][0] = -1;
-    filterfds[slot][1] = open("/dev/null", O_WRONLY);
-
-    LogMessage(L_DEBUG, "StartJob: backend = \"%s\"", command);
-    LogMessage(L_DEBUG, "StartJob: filterfds[%d] = %d, %d",
-               slot, filterfds[slot][0], filterfds[slot][1]);
-
-    pid = start_process(command, argv, envp, filterfds[!slot][0],
-			filterfds[slot][1], statusfds[1], 1);
-
-    close(filterfds[!slot][0]);
-    close(filterfds[!slot][1]);
-
-    if (pid == 0)
+    if (current->current_file == 0)
     {
-      LogMessage(L_ERROR, "Unable to start backend \"%s\" - %s.",
-                 method, strerror(errno));
-      snprintf(printer->state_message, sizeof(printer->state_message),
-               "Unable to start backend \"%s\" - %s.", method, strerror(errno));
-      return;
+      sscanf(printer->device_uri, "%254[^:]", method);
+      snprintf(command, sizeof(command), "%s/backend/%s", ServerBin, method);
+
+      argv[0] = printer->device_uri;
+
+      filterfds[slot][0] = -1;
+      filterfds[slot][1] = open("/dev/null", O_WRONLY);
+
+      LogMessage(L_DEBUG, "StartJob: backend = \"%s\"", command);
+      LogMessage(L_DEBUG, "StartJob: filterfds[%d] = %d, %d",
+        	 slot, filterfds[slot][0], filterfds[slot][1]);
+
+      pid = start_process(command, argv, envp, filterfds[!slot][0],
+			  filterfds[slot][1], statusfds[1],
+			  current->back_pipes[1], 1);
+
+      if (pid == 0)
+      {
+	LogMessage(L_ERROR, "Unable to start backend \"%s\" - %s.",
+                   method, strerror(errno));
+	snprintf(printer->state_message, sizeof(printer->state_message),
+        	 "Unable to start backend \"%s\" - %s.", method, strerror(errno));
+
+	close(current->print_pipes[0]);
+	close(current->print_pipes[1]);
+
+	current->print_pipes[0] = -1;
+	current->print_pipes[1] = -1;
+
+	return;
+      }
+      else
+      {
+	current->backend = pid;
+
+	LogMessage(L_INFO, "Started backend %s (PID %d) for job %d.", command, pid,
+                   current->id);
+      }
     }
-    else
-    {
-      current->procs[i] = pid;
 
-      LogMessage(L_INFO, "Started backend %s (PID %d) for job %d.", command, pid,
-                 current->id);
+    if (current->current_file == (current->num_files - 1))
+    {
+      close(current->print_pipes[0]);
+      close(current->print_pipes[1]);
+
+      current->print_pipes[0] = -1;
+      current->print_pipes[1] = -1;
+
+      close(current->back_pipes[0]);
+      close(current->back_pipes[1]);
+
+      current->back_pipes[0] = -1;
+      current->back_pipes[1] = -1;
     }
   }
   else
@@ -1688,8 +1725,11 @@ StartJob(int       id,		/* I - Job ID */
     filterfds[slot][0] = -1;
     filterfds[slot][1] = -1;
 
-    close(filterfds[!slot][0]);
-    close(filterfds[!slot][1]);
+    if (current->current_file == (current->num_files - 1))
+    {
+      close(filterfds[!slot][0]);
+      close(filterfds[!slot][1]);
+    }
   }
 
   close(filterfds[slot][0]);
@@ -1697,9 +1737,10 @@ StartJob(int       id,		/* I - Job ID */
 
   close(statusfds[1]);
 
-  LogMessage(L_DEBUG2, "StartJob: Adding fd %d to InputSet...", current->pipe);
+  LogMessage(L_DEBUG2, "StartJob: Adding fd %d to InputSet...",
+             current->status_pipe);
 
-  FD_SET(current->pipe, &InputSet);
+  FD_SET(current->status_pipe, &InputSet);
 }
 
 
@@ -1762,25 +1803,43 @@ StopJob(int id,			/* I - Job ID */
 
 	current->current_file --;
 
-        for (i = 0; current->procs[i]; i ++)
-	  if (current->procs[i] > 0)
+        for (i = 0; current->filters[i]; i ++)
+	  if (current->filters[i] > 0)
 	  {
-	    kill(current->procs[i], force ? SIGKILL : SIGTERM);
-	    current->procs[i] = 0;
+	    kill(current->filters[i], force ? SIGKILL : SIGTERM);
+	    current->filters[i] = 0;
 	  }
 
-        if (current->pipe)
+	if (current->backend > 0)
+	{
+	  kill(current->backend, force ? SIGKILL : SIGTERM);
+	  current->backend = 0;
+	}
+
+	close(current->print_pipes[0]);
+        close(current->print_pipes[1]);
+
+	current->print_pipes[0] = -1;
+	current->print_pipes[1] = -1;
+
+        close(current->back_pipes[0]);
+        close(current->back_pipes[1]);
+
+	current->back_pipes[0] = -1;
+	current->back_pipes[1] = -1;
+
+        if (current->status_pipe >= 0)
         {
 	 /*
 	  * Close the pipe and clear the input bit.
 	  */
 
           LogMessage(L_DEBUG2, "StopJob: Removing fd %d from InputSet...",
-	             current->pipe);
+	             current->status_pipe);
 
-          close(current->pipe);
-	  FD_CLR(current->pipe, &InputSet);
-	  current->pipe = 0;
+          close(current->status_pipe);
+	  FD_CLR(current->status_pipe, &InputSet);
+	  current->status_pipe = -1;
         }
 
         if (current->buffer)
@@ -1815,7 +1874,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
   int		loglevel;	/* Log level for message */
 
 
-  if ((bytes = read(job->pipe, job->buffer + job->bufused,
+  if ((bytes = read(job->status_pipe, job->buffer + job->bufused,
                     JOB_BUFFER_SIZE - job->bufused - 1)) > 0)
   {
     job->bufused += bytes;
@@ -1972,18 +2031,18 @@ UpdateJob(job_t *job)		/* I - Job to check */
     LogMessage(L_DEBUG, "UpdateJob: job %d, file %d is complete.",
                job->id, job->current_file - 1);
 
-    if (job->pipe)
+    if (job->status_pipe >= 0)
     {
      /*
       * Close the pipe and clear the input bit.
       */
 
       LogMessage(L_DEBUG2, "UpdateJob: Removing fd %d from InputSet...",
-                 job->pipe);
+                 job->status_pipe);
 
-      close(job->pipe);
-      FD_CLR(job->pipe, &InputSet);
-      job->pipe = 0;
+      close(job->status_pipe);
+      FD_CLR(job->status_pipe, &InputSet);
+      job->status_pipe = -1;
     }
 
     if (job->status < 0)
@@ -2075,6 +2134,7 @@ start_process(const char *command,	/* I - Full path to command */
               int        infd,		/* I - Standard input file descriptor */
 	      int        outfd,		/* I - Standard output file descriptor */
 	      int        errfd,		/* I - Standard error file descriptor */
+	      int        backfd,	/* I - Backchannel file descriptor */
 	      int        root)		/* I - Run as root? */
 {
   int	fd;				/* Looping var */
@@ -2101,12 +2161,18 @@ start_process(const char *command,	/* I - Full path to command */
       close(2);
       dup(errfd);
     }
+    if (backfd > 3)
+    {
+      close(3);
+      dup(backfd);
+      fcntl(3, F_SETFL, O_NDELAY);
+    }
 
    /*
     * Close extra file descriptors...
     */
 
-    for (fd = 3; fd < MaxFDs; fd ++)
+    for (fd = 4; fd < MaxFDs; fd ++)
       close(fd);
 
    /*
@@ -2165,5 +2231,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.9 2002/03/14 19:36:19 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.10 2002/03/21 02:34:27 mike Exp $".
  */

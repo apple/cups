@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.8 2002/02/13 17:26:52 mike Exp $"
+ * "$Id: main.c,v 1.57.2.9 2002/03/21 02:34:28 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -400,7 +400,10 @@ main(int  argc,			/* I - Number of command-line arguments */
       LogMessage(L_EMERG, "BrowseSocket = %d", BrowseSocket);
 
       for (job = Jobs; job != NULL; job = job->next)
-        LogMessage(L_EMERG, "Jobs[%d] = %d", job->id, job->pipe);
+        LogMessage(L_EMERG, "Jobs[%d] = %d < [%d %d] > [%d %d]",
+	           job->id, job->status_pipe,
+		   job->print_pipes[0], job->print_pipes[1],
+		   job->back_pipes[0], job->back_pipes[1]);
 
       break;
     }
@@ -455,14 +458,14 @@ main(int  argc,			/* I - Number of command-line arguments */
     {
       next = job->next;
 
-      if (job->pipe && FD_ISSET(job->pipe, &input))
+      if (job->status_pipe >= 0 && FD_ISSET(job->status_pipe, &input))
       {
        /*
         * Clear the input bit to avoid updating the next job
 	* using the same status pipe file descriptor...
 	*/
 
-        FD_CLR(job->pipe, &input);
+        FD_CLR(job->status_pipe, &input);
 
        /*
         * Read any status messages from the filters...
@@ -642,27 +645,31 @@ sigchld_handler(int sig)	/* I - Signal number */
 
     if (status)
     {
-      if (status < 256)
-	LogMessage(L_ERROR, "PID %d crashed on signal %d!", pid, status);
-      else
+      if (WIFEXITED(status))
 	LogMessage(L_ERROR, "PID %d stopped with status %d!", pid,
-	           status / 256);
+	           WEXITSTATUS(status));
+      else
+	LogMessage(L_ERROR, "PID %d crashed on signal %d!", pid,
+	           WTERMSIG(status));
     }
 
     for (job = Jobs; job != NULL; job = job->next)
       if (job->state->values[0].integer == IPP_JOB_PROCESSING)
       {
-	for (i = 0; job->procs[i]; i ++)
-          if (job->procs[i] == pid)
+	for (i = 0; job->filters[i]; i ++)
+          if (job->filters[i] == pid)
 	    break;
 
-	if (job->procs[i])
+	if (job->filters[i] || job->backend == pid)
 	{
 	 /*
           * OK, this process has gone away; what's left?
 	  */
 
-          job->procs[i] = -pid;
+          if (job->filters[i])
+	    job->filters[i] = -pid;
+	  else
+	    job->backend = -pid;
 
           if (status && job->status >= 0)
 	  {
@@ -674,10 +681,10 @@ sigchld_handler(int sig)	/* I - Signal number */
 	    * printer needs to be stopped.
 	    */
 
-            if (!job->procs[i + 1])
- 	      job->status = -status;	/* Backend failed */
-	    else
+            if (job->filters[i])
  	      job->status = status;	/* Filter failed */
+	    else
+ 	      job->status = -status;	/* Backend failed */
 	  }
 	  break;
 	}
@@ -798,5 +805,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.8 2002/02/13 17:26:52 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.9 2002/03/21 02:34:28 mike Exp $".
  */
