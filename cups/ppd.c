@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.19 2002/08/10 00:05:45 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.20 2002/08/12 00:44:37 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -34,17 +34,26 @@
  *
  * Contents:
  *
- *   ppdClose()        - Free all memory used by the PPD file.
- *   ppd_free_group()  - Free a single UI group.
- *   ppd_free_option() - Free a single option.
- *   ppdOpen()         - Read a PPD file into memory.
- *   ppdOpenFd()       - Read a PPD file into memory.
- *   ppdOpenFile()     - Read a PPD file into memory.
- *   ppd_read()        - Read a line from a PPD file, skipping comment lines
- *                       as necessary.
- *   compare_strings() - Compare two strings.
- *   compare_groups()  - Compare two groups.
- *   compare_options() - Compare two options.
+ *   _ppd_attr_compare()   - Compare two attributes.
+ *   ppdClose()            - Free all memory used by the PPD file.
+ *   ppdOpen()             - Read a PPD file into memory.
+ *   ppdOpenFd()           - Read a PPD file into memory.
+ *   ppdOpenFile()         - Read a PPD file into memory.
+ *   ppd_add_attr()        - Add an attribute to the PPD data.
+ *   ppd_add_choice()      - Add a choice to an option.
+ *   ppd_add_size()        - Add a page size.
+ *   ppd_compare_groups()  - Compare two groups.
+ *   ppd_compare_options() - Compare two options.
+ *   ppd_decode()          - Decode a string value...
+ *   ppd_fix()             - Fix WinANSI characters in the range 0x80 to
+ &                           0x9f to be valid ISO-8859-1 characters...
+ *   ppd_free_group()      - Free a single UI group.
+ *   ppd_free_option()     - Free a single option.
+ *   ppd_get_extopt()      - Get an extended option record.
+ *   ppd_get_group()       - Find or create the named group as needed.
+ *   ppd_get_option()      - Find or create the named option as needed.
+ *   ppd_read()            - Read a line from a PPD file, skipping comment
+ *                           lines as necessary.
  */
 
 /*
@@ -71,7 +80,7 @@
 #  define WRITE_BINARY	"w"		/* Open a binary file for writing */
 #endif /* WIN32 || __EMX__ */
 
-#define safe_free(p)	if (p) free(p)	/* Safe free macro */
+#define ppd_free(p)	if (p) free(p)	/* Safe free macro */
 
 #define PPD_KEYWORD	1		/* Line contained a keyword */
 #define PPD_OPTION	2		/* Line contained an option name */
@@ -83,215 +92,22 @@
  * Local functions...
  */
 
-static int		compare_strings(char *s, char *t);
-static int		compare_groups(ppd_group_t *g0, ppd_group_t *g1);
-static int		compare_options(ppd_option_t *o0, ppd_option_t *o1);
-static int		ppd_read(FILE *fp, char *keyword, char *option,
-			         char *text, char **string);
+static ppd_attr_t	*ppd_add_attr(ppd_file_t *ppd, const char *name,
+			              const char *spec, const char *value);
+static ppd_choice_t	*ppd_add_choice(ppd_option_t *option, const char *name);
+static ppd_size_t	*ppd_add_size(ppd_file_t *ppd, const char *name);
+static int		ppd_compare_groups(ppd_group_t *g0, ppd_group_t *g1);
+static int		ppd_compare_options(ppd_option_t *o0, ppd_option_t *o1);
 static void		ppd_decode(char *string);
 static void		ppd_fix(char *string);
 static void		ppd_free_group(ppd_group_t *group);
 static void		ppd_free_option(ppd_option_t *option);
+static ppd_ext_option_t	*ppd_get_extopt(ppd_file_t *ppd, const char *name);
 static ppd_group_t	*ppd_get_group(ppd_file_t *ppd, const char *name,
 			               const char *text);
-static ppd_attr_t	*ppd_add_attr(ppd_file_t *ppd, const char *name,
-			              const char *spec, const char *value);
 static ppd_option_t	*ppd_get_option(ppd_group_t *group, const char *name);
-static ppd_choice_t	*ppd_add_choice(ppd_option_t *option, const char *name);
-static ppd_ext_option_t	*ppd_add_extopt(ppd_file_t *ppd, const char *name);
-
-
-/*
- * 'ppdClose()' - Free all memory used by the PPD file.
- */
-
-void
-ppdClose(ppd_file_t *ppd)	/* I - PPD file record */
-{
-  int		i;		/* Looping var */
-  ppd_emul_t	*emul;		/* Current emulation */
-  ppd_group_t	*group;		/* Current group */
-  char		**font;		/* Current font */
-  char		**filter;	/* Current filter */
-  ppd_attr_t	**attr;		/* Current attribute */
-
-
- /*
-  * Range check the PPD file record...
-  */
-
-  if (ppd == NULL)
-    return;
-
- /*
-  * Free all strings at the top level...
-  */
-
-  safe_free(ppd->patches);
-  safe_free(ppd->jcl_begin);
-  safe_free(ppd->jcl_ps);
-  safe_free(ppd->jcl_end);
-  safe_free(ppd->lang_encoding);
-  safe_free(ppd->lang_version);
-  safe_free(ppd->modelname);
-  safe_free(ppd->ttrasterizer);
-  safe_free(ppd->manufacturer);
-  safe_free(ppd->product);
-  safe_free(ppd->nickname);
-  safe_free(ppd->shortnickname);
-
- /*
-  * Free any emulations...
-  */
-
-  if (ppd->num_emulations > 0)
-  {
-    for (i = ppd->num_emulations, emul = ppd->emulations; i > 0; i --, emul ++)
-    {
-      safe_free(emul->start);
-      safe_free(emul->stop);
-    }
-
-    safe_free(ppd->emulations);
-  }
-
- /*
-  * Free any UI groups, subgroups, and options...
-  */
-
-  if (ppd->num_groups > 0)
-  {
-    for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
-      ppd_free_group(group);
-
-    safe_free(ppd->groups);
-  }
-
- /*
-  * Free any page sizes...
-  */
-
-  if (ppd->num_sizes > 0)
-    safe_free(ppd->sizes);
-
- /*
-  * Free any constraints...
-  */
-
-  if (ppd->num_consts > 0)
-    safe_free(ppd->consts);
-
- /*
-  * Free any filters...
-  */
-
-  if (ppd->num_filters > 0)
-  {
-    for (i = ppd->num_filters, filter = ppd->filters; i > 0; i --, filter ++)
-      safe_free(*filter);
-
-    safe_free(ppd->filters);
-  }
-
- /*
-  * Free any fonts...
-  */
-
-  if (ppd->num_fonts > 0)
-  {
-    for (i = ppd->num_fonts, font = ppd->fonts; i > 0; i --, font ++)
-      safe_free(*font);
-
-    safe_free(ppd->fonts);
-  }
-
- /*
-  * Free any profiles...
-  */
-
-  if (ppd->num_profiles > 0)
-    safe_free(ppd->profiles);
-
- /*
-  * Free any attributes...
-  */
-
-  if (ppd->num_attrs > 0)
-  {
-    for (i = ppd->num_attrs, attr = ppd->attrs; i > 0; i --, attr ++)
-    {
-      safe_free((*attr)->value);
-      safe_free(*attr);
-    }
-
-    safe_free(ppd->attrs);
-  }
-
- /*
-  * Free the whole record...
-  */
-
-  safe_free(ppd);
-}
-
-
-/*
- * 'ppd_add_attr()' - Add an attribute to the PPD data.
- */
-
-static ppd_attr_t *		/* O - New attribute */
-ppd_add_attr(ppd_file_t *ppd,	/* I - PPD file data */
-             const char *name,	/* I - Attribute name */
-             const char *spec,	/* I - Specifier string, if any */
-	     const char *value)	/* I - Value of attribute */
-{
-  ppd_attr_t	**ptr,		/* New array */
-		*temp;		/* New attribute */
-
-
- /*
-  * Range check input...
-  */
-
-  if (ppd == NULL || name == NULL || spec == NULL)
-    return (NULL);
-
- /*
-  * Allocate memory for the new attribute...
-  */
-
-  if (ppd->num_attrs == 0)
-    ptr = malloc(sizeof(ppd_attr_t *));
-  else
-    ptr = realloc(ppd->attrs, (ppd->num_attrs + 1) * sizeof(ppd_attr_t *));
-
-  if (ptr == NULL)
-    return (NULL);
-
-  ppd->attrs = ptr;
-  ptr += ppd->num_attrs;
-
-  if ((temp = calloc(1, sizeof(ppd_attr_t))) == NULL)
-    return (NULL);
-
-  *ptr = temp;
-
-  ppd->num_attrs ++;
-
- /*
-  * Copy data over...
-  */
-
-  strlcpy(temp->name, name, sizeof(temp->name));
-  strlcpy(temp->spec, spec, sizeof(temp->spec));
-  temp->value = (char *)value;
-
- /*
-  * Return the attribute...
-  */
-
-  return (temp);
-}
+static int		ppd_read(FILE *fp, char *keyword, char *option,
+			         char *text, char **string);
 
 
 /*
@@ -315,204 +131,136 @@ _ppd_attr_compare(ppd_attr_t **a,	/* I - First attribute */
 
 
 /*
- * 'ppd_free_group()' - Free a single UI group.
+ * 'ppdClose()' - Free all memory used by the PPD file.
  */
 
-static void
-ppd_free_group(ppd_group_t *group)	/* I - Group to free */
-{
-  int		i;		/* Looping var */
-  ppd_option_t	*option;	/* Current option */
-  ppd_group_t	*subgroup;	/* Current sub-group */
-
-
-  if (group->num_options > 0)
-  {
-    for (i = group->num_options, option = group->options;
-         i > 0;
-	 i --, option ++)
-      ppd_free_option(option);
-
-    safe_free(group->options);
-  }
-
-  if (group->num_subgroups > 0)
-  {
-    for (i = group->num_subgroups, subgroup = group->subgroups;
-         i > 0;
-	 i --, subgroup ++)
-      ppd_free_group(subgroup);
-
-    safe_free(group->subgroups);
-  }
-}
-
-
-/*
- * 'ppd_free_option()' - Free a single option.
- */
-
-static void
-ppd_free_option(ppd_option_t *option)	/* I - Option to free */
-{
-  int		i;		/* Looping var */
-  ppd_choice_t	*choice;	/* Current choice */
-
-
-  if (option->num_choices > 0)
-  {
-    for (i = option->num_choices, choice = option->choices;
-         i > 0;
-         i --, choice ++)
-      safe_free(choice->code);
-
-    safe_free(option->choices);
-  }
-}
-
-
-/*
- * 'ppd_get_group()' - Find or create the named group as needed.
- */
-
-static ppd_group_t *		/* O - Named group */
-ppd_get_group(ppd_file_t *ppd,	/* I - PPD file */
-              const char *name,	/* I - Name of group */
-	      const char *text)	/* I - Text for group */
-{
-  int		i;		/* Looping var */
-  ppd_group_t	*group;		/* Group */
-
-
-  DEBUG_printf(("ppd_get_group(%p, \"%s\")\n", ppd, name));
-
-  for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
-    if (strcmp(group->name, name) == 0)
-      break;
-
-  if (i == 0)
-  {
-    DEBUG_printf(("Adding group %s...\n", name));
-
-    if (ppd->num_groups == 0)
-      group = malloc(sizeof(ppd_group_t));
-    else
-      group = realloc(ppd->groups,
-	              (ppd->num_groups + 1) * sizeof(ppd_group_t));
-
-    if (group == NULL)
-      return (NULL);
-
-    ppd->groups = group;
-    group += ppd->num_groups;
-    ppd->num_groups ++;
-
-    memset(group, 0, sizeof(ppd_group_t));
-    strlcpy(group->name, name, sizeof(group->name));
-    strlcpy(group->text, text, sizeof(group->text));
-  }
-
-  return (group);
-}
-
-
-/*
- * 'ppd_get_option()' - Find or create the named option as needed.
- */
-
-static ppd_option_t *			/* O - Named option */
-ppd_get_option(ppd_group_t *group,	/* I - Group */
-               const char  *name)	/* I - Name of option */
+void
+ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
 {
   int		i;			/* Looping var */
-  ppd_option_t	*option;		/* Option */
+  ppd_emul_t	*emul;			/* Current emulation */
+  ppd_group_t	*group;			/* Current group */
+  char		**font;			/* Current font */
+  char		**filter;		/* Current filter */
+  ppd_attr_t	**attr;			/* Current attribute */
 
 
-  for (i = group->num_options, option = group->options; i > 0; i --, option ++)
-    if (strcmp(option->keyword, name) == 0)
-      break;
+ /*
+  * Range check the PPD file record...
+  */
 
-  if (i == 0)
+  if (ppd == NULL)
+    return;
+
+ /*
+  * Free all strings at the top level...
+  */
+
+  ppd_free(ppd->patches);
+  ppd_free(ppd->jcl_begin);
+  ppd_free(ppd->jcl_ps);
+  ppd_free(ppd->jcl_end);
+  ppd_free(ppd->lang_encoding);
+  ppd_free(ppd->lang_version);
+  ppd_free(ppd->modelname);
+  ppd_free(ppd->ttrasterizer);
+  ppd_free(ppd->manufacturer);
+  ppd_free(ppd->product);
+  ppd_free(ppd->nickname);
+  ppd_free(ppd->shortnickname);
+
+ /*
+  * Free any emulations...
+  */
+
+  if (ppd->num_emulations > 0)
   {
-    if (group->num_options == 0)
-      option = malloc(sizeof(ppd_option_t));
-    else
-      option = realloc(group->options,
-	               (group->num_options + 1) * sizeof(ppd_option_t));
+    for (i = ppd->num_emulations, emul = ppd->emulations; i > 0; i --, emul ++)
+    {
+      ppd_free(emul->start);
+      ppd_free(emul->stop);
+    }
 
-    if (option == NULL)
-      return (NULL);
-
-    group->options = option;
-    option += group->num_options;
-    group->num_options ++;
-
-    memset(option, 0, sizeof(ppd_option_t));
-    strlcpy(option->keyword, name, sizeof(option->keyword));
+    ppd_free(ppd->emulations);
   }
 
-  return (option);
-}
+ /*
+  * Free any UI groups, subgroups, and options...
+  */
 
+  if (ppd->num_groups > 0)
+  {
+    for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
+      ppd_free_group(group);
 
-/*
- * 'ppd_add_choice()' - Add a choice to an option.
- */
+    ppd_free(ppd->groups);
+  }
 
-static ppd_choice_t *			/* O - Named choice */
-ppd_add_choice(ppd_option_t *option,	/* I - Option */
-               const char   *name)	/* I - Name of choice */
-{
-  ppd_choice_t	*choice;		/* Choice */
+ /*
+  * Free any page sizes...
+  */
 
+  if (ppd->num_sizes > 0)
+    ppd_free(ppd->sizes);
 
-  if (option->num_choices == 0)
-    choice = malloc(sizeof(ppd_choice_t));
-  else
-    choice = realloc(option->choices,
-	             sizeof(ppd_choice_t) * (option->num_choices + 1));
+ /*
+  * Free any constraints...
+  */
 
-  if (choice == NULL)
-    return (NULL);
+  if (ppd->num_consts > 0)
+    ppd_free(ppd->consts);
 
-  option->choices = choice;
-  choice += option->num_choices;
-  option->num_choices ++;
+ /*
+  * Free any filters...
+  */
 
-  memset(choice, 0, sizeof(ppd_choice_t));
-  strlcpy(choice->choice, name, sizeof(choice->choice));
+  if (ppd->num_filters > 0)
+  {
+    for (i = ppd->num_filters, filter = ppd->filters; i > 0; i --, filter ++)
+      ppd_free(*filter);
 
-  return (choice);
-}
+    ppd_free(ppd->filters);
+  }
 
+ /*
+  * Free any fonts...
+  */
 
-/*
- * 'ppd_add_size()' - Add a page size.
- */
+  if (ppd->num_fonts > 0)
+  {
+    for (i = ppd->num_fonts, font = ppd->fonts; i > 0; i --, font ++)
+      ppd_free(*font);
 
-static ppd_size_t *		/* O - Named size */
-ppd_add_size(ppd_file_t *ppd,	/* I - PPD file */
-             const char *name)	/* I - Name of size */
-{
-  ppd_size_t	*size;		/* Size */
+    ppd_free(ppd->fonts);
+  }
 
+ /*
+  * Free any profiles...
+  */
 
-  if (ppd->num_sizes == 0)
-    size = malloc(sizeof(ppd_size_t));
-  else
-    size = realloc(ppd->sizes, sizeof(ppd_size_t) * (ppd->num_sizes + 1));
+  if (ppd->num_profiles > 0)
+    ppd_free(ppd->profiles);
 
-  if (size == NULL)
-    return (NULL);
+ /*
+  * Free any attributes...
+  */
 
-  ppd->sizes = size;
-  size += ppd->num_sizes;
-  ppd->num_sizes ++;
+  if (ppd->num_attrs > 0)
+  {
+    for (i = ppd->num_attrs, attr = ppd->attrs; i > 0; i --, attr ++)
+    {
+      ppd_free((*attr)->value);
+      ppd_free(*attr);
+    }
 
-  memset(size, 0, sizeof(ppd_size_t));
-  strlcpy(size->name, name, sizeof(size->name));
+    ppd_free(ppd->attrs);
+  }
 
-  return (size);
+ /*
+  * Free the whole record...
+  */
+
+  ppd_free(ppd);
 }
 
 
@@ -520,35 +268,36 @@ ppd_add_size(ppd_file_t *ppd,	/* I - PPD file */
  * 'ppdOpen()' - Read a PPD file into memory.
  */
 
-ppd_file_t *			/* O - PPD file record */
-ppdOpen(FILE *fp)		/* I - File to read from */
+ppd_file_t *				/* O - PPD file record */
+ppdOpen(FILE *fp)			/* I - File to read from */
 {
-  int		i, j, k, m;	/* Looping vars */
-  int		count;		/* Temporary count */
-  ppd_file_t	*ppd;		/* PPD file record */
-  ppd_group_t	*group,		/* Current group */
-		*subgroup;	/* Current sub-group */
-  ppd_option_t	*option;	/* Current option */
-  ppd_choice_t	*choice;	/* Current choice */
-  ppd_const_t	*constraint;	/* Current constraint */
-  ppd_size_t	*size;		/* Current page size */
-  int		mask;		/* Line data mask */
-  char		keyword[PPD_MAX_NAME],
-  				/* Keyword from file */
-		name[PPD_MAX_NAME],
-				/* Option from file */
-		text[PPD_MAX_LINE],
-				/* Human-readable text from file */
-		*string,	/* Code/text from file */
-		*sptr,		/* Pointer into string */
-		*nameptr,	/* Pointer into name */
-		*temp,		/* Temporary string pointer */
-		**tempfonts;	/* Temporary fonts pointer */
-  float		order;		/* Order dependency number */
-  ppd_section_t	section;	/* Order dependency section */
-  ppd_profile_t	*profile;	/* Pointer to color profile */
-  char		**filter;	/* Pointer to filter */
-  cups_lang_t	*language;	/* Default language */
+  int			i, j, k, m;	/* Looping vars */
+  int			count;		/* Temporary count */
+  ppd_file_t		*ppd;		/* PPD file record */
+  ppd_group_t		*group,		/* Current group */
+			*subgroup;	/* Current sub-group */
+  ppd_option_t		*option;	/* Current option */
+  ppd_ext_option_t	*extopt;	/* Current extended option */
+  ppd_choice_t		*choice;	/* Current choice */
+  ppd_const_t		*constraint;	/* Current constraint */
+  ppd_size_t		*size;		/* Current page size */
+  int			mask;		/* Line data mask */
+  char			keyword[PPD_MAX_NAME],
+  					/* Keyword from file */
+			name[PPD_MAX_NAME],
+					/* Option from file */
+			text[PPD_MAX_LINE],
+					/* Human-readable text from file */
+			*string,	/* Code/text from file */
+			*sptr,		/* Pointer into string */
+			*nameptr,	/* Pointer into name */
+			*temp,		/* Temporary string pointer */
+			**tempfonts;	/* Temporary fonts pointer */
+  float			order;		/* Order dependency number */
+  ppd_section_t		section;	/* Order dependency section */
+  ppd_profile_t		*profile;	/* Pointer to color profile */
+  char			**filter;	/* Pointer to filter */
+  cups_lang_t		*language;	/* Default language */
 
 
  /*
@@ -578,14 +327,14 @@ ppdOpen(FILE *fp)		/* I - File to read from */
     * Either this is not a PPD file, or it is not a 4.x PPD file.
     */
 
-    safe_free(string);
+    ppd_free(string);
 
     return (NULL);
   }
 
   DEBUG_printf(("ppdOpen: keyword = %s, string = %p\n", keyword, string));
 
-  safe_free(string);
+  ppd_free(string);
 
  /*
   * Allocate memory for the PPD file record...
@@ -769,7 +518,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 
       if (filter == NULL)
       {
-        safe_free(filter);
+        ppd_free(filter);
 	ppdClose(ppd);
 	return (NULL);
       }
@@ -801,7 +550,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 
       if (tempfonts == NULL)
       {
-        safe_free(string);
+        ppd_free(string);
         ppdClose(ppd);
 	return (NULL);
       }
@@ -836,14 +585,14 @@ ppdOpen(FILE *fp)		/* I - File to read from */
                                                  CUPS_MSG_GENERAL))) == NULL)
 	{
           ppdClose(ppd);
-	  safe_free(string);
+	  ppd_free(string);
 	  return (NULL);
 	}
 
 	if ((option = ppd_get_option(temp, "PageSize")) == NULL)
 	{
           ppdClose(ppd);
-	  safe_free(string);
+	  ppd_free(string);
 	  return (NULL);
 	}
       }
@@ -851,7 +600,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       if ((choice = ppd_add_choice(option, "Custom")) == NULL)
       {
         ppdClose(ppd);
-	safe_free(string);
+	ppd_free(string);
 	return (NULL);
       }
 
@@ -904,7 +653,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	  {
 	    DEBUG_puts("Unable to get general group!");
             ppdClose(ppd);
-	    safe_free(string);
+	    ppd_free(string);
 	    return (NULL);
 	  }
 
@@ -912,7 +661,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	  {
 	    DEBUG_puts("Unable to get PageSize option!");
             ppdClose(ppd);
-	    safe_free(string);
+	    ppd_free(string);
 	    return (NULL);
 	  }
         }
@@ -921,7 +670,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	{
 	  DEBUG_puts("Unable to add Custom choice!");
           ppdClose(ppd);
-	  safe_free(string);
+	  ppd_free(string);
 	  return (NULL);
 	}
 
@@ -934,7 +683,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       {
 	DEBUG_puts("Unable to find PageSize option!");
 	ppdClose(ppd);
-	safe_free(string);
+	ppd_free(string);
 	return (NULL);
       }
 
@@ -942,7 +691,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       {
 	DEBUG_puts("Unable to find Custom choice!");
         ppdClose(ppd);
-	safe_free(string);
+	ppd_free(string);
 	return (NULL);
       }
 
@@ -1019,7 +768,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	                             strlen(string) + 1);
         if (temp == NULL)
 	{
-	  safe_free(string);
+	  ppd_free(string);
 	  ppdClose(ppd);
 	  return (NULL);
 	}
@@ -1069,7 +818,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
         if (group == NULL)
 	{
 	  ppdClose(ppd);
-	  safe_free(string);
+	  ppd_free(string);
 	  return (NULL);
 	}
 
@@ -1083,7 +832,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       if (option == NULL)
       {
 	ppdClose(ppd);
-	safe_free(string);
+	ppd_free(string);
 	return (NULL);
       }
 
@@ -1137,7 +886,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       if (group == NULL)
       {
         ppdClose(ppd);
-	safe_free(string);
+	ppd_free(string);
 	return (NULL);
       }
 
@@ -1153,7 +902,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       if (option == NULL)
       {
         ppdClose(ppd);
-	safe_free(string);
+	ppd_free(string);
 	return (NULL);
       }
 
@@ -1185,7 +934,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       if (group != NULL)
       {
         ppdClose(ppd);
-	safe_free(string);
+	ppd_free(string);
 	return (NULL);
       }
 
@@ -1219,7 +968,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       if (sscanf(string, "%f%40s%40s", &order, name, keyword) != 3)
       {
         ppdClose(ppd);
-	safe_free(string);
+	ppd_free(string);
 	return (NULL);
       }
 
@@ -1312,7 +1061,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       if (constraint == NULL)
       {
 	ppdClose(ppd);
-	safe_free(string);
+	ppd_free(string);
 	return (NULL);
       }
 
@@ -1327,7 +1076,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
         case 0 : /* Error */
 	case 1 : /* Error */
 	    ppdClose(ppd);
-  	    safe_free(string);
+  	    ppd_free(string);
 	    break;
 
 	case 2 : /* Two options... */
@@ -1393,7 +1142,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	*/
 
         ppdClose(ppd);
-	safe_free(string);
+	ppd_free(string);
 	return (NULL);
       }
 
@@ -1411,7 +1160,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	*/
 
         ppdClose(ppd);
-	safe_free(string);
+	ppd_free(string);
 	return (NULL);
       }
 
@@ -1459,6 +1208,164 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       choice->code = string;
       string = NULL;			/* Don't free this string below */
     }
+    else if (strcmp(keyword, "cupsUIType") == 0 &&
+             (mask & (PPD_KEYWORD | PPD_STRING)) == (PPD_KEYWORD | PPD_STRING) &&
+	     option != NULL)
+    {
+     /*
+      * Define an extended option value type...
+      */
+
+      extopt = ppd_get_extopt(ppd, name);
+
+      if (strcmp(string, "Text") == 0)
+        option->ui = PPD_UI_CUPS_TEXT;
+      else if (strcmp(string, "Integer") == 0)
+      {
+        option->ui             = PPD_UI_CUPS_INTEGER;
+	extopt->minval.integer = 0;
+	extopt->maxval.integer = 100;
+      }
+      else if (strcmp(string, "Real") == 0)
+      {
+        option->ui          = PPD_UI_CUPS_REAL;
+	extopt->minval.real = 0.0;
+	extopt->maxval.real = 1.0;
+      }
+      else if (strcmp(string, "Gamma") == 0)
+      {
+        option->ui           = PPD_UI_CUPS_GAMMA;
+	extopt->minval.gamma = 1.0;
+	extopt->maxval.gamma = 10.0;
+      }
+      else if (strcmp(string, "Curve") == 0)
+      {
+        option->ui                 = PPD_UI_CUPS_CURVE;
+	extopt->minval.curve.start = 0.0;
+	extopt->minval.curve.end   = 0.0;
+	extopt->minval.curve.gamma = 1.0;
+	extopt->maxval.curve.start = 1.0;
+	extopt->maxval.curve.end   = 1.0;
+	extopt->maxval.curve.gamma = 10.0;
+      }
+      else if (strcmp(string, "IntegerArray") == 0)
+      {
+        option->ui                                = PPD_UI_CUPS_INTEGER_ARRAY;
+	extopt->minval.integer_array.num_elements = 2;
+	extopt->maxval.integer_array.num_elements = 16;
+      }
+      else if (strcmp(string, "RealArray") == 0)
+      {
+        option->ui                             = PPD_UI_CUPS_REAL_ARRAY;
+	extopt->minval.real_array.num_elements = 2;
+	extopt->maxval.real_array.num_elements = 16;
+      }
+    }
+    else if (strcmp(keyword, "cupsUIMin") == 0 &&
+             (mask & (PPD_KEYWORD | PPD_STRING)) == (PPD_KEYWORD | PPD_STRING) &&
+	     option != NULL)
+    {
+     /*
+      * Define an extended option minimum value...
+      */
+
+      extopt = ppd_get_extopt(ppd, name);
+
+      switch (option->ui)
+      {
+        case PPD_UI_CUPS_INTEGER :
+	    sscanf(string, "%d", &(extopt->minval.integer));
+	    break;
+
+        case PPD_UI_CUPS_REAL :
+	    sscanf(string, "%f", &(extopt->minval.real));
+	    break;
+
+        case PPD_UI_CUPS_GAMMA :
+	    sscanf(string, "%f", &(extopt->minval.gamma));
+	    break;
+
+        case PPD_UI_CUPS_CURVE :
+	    sscanf(string, "%f%f%f", &(extopt->minval.curve.start),
+	           &(extopt->minval.curve.end),
+	           &(extopt->minval.curve.gamma));
+	    break;
+
+        case PPD_UI_CUPS_INTEGER_ARRAY :
+	    extopt->minval.integer_array.elements = calloc(1, sizeof(int));
+	    sscanf(string, "%d%d", &(extopt->minval.integer_array.num_elements),
+	           extopt->minval.integer_array.elements);
+	    break;
+
+        case PPD_UI_CUPS_REAL_ARRAY :
+	    extopt->minval.real_array.elements = calloc(1, sizeof(float));
+	    sscanf(string, "%d%f", &(extopt->minval.real_array.num_elements),
+	           extopt->minval.real_array.elements);
+	    break;
+
+	default :
+            break;
+      }
+    }
+    else if (strcmp(keyword, "cupsUIMax") == 0 &&
+             (mask & (PPD_KEYWORD | PPD_STRING)) == (PPD_KEYWORD | PPD_STRING) &&
+	     option != NULL)
+    {
+     /*
+      * Define an extended option maximum value...
+      */
+
+      extopt = ppd_get_extopt(ppd, name);
+
+      switch (option->ui)
+      {
+        case PPD_UI_CUPS_INTEGER :
+	    sscanf(string, "%d", &(extopt->maxval.integer));
+	    break;
+
+        case PPD_UI_CUPS_REAL :
+	    sscanf(string, "%f", &(extopt->maxval.real));
+	    break;
+
+        case PPD_UI_CUPS_GAMMA :
+	    sscanf(string, "%f", &(extopt->maxval.gamma));
+	    break;
+
+        case PPD_UI_CUPS_CURVE :
+	    sscanf(string, "%f%f%f", &(extopt->maxval.curve.start),
+	           &(extopt->maxval.curve.end),
+	           &(extopt->maxval.curve.gamma));
+	    break;
+
+        case PPD_UI_CUPS_INTEGER_ARRAY :
+	    extopt->maxval.integer_array.elements = calloc(1, sizeof(int));
+	    sscanf(string, "%d%d", &(extopt->maxval.integer_array.num_elements),
+	           extopt->maxval.integer_array.elements);
+	    break;
+
+        case PPD_UI_CUPS_REAL_ARRAY :
+	    extopt->maxval.real_array.elements = calloc(1, sizeof(float));
+	    sscanf(string, "%d%f", &(extopt->maxval.real_array.num_elements),
+	           extopt->maxval.real_array.elements);
+	    break;
+
+	default :
+            break;
+      }
+    }
+    else if (strcmp(keyword, "cupsUICommand") == 0 &&
+             (mask & (PPD_KEYWORD | PPD_STRING)) == (PPD_KEYWORD | PPD_STRING) &&
+	     option != NULL)
+    {
+     /*
+      * Define an extended option command...
+      */
+
+      extopt = ppd_get_extopt(ppd, name);
+
+      extopt->command = string;
+      string = NULL;
+    }
     else if (strcmp(keyword, "OpenSubGroup") != 0 &&
              strcmp(keyword, "CloseSubGroup") != 0)
     {
@@ -1470,7 +1377,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       string = NULL;			/* Don't free this string below */
     }
 
-    safe_free(string);
+    ppd_free(string);
   }
 
 #ifdef DEBUG
@@ -1508,14 +1415,14 @@ ppdOpen(FILE *fp)		/* I - File to read from */
   */
 
   qsort(ppd->groups, ppd->num_groups, sizeof(ppd_group_t),
-        (int (*)(const void *, const void *))compare_groups);
+        (int (*)(const void *, const void *))ppd_compare_groups);
 
   for (i = ppd->num_groups, group = ppd->groups;
        i > 0;
        i --, group ++)
   {
     qsort(group->options, group->num_options, sizeof(ppd_option_t),
-          (int (*)(const void *, const void *))compare_options);
+          (int (*)(const void *, const void *))ppd_compare_options);
 
     for (j = group->num_options, option = group->options;
          j > 0;
@@ -1526,14 +1433,14 @@ ppdOpen(FILE *fp)		/* I - File to read from */
     }
 
     qsort(group->subgroups, group->num_subgroups, sizeof(ppd_group_t),
-          (int (*)(const void *, const void *))compare_groups);
+          (int (*)(const void *, const void *))ppd_compare_groups);
 
     for (j = group->num_subgroups, subgroup = group->subgroups;
          j > 0;
 	 j --, subgroup ++)
     {
       qsort(subgroup->options, subgroup->num_options, sizeof(ppd_option_t),
-            (int (*)(const void *, const void *))compare_options);
+            (int (*)(const void *, const void *))ppd_compare_options);
 
       for (k = group->num_options, option = group->options;
            k > 0;
@@ -1544,6 +1451,13 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       }
     }
   }
+
+ /*
+  * Set the option pointers for all extended options...
+  */
+
+  for (i = 0; i < ppd->num_extended; i ++)
+    ppd->extended[i]->option = ppdFindOption(ppd, ppd->extended[i]->keyword);
 
  /*
   * Sort the attributes...
@@ -1561,11 +1475,11 @@ ppdOpen(FILE *fp)		/* I - File to read from */
  * 'ppdOpenFd()' - Read a PPD file into memory.
  */
 
-ppd_file_t *			/* O - PPD file record */
-ppdOpenFd(int fd)		/* I - File to read from */
+ppd_file_t *				/* O - PPD file record */
+ppdOpenFd(int fd)			/* I - File to read from */
 {
-  FILE		*fp;		/* File pointer */
-  ppd_file_t	*ppd;		/* PPD file record */
+  FILE		*fp;			/* File pointer */
+  ppd_file_t	*ppd;			/* PPD file record */
 
 
  /*
@@ -1585,7 +1499,7 @@ ppdOpenFd(int fd)		/* I - File to read from */
 
     ppd = ppdOpen(fp);
 
-    safe_free(fp);
+    ppd_free(fp);
   }
   else
     ppd = NULL;
@@ -1598,11 +1512,11 @@ ppdOpenFd(int fd)		/* I - File to read from */
  * 'ppdOpenFile()' - Read a PPD file into memory.
  */
 
-ppd_file_t *			/* O - PPD file record */
-ppdOpenFile(const char *filename) /* I - File to read from */
+ppd_file_t *				/* O - PPD file record */
+ppdOpenFile(const char *filename)	/* I - File to read from */
 {
-  FILE		*fp;		/* File pointer */
-  ppd_file_t	*ppd;		/* PPD file record */
+  FILE		*fp;			/* File pointer */
+  ppd_file_t	*ppd;			/* PPD file record */
 
 
  /*
@@ -1630,152 +1544,331 @@ ppdOpenFile(const char *filename) /* I - File to read from */
 
 
 /*
- * 'compare_strings()' - Compare two strings.
+ * 'ppd_add_attr()' - Add an attribute to the PPD data.
  */
 
-static int			/* O - Result of comparison */
-compare_strings(char *s,	/* I - First string */
-                char *t)	/* I - Second string */
+static ppd_attr_t *			/* O - New attribute */
+ppd_add_attr(ppd_file_t *ppd,		/* I - PPD file data */
+             const char *name,		/* I - Attribute name */
+             const char *spec,		/* I - Specifier string, if any */
+	     const char *value)		/* I - Value of attribute */
 {
-  int	diff,			/* Difference between digits */
-	digits;			/* Number of digits */
+  ppd_attr_t	**ptr,			/* New array */
+		*temp;			/* New attribute */
 
 
  /*
-  * Loop through both strings, returning only when a difference is
-  * seen.  Also, compare whole numbers rather than just characters, too!
+  * Range check input...
   */
 
-  while (*s && *t)
-  {
-    if (isdigit(*s) && isdigit(*t))
+  if (ppd == NULL || name == NULL || spec == NULL)
+    return (NULL);
+
+ /*
+  * Allocate memory for the new attribute...
+  */
+
+  if (ppd->num_attrs == 0)
+    ptr = malloc(sizeof(ppd_attr_t *));
+  else
+    ptr = realloc(ppd->attrs, (ppd->num_attrs + 1) * sizeof(ppd_attr_t *));
+
+  if (ptr == NULL)
+    return (NULL);
+
+  ppd->attrs = ptr;
+  ptr += ppd->num_attrs;
+
+  if ((temp = calloc(1, sizeof(ppd_attr_t))) == NULL)
+    return (NULL);
+
+  *ptr = temp;
+
+  ppd->num_attrs ++;
+
+ /*
+  * Copy data over...
+  */
+
+  strlcpy(temp->name, name, sizeof(temp->name));
+  strlcpy(temp->spec, spec, sizeof(temp->spec));
+  temp->value = (char *)value;
+
+ /*
+  * Return the attribute...
+  */
+
+  return (temp);
+}
+
+
+/*
+ * 'ppd_add_choice()' - Add a choice to an option.
+ */
+
+static ppd_choice_t *			/* O - Named choice */
+ppd_add_choice(ppd_option_t *option,	/* I - Option */
+               const char   *name)	/* I - Name of choice */
+{
+  ppd_choice_t	*choice;		/* Choice */
+
+
+  if (option->num_choices == 0)
+    choice = malloc(sizeof(ppd_choice_t));
+  else
+    choice = realloc(option->choices,
+	             sizeof(ppd_choice_t) * (option->num_choices + 1));
+
+  if (choice == NULL)
+    return (NULL);
+
+  option->choices = choice;
+  choice += option->num_choices;
+  option->num_choices ++;
+
+  memset(choice, 0, sizeof(ppd_choice_t));
+  strlcpy(choice->choice, name, sizeof(choice->choice));
+
+  return (choice);
+}
+
+
+/*
+ * 'ppd_add_size()' - Add a page size.
+ */
+
+static ppd_size_t *			/* O - Named size */
+ppd_add_size(ppd_file_t *ppd,		/* I - PPD file */
+             const char *name)		/* I - Name of size */
+{
+  ppd_size_t	*size;			/* Size */
+
+
+  if (ppd->num_sizes == 0)
+    size = malloc(sizeof(ppd_size_t));
+  else
+    size = realloc(ppd->sizes, sizeof(ppd_size_t) * (ppd->num_sizes + 1));
+
+  if (size == NULL)
+    return (NULL);
+
+  ppd->sizes = size;
+  size += ppd->num_sizes;
+  ppd->num_sizes ++;
+
+  memset(size, 0, sizeof(ppd_size_t));
+  strlcpy(size->name, name, sizeof(size->name));
+
+  return (size);
+}
+
+
+/*
+ * 'ppd_compare_groups()' - Compare two groups.
+ */
+
+static int				/* O - Result of comparison */
+ppd_compare_groups(ppd_group_t *g0,	/* I - First group */
+                   ppd_group_t *g1)	/* I - Second group */
+{
+  return (strcasecmp(g0->text, g1->text));
+}
+
+
+/*
+ * 'ppd_compare_options()' - Compare two options.
+ */
+
+static int				/* O - Result of comparison */
+ppd_compare_options(ppd_option_t *o0,	/* I - First option */
+                    ppd_option_t *o1)	/* I - Second option */
+{
+  return (strcasecmp(o0->text, o1->text));
+}
+
+
+/*
+ * 'ppd_decode()' - Decode a string value...
+ */
+
+static void
+ppd_decode(char *string)		/* I - String to decode */
+{
+  char	*inptr,				/* Input pointer */
+	*outptr;			/* Output pointer */
+
+
+  inptr  = string;
+  outptr = string;
+
+  while (*inptr != '\0')
+    if (*inptr == '<' && isxdigit(inptr[1]))
     {
      /*
-      * Got a number; start by skipping leading 0's...
+      * Convert hex to 8-bit values...
       */
 
-      while (*s == '0')
-        s ++;
-      while (*t == '0')
-        t ++;
-
-     /*
-      * Skip equal digits...
-      */
-
-      while (isdigit(*s) && *s == *t)
+      inptr ++;
+      while (isxdigit(*inptr))
       {
-        s ++;
-	t ++;
+	if (isalpha(*inptr))
+	  *outptr = (tolower(*inptr) - 'a' + 10) << 4;
+	else
+	  *outptr = (*inptr - '0') << 4;
+
+	inptr ++;
+
+	if (isalpha(*inptr))
+	  *outptr |= tolower(*inptr) - 'a' + 10;
+	else
+	  *outptr |= *inptr - '0';
+
+	inptr ++;
+	outptr ++;
       }
 
-     /*
-      * Bounce out if *s and *t aren't both digits...
-      */
-
-      if (isdigit(*s) && !isdigit(*t))
-        return (1);
-      else if (!isdigit(*s) && isdigit(*t))
-        return (-1);
-      else if (!isdigit(*s) || !isdigit(*t))
-        continue;     
-
-      if (*s < *t)
-        diff = -1;
-      else
-        diff = 1;
-
-     /*
-      * Figure out how many more digits there are...
-      */
-
-      digits = 0;
-
-      while (isdigit(*s))
-      {
-        digits ++;
-	s ++;
-      }
-
-      while (isdigit(*t))
-      {
-        digits --;
-	t ++;
-      }
-
-     /*
-      * Return if the number or value of the digits is different...
-      */
-
-      if (digits < 0)
-        return (-1);
-      else if (digits > 0)
-        return (1);
-      else
-        return (diff);
+      while (*inptr != '>' && *inptr != '\0')
+	inptr ++;
+      while (*inptr == '>')
+	inptr ++;
     }
-    else if (tolower(*s) < tolower(*t))
-      return (-1);
-    else if (tolower(*s) > tolower(*t))
-      return (1);
     else
-    {
-      s ++;
-      t ++;
-    }
+      *outptr++ = *inptr++;
+
+  *outptr = '\0';
+}
+
+
+/*
+ * 'ppd_fix()' - Fix WinANSI characters in the range 0x80 to 0x9f to be
+ *               valid ISO-8859-1 characters...
+ */
+
+static void
+ppd_fix(char *string)			/* IO - String to fix */
+{
+  unsigned char		*p;		/* Pointer into string */
+  static unsigned char	lut[32] =	/* Lookup table for characters */
+			{
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  0x20,
+			  'l',
+			  '`',
+			  '\'',
+			  '^',
+			  '~',
+			  0x20, /* bar */
+			  0x20, /* circumflex */
+			  0x20, /* dot */
+			  0x20, /* double dot */
+			  0x20,
+			  0x20, /* circle */
+			  0x20, /* ??? */
+			  0x20,
+			  '\"', /* should be right quotes */
+			  0x20, /* ??? */
+			  0x20  /* accent */
+			};
+
+
+  for (p = (unsigned char *)string; *p; p ++)
+    if (*p >= 0x80 && *p < 0xa0)
+      *p = lut[*p - 0x80];
+}
+
+
+/*
+ * 'ppd_free_group()' - Free a single UI group.
+ */
+
+static void
+ppd_free_group(ppd_group_t *group)	/* I - Group to free */
+{
+  int		i;			/* Looping var */
+  ppd_option_t	*option;		/* Current option */
+  ppd_group_t	*subgroup;		/* Current sub-group */
+
+
+  if (group->num_options > 0)
+  {
+    for (i = group->num_options, option = group->options;
+         i > 0;
+	 i --, option ++)
+      ppd_free_option(option);
+
+    ppd_free(group->options);
   }
 
+  if (group->num_subgroups > 0)
+  {
+    for (i = group->num_subgroups, subgroup = group->subgroups;
+         i > 0;
+	 i --, subgroup ++)
+      ppd_free_group(subgroup);
+
+    ppd_free(group->subgroups);
+  }
+}
+
+
+/*
+ * 'ppd_free_option()' - Free a single option.
+ */
+
+static void
+ppd_free_option(ppd_option_t *option)	/* I - Option to free */
+{
+  int		i;			/* Looping var */
+  ppd_choice_t	*choice;		/* Current choice */
+
+
+  if (option->num_choices > 0)
+  {
+    for (i = option->num_choices, choice = option->choices;
+         i > 0;
+         i --, choice ++)
+      ppd_free(choice->code);
+
+    ppd_free(option->choices);
+  }
+}
+
+
+/*
+ * 'ppd_get_extopt()' - Get an extended option record.
+ */
+
+static ppd_ext_option_t	*		/* O - Extended option... */
+ppd_get_extopt(ppd_file_t *ppd,		/* I - PPD file */
+               const char *name)	/* I - Name of option */
+{
+  ppd_ext_option_t	**temp,		/* New array pointer */
+			*extopt;	/* New extended option */
+
+
  /*
-  * Return the results of the final comparison...
+  * See if the option already exists...
   */
 
-  if (*s)
-    return (1);
-  else if (*t)
-    return (-1);
-  else
-    return (0);
-}
-
-
-/*
- * 'compare_groups()' - Compare two groups.
- */
-
-static int			/* O - Result of comparison */
-compare_groups(ppd_group_t *g0,	/* I - First group */
-               ppd_group_t *g1)	/* I - Second group */
-{
-  return (compare_strings(g0->text, g1->text));
-}
-
-
-/*
- * 'compare_options()' - Compare two options.
- */
-
-static int			/* O - Result of comparison */
-compare_options(ppd_option_t *o0,/* I - First option */
-                ppd_option_t *o1)/* I - Second option */
-{
-  return (compare_strings(o0->text, o1->text));
-}
-
-
-/*
- * 'ppd_add_extopt()' - Add an extended option record.
- */
-
-static ppd_ext_option_t	*	/* O - Extended option... */
-ppd_add_extopt(ppd_file_t *ppd,	/* I - PPD file */
-               const char *name)/* I - Name of option */
-{
-  ppd_ext_option_t	**temp,	/* New array pointer */
-			*extopt;/* New extended option */
-
+  if ((extopt = ppdFindExtOption(ppd, name)) != NULL)
+    return (extopt);
 
  /*
-  * First create the extended option record...
+  * Not found, so create the extended option record...
   */
 
   if ((extopt = calloc(sizeof(ppd_ext_option_t), 1)) == NULL)
@@ -1813,27 +1906,111 @@ ppd_add_extopt(ppd_file_t *ppd,	/* I - PPD file */
 
 
 /*
+ * 'ppd_get_group()' - Find or create the named group as needed.
+ */
+
+static ppd_group_t *			/* O - Named group */
+ppd_get_group(ppd_file_t *ppd,		/* I - PPD file */
+              const char *name,		/* I - Name of group */
+	      const char *text)		/* I - Text for group */
+{
+  int		i;			/* Looping var */
+  ppd_group_t	*group;			/* Group */
+
+
+  DEBUG_printf(("ppd_get_group(%p, \"%s\")\n", ppd, name));
+
+  for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
+    if (strcmp(group->name, name) == 0)
+      break;
+
+  if (i == 0)
+  {
+    DEBUG_printf(("Adding group %s...\n", name));
+
+    if (ppd->num_groups == 0)
+      group = malloc(sizeof(ppd_group_t));
+    else
+      group = realloc(ppd->groups,
+	              (ppd->num_groups + 1) * sizeof(ppd_group_t));
+
+    if (group == NULL)
+      return (NULL);
+
+    ppd->groups = group;
+    group += ppd->num_groups;
+    ppd->num_groups ++;
+
+    memset(group, 0, sizeof(ppd_group_t));
+    strlcpy(group->name, name, sizeof(group->name));
+    strlcpy(group->text, text, sizeof(group->text));
+  }
+
+  return (group);
+}
+
+
+/*
+ * 'ppd_get_option()' - Find or create the named option as needed.
+ */
+
+static ppd_option_t *			/* O - Named option */
+ppd_get_option(ppd_group_t *group,	/* I - Group */
+               const char  *name)	/* I - Name of option */
+{
+  int		i;			/* Looping var */
+  ppd_option_t	*option;		/* Option */
+
+
+  for (i = group->num_options, option = group->options; i > 0; i --, option ++)
+    if (strcmp(option->keyword, name) == 0)
+      break;
+
+  if (i == 0)
+  {
+    if (group->num_options == 0)
+      option = malloc(sizeof(ppd_option_t));
+    else
+      option = realloc(group->options,
+	               (group->num_options + 1) * sizeof(ppd_option_t));
+
+    if (option == NULL)
+      return (NULL);
+
+    group->options = option;
+    option += group->num_options;
+    group->num_options ++;
+
+    memset(option, 0, sizeof(ppd_option_t));
+    strlcpy(option->keyword, name, sizeof(option->keyword));
+  }
+
+  return (option);
+}
+
+
+/*
  * 'ppd_read()' - Read a line from a PPD file, skipping comment lines as
  *                necessary.
  */
 
-static int			/* O - Bitmask of fields read */
-ppd_read(FILE *fp,		/* I - File to read from */
-         char *keyword,		/* O - Keyword from line */
-	 char *option,		/* O - Option from line */
-         char *text,		/* O - Human-readable text from line */
-	 char **string)		/* O - Code/string data */
+static int				/* O - Bitmask of fields read */
+ppd_read(FILE *fp,			/* I - File to read from */
+         char *keyword,			/* O - Keyword from line */
+	 char *option,			/* O - Option from line */
+         char *text,			/* O - Human-readable text from line */
+	 char **string)			/* O - Code/string data */
 {
-  int		ch,		/* Character from file */
-		colon,		/* Colon seen? */
-		endquote,	/* Waiting for an end quote */
-		mask;		/* Mask to be returned */
-  char		*keyptr,	/* Keyword pointer */
-		*optptr,	/* Option pointer */
-		*textptr,	/* Text pointer */
-		*strptr,	/* Pointer into string */
-		*lineptr,	/* Current position in line buffer */
-		line[65536];	/* Line buffer (64k) */
+  int		ch,			/* Character from file */
+		colon,			/* Colon seen? */
+		endquote,		/* Waiting for an end quote */
+		mask;			/* Mask to be returned */
+  char		*keyptr,		/* Keyword pointer */
+		*optptr,		/* Option pointer */
+		*textptr,		/* Text pointer */
+		*strptr,		/* Pointer into string */
+		*lineptr,		/* Current position in line buffer */
+		line[65536];		/* Line buffer (64k) */
 
 
  /*
@@ -2100,109 +2277,5 @@ ppd_read(FILE *fp,		/* I - File to read from */
 
 
 /*
- * 'ppd_decode()' - Decode a string value...
- */
-
-static void
-ppd_decode(char *string)	/* I - String to decode */
-{
-  char	*inptr,			/* Input pointer */
-	*outptr;		/* Output pointer */
-
-
-  inptr  = string;
-  outptr = string;
-
-  while (*inptr != '\0')
-    if (*inptr == '<' && isxdigit(inptr[1]))
-    {
-     /*
-      * Convert hex to 8-bit values...
-      */
-
-      inptr ++;
-      while (isxdigit(*inptr))
-      {
-	if (isalpha(*inptr))
-	  *outptr = (tolower(*inptr) - 'a' + 10) << 4;
-	else
-	  *outptr = (*inptr - '0') << 4;
-
-	inptr ++;
-
-	if (isalpha(*inptr))
-	  *outptr |= tolower(*inptr) - 'a' + 10;
-	else
-	  *outptr |= *inptr - '0';
-
-	inptr ++;
-	outptr ++;
-      }
-
-      while (*inptr != '>' && *inptr != '\0')
-	inptr ++;
-      while (*inptr == '>')
-	inptr ++;
-    }
-    else
-      *outptr++ = *inptr++;
-
-  *outptr = '\0';
-}
-
-
-/*
- * 'ppd_fix()' - Fix WinANSI characters in the range 0x80 to 0x9f to be
- *               valid ISO-8859-1 characters...
- */
-
-static void
-ppd_fix(char *string)		/* IO - String to fix */
-{
-  unsigned char		*p;	/* Pointer into string */
-  static unsigned char	lut[32] =/* Lookup table for characters */
-			{
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  'l',
-			  '`',
-			  '\'',
-			  '^',
-			  '~',
-			  0x20, /* bar */
-			  0x20, /* circumflex */
-			  0x20, /* dot */
-			  0x20, /* double dot */
-			  0x20,
-			  0x20, /* circle */
-			  0x20, /* ??? */
-			  0x20,
-			  '\"', /* should be right quotes */
-			  0x20, /* ??? */
-			  0x20  /* accent */
-			};
-
-
-  for (p = (unsigned char *)string; *p; p ++)
-    if (*p >= 0x80 && *p < 0xa0)
-      *p = lut[*p - 0x80];
-}
-
-
-/*
- * End of "$Id: ppd.c,v 1.51.2.19 2002/08/10 00:05:45 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.20 2002/08/12 00:44:37 mike Exp $".
  */
