@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.43 2001/04/23 21:27:30 mike Exp $"
+ * "$Id: auth.c,v 1.44 2001/05/07 15:35:00 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -62,6 +62,9 @@
 #if HAVE_LIBPAM
 #  include <security/pam_appl.h>
 #endif /* HAVE_LIBPAM */
+#ifdef HAVE_USERSEC_H
+#  include <usersec.h>
+#endif /* HAVE_USERSEC_H */
 
 
 /*
@@ -607,6 +610,10 @@ IsAuthorized(client_t *con)	/* I - Connection */
   pam_handle_t	*pamh;		/* PAM authentication handle */
   int		pamerr;		/* PAM error code */
   struct pam_conv pamdata;	/* PAM conversation data */
+#elif defined(HAVE_USERSEC_H)
+  char		*authmsg;	/* Authentication message */
+  char		*loginmsg;	/* Login message */
+  int		reenter;	/* ??? */
 #else
   char		*pass;		/* Encrypted password */
 #  ifdef HAVE_SHADOW_H
@@ -815,6 +822,21 @@ IsAuthorized(client_t *con)	/* I - Connection */
       }
 
       pam_end(pamh, PAM_SUCCESS);
+#elif defined(HAVE_USERSEC_H)
+     /*
+      * Use AIX authentication interface...
+      */
+
+      LogMessage(L_DEBUG, "IsAuthorized: AIX authenticate of username \"%s\"",
+                 con->username);
+
+      reenter = 1;
+      if (authenticate(con->username, con->password, &reenter, &authmsg) != 0)
+      {
+	LogMessage(L_DEBUG, "IsAuthorized: Unable to authenticate username \"%s\": %s",
+	           con->username, strerror(errno));
+	return (HTTP_UNAUTHORIZED);
+      }
 #else
 #  ifdef HAVE_SHADOW_H
       spw = getspnam(con->username);
@@ -1209,5 +1231,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.43 2001/04/23 21:27:30 mike Exp $".
+ * End of "$Id: auth.c,v 1.44 2001/05/07 15:35:00 mike Exp $".
  */
