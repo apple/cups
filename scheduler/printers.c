@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.7 1999/03/03 21:17:58 mike Exp $"
+ * "$Id: printers.c,v 1.8 1999/03/24 16:10:25 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -67,8 +67,8 @@ AddPrinter(char *name)		/* I - Name of printer */
   strcpy((char *)p->name, name);
   p->state = IPP_PRINTER_STOPPED;
   p->attrs = ippNew();
-  attr     = ippAddString(p->attrs, IPP_TAG_PRINTER, "printer-name", name);
-  attr->value_tag = IPP_TAG_NAME;
+  attr     = ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                          "printer-name", NULL, name);
 
  /*
   * Insert the printer in the printer list alphabetically...
@@ -426,5 +426,5 @@ StopPrinter(printer_t *p)
 
 
 /*
- * End of "$Id: printers.c,v 1.7 1999/03/03 21:17:58 mike Exp $".
+ * End of "$Id: printers.c,v 1.8 1999/03/24 16:10:25 mike Exp $".
  */

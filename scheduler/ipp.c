@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.5 1999/03/03 21:17:57 mike Exp $"
+ * "$Id: ipp.c,v 1.6 1999/03/24 16:10:24 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -182,13 +182,13 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
     return;
   }
 
-  attr = ippAddString(con->response, IPP_TAG_OPERATION, "attributes-charset",
-                      charset->values[0].string);
-  attr->value_tag = IPP_TAG_CHARSET;
+  attr = ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+                      "attributes-charset", NULL,
+		      charset->values[0].string.text);
 
-  attr = ippAddString(con->response, IPP_TAG_OPERATION,
-                      "attributes-natural-language", language->values[0].string);
-  attr->value_tag = IPP_TAG_LANGUAGE;
+  attr = ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                      "attributes-natural-language", NULL,
+		      language->values[0].string.text);
 
  /*
   * OK, all the checks pass so far; try processing the operation...
@@ -317,8 +317,7 @@ cancel_job(client_t        *con,	/* I - Client connection */
     * Got a printer URI; see if we also have a job-id attribute...
     */
 
-    if ((attr = ippFindAttribute(con->request, "job-id")) == NULL ||
-        attr->value_tag != IPP_TAG_INTEGER)
+    if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
     {
       DEBUG_puts("cancel_job: got a printer-uri attribute but no job-id!");
       send_ipp_error(con, IPP_BAD_REQUEST);
@@ -333,7 +332,7 @@ cancel_job(client_t        *con,	/* I - Client connection */
     * Got a job URI; parse it to get the job ID...
     */
 
-    httpSeparate(uri->values[0].string, method, username, host, &port, resource);
+    httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
  
     if (strncmp(resource, "/jobs/", 6) != 0)
     {
@@ -342,7 +341,7 @@ cancel_job(client_t        *con,	/* I - Client connection */
       */
 
       DEBUG_printf(("cancel_job: bad job-uri attribute \'%s\'!\n",
-                    uri->values[0].string));
+                    uri->values[0].string.text));
       send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
@@ -401,9 +400,8 @@ copy_attrs(ipp_t *to,		/* I - Destination request */
     {
       case IPP_TAG_INTEGER :
       case IPP_TAG_ENUM :
-          toattr = ippAddIntegers(to, fromattr->group_tag, fromattr->name,
-	                          fromattr->num_values, NULL);
-          toattr->value_tag = fromattr->value_tag;
+          toattr = ippAddIntegers(to, fromattr->group_tag, fromattr->value_tag,
+	                          fromattr->name, fromattr->num_values, NULL);
 
           for (i = 0; i < fromattr->num_values; i ++)
 	    toattr->values[i].integer = fromattr->values[i].integer;
@@ -426,12 +424,12 @@ copy_attrs(ipp_t *to,		/* I - Destination request */
       case IPP_TAG_CHARSET :
       case IPP_TAG_LANGUAGE :
       case IPP_TAG_MIMETYPE :
-          toattr = ippAddStrings(to, fromattr->group_tag, fromattr->name,
-	                         fromattr->num_values, NULL);
-          toattr->value_tag = fromattr->value_tag;
+          toattr = ippAddStrings(to, fromattr->group_tag, fromattr->value_tag,
+	                         fromattr->name, fromattr->num_values, NULL,
+				 NULL);
 
           for (i = 0; i < fromattr->num_values; i ++)
-	    toattr->values[i].string = strdup(fromattr->values[i].string);
+	    toattr->values[i].string.text = strdup(fromattr->values[i].string.text);
           break;
 
       case IPP_TAG_DATE :
@@ -465,16 +463,20 @@ copy_attrs(ipp_t *to,		/* I - Destination request */
 
       case IPP_TAG_TEXTLANG :
       case IPP_TAG_NAMELANG :
-          toattr = ippAddLStrings(to, fromattr->group_tag, fromattr->name,
-	                          fromattr->num_values, NULL, NULL);
-          toattr->value_tag = fromattr->value_tag;
+          toattr = ippAddStrings(to, fromattr->group_tag, fromattr->value_tag,
+	                         fromattr->name, fromattr->num_values, NULL, NULL);
 
           for (i = 0; i < fromattr->num_values; i ++)
 	  {
-	    toattr->values[i].lstring.charset =
-	        strdup(fromattr->values[i].lstring.charset);
-	    toattr->values[i].lstring.string =
-	        (uchar *)strdup((char *)fromattr->values[i].lstring.string);
+	    if (i == 0)
+	      toattr->values[0].string.charset =
+	          strdup(fromattr->values[0].string.charset);
+	    else
+	      toattr->values[i].string.charset =
+	          toattr->values[0].string.charset;
+
+	    toattr->values[i].string.text =
+	        strdup(fromattr->values[i].string.text);
           }
           break;
     }
@@ -532,7 +534,7 @@ get_default(client_t *con)		/* I - Client connection */
 
   copy_attrs(con->response, printer->attrs);
 
-  if (ippFindAttribute(con->request, "requested-attributes") != NULL)
+  if (ippFindAttribute(con->request, "requested-attributes", IPP_TAG_KEYWORD) != NULL)
     con->response->request.status.status_code = IPP_OK_SUBST;
   else
     con->response->request.status.status_code = IPP_OK;
@@ -575,7 +577,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
   * Is the destination valid?
   */
 
-  httpSeparate(uri->values[0].string, method, username, host, &port, resource);
+  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
   if ((strncmp(resource, "/jobs", 5) == 0 && strlen(resource) <= 6) ||
       (strncmp(resource, "/printers", 9) == 0 && strlen(resource) <= 10))
@@ -605,9 +607,8 @@ get_jobs(client_t        *con,		/* I - Client connection */
   * right away if they specify "completed" (we don't keep old job records...
   */
 
-  if ((attr = ippFindAttribute(con->request, "which-jobs")) != NULL &&
-      attr->value_tag == IPP_TAG_KEYWORD &&
-      strcmp(attr->values[0].string, "completed") == 0)
+  if ((attr = ippFindAttribute(con->request, "which-jobs", IPP_TAG_KEYWORD)) != NULL &&
+      strcmp(attr->values[0].string.text, "completed") == 0)
   {
     con->response->request.status.status_code = IPP_OK;
     return;
@@ -618,8 +619,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
   * the report to 1000 jobs to prevent swamping of the server...
   */
 
-  if ((attr = ippFindAttribute(con->request, "limit")) != NULL &&
-      attr->value_tag == IPP_TAG_INTEGER)
+  if ((attr = ippFindAttribute(con->request, "limit", IPP_TAG_INTEGER)) != NULL)
     limit = attr->values[0].integer;
   else
     limit = 1000;
@@ -628,16 +628,14 @@ get_jobs(client_t        *con,		/* I - Client connection */
   * See if we only want to see jobs for a specific user...
   */
 
-  if ((attr = ippFindAttribute(con->request, "my-jobs")) != NULL &&
-      attr->value_tag == IPP_TAG_BOOLEAN &&
+  if ((attr = ippFindAttribute(con->request, "my-jobs", IPP_TAG_BOOLEAN)) != NULL &&
       attr->values[0].boolean)
   {
     strcpy(username, con->username);
 
-    if ((attr = ippFindAttribute(con->request, "requesting-user-name")) != NULL &&
-	attr->value_tag == IPP_TAG_NAME)
+    if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
     {
-      strncpy(username, attr->values[0].string, sizeof(username) - 1);
+      strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
       username[sizeof(username) - 1] = '\0';
     }
   }
@@ -694,32 +692,32 @@ get_jobs(client_t        *con,		/* I - Client connection */
       sprintf(printer_uri, "http://%s:%d/printers/%s", ServerName,
 	      ntohs(con->http.hostaddr.sin_port), job->dest);
 
-    attr = ippAddInteger(con->response, IPP_TAG_JOB, "job-id", job->id);
+    attr = ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
+                         "job-id", job->id);
 
     stat(job->filename, &filestats);
-    attr = ippAddInteger(con->response, IPP_TAG_JOB, "job-k-octets",
-                         (filestats.st_size + 1023) / 1024);
+    attr = ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
+                         "job-k-octets", (filestats.st_size + 1023) / 1024);
 
-    attr = ippAddString(con->response, IPP_TAG_JOB, "job-more-info", job_uri);
-    attr->value_tag = IPP_TAG_URI;
+    attr = ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
+                        "job-more-info", NULL, job_uri);
 
-    attr = ippAddString(con->response, IPP_TAG_JOB, "job-originating-user-name",
-                        job->username);
-    attr->value_tag = IPP_TAG_NAME;
+    attr = ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_NAME,
+                        "job-originating-user-name", NULL, job->username);
 
-    attr = ippAddString(con->response, IPP_TAG_JOB, "job-printer-uri", printer_uri);
-    attr->value_tag = IPP_TAG_URI;
+    attr = ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
+                        "job-printer-uri", NULL, printer_uri);
 
-    attr = ippAddInteger(con->response, IPP_TAG_JOB, "job-state", job->state);
-    attr->value_tag = IPP_TAG_ENUM;
+    attr = ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM,
+                         "job-state", job->state);
 
-    attr = ippAddString(con->response, IPP_TAG_JOB, "job-uri", job_uri);
-    attr->value_tag = IPP_TAG_URI;
+    attr = ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
+                        "job-uri", NULL, job_uri);
 
     ippAddSeparator(con->response);
   }
 
-  if (ippFindAttribute(con->request, "requested-attributes") != NULL)
+  if (ippFindAttribute(con->request, "requested-attributes", IPP_TAG_KEYWORD) != NULL)
     con->response->request.status.status_code = IPP_OK_SUBST;
   else
     con->response->request.status.status_code = IPP_OK;
@@ -760,8 +758,7 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
     * Got a printer URI; see if we also have a job-id attribute...
     */
 
-    if ((attr = ippFindAttribute(con->request, "job-id")) == NULL ||
-        attr->value_tag != IPP_TAG_INTEGER)
+    if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
     {
       DEBUG_puts("get_job_attrs: got a printer-uri attribute but no job-id!");
       send_ipp_error(con, IPP_BAD_REQUEST);
@@ -776,7 +773,7 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
     * Got a job URI; parse it to get the job ID...
     */
 
-    httpSeparate(uri->values[0].string, method, username, host, &port, resource);
+    httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
  
     if (strncmp(resource, "/jobs/", 6) != 0)
     {
@@ -785,7 +782,7 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
       */
 
       DEBUG_printf(("get_job_attrs: bad job-uri attribute \'%s\'!\n",
-                    uri->values[0].string));
+                    uri->values[0].string.text));
       send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
@@ -815,7 +812,7 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
 
   copy_attrs(con->response, job->attrs);
 
-  if (ippFindAttribute(con->request, "requested-attributes") != NULL)
+  if (ippFindAttribute(con->request, "requested-attributes", IPP_TAG_KEYWORD) != NULL)
     con->response->request.status.status_code = IPP_OK_SUBST;
   else
     con->response->request.status.status_code = IPP_OK;
@@ -842,8 +839,7 @@ get_printers(client_t *con)		/* I - Client connection */
   * the report to 1000 printers to prevent swamping of the server...
   */
 
-  if ((attr = ippFindAttribute(con->request, "limit")) != NULL &&
-      attr->value_tag == IPP_TAG_INTEGER)
+  if ((attr = ippFindAttribute(con->request, "limit", IPP_TAG_INTEGER)) != NULL)
     limit = attr->values[0].integer;
   else
     limit = 1000;
@@ -865,23 +861,21 @@ get_printers(client_t *con)		/* I - Client connection */
     *    + all printer attributes
     */
 
-    attr = ippAddInteger(con->response, IPP_TAG_PRINTER, "printer-state",
-                         printer->state);
-    attr->value_tag = IPP_TAG_ENUM;
+    attr = ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM,
+                         "printer-state", printer->state);
 
     attr = ippAddBoolean(con->response, IPP_TAG_PRINTER,
                          "printer-is-accepting-jobs", 1);
 
-    attr = ippAddString(con->response, IPP_TAG_PRINTER, "printer-device-uri",
-                        printer->device_uri);
-    attr->value_tag = IPP_TAG_URI;
+    attr = ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_URI,
+                        "printer-device-uri", NULL, printer->device_uri);
 
     copy_attrs(con->response, printer->attrs);
 
     ippAddSeparator(con->response);
   }
 
-  if (ippFindAttribute(con->request, "requested-attributes") != NULL)
+  if (ippFindAttribute(con->request, "requested-attributes", IPP_TAG_KEYWORD) != NULL)
     con->response->request.status.status_code = IPP_OK_SUBST;
   else
     con->response->request.status.status_code = IPP_OK;
@@ -917,7 +911,7 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
   * Is the destination valid?
   */
 
-  httpSeparate(uri->values[0].string, method, username, host, &port, resource);
+  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
   if ((dest = validate_dest(resource, &dtype)) == NULL)
   {
@@ -951,7 +945,7 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
 
   copy_attrs(con->response, printer->attrs);
 
-  if (ippFindAttribute(con->request, "requested-attributes") != NULL)
+  if (ippFindAttribute(con->request, "requested-attributes", IPP_TAG_KEYWORD) != NULL)
     con->response->request.status.status_code = IPP_OK_SUBST;
   else
     con->response->request.status.status_code = IPP_OK;
@@ -997,14 +991,12 @@ print_job(client_t        *con,		/* I - Client connection */
   * doesn't support compression yet...
   */
 
-  if ((attr = ippFindAttribute(con->request, "compression")) != NULL)
+  if ((attr = ippFindAttribute(con->request, "compression", IPP_TAG_KEYWORD)) != NULL)
   {
     DEBUG_puts("print_job: Unsupported compression attribute!");
     send_ipp_error(con, IPP_ATTRIBUTES);
-    attr            = ippAddString(con->response, IPP_TAG_UNSUPPORTED,
-	                           "compression", attr->values[0].string);
-    attr->value_tag = IPP_TAG_KEYWORD;
-
+    attr = ippAddString(con->response, IPP_TAG_UNSUPPORTED, IPP_TAG_KEYWORD,
+	                "compression", NULL, attr->values[0].string.text);
     return;
   }
 
@@ -1023,18 +1015,17 @@ print_job(client_t        *con,		/* I - Client connection */
   * Is it a format we support?
   */
 
-  if ((format = ippFindAttribute(con->request, "document-format")) == NULL ||
-      format->value_tag != IPP_TAG_MIMETYPE)
+  if ((format = ippFindAttribute(con->request, "document-format", IPP_TAG_MIMETYPE)) == NULL)
   {
     DEBUG_puts("print_job: missing document-format attribute!");
     send_ipp_error(con, IPP_BAD_REQUEST);
     return;
   }
 
-  if (sscanf(format->values[0].string, "%15[^/]/%31[^;]", super, type) != 2)
+  if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]", super, type) != 2)
   {
     DEBUG_printf(("print_job: could not scan type \'%s\'!\n",
-	          format->values[0].string));
+	          format->values[0].string.text));
     send_ipp_error(con, IPP_BAD_REQUEST);
     return;
   }
@@ -1051,12 +1042,10 @@ print_job(client_t        *con,		/* I - Client connection */
   if (filetype == NULL)
   {
     DEBUG_printf(("print_job: Unsupported format \'%s\'!\n",
-	          format->values[0].string));
+	          format->values[0].string.text));
     send_ipp_error(con, IPP_DOCUMENT_FORMAT);
-    attr = ippAddString(con->response, IPP_TAG_UNSUPPORTED, "document-format",
-	                format->values[0].string);
-    attr->value_tag = IPP_TAG_MIMETYPE;
-
+    attr = ippAddString(con->response, IPP_TAG_UNSUPPORTED, IPP_TAG_MIMETYPE,
+                        "document-format", NULL, format->values[0].string.text);
     return;
   }
 
@@ -1067,7 +1056,7 @@ print_job(client_t        *con,		/* I - Client connection */
   * Is the destination valid?
   */
 
-  httpSeparate(uri->values[0].string, method, username, host, &port, resource);
+  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
   if ((dest = validate_dest(resource, &dtype)) == NULL)
   {
@@ -1085,8 +1074,7 @@ print_job(client_t        *con,		/* I - Client connection */
   * Create the job and set things up...
   */
 
-  if ((attr = ippFindAttribute(con->request, "job-priority")) != NULL &&
-      attr->value_tag == IPP_TAG_INTEGER)
+  if ((attr = ippFindAttribute(con->request, "job-priority", IPP_TAG_INTEGER)) != NULL)
     priority = attr->values[0].integer;
   else
     priority = 50;
@@ -1107,13 +1095,12 @@ print_job(client_t        *con,		/* I - Client connection */
   con->filename[0] = '\0';
 
   strcpy(job->username, con->username);
-  if ((attr = ippFindAttribute(job->attrs, "requesting-user-name")) != NULL &&
-      attr->value_tag == IPP_TAG_NAME)
+  if ((attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME)) != NULL)
   {
     DEBUG_printf(("print_job: requesting-user-name = \'%s\'\n",
-                  attr->values[0].string));
+                  attr->values[0].string.text));
 
-    strncpy(job->username, attr->values[0].string, sizeof(job->username) - 1);
+    strncpy(job->username, attr->values[0].string.text, sizeof(job->username) - 1);
     job->username[sizeof(job->username) - 1] = '\0';
   }
 
@@ -1135,14 +1122,14 @@ print_job(client_t        *con,		/* I - Client connection */
 
   sprintf(job_uri, "http://%s:%d/jobs/%d", ServerName,
 	  ntohs(con->http.hostaddr.sin_port), job->id);
-  attr = ippAddString(con->response, IPP_TAG_JOB, "job-uri", job_uri);
-  attr->value_tag = IPP_TAG_URI;
+  attr = ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri",
+                      NULL, job_uri);
 
-  attr = ippAddInteger(con->response, IPP_TAG_JOB, "job-id", job->id);
-  attr->value_tag = IPP_TAG_INTEGER;
+  attr = ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
+                       "job-id", job->id);
 
-  attr = ippAddInteger(con->response, IPP_TAG_JOB, "job-state", job->state);
-  attr->value_tag = IPP_TAG_ENUM;
+  attr = ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM,
+                       "job-state", job->state);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -1166,13 +1153,11 @@ send_ipp_error(client_t     *con,	/* I - Client connection */
 
   con->response->request.status.status_code = status;
 
-  attr = ippAddString(con->response, IPP_TAG_OPERATION, "attributes-charset",
-                      DefaultCharset);
-  attr->value_tag = IPP_TAG_CHARSET;
+  attr = ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+                      "attributes-charset", NULL, DefaultCharset);
 
-  attr = ippAddString(con->response, IPP_TAG_OPERATION,
-                      "attributes-natural-language", DefaultLanguage);
-  attr->value_tag = IPP_TAG_LANGUAGE;
+  attr = ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                      "attributes-natural-language", NULL, DefaultLanguage);
 
   SendHeader(con, HTTP_OK, "application/ipp");
   httpPrintf(HTTP(con), "Content-Length: %d\r\n\r\n", ippLength(con->response));
@@ -1258,14 +1243,12 @@ validate_job(client_t        *con,	/* I - Client connection */
   * doesn't support compression yet...
   */
 
-  if ((attr = ippFindAttribute(con->request, "compression")) != NULL)
+  if ((attr = ippFindAttribute(con->request, "compression", IPP_TAG_KEYWORD)) != NULL)
   {
     DEBUG_puts("validate_job: Unsupported compression attribute!");
     send_ipp_error(con, IPP_ATTRIBUTES);
-    attr            = ippAddString(con->response, IPP_TAG_UNSUPPORTED,
-	                           "compression", attr->values[0].string);
-    attr->value_tag = IPP_TAG_KEYWORD;
-
+    attr = ippAddString(con->response, IPP_TAG_UNSUPPORTED, IPP_TAG_KEYWORD,
+	                "compression", NULL, attr->values[0].string.text);
     return;
   }
 
@@ -1273,18 +1256,17 @@ validate_job(client_t        *con,	/* I - Client connection */
   * Is it a format we support?
   */
 
-  if ((format = ippFindAttribute(con->request, "document-format")) == NULL ||
-      format->value_tag != IPP_TAG_MIMETYPE)
+  if ((format = ippFindAttribute(con->request, "document-format", IPP_TAG_MIMETYPE)) == NULL)
   {
     DEBUG_puts("validate_job: missing document-format attribute!");
     send_ipp_error(con, IPP_BAD_REQUEST);
     return;
   }
 
-  if (sscanf(format->values[0].string, "%15[^/]/%31[^;]", super, type) != 2)
+  if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]", super, type) != 2)
   {
     DEBUG_printf(("validate_job: could not scan type \'%s\'!\n",
-	          format->values[0].string));
+	          format->values[0].string.text));
     send_ipp_error(con, IPP_BAD_REQUEST);
     return;
   }
@@ -1294,12 +1276,10 @@ validate_job(client_t        *con,	/* I - Client connection */
       mimeType(MimeDatabase, super, type) == NULL)
   {
     DEBUG_printf(("validate_job: Unsupported format \'%s\'!\n",
-	          format->values[0].string));
+	          format->values[0].string.text));
     send_ipp_error(con, IPP_DOCUMENT_FORMAT);
-    attr = ippAddString(con->response, IPP_TAG_UNSUPPORTED, "document-format",
-		        format->values[0].string);
-    attr->value_tag = IPP_TAG_MIMETYPE;
-
+    attr = ippAddString(con->response, IPP_TAG_UNSUPPORTED, IPP_TAG_MIMETYPE,
+                        "document-format", NULL, format->values[0].string.text);
     return;
   }
 
@@ -1307,7 +1287,7 @@ validate_job(client_t        *con,	/* I - Client connection */
   * Is the destination valid?
   */
 
-  httpSeparate(uri->values[0].string, method, username, host, &port, resource);
+  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
   if (validate_dest(resource, &dtype) == NULL)
   {
@@ -1330,5 +1310,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.5 1999/03/03 21:17:57 mike Exp $".
+ * End of "$Id: ipp.c,v 1.6 1999/03/24 16:10:24 mike Exp $".
  */

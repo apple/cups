@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.8 1999/03/06 20:28:55 mike Exp $"
+ * "$Id: job.c,v 1.9 1999/03/24 16:10:25 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -336,7 +336,7 @@ StartJob(int       id,		/* I - Job ID */
 	  sprintf(copies, "%d", attr->values[0].integer);
         else if (strcmp(attr->name, "job-name") == 0 &&
 	         attr->value_tag == IPP_TAG_NAME)
-	  strcpy(title, attr->values[0].string);
+	  strcpy(title, attr->values[0].string.text);
 	else if ((attr->group_tag == IPP_TAG_JOB ||
 	          attr->group_tag == IPP_TAG_EXTENSION) &&
 		 (optptr - options) < (sizeof(options) - 128))
@@ -397,16 +397,16 @@ StartJob(int       id,		/* I - Job ID */
 	      case IPP_TAG_KEYWORD :
 	      case IPP_TAG_CHARSET :
 	      case IPP_TAG_LANGUAGE :
-	          if (strchr(attr->values[i].string, ' ') != NULL ||
-		      strchr(attr->values[i].string, '\t') != NULL ||
-		      strchr(attr->values[i].string, '\n') != NULL)
+	          if (strchr(attr->values[i].string.text, ' ') != NULL ||
+		      strchr(attr->values[i].string.text, '\t') != NULL ||
+		      strchr(attr->values[i].string.text, '\n') != NULL)
 		  {
 		    strcat(optptr, "\'");
-		    strcat(optptr, attr->values[i].string);
+		    strcat(optptr, attr->values[i].string.text);
 		    strcat(optptr, "\'");
 		  }
 		  else
-		    strcat(optptr, attr->values[i].string);
+		    strcat(optptr, attr->values[i].string.text);
 		  break;
 	    }
 	  }
@@ -449,16 +449,19 @@ StartJob(int       id,		/* I - Job ID */
       * Create environment variable strings for the filters...
       */
 
-      attr = ippFindAttribute(current->attrs, "attributes-natural-language");
-      sprintf(language, "LANG=%s", attr->values[0].string);
+      attr = ippFindAttribute(current->attrs, "attributes-natural-language",
+                              IPP_TAG_LANGUAGE);
+      sprintf(language, "LANG=%s", attr->values[0].string.text);
 
-      attr = ippFindAttribute(current->attrs, "document-format");
-      if ((optptr = strstr(attr->values[0].string, "charset=")) != NULL)
+      attr = ippFindAttribute(current->attrs, "document-format",
+                              IPP_TAG_MIMETYPE);
+      if ((optptr = strstr(attr->values[0].string.text, "charset=")) != NULL)
         sprintf(charset, "CHARSET=%s", optptr + 8);
       else
       {
-        attr = ippFindAttribute(current->attrs, "attributes-charset");
-        sprintf(charset, "CHARSET=%s", attr->values[0].string);
+        attr = ippFindAttribute(current->attrs, "attributes-charset",
+	                        IPP_TAG_CHARSET);
+        sprintf(charset, "CHARSET=%s", attr->values[0].string.text);
       }
 
       sprintf(ppd, "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
@@ -743,5 +746,5 @@ UpdateJob(job_t *job)	/* I - Job to check */
 
 
 /*
- * End of "$Id: job.c,v 1.8 1999/03/06 20:28:55 mike Exp $".
+ * End of "$Id: job.c,v 1.9 1999/03/24 16:10:25 mike Exp $".
  */
