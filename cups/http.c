@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.12 1999/01/30 13:25:55 mike Exp $"
+ * "$Id: http.c,v 1.13 1999/02/01 22:06:36 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -93,6 +93,7 @@ static char		*http_fields[] =
 			  "Accept-Ranges",
 			  "Age",
 			  "Allow",
+			  "Alternates",
 			  "Authorization",
 			  "Cache-Control",
 			  "Connection",
@@ -104,7 +105,9 @@ static char		*http_fields[] =
 			  "Content-MD5",
 			  "Content-Range",
 			  "Content-Type",
+			  "Content-Version",
 			  "Date",
+			  "Derived-From",
 			  "Etag",
 			  "Expires",
 			  "From",
@@ -114,9 +117,13 @@ static char		*http_fields[] =
 			  "If-None-Match",
 			  "If-Range",
 			  "If-Unmodified-since",
+			  "Keep-Alive",
 			  "Last-Modified",
+			  "Link",
 			  "Location",
 			  "Max-Forwards",
+			  "Message-Id",
+			  "MIME-Version",
 			  "Pragma",
 			  "Proxy-Authenticate",
 			  "Proxy-Authorization",
@@ -127,6 +134,7 @@ static char		*http_fields[] =
 			  "Server",
 			  "Transfer-Encoding",
 			  "Upgrade",
+			  "URI",
 			  "User-Agent",
 			  "Vary",
 			  "Via",
@@ -991,6 +999,7 @@ httpUpdate(http_t *http)		/* I - HTTP data */
 
   while (httpGets(line, sizeof(line), http) != NULL)
   {
+    puts(line);
     if (line[0] == '\0')
     {
      /*
@@ -1039,8 +1048,12 @@ httpUpdate(http_t *http)		/* I - HTTP data */
       while (isspace(*value))
         value ++;
 
+     /*
+      * Be tolerants of servers that send unknown attribute fields...
+      */
+
       if ((field = http_field(line)) == HTTP_FIELD_UNKNOWN)
-        return (HTTP_ERROR);
+        continue;
 
       httpSetField(http, field, value);
     }
@@ -1330,5 +1343,5 @@ http_sighandler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: http.c,v 1.12 1999/01/30 13:25:55 mike Exp $".
+ * End of "$Id: http.c,v 1.13 1999/02/01 22:06:36 mike Exp $".
  */

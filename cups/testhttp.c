@@ -1,5 +1,5 @@
 /*
- * "$Id: testhttp.c,v 1.2 1999/01/29 22:01:49 mike Exp $"
+ * "$Id: testhttp.c,v 1.3 1999/02/01 22:06:37 mike Exp $"
  *
  *   HTTP test program for the Common UNIX Printing System (CUPS).
  *
@@ -47,6 +47,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   http_status_t	status;		/* Status of GET command */
   char		buffer[1024];	/* Input buffer */
   int		bytes;		/* Number of bytes read */
+  FILE		*out;		/* Output file */
 
 
   puts("Connecting to dns.easysw.com...");
@@ -61,8 +62,17 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   puts("Connected to dns.easysw.com...");
 
+  out = stdout;
+
   for (i = 1; i < argc; i ++)
   {
+    if (strcmp(argv[i], "-o") == 0)
+    {
+      i ++;
+      out = fopen(argv[i], "wb");
+      continue;
+    }
+
     printf("Requesting file \"%s\"...\n", argv[i]);
     httpClearFields(http);
     httpGet(http, argv[i]);
@@ -74,16 +84,23 @@ main(int  argc,			/* I - Number of command-line arguments */
       printf("GET failed with status %d...\n", status);
 
     while ((bytes = httpRead(http, buffer, sizeof(buffer))) > 0)
-      fwrite(buffer, bytes, 1, stdout);
+    {
+      fwrite(buffer, bytes, 1, out);
+      if (out != stdout)
+        printf("Read %d bytes, %d total...\n", bytes, ftell(out));
+    }
   }
 
   puts("Closing connection to server...");
   httpClose(http);
+
+  if (out != stdout)
+    fclose(out);
 
   return (0);
 }
 
 
 /*
- * End of "$Id: testhttp.c,v 1.2 1999/01/29 22:01:49 mike Exp $".
+ * End of "$Id: testhttp.c,v 1.3 1999/02/01 22:06:37 mike Exp $".
  */
