@@ -1,16 +1,18 @@
 /*
- * "$Id: raster.c,v 1.2.2.11 2004/10/05 20:22:37 mike Exp $"
+ * "$Id: raster.c,v 1.2.2.12 2004/12/23 05:37:35 mike Exp $"
  *
  *   Raster file routines for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-2004 by Easy Software Products.
  *
+ *   This file is part of the CUPS Imaging library.
+ *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
- *   copyright law.  Distribution and use rights for the CUPS Raster source
- *   files are outlined in the GNU Library General Public License, located
- *   in the "pstoraster" directory.  If this file is missing or damaged
- *   please contact Easy Software Products at:
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
@@ -873,5 +875,5 @@ cups_write(int        fd,			/* I - File descriptor */
 
 
 /*
- * End of "$Id: raster.c,v 1.2.2.11 2004/10/05 20:22:37 mike Exp $".
+ * End of "$Id: raster.c,v 1.2.2.12 2004/12/23 05:37:35 mike Exp $".
  */
