@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.24 2000/05/23 12:19:48 mike Exp $"
+# "$Id: Makefile,v 1.25 2000/05/23 13:41:40 mike Exp $"
 #
 #   GNU Ghostscript makefile for the Common UNIX Printing System (CUPS).
 #
@@ -29,7 +29,7 @@
 #
 
 include ../Makedefs
-OPTIONS	=	-DDEBUG
+
 
 #
 # Object files...
@@ -428,9 +428,9 @@ $(LIBOBJS):	arch.h ../config.h ../Makedefs
 pstoraster:	pstoraster.o libgs.a ../Makedefs ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o pstoraster pstoraster.o libgs.a \
-		$(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS) -lm
+		$(LINKCUPSIMAGE) $(IMGLIBS) $(DSOLIBS) $(LIBS) -lm
 pstoraster.o:	arch.h ../config.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.24 2000/05/23 12:19:48 mike Exp $".
+# End of "$Id: Makefile,v 1.25 2000/05/23 13:41:40 mike Exp $".
 #
