@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.29 2000/09/13 18:46:59 mike Exp $"
+ * "$Id: http.h,v 1.30 2000/12/17 21:23:20 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -127,6 +127,19 @@ typedef enum
 
 
 /*
+ * HTTP encryption values...
+ */
+
+typedef enum
+{
+  HTTP_ENCRYPT_IF_REQUESTED,	/* Encrypt if requested */
+  HTTP_ENCRYPT_NEVER,		/* Never encrypt */
+  HTTP_ENCRYPT_PREFERRED,	/* Encryption is preferred */
+  HTTP_ENCRYPT_ALWAYS		/* Always encrypt */
+} http_encryption_t;
+
+
+/*
  * HTTP authentication types...
  */
 
@@ -150,6 +163,7 @@ typedef enum
   HTTP_ERROR = -1,		/* An error response from httpXxxx() */
 
   HTTP_CONTINUE = 100,		/* Everything OK, keep going... */
+  HTTP_UPGRADE_NOW,		/* Upgrade to TLS/SSL now */
 
   HTTP_OK = 200,		/* OPTIONS/GET/HEAD/POST/TRACE command was successful */
   HTTP_CREATED,			/* PUT command was successful */
@@ -182,6 +196,7 @@ typedef enum
   HTTP_REQUEST_TOO_LARGE,	/* Request entity too large */
   HTTP_URI_TOO_LONG,		/* URI too long */
   HTTP_UNSUPPORTED_MEDIATYPE,	/* The requested media type is unsupported */
+  HTTP_UPGRADE_REQUIRED = 426,	/* Upgrade to SSL/TLS required */
 
   HTTP_SERVER_ERROR = 500,	/* Internal server error */
   HTTP_NOT_IMPLEMENTED,		/* Feature not implemented */
@@ -261,6 +276,7 @@ typedef struct
 					/* Nonce value */
   int			nonce_count;	/* Nonce count */
   void			*tls;		/* TLS state information */
+  http_encryption_t	encryption;	/* Encryption requirements */
 } http_t;
 
 
@@ -275,6 +291,7 @@ extern int		httpCheck(http_t *http);
 extern void		httpClose(http_t *http);
 extern http_t		*httpConnect(const char *host, int port);
 extern int		httpDelete(http_t *http, const char *uri);
+extern int		httpEncryption(http_t *http, http_encryption_t e);
 #  define		httpError(http) ((http)->error)
 extern void		httpFlush(http_t *http);
 extern int		httpGet(http_t *http, const char *uri);
@@ -321,5 +338,5 @@ extern char		*httpMD5String(const md5_byte_t *, char [33]);
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.29 2000/09/13 18:46:59 mike Exp $".
+ * End of "$Id: http.h,v 1.30 2000/12/17 21:23:20 mike Exp $".
  */
