@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.9 2002/01/23 22:31:27 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.10 2002/02/27 02:31:47 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -893,6 +893,8 @@ copy_bytes(FILE   *fp,		/* I - File to read from */
 static void
 end_nup(int number)	/* I - Page number */
 {
+  puts("");
+
   if (Flip || Orientation || NUp > 1)
     puts("userdict /ESPsave get restore");
 
@@ -1143,5 +1145,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.9 2002/01/23 22:31:27 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.10 2002/02/27 02:31:47 mike Exp $".
  */

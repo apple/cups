@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.15
 
+	- Now add a newline before the end-of-page code in the
+	  PostScript filter; this fixes a problem with files
+	  that don't end with a newline.
 	- The image filters looked for the "orientation" option
 	  instead of the correctly named "orientation-requested"
 	  option.
