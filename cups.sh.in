@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: cups.sh.in,v 1.12 2001/05/21 21:32:50 mike Exp $"
+# "$Id: cups.sh.in,v 1.13 2001/10/30 20:37:13 mike Exp $"
 #
 #   Startup/shutdown script for the Common UNIX Printing System (CUPS).
 #
@@ -43,12 +43,23 @@
 
 
 #### OS-Dependent Configuration
+
 case "`uname`" in
 	IRIX*)
 		IS_ON=/sbin/chkconfig
 		;;
 
 	NetBSD*)
+        	IS_ON=:
+		;;
+
+	Darwin*)
+		. /etc/rc.common
+
+		if test "${CUPS:=-YES-}" = "-NO-"; then
+			exit 0
+		fi
+
         	IS_ON=:
 		;;
 
@@ -65,10 +76,14 @@ esac
 # all but IRIX, which can configure verbose bootup messages.
 #
 
-if $IS_ON verbose; then
-	ECHO=echo
+if "`uname`" = "Darwin"; then
+	ECHO=ConsoleMessage
 else
-	ECHO=:
+	if $IS_ON verbose; then
+		ECHO=echo
+	else
+		ECHO=:
+	fi
 fi
 
 #
@@ -86,7 +101,7 @@ case "`uname`" in
 	OSF1*)
 		pid=`ps -e | awk '{print $1,$5}' | grep cupsd | awk '{print $1}'`
 		;;
-	Linux* | NetBSD*)
+	Linux* | NetBSD* | Darwin*)
 		pid=`ps ax | awk '{print $1,$5}' | grep cupsd | awk '{print $1}'`
 		;;
 	*)
@@ -143,5 +158,5 @@ exit 0
 
 
 #
-# End of "$Id: cups.sh.in,v 1.12 2001/05/21 21:32:50 mike Exp $".
+# End of "$Id: cups.sh.in,v 1.13 2001/10/30 20:37:13 mike Exp $".
 #

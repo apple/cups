@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.104 2001/10/29 13:30:08 mike Exp $"
+ * "$Id: client.c,v 1.105 2001/10/30 20:37:15 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -173,7 +173,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
     * Do double lookups as needed...
     */
 
-    if ((host = gethostbyname(con->http.hostname)) != NULL)
+    if ((host = httpGetHostByName(con->http.hostname)) != NULL)
     {
      /*
       * See if the hostname maps to the IP address...
@@ -1149,8 +1149,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 		return (0);
 	      }
 
-	      if (httpPrintf(HTTP(con), "Content-Length: %d\r\n",
-	                     filestats.st_size) < 0)
+	      if (httpPrintf(HTTP(con), "Content-Length: %lu\r\n",
+	                     (unsigned long)filestats.st_size) < 0)
 	      {
 		CloseClient(con);
 		return (0);
@@ -1206,6 +1206,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	    close(con->file);
 	    con->file = 0;
 	    unlink(con->filename);
+	    con->filename[0] = '\0';
 
             if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
 	    {
@@ -1239,6 +1240,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
             LogMessage(L_DEBUG2, "ReadClient() %d Removing temp file %s",
 	               con->http.fd, con->filename);
 	    unlink(con->filename);
+	    con->filename[0] = '\0';
 
             if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
 	    {
@@ -1337,6 +1339,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      close(con->file);
 	      con->file = 0;
 	      unlink(con->filename);
+	      con->filename[0] = '\0';
 
               if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
 	      {
@@ -1374,6 +1377,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
               LogMessage(L_DEBUG2, "ReadClient() %d Removing temp file %s",
 	                 con->http.fd, con->filename);
 	      unlink(con->filename);
+	      con->filename[0] = '\0';
 
 	      if (con->request)
 	      {
@@ -1590,7 +1594,8 @@ SendFile(client_t    *con,
 
   if (httpPrintf(HTTP(con), "Last-Modified: %s\r\n", httpGetDateString(filestats->st_mtime)) < 0)
     return (0);
-  if (httpPrintf(HTTP(con), "Content-Length: %d\r\n", filestats->st_size) < 0)
+  if (httpPrintf(HTTP(con), "Content-Length: %lu\r\n",
+                 (unsigned long)filestats->st_size) < 0)
     return (0);
   if (httpPrintf(HTTP(con), "\r\n") < 0)
     return (0);
@@ -1763,29 +1768,6 @@ WriteClient(client_t *con)		/* I - Client connection */
     }
 
     con->bytes += bytes;
-
-#ifdef __APPLE__ /* Currently just test code... */
-    printf("Wrote %d initial bytes...\n", bytes);
-
-    if (!con->pipe_pid)
-    {
-     /*
-      * Copy rest of file...
-      */
-
-      while ((bytes = read(con->file, buf, HTTP_MAX_BUFFER)) > 0)
-      {
-        con->bytes += bytes;
-        printf("Writing %d more bytes...\n", bytes);
- 
-        if (httpWrite(HTTP(con), buf, bytes) < 0)
-        {
-          CloseClient(con);
-          return (0);
-        }
-      }
-    }
-#endif /* __APPLE__ */
   }
 
   if (bytes <= 0)
@@ -1830,6 +1812,7 @@ WriteClient(client_t *con)		/* I - Client connection */
       LogMessage(L_DEBUG2, "WriteClient: %d Removing temp file %s",
                  con->http.fd, con->filename);
       unlink(con->filename);
+      con->filename[0] = '\0';
     }
 
     if (con->request != NULL)
@@ -2416,7 +2399,7 @@ pipe_command(client_t *con,	/* I - Client connection */
     if (getuid() == 0)
     {
      /*
-      * Running as root, so change to non-priviledged user...
+      * Running as root, so change to a non-priviledged user...
       */
 
       if (setgid(Group))
@@ -2439,11 +2422,13 @@ pipe_command(client_t *con,	/* I - Client connection */
     if (infile)
     {
       close(0);
-      dup(infile);
+      if (dup(infile) < 0)
+	exit(errno);
     }
 
     close(1);
-    dup(fds[1]);
+    if (dup(fds[1]) < 0)
+      exit(errno);
 
    /*
     * Close extra file descriptors...
@@ -2463,7 +2448,6 @@ pipe_command(client_t *con,	/* I - Client connection */
     */
 
     execve(command, argv, envp);
-    perror("execve failed");
     exit(errno);
     return (0);
   }
@@ -2499,5 +2483,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.104 2001/10/29 13:30:08 mike Exp $".
+ * End of "$Id: client.c,v 1.105 2001/10/30 20:37:15 mike Exp $".
  */

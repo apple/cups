@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.23 2001/07/30 19:38:25 mike Exp $"
+ * "$Id: socket.c,v 1.24 2001/10/30 20:37:13 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -146,7 +146,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Then try to connect to the remote host...
   */
 
-  if ((hostaddr = gethostbyname(hostname)) == NULL)
+  if ((hostaddr = httpGetHostByName(hostname)) == NULL)
   {
     fprintf(stderr, "ERROR: Unable to locate printer \'%s\' - %s\n",
             hostname, strerror(errno));
@@ -343,5 +343,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.23 2001/07/30 19:38:25 mike Exp $".
+ * End of "$Id: socket.c,v 1.24 2001/10/30 20:37:13 mike Exp $".
  */

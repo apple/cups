@@ -9,6 +9,7 @@ CHANGES IN CUPS V1.1.11
 	  files.
 	- Added new "cupsaddsmb" utility for exporting
 	  CUPS printer drivers to SAMBA/Windows clients.
+	- Added preliminary support for Darwin/MacOS X.
 	- The CUPS-Add-Printer operation no longer allows
 	  arbitrary scheme names in device URIs to be used - it
 	  now restricts the available schemes to those found in
@@ -68,8 +69,6 @@ CHANGES IN CUPS V1.1.11
 	  using the subdirectory approach, e.g. the "es"
 	  subdirectory under /usr/share/cups/banners is used for
 	  the Spanish banner files.
-	- Added support for Darwin/MacOS X builds (compiles
-	  but does not work 100%).
 	- Updated the scheduler so it knows the correct
 	  language abbreviation to use for all supported
 	  PPD LanguageVersion values.  The new code also
@@ -93,6 +92,18 @@ CHANGES IN CUPS V1.1.11
 	- *BSD static library creation fixes.
 	- Use mkstemps() instead of tmpnam() in pdftops whenever
 	  possible.
+	- Added httpGetHostByName() function as a wrapper around
+	  gethostbyname() - some implementations of this
+	  function do not support IP addresses (e.g. MacOS X.)
+	- Added casts to all printf's of file lengths, since
+	  there is currently no standard way of formatting long
+	  long values.
+	- The client filename field was not cleared in all
+	  instances, resulting in old form data being submitted
+	  to CGIs.
+	- The httpConnect*() functions now try all available
+	  addresses for a host when connecting for the first
+	  time.
 
 
 CHANGES IN CUPS V1.1.10-1

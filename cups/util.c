@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.87 2001/10/29 13:30:08 mike Exp $"
+ * "$Id: util.c,v 1.88 2001/10/30 20:37:15 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -244,9 +244,10 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     */
 
     if (filename != NULL)
-      sprintf(length, "%u", ippLength(request) + (size_t)fileinfo.st_size);
+      sprintf(length, "%lu", (unsigned long)(ippLength(request) +
+                                             (size_t)fileinfo.st_size));
     else
-      sprintf(length, "%u", ippLength(request));
+      sprintf(length, "%lu", (unsigned long)ippLength(request));
 
     httpClearFields(http);
     httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, length);
@@ -1736,5 +1737,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.87 2001/10/29 13:30:08 mike Exp $".
+ * End of "$Id: util.c,v 1.88 2001/10/30 20:37:15 mike Exp $".
  */

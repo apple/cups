@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-directories.m4,v 1.3 2001/10/07 12:16:08 mike Exp $"
+dnl "$Id: cups-directories.m4,v 1.4 2001/10/30 20:37:14 mike Exp $"
 dnl
 dnl   Directory stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -108,7 +108,7 @@ if test x$rcdir = x; then
 		Darwin*)
 			# Darwin and MacOS X - this is just strange...
 			INITDIR=""
-			INITDDIR="/System/Library/StartupItems/cups"
+			INITDDIR="/System/Library/StartupItems/CUPS"
 			;;
 
 		Linux*)
@@ -171,7 +171,7 @@ fi
 
 dnl See what directory to put server executables...
 case "$uname" in
-	FreeBSD* | NetBSD* | OpenBSD*)
+	FreeBSD* | NetBSD* | OpenBSD* | Darwin*)
 		# *BSD
 		INSTALL_SYSV=""
 		CUPS_SERVERBIN='${exec_prefix}/libexec/cups'
@@ -193,7 +193,7 @@ AC_SUBST(CUPS_REQUESTS)
 
 dnl Set the CUPS_LOCALE directory...
 case "$uname" in
-	Linux* | FreeBSD* | NetBSD* | OpenBSD*)
+	Linux* | FreeBSD* | NetBSD* | OpenBSD* | Darwin*)
 		CUPS_LOCALEDIR='${datadir}/locale'
 		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$datadir/locale")
 		;;
@@ -232,5 +232,5 @@ dnl Set the CUPS_FONTPATH directory...
 AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 
 dnl
-dnl End of "$Id: cups-directories.m4,v 1.3 2001/10/07 12:16:08 mike Exp $".
+dnl End of "$Id: cups-directories.m4,v 1.4 2001/10/30 20:37:14 mike Exp $".
 dnl

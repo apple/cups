@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.87 2001/09/14 16:52:06 mike Exp $"
+ * "$Id: http.c,v 1.88 2001/10/30 20:37:14 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -32,6 +32,8 @@
  *   httpConnectEncrypt() - Connect to a HTTP server using encryption.
  *   httpEncryption()     - Set the required encryption on the link.
  *   httpReconnect()      - Reconnect to a HTTP server...
+ *   httpGetHostByName()  - Lookup a hostname or IP address, and return
+ *                          address records for the specified name.
  *   httpSeparate()       - Separate a Universal Resource Identifier into its
  *                          components.
  *   httpGetSubField()    - Get a sub-field value.
@@ -339,6 +341,7 @@ httpConnectEncrypt(const char *host,	/* I - Host to connect to */
 		   http_encryption_t encrypt)
 					/* I - Type of encryption to use */
 {
+  int			i;		/* Looping var */
   http_t		*http;		/* New HTTP connection */
   struct hostent	*hostaddr;	/* Host address data */
 
@@ -352,7 +355,7 @@ httpConnectEncrypt(const char *host,	/* I - Host to connect to */
   * Lookup the host...
   */
 
-  if ((hostaddr = gethostbyname(host)) == NULL)
+  if ((hostaddr = httpGetHostByName(host)) == NULL)
   {
    /*
     * This hack to make users that don't have a localhost entry in
@@ -361,7 +364,7 @@ httpConnectEncrypt(const char *host,	/* I - Host to connect to */
 
     if (strcasecmp(host, "localhost") != 0)
       return (NULL);
-    else if ((hostaddr = gethostbyname("127.0.0.1")) == NULL)
+    else if ((hostaddr = httpGetHostByName("127.0.0.1")) == NULL)
       return (NULL);
   }
 
@@ -405,16 +408,31 @@ httpConnectEncrypt(const char *host,	/* I - Host to connect to */
   http->encryption = encrypt;
 
  /*
-  * Connect to the remote system...
+  * Loop through the addresses we have until one of them connects...
   */
 
-  if (httpReconnect(http))
+  for (i = 0; hostaddr->h_addr_list[i]; i ++)
   {
-    free(http);
-    return (NULL);
+   /*
+    * Load the address...
+    */
+
+    httpAddrLoad(hostaddr, port, i, &(http->hostaddr));
+
+   /*
+    * Connect to the remote system...
+    */
+
+    if (!httpReconnect(http))
+      return (http);
   }
-  else
-    return (http);
+
+ /*
+  * Could not connect to any known address - bail out!
+  */
+
+  free(http);
+  return (NULL);
 }
 
 
@@ -580,6 +598,69 @@ httpReconnect(http_t *http)	/* I - HTTP data */
 #endif /* HAVE_LIBSSL */
 
   return (0);
+}
+
+
+/*
+ * 'httpGetHostByName()' - Lookup a hostname or IP address, and return
+ *                         address records for the specified name.
+ */
+
+struct hostent *			/* O - Host entry */
+httpGetHostByName(const char *name)	/* I - Hostname or IP address */
+{
+  unsigned		ip[4];		/* IP address components */
+  static unsigned	packed_ip;	/* Packed IPv4 address */
+  static char		*packed_ptr[2];	/* Pointer to packed address */
+  static struct hostent	host_ip;	/* Host entry for IP address */
+
+
+ /*
+  * This function is needed because some operating systems have a
+  * buggy implementation of httpGetHostByName() that does not support
+  * IP addresses.  If the first character of the name string is a
+  * number, then sscanf() is used to extract the IP components.
+  * We then pack the components into an IPv4 address manually,
+  * since the inet_aton() function is deprecated.  We use the
+  * htonl() macro to get the right byte order for the address.
+  */
+
+  if (isdigit(name[0]))
+  {
+   /*
+    * We have an IP address; break it up and provide the host entry
+    * to the caller.  Currently only supports IPv4 addresses, although
+    * it should be trivial to support IPv6 in CUPS 1.2.
+    */
+
+    if (sscanf(name, "%u.%u.%u.%u", ip, ip + 1, ip + 2, ip + 3) != 4)
+      return (NULL); /* Must have 4 numbers */
+
+    packed_ip = htonl(((((((ip[0] << 8) | ip[1]) << 8) | ip[2]) << 8) | ip[3]));
+
+   /*
+    * Fill in the host entry and return it...
+    */
+
+    host_ip.h_name      = (char *)name;
+    host_ip.h_aliases   = NULL;
+    host_ip.h_addrtype  = AF_INET;
+    host_ip.h_length    = 4;
+    host_ip.h_addr_list = packed_ptr;
+    packed_ptr[0]       = (char *)(&packed_ip);
+    packed_ptr[1]       = NULL;
+
+    return (&host_ip);
+  }
+  else
+  {
+   /*
+    * Use the gethostbyname() function to get the IP address for
+    * the name...
+    */
+
+    return (gethostbyname(name));
+  }
 }
 
 
@@ -2115,5 +2196,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.87 2001/09/14 16:52:06 mike Exp $".
+ * End of "$Id: http.c,v 1.88 2001/10/30 20:37:14 mike Exp $".
  */

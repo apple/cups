@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.29 2001/06/06 16:47:52 mike Exp $"
+ * "$Id: lpd.c,v 1.30 2001/10/30 20:37:13 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -399,7 +399,7 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
   * First try to reserve a port for this connection...
   */
 
-  if ((hostaddr = gethostbyname(hostname)) == NULL)
+  if ((hostaddr = httpGetHostByName(hostname)) == NULL)
   {
     fprintf(stderr, "ERROR: Unable to locate printer \'%s\' - %s",
             hostname, strerror(errno));
@@ -674,5 +674,5 @@ lpd_write(int  lpd_fd,		/* I - LPD socket */
 
 
 /*
- * End of "$Id: lpd.c,v 1.29 2001/06/06 16:47:52 mike Exp $".
+ * End of "$Id: lpd.c,v 1.30 2001/10/30 20:37:13 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.10 2001/06/05 18:28:43 mike Exp $"
+ * "$Id: listen.c,v 1.11 2001/10/30 20:37:16 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -116,7 +116,7 @@ StartListening(void)
 
   memset(&ServerAddr, 0, sizeof(ServerAddr));
 
-  if ((host = gethostbyname(ServerName)) != NULL)
+  if ((host = httpGetHostByName(ServerName)) != NULL)
   {
    /*
     * Found the server's address!
@@ -218,5 +218,5 @@ StopListening(void)
 
 
 /*
- * End of "$Id: listen.c,v 1.10 2001/06/05 18:28:43 mike Exp $".
+ * End of "$Id: listen.c,v 1.11 2001/10/30 20:37:16 mike Exp $".
  */

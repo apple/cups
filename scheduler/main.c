@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.61 2001/10/25 16:26:02 mike Exp $"
+ * "$Id: main.c,v 1.62 2001/10/30 20:37:16 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -382,12 +382,6 @@ main(int  argc,			/* I - Number of command-line arguments */
       * Process the input buffer...
       */
 
-#ifdef __APPLE__
-      printf("Client %d, fd = %d, input = %d, output = %d\n", con - Clients,
-             con->http.fd, FD_ISSET(con->http.fd, &input),
-             FD_ISSET(con->http.fd, &output));
-#endif /* __APPLE__ */
-
       if (FD_ISSET(con->http.fd, &input) || con->http.used)
         if (!ReadClient(con))
 	{
@@ -751,5 +745,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.61 2001/10/25 16:26:02 mike Exp $".
+ * End of "$Id: main.c,v 1.62 2001/10/30 20:37:16 mike Exp $".
  */
