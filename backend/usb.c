@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.18.2.13 2002/08/09 00:20:07 mike Exp $"
+ * "$Id: usb.c,v 1.18.2.14 2002/08/17 22:16:02 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -452,12 +452,12 @@ list_devices(void)
 
     sprintf(device, "/dev/unlpt%d", i);
     if (!access(device, 0))
-      printf("direct usb:%s \"Unknown\" \"USB Printer #%d\" (no reset)\n", device, i + 1);
+      printf("direct usb:%s \"Unknown\" \"USB Printer #%d (no reset)\"\n", device, i + 1);
   }
 #endif
 }
 
 
 /*
- * End of "$Id: usb.c,v 1.18.2.13 2002/08/09 00:20:07 mike Exp $".
+ * End of "$Id: usb.c,v 1.18.2.14 2002/08/17 22:16:02 mike Exp $".
  */
