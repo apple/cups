@@ -1,5 +1,5 @@
 /*
- * "$Id: image-colorspace.c,v 1.9 1999/04/01 18:24:55 mike Exp $"
+ * "$Id: image-colorspace.c,v 1.10 1999/04/02 18:13:37 mike Exp $"
  *
  *   Colorspace conversions for the Common UNIX Printing System (CUPS).
  *
@@ -248,6 +248,7 @@ ImageRGBToCMY(ib_t *in,		/* I - Input pixels */
               int  count)	/* I - Number of pixels */
 {
   int	c, m, y, k;		/* CMYK values */
+  int	cc, cm, cy;		/* Calibrated CMY values */
 
 
   if (ImageHaveProfile)
@@ -261,15 +262,37 @@ ImageRGBToCMY(ib_t *in,		/* I - Input pixels */
       m -= k;
       y -= k;
 
-      *out++ = (ImageMatrix[0][0][c] +
-                ImageMatrix[0][1][m] +
-		ImageMatrix[0][2][y] + k) * ImageDensity / 256;
-      *out++ = (ImageMatrix[1][0][c] +
-                ImageMatrix[1][1][m] +
-		ImageMatrix[1][2][y] + k) * ImageDensity / 256;
-      *out++ = (ImageMatrix[2][0][c] +
-                ImageMatrix[2][1][m] +
-		ImageMatrix[2][2][y] + k) * ImageDensity / 256;
+      cc = (ImageMatrix[0][0][c] +
+            ImageMatrix[0][1][m] +
+	    ImageMatrix[0][2][y] + k) * ImageDensity / 256;
+      cm = (ImageMatrix[1][0][c] +
+            ImageMatrix[1][1][m] +
+	    ImageMatrix[1][2][y] + k) * ImageDensity / 256;
+      cy = (ImageMatrix[2][0][c] +
+            ImageMatrix[2][1][m] +
+	    ImageMatrix[2][2][y] + k) * ImageDensity / 256;
+
+      if (cc < 0)
+        *out++ = 0;
+      else if (cc > 255)
+        *out++ = 255;
+      else
+        *out++ = cc;
+
+      if (cm < 0)
+        *out++ = 0;
+      else if (cm > 255)
+        *out++ = 255;
+      else
+        *out++ = cm;
+
+      if (cy < 0)
+        *out++ = 0;
+      else if (cy > 255)
+        *out++ = 255;
+      else
+        *out++ = cy;
+
       count --;
     }
   else
@@ -300,6 +323,7 @@ ImageRGBToCMYK(ib_t *in,	/* I - Input pixels */
 {
   int	c, m, y, k,		/* CMYK values */
 	diff;			/* Color differences */
+  int	cc, cm, cy, ck;		/* Calibrated CMYK values */
 
 
   if (ImageHaveProfile)
@@ -327,16 +351,44 @@ ImageRGBToCMYK(ib_t *in,	/* I - Input pixels */
       m -= k;
       y -= k;
 
-      *out++ = (ImageMatrix[0][0][c] +
-                ImageMatrix[0][1][m] +
-		ImageMatrix[0][2][y]) * ImageDensity / 256;
-      *out++ = (ImageMatrix[1][0][c] +
-                ImageMatrix[1][1][m] +
-		ImageMatrix[1][2][y]) * ImageDensity / 256;
-      *out++ = (ImageMatrix[2][0][c] +
-                ImageMatrix[2][1][m] +
-		ImageMatrix[2][2][y]) * ImageDensity / 256;
-      *out++ = k * ImageDensity / 256;
+      cc = (ImageMatrix[0][0][c] +
+            ImageMatrix[0][1][m] +
+	    ImageMatrix[0][2][y]) * ImageDensity / 256;
+      cm = (ImageMatrix[1][0][c] +
+            ImageMatrix[1][1][m] +
+	    ImageMatrix[1][2][y]) * ImageDensity / 256;
+      cy = (ImageMatrix[2][0][c] +
+            ImageMatrix[2][1][m] +
+	    ImageMatrix[2][2][y]) * ImageDensity / 256;
+      ck = k * ImageDensity / 256;
+
+      if (cc < 0)
+        *out++ = 0;
+      else if (cc > 255)
+        *out++ = 255;
+      else
+        *out++ = cc;
+
+      if (cm < 0)
+        *out++ = 0;
+      else if (cm > 255)
+        *out++ = 255;
+      else
+        *out++ = cm;
+
+      if (cy < 0)
+        *out++ = 0;
+      else if (cy > 255)
+        *out++ = 255;
+      else
+        *out++ = cy;
+
+      if (ck < 0)
+        *out++ = 0;
+      else if (ck > 255)
+        *out++ = 255;
+      else
+        *out++ = ck;
 
       count --;
     }
@@ -408,6 +460,7 @@ ImageRGBToRGB(ib_t *in,		/* I - Input pixels */
               int  count)	/* I - Number of pixels */
 {
   int	c, m, y, k;		/* CMYK values */
+  int	cr, cg, cb;		/* Calibrated RGB values */
 
 
   if (ImageHaveProfile)
@@ -421,15 +474,37 @@ ImageRGBToRGB(ib_t *in,		/* I - Input pixels */
       m -= k;
       y -= k;
 
-      *out++ = 255 - (ImageMatrix[0][0][c] +
-                      ImageMatrix[0][1][m] +
-		      ImageMatrix[0][2][y] + k) * ImageDensity / 256;
-      *out++ = 255 - (ImageMatrix[1][0][c] +
-                      ImageMatrix[1][1][m] +
-		      ImageMatrix[1][2][y] + k) * ImageDensity / 256;
-      *out++ = 255 - (ImageMatrix[2][0][c] +
-                      ImageMatrix[2][1][m] +
-		      ImageMatrix[2][2][y] + k) * ImageDensity / 256;
+      cr = 255 - (ImageMatrix[0][0][c] +
+                  ImageMatrix[0][1][m] +
+		  ImageMatrix[0][2][y] + k) * ImageDensity / 256;
+      cg = 255 - (ImageMatrix[1][0][c] +
+                  ImageMatrix[1][1][m] +
+		  ImageMatrix[1][2][y] + k) * ImageDensity / 256;
+      cb = 255 - (ImageMatrix[2][0][c] +
+                  ImageMatrix[2][1][m] +
+		  ImageMatrix[2][2][y] + k) * ImageDensity / 256;
+
+      if (cr < 0)
+        *out++ = 0;
+      else if (cr > 255)
+        *out++ = 255;
+      else
+        *out++ = cr;
+
+      if (cg < 0)
+        *out++ = 0;
+      else if (cg > 255)
+        *out++ = 255;
+      else
+        *out++ = cg;
+
+      if (cb < 0)
+        *out++ = 0;
+      else if (cb > 255)
+        *out++ = 255;
+      else
+        *out++ = cb;
+
       count --;
     }
   else if (in != out)
@@ -827,5 +902,5 @@ zshear(float mat[3][3],	/* I - Matrix */
 
 
 /*
- * End of "$Id: image-colorspace.c,v 1.9 1999/04/01 18:24:55 mike Exp $".
+ * End of "$Id: image-colorspace.c,v 1.10 1999/04/02 18:13:37 mike Exp $".
  */
