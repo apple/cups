@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The pdftops filter now scales PDF pages within the
+	  printable area of the page.
 	- The pstops filter didn't include the page-label and
 	  classification boxes when printing EPS or non-
 	  conformant PS files.

@@ -621,6 +621,7 @@ void PSOutputDev::init(PSOutputFunc outputFuncA, void *outputStreamA,
     writePSFmt("%%%%DocumentMedia: plain %d %d 0 () ()\n",
 	       paperWidth, paperHeight);
     writePSFmt("%%%%Pages: %d\n", lastPage - firstPage + 1);
+    writePSFmt("%%%%BoundingBox: 0 0 %d %d\n", paperWidth, paperHeight);
     writePS("%%EndComments\n");
     writePS("%%BeginDefaults\n");
     writePS("%%PageMedia: plain\n");
@@ -1684,29 +1685,37 @@ void PSOutputDev::setupImage(Ref id, Stream *str) {
 
 void PSOutputDev::startPage(int pageNum, GfxState *state) {
   int x1, y1, x2, y2, width, height, t;
+  int imageWidth, imageHeight;
+  int left, bottom, right, top;
 
+  globalParams->getPSImageableArea(left, bottom, right, top);
+  imageWidth  = right - left;
+  imageHeight = top - bottom;
 
   switch (mode) {
 
   case psModePS:
     writePSFmt("%%%%Page: %d %d\n", pageNum, seqPage);
-    writePS("%%BeginPageSetup\n");
 
     // rotate, translate, and scale page
     x1 = (int)(state->getX1() + 0.5);
     y1 = (int)(state->getY1() + 0.5);
     x2 = (int)(state->getX2() + 0.5);
     y2 = (int)(state->getY2() + 0.5);
+    writePSFmt("%%%%PageBoundingBox: %d %d %d %d\n",
+	       (int)floor(x1), (int)floor(y1),
+	       (int)ceil(x2), (int)ceil(y2));
+    writePS("%%BeginPageSetup\n");
     width = x2 - x1;
     height = y2 - y1;
-    if (width > height && width > paperWidth) {
+    if (width > height && width > imageWidth) {
       landscape = gTrue;
       writePSFmt("%%%%PageOrientation: %s\n",
 		 state->getCTM()[0] ? "Landscape" : "Portrait");
       writePS("pdfStartPage\n");
       writePS("90 rotate\n");
       tx = -x1;
-      ty = -(y1 + paperWidth);
+      ty = -(y1 + imageWidth);
       t = width;
       width = height;
       height = t;
@@ -1718,18 +1727,20 @@ void PSOutputDev::startPage(int pageNum, GfxState *state) {
       tx = -x1;
       ty = -y1;
     }
-    if (width < paperWidth) {
-      tx += (paperWidth - width) / 2;
+    tx += left;
+    ty += bottom;
+    if (width < imageWidth) {
+      tx += (imageWidth - width) / 2;
     }
-    if (height < paperHeight) {
-      ty += (paperHeight - height) / 2;
+    if (height < imageHeight) {
+      ty += (imageHeight - height) / 2;
     }
     if (tx != 0 || ty != 0) {
       writePSFmt("%g %g translate\n", tx, ty);
     }
-    if (width > paperWidth || height > paperHeight) {
-      xScale = (double)paperWidth / (double)width;
-      yScale = (double)paperHeight / (double)height;
+    if (width > imageWidth || height > imageHeight) {
+      xScale = (double)imageWidth / (double)width;
+      yScale = (double)imageHeight / (double)height;
       if (yScale < xScale) {
 	xScale = yScale;
       } else {
