@@ -1,4 +1,4 @@
-"us-ascii",
+"iso-8859-1",
 "OK",
 "Cancel",
 "Help",

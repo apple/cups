@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.2 2000/03/21 04:03:36 mike Exp $"
+ * "$Id: type.c,v 1.3 2000/04/09 23:09:08 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -383,6 +383,8 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	  op = MIME_MAGIC_INT;
 	else if (strcmp(name, "locale") == 0)
 	  op = MIME_MAGIC_LOCALE;
+	else if (strcmp(name, "contains") == 0)
+	  op = MIME_MAGIC_CONTAINS;
 	else
 	  return (-1);
       }
@@ -482,6 +484,14 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	      return (-1);
 
 	    strcpy(temp->value.localev, value[0]);
+	    break;
+	case MIME_MAGIC_CONTAINS :
+	    temp->offset = atoi(value[0]);
+	    temp->region = atoi(value[1]);
+	    if (length[2] > sizeof(temp->value.stringv))
+	      return (-1);
+	    temp->length = length[2];
+	    memcpy(temp->value.stringv, value[2], length[2]);
 	    break;
       }
     }
@@ -628,6 +638,7 @@ checkrules(const char   *filename,	/* I - Filename */
            mime_magic_t *rules)		/* I - Rules to check */
 {
   int		n;			/* Looping var */
+  int		region;			/* Region to look at */
   int		logic,			/* Logic to apply */
 		result,			/* Result of test */
 		intv;			/* Integer value */
@@ -648,6 +659,7 @@ checkrules(const char   *filename,	/* I - Filename */
 
   bufoffset = -1;
   buflength = 0;
+  result    = 0;
 
   while (rules != NULL)
   {
@@ -870,6 +882,44 @@ checkrules(const char   *filename,	/* I - Filename */
           result = (strcmp(rules->value.localev, setlocale(LC_ALL, NULL)) == 0);
 	  break;
 
+      case MIME_MAGIC_CONTAINS :
+         /*
+	  * Load the buffer if necessary...
+	  */
+
+          if (bufoffset < 0 || rules->offset < bufoffset ||
+	      (rules->offset + rules->region) > (bufoffset + buflength))
+	  {
+	   /*
+	    * Reload file buffer...
+	    */
+
+            fseek(fp, rules->offset, SEEK_SET);
+	    buflength = fread(buffer, 1, sizeof(buffer), fp);
+	    bufoffset = rules->offset;
+	  }
+
+         /*
+	  * Compare the buffer against the string.  If the file is too
+	  * short then don't compare - it can't match...
+	  */
+
+	  if ((rules->offset + rules->length) > (bufoffset + buflength))
+	    result = 0;
+	  else
+	  {
+	    if (buflength > rules->region)
+	      region = rules->region - rules->length;
+	    else
+	      region = buflength - rules->length;
+
+	    for (n = 0; n < region; n ++)
+	      if ((result = (memcmp(buffer + rules->offset - bufoffset + n,
+	                            rules->value.stringv, rules->length) == 0)) != 0)
+		break;
+          }
+	  break;
+
       default :
           if (rules->child != NULL)
 	    result = checkrules(filename, fp, rules->child);
@@ -1011,5 +1061,5 @@ patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.2 2000/03/21 04:03:36 mike Exp $".
+ * End of "$Id: type.c,v 1.3 2000/04/09 23:09:08 mike Exp $".
  */

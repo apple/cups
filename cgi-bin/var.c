@@ -1,5 +1,5 @@
 /*
- * "$Id: var.c,v 1.15 2000/02/08 20:38:44 mike Exp $"
+ * "$Id: var.c,v 1.16 2000/04/09 23:08:59 mike Exp $"
  *
  *   CGI form variable and array functions.
  *
@@ -613,6 +613,8 @@ cgi_initialize_string(const char *data)	/* I - Form data string */
       *s++ = '\0';
       cgiSetArray(name, atoi(s) - 1, value);
     }
+    else if (cgiGetVariable(name) != NULL)
+      cgiSetArray(name, cgiGetSize(name), value);
     else
       cgiSetVariable(name, value);
   }
@@ -650,5 +652,5 @@ cgi_sort_variables(void)
 
 
 /*
- * End of "$Id: var.c,v 1.15 2000/02/08 20:38:44 mike Exp $".
+ * End of "$Id: var.c,v 1.16 2000/04/09 23:08:59 mike Exp $".
  */

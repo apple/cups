@@ -26,118 +26,7 @@ System ("CUPS") Version 1.1.
 	<LI>4 - Checking the Status Via the Web</LI>
 </UL>
 
-<H1 ALIGN=RIGHT>1 - Printing System Overview</H1>
-
-<P>This chapter provides an overview of how the Common UNIX Printing System
-works.
-
-<H2>The Printing Problem</H2>
-
-<P>For years <I>the printing problem</I> has plagued UNIX&reg;. Unlike
-Microsoft&reg; Windows&reg; or MacOS, UNIX has no standard interface or
-system in place for supporting printers. Among the solutions previously
-available, the Berkeley and System V printing systems are the most
-prevalent.
-
-<P>These printing systems support line printers (text only) or
-PostScript printers (text and graphics), and with some coaxing they can
-be made to support a full range of printers and file formats. However,
-because each varient of the UNIX operating system uses a different
-printing system than the next, developing printer drivers for a wide
-range of printers is extremely difficult. That combined with the
-limited volume of customers for each UNIX varient has forced most
-printer vendors to give up supporting UNIX entirely.
-
-<P>The Common UNIX Printing System, or CUPS, is designed to eliminate
-<I>the printing problem</I>. One common printing system can be used by
-all UNIX varients to support the printing needs of users. Printer
-vendors can use its modular filter interface to develop a single driver
-program that supports a wide range of file formats with little or no
-effort.  Since CUPS provides both the System V and Berkeley printing
-commands, users (and applications) can reap the benefits of this new
-technology with no changes.
-
-<H2>The Technology</H2>
-
-<P>CUPS is based upon an emerging Internet standard called the Internet
-Printing Protocol, or IPP. IPP has been embraced by dozens of printer
-and printer server manufacturers, and will be supported by the next
-Microsoft Windows operating system.
-
-<P>IPP defines a standard protocol for printing as well as managing print
-jobs and printer options like media size, resolution, and so forth. Like all
-IP-based protocols, IPP can be used locally or over the Internet to printers
-hundreds or thousands of miles away. Unlike other protocols, however, IPP
-also supports access control, authentication, and encryption, making it a
-much more secure printing solution than older ones.
-
-<P>IPP is layered on top of the Hyper-Text Transport Protocol, or HTTP,
-which is the basis of web servers on the Internet. This allows the user to
-view documentation and status information on a printer or server using their
-web browser.
-
-<P>CUPS provides a complete IPP/1.0-based printing system that provides Basic
-authentication and domain or IP-based access control. Digest authentication
-and TLS encryption will be available in future versions of CUPS.
-
-<H2>Jobs</H2>
-
-<P>Each file that is submitted for printing is called a <I>job</I>. 
-Jobs are identified by a unique number starting at 1 and are assigned
-to a particular destination (usually a printer). Jobs can also have
-options associated with them such as media size, number of copies, and
-priority.
-
-<H2>Classes</H2>
-
-<P>CUPS supports collections of printers known as <I>classes</I>. Jobs sent
-to a class are forwarded to the first available printer in the class.
-
-<H2>Filters</H2>
-
-<P>Filters allow a user or application to print many types of files
-without extra effort. Print jobs sent to a CUPS server are filtered
-before sending them to a printer. Some filters convert job files to
-different formats that the printer can understand. Others perform page
-selection and ordering tasks. <I>Backend</I> filters perform the most
-important task of all - they send the filtered print data to the
-printer.
-
-<P>CUPS provides filters for printing many types of image files,
-HP-GL/2 files, PDF files, and text files. CUPS also supplies
-PostScript and image file Raster Image Processors, or RIPs, that
-convert PostScript or image files into bitmaps that can be sent to a
-raster printer.
-
-<P>CUPS provides backends for printing over parallel and serial ports,
-and over the network via the JetDirect (AppSocket), Server Message
-Block, and Line Printer Daemon protocols.
-
-<H2>Printer Drivers</H2>
-
-<P>Printer drivers in CUPS consist of one of more filters specific to a
-printer. CUPS includes a sample printer driver for Hewlett-Packard
-LaserJet and DeskJet printers. While this driver does not generate
-optimal output for different printer models, it does demonstrate how
-you can write your own printer drivers and incorporate them into CUPS.
-
-<H2>Networking</H2>
-
-<P>Printers and classes on the local system are automatically shared with
-other systems on the network. This allows you to setup one system to print
-to a printer and use this system as a printer server or spool host for all
-of the others.  If there is only one occurrence of a printer on a network,
-then that printer can be accessed using its name alone. If more than one
-printer exists with the same name, users must select the printer by specifying
-which server to use (e.g. "printer@host1" or "printer@host2".)
-
-<P>CUPS also provides <I>implicit classes</I>, which are collections of
-printers and/or classes with the same name. This allows you to setup multiple
-servers pointing to the same physical network printer, for example, so that
-you aren't relying on a single system for printing. Because this also works
-with printer classes, you can setup multiple servers and printers and never
-worry about a "single point of failure" unless all of the printers and servers
-goes down!
+<EMBED SRC="printing-overview.shtml">
 
 <H1 ALIGN=RIGHT>2 - Using the Printing System</H1>
 
@@ -199,14 +88,13 @@ command:
 your needs. However, there may be times when you need to change the options
 for a particular file you are printing.
 
-<P>The <CODE>lp</CODE> command allows you to pass printer options using the
-"-o" option:
+<P>The <CODE>lp</CODE> and <CODE>lpr</CODE> commands allow you to pass
+printer options using the "-o" option:
 
 <UL><PRE>
 % lp -o landscape -o scaling=75 -o media=A4 filename.jpg
+% lpr -o landscape -o scaling=75 -o media=A4 filename.jpg
 </PRE></UL>
-
-<P>The <CODE>lpr</CODE> command has no command-line option for printer options.
 
 <P>The available printer options vary depending on the printer. The standard
 options are described in <A HREF="#4">Chapter 3</A>.
@@ -222,10 +110,11 @@ printing more than one copy of a file:
 </PRE></UL>
 
 <P>Copies are normally <I>not</I> collated for you. To get collated copies
-use the <CODE>lp</CODE> command with the "-o Collate=True" option:
+use the "-o Collate=True" option:
 
 <UL><PRE>
 % lp -n num-copies -o Collate=True filename ENTER
+% lpr -#num-copies -o Collate=True filename ENTER
 </PRE></UL>
 
 <H2>Checking the Printer Status from the Command-Line</H2>
@@ -269,10 +158,11 @@ of a button!
 
 <H2>Canceling a Print Job</H2>
 
-<P>The <CODE>cancel</CODE> command cancels a print job:
+<P>The <CODE>cancel</CODE> and <CODE>lprm</CODE> commands cancel a print job:
 
 <UL><PRE>
 % cancel job-id ENTER
+% lprm job-id ENTER
 </PRE></UL>
 
 <P>The <I>job-id</I> is a number that was reported to you by the
@@ -281,7 +171,7 @@ of a button!
 <H1 ALIGN=RIGHT>3 - Standard Printer Options</H1>
 
 <P>This chapter describes the standard printer options that are available
-when printing with the <CODE>lp</CODE> command.
+when printing with the <CODE>lp</CODE> and <CODE>lpr</CODE> commands.
 
 <H2>General Options</H2>
 
@@ -294,8 +184,8 @@ when printing with the <CODE>lp</CODE> command.
 <UL><PRE>
 % lp -o media=Letter filename ENTER
 % lp -o media=Letter,MultiPurpose filename ENTER
-% lp -o media=Letter,Transparency filename ENTER
-% lp -o media=Letter,MultiPurpose,Transparency filename ENTER
+% lpr -o media=Letter,Transparency filename ENTER
+% lpr -o media=Letter,MultiPurpose,Transparency filename ENTER
 </PRE></UL>
 
 <P>The available media sizes, types, and sources depend on the printer, but
@@ -337,6 +227,7 @@ landscape orientation:
 
 <UL><PRE>
 % lp -o landscape filename ENTER
+% lpr -o landscape filename ENTER
 </PRE></UL>
 
 <H3>Printing On Both Sides of the Paper</H3>
@@ -350,6 +241,7 @@ option is suitable for landscape pages, while the
 <UL><PRE>
 % lp -o sides=two-sided-short-edge filename ENTER
 % lp -o sides=two-sided-long-edge filename ENTER
+% lpr -o sides=two-sided-long-edge filename ENTER
 </PRE></UL>
 
 <H3>Selecting a Range of Pages</H3>
@@ -360,6 +252,7 @@ option is suitable for landscape pages, while the
 % lp -o page-ranges=1 filename ENTER
 % lp -o page-ranges=1-4 filename ENTER
 % lp -o page-ranges=1-4,7,9-12 filename ENTER
+% lpr -o page-ranges=1-4,7,9-12 filename ENTER
 </PRE></UL>
 
 <P>As shown above, the <I>pages</I> value can be a single page, a range of
@@ -372,6 +265,7 @@ the pages in the "page-range" option.
 <UL><PRE>
 % lp -o page-set=odd filename ENTER
 % lp -o page-set=even filename ENTER
+% lpr -o page-set=even filename ENTER
 </PRE></UL>
 
 <H3>N-Up Printing</H3>
@@ -384,6 +278,7 @@ page.  CUPS supports 1-Up, 2-Up, and 4-Up formats:
 % lp -o number-up=1 filename ENTER
 % lp -o number-up=2 filename ENTER
 % lp -o number-up=4 filename ENTER
+% lpr -o number-up=4 filename ENTER
 </PRE></UL>
 
 <P>The default format is 1-Up.
@@ -395,6 +290,7 @@ page.  CUPS supports 1-Up, 2-Up, and 4-Up formats:
 
 <UL><PRE>
 % lp -o brightness=120 filename ENTER
+% lpr -o brightness=120 filename ENTER
 </PRE></UL>
 
 <P>Values greater than 100 will lighten the print, while values less than
@@ -407,6 +303,7 @@ using the "-o gamma=value" option:
 
 <UL><PRE>
 % lp -o gamma=1700 filename ENTER
+% lpr -o gamma=1700 filename ENTER
 </PRE></UL>
 
 <P>Values greater than 1000 will lighten the print, while values less
@@ -423,6 +320,7 @@ sRGB specification.
 
 <UL><PRE>
 % lp -o cpi=12 filename ENTER
+% lpr -o cpi=12 filename ENTER
 </PRE></UL>
 
 <H3>Setting the Number of Lines Per Inch</H3>
@@ -431,6 +329,7 @@ sRGB specification.
 
 <UL><PRE>
 % lp -o lpi=8 filename ENTER
+% lpr -o lpi=8 filename ENTER
 </PRE></UL>
 
 <H3>Setting the Number of Columns</H3>
@@ -439,6 +338,7 @@ sRGB specification.
 
 <UL><PRE>
 % lp -o columns=2 filename ENTER
+% lpr -o columns=2 filename ENTER
 </PRE></UL>
 
 <H3>Setting the Page Margins</H3>
@@ -452,6 +352,7 @@ adjust the page margins use the "-o page-left=value", "-o page-right=value",
 % lp -o page-right=value filename ENTER
 % lp -o page-top=value filename ENTER
 % lp -o page-bottom=value filename ENTER
+% lpr -o page-bottom=value filename ENTER
 </PRE></UL>
 
 <P>The <I>value</I> argument is the margin in points; each point is 1/72 inch
@@ -465,6 +366,7 @@ keywords are highlighted, and comment lines are italicized:
 
 <UL><PRE>
 % lp -o prettyprint filename ENTER
+% lpr -o prettyprint filename ENTER
 </PRE></UL>
 
 <H2>Image Options</H2>
@@ -479,6 +381,7 @@ printed image:
 <UL><PRE>
 % lp -o scaling=percent filename ENTER
 % lp -o ppi=value filename ENTER
+% lpr -o ppi=value filename ENTER
 </PRE></UL>
 
 <P>The scaling <I>percent</I> is a number from 1 to 800 specifying the size
@@ -499,6 +402,7 @@ like the tint control on your television:
 
 <UL><PRE>
 % lp -o hue=value filename ENTER
+% lpr -o hue=value filename ENTER
 </PRE></UL>
 
 <P>The <I>value</I> argument is a number from -360 to 360 and represents the
@@ -550,6 +454,7 @@ an image, much like the color knob on your television:
 
 <UL><PRE>
 % lp -o saturation=percent filename ENTER
+% lpr -o saturation=percent filename ENTER
 </PRE></UL>
 
 <P>The <I>percent</I> argument specifies the color saturation from 0 to 200.

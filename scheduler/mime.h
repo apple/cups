@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.h,v 1.1 2000/01/25 03:50:48 mike Exp $"
+ * "$Id: mime.h,v 1.2 2000/04/09 23:09:08 mike Exp $"
  *
  *   MIME type/conversion database definitions for the Common UNIX Printing System (CUPS).
  *
@@ -60,7 +60,8 @@ typedef enum
   MIME_MAGIC_CHAR,	/* Character/byte matches */
   MIME_MAGIC_SHORT,	/* Short/16-bit word matches */
   MIME_MAGIC_INT,	/* Integer/32-bit word matches */
-  MIME_MAGIC_LOCALE	/* Current locale matches string */
+  MIME_MAGIC_LOCALE,	/* Current locale matches string */
+  MIME_MAGIC_CONTAINS	/* File contains a string */
 } mime_op_t;
 
 typedef struct mime_magic_str		/**** MIME Magic Data ****/
@@ -72,6 +73,7 @@ typedef struct mime_magic_str		/**** MIME Magic Data ****/
   short		op,			/* Operation code (see above) */
 		invert;			/* Invert the result */
   int		offset,			/* Offset in file */
+		region,			/* Region length */
 		length;			/* Length of data */
   union
   {
@@ -133,5 +135,5 @@ extern mime_filter_t	*mimeFilter(mime_t *mime, mime_type_t *src, mime_type_t *ds
 #endif /* !_MIME_H_ */
 
 /*
- * End of "$Id: mime.h,v 1.1 2000/01/25 03:50:48 mike Exp $".
+ * End of "$Id: mime.h,v 1.2 2000/04/09 23:09:08 mike Exp $".
  */

@@ -9,14 +9,17 @@
 <STYLE>
 BODY { font-family: serif; font-size: 11.0pt }
 H1 { font-family: sans-serif; font-size: 20.0pt }
-H2 { font-family: sans-serif; font-size: 20.0pt }
-H3 { font-family: sans-serif; font-size: 20.0pt }
-H4 { font-family: sans-serif; font-size: 20.0pt }
-H5 { font-family: sans-serif; font-size: 20.0pt }
-H6 { font-family: sans-serif; font-size: 20.0pt }
+H2 { font-family: sans-serif; font-size: 17.0pt }
+H3 { font-family: sans-serif; font-size: 14.0pt }
+H4 { font-family: sans-serif; font-size: 11.0pt }
+H5 { font-family: sans-serif; font-size: 9.0pt }
+H6 { font-family: sans-serif; font-size: 8.0pt }
 SUB { font-size: 8.0pt }
 SUP { font-size: 8.0pt }
 PRE { font-size: 9.0pt }
+A:link { text-decoration: underline }
+A:visited { text-decoration: underline }
+A:active { text-decoration: underline }
 </STYLE>
 </HEAD>
 <BODY>
@@ -119,7 +122,12 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#4_15">4.15 CUPS-Get-PPDs Operation</A></LI>
 <UL>
 <LI><A HREF="#4_15_1">4.15.1 CUPS-Get-PPDs Request</A></LI>
-<LI><A HREF="#4_15_2">4.15.2 CUPS-Get-Classes Response</A></LI>
+<LI><A HREF="#4_15_2">4.15.2 CUPS-Get-PPDs Response</A></LI>
+</UL>
+<LI><A HREF="#4_16">4.16 CUPS-Move-Job Operation</A></LI>
+<UL>
+<LI><A HREF="#4_16_1">4.16.1 CUPS-Move-Job Request</A></LI>
+<LI><A HREF="#4_16_2">4.16.2 CUPS-Move-Job Response</A></LI>
 </UL>
 </UL>
 <B><A HREF="#5">5 Attributes</A></B>
@@ -133,15 +141,16 @@ Copyright 1997-2000, All Rights Reserved<BR>
 </UL>
 <LI><A HREF="#5_2">5.2 Job Template Attributes</A></LI>
 <UL>
-<LI><A HREF="#5_2_1">5.2.1 banner-end (name(127))</A></LI>
-<LI><A HREF="#5_2_2">5.2.2 banner-start (name(127))</A></LI>
-<LI><A HREF="#5_2_3">5.2.3 blackplot (boolean)</A></LI>
-<LI><A HREF="#5_2_4">5.2.4 brightness (integer(0:200))</A></LI>
-<LI><A HREF="#5_2_5">5.2.5 columns (integer(1:4))</A></LI>
-<LI><A HREF="#5_2_6">5.2.6 cpi (type2 enum)</A></LI>
-<LI><A HREF="#5_2_7">5.2.7 fitplot (boolean)</A></LI>
-<LI><A HREF="#5_2_8">5.2.8 gamma (integer(1:10000))</A></LI>
-<LI><A HREF="#5_2_9">5.2.9 hue (integer(-180:180))</A></LI>
+<LI><A HREF="#5_2_1">5.2.1 blackplot (boolean)</A></LI>
+<LI><A HREF="#5_2_2">5.2.2 brightness (integer(0:200))</A></LI>
+<LI><A HREF="#5_2_3">5.2.3 columns (integer(1:4))</A></LI>
+<LI><A HREF="#5_2_4">5.2.4 cpi (type2 enum)</A></LI>
+<LI><A HREF="#5_2_5">5.2.5 fitplot (boolean)</A></LI>
+<LI><A HREF="#5_2_6">5.2.6 gamma (integer(1:10000))</A></LI>
+<LI><A HREF="#5_2_7">5.2.7 hue (integer(-180:180))</A></LI>
+<LI><A HREF="#5_2_8">5.2.8 job-billing (name(MAX))</A></LI>
+<LI><A HREF="#5_2_9">5.2.9 job-sheets (1setof type3 keyword | name(MAX))</A>
+</LI>
 <LI><A HREF="#5_2_10">5.2.10 lpi (type2 enum)</A></LI>
 <LI><A HREF="#5_2_11">5.2.11 page-bottom (integer(0:MAX))</A></LI>
 <LI><A HREF="#5_2_12">5.2.12 page-left (integer(0:MAX))</A></LI>
@@ -164,14 +173,15 @@ Copyright 1997-2000, All Rights Reserved<BR>
 </UL>
 <LI><A HREF="#5_4">5.4 Printer Attributes</A></LI>
 <UL>
-<LI><A HREF="#5_4_1">5.4.1 banner-end-default (name(127))</A></LI>
-<LI><A HREF="#5_4_2">5.4.2 banner-start-default (name(127))</A></LI>
-<LI><A HREF="#5_4_3">5.4.3 banner-supported (1setof name(127))</A></LI>
-<LI><A HREF="#5_4_4">5.4.4 printer-type (type2 enum)</A></LI>
-<LI><A HREF="#5_4_5">5.4.5 printer-type-mask (type2 enum)</A></LI>
-<LI><A HREF="#5_4_6">5.4.6 requesting-user-name-allowed (1setof 
+<LI><A HREF="#5_4_1">5.4.1 job-sheets-default (1setof type3 keyword | 
+name(MAX))</A></LI>
+<LI><A HREF="#5_4_2">5.4.2 job-sheets-supported (1setof type3 keyword | 
+name(MAX))</A></LI>
+<LI><A HREF="#5_4_3">5.4.3 printer-type (type2 enum)</A></LI>
+<LI><A HREF="#5_4_4">5.4.4 printer-type-mask (type2 enum)</A></LI>
+<LI><A HREF="#5_4_5">5.4.5 requesting-user-name-allowed (1setof 
 name(127))</A></LI>
-<LI><A HREF="#5_4_7">5.4.7 requesting-user-name-denied (1setof 
+<LI><A HREF="#5_4_6">5.4.6 requesting-user-name-denied (1setof 
 name(127))</A></LI>
 </UL>
 <LI><A HREF="#5_5">5.5 Printer Class Attributes</A></LI>
@@ -235,7 +245,7 @@ name(127))</A></LI>
 defined in the &quot;IPP: Job and Printer Set Operations&quot;, &quot;IPP/1.1: 
 Output-bin Attribute Extension&quot;, and &quot;IPP/1.1: finishings 'fold',' 
 trim', and 'bale' attribute values extension&quot; specifications. </P>
-<P>CUPS also provides 12 new operations and many new attributes to 
+<P>CUPS also provides 13 new operations and many new attributes to 
 support multiple IPP printers and printer classes on a single host. </P>
 <H2><A NAME="3_1">3.1 IPP URIs</A></H2>
 <P>CUPS supports both the &quot;http&quot; and &quot;ipp&quot; methods. The following 
@@ -259,7 +269,7 @@ resource names are used: </P>
 &quot;method://hostname:port/jobs/&quot;, and &quot;method://hostname:port/printers/&quot; 
 to view and manage resources on the server dynamically. </P>
 <H2><A NAME="3_2">3.2 CUPS IPP Operations</A></H2>
-<P>CUPS provides 12 extension operations in addition to most of the 
+<P>CUPS provides 13 extension operations in addition to most of the 
 standard IPP and registered extension operations: 
 <CENTER>
 <TABLE BORDER WIDTH="80%">
@@ -321,6 +331,8 @@ VALIGN="TOP">0x4004</TD><TD VALIGN="TOP">Delete a printer.</TD></TR>
 0x400B</TD><TD VALIGN="TOP">Get all of the available devices.</TD></TR>
 <TR><TD VALIGN="TOP">CUPS-Get-PPDs</TD><TD VALIGN="TOP">1.1</TD><TD VALIGN="TOP">
 0x400C</TD><TD VALIGN="TOP">Get all of the available PPDs.</TD></TR>
+<TR><TD VALIGN="TOP">CUPS-Move-Job</TD><TD VALIGN="TOP">1.1</TD><TD VALIGN="TOP">
+0x400D</TD><TD VALIGN="TOP">Move a job to a different printer.</TD></TR>
 </TABLE>
 </CENTER>
 </P>
@@ -344,20 +356,26 @@ Print-Job request: </P>
 </UL>
 <P>Group 2: Job Template Attributes </P>
 <UL>
-<P>&quot;banner-end&quot; (name(127)): </P>
+<P>&quot;job-billing&quot; (name(MAX)): </P>
 <P><I>(CUPS 1.1 and higher)</I></P>
-<P>The client OPTIONALLY supplies a banner page that is printed  after 
-any files in the print job. The name of &quot;none&quot; is  reserved to indicate 
-that no banner page should be printed. If  the client does not specify 
-this attribute then the value of  the &quot;banner-end-default&quot; printer 
-object attribute is used. </P>
-<P>&quot;banner-start&quot; (name(127)): </P>
+<P>The client OPTIONALLY supplies a billing string that is logged  with 
+the page accounting information. </P>
+<P>&quot;job-sheets&quot; (1setof type3 keyword | name(MAX)): </P>
 <P><I>(CUPS 1.1 and higher)</I></P>
-<P>The client OPTIONALLY supplies a banner page that is printed  before 
-any files in the print job. The name of &quot;none&quot; is  reserved to indicate 
-that no banner page should be printed. If  the client does not specify 
-this attribute then the value of  the &quot;banner-start-default&quot; printer 
-object attribute is used. </P>
+<P>The client OPTIONALLY supplies one or two banner pages that  are 
+printed before and after any files in the print job. The  name of 
+&quot;none&quot; is reserved to indicate that no banner page  should be printed. 
+If the client does not specify this  attribute then the value of the 
+&quot;job-sheets-default&quot; printer  object attribute is used. </P>
+<P><B>Note:</B> Standard IPP only allows specification of a single 
+ job-sheets attribute value. </P>
+<P>&quot;media&quot; (1setof type3 keyword | name(MAX)): </P>
+<P>The client OPTIONALLY supplies one or more media attributes 
+ specifying the size, type, source, and color of the output  media. If 
+the client does not specify this attribute then the  value of the 
+&quot;media-default&quot; printer object attribute is used. </P>
+<P><B>Note:</B> Standard IPP only allows specification of a single 
+ media attribute value. </P>
 <P>Other Job Template Attributes </P>
 </UL>
 <P>The Print-Job request is followed by a file to be printed. </P>
@@ -393,20 +411,26 @@ Create-Job request: </P>
 </UL>
 <P>Group 2: Job Template Attributes </P>
 <UL>
-<P>&quot;banner-end&quot; (name(127)): </P>
+<P>&quot;job-billing&quot; (name(MAX)): </P>
 <P><I>(CUPS 1.1 and higher)</I></P>
-<P>The client OPTIONALLY supplies a banner page that is printed  after 
-any files in the print job. The name of &quot;none&quot; is  reserved to indicate 
-that no banner page should be printed. If  the client does not specify 
-this attribute then the value of  the &quot;banner-end-default&quot; printer 
-object attribute is used. </P>
-<P>&quot;banner-start&quot; (name(127)): </P>
+<P>The client OPTIONALLY supplies a billing string that is logged  with 
+the page accounting information. </P>
+<P>&quot;job-sheets&quot; (1setof type3 keyword | name(MAX)): </P>
 <P><I>(CUPS 1.1 and higher)</I></P>
-<P>The client OPTIONALLY supplies a banner page that is printed  before 
-any files in the print job. The name of &quot;none&quot; is  reserved to indicate 
-that no banner page should be printed. If  the client does not specify 
-this attribute then the value of  the &quot;banner-start-default&quot; printer 
-object attribute is used. </P>
+<P>The client OPTIONALLY supplies one or two banner pages that  are 
+printed before and after any files in the print job. The  name of 
+&quot;none&quot; is reserved to indicate that no banner page  should be printed. 
+If the client does not specify this  attribute then the value of the 
+&quot;job-sheets-default&quot; printer  object attribute is used. </P>
+<P><B>Note:</B> Standard IPP only allows specification of a single 
+ job-sheets attribute value. </P>
+<P>&quot;media&quot; (1setof type3 keyword | name(MAX)): </P>
+<P>The client OPTIONALLY supplies one or more media attributes 
+ specifying the size, type, source, and color of the output  media. If 
+the client does not specify this attribute then the  value of the 
+&quot;media-default&quot; printer object attribute is used. </P>
+<P><B>Note:</B> Standard IPP only allows specification of a single 
+ media attribute value. </P>
 <P>Standard Job Template Attributes </P>
 </UL>
 <H3><A NAME="4_2_2">4.2.2 Create-Job Response</A></H3>
@@ -445,28 +469,22 @@ number, or the job URI. </P>
 </UL>
 <P>Group 2: Job Template Attributes </P>
 <UL>
-<P>&quot;job-printer-uri&quot; (uri): </P>
-<P>The client OPTIONALLY supplies the URI of a new printer  destination 
-for the job. The new URI MUST utilize the same  IPP server (i.e. you 
-cannot move the job to a different server). </P>
-<P><B>NOTE:</B> This attribute is defined to be READ-ONLY in the 
- current IETF specification for this operation. CUPS allows the 
- &quot;job-printer-uri&quot; attribute to be changed, which makes the CUPS 
- implementation non-conforming for this particular operation. </P>
-<P>&quot;banner-end&quot; (name(127)): </P>
+<P>&quot;job-sheets&quot; (1setof type3 keyword | name(MAX)): </P>
 <P><I>(CUPS 1.1 and higher)</I></P>
-<P>The client OPTIONALLY supplies a banner page that is printed  after 
-any files in the print job. The name of &quot;none&quot; is  reserved to indicate 
-that no banner page should be printed. If  the client does not specify 
-this attribute then the value of  the &quot;banner-end-default&quot; printer 
-object attribute is used. </P>
-<P>&quot;banner-start&quot; (name(127)): </P>
-<P><I>(CUPS 1.1 and higher)</I></P>
-<P>The client OPTIONALLY supplies a banner page that is printed  before 
-any files in the print job. The name of &quot;none&quot; is  reserved to indicate 
-that no banner page should be printed. If  the client does not specify 
-this attribute then the value of  the &quot;banner-start-default&quot; printer 
-object attribute is used. </P>
+<P>The client OPTIONALLY supplies one or two banner pages that  are 
+printed before and after any files in the print job. The  name of 
+&quot;none&quot; is reserved to indicate that no banner page  should be printed. 
+If the client does not specify this  attribute then the value of the 
+&quot;job-sheets-default&quot; printer  object attribute is used. </P>
+<P><B>Note:</B> Standard IPP only allows specification of a single 
+ job-sheets attribute value. </P>
+<P>&quot;media&quot; (1setof type3 keyword | name(MAX)): </P>
+<P>The client OPTIONALLY supplies one or more media attributes 
+ specifying the size, type, source, and color of the output  media. If 
+the client does not specify this attribute then the  value of the 
+&quot;media-default&quot; printer object attribute is used. </P>
+<P><B>Note:</B> Standard IPP only allows specification of a single 
+ media attribute value. </P>
 <P>Other Job Template Attributes </P>
 </UL>
 <H3><A NAME="4_3_2">4.3.2 Set-Job-Attributes Response</A></H3>
@@ -972,9 +990,9 @@ CUPS-Get-PPDs request: </P>
  the client omits this attribute, the server responds as if this 
  attribute had been supplied with a value of 'all'. </P>
 </UL>
-<H3><A NAME="4_15_2">4.15.2 CUPS-Get-Classes Response</A></H3>
+<H3><A NAME="4_15_2">4.15.2 CUPS-Get-PPDs Response</A></H3>
 <P>The following groups of attributes are send as part of the 
-CUPS-Get-Classes Response: </P>
+CUPS-Get-PPDs Response: </P>
 <P>Group 1: Operation Attributes </P>
 <UL>
 <P>Status Message: </P>
@@ -984,10 +1002,40 @@ CUPS-Get-Classes Response: </P>
  attributes as described in section 3.1.4.2 of the IPP Model and 
  Semantics document. </P>
 </UL>
-<P>Group 2: Printer Class Object Attributes </P>
+<P>Group 2: PPD Attributes </P>
 <UL>
 <P>The set of requested attributes and their current values for each 
- printer class. </P>
+ PPD file. </P>
+</UL>
+<H2><A NAME="4_16">4.16 CUPS-Move-Job Operation</A></H2>
+<P>The CUPS-Move-Job operation (0x400D) moves an active print job to a 
+different printer (CUPS 1.1 and higher). </P>
+<H3><A NAME="4_16_1">4.16.1 CUPS-Move-Job Request</A></H3>
+<P>The following groups of attributes are supplied as part of the 
+CUPS-Move-Job request: </P>
+<P>Group 1: Operation Attributes </P>
+<UL>
+<P>Natural Language and Character Set: </P>
+<P>The &quot;attributes-charset&quot; and &quot;attributes-natural-language&quot; 
+ attributes as described in section 3.1.4.1 of the IPP Model and 
+ Semantics document. </P>
+<P>&quot;printer-uri&quot; (uri) and &quot;job-id&quot; (integer) </P>
+<P><I>OR</I></P>
+<P>&quot;job-uri&quot;: </P>
+<P>The client MUST supply a URI for the specified printer and  a job ID 
+number, or the job URI. </P>
+</UL>
+<H3><A NAME="4_16_2">4.16.2 CUPS-Move-Job Response</A></H3>
+<P>The following groups of attributes are send as part of the 
+CUPS-Move-Job Response: </P>
+<P>Group 1: Operation Attributes </P>
+<UL>
+<P>Status Message: </P>
+<P>The standard response status message. </P>
+<P>Natural Language and Character Set: </P>
+<P>The &quot;attributes-charset&quot; and &quot;attributes-natural-language&quot; 
+ attributes as described in section 3.1.4.2 of the IPP Model and 
+ Semantics document. </P>
 </UL>
 <H1><A NAME="5">5 Attributes</A></H1>
 <P>CUPS provides many extension attributes to support multiple devices, 
@@ -1047,41 +1095,29 @@ still stored and used by the  server internally to perform any needed
 authentication. </P>
 </UL>
 <H2><A NAME="5_2">5.2 Job Template Attributes</A></H2>
-<H3><A NAME="5_2_1">5.2.1 banner-end (name(127))</A></H3>
-<P><I>(CUPS 1.1 and higher)</I></P>
-<P>The banner-end attribute specifies a banner file that is printed 
-after any files in a job. The reserved value of &quot;none&quot; disables banner 
-printing. The default value is stored in the banner-end-default 
-attribute. </P>
-<H3><A NAME="5_2_2">5.2.2 banner-start (name(127))</A></H3>
-<P><I>(CUPS 1.1 and higher)</I></P>
-<P>The banner-end attribute specifies a banner file that is printed 
-before any files in a job. The reserved value of &quot;none&quot; disables banner 
-printing. The default value is stored in the banner-start-default 
-attribute. </P>
-<H3><A NAME="5_2_3">5.2.3 blackplot (boolean)</A></H3>
+<H3><A NAME="5_2_1">5.2.1 blackplot (boolean)</A></H3>
 <P>The blackplot attribute specifies whether HP-GL/2 plot files should 
 be rendered entirely in black ink (blackplot=true) or using the colors 
 and shades specified in the file (blackplot=false). The default value 
 is false. </P>
-<H3><A NAME="5_2_4">5.2.4 brightness (integer(0:200))</A></H3>
+<H3><A NAME="5_2_2">5.2.2 brightness (integer(0:200))</A></H3>
 <P>The brightness attribute specifies the overall brightness of the 
 printed output in percent. A brightness of 100 is normal, while 200 is 
 twice as bright and 50 is half as bright. The default value is 100. </P>
 <P>Brightness is applied to the Cyan, Magenta, Yellow, and Black values 
 using the function &quot;f(x) = brightness / 100 * x&quot;. </P>
-<H3><A NAME="5_2_5">5.2.5 columns (integer(1:4))</A></H3>
+<H3><A NAME="5_2_3">5.2.3 columns (integer(1:4))</A></H3>
 <P>The columns attribute specifies the number of columns to generate 
 when printing text files. The default value is 1. </P>
-<H3><A NAME="5_2_6">5.2.6 cpi (type2 enum)</A></H3>
+<H3><A NAME="5_2_4">5.2.4 cpi (type2 enum)</A></H3>
 <P>The cpi attribute specifies the number of characters per inch when 
 printing text files. Only the values 10, 12, and 17 are currently 
 supported. The default value is 10. </P>
-<H3><A NAME="5_2_7">5.2.7 fitplot (boolean)</A></H3>
+<H3><A NAME="5_2_5">5.2.5 fitplot (boolean)</A></H3>
 <P>The fitplot attribute specifies whether to scale HP-GL/2 plot files 
 to fit on the selected media (fitplot=true) or use the physical scale 
 specified in the plot file (fitplot=false). The default value is false. </P>
-<H3><A NAME="5_2_8">5.2.8 gamma (integer(1:10000))</A></H3>
+<H3><A NAME="5_2_6">5.2.6 gamma (integer(1:10000))</A></H3>
 <P>The gamma attribute specifies the luminance correction for the 
 output. A value of 1000 specifies no correction, while values of 2000 
 and 500 will generate lighter and darker output, respectively. The 
@@ -1089,9 +1125,23 @@ default value is 1000. </P>
 <P>Gamma is applied to the Red, Green, and Blue values (or luminance 
 for grayscale output) using the function &quot;f(x) = x<SUP>(1000/gamma)</SUP>
 &quot;. </P>
-<H3><A NAME="5_2_9">5.2.9 hue (integer(-180:180))</A></H3>
+<H3><A NAME="5_2_7">5.2.7 hue (integer(-180:180))</A></H3>
 <P>The hue attribute specifies a color hue rotation when printing image 
 files. The default value is 0. </P>
+<H3><A NAME="5_2_8">5.2.8 job-billing (name(MAX))</A></H3>
+<P><I>(CUPS 1.1 and higher)</I></P>
+<P>The job-billing attribute provides a name value to associate with a 
+job for billing purposes. </P>
+<H3><A NAME="5_2_9">5.2.9 job-sheets (1setof type3 keyword | name(MAX))</A>
+</H3>
+<P><I>(CUPS 1.1 and higher)</I></P>
+<P>The job-sheets attribute specifies one or two banner files that are 
+printed before and after a job. The reserved value of &quot;none&quot; disables 
+banner printing. The default value is stored in the job-sheets-default 
+attribute. </P>
+<P>If only one value is supplied, the banner file is printed before the 
+job. If two values are supplied, the first value is used as the 
+starting banner file and the second as the ending banner file. </P>
 <H3><A NAME="5_2_10">5.2.10 lpi (type2 enum)</A></H3>
 <P>The lpi attribute specifies the number of lines per inch when 
 printing text files. Only the values 6 and 8 are currently supported. 
@@ -1160,21 +1210,19 @@ or ShortNickName attributes are used instead. </P>
 relative to the model directory. The forward slash (/) is used to 
 delineate directories. </P>
 <H2><A NAME="5_4">5.4 Printer Attributes</A></H2>
-<H3><A NAME="5_4_1">5.4.1 banner-end-default (name(127))</A></H3>
+<H3><A NAME="5_4_1">5.4.1 job-sheets-default (1setof type3 keyword | 
+name(MAX))</A></H3>
 <P><I>(CUPS 1.1 and higher)</I></P>
-<P>The banner-end-default attribute specifies the default banner file 
-to print after all files in a job. The value &quot;none&quot; specifies that no 
-banner should be printed. </P>
-<H3><A NAME="5_4_2">5.4.2 banner-start-default (name(127))</A></H3>
+<P>The job-sheets-default attribute specifies the default banner 
+file(s) to print before and after each job. The value &quot;none&quot; specifies 
+that no banner should be printed. </P>
+<H3><A NAME="5_4_2">5.4.2 job-sheets-supported (1setof type3 keyword | 
+name(MAX))</A></H3>
 <P><I>(CUPS 1.1 and higher)</I></P>
-<P>The banner-start-default attribute specifies the default banner file 
-to print before all files in a job. The value &quot;none&quot; specifies that no 
-banner should be printed. </P>
-<H3><A NAME="5_4_3">5.4.3 banner-supported (1setof name(127))</A></H3>
-<P><I>(CUPS 1.1 and higher)</I></P>
-<P>The banner-supported attribute specifies the available banner files. 
-There will always be at least one banner file available called &quot;none&quot;. </P>
-<H3><A NAME="5_4_4">5.4.4 printer-type (type2 enum)</A></H3>
+<P>The job-sheets-supported attribute specifies the available banner 
+files. There will always be at least one banner file available called 
+&quot;none&quot;. </P>
+<H3><A NAME="5_4_3">5.4.3 printer-type (type2 enum)</A></H3>
 <P>The printer-type attribute specifies printer type and capability 
 bits for the printer or class. The default value is computed from 
 internal state information and the PPD file for the printer. The 
@@ -1219,13 +1267,13 @@ user-defined media sizes.</TD></TR>
 </TABLE>
 </CENTER>
 </P>
-<H3><A NAME="5_4_5">5.4.5 printer-type-mask (type2 enum)</A></H3>
+<H3><A NAME="5_4_4">5.4.4 printer-type-mask (type2 enum)</A></H3>
 <P><I>(CUPS 1.1 and higher)</I></P>
 <P>The printer-type-mask attribute is used to choose printers or 
 classes with the CUPS-Get-Printers and CUPS-Get-Classes operations. The 
 bits are defined identically to the printer-type attribute and default 
 to all 1's. </P>
-<H3><A NAME="5_4_6">5.4.6 requesting-user-name-allowed (1setof 
+<H3><A NAME="5_4_5">5.4.5 requesting-user-name-allowed (1setof 
 name(127))</A></H3>
 <P><I>(CUPS 1.1 and higher)</I></P>
 <P>The requesting-user-name-allowed attribute lists all of the users 
@@ -1233,8 +1281,8 @@ that are allowed to access a printer or class. Either this attribute or
 the requesting-user-name-denied attribute will be defined, but not 
 both. </P>
 <P>The special name &quot;ALLUSERS&quot; is reserved to indicate that all users 
-allowed. </P>
-<H3><A NAME="5_4_7">5.4.7 requesting-user-name-denied (1setof name(127))</A>
+are allowed. </P>
+<H3><A NAME="5_4_6">5.4.6 requesting-user-name-denied (1setof name(127))</A>
 </H3>
 <P><I>(CUPS 1.1 and higher)</I></P>
 <P>The requesting-user-name-denied attribute lists all of the users 
@@ -1242,7 +1290,7 @@ that are not allowed to access a printer or class. Either this
 attribute or the requesting-user-name-allowed attribute will be 
 defined, but not both. </P>
 <P>The special name &quot;ALLUSERS&quot; is reserved to indicate that all users 
-denied. </P>
+are denied. </P>
 <H2><A NAME="5_5">5.5 Printer Class Attributes</A></H2>
 <H3><A NAME="5_5_1">5.5.1 member-names (1setof name(127))</A></H3>
 <P>The member-names attribute specifies each of the printer-name 

@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.14 2000/01/04 13:45:35 mike Exp $"
+ * "$Id: language.c,v 1.15 2000/04/09 23:08:59 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -60,7 +60,20 @@ static char		*lang_encodings[] =	/* Encoding strings */
 			  "iso8859-8",
 			  "iso8859-9",
 			  "iso8859-10",
-			  "utf8"
+			  "utf8",
+			  "iso8859-13",
+			  "iso8859-14",
+			  "iso8859-15",
+			  "cp874",
+			  "cp1250",
+			  "cp1251",
+			  "cp1252",
+			  "cp1253",
+			  "cp1254",
+			  "cp1255",
+			  "cp1256",
+			  "cp1257",
+			  "cp1258"
 			};
 static char		*lang_default[] =	/* Default POSIX locale */
 			{
@@ -144,7 +157,7 @@ cupsLangGet(const char *language) /* I - Language or locale */
  /*
   * Convert the language string passed in to a locale string. "C" is the
   * standard POSIX locale and is copied unchanged.  Otherwise the
-  * language string is converted from ll-cc (language-country) to ll_CC
+  * language string is converted from ll-cc (language-country) to ll_cc
   * to match the file naming convention used by all POSIX-compliant
   * operating systems.  Any trailing character set specification is
   * dropped.
@@ -386,5 +399,5 @@ cupsLangGet(const char *language) /* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.14 2000/01/04 13:45:35 mike Exp $".
+ * End of "$Id: language.c,v 1.15 2000/04/09 23:08:59 mike Exp $".
  */

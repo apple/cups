@@ -27,118 +27,7 @@ information for the Common UNIX Printing System ("CUPS") Version 1.1.
 	<LI>A - Using CUPS with SAMBA</LI>
 </UL>
 
-<H1 ALIGN=RIGHT>1 - Printing System Overview</H1>
-
-<P>This chapter provides an overview of how the Common UNIX Printing System
-works.
-
-<H2>The Printing Problem</H2>
-
-<P>For years <I>the printing problem</I> has plagued UNIX&reg;. Unlike
-Microsoft&reg; Windows&reg; or MacOS, UNIX has no standard interface or
-system in place for supporting printers. Among the solutions previously
-available, the Berkeley and System V printing systems are the most
-prevalent.
-
-<P>These printing systems support line printers (text only) or
-PostScript printers (text and graphics), and with some coaxing they can
-be made to support a full range of printers and file formats. However,
-because each varient of the UNIX operating system uses a different
-printing system than the next, developing printer drivers for a wide
-range of printers is extremely difficult. That combined with the
-limited volume of customers for each UNIX varient has forced most
-printer vendors to give up supporting UNIX entirely.
-
-<P>The Common UNIX Printing System, or CUPS, is designed to eliminate
-<I>the printing problem</I>. One common printing system can be used by
-all UNIX varients to support the printing needs of users. Printer
-vendors can use its modular filter interface to develop a single driver
-program that supports a wide range of file formats with little or no
-effort.  Since CUPS provides both the System V and Berkeley printing
-commands, users (and applications) can reap the benefits of this new
-technology with no changes.
-
-<H2>The Technology</H2>
-
-<P>CUPS is based upon an emerging Internet standard called the Internet
-Printing Protocol, or IPP. IPP has been embraced by dozens of printer
-and printer server manufacturers, and will be supported by the next
-Microsoft Windows operating system.
-
-<P>IPP defines a standard protocol for printing as well as managing print
-jobs and printer options like media size, resolution, and so forth. Like all
-IP-based protocols, IPP can be used locally or over the Internet to printers
-hundreds or thousands of miles away. Unlike other protocols, however, IPP
-also supports access control, authentication, and encryption, making it a
-much more secure printing solution than older ones.
-
-<P>IPP is layered on top of the Hyper-Text Transport Protocol, or HTTP,
-which is the basis of web servers on the Internet. This allows the user to
-view documentation and status information on a printer or server using their
-web browser.
-
-<P>CUPS provides a complete IPP/1.0-based printing system that provides Basic
-authentication and domain or IP-based access control. Digest authentication
-and TLS encryption will be available in future versions of CUPS.
-
-<H2>Jobs</H2>
-
-<P>Each file that is submitted for printing is called a <I>job</I>. 
-Jobs are identified by a unique number starting at 1 and are assigned
-to a particular destination (usually a printer). Jobs can also have
-options associated with them such as media size, number of copies, and
-priority.
-
-<H2>Classes</H2>
-
-<P>CUPS supports collections of printers known as <I>classes</I>. Jobs sent
-to a class are forwarded to the first available printer in the class.
-
-<H2>Filters</H2>
-
-<P>Filters allow a user or application to print many types of files
-without extra effort. Print jobs sent to a CUPS server are filtered
-before sending them to a printer. Some filters convert job files to
-different formats that the printer can understand. Others perform page
-selection and ordering tasks. <I>Backend</I> filters perform the most
-important task of all - they send the filtered print data to the
-printer.
-
-<P>CUPS provides filters for printing many types of image files,
-HP-GL/2 files, PDF files, and text files. CUPS also supplies
-PostScript and image file Raster Image Processors, or RIPs, that
-convert PostScript or image files into bitmaps that can be sent to a
-raster printer.
-
-<P>CUPS provides backends for printing over parallel and serial ports,
-and over the network via the JetDirect (AppSocket), Server Message
-Block, and Line Printer Daemon protocols.
-
-<H2>Printer Drivers</H2>
-
-<P>Printer drivers in CUPS consist of one of more filters specific to a
-printer. CUPS includes a sample printer driver for Hewlett-Packard
-LaserJet and DeskJet printers. While this driver does not generate
-optimal output for different printer models, it does demonstrate how
-you can write your own printer drivers and incorporate them into CUPS.
-
-<H2>Networking</H2>
-
-<P>Printers and classes on the local system are automatically shared with
-other systems on the network. This allows you to setup one system to print
-to a printer and use this system as a printer server or spool host for all
-of the others.  If there is only one occurrence of a printer on a network,
-then that printer can be accessed using its name alone. If more than one
-printer exists with the same name, users must select the printer by specifying
-which server to use (e.g. "printer@host1" or "printer@host2".)
-
-<P>CUPS also provides <I>implicit classes</I>, which are collections of
-printers and/or classes with the same name. This allows you to setup multiple
-servers pointing to the same physical network printer, for example, so that
-you aren't relying on a single system for printing. Because this also works
-with printer classes, you can setup multiple servers and printers and never
-worry about a "single point of failure" unless all of the printers and servers
-goes down!
+<EMBED SRC="printing-overview.shtml">
 
 <H1 ALIGN=RIGHT>2 - Building and Installing CUPS</H1>
 
@@ -150,10 +39,11 @@ the section titled, <A HREF="#binary">Installing a Binary Distribution</A>.
 
 <H3>Requirements</H3>
 
-<P>You'll need an ANSI C compiler to build CUPS on your system. As its name
-implies, CUPS is designed to run on the UNIX operating system, however
-the CUPS interface library and most of the filters and backends supplied
-with CUPS should also run under Microsoft&reg; Windows&reg;.
+<P>You'll need an ANSI-compliant C compiler to build CUPS on your
+system. As its name implies, CUPS is designed to run on the UNIX
+operating system, however the CUPS interface library and most of the
+filters and backends supplied with CUPS should also run under
+Microsoft&reg; Windows&reg;.
 
 <P>For the image file filters and PostScript RIP, you'll need the JPEG,
 PNG, TIFF, and ZLIB libraries. CUPS will build without these, but with
@@ -188,9 +78,9 @@ for your system. To configure CUPS for your system type:
 </PRE></UL>
 
 <P>The default installation will put the CUPS software in the
-<CODE>/usr</CODE> and <CODE>/var</CODE> directories on your system,
-which will overwrite any existing printing commands on your system. To
-install the CUPS software in another location use the
+<CODE>/etc</CODE>, <CODE>/usr</CODE>, and <CODE>/var</CODE> directories
+on your system, which will overwrite any existing printing commands on
+your system. To install the CUPS software in another location use the
 <CODE>--prefix</CODE> option:
 
 <UL><PRE>

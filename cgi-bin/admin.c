@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.6 2000/03/30 05:19:19 mike Exp $"
+ * "$Id: admin.c,v 1.7 2000/04/09 23:08:58 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -30,6 +30,7 @@
  */
 
 #include "ipp-var.h"
+#include <ctype.h>
 
 
 /*
@@ -38,11 +39,12 @@
 
 static void	do_am_class(http_t *http, cups_lang_t *language, int modify);
 static void	do_am_printer(http_t *http, cups_lang_t *language, int modify);
+static void	do_config_printer(http_t *http, cups_lang_t *language);
 static void	do_delete_class(http_t *http, cups_lang_t *language);
 static void	do_delete_printer(http_t *http, cups_lang_t *language);
 static void	do_job_op(http_t *http, cups_lang_t *language, ipp_op_t op);
 static void	do_printer_op(http_t *http, cups_lang_t *language, ipp_op_t op);
-static void	do_test_page(http_t *http, cups_lang_t *language);
+static char	*get_line(char *buf, int length, FILE *fp);
 
 
 /*
@@ -71,9 +73,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   printf("Content-Type: text/html;charset=%s\n\n", cupsLangEncoding(language));
 
   cgiSetVariable("TITLE", "Admin");
-  cgiSetVariable("SERVER_NAME", getenv("SERVER_NAME"));
-  cgiSetVariable("REMOTE_USER", getenv("REMOTE_USER"));
-  cgiSetVariable("CUPS_VERSION", CUPS_SVERSION);
+  ippSetServerVersion();
 
   cgiCopyTemplateLang(stdout, TEMPLATES, "header.tmpl", getenv("LANG"));
 
@@ -117,8 +117,6 @@ main(int  argc,			/* I - Number of command-line arguments */
       do_printer_op(http, language, CUPS_ACCEPT_JOBS);
     else if (strcmp(op, "reject-jobs") == 0)
       do_printer_op(http, language, CUPS_REJECT_JOBS);
-    else if (strcmp(op, "print-test-page") == 0)
-      do_test_page(http, language);
     else if (strcmp(op, "add-class") == 0)
       do_am_class(http, language, 0);
     else if (strcmp(op, "add-printer") == 0)
@@ -131,6 +129,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       do_delete_class(http, language);
     else if (strcmp(op, "delete-printer") == 0)
       do_delete_printer(http, language);
+    else if (strcmp(op, "config-printer") == 0)
+      do_config_printer(http, language);
     else
     {
      /*
@@ -184,6 +184,262 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
             cups_lang_t *language,	/* I - Client's language */
 	    int         modify)		/* I - Modify the printer? */
 {
+  int		i, j;			/* Looping vars */
+  int		element;		/* Element number */
+  int		num_printers;		/* Number of printers */
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  ipp_attribute_t *attr;		/* member-uris attribute */
+  ipp_status_t	status;			/* Request status */
+  const char	*var;			/* CGI variable */
+  char		uri[HTTP_MAX_URI];	/* Device or printer URI */
+
+
+  if (cgiGetVariable("PRINTER_LOCATION") == NULL)
+  {
+    if (modify)
+    {
+     /*
+      * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the
+      * following attributes:
+      *
+      *    attributes-charset
+      *    attributes-natural-language
+      *    printer-uri
+      */
+
+      request = ippNew();
+
+      request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+      request->request.op.request_id   = 1;
+
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	   "attributes-charset", NULL, cupsLangEncoding(language));
+
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+        	   "attributes-natural-language", NULL, language->language);
+
+      snprintf(uri, sizeof(uri), "ipp://localhost/classes/%s",
+               cgiGetVariable("PRINTER_NAME"));
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+                   NULL, uri);
+
+     /*
+      * Do the request and get back a response...
+      */
+
+      if ((response = cupsDoRequest(http, request, "/")) != NULL)
+      {
+	ippSetCGIVars(response, NULL, NULL);
+	ippDelete(response);
+      }
+
+     /*
+      * Update the location and description of an existing printer...
+      */
+
+      cgiCopyTemplateLang(stdout, TEMPLATES, "modify-class.tmpl", getenv("LANG"));
+    }
+    else
+    {
+     /*
+      * Get the name, location, and description for a new printer...
+      */
+
+      cgiCopyTemplateLang(stdout, TEMPLATES, "add-class.tmpl", getenv("LANG"));
+    }
+  }
+  else if ((var = cgiGetVariable("MEMBER_URIS")) == NULL)
+  {
+   /*
+    * Build a CUPS_GET_PRINTERS request, which requires the
+    * following attributes:
+    *
+    *    attributes-charset
+    *    attributes-natural-language
+    *    printer-uri
+    */
+
+    request = ippNew();
+
+    request->request.op.operation_id = CUPS_GET_PRINTERS;
+    request->request.op.request_id   = 1;
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	 "attributes-charset", NULL, cupsLangEncoding(language));
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+        	 "attributes-natural-language", NULL, language->language);
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+                 NULL, "ipp://localhost/printers");
+
+   /*
+    * Do the request and get back a response...
+    */
+
+    if ((response = cupsDoRequest(http, request, "/")) != NULL)
+    {
+     /*
+      * Create MEMBER_URIS and MEMBER_NAMES arrays...
+      */
+
+      for (element = 0, attr = response->attrs;
+	   attr != NULL;
+	   attr = attr->next)
+	if (attr->name && strcmp(attr->name, "printer-uri-supported") == 0)
+	{
+	  cgiSetArray("MEMBER_URIS", element, attr->values[0].string.text);
+	  element ++;
+	}
+
+      for (element = 0, attr = response->attrs;
+	   attr != NULL;
+	   attr = attr->next)
+	if (attr->name && strcmp(attr->name, "printer-name") == 0)
+	{
+	  cgiSetArray("MEMBER_NAMES", element, attr->values[0].string.text);
+	  element ++;
+	}
+
+      num_printers = cgiGetSize("MEMBER_URIS");
+
+      ippDelete(response);
+    }
+    else
+      num_printers = 0;
+
+   /*
+    * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the
+    * following attributes:
+    *
+    *    attributes-charset
+    *    attributes-natural-language
+    *    printer-uri
+    */
+
+    request = ippNew();
+
+    request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+    request->request.op.request_id   = 1;
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	 "attributes-charset", NULL, cupsLangEncoding(language));
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+        	 "attributes-natural-language", NULL, language->language);
+
+    snprintf(uri, sizeof(uri), "ipp://localhost/classes/%s",
+             cgiGetVariable("PRINTER_NAME"));
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+                 NULL, uri);
+
+   /*
+    * Do the request and get back a response...
+    */
+
+    if ((response = cupsDoRequest(http, request, "/")) != NULL)
+    {
+      if ((attr = ippFindAttribute(response, "member-uris", IPP_TAG_URI)) != NULL)
+      {
+       /*
+        * Mark any current members in the class...
+	*/
+
+        for (j = 0; j < num_printers; j ++)
+	  cgiSetArray("MEMBER_SELECTED", j, "");
+
+        for (i = 0; i < attr->num_values; i ++)
+	  for (j = 0; j < num_printers; j ++)
+	    if (strcmp(attr->values[i].string.text, cgiGetArray("MEMBER_URIS", j)) == 0)
+	    {
+	      cgiSetArray("MEMBER_SELECTED", j, "SELECTED");
+	      break;
+	    }
+      }
+
+      ippDelete(response);
+    }
+
+   /*
+    * Let the user choose...
+    */
+
+    cgiCopyTemplateLang(stdout, TEMPLATES, "choose-members.tmpl", getenv("LANG"));
+  }
+  else
+  {
+   /*
+    * Build a CUPS_ADD_CLASS request, which requires the following
+    * attributes:
+    *
+    *    attributes-charset
+    *    attributes-natural-language
+    *    printer-uri
+    *    printer-location
+    *    printer-info
+    *    printer-is-accepting-jobs
+    *    printer-state
+    *    member-uris
+    */
+
+    request = ippNew();
+
+    request->request.op.operation_id = CUPS_ADD_CLASS;
+    request->request.op.request_id   = 1;
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	 "attributes-charset", NULL, cupsLangEncoding(language));
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+        	 "attributes-natural-language", NULL, language->language);
+
+    snprintf(uri, sizeof(uri), "ipp://localhost/classes/%s",
+             cgiGetVariable("PRINTER_NAME"));
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+                 NULL, uri);
+
+    ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-location",
+                 NULL, cgiGetVariable("PRINTER_LOCATION"));
+
+    ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-info",
+                 NULL, cgiGetVariable("PRINTER_INFO"));
+
+    ippAddBoolean(request, IPP_TAG_PRINTER, "printer-is-accepting-jobs", 1);
+
+    ippAddInteger(request, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state",
+                  IPP_PRINTER_IDLE);
+
+    if ((num_printers = cgiGetSize("MEMBER_URIS")) > 0)
+    {
+      attr = ippAddStrings(request, IPP_TAG_PRINTER, IPP_TAG_URI, "member-uris",
+                           num_printers, NULL, NULL);
+      for (i = 0; i < num_printers; i ++)
+        attr->values[i].string.text = strdup(cgiGetArray("MEMBER_URIS", i));
+    }
+
+   /*
+    * Do the request and get back a response...
+    */
+
+    if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
+    {
+      status = response->request.status.status_code;
+      ippDelete(response);
+    }
+    else
+      status = IPP_NOT_AUTHORIZED;
+
+    if (status > IPP_OK_CONFLICT)
+    {
+      cgiSetVariable("ERROR", ippErrorString(status));
+      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    }
+    else if (modify)
+      cgiCopyTemplateLang(stdout, TEMPLATES, "class-modified.tmpl", getenv("LANG"));
+    else
+      cgiCopyTemplateLang(stdout, TEMPLATES, "class-added.tmpl", getenv("LANG"));
+  }
 }
 
 
@@ -197,6 +453,9 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 	      int         modify)	/* I - Modify the printer? */
 {
   int		i;			/* Looping var */
+  int		element;		/* Element number */
+  ipp_attribute_t *attr,		/* Current attribute */
+		*last;			/* Last attribute */
   ipp_t		*request,		/* IPP request */
 		*response;		/* IPP response */
   ipp_status_t	status;			/* Request status */
@@ -255,7 +514,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 
       if ((response = cupsDoRequest(http, request, "/")) != NULL)
       {
-	ippSetCGIVars(response);
+	ippSetCGIVars(response, NULL, NULL);
 	ippDelete(response);
       }
 
@@ -305,7 +564,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
-      ippSetCGIVars(response);
+      ippSetCGIVars(response, NULL, NULL);
       ippDelete(response);
     }
 
@@ -377,15 +636,42 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
-      ippSetCGIVars(response);
+      if ((var = cgiGetVariable("PPD_MAKE")) == NULL)
+      {
+       /*
+	* Let the user choose a make...
+	*/
+
+        for (element = 0, attr = response->attrs, last = NULL;
+	     attr != NULL;
+	     attr = attr->next)
+	  if (attr->name && strcmp(attr->name, "ppd-make") == 0)
+	    if (last == NULL ||
+	        strcasecmp(last->values[0].string.text,
+		           attr->values[0].string.text) != 0)
+	    {
+	      cgiSetArray("PPD_MAKE", element, attr->values[0].string.text);
+	      element ++;
+	      last = attr;
+	    }
+
+	cgiCopyTemplateLang(stdout, TEMPLATES, "choose-make.tmpl",
+	                    getenv("LANG"));
+      }
+      else
+      {
+       /*
+	* Let the user choose a model...
+	*/
+
+        ippSetCGIVars(response, "ppd-make", var);
+	cgiCopyTemplateLang(stdout, TEMPLATES, "choose-model.tmpl",
+	                    getenv("LANG"));
+      }
+
       ippDelete(response);
     }
 
-   /*
-    * Let the user choose...
-    */
-
-    cgiCopyTemplateLang(stdout, TEMPLATES, "choose-model.tmpl", getenv("LANG"));
   }
   else
   {
@@ -474,6 +760,229 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     else
       cgiCopyTemplateLang(stdout, TEMPLATES, "printer-added.tmpl", getenv("LANG"));
   }
+}
+
+
+/*
+ * 'do_config_printer()' - Configure the default options for a printer.
+ */
+
+static void
+do_config_printer(http_t      *http,	/* I - HTTP connection */
+                  cups_lang_t *language)/* I - Client's language */
+{
+  int		i, j, k;		/* Looping vars */
+  int		have_options;		/* Have options? */
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  char		uri[HTTP_MAX_URI];	/* Job URI */
+  const char	*var;			/* Variable value */
+  const char	*printer;		/* Printer printer name */
+  ipp_status_t	status;			/* Operation status... */
+  const char	*filename;		/* PPD filename */
+  char		tempfile[1024];		/* Temporary filename */
+  FILE		*in,			/* Input file */
+		*out;			/* Output file */
+  char		line[1024];		/* Line from PPD file */
+  char		keyword[1024],		/* Keyword from Default line */
+		*keyptr;		/* Pointer into keyword... */
+  ppd_file_t	*ppd;			/* PPD file */
+  ppd_group_t	*group;			/* Option group */
+  ppd_option_t	*option;		/* Option */
+
+
+ /*
+  * Get the printer name...
+  */
+
+  if ((printer = cgiGetVariable("PRINTER_NAME")) != NULL)
+    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+  else
+  {
+    cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
+    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    return;
+  }
+
+ /*
+  * Get the PPD file...
+  */
+
+  if ((filename = cupsGetPPD(printer)) == NULL)
+  {
+    cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
+    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    return;
+  }
+
+  ppd = ppdOpenFile(filename);
+
+  for (have_options = 0, i = ppd->num_groups, group = ppd->groups;
+       i > 0;
+       i --, group ++)
+    for (j = group->num_options, option = group->options;
+         j > 0;
+	 j --, option ++)
+      if ((var = cgiGetVariable(option->keyword)) != NULL)
+      {
+        have_options = 1;
+	break;
+      }
+
+  if (!have_options)
+  {
+   /*
+    * Show the options to the user...
+    */
+
+    cgiCopyTemplateLang(stdout, TEMPLATES, "config-printer.tmpl",
+                        getenv("LANG"));
+
+    for (i = ppd->num_groups, group = ppd->groups;
+	 i > 0;
+	 i --, group ++)
+    {
+      cgiSetVariable("GROUP", group->text);
+      cgiCopyTemplateLang(stdout, TEMPLATES, "option-header.tmpl",
+                          getenv("LANG"));
+      
+      for (j = group->num_options, option = group->options;
+           j > 0;
+	   j --, option ++)
+      {
+        if (strcmp(option->keyword, "PageRegion") == 0)
+	  continue;
+
+        cgiSetVariable("KEYWORD", option->keyword);
+        cgiSetVariable("KEYTEXT", option->text);
+	cgiSetVariable("DEFCHOICE", option->defchoice);
+
+	cgiSetSize("CHOICES", option->num_choices);
+	cgiSetSize("TEXT", option->num_choices);
+	for (k = 0; k < option->num_choices; k ++)
+	{
+	  cgiSetArray("CHOICES", k, option->choices[k].choice);
+	  cgiSetArray("TEXT", k, option->choices[k].text);
+	}
+
+        switch (option->ui)
+	{
+	  case PPD_UI_BOOLEAN :
+              cgiCopyTemplateLang(stdout, TEMPLATES, "option-boolean.tmpl",
+	                          getenv("LANG"));
+              break;
+	  case PPD_UI_PICKONE :
+              cgiCopyTemplateLang(stdout, TEMPLATES, "option-pickone.tmpl",
+	                          getenv("LANG"));
+              break;
+	  case PPD_UI_PICKMANY :
+              cgiCopyTemplateLang(stdout, TEMPLATES, "option-pickmany.tmpl",
+	                          getenv("LANG"));
+              break;
+	}
+      }
+
+      cgiCopyTemplateLang(stdout, TEMPLATES, "option-trailer.tmpl",
+                          getenv("LANG"));
+    }
+
+    cgiCopyTemplateLang(stdout, TEMPLATES, "config-printer2.tmpl",
+                        getenv("LANG"));
+  }
+  else
+  {
+   /*
+    * Set default options...
+    */
+
+    cupsTempFile(tempfile, sizeof(tempfile));
+
+    in  = fopen(filename, "rb");
+    out = fopen(tempfile, "wb");
+
+    while (get_line(line, sizeof(line), in) != NULL)
+    {
+      if (strncmp(line, "*Default", 8) != 0)
+        fprintf(out, "%s\n", line);
+      else
+      {
+       /*
+        * Get default option name...
+	*/
+
+        strcpy(keyword, line + 8);
+
+	for (keyptr = keyword; *keyptr; keyptr ++)
+	  if (*keyptr == ':' || isspace(*keyptr))
+	    break;
+
+        *keyptr = '\0';
+
+        if (strcmp(keyword, "PageRegion") == 0)
+	  var = cgiGetVariable("PageSize");
+	else
+	  var = cgiGetVariable(keyword);
+
+        if (var != NULL)
+	  fprintf(out, "*Default%s: %s\n", keyword, var);
+	else
+	  fprintf(out, "%s\n", line);
+      }
+    }
+
+    fclose(in);
+    fclose(out);
+
+   /*
+    * Build a CUPS_ADD_PRINTER request, which requires the following
+    * attributes:
+    *
+    *    attributes-charset
+    *    attributes-natural-language
+    *    printer-uri
+    *    [ppd file]
+    */
+
+    request = ippNew();
+
+    request->request.op.operation_id = CUPS_ADD_PRINTER;
+    request->request.op.request_id   = 1;
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	 "attributes-charset", NULL, cupsLangEncoding(language));
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+        	 "attributes-natural-language", NULL, language->language);
+
+    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s",
+             cgiGetVariable("PRINTER_NAME"));
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+                 NULL, uri);
+
+   /*
+    * Do the request and get back a response...
+    */
+
+    if ((response = cupsDoFileRequest(http, request, "/admin/", tempfile)) != NULL)
+    {
+      status = response->request.status.status_code;
+      ippDelete(response);
+    }
+    else
+      status = IPP_NOT_AUTHORIZED;
+
+    if (status > IPP_OK_CONFLICT)
+    {
+      cgiSetVariable("ERROR", ippErrorString(status));
+      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    }
+    else
+      cgiCopyTemplateLang(stdout, TEMPLATES, "printer-configured.tmpl", getenv("LANG"));
+
+    unlink(tempfile);
+  }
+
+  unlink(filename);
 }
 
 
@@ -797,92 +1306,53 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
 
 
 /*
- * 'do_test_page()' - Send a test page.
+ * 'get_line()' - Get a line that is terminated by a LF, CR, or CR LF.
  */
 
-static void
-do_test_page(http_t      *http,		/* I - HTTP connection */
-             cups_lang_t *language)	/* I - Client's language */
+static char *		/* O - Pointer to buf or NULL on EOF */
+get_line(char *buf,	/* I - Line buffer */
+         int  length,	/* I - Length of buffer */
+	 FILE *fp)	/* I - File to read from */
 {
-  ipp_t		*request,		/* IPP request */
-		*response;		/* IPP response */
-  char		uri[HTTP_MAX_URI];	/* Job URI */
-  const char	*printer;		/* Printer name (purge-jobs) */
-  ipp_status_t	status;			/* Operation status... */
+  char	*bufptr;	/* Pointer into buffer */
+  int	ch;		/* Character from file */
 
 
-  if ((printer = cgiGetVariable("PRINTER_NAME")) != NULL)
-    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
-  else
+  length --;
+  bufptr = buf;
+
+  while ((ch = getc(fp)) != EOF)
   {
-    cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
-    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
-    return;
+    if (ch == '\n')
+      break;
+    else if (ch == '\r')
+    {
+     /*
+      * Look for LF...
+      */
+
+      ch = getc(fp);
+      if (ch != '\n' && ch != EOF)
+        ungetc(ch, fp);
+
+      break;
+    }
+
+    *bufptr++ = ch;
+    length --;
+    if (length == 0)
+      break;
   }
 
- /*
-  * Build an IPP_PRINT_JOB request, which requires the following
-  * attributes:
-  *
-  *    attributes-charset
-  *    attributes-natural-language
-  *    printer-uri
-  *    requesting-user-name
-  *    document-format
-  */
+  *bufptr = '\0';
 
-  request = ippNew();
-
-  request->request.op.operation_id = IPP_PRINT_JOB;
-  request->request.op.request_id   = 1;
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-               NULL, uri);
-
-  if (getenv("REMOTE_USER") != NULL)
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-                 NULL, getenv("REMOTE_USER"));
+  if (ch == EOF)
+    return (NULL);
   else
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-                 NULL, "root");
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name",
-               NULL, "Test Page");
-
-  ippAddString(request, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format",
-               NULL, "application/postscript");
-
- /*
-  * Do the request and get back a response...
-  */
-
-  if ((response = cupsDoFileRequest(http, request, uri + 15,
-                                    CUPS_DATADIR "/data/testprint.ps")) != NULL)
-  {
-    status = response->request.status.status_code;
-    ippSetCGIVars(response);
-
-    ippDelete(response);
-  }
-  else
-    status = IPP_GONE;
-
-  if (status > IPP_OK_CONFLICT)
-  {
-    cgiSetVariable("ERROR", ippErrorString(status));
-    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
-  }
-  else
-    cgiCopyTemplateLang(stdout, TEMPLATES, "test-page.tmpl", getenv("LANG"));
+    return (buf);
 }
 
 
 /*
- * End of "$Id: admin.c,v 1.6 2000/03/30 05:19:19 mike Exp $".
+ * End of "$Id: admin.c,v 1.7 2000/04/09 23:08:58 mike Exp $".
  */

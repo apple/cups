@@ -3,15 +3,10 @@
 <INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
 <INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="{?printer_location}">
 <INPUT TYPE="HIDDEN" NAME="PRINTER_INFO" VALUE="{?printer_info}">
-<INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">
-<INPUT TYPE="HIDDEN" NAME="BAUDRATE" VALUE="{?baudrate}">
-<INPUT TYPE="HIDDEN" NAME="BITS" VALUE="{?bits}">
-<INPUT TYPE="HIDDEN" NAME="PARITY" VALUE="{?parity}">
-<INPUT TYPE="HIDDEN" NAME="FLOW" VALUE="{?flow}">
 <TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
 <TR BGCOLOR="#999966">
 	<TH WIDTH="16"><IMG SRC="/images/left.gif"></TH>
-	<TH COLSPAN="2">Model/Driver for {printer_name}</TH>
+	<TH COLSPAN="2">Members for {printer_name}</TH>
 	<TH BGCOLOR="#cccc99" WIDTH="16"><IMG SRC="/images/right.gif"></TH>
 </TR>
 <TR>
@@ -19,10 +14,10 @@
 </TR>
 <TR>
 	<TD></TD>
-	<TD ALIGN="RIGHT">Make:</TD>
+	<TD ALIGN="RIGHT">Members:</TD>
 	<TD>
-	<SELECT NAME="PPD_MAKE" SIZE="10">
-	{[ppd_make]<OPTION VALUE="{ppd_make}" {?current_make={ppd_make}?SELECTED:}>{ppd_make}}
+	<SELECT NAME="MEMBER_URIS" SIZE="10" MULTIPLE>
+	{[member_uris]<OPTION VALUE="{member_uris}" {?member_selected}>{member_names}}
 	</SELECT>
 	</TD>
 </TR>

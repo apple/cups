@@ -1,5 +1,5 @@
 /*
- * "$Id: jobs.c,v 1.13 2000/03/30 05:19:19 mike Exp $"
+ * "$Id: jobs.c,v 1.14 2000/04/09 23:08:59 mike Exp $"
  *
  *   Job status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -73,9 +73,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   printf("Content-Type: text/html;charset=%s\n\n", cupsLangEncoding(language));
 
   cgiSetVariable("TITLE", "Jobs");
-  cgiSetVariable("SERVER_NAME", getenv("SERVER_NAME"));
-  cgiSetVariable("REMOTE_USER", getenv("REMOTE_USER"));
-  cgiSetVariable("CUPS_VERSION", CUPS_SVERSION);
+
+  ippSetServerVersion();
 
   cgiCopyTemplateLang(stdout, TEMPLATES, "header.tmpl", getenv("LANG"));
 
@@ -112,7 +111,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
-    ippSetCGIVars(response);
+    ippSetCGIVars(response, NULL, NULL);
     ippDelete(response);
 
     cgiCopyTemplateLang(stdout, TEMPLATES, "jobs.tmpl", getenv("LANG"));
@@ -136,5 +135,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: jobs.c,v 1.13 2000/03/30 05:19:19 mike Exp $".
+ * End of "$Id: jobs.c,v 1.14 2000/04/09 23:08:59 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.4 2000/03/21 04:03:24 mike Exp $"
+ * "$Id: ipp-var.c,v 1.5 2000/04/09 23:08:58 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,7 +23,8 @@
  *
  * Contents:
  *
- *   ippSetCGIVars() - Set CGI variables from an IPP response.
+ *   ippSetServerVersion() - Set the server name and CUPS version...
+ *   ippSetCGIVars()       - Set CGI variables from an IPP response.
  */
 
 /*
@@ -34,14 +35,30 @@
 
 
 /*
+ * 'ippSetServerVersion()' - Set the server name and CUPS version...
+ */
+
+void
+ippSetServerVersion(void)
+{
+  cgiSetVariable("SERVER_NAME", getenv("SERVER_NAME"));
+  cgiSetVariable("REMOTE_USER", getenv("REMOTE_USER"));
+  cgiSetVariable("CUPS_VERSION", CUPS_SVERSION);
+}
+
+
+/*
  * 'ippSetCGIVars()' - Set CGI variables from an IPP response.
  */
 
 void
-ippSetCGIVars(ipp_t *response)		/* I - Response data to be copied... */
+ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
+              const char *filter_name,	/* I - Filter name */
+	      const char *filter_value)	/* I - Filter value */
 {
   int			element;	/* Element in CGI array */
-  ipp_attribute_t	*attr;		/* Attribute in response... */
+  ipp_attribute_t	*attr,		/* Attribute in response... */
+			*filter;	/* Filtering attribute */
   int			i;		/* Looping var */
   char			name[1024],	/* Name of attribute */
 			value[16384],	/* Value(s) */
@@ -54,9 +71,7 @@ ippSetCGIVars(ipp_t *response)		/* I - Response data to be copied... */
   int			port;
 
 
-  cgiSetVariable("SERVER_NAME", getenv("SERVER_NAME"));
-  cgiSetVariable("REMOTE_USER", getenv("REMOTE_USER"));
-  cgiSetVariable("CUPS_VERSION", CUPS_SVERSION);
+  ippSetServerVersion();
 
   for (attr = response->attrs;
        attr && attr->group_tag == IPP_TAG_OPERATION;
@@ -67,6 +82,26 @@ ippSetCGIVars(ipp_t *response)		/* I - Response data to be copied... */
    /*
     * Copy attributes to a separator...
     */
+
+    if (filter_name)
+    {
+      for (filter = attr;
+           filter != NULL && filter->group_tag != IPP_TAG_ZERO;
+           filter = filter->next)
+        if (filter->name && strcmp(filter->name, filter_name) == 0 &&
+	    strcasecmp(filter->values[0].string.text, filter_value) == 0)
+	  break;
+
+      if (!filter)
+        return;
+
+      if (filter->group_tag == IPP_TAG_ZERO)
+      {
+        attr = filter;
+	element --;
+	continue;
+      }
+    }
 
     for (; attr != NULL && attr->group_tag != IPP_TAG_ZERO; attr = attr->next)
     {
@@ -170,5 +205,5 @@ ippSetCGIVars(ipp_t *response)		/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.4 2000/03/21 04:03:24 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.5 2000/04/09 23:08:58 mike Exp $".
  */

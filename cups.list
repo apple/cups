@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.54 2000/03/20 13:51:47 mike Exp $"
+# "$Id: cups.list,v 1.55 2000/04/09 23:08:57 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -256,10 +256,17 @@ f 0444 root sys /usr/share/cups/templates/admin-op.tmpl templates/admin-op.tmpl
 f 0444 root sys /usr/share/cups/templates/admin.tmpl templates/admin.tmpl
 f 0444 root sys /usr/share/cups/templates/choose-device.tmpl templates/choose-device.tmpl
 f 0444 root sys /usr/share/cups/templates/choose-make.tmpl templates/choose-make.tmpl
+f 0444 root sys /usr/share/cups/templates/choose-members.tmpl templates/choose-members.tmpl
 f 0444 root sys /usr/share/cups/templates/choose-model.tmpl templates/choose-model.tmpl
 f 0444 root sys /usr/share/cups/templates/choose-serial.tmpl templates/choose-serial.tmpl
 f 0444 root sys /usr/share/cups/templates/choose-uri.tmpl templates/choose-uri.tmpl
+f 0444 root sys /usr/share/cups/templates/class-added.tmpl templates/class-added.tmpl
+f 0444 root sys /usr/share/cups/templates/class-confirm.tmpl templates/class-confirm.tmpl
+f 0444 root sys /usr/share/cups/templates/class-deleted.tmpl templates/class-deleted.tmpl
+f 0444 root sys /usr/share/cups/templates/class-modified.tmpl templates/class-modified.tmpl
 f 0444 root sys /usr/share/cups/templates/classes.tmpl templates/classes.tmpl
+f 0444 root sys /usr/share/cups/templates/config-printer.tmpl templates/config-printer.tmpl
+f 0444 root sys /usr/share/cups/templates/config-printer2.tmpl templates/config-printer2.tmpl
 f 0444 root sys /usr/share/cups/templates/error.tmpl templates/error.tmpl
 f 0444 root sys /usr/share/cups/templates/header.tmpl templates/header.tmpl
 f 0444 root sys /usr/share/cups/templates/job-cancel.tmpl templates/job-cancel.tmpl
@@ -274,6 +281,11 @@ f 0444 root sys /usr/share/cups/templates/option-pickmany.tmpl templates/option-
 f 0444 root sys /usr/share/cups/templates/option-pickone.tmpl templates/option-pickone.tmpl
 f 0444 root sys /usr/share/cups/templates/option-trailer.tmpl templates/option-trailer.tmpl
 f 0444 root sys /usr/share/cups/templates/printer-accept.tmpl templates/printer-accept.tmpl
+f 0444 root sys /usr/share/cups/templates/printer-added.tmpl templates/printer-added.tmpl
+f 0444 root sys /usr/share/cups/templates/printer-configured.tmpl templates/printer-configured.tmpl
+f 0444 root sys /usr/share/cups/templates/printer-confirm.tmpl templates/printer-confirm.tmpl
+f 0444 root sys /usr/share/cups/templates/printer-deleted.tmpl templates/printer-deleted.tmpl
+f 0444 root sys /usr/share/cups/templates/printer-modified.tmpl templates/printer-modified.tmpl
 f 0444 root sys /usr/share/cups/templates/printer-reject.tmpl templates/printer-reject.tmpl
 f 0444 root sys /usr/share/cups/templates/printer-start.tmpl templates/printer-start.tmpl
 f 0444 root sys /usr/share/cups/templates/printer-stop.tmpl templates/printer-stop.tmpl
@@ -423,5 +435,5 @@ f 0444 root sys /usr/man/man5/printers.conf.5 man/printers.conf.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.54 2000/03/20 13:51:47 mike Exp $".
+# End of "$Id: cups.list,v 1.55 2000/04/09 23:08:57 mike Exp $".
 #

@@ -4,7 +4,7 @@
 <TR>
 	<TH BGCOLOR="#999966"><IMG SRC="/images/left.gif"></TH>
 	<TH BGCOLOR="#999966"><A HREF="{printer_uri_supported}">{printer_name}</A></TH>
-	<TH BGCOLOR="#999966"></TH>
+	<TH BGCOLOR="#999966">Printer Class</TH>
 	<TH><IMG SRC="/images/right.gif"></TH>
 </TR>
 <TR>
@@ -21,7 +21,7 @@
 	{?printer_state_message=?:<BR><I>"{printer_state_message}"</I>}
 	{?member_names=?:<BR>Members: {member_names}}
 	<P>
-	<A HREF="/admin/?op=print-test-page&printer_name={printer_name}">
+	<A HREF="{printer_uri_supported}?op=print-test-page">
 	<IMG SRC="/images/print-test-page.gif" ALT="Print Test Page" BORDER="0"></A>
 	{printer_state=5?
 	<A HREF="/admin/?op=start-class&printer_name={printer_name}">

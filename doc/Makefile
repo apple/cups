@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.20 2000/03/30 05:19:21 mike Exp $"
+# "$Id: Makefile,v 1.21 2000/04/09 23:09:02 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -58,6 +58,7 @@ WEBIMAGES	=	images/accept-jobs.gif \
 			images/cancel-jobs.gif \
 			images/cancel.gif \
 			images/classes.gif \
+			images/config-printer.gif \
 			images/continue.gif \
 			images/delete-class.gif \
 			images/delete-printer.gif \

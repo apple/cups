@@ -17,6 +17,9 @@ H6 { font-family: sans-serif; font-size: 8.0pt }
 SUB { font-size: 8.0pt }
 SUP { font-size: 8.0pt }
 PRE { font-size: 9.0pt }
+A:link { text-decoration: underline }
+A:visited { text-decoration: underline }
+A:active { text-decoration: underline }
 </STYLE>
 </HEAD>
 <BODY>
@@ -153,12 +156,17 @@ of a line. </P>
 charset 8bit
 </PRE>
 </UL>
-<P>Following this is a line that defines the font information: </P>
+<P>Following this are lines that define the font information: </P>
 <UL>
 <PRE>
-direction width normal bold italic bold-italic
+first last direction width normal bold italic bold-italic
 </PRE>
 </UL>
+<P><VAR>First</VAR> and <VAR>last</VAR> are the first and last glyphs 
+in the font mapping that correspond to that font; a maximum of 256 
+characters can be mapped within each group, with a maximum of 256 
+mappings (this is a PostScript limitation.) The glyph values are 
+hexadecimal. </P>
 <P><VAR>Direction</VAR> is the string &quot;ltor&quot;, &quot;rtol&quot;, or &quot;rtola&quot; 
 indicating left-to-right, right-to-left, or right-to-left Arabic text. </P>
 <P><VAR>Width</VAR> is the string &quot;single&quot; or &quot;double&quot;; double means 
@@ -170,7 +178,12 @@ available in a single style then only one typeface should be listed
 (e.g. &quot;Symbol&quot;.) Each font that is listed will be used (and downloaded 
 if needed) when printing. </P>
 <P>The remaining lines define a character to Unicode glyph mapping for 
-the character set. The character and glyph values are hexadecimal. </P>
+the character set. The character and glyph values are hexadecimal: </P>
+<UL>
+<PRE>
+xx yyyy
+</PRE>
+</UL>
 <H3><A NAME="3_1_2">3.1.2 Unicode Character Set Files</A></H3>
 <P>Unicode character set files start with a line reading: </P>
 <UL>
@@ -228,6 +241,8 @@ messages. The currently recognized values are: </P>
 <LI>iso-8859-7 </LI>
 <LI>iso-8859-8 </LI>
 <LI>iso-8859-9 </LI>
+<LI>iso-8859-10 </LI>
+<LI>iso-8859-13 </LI>
 <LI>iso-8859-14 </LI>
 <LI>iso-8859-15 </LI>
 <LI>us-ascii </LI>

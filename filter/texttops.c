@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.24 2000/03/09 19:47:27 mike Exp $"
+ * "$Id: texttops.c,v 1.25 2000/04/09 23:09:06 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -277,10 +277,10 @@ WriteProlog(char       *title,	/* I - Title of job */
       */
 
       UTF8     = 0;
-      NumFonts = 1;
+      NumFonts = 0;
 
      /*
-      * Read the font description...
+      * Read the font description(s)...
       */
 
       while (fgets(line, sizeof(line), fp) != NULL)
@@ -289,91 +289,59 @@ WriteProlog(char       *title,	/* I - Title of job */
         * Skip comment and blank lines...
 	*/
 
-        if (line[0] != '#' && line[0] != '\n')
-	  break;
-      }
+        if (line[0] == '#' || line[0] == '\n')
+	  continue;
 
-     /*
-      * Read the font descriptions that should look like:
-      *
-      *   direction width normal [bold italic bold-italic]
-      */
-
-      lineptr = line;
-      while (isspace(*lineptr))
-	lineptr ++;
-
-      valptr = lineptr;
-
-      while (!isspace(*lineptr) && *lineptr)
-	lineptr ++;
-
-      if (!*lineptr)
-      {
        /*
-	* Can't have a font without all required values...
+	* Read the font descriptions that should look like:
+	*
+	*   first last direction width normal [bold italic bold-italic]
 	*/
 
-	fprintf(stderr, "ERROR: bad font description line: %s\n", valptr);
-	fclose(fp);
-	exit(1);
-      }
+	lineptr = line;
 
-      *lineptr++ = '\0';
+        start = strtol(lineptr, &lineptr, 16);
+	end   = strtol(lineptr, &lineptr, 16);
 
-      if (strcmp(valptr, "ltor") == 0)
-	Directions[0] = 1;
-      else if (strcmp(valptr, "rtol") == 0)
-	Directions[0] = -1;
-      else
-      {
-	fprintf(stderr, "ERROR: Bad text direction %s\n", valptr);
-	fclose(fp);
-	exit(1);
-      }
+	while (isspace(*lineptr))
+	  lineptr ++;
 
-     /*
-      * Got the direction, now get the width...
-      */
+        if (!*lineptr)
+	  break;	// Must be font mapping
 
-      while (isspace(*lineptr))
-	lineptr ++;
+	valptr = lineptr;
 
-      valptr = lineptr;
+	while (!isspace(*lineptr) && *lineptr)
+	  lineptr ++;
 
-      while (!isspace(*lineptr) && *lineptr)
-	lineptr ++;
+	if (!*lineptr)
+	{
+	 /*
+	  * Can't have a font without all required values...
+	  */
 
-      if (!*lineptr)
-      {
+	  fprintf(stderr, "ERROR: bad font description line: %s\n", valptr);
+	  fclose(fp);
+	  exit(1);
+	}
+
+	*lineptr++ = '\0';
+
+	if (strcmp(valptr, "ltor") == 0)
+	  Directions[NumFonts] = 1;
+	else if (strcmp(valptr, "rtol") == 0)
+	  Directions[NumFonts] = -1;
+	else
+	{
+	  fprintf(stderr, "ERROR: Bad text direction %s\n", valptr);
+	  fclose(fp);
+	  exit(1);
+	}
+
        /*
-	* Can't have a font without all required values...
+	* Got the direction, now get the width...
 	*/
 
-	fprintf(stderr, "ERROR: bad font description line: %s\n", valptr);
-	fclose(fp);
-	exit(1);
-      }
-
-      *lineptr++ = '\0';
-
-      if (strcmp(valptr, "single") == 0)
-        Widths[0] = 1;
-      else if (strcmp(valptr, "double") == 0)
-        Widths[0] = 2;
-      else 
-      {
-	fprintf(stderr, "ERROR: Bad text width %s\n", valptr);
-	fclose(fp);
-	exit(1);
-      }
-
-     /*
-      * Get the fonts...
-      */
-
-      for (i = 0; *lineptr && i < 4; i ++)
-      {
 	while (isspace(*lineptr))
 	  lineptr ++;
 
@@ -382,25 +350,73 @@ WriteProlog(char       *title,	/* I - Title of job */
 	while (!isspace(*lineptr) && *lineptr)
 	  lineptr ++;
 
-        if (*lineptr)
-	  *lineptr++ = '\0';
+	if (!*lineptr)
+	{
+	 /*
+	  * Can't have a font without all required values...
+	  */
 
-        if (lineptr > valptr)
-	  Fonts[0][i] = strdup(valptr);
+	  fprintf(stderr, "ERROR: bad font description line: %s\n", valptr);
+	  fclose(fp);
+	  exit(1);
+	}
+
+	*lineptr++ = '\0';
+
+	if (strcmp(valptr, "single") == 0)
+          Widths[NumFonts] = 1;
+	else if (strcmp(valptr, "double") == 0)
+          Widths[NumFonts] = 2;
+	else 
+	{
+	  fprintf(stderr, "ERROR: Bad text width %s\n", valptr);
+	  fclose(fp);
+	  exit(1);
+	}
+
+       /*
+	* Get the fonts...
+	*/
+
+	for (i = 0; *lineptr && i < 4; i ++)
+	{
+	  while (isspace(*lineptr))
+	    lineptr ++;
+
+	  valptr = lineptr;
+
+	  while (!isspace(*lineptr) && *lineptr)
+	    lineptr ++;
+
+          if (*lineptr)
+	    *lineptr++ = '\0';
+
+          if (lineptr > valptr)
+	    Fonts[NumFonts][i] = strdup(valptr);
+	}
+
+       /*
+	* Fill in remaining fonts as needed...
+	*/
+
+	for (j = i; j < 4; j ++)
+	  Fonts[NumFonts][j] = strdup(Fonts[NumFonts][0]);
+
+       /*
+        * Define the character mappings...
+	*/
+
+	for (i = start, j = NumFonts * 256; i <= end; i ++, j ++)
+	  Chars[i] = j;
+
+        NumFonts ++;
       }
-
-     /*
-      * Fill in remaining fonts as needed...
-      */
-
-      for (j = i; j < 4; j ++)
-	Fonts[0][j] = strdup(Fonts[0][0]);
 
      /*
       * Read encoding lines...
       */
 
-      while (fgets(line, sizeof(line), fp) != NULL)
+      do
       {
        /*
         * Skip comment and blank lines...
@@ -414,11 +430,9 @@ WriteProlog(char       *title,	/* I - Title of job */
 	*/
 
 	if (sscanf(line, "%x%x", &ch, &unicode) == 2 && ch < 256)
-	{
-          Codes[ch] = unicode;
-	  Chars[ch] = ch;
-	}
+          Codes[Chars[ch]] = unicode;
       }
+      while (fgets(line, sizeof(line), fp) != NULL);
 
       fclose(fp);
     }
@@ -884,12 +898,14 @@ static void
 write_line(int     row,		/* I - Row number (0 to N) */
            lchar_t *line)	/* I - Line to print */
 {
+  int		i;		/* Looping var */
   int		col;		/* Current column */
   int		attr;		/* Current attribute */
+  int		font,		/* Font to use */
+		mono;		/* Monospaced? */
   lchar_t	*start;		/* First character in sequence */
 
 
-  /**** TODO - handle bidi text and arabic composition ****/
   for (col = 0, start = line; col < SizeColumns;)
   {
     while (col < SizeColumns && (line->ch == ' ' || line->ch == 0))
@@ -901,16 +917,72 @@ write_line(int     row,		/* I - Row number (0 to N) */
     if (col >= SizeColumns)
       break;
 
-    attr  = line->attr;
-    start = line;
-
-    while (col < SizeColumns && line->ch != 0 && attr == line->attr)
+    if (NumFonts == 1)
     {
+     /*
+      * All characters in a single font - assume monospaced...
+      */
+
+      attr  = line->attr;
+      start = line;
+
+      while (col < SizeColumns && line->ch != 0 && attr == line->attr)
+      {
+	col ++;
+	line ++;
+      }
+
+      write_string(col - (line - start), row, line - start, start);
+    }
+    else
+    {
+     /*
+      * Multiple fonts; break up based on the font...
+      */
+
+      attr  = line->attr;
+      start = line;
+      font  = Chars[line->ch] / 256;
+      mono  = strncmp(Fonts[font][0], "Courier", 7) == 0;
       col ++;
       line ++;
-    }
 
-    write_string(col - (line - start), row, line - start, start);
+      if (mono)
+      {
+	while (col < SizeColumns && line->ch != 0 && attr == line->attr)
+	{
+          font = Chars[line->ch] / 256;
+          if (strncmp(Fonts[font][0], "Courier", 7) != 0)
+	    break;
+
+	  col ++;
+	  line ++;
+	}
+      }
+
+      if (Directions[font] > 0)
+        write_string(col - (line - start), row, line - start, start);
+      else
+      {
+       /*
+        * Do right-to-left text...
+	*/
+
+	while (col < SizeColumns && line->ch != 0 && attr == line->attr)
+	{
+          if (Directions[Chars[line->ch] / 256] > 0 &&
+	      !ispunct(line->ch) && !isspace(line->ch))
+	    break;
+
+	  col ++;
+	  line ++;
+	}
+
+        for (i = 1; start < line; start ++)
+	  if (!isspace(start->ch))
+	    write_string(col - i, row, 1, start);
+      }
+    }
   }
 }
 
@@ -975,7 +1047,7 @@ write_string(int     col,	/* I - Start column */
   if (attr & ATTR_UNDERLINE)
     printf(" %.1f U", (float)len * 72.0 / (float)CharsPerInch);
 
-  if (UTF8)
+  if (NumFonts > 1)
   {
    /*
     * Write a hex string...
@@ -1059,7 +1131,7 @@ write_text(char *s)	/* I - String to write */
   unsigned char	*utf8;	/* UTF8 text */
 
 
-  if (UTF8)
+  if (NumFonts > 1)
   {
    /*
     * 8/8 encoding...
@@ -1071,7 +1143,7 @@ write_text(char *s)	/* I - String to write */
 
     while (*utf8)
     {
-      if (*utf8 < 0xc0)
+      if (*utf8 < 0xc0 || !UTF8)
         ch = *utf8 ++;
       else if ((*utf8 & 0xe0) == 0xc0)
       {
@@ -1127,5 +1199,5 @@ write_text(char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c,v 1.24 2000/03/09 19:47:27 mike Exp $".
+ * End of "$Id: texttops.c,v 1.25 2000/04/09 23:09:06 mike Exp $".
  */

@@ -52,11 +52,17 @@ of a line.
 charset 8bit
 </PRE></UL>
 
-<P>Following this is a line that defines the font information:
+<P>Following this are lines that define the font information:
 
 <UL><PRE>
-direction width normal bold italic bold-italic
+first last direction width normal bold italic bold-italic
 </PRE></UL>
+
+<P><VAR>First</VAR> and <VAR>last</VAR> are the first and last glyphs
+in the font mapping that correspond to that font; a maximum of 256
+characters can be mapped within each group, with a maximum of 256
+mappings (this is a PostScript limitation.) The glyph values are
+hexadecimal.
 
 <P><VAR>Direction</VAR> is the string "ltor", "rtol", or "rtola" indicating
 left-to-right, right-to-left, or right-to-left Arabic text.
@@ -71,7 +77,11 @@ Each font that is listed will be used (and downloaded if needed) when
 printing.
 
 <P>The remaining lines define a character to Unicode glyph mapping for the
-character set. The character and glyph values are hexadecimal.
+character set. The character and glyph values are hexadecimal:
+
+<UL><PRE>
+xx yyyy
+</PRE></UL>
 
 <H3>Unicode Character Set Files</H3>
 
@@ -138,6 +148,8 @@ The currently recognized values are:
 	<LI>iso-8859-7
 	<LI>iso-8859-8
 	<LI>iso-8859-9
+	<LI>iso-8859-10
+	<LI>iso-8859-13
 	<LI>iso-8859-14
 	<LI>iso-8859-15
 	<LI>us-ascii

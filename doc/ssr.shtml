@@ -39,17 +39,9 @@ system.
 
 <H2>Security Breaches</H2>
 
-<P>There are two known security vulnerabilities with local access:
+<P>There is one known security vulnerabilities with local access:
 
 <OL>
-
-	<LI>Since the default installation creates a world-readable
-	request directory, it is possible for local users to read the
-	contents of print files before they are printed.
-
-	<P>This problem can be alleviated by making the request
-	directory readable only by the user specified in the CUPS
-	configuration file.
 
 	<LI>Device URIs are passed to backend filters in argv[0] and in
 	an environment variable. Since device URIs can contain
@@ -127,22 +119,45 @@ service attacks, including:
 
 <H2>Security Breaches</H2>
 
-<P>The current CUPS server only supports Basic authentication with
-usernames and passwords. This essentially places the clear text of the
-username and password on the network. Since CUPS uses the UNIX username
-and password account information, the authentication information could
-be used to gain access to accounts (possibly priviledged accounts) on
-the server.
+<P>The current CUPS server supports Basic, Digest, and local certificate
+authentication:
+
+<OL>
+
+	<LI>Basic authentication essentially places the clear text of
+	the username and password on the network. Since CUPS uses the
+	UNIX username and password account information, the
+	authentication information could be used to gain access to
+	accounts (possibly priviledged accounts) on the server.
+
+	<LI>Digest authentication uses an MD5 checksum of the username,
+	password, and domain ("CUPS"), so the original username and
+	password is not sent over the network. However, the current
+	implementation does not authenticate the entire message and
+	uses the client's IP address for the nonce value, making it
+	possible to launch "man in the middle" and replay attacks from
+	the same client.  The next minor release of CUPS will support
+	Digest authentication of the entire message body, effectively
+	stopping these methods of attack.
+
+	<LI>Local certificate authentication passes 128-bit
+	"certificates" that identify an authenticated user.
+	Certificates are created on-the-fly from random data and stored
+	in files under <CODE>/etc/cups/certs</CODE>. They have
+	restricted read permissions: root + system for the root
+	certificate, and lp + system for CGI certificates. Because
+	certificates are only available on the local system, the CUPS
+	server does not accept local authentication unless the client
+	is connected to the localhost address (127.0.0.1.)
+
+</OL>
 
 <P>The default CUPS configuration disables remote administration. We do
 not recommend that remote administration be enabled for all hosts,
 however if you have a trusted network or subnet access can be
-restricted accordingly.
-
-<P>The next minor release of CUPS will support Digest authentication of
-the entire message body using separate MD5-based username and password
-files. This will protect password information and prevent unauthorized
-access due to compromised account passwords.
+restricted accordingly.  Also, we highly recommend using Digest
+authentication when possible; unfortunately, most web browsers do not
+support Digest authentication at this time.
 
 <EMBED SRC="glossary.shtml">
 
