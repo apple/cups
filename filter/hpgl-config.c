@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.5 1998/03/18 20:47:27 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.6 1998/05/20 13:18:48 mike Exp $"
  *
  *   HPGL configuration routines for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,10 @@
  * Revision History:
  *
  *   $Log: hpgl-config.c,v $
- *   Revision 1.5  1998/03/18 20:47:27  mike
+ *   Revision 1.6  1998/05/20 13:18:48  mike
+ *   Updated to offset page by the left/bottom margin no matter what.
+ *
+ *   Revision 1.5  1998/03/18  20:47:27  mike
  *   Fixed problem with some HPGL files not plotting - added IP call after
  *   a PS command.
  *
@@ -52,7 +55,7 @@ update_transform(void)
   float p1[2], p2[2];
   float	width, height;
   float	plotsize[2];
-  float	scaling[2];
+  float	scaling;
 
 
   if (FitPlot)
@@ -62,25 +65,31 @@ update_transform(void)
 
     if (Rotation == 0 || Rotation == 180)
     {
-      scaling[0] = PageWidth / PlotSize[0];
-      scaling[1] = PageHeight / PlotSize[1];
+      scaling = PageWidth / PlotSize[0];
+
+      if (scaling > (PageHeight / PlotSize[1]))
+      {
+	if ((scaling * PlotSize[1]) > PageHeight)
+          scaling = PageHeight / PlotSize[1];
+      }
+      else if ((PageHeight / PlotSize[1] * PlotSize[0]) <= PageWidth)
+        scaling = PageHeight / PlotSize[1];
     }
     else
     {
-      scaling[0] = PageWidth / PlotSize[1];
-      scaling[1] = PageHeight / PlotSize[0];
+      scaling = PageWidth / PlotSize[1];
+
+      if (scaling > (PageHeight / PlotSize[0]))
+      {
+	if ((scaling * PlotSize[0]) > PageHeight)
+          scaling = PageHeight / PlotSize[0];
+      }
+      else if ((PageHeight / PlotSize[0] * PlotSize[1]) <= PageWidth)
+        scaling = PageHeight / PlotSize[0];
     };
 
-    if (scaling[0] < scaling[1])
-    {
-      plotsize[0] = PlotSize[0] * scaling[0];
-      plotsize[1] = PlotSize[1] * scaling[0];
-    }
-    else
-    {
-      plotsize[0] = PlotSize[0] * scaling[1];
-      plotsize[1] = PlotSize[1] * scaling[1];
-    };
+    plotsize[0] = PlotSize[0] * scaling;
+    plotsize[1] = PlotSize[1] * scaling;
   }
   else
   {
@@ -291,8 +300,7 @@ PG_advance_page(int num_params, param_t *params)
   PageDirty = 0;
   fprintf(OutputFile, "%%%%Page: %d\n", PageCount);
   fputs("gsave\n", OutputFile);
-  if (FitPlot)
-    fprintf(OutputFile, "%.1f %.1f translate\n", PageLeft, PageBottom);
+  fprintf(OutputFile, "%.1f %.1f translate\n", PageLeft, PageBottom);
 }
 
 
@@ -383,5 +391,5 @@ SC_scale(int num_params, param_t *params)
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.5 1998/03/18 20:47:27 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.6 1998/05/20 13:18:48 mike Exp $".
  */
