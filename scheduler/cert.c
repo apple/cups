@@ -1,5 +1,5 @@
 /*
- * "$Id: cert.c,v 1.3 2000/07/24 17:06:42 mike Exp $"
+ * "$Id: cert.c,v 1.4 2000/07/24 17:48:21 mike Exp $"
  *
  *   Authentication certificate routines for the Common UNIX
  *   Printing System (CUPS).
@@ -225,17 +225,42 @@ FindCert(const char *certificate)	/* I - Certificate */
 void
 InitCerts(void)
 {
+  FILE		*fp;			/* /dev/random file */
+  unsigned	seed;			/* Seed for random number generator */
   struct timeval tod;			/* Time of day */
 
 
  /*
-  * Initialize the random number generator using the current time,
-  * including milliseconds...
+  * Initialize the random number generator using the random device or
+  * the current time, as available...
   */
 
-  gettimeofday(&tod, NULL);
+  if ((fp = fopen("/dev/random", "rb")) == NULL)
+  {
+   /*
+    * Get the time in usecs and use it as the initial seed...
+    */
 
-  srandom(tod.tv_sec + tod.tv_usec);
+    gettimeofday(&tod, NULL);
+
+    seed = (unsigned)(tod.tv_sec + tod.tv_usec);
+  }
+  else
+  {
+   /*
+    * Read 4 random characters from the random device and use
+    * them as the seed...
+    */
+
+    seed = getc(fp);
+    seed = (seed << 8) | getc(fp);
+    seed = (seed << 8) | getc(fp);
+    seed = (seed << 8) | getc(fp);
+
+    fclose(fp);
+  }
+
+  srandom(seed);
 
  /*
   * Create a root certificate and return...
@@ -246,5 +271,5 @@ InitCerts(void)
 
 
 /*
- * End of "$Id: cert.c,v 1.3 2000/07/24 17:06:42 mike Exp $".
+ * End of "$Id: cert.c,v 1.4 2000/07/24 17:48:21 mike Exp $".
  */
