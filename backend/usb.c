@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.26 2002/03/01 21:18:28 mike Exp $"
+ * "$Id: usb.c,v 1.27 2002/03/19 19:08:20 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -265,6 +265,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   if (fp != 0)
     close(fp);
 
+  fputs("INFO: Ready to print.\n", stderr);
+
   return (0);
 }
 
@@ -453,5 +455,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: usb.c,v 1.26 2002/03/01 21:18:28 mike Exp $".
+ * End of "$Id: usb.c,v 1.27 2002/03/19 19:08:20 mike Exp $".
  */
