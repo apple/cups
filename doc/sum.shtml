@@ -2,7 +2,7 @@
 <HEAD>
 	<META NAME="Description" CONTENT="Common UNIX Printing System Software Users Manual">
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2003, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SUM-1.1.18">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SUM-1.1.19">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Users Manual</TITLE>
 </HEAD>
@@ -11,7 +11,7 @@
 <H1 ALIGN="RIGHT">Preface</H1>
 
 <P>This software users manual describes how to use the Common UNIX Printing
-System<SUP>TM</SUP> ("CUPS<SUP>TM</SUP>") Version 1.1.18.
+System<SUP>TM</SUP> ("CUPS<SUP>TM</SUP>") Version 1.1.19.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -853,6 +853,19 @@ options using the <CODE>-o</CODE> argument:
 
 <P>Once saved, any <CODE>lp</CODE> or <CODE>lpr</CODE> command will
 use them when you print.
+
+<CENTER><TABLE WIDTH="80%" BORDER="1" BGCOLOR="#cccccc" CELLPADDING="5" CELLSPACING="0">
+<TR>
+	<TD><B>Note:</B>
+
+	<P>Running the <CODE>lpoptions</CODE> command as the
+	root user (or any user with a UID of 0) will set the
+	default options for all users. The root account does not
+	have its own set of default options.</P>
+
+	</TD>
+</TR>
+</TABLE></CENTER>
 
 <H2>Setting Options for a Specific Printer</H2>
 

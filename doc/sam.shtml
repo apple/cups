@@ -2584,7 +2584,7 @@ for the new one. If all of the known jobs are still pending or active then
 the new job will be rejected.
 
 <P>Setting the maximum to 0 disables this functionality. The default
-setting is 0.
+setting is 500.
 
 <!-- NEED 3in -->
 <H3><A NAME="MaxJobsPerPrinter">MaxJobsPerPrinter</A></H3>

@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2003, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SPM-1.1.18">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SPM-1.1.19">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Programmers Manual</TITLE>
 </HEAD>
@@ -11,7 +11,7 @@
 
 <P>This software programmers manual provides software
 programming information for the Common UNIX Printing System
-("CUPS") Version 1.1.18.
+("CUPS") Version 1.1.19.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -9546,6 +9546,64 @@ ppdEmitFd(ppd, 1, PPD_ORDER_PAGE);
 <A HREF="#ppdEmit"><CODE>ppdEmit()</CODE></A>
 
 
+<!-- NEW PAGE --><H2><A NAME="ppdFindAttr">ppdFindAttr()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+ppd_attr_t *
+ppdFindAttr(ppd_file_t *ppd,
+            const char *keyword,
+	    const char *spec);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>ppd</TD>
+	<TD>The PPD file</TD>
+</TR>
+<TR>
+	<TD>keyword</TD>
+	<TD>The name of the attribute</TD>
+</TR>
+<TR>
+	<TD>spec</TD>
+	<TD>The option keyword associated with the attribute or
+	NULL if you don't care.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>A pointer to the attribute data or NULL if the attribute does not exist.
+
+<H3>Description</H3>
+
+<P>The <CODE>ppdFindAttr()</CODE> function returns a pointer to
+the first occurrence of the attribute in the PPD file.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/ppd.h>
+
+ppd_file_t *ppd;
+ppd_attr_t *attr;
+
+attr = ppdFindAttr(ppd, "RequiresPageRegion", "Upper");
+</PRE>
+
+<H3>See Also</H3>
+
+<A HREF="#ppdFindNextAttr"><CODE>ppdFindNextAttr()</CODE></A>
+
+
 <!-- NEW PAGE --><H2><A NAME="ppdFindChoice">ppdFindChoice()</A></H2>
 
 <H3>Usage</H3>
@@ -9653,6 +9711,71 @@ choice = ppdFindMarkedChoice(ppd, "PageSize");
 
 <A HREF="#ppdFindChoice"><CODE>ppdFindChoice()</CODE></A>,
 <A HREF="#ppdFindOption"><CODE>ppdFindOption()</CODE></A>
+
+
+<!-- NEW PAGE --><H2><A NAME="ppdFindNextAttr">ppdFindNextAttr()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+ppd_attr_t *
+ppdFindNextAttr(ppd_file_t *ppd,
+        	const char *keyword,
+		const char *spec);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>ppd</TD>
+	<TD>A pointer to the PPD file</TD>
+</TR>
+<TR>
+	<TD>keyword</TD>
+	<TD>The name of the attribute</TD>
+</TR>
+<TR>
+	<TD>spec</TD>
+	<TD>The option keyword associated with the attribute or
+	NULL if you don't care.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>A pointer to the attribute data or NULL if the attribute does not exist.
+
+<H3>Description</H3>
+
+<P>The <CODE>ppdFindNextAttr()</CODE> function returns a pointer to
+the next occurrence of the attribute in the PPD file.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/ppd.h>
+
+ppd_file_t *ppd;
+ppd_attr_t *attr;
+
+for (attr = ppdFindAttr(ppd, "cupsICCProfile", NULL);
+     attr != NULL;
+     attr = ppdFindNextAttr(ppd, "cupsICCProfile", NULL))
+{
+  printf("*%s %s/%s: \"%s\"\n",
+         attr->name, attr->spec, attr->text,
+	 attr->value ? attr->value : "(none)");
+}
+</PRE>
+
+<H3>See Also</H3>
+
+<A HREF="#ppdFindAttr"><CODE>ppdFindAttr()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ppdFindOption">ppdFindOption()</A></H2>
