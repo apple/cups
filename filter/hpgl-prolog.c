@@ -1,10 +1,10 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.3 1998/03/10 16:49:58 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.4 1998/03/17 21:43:10 mike Exp $"
  *
  *   PostScript prolog routines for the HPGL2PS program for espPrint, a
  *   collection of printer drivers.
  *
- *   Copyright 1993-1997 by Easy Software Products
+ *   Copyright 1993-1998 by Easy Software Products
  *
  *   These coded instructions, statements, and computer programs contain
  *   unpublished proprietary information of Easy Software Products, and
@@ -17,7 +17,10 @@
  * Revision History:
  *
  *   $Log: hpgl-prolog.c,v $
- *   Revision 1.3  1998/03/10 16:49:58  mike
+ *   Revision 1.4  1998/03/17 21:43:10  mike
+ *   Fixed grayscale mode - had red & blue reversed...
+ *
+ *   Revision 1.3  1998/03/10  16:49:58  mike
  *   Changed cftime call to strftime for portability.
  *   Added return values to OutputProlog and OutputTrailer.
  *
@@ -72,7 +75,7 @@ OutputProlog(int   shading,
         fputs("/setrgbcolor { pop pop pop } bind def\n", OutputFile);
         break;
     case 0 : /* Greyscale */
-        fputs("/setrgbcolor { 0.31 mul exch 0.61 mul add exch 0.08 mul add setgray } bind def\n",
+        fputs("/setrgbcolor { 0.08 mul exch 0.61 mul add exch 0.31 mul add setgray } bind def\n",
               OutputFile);
         break;
   };
@@ -120,5 +123,5 @@ OutputTrailer(void)
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.3 1998/03/10 16:49:58 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.4 1998/03/17 21:43:10 mike Exp $".
  */
