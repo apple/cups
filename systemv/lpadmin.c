@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.2 1999/05/20 14:19:38 mike Exp $"
+ * "$Id: lpadmin.c,v 1.3 1999/05/26 20:05:20 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -45,6 +45,9 @@
 #include <cups/language.h>
 #include <cups/debug.h>
 #include <config.h>
+#ifdef HAVE_LIBZ
+#  include <zlib.h>
+#endif /* HAVE_LIBZ */
 
 
 /*
@@ -777,7 +780,48 @@ set_printer_file(http_t *http,		/* I - Server connection */
 		*response;		/* IPP Response */
   cups_lang_t	*language;		/* Default language */
   char		uri[HTTP_MAX_URI];	/* URI for printer/class */
+#ifdef HAVE_LIBZ
+  char		tempfile[1024];		/* Temporary filename */
+  FILE		*fp;			/* Temporary file */
+  gzFile	*gz;			/* GZIP'd file */
+  char		buffer[8192];		/* Copy buffer */
+  int		bytes;			/* Bytes in buffer */
 
+
+ /*
+  * See if the file is gzip'd; if so, unzip it to a temporary file and
+  * send the uncompressed file.
+  */
+
+  if (strcmp(file + strlen(file) - 3, ".gz") == 0)
+  {
+   /*
+    * Yes, the file is compressed; uncompress to a temp file...
+    */
+
+    if ((fp = fopen(tmpnam(tempfile), "wb")) == NULL)
+    {
+      perror("lpadmin: Unable to create temporary file");
+      return;
+    }
+
+    if ((gz = gzopen(file, "rb")) == NULL)
+    {
+      perror("lpadmin: Unable to open file");
+      fclose(fp);
+      unlink(tempfile);
+      return;
+    }
+
+    while ((bytes = gzread(gz, buffer, sizeof(buffer))) > 0)
+      fwrite(buffer, bytes, 1, fp);
+
+    fclose(fp);
+    gzclose(gz);
+
+    file = tempfile;
+  }
+#endif /* HAVE_LIBZ */
 
  /*
   * Build a CUPS_ADD_PRINTER request, which requires the following
@@ -814,6 +858,15 @@ set_printer_file(http_t *http,		/* I - Server connection */
     fputs("lpadmin: Unable to set interface script or PPD file!\n", stderr);
   else
     ippDelete(response);
+
+#ifdef HAVE_LIBZ
+ /*
+  * Remove the temporary file as needed...
+  */
+
+  if (file == tempfile)
+    unlink(tempfile);
+#endif /* HAVE_LIBZ */
 }
 
 
@@ -938,5 +991,5 @@ set_printer_location(http_t *http,	/* I - Server connection */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.2 1999/05/20 14:19:38 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.3 1999/05/26 20:05:20 mike Exp $".
  */

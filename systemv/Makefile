@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.6 1999/05/19 18:01:00 mike Exp $"
+# "$Id: Makefile,v 1.7 1999/05/26 20:05:19 mike Exp $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -88,7 +88,7 @@ lp.o:	../cups/cups.h ../Makedefs
 #
 
 lpadmin:	lpadmin.o ../cups/libcups.a
-	$(CC) $(LDFLAGS) -o lpadmin lpadmin.o $(LIBS)
+	$(CC) $(LDFLAGS) -o lpadmin lpadmin.o $(IMGLIBS)
 
 lpadmin.o:	../cups/cups.h ../Makedefs
 
@@ -102,5 +102,5 @@ lpstat:	lpstat.o ../cups/libcups.a
 lpstat.o:	../cups/cups.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.6 1999/05/19 18:01:00 mike Exp $".
+# End of "$Id: Makefile,v 1.7 1999/05/26 20:05:19 mike Exp $".
 #
