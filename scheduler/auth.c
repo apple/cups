@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.13 1999/06/18 18:36:43 mike Exp $"
+ * "$Id: auth.c,v 1.14 1999/08/06 16:48:42 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -296,27 +296,42 @@ IsAuthorized(client_t *con)	/* I - Connection */
   address = ntohl(con->http.hostaddr.sin_addr.s_addr);
   hostlen = strlen(con->http.hostname);
 
-  switch (auth)
+  if (address == 0x7f000001 || strcasecmp(con->http.hostname, "localhost") == 0)
   {
-    case AUTH_ALLOW : /* Order Deny,Allow */
-        if (check_auth(address, con->http.hostname, hostlen,
-	               best->num_deny, best->deny))
-	  auth = AUTH_DENY;
+   /*
+    * Access from localhost (127.0.0.1) is always allowed...
+    */
 
-        if (check_auth(address, con->http.hostname, hostlen,
-	               best->num_allow, best->allow))
-	  auth = AUTH_ALLOW;
-	break;
+    auth = AUTH_ALLOW;
+  }
+  else
+  {
+   /*
+    * Do authorization checks on the domain/address...
+    */
 
-    case AUTH_DENY : /* Order Allow,Deny */
-        if (check_auth(address, con->http.hostname, hostlen,
-	               best->num_allow, best->allow))
-	  auth = AUTH_ALLOW;
+    switch (auth)
+    {
+      case AUTH_ALLOW : /* Order Deny,Allow */
+          if (check_auth(address, con->http.hostname, hostlen,
+	        	 best->num_deny, best->deny))
+	    auth = AUTH_DENY;
 
-        if (check_auth(address, con->http.hostname, hostlen,
-	               best->num_deny, best->deny))
-	  auth = AUTH_DENY;
-	break;
+          if (check_auth(address, con->http.hostname, hostlen,
+	        	 best->num_allow, best->allow))
+	    auth = AUTH_ALLOW;
+	  break;
+
+      case AUTH_DENY : /* Order Allow,Deny */
+          if (check_auth(address, con->http.hostname, hostlen,
+	        	 best->num_allow, best->allow))
+	    auth = AUTH_ALLOW;
+
+          if (check_auth(address, con->http.hostname, hostlen,
+	        	 best->num_deny, best->deny))
+	    auth = AUTH_DENY;
+	  break;
+    }
   }
 
   if (auth == AUTH_DENY)
@@ -428,6 +443,13 @@ IsAuthorized(client_t *con)	/* I - Connection */
   for (i = 0; grp->gr_mem[i] != NULL; i ++)
     if (strcmp(con->username, grp->gr_mem[i]) == 0)
       return (HTTP_OK);
+
+ /*
+  * Check to see if the default group ID matches for the user...
+  */
+
+  if (grp->gr_gid == pw->pw_gid)
+    return (HTTP_OK);
 
  /*
   * The user isn't part of the specified group, so deny access...
@@ -576,5 +598,5 @@ check_auth(unsigned   ip,	/* I - Client address */
 
 
 /*
- * End of "$Id: auth.c,v 1.13 1999/06/18 18:36:43 mike Exp $".
+ * End of "$Id: auth.c,v 1.14 1999/08/06 16:48:42 mike Exp $".
  */

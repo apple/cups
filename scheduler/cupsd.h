@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.11 1999/07/07 18:24:38 mike Exp $"
+ * "$Id: cupsd.h,v 1.12 1999/08/06 16:48:43 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -85,9 +85,32 @@
 					/* Default language encoding */
 #define DEFAULT_CHARSET		"iso-8859-1"
 					/* Default charset */
-#define DEFAULT_GROUP		"sys"	/* Default system group */
-#define DEFAULT_UID		9	/* Default user ID */
-#define DEFAULT_GID		0	/* Default group ID */
+
+#ifdef __sgi
+#  define DEFAULT_UID		9	/* Default user ID */
+#  define DEFAULT_GID		0	/* Default group ID */
+#  define DEFAULT_GROUP		"sys"	/* Default system group */
+#elif defined(__hpux)
+#  define DEFAULT_UID		9	/* Default user ID */
+#  define DEFAULT_GID		0	/* Default group ID */
+#  define DEFAULT_GROUP		"sys"	/* Default system group */
+#elif defined(__sun)
+#  define DEFAULT_UID		71	/* Default user ID */
+#  define DEFAULT_GID		0	/* Default group ID */
+#  define DEFAULT_GROUP		"sys"	/* Default system group */
+#elif defined(__linux)
+#  define DEFAULT_UID		4	/* Default user ID */
+#  define DEFAULT_GID		0	/* Default group ID */
+#  define DEFAULT_GROUP		"sys"	/* Default system group */
+#elif defined(__osf__)
+#  define DEFAULT_UID		8	/* Default user ID */
+#  define DEFAULT_GID		0	/* Default group ID */
+#  define DEFAULT_GROUP		"system"/* Default system group */
+#else
+#  define DEFAULT_UID		9	/* Default user ID */
+#  define DEFAULT_GID		0	/* Default group ID */
+#  define DEFAULT_GROUP		"sys"	/* Default system group */
+#endif /* __sgi */
 
 
 /*
@@ -134,5 +157,5 @@ VAR int			NeedReload	VALUE(TRUE);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.11 1999/07/07 18:24:38 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.12 1999/08/06 16:48:43 mike Exp $".
  */
