@@ -1,5 +1,5 @@
 /*
- * "$Id: image-zoom.c,v 1.1 1998/02/02 20:20:02 mike Exp $"
+ * "$Id: image-zoom.c,v 1.2 1998/02/19 20:44:58 mike Exp $"
  *
  *   Image zoom routines for espPrint, a collection of printer drivers.
  *
@@ -23,9 +23,11 @@
  * Revision History:
  *
  *   $Log: image-zoom.c,v $
- *   Revision 1.1  1998/02/02 20:20:02  mike
- *   Initial revision
+ *   Revision 1.2  1998/02/19 20:44:58  mike
+ *   Fixed scaling problems...
  *
+ *   Revision 1.1  1998/02/02  20:20:02  mike
+ *   Initial revision
  */
 
 /*
@@ -40,7 +42,7 @@
  */
 
 izoom_t *
-ImageZoomAlloc(image_t *ip,	/* I - Image to zoom */
+ImageZoomAlloc(image_t *img,	/* I - Image to zoom */
                int     x0,	/* I - Upper-lefthand corner */
                int     y0,	/* I - ... */
                int     x1,	/* I - Lower-righthand corner */
@@ -50,86 +52,90 @@ ImageZoomAlloc(image_t *ip,	/* I - Image to zoom */
                int     rotated)	/* I - Non-zero if image is rotated 90 degs */
 {
   izoom_t	*z;		/* New zoom record */
-  int		width,		/* Width of image sub-region */
-		height;		/* Height of ... */
 
 
   if ((z = (izoom_t *)calloc(1, sizeof(izoom_t))) == NULL)
     return (NULL);
 
-  if ((z->rows[0] = (unsigned char *)calloc(xsize, ip->pdepth * ip->ldepth)) == NULL)
+  z->img     = img;
+  z->row     = 0;
+  z->depth   = ImageGetDepth(img);
+  z->rotated = rotated;
+
+  if (rotated)
+  {
+    z->xorig   = x1;
+    z->yorig   = y0;
+    z->width   = y1 - y0 + 1;
+    z->height  = x1 - x0 + 1;
+    z->xsize   = ysize;
+    z->ysize   = xsize;
+    z->xmod    = z->width % z->xsize;
+    z->xstep   = z->width / z->xsize;
+    z->xincr   = 1;
+    z->ymod    = z->height % z->ysize;
+    z->ystep   = z->height / z->ysize;
+    z->yincr   = 1;
+    z->instep  = z->xstep * z->depth;
+    z->inincr  = z->xincr * z->depth;
+
+    if (z->width < img->ysize)
+      z->xmax = z->width;
+    else
+      z->xmax = z->width - 1;
+
+    if (z->height < img->xsize)
+      z->ymax = z->height;
+    else
+      z->ymax = z->height - 1;
+  }
+  else
+  {
+    z->xorig   = x0;
+    z->yorig   = y0;
+    z->width   = x1 - x0 + 1;
+    z->height  = y1 - y0 + 1;
+    z->xsize   = xsize;
+    z->ysize   = ysize;
+    z->xmod    = z->width % z->xsize;
+    z->xstep   = z->width / z->xsize;
+    z->xincr   = 1;
+    z->ymod    = z->height % z->ysize;
+    z->ystep   = z->height / z->ysize;
+    z->yincr   = 1;
+    z->instep  = z->xstep * z->depth;
+    z->inincr  = z->xincr * z->depth;
+
+    if (z->width < img->xsize)
+      z->xmax = z->width;
+    else
+      z->xmax = z->width - 1;
+
+    if (z->height < img->ysize)
+      z->ymax = z->height;
+    else
+      z->ymax = z->height - 1;
+  };
+
+  if ((z->rows[0] = (ib_t *)malloc(z->xsize * z->depth)) == NULL)
   {
     free(z);
     return (NULL);
   };
 
-  if ((z->rows[1] = (unsigned char *)calloc(xsize, ip->pdepth * ip->ldepth)) == NULL)
+  if ((z->rows[1] = (ib_t *)malloc(z->xsize * z->depth)) == NULL)
   {
     free(z->rows[0]);
     free(z);
     return (NULL);
   };
 
-  z->ip  = ip;
-  z->row = 0;
-
-  width  = x1 - x0 + 1;
-  height = y1 - y0 + 1;
-
-  if (rotated)
+  if ((z->in = (ib_t *)malloc(z->width * z->depth)) == NULL)
   {
-    z->top_pixel = ip->pixels + x1 * ip->pdepth +
-                   y0 * ip->width * ip->ldepth * ip->pdepth;
-
-    z->xmult = ip->width * ip->pdepth * ip->ldepth;
-    z->ymult = -ip->pdepth;
-
-    z->xsize = xsize;
-    z->ysize = ysize;
-
-    z->xmod  = height % xsize;
-    z->ymod  = width % ysize;
-    z->xstep = height / xsize;
-    z->ystep = width / ysize;
-    z->pstep = z->xmult * (height / xsize);
-
-    if (height < ip->height)
-      z->xmax = height;
-    else
-      z->xmax = height - 1;
-
-    if (width < ip->width)
-      z->ymax = width;
-    else
-      z->ymax = width - 1;
-  }
-  else
-  {
-    z->top_pixel = ip->pixels + x0 * ip->pdepth +
-                   y0 * ip->width * ip->ldepth * ip->pdepth;
-
-    z->xmult = ip->pdepth;
-    z->ymult = ip->width * ip->pdepth * ip->ldepth;
-    z->dmult = ip->width * ip->pdepth;
-
-    z->xsize = xsize;
-    z->ysize = ysize;
-
-    z->xmod  = width % xsize;
-    z->ymod  = height % ysize;
-    z->xstep = width / xsize;
-    z->ystep = height / ysize;
-    z->pstep = z->xmult * (width / xsize);
-
-    if (width < ip->width)
-      z->xmax = width;
-    else
-      z->xmax = width - 1;
-
-    if (height < ip->height)
-      z->ymax = height;
-    else
-      z->ymax = height - 1;
+    free(z->rows[0]);
+    free(z->rows[1]);
+    free(z);
+    return (NULL);
   };
 
   return (z);
@@ -143,14 +149,24 @@ ImageZoomAlloc(image_t *ip,	/* I - Image to zoom */
 
 void
 ImageZoomFill(izoom_t *z,	/* I - Zoom record to fill */
-              int  iy,		/* I - Zoom image row */
-              int  idepth)	/* I - Image depth (for planar images) */
+              int     iy,	/* I - Zoom image row */
+              ib_t    *luts)	/* I - Lookup tables */
 {
-  unsigned char	*r,	/* Row pointer */
-		*p;	/* Pixel pointer */
-  int		xerr0,	/* X error counter */
-		xerr1;	/* ... */
-  int		ix, x, ldepth, z_xmult, z_ldepth, z_xmax, z_xsize, z_pdepth;
+  ib_t	*r,			/* Row pointer */
+	*inptr;			/* Pixel pointer */
+  int	xerr0,			/* X error counter */
+	xerr1;			/* ... */
+  int	ix,
+	x,
+	count,
+	z_depth,
+	z_xstep,
+	z_xincr,
+	z_instep,
+	z_inincr,
+	z_xmax,
+	z_xmod,
+	z_xsize;
 
 
   if (iy > z->ymax)
@@ -158,64 +174,53 @@ ImageZoomFill(izoom_t *z,	/* I - Zoom record to fill */
 
   z->row ^= 1;
 
-  r = z->rows[z->row];
-
-  z_xmax   = z->xmax;
+  z_depth  = z->depth;
   z_xsize  = z->xsize;
-  z_xmult  = z->xmult;
-  z_ldepth = z->ip->ldepth;
-  z_pdepth = z->ip->pdepth;
+  z_xmax   = z->xmax;
+  z_xmod   = z->xmod;
+  z_xstep  = z->xstep;
+  z_xincr  = z->xincr;
+  z_instep = z->instep;
+  z_inincr = z->inincr;
 
-  for (ldepth = 0; ldepth < z_ldepth; ldepth ++)
+  if (z->rotated)
+    ImageGetCol(z->img, z->xorig - iy, z->yorig, z->width, z->in);
+  else
+    ImageGetRow(z->img, z->xorig, z->yorig + iy, z->width, z->in);
+
+  ImageLut(luts, z->in, z->width, z->img->colorspace);
+
+  if (z_inincr < 0)
+    inptr = z->in + (z->width - 1) * z_depth;
+  else
+    inptr = z->in;
+
+  for (x = z_xsize, xerr0 = z_xsize, xerr1 = 0, ix = 0, r = z->rows[z->row];
+       x > 0;
+       x --)
   {
-    p = z->top_pixel + iy * z->ymult +
-        ldepth * z->ip->width * z_pdepth +
-        idepth * z->ip->width * z->ip->height * z_pdepth * z_ldepth;
-
-    for (x = z_xsize, xerr0 = z_xsize, xerr1 = 0, ix = 0;
-         x > 0;
-         x --)
+    if (ix < z_xmax)
     {
-      if (ix < z_xmax)
-      {
-        r[0] = (p[0] * xerr0 + p[z_xmult] * xerr1) / z_xsize;
+      for (count = 0; count < z_depth; count ++)
+        *r++ = (inptr[count] * xerr0 + inptr[z_depth + count] * xerr1) / z_xsize;
+    }
+    else
+    {
+      for (count = 0; count < z_depth; count ++)
+        *r++ = inptr[count];
+    };
 
-        if (z_pdepth > 1)
-        {
-          r[1] = (p[1] * xerr0 + p[1 + z_xmult] * xerr1) / z_xsize;
-          r[2] = (p[2] * xerr0 + p[2 + z_xmult] * xerr1) / z_xsize;
-        };
+    ix    += z_xstep;
+    inptr += z_instep;
+    xerr0 -= z_xmod;
+    xerr1 += z_xmod;
 
-        if (z_pdepth > 3)
-          r[3] = (p[3] * xerr0 + p[3 + z_xmult] * xerr1) / z_xsize;
-      }
-      else
-      {
-        r[0] = p[0];
-
-        if (z_pdepth > 1)
-        {
-          r[1] = p[1];
-          r[2] = p[2];
-        };
-
-        if (z_pdepth > 3)
-          r[3] = p[3];
-      };
-
-      r     += z_pdepth;
-      ix    += z->xstep;
-      p     += z->pstep;
-      xerr0 -= z->xmod;
-      xerr1 += z->xmod;
-
-      if (xerr0 <= 0)
-      {
-        xerr0 += z_xsize;
-        xerr1 -= z_xsize;
-        ix ++;
-        p     += z_xmult;
-      };
+    if (xerr0 <= 0)
+    {
+      xerr0 += z_xsize;
+      xerr1 -= z_xsize;
+      ix    += z_xincr;
+      inptr += z_inincr;
     };
   };
 }
@@ -227,63 +232,67 @@ ImageZoomFill(izoom_t *z,	/* I - Zoom record to fill */
 
 void
 ImageZoomQFill(izoom_t *z,	/* I - Zoom record to fill */
-               int  iy,		/* I - Image row */
-               int  idepth)	/* I - Image depth (for planar images) */
+               int     iy,	/* I - Zoom image row */
+               ib_t    *luts)	/* I - Lookup tables */
 {
-  unsigned char	*r,		/* Row pointer */
-		*p;		/* Pixel pointer */
-  int		xerr0,		/* X error counter */
-		xerr1;		/* ... */
-  int		ix, x, ldepth, z_xmult, z_ldepth, z_xmax, z_xsize, z_pdepth;
+  ib_t	*r,			/* Row pointer */
+	*inptr;			/* Pixel pointer */
+  int	xerr0;			/* X error counter */
+  int	ix,
+	x,
+	count,
+	z_depth,
+	z_xstep,
+	z_xincr,
+	z_instep,
+	z_inincr,
+	z_xmax,
+	z_xmod,
+	z_xsize;
 
 
   if (iy > z->ymax)
     iy = z->ymax;
 
-  z->row = 0;
+  z->row ^= 1;
 
-  r = z->rows[z->row];
-
-  z_xmax   = z->xmax;
+  z_depth  = z->depth;
   z_xsize  = z->xsize;
-  z_xmult  = z->xmult;
-  z_ldepth = z->ip->ldepth;
-  z_pdepth = z->ip->pdepth;
+  z_xmax   = z->xmax;
+  z_xmod   = z->xmod;
+  z_xstep  = z->xstep;
+  z_xincr  = z->xincr;
+  z_instep = z->instep;
+  z_inincr = z->inincr;
 
-  for (ldepth = 0; ldepth < z_ldepth; ldepth ++)
+  if (z->rotated)
+    ImageGetCol(z->img, z->xorig - iy, z->yorig, z->width, z->in);
+  else
+    ImageGetRow(z->img, z->xorig, z->yorig + iy, z->width, z->in);
+
+  ImageLut(luts, z->in, z->width, z->img->colorspace);
+
+  if (z_inincr < 0)
+    inptr = z->in + (z->width - 1) * z_depth;
+  else
+    inptr = z->in;
+
+  for (x = z_xsize, xerr0 = z_xsize, ix = 0, r = z->rows[z->row];
+       x > 0;
+       x --)
   {
-    p = z->top_pixel + iy * z->ymult +
-        ldepth * z->ip->width * z_pdepth +
-        idepth * z->ip->width * z->ip->height * z_pdepth * z_ldepth;
+    for (count = 0; count < z_depth; count ++)
+      *r++ = inptr[count];
 
-    for (x = z_xsize, xerr0 = z_xsize, xerr1 = 0, ix = 0;
-         x > 0;
-         x --)
+    ix    += z_xstep;
+    inptr += z_instep;
+    xerr0 -= z_xmod;
+
+    if (xerr0 <= 0)
     {
-      r[0] = p[0];
-
-      if (z_pdepth > 1)
-      {
-        r[1] = p[1];
-        r[2] = p[2];
-      };
-
-      if (z_pdepth > 3)
-        r[3] = p[3];
-
-      r     += z_pdepth;
-      ix    += z->xstep;
-      p     += z->pstep;
-      xerr0 -= z->xmod;
-      xerr1 += z->xmod;
-
-      if (xerr0 <= 0)
-      {
-        xerr0 += z_xsize;
-        xerr1 -= z_xsize;
-        ix ++;
-        p     += z_xmult;
-      };
+      xerr0 += z_xsize;
+      ix    += z_xincr;
+      inptr += z_inincr;
     };
   };
 }
@@ -298,10 +307,11 @@ ImageZoomFree(izoom_t *z)	/* I - Zoom record to free */
 {
   free(z->rows[0]);
   free(z->rows[1]);
+  free(z->in);
   free(z);
 }
 
 
 /*
- * End of "$Id: image-zoom.c,v 1.1 1998/02/02 20:20:02 mike Exp $".
+ * End of "$Id: image-zoom.c,v 1.2 1998/02/19 20:44:58 mike Exp $".
  */
