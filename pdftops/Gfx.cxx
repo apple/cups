@@ -39,6 +39,11 @@
 // Max delta allowed in any color component for an axial shading fill.
 #define axialColorDelta (1 / 256.0)
 
+// Some systems don't define the constant for PI...
+#ifndef M_PI
+#  define M_PI		3.14159265358979323846
+#endif // !M_PI
+
 //------------------------------------------------------------------------
 // Operator table
 //------------------------------------------------------------------------
@@ -1621,9 +1626,8 @@ void Gfx::doAxialShFill(GfxAxialShading *shading) {
 }
 
 void Gfx::doRadialShFill(GfxRadialShading *shading) {
-  double xMin, yMin, xMax, yMax;
   double x0, y0, x1, y1, r0, r1;
-  double xx, yy, rr, cr, dr, dt;
+  double xx, yy, rr, dr, dt;
   double cx, cy, th;
   double t0, t1, tt;
   GfxColor color;
@@ -1646,7 +1650,6 @@ void Gfx::doRadialShFill(GfxRadialShading *shading) {
     // get the current center/color
     dt = (rr - r0) / (r1 - r0);
 
-    cr = rr * M_SQRT1_2;
     xx = x0 + (x1 - x0) * dt;
     yy = y0 + (y1 - y0) * dt;
     tt = t0 + (t1 - t0) * dt;
