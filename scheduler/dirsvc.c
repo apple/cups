@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.31 1999/06/24 12:56:05 mike Exp $"
+ * "$Id: dirsvc.c,v 1.32 1999/06/24 13:08:05 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -206,11 +206,15 @@ UpdateBrowseList(void)
     return;
   }
 
+  DEBUG_printf(("type=%x, state=%x, uri=\"%s\"\n", type, state, uri));
+
  /*
   * Pull the URI apart to see if this is a local or remote printer...
   */
 
   httpSeparate(uri, method, username, host, &port, resource);
+
+  DEBUG_printf(("host=\"%s\", ServerName=\"%s\"\n", host, ServerName));
 
   if (strcasecmp(host, ServerName) == 0)
     return;
@@ -516,5 +520,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.31 1999/06/24 12:56:05 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.32 1999/06/24 13:08:05 mike Exp $".
  */

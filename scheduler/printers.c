@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.24 1999/06/23 17:18:45 mike Exp $"
+ * "$Id: printers.c,v 1.25 1999/06/24 13:08:05 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -40,6 +40,7 @@
  * Include necessary headers...
  */
 
+#define DEBUG
 #include "cupsd.h"
 
 
@@ -953,6 +954,9 @@ SortPrinters(void)
       break;
     else if (strcasecmp(current->name, current->next->name) > 0)
     {
+      DEBUG_printf(("Swapping %s and %s...\n", current->name,
+                    current->next->name));
+
      /*
       * Need to swap these two printers...
       */
@@ -991,5 +995,5 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 
 
 /*
- * End of "$Id: printers.c,v 1.24 1999/06/23 17:18:45 mike Exp $".
+ * End of "$Id: printers.c,v 1.25 1999/06/24 13:08:05 mike Exp $".
  */
