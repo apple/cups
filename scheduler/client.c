@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.145 2003/03/07 19:24:53 mike Exp $"
+ * "$Id: client.c,v 1.146 2003/03/10 15:04:59 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2573,8 +2573,6 @@ pipe_command(client_t *con,		/* I - Client connection */
 		root[1024],		/* CUPS_SERVERROOT environment variable */
 		query_string[10240];	/* QUERY_STRING env variable */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  sigset_t	oldmask,		/* POSIX signal masks */
-		newmask;
   struct sigaction action;		/* POSIX signal handler */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
@@ -2748,15 +2746,7 @@ pipe_command(client_t *con,		/* I - Client connection */
   * Block signals before forking...
   */
 
-#ifdef HAVE_SIGSET
-  sighold(SIGTERM);
-#elif defined(HAVE_SIGACTION)
-  sigemptyset(&newmask);
-  sigaddset(&newmask, SIGTERM);
-  sigprocmask(SIG_BLOCK, &newmask, &oldmask);
-#endif /* HAVE_SIGSET */
-
-  IgnoreChildSignals();
+  HoldSignals();
 
  /*
   * Then execute the command...
@@ -2824,8 +2814,7 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 #ifdef HAVE_SIGSET
     sigset(SIGTERM, SIG_DFL);
-
-    sigrelse(SIGTERM);
+    sigset(SIGCHLD, SIG_DFL);
 #elif defined(HAVE_SIGACTION)
     memset(&action, 0, sizeof(action));
 
@@ -2833,11 +2822,13 @@ pipe_command(client_t *con,		/* I - Client connection */
     action.sa_handler = SIG_DFL;
 
     sigaction(SIGTERM, &action, NULL);
-
-    sigprocmask(SIG_SETMASK, &oldmask, NULL);
+    sigaction(SIGCHLD, &action, NULL);
 #else
     signal(SIGTERM, SIG_DFL);
+    signal(SIGCHLD, SIG_DFL);
 #endif /* HAVE_SIGSET */
+
+    ReleaseSignals();
 
    /*
     * Execute the pipe program; if an error occurs, exit with status 1...
@@ -2874,13 +2865,7 @@ pipe_command(client_t *con,		/* I - Client connection */
     close(fds[1]);
   }
 
-#ifdef HAVE_SIGSET
-  sigrelse(SIGTERM);
-#elif defined(HAVE_SIGACTION)
-  sigprocmask(SIG_SETMASK, &oldmask, NULL);
-#endif /* HAVE_SIGSET */
-
-  CatchChildSignals();
+  ReleaseSignals();
 
   return (pid);
 }
@@ -2935,5 +2920,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.145 2003/03/07 19:24:53 mike Exp $".
+ * End of "$Id: client.c,v 1.146 2003/03/10 15:04:59 mike Exp $".
  */
