@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.178 2002/12/18 19:18:18 mike Exp $"
+ * "$Id: ipp.c,v 1.179 2003/01/03 14:59:32 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -132,7 +132,7 @@ static int	validate_user(client_t *con, const char *owner, char *username,
  * 'ProcessIPPRequest()' - Process an incoming IPP request...
  */
 
-void
+int					/* O - 1 on success, 0 on failure */
 ProcessIPPRequest(client_t *con)	/* I - Client connection */
 {
   ipp_tag_t		group;		/* Current group tag */
@@ -436,15 +436,30 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 
   LogMessage(L_DEBUG, "ProcessIPPRequest: %d status_code=%x",
              con->http.fd, con->response->request.status.status_code);
-  SendHeader(con, HTTP_OK, "application/ipp");
+  if (SendHeader(con, HTTP_OK, "application/ipp"))
+  {
+    con->http.data_encoding = HTTP_ENCODE_LENGTH;
+    con->http.data_remaining = ippLength(con->response);
 
-  con->http.data_encoding = HTTP_ENCODE_LENGTH;
-  con->http.data_remaining = ippLength(con->response);
+    httpPrintf(HTTP(con), "Content-Length: %d\r\n\r\n",
+               con->http.data_remaining);
 
-  httpPrintf(HTTP(con), "Content-Length: %d\r\n\r\n",
-             con->http.data_remaining);
+    FD_SET(con->http.fd, &OutputSet);
 
-  FD_SET(con->http.fd, &OutputSet);
+   /*
+    * Tell the caller the response header was sent successfully...
+    */
+
+    return (1);
+  }
+  else
+  {
+   /*
+    * Tell the caller the response header could not be sent...
+    */
+
+    return (0);
+  }
 }
 
 
@@ -6020,5 +6035,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.178 2002/12/18 19:18:18 mike Exp $".
+ * End of "$Id: ipp.c,v 1.179 2003/01/03 14:59:32 mike Exp $".
  */

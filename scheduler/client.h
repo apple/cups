@@ -1,5 +1,5 @@
 /*
- * "$Id: client.h,v 1.20 2002/12/17 19:00:14 swdev Exp $"
+ * "$Id: client.h,v 1.21 2003/01/03 14:59:32 mike Exp $"
  *
  *   Client definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -87,7 +87,7 @@ extern void	CloseAllClients(void);
 extern void	CloseClient(client_t *con);
 extern int	EncryptClient(client_t *con);
 extern void	PauseListening(void);
-extern void	ProcessIPPRequest(client_t *con);
+extern int	ProcessIPPRequest(client_t *con);
 extern int	ReadClient(client_t *con);
 extern void	ResumeListening(void);
 extern int	SendCommand(client_t *con, char *command, char *options);
@@ -101,5 +101,5 @@ extern void	StopListening(void);
 extern int	WriteClient(client_t *con);
 
 /*
- * End of "$Id: client.h,v 1.20 2002/12/17 19:00:14 swdev Exp $".
+ * End of "$Id: client.h,v 1.21 2003/01/03 14:59:32 mike Exp $".
  */
