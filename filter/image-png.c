@@ -1,5 +1,5 @@
 /*
- * "$Id: image-png.c,v 1.9 2000/04/30 22:03:57 mike Exp $"
+ * "$Id: image-png.c,v 1.10 2000/05/04 17:05:41 mike Exp $"
  *
  *   PNG image routines for the Common UNIX Printing System (CUPS).
  *
@@ -49,13 +49,16 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
              int        hue,		/* I - Color hue (degrees) */
 	     const ib_t *lut)		/* I - Lookup table for gamma/brightness */
 {
-  int		y;		/* Looping var */
-  png_structp	pp;		/* PNG read pointer */
-  png_infop	info;		/* PNG info pointers */
-  int		bpp;		/* Bytes per pixel */
-  ib_t		*in,		/* Input pixels */
-		*out;		/* Output pixels */
-
+  int		y;			/* Looping var */
+  png_structp	pp;			/* PNG read pointer */
+  png_infop	info;			/* PNG info pointers */
+  int		bpp;			/* Bytes per pixel */
+  int		pass,			/* Current pass */
+		passes;			/* Number of passes required */
+  ib_t		*in,			/* Input pixels */
+		*inptr,			/* Pointer into pixels */
+		*out;			/* Output pixels */
+  png_color_16	bg;			/* Background color */
 
  /*
   * Setup the PNG data structures...
@@ -107,86 +110,126 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
   else if (info->bit_depth == 16)
     png_set_strip_16(pp);
 
-  if (info->color_type == PNG_COLOR_TYPE_GRAY ||
-      info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
-    in = malloc(img->xsize);
+  passes = png_set_interlace_handling(pp);
+
+ /*
+  * Handle transparency...
+  */
+
+  if (png_get_valid(pp, info, PNG_INFO_tRNS))
+    png_set_tRNS_to_alpha(pp);
+
+  bg.red   = 65535;
+  bg.green = 65535;
+  bg.blue  = 65535;
+
+  png_set_background(pp, &bg, PNG_BACKGROUND_GAMMA_SCREEN, 0, 1.0);
+
+  if (passes == 1)
+  {
+   /*
+    * Load one row at a time...
+    */
+
+    if (info->color_type == PNG_COLOR_TYPE_GRAY ||
+	info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+      in = malloc(img->xsize);
+    else
+      in = malloc(img->xsize * 3);
+  }
   else
-    in = malloc(img->xsize * 3);
+  {
+   /*
+    * Interlaced images must be loaded all at once...
+    */
+
+    if (info->color_type == PNG_COLOR_TYPE_GRAY ||
+	info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+      in = malloc(img->xsize * img->ysize);
+    else
+      in = malloc(img->xsize * img->ysize * 3);
+  }
 
   bpp = ImageGetDepth(img);
   out = malloc(img->xsize * bpp);
 
  /*
-  * This doesn't work for interlaced PNG files... :(
+  * Read the image, interlacing as needed...
   */
 
-  for (y = 0; y < img->ysize; y ++)
-  {
-    if (info->color_type == PNG_COLOR_TYPE_GRAY ||
-	 info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+  for (pass = 1; pass <= passes; pass ++)
+    for (inptr = in, y = 0; y < img->ysize; y ++)
     {
-      if (img->colorspace == IMAGE_WHITE)
-        png_read_row(pp, (png_bytep)out, NULL);
-      else
-      {
-	png_read_row(pp, (png_bytep)in, NULL);
+      png_read_row(pp, (png_bytep)inptr, NULL);
 
-	switch (img->colorspace)
+      if (pass == passes)
+      {
+       /*
+        * Output this row...
+	*/
+
+	if (info->color_type == PNG_COLOR_TYPE_GRAY ||
+	     info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
 	{
-	  case IMAGE_RGB :
-	      ImageWhiteToRGB(in, out, img->xsize);
-	      break;
-	  case IMAGE_BLACK :
-	      ImageWhiteToBlack(in, out, img->xsize);
-	      break;
-	  case IMAGE_CMY :
-	      ImageWhiteToCMY(in, out, img->xsize);
-	      break;
-	  case IMAGE_CMYK :
-	      ImageWhiteToCMYK(in, out, img->xsize);
-	      break;
+	  switch (img->colorspace)
+	  {
+	    case IMAGE_WHITE :
+		memcpy(out, inptr, img->xsize);
+		break;
+	    case IMAGE_RGB :
+		ImageWhiteToRGB(inptr, out, img->xsize);
+		break;
+	    case IMAGE_BLACK :
+		ImageWhiteToBlack(inptr, out, img->xsize);
+		break;
+	    case IMAGE_CMY :
+		ImageWhiteToCMY(inptr, out, img->xsize);
+		break;
+	    case IMAGE_CMYK :
+		ImageWhiteToCMYK(inptr, out, img->xsize);
+		break;
+	  }
 	}
+	else
+	{
+	  if ((saturation != 100 || hue != 0) && bpp > 1)
+	    ImageRGBAdjust(inptr, img->xsize, saturation, hue);
+
+	  switch (img->colorspace)
+	  {
+	    case IMAGE_WHITE :
+		ImageRGBToWhite(inptr, out, img->xsize);
+		break;
+	    case IMAGE_RGB :
+		memcpy(out, inptr, img->xsize * 3);
+		break;
+	    case IMAGE_BLACK :
+		ImageRGBToBlack(inptr, out, img->xsize);
+		break;
+	    case IMAGE_CMY :
+		ImageRGBToCMY(inptr, out, img->xsize);
+		break;
+	    case IMAGE_CMYK :
+		ImageRGBToCMYK(inptr, out, img->xsize);
+		break;
+	  }
+	}
+
+	if (lut)
+	  ImageLut(out, img->xsize * bpp, lut);
+
+	ImagePutRow(img, 0, y, img->xsize, out);
+      }
+
+      if (passes > 1)
+      {
+	if (info->color_type == PNG_COLOR_TYPE_GRAY ||
+		 info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+          inptr += img->xsize;
+	else
+          inptr += img->xsize * 3;
       }
     }
-    else
-    {
-      if (img->colorspace == IMAGE_RGB)
-      {
-        png_read_row(pp, (png_bytep)out, NULL);
-
-	if (saturation != 100 || hue != 0)
-	  ImageRGBAdjust(out, img->xsize, saturation, hue);
-      }
-      else
-      {
-	png_read_row(pp, (png_bytep)in, NULL);
-
-	if ((saturation != 100 || hue != 0) && bpp > 1)
-	  ImageRGBAdjust(in, img->xsize, saturation, hue);
-
-	switch (img->colorspace)
-	{
-	  case IMAGE_WHITE :
-	      ImageRGBToWhite(in, out, img->xsize);
-	      break;
-	  case IMAGE_BLACK :
-	      ImageRGBToBlack(in, out, img->xsize);
-	      break;
-	  case IMAGE_CMY :
-	      ImageRGBToCMY(in, out, img->xsize);
-	      break;
-	  case IMAGE_CMYK :
-	      ImageRGBToCMYK(in, out, img->xsize);
-	      break;
-	}
-      }
-    }
-
-    if (lut)
-      ImageLut(out, img->xsize * bpp, lut);
-
-    ImagePutRow(img, 0, y, img->xsize, out);
-  }
 
   png_read_end(pp, info);
   png_read_destroy(pp, info, NULL);
@@ -203,5 +246,5 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-png.c,v 1.9 2000/04/30 22:03:57 mike Exp $".
+ * End of "$Id: image-png.c,v 1.10 2000/05/04 17:05:41 mike Exp $".
  */
