@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.3 1998/07/28 17:42:01 mike Exp $"
+ * "$Id: texttops.c,v 1.4 1998/08/10 17:14:06 mike Exp $"
  *
  *   PostScript text output filter for espPrint, a collection of printer
  *   drivers.
@@ -17,7 +17,10 @@
  * Revision History:
  *
  *   $Log: texttops.c,v $
- *   Revision 1.3  1998/07/28 17:42:01  mike
+ *   Revision 1.4  1998/08/10 17:14:06  mike
+ *   Added wrap/nowrap option.
+ *
+ *   Revision 1.3  1998/07/28  17:42:01  mike
  *   Updated the page count at the end of the file - off by one...
  *
  *   Revision 1.2  1996/10/14  16:28:08  mike
@@ -74,7 +77,8 @@ typedef struct
  * Globals...
  */
 
-int	Verbosity = 0;
+int	Verbosity = 0,
+	WrapLines = 1;
 int	SizeLines = 60,
 	SizeColumns = 80,
 	PageColumns = 1;
@@ -102,7 +106,6 @@ Setup(FILE  *out,
   float	temp;
 
 
-/*  LinesPerInch = 72.0 / fontsize;*/
   CharsPerInch = 120.0 / fontsize;
 
   if (CharsPerInch > 12)
@@ -386,6 +389,7 @@ main(int  argc,    /* I - Number of command-line arguments */
   float			fontsize,
 			width,
 			length,
+			temp,
 			left,
 			right,
 			bottom,
@@ -444,14 +448,24 @@ main(int  argc,    /* I - Number of command-line arguments */
 
               width  = size->width * 72.0;
               length = size->length * 72.0;
-#if 0 /* Leave these alone for nicer margins */
-              left   = size->left_margin * 72.0;
-              right  = 72.0 * (size->width - size->left_margin -
-                               size->horizontal_addr / (float)info->horizontal_resolution);
-              bottom = 72.0 * (size->length - size->top_margin -
-                               size->vertical_addr / (float)info->vertical_resolution);
-              top    = size->top_margin * 72.0;
-#endif /* 0 */
+
+              temp = size->left_margin * 72.0;
+	      if (temp > left)
+	        left = temp;
+
+              temp = 72.0 * (size->width - size->left_margin -
+                             size->horizontal_addr / (float)info->horizontal_resolution);
+              if (temp > right)
+	        right = temp;
+
+              temp = 72.0 * (size->length - size->top_margin -
+                             size->vertical_addr / (float)info->vertical_resolution);
+              if (temp > bottom)
+	        bottom = temp;
+
+              temp = size->top_margin * 72.0;
+	      if (temp > top)
+	        top = temp;
               break;
 
           case 'O' : /* Output file */
@@ -468,6 +482,14 @@ main(int  argc,    /* I - Number of command-line arguments */
 
           case 'l' : /* Landscape output */
               landscape = TRUE;
+              break;
+
+          case 'w' : /* Line wrapping */
+              i ++;
+              if (i >= argc)
+                Usage();
+
+              WrapLines = atoi(argv[i]);
               break;
 
           case 'F' : /* Font name */
@@ -628,7 +650,7 @@ main(int  argc,    /* I - Number of command-line arguments */
       case 0x09 :		/* HT - tab to next 8th column */
           do
           {
-            if (column >= SizeColumns)
+            if (column >= SizeColumns && WrapLines)
             {			/* Wrap text to margins */
               OutputLine(out, page_column, line, buffer);
               line ++;
@@ -646,7 +668,9 @@ main(int  argc,    /* I - Number of command-line arguments */
               column = 0;
             };
 
-            buffer[column].ch = ' ';
+            if (column < SizeColumns)
+              buffer[column].ch = ' ';
+
             column ++;
           }
           while (column & 7);
@@ -679,13 +703,14 @@ main(int  argc,    /* I - Number of command-line arguments */
           memset(buffer, 0, sizeof(buffer));
           column = 0;
           break;
-      case 0x0d :		/* CR - ignored */
+      case 0x0d :		/* CR */
+          column = 0;
           break;
       default :			/* All others... */
           if (ch < ' ')
             break;		/* Ignore other control chars */
 
-          if (column >= SizeColumns)
+          if (column >= SizeColumns && WrapLines)
           {			/* Wrap text to margins */
             OutputLine(out, page_column, line, buffer);
             line ++;
@@ -703,12 +728,16 @@ main(int  argc,    /* I - Number of command-line arguments */
             column = 0;
           };
 
-          if (ch == buffer[column].ch)
-            buffer[column].attr |= ATTR_BOLD;
-          else if (buffer[column].ch == '_')
-            buffer[column].attr |= ATTR_UNDERLINE;
+          if (column < SizeColumns)
+	  {
+            if (ch == buffer[column].ch)
+              buffer[column].attr |= ATTR_BOLD;
+            else if (buffer[column].ch == '_')
+              buffer[column].attr |= ATTR_UNDERLINE;
 
-          buffer[column].ch = ch;
+            buffer[column].ch = ch;
+	  };
+
           column ++;
           break;          
     };
@@ -735,5 +764,5 @@ main(int  argc,    /* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: texttops.c,v 1.3 1998/07/28 17:42:01 mike Exp $".
+ * End of "$Id: texttops.c,v 1.4 1998/08/10 17:14:06 mike Exp $".
  */
