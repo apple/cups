@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.32 1999/04/30 15:38:14 mike Exp $"
+ * "$Id: http.c,v 1.33 1999/04/30 15:39:39 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -67,6 +67,7 @@
 #include <fcntl.h>
 
 #include "http.h"
+#include "ipp.h"
 #include "debug.h"
 
 #if !defined(WIN32) && !defined(__EMX__)
@@ -1359,5 +1360,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.32 1999/04/30 15:38:14 mike Exp $".
+ * End of "$Id: http.c,v 1.33 1999/04/30 15:39:39 mike Exp $".
  */
