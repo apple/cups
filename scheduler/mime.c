@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.1 2000/01/25 03:50:48 mike Exp $"
+ * "$Id: mime.c,v 1.2 2000/03/13 18:39:28 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -373,6 +373,8 @@ load_types(mime_t *mime,		/* I - MIME database */
     typeptr = mimeAddType(mime, super, type);
     mimeAddTypeRule(typeptr, lineptr);
   }
+
+  fclose(fp);
 }
 
 
@@ -514,6 +516,8 @@ load_convs(mime_t *mime,		/* I - MIME database */
           (type[0] == '*' || strcmp((*temptype)->type, type) == 0))
 	mimeAddFilter(mime, *temptype, dsttype, cost, filter);
   }
+
+  fclose(fp);
 }
 
 
@@ -545,5 +549,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.1 2000/01/25 03:50:48 mike Exp $".
+ * End of "$Id: mime.c,v 1.2 2000/03/13 18:39:28 mike Exp $".
  */
