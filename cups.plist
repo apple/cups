@@ -1,0 +1,11 @@
+{
+  Description     = "CUPS Printing";
+  Provides        = ("CUPS");
+  Requires        = ("Resolver");
+  OrderPreference = "None";
+  Messages =
+  {
+    start = "Starting CUPS";
+    stop  = "Stopping CUPS";
+  };
+}

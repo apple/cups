@@ -1,0 +1,114 @@
+.\"
+.\" "$Id: cupsaddsmb.man,v 1.2 2001/11/09 17:19:41 mike Exp $"
+.\"
+.\"   cupsaddsmb man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2001 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH cupsaddsmb 8 "Common UNIX Printing System" "9 November 2001" "Easy Software Products"
+.SH NAME
+cupsaddsmb \- export printers to samba for windows clients
+.SH SYNOPSIS
+.B cupsaddsmb
+[ -a ] [ -U
+.I user
+] [ -v ]
+.br
+.B cupsaddsmb
+[ -u
+.I user
+] [ -v ] [ printer1 ... printerN ]
+.SH DESCRIPTION
+\fIcupsaddsmb\fR exports printers to the SAMBA software (version
+2.2.0 or higher) for use with Windows clients. Depending on the
+SAMBA configuration, you may need to provide a password to
+export the printers. This program requires the Adobe PostScript
+printer driver files described below.
+.LP
+The \fI-a\fR option exports all known printers. Otherwise, only
+the named printers are exported.
+.LP
+The \fI-U\fR option specifies the print admin username which defaults
+to your current username.
+.LP
+The \fI-v\fR option specifies that verbose information should be
+shown and is useful for debugging SAMBA configuration problems.
+.SH SAMBA CONFIGURATION
+\fIcupsaddsmb\fR uses the new RPC-based printing support in
+SAMBA 2.2.x to provide printer drivers and PPD files to Windows
+client machines. In order to use this functionality, you must
+first configure SAMBA (via the smb.conf file) to support
+printing through CUPS and provide a printer driver download
+share, as follows:
+.nf
+
+    [global]
+	load printers = yes
+	printing = cups
+	printcap name = cups
+
+    [printers]
+	comment = All Printers
+	path = /var/spool/samba
+	browseable = no
+	public = yes
+	guest ok = yes
+	writable = no
+	printable = yes
+	printer admin = root
+
+    [print$]
+	comment = Printer Drivers
+	path = /etc/samba/drivers
+	browseable = yes
+	guest ok = no
+	read only = yes
+	write list = root
+.fi
+.LP
+This configuration assumes a FHS-compliant installation of
+SAMBA; adjust the [printers] and [print$] share paths
+accordingly on your system as needed.
+.SH ADOBE POSTSCRIPT DRIVERS FOR WINDOWS
+\fIcupsaddsmb\fR uses the Adobe PostScript printer drivers for
+Windows, which are available for download from the Adobe web
+site (http://www.adobe.com). Once you have extracted the driver
+files, create a "drivers" directory in the CUPS data directory
+(usually /usr/share/cups) and copy the Adobe files using
+UPPERCASE filenames, as follows:
+.nf
+
+    ADFONTS.MFM
+    ADOBEPS4.DRV
+    ADOBEPS4.HLP
+    ADOBEPS5.DLL
+    ADOBEPSU.DLL
+    ADOBEPSU.HLP
+    DEFPRTR2.PPD
+    ICONLIB.DLL
+    PSMON.DLL
+.fi
+.SH SEE ALSO
+CUPS Software Administrators Manual,
+http://localhost:631/documentation.html
+.SH COPYRIGHT
+Copyright 1993-2001 by Easy Software Products, All Rights Reserved.
+.\"
+.\" End of "$Id: cupsaddsmb.man,v 1.2 2001/11/09 17:19:41 mike Exp $".
+.\"

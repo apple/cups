@@ -1,0 +1,155 @@
+*PPD-Adobe: "4.3"
+*%
+*% "$Id: dymo.ppd,v 1.4 2001/07/18 18:18:30 mike Exp $"
+*%
+*%   Sample DYMO label printer driver PPD file for the Common UNIX Printing
+*%   System (CUPS).
+*%
+*%   Copyright 2001 by Easy Software Products.
+*%
+*%   These coded instructions, statements, and computer programs are the
+*%   property of Easy Software Products and are protected by Federal
+*%   copyright law.  Distribution and use rights are outlined in the file
+*%   "LICENSE.txt" which should have been included with this file.  If this
+*%   file is missing or damaged please contact Easy Software Products
+*%   at:
+*%
+*%       Attn: CUPS Licensing Information
+*%       Easy Software Products
+*%       44141 Airport View Drive, Suite 204
+*%       Hollywood, Maryland 20636-3111 USA
+*%
+*%       Voice: (301) 373-9603
+*%       EMail: cups-info@cups.org
+*%         WWW: http://www.cups.org
+*%
+*FormatVersion:	"4.3"
+*FileVersion:	"1.1"
+*LanguageVersion: English 
+*LanguageEncoding: ISOLatin1
+*PCFileName:	"DYMO.PPD"
+*Manufacturer:	"ESP"
+*Product:	"(CUPS v1.1)"
+*cupsVersion:	1.1
+*cupsManualCopies: False
+*cupsFilter:	"application/vnd.cups-raster 0 rastertodymo"
+*cupsModelNumber: 0
+*ModelName:     "DYMO Label Printer"
+*ShortNickName: "DYMO Label Printer"
+*NickName:      "DYMO Label Printer CUPS v1.1"
+*PSVersion:	"(3010.000) 550"
+*LanguageLevel:	"3"
+*ColorDevice:	False
+*DefaultColorSpace: Gray
+*FileSystem:	False
+*Throughput:	"8"
+*LandscapeOrientation: Plus90
+*VariablePaperSize: False
+*TTRasterizer:	Type42
+
+*OpenUI *PageSize/Media Size: PickOne
+*OrderDependency: 10 AnySetup *PageSize
+*DefaultPageSize: w81h252
+*PageSize w81h252/Address - 1 1/8 x 3 1/2":			"<</PageSize[81 252]/ImagingBBox null>>setpagedevice"
+*PageSize w101h252/Large Address - 1 4/10 x 3 1/2":		"<</PageSize[101 252]/ImagingBBox null>>setpagedevice"
+*PageSize w54h144/Return Address - 3/4 x 2":			"<</PageSize[54 144]/ImagingBBox null>>setpagedevice"
+*PageSize w167h288/Shipping Address - 2 5/16 x 4":		"<</PageSize[167 288]/ImagingBBox null>>setpagedevice"
+*PageSize w162h540/Internet Postage 2-Part - 2 1/4 x 7 1/2":	"<</PageSize[162 540]/ImagingBBox null>>setpagedevice"
+*PageSize w162h504/Internet Postage 3-Part - 2 1/4 x 7":	"<</PageSize[162 504]/ImagingBBox null>>setpagedevice"
+*PageSize w41h248/File Folder - 9/16 x 3 7/16":			"<</PageSize[41 248]/ImagingBBox null>>setpagedevice"
+*PageSize w41h144/Hanging Folder - 9/16 x 2":			"<</PageSize[41 144]/ImagingBBox null>>setpagedevice"
+*PageSize w153h198/3.5" Disk - 2 1/8 x 2 3/4":			"<</PageSize[153 198]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageSize
+
+*OpenUI *PageRegion: PickOne
+*OrderDependency: 10 AnySetup *PageRegion
+*DefaultPageRegion: w81h252
+*PageRegion w81h252/Address - 1 1/8 x 3 1/2":			"<</PageSize[81 252]/ImagingBBox null>>setpagedevice"
+*PageRegion w101h252/Large Address - 1 4/10 x 3 1/2":		"<</PageSize[101 252]/ImagingBBox null>>setpagedevice"
+*PageRegion w54h144/Return Address - 3/4 x 2":			"<</PageSize[54 144]/ImagingBBox null>>setpagedevice"
+*PageRegion w167h288/Shipping Address - 2 5/16 x 4":		"<</PageSize[167 288]/ImagingBBox null>>setpagedevice"
+*PageRegion w162h540/Internet Postage 2-Part - 2 1/4 x 7 1/2":	"<</PageSize[162 540]/ImagingBBox null>>setpagedevice"
+*PageRegion w162h504/Internet Postage 3-Part - 2 1/4 x 7":	"<</PageSize[162 504]/ImagingBBox null>>setpagedevice"
+*PageRegion w41h248/File Folder - 9/16 x 3 7/16":		"<</PageSize[41 248]/ImagingBBox null>>setpagedevice"
+*PageRegion w41h144/Hanging Folder - 9/16 x 2":			"<</PageSize[41 144]/ImagingBBox null>>setpagedevice"
+*PageRegion w153h198/3.5" Disk - 2 1/8 x 2 3/4":		"<</PageSize[153 198]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageRegion
+
+*DefaultImageableArea: w81h252
+*ImageableArea w81h252/Address - 1 1/8 x 3 1/2":			"2 14.9 79 237.1"
+*ImageableArea w101h252/Large Address - 1 4/10 x 3 1/2":		"2 14.9 99 237.1"
+*ImageableArea w54h144/Return Address - 3/4 x 2":			"2 14.9 52 129.1"
+*ImageableArea w167h288/Shipping Address - 2 5/16 x 4":			"2 14.9 165 273.1"
+*ImageableArea w162h540/Internet Postage 2-Part - 2 1/4 x 7 1/2":	"2 14.9 160 525.1"
+*ImageableArea w162h504/Internet Postage 3-Part - 2 1/4 x 7":		"2 14.9 160 489.1"
+*ImageableArea w41h248/File Folder - 9/16 x 3 7/16":			"2 14.9 39 233.1"
+*ImageableArea w41h144/Hanging Folder - 9/16 x 2":			"2 14.9 39 129.1"
+*ImageableArea w153h198/3.5" Disk - 2 1/8 x 2 3/4":			"2 14.9 151 183.1"
+
+*DefaultPaperDimension: w81h252
+*PaperDimension w81h252/Address - 1 1/8 x 3 1/2":			"81 252"
+*PaperDimension w101h252/Large Address - 1 4/10 x 3 1/2":		"101 252"
+*PaperDimension w54h144/Return Address - 3/4 x 2":			"54 144"
+*PaperDimension w167h288/Shipping Address - 2 5/16 x 4":		"167 288"
+*PaperDimension w162h540/Internet Postage 2-Part - 2 1/4 x 7 1/2":	"162 540"
+*PaperDimension w162h504/Internet Postage 3-Part - 2 1/4 x 7":		"162 504"
+*PaperDimension w41h248/File Folder - 9/16 x 3 7/16":			"41 248"
+*PaperDimension w41h144/Hanging Folder - 9/16 x 2":			"41 144"
+*PaperDimension w153h198/3.5" Disk - 2 1/8 x 2 3/4":			"153 198"
+
+*OpenUI *Resolution/Output Resolution: PickOne
+*OrderDependency: 20 AnySetup *Resolution
+*DefaultResolution: 300dpi
+*Resolution 136dpi/136 DPI: "<</HWResolution[136 136]>>setpagedevice"
+*Resolution 203dpi/203 DPI: "<</HWResolution[203 203]>>setpagedevice"
+*Resolution 300dpi/300 DPI: "<</HWResolution[300 300]>>setpagedevice"
+*CloseUI: *Resolution
+
+*OpenUI *Darkness/Output Darkness: PickOne
+*OrderDependency: 20 AnySetup *Darkness
+*DefaultDarkness: Normal
+*Darkness Light: "<</cupsCompression 0>>setpagedevice"
+*Darkness Medium: "<</cupsCompression 1>>setpagedevice"
+*Darkness Normal: "<</cupsCompression 2>>setpagedevice"
+*Darkness Dark: "<</cupsCompression 3>>setpagedevice"
+*CloseUI: *Darkness
+
+*DefaultFont: Courier
+*Font AvantGarde-Book: Standard "(001.006S)" Standard ROM
+*Font AvantGarde-BookOblique: Standard "(001.006S)" Standard ROM
+*Font AvantGarde-Demi: Standard "(001.007S)" Standard ROM
+*Font AvantGarde-DemiOblique: Standard "(001.007S)" Standard ROM
+*Font Bookman-Demi: Standard "(001.004S)" Standard ROM
+*Font Bookman-DemiItalic: Standard "(001.004S)" Standard ROM
+*Font Bookman-Light: Standard "(001.004S)" Standard ROM
+*Font Bookman-LightItalic: Standard "(001.004S)" Standard ROM
+*Font Courier: Standard "(002.004S)" Standard ROM
+*Font Courier-Bold: Standard "(002.004S)" Standard ROM
+*Font Courier-BoldOblique: Standard "(002.004S)" Standard ROM
+*Font Courier-Oblique: Standard "(002.004S)" Standard ROM
+*Font Helvetica: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Bold: Standard "(001.007S)" Standard ROM
+*Font Helvetica-BoldOblique: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Narrow-Bold: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow-BoldOblique: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow-Oblique: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Oblique: Standard "(001.006S)" Standard ROM
+*Font NewCenturySchlbk-Bold: Standard "(001.009S)" Standard ROM
+*Font NewCenturySchlbk-BoldItalic: Standard "(001.007S)" Standard ROM
+*Font NewCenturySchlbk-Italic: Standard "(001.006S)" Standard ROM
+*Font NewCenturySchlbk-Roman: Standard "(001.007S)" Standard ROM
+*Font Palatino-Bold: Standard "(001.005S)" Standard ROM
+*Font Palatino-BoldItalic: Standard "(001.005S)" Standard ROM
+*Font Palatino-Italic: Standard "(001.005S)" Standard ROM
+*Font Palatino-Roman: Standard "(001.005S)" Standard ROM
+*Font Symbol: Special "(001.007S)" Special ROM
+*Font Times-Bold: Standard "(001.007S)" Standard ROM
+*Font Times-BoldItalic: Standard "(001.009S)" Standard ROM
+*Font Times-Italic: Standard "(001.007S)" Standard ROM
+*Font Times-Roman: Standard "(001.007S)" Standard ROM
+*Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
+*Font ZapfDingbats: Special "(001.004S)" Standard ROM
+*%
+*% End of "$Id: dymo.ppd,v 1.4 2001/07/18 18:18:30 mike Exp $".
+*%

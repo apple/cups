@@ -1,0 +1,95 @@
+.\"
+.\" "$Id: cups-config.man,v 1.1 2001/10/26 03:16:48 mike Exp $"
+.\"
+.\"   cups-config man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2001 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH cups-config 3 "Common UNIX Printing System" "25 October 2001" "Easy Software Products"
+.SH NAME
+cups-config \- get cups api, compiler, directory, and link information.
+.SH SYNOPSIS
+.B cups-config
+--api-version
+.br
+.B cups-config
+--cflags
+.br
+.B cups-config
+--datadir
+.br
+.B cups-config
+--help
+.br
+.B cups-config
+--ldflags
+.br
+.B cups-config
+[
+.I --image
+] [
+.I --static
+] --libs
+.br
+.B cups-config
+--serverbin
+.br
+.B cups-config
+--serverroot
+.br
+.B cups-config
+--version
+.br
+.SH DESCRIPTION
+\fBcups-config\fR is the CUPS program configuration utility. It should be
+used by application developers to determine the necessary command-line
+options for the compiler and linker, as well as determining installation
+directories for filters, configuration files, and drivers.
+.LP
+The \fI--api-version\fR command displays the current API version (major.minor).
+.LP
+The \fI--cflags\fR command displays the necessary compiler options.
+.LP
+The \fI--datadir\fR command displays the default CUPS data directory.
+.LP
+The \fI--help\fR command displays the program usage message.
+.LP
+The \fI--ldflags\fR command displays the necessary linker options.
+.LP
+The \fI--libs\fR command displays the necessary librarys to link to.
+The \fI--image\fR option adds the CUPS imaging library to the list.
+The \fI--static\fR option shows the static libraries instead of the
+default (shared) libraries.
+.LP
+The \fI--serverbin\fR command displays the default CUPS binary directory,
+where filters and backends are stored.
+.LP
+The \fI--serverroot\fR command displays the default CUPS configuration
+file directory.
+.LP
+The \fI--version\fR command displays the full version number of the
+CUPS installation (major.minor.patch).
+.SH SEE ALSO
+CUPS Software Programmers Manual,
+http://localhost:631/documentation.html
+.SH COPYRIGHT
+Copyright 1993-2001 by Easy Software Products, All Rights Reserved.
+.\"
+.\" End of "$Id: cups-config.man,v 1.1 2001/10/26 03:16:48 mike Exp $".
+.\"
