@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.124 2002/10/16 00:59:05 mike Exp $"
+ * "$Id: client.c,v 1.125 2002/10/16 02:34:00 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -542,6 +542,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
         switch (sscanf(line, "%63s%1023s%63s", operation, con->uri, version))
 	{
 	  case 1 :
+	      LogMessage(L_ERROR, "Bad request line \"%s\"!", line);
 	      SendError(con, HTTP_BAD_REQUEST);
 	      ShutdownClient(con);
 	      return (0);
@@ -551,6 +552,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  case 3 :
 	      if (sscanf(version, "HTTP/%d.%d", &major, &minor) != 2)
 	      {
+		LogMessage(L_ERROR, "Bad request line \"%s\"!", line);
 		SendError(con, HTTP_BAD_REQUEST);
 		ShutdownClient(con);
 		return (0);
@@ -593,6 +595,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  con->http.state = HTTP_HEAD;
 	else
 	{
+	  LogMessage(L_ERROR, "Bad operation \"%s\"!", operation);
 	  SendError(con, HTTP_BAD_REQUEST);
 	  ShutdownClient(con);
 	  return (0);
@@ -2609,5 +2612,5 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.124 2002/10/16 00:59:05 mike Exp $".
+ * End of "$Id: client.c,v 1.125 2002/10/16 02:34:00 mike Exp $".
  */
