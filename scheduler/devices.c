@@ -1,5 +1,5 @@
 /*
- * "$Id: devices.c,v 1.1 2000/01/30 13:11:08 mike Exp $"
+ * "$Id: devices.c,v 1.2 2000/02/10 00:57:54 mike Exp $"
  *
  *   Device scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -71,6 +71,15 @@ LoadDevices(const char *d)	/* I - Directory to scan */
 
   Devices = ippNew();
 
+  ippAddString(Devices, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+               "device-class", NULL, "file");
+  ippAddString(Devices, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+               "device-info", NULL, "Disk File");
+  ippAddString(Devices, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+               "device-make-and-model", NULL, "Unknown");
+  ippAddString(Devices, IPP_TAG_PRINTER, IPP_TAG_URI,
+               "device-uri", NULL, "file");
+
   if ((dir = opendir(d)) == NULL)
   {
     LogMessage(L_ERROR, "LoadDevices: Unable to open backend directory \"%s\": %s",
@@ -119,6 +128,7 @@ LoadDevices(const char *d)	/* I - Directory to scan */
 	  * Add strings to attributes...
 	  */
 
+          ippAddSeparator(Devices);
           ippAddString(Devices, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                        "device-class", NULL, dclass);
           ippAddString(Devices, IPP_TAG_PRINTER, IPP_TAG_TEXT,
@@ -127,7 +137,6 @@ LoadDevices(const char *d)	/* I - Directory to scan */
                        "device-make-and-model", NULL, make_model);
           ippAddString(Devices, IPP_TAG_PRINTER, IPP_TAG_URI,
                        "device-uri", NULL, uri);
-          ippAddSeparator(Devices);
 
           LogMessage(L_DEBUG, "LoadDevices: Adding device \"%s\"...", uri);
 	}
@@ -145,5 +154,5 @@ LoadDevices(const char *d)	/* I - Directory to scan */
 
 
 /*
- * End of "$Id: devices.c,v 1.1 2000/01/30 13:11:08 mike Exp $".
+ * End of "$Id: devices.c,v 1.2 2000/02/10 00:57:54 mike Exp $".
  */

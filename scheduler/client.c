@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.50 2000/02/08 20:38:59 mike Exp $"
+ * "$Id: client.c,v 1.51 2000/02/10 00:57:54 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1240,6 +1240,9 @@ WriteClient(client_t *con)		/* I - Client connection */
       con->pipe_pid = 0;
     }
 
+    if (con->filename[0])
+      unlink(con->filename);
+
     if (con->request != NULL)
     {
       ippDelete(con->request);
@@ -1675,5 +1678,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.50 2000/02/08 20:38:59 mike Exp $".
+ * End of "$Id: client.c,v 1.51 2000/02/10 00:57:54 mike Exp $".
  */

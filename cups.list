@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.44 2000/02/08 20:38:40 mike Exp $"
+# "$Id: cups.list,v 1.45 2000/02/10 00:57:51 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -230,6 +230,7 @@ f 0444 root sys /usr/share/cups/templates/admin.tmpl templates/admin.tmpl
 f 0444 root sys /usr/share/cups/templates/choose-device.tmpl templates/choose-device.tmpl
 f 0444 root sys /usr/share/cups/templates/choose-make.tmpl templates/choose-make.tmpl
 f 0444 root sys /usr/share/cups/templates/choose-model.tmpl templates/choose-model.tmpl
+f 0444 root sys /usr/share/cups/templates/choose-serial.tmpl templates/choose-serial.tmpl
 f 0444 root sys /usr/share/cups/templates/choose-uri.tmpl templates/choose-uri.tmpl
 f 0444 root sys /usr/share/cups/templates/classes.tmpl templates/classes.tmpl
 f 0444 root sys /usr/share/cups/templates/error.tmpl templates/error.tmpl
@@ -317,6 +318,7 @@ f 0444 root sys /usr/share/doc/cups/images/printer-processing.gif doc/images/pri
 f 0444 root sys /usr/share/doc/cups/images/printer-stopped.gif doc/images/printer-stopped.gif
 f 0444 root sys /usr/share/doc/cups/images/reject-jobs.gif doc/images/reject-jobs.gif
 f 0444 root sys /usr/share/doc/cups/images/release-job.gif doc/images/release-job.gif
+f 0444 root sys /usr/share/doc/cups/images/restart-job.gif doc/images/restart-job.gif
 f 0444 root sys /usr/share/doc/cups/images/right.gif doc/images/right.gif
 f 0444 root sys /usr/share/doc/cups/images/show-active.gif doc/images/show-active.gif
 f 0444 root sys /usr/share/doc/cups/images/show-completed.gif doc/images/show-completed.gif
@@ -392,5 +394,5 @@ f 0444 root sys /usr/man/man5/printers.conf.5 man/printers.conf.5
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.44 2000/02/08 20:38:40 mike Exp $".
+# End of "$Id: cups.list,v 1.45 2000/02/10 00:57:51 mike Exp $".
 #

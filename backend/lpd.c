@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.16 2000/02/02 00:50:41 mike Exp $"
+ * "$Id: lpd.c,v 1.17 2000/02/10 00:57:52 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -85,7 +85,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
   if (argc == 1)
   {
-    puts("network lpd \"\" \"LPD/LPR Host or Printer\"");
+    puts("network lpd \"Unknown\" \"LPD/LPR Host or Printer\"");
     return (0);
   }
   else if (argc < 6 || argc > 7)
@@ -410,5 +410,5 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
 
 /*
- * End of "$Id: lpd.c,v 1.16 2000/02/02 00:50:41 mike Exp $".
+ * End of "$Id: lpd.c,v 1.17 2000/02/10 00:57:52 mike Exp $".
  */

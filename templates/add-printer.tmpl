@@ -1,62 +1,33 @@
-<HTML>
-<HEAD>
-	<TITLE>Printers on {server_name} - {cups_version}</TITLE>
-	<LINK REL=STYLESHEET TYPE="text/css" HREF="/cups.css">
-	<MAP NAME="navbar">
-		<AREA SHAPE="RECT" COORDS="10,10,85,30" HREF="/printers" ALT="Current Printer Status">
-		<AREA SHAPE="RECT" COORDS="95,10,175,30" HREF="/classes" ALT="Current Printer Classes Status">
-		<AREA SHAPE="RECT" COORDS="185,10,235,30" HREF="/jobs" ALT="Current Jobs Status">
-		<AREA SHAPE="RECT" COORDS="245,10,395,30" HREF="/documentation.html" ALT="Read CUPS Documentation On-Line">
-		<AREA SHAPE="RECT" COORDS="405,10,490,30" HREF="http://www.cups.org" ALT="Download the Current CUPS Software">
-	</MAP>
-	<STYLE>
-BODY { background-color: #cccc99 }
-H1 { font-family: sans-serif; }
-H2 { font-family: sans-serif; }
-TH { background-color: #999966 }
-	</STYLE>
-</HEAD>
-<BODY>
-<P>
-<A HREF="http://www.easysw.com" ALT="Easy Software Products Home Page">
-<IMG SRC="../images/logo.gif" WIDTH="71" HEIGHT="40" BORDER=0 ALT="Easy Software Products Home Page"></A>
-<IMG SRC="../images/navbar.gif" WIDTH="540" HEIGHT="40" USEMAP="#navbar" BORDER=0>
-
-<H1>Printers on {server_name}</H1>
-
-<TABLE BORDER="1">
-<TR>
-	<TH>Name</TH>
-	<TH>Information</TH>
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
+<TR BGCOLOR="#999966">
+	<TH WIDTH="16"><IMG SRC="/images/left.gif"></TH>
+	<TH COLSPAN="2">Add New Printer</TH>
+	<TH BGCOLOR="#cccc99" WIDTH="16"><IMG SRC="/images/right.gif"></TH>
 </TR>
 <TR>
-	<TD COLSPAN="2"><IMG SRC="images/add-printer.gif"></TD>
+	<TD HEIGHT="4"></TD>
 </TR>
-{[printer_name]
 <TR>
-	<TD VALIGN=TOP><A HREF="{printer_uri}">
-	<IMG SRC="../images/printer-idle.gif" BORDER="0"><BR>{printer_name}</A></TD>
-	<TD VALIGN=TOP>Make and Model: {printer_make_and_model}<BR>
-	Location: {printer_location}<BR>
-	Printer State: {printer_idle},
-	{printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}.
-	<P>
-	<IMG SRC="../images/print-test-page.gif">
-	<IMG SRC="../images/modify-printer.gif">
-	<IMG SRC="../images/start-printer.gif">
-	<IMG SRC="../images/stop-printer.gif">
-	<IMG SRC="../images/accept-jobs.gif">
-	<IMG SRC="../images/reject-jobs.gif">
-	<IMG SRC="../images/delete-printer.gif">
-	</TD>
+	<TD></TD>
+	<TD ALIGN="RIGHT">Name:</TD>
+	<TD><INPUT TYPE="TEXT" NAME="PRINTER_NAME" SIZE="40" MAXLENGTH="127"></TD>
 </TR>
-}
+<TR>
+	<TD></TD>
+	<TD ALIGN="RIGHT">Location:</TD>
+	<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" SIZE="40" MAXLENGTH="127"></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD ALIGN="RIGHT">Description:</TD>
+	<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" SIZE="40" MAXLENGTH="127"></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD><INPUT TYPE="IMAGE" SRC="/images/continue.gif" ALT="Continue" BORDER="0"></TD>
+</TR>
 </TABLE>
-</CENTER>
-<HR>
-<P>The Common UNIX Printing System, CUPS, and the CUPS logo are the
-trademark property of <A HREF="http://www.easysw.com">Easy Software
-Products</A>. CUPS is copyright 1997-1999 by Easy Software Products,
-All Rights Reserved.
-</BODY>
-</HTML>
+</FORM>

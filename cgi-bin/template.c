@@ -1,5 +1,5 @@
 /*
- * "$Id: template.c,v 1.12 2000/01/28 18:58:31 mike Exp $"
+ * "$Id: template.c,v 1.13 2000/02/10 00:57:53 mike Exp $"
  *
  *   CGI template function.
  *
@@ -85,8 +85,11 @@ cgi_copy(FILE *out,		/* I - Output file */
   int		ch;		/* Character from file */
   char		op;		/* Operation */
   char		name[255],	/* Name of variable */
+		innername[255],	/* Inner comparison name */
+		*innerptr,	/* Pointer into inner name */
 		*s;		/* String pointer */
   const char	*value;		/* Value of variable */
+  const char	*innerval;	/* Inner value */
   char		outval[1024],	/* Output string */
 		compare[1024];	/* Comparison string */
   int		result;		/* Result of comparison */
@@ -234,6 +237,42 @@ cgi_copy(FILE *out,		/* I - Output file */
 	    sprintf(s, "%d", element + 1);
 	    s += strlen(s);
 	  }
+	  else if (ch == '{')
+	  {
+	   /*
+	    * Grab the value of a variable...
+	    */
+
+	    innerptr = innername;
+	    while ((ch = getc(in)) != EOF && ch != '}')
+	      *innerptr++ = ch;
+	    *innerptr = '\0';
+
+            if (innername[0] == '#')
+	      sprintf(s, "%d", cgiGetSize(innername + 1));
+	    else if ((innerptr = strrchr(innername, '-')) != NULL &&
+	             isdigit(innerptr[1]))
+            {
+	      *innerptr++ = '\0';
+	      if ((innerval = cgiGetArray(innername, atoi(innerptr))) == NULL)
+	        *s = '\0';
+	      else
+	        strcpy(s, innerval);
+	    }
+	    else if (innername[0] == '?')
+	    {
+	      if ((innerval = cgiGetArray(innername + 1, element)) == NULL)
+		*s = '\0';
+	      else
+		strcpy(s, innerval);
+            }
+	    else if ((innerval = cgiGetArray(innername, element)) == NULL)
+	      sprintf(s, "{%s}", innername);
+	    else
+	      strcpy(s, innerval);
+
+            s += strlen(s);
+	  }
           else if (ch == '\\')
 	    *s++ = getc(in);
 	  else
@@ -321,5 +360,5 @@ cgi_puts(const char *s,
 
 
 /*
- * End of "$Id: template.c,v 1.12 2000/01/28 18:58:31 mike Exp $".
+ * End of "$Id: template.c,v 1.13 2000/02/10 00:57:53 mike Exp $".
  */

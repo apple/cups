@@ -1,4 +1,4 @@
-<P>{#job_id=0?No Jobs:
+<P>{#job_id=0?No {?which_jobs=completed?Completed:Active} Jobs:
 <TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
 <TR BGCOLOR="#999966">
 	<TH WIDTH="16"><IMG SRC="/images/left.gif"></TH>
@@ -28,8 +28,8 @@
 	{job_k_octets>0?
 	<A HREF="/admin/?op=restart-job&job_id={job_id}">
 	<IMG SRC="/images/restart-job.gif" ALT="Restart Job" BORDER="0"></A>
-	:}
-	:
+	:}:}
+	{job_state>6?:
 	{job_state=4?
 	<A HREF="/admin/?op=release-job&job_id={job_id}">
 	<IMG SRC="/images/release-job.gif" ALT="Release Job" BORDER="0"></A>

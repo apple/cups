@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.2 2000/02/01 17:55:56 mike Exp $"
+ * "$Id: ppds.c,v 1.3 2000/02/10 00:57:54 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -298,6 +298,9 @@ load_ppds(const char *d,		/* I - Actual directory */
     * Add the PPD file...
     */
 
+    if (PPDs->attrs)
+      ippAddSeparator(PPDs);
+
     ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_NAME,
                  "ppd-name", NULL, name);
     ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
@@ -306,7 +309,6 @@ load_ppds(const char *d,		/* I - Actual directory */
                  "ppd-make-and-model", NULL, make_model);
     ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
                  "ppd-natural-language", NULL, language);
-    ippAddSeparator(PPDs);
 
     LogMessage(L_DEBUG, "LoadPPDs: Adding ppd \"%s\"...", name);
   }
@@ -316,5 +318,5 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * End of "$Id: ppds.c,v 1.2 2000/02/01 17:55:56 mike Exp $".
+ * End of "$Id: ppds.c,v 1.3 2000/02/10 00:57:54 mike Exp $".
  */

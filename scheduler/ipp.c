@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.51 2000/02/08 20:39:00 mike Exp $"
+ * "$Id: ipp.c,v 1.52 2000/02/10 00:57:54 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -67,6 +67,9 @@
 #include "cupsd.h"
 #include <pwd.h>
 #include <grp.h>
+#ifdef HAVE_LIBZ
+#  include <zlib.h>
+#endif /* HAVE_LIBZ */
 
 
 /*
@@ -717,9 +720,14 @@ add_printer(client_t        *con,	/* I - Client connection */
   int			port;		/* Port portion of URI */
   printer_t		*printer;	/* Printer/class */
   ipp_attribute_t	*attr;		/* Printer attribute */
+#ifdef HAVE_LIBZ
+  gzFile		fp;		/* Script/PPD file */
+#else
   FILE			*fp;		/* Script/PPD file */
+#endif /* HAVE_LIBZ */
   char			line[1024];	/* Line from file... */
-  char			filename[1024];	/* Script/PPD file */
+  char			srcfile[1024],	/* Source Script/PPD file */
+			dstfile[1024];	/* Destination Script/PPD file */
 
 
  /*
@@ -856,24 +864,41 @@ add_printer(client_t        *con,	/* I - Client connection */
   * See if we have an interface script or PPD file attached to the request...
   */
 
-  LogMessage(L_DEBUG, "add_printer: filename = \"%s\"", con->filename);
+  if (con->filename[0])
+    strcpy(srcfile, con->filename);
+  else if ((attr = ippFindAttribute(con->request, "ppd-name", IPP_TAG_NAME)) != NULL)
+    snprintf(srcfile, sizeof(srcfile), CUPS_DATADIR "/model/%s",
+             attr->values[0].string.text);
+  else
+    srcfile[0] = '\0';
 
-  if (con->filename[0] &&
-      (fp = fopen(con->filename, "r")) != NULL)
+  LogMessage(L_DEBUG, "add_printer: srcfile = \"%s\"", srcfile);
+
+#ifdef HAVE_LIBZ
+  if (srcfile[0] && (fp = gzopen(srcfile, "rb")) != NULL)
+#else
+  if (srcfile[0] && (fp = fopen(srcfile, "rb")) != NULL)
+#endif /* HAVE_LIBZ */
   {
    /*
     * Yes; get the first line from it...
     */
 
     line[0] = '\0';
+#ifdef HAVE_LIBZ
+    gzgets(fp, line, sizeof(line));
+    gzclose(fp);
+#else
     fgets(line, sizeof(line), fp);
     fclose(fp);
+#endif /* HAVE_LIBZ */
 
    /*
     * Then see what kind of file it is...
     */
 
-    sprintf(filename, "%s/interfaces/%s", ServerRoot, printer->name);
+    snprintf(dstfile, sizeof(dstfile), "%s/interfaces/%s", ServerRoot,
+             printer->name);
 
     if (strncmp(line, "*PPD-Adobe", 10) == 0)
     {
@@ -882,7 +907,7 @@ add_printer(client_t        *con,	/* I - Client connection */
       * that might be lying around...
       */
 
-      unlink(filename);
+      unlink(dstfile);
     }
     else
     {
@@ -891,7 +916,7 @@ add_printer(client_t        *con,	/* I - Client connection */
       * interfaces directory and make it executable...
       */
 
-      if (copy_file(con->filename, filename))
+      if (copy_file(srcfile, dstfile))
       {
         LogMessage(L_ERROR, "add_printer: Unable to copy interface script - %s!",
 	           strerror(errno));
@@ -901,11 +926,12 @@ add_printer(client_t        *con,	/* I - Client connection */
       else
       {
         LogMessage(L_DEBUG, "add_printer: Copied interface script successfully!");
-        chmod(filename, 0755);
+        chmod(dstfile, 0755);
       }
     }
 
-    sprintf(filename, "%s/ppd/%s.ppd", ServerRoot, printer->name);
+    snprintf(dstfile, sizeof(dstfile), "%s/ppd/%s.ppd", ServerRoot,
+             printer->name);
 
     if (strncmp(line, "*PPD-Adobe", 10) == 0)
     {
@@ -914,7 +940,7 @@ add_printer(client_t        *con,	/* I - Client connection */
       * ppd directory and make it readable by all...
       */
 
-      if (copy_file(con->filename, filename))
+      if (copy_file(srcfile, dstfile))
       {
         LogMessage(L_ERROR, "add_printer: Unable to copy PPD file - %s!",
 	           strerror(errno));
@@ -924,7 +950,7 @@ add_printer(client_t        *con,	/* I - Client connection */
       else
       {
         LogMessage(L_DEBUG, "add_printer: Copied PPD file successfully!");
-        chmod(filename, 0644);
+        chmod(dstfile, 0644);
       }
     }
     else
@@ -934,7 +960,7 @@ add_printer(client_t        *con,	/* I - Client connection */
       * may be lying around...
       */
 
-      unlink(filename);
+      unlink(dstfile);
     }
   }
 
@@ -1286,7 +1312,11 @@ copy_attrs(ipp_t           *to,		/* I - Destination request */
     * Filter attributes as needed...
     */
 
-    if (req != NULL)
+    if (group != IPP_TAG_ZERO && fromattr->group_tag != group &&
+        fromattr->group_tag != IPP_TAG_ZERO)
+      continue;
+
+    if (req != NULL && fromattr->name != NULL)
     {
       for (i = 0; i < req->num_values; i ++)
         if (strcmp(fromattr->name, req->values[i].string.text) == 0)
@@ -1296,13 +1326,14 @@ copy_attrs(ipp_t           *to,		/* I - Destination request */
         continue;
     }
 
-    if (group != IPP_TAG_ZERO && fromattr->group_tag != group)
-      continue;
-
     DEBUG_printf(("copy_attrs: copying attribute \'%s\'...\n", fromattr->name));
 
     switch (fromattr->value_tag)
     {
+      case IPP_TAG_ZERO :
+          ippAddSeparator(to);
+	  break;
+
       case IPP_TAG_INTEGER :
       case IPP_TAG_ENUM :
           toattr = ippAddIntegers(to, fromattr->group_tag, fromattr->value_tag,
@@ -1581,30 +1612,55 @@ static int				/* O - 0 = success, -1 = error */
 copy_file(const char *from,		/* I - Source file */
           const char *to)		/* I - Destination file */
 {
-  int	src,				/* Source file */
-	dst,				/* Destination file */
-	bytes;				/* Bytes to read/write */
-  char	buffer[8192];			/* Copy buffer */
+#ifdef HAVE_LIBZ
+  gzFile	src;			/* Source file */
+#else
+  int		src;			/* Source file */
+#endif /* HAVE_LIBZ */
+  int		dst,			/* Destination file */
+		bytes;			/* Bytes to read/write */
+  char		buffer[8192];		/* Copy buffer */
 
 
+#ifdef HAVE_LIBZ
+  if ((src = gzopen(from, "rb")) < 0)
+    return (-1);
+#else
   if ((src = open(from, O_RDONLY)) < 0)
     return (-1);
+#endif /* HAVE_LIBZ */
 
   if ((dst = open(to, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
   {
+#ifdef HAVE_LIBZ
+    gzclose(src);
+#else
     close(src);
+#endif /* HAVE_LIBZ */
     return (-1);
   }
 
+#ifdef HAVE_LIBZ
+  while ((bytes = gzread(src, buffer, sizeof(buffer))) > 0)
+#else
   while ((bytes = read(src, buffer, sizeof(buffer))) > 0)
+#endif /* HAVE_LIBZ */
     if (write(dst, buffer, bytes) < bytes)
     {
+#ifdef HAVE_LIBZ
+      gzclose(src);
+#else
       close(src);
+#endif /* HAVE_LIBZ */
       close(dst);
       return (-1);
     }
 
+#ifdef HAVE_LIBZ
+  gzclose(src);
+#else
   close(src);
+#endif /* HAVE_LIBZ */
   close(dst);
 
   return (0);
@@ -3114,7 +3170,7 @@ restart_job(client_t        *con,	/* I - Client connection */
   * See if we have retained the job files...
   */
 
-  if (!JobFiles)
+  if (!JobFiles && job->state->values[0].integer > IPP_JOB_STOPPED)
   {
    /*
     * Nope - return a "not possible" error...
@@ -3892,5 +3948,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.51 2000/02/08 20:39:00 mike Exp $".
+ * End of "$Id: ipp.c,v 1.52 2000/02/10 00:57:54 mike Exp $".
  */

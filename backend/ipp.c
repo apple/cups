@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.20 2000/02/02 00:50:41 mike Exp $"
+ * "$Id: ipp.c,v 1.21 2000/02/10 00:57:52 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -85,7 +85,12 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
   if (argc == 1)
   {
-    puts("network ipp \"\" \"Internet Printing Protocol\"");
+    if ((s = strrchr(argv[0], '/')) != NULL)
+      s ++;
+    else
+      s = argv[0];
+
+    printf("network %s \"Unknown\" \"Internet Printing Protocol\"\n", s);
     return (0);
   }
   else if (argc < 6 || argc > 7)
@@ -656,5 +661,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.20 2000/02/02 00:50:41 mike Exp $".
+ * End of "$Id: ipp.c,v 1.21 2000/02/10 00:57:52 mike Exp $".
  */
