@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.16 1999/04/21 14:12:20 mike Exp $"
+ * "$Id: ppd.c,v 1.17 1999/05/17 18:11:46 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -408,6 +408,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
   float		order;		/* Order dependency number */
   ppd_section_t	section;	/* Order dependency section */
   ppd_profile_t	*profile;	/* Pointer to color profile */
+  char		**filter;	/* Pointer to filter */
 
 
  /*
@@ -589,6 +590,24 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	     profile->matrix[1] + 1, profile->matrix[1] + 2,
 	     profile->matrix[2] + 0, profile->matrix[2] + 1,
 	     profile->matrix[2] + 2);
+    }
+    else if (strcmp(keyword, "cupsFilter") == 0)
+    {
+      if (ppd->num_filters == 0)
+        filter = malloc(sizeof(char *));
+      else
+        filter = realloc(ppd->filters, sizeof(char *) * (ppd->num_filters + 1));
+
+      ppd->filters     = filter;
+      filter           += ppd->num_filters;
+      ppd->num_filters ++;
+
+     /*
+      * Copy filter string and prevent it from being freed below...
+      */
+
+      *filter = string;
+      string  = NULL;
     }
     else if (strcmp(keyword, "VariablePaperSize") == 0 &&
              strcmp(string, "True") == 0)
@@ -1479,5 +1498,5 @@ ppd_decode(char *string)	/* I - String to decode */
 
 
 /*
- * End of "$Id: ppd.c,v 1.16 1999/04/21 14:12:20 mike Exp $".
+ * End of "$Id: ppd.c,v 1.17 1999/05/17 18:11:46 mike Exp $".
  */
