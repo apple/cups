@@ -141,13 +141,13 @@ public:
   Object *getContents(Object *obj) { return contents.fetch(xref, obj); }
 
   // Display a page.
-  void display(OutputDev *out, double dpi, int rotate,
+  void display(OutputDev *out, double hDPI, double vDPI, int rotate,
 	       Links *links, Catalog *catalog,
 	       GBool (*abortCheckCbk)(void *data) = NULL,
 	       void *abortCheckCbkData = NULL);
 
   // Display part of a page.
-  void displaySlice(OutputDev *out, double dpi, int rotate,
+  void displaySlice(OutputDev *out, double hDPI, double vDPI, int rotate,
 		    int sliceX, int sliceY, int sliceW, int sliceH,
 		    Links *links, Catalog *catalog,
 		    GBool (*abortCheckCbk)(void *data) = NULL,

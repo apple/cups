@@ -3,8 +3,16 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- Updated pdftops to Xpdf 2.03 code to fix printing bugs
+	  (STR #470)
+	- The Digest authentication code did not include the
+	  (required) "uri" attribute in the Authorization
+	  response, preventing interoperation with Apache
+	  (STR #408)
+	- The web interface could lockup when displaying certain
+	  URLs (STR #459)
 	- The PostScript filters now convert underscores ("_")
-	  to spaces for custom classification names (STR #???)
+	  to spaces for custom classification names (STR #555)
 
 
 CHANGES IN CUPS V1.1.20

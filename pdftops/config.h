@@ -14,12 +14,12 @@
 //------------------------------------------------------------------------
 
 // xpdf version
-#define xpdfVersion         "2.02pl1"
-#define xpdfVersionNum      2.02
+#define xpdfVersion         "2.03"
+#define xpdfVersionNum      2.03
 #define xpdfMajorVersion    2
-#define xpdfMinorVersion    2
+#define xpdfMinorVersion    3
 #define xpdfMajorVersionStr "2"
-#define xpdfMinorVersionStr "2"
+#define xpdfMinorVersionStr "3"
 
 // supported PDF version
 #define supportedPDFVersionStr "1.4"
@@ -29,7 +29,7 @@
 #define xpdfCopyright "Copyright 1996-2003 Glyph & Cog, LLC"
 
 // Windows resource file stuff
-#define winxpdfVersion "WinXpdf 2.02"
+#define winxpdfVersion "WinXpdf 2.03"
 #define xpdfCopyrightAmp "Copyright 1996-2003 Glyph && Cog, LLC"
 
 //------------------------------------------------------------------------
@@ -82,7 +82,7 @@
 // popen
 //------------------------------------------------------------------------
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(__BORLANDC__)
 #define popen _popen
 #define pclose _pclose
 #endif
@@ -101,7 +101,7 @@
 #undef CDECL
 #endif
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(__BORLANDC__)
 #define CDECL __cdecl
 #else
 #define CDECL

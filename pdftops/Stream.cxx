@@ -84,7 +84,7 @@ char *Stream::getLine(char *buf, int size) {
   return buf;
 }
 
-GString *Stream::getPSFilter(const char *indent) {
+GString *Stream::getPSFilter(int psLevel, const char *indent) {
   return new GString();
 }
 
@@ -696,13 +696,14 @@ void FileStream::moveStart(int delta) {
 // MemStream
 //------------------------------------------------------------------------
 
-MemStream::MemStream(char *bufA, Guint lengthA, Object *dictA):
+MemStream::MemStream(char *bufA, Guint startA, Guint lengthA, Object *dictA):
     BaseStream(dictA) {
   buf = bufA;
-  needFree = gFalse;
+  start = startA;
   length = lengthA;
-  bufEnd = buf + length;
-  bufPtr = buf;
+  bufEnd = buf + start + length;
+  bufPtr = buf + start;
+  needFree = gFalse;
 }
 
 MemStream::~MemStream() {
@@ -711,20 +712,22 @@ MemStream::~MemStream() {
   }
 }
 
-Stream *MemStream::makeSubStream(Guint start, GBool limited,
+Stream *MemStream::makeSubStream(Guint startA, GBool limited,
 				 Guint lengthA, Object *dictA) {
+  MemStream *subStr;
   Guint newLength;
 
-  if (!limited || start + lengthA > length) {
-    newLength = length - start;
+  if (!limited || startA + lengthA > start + length) {
+    newLength = start + length - startA;
   } else {
     newLength = lengthA;
   }
-  return new MemStream(buf + start, newLength, dictA);
+  subStr = new MemStream(buf, startA, newLength, dictA);
+  return subStr;
 }
 
 void MemStream::reset() {
-  bufPtr = buf;
+  bufPtr = buf + start;
 #ifndef NO_DECRYPTION
   if (decrypt) {
     decrypt->reset();
@@ -736,24 +739,24 @@ void MemStream::close() {
 }
 
 void MemStream::setPos(Guint pos, int dir) {
+  Guint i;
+
   if (dir >= 0) {
-    if (pos > length) {
-      bufPtr = bufEnd;
-    } else {
-      bufPtr = buf + pos;
-    }
+    i = pos;
   } else {
-    if (pos > length) {
-      bufPtr = buf;
-    } else {
-      bufPtr = bufEnd - pos;
-    }
+    i = start + length - pos;
   }
+  if (i < start) {
+    i = start;
+  } else if (i > start + length) {
+    i = start + length;
+  }
+  bufPtr = buf + i;
 }
 
 void MemStream::moveStart(int delta) {
-  buf += delta;
-  bufPtr = buf;
+  start += delta;
+  bufPtr = buf + start;
 }
 
 #ifndef NO_DECRYPTION
@@ -764,12 +767,13 @@ void MemStream::doDecryption(Guchar *fileKey, int keyLength,
 
   this->BaseStream::doDecryption(fileKey, keyLength, objNum, objGen);
   if (decrypt) {
-    newBuf = (char *)gmalloc(bufEnd - buf);
-    for (p = buf, q = newBuf; p < bufEnd; ++p, ++q) {
+    newBuf = (char *)gmalloc(length);
+    for (p = buf + start, q = newBuf; p < bufEnd; ++p, ++q) {
       *q = (char)decrypt->decryptByte((Guchar)*p);
     }
-    bufEnd = newBuf + (bufEnd - buf);
-    bufPtr = newBuf + (bufPtr - buf);
+    bufEnd = newBuf + length;
+    bufPtr = newBuf + (bufPtr - (buf + start));
+    start = 0;
     buf = newBuf;
     needFree = gTrue;
   }
@@ -880,10 +884,13 @@ int ASCIIHexStream::lookChar() {
   return buf;
 }
 
-GString *ASCIIHexStream::getPSFilter(const char *indent) {
+GString *ASCIIHexStream::getPSFilter(int psLevel, const char *indent) {
   GString *s;
 
-  if (!(s = str->getPSFilter(indent))) {
+  if (psLevel < 2) {
+    return NULL;
+  }
+  if (!(s = str->getPSFilter(psLevel, indent))) {
     return NULL;
   }
   s->append(indent)->append("/ASCIIHexDecode filter\n");
@@ -958,10 +965,13 @@ int ASCII85Stream::lookChar() {
   return b[index];
 }
 
-GString *ASCII85Stream::getPSFilter(const char *indent) {
+GString *ASCII85Stream::getPSFilter(int psLevel, const char *indent) {
   GString *s;
 
-  if (!(s = str->getPSFilter(indent))) {
+  if (psLevel < 2) {
+    return NULL;
+  }
+  if (!(s = str->getPSFilter(psLevel, indent))) {
     return NULL;
   }
   s->append(indent)->append("/ASCII85Decode filter\n");
@@ -1137,13 +1147,13 @@ int LZWStream::getCode() {
   return code;
 }
 
-GString *LZWStream::getPSFilter(const char *indent) {
+GString *LZWStream::getPSFilter(int psLevel, const char *indent) {
   GString *s;
 
-  if (pred) {
+  if (psLevel < 2 || pred) {
     return NULL;
   }
-  if (!(s = str->getPSFilter(indent))) {
+  if (!(s = str->getPSFilter(psLevel, indent))) {
     return NULL;
   }
   s->append(indent)->append("/LZWDecode filter\n");
@@ -1174,10 +1184,13 @@ void RunLengthStream::reset() {
   eof = gFalse;
 }
 
-GString *RunLengthStream::getPSFilter(const char *indent) {
+GString *RunLengthStream::getPSFilter(int psLevel, const char *indent) {
   GString *s;
 
-  if (!(s = str->getPSFilter(indent))) {
+  if (psLevel < 2) {
+    return NULL;
+  }
+  if (!(s = str->getPSFilter(psLevel, indent))) {
     return NULL;
   }
   s->append(indent)->append("/RunLengthDecode filter\n");
@@ -1334,12 +1347,14 @@ int CCITTFaxStream::lookChar() {
 	      code2 += code3 = getWhiteCode();
 	    } while (code3 >= 64);
 	  }
-	  codingLine[a0 + 1] = a0New + code1;
-	  ++a0;
-	  a0New = codingLine[a0 + 1] = codingLine[a0] + code2;
-	  ++a0;
-	  while (refLine[b1] <= codingLine[a0] && refLine[b1] < columns)
-	    b1 += 2;
+	  if (code1 > 0 || code2 > 0) {
+	    codingLine[a0 + 1] = a0New + code1;
+	    ++a0;
+	    a0New = codingLine[a0 + 1] = codingLine[a0] + code2;
+	    ++a0;
+	    while (refLine[b1] <= codingLine[a0] && refLine[b1] < columns)
+	      b1 += 2;
+	  }
 	  break;
 	case twoDimVert0:
 	  a0New = codingLine[++a0] = refLine[b1];
@@ -1504,7 +1519,7 @@ int CCITTFaxStream::lookChar() {
 	  return EOF;
 	}
 	eatBits(1);
-	code1 = look13Bits();
+	code1 = lookBits(13);
       } while ((code1 >> 1) != 0x001);
       eatBits(12); 
       codingLine[++a0] = columns;
@@ -1724,11 +1739,14 @@ short CCITTFaxStream::lookBits(int n) {
   return (inputBuf >> (inputBits - n)) & (0xffff >> (16 - n));
 }
 
-GString *CCITTFaxStream::getPSFilter(const char *indent) {
+GString *CCITTFaxStream::getPSFilter(int psLevel, const char *indent) {
   GString *s;
   char s1[50];
 
-  if (!(s = str->getPSFilter(indent))) {
+  if (psLevel < 2) {
+    return NULL;
+  }
+  if (!(s = str->getPSFilter(psLevel, indent))) {
     return NULL;
   }
   s->append(indent)->append("<< ");
@@ -1864,6 +1882,7 @@ void DCTStream::reset() {
   numDCHuffTables = 0;
   numACHuffTables = 0;
   colorXform = 0;
+  gotJFIFMarker = gFalse;
   gotAdobeMarker = gFalse;
   restartInterval = 0;
 
@@ -1894,7 +1913,12 @@ void DCTStream::reset() {
 
   // figure out color transform
   if (!gotAdobeMarker && numComps == 3) {
-    if (compInfo[0].id == 1 && compInfo[1].id == 2 && compInfo[2].id == 3) {
+    if (gotJFIFMarker) {
+      colorXform = 1;
+    } else if (compInfo[0].id == 82 && compInfo[1].id == 71 &&
+	       compInfo[2].id == 66) { // ASCII "RGB"
+      colorXform = 0;
+    } else {
       colorXform = 1;
     }
   }
@@ -2142,7 +2166,7 @@ GBool DCTStream::readMCURow() {
 void DCTStream::readScan() {
   int data[64];
   int x1, y1, dx1, dy1, x2, y2, y3, cc, i;
-  int h, v, horiz, vert, hSub, vSub;
+  int h, v, horiz, vert, vSub;
   int *p1;
   int c;
 
@@ -2185,7 +2209,6 @@ void DCTStream::readScan() {
 	v = compInfo[cc].vSample;
 	horiz = mcuWidth / h;
 	vert = mcuHeight / v;
-	hSub = horiz / 8;
 	vSub = vert / 8;
 	for (y2 = 0; y2 < dy1; y2 += vert) {
 	  for (x2 = 0; x2 < dx1; x2 += horiz) {
@@ -2810,7 +2833,6 @@ GBool DCTStream::readHeader() {
       break;
     case 0xd9:			// EOI
       return gFalse;
-      break;
     case 0xda:			// SOS
       if (!readScanInfo()) {
 	return gFalse;
@@ -2824,6 +2846,11 @@ GBool DCTStream::readHeader() {
       break;
     case 0xdd:			// DRI
       if (!readRestartInterval()) {
+	return gFalse;
+      }
+      break;
+    case 0xe0:			// APP0
+      if (!readJFIFMarker()) {
 	return gFalse;
       }
       break;
@@ -2923,14 +2950,21 @@ GBool DCTStream::readScanInfo() {
   }
   for (i = 0; i < scanInfo.numComps; ++i) {
     id = str->getChar();
-    for (j = 0; j < numComps; ++j) {
-      if (id == compInfo[j].id) {
-	break;
+    // some (broken) DCT streams reuse ID numbers, but at least they
+    // keep the components in order, so we check compInfo[i] first to
+    // work around the problem
+    if (id == compInfo[i].id) {
+      j = i;
+    } else {
+      for (j = 0; j < numComps; ++j) {
+	if (id == compInfo[j].id) {
+	  break;
+	}
       }
-    }
-    if (j == numComps) {
-      error(getPos(), "Bad DCT component ID in scan info block");
-      return gFalse;
+      if (j == numComps) {
+	error(getPos(), "Bad DCT component ID in scan info block");
+	return gFalse;
+      }
     }
     scanInfo.comp[j] = gTrue;
     c = str->getChar();
@@ -3023,6 +3057,36 @@ GBool DCTStream::readRestartInterval() {
   return gTrue;
 }
 
+GBool DCTStream::readJFIFMarker() {
+  int length, i;
+  char buf[5];
+  int c;
+
+  length = read16();
+  length -= 2;
+  if (length >= 5) {
+    for (i = 0; i < 5; ++i) {
+      if ((c = str->getChar()) == EOF) {
+	error(getPos(), "Bad DCT APP0 marker");
+	return gFalse;
+      }
+      buf[i] = c;
+    }
+    length -= 5;
+    if (!memcmp(buf, "JFIF\0", 5)) {
+      gotJFIFMarker = gTrue;
+    }
+  }
+  while (length > 0) {
+    if (str->getChar() == EOF) {
+      error(getPos(), "Bad DCT APP0 marker");
+      return gFalse;
+    }
+    --length;
+  }
+  return gTrue;
+}
+
 GBool DCTStream::readAdobeMarker() {
   int length, i;
   char buf[12];
@@ -3090,10 +3154,13 @@ int DCTStream::read16() {
   return (c1 << 8) + c2;
 }
 
-GString *DCTStream::getPSFilter(const char *indent) {
+GString *DCTStream::getPSFilter(int psLevel, const char *indent) {
   GString *s;
 
-  if (!(s = str->getPSFilter(indent))) {
+  if (psLevel < 2) {
+    return NULL;
+  }
+  if (!(s = str->getPSFilter(psLevel, indent))) {
     return NULL;
   }
   s->append(indent)->append("<< >> /DCTDecode filter\n");
@@ -3280,8 +3347,17 @@ int FlateStream::getRawChar() {
   return c;
 }
 
-GString *FlateStream::getPSFilter(const char *indent) {
-  return NULL;
+GString *FlateStream::getPSFilter(int psLevel, const char *indent) {
+  GString *s;
+
+  if (psLevel < 3 || pred) {
+    return NULL;
+  }
+  if (!(s = str->getPSFilter(psLevel, indent))) {
+    return NULL;
+  }
+  s->append(indent)->append("<< >> /FlateDecode filter\n");
+  return s;
 }
 
 GBool FlateStream::isBinary(GBool last) {
@@ -3658,9 +3734,6 @@ void FixedLengthEncoder::reset() {
   count = 0;
 }
 
-void FixedLengthEncoder::close() {
-}
-
 int FixedLengthEncoder::getChar() {
   if (length >= 0 && count >= length)
     return EOF;
@@ -3696,9 +3769,6 @@ void ASCIIHexEncoder::reset() {
   bufPtr = bufEnd = buf;
   lineLen = 0;
   eof = gFalse;
-}
-
-void ASCIIHexEncoder::close() {
 }
 
 GBool ASCIIHexEncoder::fillBuf() {
@@ -3745,9 +3815,6 @@ void ASCII85Encoder::reset() {
   bufPtr = bufEnd = buf;
   lineLen = 0;
   eof = gFalse;
-}
-
-void ASCII85Encoder::close() {
 }
 
 GBool ASCII85Encoder::fillBuf() {
@@ -3815,9 +3882,6 @@ void RunLengthEncoder::reset() {
   str->reset();
   bufPtr = bufEnd = nextEnd = buf;
   eof = gFalse;
-}
-
-void RunLengthEncoder::close() {
 }
 
 //

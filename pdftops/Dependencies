@@ -25,17 +25,17 @@ Dict.o: Stream.h XRef.h
 Error.o: ../config.h GlobalParams.h gtypes.h CharTypes.h Error.h
 FontEncoding.o: gmem.h FontEncoding.h gtypes.h
 FontEncodingTables.o: ../config.h FontEncodingTables.h
-FontFile.o: ../config.h gmem.h Error.h GlobalParams.h gtypes.h CharTypes.h
-FontFile.o: CharCodeToUnicode.h FontEncodingTables.h FontFile.h GString.h
-FontFile.o: CompactFontTables.h
+FontFile.o: ../config.h gmem.h GHash.h gtypes.h Error.h GlobalParams.h
+FontFile.o: CharTypes.h CharCodeToUnicode.h FontEncodingTables.h FontFile.h
+FontFile.o: GString.h CompactFontTables.h
 Function.o: ../config.h gmem.h Object.h gtypes.h GString.h Array.h Dict.h
 Function.o: Stream.h Error.h Function.h
 gfile.o: ../config.h GString.h gfile.h gtypes.h
 Gfx.o: ../config.h gmem.h GlobalParams.h gtypes.h CharTypes.h Object.h
 Gfx.o: GString.h Array.h Dict.h Stream.h Lexer.h Parser.h GfxFont.h
 Gfx.o: GfxState.h Function.h OutputDev.h Page.h Error.h Gfx.h
-GfxFont.o: ../config.h gmem.h Error.h Object.h gtypes.h GString.h Array.h
-GfxFont.o: Dict.h Stream.h GlobalParams.h CharTypes.h CMap.h
+GfxFont.o: ../config.h gmem.h GHash.h gtypes.h Error.h Object.h GString.h
+GfxFont.o: Array.h Dict.h Stream.h GlobalParams.h CharTypes.h CMap.h
 GfxFont.o: CharCodeToUnicode.h FontEncodingTables.h BuiltinFontTables.h
 GfxFont.o: BuiltinFont.h FontFile.h GfxFont.h
 GfxState.o: ../config.h gmem.h Error.h Object.h gtypes.h GString.h Array.h
@@ -75,9 +75,8 @@ PDFDoc.o: PDFDoc.h
 PDFDocEncoding.o: PDFDocEncoding.h CharTypes.h
 PSOutputDev.o: ../config.h GString.h GList.h gtypes.h GlobalParams.h
 PSOutputDev.o: CharTypes.h Object.h gmem.h Array.h Dict.h Stream.h Error.h
-PSOutputDev.o: Function.h Gfx.h GfxState.h GfxFont.h CharCodeToUnicode.h
-PSOutputDev.o: UnicodeMap.h FontFile.h Catalog.h Page.h Annot.h PSOutputDev.h
-PSOutputDev.o: OutputDev.h
+PSOutputDev.o: Function.h Gfx.h GfxState.h GfxFont.h UnicodeMap.h FontFile.h
+PSOutputDev.o: Catalog.h Page.h Annot.h PSOutputDev.h OutputDev.h
 PSTokenizer.o: ../config.h PSTokenizer.h gtypes.h
 Stream.o: ../config.h gmem.h gfile.h gtypes.h Error.h Object.h GString.h
 Stream.o: Array.h Dict.h Stream.h Decrypt.h JBIG2Stream.h Stream-CCITT.h

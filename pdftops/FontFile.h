@@ -20,6 +20,7 @@
 #include "GString.h"
 #include "CharTypes.h"
 
+class GHash;
 class CharCodeToUnicode;
 
 //------------------------------------------------------------------------
@@ -156,6 +157,7 @@ private:
 //------------------------------------------------------------------------
 
 struct TTFontTableHdr;
+struct TTFontCmap;
 
 class TrueTypeFontFile: public FontFile {
 public:
@@ -170,15 +172,34 @@ public:
 
   virtual const char **getEncoding();
 
+  // Return the number of cmaps defined by this font.
+  int getNumCmaps();
+
+  // Return the platform ID of the <i>th cmap.
+  int getCmapPlatform(int i);
+
+  // Return the encoding ID of the <i>th cmap.
+  int getCmapEncoding(int i);
+
+  // Return the index of the cmap for <platform>, <encoding>.  Returns
+  // -1 if there is no corresponding cmap.
+  int findCmap(int platform, int enc);
+
+  // Return the GID corresponding to <c> according to the <i>th cmap.
+  Gushort mapCodeToGID(int i, int c);
+
+  // Return a name-to-GID mapping, constructed from the font's post
+  // table.  Returns NULL if there is no post table.
+  GHash *getNameToGID();
+
   // Convert to a Type 42 font, suitable for embedding in a PostScript
   // file.  The name will be used as the PostScript font name (so we
   // don't need to depend on the 'name' table in the font).  The
   // encoding is needed because the PDF Font object can modify the
   // encoding.
   void convertToType42(const char *name, const char **encodingA,
-		       CharCodeToUnicode *toUnicode,
 		       GBool pdfFontHasEncoding,
-		       GBool pdfFontIsSymbolic,
+		       Gushort *codeToGID,
 		       FontFileOutputFunc outputFunc, void *outputStream);
 
   // Convert to a Type 2 CIDFont, suitable for embedding in a
@@ -213,6 +234,8 @@ private:
   int locaFmt;
   int nGlyphs;
   GBool mungedCmapSize;
+  TTFontCmap *cmaps;
+  int nCmaps;
 
   int getByte(int pos);
   int getChar(int pos);
@@ -224,8 +247,8 @@ private:
   int seekTableIdx(const char *tag);
   void cvtEncoding(const char **encodingA, GBool pdfFontHasEncoding,
 		   FontFileOutputFunc outputFunc, void *outputStream);
-  void cvtCharStrings(const char **encodingA, CharCodeToUnicode *toUnicode,
-		      GBool pdfFontHasEncoding, GBool pdfFontIsSymbolic,
+  void cvtCharStrings(const char **encodingA, GBool pdfFontHasEncoding,
+                      Gushort *codeToGID,
 		      FontFileOutputFunc outputFunc, void *outputStream);
   int getCmapEntry(int cmapFmt, int pos, int code);
   void cvtSfnts(FontFileOutputFunc outputFunc, void *outputStream,

@@ -1,5 +1,5 @@
 //
-// "$Id: pdftops.cxx,v 1.6.2.7 2003/08/28 14:36:57 mike Exp $"
+// "$Id: pdftops.cxx,v 1.6.2.8 2004/02/02 22:41:44 mike Exp $"
 //
 //   PDF to PostScript filter front-end for the Common UNIX Printing
 //   System (CUPS).
@@ -300,7 +300,7 @@ main(int  argc,				// I - Number of command-line args
                             doc->getCatalog(), 1, doc->getNumPages(),
 			    psModePS);
     if (psOut->isOk())
-      doc->displayPages(psOut, 1, doc->getNumPages(), 72, 0, gFalse);
+      doc->displayPages(psOut, 1, doc->getNumPages(), 72, 72, 0, gFalse);
     delete psOut;
 
     // clean up
@@ -327,5 +327,5 @@ main(int  argc,				// I - Number of command-line args
 
 
 //
-// End of "$Id: pdftops.cxx,v 1.6.2.7 2003/08/28 14:36:57 mike Exp $".
+// End of "$Id: pdftops.cxx,v 1.6.2.8 2004/02/02 22:41:44 mike Exp $".
 //

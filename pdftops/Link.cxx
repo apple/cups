@@ -581,13 +581,42 @@ LinkUnknown::~LinkUnknown() {
 }
 
 //------------------------------------------------------------------------
+// LinkBorderStyle
+//------------------------------------------------------------------------
+
+LinkBorderStyle::LinkBorderStyle(LinkBorderType typeA, double widthA,
+				 double *dashA, int dashLengthA,
+				 double rA, double gA, double bA) {
+  type = typeA;
+  width = widthA;
+  dash = dashA;
+  dashLength = dashLengthA;
+  r = rA;
+  g = gA;
+  b = bA;
+}
+
+LinkBorderStyle::~LinkBorderStyle() {
+  if (dash) {
+    gfree(dash);
+  }
+}
+
+//------------------------------------------------------------------------
 // Link
 //------------------------------------------------------------------------
 
 Link::Link(Dict *dict, GString *baseURI) {
-  Object obj1, obj2;
+  Object obj1, obj2, obj3;
+  LinkBorderType borderType;
+  double borderWidth;
+  double *borderDash;
+  int borderDashLength;
+  double borderR, borderG, borderB;
   double t;
+  int i;
 
+  borderStyle = NULL;
   action = NULL;
   ok = gFalse;
 
@@ -632,19 +661,92 @@ Link::Link(Dict *dict, GString *baseURI) {
     y2 = t;
   }
 
-  // get border
-  borderW = 1;
-  if (!dict->lookup("Border", &obj1)->isNull()) {
-    if (obj1.isArray() && obj1.arrayGetLength() >= 3) {
+  // get the border style info
+  borderType = linkBorderSolid;
+  borderWidth = 1;
+  borderDash = NULL;
+  borderDashLength = 0;
+  borderR = 0;
+  borderG = 0;
+  borderB = 1;
+  if (dict->lookup("BS", &obj1)->isDict()) {
+    if (obj1.dictLookup("S", &obj2)->isName()) {
+      if (obj2.isName("S")) {
+	borderType = linkBorderSolid;
+      } else if (obj2.isName("D")) {
+	borderType = linkBorderDashed;
+      } else if (obj2.isName("B")) {
+	borderType = linkBorderEmbossed;
+      } else if (obj2.isName("I")) {
+	borderType = linkBorderEngraved;
+      } else if (obj2.isName("U")) {
+	borderType = linkBorderUnderlined;
+      }
+    }
+    obj2.free();
+    if (obj1.dictLookup("W", &obj2)->isNum()) {
+      borderWidth = obj2.getNum();
+    }
+    obj2.free();
+    if (obj1.dictLookup("D", &obj2)->isArray()) {
+      borderDashLength = obj2.arrayGetLength();
+      borderDash = (double *)gmalloc(borderDashLength * sizeof(double));
+      for (i = 0; i < borderDashLength; ++i) {
+	if (obj2.arrayGet(i, &obj3)->isNum()) {
+	  borderDash[i] = obj3.getNum();
+	} else {
+	  borderDash[i] = 1;
+	}
+	obj3.free();
+      }
+    }
+    obj2.free();
+  } else {
+    obj1.free();
+    if (dict->lookup("Border", &obj1)->isArray()) {
+      if (obj1.arrayGetLength() >= 3) {
       if (obj1.arrayGet(2, &obj2)->isNum()) {
-	borderW = obj2.getNum();
+	  borderWidth = obj2.getNum();
+	}
+	obj2.free();
+	if (obj1.arrayGetLength() >= 4) {
+	  if (obj1.arrayGet(3, &obj2)->isArray()) {
+	    borderType = linkBorderDashed;
+	    borderDashLength = obj2.arrayGetLength();
+	    borderDash = (double *)gmalloc(borderDashLength * sizeof(double));
+	    for (i = 0; i < borderDashLength; ++i) {
+	      if (obj2.arrayGet(i, &obj3)->isNum()) {
+		borderDash[i] = obj3.getNum();
       } else {
-	error(-1, "Bad annotation border");
+		borderDash[i] = 1;
+	      }
+	      obj3.free();
+	    }
       }
       obj2.free();
     }
   }
+    }
+  }
   obj1.free();
+  if (dict->lookup("C", &obj1)->isArray() && obj1.arrayGetLength() == 3) {
+    if (obj1.arrayGet(0, &obj2)->isNum()) {
+      borderR = obj2.getNum();
+    }
+    obj1.free();
+    if (obj1.arrayGet(1, &obj2)->isNum()) {
+      borderG = obj2.getNum();
+    }
+    obj1.free();
+    if (obj1.arrayGet(2, &obj2)->isNum()) {
+      borderB = obj2.getNum();
+    }
+    obj1.free();
+  }
+  obj1.free();
+  borderStyle = new LinkBorderStyle(borderType, borderWidth,
+				    borderDash, borderDashLength,
+				    borderR, borderG, borderB);
 
   // look for destination
   if (!dict->lookup("Dest", &obj1)->isNull()) {
@@ -673,8 +775,12 @@ Link::Link(Dict *dict, GString *baseURI) {
 }
 
 Link::~Link() {
-  if (action)
+  if (borderStyle) {
+    delete borderStyle;
+  }
+  if (action) {
     delete action;
+}
 }
 
 //------------------------------------------------------------------------
