@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The USB backend now uses the manufacturer and model
+	  strings if the description string is not available
+	  (STR #174)
 	- The ppdOpen functions still supported the
 	  VariablePaperSize attribute, which was removed in v4.0
 	  of the PPD spec.  This caused problems with PPD files
