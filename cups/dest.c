@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.18 2001/03/30 22:23:00 mike Exp $"
+ * "$Id: dest.c,v 1.19 2001/06/06 17:54:32 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -24,12 +24,13 @@
  *
  * Contents:
  *
- *   cupsAddDest()    - Add a destination to the list of destinations.
- *   cupsFreeDests()  - Free the memory used by the list of destinations.
- *   cupsGetDest()    - Get the named destination from the list.
- *   cupsGetDests()   - Get the list of destinations.
- *   cupsSetDests()   - Set the list of destinations.
- *   cups_get_dests() - Get destinations from a file.
+ *   cupsAddDest()     - Add a destination to the list of destinations.
+ *   cupsFreeDests()   - Free the memory used by the list of destinations.
+ *   cupsGetDest()     - Get the named destination from the list.
+ *   cupsGetDests()    - Get the list of destinations.
+ *   cupsSetDests()    - Set the list of destinations.
+ *   cups_get_dests()  - Get destinations from a file.
+ *   cups_get_sdests() - Get destinations from a server.
  */
 
 /*
@@ -37,6 +38,7 @@
  */
 
 #include "cups.h"
+#include "language.h"
 #include "string.h"
 #include <stdlib.h>
 #include <ctype.h>
@@ -48,6 +50,8 @@
 
 static int	cups_get_dests(const char *filename, int num_dests,
 		               cups_dest_t **dests);
+static int	cups_get_sdests(ipp_op_t op, int num_dests,
+		                cups_dest_t **dests);
 
 
 /*
@@ -203,10 +207,7 @@ cupsGetDest(const char  *name,		/* I - Name of destination */
 int					/* O - Number of destinations */
 cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
 {
-  int		i;			/* Looping var */
   int		num_dests;		/* Number of destinations */
-  int		count;			/* Number of printers/classes */
-  char		**names;		/* Printer/class names */
   cups_dest_t	*dest;			/* Destination pointer */
   const char	*home;			/* HOME environment variable */
   char		filename[1024];		/* Local ~/.lpoptions file */
@@ -223,34 +224,11 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
   *dests    = (cups_dest_t *)0;
 
  /*
-  * Grab all available printers...
+  * Grab the printers and classes...
   */
 
-  if ((count = cupsGetPrinters(&names)) > 0)
-  {
-    for (i = 0; i < count; i ++)
-    {
-      num_dests = cupsAddDest(names[i], NULL, num_dests, dests);
-      free(names[i]);
-    }
-
-    free(names);
-  }
-
- /*
-  * Grab all available classes...
-  */
-      
-  if ((count = cupsGetClasses(&names)) > 0)
-  {
-    for (i = 0; i < count; i ++)
-    {
-      num_dests = cupsAddDest(names[i], NULL, num_dests, dests);
-      free(names[i]);
-    }
-
-    free(names);
-  }
+  num_dests = cups_get_sdests(CUPS_GET_PRINTERS, num_dests, dests);
+  num_dests = cups_get_sdests(CUPS_GET_CLASSES, num_dests, dests);
 
  /*
   * Grab the default destination...
@@ -311,23 +289,35 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
              cups_dest_t *dests)	/* I - Destinations */
 {
   int		i, j;			/* Looping vars */
+  int		wrote;			/* Wrote definition? */
   cups_dest_t	*dest;			/* Current destination */
   cups_option_t	*option;		/* Current option */
   FILE		*fp;			/* File pointer */
   const char	*home;			/* HOME environment variable */
   char		filename[1024];		/* lpoptions file */
+  int		num_temps;		/* Number of temporary destinations */
+  cups_dest_t	*temps,			/* Temporary destinations */
+		*temp;			/* Current temporary dest */
+  const char	*val;			/* Value of temporary option */
 
+
+ /*
+  * Get the server destinations...
+  */
+
+  num_temps = cups_get_sdests(CUPS_GET_PRINTERS, 0, &temps);
+  num_temps = cups_get_sdests(CUPS_GET_CLASSES, num_temps, &temps);
 
  /*
   * Figure out which file to write to...
   */
 
-#ifdef WIN32
-  if ((home = getenv("CUPS_SERVERROOT")) == NULL)
-    home = CUPS_SERVERROOT;
+  if ((home = getenv("CUPS_SERVERROOT")) != NULL)
+    snprintf(filename, sizeof(filename), "%s/lpoptions", home);
+  else
+    strcpy(filename, CUPS_SERVERROOT "/lpoptions");
 
-  snprintf(filename, sizeof(filename), "%s/lpoptions", home);
-#else
+#ifndef WIN32
   if (getuid() == 0)
   {
     if ((home = getenv("CUPS_SERVERROOT")) == NULL)
@@ -335,11 +325,14 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
 
     snprintf(filename, sizeof(filename), "%s/lpoptions", home);
   }
-  else if ((home = getenv("HOME")) != NULL)
-    snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
   else
-    return;
-#endif /* WIN32 */
+  {
+    num_temps = cups_get_dests(filename, num_temps, &temps);
+
+    if ((home = getenv("HOME")) != NULL)
+      snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
+  }
+#endif /* !WIN32 */
 
  /*
   * Try to open the file...
@@ -358,12 +351,46 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
   for (i = num_dests, dest = dests; i > 0; i --, dest ++)
     if (dest->instance != NULL || dest->num_options != 0 || dest->is_default)
     {
-      fprintf(fp, "%s %s", dest->is_default ? "Default" : "Dest",
-              dest->name);
-      if (dest->instance)
-	fprintf(fp, "/%s", dest->instance);
+      if (dest->is_default)
+      {
+	fprintf(fp, "Default %s", dest->name);
+	if (dest->instance)
+	  fprintf(fp, "/%s", dest->instance);
+
+        wrote = 1;
+      }
+      else
+        wrote = 0;
+
+      if ((temp = cupsGetDest(dest->name, dest->instance, num_temps, temps)) == NULL)
+        temp = cupsGetDest(dest->name, NULL, num_temps, temps);
 
       for (j = dest->num_options, option = dest->options; j > 0; j --, option ++)
+      {
+       /*
+	* See if the server/global options match these; if so, don't
+	* write 'em.
+	*/
+
+        if (temp && (val = cupsGetOption(option->name, temp->num_options,
+	                                 temp->options)) != NULL)
+	{
+	  if (strcasecmp(val, option->value) == 0)
+	    continue;
+	}
+
+       /*
+        * Options don't match, write to the file...
+	*/
+
+        if (!wrote)
+	{
+	  fprintf(fp, "Dest %s", dest->name);
+	  if (dest->instance)
+	    fprintf(fp, "/%s", dest->instance);
+          wrote = 1;
+	}
+        
         if (option->value[0])
 	{
 	  if (strchr(option->value, ' ') != NULL)
@@ -373,9 +400,17 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
 	}
 	else
 	  fprintf(fp, " %s", option->name);
+      }
 
-      fputs("\n", fp);
+      if (wrote)
+        fputs("\n", fp);
     }
+
+ /*
+  * Free the temporary destinations...
+  */
+
+  cupsFreeDests(num_temps, temps);
 
  /*
   * Close the file and return...
@@ -542,5 +577,146 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
 
 
 /*
- * End of "$Id: dest.c,v 1.18 2001/03/30 22:23:00 mike Exp $".
+ * 'cups_get_sdests()' - Get destinations from a server.
+ */
+
+static int				/* O - Number of destinations */
+cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
+                int         num_dests,	/* I - Number of destinations */
+                cups_dest_t **dests)	/* IO - Destinations */
+{
+  cups_dest_t	*dest;			// Current destination
+  http_t	*http;			// HTTP connection
+  ipp_t		*request,		// IPP Request
+		*response;		// IPP Response
+  ipp_attribute_t *attr;		// Current attribute
+  cups_lang_t	*language;		// Default language
+  const char	*name;			// printer-name attribute
+  char		job_sheets[1024];	// job-sheets option
+  static const char	*pattrs[] =	// Attributes we're interested in
+		{
+		  "printer-name",
+		  "job-sheets-default"
+		};
+
+
+ /*
+  * Connect to the CUPS server...
+  */
+
+  if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
+    return (num_dests);
+
+ /*
+  * Build a CUPS_GET_PRINTERS or CUPS_GET_CLASSES request, which require
+  * the following attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  */
+
+  request = ippNew();
+
+  request->request.op.operation_id = op;
+  request->request.op.request_id   = 1;
+
+  language = cupsLangDefault();
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
+
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                "requested-attributes", sizeof(pattrs) / sizeof(pattrs[0]),
+		NULL, pattrs);
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
+  {
+    for (attr = response->attrs; attr != NULL; attr = attr->next)
+    {
+     /*
+      * Skip leading attributes until we hit a printer...
+      */
+
+      while (attr != NULL && attr->group_tag != IPP_TAG_PRINTER)
+        attr = attr->next;
+
+      if (attr == NULL)
+        break;
+
+     /*
+      * Pull the needed attributes from this job...
+      */
+
+      name = NULL;
+
+      strcpy(job_sheets, "none,none");
+
+      while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
+      {
+        if (strcmp(attr->name, "printer-name") == 0 &&
+	    attr->value_tag == IPP_TAG_NAME)
+	  name = attr->values[0].string.text;
+
+        if (strcmp(attr->name, "job-sheets-default") == 0 &&
+	    (attr->value_tag == IPP_TAG_KEYWORD ||
+	     attr->value_tag == IPP_TAG_NAME))
+        {
+	  if (attr->num_values == 2)
+	    snprintf(job_sheets, sizeof(job_sheets), "%s,%s",
+	             attr->values[0].string.text, attr->values[1].string.text);
+	  else
+	    strcpy(job_sheets, attr->values[0].string.text);
+        }
+
+        attr = attr->next;
+      }
+
+     /*
+      * See if we have everything needed...
+      */
+
+      if (!name)
+      {
+        if (attr == NULL)
+	  break;
+	else
+          continue;
+      }
+
+      num_dests = cupsAddDest(name, NULL, num_dests, dests);
+
+      if ((dest = cupsGetDest(name, NULL, num_dests, *dests)) != NULL)
+        dest->num_options = cupsAddOption("job-sheets", job_sheets, 0,
+	                                  &(dest->options));
+
+      if (attr == NULL)
+	break;
+    }
+
+    ippDelete(response);
+  }
+
+ /*
+  * Close the server connection...
+  */
+
+  httpClose(http);
+
+ /*
+  * Return the count...
+  */
+
+  return (num_dests);
+}
+
+
+/*
+ * End of "$Id: dest.c,v 1.19 2001/06/06 17:54:32 mike Exp $".
  */
