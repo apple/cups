@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.12 1999/04/23 16:58:49 mike Exp $"
+ * "$Id: conf.c,v 1.13 1999/04/23 17:09:18 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -210,11 +210,37 @@ ReadConfiguration(void)
   MimeDatabase = mimeNew();
   mimeMerge(MimeDatabase, directory);
 
+ /*
+  * Load printers and classes...
+  */
+
   LoadAllPrinters();
   LoadAllClasses();
 
+ /*
+  * Add a default browser if browsing is enabled and no browser addresses
+  * were defined...
+  */
+
+  if (Browsing && NumBrowsers == 0)
+  {
+    NumBrowsers ++;
+
+    Browsers[0].sin_addr.s_addr = htonl(INADDR_BROADCAST);
+    Browsers[0].sin_family      = AF_INET;
+    Browsers[0].sin_port        = htons(BrowsePort);
+  }
+
+ /*
+  * Startup all the networking stuff...
+  */
+
   StartListening();
   StartBrowsing();
+
+ /*
+  * Check for queued jobs...
+  */
 
   CheckJobs();
 
@@ -912,6 +938,7 @@ get_address(char               *value,		/* I - Value string */
       }
 
       memcpy(&(address->sin_addr), host->h_addr, host->h_length);
+      address->sin_port = htons(defport);
     }
   }
 
@@ -933,5 +960,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.12 1999/04/23 16:58:49 mike Exp $".
+ * End of "$Id: conf.c,v 1.13 1999/04/23 17:09:18 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.11 1999/04/23 16:57:18 mike Exp $"
+ * "$Id: dirsvc.c,v 1.12 1999/04/23 17:09:19 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -30,6 +30,7 @@
  * Include necessary headers...
  */
 
+#define DEBUG
 #include "cupsd.h"
 
 
@@ -41,11 +42,10 @@ void
 StartBrowsing(void)
 {
   int			val;	/* Socket option value */
-  int			len;	/* Length of value */
   struct sockaddr_in	addr;	/* Broadcast address */
 
 
-  if (!Browsing || NumBrowsers < 1)
+  if (!Browsing)
     return;
 
  /*
@@ -66,14 +66,6 @@ StartBrowsing(void)
   val = 1;
   if (setsockopt(BrowseSocket, SOL_SOCKET, SO_BROADCAST, &val, sizeof(val)))
     perror("StartBrowsing/SO_BROADCAST");
-
-  len = sizeof(val);
-  getsockopt(BrowseSocket, IPPROTO_IP, IP_TTL, &val, &len);
-  printf("ttl = %d (%d)\n", val, len);
-
-  val = 64;
-  if (setsockopt(BrowseSocket, IPPROTO_IP, IP_TTL, &val, sizeof(val)))
-    perror("StartBrowsing/IP_TTL");
 
  /*
   * Bind the socket to browse port...
@@ -114,7 +106,7 @@ StartBrowsing(void)
 void
 StopBrowsing(void)
 {
-  if (!Browsing || NumBrowsers < 1)
+  if (!Browsing)
     return;
 
  /*
@@ -162,12 +154,13 @@ UpdateBrowseList(void)
 
   if ((bytes = recv(BrowseSocket, packet, sizeof(packet), 0)) <= 0)
   {
-    perror("UpdateBrowseList");
+    LogMessage(LOG_ERROR, "UpdateBrowseList: recv failed - %s.",
+               strerror(errno));
     return;
   }
 
   packet[bytes] = '\0';
-  fprintf(stderr, "UpdateBrowseList: (%d bytes) %s", bytes, packet);
+  DEBUG_printf(("UpdateBrowseList: (%d bytes) %s", bytes, packet));
 
   if (sscanf(packet, "%x%x%s", &type, &state, uri) != 3)
   {
@@ -280,7 +273,7 @@ SendBrowseList(void)
 
       sprintf(packet, "%x %x %s\n", p->type, p->state, p->uri);
       bytes = strlen(packet);
-      fprintf(stderr, "SendBrowseList: (%d bytes) %s", bytes, packet);
+      DEBUG_printf(("SendBrowseList: (%d bytes) %s", bytes, packet));
 
      /*
       * Send a packet to each browse address...
@@ -289,12 +282,13 @@ SendBrowseList(void)
       for (i = 0; i < NumBrowsers; i ++)
 	if (sendto(BrowseSocket, packet, bytes, 0, Browsers + i,
 	           sizeof(Browsers[0])) <= 0)
-	  perror("SendBrowseList");
+	  LogMessage(LOG_ERROR, "SendBrowseList: sendto failed for browser %d - %s.",
+	           i + 1, strerror(errno));
     }
   }
 }
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.11 1999/04/23 16:57:18 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.12 1999/04/23 17:09:19 mike Exp $".
  */
