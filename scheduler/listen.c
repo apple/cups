@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.21 2004/02/25 20:14:53 mike Exp $"
+ * "$Id: listen.c,v 1.22 2004/03/24 21:23:04 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -163,8 +163,9 @@ StartListening(void)
 
     if ((lis->fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
-      LogMessage(L_ERROR, "StartListening: Unable to open listen socket - %s.",
-                 strerror(errno));
+      LogMessage(L_ERROR, "StartListening: Unable to open listen socket for address %08x:%d - %s.",
+                 (unsigned)ntohl(lis->address.sin_addr.s_addr),
+		 ntohs(lis->address.sin_port), strerror(errno));
       exit(errno);
     }
 
@@ -187,7 +188,9 @@ StartListening(void)
 
     if (bind(lis->fd, (struct sockaddr *)&(lis->address), sizeof(lis->address)) < 0)
     {
-      LogMessage(L_ERROR, "StartListening: Unable to bind socket - %s.", strerror(errno));
+      LogMessage(L_ERROR, "StartListening: Unable to bind socket for address %08x:%d - %s.",
+                 (unsigned)ntohl(lis->address.sin_addr.s_addr),
+		 ntohs(lis->address.sin_port), strerror(errno));
       exit(errno);
     }
 
@@ -197,8 +200,9 @@ StartListening(void)
 
     if (listen(lis->fd, ListenBackLog) < 0)
     {
-      LogMessage(L_ERROR, "StartListening: Unable to listen for clients - %s.",
-                 strerror(errno));
+      LogMessage(L_ERROR, "StartListening: Unable to listen for clients on address %08x:%d - %s.",
+                 (unsigned)ntohl(lis->address.sin_addr.s_addr),
+		 ntohs(lis->address.sin_port), strerror(errno));
       exit(errno);
     }
   }
@@ -247,5 +251,5 @@ StopListening(void)
 
 
 /*
- * End of "$Id: listen.c,v 1.21 2004/02/25 20:14:53 mike Exp $".
+ * End of "$Id: listen.c,v 1.22 2004/03/24 21:23:04 mike Exp $".
  */

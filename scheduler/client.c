@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.182 2004/03/19 22:07:26 mike Exp $"
+ * "$Id: client.c,v 1.183 2004/03/24 21:23:03 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -357,7 +357,7 @@ CloseClient(client_t *con)	/* I - Client to close */
 #endif /* HAVE_GNUTLS */
 
 
-  LogMessage(L_DEBUG, "CloseClient() %d", con->http.fd);
+  LogMessage(L_DEBUG, "CloseClient: %d", con->http.fd);
 
   partial = 0;
 
@@ -560,6 +560,9 @@ EncryptClient(client_t *con)	/* I - Client to encrypt */
   SSL_set_fd(conn, con->http.fd);
   if (SSL_accept(conn) != 1)
   {
+    LogMessage(L_ERROR, "EncryptClient: Unable to encrypt connection from %s!",
+               con->http.hostname);
+
     while ((error = ERR_get_error()) != 0)
       LogMessage(L_ERROR, "EncryptClient: %s", ERR_error_string(error, NULL));
 
@@ -568,8 +571,8 @@ EncryptClient(client_t *con)	/* I - Client to encrypt */
     return (0);
   }
 
-  LogMessage(L_DEBUG, "EncryptClient() %d Connection now encrypted.",
-             con->http.fd);
+  LogMessage(L_DEBUG, "EncryptClient: %d Connection from %s now encrypted.",
+             con->http.fd, con->http.hostname);
 
   con->http.tls = conn;
   return (1);
@@ -593,6 +596,10 @@ EncryptClient(client_t *con)	/* I - Client to encrypt */
                     malloc(sizeof(gnutls_certificate_server_credentials));
   if (credentials == NULL)
   {
+    LogMessage(L_ERROR, "EncryptClient: Unable to encrypt connection from %s!",
+               con->http.hostname);
+    LogMessage(L_ERROR, "EncryptClient: %s", strerror(errno));
+
     free(conn);
     return (0);
   }
@@ -610,7 +617,10 @@ EncryptClient(client_t *con)	/* I - Client to encrypt */
 
   if (error != GNUTLS_E_SUCCESS)
   {
+    LogMessage(L_ERROR, "EncryptClient: Unable to encrypt connection from %s!",
+               con->http.hostname);
     LogMessage(L_ERROR, "EncryptClient: %s", gnutls_strerror(error));
+
     gnutls_deinit(conn->session);
     gnutls_certificate_free_credentials(*credentials);
     free(conn);
@@ -618,8 +628,8 @@ EncryptClient(client_t *con)	/* I - Client to encrypt */
     return (0);
   }
 
-  LogMessage(L_DEBUG, "EncryptClient() %d Connection now encrypted.",
-             con->http.fd);
+  LogMessage(L_DEBUG, "EncryptClient: %d Connection from %s now encrypted.",
+             con->http.fd, con->http.hostname);
 
   conn->credentials = credentials;
   con->http.tls = conn;
@@ -679,7 +689,10 @@ EncryptClient(client_t *con)	/* I - Client to encrypt */
 
   if (error)
   {
-    LogMessage(L_ERROR, "EncryptClient: %d", error);
+    LogMessage(L_ERROR, "EncryptClient: Unable to encrypt connection from %s!",
+               con->http.hostname);
+
+    LogMessage(L_ERROR, "EncryptClient: CDSA error code is %d", error);
 
     con->http.error  = error;
     con->http.status = HTTP_ERROR;
@@ -690,8 +703,9 @@ EncryptClient(client_t *con)	/* I - Client to encrypt */
     return (0);
   }
 
-  LogMessage(L_DEBUG, "EncryptClient() %d Connection now encrypted.",
-             con->http.fd);
+  LogMessage(L_DEBUG, "EncryptClient: %d Connection from %s now encrypted.",
+             con->http.fd, con->http.hostname);
+
   con->http.tls = conn;
   return (1);
 
@@ -870,7 +884,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 
   status = HTTP_CONTINUE;
 
-  LogMessage(L_DEBUG2, "ReadClient() %d, used=%d, file=%d", con->http.fd,
+  LogMessage(L_DEBUG2, "ReadClient: %d, used=%d, file=%d", con->http.fd,
              con->http.used, con->file);
 
   if (con->http.error)
@@ -935,7 +949,8 @@ ReadClient(client_t *con)		/* I - Client to read from */
         switch (sscanf(line, "%63s%1023s%63s", operation, con->uri, version))
 	{
 	  case 1 :
-	      LogMessage(L_ERROR, "Bad request line \"%s\"!", line);
+	      LogMessage(L_ERROR, "Bad request line \"%s\" from %s!", line,
+	                 con->http.hostname);
 	      SendError(con, HTTP_BAD_REQUEST);
 	      return (CloseClient(con));
 	  case 2 :
@@ -944,7 +959,8 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	  case 3 :
 	      if (sscanf(version, "HTTP/%d.%d", &major, &minor) != 2)
 	      {
-		LogMessage(L_ERROR, "Bad request line \"%s\"!", line);
+		LogMessage(L_ERROR, "Bad request line \"%s\" from %s!", line,
+	                   con->http.hostname);
 		SendError(con, HTTP_BAD_REQUEST);
 		return (CloseClient(con));
 	      }
@@ -1038,7 +1054,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
         con->start     = time(NULL);
         con->operation = con->http.state;
 
-        LogMessage(L_DEBUG, "ReadClient() %d %s %s HTTP/%d.%d", con->http.fd,
+        LogMessage(L_DEBUG, "ReadClient: %d %s %s HTTP/%d.%d", con->http.fd,
 	           operation, con->uri,
 		   con->http.version / 100, con->http.version % 100);
 
@@ -1418,7 +1434,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      if (con->options[0] == '/')
 		cups_strcpy(con->options, con->options + 1);
 
-              LogMessage(L_DEBUG2, "ReadClient() %d command=\"%s\", options = \"%s\"",
+              LogMessage(L_DEBUG2, "ReadClient: %d command=\"%s\", options = \"%s\"",
 	        	 con->http.fd, con->command, con->options);
 
 	      if (con->http.version <= HTTP_1_0)
@@ -1515,7 +1531,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	    fchmod(con->file, 0640);
 	    fchown(con->file, getuid(), Group);
 
-            LogMessage(L_DEBUG2, "ReadClient() %d REQUEST %s=%d", con->http.fd,
+            LogMessage(L_DEBUG2, "ReadClient: %d REQUEST %s=%d", con->http.fd,
 	               con->filename, con->file);
 
 	    if (con->file < 0)
@@ -1644,7 +1660,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
   switch (con->http.state)
   {
     case HTTP_PUT_RECV :
-        LogMessage(L_DEBUG2, "ReadClient() %d con->data_encoding = %s, con->data_remaining = %d, con->file = %d",
+        LogMessage(L_DEBUG2, "ReadClient: %d con->data_encoding = %s, con->data_remaining = %d, con->file = %d",
 		   con->http.fd,
 		   con->http.data_encoding == HTTP_ENCODE_CHUNKED ? "chunked" : "length",
 		   con->http.data_remaining, con->file);
@@ -1655,7 +1671,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	{
 	  con->bytes += bytes;
 
-          LogMessage(L_DEBUG2, "ReadClient() %d writing %d bytes to %d",
+          LogMessage(L_DEBUG2, "ReadClient: %d writing %d bytes to %d",
 	             con->http.fd, bytes, con->file);
 
           if (write(con->file, line, bytes) < bytes)
@@ -1681,7 +1697,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 
 	  fstat(con->file, &filestats);
 
-          LogMessage(L_DEBUG2, "ReadClient() %d Closing data file %d, size = %d.",
+          LogMessage(L_DEBUG2, "ReadClient: %d Closing data file %d, size = %d.",
                      con->http.fd, con->file, (int)filestats.st_size);
 
 	  close(con->file);
@@ -1694,7 +1710,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	    * Request is too big; remove it and send an error...
 	    */
 
-            LogMessage(L_DEBUG2, "ReadClient() %d Removing temp file %s",
+            LogMessage(L_DEBUG2, "ReadClient: %d Removing temp file %s",
 	               con->http.fd, con->filename);
 	    unlink(con->filename);
 	    ClearString(&con->filename);
@@ -1719,7 +1735,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
         break;
 
     case HTTP_POST_RECV :
-        LogMessage(L_DEBUG2, "ReadClient() %d con->data_encoding = %s, con->data_remaining = %d, con->file = %d",
+        LogMessage(L_DEBUG2, "ReadClient: %d con->data_encoding = %s, con->data_remaining = %d, con->file = %d",
 		   con->http.fd,
 		   con->http.data_encoding == HTTP_ENCODE_CHUNKED ? "chunked" : "length",
 		   con->http.data_remaining, con->file);
@@ -1732,7 +1748,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 
 	  if ((ipp_state = ippRead(&(con->http), con->request)) == IPP_ERROR)
 	  {
-            LogMessage(L_ERROR, "ReadClient() %d IPP Read Error!",
+            LogMessage(L_ERROR, "ReadClient: %d IPP Read Error!",
 	               con->http.fd);
 
 	    SendError(con, HTTP_BAD_REQUEST);
@@ -1755,7 +1771,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	  fchmod(con->file, 0640);
 	  fchown(con->file, getuid(), Group);
 
-          LogMessage(L_DEBUG2, "ReadClient() %d REQUEST %s=%d", con->http.fd,
+          LogMessage(L_DEBUG2, "ReadClient: %d REQUEST %s=%d", con->http.fd,
 	             con->filename, con->file);
 
 	  if (con->file < 0)
@@ -1773,7 +1789,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	  {
 	    con->bytes += bytes;
 
-            LogMessage(L_DEBUG2, "ReadClient() %d writing %d bytes to %d",
+            LogMessage(L_DEBUG2, "ReadClient: %d writing %d bytes to %d",
 	               con->http.fd, bytes, con->file);
 
             if (write(con->file, line, bytes) < bytes)
@@ -1802,7 +1818,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	  {
 	    fstat(con->file, &filestats);
 
-            LogMessage(L_DEBUG2, "ReadClient() %d Closing data file %d, size = %d.",
+            LogMessage(L_DEBUG2, "ReadClient: %d Closing data file %d, size = %d.",
                        con->http.fd, con->file, (int)filestats.st_size);
 
 	    close(con->file);
@@ -1815,7 +1831,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      * Request is too big; remove it and send an error...
 	      */
 
-              LogMessage(L_DEBUG2, "ReadClient() %d Removing temp file %s",
+              LogMessage(L_DEBUG2, "ReadClient: %d Removing temp file %s",
 	                 con->http.fd, con->filename);
 	      unlink(con->filename);
 	      ClearString(&con->filename);
@@ -1933,10 +1949,9 @@ SendError(client_t      *con,	/* I - Connection */
   * Put the request in the access_log file...
   */
 
-  if (con->operation > HTTP_WAITING)
-    LogRequest(con, code);
+  LogRequest(con, code);
 
-  LogMessage(L_DEBUG, "SendError() %d code=%d (%s)", con->http.fd, code,
+  LogMessage(L_DEBUG, "SendError: %d code=%d (%s)", con->http.fd, code,
              httpStatus(code));
 
  /*
@@ -2016,7 +2031,7 @@ SendFile(client_t    *con,
 {
   con->file = open(filename, O_RDONLY);
 
-  LogMessage(L_DEBUG, "SendFile() %d file=%d", con->http.fd, con->file);
+  LogMessage(L_DEBUG, "SendFile: %d file=%d", con->http.fd, con->file);
 
   if (con->file < 0)
     return (0);
@@ -2460,7 +2475,7 @@ check_if_modified(client_t    *con,		/* I - Client connection */
   if (*ptr == '\0')
     return (1);
 
-  LogMessage(L_DEBUG2, "check_if_modified() %d If-Modified-Since=\"%s\"",
+  LogMessage(L_DEBUG2, "check_if_modified: %d If-Modified-Since=\"%s\"",
              con->http.fd, ptr);
 
   while (*ptr != '\0')
@@ -2484,7 +2499,7 @@ check_if_modified(client_t    *con,		/* I - Client connection */
     }
   }
 
-  LogMessage(L_DEBUG2, "check_if_modified() %d sizes=%d,%d dates=%d,%d",
+  LogMessage(L_DEBUG2, "check_if_modified: %d sizes=%d,%d dates=%d,%d",
              con->http.fd, size, (int)filestats->st_size, (int)date,
 	     (int)filestats->st_mtime);
 
@@ -2529,7 +2544,7 @@ decode_auth(client_t *con)		/* I - Client to decode to */
 
     if ((s = strchr(value, ':')) == NULL)
     {
-      LogMessage(L_DEBUG, "decode_auth() %d no colon in auth string \"%s\"",
+      LogMessage(L_DEBUG, "decode_auth: %d no colon in auth string \"%s\"",
         	 con->http.fd, value);
       return;
     }
@@ -2563,7 +2578,7 @@ decode_auth(client_t *con)		/* I - Client to decode to */
       strlcpy(con->password, value, sizeof(con->password));
   }
 
-  LogMessage(L_DEBUG2, "decode_auth() %d username=\"%s\"",
+  LogMessage(L_DEBUG2, "decode_auth: %d username=\"%s\"",
              con->http.fd, con->username);
 }
 
@@ -2677,7 +2692,7 @@ get_file(client_t    *con,		/* I  - Client connection */
 #endif /* HAVE_PYTHON */
   }
 
-  LogMessage(L_DEBUG2, "get_file() %d filename=%s size=%d",
+  LogMessage(L_DEBUG2, "get_file: %d filename=%s size=%d",
              con->http.fd, filename, status ? -1 : (int)filestats->st_size);
 
   if (status)
@@ -3337,5 +3352,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.182 2004/03/19 22:07:26 mike Exp $".
+ * End of "$Id: client.c,v 1.183 2004/03/24 21:23:03 mike Exp $".
  */
