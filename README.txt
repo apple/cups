@@ -1,4 +1,4 @@
-README - CUPS v1.1b1 - 02/27/2000
+README - CUPS v1.1b2 - 03/13/2000
 ---------------------------------
 
 ************************************************************************
@@ -41,7 +41,7 @@ CUPS adds network printer browsing and PostScript Printer Description
 UNIX.
 
 CUPS also includes a customized version of GNU GhostScript (currently
-based off GNU GhostScript 4.03) and an image file RIP that can be used
+based off GNU GhostScript 5.50) and an image file RIP that can be used
 to support non-PostScript printers.
 
 CUPS is Copyright 1993-2000 by Easy Software Products, All Rights
@@ -125,7 +125,7 @@ user in the sys/system/root group on your system) and then shown a
 menu of available functions.
 
 [note: adding, deleting, and modifying classes has not been implemented in
-       beta 1]
+       beta 2]
 
 
 SETTING UP PRINTER QUEUES FROM THE COMMAND-LINE
@@ -169,8 +169,8 @@ Similarly, for the other sample drivers you can use:
     HP LaserJet Series          laserjet.ppd
     EPSON Stylus Color Series   stcolor.ppd
     EPSON Stylus Photo Series   stphoto.ppd
-    EPSON 9-pin Series          epson9.ppd [not in beta 1]
-    EPSON 24-pin Series         epson24.ppd [not in beta 1]
+    EPSON 9-pin Series          epson9.ppd [not in beta 2]
+    EPSON 24-pin Series         epson24.ppd [not in beta 2]
 
 These sample drivers provide basic printing capabilities, but generally
 do not exercise the full potential of the printers or CUPS.  For

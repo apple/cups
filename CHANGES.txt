@@ -1,5 +1,41 @@
-CHANGES.txt - 02/27/2000
+CHANGES.txt - 03/13/2000
 ------------------------
+
+CHANGES IN CUPS v1.1b2
+
+	- Documentation updates.
+	- The lp command didn't always load the user-defined
+	  destinations, preventing it from seeing the default
+	  printer.
+	- Many configure script and makefile fixes.
+	- The Microsoft code page files were missing from the
+	  distribution.
+	- Added a workaround for the HP IPP client (which is sending
+	  an invalid printer-uri in requests)
+	- Fixed the encoding of text-with-language and name-with-language
+	  to match the IPP spec.
+	- Added support for unknown value tags in the IPP routines
+	  (previously they would be ignored)
+	- Integrated GNU GhostScript 5.50 into the pstoraster filter.
+	- Client hostname resolution was broken on little-endian
+	  machines.
+	- Now look at client.conf file for client's default server
+	  and printer.
+	- The cupsServer() function did not close the client.conf file
+	  if it contained a ServerName directive.
+	- Added BrowseAllow, BrowseDeny, BrowseOrder, BrowsePoll, and
+	  BrowseRelay directives.
+	- BrowseInterval 0 disables advertising of local printers, but
+	  still receives information on remote printers.
+	- New browse polling daemon (for polling servers on different
+	  networks)
+	- New PPD cache file for faster startup times with large numbers
+	  of PPD files.
+	- The Host: field was incorrectly required for HTTP/1.0 clients.
+	- New set-job-attributes operation now supported.
+	- The mime_load_types() and mime_load_convs() functions did not
+	  close their input files.
+
 
 CHANGES IN CUPS v1.1b1
 
