@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.62 2000/05/11 20:02:18 mike Exp $"
+# "$Id: cups.list,v 1.63 2000/05/16 19:18:59 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -136,7 +136,7 @@ f 0444 root sys /usr/share/cups/banners/confidential data/confidential
 f 0444 root sys /usr/share/cups/banners/secret data/secret
 f 0444 root sys /usr/share/cups/banners/standard data/standard
 f 0444 root sys /usr/share/cups/banners/topsecret data/topsecret
-f 0444 root sys /usr/share/cups/banners/classified data/unclassified
+f 0444 root sys /usr/share/cups/banners/unclassified data/unclassified
 
 f 0444 root sys /usr/share/cups/charsets/windows-874 data/windows-874
 f 0444 root sys /usr/share/cups/charsets/windows-1250 data/windows-1250
@@ -260,8 +260,8 @@ f 0444 root sys /usr/share/cups/pstoraster/pdf_sec.ps pstoraster/pdf_sec.ps
 
 f 0444 root sys /usr/share/cups/model/deskjet.ppd ppd/deskjet.ppd
 f 0444 root sys /usr/share/cups/model/laserjet.ppd ppd/laserjet.ppd
-f 0444 root sys /usr/share/cups/model/epson9.ppd ppd/epson9.ppd
-f 0444 root sys /usr/share/cups/model/epson24.ppd ppd/epson24.ppd
+#f 0444 root sys /usr/share/cups/model/epson9.ppd ppd/epson9.ppd
+#f 0444 root sys /usr/share/cups/model/epson24.ppd ppd/epson24.ppd
 f 0444 root sys /usr/share/cups/model/stcolor.ppd ppd/stcolor.ppd
 f 0444 root sys /usr/share/cups/model/stphoto.ppd ppd/stphoto.ppd
 
@@ -435,7 +435,6 @@ f 0444 root sys /usr/man/man8/cups-polld.8 man/cups-polld.man
 f 0444 root sys /usr/man/man8/cupsd.8 man/cupsd.man
 f 0444 root sys /usr/man/man5/cupsd.conf.5 man/cupsd.conf.man
 f 0444 root sys /usr/man/man8/enable.8 man/enable.man
-f 0444 root sys /usr/man/man8/esplicense.8 man/esplicense.man
 l 0444 root sys /usr/man/man8/disable.8 enable.man
 f 0444 root sys /usr/man/man1/filter.1 man/filter.man
 f 0444 root sys /usr/man/man8/lpadmin.8 man/lpadmin.man
@@ -458,5 +457,5 @@ f 0444 root sys /usr/man/man5/printers.conf.5 man/printers.conf.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.62 2000/05/11 20:02:18 mike Exp $".
+# End of "$Id: cups.list,v 1.63 2000/05/16 19:18:59 mike Exp $".
 #
