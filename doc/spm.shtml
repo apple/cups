@@ -936,11 +936,623 @@ API.
 
 <H2>CUPS Constants</H2>
 
+<H3>Version Number</H3>
+
+<P>The <CODE>CUPS_VERSION</CODE> constant is a floating-point number
+representing the API version number. The current version number is
+1.0100 which represents CUPS version 1.1.0.
+
+<H3>Printer Capabilities</H3>
+
+<P>The <CODE>CUPS_PRINTER</CODE> constants represent capability bits for
+printers and classes:
+
+<UL>
+
+	<LI><CODE>CUPS_PRINTER_LOCAL</CODE> - Is a local printer or class.
+
+	<LI><CODE>CUPS_PRINTER_REMOTE</CODE> - Is a remote printer or class.
+
+	<LI><CODE>CUPS_PRINTER_CLASS</CODE> - Is a class.
+
+	<LI><CODE>CUPS_PRINTER_BW</CODE> - Printer prints in black and white.
+
+	<LI><CODE>CUPS_PRINTER_COLOR</CODE> - Printer prints in color.
+
+	<LI><CODE>CUPS_PRINTER_DUPLEX</CODE> - Printer can print double-sided.
+
+	<LI><CODE>CUPS_PRINTER_STAPLE</CODE> - Printer can staple output.
+
+	<LI><CODE>CUPS_PRINTER_COPIES</CODE> - Printer can produce multiple
+	copies on its own.
+
+	<LI><CODE>CUPS_PRINTER_COLLATE</CODE> - Printer can collate copies.
+
+	<LI><CODE>CUPS_PRINTER_PUNCH</CODE> - Printer can punch holes in output.
+
+	<LI><CODE>CUPS_PRINTER_COVER</CODE> - Printer can put covers on output.
+
+	<LI><CODE>CUPS_PRINTER_BIND</CODE> - Printer can bind output.
+
+	<LI><CODE>CUPS_PRINTER_SORT</CODE> - Printer can sort output.
+
+	<LI><CODE>CUPS_PRINTER_SMALL</CODE> - Printer can print on media up
+	to 9x14 inches.
+
+	<LI><CODE>CUPS_PRINTER_MEDIUM</CODE> - Printer can print on media
+	from 9x14 to 18x24 inches.
+
+	<LI><CODE>CUPS_PRINTER_LARGE</CODE> - Printer can print on media
+	larger than 18x24 inches.
+
+	<LI><CODE>CUPS_PRINTER_VARIABLE</CODE> - Printer can print on
+	variable or custom media sizes.
+
+	<LI><CODE>CUPS_PRINTER_IMPLICIT</CODE> - Is an implicit class.
+
+	<LI><CODE>CUPS_PRINTER_OPTIONS</CODE> - All of the printer capability
+	and option bits.
+
+</UL>
+
+<H3>Encodings</H3>
+
+<P>CUPS defines the following character set encoding constants:
+
+<UL>
+
+	<LI><CODE>CUPS_US_ASCII</CODE> - US ASCII character set.
+
+	<LI><CODE>CUPS_UTF_8</CODE> - UTF-8 encoding of Unicode.
+
+	<LI><CODE>CUPS_ISO8859_1</CODE> - ISO-8859-1 character set.
+
+	<LI><CODE>CUPS_ISO8859_2</CODE> - ISO-8859-2 character set.
+
+	<LI><CODE>CUPS_ISO8859_3</CODE> - ISO-8859-3 character set.
+
+	<LI><CODE>CUPS_ISO8859_4</CODE> - ISO-8859-4 character set.
+
+	<LI><CODE>CUPS_ISO8859_5</CODE> - ISO-8859-5 character set.
+
+	<LI><CODE>CUPS_ISO8859_6</CODE> - ISO-8859-6 character set.
+
+	<LI><CODE>CUPS_ISO8859_7</CODE> - ISO-8859-7 character set.
+
+	<LI><CODE>CUPS_ISO8859_8</CODE> - ISO-8859-8 character set.
+
+	<LI><CODE>CUPS_ISO8859_9</CODE> - ISO-8859-9 character set.
+
+	<LI><CODE>CUPS_ISO8859_10</CODE> - ISO-8859-10 character set.
+
+	<LI><CODE>CUPS_ISO8859_13</CODE> - ISO-8859-13 character set.
+
+	<LI><CODE>CUPS_ISO8859_14</CODE> - ISO-8859-14 character set.
+
+	<LI><CODE>CUPS_ISO8859_15</CODE> - ISO-8859-15 character set.
+
+	<LI><CODE>CUPS_WINDOWS_874</CODE> - Windows code page 874.
+
+	<LI><CODE>CUPS_WINDOWS_1250</CODE> - Windows code page 1250.
+
+	<LI><CODE>CUPS_WINDOWS_1251</CODE> - Windows code page 1251.
+
+	<LI><CODE>CUPS_WINDOWS_1252</CODE> - Windows code page 1252.
+
+	<LI><CODE>CUPS_WINDOWS_1253</CODE> - Windows code page 1253.
+
+	<LI><CODE>CUPS_WINDOWS_1254</CODE> - Windows code page 1254.
+
+	<LI><CODE>CUPS_WINDOWS_1255</CODE> - Windows code page 1255.
+
+	<LI><CODE>CUPS_WINDOWS_1256</CODE> - Windows code page 1256.
+
+	<LI><CODE>CUPS_WINDOWS_1257</CODE> - Windows code page 1257.
+
+	<LI><CODE>CUPS_WINDOWS_1258</CODE> - Windows code page 1258.
+
+</UL>
+
 <H2>HTTP Constants</H2>
+
+<H3>Limits</H3>
+
+<P>The following constants define the limits for strings:
+
+<UL>
+
+	<LI><CODE>HTTP_MAX_BUFFER</CODE> - Size of socket buffer.
+
+	<LI><CODE>HTTP_MAX_HOST</CODE> - Maximum length of hostname.
+
+	<LI><CODE>HTTP_MAX_URI</CODE> - Maximum length of URI.
+
+	<LI><CODE>HTTP_MAX_VALUE</CODE> - Maximum length of field values.
+
+</UL>
+
+<H3>Status Codes</H3>
+
+<P>The following status codes can be returned by <CODE>httpUpdate()</CODE>:
+
+<UL>
+
+	<LI><CODE>HTTP_ERROR</CODE> - A network error occurred
+
+	<LI><CODE>HTTP_CONTINUE</CODE> - Continue response from HTTP proxy
+
+	<LI><CODE>HTTP_OK</CODE> - OPTIONS/GET/HEAD/POST/TRACE command was successful
+
+	<LI><CODE>HTTP_CREATED</CODE> - PUT command was successful
+
+	<LI><CODE>HTTP_ACCEPTED</CODE> - DELETE command was successful
+
+	<LI><CODE>HTTP_NOT_AUTHORITATIVE</CODE> - Information isn't authoritative
+
+	<LI><CODE>HTTP_NO_CONTENT</CODE> - Successful command
+
+	<LI><CODE>HTTP_RESET_CONTENT</CODE> - Content was reset/recreated
+
+	<LI><CODE>HTTP_PARTIAL_CONTENT</CODE> - Only a partial file was recieved/sent
+
+	<LI><CODE>HTTP_MULTIPLE_CHOICES</CODE> - Multiple files match request
+
+	<LI><CODE>HTTP_MOVED_PERMANENTLY</CODE> - Document has moved permanently
+
+	<LI><CODE>HTTP_MOVED_TEMPORARILY</CODE> - Document has moved temporarily
+
+	<LI><CODE>HTTP_SEE_OTHER</CODE> - See this other link...
+
+	<LI><CODE>HTTP_NOT_MODIFIED</CODE> - File not modified
+
+	<LI><CODE>HTTP_USE_PROXY</CODE> - Must use a proxy to access this URI
+
+	<LI><CODE>HTTP_BAD_REQUEST</CODE> - Bad request
+
+	<LI><CODE>HTTP_UNAUTHORIZED</CODE> - Unauthorized to access host
+
+	<LI><CODE>HTTP_PAYMENT_REQUIRED</CODE> - Payment required
+
+	<LI><CODE>HTTP_FORBIDDEN</CODE> - Forbidden to access this URI
+
+	<LI><CODE>HTTP_NOT_FOUND</CODE> - URI was not found
+
+	<LI><CODE>HTTP_METHOD_NOT_ALLOWED</CODE> - Method is not allowed
+
+	<LI><CODE>HTTP_NOT_ACCEPTABLE</CODE> - Not Acceptable
+
+	<LI><CODE>HTTP_PROXY_AUTHENTICATION</CODE> - Proxy Authentication is Required
+
+	<LI><CODE>HTTP_REQUEST_TIMEOUT</CODE> - Request timed out
+
+	<LI><CODE>HTTP_CONFLICT</CODE> - Request is self-conflicting
+
+	<LI><CODE>HTTP_GONE</CODE> - Server has gone away
+
+	<LI><CODE>HTTP_LENGTH_REQUIRED</CODE> - A content length or encoding is required
+
+	<LI><CODE>HTTP_PRECONDITION</CODE> - Precondition failed
+
+	<LI><CODE>HTTP_REQUEST_TOO_LARGE</CODE> - Request entity too large
+
+	<LI><CODE>HTTP_URI_TOO_LONG</CODE> - URI too long
+
+	<LI><CODE>HTTP_UNSUPPORTED_MEDIATYPE</CODE> - The requested media type is unsupported
+
+	<LI><CODE>HTTP_SERVER_ERROR</CODE> - Internal server error
+
+	<LI><CODE>HTTP_NOT_IMPLEMENTED</CODE> - Feature not implemented
+
+	<LI><CODE>HTTP_BAD_GATEWAY</CODE> - Bad gateway
+
+	<LI><CODE>HTTP_SERVICE_UNAVAILABLE</CODE> - Service is unavailable
+
+	<LI><CODE>HTTP_GATEWAY_TIMEOUT</CODE> - Gateway connection timed out
+
+	<LI><CODE>HTTP_NOT_SUPPORTED</CODE> - HTTP version not supported
+
+</UL>
+
+<H3>Fields</H3>
+
+<P>The following fields are indices for each of the standard HTTP fields in
+HTTP 1/1:
+
+<UL>
+
+	<LI><CODE>HTTP_FIELD_ACCEPT_LANGUAGE</CODE> - Accept-Language
+
+	<LI><CODE>HTTP_FIELD_ACCEPT_RANGES</CODE> - Accept-Ranges
+
+	<LI><CODE>HTTP_FIELD_AUTHORIZATION</CODE> - Authorization
+
+	<LI><CODE>HTTP_FIELD_CONNECTION</CODE> - Connection
+
+	<LI><CODE>HTTP_FIELD_CONTENT_ENCODING</CODE> - Content-Encoding
+
+	<LI><CODE>HTTP_FIELD_CONTENT_LANGUAGE</CODE> - Content-Language
+
+	<LI><CODE>HTTP_FIELD_CONTENT_LENGTH</CODE> - Content-Length
+
+	<LI><CODE>HTTP_FIELD_CONTENT_LOCATION</CODE> - Content-Location
+
+	<LI><CODE>HTTP_FIELD_CONTENT_MD5</CODE> - Content-MD5
+
+	<LI><CODE>HTTP_FIELD_CONTENT_RANGE</CODE> - Content-Range
+
+	<LI><CODE>HTTP_FIELD_CONTENT_TYPE</CODE> - Content-Type
+
+	<LI><CODE>HTTP_FIELD_CONTENT_VERSION</CODE> - Content-Version
+
+	<LI><CODE>HTTP_FIELD_DATE</CODE> - Date
+
+	<LI><CODE>HTTP_FIELD_HOST</CODE> - Host
+
+	<LI><CODE>HTTP_FIELD_IF_MODIFIED_SINCE</CODE> - If-Modified-Since
+
+	<LI><CODE>HTTP_FIELD_IF_UNMODIFIED_SINCE</CODE> - If-Unmodified-Since
+
+	<LI><CODE>HTTP_FIELD_KEEP_ALIVE</CODE> - Keep-Alive
+
+	<LI><CODE>HTTP_FIELD_LAST_MODIFIED</CODE> - Last-Modified
+
+	<LI><CODE>HTTP_FIELD_LINK</CODE> - Link
+
+	<LI><CODE>HTTP_FIELD_LOCATION</CODE> - Location
+
+	<LI><CODE>HTTP_FIELD_RANGE</CODE> - Range
+
+	<LI><CODE>HTTP_FIELD_REFERER</CODE> - Referer
+
+	<LI><CODE>HTTP_FIELD_RETRY_AFTER</CODE> - Retry-After
+
+	<LI><CODE>HTTP_FIELD_TRANSFER_ENCODING</CODE> - Transfer-Encoding
+
+	<LI><CODE>HTTP_FIELD_UPGRADE</CODE> - Upgrade
+
+	<LI><CODE>HTTP_FIELD_USER_AGENT</CODE> - User-Agent
+
+	<LI><CODE>HTTP_FIELD_WWW_AUTHENTICATE</CODE> - WWW-Authenticate
+
+
+</UL>
 
 <H2>IPP Constants</H2>
 
-<H2>Language Constants</H2>
+<H3>Limits</H3>
+
+<P>The following constants define array limits for IPP data:
+
+<UL>
+
+	<LI><CODE>IPP_MAX_NAME</CODE> - Maximum length of an attribute name
+
+	<LI><CODE>IPP_MAX_VALUES</CODE> - Maximum number of set-of values
+	that can be read in a request.
+
+</UL>
+
+<H3>Tags</H3>
+
+<UL>
+
+	<LI><CODE>IPP_TAG_ZERO</CODE> - Wildcard tag value for searches; also
+	used to separate groups of attributes
+
+	<LI><CODE>IPP_TAG_OPERATION</CODE> - Tag for values of type operation
+
+	<LI><CODE>IPP_TAG_JOB</CODE> - Tag for values of type job
+
+	<LI><CODE>IPP_TAG_END</CODE> - Tag for values of type end
+
+	<LI><CODE>IPP_TAG_PRINTER</CODE> - Tag for values of type printer
+
+	<LI><CODE>IPP_TAG_UNSUPPORTED_GROUP</CODE> - Tag for values of type unsupported_group
+
+	<LI><CODE>IPP_TAG_UNSUPPORTED_VALUE</CODE> - Tag for values of type unsupported_value
+
+	<LI><CODE>IPP_TAG_DEFAULT</CODE> - Tag for values of type default
+
+	<LI><CODE>IPP_TAG_UNKNOWN</CODE> - Tag for values of type unknown
+
+	<LI><CODE>IPP_TAG_NOVALUE</CODE> - Tag for values of type novalue
+
+	<LI><CODE>IPP_TAG_NOTSETTABLE</CODE> - Tag for values of type notsettable
+
+	<LI><CODE>IPP_TAG_DELETEATTR</CODE> - Tag for values of type deleteattr
+
+	<LI><CODE>IPP_TAG_ANYVALUE</CODE> - Tag for values of type anyvalue
+
+	<LI><CODE>IPP_TAG_INTEGER</CODE> - Tag for values of type integer
+
+	<LI><CODE>IPP_TAG_BOOLEAN</CODE> - Tag for values of type boolean
+
+	<LI><CODE>IPP_TAG_ENUM</CODE> - Tag for values of type enum
+
+	<LI><CODE>IPP_TAG_STRING</CODE> - Tag for values of type string
+
+	<LI><CODE>IPP_TAG_DATE</CODE> - Tag for values of type date
+
+	<LI><CODE>IPP_TAG_RESOLUTION</CODE> - Tag for values of type resolution
+
+	<LI><CODE>IPP_TAG_RANGE</CODE> - Tag for values of type range
+
+	<LI><CODE>IPP_TAG_COLLECTION</CODE> - Tag for values of type collection
+
+	<LI><CODE>IPP_TAG_TEXTLANG</CODE> - Tag for values of type textlang
+
+	<LI><CODE>IPP_TAG_NAMELANG</CODE> - Tag for values of type namelang
+
+	<LI><CODE>IPP_TAG_TEXT</CODE> - Tag for values of type text
+
+	<LI><CODE>IPP_TAG_NAME</CODE> - Tag for values of type name
+
+	<LI><CODE>IPP_TAG_KEYWORD</CODE> - Tag for values of type keyword
+
+	<LI><CODE>IPP_TAG_URI</CODE> - Tag for values of type uri
+
+	<LI><CODE>IPP_TAG_URISCHEME</CODE> - Tag for values of type urischeme
+
+	<LI><CODE>IPP_TAG_CHARSET</CODE> - Tag for values of type charset
+
+	<LI><CODE>IPP_TAG_LANGUAGE</CODE> - Tag for values of type language
+
+	<LI><CODE>IPP_TAG_MIMETYPE</CODE> - Tag for values of type mimetype
+
+</UL>
+
+<H3>Resolution Units</H3>
+
+<P>The <CODE>IPP_RES_PER_INCH</CODE> and <CODE>IPP_RES_PER_CM</CODE> constants
+specify dots per inch and dots per centimeter, respectively.
+
+<H3>Finishings</H3>
+
+<P>The finishing values specify special finishing operations to be
+performed on the job.
+
+<UL>
+
+	<LI><CODE>IPP_FINISH_NONE</CODE> - Do no finishing
+
+	<LI><CODE>IPP_FINISH_STAPLE</CODE> - Staple the job
+
+	<LI><CODE>IPP_FINISH_PUNCH</CODE> - Punch the job
+
+	<LI><CODE>IPP_FINISH_COVER</CODE> - Cover the job
+
+	<LI><CODE>IPP_FINISH_BIND</CODE> - Bind the job
+
+</UL>
+
+<H3>Orientations</H3>
+
+<P>The orientation values specify the orientation of the job.
+
+<UL>
+
+	<LI><CODE>IPP_PORTRAIT</CODE> - No rotation
+
+	<LI><CODE>IPP_LANDSCAPE</CODE> - 90 degrees counter-clockwise
+
+	<LI><CODE>IPP_REVERSE_LANDSCAPE</CODE> - 90 degrees clockwise
+
+	<LI><CODE>IPP_REVERSE_PORTRAIT</CODE> - 180 degrees
+
+</UL>
+
+<H3>Qualities</H3>
+
+<P>The quality values specify the desired quality of the print.
+<UL>
+
+	<LI><CODE>IPP_QUALITY_DRAFT</CODE> - Draft quality
+
+	<LI><CODE>IPP_QUALITY_NORMAL</CODE> - Normal quality
+
+	<LI><CODE>IPP_QUALITY_HIGH</CODE> - High quality
+
+</UL>
+
+<H3>Job States</H3>
+
+<P>The job state values are used to represent the current job state.
+
+<UL>
+
+	<LI><CODE>IPP_JOB_PENDING</CODE> - Job is pending
+
+	<LI><CODE>IPP_JOB_HELD</CODE> - Job is held
+
+	<LI><CODE>IPP_JOB_PROCESSING</CODE> - Job is processing
+
+	<LI><CODE>IPP_JOB_STOPPED</CODE> - Job is stopped
+
+	<LI><CODE>IPP_JOB_CANCELLED</CODE> - Job is cancelled
+
+	<LI><CODE>IPP_JOB_ABORTED</CODE> - Job is aborted
+
+	<LI><CODE>IPP_JOB_COMPLETED</CODE> - Job is completed
+
+</UL>
+
+<H3>Printer States</H3>
+
+<P>The printer state values are used to represent the current printer
+state.
+
+<UL>
+
+	<LI><CODE>IPP_PRINTER_IDLE</CODE> - Printer is idle
+
+	<LI><CODE>IPP_PRINTER_PROCESSING</CODE> - Printer is processing
+
+	<LI><CODE>IPP_PRINTER_STOPPED</CODE> - Printer is stopped
+
+</UL>
+
+<H3>Operations</H3>
+
+<P>The operation values represent the available IPP operations.
+
+<UL>
+
+	<LI><CODE>IPP_PRINT_JOB</CODE> - Print a file
+
+	<LI><CODE>IPP_PRINT_URI</CODE> - Print a URI
+
+	<LI><CODE>IPP_VALIDATE_JOB</CODE> - Validate job attributes
+
+	<LI><CODE>IPP_CREATE_JOB</CODE> - Create a new job
+
+	<LI><CODE>IPP_SEND_DOCUMENT</CODE> - Send a document to a job
+
+	<LI><CODE>IPP_SEND_URI</CODE> - Send a URI to a job
+
+	<LI><CODE>IPP_CANCEL_JOB</CODE> - Cancel a job
+
+	<LI><CODE>IPP_GET_JOB_ATTRIBUTES</CODE> - Get job attributes
+
+	<LI><CODE>IPP_GET_JOBS</CODE> - Get a list of all jobs
+
+	<LI><CODE>IPP_GET_PRINTER_ATTRIBUTES</CODE> - Get printer attributes
+
+	<LI><CODE>IPP_HOLD_JOB</CODE> - Hold a pending job
+
+	<LI><CODE>IPP_RELEASE_JOB</CODE> - Release a held job
+
+	<LI><CODE>IPP_RESTART_JOB</CODE> - Restart a completed job
+
+	<LI><CODE>IPP_PAUSE_PRINTER</CODE> - Pause a printer
+
+	<LI><CODE>IPP_RESUME_PRINTER</CODE> - Restart a paused printer
+
+	<LI><CODE>IPP_PURGE_JOBS</CODE> - Purge jobs from the queue
+
+	<LI><CODE>IPP_SET_PRINTER_ATTRIBUTES</CODE> - Set printer attributes
+
+	<LI><CODE>IPP_SET_JOB_ATTRIBUTES</CODE> - Set job attributes
+
+	<LI><CODE>IPP_GET_PRINTER_SUPPORTED_VALUES</CODE> - Get printer supported values
+
+	<LI><CODE>CUPS_GET_DEFAULT</CODE> - Get the default destination
+
+	<LI><CODE>CUPS_GET_PRINTERS</CODE> - Get a list of all printers
+
+	<LI><CODE>CUPS_ADD_PRINTER</CODE> - Add or modify a printer
+
+	<LI><CODE>CUPS_DELETE_PRINTER</CODE> - Delete a printer
+
+	<LI><CODE>CUPS_GET_CLASSES</CODE> - Get a list of all classes
+
+	<LI><CODE>CUPS_ADD_CLASS</CODE> - Add or modify a class
+
+	<LI><CODE>CUPS_DELETE_CLASS</CODE> - Delete a class
+
+	<LI><CODE>CUPS_ACCEPT_JOBS</CODE> - Accept jobs on a printer or class
+
+	<LI><CODE>CUPS_REJECT_JOBS</CODE> - Reject jobs on a printer or class
+
+	<LI><CODE>CUPS_SET_DEFAULT</CODE> - Set the default destination
+
+	<LI><CODE>CUPS_GET_DEVICES</CODE> - Get a list of all devices
+
+	<LI><CODE>CUPS_GET_PPDS</CODE> - Get a list of all PPDs
+
+	<LI><CODE>CUPS_MOVE_JOB</CODE> - Move a job to a new destination
+
+</UL>
+
+<H3>Status Codes</H3>
+
+<P>Status codes are returned by all IPP requests.
+
+<UL>
+
+	<LI><CODE>IPP_OK</CODE> - Request completed with no errors
+
+	<LI><CODE>IPP_OK_SUBST</CODE> - Request completed but some attribute
+	values were substituted
+
+	<LI><CODE>IPP_OK_CONFLICT</CODE> - Request completed but some attributes
+	conflicted
+
+	<LI><CODE>IPP_BAD_REQUEST</CODE> - The request was bad
+
+	<LI><CODE>IPP_FORBIDDEN</CODE> - You don't have access to the resource
+
+	<LI><CODE>IPP_NOT_AUTHENTICATED</CODE> - You are not authenticated for
+	the resource
+
+	<LI><CODE>IPP_NOT_AUTHORIZED</CODE> - You not authorized to access
+	the resource
+
+	<LI><CODE>IPP_NOT_POSSIBLE</CODE> - The requested operation cannot be
+	completed
+
+	<LI><CODE>IPP_TIMEOUT</CODE> - A timeout occurred
+
+	<LI><CODE>IPP_NOT_FOUND</CODE> - The resource was not found
+
+	<LI><CODE>IPP_GONE</CODE> - The resource has gone away
+
+	<LI><CODE>IPP_REQUEST_ENTITY</CODE> - The request was too large
+
+	<LI><CODE>IPP_REQUEST_VALUE</CODE> - The request contained a value
+	that was unknown to the server
+
+	<LI><CODE>IPP_DOCUMENT_FORMAT</CODE> - The document format is not
+	supported by the server
+
+	<LI><CODE>IPP_ATTRIBUTES</CODE> - Required attributes are missing
+
+	<LI><CODE>IPP_URI_SCHEME</CODE> - The URI scheme is not supported
+
+	<LI><CODE>IPP_CHARSET</CODE> - The charset is not supported
+
+	<LI><CODE>IPP_CONFLICT</CODE> - One or more attributes conflict
+
+	<LI><CODE>IPP_COMPRESSION_NOT_SUPPORTED</CODE> - The specified
+	compression is not supported
+
+	<LI><CODE>IPP_COMPRESSION_ERROR</CODE> - The compressed data
+	contained an error
+
+	<LI><CODE>IPP_DOCUMENT_FORMAT_ERROR</CODE> - The document data
+	contained an error in it
+
+	<LI><CODE>IPP_DOCUMENT_ACCESS_ERROR</CODE> - The remote document
+	could not be accessed
+
+	<LI><CODE>IPP_INTERNAL_ERROR</CODE> - The server encountered an
+	internal error
+
+	<LI><CODE>IPP_OPERATION_NOT_SUPPORTED</CODE> - The requested operation
+	is not supported
+
+	<LI><CODE>IPP_SERVICE_UNAVAILABLE</CODE> - The requested service
+	is unavailable
+
+	<LI><CODE>IPP_VERSION_NOT_SUPPORTED</CODE> - The IPP request
+	version is not supported
+
+	<LI><CODE>IPP_DEVICE_ERROR</CODE> - The output device encountered
+	an error
+
+	<LI><CODE>IPP_TEMPORARY_ERROR</CODE> - A temporary error occurred
+
+	<LI><CODE>IPP_NOT_ACCEPTING</CODE> - The destination is not accepting
+	jobs
+
+	<LI><CODE>IPP_PRINTER_BUSY</CODE> - The destination is busy
+
+	<LI><CODE>IPP_ERROR_JOB_CANCELLED</CODE> - The requested job has been
+	cancelled
+
+	<LI><CODE>IPP_MULTIPLE_JOBS_NOT_SUPPORTED</CODE> - The server
+	does not support multiple jobs
+
+</UL>
 
 <H2>PPD Constants</H2>
 

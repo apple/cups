@@ -65,32 +65,40 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <LI><A HREF="#4_1_1">Setting the Orientation</A></LI>
 <LI><A HREF="#4_1_2">Selecting the Media Size, Type, and Source</A></LI>
 <LI><A HREF="#4_1_3">Printing On Both Sides of the Paper</A></LI>
-<LI><A HREF="#4_1_4">Selecting a Range of Pages</A></LI>
-<LI><A HREF="#4_1_5">Selecting Even or Odd Pages</A></LI>
-<LI><A HREF="#4_1_6">N-Up Printing</A></LI>
-<LI><A HREF="#4_1_7">Setting the Brightness</A></LI>
-<LI><A HREF="#4_1_8">Setting the Gamma Correction</A></LI>
 </UL>
-<LI><A HREF="#4_2">Text Options</A></LI>
+<LI><A HREF="#4_2">Banner Options</A></LI>
 <UL>
-<LI><A HREF="#4_2_1">Setting the Number of Characters Per Inch</A></LI>
-<LI><A HREF="#4_2_2">Setting the Number of Lines Per Inch</A></LI>
-<LI><A HREF="#4_2_3">Setting the Number of Columns</A></LI>
-<LI><A HREF="#4_2_4">Setting the Page Margins</A></LI>
-<LI><A HREF="#4_2_5">Pretty Printing</A></LI>
+<LI><A HREF="#4_2_1">Selecting the Banner Page(s)</A></LI>
 </UL>
-<LI><A HREF="#4_3">Image Options</A></LI>
+<LI><A HREF="#4_3">Document Options</A></LI>
 <UL>
-<LI><A HREF="#4_3_1">Scaling the Image</A></LI>
-<LI><A HREF="#4_3_2">Adjusting the Hue (Tint) of an Image</A></LI>
-<LI><A HREF="#4_3_3">Adjusting the Saturation (Color) of an Image</A></LI>
+<LI><A HREF="#4_3_1">Selecting a Range of Pages</A></LI>
+<LI><A HREF="#4_3_2">Selecting Even or Odd Pages</A></LI>
+<LI><A HREF="#4_3_3">N-Up Printing</A></LI>
+<LI><A HREF="#4_3_4">Setting the Brightness</A></LI>
+<LI><A HREF="#4_3_5">Setting the Gamma Correction</A></LI>
 </UL>
-<LI><A HREF="#4_4">HP-GL/2 Options</A></LI>
+<LI><A HREF="#4_4">Text Options</A></LI>
 <UL>
-<LI><A HREF="#4_4_1">Printing in Black</A></LI>
-<LI><A HREF="#4_4_2">Fitting the Plot on the Page</A></LI>
-<LI><A HREF="#4_4_3">Setting the Default Pen Width</A></LI>
+<LI><A HREF="#4_4_1">Setting the Number of Characters Per Inch</A></LI>
+<LI><A HREF="#4_4_2">Setting the Number of Lines Per Inch</A></LI>
+<LI><A HREF="#4_4_3">Setting the Number of Columns</A></LI>
+<LI><A HREF="#4_4_4">Setting the Page Margins</A></LI>
+<LI><A HREF="#4_4_5">Pretty Printing</A></LI>
 </UL>
+<LI><A HREF="#4_5">Image Options</A></LI>
+<UL>
+<LI><A HREF="#4_5_1">Scaling the Image</A></LI>
+<LI><A HREF="#4_5_2">Adjusting the Hue (Tint) of an Image</A></LI>
+<LI><A HREF="#4_5_3">Adjusting the Saturation (Color) of an Image</A></LI>
+</UL>
+<LI><A HREF="#4_6">HP-GL/2 Options</A></LI>
+<UL>
+<LI><A HREF="#4_6_1">Printing in Black</A></LI>
+<LI><A HREF="#4_6_2">Fitting the Plot on the Page</A></LI>
+<LI><A HREF="#4_6_3">Setting the Default Pen Width</A></LI>
+</UL>
+<LI><A HREF="#4_7">Raw or Unfiltered Output</A></LI>
 </UL>
 <B><A HREF="#SAVING_OPTIONS">4 - Saving Printer Options and Defaults</A></B>
 <UL>
@@ -508,7 +516,41 @@ suitable for portrait pages: </P>
 <B>lpr -o sides=one-sided filename ENTER</B>
 </PRE>
 </UL>
-<H3><A NAME="4_1_4">Selecting a Range of Pages</A></H3>
+<H2><A NAME="4_2">Banner Options</A></H2>
+<P>The following options apply when printing all types of files. </P>
+<H3><A NAME="4_2_1">Selecting the Banner Page(s)</A></H3>
+<P>The <CODE>-o jobsheets=start,end</CODE> option sets the banner 
+page(s) to use for a job: </P>
+<UL>
+<PRE>
+<B>lp -o job-sheets=none filename ENTER</B>
+<B>lp -o job-sheets=standard filename ENTER</B>
+<B>lpr -o job-sheets=classified,classified filename ENTER</B>
+</PRE>
+</UL>
+<P>If only one banner file is specified, it will be printed before the 
+files in the job. If a second banner file is specified, it is printed 
+after the files in the job. </P>
+<P>The available banner pages depend on the local system configuration; 
+CUPS includes the following banner files: </P>
+<UL>
+<LI><CODE>none</CODE> - Do not produce a banner page. </LI>
+<LI><CODE>classified</CODE> - A banner page with a &quot;classified&quot;  label 
+at the top and bottom. </LI>
+<LI><CODE>confidential</CODE> - A banner page with a  &quot;confidential&quot; 
+label at the top and bottom. </LI>
+<LI><CODE>secret</CODE> - A banner page with a &quot;secret&quot; label  at the 
+top and bottom. </LI>
+<LI><CODE>standard</CODE> - A banner page with no label at the  top and 
+bottom. </LI>
+<LI><CODE>topsecret</CODE> - A banner page with a &quot;top secret&quot;  label 
+at the top and bottom. </LI>
+<LI><CODE>unclassified</CODE> - A banner page with an  &quot;unclassified&quot; 
+label at the top and bottom. </LI>
+</UL>
+<H2><A NAME="4_3">Document Options</A></H2>
+<P>The following options apply when printing all types of files. </P>
+<H3><A NAME="4_3_1">Selecting a Range of Pages</A></H3>
 <P>The <CODE>-o page-ranges=pages</CODE> option selects a range of 
 pages for printing: </P>
 <UL>
@@ -524,7 +566,7 @@ range of pages, or a collection of page numbers and ranges separated by
 commas. The pages will always be printed in ascending order, regardless 
 of the order of the pages in the <CODE>page-ranges</CODE> option. </P>
 <P>The default is to print all pages. </P>
-<H3><A NAME="4_1_5">Selecting Even or Odd Pages</A></H3>
+<H3><A NAME="4_3_2">Selecting Even or Odd Pages</A></H3>
 <P>Use the <CODE>-o page-set=set</CODE> option to select the even or 
 odd pages: </P>
 <UL>
@@ -535,7 +577,7 @@ odd pages: </P>
 </PRE>
 </UL>
 <P>The default is to print all pages. </P>
-<H3><A NAME="4_1_6">N-Up Printing</A></H3>
+<H3><A NAME="4_3_3">N-Up Printing</A></H3>
 <P>The <CODE>-o number-up=value</CODE> option selects N-Up printing. 
  N-Up printing places multiple document pages on a single printed page. 
  CUPS supports 1-Up, 2-Up, and 4-Up formats: </P>
@@ -548,7 +590,7 @@ odd pages: </P>
 </PRE>
 </UL>
 <P>The default format is 1-Up. </P>
-<H3><A NAME="4_1_7">Setting the Brightness</A></H3>
+<H3><A NAME="4_3_4">Setting the Brightness</A></H3>
 <P>You can control the overall brightness of the printed output using 
 the <CODE>-o brightness=percent</CODE> option: </P>
 <UL>
@@ -559,7 +601,7 @@ the <CODE>-o brightness=percent</CODE> option: </P>
 </UL>
 <P>Values greater than 100 will lighten the print, while values less 
 than 100 will darken it. </P>
-<H3><A NAME="4_1_8">Setting the Gamma Correction</A></H3>
+<H3><A NAME="4_3_5">Setting the Gamma Correction</A></H3>
 <P>You can control the overall gamma correction of the printed output 
 using the <CODE>-o gamma=value</CODE> option: </P>
 <UL>
@@ -570,9 +612,9 @@ using the <CODE>-o gamma=value</CODE> option: </P>
 </UL>
 <P>Values greater than 1000 will lighten the print, while values less 
 than 1000 will darken it. The default gamma is 1000. </P>
-<H2><A NAME="4_2">Text Options</A></H2>
+<H2><A NAME="4_4">Text Options</A></H2>
 <P>The following options apply when printing text files. </P>
-<H3><A NAME="4_2_1">Setting the Number of Characters Per Inch</A></H3>
+<H3><A NAME="4_4_1">Setting the Number of Characters Per Inch</A></H3>
 <P>The <CODE>-o cpi=value</CODE> option sets the number of characters 
 per inch: </P>
 <UL>
@@ -583,7 +625,7 @@ per inch: </P>
 </PRE>
 </UL>
 <P>The default characters per inch is 10. </P>
-<H3><A NAME="4_2_2">Setting the Number of Lines Per Inch</A></H3>
+<H3><A NAME="4_4_2">Setting the Number of Lines Per Inch</A></H3>
 <P>The <CODE>-o lpi=value</CODE> option sets the number of lines per 
 inch: </P>
 <UL>
@@ -593,7 +635,7 @@ inch: </P>
 </PRE>
 </UL>
 <P>The default lines per inch is 6. </P>
-<H3><A NAME="4_2_3">Setting the Number of Columns</A></H3>
+<H3><A NAME="4_4_3">Setting the Number of Columns</A></H3>
 <P>The <CODE>-o columns=value</CODE> option sets the number of text 
 columns: </P>
 <UL>
@@ -603,7 +645,7 @@ columns: </P>
 </PRE>
 </UL>
 <P>The default number of columns is 1. </P>
-<H3><A NAME="4_2_4">Setting the Page Margins</A></H3>
+<H3><A NAME="4_4_4">Setting the Page Margins</A></H3>
 <P>Normally the page margins are set to the hard limits of the printer. 
 Use the <CODE>-o page-left=value</CODE>, <CODE>-o page-right=value</CODE>
 , <CODE>-o page-top=value</CODE>, and <CODE>-o page-bottom=value</CODE>
@@ -619,7 +661,7 @@ Use the <CODE>-o page-left=value</CODE>, <CODE>-o page-right=value</CODE>
 </UL>
 <P>The <CODE>value</CODE> argument is the margin in points; each point 
 is 1/72 inch or 0.35mm. </P>
-<H3><A NAME="4_2_5">Pretty Printing</A></H3>
+<H3><A NAME="4_4_5">Pretty Printing</A></H3>
 <P>The <CODE>-o prettyprint</CODE> option puts a header at the top of 
 each page with the page number, job title (usually the filename), and 
 the date. Also, C and C++ keywords are highlighted, and comment lines 
@@ -630,9 +672,9 @@ are italicized: </P>
 <B>lpr -o prettyprint filename ENTER</B>
 </PRE>
 </UL>
-<H2><A NAME="4_3">Image Options</A></H2>
+<H2><A NAME="4_5">Image Options</A></H2>
 <P>The following options apply when printing image files. </P>
-<H3><A NAME="4_3_1">Scaling the Image</A></H3>
+<H3><A NAME="4_5_1">Scaling the Image</A></H3>
 <P>The <CODE>-o scaling=percent</CODE> and <CODE>-o ppi=value</CODE>
  options change the size of a printed image: </P>
 <UL>
@@ -651,7 +693,7 @@ resolution of the image in pixels per inch. An image that is 3000x2400
 pixels will print 10x8 inches at 300 pixels per inch, for example. If 
 the specified resolution makes the image larger than the page, multiple 
 pages will be printed to satisfy the request. </P>
-<H3><A NAME="4_3_2">Adjusting the Hue (Tint) of an Image</A></H3>
+<H3><A NAME="4_5_2">Adjusting the Hue (Tint) of an Image</A></H3>
 <P>The <CODE>-o hue=value</CODE> option will adjust the hue of the 
 printed image, much like the tint control on your television: </P>
 <UL>
@@ -678,7 +720,7 @@ change you'll see with different colors:
 </CENTER>
 </P>
 <P>The default hue adjustment is 0. </P>
-<H3><A NAME="4_3_3">Adjusting the Saturation (Color) of an Image</A></H3>
+<H3><A NAME="4_5_3">Adjusting the Saturation (Color) of an Image</A></H3>
 <P>The <CODE>-o saturation=percent</CODE> option adjusts the saturation 
 of the colors in an image, much like the color knob on your television: </P>
 <UL>
@@ -693,25 +735,29 @@ print, while a value of 200 will make the colors extremely intense. </P>
 <P>The default saturation is 100. 
 <!-- NEED 2in ---->
 </P>
-<H2><A NAME="4_4">HP-GL/2 Options</A></H2>
+<H2><A NAME="4_6">HP-GL/2 Options</A></H2>
 <P>The following options apply to HP-GL/2 files. </P>
-<H3><A NAME="4_4_1">Printing in Black</A></H3>
+<H3><A NAME="4_6_1">Printing in Black</A></H3>
 <P>The <CODE>-o blackplot</CODE> option specifies that all pens should 
-plot in black: <U></P>
+plot in black: </P>
+<UL>
 <PRE>
 <B>lp -o blackplot filename ENTER</B>
 <B>lpr -o blackplot filename ENTER</B>
 </PRE>
+</UL>
 <P>The default is to use the colors defined in the plot file or the 
 standard pen colors defined in the HP-GL/2 reference manual from 
 Hewlett Packard. </P>
-<H3><A NAME="4_4_2">Fitting the Plot on the Page</A></H3>
+<H3><A NAME="4_6_2">Fitting the Plot on the Page</A></H3>
 <P>The <CODE>-o fitplot</CODE> option specifies that the plot should be 
-scaled to fit on the page: <U></P>
+scaled to fit on the page: </P>
+<UL>
 <PRE>
 <B>lp -o fitplot filename ENTER</B>
 <B>lpr -o fitplot filename ENTER</B>
 </PRE>
+</UL>
 <P>The default is to use the absolute distances specified in the plot 
 file. 
 <CENTER>
@@ -724,7 +770,7 @@ file.
 </TABLE>
 </CENTER>
 </P>
-<H3><A NAME="4_4_3">Setting the Default Pen Width</A></H3>
+<H3><A NAME="4_6_3">Setting the Default Pen Width</A></H3>
 <P>The <CODE>-o penwidth=value</CODE> option specifies the default pen 
 width for HP-GL/2 files: </P>
 <UL>
@@ -746,6 +792,24 @@ file. </P>
 </TABLE>
 </CENTER>
 </P>
+<H2><A NAME="4_7">Raw or Unfiltered Output</A></H2>
+<P>The <CODE>-o raw</CODE> option allows you to send files directly to 
+a printer without filtering. This is sometimes required when printing 
+from applications that provide their own &quot;printer drivers&quot; for your 
+printer: </P>
+<UL>
+<PRE>
+<B>lp -o raw filename ENTER</B>
+<B>lpr -o raw filename ENTER</B>
+</PRE>
+</UL>
+<P>The <CODE>-l</CODE> option can also be used with the <CODE>lpr</CODE>
+ command to send files directly to a printer: </P>
+<UL>
+<PRE>
+<B>lpr -l filename ENTER</B>
+</PRE>
+</UL>
 <H1 ALIGN="RIGHT"><A NAME="SAVING_OPTIONS">4 - Saving Printer Options 
 and Defaults</A></H1>
 <P>This chapter describes how to save printer options for your printer 
@@ -882,8 +946,8 @@ standards as the original. </P>
 <P>Easy Software Products also sells rights to the CUPS source code 
 under a binary distribution license for vendors that are unable to 
 release source code for their drivers, additions, and modifications to 
-CUPS under the GNU GPL. For pricing information please contact us at 
-the address shown above. </P>
+CUPS under the GNU GPL and LGPL. For pricing information please contact 
+us at the address shown above. </P>
 <P>The Common UNIX Printing System provides a &quot;pstoraster&quot; filter that 
 utilizes GNU GhostScript 5.50 to convert PostScript files into a stream 
 of raster images. For binary distribution licensing of this software, 
