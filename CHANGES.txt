@@ -178,6 +178,10 @@ CHANGES IN CUPS V1.1.7
 	- Fixed a bug in the scheduler SortPrinters() function
 	  that could cause printers to disappear or the
 	  scheduler to crash when adding a printer.
+	- Changed the pstops filter to not do per-page filtering
+	  if the file does not conform to at least version 3.0
+	  of the document structuring conventions.  This seems
+	  to "fix" printing with broken apps.
 
 
 CHANGES IN CUPS V1.1.6-3

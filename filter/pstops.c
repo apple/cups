@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.55 2001/04/19 16:35:35 mike Exp $"
+ * "$Id: pstops.c,v 1.56 2001/04/26 16:58:18 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -281,7 +281,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       printf("<</NumCopies %d>>setpagedevice\n", Copies);
   }
 
-  if (strncmp(line, "%!PS-Adobe-", 11) == 0)
+  if (strncmp(line, "%!PS-Adobe-", 11) == 0 && atof(line + 11) >= 3.0)
   {
    /*
     * OK, we have DSC comments; read until we find a %%Page comment...
@@ -940,5 +940,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.55 2001/04/19 16:35:35 mike Exp $".
+ * End of "$Id: pstops.c,v 1.56 2001/04/26 16:58:18 mike Exp $".
  */
