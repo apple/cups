@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.13 1999/05/20 18:43:03 mike Exp $"
+dnl "$Id: configure.in,v 1.14 1999/06/10 20:52:11 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -29,14 +29,27 @@ AC_PREFIX_DEFAULT(/usr)
 dnl Clear default debugging options and set normal optimization by
 dnl default unless the user asks for debugging specifically.
 
+dnl CFLAGS="${CFLAGS:=}"
+dnl CXXFLAGS="${CXXFLAGS:=}"
+dnl OPTIM="-O"
+dnl AC_SUBST(OPTIM)
+
+dnl AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging [default=no]],
+dnl if eval "test x$enable_debug = xyes"; then
+dnl 	OPTIM="-g"
+dnl fi)
+
+dnl Clear default debugging options and set debugging by
+dnl default unless the user asks for no debugging specifically.
+
 CFLAGS="${CFLAGS:=}"
 CXXFLAGS="${CXXFLAGS:=}"
-OPTIM="-O"
+OPTIM="-g"
 AC_SUBST(OPTIM)
 
-AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging [default=no]],
-if eval "test x$enable_debug = xyes"; then
-	OPTIM="-g"
+AC_ARG_ENABLE(debug, [  --disable-debug          turn off debugging [default=no]],
+if eval "test x$disable_debug = xyes"; then
+	OPTIM="-O"
 fi)
 
 dnl Checks for programs...
@@ -135,5 +148,5 @@ AC_SUBST(CUPS_DATADIR)
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.13 1999/05/20 18:43:03 mike Exp $".
+dnl End of "$Id: configure.in,v 1.14 1999/06/10 20:52:11 mike Exp $".
 dnl

@@ -4,21 +4,18 @@
 </HEAD>
 <BODY>
 
-<H1>README - CUPS v1.0b1</H1>
+<H1>README - CUPS v1.0b3</H1>
 
 <H2>Contents</H2>
 
 <UL>
 	<LI><A HREF="#intro">Introduction</A>
 	<LI><A HREF="#require">Requirements</A>
-	<LI><A HREF="#compile">Compiling CUPS</A>
-	<LI><A HREF="#config">Configuring the Software</A>
-	<LI><A HREF="#run">Running the Software</A>
-	<LI><A HREF="#use">Using the Software</A>
+	<LI><A HREF="#use">Using CUPS</A>
 	<LI><A HREF="#known">Known Problems</A>
 	<LI><A HREF="#report">Reporting Problems</A>
 	<LI><A HREF="#resources">Other Resources</A>
-	<LI><A HREF="#license">Legal Stuff</A>
+	<LI><A HREF="#legal">Legal Stuff</A>
 </UL>
 
 <H2><A NAME="intro">Introduction</A></H2>
@@ -58,127 +55,28 @@ nroff-like package.
 <P>The documentation is formatted using the HTMLDOC software (again, not
 needed unless you make changes.)
 
-<H2><A NAME="compile">Compiling CUPS</A></H2>
+<H2><A NAME="use">Using CUPS</A></H2>
 
-CUPS uses GNU autoconf to configure the makefiles and source code for your
-system. To configure CUPS for your system type:
+<P>Pre-compiled binary distributions are available for CUPS from our
+web site at
+<A HREF="http://www.cups.org/software.html">http://www.cups.org/software.html</A>.
+If you'd like to build CUPS from the source, please read the Software
+Administrator's Manual.
 
-<UL><PRE>
-% ./configure ENTER
-</PRE></UL>
-
-The default installation will put the CUPS software in the <CODE>/usr</CODE>
-and <CODE>/var</CODE> directories on your system, which will overwrite any
-existing printing commands on your system. To install the CUPS software in
-another location use the <CODE>--prefix</CODE> option:
-
-<UL><PRE>
-% ./configure --prefix=/usr/local ENTER
-</PRE></UL>
-
-Once you have configured things, just type:
-
-<UL><PRE>
-% make ENTER
-</PRE></UL>
-
-to build the software.
-
-<H2><A NAME="install">Installing the Software</A></H2>
-
-To install the software type:
-
-<UL><PRE>
-% make install ENTER
-</PRE></UL>
-
-<H2><A NAME="config">Configuring the Software</A></H2>
-
-Before you run CUPS for the first time you'll need to edit the CUPS
-configuration files which are normally located in /var/cups/conf.
-
-<UL>
-
-	The <CODE>cupsd.conf</CODE> file configures all of the
-	"global" server settings and access control. The default
-	settings are usually appropriate for most environments.
-
-	<P>The <CODE>printers.conf</CODE> file configures each printer
-	queue. You'll need to add a listing for each printer on your
-	system.
-
-	<P>The <CODE>classes.conf</CODE> file configures each printer
-	class. You'll need to add a listing for each printer class you
-	want.
-
-	<P>The <CODE>mime.types</CODE> file defines all of the
-	recognized file types. You don't normally have to edit this
-	file.
-
-	<P>The <CODE>mime.convs</CODE> file defines all of the file
-	conversion filters. You don't normally have to edit this file.
-
-</UL>
-
-In addition to the files in the /var/cups/conf directory, you'll also need
-to copy PPD files for each printer to the /var/cups/ppd directory.  If you
-don't have a PPD file for your printer, the drivers will still work, just
-with reduced functionality.
-
-<H2><A NAME="run">Running the Software</A></H2>
-
-Once you have configured the software you can start the CUPS daemon by
-typing:
-
-<UL><PRE>
-% /usr/sbin/cupsd &amp; ENTER
-</PRE></UL>
-
-<H2><A NAME="use">Using the Software</A></H2>
-
-Once you have installed the software, you can use the normal lp or lpr
-commands to print jobs. If you installed the software under /usr then
-you shouldn't have to reconfigure any applications to recognize the new
-printing system.
-
-<P>One of the advantages of CUPS is that you don't always have to send
-PostScript or Text files to your printers. If you have a JPEG file, you
-can just type "lp filename.jpg" and CUPS will handle converting it for
-you!
-
-<P>You can monitor the status of jobs via the lpstat command or with your
-web browser by pointing it at "http://localhost:631".
+<P>Once you have installed CUPS, the Software Administrator's Manual and
+Software User's Manual are excellent places to start setting things up.
 
 <H2><A NAME="known">Known Problems</A></H2>
 
 The following known problems are being worked on and should be resolved for
-the second beta release of CUPS:
+the fourth beta release of CUPS:
 
 <UL>
 
 	<LI>Documentation is not completed.
 
-	<LI>The lpadmin command is currently not provided.
-
-	<LI>The lpq command is currently not provided.
-
 	<LI>The lpc command currently only supports the help and status
 	commands.
-
-	<LI>While both GNU GhostScript and the CUPS image RIP are
-	provided, no sample raster printer driver is provided. The
-	final release of CUPS will include a PCL printer driver.
-
-	<LI>Automatic classing is currently not supported.
-
-	<LI>The CUPS server should disable core dumps by filters, backends,
-	and CGI programs.
-
-	<LI>The CUPS server should increase the FD limit to the maximum
-	allowed on the system.
-
-	<LI>The CUPS server should close stdin, stdout, and stderr and
-	run in the background ("daemon" mode...)
 
 	<LI>The class and job CGIs are currently not provided.
 
@@ -220,9 +118,9 @@ and the Common UNIX Printing System are the trademark property of Easy Software
 Products.
 
 <P>CUPS is provided under the terms of the
-<A HREF="LICENSE.html">Aladdin Free Public License</A>
+<A HREF="LICENSE.html">GNU General Public License</A>
 which is located in the files "LICENSE.html" and "LICENSE.txt". For commercial
-licensing information, please contact:
+support and "binary-only" licensing information, please contact:
 
 <UL>
 	Attn: CUPS Licensing Information
