@@ -3,6 +3,9 @@ CHANGES.txt - 04/25/2003
 
 CHANGES IN CUPS V1.1.19rc3
 
+	- The scheduler would delete all printers from
+	  printers.conf if a job was active when a HUP signal
+	  was handled (STR #47)
 	- The cups-polld program would leak memory if it was
 	  unable to send browse packets to the loopback
 	  interface (STR #40)

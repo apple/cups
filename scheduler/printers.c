@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.149 2003/04/16 20:31:45 mike Exp $"
+ * "$Id: printers.c,v 1.150 2003/04/25 15:23:22 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -369,7 +369,7 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
   * Stop printing on this printer...
   */
 
-  StopPrinter(p);
+  StopPrinter(p, 1);
 
  /*
   * Remove the dummy interface/icon/option files under IRIX...
@@ -850,7 +850,7 @@ SaveAllPrinters(void)
   */
 
   curtime = time(NULL);
-  curdate = gmtime(&curtime);
+  curdate = localtime(&curtime);
   strftime(temp, sizeof(temp) - 1, CUPS_STRFTIME_FORMAT, curdate);
 
   cupsFilePuts(fp, "# Printer configuration file for " CUPS_SVERSION "\n");
@@ -1740,7 +1740,8 @@ SetPrinterReasons(printer_t  *p,	/* I - Printer */
 
 void
 SetPrinterState(printer_t    *p,	/* I - Printer to change */
-                ipp_pstate_t s)		/* I - New state */
+                ipp_pstate_t s,		/* I - New state */
+		int          update)	/* I - Update printers.conf? */
 {
   ipp_pstate_t	old_state;		/* Old printer state */
 
@@ -1776,7 +1777,8 @@ SetPrinterState(printer_t    *p,	/* I - Printer to change */
   * to stopped (or visa-versa)...
   */
 
-  if ((old_state == IPP_PRINTER_STOPPED) != (s == IPP_PRINTER_STOPPED))
+  if ((old_state == IPP_PRINTER_STOPPED) != (s == IPP_PRINTER_STOPPED) &&
+      update)
   {
     if (p->type & CUPS_PRINTER_CLASS)
       SaveAllClasses();
@@ -1845,16 +1847,17 @@ SortPrinters(void)
  */
 
 void
-StopPrinter(printer_t *p)	/* I - Printer to stop */
+StopPrinter(printer_t *p,		/* I - Printer to stop */
+            int       update)		/* I - Update printers.conf? */
 {
-  job_t	*job;			/* Active print job */
+  job_t	*job;				/* Active print job */
 
 
  /*
   * Set the printer state...
   */
 
-  SetPrinterState(p, IPP_PRINTER_STOPPED);
+  SetPrinterState(p, IPP_PRINTER_STOPPED, update);
 
  /*
   * See if we have a job printing on this printer...
@@ -2376,5 +2379,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.149 2003/04/16 20:31:45 mike Exp $".
+ * End of "$Id: printers.c,v 1.150 2003/04/25 15:23:22 mike Exp $".
  */
