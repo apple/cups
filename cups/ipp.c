@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.56 2001/04/15 11:52:43 mike Exp $"
+ * "$Id: ipp.c,v 1.57 2001/05/16 03:44:42 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -24,32 +24,35 @@
  *
  * Contents:
  *
- *   ippAddBoolean()     - Add a boolean attribute to an IPP request.
- *   ippAddBooleans()    - Add an array of boolean values.
- *   ippAddDate()        - Add a date attribute to an IPP request.
- *   ippAddInteger()     - Add a integer attribute to an IPP request.
- *   ippAddIntegers()    - Add an array of integer values.
- *   ippAddString()      - Add a language-encoded string to an IPP request.
- *   ippAddStrings()     - Add language-encoded strings to an IPP request.
- *   ippAddRange()       - Add a range of values to an IPP request.
- *   ippAddRanges()      - Add ranges of values to an IPP request.
- *   ippAddResolution()  - Add a resolution value to an IPP request.
- *   ippAddResolutions() - Add resolution values to an IPP request.
- *   ippAddSeparator()   - Add a group separator to an IPP request.
- *   ippDateToTime()     - Convert from RFC 1903 Date/Time format to UNIX time
- *   ippDelete()         - Delete an IPP request.
- *   ippErrorString()    - Return a textual message for the given error message.
- *   ippFindAttribute()  - Find a named attribute in a request...
- *   ippLength()         - Compute the length of an IPP request.
- *   ippNew()            - Allocate a new IPP request.
- *   ippPort()           - Return the default IPP port number.
- *   ippRead()           - Read data for an IPP request.
- *   ippSetPort()        - Set the default port number.
- *   ippTimeToDate()     - Convert from UNIX time to RFC 1903 format.
- *   ippWrite()          - Write data for an IPP request.
- *   _ipp_add_attr()     - Add a new attribute to the request.
- *   _ipp_free_attr()    - Free an attribute.
- *   ipp_read()          - Semi-blocking read on a HTTP connection...
+ *   ippAddBoolean()        - Add a boolean attribute to an IPP request.
+ *   ippAddBooleans()       - Add an array of boolean values.
+ *   ippAddDate()           - Add a date attribute to an IPP request.
+ *   ippAddInteger()        - Add a integer attribute to an IPP request.
+ *   ippAddIntegers()       - Add an array of integer values.
+ *   ippAddString()         - Add a language-encoded string to an IPP request.
+ *   ippAddStrings()        - Add language-encoded strings to an IPP request.
+ *   ippAddRange()          - Add a range of values to an IPP request.
+ *   ippAddRanges()         - Add ranges of values to an IPP request.
+ *   ippAddResolution()     - Add a resolution value to an IPP request.
+ *   ippAddResolutions()    - Add resolution values to an IPP request.
+ *   ippAddSeparator()      - Add a group separator to an IPP request.
+ *   ippDateToTime()        - Convert from RFC 1903 Date/Time format to UNIX
+ *                            time in seconds.
+ *   ippDelete()            - Delete an IPP request.
+ *   ippErrorString()       - Return a textual message for the given error
+ *                            message.
+ *   ippFindAttribute()     - Find a named attribute in a request...
+ *   ippFindNextAttribute() - Find the next named attribute in a request...
+ *   ippLength()            - Compute the length of an IPP request.
+ *   ippNew()               - Allocate a new IPP request.
+ *   ippPort()              - Return the default IPP port number.
+ *   ippRead()              - Read data for an IPP request.
+ *   ippSetPort()           - Set the default port number.
+ *   ippTimeToDate()        - Convert from UNIX time to RFC 1903 format.
+ *   ippWrite()             - Write data for an IPP request.
+ *   _ipp_add_attr()        - Add a new attribute to the request.
+ *   _ipp_free_attr()       - Free an attribute.
+ *   ipp_read()             - Semi-blocking read on a HTTP connection...
  */
 
 /*
@@ -498,7 +501,7 @@ ippAddSeparator(ipp_t *ipp)		/* I - IPP request */
 
 /*
  * 'ippDateToTime()' - Convert from RFC 1903 Date/Time format to UNIX time
- *                      in seconds.
+ *                     in seconds.
  */
 
 time_t					/* O - UNIX time value */
@@ -664,16 +667,49 @@ ippFindAttribute(ipp_t      *ipp,	/* I - IPP request */
                  const char *name,	/* I - Name of attribute */
 		 ipp_tag_t  type)	/* I - Type of attribute */
 {
-  ipp_attribute_t	*attr;		/* Current atttribute */
-  ipp_tag_t		value_tag;	/* Value tag */
-
-
   DEBUG_printf(("ippFindAttribute(%p, \'%s\')\n", ipp, name));
 
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  for (attr = ipp->attrs; attr != NULL; attr = attr->next)
+ /*
+  * Reset the current pointer...
+  */
+
+  ipp->current = NULL;
+
+ /*
+  * Search for the attribute...
+  */
+
+  return (ippFindNextAttribute(ipp, name, type));
+}
+
+
+/*
+ * 'ippFindNextAttribute()' - Find the next named attribute in a request...
+ */
+
+ipp_attribute_t	*			/* O - Matching attribute */
+ippFindNextAttribute(ipp_t      *ipp,	/* I - IPP request */
+                     const char *name,	/* I - Name of attribute */
+		     ipp_tag_t  type)	/* I - Type of attribute */
+{
+  ipp_attribute_t	*attr;		/* Current atttribute */
+  ipp_tag_t		value_tag;	/* Value tag */
+
+
+  DEBUG_printf(("ippFindNextAttribute(%p, \'%s\')\n", ipp, name));
+
+  if (ipp == NULL || name == NULL)
+    return (NULL);
+
+  if (ipp->current)
+    attr = ipp->attrs;
+  else
+    attr = ipp->current->next;
+
+  for (; attr != NULL; attr = attr->next)
   {
     DEBUG_printf(("ippFindAttribute: attr = %p, name = \'%s\'\n", attr,
                   attr->name));
@@ -684,8 +720,14 @@ ippFindAttribute(ipp_t      *ipp,	/* I - IPP request */
         (value_tag == type || type == IPP_TAG_ZERO ||
 	 (value_tag == IPP_TAG_TEXTLANG && type == IPP_TAG_TEXT) ||
 	 (value_tag == IPP_TAG_NAMELANG && type == IPP_TAG_NAME)))
+    {
+      ipp->current = attr;
+
       return (attr);
+    }
   }
+
+  ipp->current = NULL;
 
   return (NULL);
 }
@@ -1870,5 +1912,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.56 2001/04/15 11:52:43 mike Exp $".
+ * End of "$Id: ipp.c,v 1.57 2001/05/16 03:44:42 mike Exp $".
  */

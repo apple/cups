@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77 2001/03/30 03:07:52 mike Exp $"
+ * "$Id: conf.c,v 1.78 2001/05/16 03:44:43 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -438,6 +438,9 @@ ReadConfiguration(void)
   }
   else
     LogMessage(L_INFO, "Configured for up to %d clients.", MaxClients);
+
+  if (Classification[0])
+    LogMessage(L_INFO, "Security set to \"%s\"", Classification);
 
  /*
   * Read the MIME type and conversion database...
@@ -1631,5 +1634,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.77 2001/03/30 03:07:52 mike Exp $".
+ * End of "$Id: conf.c,v 1.78 2001/05/16 03:44:43 mike Exp $".
  */

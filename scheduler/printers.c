@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.95 2001/04/24 14:22:01 mike Exp $"
+ * "$Id: printers.c,v 1.96 2001/05/16 03:44:44 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -102,11 +102,15 @@ AddPrinter(const char *name)	/* I - Name of printer */
   p->filetype  = mimeAddType(MimeDatabase, "printer", name);
 
   if (Classification[0])
+  {
     strcpy(p->job_sheets[0], Classification);
+    strcpy(p->job_sheets[1], Classification);
+  }
   else
+  {
     strcpy(p->job_sheets[0], "none");
-
-  strcpy(p->job_sheets[1], "none");
+    strcpy(p->job_sheets[1], "none");
+  }
 
  /*
   * Setup required filters and IPP attributes...
@@ -619,28 +623,31 @@ LoadAllPrinters(void)
     }
     else if (strcmp(name, "JobSheets") == 0)
     {
-     /*
-      * Set the initial job sheets...
-      */
-
-      for (valueptr = value; *valueptr && !isspace(*valueptr); valueptr ++);
-
-      if (*valueptr)
-        *valueptr++ = '\0';
-
-      strncpy(p->job_sheets[0], value, sizeof(p->job_sheets[0]) - 1);
-
-      while (isspace(*valueptr))
-        valueptr ++;
-
-      if (*valueptr)
+      if (!Classification[0])
       {
-        for (value = valueptr; *valueptr && !isspace(*valueptr); valueptr ++);
+       /*
+	* Set the initial job sheets...
+	*/
+
+	for (valueptr = value; *valueptr && !isspace(*valueptr); valueptr ++);
 
 	if (*valueptr)
           *valueptr++ = '\0';
 
-	strncpy(p->job_sheets[1], value, sizeof(p->job_sheets[1]) - 1);
+	strncpy(p->job_sheets[0], value, sizeof(p->job_sheets[0]) - 1);
+
+	while (isspace(*valueptr))
+          valueptr ++;
+
+	if (*valueptr)
+	{
+          for (value = valueptr; *valueptr && !isspace(*valueptr); valueptr ++);
+
+	  if (*valueptr)
+            *valueptr++ = '\0';
+
+	  strncpy(p->job_sheets[1], value, sizeof(p->job_sheets[1]) - 1);
+	}
       }
     }
     else if (strcmp(name, "AllowUser") == 0)
@@ -1053,8 +1060,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
     */
 
     if (Classification[0])
-      attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                	   "job-sheets-supported", 2, NULL, NULL);
+      attr = ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                	  "job-sheets-supported", NULL, Classification);
     else
       attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
                 	   "job-sheets-supported", NumBanners + 1, NULL, NULL);
@@ -1063,17 +1070,12 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
       LogMessage(L_EMERG, "SetPrinterAttrs: Unable to allocate memory for "
                           "job-sheets-supported attribute: %s!",
 	         strerror(errno));
-    else
+    else if (!Classification[0])
     {
       attr->values[0].string.text = strdup("none");
 
-      if (Classification[0])
-	attr->values[1].string.text = strdup(Classification);
-      else
-      {
-	for (i = 0; i < NumBanners; i ++)
-	  attr->values[i + 1].string.text = strdup(Banners[i].name);
-      }
+      for (i = 0; i < NumBanners; i ++)
+	attr->values[i + 1].string.text = strdup(Banners[i].name);
     }
 
     attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
@@ -1786,5 +1788,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.95 2001/04/24 14:22:01 mike Exp $".
+ * End of "$Id: printers.c,v 1.96 2001/05/16 03:44:44 mike Exp $".
  */

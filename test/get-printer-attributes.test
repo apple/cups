@@ -40,4 +40,5 @@
 	EXPECT printer-uri-supported
 	EXPECT uri-authentication-supported
 	EXPECT uri-security-supported
+	EXPECT foo
 }
