@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.20 2002/05/28 19:06:45 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.21 2002/06/27 12:06:36 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -418,23 +418,19 @@ main(int  argc,			/* I - Number of command-line arguments */
 	fputs(line, stdout);
         level --;
       }
-      else if (strncmp(line, "%%Orientation", 13) == 0 && level == 0)
+      else if (strncmp(line, "%ESPRotation:", 13) == 0 && level == 0)
       {
        /*
         * Reset orientation of document?
 	*/
 
-        if (strstr(line, "Landscape") != NULL && !(Orientation & 1))
+        int orient = (atoi(line + 13) / 90) & 3;
+
+        if (orient != Orientation)
 	{
-	  Orientation ++;
+	  Orientation = (4 - Orientation + orient) & 3;
 	  UpdatePageVars();
-	  Orientation = 1;
-	}
-        else if (strstr(line, "Portrait") != NULL && (Orientation & 1))
-	{
-	  Orientation = 4 - Orientation;
-	  UpdatePageVars();
-	  Orientation = 0;
+	  Orientation = orient;
 	}
       }
       else if (strncmp(line, "%%BeginProlog", 13) == 0 && level == 0)
@@ -1646,5 +1642,5 @@ start_nup(int number,		/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.20 2002/05/28 19:06:45 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.21 2002/06/27 12:06:36 mike Exp $".
  */

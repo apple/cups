@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.31.2.2 2002/03/01 19:55:17 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.31.2.3 2002/06/27 12:06:35 mike Exp $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
@@ -72,8 +72,7 @@ OutputProlog(char  *title,	/* I - Job title */
   printf("%%%%CreationDate: %s\n", line);
   printf("%%%%Title: %s\n", title);
   printf("%%%%For: %s\n", user);
-  if (Orientation & 1)
-    puts("%%Orientation: Landscape");
+  printf("%%ESPRotation: %d\n", (Orientation & 3) * 90);
   puts("%%EndComments");
   puts("%%BeginProlog");
   printf("/DefaultPenWidth %.2f def\n", PenWidth * 72.0 / 25.4);
@@ -405,5 +404,5 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.31.2.2 2002/03/01 19:55:17 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.31.2.3 2002/06/27 12:06:35 mike Exp $".
  */
