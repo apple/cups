@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.55 1999/10/22 20:00:32 mike Exp $"
+ * "$Id: http.c,v 1.56 1999/11/02 22:26:47 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -687,12 +687,15 @@ httpRead(http_t *http,			/* I - HTTP data */
     return (0);
 
   if (http->data_encoding == HTTP_ENCODE_CHUNKED &&
-      http->data_remaining <= 0 &&
-      (http->state == HTTP_GET_SEND || http->state == HTTP_POST_RECV ||
-       http->state == HTTP_POST_SEND || http->state == HTTP_PUT_RECV))
+      http->data_remaining <= 0)
   {
+    DEBUG_puts("httpRead: Getting chunk length...");
+
     if (httpGets(len, sizeof(len), http) == NULL)
+    {
+      DEBUG_puts("httpRead: Could not get length!");
       return (0);
+    }
 
     http->data_remaining = strtol(len, NULL, 16);
   }
@@ -706,9 +709,7 @@ httpRead(http_t *http,			/* I - HTTP data */
     * data, go idle...
     */
 
-    if (http->data_encoding == HTTP_ENCODE_CHUNKED &&
-	(http->state == HTTP_GET_SEND || http->state == HTTP_POST_RECV ||
-	 http->state == HTTP_POST_SEND || http->state == HTTP_PUT_RECV))
+    if (http->data_encoding == HTTP_ENCODE_CHUNKED)
       httpGets(len, sizeof(len), http);
 
     if (http->state == HTTP_POST_RECV)
@@ -750,9 +751,7 @@ httpRead(http_t *http,			/* I - HTTP data */
 
   if (http->data_remaining == 0)
   {
-    if (http->data_encoding == HTTP_ENCODE_CHUNKED &&
-	(http->state == HTTP_GET_SEND || http->state == HTTP_POST_RECV ||
-	 http->state == HTTP_POST_SEND || http->state == HTTP_PUT_RECV))
+    if (http->data_encoding == HTTP_ENCODE_CHUNKED)
       httpGets(len, sizeof(len), http);
 
     if (http->data_encoding != HTTP_ENCODE_CHUNKED)
@@ -787,9 +786,7 @@ httpWrite(http_t     *http,		/* I - HTTP data */
 
   http->activity = time(NULL);
 
-  if (http->data_encoding == HTTP_ENCODE_CHUNKED &&
-      (http->state == HTTP_GET_SEND || http->state == HTTP_POST_RECV ||
-       http->state == HTTP_POST_SEND || http->state == HTTP_PUT_RECV))
+  if (http->data_encoding == HTTP_ENCODE_CHUNKED)
   {
     if (httpPrintf(http, "%x\r\n", length) < 0)
       return (-1);
@@ -834,9 +831,7 @@ httpWrite(http_t     *http,		/* I - HTTP data */
       http->data_remaining -= bytes;
   }
 
-  if (http->data_encoding == HTTP_ENCODE_CHUNKED &&
-      (http->state == HTTP_GET_SEND || http->state == HTTP_POST_RECV ||
-       http->state == HTTP_POST_SEND || http->state == HTTP_PUT_RECV))
+  if (http->data_encoding == HTTP_ENCODE_CHUNKED)
     if (httpPrintf(http, "\r\n") < 0)
       return (-1);
 
@@ -1358,14 +1353,18 @@ httpEncode64(char       *out,	/* I - String to write to */
 int				/* O - Content length */
 httpGetLength(http_t *http)	/* I - HTTP data */
 {
+  DEBUG_printf(("httpGetLength(%08x)\n", http));
+
   if (strcasecmp(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked") == 0)
   {
+    DEBUG_puts("httpGetLength: chunked request!");
+
     http->data_encoding  = HTTP_ENCODE_CHUNKED;
     http->data_remaining = 0;
   }
   else
   {
-    http->data_encoding  = HTTP_ENCODE_LENGTH;
+    http->data_encoding = HTTP_ENCODE_LENGTH;
 
    /*
     * The following is a hack for HTTP servers that don't send a
@@ -1379,6 +1378,8 @@ httpGetLength(http_t *http)	/* I - HTTP data */
       http->data_remaining = 2147483647;
     else
       http->data_remaining = atoi(http->fields[HTTP_FIELD_CONTENT_LENGTH]);
+
+    DEBUG_printf(("httpGetLength: content_length = %d\n", http->data_remaining));
   }
 
   return (http->data_remaining);
@@ -1502,5 +1503,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.55 1999/10/22 20:00:32 mike Exp $".
+ * End of "$Id: http.c,v 1.56 1999/11/02 22:26:47 mike Exp $".
  */
