@@ -1,4 +1,4 @@
-CHANGES.txt - 10/02/2000
+CHANGES.txt - 10/04/2000
 ------------------------
 
 CHANGES IN CUPS v1.1.4
@@ -40,6 +40,11 @@ CHANGES IN CUPS v1.1.4
 	  the PPD file database.  The scheduler now checks the
 	  dates and the number of PPD files (was just checking
 	  the dates.)
+	- Updated the ippSetCGIVars() function (used by the
+	  web interfaces) to only filter valid string values.
+	- The PostScript filter was scaling 2-up pages
+	  incorrectly.  This caused the edges of some pages to
+	  be clipped.
 
 
 CHANGES IN CUPS v1.1.3
