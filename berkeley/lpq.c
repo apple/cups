@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.3 1999/06/23 14:08:21 mike Exp $"
+ * "$Id: lpq.c,v 1.4 1999/07/30 13:33:53 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,8 @@
  *
  * Contents:
  *
+ *   main()      - Parse options and commands.
+ *   show_jobs() - Show jobs.
  */
 
 /*
@@ -45,7 +47,8 @@
  * Local functions...
  */
 
-static int	show_jobs(http_t *, char *, char *, int, int);
+static int	show_jobs(http_t *, const char *, const char *, const int,
+		          const int);
 
 
 /*
@@ -58,7 +61,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 {
   int		i;		/* Looping var */
   http_t	*http;		/* Connection to server */
-  char		*dest,		/* Desired printer */
+  const char	*dest,		/* Desired printer */
 		*user;		/* Desired user */
   int		id,		/* Desired job ID */
 		interval,	/* Reporting interval */
@@ -74,7 +77,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Check for command-line options...
   */
 
-  dest       = NULL;
+  dest       = cupsGetDefault();
   user       = NULL;
   id         = 0;
   interval   = 0;
@@ -136,21 +139,21 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * 'show_jobs()' - Show printers.
+ * 'show_jobs()' - Show jobs.
  */
 
 static int			/* O - Number of jobs in queue */
-show_jobs(http_t *http,		/* I - HTTP connection to server */
-          char   *dest,		/* I - Destination */
-	  char   *user,		/* I - User */
-	  int    id,		/* I - Job ID */
-	  int    longstatus)	/* I - 1 if long report desired */
+show_jobs(http_t     *http,	/* I - HTTP connection to server */
+          const char *dest,	/* I - Destination */
+	  const char *user,	/* I - User */
+	  const int  id,	/* I - Job ID */
+	  const int  longstatus)/* I - 1 if long report desired */
 {
   ipp_t		*request,	/* IPP Request */
 		*response;	/* IPP Response */
   ipp_attribute_t *attr;	/* Current attribute */
   cups_lang_t	*language;	/* Default language */
-  char		*jobdest,	/* Pointer into job-printer-uri */
+  const char	*jobdest,	/* Pointer into job-printer-uri */
 		*jobuser,	/* Pointer to job-originating-user-name */
 		*jobname;	/* Pointer to job-name */
   ipp_jstate_t	jobstate;	/* job-state */
@@ -160,7 +163,7 @@ show_jobs(http_t *http,		/* I - HTTP connection to server */
 		jobcount,	/* Number of jobs */
 		rank;		/* Rank of job */
   char		resource[1024];	/* Resource string */
-  static char	*ranks[10] =	/* Ranking strings */
+  static const char *ranks[10] =/* Ranking strings */
 		{
 		  "th",
 		  "st",
@@ -362,5 +365,5 @@ show_jobs(http_t *http,		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpq.c,v 1.3 1999/06/23 14:08:21 mike Exp $".
+ * End of "$Id: lpq.c,v 1.4 1999/07/30 13:33:53 mike Exp $".
  */
