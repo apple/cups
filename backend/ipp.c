@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.4 1999/06/25 15:04:55 mike Exp $"
+ * "$Id: ipp.c,v 1.5 1999/06/25 16:55:16 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -124,14 +124,15 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
  /*
   * Build a URI for the printer and fill the standard IPP attributes for
-  * an IPP_PRINT_FILE request...
+  * an IPP_PRINT_FILE request.  We can't use the URI in argv[0] because it
+  * might contain username:password information...
   */
 
   request = ippNew();
   request->request.op.operation_id = IPP_PRINT_JOB;
   request->request.op.request_id   = 1;
 
-  sprintf(uri, "%s://%s:%d/%s", method, hostname, port, resource);
+  sprintf(uri, "%s://%s:%d%s", method, hostname, port, resource);
 
   language = cupsLangDefault();
 
@@ -297,6 +298,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	continue;
       }
 
+    fputs("INFO: POST successful, sending IPP request...\n", stderr);
+
    /*
     * Send the IPP request...
     */
@@ -309,6 +312,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       status = HTTP_ERROR;
       break;
     }
+
+    fputs("INFO: ippWrite() successful, sending print file...\n", stderr);
 
    /*
     * Then send the file...
@@ -329,6 +334,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     }
 
     httpWrite(http, buffer, 0);
+
+    fputs("INFO: Print file sent; checking status...\n", stderr);
 
    /*
     * Finally, check the status from the HTTP server...
@@ -387,5 +394,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.4 1999/06/25 15:04:55 mike Exp $".
+ * End of "$Id: ipp.c,v 1.5 1999/06/25 16:55:16 mike Exp $".
  */
