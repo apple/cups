@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.88 2004/06/30 20:44:53 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.89 2004/07/02 20:19:17 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -841,6 +841,16 @@ add_class(client_t        *con,		/* I - Client connection */
   }
   if ((attr = ippFindAttribute(con->request, "printer-error-policy", IPP_TAG_TEXT)) != NULL)
   {
+    if (strcmp(attr->values[0].string.text, "abort-job") &&
+        strcmp(attr->values[0].string.text, "retry-job") &&
+        strcmp(attr->values[0].string.text, "stop-printer"))
+    {
+      LogMessage(L_ERROR, "add_class: Unknown printer-error-policy \"%s\"...",
+                 attr->values[0].string.text);
+      send_ipp_error(con, IPP_NOT_POSSIBLE);
+      return;
+    }
+
     LogMessage(L_DEBUG, "add_class: Setting printer-error-policy to \"%s\"...",
                attr->values[0].string.text);
     SetString(&pclass->error_policy, attr->values[0].string.text);
@@ -1365,6 +1375,16 @@ add_printer(client_t        *con,	/* I - Client connection */
   }
   if ((attr = ippFindAttribute(con->request, "printer-error-policy", IPP_TAG_TEXT)) != NULL)
   {
+    if (strcmp(attr->values[0].string.text, "abort-job") &&
+        strcmp(attr->values[0].string.text, "retry-job") &&
+        strcmp(attr->values[0].string.text, "stop-printer"))
+    {
+      LogMessage(L_ERROR, "add_printer: Unknown printer-error-policy \"%s\"...",
+                 attr->values[0].string.text);
+      send_ipp_error(con, IPP_NOT_POSSIBLE);
+      return;
+    }
+
     LogMessage(L_DEBUG, "add_printer: Setting printer-error-policy to \"%s\"...",
                attr->values[0].string.text);
     SetString(&printer->error_policy, attr->values[0].string.text);
@@ -3965,6 +3985,11 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
   ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
              ippTimeToDate(curtime));
 
+  ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
+               "printer-error-policy", NULL, printer->op_policy);
+  ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
+               "printer-op-policy", NULL, printer->op_policy);
+
   add_queued_job_count(con, printer);
 
   requested = ippFindAttribute(con->request, "requested-attributes",
@@ -4165,6 +4190,11 @@ get_printers(client_t *con,		/* I - Client connection */
                     "printer-state-time", printer->state_time);
       ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
         	 ippTimeToDate(curtime));
+
+      ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                   "printer-error-policy", NULL, printer->op_policy);
+      ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                   "printer-op-policy", NULL, printer->op_policy);
 
       add_queued_job_count(con, printer);
 
@@ -7048,5 +7078,5 @@ validate_user(job_t      *job,		/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.88 2004/06/30 20:44:53 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.89 2004/07/02 20:19:17 mike Exp $".
  */

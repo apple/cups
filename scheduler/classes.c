@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.34.2.25 2004/06/30 17:19:51 mike Exp $"
+ * "$Id: classes.c,v 1.34.2.26 2004/07/02 20:19:17 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -66,6 +66,7 @@ AddClass(const char *name)	/* I - Name of class */
     c->type = CUPS_PRINTER_CLASS;
 
     SetStringf(&c->uri, "ipp://%s:%d/classes/%s", ServerName, LocalPort, name);
+    SetString(&c->error_policy, "retry-job");
   }
 
   return (c);
@@ -709,5 +710,5 @@ UpdateImplicitClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.34.2.25 2004/06/30 17:19:51 mike Exp $".
+ * End of "$Id: classes.c,v 1.34.2.26 2004/07/02 20:19:17 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.65 2004/07/02 19:51:24 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.66 2004/07/02 20:19:17 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -111,7 +111,7 @@ AddPrinter(const char *name)	/* I - Name of printer */
   SetString(&p->job_sheets[0], "none");
   SetString(&p->job_sheets[1], "none");
 
-  SetString(&p->error_policy, "");
+  SetString(&p->error_policy, "stop-printer");
   SetString(&p->op_policy, DefaultPolicy);
 
   p->op_policy_ptr = DefaultPolicyPtr;
@@ -410,6 +410,12 @@ CreateCommonData(void)
 		  "separate-documents-uncollated-copies",
 		  "separate-documents-collated-copies"
 		};
+  static const char * const errors[] =	/* printer-error-policy-supported values */
+		{
+		  "abort-job",
+		  "retry-job",
+		  "stop-printer"
+		};
 
 
   if (CommonData)
@@ -474,9 +480,12 @@ CreateCommonData(void)
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                "job-hold-until-default", NULL, "no-hold");
   attr = ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                       "printer-policy-supported", NumPolicies, NULL, NULL);
+                       "printer-op-policy-supported", NumPolicies, NULL, NULL);
   for (i = 0; i < NumPolicies; i ++)
     attr->values[i].string.text = strdup(Policies[i]->name);
+  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                "printer-error-policy-supported",
+		sizeof(errors) / sizeof(errors[0]), NULL, errors);
 
   if (NumBanners > 0)
   {
@@ -2477,5 +2486,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.65 2004/07/02 19:51:24 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.66 2004/07/02 20:19:17 mike Exp $".
  */
