@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.86 2004/07/02 04:51:45 mike Exp $"
+ * "$Id: client.c,v 1.91.2.87 2004/07/02 20:49:23 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -295,11 +295,13 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   val = 1;
   setsockopt(con->http.fd, IPPROTO_TCP, TCP_NODELAY, &val, sizeof(val)); 
 
+#ifdef FD_CLOEXEC
  /*
   * Close this file on all execs...
   */
 
-  fcntl(con->http.fd, F_SETFD, fcntl(con->http.fd, F_GETFD) | FD_CLOEXEC);
+  fcntl(con->http.fd, F_SETFD, FD_CLOEXEC);
+#endif /* FD_CLOEXEC */
 
  /*
   * Add the socket to the select() input mask.
@@ -1555,6 +1557,14 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	    fchmod(con->file, 0640);
 	    fchown(con->file, RunUser, Group);
 
+#ifdef FD_CLOEXEC
+	   /*
+	    * Close this file when starting other processes...
+            */
+
+            fcntl(con->file, F_SETFD, FD_CLOEXEC);
+#endif /* FD_CLOEXEC */
+
             LogMessage(L_DEBUG2, "ReadClient: %d REQUEST %s=%d", con->http.fd,
 	               con->filename, con->file);
 
@@ -1797,6 +1807,14 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	  con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
 	  fchmod(con->file, 0640);
 	  fchown(con->file, RunUser, Group);
+
+#ifdef FD_CLOEXEC
+	   /*
+	    * Close this file when starting other processes...
+            */
+
+            fcntl(con->file, F_SETFD, FD_CLOEXEC);
+#endif /* FD_CLOEXEC */
 
           LogMessage(L_DEBUG2, "ReadClient: %d REQUEST %s=%d", con->http.fd,
 	             con->filename, con->file);
@@ -2066,7 +2084,13 @@ SendFile(client_t    *con,
   if (con->file < 0)
     return (0);
 
-  fcntl(con->file, F_SETFD, fcntl(con->file, F_GETFD) | FD_CLOEXEC);
+#ifdef FD_CLOEXEC
+ /*
+  * Close this file when starting other processes...
+  */
+
+  fcntl(con->file, F_SETFD, FD_CLOEXEC);
+#endif /* FD_CLOEXEC */
 
   con->pipe_pid = 0;
 
@@ -2903,7 +2927,6 @@ pipe_command(client_t *con,		/* I - Client connection */
   char		*commptr;		/* Command string pointer */
   char		*query;			/* Query string pointer */
   char		*uriptr;		/* URI string pointer */
-  int		fd;			/* Looping var */
   int		fds[2];			/* Pipe FDs */
   int		argc;			/* Number of arguments */
   int		envc;			/* Number of environment variables */
@@ -3279,21 +3302,17 @@ pipe_command(client_t *con,		/* I - Client connection */
       close(0);
       if (dup(infile) < 0)
 	exit(errno);
+      close(infile);
     }
 
     close(1);
     if (dup(fds[1]) < 0)
       exit(errno);
+    close(fds[1]);
 
     close(2);
     dup(CGIPipes[1]);
-
-   /*
-    * Close extra file descriptors...
-    */
-
-    for (fd = 3; fd < MaxFDs; fd ++)
-      close(fd);
+    close(CGIPipes[1]);
 
    /*
     * Change umask to restrict permissions on created files...
@@ -3413,5 +3432,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.86 2004/07/02 04:51:45 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.87 2004/07/02 20:49:23 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.89 2004/07/02 20:19:17 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.90 2004/07/02 20:49:23 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -7040,14 +7040,15 @@ validate_user(job_t      *job,		/* I - Job */
   printer_t		*printer;	/* Printer for job */
 
 
-  LogMessage(L_DEBUG2, "validate_user(%d, %s, %s, %d)\n", con->http.fd,
-             owner, username, userlen);
+  LogMessage(L_DEBUG2, "validate_user(job=%d, con=%d, owner=\"%s\", username=%p, userlen=%d)\n",
+             job ? job->id : 0, con->http.fd, owner ? owner : "(null)",
+	     username, userlen);
 
  /*
   * Validate input...
   */
 
-  if (con == NULL || owner == NULL || username == NULL || userlen <= 0)
+  if (!con || !owner || !username || userlen <= 0)
     return (0);
 
  /*
@@ -7078,5 +7079,5 @@ validate_user(job_t      *job,		/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.89 2004/07/02 20:19:17 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.90 2004/07/02 20:49:23 mike Exp $".
  */
