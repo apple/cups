@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertohp.c,v 1.6 2000/05/24 18:40:38 mike Exp $"
+ * "$Id: rastertohp.c,v 1.7 2000/05/24 21:22:39 mike Exp $"
  *
  *   Hewlett-Packard Page Control Language filter for the Common UNIX
  *   Printing System (CUPS).
@@ -147,7 +147,8 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
 	break;
 
     default :
-        printf("\033&l%.2fP", length / 12.0);	/* Set page length */
+        printf("\033&l%dP",			/* Set page length */
+	       header->PageSize[1] / 12);
 	break;
   }
 
@@ -557,5 +558,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertohp.c,v 1.6 2000/05/24 18:40:38 mike Exp $".
+ * End of "$Id: rastertohp.c,v 1.7 2000/05/24 21:22:39 mike Exp $".
  */
