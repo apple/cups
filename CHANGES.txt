@@ -3,6 +3,9 @@ CHANGES.txt - 01/23/2003
 
 CHANGES IN CUPS V1.1.19
 
+	- The time-at-xyz attributes were not recognized in
+	  banner files if prefixed by a question mark, e.g.
+	  "{?time-at-creation}".
 	- Added support for pre-filtering application/pictwps
 	  files on MacOS clients before sending them to a server
 	  via IPP.
