@@ -3,6 +3,15 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The rastertoepson filter would crash under certain
+	  cirsumstances (STR #583)
+	- The USB backend did not handle serial numbers using
+	  the (incorrect) SN keyword and did not terminate the
+	  make and model name strings properly (STR #588)
+	- The USB backend did not build on Solaris x86 (STR
+	  #585)
+	- The cupsDoAuthentication() function did not use the
+	  method name for Digest authentication (STR #584)
 	- The scheduler could crash if a print job could not be
 	  printed and the PreserveJobHistory option was turned
 	  off (STR #535)

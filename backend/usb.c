@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.18.2.29 2003/09/02 20:39:56 mike Exp $"
+ * "$Id: usb.c,v 1.18.2.30 2004/02/24 16:19:55 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -63,6 +63,7 @@
 #  ifdef __sparc
 #    include <sys/ecppio.h>
 #  else
+#    include <sys/ioccom.h>
 #    include <sys/ecppsys.h>
 #  endif /* __sparc */
 #endif /* __sun */
@@ -403,6 +404,28 @@ decode_device_id(int        port,		/* I - Port number */
     attr += 5;
   else if ((attr = strstr(device_id, "SERIALNUMBER:")) != NULL)
     attr += 13;
+  else if ((attr = strstr(device_id, ";SN:")) != NULL)
+    attr += 4;
+
+  if (mfg)
+  {
+   /*
+    * Make sure manufacturer is truncated at delimiter...
+    */
+
+    if ((delim = strchr(mfg, ';')) != NULL)
+      *delim = '\0';
+  }
+
+  if (mdl)
+  {
+   /*
+    * Make sure model is truncated at delimiter...
+    */
+
+    if ((delim = strchr(mdl, ';')) != NULL)
+      *delim = '\0';
+  }
 
   if (attr)
   {
@@ -798,5 +821,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb.c,v 1.18.2.29 2003/09/02 20:39:56 mike Exp $".
+ * End of "$Id: usb.c,v 1.18.2.30 2004/02/24 16:19:55 mike Exp $".
  */
