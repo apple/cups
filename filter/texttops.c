@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.32 2001/01/22 15:03:42 mike Exp $"
+ * "$Id: texttops.c,v 1.33 2001/01/26 14:21:58 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -183,7 +183,7 @@ WriteProlog(char       *title,	/* I - Title of job */
 
   curtime = time(NULL);
   curtm   = localtime(&curtime);
-  strftime(curdate, sizeof(curdate), NULL, curtm);
+  strftime(curdate, sizeof(curdate), CUPS_STRFTIME_FORMAT, curtm);
 
   puts("%!PS-Adobe-3.0");
   printf("%%%%BoundingBox: %.0f %.0f %.0f %.0f\n", PageLeft, PageBottom,
@@ -1270,5 +1270,5 @@ write_text(char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c,v 1.32 2001/01/22 15:03:42 mike Exp $".
+ * End of "$Id: texttops.c,v 1.33 2001/01/26 14:21:58 mike Exp $".
  */

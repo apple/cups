@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.30 2001/01/22 15:03:38 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.31 2001/01/26 14:21:57 mike Exp $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
@@ -66,7 +66,7 @@ OutputProlog(char  *title,	/* I - Job title */
   puts("%%DocumentSuppliedResources: procset hpgltops 1.1 0");
   puts("%%DocumentNeededResources: font Courier Helvetica");
   puts("%%Creator: hpgltops/" CUPS_SVERSION);
-  strftime(line, sizeof(line), NULL, curtm);
+  strftime(line, sizeof(line), CUPS_STRFTIME_FORMAT, curtm);
   printf("%%%%CreationDate: %s\n", line);
   printf("%%%%Title: %s\n", title);
   printf("%%%%For: %s\n", user);
@@ -403,5 +403,5 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.30 2001/01/22 15:03:38 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.31 2001/01/26 14:21:57 mike Exp $".
  */

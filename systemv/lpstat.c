@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.35 2001/01/23 17:36:24 mike Exp $"
+ * "$Id: lpstat.c,v 1.36 2001/01/26 14:22:00 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -1456,7 +1456,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
       if (match)
       {
         jobdate = localtime(&jobtime);
-	strftime(date, sizeof(date), NULL, jobdate);
+	strftime(date, sizeof(date), CUPS_STRFTIME_FORMAT, jobdate);
         snprintf(temp, sizeof(temp), "%s-%d", dest, jobid);
         
         if (ranking)
@@ -1870,5 +1870,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.35 2001/01/23 17:36:24 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.36 2001/01/26 14:22:00 mike Exp $".
  */

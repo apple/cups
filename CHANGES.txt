@@ -1,5 +1,12 @@
-CHANGES.txt - 01/24/2001
+CHANGES.txt - 01/26/2001
 ------------------------
+
+CHANGES IN CUPS V1.1.6-1
+
+	- Added configure check for getting the correct
+	  strftime() format string; %c is not Y2k safe,
+	  and %KC and NULL are not universally supported.
+
 
 CHANGES IN CUPS V1.1.6
 

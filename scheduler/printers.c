@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.85 2001/01/22 15:04:01 mike Exp $"
+ * "$Id: printers.c,v 1.86 2001/01/26 14:21:59 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -699,7 +699,7 @@ SaveAllPrinters(void)
 
   curtime = time(NULL);
   curdate = gmtime(&curtime);
-  strftime(temp, sizeof(temp) - 1, NULL, curdate);
+  strftime(temp, sizeof(temp) - 1, CUPS_STRFTIME_FORMAT, curdate);
 
   fputs("# Printer configuration file for " CUPS_SVERSION "\n", fp);
   fprintf(fp, "# Written by cupsd on %s\n", temp);
@@ -1698,5 +1698,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.85 2001/01/22 15:04:01 mike Exp $".
+ * End of "$Id: printers.c,v 1.86 2001/01/26 14:21:59 mike Exp $".
  */

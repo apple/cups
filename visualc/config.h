@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h,v 1.3 2001/01/22 18:38:04 mike Exp $"
+ * "$Id: config.h,v 1.4 2001/01/26 14:22:01 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -42,6 +42,12 @@
 #define CUPS_LOGDIR	"C:/CUPS/logs"
 #define CUPS_DATADIR    "C:/CUPS/share"
 #define CUPS_FONTPATH	"C:/CUPS/share/fonts"
+
+/*
+ * What is the format string for strftime?
+ */
+
+#define CUPS_STRFTIME_FORMAT	"%c"
 
 /*
  * Do we have various image libraries?
@@ -137,5 +143,5 @@
 
 
 /*
- * End of "$Id: config.h,v 1.3 2001/01/22 18:38:04 mike Exp $".
+ * End of "$Id: config.h,v 1.4 2001/01/26 14:22:01 mike Exp $".
  */
