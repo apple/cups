@@ -1,5 +1,5 @@
 #
-# "$Id: mime.types,v 1.16 2001/03/02 22:33:58 andy Exp $"
+# "$Id: mime.types,v 1.17 2001/03/05 21:37:33 mike Exp $"
 #
 #   MIME types file for the Common UNIX Printing System (CUPS).
 #
@@ -100,7 +100,7 @@ image/x-sgi-rgb			rgb sgi bw icon short(0,474)
 image/x-xbitmap			xbm
 image/x-xpixmap			xpm ascii(0,1024) + string(3,"XPM")
 image/x-xwindowdump		xwd
-image/x-sun-raster		ras
+image/x-sun-raster		ras string(0,<59a66a95>)
 
 #image/fpx			fpx
 image/x-alias			pix short(8,8) short(8,24)
@@ -150,5 +150,5 @@ application/vnd.cups-raw	(string(0,<1B>E) + !string(2,<1B>%0B)) \
 #application/octet-stream
 
 #
-# End of "$Id: mime.types,v 1.16 2001/03/02 22:33:58 andy Exp $".
+# End of "$Id: mime.types,v 1.17 2001/03/05 21:37:33 mike Exp $".
 #

@@ -57,6 +57,11 @@ CHANGES IN CUPS V1.1.7
 	  temporary file functions; while this is not a problem
 	  in normal configurations (the CUPS temporary directory
 	  is restricted), they now use the cupsTempFd() function.
+	- The mime.types file was missing the recognition rule
+	  for Sun Raster images.
+	- The admin CGI was passing a printer make string to
+	  ippSetCGIVars() that was being replaced in that
+	  function.
 
 
 CHANGES IN CUPS V1.1.6-3

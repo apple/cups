@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.21 2001/02/07 00:33:54 mike Exp $"
+ * "$Id: admin.c,v 1.22 2001/03/05 21:37:33 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -495,6 +495,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 		*uriptr;		/* Pointer into URI */
   int		maxrate;		/* Maximum baud rate */
   char		baudrate[255];		/* Baud rate string */
+  char		make[255];		/* Make string */
   const char	*name,			/* Pointer to class name */
 		*ptr;			/* Pointer to CGI variable */
   static int	baudrates[] =		/* Baud rates */
@@ -787,7 +788,10 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 	* Let the user choose a model...
 	*/
 
-        ippSetCGIVars(response, "ppd-make", var);
+        strncpy(make, var, sizeof(make) - 1);
+	make[sizeof(make) - 1] = '\0';
+
+        ippSetCGIVars(response, "ppd-make", make);
 	cgiCopyTemplateLang(stdout, TEMPLATES, "choose-model.tmpl",
 	                    getenv("LANG"));
       }
@@ -1590,5 +1594,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.21 2001/02/07 00:33:54 mike Exp $".
+ * End of "$Id: admin.c,v 1.22 2001/03/05 21:37:33 mike Exp $".
  */

@@ -16,8 +16,7 @@
 	ATTR uri printer-uri $uri
 
 	# What statuses are OK?
-	STATUS ok
-	STATUS ok-subst
+	STATUS successful-ok
 
 	# What attributes do we expect?
 	EXPECT charset-configured
