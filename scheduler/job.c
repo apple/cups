@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.75 2000/06/27 21:10:53 mike Exp $"
+ * "$Id: job.c,v 1.76 2000/06/28 13:50:49 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -290,7 +290,7 @@ CheckJobs(void)
 
         LogMessage(L_WARN, "Printer/class %s has gone away; cancelling job %d!",
 	           current->dest, current->id);
-        CancelJob(current->id, 0);
+        CancelJob(current->id, 1);
 
 	if (prev == NULL)
 	  current = Jobs;
@@ -380,7 +380,8 @@ LoadAllJobs(void)
   int		jobid,		/* Current job ID */
 		fileid;		/* Current file ID */
   ipp_attribute_t *attr;	/* Job attribute */
-  char		method[HTTP_MAX_URI],
+  char		uri[HTTP_MAX_URI],/* URI for remote printer/class */
+		method[HTTP_MAX_URI],
 				/* Method portion of URI */
 		username[HTTP_MAX_URI],
 				/* Username portion of URI */
@@ -389,6 +390,7 @@ LoadAllJobs(void)
 		resource[HTTP_MAX_URI];
 				/* Resource portion of URI */
   int		port;		/* Port portion of URI */
+  printer_t	*p;		/* Printer or class */
   const char	*dest;		/* Destination */
   mime_type_t	**filetypes;	/* New filetypes array */
 
@@ -446,6 +448,7 @@ LoadAllJobs(void)
 	           filename);
 	ippDelete(job->attrs);
 	free(job);
+	unlink(filename);
 	continue;
       }
 
@@ -455,6 +458,7 @@ LoadAllJobs(void)
 	           filename);
 	ippDelete(job->attrs);
 	free(job);
+	unlink(filename);
 	continue;
       }
 
@@ -462,11 +466,48 @@ LoadAllJobs(void)
                    &port, resource);
 
       if ((dest = ValidateDest(resource, &(job->dtype))) == NULL)
+        if (strchr(resource, '@') != NULL)
+	{
+	 /*
+	  * Job queued on remote printer or class, so add it...
+	  */
+
+	  if (strncmp(resource, "/classes/", 9) == 0)
+	  {
+	    p = AddClass(resource + 9);
+	    snprintf(p->make_model, sizeof(p->make_model), "Remote Class on %s",
+        	     host);
+	  }
+	  else
+	  {
+	    p = AddPrinter(resource + 10);
+	    snprintf(p->make_model, sizeof(p->make_model), "Remote Printer on %s",
+        	     host);
+	  }
+
+	  p->type |= CUPS_PRINTER_REMOTE;
+
+	  *strchr(resource, '@') = '\0';
+	  snprintf(uri, sizeof(uri), "ipp://%s:%d%s", host, port, resource);
+
+	  strcpy(p->uri, uri);
+	  strcpy(p->more_info, uri);
+	  strcpy(p->device_uri, uri);
+	  strcpy(p->hostname, host);
+	  strcpy(p->location, "Location Unknown");
+	  strcpy(p->info, "No Information Available");
+
+	  SetPrinterAttrs(p);
+	  dest = p->name;
+        }
+
+      if (dest == NULL)
       {
         LogMessage(L_ERROR, "LoadAllJobs: Unable to queue job for destination \"%s\"!",
 	           attr->values[0].string.text);
 	ippDelete(job->attrs);
 	free(job);
+	unlink(filename);
 	continue;
       }
 
@@ -539,6 +580,7 @@ LoadAllJobs(void)
       {
         LogMessage(L_ERROR, "LoadAddJobs: Orphaned print file \"%s\"!",
 	           filename);
+        unlink(filename);
 	continue;
       }
 
@@ -2521,5 +2563,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.75 2000/06/27 21:10:53 mike Exp $".
+ * End of "$Id: job.c,v 1.76 2000/06/28 13:50:49 mike Exp $".
  */

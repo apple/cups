@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.75 2000/06/27 21:07:10 mike Exp $"
+ * "$Id: ipp.c,v 1.76 2000/06/28 13:50:49 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2133,6 +2133,7 @@ delete_printer(client_t        *con,	/* I - Client connection */
   else
     printer = FindPrinter(dest);
 
+  CancelJobs(dest);
   DeletePrinter(printer);
 
  /*
@@ -4931,5 +4932,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.75 2000/06/27 21:07:10 mike Exp $".
+ * End of "$Id: ipp.c,v 1.76 2000/06/28 13:50:49 mike Exp $".
  */
