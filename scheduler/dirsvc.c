@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.75 2001/06/05 18:28:43 mike Exp $"
+ * "$Id: dirsvc.c,v 1.76 2001/06/06 21:38:20 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -506,6 +506,8 @@ UpdateBrowseList(void)
 
       p = AddClass(name);
 
+      LogMessage(L_INFO, "Added remote class \"%s\"...", name);
+
      /*
       * Force the URI to point to the real server...
       */
@@ -587,6 +589,8 @@ UpdateBrowseList(void)
       */
 
       p = AddPrinter(name);
+
+      LogMessage(L_INFO, "Added remote printer \"%s\"...", name);
 
      /*
       * Force the URI to point to the real server...
@@ -722,8 +726,7 @@ UpdateBrowseList(void)
 
           SetPrinterAttrs(pclass);
 
-          DEBUG_printf(("Added new class \"%s\", type = %x\n", name,
-	                pclass->type));
+          LogMessage(L_INFO, "Added implicit class \"%s\"...", name);
 	}
 
         if (first != NULL)
@@ -961,5 +964,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.75 2001/06/05 18:28:43 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.76 2001/06/06 21:38:20 mike Exp $".
  */

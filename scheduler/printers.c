@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.96 2001/05/16 03:44:44 mike Exp $"
+ * "$Id: printers.c,v 1.97 2001/06/06 21:38:21 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -754,10 +754,13 @@ SaveAllPrinters(void)
 
     if (printer->info[0])
       fprintf(fp, "Info %s\n", printer->info);
+
     if (printer->more_info[0])
       fprintf(fp, "Location %s\n", printer->location);
+
     if (printer->device_uri[0])
       fprintf(fp, "DeviceURI %s\n", printer->device_uri);
+
     if (printer->state == IPP_PRINTER_STOPPED)
     {
       fputs("State Stopped\n", fp);
@@ -765,10 +768,12 @@ SaveAllPrinters(void)
     }
     else
       fputs("State Idle\n", fp);
+
     if (printer->accepting)
       fputs("Accepting Yes\n", fp);
     else
       fputs("Accepting No\n", fp);
+
     fprintf(fp, "JobSheets %s %s\n", printer->job_sheets[0],
             printer->job_sheets[1]);
 
@@ -1788,5 +1793,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.96 2001/05/16 03:44:44 mike Exp $".
+ * End of "$Id: printers.c,v 1.97 2001/06/06 21:38:21 mike Exp $".
  */

@@ -56,6 +56,16 @@ CHANGES IN CUPS V1.1.9
 	- Updated the EPSON printer driver and added PPDs for
 	  the newer EPSON Stylus printers that only support the
 	  "ESC i" graphics command.
+	- The lpadmin command didn't allow you to add remote
+	  printers to a local class.
+	- The lpadmin command didn't allow you to set the
+	  options (quotas, etc.) for a class.
+	- The scheduler did not load or save the
+	  job-sheets-default attribute for classes.
+	- The scheduler did not automatically recreate remote
+	  printers that were part of a class.
+	- It was possible for a printer class to list the same
+	  printer more than once.
 
 
 CHANGES IN CUPS V1.1.8

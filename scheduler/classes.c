@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.34 2001/03/15 20:00:57 andy Exp $"
+ * "$Id: classes.c,v 1.35 2001/06/06 21:38:19 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -91,8 +91,17 @@ void
 AddPrinterToClass(printer_t *c,	/* I - Class to add to */
                   printer_t *p)	/* I - Printer to add */
 {
+  int		i;		/* Looping var */
   printer_t	**temp;		/* Pointer to printer array */
 
+
+ /*
+  * See if this printer is already a member of the class...
+  */
+
+  for (i = 0; i < c->num_printers; i ++)
+    if (c->printers[i] == p)
+      return;
 
  /*
   * Allocate memory as needed...
@@ -336,7 +345,8 @@ LoadAllClasses(void)
   char		line[1024],		/* Line from file */
 		name[256],		/* Parameter name */
 		*nameptr,		/* Pointer into name */
-		*value;			/* Pointer to value */
+		*value,			/* Pointer to value */
+		*valueptr;		/* Pointer into value */
   printer_t	*p,			/* Current printer class */
 		*temp;			/* Temporary pointer to printer */
 
@@ -452,11 +462,31 @@ LoadAllClasses(void)
       strncpy(p->location, value, sizeof(p->location) - 1);
     else if (strcmp(name, "Printer") == 0)
     {
-      if ((temp = FindPrinter(value)) != NULL)
-        AddPrinterToClass(p, temp);
-      else
+      if ((temp = FindPrinter(value)) == NULL)
+      {
 	LogMessage(L_WARN, "Unknown printer %s on line %d of classes.conf.",
 	           value, linenum);
+
+       /*
+	* Add the missing remote printer...
+	*/
+
+	temp = AddPrinter(value);
+	strcpy(temp->make_model, "Remote Printer on unknown");
+
+        temp->state       = IPP_PRINTER_STOPPED;
+	temp->type        |= CUPS_PRINTER_REMOTE;
+	temp->browse_time = 2147483647;
+
+	strcpy(temp->location, "Location Unknown");
+	strcpy(temp->info, "No Information Available");
+	temp->hostname[0] = '\0';
+
+	SetPrinterAttrs(temp);
+      }
+
+      if (temp)
+        AddPrinterToClass(p, temp);
     }
     else if (strcmp(name, "State") == 0)
     {
@@ -490,6 +520,35 @@ LoadAllClasses(void)
         p->accepting = 1;
       else
         p->accepting = 0;
+    }
+    else if (strcmp(name, "JobSheets") == 0)
+    {
+      if (!Classification[0])
+      {
+       /*
+	* Set the initial job sheets...
+	*/
+
+	for (valueptr = value; *valueptr && !isspace(*valueptr); valueptr ++);
+
+	if (*valueptr)
+          *valueptr++ = '\0';
+
+	strncpy(p->job_sheets[0], value, sizeof(p->job_sheets[0]) - 1);
+
+	while (isspace(*valueptr))
+          valueptr ++;
+
+	if (*valueptr)
+	{
+          for (value = valueptr; *valueptr && !isspace(*valueptr); valueptr ++);
+
+	  if (*valueptr)
+            *valueptr++ = '\0';
+
+	  strncpy(p->job_sheets[1], value, sizeof(p->job_sheets[1]) - 1);
+	}
+      }
     }
     else if (strcmp(name, "AllowUser") == 0)
     {
@@ -594,8 +653,10 @@ SaveAllClasses(void)
 
     if (pclass->info[0])
       fprintf(fp, "Info %s\n", pclass->info);
+
     if (pclass->more_info[0])
       fprintf(fp, "Location %s\n", pclass->location);
+
     if (pclass->state == IPP_PRINTER_STOPPED)
     {
       fputs("State Stopped\n", fp);
@@ -603,10 +664,14 @@ SaveAllClasses(void)
     }
     else
       fputs("State Idle\n", fp);
+
     if (pclass->accepting)
       fputs("Accepting Yes\n", fp);
     else
       fputs("Accepting No\n", fp);
+
+    fprintf(fp, "JobSheets %s %s\n", pclass->job_sheets[0],
+            pclass->job_sheets[1]);
 
     for (i = 0; i < pclass->num_printers; i ++)
       fprintf(fp, "Printer %s\n", pclass->printers[i]->name);
@@ -630,5 +695,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.34 2001/03/15 20:00:57 andy Exp $".
+ * End of "$Id: classes.c,v 1.35 2001/06/06 21:38:19 mike Exp $".
  */

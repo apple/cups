@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.133 2001/06/05 21:32:00 mike Exp $"
+ * "$Id: ipp.c,v 1.134 2001/06/06 21:38:20 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -813,9 +813,19 @@ add_class(client_t        *con,		/* I - Client connection */
       */
 
       if (dtype == CUPS_PRINTER_CLASS)
+      {
         AddPrinterToClass(pclass, FindClass(dest));
+
+	LogMessage(L_DEBUG, "add_class: Added class \"%s\" to class \"%s\"...",
+	           dest, pclass->name);
+      }
       else
+      {
         AddPrinterToClass(pclass, FindPrinter(dest));
+
+	LogMessage(L_DEBUG, "add_class: Added printer \"%s\" to class \"%s\"...",
+	           dest, pclass->name);
+      }
     }
   }
 
@@ -5373,5 +5383,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.133 2001/06/05 21:32:00 mike Exp $".
+ * End of "$Id: ipp.c,v 1.134 2001/06/06 21:38:20 mike Exp $".
  */
