@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.40 2003/06/11 23:16:40 mike Exp $"
+ * "$Id: language.c,v 1.41 2003/07/20 01:24:44 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -25,13 +25,15 @@
  *
  * Contents:
  *
- *   cupsLangEncoding()  - Return the character encoding (us-ascii, etc.)
- *                         for the given language.
- *   cupsLangFlush()     - Flush all language data out of the cache.
- *   cupsLangFree()      - Free language data.
- *   cupsLangGet()       - Get a language.
- *   appleLangDefault()  - Get the default locale string.
- *   cups_cache_lookup() - Lookup a language in the cache...
+ *   cupsLangEncoding()   - Return the character encoding (us-ascii, etc.)
+ *                          for the given language.
+ *   cupsLangFlush()      - Flush all language data out of the cache.
+ *   cupsLangFree()       - Free language data.
+ *   cupsLangGet()        - Get a language.
+ *   _cupsRestoreLocale() - Restore the original locale...
+ *   _cupsSaveLocale()    - Set the locale and save a copy of the old locale...
+ *   appleLangDefault()   - Get the default locale string.
+ *   cups_cache_lookup()  - Lookup a language in the cache...
  */
 
 /*
@@ -196,7 +198,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   cups_msg_t		msg;		/* Message number */
   char			*text;		/* Message text */
   cups_lang_t		*lang;		/* Current language... */
-  const char		*oldlocale;	/* Old locale name */
+  char			*oldlocale;	/* Old locale name */
   static const char * const locale_encodings[] =
 			{		/* Locale charset names */
 			  "ASCII",
@@ -255,9 +257,9 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   */
 
 #if defined(__APPLE__) || !defined(LC_CTYPE)
-  oldlocale = setlocale(LC_ALL, "C");
+  oldlocale = _cupsSaveLocale(LC_ALL, "C");
 #else
-  oldlocale = setlocale(LC_CTYPE, "C");
+  oldlocale = _cupsSaveLocale(LC_CTYPE, "C");
 #endif /* __APPLE__ || !LC_CTYPE */
 
  /*
@@ -326,9 +328,9 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   */
 
 #if defined(__APPLE__) || !defined(LC_CTYPE)
-  setlocale(LC_ALL, oldlocale);
+  _cupsRestoreLocale(LC_ALL, oldlocale);
 #else
-  setlocale(LC_CTYPE, oldlocale);
+  _cupsRestoreLocale(LC_CTYPE, oldlocale);
 #endif /* __APPLE__ || !LC_CTYPE */
 
  /*
@@ -550,6 +552,44 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 }
 
 
+/*
+ * '_cupsRestoreLocale()' - Restore the original locale...
+ */
+
+void
+_cupsRestoreLocale(int  category,	/* I - Category */
+                   char *oldlocale)	/* I - Old locale or NULL */
+{
+  if (oldlocale)
+  {
+   /*
+    * Reset the locale and free the locale string...
+    */
+
+    setlocale(category, oldlocale);
+    free(oldlocale);
+  }
+}
+
+
+/*
+ * '_cupsSaveLocale()' - Set the locale and save a copy of the old locale...
+ */
+
+char *					/* O - Old locale or NULL */
+_cupsSaveLocale(int        category,	/* I - Category */
+                const char *locale)	/* I - New locale or NULL */
+{
+  char	*oldlocale;			/* Old locale */
+
+
+  if ((oldlocale = setlocale(category, locale)) != NULL)
+    return (strdup(oldlocale));
+  else
+    return (NULL);
+}
+
+
 #ifdef __APPLE__
 /*
  * Code & data to translate OSX's language names to their ISO 639-1 locale.
@@ -734,5 +774,5 @@ cups_cache_lookup(const char      *name,/* I - Name of locale */
 
 
 /*
- * End of "$Id: language.c,v 1.40 2003/06/11 23:16:40 mike Exp $".
+ * End of "$Id: language.c,v 1.41 2003/07/20 01:24:44 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: language.h,v 1.29 2003/02/04 05:27:22 mike Exp $"
+ * "$Id: language.h,v 1.30 2003/07/20 01:24:44 mike Exp $"
  *
  *   Multi-language support for the Common UNIX Printing System (CUPS).
  *
@@ -212,6 +212,10 @@ extern void		cupsLangFree(cups_lang_t *lang);
 extern cups_lang_t	*cupsLangGet(const char *language);
 #  define		cupsLangString(lang,msg) (lang)->messages[(msg)]
 
+/**** New in CUPS 1.1.20 ****/
+extern void		_cupsRestoreLocale(int category, char *oldlocale);
+extern char		*_cupsSaveLocale(int category, const char *locale);
+
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */
@@ -219,5 +223,5 @@ extern cups_lang_t	*cupsLangGet(const char *language);
 #endif /* !_CUPS_LANGUAGE_H_ */
 
 /*
- * End of "$Id: language.h,v 1.29 2003/02/04 05:27:22 mike Exp $".
+ * End of "$Id: language.h,v 1.30 2003/07/20 01:24:44 mike Exp $".
  */
