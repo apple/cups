@@ -1,5 +1,5 @@
 /*
- * "$Id: network.c,v 1.5.2.3 2002/03/28 12:11:43 mike Exp $"
+ * "$Id: network.c,v 1.5.2.4 2002/04/02 19:00:23 mike Exp $"
  *
  *   Network interface functions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -29,6 +29,8 @@
 
 #include "cupsd.h"
 
+#include <net/if.h>
+
 #ifdef HAVE_GETIFADDRS
 /*
  * Use native getifaddrs() function...
@@ -39,7 +41,6 @@
  * Use getifaddrs() emulation...
  */
 
-#  include <net/if.h>
 #  include <sys/ioctl.h>
 #  ifdef HAVE_SYS_SOCKIO_H
 #    include <sys/sockio.h>
@@ -475,5 +476,5 @@ freeifaddrs(struct ifaddrs *addrs)	/* I - Interface list to free */
 
 
 /*
- * End of "$Id: network.c,v 1.5.2.3 2002/03/28 12:11:43 mike Exp $".
+ * End of "$Id: network.c,v 1.5.2.4 2002/04/02 19:00:23 mike Exp $".
  */
