@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.1.2.1 2002/05/21 20:05:49 mike Exp $"
+# "$Id: Makefile,v 1.1.2.2 2002/06/06 12:32:40 mike Exp $"
 #
 #   French man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -104,11 +104,8 @@ install:	all
 	$(LN) accept.$(CAT8EXT) $(AMANDIR)/$(LANGUAGE)/cat$(MAN8EXT)/reject.$(CAT8EXT)
 	$(RM) $(AMANDIR)/$(LANGUAGE)/cat$(MAN8EXT)/disable.$(CAT8EXT)
 	$(LN) enable.$(CAT8EXT) $(AMANDIR)/$(LANGUAGE)/cat$(MAN8EXT)/disable.$(CAT8EXT)
-	for dir in $(LANGDIRS); do \
-		(cd $$dir; make install); \
-	done
 
 
 #
-# End of "$Id: Makefile,v 1.1.2.1 2002/05/21 20:05:49 mike Exp $".
+# End of "$Id: Makefile,v 1.1.2.2 2002/06/06 12:32:40 mike Exp $".
 #

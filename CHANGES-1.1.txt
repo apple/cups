@@ -1,6 +1,16 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.15-1
+
+	- The lpc and lprm sources didn't include the CUPS
+	  string function header, which is required on systems
+	  that don't have their own snprintf() function.
+	- The French manpage Makefile tried to install the
+	  language subdirectories when it (obviously) didn't
+	  have to.
+
+
 CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
