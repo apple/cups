@@ -3,6 +3,12 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The cancel and lprm commands now both display an error
+	  message and return a non-zero exit status if an
+	  attempt is made to cancel a job on a non-existent
+	  printer.
+	- The lpoptions command incorrectly complained if a
+	  request to delete a non-existent printer was made.
 	- If the client.conf file defines an alternate server
 	  name, the "configure printer" action in the web
 	  interface might not work.

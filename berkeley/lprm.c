@@ -1,5 +1,5 @@
 /*
- * "$Id: lprm.c,v 1.15.2.6 2002/06/27 19:04:32 mike Exp $"
+ * "$Id: lprm.c,v 1.15.2.7 2002/10/07 14:11:58 mike Exp $"
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
@@ -119,6 +119,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	    if ((instance = strchr(dest, '/')) != NULL)
 	      *instance = '\0';
+
+	    if (cupsGetDest(dest, NULL, num_dests, dests) == NULL)
+	    {
+	      fprintf(stderr, "lprm: Unknown destination \"%s\"!\n", dest);
+              cupsFreeDests(num_dests, dests);
+	      httpClose(http);
+	      return(1);
+	    }
 	    break;
 
 	default :
@@ -263,5 +271,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lprm.c,v 1.15.2.6 2002/06/27 19:04:32 mike Exp $".
+ * End of "$Id: lprm.c,v 1.15.2.7 2002/10/07 14:11:58 mike Exp $".
  */

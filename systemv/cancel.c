@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.19.2.8 2002/08/22 01:43:39 mike Exp $"
+ * "$Id: cancel.c,v 1.19.2.9 2002/10/07 14:11:59 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -189,6 +189,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	*/
 
         fprintf(stderr, "cancel: Unknown destination \"%s\"!\n", argv[i]);
+	return (1);
       }
 
      /*
@@ -284,5 +285,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c,v 1.19.2.8 2002/08/22 01:43:39 mike Exp $".
+ * End of "$Id: cancel.c,v 1.19.2.9 2002/10/07 14:11:59 mike Exp $".
  */
