@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.34 2000/03/09 19:47:19 mike Exp $"
+dnl "$Id: configure.in,v 1.35 2000/03/20 22:06:14 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -121,8 +121,16 @@ AC_CHECK_LIB(c,crypt,LIBS="$LIBS",AC_CHECK_LIB(crypt,crypt))
 AC_CHECK_HEADER(crypt.h, AC_DEFINE(HAVE_CRYPT_H))
 AC_CHECK_LIB(sec,getspent)
 if test "$enable_pam" != "no"; then
+	OLDLIBS="$LIBS"
 	AC_CHECK_LIB(dl,dlopen)
 	AC_CHECK_LIB(pam,pam_start)
+	if test "$ac_cv_lib_pam_pam_start" != "no"; then
+		PAMDIR="/etc/pam.d"
+	else
+		PAMDIR=""
+		LIBS="$OLDLIBS"
+	fi
+	AC_SUBST(PAMDIR)
 fi
 
 NETLIBS=""
@@ -351,5 +359,5 @@ AC_SUBST(CUPS_DOCDIR)
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.34 2000/03/09 19:47:19 mike Exp $".
+dnl End of "$Id: configure.in,v 1.35 2000/03/20 22:06:14 mike Exp $".
 dnl
