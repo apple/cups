@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- Chunked requests could cause a Denial of Service if
+	  the connection is terminated before the first byte of
+	  chunk data is sent/received (STR #143)
 	- Printers with special characters in their names were
 	  not accessible from the web interface (STR #120)
 	- The lpstat command now shows the correct interface
