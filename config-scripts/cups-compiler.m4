@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4,v 1.9.2.11 2002/11/13 19:12:42 mike Exp $"
+dnl "$Id: cups-compiler.m4,v 1.9.2.12 2003/02/11 20:20:45 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -180,6 +180,12 @@ else
 	esac
 fi
 
+if test $uname = HP-UX; then
+	if test "x$with_optim" = x; then
+		# HP-UX 10.20 (at least) needs this definition to get the
+		# h_errno global...
+		OPTIM="$OPTIM -D_XOPEN_SOURCE_EXTENDED"
+	fi
 dnl
-dnl End of "$Id: cups-compiler.m4,v 1.9.2.11 2002/11/13 19:12:42 mike Exp $".
+dnl End of "$Id: cups-compiler.m4,v 1.9.2.12 2003/02/11 20:20:45 mike Exp $".
 dnl
