@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.24 2000/03/09 19:47:26 mike Exp $"
+ * "$Id: imagetops.c,v 1.25 2000/06/27 19:01:58 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -42,6 +42,8 @@
  */
 
 int	Flip = 0,		/* Flip/mirror pages */
+	XPosition = 0,		/* Horizontal position on page */
+	YPosition = 0,		/* Vertical position on page */
 	Collate = 0,		/* Collate copies? */
 	Copies = 1;		/* Number of copies */
 
@@ -94,6 +96,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   int		ppi;		/* Pixels-per-inch */
   int		hue, sat;	/* Hue and saturation adjustment */
   int		realcopies;	/* Real copies being printed */
+  float		left, top;	/* Left and top of image */
 
 
   if (argc != 7)
@@ -149,6 +152,55 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if ((val = cupsGetOption("ppi", num_options, options)) != NULL)
     ppi = atoi(val);
+
+  if ((val = cupsGetOption("position", num_options, options)) != NULL)
+  {
+    if (strcasecmp(val, "center") == 0)
+    {
+      XPosition = 0;
+      YPosition = 0;
+    }
+    else if (strcasecmp(val, "top") == 0)
+    {
+      XPosition = 0;
+      YPosition = 1;
+    }
+    else if (strcasecmp(val, "left") == 0)
+    {
+      XPosition = -1;
+      YPosition = 0;
+    }
+    else if (strcasecmp(val, "right") == 0)
+    {
+      XPosition = 1;
+      YPosition = 0;
+    }
+    else if (strcasecmp(val, "top-left") == 0)
+    {
+      XPosition = -1;
+      YPosition = 1;
+    }
+    else if (strcasecmp(val, "top-right") == 0)
+    {
+      XPosition = 1;
+      YPosition = 1;
+    }
+    else if (strcasecmp(val, "bottom") == 0)
+    {
+      XPosition = 0;
+      YPosition = -1;
+    }
+    else if (strcasecmp(val, "bottom-left") == 0)
+    {
+      XPosition = -1;
+      YPosition = -1;
+    }
+    else if (strcasecmp(val, "bottom-right") == 0)
+    {
+      XPosition = 1;
+      YPosition = -1;
+    }
+  }
 
   if ((val = cupsGetOption("saturation", num_options, options)) != NULL)
     sat = atoi(val);
@@ -375,7 +427,34 @@ main(int  argc,		/* I - Number of command-line arguments */
 	y0 = img->ysize * ypage / ypages;
 	y1 = img->ysize * (ypage + 1) / ypages - 1;
 
-        printf("%.1f %.1f translate\n", PageLeft, PageBottom + 72.0 * yprint);
+        switch (XPosition)
+	{
+	  case -1 :
+	      left = PageLeft;
+	      break;
+	  case 0 :
+	      left = (PageWidth - xprint * 72.0) * 0.5;
+	      break;
+	  case 1 :
+	      left = PageRight - xprint * 72.0;
+	      break;
+	}
+
+        switch (YPosition)
+	{
+	  case -1 :
+	      top = PageBottom + 72.0 * yprint;
+	      break;
+	  case 0 :
+	      top = (PageLength + yprint * 72.0) * 0.5;
+	      break;
+	  case 1 :
+	      top = PageTop;
+	      break;
+	}
+
+        printf("%.1f %.1f translate\n", left, top);
+
 	printf("%.3f %.3f scale\n\n",
 	       xprint * 72.0 / (x1 - x0 + 1),
 	       yprint * 72.0 / (y1 - y0 + 1));
@@ -560,5 +639,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.24 2000/03/09 19:47:26 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.25 2000/06/27 19:01:58 mike Exp $".
  */

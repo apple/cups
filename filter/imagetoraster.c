@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.43 2000/04/12 14:41:43 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.44 2000/06/27 19:01:58 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -55,6 +55,8 @@
  */
 
 int	Flip = 0,		/* Flip/mirror pages */
+	XPosition = 0,		/* Horizontal position on page */
+	YPosition = 0,		/* Vertical position on page */
 	Collate = 0,		/* Collate copies? */
 	Copies = 1;		/* Number of copies */
 int	Floyd16x16[16][16] =	/* Traditional Floyd ordered dither */
@@ -253,6 +255,55 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if ((val = cupsGetOption("ppi", num_options, options)) != NULL)
     ppi = atoi(val);
+
+  if ((val = cupsGetOption("position", num_options, options)) != NULL)
+  {
+    if (strcasecmp(val, "center") == 0)
+    {
+      XPosition = 0;
+      YPosition = 0;
+    }
+    else if (strcasecmp(val, "top") == 0)
+    {
+      XPosition = 0;
+      YPosition = 1;
+    }
+    else if (strcasecmp(val, "left") == 0)
+    {
+      XPosition = -1;
+      YPosition = 0;
+    }
+    else if (strcasecmp(val, "right") == 0)
+    {
+      XPosition = 1;
+      YPosition = 0;
+    }
+    else if (strcasecmp(val, "top-left") == 0)
+    {
+      XPosition = -1;
+      YPosition = 1;
+    }
+    else if (strcasecmp(val, "top-right") == 0)
+    {
+      XPosition = 1;
+      YPosition = 1;
+    }
+    else if (strcasecmp(val, "bottom") == 0)
+    {
+      XPosition = 0;
+      YPosition = -1;
+    }
+    else if (strcasecmp(val, "bottom-left") == 0)
+    {
+      XPosition = -1;
+      YPosition = -1;
+    }
+    else if (strcasecmp(val, "bottom-right") == 0)
+    {
+      XPosition = 1;
+      YPosition = -1;
+    }
+  }
 
   if ((val = cupsGetOption("saturation", num_options, options)) != NULL)
     sat = atoi(val);
@@ -774,11 +825,15 @@ main(int  argc,		/* I - Number of command-line arguments */
 	  * Write leading blank space as needed...
 	  */
 
-          if (header.cupsHeight > z->ysize && Orientation < 2)
+          if (header.cupsHeight > z->ysize && YPosition <= 0)
 	  {
 	    memset(row, blank, header.cupsBytesPerLine);
 
-	    for (y = header.cupsHeight - z->ysize; y > 0; y --)
+            y = header.cupsHeight - z->ysize;
+	    if (YPosition == 0)
+	      y /= 2;
+
+	    for (; y > 0; y --)
 	    {
 	      if (cupsRasterWritePixels(ras, row, header.cupsBytesPerLine) <
 	              header.cupsBytesPerLine)
@@ -886,7 +941,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    */
 
 	    if (cupsRasterWritePixels(ras, row, header.cupsBytesPerLine) <
-	            header.cupsBytesPerLine)
+	                              header.cupsBytesPerLine)
 	    {
               fputs("ERROR: Unable to write raster data to driver!\n", stderr);
 	      ImageClose(img);
@@ -912,11 +967,15 @@ main(int  argc,		/* I - Number of command-line arguments */
 	  * Write trailing blank space as needed...
 	  */
 
-          if (header.cupsHeight > z->ysize && Orientation >= 2)
+          if (header.cupsHeight > z->ysize && YPosition <= 0)
 	  {
 	    memset(row, blank, header.cupsBytesPerLine);
 
-	    for (y = header.cupsHeight - z->ysize; y > 0; y --)
+            y = header.cupsHeight - z->ysize;
+	    if (YPosition == 0)
+	      y = y - y / 2;
+
+	    for (; y > 0; y --)
 	    {
 	      if (cupsRasterWritePixels(ras, row, header.cupsBytesPerLine) <
 	              header.cupsBytesPerLine)
@@ -1107,10 +1166,18 @@ format_CMY(cups_page_header_t *header,	/* I - Page header */
 		*dither;	/* Pointer into dither array */
 
 
-  if (Orientation == 1 || Orientation == 2)
-    bitoffset = header->cupsBitsPerPixel * (header->cupsWidth - xsize);
-  else
-    bitoffset = 0;
+  switch (XPosition)
+  {
+    case -1 :
+        bitoffset = 0;
+	break;
+    case 0 :
+        bitoffset = header->cupsBitsPerPixel * ((header->cupsWidth - xsize) / 2);
+	break;
+    case 1 :
+        bitoffset = header->cupsBitsPerPixel * (header->cupsWidth - xsize);
+	break;
+  }
 
   ptr       = row + bitoffset / 8;
   bandwidth = header->cupsBytesPerLine / 3;
@@ -1474,10 +1541,18 @@ format_CMYK(cups_page_header_t *header,	/* I - Page header */
 		*dither;	/* Pointer into dither array */
 
 
-  if (Orientation == 1 || Orientation == 2)
-    bitoffset = header->cupsBitsPerPixel * (header->cupsWidth - xsize);
-  else
-    bitoffset = 0;
+  switch (XPosition)
+  {
+    case -1 :
+        bitoffset = 0;
+	break;
+    case 0 :
+        bitoffset = header->cupsBitsPerPixel * ((header->cupsWidth - xsize) / 2);
+	break;
+    case 1 :
+        bitoffset = header->cupsBitsPerPixel * (header->cupsWidth - xsize);
+	break;
+  }
 
   ptr       = row + bitoffset / 8;
   bandwidth = header->cupsBytesPerLine / 4;
@@ -1835,10 +1910,18 @@ format_K(cups_page_header_t *header,	/* I - Page header */
 		*dither;	/* Pointer into dither array */
 
 
-  if (Orientation == 1 || Orientation == 2)
-    bitoffset = header->cupsBitsPerPixel * (header->cupsWidth - xsize);
-  else
-    bitoffset = 0;
+  switch (XPosition)
+  {
+    case -1 :
+        bitoffset = 0;
+	break;
+    case 0 :
+        bitoffset = header->cupsBitsPerPixel * ((header->cupsWidth - xsize) / 2);
+	break;
+    case 1 :
+        bitoffset = header->cupsBitsPerPixel * (header->cupsWidth - xsize);
+	break;
+  }
 
   ptr = row + bitoffset / 8;
 
@@ -1948,10 +2031,18 @@ format_KCMY(cups_page_header_t *header,	/* I - Page header */
 		*dither;	/* Pointer into dither array */
 
 
-  if (Orientation == 1 || Orientation == 2)
-    bitoffset = header->cupsBitsPerPixel * (header->cupsWidth - xsize);
-  else
-    bitoffset = 0;
+  switch (XPosition)
+  {
+    case -1 :
+        bitoffset = 0;
+	break;
+    case 0 :
+        bitoffset = header->cupsBitsPerPixel * ((header->cupsWidth - xsize) / 2);
+	break;
+    case 1 :
+        bitoffset = header->cupsBitsPerPixel * (header->cupsWidth - xsize);
+	break;
+  }
 
   ptr       = row + bitoffset / 8;
   bandwidth = header->cupsBytesPerLine / 4;
@@ -2351,10 +2442,18 @@ format_KCMYcm(cups_page_header_t *header,/* I - Page header */
 		*dither;	/* Pointer into dither array */
 
 
-  if (Orientation == 1 || Orientation == 2)
-    bitoffset = header->cupsBitsPerPixel * (header->cupsWidth - xsize);
-  else
-    bitoffset = 0;
+  switch (XPosition)
+  {
+    case -1 :
+        bitoffset = 0;
+	break;
+    case 0 :
+        bitoffset = header->cupsBitsPerPixel * ((header->cupsWidth - xsize) / 2);
+	break;
+    case 1 :
+        bitoffset = header->cupsBitsPerPixel * (header->cupsWidth - xsize);
+	break;
+  }
 
   ptr = row + bitoffset / 8;
   if (header->cupsBitsPerColor == 1)
@@ -2676,10 +2775,18 @@ format_RGBA(cups_page_header_t *header,	/* I - Page header */
 		*dither;	/* Pointer into dither array */
 
 
-  if (Orientation == 1 || Orientation == 2)
-    bitoffset = header->cupsBitsPerPixel * (header->cupsWidth - xsize);
-  else
-    bitoffset = 0;
+  switch (XPosition)
+  {
+    case -1 :
+        bitoffset = 0;
+	break;
+    case 0 :
+        bitoffset = header->cupsBitsPerPixel * ((header->cupsWidth - xsize) / 2);
+	break;
+    case 1 :
+        bitoffset = header->cupsBitsPerPixel * (header->cupsWidth - xsize);
+	break;
+  }
 
   ptr       = row + bitoffset / 8;
   bandwidth = header->cupsBytesPerLine / 4;
@@ -3067,10 +3174,18 @@ format_W(cups_page_header_t *header,	/* I - Page header */
 		*dither;	/* Pointer into dither array */
 
 
-  if (Orientation == 1 || Orientation == 2)
-    bitoffset = header->cupsBitsPerPixel * (header->cupsWidth - xsize);
-  else
-    bitoffset = 0;
+  switch (XPosition)
+  {
+    case -1 :
+        bitoffset = 0;
+	break;
+    case 0 :
+        bitoffset = header->cupsBitsPerPixel * ((header->cupsWidth - xsize) / 2);
+	break;
+    case 1 :
+        bitoffset = header->cupsBitsPerPixel * (header->cupsWidth - xsize);
+	break;
+  }
 
   ptr = row + bitoffset / 8;
 
@@ -3179,10 +3294,18 @@ format_YMC(cups_page_header_t *header,	/* I - Page header */
 		*dither;	/* Pointer into dither array */
 
 
-  if (Orientation == 1 || Orientation == 2)
-    bitoffset = header->cupsBitsPerPixel * (header->cupsWidth - xsize);
-  else
-    bitoffset = 0;
+  switch (XPosition)
+  {
+    case -1 :
+        bitoffset = 0;
+	break;
+    case 0 :
+        bitoffset = header->cupsBitsPerPixel * ((header->cupsWidth - xsize) / 2);
+	break;
+    case 1 :
+        bitoffset = header->cupsBitsPerPixel * (header->cupsWidth - xsize);
+	break;
+  }
 
   ptr       = row + bitoffset / 8;
   bandwidth = header->cupsBytesPerLine / 3;
@@ -3561,10 +3684,18 @@ format_YMCK(cups_page_header_t *header,	/* I - Page header */
 		*dither;	/* Pointer into dither array */
 
 
-  if (Orientation == 1 || Orientation == 2)
-    bitoffset = header->cupsBitsPerPixel * (header->cupsWidth - xsize);
-  else
-    bitoffset = 0;
+  switch (XPosition)
+  {
+    case -1 :
+        bitoffset = 0;
+	break;
+    case 0 :
+        bitoffset = header->cupsBitsPerPixel * ((header->cupsWidth - xsize) / 2);
+	break;
+    case 1 :
+        bitoffset = header->cupsBitsPerPixel * (header->cupsWidth - xsize);
+	break;
+  }
 
   ptr       = row + bitoffset / 8;
   bandwidth = header->cupsBytesPerLine / 4;
@@ -3971,5 +4102,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.43 2000/04/12 14:41:43 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.44 2000/06/27 19:01:58 mike Exp $".
  */
