@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.31 2003/01/29 17:04:33 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.32 2003/02/13 21:03:04 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -48,7 +48,7 @@
  *   ppd_compare_options() - Compare two options.
  *   ppd_decode()          - Decode a string value...
  *   ppd_fix()             - Fix WinANSI characters in the range 0x80 to
- &                           0x9f to be valid ISO-8859-1 characters...
+ *                           0x9f to be valid ISO-8859-1 characters...
  *   ppd_free_group()      - Free a single UI group.
  *   ppd_free_option()     - Free a single option.
  *   ppd_get_extopt()      - Get an extended option record.
@@ -96,7 +96,7 @@
 
 static ppd_status_t	ppd_status = PPD_OK;
 					/* Status of last ppdOpen*() */
-static int		ppd_line = 1;	/* Current line number */
+static int		ppd_line = 0;	/* Current line number */
 
 
 /*
@@ -365,7 +365,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
   */
 
   ppd_status = PPD_OK;
-  ppd_line   = 1;
+  ppd_line   = 0;
 
  /*
   * Range check input...
@@ -1929,10 +1929,10 @@ ppdOpenFd(int fd)			/* I - File to read from */
 
 
  /*
-  * Set the line number to 1...
+  * Set the line number to 0...
   */
 
-  ppd_line = 1;
+  ppd_line = 0;
 
  /*
   * Range check input...
@@ -1979,10 +1979,10 @@ ppdOpenFile(const char *filename)	/* I - File to read from */
 
 
  /*
-  * Set the line number to 1...
+  * Set the line number to 0...
   */
 
-  ppd_line = 1;
+  ppd_line = 0;
 
  /*
   * Range check input...
@@ -2568,16 +2568,19 @@ ppd_read(FILE *fp,			/* I - File to read from */
 	    */
 
 	    while ((ch = getc(fp)) != EOF)
-	      if (ch == '\n')
-		break;
-	      else if (ch == '\r')
+	      if (ch == '\r' || ch == '\n')
 	      {
-		ch = getc(fp);
-		if (ch != '\n')
-	          ungetc(ch, fp);
+                ppd_line ++;
 
-		ch = '\n';
-		break;
+		if (ch == '\r')
+		{
+		  ch = getc(fp);
+		  if (ch != '\n')
+	            ungetc(ch, fp);
+
+		  ch = '\n';
+		  break;
+		}
 	      }
 
             break;
@@ -2609,6 +2612,8 @@ ppd_read(FILE *fp,			/* I - File to read from */
 	 /*
 	  * Line feed or carriage return...
 	  */
+
+          ppd_line ++;
 
 	  if (ch == '\r')
 	  {
@@ -2753,5 +2758,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.31 2003/01/29 17:04:33 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.32 2003/02/13 21:03:04 mike Exp $".
  */
