@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.87 2001/05/21 21:39:39 mike Exp $"
+# "$Id: cups.list,v 1.88 2001/06/07 21:47:36 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -239,6 +239,7 @@ f 0444 root sys $AMANDIR/cat1/lpc.z man/lpc.z
 f 0444 root sys $AMANDIR/cat1/lpinfo.z man/lpinfo.z
 f 0444 root sys $AMANDIR/cat1/lpmove.z man/lpmove.z
 f 0444 root sys $MANDIR/cat1/lpoptions.z man/lpoptions.z
+f 0444 root sys $MANDIR/cat1/lppasswd.z man/lppasswd.z
 f 0444 root sys $MANDIR/cat1/lpq.z man/lpq.z
 f 0444 root sys $MANDIR/cat1/lprm.z man/lprm.z
 f 0444 root sys $MANDIR/cat1/lpr.z man/lpr.z
@@ -271,6 +272,7 @@ f 0444 root sys $MANDIR/man1m/lpinfo.1m man/lpinfo.man
 f 0444 root sys $MANDIR/man1m/lpmove.1m man/lpmove.man
 f 0444 root sys $MANDIR/man1/lpoptions.1 man/lpoptions.man
 f 0444 root sys $MANDIR/man1/lpq.1 man/lpq.man
+f 0444 root sys $MANDIR/man1/lppasswd.1 man/lppasswd.man
 f 0444 root sys $MANDIR/man1/lprm.1 man/lprm.man
 f 0444 root sys $MANDIR/man1/lpr.1 man/lpr.man
 f 0444 root sys $MANDIR/man1/lpstat.1 man/lpstat.man
@@ -301,6 +303,7 @@ f 0444 root sys $MANDIR/man8/lpc.8 man/lpc.man
 f 0444 root sys $MANDIR/man8/lpinfo.8 man/lpinfo.man
 f 0444 root sys $MANDIR/man8/lpmove.8 man/lpmove.man
 f 0444 root sys $MANDIR/man1/lpoptions.1 man/lpoptions.man
+f 0444 root sys $MANDIR/man1/lppasswd.1 man/lppasswd.man
 f 0444 root sys $MANDIR/man1/lpq.1 man/lpq.man
 f 0444 root sys $MANDIR/man1/lprm.1 man/lprm.man
 f 0444 root sys $MANDIR/man1/lpr.1 man/lpr.man
@@ -316,5 +319,5 @@ f 0444 root sys $MANDIR/man5/printers.conf.5 man/printers.conf.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.87 2001/05/21 21:39:39 mike Exp $".
+# End of "$Id: cups.list,v 1.88 2001/06/07 21:47:36 mike Exp $".
 #

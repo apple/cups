@@ -1,0 +1,61 @@
+.\"
+.\" "$Id: lppasswd.man,v 1.1 2001/06/07 21:47:38 mike Exp $"
+.\"
+.\"   lpadmin man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2001 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH lppasswd 1 "Common UNIX Printing System" "7 June 2001" "Easy Software Products"
+.SH NAME
+lppasswd \- add, change, or delete digest passwords.
+.SH SYNOPSIS
+.B lppasswd
+[ -a ] [ -g
+.I groupname
+] [ -x ] [
+.I username
+]
+.SH DESCRIPTION
+\fIlppasswd\fR adds, changes, or deletes passwords in the CUPS digest
+password file, \fIpasswd.md5\fR. When run by a normal user, \fIlppasswd\fR
+will prompt for the old and new passwords. When run by the super-user,
+\fIlppasswd\fR can add new accounts (\fI-a username\fR), change existing
+accounts (\fIusername\fR), or delete accounts (\fI-x username\fR) in the
+digest password file. Digest usernames do not have to match local UNIX
+usernames, but only UNIX usernames are supported by the CUPS client programs
+(\fIlp(1)\fR, \fIlpr(1)\fR, etc.)
+.LP
+The \fI-g\fR option specifies a group other than the system group - "sys",
+"system", or "root", depending on the operating system.
+.SH SECURITY ISSUES
+The \fIlppasswd\fR command is installed setuid to root. While every attempt
+has been made to make it secure against exploits that could grant super-user
+priviledges to unpriviledged users, paranoid system administrators may wish
+to disable or change the ownership of the program to an unpriviledged
+account.
+.SH SEE ALSO
+lp(1), lpr(1),
+CUPS Software Administrators Manual,
+CUPS Software Users Manual,
+http://localhost:631/documentation.html
+.SH COPYRIGHT
+Copyright 1993-2001 by Easy Software Products, All Rights Reserved.
+.\"
+.\" End of "$Id: lppasswd.man,v 1.1 2001/06/07 21:47:38 mike Exp $".
+.\"

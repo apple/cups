@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.12 2001/02/20 17:33:00 mike Exp $"
+# "$Id: Makefile,v 1.13 2001/06/07 21:47:37 mike Exp $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,8 +28,8 @@ include ../Makedefs
 # Man pages...
 #
 
-MAN1	=	backend.man filter.man lp.man lpoptions.man lpq.man lprm.man \
-		lpr.man lpstat.man
+MAN1	=	backend.man filter.man lp.man lpoptions.man lppasswd.man \
+		lpq.man lprm.man lpr.man lpstat.man
 MAN5	=	classes.conf.man cupsd.conf.man mime.convs.man mime.types.man \
 		printers.conf.man
 MAN8	=	accept.man cups-lpd.man cups-polld.man cupsd.man enable.man \
@@ -100,5 +100,5 @@ install:
 
 
 #
-# End of "$Id: Makefile,v 1.12 2001/02/20 17:33:00 mike Exp $".
+# End of "$Id: Makefile,v 1.13 2001/06/07 21:47:37 mike Exp $".
 #

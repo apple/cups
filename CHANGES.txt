@@ -80,6 +80,10 @@ CHANGES IN CUPS V1.1.9
 	  which are included in the MD5 sum sent to the server. 
 	  This should eliminate unnecessary password prompts
 	  when using Digest authentication.
+	- The lppasswd command didn't have a man page.
+	- Updated the PJL detection rules to allow the universal
+	  escape to occur anywhere in the first 128 bytes of the
+	  file.
 
 
 CHANGES IN CUPS V1.1.8
