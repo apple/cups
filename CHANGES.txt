@@ -32,6 +32,8 @@ CHANGES IN CUPS V1.1.7
 	- Fixed a minor IPP compliance issue with responses
 	  to requests without the attributes-charset or
 	  attributes-natural-language attributes.
+	- Sun fix: need httpFlush() call for chunked IPP
+	  requests in cupsDoFileRequest().
 
 
 CHANGES IN CUPS V1.1.6-3

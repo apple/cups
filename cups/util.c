@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.76 2001/02/09 16:23:36 mike Exp $"
+ * "$Id: util.c,v 1.77 2001/02/25 16:44:35 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -394,12 +394,6 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 	response = NULL;
 
         last_error = IPP_SERVICE_UNAVAILABLE;
-
-       /*
-	* Flush any remaining data...
-	*/
-
-	httpFlush(http);
 	break;
       }
     }
@@ -411,6 +405,12 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 
   if (filename != NULL)
     fclose(file);
+
+ /*
+  * Flush any remaining data...
+  */
+
+  httpFlush(http);
 
  /*
   * Delete the original request and return the response...
@@ -1510,5 +1510,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.76 2001/02/09 16:23:36 mike Exp $".
+ * End of "$Id: util.c,v 1.77 2001/02/25 16:44:35 mike Exp $".
  */
