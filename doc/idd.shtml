@@ -305,144 +305,184 @@ followed by its value. The following directives are understood:
 <CENTER><TABLE WIDTH="90%" BORDER="1">
 <TR>
 	<TH WIDTH="25%">Directive</TH>
+	<TH>Default</TH>
 	<TH>Description</TH>
 </TR>
 <TR>
 	<TD>AccessLog</TD>
+	<TD></TD>
 	<TD>Specifies the location of the access log file (default
 	"logs/access_log").</TD>
 </TR>
 <TR>
 	<TD>Allow</TD>
 	<TD></TD>
+	<TD></TD>
 </TR>
 <TR>
 	<TD>AuthClass</TD>
+	<TD></TD>
 	<TD></TD>
 </TR>
 <TR>
 	<TD>AuthType</TD>
 	<TD></TD>
+	<TD></TD>
 </TR>
 <TR>
 	<TD>BrowseAddress</TD>
+	<TD></TD>
 	<TD></TD>
 </TR>
 <TR>
 	<TD>BrowseInterval</TD>
 	<TD></TD>
+	<TD></TD>
 </TR>
 <TR>
 	<TD>BrowsePort</TD>
+	<TD></TD>
 	<TD></TD>
 </TR>
 <TR>
 	<TD>BrowseTimeout</TD>
 	<TD></TD>
+	<TD></TD>
 </TR>
 <TR>
 	<TD>Browsing</TD>
+	<TD></TD>
 	<TD></TD>
 </TR>
 <TR>
 	<TD>DefaultCharset</TD>
 	<TD></TD>
+	<TD></TD>
 </TR>
 <TR>
 	<TD>DefaultLanguage</TD>
+	<TD></TD>
 	<TD></TD>
 </TR>
 <TR>
 	<TD>Deny</TD>
 	<TD></TD>
+	<TD></TD>
 </TR>
 <TR>
 	<TD>DocumentRoot</TD>
+	<TD></TD>
 	<TD></TD>
 </TR>
 <TR>
 	<TD>ErrorLog</TD>
 	<TD></TD>
+	<TD></TD>
 </TR>
 <TR>
 	<TD>Group</TD>
+	<TD></TD>
 	<TD></TD>
 </TR>
 <TR>
 	<TD>HostNameLookups</TD>
 	<TD></TD>
+	<TD></TD>
 </TR>
 <TR>
 	<TD>ImplicitClasses</TD>
+	<TD></TD>
 	<TD></TD>
 </TR>
 <TR>
 	<TD>KeepAlive</TD>
 	<TD></TD>
+	<TD></TD>
 </TR>
 <TR>
 	<TD>KeepAliveTimeout</TD>
+	<TD></TD>
 	<TD></TD>
 </TR>
 <TR>
 	<TD>&lt;Location path&gt;<BR>
 	&lt;/Location&gt;</TD>
 	<TD></TD>
+	<TD></TD>
 </TR>
 <TR>
 	<TD>LogLevel</TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD>MaxClients</TD>
+	<TD></TD>
 	<TD></TD>
 </TR>
 <TR>
 	<TD>MaxLogSize</TD>
 	<TD></TD>
+	<TD></TD>
 </TR>
 <TR>
 	<TD>MaxRequestSize</TD>
+	<TD></TD>
 	<TD></TD>
 </TR>
 <TR>
 	<TD>Order</TD>
 	<TD></TD>
+	<TD></TD>
 </TR>
 <TR>
 	<TD>PageLog</TD>
+	<TD></TD>
 	<TD></TD>
 </TR>
 <TR>
 	<TD>Port</TD>
 	<TD></TD>
+	<TD></TD>
 </TR>
 <TR>
 	<TD>RIPCache</TD>
+	<TD></TD>
 	<TD></TD>
 </TR>
 <TR>
 	<TD>ServerAdmin</TD>
 	<TD></TD>
+	<TD></TD>
 </TR>
 <TR>
 	<TD>ServerName</TD>
+	<TD></TD>
 	<TD></TD>
 </TR>
 <TR>
 	<TD>ServerRoot</TD>
 	<TD></TD>
+	<TD></TD>
 </TR>
 <TR>
 	<TD>SystemGroup</TD>
+	<TD></TD>
 	<TD></TD>
 </TR>
 <TR>
 	<TD>TempDir</TD>
 	<TD></TD>
+	<TD></TD>
 </TR>
 <TR>
 	<TD>Timeout</TD>
 	<TD></TD>
+	<TD></TD>
 </TR>
 <TR>
 	<TD>User</TD>
+	<TD></TD>
 	<TD></TD>
 </TR>
 </TABLE></CENTER>
@@ -935,8 +975,8 @@ are required when initially adding a printer and optional when modifying
 a printer.
 
 <P>A PPD file or System V interface script may follow the IPP request
-body. Note that the printer will be disabled until a valid interface script or
-PPD file is sent.
+body. If a valid interface script or PPD file is not provided then the
+printer is treated as a generic PostScript device.
 
 <P>Add printer will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-authorized</CODE>,
 <CODE>ipp-bad-request</CODE>, or <CODE>ipp-attributes</CODE>.
