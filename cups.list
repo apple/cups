@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.24 1999/09/27 20:32:10 mike Exp $"
+# "$Id: cups.list,v 1.25 1999/09/30 17:44:01 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -31,7 +31,7 @@
 %vendor Easy Software Products
 %license LICENSE.cups
 %readme README.cups
-%version 1.0b10
+%version 1.0b11
 %incompat printpro
 
 %system all
@@ -313,5 +313,5 @@ f 0444 root sys /usr/man/man5/printers.conf.5 man/printers.conf.5
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.24 1999/09/27 20:32:10 mike Exp $".
+# End of "$Id: cups.list,v 1.25 1999/09/30 17:44:01 mike Exp $".
 #
