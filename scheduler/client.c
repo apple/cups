@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.34 1999/09/09 19:09:57 mike Exp $"
+ * "$Id: client.c,v 1.35 1999/09/09 19:11:14 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1502,7 +1502,7 @@ pipe_command(client_t *con,	/* I - Client connection */
     * Fork successful - return the PID...
     */
 
-    LogMessage(LOG_ERROR, "CGI %s started - PID = %d", argv[0], pid);
+    LogMessage(LOG_DEBUG, "CGI %s started - PID = %d", argv[0], pid);
 
     *outfile = fds[0];
     close(fds[1]);
@@ -1513,5 +1513,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.34 1999/09/09 19:09:57 mike Exp $".
+ * End of "$Id: client.c,v 1.35 1999/09/09 19:11:14 mike Exp $".
  */
