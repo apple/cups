@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.122 2003/09/03 14:51:31 mike Exp $"
+ * "$Id: dirsvc.c,v 1.123 2003/09/05 20:55:42 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1512,7 +1512,7 @@ SendSLPBrowse(printer_t *p)		/* I - Printer to register */
   * structure, so no buffer overflow is possible...)
   */
 
-  for (src = p->make_model, dst = make_model; *src;)
+  for (src = p->make_model, dst = make_model; src && *src;)
   {
     if (*src == ',' || *src == '\\' || *src == ')')
       *dst++ = '\\';
@@ -1525,7 +1525,7 @@ SendSLPBrowse(printer_t *p)		/* I - Printer to register */
   if (!make_model[0])
     strcpy(make_model, "Unknown");
 
-  for (src = p->location, dst = location; *src;)
+  for (src = p->location, dst = location; src && *src;)
   {
     if (*src == ',' || *src == '\\' || *src == ')')
       *dst++ = '\\';
@@ -1538,7 +1538,7 @@ SendSLPBrowse(printer_t *p)		/* I - Printer to register */
   if (!location[0])
     strcpy(location, "Unknown");
 
-  for (src = p->info, dst = info; *src;)
+  for (src = p->info, dst = info; src && *src;)
   {
     if (*src == ',' || *src == '\\' || *src == ')')
       *dst++ = '\\';
@@ -1901,5 +1901,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.122 2003/09/03 14:51:31 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.123 2003/09/05 20:55:42 mike Exp $".
  */
