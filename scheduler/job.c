@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.57 2000/03/21 04:03:35 mike Exp $"
+ * "$Id: job.c,v 1.58 2000/03/22 20:42:32 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -289,12 +289,15 @@ CheckJobs(void)
       else if (printer != NULL)
       {
        /*
-        * See if the printer is available; if so, start the job...
+        * See if the printer is available or remote and not printing a job;
+	* if so, start the job...
 	*/
 
         DEBUG_printf(("CheckJobs: printer->state = %d\n", printer->state));
 
-        if (printer->state == IPP_PRINTER_IDLE)
+        if (printer->state == IPP_PRINTER_IDLE ||	/* Printer is idle */
+	    ((printer->type & CUPS_PRINTER_REMOTE) &&	/* Printer is remote */
+	     !printer->job))				/* and not printing a job */
 	  StartJob(current->id, printer);
 
         current = current->next;
@@ -2292,5 +2295,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.57 2000/03/21 04:03:35 mike Exp $".
+ * End of "$Id: job.c,v 1.58 2000/03/22 20:42:32 mike Exp $".
  */

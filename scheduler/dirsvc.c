@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.51 2000/03/21 04:03:34 mike Exp $"
+ * "$Id: dirsvc.c,v 1.52 2000/03/22 20:42:32 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -441,6 +441,14 @@ UpdateBrowseList(void)
     strcpy(p->make_model, make_model);
 
  /*
+  * If the remote printer is idle, check for local jobs that might need to
+  * go to it...
+  */
+
+  if (p->state == IPP_PRINTER_IDLE)
+    CheckJobs();
+
+ /*
   * See if we have a default printer...  If not, make the first printer the
   * default.
   */
@@ -713,5 +721,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.51 2000/03/21 04:03:34 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.52 2000/03/22 20:42:32 mike Exp $".
  */
