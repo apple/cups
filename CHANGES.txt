@@ -64,6 +64,9 @@ CHANGES IN CUPS V1.1.9-1
 	- Use read() instead of fread() to read piped
 	  print files in lpr/lp.  This avoids a bug in the
 	  HP-UX 10.20 fread() function.
+	- Updated the pstoraster filter to use the MIPS_FIXADE
+	  system call under IRIX to fix bus error problems on
+	  R12000 processors (Ghostscript is not 64-bit clean...)
 
 
 CHANGES IN CUPS V1.1.9
