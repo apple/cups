@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.1 1996/09/30 18:43:52 mike Exp $"
+ * "$Id: pstops.c,v 1.2 1996/10/23 20:06:28 mike Exp $"
  *
  *   PostScript filter for espPrint, a collection of printer/image software.
  *
@@ -16,9 +16,13 @@
  * Revision History:
  *
  *   $Log: pstops.c,v $
- *   Revision 1.1  1996/09/30 18:43:52  mike
- *   Initial revision
+ *   Revision 1.2  1996/10/23 20:06:28  mike
+ *   Added gamma and brightness correction.
+ *   Added 1/2/4up printing.
+ *   Added 'userdict' code around gamma/brightness stuff.
  *
+ *   Revision 1.1  1996/09/30  18:43:52  mike
+ *   Initial revision
  */
 
 /*
@@ -31,24 +35,24 @@
 #include <errno.h>
 #include <ctype.h>
 #include <unistd.h>
+#include <pod.h>
+#include <errorcodes.h>
+#include <printutil.h>
 
-#define NO_ERROR		0	/* Standard error codes */
-#define ERR_UNKNOWN		1	/* Other 'unknown' error */
-#define ERR_NO_LICENSE		2	/* No license or bad license */
-#define ERR_BAD_ARG		3	/* Bad command-line argument */
-#define ERR_FILE_CONVERT	4	/* Could not convert file */
-#define ERR_DATA_BUFFER		5	/* Could not allocate data buffer */
 
 #define MAX_PAGES	10000
 #define FALSE		0
 #define TRUE		(!FALSE)
 
-
 int	PrintNumPages = 0;
 long	PrintPages[MAX_PAGES];
 int	PrintEvenPages = 1,
 	PrintOddPages = 1,
-	PrintReversed = 0;
+	PrintReversed = 0,
+	PrintColor = 0,
+	PrintWidth = 612,
+	PrintLength = 792,
+	PrintFlip = 0;
 char	*PrintRange = NULL;
 int	Verbosity = 0;
 
@@ -264,10 +268,18 @@ scan_file(FILE *fp)
  */
 
 void
-print_file(char *filename)
+print_file(char  *filename,
+           float gammaval[2],
+           int   brightness[2],
+           int   nup)
 {
   FILE	*fp;
-  int	number;
+  int	number,
+	endpage,
+	dir,
+	x, y;
+  float	w, l,
+	tx, ty;
   long	end;
 
 
@@ -282,12 +294,156 @@ print_file(char *filename)
 
   copy_bytes(fp, PrintPages[0]);
 
+ /*
+  * Gamma correct the output...
+  */
+
+  if (gammaval[0] == 0.0)
+    gammaval[0] = LutDefaultGamma();
+
+  if (PrintColor)
+  {
+    if (gammaval[1] == 0.0)
+      gammaval[1] = LutDefaultGamma();
+
+    if (gammaval[0] != 1.0 ||
+	gammaval[1] != 1.0 ||
+	brightness[0] != 100 ||
+	brightness[1] != 100)
+    {
+      printf("userdict begin\n"
+             "{ neg 1 add %f exp %f mul neg 1 add } bind dup dup "
+             "{ neg 1 add %f exp %f mul neg 1 add } bind\n"
+             "setcolortransfer\n"
+             "/setcolortransfer { pop pop pop pop } def\n"
+             "end\n",
+             gammaval[1], 100.0 / brightness[1],
+             gammaval[0], 100.0 / brightness[0]);
+    };
+  }
+  else if (gammaval[0] != 1.0 ||
+	   brightness[0] != 100)
+    printf("userdict begin\n"
+           "{ neg 1 add %f exp %f mul neg 1 add } bind "
+           "settransfer\n"
+           "/settransfer { pop } def\n"
+           "end\n",
+           gammaval[0], 100.0 / brightness[0]);
+
   if (PrintReversed)
-    for (number = PrintNumPages; number > 0; number --)
-      print_page(fp, number);
+  {
+    number  = PrintNumPages;
+    dir     = -1;
+    endpage = 0;
+  }
   else
-    for (number = 1; number <= PrintNumPages; number ++)
-      print_page(fp, number);
+  {
+    number  = 1;
+    dir     = 1;
+    endpage = PrintNumPages + 1;
+  };
+
+  switch (nup)
+  {
+    case 1 :
+        for (; number != endpage; number += dir)
+        {
+          if (PrintFlip)
+            printf("gsave\n"
+                   "%d 0 translate\n"
+                   "-1 1 scale\n",
+                   PrintWidth);
+
+          print_page(fp, number);
+
+          if (PrintFlip)
+            puts("grestore\n");
+        };
+        break;
+
+    case 2 :
+        l = (float)PrintWidth;
+        w = l * (float)PrintWidth / (float)PrintLength;
+        if (w > ((float)PrintLength * 0.5))
+        {
+          w = (float)PrintLength * 0.5;
+          l = w * (float)PrintLength / (float)PrintWidth;
+        };
+
+        tx = (float)PrintLength * 0.5 - w;
+        ty = ((float)PrintWidth - l) * 0.5;
+
+        puts("/ESPshowpage /showpage load def\n"
+             "/showpage { } def");
+
+        for (x = 0; number != endpage; number += dir, x = 1 - x)
+        {
+          printf("gsave\n"
+                 "%f %f translate\n"
+                 "%f %f scale\n",
+                 tx + w * x, ty,
+                 w / (float)PrintWidth, l / (float)PrintLength);
+          printf("newpath\n"
+                 "0 0 moveto\n"
+                 "%d 0 lineto\n"
+                 "%d %d lineto\n"
+                 "0 %d lineto\n"
+                 "closepath clip newpath\n",
+                 PrintWidth, PrintWidth, PrintLength, PrintLength);
+          if (PrintFlip)
+            printf("%d 0 translate\n"
+                   "-1 1 scale\n",
+                   PrintWidth);
+
+          print_page(fp, number);
+          puts("grestore");
+          if (x == 1)
+            puts("ESPshowpage");
+        };
+
+        if (x == 1)
+          puts("ESPshowpage");
+        break;
+
+    case 4 :
+        puts("/ESPshowpage /showpage load def\n"
+             "/showpage { } def");
+
+        w = (float)PrintWidth * 0.5;
+        l = (float)PrintLength * 0.5;
+
+        for (x = 0, y = 1; number != endpage; number += dir, x = 1 - x)
+        {
+          printf("gsave\n"
+                 "%f %f translate\n"
+                 "0.5 0.5 scale\n",
+                 (float)x * w, (float)y * l);
+          printf("newpath\n"
+                 "0 0 moveto\n"
+                 "%d 0 lineto\n"
+                 "%d %d lineto\n"
+                 "0 %d lineto\n"
+                 "closepath clip newpath\n",
+                 PrintWidth, PrintWidth, PrintLength, PrintLength);
+          if (PrintFlip)
+            printf("%d 0 translate\n"
+                   "-1 1 scale\n",
+                   PrintWidth);
+
+          print_page(fp, number);
+          puts("grestore");
+          if (x == 1)
+          {
+            y = 1 - y;
+            if (y == 1)
+              puts("ESPshowpage");
+          };
+        };
+
+        if (y != 1 || x != 0)
+          puts("ESPshowpage");
+        break;
+  };
 
   fseek(fp, 0, SEEK_END);
   end = ftell(fp);
@@ -315,12 +471,25 @@ void
 main(int  argc,
      char *argv[])
 {
-  int	i, nfiles;
-  char	*opt;
-  char	tempfile[255];
-  FILE	*temp;
-  char	buffer[8192];
+  int			i, nfiles;
+  char			*opt;
+  char			tempfile[255];
+  FILE			*temp;
+  char			buffer[8192];
+  float			gammaval[2];
+  int			brightness[2];
+  int			nup;
+  PDInfoStruct		*info;
+  PDSizeTableStruct	*size;
+  time_t		modtime;
 
+
+  gammaval[0]   = 0.0;
+  gammaval[1]   = 0.0;
+  brightness[0] = 100;
+  brightness[1] = 100;
+
+  nup = 1;
 
   for (i = 1, nfiles = 0; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -330,6 +499,33 @@ main(int  argc,
           default :
           case 'h' : /* Help */
               usage();
+              break;
+
+          case 'P' : /* Printer */
+              i ++;
+              if (i >= argc)
+                usage();
+
+              PDLocalReadInfo(argv[i], &info, &modtime);
+              size = PDFindPageSize(info, PD_SIZE_CURRENT);
+
+              PrintColor  = strncasecmp(info->printer_class, "Color", 5) == 0;
+              PrintWidth  = 72.0 * size->width;
+              PrintLength = 72.0 * size->length;
+              break;
+
+          case '1' : /* 1-up printing... */
+              nup = 1;
+              break;
+          case '2' : /* 2-up printing... */
+              nup = 2;
+              break;
+          case '4' : /* 4-up printing... */
+              nup = 4;
+              break;
+
+          case 'f' : /* Flip pages */
+              PrintFlip = 1;
               break;
 
           case 'e' : /* Print even pages */
@@ -350,10 +546,24 @@ main(int  argc,
           case 'D' : /* Debug ... */
               Verbosity ++;
               break;
+
+          case 'g' :	/* Gamma correction */
+	      i ++;
+	      if (i < argc)
+	        if (sscanf(argv[i], "%f,%f", gammaval + 0, gammaval + 1) == 1)
+	          gammaval[1] = gammaval[0];
+	      break;
+
+          case 'b' :	/* Brightness */
+	      i ++;
+	      if (i < argc)
+	        if (sscanf(argv[i], "%d,%d", brightness + 0, brightness + 1) == 1)
+	          brightness[1] = brightness[0];
+	      break;
         }
     else
     {
-      print_file(argv[i]);
+      print_file(argv[i], gammaval, brightness, nup);
       nfiles ++;
     };
 
@@ -370,7 +580,7 @@ main(int  argc,
       fputs(buffer, temp);
     fclose(temp);
 
-    print_file(tempfile);
+    print_file(tempfile, gammaval, brightness, nup);
 
     unlink(tempfile);
   };
@@ -378,5 +588,5 @@ main(int  argc,
 
 
 /*
- * End of "$Id: pstops.c,v 1.1 1996/09/30 18:43:52 mike Exp $".
+ * End of "$Id: pstops.c,v 1.2 1996/10/23 20:06:28 mike Exp $".
  */
