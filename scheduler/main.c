@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.128 2005/01/03 19:29:59 mike Exp $"
+ * "$Id: main.c,v 1.129 2005/02/07 00:15:04 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -585,7 +585,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
       if (FD_ISSET(lis->fd, input))
+      {
+        FD_CLR(lis->fd, input);
         AcceptClient(lis);
+      }
 
     for (i = NumClients, con = Clients; i > 0; i --, con ++)
     {
@@ -594,11 +597,15 @@ main(int  argc,				/* I - Number of command-line arguments */
       */
 
       if (FD_ISSET(con->http.fd, input) || con->http.used)
+      {
+        FD_CLR(con->http.fd, input);
+
         if (!ReadClient(con))
 	{
 	  con --;
 	  continue;
 	}
+      }
 
      /*
       * Write data as needed...
@@ -612,6 +619,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	* client is not ready to receive data...
 	*/
 
+	FD_CLR(con->file, input);
         con->file_ready = 1;
 
 #ifdef DEBUG
@@ -1379,5 +1387,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.128 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id: main.c,v 1.129 2005/02/07 00:15:04 mike Exp $".
  */

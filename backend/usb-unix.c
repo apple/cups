@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-unix.c,v 1.8 2005/01/03 19:29:44 mike Exp $"
+ * "$Id: usb-unix.c,v 1.9 2005/02/07 00:15:04 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -140,7 +140,7 @@ print_device(const char *uri,		/* I - Device URI */
   * stdin (otherwise you can't cancel raw jobs...)
   */
 
-  if (fp)
+  if (!fp)
   {
 #ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
     sigset(SIGTERM, SIG_IGN);
@@ -803,5 +803,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb-unix.c,v 1.8 2005/01/03 19:29:44 mike Exp $".
+ * End of "$Id: usb-unix.c,v 1.9 2005/02/07 00:15:04 mike Exp $".
  */
