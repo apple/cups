@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.45 2004/06/29 04:49:31 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.46 2004/07/02 04:44:19 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -32,6 +32,7 @@ dnl Version number information...
 CUPS_VERSION="1.1.21rc2"
 AC_SUBST(CUPS_VERSION)
 AC_DEFINE_UNQUOTED(CUPS_SVERSION, "CUPS v$CUPS_VERSION")
+AC_DEFINE_UNQUOTED(CUPS_MINIMAL, "CUPS/$CUPS_VERSION")
 
 dnl Default compiler flags...
 CFLAGS="${CFLAGS:=}"
@@ -205,5 +206,5 @@ AC_SUBST(BACKLIBS)
 AC_SUBST(COMMONLIBS)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.45 2004/06/29 04:49:31 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.46 2004/07/02 04:44:19 mike Exp $".
 dnl

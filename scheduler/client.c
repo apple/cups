@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.187 2004/06/29 04:30:39 mike Exp $"
+ * "$Id: client.c,v 1.188 2004/07/02 04:44:20 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2076,8 +2076,9 @@ SendHeader(client_t    *con,	/* I - Client to send to */
     return (0);
   if (httpPrintf(HTTP(con), "Date: %s\r\n", httpGetDateString(time(NULL))) < 0)
     return (0);
-  if (httpPrintf(HTTP(con), "Server: CUPS/1.1\r\n") < 0)
-    return (0);
+  if (ServerHeader)
+    if (httpPrintf(HTTP(con), "Server: %s\r\n", ServerHeader) < 0)
+      return (0);
   if (con->http.keep_alive && con->http.version >= HTTP_1_0)
   {
     if (httpPrintf(HTTP(con), "Connection: Keep-Alive\r\n") < 0)
@@ -3369,5 +3370,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.187 2004/06/29 04:30:39 mike Exp $".
+ * End of "$Id: client.c,v 1.188 2004/07/02 04:44:20 mike Exp $".
  */
