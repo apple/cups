@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.13 1999/02/01 22:06:36 mike Exp $"
+ * "$Id: http.c,v 1.14 1999/02/05 17:40:51 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -54,20 +54,21 @@
  *                         content-length or transfer-encoding fields.
  *   http_send()         - Send a request with all fields and the trailing
  *                         blank line.
- *   http_sighandler()   - Handle broken pipe signals from lost network
- *                         clients.
  */
 
 /*
  * Include necessary headers...
  */
 
-#include "http.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <stdarg.h>
+#include <ctype.h>
+#include "string.h"
+#include <time.h>
+#include <fcntl.h>
 
-#ifdef WIN32
-#  define strcasecmp(s,t) stricmp(s,t)
-#endif /* WIN32 */
+#include "http.h"
 
 
 /*
@@ -77,7 +78,6 @@
 static http_field_t	http_field(char *name);
 static void		http_get_length(http_t *http);
 static int		http_send(http_t *http, http_state_t request, char *uri);
-static void		http_sighandler(int sig);
 
 
 /*
@@ -1331,17 +1331,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * 'http_sighandler()' - Handle 'broken pipe' signals from lost network
- *                       clients.
- */
-
-static void
-http_sighandler(int sig)	/* I - Signal number */
-{
-/* IGNORE */
-}
-
-
-/*
- * End of "$Id: http.c,v 1.13 1999/02/01 22:06:36 mike Exp $".
+ * End of "$Id: http.c,v 1.14 1999/02/05 17:40:51 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.6 1999/01/30 13:25:54 mike Exp $"
+ * "$Id: emit.c,v 1.7 1999/02/05 17:40:50 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -34,11 +34,13 @@
  */
 
 #include "ppd.h"
-#ifdef WIN32
+#include <stdlib.h>
+
+#if defined(WIN32) || defined(__EMX__)
 #  include <io.h>
 #else
 #  include <unistd.h>
-#endif /* WIN32 */
+#endif /* WIN32 || __EMX__ */
 
 
 /*
@@ -213,47 +215,52 @@ ppd_collect(ppd_file_t    *ppd,		/* I - PPD file data */
   */
 
   for (i = ppd->num_jcls, o = ppd->jcls; i > 0; i --, o ++)
-    for (j = o->num_choices, c = o->choices; j > 0; j --, c ++)
-      if (c->marked && count < 1000)
-      {
-        collect[count] = c;
-	count ++;
-      }
-
-  for (i = ppd->num_options, o = ppd->options; i > 0; i --, o ++)
-    for (j = o->num_choices, c = o->choices; j > 0; j --, c ++)
-      if (c->marked && count < 1000)
-      {
-        collect[count] = c;
-	count ++;
-      }
-
-  for (i = ppd->num_nonuis, o = ppd->nonuis; i > 0; i --, o ++)
-    for (j = o->num_choices, c = o->choices; j > 0; j --, c ++)
-      if (c->marked && count < 1000)
-      {
-        collect[count] = c;
-	count ++;
-      }
-
-  for (i = ppd->num_groups, g = ppd->groups; i > 0; i --, g ++)
-  {
-    for (j = g->num_options, o = g->options; j > 0; j --, o ++)
-      for (k = o->num_choices, c = o->choices; k > 0; k --, c ++)
+    if (o->section == section)
+      for (j = o->num_choices, c = o->choices; j > 0; j --, c ++)
 	if (c->marked && count < 1000)
 	{
           collect[count] = c;
 	  count ++;
 	}
 
-    for (j = g->num_subgroups, sg = g->subgroups; j > 0; j --, sg ++)
-      for (k = sg->num_options, o = sg->options; k > 0; k --, o ++)
-	for (m = o->num_choices, c = o->choices; m > 0; m --, c ++)
+  for (i = ppd->num_options, o = ppd->options; i > 0; i --, o ++)
+    if (o->section == section)
+      for (j = o->num_choices, c = o->choices; j > 0; j --, c ++)
+	if (c->marked && count < 1000)
+	{
+          collect[count] = c;
+	  count ++;
+	}
+
+  for (i = ppd->num_nonuis, o = ppd->nonuis; i > 0; i --, o ++)
+    if (o->section == section)
+      for (j = o->num_choices, c = o->choices; j > 0; j --, c ++)
+	if (c->marked && count < 1000)
+	{
+          collect[count] = c;
+	  count ++;
+	}
+
+  for (i = ppd->num_groups, g = ppd->groups; i > 0; i --, g ++)
+  {
+    for (j = g->num_options, o = g->options; j > 0; j --, o ++)
+      if (o->section == section)
+	for (k = o->num_choices, c = o->choices; k > 0; k --, c ++)
 	  if (c->marked && count < 1000)
 	  {
             collect[count] = c;
 	    count ++;
 	  }
+
+    for (j = g->num_subgroups, sg = g->subgroups; j > 0; j --, sg ++)
+      for (k = sg->num_options, o = sg->options; k > 0; k --, o ++)
+	if (o->section == section)
+	  for (m = o->num_choices, c = o->choices; m > 0; m --, c ++)
+	    if (c->marked && count < 1000)
+	    {
+              collect[count] = c;
+	      count ++;
+	    }
   }
 
  /*
@@ -284,5 +291,5 @@ ppd_collect(ppd_file_t    *ppd,		/* I - PPD file data */
 
 
 /*
- * End of "$Id: emit.c,v 1.6 1999/01/30 13:25:54 mike Exp $".
+ * End of "$Id: emit.c,v 1.7 1999/02/05 17:40:50 mike Exp $".
  */

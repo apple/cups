@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.5 1999/01/30 13:25:57 mike Exp $"
+ * "$Id: ppd.c,v 1.6 1999/02/05 17:40:54 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -40,21 +40,22 @@
  */
 
 #include "ppd.h"
+#include <stdlib.h>
 #include <ctype.h>
-/*#define DEBUG*/
+#include "string.h"
 
 
 /*
  * Definitions...
  */
 
-#if defined(WIN32) || defined(OS2)
+#if defined(WIN32) || defined(__EMX__)
 #  define READ_BINARY	"rb"		/* Open a binary file for reading */
 #  define WRITE_BINARY	"wb"		/* Open a binary file for writing */
 #else
 #  define READ_BINARY	"r"		/* Open a binary file for reading */
 #  define WRITE_BINARY	"w"		/* Open a binary file for writing */
-#endif /* WIN32 || OS2 */
+#endif /* WIN32 || __EMX__ */
 
 #define PPD_KEYWORD	1		/* Line contained a keyword */
 #define PPD_OPTION	2		/* Line contained an option name */
@@ -1319,5 +1320,5 @@ ppd_decode(unsigned char *string)	/* I - String to decode */
 
 
 /*
- * End of "$Id: ppd.c,v 1.5 1999/01/30 13:25:57 mike Exp $".
+ * End of "$Id: ppd.c,v 1.6 1999/02/05 17:40:54 mike Exp $".
  */

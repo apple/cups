@@ -1,5 +1,5 @@
 /*
- * "$Id: filter.c,v 1.3 1999/01/24 14:18:43 mike Exp $"
+ * "$Id: filter.c,v 1.4 1999/02/05 17:40:51 mike Exp $"
  *
  *   File type conversion routines for the Common UNIX Printing System (CUPS).
  *
@@ -31,6 +31,18 @@
  * Revision History:
  *
  *   $Log: filter.c,v $
+ *   Revision 1.4  1999/02/05 17:40:51  mike
+ *   Added IPP client read/write code.
+ *
+ *   Added string functions missing from some UNIXs.
+ *
+ *   Added option parsing functions.
+ *
+ *   Added IPP convenience functions (not implemented yet).
+ *
+ *   Updated source files to use local string.h as needed (for
+ *   missing string functions)
+ *
  *   Revision 1.3  1999/01/24 14:18:43  mike
  *   Check-in prior to CVS use.
  *
@@ -45,6 +57,11 @@
  * Include necessary headers...
  */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+#include "string.h"
 #include "mime.h"
 
 
@@ -273,5 +290,5 @@ lookup(mime_t      *mime,	/* I - MIME database */
 
 
 /*
- * End of "$Id: filter.c,v 1.3 1999/01/24 14:18:43 mike Exp $".
+ * End of "$Id: filter.c,v 1.4 1999/02/05 17:40:51 mike Exp $".
  */

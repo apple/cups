@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.4 1999/01/27 18:31:57 mike Exp $"
+ * "$Id: ppd.h,v 1.5 1999/02/05 17:40:55 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -33,8 +33,6 @@
  */
 
 #  include <stdio.h>
-#  include <stdlib.h>
-#  include <string.h>
 
 
 /*
@@ -215,5 +213,5 @@ extern float		ppdPageWidth(ppd_file_t *ppd, char *name);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.4 1999/01/27 18:31:57 mike Exp $".
+ * End of "$Id: ppd.h,v 1.5 1999/02/05 17:40:55 mike Exp $".
  */

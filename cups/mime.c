@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.6 1999/02/01 22:08:39 mike Exp $"
+ * "$Id: mime.c,v 1.7 1999/02/05 17:40:53 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -33,6 +33,18 @@
  * Revision History:
  *
  *   $Log: mime.c,v $
+ *   Revision 1.7  1999/02/05 17:40:53  mike
+ *   Added IPP client read/write code.
+ *
+ *   Added string functions missing from some UNIXs.
+ *
+ *   Added option parsing functions.
+ *
+ *   Added IPP convenience functions (not implemented yet).
+ *
+ *   Updated source files to use local string.h as needed (for
+ *   missing string functions)
+ *
  *   Revision 1.6  1999/02/01 22:08:39  mike
  *   Restored original directory-scanning functionality of mimeLoad().
  *
@@ -55,8 +67,12 @@
  * Include necessary headers...
  */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+#include "string.h"
 #include "mime.h"
-#include <config.h>
 
 #ifdef HAVE_SYS_DIR_H
 #  include <sys/types.h>
@@ -431,7 +447,7 @@ load_convs(mime_t *mime,		/* I - MIME database */
     *temp = '\0';
 
    /*
-    * Add the filter to the MIME database; if "type" is "*" (as in "super/*")
+    * Add the filter to the MIME database; if "type" is "*" (as in "super / *")
     * then add a filter for each super type listed in the database.
     */
 
@@ -490,5 +506,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.6 1999/02/01 22:08:39 mike Exp $".
+ * End of "$Id: mime.c,v 1.7 1999/02/05 17:40:53 mike Exp $".
  */

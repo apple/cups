@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.3 1999/01/28 22:00:45 mike Exp $"
+ * "$Id: ipp.h,v 1.4 1999/02/05 17:40:52 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -47,6 +47,14 @@ extern "C" {
  */
 
 #  define IPP_VERSION		"\001\000"
+
+
+/*
+ * Common limits...
+ */
+
+#  define IPP_MAX_NAME		128
+#  define IPP_MAX_VALUES	100
 
 
 /*
@@ -138,17 +146,22 @@ typedef enum			/**** Job States.... */
   IPP_JOB_CANCELED,
   IPP_JOB_ABORTED,
   IPP_JOB_COMPLETED
-} ipp_jobstate_t;
+} ipp_jstate_t;
+
+typedef enum			/**** Printer States.... */
+{
+  IPP_PRINTER_IDLE = 3,
+  IPP_PRINTER_PROCESSING,
+  IPP_PRINTER_STOPPED
+} ipp_pstate_t;
 
 typedef enum			/**** IPP states... ****/
 {
-  IPP_IDLE,
-  IPP_REQUEST_HEADER,
-  IPP_REQUEST_ATTR,
-  IPP_REQUEST_DATA,
-  IPP_RESPONSE_HEADER,
-  IPP_RESPONSE_ATTR,
-  IPP_RESPONSE_DATA
+  IPP_ERROR = -1,		/* An error occurred */
+  IPP_IDLE,			/* Nothing is happening/request completed */
+  IPP_HEADER,			/* The request header needs to be sent/received */
+  IPP_ATTRIBUTE,		/* One or more attributes need to be sent/received */
+  IPP_DATA			/* IPP request data needs to be sent/received */
 } ipp_state_t;
 
 typedef enum			/**** IPP operations... ****/
@@ -163,7 +176,13 @@ typedef enum			/**** IPP operations... ****/
   IPP_GET_JOB_ATTRIBUTES,
   IPP_GET_JOBS,
   IPP_GET_PRINTER_ATTRIBUTES,
-  IPP_PRIVATE = 0x4000
+  IPP_PRIVATE = 0x4000,
+  CUPS_GET_PRINTERS,
+  CUPS_ADD_PRINTER,
+  CUPS_DELETE_PRINTER,
+  CUPS_GET_CLASSES,
+  CUPS_ADD_CLASS,
+  CUPS_DELETE_CLASS
 } ipp_op_t;
 
 typedef enum			/**** IPP status codes... ****/
@@ -202,6 +221,13 @@ typedef unsigned int uint;	/**** Unsigned 32-bit integer ****/
 
 typedef union			/**** Request Header ****/
 {
+  struct			/* Any Header */
+  {
+    uchar	version[2];	/* Protocol version number */
+    int		op_status;	/* Operation ID or status code*/
+    int		request_id;	/* Request ID */
+  }		any;
+
   struct			/* Operation Header */
   {
     uchar	version[2];	/* Protocol version number */
@@ -266,6 +292,7 @@ typedef struct			/**** Request State ****/
   ipp_attribute_t *attrs,	/* Attributes */
 		*last,		/* Last attribute in list */
 		*current;	/* Current attribute (for read/write) */
+  ipp_tag_t	curtag;		/* Current attribute group tag */
 } ipp_t;
 
 
@@ -289,9 +316,9 @@ extern void		ippDelete(ipp_t *ipp);
 extern ipp_attribute_t	*ippFindAttribute(ipp_t *ipp, char *name);
 extern size_t		ippLength(ipp_t *ipp);
 extern ipp_t		*ippNew(void);
-extern int		ippRead(http_t *http, ipp_t *ipp);
+extern ipp_state_t	ippRead(http_t *http, ipp_t *ipp);
 extern uchar		*ippTimeToDate(time_t t);
-extern int		ippWrite(http_t *http, ipp_t *ipp);
+extern ipp_state_t	ippWrite(http_t *http, ipp_t *ipp);
 
 /*
  * C++ magic...
@@ -303,5 +330,5 @@ extern int		ippWrite(http_t *http, ipp_t *ipp);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.3 1999/01/28 22:00:45 mike Exp $".
+ * End of "$Id: ipp.h,v 1.4 1999/02/05 17:40:52 mike Exp $".
  */

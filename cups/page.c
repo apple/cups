@@ -1,5 +1,5 @@
 /*
- * "$Id: page.c,v 1.3 1999/01/24 14:18:43 mike Exp $"
+ * "$Id: page.c,v 1.4 1999/02/05 17:40:54 mike Exp $"
  *
  *   Page size functions for the Common UNIX Printing System (CUPS).
  *
@@ -35,6 +35,7 @@
  */
 
 #include "ppd.h"
+#include "string.h"
 
 
 /*
@@ -96,5 +97,5 @@ ppdPageLength(ppd_file_t *ppd,	/* I - Size name */
 
 
 /*
- * End of "$Id: page.c,v 1.3 1999/01/24 14:18:43 mike Exp $".
+ * End of "$Id: page.c,v 1.4 1999/02/05 17:40:54 mike Exp $".
  */

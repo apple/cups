@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c,v 1.4 1999/01/27 18:31:57 mike Exp $"
+ * "$Id: testppd.c,v 1.5 1999/02/05 17:40:57 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -32,8 +32,8 @@
  * Include necessary headers...
  */
 
-#include <config.h>
 #include "ppd.h"
+#include "string.h"
 
 
 /*
@@ -181,5 +181,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c,v 1.4 1999/01/27 18:31:57 mike Exp $".
+ * End of "$Id: testppd.c,v 1.5 1999/02/05 17:40:57 mike Exp $".
  */

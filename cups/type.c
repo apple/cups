@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.3 1999/01/24 14:18:43 mike Exp $"
+ * "$Id: type.c,v 1.4 1999/02/05 17:40:57 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -34,6 +34,18 @@
  * Revision History:
  *
  *   $Log: type.c,v $
+ *   Revision 1.4  1999/02/05 17:40:57  mike
+ *   Added IPP client read/write code.
+ *
+ *   Added string functions missing from some UNIXs.
+ *
+ *   Added option parsing functions.
+ *
+ *   Added IPP convenience functions (not implemented yet).
+ *
+ *   Updated source files to use local string.h as needed (for
+ *   missing string functions)
+ *
  *   Revision 1.3  1999/01/24 14:18:43  mike
  *   Check-in prior to CVS use.
  *
@@ -48,8 +60,13 @@
  * Include necessary headers...
  */
 
-#include "mime.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
 #include <locale.h>
+
+#include "string.h"
+#include "mime.h"
 
 
 /*
@@ -614,8 +631,8 @@ compare(mime_type_t **t0,	/* I - First type */
   int	i;			/* Result of comparison */
 
 
-  if ((i = strcmp((*t0)->super, (*t1)->super)) == 0)
-    i = strcmp((*t0)->type, (*t1)->type);
+  if ((i = strcasecmp((*t0)->super, (*t1)->super)) == 0)
+    i = strcasecmp((*t0)->type, (*t1)->type);
 
   return (i);
 }
@@ -1018,5 +1035,5 @@ patmatch(char *s,	/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.3 1999/01/24 14:18:43 mike Exp $".
+ * End of "$Id: type.c,v 1.4 1999/02/05 17:40:57 mike Exp $".
  */

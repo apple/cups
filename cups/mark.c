@@ -1,5 +1,5 @@
 /*
- * "$Id: mark.c,v 1.4 1999/01/27 18:31:56 mike Exp $"
+ * "$Id: mark.c,v 1.5 1999/02/05 17:40:53 mike Exp $"
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
@@ -40,6 +40,7 @@
  */
 
 #include "ppd.h"
+#include "string.h"
 
 
 /*
@@ -368,5 +369,5 @@ ppd_default(ppd_option_t *o)	/* I - Option to default */
 
 
 /*
- * End of "$Id: mark.c,v 1.4 1999/01/27 18:31:56 mike Exp $".
+ * End of "$Id: mark.c,v 1.5 1999/02/05 17:40:53 mike Exp $".
  */

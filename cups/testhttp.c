@@ -1,5 +1,5 @@
 /*
- * "$Id: testhttp.c,v 1.3 1999/02/01 22:06:37 mike Exp $"
+ * "$Id: testhttp.c,v 1.4 1999/02/05 17:40:56 mike Exp $"
  *
  *   HTTP test program for the Common UNIX Printing System (CUPS).
  *
@@ -30,7 +30,7 @@
  * Include necessary headers...
  */
 
-#include <config.h>
+#include <stdio.h>
 #include "http.h"
 
 
@@ -102,5 +102,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testhttp.c,v 1.3 1999/02/01 22:06:37 mike Exp $".
+ * End of "$Id: testhttp.c,v 1.4 1999/02/05 17:40:56 mike Exp $".
  */
