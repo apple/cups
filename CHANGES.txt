@@ -1,4 +1,4 @@
-CHANGES.txt - 05/21/2001
+CHANGES.txt - 05/22/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.8
@@ -51,6 +51,8 @@ CHANGES IN CUPS V1.1.8
 	  clients that don't do this already...
 	- Other pstops fixed from Helge Blischke for printing
 	  non-conforming documents.
+	- The MaxJobs parameter was not reset when loading the
+	  cupsd.conf file.
 
 
 CHANGES IN CUPS V1.1.7
