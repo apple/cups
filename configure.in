@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.51 2000/08/04 14:53:49 mike Exp $"
+dnl "$Id: configure.in,v 1.52 2000/08/04 16:17:13 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -443,7 +443,7 @@ if test $prefix = "/"; then
 			fi
 			;;
 
-		OSF1* HP-UX*)
+		OSF1* | HP-UX*)
 			INITDIR="/sbin"
 			INITDDIR="../init.d"
 			;;
@@ -527,5 +527,5 @@ AC_SUBST(CUPS_DOCROOT)
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.51 2000/08/04 14:53:49 mike Exp $".
+dnl End of "$Id: configure.in,v 1.52 2000/08/04 16:17:13 mike Exp $".
 dnl
