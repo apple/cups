@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.109 2002/01/23 17:25:41 mike Exp $"
+ * "$Id: printers.c,v 1.110 2002/01/26 21:35:09 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -328,7 +328,8 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
     DefaultPrinter = Printers;
 
 #ifdef __sgi
-    write_irix_state(DefaultPrinter);
+    if (DefaultPrinter)
+      write_irix_state(DefaultPrinter);
 #endif /* __sgi */
   }
 
@@ -1464,14 +1465,15 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
  /*
   * Then the member file that tells which device file the queue is connected
-  * to...  Networked printers use "/dev/null" in this file, so that's what
-  * we use (the actual device URI can confuse some apps...)
+  * to...  While it may be confusing to apps that look at the member file
+  * directly, we put the device URI in here so that the IRIX printstatus
+  * program doesn't try to run lpstat with the undocumented "-b" option...
   */
 
   snprintf(filename, sizeof(filename), "/var/spool/lp/member/%s", p->name);
   if ((fp = fopen(filename, "w")) != NULL)
   {
-    fputs("/dev/null\n", fp);
+    fprintf(fp, "%s\n", p->device_uri);
 
     fclose(fp);
 
@@ -1996,5 +1998,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.109 2002/01/23 17:25:41 mike Exp $".
+ * End of "$Id: printers.c,v 1.110 2002/01/26 21:35:09 mike Exp $".
  */
