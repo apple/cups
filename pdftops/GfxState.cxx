@@ -818,6 +818,15 @@ GfxColorSpace *GfxIndexedColorSpace::parse(Array *arr) {
     goto err2;
   }
   indexHighA = obj1.getInt();
+  if (indexHighA > 256) {
+    error(-1, "Bad Indexed color space (hival > 256)");
+    goto err2;
+  }
+  if (indexHighA < 1) {
+    error(-1, "Bad Indexed color space (hival < 1)");
+    goto err2;
+  }
+
   obj1.free();
   cs = new GfxIndexedColorSpace(baseA, indexHighA);
   arr->get(3, &obj1);
