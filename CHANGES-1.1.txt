@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- Updated the Ghostscript 8.x integration stuff (STR
+	  #484)
 	- The lpd backend used a source port of 732 by default,
 	  which is outside of the range defined by RFC 1179;
 	  also added a new (default) "reserve=any" option for
