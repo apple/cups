@@ -360,6 +360,23 @@ public class Cups
       //  Send the HTTP header.
       //
       http.writeHeader( http.path, ipp.sizeInBytes() );
+      switch( http.status )
+      {
+        case IPPHttp.HTTP_FORBIDDEN:
+        case IPPHttp.HTTP_NOT_FOUND:
+        case IPPHttp.HTTP_BAD_REQUEST:
+        case IPPHttp.HTTP_UNAUTHORIZED:
+        case IPPHttp.HTTP_METHOD_NOT_ALLOWED:
+        case IPPHttp.HTTP_PAYMENT_REQUIRED:
+        case IPPHttp.HTTP_UPGRADE_REQUIRED:
+                     break;
+
+        case IPPHttp.HTTP_ERROR:
+                     break;
+
+        case IPPHttp.HTTP_OK:  
+                     break;
+      }
 
       //
       //  Send the request header.

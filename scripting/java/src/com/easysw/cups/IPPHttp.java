@@ -216,7 +216,8 @@ public class IPPHttp
   //
   private URL                  url;   // URL of connection.
 
-  public  Socket               conn;  // Connection socket.
+  public  Socket               conn;       // Connection socket.
+  public  boolean              connected;  // True when connected.
 
   public  BufferedInputStream  is;    //  Input stream.
   public  BufferedReader       br;
@@ -240,6 +241,9 @@ public class IPPHttp
   private int                 read_buffer_head;
   private int                 read_buffer_tail;
 
+  public int                  status;
+  public String               status_text;
+  public String               version;
   public int                  error;
   public int                  activity;
 
@@ -258,11 +262,16 @@ public class IPPHttp
    *  @throw	IOException
    *  @throw	UnknownHostException
    */
-  public IPPHttp(String request_url )
+  public IPPHttp( String request_url )
         throws IOException, UnknownHostException
   {
 
-    encrypted = false;
+    encrypted   = false;
+    status      = HTTP_OK;
+    status_text = "";
+    version     = "1.0";
+    connected   = false;
+
     try
     {
       //
@@ -285,6 +294,7 @@ public class IPPHttp
       //
       is       = new BufferedInputStream(new DataInputStream(conn.getInputStream()));
       os       = new BufferedOutputStream(new DataOutputStream(conn.getOutputStream()));
+      connected = true;
     }
     catch(UnknownHostException unknownhostexception)
     {
@@ -293,6 +303,42 @@ public class IPPHttp
     catch(IOException ioexception)
     {
             throw ioexception;
+    }
+  }
+
+
+  /**
+   *  Re-establish a dropped connection.
+   *
+   *  @return	<code>boolean</code>		True if connected.
+   *
+   *  @throw	IOException
+   */
+  public boolean reConnect() throws IOException
+  {
+    connected = false;
+
+    try
+    {
+      //
+      //  Open the socket and set the options.
+      //
+      conn     = new Socket(hostname, port);
+      conn.setSoTimeout(200);
+
+      //
+      //  Create the input and output streams.
+      //
+      is       = new BufferedInputStream(new DataInputStream(conn.getInputStream()));
+      os       = new BufferedOutputStream(new DataOutputStream(conn.getOutputStream()));
+      connected = true;
+      return(connected);
+
+    }
+    catch (IOException ioexception)
+    {
+      connected = false;
+      throw(ioexception);
     }
   }
 
@@ -372,8 +418,39 @@ public class IPPHttp
     while (!done)
     {
         read_buffer = read_line();
+        if (read_buffer.startsWith("HTTP/"))
+        {
+          int i,n;
+          String s2 = read_buffer.substring(5);
 
-        if (read_buffer.startsWith("Content-Length:"))
+          StringBuffer http_version = new StringBuffer(32);
+          StringBuffer http_status  = new StringBuffer(32);
+          StringBuffer http_text    = new StringBuffer(256);
+
+          for (i=0;(i < s2.length() && s2.charAt(i) != ' '); i++)
+          {
+            http_version.append(s2.charAt(i));
+          }
+          while (i < s2.length() && s2.charAt(i) == ' ')
+            i++;
+          for (;(i < s2.length() && s2.charAt(i) != '\n' && 
+                 s2.charAt(i) != '\r' && s2.charAt(i) != ' '); i++)
+          {
+            http_status.append(s2.charAt(i));
+          }
+
+          while (i < s2.length() && s2.charAt(i) == ' ')
+            i++;
+          for (n=0;(n < 256 && i < s2.length() && s2.charAt(i) != '\n' && 
+                 s2.charAt(i) != '\r' && s2.charAt(i) != ' '); i++)
+          {
+            http_text.append(s2.charAt(i));
+          }
+          version     = http_version.toString();
+          status      = Integer.parseInt(http_status.toString(), 10);
+          status_text = http_text.toString();
+        }
+        else if (read_buffer.startsWith("Content-Length:"))
         {
           String s2 = read_buffer.substring(15);
           read_header_content_length = Integer.parseInt(s2.trim(), 10);
