@@ -1,5 +1,5 @@
 #
-# "$Id: mime.types,v 1.5 1999/06/30 21:07:52 mike Exp $"
+# "$Id: mime.types,v 1.6 1999/07/30 13:57:16 mike Exp $"
 #
 #   MIME types file for the Common UNIX Printing System (CUPS).
 #
@@ -92,10 +92,9 @@ image/x-sgi-rgb			rgb sgi bw icon short(0,474)
 image/x-xbitmap			xbm
 image/x-xpixmap			xpm ascii(0,1024) + string(3,"XPM")
 image/x-xwindowdump		xwd
-
-# TODO: Add Sun Raster, Alias, SoftImage, GIMP??? files
-
 image/x-sun-raster		ras
+
+# TODO: Add Alias, SoftImage, GIMP??? files
 #image/x-alias			pix
 #image/x-softimage
 #image/x-gimp-xcf		xcf xcf.gz
@@ -119,5 +118,5 @@ application/vnd.cups-raster	string(0,"RaSt") string(0,"tSaR")
 application/vnd.cups-raw
 
 #
-# End of "$Id: mime.types,v 1.5 1999/06/30 21:07:52 mike Exp $".
+# End of "$Id: mime.types,v 1.6 1999/07/30 13:57:16 mike Exp $".
 #

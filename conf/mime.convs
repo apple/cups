@@ -1,5 +1,5 @@
 #
-# "$Id: mime.convs,v 1.6 1999/07/13 14:11:17 mike Exp $"
+# "$Id: mime.convs,v 1.7 1999/07/30 13:57:16 mike Exp $"
 #
 #   MIME converts file for the Common UNIX Printing System (CUPS).
 #
@@ -42,7 +42,7 @@
 #
 
 #application/msword	application/postscript	50	mswordtops
-#application/pdf		application/postscript	50	pdftops
+application/pdf		application/postscript	50	pdftops
 application/postscript	application/vnd.cups-postscript	50	pstops
 application/vnd.hp-HPGL	application/postscript	50	hpgltops
 image/*			application/vnd.cups-postscript	50	imagetops
@@ -58,5 +58,5 @@ image/*			application/vnd.cups-raster	50	imagetoraster
 application/vnd.cups-postscript	application/vnd.cups-raster	50	pstoraster
 
 #
-# End of "$Id: mime.convs,v 1.6 1999/07/13 14:11:17 mike Exp $".
+# End of "$Id: mime.convs,v 1.7 1999/07/30 13:57:16 mike Exp $".
 #
