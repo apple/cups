@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.74 2000/09/12 20:37:45 mike Exp $"
+ * "$Id: printers.c,v 1.75 2000/09/14 16:38:36 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,20 +23,22 @@
  *
  * Contents:
  *
- *   AddPrinter()        - Add a printer to the system.
- *   DeleteAllPrinters() - Delete all printers from the system.
- *   DeletePrinter()     - Delete a printer from the system.
- *   FindPrinter()       - Find a printer in the list.
- *   LoadAllPrinters()   - Load printers from the printers.conf file.
- *   SaveAllPrinters()   - Save all printer definitions to the printers.conf
- *   SetPrinterAttrs()   - Set printer attributes based upon the PPD file.
- *   SetPrinterState()   - Update the current state of a printer.
- *   SortPrinters()      - Sort the printer list when a printer name is
- *                         changed.
- *   StopPrinter()       - Stop a printer from printing any jobs...
- *   ValidateDest()      - Validate a printer/class destination.
- *   write_printcap()    - Write a pseudo-printcap file for older applications
- *                         that need it...
+ *   AddPrinter()           - Add a printer to the system.
+ *   AddPrinterFilter()     - Add a MIME filter for a printer.
+ *   DeleteAllPrinters()    - Delete all printers from the system.
+ *   DeletePrinter()        - Delete a printer from the system.
+ *   DeletePrinterFilters() - Delete all MIME filters for a printer.
+ *   FindPrinter()          - Find a printer in the list.
+ *   LoadAllPrinters()      - Load printers from the printers.conf file.
+ *   SaveAllPrinters()      - Save all printer definitions to the printers.conf
+ *   SetPrinterAttrs()      - Set printer attributes based upon the PPD file.
+ *   SetPrinterState()      - Update the current state of a printer.
+ *   SortPrinters()         - Sort the printer list when a printer name is
+ *                            changed.
+ *   StopPrinter()          - Stop a printer from printing any jobs...
+ *   ValidateDest()         - Validate a printer/class destination.
+ *   write_printcap()       - Write a pseudo-printcap file for older
+ *                            applications that need it...
  */
 
 /*
@@ -264,6 +266,8 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
 
   ippDelete(p->attrs);
 
+  DeletePrinterFilters(p);
+
   free(p);
 
  /*
@@ -294,7 +298,7 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
 
 
 /*
- * 'AddPrinterFilter()' - Add a MIME filter for a printer.
+ * 'DeletePrinterFilters()' - Delete all MIME filters for a printer.
  */
 
 void
@@ -1556,5 +1560,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.74 2000/09/12 20:37:45 mike Exp $".
+ * End of "$Id: printers.c,v 1.75 2000/09/14 16:38:36 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.69 2000/09/12 18:35:00 mike Exp $"
+ * "$Id: client.c,v 1.70 2000/09/14 16:38:36 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1559,8 +1559,7 @@ pipe_command(client_t *con,	/* I - Client connection */
   char	argbuf[10240],		/* Argument buffer */
 	*argv[100],		/* Argument strings */
 	*envp[100];		/* Environment variables */
-  char	hostname[1024],		/* Hostname string */
-	lang[1024],		/* LANG env variable */
+  char	lang[1024],		/* LANG env variable */
 	content_length[1024],	/* CONTENT_LENGTH env variable */
 	content_type[1024],	/* CONTENT_TYPE env variable */
 	ipp_port[1024],		/* Default listen port */
@@ -1631,12 +1630,10 @@ pipe_command(client_t *con,	/* I - Client connection */
   * Setup the environment variables as needed...
   */
 
-  gethostname(hostname, sizeof(hostname) - 1);
-
   sprintf(lang, "LANG=%s", con->language ? con->language->language : "C");
   sprintf(ipp_port, "IPP_PORT=%d", ntohs(con->http.hostaddr.sin_port));
   sprintf(server_port, "SERVER_PORT=%d", ntohs(con->http.hostaddr.sin_port));
-  snprintf(server_name, sizeof(server_name), "SERVER_NAME=%s", hostname);
+  snprintf(server_name, sizeof(server_name), "SERVER_NAME=%s", ServerName);
   snprintf(remote_host, sizeof(remote_host), "REMOTE_HOST=%s", con->http.hostname);
   snprintf(remote_user, sizeof(remote_user), "REMOTE_USER=%s", con->username);
   snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
@@ -1784,5 +1781,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.69 2000/09/12 18:35:00 mike Exp $".
+ * End of "$Id: client.c,v 1.70 2000/09/14 16:38:36 mike Exp $".
  */

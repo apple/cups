@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.88 2000/09/12 20:37:44 mike Exp $"
+ * "$Id: job.c,v 1.89 2000/09/14 16:38:36 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1274,7 +1274,7 @@ StartJob(int       id,		/* I - Job ID */
   envp[6]  = ppd;
   envp[7]  = root;
   envp[8]  = cache;
-  envp[9] = tmpdir;
+  envp[9]  = tmpdir;
   envp[10] = content_type;
   envp[11] = device_uri;
   envp[12] = printer_name;
@@ -2580,5 +2580,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.88 2000/09/12 20:37:44 mike Exp $".
+ * End of "$Id: job.c,v 1.89 2000/09/14 16:38:36 mike Exp $".
  */
