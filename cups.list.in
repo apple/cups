@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in,v 1.55 2004/06/29 03:14:19 mike Exp $"
+# "$Id: cups.list.in,v 1.56 2004/09/15 13:52:21 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -449,7 +449,7 @@ f 0444 root sys $MANDIR/fr/cat1/lpstat.$CAT1EXT man/lpstat.$CAT1EXT
 f 0444 root sys $MANDIR/fr/cat1/lp.$CAT1EXT man/lp.$CAT1EXT
 l 0444 root sys $MANDIR/fr/cat1/cancel.$CAT1EXT lp.$CAT1EXT
 
-f 0444 root sys $PMANDIR/fr/cat3/cups-config.$CAT3EXT man/cups-config.$CAT3EXT
+f 0444 root sys $PMANDIR/fr/cat1/cups-config.$CAT1EXT man/cups-config.$CAT1EXT
 
 f 0444 root sys $MANDIR/fr/cat5/classes.conf.$CAT5EXT man/classes.conf.$CAT5EXT
 f 0444 root sys $MANDIR/fr/cat5/cupsd.conf.$CAT5EXT man/cupsd.conf.$CAT5EXT
@@ -481,7 +481,7 @@ f 0444 root sys $MANDIR/fr/man1/lpstat.1 man/lpstat.man
 f 0444 root sys $MANDIR/fr/man1/lp.1 man/lp.man
 l 0444 root sys $MANDIR/fr/man1/cancel.1 lp.1
 
-f 0444 root sys $PMANDIR/fr/man3/cups-config.3 man/cups-config.man
+f 0444 root sys $PMANDIR/fr/man1/cups-config.1 man/cups-config.man
 
 f 0444 root sys $MANDIR/fr/man5/classes.conf.5 man/classes.conf.man
 f 0444 root sys $MANDIR/fr/man5/cupsd.conf.5 man/cupsd.conf.man
@@ -507,5 +507,5 @@ f 0444 root sys $AMANDIR/fr/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list.in,v 1.55 2004/06/29 03:14:19 mike Exp $".
+# End of "$Id: cups.list.in,v 1.56 2004/09/15 13:52:21 mike Exp $".
 #
