@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.18 2001/02/08 18:46:00 mike Exp $"
+ * "$Id: usb.c,v 1.19 2001/06/06 16:47:53 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -189,20 +189,24 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
  /*
   * Now that we are "connected" to the port, ignore SIGTERM so that we
   * can finish out any page data the driver sends (e.g. to eject the
-  * current page...
+  * current page...  Only ignore SIGTERM if we are printing data from
+  * stdin (otherwise you can't cancel raw jobs...)
   */
 
+  if (argc < 7)
+  {
 #ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-  sigset(SIGTERM, SIG_IGN);
+    sigset(SIGTERM, SIG_IGN);
 #elif defined(HAVE_SIGACTION)
-  memset(&action, 0, sizeof(action));
+    memset(&action, 0, sizeof(action));
 
-  sigemptyset(&action.sa_mask);
-  action.sa_handler = SIG_IGN;
-  sigaction(SIGTERM, &action, NULL);
+    sigemptyset(&action.sa_mask);
+    action.sa_handler = SIG_IGN;
+    sigaction(SIGTERM, &action, NULL);
 #else
-  signal(SIGTERM, SIG_IGN);
+    signal(SIGTERM, SIG_IGN);
 #endif /* HAVE_SIGSET */
+  }
 
  /*
   * Finally, send the print file...
@@ -433,5 +437,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: usb.c,v 1.18 2001/02/08 18:46:00 mike Exp $".
+ * End of "$Id: usb.c,v 1.19 2001/06/06 16:47:53 mike Exp $".
  */

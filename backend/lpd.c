@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.28 2001/03/08 15:13:13 mike Exp $"
+ * "$Id: lpd.c,v 1.29 2001/06/06 16:47:52 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -75,8 +75,8 @@ extern int	rresvport(int *port);
 
 static int	lpd_command(int lpd_fd, char *format, ...);
 static int	lpd_queue(char *hostname, char *printer, char *filename,
-		          char *user, char *title, int copies, int banner,
-			  int format, int order);
+		          int fromstdin, char *user, char *title, int copies,
+			  int banner, int format, int order);
 static int	lpd_write(int lpd_fd, char *buffer, int length);
 
 
@@ -285,7 +285,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
   if (argc > 6)
   {
-    status = lpd_queue(hostname, resource + 1, filename,
+    status = lpd_queue(hostname, resource + 1, filename, 0,
                        argv[2] /* user */, title, atoi(argv[4]) /* copies */,
 		       banner, format, order);
 
@@ -293,7 +293,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       fprintf(stderr, "PAGE: 1 %d\n", atoi(argv[4]));
   }
   else
-    status = lpd_queue(hostname, resource + 1, filename,
+    status = lpd_queue(hostname, resource + 1, filename, 1,
                        argv[2] /* user */, title, 1, banner, format, order);
 
  /*
@@ -368,6 +368,7 @@ static int			/* O - Zero on success, non-zero on failure */
 lpd_queue(char *hostname,	/* I - Host to connect to */
           char *printer,	/* I - Printer/queue name */
 	  char *filename,	/* I - File to print */
+          int  fromstdin,	/* I - Printing from stdin? */
           char *user,		/* I - Requesting user */
 	  char *title,		/* I - Job title */
 	  int  copies,		/* I - Number of copies */
@@ -475,20 +476,24 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
  /*
   * Now that we are "connected" to the port, ignore SIGTERM so that we
   * can finish out any page data the driver sends (e.g. to eject the
-  * current page...
+  * current page...  Only ignore SIGTERM if we are printing data from
+  * stdin (otherwise you can't cancel raw jobs...)
   */
 
+  if (fromstdin)
+  {
 #ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-  sigset(SIGTERM, SIG_IGN);
+    sigset(SIGTERM, SIG_IGN);
 #elif defined(HAVE_SIGACTION)
-  memset(&action, 0, sizeof(action));
+    memset(&action, 0, sizeof(action));
 
-  sigemptyset(&action.sa_mask);
-  action.sa_handler = SIG_IGN;
-  sigaction(SIGTERM, &action, NULL);
+    sigemptyset(&action.sa_mask);
+    action.sa_handler = SIG_IGN;
+    sigaction(SIGTERM, &action, NULL);
 #else
-  signal(SIGTERM, SIG_IGN);
+    signal(SIGTERM, SIG_IGN);
 #endif /* HAVE_SIGSET */
+  }
 
  /*
   * Next, open the print file and figure out its size...
@@ -669,5 +674,5 @@ lpd_write(int  lpd_fd,		/* I - LPD socket */
 
 
 /*
- * End of "$Id: lpd.c,v 1.28 2001/03/08 15:13:13 mike Exp $".
+ * End of "$Id: lpd.c,v 1.29 2001/06/06 16:47:52 mike Exp $".
  */
