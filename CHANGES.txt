@@ -123,6 +123,9 @@ CHANGES IN CUPS V1.1.7
 	- Fixed an unaligned memory buffer for the pstoraster
 	  clist states; this caused bus errors for some
 	  combinations of printers, drivers, and options.
+	- Re-added black reduction for colorful colors; this
+	  helps to prevent dark colors from getting desaturated.
+	  (only used when converting RGB to CMYK)
 
 
 CHANGES IN CUPS V1.1.6-3
