@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.1 1999/04/19 21:12:51 mike Exp $"
+ * "$Id: printers.c,v 1.2 1999/05/03 18:33:38 mike Exp $"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -62,11 +62,12 @@ main(int  argc,			/* I - Number of command-line arguments */
   http_t	*http;		/* Connection to the server */
 
 
+  setbuf(stdout, NULL);
  /*
   * Get the request language...
   */
 
-  language = cupsLangGet(getenv("LANG"));
+  language = cupsLangDefault();
 
  /*
   * Connect to the HTTP server...
@@ -444,7 +445,7 @@ show_printer_info(http_t      *http,
 
       ippDelete(jobs);
     }
-
+      
     if (jobcount == 0)
       puts("None");
     puts("</TD>");
@@ -456,5 +457,5 @@ show_printer_info(http_t      *http,
 
 
 /*
- * End of "$Id: printers.c,v 1.1 1999/04/19 21:12:51 mike Exp $".
+ * End of "$Id: printers.c,v 1.2 1999/05/03 18:33:38 mike Exp $".
  */
