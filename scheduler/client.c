@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.153 2003/03/14 21:40:39 mike Exp $"
+ * "$Id: client.c,v 1.154 2003/03/28 22:27:59 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -49,9 +49,9 @@
  * Include necessary headers...
  */
 
+#include <cups/http-private.h>
 #include "cupsd.h"
 #include <grp.h>
-#include <cups/http-private.h>
 
 
 /*
@@ -3291,5 +3291,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.153 2003/03/14 21:40:39 mike Exp $".
+ * End of "$Id: client.c,v 1.154 2003/03/28 22:27:59 mike Exp $".
  */
