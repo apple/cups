@@ -6,13 +6,11 @@ Quit
 Close
 Yes
 No
-Automatic
 On
 Off
 Save
 Discard
 Default
-User-Defined
 Options
 More Info
 Black
@@ -20,47 +18,37 @@ Colour
 Cyan
 Magenta
 Yellow
-Copyright
-All Rights Reserved
+Copyright 1993-1999 by Easy Software Products, All Rights Reserved.
 General
 Printer
-PostScript
-Image
-Text
-HPGL
+Image Options
+HP-GL/2 Options
 Extra
-Print Banner Page
-Verbose Logging
-Print Pages
 Document
+Other
+Print Pages: 
 Entire Document
-Page Range
-Reverse Order
-Page Format
+Page Range:
+Reverse Order: 
+Page Format: 
  1-Up
  2-Up
  4-Up
-Image Scaling
+Image Scaling: 
 Use Natural Image Size
 Zoom by Percent
 Zoom by PPI
-Mirror Image
-Rotate Image
-Best Fit
-Colour Saturation
-Colour Hue
-Number of Columns
-Margins
-Wrap Text
-Fit to Page
-Shading
-Default Pen Width
-Gamma Correction
-Brightness
-Colour Profile
-Add Printer
-Delete Printer
-Modify Printer
+Mirror Image: 
+Colour Saturation: 
+Colour Hue: 
+Fit to Page: 
+Shading: 
+Pen Width: 
+Gamma Correction: 
+Brightness: 
+Add
+Delete
+Modify
 Printer URI
 Printer Name
 Printer Location
@@ -85,9 +73,9 @@ Hole Punching
 Covering
 Binding
 Sorting
-Small (up to 241x356mm)
-Medium (241x356mm to 330x483mm)
-Large (330x483mm and larger)
+Small (up to 9.5x14in)
+Medium (9.5x14in to 13x19in)
+Large (13x19in and larger)
 Custom Size
 Idle
 Processing
@@ -95,10 +83,11 @@ Stopped
 All
 Odd
 Even Pages
-Other
+Darker                     Lighter
 Media Size
 Media Type
 Media Source
+Orientation: 
 Portrait
 Landscape
 400 Your browser sent a request that this server could not understand.
