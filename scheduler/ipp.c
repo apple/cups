@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.52 2000/02/10 00:57:54 mike Exp $"
+ * "$Id: ipp.c,v 1.53 2000/02/18 17:48:08 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -189,29 +189,35 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
       else
 	charset = NULL;
 
-      attr = attr->next;
+      if (attr)
+        attr = attr->next;
       if (attr != NULL && strcmp(attr->name, "attributes-natural-language") == 0 &&
 	  attr->value_tag == IPP_TAG_LANGUAGE)
 	language = attr;
       else
 	language = NULL;
 
-      attr = attr->next;
-      if (attr != NULL && strcmp(attr->name, "printer-uri") == 0 &&
-	  attr->value_tag == IPP_TAG_URI)
+      if ((attr = ippFindAttribute(con->request, "printer-uri", IPP_TAG_URI)) != NULL)
 	uri = attr;
-      else if (attr != NULL && strcmp(attr->name, "job-uri") == 0 &&
-               attr->value_tag == IPP_TAG_URI)
+      else if ((attr = ippFindAttribute(con->request, "job-uri", IPP_TAG_URI)) != NULL)
 	uri = attr;
       else
 	uri = NULL;
 
-      ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	   "attributes-charset", NULL, charset->values[0].string.text);
+      if (charset)
+	ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	     "attributes-charset", NULL, charset->values[0].string.text);
+      else
+	ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	     "attributes-charset", NULL, DefaultCharset);
 
-      ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                   "attributes-natural-language", NULL,
-		   language->values[0].string.text);
+      if (language)
+	ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                     "attributes-natural-language", NULL,
+		     language->values[0].string.text);
+      else
+	ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                     "attributes-natural-language", NULL, DefaultLanguage);
 
       if (charset == NULL || language == NULL ||
 	  (uri == NULL && con->request->request.op.operation_id < IPP_PRIVATE))
@@ -1226,15 +1232,15 @@ cancel_job(client_t        *con,	/* I - Client connection */
   * See if the job is owned by the requesting user...
   */
 
-  if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  if (con->username[0])
+    strcpy(username, con->username);
+  else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
   {
     strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
     username[sizeof(username) - 1] = '\0';
   }
-  else if (con->username[0])
-    strcpy(username, con->username);
   else
-    username[0] = '\0';
+    strcpy(username, "anonymous");
 
   if (strcmp(username, job->username) != 0 && strcmp(username, "root") != 0)
   {
@@ -1538,8 +1544,11 @@ create_job(client_t        *con,	/* I - Client connection */
 
   strncpy(job->title, title, sizeof(job->title) - 1);
 
-  strcpy(job->username, con->username);
-  if ((attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME);
+
+  if (con->username[0])
+    strcpy(job->username, con->username);
+  else if (attr != NULL)
   {
     LogMessage(L_DEBUG, "create_job: requesting-user-name = \'%s\'",
                attr->values[0].string.text);
@@ -1547,8 +1556,7 @@ create_job(client_t        *con,	/* I - Client connection */
     strncpy(job->username, attr->values[0].string.text, sizeof(job->username) - 1);
     job->username[sizeof(job->username) - 1] = '\0';
   }
-
-  if (job->username[0] == '\0')
+  else
     strcpy(job->username, "anonymous");
 
   if (attr == NULL)
@@ -1893,13 +1901,15 @@ get_jobs(client_t        *con,		/* I - Client connection */
   if ((attr = ippFindAttribute(con->request, "my-jobs", IPP_TAG_BOOLEAN)) != NULL &&
       attr->values[0].boolean)
   {
-    strcpy(username, con->username);
-
-    if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+    if (con->username[0])
+      strcpy(username, con->username);
+    else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
     {
       strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
       username[sizeof(username) - 1] = '\0';
     }
+    else
+      strcpy(username, "anonymous");
   }
   else
     username[0] = '\0';
@@ -2413,15 +2423,15 @@ hold_job(client_t        *con,	/* I - Client connection */
   * See if the job is owned by the requesting user...
   */
 
-  if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  if (con->username[0])
+    strcpy(username, con->username);
+  else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
   {
     strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
     username[sizeof(username) - 1] = '\0';
   }
-  else if (con->username[0])
-    strcpy(username, con->username);
   else
-    username[0] = '\0';
+    strcpy(username, "anonymous");
 
   if (strcmp(username, job->username) != 0 && strcmp(username, "root") != 0)
   {
@@ -2712,8 +2722,11 @@ print_job(client_t        *con,		/* I - Client connection */
 
   con->filename[0] = '\0';
 
-  strcpy(job->username, con->username);
-  if ((attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME);
+
+  if (con->username[0])
+    strcpy(job->username, con->username);
+  if (attr != NULL)
   {
     LogMessage(L_DEBUG, "print_job: requesting-user-name = \'%s\'",
                attr->values[0].string.text);
@@ -2721,8 +2734,7 @@ print_job(client_t        *con,		/* I - Client connection */
     strncpy(job->username, attr->values[0].string.text, sizeof(job->username) - 1);
     job->username[sizeof(job->username) - 1] = '\0';
   }
-
-  if (job->username[0] == '\0')
+  else
     strcpy(job->username, "anonymous");
 
   if (attr == NULL)
@@ -2997,15 +3009,15 @@ release_job(client_t        *con,	/* I - Client connection */
   * See if the job is owned by the requesting user...
   */
 
-  if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  if (con->username[0])
+    strcpy(username, con->username);
+  else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
   {
     strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
     username[sizeof(username) - 1] = '\0';
   }
-  else if (con->username[0])
-    strcpy(username, con->username);
   else
-    username[0] = '\0';
+    strcpy(username, "anonymous");
 
   if (strcmp(username, job->username) != 0 && strcmp(username, "root") != 0)
   {
@@ -3185,15 +3197,15 @@ restart_job(client_t        *con,	/* I - Client connection */
   * See if the job is owned by the requesting user...
   */
 
-  if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  if (con->username[0])
+    strcpy(username, con->username);
+  else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
   {
     strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
     username[sizeof(username) - 1] = '\0';
   }
-  else if (con->username[0])
-    strcpy(username, con->username);
   else
-    username[0] = '\0';
+    strcpy(username, "anonymous");
 
   if (strcmp(username, job->username) != 0 && strcmp(username, "root") != 0)
   {
@@ -3356,15 +3368,15 @@ send_document(client_t        *con,	/* I - Client connection */
   * See if the job is owned by the requesting user...
   */
 
-  if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  if (con->username[0])
+    strcpy(username, con->username);
+  else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
   {
     strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
     username[sizeof(username) - 1] = '\0';
   }
-  else if (con->username[0])
-    strcpy(username, con->username);
   else
-    username[0] = '\0';
+    strcpy(username, "anonymous");
 
   if (strcmp(username, job->username) != 0 && strcmp(username, "root") != 0)
   {
@@ -3895,31 +3907,27 @@ validate_job(client_t        *con,	/* I - Client connection */
   * Is it a format we support?
   */
 
-  if ((format = ippFindAttribute(con->request, "document-format", IPP_TAG_MIMETYPE)) == NULL)
+  if ((format = ippFindAttribute(con->request, "document-format", IPP_TAG_MIMETYPE)) != NULL)
   {
-    LogMessage(L_ERROR, "validate_job: missing document-format attribute!");
-    send_ipp_error(con, IPP_BAD_REQUEST);
-    return;
-  }
+    if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]", super, type) != 2)
+    {
+      LogMessage(L_ERROR, "validate_job: could not scan type \'%s\'!\n",
+		 format->values[0].string.text);
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
 
-  if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]", super, type) != 2)
-  {
-    LogMessage(L_ERROR, "validate_job: could not scan type \'%s\'!\n",
-	       format->values[0].string.text);
-    send_ipp_error(con, IPP_BAD_REQUEST);
-    return;
-  }
-
-  if ((strcmp(super, "application") != 0 ||
-       strcmp(type, "octet-stream") != 0) &&
-      mimeType(MimeDatabase, super, type) == NULL)
-  {
-    LogMessage(L_ERROR, "validate_job: Unsupported format \'%s\'!\n",
-	       format->values[0].string.text);
-    send_ipp_error(con, IPP_DOCUMENT_FORMAT);
-    ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
-                 "document-format", NULL, format->values[0].string.text);
-    return;
+    if ((strcmp(super, "application") != 0 ||
+	 strcmp(type, "octet-stream") != 0) &&
+	mimeType(MimeDatabase, super, type) == NULL)
+    {
+      LogMessage(L_ERROR, "validate_job: Unsupported format \'%s\'!\n",
+		 format->values[0].string.text);
+      send_ipp_error(con, IPP_DOCUMENT_FORMAT);
+      ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
+                   "document-format", NULL, format->values[0].string.text);
+      return;
+    }
   }
 
  /*
@@ -3948,5 +3956,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.52 2000/02/10 00:57:54 mike Exp $".
+ * End of "$Id: ipp.c,v 1.53 2000/02/18 17:48:08 mike Exp $".
  */

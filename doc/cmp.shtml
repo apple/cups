@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
-	<META NAME="DOCNUMBER" CONTENT="CUPS-CMP-1.0">
-	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-CMP-1.1">
+	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2000, All Rights Reserved">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Configuration Management Plan</TITLE>
 </HEAD>
@@ -13,7 +13,7 @@
 
 This configuration management plan document provides the guidelines for
 development and maintainance of the Common UNIX Printing System ("CUPS")
-Version 1.0 software.
+Version 1.1 software.
 
 <H2>System Overview</H2>
 
@@ -57,15 +57,15 @@ sections:
 The following CUPS documentation is referenced by this document:
 
 <UL>
-	<LI>CUPS-CMP-1.0: CUPS Configuration Management Plan 
-	<LI>CUPS-IDD-1.0: CUPS System Interface Design Description 
-	<LI>CUPS-SAM-1.0.x: CUPS Software Administrators Manual 
-	<LI>CUPS-SDD-1.0: CUPS Software Design Description 
-	<LI>CUPS-SPM-1.0: CUPS Software Programming Manual
-	<LI>CUPS-SSR-1.0: CUPS Software Security Report 
-	<LI>CUPS-STP-1.0: CUPS Software Test Plan 
-	<LI>CUPS-SUM-1.0.x: CUPS Software Users Manual 
-	<LI>CUPS-SVD-1.0.x: CUPS Software Version Description 
+	<LI>CUPS-CMP-1.1: CUPS Configuration Management Plan 
+	<LI>CUPS-IDD-1.1: CUPS System Interface Design Description 
+	<LI>CUPS-SAM-1.1.x: CUPS Software Administrators Manual 
+	<LI>CUPS-SDD-1.1: CUPS Software Design Description 
+	<LI>CUPS-SPM-1.1: CUPS Software Programming Manual
+	<LI>CUPS-SSR-1.1: CUPS Software Security Report 
+	<LI>CUPS-STP-1.1: CUPS Software Test Plan 
+	<LI>CUPS-SUM-1.1.x: CUPS Software Users Manual 
+	<LI>CUPS-SVD-1.1.x: CUPS Software Version Description 
 </UL>
 
 <H2>Other Documents</H2>
@@ -173,7 +173,7 @@ the major, minor, and patch release numbers:
 <UL>
 <PRE>
 major.minor.patch
-1.0.0
+1.1.0
 </PRE>
 </UL>
 
@@ -183,7 +183,7 @@ the build number:
 <UL>
 <PRE>
 major.minor.patchbbuild
-1.0.0b1
+1.1.0b1
 </PRE>
 </UL>
 
@@ -206,13 +206,13 @@ be incremented and the minor and patch release numbers reset to 0:
 
 <UL>
 <PRE>
-1.0.0b1    First beta release
-1.0.0b2    Second beta release
-1.0.0      First production release
-1.0.1b1    First beta of 1.0.1
-1.0.1      Production release of 1.0.1
-1.1.0b1    First beta of 1.1.0
-1.1.0      Production release of 1.1.0
+1.1.0b1    First beta release
+1.1.0b2    Second beta release
+1.1.0      First production release
+1.1.1b1    First beta of 1.1.1
+1.1.1      Production release of 1.1.1
+1.1.1b1    First beta of 1.1.1
+1.1.1      Production release of 1.1.1
 2.0.0b1    First beta of 2.0.0
 2.0.0      Production release of 2.0.0
 </PRE>
@@ -227,7 +227,7 @@ to performing a full build to ensure that source files are recompiled.
 <H2>Testing</H2>
 
 Software testing shall be conducted according to the CUPS Software Test
-Plan, CUPS-STP-1.0. Failed tests cause STRs to be generated to correct
+Plan, CUPS-STP-1.1. Failed tests cause STRs to be generated to correct
 the problems found.
 
 <H2>Release</H2>
@@ -334,12 +334,12 @@ extension of ".h".
 The top of each source file shall contain a header giving the name of the
 file, the purpose or nature of the source file, the copyright and licensing
 notice, and the functions contained in the file.  The file name and revision
-information is provided by the CVS "$Id: cmp.shtml,v 1.5 2000/01/04 13:45:38 mike Exp $" tag:
+information is provided by the CVS "$Id: cmp.shtml,v 1.6 2000/02/18 17:48:05 mike Exp $" tag:
 
 <UL>
 <PRE>
 /*
- * "$Id: cmp.shtml,v 1.5 2000/01/04 13:45:38 mike Exp $"
+ * "$Id: cmp.shtml,v 1.6 2000/02/18 17:48:05 mike Exp $"
  *
  *   Description of file contents.
  *
@@ -355,7 +355,7 @@ information is provided by the CVS "$Id: cmp.shtml,v 1.5 2000/01/04 13:45:38 mik
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -372,14 +372,14 @@ information is provided by the CVS "$Id: cmp.shtml,v 1.5 2000/01/04 13:45:38 mik
 </UL>
 
 The bottom of each source file shall contain a trailer giving the name
-of the file using the CVS "$Id: cmp.shtml,v 1.5 2000/01/04 13:45:38 mike Exp $" tag. The primary purpose of this is to
+of the file using the CVS "$Id: cmp.shtml,v 1.6 2000/02/18 17:48:05 mike Exp $" tag. The primary purpose of this is to
 mark the end of a source file; if the trailer is missing it is possible
 that code has been lost near the end of the file:
 
 <UL>
 <PRE>
 /*
- * End of "$Id: cmp.shtml,v 1.5 2000/01/04 13:45:38 mike Exp $".
+ * End of "$Id: cmp.shtml,v 1.6 2000/02/18 17:48:05 mike Exp $".
  */
 </PRE>
 </UL>
@@ -411,8 +411,8 @@ does, the possible input limits (if any), and the possible output values
  * Notes: none.
  */
 
-static float     /* O - Inverse power value, 0.0 &lt;= y &lt;= 1.0 */
-do_this(float x) /* I - Power value (0.0 &lt;= x &lt;= 1.0) */
+static float     /* O - Inverse power value, 0.0 &lt;= y &lt;= 1.1 */
+do_this(float x) /* I - Power value (0.0 &lt;= x &lt;= 1.1) */
 {
  ...
  return (y);

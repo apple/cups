@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
-	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SDD-1.0">
+	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2000, All Rights Reserved">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SDD-1.1">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Design Description</TITLE>
 </HEAD>
@@ -13,7 +13,7 @@
 
 This software design description document provides detailed information 
 on the architecture and coding of the Common UNIX Printing System 
-(&quot;CUPS&quot;) Version 1.0.
+(&quot;CUPS&quot;) Version 1.1.
 
 <H2>System Overview</H2>
 
@@ -59,15 +59,15 @@ following sections:
 The following CUPS documentation is referenced by this document:
 
 <UL>
-	<LI>CUPS-CMP-1.0: CUPS Configuration Management Plan 
-	<LI>CUPS-IDD-1.0: CUPS System Interface Design Description 
-	<LI>CUPS-SAM-1.0.x: CUPS Software Administrators Manual 
-	<LI>CUPS-SDD-1.0: CUPS Software Design Description 
-	<LI>CUPS-SPM-1.0: CUPS Software Programming Manual
-	<LI>CUPS-SSR-1.0: CUPS Software Security Report 
-	<LI>CUPS-STP-1.0: CUPS Software Test Plan 
-	<LI>CUPS-SUM-1.0.x: CUPS Software Users Manual 
-	<LI>CUPS-SVD-1.0.x: CUPS Software Version Description 
+	<LI>CUPS-CMP-1.1: CUPS Configuration Management Plan 
+	<LI>CUPS-IDD-1.1: CUPS System Interface Design Description 
+	<LI>CUPS-SAM-1.1.x: CUPS Software Administrators Manual 
+	<LI>CUPS-SDD-1.1: CUPS Software Design Description 
+	<LI>CUPS-SPM-1.1: CUPS Software Programming Manual
+	<LI>CUPS-SSR-1.1: CUPS Software Security Report 
+	<LI>CUPS-STP-1.1: CUPS Software Test Plan 
+	<LI>CUPS-SUM-1.1.x: CUPS Software Users Manual 
+	<LI>CUPS-SVD-1.1.x: CUPS Software Version Description 
 </UL>
 
 <H2>Other Documents</H2>
@@ -351,7 +351,7 @@ The texttops filter converts text files into PostScript.
 
 <H2>Scheduler</H2>
 
-The scheduler is a fully-functional HTTP/1.1 and IPP/1.0 server that
+The scheduler is a fully-functional HTTP/1.1 and IPP/1.1 server that
 manages the printers, classes, and jobs in the system.  It also handles
 a simple broadcast-based directory service so that remote print queues
 and classes can be accessed transparently from the local system.

@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.20 2000/02/01 21:00:24 mike Exp $"
+ * "$Id: cupsd.h,v 1.21 2000/02/18 17:48:07 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -90,8 +90,9 @@
 #  define DEFAULT_LANGUAGE	getenv("LANG")
 					/* Default language encoding */
 #endif /* !WIN32 */
-#define DEFAULT_CHARSET		"iso-8859-1"
+#define DEFAULT_CHARSET		"utf-8"
 					/* Default charset */
+
 
 /*
  * Global variable macros...
@@ -147,5 +148,5 @@ extern void	LoadDevices(const char *d);
 extern void	LoadPPDs(const char *d);
 
 /*
- * End of "$Id: cupsd.h,v 1.20 2000/02/01 21:00:24 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.21 2000/02/18 17:48:07 mike Exp $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.9 2000/02/08 20:38:43 mike Exp $"
+# "$Id: Makefile,v 1.10 2000/02/18 17:48:04 mike Exp $"
 #
 #   CGI makefile for the Common UNIX Printing System (CUPS).
 #
@@ -24,7 +24,7 @@
 
 include ../Makedefs
 
-TARGETS	=	libcgi.a admin.cgi classes.cgi jobs.cgi printers.cgi
+TARGETS	=	admin.cgi classes.cgi jobs.cgi printers.cgi
 LIBOBJS	=	abort.o email.o html.o ipp-var.o template.o var.o
 OBJS	=	$(LIBOBJS) admin.o classes.o jobs.o printers.o
 
@@ -41,7 +41,7 @@ all:	$(TARGETS)
 #
 
 clean:
-	rm -f $(OBJS) $(TARGETS)
+	rm -f $(OBJS) libcgi.a $(TARGETS)
 
 
 #
@@ -50,7 +50,7 @@ clean:
 
 install:
 	-$(MKDIR) $(SERVERBIN)/cgi-bin
-	$(CP)  $(SERVERBIN)/cgi-bin
+	$(CP) $(TARGETS) $(SERVERBIN)/cgi-bin
 
 
 #
@@ -113,5 +113,5 @@ printers.o:	cgi.h ipp-var.h ../cups/cups.h ../cups/ipp.h ../cups/language.h
 $(OBJS):	../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.9 2000/02/08 20:38:43 mike Exp $".
+# End of "$Id: Makefile,v 1.10 2000/02/18 17:48:04 mike Exp $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.24 2000/01/04 13:45:34 mike Exp $"
+ * "$Id: http.h,v 1.25 2000/02/18 17:48:05 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -46,6 +46,8 @@
 #    include <netinet/ip.h>
 #    include <netinet/tcp.h>
 #  endif /* WIN32 || __EMX__ */
+
+#  include "md5.h"
 
 
 /*
@@ -122,6 +124,21 @@ typedef enum
   HTTP_ENCODE_LENGTH,		/* Data is sent with Content-Length */
   HTTP_ENCODE_CHUNKED		/* Data is chunked */
 } http_encoding_t;
+
+
+/*
+ * HTTP authentication types...
+ */
+
+typedef enum
+{
+  HTTP_AUTH_NONE,		/* No authentication in use */
+  HTTP_AUTH_BASIC,		/* Basic authentication in use */
+  HTTP_AUTH_MD5,		/* Digest authentication in use */
+  HTTP_AUTH_MD5_SESS,		/* MD5-session authentication in use */
+  HTTP_AUTH_MD5_INT,		/* Digest authentication in use for body */
+  HTTP_AUTH_MD5_SESS_INT	/* MD5-session authentication in use for body */
+} http_auth_t;
 
 
 /*
@@ -238,6 +255,11 @@ typedef struct
   int			used;		/* Number of bytes used in buffer */
   char			buffer[HTTP_MAX_BUFFER];
 					/* Buffer for messages */
+  int			auth_type;	/* Authentication in use */
+  md5_state_t		md5_state;	/* MD5 state */
+  char			nonce[HTTP_MAX_VALUE];
+					/* Nonce value */
+  int			nonce_count;	/* Nonce count */
 } http_t;
 
 
@@ -289,5 +311,5 @@ extern int		httpGetLength(http_t *http);
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.24 2000/01/04 13:45:34 mike Exp $".
+ * End of "$Id: http.h,v 1.25 2000/02/18 17:48:05 mike Exp $".
  */

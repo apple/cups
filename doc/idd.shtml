@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
-	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-IDD-1.0">
+	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2000, All Rights Reserved">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-IDD-1.1">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Interface Design Description</TITLE>
 </HEAD>
@@ -13,7 +13,7 @@
 
 <P>This interface design description document provides detailed file
 formats, message formats, and program conventions for the Common UNIX
-Printing System ("CUPS") Version 1.0.
+Printing System ("CUPS") Version 1.1.
 
 <H2>System Overview</H2>
 
@@ -56,15 +56,15 @@ sections:
 <P>The following CUPS documentation is referenced by this document:
 
 <UL>
-	<LI>CUPS-CMP-1.0: CUPS Configuration Management Plan 
-	<LI>CUPS-IDD-1.0: CUPS System Interface Design Description 
-	<LI>CUPS-SAM-1.0.x: CUPS Software Administrators Manual 
-	<LI>CUPS-SDD-1.0: CUPS Software Design Description 
-	<LI>CUPS-SPM-1.0: CUPS Software Programming Manual
-	<LI>CUPS-SSR-1.0: CUPS Software Security Report 
-	<LI>CUPS-STP-1.0: CUPS Software Test Plan 
-	<LI>CUPS-SUM-1.0.x: CUPS Software Users Manual 
-	<LI>CUPS-SVD-1.0.x: CUPS Software Version Description 
+	<LI>CUPS-CMP-1.1: CUPS Configuration Management Plan 
+	<LI>CUPS-IDD-1.1: CUPS System Interface Design Description 
+	<LI>CUPS-SAM-1.1.x: CUPS Software Administrators Manual 
+	<LI>CUPS-SDD-1.1: CUPS Software Design Description 
+	<LI>CUPS-SPM-1.1: CUPS Software Programming Manual
+	<LI>CUPS-SSR-1.1: CUPS Software Security Report 
+	<LI>CUPS-STP-1.1: CUPS Software Test Plan 
+	<LI>CUPS-SUM-1.1.x: CUPS Software Users Manual 
+	<LI>CUPS-SVD-1.1.x: CUPS Software Version Description 
 </UL>
 
 <H2>Other Documents</H2>
@@ -231,7 +231,7 @@ the CMY transformation.
 <H4>cupsVersion</H4>
 
 <P>This required attribute describes which version of the CUPS IDD was used
-for the PPD file extensions. Currently it must be the string "1.0".
+for the PPD file extensions. Currently it must be the string "1.1".
 
 <H2>Scheduler Configuration Files</H2>
 
