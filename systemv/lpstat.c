@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.1 1999/03/03 21:18:58 mike Exp $"
+ * "$Id: lpstat.c,v 1.2 1999/03/24 16:11:11 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -122,13 +122,11 @@ show_accepting(http_t *http,	/* I - HTTP connection to server */
 
   language = cupsLangDefault();
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, "attributes-charset",
-                      cupsLangEncoding(language));
-  attr->value_tag = IPP_TAG_CHARSET;
+  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+                      "attributes-charset", cupsLangEncoding(language));
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, "attributes-natural-language",
-                      language->language);
-  attr->value_tag = IPP_TAG_LANGUAGE;
+  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                      "attributes-natural-language", language->language);
 
  /*
   * Do the request and get back a response...
@@ -167,11 +165,11 @@ show_accepting(http_t *http,	/* I - HTTP connection to server */
       {
         if (strcmp(attr->name, "printer-name") == 0 &&
 	    attr->value_tag == IPP_TAG_NAME)
-	  printer = attr->values[0].string;
+	  printer = attr->values[0].string.text;
 
         if (strcmp(attr->name, "printer-state-message") == 0 &&
 	    attr->value_tag == IPP_TAG_TEXT)
-	  message = attr->values[0].string;
+	  message = attr->values[0].string.text;
 
         if (strcmp(attr->name, "printer-is-accepting-jobs") == 0 &&
 	    attr->value_tag == IPP_TAG_BOOLEAN)
@@ -319,13 +317,11 @@ show_default(http_t *http)	/* I - HTTP connection to server */
 
   language = cupsLangDefault();
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, "attributes-charset",
-                      cupsLangEncoding(language));
-  attr->value_tag = IPP_TAG_CHARSET;
+  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+                      "attributes-charset", cupsLangEncoding(language));
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, "attributes-natural-language",
-                      language->language);
-  attr->value_tag = IPP_TAG_LANGUAGE;
+  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                      "attributes-natural-language", language->language);
 
  /*
   * Do the request and get back a response...
@@ -333,9 +329,8 @@ show_default(http_t *http)	/* I - HTTP connection to server */
 
   if ((response = do_request(http, request, "/printers/")) != NULL)
   {
-    if ((attr = ippFindAttribute(response, "printer-name")) != NULL &&
-        attr->value_tag == IPP_TAG_NAME)
-      printf("system default destination: %s\n", attr->values[0].string);
+    if ((attr = ippFindAttribute(response, "printer-name", IPP_TAG_NAME)) != NULL)
+      printf("system default destination: %s\n", attr->values[0].string.text);
 
     ippDelete(response);
   }
@@ -381,13 +376,11 @@ show_devices(http_t *http,	/* I - HTTP connection to server */
 
   language = cupsLangDefault();
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, "attributes-charset",
-                      cupsLangEncoding(language));
-  attr->value_tag = IPP_TAG_CHARSET;
+  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+                      "attributes-charset", cupsLangEncoding(language));
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, "attributes-natural-language",
-                      language->language);
-  attr->value_tag = IPP_TAG_LANGUAGE;
+  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                      "attributes-natural-language", language->language);
 
  /*
   * Do the request and get back a response...
@@ -425,11 +418,11 @@ show_devices(http_t *http,	/* I - HTTP connection to server */
       {
         if (strcmp(attr->name, "printer-name") == 0 &&
 	    attr->value_tag == IPP_TAG_NAME)
-	  printer = attr->values[0].string;
+	  printer = attr->values[0].string.text;
 
         if (strcmp(attr->name, "printer-device-uri") == 0 &&
 	    attr->value_tag == IPP_TAG_URI)
-	  device = attr->values[0].string;
+	  device = attr->values[0].string.text;
 
         attr = attr->next;
       }
@@ -558,17 +551,14 @@ show_jobs(http_t *http,		/* I - HTTP connection to server */
 
   language = cupsLangDefault();
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, "attributes-charset",
-                      cupsLangEncoding(language));
-  attr->value_tag = IPP_TAG_CHARSET;
+  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+                      "attributes-charset", cupsLangEncoding(language));
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, "attributes-natural-language",
-                      language->language);
-  attr->value_tag = IPP_TAG_LANGUAGE;
+  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                      "attributes-natural-language", language->language);
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, "job-uri",
+  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
                       "http://localhost/jobs/");
-  attr->value_tag = IPP_TAG_URI;
 
  /*
   * Do the request and get back a response...
@@ -613,12 +603,12 @@ show_jobs(http_t *http,		/* I - HTTP connection to server */
 
         if (strcmp(attr->name, "job-printer-uri") == 0 &&
 	    attr->value_tag == IPP_TAG_URI)
-	  if ((dest = strrchr(attr->values[0].string, '/')) != NULL)
+	  if ((dest = strrchr(attr->values[0].string.text, '/')) != NULL)
 	    dest ++;
 
         if (strcmp(attr->name, "job-originating-user-name") == 0 &&
 	    attr->value_tag == IPP_TAG_NAME)
-	  username = attr->values[0].string;
+	  username = attr->values[0].string.text;
 
         attr = attr->next;
       }
@@ -786,13 +776,11 @@ show_printers(http_t *http,	/* I - HTTP connection to server */
 
   language = cupsLangDefault();
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, "attributes-charset",
-                      cupsLangEncoding(language));
-  attr->value_tag = IPP_TAG_CHARSET;
+  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+                      "attributes-charset", cupsLangEncoding(language));
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, "attributes-natural-language",
-                      language->language);
-  attr->value_tag = IPP_TAG_LANGUAGE;
+  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                      "attributes-natural-language", language->language);
 
  /*
   * Do the request and get back a response...
@@ -832,7 +820,7 @@ show_printers(http_t *http,	/* I - HTTP connection to server */
       {
         if (strcmp(attr->name, "printer-name") == 0 &&
 	    attr->value_tag == IPP_TAG_NAME)
-	  printer = attr->values[0].string;
+	  printer = attr->values[0].string.text;
 
         if (strcmp(attr->name, "printer-state") == 0 &&
 	    attr->value_tag == IPP_TAG_ENUM)
@@ -840,7 +828,7 @@ show_printers(http_t *http,	/* I - HTTP connection to server */
 
         if (strcmp(attr->name, "printer-state-message") == 0 &&
 	    attr->value_tag == IPP_TAG_TEXT)
-	  message = attr->values[0].string;
+	  message = attr->values[0].string.text;
 
         attr = attr->next;
       }
@@ -1131,5 +1119,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.1 1999/03/03 21:18:58 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.2 1999/03/24 16:11:11 mike Exp $".
  */

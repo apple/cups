@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.3 1999/03/03 21:18:58 mike Exp $"
+ * "$Id: lp.c,v 1.4 1999/03/24 16:11:10 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -165,6 +165,16 @@ main(int  argc,		/* I - Number of command-line arguments */
       return (1);
     }
 
+    if (cupsGetOption("job-name", num_options, options) == NULL)
+    {
+      if ((title = strrchr(argv[i], '/')) != NULL)
+        title ++;
+      else
+        title = argv[i];
+
+      num_options = cupsAddOption("job-name", title, num_options, &options);
+    }
+
     num_files ++;
     job_id = cupsPrintFile(dest, argv[i], num_options, options);
 
@@ -225,5 +235,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lp.c,v 1.3 1999/03/03 21:18:58 mike Exp $".
+ * End of "$Id: lp.c,v 1.4 1999/03/24 16:11:10 mike Exp $".
  */
