@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.26 2001/06/07 17:53:09 mike Exp $"
+ * "$Id: lpadmin.c,v 1.27 2001/07/20 21:12:58 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -33,6 +33,7 @@
  *   set_printer_file()          - Set the interface script or PPD file.
  *   set_printer_info()          - Set the printer description string.
  *   set_printer_location()      - Set the printer location string.
+ *   set_printer_model()         - Set the driver model file.
  *   set_printer_options()       - Set the printer options.
  *   validate_name()             - Make sure the printer name only contains
  *                                 letters, numbers, and the underscore...
@@ -69,6 +70,7 @@ static void	set_printer_device(http_t *, char *, char *);
 static void	set_printer_file(http_t *, char *, char *);
 static void	set_printer_info(http_t *, char *, char *);
 static void	set_printer_location(http_t *, char *, char *);
+static void	set_printer_model(http_t *, char *, char *);
 static void	set_printer_options(http_t *, char *, int, cups_option_t *);
 static int	validate_name(const char *);
 
@@ -85,9 +87,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   http_t	*http;		/* Connection to server */
   char		*printer,	/* Destination printer */
 		*pclass,	/* Printer class name */
-		*val,		/* Pointer to allow/deny value */
-		filename[1024];	/* Model filename */
-  const char	*datadir;	/* CUPS_DATADIR env variable */
+		*val;		/* Pointer to allow/deny value */
   int		num_options;	/* Number of options */
   cups_option_t	*options;	/* Options */
   http_encryption_t encryption;	/* Encryption? */
@@ -98,9 +98,6 @@ main(int  argc,			/* I - Number of command-line arguments */
   num_options = 0;
   options     = NULL;
   encryption  = cupsEncryption();
-
-  if ((datadir = getenv("CUPS_DATADIR")) == NULL)
-    datadir = CUPS_DATADIR;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -298,8 +295,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    }
 
 	    if (argv[i][2])
-	      snprintf(filename, sizeof(filename), "%s/model/%s", datadir,
-	               argv[i] + 2);
+	      set_printer_model(http, printer, argv[i] + 2);
 	    else
 	    {
 	      i ++;
@@ -310,11 +306,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		return (1);
 	      }
 
-	      snprintf(filename, sizeof(filename), "%s/model/%s", datadir,
-	               argv[i]);
+	      set_printer_model(http, printer, argv[i]);
 	    }
-
-            set_printer_file(http, printer, filename);
 	    break;
 
         case 'o' : /* Set option */
@@ -1558,6 +1551,70 @@ set_printer_location(http_t *http,	/* I - Server connection */
 
 
 /*
+ * 'set_printer_model()' - Set the driver model file.
+ */
+
+static void
+set_printer_model(http_t *http,		/* I - Server connection */
+                  char   *printer,	/* I - Printer */
+		  char   *model)	/* I - Driver model file */
+{
+  ipp_t		*request,		/* IPP Request */
+		*response;		/* IPP Response */
+  cups_lang_t	*language;		/* Default language */
+  char		uri[HTTP_MAX_URI];	/* URI for printer/class */
+
+
+ /*
+  * Build a CUPS_ADD_PRINTER request, which requires the following
+  * attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  *    printer-uri
+  *    ppd-name
+  */
+
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+
+  request = ippNew();
+
+  request->request.op.operation_id = CUPS_ADD_PRINTER;
+  request->request.op.request_id   = 1;
+
+  language = cupsLangDefault();
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
+               "printer-uri", NULL, uri);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+               "ppd-name", NULL, model);
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  if ((response = cupsDoRequest(http, request, "/admin/")) == NULL)
+    fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+            ippErrorString(cupsLastError()));
+  else
+  {
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+      fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+              ippErrorString(response->request.status.status_code));
+
+    ippDelete(response);
+  }
+}
+
+
+/*
  * 'set_printer_options()' - Set the printer options.
  */
 
@@ -1795,5 +1852,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.26 2001/06/07 17:53:09 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.27 2001/07/20 21:12:58 mike Exp $".
  */

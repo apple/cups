@@ -23,6 +23,9 @@ CHANGES IN CUPS V1.1.10
 	  CUPS server using a local printer driver or interface
 	  script.  Previously the job's document format was
 	  used, which was incorrect.
+	- The lpadmin command didn't use the ppd-name attribute
+	  with the -m option; this prevented the use of the
+	  "raw" model from the command-line.
 
 
 CHANGES IN CUPS V1.1.9-1
