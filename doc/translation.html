@@ -53,6 +53,13 @@ Copyright 2001-2002, All Rights Reserved<BR>
 <LI><A HREF="#5_1_3">5.1.3 Conditional Tests</A></LI>
 <LI><A HREF="#5_1_4">5.1.4 Template File List</A></LI>
 </UL>
+<LI><A HREF="#5_2">5.2 CGI Programs</A></LI>
+<UL>
+<LI><A HREF="#5_2_1">5.2.1 admin.cgi</A></LI>
+<LI><A HREF="#5_2_2">5.2.2 classes.cgi</A></LI>
+<LI><A HREF="#5_2_3">5.2.3 jobs.cgi</A></LI>
+<LI><A HREF="#5_2_4">5.2.4 printers.cgi</A></LI>
+</UL>
 </UL>
 <B><A HREF="#6">A Glossary</A></B>
 <UL>
@@ -354,6 +361,9 @@ jobs.cgi</CODE>, and <CODE>printers.cgi</CODE>) use these template file
 <DD>This template shows &quot;job cancelled&quot;.</DD>
 <DT>job-hold.tmpl</DT>
 <DD>This template shows &quot;job held&quot;.</DD>
+<DT>job-op.tmpl</DT>
+<DD>This is the template that is used to display an error message when
+ the job interface sees an undefined operation name.</DD>
 <DT>job-release.tmpl</DT>
 <DD>This template shows &quot;job released&quot;.</DD>
 <DT>job-restart.tmpl</DT>
@@ -387,6 +397,8 @@ jobs.cgi</CODE>, and <CODE>printers.cgi</CODE>) use these template file
 <DD>This template shows &quot;printer deleted&quot;.</DD>
 <DT>printer-modified.tmpl</DT>
 <DD>This template shows &quot;printer modified&quot;.</DD>
+<DT>printer-purge.tmpl</DT>
+<DD>This template shows &quot;printer has been purged of all jobs&quot;.</DD>
 <DT>printer-reject.tmpl</DT>
 <DD>This template shows &quot;printer now rejecting jobs&quot;.</DD>
 <DT>printer-start.tmpl</DT>
@@ -400,6 +412,147 @@ jobs.cgi</CODE>, and <CODE>printers.cgi</CODE>) use these template file
 <DT>trailer.tmpl</DT>
 <DD>This template is used as the standard trailer on all dynamic
  content.</DD>
+</DL>
+<H2><A NAME="5_2">5.2 CGI Programs</A></H2>
+<P>CUPS uses four CGI programs to manage the dynamic web interfaces:</P>
+<UL>
+<LI><CODE>admin.cgi</CODE></LI>
+<LI><CODE>classes.cgi</CODE></LI>
+<LI><CODE>jobs.cgi</CODE></LI>
+<LI><CODE>printers.cgi</CODE></LI>
+</UL>
+<H3><A NAME="5_2_1">5.2.1 admin.cgi</A></H3>
+<P>The <CODE>admin.cgi</CODE> program handles all of the printer and
+ class administration functions and is run for all direct accesses to
+ the<VAR> /admin</VAR> resource. For most operations it uses the <CODE>
+PRINTER_NAME</CODE> and <CODE>OP</CODE> form variables to specify the
+ action requested.</P>
+<P>The following <CODE>OP</CODE> values are supported:</P>
+<DL>
+<DT>accept-jobs</DT>
+<DD>Accepts jobs on the named destination.</DD>
+<DT>add-class</DT>
+<DD>Adds a new printer class. This operation also adds several other
+ form variables:
+<DL>
+<DT>MEMBER_URIS</DT>
+<DD>Sets the members of the class. Multiple <CODE>MEMBER_URIS</CODE>
+ values can be provided.</DD>
+<DT>PRINTER_INFO</DT>
+<DD>Sets the printer-info attribute for the printer class, which is
+ usually the printer description.</DD>
+<DT>PRINTER_LOCATION</DT>
+<DD>Sets the printer-location attribute for the printer class.</DD>
+</DL>
+</DD>
+<DT>add-printer</DT>
+<DD>Adds a new printer. This operation also adds several other form
+ variables:
+<DL>
+<DT>BAUDRATE</DT>
+<DD>Sets the baud rate for serial devices.</DD>
+<DT>BITS</DT>
+<DD>Sets the number of data bits for serial devices.</DD>
+<DT>DEVICE_URI</DT>
+<DD>Sets the device URI for the printer.</DD>
+<DT>FLOW</DT>
+<DD>Sets the flow control for serial devices.</DD>
+<DT>PARITY</DT>
+<DD>Sets the parity checking for serial devices.</DD>
+<DT>PPD_NAME</DT>
+<DD>Sets the driver name for the printer (&quot;raw&quot; for a raw queue.)</DD>
+<DT>PRINTER_INFO</DT>
+<DD>Sets the printer-info attribute for the printer, which is usually
+ the printer description.</DD>
+<DT>PRINTER_LOCATION</DT>
+<DD>Sets the printer-location attribute for the printer.</DD>
+</DL>
+</DD>
+<DT>config-printer</DT>
+<DD>Configures an existing printer. This operation uses form variables
+ of the same name as the options in the printer's PPD file.</DD>
+<DT>delete-class</DT>
+<DD>Deletes a printer class. The form variable <CODE>CONFIRM</CODE> may
+ be set to any value to bypass the confirmation page.</DD>
+<DT>delete-printer</DT>
+<DD>Deletes a printer. The form variable <CODE>CONFIRM</CODE> may be set
+ to any value to bypass the confirmation page.</DD>
+<DT>modify-class</DT>
+<DD>Modifies a printer class. See the add-class operation for a list of
+ form variables.</DD>
+<DT>modify-printer</DT>
+<DD>Modifies a printer. See the add-printer operation for a list of form
+ variables.</DD>
+<DT>purge-jobs</DT>
+<DD>Purges all jobs on the named destination.</DD>
+<DT>reject-jobs</DT>
+<DD>Rejects new jobs on the named destination.</DD>
+<DT>start-printer</DT>
+<DD>Starts the named destination.</DD>
+<DT>stop-printer</DT>
+<DD>Stops the named destination.</DD>
+</DL>
+<H3><A NAME="5_2_2">5.2.2 classes.cgi</A></H3>
+<P>The <CODE>classes.cgi</CODE> program is responsible for listing class
+ information, including jobs destined for that class. It is for all
+ direct accesses to the<VAR> /classes</VAR> resource and supports the
+ optional form variables <CODE>OP</CODE> and <CODE>WHICH_JOBS</CODE>. If
+ no form variables are supplied then the CGI lists all or a specific
+ class and the active jobs on each class.</P>
+<P>The following <CODE>WHICH_JOBS</CODE> values are supported:</P>
+<DL>
+<DT>completed</DT>
+<DD>Show only the completed jobs.</DD>
+<DT>not-completed</DT>
+<DD>Show only the active jobs.</DD>
+</DL>
+<P>The following <CODE>OP</CODE> values are supported:</P>
+<DL>
+<DT>print-test-page</DT>
+<DD>Print a PostScript test page.</DD>
+</DL>
+<H3><A NAME="5_2_3">5.2.3 jobs.cgi</A></H3>
+<P>The <CODE>jobs.cgi</CODE> program handles all of the job functions
+ and is run for all direct accesses to the<VAR> /jobs</VAR> resource.
+ For most operations it uses the <CODE>JOB_ID</CODE>, <CODE>OP</CODE>,
+ and <CODE>WHICH_JOBS</CODE> form variables to specify the action
+ requested.</P>
+<P>The following <CODE>WHICH_JOBS</CODE> values are supported:</P>
+<DL>
+<DT>completed</DT>
+<DD>Show only the completed jobs.</DD>
+<DT>not-completed</DT>
+<DD>Show only the active jobs.</DD>
+</DL>
+<P>The following <CODE>OP</CODE> values are supported:</P>
+<DL>
+<DT>job-cancel</DT>
+<DD>Cancels a job.</DD>
+<DT>job-hold</DT>
+<DD>Holds a job indefinitely.</DD>
+<DT>job-release</DT>
+<DD>Releases a job for printing.</DD>
+<DT>job-restart</DT>
+<DD>Restarts a stopped, cancelled, completed, or aborted print job.</DD>
+</DL>
+<H3><A NAME="5_2_4">5.2.4 printers.cgi</A></H3>
+<P>The <CODE>printers.cgi</CODE> program is responsible for listing
+ printer information, including jobs destined for that printer. It is
+ for all direct accesses to the<VAR> /printers</VAR> resource and
+ supports the optional form variables <CODE>OP</CODE> and <CODE>
+WHICH_JOBS</CODE>. If no form variables are supplied then the CGI lists
+ all or a specific printer and the active jobs on each printer.</P>
+<P>The following <CODE>WHICH_JOBS</CODE> values are supported:</P>
+<DL>
+<DT>completed</DT>
+<DD>Show only the completed jobs.</DD>
+<DT>not-completed</DT>
+<DD>Show only the active jobs.</DD>
+</DL>
+<P>The following <CODE>OP</CODE> values are supported:</P>
+<DL>
+<DT>print-test-page</DT>
+<DD>Print a PostScript test page.</DD>
 </DL>
 <H1 TYPE="A" VALUE="1"><A NAME="6">A Glossary</A></H1>
 <H2><A NAME="6_1">A.1 Terms</A></H2>
