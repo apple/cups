@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.61 2002/06/11 18:35:22 mike Exp $"
+ * "$Id: auth.c,v 1.62 2002/09/26 11:31:05 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -1432,20 +1432,20 @@ cups_crypt(const char *pw,	/* I - Password string */
     pwlen = strlen(pw);
 
     md5_init(&state);
-    md5_append(&state, pw, pwlen);
-    md5_append(&state, salt, salt_end - salt);
+    md5_append(&state, (md5_byte_t *)pw, pwlen);
+    md5_append(&state, (md5_byte_t *)salt, salt_end - salt);
 
     md5_init(&state2);
-    md5_append(&state2, pw, pwlen);
-    md5_append(&state2, salt + 3, salt_end - salt - 3);
-    md5_append(&state2, pw, pwlen);
+    md5_append(&state2, (md5_byte_t *)pw, pwlen);
+    md5_append(&state2, (md5_byte_t *)salt + 3, salt_end - salt - 3);
+    md5_append(&state2, (md5_byte_t *)pw, pwlen);
     md5_finish(&state2, digest);
 
     for (i = pwlen; i > 0; i -= 16)
       md5_append(&state, digest, i > 16 ? 16 : i);
 
     for (i = pwlen; i > 0; i >>= 1)
-      md5_append(&state, (i & 1) ? "" : pw, 1);
+      md5_append(&state, (md5_byte_t *)((i & 1) ? "" : pw), 1);
 
     md5_finish(&state, digest);
 
@@ -1454,20 +1454,20 @@ cups_crypt(const char *pw,	/* I - Password string */
       md5_init(&state);
 
       if (i & 1)
-        md5_append(&state, pw, pwlen);
+        md5_append(&state, (md5_byte_t *)pw, pwlen);
       else
         md5_append(&state, digest, 16);
 
       if (i % 3)
-        md5_append(&state, salt + 3, salt_end - salt - 3);
+        md5_append(&state, (md5_byte_t *)salt + 3, salt_end - salt - 3);
 
       if (i % 7)
-        md5_append(&state, pw, pwlen);
+        md5_append(&state, (md5_byte_t *)pw, pwlen);
 
       if (i & 1)
         md5_append(&state, digest, 16);
       else
-        md5_append(&state, pw, pwlen);
+        md5_append(&state, (md5_byte_t *)pw, pwlen);
 
       md5_finish(&state, digest);
     }
@@ -1623,5 +1623,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.61 2002/06/11 18:35:22 mike Exp $".
+ * End of "$Id: auth.c,v 1.62 2002/09/26 11:31:05 mike Exp $".
  */

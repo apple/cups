@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.74 2002/09/18 14:54:24 mike Exp $"
+ * "$Id: ipp.c,v 1.75 2002/09/26 11:31:04 mike Exp $"
  *
  *   Internet Printing Protocol object functions for the Common UNIX
  *   Printing System (CUPS).
@@ -1090,7 +1090,7 @@ ippRead(http_t *http,		/* I - HTTP data */
 	    case IPP_TAG_MIMETYPE :
                 value->string.text = calloc(n + 1, 1);
 
-	        if (ipp_read(http, value->string.text, n) < n)
+	        if (ipp_read(http, (unsigned char *)value->string.text, n) < n)
 		  return (IPP_ERROR);
 
 		DEBUG_printf(("ippRead: value = \'%s\'\n",
@@ -2063,5 +2063,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.74 2002/09/18 14:54:24 mike Exp $".
+ * End of "$Id: ipp.c,v 1.75 2002/09/26 11:31:04 mike Exp $".
  */
