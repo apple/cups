@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.71 2001/01/26 14:45:23 mike Exp $"
+dnl "$Id: configure.in,v 1.72 2001/01/26 15:01:59 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -288,7 +288,7 @@ dnl Check OS version and use appropriate format string for strftime...
 AC_MSG_CHECKING(for correct format string to use with strftime)
 
 case "$uname" in
-	IRIX* SunOS*)
+	IRIX* | SunOS*)
 		# IRIX and SunOS
 		AC_MSG_RESULT(NULL)
 		AC_DEFINE(CUPS_STRFTIME_FORMAT, NULL)
@@ -621,5 +621,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.71 2001/01/26 14:45:23 mike Exp $".
+dnl End of "$Id: configure.in,v 1.72 2001/01/26 15:01:59 mike Exp $".
 dnl
