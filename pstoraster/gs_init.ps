@@ -22,7 +22,7 @@
 % Ghostscript, as distributed by Aladdin Enterprises, does not require any
 % GNU software to build or run it.
 
-% $Id: gs_init.ps,v 1.5 2000/03/08 23:14:29 mike Exp $
+% $Id: gs_init.ps,v 1.6 2000/08/14 20:17:17 mike Exp $
 % Initialization file for the interpreter.
 % When this is run, systemdict is still writable.
 
@@ -84,7 +84,7 @@ true setpacking
 <1a> cvn { } def
 
 % Acquire the debugging flags.
-currentdict /DEBUG known   /DEBUG exch def
+/DEBUG true def
   /VMDEBUG
     DEBUG {{print mark
             systemdict /level2dict known
