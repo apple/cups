@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.69 2002/01/03 20:40:34 mike Exp $"
+ * "$Id: pstops.c,v 1.70 2002/01/22 00:30:05 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -794,9 +794,9 @@ check_range(int page)	/* I - Page number */
     * See if we only print even or odd pages...
     */
 
-    if (strcasecmp(PageSet, "even") == 0 && (page & 1))
+    if (strcasecmp(PageSet, "even") == 0 && ((page - 1) % (NUp << 1)) <  NUp)
       return (0);
-    if (strcasecmp(PageSet, "odd") == 0 && !(page & 1))
+    if (strcasecmp(PageSet, "odd")  == 0 && ((page - 1) % (NUp << 1)) >= NUp)
       return (0);
   }
 
@@ -1113,5 +1113,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.69 2002/01/03 20:40:34 mike Exp $".
+ * End of "$Id: pstops.c,v 1.70 2002/01/22 00:30:05 mike Exp $".
  */
