@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gdevps.c,v 1.2 2000/03/09 15:09:28 mike Exp $ */
+/*$Id: gdevps.c,v 1.3 2000/03/13 18:30:14 mike Exp $ */
 /* PostScript-writing driver */
 #include "math_.h"
 #include "memory_.h"
@@ -224,7 +224,6 @@ private const char *const psw_header[] =
 {
     "%%EndComments",
     "%%BeginProlog",
- "% This copyright applies to everything between here and the %%EndProlog:",
     0
 };
 
@@ -516,7 +515,6 @@ psw_beginpage(gx_device_vector * vdev)
 	else if (pdev->LanguageLevel == 1.5)
 	    pputs(s, "%%Extensions: CMYK\n");
 	psw_put_lines(s, psw_header);
-	pprints1(s, "%% %s\n", gs_copyright);
 	psw_put_lines(s, psw_prolog);
 	if (pdev->LanguageLevel < 1.5)
 	    psw_put_lines(s, psw_1_prolog);

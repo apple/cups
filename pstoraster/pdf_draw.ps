@@ -1,4 +1,5 @@
-%    Copyright (C) 1994, 1995, 1997, 1998 Aladdin Enterprises.  All rights reserved.
+% Copyright 1993-2000 by Easy Software Products.
+% Copyright 1994, 1995, 1997, 1998 Aladdin Enterprises.  All rights reserved.
 % 
 % This file is part of GNU Ghostscript.
 % 
@@ -21,7 +22,7 @@
 % Ghostscript, as distributed by Aladdin Enterprises, does not require any
 % GNU software to build or run it.
 
-% $Id: pdf_draw.ps,v 1.5 2000/03/13 16:20:01 mike Exp $
+% $Id: pdf_draw.ps,v 1.6 2000/03/13 18:30:14 mike Exp $
 % pdf_draw.ps
 % PDF drawing operations (graphics, text, and images).
 
@@ -303,10 +304,8 @@ end
     4 array astore
   }
   /Indexed {
-    aload pop 3 -1 roll resolvecolorspace 3 1 roll
-    oforce dup type /stringtype eq {
-      pop
-    } {
+    aload pop 3 -1 roll oforce resolvecolorspace 3 1 roll
+    oforce dup type /stringtype ne {
 		% The color lookup table is a stream.
 		% Get its contents.  Don't lose our place in PDFfile.
 		% Stack: /Indexed basespace hival lookup
@@ -321,7 +320,7 @@ end
 		% Stack: filepos /Indexed basespace hival table
 	5 -1 roll PDFfile exch setfileposition
     }
-    ifelse 4 array astore
+    if 4 array astore
   }
   /Pattern
    { dup type /nametype ne
