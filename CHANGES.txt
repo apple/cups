@@ -1,4 +1,4 @@
-CHANGES.txt - 12/07/2001
+CHANGES.txt - 12/10/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.13
@@ -24,6 +24,7 @@ CHANGES IN CUPS V1.1.13
 	- Now also map the sides attribute to the JCLDuplex
 	  option (if present) in PPD files.
 	- Updated pdftops to Xpdf 0.93a.
+	- Added support for MD5 passwords under Slackware.
 
 
 CHANGES IN CUPS V1.1.12

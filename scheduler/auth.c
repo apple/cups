@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.51 2001/11/26 00:32:11 mike Exp $"
+ * "$Id: auth.c,v 1.52 2001/12/10 17:31:28 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -42,8 +42,11 @@
  *   IsAuthorized()       - Check to see if the user is authorized...
  *   add_allow()          - Add an allow mask to the location.
  *   add_deny()           - Add a deny mask to the location.
+ *   cups_crypt()         - Encrypt the password using the DES or MD5
+ *                          algorithms, as needed.
  *   get_md5_passwd()     - Get an MD5 password.
  *   pam_func()           - PAM conversation function.
+ *   to64()               - Base64-encode an integer value...
  */
 
 /*
@@ -53,6 +56,7 @@
 #include "cupsd.h"
 #include <pwd.h>
 #include <grp.h>
+#include <cups/md5.h>
 #ifdef HAVE_SHADOW_H
 #  include <shadow.h>
 #endif /* HAVE_SHADOW_H */
@@ -73,11 +77,16 @@
 
 static authmask_t	*add_allow(location_t *loc);
 static authmask_t	*add_deny(location_t *loc);
+#if !HAVE_LIBPAM
+static char		*cups_crypt(const char *pw, const char *salt);
+#endif /* !HAVE_LIBPAM */
 static char		*get_md5_passwd(const char *username, const char *group,
 			                char passwd[33]);
 #if HAVE_LIBPAM
 static int		pam_func(int, const struct pam_message **,
 			         struct pam_response **, void *);
+#else
+static void		to64(char *s, unsigned long v, int n);
 #endif /* HAVE_LIBPAM */
 
 
@@ -913,24 +922,22 @@ IsAuthorized(client_t *con)	/* I - Connection */
       * OK, the password isn't blank, so compare with what came from the client...
       */
 
+      pass = cups_crypt(con->password, pw->pw_passwd);
+
       LogMessage(L_DEBUG2, "IsAuthorized: pw_passwd = %s, crypt = %s",
-		 pw->pw_passwd, crypt(con->password, pw->pw_passwd));
+		 pw->pw_passwd, pass);
 
-      pass = crypt(con->password, pw->pw_passwd);
-
-      if (pass == NULL ||
-	  strcmp(pw->pw_passwd, crypt(con->password, pw->pw_passwd)) != 0)
+      if (pass == NULL || strcmp(pw->pw_passwd, pass) != 0)
       {
 #  ifdef HAVE_SHADOW_H
 	if (spw != NULL)
 	{
+	  pass = cups_crypt(con->password, spw->sp_pwdp);
+
 	  LogMessage(L_DEBUG2, "IsAuthorized: sp_pwdp = %s, crypt = %s",
-		     spw->sp_pwdp, crypt(con->password, spw->sp_pwdp));
+		     spw->sp_pwdp, pass);
 
-	  pass = crypt(con->password, spw->sp_pwdp);
-
-	  if (pass == NULL ||
-              strcmp(spw->sp_pwdp, crypt(con->password, spw->sp_pwdp)) != 0)
+	  if (pass == NULL || strcmp(spw->sp_pwdp, pass) != 0)
 	    return (HTTP_UNAUTHORIZED);
 	}
 	else
@@ -1159,6 +1166,129 @@ add_deny(location_t *loc)	/* I - Location to add to */
 }
 
 
+#if !HAVE_LIBPAM
+/*
+ * 'cups_crypt()' - Encrypt the password using the DES or MD5 algorithms,
+ *                  as needed.
+ */
+
+static char *			/* O - Encrypted password */
+cups_crypt(const char *pw,	/* I - Password string */
+           const char *salt)	/* I - Salt (key) string */
+{
+  if (strncmp(salt, "$1$", 3) == 0)
+  {
+   /*
+    * Use MD5 passwords without the benefit of PAM; this is for
+    * Slackware Linux, and the algorithm was taken from the
+    * old shadow-19990827/lib/md5crypt.c source code... :(
+    */
+
+    int		i;		/* Looping var */
+    unsigned long n;		/* Output number */
+    int		pwlen;		/* Length of password string */
+    const char	*salt_end;	/* End of "salt" data for MD5 */
+    char	*ptr;		/* Pointer into result string */
+    md5_state_t state;		/* Primary MD5 state info */
+    md5_state_t state2;		/* Secondary MD5 state info */
+    md5_byte_t	digest[16];	/* MD5 digest result */
+    static char	result[120];	/* Final password string */
+
+
+   /*
+    * Get the salt data between dollar signs, e.g. $1$saltdata$md5.
+    * Get a maximum of 8 characters of salt data after $1$...
+    */
+
+    for (salt_end = salt + 3; *salt_end && (salt_end - salt) < 11; salt_end ++)
+      if (*salt_end == '$')
+        break;
+
+   /*
+    * Compute the MD5 sum we need...
+    */
+
+    pwlen = strlen(pw);
+
+    md5_init(&state);
+    md5_append(&state, pw, pwlen);
+    md5_append(&state, salt, salt_end - salt);
+
+    md5_init(&state2);
+    md5_append(&state2, pw, pwlen);
+    md5_append(&state2, salt + 3, salt_end - salt - 3);
+    md5_append(&state2, pw, pwlen);
+    md5_finish(&state, digest);
+
+    for (i = pwlen; i > 0; i -= 16)
+      md5_append(&state, digest, i > 16 ? 16 : i);
+
+    for (i = pwlen; i > 0; i >>= 1)
+      md5_append(&state, (i & 1) ? "" : pw, 1);
+
+    md5_finish(&state, digest);
+
+    for (i = 0; i < 1000; i ++)
+    {
+      md5_init(&state);
+
+      if (i & 1)
+        md5_append(&state, pw, pwlen);
+      else
+        md5_append(&state, digest, 16);
+
+      if (i % 3)
+        md5_append(&state, salt + 3, salt_end - salt - 3);
+
+      if (i % 7)
+        md5_append(&state, pw, pwlen);
+
+      if (i & 1)
+        md5_append(&state, digest, 16);
+      else
+        md5_append(&state, pw, pwlen);
+
+      md5_finish(&state, digest);
+    }
+
+   /*
+    * Copy the final sum to the result string and return...
+    */
+
+    memcpy(result, salt, salt_end - salt);
+    ptr = result + (salt_end - salt);
+    *ptr++ = '$';
+
+    for (i = 0; i < 5; i ++, ptr += 4)
+    {
+      n = (((digest[i] << 8) | digest[i + 6]) << 8);
+
+      if (i < 4)
+        n |= digest[i + 12];
+      else
+        n |= digest[5];
+
+      to64(ptr, n, 4);
+    }
+
+    to64(ptr, digest[11], 2);
+    ptr += 2;
+    *ptr = '\0';
+
+    return (result);
+  }
+  else
+  {
+   /*
+    * Use the standard crypt() function...
+    */
+
+    return (crypt(pw, salt));
+  }
+}
+#endif /* !HAVE_LIBPAM */
+
+
 /*
  * 'get_md5_passwd()' - Get an MD5 password.
  */
@@ -1294,9 +1424,29 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
   return (PAM_SUCCESS);
 }
+#else
+
+
+/*
+ * 'to64()' - Base64-encode an integer value...
+ */
+
+static void
+to64(char          *s,	/* O - Output string */
+     unsigned long v,	/* I - Value to encode */
+     int           n)	/* I - Number of digits */
+{
+  const char	*itoa64 = "./0123456789"
+                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                          "abcdefghijklmnopqrstuvwxyz";
+
+
+  for (; n > 0; n --, v >>= 6)
+    *s++ = itoa64[v & 0x3f];
+}
 #endif /* HAVE_LIBPAM */
 
 
 /*
- * End of "$Id: auth.c,v 1.51 2001/11/26 00:32:11 mike Exp $".
+ * End of "$Id: auth.c,v 1.52 2001/12/10 17:31:28 mike Exp $".
  */
