@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.25 2000/09/18 16:24:10 mike Exp $"
+ * "$Id: lpstat.c,v 1.26 2000/09/18 16:28:46 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -905,7 +905,7 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
 
         if (strcmp(attr->name, "printer-uri-supported") == 0 &&
 	    attr->value_tag == IPP_TAG_URI)
-	  printer = attr->values[0].string.text;
+	  uri = attr->values[0].string.text;
 
         if (strcmp(attr->name, "device-uri") == 0 &&
 	    attr->value_tag == IPP_TAG_URI)
@@ -1013,7 +1013,7 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
 	  }
 #else
         if (device == NULL)
-          printf("device for %s: /dev/null\n", printer);
+          printf("device for %s: %s\n", printer, uri);
         else if (strncmp(device, "file:", 5) == 0)
           printf("device for %s: %s\n", printer, device + 5);
         else
@@ -1023,7 +1023,7 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
 	  if (strcasecmp(printer, dests[i].name) == 0 && dests[i].instance)
 	  {
             if (device == NULL)
-              printf("device for %s/%s: /dev/null\n", printer, dests[i].instance);
+              printf("device for %s/%s: %s\n", printer, dests[i].instance, uri);
             else if (strncmp(device, "file:", 5) == 0)
               printf("device for %s/%s: %s\n", printer, dests[i].instance, device + 5);
             else
@@ -1679,5 +1679,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.25 2000/09/18 16:24:10 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.26 2000/09/18 16:28:46 mike Exp $".
  */
