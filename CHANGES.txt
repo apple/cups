@@ -34,6 +34,9 @@ CHANGES IN CUPS V1.1.6
 	- The HP and EPSON sample drivers now correctly catch
 	  signals and eject the current page when a job is
 	  cancelled.
+	- Fixed bug in CGI code - did not ignore control
+	  characters (e.g. newlines) in form data.  This caused
+	  sporatic web interface problems.
 
 
 CHANGES IN CUPS V1.1.5-2

@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.27 2001/01/03 17:44:40 mike Exp $"
+ * "$Id: serial.c,v 1.28 2001/01/12 19:29:16 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -532,7 +532,7 @@ list_devices(void)
         */
 
 	for (n = 0; n < 6; n ++)
-	  printf("serial serial:/dev/ttyd%d?baud=19200 \"Unknown\" \"CDSIO Board %d Serial Port #%d\"\n",
+	  printf("serial serial:/dev/ttyd%d?baud=38400 \"Unknown\" \"CDSIO Board %d Serial Port #%d\"\n",
         	 n + 5 + 8 * inv->inv_controller, inv->inv_controller, n + 1);
       }
       else if (inv->inv_type == INV_EPC_SERIAL)
@@ -547,7 +547,7 @@ list_devices(void)
           i = 41 + 4 * (int)inv->inv_controller;
 
 	for (n = 0; n < (int)inv->inv_state; n ++)
-	  printf("serial serial:/dev/ttyd%d?baud=19200 \"Unknown\" \"EPC Serial Port %d, Ebus slot %d\"\n",
+	  printf("serial serial:/dev/ttyd%d?baud=38400 \"Unknown\" \"EPC Serial Port %d, Ebus slot %d\"\n",
         	 n + i, n + 1, (int)inv->inv_controller);
       }
       else if (inv->inv_state > 1)
@@ -557,7 +557,7 @@ list_devices(void)
         */
 
 	for (n = 0; n < (int)inv->inv_state; n ++)
-	  printf("serial serial:/dev/ttyd%d?baud=19200 \"Unknown\" \"Onboard Serial Port %d\"\n",
+	  printf("serial serial:/dev/ttyd%d?baud=38400 \"Unknown\" \"Onboard Serial Port %d\"\n",
         	 n + (int)inv->inv_unit + 1, n + (int)inv->inv_unit + 1);
       }
       else
@@ -842,5 +842,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.27 2001/01/03 17:44:40 mike Exp $".
+ * End of "$Id: serial.c,v 1.28 2001/01/12 19:29:16 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: var.c,v 1.17 2000/12/04 16:10:32 mike Exp $"
+ * "$Id: var.c,v 1.18 2001/01/12 19:29:17 mike Exp $"
  *
  *   CGI form variable and array functions.
  *
@@ -39,6 +39,8 @@
 
 /*#define DEBUG*/
 #include "cgi.h"
+#include <errno.h>
+#include <syslog.h>
 
 
 /*
@@ -489,10 +491,11 @@ cgi_initialize_post(void)
 
   for (tbytes = 0; tbytes < length; tbytes += nbytes)
     if ((nbytes = read(0, data + tbytes, length - tbytes)) < 0)
-    {
-      free(data);
-      return (0);
-    }
+      if (errno != EAGAIN)
+      {
+        free(data);
+        return (0);
+      }
 
   data[length] = '\0';
 
@@ -543,11 +546,11 @@ cgi_initialize_string(const char *data)	/* I - Form data string */
     * Get the variable name...
     */
 
-    for (s = name; *data != '\0'; data ++, s ++)
+    for (s = name; *data != '\0'; data ++)
       if (*data == '=')
         break;
-      else
-        *s = *data;
+      else if (*data >= ' ')
+        *s++ = *data;
 
     *s = '\0';
     if (*data == '=')
@@ -590,7 +593,10 @@ cgi_initialize_string(const char *data)	/* I - Form data string */
             break;
 
 	default :	/* Other characters come straight through */
-            *s = *data;
+	    if (*data < ' ')
+	      s --;
+	    else
+              *s = *data;
             break;
       }
 
@@ -600,7 +606,9 @@ cgi_initialize_string(const char *data)	/* I - Form data string */
     * Remove trailing whitespace...
     */
 
-    s --;
+    if (s > value)
+      s --;
+
     while (s >= value && *s == ' ')
       *s-- = '\0';
 
@@ -645,13 +653,14 @@ cgi_sort_variables(void)
         (int (*)(const void *, const void *))cgi_compare_variables);
 
 #ifdef DEBUG
-  puts("New variable list is:");
+  puts("Sorted variable list is:");
   for (i = 0; i < form_count; i ++)
-    printf("%s = %s\n", form_vars[i].name, form_vars[i].value);
+    printf("%d: %s (%d) = \"%s\" ...\n", i, form_vars[i].name,
+           form_vars[i].nvalues, form_vars[i].values[0]);
 #endif /* DEBUG */
 }
 
 
 /*
- * End of "$Id: var.c,v 1.17 2000/12/04 16:10:32 mike Exp $".
+ * End of "$Id: var.c,v 1.18 2001/01/12 19:29:17 mike Exp $".
  */
