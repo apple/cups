@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.115 2002/01/30 16:13:38 mike Exp $"
+ * "$Id: printers.c,v 1.116 2002/01/31 20:48:43 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -60,6 +60,7 @@
 
 static void	write_printcap(void);
 #ifdef __sgi
+static void	write_irix_config(printer_t *p);
 static void	write_irix_state(printer_t *p);
 #endif /* __sgi */
 
@@ -933,9 +934,6 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 		  "separate-documents-uncollated-copies",
 		  "separate-documents-collated-copies"
 		};
-#ifdef __sgi
-  FILE		*fp;		/* Interface script file */
-#endif /* __sgi */
 
 
   DEBUG_printf(("SetPrinterAttrs: entering name = %s, type = %x\n", p->name,
@@ -1806,10 +1804,9 @@ write_printcap(void)
 static void
 write_irix_config(printer_t *p)	/* I - Printer to update */
 {
-  char	filename[1024];		/* Interface script filename */
-  FILE	*fp;			/* Interface script file */
-  int	tag;			/* Status tag value */
-
+  char		filename[1024];	/* Interface script filename */
+  FILE		*fp;		/* Interface script file */
+  ipp_attribute_t *attr;	/* Attribute value */
 
 
  /*
@@ -1921,6 +1918,7 @@ write_irix_config(printer_t *p)	/* I - Printer to update */
     chmod(filename, 0664);
     chown(filename, User, Group);
   }
+}
 
 
 /*
@@ -2052,5 +2050,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.115 2002/01/30 16:13:38 mike Exp $".
+ * End of "$Id: printers.c,v 1.116 2002/01/31 20:48:43 mike Exp $".
  */
