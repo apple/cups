@@ -1,5 +1,5 @@
 /*
- * "$Id: var.c,v 1.19 2001/01/22 15:03:22 mike Exp $"
+ * "$Id: var.c,v 1.20 2001/02/15 13:34:14 mike Exp $"
  *
  *   CGI form variable and array functions.
  *
@@ -475,7 +475,7 @@ cgi_initialize_post(void)
   */
 
   content_length = getenv("CONTENT_LENGTH");
-  if (content_length == NULL || atoi(content_length) == 0)
+  if (content_length == NULL || atoi(content_length) <= 0)
     return (0);
 
  /*
@@ -484,6 +484,9 @@ cgi_initialize_post(void)
 
   length = atoi(content_length);
   data   = malloc(length + 1);
+
+  if (data == NULL)
+    return (0);
 
  /*
   * Read the data into the buffer...
@@ -549,7 +552,7 @@ cgi_initialize_string(const char *data)	/* I - Form data string */
     for (s = name; *data != '\0'; data ++)
       if (*data == '=')
         break;
-      else if (*data >= ' ')
+      else if (*data >= ' ' && s < (name + sizeof(name) - 1))
         *s++ = *data;
 
     *s = '\0';
@@ -562,41 +565,44 @@ cgi_initialize_string(const char *data)	/* I - Form data string */
     * Read the variable value...
     */
 
-    for (s = value, done = 0; !done && *data != '\0'; data ++, s ++)
+    for (s = value, done = 0; !done && *data != '\0'; data ++)
       switch (*data)
       {
 	case '&' :	/* End of data... */
             done = 1;
-            s --;
             break;
 
 	case '+' :	/* Escaped space character */
-            *s = ' ';
+            if (s < (value + sizeof(value) - 1))
+              *s++ = ' ';
             break;
 
 	case '%' :	/* Escaped control character */
 	   /*
-	    * Read the hex code from stdin...
+	    * Read the hex code...
 	    */
 
-            data ++;
-            ch = *data - '0';
-            if (ch > 9)
-              ch -= 7;
-            *s = ch << 4;
+            if (s < (value + sizeof(value) - 1))
+	    {
+              data ++;
+              ch = *data - '0';
+              if (ch > 9)
+        	ch -= 7;
+              *s = ch << 4;
 
-            data ++;
-            ch = *data - '0';
-            if (ch > 9)
-              ch -= 7;
-            *s |= ch;
+              data ++;
+              ch = *data - '0';
+              if (ch > 9)
+        	ch -= 7;
+              *s++ |= ch;
+            }
+	    else
+	      data += 2;
             break;
 
 	default :	/* Other characters come straight through */
-	    if (*data < ' ')
-	      s --;
-	    else
-              *s = *data;
+	    if (*data >= ' ' && s < (value + sizeof(value) - 1))
+              *s++ = *data;
             break;
       }
 
@@ -662,5 +668,5 @@ cgi_sort_variables(void)
 
 
 /*
- * End of "$Id: var.c,v 1.19 2001/01/22 15:03:22 mike Exp $".
+ * End of "$Id: var.c,v 1.20 2001/02/15 13:34:14 mike Exp $".
  */

@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.13 2000/07/07 17:02:37 mike Exp $"
+# "$Id: Makefile,v 1.14 2001/02/15 13:34:14 mike Exp $"
 #
 #   CGI makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-1999 by Easy Software Products.
+#   Copyright 1997-2001 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -24,8 +24,9 @@
 
 include ../Makedefs
 
-TARGETS	=	admin.cgi classes.cgi jobs.cgi printers.cgi
-LIBOBJS	=	abort.o email.o html.o ipp-var.o template.o var.o
+CGIS	=	admin.cgi classes.cgi jobs.cgi printers.cgi
+TARGETS	=	libcgi.a $(CGIS)
+LIBOBJS	=	html.o ipp-var.o template.o var.o
 OBJS	=	$(LIBOBJS) admin.o classes.o jobs.o printers.o
 
 
@@ -41,7 +42,7 @@ all:	$(TARGETS)
 #
 
 clean:
-	$(RM) $(OBJS) libcgi.a $(TARGETS)
+	$(RM) $(OBJS) $(TARGETS)
 
 
 #
@@ -49,10 +50,10 @@ clean:
 #
 
 install:
-	-$(MKDIR) $(SERVERBIN)/cgi-bin
-	$(CHMOD) ugo+rx $(SERVERBIN)
-	$(CHMOD) ugo+rx $(SERVERBIN)/cgi-bin
-	$(INSTALL_BIN) $(TARGETS) $(SERVERBIN)/cgi-bin
+	-$(MKDIR) $(SERVERROOT)/cgi-bin
+	$(CHMOD) ugo+rx $(SERVERROOT)
+	$(CHMOD) ugo+rx $(SERVERROOT)/cgi-bin
+	$(INSTALL_BIN) $(CGIS) $(SERVERROOT)/cgi-bin
 
 
 #
@@ -114,6 +115,7 @@ printers.o:	cgi.h ipp-var.h ../cups/cups.h ../cups/ipp.h ../cups/language.h
 
 $(OBJS):	../Makedefs
 
+
 #
-# End of "$Id: Makefile,v 1.13 2000/07/07 17:02:37 mike Exp $".
+# End of "$Id: Makefile,v 1.14 2001/02/15 13:34:14 mike Exp $".
 #

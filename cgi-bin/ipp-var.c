@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.20 2001/01/26 14:21:56 mike Exp $"
+ * "$Id: ipp-var.c,v 1.21 2001/02/15 13:34:14 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -175,13 +175,14 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
       * Copy values...
       */
 
-      value[0] = '\0';
-      valptr   = value;
+      value[0]                 = '\0';	/* Initially an empty string */
+      value[sizeof(value) - 1] = '\0';	/* In case string gets full */
+      valptr                   = value; /* Start at the beginning */
 
       for (i = 0; i < attr->num_values; i ++)
       {
 	if (i)
-	  strcat(valptr, ",");
+	  strncat(valptr, ",", sizeof(value) - (valptr - value));
 
 	valptr += strlen(valptr);
 
@@ -192,31 +193,35 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 	      if (strncmp(name, "time_at_", 8) == 0)
 	      {
 	        date = localtime((time_t *)&(attr->values[i].integer));
-		strftime(valptr, sizeof(value) - (valptr - value) - 1,
+		strftime(valptr, sizeof(value) - (valptr - value),
 		         CUPS_STRFTIME_FORMAT, date);
 	      }
 	      else
-	        sprintf(valptr, "%d", attr->values[i].integer);
+	        snprintf(valptr, sizeof(value) - (valptr - value),
+		         "%d", attr->values[i].integer);
 	      break;
 
 	  case IPP_TAG_BOOLEAN :
-	      sprintf(valptr, "%d", attr->values[i].boolean);
+	      snprintf(valptr, sizeof(value) - (valptr - value),
+	               "%d", attr->values[i].boolean);
 	      break;
 
 	  case IPP_TAG_NOVALUE :
-	      strcat(valptr, "novalue");
+	      strncat(valptr, "novalue", sizeof(value) - (valptr - value));
 	      break;
 
 	  case IPP_TAG_RANGE :
-	      sprintf(valptr, "%d-%d", attr->values[i].range.lower,
-		      attr->values[i].range.upper);
+	      snprintf(valptr, sizeof(value) - (valptr - value),
+	               "%d-%d", attr->values[i].range.lower,
+		       attr->values[i].range.upper);
 	      break;
 
 	  case IPP_TAG_RESOLUTION :
-	      sprintf(valptr, "%dx%d%s", attr->values[i].resolution.xres,
-		      attr->values[i].resolution.yres,
-		      attr->values[i].resolution.units == IPP_RES_PER_INCH ?
-			  "dpi" : "dpc");
+	      snprintf(valptr, sizeof(value) - (valptr - value),
+	               "%dx%d%s", attr->values[i].resolution.xres,
+		       attr->values[i].resolution.yres,
+		       attr->values[i].resolution.units == IPP_RES_PER_INCH ?
+			   "dpi" : "dpc");
 	      break;
 
 	  case IPP_TAG_URI :
@@ -249,7 +254,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 		    snprintf(uri, sizeof(uri), "http://%s:%d%s", hostname, port,
 		             resource);
 
-		  strcat(valptr, uri);
+		  strncat(valptr, uri, sizeof(value) - (valptr - value));
         	  break;
         	}
               }
@@ -260,7 +265,8 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 	  case IPP_TAG_KEYWORD :
 	  case IPP_TAG_CHARSET :
 	  case IPP_TAG_LANGUAGE :
-	      strcat(valptr, attr->values[i].string.text);
+	      strncat(valptr, attr->values[i].string.text,
+	              sizeof(value) - (valptr - value));
 	      break;
 
           default :
@@ -282,5 +288,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.20 2001/01/26 14:21:56 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.21 2001/02/15 13:34:14 mike Exp $".
  */

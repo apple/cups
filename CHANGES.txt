@@ -35,6 +35,18 @@ CHANGES IN CUPS V1.1.6-3
 	- Caldera fix: lpr didn't recognize BSD lpr "-1", "-2",
 	  "-3", "-4", "-q", or "-U" options.
 	- RedHat fixes: patches to GNU Ghostscript
+	- SuSE fix: temp file creation patch to GNU Ghostscript
+	  (pstoraster).
+	- SuSE fix: remove cgi-bin/abort.c and cgi-bin/email.c,
+	  which are not used.
+	- SuSE fix: missing NULL check in cgi_initialize_post().
+	- SuSE fix: potential buffer overflows in
+	  cgi_initialize_string().
+	- SuSE fix: potential buffer overflows in
+	  ippSetCGIVars()
+	- SuSE fix: more NULL checks in ppdOpen(); also make
+	  sure that all memory is freed on error to avoid memory
+	  leaks.
 	- SuSE fix: Exit from child if setgid() or setuid()
 	  fails.
 	- SuSE fix: Added setgroups() calls after setgid() and

@@ -23,7 +23,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gp_unifs.c,v 1.4 2001/01/22 15:03:55 mike Exp $ */
+/*$Id: gp_unifs.c,v 1.5 2001/02/15 13:34:16 mike Exp $ */
 /* "Unix-like" file system platform routines for Ghostscript */
 #include "memory_.h"
 #include "string_.h"
@@ -63,6 +63,7 @@ FILE *
 gp_open_scratch_file(const char *prefix, char fname[gp_file_name_sizeof],
 		     const char *mode)
 {				/* The -8 is for XXXXXX plus a possible final / and -. */
+    int fd;
     int len = gp_file_name_sizeof - strlen(prefix) - 8;
 
    /*
@@ -82,8 +83,10 @@ gp_open_scratch_file(const char *prefix, char fname[gp_file_name_sizeof],
     if (*fname != 0 && fname[strlen(fname) - 1] == 'X')
 	strcat(fname, "-");
     strcat(fname, "XXXXXX");
-    mktemp(fname);
-    return fopen(fname, mode);
+    if ((fd = mkstemp(fname)) < 0)
+      return (NULL);
+    else
+      return (fdopen(fd, mode));
 }
 
 /* Open a file with the given name, as a stream of uninterpreted bytes. */

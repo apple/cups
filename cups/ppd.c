@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.50 2001/02/09 16:23:35 mike Exp $"
+ * "$Id: ppd.c,v 1.51 2001/02/15 13:34:15 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -436,7 +436,9 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 				/* Human-readable text from file */
 		*string,	/* Code/text from file */
 		*sptr,		/* Pointer into string */
-		*nameptr;	/* Pointer into name */
+		*nameptr,	/* Pointer into name */
+		*temp,		/* Temporary string pointer */
+		**tempfonts;	/* Temporary fonts pointer */
   float		order;		/* Order dependency number */
   ppd_section_t	section;	/* Order dependency section */
   ppd_profile_t	*profile;	/* Pointer to color profile */
@@ -640,6 +642,13 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       else
         filter = realloc(ppd->filters, sizeof(char *) * (ppd->num_filters + 1));
 
+      if (filter == NULL)
+      {
+        safe_free(filter);
+	ppdClose(ppd);
+	return (NULL);
+      }
+
       ppd->filters     = filter;
       filter           += ppd->num_filters;
       ppd->num_filters ++;
@@ -660,17 +669,19 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       */
 
       if (ppd->num_fonts == 0)
-        ppd->fonts = (char **)malloc(sizeof(char *));
+        tempfonts = (char **)malloc(sizeof(char *));
       else
-        ppd->fonts = (char **)realloc(ppd->fonts,
-	                              sizeof(char *) * (ppd->num_fonts + 1));
+        tempfonts = (char **)realloc(ppd->fonts,
+	                             sizeof(char *) * (ppd->num_fonts + 1));
 
-      if (ppd->fonts == NULL)
+      if (tempfonts == NULL)
       {
+        safe_free(string);
         ppdClose(ppd);
 	return (NULL);
       }
-        
+      
+      ppd->fonts                 = tempfonts;
       ppd->fonts[ppd->num_fonts] = strdup(name);
       ppd->num_fonts ++;
     }
@@ -879,8 +890,16 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       }
       else
       {
-        ppd->patches = realloc(ppd->patches, strlen(ppd->patches) +
-	                                     strlen(string) + 1);
+        temp = realloc(ppd->patches, strlen(ppd->patches) +
+	                             strlen(string) + 1);
+        if (temp == NULL)
+	{
+	  safe_free(string);
+	  ppdClose(ppd);
+	  return (NULL);
+	}
+
+        ppd->patches = temp;
 
         strcpy(ppd->patches + strlen(ppd->patches), string);
       }
@@ -1916,5 +1935,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.50 2001/02/09 16:23:35 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51 2001/02/15 13:34:15 mike Exp $".
  */

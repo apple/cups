@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: ipacked.h,v 1.3 2001/02/14 17:20:55 mike Exp $ */
+/*$Id: ipacked.h,v 1.4 2001/02/15 13:34:16 mike Exp $ */
 /* Packed array format for Ghostscript */
 
 #ifndef ipacked_INCLUDED
@@ -122,9 +122,9 @@ typedef enum {
 /* GCC looks through the cast as if it weren't there.  It turns out that
    copying the value to a properly declared variable is convincing.  Use
    a bit of other GCC magic to make this transparent.  */
-#define PACKED(pref)    ({ const ushort *_T_ = (const ushort *)(pref); _T_; })
+#define PACKED(pref)    ({ushort *_T_ = (ushort *)(pref); _T_; })
 #else
-#define PACKED(pref)    ((const ushort *)(pref))
+#define PACKED(pref)    ((ushort *)(pref))
 #endif
 
 #define packed_per_ref (sizeof(ref) / sizeof(ref_packed))
