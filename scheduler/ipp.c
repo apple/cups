@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.129 2001/04/13 20:58:55 mike Exp $"
+ * "$Id: ipp.c,v 1.130 2001/04/15 12:24:03 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1388,14 +1388,11 @@ static void
 add_queued_job_count(client_t  *con,	/* I - Client connection */
                      printer_t *p)	/* I - Printer or class */
 {
-  cups_ptype_t	dtype;			/* Destination type */
   int		count;			/* Number of jobs on destination */
 
 
   LogMessage(L_DEBUG2, "add_queued_job_count(%d, %s)\n", con->http.fd,
              p->name);
-
-  dtype = p->type & CUPS_PRINTER_CLASS;
 
   count = GetPrinterJobCount(p->name);
 
@@ -1863,7 +1860,7 @@ copy_attribute(ipp_t           *to,	/* O - Destination request/response */
     case IPP_TAG_LANGUAGE :
     case IPP_TAG_MIMETYPE :
         toattr = ippAddStrings(to, attr->group_tag,
-	                       attr->value_tag | IPP_TAG_COPY,
+	                       (ipp_tag_t)(attr->value_tag | IPP_TAG_COPY),
 	                       attr->name, attr->num_values, NULL,
 			       NULL);
 
@@ -1903,7 +1900,7 @@ copy_attribute(ipp_t           *to,	/* O - Destination request/response */
     case IPP_TAG_TEXTLANG :
     case IPP_TAG_NAMELANG :
         toattr = ippAddStrings(to, attr->group_tag,
-	                       attr->value_tag | IPP_TAG_COPY,
+	                       (ipp_tag_t)(attr->value_tag | IPP_TAG_COPY),
 	                       attr->name, attr->num_values, NULL, NULL);
 
         for (i = 0; i < attr->num_values; i ++)
@@ -5368,5 +5365,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.129 2001/04/13 20:58:55 mike Exp $".
+ * End of "$Id: ipp.c,v 1.130 2001/04/15 12:24:03 mike Exp $".
  */
