@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-unix.c,v 1.2.2.4 2004/08/02 19:02:42 mike Exp $"
+ * "$Id: usb-unix.c,v 1.2.2.5 2004/12/09 14:53:52 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -89,7 +89,7 @@ print_device(const char *uri,		/* I - Device URI */
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 #ifdef __linux
-  unsigned char	status;			/* Port status (off-line, out-of-paper, etc.) */
+  unsigned int	status;			/* Port status (off-line, out-of-paper, etc.) */
 #endif /* __linux */
 
 
@@ -803,5 +803,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb-unix.c,v 1.2.2.4 2004/08/02 19:02:42 mike Exp $".
+ * End of "$Id: usb-unix.c,v 1.2.2.5 2004/12/09 14:53:52 mike Exp $".
  */

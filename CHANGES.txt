@@ -1,8 +1,10 @@
-CHANGES.txt - 12/06/2004
+CHANGES.txt - 12/09/2004
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The USB backend used the wrong size status variable
+	  when checking the printer status (STR #1017)
 	- The scheduler did not delete classes from other
 	  classes or implicit classes, which could cause a crash
 	  (STR #1015)
