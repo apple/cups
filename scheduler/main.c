@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.13 1999/04/22 20:20:51 mike Exp $"
+ * "$Id: main.c,v 1.14 1999/04/22 21:14:45 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -255,10 +255,13 @@ main(int  argc,			/* I - Number of command-line arguments */
     * Update the browse list as needed...
     */
 
-    if (FD_ISSET(BrowseSocket, &input))
-      UpdateBrowseList();
+    if (BrowseSocket >= 0)
+    {
+      if (FD_ISSET(BrowseSocket, &input))
+        UpdateBrowseList();
 
-    SendBrowseList();
+      SendBrowseList();
+    }
   }
 
  /*
@@ -372,5 +375,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.13 1999/04/22 20:20:51 mike Exp $".
+ * End of "$Id: main.c,v 1.14 1999/04/22 21:14:45 mike Exp $".
  */
