@@ -1,5 +1,5 @@
 /*
- * "$Id: image-zoom.c,v 1.2 1998/02/19 20:44:58 mike Exp $"
+ * "$Id: image-zoom.c,v 1.3 1998/07/28 20:51:43 mike Exp $"
  *
  *   Image zoom routines for espPrint, a collection of printer drivers.
  *
@@ -23,7 +23,11 @@
  * Revision History:
  *
  *   $Log: image-zoom.c,v $
- *   Revision 1.2  1998/02/19 20:44:58  mike
+ *   Revision 1.3  1998/07/28 20:51:43  mike
+ *   Fixed zoom alloc code - xsize and ysize were swapped when rotated output
+ *   was selected.
+ *
+ *   Revision 1.2  1998/02/19  20:44:58  mike
  *   Fixed scaling problems...
  *
  *   Revision 1.1  1998/02/02  20:20:02  mike
@@ -68,8 +72,8 @@ ImageZoomAlloc(image_t *img,	/* I - Image to zoom */
     z->yorig   = y0;
     z->width   = y1 - y0 + 1;
     z->height  = x1 - x0 + 1;
-    z->xsize   = ysize;
-    z->ysize   = xsize;
+    z->xsize   = xsize;
+    z->ysize   = ysize;
     z->xmod    = z->width % z->xsize;
     z->xstep   = z->width / z->xsize;
     z->xincr   = 1;
@@ -313,5 +317,5 @@ ImageZoomFree(izoom_t *z)	/* I - Zoom record to free */
 
 
 /*
- * End of "$Id: image-zoom.c,v 1.2 1998/02/19 20:44:58 mike Exp $".
+ * End of "$Id: image-zoom.c,v 1.3 1998/07/28 20:51:43 mike Exp $".
  */
