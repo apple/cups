@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.40 2004/02/17 20:42:33 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.41 2004/02/25 20:01:28 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -212,9 +212,9 @@ main(int  argc,			/* I - Number of command-line arguments */
   command = line[0];
   dest    = line + 1;
 
-  for (list = dest + 1; *list && !isspace(*list); list ++);
+  for (list = dest + 1; *list && !isspace(*list & 255); list ++);
 
-  while (isspace(*list))
+  while (isspace(*list & 255))
     *list++ = '\0';
 
  /*
@@ -266,8 +266,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         agent = list;
 
-	for (; *list && !isspace(*list); list ++);
-	while (isspace(*list))
+	for (; *list && !isspace(*list & 255); list ++);
+	while (isspace(*list & 255))
 	  *list++ = '\0';
 
         syslog(LOG_INFO, "Remove jobs %s on %s by %s", list, dest, agent);
@@ -483,8 +483,8 @@ recv_print_job(const char    *dest,	/* I - Destination */
     command = line[0];
     count   = line + 1;
 
-    for (name = count + 1; *name && !isspace(*name); name ++);
-    while (isspace(*name))
+    for (name = count + 1; *name && !isspace(*name & 255); name ++);
+    while (isspace(*name & 255))
       *name++ = '\0';
 
     switch (command)
@@ -840,9 +840,9 @@ remove_jobs(const char *dest,		/* I - Destination */
     * Skip job ID in list...
     */
 
-    while (isdigit(*list))
+    while (isdigit(*list & 255))
       list ++;
-    while (isspace(*list))
+    while (isspace(*list & 255))
       list ++;
 
    /*
@@ -1304,5 +1304,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.40 2004/02/17 20:42:33 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.41 2004/02/25 20:01:28 mike Exp $".
  */

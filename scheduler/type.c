@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.22 2003/04/07 18:03:28 mike Exp $"
+ * "$Id: type.c,v 1.23 2004/02/25 20:01:28 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -175,7 +175,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 
   while (*rule != '\0')
   {
-    while (isspace(*rule))
+    while (isspace(*rule & 255))
       rule ++;
 
     if (*rule == '(')
@@ -285,13 +285,13 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
       invert = 1;
       rule ++;
     }
-    else if (isalnum(*rule))
+    else if (isalnum(*rule & 255))
     {
      /*
       * Read an extension name or a function...
       */
 
-      for (ptr = name; isalnum(*rule) && (ptr - name) < (sizeof(name) - 1);)
+      for (ptr = name; isalnum(*rule & 255) && (ptr - name) < (sizeof(name) - 1);)
         *ptr++ = *rule++;
 
       *ptr       = '\0';
@@ -313,7 +313,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	  while ((ptr - value[num_values]) < (sizeof(value[0]) - 1) &&
 	         *rule != '\0' && *rule != ',' && *rule != ')')
 	  {
-	    if (isspace(*rule))
+	    if (isspace(*rule & 255))
 	    {
 	     /*
 	      * Ignore whitespace...
@@ -346,7 +346,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	      while (*rule != '>' && *rule != '\0' &&
 	             (ptr - value[num_values]) < (sizeof(value[0]) - 1))
 	      {
-	        if (isxdigit(rule[0]) && isxdigit(rule[1]))
+	        if (isxdigit(rule[0] & 255) && isxdigit(rule[1] & 255))
 		{
 		  if (isdigit(*rule))
 		    *ptr = (*rule++ - '0') << 4;
@@ -1128,5 +1128,5 @@ patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.22 2003/04/07 18:03:28 mike Exp $".
+ * End of "$Id: type.c,v 1.23 2004/02/25 20:01:28 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.53 2003/09/15 19:40:44 mike Exp $"
+ * "$Id: classes.c,v 1.54 2004/02/25 20:01:28 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -370,7 +370,7 @@ LoadAllClasses(void)
 
     len = strlen(line);
 
-    while (len > 0 && isspace(line[len - 1]))
+    while (len > 0 && isspace(line[len - 1] & 255))
     {
       len --;
       line[len] = '\0';
@@ -380,14 +380,14 @@ LoadAllClasses(void)
     * Extract the name from the beginning of the line...
     */
 
-    for (value = line; isspace(*value); value ++);
+    for (value = line; isspace(*value & 255); value ++);
 
-    for (nameptr = name; *value != '\0' && !isspace(*value) &&
+    for (nameptr = name; *value != '\0' && !isspace(*value & 255) &&
 	                     nameptr < (name + sizeof(name) - 1);)
       *nameptr++ = *value++;
     *nameptr = '\0';
 
-    while (isspace(*value))
+    while (isspace(*value & 255))
       value ++;
 
     if (name[0] == '\0')
@@ -496,7 +496,7 @@ LoadAllClasses(void)
       * Set the initial queue state message...
       */
 
-      while (isspace(*value))
+      while (isspace(*value & 255))
         value ++;
 
       strlcpy(p->state_message, value, sizeof(p->state_message));
@@ -518,19 +518,19 @@ LoadAllClasses(void)
       * Set the initial job sheets...
       */
 
-      for (valueptr = value; *valueptr && !isspace(*valueptr); valueptr ++);
+      for (valueptr = value; *valueptr && !isspace(*valueptr & 255); valueptr ++);
 
       if (*valueptr)
         *valueptr++ = '\0';
 
       SetString(&p->job_sheets[0], value);
 
-      while (isspace(*valueptr))
+      while (isspace(*valueptr & 255))
         valueptr ++;
 
       if (*valueptr)
       {
-        for (value = valueptr; *valueptr && !isspace(*valueptr); valueptr ++);
+        for (value = valueptr; *valueptr && !isspace(*valueptr & 255); valueptr ++);
 
 	if (*valueptr)
           *valueptr++ = '\0';
@@ -689,5 +689,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.53 2003/09/15 19:40:44 mike Exp $".
+ * End of "$Id: classes.c,v 1.54 2004/02/25 20:01:28 mike Exp $".
  */
