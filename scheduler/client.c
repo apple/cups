@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.36 2003/01/17 14:45:00 mike Exp $"
+ * "$Id: client.c,v 1.91.2.37 2003/01/24 14:47:56 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -826,6 +826,11 @@ ReadClient(client_t *con)	/* I - Client to read from */
 #endif /* HAVE_SSL */
       }
 
+      if (con->http.expect)
+      {
+        /**** TODO: send expected header ****/
+      }
+
       if (!SendHeader(con, HTTP_OK, NULL))
       {
 	CloseClient(con);
@@ -900,6 +905,11 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	SendError(con, status);
         ShutdownClient(con);
 	return (1);
+      }
+
+      if (con->http.expect)
+      {
+        /**** TODO: send expected header ****/
       }
 
       switch (con->http.state)
@@ -2778,5 +2788,5 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.36 2003/01/17 14:45:00 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.37 2003/01/24 14:47:56 mike Exp $".
  */
