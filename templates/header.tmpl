@@ -1,6 +1,9 @@
 <HTML>
 <HEAD>
 	<TITLE>{title} on {server_name} - {cups_version}</TITLE>
+	<!-- Prevent caching of CGI content -->
+	<META HTTP-EQUIV="Expires" CONTENT="now">
+	<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
 	<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cups.css">
 	<MAP NAME="navbar">
 		<AREA SHAPE="RECT" COORDS="12,0,50,30" HREF="http://www.easysw.com" ALT="Easy Software Products Home Page">

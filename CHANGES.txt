@@ -118,6 +118,8 @@ CHANGES IN CUPS V1.1.7
 	  up in the list of devices from lpinfo or the web
 	  interface.
 	- Added support for /dev/lpa# parallel ports under *BSD.
+	- Added META variables to the CGI header template to
+	  prevent caching of the results.
 
 
 CHANGES IN CUPS V1.1.6-3
