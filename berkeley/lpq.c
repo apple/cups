@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.9 2000/03/09 19:47:21 mike Exp $"
+ * "$Id: lpq.c,v 1.10 2000/05/11 14:19:16 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -23,8 +23,9 @@
  *
  * Contents:
  *
- *   main()      - Parse options and commands.
- *   show_jobs() - Show jobs.
+ *   main()         - Parse options and commands.
+ *   show_jobs()    - Show jobs.
+ *   show_printer() - Show printer status.
  */
 
 /*
@@ -232,7 +233,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
   {
     snprintf(resource, sizeof(resource), "ipp://localhost/printers/%s", dest);
 
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, resource);
   }
 
@@ -249,7 +250,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 
   jobcount = 0;
 
-  if ((response = cupsDoRequest(http, request, "/jobs/")) != NULL)
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
@@ -344,9 +345,12 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
           continue;
       }
 
-      /**** TODO - support OSF/1 and Berkeley formats ****/
       if (!longstatus && jobcount == 0)
-	puts("Rank   Owner      Job          Files             Total Size");
+#ifdef __osf__
+	puts("Rank   Owner      Pri  Job        Files                       Total Size");
+#else
+	puts("Rank   Owner      Job             Files                       Total Size");
+#endif /* __osf__ */
 
       jobcount ++;
 
@@ -358,7 +362,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 	strcpy(rankstr, "active");
       else
       {
-	sprintf(rankstr, "%d%s\t", rank, ranks[rank % 10]);
+	sprintf(rankstr, "%d%s", rank, ranks[rank % 10]);
 	rank ++;
       }
 
@@ -367,16 +371,25 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
         puts("");
 
         if (jobcopies > 1)
-	  sprintf(namestr, "%d copies of %s", jobcopies, jobname);
+	  snprintf(namestr, sizeof(namestr), "%d copies of %s", jobcopies,
+	           jobname);
 	else
-	  strcpy(namestr, jobname);
+	{
+	  strncpy(namestr, jobname, sizeof(namestr) - 1);
+	  namestr[sizeof(namestr) - 1] = '\0';
+	}
 
         printf("%s: %-31s [job %d localhost]\n", jobuser, rankstr, jobid);
         printf("        %-31.31s %d bytes\n", namestr, jobsize);
       }
       else
+#ifdef __osf__
+        printf("%-6s %-10.10s %-4d %-10d %-27.27s %d bytes\n", rankstr, jobuser,
+	       jobpriority, jobid, jobname, jobsize);
+#else
         printf("%-6s %-10.10s %-15d %-27.27s %d bytes\n", rankstr, jobuser,
 	       jobid, jobname, jobsize);
+#endif /* __osf */
 
       if (attr == NULL)
         break;
@@ -484,5 +497,5 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpq.c,v 1.9 2000/03/09 19:47:21 mike Exp $".
+ * End of "$Id: lpq.c,v 1.10 2000/05/11 14:19:16 mike Exp $".
  */
