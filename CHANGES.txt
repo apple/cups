@@ -1,5 +1,159 @@
-CHANGES.txt - 11/04/1999
+CHANGES.txt - 02/27/2000
 ------------------------
+
+CHANGES IN CUPS v1.1b1
+
+	- NEW web-based administration interface.
+	- NEW EPSON printer drivers.
+	- NEW user-defined printers and options.
+	- NEW persistent jobs and job history
+	- NEW IPP/1.1 support
+	- NEW template-based web interfaces.
+	- NEW CUPS-get-devices and CUPS-get-ppds operations.
+	- NEW support for create-job and send-file operations.
+	- NEW certificate-based authentication for local
+	      administration.
+
+
+CHANGES IN CUPS v1.0.5
+
+	- The HP-GL/2 filter did not correctly set the pen color
+          for pens other than #1.
+	- The scheduler would only accept 26 simultaneous jobs
+          under some OS releases (mkstemp() limitation.)  It now
+          handles up to 2^32 simultaneous jobs.
+	- The PostScript filter loaded the printer's PPD file
+          twice.
+	- The PAM authentication code now uses pam_strerror() to
+          provide a textual error message in the error_log file.
+	- The scheduler now copies PPD and interface script
+          files instead of moving them; this fixes installations
+          with a separate requests directory.
+	- The PostScript RIP did not generate correct 6-color
+          output.
+	- Several filters were marking PPD options twice when
+          they didn't need to.
+	- The scheduler did not save the printer or class state
+          after an accept-jobs or reject-jobs operation.
+	- The cupsGetDefault() function now ignores the PRINTER
+          environment variable if it is set to "lp".
+	- New ippErrorString() function to get textual error
+          messages.
+	- Better error reporting in the System V commands.
+	- The lpadmin and lpstat commands always tried to
+          connect to the default server.
+	- The text filter didn't load the charset files from the
+          correct location.
+	- Wasn't sending a WWW-Authenticate: field to HTTP
+          clients when authentication was required.
+	- httpSeparate() didn't always set the default port
+          number for known methods.
+	- The HP-GL/2 filter now looks for "PSwidth,length"
+          instead of (the correct) "PSlength,width" as
+          documented by HP.  It appears that many major CAD
+          applications are broken and this change allows the
+          auto-rotation to work with them.
+	- The IPP "printer-resolution" option was not being
+          translated.
+	- The charset files did not include the Microsoft
+          "standard" characters from 128 to 159 (unused by the
+          ISO-8859-x charsets)
+	- The scheduler was chunking the Content-Type field from
+          CGI programs; this problem was most noticeable with
+          Microsoft Internet Explorer 5.
+	- By popular demand, the printers, jobs, and classes
+          CGIs no longer force a reload of the page every 10/30
+          seconds.
+	- The scheduler incorrectly required that the IPP client
+          provide a document-format attribute for the
+          validate-job operation.
+	- Clients that sent bad IPP requests without the
+          required attributes-natural-language and
+          attributes-charset attributes would crash the
+          scheduler.
+
+
+CHANGES IN CUPS v1.0.4
+
+	- Documentation updates.
+	- Jobs would get stuck in the queue and wouldn't print
+	  until you enabled the queue.
+	- The lp and lpr commands now catch SIGHUP and SIGINTR.
+	- The lp and lpr commands now use sigaction or sigset
+	  when available.
+	- CUPS library updates for WIN32/OS-2
+
+
+CHANGES IN CUPS v1.0.3
+
+	- Documentation updates.
+	- The lpq man page was missing.
+	- The configure script was not properly detecting the
+	  image libraries.
+	- The top-level makefile was calling "make" instead of
+	  "$(MAKE)".
+	- PostScript filter fixes for number-up, OutputOrder,
+	  and %Trailer.
+	- The imagetops filter didn't end the base-85 encoding
+	  properly if the image data was not a multiple of 4
+	  bytes in length.
+	- The imagetoraster filter didn't generate good banded
+	  RGB or CMY data (was dividing the line width by 4
+	  instead of 3...)
+	- The imagetoraster filter now records the bounding
+	  box of the image on the page.
+	- The CUPS image library cache code wasn't working as
+	  designed; images larger than the maximum RIP cache
+	  would eventually thrash using the same cache tile.
+	- The CUPS image library TIFF loading code didn't
+	  handle unknown resolution units properly; the fixed
+	  code uses a default resolution of 128 PPI.
+	- cupsGetClasses() and cupsGetPrinters() did not free
+	  existing strings if they ran out of memory.
+	- The scheduler logs incorrectly contained 3 digits for
+	  the timezone offset instead of 4.
+	- The scheduler now does a lookup for the default user
+	  and group ID; the previous hardcoded values caused
+	  problems with the LPD backend.
+	- The cancel-job operation now allows any user in the
+	  system group to cancel any job.
+	- The cancel-job operation stopped the print queue if
+	  the job was being printed.
+	- Now only stop printers if the backend fails. If the
+	  filter fails then the failure is noted in the
+	  error_log and printing continues with the next file in
+	  the queue.
+	- Now log whether a filter fails because of a signal
+	  or because it returned a non-zero exit status.
+	- The root user now always passes the system group test.
+	- Printers with an interface script and remote printers
+	  and classes didn't have a printer-make-and-model
+	  attribute.
+	- Added logging of lost/timed-out remote printers.
+	- The HP-GL/2 filter was scaling the pen width twice.
+	- Updated the HP-GL/2 filter to use a single SP (Set
+	  Pen) procedure.  This makes the output smaller and is
+	  more appropriate since the filter keeps track of the
+	  pen states already.
+	- The scheduler didn't handle passwords with spaces.
+	- The IPP backend now does multiple copies and retries
+	  if the destination server requires it (e.g. HP
+	  JetDirect.)
+	- The disable command didn't implement the "-c" option
+	  (cancel all jobs.)
+	- Changed the CMYK generation function for the image file
+	  and PostScript RIPs.
+	- The lp command didn't support the "-h" option as
+	  documented.
+	- The AppSocket, IPP, and LPD backends now retry on all
+	  network errors.  This should prevent stopped queues
+	  caused by a printer being disconnected from the
+	  network or powered off.
+	- The scheduler now restarts a job if the corresponding
+	  printer is modified.
+	- The image RIPs now rotate the image if needed to fit
+	  on the page.
+
 
 CHANGES IN CUPS v1.0.2
 

@@ -1,5 +1,28 @@
-README - CUPS v1.0.3 - 12/15/1999
+README - CUPS v1.1b1 - 02/27/2000
 ---------------------------------
+
+************************************************************************
+************************************************************************
+****                                                                ****
+****     BETA SOFTWARE BETA SOFTWARE BETA SOFTWARE BETA SOFTWARE    ****
+****                                                                ****
+************************************************************************
+************************************************************************
+
+This is an official public beta release for the Common UNIX Printing
+System.  Since this is a beta release, we do not recommend that you
+use this software on a production system.  Instead, please use the
+current 1.0.x release for your production systems.
+
+Also, currently we are only providing source code for the beta releases.
+As we approach a final production ("gold") release of CUPS 1.1 we will
+provide binary distributions as well.
+
+Please report all problems in the CUPS 1.1 beta releases to
+"cups-beta@cups.org" or to the CUPS mailing list.
+
+Thanks for using CUPS!
+
 
 INTRODUCTION
 
@@ -21,7 +44,7 @@ CUPS also includes a customized version of GNU GhostScript (currently
 based off GNU GhostScript 4.03) and an image file RIP that can be used
 to support non-PostScript printers.
 
-CUPS is Copyright 1993-1999 by Easy Software Products, All Rights
+CUPS is Copyright 1993-2000 by Easy Software Products, All Rights
 Reserved.  CUPS is currently licensed under the terms of the GNU
 General Public License.  Please see the license file for details.
 
@@ -89,15 +112,31 @@ under the "doc" directory in the source archives.
 Please read the documentation before asking questions.
 
 
-SETTING UP PRINTER QUEUES
+SETTING UP PRINTER QUEUES USING YOUR WEB BROWSER
+
+CUPS 1.1 includes a new web-based administration tool that allows you
+to manage printers, classes, and jobs on your server.  To access the
+printer administration tools open the following URL in your browser:
+
+    http://localhost:631/admin
+
+You will be asked for the administration password (root or any other
+user in the sys/system/root group on your system) and then shown a
+menu of available functions.
+
+[note: adding, deleting, and modifying classes has not been implemented in
+       beta 1]
+
+
+SETTING UP PRINTER QUEUES FROM THE COMMAND-LINE
 
 CUPS works best with PPD (PostScript Printer Description) files.  In a
 pinch you can also use System V style printer interface scripts.
 
-Two sample PPD files are provided with this distribution that utilize
-the PostScript and image file RIPs and the sample HP printer driver. 
-To add the sample DeskJet driver to the system for a printer connected
-to the parallel port, use one of the following commands:
+Six sample PPD files are provided with this distribution that utilize
+the PostScript and image file RIPs and the sample EPSON and HP printer
+drivers.  To add the sample DeskJet driver to the system for a printer
+connected to the parallel port, use one of the following commands:
 
     Digital UNIX:
 
@@ -113,23 +152,29 @@ to the parallel port, use one of the following commands:
 
     Linux:
 
-        /usr/lib/lpadmin -p DeskJet -m deskjet.ppd -v parallel:/dev/par0 -E
-        /usr/lib/lpadmin -p DeskJet -m deskjet.ppd -v parallel:/dev/par1 -E
-        /usr/lib/lpadmin -p DeskJet -m deskjet.ppd -v parallel:/dev/par2 -E
+        /usr/lib/lpadmin -p DeskJet -m deskjet.ppd -v parallel:/dev/lp0 -E
+        /usr/lib/lpadmin -p DeskJet -m deskjet.ppd -v parallel:/dev/lp1 -E
+        /usr/lib/lpadmin -p DeskJet -m deskjet.ppd -v parallel:/dev/lp2 -E
 
     Solaris:
 
         /usr/lib/lpadmin -p DeskJet -m deskjet.ppd -v parallel:/dev/bpp0 -E
         /usr/lib/lpadmin -p DeskJet -m deskjet.ppd -v parallel:/dev/ecpp0 -E
 
-Similarly, for the sample LaserJet driver you can use "LaserJet" and
-"laserjet.ppd".
+Similarly, for the other sample drivers you can use:
 
-For other printers and interfaces see the CUPS System Administator's
-Manual included with this software.
+    Driver                      PPD File
+    --------------------------  ------------
+    HP DeskJet Series           deskjet.ppd
+    HP LaserJet Series          laserjet.ppd
+    EPSON Stylus Color Series   stcolor.ppd
+    EPSON Stylus Photo Series   stphoto.ppd
+    EPSON 9-pin Series          epson9.ppd [not in beta 1]
+    EPSON 24-pin Series         epson24.ppd [not in beta 1]
 
-If you're interested in a complete, commercial printing solution for
-UNIX, check out our ESP Print Pro software at:
+These sample drivers provide basic printing capabilities, but generally
+do not exercise the full potential of the printers or CUPS.  For
+commercial printer drivers check out our ESP Print Pro software at:
 
     http://www.easysw.com/printpro
 
@@ -181,7 +226,7 @@ software.  New releases of CUPS are announced to this list as well.
 
 LEGAL STUFF
 
-CUPS is Copyright 1993-1999 by Easy Software Products.  CUPS, the CUPS
+CUPS is Copyright 1993-2000 by Easy Software Products.  CUPS, the CUPS
 logo, and the Common UNIX Printing System are the trademark property of
 Easy Software Products.
 
