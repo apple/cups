@@ -6,6 +6,9 @@ CHANGES IN CUPS V1.1.5-3
 	- Fixed another possible DoS attack in httpGets()
 	- Resolution options were not being passed into the
 	  filter programs properly.
+	- The default compiler options for GCC no longer includ
+	  "-g3", which apparently is deprecated in newer
+	  versions of GCC.
 
 
 CHANGES IN CUPS V1.1.5-2
