@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.4.2.3 2002/04/20 20:04:47 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.4.2.4 2002/04/20 21:05:16 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -76,6 +76,7 @@ ln -s $root/filter/rastertohp /tmp/$user/bin/filter
 ln -s $root/filter/texttops /tmp/$user/bin/filter
 ln -s $root/pdftops/pdftops /tmp/$user/bin/filter
 ln -s $root/pstoraster/pstoraster /tmp/$user/bin/filter
+ln -s $root/pstoraster/pstoraster.convs /tmp/$user
 
 ln -s $root/data/classified /tmp/$user/share/banners
 ln -s $root/data/confidential /tmp/$user/share/banners
@@ -323,5 +324,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.4.2.3 2002/04/20 20:04:47 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.4.2.4 2002/04/20 21:05:16 mike Exp $"
 #

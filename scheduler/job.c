@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.12 2002/03/28 16:59:36 mike Exp $"
+ * "$Id: job.c,v 1.124.2.13 2002/04/20 21:05:13 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -829,6 +829,9 @@ SaveJob(int id)			/* I - Job ID */
   fchown(fd, User, Group);
 
   ippWriteFile(fd, job->attrs);
+
+  LogMessage(L_DEBUG2, "SaveJob: Closing file %d...", fd);
+
   close(fd);
 }
 
@@ -1689,11 +1692,23 @@ StartJob(int       id,		/* I - Job ID */
 	snprintf(printer->state_message, sizeof(printer->state_message),
         	 "Unable to start backend \"%s\" - %s.", method, strerror(errno));
 
+	LogMessage(L_DEBUG2, "StartJob: Closing print pipes [ %d %d ]...",
+        	   current->print_pipes[0], current->print_pipes[1]);
+
 	close(current->print_pipes[0]);
 	close(current->print_pipes[1]);
 
 	current->print_pipes[0] = -1;
 	current->print_pipes[1] = -1;
+
+	LogMessage(L_DEBUG2, "StartJob: Closing back pipes [ %d %d ]...",
+        	   current->back_pipes[0], current->back_pipes[1]);
+
+	close(current->back_pipes[0]);
+	close(current->back_pipes[1]);
+
+	current->back_pipes[0] = -1;
+	current->back_pipes[1] = -1;
 
 	return;
       }
@@ -1706,13 +1721,19 @@ StartJob(int       id,		/* I - Job ID */
       }
     }
 
-    if (current->current_file == (current->num_files - 1))
+    if (current->current_file == current->num_files)
     {
+      LogMessage(L_DEBUG2, "StartJob: Closing print pipes [ %d %d ]...",
+        	 current->print_pipes[0], current->print_pipes[1]);
+
       close(current->print_pipes[0]);
       close(current->print_pipes[1]);
 
       current->print_pipes[0] = -1;
       current->print_pipes[1] = -1;
+
+      LogMessage(L_DEBUG2, "StartJob: Closing back pipes [ %d %d ]...",
+        	 current->back_pipes[0], current->back_pipes[1]);
 
       close(current->back_pipes[0]);
       close(current->back_pipes[1]);
@@ -1726,7 +1747,7 @@ StartJob(int       id,		/* I - Job ID */
     filterfds[slot][0] = -1;
     filterfds[slot][1] = -1;
 
-    if (current->current_file == (current->num_files - 1))
+    if (current->current_file == current->num_files)
     {
       close(filterfds[!slot][0]);
       close(filterfds[!slot][1]);
@@ -1817,11 +1838,17 @@ StopJob(int id,			/* I - Job ID */
 	  current->backend = 0;
 	}
 
+	LogMessage(L_DEBUG2, "StopJob: Closing print pipes [ %d %d ]...",
+        	   current->print_pipes[0], current->print_pipes[1]);
+
 	close(current->print_pipes[0]);
         close(current->print_pipes[1]);
 
 	current->print_pipes[0] = -1;
 	current->print_pipes[1] = -1;
+
+	LogMessage(L_DEBUG2, "StopJob: Closing back pipes [ %d %d ]...",
+        	   current->back_pipes[0], current->back_pipes[1]);
 
         close(current->back_pipes[0]);
         close(current->back_pipes[1]);
@@ -2232,5 +2259,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.12 2002/03/28 16:59:36 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.13 2002/04/20 21:05:13 mike Exp $".
  */

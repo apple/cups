@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.7 2002/04/08 16:28:59 mike Exp $"
+ * "$Id: client.c,v 1.91.2.8 2002/04/20 21:05:13 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -147,6 +147,9 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
     * Can't have an unresolved IP address with double-lookups enabled...
     */
 
+    LogMessage(L_DEBUG2, "AcceptClient: Closing connection %d...",
+               con->http.fd);
+
 #ifdef WIN32
     closesocket(con->http.fd);
 #else
@@ -203,6 +206,9 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
       * Can't have a hostname that doesn't resolve to the same IP address
       * with double-lookups enabled...
       */
+
+      LogMessage(L_DEBUG2, "AcceptClient: Closing connection %d...",
+        	 con->http.fd);
 
 #ifdef WIN32
       closesocket(con->http.fd);
@@ -321,7 +327,7 @@ CloseClient(client_t *con)	/* I - Client to close */
   * Close the socket and clear the file from the input set for select()...
   */
 
-  if (con->http.fd > 0)
+  if (con->http.fd >= 0)
   {
     LogMessage(L_DEBUG2, "CloseClient: Removing fd %d from InputSet and OutputSet...",
                con->http.fd);
@@ -1213,6 +1219,9 @@ ReadClient(client_t *con)	/* I - Client to read from */
             LogMessage(L_ERROR, "ReadClient: Unable to write %d bytes to %s: %s",
 	               bytes, con->filename, strerror(errno));
 
+	    LogMessage(L_DEBUG2, "ReadClient: Closing data file %d...",
+        	       con->file);
+
 	    close(con->file);
 	    con->file = 0;
 	    unlink(con->filename);
@@ -1345,6 +1354,9 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	    {
               LogMessage(L_ERROR, "ReadClient: Unable to write %d bytes to %s: %s",
 	        	 bytes, con->filename, strerror(errno));
+
+	      LogMessage(L_DEBUG2, "ReadClient: Closing file %d...",
+        		 con->file);
 
 	      close(con->file);
 	      con->file = 0;
@@ -2509,5 +2521,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.7 2002/04/08 16:28:59 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.8 2002/04/20 21:05:13 mike Exp $".
  */

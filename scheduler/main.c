@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.9 2002/03/21 02:34:28 mike Exp $"
+ * "$Id: main.c,v 1.57.2.10 2002/04/20 21:05:16 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -371,22 +371,30 @@ main(int  argc,			/* I - Number of command-line arguments */
       LogMessage(L_EMERG, "select() failed - %s!", strerror(errno));
 
       strcpy(s, "InputSet =");
-      slen = 9;
-      sptr = s + 9;
-
-      for (i = 0; i < MaxFDs; i ++)
-        if (FD_ISSET(i, &InputSet))
-          snprintf(sptr, sizeof(s) - slen, " %d", i);
-
-      LogMessage(L_EMERG, s);
-
-      strcpy(s, "OutputSet =");
       slen = 10;
       sptr = s + 10;
 
       for (i = 0; i < MaxFDs; i ++)
-        if (FD_ISSET(i, &OutputSet))
+        if (FD_ISSET(i, &InputSet))
+	{
           snprintf(sptr, sizeof(s) - slen, " %d", i);
+	  slen += strlen(sptr);
+	  sptr += strlen(sptr);
+	}
+
+      LogMessage(L_EMERG, s);
+
+      strcpy(s, "OutputSet =");
+      slen = 11;
+      sptr = s + 11;
+
+      for (i = 0; i < MaxFDs; i ++)
+        if (FD_ISSET(i, &OutputSet))
+	{
+          snprintf(sptr, sizeof(s) - slen, " %d", i);
+	  slen += strlen(sptr);
+	  sptr += strlen(sptr);
+	}
 
       LogMessage(L_EMERG, s);
 
@@ -805,5 +813,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.9 2002/03/21 02:34:28 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.10 2002/04/20 21:05:16 mike Exp $".
  */
