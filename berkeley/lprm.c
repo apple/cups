@@ -1,5 +1,5 @@
 /*
- * "$Id: lprm.c,v 1.8 1999/10/10 15:40:16 mike Exp $"
+ * "$Id: lprm.c,v 1.9 1999/10/26 14:40:55 mike Exp $"
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
@@ -65,6 +65,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   job_id   = 0;
   dest     = cupsGetDefault();
   response = NULL;
+  http     = NULL;
 
  /*
   * Open a connection to the server...
@@ -159,6 +160,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	             uri);
       }
 
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                   "requesting-user-name", NULL, cupsUser());
+
      /*
       * Do the request and get back a response...
       */
@@ -170,10 +174,22 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       if (response != NULL)
       {
-        if (response->request.status.status_code == IPP_NOT_FOUND)
-          fputs("lprm: Job or printer not found!\n", stderr);
-        else if (response->request.status.status_code > IPP_OK_CONFLICT)
-          fputs("lprm: Unable to cancel job(s)!\n", stderr);
+        switch (response->request.status.status_code)
+	{
+	  case IPP_NOT_FOUND :
+              fputs("lprm: Job or printer not found!\n", stderr);
+	      break;
+	  case IPP_NOT_AUTHORIZED :
+              fputs("lprm: Not authorized to lprm job(s)!\n", stderr);
+	      break;
+	  case IPP_FORBIDDEN :
+              fprintf(stderr, "lprm: You don't own job ID %d!\n", job_id);
+	      break;
+	  default :
+              if (response->request.status.status_code > IPP_OK_CONFLICT)
+                fputs("lprm: Unable to lprm job(s)!\n", stderr);
+	      break;
+	}
 
         ippDelete(response);
       }
@@ -201,5 +217,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lprm.c,v 1.8 1999/10/10 15:40:16 mike Exp $".
+ * End of "$Id: lprm.c,v 1.9 1999/10/26 14:40:55 mike Exp $".
  */

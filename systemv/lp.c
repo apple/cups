@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.11 1999/08/06 16:06:15 mike Exp $"
+ * "$Id: lp.c,v 1.12 1999/10/26 14:40:57 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -23,7 +23,8 @@
  *
  * Contents:
  *
- *   main() - Parse options and send files for printing.
+ *   main()       - Parse options and send files for printing.
+ *   sighandler() - Signal catcher for when we print from stdin...
  */
 
 /*
@@ -33,6 +34,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cups/cups.h>
+
+
+#ifndef WIN32
+#  include <signal.h>
+
+
+/*
+ * Local functions.
+ */
+
+void	sighandler(void);
+#endif /* !WIN32 */
+
+
+/*
+ * Globals...
+ */
+
+char	tempfile[1024];		/* Temporary file for printing from stdin */
 
 
 /*
@@ -53,7 +73,6 @@ main(int  argc,		/* I - Number of command-line arguments */
   int		num_options;	/* Number of options */
   cups_option_t	*options;	/* Options */
   int		silent;		/* Silent or verbose output? */
-  char		tempfile[1024];	/* Temporary file for printing from stdin */
   char		buffer[8192];	/* Copy buffer */
   FILE		*temp;		/* Temporary file pointer */
 
@@ -182,7 +201,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
       if (job_id < 1)
       {
-	fprintf(stderr, "lp: unable to print file \'%s\'.\n", argv[i]);
+	fprintf(stderr, "lp: unable to print file \'%s\' - error code %x.\n",
+	        argv[i], cupsLastError());
 	return (1);
       }
       else if (!silent)
@@ -200,6 +220,10 @@ main(int  argc,		/* I - Number of command-line arguments */
       fputs("lp: error - no default destination available.\n", stderr);
       return (1);
     }
+
+#ifndef WIN32
+    signal(SIGTERM, sighandler);
+#endif /* !WIN32 */
 
     temp = fopen(cupsTempFile(tempfile, sizeof(tempfile)), "w");
 
@@ -230,7 +254,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
     if (job_id < 1)
     {
-      fputs("lp: unable to print stdin.\n", stderr);
+      fprintf(stderr, "lp: unable to print stdin - error code %x.\n",
+              cupsLastError());
       return (1);
     }
     else if (!silent)
@@ -241,6 +266,23 @@ main(int  argc,		/* I - Number of command-line arguments */
 }
 
 
+#ifndef WIN32
 /*
- * End of "$Id: lp.c,v 1.11 1999/08/06 16:06:15 mike Exp $".
+ * 'sighandler()' - Signal catcher for when we print from stdin...
+ */
+
+void
+sighandler(void)
+{
+ /*
+  * Remove the temporary file we're using to print from stdin...
+  */
+
+  unlink(tempfile);
+}
+#endif /* !WIN32 */
+
+
+/*
+ * End of "$Id: lp.c,v 1.12 1999/10/26 14:40:57 mike Exp $".
  */

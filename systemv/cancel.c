@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.12 1999/10/18 15:42:56 mike Exp $"
+ * "$Id: cancel.c,v 1.13 1999/10/26 14:40:57 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -66,16 +66,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   op     = IPP_CANCEL_JOB;
   job_id = 0;
   dest   = NULL;
-
- /*
-  * Open a connection to the server...
-  */
-
-  if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
-  {
-    fputs("cancel: Unable to contact server!\n", stderr);
-    return (1);
-  }
+  http   = NULL;
 
  /*
   * Process command-line arguments...
@@ -90,7 +81,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 
         case 'h' : /* Connect to host */
-	    httpClose(http);
+	    if (http != NULL)
+	      httpClose(http);
 
 	    if (argv[i][2] != '\0')
 	      http = httpConnect(argv[i] + 2, ippPort());
@@ -144,7 +136,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  * Reconnect to the named host...
 	  */
 
-          httpClose(http);
+          if (http != NULL)
+            httpClose(http);
 
 	  *host++ = '\0';
 
@@ -157,12 +150,24 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
 
      /*
+      * Open a connection to the server...
+      */
+
+      if (http == NULL)
+	if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
+	{
+	  fputs("cancel: Unable to contact server!\n", stderr);
+	  return (1);
+	}
+
+     /*
       * Build an IPP request, which requires the following
       * attributes:
       *
       *    attributes-charset
       *    attributes-natural-language
       *    printer-uri + job-id *or* job-uri
+      *    [requesting-user-name]
       */
 
       request = ippNew();
@@ -193,6 +198,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	             uri);
       }
 
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                   "requesting-user-name", NULL, cupsUser());
+
      /*
       * Do the request and get back a response...
       */
@@ -204,10 +212,22 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       if (response != NULL)
       {
-        if (response->request.status.status_code == IPP_NOT_FOUND)
-          fputs("cancel: Job or printer not found!\n", stderr);
-        else if (response->request.status.status_code > IPP_OK_CONFLICT)
-          fputs("cancel: Unable to cancel job(s)!\n", stderr);
+        switch (response->request.status.status_code)
+	{
+	  case IPP_NOT_FOUND :
+              fputs("cancel: Job or printer not found!\n", stderr);
+	      break;
+	  case IPP_NOT_AUTHORIZED :
+              fputs("cancel: Not authorized to cancel job(s)!\n", stderr);
+	      break;
+	  case IPP_FORBIDDEN :
+              fprintf(stderr, "cancel: You don't own job ID %d!\n", job_id);
+	      break;
+	  default :
+              if (response->request.status.status_code > IPP_OK_CONFLICT)
+                fputs("cancel: Unable to cancel job(s)!\n", stderr);
+	      break;
+	}
 
         ippDelete(response);
       }
@@ -223,5 +243,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c,v 1.12 1999/10/18 15:42:56 mike Exp $".
+ * End of "$Id: cancel.c,v 1.13 1999/10/26 14:40:57 mike Exp $".
  */
