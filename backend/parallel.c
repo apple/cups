@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c,v 1.29.2.12 2002/05/16 13:59:54 mike Exp $"
+ * "$Id: parallel.c,v 1.29.2.13 2002/10/15 16:40:33 mike Exp $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -104,6 +104,20 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   */
 
   setbuf(stderr, NULL);
+
+ /*
+  * Ignore SIGPIPE signals...
+  */
+
+#ifdef HAVE_SIGSET
+  sigset(SIGPIPE, SIG_IGN);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+  action.sa_handler = SIG_IGN;
+  sigaction(SIGPIPE, &action, NULL);
+#else
+  signal(SIGPIPE, SIG_IGN);
+#endif /* HAVE_SIGSET */
 
  /*
   * Check command-line...
@@ -654,5 +668,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c,v 1.29.2.12 2002/05/16 13:59:54 mike Exp $".
+ * End of "$Id: parallel.c,v 1.29.2.13 2002/10/15 16:40:33 mike Exp $".
  */

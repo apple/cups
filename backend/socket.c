@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.17.2.8 2002/03/25 17:14:14 mike Exp $"
+ * "$Id: socket.c,v 1.17.2.9 2002/10/15 16:40:33 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -95,6 +95,20 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   */
 
   setbuf(stderr, NULL);
+
+ /*
+  * Ignore SIGPIPE signals...
+  */
+
+#ifdef HAVE_SIGSET
+  sigset(SIGPIPE, SIG_IGN);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+  action.sa_handler = SIG_IGN;
+  sigaction(SIGPIPE, &action, NULL);
+#else
+  signal(SIGPIPE, SIG_IGN);
+#endif /* HAVE_SIGSET */
 
  /*
   * Check command-line...
@@ -345,5 +359,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.17.2.8 2002/03/25 17:14:14 mike Exp $".
+ * End of "$Id: socket.c,v 1.17.2.9 2002/10/15 16:40:33 mike Exp $".
  */

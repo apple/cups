@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.17
 
+	- The backends now ignore SIGPIPE so that failed job
+	  filters will not stop a print queue.
 	- The lpstat command did not allow for destination lists
 	  ("lpstat -v printer1,printer2")
 	- Fixed parsing of long filter status messages in the

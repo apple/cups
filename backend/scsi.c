@@ -1,5 +1,5 @@
 /*
- * "$Id: scsi.c,v 1.4.2.1 2002/05/27 14:47:11 mike Exp $"
+ * "$Id: scsi.c,v 1.4.2.2 2002/10/15 16:40:33 mike Exp $"
  *
  *   SCSI printer backend for the Common UNIX Printing System (CUPS).
  *
@@ -113,6 +113,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   int		fp;		/* Print file */
   int		copies;		/* Number of copies to print */
   int		status;		/* Exit status */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;	/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
  /*
@@ -120,6 +123,20 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   */
 
   setbuf(stderr, NULL);
+
+ /*
+  * Ignore SIGPIPE signals...
+  */
+
+#ifdef HAVE_SIGSET
+  sigset(SIGPIPE, SIG_IGN);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+  action.sa_handler = SIG_IGN;
+  sigaction(SIGPIPE, &action, NULL);
+#else
+  signal(SIGPIPE, SIG_IGN);
+#endif /* HAVE_SIGSET */
 
  /*
   * Check command-line...
@@ -202,5 +219,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: scsi.c,v 1.4.2.1 2002/05/27 14:47:11 mike Exp $".
+ * End of "$Id: scsi.c,v 1.4.2.2 2002/10/15 16:40:33 mike Exp $".
  */

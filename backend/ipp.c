@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.14 2002/07/23 21:20:25 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.15 2002/10/15 16:40:32 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -114,6 +114,20 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   */
 
   setbuf(stderr, NULL);
+
+ /*
+  * Ignore SIGPIPE signals...
+  */
+
+#ifdef HAVE_SIGSET
+  sigset(SIGPIPE, SIG_IGN);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+  action.sa_handler = SIG_IGN;
+  sigaction(SIGPIPE, &action, NULL);
+#else
+  signal(SIGPIPE, SIG_IGN);
+#endif /* HAVE_SIGSET */
 
  /*
   * Check command-line...
@@ -888,5 +902,5 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.14 2002/07/23 21:20:25 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.15 2002/10/15 16:40:32 mike Exp $".
  */

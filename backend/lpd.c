@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.28.2.14 2002/10/15 14:48:43 mike Exp $"
+ * "$Id: lpd.c,v 1.28.2.15 2002/10/15 16:40:32 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -122,6 +122,20 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   */
 
   setbuf(stderr, NULL);
+
+ /*
+  * Ignore SIGPIPE signals...
+  */
+
+#ifdef HAVE_SIGSET
+  sigset(SIGPIPE, SIG_IGN);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+  action.sa_handler = SIG_IGN;
+  sigaction(SIGPIPE, &action, NULL);
+#else
+  signal(SIGPIPE, SIG_IGN);
+#endif /* HAVE_SIGSET */
 
  /*
   * Check command-line...
@@ -907,5 +921,5 @@ rresvport(int *port)		/* IO - Port number to bind to */
 #endif /* !HAVE_RRESVPORT */
 
 /*
- * End of "$Id: lpd.c,v 1.28.2.14 2002/10/15 14:48:43 mike Exp $".
+ * End of "$Id: lpd.c,v 1.28.2.15 2002/10/15 16:40:32 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.18.2.18 2002/09/25 18:09:44 mike Exp $"
+ * "$Id: usb.c,v 1.18.2.19 2002/10/15 16:40:33 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -105,6 +105,20 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   */
 
   setbuf(stderr, NULL);
+
+ /*
+  * Ignore SIGPIPE signals...
+  */
+
+#ifdef HAVE_SIGSET
+  sigset(SIGPIPE, SIG_IGN);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+  action.sa_handler = SIG_IGN;
+  sigaction(SIGPIPE, &action, NULL);
+#else
+  signal(SIGPIPE, SIG_IGN);
+#endif /* HAVE_SIGSET */
 
  /*
   * Check command-line...
@@ -622,5 +636,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb.c,v 1.18.2.18 2002/09/25 18:09:44 mike Exp $".
+ * End of "$Id: usb.c,v 1.18.2.19 2002/10/15 16:40:33 mike Exp $".
  */
