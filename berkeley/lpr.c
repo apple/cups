@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.14 2000/08/03 17:57:42 mike Exp $"
+ * "$Id: lpr.c,v 1.15 2000/08/18 17:51:18 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -123,14 +123,17 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
 	case 'l' : /* Literal/raw */
-            num_options = cupsParseOptions("raw", num_options, &options);
+            num_options = cupsAddOption("raw", "", num_options, &options);
 	    break;
 
 	case 'p' : /* Prettyprint */
-            num_options = cupsParseOptions("prettyprint", num_options, &options);
+            num_options = cupsAddOption("prettyprint", "", num_options, &options);
 	    break;
 
 	case 'h' : /* Suppress burst page */
+            num_options = cupsAddOption("job-sheets", "none", num_options, &options);
+	    break;
+
 	case 's' : /* Don't use symlinks */
 	    break;
 
@@ -350,5 +353,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c,v 1.14 2000/08/03 17:57:42 mike Exp $".
+ * End of "$Id: lpr.c,v 1.15 2000/08/18 17:51:18 mike Exp $".
  */
