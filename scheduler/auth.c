@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.75 2004/10/04 19:40:35 mike Exp $"
+ * "$Id: auth.c,v 1.76 2004/10/11 19:29:40 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -1210,7 +1210,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
 	  if (!md5[0])
 	  {
-            LogMessage(L_ERROR, "IsAuthorized: No matching user:group for \"%s\" in passwd.md5!",
+            LogMessage(L_DEBUG2, "IsAuthorized: No matching user:group for \"%s\" in passwd.md5!",
 	               con->username);
             return (HTTP_UNAUTHORIZED);
 	  }
@@ -1219,7 +1219,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
 	  if (strcmp(md5, con->password) != 0)
 	  {
-            LogMessage(L_ERROR, "IsAuthorized: MD5s \"%s\" and \"%s\" don't match!",
+            LogMessage(L_DEBUG2, "IsAuthorized: MD5s \"%s\" and \"%s\" don't match!",
 	               md5, con->password);
             return (HTTP_UNAUTHORIZED);
 	  }
@@ -1246,7 +1246,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
 	  if (!md5[0])
 	  {
-            LogMessage(L_ERROR, "IsAuthorized: No matching user:group for \"%s\" in passwd.md5!",
+            LogMessage(L_DEBUG2, "IsAuthorized: No matching user:group for \"%s\" in passwd.md5!",
 	               con->username);
             return (HTTP_UNAUTHORIZED);
 	  }
@@ -1255,7 +1255,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
 	  if (strcmp(md5, basicmd5) != 0)
 	  {
-            LogMessage(L_ERROR, "IsAuthorized: MD5s \"%s\" and \"%s\" don't match!",
+            LogMessage(L_DEBUG2, "IsAuthorized: MD5s \"%s\" and \"%s\" don't match!",
 	               md5, basicmd5);
             return (HTTP_UNAUTHORIZED);
 	  }
@@ -1673,5 +1673,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.75 2004/10/04 19:40:35 mike Exp $".
+ * End of "$Id: auth.c,v 1.76 2004/10/11 19:29:40 mike Exp $".
  */
