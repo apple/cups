@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.68 2000/05/22 18:22:55 mike Exp $"
+ * "$Id: job.c,v 1.69 2000/06/01 20:05:38 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -771,6 +771,13 @@ StartJob(int       id,		/* I - Job ID */
 
   if (current == NULL)
     return;
+
+  if (current->num_files == 0)
+  {
+    LogMessage(L_ERROR, "StartJob: Job ID %d has no files!  Cancelling it!", id);
+    CancelJob(id, 0);
+    return;
+  }
 
  /*
   * Update the printer and job state to "processing"...
@@ -2344,5 +2351,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.68 2000/05/22 18:22:55 mike Exp $".
+ * End of "$Id: job.c,v 1.69 2000/06/01 20:05:38 mike Exp $".
  */

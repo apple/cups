@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.70 2000/06/01 18:09:45 mike Exp $"
+ * "$Id: ipp.c,v 1.71 2000/06/01 20:05:38 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -4093,8 +4093,8 @@ send_document(client_t        *con,	/* I - Client connection */
 
   con->filename[0] = '\0';
 
-  LogMessage(L_INFO, "File queued in job #%d by \'%s\'.", job->id,
-             job->username);
+  LogMessage(L_INFO, "File of type %s/%s queued in job #%d by \'%s\'.",
+             filetype->super, filetype->type, job->id, job->username);
 
  /*
   * Start the job if this is the last document...
@@ -4130,7 +4130,7 @@ send_document(client_t        *con,	/* I - Client connection */
   else
   {
     job->state->values[0].integer = IPP_JOB_HELD;
-    job->hold_until = time(NULL) + 60;
+    job->hold_until               = time(NULL) + 60;
     SaveJob(job->id);
   }
 
@@ -4806,5 +4806,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.70 2000/06/01 18:09:45 mike Exp $".
+ * End of "$Id: ipp.c,v 1.71 2000/06/01 20:05:38 mike Exp $".
  */
