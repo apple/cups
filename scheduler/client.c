@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.184 2004/04/20 13:34:49 mike Exp $"
+ * "$Id: client.c,v 1.185 2004/06/17 14:43:44 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2939,6 +2939,13 @@ pipe_command(client_t *con,		/* I - Client connection */
 		  "KOI8R",
 		  "KOI8U"
 		};
+  static const char * const encryptions[] =
+		{
+		  "CUPS_ENCRYPTION=IfRequested",
+		  "CUPS_ENCRYPTION=Never",
+		  "CUPS_ENCRYPTION=Required",
+		  "CUPS_ENCRYPTION=Always"
+		};
 
 
  /*
@@ -3143,10 +3150,13 @@ pipe_command(client_t *con,		/* I - Client connection */
   */
 
   if (con->http.encryption == HTTP_ENCRYPT_ALWAYS)
-  {
     envp[envc ++] = "HTTPS=ON";
-    envp[envc ++] = "CUPS_ENCRYPTION=Always";
-  }
+
+  envp[envc ++] = (char *)encryptions[LocalEncryption];
+
+ /*
+  * Terminate the environment array...
+  */
 
   envp[envc] = NULL;
 
@@ -3352,5 +3362,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.184 2004/04/20 13:34:49 mike Exp $".
+ * End of "$Id: client.c,v 1.185 2004/06/17 14:43:44 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.29 2004/05/27 15:37:34 mike Exp $"
+ * "$Id: lpq.c,v 1.30 2004/06/17 14:43:44 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -438,7 +438,16 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 	strcpy(rankstr, "active");
       else
       {
-	snprintf(rankstr, sizeof(rankstr), "%d%s", rank, ranks[rank % 10]);
+       /*
+        * Make the rank show the "correct" suffix for each number
+	* (11-13 are the only special cases, for English anyways...)
+	*/
+
+	if ((rank % 100) >= 11 && (rank % 100) <= 13)
+	  snprintf(rankstr, sizeof(rankstr), "%dth", rank);
+	else
+	  snprintf(rankstr, sizeof(rankstr), "%d%s", rank, ranks[rank % 10]);
+
 	rank ++;
       }
 
@@ -582,5 +591,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpq.c,v 1.29 2004/05/27 15:37:34 mike Exp $".
+ * End of "$Id: lpq.c,v 1.30 2004/06/17 14:43:44 mike Exp $".
  */

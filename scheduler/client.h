@@ -1,5 +1,5 @@
 /*
- * "$Id: client.h,v 1.30 2004/03/02 20:54:33 mike Exp $"
+ * "$Id: client.h,v 1.31 2004/06/17 14:43:44 mike Exp $"
  *
  *   Client definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -71,6 +71,8 @@ VAR int			ListenBackLog	VALUE(SOMAXCONN),
 					/* Max backlog of pending connections */
 			LocalPort	VALUE(631);
 					/* Local port to use */
+VAR http_encryption_t	LocalEncryption	VALUE(HTTP_ENCRYPT_IF_REQUESTED);
+					/* Local port encryption to use */
 VAR int			NumListeners	VALUE(0);
 					/* Number of listening sockets */
 VAR listener_t		*Listeners	VALUE(NULL);
@@ -110,5 +112,5 @@ extern void	UpdateCGI(void);
 extern int	WriteClient(client_t *con);
 
 /*
- * End of "$Id: client.h,v 1.30 2004/03/02 20:54:33 mike Exp $".
+ * End of "$Id: client.h,v 1.31 2004/06/17 14:43:44 mike Exp $".
  */

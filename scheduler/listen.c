@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.22 2004/03/24 21:23:04 mike Exp $"
+ * "$Id: listen.c,v 1.23 2004/06/17 14:43:44 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -155,7 +155,10 @@ StartListening(void)
     if (!LocalPort &&
         (ntohl(lis->address.sin_addr.s_addr) == 0x7f000001 ||
          ntohl(lis->address.sin_addr.s_addr) == 0x00000000))
-      LocalPort = ntohs(lis->address.sin_port);
+    {
+      LocalPort       = ntohs(lis->address.sin_port);
+      LocalEncryption = lis->encryption;
+    }
 
    /*
     * Create a socket for listening...
@@ -251,5 +254,5 @@ StopListening(void)
 
 
 /*
- * End of "$Id: listen.c,v 1.22 2004/03/24 21:23:04 mike Exp $".
+ * End of "$Id: listen.c,v 1.23 2004/06/17 14:43:44 mike Exp $".
  */
