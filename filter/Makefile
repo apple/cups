@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.53 2002/01/14 20:29:17 mike Exp $"
+# "$Id: Makefile,v 1.54 2002/01/15 20:37:46 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -194,7 +194,7 @@ pstops.o:	common.h
 # rastertodymo
 #
 
-rastertodymo:	rastertodymo.o ../Makedefs ../cups/$(LIBCUPS) libcupsimage.a
+rastertodymo:	rastertodymo.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ rastertodymo.o libcupsimage.a $(LIBS)
 rastertodymo.o:	raster.h
@@ -238,5 +238,5 @@ $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 
 #
-# End of "$Id: Makefile,v 1.53 2002/01/14 20:29:17 mike Exp $".
+# End of "$Id: Makefile,v 1.54 2002/01/15 20:37:46 mike Exp $".
 #
