@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.13
 
+	- cupsGetDests() didn't merge the options from the
+	  /etc/cups/lpoptions file with ~/.lpoptions - options
+	  in ~/.lpoptions overrode them completely.
+	- Added support for KOI8-R and KOI8-U character sets,
+	  and added several Russian message catalogs.
 	- The scheduler put the wrong timezone offset in the log
 	  files (e.g. +0500 instead of -0500 for EST...)
 	- The scheduler did not ignore trailing whitespace in

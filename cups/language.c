@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.20.2.1 2002/01/02 18:04:28 mike Exp $"
+ * "$Id: language.c,v 1.20.2.2 2002/01/29 20:28:02 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -73,7 +73,9 @@ static char		*lang_encodings[] =	/* Encoding strings */
 			  "windows-1255",
 			  "windows-1256",
 			  "windows-1257",
-			  "windows-1258"
+			  "windows-1258",
+			  "koi8-r",
+			  "koi8-u"
 			};
 static char		*lang_default[] =	/* Default POSIX locale */
 			{
@@ -145,6 +147,7 @@ cupsLangGet(const char *language) /* I - Language or locale */
   int		i, count;	/* Looping vars */
   char		langname[16],	/* Requested language name */
 		real[16],	/* Real language name */
+		*realptr,	/* Pointer into real language name */
 		filename[1024],	/* Filename for language locale file */
 		*localedir;	/* Directory for locale files */
   FILE		*fp;		/* Language locale file pointer */
@@ -159,8 +162,7 @@ cupsLangGet(const char *language) /* I - Language or locale */
   * standard POSIX locale and is copied unchanged.  Otherwise the
   * language string is converted from ll-cc (language-country) to ll_cc
   * to match the file naming convention used by all POSIX-compliant
-  * operating systems.  Any trailing character set specification is
-  * dropped.
+  * operating systems.
   */
 
   if (language == NULL || language[0] == '\0' ||
@@ -174,63 +176,60 @@ cupsLangGet(const char *language) /* I - Language or locale */
 
     strncpy(langname, language, sizeof(langname) - 1);
     langname[sizeof(langname) - 1] = '\0';
-
-   /*
-    * Strip charset from "locale.charset"...
-    */
-
-    if ((text = strchr(langname, '.')) != NULL)
-      *text = '\0';
   }
 
   if (strlen(langname) < 2)
     strcpy(real, "C");
   else
   {
+   /*
+    * Convert the language name to a normalized form, e.g.:
+    *
+    *     ll[_CC[.setname]]
+    */
+
     real[0] = tolower(langname[0]);
     real[1] = tolower(langname[1]);
 
-    if (langname[2] == '_' || langname[2] == '-')
+    count = 2;
+
+    if (langname[count] == '_' || langname[count] == '-')
     {
-      real[2]     = '_';
-      real[3]     = toupper(langname[3]);
-      real[4]     = toupper(langname[4]);
-      real[5]     = '\0';
-      langname[5] = '\0';
+     /*
+      * Add country code...
+      */
+
+      real[count]     = '_';
+      real[count + 1] = toupper(langname[count + 1]);
+      real[count + 2] = toupper(langname[count + 2]);
+
+      count += 3;
     }
-    else
+
+    if (langname[count] == '.')
     {
-      langname[2] = '\0';
-      real[2]     = '\0';
+     /*
+      * Add charset...
+      */
+
+      strncpy(real + count, langname + count, sizeof(real) - count - 1);
+      count += strlen(langname + count);
+
+     /*
+      * Make sure count stays within the bounds of langname and real
+      * (both vars are the same size...)
+      */
+
+      if (count >= sizeof(real))
+        count = sizeof(real) - 1;
     }
+
+    langname[count] = '\0';
+    real[count]     = '\0';
   }
 
  /*
-  * Next try to open a locale file; we will try the country-localized file
-  * first, and then look for generic language file.  If all else fails we
-  * will use the POSIX locale.
-  */
-
-  if ((localedir = getenv("LOCALEDIR")) == NULL)
-    localedir = CUPS_LOCALEDIR;
-
-  snprintf(filename, sizeof(filename), "%s/%s/cups_%s", localedir, real, real);
-
-  if ((fp = fopen(filename, "r")) == NULL)
-    if (strlen(real) > 2)
-    {
-     /*
-      * Nope, see if we can open a generic language file...
-      */
-
-      real[2] = '\0';
-      snprintf(filename, sizeof(filename), "%s/%s/cups_%s", localedir, real,
-               real);
-      fp = fopen(filename, "r");
-    }
-
- /*
-  * Then see if we already have this language loaded...
+  * See if we already have this language loaded...
   */
 
   for (lang = lang_cache; lang != NULL; lang = lang->next)
@@ -238,11 +237,34 @@ cupsLangGet(const char *language) /* I - Language or locale */
     {
       lang->used ++;
 
-      if (fp != NULL)
-        fclose(fp);
-
       return (lang);
     }
+
+
+ /*
+  * Next try to open a locale file; we will try the charset-localized
+  * file first, then the country-localized file, and finally look for
+  * a generic language file.  If all else fails we will use the POSIX
+  * locale.
+  */
+
+  if ((localedir = getenv("LOCALEDIR")) == NULL)
+    localedir = CUPS_LOCALEDIR;
+
+  do
+  {
+    snprintf(filename, sizeof(filename), "%s/%s/cups_%s", localedir,
+             real, real);
+
+    if ((fp = fopen(filename, "r")) == NULL)
+    {
+      if ((realptr = strchr(real, '.')) != NULL)
+        *realptr = '\0';
+      else if ((realptr = strchr(real, '_')) != NULL)
+        *realptr = '\0';
+    }
+  }
+  while (fp == NULL && strchr(real, '_') != NULL && strchr(real, '.') != NULL);
 
  /*
   * OK, we have an open messages file; the first line will contain the
@@ -403,5 +425,5 @@ cupsLangGet(const char *language) /* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.20.2.1 2002/01/02 18:04:28 mike Exp $".
+ * End of "$Id: language.c,v 1.20.2.2 2002/01/29 20:28:02 mike Exp $".
  */

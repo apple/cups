@@ -23,7 +23,7 @@ charset 8bit
 #
 
 00 7f ltor single Courier Courier-Bold Courier-Italic Courier-BoldItalic
-80 ff rtol single Courier-Hebrew
+80 ff rtol single Courier
 
 #
 # The following lines define the mapping from the 8-bit character set to

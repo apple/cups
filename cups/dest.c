@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.18.2.4 2002/01/23 17:32:09 mike Exp $"
+ * "$Id: dest.c,v 1.18.2.5 2002/01/29 20:28:01 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -616,18 +616,6 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
     * Add options until we hit the end of the line...
     */
 
-    if (dest->num_options)
-    {
-     /*
-      * Free old options...
-      */
-
-      cupsFreeOptions(dest->num_options, dest->options);
-
-      dest->num_options = 0;
-      dest->options     = (cups_option_t *)0;
-    }
-
     dest->num_options = cupsParseOptions(lineptr, dest->num_options,
                                          &(dest->options));
 
@@ -797,5 +785,5 @@ cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
 
 
 /*
- * End of "$Id: dest.c,v 1.18.2.4 2002/01/23 17:32:09 mike Exp $".
+ * End of "$Id: dest.c,v 1.18.2.5 2002/01/29 20:28:01 mike Exp $".
  */
