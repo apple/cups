@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- The cupsLangGet() function now uses nl_langinfo(),
+	  when available, to get the current encoding (STR #856)
 	- Added a ReloadTimeout directive to control how long
 	  the scheduler waits for jobs to complete before
 	  restarting the scheduler (STR #861)

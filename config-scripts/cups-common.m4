@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.12.2.23 2004/08/11 14:41:00 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.12.2.24 2004/08/19 14:10:27 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -118,6 +118,7 @@ dnl Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_DIRENT
 AC_CHECK_HEADER(crypt.h,AC_DEFINE(HAVE_CRYPT_H))
+AC_CHECK_HEADER(langinfo.h,AC_DEFINE(HAVE_LANGINFO_H))
 AC_CHECK_HEADER(malloc.h,AC_DEFINE(HAVE_MALLOC_H))
 AC_CHECK_HEADER(shadow.h,AC_DEFINE(HAVE_SHADOW_H))
 AC_CHECK_HEADER(string.h,AC_DEFINE(HAVE_STRING_H))
@@ -220,5 +221,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.12.2.23 2004/08/11 14:41:00 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.12.2.24 2004/08/19 14:10:27 mike Exp $".
 dnl

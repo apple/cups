@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.20.2.31 2004/06/29 13:15:08 mike Exp $"
+ * "$Id: language.c,v 1.20.2.32 2004/08/19 14:10:27 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -45,6 +45,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#ifdef HAVE_LANGINFO_H
+#  include <langinfo.h>
+#endif /* HAVE_LANGINFO_H */
 #ifdef WIN32
 #  include <io.h>
 #else
@@ -244,10 +247,14 @@ cups_lang_t *				/* O - Language data */
 cupsLangGet(const char *language)	/* I - Language or locale */
 {
   int			i, count;	/* Looping vars */
-  char			langname[16],	/* Requested language name */
+  char			locale[255],	/* Copy of locale name */
+			langname[16],	/* Requested language name */
 			country[16],	/* Country code */
 			charset[16],	/* Character set */
-			*ptr,		/* Pointer into language/ */
+#ifdef CODESET
+			*csptr,		/* Pointer to CODESET string */
+#endif /* CODESET */
+			*ptr,		/* Pointer into language/charset */
 			real[48],	/* Real language name */
 			filename[1024],	/* Filename for language locale file */
 			*localedir;	/* Directory for locale files */
@@ -260,14 +267,14 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   char			*oldlocale;	/* Old locale name */
   static const char * const locale_encodings[] =
 		{			/* Locale charset names */
-		  "ASCII",	"ISO8859-1",	"ISO8859-2",	"ISO8859-3",
-		  "ISO8859-4",	"ISO8859-5",	"ISO8859-6",	"ISO8859-7",
-		  "ISO8859-8",	"ISO8859-9",	"ISO8859-10",	"UTF-8",
-		  "ISO8859-13",	"ISO8859-14",	"ISO8859-15",	"CP874",
+		  "ASCII",	"ISO88591",	"ISO88592",	"ISO88593",
+		  "ISO88594",	"ISO88595",	"ISO88596",	"ISO88597",
+		  "ISO88598",	"ISO88599",	"ISO885910",	"UTF8",
+		  "ISO885913",	"ISO885914",	"ISO885915",	"CP874",
 		  "CP1250",	"CP1251",	"CP1252",	"CP1253",
 		  "CP1254",	"CP1255",	"CP1256",	"CP1257",
-		  "CP1258",	"KOI8R",	"KOI8U",	"ISO8859-11",
-		  "ISO8859-16",	"",		"",		"",
+		  "CP1258",	"KOI8R",	"KOI8U",	"ISO885911",
+		  "ISO885916",	"",		"",		"",
 
 		  "",		"",		"",		"",
 		  "",		"",		"",		"",
@@ -296,9 +303,11 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 		  "",		"",		"",		"",
 		  "",		"",		"",		"",
 
-		  "EUC-CN",	"EUC-JP",	"EUC-KR",	"EUC-TW"
+		  "EUCCN",	"EUCJP",	"EUCKR",	"EUCTW"
 		};
 
+
+  DEBUG_printf(("cupsLangGet(language=\"%s\")\n", language ? language : "(null)"));
 
 #ifdef __APPLE__
  /*
@@ -308,19 +317,6 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 
   if (language == NULL)
     language = appleLangDefault();
-#elif defined(LC_MESSAGES)
-  if (language == NULL)
-  {
-   /*
-    * First see if the locale has been set; if it is still "C" or
-    * "POSIX", set the locale to the default...
-    */
-
-    language = setlocale(LC_MESSAGES, NULL);
-
-    if (!language || !strcmp(language, "C") || !strcmp(language, "POSIX"))
-      language = setlocale(LC_MESSAGES, "");
-  }
 #else
   if (language == NULL)
   {
@@ -329,10 +325,26 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     * "POSIX", set the locale to the default...
     */
 
-    language = setlocale(LC_ALL, NULL);
+#  ifdef LC_MESSAGES
+    ptr = setlocale(LC_MESSAGES, NULL);
+#  else
+    ptr = setlocale(LC_ALL, NULL);
+#  endif /* LC_MESSAGES */
 
-    if (!language || !strcmp(language, "C") || !strcmp(language, "POSIX"))
-      language = setlocale(LC_ALL, "");
+    DEBUG_printf(("cupsLangGet: current locale is \"%s\"\n",
+                  ptr ? ptr : "(null)"));
+
+    if (!ptr || !strcmp(ptr, "C") || !strcmp(ptr, "POSIX"))
+      ptr = setlocale(LC_ALL, "");
+
+    if (ptr)
+    {
+      strlcpy(locale, ptr, sizeof(locale));
+      language = locale;
+
+      DEBUG_printf(("cupsLangGet: new language value is \"%s\"\n",
+                    language ? language : "(null)"));
+    }
   }
 #endif /* __APPLE__ */
 
@@ -351,6 +363,35 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     if ((language = getenv("LANG")) == NULL)
       language = "C";
   }
+
+ /*
+  * Set the charset to "unknown"...
+  */
+
+  charset[0] = '\0';
+
+#ifdef CODESET
+ /*
+  * On systems that support the nl_langinfo(CODESET) call, use
+  * this value as the character set...
+  */
+
+  if ((csptr = nl_langinfo(CODESET)) != NULL)
+  {
+   /*
+    * Copy all of the letters and numbers in the CODESET string...
+    */
+
+    for (ptr = charset; *csptr; csptr ++)
+      if (isalnum(*csptr & 255) && ptr < (charset + sizeof(charset) - 1))
+        *ptr++ = *csptr;
+
+    *ptr = '\0';
+
+    DEBUG_printf(("cupsLangGet: charset set to \"%s\" via nl_langinfo(CODESET)...\n",
+                  charset));
+  }
+#endif /* CODESET */
 
  /*
   * Set the locale back to POSIX while we do string ops, since
@@ -376,7 +417,6 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   */
 
   country[0] = '\0';
-  charset[0] = '\0';
 
   if (language == NULL || !language[0] ||
       strcmp(language, "POSIX") == 0)
@@ -410,14 +450,14 @@ cupsLangGet(const char *language)	/* I - Language or locale */
       *ptr = '\0';
     }
 
-    if (*language == '.')
+    if (*language == '.' && !charset[0])
     {
      /*
       * Copy the encoding...
       */
 
       for (language ++, ptr = charset; *language; language ++)
-	if (ptr < (charset + sizeof(charset) - 1))
+        if (isalnum(*language & 255) && ptr < (charset + sizeof(charset) - 1))
           *ptr++ = toupper(*language & 255);
 
       *ptr = '\0';
@@ -447,6 +487,9 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   _cupsRestoreLocale(LC_CTYPE, oldlocale);
 #endif /* __APPLE__ */
 
+  DEBUG_printf(("cupsLangGet: langname=\"%s\", country=\"%s\", charset=\"%s\"\n",
+                langname, country, charset));
+
  /*
   * Figure out the desired encoding...
   */
@@ -462,6 +505,10 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 	break;
       }
   }
+
+  DEBUG_printf(("cupsLangGet: encoding=%d(%s)\n", encoding,
+                encoding == CUPS_AUTO_ENCODING ? "auto" :
+		    lang_encodings[encoding]));
 
  /*
   * Now find the message catalog for this locale...
@@ -977,23 +1024,37 @@ cups_cache_lookup(const char      *name,/* I - Name of locale */
   cups_lang_t	*lang;			/* Current language */
 
 
+  DEBUG_printf(("cups_cache_lookup(name=\"%s\", encoding=%d(%s))\n", name,
+                encoding, encoding == CUPS_AUTO_ENCODING ? "auto" :
+		              lang_encodings[encoding]));
+
  /*
   * Loop through the cache and return a match if found...
   */
 
   for (lang = lang_cache; lang != NULL; lang = lang->next)
+  {
+    DEBUG_printf(("cups_cache_lookup: lang=%p, language=\"%s\", encoding=%d(%s)\n",
+                  lang, lang->language, lang->encoding,
+		  lang_encodings[lang->encoding]));
+
     if (!strcmp(lang->language, name) &&
         (encoding == CUPS_AUTO_ENCODING || encoding == lang->encoding))
     {
       lang->used ++;
 
+      DEBUG_puts("cups_cache_lookup: returning match!");
+
       return (lang);
     }
+  }
+
+  DEBUG_puts("cups_cache_lookup: returning NULL!");
 
   return (NULL);
 }
 
 
 /*
- * End of "$Id: language.c,v 1.20.2.31 2004/06/29 13:15:08 mike Exp $".
+ * End of "$Id: language.c,v 1.20.2.32 2004/08/19 14:10:27 mike Exp $".
  */

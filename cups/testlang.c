@@ -1,7 +1,7 @@
 /*
- * "$Id: testlang.c,v 1.1.2.6 2004/06/29 13:15:09 mike Exp $"
+ * "$Id: testlang.c,v 1.1.2.7 2004/08/19 14:10:27 mike Exp $"
  *
- *   HTTP test program for the Common UNIX Printing System (CUPS).
+ *   Localization test program for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-2004 by Easy Software Products.
  *
@@ -90,17 +90,30 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
 
   if (language != language2)
+  {
     puts("**** ERROR: Language cache did not work! ****");
+    puts("First result from cupsLangGet:");
+  }
 
   printf("Language = \"%s\"\n", language->language);
   printf("Encoding = \"%s\"\n", charsets[language->encoding]);
   printf("No       = \"%s\"\n", cupsLangString(language, CUPS_MSG_NO));
   printf("Yes      = \"%s\"\n", cupsLangString(language, CUPS_MSG_YES));
 
+  if (language != language2)
+  {
+    puts("Second result from cupsLangGet:");
+
+    printf("Language = \"%s\"\n", language2->language);
+    printf("Encoding = \"%s\"\n", charsets[language2->encoding]);
+    printf("No       = \"%s\"\n", cupsLangString(language2, CUPS_MSG_NO));
+    printf("Yes      = \"%s\"\n", cupsLangString(language2, CUPS_MSG_YES));
+  }
+
   return (0);
 }
 
 
 /*
- * End of "$Id: testlang.c,v 1.1.2.6 2004/06/29 13:15:09 mike Exp $".
+ * End of "$Id: testlang.c,v 1.1.2.7 2004/08/19 14:10:27 mike Exp $".
  */
