@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.40 2001/06/28 01:09:51 mike Exp $"
+# "$Id: Makedefs.in,v 1.41 2001/06/28 16:37:14 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -48,6 +48,7 @@ SHELL	=	/bin/sh
 
 INSTALL_BIN	=	$(LIBTOOL) $(INSTALL) -m 755 -s
 INSTALL_DATA	=	$(INSTALL) -m 644
+INSTALL_DIR	=	$(INSTALL) -d
 INSTALL_LIB	=	$(LIBTOOL) $(INSTALL) -m 755
 INSTALL_MAN	=	$(INSTALL) -m 644
 INSTALL_SCRIPT	=	$(INSTALL) -m 755
@@ -170,5 +171,5 @@ MAN8EXT		=	@MAN8EXT@
 	$(MV) t.z $@
 
 #
-# End of "$Id: Makedefs.in,v 1.40 2001/06/28 01:09:51 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.41 2001/06/28 16:37:14 mike Exp $"
 #
