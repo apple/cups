@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.8.2.7 2003/04/18 13:37:37 mike Exp $"
+# "$Id: Makefile,v 1.8.2.8 2004/06/29 03:46:30 mike Exp $"
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -15,9 +15,9 @@
 #       Attn: CUPS Licensing Information
 #       Easy Software Products
 #       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636-3111 USA
+#       Hollywood, Maryland 20636-3142 USA
 #
-#       Voice: (301) 373-9603
+#       Voice: (301) 373-9600
 #       EMail: cups-info@cups.org
 #         WWW: http://www.cups.org
 #
@@ -72,5 +72,5 @@ translate.o:	../cups/http.h
 
 
 #
-# End of "$Id: Makefile,v 1.8.2.7 2003/04/18 13:37:37 mike Exp $".
+# End of "$Id: Makefile,v 1.8.2.8 2004/06/29 03:46:30 mike Exp $".
 #

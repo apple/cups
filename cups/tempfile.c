@@ -1,5 +1,5 @@
 /*
- * "$Id: tempfile.c,v 1.1.2.9 2003/01/24 20:45:14 mike Exp $"
+ * "$Id: tempfile.c,v 1.1.2.10 2004/06/29 03:46:29 mike Exp $"
  *
  *   Temp file utilities for the Common UNIX Printing System (CUPS).
  *
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -217,5 +217,5 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
 
 
 /*
- * End of "$Id: tempfile.c,v 1.1.2.9 2003/01/24 20:45:14 mike Exp $".
+ * End of "$Id: tempfile.c,v 1.1.2.10 2004/06/29 03:46:29 mike Exp $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.53.2.27 2004/01/08 03:07:36 mike Exp $"
+# "$Id: Makefile,v 1.53.2.28 2004/06/29 03:46:29 mike Exp $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -15,9 +15,9 @@
 #       Attn: CUPS Licensing Information
 #       Easy Software Products
 #       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636-3111 USA
+#       Hollywood, Maryland 20636-3142 USA
 #
-#       Voice: (301) 373-9603
+#       Voice: (301) 373-9600
 #       EMail: cups-info@cups.org
 #         WWW: http://www.cups.org
 #
@@ -95,8 +95,8 @@ install:	all	installhdrs
 	fi
 	if test $(LIBCUPS) != "libcups.a"; then \
 		$(INSTALL_LIB) libcups.a $(LIBDIR); \
+		$(RANLIB) $(LIBDIR)/libcups.a; \
 	fi
-	$(RANLIB) $(LIBDIR)/libcups.a
 
 installhdrs:
 	$(INSTALL_DIR) $(INCLUDEDIR)/cups
@@ -124,7 +124,7 @@ libcups.2.dylib:	$(LIBOBJS)
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/libcups.dylib \
-		-current_version 2.6.0 \
+		-current_version 2.7.0 \
 		-compatibility_version 2.0.0 \
 		$(LIBOBJS) $(SSLLIBS) $(COMMONLIBS)
 	$(RM) libcups.dylib
@@ -150,8 +150,8 @@ libcups_s.a:	$(LIBOBJS)
 
 libcups.la:    $(LIBOBJS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
-		-version-info 2:5 $(SSLLIBS) $(COMMONLIBS)
+	$(CC) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
+		-version-info 2:7 $(SSLLIBS) $(COMMONLIBS)
 
 
 #
@@ -233,5 +233,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.53.2.27 2004/01/08 03:07:36 mike Exp $".
+# End of "$Id: Makefile,v 1.53.2.28 2004/06/29 03:46:29 mike Exp $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: md5passwd.c,v 1.5.2.7 2003/01/24 20:45:14 mike Exp $"
+ * "$Id: md5passwd.c,v 1.5.2.8 2004/06/29 03:46:29 mike Exp $"
  *
  *   MD5 password support for the Common UNIX Printing System (CUPS).
  *
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -146,5 +146,5 @@ httpMD5String(const md5_byte_t *sum,	/* I - MD5 sum data */
 
 
 /*
- * End of "$Id: md5passwd.c,v 1.5.2.7 2003/01/24 20:45:14 mike Exp $".
+ * End of "$Id: md5passwd.c,v 1.5.2.8 2004/06/29 03:46:29 mike Exp $".
  */

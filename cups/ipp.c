@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.39 2004/02/25 16:58:32 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.40 2004/06/29 03:46:29 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -16,9 +16,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -2553,5 +2553,5 @@ ipp_write_file(int         *fd,			/* I - File descriptor */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.39 2004/02/25 16:58:32 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.40 2004/06/29 03:46:29 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.1.2.7 2004/06/29 01:04:30 mike Exp $"
+ * "$Id: auth.c,v 1.1.2.8 2004/06/29 03:46:29 mike Exp $"
  *
  *   Authentication functions for the Common UNIX Printing System (CUPS).
  *
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -245,5 +245,5 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: auth.c,v 1.1.2.7 2004/06/29 01:04:30 mike Exp $".
+ * End of "$Id: auth.c,v 1.1.2.8 2004/06/29 03:46:29 mike Exp $".
  */

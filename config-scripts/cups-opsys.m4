@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-opsys.m4,v 1.5.2.7 2004/02/26 16:59:02 mike Exp $"
+dnl "$Id: cups-opsys.m4,v 1.5.2.8 2004/06/29 03:46:29 mike Exp $"
 dnl
 dnl   Operating system stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -15,9 +15,9 @@ dnl
 dnl       Attn: CUPS Licensing Information
 dnl       Easy Software Products
 dnl       44141 Airport View Drive, Suite 204
-dnl       Hollywood, Maryland 20636-3111 USA
+dnl       Hollywood, Maryland 20636-3142 USA
 dnl
-dnl       Voice: (301) 373-9603
+dnl       Voice: (301) 373-9600
 dnl       EMail: cups-info@cups.org
 dnl         WWW: http://www.cups.org
 dnl
@@ -87,5 +87,5 @@ AC_DEFINE_UNQUOTED(CUPS_DEFAULT_USER, "$CUPS_USER")
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_GROUP, "$CUPS_GROUP")
 
 dnl
-dnl "$Id: cups-opsys.m4,v 1.5.2.7 2004/02/26 16:59:02 mike Exp $"
+dnl "$Id: cups-opsys.m4,v 1.5.2.8 2004/06/29 03:46:29 mike Exp $"
 dnl

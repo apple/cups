@@ -1,5 +1,5 @@
 /*
- * "$Id: testhttp.c,v 1.11.2.6 2003/03/13 05:45:30 mike Exp $"
+ * "$Id: testhttp.c,v 1.11.2.7 2004/06/29 03:46:29 mike Exp $"
  *
  *   HTTP test program for the Common UNIX Printing System (CUPS).
  *
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -123,5 +123,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testhttp.c,v 1.11.2.6 2003/03/13 05:45:30 mike Exp $".
+ * End of "$Id: testhttp.c,v 1.11.2.7 2004/06/29 03:46:29 mike Exp $".
  */

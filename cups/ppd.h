@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.24.2.19 2004/01/08 03:07:36 mike Exp $"
+ * "$Id: ppd.h,v 1.24.2.20 2004/06/29 03:46:29 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -16,9 +16,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -433,5 +433,5 @@ extern int		ppdSaveFile(ppd_file_t *ppd, const char *filename);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.24.2.19 2004/01/08 03:07:36 mike Exp $".
+ * End of "$Id: ppd.h,v 1.24.2.20 2004/06/29 03:46:29 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.50 2004/06/29 01:04:30 mike Exp $"
+ * "$Id: http.c,v 1.82.2.51 2004/06/29 03:46:29 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -2470,5 +2470,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.50 2004/06/29 01:04:30 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.51 2004/06/29 03:46:29 mike Exp $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.41.2.27 2004/04/05 16:19:16 mike Exp $"
+# "$Id: Makefile,v 1.41.2.28 2004/06/29 03:46:30 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -15,9 +15,9 @@
 #       Attn: CUPS Licensing Information
 #       Easy Software Products
 #       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636-3111 USA
+#       Hollywood, Maryland 20636-3142 USA
 #
-#       Voice: (301) 373-9603
+#       Voice: (301) 373-9600
 #       EMail: cups-info@cups.org
 #         WWW: http://www.cups.org
 #
@@ -47,7 +47,7 @@ OBJS	=	$(HPGLOBJS) $(IMAGEOBJS) $(FORMOBJS) \
 # Make all targets...
 #
 
-all:	$(TARGETS) libcupsimage.a
+all:	$(TARGETS) $(LIBCUPSIMAGE) libcupsimage.a
 
 
 #
@@ -89,8 +89,8 @@ install:	all installhdrs
 	fi
 	-if test $(LIBCUPSIMAGE) != "libcupsimage.a"; then \
 		$(INSTALL_LIB) libcupsimage.a $(LIBDIR); \
+		$(RANLIB) $(LIBDIR)/libcupsimage.a; \
 	fi
-	$(RANLIB) $(LIBDIR)/libcupsimage.a
 
 installhdrs:
 	$(INSTALL_DIR) $(INCLUDEDIR)/cups
@@ -288,5 +288,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.41.2.27 2004/04/05 16:19:16 mike Exp $".
+# End of "$Id: Makefile,v 1.41.2.28 2004/06/29 03:46:30 mike Exp $".
 #
