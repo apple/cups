@@ -20,6 +20,25 @@
 	STATUS ok-subst
 
 	# What attributes do we expect?
+	EXPECT charset-configured
+	EXPECT charset-supported
+	EXPECT compression-supported
+	EXPECT document-format-default
+	EXPECT document-format-supported
+	EXPECT generated-natural-language-supported
+	EXPECT ipp-versions-supported
+	EXPECT natural-language-configured
+	EXPECT operations-supported
+	EXPECT printer-info
+	EXPECT printer-is-accepting-jobs
+	EXPECT printer-location
+	EXPECT printer-make-and-model
+	EXPECT printer-more-info
 	EXPECT printer-name
 	EXPECT printer-state
+	EXPECT printer-state-reasons
+	EXPECT printer-up-time
+	EXPECT printer-uri-supported
+	EXPECT uri-authentication-supported
+	EXPECT uri-security-supported
 }
