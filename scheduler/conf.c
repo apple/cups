@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.11 2002/05/22 19:12:48 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.12 2002/06/14 19:48:54 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -118,6 +118,7 @@ static var_t	variables[] =
   { "RequestRoot",	RequestRoot,		VAR_STRING,	sizeof(RequestRoot) },
   { "RIPCache",		RIPCache,		VAR_STRING,	sizeof(RIPCache) },
   { "RunAsUser", 	&RunAsUser,		VAR_BOOLEAN,	0 },
+  { "RootCertDuration", &RootCertDuration,	VAR_INTEGER,	0 },
   { "ServerAdmin",	ServerAdmin,		VAR_STRING,	sizeof(ServerAdmin) },
   { "ServerBin",	ServerBin,		VAR_STRING,	sizeof(ServerBin) },
 #ifdef HAVE_LIBSSL
@@ -330,6 +331,7 @@ ReadConfiguration(void)
   MaxClients        = 100;
   MaxLogSize        = 1024 * 1024;
   MaxRequestSize    = 0;
+  RootCertDuration  = 300;
   RunAsUser         = FALSE;
   Timeout           = DEFAULT_TIMEOUT;
 
@@ -2020,5 +2022,5 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.11 2002/05/22 19:12:48 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.12 2002/06/14 19:48:54 mike Exp $".
  */

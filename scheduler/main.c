@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.14 2002/05/16 14:00:14 mike Exp $"
+ * "$Id: main.c,v 1.57.2.15 2002/06/14 19:48:56 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -338,15 +338,25 @@ main(int  argc,			/* I - Number of command-line arguments */
     input  = InputSet;
     output = OutputSet;
 
-    timeout.tv_sec  = 1;
-    timeout.tv_usec = 0;
-
     for (i = NumClients, con = Clients; i > 0; i --, con ++)
       if (con->http.used > 0)
-      {
-        timeout.tv_sec  = 0;
-	break;
-      }
+        break;
+
+    if (i)
+    {
+      timeout.tv_sec  = 0;
+      timeout.tv_usec = 0;
+    }
+    else
+    {
+     /*
+      * If we have no pending data from a client, see when we really
+      * need to wake up...
+      */
+
+      timeout.tv_sec  = 1;
+      timeout.tv_usec = 0;
+    }
 
     if ((i = select(MaxFDs, &input, &output, NULL, &timeout)) < 0)
     {
@@ -533,7 +543,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     * Update the root certificate once every 5 minutes...
     */
 
-    if ((time(NULL) - RootCertTime) >= 300)
+    if ((time(NULL) - RootCertTime) >= RootCertDuration && RootCertDuration)
     {
      /*
       * Update the root certificate...
@@ -813,5 +823,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.14 2002/05/16 14:00:14 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.15 2002/06/14 19:48:56 mike Exp $".
  */
