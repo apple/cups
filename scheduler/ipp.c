@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.180 2003/01/03 15:49:57 mike Exp $"
+ * "$Id: ipp.c,v 1.181 2003/01/03 22:02:36 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -753,18 +753,24 @@ add_class(client_t        *con,		/* I - Client connection */
   if ((attr = ippFindAttribute(con->request, "job-quota-period",
                                IPP_TAG_INTEGER)) != NULL)
   {
+    LogMessage(L_DEBUG, "add_class: Setting job-quota-period to %d...",
+               attr->values[0].integer);
     FreeQuotas(pclass);
     pclass->quota_period = attr->values[0].integer;
   }
   if ((attr = ippFindAttribute(con->request, "job-k-limit",
                                IPP_TAG_INTEGER)) != NULL)
   {
+    LogMessage(L_DEBUG, "add_class: Setting job-k-limit to %d...",
+               attr->values[0].integer);
     FreeQuotas(pclass);
     pclass->k_limit = attr->values[0].integer;
   }
   if ((attr = ippFindAttribute(con->request, "job-page-limit",
                                IPP_TAG_INTEGER)) != NULL)
   {
+    LogMessage(L_DEBUG, "add_class: Setting job-page-limit to %d...",
+               attr->values[0].integer);
     FreeQuotas(pclass);
     pclass->page_limit = attr->values[0].integer;
   }
@@ -1237,18 +1243,24 @@ add_printer(client_t        *con,	/* I - Client connection */
   if ((attr = ippFindAttribute(con->request, "job-quota-period",
                                IPP_TAG_INTEGER)) != NULL)
   {
+    LogMessage(L_DEBUG, "add_printer: Setting job-quota-period to %d...",
+               attr->values[0].integer);
     FreeQuotas(printer);
     printer->quota_period = attr->values[0].integer;
   }
   if ((attr = ippFindAttribute(con->request, "job-k-limit",
                                IPP_TAG_INTEGER)) != NULL)
   {
+    LogMessage(L_DEBUG, "add_printer: Setting job-k-limit to %d...",
+               attr->values[0].integer);
     FreeQuotas(printer);
     printer->k_limit = attr->values[0].integer;
   }
   if ((attr = ippFindAttribute(con->request, "job-page-limit",
                                IPP_TAG_INTEGER)) != NULL)
   {
+    LogMessage(L_DEBUG, "add_printer: Setting job-page-limit to %d...",
+               attr->values[0].integer);
     FreeQuotas(printer);
     printer->page_limit = attr->values[0].integer;
   }
@@ -6039,5 +6051,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.180 2003/01/03 15:49:57 mike Exp $".
+ * End of "$Id: ipp.c,v 1.181 2003/01/03 22:02:36 mike Exp $".
  */
