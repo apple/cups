@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.15 1999/05/11 19:46:19 mike Exp $"
+ * "$Id: texttops.c,v 1.16 1999/07/22 14:49:20 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -113,8 +113,9 @@ WritePage(void)
  */
 
 void
-WriteProlog(char *title,	/* I - Title of job */
-	    char *user)		/* I - Username */
+WriteProlog(char       *title,	/* I - Title of job */
+	    char       *user,	/* I - Username */
+            ppd_file_t *ppd)	/* I - PPD file info */
 {
   int		line;		/* Current output line */
   char		*charset;	/* Character set string */
@@ -335,7 +336,7 @@ WriteProlog(char *title,	/* I - Title of job */
     printf("\t0 0 %.1f %.1f rectfill\n", PageRight - PageLeft,
 	   144.0f / LinesPerInch);
 
-    puts("\tFN setfont");
+    puts("\tFB setfont");
     puts("\t0 setgray");
 
     if (Duplex)
@@ -452,8 +453,8 @@ write_string(int     col,	/* I - Start column */
     y = PageTop;
   }
 
-  x += (float)col * 72.0 / (float)CharsPerInch;
-  y -= (float)(row + 1) * 72.0 / (float)LinesPerInch;
+  x += (float)col * 72.0f / (float)CharsPerInch;
+  y -= (float)(row + 0.5) * 72.0f / (float)LinesPerInch;
 
   attr = s->attr;
 
@@ -506,15 +507,6 @@ write_string(int     col,	/* I - Start column */
     }
 
     putchar('>');
-
-    if (attr & ATTR_RED)
-      puts("r");
-    else if (attr & ATTR_GREEN)
-      puts("g");
-    else if (attr & ATTR_BLUE)
-      puts("b");
-    else
-      puts("S");
   }
   else
   {
@@ -551,7 +543,10 @@ write_string(int     col,	/* I - Start column */
     }
 
     putchar(')');
+  }
 
+  if (PrettyPrint)
+  {
     if (attr & ATTR_RED)
       puts("r");
     else if (attr & ATTR_GREEN)
@@ -561,9 +556,11 @@ write_string(int     col,	/* I - Start column */
     else
       puts("S");
   }
+  else
+    puts("S");
 }
 
 
 /*
- * End of "$Id: texttops.c,v 1.15 1999/05/11 19:46:19 mike Exp $".
+ * End of "$Id: texttops.c,v 1.16 1999/07/22 14:49:20 mike Exp $".
  */

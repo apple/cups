@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.c,v 1.8 1999/07/15 16:27:49 mike Exp $"
+ * "$Id: textcommon.c,v 1.9 1999/07/22 14:49:19 mike Exp $"
  *
  *   Common text filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -45,7 +45,8 @@ int	WrapLines = 1,		/* Wrap text in lines */
 	PageColumns = 1,	/* Number of columns on a page */
 	ColumnGutter = 0,	/* Number of characters between text columns */
 	ColumnWidth = 80,	/* Width of each column */
-	PrettyPrint = 0;	/* Do pretty code formatting */
+	PrettyPrint = 0,	/* Do pretty code formatting */
+	Copies = 1;		/* Number of copies */
 lchar_t	**Page = NULL;		/* Page characters */
 int	NumPages = 0;		/* Number of pages in document */
 int	CharsPerInch = 10;	/* Number of character columns per inch */
@@ -217,7 +218,9 @@ TextMain(char *name,		/* I - Name of filter */
   if ((val = cupsGetOption("lpi", num_options, options)) != NULL)
     LinesPerInch = atoi(val);
 
-  WriteProlog(argv[3], argv[2]);
+  Copies = atoi(argv[4]);
+
+  WriteProlog(argv[3], argv[2], ppd);
 
  /*
   * Read text from the specified source and print it...
@@ -735,5 +738,5 @@ getutf8(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: textcommon.c,v 1.8 1999/07/15 16:27:49 mike Exp $".
+ * End of "$Id: textcommon.c,v 1.9 1999/07/22 14:49:19 mike Exp $".
  */
