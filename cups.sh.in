@@ -1,12 +1,12 @@
 #!/bin/sh
 #
-# "$Id: cups.sh.in,v 1.4 2000/07/10 19:19:12 mike Exp $"
+# "$Id: cups.sh.in,v 1.5 2000/09/09 22:43:58 mike Exp $"
 #
 #   Startup/shutdown script for the Common UNIX Printing System (CUPS).
 #
 #   Linux chkconfig stuff:
 #
-#   chkconfig: 02 99 00
+#   chkconfig: 0235 99 00
 #   description: Startup/shutdown script for the Common UNIX \
 #                Printing System (CUPS).
 #
@@ -110,5 +110,5 @@ exit 0
 
 
 #
-# End of "$Id: cups.sh.in,v 1.4 2000/07/10 19:19:12 mike Exp $".
+# End of "$Id: cups.sh.in,v 1.5 2000/09/09 22:43:58 mike Exp $".
 #
