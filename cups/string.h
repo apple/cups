@@ -1,5 +1,5 @@
 /*
- * "$Id: string.h,v 1.4 1999/10/22 20:04:01 mike Exp $"
+ * "$Id: string.h,v 1.5 1999/10/26 17:34:25 mike Exp $"
  *
  *   String definitions for the Common UNIX Printing System (CUPS).
  *
@@ -46,6 +46,15 @@
 
 
 /*
+ * C++ magic...
+ */
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
+
+
+/*
  * Prototypes...
  */
 
@@ -69,8 +78,17 @@ extern int	snprintf(char *, size_t, const char *, ...);
 extern int	vsnprintf(char *, size_t, const char *, va_list);
 #  endif /* !HAVE_VSNPRINTF */
 
+
+/*
+ * C++ magic...
+ */
+
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
+
 #endif /* !_CUPS_STRING_H_ */
 
 /*
- * End of "$Id: string.h,v 1.4 1999/10/22 20:04:01 mike Exp $".
+ * End of "$Id: string.h,v 1.5 1999/10/26 17:34:25 mike Exp $".
  */
