@@ -1,8 +1,10 @@
-CHANGES.txt - 08/23/2002
+CHANGES.txt - 08/25/2002
 ------------------------
 
 CHANGES IN CUPS V1.1.16
 
+	- The scheduler didn't reset the job state to pending
+	  when modifying an active printer.
 	- Now limit the maximum number of recursion steps when
 	  searching for a filter for a job, in case a user
 	  defines a circular filter rule.
