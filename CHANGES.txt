@@ -26,6 +26,10 @@ CHANGES IN CUPS V1.1.10
 	- The lpadmin command didn't use the ppd-name attribute
 	  with the -m option; this prevented the use of the
 	  "raw" model from the command-line.
+	- The pstoraster filter output draft (1-bit) 6-color
+	  output in the wrong order; this resulted in yellow
+	  being printed instead of black on Stylus Photo
+	  printers.
 
 
 CHANGES IN CUPS V1.1.9-1

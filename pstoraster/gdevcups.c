@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.45 2001/07/06 19:57:47 mike Exp $"
+ * "$Id: gdevcups.c,v 1.46 2001/07/21 12:48:15 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -2324,14 +2324,20 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 		       x > 0;
 		       x --, srcptr ++)
 		  {
+                   /*
+                    * Note: Because of the way the pointers are setup,
+                    *       the following code is correct even though
+                    *       the names don't match...
+                    */
+
 		    if (*srcptr & 0x20)
-		      *kptr |= bit;
-		    if (*srcptr & 0x10)
 		      *cptr |= bit;
-		    if (*srcptr & 0x08)
+		    if (*srcptr & 0x10)
 		      *mptr |= bit;
-		    if (*srcptr & 0x04)
+		    if (*srcptr & 0x08)
 		      *yptr |= bit;
+		    if (*srcptr & 0x04)
+		      *kptr |= bit;
 		    if (*srcptr & 0x02)
 		      *lcptr |= bit;
 		    if (*srcptr & 0x01)
@@ -3049,5 +3055,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.45 2001/07/06 19:57:47 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.46 2001/07/21 12:48:15 mike Exp $".
  */
