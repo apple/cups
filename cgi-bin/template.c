@@ -1,5 +1,5 @@
 /*
- * "$Id: template.c,v 1.19 2000/09/21 20:19:04 mike Exp $"
+ * "$Id: template.c,v 1.20 2000/09/26 13:45:26 mike Exp $"
  *
  *   CGI template function.
  *
@@ -160,7 +160,8 @@ cgi_copy(FILE *out,		/* I - Output file */
 		*s;		/* String pointer */
   const char	*value;		/* Value of variable */
   const char	*innerval;	/* Inner value */
-  char		outval[1024],	/* Output string */
+  const char	*outptr;	/* Output string pointer */
+  char		outval[1024],	/* Formatted output string */
 		compare[1024];	/* Comparison string */
   int		result;		/* Result of comparison */
 
@@ -190,8 +191,12 @@ cgi_copy(FILE *out,		/* I - Output file */
 
       if (s == name && isspace(ch))
       {
-        putc('{', out);
-	putc(ch, out);
+        if (out)
+	{
+          putc('{', out);
+	  putc(ch, out);
+        }
+
 	continue;
       }
 
@@ -210,14 +215,20 @@ cgi_copy(FILE *out,		/* I - Output file */
 	  *nameptr++ = '\0';
 
 	  if ((value = cgiGetArray(name + 1, atoi(nameptr) - 1)) != NULL)
-            strcpy(outval, value);
+	    outptr = value;
 	  else
+	  {
 	    outval[0] = '\0';
+	    outptr    = outval;
+	  }
 	}
         if ((value = cgiGetArray(name + 1, element)) != NULL)
-	  strcpy(outval, value);
+	  outptr = value;
 	else
+	{
 	  outval[0] = '\0';
+	  outptr    = outval;
+	}
       }
       else if (name[0] == '#')
       {
@@ -229,6 +240,8 @@ cgi_copy(FILE *out,		/* I - Output file */
           sprintf(outval, "%d", cgiGetSize(name + 1));
 	else
 	  sprintf(outval, "%d", element + 1);
+
+        outptr = outval;
       }
       else if (name[0] == '[')
       {
@@ -271,14 +284,20 @@ cgi_copy(FILE *out,		/* I - Output file */
 	{
 	  *nameptr++ = '\0';
 	  if ((value = cgiGetArray(name, atoi(nameptr) - 1)) == NULL)
-            sprintf(outval, "{%s}", name);
+          {
+	    sprintf(outval, "{%s}", name);
+	    outptr = outval;
+	  }
 	  else
-            strcpy(outval, value);
+	    outptr = value;
 	}
 	else if ((value = cgiGetArray(name, element)) == NULL)
-          sprintf(outval, "{%s}", name);
+        {
+	  sprintf(outval, "{%s}", name);
+	  outptr = outval;
+	}
 	else
-          strcpy(outval, value);
+	  outptr = value;
       }
 
      /*
@@ -292,7 +311,7 @@ cgi_copy(FILE *out,		/* I - Output file */
         */
 
 	if (out)
-	  cgi_puts(outval, out);
+	  cgi_puts(outptr, out);
 
         continue;
       }
@@ -326,6 +345,8 @@ cgi_copy(FILE *out,		/* I - Output file */
 	for (s = compare; (ch = getc(in)) != EOF;)
           if (ch == '?')
             break;
+	  else if (s >= (compare + sizeof(compare) - 1))
+	    continue;
 	  else if (ch == '#')
 	  {
 	    sprintf(s, "%d", element + 1);
@@ -352,19 +373,28 @@ cgi_copy(FILE *out,		/* I - Output file */
 	      if ((innerval = cgiGetArray(innername, atoi(innerptr) - 1)) == NULL)
 	        *s = '\0';
 	      else
-	        strcpy(s, innerval);
+	      {
+	        strncpy(s, innerval, sizeof(compare) - (s - compare) - 1);
+		compare[sizeof(compare) - 1] = '\0';
+	      }
 	    }
 	    else if (innername[0] == '?')
 	    {
 	      if ((innerval = cgiGetArray(innername + 1, element)) == NULL)
 		*s = '\0';
 	      else
-		strcpy(s, innerval);
+	      {
+	        strncpy(s, innerval, sizeof(compare) - (s - compare) - 1);
+		compare[sizeof(compare) - 1] = '\0';
+	      }
             }
 	    else if ((innerval = cgiGetArray(innername, element)) == NULL)
 	      sprintf(s, "{%s}", innername);
 	    else
-	      strcpy(s, innerval);
+	    {
+	      strncpy(s, innerval, sizeof(compare) - (s - compare) - 1);
+	      compare[sizeof(compare) - 1] = '\0';
+	    }
 
             s += strlen(s);
 	  }
@@ -385,16 +415,16 @@ cgi_copy(FILE *out,		/* I - Output file */
         switch (op)
 	{
 	  case '<' :
-	      result = strcasecmp(outval, compare) < 0;
+	      result = strcasecmp(outptr, compare) < 0;
 	      break;
 	  case '>' :
-	      result = strcasecmp(outval, compare) > 0;
+	      result = strcasecmp(outptr, compare) > 0;
 	      break;
 	  case '=' :
-	      result = strcasecmp(outval, compare) == 0;
+	      result = strcasecmp(outptr, compare) == 0;
 	      break;
 	  case '!' :
-	      result = strcasecmp(outval, compare) != 0;
+	      result = strcasecmp(outptr, compare) != 0;
 	      break;
 	  default :
 	      result = 1;
@@ -430,6 +460,13 @@ cgi_copy(FILE *out,		/* I - Output file */
     }
     else if (out)
       putc(ch, out);
+
+ /*
+  * Flush any pending output...
+  */
+
+  if (out)
+    fflush(out);
 }
 
 
@@ -458,5 +495,5 @@ cgi_puts(const char *s,
 
 
 /*
- * End of "$Id: template.c,v 1.19 2000/09/21 20:19:04 mike Exp $".
+ * End of "$Id: template.c,v 1.20 2000/09/26 13:45:26 mike Exp $".
  */
