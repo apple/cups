@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.25 2002/07/19 14:40:31 mike Exp $"
+ * "$Id: job.c,v 1.124.2.26 2002/07/23 21:20:30 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -790,7 +790,8 @@ MoveJob(int        id,		/* I - Job ID */
         break;
 
       strlcpy(current->dest, dest, sizeof(current->dest));
-      current->dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_REMOTE);
+      current->dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_REMOTE |
+                                  CUPS_PRINTER_IMPLICIT);
 
       if ((attr = ippFindAttribute(current->attrs, "job-printer-uri", IPP_TAG_URI)) != NULL)
       {
@@ -1138,6 +1139,8 @@ StartJob(int       id,		/* I - Job ID */
 		device_uri[1024],
 				/* DEVICE_URI environment variable */
 		ppd[1024],	/* PPD environment variable */
+		class_name[255],
+				/* CLASS environment variable */
 		printer_name[255],
 				/* PRINTER environment variable */
 		root[1024],	/* CUPS_SERVERROOT environment variable */
@@ -1559,6 +1562,11 @@ StartJob(int       id,		/* I - Job ID */
   snprintf(datadir, sizeof(datadir), "CUPS_DATADIR=%s", DataDir);
   snprintf(fontpath, sizeof(fontpath), "CUPS_FONTPATH=%s", FontPath);
 
+  if (current->dtype & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
+    snprintf(class_name, sizeof(class_name), "CLASS=%s", current->dest);
+  else
+    class_name[0] = '\0';
+
   if (Classification[0] && !banner_page)
   {
     if ((attr = ippFindAttribute(current->attrs, "job-sheets",
@@ -1611,7 +1619,8 @@ StartJob(int       id,		/* I - Job ID */
   envp[15] = ldpath;
   envp[16] = nlspath;
   envp[17] = classification;
-  envp[18] = NULL;
+  envp[18] = class_name;
+  envp[19] = NULL;
 
   LogMessage(L_DEBUG, "StartJob: envp = \"%s\",\"%s\",\"%s\",\"%s\","
                       "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\","
@@ -1902,7 +1911,8 @@ StopJob(int id,			/* I - Job ID */
 
         FilterLevel -= current->cost;
 
-        if (current->status < 0)
+        if (current->status < 0 &&
+	    (current->dtype & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT)) != 0)
 	  SetPrinterState(current->printer, IPP_PRINTER_STOPPED);
 	else if (current->printer->state != IPP_PRINTER_STOPPED)
 	  SetPrinterState(current->printer, IPP_PRINTER_IDLE);
@@ -2357,5 +2367,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.25 2002/07/19 14:40:31 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.26 2002/07/23 21:20:30 mike Exp $".
  */

@@ -3,6 +3,15 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- Jobs submitted to a class now bounce immediately to
+	  the next available printer rather than waiting until
+	  that printer is available.
+	- Filters and backends now also get the CLASS
+	  environment variable set when a job is printed to a
+	  printer class instead of a normal printer.
+	- Added French translations of the web interface, CUPS
+	  Overview, Software Administrators Manual, and Software
+	  Users Manual contributed by Marian REYT-LLABRES.
 	- Added several "hint" messages for common configuration
 	  problems that are stored in the error_log file.
 	- httpSeparate() now unquotes %xx characters in the

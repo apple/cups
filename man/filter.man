@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: filter.man,v 1.6.2.1 2002/01/02 18:04:53 mike Exp $"
+.\" "$Id: filter.man,v 1.6.2.2 2002/07/23 21:20:26 mike Exp $"
 .\"
 .\"   filter man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -48,6 +48,12 @@ executing each filter:
 CHARSET
 .br
 The default text character set (typically us-ascii or iso-8859-1).
+.TP 5
+CLASS
+.br
+When a job is submitted to a printer class, contains the name of
+the destination printer class. Otherwise this environment
+variable will not be set.
 .TP 5
 CONTENT_TYPE
 .br
@@ -112,5 +118,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2002 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: filter.man,v 1.6.2.1 2002/01/02 18:04:53 mike Exp $".
+.\" End of "$Id: filter.man,v 1.6.2.2 2002/07/23 21:20:26 mike Exp $".
 .\"

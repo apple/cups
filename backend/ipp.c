@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.13 2002/05/16 13:59:53 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.14 2002/07/23 21:20:25 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -94,6 +94,10 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   ipp_attribute_t *copies_sup;	/* copies-supported attribute */
   ipp_attribute_t *charset_sup;	/* charset-supported attribute */
   ipp_attribute_t *format_sup;	/* document-format-supported attribute */
+  ipp_attribute_t *printer_state;
+  				/* printer-state attribute */
+  ipp_attribute_t *printer_accepting;
+  				/* printer-is-accepting-jobs attribute */
   const char	*charset;	/* Character set to use */
   cups_lang_t	*language;	/* Default language */
   int		copies;		/* Number of copies remaining */
@@ -201,6 +205,30 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
     if ((http = httpConnect(hostname, port)) == NULL)
     {
+      if (getenv("CLASS") != NULL)
+      {
+       /*
+        * If the CLASS environment variable is set, the job was submitted
+	* to a class and not to a specific queue.  In this case, we want
+	* to abort immediately so that the job can be requeued on the next
+	* available printer in the class.
+	*/
+
+        fprintf(stderr, "INFO: Unable to queue job on %s, queuing on next printer in class...\n",
+	        hostname);
+
+        if (argc == 6)
+	  unlink(filename);
+
+       /*
+        * Sleep 5 seconds to keep the job from requeuing too rapidly...
+	*/
+
+	sleep(5);
+
+        return (1);
+      }
+
       if (errno == ECONNREFUSED || errno == EHOSTDOWN ||
           errno == EHOSTUNREACH)
       {
@@ -330,6 +358,49 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     report_printer_state(supported);
   }
   while (ipp_status > IPP_OK_CONFLICT);
+
+ /*
+  * See if the printer is accepting jobs and is not stopped; if either
+  * condition is true and we are printing to a class, requeue the job...
+  */
+
+  if (getenv("CLASS") != NULL)
+  {
+    printer_state     = ippFindAttribute(supported, "printer-state",
+                                	 IPP_TAG_ENUM);
+    printer_accepting = ippFindAttribute(supported, "printer-is-accepting-jobs",
+                                	 IPP_TAG_BOOLEAN);
+
+    if (printer_state == NULL ||
+	printer_state->values[0].integer > IPP_PRINTER_PROCESSING ||
+	printer_accepting == NULL ||
+	!printer_accepting->values[0].boolean)
+    {
+     /*
+      * If the CLASS environment variable is set, the job was submitted
+      * to a class and not to a specific queue.  In this case, we want
+      * to abort immediately so that the job can be requeued on the next
+      * available printer in the class.
+      */
+
+      fprintf(stderr, "INFO: Unable to queue job on %s, queuing on next printer in class...\n",
+	      hostname);
+
+      ippDelete(supported);
+      httpClose(http);
+
+      if (argc == 6)
+	unlink(filename);
+
+     /*
+      * Sleep 5 seconds to keep the job from requeuing too rapidly...
+      */
+
+      sleep(5);
+
+      return (1);
+    }
+  }
 
  /*
   * Now that we are "connected" to the port, ignore SIGTERM so that we
@@ -817,5 +888,5 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.13 2002/05/16 13:59:53 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.14 2002/07/23 21:20:25 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.22 2002/06/27 15:10:42 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.23 2002/07/23 21:20:31 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1657,7 +1657,8 @@ ValidateDest(const char   *hostname,	/* I - Host name */
     return (NULL);
   else if (p != NULL)
   {
-    *dtype = p->type & CUPS_PRINTER_CLASS;
+    *dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
+                        CUPS_PRINTER_REMOTE);
     return (p->name);
   }
 
@@ -1708,7 +1709,8 @@ ValidateDest(const char   *hostname,	/* I - Host name */
     if (strcasecmp(p->hostname, localname) == 0 &&
         strcasecmp(p->name, resource) == 0)
     {
-      *dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_REMOTE);
+      *dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
+                          CUPS_PRINTER_REMOTE);
       return (p->name);
     }
 
@@ -2086,5 +2088,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.22 2002/06/27 15:10:42 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.23 2002/07/23 21:20:31 mike Exp $".
  */
