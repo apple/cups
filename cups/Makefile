@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.53.2.16 2002/08/10 00:05:44 mike Exp $"
+# "$Id: Makefile,v 1.53.2.17 2002/08/19 01:15:19 mike Exp $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -32,23 +32,25 @@ include ../Makedefs
 
 LIBOBJS	=	attr.o dest.o emit.o encode.o extended.o http.o http-addr.o \
 		ipp.o langprintf.o language.o mark.o md5.o md5passwd.o \
-		options.o page.o ppd.o snprintf.o string.o tempfile.o \
-		usersys.o util.o
-OBJS	=	$(LIBOBJS) testhttp.o testppd.o
+		normalize.o options.o page.o ppd.o snprintf.o string.o \
+		tempfile.o transcode.o usersys.o util.o
+OBJS	=	$(LIBOBJS) testhttp.o testi18n.o testlang.o testppd.o
 
 
 #
 # Header files to install...
 #
 
-HEADERS	=	cups.h http.h ipp.h language.h md5.h ppd.h
+HEADERS	=	cups.h http.h ipp.h language.h md5.h normalize.h ppd.h \
+		transcode.h
 
 
 #
 # Targets in this directory...
 #
 
-TARGETS	=	$(LIBCUPS) libcups.a
+TARGETS	=	$(LIBCUPS) libcups.a \
+		testhttp testi18n testlang testppd
 
 
 #
@@ -180,6 +182,15 @@ testhttp:	testhttp.o libcups.a
 
 
 #
+# testi18n (dependency on static CUPS library is intentional)
+#
+
+testi18n:	testi18n.o libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testi18n.o libcups.a $(NETLIBS) $(SSLLIBS)
+
+
+#
 # testlang (dependency on static CUPS library is intentional)
 #
 
@@ -194,7 +205,7 @@ testlang:	testlang.o libcups.a
 
 testppd:	testppd.o libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testppd.o libcups.a $(NETLIBS)
+	$(CC) $(LDFLAGS) -o $@ testppd.o libcups.a $(NETLIBS) $(SSLLIBS)
 
 
 #
@@ -205,5 +216,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.53.2.16 2002/08/10 00:05:44 mike Exp $".
+# End of "$Id: Makefile,v 1.53.2.17 2002/08/19 01:15:19 mike Exp $".
 #

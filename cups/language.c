@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.20.2.7 2002/05/23 20:13:28 mike Exp $"
+ * "$Id: language.c,v 1.20.2.8 2002/08/19 01:15:19 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -25,6 +25,8 @@
  *
  * Contents:
  *
+ *   cupsEncodingName() - Return the character encoding name string
+ *                        for the given encoding enumeration.
  *   cupsLangEncoding() - Return the character encoding (us-ascii, etc.)
  *                        for the given language.
  *   cupsLangFlush()    - Flush all language data out of the cache.
@@ -48,8 +50,8 @@
  */
 
 static cups_lang_t	*lang_cache = NULL;	/* Language string cache */
-static char		*lang_blank = "";	/* Blank constant string */
-static char		*lang_encodings[] =	/* Encoding strings */
+static const char	*lang_blank = "";	/* Blank constant string */
+static const char	*lang_encodings[] =	/* Encoding strings */
 			{
 			  "us-ascii",
 			  "iso-8859-1",
@@ -79,7 +81,7 @@ static char		*lang_encodings[] =	/* Encoding strings */
 			  "koi8-r",
 			  "koi8-u"
 			};
-static char		*lang_default[] =	/* Default POSIX locale */
+static const char	*lang_default[] =	/* Default POSIX locale */
 			{
 #include "cups_C.h"
 			  NULL
@@ -87,11 +89,28 @@ static char		*lang_default[] =	/* Default POSIX locale */
 
 
 /*
+ * 'cupsEncodingName()' - Return the character encoding name string
+ *                        for the given encoding enumeration.
+ */
+
+const char *				/* O - Character encoding */
+cupsEncodingName(cups_encoding_t encoding)
+					/* I - Encoding enum */
+{
+  if (encoding < 0 ||
+      encoding >= (sizeof(lang_encodings) / sizeof(const char *)))
+    return (lang_encodings[0]);
+  else
+    return (lang_encodings[encoding]);
+}
+
+
+/*
  * 'cupsLangEncoding()' - Return the character encoding (us-ascii, etc.)
  *                        for the given language.
  */
 
-char *					/* O - Character encoding */
+const char *				/* O - Character encoding */
 cupsLangEncoding(cups_lang_t *lang)	/* I - Language data */
 {
   if (lang == NULL)
@@ -422,5 +441,5 @@ cupsLangGet(const char *language) /* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.20.2.7 2002/05/23 20:13:28 mike Exp $".
+ * End of "$Id: language.c,v 1.20.2.8 2002/08/19 01:15:19 mike Exp $".
  */

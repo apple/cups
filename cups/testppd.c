@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c,v 1.18.2.4 2002/03/01 19:55:14 mike Exp $"
+ * "$Id: testppd.c,v 1.18.2.5 2002/08/19 01:15:20 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -47,6 +47,7 @@ main(int  argc,			/* I - Number of command-line arguments */
      char *argv[])		/* I - Command-line arguments */
 {
   int		i, j, k, m;	/* Looping vars */
+  const char	*filename;	/* Filename */
   ppd_file_t	*ppd;		/* PPD file record */
   ppd_size_t	*size;		/* Size record */
   ppd_group_t	*group;		/* UI group */
@@ -198,5 +199,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c,v 1.18.2.4 2002/03/01 19:55:14 mike Exp $".
+ * End of "$Id: testppd.c,v 1.18.2.5 2002/08/19 01:15:20 mike Exp $".
  */

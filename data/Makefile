@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.12.2.3 2002/01/29 20:28:02 mike Exp $"
+# "$Id: Makefile,v 1.12.2.4 2002/08/19 01:15:21 mike Exp $"
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
@@ -34,7 +34,39 @@ BANNERS	=	classified \
 		standard \
 		topsecret \
 		unclassified
-
+CHARMAPS =	windows-874.txt \
+		windows-1250.txt \
+		windows-1251.txt \
+		windows-1252.txt \
+		windows-1253.txt \
+		windows-1254.txt \
+		windows-1255.txt \
+		windows-1256.txt \
+		windows-1257.txt \
+		windows-1258.txt \
+		koi8-r.txt \
+		iso-8859-1.txt \
+		iso-8859-2.txt \
+		iso-8859-3.txt \
+		iso-8859-4.txt \
+		iso-8859-5.txt \
+		iso-8859-6.txt \
+		iso-8859-7.txt \
+		iso-8859-8.txt \
+		iso-8859-9.txt \
+		iso-8859-10.txt \
+		iso-8859-13.txt \
+		iso-8859-14.txt \
+		iso-8859-15.txt \
+		unibreak.txt \
+		uni-comb.txt \
+		uni-fold.txt \
+		uni-full.txt \
+		uni-line.txt \
+		uni-nfc.txt \
+		uni-nfd.txt \
+		uni-nfkd.txt \
+		uni-prop.txt
 CHARSETS =	windows-874 \
 		windows-1250 \
 		windows-1251 \
@@ -87,6 +119,10 @@ install:
 	for file in $(BANNERS); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/banners; \
 	done
+	$(INSTALL_DIR) $(DATADIR)/charmaps
+	for file in $(CHARMAPS); do \
+		$(INSTALL_DATA) $$file $(DATADIR)/charmaps; \
+	done
 	$(INSTALL_DIR) $(DATADIR)/charsets
 	for file in $(CHARSETS); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/charsets; \
@@ -106,5 +142,5 @@ install:
 
 
 #
-# End of "$Id: Makefile,v 1.12.2.3 2002/01/29 20:28:02 mike Exp $".
+# End of "$Id: Makefile,v 1.12.2.4 2002/08/19 01:15:21 mike Exp $".
 #
