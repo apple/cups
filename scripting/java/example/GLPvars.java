@@ -11,8 +11,9 @@ public class GLPvars
     // Current selected printer name.
     public    static String       selectedPrinterName = null;
 
-    // Current user name.
+    // Current user name and password.
     public    static String       cupsUser       = "root";
+    public    static String       cupsPasswd	 = "";
 
     //  So we can access the tabs from other classes.
     public    static JTabbedPane  mainGLPPanel   = null;

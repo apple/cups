@@ -271,6 +271,8 @@ public class IPPHttp
     status_text = "";
     version     = "1.0";
     connected   = false;
+    user        = "";
+    passwd      = "";
 
     try
     {
@@ -305,6 +307,65 @@ public class IPPHttp
             throw ioexception;
     }
   }
+
+
+
+  /**
+   *  Constructor using <code>URL, user and pass</code>.
+   *
+   *  @param	request_url	<code>URL</code> of server to connect to.
+   *  @param	p_user		<code>String</code> User name.
+   *  @param	p_passwd	<code>String</code> password.
+   *  @throw	IOException
+   *  @throw	UnknownHostException
+   */
+  public IPPHttp( String request_url, String p_user, String p_passwd )
+        throws IOException, UnknownHostException
+  {
+
+    encrypted   = false;
+    status      = HTTP_OK;
+    status_text = "";
+    version     = "1.0";
+    connected   = false;
+    user        = p_user;
+    passwd      = p_passwd;
+
+    try
+    {
+      //
+      //  Create the URL and split it up.
+      //
+      url      = new URL(request_url);
+      hostname = url.getHost();
+      port     = url.getPort();
+      path     = url.getPath();
+
+
+      //
+      //  Open the socket and set the options.
+      //
+      conn     = new Socket(hostname, port);
+      conn.setSoTimeout(200);
+
+      //
+      //  Create the input and output streams.
+      //
+      is       = new BufferedInputStream(new DataInputStream(conn.getInputStream()));
+      os       = new BufferedOutputStream(new DataOutputStream(conn.getOutputStream()));
+      connected = true;
+    }
+    catch(UnknownHostException unknownhostexception)
+    {
+            throw unknownhostexception;
+    }
+    catch(IOException ioexception)
+    {
+            throw ioexception;
+    }
+  }
+
+
 
 
   /**
@@ -344,6 +405,28 @@ public class IPPHttp
 
 
 
+  /**
+   * Set the user name.
+   *
+   * @param	p_user		<code>String</code> - user name.
+   */
+  public void setUser(String p_user )
+  {
+    user = p_user;
+  }
+
+
+  /**
+   * Set the password.
+   *
+   * @param	p_passwd	<code>String</code> - password.
+   */
+  public void setPassword(String p_passwd )
+  {
+    passwd = p_passwd;
+  }
+
+
 
 
   /**
@@ -363,6 +446,16 @@ public class IPPHttp
       os.write(s1.getBytes(), 0, s1.length());
       s1 = "Content-type: application/ipp\r\n";
       os.write(s1.getBytes(), 0, s1.length());
+
+      if (user.length() > 0 && passwd.length() > 0)
+      {
+        s1 = user + ":" + passwd;
+        IPPBase64Encoder encoder = new IPPBase64Encoder();
+        String auth_string = encoder.encode(s1.getBytes());
+        s1 = "Authorization: Basic " + auth_string + "\r\n";
+        os.write(s1.getBytes(), 0, s1.length());
+      }
+
       s1 = "Content-length: " + content_length + "\r\n\r\n";
       os.write(s1.getBytes(), 0, s1.length());
       os.flush();

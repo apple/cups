@@ -57,6 +57,11 @@ public class GLPprinters implements ActionListener
         {
           u = new URL("http://" + GLPvars.getServerName() + ":631/");
           cups = new Cups(u);
+
+          // If authorization is required ....
+          // cups.setUser(GLPvars.cupsUser);
+          // cups.setPasswd(GLPvars.cupsPasswd);
+
           printer_names = cups.cupsGetPrinters();
           if (printer_names != null)
             num_printers  = printer_names.length;
@@ -89,6 +94,11 @@ public class GLPprinters implements ActionListener
             u    = new URL("http://" + GLPvars.getServerName() + 
                            ":631/printers/" + printer_names[i] );  
             cups = new Cups(u);
+
+            // If authorization is required ....
+            // cups.setUser(GLPvars.cupsUser);
+            // cups.setPasswd(GLPvars.cupsPasswd);
+
             printers[i] = new CupsPrinter( cups, printer_names[i] );
           }
           catch (IOException e)

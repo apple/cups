@@ -186,13 +186,7 @@ public class Cups
     public void setProtocol( String p_protocol )
     {
       protocol = p_protocol;
-      if (user.length() > 0 && passwd.length() > 0)
-      {
-        site = protocol + "://" + user + ":" + passwd + "@" +
-               address + ":" + port + path + dest;
-      }
-      else
-        site     = protocol + "://" + address + ":" + port + path + dest;
+      site     = protocol + "://" + address + ":" + port + path + dest;
     }
 
     /**
@@ -204,13 +198,7 @@ public class Cups
     public void setServer( String p_server )
     {
       address = p_server;
-      if (user.length() > 0 && passwd.length() > 0)
-      {
-        site = protocol + "://" + user + ":" + passwd + "@" +
-               address + ":" + port + path + dest;
-      }
-      else
-        site     = protocol + "://" + address + ":" + port + path + dest;
+      site     = protocol + "://" + address + ":" + port + path + dest;
     }
 
 
@@ -222,13 +210,7 @@ public class Cups
     public void setPort( int p_port )
     {
       port = p_port;
-      if (user.length() > 0 && passwd.length() > 0)
-      {
-        site = protocol + "://" + user + ":" + passwd + "@" +
-               address + ":" + port + path + dest;
-      }
-      else
-        site = protocol + "://" + address + ":" + port + path + dest;
+      site = protocol + "://" + address + ":" + port + path + dest;
     }
 
 
@@ -240,13 +222,6 @@ public class Cups
     public void setUser( String p_user )
     {
       user = p_user;
-      if (user.length() > 0 && passwd.length() > 0)
-      {
-        site = protocol + "://" + user + ":" + passwd + "@" +
-               address + ":" + port + path + dest;
-      }
-      else
-        site = protocol + "://" + address + ":" + port + path + dest;
     }
 
 
@@ -258,13 +233,6 @@ public class Cups
     public void setPasswd( String p_passwd )
     {
       passwd = p_passwd;
-      if (user.length() > 0 && passwd.length() > 0)
-      {
-        site = protocol + "://" + user + ":" + passwd + "@" +
-               address + ":" + port + path + dest;
-      }
-      else
-        site = protocol + "://" + address + ":" + port + path + dest;
     }
 
 
@@ -299,13 +267,7 @@ public class Cups
     public void setPath( String p_path )
     {
       path = p_path;
-      if (user.length() > 0 && passwd.length() > 0)
-      {
-        site = protocol + "://" + user + ":" + passwd + "@" +
-               address + ":" + port + path + dest;
-      }
-      else
-        site = protocol + "://" + address + ":" + port + path + dest;
+      site = protocol + "://" + address + ":" + port + path + dest;
     }
 
 
@@ -318,14 +280,7 @@ public class Cups
     public void setDest( String p_dest )
     {
       dest = p_dest;
-      if (user.length() > 0 && passwd.length() > 0)
-      {
-        site = protocol + "://" + user + ":" + passwd + "@" +
-               address + ":" + port + path + dest;
-      }
-      else
-        site = protocol + "://" + address + ":" + port + path + dest;
-    
+      site = protocol + "://" + address + ":" + port + path + dest;
     }
 
 
@@ -348,7 +303,10 @@ public class Cups
         String url_str = site + dest;
         try
         {
-          http = new IPPHttp(url_str);
+          if (user.length() > 0 && passwd.length() > 0)
+            http = new IPPHttp(url_str, user, passwd );
+          else
+            http = new IPPHttp(url_str);
         }
         catch (IOException e)
         {
@@ -472,7 +430,10 @@ public class Cups
         String url_str = site + dest;
         try
         {
-          http = new IPPHttp(url_str);
+          if (user.length() > 0 && passwd.length() > 0)
+            http = new IPPHttp(url_str, user, passwd );
+          else
+            http = new IPPHttp(url_str);
         }
         catch (IOException e)
         {
@@ -947,7 +908,10 @@ public class Cups
 
         try
         {
-          http = new IPPHttp(url_str);
+          if (user.length() > 0 && passwd.length() > 0)
+            http = new IPPHttp(url_str,user,passwd);
+          else
+            http = new IPPHttp(url_str);
         }
         catch (IOException e)
         {
