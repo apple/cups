@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.32.2.10 2002/04/29 19:10:42 mike Exp $"
+ * "$Id: serial.c,v 1.32.2.11 2002/10/11 16:19:21 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -73,6 +73,13 @@
 #    define CRTSCTS 0
 #  endif /* CNEW_RTSCTS */
 #endif /* !CRTSCTS */
+
+#if defined(__APPLE__)
+#  include <CoreFoundation/CoreFoundation.h>
+#  include <IOKit/IOKitLib.h>
+#  include <IOKit/serial/IOSerialKeys.h>
+#  include <IOKit/IOBSD.h>
+#endif /* __APPLE__ */
 
 
 /*
@@ -884,11 +891,87 @@ list_devices(void)
 	       device, i, j + 1);
       }
     }
+#elif defined(__APPLE__)
+ /*
+  * Standard serial ports on MacOS X...
+  */
 
+  kern_return_t			kernResult;
+  mach_port_t			masterPort;
+  io_iterator_t			serialPortIterator;
+  CFMutableDictionaryRef	classesToMatch;
+  io_object_t			serialService;
+
+  printf("serial serial \"Unknown\" \"Serial Printer (serial)\"\n");
+
+  kernResult = IOMasterPort(MACH_PORT_NULL, &masterPort);
+  if (KERN_SUCCESS != kernResult)
+    return;
+
+ /*
+  * Serial devices are instances of class IOSerialBSDClient.
+  */
+
+  classesToMatch = IOServiceMatching(kIOSerialBSDServiceValue);
+  if (classesToMatch != NULL)
+  {
+    CFDictionarySetValue(classesToMatch, CFSTR(kIOSerialBSDTypeKey),
+                         CFSTR(kIOSerialBSDRS232Type));
+
+    kernResult = IOServiceGetMatchingServices(masterPort, classesToMatch,
+                                              &serialPortIterator);
+    if (kernResult == KERN_SUCCESS)
+    {
+      while ((serialService = IOIteratorNext(serialPortIterator)))
+      {
+	CFTypeRef	serialNameAsCFString;
+	CFTypeRef	bsdPathAsCFString;
+	char		serialName[128];
+	char		bsdPath[1024];
+	Boolean		result;
+
+
+	serialNameAsCFString =
+	    IORegistryEntryCreateCFProperty(serialService,
+	                                    CFSTR(kIOTTYDeviceKey),
+					    kCFAllocatorDefault, 0);
+	if (serialNameAsCFString)
+	{
+	  result = CFStringGetCString(serialNameAsCFString, serialName,
+	                              sizeof(serialName),
+				      kCFStringEncodingASCII);
+	  CFRelease(serialNameAsCFString);
+
+	  if (result)
+	  {
+	    bsdPathAsCFString =
+	        IORegistryEntryCreateCFProperty(serialService,
+		                                CFSTR(kIOCalloutDeviceKey),
+						kCFAllocatorDefault, 0);
+	    if (bsdPathAsCFString)
+	    {
+	      result = CFStringGetCString(bsdPathAsCFString, bsdPath,
+	                                  sizeof(bsdPath),
+					  kCFStringEncodingASCII);
+	      CFRelease(bsdPathAsCFString);
+
+	      if (result)
+		printf("serial serial:%s?baud=115200 \"Unknown\" \"%s\"\n", bsdPath,
+		       serialName);
+	    }
+	  }
+	}
+
+	IOObjectRelease(serialService);
+      }
+
+      IOObjectRelease(serialPortIterator);    /* Release the iterator. */
+    }
+  }
 #endif
 }
 
 
 /*
- * End of "$Id: serial.c,v 1.32.2.10 2002/04/29 19:10:42 mike Exp $".
+ * End of "$Id: serial.c,v 1.32.2.11 2002/10/11 16:19:21 mike Exp $".
  */

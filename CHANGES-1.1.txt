@@ -1,6 +1,15 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.17
+
+	- The serial backend now enumerates serial ports under
+	  MacOS X.
+	- The pdftops filter contained font rasterizer code that
+	  wasn't being used and that depended on X11.  This code
+	  has been removed.
+
+
 CHANGES IN CUPS V1.1.16
 
 	- The cancel and lprm commands now both display an error
