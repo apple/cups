@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.116 2003/04/08 03:45:15 mike Exp $"
+ * "$Id: http.c,v 1.117 2003/05/09 16:05:27 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -914,6 +914,9 @@ httpRead(http_t *http,			/* I - HTTP data */
     else
       bytes = http->data_remaining;
 
+      if (!http->blocking && !httpWait(http, 1000))
+        return (0);
+
 #ifdef HAVE_SSL
     if (http->tls)
       bytes = http_read_ssl(http, http->buffer, bytes);
@@ -944,8 +947,11 @@ httpRead(http_t *http,			/* I - HTTP data */
       }
 #endif /* WIN32 */
     }
-    else
+    else if (bytes == 0)
+    {
+      http->error = EPIPE;
       return (0);
+    }
   }
 
   if (http->used > 0)
@@ -965,10 +971,16 @@ httpRead(http_t *http,			/* I - HTTP data */
   }
 #ifdef HAVE_SSL
   else if (http->tls)
+  {
+    if (!http->blocking && !httpWait(http, 1000))
+      return (0);
     bytes = http_read_ssl(http, buffer, length);
+  }
 #endif /* HAVE_SSL */
   else
   {
+    if (!http->blocking && !httpWait(http, 1000))
+      return (0);
     DEBUG_printf(("httpRead: reading %d bytes from socket...\n", length));
     bytes = recv(http->fd, buffer, length, 0);
     DEBUG_printf(("httpRead: read %d bytes from socket...\n", bytes));
@@ -986,6 +998,11 @@ httpRead(http_t *http,			/* I - HTTP data */
     else
       http->error = errno;
 #endif /* WIN32 */
+  }
+  else if (bytes == 0)
+  {
+    http->error = EPIPE;
+    return 0;
   }
 
   if (http->data_remaining == 0)
@@ -1358,7 +1375,6 @@ httpGets(char   *line,			/* I - Line to read into */
       }
       else if (bytes == 0)
       {
-        if (http->blocking)
 	  http->error = EPIPE;
 
         return (NULL);
@@ -2351,5 +2367,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.116 2003/04/08 03:45:15 mike Exp $".
+ * End of "$Id: http.c,v 1.117 2003/05/09 16:05:27 mike Exp $".
  */
