@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.c,v 1.6 1999/07/13 12:04:03 mike Exp $"
+ * "$Id: textcommon.c,v 1.7 1999/07/15 14:28:12 mike Exp $"
  *
  *   Common text filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -53,28 +53,46 @@ int	LinesPerInch = 6;	/* Number of lines per inch */
 int	UTF8 = 0;		/* Use UTF-8 encoding? */
 char	*Keywords[] =		/* List of known keywords... */
 	{
+	  "and",
+	  "and_eq",
+	  "asm",
 	  "auto",
+	  "bitand",
+	  "bitor",
+	  "bool",
 	  "break",
 	  "case",
+	  "catch",
 	  "char",
 	  "class",
+	  "compl",
 	  "const",
 	  "continue",
 	  "default",
 	  "delete",
-	  "double",
 	  "do",
+	  "double",
 	  "else",
 	  "enum",
+	  "explicit",
 	  "extern",
+	  "false",
 	  "float",
 	  "for",
 	  "friend",
 	  "goto",
 	  "if",
+	  "inline",
 	  "int",
 	  "long",
+	  "mutable",
+	  "namespace",
 	  "new",
+	  "not",
+	  "not_eq",
+	  "operator",
+	  "or",
+	  "or_eq",
 	  "private",
 	  "protected",
 	  "public",
@@ -86,12 +104,21 @@ char	*Keywords[] =		/* List of known keywords... */
 	  "static",
 	  "struct",
 	  "switch",
+	  "template",
+	  "this",
+	  "throw",
+	  "true",
+	  "try",
 	  "typedef",
+	  "typename",
 	  "union",
 	  "unsigned",
+	  "virtual",
 	  "void",
 	  "volatile",
-	  "while"
+	  "while",
+	  "xor",
+	  "xor_eq"
 	};
 
 
@@ -182,7 +209,10 @@ TextMain(char *name,		/* I - Name of filter */
   if ((val = cupsGetOption("prettyprint", num_options, options)) != NULL)
   {
     PrettyPrint = 1;
-    PageTop     -= 216.0f / LinesPerInch;
+    PageLeft    = 72.0f;
+    PageRight   = PageWidth - 36.0f;
+    PageBottom  = PageBottom > 36.0f ? PageBottom : 36.0f;
+    PageTop     = PageLength - 36.0f - 216.0f / LinesPerInch;
   }
 
   WriteProlog(argv[3], argv[2]);
@@ -703,5 +733,5 @@ getutf8(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: textcommon.c,v 1.6 1999/07/13 12:04:03 mike Exp $".
+ * End of "$Id: textcommon.c,v 1.7 1999/07/15 14:28:12 mike Exp $".
  */

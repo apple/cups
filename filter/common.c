@@ -1,5 +1,5 @@
 /*
- * "$Id: common.c,v 1.6 1999/07/13 12:03:55 mike Exp $"
+ * "$Id: common.c,v 1.7 1999/07/15 14:28:11 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -236,9 +236,11 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
   if ((val = cupsGetOption("sides", num_options, options)) != NULL &&
       strncmp(val, "two-", 4) == 0)
     Duplex = 1;
-
-  if ((val = cupsGetOption("Duplex", num_options, options)) != NULL &&
-      strcmp(val, "DuplexNoTumble") == 0)
+  else if ((val = cupsGetOption("Duplex", num_options, options)) != NULL &&
+           strcmp(val, "DuplexNoTumble") == 0)
+    Duplex = 1;
+  else if (ppdIsMarked(ppd, "Duplex", "DuplexNoTumble") ||
+           ppdIsMarked(ppd, "Duplex", "DuplexTumble"))
     Duplex = 1;
 
   return (ppd);
@@ -246,5 +248,5 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
 
 
 /*
- * End of "$Id: common.c,v 1.6 1999/07/13 12:03:55 mike Exp $".
+ * End of "$Id: common.c,v 1.7 1999/07/15 14:28:11 mike Exp $".
  */
