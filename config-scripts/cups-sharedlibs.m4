@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-sharedlibs.m4,v 1.4 2001/07/24 20:23:03 mike Exp $"
+dnl "$Id: cups-sharedlibs.m4,v 1.5 2001/10/07 12:16:08 mike Exp $"
 dnl
 dnl   Shared library support for the Common UNIX Printing System (CUPS).
 dnl
@@ -47,6 +47,12 @@ if test x$enable_shared != xno; then
 			DSO="\$(CC)"
 			DSOFLAGS="$DSOFLAGS -Wl,-soname,\$@ -shared \$(OPTIM)"
 			;;
+		Darwin*)
+			LIBCUPS="libcups.2.dylib"
+			LIBCUPSIMAGE="libcupsimage.2.dylib"
+			DSO="ld"
+			DSOFLAGS="$DSOFLAGS -dylib /usr/lib/dylib1.o -lc"
+			;;
 		AIX*)
 			LIBCUPS="libcups_s.a"
 			LIBCUPSIMAGE="libcupsimage_s.a"
@@ -74,20 +80,18 @@ AC_SUBST(DSOFLAGS)
 AC_SUBST(LIBCUPS)
 AC_SUBST(LIBCUPSIMAGE)
 
-LDFLAGS="-L../cups -L../filter $LDFLAGS"
-
 if test x$enable_shared = xno; then
-	LINKCUPS="-lcups"
-	LINKCUPSIMAGE="-lcupsimage"
+	LINKCUPS="-L../cups -lcups"
+	LINKCUPSIMAGE="-L../filter -lcupsimage"
 	LINKCUPS="$LINKCUPS \$(SSLLIBS)"
 else
 	if test $uname = AIX; then
 		
-		LINKCUPS="-lcups_s"
-		LINKCUPSIMAGE="-lcupsimage_s"
+		LINKCUPS="-L../cups -lcups_s"
+		LINKCUPSIMAGE="-L../filter -lcupsimage_s"
 	else
-		LINKCUPS="-lcups"
-		LINKCUPSIMAGE="-lcupsimage"
+		LINKCUPS="-L../cups -lcups"
+		LINKCUPSIMAGE="-L../filter -lcupsimage"
 	fi
 fi
 
@@ -132,5 +136,5 @@ AC_SUBST(DSOLIBS)
 AC_SUBST(IMGLIBS)
 
 dnl
-dnl End of "$Id: cups-sharedlibs.m4,v 1.4 2001/07/24 20:23:03 mike Exp $".
+dnl End of "$Id: cups-sharedlibs.m4,v 1.5 2001/10/07 12:16:08 mike Exp $".
 dnl

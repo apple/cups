@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.35 2001/08/06 19:37:08 mike Exp $"
+# "$Id: Makefile,v 1.36 2001/10/07 12:16:07 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -76,20 +76,23 @@ install:
 	(cd templates; $(MAKE) $(MFLAGS) install)
 	echo Installing startup script...
 	if test "x$(INITDIR)" != "x"; then \
-		$(INSTALL_DIR) $(prefix)/$(INITDIR)/init.d; \
-		$(INSTALL_SCRIPT) cups.sh $(prefix)/$(INITDIR)/init.d/cups; \
-		$(INSTALL_DIR) $(prefix)/$(INITDIR)/rc0.d; \
-		$(INSTALL_SCRIPT) cups.sh  $(prefix)/$(INITDIR)/rc0.d/K00cups; \
-		$(INSTALL_DIR) $(prefix)/$(INITDIR)/rc2.d; \
-		$(INSTALL_SCRIPT) cups.sh $(prefix)/$(INITDIR)/rc2.d/S99cups; \
-		$(INSTALL_DIR) $(prefix)/$(INITDIR)/rc3.d; \
-		$(INSTALL_SCRIPT) cups.sh $(prefix)/$(INITDIR)/rc3.d/S99cups; \
-		$(INSTALL_DIR) $(prefix)/$(INITDIR)/rc5.d; \
-		$(INSTALL_SCRIPT) cups.sh $(prefix)/$(INITDIR)/rc5.d/S99cups; \
+		$(INSTALL_DIR) $(INSTALLHERE)/$(INITDIR)/init.d; \
+		$(INSTALL_SCRIPT) cups.sh $(INSTALLHERE)/$(INITDIR)/init.d/cups; \
+		$(INSTALL_DIR) $(INSTALLHERE)/$(INITDIR)/rc0.d; \
+		$(INSTALL_SCRIPT) cups.sh  $(INSTALLHERE)/$(INITDIR)/rc0.d/K00cups; \
+		$(INSTALL_DIR) $(INSTALLHERE)/$(INITDIR)/rc2.d; \
+		$(INSTALL_SCRIPT) cups.sh $(INSTALLHERE)/$(INITDIR)/rc2.d/S99cups; \
+		$(INSTALL_DIR) $(INSTALLHERE)/$(INITDIR)/rc3.d; \
+		$(INSTALL_SCRIPT) cups.sh $(INSTALLHERE)/$(INITDIR)/rc3.d/S99cups; \
+		$(INSTALL_DIR) $(INSTALLHERE)/$(INITDIR)/rc5.d; \
+		$(INSTALL_SCRIPT) cups.sh $(INSTALLHERE)/$(INITDIR)/rc5.d/S99cups; \
 	fi
 	if test "x$(INITDIR)" = "x" -a "x$(INITDDIR)" != "x"; then \
-		$(INSTALL_DIR) $(prefix)/$(INITDDIR); \
-		$(INSTALL_SCRIPT) cups.sh $(prefix)/$(INITDDIR)/cups; \
+		$(INSTALL_DIR) $(INSTALLHERE)/$(INITDDIR); \
+		$(INSTALL_SCRIPT) cups.sh $(INSTALLHERE)/$(INITDDIR)/cups; \
+		if test "$(INITDDIR)" = "/System/Library/StartupItems/cups"; then \
+			$(INSTALL_DATA) cups.plist $(INSTALLHERE)/$(INITDDIR)/cups.plist; \
+		fi \
 	fi
 
 
@@ -133,5 +136,5 @@ tardist:
 	epm $(EPMFLAGS) -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.35 2001/08/06 19:37:08 mike Exp $".
+# End of "$Id: Makefile,v 1.36 2001/10/07 12:16:07 mike Exp $".
 #

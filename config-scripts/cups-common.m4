@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.8 2001/10/04 16:50:18 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.9 2001/10/07 12:16:08 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -129,6 +129,18 @@ dnl Checks for wait functions.
 AC_CHECK_FUNCS(waitpid)
 AC_CHECK_FUNCS(wait3)
 
+dnl Flags for "ar" command...
+case $uname in
+        Darwin*)
+                ARFLAGS="-rcv"
+                ;;
+        *)
+                ARFLAGS="crvs"
+                ;;
+esac
+
+AC_SUBST(ARFLAGS)
+
 dnl
-dnl End of "$Id: cups-common.m4,v 1.8 2001/10/04 16:50:18 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.9 2001/10/07 12:16:08 mike Exp $".
 dnl

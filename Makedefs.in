@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.43 2001/07/23 15:04:58 mike Exp $"
+# "$Id: Makedefs.in,v 1.44 2001/10/07 12:16:07 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -81,7 +81,7 @@ LIBZ	=	@LIBZ@
 #         extra debug info)
 #
 
-ARFLAGS	=	crvs
+ARFLAGS	=	@ARFLAGS@
 CFLAGS	=	@CFLAGS@ -I.. $(OPTIONS)
 CXXFLAGS =	@CXXFLAGS@ -I.. $(OPTIONS)
 DSOFLAGS =	@DSOFLAGS@
@@ -143,6 +143,8 @@ SBINDIR		=	@sbindir@
 SERVERBIN	= 	@CUPS_SERVERBIN@
 SERVERROOT	= 	@CUPS_SERVERROOT@
 
+INSTALLHERE	=
+
 CAT1EXT		=	@CAT1EXT@
 CAT5EXT		=	@CAT5EXT@
 CAT8EXT		=	@CAT8EXT@
@@ -173,5 +175,5 @@ MAN8DIR		=	@MAN8DIR@
 	$(MV) t.z $@
 
 #
-# End of "$Id: Makedefs.in,v 1.43 2001/07/23 15:04:58 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.44 2001/10/07 12:16:07 mike Exp $"
 #

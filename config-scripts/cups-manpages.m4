@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-manpages.m4,v 1.2 2001/06/29 19:14:56 mike Exp $"
+dnl "$Id: cups-manpages.m4,v 1.3 2001/10/07 12:16:08 mike Exp $"
 dnl
 dnl   Manpage stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -25,6 +25,11 @@ dnl
 dnl Fix "mandir" variable...
 if test "$mandir" = "\${prefix}/man" -a "$prefix" = "/"; then
 	case "$uname" in
+        	Darwin*)
+        		# Darwin and MacOS X
+        		mandir="/usr/share/man"
+        		AMANDIR="/usr/share/man"
+        		;;
         	FreeBSD* | NetBSD* | OpenBSD* | AIX*)
         		# *BSD + AIX
         		mandir="/usr/share/man"
@@ -90,5 +95,5 @@ AC_SUBST(MAN8EXT)
 AC_SUBST(MAN8DIR)
 
 dnl
-dnl End of "$Id: cups-manpages.m4,v 1.2 2001/06/29 19:14:56 mike Exp $".
+dnl End of "$Id: cups-manpages.m4,v 1.3 2001/10/07 12:16:08 mike Exp $".
 dnl

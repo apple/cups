@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.50 2001/08/17 15:54:02 mike Exp $"
+# "$Id: Makefile,v 1.51 2001/10/07 12:16:09 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -69,6 +69,10 @@ install:
 		$(RM) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .2`; \
 		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .2`; \
 	fi
+	-if test $(LIBCUPSIMAGE) = "libcupsimage.2.dylib"; then \
+		$(RM) $(LIBDIR)/libcupsimage.dylib; \
+		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/libcupsimage.dylib; \
+	fi
 	$(INSTALL_DIR) $(INCLUDEDIR)/cups
 	$(INSTALL_DATA) raster.h $(INCLUDEDIR)/cups
 
@@ -102,6 +106,17 @@ libcupsimage.so.2 libcupsimage.sl.2:	$(IMAGEOBJS) ../Makedefs
 	$(DSO) $(DSOFLAGS) -o $@ $(IMAGEOBJS) $(DSOLIBS) -lm
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
+
+
+#
+# libcupsimage.2.dylib
+#
+
+libcupsimage.2.dylib:	$(IMAGEOBJS) ../Makedefs
+	echo Linking $@...
+	$(DSO) $(DSOFLAGS) -o $@ $(IMAGEOBJS) $(DSOLIBS) $(LINKCUPS) -lm -lcc_dynamic
+	$(RM) libcupsimage.dylib
+	$(LN) $@ libcupsimage.dylib
 
 
 #
@@ -222,5 +237,5 @@ $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 
 #
-# End of "$Id: Makefile,v 1.50 2001/08/17 15:54:02 mike Exp $".
+# End of "$Id: Makefile,v 1.51 2001/10/07 12:16:09 mike Exp $".
 #

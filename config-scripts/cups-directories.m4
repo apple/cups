@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-directories.m4,v 1.2 2001/07/24 20:23:03 mike Exp $"
+dnl "$Id: cups-directories.m4,v 1.3 2001/10/07 12:16:08 mike Exp $"
 dnl
 dnl   Directory stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -103,6 +103,12 @@ if test x$rcdir = x; then
 			# NetBSD
 			INITDIR=""
 			INITDDIR="/etc/rc.d"
+			;;
+
+		Darwin*)
+			# Darwin and MacOS X - this is just strange...
+			INITDIR=""
+			INITDDIR="/System/Library/StartupItems/cups"
 			;;
 
 		Linux*)
@@ -226,5 +232,5 @@ dnl Set the CUPS_FONTPATH directory...
 AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 
 dnl
-dnl End of "$Id: cups-directories.m4,v 1.2 2001/07/24 20:23:03 mike Exp $".
+dnl End of "$Id: cups-directories.m4,v 1.3 2001/10/07 12:16:08 mike Exp $".
 dnl
