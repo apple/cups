@@ -873,6 +873,7 @@ determine how the server operates:
 	<LI><A HREF="#PreserveJobFiles"><CODE>PreserveJobFiles</CODE></A>
 	<LI><A HREF="#PreserveJobHistory"><CODE>PreserveJobHistory</CODE></A>
 	<LI><A HREF="#Printcap"><CODE>Printcap</CODE></A>
+	<LI><A HREF="#RemoteRoot"><CODE>RemoteRoot</CODE></A>
 	<LI><A HREF="#RequestRoot"><CODE>RequestRoot</CODE></A>
 	<LI><A HREF="#RIPCache"><CODE>RIPCache</CODE></A>
 	<LI><A HREF="#ServerAdmin"><CODE>ServerAdmin</CODE></A>
@@ -1961,6 +1962,24 @@ printcap file will be generated.
 printcap file is written whenever a printer is added or removed. The
 printcap file can then be used by applications that are hardcoded to
 look at the printcap file for the available printers.
+
+<!-- NEED 3in -->
+<H3><A NAME="RemoteRoot">RemoteRoot</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+RemoteRoot remroot
+RemoteRoot root
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>RemoteRoot</CODE> directive sets the username for
+unauthenticated root requests from remote hosts. The default
+username is <VAR>remroot</VAR>. Setting <CODE>RemoteRoot</CODE>
+to <VAR>root</VAR> effectively disables this security mechanism.
 
 <!-- NEED 3in -->
 <H3><A NAME="RequestRoot">RequestRoot</A></H3>
