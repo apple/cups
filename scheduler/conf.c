@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.126 2003/03/17 20:12:53 mike Exp $"
+ * "$Id: conf.c,v 1.127 2003/03/19 06:06:02 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -141,6 +141,7 @@ static var_t	variables[] =
   { "MaxJobsPerPrinter",	&MaxJobsPerPrinter,	VAR_INTEGER },
   { "MaxJobsPerUser",		&MaxJobsPerUser,	VAR_INTEGER },
   { "MaxLogSize",		&MaxLogSize,		VAR_INTEGER },
+  { "MaxPrinterHistory",	&MaxPrinterHistory,	VAR_INTEGER },
   { "MaxRequestSize",		&MaxRequestSize,	VAR_INTEGER },
   { "PageLog",			&PageLog,		VAR_STRING },
   { "PreserveJobFiles",		&JobFiles,		VAR_BOOLEAN },
@@ -377,6 +378,7 @@ ReadConfiguration(void)
   MaxClients          = 100;
   MaxClientsPerHost   = 0;
   MaxLogSize          = 1024 * 1024;
+  MaxPrinterHistory   = 10;
   MaxRequestSize      = 0;
   RootCertDuration    = 300;
   RunAsUser           = FALSE;
@@ -2056,5 +2058,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.126 2003/03/17 20:12:53 mike Exp $".
+ * End of "$Id: conf.c,v 1.127 2003/03/19 06:06:02 mike Exp $".
  */
