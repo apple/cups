@@ -1,5 +1,5 @@
 /*
- * "$Id: http-support.c,v 1.6 2003/08/28 14:30:01 mike Exp $"
+ * "$Id: http-support.c,v 1.7 2003/10/09 19:13:29 mike Exp $"
  *
  *   HTTP support routines for the Common UNIX Printing System (CUPS).
  *
@@ -25,9 +25,10 @@
  *
  * Contents:
  *
- *   httpSeparate() - Separate a Universal Resource Identifier into its
- *                    components.
- *   httpStatus()   - Return a short string describing a HTTP status code.
+ *   httpSeparate()   - Separate a Universal Resource Identifier into its
+ *                      components.
+ *   httpStatus()     - Return a short string describing a HTTP status code.
+ *   cups_hstrerror() - hstrerror() emulation function for Solaris and others...
  */
 
 /*
@@ -313,6 +314,32 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
 }
 
 
+#ifndef HAVE_HSTRERROR
 /*
- * End of "$Id: http-support.c,v 1.6 2003/08/28 14:30:01 mike Exp $".
+ * 'cups_hstrerror()' - hstrerror() emulation function for Solaris and others...
+ */
+
+const char *				/* O - Error string */
+cups_hstrerror(int error)		/* I - Error number */
+{
+  static const char * const errors[] =	/* Error strings */
+		{
+		  "OK",
+		  "Host not found.",
+		  "Try again.",
+		  "Unrecoverable lookup error.",
+		  "No data associated with name."
+		};
+
+
+  if (error < 0 || error > 4)
+    return ("Unknown hostname lookup error.");
+  else
+    return (errors[error]);
+}
+#endif /* !HAVE_HSTRERROR */
+
+
+/*
+ * End of "$Id: http-support.c,v 1.7 2003/10/09 19:13:29 mike Exp $".
  */
