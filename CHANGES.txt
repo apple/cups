@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- The scheduler would crash if cupsd.conf contained a
+	  BrowseProtocols line with no protocols listed.
 	- The HTML job operation templates now link back to the
 	  destination printer or class.
 	- The serial backend now detects USB serial devices.

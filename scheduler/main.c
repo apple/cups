@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.69 2002/04/20 21:06:18 mike Exp $"
+ * "$Id: main.c,v 1.70 2002/05/03 21:15:52 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -484,9 +484,9 @@ main(int  argc,			/* I - Number of command-line arguments */
     * Update the browse list as needed...
     */
 
-    if (Browsing)
+    if (Browsing && BrowseProtocols)
     {
-      if (FD_ISSET(BrowseSocket, &input))
+      if (BrowseSocket >= 0 && FD_ISSET(BrowseSocket, &input))
         UpdateCUPSBrowse();
 
       if (PollPipe >= 0 && FD_ISSET(PollPipe, &input))
@@ -806,5 +806,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.69 2002/04/20 21:06:18 mike Exp $".
+ * End of "$Id: main.c,v 1.70 2002/05/03 21:15:52 mike Exp $".
  */
