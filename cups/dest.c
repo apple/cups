@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.24 2001/10/31 01:49:12 mike Exp $"
+ * "$Id: dest.c,v 1.25 2001/11/09 20:14:48 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -684,7 +684,7 @@ cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
 
       name = NULL;
 
-      strcpy(job_sheets, "none,none");
+      strcpy(job_sheets, "");
 
       while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
       {
@@ -721,8 +721,9 @@ cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
       num_dests = cupsAddDest(name, NULL, num_dests, dests);
 
       if ((dest = cupsGetDest(name, NULL, num_dests, *dests)) != NULL)
-        dest->num_options = cupsAddOption("job-sheets", job_sheets, 0,
-	                                  &(dest->options));
+        if (job_sheets[0])
+          dest->num_options = cupsAddOption("job-sheets", job_sheets, 0,
+	                                    &(dest->options));
 
       if (attr == NULL)
 	break;
@@ -746,5 +747,5 @@ cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
 
 
 /*
- * End of "$Id: dest.c,v 1.24 2001/10/31 01:49:12 mike Exp $".
+ * End of "$Id: dest.c,v 1.25 2001/11/09 20:14:48 mike Exp $".
  */

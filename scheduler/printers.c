@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.104 2001/09/17 20:03:26 mike Exp $"
+ * "$Id: printers.c,v 1.105 2001/11/09 20:14:50 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1057,13 +1057,16 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	attr->values[i + 1].string.text = strdup(Banners[i].name);
     }
 
-    attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                	 "job-sheets-default", 2, NULL, NULL);
-
-    if (attr != NULL)
+    if (!(p->type & CUPS_PRINTER_REMOTE))
     {
-      attr->values[0].string.text = strdup(p->job_sheets[0]);
-      attr->values[1].string.text = strdup(p->job_sheets[1]);
+      attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                	   "job-sheets-default", 2, NULL, NULL);
+
+      if (attr != NULL)
+      {
+	attr->values[0].string.text = strdup(p->job_sheets[0]);
+	attr->values[1].string.text = strdup(p->job_sheets[1]);
+      }
     }
   }
 
@@ -1804,5 +1807,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.104 2001/09/17 20:03:26 mike Exp $".
+ * End of "$Id: printers.c,v 1.105 2001/11/09 20:14:50 mike Exp $".
  */

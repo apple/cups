@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.139 2001/11/09 17:19:43 mike Exp $"
+ * "$Id: job.c,v 1.140 2001/11/09 20:14:50 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1049,7 +1049,7 @@ StartJob(int       id,		/* I - Job ID */
 		path[1024],	/* PATH environment variable */
 		language[255],	/* LANG environment variable */
 		charset[255],	/* CHARSET environment variable */
-		classification[1024],	/* CLASSIFICATION environmeent variable */
+		classification[1024],	/* CLASSIFICATION environment variable */
 		content_type[255],/* CONTENT_TYPE environment variable */
 		device_uri[1024],/* DEVICE_URI environment variable */
 		ppd[1024],	/* PPD environment variable */
@@ -1192,7 +1192,12 @@ StartJob(int       id,		/* I - Job ID */
   */
 
   if (current->job_sheets == NULL)
+  {
     LogMessage(L_DEBUG, "No job-sheets attribute.");
+    if ((current->job_sheets =
+         ippFindAttribute(current->attrs, "job-sheets", IPP_TAG_ZERO)) != NULL)
+      LogMessage(L_DEBUG, "... but someone added one without setting job_sheets!");
+  }
   else if (current->job_sheets->num_values == 1)
     LogMessage(L_DEBUG, "job-sheets=%s",
                current->job_sheets->values[0].string.text);
@@ -2983,5 +2988,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.139 2001/11/09 17:19:43 mike Exp $".
+ * End of "$Id: job.c,v 1.140 2001/11/09 20:14:50 mike Exp $".
  */

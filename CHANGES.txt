@@ -118,10 +118,18 @@ CHANGES IN CUPS V1.1.11
 	  named "cupsd", not just any program with "cupsd" in
 	  the name (this caused the apcupsd UPS monitoring
 	  daemon to be stopped/restarted...)
-	- The CUPS-Move-Job operation did not change the internal
-	  destination name for held jobs, so moved (but held)
-	  jobs would print on the correct printer but show up
-	  as queued on the original destination.
+	- The CUPS-Move-Job operation did not change the
+	  internal destination name for held jobs, so moved (but
+	  held) jobs would still show up as queued on the
+	  original destination.
+	- The cups-polld program didn't send the
+	  requested-attributes attribute in the
+	  CUPS-Get-Printers and CUPS-Get-Classes requests, which
+	  made it use more CPU and bandwidth than required.
+	- The scheduler and CUPS API incorrectly added a
+	  job-sheets-default attribute for remote printers. This
+	  caused banner pages to be omitted from client system
+	  prints.
 
 
 CHANGES IN CUPS V1.1.10-1

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.147 2001/11/09 17:19:42 mike Exp $"
+ * "$Id: ipp.c,v 1.148 2001/11/09 20:14:49 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2274,6 +2274,9 @@ create_job(client_t        *con,	/* I - Client connection */
 
     if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) == NULL)
     {
+      LogMessage(L_DEBUG, "Adding default job-sheets values \"%s,%s\"...",
+                 printer->job_sheets[0], printer->job_sheets[1]);
+
       attr = ippAddStrings(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-sheets",
                            2, NULL, NULL);
       attr->values[0].string.text = strdup(printer->job_sheets[0]);
@@ -4021,6 +4024,9 @@ print_job(client_t        *con,		/* I - Client connection */
 
     if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) == NULL)
     {
+      LogMessage(L_DEBUG, "Adding default job-sheets values \"%s,%s\"...",
+                 printer->job_sheets[0], printer->job_sheets[1]);
+
       attr = ippAddStrings(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-sheets",
                            2, NULL, NULL);
       attr->values[0].string.text = strdup(printer->job_sheets[0]);
@@ -5581,5 +5587,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.147 2001/11/09 17:19:42 mike Exp $".
+ * End of "$Id: ipp.c,v 1.148 2001/11/09 20:14:49 mike Exp $".
  */
