@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgltops.h,v 1.17.2.4 2003/09/12 20:20:06 mike Exp $"
+ * "$Id: hpgltops.h,v 1.17.2.5 2003/11/07 21:43:36 mike Exp $"
  *
  *   HP-GL/2 to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -119,6 +119,7 @@ VAR float	PenPosition[2]	VALUE2(0.0f, 0.0f),
 		PenWidth	VALUE(1.0f);	/* Default pen width */
 VAR pen_t	Pens[1024];			/* State of each pen */
 VAR int		PenMotion	VALUE(0), 	/* 0 = absolute, 1 = relative */
+		PenValid	VALUE(0),	/* 1 = valid position, 0 = undefined */
 		PenNumber	VALUE(1),	/* Current pen number */
 		PenCount	VALUE(8),	/* Number of pens */
 		PenDown		VALUE(0),	/* 0 = pen up, 1 = pen down */
@@ -236,5 +237,5 @@ extern void	OutputTrailer(void);
 extern int	Outputf(const char *format, ...);
 
 /*
- * End of "$Id: hpgltops.h,v 1.17.2.4 2003/09/12 20:20:06 mike Exp $".
+ * End of "$Id: hpgltops.h,v 1.17.2.5 2003/11/07 21:43:36 mike Exp $".
  */

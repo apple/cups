@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-main.c,v 1.22.2.5 2003/08/28 14:36:53 mike Exp $"
+ * "$Id: hpgl-main.c,v 1.22.2.6 2003/11/07 21:43:36 mike Exp $"
  *
  *   HP-GL/2 filter main entry for the Common UNIX Printing System (CUPS).
  *
@@ -226,6 +226,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   while ((num_params = ParseCommand(fp, name.name, &params)) >= 0)
   {
+    Outputf("%% %s(%d)\n", name.name, num_params);
+
 #ifdef DEBUG
     {
       int i;
@@ -268,5 +270,5 @@ compare_names(const void *p1,	/* I - First name */
 
 
 /*
- * End of "$Id: hpgl-main.c,v 1.22.2.5 2003/08/28 14:36:53 mike Exp $".
+ * End of "$Id: hpgl-main.c,v 1.22.2.6 2003/11/07 21:43:36 mike Exp $".
  */

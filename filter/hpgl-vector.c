@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-vector.c,v 1.14.2.4 2003/03/21 02:45:04 mike Exp $"
+ * "$Id: hpgl-vector.c,v 1.14.2.5 2003/11/07 21:43:36 mike Exp $"
  *
  *   HP-GL/2 vector routines for the Common UNIX Printing System (CUPS).
  *
@@ -100,6 +100,8 @@ AA_arc_absolute(int     num_params,	/* I - Number of parameters */
     if (!PolygonMode)
       Outputf("MP\n");
 
+    PenValid = 1;
+
     Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
 
     if (start < end)
@@ -180,6 +182,8 @@ AR_arc_relative(int     num_params,	/* I - Number of parameters */
     if (!PolygonMode)
       Outputf("MP\n");
 
+    PenValid = 1;
+
     Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
 
     if (start < end)
@@ -233,6 +237,8 @@ AT_arc_absolute3(int     num_params,	/* I - Number of parameters */
   {
     if (!PolygonMode)
       Outputf("MP\n");
+
+    PenValid = 1;
 
     Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
 
@@ -292,6 +298,8 @@ CI_circle(int     num_params,	/* I - Number of parameters */
 
   if (!PolygonMode)
     Outputf("MP\n");
+
+  PenValid = 1;
 
   for (theta = 0.0; theta < 360.0; theta += dt)
   {
@@ -361,7 +369,7 @@ PE_polyline_encoded(int     num_params,	/* I - Number of parameters */
 
   base_bits = 6;
   frac_bits = 1.0;
-  draw      = 1;
+  draw      = PenDown;
   abscoords = 0;
 
   if (num_params == 0)
@@ -370,7 +378,13 @@ PE_polyline_encoded(int     num_params,	/* I - Number of parameters */
   if (!PolygonMode)
   {
     Outputf("MP\n");
+    PenValid = 0;
+  }
+
+  if (!PenValid)
+  {
     Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+    PenValid = 1;
   }
 
   for (s = (unsigned char *)params[0].value.string; *s != '\0';)
@@ -383,18 +397,23 @@ PE_polyline_encoded(int     num_params,	/* I - Number of parameters */
 #ifdef DEBUG
           fputs("DEBUG:     7-bit\n", stderr);
 #endif /* DEBUG */
+
+          Outputf("%% PE: 7-bit\n");
           break;
       case ':' :	/* Select pen */
           s ++;
           PenNumber = (int)decode_number(&s, base_bits, 1.0);
-	  if (PageDirty)
-	    printf("%.3f %.3f %.3f %.2f SP\n", Pens[PenNumber].rgb[0],
-		   Pens[PenNumber].rgb[1], Pens[PenNumber].rgb[2],
-		   Pens[PenNumber].width * PenScaling);
 
 #ifdef DEBUG
           fprintf(stderr, "DEBUG:     set pen #%d\n", PenNumber);
 #endif /* DEBUG */
+
+          Outputf("%% PE: set pen #%d\n", PenNumber);
+
+	  if (PageDirty)
+	    printf("%.3f %.3f %.3f %.2f SP\n", Pens[PenNumber].rgb[0],
+		   Pens[PenNumber].rgb[1], Pens[PenNumber].rgb[2],
+		   Pens[PenNumber].width * PenScaling);
           break;
       case '<' :	/* Next coords are a move-to */
           draw = 0;
@@ -403,6 +422,8 @@ PE_polyline_encoded(int     num_params,	/* I - Number of parameters */
 #ifdef DEBUG
           fputs("DEBUG:     moveto\n", stderr);
 #endif /* DEBUG */
+
+	  Outputf("%% PE: moveto\n");
           break;
       case '>' :	/* Set fractional bits */
           s ++;
@@ -412,6 +433,8 @@ PE_polyline_encoded(int     num_params,	/* I - Number of parameters */
 #ifdef DEBUG
           fprintf(stderr, "DEBUG:     set fractional bits %d\n", temp);
 #endif /* DEBUG */
+
+          Outputf("%% PE: set fractional bits %d\n", temp);
           break;
       case '=' :	/* Next coords are absolute */
           s ++;
@@ -420,6 +443,8 @@ PE_polyline_encoded(int     num_params,	/* I - Number of parameters */
 #ifdef DEBUG
           fputs("DEBUG:     absolute\n", stderr);
 #endif /* DEBUG */
+
+          Outputf("%% PE: absolute\n");
           break;
       default :
           if (*s >= 63)
@@ -434,6 +459,8 @@ PE_polyline_encoded(int     num_params,	/* I - Number of parameters */
 #ifdef DEBUG
             fprintf(stderr, "DEBUG:     coords %.3f %.3f\n", x, y);
 #endif /* DEBUG */
+
+            Outputf("%% PE: coords %.3f %.3f\n", x, y);
 
             if (abscoords)
             {
@@ -540,6 +567,8 @@ RT_arc_relative3(int     num_params,	/* I - Number of parameters */
     if (!PolygonMode)
       Outputf("MP\n");
 
+    PenValid = 1;
+
     Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
 
     PenPosition[0] = Transform[0][0] * params[0].value.number +
@@ -606,7 +635,7 @@ decode_number(unsigned char **s,	/* IO - String to decode */
       else if (**s < 63)
       {
         if (**s != '\r' && **s != '\n')
-          fprintf(stderr, "hpgl2ps: Bad PE character \'%c\'!\n", **s);
+          fprintf(stderr, "ERROR: Bad PE character 0x%02X!\n", **s);
 
         continue;
       }
@@ -648,7 +677,7 @@ decode_number(unsigned char **s,	/* IO - String to decode */
       else if (**s < 63)
       {
         if (**s != '\r' && **s != '\n')
-          fprintf(stderr, "hpgl2ps: Bad PE character \'%c\'!\n", **s);
+          fprintf(stderr, "ERROR: Bad PE character 0x%02X!\n", **s);
 
         continue;
       }
@@ -694,6 +723,8 @@ plot_points(int     num_params,	/* I - Number of parameters */
     {
       Outputf("MP\n");
       Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+
+      PenValid = 1;
     }
   }
 
@@ -740,5 +771,5 @@ plot_points(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-vector.c,v 1.14.2.4 2003/03/21 02:45:04 mike Exp $".
+ * End of "$Id: hpgl-vector.c,v 1.14.2.5 2003/11/07 21:43:36 mike Exp $".
  */

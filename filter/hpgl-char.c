@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-char.c,v 1.13.2.4 2003/09/12 20:20:05 mike Exp $"
+ * "$Id: hpgl-char.c,v 1.13.2.5 2003/11/07 21:43:36 mike Exp $"
  *
  *   HP-GL/2 character processing for the Common UNIX Printing System (CUPS).
  *
@@ -385,6 +385,7 @@ LB_label(int     num_params,		/* I - Number of parameters */
   Outputf("currentmiterlimit 1.0 setmiterlimit\n");
   Outputf("MP\n");
   Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+  PenValid = 1;
 
   Outputf("(");
   for (s = params[0].value.string; *s != '\0'; s ++)
@@ -635,5 +636,5 @@ TD_transparent_data(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-char.c,v 1.13.2.4 2003/09/12 20:20:05 mike Exp $".
+ * End of "$Id: hpgl-char.c,v 1.13.2.5 2003/11/07 21:43:36 mike Exp $".
  */

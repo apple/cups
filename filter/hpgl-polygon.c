@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-polygon.c,v 1.9.2.4 2003/03/21 02:45:04 mike Exp $"
+ * "$Id: hpgl-polygon.c,v 1.9.2.5 2003/11/07 21:43:36 mike Exp $"
  *
  *   HP-GL/2 polygon routines for the Common UNIX Printing System (CUPS).
  *
@@ -67,6 +67,8 @@ EA_edge_rect_absolute(int     num_params,	/* I - Number of parameters */
   if (!PolygonMode)
     Outputf("MP\n");
 
+  PenValid = 1;
+
   Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
   Outputf("%.3f %.3f LI\n", PenPosition[0], y);
   Outputf("%.3f %.3f LI\n", x, y);
@@ -118,6 +120,8 @@ ER_edge_rect_relative(int     num_params,	/* I - Number of parameters */
   if (!PolygonMode)
     Outputf("MP\n");
 
+  PenValid = 1;
+
   Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
   Outputf("%.3f %.3f LI\n", PenPosition[0], y);
   Outputf("%.3f %.3f LI\n", x, y);
@@ -158,6 +162,8 @@ EW_edge_wedge(int     num_params,	/* I - Number of parameters */
 
   if (!PolygonMode)
     Outputf("MP\n");
+
+  PenValid = 1;
 
   Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
 
@@ -227,7 +233,7 @@ PM_polygon_mode(int     num_params,	/* I - Number of parameters */
       params[0].value.number == 0)
   {
     Outputf("MP\n");
-/*    Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);*/
+    PenValid    = 0;
     PolygonMode = 1;
   }
   else if (params[0].value.number == 2)
@@ -258,6 +264,8 @@ RA_fill_rect_absolute(int     num_params,	/* I - Number of parameters */
 
   if (!PolygonMode)
     Outputf("MP\n");
+
+  PenValid = 1;
 
   Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
   Outputf("%.3f %.3f LI\n", PenPosition[0], y);
@@ -294,6 +302,8 @@ RR_fill_rect_relative(int     num_params,	/* I - Number of parameters */
 
   if (!PolygonMode)
     Outputf("MP\n");
+
+  PenValid = 1;
 
   Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
   Outputf("%.3f %.3f LI\n", PenPosition[0], y);
@@ -335,6 +345,8 @@ WG_fill_wedge(int     num_params,	/* I - Number of parameters */
 
   if (!PolygonMode)
     Outputf("MP\n");
+
+  PenValid = 1;
 
   Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
 
@@ -378,5 +390,5 @@ WG_fill_wedge(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-polygon.c,v 1.9.2.4 2003/03/21 02:45:04 mike Exp $".
+ * End of "$Id: hpgl-polygon.c,v 1.9.2.5 2003/11/07 21:43:36 mike Exp $".
  */
