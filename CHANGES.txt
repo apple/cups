@@ -3,6 +3,8 @@ CHANGES.txt - 10/04/2000
 
 CHANGES IN CUPS V1.1.5
 
+	- Minor code cleanup to remove extraneous compiler
+	  warnings.
 	- cupsTempFile() was using %p for the temporary
 	  filename; this should have been %08x (just 8 digit
 	  hex)
@@ -11,6 +13,9 @@ CHANGES IN CUPS V1.1.5
 	- ippWrite() and ipp_write_file() didn't send the
 	  correct value length for name-with-language and
 	  text-with-language attributes.
+	- Updated IPP code to support copied strings (that
+	  should not be freed); this provides slightly more
+	  efficient IPP server performance.
 
 
 CHANGES IN CUPS v1.1.4

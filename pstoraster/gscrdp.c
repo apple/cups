@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gscrdp.c,v 1.1 2000/03/08 23:14:38 mike Exp $ */
+/*$Id: gscrdp.c,v 1.2 2000/10/13 01:04:41 mike Exp $ */
 /* CIE color rendering dictionary creation */
 #include "math_.h"
 #include "memory_.h"
@@ -599,7 +599,9 @@ param_get_cie_render1(gs_cie_render * pcrd, gs_param_list * plist,
 	if (n > 4 || m > 4)
 	    return_error(gs_error_rangecheck);
 	memcpy(pcrd->RenderTable.lookup.dims, rt_size.data, n * sizeof(int));
-	/****** ALLOCATE table = RenderTable.lookup.table ******/
+	table = (gs_const_string *)gs_malloc(pcrd->RenderTable.lookup.dims[0],
+	                                     sizeof(gs_const_string *),
+					     "param_get_cie_render1");
 	for (j = 0; j < pcrd->RenderTable.lookup.dims[0]; ++j) {
 	    table[j].data = rt_values.data[j].data;
 	    table[j].size = rt_values.data[j].size;

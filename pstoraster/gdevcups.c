@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.35 2000/09/29 17:42:55 mike Exp $"
+ * "$Id: gdevcups.c,v 1.36 2000/10/13 01:04:39 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -251,7 +251,7 @@ private int
 cups_close(gx_device *pdev)	/* I - Device info */
 {
 #ifdef DEBUG
-  fprintf(stderr, "DEBUG: cups_close(%08x)\n", pdev);
+  fprintf(stderr, "DEBUG: cups_close(%p)\n", pdev);
 #endif /* DEBUG */
 
   if (cups->stream != NULL)
@@ -281,7 +281,7 @@ cups_get_matrix(gx_device *pdev,	/* I - Device info */
                 gs_matrix *pmat)	/* O - Physical transform matrix */
 {
 #ifdef DEBUG
-  fprintf(stderr, "DEBUG: cups_get_matrix(%08x, %08x)\n", pdev, pmat);
+  fprintf(stderr, "DEBUG: cups_get_matrix(%p, %p)\n", pdev, pmat);
 #endif /* DEBUG */
 
  /*
@@ -344,7 +344,7 @@ cups_get_params(gx_device     *pdev,	/* I - Device info */
 
 
 #ifdef DEBUG
-  fprintf(stderr, "DEBUG: cups_get_params(%08x, %08x)\n", pdev, plist);
+  fprintf(stderr, "DEBUG: cups_get_params(%p, %p)\n", pdev, plist);
 #endif /* DEBUG */
 
  /*
@@ -618,7 +618,7 @@ cups_map_cmyk_color(gx_device      *pdev,	/* I - Device info */
 
 
 #ifdef DEBUG
-  fprintf(stderr, "DEBUG: cups_map_cmyk_color(%08x, %d, %d, %d, %d)\n", pdev,
+  fprintf(stderr, "DEBUG: cups_map_cmyk_color(%p, %d, %d, %d, %d)\n", pdev,
           c, m, y, k);
 #endif /* DEBUG */
 
@@ -652,7 +652,7 @@ cups_map_cmyk_color(gx_device      *pdev,	/* I - Device info */
     default :
         switch (cups->header.cupsBitsPerColor)
         {
-          case 1 :
+          default :
               i = (((((ic << 1) | im) << 1) | iy) << 1) | ik;
               break;
           case 2 :
@@ -672,7 +672,7 @@ cups_map_cmyk_color(gx_device      *pdev,	/* I - Device info */
     case CUPS_CSPACE_GMCS :
         switch (cups->header.cupsBitsPerColor)
         {
-          case 1 :
+          default :
               i = (((((iy << 1) | im) << 1) | ic) << 1) | ik;
               break;
           case 2 :
@@ -713,7 +713,7 @@ cups_map_cmyk_color(gx_device      *pdev,	/* I - Device info */
     case CUPS_CSPACE_KCMY :
         switch (cups->header.cupsBitsPerColor)
         {
-          case 1 :
+          default :
               i = (((((ik << 1) | ic) << 1) | im) << 1) | iy;
               break;
           case 2 :
@@ -730,7 +730,7 @@ cups_map_cmyk_color(gx_device      *pdev,	/* I - Device info */
   }
 
   if (gs_log_errors > 1)
-    fprintf(stderr, "DEBUG: CMYK (%d,%d,%d,%d) -> CMYK %08.8x (%d,%d,%d,%d)\n",
+    fprintf(stderr, "DEBUG: CMYK (%d,%d,%d,%d) -> CMYK %8x (%d,%d,%d,%d)\n",
 	    c, m, y, k, i, ic, im, iy, ik);
 
   return (i);
@@ -751,7 +751,7 @@ cups_map_color_rgb(gx_device      *pdev,	/* I - Device info */
 
 
 #ifdef DEBUG
-  fprintf(stderr, "DEBUG: cups_map_color_rgb(%08x, %d, %08x)\n", pdev,
+  fprintf(stderr, "DEBUG: cups_map_color_rgb(%p, %d, %8x)\n", pdev,
           color, prgb);
 #endif /* DEBUG */
 
@@ -763,7 +763,7 @@ cups_map_color_rgb(gx_device      *pdev,	/* I - Device info */
     cups_set_color_info(pdev);
 
 #ifdef DEBUG
-  fprintf(stderr, "DEBUG: COLOR %08x = ", color);
+  fprintf(stderr, "DEBUG: COLOR %8x = ", color);
 #endif /* DEBUG */
 
  /*
@@ -772,7 +772,7 @@ cups_map_color_rgb(gx_device      *pdev,	/* I - Device info */
 
   switch (cups->header.cupsBitsPerColor)
   {
-    case 1 :
+    default :
         c3 = color & 1;
         color >>= 1;
         c2 = color & 1;
@@ -786,7 +786,7 @@ cups_map_color_rgb(gx_device      *pdev,	/* I - Device info */
         color >>= 2;
         c2 = color & 3;
         color >>= 2;
-        c2 = color & 3;
+        c1 = color & 3;
         color >>= 2;
         c0 = color;
         break;
@@ -837,6 +837,12 @@ cups_map_color_rgb(gx_device      *pdev,	/* I - Device info */
         prgb[2] = lut_color_rgb[c3];
         break;
 
+    case CUPS_CSPACE_RGBA :
+        prgb[0] = lut_color_rgb[c0];
+        prgb[1] = lut_color_rgb[c1];
+        prgb[2] = lut_color_rgb[c2];
+        break;
+
     case CUPS_CSPACE_CMY :
         prgb[0] = lut_color_rgb[c1];
         prgb[1] = lut_color_rgb[c2];
@@ -850,6 +856,7 @@ cups_map_color_rgb(gx_device      *pdev,	/* I - Device info */
         break;
 
     case CUPS_CSPACE_KCMY :
+    case CUPS_CSPACE_KCMYcm :
         k    = lut_color_rgb[c0];
         divk = gx_max_color_value - k;
         if (divk == 0)
@@ -939,7 +946,7 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 
 
 #ifdef DEBUG
-  fprintf(stderr, "DEBUG: cups_map_rgb_color(%08x, %d, %d, %d)\n", pdev, r, g, b);
+  fprintf(stderr, "DEBUG: cups_map_rgb_color(%p, %d, %d, %d)\n", pdev, r, g, b);
 #endif /* DEBUG */
 
  /*
@@ -1027,7 +1034,7 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 
         switch (cups->header.cupsBitsPerColor)
         {
-          case 1 :
+          default :
               i = (((ic << 1) | im) << 1) | iy;
               break;
           case 2 :
@@ -1038,6 +1045,28 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
               break;
           case 8 :
               i = (((ic << 8) | im) << 8) | iy;
+              break;
+        }
+        break;
+
+    case CUPS_CSPACE_RGBA :
+        ic = lut_rgb_color[r];
+        im = lut_rgb_color[g];
+        iy = lut_rgb_color[b];
+
+        switch (cups->header.cupsBitsPerColor)
+        {
+          default :
+              i = (((((ic << 1) | im) << 1) | iy) << 1) | 0x01;
+              break;
+          case 2 :
+              i = (((((ic << 2) | im) << 2) | iy) << 2) | 0x03;
+              break;
+          case 4 :
+              i = (((((ic << 4) | im) << 4) | iy) << 4) | 0x0f;
+              break;
+          case 8 :
+              i = (((((ic << 8) | im) << 8) | iy) << 8) | 0xff;
               break;
         }
         break;
@@ -1053,7 +1082,7 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 
         switch (cups->header.cupsBitsPerColor)
         {
-          case 1 :
+          default :
               i = (((ic << 1) | im) << 1) | iy;
               break;
           case 2 :
@@ -1075,7 +1104,7 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 
         switch (cups->header.cupsBitsPerColor)
         {
-          case 1 :
+          default :
               i = (((iy << 1) | im) << 1) | ic;
               break;
           case 2 :
@@ -1110,7 +1139,7 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 
         switch (cups->header.cupsBitsPerColor)
         {
-          case 1 :
+          default :
               i = (((((ic << 1) | im) << 1) | iy) << 1) | ik;
               break;
           case 2 :
@@ -1125,7 +1154,7 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
         }
 
         if (gs_log_errors > 1)
-	  fprintf(stderr, "DEBUG: CMY (%d,%d,%d) -> CMYK %08.8x (%d,%d,%d,%d)\n",
+	  fprintf(stderr, "DEBUG: CMY (%d,%d,%d) -> CMYK %8x (%d,%d,%d,%d)\n",
 	          r, g, b, i, ic, im, iy, ik);
         break;
 
@@ -1151,7 +1180,7 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 
         switch (cups->header.cupsBitsPerColor)
         {
-          case 1 :
+          default :
               i = (((((iy << 1) | im) << 1) | ic) << 1) | ik;
               break;
           case 2 :
@@ -1217,7 +1246,7 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 
         switch (cups->header.cupsBitsPerColor)
         {
-          case 1 :
+          default :
               i = (((((ik << 1) | ic) << 1) | im) << 1) | iy;
               break;
           case 2 :
@@ -1234,7 +1263,7 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
   }
 
 #ifdef DEBUG
-  fprintf(stderr, "DEBUG: RGB %d,%d,%d = %08x\n", r, g, b, i);
+  fprintf(stderr, "DEBUG: RGB %d,%d,%d = %8x\n", r, g, b, i);
 #endif /* DEBUG */
 
   return (i);
@@ -1252,7 +1281,7 @@ cups_open(gx_device *pdev)	/* I - Device info */
 
 
 #ifdef DEBUG
-  fprintf(stderr, "DEBUG: cups_open(%08x)\n", pdev);
+  fprintf(stderr, "DEBUG: cups_open(%p)\n", pdev);
 #endif /* DEBUG */
 
   if (cups->page == 0)
@@ -1292,7 +1321,7 @@ cups_print_pages(gx_device_printer *pdev,	/* I - Device info */
   (void)fp; /* reference unused file pointer to prevent compiler warning */
 
 #ifdef DEBUG
-  fprintf(stderr, "DEBUG: cups_print_pages(%08x, %08x, %d)\n", pdev, fp,
+  fprintf(stderr, "DEBUG: cups_print_pages(%p, %p, %d)\n", pdev, fp,
           num_copies);
 #endif /* DEBUG */
 
@@ -1446,7 +1475,7 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
 
 
 #ifdef DEBUG
-  fprintf(stderr, "DEBUG: cups_put_params(%08x, %08x)\n", pdev, plist);
+  fprintf(stderr, "DEBUG: cups_put_params(%p, %p)\n", pdev, plist);
 #endif /* DEBUG */
 
  /*
@@ -1652,7 +1681,7 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   cups->header.PageSize[1] = pdev->PageSize[1];
 
 #ifdef DEBUG
-  fprintf(stderr, "DEBUG: ppd = %08x\n", cups->ppd);
+  fprintf(stderr, "DEBUG: ppd = %8x\n", cups->ppd);
   fprintf(stderr, "DEBUG: PageSize = [ %.3f %.3f ]\n",
           pdev->PageSize[0], pdev->PageSize[1]);
   fprintf(stderr, "DEBUG: margins = [ %.3f %.3f %.3f %.3f ]\n",
@@ -1686,7 +1715,7 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
 
 
 #ifdef DEBUG
-  fprintf(stderr, "DEBUG: cups_set_color_info(%08x)\n", pdev);
+  fprintf(stderr, "DEBUG: cups_set_color_info(%p)\n", pdev);
 #endif /* DEBUG */
 
   switch (cups->header.cupsColorSpace)
@@ -1993,14 +2022,12 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
     else
       switch (cups->header.cupsBitsPerColor)
       {
-	case 1 :
+	default :
             memset(dst, 0, cups->header.cupsBytesPerLine);
 
             switch (cups->header.cupsColorSpace)
 	    {
-	      case CUPS_CSPACE_RGB :
-	      case CUPS_CSPACE_CMY :
-	      case CUPS_CSPACE_YMC :
+	      default :
 	          for (x = cups->width, cptr = dst, mptr = cptr + bandbytes,
 		           yptr = mptr + bandbytes, bit = 128;
 		       x > 0;
@@ -2036,6 +2063,9 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 		    }
 		  }
 	          break;
+	      case CUPS_CSPACE_GMCK :
+	      case CUPS_CSPACE_GMCS :
+	      case CUPS_CSPACE_RGBA :
 	      case CUPS_CSPACE_CMYK :
 	      case CUPS_CSPACE_YMCK :
 	      case CUPS_CSPACE_KCMY :
@@ -2123,9 +2153,7 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 
             switch (cups->header.cupsColorSpace)
 	    {
-	      case CUPS_CSPACE_RGB :
-	      case CUPS_CSPACE_CMY :
-	      case CUPS_CSPACE_YMC :
+	      default :
 	          for (x = cups->width, cptr = dst, mptr = cptr + bandbytes,
 		           yptr = mptr + bandbytes, bit = 0xc0;
 		       x > 0;
@@ -2133,41 +2161,41 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 		    switch (bit)
 		    {
 		      case 0xc0 :
-			  if (temp = *srcptr & 0x30)
+			  if ((temp = *srcptr & 0x30) != 0)
 			    *cptr |= temp << 2;
-			  if (temp = *srcptr & 0x0c)
+			  if ((temp = *srcptr & 0x0c) != 0)
 			    *mptr |= temp << 4;
-			  if (temp = *srcptr & 0x03)
+			  if ((temp = *srcptr & 0x03) != 0)
 			    *yptr |= temp << 6;
 
 			  bit = 0x30;
 			  break;
 		      case 0x30 :
-			  if (temp = *srcptr & 0x30)
+			  if ((temp = *srcptr & 0x30) != 0)
 			    *cptr |= temp;
-			  if (temp = *srcptr & 0x0c)
+			  if ((temp = *srcptr & 0x0c) != 0)
 			    *mptr |= temp << 2;
-			  if (temp = *srcptr & 0x03)
+			  if ((temp = *srcptr & 0x03) != 0)
 			    *yptr |= temp << 4;
 
 			  bit = 0x0c;
 			  break;
 		      case 0x0c :
-			  if (temp = *srcptr & 0x30)
+			  if ((temp = *srcptr & 0x30) != 0)
 			    *cptr |= temp >> 2;
-			  if (temp = *srcptr & 0x0c)
+			  if ((temp = *srcptr & 0x0c) != 0)
 			    *mptr |= temp;
-			  if (temp = *srcptr & 0x03)
+			  if ((temp = *srcptr & 0x03) != 0)
 			    *yptr |= temp << 2;
 
 			  bit = 0x03;
 			  break;
 		      case 0x03 :
-			  if (temp = *srcptr & 0x30)
+			  if ((temp = *srcptr & 0x30) != 0)
 			    *cptr |= temp >> 4;
-			  if (temp = *srcptr & 0x0c)
+			  if ((temp = *srcptr & 0x0c) != 0)
 			    *mptr |= temp >> 2;
-			  if (temp = *srcptr & 0x03)
+			  if ((temp = *srcptr & 0x03) != 0)
 			    *yptr |= temp;
 
 			  bit = 0xc0;
@@ -2177,9 +2205,13 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 			  break;
                     }
 	          break;
+	      case CUPS_CSPACE_GMCK :
+	      case CUPS_CSPACE_GMCS :
+	      case CUPS_CSPACE_RGBA :
 	      case CUPS_CSPACE_CMYK :
 	      case CUPS_CSPACE_YMCK :
 	      case CUPS_CSPACE_KCMY :
+	      case CUPS_CSPACE_KCMYcm :
 	          for (x = cups->width, cptr = dst, mptr = cptr + bandbytes,
 		           yptr = mptr + bandbytes, kptr = yptr + bandbytes,
 			   bit = 0xc0;
@@ -2188,49 +2220,49 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 		    switch (bit)
 		    {
 		      case 0xc0 :
-		          if (temp = *srcptr & 0xc0)
+		          if ((temp = *srcptr & 0xc0) != 0)
 			    *cptr |= temp;
-			  if (temp = *srcptr & 0x30)
+			  if ((temp = *srcptr & 0x30) != 0)
 			    *mptr |= temp << 2;
-			  if (temp = *srcptr & 0x0c)
+			  if ((temp = *srcptr & 0x0c) != 0)
 			    *yptr |= temp << 4;
-			  if (temp = *srcptr & 0x03)
+			  if ((temp = *srcptr & 0x03) != 0)
 			    *kptr |= temp << 6;
 
 			  bit = 0x30;
 			  break;
 		      case 0x30 :
-		          if (temp = *srcptr & 0xc0)
+		          if ((temp = *srcptr & 0xc0) != 0)
 			    *cptr |= temp >> 2;
-			  if (temp = *srcptr & 0x30)
+			  if ((temp = *srcptr & 0x30) != 0)
 			    *mptr |= temp;
-			  if (temp = *srcptr & 0x0c)
+			  if ((temp = *srcptr & 0x0c) != 0)
 			    *yptr |= temp << 2;
-			  if (temp = *srcptr & 0x03)
+			  if ((temp = *srcptr & 0x03) != 0)
 			    *kptr |= temp << 4;
 
 			  bit = 0x0c;
 			  break;
 		      case 0x0c :
-		          if (temp = *srcptr & 0xc0)
+		          if ((temp = *srcptr & 0xc0) != 0)
 			    *cptr |= temp >> 4;
-			  if (temp = *srcptr & 0x30)
+			  if ((temp = *srcptr & 0x30) != 0)
 			    *mptr |= temp >> 2;
-			  if (temp = *srcptr & 0x0c)
+			  if ((temp = *srcptr & 0x0c) != 0)
 			    *yptr |= temp;
-			  if (temp = *srcptr & 0x03)
+			  if ((temp = *srcptr & 0x03) != 0)
 			    *kptr |= temp << 2;
 
 			  bit = 0x03;
 			  break;
 		      case 0x03 :
-		          if (temp = *srcptr & 0xc0)
+		          if ((temp = *srcptr & 0xc0) != 0)
 			    *cptr |= temp >> 6;
-			  if (temp = *srcptr & 0x30)
+			  if ((temp = *srcptr & 0x30) != 0)
 			    *mptr |= temp >> 4;
-			  if (temp = *srcptr & 0x0c)
+			  if ((temp = *srcptr & 0x0c) != 0)
 			    *yptr |= temp >> 2;
-			  if (temp = *srcptr & 0x03)
+			  if ((temp = *srcptr & 0x03) != 0)
 			    *kptr |= temp;
 
 			  bit = 0xc0;
@@ -2249,9 +2281,7 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 
             switch (cups->header.cupsColorSpace)
 	    {
-	      case CUPS_CSPACE_RGB :
-	      case CUPS_CSPACE_CMY :
-	      case CUPS_CSPACE_YMC :
+	      default :
 	          for (x = cups->width, cptr = dst, mptr = cptr + bandbytes,
 		           yptr = mptr + bandbytes, bit = 0xf0;
 		       x > 0;
@@ -2259,21 +2289,21 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 		    switch (bit)
 		    {
 		      case 0xf0 :
-			  if (temp = srcptr[0] & 0x0f)
+			  if ((temp = srcptr[0] & 0x0f) != 0)
 			    *cptr |= temp << 4;
-			  if (temp = srcptr[1] & 0xf0)
+			  if ((temp = srcptr[1] & 0xf0) != 0)
 			    *mptr |= temp;
-			  if (temp = srcptr[1] & 0x0f)
+			  if ((temp = srcptr[1] & 0x0f) != 0)
 			    *yptr |= temp << 4;
 
 			  bit = 0x0f;
 			  break;
 		      case 0x0f :
-			  if (temp = srcptr[0] & 0x0f)
+			  if ((temp = srcptr[0] & 0x0f) != 0)
 			    *cptr |= temp;
-			  if (temp = srcptr[1] & 0xf0)
+			  if ((temp = srcptr[1] & 0xf0) != 0)
 			    *mptr |= temp >> 4;
-			  if (temp = srcptr[1] & 0x0f)
+			  if ((temp = srcptr[1] & 0x0f) != 0)
 			    *yptr |= temp;
 
 			  bit = 0xf0;
@@ -2284,6 +2314,9 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 			  break;
                     }
 	          break;
+	      case CUPS_CSPACE_GMCK :
+	      case CUPS_CSPACE_GMCS :
+	      case CUPS_CSPACE_RGBA :
 	      case CUPS_CSPACE_CMYK :
 	      case CUPS_CSPACE_YMCK :
 	      case CUPS_CSPACE_KCMY :
@@ -2296,25 +2329,25 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 		    switch (bit)
 		    {
 		      case 0xf0 :
-		          if (temp = srcptr[0] & 0xf0)
+		          if ((temp = srcptr[0] & 0xf0) != 0)
 			    *cptr |= temp;
-			  if (temp = srcptr[0] & 0x0f)
+			  if ((temp = srcptr[0] & 0x0f) != 0)
 			    *mptr |= temp << 4;
-			  if (temp = srcptr[1] & 0xf0)
+			  if ((temp = srcptr[1] & 0xf0) != 0)
 			    *yptr |= temp;
-			  if (temp = srcptr[1] & 0x0f)
+			  if ((temp = srcptr[1] & 0x0f) != 0)
 			    *kptr |= temp << 4;
 
 			  bit = 0x0f;
 			  break;
 		      case 0x0f :
-		          if (temp = srcptr[0] & 0xf0)
+		          if ((temp = srcptr[0] & 0xf0) != 0)
 			    *cptr |= temp >> 4;
-			  if (temp = srcptr[0] & 0x0f)
+			  if ((temp = srcptr[0] & 0x0f) != 0)
 			    *mptr |= temp;
-			  if (temp = srcptr[1] & 0xf0)
+			  if ((temp = srcptr[1] & 0xf0) != 0)
 			    *yptr |= temp >> 4;
-			  if (temp = srcptr[1] & 0x0f)
+			  if ((temp = srcptr[1] & 0x0f) != 0)
 			    *kptr |= temp;
 
 			  bit = 0xf0;
@@ -2331,9 +2364,7 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 	case 8 :
             switch (cups->header.cupsColorSpace)
 	    {
-	      case CUPS_CSPACE_RGB :
-	      case CUPS_CSPACE_CMY :
-	      case CUPS_CSPACE_YMC :
+	      default :
 	          for (x = cups->width, cptr = dst, mptr = cptr + bandbytes,
 		           yptr = mptr + bandbytes;
 		       x > 0;
@@ -2344,6 +2375,9 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 		    *yptr++ = *srcptr++;
 		  }
 	          break;
+	      case CUPS_CSPACE_GMCK :
+	      case CUPS_CSPACE_GMCS :
+	      case CUPS_CSPACE_RGBA :
 	      case CUPS_CSPACE_CMYK :
 	      case CUPS_CSPACE_YMCK :
 	      case CUPS_CSPACE_KCMY :
@@ -2419,14 +2453,12 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
       else
 	switch (cups->header.cupsBitsPerColor)
 	{
-          case 1 :
+          default :
 	      memset(dst, 0, cups->header.cupsBytesPerLine);
 
 	      switch (cups->header.cupsColorSpace)
 	      {
-		case CUPS_CSPACE_RGB :
-		case CUPS_CSPACE_CMY :
-		case CUPS_CSPACE_YMC :
+		default :
 	            for (dstptr = dst, x = cups->width, srcbit = 64 >> z,
 		             dstbit = 128;
 			 x > 0;
@@ -2452,6 +2484,9 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 		      }
 		    }
 	            break;
+		case CUPS_CSPACE_GMCK :
+		case CUPS_CSPACE_GMCS :
+		case CUPS_CSPACE_RGBA :
 		case CUPS_CSPACE_CMYK :
 		case CUPS_CSPACE_YMCK :
 		case CUPS_CSPACE_KCMY :
@@ -2506,15 +2541,13 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 	      switch (cups->header.cupsColorSpace)
 	      {
-		case CUPS_CSPACE_RGB :
-		case CUPS_CSPACE_CMY :
-		case CUPS_CSPACE_YMC :
+		default :
 	            for (dstptr = dst, x = cups->width, srcbit = 48 >> (z * 2),
 		             dstbit = 0xc0;
 			 x > 0;
 			 x --, srcptr ++)
 		    {
-		      if (temp = *srcptr & srcbit)
+		      if ((temp = *srcptr & srcbit) != 0)
 		      {
 			if (srcbit == dstbit)
 		          *dstptr |= temp;
@@ -2557,6 +2590,9 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 		      }
 		    }
 	            break;
+		case CUPS_CSPACE_GMCK :
+		case CUPS_CSPACE_GMCS :
+		case CUPS_CSPACE_RGBA :
 		case CUPS_CSPACE_CMYK :
 		case CUPS_CSPACE_YMCK :
 		case CUPS_CSPACE_KCMY :
@@ -2566,7 +2602,7 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 			 x > 0;
 			 x --, srcptr ++)
 		    {
-		      if (temp = *srcptr & srcbit)
+		      if ((temp = *srcptr & srcbit) != 0)
 		      {
 			if (srcbit == dstbit)
 		          *dstptr |= temp;
@@ -2620,9 +2656,7 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 	      switch (cups->header.cupsColorSpace)
 	      {
-		case CUPS_CSPACE_RGB :
-		case CUPS_CSPACE_CMY :
-		case CUPS_CSPACE_YMC :
+		default :
 	            if (z > 0)
 		      srcptr ++;
 
@@ -2635,7 +2669,7 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 			 x > 0;
 			 x --, srcptr += 2)
 		    {
-		      if (temp = *srcptr & srcbit)
+		      if ((temp = *srcptr & srcbit) != 0)
 		      {
 			if (srcbit == dstbit)
 		          *dstptr |= temp;
@@ -2660,6 +2694,9 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 		      }
 		    }
 	            break;
+		case CUPS_CSPACE_GMCK :
+		case CUPS_CSPACE_GMCS :
+		case CUPS_CSPACE_RGBA :
 		case CUPS_CSPACE_CMYK :
 		case CUPS_CSPACE_YMCK :
 		case CUPS_CSPACE_KCMY :
@@ -2676,7 +2713,7 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 			 x > 0;
 			 x --, srcptr += 2)
 		    {
-		      if (temp = *srcptr & srcbit)
+		      if ((temp = *srcptr & srcbit) != 0)
 		      {
 			if (srcbit == dstbit)
 		          *dstptr |= temp;
@@ -2722,5 +2759,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.35 2000/09/29 17:42:55 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.36 2000/10/13 01:04:39 mike Exp $".
  */

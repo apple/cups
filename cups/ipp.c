@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.43 2000/10/12 03:18:04 mike Exp $"
+ * "$Id: ipp.c,v 1.44 2000/10/13 01:04:37 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -656,7 +656,8 @@ ippFindAttribute(ipp_t      *ipp,	/* I - IPP request */
                  const char *name,	/* I - Name of attribute */
 		 ipp_tag_t  type)	/* I - Type of attribute */
 {
-  ipp_attribute_t	*attr;	/* Current atttribute */
+  ipp_attribute_t	*attr;		/* Current atttribute */
+  ipp_tag_t		value_tag;	/* Value tag */
 
 
   DEBUG_printf(("ippFindAttribute(%08x, \'%s\')\n", ipp, name));
@@ -669,10 +670,12 @@ ippFindAttribute(ipp_t      *ipp,	/* I - IPP request */
     DEBUG_printf(("ippFindAttribute: attr = %08x, name = \'%s\'\n", attr,
                   attr->name));
 
+    value_tag = attr->value_tag & ~IPP_TAG_COPY;
+
     if (attr->name != NULL && strcasecmp(attr->name, name) == 0 &&
-        (attr->value_tag == type || type == IPP_TAG_ZERO ||
-	 (attr->value_tag == IPP_TAG_TEXTLANG && type == IPP_TAG_TEXT) ||
-	 (attr->value_tag == IPP_TAG_NAMELANG && type == IPP_TAG_NAME)))
+        (value_tag == type || type == IPP_TAG_ZERO ||
+	 (value_tag == IPP_TAG_TEXTLANG && type == IPP_TAG_TEXT) ||
+	 (value_tag == IPP_TAG_NAMELANG && type == IPP_TAG_NAME)))
       return (attr);
   }
 
@@ -1718,5 +1721,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.43 2000/10/12 03:18:04 mike Exp $".
+ * End of "$Id: ipp.c,v 1.44 2000/10/13 01:04:37 mike Exp $".
  */

@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gsbitops.c,v 1.2 2000/03/08 23:14:33 mike Exp $ */
+/*$Id: gsbitops.c,v 1.3 2000/10/13 01:04:41 mike Exp $ */
 /* Bitmap filling, copying, and transforming operations */
 #include "stdio_.h"
 #include "memory_.h"
@@ -467,8 +467,16 @@ bits_compress_scaled(const byte * src, int srcx, uint width, uint height,
     uint h;
 
     if (out_bits <= xscale)
-	input_byte_out_bits = out_bits << (3 - log2_x),
-	    input_byte_out_mask = (1 << input_byte_out_bits) - 1;
+    {
+      input_byte_out_bits = out_bits << (3 - log2_x);
+      input_byte_out_mask = (1 << input_byte_out_bits) - 1;
+    }
+    else
+    {
+      input_byte_out_bits = out_bits;
+      input_byte_out_mask = (1 << input_byte_out_bits) - 1;
+    }
+
     for (h = height; h; srow += sskip, h -= yscale) {
 	const byte *s = srow;
 

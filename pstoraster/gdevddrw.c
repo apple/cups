@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gdevddrw.c,v 1.2 2000/03/08 23:14:22 mike Exp $ */
+/*$Id: gdevddrw.c,v 1.3 2000/10/13 01:04:40 mike Exp $ */
 /* Default polygon and image drawing device procedures */
 #include "math_.h"
 #include "memory_.h"
@@ -91,8 +91,16 @@ gx_default_fill_trapezoid(gx_device * dev, const gs_fixed_edge * left,
 	if_debug2('z', "[z]y=[%d,%d]\n", iy, iy1);
 
 	if (fill_direct)
-	    cindex = pdevc->colors.pure,
-		fill_rect = dev_proc(dev, fill_rectangle);
+	{
+	  cindex    = pdevc->colors.pure;
+          fill_rect = dev_proc(dev, fill_rectangle);
+	}
+	else
+	{
+	  cindex    = 0;
+          fill_rect = 0;
+	}
+
 	l.h = left->end.y - left->start.y;
 	r.h = right->end.y - right->start.y;
 	l.x = x0l + (fixed_half - fixed_epsilon);

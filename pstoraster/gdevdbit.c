@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gdevdbit.c,v 1.1 2000/03/08 23:14:22 mike Exp $ */
+/*$Id: gdevdbit.c,v 1.2 2000/10/13 01:04:40 mike Exp $ */
 /* Default device bitmap copying implementation */
 #include "gx.h"
 #include "gpcheck.h"
@@ -485,7 +485,9 @@ gx_default_strip_tile_rectangle(gx_device * dev, const gx_strip_bitmap * tiles,
 	if (color0 == gx_no_color_index && color1 == gx_no_color_index)
 	    proc_color = dev_proc(dev, copy_color);
 	else
-	    proc_color = 0, proc_mono = dev_proc(dev, copy_mono);
+	    proc_color = 0;
+
+        proc_mono = dev_proc(dev, copy_mono);
 
 /****** SHOULD ALSO PASS id IF COPYING A FULL TILE ******/
 #define real_copy_tile(srcx, tx, ty, tw, th)\

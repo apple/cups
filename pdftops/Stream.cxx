@@ -3289,6 +3289,7 @@ GBool RunLengthEncoder::fillBuf() {
   // check for repeat
   if (c1 == c2) {
     n = 2;
+    c = 0; // suppress bogus compiler warning
     while (n < 128 && (c = str->getChar()) == c1)
       ++n;
     buf[0] = (char)(257 - n);

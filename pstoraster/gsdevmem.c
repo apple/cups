@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gsdevmem.c,v 1.2 2000/03/08 23:14:39 mike Exp $ */
+/*$Id: gsdevmem.c,v 1.3 2000/10/13 01:04:41 mike Exp $ */
 /* Memory device creation for Ghostscript library */
 #include "math_.h"		/* for fabs */
 #include "memory_.h"
@@ -168,6 +168,9 @@ gs_initialize_wordimagedevice(gx_device_memory * new_dev, const gs_matrix * pmat
 	if (dev_palette == 0)
 	    return_error(gs_error_VMerror);
     }
+    else
+      dev_palette = 0;
+
     gs_make_mem_device(new_dev, proto_dev, mem,
 		       (page_device ? 1 : -1), 0);
     if (!has_color) {

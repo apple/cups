@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gdevprn.c,v 1.8 2000/06/02 20:05:31 mike Exp $ */
+/*$Id: gdevprn.c,v 1.9 2000/10/13 01:04:40 mike Exp $ */
 /* Generic printer driver support */
 #include "ctype_.h"
 #include "gdevprn.h"
@@ -196,9 +196,9 @@ gdev_prn_allocate(gx_device *pdev, gdev_prn_space_params *new_space_params,
     gx_device_memory * const pmemdev = (gx_device_memory *)pdev;
     byte *the_memory = 0;
     gdev_prn_space_params save_params;
-    int save_width, save_height;
-    bool is_command_list;
-    bool save_is_command_list;
+    int save_width = ppdev->width, save_height = ppdev->height;
+    bool is_command_list = false;
+    bool save_is_command_list = false;
     int ecode = 0;
     int pass;
     gs_memory_t *buffer_memory =

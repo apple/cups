@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.99 2000/09/18 17:12:42 mike Exp $"
+ * "$Id: ipp.c,v 1.100 2000/10/13 01:04:41 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1519,12 +1519,13 @@ copy_attribute(ipp_t           *to,	/* O - Destination request/response */
     case IPP_TAG_CHARSET :
     case IPP_TAG_LANGUAGE :
     case IPP_TAG_MIMETYPE :
-        toattr = ippAddStrings(to, attr->group_tag, attr->value_tag,
+        toattr = ippAddStrings(to, attr->group_tag,
+	                       attr->value_tag | IPP_TAG_COPY,
 	                       attr->name, attr->num_values, NULL,
 			       NULL);
 
         for (i = 0; i < attr->num_values; i ++)
-	  toattr->values[i].string.text = strdup(attr->values[i].string.text);
+	  toattr->values[i].string.text = attr->values[i].string.text;
         break;
 
     case IPP_TAG_DATE :
@@ -1558,20 +1559,14 @@ copy_attribute(ipp_t           *to,	/* O - Destination request/response */
 
     case IPP_TAG_TEXTLANG :
     case IPP_TAG_NAMELANG :
-        toattr = ippAddStrings(to, attr->group_tag, attr->value_tag,
+        toattr = ippAddStrings(to, attr->group_tag,
+	                       attr->value_tag | IPP_TAG_COPY,
 	                       attr->name, attr->num_values, NULL, NULL);
 
         for (i = 0; i < attr->num_values; i ++)
 	{
-	  if (i == 0)
-	    toattr->values[0].string.charset =
-	        strdup(attr->values[0].string.charset);
-	  else
-	    toattr->values[i].string.charset =
-	        toattr->values[0].string.charset;
-
-	  toattr->values[i].string.text =
-	      strdup(attr->values[i].string.text);
+          toattr->values[i].string.charset = attr->values[i].string.charset;
+	  toattr->values[i].string.text    = attr->values[i].string.text;
         }
         break;
 
@@ -4839,5 +4834,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.99 2000/09/18 17:12:42 mike Exp $".
+ * End of "$Id: ipp.c,v 1.100 2000/10/13 01:04:41 mike Exp $".
  */

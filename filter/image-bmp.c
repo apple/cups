@@ -1,5 +1,5 @@
 /*
- * "$Id: image-bmp.c,v 1.1 2000/04/30 22:03:57 mike Exp $"
+ * "$Id: image-bmp.c,v 1.2 2000/10/13 01:04:38 mike Exp $"
  *
  *   BMP image routines for the Common UNIX Printing System (CUPS).
  *
@@ -169,7 +169,7 @@ ImageReadBMP(image_t    *img,		/* IO - Image */
     switch (depth)
     {
       case 1 : /* Bitmap */
-          for (x = img->xsize, bit = 128; x > 0; x --)
+          for (x = img->xsize, bit = 128, byte = 0; x > 0; x --)
 	  {
 	    if (bit == 128)
 	      byte = getc(fp);
@@ -202,7 +202,7 @@ ImageReadBMP(image_t    *img,		/* IO - Image */
           break;
 
       case 4 : /* 16-color */
-          for (x = img->xsize, bit = 0xf0; x > 0; x --)
+          for (x = img->xsize, bit = 0xf0, temp = 0; x > 0; x --)
 	  {
 	   /*
 	    * Get a new count as needed...
@@ -495,5 +495,5 @@ read_long(FILE *fp)               /* I - File to read from */
 
 
 /*
- * End of "$Id: image-bmp.c,v 1.1 2000/04/30 22:03:57 mike Exp $".
+ * End of "$Id: image-bmp.c,v 1.2 2000/10/13 01:04:38 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: image-pix.c,v 1.1 2000/04/30 22:03:57 mike Exp $"
+ * "$Id: image-pix.c,v 1.2 2000/10/13 01:04:38 mike Exp $"
  *
  *   Alias PIX image routines for the Common UNIX Printing System (CUPS).
  *
@@ -96,7 +96,7 @@ ImageReadPIX(image_t    *img,		/* IO - Image */
 
   if (depth == 8)
   {
-    for (count = 0, y = 0; y < img->ysize; y ++)
+    for (count = 0, y = 0, g = 0; y < img->ysize; y ++)
     {
       if (img->colorspace == IMAGE_WHITE)
         ptr = out;
@@ -139,7 +139,7 @@ ImageReadPIX(image_t    *img,		/* IO - Image */
   }
   else
   {
-    for (count = 0, y = 0; y < img->ysize; y ++)
+    for (count = 0, y = 0, r = 0, g = 0, b = 0; y < img->ysize; y ++)
     {
       if (img->colorspace == IMAGE_RGB)
         ptr = out;
@@ -219,5 +219,5 @@ read_short(FILE *fp)		/* I - File to read from */
 
 
 /*
- * End of "$Id: image-pix.c,v 1.1 2000/04/30 22:03:57 mike Exp $".
+ * End of "$Id: image-pix.c,v 1.2 2000/10/13 01:04:38 mike Exp $".
  */

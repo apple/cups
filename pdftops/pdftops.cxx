@@ -88,8 +88,8 @@ int main(int argc, char *argv[]) {
 
     if ((size = ppdPageSize(ppd, NULL)) != NULL)
     {
-      paperWidth  = size->width;
-      paperHeight = size->length;
+      paperWidth  = (int)size->width;
+      paperHeight = (int)size->length;
     }
 
     psOutLevel1 = ppd->language_level == 1;

@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.51 2000/09/13 13:48:53 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.52 2000/10/13 01:04:38 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -703,6 +703,13 @@ main(int  argc,		/* I - Number of command-line arguments */
       PageWidth   = PageLength;
       PageLength  = xsize;
     }
+    else
+    {
+      xinches     = xsize;
+      yinches     = ysize;
+      xprint      = (PageRight - PageLeft) / 72.0;
+      yprint      = (PageTop - PageBottom) / 72.0;
+    }
   }
 
   xpages = ceil(xinches / xprint);
@@ -758,7 +765,7 @@ main(int  argc,		/* I - Number of command-line arguments */
               header.ImagingBoundingBox[0] = PageLeft;
 	      header.ImagingBoundingBox[2] = PageLeft + xprint * 72;
 	      break;
-	  case 0 :
+	  default :
               header.ImagingBoundingBox[0] = (PageRight + PageLeft - xprint * 72) / 2;
 	      header.ImagingBoundingBox[2] = (PageRight + PageLeft + xprint * 72) / 2;
 	      break;
@@ -774,7 +781,7 @@ main(int  argc,		/* I - Number of command-line arguments */
               header.ImagingBoundingBox[1] = PageBottom;
 	      header.ImagingBoundingBox[3] = PageBottom + yprint * 72;
 	      break;
-	  case 0 :
+	  default :
               header.ImagingBoundingBox[1] = (PageTop + PageBottom - yprint * 72) / 2;
 	      header.ImagingBoundingBox[3] = (PageTop + PageBottom + yprint * 72) / 2;
 	      break;
@@ -792,7 +799,7 @@ main(int  argc,		/* I - Number of command-line arguments */
               header.ImagingBoundingBox[0] = PageBottom;
 	      header.ImagingBoundingBox[2] = PageBottom + yprint * 72;
 	      break;
-	  case 0 :
+	  default :
               header.ImagingBoundingBox[0] = (PageTop + PageBottom - yprint * 72) / 2;
 	      header.ImagingBoundingBox[2] = (PageTop + PageBottom + yprint * 72) / 2;
 	      break;
@@ -808,7 +815,7 @@ main(int  argc,		/* I - Number of command-line arguments */
               header.ImagingBoundingBox[1] = PageLeft;
 	      header.ImagingBoundingBox[3] = PageLeft + xprint * 72;
 	      break;
-	  case 0 :
+	  default :
               header.ImagingBoundingBox[1] = (PageRight + PageLeft - xprint * 72) / 2;
 	      header.ImagingBoundingBox[3] = (PageRight + PageLeft + xprint * 72) / 2;
 	      break;
@@ -826,7 +833,7 @@ main(int  argc,		/* I - Number of command-line arguments */
               header.ImagingBoundingBox[0] = PageLeft;
 	      header.ImagingBoundingBox[2] = PageLeft + xprint * 72;
 	      break;
-	  case 0 :
+	  default :
               header.ImagingBoundingBox[0] = (PageRight + PageLeft - xprint * 72) / 2;
 	      header.ImagingBoundingBox[2] = (PageRight + PageLeft + xprint * 72) / 2;
 	      break;
@@ -842,7 +849,7 @@ main(int  argc,		/* I - Number of command-line arguments */
               header.ImagingBoundingBox[1] = PageBottom;
 	      header.ImagingBoundingBox[3] = PageBottom + yprint * 72;
 	      break;
-	  case 0 :
+	  default :
               header.ImagingBoundingBox[1] = (PageTop + PageBottom - yprint * 72) / 2;
 	      header.ImagingBoundingBox[3] = (PageTop + PageBottom + yprint * 72) / 2;
 	      break;
@@ -860,7 +867,7 @@ main(int  argc,		/* I - Number of command-line arguments */
               header.ImagingBoundingBox[0] = PageBottom;
 	      header.ImagingBoundingBox[2] = PageBottom + yprint * 72;
 	      break;
-	  case 0 :
+	  default :
               header.ImagingBoundingBox[0] = (PageTop + PageBottom - yprint * 72) / 2;
 	      header.ImagingBoundingBox[2] = (PageTop + PageBottom + yprint * 72) / 2;
 	      break;
@@ -876,7 +883,7 @@ main(int  argc,		/* I - Number of command-line arguments */
               header.ImagingBoundingBox[1] = PageLeft;
 	      header.ImagingBoundingBox[3] = PageLeft + xprint * 72;
 	      break;
-	  case 0 :
+	  default :
               header.ImagingBoundingBox[1] = (PageRight + PageLeft - xprint * 72) / 2;
 	      header.ImagingBoundingBox[3] = (PageRight + PageLeft + xprint * 72) / 2;
 	      break;
@@ -1374,7 +1381,7 @@ format_CMY(cups_page_header_t *header,	/* I - Page header */
     case -1 :
         bitoffset = 0;
 	break;
-    case 0 :
+    default :
         bitoffset = header->cupsBitsPerPixel * ((header->cupsWidth - xsize) / 2);
 	break;
     case 1 :
@@ -1749,7 +1756,7 @@ format_CMYK(cups_page_header_t *header,	/* I - Page header */
     case -1 :
         bitoffset = 0;
 	break;
-    case 0 :
+    default :
         bitoffset = header->cupsBitsPerPixel * ((header->cupsWidth - xsize) / 2);
 	break;
     case 1 :
@@ -2118,7 +2125,7 @@ format_K(cups_page_header_t *header,	/* I - Page header */
     case -1 :
         bitoffset = 0;
 	break;
-    case 0 :
+    default :
         bitoffset = header->cupsBitsPerPixel * ((header->cupsWidth - xsize) / 2);
 	break;
     case 1 :
@@ -2239,7 +2246,7 @@ format_KCMY(cups_page_header_t *header,	/* I - Page header */
     case -1 :
         bitoffset = 0;
 	break;
-    case 0 :
+    default :
         bitoffset = header->cupsBitsPerPixel * ((header->cupsWidth - xsize) / 2);
 	break;
     case 1 :
@@ -2650,7 +2657,7 @@ format_KCMYcm(cups_page_header_t *header,/* I - Page header */
     case -1 :
         bitoffset = 0;
 	break;
-    case 0 :
+    default :
         bitoffset = header->cupsBitsPerPixel * ((header->cupsWidth - xsize) / 2);
 	break;
     case 1 :
@@ -2983,7 +2990,7 @@ format_RGBA(cups_page_header_t *header,	/* I - Page header */
     case -1 :
         bitoffset = 0;
 	break;
-    case 0 :
+    default :
         bitoffset = header->cupsBitsPerPixel * ((header->cupsWidth - xsize) / 2);
 	break;
     case 1 :
@@ -3382,7 +3389,7 @@ format_W(cups_page_header_t *header,	/* I - Page header */
     case -1 :
         bitoffset = 0;
 	break;
-    case 0 :
+    default :
         bitoffset = header->cupsBitsPerPixel * ((header->cupsWidth - xsize) / 2);
 	break;
     case 1 :
@@ -3502,7 +3509,7 @@ format_YMC(cups_page_header_t *header,	/* I - Page header */
     case -1 :
         bitoffset = 0;
 	break;
-    case 0 :
+    default :
         bitoffset = header->cupsBitsPerPixel * ((header->cupsWidth - xsize) / 2);
 	break;
     case 1 :
@@ -3892,7 +3899,7 @@ format_YMCK(cups_page_header_t *header,	/* I - Page header */
     case -1 :
         bitoffset = 0;
 	break;
-    case 0 :
+    default :
         bitoffset = header->cupsBitsPerPixel * ((header->cupsWidth - xsize) / 2);
 	break;
     case 1 :
@@ -4305,5 +4312,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.51 2000/09/13 13:48:53 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.52 2000/10/13 01:04:38 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.31 2000/10/02 13:44:20 mike Exp $"
+ * "$Id: ipp.c,v 1.32 2000/10/13 01:04:36 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -248,7 +248,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     * Do the request...
     */
 
-    for (;;)
+    for (response = NULL, ipp_status = IPP_ERROR;;)
     {
      /*
       * POST the request, retrying as needed...
@@ -655,5 +655,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.31 2000/10/02 13:44:20 mike Exp $".
+ * End of "$Id: ipp.c,v 1.32 2000/10/13 01:04:36 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: pstoraster.c,v 1.16 2000/08/29 21:23:10 mike Exp $"
+ * "$Id: pstoraster.c,v 1.17 2000/10/13 01:04:41 mike Exp $"
  *
  *   PostScript RIP filter main entry for the Common UNIX Printing System
  *   (CUPS).
@@ -77,7 +77,7 @@ const char	*cupsProfile = NULL;
  * Local functions...
  */
 
-static void	define_string(char *, char *);
+static void	define_string(const char *, const char *);
 
 
 /*
@@ -194,8 +194,8 @@ main(int  argc,		/* I - Number of command-line arguments */
  */
 
 static void
-define_string(char *name,	/* I - Variable to set */
-              char *s)		/* I - Value */
+define_string(const char *name,	/* I - Variable to set */
+              const char *s)	/* I - Value */
 {
   int	len;			/* Length of string */
   char	*copy;			/* Copy of string */
@@ -229,5 +229,5 @@ define_string(char *name,	/* I - Variable to set */
 
 
 /*
- * End of "$Id: pstoraster.c,v 1.16 2000/08/29 21:23:10 mike Exp $".
+ * End of "$Id: pstoraster.c,v 1.17 2000/10/13 01:04:41 mike Exp $".
  */

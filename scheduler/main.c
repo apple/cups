@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.46 2000/10/02 12:45:36 mike Exp $"
+ * "$Id: main.c,v 1.47 2000/10/13 01:04:42 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -246,6 +246,10 @@ main(int  argc,			/* I - Number of command-line arguments */
   */
 
   senddoc_time = time(NULL);
+
+#ifdef HAVE_MALLINFO
+  mallinfo_time = 0;
+#endif /* HAVE_MALLINFO */
 
   for (;;)
   {
@@ -654,5 +658,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.46 2000/10/02 12:45:36 mike Exp $".
+ * End of "$Id: main.c,v 1.47 2000/10/13 01:04:42 mike Exp $".
  */
