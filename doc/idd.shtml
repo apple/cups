@@ -1,9 +1,9 @@
 <HTML>
 <HEAD>
-   <META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
-   <META NAME="DOCNUMBER" CONTENT="CUPS-IDD-1.0">
-   <META NAME="Author" CONTENT="Easy Software Products">
-   <TITLE>CUPS Interface Design Description</TITLE>
+	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-IDD-1.0">
+	<META NAME="Author" CONTENT="Easy Software Products">
+	<TITLE>DRAFT - CUPS Interface Design Description</TITLE>
 </HEAD>
 <BODY>
 
@@ -300,7 +300,7 @@ raster data for that page.
 
 <H2>Filter Interfaces</H2>
 
-<H1 TYPE=A VALUE=0>Glossary</H1>
+<H1 TYPE=A VALUE=1>Glossary</H1>
 
 <H2>Terms</H2>
 

@@ -1,9 +1,9 @@
 <HTML>
 <HEAD>
-   <META NAME="DOCNUMBER" CONTENT="CUPS-CMP-1.0">
-   <META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
-   <META NAME="Author" CONTENT="Easy Software Products">
-   <TITLE>CUPS Configuration Management Plan</TITLE>
+	<META NAME="DOCNUMBER" CONTENT="CUPS-CMP-1.0">
+	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
+	<META NAME="Author" CONTENT="Easy Software Products">
+	<TITLE>CUPS Configuration Management Plan</TITLE>
 </HEAD>
 <BODY>
 
@@ -232,7 +232,7 @@ When testing has been completed successfully a new distribution image is
 created from the current CVS code "snapshot". No production release shall
 contain software that has not passed the appropriate software tests.
 
-<H1 TYPE=A VALUE=0>Glossary</H1>
+<H1 TYPE=A VALUE=1>Glossary</H1>
 
 <H2>Terms</H2>
 
@@ -330,12 +330,12 @@ extension of ".h".
 The top of each source file shall contain a header giving the name of the
 file, the purpose or nature of the source file, the copyright and licensing
 notice, and the functions contained in the file.  The file name and revision
-information is provided by the CVS "$Id: cmp.shtml,v 1.1 1999/05/12 20:41:47 mike Exp $" tag:
+information is provided by the CVS "$Id: cmp.shtml,v 1.2 1999/05/13 20:40:40 mike Exp $" tag:
 
 <UL>
 <PRE>
 /*
- * "$Id: cmp.shtml,v 1.1 1999/05/12 20:41:47 mike Exp $"
+ * "$Id: cmp.shtml,v 1.2 1999/05/13 20:40:40 mike Exp $"
  *
  *   Description of file contents.
  *
@@ -368,14 +368,14 @@ information is provided by the CVS "$Id: cmp.shtml,v 1.1 1999/05/12 20:41:47 mik
 </UL>
 
 The bottom of each source file shall contain a trailer giving the name
-of the file using the CVS "$Id: cmp.shtml,v 1.1 1999/05/12 20:41:47 mike Exp $" tag. The primary purpose of this is to
+of the file using the CVS "$Id: cmp.shtml,v 1.2 1999/05/13 20:40:40 mike Exp $" tag. The primary purpose of this is to
 mark the end of a source file; if the trailer is missing it is possible
 that code has been lost near the end of the file:
 
 <UL>
 <PRE>
 /*
- * End of "$Id: cmp.shtml,v 1.1 1999/05/12 20:41:47 mike Exp $".
+ * End of "$Id: cmp.shtml,v 1.2 1999/05/13 20:40:40 mike Exp $".
  */
 </PRE>
 </UL>

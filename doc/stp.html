@@ -1,71 +1,142 @@
 <HTML>
 <HEAD>
-	<META NAME="Description" CONTENT="Common UNIX Printing System Software Test Plan">
-	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-STP-1.0b1">
-	<META NAME="Author" CONTENT="Easy Software Products">
-	<TITLE>CUPS Software Test Plan</TITLE>
+<TITLE>DRAFT - CUPS Software Test Plan</TITLE>
+<META NAME="AUTHOR" CONTENT="Easy Software Products">
+<META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
+<META NAME="DOCNUMBER" CONTENT="CUPS-STP-1.0">
 </HEAD>
 <BODY>
-
-<H1>Scope</H1>
-
-<H2>Identification</H2>
-
-This software test plan provides detailed tests that are used to evaluate
-the stability of the Common UNIX Printing System ("CUPS") Version 1.0.
-
-<EMBED SRC="system.html">
-
-<H2>Document Overview</H2>
-
-This software test plan is organized into the following sections:
-
+<CENTER><A HREF=#contents><IMG SRC="images/cups-large.gif" BORDER=0><BR>
+<H1>DRAFT - CUPS Software Test Plan</H1></A><BR>
+CUPS-STP-1.0<BR>
+Easy Software Products<BR>
+Copyright 1997-1999, All Rights Reserved<BR>
+</CENTER>
+<HR>
+<H1 ALIGN=CENTER><A NAME=CONTENTS>Table of Contents</A></H1>
+<BR>
+<BR><B><A HREF=#1>1 Scope</A></B>
 <UL>
-	<LI>1 - Scope</LI>
-	<LI>2 - References</LI>
-	<LI>3 - Local Tests</LI>
-	<LI>4 - Remote Tests</LI>
-	<LI>A - Glossary</LI>
+<LI><A HREF=#1_1>1.1 Identification</A></LI>
+<LI><A HREF=#1_2>1.2 System Overview</A></LI>
+<LI><A HREF=#1_3>1.3 Document Overview</A></LI>
 </UL>
-
-<EMBED SRC="references.html">
-
-<H1>Local Tests</H1>
-
-<H2>Interface Library</H2>
-
-<P>The interface library is used by all other sub-systems and is implicitly
-tested through the other sub-system tests.</P>
-
-<H2>Scheduler</H2>
-
-<H2>Manager</H2>
-
-<H2>Status</H2>
-
-<H2>Control</H2>
-
-<H2>Queue</H2>
-
-<H1>Remote Tests</H1>
-
-<H2>Interface Library</H2>
-
-<P>The interface library is used by all other sub-systems and is implicitly
-tested through the other sub-system tests.</P>
-
-<H2>Scheduler</H2>
-
-<H2>Manager</H2>
-
-<H2>Status</H2>
-
-<H2>Control</H2>
-
-<H2>Queue</H2>
-
-<EMBED SRC="glossary.html">
-
+<B><A HREF=#2>2 References</A></B>
+<UL>
+<LI><A HREF=#2_1>2.1 CUPS Documentation</A></LI>
+<LI><A HREF=#2_2>2.2 Other Documents</A></LI>
+</UL>
+<B><A HREF=#3>3 Local Tests</A></B>
+<BR>
+<BR><B><A HREF=#4>4 Remote Tests</A></B>
+<BR>
+<BR><B><A HREF=#5>A Glossary</A></B>
+<UL>
+<LI><A HREF=#5_1>A.1 Terms</A></LI>
+<LI><A HREF=#5_2>A.2 Acronyms</A></LI>
+</UL>
+<HR>
+<H1><A NAME=1>1 Scope</A></H1>
+<H2><A NAME=1_1>1.1 Identification</A></H2>
+ This software test plan provides detailed tests that are used to 
+evaluate the stability of the Common UNIX Printing System (&quot;CUPS&quot;) 
+Version 1.0. 
+<H2><A NAME=1_2>1.2 System Overview</A></H2>
+ The Common UNIX Printing System provides a portable printing layer for 
+ UNIX&reg; operating systems. It has been developed by Easy Software 
+ Products to promote a standard printing solution for all UNIX vendors 
+ and users. CUPS provides the System V and Berkeley command-line 
+interfaces. 
+<P>CUPS uses the Internet Printing Protocol (IETF-IPP) as the basis for 
+managing print jobs and queues. The Line Printer Daemon (LPD, RFC1179), 
+Server Message Block (SMB), and AppSocket protocols are also supported 
+with reduced functionality. </P>
+<P>CUPS adds network printer browsing and PostScript Printer 
+Description (&quot;PPD&quot;)-based printing options to support real world 
+applications under UNIX. </P>
+<H2><A NAME=1_3>1.3 Document Overview</A></H2>
+ This software test plan is organized into the following sections: 
+<UL>
+<LI>1 - Scope</LI>
+<LI>2 - References</LI>
+<LI>3 - Local Tests</LI>
+<LI>4 - Remote Tests</LI>
+<LI>A - Glossary</LI>
+</UL>
+<H1><A NAME=2>2 References</A></H1>
+<H2><A NAME=2_1>2.1 CUPS Documentation</A></H2>
+ The following CUPS documentation is referenced by this document: 
+<UL>
+<LI>CUPS-CMP-1.0: CUPS Configuration Management Plan </LI>
+<LI>CUPS-IDD-1.0: CUPS System Interface Design Description </LI>
+<LI>CUPS-SAM-1.0.x: CUPS Software Administrators Manual </LI>
+<LI>CUPS-SDD-1.0: CUPS Software Design Description </LI>
+<LI>CUPS-SPM-1.0: CUPS Software Programming Manual </LI>
+<LI>CUPS-SSR-1.0: CUPS Software Security Report </LI>
+<LI>CUPS-STP-1.0: CUPS Software Test Plan </LI>
+<LI>CUPS-SUM-1.0.x: CUPS Software Users Manual </LI>
+<LI>CUPS-SVD-1.0.x: CUPS Software Version Description </LI>
+</UL>
+<H2><A NAME=2_2>2.2 Other Documents</A></H2>
+ The following non-CUPS documents are referenced by this document: 
+<UL>
+<LI>IEEE 1387.4, System Administration: Printing (draft) </LI>
+<LI>IPP/1.0: Additional Optional Operations - Set 1 </LI>
+<LI>IPP/1.0: Encoding and Transport </LI>
+<LI>IPP/1.0: Implementers Guide </LI>
+<LI>IPP/1.0: Model and Semantics </LI>
+<LI>RFC 1179, Line Printer Daemon Protocol </LI>
+</UL>
+<H1><A NAME=3>3 Local Tests</A></H1>
+<H1><A NAME=4>4 Remote Tests</A></H1>
+<H1 TYPE=A VALUE=1><A NAME=5>A Glossary</A></H1>
+<H2><A NAME=5_1>A.1 Terms</A></H2>
+<DL>
+<DT>C </DT>
+<DD>A computer language. </DD>
+<DT>parallel </DT>
+<DD>Sending or receiving data more than 1 bit at a time. </DD>
+<DT>pipe </DT>
+<DD>A one-way communications channel between two programs. </DD>
+<DT>serial </DT>
+<DD>Sending or receiving data 1 bit at a time. </DD>
+<DT>socket </DT>
+<DD>A two-way network communications channel. </DD>
+</DL>
+<H2><A NAME=5_2>A.2 Acronyms</A></H2>
+<DL>
+<DT>ASCII </DT>
+<DD>American Standard Code for Information Interchange </DD>
+<DT>CUPS </DT>
+<DD>Common UNIX Printing System </DD>
+<DT>ESC/P </DT>
+<DD>EPSON Standard Code for Printers </DD>
+<DT>FTP </DT>
+<DD>File Transfer Protocol </DD>
+<DT>HP-GL </DT>
+<DD>Hewlett-Packard Graphics Language </DD>
+<DT>HP-PCL </DT>
+<DD>Hewlett-Packard Printer Control Language </DD>
+<DT>HP-PJL </DT>
+<DD>Hewlett-Packard Printer Job Language </DD>
+<DT>IETF </DT>
+<DD>Internet Engineering Task Force </DD>
+<DT>IPP </DT>
+<DD>Internet Printing Protocol </DD>
+<DT>ISO </DT>
+<DD>International Standards Organization </DD>
+<DT>LPD </DT>
+<DD>Line Printer Daemon </DD>
+<DT>MIME </DT>
+<DD>Multimedia Internet Mail Exchange </DD>
+<DT>PCL </DT>
+<DD>Page Control Language </DD>
+<DT>PPD </DT>
+<DD>PostScript Printer Description </DD>
+<DT>SMB </DT>
+<DD>Server Message Block </DD>
+<DT>TFTP </DT>
+<DD>Trivial File Transfer Protocol </DD>
+</DL>
 </BODY>
 </HTML>
