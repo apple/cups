@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.22.2.9 2002/06/27 19:04:33 mike Exp $"
+ * "$Id: lpadmin.c,v 1.22.2.10 2002/06/27 20:19:08 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -1812,22 +1812,27 @@ set_printer_options(http_t        *http,	/* I - Server connection */
 static int			/* O - 0 if name is no good, 1 if name is good */
 validate_name(const char *name)	/* I - Name to check */
 {
+  const char	*ptr;		/* Pointer into name */
+
+
  /*
   * Scan the whole name...
   */
 
-  while (*name)
-    if (*name == '@')
-      return (1);
-    else if (*name <= ' ' || *name == 127)
+  for (ptr = name; *ptr; ptr ++)
+    if (*ptr == '@')
+      break;
+    else if ((*ptr >= 0 && *ptr <= ' ') || *ptr == 127)
       return (0);
-    else
-      name ++;
 
-  return (1);
+ /*
+  * All the characters are good; validate the length, too...
+  */
+
+  return ((ptr - name) < 128);
 }
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.22.2.9 2002/06/27 19:04:33 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.22.2.10 2002/06/27 20:19:08 mike Exp $".
  */
