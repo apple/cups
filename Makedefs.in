@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.36.2.8 2002/05/24 15:36:20 mike Exp $"
+# "$Id: Makedefs.in,v 1.36.2.9 2002/05/31 20:32:36 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -169,14 +169,14 @@ MAN8DIR		=	@MAN8DIR@
 .man.0 .man.1 .man.1m .man.3 .man.5 .man.8:
 	echo Formatting $<...
 	$(RM) $@
-	$(NROFF) -man $< >$@
+	-$(NROFF) -man $< >$@
 .man.z:
 	echo Formatting $<...
 	$(RM) $@ t.z
-	$(NROFF) -man $< >t
+	-$(NROFF) -man $< >t
 	pack -f t
 	$(MV) t.z $@
 
 #
-# End of "$Id: Makedefs.in,v 1.36.2.8 2002/05/24 15:36:20 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.36.2.9 2002/05/31 20:32:36 mike Exp $"
 #
