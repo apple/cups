@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.9 1999/06/25 12:53:00 mike Exp $"
+ * "$Id: classes.c,v 1.10 1999/06/25 17:37:40 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -366,6 +366,8 @@ LoadAllClasses(void)
         line[len - 1] = '\0';
 
         p = AddClass(value);
+	p->accepting = 1;
+	p->state     = IPP_PRINTER_IDLE;
 
         if (strcmp(name, "<DefaultClass") == 0)
 	  DefaultPrinter = p;
@@ -422,6 +424,8 @@ LoadAllClasses(void)
         p->state = IPP_PRINTER_IDLE;
       else if (strcasecmp(value, "stopped") == 0)
         p->state = IPP_PRINTER_STOPPED;
+
+      p->accepting = p->state != IPP_PRINTER_STOPPED;
     }
   }
 
@@ -514,5 +518,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.9 1999/06/25 12:53:00 mike Exp $".
+ * End of "$Id: classes.c,v 1.10 1999/06/25 17:37:40 mike Exp $".
  */

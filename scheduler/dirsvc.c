@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.37 1999/06/25 14:50:23 mike Exp $"
+ * "$Id: dirsvc.c,v 1.38 1999/06/25 17:37:42 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -395,8 +395,16 @@ UpdateBrowseList(void)
 
         if ((pclass = FindClass(name)) == NULL)
 	{
+	 /*
+	  * Need to add the class...
+	  */
+
 	  pclass = AddClass(name);
-	  pclass->type |= CUPS_PRINTER_IMPLICIT;
+	  pclass->type      |= CUPS_PRINTER_IMPLICIT;
+	  pclass->accepting = 1;
+	  pclass->state     = IPP_PRINTER_IDLE;
+
+          SetPrinterAttrs(pclass);
 
           DEBUG_printf(("Added new class \"%s\", type = %x\n", name,
 	                pclass->type));
@@ -530,5 +538,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.37 1999/06/25 14:50:23 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.38 1999/06/25 17:37:42 mike Exp $".
  */

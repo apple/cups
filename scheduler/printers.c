@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.31 1999/06/25 14:50:24 mike Exp $"
+ * "$Id: printers.c,v 1.32 1999/06/25 17:37:43 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -412,6 +412,8 @@ LoadAllPrinters(void)
         line[len - 1] = '\0';
 
         p = AddPrinter(value);
+	p->accepting = 1;
+	p->state     = IPP_PRINTER_IDLE;
 
        /*
         * Set the default printer as needed...
@@ -1010,5 +1012,5 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 
 
 /*
- * End of "$Id: printers.c,v 1.31 1999/06/25 14:50:24 mike Exp $".
+ * End of "$Id: printers.c,v 1.32 1999/06/25 17:37:43 mike Exp $".
  */
