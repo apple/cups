@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.85 2004/06/29 20:16:29 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.86 2004/06/30 17:32:23 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -318,8 +318,7 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 	    * Remote unauthenticated user masquerading as local root...
 	    */
 
-	    free(username->values[0].string.text);
-	    username->values[0].string.text = strdup(RemoteRoot);
+	    SetString(&(username->values[0].string.text), RemoteRoot);
 	  }
 	}
 
@@ -455,7 +454,6 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 
   if (SendHeader(con, HTTP_OK, "application/ipp"))
   {
-#if 0
     if (con->http.version == HTTP_1_1)
     {
       con->http.data_encoding = HTTP_ENCODE_CHUNKED;
@@ -463,7 +461,6 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
       httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n\r\n");
     }
     else
-#endif /* 0 */
     {
       con->http.data_encoding  = HTTP_ENCODE_LENGTH;
       con->http.data_remaining = ippLength(con->response);
@@ -803,7 +800,32 @@ add_class(client_t        *con,		/* I - Client connection */
     FreeQuotas(pclass);
     pclass->page_limit = attr->values[0].integer;
   }
+  if ((attr = ippFindAttribute(con->request, "printer-op-policy", IPP_TAG_TEXT)) != NULL)
+  {
+    policy_t *p;			/* Policy */
 
+
+    if ((p = FindPolicy(attr->values[0].string.text)) != NULL)
+    {
+      LogMessage(L_DEBUG, "add_class: Setting printer-op-policy to \"%s\"...",
+                 attr->values[0].string.text);
+      SetString(&pclass->op_policy, attr->values[0].string.text);
+      pclass->op_policy_ptr = p;
+    }
+    else
+    {
+      LogMessage(L_ERROR, "add_class: Unknown printer-op-policy \"%s\"...",
+                 attr->values[0].string.text);
+      send_ipp_error(con, IPP_NOT_POSSIBLE);
+      return;
+    }
+  }
+  if ((attr = ippFindAttribute(con->request, "printer-error-policy", IPP_TAG_TEXT)) != NULL)
+  {
+    LogMessage(L_DEBUG, "add_class: Setting printer-error-policy to \"%s\"...",
+               attr->values[0].string.text);
+    SetString(&pclass->error_policy, attr->values[0].string.text);
+  }
   if ((attr = ippFindAttribute(con->request, "member-uris", IPP_TAG_URI)) != NULL)
   {
    /*
@@ -1293,6 +1315,32 @@ add_printer(client_t        *con,	/* I - Client connection */
                attr->values[0].integer);
     FreeQuotas(printer);
     printer->page_limit = attr->values[0].integer;
+  }
+  if ((attr = ippFindAttribute(con->request, "printer-op-policy", IPP_TAG_TEXT)) != NULL)
+  {
+    policy_t *p;			/* Policy */
+
+
+    if ((p = FindPolicy(attr->values[0].string.text)) != NULL)
+    {
+      LogMessage(L_DEBUG, "add_printer: Setting printer-op-policy to \"%s\"...",
+                 attr->values[0].string.text);
+      SetString(&printer->op_policy, attr->values[0].string.text);
+      printer->op_policy_ptr = p;
+    }
+    else
+    {
+      LogMessage(L_ERROR, "add_printer: Unknown printer-op-policy \"%s\"...",
+                 attr->values[0].string.text);
+      send_ipp_error(con, IPP_NOT_POSSIBLE);
+      return;
+    }
+  }
+  if ((attr = ippFindAttribute(con->request, "printer-error-policy", IPP_TAG_TEXT)) != NULL)
+  {
+    LogMessage(L_DEBUG, "add_printer: Setting printer-error-policy to \"%s\"...",
+               attr->values[0].string.text);
+    SetString(&printer->error_policy, attr->values[0].string.text);
   }
 
  /*
@@ -6923,5 +6971,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.85 2004/06/29 20:16:29 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.86 2004/06/30 17:32:23 mike Exp $".
  */
