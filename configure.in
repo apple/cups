@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.30 2000/02/08 20:38:40 mike Exp $"
+dnl "$Id: configure.in,v 1.31 2000/02/28 21:21:28 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -49,35 +49,35 @@ AC_ARG_ENABLE(shared, [  --enable-shared        turn on shared libraries [defaul
 if test "$enable_shared" != "no"; then
 	case "$uname" in
 		SunOS* | UNIX_S*)
-			LIBCUPS="libcups.so.1"
-			LIBCUPSIMAGE="libcupsimage.so.1"
+			LIBCUPS="libcups.so.2"
+			LIBCUPSIMAGE="libcupsimage.so.2"
 			DSO="\$(CC) -Wl,-h,\$@ -G \$(OPTIM) -o"
 			;;
 		HP-UX*)
-			LIBCUPS="libcups.sl.1"
-			LIBCUPSIMAGE="libcupsimage.sl.1"
+			LIBCUPS="libcups.sl.2"
+			LIBCUPSIMAGE="libcupsimage.sl.2"
 			DSO="ld -b -z +h \$@ -o"
 			;;
 		FreeBSD* | NetBSD* | OpenBSD*)
-			LIBCUPS="libcups.so.1"
-			LIBCUPSIMAGE="libcupsimage.so.1"
+			LIBCUPS="libcups.so.2"
+			LIBCUPSIMAGE="libcupsimage.so.2"
 			DSO="\$(CC) -Wl,-soname,\$@ -shared \$(OPTIM) -o"
 			;;
 		OSF1* | Linux*)
-			LIBCUPS="libcups.so.1"
-			LIBCUPSIMAGE="libcupsimage.so.1"
+			LIBCUPS="libcups.so.2"
+			LIBCUPSIMAGE="libcupsimage.so.2"
 			DSO="\$(CC) -Wl,-soname,\$@ -shared \$(OPTIM) -o"
 			;;
 		IRIX*)
-			LIBCUPS="libcups.so.1"
-			LIBCUPSIMAGE="libcupsimage.so.1"
+			LIBCUPS="libcups.so.2"
+			LIBCUPSIMAGE="libcupsimage.so.2"
 			DSO="\$(CC) -soname \$@ -shared \$(OPTIM) -o"
 			;;
 		*)
 			echo "Warning: shared libraries may not be supported.  Trying -shared"
 			echo "         option with compiler."
-			LIBCUPS="libcups.so.1"
-			LIBCUPSIMAGE="libcupsimage.so.1"
+			LIBCUPS="libcups.so.2"
+			LIBCUPSIMAGE="libcupsimage.so.2"
 			DSO="\$(CC) -Wl,-soname,\$@ -shared \$(OPTIM) -o"
 			;;
 	esac
@@ -346,5 +346,5 @@ AC_SUBST(CUPS_DOCDIR)
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.30 2000/02/08 20:38:40 mike Exp $".
+dnl End of "$Id: configure.in,v 1.31 2000/02/28 21:21:28 mike Exp $".
 dnl
