@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.17
 
+	- CUPS API library user and temp file updates for
+	  Windows.
 	- The image filters did not properly handle grayscale
 	  printing of Sun Raster images.
 	- The scheduler never reset the NumJobs variable before
