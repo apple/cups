@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.1.2.2 2001/05/14 18:01:22 mike Exp $"
+# "$Id: Makefile,v 1.1.2.3 2001/05/14 18:03:13 mike Exp $"
 #
 #   Notifier makefile for the Common UNIX Printing System (CUPS).
 #
@@ -24,8 +24,8 @@
 
 include ../Makedefs
 
-TARGETS =	indp ippget mailto
-OBJS	=	indp.o ippget.o mailto.o
+TARGETS =	indp mailto
+OBJS	=	indp.o mailto.o
 
 
 #
@@ -67,18 +67,6 @@ indp.o:	../cups/cups.h ../cups/ipp.h ../cups/language.h	\
 
 
 #
-# ippget
-#
-
-ippget:	ippget.o ../cups/$(LIBCUPS)
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o ippget ippget.o $(LIBS)
-
-ippget.o:	../cups/cups.h ../cups/ipp.h ../cups/language.h	\
-		../cups/string.h
-
-
-#
 # mailto
 #
 
@@ -93,5 +81,5 @@ mailto.o:	../cups/cups.h ../cups/ipp.h ../cups/language.h	\
 $(OBJS):	../config.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.1.2.2 2001/05/14 18:01:22 mike Exp $".
+# End of "$Id: Makefile,v 1.1.2.3 2001/05/14 18:03:13 mike Exp $".
 #
