@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.28.2.8 2002/07/11 17:51:35 mike Exp $"
+ * "$Id: lpd.c,v 1.28.2.9 2002/08/27 18:36:16 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -77,8 +77,9 @@ extern int	rresvport(int *port);
 
 static int	lpd_command(int lpd_fd, char *format, ...);
 static int	lpd_queue(char *hostname, char *printer, char *filename,
-		          char *user, char *title, int copies,
-			  int banner, int format, int order, int reserve);
+		          int fromstdin, char *user, char *title, int copies,
+			  int banner, int format, int order, int reserve,
+			  int manual_copies);
 static int	lpd_write(int lpd_fd, char *buffer, int length);
 
 
@@ -110,6 +111,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   int	format;		/* Print format */
   int	order;		/* Order of control/data files */
   int	reserve;	/* Reserve priviledged port? */
+  int	manual_copies,	/* Do manual copies? */
+	copies;		/* Number of copies */
 
 
  /*
@@ -181,10 +184,11 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * See if there are any options...
   */
 
-  banner  = 0;
-  format  = 'l';
-  order   = ORDER_CONTROL_DATA;
-  reserve = 0;
+  banner        = 0;
+  format        = 'l';
+  order         = ORDER_CONTROL_DATA;
+  reserve       = 0;
+  manual_copies = 1;
 
   if ((options = strchr(resource, '?')) != NULL)
   {
@@ -277,6 +281,17 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	 	  strcasecmp(value, "yes") == 0 ||
 	 	  strcasecmp(value, "true") == 0;
       }
+      else if (strcasecmp(name, "manual_copies") == 0)
+      {
+       /*
+        * Set port reservation mode...
+	*/
+
+        manual_copies = !value[0] ||
+	        	strcasecmp(value, "on") == 0 ||
+	 		strcasecmp(value, "yes") == 0 ||
+	 		strcasecmp(value, "true") == 0;
+      }
     }
   }
 
@@ -296,17 +311,28 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
   if (argc > 6)
   {
-    status = lpd_queue(hostname, resource + 1, filename,
-                       argv[2] /* user */, title, atoi(argv[4]) /* copies */,
-		       banner, format, order, reserve);
+    if (manual_copies)
+    {
+      manual_copies = atoi(argv[4]);
+      copies        = 1;
+    }
+    else
+    {
+      manual_copies = 1;
+      copies        = atoi(argv[4]);
+    }
+
+    status = lpd_queue(hostname, resource + 1, filename, 0,
+                       argv[2] /* user */, title, copies,
+		       banner, format, order, reserve, manual_copies);
 
     if (!status)
       fprintf(stderr, "PAGE: 1 %d\n", atoi(argv[4]));
   }
   else
-    status = lpd_queue(hostname, resource + 1, filename,
+    status = lpd_queue(hostname, resource + 1, filename, 1,
                        argv[2] /* user */, title, 1,
-		       banner, format, order, reserve);
+		       banner, format, order, reserve, 1);
 
  /*
   * Remove the temporary file if necessary...
@@ -380,13 +406,15 @@ static int			/* O - Zero on success, non-zero on failure */
 lpd_queue(char *hostname,	/* I - Host to connect to */
           char *printer,	/* I - Printer/queue name */
 	  char *filename,	/* I - File to print */
+          int  fromstdin,	/* I - Printing from stdin? */
           char *user,		/* I - Requesting user */
 	  char *title,		/* I - Job title */
 	  int  copies,		/* I - Number of copies */
 	  int  banner,		/* I - Print LPD banner? */
           int  format,		/* I - Format specifier */
           int  order,		/* I - Order of data/control files */
-	  int  reserve)		/* I - Reserve ports? */
+	  int  reserve,		/* I - Reserve ports? */
+	  int  manual_copies)	/* I - Do copies by hand... */
 {
   FILE			*fp;		/* Job file */
   char			localhost[255];	/* Local host name */
@@ -489,20 +517,24 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
  /*
   * Now that we are "connected" to the port, ignore SIGTERM so that we
   * can finish out any page data the driver sends (e.g. to eject the
-  * current page...
+  * current page...  Only ignore SIGTERM if we are printing data from
+  * stdin (otherwise you can't cancel raw jobs...)
   */
 
+  if (fromstdin)
+  {
 #ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-  sigset(SIGTERM, SIG_IGN);
+    sigset(SIGTERM, SIG_IGN);
 #elif defined(HAVE_SIGACTION)
-  memset(&action, 0, sizeof(action));
+    memset(&action, 0, sizeof(action));
 
-  sigemptyset(&action.sa_mask);
-  action.sa_handler = SIG_IGN;
-  sigaction(SIGTERM, &action, NULL);
+    sigemptyset(&action.sa_mask);
+    action.sa_handler = SIG_IGN;
+    sigaction(SIGTERM, &action, NULL);
 #else
-  signal(SIGTERM, SIG_IGN);
+    signal(SIGTERM, SIG_IGN);
 #endif /* HAVE_SIGSET */
+  }
 
  /*
   * Next, open the print file and figure out its size...
@@ -513,6 +545,8 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
     perror("ERROR: unable to stat print file");
     return (1);
   }
+
+  filestats.st_size *= manual_copies;
 
   if ((fp = fopen(filename, "rb")) == NULL)
   {
@@ -591,18 +625,25 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
             (unsigned)filestats.st_size);
 
     tbytes = 0;
-    while ((nbytes = fread(buffer, 1, sizeof(buffer), fp)) > 0)
+    while (manual_copies > 0)
     {
-      fprintf(stderr, "INFO: Spooling LPR job, %u%% complete...\n",
-              (unsigned)(100.0f * tbytes / filestats.st_size));
+      rewind(fp);
 
-      if (lpd_write(fd, buffer, nbytes) < nbytes)
+      while ((nbytes = fread(buffer, 1, sizeof(buffer), fp)) > 0)
       {
-        perror("ERROR: Unable to send print file to printer");
-        break;
+	fprintf(stderr, "INFO: Spooling LPR job, %u%% complete...\n",
+        	(unsigned)(100.0f * tbytes / filestats.st_size));
+
+	if (lpd_write(fd, buffer, nbytes) < nbytes)
+	{
+          perror("ERROR: Unable to send print file to printer");
+          break;
+	}
+	else
+          tbytes += nbytes;
       }
-      else
-        tbytes += nbytes;
+
+      manual_copies --;
     }
 
     if (tbytes < filestats.st_size)
@@ -770,5 +811,5 @@ rresvport(int *port)		/* IO - Port number to bind to */
 #endif /* !HAVE_RRESVPORT */
 
 /*
- * End of "$Id: lpd.c,v 1.28.2.8 2002/07/11 17:51:35 mike Exp $".
+ * End of "$Id: lpd.c,v 1.28.2.9 2002/08/27 18:36:16 mike Exp $".
  */

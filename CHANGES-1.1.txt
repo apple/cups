@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The LPD backend now supports a "manual_copies" option,
+	  e.g.: "lpd://server/queue?manual_copies=no", in order
+	  to handle copies for raw jobs to printers that don't
+	  implement the LPD protocol properly...
 	- The "mirror" option was not being handled by the
 	  PostScript or image filters.
 	- Updated the cupsaddsmb command to support the new CUPS
