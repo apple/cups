@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.102 2002/12/17 18:56:44 swdev Exp $"
+ * "$Id: util.c,v 1.103 2002/12/19 15:08:46 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -1293,6 +1293,9 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   {
     switch (status)
     {
+      case HTTP_NOT_FOUND :
+          last_error = IPP_NOT_FOUND;
+	  break;
       case HTTP_ERROR :
           last_error = IPP_SERVICE_UNAVAILABLE;
 	  break;
@@ -1784,5 +1787,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.102 2002/12/17 18:56:44 swdev Exp $".
+ * End of "$Id: util.c,v 1.103 2002/12/19 15:08:46 mike Exp $".
  */
