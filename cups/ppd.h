@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.24 2001/03/02 13:42:20 mike Exp $"
+ * "$Id: ppd.h,v 1.24.2.1 2001/04/11 00:24:11 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -75,7 +75,10 @@ typedef enum			/**** UI types ****/
 {
   PPD_UI_BOOLEAN,		/* True or False option */
   PPD_UI_PICKONE,		/* Pick one from a list */
-  PPD_UI_PICKMANY		/* Pick zero or more from a list */
+  PPD_UI_PICKMANY,		/* Pick zero or more from a list */
+  PPD_UI_CUPS_NUMBER,		/* Specify a linear number */
+  PPD_UI_CUPS_GAMMA,		/* Specify a gamma number */
+  PPD_UI_CUPS_CURVE		/* Specify a gamma/density LUT */
 } ppd_ui_t;
 
 typedef enum			/**** Order dependency sections ****/
@@ -123,6 +126,12 @@ typedef struct			/**** Options ****/
   float		order;		/* Order number */
   int		num_choices;	/* Number of option choices */
   ppd_choice_t	*choices;	/* Option choices */
+  const char	*command;	/* Command for numeric options */
+  int		num_values;	/* Number of numeric values */
+  float		*values,	/* Current value(s) */
+		lower,		/* Lower bounds for numeric value */
+		upper,		/* Upper bounds for numeric value */
+		precision;	/* Precision of values */
 } ppd_option_t;
 
 typedef struct ppd_group_str	/**** Groups ****/
@@ -200,6 +209,7 @@ typedef struct			/**** Files ****/
 		*jcl_end,	/* End JCL commands */
 		*lang_encoding,	/* Language encoding */
 		*lang_version,	/* Language version (English, Spanish, etc.) */
+		*pcfilename,	/* PC filename */
 		*modelname,	/* Model name (general) */
 		*ttrasterizer,	/* Truetype rasterizer */
 		*manufacturer,	/* Manufacturer name */
@@ -244,6 +254,8 @@ extern int		ppdIsMarked(ppd_file_t *ppd, const char *keyword,
 extern void		ppdMarkDefaults(ppd_file_t *ppd);
 extern int		ppdMarkOption(ppd_file_t *ppd, const char *keyword,
 			              const char *option);
+extern int		ppdMarkNumeric(ppd_file_t *ppd, const char *keyword,
+			               int num_values, float *values);
 extern ppd_choice_t	*ppdFindChoice(ppd_option_t *o, const char *option);
 extern ppd_choice_t	*ppdFindMarkedChoice(ppd_file_t *ppd, const char *keyword);
 extern ppd_option_t	*ppdFindOption(ppd_file_t *ppd, const char *keyword);
@@ -264,5 +276,5 @@ extern float		ppdPageWidth(ppd_file_t *ppd, const char *name);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.24 2001/03/02 13:42:20 mike Exp $".
+ * End of "$Id: ppd.h,v 1.24.2.1 2001/04/11 00:24:11 mike Exp $".
  */
