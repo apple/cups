@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c,v 1.24 2000/10/13 01:04:36 mike Exp $"
+ * "$Id: parallel.c,v 1.25 2000/11/20 19:46:52 mike Exp $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -565,7 +565,7 @@ list_devices(void)
       printf("direct parallel:%s \"Unknown\" \"Parallel Port #%d\"\n", device, i + 1);
     }
   }
-#elif defined(FreeBSD) || defined(OpenBSD) || defined(NetBSD)
+#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
   int	i;			/* Looping var */
   int	fd;			/* File descriptor */
   char	device[255];		/* Device filename */
@@ -585,5 +585,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c,v 1.24 2000/10/13 01:04:36 mike Exp $".
+ * End of "$Id: parallel.c,v 1.25 2000/11/20 19:46:52 mike Exp $".
  */

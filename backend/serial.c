@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.22 2000/11/14 15:13:20 mike Exp $"
+ * "$Id: serial.c,v 1.23 2000/11/20 19:46:53 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -714,7 +714,7 @@ list_devices(void)
       printf("serial serial:%s?baud=38400 \"Unknown\" \"Serial Port #%d\"\n",
              device, i + 1);
   }
-#elif defined(FreeBSD) || defined(OpenBSD) || defined(NetBSD)
+#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
   int	i, j;		/* Looping vars */
   int	fd;		/* File descriptor */
   char	device[255];	/* Device filename */
@@ -801,5 +801,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.22 2000/11/14 15:13:20 mike Exp $".
+ * End of "$Id: serial.c,v 1.23 2000/11/20 19:46:53 mike Exp $".
  */
