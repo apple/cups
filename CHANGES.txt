@@ -1,8 +1,11 @@
-CHANGES.txt - 02/20/2002
+CHANGES.txt - 02/28/2002
 ------------------------
 
 CHANGES IN CUPS V1.1.15
 
+	- The cupsEncodeOptions() function now maintains a table
+	  of known boolean and numeric options, and encodes all
+	  other options as strings.
 	- Now add a newline before the end-of-page code in the
 	  PostScript filter; this fixes a problem with files
 	  that don't end with a newline.
