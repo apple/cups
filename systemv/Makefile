@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.24 2001/06/27 21:53:19 mike Exp $"
+# "$Id: Makefile,v 1.25 2001/07/05 15:58:47 mike Exp $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -63,6 +63,7 @@ install:
 accept:	accept.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o accept accept.o $(LIBS)
+	$(RM) reject enable disable
 	$(LN) accept reject
 	$(LN) accept enable
 	$(LN) accept disable
@@ -161,5 +162,5 @@ lpstat.o:	../cups/cups.h
 $(OBJS):	../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.24 2001/06/27 21:53:19 mike Exp $".
+# End of "$Id: Makefile,v 1.25 2001/07/05 15:58:47 mike Exp $".
 #
