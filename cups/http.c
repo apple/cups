@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.140 2004/07/02 04:05:34 mike Exp $"
+ * "$Id: http.c,v 1.141 2004/08/18 15:34:02 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -1715,7 +1715,16 @@ char *					/* O - Decoded string */
 httpDecode64(char       *out,		/* I - String to write to */
              const char *in)		/* I - String to read from */
 {
-  return (httpDecode64_2(out, in, 512));
+  int	outlen;				/* Output buffer length */
+
+
+ /*
+  * Use the old maximum buffer size for binary compatibility...
+  */
+
+  outlen = 512;
+
+  return (httpDecode64_2(out, &outlen, in));
 }
 
 
@@ -1723,10 +1732,10 @@ httpDecode64(char       *out,		/* I - String to write to */
  * 'httpDecode64_2()' - Base64-decode a string.
  */
 
-char *					/* O - Decoded string */
-httpDecode64_2(char       *out,		/* I - String to write to */
-               const char *in,		/* I - String to read from */
-	       int        outlen)	/* I - Size of output string */
+char *					/* O  - Decoded string */
+httpDecode64_2(char       *out,		/* I  - String to write to */
+	       int        *outlen,	/* IO - Size of output string */
+               const char *in)		/* I  - String to read from */
 {
   int	pos,				/* Bit position */
 	base64;				/* Value of this character */
@@ -1734,7 +1743,18 @@ httpDecode64_2(char       *out,		/* I - String to write to */
 	*outend;			/* End of output buffer */
 
 
-  for (outptr = out, outend = out + outlen - 1, pos = 0; *in != '\0'; in ++)
+ /*
+  * Range check input...
+  */
+
+  if (!out || !outlen || *outlen < 1 || !in || !*in)
+    return (NULL);
+
+ /*
+  * Convert from base-64 to bytes...
+  */
+
+  for (outptr = out, outend = out + *outlen - 1, pos = 0; *in != '\0'; in ++)
   {
    /*
     * Decode this character into a number from 0 to 63...
@@ -1791,8 +1811,10 @@ httpDecode64_2(char       *out,		/* I - String to write to */
   *outptr = '\0';
 
  /*
-  * Return the decoded string...
+  * Return the decoded string and size...
   */
+
+  *outlen = (int)(outptr - out);
 
   return (out);
 }
@@ -1806,7 +1828,7 @@ char *					/* O - Encoded string */
 httpEncode64(char       *out,		/* I - String to write to */
              const char *in)		/* I - String to read from */
 {
-  return (httpEncode64_2(out, in, 512));
+  return (httpEncode64_2(out, 512, in, strlen(in)));
 }
 
 
@@ -1816,8 +1838,9 @@ httpEncode64(char       *out,		/* I - String to write to */
 
 char *					/* O - Encoded string */
 httpEncode64_2(char       *out,		/* I - String to write to */
+	       int        outlen,	/* I - Size of output string */
                const char *in,		/* I - String to read from */
-	       int        outlen)	/* I - Size of output string */
+	       int        inlen)	/* I - Size of input string */
 {
   char		*outptr,		/* Output pointer */
 		*outend;		/* End of output buffer */
@@ -1830,7 +1853,18 @@ httpEncode64_2(char       *out,		/* I - String to write to */
   		};
 
 
-  for (outptr = out, outend = out + outlen - 1; *in != '\0'; in ++)
+ /*
+  * Range check input...
+  */
+
+  if (!out || outlen < 1 || !in || inlen < 1)
+    return (NULL);
+
+ /*
+  * Convert bytes to base-64...
+  */
+
+  for (outptr = out, outend = out + outlen - 1; inlen > 0; in ++, inlen --)
   {
    /*
     * Encode the up to 3 characters as 4 Base64 numbers...
@@ -1842,7 +1876,8 @@ httpEncode64_2(char       *out,		/* I - String to write to */
       *outptr ++ = base64[((in[0] << 4) | (in[1] >> 4)) & 63];
 
     in ++;
-    if (*in == '\0')
+    inlen --;
+    if (inlen <= 0)
     {
       if (outptr < outend)
         *outptr ++ = '=';
@@ -1855,7 +1890,8 @@ httpEncode64_2(char       *out,		/* I - String to write to */
       *outptr ++ = base64[((in[0] << 2) | (in[1] >> 6)) & 63];
 
     in ++;
-    if (*in == '\0')
+    inlen --;
+    if (inlen <= 0)
     {
       if (outptr < outend)
         *outptr ++ = '=';
@@ -2513,5 +2549,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.140 2004/07/02 04:05:34 mike Exp $".
+ * End of "$Id: http.c,v 1.141 2004/08/18 15:34:02 mike Exp $".
  */
