@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.81 2001/07/23 21:17:48 mike Exp $"
+ * "$Id: dirsvc.c,v 1.82 2001/07/23 21:25:41 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1199,7 +1199,7 @@ SendSLPBrowse(printer_t *p)		/* I - Printer to register */
     if (*src == ',' || *src == '\\' || *src == ')')
       *dst++ = '\\';
 
-    *dst++ = *src;
+    *dst++ = *src++;
   }
 
   *dst = '\0';
@@ -1212,7 +1212,7 @@ SendSLPBrowse(printer_t *p)		/* I - Printer to register */
     if (*src == ',' || *src == '\\' || *src == ')')
       *dst++ = '\\';
 
-    *dst++ = *src;
+    *dst++ = *src++;
   }
 
   *dst = '\0';
@@ -1225,7 +1225,7 @@ SendSLPBrowse(printer_t *p)		/* I - Printer to register */
     if (*src == ',' || *src == '\\' || *src == ')')
       *dst++ = '\\';
 
-    *dst++ = *src;
+    *dst++ = *src++;
   }
 
   *dst = '\0';
@@ -1551,5 +1551,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.81 2001/07/23 21:17:48 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.82 2001/07/23 21:25:41 mike Exp $".
  */
