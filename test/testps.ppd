@@ -1,8 +1,8 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: ipp-test.ppd,v 1.1 2001/02/22 16:48:13 mike Exp $"
+*% "$Id: testps.ppd,v 1.1 2001/02/23 01:15:17 mike Exp $"
 *%
-*%   Test PPD file for the Common UNIX Printing System (CUPS).
+*%   Test PS PPD file for the Common UNIX Printing System (CUPS).
 *%
 *%   Copyright 1997-2001 by Easy Software Products.
 *%
@@ -26,15 +26,12 @@
 *FileVersion:	"1.1"
 *LanguageVersion: English 
 *LanguageEncoding: ISOLatin1
-*PCFileName:	"IPP_TEST.PPD"
+*PCFileName:	"TESTPS.PPD"
 *Manufacturer:	"ESP"
 *Product:	"(CUPS v1.1)"
-*cupsVersion:	1.1
-*cupsManualCopies: True
-*cupsFilter:	"application/vnd.cups-raster 50 rastertohp"
-*ModelName:     "IPP Test Printer"
-*ShortNickName: "IPP Test Printer"
-*NickName:      "IPP Test Printer CUPS v1.1"
+*ModelName:     "Test PS Printer"
+*ShortNickName: "Test PS Printer"
+*NickName:      "Test PS Printer CUPS v1.1"
 *PSVersion:	"(3010.000) 550"
 *LanguageLevel:	"3"
 *ColorDevice:	True
@@ -141,7 +138,7 @@
 
 *OpenUI *Resolution/Output Resolution: PickOne
 *OrderDependency: 20 AnySetup *Resolution
-*DefaultResolution: 300dpi
+*DefaultResolution: 100dpi
 *Resolution 75dpi/75 DPI: "<</HWResolution[75 75]>>setpagedevice"
 *Resolution 100dpi/100 DPI: "<</HWResolution[100 100]>>setpagedevice"
 *CloseUI: *Resolution
@@ -191,5 +188,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: ipp-test.ppd,v 1.1 2001/02/22 16:48:13 mike Exp $".
+*% End of "$Id: testps.ppd,v 1.1 2001/02/23 01:15:17 mike Exp $".
 *%

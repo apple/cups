@@ -1,5 +1,5 @@
 #
-# "$Id: 00010-cups-printer-ops.test,v 1.1 2001/02/22 16:48:13 mike Exp $"
+# "$Id: 00010-cups-printer-ops.test,v 1.2 2001/02/23 01:15:16 mike Exp $"
 #
 #   Verify that the CUPS printer operations work.
 #
@@ -17,7 +17,7 @@
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
 
-	FILE ipp-test.ppd
+	FILE testhp.ppd
 
 	# What statuses are OK?
 	STATUS successful-ok
@@ -25,7 +25,6 @@
 	# What attributes do we expect?
 	EXPECT attributes-charset
 	EXPECT attributes-natural-language
-	EXPECT printer-uri
 }
 {
 	# The name of the test...
@@ -47,7 +46,6 @@
 	# What attributes do we expect?
 	EXPECT attributes-charset
 	EXPECT attributes-natural-language
-	EXPECT printer-uri
 }
 {
 	# The name of the test...
@@ -105,7 +103,7 @@
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $method://$hostname:$port/printers/Test2
 
-	FILE ipp-test.ppd
+	FILE testps.ppd
 
 	# What statuses are OK?
 	STATUS successful-ok
@@ -113,7 +111,6 @@
 	# What attributes do we expect?
 	EXPECT attributes-charset
 	EXPECT attributes-natural-language
-	EXPECT printer-uri
 }
 {
 	# The name of the test...
@@ -135,7 +132,6 @@
 	# What attributes do we expect?
 	EXPECT attributes-charset
 	EXPECT attributes-natural-language
-	EXPECT printer-uri
 }
 {
 	# The name of the test...
@@ -153,6 +149,8 @@
 
 	GROUP printer
 	ATTR uri device-uri file:/tmp/Test2
+	ATTR enum printer-state 3
+	ATTR boolean printer-is-accepting-jobs true
 
 	# What statuses are OK?
 	STATUS successful-ok
@@ -160,7 +158,6 @@
 	# What attributes do we expect?
 	EXPECT attributes-charset
 	EXPECT attributes-natural-language
-	EXPECT printer-uri
 }
 {
 	# The name of the test...
@@ -178,8 +175,10 @@
 
 	GROUP printer
 	ATTR uri device-uri file:/tmp/Test1
+	ATTR enum printer-state 3
+	ATTR boolean printer-is-accepting-jobs true
 
-	FILE ipp-test.ppd
+	FILE testhp.ppd
 
 	# What statuses are OK?
 	STATUS successful-ok
@@ -187,7 +186,6 @@
 	# What attributes do we expect?
 	EXPECT attributes-charset
 	EXPECT attributes-natural-language
-	EXPECT printer-uri
 }
 {
 	# The name of the test...
@@ -209,9 +207,8 @@
 	# What attributes do we expect?
 	EXPECT attributes-charset
 	EXPECT attributes-natural-language
-	EXPECT printer-uri
 }
 
 #
-# End of "$Id: 00010-cups-printer-ops.test,v 1.1 2001/02/22 16:48:13 mike Exp $"
+# End of "$Id: 00010-cups-printer-ops.test,v 1.2 2001/02/23 01:15:16 mike Exp $"
 #

@@ -1,0 +1,195 @@
+*PPD-Adobe: "4.3"
+*%
+*% "$Id: testhp.ppd,v 1.1 2001/02/23 01:15:17 mike Exp $"
+*%
+*%   Test HP PPD file for the Common UNIX Printing System (CUPS).
+*%
+*%   Copyright 1997-2001 by Easy Software Products.
+*%
+*%   These coded instructions, statements, and computer programs are the
+*%   property of Easy Software Products and are protected by Federal
+*%   copyright law.  Distribution and use rights are outlined in the file
+*%   "LICENSE.txt" which should have been included with this file.  If this
+*%   file is missing or damaged please contact Easy Software Products
+*%   at:
+*%
+*%       Attn: CUPS Licensing Information
+*%       Easy Software Products
+*%       44141 Airport View Drive, Suite 204
+*%       Hollywood, Maryland 20636-3111 USA
+*%
+*%       Voice: (301) 373-9603
+*%       EMail: cups-info@cups.org
+*%         WWW: http://www.cups.org
+*%
+*FormatVersion:	"4.3"
+*FileVersion:	"1.1"
+*LanguageVersion: English 
+*LanguageEncoding: ISOLatin1
+*PCFileName:	"TESTHP.PPD"
+*Manufacturer:	"ESP"
+*Product:	"(CUPS v1.1)"
+*cupsVersion:	1.1
+*cupsManualCopies: True
+*cupsFilter:	"application/vnd.cups-raster 50 rastertohp"
+*ModelName:     "Test HP Printer"
+*ShortNickName: "Test HP Printer"
+*NickName:      "Test HP Printer CUPS v1.1"
+*PSVersion:	"(3010.000) 550"
+*LanguageLevel:	"3"
+*ColorDevice:	True
+*DefaultColorSpace: RGB
+*FileSystem:	False
+*Throughput:	"1"
+*LandscapeOrientation: Plus90
+*VariablePaperSize: False
+*TTRasterizer:	Type42
+
+*UIConstraints: *PageSize Executive *InputSlot Envelope
+*UIConstraints: *PageSize Letter *InputSlot Envelope
+*UIConstraints: *PageSize Legal *InputSlot Envelope
+*UIConstraints: *PageSize Tabloid *InputSlot Envelope
+*UIConstraints: *PageSize A3 *InputSlot Envelope
+*UIConstraints: *PageSize A4 *InputSlot Envelope
+*UIConstraints: *PageSize A5 *InputSlot Envelope
+*UIConstraints: *PageSize B5 *InputSlot Envelope
+*UIConstraints: *Resolution 600dpi *ColorModel CMYK
+
+*OpenUI *PageSize/Media Size: PickOne
+*OrderDependency: 10 AnySetup *PageSize
+*DefaultPageSize: Letter
+*PageSize Letter/US Letter:	"<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*PageSize Legal/US Legal:	"<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+*PageSize Executive/US Executive: "<</PageSize[522 756]/ImagingBBox null>>setpagedevice"
+*PageSize Tabloid/US Tabloid:	"<</PageSize[792 1224]/ImagingBBox null>>setpagedevice"
+*PageSize A3/A3:		"<</PageSize[842 1191]/ImagingBBox null>>setpagedevice"
+*PageSize A4/A4:		"<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+*PageSize A5/A5:		"<</PageSize[421 595]/ImagingBBox null>>setpagedevice"
+*PageSize B5/B5 (JIS):		"<</PageSize[516 729]/ImagingBBox null>>setpagedevice"
+*PageSize EnvISOB5/Envelope B5: "<</PageSize[499 709]/ImagingBBox null>>setpagedevice"
+*PageSize Env10/Envelope #10:	"<</PageSize[297 684]/ImagingBBox null>>setpagedevice"
+*PageSize EnvC5/Envelope C5:	"<</PageSize[459 649]/ImagingBBox null>>setpagedevice"
+*PageSize EnvDL/Envelope DL:	"<</PageSize[312 624]/ImagingBBox null>>setpagedevice"
+*PageSize EnvMonarch/Envelope Monarch: "<</PageSize[279 540]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageSize
+
+*OpenUI *PageRegion: PickOne
+*OrderDependency: 10 AnySetup *PageRegion
+*DefaultPageRegion: Letter
+*PageRegion Letter/US Letter:	"<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*PageRegion Legal/US Legal:	"<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+*PageRegion Executive/US Executive: "<</PageSize[522 756]/ImagingBBox null>>setpagedevice"
+*PageRegion Tabloid/US Tabloid:	"<</PageSize[792 1224]/ImagingBBox null>>setpagedevice"
+*PageRegion A3/A3:		"<</PageSize[842 1191]/ImagingBBox null>>setpagedevice"
+*PageRegion A4/A4:		"<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+*PageRegion A5/A5:		"<</PageSize[421 595]/ImagingBBox null>>setpagedevice"
+*PageRegion B5/B5 (JIS):	"<</PageSize[516 729]/ImagingBBox null>>setpagedevice"
+*PageRegion EnvISOB5/Envelope B5: "<</PageSize[499 709]/ImagingBBox null>>setpagedevice"
+*PageRegion Env10/Envelope #10:	"<</PageSize[297 684]/ImagingBBox null>>setpagedevice"
+*PageRegion EnvC5/Envelope C5:	"<</PageSize[459 649]/ImagingBBox null>>setpagedevice"
+*PageRegion EnvDL/Envelope DL:	"<</PageSize[312 624]/ImagingBBox null>>setpagedevice"
+*PageRegion EnvMonarch/Envelope Monarch: "<</PageSize[279 540]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageRegion
+
+*DefaultImageableArea: Letter 
+*ImageableArea Letter/US Letter:	"18 36 594 756"
+*ImageableArea Legal/US Legal:		"18 36 594 972"
+*ImageableArea Executive/US Executive:	"18 36 504 684"
+*ImageableArea Tabloid/US Tabloid:	"18 36 774 1188"
+*ImageableArea A3/A3:			"18 36 824 1155"
+*ImageableArea A4/A4:			"18 36 577 806"
+*ImageableArea A5/A5:			"18 36 403 559"
+*ImageableArea B5/JIS B5:		"18 36 498 693"
+*ImageableArea EnvISOB5/B5 (ISO):	"18 36 463 673"
+*ImageableArea Env10/Com-10:		"18 36 279 648"
+*ImageableArea EnvC5/EnvC5:		"18 36 441 613"
+*ImageableArea EnvDL/EnvDL:		"18 36 294 588"
+*ImageableArea EnvMonarch/Envelope Monarch: "18 36 261 504"
+
+*DefaultPaperDimension: Letter
+*PaperDimension Letter/US Letter:	"612 792"
+*PaperDimension Legal/US Legal:		"612 1008"
+*PaperDimension Executive/US Executive:	"522 756"
+*PaperDimension Tabloid/US Tabloid:	"792 1224"
+*PaperDimension A3/A3:			"842 1191"
+*PaperDimension A4/A4:			"595 842"
+*PaperDimension A5/A5:			"421 595"
+*PaperDimension B5/B5 (JIS):		"516 729"
+*PaperDimension EnvISOB5/Envelope B5:	"499 709"
+*PaperDimension Env10/Envelope #10:	"297 684"
+*PaperDimension EnvC5/Envelope C5:	"459 649"
+*PaperDimension EnvDL/Envelope DL:	"312 624"
+*PaperDimension EnvMonarch/Envelope Monarch: "279 540"
+
+*OpenUI *MediaType/Media Type: PickOne
+*OrderDependency: 10 AnySetup *MediaType
+*DefaultMediaType: Plain
+*MediaType Plain/Plain Paper:	"<</MediaType(Plain)/cupsMediaType 0>>setpagedevice"
+*MediaType Bond/Bond Paper:	"<</MediaType(Bond)/cupsMediaType 1>>setpagedevice"
+*MediaType Special/Special Paper: "<</MediaType(Special)/cupsMediaType 2>>setpagedevice"
+*MediaType Transparency/Transparency: "<</MediaType(Transparency)/cupsMediaType 3>>setpagedevice"
+*MediaType Glossy/Glossy Paper:	"<</MediaType(Glossy)/cupsMediaType 4>>setpagedevice"
+*CloseUI: *MediaType
+
+*OpenUI *InputSlot/Media Source: PickOne
+*OrderDependency: 10 AnySetup *InputSlot
+*DefaultInputSlot: Tray
+*InputSlot Tray/Tray: "<</cupsMediaPosition 1>>setpagedevice"
+*InputSlot Manual/Manual Feed: "<</cupsMediaPosition 2>>setpagedevice"
+*InputSlot Envelope/Envelope Feed: "<</cupsMediaPosition 3>>setpagedevice"
+*CloseUI: *InputSlot
+
+*OpenUI *Resolution/Output Resolution: PickOne
+*OrderDependency: 20 AnySetup *Resolution
+*DefaultResolution: 100dpi
+*Resolution 75dpi/75 DPI: "<</HWResolution[75 75]>>setpagedevice"
+*Resolution 100dpi/100 DPI: "<</HWResolution[100 100]>>setpagedevice"
+*CloseUI: *Resolution
+
+*OpenUI *ColorModel/Output Mode: PickOne
+*OrderDependency: 10 AnySetup *ColorModel
+*DefaultColorModel: CMYK
+*ColorModel CMYK/CMYK Color: "<</cupsColorOrder 1/cupsColorSpace 8/cupsCompression 2>>setpagedevice"
+*ColorModel RGB/CMY Color: "<</cupsColorOrder 1/cupsColorSpace 4/cupsCompression 2>>setpagedevice"
+*ColorModel Gray/Grayscale: "<</cupsColorOrder 0/cupsColorSpace 3/cupsCompression 2>>setpagedevice"
+*CloseUI: *ColorModel
+
+*DefaultFont: Courier
+*Font AvantGarde-Book: Standard "(001.006S)" Standard ROM
+*Font AvantGarde-BookOblique: Standard "(001.006S)" Standard ROM
+*Font AvantGarde-Demi: Standard "(001.007S)" Standard ROM
+*Font AvantGarde-DemiOblique: Standard "(001.007S)" Standard ROM
+*Font Bookman-Demi: Standard "(001.004S)" Standard ROM
+*Font Bookman-DemiItalic: Standard "(001.004S)" Standard ROM
+*Font Bookman-Light: Standard "(001.004S)" Standard ROM
+*Font Bookman-LightItalic: Standard "(001.004S)" Standard ROM
+*Font Courier: Standard "(002.004S)" Standard ROM
+*Font Courier-Bold: Standard "(002.004S)" Standard ROM
+*Font Courier-BoldOblique: Standard "(002.004S)" Standard ROM
+*Font Courier-Oblique: Standard "(002.004S)" Standard ROM
+*Font Helvetica: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Bold: Standard "(001.007S)" Standard ROM
+*Font Helvetica-BoldOblique: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Narrow-Bold: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow-BoldOblique: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow-Oblique: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Oblique: Standard "(001.006S)" Standard ROM
+*Font NewCenturySchlbk-Bold: Standard "(001.009S)" Standard ROM
+*Font NewCenturySchlbk-BoldItalic: Standard "(001.007S)" Standard ROM
+*Font NewCenturySchlbk-Italic: Standard "(001.006S)" Standard ROM
+*Font NewCenturySchlbk-Roman: Standard "(001.007S)" Standard ROM
+*Font Palatino-Bold: Standard "(001.005S)" Standard ROM
+*Font Palatino-BoldItalic: Standard "(001.005S)" Standard ROM
+*Font Palatino-Italic: Standard "(001.005S)" Standard ROM
+*Font Palatino-Roman: Standard "(001.005S)" Standard ROM
+*Font Symbol: Special "(001.007S)" Special ROM
+*Font Times-Bold: Standard "(001.007S)" Standard ROM
+*Font Times-BoldItalic: Standard "(001.009S)" Standard ROM
+*Font Times-Italic: Standard "(001.007S)" Standard ROM
+*Font Times-Roman: Standard "(001.007S)" Standard ROM
+*Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
+*Font ZapfDingbats: Special "(001.004S)" Standard ROM
+*%
+*% End of "$Id: testhp.ppd,v 1.1 2001/02/23 01:15:17 mike Exp $".
+*%

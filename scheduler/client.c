@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.87 2001/02/22 16:48:13 mike Exp $"
+ * "$Id: client.c,v 1.88 2001/02/23 01:15:15 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -44,6 +44,8 @@
  */
 
 #include "cupsd.h"
+
+#include <grp.h>
 
 #ifdef HAVE_LIBSSL
 #  include <openssl/err.h>
@@ -332,6 +334,9 @@ CloseClient(client_t *con)	/* I - Client to close */
       kill(con->pipe_pid, SIGKILL);
       waitpid(con->pipe_pid, &status, WNOHANG);
     }
+
+    LogMessage(L_DEBUG2, "CloseClient() %d Closing data file %d.",
+               con->http.fd, con->file);
 
     FD_CLR(con->file, &InputSet);
     close(con->file);
@@ -1152,6 +1157,10 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  if (con->file)
 	  {
 	    fstat(con->file, &filestats);
+
+            LogMessage(L_DEBUG2, "ReadClient() %d Closing data file %d, size = %d.",
+                       con->http.fd, con->file, filestats.st_size);
+
 	    close(con->file);
 	    con->file = 0;
 
@@ -1574,6 +1583,9 @@ WriteClient(client_t *con)		/* I - Client connection */
       if (con->pipe_pid)
 	kill(con->pipe_pid, SIGTERM);
 
+      LogMessage(L_DEBUG2, "WriteClient() %d Closing data file %d.",
+                 con->http.fd, con->file);
+
       close(con->file);
       con->file     = 0;
       con->pipe_pid = 0;
@@ -1582,7 +1594,7 @@ WriteClient(client_t *con)		/* I - Client connection */
     if (con->filename[0])
     {
       LogMessage(L_DEBUG2, "WriteClient() %d Removing temp file %s",
-                 con->filename);
+                 con->http.fd, con->filename);
       unlink(con->filename);
     }
 
@@ -2089,5 +2101,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.87 2001/02/22 16:48:13 mike Exp $".
+ * End of "$Id: client.c,v 1.88 2001/02/23 01:15:15 mike Exp $".
  */

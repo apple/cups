@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.118 2001/02/22 14:46:04 mike Exp $"
+ * "$Id: ipp.c,v 1.119 2001/02/23 01:15:15 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -945,6 +945,9 @@ add_printer(client_t        *con,	/* I - Client connection */
   int			modify;		/* Non-zero if we are modifying */
 
 
+  LogMessage(L_DEBUG2, "add_printer() %d %s %s", con->http.fd, con->uri,\
+             uri->values[0].string.text);
+
  /*
   * Was this operation called from the correct URI?
   */
@@ -956,8 +959,6 @@ add_printer(client_t        *con,	/* I - Client connection */
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
-
-  DEBUG_printf(("add_printer(%08x, %08x)\n", con, uri));
 
  /*
   * Do we have a valid URI?
@@ -1222,8 +1223,8 @@ add_printer(client_t        *con,	/* I - Client connection */
 
       if (copy_file(srcfile, dstfile))
       {
-        LogMessage(L_ERROR, "add_printer: Unable to copy interface script - %s!",
-	           strerror(errno));
+        LogMessage(L_ERROR, "add_printer: Unable to copy interface script from %s to %s - %s!",
+	           srcfile, dstfile, strerror(errno));
         send_ipp_error(con, IPP_INTERNAL_ERROR);
 	return;
       }
@@ -1246,8 +1247,8 @@ add_printer(client_t        *con,	/* I - Client connection */
 
       if (copy_file(srcfile, dstfile))
       {
-        LogMessage(L_ERROR, "add_printer: Unable to copy PPD file - %s!",
-	           strerror(errno));
+        LogMessage(L_ERROR, "add_printer: Unable to copy PPD file from %s to %s - %s!",
+	           srcfile, dstfile, strerror(errno));
         send_ipp_error(con, IPP_INTERNAL_ERROR);
 	return;
       }
@@ -4455,8 +4456,6 @@ send_ipp_error(client_t     *con,	/* I - Client connection */
   DEBUG_printf(("send_ipp_error(%08x, %04x)\n", con, status));
 
   LogMessage(L_DEBUG, "Sending IPP error code %x.", status);
-  if (con->filename[0])
-    unlink(con->filename);
 
   con->response->request.status.status_code = status;
 
@@ -5146,5 +5145,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.118 2001/02/22 14:46:04 mike Exp $".
+ * End of "$Id: ipp.c,v 1.119 2001/02/23 01:15:15 mike Exp $".
  */
