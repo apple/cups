@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc2
 
+	- Changes in job classification are now logged (STR
+	  #289)
 	- Fixed a few more SLP-related bugs (STR #259)
 	- Updated the user/group configure checks for MacOS X
 	  10.3 (STR #270)
