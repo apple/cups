@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.41.2.8 2002/03/01 19:55:15 mike Exp $"
+# "$Id: Makefile,v 1.41.2.9 2002/03/07 18:58:42 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -27,7 +27,7 @@
 include ../Makedefs
 
 TARGETS	=	hpgltops texttops pstops imagetops imagetoraster \
-		rastertodymo rastertoepson rastertohp
+		rastertodymo rastertoepson rastertohp testraster
 
 HPGLOBJS =	hpgl-attr.o hpgl-config.o hpgl-main.o hpgl-prolog.o \
 		hpgl-char.o hpgl-input.o hpgl-polygon.o hpgl-vector.o
@@ -39,7 +39,8 @@ FORMOBJS =	form-attr.o form-main.o form-ps.o form-text.o form-tree.o
 OBJS	=	$(HPGLOBJS) $(IMAGEOBJS) $(FORMOBJS) \
 		imagetops.o imagetoraster.o common.o pstops.o raster.o \
 		rastertodymo.o rastertoepson.o rastertohp.o texttops.o \
-		textcommon.o 
+		textcommon.o testraster.o
+
 
 #
 # Make all targets...
@@ -227,6 +228,16 @@ rastertohp.o:	raster.h
 
 
 #
+# testraster
+#
+
+testraster:	testraster.o raster.o
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testraster.o raster.o
+testraster.o:	raster.h
+
+
+#
 # texttops
 #
 
@@ -244,5 +255,5 @@ $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 
 #
-# End of "$Id: Makefile,v 1.41.2.8 2002/03/01 19:55:15 mike Exp $".
+# End of "$Id: Makefile,v 1.41.2.9 2002/03/07 18:58:42 mike Exp $".
 #

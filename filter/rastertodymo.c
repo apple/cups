@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertodymo.c,v 1.4.2.2 2002/03/01 19:55:22 mike Exp $"
+ * "$Id: rastertodymo.c,v 1.4.2.3 2002/03/07 18:58:44 mike Exp $"
  *
  *   DYMO label printer filter for the Common UNIX Printing System (CUPS).
  *
@@ -217,7 +217,7 @@ int			/* O - Exit status */
 main(int  argc,		/* I - Number of command-line arguments */
      char *argv[])	/* I - Command-line arguments */
 {
-  int			fd;	/* File descriptor */
+  FILE			*fp;	/* Raster data file */
   cups_raster_t		*ras;	/* Raster stream for printing */
   cups_page_header_t	header;	/* Page header from file */
   int			y;	/* Current line */
@@ -250,7 +250,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (argc == 7)
   {
-    if ((fd = open(argv[6], O_RDONLY)) == -1)
+    if ((fp = fopen(argv[6], "rb")) == NULL)
     {
       perror("ERROR: Unable to open raster file - ");
       sleep(1);
@@ -258,9 +258,9 @@ main(int  argc,		/* I - Number of command-line arguments */
     }
   }
   else
-    fd = 0;
+    fp = stdin;
 
-  ras = cupsRasterOpen(fd, CUPS_RASTER_READ);
+  ras = cupsRasterOpen(fp, CUPS_RASTER_READ);
 
  /*
   * Initialize the print device...
@@ -342,8 +342,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   */
 
   cupsRasterClose(ras);
-  if (fd != 0)
-    close(fd);
+  if (fp != stdin)
+    fclose(fp);
 
  /*
   * If no pages were printed, send an error message...
@@ -359,5 +359,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertodymo.c,v 1.4.2.2 2002/03/01 19:55:22 mike Exp $".
+ * End of "$Id: rastertodymo.c,v 1.4.2.3 2002/03/07 18:58:44 mike Exp $".
  */

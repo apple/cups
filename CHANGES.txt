@@ -1,8 +1,12 @@
-CHANGES.txt - 12/30/2001
+CHANGES.txt - 03/07/2002
 ------------------------
 
 CHANGES IN CUPS V1.2.0a1
 
+	- Added support for ICC and CIE colorspaces in RIPs.
+	- Updated the raster stream format to support more
+	  user-defined attributes and to do compression of the
+	  page data.
 	- New ippReadFile(), ippReadIO(), ippWriteFile(), and
 	  ippWriteIO() functions in CUPS API.
 	- Removed fonts and GNU Ghostscript code from base CUPS

@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.h,v 1.2.2.2 2002/03/01 19:55:22 mike Exp $"
+ * "$Id: raster.h,v 1.2.2.3 2002/03/07 18:58:44 mike Exp $"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -34,25 +34,35 @@
 #ifndef _CUPS_RASTER_H_
 #  define _CUPS_RASTER_H_
 
+/*
+ * Include necessary headers...
+ */
+
+#  include <stdio.h>
+
 #  ifdef __cplusplus
 extern "C" {
 #  endif /* __cplusplus */
 
 /*
- * Every non-PostScript printer driver that supports raster images should
- * use the application/vnd.cups-raster image file format.  Since both the
- * PostScript RIP (pstoraster, based on GNU Ghostscript 4.03) and Image RIP
- * (imagetoraster, located in the filter directory) use it, using this format
- * saves you a lot of work.  Also, the PostScript RIP passes any printer
- * options that are in a PS file to your driver this way as well...
+ * Every non-PostScript printer driver that supports raster images
+ * should use the application/vnd.cups-raster image file format.
+ * Since both the PostScript RIP (pstoraster, based on GNU
+ * Ghostscript) and Image RIP (imagetoraster, located in the filter
+ * directory) use it, using this format saves you a lot of work.
+ * Also, the PostScript RIP passes any printer options that are in
+ * a PS file to your driver this way as well...
  */
 
 /*
  * Constants...
  */
 
-#  define CUPS_RASTER_SYNC	0x52615374	/* RaSt */
-#  define CUPS_RASTER_REVSYNC	0x74536152	/* tSaR */
+#  define CUPS_RASTER_SYNC	0x52615332	/* RaS2 */
+#  define CUPS_RASTER_REVSYNC	0x32536152	/* 2SaR */
+
+#  define CUPS_RASTER_SYNCv1	0x52615374	/* RaSt */
+#  define CUPS_RASTER_REVSYNCv1	0x74536152	/* tSaR */
 
 
 /*
@@ -137,7 +147,26 @@ typedef enum
   CUPS_CSPACE_GMCS,			/* Gold, magenta, yellow, silver */
   CUPS_CSPACE_WHITE,			/* White ink (as black) */
   CUPS_CSPACE_GOLD,			/* Gold foil */
-  CUPS_CSPACE_SILVER			/* Silver foil */
+  CUPS_CSPACE_SILVER,			/* Silver foil */
+
+  CUPS_CSPACE_CIEXYZ,			/* CIE XYZ */
+  CUPS_CSPACE_CIELab,			/* CIE Lab */
+
+  CUPS_CSPACE_ICC1 = 32,		/* ICC-based, 1 color */
+  CUPS_CSPACE_ICC2,			/* ICC-based, 2 colors */
+  CUPS_CSPACE_ICC3,			/* ICC-based, 3 colors */
+  CUPS_CSPACE_ICC4,			/* ICC-based, 4 colors */
+  CUPS_CSPACE_ICC5,			/* ICC-based, 5 colors */
+  CUPS_CSPACE_ICC6,			/* ICC-based, 6 colors */
+  CUPS_CSPACE_ICC7,			/* ICC-based, 7 colors */
+  CUPS_CSPACE_ICC8,			/* ICC-based, 8 colors */
+  CUPS_CSPACE_ICC9,			/* ICC-based, 9 colors */
+  CUPS_CSPACE_ICCA,			/* ICC-based, 10 colors */
+  CUPS_CSPACE_ICCB,			/* ICC-based, 11 colors */
+  CUPS_CSPACE_ICCC,			/* ICC-based, 12 colors */
+  CUPS_CSPACE_ICCD,			/* ICC-based, 13 colors */
+  CUPS_CSPACE_ICCE,			/* ICC-based, 14 colors */
+  CUPS_CSPACE_ICCF			/* ICC-based, 15 colors */
 } cups_cspace_t;
 
 
@@ -193,6 +222,13 @@ typedef struct
   unsigned	cupsRowCount;		/* Rows per band */
   unsigned	cupsRowFeed;		/* Feed between bands */
   unsigned	cupsRowStep;		/* Spacing between lines */
+
+  /**** Version 2 Dictionary Values ****/
+  unsigned	cupsNumColors;		/* Number of colors */
+  unsigned	cupsNumber[16];		/* User-defined number values */
+  char		cupsString[8][64];	/* User-defined string values */
+  char		cupsMarkerType[64];	/* Ink/toner type */
+  char		cupsRenderingIntent[64];/* Color rendering intent */
 } cups_page_header_t;
 
 
@@ -203,9 +239,16 @@ typedef struct
 
 typedef struct
 {
-  unsigned	sync;			/* Sync word from start of stream */
-  int		fd;			/* File descriptor */
-  cups_mode_t	mode;			/* Read/write mode */
+  unsigned		sync;		/* Sync word from start of stream */
+  FILE			*fp;		/* File pointer */
+  cups_mode_t		mode;		/* Read/write mode */
+  cups_page_header_t	header;		/* Raster header for current page */
+  int			count,		/* Current row run-length count */
+			remaining,	/* Remaining rows in page image */
+			bpp;		/* Bytes per pixel/color */
+  unsigned char		*pixels,	/* Pixels for current row */
+			*pend,		/* End of pixel buffer */
+			*pcurrent;	/* Current byte in pixel buffer */
 } cups_raster_t;
 
 
@@ -214,7 +257,7 @@ typedef struct
  */
 
 extern void		cupsRasterClose(cups_raster_t *r);
-extern cups_raster_t	*cupsRasterOpen(int fd, cups_mode_t mode);
+extern cups_raster_t	*cupsRasterOpen(FILE *fp, cups_mode_t mode);
 extern unsigned		cupsRasterReadHeader(cups_raster_t *r,
 			                     cups_page_header_t *h);
 extern unsigned		cupsRasterReadPixels(cups_raster_t *r,
@@ -231,5 +274,5 @@ extern unsigned		cupsRasterWritePixels(cups_raster_t *r,
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h,v 1.2.2.2 2002/03/01 19:55:22 mike Exp $".
+ * End of "$Id: raster.h,v 1.2.2.3 2002/03/07 18:58:44 mike Exp $".
  */
