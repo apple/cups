@@ -895,7 +895,7 @@ polling method is inefficient. CUPS provides a
 single client to relay (broadcast) the polled printer information to the local subnet.</P>
 
 <P>For example, Server A and Server B are on subnet 1 and subnet 2,
-while theclients are on subnet 3.
+while the clients are on subnet 3.
 To provide printers to all of the clients in subnet 3,
 client C will be configured with the following directives in <VAR>/etc/cups/cupsd.conf</VAR>:</P>
 
