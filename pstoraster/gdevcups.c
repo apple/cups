@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.39 2000/12/14 16:55:15 mike Exp $"
+ * "$Id: gdevcups.c,v 1.40 2000/12/15 17:46:18 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -2603,17 +2603,20 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
             switch (cups->header.cupsColorSpace)
 	    {
 	      default :
-	          for (x = cups->width; x > 0; x --)
-		  {
-		    *cptr++ = srcptr[0];
-		    *mptr++ = srcptr[1];
-		    *yptr++ = srcptr[2];
-
-		    if (flip)
-		      srcptr += 3;
-		    else
-		      srcptr -= 3;
-		  }
+	          if (flip)
+	            for (x = cups->width; x > 0; x --)
+		    {
+		      *cptr-- = *srcptr++;
+		      *mptr-- = *srcptr++;
+		      *yptr-- = *srcptr++;
+		    }
+		  else
+	            for (x = cups->width; x > 0; x --)
+		    {
+		      *cptr++ = *srcptr++;
+		      *mptr++ = *srcptr++;
+		      *yptr++ = *srcptr++;
+		    }
 	          break;
 	      case CUPS_CSPACE_GMCK :
 	      case CUPS_CSPACE_GMCS :
@@ -2622,18 +2625,22 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 	      case CUPS_CSPACE_YMCK :
 	      case CUPS_CSPACE_KCMY :
 	      case CUPS_CSPACE_KCMYcm :
-	          for (x = cups->width; x > 0; x --)
-		  {
-		    *cptr++ = srcptr[0];
-		    *mptr++ = srcptr[1];
-		    *yptr++ = srcptr[2];
-		    *kptr++ = srcptr[3];
-
-		    if (flip)
-		      srcptr += 4;
-		    else
-		      srcptr -= 4;
-		  }
+	          if (flip)
+	            for (x = cups->width; x > 0; x --)
+		    {
+		      *cptr-- = *srcptr++;
+		      *mptr-- = *srcptr++;
+		      *yptr-- = *srcptr++;
+		      *kptr-- = *srcptr++;
+		    }
+		  else
+	            for (x = cups->width; x > 0; x --)
+		    {
+		      *cptr++ = *srcptr++;
+		      *mptr++ = *srcptr++;
+		      *yptr++ = *srcptr++;
+		      *kptr++ = *srcptr++;
+		    }
 	          break;
 	    }
             break;
@@ -3004,5 +3011,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.39 2000/12/14 16:55:15 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.40 2000/12/15 17:46:18 mike Exp $".
  */
