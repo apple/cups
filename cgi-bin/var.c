@@ -1,5 +1,5 @@
 /*
- * "$Id: var.c,v 1.6 1997/08/26 16:49:24 mike Exp $"
+ * "$Id: var.c,v 1.7 1997/09/02 18:46:51 mike Exp $"
  *
  *   CGI form variable functions.
  *
@@ -21,7 +21,12 @@
  * Revision History:
  *
  *   $Log: var.c,v $
- *   Revision 1.6  1997/08/26 16:49:24  mike
+ *   Revision 1.7  1997/09/02 18:46:51  mike
+ *   OK, now we check for errors in the form data.
+ *   cgiInitialize() returns 0 if there was no form data or an error occured
+ *   and 1 if form data is present.
+ *
+ *   Revision 1.6  1997/08/26  16:49:24  mike
  *   Updated cgiInitialize() to always return FALSE if no parameter data
  *   is present.
  *
@@ -72,7 +77,7 @@ static var_t	*form_vars = NULL;	/* Form variables */
 static void	cgi_sort_variables(void);
 static int	cgi_compare_variables(var_t *v1, var_t *v2);
 static void	cgi_add_variable(char *name, char *value);
-static void	cgi_initialize_string(char *data);
+static int	cgi_initialize_string(char *data);
 static int	cgi_initialize_get(int need_content);
 static int	cgi_initialize_post(int need_content);
 
@@ -191,6 +196,9 @@ cgiSetVariable(char *name,	/* I - Name of variable */
 	*var;	/* Returned variable */
 
 
+  if (name == NULL || value == NULL)
+    return;
+
   if (form_count > 0)
   {
     key.name = name;
@@ -265,6 +273,9 @@ cgi_add_variable(char *name,		/* I - Variable name */
   var_t	*var;
 
 
+  if (name == NULL || value == NULL)
+    return;
+
 #ifdef DEBUG
   printf("Adding variable \'%s\' with value \'%s\'...\n", name, value);
 #endif /* DEBUG */
@@ -285,7 +296,7 @@ cgi_add_variable(char *name,		/* I - Variable name */
  * 'cgi_initialize_string()' - Initialize form variables from a string.
  */
 
-static void
+static int
 cgi_initialize_string(char *data)	/* I - Form data string */
 {
   int	done;		/* True if we're done reading a form variable */
@@ -300,7 +311,7 @@ cgi_initialize_string(char *data)	/* I - Form data string */
   */
 
   if (data == NULL)
-    return;
+    return (0);
 
  /*
   * Loop until we've read all the form data...
@@ -321,6 +332,8 @@ cgi_initialize_string(char *data)	/* I - Form data string */
     *s = '\0';
     if (*data == '=')
       data ++;
+    else
+      return (0);
 
    /*
     * Read the variable value...
@@ -371,6 +384,8 @@ cgi_initialize_string(char *data)	/* I - Form data string */
   };
 
   cgi_sort_variables();
+
+  return (1);
 }
 
 
@@ -393,20 +408,14 @@ cgi_initialize_get(int need_content)	/* I - True if input is required */
   */
 
   data = getenv("QUERY_STRING");
-  if (data == NULL)
-    return (!need_content);
+  if (data == NULL || strlen(data) == 0)
+    return (0);
 
  /*
-  * Parse it out...
+  * Parse it out and return...
   */
 
-  cgi_initialize_string(data);
-
- /*
-  * Return...
-  */
-
-  return (1);
+  return (cgi_initialize_string(data));
 }
 
 
@@ -421,7 +430,8 @@ cgi_initialize_post(int need_content)	/* I - True if input is required */
 	*data;			/* Pointer to form data string */
   int	length,			/* Length of input data */
 	nbytes,			/* Number of bytes read this read() */
-	tbytes;			/* Total number of bytes read */
+	tbytes,			/* Total number of bytes read */
+	status;			/* Return status */
 
 
 #ifdef DEBUG
@@ -433,8 +443,8 @@ cgi_initialize_post(int need_content)	/* I - True if input is required */
   */
 
   content_length = getenv("CONTENT_LENGTH");
-  if (content_length == NULL)
-    return (!need_content);
+  if (content_length == NULL || atoi(content_length) == 0)
+    return (0);
 
  /*
   * Get the length of the input stream and allocate a buffer for it...
@@ -451,7 +461,7 @@ cgi_initialize_post(int need_content)	/* I - True if input is required */
     if ((nbytes = read(0, data + tbytes, length - tbytes)) < 0)
     {
       free(data);
-      return (!need_content);
+      return (0);
     };
 
   data[length] = '\0';
@@ -460,7 +470,7 @@ cgi_initialize_post(int need_content)	/* I - True if input is required */
   * Parse it out...
   */
 
-  cgi_initialize_string(data);
+  status = cgi_initialize_string(data);
 
  /*
   * Free the data and return...
@@ -468,10 +478,10 @@ cgi_initialize_post(int need_content)	/* I - True if input is required */
 
   free(data);
 
-  return (1);
+  return (status);
 }
 
 
 /*
- * End of "$Id: var.c,v 1.6 1997/08/26 16:49:24 mike Exp $".
+ * End of "$Id: var.c,v 1.7 1997/09/02 18:46:51 mike Exp $".
  */
