@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.30 1999/12/07 17:21:25 mike Exp $"
+# "$Id: cups.list,v 1.31 1999/12/08 15:23:29 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -258,6 +258,8 @@ f 0444 root sys /usr/share/cups/doc/sam.html doc/sam.html
 f 0444 root sys /usr/share/cups/doc/sam.pdf doc/sam.pdf
 f 0444 root sys /usr/share/cups/doc/sdd.html doc/sdd.html
 f 0444 root sys /usr/share/cups/doc/sdd.pdf doc/sdd.pdf
+f 0444 root sys /usr/share/cups/doc/spm.html doc/spm.html
+f 0444 root sys /usr/share/cups/doc/spm.pdf doc/spm.pdf
 f 0444 root sys /usr/share/cups/doc/ssr.html doc/ssr.html
 f 0444 root sys /usr/share/cups/doc/ssr.pdf doc/ssr.pdf
 f 0444 root sys /usr/share/cups/doc/sum.html doc/sum.html
@@ -276,6 +278,7 @@ l 0444 root sys /usr/share/catman/a_man/cat1/disable.z enable.z
 f 0444 root sys /usr/share/catman/u_man/cat1/filter.z man/filter.z
 f 0444 root sys /usr/share/catman/a_man/cat1/lpadmin.z man/lpadmin.z
 f 0444 root sys /usr/share/catman/a_man/cat1/lpc.z man/lpc.z
+f 0444 root sys /usr/share/catman/u_man/cat1/lpq.z man/lpq.z
 f 0444 root sys /usr/share/catman/u_man/cat1/lprm.z man/lprm.z
 f 0444 root sys /usr/share/catman/u_man/cat1/lpr.z man/lpr.z
 f 0444 root sys /usr/share/catman/u_man/cat1/lpstat.z man/lpstat.z
@@ -296,6 +299,7 @@ l 0444 root sys /usr/man/man8/disable.8 enable.8
 f 0444 root sys /usr/man/man1/filter.1 man/filter.1
 f 0444 root sys /usr/man/man8/lpadmin.8 man/lpadmin.8
 f 0444 root sys /usr/man/man8/lpc.8 man/lpc.8
+f 0444 root sys /usr/man/man1/lpq.1 man/lpq.1
 f 0444 root sys /usr/man/man1/lprm.1 man/lprm.1
 f 0444 root sys /usr/man/man1/lpr.1 man/lpr.1
 f 0444 root sys /usr/man/man1/lpstat.1 man/lpstat.1
@@ -310,5 +314,5 @@ f 0444 root sys /usr/man/man5/printers.conf.5 man/printers.conf.5
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.30 1999/12/07 17:21:25 mike Exp $".
+# End of "$Id: cups.list,v 1.31 1999/12/08 15:23:29 mike Exp $".
 #
