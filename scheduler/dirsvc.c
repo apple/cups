@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.115 2003/05/12 20:51:53 mike Exp $"
+ * "$Id: dirsvc.c,v 1.116 2003/07/19 22:13:01 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -886,15 +886,20 @@ StartPolling(void)
 	if (setgid(Group))
           exit(errno);
 
+	if (setgroups(0, NULL))
+          exit(errno);
+
 	if (setuid(User))
           exit(errno);
       }
+      else
+      {
+       /*
+	* Reset group membership to just the main one we belong to.
+	*/
 
-     /*
-      * Reset group membership to just the main one we belong to.
-      */
-
-      setgroups(0, NULL);
+	setgroups(0, NULL);
+      }
 
      /*
       * Redirect stdin and stdout to /dev/null, and stderr to the
@@ -1900,5 +1905,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.115 2003/05/12 20:51:53 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.116 2003/07/19 22:13:01 mike Exp $".
  */
