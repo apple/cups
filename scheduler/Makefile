@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.46 2002/12/17 19:00:12 swdev Exp $"
+# "$Id: Makefile,v 1.47 2003/03/05 20:42:28 mike Exp $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -69,8 +69,8 @@ install:	all
 	$(INSTALL_DIR) $(SERVERROOT)/interfaces
 	$(INSTALL_DIR) $(SERVERROOT)/ppd
 	$(INSTALL_DIR) $(LOGDIR)
-	$(INSTALL_DIR) -m 700 $(REQUESTS)
-	$(INSTALL_DIR) -m 1700 $(REQUESTS)/tmp
+	$(INSTALL_DIR) -m 710 $(REQUESTS)
+	$(INSTALL_DIR) -m 1710 $(REQUESTS)/tmp
 
 
 #
@@ -138,5 +138,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.46 2002/12/17 19:00:12 swdev Exp $".
+# End of "$Id: Makefile,v 1.47 2003/03/05 20:42:28 mike Exp $".
 #
