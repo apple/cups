@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.25 2003/08/01 15:00:30 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.26 2003/11/07 19:45:05 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -686,6 +686,79 @@ main(int  argc,			/* I - Number of command-line arguments */
 	errors ++;
       }
 
+     /*
+      * Check for page sizes without the corresponding ImageableArea or
+      * PaperDimension values...
+      */
+
+      if (ppd->num_sizes == 0)
+      {
+	if (verbose >= 0)
+	{
+	  if (!errors && !verbose)
+	    puts(" FAIL");
+
+	  puts("      **FAIL**  REQUIRED PageSize");
+	  puts("                REF: Page 41, section 5.");
+	  puts("                REF: Page 99, section 5.14.");
+        }
+
+	errors ++;
+      }
+      else
+      {
+	for (j = 0, size = ppd->sizes; j < ppd->num_sizes; j ++, size ++)
+	{
+	 /*
+	  * Don't check custom size...
+	  */
+
+	  if (!strcmp(size->name, "Custom"))
+	    continue;
+
+	 /*
+	  * Check for ImageableArea...
+	  */
+
+          if (size->left == 0.0 && size->bottom == 0.0 &&
+	      size->right == 0.0 && size->top == 0.0)
+	  {
+	    if (verbose >= 0)
+	    {
+	      if (!errors && !verbose)
+		puts(" FAIL");
+
+	      printf("      **FAIL**  REQUIRED ImageableArea for PageSize %s\n",
+	             size->name);
+	      puts("                REF: Page 41, section 5.");
+	      puts("                REF: Page 102, section 5.15.");
+            }
+
+	    errors ++;
+	  }
+
+	 /*
+	  * Check for PaperDimension...
+	  */
+
+          if (size->width == 0.0 && size->length == 0.0)
+	  {
+	    if (verbose >= 0)
+	    {
+	      if (!errors && !verbose)
+		puts(" FAIL");
+
+	      printf("      **FAIL**  REQUIRED PaperDimension for PageSize %s\n",
+	             size->name);
+	      puts("                REF: Page 41, section 5.");
+	      puts("                REF: Page 103, section 5.15.");
+            }
+
+	    errors ++;
+	  }
+	}
+      }
+
       if (errors)
 	status = ERROR_CONFORMANCE;
       else if (!verbose)
@@ -1020,5 +1093,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.25 2003/08/01 15:00:30 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.26 2003/11/07 19:45:05 mike Exp $".
  */

@@ -3,6 +3,19 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20
 
+	- The scheduler did not check for invalid allow/deny
+	  addresses such as "11.22.33.44/24". It now masks off
+	  the extra address bits and logs a warning message in
+	  the error_log file (STR #337)
+	- The cupstestppd utility now checks for missing
+	  ImageableArea and PaperDimension attributes for each
+	  defined PageSize (STR #365)
+	- The IPP code did not wait for a reply indefinitely on
+	  HTTP connections in "blocking" mode (STR #377)
+	- The web interfaces did not rewrite the default printer
+	  URI properly (STR #299 and #369)
+	- The LPD backend passed the C and L commands in the
+	  wrong order (STR #378)
 	- The Dymo label printer driver did not set the label
 	  length properly (STR #373)
 	- The scheduler did not support job IDs higher than

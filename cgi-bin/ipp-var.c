@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.23.2.15 2003/10/16 19:21:11 mike Exp $"
+ * "$Id: ipp-var.c,v 1.23.2.16 2003/11/07 19:45:05 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -26,6 +26,7 @@
  *   ippGetAttributes()    - Get the list of attributes that are needed
  *                           by the template file.
  *   ippGetTemplateDir()   - Get the templates directory...
+ *   ippRewriteURL()       - Rewrite a printer URI into a web browser URL...
  *   ippSetServerVersion() - Set the server name and CUPS version...
  *   ippSetCGIVars()       - Set CGI variables from an IPP response.
  */
@@ -186,6 +187,123 @@ ippGetTemplateDir(void)
 
 
 /*
+ * 'ippRewriteURL()' - Rewrite a printer URI into a web browser URL...
+ */
+
+char *					/* O - New URL */
+ippRewriteURL(const char *uri,		/* I - Current URI */
+              char       *url,		/* O - New URL */
+	      int        urlsize)	/* I - Size of URL buffer */
+{
+  char			method[HTTP_MAX_URI],
+			userpass[HTTP_MAX_URI],
+			hostname[HTTP_MAX_URI],
+			rawresource[HTTP_MAX_URI],
+			resource[HTTP_MAX_URI],
+					/* URI components... */
+			*rawptr,	/* Pointer into rawresource */
+			*resptr;	/* Pointer into resource */
+  int			port;		/* Port number */
+  static int		ishttps = -1;	/* Using encryption? */
+  static const char	*server;	/* Name of server */
+  static char		servername[1024];
+					/* Local server name */
+  static const char	hexchars[] = "0123456789ABCDEF";
+					/* Hexadecimal conversion characters */
+
+
+ /*
+  * Check if we have been called before...
+  */
+
+  if (ishttps < 0)
+  {
+   /*
+    * No, initialize static vars for the conversion...
+    *
+    * First get the server name associated with the client interface as
+    * well as the locally configured hostname.  We'll check *both* of
+    * these to see if the printer URL is local...
+    */
+
+    server = getenv("SERVER_NAME");
+    gethostname(servername, sizeof(servername));
+
+   /*
+    * Then flag whether we are using SSL on this connection...
+    */
+
+    ishttps = getenv("HTTPS") != NULL;
+  }
+
+ /*
+  * Convert the URI to a URL...
+  */
+
+  httpSeparate(uri, method, userpass, hostname, &port, rawresource);
+
+  if (strcmp(method, "ipp") == 0 ||
+      strcmp(method, "http") == 0)
+  {
+   /*
+    * Rewrite the resource string so it doesn't contain any
+    * illegal chars...
+    */
+
+    for (rawptr = rawresource, resptr = resource; *rawptr;)
+      if ((*rawptr & 128) || *rawptr == '%' || *rawptr == ' ' ||
+	  *rawptr == '#' || *rawptr == '?' ||
+	  *rawptr == '.') /* For MSIE */
+      {
+	if (resptr < (resource + sizeof(resource) - 3))
+	{
+	  *resptr++ = '%';
+	  *resptr++ = hexchars[(*rawptr >> 4) & 15];
+	  *resptr++ = hexchars[*rawptr & 15];
+	}
+      }
+      else if (resptr < (resource + sizeof(resource) - 1))
+	*resptr++ = *rawptr++;
+
+    *resptr = '\0';
+
+   /*
+    * Map local access to a local URI...
+    */
+
+    if (strcasecmp(hostname, server) == 0 ||
+	strcasecmp(hostname, servername) == 0)
+    {
+     /*
+      * Make URI relative to the current server...
+      */
+
+      strlcpy(url, resource, urlsize);
+    }
+    else
+    {
+     /*
+      * Rewrite URI with HTTP/HTTPS scheme...
+      */
+
+      if (userpass[0])
+	snprintf(url, urlsize, "%s://%s@%s:%d%s",
+		 ishttps ? "https" : "http",
+		 userpass, hostname, port, resource);
+      else
+	snprintf(url, urlsize, "%s://%s:%d%s", 
+		 ishttps ? "https" : "http",
+		 hostname, port, resource);
+    }
+  }
+  else
+    strlcpy(url, uri, urlsize);
+
+  return (url);
+}
+
+
+/*
  * 'ippSetServerVersion()' - Set the server name and CUPS version...
  */
 
@@ -221,22 +339,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 			*nameptr,	/* Pointer into name */
 			value[16384],	/* Value(s) */
 			*valptr;	/* Pointer into value */
-  char			method[HTTP_MAX_URI],
-			username[HTTP_MAX_URI],
-			hostname[HTTP_MAX_URI],
-			rawresource[HTTP_MAX_URI],
-			resource[HTTP_MAX_URI],
-			uri[HTTP_MAX_URI],
-			*rawptr,	/* Pointer into rawresource */
-			*resptr;	/* Pointer into resource */
-  int			port;		/* URI data */
-  int			ishttps;	/* Using encryption? */
-  const char		*server;	/* Name of server */
-  char			servername[1024];
-					/* Locale server name */
   struct tm		*date;		/* Date information */
-  static const char	hexchars[] = "0123456789ABCDEF";
-					/* Hexadecimal conversion characters */
 
 
   DEBUG_printf(("<P>ippSetCGIVars(response=%p, filter_name=\"%s\", filter_value=\"%s\", prefix=\"%s\")\n",
@@ -248,21 +351,6 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
   if (!prefix)
     ippSetServerVersion();
-
- /*
-  * Get the server name associated with the client interface as well as
-  * the locally configured hostname.  We'll check *both* of these to
-  * see if the printer URL is local...
-  */
-
-  server = getenv("SERVER_NAME");
-  gethostname(servername, sizeof(servername));
-
- /*
-  * Flag whether we are using SSL on this connection...
-  */
-
-  ishttps = getenv("HTTPS") != NULL;
 
  /*
   * Loop through the attributes and set them for the template...
@@ -334,7 +422,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
       * attribute...
       */
 
-      if (strcmp(name, "job_printer_uri") == 0)
+      if (!strcmp(name, "job_printer_uri"))
       {
         if ((valptr = strrchr(attr->values[0].string.text, '/')) == NULL)
 	  valptr = "unknown";
@@ -407,66 +495,9 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 	        * Rewrite URIs...
 		*/
 
-		httpSeparate(attr->values[i].string.text, method, username,
-		             hostname, &port, rawresource);
-
-        	if (strcmp(method, "ipp") == 0 ||
-	            strcmp(method, "http") == 0)
-        	{
-        	 /*
-	          * Rewrite the resource string so it doesn't contain any
-		  * illegal chars...
-		  */
-
-                  for (rawptr = rawresource, resptr = resource; *rawptr;)
-		    if ((*rawptr & 128) || *rawptr == '%' || *rawptr == ' ' ||
-		        *rawptr == '#' || *rawptr == '?' ||
-		        *rawptr == '.') /* For MSIE */
-		    {
-		      if (resptr < (resource + sizeof(resource) - 3))
-		      {
-		        *resptr++ = '%';
-			*resptr++ = hexchars[(*rawptr >> 4) & 15];
-			*resptr++ = hexchars[*rawptr & 15];
-		      }
-		    }
-		    else if (resptr < (resource + sizeof(resource) - 1))
-		      *resptr++ = *rawptr++;
-
-                  *resptr = '\0';
-
-        	 /*
-		  * Map local access to a local URI...
-		  */
-
-        	  if (strcasecmp(hostname, server) == 0 ||
-		      strcasecmp(hostname, servername) == 0)
-		  {
-		   /*
-		    * Make URI relative to the current server...
-		    */
-
-                    strlcpy(uri, resource, sizeof(uri));
-		  }
-		  else
-		  {
-        	   /*
-		    * Rewrite URI with HTTP address...
-		    */
-
-		    if (username[0])
-		      snprintf(uri, sizeof(uri), "%s://%s@%s:%d%s",
-		               ishttps ? "https" : "http",
-		               username, hostname, port, resource);
-        	    else
-		      snprintf(uri, sizeof(uri), "%s://%s:%d%s", 
-		               ishttps ? "https" : "http",
-			       hostname, port, resource);
-                  }
-
-		  strlcat(valptr, uri, sizeof(value) - (valptr - value));
-        	  break;
-        	}
+		ippRewriteURL(attr->values[i].string.text, valptr,
+		              sizeof(value) - (valptr - value));
+        	break;
               }
 
           case IPP_TAG_STRING :
@@ -512,5 +543,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.23.2.15 2003/10/16 19:21:11 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.23.2.16 2003/11/07 19:45:05 mike Exp $".
  */

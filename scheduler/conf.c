@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.45 2003/10/09 19:13:51 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.46 2003/11/07 19:45:05 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -2176,6 +2176,16 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
   else
     memcpy(mask, netmasks[ipcount - 1], sizeof(unsigned) * 4);
 
+ /*
+  * Check for a valid netmask; no fallback like in CUPS 1.1.x!
+  */
+
+  if ((ip[0] & ~mask[0]) != 0 ||
+      (ip[1] & ~mask[1]) != 0 ||
+      (ip[2] & ~mask[2]) != 0 ||
+      (ip[3] & ~mask[3]) != 0)
+    return (0);
+
   return (1);
 }
 
@@ -2270,5 +2280,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.45 2003/10/09 19:13:51 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.46 2003/11/07 19:45:05 mike Exp $".
  */

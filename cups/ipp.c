@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.37 2003/06/14 17:07:03 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.38 2003/11/07 19:45:05 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -2491,16 +2491,24 @@ ipp_read_http(http_t      *http,		/* I - Client connection */
       * Wait a maximum of 1 second for data...
       */
 
-      if (!httpWait(http, 1000))
+      if (!http->blocking)
       {
        /*
-        * Signal no data...
+        * Wait up to 1 second for more data on non-blocking sockets...
 	*/
 
-        bytes = -1;
-	break;
+	if (!httpWait(http, 1000))
+	{
+	 /*
+          * Signal no data...
+	  */
+
+          bytes = -1;
+	  break;
+	}
       }
-      else if ((bytes = httpRead(http, (char *)buffer, length - tbytes)) <= 0)
+
+      if ((bytes = httpRead(http, (char *)buffer, length - tbytes)) <= 0)
         break;
     }
   }
@@ -2545,5 +2553,5 @@ ipp_write_file(int         *fd,			/* I - File descriptor */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.37 2003/06/14 17:07:03 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.38 2003/11/07 19:45:05 mike Exp $".
  */

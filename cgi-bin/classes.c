@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.18.2.9 2003/07/20 03:49:45 mike Exp $"
+ * "$Id: classes.c,v 1.18.2.10 2003/11/07 19:45:05 mike Exp $"
  *
  *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -128,38 +128,12 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       if ((attr = ippFindAttribute(response, "printer-uri-supported", IPP_TAG_URI)) != NULL)
       {
-	char	method[HTTP_MAX_URI],
-		username[HTTP_MAX_URI],
-		hostname[HTTP_MAX_URI],
-		resource[HTTP_MAX_URI],
-		uri[HTTP_MAX_URI];
-	int	port;			/* URI data */
-	const char *server;		/* Name of server */
+	char	url[HTTP_MAX_URI];	/* New URL */
 
 
-       /*
-	* Map localhost access to localhost...
-	*/
-
-        server = getenv("SERVER_NAME");
-
-	httpSeparate(attr->values[0].string.text, method, username,
-		     hostname, &port, resource);
-
-	if (strcasecmp(hostname, server) == 0 &&
-	    (strcmp(getenv("REMOTE_HOST"), "127.0.0.1") == 0 ||
-	     strcmp(getenv("REMOTE_HOST"), "localhost") == 0 ||
-	     strcmp(getenv("REMOTE_HOST"), server) == 0))
-	  strcpy(hostname, "localhost");
-
-       /*
-	* Rewrite URI with HTTP address...
-	*/
-
-	snprintf(uri, sizeof(uri), "http://%s:%d%s", hostname, port,
-		 resource);
-
-        cgiSetVariable("DEFAULT_URI", uri);
+        cgiSetVariable("DEFAULT_URI",
+	               ippRewriteURL(attr->values[0].string.text,
+		                     url, sizeof(url)));
       }
 
       ippDelete(response);
@@ -368,5 +342,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: classes.c,v 1.18.2.9 2003/07/20 03:49:45 mike Exp $".
+ * End of "$Id: classes.c,v 1.18.2.10 2003/11/07 19:45:05 mike Exp $".
  */
