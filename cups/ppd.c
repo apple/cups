@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.30 1999/07/15 16:37:55 mike Exp $"
+ * "$Id: ppd.c,v 1.31 1999/07/15 17:49:21 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -1360,7 +1360,11 @@ compare_strings(char *s,	/* I - First string */
       * Bounce out if *s and *t aren't both digits...
       */
 
-      if (!isdigit(*s) || !isdigit(*t))
+      if (isdigit(*s) && !isdigit(*t))
+        return (1);
+      else if (!isdigit(*s) && isdigit(*t))
+        return (-1);
+      else if (!isdigit(*s) || !isdigit(*t))
         continue;     
 
       if (*s < *t)
@@ -1760,5 +1764,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.30 1999/07/15 16:37:55 mike Exp $".
+ * End of "$Id: ppd.c,v 1.31 1999/07/15 17:49:21 mike Exp $".
  */
