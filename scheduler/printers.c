@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.144 2003/03/20 03:04:44 mike Exp $"
+ * "$Id: printers.c,v 1.145 2003/03/28 17:31:23 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1510,6 +1510,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	  LogMessage(L_ERROR, "%s on line %d.", ppdErrorString(pstatus),
 	             pline);
 
+        LogMessage(L_INFO, "Hint: Run \"cupstestppd %s\" and fix any errors.",
+	           filename);
+
 	AddPrinterFilter(p, "application/vnd.cups-postscript 0 -");
       }
       else
@@ -2347,5 +2350,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.144 2003/03/20 03:04:44 mike Exp $".
+ * End of "$Id: printers.c,v 1.145 2003/03/28 17:31:23 mike Exp $".
  */
