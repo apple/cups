@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.20 1999/08/04 13:16:54 mike Exp $"
+dnl "$Id: configure.in,v 1.21 1999/08/06 19:27:38 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -46,7 +46,7 @@ AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging [default=no]],
 	OPTIM="-g "
 fi])
 AC_ARG_ENABLE(shared, [  --disable-shared         turn off shared libraries [default=no]])
-if eval "test x$enable_shared = xyes"; then
+if test "$disable_shared" != "yes"; then
 	case "$uname" in
 		SunOS* | UNIX_S*)
 			LIBCUPS="libcups.so.1"
@@ -93,11 +93,11 @@ AC_PATH_PROG(CHMOD,chmod)
 AC_PATH_PROG(CP,cp)
 AC_PATH_PROG(NROFF,nroff)
 if test "$NROFF" = ""; then
-    AC_PATH_PROG(NROFF,groff)
-    if test "$NROFF" = ""; then
+    AC_PATH_PROG(GROFF,groff)
+    if test "$GROFF" = ""; then
         NROFF="echo"
     else
-        NROFF="$NROFF -T ascii"
+        NROFF="$GROFF -T ascii"
     fi
 fi
 AC_PATH_PROG(HTMLDOC,htmldoc)
@@ -311,5 +311,5 @@ AC_SUBST(CUPS_DATADIR)
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.20 1999/08/04 13:16:54 mike Exp $".
+dnl End of "$Id: configure.in,v 1.21 1999/08/06 19:27:38 mike Exp $".
 dnl
