@@ -1,0 +1,8 @@
+#!/bin/sh
+rm -f cups.jar
+for x in `cat class.list`; do
+  javac $x.java
+  mv -f $x.class ../../../../classes/com/easysw/cups
+done
+jar cvf cups.jar ../../../../classes/com/easysw/cups
+mv cups.jar ../../../..
