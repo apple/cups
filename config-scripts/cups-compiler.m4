@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4,v 1.9.2.10 2002/09/26 11:16:19 mike Exp $"
+dnl "$Id: cups-compiler.m4,v 1.9.2.11 2002/11/13 19:12:42 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -180,15 +180,6 @@ else
 	esac
 fi
 
-case $uname in
-	*BSD | Darwin*)
-		ARFLAGS="-rcv"
-		;;
-	*)
-		ARFLAGS="crvs"
-		;;
-esac
-
 dnl
-dnl End of "$Id: cups-compiler.m4,v 1.9.2.10 2002/09/26 11:16:19 mike Exp $".
+dnl End of "$Id: cups-compiler.m4,v 1.9.2.11 2002/11/13 19:12:42 mike Exp $".
 dnl
