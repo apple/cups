@@ -1,6 +1,14 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.19
+
+	- The scheduler child might send SIGUSR1 to the parent
+	  before the signal handler was installed; this didn't
+	  prevent the scheduler from starting but produced an
+	  annoying error message (STR #45)
+
+
 CHANGES IN CUPS V1.1.19rc4
 
 	- The lp command did not accept "-" for printing from
