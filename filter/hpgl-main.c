@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-main.c,v 1.3 1998/03/17 22:00:22 mike Exp $"
+ * "$Id: hpgl-main.c,v 1.4 1998/08/31 20:35:49 mike Exp $"
  *
  *   Main entry for HPGL converter for espPrint, a collection of printer
  *   drivers.
@@ -17,7 +17,12 @@
  * Revision History:
  *
  *   $Log: hpgl-main.c,v $
- *   Revision 1.3  1998/03/17 22:00:22  mike
+ *   Revision 1.4  1998/08/31 20:35:49  mike
+ *   Updated pen width code to automatically adjust scaling as needed.
+ *   Updated PS code to adjust width/height by a factor of 0.75 for better
+ *   scaling of plots.
+ *
+ *   Revision 1.3  1998/03/17  22:00:22  mike
  *   Added CR (color range) support.
  *   Added "to fit or not to fit" plot code.
  *
@@ -144,7 +149,8 @@ main(int  argc,
   name_t		*command,
 			name;
   int			shading;	/* -1 = black, 0 = grey, 1 = color */
-  float			penwidth;
+  float			penwidth,
+			temp;
 
 
  /*
@@ -189,14 +195,12 @@ main(int  argc,
 	      * Grab the margin and printable area info from the database...
 	      */
 
-	      PageWidth      = 72.0 * size->horizontal_addr /
-	                       info->horizontal_resolution;
-	      PageHeight     = 72.0 * size->vertical_addr /
-	                       info->vertical_resolution;
+	      PageWidth      = 72.0 * size->horizontal_addr / info->horizontal_resolution;
+	      PageHeight     = 72.0 * size->vertical_addr / info->vertical_resolution;
 	      PageTop        = 72.0 * size->top_margin;
-	      PageBottom     = 72.0 * size->length - PageHeight - PageTop;
+	      PageBottom     = 72.0 * size->length - PageTop - PageHeight;
 	      PageLeft       = 72.0 * size->left_margin;
-	      PageRight      = 72.0 * size->width - PageWidth - PageLeft;
+	      PageRight      = 72.0 * size->width - PageLeft - PageWidth;
               break;
 
           case 'W' :
@@ -228,7 +232,7 @@ main(int  argc,
               if (i >= argc)
                 Usage();
 
-              PageRotation = Rotation = atoi(argv[i]);
+              PageRotation = atoi(argv[i]);
               break;
 
           case 'z' : /* Page zoom */
@@ -280,6 +284,21 @@ main(int  argc,
     else
       filename = argv[i];
 
+  if (PageRotation == 90 || PageRotation == 270)
+  {
+    temp       = PageWidth;
+    PageWidth  = PageHeight;
+    PageHeight = temp;
+
+    temp       = PageTop;
+    PageTop    = PageBottom;
+    PageBottom = temp;
+
+    temp       = PageLeft;
+    PageLeft   = PageRight;
+    PageRight  = temp;
+  };
+
   if (Verbosity)
   {
     fputs("hpgl2ps: Command-line args are:", stderr);
@@ -308,9 +327,9 @@ main(int  argc,
     exit(ERR_FILE_CONVERT);
   };
 
-  IP_input_absolute(0, NULL);
-
   OutputProlog(shading, penwidth);
+
+  IP_input_absolute(0, NULL);
 
   qsort(commands, NUM_COMMANDS, sizeof(name_t),
         (int (*)(const void *, const void *))compare_names);
@@ -341,5 +360,5 @@ main(int  argc,
 
 
 /*
- * End of "$Id: hpgl-main.c,v 1.3 1998/03/17 22:00:22 mike Exp $".
+ * End of "$Id: hpgl-main.c,v 1.4 1998/08/31 20:35:49 mike Exp $".
  */

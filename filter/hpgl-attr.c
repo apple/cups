@@ -1,9 +1,9 @@
 /*
- * "$Id: hpgl-attr.c,v 1.3 1998/03/17 21:59:57 mike Exp $"
+ * "$Id: hpgl-attr.c,v 1.4 1998/08/31 20:35:49 mike Exp $"
  *
  *   HPGL attribute processing for espPrint, a collection of printer drivers.
  *
- *   Copyright 1993-1996 by Easy Software Products
+ *   Copyright 1993-1998 by Easy Software Products
  *
  *   These coded instructions, statements, and computer  programs  contain
  *   unpublished  proprietary  information  of Easy Software Products, and
@@ -16,7 +16,12 @@
  * Revision History:
  *
  *   $Log: hpgl-attr.c,v $
- *   Revision 1.3  1998/03/17 21:59:57  mike
+ *   Revision 1.4  1998/08/31 20:35:49  mike
+ *   Updated pen width code to automatically adjust scaling as needed.
+ *   Updated PS code to adjust width/height by a factor of 0.75 for better
+ *   scaling of plots.
+ *
+ *   Revision 1.3  1998/03/17  21:59:57  mike
  *   Added CR (color range) support.
  *
  *   Revision 1.2  1996/10/14  16:50:14  mike
@@ -143,7 +148,7 @@ NP_number_pens(int num_params, param_t *params)
   PC_pen_color(0, NULL);
 
   for (i = 0; i <= PenCount; i ++)
-    fprintf(OutputFile, "/W%d { DefaultPenWidth setlinewidth } bind def\n", i);
+    fprintf(OutputFile, "/W%d { DefaultPenWidth PenScaling mul setlinewidth } bind def\n", i);
 }
 
 
@@ -223,10 +228,10 @@ PW_pen_width(int num_params, param_t *params)
   };
 
   if (num_params > 1)
-    fprintf(OutputFile, "/W%d { %.1f setlinewidth } bind def W%d\n",
+    fprintf(OutputFile, "/W%d { %.1f PenScaling mul setlinewidth } bind def W%d\n",
             (int)params[1].value.number, w, (int)params[1].value.number);
   else
-    fprintf(OutputFile, "/W%d { %.1f setlinewidth } bind def W%d\n", PenNumber,
+    fprintf(OutputFile, "/W%d { %.1f PenScaling mul setlinewidth } bind def W%d\n", PenNumber,
             w, PenNumber);
 }
 
@@ -272,5 +277,5 @@ WU_width_units(int num_params, param_t *params)
 
 
 /*
- * End of "$Id: hpgl-attr.c,v 1.3 1998/03/17 21:59:57 mike Exp $".
+ * End of "$Id: hpgl-attr.c,v 1.4 1998/08/31 20:35:49 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.6 1998/05/20 13:18:48 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.7 1998/08/31 20:35:49 mike Exp $"
  *
  *   HPGL configuration routines for espPrint, a collection of printer drivers.
  *
@@ -16,6 +16,11 @@
  * Revision History:
  *
  *   $Log: hpgl-config.c,v $
+ *   Revision 1.7  1998/08/31 20:35:49  mike
+ *   Updated pen width code to automatically adjust scaling as needed.
+ *   Updated PS code to adjust width/height by a factor of 0.75 for better
+ *   scaling of plots.
+ *
  *   Revision 1.6  1998/05/20 13:18:48  mike
  *   Updated to offset page by the left/bottom margin no matter what.
  *
@@ -55,7 +60,8 @@ update_transform(void)
   float p1[2], p2[2];
   float	width, height;
   float	plotsize[2];
-  float	scaling;
+  float	scaling,
+	pen_scaling;
 
 
   if (FitPlot)
@@ -126,6 +132,11 @@ update_transform(void)
 	break;
   };
 
+  if (p2[0] == p1[0])
+    p2[0] ++;
+  if (p2[1] == p1[1])
+    p2[1] ++;
+
   switch (Rotation)
   {
     case 0 :
@@ -166,10 +177,31 @@ update_transform(void)
   };
 
   if (Verbosity)
+  {
+    fprintf(stderr, "hpgl2ps: P1 = { %f %f }, P2 = { %f %f }\n",
+            P1[0], P1[1], P2[0], P2[1]);
+    fprintf(stderr, "hpgl2ps: p1 = { %f %f }, p2 = { %f %f }\n",
+            p1[0], p1[1], p2[0], p2[1]);
+    fprintf(stderr, "hpgl2ps: width = %f, height = %f\n", width, height);
+    fprintf(stderr, "hpgl2ps: plotsize = { %f %f }\n",
+            plotsize[0], plotsize[1]);
+    fprintf(stderr, "hpgl2ps: scaling = %f\n", scaling);
     fprintf(stderr, "hpgl2ps: transform matrix = [ %f %f %f %f %f %f ]\n",
             Transform[0][0], Transform[1][0], 
             Transform[0][1], Transform[1][1], 
             Transform[0][2], Transform[1][2]);
+  };
+
+  if (FitPlot)
+  {
+    pen_scaling = Transform[0][0] + Transform[0][1];
+    if (pen_scaling < 0.0)
+      pen_scaling = -pen_scaling;
+  }
+  else
+    pen_scaling = 1.0;
+
+  fprintf(OutputFile, "/PenScaling %.3f def W%d\n", pen_scaling, PenNumber);
 }
 
 
@@ -318,8 +350,16 @@ PS_plot_size(int num_params, param_t *params)
         PlotSize[1] = 72.0 * 48.0;
         break;
     case 1 :
-        PlotSize[0] = 72.0 * params[0].value.number / 1016.0;
-        PlotSize[1] = PlotSize[0];
+        if (Rotation == 0 || Rotation == 180)
+        {
+          PlotSize[1] = 72.0 * params[0].value.number / 1016.0;
+          PlotSize[0] = 0.75 * PlotSize[1];
+        }
+        else
+        {
+          PlotSize[0] = 72.0 * params[0].value.number / 1016.0;
+          PlotSize[1] = 0.75 * PlotSize[0];
+        };
         break;
     case 2 :
         if (Rotation == 0 || Rotation == 180)
@@ -391,5 +431,5 @@ SC_scale(int num_params, param_t *params)
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.6 1998/05/20 13:18:48 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.7 1998/08/31 20:35:49 mike Exp $".
  */

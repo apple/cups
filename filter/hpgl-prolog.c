@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.4 1998/03/17 21:43:10 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.5 1998/08/31 20:35:49 mike Exp $"
  *
  *   PostScript prolog routines for the HPGL2PS program for espPrint, a
  *   collection of printer drivers.
@@ -17,7 +17,12 @@
  * Revision History:
  *
  *   $Log: hpgl-prolog.c,v $
- *   Revision 1.4  1998/03/17 21:43:10  mike
+ *   Revision 1.5  1998/08/31 20:35:49  mike
+ *   Updated pen width code to automatically adjust scaling as needed.
+ *   Updated PS code to adjust width/height by a factor of 0.75 for better
+ *   scaling of plots.
+ *
+ *   Revision 1.4  1998/03/17  21:43:10  mike
  *   Fixed grayscale mode - had red & blue reversed...
  *
  *   Revision 1.3  1998/03/10  16:49:58  mike
@@ -69,6 +74,7 @@ OutputProlog(int   shading,
   fputs("%%EndComments\n", OutputFile);
   fputs("%%BeginProlog\n", OutputFile);
   fprintf(OutputFile, "/DefaultPenWidth %.2f def\n", penwidth * 72.0 / 25.4);
+  fputs("/PenScaling 1.0 def\n", OutputFile);
   switch (shading)
   {
     case -1 : /* Black only */
@@ -123,5 +129,5 @@ OutputTrailer(void)
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.4 1998/03/17 21:43:10 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.5 1998/08/31 20:35:49 mike Exp $".
  */

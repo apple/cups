@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgltops.h,v 1.3 1998/03/17 22:00:22 mike Exp $"
+ * "$Id: hpgltops.h,v 1.4 1998/08/31 20:35:49 mike Exp $"
  *
  *   HPGL to PostScript conversion program header file for espPrint, a
  *   collection of printer/image software.
@@ -15,7 +15,12 @@
  * Revision History:
  *
  *   $Log: hpgltops.h,v $
- *   Revision 1.3  1998/03/17 22:00:22  mike
+ *   Revision 1.4  1998/08/31 20:35:49  mike
+ *   Updated pen width code to automatically adjust scaling as needed.
+ *   Updated PS code to adjust width/height by a factor of 0.75 for better
+ *   scaling of plots.
+ *
+ *   Revision 1.3  1998/03/17  22:00:22  mike
  *   Added CR (color range) support.
  *   Added "to fit or not to fit" plot code.
  *
@@ -105,13 +110,14 @@ VAR int		PenMotion	VALUE(0), 	/* 0 = absolute, 1 = relative */
 		PageCount	VALUE(1),
 		PageDirty	VALUE(0),
 		WidthUnits	VALUE(0);
-VAR float	PlotSize[2]	VALUE2(1.0, 1.0);	/* Scaling to plot size */
+VAR float	PlotSize[2]	VALUE2(2592.0, 3456.0);
+						/* Plot size */
 VAR int		CharFillMode	VALUE(0),
 		CharPen		VALUE(0),
 		CharFont	VALUE(0);
 VAR float	CharHeight[2]	VALUE2(11.5,11.5);
 VAR int		Verbosity	VALUE(0);
-VAR int		FitPage		VALUE(0);
+VAR int		FitPlot		VALUE(0);
 VAR float	ColorRange[3][2]
 #ifdef _MAIN_C_
 		= {
@@ -199,5 +205,5 @@ extern int	OutputProlog(int shading, float penwidth);
 extern int	OutputTrailer(void);
 
 /*
- * End of "$Id: hpgltops.h,v 1.3 1998/03/17 22:00:22 mike Exp $".
+ * End of "$Id: hpgltops.h,v 1.4 1998/08/31 20:35:49 mike Exp $".
  */
