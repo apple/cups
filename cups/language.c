@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.20.2.25 2003/08/25 16:08:44 mike Exp $"
+ * "$Id: language.c,v 1.20.2.26 2003/09/11 23:01:52 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -342,11 +342,13 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   * chars...
   */
 
-#if defined(__APPLE__) || !defined(LC_CTYPE)
+#if defined(__APPLE__)
+  /* The ctype bug isn't in Apple's libc */
+#elif !defined(LC_CTYPE)
   oldlocale = _cupsSaveLocale(LC_ALL, "C");
 #else
   oldlocale = _cupsSaveLocale(LC_CTYPE, "C");
-#endif /* __APPLE__ || !LC_CTYPE */
+#endif /* __APPLE__ */
 
  /*
   * Parse the language string passed in to a locale string. "C" is the
@@ -370,32 +372,40 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     */
 
     for (ptr = langname; *language; language ++)
-      if (*language == '_' || *language == '-')
-      {
-        language ++;
+      if (*language == '_' || *language == '-' || *language == '.')
 	break;
-      }
       else if (ptr < (langname + sizeof(langname) - 1))
         *ptr++ = tolower(*language);
 
     *ptr = '\0';
 
-    for (ptr = country; *language; language ++)
-      if (*language == '.')
-      {
-        language ++;
-	break;
-      }
-      else if (ptr < (country + sizeof(country) - 1))
-        *ptr++ = toupper(*language);
+    if (*language == '_' || *language == '-')
+    {
+     /*
+      * Copy the country code...
+      */
 
-    *ptr = '\0';
+      for (language ++, ptr = country; *language; language ++)
+	if (*language == '.')
+	  break;
+	else if (ptr < (country + sizeof(country) - 1))
+          *ptr++ = toupper(*language);
 
-    for (ptr = charset; *language; language ++)
-      if (ptr < (charset + sizeof(charset) - 1))
-        *ptr++ = toupper(*language);
+      *ptr = '\0';
+    }
 
-    *ptr = '\0';
+    if (*language == '.')
+    {
+     /*
+      * Copy the encoding...
+      */
+
+      for (language ++, ptr = charset; *language; language ++)
+	if (ptr < (charset + sizeof(charset) - 1))
+          *ptr++ = toupper(*language);
+
+      *ptr = '\0';
+    }
 
    /*
     * Force a POSIX locale for an invalid language name...
@@ -413,11 +423,13 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   * Restore the locale...
   */
 
-#if defined(__APPLE__) || !defined(LC_CTYPE)
+#if defined(__APPLE__)
+  /* The ctype bug isn't in Apple's libc */
+#elif !defined(LC_CTYPE)
   _cupsRestoreLocale(LC_ALL, oldlocale);
 #else
   _cupsRestoreLocale(LC_CTYPE, oldlocale);
-#endif /* __APPLE__ || !LC_CTYPE */
+#endif /* __APPLE__ */
 
  /*
   * Figure out the desired encoding...
@@ -425,12 +437,15 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 
   encoding = CUPS_US_ASCII;
 
-  for (i = 0; i < (int)(sizeof(locale_encodings) / sizeof(locale_encodings[0])); i ++)
-    if (!strcmp(charset, locale_encodings[i]))
-    {
-      encoding = (cups_encoding_t)i;
-      break;
-    }
+  if (charset[0])
+  {
+    for (i = 0; i < (int)(sizeof(locale_encodings) / sizeof(locale_encodings[0])); i ++)
+      if (!strcasecmp(charset, locale_encodings[i]))
+      {
+	encoding = (cups_encoding_t)i;
+	break;
+      }
+  }
 
  /*
   * Now find the message catalog for this locale...
@@ -450,7 +465,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 
   snprintf(filename, sizeof(filename), "%s/%s/cups_%s", localedir, real, real);
 
-  if (access(filename, 0))
+  if (!country[0] || access(filename, 0))
   {
    /*
     * Country localization not available, look for generic localization...
@@ -702,15 +717,90 @@ _cupsSaveLocale(int        category,	/* I - Category */
 /*
  * Code & data to translate OSX's language names to their ISO 639-1 locale.
  *
- * In Radar bug #2563420 there's a request to have CoreFoundation export a
- * function to do this mapping. If this function gets implemented we should
- * use it.
+ * The first version uses the new CoreFoundation API added in 10.3 (Panther),
+ * the second is for 10.2 (Jaguar).
+ */
+
+#  ifdef HAVE_CF_LOCALE_ID
+/*
+ * 'appleLangDefault()' - Get the default locale string.
+ */
+
+static const char *			/* O - Locale string */
+appleLangDefault(void)
+{
+  CFPropertyListRef 	localizationList;
+					/* List of localization data */
+  CFStringRef		languageName;	/* Current name */
+  CFStringRef		localeName;	/* Canonical from of name */
+  static char		language[32] = "";
+					/* Cached language */
+
+
+ /*
+  * Only do the lookup and translation the first time.
+  */
+
+  if (!language[0])
+  {
+    localizationList =
+        CFPreferencesCopyAppValue(CFSTR("AppleLanguages"),
+                                  kCFPreferencesCurrentApplication);
+
+    if (localizationList != NULL)
+    {
+      if (CFGetTypeID(localizationList) == CFArrayGetTypeID() &&
+	  CFArrayGetCount(localizationList) > 0)
+      {
+        languageName = CFArrayGetValueAtIndex(localizationList, 0);
+
+        if (languageName != NULL &&
+            CFGetTypeID(languageName) == CFStringGetTypeID())
+        {
+	  localeName = CFLocaleCreateCanonicalLocaleIdentifierFromString(
+	                   kCFAllocatorDefault, languageName);
+
+	  if (localeName != NULL)
+	  {
+	    CFStringGetCString(localeName, language, sizeof(language),
+			       kCFStringEncodingASCII);
+	    CFRelease(localeName);
+
+	    if (!strcmp(language, "en"))
+	      strlcpy(language, "en_US.UTF-8", sizeof(language));
+	    else if (strchr(language, '.') == NULL)
+	      strlcat(language, ".UTF-8", sizeof(language));
+	  }
+        }
+      }
+
+      CFRelease(localizationList);
+    }
+  
+   /*
+    * If we didn't find the language, default to en_US...
+    */
+
+    if (!language[0])
+      strlcpy(language, "en_US.UTF-8", sizeof(language));
+  }
+
+ /*
+  * Return the cached locale...
+  */
+
+  return (language);
+}
+#  else
+/*
+ * Code & data to translate OSX 10.2's language names to their ISO 639-1
+ * locale.
  */
 
 typedef struct
 {
-  const char * const name;			/* Language name */
-  const char * const locale;			/* Locale name */
+  const char * const name;		/* Language name */
+  const char * const locale;		/* Locale name */
 } apple_name_locale_t;
 
 static const apple_name_locale_t apple_name_locale[] =
@@ -761,7 +851,7 @@ static const apple_name_locale_t apple_name_locale[] =
   { "Tigrinya"    , "ti.UTF-8" },	{ "Oromo"      , "om.UTF-8" },  
   { "Somali"      , "so.UTF-8" },	{ "Swahili"    , "sw.UTF-8" },
   { "Kinyarwanda" , "rw.UTF-8" },	{ "Rundi"      , "rn.UTF-8" },  
-  { "Nyanja"      , ""   },		{ "Malagasy"   , "mg.UTF-8" },
+  { "Nyanja"      , "" },		{ "Malagasy"   , "mg.UTF-8" },
   { "Esperanto"   , "eo.UTF-8" },	{ "Welsh"      , "cy.UTF-8" },  
   { "Basque"      , "eu.UTF-8" },	{ "Catalan"    , "ca.UTF-8" },
   { "Latin"       , "la.UTF-8" },	{ "Quechua"    , "qu.UTF-8" },  
@@ -781,14 +871,17 @@ static const apple_name_locale_t apple_name_locale[] =
  * 'appleLangDefault()' - Get the default locale string.
  */
 
-static const char *				/* O - Locale string */
+static const char *			/* O - Locale string */
 appleLangDefault(void)
 {
-  int			i;			/* Looping var */
-  CFPropertyListRef 	localizationList;	/* List of localization data */
-  CFStringRef		localizationName;	/* Current name */
-  char			buff[256];		/* Temporary buffer */
-  static const char	*language = NULL;	/* Cached language */
+  int			i;		/* Looping var */
+  CFPropertyListRef 	localizationList;
+					/* List of localization data */
+  CFStringRef		localizationName;
+					/* Current name */
+  char			buff[256];	/* Temporary buffer */
+  static const char	*language = NULL;
+					/* Cached language */
 
 
  /*
@@ -850,6 +943,7 @@ appleLangDefault(void)
 
   return (language);
 }
+#  endif /* HAVE_CF_LOCALE_ID */
 #endif /* __APPLE__ */
 
 
@@ -882,5 +976,5 @@ cups_cache_lookup(const char      *name,/* I - Name of locale */
 
 
 /*
- * End of "$Id: language.c,v 1.20.2.25 2003/08/25 16:08:44 mike Exp $".
+ * End of "$Id: language.c,v 1.20.2.26 2003/09/11 23:01:52 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.43 2003/08/22 22:02:34 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.44 2003/09/11 23:01:55 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -485,6 +485,12 @@ ReadConfiguration(void)
   */
 
   LogMessage(L_INFO, "Loaded configuration file \"%s\"", ConfigurationFile);
+
+ /*
+  * Set the default locale using the language and charset...
+  */
+
+  SetStringf(&DefaultLocale, "%s.%s", DefaultLanguage, DefaultCharset);
 
  /*
   * Update all relative filenames to include the full path from ServerRoot...
@@ -2313,5 +2319,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.43 2003/08/22 22:02:34 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.44 2003/09/11 23:01:55 mike Exp $".
  */

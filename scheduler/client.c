@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.69 2003/09/02 20:39:57 mike Exp $"
+ * "$Id: client.c,v 1.91.2.70 2003/09/11 23:01:53 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -823,23 +823,25 @@ IsCGI(client_t    *con,				/* I - Client connection */
  * 'ReadClient()' - Read data from a client.
  */
 
-int				/* O - 1 on success, 0 on error */
-ReadClient(client_t *con)	/* I - Client to read from */
+int					/* O - 1 on success, 0 on error */
+ReadClient(client_t *con)		/* I - Client to read from */
 {
-  char		line[32768],	/* Line from client... */
-		operation[64],	/* Operation code from socket */
-		version[64];	/* HTTP version number string */
-  int		major, minor;	/* HTTP version numbers */
-  http_status_t	status;		/* Transfer status */
-  ipp_state_t   ipp_state;	/* State of IPP transfer */
-  int		bytes;		/* Number of bytes to POST */
-  char		*filename;	/* Name of file for GET/HEAD */
-  char		buf[1024];	/* Buffer for real filename */
-  struct stat	filestats;	/* File information */
-  mime_type_t	*type;		/* MIME type of file */
-  printer_t	*p;		/* Printer */
-  location_t	*best;		/* Best match for authentication */
-  static unsigned request_id = 0;/* Request ID for temp files */
+  char		line[32768],		/* Line from client... */
+		operation[64],		/* Operation code from socket */
+		version[64],		/* HTTP version number string */
+		locale[64],		/* Locale */
+		*ptr;			/* Pointer into strings */
+  int		major, minor;		/* HTTP version numbers */
+  http_status_t	status;			/* Transfer status */
+  ipp_state_t   ipp_state;		/* State of IPP transfer */
+  int		bytes;			/* Number of bytes to POST */
+  char		*filename;		/* Name of file for GET/HEAD */
+  char		buf[1024];		/* Buffer for real filename */
+  struct stat	filestats;		/* File information */
+  mime_type_t	*type;			/* MIME type of file */
+  printer_t	*p;			/* Printer */
+  location_t	*best;			/* Best match for authentication */
+  static unsigned request_id = 0;	/* Request ID for temp files */
 
 
   status = HTTP_CONTINUE;
@@ -1054,9 +1056,39 @@ ReadClient(client_t *con)	/* I - Client to read from */
   if (status == HTTP_OK)
   {
     if (con->http.fields[HTTP_FIELD_ACCEPT_LANGUAGE][0])
-      con->language = cupsLangGet(con->http.fields[HTTP_FIELD_ACCEPT_LANGUAGE]);
+    {
+     /*
+      * Figure out the locale from the Accept-Language and Content-Type
+      * fields...
+      */
+
+      if ((ptr = strchr(con->http.fields[HTTP_FIELD_ACCEPT_LANGUAGE], ',')) != NULL)
+        *ptr = '\0';
+
+      if ((ptr = strchr(con->http.fields[HTTP_FIELD_ACCEPT_LANGUAGE], ';')) != NULL)
+        *ptr = '\0';
+
+      if ((ptr = strstr(con->http.fields[HTTP_FIELD_CONTENT_TYPE], "charset=")) != NULL)
+      {
+       /*
+        * Combine language and charset, and trim any extra params in the
+	* content-type.
+	*/
+
+        snprintf(locale, sizeof(locale), "%s.%s",
+	         con->http.fields[HTTP_FIELD_ACCEPT_LANGUAGE], ptr + 8);
+
+	if ((ptr = strchr(locale, ',')) != NULL)
+	  *ptr = '\0';
+      }
+      else
+        snprintf(locale, sizeof(locale), "%s.%s",
+	         con->http.fields[HTTP_FIELD_ACCEPT_LANGUAGE], DefaultCharset);
+        
+      con->language = cupsLangGet(locale);
+    }
     else
-      con->language = cupsLangGet(DefaultLanguage);
+      con->language = cupsLangGet(DefaultLocale);
 
     decode_auth(con);
 
@@ -2963,6 +2995,46 @@ pipe_command(client_t *con,		/* I - Client connection */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* POSIX signal handler */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+  static const char * const locale_encodings[] =
+		{			/* Locale charset names */
+		  "ASCII",	"ISO8859-1",	"ISO8859-2",	"ISO8859-3",
+		  "ISO8859-4",	"ISO8859-5",	"ISO8859-6",	"ISO8859-7",
+		  "ISO8859-8",	"ISO8859-9",	"ISO8859-10",	"UTF-8",
+		  "ISO8859-13",	"ISO8859-14",	"ISO8859-15",	"CP874",
+		  "CP1250",	"CP1251",	"CP1252",	"CP1253",
+		  "CP1254",	"CP1255",	"CP1256",	"CP1257",
+		  "CP1258",	"KOI8R",	"KOI8U",	"ISO8859-11",
+		  "ISO8859-16",	"",		"",		"",
+
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+
+		  "CP932",	"CP936",	"CP949",	"CP950",
+		  "CP1361",	"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+
+		  "EUC-CN",	"EUC-JP",	"EUC-KR",	"EUC-TW"
+		};
 
 
  /*
@@ -3020,8 +3092,12 @@ pipe_command(client_t *con,		/* I - Client connection */
   * Setup the environment variables as needed...
   */
 
-  snprintf(lang, sizeof(lang), "LANG=%s",
-           con->language ? con->language->language : "C");
+  if (con->language)
+    snprintf(lang, sizeof(lang), "LANG=%s.%s", con->language->language,
+             locale_encodings[con->language->encoding]);
+  else
+    strcpy(lang, "LANG=C");
+  
   sprintf(ipp_port, "IPP_PORT=%d", LocalPort);
 #ifdef AF_INET6
   if (con->http.hostaddr.addr.sa_family == AF_INET6)
@@ -3379,5 +3455,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.69 2003/09/02 20:39:57 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.70 2003/09/11 23:01:53 mike Exp $".
  */
