@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.13
 
+	- The pstops filter now supports printing N-up with the
+	  page-set option.
 	- The imagetoraster filter now supports direct printing
 	  of CMYK image data without conversion/correction.
 	- The IPP backend now reports printer state/error
