@@ -568,6 +568,42 @@ private:
 };
 
 //------------------------------------------------------------------------
+// GfxRadialShading
+//------------------------------------------------------------------------
+
+class GfxRadialShading: public GfxShading {
+public:
+
+  GfxRadialShading(double x0A, double y0A, double r0A,
+		   double x1A, double y1A, double r1A,
+		   double t0A, double t1A,
+		   Function **funcsA, int nFuncsA,
+		   GBool extend0A, GBool extend1A);
+  virtual ~GfxRadialShading();
+
+  static GfxRadialShading *parse(Dict *dict);
+
+  void getCoords(double *x0A, double *y0A, double *x1A, double *y1A)
+    { *x0A = x0; *y0A = y0; *x1A = x1; *y1A = y1; }
+  void getRadii(double *r0A, double *r1A)
+    { *r0A = r0; *r1A = r1; }
+  double getDomain0() { return t0; }
+  double getDomain1() { return t1; }
+  void getColor(double t, GfxColor *color);
+  GBool getExtend0() { return extend0; }
+  GBool getExtend1() { return extend1; }
+
+private:
+
+  double x0, y0, x1, y1;
+  double r0, r1;
+  double t0, t1;
+  Function *funcs[gfxColorMaxComps];
+  int nFuncs;
+  GBool extend0, extend1;
+};
+
+//------------------------------------------------------------------------
 // GfxImageColorMap
 //------------------------------------------------------------------------
 
