@@ -1,5 +1,5 @@
 /*
- * "$Id: language.h,v 1.18.2.4 2002/01/29 20:28:02 mike Exp $"
+ * "$Id: language.h,v 1.18.2.5 2002/01/30 12:39:22 mike Exp $"
  *
  *   Multi-language support for the Common UNIX Printing System (CUPS).
  *
@@ -183,7 +183,7 @@ typedef enum			/**** Language Encodings ****/
   CUPS_WINDOWS_1257,
   CUPS_WINDOWS_1258,
   CUPS_KOI8_R,
-  CUPS_KOI8_U,
+  CUPS_KOI8_U
 } cups_encoding_t;
 
 typedef struct cups_lang_str	/**** Language Cache Structure ****/
@@ -220,5 +220,5 @@ extern cups_lang_t	*cupsLangGet(const char *language);
 #endif /* !_CUPS_LANGUAGE_H_ */
 
 /*
- * End of "$Id: language.h,v 1.18.2.4 2002/01/29 20:28:02 mike Exp $".
+ * End of "$Id: language.h,v 1.18.2.5 2002/01/30 12:39:22 mike Exp $".
  */
