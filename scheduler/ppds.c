@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.14 2001/01/22 15:04:01 mike Exp $"
+ * "$Id: ppds.c,v 1.14.2.1 2001/05/13 18:38:38 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -568,8 +568,6 @@ load_ppds(const char *d,		/* I - Actual directory */
 	*ptr = '\0';
       else if (strncasecmp(manufacturer, "agfa", 4) == 0)
 	strcpy(manufacturer, "AGFA");
-      else if (strncasecmp(manufacturer, "ps-ipu", 6) == 0)
-	strcpy(manufacturer, "Canon");
       else if (strncasecmp(manufacturer, "herk", 4) == 0)
 	strcpy(manufacturer, "Linotype");
       else
@@ -589,8 +587,13 @@ load_ppds(const char *d,		/* I - Actual directory */
 	strcpy(manufacturer, "Seiko");
       else if (strcasecmp(manufacturer, "fiery") == 0)
 	strcpy(manufacturer, "EFI");
+      else if (strcasecmp(manufacturer, "ps") == 0 ||
+               strcasecmp(manufacturer, "colorpass") == 0)
+	strcpy(manufacturer, "Canon");
       else if (strncasecmp(manufacturer, "primera", 7) == 0)
 	strcpy(manufacturer, "Fargo");
+      else if (strcasecmp(manufacturer, "designjet") == 0)
+	strcpy(manufacturer, "HP");
     }
 
    /*
@@ -658,5 +661,5 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * End of "$Id: ppds.c,v 1.14 2001/01/22 15:04:01 mike Exp $".
+ * End of "$Id: ppds.c,v 1.14.2.1 2001/05/13 18:38:38 mike Exp $".
  */

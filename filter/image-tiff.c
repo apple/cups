@@ -1,5 +1,5 @@
 /*
- * "$Id: image-tiff.c,v 1.17 2001/01/22 15:03:39 mike Exp $"
+ * "$Id: image-tiff.c,v 1.17.2.1 2001/05/13 18:38:18 mike Exp $"
  *
  *   TIFF file routines for the Common UNIX Printing System (CUPS).
  *
@@ -96,21 +96,48 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 
   if ((tif = TIFFFdOpen(fileno(fp), "", "r")) == NULL)
   {
+    fputs("ERROR: TIFFFdOpen() failed!\n", stderr);
     fclose(fp);
     return (-1);
   }
 
-  if (!TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &width) ||
-      !TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &height) ||
-      !TIFFGetField(tif, TIFFTAG_PHOTOMETRIC, &photometric) ||
-      !TIFFGetField(tif, TIFFTAG_COMPRESSION, &compression) ||
-      !TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &samples) ||
-      !TIFFGetField(tif, TIFFTAG_BITSPERSAMPLE, &bits))
+  if (!TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &width))
   {
+    fputs("ERROR: No image width tag in the file!\n", stderr);
     TIFFClose(tif);
     fclose(fp);
     return (-1);
   }
+
+  if (!TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &height))
+  {
+    fputs("ERROR: No image height tag in the file!\n", stderr);
+    TIFFClose(tif);
+    fclose(fp);
+    return (-1);
+  }
+
+  if (!TIFFGetField(tif, TIFFTAG_PHOTOMETRIC, &photometric))
+  {
+    fputs("ERROR: No photometric tag in the file!\n", stderr);
+    TIFFClose(tif);
+    fclose(fp);
+    return (-1);
+  }
+
+  if (!TIFFGetField(tif, TIFFTAG_COMPRESSION, &compression))
+  {
+    fputs("ERROR: No compression tag in the file!\n", stderr);
+    TIFFClose(tif);
+    fclose(fp);
+    return (-1);
+  }
+
+  if (!TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &samples))
+    samples = 1;
+
+  if (!TIFFGetField(tif, TIFFTAG_BITSPERSAMPLE, &bits))
+    bits = 1;
 
  /*
   * Get the image orientation...
@@ -1657,5 +1684,5 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-tiff.c,v 1.17 2001/01/22 15:03:39 mike Exp $".
+ * End of "$Id: image-tiff.c,v 1.17.2.1 2001/05/13 18:38:18 mike Exp $".
  */

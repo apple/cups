@@ -1,27 +1,27 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>
 <HEAD>
-<TITLE> CUPS Software Administrators Manual</TITLE>
+<TITLE>CUPS Software Administrators Manual</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
 <META NAME="copyright" CONTENT="Copyright 1997-2001, All Rights Reserved">
 <META NAME="docnumber" CONTENT="CUPS-SAM-1.1.7">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
 <STYLE TYPE="text/css"><!--
-BODY { font-family: serif; font-size: 11.0pt }
-H1 { font-family: sans-serif; font-size: 20.0pt }
-H2 { font-family: sans-serif; font-size: 17.0pt }
-H3 { font-family: sans-serif; font-size: 14.0pt }
-H4 { font-family: sans-serif; font-size: 11.0pt }
-H5 { font-family: sans-serif; font-size: 9.0pt }
-H6 { font-family: sans-serif; font-size: 8.0pt }
-SUB { font-size: 8.0pt }
-SUP { font-size: 8.0pt }
-PRE { font-size: 9.0pt }
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
 --></STYLE>
 </HEAD>
 <BODY BGCOLOR="#ffffff">
-<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="100%"><BR>
-<H1> CUPS Software Administrators Manual</H1></A><BR>
+<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
+<H1>CUPS Software Administrators Manual</H1></A><BR>
 CUPS-SAM-1.1.7<BR>
 Easy Software Products<BR>
 Copyright 1997-2001, All Rights Reserved<BR>
@@ -123,6 +123,7 @@ Copyright 1997-2001, All Rights Reserved<BR>
 <LI><A HREF="#BrowseShortNames">BrowseShortNames</A></LI>
 <LI><A HREF="#BrowseTimeout">BrowseTimeout</A></LI>
 <LI><A HREF="#Browsing">Browsing</A></LI>
+<LI><A HREF="#Classification">Classification</A></LI>
 <LI><A HREF="#DataDir">DataDir</A></LI>
 <LI><A HREF="#DefaultCharset">DefaultCharset</A></LI>
 <LI><A HREF="#DefaultLanguage">DefaultLanguage</A></LI>
@@ -145,6 +146,8 @@ Copyright 1997-2001, All Rights Reserved<BR>
 <LI><A HREF="#LogLevel">LogLevel</A></LI>
 <LI><A HREF="#MaxClients">MaxClients</A></LI>
 <LI><A HREF="#MaxJobs">MaxJobs</A></LI>
+<LI><A HREF="#MaxJobsPerPrinter">MaxJobsPerPrinter</A></LI>
+<LI><A HREF="#MaxJobsPerUser">MaxJobsPerUser</A></LI>
 <LI><A HREF="#MaxLogSize">MaxLogSize</A></LI>
 <LI><A HREF="#MaxRequestSize">MaxRequestSize</A></LI>
 <LI><A HREF="#Order">Order</A></LI>
@@ -279,7 +282,6 @@ are used to support non-PostScript printers. Sample drivers for HP and
 EPSON printers are included that use these filters. </P>
 
 <!-- NEED 3in -->
-
 <H2><A NAME="1_2">Document Overview</A></H2>
 <P>This software administrators manual is organized into the following 
 sections:</P>
@@ -583,7 +585,6 @@ by typing: </P>
 </UL>
 
 <!-- NEED 4in -->
-
 <H2><A NAME="BINARY">Installing a Binary Distribution</A></H2>
 <P>CUPS comes in a variety of binary distribution formats. Easy 
 Software Products provides binaries in TAR format with installation and 
@@ -1064,6 +1065,7 @@ determine how the server operates: </P>
 <LI><A HREF="#BrowseShortNames"><CODE>BrowseShortNames</CODE></A></LI>
 <LI><A HREF="#BrowseTimeout"><CODE>BrowseTimeout</CODE></A></LI>
 <LI><A HREF="#Browsing"><CODE>Browsing</CODE></A></LI>
+<LI><A HREF="#Classification"><CODE>Classification</CODE></A></LI>
 <LI><A HREF="#DataDir"><CODE>DataDir</CODE></A></LI>
 <LI><A HREF="#DefaultCharset"><CODE>DefaultCharset</CODE></A></LI>
 <LI><A HREF="#DefaultLanguage"><CODE>DefaultLanguage</CODE></A></LI>
@@ -1087,12 +1089,14 @@ determine how the server operates: </P>
 <LI><A HREF="#LogLevel"><CODE>LogLevel</CODE></A></LI>
 <LI><A HREF="#MaxClients"><CODE>MaxClients</CODE></A></LI>
 <LI><A HREF="#MaxJobs"><CODE>MaxJobs</CODE></A></LI>
+<LI><A HREF="#MaxJobsPerPrinter"><CODE>MaxJobsPerPrinter</CODE></A></LI>
+<LI><A HREF="#MaxJobsPerUser"><CODE>MaxJobsPerUser</CODE></A></LI>
 <LI><A HREF="#MaxLogSize"><CODE>MaxLogSize</CODE></A></LI>
 <LI><A HREF="#MaxRequestSize"><CODE>MaxRequestSize</CODE></A></LI>
 <LI><A HREF="#Order"><CODE>Order</CODE></A></LI>
 <LI><A HREF="#PageLog"><CODE>PageLog</CODE></A></LI>
-<LI><A HREF="#Port"><CODE>Port</CODE></A></LI>
 </TD><TD VALIGN="TOP"> &nbsp;&nbsp;&nbsp; </TD><TD VALIGN="TOP">
+<LI><A HREF="#Port"><CODE>Port</CODE></A></LI>
 <LI><A HREF="#PreserveJobFiles"><CODE>PreserveJobFiles</CODE></A></LI>
 <LI><A HREF="#PreserveJobHistory"><CODE>PreserveJobHistory</CODE></A></LI>
 <LI><A HREF="#Printcap"><CODE>Printcap</CODE></A></LI>
@@ -1120,7 +1124,6 @@ determine how the server operates: </P>
 </UL>
 
 <!-- NEED 3in -->
-
 <H3><A NAME="AccessLog">AccessLog</A></H3>
 <HR>
 <H4>Examples</H4>
@@ -1143,7 +1146,6 @@ web access reporting tool to generate a report on CUPS server activity. </P>
 to the system log instead of a plain file. </P>
 <P>The default access log file is <VAR>/var/log/cups/access_log</VAR>. 
 <!-- NEED 6in -->
-
 </P>
 <H3><A NAME="Allow">Allow</A></H3>
 <HR>
@@ -1377,7 +1379,6 @@ allow/deny processing. The default order is <CODE>deny,allow</CODE>: </P>
 </UL>
 
 <!-- NEED 3in -->
-
 <H3><A NAME="BrowseInterval">BrowseInterval</A></H3>
 <HR>
 <H4>Examples</H4>
@@ -1530,6 +1531,27 @@ work. This problem appears to be fixed in  HP-UX 11.0. </P>
 
 <!-- NEED 3in -->
 </P>
+<H3><A NAME="Classification">Classification</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+Classification
+Classification classified
+Classification confidential
+Classification secret
+Classification topsecret
+Classification unclassified
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>Classification</CODE> directive sets the classification 
+level on the server. When this option is set, at least one of the 
+banner pages is forced to the classification level, and the 
+classification is placed on each page of output. The default is no 
+classification level. 
+<!-- NEED 3in -->
+</P>
 <H3><A NAME="DataDir">DataDir</A></H3>
 <HR>
 <H4>Examples</H4>
@@ -1559,7 +1581,6 @@ set to use for client connections. The default character set is <CODE>
 utf-8</CODE> but is overridden by the character set for the language 
 specified by the client or the <CODE>DefaultLanguage</CODE> directive. 
 <!-- NEED 3in -->
-
 </P>
 <H3><A NAME="DefaultLanguage">DefaultLanguage</A></H3>
 <HR>
@@ -1736,7 +1757,6 @@ Group root
 filter and CGI programs run as. The default group is <CODE>sys</CODE>, <CODE>
 system</CODE>, or <CODE>root</CODE> depending on the operating system. 
 <!-- NEED 3in -->
-
 </P>
 <H3><A NAME="HostNameLookups">HostNameLookups</A></H3>
 <HR>
@@ -1952,7 +1972,6 @@ server from running. </LI>
 </UL>
 
 <!-- NEED 3in -->
-
 <H3><A NAME="MaxClients">MaxClients</A></H3>
 <HR>
 <H4>Examples</H4>
@@ -1995,8 +2014,46 @@ jobs that are kept in memory. Once the number of jobs reaches the
 limit, the oldest completed job is automatically purged from the system 
 to make room for the new one. If all of the known jobs are still 
 pending or active then the new job will be rejected. </P>
-<P>Setting the maximum size to 0 disables this functionality. The 
-default setting is 0. 
+<P>Setting the maximum to 0 disables this functionality. The default 
+setting is 0. 
+<!-- NEED 3in -->
+</P>
+<H3><A NAME="MaxJobsPerPrinter">MaxJobsPerPrinter</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+MaxJobsPerPrinter 100
+MaxJobsPerPrinter 9999
+MaxJobsPerPrinter 0
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>MaxJobsPerPrinter</CODE> directive controls the maximum 
+number of active jobs that are allowed for each printer or class. Once 
+a printer or class reaches the limit, new jobs will be rejected until 
+one of the active jobs is completed, stopped, aborted, or cancelled. </P>
+<P>Setting the maximum to 0 disables this functionality. The default 
+setting is 0. 
+<!-- NEED 3in -->
+</P>
+<H3><A NAME="MaxJobsPerUser">MaxJobsPerUser</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+MaxJobsPerUser 100
+MaxJobsPerUser 9999
+MaxJobsPerUser 0
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>MaxJobsPerUser</CODE> directive controls the maximum 
+number of active jobs that are allowed for each user. Once a user 
+reaches the limit, new jobs will be rejected until one of the active 
+jobs is completed, stopped, aborted, or cancelled. </P>
+<P>Setting the maximum to 0 disables this functionality. The default 
+setting is 0. 
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="MaxLogSize">MaxLogSize</A></H3>
@@ -2167,7 +2224,6 @@ PrintcapFormat Solaris
 <P>The <CODE>PrintcapFormat</CODE> directive controls the output format 
 of the printcap file. The default is to generate a BSD printcap file. 
 <!-- NEED 3in -->
-
 </P>
 <H3><A NAME="RemoteRoot">RemoteRoot</A></H3>
 <HR>
@@ -2411,7 +2467,6 @@ appropriate temporary directory called <VAR>/foo/bar/tmp</VAR>: </P>
 </UL>
 
 <!-- NEED 3in -->
-
 <H3><A NAME="Timeout">Timeout</A></H3>
 <HR>
 <H4>Examples</H4>
@@ -2557,7 +2612,6 @@ AuthType Basic
 </UL>
 
 <!-- NEED 7in -->
-
 <H3><A NAME="7_5_3">Using Digest Authentication</A></H3>
 <P>Digest authentication uses users and passwords defined in the <VAR>
 /etc/cups/passwd.md5</VAR> file to authenticate access to resources 
@@ -2604,7 +2658,6 @@ Password again: <B>(password) ENTER</B> [password is not echoed]
 </UL>
 
 <!-- NEED 2in -->
-
 <P>Once added, a user can change his/her password by typing: </P>
 <UL>
 <PRE>
@@ -2616,7 +2669,6 @@ Password again: <B>(password) ENTER</B> [password is not echoed]
 </UL>
 
 <!-- NEED 1in -->
-
 <P>To remove a user from the password file, type: </P>
 <UL>
 <PRE>
@@ -2673,7 +2725,6 @@ Password again: <B>(password) ENTER</B> [password is not echoed]
 </UL>
 
 <!-- NEW PAGE -->
-
 <H2><A NAME="PRINTER_ACCOUNTING">Printer Accounting</A></H2>
 <P>ESP Print Pro maintains a log of all accesses, errors, and pages 
 that are printed. The log files are normally stored in the <VAR>
@@ -3010,7 +3061,6 @@ lwsrv -n &quot;<I>Name</I>&quot; -p <I>printer</I> -a /usr/lib/adicts -f /usr/li
 <P>where <CODE>Name</CODE> is the name you want to use when sharing the 
 printer, and <CODE>printer</CODE> is the name of the CUPS print queue. 
 <!-- NEED 3in -->
-
 </P>
 <H3><A NAME="8_4_2">XINET KA/Spool</A></H3>
 <P>To use your system as a print server for Mac OS clients, configure 
@@ -3048,7 +3098,6 @@ Printer Description:MyPrinter@MyServer:\
 </UL>
 
 <!-- NEED 2in -->
-
 <H2><A NAME="8_5">Printing to Mac OS Servers</A></H2>
 <P>CUPS currently does not provide a backend to communicate with a Mac 
 OS server. However, you can write and install a short shell script in 
@@ -3119,7 +3168,6 @@ exit 0
 </UL>
 
 <!-- NEED 2in -->
-
 <H2><A NAME="8_6">Printing from Windows Clients</A></H2>
 <P>While CUPS does not provide Windows support directly, the free SAMBA 
 software package does. SAMBA version 2.0.6 is the first release of 
@@ -3257,7 +3305,6 @@ find out more at our web site: </P>
 </UL>
 
 <!-- NEW PAGE -->
-
 <H2><A NAME="9_2">GNU GENERAL PUBLIC LICENSE</A></H2>
 <P>Version 2, June 1991 </P>
 <PRE>
@@ -3515,7 +3562,6 @@ DAMAGES. </LI>
 <H4>END OF TERMS AND CONDITIONS</H4>
 
 <!-- NEW PAGE -->
-
 <H2><A NAME="9_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A></H2>
 <P>Version 2, June 1991 </P>
 <PRE>
@@ -3981,7 +4027,6 @@ myprinter 08:00:69:00:12:34 192.0.2.2 <VAR>myprinter.boot</VAR>
 </UL>
 
 <!-- NEED 1in -->
-
 <P>Newer versions of <CODE>bootpd</CODE> use a different format: </P>
 <UL>
 <PRE>
@@ -4041,7 +4086,6 @@ URI(s)</TH></TR>
 address</I>/PASSTHRU</TD></TR>
 
 <!-- NEED 1in -->
-
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Axis w/o IPP
 <BR><A HREF="#AXIS"> (see directions)</A></TD><TD>socket://<I>address</I>
 :9100
@@ -4049,21 +4093,18 @@ address</I>/PASSTHRU</TD></TR>
 <BR> socket://<I>address</I>:9102</TD></TR>
 
 <!-- NEED 1in -->
-
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Axis w/IPP</TD><TD>ipp://<I>address</I>
 /LPT1
 <BR> ipp://<I>address</I>/LPT2
 <BR> ipp://<I>address</I>/COM1</TD></TR>
 
 <!-- NEED 1in -->
-
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Castelle LANpress<SUP>TM</SUP></TD><TD>
 lpd://<I>address</I>/pr1
 <BR> lpd://<I>address</I>/pr2
 <BR> lpd://<I>address</I>/pr3</TD></TR>
 
 <!-- NEED 1in -->
-
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>DPI NETPrint</TD><TD>lpd://<I>address</I>
 /pr1
 <BR> lpd://<I>address</I>/pr2
@@ -4074,21 +4115,18 @@ address</I>/print</TD></TR>
 Interface Board</TD><TD>socket://<I>address</I></TD></TR>
 
 <!-- NEED 1in -->
-
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Extended System ExtendNET</TD><TD>
 lpd://<I>address</I>/pr1
 <BR> lpd://<I>address</I>/pr2
 <BR> lpd://<I>address</I>/pr3</TD></TR>
 
 <!-- NEED 1in -->
-
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Hewlett Packard JetDirect w/o IPP</TD><TD>
 socket://<I>address</I>:9100
 <BR> socket://<I>address</I>:9101
 <BR> socket://<I>address</I>:9102</TD></TR>
 
 <!-- NEED 1in -->
-
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Hewlett Packard JetDirect w/IPP</TD><TD>
 ipp://<I>address</I>/ipp
 <BR> ipp://<I>address</I>/ipp/port1
@@ -4096,7 +4134,6 @@ ipp://<I>address</I>/ipp
 <BR> ipp://<I>address</I>/ipp/port3</TD></TR>
 
 <!-- NEED 1in -->
-
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Intel&reg; NetportExpress XL, PRO/100</TD><TD>
 lpd://<I>address</I>/LPT1_PASSTHRU
 <BR> lpd://<I>address</I>/LPT2_PASSTHRU
@@ -4105,7 +4142,6 @@ lpd://<I>address</I>/LPT1_PASSTHRU
 lpd://<I>address</I>/ps</TD></TR>
 
 <!-- NEED 1in -->
-
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Linksys EtherFast&reg;
 <BR><A HREF="#LINKSYS"> (see directions)</A></TD><TD>socket://<I>address</I>
 :4010
@@ -4159,7 +4195,6 @@ ftp&gt; <B>quit ENTER</B>
 </UL>
 
 <!-- NEED 2in -->
-
 <P>Next, edit the file with your favorite text editor and locate the 
 lines beginning with: </P>
 <UL>
@@ -4185,7 +4220,6 @@ RTN_OPT.     : <B>NO</B>
 </UL>
 
 <!-- NEED 2in -->
-
 <P>This disables the Reverse TELNET protocol and enables the standard 
 TELNET protocol on the print server. Next, assign a port number for 
 each parallel and serial port on the server as follows: </P>
@@ -4203,7 +4237,6 @@ RTEL_PR8.    : <B>9107</B>
 </UL>
 
 <!-- NEED 4in -->
-
 <P>This essentially makes the Axis print server look like a Hewlett 
 Packard JetDirect EX print server. Save the file and then upload the 
 new <VAR>config</VAR> file using the <CODE>ftp</CODE> command: </P>
@@ -4262,7 +4295,6 @@ ftp&gt; <B>quit ENTER</B>
 </UL>
 
 <!-- NEED 2in -->
-
 <P>Next, edit the file with your favorite text editor and locate the 
 lines beginning with: </P>
 <UL>
@@ -4283,7 +4315,6 @@ server as follows: </P>
 </UL>
 
 <!-- NEED 4in -->
-
 <P>This maps each virtual printer with a physical port. Save the file 
 and then upload the new <VAR>CONFIG</VAR> file using the <CODE>ftp</CODE>
  command: </P>
@@ -4541,7 +4572,6 @@ ways to minimize them. </P>
 </CENTER>
 
 <!-- NEED 4in -->
-
 <H2><A NAME="13_4">I Can't Do Administration Tasks from My Web Browser!</A>
 </H2>
 <P>This problem is usually caused by: </P>

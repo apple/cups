@@ -1,5 +1,46 @@
-CHANGES.txt - 03/29/2001
+CHANGES.txt - 05/07/2001
 ------------------------
+
+CHANGES IN CUPS V1.1.8
+
+	- Updated spec file to generate separate cups-pstoraster
+	  package for pstoraster.
+	- The spec file wasn't setting LOGDIR in the install.
+	- The scheduler might restart a stopped printer after
+	  stopping a print job. Thanks to Florent
+	  Guiliani for finding this bug!
+	- The init script showed run level 0 for the Red Hat
+	  chkconfig program.  This is incorrect because Red Hat
+	  doesn't use run level 0 for shutdown scripts.
+	- The IPP backend did not handle the
+	  client-error-not-found error when checking the status
+	  of the job that was sent.  This caused remote queues
+	  to stop on client machines when the server had job
+	  history disabled.
+	- Added httpConnectEncrypt() function to avoid
+	  performance penalty for setting up encrypted
+	  connections initially.
+	- Use httpConnectEncrypt() in all client apps and in the
+	  CUPS API to ensure consistent usage of encryption
+	  throughout.
+	- Jobs weren't queued to remote classes (fix from
+	  Richard Begg.)
+	- AIX changes from Richard Begg.
+	- Fixed the pstops fix for GNOME output - no longer use
+	  the page numbers in the %%Page: comment since GNOME
+	  puts a filename instead (!?@!#?!).  There is still an
+	  issue with N-up printing since GNOME defines its fonts
+	  in the first page instead of the document setup section
+	  (pages must be independent according to the DSC spec)
+	  People with GNOME printing problems should consult bug
+	  #54489...
+	- The imagetops filter produced PAGE: messages when
+	  generating PostScript for a non-PostScript printer
+	  (only affects page-label and Classification
+	   options.)
+	- The updated pdftops filter was looking for an options
+	  file called xpdf.conf instead of pdftops.conf.
+
 
 CHANGES IN CUPS V1.1.7
 
@@ -13,9 +54,9 @@ CHANGES IN CUPS V1.1.7
 	- All scheduler configuration files are now case
 	  insensitive to match Apache.
 	- Added support for Apache ListenBackLog, LogFormat,
-	  PassEnv, SetEnv, UnsetEnv, Require, UseCanonicalName,
-	  Satisfy, <Limit>, <LimitExcept>, LimitRequestSize, and
-	  Options directives.
+	  Require, UseCanonicalName, Satisfy, <Limit>,
+	  <LimitExcept>, LimitRequestSize, and Options
+	  directives.
 	- Added support for all Apache log levels...
 	- Added support for "double" HostNameLookups.
 	- Added new "RunAsUser" directive to support non-root
@@ -133,8 +174,65 @@ CHANGES IN CUPS V1.1.7
 	  clients or start print jobs as the load allows.
 	- Fixed a bug in the Set-Job-Attributes code that could
 	  crash the scheduler (patch from Martin Zielinski)
-	- cupsSetDests() did not quote option values with embedded
-	  spaces.
+	- cupsSetDests() did not quote option values with
+	  embedded spaces.
+	- Added support for the Enable-Printer and
+	  Disable-Printer extension operations (same as
+	  CUPS-Accept-Jobs and CUPS-Reject-Jobs.)
+	- The AppSocket and IPP backends now wait for the print
+	  job to be finished before exiting; this should prevent
+	  the loss of print jobs with older JetDirect firmware
+	  and make consecutive print jobs print faster.
+	- The BMP loading code did not handle resolution values
+	  of 0.  This is a problem with BMP image files produced
+	  by the GIMP.
+	- The HTTP Upgrade code (upgrade to TLS encryption)
+	  bypassed the authentication checks.
+	- The HTTP Upgrade code did not send a 426 status code
+	  to the client and end the current request. This caused
+	  a race condition between the client and server for the
+	  upgrade to TLS.
+	- Fixed a bug in the EOF and Trailer detection code in
+	  the pstops filter.
+	- The imagetoraster filter did not add the margins to
+	  the custom page size in the raster header.
+	- The imagetops filter did not adjust the custom page
+	  size to the size of the printed image.
+	- The imagetops filter did not include DSC comments
+	  which are required by some printers.
+	- The imagetops filter did not insert newlines in
+	  Base85 encoded output, causing files to contain
+	  lines longer than 255 characters (violation of the
+	  DSC).
+	- Added support for the DeskJet 900 series duplexer
+	  and CRET color modes in the HP driver.
+	- Added support for PPD-defined margins in the HP
+	  driver.
+	- Fixed the debugging output from pstoraster - the
+	  font list was not terminated by a newline.
+	- Some versions of the HP-UX pam_unix authentication
+	  module apparently do not pass the appdata_ptr argument
+	  to the conversation function, preventing the scheduler
+	  from authenticating users using PAM under HP-UX.  A
+	  workaround using a static variable has been added to
+	  address this problem.
+	- Fixed a bug in the scheduler SortPrinters() function
+	  that could cause printers to disappear or the
+	  scheduler to crash when adding a printer.
+	- Changed the pstops filter to not do per-page filtering
+	  if the file does not conform to at least version 3.0
+	  of the document structuring conventions.  This seems
+	  to "fix" printing with broken apps.
+	- The image filters did not handle older TIFF files that
+	  lacked the samples-per-pixel and bits-per-pixel tags.
+	- Added new cupsGetJobs() and cupsFreeJobs() functions
+	  to manage print jobs.
+	- cupsEncodeOptions() would encode names of 0 length and
+	  cupsAddOption() and cupsParseOptions() would add names
+	  of 0 length.
+	- The scheduler might block waiting for status messages
+	  after starting a new print job. Thanks to Florent
+	  Guiliani for finding this bug!
 
 
 CHANGES IN CUPS V1.1.6-3

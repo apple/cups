@@ -80,11 +80,11 @@ PDFDoc::PDFDoc(GString *fileName1, GString *userPassword) {
   ok = setup(userPassword);
 }
 
-PDFDoc::PDFDoc(BaseStream *str, GString *userPassword) {
+PDFDoc::PDFDoc(BaseStream *nstr, GString *userPassword) {
   ok = gFalse;
   fileName = NULL;
   file = NULL;
-  this->str = str;
+  str = nstr;
   xref = NULL;
   catalog = NULL;
   links = NULL;
@@ -168,8 +168,8 @@ void PDFDoc::checkHeader() {
   }
 }
 
-void PDFDoc::displayPage(OutputDev *out, int page, int zoom, int rotate,
-			 GBool doLinks) {
+void PDFDoc::displayPage(OutputDev *out, int page, double zoom,
+			 int rotate, GBool doLinks) {
   Page *p;
 
   if (printCommands) {
@@ -237,6 +237,7 @@ GBool PDFDoc::saveAs(GString *name) {
   while ((c = str->getChar()) != EOF) {
     fputc(c, f);
   }
+  str->close();
   fclose(f);
   return gTrue;
 }

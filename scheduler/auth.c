@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.41.2.1 2001/04/02 19:51:46 mike Exp $"
+ * "$Id: auth.c,v 1.41.2.2 2001/05/13 18:38:33 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -62,6 +62,9 @@
 #if HAVE_LIBPAM
 #  include <security/pam_appl.h>
 #endif /* HAVE_LIBPAM */
+#ifdef HAVE_USERSEC_H
+#  include <usersec.h>
+#endif /* HAVE_USERSEC_H */
 
 
 /*
@@ -76,6 +79,15 @@ static char		*get_md5_passwd(const char *username, const char *group,
 static int		pam_func(int, const struct pam_message **,
 			         struct pam_response **, void *);
 #endif /* HAVE_LIBPAM */
+
+
+/*
+ * Local globals...
+ */
+
+#ifdef __hpux
+static client_t		*auth_client;	/* Current client being authenticated */
+#endif /* __hpux */
 
 
 /*
@@ -539,7 +551,8 @@ FindBest(client_t *con)		/* I - Connection */
 
   for (i = NumLocations, loc = Locations; i > 0; i --, loc ++)
   {
-    DEBUG_printf(("Location %s Limit %x\n", loc->location, loc->limit));
+    LogMessage(L_DEBUG2, "FindBest: Location %s Limit %x",
+               loc->location, loc->limit);
 
     if (loc->length > bestlen &&
         strncmp(con->uri, loc->location, loc->length) == 0 &&
@@ -554,6 +567,8 @@ FindBest(client_t *con)		/* I - Connection */
  /*
   * Return the match, if any...
   */
+
+  LogMessage(L_DEBUG2, "FindBest: best = %s", best ? best->location : "NONE");
 
   return (best);
 }
@@ -602,6 +617,10 @@ IsAuthorized(client_t *con)	/* I - Connection */
   pam_handle_t	*pamh;		/* PAM authentication handle */
   int		pamerr;		/* PAM error code */
   struct pam_conv pamdata;	/* PAM conversation data */
+#elif defined(HAVE_USERSEC_H)
+  char		*authmsg;	/* Authentication message */
+  char		*loginmsg;	/* Login message */
+  int		reenter;	/* ??? */
 #else
   char		*pass;		/* Encrypted password */
 #  ifdef HAVE_SHADOW_H
@@ -627,18 +646,15 @@ IsAuthorized(client_t *con)	/* I - Connection */
 		};
 
 
+  LogMessage(L_DEBUG2, "IsAuthorized: URI = %s", con->uri);
+
  /*
   * Find a matching location; if there is no match then access is
   * not authorized...
   */
 
   if ((best = FindBest(con)) == NULL)
-  {
-    DEBUG_printf(("FindBest(%s, %s) failed!\n", states[con->http.state],
-                  con->uri));
-
     return (HTTP_FORBIDDEN);
-  }
 
  /*
   * Check host/ip-based accesses...
@@ -724,6 +740,9 @@ IsAuthorized(client_t *con)	/* I - Connection */
     }
   }
 
+  LogMessage(L_DEBUG2, "IsAuthorized: auth = %d, satisfy=%d...",
+             auth, best->satisfy);
+
   if (auth == AUTH_DENY && best->satisfy == AUTH_SATISFY_ALL)
     return (HTTP_FORBIDDEN);
 
@@ -733,7 +752,10 @@ IsAuthorized(client_t *con)	/* I - Connection */
   */
 
   if (best->encryption >= HTTP_ENCRYPT_REQUIRED && !con->http.tls)
+  {
+    LogMessage(L_DEBUG2, "IsAuthorized: Need upgrade to TLS...");
     return (HTTP_UPGRADE_REQUIRED);
+  }
 #endif /* HAVE_LIBSSL */
 
  /*
@@ -743,6 +765,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
   if (best->level == AUTH_ANON)		/* Anonymous access - allow it */
     return (HTTP_OK);
 
+  LogMessage(L_DEBUG2, "IsAuthorized: username = \"%s\" password = %d chars",
+	     con->username, strlen(con->password));
   DEBUG_printf(("IsAuthorized: username = \"%s\", password = \"%s\"\n",
 		con->username, con->password));
 
@@ -768,8 +792,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
     return (HTTP_UNAUTHORIZED);
   }
 
-  DEBUG_printf(("IsAuthorized: Checking \"%s\", address = %08x, hostname = \"%s\"\n",
-                con->username, address, con->http.hostname));
+  LogMessage(L_DEBUG2, "IsAuthorized: Checking \"%s\", address = %08x, hostname = \"%s\"",
+             con->username, address, con->http.hostname);
 
   if (strcasecmp(con->http.hostname, "localhost") != 0 ||
       strncmp(con->http.fields[HTTP_FIELD_AUTHORIZATION], "Local", 5) != 0)
@@ -795,6 +819,17 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
       pamdata.conv        = pam_func;
       pamdata.appdata_ptr = con;
+
+#  ifdef __hpux
+     /*
+      * Workaround for HP-UX bug in pam_unix; see pam_conv() below for
+      * more info...
+      */
+
+      auth_client = con;
+#  endif /* __hpux */
+
+      DEBUG_printf(("IsAuthorized: Setting appdata_ptr = %p\n", con));
 
       pamerr = pam_start("cups", con->username, &pamdata, &pamh);
       if (pamerr != PAM_SUCCESS)
@@ -824,6 +859,21 @@ IsAuthorized(client_t *con)	/* I - Connection */
       }
 
       pam_end(pamh, PAM_SUCCESS);
+#elif defined(HAVE_USERSEC_H)
+     /*
+      * Use AIX authentication interface...
+      */
+
+      LogMessage(L_DEBUG, "IsAuthorized: AIX authenticate of username \"%s\"",
+                 con->username);
+
+      reenter = 1;
+      if (authenticate(con->username, con->password, &reenter, &authmsg) != 0)
+      {
+	LogMessage(L_DEBUG, "IsAuthorized: Unable to authenticate username \"%s\": %s",
+	           con->username, strerror(errno));
+	return (HTTP_UNAUTHORIZED);
+      }
 #else
 #  ifdef HAVE_SHADOW_H
       spw = getspnam(con->username);
@@ -857,8 +907,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
       * OK, the password isn't blank, so compare with what came from the client...
       */
 
-      DEBUG_printf(("IsAuthorized: pw_passwd = %s, crypt = %s\n",
-		    pw->pw_passwd, crypt(con->password, pw->pw_passwd)));
+      LogMessage(L_DEBUG2, "IsAuthorized: pw_passwd = %s, crypt = %s",
+		 pw->pw_passwd, crypt(con->password, pw->pw_passwd));
 
       pass = crypt(con->password, pw->pw_passwd);
 
@@ -868,8 +918,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
 #  ifdef HAVE_SHADOW_H
 	if (spw != NULL)
 	{
-	  DEBUG_printf(("IsAuthorized: sp_pwdp = %s, crypt = %s\n",
-			spw->sp_pwdp, crypt(con->password, spw->sp_pwdp)));
+	  LogMessage(L_DEBUG2, "IsAuthorized: sp_pwdp = %s, crypt = %s",
+		     spw->sp_pwdp, crypt(con->password, spw->sp_pwdp));
 
 	  pass = crypt(con->password, spw->sp_pwdp);
 
@@ -938,6 +988,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
     * any valid user is OK...
     */
 
+    LogMessage(L_DEBUG2, "IsAuthorized: Checking user membership...");
+
     if (best->num_names == 0)
       return (HTTP_OK);
 
@@ -956,6 +1008,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
  /*
   * Check to see if this user is in any of the named groups...
   */
+
+  LogMessage(L_DEBUG2, "IsAuthorized: Checking group membership...");
 
   for (i = 0; i < best->num_names; i ++)
   {
@@ -985,7 +1039,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
   * The user isn't part of the specified group, so deny access...
   */
 
-  DEBUG_puts("IsAuthorized: user not in group!");
+  LogMessage(L_DEBUG2, "IsAuthorized: user not in group!");
 
   return (HTTP_UNAUTHORIZED);
 }
@@ -1148,31 +1202,59 @@ pam_func(int                      num_msg,	/* I - Number of messages */
   * Answer all of the messages...
   */
 
+  DEBUG_printf(("pam_func: appdata_ptr = %p\n", appdata_ptr));
+
+#ifdef __hpux
+ /*
+  * Apparently some versions of HP-UX 11 have a broken pam_unix security
+  * module.  This is a workaround...
+  */
+
+  client = auth_client;
+  (void)appdata_ptr;
+#else
   client = (client_t *)appdata_ptr;
+#endif /* __hpux */
 
   for (i = 0; i < num_msg; i ++)
+  {
+    DEBUG_printf(("pam_func: Message = \"%s\"\n", msg[i]->msg));
+
     switch (msg[i]->msg_style)
     {
       case PAM_PROMPT_ECHO_ON:
+          DEBUG_printf(("pam_func: PAM_PROMPT_ECHO_ON, returning \"%s\"...\n",
+	                client->username));
           replies[i].resp_retcode = PAM_SUCCESS;
           replies[i].resp         = strdup(client->username);
           break;
 
       case PAM_PROMPT_ECHO_OFF:
+          DEBUG_printf(("pam_func: PAM_PROMPT_ECHO_OFF, returning \"%s\"...\n",
+	                client->password));
           replies[i].resp_retcode = PAM_SUCCESS;
           replies[i].resp         = strdup(client->password);
           break;
 
       case PAM_TEXT_INFO:
+          DEBUG_puts("pam_func: PAM_TEXT_INFO...");
+          replies[i].resp_retcode = PAM_SUCCESS;
+          replies[i].resp         = NULL;
+          break;
+
       case PAM_ERROR_MSG:
+          DEBUG_puts("pam_func: PAM_ERROR_MSG...");
           replies[i].resp_retcode = PAM_SUCCESS;
           replies[i].resp         = NULL;
           break;
 
       default:
+          DEBUG_printf(("pam_func: Unknown PAM message %d...\n",
+	                msg[i]->msg_style));
           free(replies);
           return (PAM_CONV_ERR);
     }
+  }
 
  /*
   * Return the responses back to PAM...
@@ -1186,5 +1268,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.41.2.1 2001/04/02 19:51:46 mike Exp $".
+ * End of "$Id: auth.c,v 1.41.2.2 2001/05/13 18:38:33 mike Exp $".
  */

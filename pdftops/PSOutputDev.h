@@ -20,6 +20,7 @@
 
 class GfxPath;
 class GfxFont;
+class GfxColorSpace;
 
 //------------------------------------------------------------------------
 // Parameters
@@ -27,6 +28,9 @@ class GfxFont;
 
 // Generate Level 1 PostScript?
 extern GBool psOutLevel1;
+
+// Generate Level 1 separable PostScript?
+extern GBool psOutLevel1Sep;
 
 // Generate Encapsulated PostScript?
 extern GBool psOutEPS;
@@ -54,7 +58,7 @@ class PSOutputDev: public OutputDev {
 public:
 
   // Open a PostScript output file, and write the prolog.
-  PSOutputDev(char *fileName, Catalog *catalog,
+  PSOutputDev(const char *fileName, Catalog *catalog,
 	      int firstPage, int lastPage,
 	      GBool embedType11, GBool doForm1);
 
@@ -122,11 +126,11 @@ public:
   virtual void drawString16(GfxState *state, GString *s);
 
   //----- image drawing
-  virtual void drawImageMask(GfxState *state, Stream *str,
+  virtual void drawImageMask(GfxState *state, Object *ref, Stream *str,
 			     int width, int height, GBool invert,
 			     GBool inlineImg);
-  virtual void drawImage(GfxState *state, Stream *str, int width,
-			 int height, GfxImageColorMap *colorMap,
+  virtual void drawImage(GfxState *state, Object *ref, Stream *str,
+			 int width, int height, GfxImageColorMap *colorMap,
 			 GBool inlineImg);
 
 #if OPI_SUPPORT
@@ -137,18 +141,25 @@ public:
 
 private:
 
+  void setupResources(Dict *resDict);
   void setupFonts(Dict *resDict);
   void setupFont(GfxFont *font);
-  void setupEmbeddedType1Font(Ref *id, char *psName);
-  void setupEmbeddedType1Font(GString *fileName, char *psName);
-  void setupEmbeddedType1CFont(GfxFont *font, Ref *id, char *psName);
+  void setupEmbeddedType1Font(Ref *id, const char *psName);
+  void setupEmbeddedType1Font(GString *fileName, const char *psName);
+  void setupEmbeddedType1CFont(GfxFont *font, Ref *id, const char *psName);
+  void setupImages(Dict *resDict);
+  void setupImage(Ref id, Stream *str);
   void doPath(GfxPath *path);
   void doImageL1(GfxImageColorMap *colorMap,
 		 GBool invert, GBool inlineImg,
 		 Stream *str, int width, int height, int len);
-  void doImage(GfxImageColorMap *colorMap,
-	       GBool invert, GBool inlineImg,
-	       Stream *str, int width, int height, int len);
+  void doImageL1Sep(GfxImageColorMap *colorMap,
+		    GBool invert, GBool inlineImg,
+		    Stream *str, int width, int height, int len);
+  void doImageL2(Object *ref, GfxImageColorMap *colorMap,
+		 GBool invert, GBool inlineImg,
+		 Stream *str, int width, int height, int len);
+  void dumpColorSpaceL2(GfxColorSpace *colorSpace);
   void opiBegin20(GfxState *state, Dict *dict);
   void opiBegin13(GfxState *state, Dict *dict);
   void opiTransform(GfxState *state, double x0, double y0,
@@ -184,6 +195,8 @@ private:
   int opi13Nest;		// nesting level of OPI 1.3 objects
   int opi20Nest;		// nesting level of OPI 2.0 objects
 #endif
+
+  GBool type3Warning;		// only show the Type 3 font warning once
 
   GBool ok;			// set up ok?
 };

@@ -1,4 +1,6 @@
-/* Copyright (C) 1998 Aladdin Enterprises.  All rights reserved.
+/*
+  Copyright 2001 by Easy Software Products.
+  Copyright 1998 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
   
@@ -22,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gxclrast.c,v 1.1 2000/03/08 23:14:54 mike Exp $ */
+/*$Id: gxclrast.c,v 1.1.2.1 2001/05/13 18:38:32 mike Exp $ */
 /* Command list interpreter/rasterizer */
 #include "memory_.h"
 #include "gx.h"
@@ -419,7 +421,7 @@ in:				/* Initialize for a new page. */
 				    break;
 				case cmd_set_misc_data_x >> 6:
 				    if (cb & 0x20)
-					cmd_getw(data_x, cbp);
+					cmd_getw(data_x, cbp) /* MRS: No trailing ; */
 				    else
 					data_x = 0;
 				    data_x = (data_x << 5) + (cb & 0x1f);
@@ -1506,7 +1508,7 @@ read_set_tile_size(command_buf_t *pcb, tile_slot *bits)
 	bits->height = rep_height;
     }
     if (bd & 0x80)
-	cmd_getw(bits->rep_shift, cbp);
+	cmd_getw(bits->rep_shift, cbp) /* MRS: No trailing ; */
     else
 	bits->rep_shift = 0;
     if_debug6('L', " depth=%d size=(%d,%d), rep_size=(%d,%d), rep_shift=%d\n",

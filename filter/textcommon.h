@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.h,v 1.6 2001/01/22 15:03:42 mike Exp $"
+ * "$Id: textcommon.h,v 1.6.2.1 2001/05/13 18:38:21 mike Exp $"
  *
  *   Common text filter definitions for the Common UNIX Printing System (CUPS).
  *
@@ -89,12 +89,14 @@ extern char	**Keywords;	/* List of known keywords... */
  * Required functions...
  */
 
-extern int	TextMain(char *name, int argc, char *argv[]);
+extern int	TextMain(const char *name, int argc, char *argv[]);
 extern void	WriteEpilogue(void);
 extern void	WritePage(void);
-extern void	WriteProlog(char *title, char *user, ppd_file_t *ppd);
+extern void	WriteProlog(const char *title, const char *user,
+		            const char *classification, const char *label,
+			    ppd_file_t *ppd);
 
 
 /*
- * End of "$Id: textcommon.h,v 1.6 2001/01/22 15:03:42 mike Exp $".
+ * End of "$Id: textcommon.h,v 1.6.2.1 2001/05/13 18:38:21 mike Exp $".
  */

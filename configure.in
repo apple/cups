@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.83.2.1 2001/04/02 19:51:41 mike Exp $"
+dnl "$Id: configure.in,v 1.83.2.2 2001/05/13 18:37:58 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -39,8 +39,6 @@ dnl for them...
 
 OPTIM=""
 AC_SUBST(OPTIM)
-GSOPTIM=""
-AC_SUBST(GSOPTIM)
 PICFLAG=1
 CFLAGS="${CFLAGS:=}"
 CXXFLAGS="${CXXFLAGS:=}"
@@ -49,7 +47,6 @@ AC_SUBST(DSOFLAGS)
 
 AC_ARG_ENABLE(debug, [  --enable-debug        turn on debugging [default=no]],[if eval "test x$enable_debug = xyes"; then
 	OPTIM="-g"
-	GSOPTIM="-g"
 fi])
 AC_ARG_ENABLE(shared, [  --enable-shared        turn on shared libraries [default=yes]])
 AC_ARG_ENABLE(ssl, [  --enable-ssl           turn on SSL/TLS support [default=yes]])
@@ -96,6 +93,14 @@ if test "$enable_shared" != "no"; then
 			DSO="\$(CC)"
 			DSOFLAGS="$DSOFLAGS -soname \$@ -shared \$(OPTIM)"
 			;;
+		AIX*)
+			AC_MSG_WARN(Shared library support for AIX not available yet - defaulting to static)
+			enable_shared=no
+			PICFLAG=0
+			LIBCUPS="libcups.a"
+			LIBCUPSIMAGE="libcupsimage.a"
+			DSO=":"
+			;;
 		*)
 			echo "Warning: shared libraries may not be supported.  Trying -shared"
 			echo "         option with compiler."
@@ -126,9 +131,14 @@ fi
 
 AC_ARG_ENABLE(pam, [  --enable-pam        turn on PAM support [default=yes]])
 
-AC_ARG_WITH(fontpath, [  --with-fontpath     set font path for pstoraster],fontpath="$withval",fontpath="")
+# Don't use PAM with AIX...
+if test $uname = AIX; then
+	enable_pam=no
+fi
 
+AC_ARG_WITH(fontpath, [  --with-fontpath     set font path for pstoraster],fontpath="$withval",fontpath="")
 AC_ARG_WITH(docdir, [  --with-docdir       set path for documentation],docdir="$withval",docdir="")
+AC_ARG_WITH(logdir, [  --with-logdir       set path for log files],logdir="$withval",logdir="")
 
 dnl Checks for programs...
 AC_PROG_AWK
@@ -285,6 +295,9 @@ AC_CHECK_HEADER(malloc.h,AC_DEFINE(HAVE_MALLOC_H))
 AC_CHECK_HEADER(shadow.h,AC_DEFINE(HAVE_SHADOW_H))
 AC_CHECK_HEADER(stddef.h,AC_DEFINE(HAVE_STDDEF_H))
 AC_CHECK_HEADER(stdlib.h,AC_DEFINE(HAVE_STDLIB_H))
+AC_CHECK_HEADER(string.h,AC_DEFINE(HAVE_STRING_H))
+AC_CHECK_HEADER(strings.h,AC_DEFINE(HAVE_STRINGS_H))
+AC_CHECK_HEADER(usersec.h,AC_DEFINE(HAVE_USERSEC_H))
 AC_CHECK_HEADER(sys/ioctl.h,AC_DEFINE(HAVE_SYS_IOCTL_H))
 
 dnl Checks for string functions.
@@ -330,55 +343,49 @@ AC_CHECK_FUNCS(wait3)
 
 dnl Update compiler options...
 if test -n "$GCC"; then
-	GXX="gcc"
+	CXX="$CC"
 
 	if test -z "$OPTIM"; then
 	       	OPTIM="-O2"
-		GSOPTIM="-O1"
 	fi
 	if test $PICFLAG = 1; then
     		OPTIM="-fPIC $OPTIM"
-    		GSOPTIM="-fPIC $GSOPTIM"
 	fi
 	OPTIM="-Wall $OPTIM"
-	GSOPTIM="-Wall $GSOPTIM"
 else
 	case $uname in
-        	IRIX*)
+		AIX*)
 			if test -z "$OPTIM"; then
-        			OPTIM="-O2"
-        			GSOPTIM="-O1"
+				OPTIM="-O2 -qmaxmem=6000"
 			fi
-			if test $uversion -ge 62; then
-				OPTIM="$OPTIM -n32 -mips3"
-				GSOPTIM="$GSOPTIM -n32 -mips3"
-			fi
-			OPTIM="-fullwarn $OPTIM"
-			GSOPTIM="-fullwarn $GSOPTIM"
 			;;
 		HP-UX*)
 			if test -z "$OPTIM"; then
 				OPTIM="+O2"
-				GSOPTIM="+O1"
 			fi
-			OPTIM="-Ae +DAportable $OPTIM"
-			GSOPTIM="-Ae +DAportable $GSOPTIM"
+			CFLAGS="-Ae $CFLAGS"
+			OPTIM="+DAportable $OPTIM"
 			if test $PICFLAG = 1; then
 				OPTIM="+z $OPTIM"
-				GSOPTIM="+z $GSOPTIM"
 			fi
+			;;
+        	IRIX*)
+			if test -z "$OPTIM"; then
+        			OPTIM="-O2"
+			fi
+			if test $uversion -ge 62; then
+				OPTIM="$OPTIM -n32 -mips3"
+			fi
+			OPTIM="-fullwarn $OPTIM"
 			;;
 		SunOS*)
 			# Solaris
 			if test -z "$OPTIM"; then
 				OPTIM="-xO4"
-				GSOPTIM="-xO2"
 			fi
 			OPTIM="$OPTIM -xarch=generic"
-			GSOPTIM="$GSOPTIM -xarch=generic"
 			if test $PICFLAG = 1; then
 				OPTIM="-KPIC $OPTIM"
-				GSOPTIM="-KPIC $GSOPTIM"
 			fi
 			;;
 		*)
@@ -494,8 +501,8 @@ fi
 dnl Fix "mandir" variable...
 if test "$mandir" = "\${prefix}/man" -a "$prefix" = "/"; then
 	case "$uname" in
-        	FreeBSD* | NetBSD* | OpenBSD*)
-        		# *BSD
+        	FreeBSD* | NetBSD* | OpenBSD* | AIX*)
+        		# *BSD + AIX
         		mandir="/usr/share/man"
         		AMANDIR="/usr/share/man"
         		;;
@@ -596,6 +603,11 @@ case "$uname" in
 		INITDDIR="../init.d"
 		;;
 
+	AIX*)
+		INITDIR="/etc/rc.d"
+		INITDDIR=".."
+		;;
+
 	*)
 		INITDIR="/etc"
 		INITDDIR="../init.d"
@@ -608,12 +620,18 @@ AC_SUBST(INITDDIR)
 
 dnl Setup default locations...
 CUPS_SERVERROOT='${sysconfdir}/cups'
-CUPS_LOGDIR='${localstatedir}/log/cups'
 CUPS_REQUESTS='${localstatedir}/spool/cups'
 
 AC_DEFINE_UNQUOTED(CUPS_SERVERROOT, "$sysconfdir/cups")
-AC_DEFINE_UNQUOTED(CUPS_LOGDIR, "$localstatedir/log/cups")
 AC_DEFINE_UNQUOTED(CUPS_REQUESTS, "$localstatedir/spool/cups")
+
+if test x$logdir = x; then
+	CUPS_LOGDIR='${localstatedir}/log/cups'
+	AC_DEFINE_UNQUOTED(CUPS_LOGDIR, "$localstatedir/log/cups")
+else
+	CUPS_LOGDIR="$logdir"
+	AC_DEFINE_UNQUOTED(CUPS_LOGDIR, "$logdir")
+fi
 
 dnl See what directory to put server executables...
 case "$uname" in
@@ -644,7 +662,7 @@ case "$uname" in
 		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$datadir/locale")
 		;;
 
-	OSF1*)
+	OSF1* | AIX*)
 		CUPS_LOCALEDIR='${exec_prefix}/lib/nls/msg'
 		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$exec_prefix/lib/nls/msg")
 		;;
@@ -666,7 +684,7 @@ AC_SUBST(CUPS_DATADIR)
 dnl Set the CUPS_DOCROOT directory...
 if test x$docdir = x; then
 	CUPS_DOCROOT='${datadir}/doc/cups'
-	docdir='$datadir/doc/cups'
+	docdir="$datadir/doc/cups"
 else
 	CUPS_DOCROOT="$docdir"
 fi
@@ -680,5 +698,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.83.2.1 2001/04/02 19:51:41 mike Exp $".
+dnl End of "$Id: configure.in,v 1.83.2.2 2001/05/13 18:37:58 mike Exp $".
 dnl

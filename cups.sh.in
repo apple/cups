@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: cups.sh.in,v 1.9 2001/03/14 22:02:17 mike Exp $"
+# "$Id: cups.sh.in,v 1.9.2.1 2001/05/13 18:37:58 mike Exp $"
 #
 #   Startup/shutdown script for the Common UNIX Printing System (CUPS).
 #
@@ -28,7 +28,7 @@
 #
 #   Linux chkconfig stuff:
 #
-#   chkconfig: 0235 99 00
+#   chkconfig: 235 99 00
 #   description: Startup/shutdown script for the Common UNIX \
 #                Printing System (CUPS).
 #
@@ -76,7 +76,7 @@ fi
 #
 
 case "`uname`" in
-	IRIX* | HP-UX* | SunOS*)
+	IRIX* | HP-UX* | SunOS* | AIX*)
 		pid=`ps -e | awk '{print $1,$4}' | grep cupsd | awk '{print $1}'`
 		;;
 	OSF1*)
@@ -139,5 +139,5 @@ exit 0
 
 
 #
-# End of "$Id: cups.sh.in,v 1.9 2001/03/14 22:02:17 mike Exp $".
+# End of "$Id: cups.sh.in,v 1.9.2.1 2001/05/13 18:37:58 mike Exp $".
 #

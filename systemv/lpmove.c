@@ -1,5 +1,5 @@
 /*
- * "$Id: lpmove.c,v 1.5 2001/01/23 17:36:24 mike Exp $"
+ * "$Id: lpmove.c,v 1.5.2.1 2001/05/13 18:38:41 mike Exp $"
  *
  *   "lpmove" command for the Common UNIX Printing System (CUPS).
  *
@@ -88,7 +88,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      httpClose(http);
 
 	    if (argv[i][2] != '\0')
-	      http = httpConnect(argv[i] + 2, ippPort());
+	      http = httpConnectEncrypt(argv[i] + 2, ippPort(), encryption);
 	    else
 	    {
 	      i ++;
@@ -99,7 +99,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 		return (1);
               }
 
-	      http = httpConnect(argv[i], ippPort());
+	      http = httpConnectEncrypt(argv[i], ippPort(), encryption);
 	    }
 
 	    if (http == NULL)
@@ -107,8 +107,6 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      perror("lpmove: Unable to connect to server");
 	      return (1);
 	    }
-
-	    httpEncryption(http, encryption);
 	    break;
 
 	default :
@@ -138,15 +136,13 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if (!http)
   {
-    http = httpConnect(cupsServer(), ippPort());
+    http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
 
     if (http == NULL)
     {
       perror("lpmove: Unable to connect to server");
       return (1);
     }
-
-    httpEncryption(http, encryption);
   }
 
   move_job(http, atoi(job), dest);
@@ -232,5 +228,5 @@ move_job(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpmove.c,v 1.5 2001/01/23 17:36:24 mike Exp $".
+ * End of "$Id: lpmove.c,v 1.5.2.1 2001/05/13 18:38:41 mike Exp $".
  */

@@ -21,7 +21,7 @@
 // FontEncoding
 //------------------------------------------------------------------------
 
-inline int FontEncoding::hash(char *name) {
+inline int FontEncoding::hash(const char *name) {
   Guint h;
 
   h = (Guint)name[0] & 0xff;
@@ -33,7 +33,7 @@ inline int FontEncoding::hash(char *name) {
 FontEncoding::FontEncoding() {
   int i;
 
-  encoding = (char **)gmalloc(256 * sizeof(char *));
+  encoding = (const char **)gmalloc(256 * sizeof(const char *));
   size = 256;
   freeEnc = gTrue;
   for (i = 0; i < 256; ++i)
@@ -42,34 +42,34 @@ FontEncoding::FontEncoding() {
     hashTab[i] = -1;
 }
 
-FontEncoding::FontEncoding(char **encoding, int size) {
+FontEncoding::FontEncoding(const char **nencoding, int nsize) {
   int i;
 
-  this->encoding = encoding;
-  this->size = size;
+  encoding = nencoding;
+  size = nsize;
   freeEnc = gFalse;
   for (i = 0; i < fontEncHashSize; ++i)
     hashTab[i] = -1;
   for (i = 0; i < size; ++i) {
-    if (encoding[i])
-      addChar1(i, encoding[i]);
+    if (nencoding[i])
+      addChar1(i, nencoding[i]);
   }
 }
 
 FontEncoding::FontEncoding(FontEncoding *fontEnc) {
   int i;
 
-  encoding = (char **)gmalloc(fontEnc->size * sizeof(char *));
+  encoding = (const char **)gmalloc(fontEnc->size * sizeof(const char *));
   size = fontEnc->size;
   freeEnc = gTrue;
   for (i = 0; i < size; ++i) {
     encoding[i] =
-      fontEnc->encoding[i] ? copyString(fontEnc->encoding[i]) : NULL;
+      fontEnc->encoding[i] ? copyString(fontEnc->encoding[i]) : (char *)NULL;
   }
   memcpy(hashTab, fontEnc->hashTab, fontEncHashSize * sizeof(short));
 }
 
-void FontEncoding::addChar(int code, char *name) {
+void FontEncoding::addChar(int code, const char *name) {
   int h, i;
 
   // replace character associated with code
@@ -83,7 +83,7 @@ void FontEncoding::addChar(int code, char *name) {
       if (++h == fontEncHashSize)
 	h = 0;
     }
-    gfree(encoding[code]);
+    gfree((void *)encoding[code]);
   }
 
   // associate name with code
@@ -93,7 +93,7 @@ void FontEncoding::addChar(int code, char *name) {
   addChar1(code, name);
 }
 
-void FontEncoding::addChar1(int code, char *name) {
+void FontEncoding::addChar1(int code, const char *name) {
   int h, i, code2;
 
   // insert name in hash table
@@ -121,13 +121,13 @@ FontEncoding::~FontEncoding() {
   if (freeEnc) {
     for (i = 0; i < size; ++i) {
       if (encoding[i])
-	gfree(encoding[i]);
+	gfree((void *)encoding[i]);
     }
-    gfree(encoding);
+    gfree((void *)encoding);
   }
 }
 
-int FontEncoding::getCharCode(char *name) {
+int FontEncoding::getCharCode(const char *name) {
   int h, i, code;
 
   h = hash(name);

@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.56 2001/03/15 17:48:07 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.56.2.1 2001/05/13 18:38:19 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -804,20 +804,69 @@ main(int  argc,		/* I - Number of command-line arguments */
   if ((choice = ppdFindMarkedChoice(ppd, "PageSize")) != NULL &&
       strcasecmp(choice->choice, "Custom") == 0)
   {
+    float	width,		/* New width in points */
+		length;		/* New length in points */
+
+
     if (Orientation & 1)
     {
-      header.cupsWidth   = yprint * header.HWResolution[0];
-      header.cupsHeight  = xprint * header.HWResolution[1];
-      header.PageSize[0] = yprint * 72.0;
-      header.PageSize[1] = xprint * 72.0;
+      width  = yprint * 72.0;
+      length = xprint * 72.0;
     }
     else
     {
-      header.cupsWidth   = xprint * header.HWResolution[0];
-      header.cupsHeight  = yprint * header.HWResolution[1];
-      header.PageSize[0] = xprint * 72.0;
-      header.PageSize[1] = yprint * 72.0;
+      width  = xprint * 72.0;
+      length = yprint * 72.0;
     }
+
+   /*
+    * Add margins to page size...
+    */
+
+    width  += ppd->custom_margins[0] + ppd->custom_margins[2];
+    length += ppd->custom_margins[1] + ppd->custom_margins[3];
+
+   /*
+    * Enforce minimums...
+    */
+
+    if (width < ppd->custom_min[0])
+      width = ppd->custom_min[0];
+
+    if (length < ppd->custom_min[1])
+      length = ppd->custom_min[1];
+
+   /*
+    * Set the new custom size...
+    */
+
+    header.PageSize[0] = width + 0.5;
+    header.PageSize[1] = length + 0.5;
+
+   /*
+    * Update page variables...
+    */
+
+    PageWidth  = width;
+    PageLength = length;
+    PageLeft   = ppd->custom_margins[0];
+    PageRight  = width - ppd->custom_margins[2];
+    PageBottom = ppd->custom_margins[1];
+    PageTop    = length - ppd->custom_margins[3];
+
+   /*
+    * Remove margins from page size...
+    */
+
+    width  -= ppd->custom_margins[0] + ppd->custom_margins[2];
+    length -= ppd->custom_margins[1] + ppd->custom_margins[3];
+
+   /*
+    * Set the bitmap size...
+    */
+
+    header.cupsWidth  = width * header.HWResolution[0] / 72.0;
+    header.cupsHeight = length * header.HWResolution[1] / 72.0;
   }
   else
   {
@@ -2197,6 +2246,8 @@ format_K(cups_page_header_t *header,	/* I - Page header */
 		*dither;	/* Pointer into dither array */
 
 
+  (void)z;
+
   switch (XPosition)
   {
     case -1 :
@@ -3461,6 +3512,8 @@ format_W(cups_page_header_t *header,	/* I - Page header */
 		*dither;	/* Pointer into dither array */
 
 
+  (void)z;
+
   switch (XPosition)
   {
     case -1 :
@@ -4389,5 +4442,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.56 2001/03/15 17:48:07 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.56.2.1 2001/05/13 18:38:19 mike Exp $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.85 2001/02/21 17:01:15 mike Exp $"
+# "$Id: cups.list,v 1.85.2.1 2001/05/13 18:37:58 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -217,37 +217,37 @@ f 0444 root sys $DOCDIR/images doc/images/*.gif
 
 # Man pages
 %system irix
-d 0555 root sys $MANDIR/a_man -
-d 0555 root sys $MANDIR/a_man/cat1 -
-d 0555 root sys $MANDIR/u_man -
-d 0555 root sys $MANDIR/u_man/cat1 -
-d 0555 root sys $MANDIR/u_man/cat5 -
+d 0555 root sys $AMANDIR -
+d 0555 root sys $AMANDIR/cat1 -
+d 0555 root sys $MANDIR -
+d 0555 root sys $MANDIR/cat1 -
+d 0555 root sys $MANDIR/cat5 -
 
-f 0444 root sys $MANDIR/a_man/cat1/accept.z man/accept.z
-l 0444 root sys $MANDIR/a_man/cat1/reject.z accept.z
-f 0444 root sys $MANDIR/u_man/cat1/backend.z man/backend.z
-f 0444 root sys $MANDIR/u_man/cat5/classes.conf.z man/classes.conf.z
-f 0444 root sys $MANDIR/a_man/cat1/cups-lpd.z man/cups-lpd.z
-f 0444 root sys $MANDIR/a_man/cat1/cups-polld.z man/cups-polld.z
-f 0444 root sys $MANDIR/u_man/cat5/cupsd.conf.z man/cupsd.conf.z
-f 0444 root sys $MANDIR/a_man/cat1/cupsd.z man/cupsd.z
-f 0444 root sys $MANDIR/a_man/cat1/enable.z man/enable.z
-l 0444 root sys $MANDIR/a_man/cat1/disable.z enable.z
-f 0444 root sys $MANDIR/u_man/cat1/filter.z man/filter.z
-f 0444 root sys $MANDIR/a_man/cat1/lpadmin.z man/lpadmin.z
-f 0444 root sys $MANDIR/a_man/cat1/lpc.z man/lpc.z
-f 0444 root sys $MANDIR/a_man/cat1/lpinfo.z man/lpinfo.z
-f 0444 root sys $MANDIR/a_man/cat1/lpmove.z man/lpmove.z
-f 0444 root sys $MANDIR/u_man/cat1/lpoptions.z man/lpoptions.z
-f 0444 root sys $MANDIR/u_man/cat1/lpq.z man/lpq.z
-f 0444 root sys $MANDIR/u_man/cat1/lprm.z man/lprm.z
-f 0444 root sys $MANDIR/u_man/cat1/lpr.z man/lpr.z
-f 0444 root sys $MANDIR/u_man/cat1/lpstat.z man/lpstat.z
-f 0444 root sys $MANDIR/u_man/cat1/lp.z man/lp.z
-l 0444 root sys $MANDIR/u_man/cat1/cancel.z lp.z
-f 0444 root sys $MANDIR/u_man/cat5/mime.convs.z man/mime.convs.z
-f 0444 root sys $MANDIR/u_man/cat5/mime.types.z man/mime.types.z
-f 0444 root sys $MANDIR/u_man/cat5/printers.conf.z man/printers.conf.z
+f 0444 root sys $AMANDIR/cat1/accept.z man/accept.z
+l 0444 root sys $AMANDIR/cat1/reject.z accept.z
+f 0444 root sys $MANDIR/cat1/backend.z man/backend.z
+f 0444 root sys $MANDIR/cat5/classes.conf.z man/classes.conf.z
+f 0444 root sys $AMANDIR/cat1/cups-lpd.z man/cups-lpd.z
+f 0444 root sys $AMANDIR/cat1/cups-polld.z man/cups-polld.z
+f 0444 root sys $MANDIR/cat5/cupsd.conf.z man/cupsd.conf.z
+f 0444 root sys $AMANDIR/cat1/cupsd.z man/cupsd.z
+f 0444 root sys $AMANDIR/cat1/enable.z man/enable.z
+l 0444 root sys $AMANDIR/cat1/disable.z enable.z
+f 0444 root sys $MANDIR/cat1/filter.z man/filter.z
+f 0444 root sys $AMANDIR/cat1/lpadmin.z man/lpadmin.z
+f 0444 root sys $AMANDIR/cat1/lpc.z man/lpc.z
+f 0444 root sys $AMANDIR/cat1/lpinfo.z man/lpinfo.z
+f 0444 root sys $AMANDIR/cat1/lpmove.z man/lpmove.z
+f 0444 root sys $MANDIR/cat1/lpoptions.z man/lpoptions.z
+f 0444 root sys $MANDIR/cat1/lpq.z man/lpq.z
+f 0444 root sys $MANDIR/cat1/lprm.z man/lprm.z
+f 0444 root sys $MANDIR/cat1/lpr.z man/lpr.z
+f 0444 root sys $MANDIR/cat1/lpstat.z man/lpstat.z
+f 0444 root sys $MANDIR/cat1/lp.z man/lp.z
+l 0444 root sys $MANDIR/cat1/cancel.z lp.z
+f 0444 root sys $MANDIR/cat5/mime.convs.z man/mime.convs.z
+f 0444 root sys $MANDIR/cat5/mime.types.z man/mime.types.z
+f 0444 root sys $MANDIR/cat5/printers.conf.z man/printers.conf.z
 
 %system solaris hpux
 d 0555 root sys $MANDIR/man1 -
@@ -316,5 +316,5 @@ f 0444 root sys $MANDIR/man5/printers.conf.5 man/printers.conf.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.85 2001/02/21 17:01:15 mike Exp $".
+# End of "$Id: cups.list,v 1.85.2.1 2001/05/13 18:37:58 mike Exp $".
 #

@@ -9,26 +9,51 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <config.h>
+#define HAVE_LIBCUPS
+
 //------------------------------------------------------------------------
 // general constants
 //------------------------------------------------------------------------
 
 // xpdf version
-#define xpdfVersion "0.91"
+#define xpdfVersion "0.92"
 
 // supported PDF version
 #define supportedPDFVersionStr "1.3"
 #define supportedPDFVersionNum 1.3
-  
+
 // copyright notice
-#define xpdfCopyright "Copyright 1996-2001 Derek B. Noonburg"
+#define xpdfCopyright "Copyright 1996-2000 Derek B. Noonburg"
+
+// default paper size (in points) for PostScript output
+#ifdef A4_PAPER
+#define defPaperWidth  595    // ISO A4 (210x297 mm)
+#define defPaperHeight 842
+#else
+#define defPaperWidth  612    // American letter (8.5x11")
+#define defPaperHeight 792
+#endif
+
+// config file name
+#if defined(VMS)
+#define xpdfConfigFile "xpdfrc"
+#else
+#define xpdfConfigFile ".xpdfrc"
+#endif
 
 //------------------------------------------------------------------------
-// uncompress program
+// X-related constants
 //------------------------------------------------------------------------
 
-#define HAVE_POPEN
-#define uncompressCmd "uncompress -c"
+// default maximum size of color cube to allocate
+#define defaultRGBCube 5
+
+// number of X server fonts to cache
+#define serverFontCacheSize 16
+
+// number of Type 1 (t1lib) fonts to cache
+#define t1FontCacheSize 32
 
 // number of TrueType (FreeType) fonts to cache
 #define ttFontCacheSize 32
@@ -47,6 +72,34 @@
 #else
 #define POPEN_READ_MODE "r"
 #endif
+
+//------------------------------------------------------------------------
+// uncompress program
+//------------------------------------------------------------------------
+
+#ifdef HAVE_POPEN
+
+// command to uncompress to stdout
+#  ifdef USE_GZIP
+#    define uncompressCmd "gzip -d -c -q"
+#  else
+#    ifdef __EMX__
+#      define uncompressCmd "compress -d -c"
+#    else
+#      define uncompressCmd "uncompress -c"
+#    endif // __EMX__
+#  endif // USE_GZIP
+
+#else // HAVE_POPEN
+
+// command to uncompress a file
+#  ifdef USE_GZIP
+#    define uncompressCmd "gzip -d -q"
+#  else
+#    define uncompressCmd "uncompress"
+#  endif // USE_GZIP
+
+#endif // HAVE_POPEN
 
 //------------------------------------------------------------------------
 // Win32 stuff

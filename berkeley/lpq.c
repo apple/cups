@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.17 2001/02/13 20:37:42 mike Exp $"
+ * "$Id: lpq.c,v 1.17.2.1 2001/05/13 18:38:00 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -79,7 +79,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Connect to the scheduler...
   */
 
-  if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
+  if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
+                                 cupsEncryption())) == NULL)
   {
     fputs("lpq: Unable to contact server!\n", stderr);
     return (1);
@@ -535,5 +536,5 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpq.c,v 1.17 2001/02/13 20:37:42 mike Exp $".
+ * End of "$Id: lpq.c,v 1.17.2.1 2001/05/13 18:38:00 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.29 2001/03/09 14:26:54 mike Exp $"
+ * "$Id: lp.c,v 1.29.2.1 2001/05/13 18:38:40 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -579,7 +579,7 @@ set_job_attrs(int           job_id,	/* I - Job ID */
   char		uri[HTTP_MAX_URI];	/* URI for job */
 
 
-  http = httpConnect(cupsServer(), ippPort());
+  http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
   language = cupsLangDefault();
 
@@ -650,5 +650,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.29 2001/03/09 14:26:54 mike Exp $".
+ * End of "$Id: lp.c,v 1.29.2.1 2001/05/13 18:38:40 mike Exp $".
  */

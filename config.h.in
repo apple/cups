@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.39.2.1 2001/04/02 19:51:40 mike Exp $"
+ * "$Id: config.h.in,v 1.39.2.2 2001/05/13 18:37:58 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -94,6 +94,13 @@
 #undef HAVE_CRYPT_H
 
 /*
+ * Use <string.h>, <strings.h>, or both?
+ */
+
+#undef HAVE_STRING_H
+#undef HAVE_STRINGS_H
+
+/*
  * Do we have the strXXX() functions?
  */
 
@@ -148,5 +155,5 @@
 #undef HAVE_SYS_IOCTL_H
 
 /*
- * End of "$Id: config.h.in,v 1.39.2.1 2001/04/02 19:51:40 mike Exp $".
+ * End of "$Id: config.h.in,v 1.39.2.2 2001/05/13 18:37:58 mike Exp $".
  */

@@ -59,6 +59,9 @@ public:
   // Reset stream to beginning.
   virtual void reset() = 0;
 
+  // Close down the stream.
+  virtual void close();
+
   // Get next char from stream.
   virtual int getChar() = 0;
 
@@ -79,7 +82,7 @@ public:
   virtual void setPos(int pos1) = 0;
 
   // Get PostScript command for the filter(s).
-  virtual GString *getPSFilter(char *indent);
+  virtual GString *getPSFilter(const char *indent);
 
   // Does this stream type potentially contain non-printable chars?
   virtual GBool isBinary(GBool last = gTrue) = 0;
@@ -99,7 +102,7 @@ public:
 
 private:
 
-  Stream *makeFilter(char *name, Stream *str, Object *params);
+  Stream *makeFilter(const char *name, Stream *str, Object *params);
 
   int ref;			// reference count
 };
@@ -151,6 +154,7 @@ public:
 
   FilterStream(Stream *str);
   virtual ~FilterStream();
+  virtual void close();
   virtual int getPos() { return str->getPos(); }
   virtual void setPos(int pos);
   virtual BaseStream *getBaseStream() { return str->getBaseStream(); }
@@ -233,6 +237,8 @@ private:
 // FileStream
 //------------------------------------------------------------------------
 
+#define fileStreamBufSize 256
+
 class FileStream: public BaseStream {
 public:
 
@@ -241,6 +247,7 @@ public:
   virtual Stream *makeSubStream(int start, int length, Object *dict);
   virtual StreamKind getKind() { return strFile; }
   virtual void reset();
+  virtual void close();
   virtual int getChar()
     { return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr++ & 0xff); }
   virtual int lookChar()
@@ -258,7 +265,7 @@ private:
   FILE *f;
   int start;
   int length;
-  char buf[256];
+  char buf[fileStreamBufSize];
   char *bufPtr;
   char *bufEnd;
   int bufPos;
@@ -310,7 +317,7 @@ public:
   virtual int getChar()
     { int c = lookChar(); buf = EOF; return c; }
   virtual int lookChar();
-  virtual GString *getPSFilter(char *indent);
+  virtual GString *getPSFilter(const char *indent);
   virtual GBool isBinary(GBool last = gTrue);
 
 private:
@@ -333,7 +340,7 @@ public:
   virtual int getChar()
     { int ch = lookChar(); ++index; return ch; }
   virtual int lookChar();
-  virtual GString *getPSFilter(char *indent);
+  virtual GString *getPSFilter(const char *indent);
   virtual GBool isBinary(GBool last = gTrue);
 
 private:
@@ -359,7 +366,7 @@ public:
   virtual int getChar();
   virtual int lookChar();
   virtual int getRawChar();
-  virtual GString *getPSFilter(char *indent);
+  virtual GString *getPSFilter(const char *indent);
   virtual GBool isBinary(GBool last = gTrue);
 
 private:
@@ -395,7 +402,7 @@ public:
     { return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr++ & 0xff); }
   virtual int lookChar()
     { return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr & 0xff); }
-  virtual GString *getPSFilter(char *indent);
+  virtual GString *getPSFilter(const char *indent);
   virtual GBool isBinary(GBool last = gTrue);
 
 private:
@@ -426,7 +433,7 @@ public:
   virtual int getChar()
     { int c = lookChar(); buf = EOF; return c; }
   virtual int lookChar();
-  virtual GString *getPSFilter(char *indent);
+  virtual GString *getPSFilter(const char *indent);
   virtual GBool isBinary(GBool last = gTrue);
 
 private:
@@ -488,7 +495,7 @@ public:
   virtual void reset();
   virtual int getChar();
   virtual int lookChar();
-  virtual GString *getPSFilter(char *indent);
+  virtual GString *getPSFilter(const char *indent);
   virtual GBool isBinary(GBool last = gTrue);
   Stream *getRawStream() { return str; }
 
@@ -574,7 +581,7 @@ public:
   virtual int getChar();
   virtual int lookChar();
   virtual int getRawChar();
-  virtual GString *getPSFilter(char *indent);
+  virtual GString *getPSFilter(const char *indent);
   virtual GBool isBinary(GBool last = gTrue);
 
 private:
@@ -623,8 +630,8 @@ public:
   virtual void reset() {}
   virtual int getChar() { return EOF; }
   virtual int lookChar() { return EOF; }
-  virtual GString *getPSFilter(char *indent)  { return NULL; }
-  virtual GBool isBinary(GBool last = gTrue) { return gFalse; }
+  virtual GString *getPSFilter(const char *indent)  { (void)indent; return NULL; }
+  virtual GBool isBinary(GBool last = gTrue) { (void)last; return gFalse; }
 };
 
 //------------------------------------------------------------------------
@@ -638,10 +645,11 @@ public:
   ~FixedLengthEncoder();
   virtual StreamKind getKind() { return strWeird; }
   virtual void reset();
+  virtual void close();
   virtual int getChar();
   virtual int lookChar();
-  virtual GString *getPSFilter(char *indent) { return NULL; }
-  virtual GBool isBinary(GBool last = gTrue) { return gFalse; }
+  virtual GString *getPSFilter(const char *indent) { (void)indent; return NULL; }
+  virtual GBool isBinary(GBool last = gTrue) { (void)last; return gFalse; }
   virtual GBool isEncoder() { return gTrue; }
 
 private:
@@ -661,12 +669,13 @@ public:
   virtual ~ASCII85Encoder();
   virtual StreamKind getKind() { return strWeird; }
   virtual void reset();
+  virtual void close();
   virtual int getChar()
     { return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr++ & 0xff); }
   virtual int lookChar()
     { return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr & 0xff); }
-  virtual GString *getPSFilter(char *indent) { return NULL; }
-  virtual GBool isBinary(GBool last = gTrue) { return gFalse; }
+  virtual GString *getPSFilter(const char *indent) { (void)indent; return NULL; }
+  virtual GBool isBinary(GBool last = gTrue) { (void)last; return gFalse; }
   virtual GBool isEncoder() { return gTrue; }
 
 private:
@@ -691,12 +700,13 @@ public:
   virtual ~RunLengthEncoder();
   virtual StreamKind getKind() { return strWeird; }
   virtual void reset();
+  virtual void close();
   virtual int getChar()
     { return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr++ & 0xff); }
   virtual int lookChar()
     { return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr & 0xff); }
-  virtual GString *getPSFilter(char *indent) { return NULL; }
-  virtual GBool isBinary(GBool last = gTrue) { return gFalse; }
+  virtual GString *getPSFilter(const char *indent) { (void)indent; return NULL; }
+  virtual GBool isBinary(GBool last = gTrue) { (void)last; return gFalse; }
   virtual GBool isEncoder() { return gTrue; }
 
 private:

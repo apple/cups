@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.c,v 1.16 2001/01/24 17:18:59 mike Exp $"
+ * "$Id: textcommon.c,v 1.16.2.1 2001/05/13 18:38:21 mike Exp $"
  *
  *   Common text filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -482,9 +482,9 @@ static int	getutf8(FILE *fp);
  */
 
 int				/* O - Exit status */
-TextMain(char *name,		/* I - Name of filter */
-         int  argc,		/* I - Number of command-line arguments */
-         char *argv[])		/* I - Command-line arguments */
+TextMain(const char *name,	/* I - Name of filter */
+         int        argc,	/* I - Number of command-line arguments */
+         char       *argv[])	/* I - Command-line arguments */
 {
   FILE		*fp;		/* Print file */
   ppd_file_t	*ppd;		/* PPD file */
@@ -608,7 +608,8 @@ TextMain(char *name,		/* I - Name of filter */
 
   Copies = atoi(argv[4]);
 
-  WriteProlog(argv[3], argv[2], ppd);
+  WriteProlog(argv[3], argv[2], getenv("CLASSIFICATION"),
+              cupsGetOption("page-label", num_options, options), ppd);
 
  /*
   * Read text from the specified source and print it...
@@ -1141,5 +1142,5 @@ getutf8(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: textcommon.c,v 1.16 2001/01/24 17:18:59 mike Exp $".
+ * End of "$Id: textcommon.c,v 1.16.2.1 2001/05/13 18:38:21 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.22 2001/02/07 00:33:55 mike Exp $"
+ * "$Id: lpadmin.c,v 1.22.2.1 2001/05/13 18:38:41 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -109,15 +109,13 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'c' : /* Add printer to class */
 	    if (!http)
 	    {
-              http = httpConnect(cupsServer(), ippPort());
+              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
 
 	      if (http == NULL)
 	      {
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
-
-              httpEncryption(http, encryption);
             }
 
 	    if (printer == NULL)
@@ -154,15 +152,13 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'd' : /* Set as default destination */
 	    if (!http)
 	    {
-              http = httpConnect(cupsServer(), ippPort());
+              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
 
 	      if (http == NULL)
 	      {
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
-
-              httpEncryption(http, encryption);
             }
 
 	    if (argv[i][2])
@@ -195,7 +191,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      httpClose(http);
 
 	    if (argv[i][2] != '\0')
-	      http = httpConnect(argv[i] + 2, ippPort());
+	      http = httpConnectEncrypt(argv[i] + 2, ippPort(), encryption);
 	    else
 	    {
 	      i ++;
@@ -206,7 +202,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 		return (1);
               }
 	      else
-		http = httpConnect(argv[i], ippPort());
+		http = httpConnectEncrypt(argv[i], ippPort(), encryption);
 	    }
 
 	    if (http == NULL)
@@ -215,24 +211,19 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      return (1);
 	    }
 	    else
-	    {
-              httpEncryption(http, encryption);
 	      cupsSetServer(http->hostname);
-	    }
 	    break;
 
         case 'i' : /* Use the specified interface script */
 	    if (!http)
 	    {
-              http = httpConnect(cupsServer(), ippPort());
+              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
 
 	      if (http == NULL)
 	      {
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
-
-              httpEncryption(http, encryption);
             }
 
 	    if (printer == NULL)
@@ -275,15 +266,13 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	    if (!http)
 	    {
-              http = httpConnect(cupsServer(), ippPort());
+              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
 
 	      if (http == NULL)
 	      {
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
-
-              httpEncryption(http, encryption);
             }
 
             enable_printer(http, printer);
@@ -292,15 +281,13 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'm' : /* Use the specified standard script/PPD file */
 	    if (!http)
 	    {
-              http = httpConnect(cupsServer(), ippPort());
+              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
 
 	      if (http == NULL)
 	      {
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
-
-              httpEncryption(http, encryption);
             }
 
 	    if (printer == NULL)
@@ -350,15 +337,13 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'p' : /* Add/modify a printer */
 	    if (!http)
 	    {
-              http = httpConnect(cupsServer(), ippPort());
+              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
 
 	      if (http == NULL)
 	      {
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
-
-              httpEncryption(http, encryption);
             }
 
 	    if (argv[i][2])
@@ -391,28 +376,24 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      httpClose(http);
 
               *host++ = '\0';
-              if ((http = httpConnect(host, ippPort())) == NULL)
+              if ((http = httpConnectEncrypt(host, ippPort(), encryption)) == NULL)
 	      {
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
-
-              httpEncryption(http, encryption);
 	    }
 	    break;
 
         case 'r' : /* Remove printer from class */
 	    if (!http)
 	    {
-              http = httpConnect(cupsServer(), ippPort());
+              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
 
 	      if (http == NULL)
 	      {
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
-
-              httpEncryption(http, encryption);
             }
 
 	    if (printer == NULL)
@@ -479,15 +460,13 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'v' : /* Set the device-uri attribute */
 	    if (!http)
 	    {
-              http = httpConnect(cupsServer(), ippPort());
+              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
 
 	      if (http == NULL)
 	      {
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
-
-              httpEncryption(http, encryption);
             }
 
 	    if (printer == NULL)
@@ -516,15 +495,13 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'x' : /* Delete a printer */
 	    if (!http)
 	    {
-              http = httpConnect(cupsServer(), ippPort());
+              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
 
 	      if (http == NULL)
 	      {
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
-
-              httpEncryption(http, encryption);
             }
 
 	    if (argv[i][2])
@@ -557,7 +534,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      httpClose(http);
 
               *host++ = '\0';
-              if ((http = httpConnect(host, ippPort())) == NULL)
+              if ((http = httpConnectEncrypt(host, ippPort(), encryption)) == NULL)
 	      {
 		perror("lpadmin: Unable to connect to server");
 		return (1);
@@ -571,15 +548,13 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'D' : /* Set the printer-info attribute */
 	    if (!http)
 	    {
-              http = httpConnect(cupsServer(), ippPort());
+              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
 
 	      if (http == NULL)
 	      {
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
-
-              httpEncryption(http, encryption);
             }
 
 	    if (printer == NULL)
@@ -608,15 +583,13 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'L' : /* Set the printer-location attribute */
 	    if (!http)
 	    {
-              http = httpConnect(cupsServer(), ippPort());
+              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
 
 	      if (http == NULL)
 	      {
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
-
-              httpEncryption(http, encryption);
             }
 
 	    if (printer == NULL)
@@ -645,15 +618,13 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'P' : /* Use the specified PPD file */
 	    if (!http)
 	    {
-              http = httpConnect(cupsServer(), ippPort());
+              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
 
 	      if (http == NULL)
 	      {
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
-
-              httpEncryption(http, encryption);
             }
 
 	    if (printer == NULL)
@@ -697,15 +668,13 @@ main(int  argc,			/* I - Number of command-line arguments */
   {
     if (!http)
     {
-      http = httpConnect(cupsServer(), ippPort());
+      http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
 
       if (http == NULL)
       {
 	perror("lpadmin: Unable to connect to server");
 	return (1);
       }
-
-      httpEncryption(http, encryption);
     }
 
     if (printer == NULL)
@@ -1801,5 +1770,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.22 2001/02/07 00:33:55 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.22.2.1 2001/05/13 18:38:41 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.20 2001/02/13 20:37:43 mike Exp $"
+ * "$Id: lpr.c,v 1.20.2.1 2001/05/13 18:38:00 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -82,9 +82,9 @@ main(int  argc,		/* I - Number of command-line arguments */
   int		deletefile;	/* Delete file after print? */
   char		buffer[8192];	/* Copy buffer */
   int		temp;		/* Temporary file descriptor */
-#ifdef HAVE_SIGACTION
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;	/* Signal action */
-#endif /* HAVE_SIGACTION */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
   deletefile  = 0;
@@ -421,5 +421,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c,v 1.20 2001/02/13 20:37:43 mike Exp $".
+ * End of "$Id: lpr.c,v 1.20.2.1 2001/05/13 18:38:00 mike Exp $".
  */

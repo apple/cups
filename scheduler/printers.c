@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.2 2001/04/11 00:24:14 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.3 2001/05/13 18:38:38 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -852,6 +852,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 		  IPP_RESUME_PRINTER,
 		  IPP_PURGE_JOBS,
 		  IPP_SET_JOB_ATTRIBUTES,
+		  IPP_ENABLE_PRINTER,
+		  IPP_DISABLE_PRINTER,
 		  CUPS_GET_DEFAULT,
 		  CUPS_GET_PRINTERS,
 		  CUPS_ADD_PRINTER,
@@ -1540,9 +1542,13 @@ SortPrinters(void)
 	next          = current->next;
 	current->next = next->next;
 	next->next    = current;
+	prev          = next;
       }
       else
+      {
+        prev    = current;
 	current = current->next;
+      }
   }
   while (did_swap);
 }
@@ -1787,5 +1793,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.2 2001/04/11 00:24:14 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.3 2001/05/13 18:38:38 mike Exp $".
  */

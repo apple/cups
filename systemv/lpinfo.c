@@ -1,5 +1,5 @@
 /*
- * "$Id: lpinfo.c,v 1.3 2001/01/23 17:36:23 mike Exp $"
+ * "$Id: lpinfo.c,v 1.3.2.1 2001/05/13 18:38:41 mike Exp $"
  *
  *   "lpinfo" command for the Common UNIX Printing System (CUPS).
  *
@@ -90,15 +90,13 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'm' : /* Show models */
 	    if (!http)
 	    {
-              http = httpConnect(cupsServer(), ippPort());
+              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
 
 	      if (http == NULL)
 	      {
 		perror("lpinfo: Unable to connect to server");
 		return (1);
 	      }
-
-	      httpEncryption(http, encryption);
             }
 
             show_models(http, long_status);
@@ -107,15 +105,13 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'v' : /* Show available devices */
 	    if (!http)
 	    {
-              http = httpConnect(cupsServer(), ippPort());
+              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
 
 	      if (http == NULL)
 	      {
 		perror("lpinfo: Unable to connect to server");
 		return (1);
 	      }
-
-	      httpEncryption(http, encryption);
             }
 
             show_devices(http, long_status);
@@ -126,7 +122,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      httpClose(http);
 
 	    if (argv[i][2] != '\0')
-	      http = httpConnect(argv[i] + 2, ippPort());
+	      http = httpConnectEncrypt(argv[i] + 2, ippPort(), encryption);
 	    else
 	    {
 	      i ++;
@@ -137,7 +133,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 		return (1);
               }
 
-	      http = httpConnect(argv[i], ippPort());
+	      http = httpConnectEncrypt(argv[i], ippPort(), encryption);
 	    }
 
 	    if (http == NULL)
@@ -145,8 +141,6 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      perror("lpinfo: Unable to connect to server");
 	      return (1);
 	    }
-
-	    httpEncryption(http, encryption);
 	    break;
 
 	default :
@@ -446,5 +440,5 @@ show_models(http_t *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpinfo.c,v 1.3 2001/01/23 17:36:23 mike Exp $".
+ * End of "$Id: lpinfo.c,v 1.3.2.1 2001/05/13 18:38:41 mike Exp $".
  */

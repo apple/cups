@@ -1,5 +1,5 @@
 /*
- * "$Id: lpc.c,v 1.11 2001/02/13 20:37:42 mike Exp $"
+ * "$Id: lpc.c,v 1.11.2.1 2001/05/13 18:37:59 mike Exp $"
  *
  *   "lpc" command for the Common UNIX Printing System (CUPS).
  *
@@ -69,7 +69,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Connect to the scheduler...
   */
 
-  http = httpConnect(cupsServer(), ippPort());
+  http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
   if (argc > 1)
   {
@@ -477,5 +477,5 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpc.c,v 1.11 2001/02/13 20:37:42 mike Exp $".
+ * End of "$Id: lpc.c,v 1.11.2.1 2001/05/13 18:37:59 mike Exp $".
  */

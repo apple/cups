@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.34 2001/03/02 14:30:15 mike Exp $"
+ * "$Id: texttops.c,v 1.34.2.1 2001/05/13 18:38:21 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -57,7 +57,7 @@ int		Directions[256];/* Text directions for each font */
 
 static void	write_line(int row, lchar_t *line);
 static void	write_string(int col, int row, int len, lchar_t *s);
-static void	write_text(char *s);
+static void	write_text(const char *s);
 
 
 /*
@@ -121,9 +121,11 @@ WritePage(void)
  */
 
 void
-WriteProlog(char       *title,	/* I - Title of job */
-	    char       *user,	/* I - Username */
-            ppd_file_t *ppd)	/* I - PPD file info */
+WriteProlog(const char *title,		/* I - Title of job */
+	    const char *user,		/* I - Username */
+            const char *classification,	/* I - Classification */
+	    const char *label,		/* I - Page label */
+            ppd_file_t *ppd)		/* I - PPD file info */
 {
   int		i, j, k;	/* Looping vars */
   char		*charset;	/* Character set string */
@@ -155,6 +157,20 @@ WriteProlog(char       *title,	/* I - Title of job */
 
   if ((datadir = getenv("CUPS_DATADIR")) == NULL)
     datadir = CUPS_DATADIR;
+
+ /*
+  * Adjust margins as necessary...
+  */
+
+  if (classification || label)
+  {
+   /*
+    * Leave room for labels...
+    */
+
+    PageBottom += 36;
+    PageTop    -= 36;
+  }
 
  /*
   * Allocate memory for the page...
@@ -1202,10 +1218,10 @@ write_string(int     col,	/* I - Start column */
  */
 
 static void
-write_text(char *s)	/* I - String to write */
+write_text(const char *s)	/* I - String to write */
 {
-  int		ch;	/* Actual character value (UTF8) */
-  unsigned char	*utf8;	/* UTF8 text */
+  int			ch;	/* Actual character value (UTF8) */
+  const unsigned char	*utf8;	/* UTF8 text */
 
 
   if (NumFonts > 1)
@@ -1216,7 +1232,7 @@ write_text(char *s)	/* I - String to write */
 
     putchar('<');
 
-    utf8 = (unsigned char *)s;
+    utf8 = (const unsigned char *)s;
 
     while (*utf8)
     {
@@ -1276,5 +1292,5 @@ write_text(char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c,v 1.34 2001/03/02 14:30:15 mike Exp $".
+ * End of "$Id: texttops.c,v 1.34.2.1 2001/05/13 18:38:21 mike Exp $".
  */

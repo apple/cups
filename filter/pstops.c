@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54 2001/03/29 15:14:47 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.1 2001/05/13 18:38:20 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -59,7 +59,8 @@ int		Order = 0,		/* 0 = normal, 1 = reverse pages */
 		Flip = 0,		/* Flip/mirror pages */
 		NUp = 1,		/* Number of pages on each sheet (1, 2, 4) */
 		Collate = 0,		/* Collate copies? */
-		Copies = 1;		/* Number of copies */
+		Copies = 1,		/* Number of copies */
+		UseESPsp = 0;		/* Use ESPshowpage? */
 
 
 /*
@@ -262,26 +263,46 @@ main(int  argc,			/* I - Number of command-line arguments */
   ppdEmit(ppd, stdout, PPD_ORDER_ANY);
   ppdEmit(ppd, stdout, PPD_ORDER_PROLOG);
 
-  puts("userdict begin\n"
-       "/ESPshowpage /showpage load def\n"
-       "/showpage { } def\n"
-       "end");
-
   if (g != 1.0 || b != 1.0)
     printf("{ neg 1 add dup 0 lt { pop 1 } { %.3f exp neg 1 add } "
            "ifelse %.3f mul } bind settransfer\n", g, b);
 
-  WriteLabelProlog(cupsGetOption("page-label", num_options, options));
+ /*
+  * Figure out if we should use ESPshowpage or not...
+  */
+
+  val = cupsGetOption("page-label", num_options, options);
+
+  if (val != NULL || getenv("CLASSIFICATION") != NULL || NUp > 1)
+  {
+   /*
+    * Yes, use ESPshowpage...
+    */
+
+    UseESPsp = 1;
+
+    WriteLabelProlog(val);
+
+    puts("userdict begin\n"
+	 "/ESPshowpage /showpage load def\n"
+	 "/showpage { } def\n"
+	 "end");
+  }
 
   if (Copies > 1 && (!Collate || !slowcollate))
   {
-    if (ppd == NULL || ppd->language_level == 1)
+    if (Collate)
+      printf("%%%%Requirements: numcopies(%d) collate\n", Copies);
+    else
+      printf("%%%%Requirements: numcopies(%d)\n", Copies);
+
+    if (LanguageLevel == 1)
       printf("/#copies %d def\n", Copies);
     else
       printf("<</NumCopies %d>>setpagedevice\n", Copies);
   }
 
-  if (strncmp(line, "%!PS-Adobe-", 11) == 0)
+  if (strncmp(line, "%!PS-Adobe-", 11) == 0 && atof(line + 11) >= 3.0)
   {
    /*
     * OK, we have DSC comments; read until we find a %%Page comment...
@@ -293,7 +314,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
           strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
         level ++;
-      else if (strcmp(line, "%%EndDocument") == 0 && level > 0)
+      else if (strncmp(line, "%%EndDocument", 13) == 0 && level > 0)
         level --;
       else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
         break;
@@ -329,51 +350,54 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
           strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
         level ++;
-      else if (strcmp(line, "%%EndDocument") == 0 && level > 0)
+      else if (strncmp(line, "%%EndDocument", 13) == 0 && level > 0)
         level --;
-      else if (strcmp(line, "%%EOF") == 0 && level == 0)
+      else if (strcmp(line, "\004") == 0)
+        continue;
+      else if (strncmp(line, "%%EOF", 5) == 0 && level == 0)
+      {
+        fputs("DEBUG: Saw EOF!\n", stderr);
         saweof = 1;
+	break;
+      }
       else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
       {
-        if (sscanf(line, "%*s%*s%d", &number) == 1)
+	if (!check_range(NumPages + 1))
 	{
-	  if (!check_range(number))
+	  while (psgets(line, sizeof(line), fp) != NULL)
+	    if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
+        	strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
+              level ++;
+	    else if (strcmp(line, "%%EndDocument") == 0 && level > 0)
+              level --;
+	    else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
+	      break;
+
+          continue;
+        }
+
+        if (!sloworder && NumPages > 0)
+	  end_nup(NumPages - 1);
+
+	if (slowcollate || sloworder)
+	  Pages[NumPages] = ftell(temp);
+
+        if (!sloworder)
+	{
+	  if ((NumPages & (NUp - 1)) == 0)
 	  {
-	    while (psgets(line, sizeof(line), fp) != NULL)
-	      if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
-        	  strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
-        	level ++;
-	      else if (strcmp(line, "%%EndDocument") == 0 && level > 0)
-        	level --;
-	      else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
-	        break;
+	    if (ppd == NULL || ppd->num_filters == 0)
+	      fprintf(stderr, "PAGE: %d %d\n", page, Copies);
 
-            continue;
-          }
-
-          if (!sloworder && NumPages > 0)
-	    end_nup(NumPages - 1);
-
-	  if (slowcollate || sloworder)
-	    Pages[NumPages] = ftell(temp);
-
-          if (!sloworder)
-	  {
-	    if ((NumPages & (NUp - 1)) == 0)
-	    {
-	      if (ppd == NULL || ppd->num_filters == 0)
-		fprintf(stderr, "PAGE: %d %d\n", page, Copies);
-
-              printf("%%%%Page: %d %d\n", page, page);
-	      page ++;
-	      ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
-	    }
-
-	    start_nup(NumPages);
+            printf("%%%%Page: %d %d\n", page, page);
+	    page ++;
+	    ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
 	  }
 
-	  NumPages ++;
+	  start_nup(NumPages);
 	}
+
+	NumPages ++;
       }
       else if (strncmp(line, "%%BeginBinary:", 14) == 0 ||
                (strncmp(line, "%%BeginData:", 12) == 0 &&
@@ -400,8 +424,11 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  tbytes -= nbytes;
 	}
       }
-      else if (strcmp(line, "%%Trailer") == 0 && level == 0)
+      else if (strncmp(line, "%%Trailer", 9) == 0 && level == 0)
+      {
+        fputs("DEBUG: Saw Trailer!\n", stderr);
         break;
+      }
       else
       {
         if (!sloworder)
@@ -511,8 +538,18 @@ main(int  argc,			/* I - Number of command-line arguments */
     * Copy the trailer, if any...
     */
 
-    while ((nbytes = fread(line, 1, sizeof(line), fp)) > 0)
-      fwrite(line, 1, nbytes, stdout);
+    while (psgets(line, sizeof(line), fp) != NULL)
+    {
+      if (strcmp(line, "\004") != 0)
+        fputs(line, stdout);
+
+      if (strncmp(line, "%%EOF", 5) == 0)
+      {
+        fputs("DEBUG: Saw EOF!\n", stderr);
+        saweof = 1;
+	break;
+      }
+    }
   }
   else
   {
@@ -533,7 +570,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	fputs(line, temp);
     }
 
-    puts("ESPshowpage");
+    if (UseESPsp)
+      puts("ESPshowpage");
 
     if (slowcollate)
     {
@@ -547,7 +585,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	copy_bytes(temp, 0);
 	Copies --;
 
-        puts("ESPshowpage");
+        if (UseESPsp)
+          puts("ESPshowpage");
       }
     }
   }
@@ -565,7 +604,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if (ppd != NULL && ppd->jcl_end)
     fputs(ppd->jcl_end, stdout);
-  else if (ppd->num_filters == 0)
+  else if (ppd != NULL && ppd->num_filters == 0)
     putchar(0x04);
 
  /*
@@ -696,12 +735,15 @@ end_nup(int number)	/* I - Page number */
   switch (NUp)
   {
     case 1 :
-	WriteLabels();
-        puts("ESPshowpage");
+	if (UseESPsp)
+	{
+	  WriteLabels();
+          puts("ESPshowpage");
+	}
 	break;
 
     case 2 :
-	if ((number & 1) == 1)
+	if ((number & 1) == 1 && UseESPsp)
 	{
 	  WriteLabels();
           puts("ESPshowpage");
@@ -709,7 +751,7 @@ end_nup(int number)	/* I - Page number */
         break;
 
     case 4 :
-	if ((number & 3) == 3)
+	if ((number & 3) == 3 && UseESPsp)
 	{
 	  WriteLabels();
           puts("ESPshowpage");
@@ -921,5 +963,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54 2001/03/29 15:14:47 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.1 2001/05/13 18:38:20 mike Exp $".
  */

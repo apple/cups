@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.1 2001/04/02 19:51:47 mike Exp $"
+ * "$Id: client.c,v 1.91.2.2 2001/05/13 18:38:34 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -634,8 +634,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	}
       }
 
-      if ((strcasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Upgrade") == 0 ||
-           (best != NULL && best->encryption == HTTP_ENCRYPT_ALWAYS)) &&
+      if (strcasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Upgrade") == 0 &&
 	  con->http.tls == NULL)
       {
 #ifdef HAVE_LIBSSL
@@ -650,7 +649,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	}
 
 	httpPrintf(HTTP(con), "Connection: Upgrade\r\n");
-	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,SSL/2.0,SSL/3.0\r\n");
+	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,HTTP/1.1\r\n");
 	httpPrintf(HTTP(con), "Content-Length: 0\r\n");
 	httpPrintf(HTTP(con), "\r\n");
 
@@ -700,7 +699,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
     }
     else
     {
-      if ((status = IsAuthorized(con)) == HTTP_UPGRADE_REQUIRED)
+      if (strcasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Upgrade") == 0 &&
+	  con->http.tls == NULL)
       {
 #ifdef HAVE_LIBSSL
        /*
@@ -714,7 +714,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	}
 
 	httpPrintf(HTTP(con), "Connection: Upgrade\r\n");
-	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,SSL/2.0,SSL/3.0\r\n");
+	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,HTTP/1.1\r\n");
 	httpPrintf(HTTP(con), "Content-Length: 0\r\n");
 	httpPrintf(HTTP(con), "\r\n");
 
@@ -727,7 +727,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	}
 #endif /* HAVE_LIBSSL */
       }
-      else if (status != HTTP_OK)
+
+      if ((status = IsAuthorized(con)) != HTTP_OK)
       {
 	SendError(con, status);
 	CloseClient(con);
@@ -1250,8 +1251,9 @@ SendCommand(client_t      *con,
 
   close(fd);
 
-  LogMessage(L_DEBUG, "SendCommand() %d command=\"%s\" file=%d pipe_pid=%d",
-             con->http.fd, command, con->file, con->pipe_pid);
+  LogMessage(L_INFO, "Started \"%s\" (pid=%d)", command, con->pipe_pid);
+
+  LogMessage(L_DEBUG, "SendCommand() %d file=%d", con->http.fd, con->file);
 
   if (con->pipe_pid == 0)
     return (0);
@@ -1321,13 +1323,11 @@ SendError(client_t      *con,	/* I - Connection */
 
 #ifdef HAVE_LIBSSL
   if (code == HTTP_UPGRADE_REQUIRED)
-  {
     if (httpPrintf(HTTP(con), "Connection: Upgrade\r\n") < 0)
       return (0);
 
-    if (httpPrintf(HTTP(con), "Upgrade: TLS/1.0,SSL/2.0,SSL/3.0\r\n") < 0)
-      return (0);
-  }
+  if (httpPrintf(HTTP(con), "Upgrade: TLS/1.0,HTTP/1.1\r\n") < 0)
+    return (0);
 #endif /* HAVE_LIBSSL */
 
   if (con->http.version >= HTTP_1_1 && !con->http.keep_alive)
@@ -2132,5 +2132,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.1 2001/04/02 19:51:47 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.2 2001/05/13 18:38:34 mike Exp $".
  */

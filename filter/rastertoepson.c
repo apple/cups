@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertoepson.c,v 1.10 2001/03/05 22:09:18 mike Exp $"
+ * "$Id: rastertoepson.c,v 1.10.2.1 2001/05/13 18:38:20 mike Exp $"
  *
  *   EPSON ESC/P and ESC/P2 filter for the Common UNIX Printing System
  *   (CUPS).
@@ -1082,12 +1082,12 @@ main(int  argc,			/* I - Number of command-line arguments */
   if (page == 0)
     fputs("ERROR: No pages found!\n", stderr);
   else
-    fputs("INFO: Ready to print.\n", stderr);
+    fputs("INFO: " CUPS_SVERSION " is ready to print.\n", stderr);
 
   return (page == 0);
 }
 
 
 /*
- * End of "$Id: rastertoepson.c,v 1.10 2001/03/05 22:09:18 mike Exp $".
+ * End of "$Id: rastertoepson.c,v 1.10.2.1 2001/05/13 18:38:20 mike Exp $".
  */

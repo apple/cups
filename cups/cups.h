@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h,v 1.32 2001/02/06 23:40:07 mike Exp $"
+ * "$Id: cups.h,v 1.32.2.1 2001/05/13 18:38:02 mike Exp $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -94,7 +94,22 @@ typedef struct				/**** Destination ****/
   cups_option_t	*options;		/* Options */
 } cups_dest_t;
 
-  
+typedef struct				/**** Job ****/
+{
+  int		id;			/* The job ID */
+  char		*dest,			/* Printer or class name */
+		*title,			/* Title/job name */
+		*user,			/* User the submitted the job */
+		*format;		/* Document format */
+  ipp_jstate_t	state;			/* Job state */
+  int		size,			/* Size in kilobytes */
+		priority;		/* Priority (1-100) */
+  time_t	completed_time,		/* Time the job was completed */
+		creation_time,		/* Time the job was created */
+		processing_time;	/* Time the job was processed */
+} cups_job_t;
+
+
 /*
  * Functions...
  */
@@ -104,8 +119,11 @@ extern int		cupsCancelJob(const char *printer, int job);
 extern ipp_t		*cupsDoFileRequest(http_t *http, ipp_t *request,
 			                   const char *resource, const char *filename);
 extern http_encryption_t cupsEncryption(void);
+extern void		cupsFreeJobs(int num_jobs, cups_job_t *jobs);
 extern int		cupsGetClasses(char ***classes);
 extern const char	*cupsGetDefault(void);
+extern int		cupsGetJobs(cups_job_t **jobs, const char *dest,
+			            int myjobs, int completed);
 extern const char	*cupsGetPPD(const char *printer);
 extern int		cupsGetPrinters(char ***printers);
 extern ipp_status_t	cupsLastError(void);
@@ -153,5 +171,5 @@ extern const char	*cupsUser(void);
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.32 2001/02/06 23:40:07 mike Exp $".
+ * End of "$Id: cups.h,v 1.32.2.1 2001/05/13 18:38:02 mike Exp $".
  */

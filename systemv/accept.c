@@ -1,5 +1,5 @@
 /*
- * "$Id: accept.c,v 1.11 2001/01/23 17:36:22 mike Exp $"
+ * "$Id: accept.c,v 1.11.2.1 2001/05/13 18:38:40 mike Exp $"
  *
  *   "accept", "disable", "enable", and "reject" commands for the Common
  *   UNIX Printing System (CUPS).
@@ -123,7 +123,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      httpClose(http);
 
 	    if (argv[i][2] != '\0')
-	      http = httpConnect(argv[i] + 2, ippPort());
+	      http = httpConnectEncrypt(argv[i] + 2, ippPort(), encryption);
 	    else
 	    {
 	      i ++;
@@ -134,7 +134,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	        return (1);
 	      }
 
-	      http = httpConnect(argv[i], ippPort());
+	      http = httpConnectEncrypt(argv[i], ippPort(), encryption);
 	    }
 
 	    if (http == NULL)
@@ -182,7 +182,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
 
       if (http == NULL)
-        http = httpConnect(hostname, ippPort());
+        http = httpConnectEncrypt(hostname, ippPort(), encryption);
 
       if (http == NULL)
       {
@@ -225,8 +225,6 @@ main(int  argc,			/* I - Number of command-line arguments */
      /*
       * Do the request and get back a response...
       */
-
-      httpEncryption(http, encryption);
 
       if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
       {
@@ -306,5 +304,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: accept.c,v 1.11 2001/01/23 17:36:22 mike Exp $".
+ * End of "$Id: accept.c,v 1.11.2.1 2001/05/13 18:38:40 mike Exp $".
  */

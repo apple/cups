@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.30 2001/03/06 18:37:49 mike Exp $"
+# "$Id: cups.spec,v 1.30.2.1 2001/05/13 18:37:58 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -27,7 +27,7 @@
 Summary: Common Unix Printing System
 Name: cups
 Version: 1.1.7
-Release: 0
+Release: 1
 Copyright: GPL
 Group: System Environment/Daemons
 Source: ftp://ftp.easysw.com/pub/cups/%{version}/cups-%{version}-source.tar.gz
@@ -37,10 +37,18 @@ Vendor: Easy Software Products
 # use buildroot so as not to disturb the version already installed
 BuildRoot: /var/tmp/%{name}-root
 Conflicts: lpr, LPRng
+Provides: libcups.so.2
+Provides: libcupsimage.so.2
+Provides: cupsd
 
 %package devel
 Summary: Common Unix Printing System - development environment
 Group: Development/Libraries
+
+%package pstoraster
+Summary: Common Unix Printing System - PostScript RIP
+Group: System Environment/Daemons
+Provides: pstoraster
 
 %description
 The Common UNIX Printing System provides a portable printing layer for 
@@ -53,6 +61,11 @@ The Common UNIX Printing System provides a portable printing layer for
 UNIX® operating systems. This is the development package for creating
 additional printer drivers, and other CUPS services.
 
+%description devel
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This is the PostScript RIP package for
+supporting non-PostScript printer drivers.
+
 %prep
 %setup
 
@@ -63,13 +76,8 @@ additional printer drivers, and other CUPS services.
 make
 
 %install
-# these lines just make sure the directory structure in the
-# RPM_BUILD_ROOT exists
+# Make sure the RPM_BUILD_ROOT directory exists.
 rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
-mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc0.d
-mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc3.d
-mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc5.d
 
 make	prefix=$RPM_BUILD_ROOT \
 	exec_prefix=$RPM_BUILD_ROOT/usr \
@@ -79,6 +87,7 @@ make	prefix=$RPM_BUILD_ROOT \
 	DOCDIR=$RPM_BUILD_ROOT/usr/share/doc/cups \
 	INCLUDEDIR=$RPM_BUILD_ROOT/usr/include \
 	LIBDIR=$RPM_BUILD_ROOT/usr/lib \
+	LOGDIR=$RPM_BUILD_ROOT/var/log/cups \
 	LOCALEDIR=$RPM_BUILD_ROOT/usr/share/locale \
 	MANDIR=$RPM_BUILD_ROOT/usr/man \
 	PAMDIR=$RPM_BUILD_ROOT/etc/pam.d \
@@ -157,11 +166,32 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/*
 /usr/lib/*.so*
 %dir /usr/lib/cups
-/usr/lib/cups/*
+%dir /usr/lib/cups/backend
+/usr/lib/cups/backend/*
+%dir /usr/lib/cups/cgi-bin
+/usr/lib/cups/cgi-bin/*
+%dir /usr/lib/cups/filter
+/usr/lib/cups/filter/hpgltops
+/usr/lib/cups/filter/imagetops
+/usr/lib/cups/filter/imagetoraster
+/usr/lib/cups/filter/pdftops
+/usr/lib/cups/filter/pstops
+/usr/lib/cups/filter/rastertoepson
+/usr/lib/cups/filter/rastertohp
+/usr/lib/cups/filter/texttops
 /usr/man/*
 /usr/sbin/*
 %dir /usr/share/cups
-/usr/share/cups/*
+%dir /usr/share/cups/banners
+/usr/share/cups/banners/*
+%dir /usr/share/cups/charsets
+/usr/share/cups/charsets/*
+%dir /usr/share/cups/data
+/usr/share/cups/data/*
+%dir /usr/share/cups/model
+/usr/share/cups/model/*
+%dir /usr/share/cups/templates
+/usr/share/cups/templates/*
 %dir /usr/share/doc/cups
 /usr/share/doc/cups/*
 %dir /usr/share/locale
@@ -174,6 +204,14 @@ rm -rf $RPM_BUILD_ROOT
 /usr/include/cups/*
 /usr/lib/*.a
 
+%files pstoraster
+%dir /usr/lib/cups/filter
+/usr/lib/cups/filter/pstoraster
+%dir /usr/share/cups/fonts
+/usr/share/cups/fonts/*
+%dir /usr/share/cups/pstoraster
+/usr/share/cups/pstoraster/*
+
 #
-# End of "$Id: cups.spec,v 1.30 2001/03/06 18:37:49 mike Exp $".
+# End of "$Id: cups.spec,v 1.30.2.1 2001/05/13 18:37:58 mike Exp $".
 #

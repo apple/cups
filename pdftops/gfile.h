@@ -24,6 +24,7 @@
 #  endif
 #elif defined(ACORN)
 #elif defined(MACOS)
+#  include <ctime.h>
 #else
 #  include <unistd.h>
 #  include <sys/types.h>
@@ -60,14 +61,14 @@ extern GString *getCurrentDir();
 
 // Append a file name to a path string.  <path> may be an empty
 // string, denoting the current directory).  Returns <path>.
-extern GString *appendToPath(GString *path, char *fileName);
+extern GString *appendToPath(GString *path, const char *fileName);
 
 // Grab the path from the front of the file name.  If there is no
 // directory component in <fileName>, returns an empty string.
-extern GString *grabPath(char *fileName);
+extern GString *grabPath(const char *fileName);
 
 // Is this an absolute path or file name?
-extern GBool isAbsolutePath(char *path);
+extern GBool isAbsolutePath(const char *path);
 
 // Make this path absolute by prepending current directory (if path is
 // relative) or prepending user's directory (if path starts with '~').
@@ -75,7 +76,7 @@ GString *makePathAbsolute(GString *path);
 
 // Get the modification time for <fileName>.  Returns 0 if there is an
 // error.
-time_t getModTime(char *fileName);
+time_t getModTime(const char *fileName);
 
 // Create a temporary file and open it for writing.  If <ext> is not
 // NULL, it will be used as the file name extension.  Returns both the
@@ -83,7 +84,7 @@ time_t getModTime(char *fileName);
 // should be done to the returned file pointer; the file may be
 // reopened later for reading, but not for writing.  The <mode> string
 // should be "w" or "wb".  Returns true on success.
-GBool openTempFile(GString **name, FILE **f, char *mode, char *ext);
+GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext);
 
 //------------------------------------------------------------------------
 // GDir and GDirEntry
@@ -92,7 +93,7 @@ GBool openTempFile(GString **name, FILE **f, char *mode, char *ext);
 class GDirEntry {
 public:
 
-  GDirEntry(char *dirPath, char *name1, GBool doStat);
+  GDirEntry(const char *dirPath, const char *name1, GBool doStat);
   ~GDirEntry();
   GString *getName() { return name; }
   GBool isDir() { return dir; }
@@ -106,7 +107,7 @@ private:
 class GDir {
 public:
 
-  GDir(char *name, GBool doStat1 = gTrue);
+  GDir(const char *name, GBool doStat1 = gTrue);
   ~GDir();
   GDirEntry *getNextEntry();
   void rewind();

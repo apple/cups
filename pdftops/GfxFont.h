@@ -27,7 +27,8 @@ struct BuiltinFont;
 
 enum GfxFontCharSet16 {
   font16AdobeJapan12,		// Adobe-Japan1-2
-  font16AdobeGB12		// Adobe-GB1-2 (Chinese)
+  font16AdobeGB12,		// Adobe-GB1-2 (Chinese)
+  font16AdobeCNS13		// Adobe-CNS1-3 (Chinese)
 };
 
 //------------------------------------------------------------------------
@@ -97,7 +98,7 @@ class GfxFont {
 public:
 
   // Constructor.
-  GfxFont(char *tag1, Ref id1, Dict *fontDict);
+  GfxFont(const char *tag1, Ref id1, Dict *fontDict);
 
   // Destructor.
   ~GfxFont();
@@ -109,7 +110,7 @@ public:
   Ref getID() { return id; }
 
   // Does this font match the tag?
-  GBool matches(char *tag1) { return !tag->cmp(tag1); }
+  GBool matches(const char *tag1) { return !tag->cmp(tag1); }
 
   // Get base font name.
   GString *getName() { return name; }
@@ -127,8 +128,8 @@ public:
 
   // Get the PostScript font name for the embedded font.  Returns
   // NULL if there is no embedded font.
-  char *getEmbeddedFontName()
-    { return embFontName ? embFontName->getCString() : (char *)NULL; }
+  const char *getEmbeddedFontName()
+    { return embFontName ? embFontName->getCString() : (const char *)NULL; }
 
   // Get the name of the external font file.  Returns NULL if there
   // is no external font file.
@@ -155,10 +156,10 @@ public:
   FontEncoding *getEncoding() { return encoding; }
 
   // Return the character name associated with <code>.
-  char *getCharName(int code) { return encoding->getCharName(code); }
+  const char *getCharName(int code) { return encoding->getCharName(code); }
 
   // Return the code associated with <name>.
-  int getCharCode(char *charName) { return encoding->getCharCode(charName); }
+  int getCharCode(const char *charName) { return encoding->getCharCode(charName); }
 
   // Return the Type 3 CharProc for the character associated with <code>.
   Object *getCharProc(int code, Object *proc);
@@ -174,8 +175,8 @@ public:
   double *getFontMatrix() { return fontMat; }
 
   // Read an external or embedded font file into a buffer.
-  char *readExtFontFile(int *len);
-  char *readEmbFontFile(int *len);
+  const char *readExtFontFile(int *len);
+  const char *readEmbFontFile(int *len);
 
 private:
 
@@ -224,7 +225,7 @@ public:
   ~GfxFontDict();
 
   // Get the specified font.
-  GfxFont *lookup(char *tag);
+  GfxFont *lookup(const char *tag);
 
   // Iterative access.
   int getNumFonts() { return numFonts; }

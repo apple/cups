@@ -1,4 +1,6 @@
-/* Copyright (C) 1997, 1998 Aladdin Enterprises.  All rights reserved.
+/*
+  Copyright 2001 by Easy Software Products.
+  Copyright 1997, 1998 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
   
@@ -22,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: zfunc.c,v 1.1 2000/03/08 23:15:38 mike Exp $ */
+/*$Id: zfunc.c,v 1.1.2.1 2001/05/13 18:38:33 mike Exp $ */
 /* Generic PostScript language interface to Functions */
 #include "memory_.h"
 #include "ghost.h"
@@ -124,7 +126,7 @@ zexecfunction(os_ptr op)
 		DO_NOTHING;
 	    else {
 		if (diff > 0)
-		    push(diff);	/* can't fail */
+		    push(diff)	/* can't fail */ /* MRS: No trailing ; */
 		else if (diff < 0) {
 		    pop(-diff);
 		    op = osp;

@@ -51,7 +51,7 @@ public:
   virtual void setDefaultCTM(double *ctm1);
 
   // Start a page.
-  virtual void startPage(int pageNum, GfxState *state) {}
+  virtual void startPage(int, GfxState *) {}
 
   // End a page.
   virtual void endPage() {}
@@ -66,61 +66,63 @@ public:
   virtual void cvtUserToDev(double ux, double uy, int *dx, int *dy);
 
   //----- link borders
-  virtual void drawLink(Link *link, Catalog *catalog) {}
+  virtual void drawLink(Link *, Catalog *) {}
 
   //----- save/restore graphics state
-  virtual void saveState(GfxState *state) {}
-  virtual void restoreState(GfxState *state) {}
+  virtual void saveState(GfxState *) {}
+  virtual void restoreState(GfxState *) {}
 
   //----- update graphics state
   virtual void updateAll(GfxState *state);
-  virtual void updateCTM(GfxState *state, double m11, double m12,
-			 double m21, double m22, double m31, double m32) {}
-  virtual void updateLineDash(GfxState *state) {}
-  virtual void updateFlatness(GfxState *state) {}
-  virtual void updateLineJoin(GfxState *state) {}
-  virtual void updateLineCap(GfxState *state) {}
-  virtual void updateMiterLimit(GfxState *state) {}
-  virtual void updateLineWidth(GfxState *state) {}
-  virtual void updateFillColor(GfxState *state) {}
-  virtual void updateStrokeColor(GfxState *state) {}
+  virtual void updateCTM(GfxState *, double, double,
+			 double, double, double, double) {}
+  virtual void updateLineDash(GfxState *) {}
+  virtual void updateFlatness(GfxState *) {}
+  virtual void updateLineJoin(GfxState *) {}
+  virtual void updateLineCap(GfxState *) {}
+  virtual void updateMiterLimit(GfxState *) {}
+  virtual void updateLineWidth(GfxState *) {}
+  virtual void updateFillColor(GfxState *) {}
+  virtual void updateStrokeColor(GfxState *) {}
+  virtual void updateFillOpacity(GfxState *) {}
+  virtual void updateStrokeOpacity(GfxState *) {}
 
-  //----- update text state
-  virtual void updateFont(GfxState *state) {}
-  virtual void updateTextMat(GfxState *state) {}
-  virtual void updateCharSpace(GfxState *state) {}
-  virtual void updateRender(GfxState *state) {}
-  virtual void updateRise(GfxState *state) {}
-  virtual void updateWordSpace(GfxState *state) {}
-  virtual void updateHorizScaling(GfxState *state) {}
-  virtual void updateTextPos(GfxState *state) {}
-  virtual void updateTextShift(GfxState *state, double shift) {}
+  //----- update text 
+  virtual void updateFont(GfxState *) {}
+  virtual void updateTextMat(GfxState *) {}
+  virtual void updateCharSpace(GfxState *) {}
+  virtual void updateRender(GfxState *) {}
+  virtual void updateRise(GfxState *) {}
+  virtual void updateWordSpace(GfxState *) {}
+  virtual void updateHorizScaling(GfxState *) {}
+  virtual void updateTextPos(GfxState *) {}
+  virtual void updateTextShift(GfxState *, double) {}
 
   //----- path painting
-  virtual void stroke(GfxState *state) {}
-  virtual void fill(GfxState *state) {}
-  virtual void eoFill(GfxState *state) {}
+  virtual void stroke(GfxState *) {}
+  virtual void fill(GfxState *) {}
+  virtual void eoFill(GfxState *) {}
 
   //----- path clipping
-  virtual void clip(GfxState *state) {}
-  virtual void eoClip(GfxState *state) {}
+  virtual void clip(GfxState *) {}
+  virtual void eoClip(GfxState *) {}
 
   //----- text drawing
-  virtual void beginString(GfxState *state, GString *s) {}
-  virtual void endString(GfxState *state) {}
-  virtual void drawChar(GfxState *state, double x, double y,
-			double dx, double dy, Guchar c) {}
-  virtual void drawChar16(GfxState *state, double x, double y,
-			  double dx, double dy, int c) {}
-  virtual void drawString(GfxState *state, GString *s) {}
-  virtual void drawString16(GfxState *state, GString *s) {}
+  virtual void beginString(GfxState *, GString *) {}
+  virtual void endString(GfxState *) {}
+  virtual void drawChar(GfxState *, double, double,
+			double, double, Guchar) {}
+  virtual void drawChar16(GfxState *, double, double,
+			  double, double, int) {}
+  virtual void drawString(GfxState *, GString *) {}
+  virtual void drawString16(GfxState *, GString *) {}
 
   //----- image drawing
-  virtual void drawImageMask(GfxState *state, Stream *str,
+  virtual void drawImageMask(GfxState *state, Object *ref, Stream *str,
 			     int width, int height, GBool invert,
 			     GBool inlineImg);
-  virtual void drawImage(GfxState *state, Stream *str, int width,
-			 int height, GfxImageColorMap *colorMap,
+  virtual void drawImage(GfxState *state, Object *ref, Stream *str,
+			 int width, int height, GfxImageColorMap *colorMap,
 			 GBool inlineImg);
 
 #if OPI_SUPPORT

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.1 2001/04/02 19:51:49 mike Exp $"
+ * "$Id: job.c,v 1.124.2.2 2001/05/13 18:38:36 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -275,7 +275,16 @@ CheckJobs(void)
     if (current->state->values[0].integer == IPP_JOB_PENDING)
     {
       if ((pclass = FindClass(current->dest)) != NULL)
-        printer = FindAvailablePrinter(current->dest);
+      {
+       /*
+        * If the class is remote, just pass it to the remote server...
+	*/
+
+        if (pclass->type & CUPS_PRINTER_REMOTE)
+	  printer = pclass;
+	else
+	  printer = FindAvailablePrinter(current->dest);
+      }
       else
         printer = FindPrinter(current->dest);
 
@@ -1048,6 +1057,7 @@ StartJob(int       id,		/* I - Job ID */
 		*optptr;	/* Pointer to options */
   ipp_attribute_t *attr;	/* Current attribute */
   int		pid;		/* Process ID of new filter process */
+  int		banner_page;	/* 1 if banner page, 0 otherwise */
   int		statusfds[2],	/* Pipes used between the filters and scheduler */
 		filterfds[2][2];/* Pipes used between the filters */
   char		*argv[8],	/* Filter command-line arguments */
@@ -1084,8 +1094,8 @@ StartJob(int       id,		/* I - Job ID */
   if (current == NULL)
     return;
 
-  LogMessage(L_DEBUG, "StartJob() id = %d, file = %d", id,
-             current->current_file);
+  LogMessage(L_DEBUG, "StartJob() id = %d, file = %d/%d", id,
+             current->current_file, current->num_files);
 
   if (current->num_files == 0)
   {
@@ -1174,6 +1184,36 @@ StartJob(int       id,		/* I - Job ID */
     set_time(current, "time-at-processing");
 
  /*
+  * Determine if we are printing a banner page or not...
+  */
+
+  if (current->job_sheets == NULL)
+    LogMessage(L_DEBUG, "No job-sheets attribute.");
+  else if (current->job_sheets->num_values == 1)
+    LogMessage(L_DEBUG, "job-sheets=%s",
+               current->job_sheets->values[0].string.text);
+  else
+    LogMessage(L_DEBUG, "job-sheets=%s,%s",
+               current->job_sheets->values[0].string.text,
+               current->job_sheets->values[1].string.text);
+
+  if (printer->type & CUPS_PRINTER_REMOTE)
+    banner_page = 0;
+  else if (current->job_sheets == NULL)
+    banner_page = 0;
+  else if (strcasecmp(current->job_sheets->values[0].string.text, "none") != 0 &&
+	   current->current_file == 0)
+    banner_page = 1;
+  else if (current->job_sheets->num_values > 1 &&
+	   strcasecmp(current->job_sheets->values[1].string.text, "none") != 0 &&
+	   current->current_file == (current->num_files - 1))
+    banner_page = 1;
+  else
+    banner_page = 0;
+
+  LogMessage(L_DEBUG, "banner_page = %d", banner_page);
+
+ /*
   * Building the options string is harder than it needs to be, but
   * for the moment we need to pass strings for command-line args and
   * not IPP attribute pointers... :)
@@ -1194,13 +1234,7 @@ StartJob(int       id,		/* I - Job ID */
       * Don't use the # copies attribute if we are printing the job sheets...
       */
 
-      if ((printer->type & CUPS_PRINTER_REMOTE) ||
-          current->job_sheets == NULL ||
-          ((strcasecmp(current->job_sheets->values[0].string.text, "none") == 0 ||
-	    current->current_file != 0) &&
-           (current->job_sheets->num_values == 1 ||
-	    strcasecmp(current->job_sheets->values[1].string.text, "none") == 0 ||
-	    current->current_file != (current->num_files - 1))))
+      if (!banner_page)
         sprintf(copies, "%d", attr->values[0].integer);
     }
     else if (strcmp(attr->name, "job-name") == 0 &&
@@ -1236,6 +1270,10 @@ StartJob(int       id,		/* I - Job ID */
           strcmp(attr->name, "job-hold-until") != 0 &&
 	  strcmp(attr->name, "job-priority") != 0)
 	continue;
+
+      if (strcmp(attr->name, "page-label") == 0 &&
+	  banner_page)
+        continue;
 
      /*
       * Otherwise add them to the list...
@@ -1382,7 +1420,7 @@ StartJob(int       id,		/* I - Job ID */
   snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
   snprintf(datadir, sizeof(datadir), "CUPS_DATADIR=%s", DataDir);
   snprintf(fontpath, sizeof(fontpath), "CUPS_FONTPATH=%s", FontPath);
-  if (Classification[0])
+  if (Classification[0] && !banner_page)
     snprintf(classification, sizeof(classification), "CLASSIFICATION=%s",
              Classification);
   else
@@ -1620,7 +1658,7 @@ StopJob(int id)			/* I - Job ID */
 
         if (current->status < 0)
 	  SetPrinterState(current->printer, IPP_PRINTER_STOPPED);
-	else
+	else if (current->printer->state != IPP_PRINTER_STOPPED)
 	  SetPrinterState(current->printer, IPP_PRINTER_IDLE);
 
         LogMessage(L_DEBUG, "StopJob: printer state is %d", current->printer->state);
@@ -1696,27 +1734,22 @@ UpdateJob(job_t *job)		/* I - Job to check */
     * Figure out the logging level...
     */
 
-    if (strncmp(buffer, "ERROR:", 6) == 0)
-    {
-      loglevel = L_ERROR;
-      message  = buffer + 6;
-    }
     if (strncmp(buffer, "EMERG:", 6) == 0)
     {
       loglevel = L_EMERG;
       message  = buffer + 6;
     }
-    if (strncmp(buffer, "ALERT:", 6) == 0)
+    else if (strncmp(buffer, "ALERT:", 6) == 0)
     {
       loglevel = L_ALERT;
       message  = buffer + 6;
     }
-    if (strncmp(buffer, "CRIT:", 5) == 0)
+    else if (strncmp(buffer, "CRIT:", 5) == 0)
     {
       loglevel = L_CRIT;
       message  = buffer + 5;
     }
-    if (strncmp(buffer, "ERROR:", 6) == 0)
+    else if (strncmp(buffer, "ERROR:", 6) == 0)
     {
       loglevel = L_ERROR;
       message  = buffer + 6;
@@ -1726,7 +1759,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
       loglevel = L_WARN;
       message  = buffer + 8;
     }
-    if (strncmp(buffer, "NOTICE:", 6) == 0)
+    else if (strncmp(buffer, "NOTICE:", 6) == 0)
     {
       loglevel = L_NOTICE;
       message  = buffer + 6;
@@ -2016,5 +2049,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.1 2001/04/02 19:51:49 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.2 2001/05/13 18:38:36 mike Exp $".
  */

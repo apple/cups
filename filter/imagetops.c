@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.36 2001/03/14 13:45:33 mike Exp $"
+ * "$Id: imagetops.c,v 1.36.2.1 2001/05/13 18:38:18 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -52,7 +52,7 @@ int	Flip = 0,		/* Flip/mirror pages */
  * Local functions...
  */
 
-static void	ps_hex(ib_t *, int);
+static void	ps_hex(ib_t *, int, int);
 static void	ps_ascii85(ib_t *, int, int);
 
 
@@ -87,6 +87,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   int		out_offset,	/* Offset into output buffer */
 		out_length;	/* Length of output buffer */
   ppd_file_t	*ppd;		/* PPD file */
+  ppd_choice_t	*choice;	/* PPD option choice */
   int		num_options;	/* Number of print options */
   cups_option_t	*options;	/* Print options */
   const char	*val;		/* Option value */
@@ -99,6 +100,9 @@ main(int  argc,		/* I - Number of command-line arguments */
   int		realcopies;	/* Real copies being printed */
   float		left, top;	/* Left and top of image */
   char		filename[1024];	/* Name of file to print */
+  time_t	curtime;	/* Current time */
+  struct tm	*curtm;		/* Current date */
+  char		curdate[255];	/* Current date string */
 
 
  /*
@@ -431,8 +435,77 @@ main(int  argc,		/* I - Number of command-line arguments */
     }
   }
 
+ /*
+  * Compute the number of pages to print and the size of the image on each
+  * page...
+  */
+
   xpages = ceil(xinches / xprint);
   ypages = ceil(yinches / yprint);
+
+  xprint = xinches / xpages;
+  yprint = yinches / ypages;
+
+ /*
+  * Update the page size for custom sizes...
+  */
+
+  if ((choice = ppdFindMarkedChoice(ppd, "PageSize")) != NULL &&
+      strcasecmp(choice->choice, "Custom") == 0)
+  {
+    float	width,		/* New width in points */
+		length;		/* New length in points */
+    char	s[255];		/* New custom page size... */
+
+
+    if (Orientation & 1)
+    {
+      width  = yprint * 72.0;
+      length = xprint * 72.0;
+    }
+    else
+    {
+      width  = xprint * 72.0;
+      length = yprint * 72.0;
+    }
+
+   /*
+    * Add margins to page size...
+    */
+
+    width  += ppd->custom_margins[0] + ppd->custom_margins[2];
+    length += ppd->custom_margins[1] + ppd->custom_margins[3];
+
+   /*
+    * Enforce minimums...
+    */
+
+    if (width < ppd->custom_min[0])
+      width = ppd->custom_min[0];
+
+    if (length < ppd->custom_min[1])
+      length = ppd->custom_min[1];
+
+   /*
+    * Set the new custom size...
+    */
+
+    sprintf(s, "Custom.%.0fx%.0f", width, length);
+    ppdMarkOption(ppd, "PageSize", s);
+
+   /*
+    * Update page variables...
+    */
+
+    PageWidth  = width;
+    PageLength = length;
+    PageLeft   = ppd->custom_margins[0];
+    PageRight  = width - ppd->custom_margins[2];
+    PageBottom = ppd->custom_margins[1];
+    PageTop    = length - ppd->custom_margins[3];
+
+    UpdatePageVars();
+  }
 
  /*
   * See if we need to collate, and if so how we need to do it...
@@ -442,6 +515,14 @@ main(int  argc,		/* I - Number of command-line arguments */
     Collate = 0;
 
   slowcollate = Collate && ppdFindOption(ppd, "Collate") == NULL;
+
+  if (Copies > 1 && !slowcollate)
+  {
+    realcopies = Copies;
+    Copies     = 1;
+  }
+  else
+    realcopies = 1;
 
  /*
   * Write any "exit server" options that have been selected...
@@ -459,7 +540,25 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Start sending the document with any commands needed...
   */
 
-  puts("%!");
+  curtime = time(NULL);
+  curtm   = localtime(&curtime);
+
+  puts("%!PS-Adobe-3.0");
+  printf("%%%%BoundingBox: %.0f %.0f %.0f %.0f\n", PageLeft, PageBottom,
+         PageRight, PageTop);
+  printf("%%%%LanguageLevel: %d\n", LanguageLevel);
+  printf("%%%%Pages: %d\n", xpages * ypages * Copies);
+  puts("%%DocumentData: Clean7Bit");
+  puts("%%DocumentNeededResources: font Helvetica-Bold");
+  puts("%%Creator: imagetops/" CUPS_SVERSION);
+  strftime(curdate, sizeof(curdate), CUPS_STRFTIME_FORMAT, curtm);
+  printf("%%%%CreationDate: %s\n", curdate);
+  printf("%%%%Title: %s\n", argv[3]);
+  printf("%%%%For: %s\n", argv[2]);
+  if (Orientation & 1)
+    puts("%%Orientation: Landscape");
+  puts("%%EndComments");
+  puts("%%BeginProlog");
 
   if (ppd != NULL && ppd->patches != NULL)
     puts(ppd->patches);
@@ -474,33 +573,32 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   WriteLabelProlog(cupsGetOption("page-label", num_options, options));
 
-  if (Copies > 1 && !slowcollate)
+  if (realcopies > 1)
   {
     if (ppd == NULL || ppd->language_level == 1)
-      printf("/#copies %d def\n", Copies);
+      printf("/#copies %d def\n", realcopies);
     else
-      printf("<</NumCopies %d>>setpagedevice\n", Copies);
-
-    realcopies = Copies;
-    Copies     = 1;
+      printf("<</NumCopies %d>>setpagedevice\n", realcopies);
   }
-  else
-    realcopies = 1;
+
+  puts("%%EndProlog");
 
  /*
   * Output the pages...
   */
 
-  xprint = xinches / xpages;
-  yprint = yinches / ypages;
-  row    = malloc(img->xsize * abs(colorspace) + 3);
+  row = malloc(img->xsize * abs(colorspace) + 3);
 
   for (page = 1; Copies > 0; Copies --)
     for (xpage = 0; xpage < xpages; xpage ++)
       for (ypage = 0; ypage < ypages; ypage ++, page ++)
       {
-        fprintf(stderr, "PAGE: %d %d\n", page, realcopies);
-        fprintf(stderr, "INFO: Printing page %d...\n", page);
+        if (ppd && ppd->num_filters == 0)
+          fprintf(stderr, "PAGE: %d %d\n", page, realcopies);
+
+	fprintf(stderr, "INFO: Printing page %d...\n", page);
+
+        printf("%%%%Page: %d %d\n", page, page);
 
         ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
 
@@ -572,7 +670,7 @@ main(int  argc,		/* I - Number of command-line arguments */
           for (y = y0; y <= y1; y ++)
           {
             ImageGetRow(img, x0, y, x1 - x0 + 1, row);
-            ps_hex(row, (x1 - x0 + 1) * abs(colorspace));
+            ps_hex(row, (x1 - x0 + 1) * abs(colorspace), y == y1);
           }
 	}
 	else
@@ -620,6 +718,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 	puts("showpage");
       }
 
+  puts("%%EOF");
+
  /*
   * End the job with the appropriate JCL command or CTRL-D otherwise.
   */
@@ -645,14 +745,14 @@ main(int  argc,		/* I - Number of command-line arguments */
  */
 
 static void
-ps_hex(ib_t *data,	/* I - Data to print */
-       int  length)	/* I - Number of bytes to print */
+ps_hex(ib_t *data,		/* I - Data to print */
+       int  length,		/* I - Number of bytes to print */
+       int  last_line)		/* I - Last line of raster data? */
 {
-  int		col;
+  static int	col = 0;	/* Current column */
   static char	*hex = "0123456789ABCDEF";
+				/* Hex digits */
 
-
-  col = 0;
 
   while (length > 0)
   {
@@ -667,12 +767,19 @@ ps_hex(ib_t *data,	/* I - Data to print */
     data ++;
     length --;
 
-    col = (col + 1) & 31;
-    if (col == 0 && length > 0)
+    col += 2;
+    if (col > 78)
+    {
       putchar('\n');
+      col = 0;
+    }
   }
 
-  putchar('\n');
+  if (last_line && col)
+  {
+    putchar('\n');
+    col = 0;
+  }
 }
 
 
@@ -687,6 +794,7 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 {
   unsigned	b;		/* Binary data word */
   unsigned char	c[5];		/* ASCII85 encoded chars */
+  static int	col = 0;	/* Current column */
 
 
   while (length > 3)
@@ -694,7 +802,10 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
     b = (((((data[0] << 8) | data[1]) << 8) | data[2]) << 8) | data[3];
 
     if (b == 0)
+    {
       putchar('z');
+      col ++;
+    }
     else
     {
       c[4] = (b % 85) + '!';
@@ -708,10 +819,17 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
       c[0] = b + '!';
 
       fwrite(c, 5, 1, stdout);
+      col += 5;
     }
 
     data += 4;
     length -= 4;
+
+    if (col >= 75)
+    {
+      putchar('\n');
+      col = 0;
+    }
   }
 
   if (last_line)
@@ -735,10 +853,11 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
     }
 
     puts("~>");
+    col = 0;
   }
 }
 
 
 /*
- * End of "$Id: imagetops.c,v 1.36 2001/03/14 13:45:33 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.36.2.1 2001/05/13 18:38:18 mike Exp $".
  */

@@ -24,6 +24,7 @@ class OutputDev;
 class GfxFontDict;
 class GfxFont;
 struct GfxFontEncoding16;
+class GfxPattern;
 class GfxState;
 class Gfx;
 
@@ -61,12 +62,25 @@ struct Operator {
 class GfxResources {
 public:
 
-  GfxResources(GfxResources *next1) { fonts = NULL; next = next1; }
+  GfxResources(Dict *resDict, GfxResources *next);
   ~GfxResources();
+
+  GfxFont *lookupFont(const char *name);
+  GBool lookupXObject(const char *name, Object *obj);
+  GBool lookupXObjectNF(const char *name, Object *obj);
+  void lookupColorSpace(const char *name, Object *obj);
+  GfxPattern *lookupPattern(const char *name);
+  GBool lookupGState(const char *name, Object *obj);
+
+  GfxResources *getNext() { return next; }
+
+private:
 
   GfxFontDict *fonts;
   Object xObjDict;
   Object colorSpaceDict;
+  Object patternDict;
+  Object gStateDict;
   GfxResources *next;
 };
 
@@ -75,7 +89,7 @@ public:
 
   // Constructor for regular output.
   Gfx(OutputDev *out1, int pageNum, Dict *resDict,
-      int dpi, double x1, double y1, double x2, double y2, GBool crop,
+      double dpi, double x1, double y1, double x2, double y2, GBool crop,
       double cropX1, double cropY1, double cropX2, double cropY2,
       int rotate);
 
@@ -83,9 +97,10 @@ public:
   ~Gfx();
 
   // Interpret a stream or array of streams.
-  void display(Object *obj);
+  void display(Object *obj, GBool topLevel = gTrue);
 
-  void doWidgetForm(Object *str, double x, double y);
+  void doWidgetForm(Object *str, double xMin, double yMin,
+		    double xMax, double yMax);
 
 private:
 
@@ -96,19 +111,18 @@ private:
   GBool fontChanged;		// set if font or text matrix has changed
   GfxClipType clip;		// do a clip?
   int ignoreUndef;		// current BX/EX nesting level
+  double baseMatrix[6];		// default matrix for most recent
+				//   page/form/pattern
 
   Parser *parser;		// parser for page content stream(s)
 
   static Operator opTab[];	// table of operators
 
-  void go();
+  void go(GBool topLevel);
   void execOp(Object *cmd, Object args[], int numArgs);
-  Operator *findOp(char *name);
+  Operator *findOp(const char *name);
   GBool checkArg(Object *arg, TchkType type);
   int getPos();
-  GfxFont *lookupFont(char *name);
-  GBool lookupXObject(char *name, Object *obj);
-  void lookupColorSpace(char *name, Object *obj);
 
   // graphics state operators
   void opSave(Object args[], int numArgs);
@@ -157,6 +171,7 @@ private:
   void opEOFillStroke(Object args[], int numArgs);
   void opCloseEOFillStroke(Object args[], int numArgs);
   void opShFill(Object args[], int numArgs);
+  void doPatternFill(GBool eoFill);
   void doEndPath();
 
   // path clipping operators
@@ -192,10 +207,9 @@ private:
 
   // XObject operators
   void opXObject(Object args[], int numArgs);
-  void doImage(Stream *str, GBool inlineImg);
+  void doImage(Object *ref, Stream *str, GBool inlineImg);
   void doForm(Object *str);
-  void doForm1(Object *str, Dict *dict,
-	       Object *matrixObj, Object *bboxObj);
+  void doForm1(Object *str, Dict *resDict, double *matrix, double *bbox);
 
   // in-line image operators
   void opBeginImage(Object args[], int numArgs);

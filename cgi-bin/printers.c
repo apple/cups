@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.21 2001/01/22 15:03:22 mike Exp $"
+ * "$Id: printers.c,v 1.21.2.1 2001/05/13 18:38:01 mike Exp $"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -71,7 +71,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Connect to the HTTP server...
   */
 
-  http = httpConnect("localhost", ippPort());
+  http = httpConnectEncrypt("localhost", ippPort(), cupsEncryption());
 
  /*
   * Tell the client to expect HTML...
@@ -356,5 +356,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: printers.c,v 1.21 2001/01/22 15:03:22 mike Exp $".
+ * End of "$Id: printers.c,v 1.21.2.1 2001/05/13 18:38:01 mike Exp $".
  */

@@ -1,4 +1,6 @@
-/* Copyright (C) 1993, 1994, 1996, 1997, 1998 Aladdin Enterprises.  All rights reserved.
+/*
+  Copyright 2001 by Easy Software Products.
+  Copyright 1993, 1994, 1996, 1997, 1998 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
   
@@ -22,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: stdpre.h,v 1.2 2000/03/08 23:15:29 mike Exp $ */
+/*$Id: stdpre.h,v 1.2.2.1 2001/05/13 18:38:32 mike Exp $ */
 /* Standard definitions for Aladdin Enterprises code not needing arch.h */
 
 #ifndef stdpre_INCLUDED
@@ -303,15 +305,22 @@ typedef double floatp;
  *        ...statements...
  *      END
  */
-#define BEGIN	do {
-#define END	} while (0)
+/*** MRS: If you didn't treat C like a macro language, maybe this wouldn't
+ ***      be a problem; changed to { and } (which do work) to avoid
+ ***      needless compiler warnings...
+ ***/
+#define BEGIN	{
+#define END	}
 
 /*
  * Define a handy macro for a statement that does nothing.
  * We can't just use an empty statement, since this upsets some compilers.
  */
+/*** MRS: Fix DO_NOTHING to use a void statement.  Again, not using
+ ***      macros makes life easier...
+ ***/
 #ifndef DO_NOTHING
-#  define DO_NOTHING BEGIN END
+#  define DO_NOTHING (void)stdout
 #endif
 
 /*

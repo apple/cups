@@ -21,10 +21,14 @@ FILE *errFile;
 GBool errQuiet;
 
 void errorInit() {
-  errFile = stderr;
+  if (errQuiet) {
+    errFile = NULL;
+  } else {
+    errFile = stderr;
+  }
 }
 
-void CDECL error(int pos, char *msg, ...) {
+void CDECL error(int pos, const char *msg, ...) {
   va_list args;
 
   if (errQuiet) {

@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.17 2001/01/24 17:14:01 mike Exp $"
+ * "$Id: socket.c,v 1.17.2.1 2001/05/13 18:37:59 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -254,11 +254,16 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       * Check for possible data coming back from the printer...
       */
 
-      timeout.tv_sec = 0;
+      timeout.tv_sec  = 0;
       timeout.tv_usec = 0;
+
       FD_ZERO(&input);
       FD_SET(fd, &input);
+#ifdef __hpux
+      if (select(fd + 1, (int *)&input, NULL, NULL, &timeout) > 0)
+#else
       if (select(fd + 1, &input, NULL, NULL, &timeout) > 0)
+#endif /* __hpux */
       {
        /*
 	* Grab the data coming back and spit it out to stderr...
@@ -270,6 +275,47 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       }
       else if (argc > 6)
 	fprintf(stderr, "INFO: Sending print file, %u bytes...\n", tbytes);
+    }
+
+   /*
+    * Shutdown the socket and wait for the other end to finish...
+    */
+
+    fputs("INFO: Print file sent, waiting for printer to finish...\n", stderr);
+
+    shutdown(fd, 1);
+
+    for (;;)
+    {
+     /*
+      * Wait a maximum of 90 seconds for backchannel data or a closed
+      * connection...
+      */
+
+      timeout.tv_sec  = 90;
+      timeout.tv_usec = 0;
+
+      FD_ZERO(&input);
+      FD_SET(fd, &input);
+
+#ifdef __hpux
+      if (select(fd + 1, (int *)&input, NULL, NULL, &timeout) > 0)
+#else
+      if (select(fd + 1, &input, NULL, NULL, &timeout) > 0)
+#endif /* __hpux */
+      {
+       /*
+	* Grab the data coming back and spit it out to stderr...
+	*/
+
+	if ((nbytes = recv(fd, buffer, sizeof(buffer), 0)) > 0)
+	  fprintf(stderr, "INFO: Received %u bytes of back-channel data!\n",
+	          nbytes);
+        else
+	  break;
+      }
+      else
+        break;
     }
 
    /*
@@ -286,10 +332,12 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   if (fp != stdin)
     fclose(fp);
 
+  fputs("INFO: " CUPS_SVERSION " is ready to print.\n", stderr);
+
   return (0);
 }
 
 
 /*
- * End of "$Id: socket.c,v 1.17 2001/01/24 17:14:01 mike Exp $".
+ * End of "$Id: socket.c,v 1.17.2.1 2001/05/13 18:37:59 mike Exp $".
  */

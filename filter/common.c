@@ -1,5 +1,5 @@
 /*
- * "$Id: common.c,v 1.15 2001/03/27 20:54:15 mike Exp $"
+ * "$Id: common.c,v 1.15.2.1 2001/05/13 18:38:18 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,7 +23,12 @@
  *
  * Contents:
  *
- *   SetCommonOptions() - Set common filter options for media size, etc.
+ *   SetCommonOptions()          - Set common filter options for media size,
+ *                                 etc.
+ *   UpdatePageVars()            - Update the page variables for the
+ *                                 orientation.
+ *   WriteClassificationProlog() - Write the prolog with the classification
+ *                                 and page label.
  */
 
 /*
@@ -58,7 +63,6 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
                  cups_option_t *options,	/* I - Options */
 		 int           change_size)	/* I - Change page size? */
 {
-  float		temp;		/* Swapping variable */
   ppd_file_t	*ppd;		/* PPD file */
   ppd_size_t	*pagesize;	/* Current page size */
   const char	*val;		/* Option value */
@@ -184,57 +188,7 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
   }
 
   if (change_size)
-    switch (Orientation)
-    {
-      case 0 : /* Portait */
-          break;
-
-      case 1 : /* Landscape */
-	  temp       = PageLeft;
-	  PageLeft   = PageBottom;
-	  PageBottom = temp;
-
-	  temp       = PageRight;
-	  PageRight  = PageTop;
-	  PageTop    = temp;
-
-	  temp       = PageWidth;
-	  PageWidth  = PageLength;
-	  PageLength = temp;
-	  break;
-
-      case 2 : /* Reverse Portrait */
-	  temp       = PageWidth - PageLeft;
-	  PageLeft   = PageWidth - PageRight;
-	  PageRight  = temp;
-
-	  temp       = PageLength - PageBottom;
-	  PageBottom = PageLength - PageTop;
-	  PageTop    = temp;
-          break;
-
-      case 3 : /* Reverse Landscape */
-	  temp       = PageWidth - PageLeft;
-	  PageLeft   = PageWidth - PageRight;
-	  PageRight  = temp;
-
-	  temp       = PageLength - PageBottom;
-	  PageBottom = PageLength - PageTop;
-	  PageTop    = temp;
-
-	  temp       = PageLeft;
-	  PageLeft   = PageBottom;
-	  PageBottom = temp;
-
-	  temp       = PageRight;
-	  PageRight  = PageTop;
-	  PageTop    = temp;
-
-	  temp       = PageWidth;
-	  PageWidth  = PageLength;
-	  PageLength = temp;
-	  break;
-    }
+    UpdatePageVars();
 
   if ((val = cupsGetOption("sides", num_options, options)) != NULL &&
       strncasecmp(val, "two-", 4) == 0)
@@ -247,6 +201,70 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
     Duplex = 1;
 
   return (ppd);
+}
+
+
+/*
+ * 'UpdatePageVars()' - Update the page variables for the orientation.
+ */
+
+void
+UpdatePageVars(void)
+{
+  float		temp;		/* Swapping variable */
+
+
+  switch (Orientation)
+  {
+    case 0 : /* Portait */
+        break;
+
+    case 1 : /* Landscape */
+	temp       = PageLeft;
+	PageLeft   = PageBottom;
+	PageBottom = temp;
+
+	temp       = PageRight;
+	PageRight  = PageTop;
+	PageTop    = temp;
+
+	temp       = PageWidth;
+	PageWidth  = PageLength;
+	PageLength = temp;
+	break;
+
+    case 2 : /* Reverse Portrait */
+	temp       = PageWidth - PageLeft;
+	PageLeft   = PageWidth - PageRight;
+	PageRight  = temp;
+
+	temp       = PageLength - PageBottom;
+	PageBottom = PageLength - PageTop;
+	PageTop    = temp;
+        break;
+
+    case 3 : /* Reverse Landscape */
+	temp       = PageWidth - PageLeft;
+	PageLeft   = PageWidth - PageRight;
+	PageRight  = temp;
+
+	temp       = PageLength - PageBottom;
+	PageBottom = PageLength - PageTop;
+	PageTop    = temp;
+
+	temp       = PageLeft;
+	PageLeft   = PageBottom;
+	PageBottom = temp;
+
+	temp       = PageRight;
+	PageRight  = PageTop;
+	PageTop    = temp;
+
+	temp       = PageWidth;
+	PageWidth  = PageLength;
+	PageLength = temp;
+	break;
+  }
 }
 
 
@@ -333,5 +351,5 @@ WriteLabelProlog(const char *label)	/* I - Page label */
 
 
 /*
- * End of "$Id: common.c,v 1.15 2001/03/27 20:54:15 mike Exp $".
+ * End of "$Id: common.c,v 1.15.2.1 2001/05/13 18:38:18 mike Exp $".
  */

@@ -32,7 +32,7 @@ static char *getString(int sid, Guchar *stringIdxPtr,
 
 //------------------------------------------------------------------------
 
-static inline char *nextLine(char *line, char *end) {
+static inline const char *nextLine(const char *line, const char *end) {
   while (line < end && *line != '\n' && *line != '\r')
     ++line;
   while (line < end && *line == '\n' || *line == '\r')
@@ -56,9 +56,11 @@ FontFile::~FontFile() {
 // Type1FontFile
 //------------------------------------------------------------------------
 
-Type1FontFile::Type1FontFile(char *file, int len) {
-  char *line, *line1, *p;
+Type1FontFile::Type1FontFile(const char *file, int len) {
+  const char *line, *line1;
+  char *p, *p2;
   char buf[256];
+  char c;
   int n, code, i;
 
   name = NULL;
@@ -87,19 +89,27 @@ Type1FontFile::Type1FontFile(char *file, int len) {
 	  n = 255;
 	strncpy(buf, line, n);
 	buf[n] = '\0';
-	p = strtok(buf, " \t");
-	if (p && !strcmp(p, "dup")) {
-	  if ((p = strtok(NULL, " \t"))) {
+	for (p = buf; *p == ' ' || *p == '\t'; ++p) ;
+	if (!strncmp(p, "dup", 3)) {
+	  for (p += 3; *p == ' ' || *p == '\t'; ++p) ;
+	  for (p2 = p; *p2 >= '0' && *p2 <= '9'; ++p2) ;
+	  if (*p2) {
+	    c = *p2;
+	    *p2 = '\0';
 	    if ((code = atoi(p)) < 256) {
-	      if ((p = strtok(NULL, " \t"))) {
-		if (p[0] == '/') {
-		  encoding->addChar(code, copyString(p+1));
-		}
+	      *p2 = c;
+	      for (p = p2; *p == ' ' || *p == '\t'; ++p) ;
+	      if (*p == '/') {
+		++p;
+		for (p2 = p; *p2 && *p2 != ' ' && *p2 != '\t'; ++p2) ;
+		*p2 = '\0';
+		encoding->addChar(code, copyString(p));
 	      }
 	    }
 	  }
 	} else {
-	  if ((p = strtok(NULL, " \t\n\r")) && !strcmp(p, "def")) {
+	  if (strtok(buf, " \t") &&
+	      (p = strtok(NULL, " \t\n\r")) && !strcmp(p, "def")) {
 	    break;
 	  }
 	}
@@ -115,7 +125,7 @@ Type1FontFile::Type1FontFile(char *file, int len) {
 
 Type1FontFile::~Type1FontFile() {
   if (name)
-    gfree(name);
+    gfree((void *)name);
   if (encoding && freeEnc)
     delete encoding;
 }
@@ -130,11 +140,11 @@ FontEncoding *Type1FontFile::getEncoding(GBool taken) {
 // Type1CFontFile
 //------------------------------------------------------------------------
 
-Type1CFontFile::Type1CFontFile(char *file, int len) {
+Type1CFontFile::Type1CFontFile(const char *file, int len) {
   char buf[256];
   Guchar *topPtr, *idxStartPtr, *idxPtr0, *idxPtr1;
   Guchar *stringIdxPtr, *stringStartPtr;
-  int topOffSize, idxOffSize, stringOffSize;
+  int idxOffSize, stringOffSize;
   int nFonts, nStrings, nGlyphs;
   int nCodes, nRanges, nLeft, nSups;
   Gushort *glyphNames;
@@ -147,13 +157,14 @@ Type1CFontFile::Type1CFontFile(char *file, int len) {
   int key;
   int i, j, n;
 
+  (void)len;
+
   name = NULL;
   encoding = NULL;
   freeEnc = gTrue;
 
   // read header
   topPtr = (Guchar *)file + (file[2] & 0xff);
-  topOffSize = file[3] & 0xff;
 
   // read name index (first font only)
   nFonts = getWord(topPtr, 2);
@@ -164,7 +175,7 @@ Type1CFontFile::Type1CFontFile(char *file, int len) {
   idxPtr1 = idxStartPtr + getWord(topPtr + idxOffSize, idxOffSize);
   if ((n = idxPtr1 - idxPtr0) > 255)
     n = 255;
-  strncpy(buf, (char *)idxPtr0, n);
+  strncpy(buf, (const char *)idxPtr0, n);
   buf[n] = '\0';
   name = copyString(buf);
   topPtr = idxStartPtr + getWord(topPtr + nFonts * idxOffSize, idxOffSize);
@@ -307,7 +318,7 @@ Type1CFontFile::Type1CFontFile(char *file, int len) {
 
 Type1CFontFile::~Type1CFontFile() {
   if (name)
-    gfree(name);
+    gfree((void *)name);
   if (encoding && freeEnc)
     delete encoding;
 }
@@ -404,7 +415,7 @@ static char *getString(int sid, Guchar *stringIdxPtr,
 				       stringOffSize);
     if ((len = idxPtr1 - idxPtr0) > 255)
       len = 255;
-    strncpy(buf, (char *)idxPtr0, len);
+    strncpy(buf, (const char *)idxPtr0, len);
     buf[len] = '\0';
   }
   return buf;
@@ -414,10 +425,10 @@ static char *getString(int sid, Guchar *stringIdxPtr,
 // Type1CFontConverter
 //------------------------------------------------------------------------
 
-Type1CFontConverter::Type1CFontConverter(char *file, int len, FILE *out) {
-  this->file = file;
-  this->len = len;
-  this->out = out;
+Type1CFontConverter::Type1CFontConverter(const char *nfile, int nlen, FILE *nout) {
+  file = nfile;
+  len = nlen;
+  out = nout;
   r1 = 55665;
   line = 0;
 }
@@ -426,7 +437,7 @@ Type1CFontConverter::~Type1CFontConverter() {
 }
 
 void Type1CFontConverter::convert() {
-  char *fontName;
+  const char *fontName;
   struct {
     int version;
     int notice;
@@ -453,7 +464,7 @@ void Type1CFontConverter::convert() {
   char buf[256], eBuf[256];
   Guchar *topPtr, *idxStartPtr, *idxPtr0, *idxPtr1;
   Guchar *stringIdxPtr, *stringStartPtr;
-  int topOffSize, idxOffSize, stringOffSize;
+  int idxOffSize, stringOffSize;
   int nFonts, nStrings, nGlyphs;
   int nCodes, nRanges, nLeft, nSups;
   Gushort *glyphNames;
@@ -468,7 +479,6 @@ void Type1CFontConverter::convert() {
 
   // read header
   topPtr = (Guchar *)file + (file[2] & 0xff);
-  topOffSize = file[3] & 0xff;
 
   // read name (first font only)
   nFonts = getWord(topPtr, 2);
@@ -479,7 +489,7 @@ void Type1CFontConverter::convert() {
   idxPtr1 = idxStartPtr + getWord(topPtr + idxOffSize, idxOffSize);
   if ((n = idxPtr1 - idxPtr0) > 255)
     n = 255;
-  strncpy(buf, (char *)idxPtr0, n);
+  strncpy(buf, (const char *)idxPtr0, n);
   buf[n] = '\0';
   fontName = copyString(buf);
   topPtr = idxStartPtr + getWord(topPtr + nFonts * idxOffSize, idxOffSize);
@@ -577,15 +587,8 @@ void Type1CFontConverter::convert() {
   topPtr = stringStartPtr + getWord(topPtr + nStrings * stringOffSize,
 				    stringOffSize);
 
-#if 1 //~
-  // get global subrs
-  int nGSubrs;
-  int gSubrOffSize;
-
-  nGSubrs = getWord(topPtr, 2);
-  gSubrOffSize = topPtr[2];
+  // skip global subrs
   topPtr += 3;
-#endif
 
   // write header and font dictionary, up to encoding
   fprintf(out, "%%!FontType1-1.0: %s", fontName);
@@ -915,11 +918,11 @@ void Type1CFontConverter::convert() {
 
   // clean up
   if (dict.charset > 2)
-    gfree(glyphNames);
-  gfree(fontName);
+    gfree((void *)glyphNames);
+  gfree((void *)fontName);
 }
 
-void Type1CFontConverter::eexecWrite(char *s) {
+void Type1CFontConverter::eexecWrite(const char *s) {
   Guchar *p;
   Guchar x;
 
@@ -936,7 +939,7 @@ void Type1CFontConverter::eexecWrite(char *s) {
   }
 }
 
-void Type1CFontConverter::cvtGlyph(char *name, Guchar *s, int n) {
+void Type1CFontConverter::cvtGlyph(const char *name, Guchar *s, int n) {
   int nHints;
   int x;
   GBool first = gTrue;
@@ -1506,12 +1509,12 @@ void Type1CFontConverter::cvtGlyphWidth(GBool useOp) {
   eexecDumpOp1(13);
 }
 
-void Type1CFontConverter::eexecDumpNum(double x, GBool fp) {
+void Type1CFontConverter::eexecDumpNum(double x, GBool nfp) {
   Guchar buf[12];
   int y, n;
 
   n = 0;
-  if (fp) {
+  if (nfp) {
     if (x >= -32768 && x < 32768) {
       y = (int)(x * 256.0);
       buf[0] = 255;
@@ -1554,16 +1557,16 @@ void Type1CFontConverter::eexecDumpNum(double x, GBool fp) {
       n = 5;
     }
   }
-  charBuf->append((char *)buf, n);
+  charBuf->append((const char *)buf, n);
 }
 
-void Type1CFontConverter::eexecDumpOp1(int op) {
-  charBuf->append((char)op);
+void Type1CFontConverter::eexecDumpOp1(int nop) {
+  charBuf->append((char)nop);
 }
 
-void Type1CFontConverter::eexecDumpOp2(int op) {
+void Type1CFontConverter::eexecDumpOp2(int nop) {
   charBuf->append((char)12);
-  charBuf->append((char)op);
+  charBuf->append((char)nop);
 }
 
 void Type1CFontConverter::eexecWriteCharstring(Guchar *s, int n) {
@@ -1592,7 +1595,7 @@ void Type1CFontConverter::eexecWriteCharstring(Guchar *s, int n) {
   }
 }
 
-void Type1CFontConverter::getDeltaInt(char *buf, char *name, double *op,
+void Type1CFontConverter::getDeltaInt(char *buf, const char *name, double *nop,
 				      int n) {
   int x, i;
 
@@ -1600,14 +1603,14 @@ void Type1CFontConverter::getDeltaInt(char *buf, char *name, double *op,
   buf += strlen(buf);
   x = 0;
   for (i = 0; i < n; ++i) {
-    x += (int)op[i];
+    x += (int)nop[i];
     sprintf(buf, "%s%d", i > 0 ? " " : "", x);
     buf += strlen(buf);
   }
   sprintf(buf, "] def\n");
 }
 
-void Type1CFontConverter::getDeltaReal(char *buf, char *name, double *op,
+void Type1CFontConverter::getDeltaReal(char *buf, const char *name, double *nop,
 				       int n) {
   double x;
   int i;
@@ -1616,7 +1619,7 @@ void Type1CFontConverter::getDeltaReal(char *buf, char *name, double *op,
   buf += strlen(buf);
   x = 0;
   for (i = 0; i < n; ++i) {
-    x += op[i];
+    x += nop[i];
     sprintf(buf, "%s%g", i > 0 ? " " : "", x);
     buf += strlen(buf);
   }

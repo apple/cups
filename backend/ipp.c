@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38 2001/02/14 13:59:45 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.1 2001/05/13 18:37:59 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -23,7 +23,8 @@
  *
  * Contents:
  *
- *   main() - Send a file to the printer or server.
+ *   main()        - Send a file to the printer or server.
+ *   password_cb() - Disable the password prompt for cupsDoFileRequest().
  */
 
 /*
@@ -39,6 +40,20 @@
 #include <cups/language.h>
 #include <cups/string.h>
 #include <signal.h>
+
+
+/*
+ * Local functions...
+ */
+
+const char	*password_cb(const char *);
+
+
+/*
+ * Local globals...
+ */
+
+char	*password = NULL;
 
 
 /*
@@ -62,25 +77,20 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 		resource[1024],	/* Resource info (printer name) */
 		filename[1024];	/* File to print */
   int		port;		/* Port number (not used) */
-  char		password[255],	/* Password info */
-		uri[HTTP_MAX_URI];/* Updated URI without user/pass */
-  http_status_t	status;		/* Status of HTTP job */
+  char		uri[HTTP_MAX_URI];/* Updated URI without user/pass */
   ipp_status_t	ipp_status;	/* Status of IPP request */
-  FILE		*fp;		/* File to print */
   http_t	*http;		/* HTTP connection */
   ipp_t		*request,	/* IPP request */
 		*response,	/* IPP response */
 		*supported;	/* get-printer-attributes response */
-  ipp_attribute_t *job_id;	/* job-id attribute */
+  ipp_attribute_t *job_id_attr;	/* job-id attribute */
+  int		job_id;		/* job-id value */
+  ipp_attribute_t *job_state;	/* job-state attribute */
   ipp_attribute_t *copies_sup;	/* copies-supported attribute */
   ipp_attribute_t *charset_sup;	/* charset-supported attribute */
   ipp_attribute_t *format_sup;	/* document-format-supported attribute */
   const char	*charset;	/* Character set to use */
   cups_lang_t	*language;	/* Default language */
-  struct stat	fileinfo;	/* File statistics */
-  size_t	nbytes,		/* Number of bytes written */
-		tbytes;		/* Total bytes written */
-  char		buffer[8192];	/* Output buffer */
   int		copies;		/* Number of copies remaining */
   const char	*content_type;	/* CONTENT_TYPE environment variable */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
@@ -159,22 +169,24 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   }
 
  /*
-  * Open the print file...
-  */
-
-  if ((fp = fopen(filename, "rb")) == NULL)
-  {
-    perror("ERROR: Unable to open print file");
-    return (1);
-  }
-  else
-    stat(filename, &fileinfo);
-
- /*
   * Extract the hostname and printer name from the URI...
   */
 
   httpSeparate(argv[0], method, username, hostname, &port, resource);
+
+ /*
+  * Set the authentication info, if any...
+  */
+
+  cupsSetPasswordCB(password_cb);
+
+  if (username[0])
+  {
+    if ((password = strchr(username, ':')) != NULL)
+      *password++ = '\0';
+
+    cupsSetUser(username);
+  }
 
  /*
   * Try connecting to the remote server...
@@ -244,158 +256,64 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
         	 NULL, uri);
 
    /*
-    * Now fill in the HTTP request stuff...
-    */
-
-    httpClearFields(http);
-    httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
-    if (username[0])
-    {
-      httpEncode64(password, username);
-      httpSetField(http, HTTP_FIELD_AUTHORIZATION, password);
-    }
-
-    sprintf(buffer, "%u", ippLength(request));
-    httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, buffer);
-
-   /*
     * Do the request...
     */
 
-    for (response = NULL, ipp_status = IPP_BAD_REQUEST;;)
+    if ((supported = cupsDoRequest(http, request, resource)) == NULL)
+      ipp_status = cupsLastError();
+    else
+      ipp_status = supported->request.status.status_code;
+
+    if (ipp_status > IPP_OK_CONFLICT)
     {
-     /*
-      * POST the request, retrying as needed...
-      */
-
-      if (httpPost(http, resource))
-      {
-	fputs("INFO: Unable to POST get-printer-attributes request; retrying...\n", stderr);
-	sleep(10);
-	httpReconnect(http);
-	continue;
-      }
-
-      fputs("INFO: POST successful, sending IPP request...\n", stderr);
-
-     /*
-      * Send the IPP request...
-      */
-
-      request->state = IPP_IDLE;
-
-      if (ippWrite(http, request) == IPP_ERROR)
-      {
-	fputs("ERROR: Unable to send IPP request!\n", stderr);
-	status = HTTP_ERROR;
-	break;
-      }
-
-      fputs("INFO: IPP request sent, getting status...\n", stderr);
-
-     /*
-      * Finally, check the status from the HTTP server...
-      */
-
-      while ((status = httpUpdate(http)) == HTTP_CONTINUE);
-
       if (supported)
-	ippDelete(supported);
+        ippDelete(supported);
 
-      if (status == HTTP_OK)
+      if (ipp_status == IPP_PRINTER_BUSY ||
+	  ipp_status == IPP_SERVICE_UNAVAILABLE)
       {
-	supported = ippNew();
-	ippRead(http, supported);
+	fputs("INFO: Printer busy; will retry in 10 seconds...\n", stderr);
+	sleep(10);
+      }
+      else if ((ipp_status == IPP_BAD_REQUEST ||
+	        ipp_status == IPP_VERSION_NOT_SUPPORTED) && version == 1)
+      {
+       /*
+	* Switch to IPP/1.0...
+	*/
 
-	ipp_status = supported->request.status.status_code;
-
-	if (ipp_status > IPP_OK_CONFLICT)
-	{
-	  if (ipp_status == IPP_PRINTER_BUSY ||
-	      ipp_status == IPP_SERVICE_UNAVAILABLE)
-	  {
-	    fputs("INFO: Printer busy; will retry in 10 seconds...\n", stderr);
-	    sleep(10);
-	  }
-	  else if ((ipp_status == IPP_BAD_REQUEST ||
-	            ipp_status == IPP_VERSION_NOT_SUPPORTED) && version == 1)
-	  {
-	   /*
-	    * Switch to IPP/1.0...
-	    */
-
-	    fputs("INFO: Printer does not support IPP/1.1, trying IPP/1.0...\n", stderr);
-	    version = 0;
-	  }
-	  else
-	  {
-	    fprintf(stderr, "ERROR: Printer will not accept print file (%x)!\n",
-	            ipp_status);
-	    fprintf(stderr, "ERROR: %s\n", ippErrorString(ipp_status));
-            status = HTTP_ERROR;
-	  }
-	}
-	else if ((copies_sup = ippFindAttribute(supported, "copies-supported",
-	                                        IPP_TAG_RANGE)) != NULL)
-        {
-	 /*
-	  * Has the "copies-supported" attribute - does it have an upper
-	  * bound > 1?
-	  */
-
-	  if (copies_sup->values[0].range.upper <= 1)
-	    copies_sup = NULL; /* No */
-        }
-
-        charset_sup = ippFindAttribute(supported, "charset-supported",
-	                               IPP_TAG_CHARSET);
-        format_sup  = ippFindAttribute(supported, "document-format-supported",
-	                               IPP_TAG_MIMETYPE);
-
-        if (format_sup)
-	{
-	  fprintf(stderr, "DEBUG: document-format-supported (%d values)\n",
-	          format_sup->num_values);
-	  for (i = 0; i < format_sup->num_values; i ++)
-	    fprintf(stderr, "DEBUG: [%d] = \"%s\"\n", i,
-	            format_sup->values[i].string.text);
-	}
+	fputs("INFO: Printer does not support IPP/1.1, trying IPP/1.0...\n", stderr);
+	version = 0;
       }
       else
-      {
-        supported = NULL;
-
-	if (status == HTTP_ERROR)
-	{
-          fprintf(stderr, "WARNING: Did not receive the IPP supported (%d)\n",
-	          errno);
-	  status     = HTTP_OK;
-	  ipp_status = IPP_PRINTER_BUSY;
-	}
-	else
-	{
-          fprintf(stderr, "ERROR: Validate request was not accepted (%d)!\n",
-	          status);
-	  ipp_status = IPP_FORBIDDEN;
-	}
-      }
-
-      httpFlush(http);
-
-      break;
+	fprintf(stderr, "ERROR: Printer will not accept print file (%s)!\n",
+	        ippErrorString(ipp_status));
     }
-
-    if (status != HTTP_OK)
+    else if ((copies_sup = ippFindAttribute(supported, "copies-supported",
+	                                    IPP_TAG_RANGE)) != NULL)
     {
-      if (fp != stdin)
-	fclose(fp);
+     /*
+      * Has the "copies-supported" attribute - does it have an upper
+      * bound > 1?
+      */
 
-      httpClose(http);
-
-      return (1);
+      if (copies_sup->values[0].range.upper <= 1)
+	copies_sup = NULL; /* No */
     }
-    else if (ipp_status > IPP_OK_CONFLICT)
-      httpReconnect(http);
+
+    charset_sup = ippFindAttribute(supported, "charset-supported",
+	                           IPP_TAG_CHARSET);
+    format_sup  = ippFindAttribute(supported, "document-format-supported",
+	                           IPP_TAG_MIMETYPE);
+
+    if (format_sup)
+    {
+      fprintf(stderr, "DEBUG: document-format-supported (%d values)\n",
+	      format_sup->num_values);
+      for (i = 0; i < format_sup->num_values; i ++)
+	fprintf(stderr, "DEBUG: [%d] = \"%s\"\n", i,
+	        format_sup->values[i].string.text);
+    }
   }
   while (ipp_status > IPP_OK_CONFLICT);
 
@@ -525,133 +443,39 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies", atoi(argv[4]));
 
    /*
-    * Now fill in the HTTP request stuff...
-    */
-
-    httpClearFields(http);
-    httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
-    if (username[0])
-    {
-      httpEncode64(password, username);
-      httpSetField(http, HTTP_FIELD_AUTHORIZATION, password);
-    }
-
-    sprintf(buffer, "%u", ippLength(request) + (size_t)fileinfo.st_size);
-    httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, buffer);
-
-   /*
     * Do the request...
     */
 
-    for (;;)
+    if ((response = cupsDoFileRequest(http, request, resource, filename)) == NULL)
+      ipp_status = cupsLastError();
+    else
+      ipp_status = response->request.status.status_code;
+
+    if (ipp_status > IPP_OK_CONFLICT)
     {
-     /*
-      * POST the request, retrying as needed...
-      */
-
-      httpReconnect(http);
-
-      if (httpPost(http, resource))
+      if (ipp_status == IPP_SERVICE_UNAVAILABLE ||
+	  ipp_status == IPP_PRINTER_BUSY)
       {
-	fputs("INFO: Unable to POST print request; retrying...\n", stderr);
+	fputs("INFO: Printer is busy; retrying print job...\n", stderr);
 	sleep(10);
-	continue;
-      }
-
-      fputs("INFO: POST successful, sending IPP request...\n", stderr);
-
-     /*
-      * Send the IPP request...
-      */
-
-      request->state = IPP_IDLE;
-
-      if (ippWrite(http, request) == IPP_ERROR)
-      {
-	fputs("ERROR: Unable to send IPP request!\n", stderr);
-	status = HTTP_ERROR;
-	break;
-      }
-
-      fputs("INFO: IPP request sent, sending print file...\n", stderr);
-
-     /*
-      * Then send the file...
-      */
-
-      rewind(fp);
-
-      tbytes = 0;
-      while ((nbytes = fread(buffer, 1, sizeof(buffer), fp)) > 0)
-      {
-	tbytes += nbytes;
-	fprintf(stderr, "INFO: Sending print file, %uk...\n", tbytes / 1024);
-
-	if (httpWrite(http, buffer, nbytes) < nbytes)
-	{
-          perror("ERROR: Unable to send print file to printer");
-	  status = HTTP_ERROR;
-          break;
-	}
-      }
-
-      fputs("INFO: Print file sent; checking status...\n", stderr);
-
-     /*
-      * Finally, check the status from the HTTP server...
-      */
-
-      while ((status = httpUpdate(http)) == HTTP_CONTINUE);
-
-      if (status == HTTP_OK)
-      {
-	response = ippNew();
-	ippRead(http, response);
-
-	if ((ipp_status = response->request.status.status_code) > IPP_OK_CONFLICT)
-	{
-          if (ipp_status == IPP_SERVICE_UNAVAILABLE ||
-	      ipp_status == IPP_PRINTER_BUSY)
-	  {
-	    fputs("INFO: Printer is busy; retrying print job...\n", stderr);
-	    sleep(10);
-	  }
-	  else
-	  {
-            fprintf(stderr, "ERROR: Print file was not accepted (%04x)!\n",
-	            response->request.status.status_code);
-	    fprintf(stderr, "ERROR: %s\n", ippErrorString(ipp_status));
-	  }
-	}
-	else if ((job_id = ippFindAttribute(response, "job-id", IPP_TAG_INTEGER)) == NULL)
-          fputs("INFO: Print file accepted - job ID unknown.\n", stderr);
-	else
-          fprintf(stderr, "INFO: Print file accepted - job ID %d.\n",
-	          job_id->values[0].integer);
       }
       else
-      {
-	response   = NULL;
-	ipp_status = IPP_PRINTER_BUSY;
-
-	if (status == HTTP_ERROR)
-	{
-          fprintf(stderr, "WARNING: Did not receive the IPP response (%d)\n",
-	          errno);
-	  status = HTTP_OK;
-	}
-	else
-          fprintf(stderr, "ERROR: Print request was not accepted (%d)!\n", status);
-      }
-
-      httpFlush(http);
-
-      break;
+        fprintf(stderr, "ERROR: Print file was not accepted (%s)!\n",
+	        ippErrorString(ipp_status));
+    }
+    else if ((job_id_attr = ippFindAttribute(response, "job-id",
+                                             IPP_TAG_INTEGER)) == NULL)
+    {
+      fputs("INFO: Print file accepted - job ID unknown.\n", stderr);
+      job_id = 0;
+    }
+    else
+    {
+      job_id = job_id_attr->values[0].integer;
+      fprintf(stderr, "INFO: Print file accepted - job ID %d.\n", job_id);
     }
 
-    if (request != NULL)
-      ippDelete(request);
-    if (response != NULL)
+    if (response)
       ippDelete(response);
 
     if (ipp_status <= IPP_OK_CONFLICT)
@@ -662,6 +486,97 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     else if (ipp_status != IPP_SERVICE_UNAVAILABLE &&
 	     ipp_status != IPP_PRINTER_BUSY)
       break;
+
+   /*
+    * Wait for the job to complete...
+    */
+
+    if (!job_id)
+      continue;
+
+    fputs("INFO: Waiting for job to complete...\n", stderr);
+
+    for (;;)
+    {
+     /*
+      * Build an IPP_GET_JOB_ATTRIBUTES request...
+      */
+
+      request = ippNew();
+      request->request.op.version[1]   = version;
+      request->request.op.operation_id = IPP_GET_JOB_ATTRIBUTES;
+      request->request.op.request_id   = 1;
+
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	   "attributes-charset", NULL, charset);
+
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+        	   "attributes-natural-language", NULL,
+        	   language != NULL ? language->language : "en");
+
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+        	   NULL, uri);
+
+      ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-id",
+        	    job_id);
+
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                   "requested-attributes", NULL, "job-state");
+
+     /*
+      * Do the request...
+      */
+
+      if ((response = cupsDoRequest(http, request, resource)) == NULL)
+	ipp_status = cupsLastError();
+      else
+	ipp_status = response->request.status.status_code;
+
+      if (ipp_status == IPP_NOT_FOUND)
+      {
+       /*
+        * Job has gone away and the server has no job history...
+	*/
+
+        ippDelete(response);
+        break;
+      }
+
+      if (ipp_status > IPP_OK_CONFLICT)
+      {
+	if (ipp_status != IPP_SERVICE_UNAVAILABLE &&
+	    ipp_status != IPP_PRINTER_BUSY)
+	{
+	  if (response)
+	    ippDelete(response);
+
+          fprintf(stderr, "ERROR: Unable to get job %d attributes (%s)!\n",
+	          job_id, ippErrorString(ipp_status));
+          break;
+	}
+      }
+      else if ((job_state = ippFindAttribute(response, "job-state", IPP_TAG_ENUM)) != NULL)
+      {
+       /*
+        * Stop polling if the job is finished...
+	*/
+
+        if (job_state->values[0].integer > IPP_JOB_PROCESSING)
+	{
+	  ippDelete(response);
+	  break;
+	}
+      }
+
+     /*
+      * Wait 10 seconds before polling again...
+      */
+
+      if (response)
+	ippDelete(response);
+
+      sleep(10);
+    }
   }
 
  /*
@@ -677,8 +592,6 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Close and remove the temporary file if necessary...
   */
 
-  fclose(fp);
-
   if (argc < 7)
     unlink(filename);
 
@@ -686,10 +599,26 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Return the queue status...
   */
 
-  return (status != HTTP_OK);
+  if (ipp_status <= IPP_OK_CONFLICT)
+    fputs("INFO: " CUPS_SVERSION " is ready to print.\n", stderr);
+
+  return (ipp_status > IPP_OK_CONFLICT);
 }
 
 
 /*
- * End of "$Id: ipp.c,v 1.38 2001/02/14 13:59:45 mike Exp $".
+ * 'password_cb()' - Disable the password prompt for cupsDoFileRequest().
+ */
+
+const char *			/* O - Password  */
+password_cb(const char *prompt)	/* I - Prompt (not used) */
+{
+  (void)prompt;
+
+  return (password);
+}
+
+
+/*
+ * End of "$Id: ipp.c,v 1.38.2.1 2001/05/13 18:37:59 mike Exp $".
  */

@@ -73,6 +73,10 @@ public:
   int getRootNum() { return rootNum; }
   int getRootGen() { return rootGen; }
 
+  // Get end position for a stream in a damaged file.
+  // Returns -1 if unknown or file is not damaged.
+  int getStreamEnd(int start);
+
 private:
 
   BaseStream *str;		// input stream
@@ -84,6 +88,9 @@ private:
   GBool ok;			// true if xref table is valid
   Object trailerDict;		// trailer dictionary
   int lastXRefPos;		// offset of last xref table
+  int *streamEnds;		// 'endstream' positions - only used in
+				//   damaged files
+  int streamEndsLen;		// number of valid entries in streamEnds
 #ifndef NO_DECRYPTION
   GBool encrypted;		// true if file is encrypted
   int permFlags;		// permission bits

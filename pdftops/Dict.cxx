@@ -31,13 +31,13 @@ Dict::~Dict() {
   int i;
 
   for (i = 0; i < length; ++i) {
-    gfree(entries[i].key);
+    gfree((void *)entries[i].key);
     entries[i].val.free();
   }
   gfree(entries);
 }
 
-void Dict::add(char *key, Object *val) {
+void Dict::add(const char *key, Object *val) {
   if (length + 1 > size) {
     size += 8;
     entries = (DictEntry *)grealloc(entries, size * sizeof(DictEntry));
@@ -47,7 +47,7 @@ void Dict::add(char *key, Object *val) {
   ++length;
 }
 
-inline DictEntry *Dict::find(char *key) {
+inline DictEntry *Dict::find(const char *key) {
   int i;
 
   for (i = 0; i < length; ++i) {
@@ -57,25 +57,25 @@ inline DictEntry *Dict::find(char *key) {
   return NULL;
 }
 
-GBool Dict::is(char *type) {
+GBool Dict::is(const char *type) {
   DictEntry *e;
 
   return (e = find("Type")) && e->val.isName(type);
 }
 
-Object *Dict::lookup(char *key, Object *obj) {
+Object *Dict::lookup(const char *key, Object *obj) {
   DictEntry *e;
 
   return (e = find(key)) ? e->val.fetch(obj) : obj->initNull();
 }
 
-Object *Dict::lookupNF(char *key, Object *obj) {
+Object *Dict::lookupNF(const char *key, Object *obj) {
   DictEntry *e;
 
   return (e = find(key)) ? e->val.copy(obj) : obj->initNull();
 }
 
-char *Dict::getKey(int i) {
+const char *Dict::getKey(int i) {
   return entries[i].key;
 }
 

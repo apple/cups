@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.19 2001/03/02 17:35:04 mike Exp $"
+ * "$Id: cancel.c,v 1.19.2.1 2001/05/13 18:38:40 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -101,7 +101,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      httpClose(http);
 
 	    if (argv[i][2] != '\0')
-	      http = httpConnect(argv[i] + 2, ippPort());
+	      http = httpConnectEncrypt(argv[i] + 2, ippPort(), encryption);
 	    else
 	    {
 	      i ++;
@@ -112,7 +112,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 		return (1);
               }
 	      else
-		http = httpConnect(argv[i], ippPort());
+		http = httpConnectEncrypt(argv[i], ippPort(), encryption);
 	    }
 
 	    if (http == NULL)
@@ -189,7 +189,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	  *host++ = '\0';
 
-	  if ((http = httpConnect(host, ippPort())) == NULL)
+	  if ((http = httpConnectEncrypt(host, ippPort(), encryption)) == NULL)
 	  {
 	    perror("cancel: Unable to connect to server");
 	    return (1);
@@ -202,7 +202,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       */
 
       if (http == NULL)
-	if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
+	if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                               encryption)) == NULL)
 	{
 	  fputs("cancel: Unable to contact server!\n", stderr);
 	  return (1);
@@ -253,8 +254,6 @@ main(int  argc,			/* I - Number of command-line arguments */
       * Do the request and get back a response...
       */
 
-      httpEncryption(http, encryption);
-
       if (op == IPP_PURGE_JOBS)
         response = cupsDoRequest(http, request, "/admin/");
       else
@@ -282,5 +281,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c,v 1.19 2001/03/02 17:35:04 mike Exp $".
+ * End of "$Id: cancel.c,v 1.19.2.1 2001/05/13 18:38:40 mike Exp $".
  */

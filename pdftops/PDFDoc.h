@@ -61,8 +61,8 @@ public:
   int getNumPages() { return catalog->getNumPages(); }
 
   // Display a page.
-  void displayPage(OutputDev *out, int page, int zoom, int rotate,
-		   GBool doLinks);
+  void displayPage(OutputDev *out, int page, double zoom,
+		   int rotate, GBool doLinks);
 
   // Display a range of pages.
   void displayPages(OutputDev *out, int firstPage, int lastPage,

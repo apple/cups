@@ -1,4 +1,6 @@
-/* Copyright (C) 1996, 1997, 1998 Aladdin Enterprises.  All rights reserved.
+/*
+  Copyright 2001 by Easy Software Products
+  Copyright 1996, 1997, 1998 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
   
@@ -22,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gstype2.c,v 1.1 2000/03/08 23:14:49 mike Exp $ */
+/*$Id: gstype2.c,v 1.1.2.1 2001/05/13 18:38:31 mike Exp $ */
 /* Adobe Type 2 charstring interpreter */
 #include "math_.h"
 #include "memory_.h"
@@ -259,7 +261,12 @@ gs_type2_charstring_interpret(gs_type1_state * pcis,
 		goto vstem;
 	    case cx_vmoveto:
 		check_first_operator(csp > cstack);
-		accum_y(*csp);
+                /*** MRS: This is the first of many macro invocations;
+                 ***      Since these are encased in {} (previously an
+                 ***      empty do while(0) loop), we don't need the
+                 ***      trailing semicolon...
+                 ***/
+		accum_y(*csp)
 	      move:if ((pcis->hint_next != 0 || path_is_drawing(sppath)))
 		    apply_path_hints(pcis, true);
 		code = gx_path_add_point(sppath, ptx, pty);
@@ -283,9 +290,9 @@ gs_type2_charstring_interpret(gs_type1_state * pcis,
 		vertical = true;
 	      hvl:for (ap = cstack; ap <= csp; vertical = !vertical, ++ap) {
 		    if (vertical)
-			accum_y(*ap);
+			accum_y(*ap)
 		    else
-			accum_x(*ap);
+			accum_x(*ap)
 		    code = gx_path_add_line(sppath, ptx, pty);
 		    if (code < 0)
 			return code;
@@ -343,7 +350,7 @@ gs_type2_charstring_interpret(gs_type1_state * pcis,
 		goto move;
 	    case cx_hmoveto:
 		check_first_operator(csp > cstack);
-		accum_x(*csp);
+		accum_x(*csp)
 		goto move;
 	    case cx_vhcurveto:
 		vertical = true;
@@ -356,9 +363,9 @@ gs_type2_charstring_interpret(gs_type1_state * pcis,
 		    fixed ay0 = sppath->position.y - pty;
 
 		    if (vertical)
-			accum_y(ap[0]);
+			accum_y(ap[0])
 		    else
-			accum_x(ap[0]);
+			accum_x(ap[0])
 		    pt1.x = ptx + ax0, pt1.y = pty + ay0;
 		    accum_xy(ap[1], ap[2]);
 		    pt2.x = ptx, pt2.y = pty;
@@ -366,12 +373,12 @@ gs_type2_charstring_interpret(gs_type1_state * pcis,
 			if (ap + 4 == csp)
 			    accum_xy(ap[3], ap[4]);
 			else
-			    accum_x(ap[3]);
+			    accum_x(ap[3])
 		    } else {
 			if (ap + 4 == csp)
 			    accum_xy(ap[4], ap[3]);
 			else
-			    accum_y(ap[3]);
+			    accum_y(ap[3])
 		    }
 		    code = gx_path_add_curve(sppath, pt1.x, pt1.y,
 					     pt2.x, pt2.y, ptx, pty);

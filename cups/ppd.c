@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.1 2001/04/11 00:24:11 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.2 2001/05/13 18:38:04 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -1430,7 +1430,7 @@ ppdOpenFile(const char *filename) /* I - File to read from */
  * 'compare_strings()' - Compare two strings.
  */
 
-int				/* O - Result of comparison */
+static int			/* O - Result of comparison */
 compare_strings(char *s,	/* I - First string */
                 char *t)	/* I - Second string */
 {
@@ -1940,5 +1940,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.1 2001/04/11 00:24:11 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.2 2001/05/13 18:38:04 mike Exp $".
  */

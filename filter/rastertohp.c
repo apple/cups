@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertohp.c,v 1.15 2001/03/02 14:30:15 mike Exp $"
+ * "$Id: rastertohp.c,v 1.15.2.1 2001/05/13 18:38:21 mike Exp $"
  *
  *   Hewlett-Packard Page Control Language filter for the Common UNIX
  *   Printing System (CUPS).
@@ -52,8 +52,10 @@
  */
 
 unsigned char	*Planes[4],		/* Output buffers */
-		*CompBuffer;		/* Compression buffer */
+		*CompBuffer,		/* Compression buffer */
+		*BitBuffer;		/* Buffer for output bits */
 int		NumPlanes,		/* Number of color planes */
+		ColorBits,		/* Number of bits per color */
 		Feed,			/* Number of lines to skip */
 		Duplex,			/* Current duplex mode */
 		Page;			/* Current page number */
@@ -64,7 +66,7 @@ int		NumPlanes,		/* Number of color planes */
  */
 
 void	Setup(void);
-void	StartPage(cups_page_header_t *header);
+void	StartPage(ppd_file_t *ppd, cups_page_header_t *header);
 void	EndPage(void);
 void	Shutdown(void);
 
@@ -94,7 +96,8 @@ Setup(void)
  */
 
 void
-StartPage(cups_page_header_t *header)	/* I - Page header */
+StartPage(ppd_file_t         *ppd,	/* I - PPD file */
+          cups_page_header_t *header)	/* I - Page header */
 {
   int	plane;				/* Looping var */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
@@ -123,7 +126,8 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
   * Setup printer/job attributes...
   */
 
-  Duplex = header->Duplex;
+  Duplex    = header->Duplex;
+  ColorBits = header->cupsBitsPerColor;
 
   if (!Duplex || (Page & 1))
   {
@@ -132,6 +136,7 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
     */
 
     printf("\033&l6D\033&k12H");		/* Set 6 LPI, 10 CPI */
+    printf("\033&l0O");				/* Set portrait orientation */
 
     switch (header->PageSize[1])
     {
@@ -199,6 +204,9 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
              header->Duplex + header->Tumble);
 
     printf("\033&l0L");				/* Turn off perforation skip */
+
+    if (ppd && ppd->model_number == 2)
+      printf("\033&l-2H");			/* Load media */
   }
   else
     printf("\033&a2G");				/* Set back side */
@@ -208,23 +216,86 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
   */
 
   printf("\033*t%dR", header->HWResolution[0]);	/* Set resolution */
+
+  if (ppd->model_number == 2)
+  {
+   /*
+    * Figure out the number of color planes...
+    */
+
+    if (header->cupsColorSpace == CUPS_CSPACE_KCMY)
+      NumPlanes = 4;
+    else
+      NumPlanes = 1;
+
+   /*
+    * Send 26-byte configure image data command with horizontal and
+    * vertical resolutions as well as a color count...
+    */
+
+    printf("\033*g26W");
+    putchar(2);					/* Format 2 */
+    putchar(NumPlanes);				/* Output planes */
+
+    putchar(header->HWResolution[0] >> 8);	/* Black resolution */
+    putchar(header->HWResolution[0]);
+    putchar(header->HWResolution[1] >> 8);
+    putchar(header->HWResolution[1]);
+    putchar(0);
+    putchar(1 << ColorBits);			/* # of black levels */
+
+    putchar(header->HWResolution[0] >> 8);	/* Cyan resolution */
+    putchar(header->HWResolution[0]);
+    putchar(header->HWResolution[1] >> 8);
+    putchar(header->HWResolution[1]);
+    putchar(0);
+    putchar(1 << ColorBits);			/* # of cyan levels */
+
+    putchar(header->HWResolution[0] >> 8);	/* Magenta resolution */
+    putchar(header->HWResolution[0]);
+    putchar(header->HWResolution[1] >> 8);
+    putchar(header->HWResolution[1]);
+    putchar(0);
+    putchar(1 << ColorBits);			/* # of magenta levels */
+
+    putchar(header->HWResolution[0] >> 8);	/* Yellow resolution */
+    putchar(header->HWResolution[0]);
+    putchar(header->HWResolution[1] >> 8);
+    putchar(header->HWResolution[1]);
+    putchar(0);
+    putchar(1 << ColorBits);			/* # of yellow levels */
+  }
+  else
+  {
+    if (header->cupsColorSpace == CUPS_CSPACE_KCMY)
+    {
+      NumPlanes = 4;
+      printf("\033*r-4U");			/* Set KCMY graphics */
+    }
+    else if (header->cupsColorSpace == CUPS_CSPACE_CMY)
+    {
+      NumPlanes = 3;
+      printf("\033*r-3U");			/* Set CMY graphics */
+    }
+    else
+      NumPlanes = 1;				/* Black&white graphics */
+  }
+
+ /*
+  * Set size and position of graphics...
+  */
+
   printf("\033*r%dS", header->cupsWidth);	/* Set width */
   printf("\033*r%dT", header->cupsHeight);	/* Set height */
 
-  if (header->cupsColorSpace == CUPS_CSPACE_KCMY)
-  {
-    NumPlanes = 4;
-    printf("\033*r-4U");			/* Set KCMY graphics */
-  }
-  else if (header->cupsColorSpace == CUPS_CSPACE_CMY)
-  {
-    NumPlanes = 3;
-    printf("\033*r-3U");			/* Set CMY graphics */
-  }
-  else
-    NumPlanes = 1;				/* Black&white graphics */
+  printf("\033&a0H");				/* Set horizontal position */
 
-  printf("\033&a0H\033&a330V");			/* Set top-of-page */
+  if (ppd)
+    printf("\033&a%.0fV", 			/* Set vertical position */
+           10.0 * (ppd->sizes[0].length - ppd->sizes[0].top));
+  else
+    printf("\033&a0V");				/* Set top-of-page */
+
   printf("\033*r1A");				/* Start graphics */
 
   if (header->cupsCompression)
@@ -240,6 +311,11 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
   Planes[0] = malloc(header->cupsBytesPerLine);
   for (plane = 1; plane < NumPlanes; plane ++)
     Planes[plane] = Planes[0] + plane * header->cupsBytesPerLine / NumPlanes;
+
+  if (ColorBits > 1)
+    BitBuffer = malloc(ColorBits * ((header->cupsWidth + 7) / 8));
+  else
+    BitBuffer = NULL;
 
   if (header->cupsCompression)
     CompBuffer = malloc(header->cupsBytesPerLine * 2);
@@ -267,7 +343,9 @@ EndPage(void)
   if (NumPlanes > 1)
   {
      printf("\033*rC");			/* End color GFX */
-     printf("\033&l0H");		/* Eject current page */
+
+     if (!(Duplex && (Page & 1)))
+       printf("\033&l0H");		/* Eject current page */
   }
   else
   {
@@ -300,6 +378,9 @@ EndPage(void)
   */
 
   free(Planes[0]);
+
+  if (BitBuffer)
+    free(BitBuffer);
 
   if (CompBuffer)
     free(CompBuffer);
@@ -490,7 +571,14 @@ CompressData(unsigned char *line,	/* I - Data to compress */
 void
 OutputLine(cups_page_header_t *header)	/* I - Page header */
 {
-  int	plane;	/* Current plane */
+  int		plane,			/* Current plane */
+		bytes,			/* Bytes to write */
+		count;			/* Bytes to convert */
+  unsigned char	bit,			/* Current plane data */
+		bit0,			/* Current low bit data */
+		bit1,			/* Current high bit data */
+		*plane_ptr,		/* Pointer into Planes */
+		*bit_ptr;		/* Pointer into BitBuffer */
 
 
  /*
@@ -507,10 +595,54 @@ OutputLine(cups_page_header_t *header)	/* I - Page header */
   * Write bitmap data as needed...
   */
 
+  bytes = (header->cupsWidth + 7) / 8;
+
   for (plane = 0; plane < NumPlanes; plane ++)
-    CompressData(Planes[plane], header->cupsBytesPerLine / NumPlanes,
-		 plane < (NumPlanes - 1) ? 'V' : 'W',
-		 header->cupsCompression);
+    if (ColorBits == 1)
+    {
+     /*
+      * Send bits as-is...
+      */
+
+      CompressData(Planes[plane], bytes, plane < (NumPlanes - 1) ? 'V' : 'W',
+		   header->cupsCompression);
+    }
+    else
+    {
+     /*
+      * Separate low and high bit data into separate buffers.
+      */
+
+      for (count = header->cupsBytesPerLine / NumPlanes,
+               plane_ptr = Planes[plane], bit_ptr = BitBuffer;
+	   count > 0;
+	   count -= 2, plane_ptr += 2, bit_ptr ++)
+      {
+        bit = plane_ptr[0];
+
+        bit0 = ((bit & 64) << 1) | ((bit & 16) << 2) | ((bit & 4) << 3) | ((bit & 1) << 4);
+        bit1 = (bit & 128) | ((bit & 32) << 1) | ((bit & 8) << 2) | ((bit & 2) << 3);
+
+        if (count > 1)
+	{
+	  bit = plane_ptr[1];
+
+          bit0 |= (bit & 1) | ((bit & 4) >> 1) | ((bit & 16) >> 2) | ((bit & 64) >> 3);
+          bit1 |= ((bit & 2) >> 1) | ((bit & 8) >> 2) | ((bit & 32) >> 3) | ((bit & 128) >> 4);
+	}
+
+        bit_ptr[0]     = bit0;
+	bit_ptr[bytes] = bit1;
+      }
+
+     /*
+      * Send low and high bits...
+      */
+
+      CompressData(BitBuffer, bytes, 'V', header->cupsCompression);
+      CompressData(BitBuffer + bytes, bytes, plane < (NumPlanes - 1) ? 'V' : 'W',
+		   header->cupsCompression);
+    }
 
   fflush(stdout);
 }
@@ -528,6 +660,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   cups_raster_t		*ras;	/* Raster stream for printing */
   cups_page_header_t	header;	/* Page header from file */
   int			y;	/* Current line */
+  ppd_file_t		*ppd;	/* PPD file */
 
 
  /*
@@ -573,6 +706,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Initialize the print device...
   */
 
+  ppd = ppdOpenFile(getenv("PPD"));
+
   Setup();
 
  /*
@@ -595,7 +730,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     * Start the page...
     */
 
-    StartPage(&header);
+    StartPage(ppd, &header);
 
    /*
     * Loop for each line on the page...
@@ -642,6 +777,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   Shutdown();
 
+  if (ppd)
+    ppdClose(ppd);
+
  /*
   * Close the raster stream...
   */
@@ -657,12 +795,12 @@ main(int  argc,		/* I - Number of command-line arguments */
   if (Page == 0)
     fputs("ERROR: No pages found!\n", stderr);
   else
-    fputs("INFO: Ready to print.\n", stderr);
+    fputs("INFO: " CUPS_SVERSION " is ready to print.\n", stderr);
 
   return (Page == 0);
 }
 
 
 /*
- * End of "$Id: rastertohp.c,v 1.15 2001/03/02 14:30:15 mike Exp $".
+ * End of "$Id: rastertohp.c,v 1.15.2.1 2001/05/13 18:38:21 mike Exp $".
  */

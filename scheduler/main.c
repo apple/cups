@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57 2001/03/14 22:02:18 mike Exp $"
+ * "$Id: main.c,v 1.57.2.1 2001/05/13 18:38:37 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -335,7 +335,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       * Log all sorts of debug info to help track down the problem.
       */
 
-      LogMessage(L_ERROR, "select() failed - %s!", strerror(errno));
+      LogMessage(L_EMERG, "select() failed - %s!", strerror(errno));
 
       strcpy(s, "InputSet =");
       slen = 9;
@@ -345,7 +345,7 @@ main(int  argc,			/* I - Number of command-line arguments */
         if (FD_ISSET(i, &InputSet))
           snprintf(sptr, sizeof(s) - slen, " %d", i);
 
-      LogMessage(L_ERROR, s);
+      LogMessage(L_EMERG, s);
 
       strcpy(s, "OutputSet =");
       slen = 10;
@@ -355,19 +355,19 @@ main(int  argc,			/* I - Number of command-line arguments */
         if (FD_ISSET(i, &OutputSet))
           snprintf(sptr, sizeof(s) - slen, " %d", i);
 
-      LogMessage(L_ERROR, s);
+      LogMessage(L_EMERG, s);
 
       for (i = 0, con = Clients; i < NumClients; i ++, con ++)
-        LogMessage(L_ERROR, "Clients[%d] = %d, file = %d, state = %d",
+        LogMessage(L_EMERG, "Clients[%d] = %d, file = %d, state = %d",
 	           i, con->http.fd, con->file, con->http.state);
 
       for (i = 0, lis = Listeners; i < NumListeners; i ++, lis ++)
-        LogMessage(L_ERROR, "Listeners[%d] = %d", i, lis->fd);
+        LogMessage(L_EMERG, "Listeners[%d] = %d", i, lis->fd);
 
-      LogMessage(L_ERROR, "BrowseSocket = %d", BrowseSocket);
+      LogMessage(L_EMERG, "BrowseSocket = %d", BrowseSocket);
 
       for (job = Jobs; job != NULL; job = job->next)
-        LogMessage(L_ERROR, "Jobs[%d] = %d", job->id, job->pipe);
+        LogMessage(L_EMERG, "Jobs[%d] = %d", job->id, job->pipe);
 
       break;
     }
@@ -423,7 +423,20 @@ main(int  argc,			/* I - Number of command-line arguments */
       next = job->next;
 
       if (job->pipe && FD_ISSET(job->pipe, &input))
+      {
+       /*
+        * Clear the input bit to avoid updating the next job
+	* using the same status pipe file descriptor...
+	*/
+
+        FD_CLR(job->pipe, &input);
+
+       /*
+        * Read any status messages from the filters...
+	*/
+
         UpdateJob(job);
+      }
     }
 
    /*
@@ -727,5 +740,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57 2001/03/14 22:02:18 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.1 2001/05/13 18:38:37 mike Exp $".
  */

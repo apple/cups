@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.1 2001/04/02 19:51:43 mike Exp $"
+ * "$Id: http.c,v 1.82.2.2 2001/05/13 18:38:03 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,41 +23,42 @@
  *
  * Contents:
  *
- *   httpInitialize()    - Initialize the HTTP interface library and set the
- *                         default HTTP proxy (if any).
- *   httpCheck()         - Check to see if there is a pending response from
- *                         the server.
- *   httpClose()         - Close an HTTP connection...
- *   httpConnect()       - Connect to a HTTP server.
- *   httpEncryption()    - Set the required encryption on the link.
- *   httpReconnect()     - Reconnect to a HTTP server...
- *   httpSeparate()      - Separate a Universal Resource Identifier into its
- *                         components.
- *   httpSetField()      - Set the value of an HTTP header.
- *   httpDelete()        - Send a DELETE request to the server.
- *   httpGet()           - Send a GET request to the server.
- *   httpHead()          - Send a HEAD request to the server.
- *   httpOptions()       - Send an OPTIONS request to the server.
- *   httpPost()          - Send a POST request to the server.
- *   httpPut()           - Send a PUT request to the server.
- *   httpTrace()         - Send an TRACE request to the server.
- *   httpFlush()         - Flush data from a HTTP connection.
- *   httpRead()          - Read data from a HTTP connection.
- *   httpWrite()         - Write data to a HTTP connection.
- *   httpGets()          - Get a line of text from a HTTP connection.
- *   httpPrintf()        - Print a formatted string to a HTTP connection.
- *   httpStatus()        - Return a short string describing a HTTP status code.
- *   httpGetDateString() - Get a formatted date/time string from a time value.
- *   httpGetDateTime()   - Get a time value from a formatted date/time string.
- *   httpUpdate()        - Update the current HTTP state for incoming data.
- *   httpDecode64()      - Base64-decode a string.
- *   httpEncode64()      - Base64-encode a string.
- *   httpGetLength()     - Get the amount of data remaining from the
- *                         content-length or transfer-encoding fields.
- *   http_field()        - Return the field index for a field name.
- *   http_send()         - Send a request with all fields and the trailing
- *                         blank line.
- *   http_upgrade()      - Force upgrade to TLS encryption.
+ *   httpInitialize()     - Initialize the HTTP interface library and set the
+ *                          default HTTP proxy (if any).
+ *   httpCheck()          - Check to see if there is a pending response from
+ *                          the server.
+ *   httpClose()          - Close an HTTP connection...
+ *   httpConnect()        - Connect to a HTTP server.
+ *   httpConnectEncrypt() - Connect to a HTTP server using encryption.
+ *   httpEncryption()     - Set the required encryption on the link.
+ *   httpReconnect()      - Reconnect to a HTTP server...
+ *   httpSeparate()       - Separate a Universal Resource Identifier into its
+ *                          components.
+ *   httpSetField()       - Set the value of an HTTP header.
+ *   httpDelete()         - Send a DELETE request to the server.
+ *   httpGet()            - Send a GET request to the server.
+ *   httpHead()           - Send a HEAD request to the server.
+ *   httpOptions()        - Send an OPTIONS request to the server.
+ *   httpPost()           - Send a POST request to the server.
+ *   httpPut()            - Send a PUT request to the server.
+ *   httpTrace()          - Send an TRACE request to the server.
+ *   httpFlush()          - Flush data from a HTTP connection.
+ *   httpRead()           - Read data from a HTTP connection.
+ *   httpWrite()          - Write data to a HTTP connection.
+ *   httpGets()           - Get a line of text from a HTTP connection.
+ *   httpPrintf()         - Print a formatted string to a HTTP connection.
+ *   httpStatus()         - Return a short string describing a HTTP status code.
+ *   httpGetDateString()  - Get a formatted date/time string from a time value.
+ *   httpGetDateTime()    - Get a time value from a formatted date/time string.
+ *   httpUpdate()         - Update the current HTTP state for incoming data.
+ *   httpDecode64()       - Base64-decode a string.
+ *   httpEncode64()       - Base64-encode a string.
+ *   httpGetLength()      - Get the amount of data remaining from the
+ *                          content-length or transfer-encoding fields.
+ *   http_field()         - Return the field index for a field name.
+ *   http_send()          - Send a request with all fields and the trailing
+ *                          blank line.
+ *   http_upgrade()       - Force upgrade to TLS encryption.
  */
 
 /*
@@ -311,6 +312,32 @@ http_t *			/* O - New HTTP connection */
 httpConnect(const char *host,	/* I - Host to connect to */
             int        port)	/* I - Port number */
 {
+  http_encryption_t	encrypt;/* Type of encryption to use */
+
+
+ /*
+  * Set the default encryption status...
+  */
+
+  if (port == 443)
+    encrypt = HTTP_ENCRYPT_ALWAYS;
+  else
+    encrypt = HTTP_ENCRYPT_IF_REQUESTED;
+
+  return (httpConnectEncrypt(host, port, encrypt));
+}
+
+
+/*
+ * 'httpConnectEncrypt()' - Connect to a HTTP server using encryption.
+ */
+
+http_t *				/* O - New HTTP connection */
+httpConnectEncrypt(const char *host,	/* I - Host to connect to */
+                   int        port,	/* I - Port number */
+		   http_encryption_t encrypt)
+					/* I - Type of encryption to use */
+{
   int			i;		/* Looping var */
   http_t		*http;		/* New HTTP connection */
   struct hostent	*hostaddr;	/* Host address data */
@@ -381,6 +408,12 @@ httpConnect(const char *host,	/* I - Host to connect to */
 
     http->encryption = HTTP_ENCRYPT_ALWAYS;
   }
+
+ /*
+  * Set the encryption status...
+  */
+
+  http->encryption = encrypt;
 
  /*
   * Loop through the addresses we have until one of them connects...
@@ -2063,5 +2096,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.1 2001/04/02 19:51:43 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.2 2001/05/13 18:38:03 mike Exp $".
  */

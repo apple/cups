@@ -21,7 +21,7 @@
 % Ghostscript, as distributed by Aladdin Enterprises, does not require any
 % GNU software to build or run it.
 
-% $Id: gs_fonts.ps,v 1.2 2000/03/08 23:14:29 mike Exp $
+% $Id: gs_fonts.ps,v 1.2.2.1 2001/05/13 18:38:31 mike Exp $
 % Font initialization and management code.
 
 % Define the default font.
@@ -281,7 +281,7 @@ FONTPATH length 0 eq { (%END FONTPATH) .skipeof } if
 		{ pop pop
 		}
 		{ exch copystring exch
-		  DEBUG { ( ) print dup =only flush } if
+		  DEBUG { dup =only (\n) print flush } if
 		  1 index .definefontmap
 		  .splitfilename pop true .scanfontdict 3 1 roll .growput
 			% Increment fontcount.

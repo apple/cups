@@ -33,7 +33,10 @@
 #endif // WIN32
 #include "GString.h"
 #include "gfile.h"
-#include <cups/cups.h>
+
+#ifdef HAVE_LIBCUPS
+#  include <cups/cups.h>
+#endif // HAVE_LIBCUPS
 
 // Some systems don't define this, so just make it something reasonably
 // large.
@@ -75,6 +78,10 @@ GString *getHomeDir() {
 
   if ((s = getenv("HOME"))) {
     ret = new GString(s);
+#  ifdef HAVE_LIBCUPS
+  } else if ((s = getenv("CUPS_SERVERROOT"))) {
+    ret = new GString(s);
+#  endif // HAVE_LIBCUPS
   } else {
     if ((s = getenv("USER")))
       pw = getpwnam(s);
@@ -107,7 +114,7 @@ GString *getCurrentDir() {
   return new GString();
 }
 
-GString *appendToPath(GString *path, char *fileName) {
+GString *appendToPath(GString *path, const char *fileName) {
 #if defined(VMS)
   //---------- VMS ----------
   //~ this should handle everything necessary for file
@@ -273,10 +280,10 @@ GString *appendToPath(GString *path, char *fileName) {
 #endif
 }
 
-GString *grabPath(char *fileName) {
+GString *grabPath(const char *fileName) {
 #ifdef VMS
   //---------- VMS ----------
-  char *p;
+  const char *p;
 
   if ((p = strrchr(fileName, ']')))
     return new GString(fileName, p + 1 - fileName);
@@ -286,7 +293,7 @@ GString *grabPath(char *fileName) {
 
 #elif defined(__EMX__) || defined(WIN32)
   //---------- OS/2+EMX and Win32 ----------
-  char *p;
+  const char *p;
 
   if ((p = strrchr(fileName, '/')))
     return new GString(fileName, p - fileName);
@@ -298,7 +305,7 @@ GString *grabPath(char *fileName) {
 
 #elif defined(ACORN)
   //---------- RISCOS ----------
-  char *p;
+  const char *p;
 
   if ((p = strrchr(fileName, '.')))
     return new GString(fileName, p - fileName);
@@ -306,7 +313,7 @@ GString *grabPath(char *fileName) {
 
 #elif defined(MACOS)
   //---------- MacOS ----------
-  char *p;
+  const char *p;
 
   if ((p = strrchr(fileName, ':')))
     return new GString(fileName, p - fileName);
@@ -314,7 +321,7 @@ GString *grabPath(char *fileName) {
 
 #else
   //---------- Unix ----------
-  char *p;
+  const char *p;
 
   if ((p = strrchr(fileName, '/')))
     return new GString(fileName, p - fileName);
@@ -322,7 +329,7 @@ GString *grabPath(char *fileName) {
 #endif
 }
 
-GBool isAbsolutePath(char *path) {
+GBool isAbsolutePath(const char *path) {
 #ifdef VMS
   //---------- VMS ----------
   return strchr(path, ':') ||
@@ -428,7 +435,7 @@ GString *makePathAbsolute(GString *path) {
 #endif
 }
 
-time_t getModTime(char *fileName) {
+time_t getModTime(const char *fileName) {
 #ifdef WIN32
   //~ should implement this, but it's (currently) only used in xpdf
   return 0;
@@ -442,10 +449,13 @@ time_t getModTime(char *fileName) {
 #endif
 }
 
-GBool openTempFile(GString **name, FILE **f, char *mode, char *ext) {
+GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) {
+#ifdef HAVE_LIBCUPS
   char	filename[1024];	// Name of temporary file...
   int	fd;		// File descriptor...
 
+
+  (void)ext;
 
   // Use the CUPS temporary file function on all platforms...
   if ((fd = cupsTempFd(filename, sizeof(filename))) < 0)
@@ -456,13 +466,72 @@ GBool openTempFile(GString **name, FILE **f, char *mode, char *ext) {
   *name = new GString(filename);
 
   return (gTrue);
+#elif defined(VMS) || defined(__EMX__) || defined(WIN32) || defined(ACORN) || defined(MACOS)
+  //---------- non-Unix ----------
+  char *s;
+
+  // There is a security hole here: an attacker can create a symlink
+  // with this file name after the tmpnam call and before the fopen
+  // call.  I will happily accept fixes to this function for non-Unix
+  // OSs.
+  if (!(s = tmpnam(NULL))) {
+    return gFalse;
+  }
+  *name = new GString(s);
+  if (ext) {
+    (*name)->append(ext);
+  }
+  if (!(*f = fopen((*name)->getCString(), mode))) {
+    delete (*name);
+    return gFalse;
+  }
+  return gTrue;
+#else
+  //---------- Unix ----------
+  char *s, *p;
+  int fd;
+
+  if (ext) {
+    if (!(s = tmpnam(NULL))) {
+      return gFalse;
+    }
+    *name = new GString(s);
+    s = (*name)->getCString();
+    if ((p = strrchr(s, '.'))) {
+      (*name)->del(p - s, (*name)->getLength() - (p - s));
+    }
+    (*name)->append(ext);
+    fd = open((*name)->getCString(), O_WRONLY | O_CREAT | O_EXCL, 0600);
+  } else {
+#  if HAVE_MKSTEMP
+    if ((s = getenv("TMPDIR"))) {
+      *name = new GString(s);
+    } else {
+      *name = new GString("/tmp");
+    }
+    (*name)->append("/XXXXXX");
+    fd = mkstemp((*name)->getCString());
+#  else // HAVE_MKSTEMP
+    if (!(s = tmpnam(NULL))) {
+      return gFalse;
+    }
+    *name = new GString(s);
+    fd = open((*name)->getCString(), O_WRONLY | O_CREAT | O_EXCL, 0600);
+#  endif // HAVE_MKSTEMP
+  }
+  if (fd < 0 || !(*f = fdopen(fd, mode))) {
+    delete *name;
+    return gFalse;
+  }
+  return gTrue;
+#endif
 }
 
 //------------------------------------------------------------------------
 // GDir and GDirEntry
 //------------------------------------------------------------------------
 
-GDirEntry::GDirEntry(char *dirPath, char *name1, GBool doStat) {
+GDirEntry::GDirEntry(const char *dirPath, const char *name1, GBool doStat) {
 #ifdef VMS
   char *p;
 #elif defined(WIN32)
@@ -501,7 +570,7 @@ GDirEntry::~GDirEntry() {
   delete name;
 }
 
-GDir::GDir(char *name, GBool doStat1) {
+GDir::GDir(const char *name, GBool doStat1) {
   path = new GString(name);
   doStat = doStat1;
 #if defined(WIN32)

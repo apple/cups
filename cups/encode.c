@@ -1,5 +1,5 @@
 /*
- * "$Id: encode.c,v 1.1 2001/03/09 20:06:06 mike Exp $"
+ * "$Id: encode.c,v 1.1.2.1 2001/05/13 18:38:02 mike Exp $"
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
@@ -86,7 +86,8 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
     */
 
     if (strcasecmp(options[i].name, "raw") == 0 ||
-        strcasecmp(options[i].name, "document-format") == 0)
+        strcasecmp(options[i].name, "document-format") == 0 ||
+	!options[i].name[0])
       continue;
 
    /*
@@ -306,5 +307,5 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 
 
 /*
- * End of "$Id: encode.c,v 1.1 2001/03/09 20:06:06 mike Exp $".
+ * End of "$Id: encode.c,v 1.1.2.1 2001/05/13 18:38:02 mike Exp $".
  */

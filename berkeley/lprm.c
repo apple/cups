@@ -1,5 +1,5 @@
 /*
- * "$Id: lprm.c,v 1.15 2001/03/02 17:35:03 mike Exp $"
+ * "$Id: lprm.c,v 1.15.2.1 2001/05/13 18:38:00 mike Exp $"
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
@@ -82,14 +82,12 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Open a connection to the server...
   */
 
-  if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
+  if ((http = httpConnectEncrypt(cupsServer(), ippPort(), encryption)) == NULL)
   {
     fputs("lprm: Unable to contact server!\n", stderr);
     cupsFreeDests(num_dests, dests);
     return (1);
   }
-
-  httpEncryption(http, encryption);
 
  /*
   * Process command-line arguments...
@@ -265,5 +263,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lprm.c,v 1.15 2001/03/02 17:35:03 mike Exp $".
+ * End of "$Id: lprm.c,v 1.15.2.1 2001/05/13 18:38:00 mike Exp $".
  */

@@ -16,12 +16,12 @@ extern GBool printCommands;
 extern GBool errQuiet;
 
 // Font search path.
-extern char **fontPath;
+extern const char **fontPath;
 
 // Mapping from PDF font name to device font name.
 struct DevFontMapEntry {
-  char *pdfFont;
-  char *devFont;
+  const char *pdfFont;
+  const char *devFont;
 };
 extern DevFontMapEntry *devFontMap;
 
@@ -29,7 +29,7 @@ extern DevFontMapEntry *devFontMap;
 
 // Initialize font path and font map, and read configuration file,
 // if present.
-extern void initParams(char *configFile);
+extern void initParams(const char *configFile);
 
 // Free memory used for font path and font map.
 extern void freeParams();

@@ -364,10 +364,27 @@ LinkURI::~LinkURI() {
 }
 
 //------------------------------------------------------------------------
+// LinkNamed
+//------------------------------------------------------------------------
+
+LinkNamed::LinkNamed(Object *nameObj) {
+  name = NULL;
+  if (nameObj->isName()) {
+    name = new GString(nameObj->getName());
+  }
+}
+
+LinkNamed::~LinkNamed() {
+  if (name) {
+    delete name;
+  }
+}
+
+//------------------------------------------------------------------------
 // LinkUnknown
 //------------------------------------------------------------------------
 
-LinkUnknown::LinkUnknown(char *action1) {
+LinkUnknown::LinkUnknown(const char *action1) {
   action = new GString(action1);
 }
 
@@ -470,6 +487,12 @@ Link::Link(Dict *dict, GString *baseURI) {
       } else if (obj2.isName("URI")) {
 	obj1.dictLookup("URI", &obj3);
 	action = new LinkURI(&obj3, baseURI);
+	obj3.free();
+
+      // Named action
+      } else if (obj2.isName("Named")) {
+	obj1.dictLookup("N", &obj3);
+	action = new LinkNamed(&obj3);
 	obj3.free();
 
       // unknown action

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.8 2001/01/22 15:03:53 mike Exp $"
+# "$Id: Makefile,v 1.8.2.1 2001/05/13 18:38:30 mike Exp $"
 #
 #   PPD file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,8 +28,9 @@ include ../Makedefs
 # PPD files...
 #
 
-FILES	=	deskjet.ppd epson9.ppd epson24.ppd laserjet.ppd \
+FILES	=	deskjet.ppd deskjet2.ppd epson9.ppd epson24.ppd laserjet.ppd \
 		okidata9.ppd okidat24.ppd stcolor.ppd stphoto.ppd
+
 
 #
 # Make everything...
@@ -37,11 +38,13 @@ FILES	=	deskjet.ppd epson9.ppd epson24.ppd laserjet.ppd \
 
 all:
 
+
 #
 # Clean all config and object files...
 #
 
 clean:
+
 
 #
 # Install files...
@@ -52,6 +55,7 @@ install:
 	$(CHMOD) ugo+rx $(DATADIR)/model
 	$(INSTALL_DATA) $(FILES) $(DATADIR)/model
 
+
 #
-# End of "$Id: Makefile,v 1.8 2001/01/22 15:03:53 mike Exp $".
+# End of "$Id: Makefile,v 1.8.2.1 2001/05/13 18:38:30 mike Exp $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.24.2.1 2001/04/02 19:51:48 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.24.2.2 2001/05/13 18:38:34 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -299,7 +299,8 @@ print_file(const char    *name,		/* I - Printer or class name */
   * Setup a connection and request data...
   */
 
-  if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
+  if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
+                                 cupsEncryption())) == NULL)
   {
     syslog(LOG_ERR, "Unable to connect to server: %s", strerror(errno));
     return (0);
@@ -762,7 +763,8 @@ remove_jobs(const char *dest,		/* I - Destination */
   * Try connecting to the local server...
   */
 
-  if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
+  if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
+                                 cupsEncryption())) == NULL)
     return (1);
 
   language = cupsLangDefault();
@@ -915,7 +917,8 @@ send_state(const char *dest,		/* I - Destination */
   * Try connecting to the local server...
   */
 
-  if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
+  if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
+                                 cupsEncryption())) == NULL)
     return (1);
 
  /*
@@ -1235,5 +1238,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.24.2.1 2001/04/02 19:51:48 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.24.2.2 2001/05/13 18:38:34 mike Exp $".
  */

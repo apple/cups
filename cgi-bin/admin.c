@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.22 2001/03/05 21:37:33 mike Exp $"
+ * "$Id: admin.c,v 1.22.2.1 2001/05/13 18:38:01 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -105,7 +105,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     * Connect to the HTTP server...
     */
 
-    http = httpConnect("localhost", ippPort());
+    http = httpConnectEncrypt("localhost", ippPort(), cupsEncryption());
 
    /*
     * Do the operation...
@@ -1594,5 +1594,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.22 2001/03/05 21:37:33 mike Exp $".
+ * End of "$Id: admin.c,v 1.22.2.1 2001/05/13 18:38:01 mike Exp $".
  */

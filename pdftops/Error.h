@@ -21,6 +21,6 @@ extern FILE *errFile;
 
 extern void errorInit();
 
-extern void CDECL error(int pos, char *msg, ...);
+extern void CDECL error(int pos, const char *msg, ...);
 
 #endif

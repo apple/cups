@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.1 2001/04/02 19:51:44 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.2 2001/05/13 18:38:03 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -680,7 +680,7 @@ ippFindAttribute(ipp_t      *ipp,	/* I - IPP request */
     DEBUG_printf(("ippFindAttribute: attr = %p, name = \'%s\'\n", attr,
                   attr->name));
 
-    value_tag = attr->value_tag & ~IPP_TAG_COPY;
+    value_tag = (ipp_tag_t)(attr->value_tag & IPP_TAG_MASK);
 
     if (attr->name != NULL && strcasecmp(attr->name, name) == 0 &&
         (value_tag == type || type == IPP_TAG_ZERO ||
@@ -2683,5 +2683,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.1 2001/04/02 19:51:44 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.2 2001/05/13 18:38:03 mike Exp $".
  */

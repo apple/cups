@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.31 2001/02/02 16:37:45 mike Exp $"
+# "$Id: Makefile,v 1.31.2.1 2001/05/13 18:38:31 mike Exp $"
 #
 #   GNU Ghostscript makefile for the Common UNIX Printing System (CUPS).
 #
@@ -29,16 +29,6 @@
 #
 
 include ../Makedefs
-
-
-#
-# Updated rules for Ghostscript, which can't use the same level of
-# optimization on many platforms...
-#
-
-.c.o:
-	echo Compiling $<...
-	$(CC) $(GSOPTIM) $(CFLAGS) -c $<
 
 
 #
@@ -418,9 +408,6 @@ libgs.a:	$(LIBOBJS) ../Makedefs
 	$(AR) $(ARFLAGS) $@ $(LIBOBJS)
 	$(RANLIB) $@
 
-gdevcups.o:	../filter/raster.h
-$(LIBOBJS):	arch.h ../config.h ../Makedefs
-
 
 #
 # pstoraster - PostScript RIP filter.
@@ -430,9 +417,30 @@ pstoraster:	pstoraster.o libgs.a ../Makedefs ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o pstoraster pstoraster.o libgs.a \
 		$(LINKCUPSIMAGE) $(IMGLIBS) $(DSOLIBS) $(LIBS) -lm
-pstoraster.o:	arch.h ../config.h ../Makedefs
 
 
 #
-# End of "$Id: Makefile,v 1.31 2001/02/02 16:37:45 mike Exp $".
+# Generate dependencies for Ghostscript source files...
+#
+
+depend:
+	rm -f Dependencies
+	touch Dependencies
+	for file in $(OBJS:.o=.c); do \
+		echo $$file; \
+		makedepend -a -fDependencies -I.. -Y $$file >/dev/null 2>&1; \
+	done
+
+
+#
+# Dependencies...
+#
+
+$(OBJS):	../Makedefs
+
+include Dependencies
+
+
+#
+# End of "$Id: Makefile,v 1.31.2.1 2001/05/13 18:38:31 mike Exp $".
 #

@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gdevm1.c,v 1.2 2000/03/08 23:14:23 mike Exp $ */
+/*$Id: gdevm1.c,v 1.2.2.1 2001/05/13 18:38:31 mike Exp $ */
 /* Monobit "memory" (stored bitmap) device */
 #include "memory_.h"
 #include "gx.h"
@@ -191,16 +191,16 @@ typedef struct {
  * The indexing is (transparent, 0, 1, unused). */
 private const copy_mode copy_modes[16] =
 {
-    {~0, COPY_FUNNY},		/* NN */
-    {~0, COPY_AND},		/* N0 */
+    {~0UL, COPY_FUNNY},		/* NN */
+    {~0UL, COPY_AND},		/* N0 */
     {0, COPY_OR},		/* N1 */
     {0, 0},			/* unused */
     {0, COPY_AND},		/* 0N */
     {0, COPY_FUNNY},		/* 00 */
     {0, COPY_STORE},		/* 01 */
     {0, 0},			/* unused */
-    {~0, COPY_OR},		/* 1N */
-    {~0, COPY_STORE},		/* 10 */
+    {~0UL, COPY_OR},		/* 1N */
+    {~0UL, COPY_STORE},		/* 10 */
     {0, COPY_FUNNY},		/* 11 */
     {0, 0},			/* unused */
     {0, 0},			/* unused */

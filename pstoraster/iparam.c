@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: iparam.c,v 1.2 2000/03/08 23:15:14 mike Exp $ */
+/*$Id: iparam.c,v 1.2.2.1 2001/05/13 18:38:32 mike Exp $ */
 /* Interpreter implementations of parameter dictionaries */
 #include "memory_.h"
 #include "string_.h"
@@ -251,7 +251,7 @@ ref_param_write_typed(gs_param_list * plist, gs_param_name pkey,
 	case gs_param_type_array:
 	    return ref_param_begin_write_collection(plist, pkey,
 						    &pvalue->value.d,
-					 pvalue->type - gs_param_type_dict);
+					 (gs_param_collection_type_t)(pvalue->type - gs_param_type_dict));
 	default:
 	    return_error(e_typecheck);
     }

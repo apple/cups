@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.36 2001/03/01 18:10:40 mike Exp $"
+# "$Id: Makedefs.in,v 1.36.2.1 2001/05/13 18:37:58 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -70,8 +70,6 @@ LIBZ	=	@LIBZ@
 #
 # Program options...
 #
-# GSOPTIM defines the common compiler optimization/debugging options for
-#         pstoraster (Ghostscript).
 # OPTIM   defines the common compiler optimization/debugging options.
 # OPTIONS defines other compile-time options (currently only -dDEBUG for
 #         extra debug info)
@@ -82,7 +80,6 @@ CFLAGS	=	@CFLAGS@ -I.. $(OPTIONS)
 CXXFLAGS =	@CXXFLAGS@ -I.. $(OPTIONS)
 DSOFLAGS =	@DSOFLAGS@
 DSOLIBS	=	@DSOLIBS@
-GSOPTIM	=	@GSOPTIM@
 IMGLIBS	=	@IMGLIBS@ -lm
 LDFLAGS	=	@LDFLAGS@ $(OPTIM)
 LINKCUPS =	@LINKCUPS@
@@ -168,5 +165,5 @@ MAN8EXT		=	@MAN8EXT@
 	$(MV) t.z $@
 
 #
-# End of "$Id: Makedefs.in,v 1.36 2001/03/01 18:10:40 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.36.2.1 2001/05/13 18:37:58 mike Exp $"
 #

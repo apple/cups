@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.1 2001/04/02 19:51:48 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.2 2001/05/13 18:38:35 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -391,10 +391,12 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
               break;
 
 	  case CUPS_ACCEPT_JOBS :
+	  case IPP_ENABLE_PRINTER :
               accept_jobs(con, uri);
               break;
 
 	  case CUPS_REJECT_JOBS :
+	  case IPP_DISABLE_PRINTER :
               reject_jobs(con, uri);
               break;
 
@@ -1386,14 +1388,11 @@ static void
 add_queued_job_count(client_t  *con,	/* I - Client connection */
                      printer_t *p)	/* I - Printer or class */
 {
-  cups_ptype_t	dtype;			/* Destination type */
   int		count;			/* Number of jobs on destination */
 
 
   LogMessage(L_DEBUG2, "add_queued_job_count(%d, %s)\n", con->http.fd,
              p->name);
-
-  dtype = p->type & CUPS_PRINTER_CLASS;
 
   count = GetPrinterJobCount(p->name);
 
@@ -1825,7 +1824,8 @@ copy_attribute(ipp_t           *to,	/* O - Destination request/response */
   ipp_attribute_t	*toattr;	/* Destination attribute */
 
 
-  LogMessage(L_DEBUG2, "copy_attribute(%p, %s)\n", to, attr->name);
+  LogMessage(L_DEBUG2, "copy_attribute(%p, %s)\n", to,
+             attr->name ? attr->name : "(null)");
 
   switch (attr->value_tag)
   {
@@ -1860,7 +1860,7 @@ copy_attribute(ipp_t           *to,	/* O - Destination request/response */
     case IPP_TAG_LANGUAGE :
     case IPP_TAG_MIMETYPE :
         toattr = ippAddStrings(to, attr->group_tag,
-	                       attr->value_tag | IPP_TAG_COPY,
+	                       (ipp_tag_t)(attr->value_tag | IPP_TAG_COPY),
 	                       attr->name, attr->num_values, NULL,
 			       NULL);
 
@@ -1900,7 +1900,7 @@ copy_attribute(ipp_t           *to,	/* O - Destination request/response */
     case IPP_TAG_TEXTLANG :
     case IPP_TAG_NAMELANG :
         toattr = ippAddStrings(to, attr->group_tag,
-	                       attr->value_tag | IPP_TAG_COPY,
+	                       (ipp_tag_t)(attr->value_tag | IPP_TAG_COPY),
 	                       attr->name, attr->num_values, NULL, NULL);
 
         for (i = 0; i < attr->num_values; i ++)
@@ -2224,6 +2224,8 @@ create_job(client_t        *con,	/* I - Client connection */
       attr->values[0].string.text = strdup(printer->job_sheets[0]);
       attr->values[1].string.text = strdup(printer->job_sheets[1]);
     }
+
+    job->job_sheets = attr;
 
    /*
     * Enforce classification level if set...
@@ -3891,6 +3893,8 @@ print_job(client_t        *con,		/* I - Client connection */
       attr->values[1].string.text = strdup(printer->job_sheets[1]);
     }
 
+    job->job_sheets = attr;
+
    /*
     * Enforce classification level if set...
     */
@@ -5424,5 +5428,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.1 2001/04/02 19:51:48 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.2 2001/05/13 18:38:35 mike Exp $".
  */
