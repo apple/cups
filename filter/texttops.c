@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.1 1996/10/14 16:07:57 mike Exp $"
+ * "$Id: texttops.c,v 1.2 1996/10/14 16:28:08 mike Exp $"
  *
  *   PostScript text output filter for espPrint, a collection of printer
  *   drivers.
@@ -17,9 +17,13 @@
  * Revision History:
  *
  *   $Log: texttops.c,v $
- *   Revision 1.1  1996/10/14 16:07:57  mike
- *   Initial revision
+ *   Revision 1.2  1996/10/14 16:28:08  mike
+ *   Updated for 3.2 release.
+ *   Added width, length, left, right, top, and bottom margin options.
+ *   Revamped Setup() code for new options.
  *
+ *   Revision 1.1  1996/10/14  16:07:57  mike
+ *   Initial revision
  */
 
 /*
@@ -81,14 +85,19 @@ int	LinesPerInch = 6;
  */
 
 void
-Setup(FILE              *out,
-      PDSizeTableStruct *size,
-      char              *fontname,
-      float		fontsize,
-      int		landscape)
+Setup(FILE  *out,
+      float width,
+      float length,
+      float left,
+      float right,
+      float bottom,
+      float top,
+      char  *fontname,
+      float fontsize,
+      int   landscape)
 {
   int	i;
-  float	length, width, left;
+  float	temp;
 
 
   LinesPerInch = 72.0 / fontsize;
@@ -96,33 +105,36 @@ Setup(FILE              *out,
   
   if (landscape)
   {
-    SizeColumns = (size->length - 2.0 * size->top_margin - (PageColumns - 1) * 0.25) * CharsPerInch;
-    SizeLines   = (size->width - 2.0 * size->left_margin) * LinesPerInch;
+    SizeColumns = ((length - bottom - top) / 72.0 - (PageColumns - 1) * 0.25) *
+                  CharsPerInch;
+    SizeLines   = (width - left - right) / 72.0 * LinesPerInch;
 
-    left   = 72.0 * size->top_margin;
-    width  = 72.0 * (size->length - 2.0 * size->top_margin) / PageColumns;
-    length = 72.0 * (size->width - size->left_margin) - fontsize;
+    temp   = width;
+    width  = length;
+    length = temp;
+
+    temp   = left;
+    left   = bottom;
+    bottom = temp;
+
+    temp   = right;
+    right  = top;
+    top    = temp;
   }
   else
   {
-    SizeColumns = (size->width - 2.0 * size->left_margin - (PageColumns - 1) * 0.25) * CharsPerInch;
-    SizeLines   = (size->length - 2.0 * size->top_margin) * LinesPerInch;
-
-    left   = 72.0 * size->left_margin;
-    width  = 72.0 * (size->width - 2.0 * size->left_margin) / PageColumns;
-    length = 72.0 * (size->length - size->top_margin) - fontsize;
+    SizeColumns = ((width - left - right) / 72.0 - (PageColumns - 1) * 0.25) *
+                  CharsPerInch;
+    SizeLines   = (length - bottom - top) * LinesPerInch;
   };
 
   SizeColumns /= PageColumns;
 
   fputs("%!PS-Adobe-3.0\n", out);
   fprintf(out, "%%%%BoundingBox: %f %f %f %f\n",
-          72.0 * size->left_margin, 
-          72.0 * size->top_margin, 
-          72.0 * (size->width - size->left_margin), 
-          72.0 * (size->length - size->left_margin));
+          left, bottom, width - right, length - top);
   fputs("%%LanguageLevel: 1\n", out);
-  fputs("%%Creator: ntext2ps 3.1 Copyright 1993-1996 Easy Software Products\n", out);
+  fputs("%%Creator: text2ps 3.2 Copyright 1993-1996 Easy Software Products\n", out);
   fprintf(out, "%%%%Pages: (atend)\n");
   fputs("%%EndComments\n\n", out);
 
@@ -131,10 +143,10 @@ Setup(FILE              *out,
   fprintf(out, "/B /%s-Bold findfont %f scalefont def\n", fontname, fontsize);
   fprintf(out, "/S { setfont /y exch %f mul %f sub neg def %f mul %f add exch %f mul add /x exch def "
                "x y moveto show } bind def\n",
-          fontsize, length, 72.0 / CharsPerInch, left, width);
+          fontsize, length - fontsize, 72.0 / CharsPerInch, left, width);
   fprintf(out, "/U { setfont /y exch %f mul %f sub neg def %f mul %f add exch %f mul add /x exch def "
                "x y moveto dup show x y moveto stringwidth rlineto } bind def\n",
-          fontsize, length, 72.0 / CharsPerInch, left, width);
+          fontsize, length - fontsize, 72.0 / CharsPerInch, left, width);
   fputs("%%EndProlog\n", out);
 }
 
@@ -230,7 +242,7 @@ OutputLine(FILE    *out,
 void
 Usage(void)
 {    
-  fputs("Usage: ntext2ps -P <printer-name> [-D]\n", stderr);
+  fputs("Usage: text2ps -P <printer-name> [-D]\n", stderr);
   fputs("               [-e] [-s] [-w] [-Z]\n", stderr);
   fputs("               [-L <log-file>] [-O <output-file>]\n", stderr);
   fputs("               [-M <printer-model]\n", stderr);
@@ -252,8 +264,7 @@ main(int  argc,    /* I - Number of command-line arguments */
   char			*opt;		/* Current option character */
   int			empty_infile,	/* TRUE if the input file is empty */
 			need_status;	/* TRUE if all we need to do is update the printer status */
-  char			*filename,	/* Input filename, if specified (NULL otherwise). */
-			*printer;	/* Name of printer */
+  char			*filename;	/* Input filename, if specified (NULL otherwise). */
   FILE			*fp;		/* Input file */
   int			line,
   			column,
@@ -261,7 +272,13 @@ main(int  argc,    /* I - Number of command-line arguments */
   			page,
   			landscape;
   char			*fontname;
-  float			fontsize;
+  float			fontsize,
+			width,
+			length,
+			left,
+			right,
+			bottom,
+			top;
   PDInfoStruct		*info;		/* POD info */
   PDStatusStruct	*status;	/* POD status */
   time_t		mod_time;	/* Modification time */
@@ -280,10 +297,13 @@ main(int  argc,    /* I - Number of command-line arguments */
   fontname  = "Courier";
   fontsize  = 12.0;
   landscape = 0;
-
-  if (argc < 3)
-    Usage();
-
+  width     = 612;
+  length    = 792;
+  left      = 18;
+  right     = 18;
+  bottom    = 18;
+  top       = 18;
+  
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
       for (opt = argv[i] + 1; *opt != '\0'; opt ++)
@@ -294,15 +314,31 @@ main(int  argc,    /* I - Number of command-line arguments */
               if (i >= argc)
                 Usage();
 
-              printer = argv[i];
-              break;
+	     /*
+	      * Open the POD database files and get the printer definition record.
+	      */
 
-          case 'L' : /* Log file */
-              i ++;
-              if (i >= argc)
-                Usage();
+	      if (PDLocalReadInfo(argv[i], &info, &mod_time) < 0)
+	      {
+		fprintf(stderr, "text2ps: Could not open required POD database files for printer \'%s\'.\n", 
+        		argv[i]);
+		fprintf(stderr, "text2ps: Are you sure all required POD files are properly installed?\n");
 
-              freopen(argv[i], "w", stderr);
+		PDPerror("text2ps");
+		exit(ERR_POD_ACCESS);
+	      };
+
+	      status = info->active_status;
+	      size   = PDFindPageSize(info, PD_SIZE_CURRENT);
+
+              width  = size->width * 72.0;
+              length = size->length * 72.0;
+              left   = size->left_margin * 72.0;
+              right  = 72.0 * (size->width - size->left_margin -
+                               size->horizontal_addr / (float)info->horizontal_resolution);
+              bottom = 72.0 * (size->length - size->top_margin -
+                               size->vertical_addr / (float)info->vertical_resolution);
+              top    = size->top_margin * 72.0;
               break;
 
           case 'O' : /* Output file */
@@ -345,6 +381,54 @@ main(int  argc,    /* I - Number of command-line arguments */
               PageColumns = atof(argv[i]);
               break;
 
+          case 'W' : /* Width */
+              i ++;
+              if (i >= argc)
+                Usage();
+
+              width = atof(argv[i]) * 72.0;
+              break;
+
+          case 'H' : /* Length */
+              i ++;
+              if (i >= argc)
+                Usage();
+
+              length = atof(argv[i]) * 72.0;
+              break;
+
+          case 'L' : /* Left margin */
+              i ++;
+              if (i >= argc)
+                Usage();
+
+              left = atof(argv[i]) * 72.0;
+              break;
+
+          case 'R' : /* Right margin */
+              i ++;
+              if (i >= argc)
+                Usage();
+
+              right = atof(argv[i]) * 72.0;
+              break;
+
+          case 'T' : /* Top margin */
+              i ++;
+              if (i >= argc)
+                Usage();
+
+              top = atof(argv[i]) * 72.0;
+              break;
+
+          case 'B' : /* Bottom margin */
+              i ++;
+              if (i >= argc)
+                Usage();
+
+              bottom = atof(argv[i]) * 72.0;
+              break;
+
           default :
               Usage();
               break;
@@ -356,35 +440,11 @@ main(int  argc,    /* I - Number of command-line arguments */
 
   if (Verbosity)
   {
-    fputs("ntext2ps: Command-line args are:", stderr);
+    fputs("text2ps: Command-line args are:", stderr);
     for (i = 1; i < argc; i ++)
       fprintf(stderr, " %s", argv[i]);
     fputs("\n", stderr);
   };
-
- /*
-  * Check for necessary args...
-  */
-
-  if (printer == NULL)
-    Usage();
-
- /*
-  * Open the POD database files and get the printer definition record.
-  */
-  
-  if (PDLocalReadInfo(printer, &info, &mod_time) < 0)
-  {
-    fprintf(stderr, "ntext2ps: Could not open required POD database files for printer \'%s\'.\n", 
-            printer);
-    fprintf(stderr, "         Are you sure all required POD files are properly installed?\n");
-
-    PDPerror("ntext2ps");
-    exit(ERR_POD_ACCESS);
-  };
-
-  status = info->active_status;
-  size   = PDFindPageSize(info, PD_SIZE_CURRENT);
 
  /*
   * Setup the output file...
@@ -397,12 +457,13 @@ main(int  argc,    /* I - Number of command-line arguments */
 
   if (out == NULL)
   {
-    fprintf(stderr, "ntext2ps: Unable to create PostScript output to %s - %s\n",
+    fprintf(stderr, "text2ps: Unable to create PostScript output to %s - %s\n",
             outfile == NULL ? "(stdout)" : outfile, strerror(errno));
     exit(ERR_TRANSMISSION);
   };
 
-  Setup(out, size, fontname, fontsize, landscape);
+  Setup(out, width, length, left, right, bottom, top, fontname, fontsize,
+        landscape);
 
  /*
   * Read text from the specified source and print them...
@@ -561,5 +622,5 @@ main(int  argc,    /* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: texttops.c,v 1.1 1996/10/14 16:07:57 mike Exp $".
+ * End of "$Id: texttops.c,v 1.2 1996/10/14 16:28:08 mike Exp $".
  */
