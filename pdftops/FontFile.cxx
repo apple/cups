@@ -2092,6 +2092,13 @@ void Type1CFontFile::cvtGlyph(int pos, int n, GBool top) {
 	}
 	nHints += nOps / 2;
 	break;
+      case 15:			// (obsolete)
+	// this op is ignored, but we need the glyph width
+	if (firstOp) {
+	  cvtGlyphWidth(nOps > 0);
+	  firstOp = gFalse;
+	}
+	break;
       case 18:			// hstemhm
 	// ignored
 	if (firstOp) {
