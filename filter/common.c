@@ -1,5 +1,5 @@
 /*
- * "$Id: common.c,v 1.15.2.2 2002/01/02 18:04:42 mike Exp $"
+ * "$Id: common.c,v 1.15.2.3 2002/01/23 22:31:26 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,12 +23,12 @@
  *
  * Contents:
  *
- *   SetCommonOptions()          - Set common filter options for media size,
- *                                 etc.
- *   UpdatePageVars()            - Update the page variables for the
- *                                 orientation.
- *   WriteClassificationProlog() - Write the prolog with the classification
- *                                 and page label.
+ *   SetCommonOptions() - Set common filter options for media size,
+ *                        etc.
+ *   UpdatePageVars()   - Update the page variables for the orientation.
+ *   WriteLabelProlog() - Write the prolog with the classification
+ *                        and page label.
+ *   WriteLabels()      - Write the actual page labels.
  */
 
 /*
@@ -113,7 +113,7 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
 
   if ((val = cupsGetOption("page-left", num_options, options)) != NULL)
   {
-    switch (Orientation)
+    switch (Orientation & 3)
     {
       case 0 :
           PageLeft = (float)atof(val);
@@ -132,7 +132,7 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
 
   if ((val = cupsGetOption("page-right", num_options, options)) != NULL)
   {
-    switch (Orientation)
+    switch (Orientation & 3)
     {
       case 0 :
           PageRight = PageWidth - (float)atof(val);
@@ -151,7 +151,7 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
 
   if ((val = cupsGetOption("page-bottom", num_options, options)) != NULL)
   {
-    switch (Orientation)
+    switch (Orientation & 3)
     {
       case 0 :
           PageBottom = (float)atof(val);
@@ -170,7 +170,7 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
 
   if ((val = cupsGetOption("page-top", num_options, options)) != NULL)
   {
-    switch (Orientation)
+    switch (Orientation & 3)
     {
       case 0 :
           PageTop = PageLength - (float)atof(val);
@@ -214,7 +214,7 @@ UpdatePageVars(void)
   float		temp;		/* Swapping variable */
 
 
-  switch (Orientation)
+  switch (Orientation & 3)
   {
     case 0 : /* Portait */
         break;
@@ -269,12 +269,15 @@ UpdatePageVars(void)
 
 
 /*
- * 'WriteClassificationProlog()' - Write the prolog with the classification
- *                                 and page label.
+ * 'WriteLabelProlog()' - Write the prolog with the classification
+ *                        and page label.
  */
 
 void
-WriteLabelProlog(const char *label)	/* I - Page label */
+WriteLabelProlog(const char *label,	/* I - Page label */
+		 float      bottom,	/* I - Bottom position in points */
+		 float      top,	/* I - Top position in points */
+		 float      width)	/* I - Width in points */
 {
   const char	*classification;	/* CLASSIFICATION environment variable */
 
@@ -336,20 +339,62 @@ WriteLabelProlog(const char *label)	/* I - Page label */
   puts("/espWL{");
   puts("  espPF setfont");
   printf("  espPL stringwidth pop dup 12 add exch  -0.5 mul %.0f add\n",
-         PageWidth * 0.5f);
+         width * 0.5f);
   puts("  1 setgray");
-  printf("  dup 6 sub %.0f 3 index 20 rectfill\n", PageBottom - 2.0);
-  printf("  dup 6 sub %.0f 3 index 20 rectfill\n", PageTop - 18.0);
+  printf("  dup 6 sub %.0f 3 index 20 rectfill\n", bottom - 2.0);
+  printf("  dup 6 sub %.0f 3 index 20 rectfill\n", top - 18.0);
   puts("  0 setgray");
-  printf("  dup 6 sub %.0f 3 index 20 rectstroke\n", PageBottom - 2.0);
-  printf("  dup 6 sub %.0f 3 index 20 rectstroke\n", PageTop - 18.0);
-  printf("  dup %.0f moveto espPL show\n", PageBottom + 2.0);
-  printf("  %.0f moveto espPL show\n", PageTop - 14.0);
+  printf("  dup 6 sub %.0f 3 index 20 rectstroke\n", bottom - 2.0);
+  printf("  dup 6 sub %.0f 3 index 20 rectstroke\n", top - 18.0);
+  printf("  dup %.0f moveto espPL show\n", bottom + 2.0);
+  printf("  %.0f moveto espPL show\n", top - 14.0);
   puts("pop");
   puts("}bind def");
 }
 
 
 /*
- * End of "$Id: common.c,v 1.15.2.2 2002/01/02 18:04:42 mike Exp $".
+ * 'WriteLabels()' - Write the actual page labels.
+ */
+
+void
+WriteLabels(int orient)	/* I - Orientation of the page */
+{
+  float	width,		/* Width of page */
+	length;		/* Length of page */
+
+
+  puts("gsave");
+
+  if ((orient ^ Orientation) & 1)
+  {
+    width  = PageLength;
+    length = PageWidth;
+  }
+  else
+  {
+    width  = PageWidth;
+    length = PageLength;
+  }
+
+  switch (orient & 3)
+  {
+    case 1 : /* Landscape */
+        printf("%.1f 0.0 translate 90 rotate\n", length);
+        break;
+    case 2 : /* Reverse Portrait */
+        printf("%.1f %.1f translate 180 rotate\n", width, length);
+        break;
+    case 3 : /* Reverse Landscape */
+        printf("0.0 %.1f translate -90 rotate\n", width);
+        break;
+  }
+
+  puts("espWL");
+  puts("grestore");
+}
+
+
+/*
+ * End of "$Id: common.c,v 1.15.2.3 2002/01/23 22:31:26 mike Exp $".
  */

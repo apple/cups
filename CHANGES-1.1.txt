@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.13
 
+	- Classification and page labels were not rotated to
+	  match the page orientation.
 	- Now set the TCP "no delay" option on network
 	  connections to improve performance/response time.
 	- Improved the IRIX printing tools support with patches

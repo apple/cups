@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.8 2002/01/23 17:32:11 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.9 2002/01/23 22:31:27 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -308,7 +308,21 @@ main(int  argc,			/* I - Number of command-line arguments */
     UseESPsp = 1;
   }
 
-  WriteLabelProlog(val);
+  if (NUp == 2)
+  {
+   /*
+    * For 2-up output, rotate the labels to match the orientation
+    * of the pages...
+    */
+
+    if (Orientation & 1)
+      WriteLabelProlog(val, PageBottom, PageWidth - PageLength + PageTop,
+                       PageLength);
+    else
+      WriteLabelProlog(val, PageLeft, PageRight, PageLength);
+  }
+  else
+    WriteLabelProlog(val, PageBottom, PageTop, PageWidth);
 
   if (UseESPsp)
     puts("userdict begin\n"
@@ -887,7 +901,7 @@ end_nup(int number)	/* I - Page number */
     case 1 :
 	if (UseESPsp)
 	{
-	  WriteLabels();
+	  WriteLabels(Orientation);
           puts("ESPshowpage");
 	}
 	break;
@@ -895,7 +909,23 @@ end_nup(int number)	/* I - Page number */
     case 2 :
 	if ((number & 1) == 1 && UseESPsp)
 	{
-	  WriteLabels();
+	  if (Orientation & 1)
+	  {
+	   /*
+	    * Rotate the labels back to portrait...
+	    */
+
+	    WriteLabels(Orientation - 1);
+	  }
+	  else
+	  {
+	   /*
+	    * Rotate the labels to landscape...
+	    */
+
+	    WriteLabels(Orientation + 1);
+	  }
+
           puts("ESPshowpage");
 	}
         break;
@@ -903,7 +933,7 @@ end_nup(int number)	/* I - Page number */
     case 4 :
 	if ((number & 3) == 3 && UseESPsp)
 	{
-	  WriteLabels();
+	  WriteLabels(Orientation);
           puts("ESPshowpage");
 	}
         break;
@@ -1113,5 +1143,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.8 2002/01/23 17:32:11 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.9 2002/01/23 22:31:27 mike Exp $".
  */

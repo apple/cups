@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.41.2.6 2002/01/23 17:32:11 mike Exp $"
+# "$Id: Makefile,v 1.41.2.7 2002/01/23 22:31:26 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -169,7 +169,7 @@ imagetops:	imagetops.o common.o $(LIBCUPSIMAGE) ../Makedefs \
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ imagetops.o common.o $(LINKCUPSIMAGE) \
 		$(IMGLIBS) $(LIBS)
-imagetops:	common.h image.h
+imagetops.o:	common.h image.h
 
 
 #
@@ -181,7 +181,7 @@ imagetoraster:	imagetoraster.o common.o $(LIBCUPSIMAGE) ../Makedefs \
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ imagetoraster.o common.o $(LINKCUPSIMAGE) \
 		$(IMGLIBS) $(LIBS)
-imagetoraster:	common.h image.h raster.h
+imagetoraster.o:	common.h image.h raster.h
 
 
 #
@@ -242,5 +242,5 @@ $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 
 #
-# End of "$Id: Makefile,v 1.41.2.6 2002/01/23 17:32:11 mike Exp $".
+# End of "$Id: Makefile,v 1.41.2.7 2002/01/23 22:31:26 mike Exp $".
 #
