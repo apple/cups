@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c,v 1.14.2.11 2004/06/29 18:54:17 mike Exp $"
+ * "$Id: usersys.c,v 1.14.2.12 2004/06/29 20:33:11 mike Exp $"
  *
  *   User, system, and password routines for the Common UNIX Printing
  *   System (CUPS).
@@ -46,7 +46,6 @@
 #include "string.h"
 #include "http-private.h"
 #include <stdlib.h>
-#include <ctype.h>
 
 #ifdef WIN32
 #  include <windows.h>
@@ -200,6 +199,7 @@ cupsServer(void)
   FILE		*fp;			/* client.conf file */
   char		*server;		/* Pointer to server name */
   const char	*home;			/* Home directory of user */
+  char		*port;			/* Port number */
   char		line[1024];		/* Line from file */
 
 
@@ -267,20 +267,18 @@ cupsServer(void)
     }
 
    /*
-    * Copy the server name over...
+    * Copy the server name over and set the port number, if any...
     */
 
     strlcpy(cups_server, server, sizeof(cups_server));
 
-#ifdef HAVE_DOMAINSOCKETS
-    if (cups_server[0] != '/')
-      strlcpy(cups_server_domainsocket, CUPS_DEFAULT_DOMAINSOCKET, sizeof(cups_server_domainsocket));
-    else
+    if (cups_server[0] != '/' && (port = strrchr(cups_server, ':')) != NULL &&
+        isdigit(port[1] & 255))
     {
-      strlcpy(cups_server_domainsocket, cups_server, sizeof(cups_server));
-      strlcpy(cups_server, "localhost", sizeof(cups_server));
-  }
-#endif /* HAVE_DOMAINSOCKETS */
+      *port++ = '\0';
+
+      ippSetPort(atoi(port));
+    }
   }
 
   return (cups_server);
@@ -470,5 +468,5 @@ cups_get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: usersys.c,v 1.14.2.11 2004/06/29 18:54:17 mike Exp $".
+ * End of "$Id: usersys.c,v 1.14.2.12 2004/06/29 20:33:11 mike Exp $".
  */

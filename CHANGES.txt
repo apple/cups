@@ -3,6 +3,9 @@ CHANGES.txt - 06/29/2004
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The CUPS_SERVER and ServerName directives (client.conf
+	  and ~/.cupsrc) may now contain names of the form
+	  "server:port" and "/path/to/domain/socket".
 	- The "cancel -u user" command now works for ordinary
 	  users (STR #751)
 	- Added test run support to "make test" target (STR #64)

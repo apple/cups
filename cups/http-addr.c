@@ -1,5 +1,5 @@
 /*
- * "$Id: http-addr.c,v 1.1.2.16 2004/06/29 18:54:17 mike Exp $"
+ * "$Id: http-addr.c,v 1.1.2.17 2004/06/29 20:33:11 mike Exp $"
  *
  *   HTTP address routines for the Common UNIX Printing System (CUPS).
  *
@@ -108,6 +108,15 @@ httpAddrLoad(const struct hostent *host,	/* I - Host entry */
   }
   else
 #endif /* AF_INET6 */
+#ifdef AF_LOCAL
+  if (host->h_addrtype == AF_LOCAL)
+  {
+    addr->un.sun_family = AF_LOCAL;
+    strlcpy(addr->un.sun_path, host->h_addr_list[n], sizeof(addr->un.sun_path));
+  }
+  else
+#endif /* AF_LOCAL */
+  if (host->h_addrtype == AF_INET)
   {
 #  ifdef WIN32
     addr->ipv4.sin_port = htons((u_short)port);
@@ -172,6 +181,14 @@ httpAddrLookup(const http_addr_t *addr,		/* I - Address to lookup */
                          sizeof(struct in6_addr), AF_INET6);
   else
 #endif /* AF_INET6 */
+#ifdef AF_LOCAL
+  if (addr->addr.sa_family == AF_LOCAL)
+  {
+    strlcpy(name, addr->un.sun_path, namelen);
+    return (name);
+  }
+  else
+#endif /* AF_LOCAL */
   if (addr->addr.sa_family == AF_INET)
     host = gethostbyaddr(ADDR_CAST &(addr->ipv4.sin_addr),
                          sizeof(struct in_addr), AF_INET);
@@ -184,8 +201,7 @@ httpAddrLookup(const http_addr_t *addr,		/* I - Address to lookup */
     return (NULL);
   }
 
-  strncpy(name, host->h_name, namelen - 1);
-  name[namelen - 1] = '\0';
+  strlcpy(name, host->h_name, namelen);
 
   return (name);
 }
@@ -243,7 +259,7 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
   unsigned		ip[4];		/* IP address components */
   static unsigned	packed_ip;	/* Packed IPv4 address */
   static char		*packed_ptr[2];	/* Pointer to packed address */
-  static struct hostent	host_ip;	/* Host entry for IP address */
+  static struct hostent	host_ip;	/* Host entry for IP/domain address */
 
 
 #if defined(__APPLE__)
@@ -261,7 +277,29 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
   * We then pack the components into an IPv4 address manually,
   * since the inet_aton() function is deprecated.  We use the
   * htonl() macro to get the right byte order for the address.
+  *
+  * We also support domain sockets when supported by the underlying
+  * OS...
   */
+
+#ifdef AF_LOCAL
+  if (name[0] == '/')
+  {
+   /*
+    * A domain socket address, so make an AF_LOCAL entry and return it...
+    */
+
+    host_ip.h_name      = (char *)name;
+    host_ip.h_aliases   = NULL;
+    host_ip.h_addrtype  = AF_LOCAL;
+    host_ip.h_length    = strlen(name) + 1;
+    host_ip.h_addr_list = packed_ptr;
+    packed_ptr[0]       = (char *)name;
+    packed_ptr[1]       = NULL;
+
+    return (&host_ip);
+  }
+#endif /* AF_LOCAL */
 
   for (nameptr = name; isdigit(*nameptr & 255) || *nameptr == '.'; nameptr ++);
 
@@ -308,5 +346,5 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
 
 
 /*
- * End of "$Id: http-addr.c,v 1.1.2.16 2004/06/29 18:54:17 mike Exp $".
+ * End of "$Id: http-addr.c,v 1.1.2.17 2004/06/29 20:33:11 mike Exp $".
  */
