@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.97 2001/06/06 21:38:21 mike Exp $"
+ * "$Id: printers.c,v 1.98 2001/06/07 15:54:05 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -471,7 +471,7 @@ LoadAllPrinters(void)
 
 
  /*
-  * Open the printer.conf file...
+  * Open the printers.conf file...
   */
 
   snprintf(line, sizeof(line), "%s/printers.conf", ServerRoot);
@@ -692,6 +692,7 @@ SaveAllPrinters(void)
   int		i;			/* Looping var */
   FILE		*fp;			/* printers.conf file */
   char		temp[1024];		/* Temporary string */
+  char		backup[1024];		/* printers.conf.O file */
   printer_t	*printer;		/* Current printer class */
   time_t	curtime;		/* Current time */
   struct tm	*curdate;		/* Current date */
@@ -702,9 +703,17 @@ SaveAllPrinters(void)
   */
 
   snprintf(temp, sizeof(temp), "%s/printers.conf", ServerRoot);
+  snprintf(backup, sizeof(backup), "%s/printers.conf.O", ServerRoot);
+
+  if (rename(temp, backup))
+    LogMessage(L_ERROR, "Unable to backup printers.conf - %s", strerror(errno));
+
   if ((fp = fopen(temp, "w")) == NULL)
   {
     LogMessage(L_ERROR, "Unable to save printers.conf - %s", strerror(errno));
+
+    if (rename(backup, temp))
+      LogMessage(L_ERROR, "Unable to restore printers.conf - %s", strerror(errno));
     return;
   }
   else
@@ -1793,5 +1802,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.97 2001/06/06 21:38:21 mike Exp $".
+ * End of "$Id: printers.c,v 1.98 2001/06/07 15:54:05 mike Exp $".
  */

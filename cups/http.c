@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.84 2001/06/01 15:09:17 mike Exp $"
+ * "$Id: http.c,v 1.85 2001/06/07 15:54:03 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1607,9 +1607,6 @@ httpUpdate(http_t *http)		/* I - HTTP data */
 
         return (HTTP_CONTINUE);
       }
-      else if (http->status == HTTP_UPGRADE_REQUIRED &&
-               http->encryption != HTTP_ENCRYPT_NEVER)
-        http->encryption = HTTP_ENCRYPT_REQUIRED;
 #endif /* HAVE_LIBSSL */
 
       httpGetLength(http);
@@ -2075,5 +2072,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.84 2001/06/01 15:09:17 mike Exp $".
+ * End of "$Id: http.c,v 1.85 2001/06/07 15:54:03 mike Exp $".
  */

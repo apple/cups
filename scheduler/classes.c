@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.35 2001/06/06 21:38:19 mike Exp $"
+ * "$Id: classes.c,v 1.36 2001/06/07 15:54:04 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -590,6 +590,7 @@ SaveAllClasses(void)
 {
   FILE		*fp;			/* classes.conf file */
   char		temp[1024];		/* Temporary string */
+  char		backup[1024];		/* classes.conf.O file */
   printer_t	*pclass;		/* Current printer class */
   int		i;			/* Looping var */
   time_t	curtime;		/* Current time */
@@ -601,9 +602,17 @@ SaveAllClasses(void)
   */
 
   snprintf(temp, sizeof(temp), "%s/classes.conf", ServerRoot);
+  snprintf(backup, sizeof(backup), "%s/classes.conf.O", ServerRoot);
+
+  if (rename(temp, backup))
+    LogMessage(L_ERROR, "Unable to backup classes.conf - %s", strerror(errno));
+
   if ((fp = fopen(temp, "w")) == NULL)
   {
     LogMessage(L_ERROR, "Unable to save classes.conf - %s", strerror(errno));
+
+    if (rename(backup, temp))
+      LogMessage(L_ERROR, "Unable to restore classes.conf - %s", strerror(errno));
     return;
   }
   else
@@ -695,5 +704,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.35 2001/06/06 21:38:19 mike Exp $".
+ * End of "$Id: classes.c,v 1.36 2001/06/07 15:54:04 mike Exp $".
  */

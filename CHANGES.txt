@@ -66,6 +66,20 @@ CHANGES IN CUPS V1.1.9
 	  printers that were part of a class.
 	- It was possible for a printer class to list the same
 	  printer more than once.
+	- The scheduler now makes a backup copy of classes.conf
+	  and printers.conf before writing the new file.
+	- The lppasswd program incorrectly asked for a new
+	  password when deleting an existing MD5 password
+	  account.
+	- The scheduler did not match "/printers/name.ppd"
+	  against a location of "/printers/name".
+	- The client code did not always handle HTTP encryption
+	  upgrades properly.
+	- The client code now caches the last Digest password so
+	  it can retry using a new resource path or nonce value,
+	  which are included in the MD5 sum sent to the server. 
+	  This should eliminate unnecessary password prompts
+	  when using Digest authentication.
 
 
 CHANGES IN CUPS V1.1.8

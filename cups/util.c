@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.85 2001/05/06 00:11:25 mike Exp $"
+ * "$Id: util.c,v 1.86 2001/06/07 15:54:03 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -66,7 +66,9 @@
 
 static http_t		*cups_server = NULL;	/* Current server connection */
 static ipp_status_t	last_error = IPP_OK;	/* Last IPP error */
-static char		authstring[1024] = "";	/* Authorization string */
+static char		authstring[HTTP_MAX_VALUE] = "";
+						/* Authorization string */
+static char		pwdstring[33] = "";	/* Last password string */
 
 
 /*
@@ -179,6 +181,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 		plain[255],		/* Plaintext username:password */
 		encode[512];		/* Encoded username:password */
   char		prompt[1024];		/* Prompt string */
+  int		digest_tries;		/* Number of tries with Digest */
 
 
   if (http == NULL || request == NULL || resource == NULL)
@@ -228,8 +231,9 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
   * Loop until we can send the request without authorization problems.
   */
 
-  response = NULL;
-  status   = HTTP_ERROR;
+  response     = NULL;
+  status       = HTTP_ERROR;
+  digest_tries = 0;
 
   while (response == NULL)
   {
@@ -315,50 +319,63 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
         continue;
 
      /*
-      * Nope - get a password from the user...
+      * See if we should retry the current digest password...
       */
 
-      snprintf(prompt, sizeof(prompt), "Password for %s on %s? ", cupsUser(),
-               http->hostname);
-
-      if ((password = cupsGetPassword(prompt)) != NULL)
+      if (strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5) == 0 ||
+          digest_tries > 1 || !pwdstring[0])
       {
        /*
-	* Got a password; send it to the server...
+	* Nope - get a password from the user...
 	*/
 
-        if (!password[0])
-          break;
+	snprintf(prompt, sizeof(prompt), "Password for %s on %s? ", cupsUser(),
+        	 http->hostname);
 
-        if (strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5) == 0)
-        {
-	 /*
-	  * Basic authentication...
-	  */
+        if ((password = cupsGetPassword(prompt)) == NULL)
+	  break;
+	if (!password[0])
+	  break;
 
-	  snprintf(plain, sizeof(plain), "%s:%s", cupsUser(), password);
-	  httpEncode64(encode, plain);
-	  snprintf(authstring, sizeof(authstring), "Basic %s", encode);
-	}
-        else
-	{
-	 /*
-	  * Digest authentication...
-	  */
+        strncpy(pwdstring, password, sizeof(pwdstring) - 1);
+	pwdstring[sizeof(pwdstring) - 1] = '\0';
 
-          httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "realm", realm);
-          httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "nonce", nonce);
-
-	  httpMD5(cupsUser(), realm, password, encode);
-	  httpMD5Final(nonce, "POST", resource, encode);
-	  snprintf(authstring, sizeof(authstring),
-	           "Digest username=\"%s\", realm=\"%s\", nonce=\"%s\", "
-	           "response=\"%s\"", cupsUser(), realm, nonce, encode);
-	}
-        continue;
+        digest_tries = 0;
       }
       else
-        break;
+        digest_tries ++;
+
+     /*
+      * Got a password; encode it for the server...
+      */
+
+      if (strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5) == 0)
+      {
+       /*
+	* Basic authentication...
+	*/
+
+	snprintf(plain, sizeof(plain), "%s:%s", cupsUser(), pwdstring);
+	httpEncode64(encode, plain);
+	snprintf(authstring, sizeof(authstring), "Basic %s", encode);
+      }
+      else
+      {
+       /*
+	* Digest authentication...
+	*/
+
+        httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "realm", realm);
+        httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "nonce", nonce);
+
+	httpMD5(cupsUser(), realm, pwdstring, encode);
+	httpMD5Final(nonce, "POST", resource, encode);
+	snprintf(authstring, sizeof(authstring),
+	         "Digest username=\"%s\", realm=\"%s\", nonce=\"%s\", "
+	         "response=\"%s\"", cupsUser(), realm, nonce, encode);
+      }
+
+      continue;
     }
     else if (status == HTTP_ERROR)
     {
@@ -379,6 +396,12 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
       */
 
       httpFlush(http);
+
+     /*
+      * Upgrade with encryption...
+      */
+
+      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 
      /*
       * Try again, this time with encryption enabled...
@@ -954,6 +977,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 		encode[512];		/* Encoded username:password */
   http_status_t	status;			/* HTTP status from server */
   char		prompt[1024];		/* Prompt string */
+  int		digest_tries;		/* Number of tries with Digest */
   static char	filename[HTTP_MAX_URI];	/* Local filename */
   static const char *requested_attrs[] =/* Requested attributes */
 		{
@@ -1111,6 +1135,8 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 
   snprintf(resource, sizeof(resource), "/printers/%s.ppd", printer);
 
+  digest_tries = 0;
+
   do
   {
     httpClearFields(cups_server);
@@ -1151,51 +1177,86 @@ cupsGetPPD(const char *name)		/* I - Printer name */
         continue;
 
      /*
-      * Nope, get a password from the user...
+      * See if we should retry the current digest password...
       */
 
-      snprintf(prompt, sizeof(prompt), "Password for %s on %s? ", cupsUser(),
-               cups_server->hostname);
-
-      if ((password = cupsGetPassword(prompt)) != NULL)
+      if (strncmp(cups_server->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5) == 0 ||
+          digest_tries > 1 || !pwdstring[0])
       {
        /*
-	* Got a password; send it to the server...
+	* Nope - get a password from the user...
 	*/
 
-        if (!password[0])
-          break;
+	snprintf(prompt, sizeof(prompt), "Password for %s on %s? ", cupsUser(),
+        	 cups_server->hostname);
 
-        if (strncmp(cups_server->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5) == 0)
-        {
-	 /*
-	  * Basic authentication...
-	  */
+        if ((password = cupsGetPassword(prompt)) == NULL)
+	  break;
+	if (!password[0])
+	  break;
 
-	  snprintf(plain, sizeof(plain), "%s:%s", cupsUser(), password);
-	  httpEncode64(encode, plain);
-	  snprintf(authstring, sizeof(authstring), "Basic %s", encode);
-	}
-        else
-	{
-	 /*
-	  * Digest authentication...
-	  */
+        strncpy(pwdstring, password, sizeof(pwdstring) - 1);
+	pwdstring[sizeof(pwdstring) - 1] = '\0';
 
-          httpGetSubField(cups_server, HTTP_FIELD_WWW_AUTHENTICATE, "realm", realm);
-          httpGetSubField(cups_server, HTTP_FIELD_WWW_AUTHENTICATE, "nonce", nonce);
-
-	  httpMD5(cupsUser(), realm, password, encode);
-	  httpMD5Final(nonce, "GET", resource, encode);
-	  snprintf(authstring, sizeof(authstring),
-	           "Digest username=\"%s\", realm=\"%s\", nonce=\"%s\", "
-	           "response=\"%s\"", cupsUser(), realm, nonce, encode);
-	}
-        continue;
+        digest_tries = 0;
       }
       else
-        break;
+        digest_tries ++;
+
+     /*
+      * Got a password; encode it for the server...
+      */
+
+      if (strncmp(cups_server->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5) == 0)
+      {
+       /*
+	* Basic authentication...
+	*/
+
+	snprintf(plain, sizeof(plain), "%s:%s", cupsUser(), pwdstring);
+	httpEncode64(encode, plain);
+	snprintf(authstring, sizeof(authstring), "Basic %s", encode);
+      }
+      else
+      {
+       /*
+	* Digest authentication...
+	*/
+
+        httpGetSubField(cups_server, HTTP_FIELD_WWW_AUTHENTICATE, "realm", realm);
+        httpGetSubField(cups_server, HTTP_FIELD_WWW_AUTHENTICATE, "nonce", nonce);
+
+	httpMD5(cupsUser(), realm, pwdstring, encode);
+	httpMD5Final(nonce, "GET", resource, encode);
+	snprintf(authstring, sizeof(authstring),
+	         "Digest username=\"%s\", realm=\"%s\", nonce=\"%s\", "
+	         "response=\"%s\"", cupsUser(), realm, nonce, encode);
+      }
+
+      continue;
     }
+#ifdef HAVE_LIBSSL
+    else if (status == HTTP_UPGRADE_REQUIRED)
+    {
+     /*
+      * Flush any error message...
+      */
+
+      httpFlush(cups_server);
+
+     /*
+      * Upgrade with encryption...
+      */
+
+      httpEncryption(cups_server, HTTP_ENCRYPT_REQUIRED);
+
+     /*
+      * Try again, this time with encryption enabled...
+      */
+
+      continue;
+    }
+#endif /* HAVE_LIBSSL */
   }
   while (status == HTTP_UNAUTHORIZED || status == HTTP_UPGRADE_REQUIRED);
 
@@ -1675,5 +1736,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.85 2001/05/06 00:11:25 mike Exp $".
+ * End of "$Id: util.c,v 1.86 2001/06/07 15:54:03 mike Exp $".
  */

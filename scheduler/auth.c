@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.46 2001/06/05 15:42:35 mike Exp $"
+ * "$Id: auth.c,v 1.47 2001/06/07 15:54:04 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -511,6 +511,9 @@ location_t *			/* O - Location that matches */
 FindBest(client_t *con)		/* I - Connection */
 {
   int		i;		/* Looping var */
+  char		uri[HTTP_MAX_URI],
+				/* URI in request... */
+		*uriptr;	/* Pointer into URI */
   location_t	*loc,		/* Current location */
 		*best;		/* Best match for location so far */
   int		bestlen;	/* Length of best match */
@@ -535,6 +538,32 @@ FindBest(client_t *con)		/* I - Connection */
 
 
  /*
+  * First copy the connection URI to a local string so we have drop
+  * any .ppd extension from the pathname in /printers or /classes
+  * URIs...
+  *
+  * Note: The uri and con->uri variables are both strings of size
+  *       HTTP_MAX_URI, so strcpy is safe...
+  */
+
+  strcpy(uri, con->uri);
+
+  if (strncmp(uri, "/printers/", 10) == 0 ||
+      strncmp(uri, "/classes/", 9) == 0)
+  {
+   /*
+    * Check if the URI has .ppd on the end...
+    */
+
+    uriptr = uri + strlen(uri) - 4; /* len > 4 if we get here... */
+
+    if (strcmp(uriptr, ".ppd") == 0)
+      *uriptr = '\0';
+  }
+
+  LogMessage(L_DEBUG2, "FindBest: uri = \"%s\"...", uri);
+
+ /*
   * Loop through the list of locations to find a match...
   */
 
@@ -548,7 +577,7 @@ FindBest(client_t *con)		/* I - Connection */
                loc->location, loc->limit);
 
     if (loc->length > bestlen &&
-        strncmp(con->uri, loc->location, loc->length) == 0 &&
+        strncmp(uri, loc->location, loc->length) == 0 &&
 	loc->location[0] == '/' &&
 	(limit & loc->limit) != 0)
     {
@@ -561,7 +590,8 @@ FindBest(client_t *con)		/* I - Connection */
   * Return the match, if any...
   */
 
-  LogMessage(L_DEBUG2, "FindBest: best = %s", best ? best->location : "NONE");
+  LogMessage(L_DEBUG2, "FindBest: best = \"%s\"",
+             best ? best->location : "NONE");
 
   return (best);
 }
@@ -639,7 +669,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 		};
 
 
-  LogMessage(L_DEBUG2, "IsAuthorized: URI = %s", con->uri);
+  LogMessage(L_DEBUG2, "IsAuthorized: con->uri = \"%s\"", con->uri);
 
  /*
   * Find a matching location; if there is no match then access is
@@ -759,25 +789,25 @@ IsAuthorized(client_t *con)	/* I - Connection */
       return (HTTP_UNAUTHORIZED);
 
    /*
-    * Get the user info...
-    */
-
-    pw = getpwnam(con->username);	/* Get the current password */
-    endpwent();				/* Close the password file */
-
-    if (pw == NULL)			/* No such user... */
-    {
-      LogMessage(L_WARN, "IsAuthorized: Unknown username \"%s\"; access denied.",
-        	 con->username);
-      return (HTTP_UNAUTHORIZED);
-    }
-
-   /*
     * See if we are doing Digest or Basic authentication...
     */
 
     if (best->type == AUTH_BASIC)
     {
+     /*
+      * Get the user info...
+      */
+
+      pw = getpwnam(con->username);	/* Get the current password */
+      endpwent();				/* Close the password file */
+
+      if (pw == NULL)			/* No such user... */
+      {
+	LogMessage(L_WARN, "IsAuthorized: Unknown username \"%s\"; access denied.",
+        	   con->username);
+	return (HTTP_UNAUTHORIZED);
+      }
+
 #if HAVE_LIBPAM
      /*
       * Only use PAM to do authentication.  This allows MD5 passwords, among
@@ -921,6 +951,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
         LogMessage(L_ERROR, "IsAuthorized: Got \"%s\"!", nonce);
         return (HTTP_UNAUTHORIZED);
       }
+
+      LogMessage(L_DEBUG2, "IsAuthorized: nonce = \"%s\"", nonce);
 
       if (best->num_names && best->level == AUTH_GROUP)
       {
@@ -1248,5 +1280,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.46 2001/06/05 15:42:35 mike Exp $".
+ * End of "$Id: auth.c,v 1.47 2001/06/07 15:54:04 mike Exp $".
  */
