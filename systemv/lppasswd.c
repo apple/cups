@@ -1,5 +1,5 @@
 /*
- * "$Id: lppasswd.c,v 1.9 2001/01/22 15:04:03 mike Exp $"
+ * "$Id: lppasswd.c,v 1.10 2001/02/07 19:53:55 mike Exp $"
  *
  *   MD5 password program for the Common UNIX Printing System (CUPS).
  *
@@ -23,8 +23,9 @@
  *
  * Contents:
  *
- *   main()  - Add, change, or delete passwords from the MD5 password file.
- *   usage() - Show program usage.
+ *   main()    - Add, change, or delete passwords from the MD5 password file.
+ *   usage()   - Show program usage.
+ *   xstrdup() - strdup() function with NULL checking...
  */
 
 /*
@@ -35,6 +36,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <ctype.h>
+#include <fcntl.h>
 #include <grp.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -57,7 +59,8 @@
  * Local functions...
  */
 
-void	usage(FILE *fp);
+static void	usage(FILE *fp);
+static char	*xstrdup(const char *);
 
 
 /*
@@ -73,7 +76,6 @@ main(int  argc,			/* I - Number of command-line arguments */
   const char	*username;	/* Pointer to username */
   const char	*groupname;	/* Pointer to group name */
   int		op;		/* Operation (add, change, delete) */
-  struct group	*group;		/* System group */
   const char	*passwd;	/* Password string */
   FILE		*infile,	/* Input file */
 		*outfile;	/* Output file */
@@ -84,46 +86,48 @@ main(int  argc,			/* I - Number of command-line arguments */
 		md5new[33];	/* New MD5 sum */
   const char	*root;		/* CUPS server root directory */
   char		passwdmd5[1024],/* passwd.md5 file */
-		passwdold[1024];/* passwd.old file */
+		passwdold[1024],/* passwd.old file */
+		passwdnew[1024];/* passwd.tmp file */
+  char		*newpass,	/* new password */
+  		*oldpass;	/* old password */
+  int		flag;		/* Password check flags... */
+  int		fd;		/* Password file descriptor */
 
 
  /*
   * Find the server directory...
+  *
+  * Don't use CUPS_SERVERROOT unless we're run by the
+  * super user.
   */
 
-  if ((root = getenv("CUPS_SERVERROOT")) == NULL)
-    root = CUPS_SERVERROOT;
-
-  snprintf(passwdmd5, sizeof(passwdmd5), "%s/passwd.md5", root);
-  snprintf(passwdold, sizeof(passwdold), "%s/passwd.old", root);
+  if (!getuid() && (root = getenv("CUPS_SERVERROOT")) != NULL)
+  {
+    snprintf(passwdmd5, sizeof(passwdmd5), "%s/passwd.md5", root);
+    snprintf(passwdold, sizeof(passwdold), "%s/passwd.old", root);
+    snprintf(passwdnew, sizeof(passwdnew), "%s/passwd.new", root);
+  }
+  else
+  {
+    strcpy(passwdmd5, CUPS_SERVERROOT "/passwd.md5");
+    strcpy(passwdold, CUPS_SERVERROOT "/passwd.old");
+    strcpy(passwdnew, CUPS_SERVERROOT "/passwd.new");
+  }
 
  /*
   * Find the default system group: "sys", "system", or "root"...
   */
 
-  group = getgrnam("sys");
-  endgrent();
-
-  if (group != NULL)
+  if (getgrnam("sys"))
     groupname = "sys";
+  else if (getgrnam("system"))
+    groupname = "system";
+  else if (getgrnam("root"))
+    groupname = "root";
   else
-  {
-    group = getgrnam("system");
-    endgrent();
+    groupname = "unknown";
 
-    if (group != NULL)
-      groupname = "system";
-    else
-    {
-      group = getgrnam("root");
-      endgrent();
-
-      if (group != NULL)
-        groupname = "root";
-      else
-        groupname = "unknown";
-    }
-  }
+  endgrent();
 
   username = NULL;
   op       = CHANGE;
@@ -180,42 +184,97 @@ main(int  argc,			/* I - Number of command-line arguments */
   if (!username)
     username = cupsUser();
 
+  oldpass = newpass = NULL;
+
  /*
-  * Try locking the password file...
+  * Obtain old and new password _before_ locking the database
+  * to keep users from locking the file indefinitely.
   */
 
-  if (access(passwdold, 0) == 0)
+  if (op == CHANGE && getuid())
   {
-    fputs("lppasswd: Password file busy!\n", stderr);
+    if ((passwd = cupsGetPassword("Enter old password:")) == NULL)
+      return (1);
+
+    oldpass = xstrdup(passwd);
+  }
+
+ /*
+  * Now get the new password
+  */
+
+  if ((passwd = cupsGetPassword("Enter password:")) == NULL)
+    return (1);
+
+  newpass = xstrdup(passwd);
+
+  if ((passwd = cupsGetPassword("Enter password again:")) == NULL)
+    return (1);
+
+  if (strcmp(passwd, newpass) != 0)
+  {
+    fputs("lppasswd: Sorry, passwords don't match!\n", stderr);
     return (1);
   }
 
-  if (rename(passwdmd5, passwdold))
-    if (errno != ENOENT && op != ADD)
-    {
-      perror("lppasswd: Unable to rename password file");
-      return (1);
-    }
+ /*
+  * Check that the password contains at least one letter and number.
+  */
+
+  flag = 0;
+
+  for (passwd = newpass; *passwd; passwd ++)
+    if (isdigit(*passwd))
+      flag |= 1;
+    else if (isalpha(*passwd))
+      flag |= 2;
+
+ /*
+  * Only allow passwords that are at least 6 chars, have a letter and
+  * a number, and don't contain the username.
+  */
+
+  if (strlen(newpass) < 6 || strstr(newpass, username) != NULL || flag != 3)
+  {
+    fputs("lppasswd: Sorry, password rejected.\n"
+	  "Your password must be at least 6 characters long, cannot contain\n"
+	  "your username, and must contain at least one letter and number.\n",
+	  stderr);
+    return (1);
+  }
+
+  outfile = infile = NULL;
+
+  /*
+   * Open the output file.
+   */
+
+  if ((fd = open(passwdnew, O_WRONLY|O_CREAT|O_EXCL, 0400)) < 0)
+  {
+    if (errno == EEXIST)
+      fputs("lppasswd: Password file busy!\n", stderr);
+    else
+      perror("lppasswd: Unable to open passwd file");
+
+    return (1);
+  }
+
+  if ((outfile = fdopen(fd, "w")) == NULL)
+  {
+    perror("lppasswd: Unable to open passwd file");
+    goto fail_out;
+  }
 
  /*
   * Open the existing password file and create a new one...
   */
 
-  infile = fopen(passwdold, "r");
-  if (infile == NULL && op != ADD)
+  infile = fopen(passwdmd5, "r");
+  if (infile == NULL && errno != ENOENT && op != ADD)
   {
     fputs("lppasswd: No password file to add to or delete from!\n", stderr);
-    return (1);
+    goto fail_out;
   }
-
-  if ((outfile = fopen(passwdmd5, "w")) == NULL)
-  {
-    perror("lppasswd: Unable to create password file");
-    rename(passwdold, passwdmd5);
-    return (1);
-  }
-
-  fchmod(fileno(outfile), 0400);
 
  /*
   * Read lines from the password file; the format is:
@@ -254,135 +313,61 @@ main(int  argc,			/* I - Number of command-line arguments */
             username, groupname);
   else if (op != DELETE)
   {
-    if (op == CHANGE && getuid())
+    if (oldpass &&
+        strcmp(httpMD5(username, "CUPS", oldpass, md5new), md5line) != 0)
     {
-      if ((passwd  = cupsGetPassword("Enter old password:")) == NULL)
-      {
-       /*
-	* Close the files and remove the old password file...
-	*/
-
-	fclose(infile);
-	fclose(outfile);
-
-	unlink(passwdold);
-
-	return (0);
-      }
-
-      if (strcmp(httpMD5(username, "CUPS", passwd, md5new), md5line) != 0)
-      {
-	fputs("lppasswd: Sorry, password doesn't match!\n", stderr);
-
-       /*
-	* Close the files and remove the old password file...
-	*/
-
-	fclose(infile);
-	fclose(outfile);
-
-        rename(passwdold, passwdmd5);
-
-	return (1);
-      }
-    }
-
-    if ((passwd  = cupsGetPassword("Enter password:")) == NULL)
-    {
-     /*
-      * Close the files and remove the old password file...
-      */
-
-      fclose(infile);
-      fclose(outfile);
-
-      rename(passwdold, passwdmd5);
-
-      return (0);
-    }
-
-    strncpy(line, passwd, sizeof(line) - 1);
-    line[sizeof(line) - 1] = '\0';
-      
-    if ((passwd  = cupsGetPassword("Enter password again:")) == NULL)
-    {
-     /*
-      * Close the files and remove the old password file...
-      */
-
-      fclose(infile);
-      fclose(outfile);
-
-      rename(passwdold, passwdmd5);
-
-      return (0);
-    }
-
-    if (strcmp(passwd, line) != 0)
-    {
-      fputs("lppasswd: Sorry, passwords don't match!\n", stderr);
-
-     /*
-      * Close the files and remove the old password file...
-      */
-
-      fclose(infile);
-      fclose(outfile);
-
-      rename(passwdold, passwdmd5);
-
-      return (1);
-    }
-
-   /*
-    * Check that the password contains at least one letter and number.
-    */
-
-    for (passwd = line; *passwd; passwd ++)
-      if (isdigit(*passwd))
-        break;
-
-    if (*passwd)
-      for (passwd = line; *passwd; passwd ++)
-	if (isalpha(*passwd))
-          break;
-
-   /*
-    * Only allow passwords that are at least 6 chars, have a letter and
-    * a number, and don't contain the username.
-    */
-
-    if (strlen(line) < 6 || strstr(line, username) != NULL || !*passwd)
-    {
-      fputs("lppasswd: Sorry, password must be at least 6 characters long, cannot contain\n"
-            "          your username, and must contain at least one letter and number.\n", stderr);
-
-     /*
-      * Close the files and remove the old password file...
-      */
-
-      fclose(infile);
-      fclose(outfile);
-
-      rename(passwdold, passwdmd5);
-
-      return (1);
+      fputs("lppasswd: Sorry, password doesn't match!\n", stderr);
+      goto fail_out;
     }
 
     fprintf(outfile, "%s:%s:%s\n", username, groupname,
-            httpMD5(username, "CUPS", passwd, md5new));
+            httpMD5(username, "CUPS", newpass, md5new));
   }
 
  /*
   * Close the files and remove the old password file...
   */
 
-  fclose(infile);
+  if (infile)
+    fclose(infile);
+
   fclose(outfile);
 
+ /*
+  * Save old passwd file
+  */
+
   unlink(passwdold);
+  link(passwdmd5, passwdold);
+
+ /*
+  * Install new password file
+  */
+
+  if (rename(passwdnew, passwdmd5) < 0)
+  {
+    perror("lppasswd: failed to rename passwd file");
+    unlink(passwdnew);
+    return (1);
+  }
 
   return (0);
+
+ /*
+  * This is where all errors die...
+  */
+
+fail_out:
+
+  if (infile)
+    fclose(infile);
+
+  if (outfile)
+    fclose(outfile);
+
+  unlink(passwdnew);
+
+  return (1);
 }
 
 
@@ -409,5 +394,28 @@ usage(FILE *fp)		/* I - File to send usage to */
 
 
 /*
- * End of "$Id: lppasswd.c,v 1.9 2001/01/22 15:04:03 mike Exp $".
+ * 'xstrdup()' - strdup() function with NULL checking...
+ */
+
+static char *			/* O - New string */
+xstrdup(const char *in)		/* I - String to duplicate */
+{
+  char	*out;			/* New string */
+
+
+  if (in == NULL)
+    return (NULL);
+
+  if ((out = strdup(in)) == NULL)
+  {
+    perror("lppasswd: Out of memory!");
+    exit(1);
+  }
+
+  return (out);
+}
+
+
+/*
+ * End of "$Id: lppasswd.c,v 1.10 2001/02/07 19:53:55 mike Exp $".
  */

@@ -1,4 +1,4 @@
-CHANGES.txt - 02/06/2001
+CHANGES.txt - 02/07/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.6-2
@@ -21,6 +21,29 @@ CHANGES IN CUPS V1.1.6-2
 	- Fix for pstoraster when ZLIB is not available.
 	- cupsGetPPD() didn't reconnect when a HTTP connection
 	  was lost.
+	- SuSE fix: httpConnect() didn't check that the
+	  value from gethostbyname() was a valid IPv4 address.
+	- SuSE fix: httpConnect() didn't allow file descriptor 0
+	  to be used for a socket.
+	- SuSE fix: ippRead() didn't confirm that all values in
+	  a set were numeric or string types.
+	- SuSE fix: lppasswd race condition fixes.
+	- SuSE fix: directive names could overflow buffer when
+	  reading *.conf files.
+	- SuSE fix: HEAD requests for PPD files did not use the
+	  same logic as GET requests.
+	- SuSE fix: possible buffer overflow when adding
+	  /index.html to requested directory name.
+	- SuSE fix: possible buffer overflow when converting
+	  IPP attributes to string options for filters.
+	- SuSE fix: creating file: device output with mode 0666
+	  instead of mode 0600.
+	- SuSE fix: creating job info files with mode 0640
+	  instead of 0600.
+	- SuSE fix: don't rely on snprintf() for including
+	  system name in log filenames.
+	- SuSE fix: add bounds checking when copying quoted
+	  and hex strings.
 
 
 CHANGES IN CUPS V1.1.6-1
