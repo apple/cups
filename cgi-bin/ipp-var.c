@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.23.2.4 2002/05/16 13:59:56 mike Exp $"
+ * "$Id: ipp-var.c,v 1.23.2.5 2002/10/17 17:05:59 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -72,6 +72,10 @@ ippSetServerVersion(void)
   cgiSetVariable("SERVER_NAME", getenv("SERVER_NAME"));
   cgiSetVariable("REMOTE_USER", getenv("REMOTE_USER"));
   cgiSetVariable("CUPS_VERSION", CUPS_SVERSION);
+
+#ifdef LC_TIME
+  setlocale(LC_TIME, "");
+#endif /* LC_TIME */
 }
 
 
@@ -296,5 +300,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.23.2.4 2002/05/16 13:59:56 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.23.2.5 2002/10/17 17:05:59 mike Exp $".
  */

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-directories.m4,v 1.5.2.4 2002/02/12 19:23:06 mike Exp $"
+dnl "$Id: cups-directories.m4,v 1.5.2.5 2002/10/17 17:06:00 mike Exp $"
 dnl
 dnl   Directory stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -81,6 +81,10 @@ if test "$sysconfdir" = "\${prefix}/etc"; then
 fi
 
 dnl Fix "libdir" variable for IRIX 6.x...
+if test "$libdir" = "\${exec_prefix}/lib"; then
+	libdir="$exec_prefix/lib"
+fi
+
 if test "$uname" = "IRIX" -a $uversion -ge 62; then
 	libdir="$exec_prefix/lib32"
 fi
@@ -180,8 +184,8 @@ case "$uname" in
 	*)
 		# All others
 		INSTALL_SYSV="install-sysv"
-		CUPS_SERVERBIN="$exec_prefix/lib/cups"
-		AC_DEFINE_UNQUOTED(CUPS_SERVERBIN, "$exec_prefix/lib/cups")
+		CUPS_SERVERBIN="$libdir/cups"
+		AC_DEFINE_UNQUOTED(CUPS_SERVERBIN, "$libdir/cups")
 		;;
 esac
 
@@ -234,5 +238,5 @@ AC_SUBST(CUPS_FONTPATH)
 AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 
 dnl
-dnl End of "$Id: cups-directories.m4,v 1.5.2.4 2002/02/12 19:23:06 mike Exp $".
+dnl End of "$Id: cups-directories.m4,v 1.5.2.5 2002/10/17 17:06:00 mike Exp $".
 dnl

@@ -1,5 +1,5 @@
 /*
- * "$Id: common.c,v 1.15.2.8 2002/10/11 16:32:15 mike Exp $"
+ * "$Id: common.c,v 1.15.2.9 2002/10/17 17:06:00 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -39,6 +39,7 @@
  */
 
 #include "common.h"
+#include <locale.h>
 
 
 /*
@@ -70,6 +71,10 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
   ppd_size_t	*pagesize;	/* Current page size */
   const char	*val;		/* Option value */
 
+
+#ifdef LC_TIME
+  setlocale(LC_TIME, "");
+#endif /* LC_TIME */
 
   ppd = ppdOpenFile(getenv("PPD"));
 
@@ -460,5 +465,5 @@ WriteLabels(int orient)	/* I - Orientation of the page */
 
 
 /*
- * End of "$Id: common.c,v 1.15.2.8 2002/10/11 16:32:15 mike Exp $".
+ * End of "$Id: common.c,v 1.15.2.9 2002/10/17 17:06:00 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.21 2002/10/16 02:35:33 mike Exp $"
+ * "$Id: main.c,v 1.57.2.22 2002/10/17 17:06:01 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -235,6 +235,10 @@ main(int  argc,			/* I - Number of command-line arguments */
     TZ[0] = '\0';
 
   tzset();
+
+#ifdef LC_TIME
+  setlocale(LC_TIME, "");
+#endif /* LC_TIME */
 
  /*
   * Set the maximum number of files...
@@ -896,5 +900,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.21 2002/10/16 02:35:33 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.22 2002/10/17 17:06:01 mike Exp $".
  */
