@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.14 2002/01/30 16:14:09 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.15 2002/03/22 17:50:52 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1767,8 +1767,12 @@ write_printcap(void)
 	*    PrinterN:
 	*/
 
+        if (DefaultPrinter)
+	  fprintf(fp, "%s:\n", DefaultPrinter->name);
+
 	for (p = Printers; p != NULL; p = p->next)
-	  fprintf(fp, "%s:\n", p->name);
+	  if (p != DefaultPrinter)
+	    fprintf(fp, "%s:\n", p->name);
         break;
 
     case PRINTCAP_SOLARIS:
@@ -1777,11 +1781,19 @@ write_printcap(void)
 	*
 	*    _all:all=Printer1,Printer2,Printer3,...,PrinterN
 	*    _default:use=DefaultPrinter
-	*    Printer1:
+	*    Printer1:\
+	*            :bsdaddr=ServerName,Printer1:\
+	*            :description=Description:
 	*    Printer2:
+	*            :bsdaddr=ServerName,Printer2:\
+	*            :description=Description:
 	*    Printer3:
+	*            :bsdaddr=ServerName,Printer3:\
+	*            :description=Description:
 	*    ...
 	*    PrinterN:
+	*            :bsdaddr=ServerName,PrinterN:\
+	*            :description=Description:
 	*/
 
         fputs("_all:all=", fp);
@@ -1792,7 +1804,10 @@ write_printcap(void)
 	  fprintf(fp, "_default:use=%s\n", DefaultPrinter->name);
 
 	for (p = Printers; p != NULL; p = p->next)
-	  fprintf(fp, "%s:\n", p->name);
+	  fprintf(fp, "%s:\\\n"
+	              "\t:bsdaddr=%s,%s:\\\n"
+		      "\t:description=%s:\n",
+		  p->name, ServerName, p->name, p->info);
         break;
   }
 
@@ -2059,5 +2074,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.14 2002/01/30 16:14:09 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.15 2002/03/22 17:50:52 mike Exp $".
  */
