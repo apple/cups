@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.43 2002/03/01 19:53:29 mike Exp $"
+ * "$Id: ipp.h,v 1.44 2002/03/22 15:07:23 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -48,7 +48,7 @@ extern "C" {
  * IPP version string...
  */
 
-#  define IPP_VERSION		"\001\000"
+#  define IPP_VERSION		"\001\001"
 
 /*
  * IPP registered port number...  This is the default value - applications
@@ -430,5 +430,5 @@ extern void		_ipp_free_attr(ipp_attribute_t *);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.43 2002/03/01 19:53:29 mike Exp $".
+ * End of "$Id: ipp.h,v 1.44 2002/03/22 15:07:23 mike Exp $".
  */
