@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.1 1998/02/19 20:43:33 mike Exp $"
+ * "$Id: imagetops.c,v 1.2 1998/03/31 18:26:41 mike Exp $"
  *
  *   Image file to PostScript conversion program for espPrint, a collection
  *   of printer drivers.
@@ -17,7 +17,10 @@
  * Revision History:
  *
  *   $Log: imagetops.c,v $
- *   Revision 1.1  1998/02/19 20:43:33  mike
+ *   Revision 1.2  1998/03/31 18:26:41  mike
+ *   Added setcolorspace command for Level 2 output.
+ *
+ *   Revision 1.1  1998/02/19  20:43:33  mike
  *   Initial revision
  *
  */
@@ -75,7 +78,7 @@ static void	print_prolog(FILE *, int, float *, int *, float *);
  * 'main()' - Main entry...
  */
 
-void
+int
 main(int  argc,		/* I - Number of command-line arguments */
      char *argv[])	/* I - Command-line arguments */
 {
@@ -588,6 +591,10 @@ main(int  argc,		/* I - Number of command-line arguments */
 
       if (level == 1)
 	fprintf(out, "\t/picture %d string def\n", (x1 - x0 + 1) * abs(colorspace));
+      else if (colorspace == IMAGE_WHITE)
+        fputs("/DeviceGray setcolorspace\n", out);
+      else
+        fputs("/DeviceRGB setcolorspace\n", out);
 
       if (rotation == 0)
       {
@@ -651,6 +658,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (out != stdout)
     fclose(out);
+
+  return (NO_ERROR);
 }
 
 
@@ -882,5 +891,5 @@ print_prolog(FILE  *out,
 
 
 /*
- * End of "$Id: imagetops.c,v 1.1 1998/02/19 20:43:33 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.2 1998/03/31 18:26:41 mike Exp $".
  */
