@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.5 1999/04/16 20:43:54 mike Exp $"
+ * "$Id: socket.c,v 1.6 1999/04/21 15:02:02 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,7 @@
  *
  * Contents:
  *
+ *   main() - Send a file to the printer or server.
  */
 
 /*
@@ -101,7 +102,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
     if ((fp = fopen(argv[6], "rb")) == NULL)
     {
-      perror("ERROR: unable to open print file - ");
+      perror("ERROR: unable to open print file");
       return (1);
     }
   }
@@ -138,7 +139,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   {
     if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-      perror("ERROR: Unable to connect to printer - ");
+      perror("ERROR: Unable to connect to printer");
       return (1);
     }
 
@@ -210,7 +211,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	fprintf(stderr, "INFO: Received %u bytes of back-channel data!\n",
 	        nbytes);
     }
-    else
+    else if (argc > 6)
       fprintf(stderr, "INFO: Sending print file, %u bytes...\n", tbytes);
   }
 
@@ -227,5 +228,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.5 1999/04/16 20:43:54 mike Exp $".
+ * End of "$Id: socket.c,v 1.6 1999/04/21 15:02:02 mike Exp $".
  */

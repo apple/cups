@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.3 1999/03/06 20:26:05 mike Exp $"
+ * "$Id: lpd.c,v 1.4 1999/04/21 15:02:00 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,9 @@
  *
  * Contents:
  *
+ *   main()        - Send a file to the printer or server.
+ *   lpd_command() - Send an LPR command sequence and wait for a reply.
+ *   lpd_queue()   - Queue a file using the Line Printer Daemon protocol.
  */
 
 /*
@@ -106,14 +109,14 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
     if ((fp = fopen(tmpnam(filename), "w")) == NULL)
     {
-      perror("lpd: unable to create temporary file - ");
+      perror("lpd: unable to create temporary file");
       return (1);
     }
 
     while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
       if (fwrite(buffer, 1, bytes, fp) < bytes)
       {
-        perror("lpd: unable to write to temporary file - ");
+        perror("lpd: unable to write to temporary file");
 	fclose(fp);
 	unlink(filename);
 	return (1);
@@ -247,7 +250,7 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
   {
     if ((fd = rresvport(&port)) < 0)
     {
-      perror("ERROR: Unable to connect to printer - ");
+      perror("ERROR: Unable to connect to printer");
       return (1);
     }
 
@@ -271,7 +274,7 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
       }
       else
       {
-	perror("ERROR: Unable to connect to printer - ");
+	perror("ERROR: Unable to connect to printer");
         return (1);
       }
     }
@@ -285,13 +288,13 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
   if (stat(filename, &filestats))
   {
-    perror("lpd: unable to stat print file - ");
+    perror("lpd: unable to stat print file");
     return (1);
   }
 
   if ((fp = fopen(filename, "rb")) == NULL)
   {
-    perror("lpd: unable to open print file for reading - ");
+    perror("lpd: unable to open print file for reading");
     return (1);
   }
 
@@ -329,7 +332,7 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
   if (send(fd, control, strlen(control) + 1, 0) < (strlen(control) + 1))
   {
-    perror("ERROR: Unable to write control file - ");
+    perror("ERROR: Unable to write control file");
     status = 1;
   }
   else if (read(fd, &status, 1) < 1 || status != 0)
@@ -346,17 +349,18 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
     lpd_command(fd, "\003%d dfA%03.3d%s\n", filestats.st_size,
                 getpid() % 1000, localhost);
 
-    fprintf(stderr, "lpd: Sending data file (%u bytes)\n", filestats.st_size);
+    fprintf(stderr, "lpd: Sending data file (%u bytes)\n",
+            (unsigned)filestats.st_size);
 
     tbytes = 0;
     while ((nbytes = fread(buffer, 1, sizeof(buffer), fp)) > 0)
     {
       fprintf(stderr, "INFO: Spooling LPR job, %u%% complete...\n",
-              100 * tbytes / filestats.st_size);
+              (unsigned)(100 * tbytes / filestats.st_size));
 
       if (send(fd, buffer, nbytes, 0) < nbytes)
       {
-        perror("ERROR: Unable to send print file to printer - ");
+        perror("ERROR: Unable to send print file to printer");
         break;
       }
       else
@@ -386,5 +390,5 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
 
 /*
- * End of "$Id: lpd.c,v 1.3 1999/03/06 20:26:05 mike Exp $".
+ * End of "$Id: lpd.c,v 1.4 1999/04/21 15:02:00 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.4 1999/04/16 20:43:54 mike Exp $"
+ * "$Id: serial.c,v 1.5 1999/04/21 15:02:01 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,7 @@
  *
  * Contents:
  *
+ *   main() - Send a file to the printer or server.
  */
 
 /*
@@ -94,7 +95,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
     if ((fp = fopen(argv[6], "rb")) == NULL)
     {
-      perror("ERROR: unable to open print file - ");
+      perror("ERROR: unable to open print file");
       return (1);
     }
   }
@@ -125,7 +126,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
   if ((fd = open(resource, O_WRONLY)) == -1)
   {
-    perror("ERROR: Unable to open parallel port device file - ");
+    perror("ERROR: Unable to open serial port device file");
     return (1);
   }
 
@@ -269,13 +270,14 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
     if (write(fd, buffer, nbytes) < nbytes)
     {
-      perror("ERROR: Unable to send print file to printer - ");
+      perror("ERROR: Unable to send print file to printer");
       break;
     }
     else
       tbytes += nbytes;
 
-    fprintf(stderr, "INFO: Sending print file, %u bytes...\n", tbytes);
+    if (argc > 6)
+      fprintf(stderr, "INFO: Sending print file, %u bytes...\n", tbytes);
   }
 
  /*
@@ -291,5 +293,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: serial.c,v 1.4 1999/04/16 20:43:54 mike Exp $".
+ * End of "$Id: serial.c,v 1.5 1999/04/21 15:02:01 mike Exp $".
  */
