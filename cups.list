@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.63 2000/05/16 19:18:59 mike Exp $"
+# "$Id: cups.list,v 1.64 2000/05/22 18:20:10 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -286,6 +286,7 @@ f 0444 root sys /usr/share/cups/templates/error.tmpl templates/error.tmpl
 f 0444 root sys /usr/share/cups/templates/job-cancel.tmpl templates/job-cancel.tmpl
 f 0444 root sys /usr/share/cups/templates/job-hold.tmpl templates/job-hold.tmpl
 f 0444 root sys /usr/share/cups/templates/job-release.tmpl templates/job-release.tmpl
+f 0444 root sys /usr/share/cups/templates/job-restart.tmpl templates/job-restart.tmpl
 f 0444 root sys /usr/share/cups/templates/jobs.tmpl templates/jobs.tmpl
 f 0444 root sys /usr/share/cups/templates/modify-class.tmpl templates/modify-class.tmpl
 f 0444 root sys /usr/share/cups/templates/modify-printer.tmpl templates/modify-printer.tmpl
@@ -383,6 +384,8 @@ f 0444 root sys /usr/share/doc/cups/cmp.pdf doc/cmp.pdf
 f 0444 root sys /usr/share/doc/cups/cupsdoc.css doc/cupsdoc.css
 f 0444 root sys /usr/share/doc/cups/idd.html doc/idd.html
 f 0444 root sys /usr/share/doc/cups/idd.pdf doc/idd.pdf
+f 0444 root sys /usr/share/doc/cups/ipp.html doc/ipp.html
+f 0444 root sys /usr/share/doc/cups/ipp.pdf doc/ipp.pdf
 f 0444 root sys /usr/share/doc/cups/overview.html doc/overview.html
 f 0444 root sys /usr/share/doc/cups/overview.pdf doc/overview.pdf
 f 0444 root sys /usr/share/doc/cups/sam.html doc/sam.html
@@ -457,5 +460,5 @@ f 0444 root sys /usr/man/man5/printers.conf.5 man/printers.conf.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.63 2000/05/16 19:18:59 mike Exp $".
+# End of "$Id: cups.list,v 1.64 2000/05/22 18:20:10 mike Exp $".
 #
