@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.5 2002/01/02 18:05:03 mike Exp $"
+ * "$Id: job.c,v 1.124.2.6 2002/01/26 21:36:37 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1774,6 +1774,9 @@ UpdateJob(job_t *job)		/* I - Job to check */
     lineptr[1] = 0;
   }
 
+  if (job->bufused == 0 && bytes == 0)
+    lineptr = NULL;
+
   while (lineptr != NULL)
   {
    /*
@@ -2101,5 +2104,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.5 2002/01/02 18:05:03 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.6 2002/01/26 21:36:37 mike Exp $".
  */

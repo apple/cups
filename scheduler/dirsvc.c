@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.6 2002/01/14 19:15:04 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.7 2002/01/26 21:36:36 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -695,6 +695,13 @@ StartPolling(void)
 
 
  /*
+  * Don't do anything if we aren't polling...
+  */
+
+  if (NumPolled == 0)
+    return;
+
+ /*
   * Setup string arguments for port and interval options.
   */
 
@@ -1167,6 +1174,9 @@ UpdatePolling(void)
     lineptr[1] = 0;
   }
 
+  if (bytes == 0 && bufused == 0)
+    lineptr = NULL;
+
   while (lineptr != NULL)
   {
    /*
@@ -1190,16 +1200,14 @@ UpdatePolling(void)
     lineptr = strchr(buffer, '\n');
   }
 
-  if (bytes < 0)
+  if (bytes <= 0)
   {
+   /*
+    * All polling processes have died; stop polling...
+    */
+
     LogMessage(L_ERROR, "UpdatePolling: all polling processes have exited!");
-    close(PollPipe);
-
-    LogMessage(L_DEBUG2, "UpdatePolling: removing fd %d from InputSet.",
-               PollPipe);
-    FD_CLR(PollPipe, &InputSet);
-
-    PollPipe = 0;
+    StopPolling();
   }
 }
 
@@ -1713,5 +1721,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.6 2002/01/14 19:15:04 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.7 2002/01/26 21:36:36 mike Exp $".
  */

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4,v 1.9.2.3 2002/01/14 20:36:31 mike Exp $"
+dnl "$Id: cups-compiler.m4,v 1.9.2.4 2002/01/26 21:36:35 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -49,15 +49,16 @@ if test -n "$GCC"; then
 	# Previous versions of GCC do not have the reliance on the stdc++
 	# or g++ libraries, so the extra supc++ library is not needed.
 
-	case "`$CXX --version`" in
-    		3*)
-			AC_MSG_WARN(GCC 3.0.x is known to produce incorrect code - use with caution!)
-			LIBS="$LIBS -lsupc++"
-			;;
-    		3.1*)
-			LIBS="$LIBS -lsupc++"
-			;;
-	esac
+	AC_MSG_CHECKING(if libsupc++ is required)
+
+ 	SUPC="`$CXX -print-file-name=libsupc++.a 2>/dev/null`"
+ 	if test -n "$SUPC" -a "$SUPC" != "libsupc++.a"; then
+ 		# This is gcc 3.x, and it knows of libsupc++, so we need it
+ 		LIBS="$LIBS -lsupc++"
+		AC_MSG_RESULT(yes)
+	else
+		AC_MSG_RESULT(no)
+ 	fi
 
 	CXX="$CC"
 
@@ -78,7 +79,9 @@ if test -n "$GCC"; then
     		OPTIM="-fPIC $OPTIM"
 	fi
 
-	OPTIM="-Wall $OPTIM"
+	if test "x$with_optim" = x; then
+		OPTIM="-Wall $OPTIM"
+	fi
 else
 	case $uname in
 		AIX*)
@@ -122,7 +125,9 @@ else
 				OPTIM="$OPTIM -n32 -mips3"
 			fi
 
-			OPTIM="-fullwarn $OPTIM"
+			if test "x$with_optim" = x; then
+				OPTIM="-fullwarn $OPTIM"
+			fi
 			;;
 		SunOS*)
 			# Solaris
@@ -178,5 +183,5 @@ case $uname in
 esac
 
 dnl
-dnl End of "$Id: cups-compiler.m4,v 1.9.2.3 2002/01/14 20:36:31 mike Exp $".
+dnl End of "$Id: cups-compiler.m4,v 1.9.2.4 2002/01/26 21:36:35 mike Exp $".
 dnl
