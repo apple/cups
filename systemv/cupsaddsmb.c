@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsaddsmb.c,v 1.1 2001/09/18 19:14:47 mike Exp $"
+ * "$Id: cupsaddsmb.c,v 1.2 2001/11/09 17:19:44 mike Exp $"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,9 @@
  *
  * Contents:
  *
+ *   main()             - Export printers on the command-line.
+ *   do_samba_command() - Do a SAMBA command, asking for a password as needed.
+ *   export_dest()      - Export a destination to SAMBA.
  */
 
 /*
@@ -37,10 +40,17 @@
 
 
 /*
+ * Local globals...
+ */
+
+int	Verbosity = 0;
+
+
+/*
  * Local functions...
  */
 
-int	do_samba_command(const char *, const char *);
+int	do_samba_command(const char *, const char *, const char *);
 int	export_dest(const char *);
 
 
@@ -76,6 +86,19 @@ main(int  argc,		/* I - Number of command-line arguments */
       if (status)
         return (status);
     }
+    else if (strcmp(argv[i], "-U") == 0)
+    {
+      i ++;
+      if (i >= argc)
+      {
+	puts("Usage: cupsaddsmb [-a] [-U user] [-v] [printer1 ... printerN]");
+	return (1);
+      }
+
+      cupsSetUser(argv[i]);
+    }
+    else if (strcmp(argv[i], "-v") == 0)
+      Verbosity = 1;
     else if (argv[i][0] != '-')
     {
       if ((status = export_dest(argv[i])) != 0)
@@ -83,7 +106,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     }
     else
     {
-      puts("Usage: cupsaddsmb [-a] [printer1 ... printerN]");
+      puts("Usage: cupsaddsmb [-a] [-U user] [-v] [printer1 ... printerN]");
       return (1);
     }
 
@@ -98,6 +121,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 int					/* O - Status of command */
 do_samba_command(const char *command,	/* I - Command to run */
+                 const char *args,	/* I - Argument(s) for command */
                  const char *filename)	/* I - File to use as input */
 {
   int		status;			/* Status of command */
@@ -108,22 +132,52 @@ do_samba_command(const char *command,	/* I - Command to run */
   for (status = 1;;)
   {
     if (p)
-      snprintf(temp, sizeof(temp), "%s -N -U%s%%%s <%s >/dev/null 2>/dev/null",
-               command, cupsUser(), p, filename ? filename : "/dev/null");
+      snprintf(temp, sizeof(temp), "%s -N -U \'%s%%%s\' %s <%s",
+               command, cupsUser(), p, args, filename ? filename : "/dev/null");
     else
-      snprintf(temp, sizeof(temp), "%s -N -U%s <%s >/dev/null 2>/dev/null",
-               command, cupsUser(), filename ? filename : "/dev/null");
+      snprintf(temp, sizeof(temp), "%s -N -U \'%s\' %s <%s",
+               command, cupsUser(), args, filename ? filename : "/dev/null");
+
+    if (Verbosity)
+    {
+      printf("Running the following command:\n\n    %s\n", temp);
+
+      if (filename)
+      {
+        char cat[1024];
+
+
+        puts("\nwith the following input:\n");
+
+        snprintf(cat, sizeof(cat), "cat %s", filename);
+        system(cat);
+      }
+    }
+    else
+    {
+      strncat(temp, " >/dev/null 2>/dev/null", sizeof(temp) - 1);
+      temp[sizeof(temp) - 1] = '\0';
+    }
 
     if ((status = system(temp)) != 0)
     {
+      if (Verbosity)
+        puts("");
+
       snprintf(temp, sizeof(temp),
-               "Password required to access %s via SAMBA.", cupsServer());
+               "Password for %s required to access %s via SAMBA: ",
+	       cupsUser(), cupsServer());
 
       if ((p = cupsGetPassword(temp)) == NULL)
         break;
     }
     else
+    {
+      if (Verbosity)
+        puts("");
+
       break;
+    }
   }
 
   return (status);
@@ -196,7 +250,7 @@ export_dest(const char *dest)	/* I - Destination to export */
   /* Run the smbclient command to copy the Windows drivers... */
   snprintf(command, sizeof(command), "smbclient //%s/print\\$", cupsServer());
 
-  if ((status = do_samba_command(command, tempfile)) != 0)
+  if ((status = do_samba_command(command, "", tempfile)) != 0)
   {
     fprintf(stderr, "ERROR: Unable to copy Windows printer driver files (%d)!\n",
             status);
@@ -221,18 +275,24 @@ export_dest(const char *dest)	/* I - Destination to export */
 	      "NULL:RAW:NULL\"\n",
           dest, dest);
   fprintf(fp, "addprinter %s %s \"%s\" \"\"\n", dest, dest, dest);
+
+ /*
+  * MRS: For some reason, SAMBA doesn't like to install Win9x drivers
+  *      with aux files.  They are currently commented out but further
+  *      investigation is required...
+  */
+
   fprintf(fp, "adddriver \"Windows 4.0\" "
               "\"%s:ADOBEPS4.DRV:%s.PPD:NULL:ADOBEPS4.HLP:"
-	      "PSMON.DLL:RAW:ADFONTS.MFM,DEFPRTR2.PPD,ICONLIB.DLL\"\n",
+	      "PSMON.DLL:RAW:NULL\"\n",
+	      /*"PSMON.DLL:RAW:ADFONTS.MFM,DEFPRTR2.PPD,ICONLIB.DLL\"\n",*/
 	      dest, dest);
   fputs("quit\n", fp);
 
   fclose(fp);
 
   /* Run the rpcclient command to install the Windows drivers... */
-  snprintf(command, sizeof(command), "rpcclient %s", cupsServer());
-
-  if ((status = do_samba_command(command, tempfile)) != 0)
+  if ((status = do_samba_command("rpcclient", cupsServer(), tempfile)) != 0)
   {
     fprintf(stderr, "ERROR: Unable to install Windows printer driver files (%d)!\n",
             status);
@@ -247,5 +307,5 @@ export_dest(const char *dest)	/* I - Destination to export */
 
 
 /*
- * End of "$Id: cupsaddsmb.c,v 1.1 2001/09/18 19:14:47 mike Exp $".
+ * End of "$Id: cupsaddsmb.c,v 1.2 2001/11/09 17:19:44 mike Exp $".
  */

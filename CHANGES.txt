@@ -118,6 +118,10 @@ CHANGES IN CUPS V1.1.11
 	  named "cupsd", not just any program with "cupsd" in
 	  the name (this caused the apcupsd UPS monitoring
 	  daemon to be stopped/restarted...)
+	- The CUPS-Move-Job operation did not change the internal
+	  destination name for held jobs, so moved (but held)
+	  jobs would print on the correct printer but show up
+	  as queued on the original destination.
 
 
 CHANGES IN CUPS V1.1.10-1

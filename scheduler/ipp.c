@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.146 2001/10/22 21:04:08 mike Exp $"
+ * "$Id: ipp.c,v 1.147 2001/11/09 17:19:42 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -53,7 +53,7 @@
  *   get_printer_attrs()         - Get printer attributes.
  *   get_printers()              - Get a list of printers.
  *   hold_job()                  - Hold a print job.
- *   move_job()                  - Move a job.
+ *   move_job()                  - Move a job to a new destination.
  *   print_job()                 - Print a file to a printer or class.
  *   reject_jobs()               - Reject print jobs to a printer.
  *   release_job()               - Release a held print job.
@@ -3517,7 +3517,7 @@ hold_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * 'move_job()' - Set job attributes.
+ * 'move_job()' - Move a job to a new destination.
  */
 
 static void
@@ -5581,5 +5581,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.146 2001/10/22 21:04:08 mike Exp $".
+ * End of "$Id: ipp.c,v 1.147 2001/11/09 17:19:42 mike Exp $".
  */
