@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.31.2.13 2004/06/29 13:15:07 mike Exp $"
+# "$Id: Makefile,v 1.31.2.14 2004/06/29 20:16:29 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -112,6 +112,7 @@ install:	installhdrs
 		fi \
 	fi
 
+
 #
 # Install source and header files...
 #
@@ -164,5 +165,5 @@ tardist:
 	epm $(EPMFLAGS) -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.31.2.13 2004/06/29 13:15:07 mike Exp $".
+# End of "$Id: Makefile,v 1.31.2.14 2004/06/29 20:16:29 mike Exp $".
 #

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.4.2.20 2004/06/28 23:35:10 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.4.2.21 2004/06/29 20:16:30 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -47,6 +47,7 @@ echo ""
 echo "OK, now that we have the Dirty Harry quote out of the way, please"
 echo "choose the type of test you wish to perform:"
 echo ""
+echo "0 - No testing, keep the scheduler running for me (all systems)"
 echo "1 - Basic conformance test, no load testing (all systems)"
 echo "2 - Basic conformance test, some load testing (minimum 256MB VM, 50MB disk)"
 echo "3 - Basic conformance test, extreme load testing (minimum 1GB VM, 500MB disk)"
@@ -57,6 +58,12 @@ echo "Please enter the number of the test you wish to perform:"
 read testtype
 
 case "$testtype" in
+	0)
+		echo "Running in test mode (0)"
+		nprinters1=0
+		nprinters2=0
+		pjobs=0
+		;;
 	2)
 		echo "Running the medium tests (2)"
 		nprinters1=10
@@ -304,6 +311,7 @@ export HOME
 
 echo "Starting scheduler:"
 echo "    $valgrind ../scheduler/cupsd -c /tmp/$user/cupsd.conf -f >/tmp/$user/log/debug_log &"
+echo ""
 
 $valgrind ../scheduler/cupsd -c /tmp/$user/cupsd.conf -f >/tmp/$user/log/debug_log &
 cupsd=$!
@@ -312,6 +320,14 @@ cupsd=$!
 #	# Trace system calls in cupsd if we have strace...
 #	/usr/bin/strace -tt -o /tmp/$user/log/cupsd.trace -p $cupsd &
 #fi
+
+if test "x$testtype" = x0; then
+	echo "Scheduler is PID $cupsd and is listening on port 8631."
+	echo ""
+	echo "Set the IPP_PORT environment variable to 8631 to test the software"
+	echo "interactively from the command-line."
+	exit 0
+fi
 
 echo "Scheduler is PID $cupsd; run debugger now if you need to."
 echo ""
@@ -479,5 +495,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.4.2.20 2004/06/28 23:35:10 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.4.2.21 2004/06/29 20:16:30 mike Exp $"
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.84 2004/06/29 13:15:10 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.85 2004/06/29 20:16:29 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1561,9 +1561,10 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
   * Was this operation called from the correct URI?
   */
 
-  if (strncmp(con->uri, "/admin/", 7) != 0)
+  if (strncmp(con->uri, "/admin/", 7) &&
+      strncmp(con->uri, "/jobs/", 7))
   {
-    LogMessage(L_ERROR, "cancel_all_jobs: admin request on bad resource \'%s\'!",
+    LogMessage(L_ERROR, "cancel_all_jobs: request on bad resource \'%s\'!",
                con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
@@ -1573,7 +1574,7 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
   * See if we have a printer URI...
   */
 
-  if (strcmp(uri->name, "printer-uri") != 0)
+  if (strcmp(uri->name, "printer-uri"))
   {
     LogMessage(L_ERROR, "cancel_all_jobs: bad %s attribute \'%s\'!",
                uri->name, uri->values[0].string.text);
@@ -1600,6 +1601,16 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
   }
   else
     username = NULL;
+
+  if ((!username ||
+       (username && con->username[0] && strcmp(username, con->username))) &&
+      strncmp(con->uri, "/admin/", 7))
+  {
+    LogMessage(L_ERROR, "cancel_all_jobs: only administrators can cancel "
+                        "other users\' jobs!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
 
  /*
   * Look for the "purge-jobs" attribute...
@@ -6912,5 +6923,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.84 2004/06/29 13:15:10 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.85 2004/06/29 20:16:29 mike Exp $".
  */

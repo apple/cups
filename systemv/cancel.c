@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.19.2.15 2004/06/29 13:15:11 mike Exp $"
+ * "$Id: cancel.c,v 1.19.2.16 2004/06/29 20:16:30 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -275,7 +275,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       * Do the request and get back a response...
       */
 
-      if (op == IPP_PURGE_JOBS)
+      if (op == IPP_PURGE_JOBS && (!user || strcasecmp(user, cupsUser())))
         response = cupsDoRequest(http, request, "/admin/");
       else
         response = cupsDoRequest(http, request, "/jobs/");
@@ -377,5 +377,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c,v 1.19.2.15 2004/06/29 13:15:11 mike Exp $".
+ * End of "$Id: cancel.c,v 1.19.2.16 2004/06/29 20:16:30 mike Exp $".
  */
