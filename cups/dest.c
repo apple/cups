@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.18.2.14 2004/02/25 16:58:32 mike Exp $"
+ * "$Id: dest.c,v 1.18.2.15 2004/05/13 20:24:48 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -679,7 +679,8 @@ cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
   * Connect to the CUPS server...
   */
 
-  if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
+  if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
+                                 cupsEncryption())) == NULL)
     return (num_dests);
 
  /*
@@ -796,5 +797,5 @@ cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
 
 
 /*
- * End of "$Id: dest.c,v 1.18.2.14 2004/02/25 16:58:32 mike Exp $".
+ * End of "$Id: dest.c,v 1.18.2.15 2004/05/13 20:24:48 mike Exp $".
  */
