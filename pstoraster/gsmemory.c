@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gsmemory.c,v 1.5 2000/10/13 01:04:41 mike Exp $ */
+/*$Id: gsmemory.c,v 1.6 2000/10/19 13:18:30 mike Exp $ */
 /* Generic allocator support */
 #include "memory_.h"
 #include "gstypes.h"
@@ -188,7 +188,7 @@ RELOC_PTRS_BEGIN(basic_reloc_ptrs)
 		RELOC_CONST_STRING_VAR(*(gs_const_string *)pptr);
 		break;
 	    case GC_ELT_REF:
-		return 0;
+		break;
 	}
     }
     if (psd->super_type)

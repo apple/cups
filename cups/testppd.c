@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c,v 1.16 2000/06/12 15:51:26 mike Exp $"
+ * "$Id: testppd.c,v 1.17 2000/10/19 13:18:29 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -171,6 +171,17 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
     }
 
+    printf("    num_profiles = %d\n", ppd->num_profiles);
+    for (j = 0; j < ppd->num_profiles; j ++)
+      printf("        profiles[%d] = %s/%s %.3f %.3f [ %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f ]\n",
+             j, ppd->profiles[j].resolution, ppd->profiles[j].media_type,
+	     ppd->profiles[j].gamma, ppd->profiles[j].density,
+	     ppd->profiles[j].matrix[0][0], ppd->profiles[j].matrix[0][1],
+	     ppd->profiles[j].matrix[0][2], ppd->profiles[j].matrix[1][0],
+	     ppd->profiles[j].matrix[1][1], ppd->profiles[j].matrix[1][2],
+	     ppd->profiles[j].matrix[2][0], ppd->profiles[j].matrix[2][1],
+	     ppd->profiles[j].matrix[2][2]);
+
     printf("    num_fonts = %d\n", ppd->num_fonts);
     for (j = 0; j < ppd->num_fonts; j ++)
       printf("        fonts[%d] = %s\n", j, ppd->fonts[j]);
@@ -183,5 +194,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c,v 1.16 2000/06/12 15:51:26 mike Exp $".
+ * End of "$Id: testppd.c,v 1.17 2000/10/19 13:18:29 mike Exp $".
  */

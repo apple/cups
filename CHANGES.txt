@@ -3,6 +3,10 @@ CHANGES.txt - 10/16/2000
 
 CHANGES IN CUPS V1.1.5
 
+	- Documentation updates.
+	- Makefile/configure script updates.
+	- The RPM spec file didn't work out-of-the-box under
+	  RedHat or Mandrake.
 	- Minor code cleanup to remove extraneous compiler
 	  warnings.
 	- cupsTempFile() was using %p for the temporary
@@ -25,6 +29,8 @@ CHANGES IN CUPS V1.1.5
 	  data required when getting the list of printer or
 	  class information.  This should improve performance
 	  with large numbers of printers on slower machines.
+	- The scheduler was always enforcing the FilterLimit,
+	  even if FilterLimit was set to 0.
 	- Updated the Linux USB backend to support Mandrake's
 	  /dev/usb/usblp# filenames.
 	- The PRINTER and LPDEST environment variables did not
