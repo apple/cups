@@ -1552,7 +1552,7 @@ just the command name...)
 in some cases by trying to open the ports to see if they actually exist.
 
 <P>Once it finds a serial port it writes a single line for each port to
-the standard error file. Each line looks like this:
+the standard output file. Each line looks like this:
 
 <UL><PRE>
 serial serial:/dev/ttyS0?baud=115200 "Unknown" "Serial Port 1"
