@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h,v 1.22.2.19 2004/06/30 18:24:18 mike Exp $"
+ * "$Id: printers.h,v 1.22.2.20 2004/08/23 18:01:56 mike Exp $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -137,5 +137,5 @@ extern void		WritePrintcap(void);
 
 
 /*
- * End of "$Id: printers.h,v 1.22.2.19 2004/06/30 18:24:18 mike Exp $".
+ * End of "$Id: printers.h,v 1.22.2.20 2004/08/23 18:01:56 mike Exp $".
  */

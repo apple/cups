@@ -1,5 +1,5 @@
 /*
- * "$Id: banners.h,v 1.2.2.4 2004/06/29 13:15:10 mike Exp $"
+ * "$Id: banners.h,v 1.2.2.5 2004/08/23 18:01:56 mike Exp $"
  *
  *   Banner definitions for the Common UNIX Printing System (CUPS).
  *
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -53,5 +53,5 @@ extern void	LoadBanners(const char *d);
 
 
 /*
- * End of "$Id: banners.h,v 1.2.2.4 2004/06/29 13:15:10 mike Exp $".
+ * End of "$Id: banners.h,v 1.2.2.5 2004/08/23 18:01:56 mike Exp $".
  */

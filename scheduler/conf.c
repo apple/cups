@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.60 2004/08/19 12:46:28 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.61 2004/08/23 18:01:56 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -2912,5 +2912,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.60 2004/08/19 12:46:28 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.61 2004/08/23 18:01:56 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.h,v 1.10.2.4 2004/06/29 13:15:10 mike Exp $"
+ * "$Id: classes.h,v 1.10.2.5 2004/08/23 18:01:56 mike Exp $"
  *
  *   Printer class definitions for the Common UNIX Printing System (CUPS).
  *
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -40,5 +40,5 @@ extern void		UpdateImplicitClasses(void);
 
 
 /*
- * End of "$Id: classes.h,v 1.10.2.4 2004/06/29 13:15:10 mike Exp $".
+ * End of "$Id: classes.h,v 1.10.2.5 2004/08/23 18:01:56 mike Exp $".
  */

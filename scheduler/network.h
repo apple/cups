@@ -1,5 +1,5 @@
 /*
- * "$Id: network.h,v 1.1.2.4 2004/08/18 17:49:19 mike Exp $"
+ * "$Id: network.h,v 1.1.2.5 2004/08/23 18:01:56 mike Exp $"
  *
  *   Network interface definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -16,7 +16,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -60,5 +60,5 @@ extern void		NetIFUpdate(void);
 
 
 /*
- * End of "$Id: network.h,v 1.1.2.4 2004/08/18 17:49:19 mike Exp $".
+ * End of "$Id: network.h,v 1.1.2.5 2004/08/23 18:01:56 mike Exp $".
  */

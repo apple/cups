@@ -1,5 +1,5 @@
 /*
- * "$Id: statbuf.h,v 1.1.2.1 2004/07/02 19:12:48 mike Exp $"
+ * "$Id: statbuf.h,v 1.1.2.2 2004/08/23 18:01:56 mike Exp $"
  *
  *   Status buffer definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -16,7 +16,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -55,5 +55,5 @@ extern char		*cupsdStatBufUpdate(cupsd_statbuf_t *sb, int *loglevel,
 
 
 /*
- * End of "$Id: statbuf.h,v 1.1.2.1 2004/07/02 19:12:48 mike Exp $".
+ * End of "$Id: statbuf.h,v 1.1.2.2 2004/08/23 18:01:56 mike Exp $".
  */

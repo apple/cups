@@ -1,5 +1,5 @@
 /*
- * "$Id: notify.h,v 1.1.2.1 2004/07/02 19:12:48 mike Exp $"
+ * "$Id: notify.h,v 1.1.2.2 2004/08/23 18:01:56 mike Exp $"
  *
  *   Notification definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -16,7 +16,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -133,5 +133,5 @@ VAR cupsd_subscription_t *Subscriptions	VALUE(NULL),
 
 
 /*
- * End of "$Id: notify.h,v 1.1.2.1 2004/07/02 19:12:48 mike Exp $".
+ * End of "$Id: notify.h,v 1.1.2.2 2004/08/23 18:01:56 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: policy.h,v 1.1.2.8 2004/06/30 18:24:18 mike Exp $"
+ * "$Id: policy.h,v 1.1.2.9 2004/08/23 18:01:56 mike Exp $"
  *
  *   Policy definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -16,7 +16,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -92,5 +92,5 @@ extern policyop_t	*FindPolicyOp(policy_t *p, ipp_op_t op);
 
 
 /*
- * End of "$Id: policy.h,v 1.1.2.8 2004/06/30 18:24:18 mike Exp $".
+ * End of "$Id: policy.h,v 1.1.2.9 2004/08/23 18:01:56 mike Exp $".
  */

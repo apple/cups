@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.h,v 1.16.2.8 2004/06/29 13:15:10 mike Exp $"
+ * "$Id: auth.h,v 1.16.2.9 2004/08/23 18:01:56 mike Exp $"
  *
  *   Authorization definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -16,7 +16,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -135,5 +135,5 @@ extern http_status_t	IsAuthorized(client_t *con);
 
 
 /*
- * End of "$Id: auth.h,v 1.16.2.8 2004/06/29 13:15:10 mike Exp $".
+ * End of "$Id: auth.h,v 1.16.2.9 2004/08/23 18:01:56 mike Exp $".
  */
