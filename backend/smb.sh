@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: smb.sh,v 1.1 1999/06/15 20:38:52 mike Exp $"
+# "$Id: smb.sh,v 1.2 1999/09/08 21:12:09 mike Exp $"
 #
 #   SMB printing script for the Common UNIX Printing System (CUPS).
 #
@@ -24,6 +24,16 @@
 #
 
 SMBCLIENT=/usr/local/samba/bin/smbclient
+
+#
+# Get the URI from the "$_" variable; we normally would use $0, however BASH
+# (incorrectly) assigns the name of the script (/var/cups/backend/smb) to
+# $0 instead of the passed argv[0] string.  However, "$_" gets clobbered by
+# commands that are run (including "test" commands in "if" statements), so
+# we have to set the URI before checking to see if we have enough arguments...
+#
+
+uri="$_"
 
 #
 # Usage:
@@ -56,10 +66,9 @@ else
 fi
 
 #
-# Take apart the URI in $0...
+# Take apart the URI...
 #
 
-uri="$0"
 host=`echo $uri | awk -F/ '{print substr($3, index($3, "@") + 1)}'`
 user=`echo $uri | awk -F/ '{print substr($3, 0, index($3, "@") - 1)}'`
 if [ "$user" != "" ]; then
@@ -84,5 +93,5 @@ if [ $# = 5 ]; then
 fi
 
 #
-# End of "$Id: smb.sh,v 1.1 1999/06/15 20:38:52 mike Exp $".
+# End of "$Id: smb.sh,v 1.2 1999/09/08 21:12:09 mike Exp $".
 #
