@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.173 2002/10/16 02:34:01 mike Exp $"
+ * "$Id: ipp.c,v 1.174 2002/11/21 21:46:12 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -4500,14 +4500,20 @@ read_ps_job_ticket(client_t *con)	/* I - Client connection */
       * Some other value; first free the old value...
       */
 
-      for (prev2 = con->request->attrs; prev2 != NULL; prev2 = prev2->next)
-	if (prev2->next == attr2)
-	  break;
-
-      if (prev2)
-	prev2->next = attr2->next;
-      else
+      if (con->request->attrs == attr2)
 	con->request->attrs = attr2->next;
+      else
+      {
+	for (prev2 = con->request->attrs; prev2 != NULL; prev2 = prev2->next)
+	  if (prev2->next == attr2)
+	  {
+	    prev2->next = attr2->next;
+	    break;
+	  }
+      }
+
+      if (con->request->last == attr2)
+        con->request->last = prev2;
 
       _ipp_free_attr(attr2);
     }
@@ -5499,14 +5505,20 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
       * Some other value; first free the old value...
       */
 
-      for (prev2 = job->attrs->attrs; prev2 != NULL; prev2 = prev2->next)
-	if (prev2->next == attr2)
-	  break;
-
-      if (prev2)
-	prev2->next = attr2->next;
+      if (con->request->attrs == attr2)
+	con->request->attrs = attr2->next;
       else
-	job->attrs->attrs = attr2->next;
+      {
+	for (prev2 = con->request->attrs; prev2 != NULL; prev2 = prev2->next)
+	  if (prev2->next == attr2)
+	  {
+	    prev2->next = attr2->next;
+	    break;
+	  }
+      }
+
+      if (con->request->last == attr2)
+        con->request->last = prev2;
 
       _ipp_free_attr(attr2);
 
@@ -5550,6 +5562,9 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
 	  prev2->next = attr2->next;
 	else
 	  job->attrs->attrs = attr2->next;
+
+        if (attr2 == job->attrs->last)
+	  job->attrs->last = prev2;
 
         _ipp_free_attr(attr2);
       }
@@ -5981,5 +5996,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.173 2002/10/16 02:34:01 mike Exp $".
+ * End of "$Id: ipp.c,v 1.174 2002/11/21 21:46:12 mike Exp $".
  */

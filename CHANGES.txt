@@ -3,6 +3,11 @@ CHANGES.txt - 11/21/2002
 
 CHANGES IN CUPS V1.1.17
 
+	- Fixed a problem with the Set-Job-Attributes and
+	  PostScript job ticket code in the scheduler - the
+	  "last" attribute pointer was never updated, which
+	  could cause the scheduler to crash when applying job
+	  ticket data.
 	- Fixed a problem in the scheduler that caused it to
 	  continue processing HTTP requests on a connection
 	  after it was shutdown.
