@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.32 2000/10/13 01:04:36 mike Exp $"
+ * "$Id: ipp.c,v 1.33 2001/01/12 15:52:01 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -73,6 +73,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   ipp_attribute_t *job_id;	/* job-id attribute */
   ipp_attribute_t *copies_sup;	/* copies-supported attribute */
   ipp_attribute_t *charset_sup;	/* charset-supported attribute */
+  ipp_attribute_t *format_sup;	/* document-format-supported attribute */
   const char	*charset;	/* Character set to use */
   cups_lang_t	*language;	/* Default language */
   struct stat	fileinfo;	/* File statistics */
@@ -248,7 +249,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     * Do the request...
     */
 
-    for (response = NULL, ipp_status = IPP_ERROR;;)
+    for (response = NULL, ipp_status = IPP_BAD_REQUEST;;)
     {
      /*
       * POST the request, retrying as needed...
@@ -331,6 +332,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
         charset_sup = ippFindAttribute(response, "charset-supported",
 	                               IPP_TAG_CHARSET);
+        format_sup  = ippFindAttribute(response, "document-format-supported",
+	                               IPP_TAG_MIMETYPE);
       }
       else
       {
@@ -481,9 +484,16 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     options     = NULL;
     num_options = cupsParseOptions(argv[5], 0, &options);
 
-    if ((content_type = getenv("CONTENT_TYPE")) != NULL &&
-        strcasecmp(content_type, "application/vnd.cups-raw") == 0)
-      num_options = cupsAddOption("raw", "", num_options, &options);
+    if ((content_type = getenv("CONTENT_TYPE")) != NULL && format_sup != NULL)
+    {
+      for (i = 0; i < format_sup->num_values; i ++)
+        if (strcasecmp(content_type, format_sup->values[i].string.text) == 0)
+          break;
+
+      if (i < format_sup->num_values)
+        num_options = cupsAddOption("document-format", content_type,
+	                            num_options, &options);
+    }
 
     cupsEncodeOptions(request, num_options, options);
     cupsFreeOptions(num_options, options);
@@ -655,5 +665,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.32 2000/10/13 01:04:36 mike Exp $".
+ * End of "$Id: ipp.c,v 1.33 2001/01/12 15:52:01 mike Exp $".
  */
