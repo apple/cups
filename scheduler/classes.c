@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.6 1999/06/18 18:36:43 mike Exp $"
+ * "$Id: classes.c,v 1.7 1999/06/24 14:20:34 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -98,17 +98,6 @@ AddPrinterToClass(printer_t *c,	/* I - Class to add to */
   c->num_printers ++;
 
   *temp = p;
-
- /*
-  * Update the printer type mask...
-  */
-
-  if (c->num_printers == 1)
-    c->type = p->type & ~CUPS_PRINTER_REMOTE;
-  else
-    c->type &= p->type;
-
-  c->type |= CUPS_PRINTER_CLASS;
 
  /*
   * Update the IPP attributes...
@@ -519,5 +508,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.6 1999/06/18 18:36:43 mike Exp $".
+ * End of "$Id: classes.c,v 1.7 1999/06/24 14:20:34 mike Exp $".
  */
