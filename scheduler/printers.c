@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.33 1999/06/27 12:30:36 mike Exp $"
+ * "$Id: printers.c,v 1.34 1999/06/27 12:42:29 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -875,37 +875,37 @@ SetPrinterAttrs(printer_t *p)	/* I - Printer to setup */
 
 	AddPrinterFilter(p, "application/vnd.cups-postscript 0 -");
       }
+      else
+      {
+       /*
+	* If we have an interface script, add a filter entry for it...
+	*/
+
+	sprintf(filename, "%s/interfaces/%s", ServerRoot, p->name);
+	if (access(filename, X_OK) == 0)
+	{
+	 /*
+	  * Yes, we have a System V style interface script; use it!
+	  */
+
+	  sprintf(filename, "*/* 0 %s/interfaces/%s", ServerRoot, p->name);
+	  AddPrinterFilter(p, filename);
+	}
+	else
+	{
+	 /*
+          * Otherwise we have neither - treat this as a "generic" PostScript
+	  * printer with no PPD file...
+	  */
+
+	  AddPrinterFilter(p, "application/vnd.cups-postscript 0 -");
+	}
+      }
 
       ippAddIntegers(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                      "finishings-supported", num_finishings, (int *)finishings);
       ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                     "finishings-default", IPP_FINISH_NONE);
-    }
-    else
-    {
-     /*
-      * If we have an interface script, add a filter entry for it...
-      */
-
-      sprintf(filename, "%s/interfaces/%s", ServerRoot, p->name);
-      if (access(filename, X_OK) == 0)
-      {
-       /*
-	* Yes, we have a System V style interface script; use it!
-	*/
-
-	sprintf(filename, "*/* 0 %s/interfaces/%s", ServerRoot, p->name);
-	AddPrinterFilter(p, filename);
-      }
-      else
-      {
-       /*
-        * Otherwise we have neither - treat this as a "generic" PostScript
-	* printer with no PPD file...
-	*/
-
-	AddPrinterFilter(p, "application/vnd.cups-postscript 0 -");
-      }
     }
   }
 
@@ -1023,5 +1023,5 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 
 
 /*
- * End of "$Id: printers.c,v 1.33 1999/06/27 12:30:36 mike Exp $".
+ * End of "$Id: printers.c,v 1.34 1999/06/27 12:42:29 mike Exp $".
  */
