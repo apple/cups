@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.3 2002/01/02 18:04:17 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.4 2002/01/18 20:12:58 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -23,8 +23,10 @@
  *
  * Contents:
  *
- *   main()        - Send a file to the printer or server.
- *   password_cb() - Disable the password prompt for cupsDoFileRequest().
+ *   main()                 - Send a file to the printer or server.
+ *   password_cb()          - Disable the password prompt for
+ *                            cupsDoFileRequest().
+ *   report_printer_state() - Report the printer state.
  */
 
 /*
@@ -47,6 +49,7 @@
  */
 
 const char	*password_cb(const char *);
+int		report_printer_state(ipp_t *ipp);
 
 
 /*
@@ -97,6 +100,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   struct sigaction action;	/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
   int		version;	/* IPP version */
+  int		reasons;	/* Number of printer-state-reasons shown */
 
 
  /*
@@ -266,13 +270,11 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
     if (ipp_status > IPP_OK_CONFLICT)
     {
-      if (supported)
-        ippDelete(supported);
-
       if (ipp_status == IPP_PRINTER_BUSY ||
 	  ipp_status == IPP_SERVICE_UNAVAILABLE)
       {
 	fputs("INFO: Printer busy; will retry in 10 seconds...\n", stderr);
+        report_printer_state(supported);
 	sleep(10);
       }
       else if ((ipp_status == IPP_BAD_REQUEST ||
@@ -286,8 +288,13 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	version = 0;
       }
       else
-	fprintf(stderr, "ERROR: Printer will not accept print file (%s)!\n",
+	fprintf(stderr, "ERROR: Unable to get printer status (%s)!\n",
 	        ippErrorString(ipp_status));
+
+      if (supported)
+        ippDelete(supported);
+
+      continue;
     }
     else if ((copies_sup = ippFindAttribute(supported, "copies-supported",
 	                                    IPP_TAG_RANGE)) != NULL)
@@ -314,32 +321,38 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	fprintf(stderr, "DEBUG: [%d] = \"%s\"\n", i,
 	        format_sup->values[i].string.text);
     }
+
+    report_printer_state(supported);
   }
   while (ipp_status > IPP_OK_CONFLICT);
 
  /*
   * Now that we are "connected" to the port, ignore SIGTERM so that we
   * can finish out any page data the driver sends (e.g. to eject the
-  * current page...
+  * current page...  Only ignore SIGTERM if we are printing data from
+  * stdin (otherwise you can't cancel raw jobs...)
   */
 
+  if (argc < 7)
+  {
 #ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-  sigset(SIGTERM, SIG_IGN);
+    sigset(SIGTERM, SIG_IGN);
 #elif defined(HAVE_SIGACTION)
-  memset(&action, 0, sizeof(action));
+    memset(&action, 0, sizeof(action));
 
-  sigemptyset(&action.sa_mask);
-  action.sa_handler = SIG_IGN;
-  sigaction(SIGTERM, &action, NULL);
+    sigemptyset(&action.sa_mask);
+    action.sa_handler = SIG_IGN;
+    sigaction(SIGTERM, &action, NULL);
 #else
-  signal(SIGTERM, SIG_IGN);
+    signal(SIGTERM, SIG_IGN);
 #endif /* HAVE_SIGSET */
+  }
 
  /*
   * See if the printer supports multiple copies...
   */
 
-  if (copies_sup)
+  if (copies_sup || argc < 7)
     copies = 1;
   else
     copies = atoi(argv[4]);
@@ -384,6 +397,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
  /*
   * Then issue the print-job request...
   */
+
+  reasons = 0;
 
   while (copies > 0)
   {
@@ -557,10 +572,12 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       if (ipp_status == IPP_NOT_FOUND)
       {
        /*
-        * Job has gone away and the server has no job history...
+        * Job has gone away and/or the server has no job history...
 	*/
 
         ippDelete(response);
+
+	ipp_status = IPP_OK;
         break;
       }
 
@@ -591,12 +608,45 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	}
       }
 
+      if (response)
+	ippDelete(response);
+
+
+     /*
+      * Now check on the printer state...
+      */
+
+      request = ippNew();
+      request->request.op.version[1]   = version;
+      request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+      request->request.op.request_id   = 1;
+
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	   "attributes-charset", NULL, charset);
+
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+        	   "attributes-natural-language", NULL,
+        	   language != NULL ? language->language : "en");
+
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+        	   NULL, uri);
+
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                   "requested-attributes", NULL, "job-state-reasons");
+
+     /*
+      * Do the request...
+      */
+
+      if ((response = cupsDoRequest(http, request, resource)) != NULL)
+      {
+        reasons = report_printer_state(response);
+	ippDelete(response);
+      }
+
      /*
       * Wait 10 seconds before polling again...
       */
-
-      if (response)
-	ippDelete(response);
 
       sleep(10);
     }
@@ -622,7 +672,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Return the queue status...
   */
 
-  if (ipp_status <= IPP_OK_CONFLICT)
+  if (ipp_status <= IPP_OK_CONFLICT && reasons == 0)
     fputs("INFO: Ready to print.\n", stderr);
 
   return (ipp_status > IPP_OK_CONFLICT);
@@ -643,5 +693,94 @@ password_cb(const char *prompt)	/* I - Prompt (not used) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.3 2002/01/02 18:04:17 mike Exp $".
+ * 'report_printer_state()' - Report the printer state.
+ */
+
+int					/* O - Number of reasons found */
+report_printer_state(ipp_t *ipp)	/* I - IPP response */
+{
+  int			i;		/* Looping var */
+  ipp_attribute_t	*reasons;	/* printer-state-reasons */
+  const char		*message;	/* Message to show */
+
+
+  if ((reasons = ippFindAttribute(ipp, "printer-state-reasons",
+                                  IPP_TAG_KEYWORD)) == NULL)
+    return (0);
+
+  for (i = 0; i < reasons->num_values; i ++)
+  {
+    message = NULL;
+
+    if (strncmp(reasons->values[i].string.text, "media-needed", 12) == 0)
+      message = "Media tray needs to be filled.";
+    else if (strncmp(reasons->values[i].string.text, "media-jam", 9) == 0)
+      message = "Media jam!";
+    else if (strncmp(reasons->values[i].string.text, "moving-to-paused", 16) == 0 ||
+             strncmp(reasons->values[i].string.text, "paused", 6) == 0 ||
+	     strncmp(reasons->values[i].string.text, "shutdown", 8) == 0)
+      message = "Printer off-line.";
+    else if (strncmp(reasons->values[i].string.text, "toner-low", 9) == 0)
+      message = "Toner low.";
+    else if (strncmp(reasons->values[i].string.text, "toner-empty", 11) == 0)
+      message = "Out of toner!";
+    else if (strncmp(reasons->values[i].string.text, "cover-open", 10) == 0)
+      message = "Cover open.";
+    else if (strncmp(reasons->values[i].string.text, "interlock-open", 14) == 0)
+      message = "Interlock open.";
+    else if (strncmp(reasons->values[i].string.text, "door-open", 9) == 0)
+      message = "Door open.";
+    else if (strncmp(reasons->values[i].string.text, "input-tray-missing", 18) == 0)
+      message = "Media tray missing!";
+    else if (strncmp(reasons->values[i].string.text, "media-low", 9) == 0)
+      message = "Media tray almost empty.";
+    else if (strncmp(reasons->values[i].string.text, "media-empty", 11) == 0)
+      message = "Media tray empty!";
+    else if (strncmp(reasons->values[i].string.text, "output-tray-missing", 19) == 0)
+      message = "Output tray missing!";
+    else if (strncmp(reasons->values[i].string.text, "output-area-almost-full", 23) == 0)
+      message = "Output bin almost full.";
+    else if (strncmp(reasons->values[i].string.text, "output-area-full", 16) == 0)
+      message = "Output bin full!";
+    else if (strncmp(reasons->values[i].string.text, "marker-supply-low", 17) == 0)
+      message = "Ink/toner almost empty.";
+    else if (strncmp(reasons->values[i].string.text, "marker-supply-empty", 19) == 0)
+      message = "Ink/toner empty!";
+    else if (strncmp(reasons->values[i].string.text, "marker-waste-almost-full", 24) == 0)
+      message = "Ink/toner waste bin almost full.";
+    else if (strncmp(reasons->values[i].string.text, "marker-waste-full", 17) == 0)
+      message = "Ink/toner waste bin full!";
+    else if (strncmp(reasons->values[i].string.text, "fuser-over-temp", 15) == 0)
+      message = "Fuser temperature high!";
+    else if (strncmp(reasons->values[i].string.text, "fuser-under-temp", 16) == 0)
+      message = "Fuser temperature low!";
+    else if (strncmp(reasons->values[i].string.text, "opc-near-eol", 12) == 0)
+      message = "OPC almost at end-of-life.";
+    else if (strncmp(reasons->values[i].string.text, "opc-life-over", 13) == 0)
+      message = "OPC at end-of-life!";
+    else if (strncmp(reasons->values[i].string.text, "developer-low", 13) == 0)
+      message = "Developer almost empty.";
+    else if (strncmp(reasons->values[i].string.text, "developer-empty", 15) == 0)
+      message = "Developer empty!";
+    else if (strstr(reasons->values[i].string.text, "error") == 0)
+      message = "Printer error, type unknown!";
+
+    if (message)
+    {
+      if (strstr(reasons->values[i].string.text, "error"))
+        fprintf(stderr, "ERROR: %s\n", message);
+      else if (strstr(reasons->values[i].string.text, "warning"))
+        fprintf(stderr, "WARNING: %s\n", message);
+      else
+        fprintf(stderr, "INFO: %s\n", message);
+    }
+  }
+
+  return (reasons->num_values);
+}
+
+
+
+/*
+ * End of "$Id: ipp.c,v 1.38.2.4 2002/01/18 20:12:58 mike Exp $".
  */
