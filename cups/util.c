@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.14 1999/05/03 18:34:03 mike Exp $"
+ * "$Id: util.c,v 1.15 1999/05/09 13:37:16 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -143,11 +143,13 @@ cupsDoRequest(http_t *http,	/* I - HTTP connection to server */
 {
   ipp_t		*response;	/* IPP response data */
   char		length[255];	/* Content-Length field */
+  http_status_t	status;		/* Status of HTTP request */
+#if !defined(WIN32) && !defined(__EMX__)
   char		*password,	/* Password string */
 		plain[255],	/* Plaintext username:password */
 		encode[255];	/* Encoded username:password */
-  http_status_t	status;		/* Status of HTTP request */
   char		junk[8192];	/* Junk buffer for error data */
+#endif /* !WIN32 && !__EMX__ */
   static char	authstring[255] = "";
 				/* Authorization string */
 
@@ -188,6 +190,7 @@ cupsDoRequest(http_t *http,	/* I - HTTP connection to server */
 
     httpFlush(http);
 
+#if !defined(WIN32) && !defined(__EMX__)
     if ((password = getpass("Password:")) != NULL)
     {
      /*
@@ -209,6 +212,7 @@ cupsDoRequest(http_t *http,	/* I - HTTP connection to server */
       ippWrite(http, request);
       status = httpUpdate(http);
     }
+#endif /* !WIN32 && !__EMX__ */
   }
 
   if (status != HTTP_OK)
@@ -908,5 +912,5 @@ cups_connect(char *name,	/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.14 1999/05/03 18:34:03 mike Exp $".
+ * End of "$Id: util.c,v 1.15 1999/05/09 13:37:16 mike Exp $".
  */
