@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.41.2.4 2001/12/27 00:04:51 mike Exp $"
+ * "$Id: auth.c,v 1.41.2.5 2002/01/02 17:33:55 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -1315,7 +1315,7 @@ cups_crypt(const char *pw,	/* I - Password string */
     md5_append(&state2, pw, pwlen);
     md5_append(&state2, salt + 3, salt_end - salt - 3);
     md5_append(&state2, pw, pwlen);
-    md5_finish(&state, digest);
+    md5_finish(&state2, digest);
 
     for (i = pwlen; i > 0; i -= 16)
       md5_append(&state, digest, i > 16 ? 16 : i);
@@ -1545,5 +1545,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.41.2.4 2001/12/27 00:04:51 mike Exp $".
+ * End of "$Id: auth.c,v 1.41.2.5 2002/01/02 17:33:55 mike Exp $".
  */
