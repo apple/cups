@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.51 2004/05/13 20:22:01 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.52 2004/06/29 03:28:08 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -1418,14 +1418,34 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * System (admin) group(s)...
       */
 
-      char *valueptr; /* Pointer into value */
+      char	*valueptr,	/* Pointer into value */
+		quote;		/* Quote character */
 
 
       for (i = NumSystemGroups; *value && i < MAX_SYSTEM_GROUPS; i ++)
       {
-        for (valueptr = value; *valueptr; valueptr ++)
-	  if (isspace(*valueptr) || *valueptr == ',')
-	    break;
+        if (*value == '\'' || *value == '\"')
+	{
+	 /*
+	  * Scan quoted name...
+	  */
+
+	  quote = *value++;
+
+	  for (valueptr = value; *valueptr; valueptr ++)
+	    if (*valueptr == quote)
+	      break;
+	}
+	else
+	{
+	 /*
+	  * Scan space or comma-delimited name...
+	  */
+
+          for (valueptr = value; *valueptr; valueptr ++)
+	    if (isspace(*valueptr) || *valueptr == ',')
+	      break;
+        }
 
         if (*valueptr)
           *valueptr++ = '\0';
@@ -2309,5 +2329,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.51 2004/05/13 20:22:01 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.52 2004/06/29 03:28:08 mike Exp $".
  */

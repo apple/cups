@@ -3,6 +3,7 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- Added support for quoted system group names (STR #784)
 	- Added "version" option to IPP backend to workaround
 	  serious bug in Linksys's IPP implementation (STR #767)
 	- Added Spanish translation of web interface (STR #772)

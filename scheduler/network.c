@@ -1,5 +1,5 @@
 /*
- * "$Id: network.c,v 1.5.2.8 2003/03/31 19:20:16 mike Exp $"
+ * "$Id: network.c,v 1.5.2.9 2004/06/29 03:28:08 mike Exp $"
  *
  *   Network interface functions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -16,9 +16,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  */
@@ -484,5 +484,5 @@ freeifaddrs(struct ifaddrs *addrs)	/* I - Interface list to free */
 
 
 /*
- * End of "$Id: network.c,v 1.5.2.8 2003/03/31 19:20:16 mike Exp $".
+ * End of "$Id: network.c,v 1.5.2.9 2004/06/29 03:28:08 mike Exp $".
  */

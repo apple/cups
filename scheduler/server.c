@@ -1,5 +1,5 @@
 /*
- * "$Id: server.c,v 1.2.2.12 2003/04/10 20:15:55 mike Exp $"
+ * "$Id: server.c,v 1.2.2.13 2004/06/29 03:28:08 mike Exp $"
  *
  *   Server start/stop routines for the Common UNIX Printing System (CUPS).
  *
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -180,5 +180,5 @@ StopServer(void)
 
 
 /*
- * End of "$Id: server.c,v 1.2.2.12 2003/04/10 20:15:55 mike Exp $".
+ * End of "$Id: server.c,v 1.2.2.13 2004/06/29 03:28:08 mike Exp $".
  */

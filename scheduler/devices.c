@@ -1,5 +1,5 @@
 /*
- * "$Id: devices.c,v 1.14.2.5 2004/02/25 20:01:37 mike Exp $"
+ * "$Id: devices.c,v 1.14.2.6 2004/06/29 03:28:08 mike Exp $"
  *
  *   Device scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -480,5 +480,5 @@ sigalrm_handler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: devices.c,v 1.14.2.5 2004/02/25 20:01:37 mike Exp $".
+ * End of "$Id: devices.c,v 1.14.2.6 2004/06/29 03:28:08 mike Exp $".
  */

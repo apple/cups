@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.58 2004/06/29 01:07:18 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.59 2004/06/29 03:28:08 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -2438,5 +2438,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.58 2004/06/29 01:07:18 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.59 2004/06/29 03:28:08 mike Exp $".
  */
