@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc3
 
+	- The pstops filter did not report the correct number of
+	  copies for the page_log file when printing collated
+	  copies to a printer that doesn't support them in
+	  hardware (STR #32)
 	- cupsLangGet() needs to set the CTYPE locale to "C"
 	  (POSIX) to avoid erroneous tolower/toupper values (fix
 	  suggested by Bjoern Jacke)
