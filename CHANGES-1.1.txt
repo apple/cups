@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The cups-polld program now only sleeps after getting
+	  all printers and classes.  This allows for longer
+	  intervals without excessive delays before classes show
+	  up...
 	- Added a new httpWait() function to support waiting for
 	  data for a specific number of milliseconds.
 	- httpGets() now times out after 1 second on

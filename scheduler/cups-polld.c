@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-polld.c,v 1.5.2.12 2003/01/29 15:38:46 mike Exp $"
+ * "$Id: cups-polld.c,v 1.5.2.13 2003/02/11 19:19:27 mike Exp $"
  *
  *   Polling daemon for the Common UNIX Printing System (CUPS).
  *
@@ -88,6 +88,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   int			sock;		/* Browser sock */
   int			port;		/* Browser port */
   int			val;		/* Socket option value */
+  int			seconds,	/* Seconds left from poll */
+			remain;		/* Total remaining time to sleep */
 
 
  /*
@@ -156,24 +158,26 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   for (;;)
   {
-    if (!poll_server(http, language, CUPS_GET_PRINTERS, sock, port,
-                     interval / 2))
-    {
-     /*
-      * We got the printers, now get the classes...
-      */
+   /*
+    * Get the printers, then the classes...
+    */
 
-      poll_server(http, language, CUPS_GET_CLASSES, sock, port, interval / 2);
-    }
-    else
-    {
-     /*
-      * If successful, poll_server() will sleep for us; otherwise sleep
-      * here...
-      */
+    remain = interval;
 
-      sleep(interval);
-    }
+    if ((seconds = poll_server(http, language, CUPS_GET_PRINTERS, sock, port,
+                               interval / 2)) > 0)
+      remain -= seconds;
+
+    if ((seconds = poll_server(http, language, CUPS_GET_CLASSES, sock, port,
+                               interval / 2)) > 0)
+      remain -= seconds;
+
+   /*
+    * Sleep for any remaining time...
+    */
+
+    if (remain > 0) 
+      sleep(remain);
   }
 }
 
@@ -182,7 +186,7 @@ main(int  argc,				/* I - Number of command-line arguments */
  * 'poll_server()' - Poll the server for the given set of printers or classes.
  */
 
-int					/* O - 0 for success, -1 on error */
+int					/* O - Number of seconds or -1 on error */
 poll_server(http_t      *http,		/* I - HTTP connection */
             cups_lang_t *language,	/* I - Language */
 	    ipp_op_t    op,		/* I - Operation code */
@@ -190,6 +194,7 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 	    int         port,		/* I - Broadcast port */
 	    int         interval)	/* I - Polling interval */
 {
+  int			seconds;	/* Number of seconds */
   int			count,		/* Current number of printers/classes */
 			max_count;	/* Maximum printers/classes per second */
   ipp_t			*request,	/* Request data */
@@ -271,6 +276,7 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 	     max_count ++);
 
     count     = 0;
+    seconds   = time(NULL);
     max_count = max_count / interval + 1;
 
    /*
@@ -354,7 +360,7 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 	snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"\n",
         	 type | CUPS_PRINTER_REMOTE, state, uri,
 		 location, info, make_model);
-        puts(packet);
+        fputs(packet, stderr);
 
 	if (sendto(sock, packet, strlen(packet), 0,
 	           (struct sockaddr *)&addr, sizeof(addr)) <= 0)
@@ -377,7 +383,6 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 
 	  count = 0;
 	  sleep(1);
-	  interval --;
 	}
       }
 
@@ -396,16 +401,13 @@ poll_server(http_t      *http,		/* I - HTTP connection */
   }
 
  /*
-  * OK, sleep for the remaining time interval...
+  * Return the number of seconds we used...
   */
 
-  if (interval)
-    sleep(interval);
-
-  return (0);
+  return (time(NULL) - seconds);
 }
 
 
 /*
- * End of "$Id: cups-polld.c,v 1.5.2.12 2003/01/29 15:38:46 mike Exp $".
+ * End of "$Id: cups-polld.c,v 1.5.2.13 2003/02/11 19:19:27 mike Exp $".
  */
