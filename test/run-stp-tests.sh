@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.4.2.2 2002/01/14 19:15:06 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.4.2.3 2002/04/20 20:04:47 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -134,17 +134,17 @@ cp $root/conf/mime.convs /tmp/$user/mime.convs
 #
 
 if test "x$LD_LIBRARY_PATH" = x; then
-	LD_LIBRARY_PATH="$root/cups:$root/filter"
+	LD_LIBRARY_PATH="$root/cups:$root/filter:$root/ipp"
 else
-	LD_LIBRARY_PATH="$root/cups:$root/filter:$LD_LIBRARY_PATH"
+	LD_LIBRARY_PATH="$root/cups:$root/filter:$root/ipp:$LD_LIBRARY_PATH"
 fi
 
 export LD_LIBRARY_PATH
 
 if test "x$DYLD_LIBRARY_PATH" = x; then
-	DYLD_LIBRARY_PATH="$root/cups:$root/filter"
+	DYLD_LIBRARY_PATH="$root/cups:$root/filter:$root/ipp"
 else
-	DYLD_LIBRARY_PATH="$root/cups:$root/filter:$DYLD_LIBRARY_PATH"
+	DYLD_LIBRARY_PATH="$root/cups:$root/filter:$root/ipp:$DYLD_LIBRARY_PATH"
 fi
 
 export DYLD_LIBRARY_PATH
@@ -323,5 +323,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.4.2.2 2002/01/14 19:15:06 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.4.2.3 2002/04/20 20:04:47 mike Exp $"
 #

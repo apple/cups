@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.41.2.8 2002/03/27 20:00:06 mike Exp $"
+ * "$Id: auth.c,v 1.41.2.9 2002/04/20 20:04:45 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -56,7 +56,6 @@
 #include "cupsd.h"
 #include <pwd.h>
 #include <grp.h>
-#include <cups/md5.h>
 #ifdef HAVE_SHADOW_H
 #  include <shadow.h>
 #endif /* HAVE_SHADOW_H */
@@ -1723,5 +1722,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.41.2.8 2002/03/27 20:00:06 mike Exp $".
+ * End of "$Id: auth.c,v 1.41.2.9 2002/04/20 20:04:45 mike Exp $".
  */
