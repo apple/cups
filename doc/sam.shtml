@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
-	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2000, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.1.5">
+	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2001, All Rights Reserved">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.1.6">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Administrators Manual</TITLE>
 </HEAD>
@@ -11,7 +11,7 @@
 
 <P>This software administrators manual provides printer administration
 information for the Common UNIX Printing System<SUP>TM</SUP>
-("CUPS<SUP>TM</SUP>"), version 1.1.5.
+("CUPS<SUP>TM</SUP>"), version 1.1.6.
 
 <EMBED SRC="system-overview.shtml">
 
