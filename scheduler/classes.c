@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.27 2001/01/18 22:18:22 mike Exp $"
+ * "$Id: classes.c,v 1.28 2001/01/19 14:54:40 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -245,12 +245,15 @@ FindAvailablePrinter(const char *name)	/* I - Class to check */
   * printer...  We keep track of the last printer that we used so that
   * a "round robin" type of scheduling is realized (otherwise the first
   * server might be saturated with print jobs...)
+  *
+  * Thanks to Joel Fredrikson for helping us get this right!
   */
 
-  for (i = c->last_printer + 1;
-       i != c->last_printer;
-       i = (i + 1) % c->num_printers)
+  for (i = c->last_printer + 1; ; i ++)
   {
+    if (i >= c->num_printers)
+      i = 0;
+
     if (c->printers[i]->state == IPP_PRINTER_IDLE ||
         ((c->printers[i]->type & CUPS_PRINTER_REMOTE) && !c->printers[i]->job))
     {
@@ -258,7 +261,7 @@ FindAvailablePrinter(const char *name)	/* I - Class to check */
       return (c->printers[i]);
     }
 
-    if (c->num_printers == 1)
+    if (i == c->last_printer)
       break;
   }
 
@@ -598,5 +601,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.27 2001/01/18 22:18:22 mike Exp $".
+ * End of "$Id: classes.c,v 1.28 2001/01/19 14:54:40 mike Exp $".
  */
