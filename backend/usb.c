@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.2 2000/02/23 03:28:38 mike Exp $"
+ * "$Id: usb.c,v 1.3 2000/02/24 02:24:43 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -213,7 +213,6 @@ list_devices(void)
 {
 #ifdef __linux
   int	i;			/* Looping var */
-  int	is_printer;		/* Printer device? */
   int	fd;			/* File descriptor */
   char	device[255];		/* Device filename */
   FILE	*probe;			/* /proc/parport/n/autoprobe file */
@@ -225,8 +224,7 @@ list_devices(void)
 
   if ((probe = fopen("/proc/bus/usb/devices", "r")) != NULL)
   {
-    i          = 0;
-    is_printer = 0;
+    i = 0;
 
     memset(make, 0, sizeof(make));
     memset(model, 0, sizeof(model));
@@ -244,59 +242,37 @@ list_devices(void)
       * See if it is a printer device ("P: ...")
       */
 
-      if (strncmp(line, "S:", 2) == 0 && is_printer)
+      if (strncmp(line, "S:", 2) == 0)
       {
        /*
         * String attribute...
 	*/
 
         if (strncmp(line, "S:  Manufacturer=", 17) == 0)
+	{
 	  strncpy(make, line + 17, sizeof(make) - 1);
+	  if (strcmp(make, "Hewlett-Packard") == 0)
+	    strcpy(make, "HP");
+	}
         else if (strncmp(line, "S:  Product=", 12) == 0)
 	  strncpy(model, line + 12, sizeof(model) - 1);
       }
-      else if (is_printer)
+      else if (strncmp(line, "I:", 2) == 0 &&
+               strstr(line, "Driver=printer") != NULL &&
+	       make[0] && model[0])
       {
        /*
         * We were processing a printer device; send the info out...
 	*/
 
-	if (make[0])
-	  printf("direct usb:/dev/usblp%d \"%s %s\" \"USB Printer #%d\"\n",
-		 i, make, model, i + 1);
-	else if (model[0])
-	  printf("direct usb:/dev/usblp%d \"%s\" \"USB Printer #%d\"\n",
-		 i, model, i + 1);
-	else
-	  printf("direct usb:/dev/usblp%d \"Unknown\" \"USB Printer #%d\"\n",
-		 i, i + 1);
+	printf("direct usb:/dev/usb/usblp%d \"%s %s\" \"USB Printer #%d\"\n",
+	       i, make, model, i + 1);
 
-        is_printer = strstr(line, "Prnt=01") != NULL;
 	i ++;
 
 	memset(make, 0, sizeof(make));
 	memset(model, 0, sizeof(model));
       }
-      else
-        is_printer = strstr(line, "Prnt=01") != NULL;
-
-    }
-
-    if (is_printer)
-    {
-     /*
-      * We were processing a printer device; send the info out...
-      */
-
-      if (make[0])
-	printf("direct usb:/dev/usblp%d \"%s %s\" \"USB Printer #%d\"\n",
-	       i, make, model, i + 1);
-      else if (model[0])
-	printf("direct usb:/dev/usblp%d \"%s\" \"USB Printer #%d\"\n",
-	       i, model, i + 1);
-      else
-	printf("direct usb:/dev/usblp%d \"Unknown\" \"USB Printer #%d\"\n",
-	       i, i + 1);
     }
 
     fclose(probe);
@@ -305,7 +281,7 @@ list_devices(void)
   {
     for (i = 0; i < 8; i ++)
     {
-      sprintf(device, "/dev/usblp%d", i);
+      sprintf(device, "/dev/usb/usblp%d", i);
       if ((fd = open(device, O_WRONLY)) >= 0)
       {
 	close(fd);
@@ -323,5 +299,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: usb.c,v 1.2 2000/02/23 03:28:38 mike Exp $".
+ * End of "$Id: usb.c,v 1.3 2000/02/24 02:24:43 mike Exp $".
  */
