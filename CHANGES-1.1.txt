@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The lp, lpadmin, and lpstat commands now consistently
+	  return with a non-zero exit status when an error
+	  occurs.
 	- The scheduler would not accept print jobs sent to a
 	  stopped remote printer.
 	- The texttops filter incorrectly converted the page

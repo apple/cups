@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.29.2.8 2002/09/15 12:02:44 mike Exp $"
+ * "$Id: lp.c,v 1.29.2.9 2002/10/01 17:24:26 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -33,12 +33,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <cups/cups.h>
 #include <cups/string.h>
 #include <cups/language.h>
 
 
 #ifndef WIN32
+#  include <unistd.h>
 #  include <signal.h>
 
 
@@ -442,6 +444,13 @@ main(int  argc,		/* I - Number of command-line arguments */
       * Print a file...
       */
 
+      if (access(argv[i], R_OK) != 0)
+      {
+        fprintf(stderr, "lp: Unable to access \"%s\" - %s\n", argv[i],
+	        strerror(errno));
+        return (1);
+      }
+
       files[num_files] = argv[i];
       num_files ++;
 
@@ -649,5 +658,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.29.2.8 2002/09/15 12:02:44 mike Exp $".
+ * End of "$Id: lp.c,v 1.29.2.9 2002/10/01 17:24:26 mike Exp $".
  */
