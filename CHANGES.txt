@@ -18,6 +18,12 @@ CHANGES IN CUPS V1.1.7-1
 	  status of the job that was sent.  This caused
 	  remote queues to stop on client machines when
 	  the server had job history disabled.
+	- Added httpConnectEncrypt() function to avoid
+	  performance penalty for setting up encrypted
+	  connections initially.
+	- Use httpConnectEncrypt() in all client apps
+	  and in the CUPS API to ensure consistent usage
+	  of encryption throughout.
 
 
 CHANGES IN CUPS V1.1.7

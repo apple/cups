@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.33 2001/01/22 15:03:25 mike Exp $"
+ * "$Id: http.h,v 1.34 2001/05/06 00:11:24 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -290,6 +290,8 @@ extern int		httpCheck(http_t *http);
 						httpSetField((http), HTTP_FIELD_HOST, (http)->hostname)
 extern void		httpClose(http_t *http);
 extern http_t		*httpConnect(const char *host, int port);
+extern http_t		*httpConnectEncrypt(const char *host, int port,
+			                    http_encryption_t encrypt);
 extern int		httpDelete(http_t *http, const char *uri);
 extern int		httpEncryption(http_t *http, http_encryption_t e);
 #  define		httpError(http) ((http)->error)
@@ -338,5 +340,5 @@ extern char		*httpMD5String(const md5_byte_t *, char [33]);
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.33 2001/01/22 15:03:25 mike Exp $".
+ * End of "$Id: http.h,v 1.34 2001/05/06 00:11:24 mike Exp $".
  */

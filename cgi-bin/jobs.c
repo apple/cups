@@ -1,5 +1,5 @@
 /*
- * "$Id: jobs.c,v 1.15 2001/01/22 15:03:22 mike Exp $"
+ * "$Id: jobs.c,v 1.16 2001/05/06 00:11:23 mike Exp $"
  *
  *   Job status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -64,7 +64,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Connect to the HTTP server...
   */
 
-  http = httpConnect("localhost", ippPort());
+  http = httpConnectEncrypt("localhost", ippPort(), cupsEncryption());
 
  /*
   * Tell the client to expect HTML...
@@ -135,5 +135,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: jobs.c,v 1.15 2001/01/22 15:03:22 mike Exp $".
+ * End of "$Id: jobs.c,v 1.16 2001/05/06 00:11:23 mike Exp $".
  */
