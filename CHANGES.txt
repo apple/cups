@@ -1,8 +1,11 @@
-CHANGES.txt - 04/14/2002
+CHANGES.txt - 05/08/2002
 ------------------------
 
 CHANGES IN CUPS V1.2.0a1
 
+	- Now support custom attributes and extended options in
+	  PPD files.
+	- Now provide functions to save PPD files.
 	- New policy mechanism allows per-operation and
 	  per-printer control over what users and groups are
 	  allowed to do various IPP operations.
@@ -11,21 +14,14 @@ CHANGES IN CUPS V1.2.0a1
 	  (abort-job, retry-job, requeue-job, stop-printer)
 	- Updated the printer test page with a better color
 	  wheel and a separate grayscale ramp.
-	- The IPP and HTTP functions are now provided in a
-	  separate library (libipp).
 	- A single backend process is now run to send all print
 	  data for a job.
 	- Backends and filters can now send and receive
 	  backchannel data over file descriptor 3.
-	- Added support for ICC and CIE colorspaces in RIPs.
 	- Updated the raster stream format to support more
 	  user-defined attributes and to do compression of the
 	  page data.
 	- New ippReadFile(), ippReadIO(), ippWriteFile(), and
 	  ippWriteIO() functions in CUPS API.
-	- Removed fonts and GNU Ghostscript code from base CUPS
-	  distribution; these are now available as part of ESP
-	  Ghostscript, or by patching GNU Ghostscript using the
-	  patches in the pstoraster directory.
 	- Added Cookie, Expect, and Set-Cookie fields to HTTP
 	  request structure.
