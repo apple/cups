@@ -11,7 +11,9 @@ CHANGES IN CUPS V1.1.16
 	  name when cancelling a specific job ID (Solaris
 	  compatibility).
 	- The scheduler now rejects jobs with copies outside the
-	  range of 1 to 100, inclusive.
+	  range of 1 to MaxCopies, inclusive.
+	- Added new MaxCopies directive to set the maximum
+	  number of copies that a user can request.
 	- The scheduler didn't block signals while it processed
 	  others and when it forked processes.
 	- The scheduler checked for new jobs to print when

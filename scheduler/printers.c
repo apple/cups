@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.25 2002/08/21 17:24:29 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.26 2002/08/22 17:07:56 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1026,7 +1026,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
                 "job-priority-supported", 100);
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "job-priority-default", 50);
-  ippAddRange(p->attrs, IPP_TAG_PRINTER, "copies-supported", 1, 65535);
+  ippAddRange(p->attrs, IPP_TAG_PRINTER, "copies-supported", 1, MaxCopies);
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "copies-default", 1);
   ippAddBoolean(p->attrs, IPP_TAG_PRINTER, "page-ranges-supported", 1);
@@ -2086,5 +2086,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.25 2002/08/21 17:24:29 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.26 2002/08/22 17:07:56 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.14 2002/08/12 17:47:44 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.15 2002/08/22 17:07:53 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -105,6 +105,7 @@ static var_t	variables[] =
   { "LogFilePerm",	&LogFilePerm,		VAR_INTEGER,	0 },
   { "MaxActiveJobs",	&MaxActiveJobs,		VAR_INTEGER,	0 },
   { "MaxClients",	&MaxClients,		VAR_INTEGER,	0 },
+  { "MaxCopies",	&MaxCopies,		VAR_INTEGER,	0 },
   { "MaxJobs",		&MaxJobs,		VAR_INTEGER,	0 },
   { "MaxJobsPerPrinter",&MaxJobsPerPrinter,	VAR_INTEGER,	0 },
   { "MaxJobsPerUser",	&MaxJobsPerUser,	VAR_INTEGER,	0 },
@@ -356,6 +357,7 @@ ReadConfiguration(void)
   MaxActiveJobs     = 0;
   MaxJobsPerPrinter = 0;
   MaxJobsPerUser    = 0;
+  MaxCopies         = 100;
 
  /*
   * Read the configuration file...
@@ -2026,5 +2028,5 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.14 2002/08/12 17:47:44 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.15 2002/08/22 17:07:53 mike Exp $".
  */

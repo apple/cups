@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.22 2002/08/22 16:45:38 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.23 2002/08/22 17:07:54 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2127,7 +2127,7 @@ create_job(client_t        *con,	/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "copies", IPP_TAG_INTEGER)) != NULL)
   {
-    if (attr->values[0].integer < 1 || attr->values[0].integer > 100)
+    if (attr->values[0].integer < 1 || attr->values[0].integer > MaxCopies)
     {
       LogMessage(L_INFO, "create_job: bad copies value %d.",
                  attr->values[0].integer);
@@ -3869,7 +3869,7 @@ print_job(client_t        *con,		/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "copies", IPP_TAG_INTEGER)) != NULL)
   {
-    if (attr->values[0].integer < 1 || attr->values[0].integer > 100)
+    if (attr->values[0].integer < 1 || attr->values[0].integer > MaxCopies)
     {
       LogMessage(L_INFO, "print_job: bad copies value %d.",
                  attr->values[0].integer);
@@ -6024,5 +6024,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.22 2002/08/22 16:45:38 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.23 2002/08/22 17:07:54 mike Exp $".
  */
