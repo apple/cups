@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.81.2.14 2002/05/31 13:03:05 mike Exp $"
+ * "$Id: util.c,v 1.81.2.15 2002/08/12 21:03:00 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -1564,9 +1564,7 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 	     char       *printer,	/* O - Printer name [HTTP_MAX_URI] */
              char       *hostname)	/* O - Hostname [HTTP_MAX_URI] */
 {
-  char		hostbuf[HTTP_MAX_URI];	/* Name of host */
-  static char	printerbuf[HTTP_MAX_URI];
-					/* Name of printer or class */
+  char	hostbuf[HTTP_MAX_URI];		/* Name of host */
 
 
   DEBUG_printf(("cups_connect(\"%s\", %p, %p)\n", name, printer, hostname));
@@ -1577,8 +1575,13 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
     return (NULL);
   }
 
-  if (sscanf(name, "%1023[^@]@%1023s", printerbuf, hostbuf) == 1)
-    strlcpy(hostbuf, cupsServer(), sizeof(hostbuf));
+ /*
+  * All jobs are now queued to cupsServer() to avoid hostname
+  * resolution problems and to ensure that the user sees all
+  * locally queued jobs locally.
+  */
+
+  strlcpy(hostbuf, cupsServer(), sizeof(hostbuf));
 
   if (hostname != NULL)
     strlcpy(hostname, hostbuf, HTTP_MAX_URI);
@@ -1586,9 +1589,9 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
     hostname = hostbuf;
 
   if (printer != NULL)
-    strlcpy(printer, printerbuf, HTTP_MAX_URI);
+    strlcpy(printer, name, HTTP_MAX_URI);
   else
-    printer = printerbuf;
+    printer = (char *)name;
 
   if (cups_server != NULL)
   {
@@ -1681,5 +1684,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.81.2.14 2002/05/31 13:03:05 mike Exp $".
+ * End of "$Id: util.c,v 1.81.2.15 2002/08/12 21:03:00 mike Exp $".
  */

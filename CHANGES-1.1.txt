@@ -3,6 +3,12 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The CUPS API convenience functions would attempt to
+	  connect to the remote server name in a
+	  "printer@server" printer name instead of dealing with
+	  the default (usually local) server.  Aside from
+	  causing user confusion, the remote server name might
+	  not be resolved properly, causing further problems.
 	- "lp -q" would cause the "lp" command to segfault, as
 	  the program would try to print the option letter that
 	  caused the error using the wrong index into the
