@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.120 2002/09/15 12:39:51 mike Exp $"
+ * "$Id: client.c,v 1.121 2002/09/15 22:54:23 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2294,6 +2294,7 @@ pipe_command(client_t *con,		/* I - Client connection */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   sigset_t	oldmask,		/* POSIX signal masks */
 		newmask;
+  struct sigaction action;		/* POSIX signal handler */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
@@ -2538,11 +2539,26 @@ pipe_command(client_t *con,		/* I - Client connection */
     */
 
 #ifdef HAVE_SIGSET
+    sigset(SIGTERM, SIG_DFL);
+    sigset(SIGCHLD, SIG_DFL);
+
     sigrelse(SIGTERM);
     sigrelse(SIGCHLD);
 #elif defined(HAVE_SIGACTION)
+    memset(&action, 0, sizeof(action));
+
+    sigemptyset(&action.sa_mask);
+    action.sa_handler = SIG_DFL;
+
+    sigaction(SIGTERM, &action, NULL);
+    sigaction(SIGCHLD, &action, NULL);
+
     sigprocmask(SIG_SETMASK, &oldmask, NULL);
+#else
+    signal(SIGTERM, SIG_DFL);
+    signal(SIGCHLD, SIG_DFL);
 #endif /* HAVE_SIGSET */
+
 
    /*
     * Execute the pipe program; if an error occurs, exit with status 1...
@@ -2591,5 +2607,5 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.120 2002/09/15 12:39:51 mike Exp $".
+ * End of "$Id: client.c,v 1.121 2002/09/15 22:54:23 mike Exp $".
  */
