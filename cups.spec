@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.20 2000/08/01 17:40:49 mike Exp $"
+# "$Id: cups.spec,v 1.21 2000/08/01 18:15:49 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -30,7 +30,7 @@ Version: 1.1.2
 Release: 0
 Copyright: GPL
 Group: System Environment/Daemons
-Source: ftp://ftp.easysw.com/pub/cups/%{Version}/cups-%{Version}-source.tar.gz
+Source: ftp://ftp.easysw.com/pub/cups/%version/cups-%version-source.tar.gz
 Url: http://www.cups.org
 Packager: Michael Sweet <mike@easysw.com>
 Vendor: Easy Software Products
@@ -68,18 +68,21 @@ make
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
 
-make	datadir=$RPM_BUILD_ROOT/usr/share \
+make	prefix=$RPM_BUILD_ROOT \
 	exec_prefix=$RPM_BUILD_ROOT/usr \
-	includedir=$RPM_BUILD_ROOT/usr/include \
-	infodir=$RPM_BUILD_ROOT/usr/info \
-	libdir=$RPM_BUILD_ROOT/usr/lib \
-	localestatedir=$RPM_BUILD_ROOT/var \
-	prefix=$RPM_BUILD_ROOT \
-	sharedstatedir=$RPM_BUILD_ROOT/usr/com \
-	sysconfdir=$RPM_BUILD_ROOT/etc \
+	BINDIR=$RPM_BUILD_ROOT/usr/bin \
+	DATADIR=$RPM_BUILD_ROOT/usr/share/cups \
+	DOCDIR=$RPM_BUILD_ROOT/usr/share/doc/cups \
+	INCLUDEDIR=$RPM_BUILD_ROOT/usr/include \
+	LIBDIR=$RPM_BUILD_ROOT/usr/lib \
+	LOCALEDIR=$RPM_BUILD_ROOT/usr/share/locale \
+	MANDIR=$RPM_BUILD_ROOT/usr/man \
+	PAMDIR=$RPM_BUILD_ROOT/etc/pam.d \
+	REQUESTS=$RPM_BUILD_ROOT/var/spool/cups \
+	SBINDIR=$RPM_BUILD_ROOT/usr/sbin \
+	SERVERBIN=$RPM_BUILD_ROOT/usr/lib/cups \
+	SERVERROOT=$RPM_BUILD_ROOT/etc/cups \
 	install
-
-install -m 755 -o root -g root cups.sh $RPM_BUILD_ROOT/etc/rc.d/init.d/cups
 
 %post
 /sbin/chkconfig --add cups
@@ -109,5 +112,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/*.a
 
 #
-# End of "$Id: cups.spec,v 1.20 2000/08/01 17:40:49 mike Exp $".
+# End of "$Id: cups.spec,v 1.21 2000/08/01 18:15:49 mike Exp $".
 #
