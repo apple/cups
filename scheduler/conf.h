@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.58 2003/08/22 22:01:24 mike Exp $"
+ * "$Id: conf.h,v 1.59 2003/09/10 02:49:14 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -84,6 +84,8 @@ VAR char		*SystemGroups[MAX_SYSTEM_GROUPS],
 					/* Default language encoding */
 			*DefaultCharset		VALUE(NULL),
 					/* Default charset */
+			*DefaultLocale		VALUE(NULL),
+					/* Default locale */
 			*RIPCache		VALUE(NULL),
 					/* Amount of memory for RIPs */
 			*TempDir		VALUE(NULL),
@@ -194,5 +196,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.58 2003/08/22 22:01:24 mike Exp $".
+ * End of "$Id: conf.h,v 1.59 2003/09/10 02:49:14 mike Exp $".
  */
