@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.c,v 1.2.2.3 2002/03/07 18:58:43 mike Exp $"
+ * "$Id: raster.c,v 1.2.2.4 2002/03/13 11:50:47 mike Exp $"
  *
  *   Raster file routines for the Common UNIX Printing System (CUPS).
  *
@@ -171,8 +171,9 @@ cupsRasterReadHeader(cups_raster_t      *r,	/* I - Raster stream */
 
   if (r->sync == CUPS_RASTER_SYNCv1 || r->sync == CUPS_RASTER_REVSYNCv1)
     len -= sizeof(h->cupsMarkerType) + sizeof(h->cupsRenderingIntent) +
-           sizeof(h->cupsString) + sizeof(h->cupsNumber) +
-	   sizeof(h->cupsNumColors); /* Adjust for v1 raster format */
+           sizeof(h->cupsString) + sizeof(h->cupsInteger) +
+	   sizeof(h->cupsReal) + sizeof(h->cupsNumColors);
+	   /* Adjust for v1 raster format */
 
  /*
   * Read the header...
@@ -188,7 +189,7 @@ cupsRasterReadHeader(cups_raster_t      *r,	/* I - Raster stream */
   */
 
   if (r->sync == CUPS_RASTER_REVSYNC || r->sync == CUPS_RASTER_REVSYNCv1)
-    for (len = 52, s = (union swap_s *)&(r->header.AdvanceDistance);
+    for (len = 68, s = (union swap_s *)&(r->header.AdvanceDistance);
 	 len > 0;
 	 len --, s ++)
       s->v = (((((s->b[3] << 8) | s->b[2]) << 8) | s->b[1]) << 8) | s->b[0];
@@ -717,5 +718,5 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
 
 
 /*
- * End of "$Id: raster.c,v 1.2.2.3 2002/03/07 18:58:43 mike Exp $".
+ * End of "$Id: raster.c,v 1.2.2.4 2002/03/13 11:50:47 mike Exp $".
  */
