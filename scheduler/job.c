@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.76 2000/06/28 13:50:49 mike Exp $"
+ * "$Id: job.c,v 1.77 2000/06/28 14:00:49 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -135,7 +135,7 @@ CancelJob(int id,		/* I - Job to cancel */
 
       current->state->values[0].integer = IPP_JOB_CANCELLED;
 
-      set_time(current, "job-at-completion");
+      set_time(current, "time-at-completion");
 
      /*
       * Remove the print file for good if we aren't preserving jobs or
@@ -485,7 +485,8 @@ LoadAllJobs(void)
         	     host);
 	  }
 
-	  p->type |= CUPS_PRINTER_REMOTE;
+	  p->type        |= CUPS_PRINTER_REMOTE;
+	  p->browse_time = 2147483647;
 
 	  *strchr(resource, '@') = '\0';
 	  snprintf(uri, sizeof(uri), "ipp://%s:%d%s", host, port, resource);
@@ -976,7 +977,7 @@ StartJob(int       id,		/* I - Job ID */
   printer->job     = current;
   SetPrinterState(printer, IPP_PRINTER_PROCESSING);
 
-  set_time(current, "job-at-processing");
+  set_time(current, "time-at-processing");
 
  /*
   * Figure out what filters are required to convert from
@@ -2460,7 +2461,7 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 
 
 /*
- * 'set_time()' - Set one of the "job-time-at-xyz" attributes...
+ * 'set_time()' - Set one of the "time-at-xyz" attributes...
  */
 
 static void
@@ -2470,13 +2471,11 @@ set_time(job_t      *job,	/* I - Job to update */
   ipp_attribute_t	*attr;	/* Time attribute */
 
 
-  if ((attr = ippFindAttribute(job->attrs, name, IPP_TAG_NOVALUE)) != NULL)
+  if ((attr = ippFindAttribute(job->attrs, name, IPP_TAG_ZERO)) != NULL)
   {
-    attr->value_tag = IPP_TAG_INTEGER;
-    attr->values[0].integer = time(NULL) - StartTime;
+    attr->value_tag         = IPP_TAG_INTEGER;
+    attr->values[0].integer = time(NULL);
   }
-  else if ((attr = ippFindAttribute(job->attrs, name, IPP_TAG_INTEGER)) != NULL)
-    attr->values[0].integer = time(NULL) - StartTime;
 }
 
 
@@ -2563,5 +2562,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.76 2000/06/28 13:50:49 mike Exp $".
+ * End of "$Id: job.c,v 1.77 2000/06/28 14:00:49 mike Exp $".
  */

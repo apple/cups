@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.76 2000/06/28 13:50:49 mike Exp $"
+ * "$Id: ipp.c,v 1.77 2000/06/28 14:00:48 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1752,7 +1752,7 @@ create_job(client_t        *con,	/* I - Client connection */
   }
 
   ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "time-at-creation",
-                time(NULL) - StartTime);
+                time(NULL));
   attr = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
                        "time-at-processing", 0);
   attr->value_tag = IPP_TAG_NOVALUE;
@@ -2378,7 +2378,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
                  "job-uri", NULL, job_uri);
 
     ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
-                  "job-printer-up-time", time(NULL) - StartTime);
+                  "job-printer-up-time", time(NULL));
 
    /*
     * Copy the job attributes to the response using the requested-attributes
@@ -2514,7 +2514,7 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
                "job-uri", NULL, job_uri);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
-                "job-printer-up-time", time(NULL) - StartTime);
+                "job-printer-up-time", time(NULL));
 
  /*
   * Copy the job attributes to the response using the requested-attributes
@@ -3381,7 +3381,7 @@ print_job(client_t        *con,		/* I - Client connection */
                title);
 
   ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "time-at-creation",
-                time(NULL) - StartTime);
+                time(NULL));
   attr = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
                        "time-at-processing", 0);
   attr->value_tag = IPP_TAG_NOVALUE;
@@ -4932,5 +4932,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.76 2000/06/28 13:50:49 mike Exp $".
+ * End of "$Id: ipp.c,v 1.77 2000/06/28 14:00:48 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.64 2000/06/27 20:09:01 mike Exp $"
+ * "$Id: printers.c,v 1.65 2000/06/28 14:00:49 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -853,6 +853,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   ippAddIntegers(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "operations-supported",
                  sizeof(ops) / sizeof(ops[0]) + JobFiles - 1, (int *)ops);
   ippAddBoolean(p->attrs, IPP_TAG_PRINTER, "multiple-document-jobs-supported", 1);
+  ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                "multiple-operation-time-out", 60);
   ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                 "multiple-document-handling-supported",
                 sizeof(multiple_document_handling) /
@@ -1409,5 +1411,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.64 2000/06/27 20:09:01 mike Exp $".
+ * End of "$Id: printers.c,v 1.65 2000/06/28 14:00:49 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.23 2000/05/01 19:50:26 mike Exp $"
+ * "$Id: cupsd.h,v 1.24 2000/06/28 14:00:48 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -152,7 +152,6 @@ typedef struct direct DIRENT;
 VAR fd_set		InputSet,	/* Input files for select() */
 			OutputSet;	/* Output files for select() */
 
-VAR time_t		StartTime;	/* Time server was started */
 VAR int			NeedReload	VALUE(TRUE);
 					/* Need to load configuration? */
 VAR char		TZ[1024]	VALUE("TZ=GMT");
@@ -172,5 +171,5 @@ extern void	LoadDevices(const char *d);
 extern void	LoadPPDs(const char *d);
 
 /*
- * End of "$Id: cupsd.h,v 1.23 2000/05/01 19:50:26 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.24 2000/06/28 14:00:48 mike Exp $".
  */
