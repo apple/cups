@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gsdparam.c,v 1.6 2000/06/26 15:50:17 mike Exp $ */
+/*$Id: gsdparam.c,v 1.7 2000/09/10 16:46:41 mike Exp $ */
 /* Default device parameters for Ghostscript library */
 #include "memory_.h"		/* for memcpy */
 #include "string_.h"		/* for strlen */
@@ -292,9 +292,9 @@ gdev_write_input_media(int index, gs_param_dict * pdict,
 	if (code < 0)
 	    return code;
     }
-    code = finish_media(mdict.list, "MediaType", pim->MediaType);
+/*    code = finish_media(mdict.list, "MediaType", pim->MediaType);
     if (code < 0)
-	return code;
+	return code;*/
     return param_end_write_dict(pdict->list, key, &mdict);
 }
 

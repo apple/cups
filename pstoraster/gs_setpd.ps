@@ -21,7 +21,7 @@
 % Ghostscript, as distributed by Aladdin Enterprises, does not require any
 % GNU software to build or run it.
 
-% $Id: gs_setpd.ps,v 1.7 2000/08/16 17:00:18 mike Exp $
+% $Id: gs_setpd.ps,v 1.8 2000/09/10 16:46:41 mike Exp $
 % The current implementation of setpagedevice has the following limitations:
 %	- It doesn't attempt to "interact with the user" for Policy = 2.
 
@@ -107,7 +107,7 @@ level2dict begin
    dup type /booleantype eq
     { pop pop }
     {		% This should never happen!
-      (Error in .trysetparams!\n) print pstack flush
+      DEBUG { (Error in .trysetparams!\n) print pstack flush } if
       cleartomark pop pop pop
       /.installpagedevice cvx /rangecheck signalerror
     }
@@ -197,6 +197,7 @@ level2dict begin
 % We have to deal specially with entries that the driver may change
 % on its own.
 /.dynamicppkeys mark
+  /PageSize dup		% because it changes when PageSize is set
   /PageCount dup
 .dicttomark readonly def
 /.makecurrentpagedevice		% - .makecurrentpagedevice <dict>
@@ -312,10 +313,12 @@ level2dict begin
 % true iff the key/value pair should be presented to .putdeviceparams.
 /.presentspecial mark
   .dynamicppkeys { pop false } forall
+			% We must ignore an explicit request for PageSize,
+			% because media matching always handles this.
+  /PageSize false
   /Name false
   /OutputDevice false
   /PageOffset false
-  /PageSize false
   /InputAttributes false
   .inputattrkeys
     { dup /PageSize eq
@@ -393,17 +396,17 @@ level2dict begin
 % They are expected to consume the top 2 operands.
 % NOTE: we currently treat all values other than 0, 1, or 7 (for PageSize)
 % the same as 0, i.e., we signal an error.
-%  0 {		% Set errorinfo and signal a configurationerror.
-%	pop dup 4 index exch get 2 array astore
-%	$error /errorinfo 3 -1 roll put
-%	cleartomark
-%	/setpagedevice load /configurationerror signalerror
+%  0 {  	      % Set errorinfo and signal a configurationerror.
+%     pop dup 4 index exch get 2 array astore
+%     $error /errorinfo 3 -1 roll put
+%     cleartomark
+%     /setpagedevice load /configurationerror signalerror
 %  } bind
 %%%% MRS - The current CUPS backend driver does not register any of
-%%%%       these attributes with GhostScript from the PPD file.  As
-%%%%       a result, we must allow all attributes and values.
-  0 {		% For all attributes just impose the request.
-	 pop pop
+%%%%	   these attributes with GhostScript from the PPD file.  As
+%%%%	   a result, we must allow all attributes and values.
+  0 {	      % For all attributes just impose the request.
+	 pop 2 index exch 7 put
   } bind
   1 {		% Roll back the failed request to its previous status.
 DEBUG { (Rolling back.\n) print pstack flush } if
@@ -475,9 +478,9 @@ DEBUG { (Rolling back.\n) print pstack flush } if
 			%   -mark- key1 value1 ...
    counttomark 5 add index .computemediasize
    exch pop exch pop /PageSize exch
-   (Putting.\n) print pstack flush
+DEBUG { (Putting.\n) print pstack flush } if
    .putdeviceparamsonly
-   (Result of putting.\n) print pstack flush
+DEBUG { (Result of putting.\n) print pstack flush } if
  } bind def
 
 % Compute the media size and initial matrix from a merged request (after
@@ -513,7 +516,7 @@ DEBUG { (Rolling back.\n) print pstack flush } if
 		% also handle the case where the current device
 		% is not a page device.
 		% Stack: mark <request> <current>
-   (Checking.\n) print pstack flush
+DEBUG { (Checking.\n) print pstack flush } if
 
    dup /OutputDevice .knownget
     {		% Current device is a page device.
@@ -555,7 +558,7 @@ DEBUG { (Rolling back.\n) print pstack flush } if
 		% Construct a merged request from the actual request plus
 		% any keys that should always be propagated.
 		% Stack: mark <request> <orig>
-   (Merging.\n) print pstack flush
+DEBUG { (Merging.\n) print pstack flush } if
 
    exch 1 index length 1 index length add dict
    .copiedkeys
@@ -582,7 +585,7 @@ DEBUG { (Rolling back.\n) print pstack flush } if
 
 		% Select input and output media.
 		% Stack: mark <orig> <request> <merged>
-   (Selecting.\n) print pstack flush
+DEBUG { (Selecting.\n) print pstack flush } if
 
    0 dict	% <failed>
    1 index /InputAttributes .knownget
@@ -599,7 +602,7 @@ DEBUG { (Rolling back.\n) print pstack flush } if
 
 		% Construct the new device, and attempt to set its attributes.
 		% Stack: mark <orig> <request> <merged> <failed>
-   (Constructing.\n) print pstack flush
+DEBUG { (Constructing.\n) print pstack flush } if
 
    currentdevice .devicename 2 index /OutputDevice get eq
     { currentdevice }
@@ -615,7 +618,7 @@ DEBUG { (Rolling back.\n) print pstack flush } if
     {		% The request failed.
 		% Stack: ... <orig> <request> <merged> <failed> <device>
 		%   <Policies> true mark <name> <errorname> ...
-      (Recovering.\n) print pstack flush
+DEBUG { (Recovering.\n) print pstack flush } if
       counttomark 4 add index
       counttomark 2 idiv { dup 4 -2 roll put } repeat
       pop pop pop
@@ -635,7 +638,7 @@ DEBUG { (Rolling back.\n) print pstack flush } if
 
 		% The attempt succeeded.  Install the new device.
 		% Stack: mark ... <merged> <failed> <device> <eraseflag>
-   (Installing.\n) print pstack flush
+DEBUG { (Installing.\n) print pstack flush } if
 
    pop 2 .endpage
     { 1 true .outputpage
@@ -686,7 +689,7 @@ DEBUG { (Rolling back.\n) print pstack flush } if
 
 		% Clean up, calling PolicyReport if needed.
 		% Stack: mark ... <failed> <merged>
-   (Finishing.\n) print pstack flush
+DEBUG { (Finishing.\n) print pstack flush } if
 
    exch dup length 0 ne
     { 1 index /Policies get /PolicyReport get

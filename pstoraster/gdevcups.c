@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.33 2000/09/09 22:44:01 mike Exp $"
+ * "$Id: gdevcups.c,v 1.34 2000/09/10 16:46:40 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -740,7 +740,7 @@ cups_map_cmyk_color(gx_device      *pdev,	/* I - Device info */
 /*
  * 'cups_map_color_rgb()' - Map a color index to an RGB color.
  */
- 
+
 private int
 cups_map_color_rgb(gx_device      *pdev,	/* I - Device info */
                    gx_color_index color,	/* I - Color index */
@@ -1471,7 +1471,10 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
     return (code); \
   } \
   else if (code == 0) \
-    cups->header.name = (type)intval;
+  { \
+    fprintf(stderr, "DEBUG: Setting %s to %d...\n", sname, intval); \
+    cups->header.name = (type)intval; \
+  }
 
 #define floatoption(name, sname) \
   if ((code = param_read_float(plist, sname, &floatval)) < 0) \
@@ -2705,5 +2708,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.33 2000/09/09 22:44:01 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.34 2000/09/10 16:46:40 mike Exp $".
  */
