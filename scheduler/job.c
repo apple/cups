@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.203 2003/04/10 20:14:06 mike Exp $"
+ * "$Id: job.c,v 1.204 2003/04/10 20:15:31 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2277,7 +2277,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
 	  */
 
 	  LogMessage(L_ERROR, "Canceling fax job %d since it could not be sent after %d tries.",
-	             FaxRetryLimit);
+	             job->id, FaxRetryLimit);
 	  CancelJob(job->id, 0);
 	}
 	else
@@ -2629,5 +2629,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.203 2003/04/10 20:14:06 mike Exp $".
+ * End of "$Id: job.c,v 1.204 2003/04/10 20:15:31 mike Exp $".
  */
