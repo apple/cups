@@ -1,4 +1,4 @@
-CHANGES.txt - 02/08/2001
+CHANGES.txt - 02/13/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.6-3
@@ -18,6 +18,12 @@ CHANGES IN CUPS V1.1.6-3
 	  implicit status of a class.
 	- DeletePrinterFromClasses() didn't remove printers
 	  from implicit classes.
+	- StartJob() didn't send the job-sheets, job-priority,
+	  and job-hold-until attributes to remote printers.
+	- The pstops and imagetops filters now generate copies
+	  using the appropriate method for a Level 1, 2, or 3
+	  printer since some Level 2/3 printers don't support
+	  the /#copies variable anymore.
 	- Caldera fix: lpr didn't recognize BSD lpr "-1", "-2",
 	  "-3", or "-4" options.
 	- SuSE fix: Exit from child if setgid() or setuid()

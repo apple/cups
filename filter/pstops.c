@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.48 2001/02/06 23:40:08 mike Exp $"
+ * "$Id: pstops.c,v 1.49 2001/02/13 16:08:00 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -289,7 +289,12 @@ main(int  argc,			/* I - Number of command-line arguments */
            "ifelse %.3f mul } bind settransfer\n", g, b);
 
   if (Copies > 1 && (!Collate || !slowcollate))
-    printf("/#copies %d def\n", Copies);
+  {
+    if (ppd == NULL || ppd->language_level == 1)
+      printf("/#copies %d def\n", Copies);
+    else
+      printf("<</NumCopies %d>>setpagedevice\n", Copies);
+  }
 
   if (strncmp(line, "%!PS-Adobe-", 11) == 0)
   {
@@ -915,5 +920,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.48 2001/02/06 23:40:08 mike Exp $".
+ * End of "$Id: pstops.c,v 1.49 2001/02/13 16:08:00 mike Exp $".
  */

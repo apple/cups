@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.33 2001/02/06 23:40:08 mike Exp $"
+ * "$Id: imagetops.c,v 1.34 2001/02/13 16:08:00 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -479,7 +479,11 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (Copies > 1 && !slowcollate)
   {
-    printf("/#copies %d def\n", Copies);
+    if (ppd == NULL || ppd->language_level == 1)
+      printf("/#copies %d def\n", Copies);
+    else
+      printf("<</NumCopies %d>>setpagedevice\n", Copies);
+
     realcopies = Copies;
     Copies     = 1;
   }
@@ -738,5 +742,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.33 2001/02/06 23:40:08 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.34 2001/02/13 16:08:00 mike Exp $".
  */

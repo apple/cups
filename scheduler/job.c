@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.111 2001/02/09 19:51:42 mike Exp $"
+ * "$Id: job.c,v 1.112 2001/02/13 16:08:01 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1101,7 +1101,8 @@ StartJob(int       id,		/* I - Job ID */
       * Don't use the # copies attribute if we are printing the job sheets...
       */
 
-      if (current->job_sheets == NULL ||
+      if ((printer->type & CUPS_PRINTER_REMOTE) ||
+          current->job_sheets == NULL ||
           ((strcasecmp(current->job_sheets->values[0].string.text, "none") == 0 ||
 	    current->current_file != 0) &&
            (current->job_sheets->num_values == 1 ||
@@ -1129,8 +1130,17 @@ StartJob(int       id,		/* I - Job ID */
 	  attr->value_tag == IPP_TAG_URISCHEME)
 	continue;
 
-      if (strncmp(attr->name, "job-", 4) == 0 ||
-          strncmp(attr->name, "time-", 5) == 0)
+      if (strncmp(attr->name, "time-", 5) == 0)
+	continue;
+
+      if (strncmp(attr->name, "job-", 4) == 0 &&
+          !(printer->type & CUPS_PRINTER_REMOTE))
+	continue;
+
+      if (strncmp(attr->name, "job-", 4) == 0 &&
+          strcmp(attr->name, "job-sheets") != 0 &&
+          strcmp(attr->name, "job-hold-until") != 0 &&
+	  strcmp(attr->name, "job-priority") != 0)
 	continue;
 
      /*
@@ -2726,5 +2736,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.111 2001/02/09 19:51:42 mike Exp $".
+ * End of "$Id: job.c,v 1.112 2001/02/13 16:08:01 mike Exp $".
  */
