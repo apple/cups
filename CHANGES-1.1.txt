@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- Updated the CUPS startup script to better support
+	  different timezones and to support the RedHat/Mandrake
+	  init script functions, if available.
 	- The scheduler did not properly handle backslashes in
 	  banner files; it incorrectly assumed that "\c" should
 	  always be replaced by "c", instead of only looking for
