@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.88 2003/02/14 20:25:04 mike Exp $"
+ * "$Id: ppd.c,v 1.89 2003/02/18 18:25:13 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -2323,7 +2323,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 	*lineptr++ = '\n';
       }
-      else if (ch < ' ' && ch != '\t')
+      else if (ch < ' ' && ch != '\t' && ch != 0x1a)
       {
        /*
         * Other control characters...
@@ -2333,7 +2333,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
         return (0);
       }
-      else
+      else if (ch != 0x1a)
       {
        /*
 	* Any other character...
@@ -2383,7 +2383,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 		break;
 	      }
-	      else if (ch < ' ' && ch != '\t')
+	      else if (ch < ' ' && ch != '\t' && ch != 0x1a)
 	      {
 	       /*
         	* Other control characters...
@@ -2393,7 +2393,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
         	return (0);
 	      }
-	      else
+	      else if (ch != 0x1a)
 	      {
 	        col ++;
 
@@ -2443,7 +2443,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 	  ch = '\n';
 	}
-	else if (ch < ' ' && ch != '\t')
+	else if (ch < ' ' && ch != '\t' && ch != 0x1a)
 	{
 	 /*
           * Other control characters...
@@ -2453,7 +2453,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
           return (0);
 	}
-	else
+	else if (ch != 0x1a)
 	{
 	  col ++;
 
@@ -2500,7 +2500,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 	  break;
 	}
-	else if (ch < ' ' && ch != '\t')
+	else if (ch < ' ' && ch != '\t' && ch != 0x1a)
 	{
 	 /*
           * Other control characters...
@@ -2510,7 +2510,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
           return (0);
 	}
-	else
+	else if (ch != 0x1a)
 	{
 	  col ++;
 
@@ -2643,7 +2643,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 	while (*lineptr != '\0' && *lineptr != '\n' && *lineptr != ':')
 	{
-	  if ((*lineptr < ' ' && *lineptr != '\t') ||
+	  if (((unsigned char)*lineptr < ' ' && *lineptr != '\t') ||
 	      (textptr - text) >= (PPD_MAX_LINE - 1))
 	  {
 	    ppd_status = PPD_ILLEGAL_TRANSLATION;
@@ -2693,5 +2693,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.88 2003/02/14 20:25:04 mike Exp $".
+ * End of "$Id: ppd.c,v 1.89 2003/02/18 18:25:13 mike Exp $".
  */
