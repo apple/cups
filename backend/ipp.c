@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.5 1999/06/25 16:55:16 mike Exp $"
+ * "$Id: ipp.c,v 1.6 1999/06/25 17:08:10 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -313,7 +313,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       break;
     }
 
-    fputs("INFO: ippWrite() successful, sending print file...\n", stderr);
+    fputs("INFO: IPP request sent, sending print file...\n", stderr);
 
    /*
     * Then send the file...
@@ -394,5 +394,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.5 1999/06/25 16:55:16 mike Exp $".
+ * End of "$Id: ipp.c,v 1.6 1999/06/25 17:08:10 mike Exp $".
  */
