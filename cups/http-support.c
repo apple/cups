@@ -1,5 +1,5 @@
 /*
- * "$Id: http-support.c,v 1.2 2002/09/05 21:02:28 mike Exp $"
+ * "$Id: http-support.c,v 1.3 2002/09/05 21:12:00 mike Exp $"
  *
  *   HTTP support routines for the Common UNIX Printing System (CUPS).
  *
@@ -27,6 +27,7 @@
  *
  *   httpSeparate() - Separate a Universal Resource Identifier into its
  *                    components.
+ *   httpStatus()   - Return a short string describing a HTTP status code.
  */
 
 /*
@@ -265,5 +266,52 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 
 
 /*
- * End of "$Id: http-support.c,v 1.2 2002/09/05 21:02:28 mike Exp $".
+ * 'httpStatus()' - Return a short string describing a HTTP status code.
+ */
+
+const char *				/* O - String or NULL */
+httpStatus(http_status_t status)	/* I - HTTP status code */
+{
+  switch (status)
+  {
+    case HTTP_CONTINUE :
+        return ("Continue");
+    case HTTP_SWITCHING_PROTOCOLS :
+        return ("Switching Protocols");
+    case HTTP_OK :
+        return ("OK");
+    case HTTP_CREATED :
+        return ("Created");
+    case HTTP_ACCEPTED :
+        return ("Accepted");
+    case HTTP_NO_CONTENT :
+        return ("No Content");
+    case HTTP_NOT_MODIFIED :
+        return ("Not Modified");
+    case HTTP_BAD_REQUEST :
+        return ("Bad Request");
+    case HTTP_UNAUTHORIZED :
+        return ("Unauthorized");
+    case HTTP_FORBIDDEN :
+        return ("Forbidden");
+    case HTTP_NOT_FOUND :
+        return ("Not Found");
+    case HTTP_REQUEST_TOO_LARGE :
+        return ("Request Entity Too Large");
+    case HTTP_URI_TOO_LONG :
+        return ("URI Too Long");
+    case HTTP_UPGRADE_REQUIRED :
+        return ("Upgrade Required");
+    case HTTP_NOT_IMPLEMENTED :
+        return ("Not Implemented");
+    case HTTP_NOT_SUPPORTED :
+        return ("Not Supported");
+    default :
+        return ("Unknown");
+  }
+}
+
+
+/*
+ * End of "$Id: http-support.c,v 1.3 2002/09/05 21:12:00 mike Exp $".
  */
