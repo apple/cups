@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.36 1999/12/01 20:25:03 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.37 1999/12/15 18:51:56 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -150,7 +150,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 		xinches,	/* Total size in inches */
 		yinches;
   float		xsize,		/* Total size in points */
-		ysize;
+		ysize,
+		xsize2,
+		ysize2;
   int		xpages,		/* # x pages */
 		ypages,		/* # y pages */
 		xpage,		/* Current x page */
@@ -473,17 +475,6 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Scale as necessary...
   */
 
-  if (Orientation & 1)
-  {
-    xprint = (PageTop - PageBottom) / 72.0;
-    yprint = (PageRight - PageLeft) / 72.0;
-  }
-  else
-  {
-    xprint = (PageRight - PageLeft) / 72.0;
-    yprint = (PageTop - PageBottom) / 72.0;
-  }
-
   if (zoom == 0.0 && ppi == 0)
     ppi = img->xppi;
 
@@ -493,14 +484,45 @@ main(int  argc,		/* I - Number of command-line arguments */
     * Scale the image as neccesary to match the desired pixels-per-inch.
     */
     
+    if (Orientation & 1)
+    {
+      xprint = (PageTop - PageBottom) / 72.0;
+      yprint = (PageRight - PageLeft) / 72.0;
+    }
+    else
+    {
+      xprint = (PageRight - PageLeft) / 72.0;
+      yprint = (PageTop - PageBottom) / 72.0;
+    }
+
     xinches = (float)img->xsize / (float)ppi;
     yinches = (float)img->ysize / (float)ppi;
+
+   /*
+    * Rotate the image if it will fit landscape but not portrait...
+    */
+
+    if ((xinches > xprint || yinches > yprint) &&
+        xinches <= yprint && yinches <= xprint)
+    {
+     /*
+      * Rotate the image as needed...
+      */
+
+      Orientation = (Orientation + 1) & 3;
+      xsize       = yprint;
+      yprint      = xprint;
+      xprint      = xsize;
+    }
   }
   else
   {
    /*
     * Scale percentage of page size...
     */
+
+    xprint = (PageRight - PageLeft) / 72.0;
+    yprint = (PageTop - PageBottom) / 72.0;
 
     xsize = xprint * zoom;
     ysize = xsize * img->ysize / img->xsize;
@@ -511,8 +533,42 @@ main(int  argc,		/* I - Number of command-line arguments */
       xsize = ysize * img->xsize / img->ysize;
     }
 
-    xinches = xsize;
-    yinches = ysize;
+    xsize2 = yprint * zoom;
+    ysize2 = xsize2 * img->ysize / img->xsize;
+
+    if (ysize2 > (xprint * zoom))
+    {
+      ysize2 = xprint * zoom;
+      xsize2 = ysize2 * img->xsize / img->ysize;
+    }
+
+   /*
+    * Choose the rotation with the largest area, but prefer
+    * portrait if they are equal...
+    */
+
+    if ((xsize * ysize) < (xsize2 * xsize2))
+    {
+     /*
+      * Do landscape orientation...
+      */
+
+      Orientation = 1;
+      xinches     = xsize2;
+      yinches     = ysize2;
+      xprint      = (PageTop - PageBottom) / 72.0;
+      yprint      = (PageRight - PageLeft) / 72.0;
+    }
+    else
+    {
+     /*
+      * Do portrait orientation...
+      */
+
+      Orientation = 0;
+      xinches     = xsize;
+      yinches     = ysize;
+    }
   }
 
   xpages = ceil(xinches / xprint);
@@ -3915,5 +3971,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.36 1999/12/01 20:25:03 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.37 1999/12/15 18:51:56 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.20 1999/11/12 16:00:44 mike Exp $"
+ * "$Id: imagetops.c,v 1.21 1999/12/15 18:51:56 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -68,7 +68,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 		xinches,	/* Total size in inches */
 		yinches;
   float		xsize,		/* Total size in points */
-		ysize;
+		ysize,
+		xsize2,
+		ysize2;
   int		xpages,		/* # x pages */
 		ypages,		/* # y pages */
 		xpage,		/* Current x page */
@@ -176,11 +178,11 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Scale as necessary...
   */
 
-  xprint = (PageRight - PageLeft) / 72.0;
-  yprint = (PageTop - PageBottom) / 72.0;
-
   if (zoom == 0.0 && ppi == 0)
     ppi = img->xppi;
+
+  xprint = (PageRight - PageLeft) / 72.0;
+  yprint = (PageTop - PageBottom) / 72.0;
 
   if (ppi > 0)
   {
@@ -190,6 +192,33 @@ main(int  argc,		/* I - Number of command-line arguments */
     
     xinches = (float)img->xsize / (float)ppi;
     yinches = (float)img->ysize / (float)ppi;
+
+   /*
+    * Rotate the image if it will fit landscape but not portrait...
+    */
+
+    if ((xinches > xprint || yinches > yprint) &&
+        xinches <= yprint && yinches <= xprint)
+    {
+     /*
+      * Rotate the image as needed...
+      */
+
+      Orientation = (Orientation + 1) & 3;
+      xsize       = yprint;
+      yprint      = xprint;
+      xprint      = xsize;
+
+      xsize       = PageLeft;
+      PageLeft    = PageBottom;
+      PageBottom  = PageWidth - PageRight;
+      PageRight   = PageTop;
+      PageTop     = PageLength - xsize;
+
+      xsize       = PageWidth;
+      PageWidth   = PageLength;
+      PageLength  = xsize;
+    }
   }
   else
   {
@@ -206,8 +235,52 @@ main(int  argc,		/* I - Number of command-line arguments */
       xsize = ysize * img->xsize / img->ysize;
     }
 
-    xinches = xsize;
-    yinches = ysize;
+    xsize2 = yprint * zoom;
+    ysize2 = xsize2 * img->ysize / img->xsize;
+
+    if (ysize2 > (xprint * zoom))
+    {
+      ysize2 = xprint * zoom;
+      xsize2 = ysize2 * img->xsize / img->ysize;
+    }
+
+   /*
+    * Choose the rotation with the largest area, but prefer
+    * portrait if they are equal...
+    */
+
+    if ((xsize * ysize) < (xsize2 * xsize2))
+    {
+     /*
+      * Do landscape orientation...
+      */
+
+      Orientation = 1;
+      xinches     = xsize2;
+      yinches     = ysize2;
+      xprint      = (PageTop - PageBottom) / 72.0;
+      yprint      = (PageRight - PageLeft) / 72.0;
+
+      xsize       = PageLeft;
+      PageLeft    = PageBottom;
+      PageBottom  = PageWidth - PageRight;
+      PageRight   = PageTop;
+      PageTop     = PageLength - xsize;
+
+      xsize       = PageWidth;
+      PageWidth   = PageLength;
+      PageLength  = xsize;
+    }
+    else
+    {
+     /*
+      * Do portrait orientation...
+      */
+
+      Orientation = 0;
+      xinches     = xsize;
+      yinches     = ysize;
+    }
   }
 
   xpages = ceil(xinches / xprint);
@@ -491,5 +564,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.20 1999/11/12 16:00:44 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.21 1999/12/15 18:51:56 mike Exp $".
  */
