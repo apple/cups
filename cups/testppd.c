@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c,v 1.15 2000/03/09 19:47:23 mike Exp $"
+ * "$Id: testppd.c,v 1.16 2000/06/12 15:51:26 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -171,6 +171,10 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
     }
 
+    printf("    num_fonts = %d\n", ppd->num_fonts);
+    for (j = 0; j < ppd->num_fonts; j ++)
+      printf("        fonts[%d] = %s\n", j, ppd->fonts[j]);
+
     ppdClose(ppd);
   }
 
@@ -179,5 +183,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c,v 1.15 2000/03/09 19:47:23 mike Exp $".
+ * End of "$Id: testppd.c,v 1.16 2000/06/12 15:51:26 mike Exp $".
  */

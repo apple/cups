@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.43 2000/06/12 15:42:46 mike Exp $"
+ * "$Id: ppd.c,v 1.44 2000/06/12 15:51:26 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -651,9 +651,8 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	return (NULL);
       }
         
-      ppd->fonts[ppd->num_fonts] = string;
+      ppd->fonts[ppd->num_fonts] = strdup(name);
       ppd->num_fonts ++;
-      string = NULL;
     }
     else if (strcmp(keyword, "VariablePaperSize") == 0 &&
              strcmp(string, "True") == 0 &&
@@ -1857,5 +1856,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.43 2000/06/12 15:42:46 mike Exp $".
+ * End of "$Id: ppd.c,v 1.44 2000/06/12 15:51:26 mike Exp $".
  */
