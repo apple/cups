@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.9 2000/06/28 16:40:52 mike Exp $"
+ * "$Id: dest.c,v 1.10 2000/07/21 15:31:06 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -87,9 +87,8 @@ cupsAddDest(const char  *name,		/* I - Name of destination */
   for (i = num_dests; i > 0; i --, dest ++)
     if (strcasecmp(name, dest->name) < 0)
       break;
-    else if (instance == NULL && dest->instance != NULL)
-      break;
-    else if (instance != NULL && dest->instance != NULL &&
+    else if (strcasecmp(name, dest->name) == 0 &&
+             instance != NULL && dest->instance != NULL &&
              strcasecmp(instance, dest->instance) < 0)
       break;
 
@@ -501,5 +500,5 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
 
 
 /*
- * End of "$Id: dest.c,v 1.9 2000/06/28 16:40:52 mike Exp $".
+ * End of "$Id: dest.c,v 1.10 2000/07/21 15:31:06 mike Exp $".
  */
