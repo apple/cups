@@ -1,5 +1,5 @@
 /*
- * "$Id: network.c,v 1.6 2002/03/27 21:54:02 mike Exp $"
+ * "$Id: network.c,v 1.7 2002/03/28 12:11:05 mike Exp $"
  *
  *   Network interface functions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -203,22 +203,29 @@ NetIFUpdate(void)
       host = gethostbyaddr(&(temp->address.sin_addr),
                            sizeof(struct in_addr), AF_INET);
 #endif /* !__sgi */
-
-      if (host != NULL)
-        strncpy(temp->hostname, host->h_name, sizeof(temp->hostname) - 1);
-      else if (ntohl(temp->address.sin_addr.s_addr) == 0x7f000001 ||
-               temp->address.sin_addr.s_addr == ServerAddr.sin_addr.s_addr)
-        strncpy(temp->hostname, ServerName, sizeof(temp->hostname) - 1);
-      else
-      {
-        unsigned ip = ntohl(temp->address.sin_addr.s_addr);
-
-        snprintf(temp->hostname, sizeof(temp->hostname), "%d.%d.%d.%d",
-	         (ip >> 24) & 255, (ip >> 16) & 255, (ip >> 8) & 255, ip & 255);
-      }
     }
     else
+      host = NULL;
+
+   /*
+    * Map the default server address and localhost to the server name
+    * and localhost, respectively; for all other addresses, use the
+    * dotted notation...
+    */
+
+    if (host != NULL)
+      strncpy(temp->hostname, host->h_name, sizeof(temp->hostname) - 1);
+    else if (ntohl(temp->address.sin_addr.s_addr) == 0x7f000001)
+      strcpy(temp->hostname, "localhost");
+    else if (temp->address.sin_addr.s_addr == ServerAddr.sin_addr.s_addr)
       strncpy(temp->hostname, ServerName, sizeof(temp->hostname) - 1);
+    else
+    {
+      unsigned ip = ntohl(temp->address.sin_addr.s_addr);
+
+      snprintf(temp->hostname, sizeof(temp->hostname), "%d.%d.%d.%d",
+	       (ip >> 24) & 255, (ip >> 16) & 255, (ip >> 8) & 255, ip & 255);
+    }
   }
 
   freeifaddrs(addrs);
@@ -462,5 +469,5 @@ freeifaddrs(struct ifaddrs *addrs)	/* I - Interface list to free */
 
 
 /*
- * End of "$Id: network.c,v 1.6 2002/03/27 21:54:02 mike Exp $".
+ * End of "$Id: network.c,v 1.7 2002/03/28 12:11:05 mike Exp $".
  */
