@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.9 1999/04/22 20:20:51 mike Exp $"
+ * "$Id: ipp.c,v 1.10 1999/05/01 13:16:46 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -98,169 +98,172 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
     */
 
     send_ipp_error(con, IPP_VERSION_NOT_SUPPORTED);
-
-    return;
   }  
-
- /*
-  * Make sure that the attributes are provided in the correct order and
-  * don't repeat groups...
-  */
-
-  for (attr = con->request->attrs, group = attr->group_tag;
-       attr != NULL;
-       attr = attr->next)
-    if (attr->group_tag < group)
-    {
-     /*
-      * Out of order; return an error...
-      */
-
-      DEBUG_puts("ProcessIPPRequest: attribute groups are out of order!");
-      send_ipp_error(con, IPP_BAD_REQUEST);
-      return;
-    }
-    else
-      group = attr->group_tag;
-
- /*
-  * Then make sure that the first three attributes are:
-  *
-  *     attributes-charset
-  *     attributes-natural-language
-  *     printer-uri
-  */
-
-  attr = con->request->attrs;
-  if (attr != NULL && strcmp(attr->name, "attributes-charset") == 0 &&
-      attr->value_tag == IPP_TAG_CHARSET)
-    charset = attr;
   else
-    charset = NULL;
-
-  attr = attr->next;
-  if (attr != NULL && strcmp(attr->name, "attributes-natural-language") == 0 &&
-      attr->value_tag == IPP_TAG_LANGUAGE)
-    language = attr;
-  else
-    language = NULL;
-
-  attr = attr->next;
-  if (attr != NULL && strcmp(attr->name, "printer-uri") == 0 &&
-      attr->value_tag == IPP_TAG_URI)
-    uri = attr;
-  else if (attr != NULL && strcmp(attr->name, "job-uri") == 0 &&
-           attr->value_tag == IPP_TAG_URI)
-    uri = attr;
-  else
-    uri = NULL;
-
-  if (charset == NULL || language == NULL ||
-      (uri == NULL && con->request->request.op.operation_id < IPP_PRIVATE))
   {
    /*
-    * Return an error, since attributes-charset,
-    * attributes-natural-language, and printer-uri/job-uri are required
-    * for all operations.
+    * Make sure that the attributes are provided in the correct order and
+    * don't repeat groups...
     */
 
-    DEBUG_printf(("ProcessIPPRequest: missing attributes (%08x, %08x, %08x)!\n",
-                  charset, language, uri));
-    send_ipp_error(con, IPP_BAD_REQUEST);
-    return;
-  }
+    for (attr = con->request->attrs, group = attr->group_tag;
+	 attr != NULL;
+	 attr = attr->next)
+      if (attr->group_tag < group)
+      {
+       /*
+	* Out of order; return an error...
+	*/
 
-  attr = ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                      "attributes-charset", NULL,
-		      charset->values[0].string.text);
-
-  attr = ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                      "attributes-natural-language", NULL,
-		      language->values[0].string.text);
-
- /*
-  * OK, all the checks pass so far; try processing the operation...
-  */
-
-  switch (con->request->request.op.operation_id)
-  {
-    case IPP_PRINT_JOB :
-        print_job(con, uri);
-        break;
-
-    case IPP_VALIDATE_JOB :
-        validate_job(con, uri);
-        break;
-
-    case IPP_CANCEL_JOB :
-        cancel_job(con, uri);
-        break;
-
-    case IPP_GET_JOB_ATTRIBUTES :
-        get_job_attrs(con, uri);
-        break;
-
-    case IPP_GET_JOBS :
-        get_jobs(con, uri);
-        break;
-
-    case IPP_GET_PRINTER_ATTRIBUTES :
-        get_printer_attrs(con, uri);
-        break;
-
-    case IPP_PAUSE_PRINTER :
-        stop_printer(con, uri);
+	DEBUG_puts("ProcessIPPRequest: attribute groups are out of order!");
+	send_ipp_error(con, IPP_BAD_REQUEST);
 	break;
+      }
+      else
+	group = attr->group_tag;
 
-    case IPP_RESUME_PRINTER :
-        start_printer(con, uri);
-	break;
+    if (attr == NULL)
+    {
+     /*
+      * Then make sure that the first three attributes are:
+      *
+      *     attributes-charset
+      *     attributes-natural-language
+      *     printer-uri
+      */
 
-    case IPP_PURGE_JOBS :
-        cancel_all_jobs(con, uri);
-        break;
+      attr = con->request->attrs;
+      if (attr != NULL && strcmp(attr->name, "attributes-charset") == 0 &&
+	  attr->value_tag == IPP_TAG_CHARSET)
+	charset = attr;
+      else
+	charset = NULL;
 
-    case CUPS_GET_DEFAULT :
-        get_default(con);
-        break;
+      attr = attr->next;
+      if (attr != NULL && strcmp(attr->name, "attributes-natural-language") == 0 &&
+	  attr->value_tag == IPP_TAG_LANGUAGE)
+	language = attr;
+      else
+	language = NULL;
 
-    case CUPS_GET_PRINTERS :
-        get_printers(con);
-        break;
+      attr = attr->next;
+      if (attr != NULL && strcmp(attr->name, "printer-uri") == 0 &&
+	  attr->value_tag == IPP_TAG_URI)
+	uri = attr;
+      else if (attr != NULL && strcmp(attr->name, "job-uri") == 0 &&
+               attr->value_tag == IPP_TAG_URI)
+	uri = attr;
+      else
+	uri = NULL;
+
+      if (charset == NULL || language == NULL ||
+	  (uri == NULL && con->request->request.op.operation_id < IPP_PRIVATE))
+      {
+       /*
+	* Return an error, since attributes-charset,
+	* attributes-natural-language, and printer-uri/job-uri are required
+	* for all operations.
+	*/
+
+	DEBUG_printf(("ProcessIPPRequest: missing attributes (%08x, %08x, %08x)!\n",
+                      charset, language, uri));
+	send_ipp_error(con, IPP_BAD_REQUEST);
+      }
+      else
+      {
+	attr = ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+                	    "attributes-charset", NULL,
+			    charset->values[0].string.text);
+
+	attr = ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                	    "attributes-natural-language", NULL,
+			    language->values[0].string.text);
+
+       /*
+	* OK, all the checks pass so far; try processing the operation...
+	*/
+
+	switch (con->request->request.op.operation_id)
+	{
+	  case IPP_PRINT_JOB :
+              print_job(con, uri);
+              break;
+
+	  case IPP_VALIDATE_JOB :
+              validate_job(con, uri);
+              break;
+
+	  case IPP_CANCEL_JOB :
+              cancel_job(con, uri);
+              break;
+
+	  case IPP_GET_JOB_ATTRIBUTES :
+              get_job_attrs(con, uri);
+              break;
+
+	  case IPP_GET_JOBS :
+              get_jobs(con, uri);
+              break;
+
+	  case IPP_GET_PRINTER_ATTRIBUTES :
+              get_printer_attrs(con, uri);
+              break;
+
+	  case IPP_PAUSE_PRINTER :
+              stop_printer(con, uri);
+	      break;
+
+	  case IPP_RESUME_PRINTER :
+              start_printer(con, uri);
+	      break;
+
+	  case IPP_PURGE_JOBS :
+              cancel_all_jobs(con, uri);
+              break;
+
+	  case CUPS_GET_DEFAULT :
+              get_default(con);
+              break;
+
+	  case CUPS_GET_PRINTERS :
+              get_printers(con);
+              break;
 
 #if 0
-    case CUPS_ADD_PRINTER :
-        add_printer(con);
-        break;
+	  case CUPS_ADD_PRINTER :
+              add_printer(con);
+              break;
 
-    case CUPS_DELETE_PRINTER :
-        delete_printer(con);
-        break;
+	  case CUPS_DELETE_PRINTER :
+              delete_printer(con);
+              break;
 
-    case CUPS_GET_CLASSES :
-        get_classes(con);
-        break;
+	  case CUPS_GET_CLASSES :
+              get_classes(con);
+              break;
 
-    case CUPS_ADD_CLASS :
-        add_class(con);
-        break;
+	  case CUPS_ADD_CLASS :
+              add_class(con);
+              break;
 
-    case CUPS_DELETE_CLASS :
-        delete_class(con);
-        break;
+	  case CUPS_DELETE_CLASS :
+              delete_class(con);
+              break;
 #endif /* 0 */
 
-    case CUPS_ACCEPT_JOBS :
-        accept_jobs(con, uri);
-        break;
+	  case CUPS_ACCEPT_JOBS :
+              accept_jobs(con, uri);
+              break;
 
-    case CUPS_REJECT_JOBS :
-        reject_jobs(con, uri);
-        break;
+	  case CUPS_REJECT_JOBS :
+              reject_jobs(con, uri);
+              break;
 
-    default :
-        send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
-	return;
+	  default :
+              send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
+	}
+      }
+    }
   }
 
   SendHeader(con, HTTP_OK, "application/ipp");
@@ -774,6 +777,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
 					/* Job URI... */
 			printer_uri[HTTP_MAX_URI];
 					/* Printer URI... */
+  char			mimetype[255];	/* MIME type of document */
   struct stat		filestats;	/* Print file information */
 
 
@@ -883,6 +887,8 @@ get_jobs(client_t        *con,		/* I - Client connection */
     *    job-priority
     *    job-state
     *    job-uri
+    *    job-name
+    *    document-format
     *
     * Note that we are supposed to look at the "requested-attributes"
     * attribute to determine what we send, however the IPP/1.0 spec also
@@ -902,27 +908,32 @@ get_jobs(client_t        *con,		/* I - Client connection */
       sprintf(printer_uri, "http://%s:%d/printers/%s", ServerName,
 	      ntohs(con->http.hostaddr.sin_port), job->dest);
 
-    attr = ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
-                         "job-id", job->id);
+    ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
+    ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_NAME, "job-name",
+                  NULL, job->title);
 
     stat(job->filename, &filestats);
-    attr = ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
-                         "job-k-octets", (filestats.st_size + 1023) / 1024);
+    ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
+                  "job-k-octets", (filestats.st_size + 1023) / 1024);
 
-    attr = ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
-                        "job-more-info", NULL, job_uri);
+    ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
+                 "job-more-info", NULL, job_uri);
 
-    attr = ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_NAME,
-                        "job-originating-user-name", NULL, job->username);
+    ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_NAME,
+                 "job-originating-user-name", NULL, job->username);
 
-    attr = ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
-                        "job-printer-uri", NULL, printer_uri);
+    ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
+                 "job-printer-uri", NULL, printer_uri);
 
-    attr = ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM,
-                         "job-state", job->state);
+    ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM,
+                  "job-state", job->state);
 
-    attr = ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
-                        "job-uri", NULL, job_uri);
+    ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
+                 "job-uri", NULL, job_uri);
+
+    sprintf(mimetype, "%s/%s", job->filetype->super, job->filetype->type);
+    ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
+                 "document-format", NULL, mimetype);
 
     ippAddSeparator(con->response);
   }
@@ -1203,6 +1214,7 @@ print_job(client_t        *con,		/* I - Client connection */
   char			*dest;		/* Destination */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
   int			priority;	/* Job priority */
+  char			*title;		/* Job name/title */
   job_t			*job;		/* Current job */
   char			job_uri[HTTP_MAX_URI],
 					/* Job URI */
@@ -1336,6 +1348,11 @@ print_job(client_t        *con,		/* I - Client connection */
   else
     priority = 50;
 
+  if ((attr = ippFindAttribute(con->request, "job-name", IPP_TAG_NAME)) != NULL)
+    title = attr->values[0].string.text;
+  else
+    title = "Untitled";
+
   if ((job = AddJob(priority, dest)) == NULL)
   {
     send_ipp_error(con, IPP_INTERNAL_ERROR);
@@ -1349,6 +1366,7 @@ print_job(client_t        *con,		/* I - Client connection */
   con->request  = NULL;
 
   strcpy(job->filename, con->filename);
+  strcpy(job->title, title);
   con->filename[0] = '\0';
 
   strcpy(job->username, con->username);
@@ -1486,11 +1504,6 @@ send_ipp_error(client_t     *con,	/* I - Client connection */
 
   ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, DefaultLanguage);
-
-  SendHeader(con, HTTP_OK, "application/ipp");
-  httpPrintf(HTTP(con), "Content-Length: %d\r\n\r\n", ippLength(con->response));
-
-  FD_SET(con->http.fd, &OutputSet);
 }
 
 
@@ -1782,5 +1795,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.9 1999/04/22 20:20:51 mike Exp $".
+ * End of "$Id: ipp.c,v 1.10 1999/05/01 13:16:46 mike Exp $".
  */
