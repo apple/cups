@@ -1183,8 +1183,7 @@ send browsing information to. Multiple <CODE>BrowseAddress</CODE>
 directives can be specified to send browsing information to different
 networks or systems.
 
-<P>The default address is <CODE>255.255.255.255:631</CODE> which will
-broadcast the information to all networks the server is connected to.
+<P>No browse addresses are set by default.
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
