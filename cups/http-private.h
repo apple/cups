@@ -1,5 +1,5 @@
 /*
- * "$Id: http-private.h,v 1.1.2.1 2003/01/15 04:25:49 mike Exp $"
+ * "$Id: http-private.h,v 1.1.2.2 2003/01/24 19:19:42 mike Exp $"
  *
  *   Private HTTP definitions for the Common UNIX Printing System (CUPS).
  *
@@ -58,10 +58,20 @@ typedef struct
   void			*credentials;	/* GNU TLS credentials object */
 } http_tls_t;
 
+#  elif defined(HAVE_CDSASSL)
+/*
+ * Darwin's Security framework provides its own SSL/TLS context structure
+ * for its IO and protocol management...
+ */
+
+#    include <Security/SecureTransport.h>
+
+typedef SSLConnectionRef http_tls_t;
+
 #  endif /* HAVE_LIBSSL */
   
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id: http-private.h,v 1.1.2.1 2003/01/15 04:25:49 mike Exp $".
+ * End of "$Id: http-private.h,v 1.1.2.2 2003/01/24 19:19:42 mike Exp $".
  */

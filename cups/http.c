@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.23 2003/01/15 04:25:49 mike Exp $"
+ * "$Id: http.c,v 1.82.2.24 2003/01/24 19:19:42 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -63,6 +63,8 @@
  *   http_shutdown_ssl()  - Shut down SSL/TLS on a connection.
  *   http_read_ssl()      - Read from a SSL/TLS connection.
  *   http_write_ssl()     - Write to a SSL/TLS connection.
+ *   CDSAReadFunc()       - Read function for CDSA decryption code.
+ *   CDSAWriteFunc()      - Write function for CDSA encryption code.
  */
 
 /*
@@ -109,6 +111,10 @@ static int		http_setup_ssl(http_t *http);
 static void		http_shutdown_ssl(http_t *http);
 static int		http_read_ssl(http_t *http, char *buf, int len);
 static int		http_write_ssl(http_t *http, const char *buf, int len);
+#  ifdef HAVE_CDSASSL
+static OSStatus		CDSAReadFunc(SSLConnectionRef connection, void *data, size_t *dataLength);
+static OSStatus		CDSAWriteFunc(SSLConnectionRef connection, const void *data, size_t *dataLength);
+#  endif /* HAVE_CDSASSL */
 #endif /* HAVE_SSL */
 
 
@@ -1892,7 +1898,6 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 #ifdef HAVE_SSL
-
 /*
  * 'http_upgrade()' - Force upgrade to TLS encryption.
  */
@@ -1968,11 +1973,11 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
     DEBUG_puts("Server does not support HTTP upgrade!");
 
-#ifdef WIN32
+#  ifdef WIN32
     closesocket(http->fd);
-#else
+#  else
     close(http->fd);
-#endif
+#  endif
 
     http->fd = -1;
 
@@ -1990,16 +1995,20 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 static int				/* O - Status of connection */
 http_setup_ssl(http_t *http)		/* I - HTTP data */
 {
-#ifdef HAVE_LIBSSL
+#  ifdef HAVE_LIBSSL
   SSL_CTX	*context;	/* Context for encryption */
   SSL		*conn;		/* Connection for encryption */
-#elif defined(HAVE_GNUTLS) /* HAVE_LIBSSL */
+#  elif defined(HAVE_GNUTLS)
   http_tls_t	*conn;		/* TLS session object */
-  gnutls_certificate_client_credentials *credentials; /* TLS credentials */
-#endif /* HAVE_GNUTLS */
+  gnutls_certificate_client_credentials *credentials;
+				/* TLS credentials */
+#  elif defined(HAVE_CDSASSL)
+  SSLContextRef	conn;		/* Context for encryption */
+  OSStatus	error;		/* Error info */
+#  endif /* HAVE_LIBSSL */
 
-#ifdef HAVE_LIBSSL
 
+#  ifdef HAVE_LIBSSL
   context = SSL_CTX_new(SSLv23_client_method());
   conn    = SSL_new(context);
 
@@ -2009,19 +2018,19 @@ http_setup_ssl(http_t *http)		/* I - HTTP data */
     SSL_CTX_free(context);
     SSL_free(conn);
 
-#ifdef WIN32
+#    ifdef WIN32
     http->error  = WSAGetLastError();
-#else
+#    else
     http->error  = errno;
-#endif /* WIN32 */
+#    endif /* WIN32 */
     http->status = HTTP_ERROR;
 
     return (HTTP_ERROR);
   }
 
-#elif defined(HAVE_GNUTLS) /* HAVE_LIBSSL */
-
+#  elif defined(HAVE_GNUTLS)
   conn = (http_tls_t *)malloc(sizeof(http_tls_t));
+
   if (conn == NULL)
   {
     http->error  = errno;
@@ -2029,8 +2038,9 @@ http_setup_ssl(http_t *http)		/* I - HTTP data */
 
     return (-1);
   }
+
   credentials = (gnutls_certificate_client_credentials *)
-    malloc(sizeof(gnutls_certificate_client_credentials));
+                    malloc(sizeof(gnutls_certificate_client_credentials));
   if (credentials == NULL)
   {
     free(conn);
@@ -2058,7 +2068,36 @@ http_setup_ssl(http_t *http)		/* I - HTTP data */
 
   conn->credentials = credentials;
 
-#endif /* HAVE_GNUTLS */
+#  elif defined(HAVE_CDSASSL)
+  error = SSLNewContext(false, &conn);
+
+  if (!error)
+    error = SSLSetIOFuncs(conn, CDSAReadFunc, CDSAWriteFunc);
+
+  if (!error)
+    error = SSLSetConnection(conn, (SSLConnectionRef)http->fd);
+
+  if (!error)
+    error = SSLSetAllowsExpiredCerts(conn, true);
+
+  if (!error)
+    error = SSLSetAllowsAnyRoot(conn, true);
+
+  if (!error)
+    error = SSLHandshake(conn);
+
+  if (error != 0)
+  {
+    http->error  = error;
+    http->status = HTTP_ERROR;
+
+    SSLDisposeContext(conn);
+
+    close(http->fd);
+
+    return (-1);
+  }
+#  endif /* HAVE_CDSASSL */
 
   http->tls = conn;
   return (0);
@@ -2072,9 +2111,10 @@ http_setup_ssl(http_t *http)		/* I - HTTP data */
 static void
 http_shutdown_ssl(http_t *http)	/* I - HTTP data */
 {
-#ifdef HAVE_LIBSSL
+#  ifdef HAVE_LIBSSL
   SSL_CTX	*context;	/* Context for encryption */
   SSL		*conn;		/* Connection for encryption */
+
 
   conn    = (SSL *)(http->tls);
   context = SSL_get_SSL_CTX(conn);
@@ -2082,9 +2122,12 @@ http_shutdown_ssl(http_t *http)	/* I - HTTP data */
   SSL_shutdown(conn);
   SSL_CTX_free(context);
   SSL_free(conn);
-#elif defined(HAVE_GNUTLS) /* HAVE_LIBSSL */
-  http_tls_t      *conn;		/* Encryption session */
-  gnutls_certificate_client_credentials *credentials; /* TLS credentials */
+
+#  elif defined(HAVE_GNUTLS)
+  http_tls_t      *conn;	/* Encryption session */
+  gnutls_certificate_client_credentials *credentials;
+				/* TLS credentials */
+
 
   conn = (http_tls_t *)(http->tls);
   credentials = (gnutls_certificate_client_credentials *)(conn->credentials);
@@ -2094,7 +2137,11 @@ http_shutdown_ssl(http_t *http)	/* I - HTTP data */
   gnutls_certificate_free_credentials(*credentials);
   free(credentials);
   free(conn);
-#endif /* HAVE_GNUTLS */
+
+#  elif defined(HAVE_CDSASSL)
+  SSLClose((SSLContextRef)http->tls);
+  SSLDisposeContext((SSLContextRef)http->tls);
+#  endif /* HAVE_LIBSSL */
 
   http->tls = NULL;
 }
@@ -2109,11 +2156,28 @@ http_read_ssl(http_t *http,		/* I - HTTP data */
 	      char   *buf,		/* I - Buffer to store data */
 	      int    len)		/* I - Length of buffer */
 {
-#if defined(HAVE_LIBSSL)
+#  if defined(HAVE_LIBSSL)
   return (SSL_read((SSL *)(http->tls), buf, len));
-#elif defined(HAVE_GNUTLS) /* HAVE_LIBSSL */
+
+#  elif defined(HAVE_GNUTLS)
   return (gnutls_record_recv(((http_tls_t *)(http->tls))->session, buf, len));
-#endif /* HAVE_GNUTLS */
+
+#  elif defined(HAVE_CDSASSL)
+  OSStatus	error;			/* Error info */
+  size_t	processed;		/* Number of bytes processed */
+
+
+  error = SSLRead((SSLContextRef)http->tls, buf, len, &processed);
+
+  if (error == 0)
+    return (processed);
+  else
+  {
+    http->error = error;
+
+    return (-1);
+  }
+#  endif /* HAVE_LIBSSL */
 }
 
 
@@ -2126,15 +2190,78 @@ http_write_ssl(http_t     *http,	/* I - HTTP data */
 	       const char *buf,		/* I - Buffer holding data */
 	       int        len)		/* I - Length of buffer */
 {
-#if defined(HAVE_LIBSSL)
+#  if defined(HAVE_LIBSSL)
   return (SSL_write((SSL *)(http->tls), buf, len));
-#elif defined(HAVE_GNUTLS) /* HAVE_LIBSSL */
+
+#  elif defined(HAVE_GNUTLS)
   return (gnutls_record_send(((http_tls_t *)(http->tls))->session, buf, len));
-#endif /* HAVE_GNUTLS */
+#  elif defined(HAVE_CDSASSL)
+  OSStatus	error;			/* Error info */
+  size_t	processed;		/* Number of bytes processed */
+
+
+  error = SSLWrite((SSLContextRef)http->tls, buf, len, &processed);
+
+  if (error == 0)
+    return (processed);
+  else
+  {
+    http->error = error;
+    return (-1);
+  }
+#  endif /* HAVE_LIBSSL */
 }
 
-#endif /* HAVE_SSL */
+
+#  if defined(HAVE_CDSASSL)
+/*
+ * 'CDSAReadFunc()' - Read function for CDSA decryption code.
+ */
+
+static OSStatus					/* O  - -1 on error, 0 on success */
+CDSAReadFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
+             void             *data,		/* I  - Data buffer */
+	     size_t           *dataLength)	/* IO - Number of bytes */
+{
+  ssize_t	bytes;				/* Number of bytes read */
+
+
+  bytes = recv((int)connection, data, *dataLength, 0);
+  if (bytes >= 0)
+  {
+    *dataLength = bytes;
+    return (0);
+  }
+  else
+    return (-1);
+}
+
 
 /*
- * End of "$Id: http.c,v 1.82.2.23 2003/01/15 04:25:49 mike Exp $".
+ * 'CDSAWriteFunc()' - Write function for CDSA encryption code.
+ */
+
+static OSStatus					/* O  - -1 on error, 0 on success */
+CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
+              const void       *data,		/* I  - Data buffer */
+	      size_t           *dataLength)	/* IO - Number of bytes */
+{
+  ssize_t bytes;
+
+
+  bytes = write((int)connection, data, *dataLength);
+  if (bytes >= 0)
+  {
+    *dataLength = bytes;
+    return (0);
+  }
+  else
+    return (-1);
+}
+#  endif /* HAVE_CDSASSL */
+#endif /* HAVE_SSL */
+
+
+/*
+ * End of "$Id: http.c,v 1.82.2.24 2003/01/24 19:19:42 mike Exp $".
  */

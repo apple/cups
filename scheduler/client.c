@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.38 2003/01/24 15:28:06 mike Exp $"
+ * "$Id: client.c,v 1.91.2.39 2003/01/24 19:19:43 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -39,6 +39,8 @@
  *   get_file()            - Get a filename and state info.
  *   install_conf_file()   - Install a configuration file.
  *   pipe_command()        - Pipe the output of a command to the remote client.
+ *   CDSAReadFunc()        - Read function for CDSA decryption code.
+ *   CDSAWriteFunc()       - Write function for CDSA encryption code.
  */
 
 /*
@@ -61,6 +63,13 @@ static char		*get_file(client_t *con, struct stat *filestats);
 static http_status_t	install_conf_file(client_t *con);
 static int		pipe_command(client_t *con, int infile, int *outfile,
 			             char *command, char *options);
+
+#ifdef HAVE_CDSASSL
+OSStatus		CDSAReadFunc(SSLConnectionRef connection, void *data,
+			             size_t *dataLength);
+OSStatus		CDSAWriteFunc(SSLConnectionRef connection,
+			              const void *data, size_t *dataLength);
+#endif /* HAVE_CDSASSL */
 
 
 /*
@@ -341,14 +350,15 @@ void
 CloseClient(client_t *con)	/* I - Client to close */
 {
   int		status;		/* Exit status of pipe command */
-#if defined HAVE_LIBSSL
+#if defined(HAVE_LIBSSL)
   SSL_CTX	*context;	/* Context for encryption */
   SSL		*conn;		/* Connection for encryption */
   unsigned long	error;		/* Error code */
-#elif defined HAVE_GNUTLS /* HAVE_LIBSSL */
-  http_tls_t      *conn;		/* TLS connection information */
+#elif defined(HAVE_GNUTLS)
+  http_tls_t     *conn;		/* TLS connection information */
   int            error;		/* Error code */
-  gnutls_certificate_server_credentials *credentials; /* TLS credentials */
+  gnutls_certificate_server_credentials *credentials;
+				/* TLS credentials */
 #endif /* HAVE_GNUTLS */
 
 
@@ -361,7 +371,7 @@ CloseClient(client_t *con)	/* I - Client to close */
 
   if (con->http.tls)
   {
-#if defined HAVE_LIBSSL
+#  ifdef HAVE_LIBSSL
     conn    = (SSL *)(con->http.tls);
     context = SSL_get_SSL_CTX(conn);
 
@@ -380,7 +390,8 @@ CloseClient(client_t *con)	/* I - Client to close */
 
     SSL_CTX_free(context);
     SSL_free(conn);
-#elif defined HAVE_GNUTLS /* HAVE_LIBSSL */
+
+#  elif defined(HAVE_GNUTLS)
     conn        = (http_tls_t *)(con->http.tls);
     credentials = (gnutls_certificate_server_credentials *)(conn->credentials);
 
@@ -399,11 +410,15 @@ CloseClient(client_t *con)	/* I - Client to close */
     gnutls_certificate_free_credentials(*credentials);
     free(credentials);
     free(conn);
-#endif /* HAVE_GNUTLS */
+
+#  elif defined(HAVE_CDSASSL)
+    status = SSLClose((SSLContextRef)con->http.tls);
+    SSLDisposeContext((SSLContextRef)con->http.tls);
+#  endif /* HAVE_LIBSSL */
 
     con->http.tls = NULL;
   }
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_SSL */
 
  /*
   * Close the socket and clear the file from the input set for select()...
@@ -522,20 +537,24 @@ EncryptClient(client_t *con)	/* I - Client to encrypt */
 
   con->http.tls = conn;
   return (1);
-#elif defined HAVE_GNUTLS /* HAVE_LIBSSL */
+  
+#elif defined(HAVE_GNUTLS)
   http_tls_t	*conn;		/* TLS session object */
   int		error;		/* Error code */
-  gnutls_certificate_server_credentials *credentials; /* TLS credentials */
+  gnutls_certificate_server_credentials *credentials;
+				/* TLS credentials */
 
  /*
   * Create the SSL object and perform the SSL handshake...
   */
 
   conn = (http_tls_t *)malloc(sizeof(gnutls_session));
+
   if (conn == NULL)
     return (0);
+
   credentials = (gnutls_certificate_server_credentials *)
-    malloc(sizeof(gnutls_certificate_server_credentials));
+                    malloc(sizeof(gnutls_certificate_server_credentials));
   if (credentials == NULL)
   {
     free(conn);
@@ -569,6 +588,77 @@ EncryptClient(client_t *con)	/* I - Client to encrypt */
   conn->credentials = credentials;
   con->http.tls = conn;
   return (1);
+
+#elif defined(HAVE_CDSASSL)
+  OSStatus		error;		/* Error info */
+  SSLContextRef		conn;		/* New connection */
+  SSLProtocol		tryVersion;	/* Protocol version */
+  const char		*hostName;	/* Local hostname */
+  int			allowExpired;	/* Allow expired certificates? */
+  int			allowAnyRoot;	/* Allow any root certificate? */
+  SSLProtocol		*negVersion;	/* Negotiated protocol version */
+  SSLCipherSuite	*negCipher;	/* Negotiated cypher */
+  CFArrayRef		*peerCerts;	/* Certificates */
+
+
+  conn         = NULL;
+  error        = SSLNewContext(true, &conn);
+  allowExpired = 1;
+  allowAnyRoot = 1;
+
+  if (!error)
+    error = SSLSetIOFuncs(conn, CDSAReadFunc, CDSAWriteFunc);
+
+  if (!error)
+    error = SSLSetProtocolVersion(conn, kSSLProtocol3);
+
+  if (!error)
+    error = SSLSetConnection(conn, (SSLConnectionRef)con->http.fd);
+
+  if (!error)
+  {
+    hostName = ServerName;	/* MRS: ??? */
+    error    = SSLSetPeerDomainName(conn, hostName, strlen(hostName) + 1);
+  }
+
+  /* have to do these options befor setting server certs */
+  if (!error && allowExpired)
+    error = SSLSetAllowsExpiredCerts(conn, true);
+
+  if (!error && allowAnyRoot)
+    error = SSLSetAllowsAnyRoot(conn, true);
+
+  if (!error && ServerCertificatesArray != NULL)
+    error = SSLSetCertificate(conn, ServerCertificatesArray);
+
+ /*
+  * Perform SSL/TLS handshake
+  */
+
+  do
+  {
+    error = SSLHandshake(conn);
+  }
+  while (error == errSSLWouldBlock);
+
+  if (error)
+  {
+    LogMessage(L_ERROR, "EncryptClient: %d", error);
+
+    con->http.error  = error;
+    con->http.status = HTTP_ERROR;
+
+    if (conn != NULL)
+      SSLDisposeContext(conn);
+
+    return (0);
+  }
+
+  LogMessage(L_DEBUG, "EncryptClient() %d Connection now encrypted.",
+             con->http.fd);
+  con->http.tls = conn;
+  return (1);
+
 #else
   return (0);
 #endif /* HAVE_GNUTLS */
@@ -2821,6 +2911,54 @@ pipe_command(client_t *con,		/* I - Client connection */
 }
 
 
+#if defined(HAVE_CDSASSL)
 /*
- * End of "$Id: client.c,v 1.91.2.38 2003/01/24 15:28:06 mike Exp $".
+ * 'CDSAReadFunc()' - Read function for CDSA decryption code.
+ */
+
+static OSStatus					/* O  - -1 on error, 0 on success */
+CDSAReadFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
+             void             *data,		/* I  - Data buffer */
+	     size_t           *dataLength)	/* IO - Number of bytes */
+{
+  ssize_t	bytes;				/* Number of bytes read */
+
+
+  bytes = recv((int)connection, data, *dataLength, 0);
+  if (bytes >= 0)
+  {
+    *dataLength = bytes;
+    return (0);
+  }
+  else
+    return (-1);
+}
+
+
+/*
+ * 'CDSAWriteFunc()' - Write function for CDSA encryption code.
+ */
+
+static OSStatus					/* O  - -1 on error, 0 on success */
+CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
+              const void       *data,		/* I  - Data buffer */
+	      size_t           *dataLength)	/* IO - Number of bytes */
+{
+  ssize_t bytes;
+
+
+  bytes = write((int)connection, data, *dataLength);
+  if (bytes >= 0)
+  {
+    *dataLength = bytes;
+    return (0);
+  }
+  else
+    return (-1);
+}
+#endif /* HAVE_CDSASSL */
+
+
+/*
+ * End of "$Id: client.c,v 1.91.2.39 2003/01/24 19:19:43 mike Exp $".
  */

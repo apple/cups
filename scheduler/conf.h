@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.36.2.12 2003/01/15 04:25:55 mike Exp $"
+ * "$Id: conf.h,v 1.36.2.13 2003/01/24 19:19:46 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -22,6 +22,7 @@
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  */
+
 
 /*
  * Log levels...
@@ -165,6 +166,10 @@ VAR char		ServerCertificate[1024]	VALUE("ssl/server.crt"),
 			ServerKey[1024]		VALUE("ssl/server.key");
 					/* Server key file */
 #endif /* HAVE_SSL */
+#ifdef HAVE_CDSASSL
+VAR CFArrayRef		ServerCertificatesArray	VALUE(NULL);
+					/* Array containing certificates */
+#endif /* HAVE_CDSASSL */
 
 
 /*
@@ -183,5 +188,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.36.2.12 2003/01/15 04:25:55 mike Exp $".
+ * End of "$Id: conf.h,v 1.36.2.13 2003/01/24 19:19:46 mike Exp $".
  */

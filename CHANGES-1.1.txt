@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- Added preliminary support for CDSA; patch provided by
+	  Apple.
 	- Implicit classes are now created from identical
 	  printer classes on the network.
 	- The lp command now supports a "-H restart" option to

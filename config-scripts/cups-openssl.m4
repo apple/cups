@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-openssl.m4,v 1.4.2.7 2003/01/17 15:30:27 mike Exp $"
+dnl "$Id: cups-openssl.m4,v 1.4.2.8 2003/01/24 19:19:41 mike Exp $"
 dnl
 dnl   OpenSSL/GNUTLS stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -25,6 +25,7 @@ dnl
 AC_ARG_ENABLE(ssl, [  --enable-ssl            turn on SSL/TLS support, default=yes])
 AC_ARG_ENABLE(openssl, [  --enable-openssl        use OpenSSL for SSL/TLS support, default=yes])
 AC_ARG_ENABLE(gnutls, [  --enable-gnutls         use GNU TLS for SSL/TLS support, default=yes])
+AC_ARG_ENABLE(cdsassl, [  --enable-cdsassl        use CDSA for SSL/TLS support, default=yes])
 AC_ARG_WITH(openssl-libs, [  --with-openssl-libs     set directory for OpenSSL library],
     LDFLAGS="-L$withval $LDFLAGS"
     DSOFLAGS="-L$withval $DSOFLAGS",)
@@ -36,7 +37,9 @@ AC_ARG_WITH(openssl-includes, [  --with-openssl-includes set directory for OpenS
 SSLLIBS=""
 
 if test x$enable_ssl != xno; then
-    if test x$enable_openssl != xno; then
+    dnl Check for the OpenSSL library first, which has precedence over
+    dnl CDSA and GNUTLS...
+    if test "x${SSLLIBS}" == "x" -a "x${enable_openssl}" != "xno"; then
 	AC_CHECK_HEADER(openssl/ssl.h,
 	    dnl Save the current libraries so the crypto stuff isn't always
 	    dnl included...
@@ -67,8 +70,17 @@ if test x$enable_ssl != xno; then
 	    LIBS="$SAVELIBS")
     fi
 
-    dnl If OpenSSL wasn't found, look for GNU TLS...
+    dnl If OpenSSL wasn't found, look for CDSA...
+    if test "x${SSLLIBS}" == "x" -a "x${enable_cdsassl}" != "xno"; then
+	if test $uname = Darwin; then
+	    AC_CHECK_HEADER(Security/SecureTransport.h,
+		[SSLLIBS="-framework CoreFoundation -framework Security"
+		 AC_DEFINE(HAVE_SSL)
+		 AC_DEFINE(HAVE_CDSASSL)])
+	fi
+    fi
 
+    dnl Then look for GNU TLS...
     if test "x${SSLLIBS}" == "x" -a "x${enable_gnutls}" != "xno"; then
 	AC_CHECK_HEADER(gnutls/gnutls.h,
 	    dnl Save the current libraries so the crypto stuff isn't always
@@ -93,5 +105,5 @@ AC_SUBST(EXPORT_SSLLIBS)
 
 
 dnl
-dnl End of "$Id: cups-openssl.m4,v 1.4.2.7 2003/01/17 15:30:27 mike Exp $".
+dnl End of "$Id: cups-openssl.m4,v 1.4.2.8 2003/01/24 19:19:41 mike Exp $".
 dnl
