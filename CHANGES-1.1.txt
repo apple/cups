@@ -7,9 +7,11 @@ CHANGES IN CUPS V1.1.19
 	  even if FileDevices is set to No.
 	- CUPS uses strerror() for hostname resolution errors,
 	  when it should have used hstrerror().
-	- The USB backend didn't sort the devices entries, so it
-	  could associate the wrong serial number with a
-	  printer.
+	- The USB backend no longer tries to guess the serial
+	  number of a device from the USB devices file; this
+	  means that printers that don't report their serial
+	  numbers in the device ID string will not be
+	  individually selectable.
 	- The pstops filter didn't handle page ranges properly
 	  when a page contained an embedded document.
 	- Added a partial translation of the web interface to

@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.18.2.22 2003/01/23 16:15:55 mike Exp $"
+ * "$Id: usb.c,v 1.18.2.23 2003/01/23 18:55:00 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -319,14 +319,7 @@ decode_device_id(int        port,		/* I - Port number */
   char	*attr,					/* 1284 attribute */
   	*delim,					/* 1284 delimiter */
 	*uriptr,				/* Pointer into URI */
-	line[1024];				/* Line from devices file */
-  FILE	*fp;					/* /proc/bus/usb/devices file */
-  int	current;				/* Current printer port */
-  char	serial_number[1024],			/* Serial number string */
-	temp[1024];				/* Temporary string */
-  int	i, j, k;				/* Looping vars */
-  int	num_blocks;				/* Number of blocks in devices file */
-  int	blocks[100][2];				/* Blocks in devices file */
+	serial_number[1024];			/* Serial number string */
 
 
  /*
@@ -372,96 +365,8 @@ decode_device_id(int        port,		/* I - Port number */
     if ((delim = strchr(serial_number, ';')) != NULL)
       *delim = '\0';
   }
-  else if ((fp = fopen("/proc/bus/usb/devices", "r")) != NULL)
-  {
-   /*
-    * No serial number in device ID string; try the devices file...
-    *
-    * Since the devices file may list the devices out-of-order, we need
-    * to first read all of the blocks in the file and sort them...
-    */
-
-    num_blocks = 0;
-
-    while (fgets(line, sizeof(line), fp) != NULL)
-    {
-      if (line[0] == 'T')
-      {
-        if ((attr = strstr(line, "Dev#=")) == NULL)
-	  continue;
-
-        blocks[num_blocks][0] = (int)ftell(fp);
-        blocks[num_blocks][1] = atoi(attr + 5);
-
-	num_blocks ++;
-
-	if (num_blocks >= 100)
-	  break;
-      }
-    }
-
-   /*
-    * Sort the blocks by device number...
-    */
-
-    for (i = 0; i < (num_blocks - 1); i ++)
-      for (j = i + 1; j < num_blocks; j ++)
-        if (blocks[j][1] < blocks[i][1])
-	{
-	  k            = blocks[j][0];
-	  blocks[j][0] = blocks[i][0];
-	  blocks[i][0] = k;
-
-	  k            = blocks[j][1];
-	  blocks[j][1] = blocks[i][1];
-	  blocks[i][1] = k;
-	}
-
-   /*
-    * Then re-scan the file for the right block...
-    */
-
+  else
     serial_number[0] = '\0';
-
-    for (current = 0, i = 0; !serial_number[0] && i < num_blocks; i ++)
-    {
-      fseek(fp, blocks[i][0], SEEK_SET);
-
-      while (fgets(line, sizeof(line), fp) != NULL)
-      {
-        if (line[0] == 'T')
-	  break;
-
-	if (line[0] == 'S' && (attr = strstr(line, "SerialNumber=")) != NULL)
-	{
-	 /*
-          * Copy serial number from line...
-	  */
-
-	  strlcpy(temp, attr + 13, sizeof(temp));
-	  if ((delim = strchr(temp, '\n')) != NULL)
-	    *delim = '\0';
-	}
-	else if (line[0] == 'I' && strstr(line, "Driver=usblp") != NULL &&
-        	 strstr(line, "Prot=02") != NULL)
-	{
-	 /*
-          * Found printer device; if current == port, then use it!
-	  */
-
-	  if (current == port)
-	  {
-	    strlcpy(serial_number, temp, sizeof(serial_number));
-	    break;
-	  }
-
-	  current ++;
-	}
-      }
-    }
-
-    fclose(fp);
-  }
 
  /*
   * Generate the device URI from the make_model and serial number strings.
@@ -839,5 +744,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb.c,v 1.18.2.22 2003/01/23 16:15:55 mike Exp $".
+ * End of "$Id: usb.c,v 1.18.2.23 2003/01/23 18:55:00 mike Exp $".
  */
