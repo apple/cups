@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.c,v 1.16.2.6 2002/03/26 19:03:24 mike Exp $"
+ * "$Id: textcommon.c,v 1.16.2.7 2002/05/21 19:21:29 mike Exp $"
  *
  *   Common text filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -78,11 +78,13 @@ static char *code_keywords[] =	/* List of known C/C++ keywords... */
 	  "class",
 	  "compl",
 	  "const",
+	  "const_cast",
 	  "continue",
 	  "default",
 	  "delete",
 	  "do",
 	  "double",
+	  "dynamic_cast",
 	  "else",
 	  "enum",
 	  "explicit",
@@ -113,6 +115,7 @@ static char *code_keywords[] =	/* List of known C/C++ keywords... */
 	  "signed",
 	  "sizeof",
 	  "static",
+	  "static_cast",
 	  "struct",
 	  "switch",
 	  "template",
@@ -493,6 +496,7 @@ TextMain(const char *name,	/* I - Name of filter */
   int		i,		/* Looping var */
 		ch,		/* Current char from file */
 		lastch,		/* Previous char from file */
+		nextch,		/* Next char from file */
 		attr,		/* Current attribute */
 		line,		/* Current line */
   		column,		/* Current column */
@@ -702,6 +706,27 @@ TextMain(const char *name,	/* I - Name of filter */
 	  keycol = column;
           break;
 
+      case 0x0d :		/* CR */
+#ifndef __APPLE__
+         /*
+	  * All but MacOS/Darwin treat CR as was intended by ANSI
+	  * folks, namely to move to column 0/1.  Some programs still
+	  * use this to do boldfacing and underlining...
+	  */
+
+          column = 0;
+          break;
+#else
+         /*
+	  * MacOS/Darwin still need to treat CR as a line ending.
+	  */
+
+          if ((nextch = getc(fp)) != 0x0a)
+	    ungetc(nextch, fp);
+	  else
+	    ch = nextch;
+#endif /* !__APPLE__ */
+
       case 0x0a :		/* LF - output current line */
           if (PrettyPrint && keyptr > keyword)
 	  {
@@ -792,10 +817,6 @@ TextMain(const char *name,	/* I - Name of filter */
             WritePage();
             page_column = 0;
           }
-          break;
-
-      case 0x0d :		/* CR */
-          column = 0;
           break;
 
       case 0x1b :		/* Escape sequence */
@@ -1156,5 +1177,5 @@ getutf8(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: textcommon.c,v 1.16.2.6 2002/03/26 19:03:24 mike Exp $".
+ * End of "$Id: textcommon.c,v 1.16.2.7 2002/05/21 19:21:29 mike Exp $".
  */

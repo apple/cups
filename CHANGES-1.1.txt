@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- Updated the text filter to support the const_cast,
+	  dynamic_cast, and static_cast keywords in ISO C++.
 	- Now use strlcat() and strlcpy() (or emulation
 	  functions) for easier string/buffer protection.
 	- The auto-generated printcap/printers.conf files now
