@@ -1,9 +1,9 @@
 #
-# "$Id: pstoraster.convs,v 1.1.2.1 2001/12/29 19:04:32 mike Exp $"
+# "$Id: pstoraster.convs,v 1.1.2.2 2002/04/21 16:11:29 mike Exp $"
 #
-#   MIME converts file for the Common UNIX Printing System (CUPS).
+#   MIME converts file for Ghostscript.
 #
-#   Copyright 1997-2001 by Easy Software Products.
+#   Copyright 1997-2002 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -25,5 +25,5 @@
 application/vnd.cups-postscript	application/vnd.cups-raster	100	pstoraster
 
 #
-# End of "$Id: pstoraster.convs,v 1.1.2.1 2001/12/29 19:04:32 mike Exp $".
+# End of "$Id: pstoraster.convs,v 1.1.2.2 2002/04/21 16:11:29 mike Exp $".
 #
