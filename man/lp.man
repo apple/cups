@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lp.man,v 1.6.2.4 2003/01/07 18:27:06 mike Exp $"
+.\" "$Id: lp.man,v 1.6.2.5 2003/05/01 18:42:00 mike Exp $"
 .\"
 .\"   lp/cancel man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lp 1 "Common UNIX Printing System" "25 September 2001" "Easy Software Products"
+.TH lp 1 "Common UNIX Printing System" "1 May 2003" "Easy Software Products"
 .SH NAME
 lp \- print files
 .br
@@ -78,7 +78,8 @@ cancel \- cancel jobs
 .I destination-id
 ]
 .SH DESCRIPTION
-\fBlp\fR submits files for printing or alters a pending job.
+\fBlp\fR submits files for printing or alters a pending job. Use
+a filename of "-" to force printing from the standard input.
 .LP
 \fBcancel\fR cancels existing print jobs. The \fI-a\fR option will remove
 all jobs from the specified destination.
@@ -164,5 +165,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2003 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lp.man,v 1.6.2.4 2003/01/07 18:27:06 mike Exp $".
+.\" End of "$Id: lp.man,v 1.6.2.5 2003/05/01 18:42:00 mike Exp $".
 .\"

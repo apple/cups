@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc4
 
+	- The lp command did not accept "-" for printing from
+	  the standard input as required by POSIX 1003.1 (STR
+	  #59)
 	- Added the job-originating-host-name information for
 	  the page_log file documentation in the SAM (STR #31)
 	- The German web interface templates did not use the

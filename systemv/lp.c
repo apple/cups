@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.29.2.13 2003/04/10 18:38:07 mike Exp $"
+ * "$Id: lp.c,v 1.29.2.14 2003/05/01 18:42:01 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -124,7 +124,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   job_id      = 0;
 
   for (i = 1; i < argc; i ++)
-    if (argv[i][0] == '-')
+    if (argv[i][0] == '-' && argv[i][1])
       switch (argv[i][1])
       {
         case 'E' : /* Encrypt */
@@ -452,6 +452,17 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    fprintf(stderr, "lp: Unknown option \'%c\'!\n", argv[i][1]);
 	    return (1);
       }
+    else if (!strcmp(argv[i], "-"))
+    {
+      if (num_files || job_id)
+      {
+        fputs("lp: Error - cannot print from stdin if files or a job ID are "
+	      "provided!\n", stderr);
+	return (1);
+      }
+
+      break;
+    }
     else if (num_files < 1000 && job_id == 0)
     {
      /*
@@ -729,5 +740,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.29.2.13 2003/04/10 18:38:07 mike Exp $".
+ * End of "$Id: lp.c,v 1.29.2.14 2003/05/01 18:42:01 mike Exp $".
  */
