@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.58 2001/05/21 21:14:12 mike Exp $"
+ * "$Id: pstops.c,v 1.59 2001/05/21 21:16:15 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -312,7 +312,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     while (psgets(line, sizeof(line), fp) != NULL)
       if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
-          strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
+          strncmp(line, "%%BeginDocument ", 16) == 0 ||	/* Adobe Acrobat BUG */
+	  strncmp(line, "%!PS-Adobe", 10) == 0)		/* Non-conforming EPS */
         level ++;
       else if (strncmp(line, "%%EndDocument", 13) == 0 && level > 0)
         level --;
@@ -994,5 +995,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.58 2001/05/21 21:14:12 mike Exp $".
+ * End of "$Id: pstops.c,v 1.59 2001/05/21 21:16:15 mike Exp $".
  */
