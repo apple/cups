@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.19 2001/10/26 03:16:48 mike Exp $"
+# "$Id: Makefile,v 1.20 2002/03/08 19:18:49 mike Exp $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -59,10 +59,17 @@ clean:
 
 
 #
+# Dummy depend target...
+#
+
+depend:
+
+
+#
 # Install files...
 #
 
-install:
+install:	all
 	$(INSTALL_DIR) $(MANDIR)/man1
 	for file in $(MAN1); do \
 		$(INSTALL_MAN) $$file $(MANDIR)/man1/`basename $$file man`1; \
@@ -110,5 +117,5 @@ install:
 
 
 #
-# End of "$Id: Makefile,v 1.19 2001/10/26 03:16:48 mike Exp $".
+# End of "$Id: Makefile,v 1.20 2002/03/08 19:18:49 mike Exp $".
 #

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.42 2002/02/12 19:05:36 mike Exp $"
+# "$Id: Makefile,v 1.43 2002/03/08 19:18:46 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -51,6 +51,17 @@ clean:
 		echo Cleaning in $$dir... ;\
 		(cd $$dir; $(MAKE) $(MFLAGS) clean) || exit 1;\
 	done
+
+#
+# Make dependencies
+#
+
+depend:
+	for dir in $(DIRS); do\
+		echo Making dependencies in $$dir... ;\
+		(cd $$dir; $(MAKE) $(MFLAGS) depend) || exit 1;\
+	done
+
 
 #
 # Install object and target files...
@@ -144,5 +155,5 @@ tardist:
 	epm $(EPMFLAGS) -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.42 2002/02/12 19:05:36 mike Exp $".
+# End of "$Id: Makefile,v 1.43 2002/03/08 19:18:46 mike Exp $".
 #

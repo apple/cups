@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.29 2002/01/02 17:59:18 mike Exp $"
+# "$Id: Makefile,v 1.30 2002/03/08 19:18:52 mike Exp $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -46,10 +46,18 @@ clean:
 
 
 #
+# Update dependencies (without system header dependencies...)
+#
+
+depend:
+	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c) >/dev/null 2>&1
+
+
+#
 # Install all targets...
 #
 
-install:
+install:	all
 	$(INSTALL_DIR) $(BINDIR)
 	$(INSTALL_BIN) accept $(SBINDIR)
 	$(RM) $(SBINDIR)/reject
@@ -81,8 +89,6 @@ accept:	accept.o ../cups/$(LIBCUPS)
 	$(LN) accept enable
 	$(LN) accept disable
 
-accept.o:	../cups/cups.h
-
 
 #
 # cancel
@@ -91,8 +97,6 @@ accept.o:	../cups/cups.h
 cancel:	cancel.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cancel cancel.o $(LIBS)
-
-cancel.o:	../cups/cups.h
 
 
 #
@@ -103,8 +107,6 @@ cupsaddsmb:	cupsaddsmb.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cupsaddsmb cupsaddsmb.o $(LIBS)
 
-cupsaddsmb.o:	../cups/cups.h ../cups/string.h
-
 
 #
 # lp
@@ -113,8 +115,6 @@ cupsaddsmb.o:	../cups/cups.h ../cups/string.h
 lp:	lp.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lp lp.o $(LIBS)
-
-lp.o:	../cups/cups.h
 
 
 #
@@ -125,8 +125,6 @@ lpadmin:	lpadmin.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lpadmin lpadmin.o $(LIBZ) $(LIBS)
 
-lpadmin.o:	../cups/cups.h
-
 
 #
 # lpinfo
@@ -135,8 +133,6 @@ lpadmin.o:	../cups/cups.h
 lpinfo:	lpinfo.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lpinfo lpinfo.o $(LIBS)
-
-lpinfo.o:	../cups/cups.h
 
 
 #
@@ -147,8 +143,6 @@ lpmove:	lpmove.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lpmove lpmove.o $(LIBS)
 
-lpmove.o:	../cups/cups.h
-
 
 #
 # lpoptions
@@ -157,8 +151,6 @@ lpmove.o:	../cups/cups.h
 lpoptions:	lpoptions.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lpoptions lpoptions.o $(LIBZ) $(LIBS)
-
-lpoptions.o:	../cups/cups.h
 
 
 #
@@ -169,8 +161,6 @@ lppasswd:	lppasswd.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lppasswd lppasswd.o $(LIBZ) $(LIBS)
 
-lppasswd.o:	../cups/cups.h ../cups/md5.h ../cups/string.h ../config.h
-
 
 #
 # lpstat
@@ -180,11 +170,14 @@ lpstat:	lpstat.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lpstat lpstat.o $(LIBS)
 
-lpstat.o:	../cups/cups.h
-
-
-$(OBJS):	../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.29 2002/01/02 17:59:18 mike Exp $".
+# Dependencies...
+#
+
+include Dependencies
+
+
+#
+# End of "$Id: Makefile,v 1.30 2002/03/08 19:18:52 mike Exp $".
 #

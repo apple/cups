@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.36 2002/01/02 17:59:09 mike Exp $"
+# "$Id: Makefile,v 1.37 2002/03/08 19:18:51 mike Exp $"
 #
 #   GNU Ghostscript makefile for the Common UNIX Printing System (CUPS).
 #
@@ -372,6 +372,19 @@ clean:
 
 
 #
+# Generate dependencies for Ghostscript source files...
+# (this is a little complicated because there are too many source files)
+#
+
+depend:
+	rm -f Dependencies
+	touch Dependencies
+	for file in $(OBJS:.o=.c); do \
+		makedepend -a -Y -I.. -fDependencies $$file >/dev/null 2>&1; \
+	done
+
+
+#
 # Install files...
 #
 
@@ -428,27 +441,12 @@ purify:	pstoraster.o libgs.a ../Makedefs ../cups/$(LIBCUPS)
 
 
 #
-# Generate dependencies for Ghostscript source files...
-#
-
-depend:
-	rm -f Dependencies
-	touch Dependencies
-	for file in $(OBJS:.o=.c); do \
-		echo $$file; \
-		makedepend -a -fDependencies -I.. -Y $$file >/dev/null 2>&1; \
-	done
-
-
-#
 # Dependencies...
 #
-
-$(OBJS):	../Makedefs
 
 include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.36 2002/01/02 17:59:09 mike Exp $".
+# End of "$Id: Makefile,v 1.37 2002/03/08 19:18:51 mike Exp $".
 #

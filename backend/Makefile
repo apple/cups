@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.31 2002/03/08 15:00:40 mike Exp $"
+# "$Id: Makefile,v 1.32 2002/03/08 19:18:46 mike Exp $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -51,7 +51,7 @@ clean:
 #
 
 depend:
-	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c)
+	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c) >/dev/null 2>&1
 
 
 #
@@ -140,5 +140,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.31 2002/03/08 15:00:40 mike Exp $".
+# End of "$Id: Makefile,v 1.32 2002/03/08 19:18:46 mike Exp $".
 #

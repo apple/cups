@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.66 2002/03/01 19:53:27 mike Exp $"
+# "$Id: Makefile,v 1.67 2002/03/08 19:18:48 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -63,6 +63,14 @@ all:	$(TARGETS)
 
 clean:
 	$(RM) $(OBJS) $(TARGETS) `basename $(LIBCUPS) .2`
+
+
+#
+# Update dependencies (without system header dependencies...)
+#
+
+depend:
+	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c) >/dev/null 2>&1
 
 
 #
@@ -160,23 +168,6 @@ cups_C.h:	../locale/C/cups_C
 	$(RM) cups_C.h
 	$(AWK) '{print "\"" $$0 "\","}' < ../locale/C/cups_C > cups_C.h
 
-dest.o:		cups.h http.h ipp.h language.h string.h
-emit.o:		ppd.h
-encode.o:	cups.h ipp.h string.h
-http.o:		http.h ipp.h md5.h string.h
-ipp.o:		http.h ipp.h string.h language.h
-language.o:	cups_C.h language.h string.h
-mark.o:		ppd.h
-md5.o:		md5.h
-options.o:	cups.h
-page.o:		ppd.h
-ppd.o:		language.h ppd.h
-snprintf.o:	string.h
-string.o:	string.h
-tempfile.o:	cups.h string.h
-usersys.o:	cups.h
-util.o:		cups.h http.h ipp.h
-
 
 #
 # testhttp (dependency on static CUPS library is intentional)
@@ -185,8 +176,6 @@ util.o:		cups.h http.h ipp.h
 testhttp:	testhttp.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testhttp.o libcups.a $(NETLIBS) $(SSLLIBS)
-
-testhttp.o:	http.h
 
 
 #
@@ -197,14 +186,19 @@ testppd:	testppd.o ppd-debug.o language.o mark.o page.o
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testppd.o ppd-debug.o language.o mark.o page.o
 
-testppd.o:	ppd.h
-ppd-debug.o:	ppd.c language.h ppd.h
+ppd-debug.o:	ppd.c ppd.h string.h ../config.h language.h debug.h
 	echo Compiling $< with debugging...
 	$(CC) $(OPTIM) $(CFLAGS) -DDEBUG -c -o $@ $<
 
-$(OBJS):	../Makedefs ../config.h
 
 
 #
-# End of "$Id: Makefile,v 1.66 2002/03/01 19:53:27 mike Exp $".
+# Dependencies...
+#
+
+include Dependencies
+
+
+#
+# End of "$Id: Makefile,v 1.67 2002/03/08 19:18:48 mike Exp $".
 #
