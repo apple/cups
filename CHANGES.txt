@@ -1,4 +1,4 @@
-CHANGES.txt - 04/30/2001
+CHANGES.txt - 05/01/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.7
@@ -189,6 +189,9 @@ CHANGES IN CUPS V1.1.7
 	- cupsEncodeOptions() would encode names of 0 length and
 	  cupsAddOption() and cupsParseOptions() would add names
 	  of 0 length.
+	- The scheduler might block waiting for status messages
+	  after starting a new print job. Thanks to Florent
+	  Guiliani for finding this bug!
 
 
 CHANGES IN CUPS V1.1.6-3
