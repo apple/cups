@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.16 2002/05/15 20:49:56 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.17 2002/05/16 14:02:25 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -366,7 +366,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Apple uses RBI comments for various non-PPD options...
   */
 
-  printf("%%%%RBINumCopies: %d\n", Copies);
+  printf("%%RBINumCopies: %d\n", Copies);
 
  /*
   * Figure out if we should use ESPshowpage or not...
@@ -1593,5 +1593,5 @@ start_nup(int number,		/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.16 2002/05/15 20:49:56 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.17 2002/05/16 14:02:25 mike Exp $".
  */
