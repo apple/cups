@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.77 2001/02/14 15:39:52 mike Exp $"
+dnl "$Id: configure.in,v 1.78 2001/02/14 15:48:48 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -361,6 +361,10 @@ else
 			fi
 			OPTIM="-Ae +DAportable $OPTIM"
 			GSOPTIM="-Ae +DAportable $GSOPTIM"
+			if test $PICFLAG = 1; then
+				OPTIM="+z $OPTIM"
+				GSOPTIM="+z $GSOPTIM"
+			fi
 			;;
 		SunOS*)
 			# Solaris
@@ -653,5 +657,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.77 2001/02/14 15:39:52 mike Exp $".
+dnl End of "$Id: configure.in,v 1.78 2001/02/14 15:48:48 mike Exp $".
 dnl
