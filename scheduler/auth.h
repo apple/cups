@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.h,v 1.20 2002/03/27 18:55:38 mike Exp $"
+ * "$Id: auth.h,v 1.21 2002/06/11 18:33:58 mike Exp $"
  *
  *   Authorization definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -129,9 +129,11 @@ extern void		DenyIP(location_t *loc, unsigned address,
 			       unsigned netmask);
 extern location_t	*FindBest(const char *path, http_state_t state);
 extern location_t	*FindLocation(const char *location);
+extern char		*GetMD5Passwd(const char *username, const char *group,
+			              char passwd[33]);
 extern http_status_t	IsAuthorized(client_t *con);
 
 
 /*
- * End of "$Id: auth.h,v 1.20 2002/03/27 18:55:38 mike Exp $".
+ * End of "$Id: auth.h,v 1.21 2002/06/11 18:33:58 mike Exp $".
  */
