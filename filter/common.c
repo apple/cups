@@ -1,5 +1,5 @@
 /*
- * "$Id: common.c,v 1.1 1999/03/23 20:10:17 mike Exp $"
+ * "$Id: common.c,v 1.2 1999/03/24 13:59:46 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -39,7 +39,7 @@
 int	Orientation = 0,	/* 0 = portrait, 1 = landscape, etc. */
 	Duplex = 0,		/* Duplexed? */
 	LanguageLevel = 1,	/* Language level of printer */
-	ColorDevice = 0;	/* Do color text? */
+	ColorDevice = 1;	/* Do color text? */
 float	PageLeft = 18.0f,	/* Left margin */
 	PageRight = 594.0f,	/* Right margin */
 	PageBottom = 36.0f,	/* Bottom margin */
@@ -243,5 +243,5 @@ SetCommonOptions(int           num_options,
 
 
 /*
- * End of "$Id: common.c,v 1.1 1999/03/23 20:10:17 mike Exp $".
+ * End of "$Id: common.c,v 1.2 1999/03/24 13:59:46 mike Exp $".
  */

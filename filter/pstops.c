@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.10 1999/03/23 18:39:07 mike Exp $"
+ * "$Id: pstops.c,v 1.11 1999/03/24 13:59:47 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -58,7 +58,7 @@
  */
 
 int	NumPages = 0;		/* Number of pages in file */
-size_t	Pages[MAX_PAGES];	/* Offsets to each page */
+long	Pages[MAX_PAGES];	/* Offsets to each page */
 char	PageLabels[MAX_PAGES][64];
 				/* Page labels */
 char	*PageRanges = NULL;	/* Range of pages selected */
@@ -67,14 +67,12 @@ int	Order = 0,		/* 0 = normal, 1 = reverse pages */
 	Flip = 0,		/* Flip/mirror pages */
 	Orientation = 0,	/* 0 = Portrait, 1 = Landscape, etc. */
 	NUp = 1,		/* Number of pages on each sheet (1, 2, 4) */
-	ColorDevice = 0,	/* Color printer? */
+	LanguageLevel = 1,	/* LanguageLevel of printer */
+	ColorDevice = 1,	/* Color printer? */
 	Collate = 0,		/* Collate copies? */
-	Copies = 1;		/* Number of copies */
-float	PageLeft = 18.0f,	/* Left margin */
-	PageRight = 594.0f,	/* Right margin */
-	PageBottom = 36.0f,	/* Bottom margin */
-	PageTop = 756.0f,	/* Top margin */
-	PageWidth = 612.0f,	/* Total page width */
+	Copies = 1,		/* Number of copies */
+	Duplex = 0;		/* Duplexed output? */
+float	PageWidth = 612.0f,	/* Total page width */
 	PageLength = 792.0f;	/* Total page length */
 
 
@@ -84,17 +82,12 @@ float	PageLeft = 18.0f,	/* Left margin */
 
 static int	check_range(int page);
 static void	copy_bytes(FILE *fp, size_t length);
+static void	end_nup(int number);
 static char	*psgets(char *buf, size_t len, FILE *fp);
+static void	start_nup(int number);
 
 
 
-  if (Landscape)
-  {
-    if (Duplex && (NumPages & 1) == 0)
-      printf("0 %.1f translate -90 rotate\n", PageWidth);
-    else
-      printf("%.1f 0 translate 90 rotate\n", PageLength);
-  }
 
 
 /*
@@ -106,12 +99,20 @@ main(int  argc,			/* I - Number of command-line arguments */
      char *argv[])		/* I - Command-line arguments */
 {
   FILE		*fp;		/* Print file */
-		*temp;		/* Temporary page cache */
+  float		t;		/* Swap variable */
   ppd_file_t	*ppd;		/* PPD file */
   ppd_size_t	*pagesize;	/* Current page size */
   int		num_options;	/* Number of print options */
   cups_option_t	*options;	/* Print options */
   char		*val;		/* Option value */
+  char		tempfile[255];	/* Temporary file name */
+  FILE		*temp;		/* Temporary file */
+  int		number;		/* Page number */
+  int		slowcollate;	/* 1 if we need to collate manually */
+  int		sloworder;	/* 1 if we need to order manually */
+  char		line[8192];	/* Line buffer */
+  float		g;		/* Gamma correction value */
+  float		b;		/* Brightness factor */
 
 
   if (argc < 6 || argc > 7)
@@ -144,6 +145,9 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Process command-line options and write the prolog...
   */
 
+  g = 1.0;
+  b = 1.0;
+
   ppd = ppdOpenFile(getenv("PPD"));
 
   options     = NULL;
@@ -156,32 +160,19 @@ main(int  argc,			/* I - Number of command-line arguments */
   {
     PageWidth  = pagesize->width;
     PageLength = pagesize->length;
-    PageTop    = pagesize->top;
-    PageBottom = pagesize->bottom;
-    PageLeft   = pagesize->left;
-    PageRight  = pagesize->right;
   }
 
   if (ppd != NULL)
-    ColorDevice = ppd->color_device;
+  {
+    ColorDevice   = ppd->color_device;
+    LanguageLevel = ppd->language_level;
+  }
 
   if ((val = cupsGetOption("page-ranges", num_options, options)) != NULL)
     PageRanges = val;
 
   if ((val = cupsGetOption("page-set", num_options, options)) != NULL)
     PageSet = val;
-
-  if ((val = cupsGetOption("page-left", num_options, options)) != NULL)
-    PageLeft = (float)atof(val);
-
-  if ((val = cupsGetOption("page-right", num_options, options)) != NULL)
-    PageRight = PageWidth - (float)atof(val);
-
-  if ((val = cupsGetOption("page-bottom", num_options, options)) != NULL)
-    PageBottom = (float)atof(val);
-
-  if ((val = cupsGetOption("page-top", num_options, options)) != NULL)
-    PageTop = PageLength - (float)atof(val);
 
   if ((val = cupsGetOption("landscape", num_options, options)) != NULL)
     Orientation = 1;
@@ -202,6 +193,13 @@ main(int  argc,			/* I - Number of command-line arguments */
       Orientation ^= 1;
   }
 
+  if (Orientation & 1)
+  {
+    t          = PageWidth;
+    PageWidth  = PageLength;
+    PageLength = t;
+  }
+
   if ((val = cupsGetOption("sides", num_options, options)) != NULL &&
       strncmp(val, "two-", 4) == 0)
     Duplex = 1;
@@ -210,216 +208,279 @@ main(int  argc,			/* I - Number of command-line arguments */
       strcmp(val, "NoTumble") == 0)
     Duplex = 1;
 
-  write_prolog(argv[3], argv[2]);
+  if ((val = cupsGetOption("copies", num_options, options)) != NULL)
+    Copies = atoi(val);
 
+  if ((val = cupsGetOption("multiple-document-handling", num_options, options)) != NULL)
+  {
+   /*
+    * This IPP attribute is unnecessarily complicated...
+    *
+    *   single-document, separate-documents-collated-copies, and
+    *   single-document-new-sheet all require collated copies.
+    *
+    *   separate-documents-collated-copies allows for uncollated copies.
+    */
 
-  int			i, n, nfiles;
-  char			*opt;
-  char			tempfile[255];
-  FILE			*temp;
-  char			buffer[8192];
-  float			gammaval[4];
-  int			brightness[4];
-  int			nup;
-  int			landscape;
-  PDInfoStruct		*info;
-  PDSizeTableStruct	*size;
-  time_t		modtime;
+    Collate = strcmp(val, "separate-documents-collated-copies") != 0;
+  }
 
+  if ((val = cupsGetOption("Collate", num_options, options)) != NULL &&
+      strcmp(val, "True") == 0)
+    Collate = 1;
 
-  gammaval[0]   = 0.0;
-  gammaval[1]   = 0.0;
-  gammaval[2]   = 0.0;
-  gammaval[3]   = 0.0;
-  brightness[0] = 100;
-  brightness[1] = 100;
-  brightness[2] = 100;
-  brightness[3] = 100;
+  if ((val = cupsGetOption("OutputOrder", num_options, options)) != NULL &&
+      strcmp(val, "Reverse") == 0)
+    Order = 1;
 
-  nup       = 1;
-  landscape = 0;
+  if ((val = cupsGetOption("number-up", num_options, options)) != NULL)
+    NUp = atoi(val);
 
-  for (i = 1, nfiles = 0; i < argc; i ++)
-    if (argv[i][0] == '-')
-      for (opt = argv[i] + 1; *opt != '\0'; opt ++)
-        switch (*opt)
-        {
-          default :
-          case 'h' : /* Help */
-              usage();
-              break;
+  if ((val = cupsGetOption("gamma", num_options, options)) != NULL)
+    g = atoi(val) * 0.001f;
 
-          case 'P' : /* Printer */
-              i ++;
-              if (i >= argc)
-                usage();
+  if ((val = cupsGetOption("brightness", num_options, options)) != NULL)
+    b = atoi(val) * 0.01f;
 
-              PDLocalReadInfo(argv[i], &info, &modtime);
-              size = PDFindPageSize(info, PD_SIZE_CURRENT);
+ /*
+  * See if we have to filter the fast or slow way...
+  */
 
-              PrintColor  = strncasecmp(info->printer_class, "Color", 5) == 0;
-              PrintWidth  = 72.0 * size->width;
-              PrintLength = 72.0 * size->length;
+  if (ppdFindOption(ppd, "Collate") == NULL && Collate && Copies > 1)
+    slowcollate = 1;
+  else
+    slowcollate = 0;
 
-	      memcpy(ColorProfile, info->active_status->color_profile,
-	             sizeof(ColorProfile));
-              break;
+  if (ppdFindOption(ppd, "OutputOrder") == NULL && Order)
+    sloworder = 1;
+  else
+    sloworder = 0;
 
-          case 'l' : /* Landscape printing... */
-              landscape = 1;
-              break;
+ /*
+  * If we need to filter slowly, then create a temporary file for page data...
+  *
+  * If the temp file can't be created, then we'll ignore the collating/output
+  * order options...
+  */
 
-          case '1' : /* 1-up printing... */
-              nup = 1;
-              break;
-          case '2' : /* 2-up printing... */
-              nup = 2;
-              break;
-          case '4' : /* 4-up printing... */
-              nup = 4;
-              break;
+  if (sloworder || slowcollate)
+  {
+    temp = fopen(tmpnam(tempfile), "wb+");
 
-          case 'f' : /* Flip pages */
-              PrintFlip = 1;
-              break;
+    if (temp == NULL)
+      slowcollate = sloworder = 0;
+  }
 
-          case 'e' : /* Print even pages */
-              PrintEvenPages = 1;
-              PrintOddPages  = 0;
-              break;
-          case 'o' : /* Print odd pages */
-              PrintEvenPages = 0;
-              PrintOddPages  = 1;
-              break;
-          case 'r' : /* Print pages reversed */
-              PrintReversed = 1;
-              break;
-          case 'p' : /* Print page range */
-              PrintRange = opt + 1;
-              opt += strlen(opt) - 1;
-              break;
-          case 'D' : /* Debug ... */
-              Verbosity ++;
-              break;
+ /*
+  * Write any "exit server" options that have been selected...
+  */
 
-          case 'g' :	/* Gamma correction */
-	      i ++;
-	      if (i < argc)
-	        switch (sscanf(argv[i], "%f,%f,%f,%f", gammaval + 0,
-	                       gammaval + 1, gammaval + 2, gammaval + 3))
-	        {
-	          case 1 :
-	              gammaval[1] = gammaval[0];
-	          case 2 :
-	              gammaval[2] = gammaval[1];
-	              gammaval[3] = gammaval[1];
-	              break;
-	        };
-	      break;
+  ppdEmit(ppd, stdout, PPD_ORDER_EXIT);
 
-          case 'b' :	/* Brightness */
-	      i ++;
-	      if (i < argc)
-	        switch (sscanf(argv[i], "%d,%d,%d,%d", brightness + 0,
-	                       brightness + 1, brightness + 2, brightness + 3))
-	        {
-	          case 1 :
-	              brightness[1] = brightness[0];
-	          case 2 :
-	              brightness[2] = brightness[1];
-	              brightness[3] = brightness[1];
-	              break;
-	        };
-	      break;
+ /*
+  * Write any JCL commands that are needed to print PostScript code...
+  */
 
-          case 'c' : /* Color profile */
-              i ++;
-              if (i < argc)
-                sscanf(argv[i], "%f,%f,%f,%f,%f,%f",
-                       ColorProfile + 0,
-                       ColorProfile + 1,
-                       ColorProfile + 2,
-                       ColorProfile + 3,
-                       ColorProfile + 4,
-                       ColorProfile + 5);
-              break;
-        }
-    else
+  ppdEmit(ppd, stdout, PPD_ORDER_JCL);
+
+  if (ppd != NULL && ppd->jcl_begin && ppd->jcl_ps)
+  {
+    fputs((char *)ppd->jcl_begin, stdout);
+    fputs((char *)ppd->jcl_ps, stdout);
+  }
+
+ /*
+  * Read the first line to see if we have DSC comments...
+  */
+
+  if (psgets(line, sizeof(line), fp) == NULL)
+  {
+    fputs("ERROR: Empty print file!\n", stderr);
+    ppdClose(ppd);
+    return (1);
+  }
+
+ /*
+  * Start sending the document with any commands needed...
+  */
+
+  puts(line);
+
+  ppdEmit(ppd, stdout, PPD_ORDER_DOCUMENT);
+  ppdEmit(ppd, stdout, PPD_ORDER_ANY);
+  ppdEmit(ppd, stdout, PPD_ORDER_PROLOG);
+
+  if (NUp > 1)
+    puts("userdict begin\n"
+         "/ESPshowpage /showpage load def\n"
+         "/showpage { } def\n"
+         "end");
+
+  if (g != 1.0 || b != 1.0)
+    printf("{ neg 1 add %.3f exp neg 1 add %.3f mul } bind settransfer\n", g, b);
+
+  if (Copies > 1 && (!Collate || !slowcollate))
+    printf("/#copies %d def\n", Copies);
+
+  if (strncmp(line, "%!PS-Adobe-", 11) == 0)
+  {
+   /*
+    * OK, we have DSC comments; read until we find a %%Page comment...
+    */
+
+    while (psgets(line, sizeof(line), fp) != NULL)
+      if (strncmp(line, "%%Page:", 7) == 0)
+        break;
+      else
+        puts(line);
+
+   /*
+    * Then read all of the pages, filtering as needed...
+    */
+
+    for (;;)
     {
-      if (landscape && nfiles == 0)
+      if (strncmp(line, "%%Page:", 7) == 0)
       {
-	n           = PrintWidth;
-	PrintWidth  = PrintLength;
-	PrintLength = n;
-      };
+        if (sscanf(line, "%*s%*s%d", &number) == 1)
+	{
+	  if (!check_range(number))
+	  {
+	    while (psgets(line, sizeof(line), fp) != NULL)
+	      if (strncmp(line, "%%Page:", 7) == 0)
+	        break;
+            continue;
+          }
 
-      if (nup == 1 && PrintEvenPages && PrintOddPages && PrintRange == NULL &&
-	  !PrintReversed)
-      {
-       /*
-	* Just cat the file to stdout - we don't need to to any processing.
-	*/
+          if (!sloworder && NumPages > 0)
+	    end_nup(NumPages - 1);
 
-        print_header(gammaval, brightness);
+	  if (slowcollate || sloworder)
+	    Pages[NumPages] = ftell(temp);
 
-        if ((temp = fopen(argv[i], "r")) != NULL)
-        {
-	  copy_bytes(temp, -1);
-          fclose(temp);
-        };
+	  NumPages ++;
+
+          if (!sloworder)
+	  {
+	    ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
+	    start_nup(NumPages - 1);
+	  }
+	}
       }
       else
       {
-       /*
-        * Filter the file as necessary...
-        */
+        if (!sloworder)
+	  puts(line);
 
-        print_file(argv[i], gammaval, brightness, nup, landscape);
-      };
+	if (slowcollate || sloworder)
+	{
+	  fputs(line, temp);
+	  putc('\n', temp);
+	}
+      }
 
-      nfiles ++;
-    };
-
-  if (nfiles == 0)
-  {
-    if (landscape)
-    {
-      n           = PrintWidth;
-      PrintWidth  = PrintLength;
-      PrintLength = n;
-    };
-
-    if (nup == 1 && PrintEvenPages && PrintOddPages && PrintRange == NULL &&
-	!PrintReversed)
-    {
-     /*
-      * Just cat stdin to stdout - we don't need to to any processing.
-      */
-
-      print_header(gammaval, brightness);
-
-      copy_bytes(stdin, -1);
+      if (psgets(line, sizeof(line), fp) == NULL)
+        break;
     }
-    else
+
+    if (!sloworder)
+      end_nup((NumPages + NUp - 1) & (NUp - 1));
+
+    if (slowcollate || sloworder)
     {
-     /*
-      * Copy stdin to a temporary file and filter the temporary file.
-      */
+      Pages[NumPages] = ftell(temp);
 
-      if ((temp = fopen(tmpnam(tempfile), "w")) == NULL)
-	exit(ERR_DATA_BUFFER);
+      if (!sloworder)
+      {
+        while (Copies > 1)
+	{
+	  rewind(temp);
 
-      while (fgets(buffer, sizeof(buffer), stdin) != NULL)
-	fputs(buffer, temp);
-      fclose(temp);
+	  for (number = 0; number < NumPages; number ++)
+	  {
+	    ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
+	    start_nup(number);
+	    copy_bytes(temp, Pages[number + 1] - Pages[number]);
+	    end_nup(number);
+	  }
 
-      print_file(tempfile, gammaval, brightness, nup, landscape);
+	  Copies --;
+	}
+      }
+      else
+      {
+        if (!slowcollate)
+	  Copies = 1;
 
-      unlink(tempfile);
-    };
-  };
+        while (Copies > 0)
+	{
+	  for (number = NumPages - 1; number >= 0; number --)
+	  {
+	    ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
+	    start_nup(NumPages - 1 - number);
+	    fseek(temp, Pages[number], SEEK_SET);
+	    copy_bytes(temp, Pages[number + 1] - Pages[number]);
+	    end_nup(NumPages - 1 - number);
+	  }
+
+	  Copies --;
+	}
+      }
+    }
+  }
+  else
+  {
+   /*
+    * No DSC comments - write any page commands and then the rest of the file...
+    */
+
+    ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
+
+    while (psgets(line, sizeof(line), fp) != NULL)
+    {
+      puts(line);
+
+      if (slowcollate)
+      {
+	fputs(line, temp);
+	putc('\n', temp);
+      }
+    }
+
+    if (slowcollate)
+    {
+      while (Copies > 1)
+      {
+        ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
+	rewind(temp);
+	copy_bytes(temp, 0);
+      }
+    }
+  }
+
+ /*
+  * End the job with the appropriate JCL command or CTRL-D otherwise.
+  */
+
+  if (ppd != NULL && ppd->jcl_end)
+    fputs((char *)ppd->jcl_end, stdout);
+  else
+    putchar(0x04);
+
+ /*
+  * Close files and remove the temporary file if needed...
+  */
+
+  if (slowcollate || sloworder)
+  {
+    fclose(temp);
+    unlink(tempfile);
+  }
 
   ppdClose(ppd);
+
+  if (fp != stdin)
+    fclose(fp);
 
   return (0);
 }
@@ -517,6 +578,30 @@ copy_bytes(FILE   *fp,		/* I - File to read from */
 
 
 /*
+ * 'end_nup()' - End processing for N-up printing...
+ */
+
+static void
+end_nup(int number)	/* I - Page number */
+{
+  puts("grestore");
+
+  switch (NUp)
+  {
+    case 2 :
+	if ((number & 1) == 1)
+          puts("ESPshowpage");
+        break;
+
+    case 4 :
+	if ((number & 3) == 3)
+          puts("ESPshowpage");
+        break;
+  }
+}
+
+
+/*
  * 'psgets()' - Get a line from a file.
  *
  * Note:
@@ -575,455 +660,111 @@ psgets(char   *buf,	/* I - Buffer to read into */
 
 
 /*
- * 'print_page()' - Print the specified page...
+ * 'start_nup()' - Start processing for N-up printing...
  */
-
-int
-print_page(FILE *fp,
-           int  number)
-{
-  if (number < 1 || number > PrintNumPages || !test_page(number))
-    return (0);
-
-  if (Verbosity)
-    fprintf(stderr, "psfilter: Printing page %d\n", number);
-
-  number --;
-  if (PrintPages[number] != ftell(fp))
-    fseek(fp, PrintPages[number], SEEK_SET);
-
-  copy_bytes(fp, PrintPages[number + 1] - PrintPages[number]);
-
-  return (1);
-}
-
-
-/*
- * 'scan_file()' - Scan a file for %%Page markers...
- */
-
-#define PS_DOCUMENT	0
-#define PS_FILE		1
-#define PS_FONT		2
-#define PS_RESOURCE	3
-
-#define PS_MAX		1000
-
-#define pushdoc(n)	{ if (doclevel < PS_MAX) { indent[doclevel] = '\t'; doclevel ++; docstack[doclevel] = (n); if (Verbosity) fprintf(stderr, "psfilter: pushdoc(%d), doclevel = %d\n", (n), doclevel); }; }
-#define popdoc(n)	{ if (doclevel >= 0 && docstack[doclevel] == (n)) doclevel --; indent[doclevel] = '\0'; if (Verbosity) fprintf(stderr, "psfilter: popdoc(%d), doclevel = %d\n", (n), doclevel); }
 
 static void
-scan_file(FILE *fp)
+start_nup(int number)	/* I - Page number */
 {
-  char	line[8192];
-  int	doclevel,		/* Sub-document stack level */
-	docstack[PS_MAX + 1];	/* Stack contents... */
-  char	indent[1024];
+  int	x, y;		/* Relative position of subpage */
+  float	w, l,		/* Width and length of subpage */
+	tx, ty;		/* Translation values for subpage */
 
 
-  PrintNumPages = 0;
-  PrintPages[0] = 0;
-  doclevel = -1;
-  memset(indent, 0, sizeof(indent));
+  puts("gsave");
 
-  rewind(fp);
+  if (Flip)
+    printf("%.0f 0 translate -1 1 scale\n", PageWidth);
 
-  while (fgets(line, sizeof(line), fp) != NULL)
+  switch (Orientation)
   {
-    if (line[0] == '\r')
-      strcpy(line, line + 1);		/* Strip leading CR */
-    if (line[strlen(line) - 1] == '\n')
-      line[strlen(line) - 1] = '\0';	/* Strip trailing LF */
-    if (line[strlen(line) - 1] == '\r')
-      line[strlen(line) - 1] = '\0';	/* Strip trailing CR */
-
-    if (line[0] == '%' && line[1] == '%')
-    {
-      if (Verbosity)
-        fprintf(stderr, "psfilter: Control line - %s%s\n", indent, line);
-
-     /*
-      * Note that we check for colons and spaces after the BeginXXXX control
-      * lines because Adobe's Acrobat product produces incorrect output!
-      */
-
-      if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
-          strncmp(line, "%%BeginDocument ", 16) == 0)
-	pushdoc(PS_DOCUMENT)
-      else if (strncmp(line, "%%BeginFont:", 12) == 0 ||
-               strncmp(line, "%%BeginFont ", 12) == 0)
-	pushdoc(PS_FONT)
-      else if (strncmp(line, "%%BeginFile:", 12) == 0 ||
-               strncmp(line, "%%BeginFile ", 12) == 0)
-	pushdoc(PS_FILE)
-      else if (strncmp(line, "%%BeginResource:", 16) == 0 ||
-               strncmp(line, "%%BeginResource ", 16) == 0)
-	pushdoc(PS_RESOURCE)
-      else if (strcmp(line, "%%EndDocument") == 0)
-	popdoc(PS_DOCUMENT)
-      else if (strcmp(line, "%%EndFont") == 0)
-	popdoc(PS_FONT)
-      else if (strcmp(line, "%%EndFile") == 0)
-	popdoc(PS_FILE)
-      else if (strcmp(line, "%%EndResource") == 0)
-	popdoc(PS_RESOURCE)
-      else if (strncmp(line, "%%Page:", 7) == 0)
-      {
-        if (doclevel < 0)
-	{
-	  if (Verbosity)
-	    fprintf(stderr, "psfilter: Page %d begins at offset %u\n",
-	            PrintNumPages + 2, PrintPages[PrintNumPages]);
-
-	  PrintNumPages ++;
-	}
-	else if (Verbosity)
-	  fprintf(stderr, "psfilter: embedded page %d begins at offset %u (doclevel = %d [%d])\n",
-	          PrintNumPages + 2, PrintPages[PrintNumPages],
-		  doclevel, docstack[doclevel]);
-      }
-      else if (strcmp(line, "%%Trailer") == 0 && doclevel < 0)
+    case 1 : /* Landscape */
+        printf("%.0f 0 translate 90 rotate\n", PageLength);
         break;
-      else if (strcmp(line, "%%EOF") == 0)
-      {
-        doclevel --;
-        if (doclevel < 0)
-          doclevel = -1;
-      };
-    };
-
-    PrintPages[PrintNumPages] = ftell(fp);
-  };
-
-  rewind(fp);
-
-  if (PrintNumPages == 0)
-  {
-    fputs("psfilter: Warning - this PostScript file does not conform to the DSC!\n", stderr);
-
-    PrintPages[1] = PrintPages[0];
-    PrintPages[0] = 0;
-    PrintNumPages = 1;
-  }
-  else if (Verbosity)
-    fprintf(stderr, "psfilter: Saw %d pages total.\n", PrintNumPages);
-}
-
-
-/*
- * 'make_transfer_function()' - Make a transfer function given a gamma,
- *                              brightness, and color profile values.
- */
-
-void
-make_transfer_function(char  *s,	/* O - Transfer function string */
-                       float ig,	/* I - Image gamma */
-                       float ib,	/* I - Image brightness */
-                       float pg,	/* I - Profile gamma */
-                       float pd)	/* I - Profile ink density */
-{
-  if (ig == 0.0)
-    ig = LutDefaultGamma();
-
-  if ((ig == 1.0 || ig == 0.0) &&
-      (ib == 1.0 || ib == 0.0) &&
-      (pg == 1.0 || pg == 0.0) &&
-      (pd == 1.0 || pd == 0.0))
-  {
-    s[0] = '\0';
-    return;
-  };
-
-  if (ig != 1.0 && ig != 0.0)
-    sprintf(s, "%.4f exp ", 1.0 / ig);
-  else
-    s[0] = '\0';
-
-  if (ib != 1.0 || ib != 0.0 ||
-      pg != 1.0 || pg != 0.0 ||
-      pd != 1.0 || pd != 0.0)
-  {
-    strcat(s, "neg 1 add ");
-
-    if (ib != 1.0 && ib != 0.0)
-      sprintf(s + strlen(s), "%.2f mul ", ib);
-
-    if (pg != 1.0 && pg != 0.0)
-      sprintf(s + strlen(s), "%.4f exp ", 1.0 / pg);
-
-    if (pd != 1.0 && pd != 0.0)
-      sprintf(s + strlen(s), "%.4f mul ", pd);
-
-    strcat(s, "neg 1 add");
-  };
-}
-
-
-/*
- * 'print_header()' - Print the output header...
- */
-
-void
-print_header(float gammaval[4],
-             int   brightness[4])
-{
-  char	cyan[255],
-	magenta[255],
-	yellow[255],
-	black[255];
-
-
-  puts("%!PS-Adobe-3.0");
-
-  puts("userdict begin");
-
-  make_transfer_function(black, gammaval[0], 100.0 / brightness[0],
-                         ColorProfile[PD_PROFILE_KG],
-                         ColorProfile[PD_PROFILE_KD]);
-
-  if (PrintColor)
-  {
-   /*
-    * Color output...
-    */
-
-    make_transfer_function(cyan, gammaval[1], 100.0 / brightness[1],
-                           ColorProfile[PD_PROFILE_BG],
-                           ColorProfile[PD_PROFILE_CD]);
-    make_transfer_function(magenta, gammaval[2], 100.0 / brightness[2],
-                           ColorProfile[PD_PROFILE_BG],
-                           ColorProfile[PD_PROFILE_MD]);
-    make_transfer_function(yellow, gammaval[3], 100.0 / brightness[3],
-                           ColorProfile[PD_PROFILE_BG],
-                           ColorProfile[PD_PROFILE_YD]);
-
-    printf("{ %s } bind\n"
-           "{ %s } bind\n"
-           "{ %s } bind\n"
-           "{ %s } bind\n"
-           "setcolortransfer\n",
-           cyan, magenta, yellow, black);
-  }
-  else
-  {
-   /*
-    * B&W output...
-    */
-
-    printf("{ %s } bind\n"
-           "settransfer\n",
-           black);
-  };
-
-  puts("end");
-}
-
-
-/*
- * 'print_file()' - Print a file...
- */
-
-void
-print_file(char  *filename,
-           float gammaval[4],
-           int   brightness[4],
-           int   nup,
-	   int   landscape)
-{
-  FILE	*fp;
-  int	number,
-	endpage,
-	dir,
-	x, y;
-  float	w, l,
-	tx, ty;
-  long	end;
-
-
-  if ((fp = fopen(filename, "r")) == NULL)
-  {
-    fprintf(stderr, "psfilter: Unable to open file \'%s\' for reading - %s\n",
-            filename, strerror(errno));
-    exit(1);
-  };
-
-  scan_file(fp);
-
-  print_header(gammaval, brightness);
-
-  if (PrintReversed)
-  {
-    number  = PrintNumPages;
-    dir     = -1;
-    endpage = 0;
-  }
-  else
-  {
-    number  = 1;
-    dir     = 1;
-    endpage = PrintNumPages + 1;
-  };
-
-  switch (nup)
-  {
-    case 1 :
-        copy_bytes(fp, PrintPages[0]);
-
-        for (; number != endpage; number += dir)
-        {
-          if (PrintFlip)
-            printf("gsave\n"
-                   "%d 0 translate\n"
-                   "-1 1 scale\n",
-                   PrintWidth);
-
-          print_page(fp, number);
-
-          if (PrintFlip)
-            puts("grestore\n");
-        };
+    case 2 : /* Reverse Portrait */
+        printf("%.0f %.0f translate 180 rotate\n", PageWidth, PageLength);
         break;
+    case 3 : /* Reverse Landscape */
+        printf("0 %.0f translate -90 rotate\n", PageWidth);
+        break;
+  }
 
+  switch (NUp)
+  {
     case 2 :
-        if (landscape)
-	{
-          w = (float)PrintLength;
-          l = w * (float)PrintLength / (float)PrintWidth;
-          if (l > ((float)PrintWidth * 0.5))
-          {
-            l = (float)PrintWidth * 0.5;
-            w = l * (float)PrintWidth / (float)PrintLength;
-          };
+        x = number & 1;
 
-          tx = (float)PrintWidth * 0.5 - l;
-          ty = ((float)PrintLength - w) * 0.5;
+        if (Orientation & 1)
+	{
+	  x = 1 - x;
+          w = PageLength;
+          l = w * PageLength / PageWidth;
+
+          if (l > (PageWidth * 0.5))
+          {
+            l = PageWidth * 0.5;
+            w = l * PageWidth / PageLength;
+          }
+
+          tx = PageWidth * 0.5 - l;
+          ty = (PageLength - w) * 0.5;
         }
 	else
 	{
-          l = (float)PrintWidth;
-          w = l * (float)PrintWidth / (float)PrintLength;
-          if (w > ((float)PrintLength * 0.5))
-          {
-            w = (float)PrintLength * 0.5;
-            l = w * (float)PrintLength / (float)PrintWidth;
-          };
+          l = PageWidth;
+          w = l * PageWidth / PageLength;
 
-          tx = (float)PrintLength * 0.5 - w;
-          ty = ((float)PrintWidth - l) * 0.5;
+          if (w > (PageLength * 0.5))
+          {
+            w = PageLength * 0.5;
+            l = w * PageLength / PageWidth;
+          }
+
+          tx = PageLength * 0.5 - w;
+          ty = (PageWidth - l) * 0.5;
         }
 
-        puts("userdict begin\n"
-             "/ESPshowpage /showpage load def\n"
-             "/showpage { } def\n"
-             "end");
+        if (Orientation & 1)
+	{
+          printf("0 %.0f translate -90 rotate\n", PageLength);
+          printf("%.0f %.0f translate %.3f %.3f scale\n",
+                 ty, tx + l * x, w / PageWidth, l / PageLength);
+        }
+        else
+	{
+          printf("%.0f 0 translate 90 rotate\n", PageWidth);
+          printf("%.0f %.0f translate %.3f %.3f scale\n",
+                 tx + w * x, ty, w / PageWidth, l / PageLength);
+        }
 
-        copy_bytes(fp, PrintPages[0]);
-
-        for (x = landscape; number != endpage;)
-        {
-          puts("gsave");
-          printf("%d 0.0 translate\n"
-                 "90 rotate\n",
-                 PrintWidth);
-          if (landscape)
-            printf("%f %f translate\n"
-                   "%f %f scale\n",
-                   ty, tx + l * x,
-                   w / (float)PrintWidth, l / (float)PrintLength);
-          else
-            printf("%f %f translate\n"
-                   "%f %f scale\n",
-                   tx + w * x, ty,
-                   w / (float)PrintWidth, l / (float)PrintLength);
-          printf("newpath\n"
-                 "0 0 moveto\n"
-                 "%d 0 lineto\n"
-                 "%d %d lineto\n"
-                 "0 %d lineto\n"
-                 "closepath clip newpath\n",
-                 PrintWidth, PrintWidth, PrintLength, PrintLength);
-          if (PrintFlip)
-            printf("%d 0 translate\n"
-                   "-1 1 scale\n",
-                   PrintWidth);
-
-          if (print_page(fp, number))
-          {
-            number += dir;
-            x = 1 - x;
-          };
-
-          puts("grestore");
-
-          if (x == landscape)
-            puts("ESPshowpage");
-        };
-
-        if (x != landscape)
-          puts("ESPshowpage");
+	printf("newpath\n"
+               "0 0 moveto\n"
+               "%.0f 0 lineto\n"
+               "%.0f %.0f lineto\n"
+               "0 %.0f lineto\n"
+               "closepath clip newpath\n",
+               PageWidth, PageWidth, PageLength, PageLength);
         break;
 
     case 4 :
-        puts("userdict begin\n"
-             "/ESPshowpage /showpage load def\n"
-             "/showpage { } def\n"
-             "end");
+        x = number & 1;
+	y = 1 - ((number & 2) != 0);
+        w = PageWidth * 0.5;
+        l = PageLength * 0.5;
 
-
-        w = (float)PrintWidth * 0.5;
-        l = (float)PrintLength * 0.5;
-
-        copy_bytes(fp, PrintPages[0]);
-
-        for (x = 0, y = 1; number != endpage;)
-        {
-          printf("gsave\n"
-                 "%f %f translate\n"
-                 "0.5 0.5 scale\n",
-                 (float)x * w, (float)y * l);
-          printf("newpath\n"
-                 "0 0 moveto\n"
-                 "%d 0 lineto\n"
-                 "%d %d lineto\n"
-                 "0 %d lineto\n"
-                 "closepath clip newpath\n",
-                 PrintWidth, PrintWidth, PrintLength, PrintLength);
-          if (PrintFlip)
-            printf("%d 0 translate\n"
-                   "-1 1 scale\n",
-                   PrintWidth);
-
-          if (print_page(fp, number))
-          {
-            number += dir;
-            x = 1 - x;
-          };
-
-          puts("grestore");
-
-          if (x == 0)
-          {
-            y = 1 - y;
-            if (y == 1)
-              puts("ESPshowpage");
-          };
-        };
-
-        if (y != 1 || x != 1)
-          puts("ESPshowpage");
+	printf("%.0f %.0f translate 0.5 0.5 scale\n", x * w, y * l);
+        printf("newpath\n"
+               "0 0 moveto\n"
+               "%.0f 0 lineto\n"
+               "%.0f %.0f lineto\n"
+               "0 %.0f lineto\n"
+               "closepath clip newpath\n",
+               PageWidth, PageWidth, PageLength, PageLength);
         break;
-  };
-
-  fseek(fp, 0, SEEK_END);
-  end = ftell(fp);
-  fseek(fp, PrintPages[PrintNumPages], SEEK_SET);
-
-  copy_bytes(fp, end - PrintPages[PrintNumPages]);
-
-  fclose(fp);
+  }
 }
 
 
 /*
- * End of "$Id: pstops.c,v 1.10 1999/03/23 18:39:07 mike Exp $".
+ * End of "$Id: pstops.c,v 1.11 1999/03/24 13:59:47 mike Exp $".
  */
