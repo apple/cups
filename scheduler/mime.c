@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.2 2000/03/13 18:39:28 mike Exp $"
+ * "$Id: mime.c,v 1.3 2000/08/03 18:02:06 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -507,6 +507,16 @@ load_convs(mime_t *mime,		/* I - MIME database */
 
     *temp = '\0';
 
+    if (strcmp(super, "*") == 0 && strcmp(type, "*") == 0)
+    {
+     /*
+      * Force * / * to be "application/octet-stream"...
+      */
+
+      strcpy(super, "application");
+      strcpy(type, "octet-stream");
+    }
+
    /*
     * Add the filter to the MIME database, supporting wildcards as needed...
     */
@@ -549,5 +559,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.2 2000/03/13 18:39:28 mike Exp $".
+ * End of "$Id: mime.c,v 1.3 2000/08/03 18:02:06 mike Exp $".
  */
