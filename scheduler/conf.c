@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.99 2002/01/23 17:25:40 mike Exp $"
+ * "$Id: conf.c,v 1.100 2002/03/27 21:54:01 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -770,11 +770,40 @@ read_configuration(FILE *fp)		/* I - File to read from */
 
       if (NumBrowsers < MAX_BROWSERS)
       {
-        if (get_address(value, INADDR_NONE, BrowsePort, Browsers + NumBrowsers))
+        memset(Browsers + NumBrowsers, 0, sizeof(dirsvc_addr_t));
+
+        if (strcasecmp(value, "@LOCAL") == 0)
+	{
+	 /*
+	  * Send browse data to all local interfaces...
+	  */
+
+	  strcpy(Browsers[NumBrowsers].iface, "*");
+	  NumBrowsers ++;
+	}
+	else if (strncasecmp(value, "@IF(", 4) == 0)
+	{
+	 /*
+	  * Send browse data to the named interface...
+	  */
+
+	  strncpy(Browsers[NumBrowsers].iface, value + 4,
+	          sizeof(Browsers[0].iface) - 1);
+
+          nameptr = Browsers[NumBrowsers].iface +
+	            strlen(Browsers[NumBrowsers].iface) - 1;
+          if (*nameptr == ')')
+	    *nameptr = '\0';
+
+	  NumBrowsers ++;
+	}
+	else if (get_address(value, INADDR_NONE, BrowsePort,
+	                     &(Browsers[NumBrowsers].to)))
         {
           LogMessage(L_INFO, "Sending browsing info to %x:%d",
-                     ntohl(Browsers[NumBrowsers].sin_addr.s_addr),
-                     ntohs(Browsers[NumBrowsers].sin_port));
+                     ntohl(Browsers[NumBrowsers].to.sin_addr.s_addr),
+                     ntohs(Browsers[NumBrowsers].to.sin_port));
+
 	  NumBrowsers ++;
         }
 	else
@@ -1864,5 +1893,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.99 2002/01/23 17:25:40 mike Exp $".
+ * End of "$Id: conf.c,v 1.100 2002/03/27 21:54:01 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: network.c,v 1.5 2002/03/27 18:36:18 mike Exp $"
+ * "$Id: network.c,v 1.6 2002/03/27 21:54:02 mike Exp $"
  *
  *   Network interface functions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -131,6 +131,7 @@ NetIFUpdate(void)
   cups_netif_t	*temp;		/* Current interface */
   struct ifaddrs *addrs,	/* Interface address list */
 		*addr;		/* Current interface address */
+  struct hostent *host;		/* Host lookup info */
 
 
  /*
@@ -185,7 +186,8 @@ NetIFUpdate(void)
     if (addr->ifa_dstaddr)
       memcpy(&(temp->broadcast), addr->ifa_dstaddr, sizeof(temp->broadcast));
 
-    if (!(addr->ifa_flags & IFF_POINTOPOINT))
+    if (!(addr->ifa_flags & IFF_POINTOPOINT) &&
+        ntohl(temp->address.sin_addr.s_addr) != 0x7f000001)
       temp->is_local = 1;
 
    /*
@@ -194,7 +196,26 @@ NetIFUpdate(void)
 
     if (HostNameLookups)
     {
-      strncpy(temp->hostname, ServerName, sizeof(temp->hostname) - 1);
+#ifndef __sgi
+      host = gethostbyaddr((char *)&(temp->address.sin_addr),
+                           sizeof(struct in_addr), AF_INET);
+#else
+      host = gethostbyaddr(&(temp->address.sin_addr),
+                           sizeof(struct in_addr), AF_INET);
+#endif /* !__sgi */
+
+      if (host != NULL)
+        strncpy(temp->hostname, host->h_name, sizeof(temp->hostname) - 1);
+      else if (ntohl(temp->address.sin_addr.s_addr) == 0x7f000001 ||
+               temp->address.sin_addr.s_addr == ServerAddr.sin_addr.s_addr)
+        strncpy(temp->hostname, ServerName, sizeof(temp->hostname) - 1);
+      else
+      {
+        unsigned ip = ntohl(temp->address.sin_addr.s_addr);
+
+        snprintf(temp->hostname, sizeof(temp->hostname), "%d.%d.%d.%d",
+	         (ip >> 24) & 255, (ip >> 16) & 255, (ip >> 8) & 255, ip & 255);
+      }
     }
     else
       strncpy(temp->hostname, ServerName, sizeof(temp->hostname) - 1);
@@ -441,5 +462,5 @@ freeifaddrs(struct ifaddrs *addrs)	/* I - Interface list to free */
 
 
 /*
- * End of "$Id: network.c,v 1.5 2002/03/27 18:36:18 mike Exp $".
+ * End of "$Id: network.c,v 1.6 2002/03/27 21:54:02 mike Exp $".
  */
