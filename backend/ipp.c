@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.52 2001/10/31 01:49:11 mike Exp $"
+ * "$Id: ipp.c,v 1.53 2001/10/31 21:40:23 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -504,7 +504,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     if (response)
       ippDelete(response);
 
-    if (ipp_status <= IPP_OK_CONFLICT)
+    if (ipp_status <= IPP_OK_CONFLICT && argc > 6)
     {
       fprintf(stderr, "PAGE: 1 %d\n", copies_sup ? atoi(argv[4]) : 1);
       copies --;
@@ -649,5 +649,5 @@ password_cb(const char *prompt)	/* I - Prompt (not used) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.52 2001/10/31 01:49:11 mike Exp $".
+ * End of "$Id: ipp.c,v 1.53 2001/10/31 21:40:23 mike Exp $".
  */
