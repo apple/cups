@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.17.2.6 2002/03/01 19:55:09 mike Exp $"
+ * "$Id: socket.c,v 1.17.2.7 2002/03/01 21:19:23 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -45,6 +45,8 @@
 #ifdef WIN32
 #  include <winsock.h>
 #else
+#  include <unistd.h>
+#  include <fcntl.h>
 #  include <sys/socket.h>
 #  include <netinet/in.h>
 #  include <arpa/inet.h>
@@ -68,7 +70,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 		hostname[1024],	/* Hostname */
 		username[255],	/* Username info (not used) */
 		resource[1024];	/* Resource info (not used) */
-  FILE		*fp;		/* Print file */
+  int		fp;		/* Print file */
   int		copies;		/* Number of copies to print */
   int		port;		/* Port number */
   int		delay;		/* Delay for retries... */
@@ -117,7 +119,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
   if (argc == 6)
   {
-    fp     = stdin;
+    fp     = 0;
     copies = 1;
   }
   else
@@ -126,7 +128,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     * Try to open the print file...
     */
 
-    if ((fp = fopen(argv[6], "rb")) == NULL)
+    if ((fp = open(argv[6], O_RDONLY)) < 0)
     {
       perror("ERROR: unable to open print file");
       return (1);
@@ -222,16 +224,16 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
     copies --;
 
-    if (fp != stdin)
+    if (fp != 0)
     {
       fputs("PAGE: 1 1\n", stderr);
-      rewind(fp);
+      lseek(fp, 0, SEEK_SET);
     }
 
     fputs("INFO: Connected to host, sending print job...\n", stderr);
 
     tbytes = 0;
-    while ((nbytes = fread(buffer, 1, sizeof(buffer), fp)) > 0)
+    while ((nbytes = read(fp, buffer, sizeof(buffer))) > 0)
     {
      /*
       * Write the print data to the printer...
@@ -332,8 +334,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Close the input file and return...
   */
 
-  if (fp != stdin)
-    fclose(fp);
+  if (fp != 0)
+    close(fp);
 
   fputs("INFO: Ready to print.\n", stderr);
 
@@ -342,5 +344,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.17.2.6 2002/03/01 19:55:09 mike Exp $".
+ * End of "$Id: socket.c,v 1.17.2.7 2002/03/01 21:19:23 mike Exp $".
  */

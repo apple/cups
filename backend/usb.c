@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.18.2.6 2002/03/01 19:55:09 mike Exp $"
+ * "$Id: usb.c,v 1.18.2.7 2002/03/01 21:19:23 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -74,7 +74,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 		resource[1024],	/* Resource info (device and options) */
 		*options;	/* Pointer to options */
   int		port;		/* Port number (not used) */
-  FILE		*fp;		/* Print file */
+  int		fp;		/* Print file */
   int		copies;		/* Number of copies to print */
   int		fd;		/* Parallel device */
   int		wbytes;		/* Number of bytes written */
@@ -116,7 +116,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
   if (argc == 6)
   {
-    fp     = stdin;
+    fp     = 0;
     copies = 1;
   }
   else
@@ -125,7 +125,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     * Try to open the print file...
     */
 
-    if ((fp = fopen(argv[6], "rb")) == NULL)
+    if ((fp = open(argv[6], O_RDONLY)) < 0)
     {
       perror("ERROR: unable to open print file");
       return (1);
@@ -215,14 +215,14 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   {
     copies --;
 
-    if (fp != stdin)
+    if (fp != 0)
     {
       fputs("PAGE: 1 1\n", stderr);
-      rewind(fp);
+      lseek(fp, 0, SEEK_SET);
     }
 
     tbytes = 0;
-    while ((nbytes = fread(buffer, 1, sizeof(buffer), fp)) > 0)
+    while ((nbytes = read(fp, buffer, sizeof(buffer))) > 0)
     {
      /*
       * Write the print data to the printer...
@@ -258,8 +258,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   */
 
   close(fd);
-  if (fp != stdin)
-    fclose(fp);
+  if (fp != 0)
+    close(fp);
 
   return (0);
 }
@@ -449,5 +449,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: usb.c,v 1.18.2.6 2002/03/01 19:55:09 mike Exp $".
+ * End of "$Id: usb.c,v 1.18.2.7 2002/03/01 21:19:23 mike Exp $".
  */
