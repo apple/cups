@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.90 2004/08/05 20:53:12 mike Exp $"
+ * "$Id: client.c,v 1.91.2.91 2004/08/06 13:57:05 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1289,7 +1289,11 @@ ReadClient(client_t *con)		/* I - Client to read from */
               if (strncmp(con->uri, "/admin", 6) == 0)
 	      {
 		SetStringf(&con->command, "%s/cgi-bin/admin.cgi", ServerBin);
-		SetString(&con->options, con->uri + 6);
+
+		if ((ptr = strchr(con->uri + 6, '?')) != NULL)
+		  SetStringf(&con->options, "admin%s", ptr);
+		else
+		  SetString(&con->options, "admin");
 	      }
               else if (strncmp(con->uri, "/printers", 9) == 0)
 	      {
@@ -1304,11 +1308,12 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      else
 	      {
 		SetStringf(&con->command, "%s/cgi-bin/jobs.cgi", ServerBin);
-		SetString(&con->options, con->uri + 5);
-	      }
 
-	      if (con->options[0] == '/')
-		cups_strcpy(con->options, con->options + 1);
+		if (con->uri[5] == '/')
+		  SetString(&con->options, con->uri + 6);
+		else
+		  SetString(&con->options, con->uri + 5);
+	      }
 
               if (!SendCommand(con, con->command, con->options))
 	      {
@@ -2910,7 +2915,9 @@ pipe_command(client_t *con,		/* I - Client connection */
   * Parse a copy of the options string, which is of the form:
   *
   *     name argument+argument+argument
+  *     name?argument+argument+argument
   *     name param=value&param=value
+  *     name?param=value&param=value
   *
   * If the string contains an "=" character after the initial name,
   * then we treat it as a HTTP GET form request and make a copy of
@@ -2919,6 +2926,9 @@ pipe_command(client_t *con,		/* I - Client connection */
   * The string is always parsed out as command-line arguments, to
   * be consistent with Apache...
   */
+
+  LogMessage(L_DEBUG2, "pipe_command: command=\"%s\", options=\"%s\"",
+             command, options);
 
   strlcpy(argbuf, options, sizeof(argbuf));
 
@@ -2931,7 +2941,7 @@ pipe_command(client_t *con,		/* I - Client connection */
     * Break arguments whenever we see a + or space...
     */
 
-    if (*commptr == ' ' || *commptr == '+')
+    if (*commptr == ' ' || *commptr == '+' || (*commptr == '?' && argc == 1))
     {
      /*
       * Terminate the current string and skip trailing whitespace...
@@ -3169,9 +3179,9 @@ pipe_command(client_t *con,		/* I - Client connection */
   if (LogLevel == L_DEBUG2)
   {
     for (i = 0; i < argc; i ++)
-      LogMessage(L_DEBUG2, "argv[%d] = \"%s\"", i, argv[i]);
+      LogMessage(L_DEBUG2, "pipe_command: argv[%d] = \"%s\"", i, argv[i]);
     for (i = 0; i < envc; i ++)
-      LogMessage(L_DEBUG2, "envp[%d] = \"%s\"", i, envp[i]);
+      LogMessage(L_DEBUG2, "pipe_command: envp[%d] = \"%s\"", i, envp[i]);
   }
 
  /*
@@ -3368,5 +3378,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.90 2004/08/05 20:53:12 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.91 2004/08/06 13:57:05 mike Exp $".
  */
