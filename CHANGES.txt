@@ -1,8 +1,9 @@
-CHANGES.txt - 10/11/2002
+CHANGES.txt - 10/15/2002
 ------------------------
 
 CHANGES IN CUPS V1.1.17
 
+	- French translation updates.
 	- The filters did not quote the page label string when
 	  embedding it in PostScript output.
 	- The serial backend now enumerates serial ports under

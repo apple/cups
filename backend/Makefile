@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.36 2002/05/24 21:04:46 mike Exp $"
+# "$Id: Makefile,v 1.37 2002/10/15 13:59:05 mike Exp $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -122,7 +122,7 @@ scsi.o:	scsi.c scsi-irix.c scsi-linux.c
 
 serial:	serial.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o serial serial.o $(LIBS)
+	$(CC) $(LDFLAGS) -o serial serial.o $(BACKLIBS) $(LIBS)
 
 
 #
@@ -140,7 +140,7 @@ socket:	socket.o ../cups/$(LIBCUPS)
 
 usb:	usb.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o usb usb.o $(LIBS)
+	$(CC) $(LDFLAGS) -o usb usb.o $(BACKLIBS) $(LIBS)
 
 
 #
@@ -151,5 +151,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.36 2002/05/24 21:04:46 mike Exp $".
+# End of "$Id: Makefile,v 1.37 2002/10/15 13:59:05 mike Exp $".
 #
