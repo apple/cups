@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The scheduler did not use a case-insensitive
+	  comparison when checking for group membership, which
+	  caused problems with Win9x clients printing via SAMBA
+	  (STR #647)
 	- The scheduler did not report the addresses associated
 	  with certain network errors, making troubleshooting
 	  difficult (STR #648, #649)
