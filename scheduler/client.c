@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.65 2003/07/20 12:51:43 mike Exp $"
+ * "$Id: client.c,v 1.91.2.66 2003/07/20 15:41:20 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2942,7 +2942,8 @@ pipe_command(client_t *con,		/* I - Client connection */
 		server_name[1024],	/* SERVER_NAME environment variable */
 		server_port[1024],	/* SERVER_PORT environment variable */
 		tmpdir[1024],		/* TMPDIR environment variable */
-		vg_args[1024];		/* VG_ARGS environment variable */
+		vg_args[1024],		/* VG_ARGS environment variable */
+		ld_assume_kernel[1024];	/* LD_ASSUME_KERNEL environment variable */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* POSIX signal handler */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -3057,6 +3058,13 @@ pipe_command(client_t *con,		/* I - Client connection */
   {
     snprintf(vg_args, sizeof(vg_args), "VG_ARGS=%s", getenv("VG_ARGS"));
     envp[envc ++] = vg_args;
+  }
+
+  if (getenv("LD_ASSUME_KERNEL") != NULL)
+  {
+    snprintf(ld_assume_kernel, sizeof(ld_assume_kernel), "LD_ASSUME_KERNEL=%s",
+             getenv("LD_ASSUME_KERNEL"));
+    envp[envc ++] = ld_assume_kernel;
   }
 
   if (getenv("LD_LIBRARY_PATH") != NULL)
@@ -3355,5 +3363,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.65 2003/07/20 12:51:43 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.66 2003/07/20 15:41:20 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: template.c,v 1.22.2.4 2003/01/07 18:26:20 mike Exp $"
+ * "$Id: template.c,v 1.22.2.5 2003/07/20 15:41:18 mike Exp $"
  *
  *   CGI template function.
  *
@@ -222,7 +222,7 @@ cgi_copy(FILE *out,		/* I - Output file */
 	    outptr    = outval;
 	  }
 	}
-        if ((value = cgiGetArray(name + 1, element)) != NULL)
+        else if ((value = cgiGetArray(name + 1, element)) != NULL)
 	  outptr = value;
 	else
 	{
@@ -332,7 +332,7 @@ cgi_copy(FILE *out,		/* I - Output file */
         * Test for existance...
 	*/
 
-        result = cgiGetArray(name, element) != NULL && outval[0];
+        result = cgiGetArray(name, element) != NULL && outptr[0];
       }
       else
       {
@@ -488,5 +488,5 @@ cgi_puts(const char *s,
 
 
 /*
- * End of "$Id: template.c,v 1.22.2.4 2003/01/07 18:26:20 mike Exp $".
+ * End of "$Id: template.c,v 1.22.2.5 2003/07/20 15:41:18 mike Exp $".
  */
