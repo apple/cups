@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.21 1999/08/06 19:27:38 mike Exp $"
+dnl "$Id: configure.in,v 1.22 1999/08/20 14:29:55 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -212,6 +212,7 @@ else
 			if test -z "$OPTIM"; then
 				OPTIM="+O2"
 			fi
+			OPTIM="-Ae $OPTIM"
 			;;
 		SunOS*)
 			# Solaris
@@ -311,5 +312,5 @@ AC_SUBST(CUPS_DATADIR)
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.21 1999/08/06 19:27:38 mike Exp $".
+dnl End of "$Id: configure.in,v 1.22 1999/08/20 14:29:55 mike Exp $".
 dnl
