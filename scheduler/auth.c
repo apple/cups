@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.67 2003/01/24 20:39:43 mike Exp $"
+ * "$Id: auth.c,v 1.68 2003/01/31 17:48:23 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -772,14 +772,23 @@ GetMD5Passwd(const char *username,	/* I - Username */
 	tempgroup[33];			/* Group from file */
 
 
+  LogMessage(L_DEBUG2, "GetMD5Passwd(username=\"%s\", group=\"%s\", passwd=%p)",
+             username, group ? group : "(null)", passwd);
+
   snprintf(filename, sizeof(filename), "%s/passwd.md5", ServerRoot);
   if ((fp = fopen(filename, "r")) == NULL)
+  {
+    LogMessage(L_ERROR, "Unable to open %s - %s", filename, strerror(errno));
     return (NULL);
+  }
 
   while (fgets(line, sizeof(line), fp) != NULL)
   {
     if (sscanf(line, "%32[^:]:%32[^:]:%32s", tempuser, tempgroup, passwd) != 3)
+    {
+      LogMessage(L_ERROR, "Bad MD5 password line: %s", line);
       continue;
+    }
 
     if (strcmp(username, tempuser) == 0 &&
         (group == NULL || strcmp(group, tempgroup) == 0))
@@ -787,6 +796,9 @@ GetMD5Passwd(const char *username,	/* I - Username */
      /*
       * Found the password entry!
       */
+
+      LogMessage(L_DEBUG2, "Found MD5 user %s, group %s...", username,
+                 tempgroup);
 
       fclose(fp);
       return (passwd);
@@ -1153,6 +1165,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
 	  if (best->num_names && best->level == AUTH_GROUP)
 	  {
+	    LogMessage(L_DEBUG2, "IsAuthorized: num_names = %d", best->num_names);
+
             for (i = 0; i < best->num_names; i ++)
 	      if (GetMD5Passwd(con->username, best->names[i], md5))
 		break;
@@ -1188,6 +1202,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
 	  if (best->num_names && best->level == AUTH_GROUP)
 	  {
+	    LogMessage(L_DEBUG2, "IsAuthorized: num_names = %d", best->num_names);
+
             for (i = 0; i < best->num_names; i ++)
 	      if (GetMD5Passwd(con->username, best->names[i], md5))
 		break;
@@ -1627,5 +1643,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.67 2003/01/24 20:39:43 mike Exp $".
+ * End of "$Id: auth.c,v 1.68 2003/01/31 17:48:23 mike Exp $".
  */

@@ -1,8 +1,10 @@
-CHANGES.txt - 01/28/2003
+CHANGES.txt - 01/31/2003
 ------------------------
 
 CHANGES IN CUPS V1.1.19
 
+	- The scheduler did not properly parse the SystemGroup
+	  directive, so only the first group would be used.
 	- Revamped how strings are stored in the scheduler,
 	  providing a substantial improvement in memory usage
 	  for systems with large numbers of printers.
