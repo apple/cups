@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.9 2001/08/17 14:12:12 mike Exp $"
+# "$Id: Makefile,v 1.10 2001/09/24 17:51:16 mike Exp $"
 #
 #   Template makefile for the Common UNIX Printing System (CUPS).
 #
@@ -51,6 +51,7 @@ FILES	=	add-class.tmpl \
 		job-cancel.tmpl \
 		job-hold.tmpl \
 		job-release.tmpl \
+		job-restart.tmpl \
 		modify-class.tmpl \
 		modify-printer.tmpl \
 		option-boolean.tmpl \
@@ -98,5 +99,5 @@ install:
 
 
 #
-# End of "$Id: Makefile,v 1.9 2001/08/17 14:12:12 mike Exp $".
+# End of "$Id: Makefile,v 1.10 2001/09/24 17:51:16 mike Exp $".
 #
