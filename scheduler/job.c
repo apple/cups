@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.93 2004/08/11 14:58:31 mike Exp $"
+ * "$Id: job.c,v 1.124.2.94 2004/08/12 03:24:41 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1735,7 +1735,7 @@ StartJob(int       id,			/* I - Job ID */
 	  case IPP_TAG_KEYWORD :
 	  case IPP_TAG_CHARSET :
 	  case IPP_TAG_LANGUAGE :
-	      for (valptr = attr->values[i].string.text, ' '); *valptr;)
+	      for (valptr = attr->values[i].string.text; *valptr;)
 	      {
 	        if (strchr(" \t\n\\\'\"", *valptr))
 		  *optptr++ = '\\';
@@ -2765,5 +2765,5 @@ set_hold_until(job_t *job, 		/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.93 2004/08/11 14:58:31 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.94 2004/08/12 03:24:41 mike Exp $".
  */
