@@ -631,7 +631,17 @@ VALIGN="TOP">0x4006</TD><TD VALIGN="TOP">Add or modify a printer class.</TD>
 </UL>
 <H2><A NAME="4_6">4.6 CUPS-Add-Modify-Printer Operation</A></H2>
 <P>The CUPS-Add-Modify-Printer operation (0x4003) adds a new printer or
- modifies an existing printer on the system.</P>
+ modifies an existing printer on the system.
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B>Note:</B>
+<P>This operation requires administrative priviledges and must be POSTed
+ to &quot;/admin/&quot;. POSTs to other paths will result in a
+ client-error-not-authorized (IPP_NOT_AUTHORIZED) error.</P>
+</TD></TR>
+</TABLE>
+</CENTER>
+</P>
 <H3><A NAME="4_6_1">4.6.1 CUPS-Add-Modify-Printer Request</A></H3>
 <P>The following groups of attributes are supplied as part of the
  CUPS-Add-Modify-Printer request:</P>
@@ -705,7 +715,17 @@ VALIGN="TOP">0x4006</TD><TD VALIGN="TOP">Add or modify a printer class.</TD>
 </UL>
 <H2><A NAME="4_7">4.7 CUPS-Delete-Printer Operation</A></H2>
 <P>The CUPS-Delete-Printer operation (0x4004) removes an existing
- printer from the system.</P>
+ printer from the system.
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B>Note:</B>
+<P>This operation requires administrative priviledges and must be POSTed
+ to &quot;/admin/&quot;. POSTs to other paths will result in a
+ client-error-not-authorized (IPP_NOT_AUTHORIZED) error.</P>
+</TD></TR>
+</TABLE>
+</CENTER>
+</P>
 <H3><A NAME="4_7_1">4.7.1 CUPS-Delete-Printer Request</A></H3>
 <P>The following groups of attributes are supplied as part of the
  CUPS-Delete-Printer request:</P>
@@ -787,7 +807,17 @@ VALIGN="TOP">0x4006</TD><TD VALIGN="TOP">Add or modify a printer class.</TD>
 </UL>
 <H2><A NAME="4_9">4.9 CUPS-Add-Modify-Class Operation</A></H2>
 <P>The CUPS-Add-Modify-Class operation (0x4006) adds a new printer class
- or modifies and existing printer class on the system.</P>
+ or modifies and existing printer class on the system.
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B>Note:</B>
+<P>This operation requires administrative priviledges and must be POSTed
+ to &quot;/admin/&quot;. POSTs to other paths will result in a
+ client-error-not-authorized (IPP_NOT_AUTHORIZED) error.</P>
+</TD></TR>
+</TABLE>
+</CENTER>
+</P>
 <H3><A NAME="4_9_1">4.9.1 CUPS-Add-Modify-Class Request</A></H3>
 <P>The following groups of attributes are supplied as part of the
  CUPS-Add-Modify-Class request:</P>
@@ -845,7 +875,17 @@ VALIGN="TOP">0x4006</TD><TD VALIGN="TOP">Add or modify a printer class.</TD>
 </UL>
 <H2><A NAME="4_10">4.10 CUPS-Delete-Class Operation</A></H2>
 <P>The CUPS-Delete-Class operation (0x4007) removes an existing printer
- class from the system.</P>
+ class from the system.
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B>Note:</B>
+<P>This operation requires administrative priviledges and must be POSTed
+ to &quot;/admin/&quot;. POSTs to other paths will result in a
+ client-error-not-authorized (IPP_NOT_AUTHORIZED) error.</P>
+</TD></TR>
+</TABLE>
+</CENTER>
+</P>
 <H3><A NAME="4_10_1">4.10.1 CUPS-Delete-Class Request</A></H3>
 <P>The following groups of attributes are supplied as part of the
  CUPS-Delete-Class request:</P>
@@ -873,7 +913,17 @@ VALIGN="TOP">0x4006</TD><TD VALIGN="TOP">Add or modify a printer class.</TD>
 <H2><A NAME="4_11">4.11 CUPS-Accept-Jobs Operation</A></H2>
 <P>The CUPS-Accept-Jobs operation (0x4008) sets the
  &quot;printer-is-accepting-jobs&quot; attribute to true for the specified printer
- or printer class.</P>
+ or printer class.
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B>Note:</B>
+<P>This operation requires administrative priviledges and must be POSTed
+ to &quot;/admin/&quot;. POSTs to other paths will result in a
+ client-error-not-authorized (IPP_NOT_AUTHORIZED) error.</P>
+</TD></TR>
+</TABLE>
+</CENTER>
+</P>
 <H3><A NAME="4_11_1">4.11.1 CUPS-Accept-Jobs Request</A></H3>
 <P>The following groups of attributes are supplied as part of the
  CUPS-Accept-Jobs request:</P>
@@ -900,9 +950,19 @@ VALIGN="TOP">0x4006</TD><TD VALIGN="TOP">Add or modify a printer class.</TD>
  document.</P>
 </UL>
 <H2><A NAME="4_12">4.12 CUPS-Reject-Jobs Operation</A></H2>
-<P>The CUPS-Reject-Jobs operation (0x4009) sets
- the&quot;printer-is-accepting-jobs&quot; attribute to false for the specified
- printer or printer class.</P>
+<P>The CUPS-Reject-Jobs operation (0x4009) sets the
+ &quot;printer-is-accepting-jobs&quot; attribute to false for the specified
+ printer or printer class.
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B>Note:</B>
+<P>This operation requires administrative priviledges and must be POSTed
+ to &quot;/admin/&quot;. POSTs to other paths will result in a
+ client-error-not-authorized (IPP_NOT_AUTHORIZED) error.</P>
+</TD></TR>
+</TABLE>
+</CENTER>
+</P>
 <H3><A NAME="4_12_1">4.12.1 CUPS-Reject-Jobs Request</A></H3>
 <P>The following groups of attributes are supplied as part of the
  CUPS-Reject-Jobs request:</P>
@@ -936,8 +996,17 @@ VALIGN="TOP">0x4006</TD><TD VALIGN="TOP">Add or modify a printer class.</TD>
 </UL>
 <H2><A NAME="4_13">4.13 CUPS-Set-Default Operation</A></H2>
 <P>The CUPS-Set-Default operation (0x400A) sets the default printer
- destination for all clients when a resource name of &quot;/printers&quot; is
- specified.</P>
+ destination for all clients.
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B>Note:</B>
+<P>This operation requires administrative priviledges and must be POSTed
+ to &quot;/admin/&quot;. POSTs to other paths will result in a
+ client-error-not-authorized (IPP_NOT_AUTHORIZED) error.</P>
+</TD></TR>
+</TABLE>
+</CENTER>
+</P>
 <H3><A NAME="4_13_1">4.13.1 CUPS-Set-Default Request</A></H3>
 <P>The following groups of attributes are supplied as part of the
  CUPS-Set-Default request:</P>
