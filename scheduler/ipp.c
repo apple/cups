@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.207 2003/04/10 14:30:48 mike Exp $"
+ * "$Id: ipp.c,v 1.208 2003/04/11 02:11:15 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2562,6 +2562,8 @@ copy_model(const char *from,		/* I - Source file */
 		choice[PPD_MAX_NAME];	/* Choice name */
   int		num_defaults;		/* Number of default options */
   ppd_default_t	*defaults;		/* Default options */
+  char		cups_protocol[PPD_MAX_LINE];
+					/* cupsProtocol attribute */
 #ifdef HAVE_LIBPAPER
   char		*paper_result;		/* Paper size name from libpaper */
   char		system_paper[64];	/* Paper size name buffer */
@@ -2574,8 +2576,9 @@ copy_model(const char *from,		/* I - Source file */
   * Open the destination (if possible) and set the default options...
   */
 
-  num_defaults = 0;
-  defaults     = NULL;
+  num_defaults     = 0;
+  defaults         = NULL;
+  cups_protocol[0] = '\0';
 
   if ((dst = cupsFileOpen(to, "rb")) != NULL)
   {
@@ -2595,6 +2598,8 @@ copy_model(const char *from,		/* I - Source file */
           num_defaults = ppd_add_default(option, choice, num_defaults,
 	                                 &defaults);
       }
+      else if (!strncmp(buffer, "*cupsProtocol:", 14))
+        strlcpy(cups_protocol, buffer, sizeof(cups_protocol));
 
     cupsFileClose(dst);
   }
@@ -2711,6 +2716,9 @@ copy_model(const char *from,		/* I - Source file */
 
     cupsFilePrintf(dst, "%s\n", buffer);
   }
+
+  if (cups_protocol[0])
+    cupsFilePrintf(dst, "%s\n", cups_protocol);
 
  /*
   * Close both files and return...
@@ -6575,5 +6583,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.207 2003/04/10 14:30:48 mike Exp $".
+ * End of "$Id: ipp.c,v 1.208 2003/04/11 02:11:15 mike Exp $".
  */
