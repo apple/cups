@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.224 2004/02/04 20:13:18 mike Exp $"
+ * "$Id: ipp.c,v 1.225 2004/02/17 21:06:45 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -961,9 +961,9 @@ add_job_state_reasons(client_t *con,	/* I - Client connection */
 
 
   LogMessage(L_DEBUG2, "add_job_state_reasons(%p[%d], %d)\n", con, con->http.fd,
-             job->id);
+             job ? job->id : 0);
 
-  switch (job->state->values[0].integer)
+  switch (job ? job->state->values[0].integer : IPP_JOB_CANCELLED)
   {
     case IPP_JOB_PENDING :
         if (job->dtype & CUPS_PRINTER_CLASS)
@@ -4459,6 +4459,7 @@ print_job(client_t        *con,		/* I - Client connection */
   int			priority;	/* Job priority */
   char			*title;		/* Job name/title */
   job_t			*job;		/* Current job */
+  int			jobid;		/* Job ID number */
   char			job_uri[HTTP_MAX_URI],
 					/* Job URI */
 			printer_uri[HTTP_MAX_URI],
@@ -5083,23 +5084,28 @@ print_job(client_t        *con,		/* I - Client connection */
   SaveJob(job->id);
 
  /*
-  * Start the job if possible...
+  * Start the job if possible...  Since CheckJobs() can cancel a job if it
+  * doesn't print, we need to re-find the job afterwards...
   */
 
+  jobid = job->id;
+
   CheckJobs();
+
+  job = FindJob(jobid);
 
  /*
   * Fill in the response info...
   */
 
   snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	   ntohs(con->http.hostaddr.sin_port), job->id);
+	   ntohs(con->http.hostaddr.sin_port), jobid);
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL, job_uri);
 
-  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", jobid);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
-                job->state->values[0].integer);
+                job ? job->state->values[0].integer : IPP_JOB_CANCELLED);
   add_job_state_reasons(con, job);
 
   con->response->request.status.status_code = IPP_OK;
@@ -5997,7 +6003,17 @@ send_document(client_t        *con,	/* I - Client connection */
     }
 
     SaveJob(job->id);
+
+   /*
+    * Start the job if possible...  Since CheckJobs() can cancel a job if it
+    * doesn't print, we need to re-find the job afterwards...
+    */
+
+    jobid = job->id;
+
     CheckJobs();
+
+    job = FindJob(jobid);
   }
   else
   {
@@ -6017,14 +6033,14 @@ send_document(client_t        *con,	/* I - Client connection */
   */
 
   snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	   ntohs(con->http.hostaddr.sin_port), job->id);
+	   ntohs(con->http.hostaddr.sin_port), jobid);
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL,
                job_uri);
 
-  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", jobid);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
-                job->state->values[0].integer);
+                job ? job->state->values[0].integer : IPP_JOB_CANCELLED);
   add_job_state_reasons(con, job);
 
   con->response->request.status.status_code = IPP_OK;
@@ -6853,5 +6869,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.224 2004/02/04 20:13:18 mike Exp $".
+ * End of "$Id: ipp.c,v 1.225 2004/02/17 21:06:45 mike Exp $".
  */
