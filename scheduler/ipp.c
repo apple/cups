@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.181 2003/01/03 22:02:36 mike Exp $"
+ * "$Id: ipp.c,v 1.182 2003/01/23 18:01:14 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1130,10 +1130,10 @@ add_printer(client_t        *con,	/* I - Client connection */
       * See if the administrator has enabled file devices...
       */
 
-      if (!FileDevice)
+      if (!FileDevice && strcmp(resource, "/dev/null"))
       {
        /*
-        * Could not find device in list!
+        * File devices are disabled and the URL is not file:/dev/null...
 	*/
 
 	LogMessage(L_ERROR, "add_printer: File device URIs have been disabled! "
@@ -6051,5 +6051,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.181 2003/01/03 22:02:36 mike Exp $".
+ * End of "$Id: ipp.c,v 1.182 2003/01/23 18:01:14 mike Exp $".
  */
