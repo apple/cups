@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.15 2000/01/20 13:05:40 mike Exp $"
+# "$Id: Makefile,v 1.16 2000/02/08 20:38:58 mike Exp $"
 #
 #   GNU Ghostscript makefile for the Common UNIX Printing System (CUPS).
 #
@@ -120,9 +120,9 @@ clean:
 #
 
 install:	$(TARGETS)
-	-$(MKDIR) $(SERVERROOT)/filter
-	$(CP) pstoraster $(SERVERROOT)/filter
-	-$(LN) pstoraster $(SERVERROOT)/filter/pdftops
+	-$(MKDIR) $(SERVERBIN)/filter
+	$(CP) pstoraster $(SERVERBIN)/filter
+	-$(LN) pstoraster $(SERVERBIN)/filter/pdftops
 	-$(MKDIR) $(DATADIR)/pstoraster
 	$(CP) $(DFILES) $(DATADIR)/pstoraster
 
@@ -163,5 +163,5 @@ pstoraster:	pstoraster.o libgs.a ../Makedefs ../cups/$(LIBCUPS)
 pstoraster.o:	arch.h ../config.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.15 2000/01/20 13:05:40 mike Exp $".
+# End of "$Id: Makefile,v 1.16 2000/02/08 20:38:58 mike Exp $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.46 2000/01/27 03:38:34 mike Exp $"
+ * "$Id: dirsvc.c,v 1.47 2000/02/08 20:38:59 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -136,6 +136,7 @@ StopBrowsing(void)
 #endif /* WIN32 || __EMX__ */
 
     FD_CLR(BrowseSocket, &InputSet);
+    BrowseSocket = 0;
   }
 }
 
@@ -442,6 +443,9 @@ SendBrowseList(void)
 				/* Browse data packet */
 
 
+  if (!Browsing)
+    return;
+
  /*
   * Compute the update time...
   */
@@ -490,13 +494,20 @@ SendBrowseList(void)
       for (i = 0; i < NumBrowsers; i ++)
 	if (sendto(BrowseSocket, packet, bytes, 0,
 	           (struct sockaddr *)Browsers + i, sizeof(Browsers[0])) <= 0)
+	{
 	  LogMessage(L_ERROR, "SendBrowseList: sendto failed for browser %d - %s.",
 	             i + 1, strerror(errno));
+	  LogMessage(L_ERROR, "Browsing turned off.");
+
+	  StopBrowsing();
+	  Browsing = 0;
+	  return;
+	}
     }
   }
 }
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.46 2000/01/27 03:38:34 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.47 2000/02/08 20:38:59 mike Exp $".
  */

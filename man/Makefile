@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.4 1999/12/08 12:45:58 mike Exp $"
+# "$Id: Makefile,v 1.5 2000/02/08 20:38:57 mike Exp $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,14 +28,14 @@ include ../Makedefs
 # Man pages...
 #
 
-MAN1	=	backend.1 filter.1 lp.1 lpq.1 lprm.1 lpr.1 lpstat.1
-MAN5	=	classes.conf.5 cupsd.conf.5 mime.convs.5 mime.types.5 \
+CAT1	=	backend.1 filter.1 lp.1 lpq.1 lprm.1 lpr.1 lpstat.1
+CAT5	=	classes.conf.5 cupsd.conf.5 mime.convs.5 mime.types.5 \
 		printers.conf.5
-MAN8	=	accept.8 cupsd.8 enable.8 lpadmin.8 lpc.8
+CAT8	=	accept.8 cupsd.8 enable.8 lpadmin.8 lpc.8
 
-CAT1	=	$(MAN1:.1=.$(CAT))
-CAT5	=	$(MAN5:.5=.$(CAT))
-CAT8	=	$(MAN8:.8=.$(CAT))
+MAN1	=	$(MAN1:.1=.man)
+MAN5	=	$(MAN5:.5=.man)
+MAN8	=	$(MAN8:.8=.man)
 
 #
 # Make everything...
@@ -55,24 +55,30 @@ clean:
 
 install:
 	-$(MKDIR) $(MANDIR)/man1
-	$(CP) $(MAN1) $(MANDIR)/man1
+	for file in $(MAN1); do \
+		$(CP) $$file $(MANDIR)/man1/`basename $$file man`1; \
+	done
 	$(LN) lp.1 $(MANDIR)/man1/cancel.1
-	-$(MKDIR) $(MANDIR)/man5
-	$(CP) $(MAN5) $(MANDIR)/man5
-	-$(MKDIR) $(MANDIR)/man8
-	$(CP) $(MAN8) $(MANDIR)/man8
-	$(LN) accept.8 $(MANDIR)/man8/reject.8
-	$(LN) enable.8 $(MANDIR)/man8/disable.8
 	-$(MKDIR) $(MANDIR)/cat1
 	$(CP) $(CAT1) $(MANDIR)/cat1
-	$(LN) lp.$(CAT) $(MANDIR)/cat1/cancel.$(CAT)
+	$(LN) lp.1 $(MANDIR)/cat1/cancel.1
+	-$(MKDIR) $(MANDIR)/man5
+	for file in $(MAN5); do \
+		$(CP) $$file $(MANDIR)/man5/`basename $$file man`5; \
+	done
 	-$(MKDIR) $(MANDIR)/cat5
 	$(CP) $(CAT5) $(MANDIR)/cat5
+	-$(MKDIR) $(MANDIR)/man8
+	for file in $(MAN8); do \
+		$(CP) $$file $(MANDIR)/man8/`basename $$file man`8; \
+	done
+	$(LN) accept.8 $(MANDIR)/man8/reject.8
+	$(LN) enable.8 $(MANDIR)/man8/disable.8
 	-$(MKDIR) $(MANDIR)/cat8
 	$(CP) $(CAT8) $(MANDIR)/cat8
-	$(LN) accept.$(CAT) $(MANDIR)/cat8/reject.$(CAT)
-	$(LN) enable.$(CAT) $(MANDIR)/cat8/disable.$(CAT)
+	$(LN) accept.8 $(MANDIR)/cat8/reject.8
+	$(LN) enable.8 $(MANDIR)/cat8/disable.8
 
 #
-# End of "$Id: Makefile,v 1.4 1999/12/08 12:45:58 mike Exp $".
+# End of "$Id: Makefile,v 1.5 2000/02/08 20:38:57 mike Exp $".
 #

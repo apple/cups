@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.11 2000/01/20 22:33:10 mike Exp $"
+# "$Id: cups.spec,v 1.12 2000/02/08 20:38:40 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -26,11 +26,11 @@
 
 Summary: Common Unix Printing System
 Name: cups
-Version: 1.1
+Version: 1.1a6
 Release: 0
 Copyright: GPL
 Group: System Environment/Daemons
-Source: ftp://ftp.easysw.com/pub/cups/1.1/cups-1.1-source.tar.gz
+Source: ftp://ftp.easysw.com/pub/cups/beta/cups-1.1a6-source.tar.gz
 Url: http://www.cups.org
 Packager: Michael Sweet <mike@easysw.com>
 Vendor: Easy Software Products
@@ -66,28 +66,13 @@ make
 # these lines just make sure the directory structure in the
 # RPM_BUILD_ROOT exists
 rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT/etc/cups
 mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
-mkdir -p $RPM_BUILD_ROOT/usr/bin
-mkdir -p $RPM_BUILD_ROOT/usr/lib/cups
-mkdir -p $RPM_BUILD_ROOT/usr/man/man1
-mkdir -p $RPM_BUILD_ROOT/usr/man/man5
-mkdir -p $RPM_BUILD_ROOT/usr/man/man8
-mkdir -p $RPM_BUILD_ROOT/usr/share/cups
-mkdir -p $RPM_BUILD_ROOT/usr/share/locale
-mkdir -p $RPM_BUILD_ROOT/var/log/cups
-mkdir -p $RPM_BUILD_ROOT/var/spool/cups
 
-make prefix=$RPM_BUILD_ROOT/usr DATADIR=$RPM_BUILD_ROOT/usr/share/cups LOCALEDIR=$RPM_BUILD_ROOT/usr/share/locale SERVERROOT=$RPM_BUILD_ROOT/var/cups install
+make prefix=$RPM_BUILD_ROOT/usr LOGDIR=$RPM_BUILD_ROOT/var/log/cups \
+	REQUESTS=$RPM_BUILD_ROOT/var/spool/cups \
+	SERVERROOT=$RPM_BUILD_ROOT/etc/cups install
 
 install -m 755 -o root -g root cups.sh $RPM_BUILD_ROOT/etc/rc.d/init.d/cups
-
-ln -sf /usr/sbin/accept $RPM_BUILD_ROOT/usr/bin/disable
-ln -sf /usr/sbin/accept $RPM_BUILD_ROOT/usr/bin/enable
-ln -sf /usr/sbin/accept $RPM_BUILD_ROOT/usr/lib/accept
-ln -sf /usr/sbin/accept $RPM_BUILD_ROOT/usr/lib/reject
-ln -sf /usr/sbin/accept $RPM_BUILD_ROOT/usr/sbin/reject
-ln -sf /usr/sbin/lpadmin $RPM_BUILD_ROOT/usr/lib/lpadmin
 
 %post
 /sbin/chkconfig --add cups
@@ -99,29 +84,32 @@ ln -sf /usr/sbin/lpadmin $RPM_BUILD_ROOT/usr/lib/lpadmin
 rm -rf $RPM_BUILD_ROOT
 
 %files
+%defattr(-,root,root)
 /etc/rc.d/init.d/cups
-%config /var/cups/conf/*
+%config /etc/cups/*
+%dir /etc/cups/certs
+%dir /etc/cups/interfaces
+%dir /etc/cups/ppd
 /usr/bin/*
 /usr/lib/*
 /usr/man/*
 /usr/sbin/*
 %dir /usr/share/cups
 /usr/share/cups/*
+%dir /usr/share/doc/cups
+/usr/share/doc/cups/*
 %dir /var/cups
-/var/cups/backend/*
-/var/cups/cgi-bin/*
-/var/cups/filter/*
-%dir /var/cups/interfaces
-%dir /var/cups/logs
-%dir /var/cups/ppd
-%dir /var/cups/requests
-%dir /etc/cups
+/usr/lib/cups/backend/*
+/usr/lib/cups/cgi-bin/*
+/usr/lib/cups/filter/*
+%dir /var/spool/cups
 %dir /var/log/cups
 
 %files devel
 %dir /usr/include/cups
 /usr/include/cups/*
+/usr/lib/*.a
 
 #
-# End of "$Id: cups.spec,v 1.11 2000/01/20 22:33:10 mike Exp $".
+# End of "$Id: cups.spec,v 1.12 2000/02/08 20:38:40 mike Exp $".
 #

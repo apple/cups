@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.15 2000/02/02 00:50:42 mike Exp $"
+ * "$Id: printers.c,v 1.16 2000/02/08 20:38:44 mike Exp $"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -46,12 +46,16 @@ main(int  argc,			/* I - Number of command-line arguments */
   http_t	*http;		/* Connection to the server */
   ipp_t		*request,	/* IPP request */
 		*response;	/* IPP response */
-  ipp_attribute_t *attr;	/* IPP attribute */
   char		uri[HTTP_MAX_URI];
 				/* Printer URI */
+  const char	*which_jobs;	/* Which jobs to show */
+ 
 
+ /*
+  * Get any form variables...
+  */
 
-  setbuf(stdout, NULL);
+  cgiInitialize();
 
  /*
   * Get the request language...
@@ -178,6 +182,10 @@ main(int  argc,			/* I - Number of command-line arguments */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
                  uri);
 
+    if ((which_jobs = cgiGetVariable("which_jobs")) != NULL)
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "which-jobs",
+                   NULL, which_jobs);
+
    /*
     * Do the request and get back a response...
     */
@@ -209,5 +217,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: printers.c,v 1.15 2000/02/02 00:50:42 mike Exp $".
+ * End of "$Id: printers.c,v 1.16 2000/02/08 20:38:44 mike Exp $".
  */

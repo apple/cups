@@ -1,9 +1,7 @@
 #
-# "$Id: Makedefs.in,v 1.17 2000/01/20 13:05:37 mike Exp $"
+# "$Id: Makedefs.in,v 1.18 2000/02/08 20:38:40 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
-#
-#   @configure_input@
 #
 #   Copyright 1997-2000 by Easy Software Products, all rights reserved.
 #
@@ -75,12 +73,6 @@ OPTIM	=	@OPTIM@
 OPTIONS	=
 
 #
-# Formatted man page extension...
-#
-
-CAT	=	@CAT@
-
-#
 # Directories...
 #
 # The first section uses the GNU names (which are *extremely*
@@ -111,6 +103,7 @@ top_srcdir	=	@top_srcdir@
 
 BINDIR		=	@bindir@
 DATADIR		=	@CUPS_DATADIR@
+DOCDIR		=	@CUPS_DOCDIR@
 INCLUDEDIR	=	$(includedir)
 LIBDIR		=	$(libdir)
 LOCALEDIR	= 	@CUPS_LOCALEDIR@
@@ -126,16 +119,15 @@ SERVERROOT	= 	@CUPS_SERVERROOT@
 #
 
 .SILENT:
-.SUFFIXES:	.a .c .gz .h .o .z .1 .5 .8
+.SUFFIXES:	.a .c .h .man .o .1 .5 .8
 .c.o:
 	echo Compiling $<...
 	$(CC) $(CFLAGS) -c $<
-.1.z .5.z .8.z .1.gz .5.gz .8.gz:
+.man.1 .man.5 .man.8:
 	echo Formatting $<...
-	$(NROFF) -man $< >t
-	$(PACK) t
-	-mv t.$(CAT) $@
+	$(RM) $@
+	$(NROFF) -man $< >$@
 
 #
-# End of "$Id: Makedefs.in,v 1.17 2000/01/20 13:05:37 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.18 2000/02/08 20:38:40 mike Exp $"
 #

@@ -1,24 +1,49 @@
-<TABLE BORDER="1">
-<TR>
-	<TH>Name</TH>
-	<TH>Information</TH>
-</TR>
+{#printer_name=0?No classes:
+<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
 {[printer_name]
 <TR>
+	<TH BGCOLOR="#999966"><IMG SRC="/images/left.gif"></TH>
+	<TH BGCOLOR="#999966"><A HREF="{printer_uri_supported}">{printer_name}</A></TH>
+	<TH BGCOLOR="#999966"></TH>
+	<TH><IMG SRC="/images/right.gif"></TH>
+</TR>
+<TR>
+	<TD HEIGHT="4"></TD>
+</TR>
+<TR>
+	<TD></TD>
 	<TD VALIGN=TOP><A HREF="{printer_uri_supported}">
-	<IMG SRC="../images/classes.gif" BORDER="0"><BR>{printer_name}</A></TD>
+	<IMG SRC="../images/classes.gif" BORDER="0"></A></TD>
 	<TD VALIGN=TOP>Description: {printer_info}<BR>
 	Location: {printer_location}<BR>
-	Class State: {printer_state=3?idle:{printer_state=4?processing:stopped}}},
+	Class State: {printer_state=3?idle:{printer_state=4?processing:stopped}},
 	{printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}.
-	{printer_state_message!?<BR><I>"{printer_state_message}"</I>:}
+	{?printer_state_message=?:<BR><I>"{printer_state_message}"</I>}
 	<P>
-	<IMG SRC="../images/print-test-page.gif" ALT="Print Test Page">
-	<IMG SRC="../images/start-class.gif" ALT="Start Class">
-	<IMG SRC="../images/stop-class.gif" ALT="Stop Class">
-	<IMG SRC="../images/accept-jobs.gif" ALT="Accept Jobs">
-	<IMG SRC="../images/reject-jobs.gif" ALT="Reject Jobs">
+	<A HREF="/admin/?op=print-test-page&printer_name={printer_name}">
+	<IMG SRC="/images/print-test-page.gif" ALT="Print Test Page" BORDER="0"></A>
+	{printer_state=5?
+	<A HREF="/admin/?op=start-class&printer_name={printer_name}">
+	<IMG SRC="/images/start-class.gif" ALT="Start Class" BORDER="0"></A>
+	:
+	<A HREF="/admin/?op=stop-printer&printer_name={printer_name}">
+	<IMG SRC="/images/stop-class.gif" ALT="Stop Class" BORDER="0"></A>
+	}
+	{printer_is_accepting_jobs=0?
+	<A HREF="/admin/?op=accept-jobs&printer_name={printer_name}">
+	<IMG SRC="/images/accept-jobs.gif" ALT="Accept Jobs" BORDER="0"></A>
+	:
+	<A HREF="/admin/?op=reject-jobs&printer_name={printer_name}">
+	<IMG SRC="/images/reject-jobs.gif" ALT="Reject Jobs" BORDER="0"></A>
+	}
+	<A HREF="/admin/?op=modify-class&printer_name={printer_name}">
+	<IMG SRC="/images/modify-class.gif" ALT="Modify Class" BORDER="0"></A>
+	<A HREF="/admin/?op=delete-class&printer_name={printer_name}">
+	<IMG SRC="/images/delete-class.gif" ALT="Delete Class" BORDER="0"></A>
 	</TD>
 </TR>
 }
 </TABLE>
+}
+<P><A HREF="/admin/?op=add-class">
+<IMG SRC="/images/add-class.gif" ALT="Add Class" BORDER="0"></A>

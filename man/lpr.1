@@ -1,96 +1,132 @@
-.\"
-.\" "$Id: lpr.1,v 1.4 2000/01/04 13:46:03 mike Exp $"
-.\"
-.\"   lpr man page for the Common UNIX Printing System (CUPS).
-.\"
-.\"   Copyright 1997-2000 by Easy Software Products.
-.\"
-.\"   These coded instructions, statements, and computer programs are the
-.\"   property of Easy Software Products and are protected by Federal
-.\"   copyright law.  Distribution and use rights are outlined in the file
-.\"   "LICENSE.txt" which should have been included with this file.  If this
-.\"   file is missing or damaged please contact Easy Software Products
-.\"   at:
-.\"
-.\"       Attn: CUPS Licensing Information
-.\"       Easy Software Products
-.\"       44141 Airport View Drive, Suite 204
-.\"       Hollywood, Maryland 20636-3111 USA
-.\"
-.\"       Voice: (301) 373-9603
-.\"       EMail: cups-info@cups.org
-.\"         WWW: http://www.cups.org
-.\"
-.TH lpr 1 "Common UNIX Printing System" "9 September 1999" "Easy Software Products"
-.SH NAME
-lpr \- print files
-.SH SYNOPSIS
-.B lpr
-[ \-P
-.I destination
-] [ \-#
-.I num-copies
-[ \-l ] [ \-o
-.I option
-] [ \-p] [ \-r ] [ \-C/J/T
-.I title
-] [
-.I file(s)
-]
-.SH DESCRIPTION
-\fBlpr\fR submits files for printing. Files named on the command line are sent
-to the named printer (or the system default destination if no destination is
-specified). If no files are listed on the command-line \fBlpr\fR reads the
-print file from the standard input.
-.SH OPTIONS
-The following options are recognized by \fBlpr\fR:
-.TP 5
-\-P \fIdestination\fR
-.br
-Prints files to the named printer.
-.TP 5
-\-# \fIcopies\fR
-.br
-Sets the number of copies to print from 1 to 100.
-.TP 5
-\-C \fIname\fR
-.br
-Sets the job name.
-.TP 5
-\-J \fIname\fR
-.br
-Sets the job name.
-.TP 5
-\-T \fIname\fR
-.br
-Sets the job name.
-.TP 5
-\-l
-.br
-Specifies that the print file is already formatted for the destination and
-should be sent without filtering. This option is equivalent to "-oraw".
-.TP 5
-\-o \fIoption\fR
-.br
-Sets a job option.
-.TP 5
-\-p
-.br
-Specifies that the print file should be formatted with a shaded header with
-the date, time, job name, and page number. This option is equivalent to
-"-oprettyprint" and is only useful when printing text files.
-.TP 5
-\-r
-.br
-Specifies that the named print files should be deleted after printing them.
-.SH COMPATIBILITY
-The "c", "d", "f", "g", "i", "m", "n", "t", "v", and "w" options are not
-supported by CUPS and will produce a warning message if used.
-.SH SEE ALSO
-cancel(1), lp(1), lpstat(1),
-CUPS Software Users Manual
-.SH COPYRIGHT
-Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
-.\"
-.\" End of "$Id: lpr.1,v 1.4 2000/01/04 13:46:03 mike Exp $".
-.\"
+
+
+
+lpr(1)                Easy Software Products               lpr(1)
+
+
+NNAAMMEE
+       lpr - print files
+
+SSYYNNOOPPSSIISS
+       llpprr  [ -P _d_e_s_t_i_n_a_t_i_o_n ] [ -# _n_u_m_-_c_o_p_i_e_s [ -l ] [ -o _o_p_t_i_o_n
+       ] [ -p] [ -r ] [ -C/J/T _t_i_t_l_e ] [ _f_i_l_e_(_s_) ]
+
+DDEESSCCRRIIPPTTIIOONN
+       llpprr submits files for printing. Files named on the command
+       line  are sent to the named printer (or the system default
+       destination if no destination is specified). If  no  files
+       are  listed  on  the command-line llpprr reads the print file
+       from the standard input.
+
+OOPPTTIIOONNSS
+       The following options are recognized by llpprr:
+
+       -P _d_e_s_t_i_n_a_t_i_o_n
+            Prints files to the named printer.
+
+       -# _c_o_p_i_e_s
+            Sets the number of copies to print from 1 to 100.
+
+       -C _n_a_m_e
+            Sets the job name.
+
+       -J _n_a_m_e
+            Sets the job name.
+
+       -T _n_a_m_e
+            Sets the job name.
+
+       -l
+            Specifies that the print file  is  already  formatted
+            for  the  destination and should be sent without fil-
+            tering. This option is equivalent to "-oraw".
+
+       -o _o_p_t_i_o_n
+            Sets a job option.
+
+       -p
+            Specifies that the print  file  should  be  formatted
+            with  a  shaded header with the date, time, job name,
+            and  page  number.  This  option  is  equivalent   to
+            "-oprettyprint" and is only useful when printing text
+            files.
+
+       -r
+            Specifies  that  the  named  print  files  should  be
+            deleted after printing them.
+
+CCOOMMPPAATTIIBBIILLIITTYY
+       The  "c",  "d", "f", "g", "i", "m", "n", "t", "v", and "w"
+       options are not supported  by  CUPS  and  will  produce  a
+
+
+
+9 September 1999   Common UNIX Printing System                  1
+
+
+
+
+
+lpr(1)                Easy Software Products               lpr(1)
+
+
+       warning message if used.
+
+SSEEEE AALLSSOO
+       cancel(1), lp(1), lpstat(1), CUPS Software Users Manual
+
+CCOOPPYYRRIIGGHHTT
+       Copyright  1993-2000 by Easy Software Products, All Rights
+       Reserved.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+9 September 1999   Common UNIX Printing System                  2
+
+

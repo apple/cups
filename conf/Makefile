@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.5 1999/12/15 15:18:04 mike Exp $"
+# "$Id: Makefile,v 1.6 2000/02/08 20:38:45 mike Exp $"
 #
 #   Configuration file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -48,24 +48,24 @@ clean:
 #
 
 install:
-	-$(MKDIR) $(SERVERROOT)/conf
+	-$(MKDIR) $(SERVERROOT)
 	for file in $(KEEP); do \
-		if test -r $(SERVERROOT)/conf/$$file ; then \
-			$(CP) $$file $(SERVERROOT)/conf/$$file.N ; \
+		if test -r $(SERVERROOT)/$$file ; then \
+			$(CP) $$file $(SERVERROOT)/$$file.N ; \
 		else \
-			$(CP) $$file $(SERVERROOT)/conf ; \
+			$(CP) $$file $(SERVERROOT) ; \
 		fi ; \
 	done
 	for file in $(REPLACE); do \
-		if test -r $(SERVERROOT)/conf/$$file ; then \
-			$(MV) $(SERVERROOT)/conf/$$file $(SERVERROOT)/conf/$$file.O ; \
+		if test -r $(SERVERROOT)/$$file ; then \
+			$(MV) $(SERVERROOT)/$$file $(SERVERROOT)/$$file.O ; \
 		fi ; \
-		$(CP) $$file $(SERVERROOT)/conf ; \
+		$(CP) $$file $(SERVERROOT) ; \
 	done
 	if test -r /etc/printcap -a ! -r /etc/printcap.O; then \
 		$(CP) /etc/printcap /etc/printcap.O ; \
 	fi
 
 #
-# End of "$Id: Makefile,v 1.5 1999/12/15 15:18:04 mike Exp $".
+# End of "$Id: Makefile,v 1.6 2000/02/08 20:38:45 mike Exp $".
 #

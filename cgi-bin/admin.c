@@ -1,7 +1,7 @@
 /*
- * "$Id: admin.c,v 1.2 2000/02/01 02:52:23 mike Exp $"
+ * "$Id: admin.c,v 1.3 2000/02/08 20:38:43 mike Exp $"
  *
- *   Class status CGI for the Common UNIX Printing System (CUPS).
+ *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-2000 by Easy Software Products.
  *
@@ -32,22 +32,16 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <cups/cups.h>
-#include <cups/language.h>
-#include <cups/debug.h>
-#include <config.h>
+#include "ipp-var.h"
 
 
 /*
  * Local functions...
  */
 
-static void	show_class_list(http_t *http, cups_lang_t *language);
-static void	show_class_info(http_t *http, cups_lang_t *language,
-		                  char *name);
+static void	do_job_op(http_t *http, cups_lang_t *language, ipp_op_t op);
+static void	do_printer_op(http_t *http, cups_lang_t *language, ipp_op_t op);
+static void	do_test_page(http_t *http, cups_lang_t *language);
 
 
 /*
@@ -59,8 +53,8 @@ main(int  argc,			/* I - Number of command-line arguments */
      char *argv[])		/* I - Command-line arguments */
 {
   cups_lang_t	*language;	/* Language information */
-  char		*name;		/* Class name */
   http_t	*http;		/* Connection to the server */
+  const char	*op;		/* Operation name */
 
 
  /*
@@ -70,105 +64,92 @@ main(int  argc,			/* I - Number of command-line arguments */
   language = cupsLangDefault();
 
  /*
-  * Connect to the HTTP server...
-  */
-
-  http = httpConnect("localhost", ippPort());
-
- /*
-  * Tell the client to expect HTML...
+  * Send a standard header...
   */
 
   printf("Content-Type: text/html;charset=%s\n\n", cupsLangEncoding(language));
 
- /*
-  * See if we need to show a list of classes or the status of a
-  * single class...
-  */
+  cgiSetVariable("TITLE", "Admin");
+  cgiSetVariable("SERVER_NAME", getenv("SERVER_NAME"));
+  cgiSetVariable("REMOTE_USER", getenv("REMOTE_USER"));
+  cgiSetVariable("CUPS_VERSION", CUPS_SVERSION);
 
-  name = argv[0];
-  if (strcmp(name, "/") == 0 || strcmp(name, "classes.cgi") == 0)
-    name = NULL;
+  cgiCopyTemplateFile(stdout, TEMPLATES "/header.tmpl");
 
  /*
-  * Print the standard header...
+  * See if we have form data...
   */
 
-  puts("<HTML>");
-  puts("<HEAD>");
-  if (name)
-    puts("<META HTTP-EQUIV=\"Refresh\" CONTENT=\"10\">");
+  if (!cgiInitialize())
+  {
+   /*
+    * Nope, send the administration menu...
+    */
+
+    cgiCopyTemplateFile(stdout, TEMPLATES "/admin.tmpl");
+  }
+  else if ((op = cgiGetVariable("OP")) != NULL)
+  {
+   /*
+    * Connect to the HTTP server...
+    */
+
+    http = httpConnect("localhost", ippPort());
+
+   /*
+    * Do the operation...
+    */
+
+    if (strcmp(op, "cancel-job") == 0)
+      do_job_op(http, language, IPP_CANCEL_JOB);
+    else if (strcmp(op, "hold-job") == 0)
+      do_job_op(http, language, IPP_HOLD_JOB);
+    else if (strcmp(op, "release-job") == 0)
+      do_job_op(http, language, IPP_RELEASE_JOB);
+    else if (strcmp(op, "start-printer") == 0)
+      do_printer_op(http, language, IPP_RESUME_PRINTER);
+    else if (strcmp(op, "stop-printer") == 0)
+      do_printer_op(http, language, IPP_PAUSE_PRINTER);
+    else if (strcmp(op, "accept-jobs") == 0)
+      do_printer_op(http, language, CUPS_ACCEPT_JOBS);
+    else if (strcmp(op, "reject-jobs") == 0)
+      do_printer_op(http, language, CUPS_REJECT_JOBS);
+    else if (strcmp(op, "print-test-page") == 0)
+      do_test_page(http, language);
+    else
+    {
+     /*
+      * Bad operation code...  Display an error...
+      */
+
+      cgiCopyTemplateFile(stdout, TEMPLATES "/admin-op.tmpl");
+    }
+
+   /*
+    * Close the HTTP server connection...
+    */
+
+    httpClose(http);
+  }
   else
-    puts("<META HTTP-EQUIV=\"Refresh\" CONTENT=\"30\">");
-  printf("<TITLE>%s on %s - " CUPS_SVERSION "</TITLE>\n",
-         name == NULL ? "Classes" : name, getenv("SERVER_NAME"));
-  puts("<LINK REL=STYLESHEET TYPE=\"text/css\" HREF=\"/cups.css\">");
-  puts("<MAP NAME=\"navbar\">");
-#ifdef ESPPRINTPRO
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"10,10,76,30\" HREF=\"/printers\" ALT=\"Current Printer Status\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"88,10,158,30\" HREF=\"/classes\" ALT=\"Current Printer Classes Status\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"170,10,210,30\" HREF=\"/jobs\" ALT=\"Current Jobs Status\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"222,10,354,30\" HREF=\"/documentation.html\" ALT=\"Read CUPS Documentation On-Line\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"366,10,442,30\" HREF=\"http://www.easysw.com/software.html\" ALT=\"Download the Current ESP Print Pro Software\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"454,10,530,30\" HREF=\"http://www.easysw.com/support.html\" ALT=\"Get Tech Support for Current ESP Print Pro\">");
-#else
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"10,10,85,30\" HREF=\"/printers\" ALT=\"Current Printer Status\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"95,10,175,30\" HREF=\"/classes\" ALT=\"Current Printer Classes Status\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"185,10,235,30\" HREF=\"/jobs\" ALT=\"Current Jobs Status\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"245,10,395,30\" HREF=\"/documentation.html\" ALT=\"Read CUPS Documentation On-Line\">");
-  puts("<AREA SHAPE=\"RECT\" COORDS=\"405,10,490,30\" HREF=\"http://www.cups.org\" ALT=\"Download the Current CUPS Software\">");
-#endif /* ESPPRINTPRO */
-  puts("</MAP>");
-  puts("</HEAD>");
-  puts("<BODY>");
-  puts("<P ALIGN=CENTER>");
-  puts("<A HREF=\"http://www.easysw.com\" ALT=\"Easy Software Products Home Page\">");
-  puts("<IMG SRC=\"/images/logo.gif\" WIDTH=\"71\" HEIGHT=\"40\" BORDER=0 ALT=\"Easy Software Products Home Page\"></A>");
-  puts("<IMG SRC=\"/images/navbar.gif\" WIDTH=\"540\" HEIGHT=\"40\" USEMAP=\"#navbar\" BORDER=0>");
+  {
+   /*
+    * Form data but no operation code...  Display an error...
+    */
 
-  printf("<H1>%s on %s</H1>\n", name == NULL ? "Classes" : name,
-         getenv("SERVER_NAME"));
-  fflush(stdout);
-
-  puts("<CENTER>");
-  puts("<TABLE WIDTH=\"90%\" BORDER=\"1\">");
-  puts("<TR>");
-  puts("<TH>Name</TH>");
-  puts("<TH WIDTH=\"50%\">Status</TH>");
-  puts("<TH WIDTH=\"25%\">Jobs</TH>");
-  puts("</TR>");
+    cgiCopyTemplateFile(stdout, TEMPLATES "/admin-op.tmpl");
+  }
 
  /*
-  * Show the information...
+  * Send the standard trailer...
   */
 
-  if (name == NULL)
-    show_class_list(http, language);
-  else
-    show_class_info(http, language, name);
+  cgiCopyTemplateFile(stdout, TEMPLATES "/trailer.tmpl");
 
  /*
-  * Write a standard trailer...
+  * Free the request language...
   */
 
-  puts("</TABLE>");
-  puts("</CENTER>");
-
-  puts("<HR>");
-
-  puts("<P>The Common UNIX Printing System, CUPS, and the CUPS logo are the");
-  puts("trademark property of <A HREF=\"http://www.easysw.com\">Easy Software");
-  puts("Products</A>. CUPS is copyright 1997-2000 by Easy Software Products,");
-  puts("All Rights Reserved.");
-
-  puts("</BODY>");
-  puts("</HTML>");
-
- /*
-  * Close the HTTP server connection...
-  */
-
-  httpClose(http);
   cupsLangFree(language);
 
  /*
@@ -180,31 +161,47 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * 'show_class_list()' - Show a list of classes...
+ * 'do_job_op()' - Do a job operation.
  */
 
 static void
-show_class_list(http_t      *http,	/* I - HTTP connection */
-                  cups_lang_t *language)/* I - Client's language */
+do_job_op(http_t      *http,		/* I - HTTP connection */
+          cups_lang_t *language,	/* I - Client's language */
+	  ipp_op_t    op)		/* I - Operation to perform */
 {
-  ipp_t		*request,	/* IPP request */
-		*response;	/* IPP response */
-  ipp_attribute_t *attr;	/* IPP attribute */
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  char		uri[HTTP_MAX_URI];	/* Job URI */
+  const char	*job;			/* Job ID */
+  const char	*printer;		/* Printer name (purge-jobs) */
+  ipp_status_t	status;			/* Operation status... */
 
+
+  if ((job = cgiGetVariable("JOB_ID")) != NULL)
+    snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%s", job);
+  else if ((printer = cgiGetVariable("PRINTER_NAME")) != NULL)
+    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+  else
+  {
+    cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
+    cgiCopyTemplateFile(stdout, TEMPLATES "/error.tmpl");
+    return;
+  }
 
  /*
-  * Build a CUPS_GET_CLASSES request, which requires the following
+  * Build a job request, which requires the following
   * attributes:
   *
   *    attributes-charset
   *    attributes-natural-language
+  *    job-uri or printer-uri (purge-jobs)
+  *    requesting-user-name
   */
 
   request = ippNew();
 
-  request->request.op.operation_id = CUPS_GET_CLASSES;
+  request->request.op.operation_id = op;
   request->request.op.request_id   = 1;
-
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
                "attributes-charset", NULL, cupsLangEncoding(language));
@@ -212,73 +209,74 @@ show_class_list(http_t      *http,	/* I - HTTP connection */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
 
+  if (job)
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
+                 NULL, uri);
+  else
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+                 NULL, uri);
+
+  if (getenv("REMOTE_USER") != NULL)
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+                 NULL, getenv("REMOTE_USER"));
+  else
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+                 NULL, "root");
+
  /*
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, "/")) != NULL)
+  if ((response = cupsDoRequest(http, request, "/jobs")) != NULL)
   {
-   /*
-    * Loop through the classes returned in the list and display
-    * their devices...
-    */
-
-    for (attr = response->attrs; attr != NULL; attr = attr->next)
-    {
-     /*
-      * Skip leading attributes until we hit a job...
-      */
-
-      while (attr != NULL && attr->group_tag != IPP_TAG_PRINTER)
-        attr = attr->next;
-
-      if (attr == NULL)
-        break;
-
-     /*
-      * Show the class status for each class...
-      */
-
-      while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
-      {
-        if (strcmp(attr->name, "printer-name") == 0 &&
-	    attr->value_tag == IPP_TAG_NAME)
-	  show_class_info(http, language, attr->values[0].string.text);
-
-        attr = attr->next;
-      }
-
-      if (attr == NULL)
-        break;
-    }
+    status = response->request.status.status_code;
 
     ippDelete(response);
   }
+  else
+    status = IPP_GONE;
+
+  if (status > IPP_OK_CONFLICT)
+  {
+    cgiSetVariable("ERROR", ippErrorString(status));
+    cgiCopyTemplateFile(stdout, TEMPLATES "/error.tmpl");
+  }
+  else if (op == IPP_CANCEL_JOB)
+    cgiCopyTemplateFile(stdout, TEMPLATES "/job-cancel.tmpl");
+  else if (op == IPP_HOLD_JOB)
+    cgiCopyTemplateFile(stdout, TEMPLATES "/job-hold.tmpl");
+  else if (op == IPP_RELEASE_JOB)
+    cgiCopyTemplateFile(stdout, TEMPLATES "/job-release.tmpl");
 }
 
 
 /*
- * 'show_class_info()' - Show class information.
+ * 'do_printer_op()' - Do a printer operation.
  */
 
 static void
-show_class_info(http_t      *http,
-                  cups_lang_t *language,
-                  char        *name)
+do_printer_op(http_t      *http,	/* I - HTTP connection */
+              cups_lang_t *language,	/* I - Client's language */
+	      ipp_op_t    op)		/* I - Operation to perform */
 {
-  ipp_t		*request,	/* IPP request */
-		*response,	/* IPP response */
-		*jobs;		/* IPP Get Jobs response */
-  int		jobcount;	/* Number of jobs */
-  ipp_attribute_t *attr;	/* IPP attribute */
-  char		*message;	/* Printer state message */
-  int		accepting;	/* Accepting requests? */
-  ipp_pstate_t	pstate;		/* Printer state */
-  char		uri[HTTP_MAX_URI];/* Printer URI */
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  char		uri[HTTP_MAX_URI];	/* Printer URI */
+  const char	*printer;		/* Printer name (purge-jobs) */
+  ipp_status_t	status;			/* Operation status... */
 
+
+  if ((printer = cgiGetVariable("PRINTER_NAME")) != NULL)
+    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+  else
+  {
+    cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
+    cgiCopyTemplateFile(stdout, TEMPLATES "/error.tmpl");
+    return;
+  }
 
  /*
-  * Build a IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
+  * Build a printer request, which requires the following
   * attributes:
   *
   *    attributes-charset
@@ -288,7 +286,7 @@ show_class_info(http_t      *http,
 
   request = ippNew();
 
-  request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+  request->request.op.operation_id = op;
   request->request.op.request_id   = 1;
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
@@ -297,190 +295,125 @@ show_class_info(http_t      *http,
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
 
-  snprintf(uri, sizeof(uri), "ipp://localhost/classes/%s", name);
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+               NULL, uri);
 
  /*
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, "/")) == NULL)
+  if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
   {
-    puts("<P>Unable to communicate with CUPS server!");
-    return;
-  }
+    status = response->request.status.status_code;
 
-  if (response->request.status.status_code == IPP_NOT_FOUND)
-  {
-    puts("<P>Class does not exist.");
     ippDelete(response);
-    return;
   }
-
- /*
-  * Grab the needed class attributes...
-  */
-
-  if ((attr = ippFindAttribute(response, "printer-state", IPP_TAG_ENUM)) != NULL)
-    pstate = (ipp_pstate_t)attr->values[0].integer;
   else
-    pstate = IPP_PRINTER_IDLE;
+    status = IPP_GONE;
 
-  if ((attr = ippFindAttribute(response, "printer-state-message", IPP_TAG_TEXT)) != NULL)
-    message = attr->values[0].string.text;
-  else
-    message = NULL;
-
-  if ((attr = ippFindAttribute(response, "printer-is-accepting-jobs",
-                               IPP_TAG_BOOLEAN)) != NULL)
-    accepting = attr->values[0].boolean;
-  else
-    accepting = 1;
-
-  if ((attr = ippFindAttribute(response, "printer-uri-supported", IPP_TAG_URI)) != NULL)
+  if (status > IPP_OK_CONFLICT)
   {
-    strcpy(uri, "http:");
-    strncpy(uri + 5, strchr(attr->values[0].string.text, '/'), sizeof(uri) - 6);
-    uri[sizeof(uri) - 1] = '\0';
+    cgiSetVariable("ERROR", ippErrorString(status));
+    cgiCopyTemplateFile(stdout, TEMPLATES "/error.tmpl");
   }
-
- /*
-  * Display the class entry...
-  */
-
-  puts("<TR>");
-
-  printf("<TD VALIGN=TOP><A HREF=\"%s\">%s</A></TD>\n", uri, name);
-
-  puts("<TD VALIGN=TOP><IMG SRC=\"/images/classes.gif\" ALIGN=\"LEFT\">");
-
-  printf("%s: %s, %s<BR>\n",
-         cupsLangString(language, CUPS_MSG_PRINTER_STATE),
-         cupsLangString(language, pstate == IPP_PRINTER_IDLE ? CUPS_MSG_IDLE :
-	                          pstate == IPP_PRINTER_PROCESSING ?
-				  CUPS_MSG_PROCESSING : CUPS_MSG_STOPPED),
-         cupsLangString(language, accepting ? CUPS_MSG_ACCEPTING_JOBS :
-	                          CUPS_MSG_NOT_ACCEPTING_JOBS));
-
-  if (message)
-    printf("<BR CLEAR=ALL><I>\"%s\"</I>\n", message);
-  else if (!accepting || pstate == IPP_PRINTER_STOPPED)
-    puts("<BR CLEAR=ALL><I>\"Reason Unknown\"</I>");
-
-  puts("</TD>");
-
- /*
-  * Show a list of jobs as needed...
-  */
-
-  if (pstate != IPP_PRINTER_IDLE)
-  {
-   /*
-    * Build an IPP_GET_JOBS request, which requires the following
-    * attributes:
-    *
-    *    attributes-charset
-    *    attributes-natural-language
-    *    printer-uri
-    */
-
-    request = ippNew();
-
-    request->request.op.operation_id = IPP_GET_JOBS;
-    request->request.op.request_id   = 1;
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-              	 "attributes-charset", NULL,
-		 cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                 "attributes-natural-language", NULL,
-		 language->language);
-
-    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", name);
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
-	         "printer-uri", NULL, uri);
-
-    jobs = cupsDoRequest(http, request, "/");
-  }
-  else
-    jobs = NULL;
-
-  puts("<TD VALIGN=\"TOP\">");
-  jobcount = 0;
-
-  if (jobs != NULL)
-  {
-    char	*username;	/* Pointer to job-originating-user-name */
-    int		jobid,		/* job-id */
-		size;		/* job-k-octets */
-
-
-    for (attr = jobs->attrs; attr != NULL; attr = attr->next)
-    {
-     /*
-      * Skip leading attributes until we hit a job...
-      */
-
-      while (attr != NULL && attr->group_tag != IPP_TAG_JOB)
-        attr = attr->next;
-
-      if (attr == NULL)
-        break;
-
-     /*
-      * Pull the needed attributes from this job...
-      */
-
-      jobid    = 0;
-      size     = 0;
-      username = NULL;
-
-      while (attr != NULL && attr->group_tag == IPP_TAG_JOB)
-      {
-        if (strcmp(attr->name, "job-id") == 0 &&
-	    attr->value_tag == IPP_TAG_INTEGER)
-	  jobid = attr->values[0].integer;
-
-        if (strcmp(attr->name, "job-k-octets") == 0 &&
-	    attr->value_tag == IPP_TAG_INTEGER)
-	  size = attr->values[0].integer;
-
-        if (strcmp(attr->name, "job-originating-user-name") == 0 &&
-	    attr->value_tag == IPP_TAG_NAME)
-	  username = attr->values[0].string.text;
-
-        attr = attr->next;
-      }
-
-     /*
-      * Display the job if it matches the current class...
-      */
-
-      if (username != NULL)
-      {
-	jobcount ++;
-	printf("<A HREF=\"/jobs/%d\">%s-%d %s %dk</A><BR>\n", jobid, name,
-	       jobid, username, size);
-      }
-
-      if (attr == NULL)
-        break;
-    }
-
-    ippDelete(jobs);
-  }
-
-  if (jobcount == 0)
-    puts("None");
-  puts("</TD>");
-  puts("</TR>");
-
-  ippDelete(response);
+  else if (op == IPP_PAUSE_PRINTER)
+    cgiCopyTemplateFile(stdout, TEMPLATES "/printer-stop.tmpl");
+  else if (op == IPP_RESUME_PRINTER)
+    cgiCopyTemplateFile(stdout, TEMPLATES "/printer-start.tmpl");
+  else if (op == CUPS_ACCEPT_JOBS)
+    cgiCopyTemplateFile(stdout, TEMPLATES "/printer-accept.tmpl");
+  else if (op == CUPS_REJECT_JOBS)
+    cgiCopyTemplateFile(stdout, TEMPLATES "/printer-reject.tmpl");
 }
 
 
 /*
- * End of "$Id: admin.c,v 1.2 2000/02/01 02:52:23 mike Exp $".
+ * 'do_test_page()' - Send a test page.
+ */
+
+static void
+do_test_page(http_t      *http,		/* I - HTTP connection */
+             cups_lang_t *language)	/* I - Client's language */
+{
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  char		uri[HTTP_MAX_URI];	/* Job URI */
+  const char	*printer;		/* Printer name (purge-jobs) */
+  ipp_status_t	status;			/* Operation status... */
+
+
+  if ((printer = cgiGetVariable("PRINTER_NAME")) != NULL)
+    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+  else
+  {
+    cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
+    cgiCopyTemplateFile(stdout, TEMPLATES "/error.tmpl");
+    return;
+  }
+
+ /*
+  * Build an IPP_PRINT_JOB request, which requires the following
+  * attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  *    printer-uri
+  *    requesting-user-name
+  *    document-format
+  */
+
+  request = ippNew();
+
+  request->request.op.operation_id = IPP_PRINT_JOB;
+  request->request.op.request_id   = 1;
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+               NULL, uri);
+
+  if (getenv("REMOTE_USER") != NULL)
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+                 NULL, getenv("REMOTE_USER"));
+  else
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+                 NULL, "root");
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name",
+               NULL, "Test Page");
+
+  ippAddString(request, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format",
+               NULL, "application/postscript");
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  if ((response = cupsDoFileRequest(http, request, uri + 15,
+                                    CUPS_DATADIR "/data/testprint.ps")) != NULL)
+  {
+    status = response->request.status.status_code;
+    ippSetCGIVars(response);
+
+    ippDelete(response);
+  }
+  else
+    status = IPP_GONE;
+
+  if (status > IPP_OK_CONFLICT)
+  {
+    cgiSetVariable("ERROR", ippErrorString(status));
+    cgiCopyTemplateFile(stdout, TEMPLATES "/error.tmpl");
+  }
+  else
+    cgiCopyTemplateFile(stdout, TEMPLATES "/test-page.tmpl");
+}
+
+
+/*
+ * End of "$Id: admin.c,v 1.3 2000/02/08 20:38:43 mike Exp $".
  */

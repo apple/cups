@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.15 2000/01/04 13:45:38 mike Exp $"
+# "$Id: Makefile,v 1.16 2000/02/08 20:38:48 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -31,10 +31,10 @@ include ../Makedefs
 .SUFFIXES:	.html .pdf .shtml
 .shtml.html:
 	echo Formatting $@...
-	htmldoc --title images/cups-large.gif --numbered -f $@ $<
+	htmldoc --titleimage images/cups-large.gif --numbered -f $@ $<
 .shtml.pdf:
 	echo Formatting $@...
-	htmldoc --title images/cups-large.gif --duplex --compression=9 \
+	htmldoc --titleimage images/cups-large.gif --duplex --compression=9 \
 		--numbered --jpeg -f $@ $<
 
 #
@@ -46,9 +46,39 @@ DOCUMENTS	=	cmp.shtml idd.shtml sam.shtml sdd.shtml spm.shtml \
 DOCIMAGES	=	images/cups-block-diagram.gif images/cups-large.gif \
 			images/cups-medium.gif images/cups-small.gif
 WEBPAGES	=	cups.css cupsdoc.css index.html documentation.html
-WEBIMAGES	=	images/classes.gif images/logo.gif images/navbar.gif \
-			images/printer-idle.gif	images/printer-processing.gif \
-			images/printer-stopped.gif
+WEBIMAGES	=	images/accept-jobs.gif \
+			images/add-class.gif \
+			images/add-printer.gif \
+			images/cancel-job.gif \
+			images/cancel-jobs.gif \
+			images/cancel.gif \
+			images/classes.gif \
+			images/continue.gif \
+			images/delete-class.gif \
+			images/delete-printer.gif \
+			images/draft.gif \
+			images/hold-job.gif \
+			images/left.gif \
+			images/logo.gif \
+			images/manage-classes.gif \
+			images/manage-jobs.gif \
+			images/manage-printers.gif \
+			images/modify-class.gif \
+			images/modify-printer.gif \
+			images/navbar.gif \
+			images/print-test-page.gif \
+			images/printer-idle.gif \
+			images/printer-processing.gif \
+			images/printer-stopped.gif \
+			images/reject-jobs.gif \
+			images/release-job.gif \
+			images/right.gif \
+			images/show-active.gif \
+			images/show-completed.gif \
+			images/start-class.gif \
+			images/start-printer.gif \
+			images/stop-class.gif \
+			images/stop-printer.gif
 
 #
 #
@@ -71,14 +101,14 @@ clean:
 #
 
 install:
-	-$(MKDIR) $(DATADIR)/doc
-	$(CP) $(WEBPAGES) $(DATADIR)/doc
-	$(CP) overview.html overview.pdf $(DATADIR)/doc
-	$(CP) $(DOCUMENTS:.shtml=.html) $(DATADIR)/doc
-	$(CP) $(DOCUMENTS:.shtml=.pdf) $(DATADIR)/doc
-	-$(MKDIR) $(DATADIR)/doc/images
-	$(CP) $(WEBIMAGES) $(DATADIR)/doc/images
-	$(CP) $(DOCIMAGES) $(DATADIR)/doc/images
+	-$(MKDIR) $(DOCDIR)/doc
+	$(CP) $(WEBPAGES) $(DOCDIR)/doc
+	$(CP) overview.html overview.pdf $(DOCDIR)/doc
+	$(CP) $(DOCUMENTS:.shtml=.html) $(DOCDIR)/doc
+	$(CP) $(DOCUMENTS:.shtml=.pdf) $(DOCDIR)/doc
+	-$(MKDIR) $(DOCDIR)/doc/images
+	$(CP) $(WEBIMAGES) $(DOCDIR)/doc/images
+	$(CP) $(DOCIMAGES) $(DOCDIR)/doc/images
 
 #
 # The overview, admin manual, programmers manual, and users manual get
@@ -91,26 +121,26 @@ overview.pdf:	overview.html
 
 sam.html:	sam.shtml
 	echo Formatting $@...
-	htmldoc --title images/cups-large.gif -f $@ $<
+	htmldoc --titleimage images/cups-large.gif -f $@ $<
 sam.pdf:	sam.shtml
 	echo Formatting $@...
-	htmldoc --title images/cups-large.gif --duplex --compression=9 \
+	htmldoc --titleimage images/cups-large.gif --duplex --compression=9 \
 		--jpeg -f $@ $<
 
 spm.html:	spm.shtml
 	echo Formatting $@...
-	htmldoc --title images/cups-large.gif -f $@ $<
+	htmldoc --titleimage images/cups-large.gif -f $@ $<
 spm.pdf:	spm.shtml
 	echo Formatting $@...
-	htmldoc --title images/cups-large.gif --duplex --compression=9 \
+	htmldoc --titleimage images/cups-large.gif --duplex --compression=9 \
 		--jpeg -f $@ $<
 
 sum.html:	sum.shtml
 	echo Formatting $@...
-	htmldoc --title images/cups-large.gif -f $@ $<
+	htmldoc --titleimage images/cups-large.gif -f $@ $<
 sum.pdf:	sum.shtml
 	echo Formatting $@...
-	htmldoc --title images/cups-large.gif --duplex --compression=9 \
+	htmldoc --titleimage images/cups-large.gif --duplex --compression=9 \
 		--jpeg -f $@ $<
 
 #

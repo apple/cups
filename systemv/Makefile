@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.14 2000/01/04 13:46:11 mike Exp $"
+# "$Id: Makefile,v 1.15 2000/02/08 20:39:02 mike Exp $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -48,13 +48,19 @@ install:
 	-$(MKDIR) $(BINDIR)
 	-$(MKDIR) $(LIBDIR)
 	$(CP) accept lpadmin $(SBINDIR)
-	-$(LN) accept $(SBINDIR)/reject
-	-$(LN) $(SBINDIR)/lpadmin $(LIBDIR)
-	-$(LN) $(SBINDIR)/accept $(LIBDIR)
-	-$(LN) $(SBINDIR)/accept $(LIBDIR)/reject
-	-$(LN) $(SBINDIR)/accept $(BINDIR)/disable
-	-$(LN) $(SBINDIR)/accept $(BINDIR)/enable
 	$(CP) cancel lp lpstat $(BINDIR)
+	$(RM) $(SBINDIR)/reject
+	$(LN) accept $(SBINDIR)/reject
+	$(RM) $(LIBDIR)/lpadmin
+	$(LN) ../sbin/lpadmin $(LIBDIR)
+	$(RM) $(LIBDIR)/accept
+	$(LN) ../sbin/accept $(LIBDIR)
+	$(RM) $(LIBDIR)/reject
+	$(LN) ../sbin/accept $(LIBDIR)/reject
+	$(RM) $(BINDIR)/disable
+	$(LN) ../sbin/accept $(BINDIR)/disable
+	$(RM) $(BINDIR)/enable
+	$(LN) ../sbin/accept $(BINDIR)/enable
 
 #
 # accept
@@ -63,9 +69,6 @@ install:
 accept:	accept.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o accept accept.o $(LIBS)
-	-$(LN) accept disable
-	-$(LN) accept enable
-	-$(LN) accept reject
 
 accept.o:	../cups/cups.h ../Makedefs
 
@@ -110,5 +113,5 @@ lpstat:	lpstat.o ../cups/$(LIBCUPS)
 lpstat.o:	../cups/cups.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.14 2000/01/04 13:46:11 mike Exp $".
+# End of "$Id: Makefile,v 1.15 2000/02/08 20:39:02 mike Exp $".
 #

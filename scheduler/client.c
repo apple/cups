@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.49 2000/02/03 14:18:53 mike Exp $"
+ * "$Id: client.c,v 1.50 2000/02/08 20:38:59 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -239,8 +239,6 @@ ReadClient(client_t *con)	/* I - Client to read from */
   char		*filename;	/* Name of file for GET/HEAD */
   struct stat	filestats;	/* File information */
   mime_type_t	*type;		/* MIME type of file */
-  char		command[1024],	/* Command to run */
-		*options;	/* Options/CGI data */
   printer_t	*p;		/* Printer */
   static unsigned request_id = 0;/* Request ID for temp files */
 
@@ -282,6 +280,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	con->bytes               = 0;
 	con->file                = 0;
 	con->pipe_pid            = 0;
+	con->command[0]          = '\0';
 	con->username[0]         = '\0';
 	con->password[0]         = '\0';
 	con->uri[0]              = '\0';
@@ -476,29 +475,33 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
             if (strncmp(con->uri, "/admin", 6) == 0)
 	    {
-	      snprintf(command, sizeof(command), "%s/cgi-bin/admin.cgi", ServerBin);
-	      options = con->uri + 6;
+	      snprintf(con->command, sizeof(con->command),
+	               "%s/cgi-bin/admin.cgi", ServerBin);
+	      con->options = con->uri + 6;
 	    }
             else if (strncmp(con->uri, "/printers", 9) == 0)
 	    {
-	      snprintf(command, sizeof(command), "%s/cgi-bin/printers.cgi", ServerBin);
-	      options = con->uri + 9;
+	      snprintf(con->command, sizeof(con->command),
+	               "%s/cgi-bin/printers.cgi", ServerBin);
+	      con->options = con->uri + 9;
 	    }
 	    else if (strncmp(con->uri, "/classes", 8) == 0)
 	    {
-	      snprintf(command, sizeof(command), "%s/cgi-bin/classes.cgi", ServerBin);
-	      options = con->uri + 8;
+	      snprintf(con->command, sizeof(con->command),
+	               "%s/cgi-bin/classes.cgi", ServerBin);
+	      con->options = con->uri + 8;
 	    }
 	    else
 	    {
-	      snprintf(command, sizeof(command), "%s/cgi-bin/jobs.cgi", ServerBin);
-	      options = con->uri + 5;
+	      snprintf(con->command, sizeof(con->command),
+	               "%s/cgi-bin/jobs.cgi", ServerBin);
+	      con->options = con->uri + 5;
 	    }
 
-	    if (*options == '/')
-	      options ++;
+	    if (con->options[0] == '/')
+	      con->options ++;
 
-            if (!SendCommand(con, command, options))
+            if (!SendCommand(con, con->command, con->options))
 	    {
 	      if (!SendError(con, HTTP_NOT_FOUND))
 	      {
@@ -557,6 +560,9 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  * so check the length against any limits that are set...
 	  */
 
+          LogMessage(L_DEBUG, "POST %s", con->uri);
+	  LogMessage(L_DEBUG, "CONTENT_TYPE = %s", con->http.fields[HTTP_FIELD_CONTENT_TYPE]);
+
           if (con->http.fields[HTTP_FIELD_CONTENT_LENGTH][0] &&
 	      atoi(con->http.fields[HTTP_FIELD_CONTENT_LENGTH]) > MaxRequestSize &&
 	      MaxRequestSize > 0)
@@ -581,50 +587,45 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
 	  if (strcmp(con->http.fields[HTTP_FIELD_CONTENT_TYPE], "application/ipp") == 0)
             con->request = ippNew();
-	  else if (strcmp(con->http.fields[HTTP_FIELD_CONTENT_TYPE], "application/x-www-form-urlencoded") == 0 &&
-	           (strncmp(con->uri, "/admin", 6) == 0 ||
-	            strncmp(con->uri, "/printers", 9) == 0 ||
-	            strncmp(con->uri, "/classes", 8) == 0 ||
-	            strncmp(con->uri, "/jobs", 5) == 0))
+	  else if (strncmp(con->uri, "/admin", 6) == 0 ||
+	           strncmp(con->uri, "/printers", 9) == 0 ||
+	           strncmp(con->uri, "/classes", 8) == 0 ||
+	           strncmp(con->uri, "/jobs", 5) == 0)
 	  {
 	   /*
 	    * CGI request...
 	    */
 
-            if (strncmp(con->uri, "/admin", 9) == 0)
+            if (strncmp(con->uri, "/admin", 6) == 0)
 	    {
-	      snprintf(command, sizeof(command), "%s/cgi-bin/admin.cgi", ServerBin);
-	      options = con->uri + 9;
+	      snprintf(con->command, sizeof(con->command),
+	               "%s/cgi-bin/admin.cgi", ServerBin);
+	      con->options = con->uri + 6;
 	    }
             else if (strncmp(con->uri, "/printers", 9) == 0)
 	    {
-	      snprintf(command, sizeof(command), "%s/cgi-bin/printers.cgi", ServerBin);
-	      options = con->uri + 9;
+	      snprintf(con->command, sizeof(con->command),
+	               "%s/cgi-bin/printers.cgi", ServerBin);
+	      con->options = con->uri + 9;
 	    }
 	    else if (strncmp(con->uri, "/classes", 8) == 0)
 	    {
-	      snprintf(command, sizeof(command), "%s/cgi-bin/classes.cgi", ServerBin);
-	      options = con->uri + 8;
+	      snprintf(con->command, sizeof(con->command),
+	               "%s/cgi-bin/classes.cgi", ServerBin);
+	      con->options = con->uri + 8;
 	    }
 	    else
 	    {
-	      snprintf(command, sizeof(command), "%s/cgi-bin/jobs.cgi", ServerBin);
-	      options = con->uri + 5;
+	      snprintf(con->command, sizeof(con->command),
+	               "%s/cgi-bin/jobs.cgi", ServerBin);
+	      con->options = con->uri + 5;
 	    }
 
-	    if (*options == '/')
-	      options ++;
+	    if (con->options[0] == '/')
+	      con->options ++;
 
-            if (!SendCommand(con, command, options))
-	    {
-	      if (!SendError(con, HTTP_NOT_FOUND))
-	      {
-	        CloseClient(con);
-		return (0);
-	      }
-            }
-	    else
-              LogRequest(con, HTTP_OK);
+            LogMessage(L_DEBUG, "ReadClient() %d command=\"%s\", options = \"%s\"",
+	               con->http.fd, con->command, con->options);
 
 	    if (con->http.version <= HTTP_1_0)
 	      con->http.keep_alive = HTTP_KEEPALIVE_OFF;
@@ -653,8 +654,10 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	    * Send PPD file...
 	    */
 
-            snprintf(command, sizeof(command), "/ppd/%s", con->uri + 10);
-	    strcpy(con->uri, command);
+            snprintf(con->command, sizeof(con->command),
+	             "/ppd/%s", con->uri + 10);
+	    strcpy(con->uri, con->command);
+	    con->command[0] = '\0';
 	  }
 
 	  if (strncmp(con->uri, "/admin/", 7) == 0 ||
@@ -756,14 +759,10 @@ ReadClient(client_t *con)	/* I - Client to read from */
         break;
 
     case HTTP_POST_RECV :
-        LogMessage(L_DEBUG, "ReadClient() %d con->data_encoding = %s con->data_remaining = %d",
+        LogMessage(L_DEBUG, "ReadClient() %d con->data_encoding = %s, con->data_remaining = %d, con->file = %d",
 		   con->http.fd,
 		   con->http.data_encoding == HTTP_ENCODE_CHUNKED ? "chunked" : "length",
-		   con->http.data_remaining);
-        DEBUG_printf(("ReadClient() %d con->data_encoding = %s con->data_remaining = %d\n",
-		      con->http.fd,
-		      con->http.data_encoding == HTTP_ENCODE_CHUNKED ? "chunked" : "length",
-		      con->http.data_remaining));
+		   con->http.data_remaining, con->file);
 
         if (con->request != NULL)
 	{
@@ -780,32 +779,32 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  }
 	  else if (ipp_state != IPP_DATA)
 	    break;
+	}
 
-          if (con->file == 0 && con->http.state != HTTP_POST_SEND)
+        if (con->file == 0 && con->http.state != HTTP_POST_SEND)
+	{
+         /*
+	  * Create a file as needed for the request data...
+	  */
+
+          snprintf(con->filename, sizeof(con->filename), "%s/%08x",
+	           RequestRoot, request_id ++);
+	  con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
+	  fchmod(con->file, 0640);
+	  fchown(con->file, User, Group);
+
+          LogMessage(L_DEBUG, "ReadClient() %d REQUEST %s", con->http.fd,
+	             con->filename);
+
+	  if (con->file < 0)
 	  {
-           /*
-	    * Create a file as needed for the request data...
-	    */
-
-            snprintf(con->filename, sizeof(con->filename), "%s/%08x",
-	             RequestRoot, request_id ++);
-	    con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
-	    fchmod(con->file, 0640);
-	    fchown(con->file, User, Group);
-
-            LogMessage(L_DEBUG, "ReadClient() %d REQUEST %s", con->http.fd,
-	               con->filename);
-
-	    if (con->file < 0)
+	    if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
 	    {
-	      if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
-	      {
-		CloseClient(con);
-		return (0);
-	      }
+	      CloseClient(con);
+	      return (0);
 	    }
 	  }
-        }
+	}
 
 	if (con->http.state != HTTP_POST_SEND)
 	{
@@ -874,6 +873,20 @@ ReadClient(client_t *con)	/* I - Client to read from */
 		return (0);
 	      }
 	    }
+
+	    if (con->command[0])
+	    {
+	      if (!SendCommand(con, con->command, con->options))
+	      {
+		if (!SendError(con, HTTP_NOT_FOUND))
+		{
+	          CloseClient(con);
+		  return (0);
+		}
+              }
+	      else
+        	LogRequest(con, HTTP_OK);
+            }
 	  }
 
           if (con->request)
@@ -901,7 +914,17 @@ SendCommand(client_t      *con,
 	    char          *command,
 	    char          *options)
 {
-  con->pipe_pid = pipe_command(con, 0, &(con->file), command, options);
+  int	fd;
+
+
+  if (con->filename[0])
+    fd = open(con->filename, O_RDONLY);
+  else
+    fd = open("/dev/null", O_RDONLY);
+
+  con->pipe_pid = pipe_command(con, fd, &(con->file), command, options);
+
+  close(fd);
 
   LogMessage(L_DEBUG, "SendCommand() %d command=\"%s\" file=%d pipe_pid=%d",
              con->http.fd, command, con->file, con->pipe_pid);
@@ -1138,6 +1161,7 @@ WriteClient(client_t *con)		/* I - Client connection */
 	  *bufptr++ = '\0';
 
 	  httpPrintf(HTTP(con), "%s\r\n", buf);
+	  LogMessage(L_DEBUG, "WriteClient() %d %s", con->http.fd, buf);
 
          /*
 	  * Update buffer...
@@ -1448,7 +1472,7 @@ pipe_command(client_t *con,	/* I - Client connection */
   char	*commptr;		/* Command string pointer */
   int	fds[2];			/* Pipe FDs */
   int	argc;			/* Number of arguments */
-  char	argbuf[1024],		/* Argument buffer */
+  char	argbuf[10240],		/* Argument buffer */
 	*argv[100],		/* Argument strings */
 	*envp[100];		/* Environment variables */
   char	hostname[1024];		/* Hostname string */
@@ -1461,6 +1485,7 @@ pipe_command(client_t *con,	/* I - Client connection */
   static char	remote_host[1024];	/* REMOTE_HOST env variable */
   static char	remote_user[1024];	/* REMOTE_HOST env variable */
   static char	tmpdir[1024];		/* TMPDIR env variable */
+  static char	query_string[10240];	/* QUERY_STRING env variable */
 
 
  /*
@@ -1471,13 +1496,14 @@ pipe_command(client_t *con,	/* I - Client connection */
   argbuf[sizeof(argbuf) - 1] = '\0';
 
  /*
-  * Parse the string; arguments can be separated by spaces or by ? or +...
+  * Parse the string; arguments can be separated by + and are terminated
+  * by ?...
   */
 
   argv[0] = argbuf;
 
   for (commptr = argbuf, argc = 1; *commptr != '\0' && argc < 99; commptr ++)
-    if (*commptr == ' ' || *commptr == '?' || *commptr == '+')
+    if (*commptr == ' ' || *commptr == '+')
     {
       *commptr++ = '\0';
 
@@ -1506,6 +1532,8 @@ pipe_command(client_t *con,	/* I - Client connection */
 
       strcpy(commptr + 1, commptr + 3);
     }
+    else if (*commptr == '?')
+      break;
 
   argv[argc] = NULL;
 
@@ -1542,11 +1570,25 @@ pipe_command(client_t *con,	/* I - Client connection */
   if (con->operation == HTTP_GET)
   {
     envp[12] = "REQUEST_METHOD=GET";
-    envp[13] = NULL;
+
+    if (*commptr)
+    {
+     /*
+      * Add GET form variables after ?...
+      */
+
+      *commptr++ = '\0';
+
+      snprintf(query_string, sizeof(query_string), "QUERY_STRING=%s", commptr);
+      envp[13] = query_string;
+      envp[14] = NULL;
+    }
+    else
+      envp[13] = NULL;
   }
   else
   {
-    sprintf(content_length, "CONTENT_LENGTH=%d", con->http.data_remaining);
+    sprintf(content_length, "CONTENT_LENGTH=%d", con->bytes);
     snprintf(content_type, sizeof(content_type), "CONTENT_TYPE=%s",
              con->http.fields[HTTP_FIELD_CONTENT_TYPE]);
 
@@ -1620,12 +1662,12 @@ pipe_command(client_t *con,	/* I - Client connection */
     * Fork successful - return the PID...
     */
 
+    AddCert(pid, con->username);
+
     LogMessage(L_DEBUG, "CGI %s started - PID = %d", argv[0], pid);
 
     *outfile = fds[0];
     close(fds[1]);
-
-    AddCert(pid, con->username);
 
     return (pid);
   }
@@ -1633,5 +1675,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.49 2000/02/03 14:18:53 mike Exp $".
+ * End of "$Id: client.c,v 1.50 2000/02/08 20:38:59 mike Exp $".
  */

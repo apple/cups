@@ -1,102 +1,132 @@
-.\"
-.\" "$Id: backend.1,v 1.3 2000/01/04 13:46:00 mike Exp $"
-.\"
-.\"   backend man page for the Common UNIX Printing System (CUPS).
-.\"
-.\"   Copyright 1997-2000 by Easy Software Products.
-.\"
-.\"   These coded instructions, statements, and computer programs are the
-.\"   property of Easy Software Products and are protected by Federal
-.\"   copyright law.  Distribution and use rights are outlined in the file
-.\"   "LICENSE.txt" which should have been included with this file.  If this
-.\"   file is missing or damaged please contact Easy Software Products
-.\"   at:
-.\"
-.\"       Attn: CUPS Licensing Information
-.\"       Easy Software Products
-.\"       44141 Airport View Drive, Suite 204
-.\"       Hollywood, Maryland 20636-3111 USA
-.\"
-.\"       Voice: (301) 373-9603
-.\"       EMail: cups-info@cups.org
-.\"         WWW: http://www.cups.org
-.\"
-.TH backend 1 "Common UNIX Printing System" "22 September 1999" "Easy Software Products"
-.SH NAME
-backend \- backend transmission interfaces
-.SH SYNOPSIS
-.B backend
-job user title num-copies options
-.I [ filename ]
-.SH DESCRIPTION
-The CUPS backend interface provides a standard method for sending document
-files to different physical interfaces.
-.LP
-Backends must be capable of reading from a filename on the command-line
-or from the standard input, copying stdin to a temporary if required by
-the physical interface.
-.LP
-The command name (argv[0]) is set to the device URI of the destination printer.
-.SH ENVIRONMENT VARIABLES
-The following environment variables are defined by the CUPS server when
-executing the backend:
-.TP 5
-CHARSET
-.br
-The default text character set (typically us-ascii or iso-8859-1).
-.TP 5
-CONTENT_TYPE
-.br
-The MIME type associated with the file (e.g. application/postscript).
-.TP 5
-DEVICE_URI
-.br
-The device-uri associated with the printer; this is provided for shell
-scripts which may not be able to get the passed argv[0] string.
-.TP 5
-LANG
-.br
-The default language locale (typically C or en).
-.TP 5
-PATH
-.br
-The standard execution path for external programs that may be run by
-the backend.
-.TP 5
-PPD
-.br
-The full pathname of the PostScript Printer Description (PPD) file for
-this printer.
-.TP 5
-PRINTER
-.br
-The name of the printer.
-.TP 5
-RIP_CACHE
-.br
-The recommended amount of memory to use for Raster Image Processors (RIPs).
-.TP 5
-SERVER_ROOT
-.br
-The root directory of the server.
-.TP 5
-SOFTWARE
-.br
-The name and version number of the server (typically CUPS/1.0).
-.TP 5
-TZ
-.br
-The timezone of the server.
-.TP 5
-USER
-.br
-The user executing the backend (typically lp).
-.SH SEE ALSO
-cupsd(8), filter(1)
-CUPS Software Administrators Manual,
-CUPS Interface Design Description
-.SH COPYRIGHT
-Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
-.\"
-.\" End of "$Id: backend.1,v 1.3 2000/01/04 13:46:00 mike Exp $".
-.\"
+
+
+
+backend(1)            Easy Software Products           backend(1)
+
+
+NNAAMMEE
+       backend - backend transmission interfaces
+
+SSYYNNOOPPSSIISS
+       bbaacckkeenndd job user title num-copies options _[ _f_i_l_e_n_a_m_e _]
+
+DDEESSCCRRIIPPTTIIOONN
+       The  CUPS backend interface provides a standard method for
+       sending document files to different physical interfaces.
+
+       Backends must be capable of reading from a filename on the
+       command-line  or from the standard input, copying stdin to
+       a temporary if required by the physical interface.
+
+       The command name (argv[0]) is set to the device URI of the
+       destination printer.
+
+EENNVVIIRROONNMMEENNTT VVAARRIIAABBLLEESS
+       The  following  environment  variables  are defined by the
+       CUPS server when executing the backend:
+
+       CHARSET
+            The default text character set (typically us-ascii or
+            iso-8859-1).
+
+       CONTENT_TYPE
+            The MIME type associated with the file (e.g. applica-
+            tion/postscript).
+
+       DEVICE_URI
+            The device-uri associated with the printer;  this  is
+            provided  for  shell scripts which may not be able to
+            get the passed argv[0] string.
+
+       LANG
+            The default language locale (typically C or en).
+
+       PATH
+            The standard execution  path  for  external  programs
+            that may be run by the backend.
+
+       PPD
+            The  full pathname of the PostScript Printer Descrip-
+            tion (PPD) file for this printer.
+
+       PRINTER
+            The name of the printer.
+
+       RIP_CACHE
+            The recommended amount of memory to  use  for  Raster
+            Image Processors (RIPs).
+
+       SERVER_ROOT
+            The root directory of the server.
+
+
+
+22 September 1999  Common UNIX Printing System                  1
+
+
+
+
+
+backend(1)            Easy Software Products           backend(1)
+
+
+       SOFTWARE
+            The  name and version number of the server (typically
+            CUPS/1.0).
+
+       TZ
+            The timezone of the server.
+
+       USER
+            The user executing the backend (typically lp).
+
+SSEEEE AALLSSOO
+       cupsd(8), filter(1) CUPS Software  Administrators  Manual,
+       CUPS Interface Design Description
+
+CCOOPPYYRRIIGGHHTT
+       Copyright  1993-2000 by Easy Software Products, All Rights
+       Reserved.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+22 September 1999  Common UNIX Printing System                  2
+
+

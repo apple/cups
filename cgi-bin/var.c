@@ -1,5 +1,5 @@
 /*
- * "$Id: var.c,v 1.14 2000/01/18 15:33:45 mike Exp $"
+ * "$Id: var.c,v 1.15 2000/02/08 20:38:44 mike Exp $"
  *
  *   CGI form variable and array functions.
  *
@@ -608,10 +608,10 @@ cgi_initialize_string(const char *data)	/* I - Form data string */
     * Add the string to the variable "database"...
     */
 
-    if ((s = strrchr(name, '-')) != NULL)
+    if ((s = strrchr(name, '-')) != NULL && isdigit(s[1]))
     {
-      *s = '\0';
-      cgiSetArray(name, atoi(s + 1) - 1, value);
+      *s++ = '\0';
+      cgiSetArray(name, atoi(s) - 1, value);
     }
     else
       cgiSetVariable(name, value);
@@ -650,5 +650,5 @@ cgi_sort_variables(void)
 
 
 /*
- * End of "$Id: var.c,v 1.14 2000/01/18 15:33:45 mike Exp $".
+ * End of "$Id: var.c,v 1.15 2000/02/08 20:38:44 mike Exp $".
  */

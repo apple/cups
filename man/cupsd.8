@@ -1,48 +1,66 @@
-.\"
-.\" "$Id: cupsd.8,v 1.4 2000/01/04 13:46:00 mike Exp $"
-.\"
-.\"   cupsd man page for the Common UNIX Printing System (CUPS).
-.\"
-.\"   Copyright 1997-2000 by Easy Software Products.
-.\"
-.\"   These coded instructions, statements, and computer programs are the
-.\"   property of Easy Software Products and are protected by Federal
-.\"   copyright law.  Distribution and use rights are outlined in the file
-.\"   "LICENSE.txt" which should have been included with this file.  If this
-.\"   file is missing or damaged please contact Easy Software Products
-.\"   at:
-.\"
-.\"       Attn: CUPS Licensing Information
-.\"       Easy Software Products
-.\"       44141 Airport View Drive, Suite 204
-.\"       Hollywood, Maryland 20636-3111 USA
-.\"
-.\"       Voice: (301) 373-9603
-.\"       EMail: cups-info@cups.org
-.\"         WWW: http://www.cups.org
-.\"
-.TH cupsd 8 "Common UNIX Printing System" "22 September 1999" "Easy Software Products"
-.SH NAME
-cupsd \- common unix printing system daemon
-.SH SYNOPSIS
-.B cupsd
-.I [ \-c config-file ]
-.SH DESCRIPTION
-\fIcupsd\fR is the scheduler for the Common UNIX Printing System. It implements
-a printing system based upon the Internet Printing Protocol, version 1.0.  If
-no options are specified on the command-line then the default configuration file
-(usually \fI/var/cups/conf/cupsd.conf\fR) will be used.
-.SH COMPATIBILITY
-\fIcupsd\fR implements all of the required IPP/1.0 attributes and operations.
-It also implements optional operation set 1 and several CUPS-specific
-administation operations.
-.SH SEE ALSO
-backend(1), classes.conf(5), cupsd.conf(5), filter(1), mime.convs(5),
-mime.types(5), printers.conf(5),
-CUPS Software Administrators Manual,
-CUPS Interface Design Description
-.SH COPYRIGHT
-Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
-.\"
-.\" End of "$Id: cupsd.8,v 1.4 2000/01/04 13:46:00 mike Exp $".
-.\"
+
+
+
+cupsd(8)              Easy Software Products             cupsd(8)
+
+
+NNAAMMEE
+       cupsd - common unix printing system daemon
+
+SSYYNNOOPPSSIISS
+       ccuuppssdd _[ _-_c _c_o_n_f_i_g_-_f_i_l_e _]
+
+DDEESSCCRRIIPPTTIIOONN
+       _c_u_p_s_d  is  the scheduler for the Common UNIX Printing Sys-
+       tem. It implements a printing system based upon the Inter-
+       net  Printing  Protocol,  version  1.0.  If no options are
+       specified on the command-line then the default  configura-
+       tion  file  (usually  _/_v_a_r_/_c_u_p_s_/_c_o_n_f_/_c_u_p_s_d_._c_o_n_f)  will  be
+       used.
+
+CCOOMMPPAATTIIBBIILLIITTYY
+       _c_u_p_s_d implements all of the  required  IPP/1.0  attributes
+       and operations.  It also implements optional operation set
+       1 and several CUPS-specific administation operations.
+
+SSEEEE AALLSSOO
+       backend(1),  classes.conf(5),  cupsd.conf(5),   filter(1),
+       mime.convs(5), mime.types(5), printers.conf(5), CUPS Soft-
+       ware Administrators Manual, CUPS Interface Design Descrip-
+       tion
+
+CCOOPPYYRRIIGGHHTT
+       Copyright  1993-2000 by Easy Software Products, All Rights
+       Reserved.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+22 September 1999  Common UNIX Printing System                  1
+
+

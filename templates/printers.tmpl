@@ -1,25 +1,53 @@
-<TABLE BORDER="1">
-<TR>
-	<TH>Name</TH>
-	<TH>Information</TH>
-</TR>
+{#printer_name=0?No printers:
+<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
 {[printer_name]
 <TR>
-	<TD VALIGN=TOP><A HREF="{printer_uri_supported}">
-	<IMG SRC="../images/printer-{printer_state=3?idle:{printer_state=4?processing:stopped}}.gif" BORDER="0"><BR>{printer_name}</A></TD>
-	<TD VALIGN=TOP>Make and Model: {printer_make_and_model}<BR>
-	Description: {printer_info}<BR>
+	<TH BGCOLOR="#999966"><IMG SRC="/images/left.gif"></TH>
+	<TH BGCOLOR="#999966"><A HREF="{printer_uri_supported}">{printer_name}</A></TH>
+	<TH BGCOLOR="#999966">{printer_make_and_model}</TH>
+	<TH><IMG SRC="/images/right.gif"></TH>
+</TR>
+<TR>
+	<TD HEIGHT="4"></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD VALIGN="TOP"><A HREF="{printer_uri_supported}">
+	<IMG SRC="../images/printer-{printer_state=3?idle:{printer_state=4?processing:stopped}}.gif" BORDER="0"></A>
+	</TD>
+	<TD VALIGN="TOP">Description: {printer_info}<BR>
 	Location: {printer_location}<BR>
 	Printer State: {printer_state=3?idle:{printer_state=4?processing:stopped}},
 	{printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}.
 	{?printer_state_message=?:<BR><I>"{printer_state_message}"</I>}
 	<P>
-	<IMG SRC="../images/print-test-page.gif" ALT="Print Test Page">
-	<IMG SRC="../images/start-printer.gif" ALT="Start Printer">
-	<IMG SRC="../images/stop-printer.gif" ALT="Stop Printer">
-	<IMG SRC="../images/accept-jobs.gif" ALT="Accept Jobs">
-	<IMG SRC="../images/reject-jobs.gif" ALT="Reject Jobs">
+	<A HREF="/admin/?op=print-test-page&printer_name={printer_name}">
+	<IMG SRC="/images/print-test-page.gif" ALT="Print Test Page" BORDER="0"></A>
+	{printer_state=5?
+	<A HREF="/admin/?op=start-printer&printer_name={printer_name}">
+	<IMG SRC="/images/start-printer.gif" ALT="Start Printer" BORDER="0"></A>
+	:
+	<A HREF="/admin/?op=stop-printer&printer_name={printer_name}">
+	<IMG SRC="/images/stop-printer.gif" ALT="Stop Printer" BORDER="0"></A>
+	}
+	{printer_is_accepting_jobs=0?
+	<A HREF="/admin/?op=accept-jobs&printer_name={printer_name}">
+	<IMG SRC="/images/accept-jobs.gif" ALT="Accept Jobs" BORDER="0"></A>
+	:
+	<A HREF="/admin/?op=reject-jobs&printer_name={printer_name}">
+	<IMG SRC="/images/reject-jobs.gif" ALT="Reject Jobs" BORDER="0"></A>
+	}
+	<A HREF="/admin/?op=modify-printer&printer_name={printer_name}">
+	<IMG SRC="/images/modify-printer.gif" ALT="Modify Printer" BORDER="0"></A>
+	<A HREF="/admin/?op=delete-printer&printer_name={printer_name}">
+	<IMG SRC="/images/delete-printer.gif" ALT="Delete Printer" BORDER="0"></A>
 	</TD>
+</TR>
+<TR>
+	<TD>&nbsp;</TD>
 </TR>
 }
 </TABLE>
+}
+<P><A HREF="/admin/?op=add-printer">
+<IMG SRC="/images/add-printer.gif" ALT="Add Printer" BORDER="0"></A>

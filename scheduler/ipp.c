@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.50 2000/02/06 22:09:06 mike Exp $"
+ * "$Id: ipp.c,v 1.51 2000/02/08 20:39:00 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -50,7 +50,8 @@
  *   hold_job()                  - Hold a print job.
  *   print_job()                 - Print a file to a printer or class.
  *   reject_jobs()               - Reject print jobs to a printer.
- *   restart_job()               - Cancel a print job.
+ *   release_job()               - Release a held print job.
+ *   restart_job()               - Restart an old print job.
  *   send_document()             - Send a file to a printer or class.
  *   send_ipp_error()            - Send an error status back to the IPP client.
  *   set_default()               - Set the default destination...
@@ -95,6 +96,7 @@ static void	get_printer_attrs(client_t *con, ipp_attribute_t *uri);
 static void	hold_job(client_t *con, ipp_attribute_t *uri);
 static void	print_job(client_t *con, ipp_attribute_t *uri);
 static void	reject_jobs(client_t *con, ipp_attribute_t *uri);
+static void	release_job(client_t *con, ipp_attribute_t *uri);
 static void	restart_job(client_t *con, ipp_attribute_t *uri);
 static void	send_document(client_t *con, ipp_attribute_t *uri);
 static void	send_ipp_error(client_t *con, ipp_status_t status);
@@ -174,7 +176,7 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
       *
       *     attributes-charset
       *     attributes-natural-language
-      *     printer-uri
+      *     printer-uri/job-uri
       */
 
       attr = con->request->attrs;
@@ -270,6 +272,10 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 
 	  case IPP_HOLD_JOB :
               hold_job(con, uri);
+              break;
+
+	  case IPP_RELEASE_JOB :
+              release_job(con, uri);
               break;
 
 	  case IPP_RESTART_JOB :
@@ -2819,7 +2825,180 @@ reject_jobs(client_t        *con,	/* I - Client connection */
 
 
 /*
- * 'restart_job()' - Cancel a print job.
+ * 'release_job()' - Release a held print job.
+ */
+
+static void
+release_job(client_t        *con,	/* I - Client connection */
+            ipp_attribute_t *uri)	/* I - Job or Printer URI */
+{
+  int			i;		/* Looping var */
+  ipp_attribute_t	*attr;		/* Current attribute */
+  int			jobid;		/* Job ID */
+  char			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			username[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+  job_t			*job;		/* Job information */
+  struct passwd		*user;		/* User info */
+  struct group		*group;		/* System group info */
+
+
+  DEBUG_printf(("release_job(%08x, %08x)\n", con, uri));
+
+ /*
+  * Verify that the POST operation was done to a valid URI.
+  */
+
+  if (strncmp(con->uri, "/classes/", 9) != 0 &&
+      strncmp(con->uri, "/jobs/", 5) != 0 &&
+      strncmp(con->uri, "/printers/", 10) != 0)
+  {
+    LogMessage(L_ERROR, "release_job: release request on bad resource \'%s\'!",
+               con->uri);
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * See if we have a job URI or a printer URI...
+  */
+
+  if (strcmp(uri->name, "printer-uri") == 0)
+  {
+   /*
+    * Got a printer URI; see if we also have a job-id attribute...
+    */
+
+    if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
+    {
+      LogMessage(L_ERROR, "release_job: got a printer-uri attribute but no job-id!");
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
+
+    jobid = attr->values[0].integer;
+  }
+  else
+  {
+   /*
+    * Got a job URI; parse it to get the job ID...
+    */
+
+    httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+ 
+    if (strncmp(resource, "/jobs/", 6) != 0)
+    {
+     /*
+      * Not a valid URI!
+      */
+
+      LogMessage(L_ERROR, "release_job: bad job-uri attribute \'%s\'!",
+                 uri->values[0].string.text);
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
+
+    jobid = atoi(resource + 6);
+  }
+
+ /*
+  * See if the job exists...
+  */
+
+  if ((job = FindJob(jobid)) == NULL)
+  {
+   /*
+    * Nope - return a "not found" error...
+    */
+
+    LogMessage(L_ERROR, "release_job: job #%d doesn't exist!", jobid);
+    send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * See if job is "held"...
+  */
+
+  if (job->state->values[0].integer != IPP_JOB_HELD)
+  {
+   /*
+    * Nope - return a "not possible" error...
+    */
+
+    LogMessage(L_ERROR, "release_job: job #%d is not held!", jobid);
+    send_ipp_error(con, IPP_NOT_POSSIBLE);
+    return;
+  }
+
+ /*
+  * See if the job is owned by the requesting user...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+  {
+    strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
+    username[sizeof(username) - 1] = '\0';
+  }
+  else if (con->username[0])
+    strcpy(username, con->username);
+  else
+    username[0] = '\0';
+
+  if (strcmp(username, job->username) != 0 && strcmp(username, "root") != 0)
+  {
+   /*
+    * Not the owner or root; check to see if the user is a member of the
+    * system group...
+    */
+
+    user = getpwnam(username);
+    endpwent();
+
+    group = getgrnam(SystemGroup);
+    endgrent();
+
+    if (group != NULL)
+      for (i = 0; group->gr_mem[i]; i ++)
+        if (strcmp(username, group->gr_mem[i]) == 0)
+	  break;
+
+    if (user == NULL || group == NULL ||
+        (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
+    {
+     /*
+      * Username not found, group not found, or user is not part of the
+      * system group...
+      */
+
+      LogMessage(L_ERROR, "release_job: \"%s\" not authorized to release job id %d owned by \"%s\"!",
+        	 username, jobid, job->username);
+      send_ipp_error(con, IPP_FORBIDDEN);
+      return;
+    }
+  }
+
+ /*
+  * Release the job and return...
+  */
+
+  ReleaseJob(jobid);
+
+  LogMessage(L_INFO, "Job %d was released by \'%s\'.", jobid,
+             con->username[0] ? con->username : "unknown");
+
+  con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
+ * 'restart_job()' - Restart an old print job.
  */
 
 static void
@@ -2913,6 +3092,36 @@ restart_job(client_t        *con,	/* I - Client connection */
 
     LogMessage(L_ERROR, "restart_job: job #%d doesn't exist!", jobid);
     send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * See if job is in any of the "completed" states...
+  */
+
+  if (job->state->values[0].integer <= IPP_JOB_PROCESSING)
+  {
+   /*
+    * Nope - return a "not possible" error...
+    */
+
+    LogMessage(L_ERROR, "restart_job: job #%d is not complete!", jobid);
+    send_ipp_error(con, IPP_NOT_POSSIBLE);
+    return;
+  }
+
+ /*
+  * See if we have retained the job files...
+  */
+
+  if (!JobFiles)
+  {
+   /*
+    * Nope - return a "not possible" error...
+    */
+
+    LogMessage(L_ERROR, "restart_job: job #%d cannot be restarted - no files!", jobid);
+    send_ipp_error(con, IPP_NOT_POSSIBLE);
     return;
   }
 
@@ -3683,5 +3892,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.50 2000/02/06 22:09:06 mike Exp $".
+ * End of "$Id: ipp.c,v 1.51 2000/02/08 20:39:00 mike Exp $".
  */

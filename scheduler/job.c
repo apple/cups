@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.52 2000/02/06 22:09:06 mike Exp $"
+ * "$Id: job.c,v 1.53 2000/02/08 20:39:00 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -33,7 +33,8 @@
  *   LoadAllJobs()    - Load all jobs from disk.
  *   LoadJob()        - Load a job from disk.
  *   MoveJob()        - Move the specified job to a different destination.
- *   RestartJob()     - Resume the specified job.
+ *   ReleaseJob()     - Release the specified job.
+ *   RestartJob()     - Restart the specified job.
  *   SaveJob()        - Save a job to disk.
  *   StartJob()       - Start a print job.
  *   StopAllJobs()    - Stop all print jobs.
@@ -348,6 +349,8 @@ HoldJob(int id)			/* I - Job ID */
 
   job->state->values[0].integer = IPP_JOB_HELD;
 
+  SaveJob(id);
+
   CheckJobs();
 }
 
@@ -561,7 +564,29 @@ MoveJob(int        id,		/* I - Job ID */
 
 
 /*
- * 'RestartJob()' - Resume the specified job.
+ * 'ReleaseJob()' - Release the specified job.
+ */
+
+void
+ReleaseJob(int id)		/* I - Job ID */
+{
+  job_t	*job;			/* Job data */
+
+
+  if ((job = FindJob(id)) == NULL)
+    return;
+
+  if (job->state->values[0].integer == IPP_JOB_HELD)
+  {
+    job->state->values[0].integer = IPP_JOB_PENDING;
+    SaveJob(id);
+    CheckJobs();
+  }
+}
+
+
+/*
+ * 'RestartJob()' - Restart the specified job.
  */
 
 void
@@ -573,9 +598,10 @@ RestartJob(int id)		/* I - Job ID */
   if ((job = FindJob(id)) == NULL)
     return;
 
-  if (job->state->values[0].integer == IPP_JOB_HELD)
+  if (job->state->values[0].integer > IPP_JOB_PROCESSING && JobFiles)
   {
     job->state->values[0].integer = IPP_JOB_PENDING;
+    SaveJob(id);
     CheckJobs();
   }
 }
@@ -1978,6 +2004,14 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 		  bufptr += n;
 		}
 		break;
+
+            case IPP_TAG_UNSUPPORTED_VALUE :
+	    case IPP_TAG_DEFAULT :
+	    case IPP_TAG_UNKNOWN :
+	    case IPP_TAG_NOVALUE :
+	        *bufptr++ = 0;
+		*bufptr++ = 0;
+		break;
 	  }
 
          /*
@@ -2037,12 +2071,12 @@ set_time(job_t      *job,	/* I - Job to update */
   ipp_attribute_t	*attr;	/* Time attribute */
 
 
-  if ((attr = ippFindAttribute(job->attrs, name, IPP_TAG_NOVALUE)) == NULL)
+  if ((attr = ippFindAttribute(job->attrs, name, IPP_TAG_NOVALUE)) != NULL)
   {
     attr->value_tag = IPP_TAG_INTEGER;
     attr->values[0].integer = time(NULL) - StartTime;
   }
-  else if ((attr = ippFindAttribute(job->attrs, name, IPP_TAG_INTEGER)) == NULL)
+  else if ((attr = ippFindAttribute(job->attrs, name, IPP_TAG_INTEGER)) != NULL)
     attr->values[0].integer = time(NULL) - StartTime;
 }
 
@@ -2130,5 +2164,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.52 2000/02/06 22:09:06 mike Exp $".
+ * End of "$Id: job.c,v 1.53 2000/02/08 20:39:00 mike Exp $".
  */

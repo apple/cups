@@ -1,108 +1,132 @@
-.\"
-.\" "$Id: filter.1,v 1.3 2000/01/04 13:46:02 mike Exp $"
-.\"
-.\"   filter man page for the Common UNIX Printing System (CUPS).
-.\"
-.\"   Copyright 1997-2000 by Easy Software Products.
-.\"
-.\"   These coded instructions, statements, and computer programs are the
-.\"   property of Easy Software Products and are protected by Federal
-.\"   copyright law.  Distribution and use rights are outlined in the file
-.\"   "LICENSE.txt" which should have been included with this file.  If this
-.\"   file is missing or damaged please contact Easy Software Products
-.\"   at:
-.\"
-.\"       Attn: CUPS Licensing Information
-.\"       Easy Software Products
-.\"       44141 Airport View Drive, Suite 204
-.\"       Hollywood, Maryland 20636-3111 USA
-.\"
-.\"       Voice: (301) 373-9603
-.\"       EMail: cups-info@cups.org
-.\"         WWW: http://www.cups.org
-.\"
-.TH filter 1 "Common UNIX Printing System" "22 September 1999" "Easy Software Products"
-.SH NAME
-filter \- file conversion filter interfaces
-.SH SYNOPSIS
-.B filter
-job user title num-copies options
-.I [ filename ]
-.SH DESCRIPTION
-The CUPS filter interface provides a standard method for adding support for
-new document types to CUPS. Each filter is capable of converting from one
-or more input formats to another format that can either be printed directly
-or piped into another filter to get it to a printable format.
-.LP
-Filters must be capable of reading from a filename on the command-line or from
-the standard input, copying stdin to a temporary if required by the file
-format.
-.LP
-The command name (argv[0]) is set to the name of the destination printer.
-.SH ENVIRONMENT VARIABLES
-The following environment variables are defined by the CUPS server when
-executing each filter:
-.TP 5
-CHARSET
-.br
-The default text character set (typically us-ascii or iso-8859-1).
-.TP 5
-CONTENT_TYPE
-.br
-The MIME type associated with the file (e.g. application/postscript).
-.TP 5
-DEVICE_URI
-.br
-The device-uri associated with the printer.
-.TP 5
-LANG
-.br
-The default language locale (typically C or en).
-.TP 5
-PATH
-.br
-The standard execution path for external programs that may be run by the filter.
-.TP 5
-PPD
-.br
-The full pathname of the PostScript Printer Description (PPD) file for
-this printer.
-.TP 5
-PRINTER
-.br
-The name of the printer; this is provided for shell scripts which may not be
-able to get the passed argv[0] string.
-.TP 5
-RIP_CACHE
-.br
-The recommended amount of memory to use for Raster Image Processors (RIPs).
-.TP 5
-SERVER_ROOT
-.br
-The root directory of the server.
-.TP 5
-SOFTWARE
-.br
-The name and version number of the server (typically CUPS/1.0).
-.TP 5
-TZ
-.br
-The timezone of the server.
-.TP 5
-USER
-.br
-The user executing the filter (typically lp).
-.SH COMPATIBILITY
-While the filter interface is compatible with System V interface
-scripts, it will only work with the System V interface script as the
-only filter.  Typically the interface script will be provided via the
-\fBlpadmin(8)\fR command using the \fI-i\fR option.
-.SH SEE ALSO
-backend(1), cupsd(8),
-CUPS Software Administrators Manual,
-CUPS Interface Design Description
-.SH COPYRIGHT
-Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
-.\"
-.\" End of "$Id: filter.1,v 1.3 2000/01/04 13:46:02 mike Exp $".
-.\"
+
+
+
+filter(1)             Easy Software Products            filter(1)
+
+
+NNAAMMEE
+       filter - file conversion filter interfaces
+
+SSYYNNOOPPSSIISS
+       ffiilltteerr job user title num-copies options _[ _f_i_l_e_n_a_m_e _]
+
+DDEESSCCRRIIPPTTIIOONN
+       The  CUPS  filter interface provides a standard method for
+       adding support for new document types to CUPS. Each filter
+       is capable of converting from one or more input formats to
+       another format that can  either  be  printed  directly  or
+       piped into another filter to get it to a printable format.
+
+       Filters must be capable of reading from a filename on  the
+       command-line  or from the standard input, copying stdin to
+       a temporary if required by the file format.
+
+       The command name (argv[0]) is set to the name of the  des-
+       tination printer.
+
+EENNVVIIRROONNMMEENNTT VVAARRIIAABBLLEESS
+       The  following  environment  variables  are defined by the
+       CUPS server when executing each filter:
+
+       CHARSET
+            The default text character set (typically us-ascii or
+            iso-8859-1).
+
+       CONTENT_TYPE
+            The MIME type associated with the file (e.g. applica-
+            tion/postscript).
+
+       DEVICE_URI
+            The device-uri associated with the printer.
+
+       LANG
+            The default language locale (typically C or en).
+
+       PATH
+            The standard execution  path  for  external  programs
+            that may be run by the filter.
+
+       PPD
+            The  full pathname of the PostScript Printer Descrip-
+            tion (PPD) file for this printer.
+
+       PRINTER
+            The name of the printer; this is provided  for  shell
+            scripts  which  may  not  be  able  to get the passed
+            argv[0] string.
+
+       RIP_CACHE
+            The recommended amount of memory to  use  for  Raster
+            Image Processors (RIPs).
+
+
+
+22 September 1999  Common UNIX Printing System                  1
+
+
+
+
+
+filter(1)             Easy Software Products            filter(1)
+
+
+       SERVER_ROOT
+            The root directory of the server.
+
+       SOFTWARE
+            The  name and version number of the server (typically
+            CUPS/1.0).
+
+       TZ
+            The timezone of the server.
+
+       USER
+            The user executing the filter (typically lp).
+
+CCOOMMPPAATTIIBBIILLIITTYY
+       While the filter interface is  compatible  with  System  V
+       interface  scripts,  it  will  only work with the System V
+       interface script as the only filter.  Typically the inter-
+       face  script  will  be provided via the llppaaddmmiinn((88)) command
+       using the _-_i option.
+
+SSEEEE AALLSSOO
+       backend(1), cupsd(8), CUPS Software Administrators Manual,
+       CUPS Interface Design Description
+
+CCOOPPYYRRIIGGHHTT
+       Copyright  1993-2000 by Easy Software Products, All Rights
+       Reserved.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+22 September 1999  Common UNIX Printing System                  2
+
+

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.29 2000/02/06 22:09:03 mike Exp $"
+dnl "$Id: configure.in,v 1.30 2000/02/08 20:38:40 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -110,21 +110,6 @@ if test "$NROFF" = ""; then
 fi
 AC_PATH_PROG(HTMLDOC,htmldoc)
 AC_PATH_PROG(MKDIR,mkdir)
-AC_PATH_PROG(PACK,pack)
-if test "$PACK" = ""; then
-    AC_PATH_PROG(PACK,gzip)
-    if test "$PACK" = ""; then
-        PACK="echo"
-	CAT="dummy"
-    else
-        PACK="$PACK -fv9"
-	CAT="gz"
-    fi
-else
-    PACK="$PACK -f"
-    CAT="z"
-fi
-AC_SUBST(CAT)
 AC_PATH_PROG(RM,rm)
 AC_PATH_PROG(SED,sed)
 
@@ -217,7 +202,7 @@ AC_CHECK_FUNCS(wait3)
 dnl Update compiler options...
 if test -n "$GXX" -o $uname = Linux; then
 	if test -z "$OPTIM"; then
-	       	OPTIM="-O2"
+	       	OPTIM="-O2 -g3"
 	fi
 	if test $PICFLAG = 1; then
     		OPTIM="-fPIC $OPTIM"
@@ -226,7 +211,7 @@ else
 	case $uname in
         	IRIX*)
 			if test -z "$OPTIM"; then
-        			OPTIM="-O2"
+        			OPTIM="-O2 -g3"
 			fi
 			if test $uversion -ge 62; then
 				OPTIM="$OPTIM -n32 -mips3"
@@ -234,14 +219,14 @@ else
 			;;
 		HP-UX*)
 			if test -z "$OPTIM"; then
-				OPTIM="+O2"
+				OPTIM="+O2 -g3"
 			fi
 			OPTIM="-Ae $OPTIM"
 			;;
 		SunOS*)
 			# Solaris
 			if test -z "$OPTIM"; then
-				OPTIM="-O"
+				OPTIM="-O -g3"
 			fi
 			if test $PICFLAG = 1; then
 				OPTIM="-KPIC $OPTIM"
@@ -290,32 +275,38 @@ AC_SUBST(IMGLIBS)
 AC_SUBST(LIBCUPS)
 AC_SUBST(LIBCUPSIMAGE)
 
-dnl Fix "prefix" variable if it hasn't been specified...
-if test "$prefix" = "NONE"; then
+dnl Fix prefix as needed..
+if test "$prefix" = "NONE" ; then
 	prefix="/usr"
 fi
 
 dnl Fix "libdir" variable for IRIX 6.x...
 if test "$uname" = "IRIX" -a $uversion -ge 65; then
-	libdir="/usr/lib32"
+	libdir="${prefix}/lib32"
 fi
 
 dnl Need special attention for the default location...
-if test "$prefix" = "/usr"; then
+if test "$prefix" = "/usr" ; then
 	CUPS_SERVERROOT="/etc/cups"
-	CUPS_SERVERBIN="/usr/lib/cups"
 	CUPS_LOGDIR="/var/log/cups"
 	CUPS_REQUESTS="/var/spool/cups"
+
+	AC_DEFINE_UNQUOTED(CUPS_SERVERROOT, "$CUPS_SERVERROOT")
+	AC_DEFINE_UNQUOTED(CUPS_LOGDIR, "$CUPS_LOGDIR")
+	AC_DEFINE_UNQUOTED(CUPS_REQUESTS, "$CUPS_REQUESTS")
 else
-	CUPS_SERVERROOT="$prefix/etc/cups"
-	CUPS_SERVERBIN="$prefix/lib/cups"
-	CUPS_LOGDIR="$prefix/log/cups"
-	CUPS_REQUESTS="$prefix/spool/cups"
+	CUPS_SERVERROOT='${prefix}/etc/cups'
+	CUPS_LOGDIR='${prefix}/log/cups'
+	CUPS_REQUESTS='${prefix}/spool/cups'
+
+	AC_DEFINE_UNQUOTED(CUPS_SERVERROOT, "$prefix/etc/cups")
+	AC_DEFINE_UNQUOTED(CUPS_LOGDIR, "$prefix/log/cups")
+	AC_DEFINE_UNQUOTED(CUPS_REQUESTS, "$prefix/spool/cups")
 fi
-AC_DEFINE_UNQUOTED(CUPS_SERVERROOT, "$CUPS_SERVERROOT")
-AC_DEFINE_UNQUOTED(CUPS_SERVERBIN, "$CUPS_SERVERBIN")
-AC_DEFINE_UNQUOTED(CUPS_LOGDIR, "$CUPS_LOGDIR")
-AC_DEFINE_UNQUOTED(CUPS_REQUESTS, "$CUPS_REQUESTS")
+
+CUPS_SERVERBIN='${prefix}/lib/cups'
+AC_DEFINE_UNQUOTED(CUPS_SERVERBIN, "$prefix/lib/cups")
+
 AC_SUBST(CUPS_SERVERROOT)
 AC_SUBST(CUPS_SERVERBIN)
 AC_SUBST(CUPS_LOGDIR)
@@ -324,29 +315,36 @@ AC_SUBST(CUPS_REQUESTS)
 dnl Set the CUPS_LOCALE directory...
 case "$uname" in
 	Linux)
-		CUPS_LOCALEDIR="$prefix/share/locale"
+		CUPS_LOCALEDIR='${prefix}/share/locale'
+		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$prefix/share/locale")
 		;;
 
 	OSF1)
-		CUPS_LOCALEDIR="$prefix/lib/nls/msg"
+		CUPS_LOCALEDIR='${prefix}/lib/nls/msg'
+		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$prefix/lib/nls/msg")
 		;;
 
 	*)
 		# This is the standard System V location...
-		CUPS_LOCALEDIR="$prefix/lib/locale"
+		CUPS_LOCALEDIR='${prefix}/lib/locale'
+		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$prefix/lib/locale")
 		;;
 esac
 
-AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$CUPS_LOCALEDIR")
 AC_SUBST(CUPS_LOCALEDIR)
 
-dnl Set the CUPS_DATAFILE directory...
-CUPS_DATADIR="$prefix/share/cups"
-AC_DEFINE_UNQUOTED(CUPS_DATADIR, "$CUPS_DATADIR")
+dnl Set the CUPS_DATADIR directory...
+CUPS_DATADIR='${datadir}/cups'
+AC_DEFINE_UNQUOTED(CUPS_DATADIR, "$prefix/share/cups")
 AC_SUBST(CUPS_DATADIR)
+
+dnl Set the CUPS_DOCDIR directory...
+CUPS_DOCDIR='${datadir}/doc/cups'
+AC_DEFINE_UNQUOTED(CUPS_DOCDIR, "$prefix/share/doc/cups")
+AC_SUBST(CUPS_DOCDIR)
 
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.29 2000/02/06 22:09:03 mike Exp $".
+dnl End of "$Id: configure.in,v 1.30 2000/02/08 20:38:40 mike Exp $".
 dnl

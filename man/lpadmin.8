@@ -1,124 +1,132 @@
-.\"
-.\" "$Id: lpadmin.8,v 1.9 2000/01/04 13:46:02 mike Exp $"
-.\"
-.\"   lpadmin man page for the Common UNIX Printing System (CUPS).
-.\"
-.\"   Copyright 1997-2000 by Easy Software Products.
-.\"
-.\"   These coded instructions, statements, and computer programs are the
-.\"   property of Easy Software Products and are protected by Federal
-.\"   copyright law.  Distribution and use rights are outlined in the file
-.\"   "LICENSE.txt" which should have been included with this file.  If this
-.\"   file is missing or damaged please contact Easy Software Products
-.\"   at:
-.\"
-.\"       Attn: CUPS Licensing Information
-.\"       Easy Software Products
-.\"       44141 Airport View Drive, Suite 204
-.\"       Hollywood, Maryland 20636-3111 USA
-.\"
-.\"       Voice: (301) 373-9603
-.\"       EMail: cups-info@cups.org
-.\"         WWW: http://www.cups.org
-.\"
-.TH lpadmin 8 "Common UNIX Printing System" "22 September 1999" "Easy Software Products"
-.SH NAME
-lpadmin \- configure cups printers and classes
-.SH SYNOPSIS
-.B lpadmin
-[ -h
-.I server
-] \-d
-.I destination
-.br
-.B lpadmin
-[ -h
-.I server
-] \-p
-.I printer
-.I option(s)
-.br
-.B lpadmin
-[ -h
-.I server
-] \-x
-.I destination
-.SH DESCRIPTION
-\fIlpadmin\fR configures printer and class queues provided by CUPS. It can also
-be used to set the system default printer or class.
-.LP
-The first form of the command sets the default printer or class to
-\fIdestination\fR.  Subsequent print jobs submitted via the \fIlp(1)\fR or
-\fIlpr(1)\fR commands will use this destination unless the user specifies
-otherwise.
-.LP
-The second form of the command configures the named printer.  The additional
-options are described below.
-.LP
-The third form of the command deletes the printer or class \fIdestination\fR.
-Any jobs that are pending for the destination will be removed and any job that
-is currently printed will be aborted.
-.SH CONFIGURATION OPTIONS
-The following options are recognized when configuring a printer queue:
-.TP 5
-\-c \fIclass\fR
-.br
-Adds the named \fIprinter\fR to \fIclass\fR.  If \fIclass\fR does not
-exist it is created automatically.
-.TP 5
-\-i \fIinterface\fR
-.br
-Sets a System V style interface script for the printer.  This option cannot
-be specified with the \fI\-P\fR option (PPD file) and is intended for
-providing support for legacy printer drivers.
-.TP 5
-\-m \fImodel\fR
-.br
-Sets a standard System V interface script or PPD file from the model
-directory.
-.TP 5
-\-r \fIclass\fR
-.br
-Removes the named \fIprinter\fR from \fIclass\fR.  If the resulting class
-becomes empty it is removed.
-.TP 5
-\-v \fIdevice-uri\fR
-.br
-Sets the \fIdevice-uri\fR attribute of the printer queue.  If \fIdevice-uri\fR
-is a filename it is automatically converted to the form \fBfile:/file/name\fR.
-.TP 5
-\-D \fIinfo\fR
-.br
-Provides a textual description of the printer.
-.TP 5
-\-E
-.br
-Enables the printer and accepts jobs; this is the same as running the
-\fIaccept(8)\fR and \fIenable(8)\fR programs on the printer.
-.TP 5
-\-L \fIlocation\fR
-.br
-Provides a textual location of the printer.
-.TP 5
-\-P \fIppd-file\fR
-.br
-Specifies a PostScript Printer Description file to use with the printer. If
-specified, this option overrides the \fI-i\fR option (interface script).
-.SH COMPATIBILITY
-Unlike the System V printing system, CUPS allows printer names to contain
-any printable character except SPACE and TAB. Also, printer and class names are
-\fBnot\fR case-sensitive. Finally, the CUPS version of \fIlpadmin\fR may ask the
-user for an access password depending on the printing system configuration.
-This differs from the System V version which requires the root user to execute
-this command.
-.SH LIMITATIONS
-The CUPS version of \fIlpadmin\fR does not support all of the System V or
-Solaris printing system configuration options.
-.SH SEE ALSO
-accept(8), cancel(1), disable(8), enable(8), lp(1), lpstat(1), reject(8),
-CUPS Software Administrators Manual
-.SH COPYRIGHT
-Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
-.\"
-.\" End of "$Id: lpadmin.8,v 1.9 2000/01/04 13:46:02 mike Exp $".
-.\"
+
+
+
+lpadmin(8)            Easy Software Products           lpadmin(8)
+
+
+NNAAMMEE
+       lpadmin - configure cups printers and classes
+
+SSYYNNOOPPSSIISS
+       llppaaddmmiinn [ -h _s_e_r_v_e_r ] -d _d_e_s_t_i_n_a_t_i_o_n
+       llppaaddmmiinn [ -h _s_e_r_v_e_r ] -p _p_r_i_n_t_e_r _o_p_t_i_o_n_(_s_)
+       llppaaddmmiinn [ -h _s_e_r_v_e_r ] -x _d_e_s_t_i_n_a_t_i_o_n
+
+DDEESSCCRRIIPPTTIIOONN
+       _l_p_a_d_m_i_n  configures  printer  and class queues provided by
+       CUPS. It can also  be  used  to  set  the  system  default
+       printer or class.
+
+       The  first form of the command sets the default printer or
+       class to _d_e_s_t_i_n_a_t_i_o_n.  Subsequent print jobs submitted via
+       the  _l_p_(_1_)  or  _l_p_r_(_1_)  commands will use this destination
+       unless the user specifies otherwise.
+
+       The second  form  of  the  command  configures  the  named
+       printer.  The additional options are described below.
+
+       The third form of the command deletes the printer or class
+       _d_e_s_t_i_n_a_t_i_o_n.  Any jobs that are pending for  the  destina-
+       tion will be removed and any job that is currently printed
+       will be aborted.
+
+CCOONNFFIIGGUURRAATTIIOONN OOPPTTIIOONNSS
+       The following options are recognized  when  configuring  a
+       printer queue:
+
+       -c _c_l_a_s_s
+            Adds  the  named _p_r_i_n_t_e_r to _c_l_a_s_s.  If _c_l_a_s_s does not
+            exist it is created automatically.
+
+       -i _i_n_t_e_r_f_a_c_e
+            Sets a  System  V  style  interface  script  for  the
+            printer.  This option cannot be specified with the _-_P
+            option (PPD file) and is intended for providing  sup-
+            port for legacy printer drivers.
+
+       -m _m_o_d_e_l
+            Sets a standard System V interface script or PPD file
+            from the model directory.
+
+       -r _c_l_a_s_s
+            Removes the named _p_r_i_n_t_e_r from _c_l_a_s_s.  If the result-
+            ing class becomes empty it is removed.
+
+       -v _d_e_v_i_c_e_-_u_r_i
+            Sets  the  _d_e_v_i_c_e_-_u_r_i attribute of the printer queue.
+            If _d_e_v_i_c_e_-_u_r_i is a filename it is automatically  con-
+            verted to the form ffiillee:://ffiillee//nnaammee.
+
+
+
+
+
+22 September 1999  Common UNIX Printing System                  1
+
+
+
+
+
+lpadmin(8)            Easy Software Products           lpadmin(8)
+
+
+       -D _i_n_f_o
+            Provides a textual description of the printer.
+
+       -E
+            Enables  the  printer  and  accepts jobs; this is the
+            same as running the _a_c_c_e_p_t_(_8_) and _e_n_a_b_l_e_(_8_)  programs
+            on the printer.
+
+       -L _l_o_c_a_t_i_o_n
+            Provides a textual location of the printer.
+
+       -P _p_p_d_-_f_i_l_e
+            Specifies  a  PostScript  Printer Description file to
+            use with the printer. If specified, this option over-
+            rides the _-_i option (interface script).
+
+CCOOMMPPAATTIIBBIILLIITTYY
+       Unlike  the  System V printing system, CUPS allows printer
+       names to contain any printable character except SPACE  and
+       TAB. Also, printer and class names are nnoott case-sensitive.
+       Finally, the CUPS version of _l_p_a_d_m_i_n may ask the user  for
+       an  access  password depending on the printing system con-
+       figuration.  This differs from the System V version  which
+       requires the root user to execute this command.
+
+LLIIMMIITTAATTIIOONNSS
+       The  CUPS  version  of _l_p_a_d_m_i_n does not support all of the
+       System V or Solaris printing system configuration options.
+
+SSEEEE AALLSSOO
+       accept(8),   cancel(1),   disable(8),   enable(8),  lp(1),
+       lpstat(1), reject(8), CUPS Software Administrators Manual
+
+CCOOPPYYRRIIGGHHTT
+       Copyright 1993-2000 by Easy Software Products, All  Rights
+       Reserved.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+22 September 1999  Common UNIX Printing System                  2
+
+

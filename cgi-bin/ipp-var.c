@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.2 2000/02/02 00:50:42 mike Exp $"
+ * "$Id: ipp-var.c,v 1.3 2000/02/08 20:38:44 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -111,11 +111,11 @@ ippSetCGIVars(ipp_t *response)		/* I - Response data to be copied... */
 	      break;
 
 	  case IPP_TAG_BOOLEAN :
-	      if (!attr->values[i].boolean)
-		strcat(valptr, "no");
+	      sprintf(valptr, "%d", attr->values[i].boolean);
+	      break;
 
 	  case IPP_TAG_NOVALUE :
-	      strcat(valptr, attr->name);
+	      strcat(valptr, "novalue");
 	      break;
 
 	  case IPP_TAG_RANGE :
@@ -171,5 +171,5 @@ ippSetCGIVars(ipp_t *response)		/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.2 2000/02/02 00:50:42 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.3 2000/02/08 20:38:44 mike Exp $".
  */
