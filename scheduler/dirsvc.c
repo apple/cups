@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.102 2002/12/17 19:00:15 swdev Exp $"
+ * "$Id: dirsvc.c,v 1.103 2003/01/04 15:39:31 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -670,7 +670,7 @@ SendCUPSBrowse(printer_t *p)		/* I - Printer to send */
 
       bytes = strlen(packet);
       LogMessage(L_DEBUG2, "SendBrowseList: (%d bytes to %x) %s", bytes,
-        	 ntohl(b->to.sin_addr.s_addr), packet);
+        	 (unsigned)ntohl(b->to.sin_addr.s_addr), packet);
 
       if (sendto(BrowseSocket, packet, bytes, 0,
 		 (struct sockaddr *)&(b->to), sizeof(struct sockaddr_in)) <= 0)
@@ -1855,5 +1855,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.102 2002/12/17 19:00:15 swdev Exp $".
+ * End of "$Id: dirsvc.c,v 1.103 2003/01/04 15:39:31 mike Exp $".
  */
