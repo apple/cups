@@ -1,7 +1,7 @@
 /*
- * "$Id: conf.c,v 1.8 1999/04/16 20:47:47 mike Exp $"
+ * "$Id: conf.c,v 1.9 1999/04/21 22:41:27 mike Exp $"
  *
- *   for the Common UNIX Printing System (CUPS).
+ *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
  *
@@ -151,8 +151,8 @@ ReadConfiguration(void)
 
   gethostname(ServerName, sizeof(ServerName));
   sprintf(ServerAdmin, "root@%s", ServerName);
-  strcpy(ServerRoot, ".");
-  strcpy(DocumentRoot, ".");
+  strcpy(ServerRoot, SERVERDIR);
+  strcpy(DocumentRoot, SERVERDIR "/doc");
   strcpy(SystemGroup, DEFAULT_GROUP);
   strcpy(AccessLog, "logs/access_log");
   strcpy(ErrorLog, "logs/error_log");
@@ -170,7 +170,7 @@ ReadConfiguration(void)
   ImplicitClasses  = TRUE;
 
   Browsing         = TRUE;
-  BrowsePort       = DEFAULT_PORT;
+  BrowsePort       = IPP_PORT;
   BrowseInterval   = DEFAULT_INTERVAL;
   BrowseTimeout    = DEFAULT_TIMEOUT;
   NumBrowsers      = 0;
@@ -448,7 +448,7 @@ read_configuration(FILE *fp)	/* I - File to read from */
 
       if (NumListeners < MAX_BROWSERS)
       {
-        if (get_address(value, INADDR_ANY, DEFAULT_PORT,
+        if (get_address(value, INADDR_ANY, IPP_PORT,
 	                &(Listeners[NumListeners].address)))
 	  NumListeners ++;
 	else
@@ -920,5 +920,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.8 1999/04/16 20:47:47 mike Exp $".
+ * End of "$Id: conf.c,v 1.9 1999/04/21 22:41:27 mike Exp $".
  */

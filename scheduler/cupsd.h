@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.6 1999/04/21 21:19:37 mike Exp $"
+ * "$Id: cupsd.h,v 1.7 1999/04/21 22:41:28 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -79,7 +79,6 @@
  * Defaults...
  */
 
-#define DEFAULT_PORT		631	/* IPP port reserved with the IANA */
 #define DEFAULT_TIMEOUT		300	/* Timeout during requests/updates */
 #define DEFAULT_KEEPALIVE	30	/* Timeout between requests */
 #define DEFAULT_INTERVAL	30	/* Interval between browse updates */
@@ -134,5 +133,5 @@ VAR int			NeedReload	VALUE(TRUE);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.6 1999/04/21 21:19:37 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.7 1999/04/21 22:41:28 mike Exp $".
  */

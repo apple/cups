@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.7 1999/04/16 20:47:47 mike Exp $"
+ * "$Id: conf.h,v 1.8 1999/04/21 22:41:28 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -38,48 +38,48 @@
  * Globals...
  */
 
-VAR char		ConfigurationFile[256] VALUE("/var/spool/cups/cupsd.conf"),
+VAR char		ConfigurationFile[256]	VALUE(SERVERDIR "/conf/cupsd.conf"),
 					/* Configuration file to use */
-			ServerName[256]	VALUE(""),
+			ServerName[256]		VALUE(""),
 					/* FQDN for server */
-			ServerAdmin[256] VALUE(""),
+			ServerAdmin[256]	VALUE(""),
 					/* Administrator's email */
-			ServerRoot[1024] VALUE("."),
+			ServerRoot[1024]	VALUE(SERVERDIR),
 					/* Root directory for scheduler */
-			DocumentRoot[1024] VALUE("."),
+			DocumentRoot[1024]	VALUE(SERVERDIR "/doc"),
 					/* Root directory for documents */
 			SystemGroup[32]		VALUE(DEFAULT_GROUP),
 					/* System group name */
-			AccessLog[1024]	VALUE("logs/access_log"),
+			AccessLog[1024]		VALUE("logs/access_log"),
 					/* Access log filename */
-			ErrorLog[1024]	VALUE("logs/error_log"),
+			ErrorLog[1024]		VALUE("logs/error_log"),
 					/* Error log filename */
-			DefaultLanguage[32] VALUE(DEFAULT_LANGUAGE),
+			DefaultLanguage[32]	VALUE(DEFAULT_LANGUAGE),
 					/* Default language encoding */
-			DefaultCharset[32] VALUE(DEFAULT_CHARSET),
+			DefaultCharset[32]	VALUE(DEFAULT_CHARSET),
 					/* Default charset */
-			RIPCache[32]	VALUE("32m");
-VAR int			User		VALUE(DEFAULT_UID),
+			RIPCache[32]		VALUE("32m");
+VAR int			User			VALUE(DEFAULT_UID),
 					/* User ID for server */
-			Group		VALUE(DEFAULT_GID),
+			Group			VALUE(DEFAULT_GID),
 					/* Group ID for server */
-			LogLevel	VALUE(LOG_ERROR),
+			LogLevel		VALUE(LOG_ERROR),
 					/* Log level */
-			HostNameLookups	VALUE(FALSE),
+			HostNameLookups		VALUE(FALSE),
 					/* Do we do reverse lookups? */
-			Timeout		VALUE(DEFAULT_TIMEOUT),
+			Timeout			VALUE(DEFAULT_TIMEOUT),
 					/* Timeout during requests */
-			KeepAlive	VALUE(TRUE),
+			KeepAlive		VALUE(TRUE),
 					/* Support the Keep-Alive option? */
-			KeepAliveTimeout VALUE(DEFAULT_KEEPALIVE),
+			KeepAliveTimeout	VALUE(DEFAULT_KEEPALIVE),
 					/* Timeout between requests */
-			ImplicitClasses	VALUE(TRUE);
+			ImplicitClasses		VALUE(TRUE);
 					/* Are classes implicitly created? */
-VAR FILE		*AccessFile	VALUE(NULL),
+VAR FILE		*AccessFile		VALUE(NULL),
 					/* Access log file */
-			*ErrorFile	VALUE(NULL);
+			*ErrorFile		VALUE(NULL);
 					/* Error log file */
-VAR mime_t		*MimeDatabase	VALUE(NULL);
+VAR mime_t		*MimeDatabase		VALUE(NULL);
 
 
 /*
@@ -92,5 +92,5 @@ extern int	LogMessage(int level, char *message, ...);
 
 
 /*
- * End of "$Id: conf.h,v 1.7 1999/04/16 20:47:47 mike Exp $".
+ * End of "$Id: conf.h,v 1.8 1999/04/21 22:41:28 mike Exp $".
  */
