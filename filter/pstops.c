@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.17 2002/05/16 14:02:25 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.18 2002/05/16 15:22:37 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -139,7 +139,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		subpage;	/* Sub-page number */
   int		copy;		/* Current copy */
   int		saweof;		/* Did we see a %%EOF tag? */
-  int		sent_prolog,	/* Did we send the prolog commands? */
+  int		sent_espsp,	/* Did we send the ESPshowpage commands? */
+		sent_prolog,	/* Did we send the prolog commands? */
 		sent_setup;	/* Did we send the setup commands? */
 
 
@@ -340,22 +341,17 @@ main(int  argc,			/* I - Number of command-line arguments */
   }
 
  /*
-  * See if this is an EPS file...
-  */
-
-  UseESPsp = strstr(line, "EPS") != NULL;
-
- /*
   * Start sending the document with any commands needed...
   */
 
   fputs(line, stdout);
 
   saweof      = 0;
+  sent_espsp  = 0;
   sent_prolog = 0;
   sent_setup  = 0;
 
-  if (Copies > 1 && (!Collate || !slowcollate))
+  if (Copies != 1 && (!Collate || !slowcollate))
     printf("%%%%Requirements: numcopies(%d)%s%s\n", Copies,
            Collate ? " collate" : "",
 	   Duplex ? " duplex" : "");
@@ -374,7 +370,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   val = cupsGetOption("page-label", num_options, options);
 
-  if (val != NULL || getenv("CLASSIFICATION") != NULL || NUp > 1)
+  if (val != NULL || getenv("CLASSIFICATION") != NULL || NUp > 1 ||
+      strstr(line, "EPS") != NULL)
   {
    /*
     * Yes, use ESPshowpage...
@@ -382,10 +379,6 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     UseESPsp = 1;
   }
-
-  if (UseESPsp)
-    puts("userdict/ESPshowpage/showpage load put\n"
-	 "userdict/showpage{}put");
 
   if (strncmp(line, "%!PS-Adobe-", 11) == 0)
   {
@@ -401,6 +394,17 @@ main(int  argc,			/* I - Number of command-line arguments */
     {
       if (strncmp(line, "%%", 2) == 0)
         fprintf(stderr, "DEBUG: %d %s", level, line);
+      else if (line[0] != '%' && line[0] && !sent_espsp && UseESPsp)
+      {
+       /*
+        * Send ESPshowpage stuff...
+	*/
+
+        sent_espsp = 1;
+
+	puts("userdict/ESPshowpage/showpage load put\n"
+	     "userdict/showpage{}put");
+      }
 
       if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
           strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
@@ -518,6 +522,18 @@ main(int  argc,			/* I - Number of command-line arguments */
       do_setup(ppd, Copies, Collate, slowcollate, g, b);
 
       puts("%%EndSetup");
+    }
+
+    if (!sent_espsp && UseESPsp)
+    {
+     /*
+      * Send ESPshowpage stuff...
+      */
+
+      sent_espsp = 1;
+
+      puts("userdict/ESPshowpage/showpage load put\n"
+	   "userdict/showpage{}put");
     }
 
    /*
@@ -845,7 +861,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     * Copy the trailer, if any...
     */
 
-    puts("%%Trailer:");
+    puts("%%Trailer");
     printf("%%%%Pages: %d\n", page - 1);
 
     while (psgets(line, sizeof(line), fp) != NULL)
@@ -872,6 +888,10 @@ main(int  argc,			/* I - Number of command-line arguments */
       printf("%%%%Pages: %d\n", Copies);
     else
       puts("%%Pages: 1");
+
+    if (UseESPsp)
+      puts("userdict/ESPshowpage/showpage load put\n"
+	   "userdict/showpage{}put");
 
     puts("%%BeginProlog");
     do_prolog(ppd);
@@ -1063,7 +1083,11 @@ do_prolog(ppd_file_t *ppd)		/* I - PPD file */
   */
 
   if (ppd != NULL && ppd->patches != NULL)
+  {
+    puts("%%BeginFeature: *JobPatchFile 1");
     puts(ppd->patches);
+    puts("%%EndFeature");
+  }
 
   ppdEmit(ppd, stdout, PPD_ORDER_PROLOG);
 }
@@ -1092,7 +1116,7 @@ do_setup(ppd_file_t *ppd,		/* I - PPD file */
   * Set the number of copies for the job...
   */
 
-  if (copies > 1 && (!collate || !slowcollate))
+  if (copies != 1 && (!collate || !slowcollate))
   {
     printf("%%RBIBeginNonPPDFeature: *NumCopies %d\n", copies);
     printf("%d/languagelevel where{pop languagelevel 2 ge}{false}ifelse{1 dict begin"
@@ -1561,37 +1585,34 @@ start_nup(int number,		/* I - Page number */
         break;
   }
 
-  if (NUp > 1)
+ /*
+  * Draw borders as necessary...
+  */
+
+  if (Border && show_border)
   {
    /*
-    * Draw borders as necessary...
+    * Set the line width and color...
     */
 
-    if (Border && show_border)
-    {
-     /*
-      * Set the line width and color...
-      */
+    puts("gsave");
+    printf("%.3f setlinewidth 0 setgray newpath\n",
+           (Border & BORDER_THICK) ? PageWidth / w : 0.0);
 
-      puts("gsave");
-      printf("%.3f setlinewidth 0 setgray newpath\n",
-             (Border & BORDER_THICK) ? PageWidth / w : 0.0);
+    printf("0 0 %.1f %.1f ESPrs\n", PageWidth, PageLength);
 
-      printf("0 0 %.1f %.1f ESPrs\n", PageWidth, PageLength);
-
-      if (Border & BORDER_DOUBLE)
-        printf("2 2 %.1f %.1f ESPrs\n", PageWidth - 4.0, PageLength - 4.0);
-    }
-
-   /*
-    * Clip the page that follows to the bounding box of the page...
-    */
-
-    printf("0 0 %.1f %.1f ESPrc\n", PageWidth, PageLength);
+    if (Border & BORDER_DOUBLE)
+      printf("2 2 %.1f %.1f ESPrs\n", PageWidth - 4.0, PageLength - 4.0);
   }
+
+ /*
+  * Clip the page that follows to the bounding box of the page...
+  */
+
+  printf("0 0 %.1f %.1f ESPrc\n", PageWidth, PageLength);
 }
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.17 2002/05/16 14:02:25 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.18 2002/05/16 15:22:37 mike Exp $".
  */
