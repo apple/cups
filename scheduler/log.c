@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.18 2001/02/07 19:41:37 mike Exp $"
+ * "$Id: log.c,v 1.19 2001/02/21 20:16:47 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -118,9 +118,13 @@ LogMessage(int        level,	/* I - Log level */
   va_list	ap;		/* Argument pointer */
   static char	levels[] =	/* Log levels... */
 		{
-		  'N',
+		  ' ',
+		  'X',
+		  'A',
+		  'C',
 		  'E',
 		  'W',
+		  'N',
 		  'I',
 		  'D',
 		  'd'
@@ -128,10 +132,15 @@ LogMessage(int        level,	/* I - Log level */
 #ifdef HAVE_VSYSLOG
   static int	syslevels[] =	/* SYSLOG levels... */
 		{
-		  LOG_NOTICE,
+		  0,
+		  LOG_EMERG,
+		  LOG_ALERT,
+		  LOG_CRIT,
 		  LOG_ERR,
 		  LOG_WARNING,
+		  LOG_NOTICE,
 		  LOG_INFO,
+		  LOG_DEBUG,
 		  LOG_DEBUG
 		};
 #endif /* HAVE_VSYSLOG */
@@ -427,5 +436,5 @@ check_log_file(FILE       **log,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c,v 1.18 2001/02/07 19:41:37 mike Exp $".
+ * End of "$Id: log.c,v 1.19 2001/02/21 20:16:47 mike Exp $".
  */

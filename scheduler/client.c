@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.85 2001/02/20 22:41:55 mike Exp $"
+ * "$Id: client.c,v 1.86 2001/02/21 20:16:46 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -239,10 +239,10 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 
 #ifdef HAVE_LIBSSL
  /*
-  * See if we are connecting on port 443...
+  * See if we are connecting on a secure port...
   */
 
-  if (ntohs(con->http.hostaddr.sin_port) == 443)
+  if (lis->encryption == HTTP_ENCRYPT_ALWAYS)
   {
    /*
     * https connection; go secure...
@@ -2078,5 +2078,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.85 2001/02/20 22:41:55 mike Exp $".
+ * End of "$Id: client.c,v 1.86 2001/02/21 20:16:46 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.72 2001/02/21 17:01:17 mike Exp $"
+ * "$Id: conf.c,v 1.73 2001/02/21 20:16:47 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -592,7 +592,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
       * Add a listening address to the list...
       */
 
-      if (NumListeners < MAX_BROWSERS)
+      if (NumListeners < MAX_LISTENERS)
       {
         if (get_address(value, INADDR_ANY, IPP_PORT,
 	                &(Listeners[NumListeners].address)))
@@ -610,6 +610,34 @@ read_configuration(FILE *fp)		/* I - File to read from */
         LogMessage(L_WARN, "Too many %s directives at line %d.", name,
 	           linenum);
     }
+#ifdef HAVE_LIBSSL
+    else if (strcasecmp(name, "SSLPort") == 0 ||
+             strcasecmp(name, "SSLListen") == 0)
+    {
+     /*
+      * Add a listening address to the list...
+      */
+
+      if (NumListeners < MAX_LISTENERS)
+      {
+        if (get_address(value, INADDR_ANY, IPP_PORT,
+	                &(Listeners[NumListeners].address)))
+        {
+          LogMessage(L_INFO, "Listening to %x:%d (SSL)",
+                     ntohl(Listeners[NumListeners].address.sin_addr.s_addr),
+                     ntohs(Listeners[NumListeners].address.sin_port));
+          Listeners[NumListeners].encryption = HTTP_ENCRYPT_ALWAYS;
+	  NumListeners ++;
+        }
+	else
+          LogMessage(L_ERROR, "Bad %s address %s at line %d.", name,
+	             value, linenum);
+      }
+      else
+        LogMessage(L_WARN, "Too many %s directives at line %d.", name,
+	           linenum);
+    }
+#endif /* HAVE_LIBSSL */
     else if (strcasecmp(name, "BrowseAddress") == 0)
     {
      /*
@@ -1027,12 +1055,22 @@ read_configuration(FILE *fp)		/* I - File to read from */
         LogLevel = L_DEBUG;
       else if (strcasecmp(value, "info") == 0)
         LogLevel = L_INFO;
+      else if (strcasecmp(value, "notice") == 0)
+        LogLevel = L_NOTICE;
       else if (strcasecmp(value, "warn") == 0)
         LogLevel = L_WARN;
       else if (strcasecmp(value, "error") == 0)
         LogLevel = L_ERROR;
+      else if (strcasecmp(value, "crit") == 0)
+        LogLevel = L_CRIT;
+      else if (strcasecmp(value, "alert") == 0)
+        LogLevel = L_ALERT;
+      else if (strcasecmp(value, "emerg") == 0)
+        LogLevel = L_EMERG;
       else if (strcasecmp(value, "none") == 0)
         LogLevel = L_NONE;
+      else
+        LogMessage(L_WARN, "Unknown LogLevel %s on line %d.", value, linenum);
     }
     else
     {
@@ -1579,5 +1617,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.72 2001/02/21 17:01:17 mike Exp $".
+ * End of "$Id: conf.c,v 1.73 2001/02/21 20:16:47 mike Exp $".
  */
