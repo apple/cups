@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.22 1999/06/15 20:40:00 mike Exp $"
+ * "$Id: ppd.c,v 1.23 1999/06/15 21:27:09 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -50,7 +50,6 @@
  * Include necessary headers.
  */
 
-#define DEBUG
 #include "ppd.h"
 #include <stdlib.h>
 #include <ctype.h>
@@ -641,7 +640,9 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       * Add a "Custom" page size option...
       */
 
-      if ((group = ppd_get_group(ppd, "General")) == NULL)
+      if ((group = ppd_get_group(ppd,
+                                 cupsLangString(language,
+                                                CUPS_MSG_GENERAL))) == NULL)
       {
         ppdClose(ppd);
 	free(string);
@@ -662,7 +663,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	return (NULL);
       }
 
-      strcpy(choice->text, "Custom Size");
+      strcpy(choice->text, cupsLangString(language, CUPS_MSG_VARIABLE));
       group  = NULL;
       option = NULL;
     }
@@ -689,7 +690,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
     {
       if ((option = ppdFindOption(ppd, "PageSize")) == NULL)
       {
-        ppdClose(ppd);
+	ppdClose(ppd);
 	free(string);
 	return (NULL);
       }
@@ -1691,5 +1692,5 @@ ppd_decode(char *string)	/* I - String to decode */
 
 
 /*
- * End of "$Id: ppd.c,v 1.22 1999/06/15 20:40:00 mike Exp $".
+ * End of "$Id: ppd.c,v 1.23 1999/06/15 21:27:09 mike Exp $".
  */
