@@ -1,5 +1,5 @@
 /*
- * "$Id: debug.h,v 1.4.2.2 2002/03/01 19:55:10 mike Exp $"
+ * "$Id: debug.h,v 1.4.2.3 2002/05/09 02:22:06 mike Exp $"
  *
  *   Debugging macros for the Common UNIX Printing System (CUPS).
  *
@@ -24,8 +24,8 @@
  *   This file is subject to the Apple OS-Developed Software exception.
  */
 
-#ifndef _CUPS_DEBUG_H_
-#  define _CUPS_DEBUG_H_
+#ifndef _IPP_DEBUG_H_
+#  define _IPP_DEBUG_H_
 
 /*
  * Include necessary headers...
@@ -52,8 +52,8 @@
 #    define DEBUG_printf(x)
 #  endif /* DEBUG */
 
-#endif /* !_CUPS_DEBUG_H_ */
+#endif /* !_IPP_DEBUG_H_ */
 
 /*
- * End of "$Id: debug.h,v 1.4.2.2 2002/03/01 19:55:10 mike Exp $".
+ * End of "$Id: debug.h,v 1.4.2.3 2002/05/09 02:22:06 mike Exp $".
  */

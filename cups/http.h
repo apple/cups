@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.1.2.1 2002/03/22 15:47:24 mike Exp $"
+ * "$Id: http.h,v 1.33.2.10 2002/05/09 02:22:07 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -372,5 +372,5 @@ extern char		*httpAddrString(const http_addr_t *addr,
 #endif /* !_IPP_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.1.2.1 2002/03/22 15:47:24 mike Exp $".
+ * End of "$Id: http.h,v 1.33.2.10 2002/05/09 02:22:07 mike Exp $".
  */

@@ -1,7 +1,7 @@
 /*
- * "$Id: string.h,v 1.7.2.5 2002/03/22 15:47:22 mike Exp $"
+ * "$Id: string.h,v 1.7.2.6 2002/05/09 02:22:09 mike Exp $"
  *
- *   String redirection header for the Common UNIX Printing System (CUPS).
+ *   String definitions for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-2002 by Easy Software Products.
  *
@@ -24,17 +24,87 @@
  *   This file is subject to the Apple OS-Developed Software exception.
  */
 
-#ifndef _CUPS_STRING_H_
-#  define _CUPS_STRING_H_
+#ifndef _IPP_STRING_H_
+#  define _IPP_STRING_H_
 
 /*
- * Include real header file...
+ * Include necessary headers...
  */
 
-#  include <ipp/string.h>
+#  include "config.h"
 
-#endif /* !_CUPS_STRING_H_ */
+#  include <stdio.h>
+#  include <stdarg.h>
+#  include <ctype.h>
+
+#  ifdef HAVE_STRING_H
+#    include <string.h>
+#  endif /* HAVE_STRING_H */
+
+#  ifdef HAVE_STRINGS_H
+#    include <strings.h>
+#  endif /* HAVE_STRINGS_H */
+
 
 /*
- * End of "$Id: string.h,v 1.7.2.5 2002/03/22 15:47:22 mike Exp $".
+ * Stuff for WIN32 and OS/2...
+ */
+
+#  if defined(WIN32) || defined(__EMX__)
+#    define strcasecmp	stricmp
+#    define strncasecmp	strnicmp
+#  endif /* WIN32 || __EMX__ */
+
+
+/*
+ * C++ magic...
+ */
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
+
+
+/*
+ * Prototypes...
+ */
+
+#  ifndef HAVE_STRDUP
+extern char	*ipp_strdup(const char *);
+#    define strdup ipp_strdup
+#  endif /* !HAVE_STRDUP */
+
+#  ifndef HAVE_STRCASECMP
+extern int	ipp_strcasecmp(const char *, const char *);
+#    define strcasecmp ipp_strcasecmp
+#  endif /* !HAVE_STRCASECMP */
+
+#  ifndef HAVE_STRNCASECMP
+extern int	ipp_strncasecmp(const char *, const char *, size_t n);
+#    define strncasecmp ipp_strncasecmp
+#  endif /* !HAVE_STRNCASECMP */
+
+#  ifndef HAVE_SNPRINTF
+extern int	ipp_snprintf(char *, size_t, const char *, ...);
+#    define snprintf ipp_snprintf
+#  endif /* !HAVE_SNPRINTF */
+
+#  ifndef HAVE_VSNPRINTF
+extern int	ipp_vsnprintf(char *, size_t, const char *, va_list);
+#    define vsnprintf ipp_vsnprintf
+#  endif /* !HAVE_VSNPRINTF */
+
+
+/*
+ * C++ magic...
+ */
+
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
+
+#endif /* !_IPP_STRING_H_ */
+
+/*
+ * End of "$Id: string.h,v 1.7.2.6 2002/05/09 02:22:09 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: string.c,v 1.1.2.1 2002/03/22 15:47:26 mike Exp $"
+ * "$Id: string.c,v 1.5.2.4 2002/05/09 02:22:09 mike Exp $"
  *
  *   String functions for the Common UNIX Printing System (CUPS).
  *
@@ -123,5 +123,5 @@ ipp_strncasecmp(const char *s,	/* I - First string */
 
 
 /*
- * End of "$Id: string.c,v 1.1.2.1 2002/03/22 15:47:26 mike Exp $".
+ * End of "$Id: string.c,v 1.5.2.4 2002/05/09 02:22:09 mike Exp $".
  */

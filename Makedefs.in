@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.36.2.6 2002/03/22 15:47:15 mike Exp $"
+# "$Id: Makedefs.in,v 1.36.2.7 2002/05/09 02:22:03 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -67,7 +67,6 @@ CUPS_GROUP	=	@CUPS_GROUP@
 
 LIBCUPS	=	@LIBCUPS@
 LIBCUPSIMAGE =	@LIBCUPSIMAGE@
-LIBIPP	=	@LIBIPP@
 LIBJPEG	=	@LIBJPEG@
 LIBMALLOC =	@LIBMALLOC@
 LIBPNG	=	@LIBPNG@
@@ -92,7 +91,7 @@ IMGLIBS	=	@IMGLIBS@ -lm
 LDFLAGS	=	@LDFLAGS@ $(OPTIM)
 LINKCUPS =	@LINKCUPS@
 LINKCUPSIMAGE =	@LINKCUPSIMAGE@
-LIBS	=	$(LINKCUPS) $(NETLIBS) @LIBS@
+LIBS	=	$(LINKCUPS) $(SSLLIBS) $(NETLIBS) @LIBS@
 NETLIBS	=	@NETLIBS@
 OPTIM	=	@OPTIM@
 OPTIONS	=
@@ -179,5 +178,5 @@ MAN8DIR		=	@MAN8DIR@
 	$(MV) t.z $@
 
 #
-# End of "$Id: Makedefs.in,v 1.36.2.6 2002/03/22 15:47:15 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.36.2.7 2002/05/09 02:22:03 mike Exp $"
 #

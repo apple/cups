@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.53.2.9 2002/03/22 16:24:34 mike Exp $"
+# "$Id: Makefile,v 1.53.2.10 2002/05/09 02:22:06 mike Exp $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -30,8 +30,10 @@ include ../Makedefs
 # Object files...
 #
 
-LIBOBJS	=	dest.o emit.o encode.o language.o mark.o options.o \
-		page.o ppd.o tempfile.o usersys.o util.o
+LIBOBJS	=	dest.o emit.o encode.o http.o http-addr.o ipp.o \
+		language.o mark.o md5.o md5passwd.o options.o \
+		page.o ppd.o snprintf.o	string.o tempfile.o \
+		usersys.o util.o
 OBJS	=	$(LIBOBJS) testhttp.o testppd.o
 
 
@@ -39,7 +41,7 @@ OBJS	=	$(LIBOBJS) testhttp.o testppd.o
 # Header files to install...
 #
 
-HEADERS	=	cups.h language.h ppd.h
+HEADERS	=	cups.h http.h ipp.h language.h md5.h ppd.h
 
 
 #
@@ -61,7 +63,7 @@ all:	$(TARGETS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) `basename $(LIBCUPS) .3`
+	$(RM) $(OBJS) $(TARGETS) `basename $(LIBCUPS) .2`
 
 
 #
@@ -79,12 +81,12 @@ depend:
 install:	all	installhdrs
 	$(INSTALL_DIR) $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPS) $(LIBDIR)
-	if test $(LIBCUPS) = "libcups.so.3" -o $(LIBCUPS) = "libcups.sl.3"; then \
+	if test $(LIBCUPS) = "libcups.so.2" -o $(LIBCUPS) = "libcups.sl.2"; then \
 		$(INSTALL_LIB) libcups.a $(LIBDIR); \
-		$(RM) $(LIBDIR)/`basename $(LIBCUPS) .3`; \
-		$(LN) $(LIBCUPS) $(LIBDIR)/`basename $(LIBCUPS) .3`; \
+		$(RM) $(LIBDIR)/`basename $(LIBCUPS) .2`; \
+		$(LN) $(LIBCUPS) $(LIBDIR)/`basename $(LIBCUPS) .2`; \
 	fi
-	if test $(LIBCUPS) = "libcups.3.dylib"; then \
+	if test $(LIBCUPS) = "libcups.2.dylib"; then \
 		$(STRIP) -x $(LIBDIR)/$(LIBCUPS); \
 		$(INSTALL_LIB) libcups.a $(LIBDIR); \
 		$(RM) $(LIBDIR)/libcups.dylib; \
@@ -102,26 +104,26 @@ installhdrs:
 
 
 #
-# libcups.so.3, libcups.sl.3
+# libcups.so.2, libcups.sl.2
 #
 
-libcups.so.3 libcups.sl.3:	$(LIBOBJS)
+libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS)
-	$(RM) `basename $@ .3`
-	$(LN) $@ `basename $@ .3`
+	$(RM) `basename $@ .2`
+	$(LN) $@ `basename $@ .2`
 
 
 #
 # libcups.2.dylib
 #
 
-libcups.3.dylib:	$(LIBOBJS)
+libcups.2.dylib:	$(LIBOBJS)
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/libcups.dylib \
-		-current_version 3.0.0 \
-		-compatibility_version 3.0.0 \
+		-current_version 2.5.0 \
+		-compatibility_version 2.0.0 \
 		$(LIBOBJS)
 	$(RM) libcups.dylib
 	$(LN) $@ libcups.dylib
@@ -145,7 +147,7 @@ libcups_s.a:	$(LIBOBJS)
 libcups.la:    $(LIBOBJS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
-		-version-info 3:0
+		-version-info 2:5
 
 
 #
@@ -170,6 +172,15 @@ cups_C.h:	../locale/C/cups_C
 
 
 #
+# testhttp (dependency on static CUPS library is intentional)
+#
+
+testhttp:	testhttp.o libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testhttp.o libcups.a $(NETLIBS) $(SSLLIBS)
+
+
+#
 # testppd (dependency on static CUPS library is intentional)
 #
 
@@ -186,5 +197,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.53.2.9 2002/03/22 16:24:34 mike Exp $".
+# End of "$Id: Makefile,v 1.53.2.10 2002/05/09 02:22:06 mike Exp $".
 #

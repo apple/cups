@@ -1,15 +1,15 @@
 # DO NOT DELETE
 
-betest.o: ../cups/string.h ../ipp/string.h ../config.h
-ipp.o: ../cups/cups.h ../ipp/ipp.h ../ipp/http.h ../ipp/md5.h ../cups/ppd.h
-ipp.o: ../cups/language.h ../cups/string.h ../ipp/string.h ../config.h
-lpd.o: ../cups/cups.h ../ipp/ipp.h ../ipp/http.h ../ipp/md5.h ../cups/ppd.h
-lpd.o: ../cups/string.h ../ipp/string.h ../config.h
-parallel.o: ../cups/cups.h ../ipp/ipp.h ../ipp/http.h ../ipp/md5.h
-parallel.o: ../cups/ppd.h ../cups/string.h ../ipp/string.h ../config.h
-serial.o: ../cups/cups.h ../ipp/ipp.h ../ipp/http.h ../ipp/md5.h
-serial.o: ../cups/ppd.h ../cups/string.h ../ipp/string.h ../config.h
-socket.o: ../cups/cups.h ../ipp/ipp.h ../ipp/http.h ../ipp/md5.h
-socket.o: ../cups/ppd.h ../cups/string.h ../ipp/string.h ../config.h
-usb.o: ../cups/cups.h ../ipp/ipp.h ../ipp/http.h ../ipp/md5.h ../cups/ppd.h
-usb.o: ../cups/string.h ../ipp/string.h ../config.h
+betest.o: ../cups/string.h ../config.h
+ipp.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+ipp.o: ../cups/ppd.h ../cups/language.h ../cups/string.h ../config.h
+lpd.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+lpd.o: ../cups/ppd.h ../cups/string.h ../config.h
+parallel.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+parallel.o: ../cups/ppd.h ../cups/string.h ../config.h
+serial.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+serial.o: ../cups/ppd.h ../cups/string.h ../config.h
+socket.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+socket.o: ../cups/ppd.h ../cups/string.h ../config.h
+usb.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+usb.o: ../cups/ppd.h ../cups/string.h ../config.h

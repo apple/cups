@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.1.2.2 2002/04/06 09:42:41 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.14 2002/05/09 02:22:07 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -2241,5 +2241,5 @@ ipp_write_mem(ipp_mem_t   *m,		/* I - Memory buffer */
 
 
 /*
- * End of "$Id: ipp.c,v 1.1.2.2 2002/04/06 09:42:41 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.14 2002/05/09 02:22:07 mike Exp $".
  */
