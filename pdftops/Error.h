@@ -18,6 +18,6 @@
 #include <stdio.h>
 #include "config.h"
 
-extern void CDECL error(int pos, char *msg, ...);
+extern void CDECL error(int pos, const char *msg, ...);
 
 #endif

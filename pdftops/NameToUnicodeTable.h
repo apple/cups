@@ -8,7 +8,7 @@
 
 static struct {
   Unicode u;
-  char *name;
+  const char *name;
 } nameToUnicodeTab[] = {
   {0x0021, "!"},
   {0x0023, "#"},

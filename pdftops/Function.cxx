@@ -720,7 +720,7 @@ enum PSOp {
 // Note: 'if' and 'ifelse' are parsed separately.
 // The rest are listed here in alphabetical order.
 // The index in this table is equivalent to the entry in PSOp.
-char *psOpNames[] = {
+const char *psOpNames[] = {
   "abs",
   "add",
   "and",

@@ -41,7 +41,7 @@ GBool parseArgs(ArgDesc *args, int *argc, char *argv[]) {
 
 void printUsage(char *program, char *otherArgs, ArgDesc *args) {
   ArgDesc *arg;
-  char *typ;
+  const char *typ;
   int w, w1;
 
   w = 0;

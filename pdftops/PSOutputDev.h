@@ -45,13 +45,13 @@ enum PSFileType {
   psGeneric			// write to a generic stream
 };
 
-typedef void (*PSOutputFunc)(void *stream, char *data, int len);
+typedef void (*PSOutputFunc)(void *stream, const char *data, int len);
 
 class PSOutputDev: public OutputDev {
 public:
 
   // Open a PostScript output file, and write the prolog.
-  PSOutputDev(char *fileName, XRef *xrefA, Catalog *catalog,
+  PSOutputDev(const char *fileName, XRef *xrefA, Catalog *catalog,
 	      int firstPage, int lastPage, PSOutMode modeA);
 
   // Open a PSOutputDev that will write to a generic stream.
@@ -156,14 +156,14 @@ private:
   void setupResources(Dict *resDict);
   void setupFonts(Dict *resDict);
   void setupFont(GfxFont *font, Dict *parentResDict);
-  void setupEmbeddedType1Font(Ref *id, char *psName);
-  void setupExternalType1Font(GString *fileName, char *psName);
-  void setupEmbeddedType1CFont(GfxFont *font, Ref *id, char *psName);
-  void setupEmbeddedTrueTypeFont(GfxFont *font, Ref *id, char *psName);
-  void setupExternalTrueTypeFont(GfxFont *font, char *psName);
-  void setupEmbeddedCIDType0Font(GfxFont *font, Ref *id, char *psName);
-  void setupEmbeddedCIDTrueTypeFont(GfxFont *font, Ref *id, char *psName);
-  void setupType3Font(GfxFont *font, char *psName, Dict *parentResDict);
+  void setupEmbeddedType1Font(Ref *id, const char *psName);
+  void setupExternalType1Font(GString *fileName, const char *psName);
+  void setupEmbeddedType1CFont(GfxFont *font, Ref *id, const char *psName);
+  void setupEmbeddedTrueTypeFont(GfxFont *font, Ref *id, const char *psName);
+  void setupExternalTrueTypeFont(GfxFont *font, const char *psName);
+  void setupEmbeddedCIDType0Font(GfxFont *font, Ref *id, const char *psName);
+  void setupEmbeddedCIDTrueTypeFont(GfxFont *font, Ref *id, const char *psName);
+  void setupType3Font(GfxFont *font, const char *psName, Dict *parentResDict);
   void setupImages(Dict *resDict);
   void setupImage(Ref id, Stream *str);
   void addProcessColor(double c, double m, double y, double k);
@@ -187,10 +187,10 @@ private:
   GBool getFileSpec(Object *fileSpec, Object *fileName);
 #endif
   void writePSChar(char c);
-  void writePS(char *s);
+  void writePS(const char *s);
   void writePSFmt(const char *fmt, ...);
   void writePSString(GString *s);
-  void writePSName(char *s);
+  void writePSName(const char *s);
   GString *filterPSName(GString *name);
 
   PSLevel level;		// PostScript level (1, 2, separation)

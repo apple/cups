@@ -39,7 +39,7 @@ public:
   virtual void reset();
   virtual int getChar();
   virtual int lookChar();
-  virtual GString *getPSFilter(char *indent);
+  virtual GString *getPSFilter(const char *indent);
   virtual GBool isBinary(GBool last = gTrue);
 
 private:

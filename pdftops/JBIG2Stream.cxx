@@ -1452,7 +1452,7 @@ int JBIG2Stream::lookChar() {
   return EOF;
 }
 
-GString *JBIG2Stream::getPSFilter(char *indent) {
+GString *JBIG2Stream::getPSFilter(const char *indent) {
   return NULL;
 }
 
