@@ -1,8 +1,11 @@
-CHANGES.txt - 10/17/2002
+CHANGES.txt - 10/20/2002
 ------------------------
 
 CHANGES IN CUPS V1.1.17
 
+	- Fixed the libtool build rules.
+	- The manpage make rules didn't use $(MAKE) and
+	  $(MFLAGS) for the language subdirectories.
 	- Now set the LC_TIME locale category to get the
 	  properly localized time string.
 	- Fixed a problem in the scheduler that would cause the
