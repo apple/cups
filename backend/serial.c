@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.29 2001/01/22 15:03:20 mike Exp $"
+ * "$Id: serial.c,v 1.30 2001/01/22 15:58:23 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -800,7 +800,7 @@ list_devices(void)
              device, i + 1);
     }
   }
-+#elif defined(__NetBSD__)
+#elif defined(__NetBSD__)
   int	i, j;		/* Looping vars */
   int	fd;		/* File descriptor */
   char	device[255];	/* Device filename */
@@ -842,5 +842,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.29 2001/01/22 15:03:20 mike Exp $".
+ * End of "$Id: serial.c,v 1.30 2001/01/22 15:58:23 mike Exp $".
  */
