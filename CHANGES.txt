@@ -1,5 +1,12 @@
-CHANGES.txt - 06/28/2001
+CHANGES.txt - 07/06/2001
 ------------------------
+
+CHANGES IN CUPS V1.1.10
+
+	- The pstoraster filter did not correctly support
+	  DuplexTumble mode for printers that used flip
+	  duplexing.
+
 
 CHANGES IN CUPS V1.1.9
 
