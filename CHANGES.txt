@@ -1,4 +1,4 @@
-CHANGES.txt - 10/31/2001
+CHANGES.txt - 11/02/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.11
@@ -114,6 +114,10 @@ CHANGES IN CUPS V1.1.11
 	  page comments when printing files directly...)
 	- The pdftops filter didn't properly map glyph names of
 	  embedded Asian TrueType fonts.
+	- Changed the CUPS startup script to look for a program
+	  named "cupsd", not just any program with "cupsd" in
+	  the name (this caused the apcupsd UPS monitoring
+	  daemon to be stopped/restarted...)
 
 
 CHANGES IN CUPS V1.1.10-1

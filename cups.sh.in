@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: cups.sh.in,v 1.14 2001/10/30 22:12:47 mike Exp $"
+# "$Id: cups.sh.in,v 1.15 2001/11/02 20:43:10 mike Exp $"
 #
 #   Startup/shutdown script for the Common UNIX Printing System (CUPS).
 #
@@ -91,18 +91,21 @@ fi
 #
 
 case "`uname`" in
-	IRIX* | HP-UX* | SunOS* | AIX* | SINIX*)
-		pid=`ps -e | awk '{print $1,$4}' | grep cupsd | awk '{print $1}'`
+	IRIX* | HP-UX* | AIX* | SINIX*)
+		pid=`ps -e | awk '{if (match($4, ".*/cupsd$") || $4 == "cupsd") print $1}'`
+		;;
+	SunOS*)
+		pid=`ps -e | nawk '{if (match($4, ".*/cupsd$") || $4 == "cupsd") print $1}'`
 		;;
 	UnixWare*)
-		pid=`ps -e | awk '{print $1,$6}' | grep cupsd | awk '{print $1}'`
+		pid=`ps -e | awk '{if (match($6, ".*/cupsd$") || $6 == "cupsd") print $1}'`
 		. /etc/TIMEZONE
 		;;
 	OSF1*)
-		pid=`ps -e | awk '{print $1,$5}' | grep cupsd | awk '{print $1}'`
+		pid=`ps -e | awk '{if (match($5, ".*/cupsd$") || $5 == "cupsd") print $1}'`
 		;;
 	Linux* | NetBSD* | Darwin*)
-		pid=`ps ax | awk '{print $1,$5}' | grep cupsd | awk '{print $1}'`
+		pid=`ps ax | awk '{if (match($5, ".*/cupsd$") || $5 == "cupsd") print $1}'`
 		;;
 	*)
 		pid=""
@@ -158,5 +161,5 @@ exit 0
 
 
 #
-# End of "$Id: cups.sh.in,v 1.14 2001/10/30 22:12:47 mike Exp $".
+# End of "$Id: cups.sh.in,v 1.15 2001/11/02 20:43:10 mike Exp $".
 #
