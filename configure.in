@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.14 1999/06/10 20:52:11 mike Exp $"
+dnl "$Id: configure.in,v 1.15 1999/06/11 20:23:49 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -58,11 +58,19 @@ AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_RANLIB
 AC_PATH_PROG(AR,ar)
+AC_PATH_PROG(CHMOD,chmod)
 AC_PATH_PROG(CP,cp)
-AC_PATH_PROG(MKDIR,mkdir)
-AC_PATH_PROG(RM,rm)
 AC_PATH_PROG(GROFF,groff)
 AC_PATH_PROG(HTMLDOC,htmldoc)
+AC_PATH_PROG(MKDIR,mkdir)
+AC_PATH_PROG(RM,rm)
+AC_PATH_PROG(SED,sed)
+AC_PATH_PROG(SMBCLIENT,smbclient)
+if test "$SMBCLIENT" = ""; then
+    echo "Looking for smbclient in standard locations..."
+    AC_PATH_PROG(SMBCLIENT,smbclient,samba_not_detected,
+	/usr/samba/bin:/usr/local/samba/bin:/usr/freeware/samba/bin:/opt/samba/bin)
+fi
 
 dnl Architecture checks...
 AC_C_BIGENDIAN
@@ -148,5 +156,5 @@ AC_SUBST(CUPS_DATADIR)
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.14 1999/06/10 20:52:11 mike Exp $".
+dnl End of "$Id: configure.in,v 1.15 1999/06/11 20:23:49 mike Exp $".
 dnl
