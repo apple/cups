@@ -1,11 +1,11 @@
 xpdf
 ====
 
-version 0.90
-99-aug-02
+version 0.92
+2000-dec-03
 
 The xpdf software and documentation are
-copyright 1996-1999 Derek B. Noonburg.
+copyright 1996-2000 Derek B. Noonburg.
 
 Email: derekn@foolabs.com
 WWW: http://www.foolabs.com/xpdf/
@@ -168,7 +168,20 @@ For Japanese support, you will need a Japanese font of the form:
 
     -*-fixed-medium-r-normal-*-NN-*-*-*-*-*-jisx0208.1983-0
 
-and an X server that can handle 16-bit fonts.
+and an X server that can handle 16-bit fonts.  You can also set this
+font using the xpdf.japaneseFont resource.
+
+For Chinese GB support, you will need a font of the form:
+
+    -*-fangsong ti-medium-r-normal-*-%s-*-*-*-*-*-gb2312.1980-0
+
+You can replace this font using the xpdf.chineseGBFont resource.
+
+For Chinese CNS support, you will need a font of the form:
+
+    -*-fixed-medium-r-normal--*-%s-*-*-*-*-big5-0
+
+You can replace this font using the xpdf.chineseCNSFont resource.
 
 If compiled with t1lib support, xpdf will use t1lib to render embedded
 Type 1 and Type 1C fonts.  In addition, xpdf can be configured to use
@@ -190,6 +203,28 @@ example:
     xpdf.t1CourierBoldOblique:   /usr/local/fonts/Courier-BoldOblique.pfa
     xpdf.t1Symbol:               /usr/local/fonts/Symbol.pfa
     xpdf.t1ZapfDingbats:         /usr/local/fonts/ZapfDingbats.pfa
+
+Ghostscript comes with a set of free, high-quality Type 1 fonts,
+donated by URW++ Design and Development Incorporated.  The xpdf X
+resources needed for these fonts are:
+
+    xpdf.t1TimesRoman:           /usr/ghostscript/fonts/n021003l.pfb
+    xpdf.t1TimesItalic:          /usr/ghostscript/fonts/n021023l.pfb
+    xpdf.t1TimesBold:            /usr/ghostscript/fonts/n021004l.pfb
+    xpdf.t1TimesBoldItalic:      /usr/ghostscript/fonts/n021024l.pfb
+    xpdf.t1Helvetica:            /usr/ghostscript/fonts/n019003l.pfb
+    xpdf.t1HelveticaOblique:     /usr/ghostscript/fonts/n019023l.pfb
+    xpdf.t1HelveticaBold:        /usr/ghostscript/fonts/n019004l.pfb
+    xpdf.t1HelveticaBoldOblique: /usr/ghostscript/fonts/n019024l.pfb
+    xpdf.t1Courier:              /usr/ghostscript/fonts/n022003l.pfb
+    xpdf.t1CourierOblique:       /usr/ghostscript/fonts/n022023l.pfb
+    xpdf.t1CourierBold:          /usr/ghostscript/fonts/n022004l.pfb
+    xpdf.t1CourierBoldOblique:   /usr/ghostscript/fonts/n022024l.pfb
+    xpdf.t1Symbol:               /usr/ghostscript/fonts/s050000l.pfb
+    xpdf.t1ZapfDingbats:         /usr/ghostscript/fonts/d050000l.pfb
+
+You will obviously need to replace '/usr/ghostscript/fonts' with the
+appropriate path on your system.
 
 
 The Unisys LZW Patent
@@ -230,8 +265,7 @@ See the separate file, INSTALL.
 Bugs
 ----
 
-This release of xpdf should improve the situation with embedded
-fonts.  However, Type 3 and TrueType fonts are still not handled.
+Type 3 fonts are still not well supported by xpdf.
 
 If you find a bug in xpdf, i.e., if it prints an error message,
 crashes, or incorrectly displays a document, and you don't see that
@@ -245,7 +279,8 @@ Acknowledgments
 Thanks to:
 
 * Patrick Voigt for help with the remote server code.
-* Patrick Moreau and Martin P.J. Zinser for the VMS port.
+* Patrick Moreau, Martin P.J. Zinser, and David Mathog for the VMS
+  port.
 * David Boldt and Rick Rodgers for sample man pages.
 * Brendan Miller for the icon idea.
 * Olly Betts for help testing pdftotext.
@@ -255,6 +290,8 @@ Thanks to:
 * Leo Smiers for the decryption patches.
 * Rainer Menzner for creating t1lib, and for helping me adapt it to
   xpdf.
+* Pine Tree Systems A/S for funding the OPI and EPS support in
+  pdftops.
 
 
 References
@@ -276,18 +313,41 @@ Addison-Wesley, 1990, ISBN 0-201-18127-4.
 Adobe Systems, Inc., _Adobe CMap and CIDFont Files Specification_,
 Adobe Developer Support Technical Specification #5014.  1995.
 http://www.adobe.com/supportservice/devrelations/PDFS/TN/5014.CIDFont_Spec.pdf
-[CMap file format needed for Japanese font support.]
+[CMap file format needed for Japanese and Chinese font support.]
 
 Adobe Systems, Inc., _Adobe-Japan1-2 Character Collection for
-CID-Keyed Fonts_ (Bitmap Character Image Version), Adobe Developer
-Support Technical Note #5078-b.  1994. 
-http://www.adobe.com/supportservice/devrelations/PDFS/TN/5078b.pdf
-[The complete Adobe Japanese character set.]
+CID-Keyed Fonts_, Adobe Developer Support Technical Note #5078.
+1994.
+http://partners.adobe.com/asn/developer/PDFS/TN/5078.CID_Glyph.pdf
+[The Adobe Japanese character set.]
+
+Adobe Systems, Inc., _Adobe-GB1-3 Character Collection for
+CID-Keyed Fonts_, Adobe Developer Support Technical Note #5079.
+1998.
+http://partners.adobe.com/asn/developer/PDFS/TN/5079.GB_CharColl.pdf
+[The Adobe Chinese GB character set.]
+
+Adobe Systems, Inc., _Adobe-CNS1-3 Character Collection for
+CID-Keyed Fonts_, Adobe Developer Support Technical Note #5080.
+2000.
+http://partners.adobe.com/asn/developer/PDFS/TN/5080.CNS_CharColl.pdf
+[The Adobe Chinese CNS character set.]
 
 Adobe Systems Inc., _Supporting the DCT Filters in PostScript Level
 2_, Adobe Developer Support Technical Note #5116.  1992.
 http://www.adobe.com/supportservice/devrelations/PDFS/TN/5116.PS2_DCT.PDF
 [Description of the DCTDecode filter parameters.]
+
+Adobe Systems Inc., _Open Prepress Interface (OPI) Specification -
+Version 2.0_, Adobe Developer Support Technical Note #5660.  2000.
+http://partners.adobe.com/asn/developer/PDFS/TN/5660.OPI_2.0.pdf
+
+Adobe Systems Inc., CMap files.
+ftp://ftp.oreilly.com/pub/examples/nutshell/cjkv/adobe/
+[The actual CMap files for the 16-bit CJK encodings.]
+
+Aldus Corp., _OPI: Open Prepress Interface Specification 1.3_.  1993.
+http://partners.adobe.com/asn/developer/PDFS/TN/OPI_13.pdf
 
 Anonymous, RC4 source code.
 ftp://ftp.ox.ac.uk/pub/crypto/misc/rc4.tar.gz
@@ -328,6 +388,10 @@ Christoph Loeffler, Adriaan Ligtenberg, George S. Moschytz, "Practical
 Fast 1-D DCT Algorithms with 11 Multiplications".  IEEE Intl. Conf. on
 Acoustics, Speech & Signal Processing, 1989, 988-991.
 [The fast IDCT algorithm used in the DCTDecode filter.]
+
+Charles Poynton, "Color FAQ".
+http://www.inforamp.net/~poynton/ColorFAQ.html
+[The mapping from the CIE 1931 (XYZ) color space to RGB.]
 
 R. Rivest, "The MD5 Message-Digest Algorithm".  RFC 1321.
 [MD5 is used in PDF document encryption.]

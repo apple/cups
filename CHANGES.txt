@@ -36,6 +36,8 @@ CHANGES IN CUPS V1.1.10
 	  output in the wrong order; this resulted in yellow
 	  being printed instead of black on Stylus Photo
 	  printers.
+	- The pdftops filter did not have the Japanese and
+	  Chinese text support compiled into it.
 
 
 CHANGES IN CUPS V1.1.9-1

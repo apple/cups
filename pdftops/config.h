@@ -42,6 +42,11 @@
 #define xpdfConfigFile ".xpdfrc"
 #endif
 
+// Support Unicode/etc.
+#define JAPANESE_SUPPORT 1
+#define CHINESE_GB_SUPPORT 1
+#define CHINESE_CNS_SUPPORT 1
+
 //------------------------------------------------------------------------
 // X-related constants
 //------------------------------------------------------------------------
