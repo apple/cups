@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.78 2000/06/28 16:06:22 mike Exp $"
+ * "$Id: ipp.c,v 1.79 2000/06/28 16:13:13 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1776,7 +1776,9 @@ create_job(client_t        *con,	/* I - Client connection */
 
   if ((attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_KEYWORD)) == NULL)
     attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
-
+  if (attr == NULL)
+    attr = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+                        "job-hold-until", NULL, "no-hold");
   if (attr != NULL && strcmp(attr->values[0].string.text, "no-hold") != 0)
   {
    /*
@@ -3391,6 +3393,9 @@ print_job(client_t        *con,		/* I - Client connection */
 
   if ((attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_KEYWORD)) == NULL)
     attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
+  if (attr == NULL)
+    attr = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+                        "job-hold-until", NULL, "no-hold");
 
   if (attr != NULL && strcmp(attr->values[0].string.text, "no-hold") != 0)
   {
@@ -4932,5 +4937,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.78 2000/06/28 16:06:22 mike Exp $".
+ * End of "$Id: ipp.c,v 1.79 2000/06/28 16:13:13 mike Exp $".
  */
