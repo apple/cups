@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.27 2002/12/17 18:56:43 swdev Exp $"
+ * "$Id: ppd.h,v 1.28 2003/01/28 15:29:14 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -100,6 +100,15 @@ typedef enum			/**** Colorspaces ****/
   PPD_CS_N			/* DeviceN colorspace */
 } ppd_cs_t;
 
+typedef struct			/**** PPD Attribute Structure ****/
+{
+  char		name[PPD_MAX_NAME],
+  				/* Name of attribute (cupsXYZ) */
+		spec[PPD_MAX_NAME + PPD_MAX_TEXT],
+				/* Specifier string, if any */
+		*value;		/* Value string */
+} ppd_attr_t;
+
 typedef struct			/**** Option choices ****/
 {
   char		marked,		/* 0 if not selected, 1 otherwise */
@@ -129,8 +138,14 @@ typedef struct			/**** Options ****/
 
 typedef struct ppd_group_str	/**** Groups ****/
 {
-  char		text[PPD_MAX_TEXT];
+  /**** Group text strings are limited to 39 chars + nul in order to
+   **** preserve binary compatibility and allow applications to get
+   **** the group's keyword name.
+   ****/
+  char		text[PPD_MAX_TEXT - PPD_MAX_NAME],
   				/* Human-readable group name */
+		name[PPD_MAX_NAME];
+				/* Group name */
   int		num_options;	/* Number of options */
   ppd_option_t	*options;	/* Options */
   int		num_subgroups;	/* Number of sub-groups */
@@ -223,7 +238,16 @@ typedef struct			/**** Files ****/
   ppd_profile_t	*profiles;	/* sRGB color profiles */
   int		num_filters;	/* Number of filters */
   char		**filters;	/* Filter strings... */
+
+  /**** New in CUPS 1.1 ****/
   int		flip_duplex;	/* 1 = Flip page for back sides */
+
+  /**** New in CUPS 1.1.19 ****/
+  char		*protocols,	/* Protocols (BCP, TBCP) string */
+		*pcfilename;	/* PCFileName string */
+  int		num_attrs,	/* Number of attributes */
+		cur_attr;	/* Current attribute */
+  ppd_attr_t	**attrs;	/* Attributes */
 } ppd_file_t;
 
 
@@ -241,20 +265,26 @@ extern int		ppdEmitFd(ppd_file_t *ppd, int fd,
 			          ppd_section_t section);
 extern int		ppdEmitJCL(ppd_file_t *ppd, FILE *fp, int job_id,
 			           const char *user, const char *title);
+extern ppd_choice_t	*ppdFindChoice(ppd_option_t *o, const char *option);
+extern ppd_choice_t	*ppdFindMarkedChoice(ppd_file_t *ppd, const char *keyword);
+extern ppd_option_t	*ppdFindOption(ppd_file_t *ppd, const char *keyword);
 extern int		ppdIsMarked(ppd_file_t *ppd, const char *keyword,
 			            const char *option);
 extern void		ppdMarkDefaults(ppd_file_t *ppd);
 extern int		ppdMarkOption(ppd_file_t *ppd, const char *keyword,
 			              const char *option);
-extern ppd_choice_t	*ppdFindChoice(ppd_option_t *o, const char *option);
-extern ppd_choice_t	*ppdFindMarkedChoice(ppd_file_t *ppd, const char *keyword);
-extern ppd_option_t	*ppdFindOption(ppd_file_t *ppd, const char *keyword);
 extern ppd_file_t	*ppdOpen(FILE *fp);
 extern ppd_file_t	*ppdOpenFd(int fd);
 extern ppd_file_t	*ppdOpenFile(const char *filename);
 extern float		ppdPageLength(ppd_file_t *ppd, const char *name);
 extern ppd_size_t	*ppdPageSize(ppd_file_t *ppd, const char *name);
 extern float		ppdPageWidth(ppd_file_t *ppd, const char *name);
+
+/**** New in CUPS 1.1.19 ****/
+extern const char	*ppdFindAttr(ppd_file_t *ppd, const char *name,
+			             const char *spec);
+extern const char	*ppdFindNextAttr(ppd_file_t *ppd, const char *name,
+			                 const char *spec);
 
 /*
  * C++ magic...
@@ -266,5 +296,5 @@ extern float		ppdPageWidth(ppd_file_t *ppd, const char *name);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.27 2002/12/17 18:56:43 swdev Exp $".
+ * End of "$Id: ppd.h,v 1.28 2003/01/28 15:29:14 mike Exp $".
  */
