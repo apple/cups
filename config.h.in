@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.39.2.7 2002/01/27 21:20:25 mike Exp $"
+ * "$Id: config.h.in,v 1.39.2.8 2002/03/27 19:35:22 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -203,5 +203,19 @@
 
 
 /*
- * End of "$Id: config.h.in,v 1.39.2.7 2002/01/27 21:20:25 mike Exp $".
+ * Do we have getifaddrs()?
+ */
+
+#undef HAVE_GETIFADDRS
+
+
+/*
+ * Does the sockaddr structure contain an sa_len parameter?
+ */
+
+#undef HAVE_STRUCT_SOCKADDR_SA_LEN
+
+
+/*
+ * End of "$Id: config.h.in,v 1.39.2.8 2002/03/27 19:35:22 mike Exp $".
  */
