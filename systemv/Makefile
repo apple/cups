@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.37 2004/02/25 20:14:53 mike Exp $"
+# "$Id: Makefile,v 1.38 2004/06/29 03:44:53 mike Exp $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -15,9 +15,9 @@
 #       Attn: CUPS Licensing Information
 #       Easy Software Products
 #       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636-3111 USA
+#       Hollywood, Maryland 20636-3142 USA
 #
-#       Voice: (301) 373-9603
+#       Voice: (301) 373-9600
 #       EMail: cups-info@cups.org
 #         WWW: http://www.cups.org
 #
@@ -192,5 +192,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.37 2004/02/25 20:14:53 mike Exp $".
+# End of "$Id: Makefile,v 1.38 2004/06/29 03:44:53 mike Exp $".
 #

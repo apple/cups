@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.52 2004/06/29 03:14:19 mike Exp $"
+# "$Id: Makefile,v 1.53 2004/06/29 03:44:52 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -15,7 +15,7 @@
 #       Attn: CUPS Licensing Information
 #       Easy Software Products
 #       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636-3111 USA
+#       Hollywood, Maryland 20636-3142 USA
 #
 #       Voice: (301) 373-9600
 #       EMail: cups-info@cups.org

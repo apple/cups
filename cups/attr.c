@@ -1,5 +1,5 @@
 /*
- * "$Id: attr.c,v 1.5 2004/02/25 20:14:51 mike Exp $"
+ * "$Id: attr.c,v 1.6 2004/06/29 03:44:52 mike Exp $"
  *
  *   PPD model-specific attribute routines for the Common UNIX Printing System
  *   (CUPS).
@@ -16,7 +16,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -176,5 +176,5 @@ ppdFindNextAttr(ppd_file_t *ppd,	/* I - PPD file data */
 
 
 /*
- * End of "$Id: attr.c,v 1.5 2004/02/25 20:14:51 mike Exp $".
+ * End of "$Id: attr.c,v 1.6 2004/06/29 03:44:52 mike Exp $".
  */

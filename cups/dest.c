@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.38 2004/06/29 01:02:45 mike Exp $"
+ * "$Id: dest.c,v 1.39 2004/06/29 03:44:52 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -16,9 +16,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -852,5 +852,5 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: dest.c,v 1.38 2004/06/29 01:02:45 mike Exp $".
+ * End of "$Id: dest.c,v 1.39 2004/06/29 03:44:52 mike Exp $".
  */

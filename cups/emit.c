@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.39 2004/02/25 20:14:51 mike Exp $"
+ * "$Id: emit.c,v 1.40 2004/06/29 03:44:52 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -734,5 +734,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c,v 1.39 2004/02/25 20:14:51 mike Exp $".
+ * End of "$Id: emit.c,v 1.40 2004/06/29 03:44:52 mike Exp $".
  */
