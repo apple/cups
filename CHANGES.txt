@@ -1,8 +1,17 @@
-CHANGES.txt - 05/24/2004
+CHANGES.txt - 05/27/2004
 ------------------------
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The scheduler could crash when processing a Limit or
+	  LimitExcept directive (STR #728)
+	- The lpq, lpr, and lp commands did not differentiate
+	  between the server being unresponsive and the lack of
+	  a default printer (STR #728)
+	- The PAM checks in the configure script did not stop
+	  after the first match (STR #728)
+	- The cups-config man page was incorrectly placed in
+	  section 3 (STR #728)
 	- The cupstestppd utility did not show a warning message
 	  when a PPD file indicated BCP protocol support with
 	  PJL (STR #720)
