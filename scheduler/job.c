@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.182 2003/01/29 19:54:51 mike Exp $"
+ * "$Id: job.c,v 1.183 2003/01/29 20:10:47 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -198,6 +198,10 @@ CancelJob(int id,		/* I - Job to cancel */
           ippDelete(current->attrs);
 
         free(current->filetypes);
+
+        ClearString(&current->username);
+        ClearString(&current->dest);
+        ClearString(&current->title);
 
         free(current);
 
@@ -3374,5 +3378,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.182 2003/01/29 19:54:51 mike Exp $".
+ * End of "$Id: job.c,v 1.183 2003/01/29 20:10:47 mike Exp $".
  */
