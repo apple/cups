@@ -28,6 +28,7 @@ enum LinkActionKind {
   actionGoToR,			// go to destination in new file
   actionLaunch,			// launch app (or open document)
   actionURI,			// URI
+  actionNamed,			// named action
   actionUnknown			// anything else
 };
 
@@ -216,6 +217,28 @@ public:
 private:
 
   GString *uri;			// the URI
+};
+
+//------------------------------------------------------------------------
+// LinkNamed
+//------------------------------------------------------------------------
+
+class LinkNamed: public LinkAction {
+public:
+
+  // Build a LinkNamed given the action name.
+  LinkNamed(Object *nameObj);
+
+  virtual ~LinkNamed();
+
+  virtual GBool isOk() { return name != NULL; }
+
+  virtual LinkActionKind getKind() { return actionNamed; }
+  GString *getName() { return name; }
+
+private:
+
+  GString *name;
 };
 
 //------------------------------------------------------------------------

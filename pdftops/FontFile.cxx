@@ -58,8 +58,9 @@ FontFile::~FontFile() {
 
 Type1FontFile::Type1FontFile(const char *file, int len) {
   const char *line, *line1;
-  char *p;
+  char *p, *p2;
   char buf[256];
+  char c;
   int n, code, i;
 
   name = NULL;
@@ -88,19 +89,27 @@ Type1FontFile::Type1FontFile(const char *file, int len) {
 	  n = 255;
 	strncpy(buf, line, n);
 	buf[n] = '\0';
-	p = strtok(buf, " \t");
-	if (p && !strcmp(p, "dup")) {
-	  if ((p = strtok(NULL, " \t"))) {
+	for (p = buf; *p == ' ' || *p == '\t'; ++p) ;
+	if (!strncmp(p, "dup", 3)) {
+	  for (p += 3; *p == ' ' || *p == '\t'; ++p) ;
+	  for (p2 = p; *p2 >= '0' && *p2 <= '9'; ++p2) ;
+	  if (*p2) {
+	    c = *p2;
+	    *p2 = '\0';
 	    if ((code = atoi(p)) < 256) {
-	      if ((p = strtok(NULL, " \t"))) {
-		if (p[0] == '/') {
-		  encoding->addChar(code, copyString(p+1));
-		}
+	      *p2 = c;
+	      for (p = p2; *p == ' ' || *p == '\t'; ++p) ;
+	      if (*p == '/') {
+		++p;
+		for (p2 = p; *p2 && *p2 != ' ' && *p2 != '\t'; ++p2) ;
+		*p2 = '\0';
+		encoding->addChar(code, copyString(p));
 	      }
 	    }
 	  }
 	} else {
-	  if ((p = strtok(NULL, " \t\n\r")) && !strcmp(p, "def")) {
+	  if (strtok(buf, " \t") &&
+	      (p = strtok(NULL, " \t\n\r")) && !strcmp(p, "def")) {
 	    break;
 	  }
 	}

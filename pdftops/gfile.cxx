@@ -33,7 +33,10 @@
 #endif // WIN32
 #include "GString.h"
 #include "gfile.h"
-#include <cups/cups.h>
+
+#ifdef HAVE_LIBCUPS
+#  include <cups/cups.h>
+#endif // HAVE_LIBCUPS
 
 // Some systems don't define this, so just make it something reasonably
 // large.
@@ -44,13 +47,53 @@
 //------------------------------------------------------------------------
 
 GString *getHomeDir() {
-// Updated to use CUPS_SERVERROOT...
-  const char *s;
+#ifdef VMS
+  //---------- VMS ----------
+  return new GString("SYS$LOGIN:");
 
-  if ((s = getenv("CUPS_SERVERROOT")))
-    return new GString(s);
+#elif defined(__EMX__) || defined(WIN32)
+  //---------- OS/2+EMX and Win32 ----------
+  char *s;
+  GString *ret;
+
+  if ((s = getenv("HOME")))
+    ret = new GString(s);
   else
-    return new GString(CUPS_SERVERROOT);
+    ret = new GString(".");
+  return ret;
+
+#elif defined(ACORN)
+  //---------- RISCOS ----------
+  return new GString("@");
+
+#elif defined(MACOS)
+  //---------- MacOS ----------
+  return new GString(":");
+
+#else
+  //---------- Unix ----------
+  char *s;
+  struct passwd *pw;
+  GString *ret;
+
+  if ((s = getenv("HOME"))) {
+    ret = new GString(s);
+#  ifdef HAVE_LIBCUPS
+  } else if ((s = getenv("CUPS_SERVERROOT"))) {
+    ret = new GString(s);
+#  endif // HAVE_LIBCUPS
+  } else {
+    if ((s = getenv("USER")))
+      pw = getpwnam(s);
+    else
+      pw = getpwuid(getuid());
+    if (pw)
+      ret = new GString(pw->pw_dir);
+    else
+      ret = new GString(".");
+  }
+  return ret;
+#endif
 }
 
 GString *getCurrentDir() {
@@ -407,6 +450,7 @@ time_t getModTime(const char *fileName) {
 }
 
 GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) {
+#ifdef HAVE_LIBCUPS
   char	filename[1024];	// Name of temporary file...
   int	fd;		// File descriptor...
 
@@ -422,6 +466,65 @@ GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) 
   *name = new GString(filename);
 
   return (gTrue);
+#elif defined(VMS) || defined(__EMX__) || defined(WIN32) || defined(ACORN) || defined(MACOS)
+  //---------- non-Unix ----------
+  char *s;
+
+  // There is a security hole here: an attacker can create a symlink
+  // with this file name after the tmpnam call and before the fopen
+  // call.  I will happily accept fixes to this function for non-Unix
+  // OSs.
+  if (!(s = tmpnam(NULL))) {
+    return gFalse;
+  }
+  *name = new GString(s);
+  if (ext) {
+    (*name)->append(ext);
+  }
+  if (!(*f = fopen((*name)->getCString(), mode))) {
+    delete (*name);
+    return gFalse;
+  }
+  return gTrue;
+#else
+  //---------- Unix ----------
+  char *s, *p;
+  int fd;
+
+  if (ext) {
+    if (!(s = tmpnam(NULL))) {
+      return gFalse;
+    }
+    *name = new GString(s);
+    s = (*name)->getCString();
+    if ((p = strrchr(s, '.'))) {
+      (*name)->del(p - s, (*name)->getLength() - (p - s));
+    }
+    (*name)->append(ext);
+    fd = open((*name)->getCString(), O_WRONLY | O_CREAT | O_EXCL, 0600);
+  } else {
+#  if HAVE_MKSTEMP
+    if ((s = getenv("TMPDIR"))) {
+      *name = new GString(s);
+    } else {
+      *name = new GString("/tmp");
+    }
+    (*name)->append("/XXXXXX");
+    fd = mkstemp((*name)->getCString());
+#  else // HAVE_MKSTEMP
+    if (!(s = tmpnam(NULL))) {
+      return gFalse;
+    }
+    *name = new GString(s);
+    fd = open((*name)->getCString(), O_WRONLY | O_CREAT | O_EXCL, 0600);
+#  endif // HAVE_MKSTEMP
+  }
+  if (fd < 0 || !(*f = fdopen(fd, mode))) {
+    delete *name;
+    return gFalse;
+  }
+  return gTrue;
+#endif
 }
 
 //------------------------------------------------------------------------

@@ -31,18 +31,21 @@
 #if JAPANESE_SUPPORT
 #include "Japan12CMapInfo.h"
 #endif
-#if CHINESE_SUPPORT
+#if CHINESE_GB_SUPPORT
 #include "GB12CMapInfo.h"
+#endif
+#if CHINESE_CNS_SUPPORT
+#include "CNS13CMapInfo.h"
 #endif
 
 //------------------------------------------------------------------------
 
-#if defined(JAPANESE_SUPPORT) || defined(CHINESE_SUPPORT)
+#if defined(JAPANESE_SUPPORT) || defined(CHINESE_GB_SUPPORT) || defined(CHINESE_CNS_SUPPORT)
 extern "C" {
 static int cmpWidthExcep(const void *w1, const void *w2);
 static int cmpWidthExcepV(const void *w1, const void *w2);
 }
-#endif /* JAPANESE_SUPPORT || CHINESE_SUPPORT */
+#endif /* JAPANESE_SUPPORT || CHINESE_GB_SUPPORT || CHINESE_CNS_SUPPORT */
 
 //------------------------------------------------------------------------
 
@@ -76,24 +79,6 @@ GfxFont::GfxFont(const char *tag1, Ref id1, Dict *fontDict) {
   tag = new GString(tag1);
   id = id1;
 
-  // get base font name
-  name = NULL;
-  fontDict->lookup("BaseFont", &obj1);
-  if (obj1.isName())
-    name = new GString(obj1.getName());
-  obj1.free();
-
-  // is it a built-in font?
-  builtinFont = NULL;
-  if (name) {
-    for (i = 0; i < numBuiltinFonts; ++i) {
-      if (!strcmp(builtinFonts[i].name, name->getCString())) {
-	builtinFont = &builtinFonts[i];
-	break;
-      }
-    }
-  }
-
   // get font type
   type = fontUnknownType;
   fontDict->lookup("Subtype", &obj1);
@@ -110,8 +95,12 @@ GfxFont::GfxFont(const char *tag1, Ref id1, Dict *fontDict) {
   obj1.free();
   is16 = gFalse;
 
-  // assume Times-Roman by default (for substitution purposes)
-  flags = fontSerif;
+  // get base font name
+  name = NULL;
+  fontDict->lookup("BaseFont", &obj1);
+  if (obj1.isName())
+    name = new GString(obj1.getName());
+  obj1.free();
 
   // Newer Adobe tools are using Base14-compatible TrueType fonts
   // without embedding them, so munge the names into the equivalent
@@ -123,29 +112,29 @@ GfxFont::GfxFont(const char *tag1, Ref id1, Dict *fontDict) {
     if (!strncmp(p, "Arial", 5)) {
       if (!strcmp(p+5, ",Bold")) {
 	name2 = "Helvetica-Bold";
-      } else if (!strcmp(p+5, "Italic")) {
+      } else if (!strcmp(p+5, ",Italic")) {
 	name2 = "Helvetica-Oblique";
-      } else if (!strcmp(p+5, "BoldItalic")) {
+      } else if (!strcmp(p+5, ",BoldItalic")) {
 	name2 = "Helvetica-BoldOblique";
       } else {
 	name2 = "Helvetica";
       }
     } else if (!strncmp(p, "TimesNewRoman", 13)) {
-      if (!strcmp(p+5, ",Bold")) {
+      if (!strcmp(p+13, ",Bold")) {
 	name2 = "Times-Bold";
-      } else if (!strcmp(p+5, "Italic")) {
+      } else if (!strcmp(p+13, ",Italic")) {
 	name2 = "Times-Italic";
-      } else if (!strcmp(p+5, "BoldItalic")) {
+      } else if (!strcmp(p+13, ",BoldItalic")) {
 	name2 = "Times-BoldItalic";
       } else {
 	name2 = "Times-Roman";
       }
     } else if (!strncmp(p, "CourierNew", 10)) {
-      if (!strcmp(p+5, ",Bold")) {
+      if (!strcmp(p+10, ",Bold")) {
 	name2 = "Courier-Bold";
-      } else if (!strcmp(p+5, "Italic")) {
+      } else if (!strcmp(p+10, ",Italic")) {
 	name2 = "Courier-Oblique";
-      } else if (!strcmp(p+5, "BoldItalic")) {
+      } else if (!strcmp(p+10, ",BoldItalic")) {
 	name2 = "Courier-BoldOblique";
       } else {
 	name2 = "Courier";
@@ -156,6 +145,20 @@ GfxFont::GfxFont(const char *tag1, Ref id1, Dict *fontDict) {
       name = new GString(name2);
     }
   }
+
+  // is it a built-in font?
+  builtinFont = NULL;
+  if (name) {
+    for (i = 0; i < numBuiltinFonts; ++i) {
+      if (!strcmp(builtinFonts[i].name, name->getCString())) {
+	builtinFont = &builtinFonts[i];
+	break;
+      }
+    }
+  }
+
+  // assume Times-Roman by default (for substitution purposes)
+  flags = fontSerif;
 
   // get info from font descriptor
   embFontName = NULL;
@@ -568,6 +571,7 @@ const char *GfxFont::readEmbFontFile(int *len) {
     buf[i++] = c;
   }
   *len = i;
+  str->close();
 
   obj2.free();
   obj1.free();
@@ -652,10 +656,10 @@ void GfxFont::makeWidths(Dict *fontDict, FontEncoding *builtinEncoding,
 
 void GfxFont::getType0EncAndWidths(Dict *fontDict) {
   Object obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8;
-#if defined(JAPANESE_SUPPORT) || defined(CHINESE_SUPPORT)
+#if defined(JAPANESE_SUPPORT) || defined(CHINESE_GB_SUPPORT) || defined(CHINESE_CNS_SUPPORT)
   int excepsSize;
   int i, j, k, n;
-#endif /* JAPANESE_SUPPORT || CHINESE_SUPPORT */
+#endif /* JAPANESE_SUPPORT || CHINESE_GB_SUPPORT || CHINESE_CNS_SUPPORT */
 
   widths16.exceps = NULL;
   widths16.excepsV = NULL;
@@ -692,11 +696,20 @@ void GfxFont::getType0EncAndWidths(Dict *fontDict) {
 #endif
     } else if (obj4.getString()->cmp("Adobe") == 0 &&
 	       obj5.getString()->cmp("GB1") == 0) {
-#if CHINESE_SUPPORT
+#if CHINESE_GB_SUPPORT
       is16 = gTrue;
       enc16.charSet = font16AdobeGB12;
 #else
-      error(-1, "Xpdf was compiled without Chinese font support");
+      error(-1, "Xpdf was compiled without Chinese GB font support");
+      goto err4;
+#endif
+    } else if (obj4.getString()->cmp("Adobe") == 0 &&
+	       obj5.getString()->cmp("CNS1") == 0) {
+#if CHINESE_CNS_SUPPORT
+      is16 = gTrue;
+      enc16.charSet = font16AdobeCNS13;
+#else
+      error(-1, "Xpdf was compiled without Chinese CNS font support");
       goto err4;
 #endif
     } else {
@@ -709,7 +722,7 @@ void GfxFont::getType0EncAndWidths(Dict *fontDict) {
     goto err4;
   }
 
-#if defined(JAPANESE_SUPPORT) || defined(CHINESE_SUPPORT)
+#if defined(JAPANESE_SUPPORT) || defined(CHINESE_GB_SUPPORT) || defined(CHINESE_CNS_SUPPORT)
   obj5.free();
   obj4.free();
   obj3.free();
@@ -915,7 +928,7 @@ void GfxFont::getType0EncAndWidths(Dict *fontDict) {
     enc16.enc = gfxJapan12Tab[i].enc;
   }
 #  endif
-#  if CHINESE_SUPPORT
+#  if CHINESE_GB_SUPPORT
   if (enc16.charSet == font16AdobeGB12) {
     for (i = 0; gfxGB12Tab[i].name; ++i) {
       if (!strcmp(obj1.getName(), gfxGB12Tab[i].name))
@@ -929,10 +942,24 @@ void GfxFont::getType0EncAndWidths(Dict *fontDict) {
     enc16.enc = gfxGB12Tab[i].enc;
   }
 #  endif
+#  if CHINESE_CNS_SUPPORT
+  if (enc16.charSet == font16AdobeCNS13) {
+    for (i = 0; gfxCNS13Tab[i].name; ++i) {
+      if (!strcmp(obj1.getName(), gfxCNS13Tab[i].name))
+	break;
+    }
+    if (!gfxCNS13Tab[i].name) {
+      error(-1, "Unknown encoding '%s' for Adobe-CNS1-3 font",
+	    obj1.getName());
+      goto err1;
+    }
+    enc16.enc = gfxCNS13Tab[i].enc;
+  }
+#  endif
   obj1.free();
 
   return;
-#endif /* JAPANESE_SUPPORT || CHINESE_SUPPORT */
+#endif /* JAPANESE_SUPPORT || CHINESE_GB_SUPPORT || CHINESE_CNS_SUPPORT */
 
  err4:
   obj5.free();
@@ -948,7 +975,7 @@ void GfxFont::getType0EncAndWidths(Dict *fontDict) {
   makeWidths(fontDict, NULL, NULL, 0);
 }
 
-#if defined(JAPANESE_SUPPORT) || defined(CHINESE_SUPPORT)
+#if defined(JAPANESE_SUPPORT) || defined(CHINESE_GB_SUPPORT) || defined(CHINESE_CNS_SUPPORT)
 static int cmpWidthExcep(const void *w1, const void *w2) {
   return ((GfxFontWidthExcep *)w1)->first - ((GfxFontWidthExcep *)w2)->first;
 }
@@ -956,7 +983,7 @@ static int cmpWidthExcep(const void *w1, const void *w2) {
 static int cmpWidthExcepV(const void *w1, const void *w2) {
   return ((GfxFontWidthExcepV *)w1)->first - ((GfxFontWidthExcepV *)w2)->first;
 }
-#endif /* JAPANESE_SUPPORT || CHINESE_SUPPORT */
+#endif /* JAPANESE_SUPPORT || CHINESE_GB_SUPPORT || CHINESE_CNS_SUPPORT */
 
 //------------------------------------------------------------------------
 // GfxFontDict

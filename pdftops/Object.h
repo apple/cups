@@ -173,6 +173,7 @@ public:
   // Stream accessors.
   GBool streamIs(const char *dictType);
   void streamReset();
+  void streamClose();
   int streamGetChar();
   int streamLookChar();
   char *streamGetLine(char *buf, int size);
@@ -274,6 +275,9 @@ inline GBool Object::isStream(const char *dictType)
 
 inline void Object::streamReset()
   { stream->reset(); }
+
+inline void Object::streamClose()
+  { stream->close(); }
 
 inline int Object::streamGetChar()
   { return stream->getChar(); }

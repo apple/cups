@@ -21,6 +21,7 @@
 
 FormWidget::FormWidget(Dict *dict) {
   Object obj1, obj2;
+  double t;
 
   ok = gFalse;
 
@@ -52,6 +53,16 @@ FormWidget::FormWidget(Dict *dict) {
     obj1.arrayGet(3, &obj2);
     yMax = obj2.getNum();
     obj2.free();
+    if (xMin > xMax) {
+      t = xMin; xMin = xMax; xMax = t;
+    }
+    if (yMin > yMax) {
+      t = yMin; yMin = yMax; yMax = t;
+    }
+  } else {
+    //~ this should return an error
+    xMin = yMin = 0;
+    xMax = yMax = 1;
   }
   obj1.free();
 }
@@ -64,7 +75,7 @@ void FormWidget::draw(Gfx *gfx) {
   Object obj;
 
   if (appearance.fetch(&obj)->isStream()) {
-    gfx->doWidgetForm(&obj, xMin, yMin);
+    gfx->doWidgetForm(&obj, xMin, yMin, xMax, yMax);
   }
   obj.free();
 }
@@ -86,7 +97,9 @@ FormWidgets::FormWidgets(Object *annots) {
   if (annots->isArray()) {
     for (i = 0; i < annots->arrayGetLength(); ++i) {
       if (annots->arrayGet(i, &obj1)->isDict()) {
-	if (obj1.dictLookup("Subtype", &obj2)->isName("Widget")) {
+	obj1.dictLookup("Subtype", &obj2);
+	if (obj2.isName("Widget") ||
+	    obj2.isName("Stamp")) {
 	  widget = new FormWidget(obj1.getDict());
 	  if (widget->isOk()) {
 	    if (nWidgets >= size) {

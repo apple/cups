@@ -15,6 +15,7 @@
 #include "Array.h"
 #include "Dict.h"
 #include "Parser.h"
+#include "XRef.h"
 #include "Error.h"
 #ifndef NO_DECRYPTION
 #include "Decrypt.h"
@@ -150,7 +151,7 @@ Object *Parser::getObj(Object *obj) {
 Stream *Parser::makeStream(Object *dict) {
   Object obj;
   Stream *str;
-  int pos, length;
+  int pos, endPos, length;
 
   // get stream start position
   lexer->skipToNextLine();
@@ -165,6 +166,11 @@ Stream *Parser::makeStream(Object *dict) {
     error(getPos(), "Bad 'Length' attribute in stream");
     obj.free();
     return NULL;
+  }
+
+  // check for length in damaged file
+  if ((endPos = xref->getStreamEnd(pos)) >= 0) {
+    length = endPos - pos;
   }
 
   // make base stream

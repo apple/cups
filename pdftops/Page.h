@@ -99,7 +99,7 @@ public:
   Object *getContents(Object *obj) { return contents.fetch(obj); }
 
   // Display a page.
-  void display(OutputDev *out, int dpi, int rotate,
+  void display(OutputDev *out, double dpi, int rotate,
 	       Links *links, Catalog *catalog);
 
 private:

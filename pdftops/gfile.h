@@ -11,7 +11,6 @@
 #ifndef GFILE_H
 #define GFILE_H
 
-#include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -24,6 +23,7 @@
 #  endif
 #elif defined(ACORN)
 #elif defined(MACOS)
+#  include <ctime.h>
 #else
 #  include <unistd.h>
 #  include <sys/types.h>

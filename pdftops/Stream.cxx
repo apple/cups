@@ -59,6 +59,9 @@ Stream::Stream() {
 Stream::~Stream() {
 }
 
+void Stream::close() {
+}
+
 int Stream::getRawChar() {
   error(-1, "Internal: called getRawChar() on non-predictor stream");
   return EOF;
@@ -294,6 +297,10 @@ FilterStream::FilterStream(Stream *nstr) {
 }
 
 FilterStream::~FilterStream() {
+}
+
+void FilterStream::close() {
+  str->close();
 }
 
 void FilterStream::setPos(int pos) {
@@ -560,9 +567,7 @@ FileStream::FileStream(FILE *nf, int nstart, int nlength, Object *dict):
 }
 
 FileStream::~FileStream() {
-  if (savePos >= 0) {
-    fseek(f, savePos, SEEK_SET);
-  }
+  close();
 }
 
 Stream *FileStream::makeSubStream(int nstart, int nlength, Object *ndict) {
@@ -580,6 +585,13 @@ void FileStream::reset() {
 #endif
 }
 
+void FileStream::close() {
+  if (savePos >= 0) {
+    fseek(f, savePos, SEEK_SET);
+    savePos = -1;
+  }
+}
+
 GBool FileStream::fillBuf() {
   int n;
 #ifndef NO_DECRYPTION
@@ -588,20 +600,24 @@ GBool FileStream::fillBuf() {
 
   bufPos += bufEnd - buf;
   bufPtr = bufEnd = buf;
-  if (length >= 0 && bufPos >= start + length)
+  if (length >= 0 && bufPos >= start + length) {
     return gFalse;
-  if (length >= 0 && bufPos + 256 > start + length)
+  }
+  if (length >= 0 && bufPos + fileStreamBufSize > start + length) {
     n = start + length - bufPos;
-  else
-    n = 256;
+  } else {
+    n = fileStreamBufSize;
+  }
   n = fread(buf, 1, n, f);
   bufEnd = buf + n;
-  if (bufPtr >= bufEnd)
+  if (bufPtr >= bufEnd) {
     return gFalse;
+  }
 #ifndef NO_DECRYPTION
   if (decrypt) {
-    for (p = buf; p < bufEnd; ++p)
+    for (p = buf; p < bufEnd; ++p) {
       *p = (char)decrypt->decryptByte((Guchar)*p);
+    }
   }
 #endif
   return gTrue;
@@ -1281,8 +1297,9 @@ int CCITTFaxStream::lookChar() {
 #if 0 //~
   GBool err;
 #endif
+  GBool gotEOL;
   int ret;
-  int bits, i, n;
+  int bits, i;
 
   // if at eof just return EOF
   if (eof && codingLine[a0] >= columns) {
@@ -1437,58 +1454,53 @@ int CCITTFaxStream::lookChar() {
       inputBits &= ~7;
     }
 
-    // check for end-of-line marker, end-of-block marker, and
-    // 2D encoding tag
-    if (endOfBlock) {
+    // check for end-of-line marker, skipping over any extra zero bits
+    gotEOL = gFalse;
+    if (!endOfBlock && row == rows - 1) {
+      eof = gTrue;
+    } else {
       code1 = lookBits(12);
-      if (code1 == EOF) {
+      while (code1 == 0) {
+	eatBits(1);
+	code1 = lookBits(12);
+      }
+      if (code1 == 0x001) {
+	eatBits(12);
+	gotEOL = gTrue;
+      } else if (code1 == EOF) {
 	eof = gTrue;
-      } else if (code1 == 0x001) {
+      }
+    }
+
+    // get 2D encoding tag
+    if (!eof && encoding > 0) {
+      nextLine2D = !lookBits(1);
+      eatBits(1);
+    }
+
+    // check for end-of-block marker
+    if (endOfBlock && gotEOL) {
+      code1 = lookBits(12);
+      if (code1 == 0x001) {
 	eatBits(12);
 	if (encoding > 0) {
-	  nextLine2D = !lookBits(1);
+	  lookBits(1);
 	  eatBits(1);
 	}
-	code1 = lookBits(12);
-	if (code1 == 0x001) {
-	  eatBits(12);
-	  if (encoding > 0) {
-	    lookBits(1);
-	    eatBits(1);
-	  }
-	  if (encoding >= 0) {
-	    for (i = 0; i < 4; ++i) {
-	      code1 = lookBits(12);
-	      if (code1 != 0x001) {
-		error(getPos(), "Bad RTC code in CCITTFax stream");
-	      }
-	      eatBits(12);
-	      if (encoding > 0) {
-		lookBits(1);
-		eatBits(1);
-	      }
+	if (encoding >= 0) {
+	  for (i = 0; i < 4; ++i) {
+	    code1 = lookBits(12);
+	    if (code1 != 0x001) {
+	      error(getPos(), "Bad RTC code in CCITTFax stream");
+	    }
+	    eatBits(12);
+	    if (encoding > 0) {
+	      lookBits(1);
+	      eatBits(1);
 	    }
 	  }
-	  eof = gTrue;
 	}
-      } else {
-	if (encoding > 0) {
-	  nextLine2D = !lookBits(1);
-	  eatBits(1);
-	}
-      }
-    } else {
-      if (row == rows - 1) {
 	eof = gTrue;
-      } else {
-	for (n = 0; n < 11 && lookBits(n) == 0; ++n) ;
-	if (n == 11 && lookBits(12) == 0x001) {
-	  eatBits(12);
-	}
-	if (encoding > 0) {
-	  nextLine2D = !lookBits(1);
-	  eatBits(1);
-	}
       }
     }
 
@@ -1601,10 +1613,11 @@ short CCITTFaxStream::getWhiteCode() {
   code = 0; // make gcc happy
   if (endOfBlock) {
     code = lookBits(12);
-    if ((code >> 5) == 0)
+    if ((code >> 5) == 0) {
       p = &whiteTab1[code];
-    else
+    } else {
       p = &whiteTab2[code >> 3];
+    }
     if (p->bits > 0) {
       eatBits(p->bits);
       return p->n;
@@ -1634,7 +1647,10 @@ short CCITTFaxStream::getWhiteCode() {
     }
   }
   error(getPos(), "Bad white code (%04x) in CCITTFax stream", code);
-  return EOF;
+  // eat a bit and return a positive number so that the caller doesn't
+  // go into an infinite loop
+  eatBits(1);
+  return 1;
 }
 
 short CCITTFaxStream::getBlackCode() {
@@ -1645,12 +1661,13 @@ short CCITTFaxStream::getBlackCode() {
   code = 0; // make gcc happy
   if (endOfBlock) {
     code = lookBits(13);
-    if ((code >> 7) == 0)
+    if ((code >> 7) == 0) {
       p = &blackTab1[code];
-    else if ((code >> 9) == 0)
+    } else if ((code >> 9) == 0) {
       p = &blackTab2[(code >> 1) - 64];
-    else
+    } else {
       p = &blackTab3[code >> 7];
+    }
     if (p->bits > 0) {
       eatBits(p->bits);
       return p->n;
@@ -1693,7 +1710,10 @@ short CCITTFaxStream::getBlackCode() {
     }
   }
   error(getPos(), "Bad black code (%04x) in CCITTFax stream", code);
-  return EOF;
+  // eat a bit and return a positive number so that the caller doesn't
+  // go into an infinite loop
+  eatBits(1);
+  return 1;
 }
 
 short CCITTFaxStream::lookBits(int n) {
@@ -1701,9 +1721,14 @@ short CCITTFaxStream::lookBits(int n) {
 
   while (inputBits < n) {
     if ((c = str->getChar()) == EOF) {
-      if (inputBits == 0)
+      if (inputBits == 0) {
 	return EOF;
-      c = 0;
+      }
+      // near the end of the stream, the caller may ask for more bits
+      // than are available, but there may still be a valid code in
+      // however many bits are available -- we need to return correct
+      // data in this case
+      return (inputBuf << (n - inputBits)) & (0xffff >> (16 - n));
     }
     inputBuf = (inputBuf << 8) + c;
     inputBits += 8;
@@ -2811,6 +2836,14 @@ FlateStream::~FlateStream() {
 void FlateStream::reset() {
   int cmf, flg;
 
+  index = 0;
+  remain = 0;
+  codeBuf = 0;
+  codeSize = 0;
+  compressedBlock = gFalse;
+  endOfBlock = gTrue;
+  eof = gTrue;
+
   str->reset();
 
   // read header
@@ -2833,13 +2866,6 @@ void FlateStream::reset() {
     return;
   }
 
-  // initialize
-  index = 0;
-  remain = 0;
-  codeBuf = 0;
-  codeSize = 0;
-  compressedBlock = gFalse;
-  endOfBlock = gTrue;
   eof = gFalse;
 }
 
@@ -3254,6 +3280,9 @@ void FixedLengthEncoder::reset() {
   count = 0;
 }
 
+void FixedLengthEncoder::close() {
+}
+
 int FixedLengthEncoder::getChar() {
   if (length >= 0 && count >= length)
     return EOF;
@@ -3288,6 +3317,9 @@ void ASCII85Encoder::reset() {
   bufPtr = bufEnd = buf;
   lineLen = 0;
   eof = gFalse;
+}
+
+void ASCII85Encoder::close() {
 }
 
 GBool ASCII85Encoder::fillBuf() {
@@ -3355,6 +3387,9 @@ void RunLengthEncoder::reset() {
   str->reset();
   bufPtr = bufEnd = nextEnd = buf;
   eof = gFalse;
+}
+
+void RunLengthEncoder::close() {
 }
 
 //

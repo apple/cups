@@ -168,8 +168,8 @@ void PDFDoc::checkHeader() {
   }
 }
 
-void PDFDoc::displayPage(OutputDev *out, int page, int zoom, int rotate,
-			 GBool doLinks) {
+void PDFDoc::displayPage(OutputDev *out, int page, double zoom,
+			 int rotate, GBool doLinks) {
   Page *p;
 
   if (printCommands) {
@@ -237,6 +237,7 @@ GBool PDFDoc::saveAs(GString *name) {
   while ((c = str->getChar()) != EOF) {
     fputc(c, f);
   }
+  str->close();
   fclose(f);
   return gTrue;
 }

@@ -182,7 +182,7 @@ Page::~Page() {
   contents.free();
 }
 
-void Page::display(OutputDev *out, int dpi, int rotate,
+void Page::display(OutputDev *out, double dpi, int rotate,
 		   Links *links, Catalog *catalog) {
 #ifndef PDF_PARSER_ONLY
   Gfx *gfx;
@@ -234,6 +234,9 @@ void Page::display(OutputDev *out, int dpi, int rotate,
   }
   for (i = 0; i < formWidgets->getNumWidgets(); ++i) {
     formWidgets->getWidget(i)->draw(gfx);
+  }
+  if (formWidgets->getNumWidgets() > 0) {
+    out->dump();
   }
   delete formWidgets;
 

@@ -59,6 +59,9 @@ public:
   // Reset stream to beginning.
   virtual void reset() = 0;
 
+  // Close down the stream.
+  virtual void close();
+
   // Get next char from stream.
   virtual int getChar() = 0;
 
@@ -151,6 +154,7 @@ public:
 
   FilterStream(Stream *str);
   virtual ~FilterStream();
+  virtual void close();
   virtual int getPos() { return str->getPos(); }
   virtual void setPos(int pos);
   virtual BaseStream *getBaseStream() { return str->getBaseStream(); }
@@ -233,6 +237,8 @@ private:
 // FileStream
 //------------------------------------------------------------------------
 
+#define fileStreamBufSize 256
+
 class FileStream: public BaseStream {
 public:
 
@@ -241,6 +247,7 @@ public:
   virtual Stream *makeSubStream(int start, int length, Object *dict);
   virtual StreamKind getKind() { return strFile; }
   virtual void reset();
+  virtual void close();
   virtual int getChar()
     { return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr++ & 0xff); }
   virtual int lookChar()
@@ -258,7 +265,7 @@ private:
   FILE *f;
   int start;
   int length;
-  char buf[256];
+  char buf[fileStreamBufSize];
   char *bufPtr;
   char *bufEnd;
   int bufPos;
@@ -638,6 +645,7 @@ public:
   ~FixedLengthEncoder();
   virtual StreamKind getKind() { return strWeird; }
   virtual void reset();
+  virtual void close();
   virtual int getChar();
   virtual int lookChar();
   virtual GString *getPSFilter(const char *indent) { (void)indent; return NULL; }
@@ -661,6 +669,7 @@ public:
   virtual ~ASCII85Encoder();
   virtual StreamKind getKind() { return strWeird; }
   virtual void reset();
+  virtual void close();
   virtual int getChar()
     { return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr++ & 0xff); }
   virtual int lookChar()
@@ -691,6 +700,7 @@ public:
   virtual ~RunLengthEncoder();
   virtual StreamKind getKind() { return strWeird; }
   virtual void reset();
+  virtual void close();
   virtual int getChar()
     { return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr++ & 0xff); }
   virtual int lookChar()

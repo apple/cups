@@ -64,7 +64,7 @@ FontEncoding::FontEncoding(FontEncoding *fontEnc) {
   freeEnc = gTrue;
   for (i = 0; i < size; ++i) {
     encoding[i] =
-      fontEnc->encoding[i] ? copyString(fontEnc->encoding[i]) : NULL;
+      fontEnc->encoding[i] ? copyString(fontEnc->encoding[i]) : (char *)NULL;
   }
   memcpy(hashTab, fontEnc->hashTab, fontEncHashSize * sizeof(short));
 }

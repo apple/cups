@@ -54,7 +54,7 @@ private:
   int hash(const char *name);
   void addChar1(int code, const char *name);
 
-  const char **encoding;		// code --> name mapping
+  const char **encoding;	// code --> name mapping
   int size;			// number of codes
   GBool freeEnc;		// should we free the encoding array?
   short				// name --> code hash table

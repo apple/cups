@@ -19,17 +19,25 @@
 
 //------------------------------------------------------------------------
 
-// A '1' in this array means the corresponding character ends a name
-// or command.
-static char endOfNameChars[128] = {
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0,   // 0x
+// A '1' in this array means the character is white space.  A '1' or
+// '2' means the character ends a name or command.
+static char specialChars[256] = {
+  1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0,   // 0x
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 1x
-  1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1,   // 2x
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0,   // 3x
+  1, 0, 0, 0, 0, 2, 0, 0, 2, 2, 0, 0, 0, 0, 0, 2,   // 2x
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0,   // 3x
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 4x
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0,   // 5x
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0,   // 5x
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 6x
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0    // 7x
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0,   // 7x
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 8x
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // 9x
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // ax
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // bx
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // cx
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // dx
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // ex
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0    // fx
 };
 
 //------------------------------------------------------------------------
@@ -66,10 +74,13 @@ Lexer::Lexer(Object *obj) {
 }
 
 Lexer::~Lexer() {
-  if (!curStr.isNone())
+  if (!curStr.isNone()) {
+    curStr.streamClose();
     curStr.free();
-  if (freeArray)
+  }
+  if (freeArray) {
     delete streams;
+  }
 }
 
 int Lexer::getChar() {
@@ -77,6 +88,7 @@ int Lexer::getChar() {
 
   c = EOF;
   while (!curStr.isNone() && (c = curStr.streamGetChar()) == EOF) {
+    curStr.streamClose();
     curStr.free();
     ++strPtr;
     if (strPtr < streams->getLength()) {
@@ -88,18 +100,10 @@ int Lexer::getChar() {
 }
 
 int Lexer::lookChar() {
-  int c;
-
-  c = EOF;
-  while (!curStr.isNone() && (c = curStr.streamLookChar()) == EOF) {
-    curStr.free();
-    ++strPtr;
-    if (strPtr < streams->getLength()) {
-      streams->get(strPtr, &curStr);
-      curStr.streamReset();
-    }
+  if (curStr.isNone()) {
+    return EOF;
   }
-  return c;
+  return curStr.streamLookChar();
 }
 
 Object *Lexer::getObj(Object *obj) {
@@ -115,14 +119,15 @@ Object *Lexer::getObj(Object *obj) {
   // skip whitespace and comments
   comment = gFalse;
   while (1) {
-    if ((c = getChar()) == EOF)
+    if ((c = getChar()) == EOF) {
       return obj->initEOF();
+    }
     if (comment) {
       if (c == '\r' || c == '\n')
 	comment = gFalse;
     } else if (c == '%') {
       comment = gTrue;
-    } else if (!isspace(c)) {
+    } else if (specialChars[c] != 1) {
       break;
     }
   }
@@ -164,8 +169,9 @@ Object *Lexer::getObj(Object *obj) {
     scale = 0.1;
     while (1) {
       c = lookChar();
-      if (!isdigit(c))
+      if (!isdigit(c)) {
 	break;
+      }
       getChar();
       xf = xf + scale * (c - '0');
       scale *= 0.1;
@@ -187,8 +193,11 @@ Object *Lexer::getObj(Object *obj) {
       switch (c = getChar()) {
 
       case EOF:
+#if 0
+      // This breaks some PDF files, e.g., ones from Photoshop.
       case '\r':
       case '\n':
+#endif
 	error(getPos(), "Unterminated string");
 	done = gTrue;
 	break;
@@ -240,8 +249,9 @@ Object *Lexer::getObj(Object *obj) {
 	  break;
 	case '\r':
 	  c = lookChar();
-	  if (c == '\n')
+	  if (c == '\n') {
 	    getChar();
+	  }
 	  break;
 	case '\n':
 	  break;
@@ -284,29 +294,31 @@ Object *Lexer::getObj(Object *obj) {
   case '/':
     p = tokBuf;
     n = 0;
-    while ((c = lookChar()) != EOF && !(c < 128 && endOfNameChars[c])) {
+    while ((c = lookChar()) != EOF && !specialChars[c]) {
       getChar();
       if (c == '#') {
 	c2 = lookChar();
-	if (c2 >= '0' && c2 <= '9')
+	if (c2 >= '0' && c2 <= '9') {
 	  c = c2 - '0';
-	else if (c2 >= 'A' && c2 <= 'F')
+	} else if (c2 >= 'A' && c2 <= 'F') {
 	  c = c2 - 'A' + 10;
-	else if (c2 >= 'a' && c2 <= 'f')
+	} else if (c2 >= 'a' && c2 <= 'f') {
 	  c = c2 - 'a' + 10;
-	else
+	} else {
 	  goto notEscChar;
+	}
 	getChar();
 	c <<= 4;
 	c2 = getChar();
-	if (c2 >= '0' && c2 <= '9')
+	if (c2 >= '0' && c2 <= '9') {
 	  c += c2 - '0';
-	else if (c2 >= 'A' && c2 <= 'F')
+	} else if (c2 >= 'A' && c2 <= 'F') {
 	  c += c2 - 'A' + 10;
-	else if (c2 >= 'a' && c2 <= 'f')
+	} else if (c2 >= 'a' && c2 <= 'f') {
 	  c += c2 - 'a' + 10;
-	else
+	} else {
 	  error(getPos(), "Illegal digit in hex char in name");
+	}
       }
      notEscChar:
       if (++n == tokBufSize) {
@@ -351,7 +363,7 @@ Object *Lexer::getObj(Object *obj) {
 	} else if (c == EOF) {
 	  error(getPos(), "Unterminated hex string");
 	  break;
-	} else if (!isspace(c)) {
+	} else if (specialChars[c] != 1) {
 	  c2 = c2 << 4;
 	  if (c >= '0' && c <= '9')
 	    c2 += c - '0';
@@ -414,7 +426,7 @@ Object *Lexer::getObj(Object *obj) {
     p = tokBuf;
     *p++ = c;
     n = 1;
-    while ((c = lookChar()) != EOF && !(c < 128 && endOfNameChars[c])) {
+    while ((c = lookChar()) != EOF && !specialChars[c]) {
       getChar();
       if (++n == tokBufSize) {
 	error(getPos(), "Command token too long");
@@ -423,14 +435,15 @@ Object *Lexer::getObj(Object *obj) {
       *p++ = c;
     }
     *p = '\0';
-    if (tokBuf[0] == 't' && !strcmp(tokBuf, "true"))
+    if (tokBuf[0] == 't' && !strcmp(tokBuf, "true")) {
       obj->initBool(gTrue);
-    else if (tokBuf[0] == 'f' && !strcmp(tokBuf, "false"))
+    } else if (tokBuf[0] == 'f' && !strcmp(tokBuf, "false")) {
       obj->initBool(gFalse);
-    else if (tokBuf[0] == 'n' && !strcmp(tokBuf, "null"))
+    } else if (tokBuf[0] == 'n' && !strcmp(tokBuf, "null")) {
       obj->initNull();
-    else
+    } else {
       obj->initCmd(tokBuf);
+    }
     break;
   }
 
@@ -442,11 +455,13 @@ void Lexer::skipToNextLine() {
 
   while (1) {
     c = getChar();
-    if (c == EOF || c == '\n')
+    if (c == EOF || c == '\n') {
       return;
+    }
     if (c == '\r') {
-      if ((c = lookChar()) == '\n')
+      if ((c = lookChar()) == '\n') {
 	getChar();
+      }
       return;
     }
   }

@@ -84,8 +84,10 @@ public:
   virtual void updateLineWidth(GfxState *) {}
   virtual void updateFillColor(GfxState *) {}
   virtual void updateStrokeColor(GfxState *) {}
+  virtual void updateFillOpacity(GfxState *) {}
+  virtual void updateStrokeOpacity(GfxState *) {}
 
-  //----- update text state
+  //----- update text 
   virtual void updateFont(GfxState *) {}
   virtual void updateTextMat(GfxState *) {}
   virtual void updateCharSpace(GfxState *) {}
@@ -108,17 +110,19 @@ public:
   //----- text drawing
   virtual void beginString(GfxState *, GString *) {}
   virtual void endString(GfxState *) {}
-  virtual void drawChar(GfxState *, double, double, double, double, Guchar) {}
-  virtual void drawChar16(GfxState *, double, double, double, double, int) {}
+  virtual void drawChar(GfxState *, double, double,
+			double, double, Guchar) {}
+  virtual void drawChar16(GfxState *, double, double,
+			  double, double, int) {}
   virtual void drawString(GfxState *, GString *) {}
   virtual void drawString16(GfxState *, GString *) {}
 
   //----- image drawing
-  virtual void drawImageMask(GfxState *state, Stream *str,
+  virtual void drawImageMask(GfxState *state, Object *ref, Stream *str,
 			     int width, int height, GBool invert,
 			     GBool inlineImg);
-  virtual void drawImage(GfxState *state, Stream *str, int width,
-			 int height, GfxImageColorMap *colorMap,
+  virtual void drawImage(GfxState *state, Object *ref, Stream *str,
+			 int width, int height, GfxImageColorMap *colorMap,
 			 GBool inlineImg);
 
 #if OPI_SUPPORT

@@ -21,7 +21,11 @@ FILE *errFile;
 GBool errQuiet;
 
 void errorInit() {
-  errFile = stderr;
+  if (errQuiet) {
+    errFile = NULL;
+  } else {
+    errFile = stderr;
+  }
 }
 
 void CDECL error(int pos, const char *msg, ...) {
