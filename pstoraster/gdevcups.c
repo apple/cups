@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.17 1999/12/10 21:47:58 mike Exp $"
+ * "$Id: gdevcups.c,v 1.18 1999/12/16 22:48:25 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -953,9 +953,14 @@ cups_print_pages(gx_device_printer *pdev,	/* I - Device info */
         break;
 
     case CUPS_ORDER_BANDED :
-        cups->header.cupsBytesPerLine = (cups->header.cupsBitsPerPixel *
-                                         cups->header.cupsWidth + 7) / 8 *
-				        cups->color_info.num_components;
+        if (cups->header.cupsColorSpace == CUPS_CSPACE_KCMYcm &&
+	    cups->header.cupsBitsPerColor == 1)
+          cups->header.cupsBytesPerLine = (cups->header.cupsBitsPerPixel *
+                                           cups->header.cupsWidth + 7) / 8 * 6;
+        else
+          cups->header.cupsBytesPerLine = (cups->header.cupsBitsPerPixel *
+                                           cups->header.cupsWidth + 7) / 8 *
+				          cups->color_info.num_components;
         break;
 
     case CUPS_ORDER_PLANAR :
@@ -987,7 +992,7 @@ cups_print_pages(gx_device_printer *pdev,	/* I - Device info */
     * Need an output buffer, too...
     */
 
-    dst = (unsigned char *)gs_malloc(cups->header.cupsBytesPerLine, 1,
+    dst = (unsigned char *)gs_malloc(cups->header.cupsBytesPerLine, 2,
                                      "cups_print_pages");
 
     if (dst == NULL)	/* can't allocate working area */
@@ -2344,5 +2349,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.17 1999/12/10 21:47:58 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.18 1999/12/16 22:48:25 mike Exp $".
  */
