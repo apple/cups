@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.26 1999/11/01 16:53:43 mike Exp $"
+ * "$Id: pstops.c,v 1.27 1999/11/03 19:05:31 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -617,7 +617,7 @@ static void
 end_nup(int number)	/* I - Page number */
 {
   if (Flip || Orientation || NUp > 1)
-    puts("grestoreall");
+    puts("ESPsave restore");
 
   switch (NUp)
   {
@@ -702,13 +702,17 @@ start_nup(int number)	/* I - Page number */
   int	x, y;		/* Relative position of subpage */
   float	w, l,		/* Width and length of subpage */
 	tx, ty;		/* Translation values for subpage */
+  float	pw, pl;		/* Printable width and length of full page */
 
 
   if (Flip || Orientation || NUp > 1)
-    puts("gsave");
+    puts("/ESPsave save def");
 
   if (Flip)
     printf("%.0f 0 translate -1 1 scale\n", PageWidth);
+
+  pw = PageRight - PageLeft;
+  pl = PageTop - PageBottom;
 
   switch (Orientation)
   {
@@ -731,44 +735,49 @@ start_nup(int number)	/* I - Page number */
         if (Orientation & 1)
 	{
 	  x = 1 - x;
-          w = PageLength;
-          l = w * PageLength / PageWidth;
+          w = pl;
+          l = w * pl / pw;
 
-          if (l > (PageWidth * 0.5))
+          if (l > (pw * 0.5))
           {
-            l = PageWidth * 0.5;
-            w = l * PageWidth / PageLength;
+            l = pw * 0.5;
+            w = l * pw / pl;
           }
 
-          tx = PageWidth * 0.5 - l;
-          ty = (PageLength - w) * 0.5;
+          tx = pw * 0.5 - l;
+          ty = (pl - w) * 0.5;
         }
 	else
 	{
-          l = PageWidth;
-          w = l * PageWidth / PageLength;
+          l = pw;
+          w = l * pw / pl;
 
-          if (w > (PageLength * 0.5))
+          if (w > (pl * 0.5))
           {
-            w = PageLength * 0.5;
-            l = w * PageLength / PageWidth;
+            w = pl * 0.5;
+            l = w * pl / pw;
           }
 
-          tx = PageLength * 0.5 - w;
-          ty = (PageWidth - l) * 0.5;
+          tx = pl * 0.5 - w;
+          ty = (pw - l) * 0.5;
         }
+
+        if (Duplex && (number & 2))
+	  printf("%.0f %.0f translate\n", PageWidth - PageRight, PageBottom);
+	else
+	  printf("%.0f %.0f translate\n", PageLeft, PageBottom);
 
         if (Orientation & 1)
 	{
-          printf("0 %.0f translate -90 rotate\n", PageLength);
+          printf("0 %.0f translate -90 rotate\n", pl);
           printf("%.0f %.0f translate %.3f %.3f scale\n",
-                 ty, tx + l * x, w / PageWidth, l / PageLength);
+                 ty, tx + l * x, w / pw, l / pl);
         }
         else
 	{
-          printf("%.0f 0 translate 90 rotate\n", PageWidth);
+          printf("%.0f 0 translate 90 rotate\n", pw);
           printf("%.0f %.0f translate %.3f %.3f scale\n",
-                 tx + w * x, ty, w / PageWidth, l / PageLength);
+                 tx + w * x, ty, w / pw, l / pl);
         }
 
 	printf("newpath\n"
@@ -777,14 +786,19 @@ start_nup(int number)	/* I - Page number */
                "%.0f %.0f lineto\n"
                "0 %.0f lineto\n"
                "closepath clip newpath\n",
-               PageWidth, PageWidth, PageLength, PageLength);
+               pw, pw, pl, pl);
         break;
 
     case 4 :
         x = number & 1;
 	y = 1 - ((number & 2) != 0);
-        w = PageWidth * 0.5;
-        l = PageLength * 0.5;
+        w = pw * 0.5;
+        l = pl * 0.5;
+
+        if (Duplex && (number & 4))
+	  printf("%.0f %.0f translate\n", PageWidth - PageRight, PageBottom);
+	else
+	  printf("%.0f %.0f translate\n", PageLeft, PageBottom);
 
 	printf("%.0f %.0f translate 0.5 0.5 scale\n", x * w, y * l);
         printf("newpath\n"
@@ -793,12 +807,12 @@ start_nup(int number)	/* I - Page number */
                "%.0f %.0f lineto\n"
                "0 %.0f lineto\n"
                "closepath clip newpath\n",
-               PageWidth, PageWidth, PageLength, PageLength);
+               pw, pw, pl, pl);
         break;
   }
 }
 
 
 /*
- * End of "$Id: pstops.c,v 1.26 1999/11/01 16:53:43 mike Exp $".
+ * End of "$Id: pstops.c,v 1.27 1999/11/03 19:05:31 mike Exp $".
  */
