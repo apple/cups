@@ -1,14 +1,8 @@
 #!/bin/sh
 #
-# "$Id: cups.sh.in,v 1.6 2001/01/22 15:03:16 mike Exp $"
+# "$Id: cups.sh.in,v 1.7 2001/02/02 16:38:16 mike Exp $"
 #
 #   Startup/shutdown script for the Common UNIX Printing System (CUPS).
-#
-#   Linux chkconfig stuff:
-#
-#   chkconfig: 0235 99 00
-#   description: Startup/shutdown script for the Common UNIX \
-#                Printing System (CUPS).
 #
 #   Copyright 1997-2001 by Easy Software Products, all rights reserved.
 #
@@ -29,10 +23,33 @@
 #         WWW: http://www.cups.org
 #
 
-# See what program to use for configuration stuff...
+#### OS-Dependent Information
+
+#
+#   Linux chkconfig stuff:
+#
+#   chkconfig: 0235 99 00
+#   description: Startup/shutdown script for the Common UNIX \
+#                Printing System (CUPS).
+#
+
+#
+#   NetBSD 1.5+ rcorder script lines.  The format of the following two
+#   lines is very strict -- please don't add additional spaces!
+#
+# PROVIDE: cups
+# REQUIRE: DAEMON
+#
+
+
+#### OS-Dependent Configuration
 case "`uname`" in
 	IRIX*)
 		IS_ON=/sbin/chkconfig
+		;;
+
+	NetBSD*)
+        	IS_ON=:
 		;;
 
 	*)
@@ -40,23 +57,32 @@ case "`uname`" in
 		;;
 esac
 
+#### OS-Independent Stuff
+
+#
 # The verbose flag controls the printing of the names of
-# daemons as they are started.
+# daemons as they are started.  Currently always echos for
+# all but IRIX, which can configure verbose bootup messages.
+#
+
 if $IS_ON verbose; then
 	ECHO=echo
 else
 	ECHO=:
 fi
 
-# See if the CUPS server is running...
+#
+# See if the CUPS server (cupsd) is running...
+#
+
 case "`uname`" in
-	IRIX* | HP-UX | SunOS)
+	IRIX* | HP-UX* | SunOS*)
 		pid=`ps -e | awk '{print $1,$4}' | grep cupsd | awk '{print $1}'`
 		;;
-	OSF1)
+	OSF1*)
 		pid=`ps -e | awk '{print $1,$5}' | grep cupsd | awk '{print $1}'`
 		;;
-	Linux)
+	Linux* | NetBSD*)
 		pid=`ps ax | awk '{print $1,$5}' | grep cupsd | awk '{print $1}'`
 		;;
 	*)
@@ -64,7 +90,10 @@ case "`uname`" in
 		;;
 esac
 
+#
 # Start or stop the CUPS server based upon the first argument to the script.
+#
+
 case $1 in
 	start | restart | reload)
 		if test "$pid" != ""; then
@@ -106,9 +135,13 @@ case $1 in
 		;;
 esac
 
+#
+# Exit with no errors.
+#
+
 exit 0
 
 
 #
-# End of "$Id: cups.sh.in,v 1.6 2001/01/22 15:03:16 mike Exp $".
+# End of "$Id: cups.sh.in,v 1.7 2001/02/02 16:38:16 mike Exp $".
 #
