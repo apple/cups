@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.43.2.13 2002/09/03 00:48:01 mike Exp $"
+ * "$Id: gdevcups.c,v 1.43.2.14 2002/09/04 02:21:50 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -1887,7 +1887,8 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   }
 
   old_depth = pdev->color_info.depth;
-  size_set  = param_read_float_array(plist, "PageSize", &arrayval) == 0;
+  size_set  = param_read_float_array(plist, ".MediaSize", &arrayval) == 0 ||
+              param_read_float_array(plist, "PageSize", &arrayval) == 0;
 
   stringoption(MediaClass, "MediaClass")
   stringoption(MediaColor, "MediaColor")
@@ -2003,6 +2004,12 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   }
 
  /*
+  * Set the margins to update the bitmap size...
+  */
+
+  gx_device_set_margins(pdev, margins, false);
+
+ /*
   * Then process standard page device options...
   */
 
@@ -2023,19 +2030,17 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   cups->header.ImagingBoundingBox[2] = pdev->MediaSize[0] - 72.0 * margins[2];
   cups->header.ImagingBoundingBox[3] = pdev->MediaSize[1] - 72.0 * margins[3];
 
-  cups->header.ImagingBoundingBox[0] = 72.0 * margins[0];
-  cups->header.ImagingBoundingBox[1] = 72.0 * margins[1];
-  cups->header.ImagingBoundingBox[2] = pdev->MediaSize[0] - 72.0 * margins[2];
-  cups->header.ImagingBoundingBox[3] = pdev->MediaSize[1] - 72.0 * margins[3];
-
  /*
   * Reallocate memory if the size or color depth was changed...
   */
 
+  fprintf(stderr, "DEBUG: old_depth = %d, depth = %d, size_set = %d\n",
+          old_depth, pdev->color_info.depth, size_set);
+
   if (old_depth != pdev->color_info.depth || size_set)
   {
    /*
-    * Make sure the page image is the correct size (current Ghostscript
+    * Make sure the page image is the correct size - current Ghostscript
     * does not keep track of the margins in the bitmap size...
     */
 
@@ -3448,5 +3453,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.43.2.13 2002/09/03 00:48:01 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.43.2.14 2002/09/04 02:21:50 mike Exp $".
  */
