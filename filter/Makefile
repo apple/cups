@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.35 2000/07/19 17:18:42 mike Exp $"
+# "$Id: Makefile,v 1.36 2000/08/18 17:24:42 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -51,7 +51,7 @@ all:	$(TARGETS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) $(LIBCUPSIMAGE)
+	$(RM) $(OBJS) $(TARGETS) $(LIBCUPSIMAGE) `basename $(LIBCUPSIMAGE) .2`
 
 
 #
@@ -203,5 +203,5 @@ $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 
 #
-# End of "$Id: Makefile,v 1.35 2000/07/19 17:18:42 mike Exp $".
+# End of "$Id: Makefile,v 1.36 2000/08/18 17:24:42 mike Exp $".
 #

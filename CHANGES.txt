@@ -19,6 +19,10 @@ CHANGES IN CUPS v1.1.3
 	  driver modules are in fact loaded...
 	- Added new FilterLimit directive to limit the number
 	  of processing jobs/filters on a system.
+	- set-job-attributes didn't change the job-state to
+	  held/pending when the job-hold-until attribute was
+	  specified.
+	- set-job-attributes didn't save the new job attributes.
 
 
 CHANGES IN CUPS v1.1.2

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.10 2000/07/07 17:02:44 mike Exp $"
+# "$Id: Makefile,v 1.11 2000/08/18 17:24:43 mike Exp $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -52,6 +52,7 @@ all:	$(CAT1) $(CAT5) $(CAT8)
 #
 
 clean:
+	$(RM) $(CAT1) $(CAT5) $(CAT8)
 
 
 #
@@ -99,5 +100,5 @@ install:
 
 
 #
-# End of "$Id: Makefile,v 1.10 2000/07/07 17:02:44 mike Exp $".
+# End of "$Id: Makefile,v 1.11 2000/08/18 17:24:43 mike Exp $".
 #
