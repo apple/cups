@@ -3165,6 +3165,10 @@ GString *PSOutputDev::filterPSName(GString *name) {
   char c;
 
   name2 = new GString();
+  c = name->getChar(0);
+  if (c >= '0' && c <= '9') {
+    name2->append('f');
+  }
   for (i = 0; i < name->getLength(); ++i) {
     c = name->getChar(i);
     if (c <= (char)0x20 || c >= (char)0x7f ||

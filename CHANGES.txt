@@ -1,8 +1,10 @@
-CHANGES.txt - 11/05/2002
+CHANGES.txt - 11/15/2002
 ------------------------
 
 CHANGES IN CUPS V1.1.17
 
+	- The pdftops filter didn't support all of the MacOS
+	  characters for MacRoman encoded fonts.
 	- The cupsEncodeOptions() and cupsParseOptions()
 	  functions now conform to the grammer defined by the
 	  current draft of the PAPI specification.  The main
