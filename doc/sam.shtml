@@ -2738,9 +2738,10 @@ Port 80
 
 <H4>Description</H4>
 
-<P>The <CODE>Port</CODE> directive specifies a port to listen on.
-Multiple <CODE>Port</CODE> lines can be specified to listen on multiple
-ports. The default port is 631.
+<P>The <CODE>Port</CODE> directive specifies a port to listen
+on. Multiple <CODE>Port</CODE> lines can be specified to listen
+on multiple ports. The <CODE>Port</CODE> directive is equivalent
+to "<CODE>Listen *:nnn</CODE>". The default port is 631.
 
 <!-- NEED 3in -->
 <H3><A NAME="PreserveJobHistory">PreserveJobHistory</A></H3>
