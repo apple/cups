@@ -1,5 +1,5 @@
 /*
- * "$Id: lpc.c,v 1.4 1999/06/23 14:08:20 mike Exp $"
+ * "$Id: lpc.c,v 1.5 1999/09/27 16:11:49 mike Exp $"
  *
  *   "lpc" command for the Common UNIX Printing System (CUPS).
  *
@@ -433,7 +433,15 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 	if (strncmp(device, "file:", 5) == 0)
 	  printf("\tprinter is on device \'%s\' speed -1\n", device + 5);
 	else
+	{
+	 /*
+	  * Just show the method...
+	  */
+
+	  *strchr(device, ':') = '\0';
 	  printf("\tprinter is on device \'%s\' speed -1\n", device);
+	}
+
 	printf("\tqueuing is %sabled\n", accepting ? "en" : "dis");
 	printf("\tprinting is %sabled\n",
 	       pstate == IPP_PRINTER_STOPPED ? "dis" : "en");
@@ -454,5 +462,5 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpc.c,v 1.4 1999/06/23 14:08:20 mike Exp $".
+ * End of "$Id: lpc.c,v 1.5 1999/09/27 16:11:49 mike Exp $".
  */
