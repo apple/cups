@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile.in,v 1.1.2.4 2002/03/22 17:55:05 mike Exp $"
+# "$Id: Makefile.in,v 1.1.2.5 2002/05/09 02:28:57 mike Exp $"
 #
 #   IPP library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -69,7 +69,7 @@ all:	$(TARGETS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) `basename $(LIBIPP) .3`
+	$(RM) $(OBJS) $(TARGETS) `basename $(LIBIPP) .2`
 
 
 #
@@ -87,12 +87,12 @@ depend:
 install:	all	installhdrs
 	$(INSTALL_DIR) $(LIBDIR)
 	$(INSTALL_LIB) $(LIBIPP) $(LIBDIR)
-	if test $(LIBIPP) = "libipp.so.3" -o $(LIBIPP) = "libipp.sl.3"; then \
+	if test $(LIBIPP) = "libipp.so.2" -o $(LIBIPP) = "libipp.sl.2"; then \
 		$(INSTALL_LIB) libipp.a $(LIBDIR); \
-		$(RM) $(LIBDIR)/`basename $(LIBIPP) .3`; \
-		$(LN) $(LIBIPP) $(LIBDIR)/`basename $(LIBIPP) .3`; \
+		$(RM) $(LIBDIR)/`basename $(LIBIPP) .2`; \
+		$(LN) $(LIBIPP) $(LIBDIR)/`basename $(LIBIPP) .2`; \
 	fi
-	if test $(LIBIPP) = "libipp.3.dylib"; then \
+	if test $(LIBIPP) = "libipp.2.dylib"; then \
 		$(STRIP) -x $(LIBDIR)/$(LIBIPP); \
 		$(INSTALL_LIB) libipp.a $(LIBDIR); \
 		$(RM) $(LIBDIR)/libipp.dylib; \
@@ -110,26 +110,26 @@ installhdrs:
 
 
 #
-# libipp.so.3, libipp.sl.3
+# libipp.so.2, libipp.sl.2
 #
 
-libipp.so.3 libipp.sl.3:	$(LIBOBJS)
+libipp.so.2 libipp.sl.2:	$(LIBOBJS)
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS) $(SSLLIBS)
-	$(RM) `basename $@ .3`
-	$(LN) $@ `basename $@ .3`
+	$(RM) `basename $@ .2`
+	$(LN) $@ `basename $@ .2`
 
 
 #
 # libipp.2.dylib
 #
 
-libipp.3.dylib:	$(LIBOBJS)
+libipp.2.dylib:	$(LIBOBJS)
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/libipp.dylib \
-		-current_version 3.0.0 \
-		-compatibility_version 3.0.0 \
+		-current_version 2.0.0 \
+		-compatibility_version 2.0.0 \
 		$(LIBOBJS) $(SSLLIBS)
 	$(RM) libipp.dylib
 	$(LN) $@ libipp.dylib
@@ -155,7 +155,7 @@ libipp_s.a:	$(LIBOBJS)
 libipp.la:    $(LIBOBJS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
-		-version-info 3:0 $(SSLLIBS)
+		-version-info 2:0 $(SSLLIBS)
 
 
 #
@@ -233,5 +233,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile.in,v 1.1.2.4 2002/03/22 17:55:05 mike Exp $".
+# End of "$Id: Makefile.in,v 1.1.2.5 2002/05/09 02:28:57 mike Exp $".
 #
