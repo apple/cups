@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.6 2000/04/20 19:56:38 mike Exp $"
+# "$Id: Makefile,v 1.7 2000/05/20 15:47:46 mike Exp $"
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -50,7 +50,7 @@ clean:
 #
 
 install:
-	-$(MKDIR) $(LIBDIR)/locale
+	-$(MKDIR) $(LOCALEDIR)
 	for dir in $(LOCALES) ; do \
 		if test ! -d $(LOCALEDIR)/$$dir ; then \
 			$(MKDIR) $(LOCALEDIR)/$$dir ; \
@@ -74,5 +74,5 @@ translate.o:	../cups/http.h
 
 
 #
-# End of "$Id: Makefile,v 1.6 2000/04/20 19:56:38 mike Exp $".
+# End of "$Id: Makefile,v 1.7 2000/05/20 15:47:46 mike Exp $".
 #
