@@ -1,5 +1,5 @@
 /*
- * "$Id: http-addr.c,v 1.1.2.17 2004/06/29 20:33:11 mike Exp $"
+ * "$Id: http-addr.c,v 1.1.2.18 2004/07/06 00:35:31 mike Exp $"
  *
  *   HTTP address routines for the Common UNIX Printing System (CUPS).
  *
@@ -145,8 +145,10 @@ httpAddrLocalhost(const http_addr_t *addr)
     return (1);
 #endif /* AF_INET6 */
 
+#ifdef AF_LOCAL
   if (addr->addr.sa_family == AF_LOCAL)
     return (1);
+#endif /* AF_LOCAL */
 
   if (addr->addr.sa_family == AF_INET &&
       ntohl(addr->ipv4.sin_addr.s_addr) == 0x7f000001)
@@ -174,6 +176,9 @@ httpAddrLookup(const http_addr_t *addr,		/* I - Address to lookup */
 {
   struct hostent	*host;			/* Host from name service */
 
+
+  DEBUG_printf(("httpAddrLookup(addr=%p, name=%p, namelen=%d)\n",
+                addr, name, namelen));
 
 #ifdef AF_INET6
   if (addr->addr.sa_family == AF_INET6)
@@ -216,6 +221,9 @@ httpAddrString(const http_addr_t *addr,		/* I - Address to convert */
                char              *s,		/* I - String buffer */
 	       int               slen)		/* I - Length of string */
 {
+  DEBUG_printf(("httpAddrString(addr=%p, s=%p, slen=%d)\n",
+                addr, s, slen));
+
 #ifdef AF_INET6
   if (addr->addr.sa_family == AF_INET6)
     snprintf(s, slen, "%u.%u.%u.%u",
@@ -243,6 +251,8 @@ httpAddrString(const http_addr_t *addr,		/* I - Address to convert */
   else
     strlcpy(s, "UNKNOWN", slen);
 
+  DEBUG_printf(("httpAddrString: returning \"%s\"...\n", s));
+
   return (s);
 }
 
@@ -261,6 +271,8 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
   static char		*packed_ptr[2];	/* Pointer to packed address */
   static struct hostent	host_ip;	/* Host entry for IP/domain address */
 
+
+  DEBUG_printf(("httpGetHostByName(name=\"%s\")\n", name));
 
 #if defined(__APPLE__)
   /* OS X hack to avoid it's ocassional long delay in lookupd */
@@ -297,6 +309,8 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
     packed_ptr[0]       = (char *)name;
     packed_ptr[1]       = NULL;
 
+    DEBUG_puts("httpGetHostByName: returning domain socket address...");
+
     return (&host_ip);
   }
 #endif /* AF_LOCAL */
@@ -331,6 +345,8 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
     packed_ptr[0]       = (char *)(&packed_ip);
     packed_ptr[1]       = NULL;
 
+    DEBUG_puts("httpGetHostByName: returning IPv4 address...");
+
     return (&host_ip);
   }
   else
@@ -340,11 +356,13 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
     * the name...
     */
 
+    DEBUG_puts("httpGetHostByName: returning domain lookup address(es)...");
+
     return (gethostbyname(name));
   }
 }
 
 
 /*
- * End of "$Id: http-addr.c,v 1.1.2.17 2004/06/29 20:33:11 mike Exp $".
+ * End of "$Id: http-addr.c,v 1.1.2.18 2004/07/06 00:35:31 mike Exp $".
  */

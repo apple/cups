@@ -1,5 +1,5 @@
 /*
- * "$Id: testspeed.c,v 1.3.2.6 2004/06/29 13:15:11 mike Exp $"
+ * "$Id: testspeed.c,v 1.3.2.7 2004/07/06 00:35:31 mike Exp $"
  *
  *   Scheduler speed test for the Common UNIX Printing System (CUPS).
  *
@@ -116,35 +116,42 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   start = time(NULL);
 
-  for (i = 0; i < children; i ++)
-    if ((pid = fork()) == 0)
-    {
-     /*
-      * Child goes here...
-      */
-
-      exit(do_test(server, encryption, requests));
-    }
-    else if (pid < 0)
-    {
-      perror("fork failed");
-      break;
-    }
-    else
-      printf("testspeed(%d): Started...\n", pid);
-
- /*
-  * Wait for children to finish...
-  */
-
-  for (;;)
+  if (children == 1)
   {
-    pid = wait(&status);
+    do_test(server, encryption, requests);
+  }
+  else
+  {
+    for (i = 0; i < children; i ++)
+      if ((pid = fork()) == 0)
+      {
+       /*
+	* Child goes here...
+	*/
 
-    if (pid < 0 && errno != EINTR)
-      break;
+	exit(do_test(server, encryption, requests));
+      }
+      else if (pid < 0)
+      {
+	perror("fork failed");
+	break;
+      }
+      else
+	printf("testspeed(%d): Started...\n", pid);
 
-    printf("testspeed(%d): Ended (%d)...\n", pid, status);
+   /*
+    * Wait for children to finish...
+    */
+
+    for (;;)
+    {
+      pid = wait(&status);
+
+      if (pid < 0 && errno != EINTR)
+	break;
+
+      printf("testspeed(%d): Ended (%d)...\n", pid, status);
+    }
   }
 
  /*
@@ -288,5 +295,5 @@ usage(void)
 
 
 /*
- * End of "$Id: testspeed.c,v 1.3.2.6 2004/06/29 13:15:11 mike Exp $".
+ * End of "$Id: testspeed.c,v 1.3.2.7 2004/07/06 00:35:31 mike Exp $".
  */

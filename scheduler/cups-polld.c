@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-polld.c,v 1.5.2.20 2004/06/29 13:15:10 mike Exp $"
+ * "$Id: cups-polld.c,v 1.5.2.21 2004/07/06 00:35:31 mike Exp $"
  *
  *   Polling daemon for the Common UNIX Printing System (CUPS).
  *
@@ -23,7 +23,7 @@
  *
  * Contents:
  *
- *   main()        - Open socks and poll until we are killed...
+ *   main()        - Open sockets and poll until we are killed...
  *   poll_server() - Poll the server for the given set of printers or classes.
  */
 
@@ -48,7 +48,7 @@ int	poll_server(http_t *http, cups_lang_t *language, ipp_op_t op,
 
 
 /*
- * 'main()' - Open socks and poll until we are killed...
+ * 'main()' - Open sockets and poll until we are killed...
  */
 
 int					/* O - Exit status */
@@ -407,5 +407,5 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: cups-polld.c,v 1.5.2.20 2004/06/29 13:15:10 mike Exp $".
+ * End of "$Id: cups-polld.c,v 1.5.2.21 2004/07/06 00:35:31 mike Exp $".
  */

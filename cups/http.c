@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.54 2004/07/02 04:08:59 mike Exp $"
+ * "$Id: http.c,v 1.82.2.55 2004/07/06 00:35:31 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -383,17 +383,18 @@ httpConnectEncrypt(const char *host,	/* I - Host to connect to */
   }
 
  /*
-  * Verify that it is an IPv4 address (IPv6 support will come in CUPS 1.2...)
+  * Verify that it is an IPv4, IPv6, or domain address...
   */
 
+  if ((hostaddr->h_addrtype != AF_INET || hostaddr->h_length != 4)
 #ifdef AF_INET6
-  if ((hostaddr->h_addrtype != AF_INET || hostaddr->h_length != 4) &&
-      (hostaddr->h_addrtype != AF_INET6 || hostaddr->h_length != 16))
-    return (NULL);
-#else
-  if (hostaddr->h_addrtype != AF_INET || hostaddr->h_length != 4)
-    return (NULL);
+      && (hostaddr->h_addrtype != AF_INET6 || hostaddr->h_length != 16)
 #endif /* AF_INET6 */
+#ifdef AF_LOCAL
+      && (hostaddr->h_addrtype != AF_LOCAL)
+#endif /* AF_LOCAL */
+      )
+    return (NULL);
 
  /*
   * Allocate memory for the structure...
@@ -2521,5 +2522,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.54 2004/07/02 04:08:59 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.55 2004/07/06 00:35:31 mike Exp $".
  */
