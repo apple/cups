@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.42 2001/05/21 21:24:48 mike Exp $"
+ * "$Id: ipp.c,v 1.43 2001/06/06 14:11:47 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -339,7 +339,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * See if the printer supports multiple copies...
   */
 
-  if (copies_sup)
+  if (copies_sup || argc < 7)
     copies = 1;
   else
     copies = atoi(argv[4]);
@@ -622,5 +622,5 @@ password_cb(const char *prompt)	/* I - Prompt (not used) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.42 2001/05/21 21:24:48 mike Exp $".
+ * End of "$Id: ipp.c,v 1.43 2001/06/06 14:11:47 mike Exp $".
  */
