@@ -1,5 +1,5 @@
 /*
- * "$Id: lpmove.c,v 1.5.2.4 2002/05/09 03:08:05 mike Exp $"
+ * "$Id: lpmove.c,v 1.5.2.5 2002/06/27 19:49:15 mike Exp $"
  *
  *   "lpmove" command for the Common UNIX Printing System (CUPS).
  *
@@ -58,6 +58,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		i;		/* Looping var */
   http_t	*http;		/* Connection to server */
   const char	*job;		/* Job name */
+  int		num_dests;	/* Number of destinations */
+  cups_dest_t	*dests;		/* Destinations */
   const char	*dest;		/* New destination */
   http_encryption_t encryption;	/* Encryption? */
 
@@ -66,6 +68,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   job        = NULL;
   dest       = NULL;
   encryption = cupsEncryption();
+  num_dests  = 0;
+  dests      = NULL;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -115,7 +119,11 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
     else if (job == NULL)
     {
-      if ((job = strrchr(argv[i], '-')) != NULL)
+      if (num_dests == 0)
+        num_dests = cupsGetDests(&dests);
+
+      if ((job = strrchr(argv[i], '-')) != NULL &&
+          cupsGetDest(argv[i], NULL, num_dests, dests) == NULL)
         job ++;
       else
         job = argv[i];
@@ -228,5 +236,5 @@ move_job(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpmove.c,v 1.5.2.4 2002/05/09 03:08:05 mike Exp $".
+ * End of "$Id: lpmove.c,v 1.5.2.5 2002/06/27 19:49:15 mike Exp $".
  */
