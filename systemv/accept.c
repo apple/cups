@@ -1,5 +1,5 @@
 /*
- * "$Id: accept.c,v 1.3 1999/06/10 16:16:09 mike Exp $"
+ * "$Id: accept.c,v 1.4 1999/06/18 18:36:51 mike Exp $"
  *
  *   "accept", "disable", "enable", and "reject" commands for the Common
  *   UNIX Printing System (CUPS).
@@ -15,7 +15,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -214,5 +214,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: accept.c,v 1.3 1999/06/10 16:16:09 mike Exp $".
+ * End of "$Id: accept.c,v 1.4 1999/06/18 18:36:51 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: filter.c,v 1.7 1999/05/21 20:53:30 mike Exp $"
+ * "$Id: filter.c,v 1.8 1999/06/18 18:36:08 mike Exp $"
  *
  *   File type conversion routines for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -293,5 +293,5 @@ lookup(mime_t      *mime,	/* I - MIME database */
 
 
 /*
- * End of "$Id: filter.c,v 1.7 1999/05/21 20:53:30 mike Exp $".
+ * End of "$Id: filter.c,v 1.8 1999/06/18 18:36:08 mike Exp $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.2 1999/06/09 20:03:46 mike Exp $"
+# "$Id: Makefile,v 1.3 1999/06/18 18:36:04 mike Exp $"
 #
 #   Berkeley commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -14,7 +14,7 @@
 #
 #       Attn: CUPS Licensing Information
 #       Easy Software Products
-#       44145 Airport View Drive, Suite 204
+#       44141 Airport View Drive, Suite 204
 #       Hollywood, Maryland 20636-3111 USA
 #
 #       Voice: (301) 373-9603
@@ -87,5 +87,5 @@ lprm:	lprm.o ../cups/libcups.a
 lprm.o:	../cups/cups.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.2 1999/06/09 20:03:46 mike Exp $".
+# End of "$Id: Makefile,v 1.3 1999/06/18 18:36:04 mike Exp $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.h,v 1.4 1999/02/05 17:40:53 mike Exp $"
+ * "$Id: mime.h,v 1.5 1999/06/18 18:36:11 mike Exp $"
  *
  *   MIME type/conversion database definitions for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -133,5 +133,5 @@ extern mime_filter_t	*mimeFilter(mime_t *mime, mime_type_t *src, mime_type_t *ds
 #endif /* !_MIME_H_ */
 
 /*
- * End of "$Id: mime.h,v 1.4 1999/02/05 17:40:53 mike Exp $".
+ * End of "$Id: mime.h,v 1.5 1999/06/18 18:36:11 mike Exp $".
  */

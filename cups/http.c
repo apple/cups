@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.36 1999/06/15 20:39:55 mike Exp $"
+ * "$Id: http.c,v 1.37 1999/06/18 18:36:08 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -1395,5 +1395,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.36 1999/06/15 20:39:55 mike Exp $".
+ * End of "$Id: http.c,v 1.37 1999/06/18 18:36:08 mike Exp $".
  */

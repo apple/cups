@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.8 1999/05/09 13:37:15 mike Exp $"
+ * "$Id: language.c,v 1.9 1999/06/18 18:36:09 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -366,5 +366,5 @@ cupsLangGet(char *language)	/* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.8 1999/05/09 13:37:15 mike Exp $".
+ * End of "$Id: language.c,v 1.9 1999/06/18 18:36:09 mike Exp $".
  */

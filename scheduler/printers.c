@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.19 1999/06/04 21:07:24 mike Exp $"
+ * "$Id: printers.c,v 1.20 1999/06/18 18:36:49 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -939,5 +939,5 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 
 
 /*
- * End of "$Id: printers.c,v 1.19 1999/06/04 21:07:24 mike Exp $".
+ * End of "$Id: printers.c,v 1.20 1999/06/18 18:36:49 mike Exp $".
  */

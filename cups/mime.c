@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.12 1999/04/21 21:19:33 mike Exp $"
+ * "$Id: mime.c,v 1.13 1999/06/18 18:36:10 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -33,6 +33,9 @@
  * Revision History:
  *
  *   $Log: mime.c,v $
+ *   Revision 1.13  1999/06/18 18:36:10  mike
+ *   Fixed address to 44141 Airport View Drive...
+ *
  *   Revision 1.12  1999/04/21 21:19:33  mike
  *   Changes for HP-UX.
  *
@@ -607,5 +610,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.12 1999/04/21 21:19:33 mike Exp $".
+ * End of "$Id: mime.c,v 1.13 1999/06/18 18:36:10 mike Exp $".
  */

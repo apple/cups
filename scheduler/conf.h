@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.10 1999/05/18 21:21:50 mike Exp $"
+ * "$Id: conf.h,v 1.11 1999/06/18 18:36:45 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -15,7 +15,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -103,5 +103,5 @@ extern int	LogPage(job_t *job, char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.10 1999/05/18 21:21:50 mike Exp $".
+ * End of "$Id: conf.h,v 1.11 1999/06/18 18:36:45 mike Exp $".
  */

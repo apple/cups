@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.25 1999/06/09 20:07:04 mike Exp $"
+ * "$Id: job.c,v 1.26 1999/06/18 18:36:48 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -907,5 +907,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.25 1999/06/09 20:07:04 mike Exp $".
+ * End of "$Id: job.c,v 1.26 1999/06/18 18:36:48 mike Exp $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.2 1999/05/19 18:00:50 mike Exp $"
+# "$Id: Makefile,v 1.3 1999/06/18 18:36:06 mike Exp $"
 #
 #   CGI makefile for the Common UNIX Printing System (CUPS).
 #
@@ -14,7 +14,7 @@
 #
 #       Attn: CUPS Licensing Information
 #       Easy Software Products
-#       44145 Airport View Drive, Suite 204
+#       44141 Airport View Drive, Suite 204
 #       Hollywood, Maryland 20636-3111 USA
 #
 #       Voice: (301) 373-9603
@@ -59,5 +59,5 @@ printers.cgi:	printers.o ../Makedefs ../cups/libcups.a
 $(OBJS):	../Makedefs ../cups/cups.h ../cups/ipp.h ../cups/language.h
 
 #
-# End of "$Id: Makefile,v 1.2 1999/05/19 18:00:50 mike Exp $".
+# End of "$Id: Makefile,v 1.3 1999/06/18 18:36:06 mike Exp $".
 #

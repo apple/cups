@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.5 1999/04/21 15:02:01 mike Exp $"
+ * "$Id: serial.c,v 1.6 1999/06/18 18:36:03 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -293,5 +293,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: serial.c,v 1.5 1999/04/21 15:02:01 mike Exp $".
+ * End of "$Id: serial.c,v 1.6 1999/06/18 18:36:03 mike Exp $".
  */

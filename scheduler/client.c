@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.22 1999/06/18 16:43:01 mike Exp $"
+ * "$Id: client.c,v 1.23 1999/06/18 18:36:44 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -1503,5 +1503,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.22 1999/06/18 16:43:01 mike Exp $".
+ * End of "$Id: client.c,v 1.23 1999/06/18 18:36:44 mike Exp $".
  */

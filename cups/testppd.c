@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c,v 1.11 1999/04/21 14:12:22 mike Exp $"
+ * "$Id: testppd.c,v 1.12 1999/06/18 18:36:12 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -179,5 +179,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c,v 1.11 1999/04/21 14:12:22 mike Exp $".
+ * End of "$Id: testppd.c,v 1.12 1999/06/18 18:36:12 mike Exp $".
  */

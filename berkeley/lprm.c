@@ -1,5 +1,5 @@
 /*
- * "$Id: lprm.c,v 1.2 1999/06/09 20:03:48 mike Exp $"
+ * "$Id: lprm.c,v 1.3 1999/06/18 18:36:05 mike Exp $"
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -194,5 +194,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lprm.c,v 1.2 1999/06/09 20:03:48 mike Exp $".
+ * End of "$Id: lprm.c,v 1.3 1999/06/18 18:36:05 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: debug.h,v 1.1 1999/04/21 19:43:58 mike Exp $"
+ * "$Id: debug.h,v 1.2 1999/06/18 18:36:07 mike Exp $"
  *
  *   Debugging macros for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -53,5 +53,5 @@
 #endif /* !_CUPS_DEBUG_H_ */
 
 /*
- * End of "$Id: debug.h,v 1.1 1999/04/21 19:43:58 mike Exp $".
+ * End of "$Id: debug.h,v 1.2 1999/06/18 18:36:07 mike Exp $".
  */

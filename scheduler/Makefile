@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.11 1999/06/18 16:43:00 mike Exp $"
+# "$Id: Makefile,v 1.12 1999/06/18 18:36:42 mike Exp $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -14,7 +14,7 @@
 #
 #       Attn: CUPS Licensing Information
 #       Easy Software Products
-#       44145 Airport View Drive, Suite 204
+#       44141 Airport View Drive, Suite 204
 #       Hollywood, Maryland 20636-3111 USA
 #
 #       Voice: (301) 373-9603
@@ -76,5 +76,5 @@ testspeed.o:	../cups/cups.h ../cups/http.h ../cups/ipp.h ../cups/language.h
 $(OBJS):	../config.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.11 1999/06/18 16:43:00 mike Exp $".
+# End of "$Id: Makefile,v 1.12 1999/06/18 18:36:42 mike Exp $".
 #

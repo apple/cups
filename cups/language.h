@@ -1,5 +1,5 @@
 /*
- * "$Id: language.h,v 1.7 1999/06/15 20:39:59 mike Exp $"
+ * "$Id: language.h,v 1.8 1999/06/18 18:36:10 mike Exp $"
  *
  *   Multi-language support for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -182,5 +182,5 @@ extern cups_lang_t	*cupsLangGet(char *language);
 #endif /* !_CUPS_LANGUAGE_H_ */
 
 /*
- * End of "$Id: language.h,v 1.7 1999/06/15 20:39:59 mike Exp $".
+ * End of "$Id: language.h,v 1.8 1999/06/18 18:36:10 mike Exp $".
  */

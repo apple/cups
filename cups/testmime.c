@@ -1,5 +1,5 @@
 /*
- * "$Id: testmime.c,v 1.5 1999/03/01 20:51:54 mike Exp $"
+ * "$Id: testmime.c,v 1.6 1999/06/18 18:36:12 mike Exp $"
  *
  *   MIME test program for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -195,5 +195,5 @@ print_rules(mime_magic_t *rules)	/* I - Rules to print */
 
 
 /*
- * End of "$Id: testmime.c,v 1.5 1999/03/01 20:51:54 mike Exp $".
+ * End of "$Id: testmime.c,v 1.6 1999/06/18 18:36:12 mike Exp $".
  */

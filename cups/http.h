@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.18 1999/06/15 20:39:58 mike Exp $"
+ * "$Id: http.h,v 1.19 1999/06/18 18:36:09 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -15,7 +15,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -313,5 +313,5 @@ extern int		httpGetLength(http_t *http);
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.18 1999/06/15 20:39:58 mike Exp $".
+ * End of "$Id: http.h,v 1.19 1999/06/18 18:36:09 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.h,v 1.8 1999/05/26 20:05:05 mike Exp $"
+ * "$Id: job.h,v 1.9 1999/06/18 18:36:48 mike Exp $"
  *
  *   Print job definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -71,5 +71,5 @@ extern void	StopJob(int id);
 extern void	UpdateJob(job_t *job);
 
 /*
- * End of "$Id: job.h,v 1.8 1999/05/26 20:05:05 mike Exp $".
+ * End of "$Id: job.h,v 1.9 1999/06/18 18:36:48 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.19 1999/06/09 20:07:03 mike Exp $"
+ * "$Id: dirsvc.c,v 1.20 1999/06/18 18:36:46 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -427,5 +427,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.19 1999/06/09 20:07:03 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.20 1999/06/18 18:36:46 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.5 1999/06/15 20:38:51 mike Exp $"
+ * "$Id: lpd.c,v 1.6 1999/06/18 18:36:02 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -389,5 +389,5 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
 
 /*
- * End of "$Id: lpd.c,v 1.5 1999/06/15 20:38:51 mike Exp $".
+ * End of "$Id: lpd.c,v 1.6 1999/06/18 18:36:02 mike Exp $".
  */

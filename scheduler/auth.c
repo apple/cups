@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.12 1999/05/20 18:43:05 mike Exp $"
+ * "$Id: auth.c,v 1.13 1999/06/18 18:36:43 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -576,5 +576,5 @@ check_auth(unsigned   ip,	/* I - Client address */
 
 
 /*
- * End of "$Id: auth.c,v 1.12 1999/05/20 18:43:05 mike Exp $".
+ * End of "$Id: auth.c,v 1.13 1999/06/18 18:36:43 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: string.c,v 1.2 1999/03/01 20:51:53 mike Exp $"
+ * "$Id: string.c,v 1.3 1999/06/18 18:36:11 mike Exp $"
  *
  *   String functions for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -121,5 +121,5 @@ strncasecmp(const char *s,	/* I - First string */
 
 
 /*
- * End of "$Id: string.c,v 1.2 1999/03/01 20:51:53 mike Exp $".
+ * End of "$Id: string.c,v 1.3 1999/06/18 18:36:11 mike Exp $".
  */

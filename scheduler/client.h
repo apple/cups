@@ -1,5 +1,5 @@
 /*
- * "$Id: client.h,v 1.4 1999/03/01 22:26:16 mike Exp $"
+ * "$Id: client.h,v 1.5 1999/06/18 18:36:45 mike Exp $"
  *
  *   Client definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -91,5 +91,5 @@ extern void	StopListening(void);
 extern int	WriteClient(client_t *con);
 
 /*
- * End of "$Id: client.h,v 1.4 1999/03/01 22:26:16 mike Exp $".
+ * End of "$Id: client.h,v 1.5 1999/06/18 18:36:45 mike Exp $".
  */

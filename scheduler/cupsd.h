@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.9 1999/05/18 21:21:50 mike Exp $"
+ * "$Id: cupsd.h,v 1.10 1999/06/18 18:36:46 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -135,5 +135,5 @@ VAR int			NeedReload	VALUE(TRUE);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.9 1999/05/18 21:21:50 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.10 1999/06/18 18:36:46 mike Exp $".
  */
