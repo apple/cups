@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.46 2001/07/21 12:48:15 mike Exp $"
+ * "$Id: gdevcups.c,v 1.47 2001/10/31 18:17:26 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -1492,8 +1492,7 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   gs_param_string	stringval;	/* String value */
   gs_param_float_array	arrayval;	/* Float array value */
   int			old_depth;	/* Old color depth */
-  int			old_width;	/* Old bitmap width */
-  int			old_height;	/* Old bitmap height */
+  int			size_set;	/* Was the size set? */
   gdev_prn_space_params	sp;		/* Space parameter data */
 
 
@@ -1571,9 +1570,8 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
       cups->header.name[i] = (unsigned)arrayval.data[i]; \
   }
 
-  old_depth  = pdev->color_info.depth;
-  old_width  = pdev->width;
-  old_height = pdev->height;
+  old_depth = pdev->color_info.depth;
+  size_set  = param_read_float_array(plist, "PageSize", &arrayval) == 0;
 
   stringoption(MediaClass, "MediaClass")
   stringoption(MediaColor, "MediaColor")
@@ -1696,14 +1694,12 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   cups->header.PageSize[1] = pdev->PageSize[1];
 
  /*
-  * Reallocate memory as required...
+  * Reallocate memory if the size or color depth was changed...
   */
 
-  if (old_depth != pdev->color_info.depth ||
-      old_width != pdev->width ||
-      old_height != pdev->height)
+  if (old_depth != pdev->color_info.depth || size_set)
   {
-    fputs("DEBUG: Reallocating memory for new color depth...\n", stderr);
+    fputs("DEBUG: Reallocating memory...\n", stderr);
     sp = ((gx_device_printer *)pdev)->space_params;
 
     if ((code = gdev_prn_reallocate_memory(pdev, &sp, pdev->width,
@@ -3055,5 +3051,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.46 2001/07/21 12:48:15 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.47 2001/10/31 18:17:26 mike Exp $".
  */

@@ -1,4 +1,4 @@
-CHANGES.txt - 10/29/2001
+CHANGES.txt - 10/31/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.11
@@ -104,6 +104,11 @@ CHANGES IN CUPS V1.1.11
 	- The httpConnect*() functions now try all available
 	  addresses for a host when connecting for the first
 	  time.
+	- The pstoraster filter would "lose" all drawing
+	  commands when the PageSize was set but the printer
+	  bitmap was  not reallocated.  This was most noticeable
+	  with the output from StarOffice 6 beta and would
+	  result in a blank page being output...
 
 
 CHANGES IN CUPS V1.1.10-1
