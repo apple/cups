@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.71 2004/02/25 20:14:53 mike Exp $"
+ * "$Id: auth.c,v 1.72 2004/05/13 15:13:42 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -713,13 +713,35 @@ FindBest(const char   *path,	/* I - Resource path */
     LogMessage(L_DEBUG2, "FindBest: Location %s Limit %x",
                loc->location, loc->limit);
 
-    if (loc->length > bestlen &&
-        strncmp(uri, loc->location, loc->length) == 0 &&
-	loc->location[0] == '/' &&
-	(limit & loc->limit) != 0)
+    if (!strncmp(uri, "/printers/", 10) ||!strncmp(uri, "/classes/", 9))
     {
-      best    = loc;
-      bestlen = loc->length;
+     /*
+      * Use case-insensitive comparison for queue names...
+      */
+
+      if (loc->length > bestlen &&
+          strncasecmp(uri, loc->location, loc->length) == 0 &&
+	  loc->location[0] == '/' &&
+	  (limit & loc->limit) != 0)
+      {
+	best    = loc;
+	bestlen = loc->length;
+      }
+    }
+    else
+    {
+     /*
+      * Use case-sensitive comparison for other URIs...
+      */
+
+      if (loc->length > bestlen &&
+          strncmp(uri, loc->location, loc->length) == 0 &&
+	  loc->location[0] == '/' &&
+	  (limit & loc->limit) != 0)
+      {
+	best    = loc;
+	bestlen = loc->length;
+      }
     }
   }
 
@@ -1643,5 +1665,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.71 2004/02/25 20:14:53 mike Exp $".
+ * End of "$Id: auth.c,v 1.72 2004/05/13 15:13:42 mike Exp $".
  */

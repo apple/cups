@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-unix.c,v 1.3 2004/04/01 18:59:59 mike Exp $"
+ * "$Id: usb-unix.c,v 1.4 2004/05/13 15:13:42 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -184,6 +184,8 @@ print_device(const char *uri,		/* I - Device URI */
   * Finally, send the print file...
   */
 
+  wbytes = 0;
+
   while (copies > 0)
   {
     copies --;
@@ -236,7 +238,7 @@ print_device(const char *uri,		/* I - Device URI */
 
   close(fd);
 
-  return (0);
+  return (wbytes < 0);
 }
 
 
@@ -801,5 +803,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb-unix.c,v 1.3 2004/04/01 18:59:59 mike Exp $".
+ * End of "$Id: usb-unix.c,v 1.4 2004/05/13 15:13:42 mike Exp $".
  */
