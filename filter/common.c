@@ -1,5 +1,5 @@
 /*
- * "$Id: common.c,v 1.10 2000/01/04 13:45:42 mike Exp $"
+ * "$Id: common.c,v 1.11 2000/09/06 14:29:13 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -153,13 +153,13 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
           PageBottom = (float)atof(val);
 	  break;
       case 1 :
-          PageRight = PageWidth - (float)atof(val);
+          PageLeft = (float)atof(val);
 	  break;
       case 2 :
           PageTop = PageLength - (float)atof(val);
 	  break;
       case 3 :
-          PageLeft = (float)atof(val);
+          PageRight = PageWidth - (float)atof(val);
 	  break;
     }
   }
@@ -172,13 +172,13 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
           PageTop = PageLength - (float)atof(val);
 	  break;
       case 1 :
-          PageLeft = (float)atof(val);
+          PageRight = PageWidth - (float)atof(val);
 	  break;
       case 2 :
           PageBottom = (float)atof(val);
 	  break;
       case 3 :
-          PageRight = PageWidth - (float)atof(val);
+          PageLeft = (float)atof(val);
 	  break;
     }
   }
@@ -251,5 +251,5 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
 
 
 /*
- * End of "$Id: common.c,v 1.10 2000/01/04 13:45:42 mike Exp $".
+ * End of "$Id: common.c,v 1.11 2000/09/06 14:29:13 mike Exp $".
  */
