@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.5 1998/07/28 20:48:30 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.6 1998/08/10 16:20:08 mike Exp $"
  *
  *   Image file to STIFF conversion program for espPrint, a collection
  *   of printer drivers.
@@ -17,7 +17,10 @@
  * Revision History:
  *
  *   $Log: imagetoraster.c,v $
- *   Revision 1.5  1998/07/28 20:48:30  mike
+ *   Revision 1.6  1998/08/10 16:20:08  mike
+ *   Fixed scaling problems.
+ *
+ *   Revision 1.5  1998/07/28  20:48:30  mike
  *   Updated size/page computation code to work properly.
  *
  *   Revision 1.4  1998/07/28  18:49:15  mike
@@ -383,7 +386,8 @@ main(int  argc,		/* I - Number of command-line arguments */
               if (i >= argc)
                 usage();
 
-              width = atoi(argv[i]);
+              width    = atoi(argv[i]);
+	      variable = 0;
               break;
 
           case 'H' : /* Pixel height */
@@ -391,7 +395,8 @@ main(int  argc,		/* I - Number of command-line arguments */
               if (i >= argc)
                 usage();
 
-              height = atoi(argv[i]);
+              height   = atoi(argv[i]);
+	      variable = 0;
               break;
 
           case 'M' : /* Model (PostScript Level) */
@@ -593,29 +598,27 @@ main(int  argc,		/* I - Number of command-line arguments */
     * Scale the image as neccesary to match the desired pixels-per-inch.
     */
     
-    xinches = (float)img->xsize / (float)xppi;
-    yinches = (float)img->ysize / (float)yppi;
 
     if (rotation == 0)
     {
-      xzoom = xinches / xprint;
-      yzoom = yinches / yprint;
+      xinches = (float)img->xsize / (float)xppi;
+      yinches = (float)img->ysize / (float)yppi;
     }
     else if (rotation == 1)
     {
-      xzoom = yinches / xprint;
-      yzoom = xinches / yprint;
+      xinches = (float)img->ysize / (float)yppi;
+      yinches = (float)img->xsize / (float)xppi;
     }
     else
     {
-      xzoom = xinches / xprint;
-      yzoom = yinches / yprint;
+      xinches  = (float)img->xsize / (float)xppi;
+      yinches  = (float)img->ysize / (float)yppi;
       rotation = 0;
 
       if (xinches > xprint && xinches <= yprint)
       {
-	xzoom = yinches / xprint;
-	yzoom = xinches / yprint;
+	xinches  = (float)img->ysize / (float)yppi;
+	yinches  = (float)img->xsize / (float)xppi;
         rotation = 1;
       };
     };
@@ -630,6 +633,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     {
       xsize = xprint * xzoom;
       ysize = xsize * img->ysize / img->xsize;
+
       if (ysize > (yprint * yzoom))
       {
         ysize = yprint * yzoom;
@@ -638,18 +642,20 @@ main(int  argc,		/* I - Number of command-line arguments */
     }
     else if (rotation == 1)
     {
-      xsize = xprint * xzoom;
-      ysize = xsize * img->xsize / img->ysize;
-      if (ysize > (yprint * yzoom))
+      ysize = xprint * yzoom;
+      xsize = ysize * img->xsize / img->ysize;
+
+      if (xsize > (yprint * xzoom))
       {
-        ysize = yprint * yzoom;
-        xsize = ysize * img->ysize / img->xsize;
+        xsize = yprint * xzoom;
+        ysize = xsize * img->ysize / img->xsize;
       };
     }
     else
     {
       xsize = xprint * xzoom;
       ysize = xsize * img->ysize / img->xsize;
+
       if (ysize > (yprint * yzoom))
       {
         ysize = yprint * yzoom;
@@ -658,6 +664,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
       ytemp = xprint * yzoom;
       xtemp = ytemp * img->xsize / img->ysize;
+
       if (xtemp > (yprint * xzoom))
       {
         xtemp = yprint * xzoom;
@@ -675,8 +682,16 @@ main(int  argc,		/* I - Number of command-line arguments */
         rotation = 0;
     };
 
-    xinches = xsize;
-    yinches = ysize;
+    if (rotation)
+    {
+      xinches = ysize;
+      yinches = xsize;
+    }
+    else
+    {
+      xinches = xsize;
+      yinches = ysize;
+    };
   };
 
   xpages = ceil(xinches / xprint);
@@ -1126,5 +1141,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.5 1998/07/28 20:48:30 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.6 1998/08/10 16:20:08 mike Exp $".
  */
