@@ -1,4 +1,4 @@
-CHANGES.txt - 11/06/2000
+CHANGES.txt - 11/10/2000
 ------------------------
 
 CHANGES IN CUPS V1.1.5
@@ -82,6 +82,17 @@ CHANGES IN CUPS V1.1.5
 	- The LoadPPDs() function in the scheduler didn't
 	  properly set the alloc_ppds variable or handle
 	  a PPD database containing 0 printers.
+	- The scheduler FindAvailablePrinter() function
+	  didn't use the same queuing logic as the
+	  CheckJobs() function.  This caused classes to
+	  stall if a remote printer was always busy.
+	- Jobs are now assigned to printers in a class
+	  round-robin style.  This should prevent the
+	  first server in the class from bearing the
+	  brunt of the jobs.
+	- The scheduler's LoadAllJobs() function didn't
+	  always restore remote printers for queued jobs
+	  on startup.
 
 
 CHANGES IN CUPS v1.1.4

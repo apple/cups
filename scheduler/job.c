@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.95 2000/11/06 16:18:12 mike Exp $"
+ * "$Id: job.c,v 1.96 2000/11/10 15:32:40 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -465,7 +465,8 @@ LoadAllJobs(void)
                    &port, resource);
 
       if ((dest = ValidateDest(host, resource, &(job->dtype))) == NULL)
-        if (strchr(resource, '@') != NULL)
+        if (strcasecmp(host, "localhost") != 0 &&
+	    strcasecmp(host, ServerName) != 0)
 	{
 	 /*
 	  * Job queued on remote printer or class, so add it...
@@ -2589,5 +2590,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.95 2000/11/06 16:18:12 mike Exp $".
+ * End of "$Id: job.c,v 1.96 2000/11/10 15:32:40 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h,v 1.18 2000/09/14 16:38:36 mike Exp $"
+ * "$Id: printers.h,v 1.19 2000/11/10 15:32:40 mike Exp $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -49,7 +49,8 @@ typedef struct printer_str
   mime_type_t	*filetype;		/* Pseudo-filetype for printer */
   void		*job;			/* Current job in queue */
   ipp_t		*attrs;			/* Attributes supported by this printer */
-  int		num_printers;		/* Number of printers in class */
+  int		num_printers,		/* Number of printers in class */
+		last_printer;		/* Last printer job was sent to */
   struct printer_str **printers;	/* Printers in class */
 } printer_t;
 
@@ -85,5 +86,5 @@ extern const char	*ValidateDest(const char *hostname,
 
 
 /*
- * End of "$Id: printers.h,v 1.18 2000/09/14 16:38:36 mike Exp $".
+ * End of "$Id: printers.h,v 1.19 2000/11/10 15:32:40 mike Exp $".
  */
