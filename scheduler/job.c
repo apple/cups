@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.54 2000/02/11 05:04:14 mike Exp $"
+ * "$Id: job.c,v 1.55 2000/03/09 20:13:28 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1374,7 +1374,8 @@ ipp_read_file(const char *filename,	/* I - File to read from */
 {
   int			fd;		/* File descriptor for file */
   int			n;		/* Length of data */
-  unsigned char		buffer[8192];	/* Data buffer */
+  unsigned char		buffer[8192],	/* Data buffer */
+			*bufptr;	/* Pointer into buffer */
   ipp_attribute_t	*attr;		/* Current attribute */
   ipp_tag_t		tag;		/* Current tag */
 
@@ -1407,7 +1408,7 @@ ipp_read_file(const char *filename,	/* I - File to read from */
 
         if ((n = read(fd, buffer, 8)) < 8)
 	{
-	  DEBUG_printf(("ippRead: Unable to read header (%d bytes read)!\n", n));
+	  DEBUG_printf(("ipp_read_file: Unable to read header (%d bytes read)!\n", n));
 	  close(fd);
 	  return (n == 0 ? IPP_IDLE : IPP_ERROR);
 	}
@@ -1418,7 +1419,7 @@ ipp_read_file(const char *filename,	/* I - File to read from */
 
 	if (buffer[0] != 1)
 	{
-	  DEBUG_printf(("ippRead: version number (%d.%d) is bad.\n", buffer[0],
+	  DEBUG_printf(("ipp_read_file: version number (%d.%d) is bad.\n", buffer[0],
 	                buffer[1]));
 	  close(fd);
 	  return (IPP_ERROR);
@@ -1453,7 +1454,7 @@ ipp_read_file(const char *filename,	/* I - File to read from */
 	    * No more attributes left...
 	    */
 
-            DEBUG_puts("ippRead: IPP_TAG_END!");
+            DEBUG_puts("ipp_read_file: IPP_TAG_END!");
 
 	    ipp->state = IPP_DATA;
 	    break;
@@ -1469,11 +1470,11 @@ ipp_read_file(const char *filename,	/* I - File to read from */
 
 	    ipp->curtag  = tag;
 	    ipp->current = NULL;
-	    DEBUG_printf(("ippRead: group tag = %x\n", tag));
+	    DEBUG_printf(("ipp_read_file: group tag = %x\n", tag));
 	    continue;
 	  }
 
-          DEBUG_printf(("ippRead: value tag = %x\n", tag));
+          DEBUG_printf(("ipp_read_file: value tag = %x\n", tag));
 
          /*
 	  * Get the name...
@@ -1481,14 +1482,14 @@ ipp_read_file(const char *filename,	/* I - File to read from */
 
           if (read(fd, buffer, 2) < 2)
 	  {
-	    DEBUG_puts("ippRead: unable to read name length!");
+	    DEBUG_puts("ipp_read_file: unable to read name length!");
 	    close(fd);
 	    return (IPP_ERROR);
 	  }
 
           n = (buffer[0] << 8) | buffer[1];
 
-          DEBUG_printf(("ippRead: name length = %d\n", n));
+          DEBUG_printf(("ipp_read_file: name length = %d\n", n));
 
           if (n == 0)
 	  {
@@ -1518,13 +1519,13 @@ ipp_read_file(const char *filename,	/* I - File to read from */
 
 	    if (read(fd, buffer, n) < n)
 	    {
-	      DEBUG_puts("ippRead: unable to read name!");
+	      DEBUG_puts("ipp_read_file: unable to read name!");
 	      close(fd);
 	      return (IPP_ERROR);
 	    }
 
 	    buffer[n] = '\0';
-	    DEBUG_printf(("ippRead: name = \'%s\'\n", buffer));
+	    DEBUG_printf(("ipp_read_file: name = \'%s\'\n", buffer));
 
 	    attr = ipp->current = _ipp_add_attr(ipp, IPP_MAX_VALUES);
 
@@ -1536,13 +1537,13 @@ ipp_read_file(const char *filename,	/* I - File to read from */
 
 	  if (read(fd, buffer, 2) < 2)
 	  {
-	    DEBUG_puts("ippRead: unable to read value length!");
+	    DEBUG_puts("ipp_read_file: unable to read value length!");
 	    close(fd);
 	    return (IPP_ERROR);
 	  }
 
 	  n = (buffer[0] << 8) | buffer[1];
-          DEBUG_printf(("ippRead: value length = %d\n", n));
+          DEBUG_printf(("ipp_read_file: value length = %d\n", n));
 
 	  switch (tag)
 	  {
@@ -1584,7 +1585,7 @@ ipp_read_file(const char *filename,	/* I - File to read from */
 	        }
 
                 buffer[n] = '\0';
-		DEBUG_printf(("ippRead: value = \'%s\'\n", buffer));
+		DEBUG_printf(("ipp_read_file: value = \'%s\'\n", buffer));
 
                 attr->values[attr->num_values].string.text = strdup((char *)buffer);
 	        break;
@@ -1630,32 +1631,47 @@ ipp_read_file(const char *filename,	/* I - File to read from */
 	    case IPP_TAG_TEXTLANG :
 	    case IPP_TAG_NAMELANG :
 	        if (read(fd, buffer, n) < n)
-	        {
-	          close(fd);
-                  return (IPP_ERROR);
-	        }
+		  return (IPP_ERROR);
 
-                buffer[n] = '\0';
+                bufptr = buffer;
 
-                attr->values[attr->num_values].string.charset = strdup((char *)buffer);
+	       /*
+	        * text-with-language and name-with-language are composite
+		* values:
+		*
+		*    charset-length
+		*    charset
+		*    text-length
+		*    text
+		*/
 
-	        if (read(fd, buffer, 2) < 2)
-	        {
-	          close(fd);
-                  return (IPP_ERROR);
-	        }
+		n = (bufptr[0] << 8) | bufptr[1];
 
-		n = (buffer[0] << 8) | buffer[1];
+                attr->values[attr->num_values].string.charset = calloc(n + 1, 1);
 
-	        if (read(fd, buffer, n) < n)
-	        {
-	          close(fd);
-                  return (IPP_ERROR);
-	        }
+		memcpy(attr->values[attr->num_values].string.charset,
+		       bufptr + 2, n);
 
-                buffer[n] = '\0';
+                bufptr += 2 + n;
+		n = (bufptr[0] << 8) | bufptr[1];
 
-                attr->values[attr->num_values].string.text = strdup((char *)buffer);
+                attr->values[attr->num_values].string.text = calloc(n + 1, 1);
+
+		memcpy(attr->values[attr->num_values].string.text,
+		       bufptr + 2, n);
+
+	        break;
+
+            default : /* Other unsupported values */
+                attr->values[attr->num_values].unknown.length = n;
+	        if (n > 0)
+		{
+		  attr->values[attr->num_values].unknown.data = malloc(n);
+	          if (read(fd, attr->values[attr->num_values].unknown.data, n) < n)
+		    return (IPP_ERROR);
+		}
+		else
+		  attr->values[attr->num_values].unknown.data = NULL;
 	        break;
 	  }
 
@@ -1735,7 +1751,7 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 
         if (write(fd, (char *)buffer, bufptr - buffer) < 0)
 	{
-	  DEBUG_puts("ippWrite: Could not write IPP header...");
+	  DEBUG_puts("ipp_write_file: Could not write IPP header...");
 	  close(fd);
 	  return (IPP_ERROR);
 	}
@@ -1767,14 +1783,14 @@ ipp_write_file(const char *filename,	/* I - File to write to */
             if (attr->group_tag == IPP_TAG_ZERO)
 	      continue;
 
-            DEBUG_printf(("ippWrite: wrote group tag = %x\n", attr->group_tag));
+            DEBUG_printf(("ipp_write_file: wrote group tag = %x\n", attr->group_tag));
 	    *bufptr++ = attr->group_tag;
 	  }
 
           n = strlen(attr->name);
 
-          DEBUG_printf(("ippWrite: writing value tag = %x\n", attr->value_tag));
-          DEBUG_printf(("ippWrite: writing name = %d, \'%s\'\n", n, attr->name));
+          DEBUG_printf(("ipp_write_file: writing value tag = %x\n", attr->value_tag));
+          DEBUG_printf(("ipp_write_file: writing name = %d, \'%s\'\n", n, attr->name));
 
           *bufptr++ = attr->value_tag;
 	  *bufptr++ = n >> 8;
@@ -1848,9 +1864,9 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 		    * values with a zero-length name...
 		    */
 
-        	    DEBUG_printf(("ippWrite: writing value tag = %x\n",
+        	    DEBUG_printf(("ipp_write_file: writing value tag = %x\n",
 		                  attr->value_tag));
-        	    DEBUG_printf(("ippWrite: writing name = 0, \'\'\n"));
+        	    DEBUG_printf(("ipp_write_file: writing name = 0, \'\'\n"));
 
                     *bufptr++ = attr->value_tag;
 		    *bufptr++ = 0;
@@ -1859,14 +1875,14 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 
                   n = strlen(attr->values[i].string.text);
 
-                  DEBUG_printf(("ippWrite: writing string = %d, \'%s\'\n", n,
+                  DEBUG_printf(("ipp_write_file: writing string = %d, \'%s\'\n", n,
 		                attr->values[i].string.text));
 
                   if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
 		  {
                     if (write(fd, (char *)buffer, bufptr - buffer) < 0)
 	            {
-	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              DEBUG_puts("ipp_write_file: Could not write IPP attribute...");
 	              close(fd);
 	              return (IPP_ERROR);
 	            }
@@ -1976,52 +1992,84 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 		    *bufptr++ = 0;
 		  }
 
-                  n = strlen(attr->values[i].string.charset);
+                  n = strlen(attr->values[i].string.charset) +
+		      strlen(attr->values[i].string.text) +
+		      2;
 
                   if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
 		  {
                     if (write(fd, (char *)buffer, bufptr - buffer) < 0)
 	            {
-	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
-	              close(fd);
+	              DEBUG_puts("ipp_write_file: Could not write IPP attribute...");
 	              return (IPP_ERROR);
 	            }
 
 		    bufptr = buffer;
 		  }
 
+                 /* Length of entire value */
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
+
+                 /* Length of charset */
+                  n = strlen(attr->values[i].string.charset);
+	          *bufptr++ = n >> 8;
+		  *bufptr++ = n;
+
+                 /* Charset */
 		  memcpy(bufptr, attr->values[i].string.charset, n);
 		  bufptr += n;
 
+                 /* Length of text */
                   n = strlen(attr->values[i].string.text);
-
-                  if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
-		  {
-                    if (write(fd, (char *)buffer, bufptr - buffer) < 0)
-	            {
-	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
-	              close(fd);
-	              return (IPP_ERROR);
-	            }
-
-		    bufptr = buffer;
-		  }
-
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
+
+                 /* Text */
 		  memcpy(bufptr, attr->values[i].string.text, n);
 		  bufptr += n;
 		}
 		break;
 
-            case IPP_TAG_UNSUPPORTED_VALUE :
-	    case IPP_TAG_DEFAULT :
-	    case IPP_TAG_UNKNOWN :
-	    case IPP_TAG_NOVALUE :
-	        *bufptr++ = 0;
-		*bufptr++ = 0;
+            default :
+	        for (i = 0; i < attr->num_values; i ++)
+		{
+		  if (i)
+		  {
+		   /*
+		    * Arrays and sets are done by sending additional
+		    * values with a zero-length name...
+		    */
+
+                    *bufptr++ = attr->value_tag;
+		    *bufptr++ = 0;
+		    *bufptr++ = 0;
+		  }
+
+                  n = attr->values[i].unknown.length;
+
+                  if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
+		  {
+                    if (write(fd, (char *)buffer, bufptr - buffer) < 0)
+	            {
+	              DEBUG_puts("ipp_write_file: Could not write IPP attribute...");
+	              return (IPP_ERROR);
+	            }
+
+		    bufptr = buffer;
+		  }
+
+                 /* Length of unknown value */
+	          *bufptr++ = n >> 8;
+		  *bufptr++ = n;
+
+                 /* Value */
+		  if (n > 0)
+		  {
+		    memcpy(bufptr, attr->values[i].unknown.data, n);
+		    bufptr += n;
+		  }
+		}
 		break;
 	  }
 
@@ -2031,12 +2079,12 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 
           if (write(fd, (char *)buffer, bufptr - buffer) < 0)
 	  {
-	    DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	    DEBUG_puts("ipp_write_file: Could not write IPP attribute...");
 	    close(fd);
 	    return (IPP_ERROR);
 	  }
 
-          DEBUG_printf(("ippWrite: wrote %d bytes\n", bufptr - buffer));
+          DEBUG_printf(("ipp_write_file: wrote %d bytes\n", bufptr - buffer));
 	}
 
 	if (ipp->current == NULL)
@@ -2048,7 +2096,7 @@ ipp_write_file(const char *filename,	/* I - File to write to */
           buffer[0] = IPP_TAG_END;
 	  if (write(fd, (char *)buffer, 1) < 0)
 	  {
-	    DEBUG_puts("ippWrite: Could not write IPP end-tag...");
+	    DEBUG_puts("ipp_write_file: Could not write IPP end-tag...");
 	    close(fd);
 	    return (IPP_ERROR);
 	  }
@@ -2175,5 +2223,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.54 2000/02/11 05:04:14 mike Exp $".
+ * End of "$Id: job.c,v 1.55 2000/03/09 20:13:28 mike Exp $".
  */

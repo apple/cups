@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.33 2000/02/08 20:38:46 mike Exp $"
+ * "$Id: ipp.c,v 1.34 2000/03/09 20:13:28 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -767,10 +767,15 @@ ippLength(ipp_t *ipp)		/* I - IPP request */
 
       case IPP_TAG_TEXTLANG :
       case IPP_TAG_NAMELANG :
-          bytes += 2 * attr->num_values;/* Charset length */
+          bytes += 4 * attr->num_values;/* Charset + text length */
           for (i = 0; i < attr->num_values; i ++)
 	    bytes += strlen(attr->values[i].string.charset) +
 	             strlen(attr->values[i].string.text);
+	  break;
+
+      default :
+          for (i = 0; i < attr->num_values; i ++)
+            bytes += attr->values[0].unknown.length;
 	  break;
     }
   }
@@ -818,7 +823,8 @@ ippRead(http_t *http,		/* I - HTTP data */
         ipp_t  *ipp)		/* I - IPP data */
 {
   int			n;		/* Length of data */
-  unsigned char		buffer[8192];	/* Data buffer */
+  unsigned char		buffer[8192],	/* Data buffer */
+			*bufptr;	/* Pointer into buffer */
   ipp_attribute_t	*attr;		/* Current attribute */
   ipp_tag_t		tag;		/* Current tag */
 
@@ -1043,21 +1049,45 @@ ippRead(http_t *http,		/* I - HTTP data */
 	        if (ipp_read(http, buffer, n) < n)
 		  return (IPP_ERROR);
 
-                buffer[n] = '\0';
+                bufptr = buffer;
 
-                attr->values[attr->num_values].string.charset = strdup((char *)buffer);
+	       /*
+	        * text-with-language and name-with-language are composite
+		* values:
+		*
+		*    charset-length
+		*    charset
+		*    text-length
+		*    text
+		*/
 
-	        if (ipp_read(http, buffer, 2) < 2)
-		  return (IPP_ERROR);
+		n = (bufptr[0] << 8) | bufptr[1];
 
-		n = (buffer[0] << 8) | buffer[1];
+                attr->values[attr->num_values].string.charset = calloc(n + 1, 1);
 
-	        if (ipp_read(http, buffer, n) < n)
-		  return (IPP_ERROR);
+		memcpy(attr->values[attr->num_values].string.charset,
+		       bufptr + 2, n);
 
-                buffer[n] = '\0';
+                bufptr += 2 + n;
+		n = (bufptr[0] << 8) | bufptr[1];
 
-                attr->values[attr->num_values].string.text = strdup((char *)buffer);
+                attr->values[attr->num_values].string.text = calloc(n + 1, 1);
+
+		memcpy(attr->values[attr->num_values].string.text,
+		       bufptr + 2, n);
+
+	        break;
+
+            default : /* Other unsupported values */
+                attr->values[attr->num_values].unknown.length = n;
+	        if (n > 0)
+		{
+		  attr->values[attr->num_values].unknown.data = malloc(n);
+	          if (ipp_read(http, attr->values[attr->num_values].unknown.data, n) < n)
+		    return (IPP_ERROR);
+		}
+		else
+		  attr->values[attr->num_values].unknown.data = NULL;
 	        break;
 	  }
 
@@ -1414,7 +1444,9 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		    *bufptr++ = 0;
 		  }
 
-                  n = strlen(attr->values[i].string.charset);
+                  n = strlen(attr->values[i].string.charset) +
+		      strlen(attr->values[i].string.text) +
+		      2;
 
                   if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
 		  {
@@ -1427,37 +1459,69 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		    bufptr = buffer;
 		  }
 
+                 /* Length of entire value */
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
+
+                 /* Length of charset */
+                  n = strlen(attr->values[i].string.charset);
+	          *bufptr++ = n >> 8;
+		  *bufptr++ = n;
+
+                 /* Charset */
 		  memcpy(bufptr, attr->values[i].string.charset, n);
 		  bufptr += n;
 
+                 /* Length of text */
                   n = strlen(attr->values[i].string.text);
-
-                  if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
-		  {
-                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
-	            {
-	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
-	              return (IPP_ERROR);
-	            }
-
-		    bufptr = buffer;
-		  }
-
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
+
+                 /* Text */
 		  memcpy(bufptr, attr->values[i].string.text, n);
 		  bufptr += n;
 		}
 		break;
 
-            case IPP_TAG_UNSUPPORTED_VALUE :
-	    case IPP_TAG_DEFAULT :
-	    case IPP_TAG_UNKNOWN :
-	    case IPP_TAG_NOVALUE :
-	        *bufptr++ = 0;
-		*bufptr++ = 0;
+            default :
+	        for (i = 0; i < attr->num_values; i ++)
+		{
+		  if (i)
+		  {
+		   /*
+		    * Arrays and sets are done by sending additional
+		    * values with a zero-length name...
+		    */
+
+                    *bufptr++ = attr->value_tag;
+		    *bufptr++ = 0;
+		    *bufptr++ = 0;
+		  }
+
+                  n = attr->values[i].unknown.length;
+
+                  if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
+		  {
+                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+	            {
+	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              return (IPP_ERROR);
+	            }
+
+		    bufptr = buffer;
+		  }
+
+                 /* Length of unknown value */
+	          *bufptr++ = n >> 8;
+		  *bufptr++ = n;
+
+                 /* Value */
+		  if (n > 0)
+		  {
+		    memcpy(bufptr, attr->values[i].unknown.data, n);
+		    bufptr += n;
+		  }
+		}
 		break;
 	  }
 
@@ -1591,5 +1655,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.33 2000/02/08 20:38:46 mike Exp $".
+ * End of "$Id: ipp.c,v 1.34 2000/03/09 20:13:28 mike Exp $".
  */
