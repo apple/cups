@@ -1,9 +1,9 @@
 #
-# "$Id: cups.mak,v 1.1.2.3 2002/05/13 16:21:35 mike Exp $"
+# "$Id: cups.mak,v 1.1.2.4 2003/07/20 22:54:43 mike Exp $"
 #
 # CUPS driver makefile for Ghostscript.
 #
-# Copyright 2001-2002 by Easy Software Products.
+# Copyright 2001-2003 by Easy Software Products.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ cups_=	$(GLOBJ)gdevcups.$(OBJ)
 
 CUPSSERVER= $(install_prefix)`cups-config --serverbin`
 CUPSCONFIG= $(install_prefix)`cups-config --serverroot`
+CUPSDATA= $(install_prefix)`cups-config --datadir`
 
 $(DD)cups.dev:	$(cups_) $(GLD)page.dev
 	$(ADDMOD) $(DD)cups -lib cupsimage -lib cups
@@ -39,10 +40,14 @@ install:	install-cups
 install-cups:
 	-mkdir -p $(CUPSSERVER)/filter
 	$(INSTALL_PROGRAM) pstoraster/pstoraster $(CUPSSERVER)/filter
+	$(INSTALL_PROGRAM) pstoraster/pstopcl6 $(CUPSSERVER)/filter
 	-mkdir -p $(CUPSCONFIG)
 	$(INSTALL_DATA) pstoraster/pstoraster.convs $(CUPSCONFIG)
+	-mkdir -p $(CUPSDATA)/model
+	$(INSTALL_DATA) pstoraster/pxlcolor.ppd $(CUPSDATA)/model
+	$(INSTALL_DATA) pstoraster/pxlmono.ppd $(CUPSDATA)/model
 
 
 #
-# End of "$Id: cups.mak,v 1.1.2.3 2002/05/13 16:21:35 mike Exp $".
+# End of "$Id: cups.mak,v 1.1.2.4 2003/07/20 22:54:43 mike Exp $".
 #

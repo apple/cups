@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-# "$Id: pstoraster,v 1.1.2.3 2002/04/22 19:49:20 mike Exp $"
+# "$Id: pstoraster,v 1.1.2.4 2003/07/20 22:54:45 mike Exp $"
 #
 # CUPS filter script for Ghostscript.
 #
-# Copyright 2001-2002 by Easy Software Products.
+# Copyright 2001-2003 by Easy Software Products.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -48,5 +48,5 @@ done
 $bindir/gs $gsopts -sOUTPUTFILE="%stdout" $profile $6
 
 #
-# End of "$Id: pstoraster,v 1.1.2.3 2002/04/22 19:49:20 mike Exp $".
+# End of "$Id: pstoraster,v 1.1.2.4 2003/07/20 22:54:45 mike Exp $".
 #

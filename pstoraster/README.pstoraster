@@ -1,4 +1,4 @@
-README.pstoraster - 04/23/2002
+README.pstoraster - 07/20/2003
 ------------------------------
 
 INTRODUCTION
@@ -6,11 +6,13 @@ INTRODUCTION
     This directory contains the CUPS "driver" for GNU
     Ghostscript, the pstoraster script that is used to run
     Ghostscript as a CUPS filter, the pstoraster.convs file that
-    defines the PostScript to raster filter for CUPS drivers,
-    and a makefile fragment that adds the CUPS driver.
+    defines the PostScript to raster filter for CUPS drivers, a
+    makefile fragment that adds the CUPS driver, and the wrapper
+    script (pstopxl) and PPD files (pxl*.ppd) to support PCL
+    XL/PCL 6 printers.
 
     This software is included with both the CUPS and ESP
-    Ghostscript 7.05.1 distributions.  While the files will also
+    Ghostscript 7.07.1 distributions.  While the files will also
     compile with earlier versions of Ghostscript, there are bugs
     in older versions of GNU Ghostscript which may cause
     problems.
@@ -32,18 +34,21 @@ COMPILING ESP GHOSTSCRIPT WITH THE CUPS DRIVER
     the cupsd process, either by sending the HUP signal to the
     process or using the init script supplied with CUPS.
 
+    To use the PCL XL/PCL 6 drivers, make sure that you also
+    configure Ghostscript with the pxlmono and pxlcolor drivers.
+
 
 COMPILING GNU GHOSTSCRIPT WITH THE CUPS DRIVER
 
     Before configuring GNU Ghostscript, first copy this directory
     to the GNU Ghostscript source directory, e.g.:
 
-        cp -r pstoraster /some/path/to/ghostscript-7.05
+        cp -r pstoraster /some/path/to/ghostscript-7.07
 
     Next apply the patch:
 
-        cd /some/path/to/ghostscript-7.05
-        patch -p1 pstoraster/ghostscript-705.patch
+        cd /some/path/to/ghostscript-7.07
+        patch -p1 pstoraster/ghostscript-707.patch
 
     Finally, run the configure script to use the new Ghostscript
     with CUPS:
@@ -61,3 +66,6 @@ COMPILING GNU GHOSTSCRIPT WITH THE CUPS DRIVER
     Once you have compiled and installed Ghostscript, restart
     the cupsd process, either by sending the HUP signal to the
     process or using the init script supplied with CUPS.
+
+    To use the PCL XL/PCL 6 drivers, make sure that you also
+    configure Ghostscript with the pxlmono and pxlcolor drivers.

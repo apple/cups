@@ -1,8 +1,8 @@
 #!/bin/sh
 #
-# "$Id: pstoraster.in,v 1.3.2.2 2003/01/07 18:27:13 mike Exp $"
+# "$Id: pstoraster.in,v 1.3.2.3 2003/07/20 22:54:45 mike Exp $"
 #
-# CUPS filter script for Ghostscript.
+# CUPS raster filter script for Ghostscript.
 #
 # Copyright 2001-2003 by Easy Software Products.
 #
@@ -31,7 +31,7 @@ GS_LIB="${CUPS_FONTPATH:=/usr/share/cups/fonts}"
 export GS_LIB
 
 # Options we use with Ghostscript...
-gsopts="-dQUIET -dDEBUG -dPARANOIDSAFER -dNOPAUSE -dBATCH "
+gsopts="-dQUIET -dDEBUG -dPARANOIDSAFER -dNOPAUSE -dBATCH"
 gsopts="$gsopts -dNOMEDIAATTRS -sDEVICE=cups -sstdout=%stderr"
 
 # See if we have a profile=n,n,n,n,n,n,n,n,n,n,n option...
@@ -51,11 +51,12 @@ else
 	ifile="$6"
 fi
 
-echo DEBUG: Running $bindir/@GS@ $gsopts -sOUTPUTFILE="%stdout" -c "$profile" $ifile 1>&2
+echo INFO: Starting ESP Ghostscript 7.07.1... 1>&2
+echo DEBUG: Running $bindir/@GS@ $gsopts -sOUTPUTFILE="%stdout" -c"$profile" "$ifile" 1>&2
 
 # Now run Ghostscript...
-$bindir/@GS@ $gsopts -sOUTPUTFILE="%stdout" -c "$profile" $ifile
+$bindir/@GS@ $gsopts -sOUTPUTFILE="%stdout" -c"$profile" "$ifile"
 
 #
-# End of "$Id: pstoraster.in,v 1.3.2.2 2003/01/07 18:27:13 mike Exp $".
+# End of "$Id: pstoraster.in,v 1.3.2.3 2003/07/20 22:54:45 mike Exp $".
 #
