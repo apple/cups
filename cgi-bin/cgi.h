@@ -1,9 +1,9 @@
 /*
- * "$Id: cgi.h,v 1.8 1999/10/27 01:22:26 mike Exp $"
+ * "$Id: cgi.h,v 1.9 2000/01/18 15:33:39 mike Exp $"
  *
  *   CGI support library definitions.
  *
- *   Copyright 1997-1999 by Easy Software Products.
+ *   Copyright 1997-2000 by Easy Software Products.
  *
  *   This program is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU General Public License as published by the Free
@@ -77,5 +77,5 @@ extern void		cgiEMailClose(FILE *mail);
 #endif /* !_CGI_H_ */
 
 /*
- * End of "$Id: cgi.h,v 1.8 1999/10/27 01:22:26 mike Exp $".
+ * End of "$Id: cgi.h,v 1.9 2000/01/18 15:33:39 mike Exp $".
  */
