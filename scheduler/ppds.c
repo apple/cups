@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.11 2000/11/03 14:13:30 mike Exp $"
+ * "$Id: ppds.c,v 1.12 2000/11/07 16:15:49 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -134,18 +134,20 @@ LoadPPDs(const char *d)		/* I - Directory to scan... */
     else
       LogMessage(L_ERROR, "LoadPPDs: Unable to write %s...", filename);
   }
-  else
+  else if ((num_ppds = fileinfo.st_size / sizeof(ppd_info_t)) > 0)
   {
    /*
     * Load the ppds.dat file instead...
     */
 
-    num_ppds = fileinfo.st_size / sizeof(ppd_info_t);
+    alloc_ppds = num_ppds;
+
     if ((ppds = malloc(sizeof(ppd_info_t) * num_ppds)) == NULL)
     {
       LogMessage(L_ERROR, "LoadPPDs: Unable to allocate memory for %d PPD files!",
                  num_ppds);
-      num_ppds = 0;
+      num_ppds   = 0;
+      alloc_ppds = 0;
     }
     else if ((fp = fopen(filename, "rb")) != NULL)
     {
@@ -154,7 +156,10 @@ LoadPPDs(const char *d)		/* I - Directory to scan... */
       LogMessage(L_INFO, "LoadPPDs: Read %s...", filename);
     }
     else
+    {
       LogMessage(L_ERROR, "LoadPPDs: Unable to read %s...", filename);
+      num_ppds = 0;
+    }
   }
 
  /*
@@ -183,7 +188,10 @@ LoadPPDs(const char *d)		/* I - Directory to scan... */
   */
 
   if (alloc_ppds)
+  {
     free(ppds);
+    alloc_ppds = 0;
+  }
 }
 
 
@@ -647,5 +655,5 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * End of "$Id: ppds.c,v 1.11 2000/11/03 14:13:30 mike Exp $".
+ * End of "$Id: ppds.c,v 1.12 2000/11/07 16:15:49 mike Exp $".
  */

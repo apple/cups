@@ -79,6 +79,9 @@ CHANGES IN CUPS V1.1.5
 	  PCL job files.
 	- The mimeLoadType() function didn't handle the
           3-argument contains() function.
+	- The LoadPPDs() function in the scheduler didn't
+	  properly set the alloc_ppds variable or handle
+	  a PPD database containing 0 printers.
 
 
 CHANGES IN CUPS v1.1.4
