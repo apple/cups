@@ -1,8 +1,10 @@
-CHANGES.txt - 06/02/2003
+CHANGES.txt - 06/07/2003
 ------------------------
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The ppdEmitJCL() function wrote JCL commands to stdout
+	  instead of the passed file pointer (STR #142)
 	- The httpGets() function could, in certain states,
 	  block waiting for data (STR #132)
 	- The cupsEmitJCL() function not outputs an empty @PJL

@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.35 2003/06/02 20:24:00 mike Exp $"
+ * "$Id: emit.c,v 1.36 2003/06/07 15:37:41 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -622,10 +622,10 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
             job_id, user, temp);
   }
   else
-    fputs(ppd->jcl_begin, stdout);
+    fputs(ppd->jcl_begin, fp);
 
-  ppdEmit(ppd, stdout, PPD_ORDER_JCL);
-  fputs(ppd->jcl_ps, stdout);
+  ppdEmit(ppd, fp, PPD_ORDER_JCL);
+  fputs(ppd->jcl_ps, fp);
 
   return (0);
 }
@@ -724,5 +724,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c,v 1.35 2003/06/02 20:24:00 mike Exp $".
+ * End of "$Id: emit.c,v 1.36 2003/06/07 15:37:41 mike Exp $".
  */
