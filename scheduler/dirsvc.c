@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.16 2002/07/02 19:15:24 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.17 2002/09/24 18:42:53 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -180,7 +180,8 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
       * Force the URI to point to the real server...
       */
 
-      p->type = type;
+      p->type      = type;
+      p->accepting = 1;
       strlcpy(p->uri, uri, sizeof(p->uri));
       strlcpy(p->device_uri, uri, sizeof(p->device_uri));
       strlcpy(p->hostname, host, sizeof(p->hostname));
@@ -254,7 +255,8 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
       * Force the URI to point to the real server...
       */
 
-      p->type = type;
+      p->type      = type;
+      p->accepting = 1;
       strlcpy(p->hostname, host, sizeof(p->hostname));
       strlcpy(p->uri, uri, sizeof(p->uri));
       strlcpy(p->device_uri, uri, sizeof(p->device_uri));
@@ -268,7 +270,6 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
   */
 
   p->state       = state;
-  p->accepting   = state != IPP_PRINTER_STOPPED;
   p->browse_time = time(NULL);
 
   if (p->type != type)
@@ -1851,5 +1852,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.16 2002/07/02 19:15:24 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.17 2002/09/24 18:42:53 mike Exp $".
  */
