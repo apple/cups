@@ -77,7 +77,7 @@ The following non-CUPS documents are referenced by this document:
 	<LI>RFC 1179, Line Printer Daemon Protocol 
 </UL>
 
-<H1>3 - Local Access Risks</H1>
+<H1>Local Access Risks</H1>
 
 <P>Local access risks are those that can be exploited only with a local user
 account. This section does not address issues related to dissemination of the
@@ -93,13 +93,13 @@ are printed.
 <P>This problem can be alleviated by making the request directory readable only
 by the user specified in the CUPS configuration file.
 
-<H1>4 - Remote Access Risks</H1>
+<H1>Remote Access Risks</H1>
 
 <P>Remote access risks are those that can be exploited without a local user
 account and/or from a remote system. This section does not address issues
 related to network or firewall security.
 
-<H3>Denial of Service Attacks</H3>
+<H2>Denial of Service Attacks</H2>
 
 <P>Like all internet services, the CUPS server is vulnerable to denial of
 service attacks, including:
@@ -152,7 +152,7 @@ service attacks, including:
 
 </OL>
 
-<H3>Security Breaches</H3>
+<H2>Security Breaches</H2>
 
 <P>The current CUPS server only supports Basic authentication with
 usernames and passwords. This essentially places the clear text of the
