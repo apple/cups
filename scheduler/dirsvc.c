@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.56 2000/06/27 20:04:56 mike Exp $"
+ * "$Id: dirsvc.c,v 1.57 2000/08/30 20:24:53 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -350,9 +350,23 @@ UpdateBrowseList(void)
   hptr = strchr(host, '.');
   sptr = strchr(ServerName, '.');
 
-  if (hptr != NULL && sptr != NULL &&
-      strcasecmp(hptr, sptr) == 0)
-    *hptr = '\0';
+  if (sptr != NULL && hptr != NULL)
+  {
+   /*
+    * Strip the common domain name components...
+    */
+
+    while (hptr != NULL)
+    {
+      if (strcasecmp(hptr, sptr) == 0)
+      {
+        *hptr = '\0';
+	break;
+      }
+      else
+        hptr = strchr(hptr + 1, '.');
+    }
+  }
 
   if (type & CUPS_PRINTER_CLASS)
   {
@@ -786,5 +800,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.56 2000/06/27 20:04:56 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.57 2000/08/30 20:24:53 mike Exp $".
  */

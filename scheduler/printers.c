@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.68 2000/08/30 20:12:50 mike Exp $"
+ * "$Id: printers.c,v 1.69 2000/08/30 20:24:53 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1383,6 +1383,9 @@ ValidateDest(const char   *hostname,	/* I - Host name */
   printer_t	*p;			/* Current printer */
   int		rlen;			/* Length of name sans @ */
   const char	*temp;			/* Pointer to @ */
+  char		localname[1024],	/* Localized hostname */
+		*lptr,			/* Pointer into localized hostname */
+		*sptr;			/* Pointer into server name */
 
 
  /*
@@ -1426,6 +1429,34 @@ ValidateDest(const char   *hostname,	/* I - Host name */
     rlen = strlen(resource);
 
  /*
+  * Localize the hostname...
+  */
+
+  strncpy(localname, hostname, sizeof(localname) - 1);
+  localname[sizeof(localname) - 1] = '\0';
+
+  lptr = strchr(localname, '.');
+  sptr = strchr(ServerName, '.');
+
+  if (sptr != NULL && lptr != NULL)
+  {
+   /*
+    * Strip the common domain name components...
+    */
+
+    while (lptr != NULL)
+    {
+      if (strcasecmp(lptr, sptr) == 0)
+      {
+        *lptr = '\0';
+	break;
+      }
+      else
+        lptr = strchr(lptr + 1, '.');
+    }
+  }
+
+ /*
   * Change localhost to the server name...
   */
 
@@ -1437,7 +1468,7 @@ ValidateDest(const char   *hostname,	/* I - Host name */
   */
 
   for (p = Printers; p != NULL; p = p->next)
-    if (strcasecmp(p->hostname, hostname) == 0 &&
+    if (strcasecmp(p->hostname, localname) == 0 &&
         (strcasecmp(p->name, resource) == 0 ||
 	 (strncasecmp(p->name, resource, rlen) == 0 &&
 	  p->name[rlen] == '@')))
@@ -1492,5 +1523,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.68 2000/08/30 20:12:50 mike Exp $".
+ * End of "$Id: printers.c,v 1.69 2000/08/30 20:24:53 mike Exp $".
  */
