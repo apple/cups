@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.17 2001/01/12 17:24:21 mike Exp $"
+ * "$Id: ipp-var.c,v 1.18 2001/01/18 22:27:04 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -191,7 +191,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 	  case IPP_TAG_ENUM :
 	      if (strncmp(name, "time_at_", 8) == 0)
 	      {
-	        date = localtime(&(attr->values[i].integer));
+	        date = localtime((time_t *)&(attr->values[i].integer));
 		strftime(valptr, sizeof(value) - (valptr - value) - 1,
 		         NULL, date);
 	      }
@@ -282,5 +282,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.17 2001/01/12 17:24:21 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.18 2001/01/18 22:27:04 mike Exp $".
  */
