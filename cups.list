@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.49 2000/02/25 03:00:51 mike Exp $"
+# "$Id: cups.list,v 1.50 2000/02/26 22:56:49 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -126,17 +126,29 @@ f 0444 root sys /usr/lib/locale/fr/cups_fr locale/fr/cups_fr
 f 0444 root sys /usr/lib/locale/it/cups_it locale/it/cups_it
 
 %system all
-f 0444 root sys /usr/share/cups/data/8859-1 data/8859-1
-f 0444 root sys /usr/share/cups/data/8859-14 data/8859-14
-f 0444 root sys /usr/share/cups/data/8859-15 data/8859-15
-f 0444 root sys /usr/share/cups/data/8859-2 data/8859-2
-f 0444 root sys /usr/share/cups/data/8859-3 data/8859-3
-f 0444 root sys /usr/share/cups/data/8859-4 data/8859-4
-f 0444 root sys /usr/share/cups/data/8859-5 data/8859-5
-f 0444 root sys /usr/share/cups/data/8859-6 data/8859-6
-f 0444 root sys /usr/share/cups/data/8859-7 data/8859-7
-f 0444 root sys /usr/share/cups/data/8859-8 data/8859-8
-f 0444 root sys /usr/share/cups/data/8859-9 data/8859-9
+f 0444 root sys /usr/share/cups/charsets/cp874 data/cp874
+f 0444 root sys /usr/share/cups/charsets/cp1250 data/cp1250
+f 0444 root sys /usr/share/cups/charsets/cp1251 data/cp1251
+f 0444 root sys /usr/share/cups/charsets/cp1252 data/cp1252
+f 0444 root sys /usr/share/cups/charsets/cp1253 data/cp1253
+f 0444 root sys /usr/share/cups/charsets/cp1254 data/cp1254
+f 0444 root sys /usr/share/cups/charsets/cp1255 data/cp1255
+f 0444 root sys /usr/share/cups/charsets/cp1256 data/cp1256
+f 0444 root sys /usr/share/cups/charsets/cp1257 data/cp1257
+f 0444 root sys /usr/share/cups/charsets/cp1258 data/cp1258
+f 0444 root sys /usr/share/cups/charsets/iso-8859-1 data/iso-8859-1
+f 0444 root sys /usr/share/cups/charsets/iso-8859-14 data/iso-8859-14
+f 0444 root sys /usr/share/cups/charsets/iso-8859-15 data/iso-8859-15
+f 0444 root sys /usr/share/cups/charsets/iso-8859-2 data/iso-8859-2
+f 0444 root sys /usr/share/cups/charsets/iso-8859-3 data/iso-8859-3
+f 0444 root sys /usr/share/cups/charsets/iso-8859-4 data/iso-8859-4
+f 0444 root sys /usr/share/cups/charsets/iso-8859-5 data/iso-8859-5
+f 0444 root sys /usr/share/cups/charsets/iso-8859-6 data/iso-8859-6
+f 0444 root sys /usr/share/cups/charsets/iso-8859-7 data/iso-8859-7
+f 0444 root sys /usr/share/cups/charsets/iso-8859-8 data/iso-8859-8
+f 0444 root sys /usr/share/cups/charsets/iso-8859-9 data/iso-8859-9
+f 0444 root sys /usr/share/cups/charsets/utf-8 data/utf-8
+
 f 0444 root sys /usr/share/cups/data/HPGLprolog data/HPGLprolog
 f 0444 root sys /usr/share/cups/data/psglyphs data/psglyphs
 f 0444 root sys /usr/share/cups/fonts/AvantGarde-Book fonts/AvantGarde-Book
@@ -397,5 +409,5 @@ f 0444 root sys /usr/man/man5/printers.conf.5 man/printers.conf.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.49 2000/02/25 03:00:51 mike Exp $".
+# End of "$Id: cups.list,v 1.50 2000/02/26 22:56:49 mike Exp $".
 #

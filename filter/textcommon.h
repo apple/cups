@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.h,v 1.3 2000/01/04 13:45:49 mike Exp $"
+ * "$Id: textcommon.h,v 1.4 2000/02/26 22:56:50 mike Exp $"
  *
  *   Common text filter definitions for the Common UNIX Printing System (CUPS).
  *
@@ -33,11 +33,15 @@
  * Constants...
  */
 
+#define ATTR_NORMAL	0x00
 #define ATTR_BOLD	0x01
-#define ATTR_UNDERLINE	0x02
-#define ATTR_RAISED	0x04
-#define ATTR_LOWERED	0x08
-#define ATTR_ITALIC	0x10
+#define ATTR_ITALIC	0x02
+#define ATTR_BOLDITALIC	0x03
+#define ATTR_FONT	0x03
+
+#define ATTR_UNDERLINE	0x04
+#define ATTR_RAISED	0x08
+#define ATTR_LOWERED	0x10
 #define ATTR_RED	0x20
 #define ATTR_GREEN	0x40
 #define ATTR_BLUE	0x80
@@ -85,5 +89,5 @@ extern void	WriteProlog(char *title, char *user, ppd_file_t *ppd);
 
 
 /*
- * End of "$Id: textcommon.h,v 1.3 2000/01/04 13:45:49 mike Exp $".
+ * End of "$Id: textcommon.h,v 1.4 2000/02/26 22:56:50 mike Exp $".
  */
