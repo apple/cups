@@ -1,5 +1,5 @@
 /*
- * "$Id: encode.c,v 1.1.2.12 2003/02/10 17:58:47 mike Exp $"
+ * "$Id: encode.c,v 1.1.2.13 2003/02/13 03:23:55 mike Exp $"
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
@@ -260,7 +260,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
     * Scan the value string for values...
     */
 
-    for (j = 0; *val != '\0' || j == 0; val = sep, j ++)
+    for (j = 0; j < count; val = sep, j ++)
     {
      /*
       * Find the end of this value and mark it if needed...
@@ -382,5 +382,5 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 
 
 /*
- * End of "$Id: encode.c,v 1.1.2.12 2003/02/10 17:58:47 mike Exp $".
+ * End of "$Id: encode.c,v 1.1.2.13 2003/02/13 03:23:55 mike Exp $".
  */
