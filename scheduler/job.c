@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.112 2001/02/13 16:08:01 mike Exp $"
+ * "$Id: job.c,v 1.113 2001/02/19 02:27:31 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -517,7 +517,8 @@ LoadAllJobs(void)
 
       strncpy(job->dest, dest, sizeof(job->dest) - 1);
 
-      job->sheets     = ippFindAttribute(job->attrs, "job-sheets-completed", IPP_TAG_INTEGER);
+      job->sheets     = ippFindAttribute(job->attrs, "job-media-sheets-completed",
+                                         IPP_TAG_INTEGER);
       job->state      = ippFindAttribute(job->attrs, "job-state", IPP_TAG_ENUM);
       job->job_sheets = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME);
 
@@ -2736,5 +2737,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.112 2001/02/13 16:08:01 mike Exp $".
+ * End of "$Id: job.c,v 1.113 2001/02/19 02:27:31 mike Exp $".
  */

@@ -20,6 +20,10 @@ CHANGES IN CUPS V1.1.6-3
 	  from implicit classes.
 	- StartJob() didn't send the job-sheets, job-priority,
 	  and job-hold-until attributes to remote printers.
+	- LoadAllJobs() was looking for job-sheets-completed
+	  instead of job-media-sheets-completed.  This would
+	  prevent accumulation of page data after a restart
+	  of the scheduler.
 	- The pstops and imagetops filters now generate copies
 	  using the appropriate method for a Level 1, 2, or 3
 	  printer since some Level 2/3 printers don't support
