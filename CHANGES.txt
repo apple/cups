@@ -3,6 +3,7 @@ CHANGES.txt - 07/31/2000
 
 CHANGES IN CUPS v1.1.2
 
+	- Makefile/configure fixes
 	- The cupsTempFile() function now uses a different
 	  algorithm for generating temp files and "reserves"
 	  them to avoid possible security exploitation.
@@ -10,8 +11,20 @@ CHANGES IN CUPS v1.1.2
 	  number generator for certificates.
 	- The /var/spool/cups and /var/spool/cups/tmp directories
 	  were incorrectly owned by root; they are now owned by
-	  the filter user (typically "lp")
-	- Makefile/configure fixes
+	  the filter user, typically "lp".
+	- The scheduler now resets the permissions on the spool
+	  and temp directories as needed to match the filter
+	  user.
+	- Now expose ppdCollect() as an externally callable
+	  function.
+	- The image filters now support filtering from the
+	  standard input.
+	- The imagetoraster filter now collects all printer
+	  options and job patch files and applies them to the
+	  page header as needed.
+	- Added format and banner options to LPD backend.
+	- The send-document operation didn't start a job
+	  immediately when last-document was true.
 
 
 CHANGES IN CUPS v1.1.1
