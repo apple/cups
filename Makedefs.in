@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.24 2000/06/22 20:33:31 mike Exp $"
+# "$Id: Makedefs.in,v 1.25 2000/07/07 17:02:34 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -49,7 +49,6 @@ SHELL	=	/bin/sh
 #
 
 INSTALL_BIN	=	$(LIBTOOL) $(CP)
-INSTALL_CAT	=	@INSTALL_CAT@
 INSTALL_DATA	=	$(CP)
 INSTALL_LIB	=	$(LIBTOOL) $(CP)
 INSTALL_MAN	=	$(CP)
@@ -120,6 +119,7 @@ top_srcdir	=	@top_srcdir@
 BINDIR		=	@bindir@
 DATADIR		=	@CUPS_DATADIR@
 DOCDIR		=	@CUPS_DOCROOT@
+ESP_ROOT	=	@ESP_ROOT@
 INCLUDEDIR	=	$(includedir)
 LIBDIR		=	$(libdir)
 LOCALEDIR	= 	@CUPS_LOCALEDIR@
@@ -131,23 +131,33 @@ SBINDIR		=	@sbindir@
 SERVERBIN	= 	@CUPS_SERVERBIN@
 SERVERROOT	= 	@CUPS_SERVERROOT@
 
+CAT1EXT		=	@CAT1EXT@
+CAT5EXT		=	@CAT5EXT@
+CAT8EXT		=	@CAT8EXT@
+
 #
 # Rules...
 #
 
 .SILENT:
-.SUFFIXES:	.a .c .cxx .h .man .o .1 .5 .8
+.SUFFIXES:	.a .c .cxx .h .man .o .0 .1 .5 .8 .z
 .c.o:
 	echo Compiling $<...
 	$(CC) $(CFLAGS) -c $<
 .cxx.o:
 	echo Compiling $<...
 	$(CXX) $(CXXFLAGS) -c $<
-.man.1 .man.5 .man.8:
+.man.0 .man.1 .man.5 .man.8:
 	echo Formatting $<...
 	$(RM) $@
 	$(NROFF) -man $< >$@
+.man.z:
+	echo Formatting $<...
+	$(RM) $@
+	$(NROFF) -man $< >t
+	pack -f t
+	$(MV) t $@
 
 #
-# End of "$Id: Makedefs.in,v 1.24 2000/06/22 20:33:31 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.25 2000/07/07 17:02:34 mike Exp $"
 #

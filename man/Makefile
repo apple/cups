@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.9 2000/05/10 21:07:04 mike Exp $"
+# "$Id: Makefile,v 1.10 2000/07/07 17:02:44 mike Exp $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,15 +28,16 @@ include ../Makedefs
 # Man pages...
 #
 
-CAT1	=	backend.1 filter.1 lp.1 lpoptions.1 lpq.1 lprm.1 lpr.1 lpstat.1
-CAT5	=	classes.conf.5 cupsd.conf.5 mime.convs.5 mime.types.5 \
-		printers.conf.5
-CAT8	=	accept.8 cups-lpd.8 cups-polld.8 cupsd.8 enable.8 \
-		lpadmin.8 lpinfo.8 lpmove.8 lpc.8
+MAN1	=	backend.man filter.man lp.man lpoptions.man lpq.man lprm.man \
+		lpr.man lpstat.man
+MAN5	=	classes.conf.man cupsd.conf.man mime.convs.man mime.types.man \
+		printers.conf.man
+MAN8	=	accept.man cups-lpd.man cups-polld.man cupsd.man enable.man \
+		lpadmin.man lpinfo.man lpmove.man lpc.man
 
-MAN1	=	$(CAT1:.1=.man)
-MAN5	=	$(CAT5:.5=.man)
-MAN8	=	$(CAT8:.8=.man)
+CAT1	=	$(MAN1:.man=.$(CAT1EXT))
+CAT5	=	$(MAN5:.man=.$(CAT1EXT))
+CAT8	=	$(MAN8:.man=.$(CAT1EXT))
 
 
 #
@@ -57,20 +58,22 @@ clean:
 # Install files...
 #
 
-install:	install-man $(INSTALL_CAT)
-
-install-man:
+install:
 	-$(MKDIR) $(MANDIR)/man1
+	-$(CHMOD) ugo+rx $(MANDIR)
+	-$(CHMOD) ugo+rx $(MANDIR)/man1
 	for file in $(MAN1); do \
 		$(INSTALL_MAN) $$file $(MANDIR)/man1/`basename $$file man`1; \
 	done
 	$(RM) $(MANDIR)/man1/cancel.1
 	$(LN) lp.1 $(MANDIR)/man1/cancel.1
 	-$(MKDIR) $(MANDIR)/man5
+	-$(CHMOD) ugo+rx $(MANDIR)/man5
 	for file in $(MAN5); do \
 		$(INSTALL_MAN) $$file $(MANDIR)/man5/`basename $$file man`5; \
 	done
 	-$(MKDIR) $(MANDIR)/man8
+	-$(CHMOD) ugo+rx $(MANDIR)/man8
 	for file in $(MAN8); do \
 		$(INSTALL_MAN) $$file $(MANDIR)/man8/`basename $$file man`8; \
 	done
@@ -78,42 +81,23 @@ install-man:
 	$(LN) accept.8 $(MANDIR)/man8/reject.8
 	$(RM) $(MANDIR)/man8/disable.8
 	$(LN) enable.8 $(MANDIR)/man8/disable.8
-
-install-cat:
 	-$(MKDIR) $(MANDIR)/cat1
+	-$(CHMOD) ugo+rx $(MANDIR)/cat1
 	$(INSTALL_MAN) $(CAT1) $(MANDIR)/cat1
-	$(RM) $(MANDIR)/cat1/cancel.1
-	$(LN) lp.1 $(MANDIR)/cat1/cancel.1
+	$(RM) $(MANDIR)/cat1/cancel.$(CAT1EXT)
+	$(LN) lp.$(CAT1EXT) $(MANDIR)/cat1/cancel.$(CAT1EXT)
 	-$(MKDIR) $(MANDIR)/cat5
+	-$(CHMOD) ugo+rx $(MANDIR)/cat5
 	$(INSTALL_MAN) $(CAT5) $(MANDIR)/cat5
 	-$(MKDIR) $(MANDIR)/cat8
+	-$(CHMOD) ugo+rx $(MANDIR)/cat8
 	$(INSTALL_MAN) $(CAT8) $(MANDIR)/cat8
-	$(RM) $(MANDIR)/cat8/reject.8
-	$(LN) accept.8 $(MANDIR)/cat8/reject.8
-	$(RM) $(MANDIR)/cat8/disable.8
-	$(LN) enable.8 $(MANDIR)/cat8/disable.8
-
-install-bsdcat:
-	-$(MKDIR) $(MANDIR)/cat1
-	for file in $(CAT1); do \
-		$(INSTALL_MAN) $$file $(MANDIR)/cat1/`basename $$file 1`0; \
-	done
-	$(RM) $(MANDIR)/cat1/cancel.0
-	$(LN) lp.0 $(MANDIR)/cat1/cancel.0
-	-$(MKDIR) $(MANDIR)/cat5
-	for file in $(CAT5); do \
-		$(INSTALL_MAN) $$file $(MANDIR)/cat5/`basename $$file 5`0; \
-	done
-	-$(MKDIR) $(MANDIR)/cat8
-	for file in $(CAT8); do \
-		$(INSTALL_MAN) $$file $(MANDIR)/cat8/`basename $$file 8`0; \
-	done
-	$(RM) $(MANDIR)/cat8/reject.0
-	$(LN) accept.0 $(MANDIR)/cat8/reject.0
-	$(RM) $(MANDIR)/cat8/disable.0
-	$(LN) enable.0 $(MANDIR)/cat8/disable.0
+	$(RM) $(MANDIR)/cat8/reject.$(CAT1EXT)
+	$(LN) accept.$(CAT1EXT) $(MANDIR)/cat8/reject.$(CAT1EXT)
+	$(RM) $(MANDIR)/cat8/disable.$(CAT1EXT)
+	$(LN) enable.$(CAT1EXT) $(MANDIR)/cat8/disable.$(CAT1EXT)
 
 
 #
-# End of "$Id: Makefile,v 1.9 2000/05/10 21:07:04 mike Exp $".
+# End of "$Id: Makefile,v 1.10 2000/07/07 17:02:44 mike Exp $".
 #

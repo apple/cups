@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.12 2000/03/30 05:19:18 mike Exp $"
+# "$Id: Makefile,v 1.13 2000/07/07 17:02:37 mike Exp $"
 #
 #   CGI makefile for the Common UNIX Printing System (CUPS).
 #
@@ -50,6 +50,8 @@ clean:
 
 install:
 	-$(MKDIR) $(SERVERBIN)/cgi-bin
+	$(CHMOD) ugo+rx $(SERVERBIN)
+	$(CHMOD) ugo+rx $(SERVERBIN)/cgi-bin
 	$(INSTALL_BIN) $(TARGETS) $(SERVERBIN)/cgi-bin
 
 
@@ -113,5 +115,5 @@ printers.o:	cgi.h ipp-var.h ../cups/cups.h ../cups/ipp.h ../cups/language.h
 $(OBJS):	../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.12 2000/03/30 05:19:18 mike Exp $".
+# End of "$Id: Makefile,v 1.13 2000/07/07 17:02:37 mike Exp $".
 #

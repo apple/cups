@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.9 2000/05/12 19:18:41 mike Exp $"
+# "$Id: Makefile,v 1.10 2000/07/07 17:02:38 mike Exp $"
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
@@ -81,19 +81,23 @@ clean:
 #
 
 install:
-	-$(MKDIR) $(DATADIR)
 	-$(MKDIR) $(DATADIR)/banners
+	$(CHMOD) ugo+rx $(DATADIR)
+	$(CHMOD) ugo+rx $(DATADIR)/banners
 	$(INSTALL_DATA) $(BANNERS) $(DATADIR)/banners
 	-$(MKDIR) $(DATADIR)/charsets
+	$(CHMOD) ugo+rx $(DATADIR)/charsets
 	$(INSTALL_DATA) $(CHARSETS) $(DATADIR)/charsets
 	-$(MKDIR) $(DATADIR)/data
+	$(CHMOD) ugo+rx $(DATADIR)/data
 	$(INSTALL_DATA) $(DATAFILES) $(DATADIR)/data
 	-if test "$(PAMDIR)" != ""; then \
 		$(MKDIR) $(PAMDIR); \
+		$(CHMOD) ugo+rx $(PAMDIR); \
 		$(INSTALL_DATA) cups.pam $(PAMDIR)/cups; \
 	fi
 
 
 #
-# End of "$Id: Makefile,v 1.9 2000/05/12 19:18:41 mike Exp $".
+# End of "$Id: Makefile,v 1.10 2000/07/07 17:02:38 mike Exp $".
 #

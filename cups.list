@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.68 2000/07/07 15:18:41 mike Exp $"
+# "$Id: cups.list,v 1.69 2000/07/07 17:02:34 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -326,20 +326,21 @@ f 0444 root sys $DOCDIR/documentation.html doc/documentation.html
 f 0444 root sys $DOCDIR/index.html doc/index.html
 
 d 0555 root sys $DOCDIR/images -
+
+f 0444 root sys $DOCDIR/images/classes.gif doc/images/classes.gif
+f 0444 root sys $DOCDIR/images/printer-idle.gif doc/images/printer-idle.gif
+f 0444 root sys $DOCDIR/images/printer-processing.gif doc/images/printer-processing.gif
+f 0444 root sys $DOCDIR/images/printer-stopped.gif doc/images/printer-stopped.gif
+
 f 0444 root sys $DOCDIR/images/accept-jobs.gif doc/images/accept-jobs.gif
 f 0444 root sys $DOCDIR/images/add-class.gif doc/images/add-class.gif
 f 0444 root sys $DOCDIR/images/add-printer.gif doc/images/add-printer.gif
 f 0444 root sys $DOCDIR/images/cancel-job.gif doc/images/cancel-job.gif
 f 0444 root sys $DOCDIR/images/cancel-jobs.gif doc/images/cancel-jobs.gif
 f 0444 root sys $DOCDIR/images/cancel.gif doc/images/cancel.gif
-f 0444 root sys $DOCDIR/images/classes.gif doc/images/classes.gif
 f 0444 root sys $DOCDIR/images/continue.gif doc/images/continue.gif
 f 0444 root sys $DOCDIR/images/config-printer.gif doc/images/config-printer.gif
-f 0444 root sys $DOCDIR/images/cups-bar.gif doc/images/cups-bar.gif
 f 0444 root sys $DOCDIR/images/cups-block-diagram.gif doc/images/cups-block-diagram.gif
-f 0444 root sys $DOCDIR/images/cups-large.gif doc/images/cups-large.gif
-f 0444 root sys $DOCDIR/images/cups-medium.gif doc/images/cups-medium.gif
-f 0444 root sys $DOCDIR/images/cups-small.gif doc/images/cups-small.gif
 f 0444 root sys $DOCDIR/images/delete-class.gif doc/images/delete-class.gif
 f 0444 root sys $DOCDIR/images/delete-printer.gif doc/images/delete-printer.gif
 f 0444 root sys $DOCDIR/images/hold-job.gif doc/images/hold-job.gif
@@ -352,9 +353,6 @@ f 0444 root sys $DOCDIR/images/modify-class.gif doc/images/modify-class.gif
 f 0444 root sys $DOCDIR/images/modify-printer.gif doc/images/modify-printer.gif
 f 0444 root sys $DOCDIR/images/navbar.gif doc/images/navbar.gif
 f 0444 root sys $DOCDIR/images/print-test-page.gif doc/images/print-test-page.gif
-f 0444 root sys $DOCDIR/images/printer-idle.gif doc/images/printer-idle.gif
-f 0444 root sys $DOCDIR/images/printer-processing.gif doc/images/printer-processing.gif
-f 0444 root sys $DOCDIR/images/printer-stopped.gif doc/images/printer-stopped.gif
 f 0444 root sys $DOCDIR/images/reject-jobs.gif doc/images/reject-jobs.gif
 f 0444 root sys $DOCDIR/images/release-job.gif doc/images/release-job.gif
 f 0444 root sys $DOCDIR/images/restart-job.gif doc/images/restart-job.gif
@@ -387,6 +385,11 @@ f 0444 root sys $DOCDIR/sum.html doc/sum.html
 f 0444 root sys $DOCDIR/sum.pdf doc/sum.pdf
 f 0444 root sys $DOCDIR/svd.html doc/svd.html
 f 0444 root sys $DOCDIR/svd.pdf doc/svd.pdf
+f 0444 root sys $DOCDIR/images/cups-bar.gif doc/images/cups-bar.gif
+f 0444 root sys $DOCDIR/images/cups-large.gif doc/images/cups-large.gif
+f 0444 root sys $DOCDIR/images/cups-medium.gif doc/images/cups-medium.gif
+f 0444 root sys $DOCDIR/images/cups-small.gif doc/images/cups-small.gif
+
 
 # Man pages
 %system irix
@@ -396,31 +399,31 @@ d 0555 root sys $MANDIR/u_man -
 d 0555 root sys $MANDIR/u_man/cat1 -
 d 0555 root sys $MANDIR/u_man/cat5 -
 
-f 0444 root sys $MANDIR/a_man/cat1/accept.1 man/accept.8
-l 0444 root sys $MANDIR/a_man/cat1/reject.1 accept.1
-f 0444 root sys $MANDIR/u_man/cat1/backend.1 man/backend.1
-f 0444 root sys $MANDIR/u_man/cat5/classes.conf.5 man/classes.conf.5
-f 0444 root sys $MANDIR/a_man/cat1/cups-lpd.1 man/cups-lpd.8
-f 0444 root sys $MANDIR/a_man/cat1/cups-polld.1 man/cups-polld.8
-f 0444 root sys $MANDIR/u_man/cat5/cupsd.conf.5 man/cupsd.conf.5
-f 0444 root sys $MANDIR/a_man/cat1/cupsd.1 man/cupsd.8
-f 0444 root sys $MANDIR/a_man/cat1/enable.1 man/enable.8
-l 0444 root sys $MANDIR/a_man/cat1/disable.1 enable.1
-f 0444 root sys $MANDIR/u_man/cat1/filter.1 man/filter.1
-f 0444 root sys $MANDIR/a_man/cat1/lpadmin.1 man/lpadmin.8
-f 0444 root sys $MANDIR/a_man/cat1/lpc.1 man/lpc.8
-f 0444 root sys $MANDIR/a_man/cat1/lpinfo.1 man/lpinfo.8
-f 0444 root sys $MANDIR/a_man/cat1/lpmove.1 man/lpmove.8
-f 0444 root sys $MANDIR/u_man/cat1/lpoptions.1 man/lpoptions.1
-f 0444 root sys $MANDIR/u_man/cat1/lpq.1 man/lpq.1
-f 0444 root sys $MANDIR/u_man/cat1/lprm.1 man/lprm.1
-f 0444 root sys $MANDIR/u_man/cat1/lpr.1 man/lpr.1
-f 0444 root sys $MANDIR/u_man/cat1/lpstat.1 man/lpstat.1
-f 0444 root sys $MANDIR/u_man/cat1/lp.1 man/lp.1
-l 0444 root sys $MANDIR/u_man/cat1/cancel.1 lp.1
-f 0444 root sys $MANDIR/u_man/cat5/mime.convs.5 man/mime.convs.5
-f 0444 root sys $MANDIR/u_man/cat5/mime.types.5 man/mime.types.5
-f 0444 root sys $MANDIR/u_man/cat5/printers.conf.5 man/printers.conf.5
+f 0444 root sys $MANDIR/a_man/cat1/accept.z man/accept.z
+l 0444 root sys $MANDIR/a_man/cat1/reject.z accept.z
+f 0444 root sys $MANDIR/u_man/cat1/backend.z man/backend.z
+f 0444 root sys $MANDIR/u_man/cat5/classes.conf.z man/classes.conf.z
+f 0444 root sys $MANDIR/a_man/cat1/cups-lpd.z man/cups-lpd.z
+f 0444 root sys $MANDIR/a_man/cat1/cups-polld.z man/cups-polld.z
+f 0444 root sys $MANDIR/u_man/cat5/cupsd.conf.z man/cupsd.conf.z
+f 0444 root sys $MANDIR/a_man/cat1/cupsd.z man/cupsd.z
+f 0444 root sys $MANDIR/a_man/cat1/enable.z man/enable.z
+l 0444 root sys $MANDIR/a_man/cat1/disable.z enable.z
+f 0444 root sys $MANDIR/u_man/cat1/filter.z man/filter.z
+f 0444 root sys $MANDIR/a_man/cat1/lpadmin.z man/lpadmin.z
+f 0444 root sys $MANDIR/a_man/cat1/lpc.z man/lpc.z
+f 0444 root sys $MANDIR/a_man/cat1/lpinfo.z man/lpinfo.z
+f 0444 root sys $MANDIR/a_man/cat1/lpmove.z man/lpmove.z
+f 0444 root sys $MANDIR/u_man/cat1/lpoptions.z man/lpoptions.z
+f 0444 root sys $MANDIR/u_man/cat1/lpq.z man/lpq.z
+f 0444 root sys $MANDIR/u_man/cat1/lprm.z man/lprm.z
+f 0444 root sys $MANDIR/u_man/cat1/lpr.z man/lpr.z
+f 0444 root sys $MANDIR/u_man/cat1/lpstat.z man/lpstat.z
+f 0444 root sys $MANDIR/u_man/cat1/lp.z man/lp.z
+l 0444 root sys $MANDIR/u_man/cat1/cancel.z lp.z
+f 0444 root sys $MANDIR/u_man/cat5/mime.convs.z man/mime.convs.z
+f 0444 root sys $MANDIR/u_man/cat5/mime.types.z man/mime.types.z
+f 0444 root sys $MANDIR/u_man/cat5/printers.conf.z man/printers.conf.z
 %system !irix
 d 0555 root sys $MANDIR/man1 -
 d 0555 root sys $MANDIR/man5 -
@@ -457,5 +460,5 @@ f 0444 root sys $MANDIR/man5/printers.conf.5 man/printers.conf.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.68 2000/07/07 15:18:41 mike Exp $".
+# End of "$Id: cups.list,v 1.69 2000/07/07 17:02:34 mike Exp $".
 #

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.43 2000/07/07 15:18:41 mike Exp $"
+dnl "$Id: configure.in,v 1.44 2000/07/07 17:02:34 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -313,19 +313,6 @@ else
 	IMGLIBS="\$(LIBJPEG) \$(LIBPNG) \$(LIBTIFF) \$(LIBZ)"
 fi
 
-# Figure out how to install "cat" pages...
-case "$uname" in
-	FreeBSD* | NetBSD* | OpenBSD*)
-		# *BSD
-		INSTALL_CAT="install-bsdcat"
-		;;
-	*)
-		# All others
-		INSTALL_CAT="install-cat"
-		;;
-esac
-AC_SUBST(INSTALL_CAT)
-
 AC_SUBST(DSO)
 AC_SUBST(DSOLIBS)
 AC_SUBST(IMGLIBS)
@@ -358,6 +345,32 @@ if test "$mandir" == "\${prefix}/man" -a "$prefix" = "/"; then
 		mandir="/usr/man"
 	fi
 fi
+
+dnl Setup manpage extensions...
+case "$uname" in
+	FreeBSD* | NetBSD* | OpenBSD*)
+		# *BSD
+		CAT1EXT=0
+		CAT5EXT=0
+		CAT8EXT=0
+		;;
+	IRIX*)
+		# SGI IRIX
+		CAT1EXT=z
+		CAT5EXT=z
+		CAT8EXT=z
+		;;
+	*)
+		# All others
+		CAT1EXT=1
+		CAT5EXT=5
+		CAT8EXT=8
+		;;
+esac
+
+AC_SUBST(CAT1EXT)
+AC_SUBST(CAT5EXT)
+AC_SUBST(CAT8EXT)
 
 dnl Setup default locations...
 CUPS_SERVERROOT='${prefix}/etc/cups'
@@ -424,5 +437,5 @@ AC_SUBST(CUPS_DOCROOT)
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.43 2000/07/07 15:18:41 mike Exp $".
+dnl End of "$Id: configure.in,v 1.44 2000/07/07 17:02:34 mike Exp $".
 dnl

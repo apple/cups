@@ -65,6 +65,8 @@ clean:
 
 install:
 	-$(MKDIR) $(DATADIR)/fonts
+	$(CHMOD) ugo+rx $(DATADIR)
+	$(CHMOD) ugo+rx $(DATADIR)/fonts
 	$(INSTALL_DATA) $(FONTS) $(DATADIR)/fonts
 
 
