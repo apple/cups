@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: stcolor.ppd,v 1.1 2000/01/20 22:33:12 mike Exp $"
+*% "$Id: stcolor.ppd,v 1.2 2000/01/21 02:23:27 mike Exp $"
 *%
 *%   Sample EPSON Stylus Color driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -33,6 +33,9 @@
 *cupsVersion:	1.1
 *cupsManualCopies: True
 *cupsFilter:	"application/vnd.cups-raster 0 rastertoepson"
+*cupsColorProfile 180dpi/-: "1.0 1.0 1.0 0.0 -0.2 -0.4 1.0 -0.1 -0.2 -0.3 1.0"
+*cupsColorProfile 360dpi/-: "1.0 1.5 1.0 0.0 -0.2 -0.4 1.0 -0.1 -0.2 -0.3 1.0"
+*cupsColorProfile 720dpi/-: "0.5 1.5 1.0 0.0 -0.2 -0.4 1.0 -0.1 -0.2 -0.3 1.0"
 *ModelName:     "EPSON Stylus Color Series"
 *ShortNickName: "EPSON Stylus Color Series"
 *NickName:      "EPSON Stylus Color Series CUPS v1.1"
@@ -63,9 +66,9 @@
 *CloseUI: *PageRegion
 
 *DefaultImageableArea: Letter 
-*ImageableArea Letter:	"8.60 39.60 584.60 783.40"
-*ImageableArea Legal:	"8.60 39.60 584.60 999.40"
-*ImageableArea A4:	"8.60 39.60 567.60 833.40"
+*ImageableArea Letter:	"8.60 39.60 603.40 766.49"
+*ImageableArea Legal:	"8.60 39.60 603.40 982.49"
+*ImageableArea A4:	"8.60 39.60 586.40 816.49"
 
 *DefaultPaperDimension: Letter
 *PaperDimension Letter:	"612 792"
@@ -76,8 +79,8 @@
 *OrderDependency: 20 AnySetup *Resolution
 *DefaultResolution: 360dpi
 *Resolution 180dpi/180 DPI: "<</HWResolution[180 180]>>setpagedevice"
-*Resolution 360dpi/360 DPI: "<</HWResolution[360 360]>>setpagedevice"
-*Resolution 720dpi/720 DPI: "<</HWResolution[720 720]>>setpagedevice"
+*Resolution 360dpi/360 DPI: "<</HWResolution[360 360]>>setpagedevice{0.6666 exp}bind settransfer"
+*Resolution 720dpi/720 DPI: "<</HWResolution[720 720]>>setpagedevice{0.6666 exp}bind settransfer"
 *CloseUI: *Resolution
 
 *OpenUI *ColorModel/Output Mode: PickOne
@@ -124,5 +127,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: stcolor.ppd,v 1.1 2000/01/20 22:33:12 mike Exp $".
+*% End of "$Id: stcolor.ppd,v 1.2 2000/01/21 02:23:27 mike Exp $".
 *%

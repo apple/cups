@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.48 2000/01/04 13:46:09 mike Exp $"
+ * "$Id: job.c,v 1.49 2000/01/21 02:23:29 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -79,7 +79,8 @@ typedef struct direct DIRENT;
 static ipp_state_t	ipp_read_file(const char *filename, ipp_t *ipp);
 static ipp_state_t	ipp_write_file(const char *filename, ipp_t *ipp);
 static int		start_process(const char *command, char *argv[],
-			              char *envp[], int in, int out, int err);
+			              char *envp[], int in, int out, int err,
+				      int root);
 
 
 /*
@@ -100,7 +101,6 @@ AddJob(int        priority,	/* I - Job priority */
   job->id       = NextJobId ++;
   job->priority = priority;
   strncpy(job->dest, dest, sizeof(job->dest) - 1);
-  job->state->values[0].integer = IPP_JOB_HELD;
 
   NumJobs ++;
 
@@ -930,7 +930,7 @@ StartJob(int       id,		/* I - Job ID */
       argv[6] = NULL;
 
     if (filters[i].filter[0] != '/')
-      sprintf(command, "%s/filter/%s", ServerRoot, filters[i].filter);
+      sprintf(command, "%s/filter/%s", ServerBin, filters[i].filter);
     else
       strcpy(command, filters[i].filter);
 
@@ -955,7 +955,7 @@ StartJob(int       id,		/* I - Job ID */
          	  filterfds[i & 1][1]));
 
     pid = start_process(command, argv, envp, filterfds[!(i & 1)][0],
-                        filterfds[i & 1][1], statusfds[1]);
+                        filterfds[i & 1][1], statusfds[1], 0);
 
     close(filterfds[!(i & 1)][0]);
     close(filterfds[!(i & 1)][1]);
@@ -988,7 +988,7 @@ StartJob(int       id,		/* I - Job ID */
   if (strncmp(printer->device_uri, "file:", 5) != 0)
   {
     sscanf(printer->device_uri, "%254[^:]", method);
-    sprintf(command, "%s/backend/%s", ServerRoot, method);
+    sprintf(command, "%s/backend/%s", ServerBin, method);
 
     argv[0] = printer->device_uri;
     if (num_filters)
@@ -1004,7 +1004,7 @@ StartJob(int       id,		/* I - Job ID */
         	  filterfds[i & 1][1]));
 
     pid = start_process(command, argv, envp, filterfds[!(i & 1)][0],
-			filterfds[i & 1][1], statusfds[1]);
+			filterfds[i & 1][1], statusfds[1], 1);
 
     close(filterfds[!(i & 1)][0]);
     close(filterfds[!(i & 1)][1]);
@@ -2030,7 +2030,8 @@ start_process(const char *command,	/* I - Full path to command */
 	      char       *envp[],	/* I - Environment */
               int        infd,		/* I - Standard input file descriptor */
 	      int        outfd,		/* I - Standard output file descriptor */
-	      int        errfd)		/* I - Standard error file descriptor */
+	      int        errfd,		/* I - Standard error file descriptor */
+	      int        root)		/* I - Run as root? */
 {
   int	fd;				/* Looping var */
   int	pid;				/* Process ID */
@@ -2068,8 +2069,11 @@ start_process(const char *command,	/* I - Full path to command */
     * Change user to something "safe"...
     */
 
-    setgid(Group);
-    setuid(User);
+    if (!root)
+    {
+      setgid(Group);
+      setuid(User);
+    }
 
    /*
     * Execute the command; if for some reason this doesn't work,
@@ -2078,7 +2082,7 @@ start_process(const char *command,	/* I - Full path to command */
 
     execve(command, argv, envp);
 
-    perror("cupsd: execve() failed");
+    perror(command);
 
     exit(errno);
   }
@@ -2099,5 +2103,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.48 2000/01/04 13:46:09 mike Exp $".
+ * End of "$Id: job.c,v 1.49 2000/01/21 02:23:29 mike Exp $".
  */

@@ -1,5 +1,6 @@
+#define DEBUG
 /*
- * "$Id: client.c,v 1.44 2000/01/06 15:01:00 mike Exp $"
+ * "$Id: client.c,v 1.45 2000/01/21 02:23:28 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -242,6 +243,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
   char		command[1024],	/* Command to run */
 		*options;	/* Options/CGI data */
   printer_t	*p;		/* Printer */
+  static unsigned request_id = 0;/* Request ID for temp files */
 
 
   status = HTTP_CONTINUE;
@@ -786,9 +788,9 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	    * Create a file as needed for the request data...
 	    */
 
-            snprintf(con->filename, sizeof(con->filename), "%s/%08xXXXXXX",
-	             RequestRoot, time(NULL));
-	    con->file = mkstemp(con->filename);
+            snprintf(con->filename, sizeof(con->filename), "%s/%08x",
+	             RequestRoot, request_id ++);
+	    con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
 	    fchmod(con->file, 0640);
 	    fchown(con->file, User, Group);
 
@@ -817,8 +819,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  {
 	    con->bytes += bytes;
 
-            if (bytes >= 1024)
-              LogMessage(LOG_DEBUG, "ReadClient() %d writing %d bytes", bytes);
+            LogMessage(LOG_DEBUG, "ReadClient() %d writing %d bytes",
+	               con->http.fd, bytes);
 
             if (write(con->file, line, bytes) < bytes)
 	    {
@@ -1560,5 +1562,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.44 2000/01/06 15:01:00 mike Exp $".
+ * End of "$Id: client.c,v 1.45 2000/01/21 02:23:28 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.41 2000/01/04 13:46:09 mike Exp $"
+ * "$Id: ipp.c,v 1.42 2000/01/21 02:23:28 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -30,6 +30,7 @@
  *   cancel_all_jobs()   - Cancel all print jobs.
  *   cancel_job()        - Cancel a print job.
  *   copy_attrs()        - Copy attributes from one request to another.
+ *   copy_file()         - Copy a PPD file or interface script...
  *   delete_printer()    - Remove a printer or class from the system.
  *   get_default()       - Get the default destination.
  *   get_jobs()          - Get a list of jobs for the specified printer.
@@ -64,6 +65,7 @@ static void	cancel_all_jobs(client_t *con, ipp_attribute_t *uri);
 static void	cancel_job(client_t *con, ipp_attribute_t *uri);
 static void	copy_attrs(ipp_t *to, ipp_t *from, ipp_attribute_t *req);
 static void	create_job(client_t *con, ipp_attribute_t *uri);
+static int	copy_file(const char *from, const char *to);
 static void	delete_printer(client_t *con, ipp_attribute_t *uri);
 static void	get_default(client_t *con);
 static void	get_devices(client_t *con);
@@ -395,6 +397,11 @@ accept_jobs(client_t        *con,	/* I - Client connection */
   printer = FindPrinter(name);
   printer->accepting        = 1;
   printer->state_message[0] = '\0';
+
+  if (dtype == CUPS_PRINTER_CLASS)
+    SaveAllClasses();
+  else
+    SaveAllPrinters();
 
   LogMessage(LOG_INFO, "Printer \'%s\' now accepting jobs (\'%s\').", name,
              con->username);
@@ -849,9 +856,9 @@ add_printer(client_t        *con,	/* I - Client connection */
       * interfaces directory and make it executable...
       */
 
-      if (rename(con->filename, filename))
+      if (copy_file(con->filename, filename))
       {
-        LogMessage(LOG_ERROR, "add_printer: Unable to rename interface script - %s!",
+        LogMessage(LOG_ERROR, "add_printer: Unable to copy interface script - %s!",
 	           strerror(errno));
         send_ipp_error(con, IPP_INTERNAL_ERROR);
 	return;
@@ -869,9 +876,9 @@ add_printer(client_t        *con,	/* I - Client connection */
       * ppd directory and make it readable by all...
       */
 
-      if (rename(con->filename, filename))
+      if (copy_file(con->filename, filename))
       {
-        LogMessage(LOG_ERROR, "add_printer: Unable to rename PPD file - %s!",
+        LogMessage(LOG_ERROR, "add_printer: Unable to copy PPD file - %s!",
 	           strerror(errno));
         send_ipp_error(con, IPP_INTERNAL_ERROR);
 	return;
@@ -1454,6 +1461,44 @@ create_job(client_t        *con,	/* I - Client connection */
                 job->state->values[0].integer);
 
   con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
+ * 'copy_file()' - Copy a PPD file or interface script...
+ */
+
+static int				/* O - 0 = success, -1 = error */
+copy_file(const char *from,		/* I - Source file */
+          const char *to)		/* I - Destination file */
+{
+  int	src,				/* Source file */
+	dst,				/* Destination file */
+	bytes;				/* Bytes to read/write */
+  char	buffer[8192];			/* Copy buffer */
+
+
+  if ((src = open(from, O_RDONLY)) < 0)
+    return (-1);
+
+  if ((dst = open(to, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
+  {
+    close(src);
+    return (-1);
+  }
+
+  while ((bytes = read(src, buffer, sizeof(buffer))) > 0)
+    if (write(dst, buffer, bytes) < bytes)
+    {
+      close(src);
+      close(dst);
+      return (-1);
+    }
+
+  close(src);
+  close(dst);
+
+  return (0);
 }
 
 
@@ -2459,7 +2504,6 @@ print_job(client_t        *con,		/* I - Client connection */
     return;
   }
 
-  job->state->values[0].integer = IPP_JOB_PENDING;
   job->dtype   = dtype;
   job->attrs   = con->request;
   con->request = NULL;
@@ -2513,7 +2557,7 @@ print_job(client_t        *con,		/* I - Client connection */
 
   ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
   job->state = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_ENUM,
-                               "job->state", IPP_JOB_STOPPED);
+                             "job->state", IPP_JOB_PENDING);
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
                printer_uri);
 
@@ -2614,6 +2658,11 @@ reject_jobs(client_t        *con,	/* I - Client connection */
             sizeof(printer->state_message) - 1);
     printer->state_message[sizeof(printer->state_message) - 1] = '\0';
   }
+
+  if (dtype == CUPS_PRINTER_CLASS)
+    SaveAllClasses();
+  else
+    SaveAllPrinters();
 
   if (dtype == CUPS_PRINTER_CLASS)
     LogMessage(LOG_INFO, "Class \'%s\' rejecting jobs (\'%s\').", name,
@@ -3490,5 +3539,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.41 2000/01/04 13:46:09 mike Exp $".
+ * End of "$Id: ipp.c,v 1.42 2000/01/21 02:23:28 mike Exp $".
  */

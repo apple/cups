@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertoepson.c,v 1.1 2000/01/20 22:33:11 mike Exp $"
+ * "$Id: rastertoepson.c,v 1.2 2000/01/21 02:23:26 mike Exp $"
  *
  *   EPSON ESC/P and ESC/P2 filter for the Common UNIX Printing System
  *   (CUPS).
@@ -111,8 +111,17 @@ StartPage(cups_page_header_t *header,	/* I - Page header */
   printf("\033@");
 
  /*
+  * Set graphics mode...
+  */
+
+  pwrite("\033(G\001\000\001", 6);	/* Graphics mode */
+
+ /*
   * Set the media size...
   */
+
+  pwrite("\033(U\001\000", 5);		/* Resolution/units */
+  putchar(3600 / header->HWResolution[1]);
 
   n = header->PageSize[1] * header->HWResolution[1] / 72.0;
 
@@ -130,7 +139,7 @@ StartPage(cups_page_header_t *header,	/* I - Page header */
   putchar(n >> 8);
 
  /*
-  * Set graphics mode...
+  * Set other stuff...
   */
 
   if (header->cupsColorSpace == CUPS_CSPACE_CMY)
@@ -142,19 +151,13 @@ StartPage(cups_page_header_t *header,	/* I - Page header */
   else
     NumPlanes = 1;
 
-  pwrite("\033(G\001\000\001", 6);	/* Graphics mode */
-  pwrite("\033(U\001\000", 5);		/* Resolution */
-  putchar(3600 / header->HWResolution[1]);
-
   if (header->HWResolution[1] == 720)
   {
     pwrite("\033(i\001\000\001", 6);	/* Microweave */
     pwrite("\033(e\002\000\000\001", 7);/* Small dots */
   }
 
-  pwrite("\033(V\002\000", 5);		/* Set absolute position */
-  putchar(t);
-  putchar(t >> 8);
+  pwrite("\033(V\002\000\000\000", 7);	/* Set absolute position 0 */
 
   Feed = 0;				/* No blank lines yet */
 
@@ -355,20 +358,8 @@ void
 OutputLine(cups_page_header_t *header)	/* I - Page header */
 {
   int	plane;				/* Current plane */
+  int	bytes;				/* Bytes per plane */
   int	xstep, ystep;			/* X & Y resolutions */
-
- /*
-  * Output whitespace as needed...
-  */
-
-  if (Feed > 0)
-  {
-    pwrite("\033(v\002\000", 5);	/* Relative vertical position */
-    putchar(Feed);
-    putchar(Feed >> 8);
-
-    Feed = 0;
-  }
 
  /*
   * Write bitmap data as needed...
@@ -376,10 +367,34 @@ OutputLine(cups_page_header_t *header)	/* I - Page header */
 
   xstep = 3600 / header->HWResolution[0];
   ystep = 3600 / header->HWResolution[1];
+  bytes = header->cupsBytesPerLine / NumPlanes;
 
   for (plane = 0; plane < NumPlanes; plane ++)
-    CompressData(Planes[plane], header->cupsBytesPerLine / NumPlanes, plane,
-		 header->cupsCompression, xstep, ystep);
+  {
+   /*
+    * Skip blank data...
+    */
+
+    if (!Planes[plane][0] &&
+        memcmp(Planes[plane], Planes[plane] + 1, bytes - 1) == 0)
+      continue;
+
+   /*
+    * Output whitespace as needed...
+    */
+
+    if (Feed > 0)
+    {
+      pwrite("\033(v\002\000", 5);	/* Relative vertical position */
+      putchar(Feed);
+      putchar(Feed >> 8);
+
+      Feed = 0;
+    }
+
+    CompressData(Planes[plane], bytes, plane, header->cupsCompression, xstep,
+                 ystep);
+  }
 
   Feed ++;
 }
@@ -486,14 +501,10 @@ main(int  argc,		/* I - Number of command-line arguments */
         break;
 
      /*
-      * See if the line is blank; if not, write it to the printer...
+      * Write it to the printer...
       */
 
-      if (Planes[0][0] ||
-          memcmp(Planes[0], Planes[0] + 1, header.cupsBytesPerLine - 1))
-        OutputLine(&header);
-      else
-        Feed ++;
+      OutputLine(&header);
     }
 
    /*
@@ -533,5 +544,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertoepson.c,v 1.1 2000/01/20 22:33:11 mike Exp $".
+ * End of "$Id: rastertoepson.c,v 1.2 2000/01/21 02:23:26 mike Exp $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.38 2000/01/20 22:33:10 mike Exp $"
+# "$Id: cups.list,v 1.39 2000/01/21 02:23:25 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -26,8 +26,8 @@
 %product Common UNIX Printing System
 %copyright 1993-2000 by Easy Software Products, All Rights Reserved.
 %vendor Easy Software Products
-%license LICENSE.cups
-%readme README.cups
+%license LICENSE.txt
+%readme README.txt
 %version 1.1b1
 %incompat printpro
 
@@ -35,7 +35,7 @@
 # Server files
 f 0555 root sys /usr/lib/cups/backend/ipp backend/ipp
 l 0555 root sys /usr/lib/cups/backend/http ipp
-f 4550 root sys /usr/lib/cups/backend/lpd backend/lpd
+f 0555 root sys /usr/lib/cups/backend/lpd backend/lpd
 f 0555 root sys /usr/lib/cups/backend/parallel backend/parallel
 f 0555 root sys /usr/lib/cups/backend/serial backend/serial
 f 0555 root sys /usr/lib/cups/backend/socket backend/socket
@@ -243,7 +243,7 @@ f 0444 root sys /usr/include/cups/ipp.h cups/ipp.h
 f 0444 root sys /usr/include/cups/language.h cups/language.h
 f 0444 root sys /usr/include/cups/mime.h cups/mime.h
 f 0444 root sys /usr/include/cups/ppd.h cups/ppd.h
-f 0444 root sys /usr/include/cups/raster.h cups/raster.h
+f 0444 root sys /usr/include/cups/raster.h filter/raster.h
 
 %system irix-6.5
 f 0444 root sys /usr/lib32/libcups.a cups/libcups.a
@@ -333,5 +333,5 @@ f 0444 root sys /usr/man/man5/printers.conf.5 man/printers.conf.5
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.38 2000/01/20 22:33:10 mike Exp $".
+# End of "$Id: cups.list,v 1.39 2000/01/21 02:23:25 mike Exp $".
 #

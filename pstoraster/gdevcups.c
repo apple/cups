@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.20 2000/01/20 13:05:41 mike Exp $"
+ * "$Id: gdevcups.c,v 1.21 2000/01/21 02:23:28 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -1360,7 +1360,7 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
         if (cups->header.cupsBitsPerColor == 1)
 	{
 	  cups->header.cupsBitsPerPixel   = 8;
-	  cups->color_info.depth          = 4;
+	  cups->color_info.depth          = 8;
 	  cups->color_info.num_components = 4;
 	  break;
 	}
@@ -1708,21 +1708,21 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
 		  }
 	          break;
 	      case CUPS_CSPACE_KCMYcm :
-	          for (x = cups->width, cptr = dst, mptr = cptr + bandbytes,
-		           yptr = mptr + bandbytes, kptr = yptr + bandbytes,
-			   lcptr = kptr + bandbytes, lmptr = lcptr + bandbytes,
+	          for (x = cups->width, kptr = dst, cptr = kptr + bandbytes,
+		           mptr = cptr + bandbytes, yptr = mptr + bandbytes,
+			   lcptr = yptr + bandbytes, lmptr = lcptr + bandbytes,
 			   bit = 128;
 		       x > 0;
 		       x --, srcptr ++)
 		  {
 		    if (*srcptr & 0x20)
-		      *cptr |= bit;
-		    if (*srcptr & 0x10)
-		      *mptr |= bit;
-		    if (*srcptr & 0x08)
-		      *yptr |= bit;
-		    if (*srcptr & 0x04)
 		      *kptr |= bit;
+		    if (*srcptr & 0x10)
+		      *cptr |= bit;
+		    if (*srcptr & 0x08)
+		      *mptr |= bit;
+		    if (*srcptr & 0x04)
+		      *yptr |= bit;
 		    if (*srcptr & 0x02)
 		      *lcptr |= bit;
 		    if (*srcptr & 0x01)
@@ -2349,5 +2349,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.20 2000/01/20 13:05:41 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.21 2000/01/21 02:23:28 mike Exp $".
  */
