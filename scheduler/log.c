@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.9 2000/05/02 19:29:23 mike Exp $"
+ * "$Id: log.c,v 1.10 2000/06/27 19:31:23 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -116,9 +116,14 @@ LogMessage(int        level,	/* I - Log level */
     if (ErrorLog[0] == '\0')
       return (1);
     else if (ErrorLog[0] != '/')
-      sprintf(filename, "%s/%s", ServerRoot, ErrorLog);
+      snprintf(backname, sizeof(backname), "%s/%s", ServerRoot, ErrorLog);
     else
-      strcpy(filename, ErrorLog);
+    {
+      strncpy(backname, ErrorLog, sizeof(backname) - 1);
+      backname[sizeof(backname) - 1] = '\0';
+    }
+
+    snprintf(filename, sizeof(filename), backname, ServerName);
 
     if ((ErrorFile = fopen(filename, "a")) == NULL)
       return (0);
@@ -137,9 +142,14 @@ LogMessage(int        level,	/* I - Log level */
     fclose(ErrorFile);
 
     if (ErrorLog[0] != '/')
-      sprintf(filename, "%s/%s", ServerRoot, ErrorLog);
+      snprintf(backname, sizeof(backname), "%s/%s", ServerRoot, ErrorLog);
     else
-      strcpy(filename, ErrorLog);
+    {
+      strncpy(backname, ErrorLog, sizeof(backname) - 1);
+      backname[sizeof(backname) - 1] = '\0';
+    }
+
+    snprintf(filename, sizeof(filename), backname, ServerName);
 
     strcpy(backname, filename);
     strcat(backname, ".O");
@@ -222,9 +232,14 @@ LogPage(job_t       *job,	/* I - Job being printed */
     if (PageLog[0] == '\0')
       return (1);
     else if (PageLog[0] != '/')
-      sprintf(filename, "%s/%s", ServerRoot, PageLog);
+      snprintf(backname, sizeof(backname), "%s/%s", ServerRoot, PageLog);
     else
-      strcpy(filename, PageLog);
+    {
+      strncpy(backname, PageLog, sizeof(backname) - 1);
+      backname[sizeof(backname) - 1] = '\0';
+    }
+
+    snprintf(filename, sizeof(filename), backname, ServerName);
 
     if ((PageFile = fopen(filename, "a")) == NULL)
       return (0);
@@ -243,9 +258,14 @@ LogPage(job_t       *job,	/* I - Job being printed */
     fclose(PageFile);
 
     if (PageLog[0] != '/')
-      sprintf(filename, "%s/%s", ServerRoot, PageLog);
+      snprintf(backname, sizeof(backname), "%s/%s", ServerRoot, PageLog);
     else
-      strcpy(filename, PageLog);
+    {
+      strncpy(backname, PageLog, sizeof(backname) - 1);
+      backname[sizeof(backname) - 1] = '\0';
+    }
+
+    snprintf(filename, sizeof(filename), backname, ServerName);
 
     strcpy(backname, filename);
     strcat(backname, ".O");
@@ -331,9 +351,14 @@ LogRequest(client_t      *con,	/* I - Request to log */
     if (AccessLog[0] == '\0')
       return (1);
     else if (AccessLog[0] != '/')
-      sprintf(filename, "%s/%s", ServerRoot, AccessLog);
+      snprintf(backname, sizeof(backname), "%s/%s", ServerRoot, AccessLog);
     else
-      strcpy(filename, AccessLog);
+    {
+      strncpy(backname, AccessLog, sizeof(backname) - 1);
+      backname[sizeof(backname) - 1] = '\0';
+    }
+
+    snprintf(filename, sizeof(filename), backname, ServerName);
 
     if ((AccessFile = fopen(filename, "a")) == NULL)
       return (0);
@@ -352,9 +377,14 @@ LogRequest(client_t      *con,	/* I - Request to log */
     fclose(AccessFile);
 
     if (AccessLog[0] != '/')
-      sprintf(filename, "%s/%s", ServerRoot, AccessLog);
+      snprintf(backname, sizeof(backname), "%s/%s", ServerRoot, AccessLog);
     else
-      strcpy(filename, AccessLog);
+    {
+      strncpy(backname, AccessLog, sizeof(backname) - 1);
+      backname[sizeof(backname) - 1] = '\0';
+    }
+
+    snprintf(filename, sizeof(filename), backname, ServerName);
 
     strcpy(backname, filename);
     strcat(backname, ".O");
@@ -437,5 +467,5 @@ get_datetime(time_t t)		/* I - Time value */
 
 
 /*
- * End of "$Id: log.c,v 1.9 2000/05/02 19:29:23 mike Exp $".
+ * End of "$Id: log.c,v 1.10 2000/06/27 19:31:23 mike Exp $".
  */
