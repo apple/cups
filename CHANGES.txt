@@ -1,4 +1,4 @@
-CHANGES.txt - 12/16/2004
+CHANGES.txt - 12/27/2004
 ------------------------
 
 CHANGES IN CUPS V1.1.23rc1
