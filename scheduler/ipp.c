@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.179 2003/01/03 14:59:32 mike Exp $"
+ * "$Id: ipp.c,v 1.180 2003/01/03 15:49:57 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -436,6 +436,7 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 
   LogMessage(L_DEBUG, "ProcessIPPRequest: %d status_code=%x",
              con->http.fd, con->response->request.status.status_code);
+
   if (SendHeader(con, HTTP_OK, "application/ipp"))
   {
     con->http.data_encoding = HTTP_ENCODE_LENGTH;
@@ -443,6 +444,9 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 
     httpPrintf(HTTP(con), "Content-Length: %d\r\n\r\n",
                con->http.data_remaining);
+
+    LogMessage(L_DEBUG2, "ProcessIPPRequest: Adding fd %d to OutputSet...",
+               con->http.fd);
 
     FD_SET(con->http.fd, &OutputSet);
 
@@ -6035,5 +6039,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.179 2003/01/03 14:59:32 mike Exp $".
+ * End of "$Id: ipp.c,v 1.180 2003/01/03 15:49:57 mike Exp $".
  */
