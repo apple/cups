@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.18.2.15 2004/05/13 20:24:48 mike Exp $"
+ * "$Id: dest.c,v 1.18.2.16 2004/06/29 01:04:30 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -30,6 +30,7 @@
  *   cupsFreeDests()   - Free the memory used by the list of destinations.
  *   cupsGetDest()     - Get the named destination from the list.
  *   cupsGetDests()    - Get the list of destinations.
+ *   cupsGetDests2()   - Get the list of destinations using a HTTP connection.
  *   cupsSetDests()    - Set the list of destinations.
  *   cups_get_dests()  - Get destinations from a file.
  *   cups_get_sdests() - Get destinations from a server.
@@ -52,7 +53,7 @@
 
 static int	cups_get_dests(const char *filename, int num_dests,
 		               cups_dest_t **dests);
-static int	cups_get_sdests(ipp_op_t op, int num_dests,
+static int	cups_get_sdests(http_t *http, ipp_op_t op, int num_dests,
 		                cups_dest_t **dests);
 
 
@@ -209,6 +210,33 @@ cupsGetDest(const char  *name,		/* I - Name of destination */
 int					/* O - Number of destinations */
 cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
 {
+  int		num_dests;		/* Number of destinations */
+  http_t	*http;			/* HTTP connection */
+
+
+ /*
+  * Connect to the CUPS server and get the destination list and options...
+  */
+
+  http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
+
+  num_dests = cupsGetDests2(http, dests);
+
+  if (http)
+    httpClose(http);
+
+  return (num_dests);
+}
+
+
+/*
+ * 'cupsGetDests2()' - Get the list of destinations.
+ */
+
+int					/* O - Number of destinations */
+cupsGetDests2(http_t      *http,	/* I - HTTP connection */
+              cups_dest_t **dests)	/* O - Destinations */
+{
   int		i;			/* Looping var */
   int		num_dests;		/* Number of destinations */
   cups_dest_t	*dest;			/* Destination pointer */
@@ -222,6 +250,13 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
 
 
  /*
+  * Range check the input...
+  */
+
+  if (!http || !dests)
+    return (0);
+
+ /*
   * Initialize destination array...
   */
 
@@ -232,8 +267,8 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
   * Grab the printers and classes...
   */
 
-  num_dests = cups_get_sdests(CUPS_GET_PRINTERS, num_dests, dests);
-  num_dests = cups_get_sdests(CUPS_GET_CLASSES, num_dests, dests);
+  num_dests = cups_get_sdests(http, CUPS_GET_PRINTERS, num_dests, dests);
+  num_dests = cups_get_sdests(http, CUPS_GET_CLASSES, num_dests, dests);
 
  /*
   * Make a copy of the "real" queues for a later sanity check...
@@ -259,7 +294,7 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
   * Grab the default destination...
   */
 
-  if ((defprinter = cupsGetDefault()) != NULL)
+  if ((defprinter = cupsGetDefault2(http)) != NULL)
   {
    /*
     * Grab printer and instance name...
@@ -363,6 +398,31 @@ void
 cupsSetDests(int         num_dests,	/* I - Number of destinations */
              cups_dest_t *dests)	/* I - Destinations */
 {
+  http_t	*http;			/* HTTP connection */
+
+
+ /*
+  * Connect to the CUPS server and save the destination list and options...
+  */
+
+  http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
+
+  cupsSetDests2(http, num_dests, dests);
+
+  if (http)
+    httpClose(http);
+}
+
+
+/*
+ * 'cupsSetDests()' - Set the list of destinations.
+ */
+
+int					/* O - 0 on success, -1 on error */
+cupsSetDests2(http_t      *http,	/* I - HTTP connection */
+              int         num_dests,	/* I - Number of destinations */
+              cups_dest_t *dests)	/* I - Destinations */
+{
   int		i, j;			/* Looping vars */
   int		wrote;			/* Wrote definition? */
   cups_dest_t	*dest;			/* Current destination */
@@ -377,11 +437,18 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
 
 
  /*
+  * Range check the input...
+  */
+
+  if (!http || !num_dests || !dests)
+    return (-1);
+
+ /*
   * Get the server destinations...
   */
 
-  num_temps = cups_get_sdests(CUPS_GET_PRINTERS, 0, &temps);
-  num_temps = cups_get_sdests(CUPS_GET_CLASSES, num_temps, &temps);
+  num_temps = cups_get_sdests(http, CUPS_GET_PRINTERS, 0, &temps);
+  num_temps = cups_get_sdests(http, CUPS_GET_CLASSES, num_temps, &temps);
 
  /*
   * Figure out which file to write to...
@@ -417,7 +484,7 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
   if ((fp = fopen(filename, "w")) == NULL)
   {
     cupsFreeDests(num_temps, temps);
-    return;
+    return (-1);
   }
 
  /*
@@ -495,7 +562,9 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
   * Close the file and return...
   */
 
-  fclose(fp);      
+  fclose(fp);
+
+  return (0);
 }
 
 
@@ -656,12 +725,12 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
  */
 
 static int				/* O - Number of destinations */
-cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
+cups_get_sdests(http_t      *http,	/* I - HTTP connection */
+                ipp_op_t    op,		/* I - get-printers or get-classes */
                 int         num_dests,	/* I - Number of destinations */
                 cups_dest_t **dests)	/* IO - Destinations */
 {
   cups_dest_t	*dest;			/* Current destination */
-  http_t	*http;			/* HTTP connection */
   ipp_t		*request,		/* IPP Request */
 		*response;		/* IPP Response */
   ipp_attribute_t *attr;		/* Current attribute */
@@ -674,14 +743,6 @@ cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
 		  "job-sheets-default"
 		};
 
-
- /*
-  * Connect to the CUPS server...
-  */
-
-  if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
-                                 cupsEncryption())) == NULL)
-    return (num_dests);
 
  /*
   * Build a CUPS_GET_PRINTERS or CUPS_GET_CLASSES request, which require
@@ -783,12 +844,6 @@ cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
   }
 
  /*
-  * Close the server connection...
-  */
-
-  httpClose(http);
-
- /*
   * Return the count...
   */
 
@@ -797,5 +852,5 @@ cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
 
 
 /*
- * End of "$Id: dest.c,v 1.18.2.15 2004/05/13 20:24:48 mike Exp $".
+ * End of "$Id: dest.c,v 1.18.2.16 2004/06/29 01:04:30 mike Exp $".
  */

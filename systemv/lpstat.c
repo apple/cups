@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.37.2.19 2004/05/27 15:37:47 mike Exp $"
+ * "$Id: lpstat.c,v 1.37.2.20 2004/06/29 01:04:30 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -25,6 +25,7 @@
  *
  *   main()           - Parse options and show status information.
  *   check_dest()     - Verify that the named destination(s) exists.
+ *   connect_server() - Connect to the server as necessary...
  *   show_accepting() - Show acceptance status.
  *   show_classes()   - Show printer classes.
  *   show_default()   - Show default destination.
@@ -51,7 +52,8 @@
  * Local functions...
  */
 
-static void	check_dest(const char *, int *, cups_dest_t **);
+static void	check_dest(http_t *, const char *, int *, cups_dest_t **);
+static http_t	*connect_server(http_t *);
 static int	show_accepting(http_t *, const char *, int, cups_dest_t *);
 static int	show_classes(http_t *, const char *);
 static void	show_default(int, cups_dest_t *);
@@ -78,6 +80,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		long_status;	/* Long status report? */
   int		ranking;	/* Show job ranking? */
   const char	*which;		/* Which jobs to show? */
+  char		op;		/* Last operation on command-line */
 
 
 #ifdef LC_TIME
@@ -91,6 +94,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   ranking     = 0;
   status      = 0;
   which       = "not-completed";
+  op          = 0;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -113,13 +117,15 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 
         case 'P' : /* Show paper types */
+	    op = 'P';
 	    break;
-	    
+
         case 'R' : /* Show ranking */
 	    ranking = 1;
 	    break;
-	    
+
         case 'S' : /* Show charsets */
+	    op = 'S';
 	    if (!argv[i][2])
 	      i ++;
 	    break;
@@ -150,21 +156,12 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 
         case 'a' : /* Show acceptance status */
-	    if (!http)
-	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                cupsEncryption());
-
-	      if (http == NULL)
-	      {
-		perror("lpstat: Unable to connect to server");
-		return (1);
-	      }
-            }
+	    op   = 'a';
+	    http = connect_server(http);
 
 	    if (argv[i][2] != '\0')
 	    {
-              check_dest(argv[i] + 2, &num_dests, &dests);
+              check_dest(http, argv[i] + 2, &num_dests, &dests);
 
 	      status |= show_accepting(http, argv[i] + 2, num_dests, dests);
 	    }
@@ -172,14 +169,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    {
 	      i ++;
 
-              check_dest(argv[i], &num_dests, &dests);
+              check_dest(http, argv[i], &num_dests, &dests);
 
 	      status |= show_accepting(http, argv[i], num_dests, dests);
 	    }
 	    else
 	    {
               if (num_dests == 0)
-		num_dests = cupsGetDests(&dests);
+		num_dests = cupsGetDests2(http, &dests);
 
 	      status |= show_accepting(http, NULL, num_dests, dests);
 	    }
@@ -187,17 +184,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 #ifdef __sgi
         case 'b' : /* Show both the local and remote status */
-	    if (!http)
-	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                cupsEncryption());
-
-	      if (http == NULL)
-	      {
-		perror("lpstat: Unable to connect to server");
-		return (1);
-	      }
-            }
+	    op   = 'b';
+	    http = connect_server(http);
 
 	    if (argv[i][2] != '\0')
 	    {
@@ -210,7 +198,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      * happy...
 	      */
 
-              check_dest(argv[i] + 2, &num_dests, &dests);
+              check_dest(http, argv[i] + 2, &num_dests, &dests);
 
 	      puts("");
 	      status |= show_jobs(http, argv[i] + 2, NULL, 3, ranking, which);
@@ -226,21 +214,12 @@ main(int  argc,			/* I - Number of command-line arguments */
 #endif /* __sgi */
 
         case 'c' : /* Show classes and members */
-	    if (!http)
-	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                cupsEncryption());
-
-	      if (http == NULL)
-	      {
-		perror("lpstat: Unable to connect to server");
-		return (1);
-	      }
-            }
+	    op   = 'c';
+	    http = connect_server(http);
 
 	    if (argv[i][2] != '\0')
 	    {
-              check_dest(argv[i] + 2, &num_dests, &dests);
+              check_dest(http, argv[i] + 2, &num_dests, &dests);
 
 	      status |= show_classes(http, argv[i] + 2);
 	    }
@@ -248,7 +227,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    {
 	      i ++;
 
-              check_dest(argv[i], &num_dests, &dests);
+              check_dest(http, argv[i], &num_dests, &dests);
 
 	      status |= show_classes(http, argv[i]);
 	    }
@@ -257,17 +236,21 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 
         case 'd' : /* Show default destination */
+	    op   = 'd';
+	    http = connect_server(http);
+
             if (num_dests == 0)
-	      num_dests = cupsGetDests(&dests);
+	      num_dests = cupsGetDests2(http, &dests);
 
             show_default(num_dests, dests);
 	    break;
 
         case 'f' : /* Show forms */
+	    op   = 'f';
 	    if (!argv[i][2])
 	      i ++;
 	    break;
-	    
+
         case 'h' : /* Connect to host */
 	    if (http)
 	    {
@@ -293,21 +276,12 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         case 'l' : /* Long status or long job status */
 #ifdef __sgi
-	    if (!http)
-	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                cupsEncryption());
-
-	      if (http == NULL)
-	      {
-		perror("lpstat: Unable to connect to server");
-		return (1);
-	      }
-            }
+	    op   = 'l';
+	    http = connect_server(http);
 
 	    if (argv[i][2] != '\0')
 	    {
-              check_dest(argv[i] + 2, &num_dests, &dests);
+              check_dest(http, argv[i] + 2, &num_dests, &dests);
 
 	      status |= show_jobs(http, argv[i] + 2, NULL, 3, ranking, which);
 	    }
@@ -317,21 +291,12 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 
         case 'o' : /* Show jobs by destination */
-	    if (!http)
-	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                cupsEncryption());
-
-	      if (http == NULL)
-	      {
-		perror("lpstat: Unable to connect to server");
-		return (1);
-	      }
-            }
+	    op   = 'o';
+	    http = connect_server(http);
 
 	    if (argv[i][2] != '\0')
 	    {
-              check_dest(argv[i] + 2, &num_dests, &dests);
+              check_dest(http, argv[i] + 2, &num_dests, &dests);
 
 	      status |= show_jobs(http, argv[i] + 2, NULL, long_status,
 	                          ranking, which);
@@ -340,7 +305,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    {
 	      i ++;
 
-              check_dest(argv[i], &num_dests, &dests);
+              check_dest(http, argv[i], &num_dests, &dests);
 
 	      status |= show_jobs(http, argv[i], NULL, long_status,
 	                          ranking, which);
@@ -351,21 +316,12 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 
         case 'p' : /* Show printers */
-	    if (!http)
-	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                cupsEncryption());
-
-	      if (http == NULL)
-	      {
-		perror("lpstat: Unable to connect to server");
-		return (1);
-	      }
-            }
+	    op   = 'p';
+	    http = connect_server(http);
 
 	    if (argv[i][2] != '\0')
 	    {
-              check_dest(argv[i] + 2, &num_dests, &dests);
+              check_dest(http, argv[i] + 2, &num_dests, &dests);
 
 	      status |= show_printers(http, argv[i] + 2, num_dests, dests, long_status);
 	    }
@@ -373,50 +329,32 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    {
 	      i ++;
 
-              check_dest(argv[i], &num_dests, &dests);
+              check_dest(http, argv[i], &num_dests, &dests);
 
 	      status |= show_printers(http, argv[i], num_dests, dests, long_status);
 	    }
 	    else
 	    {
               if (num_dests == 0)
-		num_dests = cupsGetDests(&dests);
+		num_dests = cupsGetDests2(http, &dests);
 
 	      status |= show_printers(http, NULL, num_dests, dests, long_status);
 	    }
 	    break;
 
         case 'r' : /* Show scheduler status */
-	    if (!http)
-	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                cupsEncryption());
-
-	      if (http == NULL)
-	      {
-		perror("lpstat: Unable to connect to server");
-		return (1);
-	      }
-            }
+	    op   = 'r';
+	    http = connect_server(http);
 
 	    show_scheduler(http);
 	    break;
 
         case 's' : /* Show summary */
-	    if (!http)
-	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                cupsEncryption());
-
-	      if (http == NULL)
-	      {
-		perror("lpstat: Unable to connect to server");
-		return (1);
-	      }
-            }
+	    op   = 's';
+	    http = connect_server(http);
 
             if (num_dests == 0)
-	      num_dests = cupsGetDests(&dests);
+	      num_dests = cupsGetDests2(http, &dests);
 
 	    show_default(num_dests, dests);
 	    status |= show_classes(http, NULL);
@@ -424,20 +362,11 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 
         case 't' : /* Show all info */
-	    if (!http)
-	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                cupsEncryption());
-
-	      if (http == NULL)
-	      {
-		perror("lpstat: Unable to connect to server");
-		return (1);
-	      }
-            }
+	    op   = 't';
+	    http = connect_server(http);
 
             if (num_dests == 0)
-	      num_dests = cupsGetDests(&dests);
+	      num_dests = cupsGetDests2(http, &dests);
 
 	    show_scheduler(http);
 	    show_default(num_dests, dests);
@@ -449,17 +378,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 
         case 'u' : /* Show jobs by user */
-	    if (!http)
-	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                cupsEncryption());
-
-	      if (http == NULL)
-	      {
-		perror("lpstat: Unable to connect to server");
-		return (1);
-	      }
-            }
+	    op   = 'u';
+	    http = connect_server(http);
 
 	    if (argv[i][2] != '\0')
 	      status |= show_jobs(http, NULL, argv[i] + 2, long_status,
@@ -476,21 +396,12 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 
         case 'v' : /* Show printer devices */
-	    if (!http)
-	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                cupsEncryption());
-
-	      if (http == NULL)
-	      {
-		perror("lpstat: Unable to connect to server");
-		return (1);
-	      }
-            }
+	    op   = 'v';
+	    http = connect_server(http);
 
 	    if (argv[i][2] != '\0')
 	    {
-              check_dest(argv[i] + 2, &num_dests, &dests);
+              check_dest(http, argv[i] + 2, &num_dests, &dests);
 
 	      status |= show_devices(http, argv[i] + 2, num_dests, dests);
 	    }
@@ -498,14 +409,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    {
 	      i ++;
 
-              check_dest(argv[i], &num_dests, &dests);
+              check_dest(http, argv[i], &num_dests, &dests);
 
 	      status |= show_devices(http, argv[i], num_dests, dests);
 	    }
 	    else
 	    {
               if (num_dests == 0)
-		num_dests = cupsGetDests(&dests);
+		num_dests = cupsGetDests2(http, &dests);
 
 	      status |= show_devices(http, NULL, num_dests, dests);
 	    }
@@ -518,34 +429,15 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
     else
     {
-      if (!http)
-      {
-	http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                          cupsEncryption());
-
-	if (http == NULL)
-	{
-	  perror("lpstat: Unable to connect to server");
-	  return (1);
-	}
-      }
+      http = connect_server(http);
 
       status |= show_jobs(http, argv[i], NULL, long_status, ranking, which);
+      op = 'o';
     }
 
-  if (argc == 1)
+  if (!op)
   {
-    if (!http)
-    {
-      http = httpConnectEncrypt(cupsServer(), ippPort(),
-                                cupsEncryption());
-
-      if (http == NULL)
-      {
-	perror("lpstat: Unable to connect to server");
-	return (1);
-      }
-    }
+    http = connect_server(http);
 
     status |= show_jobs(http, NULL, cupsUser(), long_status, ranking, which);
   }
@@ -559,7 +451,8 @@ main(int  argc,			/* I - Number of command-line arguments */
  */
 
 static void
-check_dest(const char  *name,		/* I  - Name of printer/class(es) */
+check_dest(http_t      *http,		/* I  - HTTP connection */
+           const char  *name,		/* I  - Name of printer/class(es) */
            int         *num_dests,	/* IO - Number of destinations */
 	   cups_dest_t **dests)		/* IO - Destinations */
 {
@@ -573,7 +466,7 @@ check_dest(const char  *name,		/* I  - Name of printer/class(es) */
   */
 
   if (*num_dests == 0)
-    *num_dests = cupsGetDests(dests);
+    *num_dests = cupsGetDests2(http, dests);
 
  /*
   * Scan the name string for printer/class name(s)...
@@ -618,6 +511,29 @@ check_dest(const char  *name,		/* I  - Name of printer/class(es) */
       exit(1);
     }
   }
+}
+
+
+/*
+ * 'connect_server()' - Connect to the server as necessary...
+ */
+
+static http_t *				/* O - New HTTP connection */
+connect_server(http_t *http)		/* I - Current HTTP connection */
+{
+  if (!http)
+  {
+    http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                      cupsEncryption());
+
+    if (http == NULL)
+    {
+      perror("lpstat: Unable to connect to server");
+      exit(1);
+    }
+  }
+
+  return (http);
 }
 
 
@@ -979,7 +895,12 @@ show_classes(http_t     *http,		/* I - HTTP connection to server */
       {
         httpSeparate(printer_uri, method, username, server, &port, resource);
 
-        if ((http2 = httpConnectEncrypt(server, port, cupsEncryption())) != NULL)
+        if (!strcasecmp(server, http->hostname))
+	  http2 = http;
+	else
+	  http2 = httpConnectEncrypt(server, port, cupsEncryption());
+
+	if (http2 != NULL)
 	{
 	 /*
 	  * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the
@@ -1014,7 +935,8 @@ show_classes(http_t     *http,		/* I - HTTP connection to server */
           if ((response2 = cupsDoRequest(http2, request, "/")) != NULL)
 	    members = ippFindAttribute(response2, "member-names", IPP_TAG_NAME);
 
-          httpClose(http2);
+          if (http2 != http)
+            httpClose(http2);
         }
       }
 
@@ -2163,5 +2085,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.37.2.19 2004/05/27 15:37:47 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.37.2.20 2004/06/29 01:04:30 mike Exp $".
  */

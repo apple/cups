@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.49 2004/05/27 18:18:11 mike Exp $"
+ * "$Id: http.c,v 1.82.2.50 2004/06/29 01:04:30 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -290,6 +290,8 @@ httpClearCookie(http_t *http)			/* I - Connection */
 void
 httpClose(http_t *http)		/* I - Connection to close */
 {
+  DEBUG_printf(("httpClose(http=%p)\n", http));
+
   if (!http)
     return;
 
@@ -353,7 +355,10 @@ httpConnectEncrypt(const char *host,	/* I - Host to connect to */
   struct hostent	*hostaddr;	/* Host address data */
 
 
-  if (host == NULL)
+  DEBUG_printf(("httpConnectEncrypt(host=\"%s\", port=%d, encrypt=%d)\n",
+                host ? host : "(null)", port, encrypt));
+
+  if (!host)
     return (NULL);
 
   httpInitialize();
@@ -1580,6 +1585,9 @@ httpUpdate(http_t *http)		/* I - HTTP data */
       if (http->status == HTTP_CONTINUE)
         return (http->status);
 
+      if (http->status < HTTP_BAD_REQUEST)
+        http->digest_tries = 0;
+
 #ifdef HAVE_SSL
       if (http->status == HTTP_SWITCHING_PROTOCOLS && !http->tls)
       {
@@ -2462,5 +2470,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.49 2004/05/27 18:18:11 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.50 2004/06/29 01:04:30 mike Exp $".
  */

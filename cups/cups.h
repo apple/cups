@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h,v 1.32.2.14 2004/02/24 19:04:05 mike Exp $"
+ * "$Id: cups.h,v 1.32.2.15 2004/06/29 01:04:30 mike Exp $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -181,6 +181,24 @@ extern http_status_t	cupsPutFile(http_t *http, const char *resource,
 			            const char *filename);
 extern http_status_t	cupsPutFd(http_t *http, const char *resource, int fd);
 
+/**** New in CUPS 1.1.21 ****/
+extern const char	*cupsGetDefault2(http_t *http);
+extern int		cupsGetDests2(http_t *http, cups_dest_t **dests);
+extern int		cupsGetJobs2(http_t *http, cups_job_t **jobs,
+			             const char *dest, int myjobs,
+				     int completed);
+extern const char	*cupsGetPPD2(http_t *http, const char *printer);
+extern int		cupsPrintFile2(http_t *http, const char *printer,
+			               const char *filename,
+				       const char *title, int num_options,
+				       cups_option_t *options);
+extern int		cupsPrintFiles2(http_t *http, const char *printer,
+			                int num_files, const char **files,
+					const char *title, int num_options,
+					cups_option_t *options);
+extern int		cupsSetDests2(http_t *http, int num_dests,
+			              cups_dest_t *dests);
+
 
 #  ifdef __cplusplus
 }
@@ -189,5 +207,5 @@ extern http_status_t	cupsPutFd(http_t *http, const char *resource, int fd);
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.32.2.14 2004/02/24 19:04:05 mike Exp $".
+ * End of "$Id: cups.h,v 1.32.2.15 2004/06/29 01:04:30 mike Exp $".
  */

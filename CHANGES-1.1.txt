@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- Added new CUPS API convenience functions which accept
+	  a HTTP connection to eliminate extra username/password
+	  prompts. This resolves a previous authentication
+	  caching issue (STR #729, STR #743)
 	- The scheduler did not correctly throttle the browse
 	  broadcasts, resulting in missing printers on client
 	  machines (STR #754)
