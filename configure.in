@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.9 1999/04/29 19:22:49 mike Exp $"
+dnl "$Id: configure.in,v 1.10 1999/05/14 17:02:53 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -42,14 +42,12 @@ fi)
 dnl Checks for programs...
 AC_PROG_AWK
 AC_PROG_CC
-AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_RANLIB
 AC_PATH_PROG(AR,ar)
 AC_PATH_PROG(CP,cp)
 AC_PATH_PROG(MKDIR,mkdir)
 AC_PATH_PROG(RM,rm)
-AC_PATH_PROG(FLUID,fluid)
 AC_PATH_PROG(GROFF,groff)
 AC_PATH_PROG(HTMLDOC,htmldoc)
 
@@ -76,38 +74,24 @@ else
 	echo "Not using -lnsl since you are running IRIX."
 fi)
 
-AC_PATH_X
-if test "$x_libraries" = "/usr/lib"; then
-	echo "Ignoring X library directory \"$x_libraries\" requested by configure."
-	x_libraries="NONE"
-fi
-if test "$x_includes" = "/usr/include"; then
-	echo "Ignoring X include directory \"$x_includes\" requested by configure."
-	x_includes="NONE"
-fi
-GUILIBS=""
-AC_SUBST(GUILIBS)
-AC_CHECK_HEADER(FL/Fl.H,AC_DEFINE(HAVE_LIBFLTK)
-if test "$x_libraries" = "NONE" -o "$x_libraries" = ""; then
-	GUILIBS="-lfltk -lX11 -lXext"
-else
-	GUILIBS="-L$x_libraries -lfltk -lX11 -lXext"
-fi
-if test "$x_includes" != "NONE" -a "$x_includes" != ""; then
-	CFLAGS="$CFLAGS -I$x_includes"
-	CXXFLAGS="$CXXFLAGS -I$x_includes"
-fi)
-
 IMGLIBS=""
 AC_SUBST(IMGLIBS)
-AC_CHECK_LIB(jpeg,jpeg_destroy_decompress,AC_DEFINE(HAVE_LIBJPEG)
-IMGLIBS="$IMGLIBS -ljpeg")
-AC_CHECK_LIB(png,png_read_info,AC_DEFINE(HAVE_LIBPNG)
-IMGLIBS="$IMGLIBS -lpng")
-AC_CHECK_LIB(tiff,TIFFGetField,AC_DEFINE(HAVE_LIBTIFF)
-IMGLIBS="$IMGLIBS -ltiff")
-AC_CHECK_LIB(z,deflate,AC_DEFINE(HAVE_LIBZ)
-IMGLIBS="$IMGLIBS -lz")
+AC_CHECK_LIB(jpeg,jpeg_destroy_decompress,
+    AC_CHECK_HEADER(jpeglib.h,
+        AC_DEFINE(HAVE_LIBJPEG)
+        IMGLIBS="$IMGLIBS -ljpeg"))
+AC_CHECK_LIB(png,png_read_info,
+    AC_CHECK_HEADER(png.h,
+        AC_DEFINE(HAVE_LIBPNG)
+        IMGLIBS="$IMGLIBS -lpng"))
+AC_CHECK_LIB(tiff,TIFFGetField,
+    AC_CHECK_HEADER(tiff.h,
+        AC_DEFINE(HAVE_LIBTIFF)
+        IMGLIBS="$IMGLIBS -ltiff"))
+AC_CHECK_LIB(z,deflate,
+    AC_CHECK_HEADER(zlib.h,
+        AC_DEFINE(HAVE_LIBZ)
+        IMGLIBS="$IMGLIBS -lz"))
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -132,18 +116,27 @@ if test "$prefix" = "NONE"; then
 	prefix="/usr"
 fi
 
-dnl SERVERDIR needs special attention for the default location...
+dnl CUPS_SERVERROOT needs special attention for the default location...
 if test "$prefix" = "/usr"; then
-	AC_DEFINE(SERVERDIR, "/var/cups")
+	CUPS_SERVERROOT="/var/cups"
 else
-	AC_DEFINE_UNQUOTED(SERVERDIR, "$prefix/var/cups")
+	CUPS_SERVERROOT="$prefix/var/cups"
 fi
+AC_DEFINE_UNQUOTED(CUPS_SERVERROOT, "$CUPS_SERVERROOT")
+AC_SUBST(CUPS_SERVERROOT)
 
-dnl Set the LOCALE directory...
-AC_DEFINE_UNQUOTED(LOCALEDIR, "$prefix/lib/locale")
+dnl Set the CUPS_LOCALE directory...
+CUPS_LOCALEDIR="$prefix/lib/locale"
+AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$CUPS_LOCALEDIR")
+AC_SUBST(CUPS_LOCALEDIR)
+
+dnl Set the CUPS_DATAFILE directory...
+CUPS_DATADIR="$prefix/share/cups"
+AC_DEFINE_UNQUOTED(CUPS_DATADIR, "$CUPS_DATADIR")
+AC_SUBST(CUPS_DATADIR)
 
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.9 1999/04/29 19:22:49 mike Exp $".
+dnl End of "$Id: configure.in,v 1.10 1999/05/14 17:02:53 mike Exp $".
 dnl

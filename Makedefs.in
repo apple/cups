@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.5 1999/04/22 20:18:16 mike Exp $"
+# "$Id: Makedefs.in,v 1.6 1999/05/14 17:02:52 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -32,8 +32,6 @@ AR	=	@AR@
 AWK	=	@AWK@
 CC	=	@CC@
 CP	=	@CP@
-CXX	=	@CXX@
-FLUID	=	@FLUID@
 HTMLDOC	=	@HTMLDOC@
 LN	=	/bin/ln -sf
 MKDIR	=	@MKDIR@ -p
@@ -52,8 +50,6 @@ SHELL	=	/bin/sh
 
 ARFLAGS	=	crvs
 CFLAGS	=	@CFLAGS@ $(OPTIM) -I.. $(OPTIONS)
-CXXFLAGS =	@CXXFLAGS@ $(OPTIM) -I.. $(OPTIONS)
-GUILIBS	=	@GUILIBS@ $(LIBS) -lm
 IMGLIBS	=	@IMGLIBS@ $(LIBS) -lm
 LDFLAGS	=	@LDFLAGS@ $(OPTIM)
 LIBS	=	@LIBS@ -L../cups -lcups
@@ -89,29 +85,27 @@ srcdir		=	@srcdir@
 sysconfdir	=	@sysconfdir@
 top_srcdir	=	@top_srcdir@
 
-INCDIR	=	$(includedir)/cups
-LIBDIR	=	$(libdir)
-SPOOLDIR =	$(libexecdir)/cups
-LOCAL	=	@localstatedir@
-MANDIR	=	@mandir@
-SBINDIR	=	@sbindir@
+BINDIR		=	@bindir@
+DATADIR		=	@CUPS_DATADIR@
+INCLUDEDIR	=	$(includedir)/cups
+LIBDIR		=	$(libdir)
+LOCALEDIR	= 	@CUPS_LOCALEDIR@
+MANDIR		=	@mandir@
+SBINDIR		=	@sbindir@
+SERVERROOT	= 	@CUPS_SERVERROOT@
 
 #
 # Rules...
 #
 
-.SUFFIXES:	.a .c .cxx .fl .h .man .o .z
+.SUFFIXES:	.a .c .h .1 .2 .3 .4 .5 .6 .7 .8 .o .z
 .c.o:
 	$(CC) $(CFLAGS) -c $<
-.cxx.o:
-	$(CXX) $(CXXFLAGS) -c $<
-.fl.cxx .fl.h:
-	$(FLUID) -c $<
-.man.z:
+.1.z .2.z .3.z .4.z .5.z .6.z .7.z .8.z:
 	$(NROFF) -man $< >t
 	pack -f t
-	mv t $@
+	mv t.z $@
 
 #
-# End of "$Id: Makedefs.in,v 1.5 1999/04/22 20:18:16 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.6 1999/05/14 17:02:52 mike Exp $"
 #

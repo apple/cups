@@ -1,0 +1,109 @@
+.\"
+.\" "$Id: lpadmin.8,v 1.1 1999/05/14 17:03:03 mike Exp $"
+.\"
+.\"   lpadmin man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-1999 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH lpadmin 8 "Common UNIX Printing System" "14 May 1999" "Easy Software Products"
+.SH NAME
+lpadmin \- configure cups destinations
+.SH SYNOPSIS
+.B lpadmin
+\-d
+.I destination
+.br
+.B lpadmin
+\-p
+.I printer
+.I option(s)
+.br
+.B lpadmin
+\-x
+.I destination
+.SH DESCRIPTION
+\fBlpadmin\fR configures printer and class queues provided by CUPS. It can also
+be used to set the system default printer or class.
+.LP
+The first form of the command sets the default printer or class to
+\fIdestination\fR.  Subsequent print jobs submitted via the \fIlp(1)\fR or
+\fIlpr(1)\fR commands will use this destination unless the user specifies
+otherwise.
+.LP
+The second form of the command configures the named printer.  The additional
+options are described below.
+.LP
+The third form of the command deletes the printer or class \fIdestination\fR.
+Any jobs that are pending for the destination will be removed and any job that
+is currently printed will be aborted.
+.SH CONFIGURATION OPTIONS
+The following options are recognized when configuring a printer queue:
+.TP 5
+\-c \fIclass\fR
+.br
+Adds the named \fIprinter\fR to \fIclass\fR.  If \fIclass\fR does not
+exist it is created automatically.
+.TP 5
+\-i \fIinterface\fR
+.br
+Sets a System V style interface script for the printer.  This option cannot
+be specified with the \fI\-P\fR option (PPD file) and is intended for
+providing support for legacy printer drivers.
+.TP 5
+\-r \fIclass\fR
+.br
+Removes the named \fIprinter\fR from \fIclass\fR.  If the resulting class
+becomes empty it is removed.
+.TP 5
+\-v \fIdevice-uri\fR
+.br
+Sets the \fIdevice-uri\fR attribute of the printer queue.  If \fIdevice-uri\fR
+is a filename it is automatically converted to the form \fBfile:/file/name\fR.
+.TP 5
+\-F \fIfilter\fR
+.br
+Adds a filter for the printer.  \fIFilter\fR is a string of the form
+\fI"mime-type cost program"\fR, where \fImime-type\fR is a MIME type string
+(e.g. "application/postscript", "text/*"), \fIcost\fR is a filtering cost from
+0 to 100, and \fIprogram\fR is the filter program to use.  If \fIprogram\fR
+is not an absolute path then the filter is assumed to reside in the
+scheduler's standard filter directory.
+.TP 5
+\-P \fIppd-file\fR
+.br
+Specifies a PostScript Printer Description file to use with the printer. If
+specified, this option overrides the \fI-i\fR option (interface script).
+.SH COMPATIBILITY
+Unlike the System V printing system, CUPS allows printer names to contain
+any printable character except SPACE and TAB. Also, printer and class names are
+\fBnot\fR case-sensitive. Also, the CUPS version of \fBlpadmin\fR may ask the
+user for an access password depending on the printing system configuration.
+This differs from the System V version which requires the root user to execute
+this command.
+.LP
+The CUPS version of \fBlpadmin\fR does not support all of the System V
+printing system configuration options.
+.SH SEE ALSO
+accept(8), cancel(1), disable(8), enable(8), lp(1), lpstat(1), reject(8),
+CUPS Software Administrator's Manual
+.SH COPYRIGHT
+Copyright 1993-1999 by Easy Software Products, All Rights Reserved.
+.\"
+.\" End of "$Id: lpadmin.8,v 1.1 1999/05/14 17:03:03 mike Exp $".
+.\"

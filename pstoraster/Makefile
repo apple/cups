@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.7 1999/05/10 21:34:46 mike Exp $"
+# "$Id: Makefile,v 1.8 1999/05/14 17:03:06 mike Exp $"
 #
 #   GNU Ghostscript makefile for the Common UNIX Printing System (CUPS).
 #
@@ -137,13 +137,12 @@ arch.h:		genarch
 # pstoraster - PostScript conversion filter.
 #
 
-pstoraster:	$(OBJS) ../Makedefs ../cups/libcups.a ../jpeg/libjpeg.a ../zlib/libz.a
-	$(CC) $(LDFLAGS) -o pstoraster $(OBJS) ../jpeg/libjpeg.a ../zlib/libz.a \
-		$(LIBS) -lm
+pstoraster:	$(OBJS) ../Makedefs ../cups/libcups.a
+	$(CC) $(LDFLAGS) -o pstoraster $(OBJS) $(IMGLIBS) 
 
 $(OBJS):	arch.h ../config.h ../Makedefs
 gconf.o iconf.o gscdef.o:	gconfig.h
 
 #
-# End of "$Id: Makefile,v 1.7 1999/05/10 21:34:46 mike Exp $".
+# End of "$Id: Makefile,v 1.8 1999/05/14 17:03:06 mike Exp $".
 #

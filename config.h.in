@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.4 1999/04/29 19:22:49 mike Exp $"
+ * "$Id: config.h.in,v 1.5 1999/05/14 17:02:53 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -28,14 +28,15 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION	"1.0"
+#define CUPS_SVERSION	"CUPS v1.0"
 
 /*
  * Where are files stored?
  */
 
-#define LOCALEDIR	"/usr/lib/locale"
-#define SERVERDIR	"/var/cups"
+#define CUPS_LOCALEDIR	"/usr/lib/locale"
+#define CUPS_SERVERROOT	"/var/cups"
+#define CUPS_DATADIR	"/usr/share/cups"
 
 /*
  * Do we have various image libraries?
@@ -90,5 +91,5 @@
 #undef HAVE_WAIT3
 
 /*
- * End of "$Id: config.h.in,v 1.4 1999/04/29 19:22:49 mike Exp $".
+ * End of "$Id: config.h.in,v 1.5 1999/05/14 17:02:53 mike Exp $".
  */

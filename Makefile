@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.7 1999/04/28 15:51:32 mike Exp $"
+# "$Id: Makefile,v 1.8 1999/05/14 17:02:53 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -22,11 +22,14 @@
 #         WWW: http://www.cups.org
 #
 
+include Makedefs
+
 #
-# Directorys to make...
+# Directories to make...
 #
 
-DIRS	=	cups backend cgi-bin driver filter gui scheduler systemv
+DIRS	=	cups backend berkeley cgi-bin filter man pstoraster \
+		scheduler systemv
 
 #
 # Make all targets...
@@ -45,6 +48,7 @@ clean:
 	for dir in $(DIRS); do\
 		(cd $$dir; make clean);\
 	done
+
 #
 # Install object and target files...
 #
@@ -53,7 +57,11 @@ install:
 	for dir in $(DIRS); do\
 		(cd $$dir; make install);\
 	done
+	(cd conf; make install)
+	(cd data; make install)
+	(cd doc; make install)
+	(cd fonts; make install)
 
 #
-# End of "$Id: Makefile,v 1.7 1999/04/28 15:51:32 mike Exp $".
+# End of "$Id: Makefile,v 1.8 1999/05/14 17:02:53 mike Exp $".
 #

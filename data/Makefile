@@ -1,7 +1,7 @@
 #
-# "$Id: Makefile,v 1.2 1999/05/14 17:02:54 mike Exp $"
+# "$Id: Makefile,v 1.1 1999/05/14 17:02:56 mike Exp $"
 #
-#   Configuration file makefile for the Common UNIX Printing System (CUPS).
+#   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
 #   Copyright 1993-1999 by Easy Software Products.
 #
@@ -25,10 +25,11 @@
 include ../Makedefs
 
 #
-# Config files...
+# Data files...
 #
 
-FILES	=	classes.conf cupsd.conf mime.convs mime.types printers.conf
+FILES	=	8859-1 8859-14 8859-15 8859-2 8859-3 8859-4 8859-5 \
+		8859-6 8859-7 8859-8 8859-9 HPGLprolog
 
 #
 # Make everything...
@@ -47,15 +48,9 @@ clean:
 #
 
 install:
-	-$(MKDIR) $(SERVERROOT)/conf
-	for file in $(FILES); do \
-		if test -e $(SERVERROOT)/conf/$$file ; then \
-			$(CP) $$file $(SERVERROOT)/conf/$$file.N ; \
-		else \
-			$(CP) $$file $(SERVERROOT)/conf ; \
-		fi ; \
-	end
+	-$(MKDIR) $(DATADIR)
+	$(CP) $(FILES) $(DATADIR)
 
 #
-# End of "$Id: Makefile,v 1.2 1999/05/14 17:02:54 mike Exp $".
+# End of "$Id: Makefile,v 1.1 1999/05/14 17:02:56 mike Exp $".
 #

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.10 1999/04/21 22:50:31 mike Exp $"
+# "$Id: Makefile,v 1.11 1999/05/14 17:02:58 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -24,11 +24,7 @@
 
 include ../Makedefs
 
-#TARGETS	=	hpgltops \
-#			image.a imagetops imagetoraster \
-#			pstops \
-#			texttoescp texttopcl texttops
-TARGETS	=	hpgltops texttops pstops image.a imagetops imagetoraster
+TARGETS	=	hpgltops texttops pstops imagetops imagetoraster
 
 HPGLOBJS =	hpgl-attr.o hpgl-config.o hpgl-main.o hpgl-prolog.o \
 		hpgl-char.o hpgl-input.o hpgl-polygon.o hpgl-vector.o
@@ -49,13 +45,15 @@ all:	$(TARGETS)
 #
 
 clean:
-	rm -f $(OBJS) $(TARGETS)
+	rm -f $(OBJS) $(TARGETS) image.a
 
 #
 # Install all targets...
 #
 
 install:
+	-$(MKDIR) $(SERVERROOT)/filter
+	$(CP) $(TARGETS) $(SERVERROOT)/filter
 
 #
 # hpgltops
@@ -112,5 +110,5 @@ textcommon.o:	textcommon.h common.h
 $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 #
-# End of "$Id: Makefile,v 1.10 1999/04/21 22:50:31 mike Exp $".
+# End of "$Id: Makefile,v 1.11 1999/05/14 17:02:58 mike Exp $".
 #
