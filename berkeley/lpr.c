@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.12 2000/03/09 19:47:22 mike Exp $"
+ * "$Id: lpr.c,v 1.13 2000/06/26 15:08:55 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -63,12 +63,17 @@ int
 main(int  argc,		/* I - Number of command-line arguments */
      char *argv[])	/* I - Command-line arguments */
 {
-  int		i;		/* Looping var */
+  int		i, j;		/* Looping var */
   int		job_id;		/* Job ID */
-  const char	*dest;		/* Destination printer */
+  char		*printer,	/* Destination printer or class */
+		*instance;	/* Instance */
   const char	*title;		/* Job title */
   int		num_copies;	/* Number of copies per file */
-  int		num_files;	/* Number of files printed */
+  int		num_files;	/* Number of files to print */
+  const char	*files[1000];	/* Files to print */
+  int		num_dests;	/* Number of destinations */
+  cups_dest_t	*dests,		/* Destinations */
+		*dest;		/* Selected destination */
   int		num_options;	/* Number of options */
   cups_option_t	*options;	/* Options */
   int		deletefile;	/* Delete file after print? */
@@ -80,7 +85,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
   deletefile  = 0;
-  dest        = cupsGetDefault();
+  printer     = NULL;
+  num_dests   = 0;
+  dests       = NULL;
   num_options = 0;
   options     = NULL;
   num_files   = 0;
@@ -137,11 +144,25 @@ main(int  argc,		/* I - Number of command-line arguments */
 
         case 'P' : /* Destination printer or class */
 	    if (argv[i][2] != '\0')
-	      dest = argv[i] + 2;
+	      printer = argv[i] + 2;
 	    else
 	    {
 	      i ++;
-	      dest = argv[i];
+	      printer = argv[i];
+	    }
+
+            if ((instance = strrchr(printer, '/')) != NULL)
+	      *instance++ = '\0';
+
+	    if (num_dests == 0)
+	      num_dests = cupsGetDests(&dests);
+
+            if ((dest = cupsGetDest(printer, instance, num_dests, dests)) != NULL)
+	    {
+	      for (j = 0; j < dest->num_options; j ++)
+	        num_options = cupsAddOption(dest->options[j].name,
+		                            dest->options[j].value,
+					    num_options, &options);
 	    }
 	    break;
 
@@ -180,54 +201,70 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    fprintf(stderr, "lpr: Unknown option \'%c\'!\n", argv[i][1]);
 	    return (1);
       }
-    else
+    else if (num_files < 1000)
     {
      /*
       * Print a file...
       */
 
-      if (dest == NULL)
-      {
-	fputs("lpr: error - no default destination available.\n", stderr);
-	return (1);
-      }
-
+      files[num_files] = argv[i];
       num_files ++;
-      if (title)
-        job_id = cupsPrintFile(dest, argv[i], title, num_options, options);
-      else
-      {
-        char *filename;
 
-        if ((filename = strrchr(argv[i], '/')) != NULL)
-	  filename ++;
+      if (title == NULL)
+      {
+        if ((title = strrchr(argv[i], '/')) != NULL)
+	  title ++;
 	else
-	  filename = argv[i];
-
-        job_id = cupsPrintFile(dest, argv[i], filename, num_options, options);
+          title = argv[i];
       }
-
-      if (job_id < 1)
-      {
-	fprintf(stderr, "lpr: unable to print file \'%s\' - %s.\n",
-	        argv[i], ippErrorString(cupsLastError()));
-	return (1);
-      }
-      else if (deletefile)
-        unlink(argv[i]);
     }
-
+    else
+      fprintf(stderr, "lpr: Too many files - \"%s\"\n", argv[i]);
  /*
-  * See if we printed anything; if not, print from stdin...
+  * See if we have any files to print; if not, print from stdin...
   */
 
-  if (num_files == 0)
+  if (printer == NULL)
   {
-    if (dest == NULL)
+    if (num_dests == 0)
+      num_dests = cupsGetDests(&dests);
+
+    for (j = 0, dest = dests; j < num_dests; j ++, dest ++)
+      if (dest->is_default)
+      {
+	printer = dests[j].name;
+
+	for (j = 0; j < dest->num_options; j ++)
+	  num_options = cupsAddOption(dest->options[j].name,
+		                      dest->options[j].value,
+				      num_options, &options);
+        break;
+      }
+  }
+
+  if (printer == NULL)
+  {
+    fputs("lpr: error - no default destination available.\n", stderr);
+    return (1);
+  }
+
+  if (num_files > 0)
+  {
+    job_id = cupsPrintFiles(printer, num_files, files, title, num_options, options);
+
+    if (deletefile)
     {
-      fputs("lpr: error - no default destination available.\n", stderr);
-      return (1);
+     /*
+      * Delete print files after printing...
+      */
+
+      for (i = 0; i < num_files; i ++)
+        unlink(files[i]);
     }
+  }
+  else
+  {
+    num_files = 1;
 
 #ifndef WIN32
 #  if defined(HAVE_SIGSET)
@@ -264,23 +301,23 @@ main(int  argc,		/* I - Number of command-line arguments */
 
     if (i == 0)
     {
-      fputs("lpr: standard input is empty, so no job has been sent.\n", stderr);
+      fputs("lpr: stdin is empty, so no job has been sent.\n", stderr);
       return (1);
     }
 
     if (title)
-      job_id = cupsPrintFile(dest, tempfile, title, num_options, options);
+      job_id = cupsPrintFile(printer, tempfile, title, num_options, options);
     else
-      job_id = cupsPrintFile(dest, tempfile, "(stdin)", num_options, options);
+      job_id = cupsPrintFile(printer, tempfile, "(stdin)", num_options, options);
 
     unlink(tempfile);
+  }
 
-    if (job_id < 1)
-    {
-      fprintf(stderr, "lpr: unable to print standard input - %s.\n",
-              ippErrorString(cupsLastError()));
-      return (1);
-    }
+  if (job_id < 1)
+  {
+    fprintf(stderr, "lpr: unable to print file: %s\n",
+	    ippErrorString(cupsLastError()));
+    return (1);
   }
 
   return (0);
@@ -311,5 +348,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c,v 1.12 2000/03/09 19:47:22 mike Exp $".
+ * End of "$Id: lpr.c,v 1.13 2000/06/26 15:08:55 mike Exp $".
  */
