@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.19.2.9 2003/03/04 15:34:57 mike Exp $"
+ * "$Id: log.c,v 1.19.2.10 2003/03/10 15:05:54 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -153,6 +153,8 @@ LogMessage(int        level,	/* I - Log level */
   if (level > LogLevel)
     return (1);
 
+  HoldSignals();
+
 #ifdef HAVE_VSYSLOG
  /*
   * See if we are logging errors via syslog...
@@ -164,6 +166,8 @@ LogMessage(int        level,	/* I - Log level */
     vsyslog(syslevels[level], message, ap);
     va_end(ap);
 
+    ReleaseSignals();
+
     return (1);
   }
 #endif /* HAVE_VSYSLOG */
@@ -173,8 +177,12 @@ LogMessage(int        level,	/* I - Log level */
   */
 
   if (!check_log_file(&ErrorFile, ErrorLog))
+  {
+    ReleaseSignals();
+
     return (0);
-  
+  }
+
  /*
   * Print the log level and date/time...
   */
@@ -199,6 +207,8 @@ LogMessage(int        level,	/* I - Log level */
 
   fflush(ErrorFile);
 
+  ReleaseSignals();
+
   return (1);
 }
 
@@ -219,6 +229,8 @@ LogPage(job_t       *job,	/* I - Job being printed */
   hostname = ippFindAttribute(job->attrs, "job-originating-host-name",
                               IPP_TAG_ZERO);
 
+  HoldSignals();
+
 #ifdef HAVE_VSYSLOG
  /*
   * See if we are logging pages via syslog...
@@ -231,6 +243,8 @@ LogPage(job_t       *job,	/* I - Job being printed */
            job->id, page, billing ? billing->values[0].string.text : "-",
            hostname->values[0].string.text);
 
+    ReleaseSignals();
+
     return (1);
   }
 #endif /* HAVE_VSYSLOG */
@@ -240,7 +254,11 @@ LogPage(job_t       *job,	/* I - Job being printed */
   */
 
   if (!check_log_file(&PageFile, PageLog))
+  {
+    ReleaseSignals();
+
     return (0);
+  }
 
  /*
   * Print a page log entry of the form:
@@ -255,6 +273,8 @@ LogPage(job_t       *job,	/* I - Job being printed */
 	  billing ? billing->values[0].string.text : "-",
           hostname->values[0].string.text);
   fflush(PageFile);
+
+  ReleaseSignals();
 
   return (1);
 }
@@ -287,6 +307,8 @@ LogRequest(client_t      *con,	/* I - Request to log */
 		};
 
 
+  HoldSignals();
+
 #ifdef HAVE_VSYSLOG
  /*
   * See if we are logging accesses via syslog...
@@ -300,6 +322,8 @@ LogRequest(client_t      *con,	/* I - Request to log */
 	   con->http.version / 100, con->http.version % 100,
 	   code, con->bytes);
 
+    ReleaseSignals();
+
     return (1);
   }
 #endif /* HAVE_VSYSLOG */
@@ -309,7 +333,11 @@ LogRequest(client_t      *con,	/* I - Request to log */
   */
 
   if (!check_log_file(&AccessFile, AccessLog))
+  {
+    ReleaseSignals();
+
     return (0);
+  }
 
  /*
   * Write a log of the request in "common log format"...
@@ -321,6 +349,8 @@ LogRequest(client_t      *con,	/* I - Request to log */
 	  con->http.version / 100, con->http.version % 100,
 	  code, con->bytes);
   fflush(AccessFile);
+
+  ReleaseSignals();
 
   return (1);
 }
@@ -448,5 +478,5 @@ check_log_file(FILE       **log,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c,v 1.19.2.9 2003/03/04 15:34:57 mike Exp $".
+ * End of "$Id: log.c,v 1.19.2.10 2003/03/10 15:05:54 mike Exp $".
  */

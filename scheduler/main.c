@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.35 2003/03/07 19:25:50 mike Exp $"
+ * "$Id: main.c,v 1.57.2.36 2003/03/10 15:05:54 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -25,7 +25,9 @@
  *
  *   main()               - Main entry for the CUPS scheduler.
  *   CatchChildSignals()  - Catch SIGCHLD signals...
+ *   HoldSignals()        - Hold child and termination signals.
  *   IgnoreChildSignals() - Ignore SIGCHLD signals...
+ *   ReleaseSignals()     - Release signals for delivery.
  *   SetString()          - Set a string value.
  *   SetStringf()         - Set a formatted string value.
  *   sigchld_handler()    - Handle 'child' signals from old processes.
@@ -61,12 +63,21 @@ static void	usage(void);
 
 
 /*
+ * Local globals...
+ */
+
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+static sigset_t	oldmask;		/* Old POSIX signal mask */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+
+
+/*
  * 'main()' - Main entry for the CUPS scheduler.
  */
 
-int				/* O - Exit status */
-main(int  argc,			/* I - Number of command-line arguments */
-     char *argv[])		/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
   int			i;		/* Looping var */
   char			*opt;		/* Option character */
@@ -688,10 +699,6 @@ CatchChildSignals(void)
 #else
   signal(SIGCLD, sigchld_handler);	/* No, SIGCLD isn't a typo... */
 #endif /* HAVE_SIGSET */
-
-#if defined(HAVE_WAITPID) || defined(HAVE_WAIT3)
-  sigchld_handler(SIGCHLD);
-#endif /* HAVE_WAITPID || HAVE_WAIT3 */
 }
 
 
@@ -711,6 +718,30 @@ ClearString(char **s)			/* O - String value */
 
 
 /*
+ * 'HoldSignals()' - Hold child and termination signals.
+ */
+
+void
+HoldSignals(void)
+{
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  sigset_t		newmask;	/* New POSIX signal mask */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+  
+
+#ifdef HAVE_SIGSET
+  sighold(SIGTERM);
+  sighold(SIGCHLD);
+#elif defined(HAVE_SIGACTION)
+  sigemptyset(&newmask);
+  sigaddset(&newmask, SIGTERM);
+  sigaddset(&newmask, SIGCHLD);
+  sigprocmask(SIG_BLOCK, &newmask, &oldmask);
+#endif /* HAVE_SIGSET */
+}
+
+
+/*
  * 'IgnoreChildSignals()' - Ignore SIGCHLD signals...
  *
  * We don't really ignore them, we set the signal handler to SIG_DFL,
@@ -724,6 +755,7 @@ IgnoreChildSignals(void)
   struct sigaction	action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
+
 #ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
   sigset(SIGCHLD, SIG_DFL);
 #elif defined(HAVE_SIGACTION)
@@ -735,6 +767,22 @@ IgnoreChildSignals(void)
   sigaction(SIGCHLD, &action, NULL);
 #else
   signal(SIGCLD, SIG_DFL);	/* No, SIGCLD isn't a typo... */
+#endif /* HAVE_SIGSET */
+}
+
+
+/*
+ * 'ReleaseSignals()' - Release signals for delivery.
+ */
+
+void
+ReleaseSignals(void)
+{
+#ifdef HAVE_SIGSET
+  sigrelse(SIGTERM);
+  sigrelse(SIGCHLD);
+#elif defined(HAVE_SIGACTION)
+  sigprocmask(SIG_SETMASK, &oldmask, NULL);
 #endif /* HAVE_SIGSET */
 }
 
@@ -1030,5 +1078,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.35 2003/03/07 19:25:50 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.36 2003/03/10 15:05:54 mike Exp $".
  */

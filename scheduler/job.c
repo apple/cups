@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.50 2003/03/07 19:25:49 mike Exp $"
+ * "$Id: job.c,v 1.124.2.51 2003/03/10 15:05:53 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2482,8 +2482,6 @@ start_process(const char *command,	/* I - Full path to command */
 {
   int	fd;				/* Looping var */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  sigset_t		oldmask,	/* POSIX signal masks */
-			newmask;
   struct sigaction	action;		/* POSIX signal handler */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
@@ -2495,15 +2493,7 @@ start_process(const char *command,	/* I - Full path to command */
   * Block signals before forking...
   */
 
-#ifdef HAVE_SIGSET
-  sighold(SIGTERM);
-#elif defined(HAVE_SIGACTION)
-  sigemptyset(&newmask);
-  sigaddset(&newmask, SIGTERM);
-  sigprocmask(SIG_BLOCK, &newmask, &oldmask);
-#endif /* HAVE_SIGSET */
-
-  IgnoreChildSignals();
+  HoldSignals();
 
   if ((*pid = fork()) == 0)
   {
@@ -2580,8 +2570,6 @@ start_process(const char *command,	/* I - Full path to command */
 #ifdef HAVE_SIGSET
     sigset(SIGTERM, SIG_DFL);
     sigset(SIGCHLD, SIG_DFL);
-
-    sigrelse(SIGTERM);
 #elif defined(HAVE_SIGACTION)
     memset(&action, 0, sizeof(action));
 
@@ -2589,11 +2577,13 @@ start_process(const char *command,	/* I - Full path to command */
     action.sa_handler = SIG_DFL;
 
     sigaction(SIGTERM, &action, NULL);
-
-    sigprocmask(SIG_SETMASK, &oldmask, NULL);
+    sigaction(SIGCHLD, &action, NULL);
 #else
     signal(SIGTERM, SIG_DFL);
+    signal(SIGCHLD, SIG_DFL);
 #endif /* HAVE_SIGSET */
+
+    ReleaseSignals();
 
    /*
     * Execute the command; if for some reason this doesn't work,
@@ -2617,18 +2607,12 @@ start_process(const char *command,	/* I - Full path to command */
     *pid = 0;
   }
 
-#ifdef HAVE_SIGSET
-  sigrelse(SIGTERM);
-#elif defined(HAVE_SIGACTION)
-  sigprocmask(SIG_SETMASK, &oldmask, NULL);
-#endif /* HAVE_SIGSET */
-
-  CatchChildSignals();
+  ReleaseSignals();
 
   return (*pid);
 }
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.50 2003/03/07 19:25:49 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.51 2003/03/10 15:05:53 mike Exp $".
  */
