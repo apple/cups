@@ -123,6 +123,11 @@ CHANGES IN CUPS V1.1.9
 	  using HTTP GET and PUT requests.
 	- The web interface didn't allow you to modify the
 	  location or description of the printer.
+	- The pdftops filter now uses its own temporary file
+	  function to work with PDF files using LZW compression
+	  (which use the uncompress program or gunzip)
+	- The SystemGroup directive now supports specification of
+	  multiple groups.
 
 
 CHANGES IN CUPS V1.1.8

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.82 2001/06/22 15:50:53 mike Exp $"
+ * "$Id: conf.c,v 1.83 2001/06/22 19:47:19 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -120,7 +120,6 @@ static var_t	variables[] =
 #endif /* HAVE_LIBSSL */
   { "ServerName",	ServerName,		VAR_STRING,	sizeof(ServerName) },
   { "ServerRoot",	ServerRoot,		VAR_STRING,	sizeof(ServerRoot) },
-  { "SystemGroup",	SystemGroup,		VAR_STRING,	sizeof(SystemGroup) },
   { "TempDir",		TempDir,		VAR_STRING,	sizeof(TempDir) },
   { "Timeout",		&Timeout,		VAR_INTEGER,	0 }
 };
@@ -259,9 +258,11 @@ ReadConfiguration(void)
   group = getgrnam("sys");
   endgrent();
 
+  NumSystemGroups = 0;
+
   if (group != NULL)
   {
-    strcpy(SystemGroup, "sys");
+    strcpy(SystemGroups[0], "sys");
     Group = group->gr_gid;
   }
   else
@@ -271,7 +272,7 @@ ReadConfiguration(void)
 
     if (group != NULL)
     {
-      strcpy(SystemGroup, "system");
+      strcpy(SystemGroups[0], "system");
       Group = group->gr_gid;
     }
     else
@@ -281,12 +282,12 @@ ReadConfiguration(void)
 
       if (group != NULL)
       {
-	strcpy(SystemGroup, "root");
+	strcpy(SystemGroups[0], "root");
 	Group = group->gr_gid;
       }
       else
       {
-	strcpy(SystemGroup, "unknown");
+	strcpy(SystemGroups[0], "unknown");
 	Group = 0;
       }
     }
@@ -1074,6 +1075,34 @@ read_configuration(FILE *fp)		/* I - File to read from */
 	             value);
       }
     }
+    else if (strcasecmp(name, "SystemGroup") == 0)
+    {
+     /*
+      * System (admin) group(s)...
+      */
+
+      char *valueptr; /* Pointer into value */
+
+
+      for (i = 0; i < MAX_SYSTEM_GROUPS; i ++)
+      {
+        for (valueptr = value; *valueptr; valueptr ++)
+	  if (isspace(*valueptr) || *valueptr == ',')
+	    break;
+
+        if (*valueptr)
+          *valueptr++ = '\0';
+
+        strncpy(SystemGroups[i], value, sizeof(SystemGroups[0]));
+	SystemGroups[i][sizeof(SystemGroups[0]) - 1] = '\0';
+
+        while (*value == ',' || isspace(*value))
+	  value ++;
+      }
+
+      if (i)
+        NumSystemGroups = i;
+    }
     else if (strcasecmp(name, "HostNameLookups") == 0)
     {
      /*
@@ -1199,6 +1228,7 @@ read_location(FILE *fp,		/* I - Configuration file */
               char *location,	/* I - Location name/path */
 	      int  linenum)	/* I - Current line number */
 {
+  int		i;			/* Looping var */
   location_t	*loc,			/* New location */
 		*parent;		/* Parent location */
   int		len;			/* Length of line */
@@ -1508,7 +1538,9 @@ read_location(FILE *fp,		/* I - Configuration file */
       else if (strcasecmp(value, "system") == 0)
       {
         loc->level = AUTH_GROUP;
-	AddName(loc, SystemGroup);
+
+	for (i = 0; i < NumSystemGroups; i ++)
+	  AddName(loc, SystemGroups[i]);
       }
       else
         LogMessage(L_WARN, "Unknown authorization class %s on line %d.",
@@ -1673,5 +1705,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.82 2001/06/22 15:50:53 mike Exp $".
+ * End of "$Id: conf.c,v 1.83 2001/06/22 19:47:19 mike Exp $".
  */

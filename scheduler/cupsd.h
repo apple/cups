@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.29 2001/06/21 21:22:20 mike Exp $"
+ * "$Id: cupsd.h,v 1.30 2001/06/22 19:47:19 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -72,6 +72,7 @@
 #define MAX_LISTENERS		10	/* Maximum number of listener sockets */
 #define MAX_USERPASS		33	/* Maximum size of username/password */
 #define MAX_FILTERS		20	/* Maximum number of filters */
+#define MAX_SYSTEM_GROUPS	32	/* Maximum number of system groups */
 
 
 /*
@@ -171,5 +172,5 @@ extern void	StopServer(void);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.29 2001/06/21 21:22:20 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.30 2001/06/22 19:47:19 mike Exp $".
  */

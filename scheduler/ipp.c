@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.137 2001/06/22 15:50:53 mike Exp $"
+ * "$Id: ipp.c,v 1.138 2001/06/22 19:47:19 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -5390,7 +5390,7 @@ validate_user(client_t   *con,		/* I - Client connection */
               char       *username,	/* O - Authenticated username */
 	      int        userlen)	/* I - Length of username */
 {
-  int			i;		/* Looping var */
+  int			i, j;		/* Looping vars */
   ipp_attribute_t	*attr;		/* requesting-user-name attribute */
   struct passwd		*user;		/* User info */
   struct group		*group;		/* System group info */
@@ -5433,20 +5433,26 @@ validate_user(client_t   *con,		/* I - Client connection */
     user = getpwnam(username);
     endpwent();
 
-    group = getgrnam(SystemGroup);
-    endgrent();
-
-    if (group != NULL)
+    for (i = 0, j = 0, group = NULL; i < NumSystemGroups; i ++)
     {
-      for (i = 0; group->gr_mem[i]; i ++)
-        if (strcmp(username, group->gr_mem[i]) == 0)
+      group = getgrnam(SystemGroups[i]);
+      endgrent();
+
+      if (group != NULL)
+      {
+	for (j = 0; group->gr_mem[j]; j ++)
+          if (strcmp(username, group->gr_mem[j]) == 0)
+	    break;
+
+        if (group->gr_mem[j])
 	  break;
+      }
+      else
+	j = 0;
     }
-    else
-      i = 0;
 
     if (user == NULL || group == NULL ||
-        (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
+        (group->gr_mem[j] == NULL && group->gr_gid != user->pw_gid))
     {
      /*
       * Username not found, group not found, or user is not part of the
@@ -5462,5 +5468,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.137 2001/06/22 15:50:53 mike Exp $".
+ * End of "$Id: ipp.c,v 1.138 2001/06/22 19:47:19 mike Exp $".
  */

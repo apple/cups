@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.97 2001/06/22 15:50:52 mike Exp $"
+ * "$Id: client.c,v 1.98 2001/06/22 19:47:18 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2176,6 +2176,17 @@ install_conf_file(client_t *con)	/* I - Connection */
     return (HTTP_SERVER_ERROR);
   }
 
+ /*
+  * If the cupsd.conf file was updated, set the NeedReload flag...
+  */
+
+  if (strcmp(con->uri, "/admin/conf/cupsd.conf") == 0)
+    NeedReload = TRUE;
+
+ /*
+  * Return that the file was created successfully...
+  */
+
   return (HTTP_CREATED);
 }
 
@@ -2450,5 +2461,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.97 2001/06/22 15:50:52 mike Exp $".
+ * End of "$Id: client.c,v 1.98 2001/06/22 19:47:18 mike Exp $".
  */
