@@ -213,7 +213,7 @@ const char *macRomanEncoding[256] = {
   "guillemotleft",
   "guillemotright",
   "ellipsis",
-  "nobreakspace",
+  "space",
   "Agrave",
   "Atilde",
   "Otilde",
