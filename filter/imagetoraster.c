@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.50 2000/09/09 22:43:58 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.51 2000/09/13 13:48:53 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -360,7 +360,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   header.cupsColorOrder   = CUPS_ORDER_CHUNKED;
   header.cupsColorSpace   = CUPS_CSPACE_K;
 
-  if (ppd->patches)
+  if (ppd && ppd->patches)
     exec_code(&header, ppd->patches);
 
   if ((count = ppdCollect(ppd, PPD_ORDER_DOCUMENT, &choices)) > 0)
@@ -4305,5 +4305,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.50 2000/09/09 22:43:58 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.51 2000/09/13 13:48:53 mike Exp $".
  */

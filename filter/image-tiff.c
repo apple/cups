@@ -1,5 +1,5 @@
 /*
- * "$Id: image-tiff.c,v 1.15 2000/07/18 19:45:52 mike Exp $"
+ * "$Id: image-tiff.c,v 1.16 2000/09/13 13:48:53 mike Exp $"
  *
  *   TIFF file routines for the Common UNIX Printing System (CUPS).
  *
@@ -69,6 +69,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 		num_colors,		/* Number of colors */
 		bpp,			/* Bytes per pixel */
 		x, y,			/* Current x & y */
+		row,			/* Current row in image */
 		xstart, ystart,		/* Starting x & y */
 		xdir, ydir,		/* X & y direction */
 		xcount, ycount,		/* X & Y counters */
@@ -180,6 +181,35 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
   switch (orientation)
   {
     case ORIENTATION_TOPRIGHT :
+        fputs("DEBUG: orientation = top-right\n", stderr);
+        break;
+    case ORIENTATION_RIGHTTOP :
+        fputs("DEBUG: orientation = right-top\n", stderr);
+        break;
+    default :
+    case ORIENTATION_TOPLEFT :
+        fputs("DEBUG: orientation = top-left\n", stderr);
+        break;
+    case ORIENTATION_LEFTTOP :
+        fputs("DEBUG: orientation = left-top\n", stderr);
+        break;
+    case ORIENTATION_BOTLEFT :
+        fputs("DEBUG: orientation = bottom-left\n", stderr);
+        break;
+    case ORIENTATION_LEFTBOT :
+        fputs("DEBUG: orientation = left-bottom\n", stderr);
+        break;
+    case ORIENTATION_BOTRIGHT :
+        fputs("DEBUG: orientation = bottom-right\n", stderr);
+        break;
+    case ORIENTATION_RIGHTBOT :
+        fputs("DEBUG: orientation = right-bottom\n", stderr);
+        break;
+  }
+
+  switch (orientation)
+  {
+    case ORIENTATION_TOPRIGHT :
     case ORIENTATION_RIGHTTOP :
         xstart = img->xsize - 1;
         xdir   = -1;
@@ -272,13 +302,13 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
           * Row major order...
           */
 
-          for (y = ystart, ycount = img->ysize;
+          for (y = ystart, ycount = img->ysize, row = 0;
                ycount > 0;
-               ycount --, y += ydir)
+               ycount --, y += ydir, row ++)
           {
             if (bits == 1)
             {
-              TIFFReadScanline(tif, scanline, y, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
               for (xcount = img->xsize, scanptr = scanline, p = in + xstart, bit = 128;
                    xcount > 0;
                    xcount --, p += pstep)
@@ -299,7 +329,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
             }
             else if (bits == 2)
             {
-              TIFFReadScanline(tif, scanline, y, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
               for (xcount = img->xsize, scanptr = scanline, p = in + xstart, bit = 0xc0;
                    xcount > 0;
                    xcount --, p += pstep)
@@ -320,7 +350,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
             }
             else if (bits == 4)
             {
-              TIFFReadScanline(tif, scanline, y, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
               for (xcount = img->xsize, scanptr = scanline, p = in + xstart, bit = 0xf0;
                    xcount > 0;
                    xcount --, p += pstep)
@@ -340,7 +370,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
             }
             else if (xdir < 0 || zero || alpha)
             {
-              TIFFReadScanline(tif, scanline, y, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
 
               if (alpha)
 	      {
@@ -380,7 +410,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
               }
             }
             else
-              TIFFReadScanline(tif, in, y, 0);
+              TIFFReadScanline(tif, in, row, 0);
 
             if (img->colorspace == IMAGE_WHITE)
 	    {
@@ -420,13 +450,13 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
           * Column major order...
           */
 
-          for (x = xstart, xcount = img->xsize;
+          for (x = xstart, xcount = img->xsize, row = 0;
                xcount > 0;
-               xcount --, x += xdir)
+               xcount --, x += xdir, row ++)
           {
             if (bits == 1)
             {
-              TIFFReadScanline(tif, scanline, x, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
               for (ycount = img->ysize, scanptr = scanline, p = in + ystart, bit = 128;
                    ycount > 0;
                    ycount --, p += ydir)
@@ -447,7 +477,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
             }
             else if (bits == 2)
             {
-              TIFFReadScanline(tif, scanline, x, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
               for (ycount = img->ysize, scanptr = scanline, p = in + ystart, bit = 0xc0;
                    ycount > 0;
                    ycount --, p += ydir)
@@ -469,7 +499,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
             }
             else if (bits == 4)
             {
-              TIFFReadScanline(tif, scanline, x, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
               for (ycount = img->ysize, scanptr = scanline, p = in + ystart, bit = 0xf0;
                    ycount > 0;
                    ycount --, p += ydir)
@@ -489,7 +519,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
             }
             else if (ydir < 0 || zero || alpha)
             {
-              TIFFReadScanline(tif, scanline, x, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
 
               if (alpha)
 	      {
@@ -529,7 +559,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 	      }
             }
             else
-              TIFFReadScanline(tif, in, x, 0);
+              TIFFReadScanline(tif, in, row, 0);
 
             if (img->colorspace == IMAGE_WHITE)
 	    {
@@ -587,13 +617,13 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
           * Row major order...
           */
 
-          for (y = ystart, ycount = img->ysize;
+          for (y = ystart, ycount = img->ysize, row = 0;
                ycount > 0;
-               ycount --, y += ydir)
+               ycount --, y += ydir, row ++)
           {
             if (bits == 1)
             {
-              TIFFReadScanline(tif, scanline, y, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
               for (xcount = img->xsize, scanptr = scanline,
 	               p = in + xstart * 3, bit = 128;
                    xcount > 0;
@@ -623,7 +653,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
             }
             else if (bits == 2)
             {
-              TIFFReadScanline(tif, scanline, y, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
               for (xcount = img->xsize, scanptr = scanline,
 	               p = in + xstart * 3, bit = 0xc0;
                    xcount > 0;
@@ -648,7 +678,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
             }
             else if (bits == 4)
             {
-              TIFFReadScanline(tif, scanline, y, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
               for (xcount = img->xsize, scanptr = scanline,
 	               p = in + 3 * xstart, bit = 0xf0;
                    xcount > 0;
@@ -674,7 +704,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
             }
             else
             {
-              TIFFReadScanline(tif, scanline, y, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
 
               for (xcount = img->xsize, p = in + 3 * xstart, scanptr = scanline;
                    xcount > 0;
@@ -724,13 +754,13 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
           * Column major order...
           */
 
-          for (x = xstart, xcount = img->xsize;
+          for (x = xstart, xcount = img->xsize, row = 0;
                xcount > 0;
-               xcount --, x += xdir)
+               xcount --, x += xdir, row ++)
           {
             if (bits == 1)
             {
-              TIFFReadScanline(tif, scanline, x, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
               for (ycount = img->ysize, scanptr = scanline,
 	               p = in + 3 * ystart, bit = 128;
                    ycount > 0;
@@ -760,7 +790,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
             }
             else if (bits == 2)
             {
-              TIFFReadScanline(tif, scanline, x, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
               for (ycount = img->ysize, scanptr = scanline,
 	               p = in + 3 * ystart, bit = 0xc0;
                    ycount > 0;
@@ -785,7 +815,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
             }
             else if (bits == 4)
             {
-              TIFFReadScanline(tif, scanline, x, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
               for (ycount = img->ysize, scanptr = scanline,
 	               p = in + 3 * ystart, bit = 0xf0;
                    ycount > 0;
@@ -811,7 +841,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
             }
             else
             {
-              TIFFReadScanline(tif, scanline, x, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
 
               for (ycount = img->ysize, p = in + 3 * ystart, scanptr = scanline;
                    ycount > 0;
@@ -864,13 +894,13 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
           * Row major order...
           */
 
-          for (y = ystart, ycount = img->ysize;
+          for (y = ystart, ycount = img->ysize, row = 0;
                ycount > 0;
-               ycount --, y += ydir)
+               ycount --, y += ydir, row ++)
           {
             if (bits == 1)
             {
-              TIFFReadScanline(tif, scanline, y, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
               for (xcount = img->xsize, scanptr = scanline, p = in + xstart * 3, bit = 0xf0;
                    xcount > 0;
                    xcount --, p += pstep)
@@ -901,7 +931,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
             }
             else if (bits == 2)
             {
-              TIFFReadScanline(tif, scanline, y, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
               for (xcount = img->xsize, scanptr = scanline, p = in + xstart * 3;
                    xcount > 0;
                    xcount --, p += pstep, scanptr ++)
@@ -916,7 +946,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
             }
             else if (bits == 4)
             {
-              TIFFReadScanline(tif, scanline, y, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
               for (xcount = img->xsize, scanptr = scanline, p = in + xstart * 3;
                    xcount > 0;
                    xcount -= 2, p += 2 * pstep, scanptr += 3)
@@ -940,7 +970,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
             }
             else if (xdir < 0 || alpha)
             {
-              TIFFReadScanline(tif, scanline, y, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
 
               if (alpha)
 	      {
@@ -966,7 +996,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 	      }
             }
             else
-              TIFFReadScanline(tif, in, y, 0);
+              TIFFReadScanline(tif, in, row, 0);
 
             if ((saturation != 100 || hue != 0) && bpp > 1)
               ImageRGBAdjust(in, img->xsize, saturation, hue);
@@ -1009,13 +1039,13 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
           * Column major order...
           */
 
-          for (x = xstart, xcount = img->xsize;
+          for (x = xstart, xcount = img->xsize, row = 0;
                xcount > 0;
-               xcount --, x += xdir)
+               xcount --, x += xdir, row ++)
           {
             if (bits == 1)
             {
-              TIFFReadScanline(tif, scanline, x, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
               for (ycount = img->ysize, scanptr = scanline, p = in + ystart * 3, bit = 0xf0;
                    ycount > 0;
                    ycount --, p += pstep)
@@ -1046,7 +1076,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
             }
             else if (bits == 2)
             {
-              TIFFReadScanline(tif, scanline, x, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
               for (ycount = img->ysize, scanptr = scanline, p = in + ystart * 3;
                    ycount > 0;
                    ycount --, p += pstep, scanptr ++)
@@ -1061,7 +1091,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
             }
             else if (bits == 4)
             {
-              TIFFReadScanline(tif, scanline, x, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
               for (ycount = img->ysize, scanptr = scanline, p = in + ystart * 3;
                    ycount > 0;
                    ycount -= 2, p += 2 * pstep, scanptr += 3)
@@ -1085,7 +1115,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
             }
             else if (ydir < 0 || alpha)
             {
-              TIFFReadScanline(tif, scanline, x, 0);
+              TIFFReadScanline(tif, scanline, row, 0);
 
               if (alpha)
 	      {
@@ -1111,7 +1141,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 	      }
             }
             else
-              TIFFReadScanline(tif, in, x, 0);
+              TIFFReadScanline(tif, in, row, 0);
 
             if ((saturation != 100 || hue != 0) && bpp > 1)
               ImageRGBAdjust(in, img->ysize, saturation, hue);
@@ -1161,13 +1191,13 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
             * Row major order...
             */
 
-            for (y = ystart, ycount = img->ysize;
+            for (y = ystart, ycount = img->ysize, row = 0;
         	 ycount > 0;
-        	 ycount --, y += ydir)
+        	 ycount --, y += ydir, row ++)
             {
               if (bits == 1)
               {
-        	TIFFReadScanline(tif, scanline, y, 0);
+        	TIFFReadScanline(tif, scanline, row, 0);
         	for (xcount = img->xsize, scanptr = scanline, p = in + xstart * 3, bit = 0xf0;
                      xcount > 0;
                      xcount --, p += pstep)
@@ -1207,7 +1237,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
               }
               else if (bits == 2)
               {
-        	TIFFReadScanline(tif, scanline, y, 0);
+        	TIFFReadScanline(tif, scanline, row, 0);
         	for (xcount = img->xsize, scanptr = scanline, p = in + xstart * 3;
                      xcount > 0;
                      xcount --, p += pstep, scanptr ++)
@@ -1253,7 +1283,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
               }
               else if (bits == 4)
               {
-        	TIFFReadScanline(tif, scanline, y, 0);
+        	TIFFReadScanline(tif, scanline, row, 0);
         	for (xcount = img->xsize, scanptr = scanline, p = in + xstart * 3;
                      xcount > 0;
                      xcount --, p += pstep, scanptr += 2)
@@ -1299,7 +1329,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
               }
               else
               {
-        	TIFFReadScanline(tif, scanline, y, 0);
+        	TIFFReadScanline(tif, scanline, row, 0);
 
         	for (xcount = img->xsize, p = in + xstart * 3, scanptr = scanline;
                      xcount > 0;
@@ -1382,13 +1412,13 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
             * Column major order...
             */
 
-            for (x = xstart, xcount = img->xsize;
+            for (x = xstart, xcount = img->xsize, row = 0;
         	 xcount > 0;
-        	 xcount --, x += xdir)
+        	 xcount --, x += xdir, row ++)
             {
               if (bits == 1)
               {
-        	TIFFReadScanline(tif, scanline, x, 0);
+        	TIFFReadScanline(tif, scanline, row, 0);
         	for (ycount = img->ysize, scanptr = scanline, p = in + xstart * 3, bit = 0xf0;
                      ycount > 0;
                      ycount --, p += pstep)
@@ -1428,7 +1458,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
               }
               else if (bits == 2)
               {
-        	TIFFReadScanline(tif, scanline, x, 0);
+        	TIFFReadScanline(tif, scanline, row, 0);
         	for (ycount = img->ysize, scanptr = scanline, p = in + xstart * 3;
                      ycount > 0;
                      ycount --, p += pstep, scanptr ++)
@@ -1474,7 +1504,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
               }
               else if (bits == 4)
               {
-        	TIFFReadScanline(tif, scanline, x, 0);
+        	TIFFReadScanline(tif, scanline, row, 0);
         	for (ycount = img->ysize, scanptr = scanline, p = in + xstart * 3;
                      ycount > 0;
                      ycount --, p += pstep, scanptr += 2)
@@ -1520,7 +1550,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
               }
               else
               {
-        	TIFFReadScanline(tif, scanline, x, 0);
+        	TIFFReadScanline(tif, scanline, row, 0);
 
         	for (ycount = img->ysize, p = in + xstart * 3, scanptr = scanline;
                      ycount > 0;
@@ -1627,5 +1657,5 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-tiff.c,v 1.15 2000/07/18 19:45:52 mike Exp $".
+ * End of "$Id: image-tiff.c,v 1.16 2000/09/13 13:48:53 mike Exp $".
  */
