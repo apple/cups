@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The GNU TLS code incorrectly used
+	  gnutls_check_pending() instead of
+	  gnutls_record_check_pending() (STR #128)
 	- The ppdEmit() functions output "PageSize Custom"
 	  instead of "CustomPageSize True" in the DSC comments.
 	  Also, the custom page size code did not use the
