@@ -1,5 +1,5 @@
 /*
- * "$Id: common.h,v 1.6.2.4 2002/03/01 19:55:16 mike Exp $"
+ * "$Id: common.h,v 1.6.2.5 2002/05/14 16:24:22 mike Exp $"
  *
  *   Common filter definitions for the Common UNIX Printing System (CUPS).
  *
@@ -63,11 +63,12 @@ extern float	PageLeft,	/* Left margin */
 extern ppd_file_t *SetCommonOptions(int num_options, cups_option_t *options,
 		                    int change_size);
 extern void	UpdatePageVars(void);
+extern void	WriteCommon(void);
 extern void	WriteLabelProlog(const char *label, float bottom,
 		                 float top, float width);
 extern void	WriteLabels(int orient);
 
 
 /*
- * End of "$Id: common.h,v 1.6.2.4 2002/03/01 19:55:16 mike Exp $".
+ * End of "$Id: common.h,v 1.6.2.5 2002/05/14 16:24:22 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.17 2002/05/14 01:25:43 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.18 2002/05/14 16:24:23 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -852,8 +852,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 		*output_bin;		/* OutputBin options */
   ipp_attribute_t *attr;		/* Attribute data */
   ipp_value_t	*val;			/* Attribute value */
-  int		nups[3] =		/* number-up-supported values */
-		{ 1, 2, 4 };
+  int		nups[] =		/* number-up-supported values */
+		{ 1, 2, 4, 6, 9, 16 };
   ipp_orient_t	orients[4] =		/* orientation-requested-supported values */
 		{
 		  IPP_PORTRAIT,
@@ -1039,7 +1039,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
                 "copies-default", 1);
   ippAddBoolean(p->attrs, IPP_TAG_PRINTER, "page-ranges-supported", 1);
   ippAddIntegers(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                 "number-up-supported", 3, nups);
+                 "number-up-supported", sizeof(nups) / sizeof(nups[0]), nups);
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "number-up-default", 1);
   ippAddIntegers(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
@@ -2075,5 +2075,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.17 2002/05/14 01:25:43 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.18 2002/05/14 16:24:23 mike Exp $".
  */

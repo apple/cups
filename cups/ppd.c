@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.13 2002/05/14 01:25:39 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.14 2002/05/14 16:24:21 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -598,7 +598,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
   ppd->language_level = 1;
   ppd->color_device   = 0;
   ppd->colorspace     = PPD_CS_GRAY;
-  ppd->landscape      = 90;
+  ppd->landscape      = -90;
 
  /*
   * Read lines from the PPD file and add them to the file record...
@@ -2147,5 +2147,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.13 2002/05/14 01:25:39 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.14 2002/05/14 16:24:21 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: common.c,v 1.15.2.4 2002/03/01 19:55:15 mike Exp $"
+ * "$Id: common.c,v 1.15.2.5 2002/05/14 16:24:22 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -28,6 +28,7 @@
  *   SetCommonOptions() - Set common filter options for media size,
  *                        etc.
  *   UpdatePageVars()   - Update the page variables for the orientation.
+ *   WriteCommon()      - Write common procedures...
  *   WriteLabelProlog() - Write the prolog with the classification
  *                        and page label.
  *   WriteLabels()      - Write the actual page labels.
@@ -271,6 +272,28 @@ UpdatePageVars(void)
 
 
 /*
+ * 'WriteCommon()' - Write common procedures...
+ */
+
+void
+WriteCommon(void)
+{
+  puts("% x y w h ESPrc - Clip to a rectangle.\n"
+       "userdict/ESPrc/rectclip where{pop/rectclip load}\n"
+       "{{newpath 4 2 roll moveto 1 index 0 rlineto 0 exch rlineto\n"
+       "neg 0 rlineto closepath clip newpath}bind}ifelse put");
+  puts("% x y w h ESPrf - Fill a rectangle.\n"
+       "userdict/ESPrf/rectfill where{pop/rectfill load}\n"
+       "{{gsave newpath 4 2 roll moveto 1 index 0 rlineto 0 exch rlineto\n"
+       "neg 0 rlineto closepath fill grestore}bind}ifelse put\n");
+  puts("% x y w h ESPrs - Stroke a rectangle.\n"
+       "userdict/ESPrs/rectstroke where{pop/rectstroke load}\n"
+       "{{gsave newpath 4 2 roll moveto 1 index 0 rlineto 0 exch rlineto\n"
+       "neg 0 rlineto closepath stroke grestore}bind}ifelse put\n");
+}
+
+
+/*
  * 'WriteLabelProlog()' - Write the prolog with the classification
  *                        and page label.
  */
@@ -300,7 +323,7 @@ WriteLabelProlog(const char *label,	/* I - Page label */
 
   if (!classification[0] && (label == NULL || !label[0]))
   {
-    puts("/espWL{}bind def");
+    puts("userdict/ESPwl{}bind put");
     return;
   }
 
@@ -308,50 +331,51 @@ WriteLabelProlog(const char *label,	/* I - Page label */
   * Set the classification + page label string...
   */
 
+  printf("userdict");
   if (strcmp(classification, "confidential") == 0)
-    printf("/espPL(CONFIDENTIAL");
+    printf("/ESPpl(CONFIDENTIAL");
   else if (strcmp(classification, "classified") == 0)
-    printf("/espPL(CLASSIFIED");
+    printf("/ESPpl(CLASSIFIED");
   else if (strcmp(classification, "secret") == 0)
-    printf("/espPL(SECRET");
+    printf("/ESPpl(SECRET");
   else if (strcmp(classification, "topsecret") == 0)
-    printf("/espPL(TOP SECRET");
+    printf("/ESPpl(TOP SECRET");
   else if (strcmp(classification, "unclassified") == 0)
-    printf("/espPL(UNCLASSIFIED");
+    printf("/ESPpl(UNCLASSIFIED");
   else
-    printf("/espPL(");
+    printf("/ESPpl(");
 
   if (classification[0] && label)
-    printf(" - %s)def\n", label);
+    printf(" - %s)put\n", label);
   else if (label)
-    printf("%s)def\n", label);
+    printf("%s)put\n", label);
   else
-    puts(")def");
+    puts(")put");
 
  /*
   * Then get a 14 point Helvetica-Bold font...
   */
 
-  puts("/espPF /Helvetica-Bold findfont 14 scalefont def");
+  puts("userdict/ESPpf /Helvetica-Bold findfont 14 scalefont put");
 
  /*
   * Finally, the procedure to write the labels on the page...
   */
 
-  puts("/espWL{");
-  puts("  espPF setfont");
-  printf("  espPL stringwidth pop dup 12 add exch  -0.5 mul %.0f add\n",
+  puts("userdict/ESPwl{");
+  puts("  ESPpf setfont");
+  printf("  ESPpl stringwidth pop dup 12 add exch -0.5 mul %.0f add\n",
          width * 0.5f);
   puts("  1 setgray");
-  printf("  dup 6 sub %.0f 3 index 20 rectfill\n", bottom - 2.0);
-  printf("  dup 6 sub %.0f 3 index 20 rectfill\n", top - 18.0);
+  printf("  dup 6 sub %.0f 3 index 20 ESPrf\n", bottom - 2.0);
+  printf("  dup 6 sub %.0f 3 index 20 ESPrf\n", top - 18.0);
   puts("  0 setgray");
-  printf("  dup 6 sub %.0f 3 index 20 rectstroke\n", bottom - 2.0);
-  printf("  dup 6 sub %.0f 3 index 20 rectstroke\n", top - 18.0);
-  printf("  dup %.0f moveto espPL show\n", bottom + 2.0);
-  printf("  %.0f moveto espPL show\n", top - 14.0);
+  printf("  dup 6 sub %.0f 3 index 20 ESPrs\n", bottom - 2.0);
+  printf("  dup 6 sub %.0f 3 index 20 ESPrs\n", top - 18.0);
+  printf("  dup %.0f moveto ESPpl show\n", bottom + 2.0);
+  printf("  %.0f moveto ESPpl show\n", top - 14.0);
   puts("pop");
-  puts("}bind def");
+  puts("}bind put");
 }
 
 
@@ -392,11 +416,11 @@ WriteLabels(int orient)	/* I - Orientation of the page */
         break;
   }
 
-  puts("espWL");
+  puts("ESPwl");
   puts("grestore");
 }
 
 
 /*
- * End of "$Id: common.c,v 1.15.2.4 2002/03/01 19:55:15 mike Exp $".
+ * End of "$Id: common.c,v 1.15.2.5 2002/05/14 16:24:22 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.14 2002/04/17 17:23:20 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.15 2002/05/14 16:24:22 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -28,6 +28,8 @@
  *   main()        - Main entry...
  *   check_range() - Check to see if the current page is selected for
  *   copy_bytes()  - Copy bytes from the input file to stdout...
+ *   do_prolog()   - Send the necessary document prolog commands...
+ *   do_setup()    - Send the necessary document setup commands...
  *   end_nup()     - End processing for N-up printing...
  *   psgets()      - Get a line from a file.
  *   start_nup()   - Start processing for N-up printing...
@@ -46,6 +48,26 @@
 
 #define MAX_PAGES	10000
 
+#define BORDER_NONE	0	/* No border or hairline border */
+#define BORDER_THICK	1	/* Think border */
+#define BORDER_SINGLE	2	/* Single-line hairline border */
+#define BORDER_SINGLE2	3	/* Single-line thick border */
+#define BORDER_DOUBLE	4	/* Double-line hairline border */
+#define BORDER_DOUBLE2	5	/* Double-line thick border */
+
+#define LAYOUT_LRBT	0	/* Left to right, bottom to top */
+#define LAYOUT_LRTB	1	/* Left to right, top to bottom */
+#define LAYOUT_RLBT	2	/* Right to left, bottom to top */
+#define LAYOUT_RLTB	3	/* Right to left, top to bottom */
+#define LAYOUT_BTLR	4	/* Bottom to top, left to right */
+#define LAYOUT_BTRL	5	/* Bottom to top, right to left */
+#define LAYOUT_TBLR	6	/* Top to bottom, left to right */
+#define LAYOUT_TBRL	7	/* Top to bottom, right to left */
+
+#define LAYOUT_NEGATEY	1
+#define LAYOUT_NEGATEX	2
+#define LAYOUT_VERTICAL	4
+
 
 /*
  * Globals...
@@ -62,7 +84,10 @@ int		Order = 0,		/* 0 = normal, 1 = reverse pages */
 		NUp = 1,		/* Number of pages on each sheet (1, 2, 4) */
 		Collate = 0,		/* Collate copies? */
 		Copies = 1,		/* Number of copies */
-		UseESPsp = 0;		/* Use ESPshowpage? */
+		UseESPsp = 0,		/* Use ESPshowpage? */
+		Border = BORDER_NONE,	/* Border around pages */
+		Layout = LAYOUT_LRTB,	/* Layout of N-up pages */
+		NormalLandscape = 1;	/* Normal rotation for landscape? */
 
 
 /*
@@ -71,9 +96,14 @@ int		Order = 0,		/* 0 = normal, 1 = reverse pages */
 
 static int	check_range(int page);
 static void	copy_bytes(FILE *fp, size_t length);
+static void	do_prolog(ppd_file_t *ppd);
+static void 	do_setup(ppd_file_t *ppd, int copies,  int collate,
+		         int slowcollate, float g, float b);
 static void	end_nup(int number);
+#define		is_first_page(p)	(NUp == 1 || (((p)+1) % NUp) == 1)
+#define		is_last_page(p)		(NUp > 1 && (((p)+1) % NUp) == 0)
 static char	*psgets(char *buf, size_t len, FILE *fp);
-static void	start_nup(int number);
+static void	start_nup(int number, int show_border);
 
 
 /*
@@ -109,6 +139,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		subpage;	/* Sub-page number */
   int		copy;		/* Current copy */
   int		saweof;		/* Did we see a %%EOF tag? */
+  int		sent_prolog,	/* Did we send the prolog commands? */
+		sent_setup;	/* Did we send the setup commands? */
 
 
  /*
@@ -162,6 +194,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   ppd = SetCommonOptions(num_options, options, 1);
 
+  if (ppd && ppd->landscape < 0)
+    NormalLandscape = 0;
+
   if ((val = cupsGetOption("page-ranges", num_options, options)) != NULL)
     PageRanges = val;
 
@@ -192,6 +227,40 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if ((val = cupsGetOption("number-up", num_options, options)) != NULL)
     NUp = atoi(val);
+
+  if ((val = cupsGetOption("number-up-border", num_options, options)) != NULL)
+  {
+    if (strcasecmp(val, "none") == 0)
+      Border = BORDER_NONE;
+    else if (strcasecmp(val, "single") == 0)
+      Border = BORDER_SINGLE;
+    else if (strcasecmp(val, "single-thick") == 0)
+      Border = BORDER_SINGLE2;
+    else if (strcasecmp(val, "double") == 0)
+      Border = BORDER_DOUBLE;
+    else if (strcasecmp(val, "double-thick") == 0)
+      Border = BORDER_DOUBLE2;
+  }
+
+  if ((val = cupsGetOption("number-up-layout", num_options, options)) != NULL)
+  {
+    if (strcasecmp(val, "lrtb") == 0)
+      Layout = LAYOUT_LRTB;
+    else if (strcasecmp(val, "lrbt") == 0)
+      Layout = LAYOUT_LRBT;
+    else if (strcasecmp(val, "rltb") == 0)
+      Layout = LAYOUT_RLTB;
+    else if (strcasecmp(val, "rlbt") == 0)
+      Layout = LAYOUT_RLBT;
+    else if (strcasecmp(val, "tblr") == 0)
+      Layout = LAYOUT_TBLR;
+    else if (strcasecmp(val, "tbrl") == 0)
+      Layout = LAYOUT_TBRL;
+    else if (strcasecmp(val, "btlr") == 0)
+      Layout = LAYOUT_BTLR;
+    else if (strcasecmp(val, "btrl") == 0)
+      Layout = LAYOUT_BTRL;
+  }
 
   if ((val = cupsGetOption("gamma", num_options, options)) != NULL)
     g = atoi(val) * 0.001f;
@@ -280,20 +349,18 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Start sending the document with any commands needed...
   */
 
-  puts(line);
+  fputs(line, stdout);
 
-  saweof = 0;
+  saweof      = 0;
+  sent_prolog = 0;
+  sent_setup  = 0;
 
-  if (ppd != NULL && ppd->patches != NULL)
-    puts(ppd->patches);
-
-  ppdEmit(ppd, stdout, PPD_ORDER_DOCUMENT);
-  ppdEmit(ppd, stdout, PPD_ORDER_ANY);
-  ppdEmit(ppd, stdout, PPD_ORDER_PROLOG);
-
-  if (g != 1.0 || b != 1.0)
-    printf("{ neg 1 add dup 0 lt { pop 1 } { %.3f exp neg 1 add } "
-           "ifelse %.3f mul } bind settransfer\n", g, b);
+  if (Copies > 1 && (!Collate || !slowcollate))
+    printf("%%%%Requirements: numcopies(%d)%s%s\n", Copies,
+           Collate ? " collate" : "",
+	   Duplex ? " duplex" : "");
+  else if (Duplex)
+    puts("%%%%Requirements: duplex\n");
 
  /*
   * Figure out if we should use ESPshowpage or not...
@@ -310,24 +377,17 @@ main(int  argc,			/* I - Number of command-line arguments */
     UseESPsp = 1;
   }
 
-  if (Copies > 1 && (!Collate || !slowcollate))
-  {
-    if (Collate)
-      printf("%%%%Requirements: numcopies(%d) collate\n", Copies);
-    else
-      printf("%%%%Requirements: numcopies(%d)\n", Copies);
-
-    if (LanguageLevel == 1)
-      printf("/#copies %d def\n", Copies);
-    else
-      printf("<</NumCopies %d>>setpagedevice\n", Copies);
-  }
+  if (UseESPsp)
+    puts("userdict/ESPshowpage/showpage load put\n"
+	 "userdict/showpage{}put");
 
   if (strncmp(line, "%!PS-Adobe-", 11) == 0)
   {
    /*
     * OK, we have DSC comments; read until we find a %%Page comment...
     */
+
+    puts("%%Pages: (atend)");
 
     level = 0;
 
@@ -338,10 +398,16 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
           strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
+      {
+	fputs(line, stdout);
         level ++;
+      }
       else if (strncmp(line, "%%EndDocument", 13) == 0 && level > 0)
+      {
+	fputs(line, stdout);
         level --;
-      else if (strncmp(line, "%%Orientation", 13) == 0)
+      }
+      else if (strncmp(line, "%%Orientation", 13) == 0 && level == 0)
       {
        /*
         * Reset orientation of document?
@@ -358,6 +424,36 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  Orientation = 4 - Orientation;
 	  UpdatePageVars();
 	  Orientation = 0;
+	}
+      }
+      else if (strncmp(line, "%%BeginProlog", 13) == 0 && level == 0)
+      {
+       /*
+        * Write the existing comment line, and then follow with patches
+	* and prolog commands...
+	*/
+
+        fputs(line, stdout);
+
+	if (!sent_prolog)
+	{
+	  sent_prolog = 1;
+          do_prolog(ppd);
+	}
+      }
+      else if (strncmp(line, "%%BeginSetup", 12) == 0 && level == 0)
+      {
+       /*
+        * Write the existing comment line, and then follow with document
+	* setup commands...
+	*/
+
+        fputs(line, stdout);
+
+	if (!sent_setup)
+	{
+	  sent_setup = 1;
+          do_setup(ppd, Copies, Collate, slowcollate, g, b);
 	}
       }
       else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
@@ -390,18 +486,42 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  tbytes -= nbytes;
 	}
       }
-      else
+      else if (strncmp(line, "%%Pages:", 8) != 0)
         fputs(line, stdout);
+    }
+
+   /*
+    * Make sure we have the prolog and setup commands written...
+    */
+
+    if (!sent_prolog)
+    {
+      puts("%%BeginProlog");
+
+      sent_prolog = 1;
+      do_prolog(ppd);
+
+      puts("%%EndProlog");
+    }
+
+    if (!sent_setup)
+    {
+      puts("%%BeginSetup");
+
+      sent_setup = 1;
+      do_setup(ppd, Copies, Collate, slowcollate, g, b);
+
+      puts("%%EndSetup");
     }
 
    /*
     * Write the page and label prologs...
     */
 
-    if (NUp == 2)
+    if (NUp == 2 || NUp == 6)
     {
      /*
-      * For 2-up output, rotate the labels to match the orientation
+      * For 2- and 6-up output, rotate the labels to match the orientation
       * of the pages...
       */
 
@@ -413,12 +533,6 @@ main(int  argc,			/* I - Number of command-line arguments */
     }
     else
       WriteLabelProlog(val, PageBottom, PageTop, PageWidth);
-
-    if (UseESPsp)
-      puts("userdict begin\n"
-	   "/ESPshowpage /showpage load def\n"
-	   "/showpage { } def\n"
-	   "end");
 
    /*
     * Then read all of the pages, filtering as needed...
@@ -469,7 +583,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         if (!sloworder)
 	{
-	  if ((NumPages & (NUp - 1)) == 0)
+	  if (is_first_page(NumPages))
 	  {
 	    if (ppd == NULL || ppd->num_filters == 0)
 	      fprintf(stderr, "PAGE: %d %d\n", page, Copies);
@@ -479,7 +593,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
 	  }
 
-	  start_nup(NumPages);
+	  start_nup(NumPages, 1);
 	}
 
 	NumPages ++;
@@ -544,9 +658,9 @@ main(int  argc,			/* I - Number of command-line arguments */
     {
       end_nup(NumPages - 1);
 
-      if (NumPages & (NUp - 1))
+      if (!is_last_page(NumPages))
       {
-	start_nup(NUp - 1);
+	start_nup(NUp - 1, 0);
         end_nup(NUp - 1);
       }
 
@@ -563,7 +677,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	page ++;
 	ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
 
-	start_nup(NUp - 1);
+	start_nup(NUp - 1, 0);
 	puts("showpage");
         end_nup(NUp - 1);
       }
@@ -581,7 +695,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	  for (number = 0; number < NumPages; number ++)
 	  {
-	    if ((number & (NUp - 1)) == 0)
+	    if (is_first_page(number))
 	    {
 	      if (ppd == NULL || ppd->num_filters == 0)
 		fprintf(stderr, "PAGE: %d 1\n", page);
@@ -591,14 +705,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
 	    }
 
-	    start_nup(number);
+	    start_nup(number, 1);
 	    copy_bytes(temp, Pages[number + 1] - Pages[number]);
 	    end_nup(number);
 	  }
 
-          if (NumPages & (NUp - 1))
+          if (!is_last_page(NumPages))
 	  {
-	    start_nup(NUp - 1);
+	    start_nup(NUp - 1, 0);
             end_nup(NUp - 1);
 	  }
 
@@ -615,7 +729,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    page ++;
 	    ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
 
-	    start_nup(NUp - 1);
+	    start_nup(NUp - 1, 0);
 	    puts("showpage");
             end_nup(NUp - 1);
 	  }
@@ -652,15 +766,15 @@ main(int  argc,			/* I - Number of command-line arguments */
 	         subpage < NUp && number < NumPages;
 		 subpage ++, number ++)
 	    {
-	      start_nup(number);
+	      start_nup(number, 1);
 	      fseek(temp, Pages[number], SEEK_SET);
 	      copy_bytes(temp, Pages[number + 1] - Pages[number]);
 	      end_nup(number);
 	    }
 
-            if (number & (NUp - 1))
+            if (!is_last_page(number))
 	    {
-	      start_nup(NUp - 1);
+	      start_nup(NUp - 1, 0);
               end_nup(NUp - 1);
 	    }
 
@@ -681,15 +795,15 @@ main(int  argc,			/* I - Number of command-line arguments */
 	             subpage < NUp && number < NumPages;
 		     subpage ++, number ++)
 		{
-		  start_nup(number);
+		  start_nup(number, 1);
 		  fseek(temp, Pages[number], SEEK_SET);
 		  copy_bytes(temp, Pages[number + 1] - Pages[number]);
 		  end_nup(number);
 		}
 
-        	if (number & (NUp - 1))
+        	if (!is_last_page(number))
 		{
-		  start_nup(NUp - 1);
+		  start_nup(NUp - 1, 0);
         	  end_nup(NUp - 1);
 		}
               }
@@ -706,7 +820,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 		page ++;
 		ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
 
-		start_nup(NUp - 1);
+		start_nup(NUp - 1, 0);
 		puts("showpage");
         	end_nup(NUp - 1);
 
@@ -725,9 +839,13 @@ main(int  argc,			/* I - Number of command-line arguments */
     * Copy the trailer, if any...
     */
 
+    puts("%%Trailer:");
+    printf("%%%%Pages: %d\n", page - 1);
+
     while (psgets(line, sizeof(line), fp) != NULL)
     {
-      if (strcmp(line, "\004") != 0)
+      if (strcmp(line, "\004") != 0 &&
+          strncmp(line, "%%Pages:", 8) != 0)
         fputs(line, stdout);
 
       if (strncmp(line, "%%EOF", 5) == 0)
@@ -743,6 +861,19 @@ main(int  argc,			/* I - Number of command-line arguments */
    /*
     * No DSC comments - write any page commands and then the rest of the file...
     */
+
+    if (slowcollate && Copies > 1)
+      printf("%%%%Pages: %d\n", Copies);
+    else
+      puts("%%Pages: 1");
+
+    puts("%%BeginProlog");
+    do_prolog(ppd);
+    puts("%%EndProlog");
+
+    puts("%%BeginSetup");
+    do_setup(ppd, Copies, Collate, slowcollate, g, b);
+    puts("%%EndSetup");
 
     if (ppd == NULL || ppd->num_filters == 0)
       fprintf(stderr, "PAGE: 1 %d\n", slowcollate ? 1 : Copies);
@@ -791,10 +922,13 @@ main(int  argc,			/* I - Number of command-line arguments */
   * End the job with the appropriate JCL command or CTRL-D otherwise.
   */
 
-  if (ppd != NULL && ppd->jcl_end)
-    fputs(ppd->jcl_end, stdout);
-  else if (ppd != NULL && ppd->num_filters == 0)
-    putchar(0x04);
+  if (ppd != NULL)
+  {
+    if (ppd->jcl_end)
+      fputs(ppd->jcl_end, stdout);
+    else if (ppd->num_filters == 0)
+      putchar(0x04);
+  }
 
  /*
   * Close files and remove the temporary file if needed...
@@ -912,6 +1046,73 @@ copy_bytes(FILE   *fp,		/* I - File to read from */
 
 
 /*
+ * 'do_prolog()' - Send the necessary document prolog commands...
+ */
+
+static void
+do_prolog(ppd_file_t *ppd)		/* I - PPD file */
+{
+ /*
+  * Send the document prolog commands...
+  */
+
+  if (ppd != NULL && ppd->patches != NULL)
+    puts(ppd->patches);
+
+  ppdEmit(ppd, stdout, PPD_ORDER_PROLOG);
+}
+
+
+/*
+ * 'do_setup()' - Send the necessary document setup commands...
+ */
+
+static void
+do_setup(ppd_file_t *ppd,		/* I - PPD file */
+         int        copies,		/* I - Number of copies */
+	 int        collate,		/* I - Collate output? */
+	 int        slowcollate,	/* I - Slow collate */
+	 float      g,			/* I - Gamma value */
+	 float      b)			/* I - Brightness value */
+{
+ /*
+  * Send all the printer-specific setup commands...
+  */
+
+  ppdEmit(ppd, stdout, PPD_ORDER_DOCUMENT);
+  ppdEmit(ppd, stdout, PPD_ORDER_ANY);
+
+ /*
+  * Set the number of copies for the job...
+  */
+
+  if (copies > 1 && (!collate || !slowcollate))
+  {
+    printf("%%ESPBeginNonPPDFeature: *NumCopies %d\n", copies);
+    printf("%d/languagelevel where{pop languagelevel 2 ge}{false}ifelse{1 dict begin"
+	    "/NumCopies exch def currentdict end " 
+	    "setpagedevice}{userdict/#copies 3 -1 roll put}ifelse\n", copies);
+    printf("%%ESPEndNonPPDFeature\n");
+  }
+
+ /*
+  * Changes to the transfer function must be made AFTER any
+  * setpagedevice code...
+  */
+
+  if (g != 1.0 || b != 1.0)
+    printf("{ neg 1 add dup 0 lt { pop 1 } { %.3f exp neg 1 add } "
+	   "ifelse %.3f mul } bind settransfer\n", g, b);
+
+ /*
+  * Make sure we have rectclip and rectstroke procedures of some sort...
+  */
+
+  WriteCommon();
+}
+
+
+/*
  * 'end_nup()' - End processing for N-up printing...
  */
 
@@ -934,7 +1135,8 @@ end_nup(int number)	/* I - Page number */
 	break;
 
     case 2 :
-	if ((number & 1) == 1 && UseESPsp)
+    case 6 :
+	if (is_last_page(number) && UseESPsp)
 	{
 	  if (Orientation & 1)
 	  {
@@ -944,21 +1146,29 @@ end_nup(int number)	/* I - Page number */
 
 	    WriteLabels(Orientation - 1);
 	  }
+	  else if (Orientation == 0)
+	  {
+	   /*
+	    * Rotate the labels to landscape...
+	    */
+
+	    WriteLabels(NormalLandscape ? 1 : 3);
+	  }
 	  else
 	  {
 	   /*
 	    * Rotate the labels to landscape...
 	    */
 
-	    WriteLabels(Orientation + 1);
+	    WriteLabels(NormalLandscape ? 3 : 1);
 	  }
 
           puts("ESPshowpage");
 	}
         break;
 
-    case 4 :
-	if ((number & 3) == 3 && UseESPsp)
+    default :
+	if (is_last_page(number) && UseESPsp)
 	{
 	  WriteLabels(Orientation);
           puts("ESPshowpage");
@@ -1042,22 +1252,25 @@ psgets(char   *buf,	/* I - Buffer to read into */
  */
 
 static void
-start_nup(int number)	/* I - Page number */
+start_nup(int number,		/* I - Page number */
+          int show_border)	/* I - Show the page border? */
 {
-  int	x, y;		/* Relative position of subpage */
-  float	w, l,		/* Width and length of subpage */
-	tx, ty;		/* Translation values for subpage */
-  float	pw, pl;		/* Printable width and length of full page */
+  int	pos;			/* Position on page */
+  int	x, y;			/* Relative position of subpage */
+  float	w, l,			/* Width and length of subpage */
+	tx, ty;			/* Translation values for subpage */
+  float	pw, pl;			/* Printable width and length of full page */
 
 
   if (Flip || Orientation || NUp > 1)
-    puts("userdict /ESPsave save put");
+    puts("userdict/ESPsave save put");
 
   if (Flip)
     printf("%.1f 0.0 translate -1 1 scale\n", PageWidth);
 
-  pw = PageRight - PageLeft;
-  pl = PageTop - PageBottom;
+  pos = number % NUp;
+  pw  = PageRight - PageLeft;
+  pl  = PageTop - PageBottom;
 
   fprintf(stderr, "DEBUG: pw = %.1f, pl = %.1f\n", pw, pl);
   fprintf(stderr, "DEBUG: PageLeft = %.1f, PageRight = %.1f\n", PageLeft, PageRight);
@@ -1077,14 +1290,26 @@ start_nup(int number)	/* I - Page number */
         break;
   }
 
+  if (Duplex && NUp > 1 && ((number / NUp) & 1))
+    printf("%.1f %.1f translate\n", PageWidth - PageRight, PageBottom);
+  else if (NUp > 1)
+    printf("%.1f %.1f translate\n", PageLeft, PageBottom);
+
   switch (NUp)
   {
-    case 2 :
-        x = number & 1;
+    default :
+        w = PageWidth;
+	l = PageLength;
+	break;
 
+    case 2 :
         if (Orientation & 1)
 	{
-	  x = 1 - x;
+          x = pos & 1;
+
+          if (Layout & LAYOUT_NEGATEY)
+	    x = 1 - x;
+
           w = pl;
           l = w * PageLength / PageWidth;
 
@@ -1094,11 +1319,24 @@ start_nup(int number)	/* I - Page number */
             w = l * PageWidth / PageLength;
           }
 
-          tx = pw * 0.5 - l;
-          ty = (pl - w) * 0.5;
+          tx = 0.5 * (pw * 0.5 - l);
+          ty = 0.5 * (pl - w);
+
+          if (NormalLandscape)
+            printf("0.0 %.1f translate -90 rotate\n", pl);
+	  else
+	    printf("%.1f 0.0 translate 90 rotate\n", pw);
+
+          printf("%.1f %.1f translate %.3f %.3f scale\n",
+                 ty, tx + l * x, w / PageWidth, l / PageLength);
         }
 	else
 	{
+          x = pos & 1;
+
+          if (Layout & LAYOUT_NEGATEX)
+	    x = 1 - x;
+
           l = pw;
           w = l * PageWidth / PageLength;
 
@@ -1108,40 +1346,36 @@ start_nup(int number)	/* I - Page number */
             l = w * PageLength / PageWidth;
           }
 
-          tx = pl * 0.5 - w;
-          ty = (pw - l) * 0.5;
-        }
+          tx = 0.5 * (pl * 0.5 - w);
+          ty = 0.5 * (pw - l);
 
-        if (Duplex && (number & 2))
-	  printf("%.1f %.1f translate\n", PageWidth - PageRight, PageBottom);
-	else
-	  printf("%.1f %.1f translate\n", PageLeft, PageBottom);
+          if (NormalLandscape)
+	    printf("%.1f 0.0 translate 90 rotate\n", pw);
+	  else
+            printf("0.0 %.1f translate -90 rotate\n", pl);
 
-        if (Orientation & 1)
-	{
-          printf("0.0 %.1f translate -90 rotate\n", pl);
-          printf("%.1f %.1f translate %.3f %.3f scale\n",
-                 ty, tx + l * x, w / PageWidth, l / PageLength);
-        }
-        else
-	{
-          printf("%.1f 0.0 translate 90 rotate\n", pw);
           printf("%.1f %.1f translate %.3f %.3f scale\n",
                  tx + w * x, ty, w / PageWidth, l / PageLength);
         }
-
-	printf("newpath\n"
-               "0.0 0.0 moveto\n"
-               "%.1f 0.0 lineto\n"
-               "%.1f %.1f lineto\n"
-               "0.0 %.1f lineto\n"
-               "closepath clip newpath\n",
-               PageWidth, PageWidth, PageLength, PageLength);
         break;
 
     case 4 :
-        x = number & 1;
-	y = 1 - ((number & 2) != 0);
+        if (Layout & LAYOUT_VERTICAL)
+	{
+	  x = (pos / 2) & 1;
+          y = pos & 1;
+        }
+	else
+	{
+          x = pos & 1;
+	  y = (pos / 2) & 1;
+        }
+
+        if (Layout & LAYOUT_NEGATEX)
+	  x = 1 - x;
+
+	if (Layout & LAYOUT_NEGATEY)
+	  y = 1 - y;
 
         w = pw * 0.5;
 	l = w * PageLength / PageWidth;
@@ -1152,25 +1386,206 @@ start_nup(int number)	/* I - Page number */
 	  w = l * PageWidth / PageLength;
 	}
 
-        if (Duplex && (number & 4))
-	  printf("%.1f %.1f translate\n", PageWidth - PageRight, PageBottom);
-	else
-	  printf("%.1f %.1f translate\n", PageLeft, PageBottom);
+        tx = 0.5 * (pw * 0.5 - w);
+        ty = 0.5 * (pl * 0.5 - l);
 
-	printf("%.1f %.1f translate %.3f %.3f scale\n", x * w, y * l,
+	printf("%.1f %.1f translate %.3f %.3f scale\n", tx + x * w, ty + y * l,
 	       w / PageWidth, l / PageLength);
-        printf("newpath\n"
-               "0.0 0.0 moveto\n"
-               "%.1f 0.0 lineto\n"
-               "%.1f %.1f lineto\n"
-               "0.0 %.1f lineto\n"
-               "closepath clip newpath\n",
-               PageWidth, PageWidth, PageLength, PageLength);
         break;
+
+    case 6 :
+        if (Orientation & 1)
+	{
+	  if (Layout & LAYOUT_VERTICAL)
+	  {
+	    x = pos / 3;
+	    y = pos % 3;
+
+            if (Layout & LAYOUT_NEGATEX)
+	      x = 1 - x;
+
+            if (Layout & LAYOUT_NEGATEY)
+	      y = 2 - y;
+	  }
+	  else
+	  {
+	    x = pos & 1;
+	    y = pos / 2;
+
+            if (Layout & LAYOUT_NEGATEX)
+	      x = 1 - x;
+
+            if (Layout & LAYOUT_NEGATEY)
+	      y = 2 - y;
+	  }
+
+          w = pl * 0.5;
+          l = w * PageLength / PageWidth;
+
+          if (l > (pw * 0.333))
+          {
+            l = pw * 0.333;
+            w = l * PageWidth / PageLength;
+          }
+
+          tx = 0.5 * (pl - 2 * w);
+          ty = 0.5 * (pw - 3 * l);
+
+          if (NormalLandscape)
+            printf("0.0 %.1f translate -90 rotate\n", pl);
+	  else
+	    printf("%.1f 0.0 translate 90 rotate\n", pw);
+
+          printf("%.1f %.1f translate %.3f %.3f scale\n",
+                 tx + x * w, ty + y * l, w / PageWidth, l / PageLength);
+        }
+	else
+	{
+	  if (Layout & LAYOUT_VERTICAL)
+	  {
+	    x = pos % 3;
+	    y = pos / 3;
+
+            if (Layout & LAYOUT_NEGATEX)
+	      x = 2 - x;
+
+            if (Layout & LAYOUT_NEGATEY)
+	      y = 1 - y;
+	  }
+	  else
+	  {
+	    x = pos / 3;
+	    y = pos % 3;
+
+            if (Layout & LAYOUT_NEGATEX)
+	      x = 1 - x;
+
+            if (Layout & LAYOUT_NEGATEY)
+	      y = 2 - y;
+	  }
+
+          l = pw * 0.5;
+          w = l * PageWidth / PageLength;
+
+          if (w > (pl * 0.333))
+          {
+            w = pl * 0.333;
+            l = w * PageLength / PageWidth;
+          }
+
+          tx = 0.5 * (pl - 3 * w);
+          ty = 0.5 * (pw - 2 * l);
+
+          if (NormalLandscape)
+	    printf("%.1f 0.0 translate 90 rotate\n", pw);
+	  else
+            printf("0.0 %.1f translate -90 rotate\n", pl);
+
+          printf("%.1f %.1f translate %.3f %.3f scale\n",
+                 tx + w * x, ty + l * y, w / PageWidth, l / PageLength);
+        }
+        break;
+
+    case 9 :
+        if (Layout & LAYOUT_VERTICAL)
+	{
+	  x = (pos / 3) % 3;
+          y = pos % 3;
+        }
+	else
+	{
+          x = pos % 3;
+	  y = (pos / 3) % 3;
+        }
+
+        if (Layout & LAYOUT_NEGATEX)
+	  x = 2 - x;
+
+	if (Layout & LAYOUT_NEGATEY)
+	  y = 2 - y;
+
+        w = pw * 0.333;
+	l = w * PageLength / PageWidth;
+
+	if (l > (pl * 0.333))
+	{
+	  l = pl * 0.333;
+	  w = l * PageWidth / PageLength;
+	}
+
+        tx = 0.5 * (pw * 0.333 - w);
+        ty = 0.5 * (pl * 0.333 - l);
+
+	printf("%.1f %.1f translate %.3f %.3f scale\n", tx + x * w, ty + y * l,
+	       w / PageWidth, l / PageLength);
+        break;
+
+    case 16 :
+        if (Layout & LAYOUT_VERTICAL)
+	{
+	  x = (pos / 4) & 3;
+          y = pos & 3;
+        }
+	else
+	{
+          x = pos & 3;
+	  y = (pos / 4) & 3;
+        }
+
+        if (Layout & LAYOUT_NEGATEX)
+	  x = 3 - x;
+
+	if (Layout & LAYOUT_NEGATEY)
+	  y = 3 - y;
+
+        w = pw * 0.25;
+	l = w * PageLength / PageWidth;
+
+	if (l > (pl * 0.25))
+	{
+	  l = pl * 0.25;
+	  w = l * PageWidth / PageLength;
+	}
+
+        tx = 0.5 * (pw * 0.25 - w);
+        ty = 0.5 * (pl * 0.25 - l);
+
+	printf("%.1f %.1f translate %.3f %.3f scale\n", tx + x * w, ty + y * l,
+	       w / PageWidth, l / PageLength);
+        break;
+  }
+
+  if (NUp > 1)
+  {
+   /*
+    * Draw borders as necessary...
+    */
+
+    if (Border && show_border)
+    {
+     /*
+      * Set the line width and color...
+      */
+
+      puts("gsave");
+      printf("%.3f setlinewidth 0 setgray newpath\n",
+             (Border & BORDER_THICK) ? PageWidth / w : 0.0);
+
+      printf("0 0 %.1f %.1f ESPrs\n", PageWidth, PageLength);
+
+      if (Border & BORDER_DOUBLE)
+        printf("2 2 %.1f %.1f ESPrs\n", PageWidth - 4.0, PageLength - 4.0);
+    }
+
+   /*
+    * Clip the page that follows to the bounding box of the page...
+    */
+
+    printf("0 0 %.1f %.1f ESPrc\n", PageWidth, PageLength);
   }
 }
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.14 2002/04/17 17:23:20 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.15 2002/05/14 16:24:22 mike Exp $".
  */
