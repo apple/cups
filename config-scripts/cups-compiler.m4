@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4,v 1.18 2002/07/17 17:30:13 mike Exp $"
+dnl "$Id: cups-compiler.m4,v 1.19 2002/09/26 11:15:59 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -62,7 +62,7 @@ if test -n "$GCC"; then
 			;;
 		*)
         		# This is gcc 3.x, and it knows of libsupc++, so we need it
-        		LIBS="$LIBS -lsupc++"
+        		CXXLIBS="-lsupc++"
         		AC_MSG_RESULT(yes)
 			;;
 	esac
@@ -190,5 +190,5 @@ case $uname in
 esac
 
 dnl
-dnl End of "$Id: cups-compiler.m4,v 1.18 2002/07/17 17:30:13 mike Exp $".
+dnl End of "$Id: cups-compiler.m4,v 1.19 2002/09/26 11:15:59 mike Exp $".
 dnl
