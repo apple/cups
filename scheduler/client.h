@@ -1,5 +1,5 @@
 /*
- * "$Id: client.h,v 1.24 2003/03/14 21:40:39 mike Exp $"
+ * "$Id: client.h,v 1.25 2003/03/14 21:42:29 mike Exp $"
  *
  *   Client definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -77,6 +77,7 @@ VAR client_t		*Clients	VALUE(NULL);
 					/* HTTP clients */
 VAR struct sockaddr_in	ServerAddr;	/* Server IP address */
 VAR int			CGIPipes[2]	VALUE2(-1,-1);
+					/* Pipes for CGI error/debug output */
 
 
 /*
@@ -105,5 +106,5 @@ extern void	UpdateCGI(void);
 extern int	WriteClient(client_t *con);
 
 /*
- * End of "$Id: client.h,v 1.24 2003/03/14 21:40:39 mike Exp $".
+ * End of "$Id: client.h,v 1.25 2003/03/14 21:42:29 mike Exp $".
  */
