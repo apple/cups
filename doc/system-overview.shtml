@@ -1,6 +1,7 @@
 <H2>System Overview</H2>
 
-<P>The Common UNIX Printing System provides a portable printing layer for 
+<P>The Common UNIX Printing System<SUP>TM</SUP> ("CUPS") provides a portable
+printing layer for 
 UNIX&reg; operating systems. It has been developed by
 <A HREF="http://www.easysw.com">Easy Software Products</A> to promote a
 standard printing solution for all UNIX vendors and users. CUPS provides
@@ -12,9 +13,9 @@ RFC1179), Server Message Block (SMB), and AppSocket protocols are also
 supported with reduced functionality.
 
 <P>CUPS adds network printer browsing and PostScript Printer
-Description (&quot;PPD&quot;)-based printing options to support real
-world applications under UNIX.
+Description (&quot;PPD&quot;)-based printing options to support real-world
+printing under UNIX.
 
 <P>CUPS also includes a customized version of GNU GhostScript
 (currently based off GNU GhostScript 5.50) and an image file RIP that
-is used to support non-PostScript printers.
+are used to support non-PostScript printers.

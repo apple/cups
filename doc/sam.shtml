@@ -21,10 +21,16 @@ information for the Common UNIX Printing System ("CUPS") Version 1.1.
 <UL>
 	<LI>1 - Printing System Overview</LI>
 	<LI>2 - Building and Installing CUPS</LI>
-	<LI>3 - Printer Queue Management</LI>
-	<LI>4 - Printing System Management</LI>
-	<LI>5 - Printer Accounting</LI>
-	<LI>A - Using CUPS with SAMBA</LI>
+	<LI>3 - Getting Started</LI>
+	<LI>4 - Managing Printers</LI>
+	<LI>5 - Printer Classes</LI>
+	<LI>6 - Printing System Management</LI>
+	<LI>7 - Printing System Security</LI>
+	<LI>8 - Printing from Windows and MacOS</LI>
+	<LI>9 - Printer Accounting</LI>
+	<LI>A - Software License Agreement</LI>
+	<LI>B - Common Network Settings</LI>
+	<LI>C - Troubleshooting Common Problems</LI>
 </UL>
 
 <EMBED SRC="printing-overview.shtml">
@@ -149,7 +155,14 @@ installation script with:
 <P>After asking you a few yes/no questions the CUPS software will be
 installed and the scheduler will be started automatically.
 
-<H1 ALIGN=RIGHT>3 - Printer Queue Management</H1>
+
+
+
+<H1 ALIGN="RIGHT">3 - Getting Started</H1>
+
+
+
+<H1 ALIGN="RIGHT">4 - Managing Printers</H1>
 
 <P>This chapter discusses how to add, modify, and delete print queues
 on your system.
@@ -320,7 +333,12 @@ those that have been queued. This is useful for when you must perform
 maintenance on the printer and will not have it available to users for
 a long period of time.
 
-<H1 ALIGN=RIGHT>4 - Printing System Management</H1>
+
+<H1 ALIGN="RIGHT">5 - Printer Classes</H1>
+
+
+
+<H1 ALIGN="RIGHT">6 - Printing System Management</H1>
 
 <P>This chapter shows how you can configure the CUPS server.
 
@@ -734,6 +752,9 @@ the file type based upon the contents of the file instead.
 	<LI><CODE>string(offset,"string")</CODE> - True if bytes are
 	identical to string
 
+	<LI><CODE>contains(offset,range,"string")</CODE> - True if the
+	range of bytes contains the string
+
 	<LI><CODE>char(offset,value)</CODE> - True if byte is identical
 
 	<LI><CODE>short(offset,value)</CODE> - True if 16-bit integer
@@ -908,11 +929,24 @@ field in the <CODE>access_log</CODE> file.
 and number of copies being printed of that page. For printer that can not
 produce copies on their own, the <I>num-pages</I> field will always be 1.
 
-<H1 ALIGN="RIGHT">A - Using CUPS with SAMBA</H1>
 
-<P>This appendix describes how to use CUPS with SAMBA.
+<H1 ALIGN="RIGHT">7 - Printing System Security</H1>
 
-<H2>What is SAMBA?</H2>
+
+
+<H1 ALIGN="RIGHT">8 - Printing from Client Systems</H1>
+
+<P>This chapter describes how to print from client systems that use the CUPS,
+LPD, Windows, or MacOS printing protocols.
+
+<H2>Printing from CUPS Client Machines</H2>
+
+
+<H2>Printing from LPD Clients</H2>
+
+<H2>Printing from Windows Clients</H2>
+
+<H3>What is SAMBA?</H3>
 
 <P>In case you haven't heard of SAMBA, it is basically a software package
 that allows you to configure your UNIX system as a Windows file and printer
@@ -924,7 +958,7 @@ You can download SAMBA from:
 
 <P ALIGN="CENTER"><A HREF="http://www.samba.org">http://www.samba.org</A></P>
 
-<H2>How Do I Configure SAMBA for CUPS?</H2>
+<H3>How Do I Configure SAMBA for CUPS?</H3>
 
 <P>To configure SAMBA for CUPS, edit the <CODE>smb.conf</CODE> file and
 replace the existing printing commands and options with the line:
@@ -936,7 +970,7 @@ printing = cups
 <P>That's all there is to it!  Remote users will now be able to browse and
 print to printers on your system.
 
-<H2>How Do I Configure CUPS for SAMBA?</H2>
+<H3>How Do I Configure CUPS for SAMBA?</H3>
 
 <P>To configure CUPS for SAMBA, run the following command:
 
@@ -955,6 +989,24 @@ method in the device URI for your printers:
 
 <P>The second form only needs to be used if the Windows system is in a
 different workgroup.
+
+
+<H1 ALIGN="RIGHT">9 - Printer Accounting</H1>
+
+
+
+<H1 ALIGN="RIGHT">A - Software License Agreement</H1>
+
+<EMBED SRC="../LICENSE.html">
+
+
+<H1 ALIGN="RIGHT">B - Common Network Settings</H1>
+
+
+
+<H1 ALIGN="RIGHT">C - Troubleshooting Common Problems</H1>
+
+
 
 </BODY>
 </HTML>
