@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.3 1999/05/15 03:39:33 mike Exp $"
+# "$Id: Makefile,v 1.4 1999/07/30 14:18:35 mike Exp $"
 #
 #   Configuration file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,7 +28,8 @@ include ../Makedefs
 # Config files...
 #
 
-FILES	=	classes.conf cupsd.conf mime.convs mime.types printers.conf
+KEEP	=	classes.conf cupsd.conf printers.conf
+REPLACE	=	mime.convs mime.types
 
 #
 # Make everything...
@@ -48,14 +49,20 @@ clean:
 
 install:
 	-$(MKDIR) $(SERVERROOT)/conf
-	for file in $(FILES); do \
+	for file in $(KEEP); do \
 		if test -e $(SERVERROOT)/conf/$$file ; then \
 			$(CP) $$file $(SERVERROOT)/conf/$$file.N ; \
 		else \
 			$(CP) $$file $(SERVERROOT)/conf ; \
 		fi ; \
 	done
+	for file in $(REPLACE); do \
+		if test -e $(SERVERROOT)/conf/$$file ; then \
+			$(MV) $(SERVERROOT)/conf/$$file $(SERVERROOT)/conf/$$file.O ; \
+		fi ; \
+		$(CP) $$file $(SERVERROOT)/conf ; \
+	done
 
 #
-# End of "$Id: Makefile,v 1.3 1999/05/15 03:39:33 mike Exp $".
+# End of "$Id: Makefile,v 1.4 1999/07/30 14:18:35 mike Exp $".
 #
