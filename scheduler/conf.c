@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.7 1999/02/26 22:02:06 mike Exp $"
+ * "$Id: conf.c,v 1.8 1999/04/16 20:47:47 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -73,6 +73,7 @@ static var_t	variables[] =
   { "ErrorLog",		ErrorLog,		VAR_STRING,	sizeof(ErrorLog) },
   { "DefaultCharset",	DefaultCharset,		VAR_STRING,	sizeof(DefaultCharset) },
   { "DefaultLanguage",	DefaultLanguage,	VAR_STRING,	sizeof(DefaultLanguage) },
+  { "RIPCache",		RIPCache,		VAR_STRING,	sizeof(RIPCache) },
   { "HostNameLookups",	&HostNameLookups,	VAR_BOOLEAN,	0 },
   { "Timeout",		&Timeout,		VAR_INTEGER,	0 },
   { "KeepAlive",	&KeepAlive,		VAR_BOOLEAN,	0 },
@@ -157,6 +158,8 @@ ReadConfiguration(void)
   strcpy(ErrorLog, "logs/error_log");
   strcpy(DefaultLanguage, DEFAULT_LANGUAGE);
   strcpy(DefaultCharset, DEFAULT_CHARSET);
+  strcpy(RIPCache, "32m");
+
   User             = DEFAULT_UID;
   Group            = DEFAULT_GID;
   LogLevel         = LOG_ERROR;
@@ -290,7 +293,8 @@ LogMessage(int  level,		/* I - Log level */
            char *message,	/* I - printf-style message string */
 	   ...)			/* I - Additional args as needed */
 {
-  char		filename[1024];	/* Name of error log file */
+  char		filename[1024],	/* Name of error log file */
+		backname[1024];	/* Backup filename */
   va_list	ap;		/* Argument pointer */
 
 
@@ -307,10 +311,40 @@ LogMessage(int  level,		/* I - Log level */
         ErrorFile = stderr;
     }
 
+    if (ftell(ErrorFile) > 1048576)
+    {
+     /*
+      * Rotate error_log file...
+      */
+
+      fclose(ErrorFile);
+
+      if (ErrorLog[0] != '/')
+        sprintf(filename, "%s/%s", ServerRoot, ErrorLog);
+      else
+        strcpy(filename, ErrorLog);
+
+      strcpy(backname, filename);
+      strcat(backname, ".O");
+
+      unlink(backname);
+      rename(filename, backname);
+
+      if ((ErrorFile = fopen(filename, "a")) == NULL)
+        ErrorFile = stderr;
+    }
+
     va_start(ap, message);
+
     vfprintf(ErrorFile, message, ap);
     fputs("\n", ErrorFile);
     fflush(ErrorFile);
+
+#ifdef DEBUG
+    vprintf(message, ap);
+    puts("");
+#endif /* DEBUG */
+
     va_end(ap);
   }
 
@@ -886,5 +920,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.7 1999/02/26 22:02:06 mike Exp $".
+ * End of "$Id: conf.c,v 1.8 1999/04/16 20:47:47 mike Exp $".
  */

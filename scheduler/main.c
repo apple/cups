@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.8 1999/02/26 22:02:07 mike Exp $"
+ * "$Id: main.c,v 1.9 1999/04/16 20:47:48 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -169,7 +169,22 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (errno == EINTR)
         continue;
 
-      fprintf(stderr, "cupsd: select() failed - %s\n", strerror(errno));
+      perror("cupsd: select() failed");
+
+#ifdef DEBUG
+      printf("cupsd: InputSet =");
+      for (i = 0; i < 100; i ++)
+        if (FD_ISSET(i, &input))
+          printf(" %d", i);
+      puts("");
+
+      printf("cupsd: OutputSet =");
+      for (i = 0; i < 100; i ++)
+        if (FD_ISSET(i, &output))
+          printf(" %d", i);
+      puts("");
+#endif /* 0 */
+
       break;
     }
 
@@ -256,7 +271,6 @@ sigcld_handler(int sig)	/* I - Signal number */
   (void)sig;
 
   pid = wait(&status);
-
   DEBUG_printf(("sigcld_handler: pid = %d, status = %d\n", pid, status));
 
   for (job = Jobs; job != NULL; job = job->next)
@@ -274,23 +288,42 @@ sigcld_handler(int sig)	/* I - Signal number */
 
         job->procs[i] = -pid;
 
-        for (i = 0; job->procs[i]; i ++)
-	  if (job->procs[i] > 0)
-	    break;
+        if (status)
+	{
+	 /*
+	  * A fatal error occurred, so stop the printer until the problem
+	  * can be resolved...
+	  */
 
-        if (job->procs[i])
-	  return; /* Still have active processes left */
+	  StopPrinter(job->printer);
+	}
+	else
+	{
+	 /*
+	  * OK return status; see if all processes are complete...
+	  */
 
-       /*
-        * OK, this was the last process; cancel the job...
-	*/
+          for (i = 0; job->procs[i]; i ++)
+	    if (job->procs[i] > 0)
+	      break;
 
-        DEBUG_printf(("sigcld_handler: job %d is completed.\n", job->id));
+          if (job->procs[i])
+	    return; /* Still have active processes left */
 
-        CancelJob(job->id);
-	return;
+	 /*
+          * OK, this was the last process; cancel the job...
+	  */
+
+          DEBUG_printf(("sigcld_handler: job %d is completed.\n", job->id));
+
+          CancelJob(job->id);
+	}
+
+	break;
       }
     }
+
+  sigset(SIGCLD, sigcld_handler);
 }
 
 
@@ -314,11 +347,11 @@ sighup_handler(int sig)	/* I - Signal number */
 static void
 usage(void)
 {
-  fputs("Usage: cupsd [-c config-file]", stderr);
+  fputs("Usage: cupsd [-c config-file]\n", stderr);
   exit(1);
 }
 
 
 /*
- * End of "$Id: main.c,v 1.8 1999/02/26 22:02:07 mike Exp $".
+ * End of "$Id: main.c,v 1.9 1999/04/16 20:47:48 mike Exp $".
  */

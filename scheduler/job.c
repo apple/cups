@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.9 1999/03/24 16:10:25 mike Exp $"
+ * "$Id: job.c,v 1.10 1999/04/16 20:47:48 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -40,6 +40,14 @@
  */
 
 #include "cupsd.h"
+
+
+/*
+ * Local functions...
+ */
+
+static int	start_process(char *command, char *argv[], char *envp[],
+		              int in, int out, int err);
 
 
 /*
@@ -272,24 +280,25 @@ StartJob(int       id,		/* I - Job ID */
   int		i;		/* Looping var */
   int		num_filters;	/* Number of filters for job */
   mime_filter_t	*filters;	/* Filters for job */
+  char		method[255],	/* Method for output */
+		*optptr;	/* Pointer to options */
+  ipp_attribute_t *attr;	/* Current attribute */
+  int		pid;		/* Process ID of new filter process */
   int		statusfds[2],	/* Pipes used between the filters and scheduler */
 		filterfds[2][2];/* Pipes used between the filters */
-  char		*argv[8];	/* Filter command-line arguments */
-  char		command[1024],	/* Full path to filter/backend command */
-		method[255],	/* Method for output */
+  char		*argv[8],	/* Filter command-line arguments */
+		command[1024],	/* Full path to filter/backend command */
 		jobid[255],	/* Job ID string */
 		title[IPP_MAX_NAME],
 				/* Job title string */
 		copies[255],	/* # copies string */
 		options[16384],	/* Full list of options */
-		*optptr;	/* Pointer to options */
-  ipp_attribute_t *attr;	/* Current attribute */
-  char		*envp[10];	/* Environment variables */
-  char		language[255],	/* LANG environment variable */
+		*envp[11],	/* Environment variables */
+		language[255],	/* LANG environment variable */
 		charset[255],	/* CHARSET environment variable */
 		ppd[1024],	/* PPD environment variable */
-		root[1024];	/* SERVER_ROOT environment variable */
-  int		pid;		/* Process ID of new filter process */
+		root[1024],	/* SERVER_ROOT environment variable */
+		cache[255];	/* RIP_MAX_CACHE environment variable */
 
 
   DEBUG_printf(("StartJob(%d, %08x)\n", id, printer));
@@ -466,17 +475,30 @@ StartJob(int       id,		/* I - Job ID */
 
       sprintf(ppd, "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
       sprintf(root, "SERVER_ROOT=%s", ServerRoot);
+      sprintf(cache, "RIP_MAX_CACHE=%s", RIPCache);
 
-      envp[0] = "PATH=/bin:/usr/bin";
-      envp[1] = "SOFTWARE=CUPS/1.0";
-      envp[2] = "TZ=GMT";
-      envp[3] = "USER=root";
-      envp[4] = charset;
-      envp[5] = language;
-      envp[6] = "TZ=GMT";
-      envp[7] = ppd;
-      envp[8] = root;
-      envp[9] = NULL;
+      envp[0]  = "PATH=/bin:/usr/bin";
+      envp[1]  = "SOFTWARE=CUPS/1.0";
+      envp[2]  = "TZ=GMT";
+      envp[3]  = "USER=root";
+      envp[4]  = charset;
+      envp[5]  = language;
+      envp[6]  = "TZ=GMT";
+      envp[7]  = ppd;
+      envp[8]  = root;
+      envp[9]  = cache;
+      envp[10] = NULL;
+
+      DEBUG_puts(envp[0]);
+      DEBUG_puts(envp[1]);
+      DEBUG_puts(envp[2]);
+      DEBUG_puts(envp[3]);
+      DEBUG_puts(envp[4]);
+      DEBUG_puts(envp[5]);
+      DEBUG_puts(envp[6]);
+      DEBUG_puts(envp[7]);
+      DEBUG_puts(envp[8]);
+      DEBUG_puts(envp[9]);
 
      /*
       * Now create processes for all of the filters...
@@ -489,8 +511,18 @@ StartJob(int       id,		/* I - Job ID */
         return;
       }
 
+      DEBUG_printf(("statusfds = %d, %d\n", statusfds[0], statusfds[1]));
+
       current->pipe = statusfds[0];
       memset(current->procs, 0, sizeof(current->procs));
+
+      if (strcmp(filters[num_filters - 1].filter, "-") == 0)
+        num_filters --;
+
+      filterfds[1][0] = open("/dev/null", O_RDONLY);
+      filterfds[1][1] = -1;
+      DEBUG_printf(("filterfds[%d] = %d, %d\n", 1, filterfds[1][0],
+                    filterfds[1][1]));
 
       for (i = 0; i < num_filters; i ++)
       {
@@ -502,93 +534,46 @@ StartJob(int       id,		/* I - Job ID */
 	else
 	  strcpy(command, filters[i].filter);
 
+	DEBUG_printf(("%s: %s %s %s %s %s %s %s\n", command, argv[0],
+	              argv[1], argv[2], argv[3], argv[4], argv[5], argv[6]));
+
         if (i < (num_filters - 1) ||
 	    strncmp(printer->device_uri, "file:", 5) != 0)
           pipe(filterfds[i & 1]);
 	else
 	{
 	  filterfds[i & 1][0] = -1;
-	  filterfds[i & 1][1] = open(printer->device_uri + 5, O_WRONLY | O_EXCL);
-	}
-
-        if ((pid = fork()) == 0)
-	{
-	 /*
-	  * Child process goes here...
-	  */
-
-         /*
-	  * Update stdin/stdout/stderr as needed...
-	  */
-
-          close(0);
-	  if (i)
-	  {
-	    dup(filterfds[!(i & 1)][0]);
-            close(filterfds[!(i & 1)][0]);
-            close(filterfds[!(i & 1)][1]);
-	  }
+	  if (strncmp(printer->device_uri, "file:/dev/", 10) == 0)
+	    filterfds[i & 1][1] = open(printer->device_uri + 5,
+	                               O_WRONLY | O_EXCL);
 	  else
-	    open("/dev/null", O_RDONLY);
-
-	  close(1);
-	  dup(filterfds[i & 1][1]);
-          close(filterfds[i & 1][0]);
-          close(filterfds[i & 1][1]);
-
-	  close(2);
-	  dup(statusfds[1]);
-	  close(statusfds[0]);
-	  close(statusfds[1]);
-
-         /*
-	  * Change user to something "safe"...
-	  */
-
-	  setuid(User);
-	  setgid(Group);
-
-         /*
-	  * Execute the command; if for some reason this doesn't work,
-	  * return error code 1.
-	  */
-
-	  execve(command, argv, envp);
-
-          DEBUG_printf(("StartJob: unable to execve() %s - %s.\n", command,
-	                strerror(errno)));
-
-	  exit(-1);
+	    filterfds[i & 1][1] = open(printer->device_uri + 5,
+	                               O_WRONLY | O_CREAT | O_TRUNC, 0666);
 	}
-	else if (pid < 0)
+
+	DEBUG_printf(("filterfds[%d] = %d, %d\n", i & 1, filterfds[i & 1][0],
+         	      filterfds[i & 1][1]));
+
+        pid = start_process(command, argv, envp, filterfds[!(i & 1)][0],
+	                    filterfds[i & 1][1], statusfds[1]);
+
+        close(filterfds[!(i & 1)][0]);
+        close(filterfds[!(i & 1)][1]);
+
+	if (pid == 0)
 	{
-	 /*
-	  * ERROR
-	  */
-
-          DEBUG_printf(("StartJob: unable to fork() %s - %s.\n", command,
-	                strerror(errno)));
-
-	  CancelJob(current->id);
+	  StopPrinter(current->printer);
 	  return;
 	}
 	else
 	{
-	 /*
-	  * Parent process goes here...
-	  */
-
 	  current->procs[i] = pid;
 
           DEBUG_printf(("StartJob: started %s - pid = %d.\n", command, pid));
-
-          if (i)
-	  {
-            close(filterfds[!(i & 1)][0]);
-            close(filterfds[!(i & 1)][1]);
-	  }
 	}
       }
+
+      free(filters);
 
      /*
       * Finally, pipe the final output into a backend process if needed...
@@ -600,82 +585,48 @@ StartJob(int       id,		/* I - Job ID */
         sprintf(command, "%s/backend/%s", ServerRoot, method);
 
         argv[0] = printer->device_uri;
-	if (i)
-	  argv[4] = "1";
+        if (num_filters)
+	  argv[6] = NULL;
 
-        if ((pid = fork()) == 0)
+	DEBUG_printf(("%s: %s %s %s %s %s %s %s\n", command, argv[0],
+	              argv[1], argv[2], argv[3], argv[4], argv[5], argv[6]));
+
+	filterfds[i & 1][0] = -1;
+	filterfds[i & 1][1] = open("/dev/null", O_WRONLY);
+
+	DEBUG_printf(("filterfds[%d] = %d, %d\n", i & 1, filterfds[i & 1][0],
+        	      filterfds[i & 1][1]));
+
+        pid = start_process(command, argv, envp, filterfds[!(i & 1)][0],
+	                    filterfds[i & 1][1], statusfds[1]);
+
+        close(filterfds[!(i & 1)][0]);
+        close(filterfds[!(i & 1)][1]);
+
+	if (pid == 0)
 	{
-	 /*
-	  * Child process goes here...
-	  */
-
-         /*
-	  * Update stdin/stdout/stderr as needed...
-	  */
-
-          close(0);
-	  if (i)
-	  {
-	    dup(filterfds[!(i & 1)][0]);
-            close(filterfds[!(i & 1)][0]);
-            close(filterfds[!(i & 1)][1]);
-	  }
-	  else
-	    open("/dev/null", O_RDONLY);
-
-	  close(1);
-	  open("/dev/null", O_WRONLY);
-
-	  close(2);
-	  dup(statusfds[1]);
-	  close(statusfds[0]);
-	  close(statusfds[1]);
-
-         /*
-	  * Change user to something "safe"...
-	  */
-
-	  setuid(User);
-	  setgid(Group);
-
-         /*
-	  * Execute the command; if for some reason this doesn't work,
-	  * return error code 1.
-	  */
-
-	  execve(command, argv, envp);
-
-          DEBUG_printf(("StartJob: unable to execve() %s - %s.\n", command,
-	                strerror(errno)));
-
-	  exit(-1);
-	}
-	else if (pid < 0)
-	{
-	 /*
-	  * ERROR
-	  */
-
-          DEBUG_printf(("StartJob: unable to fork() %s - %s.\n", command,
-	                strerror(errno)));
-
-	  CancelJob(current->id);
+	  StopPrinter(current->printer);
 	  return;
 	}
 	else
 	{
-	 /*
-	  * Parent process goes here...
-	  */
-
 	  current->procs[i] = pid;
 
           DEBUG_printf(("StartJob: started %s - pid = %d.\n", command, pid));
 	}
       }
+      else
+      {
+	filterfds[i & 1][0] = -1;
+	filterfds[i & 1][1] = -1;
 
-      close(filterfds[!(i & 1)][0]);
-      close(filterfds[!(i & 1)][1]);
+        close(filterfds[!(i & 1)][0]);
+        close(filterfds[!(i & 1)][1]);
+      }
+
+      close(filterfds[i & 1][0]);
+      close(filterfds[i & 1][1]);
+
       close(statusfds[1]);
 
       FD_SET(current->pipe, &InputSet);
@@ -705,7 +656,7 @@ StopJob(int id)
       {
         DEBUG_puts("StopJob: job state is \'processing\'.");
 
-	current->state          = IPP_JOB_PENDING;
+	current->state          = IPP_JOB_STOPPED;
 	current->printer->state = IPP_PRINTER_IDLE;
         current->printer->job   = NULL;
         current->printer        = NULL;
@@ -746,5 +697,83 @@ UpdateJob(job_t *job)	/* I - Job to check */
 
 
 /*
- * End of "$Id: job.c,v 1.9 1999/03/24 16:10:25 mike Exp $".
+ * 'start_process()' - Start a background process.
+ */
+
+static int			/* O - Process ID or 0 */
+start_process(char *command,	/* I - Full path to command */
+              char *argv[],	/* I - Command-line arguments */
+	      char *envp[],	/* I - Environment */
+              int  infd,	/* I - Standard input file descriptor */
+	      int  outfd,	/* I - Standard output file descriptor */
+	      int  errfd)	/* I - Standard error file descriptor */
+{
+  int	fd;			/* Looping var */
+  int	pid;			/* Process ID */
+
+
+  DEBUG_printf(("start_process(\"%s\", %08x, %08x, %d, %d, %d)\n",
+                command, argv, envp, infd, outfd, errfd));
+
+  if ((pid = fork()) == 0)
+  {
+   /*
+    * Child process goes here...
+    *
+    * Update stdin/stdout/stderr as needed...
+    */
+
+    close(0);
+    dup(infd);
+    close(1);
+    dup(outfd);
+    if (errfd > 2)
+    {
+      close(2);
+      dup(errfd);
+    }
+
+   /*
+    * Close extra file descriptors...
+    */
+
+    for (fd = 3; fd < _NFILE; fd ++)
+      close(fd);
+
+   /*
+    * Change user to something "safe"...
+    */
+
+    setuid(User);
+    setgid(Group);
+
+   /*
+    * Execute the command; if for some reason this doesn't work,
+    * return the error code...
+    */
+
+    execve(command, argv, envp);
+
+    perror("cupsd: execve() failed");
+
+    exit(errno);
+  }
+  else if (pid < 0)
+  {
+   /*
+    * Error - couldn't fork a new process!
+    */
+
+    DEBUG_printf(("StartJob: unable to fork() %s - %s.\n", command,
+	          strerror(errno)));
+
+    return (0);
+  }
+
+  return (pid);
+}
+
+
+/*
+ * End of "$Id: job.c,v 1.10 1999/04/16 20:47:48 mike Exp $".
  */

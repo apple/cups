@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.8 1999/03/24 16:10:25 mike Exp $"
+ * "$Id: printers.c,v 1.9 1999/04/16 20:47:48 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -422,9 +422,13 @@ StartPrinter(printer_t *p)
 void
 StopPrinter(printer_t *p)
 {
+  if (p->job)
+    StopJob(((job_t *)p->job)->id);
+
+  p->state = IPP_PRINTER_STOPPED;
 }
 
 
 /*
- * End of "$Id: printers.c,v 1.8 1999/03/24 16:10:25 mike Exp $".
+ * End of "$Id: printers.c,v 1.9 1999/04/16 20:47:48 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.8 1999/03/03 21:17:57 mike Exp $"
+ * "$Id: client.c,v 1.9 1999/04/16 20:47:47 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -74,6 +74,9 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   struct hostent	*host;	/* Host entry for address */
 
 
+  DEBUG_printf(("AcceptClient(%08x) %d NumClients = %d\n",
+                lis, lis->fd, NumClients));
+
  /*
   * Get a pointer to the next available client...
   */
@@ -120,6 +123,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 
   fcntl(con->http.fd, F_SETFD, fcntl(con->http.fd, F_GETFD) | FD_CLOEXEC);
 
+  DEBUG_printf(("AcceptClient: Adding fd %d to InputSet...\n", con->http.fd));
   FD_SET(con->http.fd, &InputSet);
 
   NumClients ++;
@@ -130,7 +134,10 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 
   if (NumClients == MAX_CLIENTS)
     for (i = 0; i < NumListeners; i ++)
+    {
+      DEBUG_printf(("AcceptClient: Removing fd %d from InputSet...\n", Listeners[i].fd));
       FD_CLR(Listeners[i].fd, &InputSet);
+    }
 }
 
 
@@ -178,18 +185,26 @@ CloseClient(client_t *con)	/* I - Client to close */
 #endif /* WIN32 || __EMX__ */
 
   for (i = 0; i < NumListeners; i ++)
+  {
+    DEBUG_printf(("CloseClient: Adding fd %d to InputSet...\n", Listeners[i].fd));
     FD_SET(Listeners[i].fd, &InputSet);
+  }
 
+  DEBUG_printf(("CloseClient: Removing fd %d from InputSet...\n", con->http.fd));
   FD_CLR(con->http.fd, &InputSet);
   if (con->pipe_pid != 0)
+  {
+    DEBUG_printf(("CloseClient: Removing fd %d from InputSet...\n", con->file));
     FD_CLR(con->file, &InputSet);
+  }
+
   FD_CLR(con->http.fd, &OutputSet);
 
  /*
   * If we have a data file open, close it...
   */
 
-  if (con->file > 0)
+  if (con->file)
   {
     if (con->pipe_pid)
     {
@@ -198,6 +213,7 @@ CloseClient(client_t *con)	/* I - Client to close */
     }
 
     close(con->file);
+    con->file = 0;
   }
 
  /*
@@ -229,6 +245,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
   mime_type_t	*type;		/* MIME type of file */
   char		command[1024],	/* Command to run */
 		*options;	/* Options/CGI data */
+
 
   status = HTTP_CONTINUE;
 
@@ -675,10 +692,14 @@ ReadClient(client_t *con)	/* I - Client to read from */
         break;
 
     case HTTP_POST_RECV :
-        LogMessage(LOG_DEBUG, "ReadClient() %d con->data_encoding = %s con->data_remaining = %d\n",
+        LogMessage(LOG_DEBUG, "ReadClient() %d con->data_encoding = %s con->data_remaining = %d",
 		   con->http.fd,
 		   con->http.data_encoding == HTTP_ENCODE_CHUNKED ? "chunked" : "length",
 		   con->http.data_remaining);
+        DEBUG_printf(("ReadClient() %d con->data_encoding = %s con->data_remaining = %d\n",
+		      con->http.fd,
+		      con->http.data_encoding == HTTP_ENCODE_CHUNKED ? "chunked" : "length",
+		      con->http.data_remaining));
 
         if (con->request != NULL)
 	{
@@ -689,9 +710,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  if (ippRead(&(con->http), con->request) != IPP_DATA)
 	    break;
 
-          if (con->file == 0 &&
-	      (con->http.data_remaining > 0 ||
-	       con->http.data_encoding == HTTP_ENCODE_CHUNKED))
+          if (con->file == 0 && con->http.state != HTTP_POST_SEND)
 	  {
            /*
 	    * Create a file as needed for the request data...
@@ -699,6 +718,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
             sprintf(con->filename, "%s/requests/XXXXXX", ServerRoot);
 	    con->file = mkstemp(con->filename);
+	    /*fchmod(con->file, 0644);*/
 
             LogMessage(LOG_INFO, "ReadClient() %d REQUEST %s", con->http.fd,
 	               con->filename);
@@ -712,45 +732,43 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      }
 	    }
 	  }
-	  else
-	  {
-	   /*
-	    * No more data - process the request now...
-	    */
-
-            con->http.state = HTTP_POST_SEND;
-            ProcessIPPRequest(con);
-	    break;
-	  }
         }
 
-        if ((bytes = httpRead(HTTP(con), line, sizeof(line))) < 0)
+	if (con->http.state != HTTP_POST_SEND)
 	{
-	  CloseClient(con);
-	  return (0);
-	}
-	else if (bytes > 0)
-	{
-	  con->bytes += bytes;
-
-          LogMessage(LOG_DEBUG, "ReadClient() %d writing %d bytes", bytes);
-
-          if (write(con->file, line, bytes) < bytes)
+          if ((bytes = httpRead(HTTP(con), line, sizeof(line))) < 0)
 	  {
-	    close(con->file);
-	    unlink(con->filename);
+	    CloseClient(con);
+	    return (0);
+	  }
+	  else if (bytes > 0)
+	  {
+	    con->bytes += bytes;
 
-            if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
+            LogMessage(LOG_DEBUG, "ReadClient() %d writing %d bytes", bytes);
+
+            if (write(con->file, line, bytes) < bytes)
 	    {
-	      CloseClient(con);
-	      return (0);
+	      close(con->file);
+	      con->file = 0;
+	      unlink(con->filename);
+
+              if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
+	      {
+		CloseClient(con);
+		return (0);
+	      }
 	    }
 	  }
 	}
 
 	if (con->http.state == HTTP_POST_SEND)
 	{
-	  close(con->file);
+	  if (con->file)
+	  {
+	    close(con->file);
+	    con->file = 0;
+	  }
 
           if (con->request)
             ProcessIPPRequest(con);
@@ -787,6 +805,7 @@ SendCommand(client_t      *con,
 
   fcntl(con->file, F_SETFD, fcntl(con->file, F_GETFD) | FD_CLOEXEC);
 
+  DEBUG_printf(("SendCommand: Adding fd %d to InputSet...\n", con->file));
   FD_SET(con->file, &InputSet);
   FD_SET(con->http.fd, &OutputSet);
 
@@ -1050,6 +1069,7 @@ StartListening(void)
     * Setup the select() input mask to contain the listening socket we have.
     */
 
+    DEBUG_printf(("StartListening: Adding fd %d to InputSet...\n", lis->fd));
     FD_SET(lis->fd, &InputSet);
   }
 
@@ -1076,6 +1096,7 @@ StopListening(void)
     close(lis->fd);
 #endif /* WIN32 || __EMX__ */
 
+    DEBUG_printf(("StopListening: Removing fd %d from InputSet...\n", lis->fd));
     FD_CLR(lis->fd, &InputSet);
   }
 
@@ -1098,6 +1119,13 @@ WriteClient(client_t *con)
   if (con->http.state != HTTP_GET_SEND &&
       con->http.state != HTTP_POST_SEND)
     return (1);
+
+  if (con->http.fd == 0)
+  {
+    printf("ERROR - con = %08x (%d), NumClients = %d\n", con, con - Clients,
+           NumClients);
+    abort();
+  }
 
   if (con->response != NULL)
     bytes = ippWrite(&(con->http), con->response) != IPP_DATA;
@@ -1126,15 +1154,21 @@ WriteClient(client_t *con)
     }
 
     FD_CLR(con->http.fd, &OutputSet);
-    FD_CLR(con->file, &InputSet);
 
-    if (con->pipe_pid)
+    if (con->file)
     {
-      kill(con->pipe_pid, SIGKILL);
-      waitpid(con->pipe_pid, &status, WNOHANG);
-    }
+      DEBUG_printf(("WriteClient: Removing fd %d from InputSet...\n", con->file));
+      FD_CLR(con->file, &InputSet);
 
-    close(con->file);
+      if (con->pipe_pid)
+      {
+	kill(con->pipe_pid, SIGKILL);
+	waitpid(con->pipe_pid, &status, WNOHANG);
+      }
+
+      close(con->file);
+      con->file = 0;
+    }
 
     if (!con->http.keep_alive)
     {
@@ -1348,7 +1382,7 @@ pipe_command(client_t *con,	/* I - Client connection */
 
   argv[0] = argbuf;
 
-  for (commptr = argbuf, argc = 1; *commptr != '\0'; commptr ++)
+  for (commptr = argbuf, argc = 1; *commptr != '\0' && argc < 99; commptr ++)
     if (*commptr == ' ' || *commptr == '?' || *commptr == '+')
     {
       *commptr++ = '\0';
@@ -1381,8 +1415,8 @@ pipe_command(client_t *con,	/* I - Client connection */
 
   argv[argc] = NULL;
 
-  if (argv[1][0] == '\0')
-    argv[1] = strrchr(command, '/') + 1;
+  if (argv[0][0] == '\0')
+    argv[0] = strrchr(command, '/') + 1;
 
  /*
   * Setup the environment variables as needed...
@@ -1602,5 +1636,5 @@ show_printer_status(client_t *con)
 
 
 /*
- * End of "$Id: client.c,v 1.8 1999/03/03 21:17:57 mike Exp $".
+ * End of "$Id: client.c,v 1.9 1999/04/16 20:47:47 mike Exp $".
  */

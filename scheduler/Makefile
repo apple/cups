@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.5 1999/03/01 22:26:15 mike Exp $"
+# "$Id: Makefile,v 1.6 1999/04/16 20:47:46 mike Exp $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -24,6 +24,7 @@
 
 include ../Makedefs
 
+#OPTIONS	=	-DDEBUG
 OBJS	=	auth.o classes.o client.o conf.o dirsvc.o main.o ipp.o job.o \
 		printers.o
 
@@ -52,5 +53,5 @@ clean:
 install:
 
 #
-# End of "$Id: Makefile,v 1.5 1999/03/01 22:26:15 mike Exp $".
+# End of "$Id: Makefile,v 1.6 1999/04/16 20:47:46 mike Exp $".
 #

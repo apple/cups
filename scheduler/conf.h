@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.6 1999/02/26 22:02:06 mike Exp $"
+ * "$Id: conf.h,v 1.7 1999/04/16 20:47:47 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -56,8 +56,9 @@ VAR char		ConfigurationFile[256] VALUE("/var/spool/cups/cupsd.conf"),
 					/* Error log filename */
 			DefaultLanguage[32] VALUE(DEFAULT_LANGUAGE),
 					/* Default language encoding */
-			DefaultCharset[32] VALUE(DEFAULT_CHARSET);
+			DefaultCharset[32] VALUE(DEFAULT_CHARSET),
 					/* Default charset */
+			RIPCache[32]	VALUE("32m");
 VAR int			User		VALUE(DEFAULT_UID),
 					/* User ID for server */
 			Group		VALUE(DEFAULT_GID),
@@ -91,5 +92,5 @@ extern int	LogMessage(int level, char *message, ...);
 
 
 /*
- * End of "$Id: conf.h,v 1.6 1999/02/26 22:02:06 mike Exp $".
+ * End of "$Id: conf.h,v 1.7 1999/04/16 20:47:47 mike Exp $".
  */
