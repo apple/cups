@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.134 2001/07/17 12:38:49 mike Exp $"
+ * "$Id: job.c,v 1.135 2001/07/23 19:10:21 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1417,8 +1417,19 @@ StartJob(int       id,		/* I - Job ID */
   snprintf(datadir, sizeof(datadir), "CUPS_DATADIR=%s", DataDir);
   snprintf(fontpath, sizeof(fontpath), "CUPS_FONTPATH=%s", FontPath);
   if (Classification[0] && !banner_page)
-    snprintf(classification, sizeof(classification), "CLASSIFICATION=%s",
-             Classification);
+  {
+    if ((attr = ippFindAttribute(current->attrs, "job-sheets",
+                                 IPP_TAG_NAME)) == NULL)
+      snprintf(classification, sizeof(classification), "CLASSIFICATION=%s",
+               Classification);
+    else if (attr->num_values > 1 &&
+             strcmp(attr->values[1].string.text, "none") != 0)
+      snprintf(classification, sizeof(classification), "CLASSIFICATION=%s",
+               attr->values[1].string.text);
+    else
+      snprintf(classification, sizeof(classification), "CLASSIFICATION=%s",
+               attr->values[0].string.text);
+  }
   else
     classification[0] = '\0';
   if (getenv("LD_LIBRARY_PATH") != NULL)
@@ -2934,5 +2945,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.134 2001/07/17 12:38:49 mike Exp $".
+ * End of "$Id: job.c,v 1.135 2001/07/23 19:10:21 mike Exp $".
  */

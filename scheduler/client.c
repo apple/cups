@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.100 2001/07/16 16:23:32 mike Exp $"
+ * "$Id: client.c,v 1.101 2001/07/23 19:10:20 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -396,7 +396,7 @@ EncryptClient(client_t *con)	/* I - Client to encrypt */
 #ifdef HAVE_LIBSSL
   SSL_CTX	*context;	/* Context for encryption */
   SSL		*conn;		/* Connection for encryption */
-  int		error;		/* Error code */
+  unsigned long	error;		/* Error code */
 
 
  /*
@@ -2471,5 +2471,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.100 2001/07/16 16:23:32 mike Exp $".
+ * End of "$Id: client.c,v 1.101 2001/07/23 19:10:20 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.141 2001/07/19 14:54:17 mike Exp $"
+ * "$Id: ipp.c,v 1.142 2001/07/23 19:10:20 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -707,7 +707,8 @@ add_class(client_t        *con,		/* I - Client connection */
             sizeof(pclass->state_message) - 1);
     pclass->state_message[sizeof(pclass->state_message) - 1] = '\0';
   }
-  if ((attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_ZERO)) != NULL)
+  if ((attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_ZERO)) != NULL &&
+      !Classification[0])
   {
     strncpy(pclass->job_sheets[0], attr->values[0].string.text,
             sizeof(pclass->job_sheets[0]) - 1);
@@ -716,24 +717,6 @@ add_class(client_t        *con,		/* I - Client connection */
               sizeof(pclass->job_sheets[1]) - 1);
     else
       strcpy(pclass->job_sheets[1], "none");
-
-   /*
-    * Enforce classification level if set...
-    */
-
-    if (Classification[0])
-    {
-      if (strcmp(pclass->job_sheets[0], Classification) != 0 &&
-          strcmp(pclass->job_sheets[1], Classification) != 0)
-      {
-       /*
-        * Force the leading banner to have the classification on it...
-	*/
-
-        strcpy(pclass->job_sheets[0], Classification);
-      }
-    }
-
   }
   if ((attr = ippFindAttribute(con->request, "requesting-user-name-allowed",
                                IPP_TAG_ZERO)) != NULL)
@@ -1163,7 +1146,8 @@ add_printer(client_t        *con,	/* I - Client connection */
             sizeof(printer->state_message) - 1);
     printer->state_message[sizeof(printer->state_message) - 1] = '\0';
   }
-  if ((attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_ZERO)) != NULL)
+  if ((attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_ZERO)) != NULL &&
+      !Classification[0])
   {
     strncpy(printer->job_sheets[0], attr->values[0].string.text,
             sizeof(printer->job_sheets[0]) - 1);
@@ -1172,23 +1156,6 @@ add_printer(client_t        *con,	/* I - Client connection */
               sizeof(printer->job_sheets[1]) - 1);
     else
       strcpy(printer->job_sheets[1], "none");
-
-   /*
-    * Force classification if necessary...
-    */
-
-    if (Classification[0])
-    {
-      if (strcmp(printer->job_sheets[0], Classification) != 0 &&
-          strcmp(printer->job_sheets[1], Classification) != 0)
-      {
-       /*
-        * Force the leading banner to have the classification on it...
-	*/
-
-        strcpy(printer->job_sheets[0], Classification);
-      }
-    }
   }
   if ((attr = ippFindAttribute(con->request, "requesting-user-name-allowed",
                                IPP_TAG_ZERO)) != NULL)
@@ -2294,9 +2261,35 @@ create_job(client_t        *con,	/* I - Client connection */
 
     if (Classification[0])
     {
-      if (strcmp(attr->values[0].string.text, Classification) != 0 &&
-          (attr->num_values == 1 ||
-	   strcmp(attr->values[1].string.text, Classification) != 0))
+      if (ClassifyOverride)
+      {
+        if (strcmp(attr->values[0].string.text, "none") == 0 &&
+	    (attr->num_values == 1 ||
+	     strcmp(attr->values[1].string.text, "none") == 0))
+        {
+	 /*
+          * Force the leading banner to have the classification on it...
+	  */
+
+          free(attr->values[0].string.text);
+	  attr->values[0].string.text = strdup(Classification);
+	}
+	else if (attr->num_values == 2 &&
+	         strcmp(attr->values[0].string.text, attr->values[1].string.text) != 0 &&
+		 strcmp(attr->values[0].string.text, "none") != 0 &&
+		 strcmp(attr->values[1].string.text, "none") != 0)
+        {
+	 /*
+	  * Can't put two different security markings on the same document!
+	  */
+
+          free(attr->values[1].string.text);
+	  attr->values[1].string.text = strdup(attr->values[0].string.text);
+	}
+      }
+      else if (strcmp(attr->values[0].string.text, Classification) != 0 &&
+               (attr->num_values == 1 ||
+	       strcmp(attr->values[1].string.text, Classification) != 0))
       {
        /*
         * Force the leading banner to have the classification on it...
@@ -3973,9 +3966,35 @@ print_job(client_t        *con,		/* I - Client connection */
 
     if (Classification[0])
     {
-      if (strcmp(attr->values[0].string.text, Classification) != 0 &&
-          (attr->num_values == 1 ||
-	   strcmp(attr->values[1].string.text, Classification) != 0))
+      if (ClassifyOverride)
+      {
+        if (strcmp(attr->values[0].string.text, "none") == 0 &&
+	    (attr->num_values == 1 ||
+	     strcmp(attr->values[1].string.text, "none") == 0))
+        {
+	 /*
+          * Force the leading banner to have the classification on it...
+	  */
+
+          free(attr->values[0].string.text);
+	  attr->values[0].string.text = strdup(Classification);
+	}
+	else if (attr->num_values == 2 &&
+	         strcmp(attr->values[0].string.text, attr->values[1].string.text) != 0 &&
+		 strcmp(attr->values[0].string.text, "none") != 0 &&
+		 strcmp(attr->values[1].string.text, "none") != 0)
+        {
+	 /*
+	  * Can't put two different security markings on the same document!
+	  */
+
+          free(attr->values[1].string.text);
+	  attr->values[1].string.text = strdup(attr->values[0].string.text);
+	}
+      }
+      else if (strcmp(attr->values[0].string.text, Classification) != 0 &&
+               (attr->num_values == 1 ||
+	       strcmp(attr->values[1].string.text, Classification) != 0))
       {
        /*
         * Force the leading banner to have the classification on it...
@@ -5493,5 +5512,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.141 2001/07/19 14:54:17 mike Exp $".
+ * End of "$Id: ipp.c,v 1.142 2001/07/23 19:10:20 mike Exp $".
  */

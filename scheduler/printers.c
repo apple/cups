@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.100 2001/07/12 18:10:14 mike Exp $"
+ * "$Id: printers.c,v 1.101 2001/07/23 19:10:21 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1074,7 +1074,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
     * Setup the job-sheets-supported and job-sheets-default attributes...
     */
 
-    if (Classification[0])
+    if (Classification[0] && !ClassifyOverride)
       attr = ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
                 	  "job-sheets-supported", NULL, Classification);
     else
@@ -1085,7 +1085,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
       LogMessage(L_EMERG, "SetPrinterAttrs: Unable to allocate memory for "
                           "job-sheets-supported attribute: %s!",
 	         strerror(errno));
-    else if (!Classification[0])
+    else if (!Classification[0] || ClassifyOverride)
     {
       attr->values[0].string.text = strdup("none");
 
@@ -1803,5 +1803,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.100 2001/07/12 18:10:14 mike Exp $".
+ * End of "$Id: printers.c,v 1.101 2001/07/23 19:10:21 mike Exp $".
  */
