@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.43 2001/06/27 21:53:13 mike Exp $"
+# "$Id: Makefile,v 1.44 2001/06/29 12:15:25 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -62,7 +62,7 @@ install:
 	$(INSTALL_DIR) $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPSIMAGE) $(LIBDIR)
 	if test $(LIBCUPSIMAGE) != "libcupsimage.a" -a $(LIBCUPSIMAGE) != "libcupsimage.la"; then \
-		$(INSTALL_LIB) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .2` $(LIBDIR); \
+		$(INSTALL_LIB) `basename $(LIBCUPSIMAGE) .2` $(LIBDIR); \
 	fi
 	$(INSTALL_DIR) $(SERVERBIN)/filter
 	$(INSTALL_BIN) $(TARGETS) $(SERVERBIN)/filter
@@ -209,5 +209,5 @@ $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 
 #
-# End of "$Id: Makefile,v 1.43 2001/06/27 21:53:13 mike Exp $".
+# End of "$Id: Makefile,v 1.44 2001/06/29 12:15:25 mike Exp $".
 #
