@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.81.2.17 2002/10/16 02:35:29 mike Exp $"
+ * "$Id: util.c,v 1.81.2.18 2002/12/10 20:40:11 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -1089,7 +1089,10 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   cupsLangFree(language);
 
   if (!printer[0])
+  {
+    last_error = IPP_NOT_FOUND;
     return (NULL);
+  }
 
  /*
   * Reconnect to the correct server as needed...
@@ -1117,6 +1120,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
     * Can't open file; close the server connection and return NULL...
     */
 
+    last_error = IPP_INTERNAL_ERROR;
     httpFlush(cups_server);
     httpClose(cups_server);
     cups_server = NULL;
@@ -1223,6 +1227,19 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 
   if (status != HTTP_OK)
   {
+    switch (status)
+    {
+      case HTTP_ERROR :
+          last_error = IPP_SERVICE_UNAVAILABLE;
+	  break;
+      case HTTP_UNAUTHORIZED :
+          last_error = IPP_NOT_AUTHORIZED;
+	  break;
+      default :
+          last_error = IPP_INTERNAL_ERROR;
+	  break;
+    }
+
     unlink(filename);
     httpFlush(cups_server);
     httpClose(cups_server);
@@ -1708,5 +1725,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.81.2.17 2002/10/16 02:35:29 mike Exp $".
+ * End of "$Id: util.c,v 1.81.2.18 2002/12/10 20:40:11 mike Exp $".
  */

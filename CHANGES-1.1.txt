@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.18
 
+	- The cupsGetPPD() function didn't always set the
+	  cupsLastError() value when an error occurred.
 	- The IPP media, output-bin, and sides attributes took
 	  precedence over the corresponding PPD options, which
 	  caused inconsistent behavior under MacOS X with some
