@@ -3,6 +3,9 @@ CHANGES.txt - 05/22/2003
 
 CHANGES IN CUPS V1.1.19
 
+	- The lpq command did not ensure that there was
+	  whitespace between the fields in the job listing (STR
+	  #117)
 	- The German web templates had errors (STR #119)
 	- The configure script didn't specify the static
 	  libraries properly when configuring with the
