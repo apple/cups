@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.131 2001/04/30 15:34:04 mike Exp $"
+ * "$Id: ipp.c,v 1.132 2001/05/16 19:33:11 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -267,6 +267,15 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 
         if (uri == NULL)
 	  LogMessage(L_ERROR, "ProcessIPPRequest: missing printer-uri or job-uri attribute!");
+
+	LogMessage(L_DEBUG, "Request attributes follow...");
+
+	for (attr = con->request->attrs; attr != NULL; attr = attr->next)
+	  LogMessage(L_DEBUG, "attr \"%s\": group_tag = %x, value_tag = %x",
+	             attr->name ? attr->name : "(null)", attr->group_tag,
+		     attr->value_tag);
+
+	LogMessage(L_DEBUG, "End of attributes...");
 
 	send_ipp_error(con, IPP_BAD_REQUEST);
       }
@@ -5369,5 +5378,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.131 2001/04/30 15:34:04 mike Exp $".
+ * End of "$Id: ipp.c,v 1.132 2001/05/16 19:33:11 mike Exp $".
  */
