@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.55 2001/06/29 19:44:25 mike Exp $"
+ * "$Id: ppd.c,v 1.56 2001/07/02 19:50:26 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -1764,6 +1764,8 @@ ppd_read(FILE *fp,		/* I - File to read from */
 
     *lineptr = '\0';
 
+    DEBUG_printf(("LINE = \"%s\"\n", line));
+
     if (ch == EOF && lineptr == line)
       return (0);
 
@@ -1782,7 +1784,8 @@ ppd_read(FILE *fp,		/* I - File to read from */
     if (line[0] != '*')			/* All lines start with an asterisk */
       continue;
 
-    if (strncmp(line, "*%", 2) == 0 ||	/* Comment line */
+    if (strcmp(line, "*") == 0 ||	/* (Bad) comment line */
+        strncmp(line, "*%", 2) == 0 ||	/* Comment line */
         strncmp(line, "*?", 2) == 0 ||	/* Query line */
         strcmp(line, "*End") == 0)	/* End of multi-line string */
       continue;
@@ -1988,5 +1991,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.55 2001/06/29 19:44:25 mike Exp $".
+ * End of "$Id: ppd.c,v 1.56 2001/07/02 19:50:26 mike Exp $".
  */
