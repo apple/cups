@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.23 2000/03/21 04:03:23 mike Exp $"
+ * "$Id: ipp.c,v 1.24 2000/04/27 21:31:37 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -38,6 +38,7 @@
 #include <cups/cups.h>
 #include <cups/language.h>
 #include <cups/string.h>
+#include <signal.h>
 
 
 /*
@@ -82,6 +83,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   char		buffer[8192];	/* Output buffer */
   int		copies;		/* Number of copies remaining */
   const char	*content_type;	/* CONTENT_TYPE environment variable */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;	/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
   if (argc == 1)
@@ -347,6 +351,24 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     }
   }
   while (ipp_status > IPP_OK_CONFLICT);
+
+ /*
+  * Now that we are "connected" to the port, ignore SIGTERM so that we
+  * can finish out any page data the driver sends (e.g. to eject the
+  * current page...
+  */
+
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+  sigset(SIGTERM, SIG_IGN);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+
+  sigemptyset(&action.sa_mask);
+  action.sa_handler = SIG_IGN;
+  sigaction(SIGTERM, &action, NULL);
+#else
+  signal(SIGTERM, SIG_IGN);
+#endif /* HAVE_SIGSET */
 
  /*
   * See if the printer supports multiple copies...
@@ -671,5 +693,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.23 2000/03/21 04:03:23 mike Exp $".
+ * End of "$Id: ipp.c,v 1.24 2000/04/27 21:31:37 mike Exp $".
  */

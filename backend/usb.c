@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.5 2000/03/30 05:19:17 mike Exp $"
+ * "$Id: usb.c,v 1.6 2000/04/27 21:31:38 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -36,6 +36,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <cups/string.h>
+#include <signal.h>
 
 #if defined(WIN32) || defined(__EMX__)
 #  include <io.h>
@@ -78,6 +79,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 		tbytes;		/* Total number of bytes written */
   char		buffer[8192];	/* Output buffer */
   struct termios opts;		/* Parallel port options */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;	/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
   if (argc == 1)
@@ -169,6 +173,24 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   /**** No options supported yet ****/
 
   tcsetattr(fd, TCSANOW, &opts);
+
+ /*
+  * Now that we are "connected" to the port, ignore SIGTERM so that we
+  * can finish out any page data the driver sends (e.g. to eject the
+  * current page...
+  */
+
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+  sigset(SIGTERM, SIG_IGN);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+
+  sigemptyset(&action.sa_mask);
+  action.sa_handler = SIG_IGN;
+  sigaction(SIGTERM, &action, NULL);
+#else
+  signal(SIGTERM, SIG_IGN);
+#endif /* HAVE_SIGSET */
 
  /*
   * Finally, send the print file...
@@ -324,5 +346,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: usb.c,v 1.5 2000/03/30 05:19:17 mike Exp $".
+ * End of "$Id: usb.c,v 1.6 2000/04/27 21:31:38 mike Exp $".
  */

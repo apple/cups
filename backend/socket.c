@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.12 2000/02/10 00:57:52 mike Exp $"
+ * "$Id: socket.c,v 1.13 2000/04/27 21:31:38 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -38,6 +38,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <signal.h>
 
 #if defined(WIN32) || defined(__EMX__)
 #  include <winsock.h>
@@ -79,6 +80,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 		*bufptr;	/* Pointer into buffer */
   struct timeval timeout;	/* Timeout for select() */
   fd_set	input;		/* Input set for select() */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;	/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
   if (argc == 1)
@@ -179,6 +183,24 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     }
 
    /*
+    * Now that we are "connected" to the port, ignore SIGTERM so that we
+    * can finish out any page data the driver sends (e.g. to eject the
+    * current page...
+    */
+
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+    sigset(SIGTERM, SIG_IGN);
+#elif defined(HAVE_SIGACTION)
+    memset(&action, 0, sizeof(action));
+
+    sigemptyset(&action.sa_mask);
+    action.sa_handler = SIG_IGN;
+    sigaction(SIGTERM, &action, NULL);
+#else
+    signal(SIGTERM, SIG_IGN);
+#endif /* HAVE_SIGSET */
+
+   /*
     * Finally, send the print file...
     */
 
@@ -255,5 +277,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.12 2000/02/10 00:57:52 mike Exp $".
+ * End of "$Id: socket.c,v 1.13 2000/04/27 21:31:38 mike Exp $".
  */

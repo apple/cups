@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.19 2000/04/19 21:25:57 mike Exp $"
+ * "$Id: lpd.c,v 1.20 2000/04/27 21:31:38 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -40,6 +40,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <signal.h>
 
 #if defined(WIN32) || defined(__EMX__)
 #  include <winsock.h>
@@ -246,6 +247,9 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
   size_t		nbytes,		/* Number of bytes written */
 			tbytes;		/* Total bytes written */
   char			buffer[8192];	/* Output buffer */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction	action;		/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
  /*
@@ -305,6 +309,24 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
   }
 
   fprintf(stderr, "INFO: Connected on port %d...\n", port);
+
+ /*
+  * Now that we are "connected" to the port, ignore SIGTERM so that we
+  * can finish out any page data the driver sends (e.g. to eject the
+  * current page...
+  */
+
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+  sigset(SIGTERM, SIG_IGN);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+
+  sigemptyset(&action.sa_mask);
+  action.sa_handler = SIG_IGN;
+  sigaction(SIGTERM, &action, NULL);
+#else
+  signal(SIGTERM, SIG_IGN);
+#endif /* HAVE_SIGSET */
 
  /*
   * Next, open the print file and figure out its size...
@@ -416,5 +438,5 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
 
 /*
- * End of "$Id: lpd.c,v 1.19 2000/04/19 21:25:57 mike Exp $".
+ * End of "$Id: lpd.c,v 1.20 2000/04/27 21:31:38 mike Exp $".
  */
