@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.43 1999/10/13 16:50:13 mike Exp $"
+ * "$Id: printers.c,v 1.44 1999/12/07 18:10:18 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -761,7 +761,22 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                 "orientation-requested-default", IPP_PORTRAIT);
 
-  if (!(p->type & CUPS_PRINTER_REMOTE))
+  if (p->type & CUPS_PRINTER_REMOTE)
+  {
+   /*
+    * Tell the client this is a remote printer of some type...
+    */
+
+    if (p->type & CUPS_PRINTER_CLASS)
+      snprintf(filename, sizeof(filename), "Remote Printer Class on %s",
+               p->hostname);
+    else
+      snprintf(filename, sizeof(filename), "Remote Printer on %s", p->hostname);
+
+    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                 "printer-make-and-model", NULL, filename);
+  }
+  else
   {
    /*
     * Assign additional attributes depending on whether this is a printer
@@ -775,6 +790,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
      /*
       * Add class-specific attributes...
       */
+
+      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                   "printer-make-and-model", NULL, "Local Printer Class");
 
       if (p->num_printers > 0)
       {
@@ -961,6 +979,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	  * Yes, we have a System V style interface script; use it!
 	  */
 
+	  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                       "printer-make-and-model", NULL, "Local System V Printer");
+
 	  sprintf(filename, "*/* 0 %s/interfaces/%s", ServerRoot, p->name);
 	  AddPrinterFilter(p, filename);
 	}
@@ -970,6 +991,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
           * Otherwise we have neither - treat this as a "dumb" printer
 	  * with no PPD file...
 	  */
+
+	  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                       "printer-make-and-model", NULL, "Local Raw Printer");
 
 	  AddPrinterFilter(p, "*/* 0 -");
 	}
@@ -1206,5 +1230,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.43 1999/10/13 16:50:13 mike Exp $".
+ * End of "$Id: printers.c,v 1.44 1999/12/07 18:10:18 mike Exp $".
  */

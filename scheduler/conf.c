@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.34 1999/10/10 15:41:09 mike Exp $"
+ * "$Id: conf.c,v 1.35 1999/12/07 18:10:18 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -122,6 +122,8 @@ ReadConfiguration(void)
   char		directory[1024];/* Configuration directory */
   struct rlimit	limit;		/* Runtime limit */
   char		*language;	/* Language string */
+  struct passwd	*user;		/* Default user */
+  struct group	*group;		/* Default group */
 
 
  /*
@@ -194,21 +196,53 @@ ReadConfiguration(void)
   * Find the default system group: "sys", "system", or "root"...
   */
 
-  if (getgrnam("sys") != NULL)
-    strcpy(SystemGroup, "sys");
-  else
-  {
-    endgrent();
-    if (getgrnam("system") != NULL)
-      strcpy(SystemGroup, "system");
-    else
-      strcpy(SystemGroup, "root");
-  }
-
+  group = getgrnam("sys");
   endgrent();
 
-  User             = DEFAULT_UID;
-  Group            = DEFAULT_GID;
+  if (group != NULL)
+  {
+    strcpy(SystemGroup, "sys");
+    Group = group->gr_gid;
+  }
+  else
+  {
+    group = getgrnam("system");
+    endgrent();
+
+    if (group != NULL)
+    {
+      strcpy(SystemGroup, "system");
+      Group = group->gr_gid;
+    }
+    else
+    {
+      group = getgrnam("root");
+      endgrent();
+
+      if (group != NULL)
+      {
+	strcpy(SystemGroup, "root");
+	Group = group->gr_gid;
+      }
+      else
+      {
+	strcpy(SystemGroup, "unknown");
+	Group = 0;
+      }
+    }
+  }
+
+ /*
+  * Find the default user...
+  */
+
+  if ((user = getpwnam("lp")) == NULL)
+    User = 1;	/* Force to a non-priviledged account */
+  else
+    User = user->pw_uid;
+
+  endpwent();
+
   LogLevel         = LOG_ERROR;
   HostNameLookups  = FALSE;
   Timeout          = DEFAULT_TIMEOUT;
@@ -907,5 +941,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.34 1999/10/10 15:41:09 mike Exp $".
+ * End of "$Id: conf.c,v 1.35 1999/12/07 18:10:18 mike Exp $".
  */

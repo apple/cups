@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.3 1999/10/12 13:59:07 mike Exp $"
+ * "$Id: log.c,v 1.4 1999/12/07 18:10:18 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -354,7 +354,7 @@ get_datetime(time_t t)		/* I - Time value */
 
   date = localtime(&t);
 
-  sprintf(s, "[%02d/%s/%04d:%02d:%02d:%02d %+02d%02d]",
+  sprintf(s, "[%02d/%s/%04d:%02d:%02d:%02d %+03d%02d]",
 	  date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
 	  date->tm_hour, date->tm_min, date->tm_sec,
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
@@ -368,5 +368,5 @@ get_datetime(time_t t)		/* I - Time value */
 
 
 /*
- * End of "$Id: log.c,v 1.3 1999/10/12 13:59:07 mike Exp $".
+ * End of "$Id: log.c,v 1.4 1999/12/07 18:10:18 mike Exp $".
  */

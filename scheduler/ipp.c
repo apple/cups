@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.35 1999/11/04 13:40:41 mike Exp $"
+ * "$Id: ipp.c,v 1.36 1999/12/07 18:10:18 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -50,6 +50,8 @@
  */
 
 #include "cupsd.h"
+#include <pwd.h>
+#include <grp.h>
 
 
 /*
@@ -961,6 +963,7 @@ static void
 cancel_job(client_t        *con,	/* I - Client connection */
 	   ipp_attribute_t *uri)	/* I - Job or Printer URI */
 {
+  int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Current attribute */
   int			jobid;		/* Job ID */
   char			method[HTTP_MAX_URI],
@@ -973,6 +976,8 @@ cancel_job(client_t        *con,	/* I - Client connection */
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
   job_t			*job;		/* Job information */
+  struct passwd		*user;		/* User info */
+  struct group		*group;		/* System group info */
 
 
   DEBUG_printf(("cancel_job(%08x, %08x)\n", con, uri));
@@ -1064,10 +1069,35 @@ cancel_job(client_t        *con,	/* I - Client connection */
 
   if (strcmp(username, job->username) != 0 && strcmp(username, "root") != 0)
   {
-    LogMessage(LOG_ERROR, "cancel_job: \"%s\" not authorized to delete job id %d owned by \"%s\"!",
-               username, jobid, job->username);
-    send_ipp_error(con, IPP_FORBIDDEN);
-    return;
+   /*
+    * Not the owner or root; check to see if the user is a member of the
+    * system group...
+    */
+
+    user = getpwnam(username);
+    endpwent();
+
+    group = getgrnam(SystemGroup);
+    endgrent();
+
+    if (group != NULL)
+      for (i = 0; group->gr_mem[i]; i ++)
+        if (strcmp(username, group->gr_mem[i]) == 0)
+	  break;
+
+    if (user == NULL || group == NULL ||
+        (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
+    {
+     /*
+      * Username not found, group not found, or user is not part of the
+      * system group...
+      */
+
+      LogMessage(LOG_ERROR, "cancel_job: \"%s\" not authorized to delete job id %d owned by \"%s\"!",
+        	 username, jobid, job->username);
+      send_ipp_error(con, IPP_FORBIDDEN);
+      return;
+    }
   }
 
  /*
@@ -2581,5 +2611,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.35 1999/11/04 13:40:41 mike Exp $".
+ * End of "$Id: ipp.c,v 1.36 1999/12/07 18:10:18 mike Exp $".
  */
