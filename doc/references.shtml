@@ -1,0 +1,39 @@
+<H1>References</H1>
+
+<H2>CUPS Documentation</H2>
+
+<P>The following CUPS documentation is referenced by this document:
+
+<UL>
+	<LI>CUPS-CMP-1.1: CUPS Configuration Management Plan 
+	<LI>CUPS-IDD-1.1: CUPS System Interface Design Description 
+	<LI>CUPS-SAM-1.1.x: CUPS Software Administrators Manual 
+	<LI>CUPS-SDD-1.1: CUPS Software Design Description 
+	<LI>CUPS-SPM-1.1: CUPS Software Programming Manual
+	<LI>CUPS-SSR-1.1: CUPS Software Security Report 
+	<LI>CUPS-STP-1.1: CUPS Software Test Plan 
+	<LI>CUPS-SUM-1.1.x: CUPS Software Users Manual 
+	<LI>CUPS-SVD-1.1.x: CUPS Software Version Description 
+</UL>
+
+<H2>Other Documents</H2>
+
+<P>The following non-CUPS documents are referenced by this document:
+
+<UL>
+	<LI>Adobe PostScript Printer Description File Format Specification,
+	Version 4.3.
+	<LI>Adobe PostScript Language Reference, Third Edition.
+	<LI>IPP: Job and Printer Set Operations
+	<LI>IPP/1.1: Encoding and Transport 
+	<LI>IPP/1.1: Implementers Guide
+	<LI>IPP/1.1: Model and Semantics
+	<LI>RFC 1179, Line Printer Daemon Protocol 
+	<LI>RFC 2567, Design Goals for an Internet Printing Protocol
+	<LI>RFC 2568, Rationale for the Structure of the Model and Protocol
+	for the Internet Printing Protocol
+	<LI>RFC 2569, Mapping between LPD and IPP Protocols
+	<LI>RFC 2616, Hypertext Transfer Protocol -- HTTP/1.1
+	<LI>RFC 2617, HTTP Authentication: Basic and Digest Access
+	Authentication
+</UL>

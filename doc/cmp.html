@@ -3,8 +3,8 @@
 <HEAD>
 <TITLE>CUPS Configuration Management Plan</TITLE>
 <META NAME="AUTHOR" CONTENT="Easy Software Products">
-<META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
-<META NAME="DOCNUMBER" CONTENT="CUPS-CMP-1.0">
+<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2000, All Rights Reserved">
+<META NAME="DOCNUMBER" CONTENT="CUPS-CMP-1.1">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
 <STYLE>
 BODY { font-family: serif; font-size: 11.0pt }
@@ -22,9 +22,9 @@ PRE { font-size: 9.0pt }
 <BODY>
 <CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0"><BR>
 <H1>CUPS Configuration Management Plan</H1></A><BR>
-CUPS-CMP-1.0<BR>
+CUPS-CMP-1.1<BR>
 Easy Software Products<BR>
-Copyright 1997-1999, All Rights Reserved<BR>
+Copyright 1997-2000, All Rights Reserved<BR>
 </CENTER>
 <HR>
 <H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
@@ -118,13 +118,13 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <H2><A NAME="1_1">1.1 Identification</A></H2>
  This configuration management plan document provides the guidelines 
 for development and maintainance of the Common UNIX Printing System 
-(&quot;CUPS&quot;) Version 1.0 software. 
+(&quot;CUPS&quot;) Version 1.1 software. 
 <H2><A NAME="1_2">1.2 System Overview</A></H2>
- The Common UNIX Printing System provides a portable printing layer for 
- UNIX&reg; operating systems. It has been developed by Easy Software 
- Products to promote a standard printing solution for all UNIX vendors 
- and users. CUPS provides the System V and Berkeley command-line 
-interfaces. 
+<P>The Common UNIX Printing System provides a portable printing layer 
+for  UNIX&reg; operating systems. It has been developed by <A HREF="http://www.easysw.com">
+Easy Software Products</A> to promote a standard printing solution for 
+all UNIX vendors and users. CUPS provides the System V and Berkeley 
+command-line interfaces. </P>
 <P>CUPS uses the Internet Printing Protocol (IETF-IPP) as the basis for 
 managing print jobs and queues. The Line Printer Daemon (LPD, RFC1179), 
 Server Message Block (SMB), and AppSocket protocols are also supported 
@@ -133,8 +133,8 @@ with reduced functionality. </P>
 Description (&quot;PPD&quot;)-based printing options to support real world 
 applications under UNIX. </P>
 <P>CUPS also includes a customized version of GNU GhostScript 
-(currently based off GNU GhostScript 4.03) and an image file RIP that 
-can be used to support non-PostScript printers. </P>
+(currently based off GNU GhostScript 5.50) and an image file RIP that 
+is used to support non-PostScript printers. </P>
 <H2><A NAME="1_3">1.3 Document Overview</A></H2>
  This configuration management document is organized into the following 
 sections: 
@@ -149,27 +149,36 @@ sections:
 </UL>
 <H1><A NAME="2">2 References</A></H1>
 <H2><A NAME="2_1">2.1 CUPS Documentation</A></H2>
- The following CUPS documentation is referenced by this document: 
+<P>The following CUPS documentation is referenced by this document: </P>
 <UL>
-<LI>CUPS-CMP-1.0: CUPS Configuration Management Plan </LI>
-<LI>CUPS-IDD-1.0: CUPS System Interface Design Description </LI>
-<LI>CUPS-SAM-1.0.x: CUPS Software Administrators Manual </LI>
-<LI>CUPS-SDD-1.0: CUPS Software Design Description </LI>
-<LI>CUPS-SPM-1.0: CUPS Software Programming Manual </LI>
-<LI>CUPS-SSR-1.0: CUPS Software Security Report </LI>
-<LI>CUPS-STP-1.0: CUPS Software Test Plan </LI>
-<LI>CUPS-SUM-1.0.x: CUPS Software Users Manual </LI>
-<LI>CUPS-SVD-1.0.x: CUPS Software Version Description </LI>
+<LI>CUPS-CMP-1.1: CUPS Configuration Management Plan </LI>
+<LI>CUPS-IDD-1.1: CUPS System Interface Design Description </LI>
+<LI>CUPS-SAM-1.1.x: CUPS Software Administrators Manual </LI>
+<LI>CUPS-SDD-1.1: CUPS Software Design Description </LI>
+<LI>CUPS-SPM-1.1: CUPS Software Programming Manual </LI>
+<LI>CUPS-SSR-1.1: CUPS Software Security Report </LI>
+<LI>CUPS-STP-1.1: CUPS Software Test Plan </LI>
+<LI>CUPS-SUM-1.1.x: CUPS Software Users Manual </LI>
+<LI>CUPS-SVD-1.1.x: CUPS Software Version Description </LI>
 </UL>
 <H2><A NAME="2_2">2.2 Other Documents</A></H2>
- The following non-CUPS documents are referenced by this document: 
+<P>The following non-CUPS documents are referenced by this document: </P>
 <UL>
-<LI>IEEE 1387.4, System Administration: Printing (draft) </LI>
-<LI>IPP/1.0: Additional Optional Operations - Set 1 </LI>
+<LI>Adobe PostScript Printer Description File Format Specification, 
+ Version 4.3. </LI>
+<LI>Adobe PostScript Language Reference, Third Edition. </LI>
+<LI>IPP: Job and Printer Set Operations </LI>
+<LI>IPP/1.1: Encoding and Transport </LI>
+<LI>IPP/1.1: Implementers Guide </LI>
+<LI>IPP/1.1: Model and Semantics </LI>
 <LI>RFC 1179, Line Printer Daemon Protocol </LI>
-<LI>RFC 2565, IPP/1.0: Encoding and Transport </LI>
-<LI>RFC 2566, IPP/1.0: Model and Semantics </LI>
-<LI>RFC 2639, IPP/1.0: Implementers Guide </LI>
+<LI>RFC 2567, Design Goals for an Internet Printing Protocol </LI>
+<LI>RFC 2568, Rationale for the Structure of the Model and Protocol 
+ for the Internet Printing Protocol </LI>
+<LI>RFC 2569, Mapping between LPD and IPP Protocols </LI>
+<LI>RFC 2616, Hypertext Transfer Protocol -- HTTP/1.1 </LI>
+<LI>RFC 2617, HTTP Authentication: Basic and Digest Access 
+ Authentication </LI>
 </UL>
 <H1><A NAME="3">3 File Management</A></H1>
 <H2><A NAME="3_1">3.1 Directory Structure</A></H2>
@@ -236,7 +245,7 @@ represent the major, minor, and patch release numbers:
 <UL>
 <PRE>
 major.minor.patch
-1.0.0
+1.1.0
 </PRE>
 </UL>
  Beta-test releases are indentified by appending the letter B followed 
@@ -244,7 +253,7 @@ by the build number:
 <UL>
 <PRE>
 major.minor.patchbbuild
-1.0.0b1
+1.1.0b1
 </PRE>
 </UL>
  A CVS snapshot is generated for every beta and final release and uses 
@@ -264,13 +273,13 @@ release number will be incremented and the minor and patch release
 numbers reset to 0: 
 <UL>
 <PRE>
-1.0.0b1    First beta release
-1.0.0b2    Second beta release
-1.0.0      First production release
-1.0.1b1    First beta of 1.0.1
-1.0.1      Production release of 1.0.1
-1.1.0b1    First beta of 1.1.0
-1.1.0      Production release of 1.1.0
+1.1.0b1    First beta release
+1.1.0b2    Second beta release
+1.1.0      First production release
+1.1.1b1    First beta of 1.1.1
+1.1.1      Production release of 1.1.1
+1.1.1b1    First beta of 1.1.1
+1.1.1      Production release of 1.1.1
 2.0.0b1    First beta of 2.0.0
 2.0.0      Production release of 2.0.0
 </PRE>
@@ -282,7 +291,7 @@ deleted prior to performing a full build to ensure that source files
 are recompiled. 
 <H2><A NAME="5_3">5.3 Testing</A></H2>
  Software testing shall be conducted according to the CUPS Software 
-Test Plan, CUPS-STP-1.0. Failed tests cause STRs to be generated to 
+Test Plan, CUPS-STP-1.1. Failed tests cause STRs to be generated to 
 correct the problems found. 
 <H2><A NAME="5_4">5.4 Release</A></H2>
  When testing has been completed successfully a new distribution image 
@@ -347,18 +356,17 @@ to all C and C++ source files provided with CUPS.
  All source files names shall be 16 characters or less in length to 
 ensure compatibility with older UNIX filesystems. Source files 
 containing functions shall have an extension of &quot;.c&quot; for ANSI C and 
-&quot;.cpp&quot; for C++ source files. All other &quot;include&quot; files shall have an 
+&quot;.cxx&quot; for C++ source files. All other &quot;include&quot; files shall have an 
 extension of &quot;.h&quot;. 
 <H3><A NAME="7_1_2">B.1.2 Documentation</A></H3>
  The top of each source file shall contain a header giving the name of 
 the file, the purpose or nature of the source file, the copyright and 
 licensing notice, and the functions contained in the file.  The file 
-name and revision information is provided by the CVS &quot;$Id: cmp.shtml,v 
-1.5 2000/01/04 13:45:38 mike Exp $&quot; tag: 
+name and revision information is provided by the CVS &quot;$Id$&quot; tag: 
 <UL>
 <PRE>
 /*
- * &quot;$Id$&quot;
+ * &quot;36;Id$&quot;
  *
  *   Description of file contents.
  *
@@ -374,7 +382,7 @@ name and revision information is provided by the CVS &quot;$Id: cmp.shtml,v
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -390,14 +398,13 @@ name and revision information is provided by the CVS &quot;$Id: cmp.shtml,v
 </PRE>
 </UL>
  The bottom of each source file shall contain a trailer giving the name 
-of the file using the CVS &quot;$Id: cmp.shtml,v 1.5 2000/01/04 13:45:38 
-mike Exp $&quot; tag. The primary purpose of this is to mark the end of a 
-source file; if the trailer is missing it is possible that code has 
-been lost near the end of the file: 
+of the file using the CVS &quot;$Id$&quot; tag. The primary purpose of this is to 
+mark the end of a source file; if the trailer is missing it is possible 
+that code has been lost near the end of the file: 
 <UL>
 <PRE>
 /*
- * End of &quot;$Id$&quot;.
+ * End of &quot;36;Id$&quot;.
  */
 </PRE>
 </UL>
@@ -422,11 +429,11 @@ output values (if any), and any special information needed:
  * Notes: none.
  */
 
-static float     /* O - Inverse power value, 0.0 &lt;= y &lt;= 1.0 */
-do_this(float x) /* I - Power value (0.0 &lt;= x &lt;= 1.0) */
+static float     /* O - Inverse power value, 0.0 &lt;= y &lt;= 1.1 */
+do_this(float x) /* I - Power value (0.0 &lt;= x &lt;= 1.1) */
 {
- ...
- return (y);
+  ...
+  return (y);
 }
 </PRE>
 </UL>
@@ -449,8 +456,8 @@ output values (if any), and any special information needed:
 float                   /* O - Inverse power value, 0.0 &lt;= y &lt;= 1.0 */
 class::do_this(float x) /* I - Power value (0.0 &lt;= x &lt;= 1.0) */
 {
- ...
- return (y);
+  ...
+  return (y);
 }
 </PRE>
 </UL>

@@ -12,25 +12,7 @@
 This software administrators manual provides printer administration
 information for the Common UNIX Printing System ("CUPS") Version 1.1.
 
-<H2>System Overview</H2>
-
-The Common UNIX Printing System provides a portable printing layer for 
-UNIX&reg; operating systems. It has been developed by Easy Software 
-Products to promote a standard printing solution for all UNIX vendors 
-and users. CUPS provides the System V and Berkeley command-line interfaces.
-
-<P>CUPS uses the Internet Printing Protocol (IETF-IPP) as the basis
-for managing print jobs and queues. The Line Printer Daemon (LPD,
-RFC1179), Server Message Block (SMB), and AppSocket protocols are also
-supported with reduced functionality.
-
-<P>CUPS adds network printer browsing and PostScript Printer
-Description (&quot;PPD&quot;)-based printing options to support real
-world applications under UNIX.
-
-<P>CUPS also includes a customized version of GNU GhostScript
-(currently based off GNU GhostScript 4.03) and an image file RIP that
-can be used to support non-PostScript printers.
+<EMBED SRC="system-overview.shtml">
 
 <H2>Document Overview</H2>
 

@@ -15,25 +15,7 @@ This software design description document provides detailed information
 on the architecture and coding of the Common UNIX Printing System 
 (&quot;CUPS&quot;) Version 1.1.
 
-<H2>System Overview</H2>
-
-The Common UNIX Printing System provides a portable printing layer for 
-UNIX&reg; operating systems. It has been developed by Easy Software 
-Products to promote a standard printing solution for all UNIX vendors 
-and users. CUPS provides the System V and Berkeley command-line interfaces.
-
-<P>CUPS uses the Internet Printing Protocol (IETF-IPP) as the basis
-for managing print jobs and queues. The Line Printer Daemon (LPD,
-RFC1179), Server Message Block (SMB), and AppSocket protocols are also
-supported with reduced functionality.
-
-<P>CUPS adds network printer browsing and PostScript Printer
-Description (&quot;PPD&quot;)-based printing options to support real
-world applications under UNIX.
-
-<P>CUPS also includes a customized version of GNU GhostScript
-(currently based off GNU GhostScript 4.03) and an image file RIP that
-can be used to support non-PostScript printers.
+<EMBED SRC="system-overview.shtml">
 
 <H2>Document Overview</H2>
 
@@ -52,36 +34,7 @@ following sections:
 
 </UL>
 
-<H1>References</H1>
-
-<H2>CUPS Documentation</H2>
-
-The following CUPS documentation is referenced by this document:
-
-<UL>
-	<LI>CUPS-CMP-1.1: CUPS Configuration Management Plan 
-	<LI>CUPS-IDD-1.1: CUPS System Interface Design Description 
-	<LI>CUPS-SAM-1.1.x: CUPS Software Administrators Manual 
-	<LI>CUPS-SDD-1.1: CUPS Software Design Description 
-	<LI>CUPS-SPM-1.1: CUPS Software Programming Manual
-	<LI>CUPS-SSR-1.1: CUPS Software Security Report 
-	<LI>CUPS-STP-1.1: CUPS Software Test Plan 
-	<LI>CUPS-SUM-1.1.x: CUPS Software Users Manual 
-	<LI>CUPS-SVD-1.1.x: CUPS Software Version Description 
-</UL>
-
-<H2>Other Documents</H2>
-
-The following non-CUPS documents are referenced by this document:
-
-<UL>
-	<LI>IEEE 1387.4, System Administration: Printing (draft) 
-	<LI>IPP/1.0: Additional Optional Operations - Set 1
-	<LI>RFC 1179, Line Printer Daemon Protocol 
-	<LI>RFC 2565, IPP/1.0: Encoding and Transport 
-	<LI>RFC 2566, IPP/1.0: Model and Semantics
-	<LI>RFC 2639, IPP/1.0: Implementers Guide
-</UL>
+<EMBED SRC="references.shtml">
 
 <H1>Design Overview</H1>
 
@@ -476,82 +429,7 @@ user.
 The reject command tells the scheduler not to accept new jobs for specific
 printers.
 
-<H1 TYPE=A VALUE=1>Glossary</H1>
-
-<H2>Terms</H2>
-
-<DL>
-
-	<DT>C
-	<DD>A computer language.
-
-	<DT>parallel
-	<DD>Sending or receiving data more than 1 bit at a time.
-
-	<DT>pipe
-	<DD>A one-way communications channel between two programs.
-
-	<DT>serial
-	<DD>Sending or receiving data 1 bit at a time.
-
-	<DT>socket
-	<DD>A two-way network communications channel.
-
-</DL>
-
-<H2>Acronyms</H2>
-
-<DL>
-
-	<DT>ASCII
-	<DD>American Standard Code for Information Interchange
-
-	<DT>CUPS
-	<DD>Common UNIX Printing System
-
-	<DT>ESC/P
-	<DD>EPSON Standard Code for Printers
-
-	<DT>FTP
-	<DD>File Transfer Protocol
-
-	<DT>HP-GL
-	<DD>Hewlett-Packard Graphics Language
-
-	<DT>HP-PCL
-	<DD>Hewlett-Packard Printer Control Language
-
-	<DT>HP-PJL
-	<DD>Hewlett-Packard Printer Job Language
-
-	<DT>IETF
-	<DD>Internet Engineering Task Force
-
-	<DT>IPP
-	<DD>Internet Printing Protocol
-
-	<DT>ISO
-	<DD>International Standards Organization
-
-	<DT>LPD
-	<DD>Line Printer Daemon
-
-	<DT>MIME
-	<DD>Multimedia Internet Mail Exchange
-
-	<DT>PCL
-	<DD>Page Control Language
-
-	<DT>PPD
-	<DD>PostScript Printer Description
-
-	<DT>SMB
-	<DD>Server Message Block
-
-	<DT>TFTP
-	<DD>Trivial File Transfer Protocol
-
-</DL>
+<EMBED SRC="glossary.shtml">
 
 </BODY>
 </HTML>

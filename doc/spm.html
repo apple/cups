@@ -3,8 +3,8 @@
 <HEAD>
 <TITLE>DRAFT - CUPS Software Programmers Manual</TITLE>
 <META NAME="AUTHOR" CONTENT="Easy Software Products">
-<META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
-<META NAME="DOCNUMBER" CONTENT="CUPS-SPM-1.0b1">
+<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2000, All Rights Reserved">
+<META NAME="DOCNUMBER" CONTENT="CUPS-SPM-1.1">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
 <STYLE>
 BODY { font-family: serif; font-size: 11.0pt }
@@ -22,9 +22,9 @@ PRE { font-size: 9.0pt }
 <BODY>
 <CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0"><BR>
 <H1>DRAFT - CUPS Software Programmers Manual</H1></A><BR>
-CUPS-SPM-1.0b1<BR>
+CUPS-SPM-1.1<BR>
 Easy Software Products<BR>
-Copyright 1997-1999, All Rights Reserved<BR>
+Copyright 1997-2000, All Rights Reserved<BR>
 </CENTER>
 <HR>
 <H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
@@ -88,24 +88,16 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF="#3_5_3">Getting the Language Encoding</A></LI>
 <LI><A HREF="#3_5_4">Getting a Language String</A></LI>
 </UL>
-<LI><A HREF="#3_6">MIME Services</A></LI>
+<LI><A HREF="#3_6">PPD Services</A></LI>
 <UL>
 <LI><A HREF="#3_6_1">Include Files</A></LI>
-<LI><A HREF="#3_6_2">Loading a MIME Database</A></LI>
-<LI><A HREF="#3_6_3">Finding a Specific MIME Type</A></LI>
-<LI><A HREF="#3_6_4">Finding the MIME Type of a File</A></LI>
-<LI><A HREF="#3_6_5">Filters</A></LI>
-</UL>
-<LI><A HREF="#3_7">PPD Services</A></LI>
-<UL>
-<LI><A HREF="#3_7_1">Include Files</A></LI>
-<LI><A HREF="#3_7_2">Loading a PPD File</A></LI>
-<LI><A HREF="#3_7_3">Options and Groups</A></LI>
-<LI><A HREF="#3_7_4">Finding an Option</A></LI>
-<LI><A HREF="#3_7_5">Finding a Page Size</A></LI>
-<LI><A HREF="#3_7_6">Marking Options</A></LI>
-<LI><A HREF="#3_7_7">Checking for Conflicts</A></LI>
-<LI><A HREF="#3_7_8">Sending Options</A></LI>
+<LI><A HREF="#3_6_2">Loading a PPD File</A></LI>
+<LI><A HREF="#3_6_3">Options and Groups</A></LI>
+<LI><A HREF="#3_6_4">Finding an Option</A></LI>
+<LI><A HREF="#3_6_5">Finding a Page Size</A></LI>
+<LI><A HREF="#3_6_6">Marking Options</A></LI>
+<LI><A HREF="#3_6_7">Checking for Conflicts</A></LI>
+<LI><A HREF="#3_6_8">Sending Options</A></LI>
 </UL>
 </UL>
 <B><A HREF="#4">3 - Writing Filters</A></B>
@@ -161,9 +153,8 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF="#7_2">HTTP Constants</A></LI>
 <LI><A HREF="#7_3">IPP Constants</A></LI>
 <LI><A HREF="#7_4">Language Constants</A></LI>
-<LI><A HREF="#7_5">MIME Constants</A></LI>
-<LI><A HREF="#7_6">PPD Constants</A></LI>
-<LI><A HREF="#7_7">Raster Constants</A></LI>
+<LI><A HREF="#7_5">PPD Constants</A></LI>
+<LI><A HREF="#7_6">Raster Constants</A></LI>
 </UL>
 <B><A HREF="#8">B - Structures</A></B>
 <UL>
@@ -878,7 +869,7 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF="#9_80_5">Example</A></LI>
 <LI><A HREF="#9_80_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#mimeAddFilter">mimeAddFilter()</A></LI>
+<LI><A HREF="#ppdClose">ppdClose()</A></LI>
 <UL>
 <LI><A HREF="#9_81_1">Usage</A></LI>
 <LI><A HREF="#9_81_2">Arguments</A></LI>
@@ -887,7 +878,7 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF="#9_81_5">Example</A></LI>
 <LI><A HREF="#9_81_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#mimeAddType">mimeAddType()</A></LI>
+<LI><A HREF="#ppdConflicts">ppdConflicts()</A></LI>
 <UL>
 <LI><A HREF="#9_82_1">Usage</A></LI>
 <LI><A HREF="#9_82_2">Arguments</A></LI>
@@ -896,7 +887,7 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF="#9_82_5">Example</A></LI>
 <LI><A HREF="#9_82_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#mimeAddTypeRule">mimeAddTypeRule()</A></LI>
+<LI><A HREF="#pddEmitFd">pddEmitFd()</A></LI>
 <UL>
 <LI><A HREF="#9_83_1">Usage</A></LI>
 <LI><A HREF="#9_83_2">Arguments</A></LI>
@@ -905,7 +896,7 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF="#9_83_5">Example</A></LI>
 <LI><A HREF="#9_83_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#mimeDelete">mimeDelete()</A></LI>
+<LI><A HREF="#ppdEmit">ppdEmit()</A></LI>
 <UL>
 <LI><A HREF="#9_84_1">Usage</A></LI>
 <LI><A HREF="#9_84_2">Arguments</A></LI>
@@ -914,7 +905,7 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF="#9_84_5">Example</A></LI>
 <LI><A HREF="#9_84_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#mimeFileType">mimeFileType()</A></LI>
+<LI><A HREF="#ppdFindChoice">ppdFindChoice()</A></LI>
 <UL>
 <LI><A HREF="#9_85_1">Usage</A></LI>
 <LI><A HREF="#9_85_2">Arguments</A></LI>
@@ -923,7 +914,7 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF="#9_85_5">Example</A></LI>
 <LI><A HREF="#9_85_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#mimeFilter">mimeFilter()</A></LI>
+<LI><A HREF="#ppdFindMarkedChoice">ppdFindMarkedChoice()</A></LI>
 <UL>
 <LI><A HREF="#9_86_1">Usage</A></LI>
 <LI><A HREF="#9_86_2">Arguments</A></LI>
@@ -932,7 +923,7 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF="#9_86_5">Example</A></LI>
 <LI><A HREF="#9_86_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#mimeLoad">mimeLoad()</A></LI>
+<LI><A HREF="#ppdFindOption">ppdFindOption()</A></LI>
 <UL>
 <LI><A HREF="#9_87_1">Usage</A></LI>
 <LI><A HREF="#9_87_2">Arguments</A></LI>
@@ -941,7 +932,7 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF="#9_87_5">Example</A></LI>
 <LI><A HREF="#9_87_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#mimeMerge">mimeMerge()</A></LI>
+<LI><A HREF="#ppdIsMarked">ppdIsMarked()</A></LI>
 <UL>
 <LI><A HREF="#9_88_1">Usage</A></LI>
 <LI><A HREF="#9_88_2">Arguments</A></LI>
@@ -950,7 +941,7 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF="#9_88_5">Example</A></LI>
 <LI><A HREF="#9_88_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#mimeNew">mimeNew()</A></LI>
+<LI><A HREF="#ppdMarkDefaults">ppdMarkDefaults()</A></LI>
 <UL>
 <LI><A HREF="#9_89_1">Usage</A></LI>
 <LI><A HREF="#9_89_2">Arguments</A></LI>
@@ -959,7 +950,7 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF="#9_89_5">Example</A></LI>
 <LI><A HREF="#9_89_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#mimeType">mimeType()</A></LI>
+<LI><A HREF="#ppdMarkOption">ppdMarkOption()</A></LI>
 <UL>
 <LI><A HREF="#9_90_1">Usage</A></LI>
 <LI><A HREF="#9_90_2">Arguments</A></LI>
@@ -968,7 +959,7 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF="#9_90_5">Example</A></LI>
 <LI><A HREF="#9_90_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdClose">ppdClose()</A></LI>
+<LI><A HREF="#ppdOpenFd">ppdOpenFd()</A></LI>
 <UL>
 <LI><A HREF="#9_91_1">Usage</A></LI>
 <LI><A HREF="#9_91_2">Arguments</A></LI>
@@ -977,7 +968,7 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF="#9_91_5">Example</A></LI>
 <LI><A HREF="#9_91_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdConflicts">ppdConflicts()</A></LI>
+<LI><A HREF="#ppdOpenFile">ppdOpenFile()</A></LI>
 <UL>
 <LI><A HREF="#9_92_1">Usage</A></LI>
 <LI><A HREF="#9_92_2">Arguments</A></LI>
@@ -986,7 +977,7 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF="#9_92_5">Example</A></LI>
 <LI><A HREF="#9_92_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#pddEmitFd">pddEmitFd()</A></LI>
+<LI><A HREF="#ppdOpen">ppdOpen()</A></LI>
 <UL>
 <LI><A HREF="#9_93_1">Usage</A></LI>
 <LI><A HREF="#9_93_2">Arguments</A></LI>
@@ -995,7 +986,7 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF="#9_93_5">Example</A></LI>
 <LI><A HREF="#9_93_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdEmit">ppdEmit()</A></LI>
+<LI><A HREF="#ppdPageLength">ppdPageLength()</A></LI>
 <UL>
 <LI><A HREF="#9_94_1">Usage</A></LI>
 <LI><A HREF="#9_94_2">Arguments</A></LI>
@@ -1004,7 +995,7 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF="#9_94_5">Example</A></LI>
 <LI><A HREF="#9_94_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdFindChoice">ppdFindChoice()</A></LI>
+<LI><A HREF="#ppdPageSize">ppdPageSize()</A></LI>
 <UL>
 <LI><A HREF="#9_95_1">Usage</A></LI>
 <LI><A HREF="#9_95_2">Arguments</A></LI>
@@ -1013,7 +1004,7 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF="#9_95_5">Example</A></LI>
 <LI><A HREF="#9_95_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdFindMarkedChoice">ppdFindMarkedChoice()</A></LI>
+<LI><A HREF="#ppdPageWidth">ppdPageWidth()</A></LI>
 <UL>
 <LI><A HREF="#9_96_1">Usage</A></LI>
 <LI><A HREF="#9_96_2">Arguments</A></LI>
@@ -1022,107 +1013,17 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF="#9_96_5">Example</A></LI>
 <LI><A HREF="#9_96_6">See Also</A></LI>
 </UL>
-<LI><A HREF="#ppdFindOption">ppdFindOption()</A></LI>
-<UL>
-<LI><A HREF="#9_97_1">Usage</A></LI>
-<LI><A HREF="#9_97_2">Arguments</A></LI>
-<LI><A HREF="#9_97_3">Returns</A></LI>
-<LI><A HREF="#9_97_4">Description</A></LI>
-<LI><A HREF="#9_97_5">Example</A></LI>
-<LI><A HREF="#9_97_6">See Also</A></LI>
-</UL>
-<LI><A HREF="#ppdIsMarked">ppdIsMarked()</A></LI>
-<UL>
-<LI><A HREF="#9_98_1">Usage</A></LI>
-<LI><A HREF="#9_98_2">Arguments</A></LI>
-<LI><A HREF="#9_98_3">Returns</A></LI>
-<LI><A HREF="#9_98_4">Description</A></LI>
-<LI><A HREF="#9_98_5">Example</A></LI>
-<LI><A HREF="#9_98_6">See Also</A></LI>
-</UL>
-<LI><A HREF="#ppdMarkDefaults">ppdMarkDefaults()</A></LI>
-<UL>
-<LI><A HREF="#9_99_1">Usage</A></LI>
-<LI><A HREF="#9_99_2">Arguments</A></LI>
-<LI><A HREF="#9_99_3">Returns</A></LI>
-<LI><A HREF="#9_99_4">Description</A></LI>
-<LI><A HREF="#9_99_5">Example</A></LI>
-<LI><A HREF="#9_99_6">See Also</A></LI>
-</UL>
-<LI><A HREF="#ppdMarkOption">ppdMarkOption()</A></LI>
-<UL>
-<LI><A HREF="#9_100_1">Usage</A></LI>
-<LI><A HREF="#9_100_2">Arguments</A></LI>
-<LI><A HREF="#9_100_3">Returns</A></LI>
-<LI><A HREF="#9_100_4">Description</A></LI>
-<LI><A HREF="#9_100_5">Example</A></LI>
-<LI><A HREF="#9_100_6">See Also</A></LI>
-</UL>
-<LI><A HREF="#ppdOpenFd">ppdOpenFd()</A></LI>
-<UL>
-<LI><A HREF="#9_101_1">Usage</A></LI>
-<LI><A HREF="#9_101_2">Arguments</A></LI>
-<LI><A HREF="#9_101_3">Returns</A></LI>
-<LI><A HREF="#9_101_4">Description</A></LI>
-<LI><A HREF="#9_101_5">Example</A></LI>
-<LI><A HREF="#9_101_6">See Also</A></LI>
-</UL>
-<LI><A HREF="#ppdOpenFile">ppdOpenFile()</A></LI>
-<UL>
-<LI><A HREF="#9_102_1">Usage</A></LI>
-<LI><A HREF="#9_102_2">Arguments</A></LI>
-<LI><A HREF="#9_102_3">Returns</A></LI>
-<LI><A HREF="#9_102_4">Description</A></LI>
-<LI><A HREF="#9_102_5">Example</A></LI>
-<LI><A HREF="#9_102_6">See Also</A></LI>
-</UL>
-<LI><A HREF="#ppdOpen">ppdOpen()</A></LI>
-<UL>
-<LI><A HREF="#9_103_1">Usage</A></LI>
-<LI><A HREF="#9_103_2">Arguments</A></LI>
-<LI><A HREF="#9_103_3">Returns</A></LI>
-<LI><A HREF="#9_103_4">Description</A></LI>
-<LI><A HREF="#9_103_5">Example</A></LI>
-<LI><A HREF="#9_103_6">See Also</A></LI>
-</UL>
-<LI><A HREF="#ppdPageLength">ppdPageLength()</A></LI>
-<UL>
-<LI><A HREF="#9_104_1">Usage</A></LI>
-<LI><A HREF="#9_104_2">Arguments</A></LI>
-<LI><A HREF="#9_104_3">Returns</A></LI>
-<LI><A HREF="#9_104_4">Description</A></LI>
-<LI><A HREF="#9_104_5">Example</A></LI>
-<LI><A HREF="#9_104_6">See Also</A></LI>
-</UL>
-<LI><A HREF="#ppdPageSize">ppdPageSize()</A></LI>
-<UL>
-<LI><A HREF="#9_105_1">Usage</A></LI>
-<LI><A HREF="#9_105_2">Arguments</A></LI>
-<LI><A HREF="#9_105_3">Returns</A></LI>
-<LI><A HREF="#9_105_4">Description</A></LI>
-<LI><A HREF="#9_105_5">Example</A></LI>
-<LI><A HREF="#9_105_6">See Also</A></LI>
-</UL>
-<LI><A HREF="#ppdPageWidth">ppdPageWidth()</A></LI>
-<UL>
-<LI><A HREF="#9_106_1">Usage</A></LI>
-<LI><A HREF="#9_106_2">Arguments</A></LI>
-<LI><A HREF="#9_106_3">Returns</A></LI>
-<LI><A HREF="#9_106_4">Description</A></LI>
-<LI><A HREF="#9_106_5">Example</A></LI>
-<LI><A HREF="#9_106_6">See Also</A></LI>
-</UL>
 </UL>
 <HR>
 <H1 ALIGN="RIGHT"><A NAME="1">Preface</A></H1>
  This software programmers manual provides software programming 
-information for the Common UNIX Printing System (&quot;CUPS&quot;) Version 1.0. 
+information for the Common UNIX Printing System (&quot;CUPS&quot;) Version 1.1. 
 <H2><A NAME="1_1">System Overview</A></H2>
- The Common UNIX Printing System provides a portable printing layer for 
- UNIX&reg; operating systems. It has been developed by Easy Software 
- Products to promote a standard printing solution for all UNIX vendors 
- and users. CUPS provides the System V and Berkeley command-line 
-interfaces. 
+<P>The Common UNIX Printing System provides a portable printing layer 
+for  UNIX&reg; operating systems. It has been developed by <A HREF="http://www.easysw.com">
+Easy Software Products</A> to promote a standard printing solution for 
+all UNIX vendors and users. CUPS provides the System V and Berkeley 
+command-line interfaces. </P>
 <P>CUPS uses the Internet Printing Protocol (IETF-IPP) as the basis for 
 managing print jobs and queues. The Line Printer Daemon (LPD, RFC1179), 
 Server Message Block (SMB), and AppSocket protocols are also supported 
@@ -1131,8 +1032,8 @@ with reduced functionality. </P>
 Description (&quot;PPD&quot;)-based printing options to support real world 
 applications under UNIX. </P>
 <P>CUPS also includes a customized version of GNU GhostScript 
-(currently based off GNU GhostScript 4.03) and an image file RIP that 
-can be used to support non-PostScript printers. </P>
+(currently based off GNU GhostScript 5.50) and an image file RIP that 
+is used to support non-PostScript printers. </P>
 <H2><A NAME="1_2">Document Overview</A></H2>
 <P>This software administrators manual is organized into the following 
 sections:</P>
@@ -1274,21 +1175,15 @@ unless all of the printers and servers goes down! </P>
 <H3><A NAME="3_5_2">Getting the Default Language</A></H3>
 <H3><A NAME="3_5_3">Getting the Language Encoding</A></H3>
 <H3><A NAME="3_5_4">Getting a Language String</A></H3>
-<H2><A NAME="3_6">MIME Services</A></H2>
+<H2><A NAME="3_6">PPD Services</A></H2>
 <H3><A NAME="3_6_1">Include Files</A></H3>
-<H3><A NAME="3_6_2">Loading a MIME Database</A></H3>
-<H3><A NAME="3_6_3">Finding a Specific MIME Type</A></H3>
-<H3><A NAME="3_6_4">Finding the MIME Type of a File</A></H3>
-<H3><A NAME="3_6_5">Filters</A></H3>
-<H2><A NAME="3_7">PPD Services</A></H2>
-<H3><A NAME="3_7_1">Include Files</A></H3>
-<H3><A NAME="3_7_2">Loading a PPD File</A></H3>
-<H3><A NAME="3_7_3">Options and Groups</A></H3>
-<H3><A NAME="3_7_4">Finding an Option</A></H3>
-<H3><A NAME="3_7_5">Finding a Page Size</A></H3>
-<H3><A NAME="3_7_6">Marking Options</A></H3>
-<H3><A NAME="3_7_7">Checking for Conflicts</A></H3>
-<H3><A NAME="3_7_8">Sending Options</A></H3>
+<H3><A NAME="3_6_2">Loading a PPD File</A></H3>
+<H3><A NAME="3_6_3">Options and Groups</A></H3>
+<H3><A NAME="3_6_4">Finding an Option</A></H3>
+<H3><A NAME="3_6_5">Finding a Page Size</A></H3>
+<H3><A NAME="3_6_6">Marking Options</A></H3>
+<H3><A NAME="3_6_7">Checking for Conflicts</A></H3>
+<H3><A NAME="3_6_8">Sending Options</A></H3>
 <H1 ALIGN="RIGHT"><A NAME="4">3 - Writing Filters</A></H1>
 <P>This chapter describes how to write a file filter for CUPS. </P>
 <H2><A NAME="4_1">Overview</A></H2>
@@ -1334,9 +1229,8 @@ CUPS API. </P>
 <H2><A NAME="7_2">HTTP Constants</A></H2>
 <H2><A NAME="7_3">IPP Constants</A></H2>
 <H2><A NAME="7_4">Language Constants</A></H2>
-<H2><A NAME="7_5">MIME Constants</A></H2>
-<H2><A NAME="7_6">PPD Constants</A></H2>
-<H2><A NAME="7_7">Raster Constants</A></H2>
+<H2><A NAME="7_5">PPD Constants</A></H2>
+<H2><A NAME="7_6">Raster Constants</A></H2>
 <H1 ALIGN="RIGHT"><A NAME="8">B - Structures</A></H1>
 <P>This appendix describes all of the structures that are defined by 
 the CUPS API. </P>
@@ -3506,7 +3400,7 @@ cupsServer()</A>
 <H3><A NAME="9_80_6">See Also</A></H3>
 
 <!-- NEW PAGE ---->
-<H2><A NAME="mimeAddFilter">mimeAddFilter()</A></H2>
+<H2><A NAME="ppdClose">ppdClose()</A></H2>
 <H3><A NAME="9_81_1">Usage</A></H3>
 <PRE>
 </PRE>
@@ -3525,7 +3419,7 @@ cupsServer()</A>
 <H3><A NAME="9_81_6">See Also</A></H3>
 
 <!-- NEW PAGE ---->
-<H2><A NAME="mimeAddType">mimeAddType()</A></H2>
+<H2><A NAME="ppdConflicts">ppdConflicts()</A></H2>
 <H3><A NAME="9_82_1">Usage</A></H3>
 <PRE>
 </PRE>
@@ -3544,7 +3438,7 @@ cupsServer()</A>
 <H3><A NAME="9_82_6">See Also</A></H3>
 
 <!-- NEW PAGE ---->
-<H2><A NAME="mimeAddTypeRule">mimeAddTypeRule()</A></H2>
+<H2><A NAME="pddEmitFd">pddEmitFd()</A></H2>
 <H3><A NAME="9_83_1">Usage</A></H3>
 <PRE>
 </PRE>
@@ -3563,7 +3457,7 @@ cupsServer()</A>
 <H3><A NAME="9_83_6">See Also</A></H3>
 
 <!-- NEW PAGE ---->
-<H2><A NAME="mimeDelete">mimeDelete()</A></H2>
+<H2><A NAME="ppdEmit">ppdEmit()</A></H2>
 <H3><A NAME="9_84_1">Usage</A></H3>
 <PRE>
 </PRE>
@@ -3582,7 +3476,7 @@ cupsServer()</A>
 <H3><A NAME="9_84_6">See Also</A></H3>
 
 <!-- NEW PAGE ---->
-<H2><A NAME="mimeFileType">mimeFileType()</A></H2>
+<H2><A NAME="ppdFindChoice">ppdFindChoice()</A></H2>
 <H3><A NAME="9_85_1">Usage</A></H3>
 <PRE>
 </PRE>
@@ -3601,7 +3495,7 @@ cupsServer()</A>
 <H3><A NAME="9_85_6">See Also</A></H3>
 
 <!-- NEW PAGE ---->
-<H2><A NAME="mimeFilter">mimeFilter()</A></H2>
+<H2><A NAME="ppdFindMarkedChoice">ppdFindMarkedChoice()</A></H2>
 <H3><A NAME="9_86_1">Usage</A></H3>
 <PRE>
 </PRE>
@@ -3620,7 +3514,7 @@ cupsServer()</A>
 <H3><A NAME="9_86_6">See Also</A></H3>
 
 <!-- NEW PAGE ---->
-<H2><A NAME="mimeLoad">mimeLoad()</A></H2>
+<H2><A NAME="ppdFindOption">ppdFindOption()</A></H2>
 <H3><A NAME="9_87_1">Usage</A></H3>
 <PRE>
 </PRE>
@@ -3639,7 +3533,7 @@ cupsServer()</A>
 <H3><A NAME="9_87_6">See Also</A></H3>
 
 <!-- NEW PAGE ---->
-<H2><A NAME="mimeMerge">mimeMerge()</A></H2>
+<H2><A NAME="ppdIsMarked">ppdIsMarked()</A></H2>
 <H3><A NAME="9_88_1">Usage</A></H3>
 <PRE>
 </PRE>
@@ -3658,7 +3552,7 @@ cupsServer()</A>
 <H3><A NAME="9_88_6">See Also</A></H3>
 
 <!-- NEW PAGE ---->
-<H2><A NAME="mimeNew">mimeNew()</A></H2>
+<H2><A NAME="ppdMarkDefaults">ppdMarkDefaults()</A></H2>
 <H3><A NAME="9_89_1">Usage</A></H3>
 <PRE>
 </PRE>
@@ -3677,7 +3571,7 @@ cupsServer()</A>
 <H3><A NAME="9_89_6">See Also</A></H3>
 
 <!-- NEW PAGE ---->
-<H2><A NAME="mimeType">mimeType()</A></H2>
+<H2><A NAME="ppdMarkOption">ppdMarkOption()</A></H2>
 <H3><A NAME="9_90_1">Usage</A></H3>
 <PRE>
 </PRE>
@@ -3696,7 +3590,7 @@ cupsServer()</A>
 <H3><A NAME="9_90_6">See Also</A></H3>
 
 <!-- NEW PAGE ---->
-<H2><A NAME="ppdClose">ppdClose()</A></H2>
+<H2><A NAME="ppdOpenFd">ppdOpenFd()</A></H2>
 <H3><A NAME="9_91_1">Usage</A></H3>
 <PRE>
 </PRE>
@@ -3715,7 +3609,7 @@ cupsServer()</A>
 <H3><A NAME="9_91_6">See Also</A></H3>
 
 <!-- NEW PAGE ---->
-<H2><A NAME="ppdConflicts">ppdConflicts()</A></H2>
+<H2><A NAME="ppdOpenFile">ppdOpenFile()</A></H2>
 <H3><A NAME="9_92_1">Usage</A></H3>
 <PRE>
 </PRE>
@@ -3734,7 +3628,7 @@ cupsServer()</A>
 <H3><A NAME="9_92_6">See Also</A></H3>
 
 <!-- NEW PAGE ---->
-<H2><A NAME="pddEmitFd">pddEmitFd()</A></H2>
+<H2><A NAME="ppdOpen">ppdOpen()</A></H2>
 <H3><A NAME="9_93_1">Usage</A></H3>
 <PRE>
 </PRE>
@@ -3753,7 +3647,7 @@ cupsServer()</A>
 <H3><A NAME="9_93_6">See Also</A></H3>
 
 <!-- NEW PAGE ---->
-<H2><A NAME="ppdEmit">ppdEmit()</A></H2>
+<H2><A NAME="ppdPageLength">ppdPageLength()</A></H2>
 <H3><A NAME="9_94_1">Usage</A></H3>
 <PRE>
 </PRE>
@@ -3772,7 +3666,7 @@ cupsServer()</A>
 <H3><A NAME="9_94_6">See Also</A></H3>
 
 <!-- NEW PAGE ---->
-<H2><A NAME="ppdFindChoice">ppdFindChoice()</A></H2>
+<H2><A NAME="ppdPageSize">ppdPageSize()</A></H2>
 <H3><A NAME="9_95_1">Usage</A></H3>
 <PRE>
 </PRE>
@@ -3791,7 +3685,7 @@ cupsServer()</A>
 <H3><A NAME="9_95_6">See Also</A></H3>
 
 <!-- NEW PAGE ---->
-<H2><A NAME="ppdFindMarkedChoice">ppdFindMarkedChoice()</A></H2>
+<H2><A NAME="ppdPageWidth">ppdPageWidth()</A></H2>
 <H3><A NAME="9_96_1">Usage</A></H3>
 <PRE>
 </PRE>
@@ -3808,195 +3702,5 @@ cupsServer()</A>
 <PRE>
 </PRE>
 <H3><A NAME="9_96_6">See Also</A></H3>
-
-<!-- NEW PAGE ---->
-<H2><A NAME="ppdFindOption">ppdFindOption()</A></H2>
-<H3><A NAME="9_97_1">Usage</A></H3>
-<PRE>
-</PRE>
-<H3><A NAME="9_97_2">Arguments</A></H3>
-<CENTER>
-<TABLE BORDER WIDTH="80%">
-<TR><TH>Argument</TH><TH>Description</TH></TR>
-<TR><TD><TD></TR>
-</TABLE>
-</CENTER>
-<H3><A NAME="9_97_3">Returns</A></H3>
-<H3><A NAME="9_97_4">Description</A></H3>
-<H3><A NAME="9_97_5">Example</A></H3>
-<PRE>
-</PRE>
-<H3><A NAME="9_97_6">See Also</A></H3>
-
-<!-- NEW PAGE ---->
-<H2><A NAME="ppdIsMarked">ppdIsMarked()</A></H2>
-<H3><A NAME="9_98_1">Usage</A></H3>
-<PRE>
-</PRE>
-<H3><A NAME="9_98_2">Arguments</A></H3>
-<CENTER>
-<TABLE BORDER WIDTH="80%">
-<TR><TH>Argument</TH><TH>Description</TH></TR>
-<TR><TD><TD></TR>
-</TABLE>
-</CENTER>
-<H3><A NAME="9_98_3">Returns</A></H3>
-<H3><A NAME="9_98_4">Description</A></H3>
-<H3><A NAME="9_98_5">Example</A></H3>
-<PRE>
-</PRE>
-<H3><A NAME="9_98_6">See Also</A></H3>
-
-<!-- NEW PAGE ---->
-<H2><A NAME="ppdMarkDefaults">ppdMarkDefaults()</A></H2>
-<H3><A NAME="9_99_1">Usage</A></H3>
-<PRE>
-</PRE>
-<H3><A NAME="9_99_2">Arguments</A></H3>
-<CENTER>
-<TABLE BORDER WIDTH="80%">
-<TR><TH>Argument</TH><TH>Description</TH></TR>
-<TR><TD><TD></TR>
-</TABLE>
-</CENTER>
-<H3><A NAME="9_99_3">Returns</A></H3>
-<H3><A NAME="9_99_4">Description</A></H3>
-<H3><A NAME="9_99_5">Example</A></H3>
-<PRE>
-</PRE>
-<H3><A NAME="9_99_6">See Also</A></H3>
-
-<!-- NEW PAGE ---->
-<H2><A NAME="ppdMarkOption">ppdMarkOption()</A></H2>
-<H3><A NAME="9_100_1">Usage</A></H3>
-<PRE>
-</PRE>
-<H3><A NAME="9_100_2">Arguments</A></H3>
-<CENTER>
-<TABLE BORDER WIDTH="80%">
-<TR><TH>Argument</TH><TH>Description</TH></TR>
-<TR><TD><TD></TR>
-</TABLE>
-</CENTER>
-<H3><A NAME="9_100_3">Returns</A></H3>
-<H3><A NAME="9_100_4">Description</A></H3>
-<H3><A NAME="9_100_5">Example</A></H3>
-<PRE>
-</PRE>
-<H3><A NAME="9_100_6">See Also</A></H3>
-
-<!-- NEW PAGE ---->
-<H2><A NAME="ppdOpenFd">ppdOpenFd()</A></H2>
-<H3><A NAME="9_101_1">Usage</A></H3>
-<PRE>
-</PRE>
-<H3><A NAME="9_101_2">Arguments</A></H3>
-<CENTER>
-<TABLE BORDER WIDTH="80%">
-<TR><TH>Argument</TH><TH>Description</TH></TR>
-<TR><TD><TD></TR>
-</TABLE>
-</CENTER>
-<H3><A NAME="9_101_3">Returns</A></H3>
-<H3><A NAME="9_101_4">Description</A></H3>
-<H3><A NAME="9_101_5">Example</A></H3>
-<PRE>
-</PRE>
-<H3><A NAME="9_101_6">See Also</A></H3>
-
-<!-- NEW PAGE ---->
-<H2><A NAME="ppdOpenFile">ppdOpenFile()</A></H2>
-<H3><A NAME="9_102_1">Usage</A></H3>
-<PRE>
-</PRE>
-<H3><A NAME="9_102_2">Arguments</A></H3>
-<CENTER>
-<TABLE BORDER WIDTH="80%">
-<TR><TH>Argument</TH><TH>Description</TH></TR>
-<TR><TD><TD></TR>
-</TABLE>
-</CENTER>
-<H3><A NAME="9_102_3">Returns</A></H3>
-<H3><A NAME="9_102_4">Description</A></H3>
-<H3><A NAME="9_102_5">Example</A></H3>
-<PRE>
-</PRE>
-<H3><A NAME="9_102_6">See Also</A></H3>
-
-<!-- NEW PAGE ---->
-<H2><A NAME="ppdOpen">ppdOpen()</A></H2>
-<H3><A NAME="9_103_1">Usage</A></H3>
-<PRE>
-</PRE>
-<H3><A NAME="9_103_2">Arguments</A></H3>
-<CENTER>
-<TABLE BORDER WIDTH="80%">
-<TR><TH>Argument</TH><TH>Description</TH></TR>
-<TR><TD><TD></TR>
-</TABLE>
-</CENTER>
-<H3><A NAME="9_103_3">Returns</A></H3>
-<H3><A NAME="9_103_4">Description</A></H3>
-<H3><A NAME="9_103_5">Example</A></H3>
-<PRE>
-</PRE>
-<H3><A NAME="9_103_6">See Also</A></H3>
-
-<!-- NEW PAGE ---->
-<H2><A NAME="ppdPageLength">ppdPageLength()</A></H2>
-<H3><A NAME="9_104_1">Usage</A></H3>
-<PRE>
-</PRE>
-<H3><A NAME="9_104_2">Arguments</A></H3>
-<CENTER>
-<TABLE BORDER WIDTH="80%">
-<TR><TH>Argument</TH><TH>Description</TH></TR>
-<TR><TD><TD></TR>
-</TABLE>
-</CENTER>
-<H3><A NAME="9_104_3">Returns</A></H3>
-<H3><A NAME="9_104_4">Description</A></H3>
-<H3><A NAME="9_104_5">Example</A></H3>
-<PRE>
-</PRE>
-<H3><A NAME="9_104_6">See Also</A></H3>
-
-<!-- NEW PAGE ---->
-<H2><A NAME="ppdPageSize">ppdPageSize()</A></H2>
-<H3><A NAME="9_105_1">Usage</A></H3>
-<PRE>
-</PRE>
-<H3><A NAME="9_105_2">Arguments</A></H3>
-<CENTER>
-<TABLE BORDER WIDTH="80%">
-<TR><TH>Argument</TH><TH>Description</TH></TR>
-<TR><TD><TD></TR>
-</TABLE>
-</CENTER>
-<H3><A NAME="9_105_3">Returns</A></H3>
-<H3><A NAME="9_105_4">Description</A></H3>
-<H3><A NAME="9_105_5">Example</A></H3>
-<PRE>
-</PRE>
-<H3><A NAME="9_105_6">See Also</A></H3>
-
-<!-- NEW PAGE ---->
-<H2><A NAME="ppdPageWidth">ppdPageWidth()</A></H2>
-<H3><A NAME="9_106_1">Usage</A></H3>
-<PRE>
-</PRE>
-<H3><A NAME="9_106_2">Arguments</A></H3>
-<CENTER>
-<TABLE BORDER WIDTH="80%">
-<TR><TH>Argument</TH><TH>Description</TH></TR>
-<TR><TD><TD></TR>
-</TABLE>
-</CENTER>
-<H3><A NAME="9_106_3">Returns</A></H3>
-<H3><A NAME="9_106_4">Description</A></H3>
-<H3><A NAME="9_106_5">Example</A></H3>
-<PRE>
-</PRE>
-<H3><A NAME="9_106_6">See Also</A></H3>
 </BODY>
 </HTML>
