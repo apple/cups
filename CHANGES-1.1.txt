@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The PostScript filter now detects EPS files and should
+	  better handle printing EPS files.
 	- The cancel command now ignores a trailing destination
 	  name when cancelling a specific job ID (Solaris
 	  compatibility).

@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.23 2002/08/14 04:10:53 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.24 2002/08/22 16:00:55 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -381,10 +381,11 @@ main(int  argc,			/* I - Number of command-line arguments */
     UseESPsp = 1;
   }
 
-  if (strncmp(line, "%!PS-Adobe-", 11) == 0)
+  if (strncmp(line, "%!PS-Adobe-", 11) == 0 && strstr(line, "EPSF") == NULL)
   {
    /*
-    * OK, we have DSC comments; read until we find a %%Page comment...
+    * OK, we have DSC comments and this isn't an EPS file; read until we
+    * find a %%Page comment...
     */
 
     puts("%%Pages: (atend)");
@@ -1642,5 +1643,5 @@ start_nup(int number,		/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.23 2002/08/14 04:10:53 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.24 2002/08/22 16:00:55 mike Exp $".
  */
