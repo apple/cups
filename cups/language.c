@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.31 2003/02/04 05:27:22 mike Exp $"
+ * "$Id: language.c,v 1.32 2003/02/04 19:02:24 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -540,7 +540,7 @@ appleLangDefault(void)
 	  {
 	    if (strcasecmp(buff, apple_name_locale[i].name) == 0)
 	    {
-	      language = nameToLocaleTable[i].locale;
+	      language = name_locale[i].locale;
 	      break;
 	    }
 	  }
@@ -568,5 +568,5 @@ appleLangDefault(void)
 
 
 /*
- * End of "$Id: language.c,v 1.31 2003/02/04 05:27:22 mike Exp $".
+ * End of "$Id: language.c,v 1.32 2003/02/04 19:02:24 mike Exp $".
  */
