@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.29.2.18 2004/06/29 13:15:11 mike Exp $"
+ * "$Id: lp.c,v 1.29.2.19 2004/07/17 02:44:49 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -561,7 +561,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
     if (temp < 0)
     {
-      fputs("lp: unable to create temporary file.\n", stderr);
+      fprintf(stderr, "lp: unable to create temporary file \"%s\" - %s\n",
+              tempfile, strerror(errno));
       return (1);
     }
 
@@ -747,5 +748,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.29.2.18 2004/06/29 13:15:11 mike Exp $".
+ * End of "$Id: lp.c,v 1.29.2.19 2004/07/17 02:44:49 mike Exp $".
  */

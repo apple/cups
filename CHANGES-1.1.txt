@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- The lp and lpr commands now report the temporary
+	  filename and error if they are unable to create a
+	  temporary file (STR #812)
 	- Added ServerTokens directive to control the Server
 	  header in HTTP responses (STR #792)
 	- Added new httpDecode64_2(), httpEncode64_2(), and

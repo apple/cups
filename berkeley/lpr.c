@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.20.2.12 2004/06/29 13:15:08 mike Exp $"
+ * "$Id: lpr.c,v 1.20.2.13 2004/07/17 02:44:49 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -372,7 +372,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
     if ((temp = cupsTempFd(tempfile, sizeof(tempfile))) < 0)
     {
-      fputs("lpr: unable to create temporary file.\n", stderr);
+      fprintf(stderr, "lpr: unable to create temporary file \"%s\" - %s\n",
+              tempfile, strerror(errno));
       return (1);
     }
 
@@ -431,5 +432,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c,v 1.20.2.12 2004/06/29 13:15:08 mike Exp $".
+ * End of "$Id: lpr.c,v 1.20.2.13 2004/07/17 02:44:49 mike Exp $".
  */

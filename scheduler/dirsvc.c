@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.53 2004/07/02 19:51:24 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.54 2004/07/17 02:44:49 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -653,7 +653,9 @@ SendBrowseList(void)
       if (!p)
         p = Printers;
 
-      if (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT))
+      if (!p)
+        break;
+      else if (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT))
         continue;
       else if (p->browse_time < ut)
       {
@@ -2107,5 +2109,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.53 2004/07/02 19:51:24 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.54 2004/07/17 02:44:49 mike Exp $".
  */
