@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.151 2002/01/02 17:59:15 mike Exp $"
+ * "$Id: ipp.c,v 1.152 2002/01/09 17:03:44 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2338,9 +2338,12 @@ create_job(client_t        *con,	/* I - Client connection */
     * See if we need to add the starting sheet...
     */
 
-    kbytes = copy_banner(con, job, attr->values[0].string.text);
+    if (!(printer->type & CUPS_PRINTER_REMOTE))
+    {
+      kbytes = copy_banner(con, job, attr->values[0].string.text);
 
-    UpdateQuota(printer, job->username, 0, kbytes);
+      UpdateQuota(printer, job->username, 0, kbytes);
+    }
   }
   else if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) != NULL)
     job->sheets = attr;
@@ -4115,9 +4118,12 @@ print_job(client_t        *con,		/* I - Client connection */
     * Add the starting sheet...
     */
 
-    kbytes = copy_banner(con, job, attr->values[0].string.text);
+    if (!(printer->type & CUPS_PRINTER_REMOTE))
+    {
+      kbytes = copy_banner(con, job, attr->values[0].string.text);
 
-    UpdateQuota(printer, job->username, 0, kbytes);
+      UpdateQuota(printer, job->username, 0, kbytes);
+    }
   }
   else if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) != NULL)
     job->sheets = attr;
@@ -5620,5 +5626,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.151 2002/01/02 17:59:15 mike Exp $".
+ * End of "$Id: ipp.c,v 1.152 2002/01/09 17:03:44 mike Exp $".
  */
