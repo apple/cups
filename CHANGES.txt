@@ -1,6 +1,23 @@
 CHANGES.txt - 02/07/2001
 ------------------------
 
+CHANGES IN CUPS V1.1.6-3
+
+	- The configure script put the JPEG library before the
+	  TIFF library; this caused problems in some
+	  configurations since the TIFF library also supports
+	  JPEG compression of TIFF images.
+	- The updated cupsTempFile() function did not return
+	  the filename when called with a filename buffer of
+	  NULL (previously it used a static buffer.)
+	- FreeBSD uses /dev/unlptN, but NetBSD and OpenBSD use
+	  /dev/ulptN.
+	- SuSE fix: Exit from child if setgid() or setuid()
+	  fails.
+	- SuSE fix: Added setgroups() calls after setgid() and
+	  setuid() calls.
+
+
 CHANGES IN CUPS V1.1.6-2
 
 	- Added changes to support NetBSD startup scripts.

@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.70 2001/01/23 15:08:13 mike Exp $"
+ * "$Id: dirsvc.c,v 1.71 2001/02/08 19:24:15 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -876,8 +876,28 @@ StartPolling(void)
       * Child...
       */
 
-      setgid(Group);
-      setuid(User);
+      if (getuid() == 0)
+      {
+       /*
+	* Running as root, so change to non-priviledged user...
+	*/
+
+	if (setgid(Group))
+          exit(errno);
+
+	if (setuid(User))
+          exit(errno);
+      }
+
+     /*
+      * Reset group membership to just the main one we belong to.
+      */
+
+      setgroups(0, NULL);
+
+     /*
+      * Execute the polling daemon...
+      */
 
       execl(CUPS_SERVERBIN "/daemon/cups-polld", "cups-polld", poll->hostname,
             sport, interval, bport, NULL);
@@ -918,5 +938,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.70 2001/01/23 15:08:13 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.71 2001/02/08 19:24:15 mike Exp $".
  */

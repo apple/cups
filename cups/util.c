@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.74 2001/02/07 01:25:39 mike Exp $"
+ * "$Id: util.c,v 1.75 2001/02/08 19:24:14 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -1338,11 +1338,6 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
 
 /*
  * 'cupsTempFile()' - Generate a temporary filename.
- *
- * Note: This function will be removed in the next minor release of
- *       CUPS due to serious bugs in glibc - the fopen() function
- *       in glibc does an unlink before creating the file, which
- *       opens up a major symlink hole!
  */
 
 char *					/* O - Filename */
@@ -1350,7 +1345,18 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
              int  len)			/* I - Size of buffer */
 {
   int		fd;			/* File descriptor for temp file */
+  static char	buf[1024] = "";		/* Buffer if you pass in NULL and 0 */
 
+
+ /*
+  * See if a filename was specified...
+  */
+
+  if (filename == NULL)
+  {
+    filename = buf;
+    len      = sizeof(buf);
+  }
 
  /*
   * Create the temporary file...
@@ -1504,5 +1510,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.74 2001/02/07 01:25:39 mike Exp $".
+ * End of "$Id: util.c,v 1.75 2001/02/08 19:24:14 mike Exp $".
  */

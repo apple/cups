@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.75 2001/02/08 14:57:38 mike Exp $"
+dnl "$Id: configure.in,v 1.76 2001/02/08 19:24:13 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -389,20 +389,9 @@ if test "$DSO" != ":"; then
 	# When using DSOs the image libraries are linked to libcupsimage.so
 	# rather than to the executables.  This makes things smaller if you
 	# are using any static libraries, and it also allows us to distribute
-	# a single DSO rather than a bunch...unless the linker is dumb.
-	case $uname in
-		NetBSD*)
-			# NetBSD's linker won't resolve symbols in a shared
-			# libraries unless their enclosing shared libraries
-			# are explicitly listed.
-			DSOLIBS="\$(LIBPNG) \$(LIBTIFF) \$(LIBJPEG) \$(LIBZ)"
-			IMGLIBS="\$(LIBPNG) \$(LIBTIFF) \$(LIBJPEG) \$(LIBZ)"
-			;;
-		*)
-			DSOLIBS="\$(LIBPNG) \$(LIBTIFF) \$(LIBJPEG) \$(LIBZ)"
-			IMGLIBS=""
-			;;
-	esac
+	# a single DSO rather than a bunch...
+	DSOLIBS="\$(LIBPNG) \$(LIBTIFF) \$(LIBJPEG) \$(LIBZ)"
+	IMGLIBS=""
 
 	# The *BSD, HP-UX, and Solaris run-time linkers need help when
 	# deciding where to find a DSO.  Add linker options to tell them
@@ -664,5 +653,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.75 2001/02/08 14:57:38 mike Exp $".
+dnl End of "$Id: configure.in,v 1.76 2001/02/08 19:24:13 mike Exp $".
 dnl

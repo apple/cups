@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.108 2001/02/07 19:41:37 mike Exp $"
+ * "$Id: job.c,v 1.109 2001/02/08 19:24:15 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2576,11 +2576,24 @@ start_process(const char *command,	/* I - Full path to command */
     * Change user to something "safe"...
     */
 
-    if (!root)
+    if (!root && getuid() == 0)
     {
-      setgid(Group);
-      setuid(User);
+     /*
+      * Running as root, so change to non-priviledged user...
+      */
+
+      if (setgid(Group))
+        exit(errno);
+
+      if (setuid(User))
+        exit(errno);
     }
+
+   /*
+    * Reset group membership to just the main one we belong to.
+    */
+
+    setgroups(0, NULL);
 
    /*
     * Change umask to restrict permissions on created files...
@@ -2615,5 +2628,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.108 2001/02/07 19:41:37 mike Exp $".
+ * End of "$Id: job.c,v 1.109 2001/02/08 19:24:15 mike Exp $".
  */
