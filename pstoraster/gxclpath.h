@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gxclpath.h,v 1.2 2000/03/08 23:14:53 mike Exp $ */
+/*$Id: gxclpath.h,v 1.3 2001/03/16 20:42:06 mike Exp $ */
 /* Extends (requires) gxcldev.h */
 
 #ifndef gxclpath_INCLUDED
@@ -191,7 +191,7 @@ void cmd_clear_known(P2(gx_device_clist_writer * cldev, uint known));
 
 /* Write out values of any unknown parameters. */
 #define cmd_do_write_unknown(cldev, pcls, must_know)\
-  ( ~(pcls)->known & (must_know) ?\
+  ( ~((pcls)->known) & (must_know) ?\
     cmd_write_unknown(cldev, pcls, must_know) : 0 )
 int cmd_write_unknown(P3(gx_device_clist_writer * cldev, gx_clist_state * pcls,
 			 uint must_know));

@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gxclpath.c,v 1.2 2000/03/08 23:14:53 mike Exp $ */
+/*$Id: gxclpath.c,v 1.3 2001/03/16 20:42:06 mike Exp $ */
 /* Higher-level path operations for band lists */
 #include "math_.h"
 #include "memory_.h"
@@ -163,7 +163,7 @@ cmd_clear_known(gx_device_clist_writer * cldev, uint known)
     gx_clist_state *pcls = cldev->states;
     int i;
 
-    for (i = cldev->nbands; --i >= 0; ++pcls)
+    for (i = cldev->nbands - 1; i >= 0; i --, pcls ++)
 	pcls->known &= unknown;
 }
 

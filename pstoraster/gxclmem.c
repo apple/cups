@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gxclmem.c,v 1.5 2001/02/07 01:25:40 mike Exp $ */
+/*$Id: gxclmem.c,v 1.6 2001/03/16 20:42:06 mike Exp $ */
 /* RAM-based command list implementation */
 #include "memory_.h"
 #include "gx.h"
@@ -629,7 +629,7 @@ memfile_next_blk(MEMFILE * f)
     }				/* end else (when we are compressing)                           */
 #endif /* HAVE_LIBZ */
 
-    return (0);
+    return (ecode);
 }
 
 int	/* returns # of chars actually written */

@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gxclist.h,v 1.2 2000/03/08 23:14:53 mike Exp $ */
+/*$Id: gxclist.h,v 1.3 2001/03/16 20:42:06 mike Exp $ */
 /* Command list definitions for Ghostscript. */
 /* Requires gxdevice.h and gxdevmem.h */
 
@@ -132,18 +132,6 @@ typedef struct {
 #define ts_bits(cldev,pts) (ts_mask(pts) + (cldev)->tile_band_mask_size)
 } tile_slot;
 
-/* Define the prefix on each command run in the writing buffer. */
-typedef struct cmd_prefix_s cmd_prefix;
-struct cmd_prefix_s {
-    cmd_prefix *next;
-    uint size;
-};
-
-/* Define the pointers for managing a list of command runs in the buffer. */
-/* There is one of these for each band, plus one for band-range commands. */
-typedef struct cmd_list_s {
-    cmd_prefix *head, *tail;	/* list of commands for band */
-} cmd_list;
 
 /*
  * In order to keep the per-band state down to a reasonable size,
@@ -208,9 +196,9 @@ typedef struct gx_device_clist_writer_s {
     byte *cbuf;			/* start of command buffer */
     byte *cnext;		/* next slot in command buffer */
     byte *cend;			/* end of command buffer */
-    cmd_list *ccl;		/* &clist_state.list of last command */
+    cmd_list *ccl;	/* &clist_state.list of last command */
     cmd_list band_range_list;	/* list of band-range commands */
-    int band_range_min, band_range_max;		/* range for list */
+    int band_range_min, band_range_max;	/* range for list */
     uint tile_max_size;		/* max size of a single tile (bytes) */
     uint tile_max_count;	/* max # of hash table entries */
     gx_strip_bitmap tile_params;	/* current tile parameters */

@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gxclutil.c,v 1.1 2000/03/08 23:14:54 mike Exp $ */
+/*$Id: gxclutil.c,v 1.2 2001/03/16 20:42:06 mike Exp $ */
 /* Command list writing utilities. */
 
 #include "memory_.h"
@@ -495,9 +495,9 @@ cmd_set_tile_phase(gx_device_clist_writer * cldev, gx_clist_state * pcls,
     if (code < 0)
 	return code;
     ++dp;
-    cmd_putxy(pcls->tile_phase, dp);
     pcls->tile_phase.x = px;
     pcls->tile_phase.y = py;
+    cmd_putxy(pcls->tile_phase, dp);
     return 0;
 }
 

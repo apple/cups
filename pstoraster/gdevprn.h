@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gdevprn.h,v 1.4 2000/03/08 23:14:25 mike Exp $ */
+/*$Id: gdevprn.h,v 1.5 2001/03/16 20:42:06 mike Exp $ */
 /* Common header file for memory-buffered printers */
 
 #ifndef gdevprn_INCLUDED
@@ -37,7 +37,7 @@
 #include "gsutil.h"		/* for memflip8x8 */
 #include "gxdevice.h"
 #include "gxdevmem.h"
-#include "gxclist.h"
+#include "gxcldev.h"
 #include "gsparam.h"
 
 /*

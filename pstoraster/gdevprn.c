@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gdevprn.c,v 1.11 2001/03/08 15:13:14 mike Exp $ */
+/*$Id: gdevprn.c,v 1.12 2001/03/16 20:42:06 mike Exp $ */
 /* Generic printer driver support */
 #include "ctype_.h"
 #include "gdevprn.h"
@@ -815,10 +815,8 @@ gdev_prn_maybe_reallocate_memory(gx_device_printer *prdev,
 {
     int code = 0;
     gx_device *const pdev = (gx_device *)prdev;
-    gx_device_memory * const mdev = (gx_device_memory *)prdev;
 	
-    /* The first test here used to be prdev->open.  See News for 5.50. */
-    if (mdev->base != 0 &&
+    if (prdev->is_open &&
 	(memcmp(&prdev->space_params, old_sp, sizeof(*old_sp)) != 0 ||
 	 prdev->width != old_width || prdev->height != old_height )
 	) {

@@ -22,13 +22,12 @@
   GNU software to build or run it.
 */
 
-/*$Id: gxcldev.h,v 1.2 2000/03/08 23:14:51 mike Exp $ */
+/*$Id: gxcldev.h,v 1.3 2001/03/16 20:42:06 mike Exp $ */
 /* Internal definitions for Ghostscript command lists. */
 
 #ifndef gxcldev_INCLUDED
 #  define gxcldev_INCLUDED
 
-#include "gxclist.h"
 #include "gsropt.h"
 #include "gxht.h"		/* for gxdht.h */
 #include "gxtmap.h"		/* ditto */
@@ -247,6 +246,19 @@ typedef struct cmd_block_s {
 
 /* ---------------- Band state ---------------- */
 
+/* Define the prefix on each command run in the writing buffer. */
+typedef struct cmd_prefix_s cmd_prefix;
+struct cmd_prefix_s {
+    cmd_prefix *next;
+    uint size;
+};
+
+/* Define the pointers for managing a list of command runs in the buffer. */
+/* There is one of these for each band, plus one for band-range commands. */
+typedef struct cmd_list_s {
+    cmd_prefix *head, *tail;	/* list of commands for band */
+} cmd_list;
+
 /* Remember the current state of one band when writing or reading. */
 struct gx_clist_state_s {
     gx_color_index colors[2];	/* most recent colors */
@@ -280,6 +292,12 @@ struct gx_clist_state_s {
     /* Following is set when writing, read when reading */
     ulong cost;			/* cost of rendering the band */
 };
+
+/**** MRS: We need to include this here instead of the top to avoid lots of
+ ****      pointer errors.  Why the f**k does GS have to define so many
+ ****      interdependent structures?!?
+ ****/
+#include "gxclist.h"
 
 /* The initial values for a band state */
 /*static const gx_clist_state cls_initial */
@@ -555,6 +573,7 @@ int cmd_update_lop(P3(gx_device_clist_writer *, gx_clist_state *,
  * permanent_error, which prevents writing to the command list.
  */
 
+/**** MRS: Added cast to cdev->states since size of gx_clist_state is unknown ****/
 #define FOR_RECTS\
     BEGIN\
 	int yend = y + height;\
@@ -565,7 +584,7 @@ int cmd_update_lop(P3(gx_device_clist_writer *, gx_clist_state *,
 	  return (cdev->permanent_error);\
 	do {\
 	    int band = y / band_height;\
-	    gx_clist_state *pcls = cdev->states + band;\
+	    gx_clist_state *pcls = ((struct gx_clist_state_s *)cdev->states) + band;\
 	    int band_end = (band + 1) * band_height;\
 \
 	    height = min(band_end, yend) - y;\
