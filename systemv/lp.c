@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.17 2000/01/29 23:08:02 mike Exp $"
+ * "$Id: lp.c,v 1.18 2000/02/28 19:17:46 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -64,16 +64,17 @@ int
 main(int  argc,		/* I - Number of command-line arguments */
      char *argv[])	/* I - Command-line arguments */
 {
-  int		i;		/* Looping var */
+  int		i, j;		/* Looping vars */
   int		job_id;		/* Job ID */
-  const char	*dest;		/* Destination printer */
+  char		*printer,	/* Printer name */
+		*instance;	/* Instance name */ 
   char		*title;		/* Job title */
   int		priority;	/* Job priority (1-100) */
   int		num_copies;	/* Number of copies per file */
   int		num_files;	/* Number of files printed */
   int		num_dests;	/* Number of destinations */
   cups_dest_t	*dests,		/* Destinations */
-		*destptr;	/* Selected destination */
+		*dest;		/* Selected destination */
   int		num_options;	/* Number of options */
   cups_option_t	*options;	/* Options */
   int		silent;		/* Silent or verbose output? */
@@ -86,7 +87,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
   silent      = 0;
-  dest        = NULL;
+  printer     = NULL;
+  num_dests   = 0;
+  dests       = NULL;
   num_options = 0;
   options     = NULL;
   num_files   = 0;
@@ -101,11 +104,25 @@ main(int  argc,		/* I - Number of command-line arguments */
 
         case 'd' : /* Destination printer or class */
 	    if (argv[i][2] != '\0')
-	      dest = argv[i] + 2;
+	      printer = argv[i] + 2;
 	    else
 	    {
 	      i ++;
-	      dest = argv[i];
+	      printer = argv[i];
+	    }
+
+            if ((instance = strrchr(printer, '/')) != NULL)
+	      *instance++ = '\0';
+
+	    if (num_dests == 0)
+	      num_dests = cupsGetDests(&dests);
+
+            if ((dest = cupsGetDest(printer, instance, num_dests, dests)) != NULL)
+	    {
+	      for (j = 0; j < dest->num_options; j ++)
+	        num_options = cupsAddOption(dest->options[j].name,
+		                            dest->options[j].value,
+					    num_options, &options);
 	    }
 	    break;
 
@@ -197,10 +214,22 @@ main(int  argc,		/* I - Number of command-line arguments */
       * Print a file...
       */
 
-      if (dest == NULL)
-        dest = cupsGetDefault();
+      if (printer == NULL)
+      {
+        for (j = 0, dest = dests; j < num_dests; j ++, dest ++)
+	  if (dest->is_default)
+	  {
+	    printer = dests[j].name;
 
-      if (dest == NULL)
+	    for (j = 0; j < dest->num_options; j ++)
+	      num_options = cupsAddOption(dest->options[j].name,
+		                	  dest->options[j].value,
+					  num_options, &options);
+            break;
+	  }
+      }
+
+      if (printer == NULL)
       {
 	fputs("lp: error - no default destination available.\n", stderr);
 	return (1);
@@ -208,7 +237,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
       num_files ++;
       if (title)
-        job_id = cupsPrintFile(dest, argv[i], title, num_options, options);
+        job_id = cupsPrintFile(printer, argv[i], title, num_options, options);
       else
       {
         char *filename;
@@ -218,7 +247,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	else
 	  filename = argv[i];
 
-        job_id = cupsPrintFile(dest, argv[i], filename, num_options, options);
+        job_id = cupsPrintFile(printer, argv[i], filename, num_options, options);
       }
 
       if (job_id < 1)
@@ -228,7 +257,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	return (1);
       }
       else if (!silent)
-	fprintf(stderr, "request id is %s-%d (1 file(s))\n", dest, job_id);
+	fprintf(stderr, "request id is %s-%d (1 file(s))\n", printer, job_id);
     }
 
  /*
@@ -237,10 +266,22 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (num_files == 0)
   {
-    if (dest == NULL)
-      dest = cupsGetDefault();
+    if (printer == NULL)
+    {
+      for (j = 0, dest = dests; j < num_dests; j ++, dest ++)
+	if (dest->is_default)
+	{
+	  printer = dests[j].name;
 
-    if (dest == NULL)
+	  for (j = 0; j < dest->num_options; j ++)
+	    num_options = cupsAddOption(dest->options[j].name,
+		                	dest->options[j].value,
+					num_options, &options);
+          break;
+	}
+    }
+
+    if (printer == NULL)
     {
       fputs("lp: error - no default destination available.\n", stderr);
       return (1);
@@ -286,9 +327,9 @@ main(int  argc,		/* I - Number of command-line arguments */
     }
 
     if (title)
-      job_id = cupsPrintFile(dest, tempfile, title, num_options, options);
+      job_id = cupsPrintFile(printer, tempfile, title, num_options, options);
     else
-      job_id = cupsPrintFile(dest, tempfile, "(stdin)", num_options, options);
+      job_id = cupsPrintFile(printer, tempfile, "(stdin)", num_options, options);
 
     unlink(tempfile);
 
@@ -299,7 +340,7 @@ main(int  argc,		/* I - Number of command-line arguments */
       return (1);
     }
     else if (!silent)
-      fprintf(stderr, "request id is %s-%d (1 file(s))\n", dest, job_id);
+      fprintf(stderr, "request id is %s-%d (1 file(s))\n", printer, job_id);
   }
 
   return (0);
@@ -330,5 +371,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.17 2000/01/29 23:08:02 mike Exp $".
+ * End of "$Id: lp.c,v 1.18 2000/02/28 19:17:46 mike Exp $".
  */
