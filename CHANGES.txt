@@ -50,6 +50,10 @@ CHANGES IN CUPS V1.1.6
 	  and user-level access control.
 	- Added "-E" option to all printing commands to force
 	  encryption.
+	- The client code did not consume the response to the
+	  OPTIONS request when switching to secure mode.
+	- The scheduler did not output a Content-Length field
+	  when responding to an OPTIONS request.
 
 
 CHANGES IN CUPS V1.1.5-2

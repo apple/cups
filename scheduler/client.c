@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.80 2001/01/22 15:03:58 mike Exp $"
+ * "$Id: client.c,v 1.81 2001/01/24 14:16:01 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -46,6 +46,7 @@
 #include "cupsd.h"
 
 #ifdef HAVE_LIBSSL
+#  include <openssl/err.h>
 #  include <openssl/ssl.h>
 #  include <openssl/rand.h>
 #endif /* HAVE_LIBSSL */
@@ -306,7 +307,13 @@ EncryptClient(client_t *con)	/* I - Client to encrypt */
 #ifdef HAVE_LIBSSL
   SSL_CTX	*context;	/* Context for encryption */
   SSL		*conn;		/* Connection for encryption */
-  
+  int		error;		/* Error code */
+
+
+ /*
+  * Create the SSL context and accept the connection...
+  */
+
   context = SSL_CTX_new(SSLv23_method());
   conn    = SSL_new(context);
 
@@ -316,6 +323,9 @@ EncryptClient(client_t *con)	/* I - Client to encrypt */
   SSL_set_fd(conn, con->http.fd);
   if (SSL_accept(conn) != 1)
   {
+    while ((error = ERR_get_error()) != 0)
+      LogMessage(L_ERROR, "EncryptClient: %s", ERR_error_string(error, NULL));
+
     SSL_CTX_free(context);
     SSL_free(conn);
     return (0);
@@ -555,6 +565,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
 	httpPrintf(HTTP(con), "Connection: Upgrade\r\n");
 	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,SSL/2.0,SSL/3.0\r\n");
+	httpPrintf(HTTP(con), "Content-Length: 0\r\n");
 	httpPrintf(HTTP(con), "\r\n");
 
         EncryptClient(con);
@@ -574,6 +585,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
       }
 
       httpPrintf(HTTP(con), "Allow: GET, HEAD, OPTIONS, POST\r\n");
+      httpPrintf(HTTP(con), "Content-Length: 0\r\n");
       httpPrintf(HTTP(con), "\r\n");
     }
     else if (strstr(con->uri, "..") != NULL)
@@ -617,6 +629,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
 	httpPrintf(HTTP(con), "Connection: Upgrade\r\n");
 	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,SSL/2.0,SSL/3.0\r\n");
+	httpPrintf(HTTP(con), "Content-Length: 0\r\n");
 	httpPrintf(HTTP(con), "\r\n");
 
         EncryptClient(con);
@@ -1955,5 +1968,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.80 2001/01/22 15:03:58 mike Exp $".
+ * End of "$Id: client.c,v 1.81 2001/01/24 14:16:01 mike Exp $".
  */

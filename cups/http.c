@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.75 2001/01/22 15:03:24 mike Exp $"
+ * "$Id: http.c,v 1.76 2001/01/24 14:15:26 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -81,6 +81,7 @@
 #endif /* !WIN32 && !__EMX__ */
 
 #ifdef HAVE_LIBSSL
+#  include <openssl/err.h>
 #  include <openssl/rand.h>
 #  include <openssl/ssl.h>
 #endif /* HAVE_LIBSSL */
@@ -176,10 +177,9 @@ void
 httpInitialize(void)
 {
 #ifdef HAVE_LIBSSL
-#  if defined(WIN32) || defined(__EMX__)
-#  else
   struct timeval	curtime;	/* Current time in microseconds */
-#  endif /* WIN32 || __EMX__ */
+  int			i;		/* Looping var */
+  unsigned char		data[1024];	/* Seed data */
 #endif /* HAVE_LIBSSL */
 
 #if defined(WIN32) || defined(__EMX__)
@@ -207,6 +207,7 @@ httpInitialize(void)
 #endif /* WIN32 || __EMX__ */
 
 #ifdef HAVE_LIBSSL
+  SSL_load_error_strings();
   SSL_library_init();
 
  /*
@@ -214,11 +215,13 @@ httpInitialize(void)
   * it is the best we can do (on others, this seed isn't even used...)
   */
 
-#  if defined(WIN32) || defined(__EMX__)
-#  else
   gettimeofday(&curtime, NULL);
-  RAND_seed(&curtime, sizeof(curtime));
-#  endif /* WIN32 || __EMX__ */
+  srand(curtime.tv_sec + curtime.tv_usec);
+
+  for (i = 0; i < sizeof(data); i ++)
+    data[i] = rand(); /* Yes, this is a poor source of random data... */
+
+  RAND_seed(&data, sizeof(data));
 #endif /* HAVE_LIBSSL */
 }
 
@@ -1910,50 +1913,73 @@ http_send(http_t       *http,	/* I - HTTP data */
 static int			/* O - Status of connection */
 http_upgrade(http_t *http)	/* I - HTTP data */
 {
-  SSL_CTX	*context;	/* Context for encryption */
-  SSL		*conn;		/* Connection for encryption */
-  char		buffer[1024];	/* Status from server... */
+  int		ret;		/* Return value */
+  http_t	myhttp;		/* Local copy of HTTP data */
 
+
+  DEBUG_printf(("http_upgrade(%p)\n", http));
+
+ /*
+  * Copy the HTTP data to a local variable so we can do the OPTIONS
+  * request without interfering with the existing request data...
+  */
+
+  memcpy(&myhttp, http, sizeof(myhttp));
 
  /*
   * Send an OPTIONS request to the server, requiring SSL or TLS
   * encryption on the link...
   */
 
-  if (httpPrintf(http, "OPTIONS * HTTP/1.1\r\n") < 0)
-    return (-1);
-  if (httpPrintf(http, "Host: %s\r\n", http->hostname) < 0)
-    return (-1);
-  if (httpPrintf(http, "Connection: upgrade\r\n") < 0)
-    return (-1);
-  if (httpPrintf(http, "Upgrade: TLS/1.0, SSL/2.0, SSL/3.0\r\n") < 0)
-    return (-1);
-  if (httpPrintf(http, "\r\n") < 0)
-    return (-1);
+  httpClearFields(&myhttp);
+  httpSetField(&myhttp, HTTP_FIELD_CONNECTION, "upgrade");
+  httpSetField(&myhttp, HTTP_FIELD_UPGRADE, "TLS/1.0, SSL/2.0, SSL/3.0");
+
+  if ((ret = httpOptions(&myhttp, "*")) == 0)
+  {
+   /*
+    * Wait for the secure connection...
+    */
+
+    while (httpUpdate(&myhttp) == HTTP_CONTINUE);
+  }
+
+  httpFlush(&myhttp);
 
  /*
-  * Wait for the response data...
+  * Copy the HTTP data back over, if any...
   */
 
-  while (httpGets(buffer, sizeof(buffer), http) != NULL)
-    if (!buffer[0])
-      break;
+  http->fd         = myhttp.fd;
+  http->error      = myhttp.error;
+  http->activity   = myhttp.activity;
+  http->status     = myhttp.status;
+  http->version    = myhttp.version;
+  http->keep_alive = myhttp.keep_alive;
+  http->used       = myhttp.used;
 
-  context = SSL_CTX_new(SSLv23_method());
-  conn    = SSL_new(context);
+  if (http->used)
+    memcpy(http->buffer, myhttp.buffer, http->used);
 
-  SSL_set_fd(conn, http->fd);
-  if (SSL_connect(conn) != 1)
+  http->auth_type   = myhttp.auth_type;
+  http->nonce_count = myhttp.nonce_count;
+
+  memcpy(http->nonce, myhttp.nonce, sizeof(http->nonce));
+
+  http->tls        = myhttp.tls;
+  http->encryption = myhttp.encryption;
+
+ /*
+  * See if we actually went secure...
+  */
+
+  if (!http->tls)
   {
-    SSL_CTX_free(context);
-    SSL_free(conn);
+   /*
+    * Server does not support HTTP upgrade...
+    */
 
-#if defined(WIN32) || defined(__EMX__)
-    http->error  = WSAGetLastError();
-#else
-    http->error  = errno;
-#endif /* WIN32 || __EMX__ */
-    http->status = HTTP_ERROR;
+    DEBUG_puts("Server does not support HTTP upgrade!");
 
 #ifdef WIN32
     closesocket(http->fd);
@@ -1961,16 +1987,16 @@ http_upgrade(http_t *http)	/* I - HTTP data */
     close(http->fd);
 #endif
 
+    http->fd = -1;
+
     return (-1);
   }
-
-  http->tls = conn;
-
-  return (0);
+  else
+    return (ret);
 }
 #endif /* HAVE_LIBSSL */
 
 
 /*
- * End of "$Id: http.c,v 1.75 2001/01/22 15:03:24 mike Exp $".
+ * End of "$Id: http.c,v 1.76 2001/01/24 14:15:26 mike Exp $".
  */

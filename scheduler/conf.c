@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.67 2001/01/23 13:54:27 mike Exp $"
+ * "$Id: conf.c,v 1.68 2001/01/24 14:16:01 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -150,6 +150,10 @@ ReadConfiguration(void)
   char		*language;	/* Language string */
   struct passwd	*user;		/* Default user */
   struct group	*group;		/* Default group */
+#ifdef HAVE_LIBSSL
+  struct timeval curtime;	/* Current time in microseconds */
+  unsigned char	data[1024];	/* Seed data */
+#endif /* HAVE_LIBSSL */
 
 
  /*
@@ -478,6 +482,19 @@ ReadConfiguration(void)
 
   SSL_library_init();
   SSL_load_error_strings();
+
+ /*
+  * Using the current time is a dubious random seed, but on some systems
+  * it is the best we can do (on others, this seed isn't even used...)
+  */
+
+  gettimeofday(&curtime, NULL);
+  srand(curtime.tv_sec + curtime.tv_usec);
+
+  for (i = 0; i < sizeof(data); i ++)
+    data[i] = rand(); /* Yes, this is a poor source of random data... */
+
+  RAND_seed(&data, sizeof(data));
 #endif /* HAVE_LIBSSL */
 
  /*
@@ -1464,5 +1481,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.67 2001/01/23 13:54:27 mike Exp $".
+ * End of "$Id: conf.c,v 1.68 2001/01/24 14:16:01 mike Exp $".
  */
