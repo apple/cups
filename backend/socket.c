@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.6 1999/04/21 15:02:02 mike Exp $"
+ * "$Id: socket.c,v 1.7 1999/10/28 20:32:41 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -66,6 +66,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 		username[255],	/* Username info (not used) */
 		resource[1024];	/* Resource info (not used) */
   FILE		*fp;		/* Print file */
+  int		copies;		/* Number of copies to print */
   int		port;		/* Port number */
   int		fd;		/* AppSocket */
   int		error;		/* Error code (if any) */
@@ -93,7 +94,10 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   */
 
   if (argc == 6)
-    fp = stdin;
+  {
+    fp     = stdin;
+    copies = 1;
+  }
   else
   {
    /*
@@ -105,6 +109,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       perror("ERROR: unable to open print file");
       return (1);
     }
+
+    copies = atoi(argv[4]);
   }
 
  /*
@@ -135,91 +141,107 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   addr.sin_family = hostaddr->h_addrtype;
   addr.sin_port   = htons(port);
 
-  for (;;)
+  while (copies > 0)
   {
-    if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    for (;;)
     {
-      perror("ERROR: Unable to connect to printer");
-      return (1);
-    }
-
-    if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
-    {
-      error = errno;
-      close(fd);
-      fd = -1;
-
-      if (error == ECONNREFUSED)
-      {
-	fprintf(stderr, "INFO: Network host \'%s\' is busy; will retry in 30 seconds...\n",
-                hostname);
-	sleep(30);
-      }
-      else
+      if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
       {
 	perror("ERROR: Unable to connect to printer");
-        return (1);
+	return (1);
       }
-    }
-    else
-      break;
-  }
 
- /*
-  * Finally, send the print file...
-  */
-
-  fputs("INFO: Connected to host, sending print job...\n", stderr);
-
-  tbytes = 0;
-  while ((nbytes = fread(buffer, 1, sizeof(buffer), fp)) > 0)
-  {
-   /*
-    * Write the print data to the printer...
-    */
-
-    tbytes += nbytes;
-    bufptr = buffer;
-
-    while (nbytes > 0)
-    {
-      if ((wbytes = send(fd, bufptr, nbytes, 0)) < 0)
+      if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
       {
-	perror("ERROR: Unable to send print file to printer");
-	break;
-      }
+	error = errno;
+	close(fd);
+	fd = -1;
 
-      nbytes -= wbytes;
-      bufptr += wbytes;
+	if (error == ECONNREFUSED)
+	{
+	  fprintf(stderr, "INFO: Network host \'%s\' is busy; will retry in 30 seconds...\n",
+                  hostname);
+	  sleep(30);
+	}
+	else
+	{
+	  perror("ERROR: Unable to connect to printer");
+          return (1);
+	}
+      }
+      else
+	break;
     }
 
    /*
-    * Check for possible data coming back from the printer...
+    * Finally, send the print file...
     */
 
-    timeout.tv_sec = 0;
-    timeout.tv_usec = 0;
-    FD_ZERO(&input);
-    FD_SET(fd, &input);
-    if (select(fd + 1, &input, NULL, NULL, &timeout) > 0)
+    copies --;
+
+    if (fp != stdin)
+    {
+      fputs("PAGE: 1 1\n", stderr);
+      rewind(fp);
+    }
+
+    fputs("INFO: Connected to host, sending print job...\n", stderr);
+
+    tbytes = 0;
+    while ((nbytes = fread(buffer, 1, sizeof(buffer), fp)) > 0)
     {
      /*
-      * Grab the data coming back and spit it out to stderr...
+      * Write the print data to the printer...
       */
 
-      if ((nbytes = recv(fd, buffer, sizeof(buffer), 0)) > 0)
-	fprintf(stderr, "INFO: Received %u bytes of back-channel data!\n",
-	        nbytes);
+      tbytes += nbytes;
+      bufptr = buffer;
+
+      while (nbytes > 0)
+      {
+	if ((wbytes = send(fd, bufptr, nbytes, 0)) < 0)
+	{
+	  perror("ERROR: Unable to send print file to printer");
+	  break;
+	}
+
+	nbytes -= wbytes;
+	bufptr += wbytes;
+      }
+
+     /*
+      * Check for possible data coming back from the printer...
+      */
+
+      timeout.tv_sec = 0;
+      timeout.tv_usec = 0;
+      FD_ZERO(&input);
+      FD_SET(fd, &input);
+      if (select(fd + 1, &input, NULL, NULL, &timeout) > 0)
+      {
+       /*
+	* Grab the data coming back and spit it out to stderr...
+	*/
+
+	if ((nbytes = recv(fd, buffer, sizeof(buffer), 0)) > 0)
+	  fprintf(stderr, "INFO: Received %u bytes of back-channel data!\n",
+	          nbytes);
+      }
+      else if (argc > 6)
+	fprintf(stderr, "INFO: Sending print file, %u bytes...\n", tbytes);
     }
-    else if (argc > 6)
-      fprintf(stderr, "INFO: Sending print file, %u bytes...\n", tbytes);
+
+   /*
+    * Close the socket connection...
+    */
+
+    close(fd);
   }
 
  /*
-  * Close the socket connection and input file and return...
+  * Close the input file and return...
   */
 
-  close(fd);
   if (fp != stdin)
     fclose(fp);
 
@@ -228,5 +250,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.6 1999/04/21 15:02:02 mike Exp $".
+ * End of "$Id: socket.c,v 1.7 1999/10/28 20:32:41 mike Exp $".
  */

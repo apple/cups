@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c,v 1.6 1999/06/18 18:36:03 mike Exp $"
+ * "$Id: parallel.c,v 1.7 1999/10/28 20:32:41 mike Exp $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -63,6 +63,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 		*options;	/* Pointer to options */
   int		port;		/* Port number (not used) */
   FILE		*fp;		/* Print file */
+  int		copies;		/* Number of copies to print */
   int		fd;		/* Parallel device */
   int		error;		/* Error code (if any) */
   size_t	nbytes,		/* Number of bytes written */
@@ -83,7 +84,10 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   */
 
   if (argc == 6)
-    fp = stdin;
+  {
+    fp     = stdin;
+    copies = 1;
+  }
   else
   {
    /*
@@ -95,6 +99,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       perror("ERROR: unable to open print file");
       return (1);
     }
+
+    copies = atoi(argv[4]);
   }
 
  /*
@@ -143,23 +149,34 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Finally, send the print file...
   */
 
-  tbytes = 0;
-  while ((nbytes = fread(buffer, 1, sizeof(buffer), fp)) > 0)
+  while (copies > 0)
   {
-   /*
-    * Write the print data to the printer...
-    */
+    copies --;
 
-    if (write(fd, buffer, nbytes) < nbytes)
+    if (fp != stdin)
     {
-      perror("ERROR: Unable to send print file to printer");
-      break;
+      fputs("PAGE: 1 1\n", stderr);
+      rewind(fp);
     }
-    else
-      tbytes += nbytes;
 
-    if (argc > 6)
-      fprintf(stderr, "INFO: Sending print file, %u bytes...\n", tbytes);
+    tbytes = 0;
+    while ((nbytes = fread(buffer, 1, sizeof(buffer), fp)) > 0)
+    {
+     /*
+      * Write the print data to the printer...
+      */
+
+      if (write(fd, buffer, nbytes) < nbytes)
+      {
+	perror("ERROR: Unable to send print file to printer");
+	break;
+      }
+      else
+	tbytes += nbytes;
+
+      if (argc > 6)
+	fprintf(stderr, "INFO: Sending print file, %u bytes...\n", tbytes);
+    }
   }
 
  /*
@@ -175,5 +192,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: parallel.c,v 1.6 1999/06/18 18:36:03 mike Exp $".
+ * End of "$Id: parallel.c,v 1.7 1999/10/28 20:32:41 mike Exp $".
  */

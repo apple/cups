@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.13 1999/10/25 16:17:06 mike Exp $"
+ * "$Id: ipp.c,v 1.14 1999/10/28 20:32:40 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -133,8 +133,6 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   request->request.op.operation_id = IPP_PRINT_JOB;
   request->request.op.request_id   = 1;
 
-  snprintf(uri, sizeof(uri), "%s://%s:%d%s", method, hostname, port, resource);
-
   language = cupsLangDefault();
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
@@ -144,13 +142,21 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
                "attributes-natural-language", NULL,
                language != NULL ? language->language : "C");
 
+  snprintf(uri, sizeof(uri), "%s://%s:%d%s", method, hostname, port, resource);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
+
+  fprintf(stderr, "DEBUG: printer-uri = \"%s\"\n", uri);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
                NULL, argv[2]);
 
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL, argv[3]);
+  fprintf(stderr, "DEBUG: requesting-user-name = \"%s\"\n", argv[2]);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL,
+               argv[3]);
+
+  fprintf(stderr, "DEBUG: job-name = \"%s\"\n", argv[3]);
 
  /*
   * Handle options on the command-line...
@@ -362,8 +368,16 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       ippRead(http, response);
 
       if (response->request.status.status_code > IPP_OK_CONFLICT)
+      {
+        ipp_attribute_t	*attr;
+
         fprintf(stderr, "ERROR: Print file was not accepted (%04x)!\n",
 	        response->request.status.status_code);
+
+        for (attr = response->attrs; attr != NULL; attr = attr->next)
+	  if (attr->name != NULL)
+	    fprintf(stderr, "ERROR: attribute \"%s\"\n", attr->name);
+      }
       else if ((job_id = ippFindAttribute(response, "job-id", IPP_TAG_INTEGER)) == NULL)
         fputs("INFO: Print file accepted - job ID unknown.\n", stderr);
       else
@@ -402,7 +416,12 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   */
 
   if (fp != stdin)
+  {
+    if (status == HTTP_OK)
+      fprintf(stderr, "PAGE: 1 %d\n", atoi(argv[4]));
+
     fclose(fp);
+  }
 
  /*
   * Return the queue status...
@@ -413,5 +432,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.13 1999/10/25 16:17:06 mike Exp $".
+ * End of "$Id: ipp.c,v 1.14 1999/10/28 20:32:40 mike Exp $".
  */

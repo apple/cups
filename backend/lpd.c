@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.11 1999/10/12 18:19:30 mike Exp $"
+ * "$Id: lpd.c,v 1.12 1999/10/28 20:32:40 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -140,8 +140,17 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Queue the job...
   */
 
-  status = lpd_queue(hostname, resource + 1, filename,
-                     argv[2] /* user */, atoi(argv[4]) /* copies */);
+  if (argc > 6)
+  {
+    status = lpd_queue(hostname, resource + 1, filename,
+                       argv[2] /* user */, atoi(argv[4]) /* copies */);
+
+    if (!status)
+      fprintf(stderr, "PAGE: 1 %d\n", atoi(argv[4]));
+  }
+  else
+    status = lpd_queue(hostname, resource + 1, filename,
+                       argv[2] /* user */, 1);
 
  /*
   * Remove the temporary file if necessary...
@@ -316,6 +325,7 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
   while (copies > 0)
   {
+    
     snprintf(cptr, sizeof(control) - (cptr - control), "ldfA%03.3d%s\n",
              getpid() % 1000, localhost);
     cptr   += strlen(cptr);
@@ -394,5 +404,5 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
 
 /*
- * End of "$Id: lpd.c,v 1.11 1999/10/12 18:19:30 mike Exp $".
+ * End of "$Id: lpd.c,v 1.12 1999/10/28 20:32:40 mike Exp $".
  */
