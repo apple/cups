@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.4 1999/03/01 20:51:55 mike Exp $"
+ * "$Id: util.c,v 1.5 1999/03/01 22:24:24 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -34,6 +34,8 @@
 #include "language.h"
 #include "string.h"
 #include "debug.h"
+#include <stdlib.h>
+#include <ctype.h>
 #include <errno.h>
 #include <sys/stat.h>
 
@@ -83,7 +85,7 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
   int			i;			/* Looping var */
   int			n, n2;			/* Attribute values */
   char			*name,			/* Name of option */
-			*val;			/* Pointer to option value */
+			*val,			/* Pointer to option value */
 			*s;			/* Pointer into option value */
   http_t		*http;			/* HTTP connection */
   ipp_t			*request;		/* IPP request */
@@ -191,7 +193,7 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
    /*
     * See what the option value is; for compatibility with older interface
     * scripts, we have to support single-argument options, option SPACE value,
-    * option=value, and option=low-high.
+    * option=value, option=low-high, and option=MxN.
     */
 
     name = options[i].name;
@@ -250,27 +252,52 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
       s = "";
     }
 
-    if (*s != '\0' && *s != '-')
+    if (*s != '\0' && *s != '-' && (*s != 'x' || s == val))
     {
      /*
       * String value(s)...
       */
+
+      DEBUG_printf(("cupsPrintJob: Adding string option \'%s\' with value \'%s\'...\n",
+                    name, val));
 
       attr = ippAddString(request, IPP_TAG_JOB, name, val);
     }
     else if (val != NULL)
     {
      /*
-      * Numeric value or range...
+      * Numeric value, range, or resolution...
       */
 
       if (*s == '-')
       {
         n2   = strtol(s + 1, NULL, 0);
         attr = ippAddRange(request, IPP_TAG_JOB, name, n, n2);
+
+	DEBUG_printf(("cupsPrintJob: Adding range option \'%s\' with value %d-%d...\n",
+                      name, n, n2));
+      }
+      else if (*s == 'x')
+      {
+        n2 = strtol(s + 1, &s, 0);
+
+	if (strcmp(s, "dpc") == 0 || strcmp(s, "cm") == 0)
+          attr = ippAddResolution(request, IPP_TAG_JOB, name, n, n2,
+	                          IPP_RES_PER_CM);
+        else
+          attr = ippAddResolution(request, IPP_TAG_JOB, name, n, n2,
+	                          IPP_RES_PER_INCH);
+
+	DEBUG_printf(("cupsPrintJob: Adding resolution option \'%s\' with value %dx%d%s...\n",
+                      name, n, n2, s));
       }
       else
+      {
         attr = ippAddInteger(request, IPP_TAG_JOB, name, n);
+
+	DEBUG_printf(("cupsPrintJob: Adding integer option \'%s\' with value %d...\n",
+                      name, n));
+      }
     }
     else
     {
@@ -278,6 +305,8 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
       * Boolean value...
       */
 
+      DEBUG_printf(("cupsPrintJob: Adding boolean option \'%s\' with value %d...\n",
+                    name, n));
       attr = ippAddBoolean(request, IPP_TAG_JOB, name, n);
     }
   }
@@ -362,5 +391,5 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
 
 
 /*
- * End of "$Id: util.c,v 1.4 1999/03/01 20:51:55 mike Exp $".
+ * End of "$Id: util.c,v 1.5 1999/03/01 22:24:24 mike Exp $".
  */

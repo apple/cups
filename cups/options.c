@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c,v 1.2 1999/02/26 15:10:25 mike Exp $"
+ * "$Id: options.c,v 1.3 1999/03/01 22:24:24 mike Exp $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -49,28 +49,53 @@ cupsAddOption(char          *name,		/* I - Name of option */
 	      int           num_options,	/* I - Number of options */
               cups_option_t **options)		/* IO - Pointer to options */
 {
+  int		i;				/* Looping var */
   cups_option_t	*temp;				/* Pointer to new option */
 
 
   if (name == NULL || value == NULL || options == NULL)
     return (0);
 
-  if (num_options == 0)
-    temp = (cups_option_t *)malloc(sizeof(cups_option_t));
+ /*
+  * Look for an existing option with the same name...
+  */
+
+  for (i = 0, temp = *options; i < num_options; i ++, temp ++)
+    if (strcmp(temp->name, name) == 0)
+      break;
+
+  if (i >= num_options)
+  {
+   /*
+    * No matching option name...
+    */
+
+    if (num_options == 0)
+      temp = (cups_option_t *)malloc(sizeof(cups_option_t));
+    else
+      temp = (cups_option_t *)realloc(*options, sizeof(cups_option_t) *
+                                        	(num_options + 1));
+
+    if (temp == NULL)
+      return (0);
+
+    *options    = temp;
+    temp        += num_options;
+    temp->name  = strdup(name);
+    num_options ++;
+  }
   else
-    temp = (cups_option_t *)realloc(*options, sizeof(cups_option_t) *
-                                              (num_options + 1));
+  {
+   /*
+    * Match found; free the old value...
+    */
 
-  if (temp == NULL)
-    return (0);
+    free(temp->value);
+  }
 
-  *options = temp;
-  temp     += num_options;
-
-  temp->name  = strdup(name);
   temp->value = strdup(value);
 
-  return (num_options + 1);
+  return (num_options);
 }
 
 
@@ -243,5 +268,5 @@ cupsParseOptions(char          *arg,		/* I - Argument to parse */
 
 
 /*
- * End of "$Id: options.c,v 1.2 1999/02/26 15:10:25 mike Exp $".
+ * End of "$Id: options.c,v 1.3 1999/03/01 22:24:24 mike Exp $".
  */

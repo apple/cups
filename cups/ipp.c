@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.7 1999/03/01 20:51:52 mike Exp $"
+ * "$Id: ipp.c,v 1.8 1999/03/01 22:24:23 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -77,6 +77,8 @@ ippAddBoolean(ipp_t     *ipp,		/* I - IPP request */
   ipp_attribute_t	*attr;		/* New attribute */
 
 
+  DEBUG_printf(("ippAddBoolean(%08x, %02x, \'%s\', %d)\n", ipp, group, name, value));
+
   if (ipp == NULL || name == NULL)
     return (NULL);
 
@@ -107,6 +109,9 @@ ippAddBooleans(ipp_t     *ipp,		/* I - IPP request */
   ipp_attribute_t	*attr;		/* New attribute */
 
 
+  DEBUG_printf(("ippAddBooleans(%08x, %02x, \'%s\', %d, %d, ...)\n", ipp,
+                group, name, num_values, values[0]));
+
   if (ipp == NULL || name == NULL || values == NULL)
     return (NULL);
 
@@ -136,6 +141,9 @@ ippAddDate(ipp_t     *ipp,		/* I - IPP request */
 {
   ipp_attribute_t	*attr;		/* New attribute */
 
+
+  DEBUG_printf(("ippAddDate(%08x, %02x, \'%s\', %08x)\n", ipp, group, name,
+                value));
 
   if (ipp == NULL || name == NULL || value == NULL)
     return (NULL);
@@ -176,7 +184,7 @@ ippAddInteger(ipp_t     *ipp,		/* I - IPP request */
 
   attr->name              = strdup(name);
   attr->group_tag         = group;
-  attr->value_tag         = IPP_TAG_BOOLEAN;
+  attr->value_tag         = IPP_TAG_INTEGER;
   attr->values[0].integer = value;
 
   return (attr);
@@ -206,7 +214,7 @@ ippAddIntegers(ipp_t     *ipp,		/* I - IPP request */
 
   attr->name      = strdup(name);
   attr->group_tag = group;
-  attr->value_tag = IPP_TAG_BOOLEAN;
+  attr->value_tag = IPP_TAG_INTEGER;
 
   for (i = 0; i < num_values; i ++)
     attr->values[i].integer = values[i];
@@ -1326,5 +1334,5 @@ add_attr(ipp_t *ipp,			/* I - IPP request */
 
 
 /*
- * End of "$Id: ipp.c,v 1.7 1999/03/01 20:51:52 mike Exp $".
+ * End of "$Id: ipp.c,v 1.8 1999/03/01 22:24:23 mike Exp $".
  */
