@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.31 2000/04/30 22:03:56 mike Exp $"
+# "$Id: Makefile,v 1.32 2000/05/12 19:07:22 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -95,9 +95,9 @@ $(HPGLOBJS):	hpgltops.h
 # libcupsimage.so.2, libcupsimage.sl.2
 #
 
-libcupsimage.so.2 libcupsimage.sl.2:	$(IMAGEOBJS) raster.o ../Makedefs
+libcupsimage.so.2 libcupsimage.sl.2:	$(IMAGEOBJS) ../Makedefs
 	echo Linking $@...
-	$(DSO) $@ $(IMAGEOBJS) raster.o $(DSOLIBS) -lm
+	$(DSO) $@ $(IMAGEOBJS) $(DSOLIBS) -lm
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
 
@@ -106,9 +106,9 @@ libcupsimage.so.2 libcupsimage.sl.2:	$(IMAGEOBJS) raster.o ../Makedefs
 # libcupsimage.la
 #
 
-libcupsimage.la:       $(IMAGEOBJS) raster.o ../Makedefs
+libcupsimage.la:       $(IMAGEOBJS) ../Makedefs
 	echo Linking $@...
-	$(CC) -o $@ $(IMAGEOBJS:.o=.lo) raster.lo -rpath $(LIBDIR) \
+	$(CC) -o $@ $(IMAGEOBJS:.o=.lo) -rpath $(LIBDIR) \
 		-version-info 2:0
 
 
@@ -116,10 +116,10 @@ libcupsimage.la:       $(IMAGEOBJS) raster.o ../Makedefs
 # libcupsimage.a
 #
 
-libcupsimage.a:	$(IMAGEOBJS) raster.o ../Makedefs
+libcupsimage.a:	$(IMAGEOBJS) ../Makedefs
 	echo Archiving $@...
 	$(RM) $@
-	$(AR) $(ARFLAGS) $@ $(IMAGEOBJS) raster.o
+	$(AR) $(ARFLAGS) $@ $(IMAGEOBJS)
 	$(RANLIB) $@
 
 $(IMAGEOBJS):	image.h
@@ -198,5 +198,5 @@ $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 
 #
-# End of "$Id: Makefile,v 1.31 2000/04/30 22:03:56 mike Exp $".
+# End of "$Id: Makefile,v 1.32 2000/05/12 19:07:22 mike Exp $".
 #
