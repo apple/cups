@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.22.2.14 2002/10/01 17:24:26 mike Exp $"
+ * "$Id: lpadmin.c,v 1.22.2.15 2002/10/02 19:15:08 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -849,18 +849,21 @@ add_printer_to_class(http_t *http,	/* I - Server connection */
 
     return (1);
   }
-  else
+  else if (response->request.status.status_code > IPP_OK_CONFLICT)
   {
-    if (response->request.status.status_code > IPP_OK_CONFLICT)
-      fprintf(stderr, "lpadmin: add-class failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+    fprintf(stderr, "lpadmin: add-class failed: %s\n",
+            ippErrorString(response->request.status.status_code));
 
     ippDelete(response);
 
     return (1);
   }
+  else
+  {
+    ippDelete(response);
 
-  return (0);
+    return (0);
+  }
 }
 
 
@@ -2015,5 +2018,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.22.2.14 2002/10/01 17:24:26 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.22.2.15 2002/10/02 19:15:08 mike Exp $".
  */
