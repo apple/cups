@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.49 1999/09/08 20:09:36 mike Exp $"
+ * "$Id: http.c,v 1.50 1999/10/07 19:13:34 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1305,7 +1305,10 @@ httpEncode64(char       *out,	/* I - String to write to */
 
     in ++;
     if (*in == '\0')
+    {
+      *outptr ++ = '=';
       break;
+    }
 
     *outptr ++ = base64[((in[0] << 2) | (in[1] >> 6)) & 63];
 
@@ -1479,5 +1482,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.49 1999/09/08 20:09:36 mike Exp $".
+ * End of "$Id: http.c,v 1.50 1999/10/07 19:13:34 mike Exp $".
  */
