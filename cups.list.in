@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in,v 1.13.2.19 2003/05/15 17:48:30 mike Exp $"
+# "$Id: cups.list.in,v 1.13.2.20 2003/06/14 13:35:49 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -46,8 +46,8 @@
 %provides libcupsys2-dev
 
 %format rpm deb portable
-%provides libcups.so.2
-%provides libcupsimage.so.2
+%provides @LIBCUPS@
+%provides @LIBCUPSIMAGE@
 %format all
 
 #
@@ -102,6 +102,8 @@ $CAT5EXT=@CAT5EXT@
 $CAT8EXT=@CAT8EXT@
 $MAN8EXT=@MAN8EXT@
 $MAN8DIR=@MAN8DIR@
+
+$DSOLIBS=@DSOLIBS@
 
 # Make sure the MD5 password file is now owned by CUPS_USER...
 %postinstall if test -f $SERVERROOT/passwd.md5; then
@@ -184,6 +186,7 @@ l 0555 root sys /usr/bsd/lprm $BINDIR/lprm
 %system all
 
 # DSOs
+%if DSOLIBS
 %system hpux
 f 0555 root sys $LIBDIR/libcups.sl.2 cups/libcups.sl.2
 l 0555 root sys $LIBDIR/libcups.sl libcups.sl.2
@@ -203,6 +206,7 @@ l 0555 root sys $LIBDIR/libcups.so libcups.so.2
 f 0555 root sys $LIBDIR/libcupsimage.so.2 filter/libcupsimage.so.2
 l 0555 root sys $LIBDIR/libcupsimage.so libcupsimage.so.2
 %system all
+%endif
 
 # Directories
 d 0755 root sys $LOGDIR -
@@ -408,5 +412,5 @@ f 0444 root sys $AMANDIR/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list.in,v 1.13.2.19 2003/05/15 17:48:30 mike Exp $".
+# End of "$Id: cups.list.in,v 1.13.2.20 2003/06/14 13:35:49 mike Exp $".
 #

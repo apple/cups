@@ -3,6 +3,12 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The French and German option-conflict.tmpl template
+	  files did not get installed (STR #148)
+	- The cups.list.in file did not work when compiling
+	  without shared libraries (STR #149)
+	- The DSOFLAGS included the LDFLAGS, which causes
+	  problems on at least HP-UX (STR #150)
 	- The fax printer support did not keep track of the fax
 	  capability bit (STR #144)
 	- The appleLangDefault() function could leak a small

@@ -1,5 +1,5 @@
 /*
- * "$Id: file.c,v 1.1.2.3 2003/04/10 14:13:53 mike Exp $"
+ * "$Id: file.c,v 1.1.2.4 2003/06/14 13:35:50 mike Exp $"
  *
  *   File functions for the Common UNIX Printing System (CUPS).
  *
@@ -830,7 +830,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
     * Decompress data from the buffer...
     */
 
-    fp->stream.next_out  = fp->buf;
+    fp->stream.next_out  = (Bytef *)fp->buf;
     fp->stream.avail_out = sizeof(fp->buf);
 
     if (inflate(&(fp->stream), Z_NO_FLUSH) == Z_STREAM_END)
@@ -969,5 +969,5 @@ cups_write(int        fd,		/* I - File descriptor */
 
 
 /*
- * End of "$Id: file.c,v 1.1.2.3 2003/04/10 14:13:53 mike Exp $".
+ * End of "$Id: file.c,v 1.1.2.4 2003/06/14 13:35:50 mike Exp $".
  */
