@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.14 2000/09/19 16:37:00 mike Exp $"
+ * "$Id: admin.c,v 1.15 2000/09/26 20:40:20 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -78,6 +78,8 @@ main(int  argc,			/* I - Number of command-line arguments */
  /*
   * Send a standard header...
   */
+
+  setbuf(stdout, NULL);
 
   printf("Content-Type: text/html;charset=%s\n\n", cupsLangEncoding(language));
 
@@ -544,8 +546,10 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 
     oldinfo = cupsDoRequest(http, request, "/");
   }
+  else
+    oldinfo = NULL;
 
-  if (cgiGetVariable("PRINTER_LOCATION") == NULL)
+  if ((name = cgiGetVariable("PRINTER_NAME")) == NULL)
   {
     if (modify)
     {
@@ -573,7 +577,6 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     return;
   }
 
-  name = cgiGetVariable("PRINTER_NAME");
   if (isdigit(*name))
     ptr = name;
   else
@@ -1577,5 +1580,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.14 2000/09/19 16:37:00 mike Exp $".
+ * End of "$Id: admin.c,v 1.15 2000/09/26 20:40:20 mike Exp $".
  */
