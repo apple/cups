@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.15 2002/05/16 13:59:59 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.16 2002/05/23 17:55:02 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -1298,7 +1298,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	      break;
 	    }
       }
-      else
+      else if (strcmp(keyword + 7, option->keyword) == 0)
         strlcpy(option->defchoice, string, sizeof(option->defchoice));
     }
     else if (strcmp(keyword, "UIConstraints") == 0 ||
@@ -1421,7 +1421,8 @@ ppdOpen(FILE *fp)		/* I - File to read from */
     }
     else if (option != NULL &&
              (mask & (PPD_KEYWORD | PPD_OPTION | PPD_STRING)) ==
-	         (PPD_KEYWORD | PPD_OPTION | PPD_STRING))
+	         (PPD_KEYWORD | PPD_OPTION | PPD_STRING) &&
+	     strcmp(keyword, option->keyword) == 0)
     {
       DEBUG_printf(("group = %p, subgroup = %p\n", group, subgroup));
 
@@ -2147,5 +2148,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.15 2002/05/16 13:59:59 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.16 2002/05/23 17:55:02 mike Exp $".
  */

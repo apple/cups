@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- Fixed handling of invalid PPD attributes inside
+	  OpenUI/CloseUI.
 	- Fixed a problem with SSL and the job, printer, and
 	  admin CGIs on ports other than 443.
 	- The scheduler didn't handle AuthClass properly.
