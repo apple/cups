@@ -30,6 +30,8 @@ CHANGES IN CUPS V1.1.7-1
 	  generating PostScript for a non-PostScript printer
 	  (only affects page-label and Classification
 	   options.)
+	- The updated pdftops filter was looking for an options
+	  file called xpdf.conf instead of pdftops.conf.
 
 
 CHANGES IN CUPS V1.1.7

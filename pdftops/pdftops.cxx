@@ -181,7 +181,7 @@ int main(int argc, char *argv[]) {
   // read config file
 #ifdef HAVE_LIBCUPS
   if ((server_root = getenv("CUPS_SERVERROOT")) != NULL) {
-    sprintf(tempfile, "%s/xpdf.conf", server_root);
+    sprintf(tempfile, "%s/pdftops.conf", server_root);
     initParams(tempfile);
   } else
 #endif /* HAVE_LIBCUPS */
