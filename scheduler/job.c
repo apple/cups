@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.61 2000/04/11 21:02:10 mike Exp $"
+ * "$Id: job.c,v 1.62 2000/04/19 18:36:52 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -438,7 +438,15 @@ LoadAllJobs(void)
 	continue;
       }
 
-      attr = ippFindAttribute(job->attrs, "job-printer-uri", IPP_TAG_URI);
+      if ((attr = ippFindAttribute(job->attrs, "job-printer-uri", IPP_TAG_URI)) == NULL)
+      {
+        LogMessage(L_ERROR, "LoadAllJobs: No job-printer-uri attribute in control file \"%s\"!",
+	           filename);
+	ippDelete(job->attrs);
+	free(job);
+	continue;
+      }
+
       httpSeparate(attr->values[0].string.text, method, username, host,
                    &port, resource);
 
@@ -2305,5 +2313,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.61 2000/04/11 21:02:10 mike Exp $".
+ * End of "$Id: job.c,v 1.62 2000/04/19 18:36:52 mike Exp $".
  */
