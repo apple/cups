@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.34.2.11 2003/03/10 19:07:17 mike Exp $"
+ * "$Id: classes.c,v 1.34.2.12 2003/03/10 19:28:23 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -460,7 +460,7 @@ LoadAllClasses(void)
 
 	if ((temp = AddPrinter(value)) != NULL)
 	{
-	  strcpy(temp->make_model, "Remote Printer on unknown");
+	  SetString(&temp->make_model, "Remote Printer on unknown");
 
           temp->state       = IPP_PRINTER_STOPPED;
 	  temp->type        |= CUPS_PRINTER_REMOTE;
@@ -675,5 +675,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.34.2.11 2003/03/10 19:07:17 mike Exp $".
+ * End of "$Id: classes.c,v 1.34.2.12 2003/03/10 19:28:23 mike Exp $".
  */
