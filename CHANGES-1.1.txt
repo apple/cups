@@ -5,6 +5,7 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- The scheduler didn't handle AuthClass properly.
 	- Added French translation of man pages.
 	- Updated the text filter to support the const_cast,
 	  dynamic_cast, and static_cast keywords in ISO C++.
