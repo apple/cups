@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.c,v 1.2.2.10 2004/06/29 13:15:09 mike Exp $"
+ * "$Id: raster.c,v 1.2.2.11 2004/10/05 20:22:37 mike Exp $"
  *
  *   Raster file routines for the Common UNIX Printing System (CUPS).
  *
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -595,10 +595,10 @@ cups_raster_read_header(cups_raster_t *r)	/* I - Raster stream */
   */
 
   if (r->sync == CUPS_RASTER_REVSYNC || r->sync == CUPS_RASTER_REVSYNCv1)
-    for (len = 68, s = (union swap_s *)&(r->header.AdvanceDistance);
+    for (len = 74, s = (union swap_s *)&(r->header.AdvanceDistance);
 	 len > 0;
 	 len --, s ++)
-      s->v = (((((s->b[3] << 8) | s->b[2]) << 8) | s->b[1]) << 8) | s->b[0];
+      s->v = (((((s->b[0] << 8) | s->b[1]) << 8) | s->b[2]) << 8) | s->b[3];
 
  /*
   * Update the header and row count...
@@ -873,5 +873,5 @@ cups_write(int        fd,			/* I - File descriptor */
 
 
 /*
- * End of "$Id: raster.c,v 1.2.2.10 2004/06/29 13:15:09 mike Exp $".
+ * End of "$Id: raster.c,v 1.2.2.11 2004/10/05 20:22:37 mike Exp $".
  */

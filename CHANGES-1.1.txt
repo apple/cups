@@ -1,6 +1,12 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.22
+
+	- cupsRasterReadHeader() didn't swap bytes for the
+	  numeric fields properly (STR #930)
+
+
 CHANGES IN CUPS V1.1.22rc1
 
 	- Now sanitize the device URI that is reported in the
