@@ -1,5 +1,5 @@
 /*
- * "$Id: lpoptions.c,v 1.9.2.6 2003/01/07 18:27:31 mike Exp $"
+ * "$Id: lpoptions.c,v 1.9.2.7 2003/03/04 15:34:59 mike Exp $"
  *
  *   Printer option program for the Common UNIX Printing System (CUPS).
  *
@@ -148,11 +148,11 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      if (num_dests == 0)
 		num_dests = cupsGetDests(&dests);
 
-	      for (i = num_dests, dest = dests; i > 0; i --, dest ++)
+	      for (j = num_dests, dest = dests; j > 0; j --, dest ++)
 	        if (dest->is_default)
 		  break;
 
-              if (i == 0)
+              if (j == 0)
 	        dest = dests;
 	    }
 
@@ -444,5 +444,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpoptions.c,v 1.9.2.6 2003/01/07 18:27:31 mike Exp $".
+ * End of "$Id: lpoptions.c,v 1.9.2.7 2003/03/04 15:34:59 mike Exp $".
  */

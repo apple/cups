@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.19.2.8 2003/01/24 20:45:20 mike Exp $"
+ * "$Id: log.c,v 1.19.2.9 2003/03/04 15:34:57 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -211,11 +211,13 @@ int				/* O - 1 on success, 0 on error */
 LogPage(job_t       *job,	/* I - Job being printed */
         const char  *page)	/* I - Page being printed */
 {
-  ipp_attribute_t *billing;	/* job-billing attribute */
+  ipp_attribute_t *billing,	/* job-billing attribute */
+                  *hostname;	/* job-originating-host-name attribute */
 
 
-
-  billing = ippFindAttribute(job->attrs, "job-billing", IPP_TAG_ZERO);
+  billing  = ippFindAttribute(job->attrs, "job-billing", IPP_TAG_ZERO);
+  hostname = ippFindAttribute(job->attrs, "job-originating-host-name",
+                              IPP_TAG_ZERO);
 
 #ifdef HAVE_VSYSLOG
  /*
@@ -224,8 +226,10 @@ LogPage(job_t       *job,	/* I - Job being printed */
 
   if (strcmp(PageLog, "syslog") == 0)
   {
-    syslog(LOG_INFO, "PAGE %s %s %d %s %s", job->printer->name, job->username,
-           job->id, page, billing ? billing->values[0].string.text : "");
+    syslog(LOG_INFO, "PAGE %s %s %d %s %s %s", job->printer->name,
+           job->username ? job->username : "-",
+           job->id, page, billing ? billing->values[0].string.text : "-",
+           hostname->values[0].string.text);
 
     return (1);
   }
@@ -241,12 +245,15 @@ LogPage(job_t       *job,	/* I - Job being printed */
  /*
   * Print a page log entry of the form:
   *
-  *    printer job-id user [DD/MON/YYYY:HH:MM:SS +TTTT] page num-copies billing
+  *    printer job-id user [DD/MON/YYYY:HH:MM:SS +TTTT] page num-copies \
+  *        billing hostname
   */
 
-  fprintf(PageFile, "%s %s %d %s %s %s\n", job->printer->name, job->username,
+  fprintf(PageFile, "%s %s %d %s %s %s %s\n", job->printer->name,
+          job->username ? job->username : "-",
           job->id, GetDateTime(time(NULL)), page,
-	  billing ? billing->values[0].string.text : "");
+	  billing ? billing->values[0].string.text : "-",
+          hostname->values[0].string.text);
   fflush(PageFile);
 
   return (1);
@@ -441,5 +448,5 @@ check_log_file(FILE       **log,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c,v 1.19.2.8 2003/01/24 20:45:20 mike Exp $".
+ * End of "$Id: log.c,v 1.19.2.9 2003/03/04 15:34:57 mike Exp $".
  */

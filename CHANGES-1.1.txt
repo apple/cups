@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- "lpoptions -l" got in an infinite loop if no default
+	  printer was available.
+	- The scheduler now logs the job-originating-host-name
+	  attribute in the page_log file, and uses "-" for any
+	  empty fields (patch from Dominik Kubla).
 	- The pdftops filter now scales PDF pages within the
 	  printable area of the page.
 	- The pstops filter didn't include the page-label and
