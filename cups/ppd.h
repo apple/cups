@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.13 1999/04/09 14:21:25 mike Exp $"
+ * "$Id: ppd.h,v 1.14 1999/04/21 14:12:21 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -92,8 +92,8 @@ typedef enum			/**** Colorspaces ****/
 typedef struct			/**** Option choices ****/
 {
   char		marked,		/* 0 if not selected, 1 otherwise */
-		choice[41];	/* Computer-readable option name */
-  unsigned char	text[81],	/* Human-readable option name */
+		choice[41],	/* Computer-readable option name */
+		text[81],	/* Human-readable option name */
 		*code;		/* Code to send for this option */
   void		*option;	/* Pointer to parent option structure */
 } ppd_choice_t;
@@ -102,8 +102,8 @@ typedef struct			/**** Options ****/
 {
   char		conflicted,	/* 0 if no conflicts exist, 1 otherwise */
 		keyword[41],	/* Option keyword name ("PageSize", etc.) */
-		defchoice[41];	/* Default option choice */
-  unsigned char	text[81];	/* Human-readable text */
+		defchoice[41],	/* Default option choice */
+		text[81];	/* Human-readable text */
   ppd_ui_t	ui;		/* Type of UI option */
   ppd_section_t	section;	/* Section for command */
   float		order;		/* Order number */
@@ -113,7 +113,7 @@ typedef struct			/**** Options ****/
 
 typedef struct ppd_group_str	/**** Groups ****/
 {
-  unsigned char	text[81];	/* Human-readable group name */
+  char		text[81];	/* Human-readable group name */
   int		num_options;	/* Number of options */
   ppd_option_t	*options;	/* Options */
   int		num_subgroups;	/* Number of sub-groups */
@@ -143,8 +143,8 @@ typedef struct			/**** Page Sizes ****/
 
 typedef struct			/**** Emulators ****/
 {
-  char		name[41];	/* Emulator name */
-  unsigned char	*start,		/* Code to switch to this emulation */
+  char		name[41],	/* Emulator name */
+		*start,		/* Code to switch to this emulation */
 		*stop;		/* Code to stop this emulation */
 } ppd_emul_t;
 
@@ -167,17 +167,17 @@ typedef struct			/**** Files ****/
 		model_number,	/* Device-specific model number */
 		manual_copies;	/* 1 = Copies done manually, 0 = hardware */
   ppd_cs_t	colorspace;	/* Default colorspace */
-  unsigned char	*patches;	/* Patch commands to be sent to printer */
+  char		*patches;	/* Patch commands to be sent to printer */
   int		num_emulations;	/* Number of emulations supported */
   ppd_emul_t	*emulations;	/* Emulations and the code to invoke them */
-  unsigned char	*jcl_begin,	/* Start JCL commands */
+  char		*jcl_begin,	/* Start JCL commands */
 		*jcl_ps,	/* Enter PostScript interpreter */
-		*jcl_end;	/* End JCL commands */
-  char		*lang_encoding,	/* Language encoding */
+		*jcl_end,	/* End JCL commands */
+		*lang_encoding,	/* Language encoding */
 		*lang_version,	/* Language version (English, Spanish, etc.) */
 		*modelname,	/* Model name (general) */
-		*ttrasterizer;	/* Truetype rasterizer */
-  unsigned char	*manufacturer,	/* Manufacturer name */
+		*ttrasterizer,	/* Truetype rasterizer */
+		*manufacturer,	/* Manufacturer name */
 		*product,	/* Product name (from PS RIP/interpreter) */
 		*nickname,	/* Nickname (specific) */
 		*shortnickname;	/* Short version of nickname */
@@ -232,5 +232,5 @@ extern float		ppdPageWidth(ppd_file_t *ppd, char *name);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.13 1999/04/09 14:21:25 mike Exp $".
+ * End of "$Id: ppd.h,v 1.14 1999/04/21 14:12:21 mike Exp $".
  */

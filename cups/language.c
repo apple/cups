@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.3 1999/02/26 15:10:25 mike Exp $"
+ * "$Id: language.c,v 1.4 1999/04/21 14:12:19 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -46,7 +46,7 @@
  */
 
 static cups_lang_t	*lang_cache = NULL;	/* Language string cache */
-static unsigned char	*lang_blank = "";	/* Blank constant string */
+static char		*lang_blank = "";	/* Blank constant string */
 static char		*lang_encodings[] =	/* Encoding strings */
 			{
 			  "us-ascii",
@@ -330,7 +330,7 @@ cupsLangGet(char *language)	/* I - Language or locale */
     while (isspace(*text))
       text ++;
     
-    lang->messages[msg] = (unsigned char *)strdup(text);
+    lang->messages[msg] = strdup(text);
   }
 
  /*
@@ -344,5 +344,5 @@ cupsLangGet(char *language)	/* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.3 1999/02/26 15:10:25 mike Exp $".
+ * End of "$Id: language.c,v 1.4 1999/04/21 14:12:19 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.11 1999/04/09 14:21:23 mike Exp $"
+ * "$Id: emit.c,v 1.12 1999/04/21 14:12:16 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -113,13 +113,13 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
 
       if (choices[i]->code != NULL && choices[i]->code[0] != '\0')
       {
-        if (fputs((char *)choices[i]->code, fp) < 0)
+        if (fputs(choices[i]->code, fp) < 0)
         {
           free(choices);
           return (-1);
         }
 
-        if (choices[i]->code[strlen((char *)choices[i]->code) - 1] != '\n')
+        if (choices[i]->code[strlen(choices[i]->code) - 1] != '\n')
           putc('\n', fp);
       }
 
@@ -129,7 +129,7 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
         return (-1);
       }
     }
-    else if (fputs((char *)choices[i]->code, fp) < 0)
+    else if (fputs(choices[i]->code, fp) < 0)
     {
       free(choices);
       return (-1);
@@ -174,7 +174,7 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
         return (-1);
       }
 
-      if (write(fd, choices[i]->code, strlen((char *)choices[i]->code)) < 1)
+      if (write(fd, choices[i]->code, strlen(choices[i]->code)) < 1)
       {
         free(choices);
         return (-1);
@@ -186,7 +186,7 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
         return (-1);
       }
     }
-    else if (write(fd, choices[i]->code, strlen((char *)choices[i]->code)) < 1)
+    else if (write(fd, choices[i]->code, strlen(choices[i]->code)) < 1)
     {
       free(choices);
       return (-1);
@@ -297,5 +297,5 @@ ppd_collect(ppd_file_t    *ppd,		/* I - PPD file data */
 
 
 /*
- * End of "$Id: emit.c,v 1.11 1999/04/09 14:21:23 mike Exp $".
+ * End of "$Id: emit.c,v 1.12 1999/04/21 14:12:16 mike Exp $".
  */

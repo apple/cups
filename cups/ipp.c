@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.10 1999/03/21 02:10:01 mike Exp $"
+ * "$Id: ipp.c,v 1.11 1999/04/21 14:12:18 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -44,6 +44,7 @@
  *   ippTimeToDate()     - Convert from UNIX time to RFC 1903 format.
  *   ippWrite()          - Write data for an IPP request.
  *   add_attr()          - Add a new attribute to the request.
+ *   ipp_read()          - Semi-blocking read on a HTTP connection...
  */
 
 /*
@@ -63,6 +64,7 @@
  */
 
 static ipp_attribute_t	*add_attr(ipp_t *ipp, int num_values);
+static int		ipp_read(http_t *http, char *buffer, int length);
 
 
 /*
@@ -740,7 +742,7 @@ ippRead(http_t *http,		/* I - HTTP data */
         * Get the request header...
 	*/
 
-        if ((n = httpRead(http, buffer, 8)) < 8)
+        if ((n = ipp_read(http, buffer, 8)) < 8)
 	{
 	  DEBUG_printf(("ippRead: Unable to read header (%d bytes read)!\n", n));
 	  return (n == 0 ? IPP_IDLE : IPP_ERROR);
@@ -779,7 +781,7 @@ ippRead(http_t *http,		/* I - HTTP data */
 	  break;
 
     case IPP_ATTRIBUTE :
-        while (httpRead(http, buffer, 1) > 0)
+        while (ipp_read(http, buffer, 1) > 0)
 	{
 	 /*
 	  * Read this attribute...
@@ -819,7 +821,7 @@ ippRead(http_t *http,		/* I - HTTP data */
 	  * Get the name...
 	  */
 
-          if (httpRead(http, buffer, 2) < 2)
+          if (ipp_read(http, buffer, 2) < 2)
 	  {
 	    DEBUG_puts("ippRead: unable to read name length!");
 	    return (IPP_ERROR);
@@ -849,7 +851,7 @@ ippRead(http_t *http,		/* I - HTTP data */
 	    * New attribute; read the name and add it...
 	    */
 
-	    if (httpRead(http, buffer, n) < n)
+	    if (ipp_read(http, buffer, n) < n)
 	    {
 	      DEBUG_puts("ippRead: unable to read name!");
 	      return (IPP_ERROR);
@@ -866,7 +868,7 @@ ippRead(http_t *http,		/* I - HTTP data */
 	    attr->num_values = 0;
 	  }
 
-	  if (httpRead(http, buffer, 2) < 2)
+	  if (ipp_read(http, buffer, 2) < 2)
 	  {
 	    DEBUG_puts("ippRead: unable to read value length!");
 	    return (IPP_ERROR);
@@ -879,7 +881,7 @@ ippRead(http_t *http,		/* I - HTTP data */
 	  {
 	    case IPP_TAG_INTEGER :
 	    case IPP_TAG_ENUM :
-	        if (httpRead(http, buffer, 4) < 4)
+	        if (ipp_read(http, buffer, 4) < 4)
 		  return (IPP_ERROR);
 
 		n = (((((buffer[0] << 8) | buffer[1]) << 8) | buffer[2]) << 8) |
@@ -888,7 +890,7 @@ ippRead(http_t *http,		/* I - HTTP data */
                 attr->values[attr->num_values].integer = n;
 	        break;
 	    case IPP_TAG_BOOLEAN :
-	        if (httpRead(http, buffer, 1) < 1)
+	        if (ipp_read(http, buffer, 1) < 1)
 		  return (IPP_ERROR);
 
                 attr->values[attr->num_values].boolean = buffer[0];
@@ -902,7 +904,7 @@ ippRead(http_t *http,		/* I - HTTP data */
 	    case IPP_TAG_CHARSET :
 	    case IPP_TAG_LANGUAGE :
 	    case IPP_TAG_MIMETYPE :
-	        if (httpRead(http, buffer, n) < n)
+	        if (ipp_read(http, buffer, n) < n)
 		  return (IPP_ERROR);
 
                 buffer[n] = '\0';
@@ -911,13 +913,13 @@ ippRead(http_t *http,		/* I - HTTP data */
                 attr->values[attr->num_values].string.text = strdup(buffer);
 	        break;
 	    case IPP_TAG_DATE :
-	        if (httpRead(http, buffer, 11) < 11)
+	        if (ipp_read(http, buffer, 11) < 11)
 		  return (IPP_ERROR);
 
                 memcpy(attr->values[attr->num_values].date, buffer, 11);
 	        break;
 	    case IPP_TAG_RESOLUTION :
-	        if (httpRead(http, buffer, 9) < 9)
+	        if (ipp_read(http, buffer, 9) < 9)
 		  return (IPP_ERROR);
 
                 attr->values[attr->num_values].resolution.xres =
@@ -930,7 +932,7 @@ ippRead(http_t *http,		/* I - HTTP data */
 		    (ipp_res_t)buffer[8];
 	        break;
 	    case IPP_TAG_RANGE :
-	        if (httpRead(http, buffer, 8) < 8)
+	        if (ipp_read(http, buffer, 8) < 8)
 		  return (IPP_ERROR);
 
                 attr->values[attr->num_values].range.lower =
@@ -942,19 +944,19 @@ ippRead(http_t *http,		/* I - HTTP data */
 	        break;
 	    case IPP_TAG_TEXTLANG :
 	    case IPP_TAG_NAMELANG :
-	        if (httpRead(http, buffer, n) < n)
+	        if (ipp_read(http, buffer, n) < n)
 		  return (IPP_ERROR);
 
                 buffer[n] = '\0';
 
                 attr->values[attr->num_values].string.charset = strdup(buffer);
 
-	        if (httpRead(http, buffer, 2) < 2)
+	        if (ipp_read(http, buffer, 2) < 2)
 		  return (IPP_ERROR);
 
 		n = (buffer[0] << 8) | buffer[1];
 
-	        if (httpRead(http, buffer, n) < n)
+	        if (ipp_read(http, buffer, n) < n)
 		  return (IPP_ERROR);
 
                 buffer[n] = '\0';
@@ -1418,5 +1420,35 @@ add_attr(ipp_t *ipp,			/* I - IPP request */
 
 
 /*
- * End of "$Id: ipp.c,v 1.10 1999/03/21 02:10:01 mike Exp $".
+ * 'ipp_read()' - Semi-blocking read on a HTTP connection...
+ */
+
+static int		/* O - Number of bytes read */
+ipp_read(http_t *http,	/* I - Client connection */
+         char   *buffer,/* O - Buffer for data */
+	 int    length)	/* I - Total length */
+{
+  int	tbytes,		/* Total bytes read */
+	bytes;		/* Bytes read this pass */
+
+
+ /*
+  * Loop until all bytes are read...
+  */
+
+  for (tbytes = 0; tbytes < length; tbytes += bytes, buffer += bytes)
+    if ((bytes = httpRead(http, buffer, length - tbytes)) <= 0)
+      break;
+
+ /*
+  * Return the number of bytes read...
+  */
+
+  return (tbytes);
+}
+
+
+
+/*
+ * End of "$Id: ipp.c,v 1.11 1999/04/21 14:12:18 mike Exp $".
  */
