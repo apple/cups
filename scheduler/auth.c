@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.41.2.11 2002/05/29 16:39:18 mike Exp $"
+ * "$Id: auth.c,v 1.41.2.12 2002/06/06 03:01:53 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -263,8 +263,10 @@ AllowIP(location_t *loc,	/* I - Location to add to */
   memcpy(temp->mask.ip.address, address, sizeof(address));
   memcpy(temp->mask.ip.netmask, netmask, sizeof(netmask));
 
-  LogMessage(L_DEBUG, "AllowIP: %s allow %08x/%08x", loc->location,
-             address, netmask);
+  LogMessage(L_DEBUG, "AllowIP: %s allow %x:%x:%x:%x/%x:%x:%x:%x",
+	     loc->location, address[0], address[1], address[2],
+	     address[3], netmask[0], netmask[1], netmask[2],
+	     netmask[3]);
 }
 
 
@@ -693,8 +695,10 @@ DenyIP(location_t *loc,		/* I - Location to add to */
   memcpy(temp->mask.ip.address, address, sizeof(address));
   memcpy(temp->mask.ip.netmask, netmask, sizeof(netmask));
 
-  LogMessage(L_DEBUG, "DenyIP: %s deny %08x/%08x\n", loc->location,
-             address, netmask);
+  LogMessage(L_DEBUG, "DenyIP: %s deny %x:%x:%x:%x/%x:%x:%x:%x",
+	     loc->location, address[0], address[1], address[2],
+	     address[3], netmask[0], netmask[1], netmask[2],
+	     netmask[3]);
 }
 
 
@@ -1016,8 +1020,9 @@ IsAuthorized(client_t *con)	/* I - Connection */
     return (HTTP_UNAUTHORIZED);
   }
 
-  LogMessage(L_DEBUG2, "IsAuthorized: Checking \"%s\", address = %08x, hostname = \"%s\"",
-             con->username, address, con->http.hostname);
+  LogMessage(L_DEBUG2, "IsAuthorized: Checking \"%s\", address = %x:%x:%x:%x, hostname = \"%s\"",
+	     con->username, address[0], address[1], address[2],
+	     address[3], con->http.hostname);
 
   pw = NULL;
 
@@ -1723,5 +1728,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.41.2.11 2002/05/29 16:39:18 mike Exp $".
+ * End of "$Id: auth.c,v 1.41.2.12 2002/06/06 03:01:53 mike Exp $".
  */
