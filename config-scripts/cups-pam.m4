@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-pam.m4,v 1.2.2.4 2002/06/04 21:15:57 mike Exp $"
+dnl "$Id: cups-pam.m4,v 1.2.2.5 2002/08/30 20:58:21 mike Exp $"
 dnl
 dnl   PAM stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -31,6 +31,7 @@ fi
 
 PAMDIR=""
 PAMLIBS=""
+PAMMOD="pam_unknown.so"
 
 if test x$enable_pam != xno; then
 	SAVELIBS="$LIBS"
@@ -51,11 +52,20 @@ if test x$enable_pam != xno; then
 	fi
 
 	LIBS="$SAVELIBS"
+
+	# This test might need to be updated as Linux distributors move
+	# things around...
+	for mod in pam_unix2.so pam_unix.so pam_pwdb.so; do
+		if test -f /lib/security/$mod; then
+			PAMMOD="$mod"
+		fi
+	done
 fi
 
 AC_SUBST(PAMDIR)
 AC_SUBST(PAMLIBS)
+AC_SUBST(PAMMOD)
 
 dnl
-dnl End of "$Id: cups-pam.m4,v 1.2.2.4 2002/06/04 21:15:57 mike Exp $".
+dnl End of "$Id: cups-pam.m4,v 1.2.2.5 2002/08/30 20:58:21 mike Exp $".
 dnl
