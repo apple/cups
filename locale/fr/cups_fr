@@ -37,9 +37,9 @@ Entire Document
 Page Range
 Reverse Order
 Page Format
-1-Up
-2-Up
-4-Up
+ 1-Up
+ 2-Up
+ 4-Up
 Image Scaling
 Use Natural Image Size
 Zoom by Percent
@@ -89,6 +89,9 @@ Petit (up to 241x356mm)
 Moyenne (241x356mm to 330x483mm)
 Grand (330x483mm and larger)
 Faite sur Commande Taille
+Idle
+Processing
+Stopped
 400 Votre browser a envoyé une demande que ce serveur ne pourrait pas comprendre.
 Ce serveur ne pourrait pas vérifier que vous êtes autorisés à accéder à la ressource.
 You must pay to access this server.
