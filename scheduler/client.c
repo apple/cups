@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.8 2002/04/20 21:05:13 mike Exp $"
+ * "$Id: client.c,v 1.91.2.9 2002/04/21 12:47:03 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -79,6 +79,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   int			val;	/* Parameter value */
   client_t		*con;	/* New client pointer */
   const struct hostent	*host;	/* Host entry for address */
+  char			*hostname;/* Hostname for address */
   http_addr_t		temp;	/* Temporary address variable */
 
 
@@ -123,11 +124,11 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   con->http.hostaddr.ipv4.sin_port = lis->address.ipv4.sin_port;
 
   if (HostNameLookups)
-    host = httpAddrLookup(&(con->http.hostaddr), con->http.hostname,
-                          sizeof(con->http.hostname));
+    hostname = httpAddrLookup(&(con->http.hostaddr), con->http.hostname,
+                              sizeof(con->http.hostname));
   else
   {
-    host = NULL;
+    hostname = NULL;
     httpAddrString(&(con->http.hostaddr), con->http.hostname,
                    sizeof(con->http.hostname));
   }
@@ -141,7 +142,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
     strncpy(con->http.hostname, ServerName, sizeof(con->http.hostname) - 1);
   }
 
-  if (host == NULL && HostNameLookups == 2)
+  if (hostname == NULL && HostNameLookups == 2)
   {
    /*
     * Can't have an unresolved IP address with double-lookups enabled...
@@ -224,11 +225,11 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 
 #ifdef AF_INET6
   if (con->http.hostaddr.addr.sa_family == AF_INET6)
-    LogMessage(L_DEBUG, "AcceptClient() %d from %s:%d.", con->http.fd,
+    LogMessage(L_DEBUG, "AcceptClient: %d from %s:%d.", con->http.fd,
                con->http.hostname, ntohs(con->http.hostaddr.ipv6.sin6_port));
   else
 #endif /* AF_INET6 */
-  LogMessage(L_DEBUG, "AcceptClient() %d from %s:%d.", con->http.fd,
+  LogMessage(L_DEBUG, "AcceptClient: %d from %s:%d.", con->http.fd,
              con->http.hostname, ntohs(con->http.hostaddr.ipv4.sin_port));
 
  /*
@@ -247,7 +248,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 
   fcntl(con->http.fd, F_SETFD, fcntl(con->http.fd, F_GETFD) | FD_CLOEXEC);
 
-  LogMessage(L_DEBUG2, "AcceptClient() Adding fd %d to InputSet...",
+  LogMessage(L_DEBUG2, "AcceptClient: Adding fd %d to InputSet...",
              con->http.fd);
   FD_SET(con->http.fd, &InputSet);
 
@@ -2521,5 +2522,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.8 2002/04/20 21:05:13 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.9 2002/04/21 12:47:03 mike Exp $".
  */

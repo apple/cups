@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.10 2002/04/20 21:05:16 mike Exp $"
+ * "$Id: main.c,v 1.57.2.11 2002/04/21 12:47:07 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -551,6 +551,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   * immediately.
   */
 
+  StopBrowsing();
+  StopAllJobs();
   DeleteAllCerts();
   CloseAllClients();
   StopListening();
@@ -813,5 +815,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.10 2002/04/20 21:05:16 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.11 2002/04/21 12:47:07 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.9.2.4 2002/01/27 21:20:32 mike Exp $"
+ * "$Id: listen.c,v 1.9.2.5 2002/04/21 12:47:07 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -54,10 +54,15 @@ PauseListening(void)
   if (NumClients == MaxClients)
     LogMessage(L_WARN, "Max clients reached, holding new connections...");
 
-  LogMessage(L_DEBUG, "PauseListening: clearing input bits...");
+  LogMessage(L_DEBUG, "PauseListening: Clearing input bits...");
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+  {
+    LogMessage(L_DEBUG2, "PauseListening: Removing fd %d from InputSet...",
+               lis->fd);
+
     FD_CLR(lis->fd, &InputSet);
+  }
 }
 
 
@@ -78,10 +83,14 @@ ResumeListening(void)
   if (NumClients >= (MaxClients - 1))
     LogMessage(L_WARN, "Resuming new connection processing...");
 
-  LogMessage(L_DEBUG, "ResumeListening: setting input bits...");
+  LogMessage(L_DEBUG, "ResumeListening: Setting input bits...");
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+  {
+    LogMessage(L_DEBUG2, "ResumeListening: Adding fd %d to InputSet...",
+               lis->fd);
     FD_SET(lis->fd, &InputSet);
+  }
 }
 
 
@@ -151,6 +160,8 @@ StartListening(void)
       exit(errno);
     }
 
+    LogMessage(L_DEBUG2, "StartListening: fd=%d", lis->fd);
+
     fcntl(lis->fd, F_SETFD, fcntl(lis->fd, F_GETFD) | FD_CLOEXEC);
 
    /*
@@ -216,5 +227,5 @@ StopListening(void)
 
 
 /*
- * End of "$Id: listen.c,v 1.9.2.4 2002/01/27 21:20:32 mike Exp $".
+ * End of "$Id: listen.c,v 1.9.2.5 2002/04/21 12:47:07 mike Exp $".
  */

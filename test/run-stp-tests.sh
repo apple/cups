@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.4.2.4 2002/04/20 21:05:16 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.4.2.5 2002/04/21 12:47:08 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -169,6 +169,11 @@ echo "Starting scheduler..."
 ../scheduler/cupsd -c /tmp/$user/cupsd.conf -f &
 cupsd=$!
 
+if test -x /usr/bin/strace; then
+	# Trace system calls in cupsd if we have strace...
+	/usr/bin/strace -tt -o /tmp/$user/log/cupsd.trace -p $cupsd &
+fi
+
 echo "Scheduler is PID $cupsd; run debugger now if you need to."
 echo ""
 echo "Press ENTER to continue..."
@@ -292,6 +297,13 @@ echo "<PRE>" >>$strfile
 cat /tmp/$user/log/page_log >>$strfile
 echo "</PRE>" >>$strfile
 
+if test -f /tmp/$user/log/cupsd.trace; then
+	echo "<H2>cupsd.trace</H2>" >>$strfile
+	echo "<PRE>" >>$strfile
+	cat /tmp/$user/log/cupsd.trace >>$strfile
+	echo "</PRE>" >>$strfile
+fi
+
 #
 # Format the reports and tell the user where to find them...
 #
@@ -324,5 +336,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.4.2.4 2002/04/20 21:05:16 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.4.2.5 2002/04/21 12:47:08 mike Exp $"
 #
