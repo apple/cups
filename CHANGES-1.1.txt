@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- cupsEncodeOptions() did not allow boolean options to
+	  use "yes" and "on" for true values (STR #227)
 	- The pstops filter only sent the TBCP exit sequence if
 	  it was defined in the JCLEnd attribute in the PPD file
 	  (STR #224)
