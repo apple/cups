@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.40 2002/12/17 18:56:36 swdev Exp $"
+ * "$Id: admin.c,v 1.41 2003/03/21 17:09:29 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -233,7 +233,7 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
 
       if ((response = cupsDoRequest(http, request, "/")) != NULL)
       {
-	ippSetCGIVars(response, NULL, NULL);
+	ippSetCGIVars(response, NULL, NULL, NULL);
 	ippDelete(response);
       }
 
@@ -548,7 +548,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
       */
 
       if (oldinfo)
-	ippSetCGIVars(oldinfo, NULL, NULL);
+	ippSetCGIVars(oldinfo, NULL, NULL, NULL);
 
       cgiCopyTemplateLang(stdout, TEMPLATES, "modify-printer.tmpl", getenv("LANG"));
     }
@@ -610,7 +610,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
-      ippSetCGIVars(response, NULL, NULL);
+      ippSetCGIVars(response, NULL, NULL, NULL);
       ippDelete(response);
     }
 
@@ -776,7 +776,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 
         strlcpy(make, var, sizeof(make));
 
-        ippSetCGIVars(response, "ppd-make", make);
+        ippSetCGIVars(response, "ppd-make", make, NULL);
 	cgiCopyTemplateLang(stdout, TEMPLATES, "choose-model.tmpl",
 	                    getenv("LANG"));
       }
@@ -1547,5 +1547,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.40 2002/12/17 18:56:36 swdev Exp $".
+ * End of "$Id: admin.c,v 1.41 2003/03/21 17:09:29 mike Exp $".
  */

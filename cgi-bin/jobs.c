@@ -1,5 +1,5 @@
 /*
- * "$Id: jobs.c,v 1.21 2002/12/17 18:56:36 swdev Exp $"
+ * "$Id: jobs.c,v 1.22 2003/03/21 17:09:30 mike Exp $"
  *
  *   Job status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -145,7 +145,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
-      ippSetCGIVars(response, NULL, NULL);
+      ippSetCGIVars(response, NULL, NULL, NULL);
       ippDelete(response);
 
       cgiCopyTemplateLang(stdout, TEMPLATES, "jobs.tmpl", getenv("LANG"));
@@ -255,5 +255,5 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: jobs.c,v 1.21 2002/12/17 18:56:36 swdev Exp $".
+ * End of "$Id: jobs.c,v 1.22 2003/03/21 17:09:30 mike Exp $".
  */
