@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-vector.c,v 1.7 1999/03/21 21:12:18 mike Exp $"
+ * "$Id: hpgl-vector.c,v 1.8 1999/03/22 21:42:35 mike Exp $"
  *
  *   HP-GL/2 vector routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,18 @@
  *
  * Contents:
  *
+ *   AA_arc_absolute()    - Draw an arc.
+ *   AR_arc_relative()    - Draw an arc relative to the current pen
+ *   AT_arc_absolute3()   - Draw an arc using 3 points.
+ *   CI_circle()          - Draw a circle.
+ *   PA_plot_absolute()   - Plot a line using absolute coordinates.
+ *   PD_pen_down()        - Start drawing.
+ *   PE_polygon_encoded() - Draw an encoded polyline.
+ *   PR_plot_relative()   - Plot a line using relative coordinates.
+ *   PU_pen_up()          - Stop drawing.
+ *   RT_arc_relative3()   - Draw an arc through 3 points relative to the
+ *   decode_number()      - Decode an encoded number.
+ *   plot_points()        - Plot the specified points.
  */
 
 /*
@@ -688,5 +700,5 @@ plot_points(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-vector.c,v 1.7 1999/03/21 21:12:18 mike Exp $".
+ * End of "$Id: hpgl-vector.c,v 1.8 1999/03/22 21:42:35 mike Exp $".
  */

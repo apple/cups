@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-polygon.c,v 1.6 1999/03/21 21:12:18 mike Exp $"
+ * "$Id: hpgl-polygon.c,v 1.7 1999/03/22 21:42:35 mike Exp $"
  *
  *   HP-GL/2 polygon routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,15 @@
  *
  * Contents:
  *
+ *   EA_edge_rect_absolute() - Draw a rectangle.
+ *   EP_edge_polygon()       - Stroke the edges of a polygon.
+ *   ER_edge_rect_relative() - Draw a rectangle relative to the current
+ *   EW_edge_wedge()         - Draw a pie wedge.
+ *   FP_fill_polygon()       - Fill a polygon.
+ *   PM_polygon_mode()       - Set the polygon drawing mode.
+ *   RA_fill_rect_absolute() - Fill a rectangle.
+ *   RR_fill_rect_relative() - Fill a rectangle relative to the current
+ *   WG_fill_wedge()         - Fill a pie wedge.
  */
 
 /*
@@ -367,5 +376,5 @@ WG_fill_wedge(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-polygon.c,v 1.6 1999/03/21 21:12:18 mike Exp $".
+ * End of "$Id: hpgl-polygon.c,v 1.7 1999/03/22 21:42:35 mike Exp $".
  */

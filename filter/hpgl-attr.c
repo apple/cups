@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-attr.c,v 1.9 1999/03/21 21:12:13 mike Exp $"
+ * "$Id: hpgl-attr.c,v 1.10 1999/03/22 21:42:33 mike Exp $"
  *
  *   HP-GL/2 attribute processing for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,19 @@
  *
  * Contents:
  *
+ *   CR_color_range()     - Set the range for color values.
+ *   AC_anchor_corner()   - Set the anchor corner.
+ *   FT_fill_type()       - Set the fill type or pattern.
+ *   LA_line_attributes() - Set the line drawing attributes.
+ *   LT_line_type()       - Set the line type (style)...
+ *   NP_number_pens()     - Set the number of pens to be used.
+ *   PC_pen_color()       - Set the pen color...
+ *   PW_pen_width()       - Set the pen width.
+ *   RF_raster_fill()     - Set the raster fill pattern.
+ *   SM_symbol_mode()     - Set where symbols are drawn.
+ *   SP_select_pen()      - Select a pen for drawing.
+ *   UL_user_line_type()  - Set a user-defined line type.
+ *   WU_width_units()     - Set the units used for pen widths.
  */
 
 /*
@@ -388,5 +401,5 @@ WU_width_units(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-attr.c,v 1.9 1999/03/21 21:12:13 mike Exp $".
+ * End of "$Id: hpgl-attr.c,v 1.10 1999/03/22 21:42:33 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.13 1999/03/22 01:19:44 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.14 1999/03/22 21:42:34 mike Exp $"
  *
  *   HP-GL/2 configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,18 @@
  *
  * Contents:
  *
+ *   update_transform()  - Update the page transformation matrix as needed.
+ *   BP_begin_plot()     - Start a plot...
+ *   DF_default_values() - Set all state info to the default values.
+ *   IN_initialize()     - Initialize the plotter.
+ *   IP_input_absolute() - Set P1 and P2 values for the plot.
+ *   IR_input_relative() - Update P1 and P2.
+ *   IW_input_window()   - Setup an input window.
+ *   PG_advance_page()   - Eject the current page.
+ *   PS_plot_size()      - Set the plot size.
+ *   RO_rotate()         - Rotate the plot.
+ *   RP_replot()         - Replot the current page.
+ *   SC_scale()          - Set user-defined scaling.
  */
 
 /*
@@ -332,6 +344,9 @@ void
 PG_advance_page(int     num_params,	/* I - Number of parameters */
                 param_t *params)	/* I - Parameters */
 {
+  (void)num_params;
+  (void)params;
+
   if (PageDirty)
   {
     puts("grestore");
@@ -452,5 +467,5 @@ SC_scale(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.13 1999/03/22 01:19:44 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.14 1999/03/22 21:42:34 mike Exp $".
  */

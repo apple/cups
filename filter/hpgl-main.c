@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-main.c,v 1.9 1999/03/22 01:19:44 mike Exp $"
+ * "$Id: hpgl-main.c,v 1.10 1999/03/22 21:42:34 mike Exp $"
  *
  *   HP-GL/2 filter main entry for the Common UNIX Printing System (CUPS).
  *
@@ -116,7 +116,7 @@ static name_t commands[] =
  * Local functions...
  */
 
-static int	compare_names(void *p1, void *p2);
+static int	compare_names(const void *p1, const void *p2);
 
 
 /*
@@ -267,5 +267,5 @@ compare_names(const void *p1,	/* I - First name */
 
 
 /*
- * End of "$Id: hpgl-main.c,v 1.9 1999/03/22 01:19:44 mike Exp $".
+ * End of "$Id: hpgl-main.c,v 1.10 1999/03/22 21:42:34 mike Exp $".
  */

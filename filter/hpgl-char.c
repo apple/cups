@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-char.c,v 1.6 1999/03/21 21:12:14 mike Exp $"
+ * "$Id: hpgl-char.c,v 1.7 1999/03/22 21:42:33 mike Exp $"
  *
  *   HP-GL/2 character processing for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,25 @@
  *
  * Contents:
  *
+ *   AD_define_alternate()     - Define the alternate font.
+ *   CF_character_fill()       - Set whether or not to fill or outline
+ *                               characters.
+ *   CP_character_plot()       - Move the current pen position for the given
+ *                               number of columns and rows.
+ *   DI_absolute_direction()   - Set the direction vector for text.
+ *   DR_relative_direction()   - Set the relative direction vector for text.
+ *   DT_define_label_term()    - Set the label string terminator.
+ *   DV_define_variable_path() - Define a path for text.
+ *   ES_extra_space()          - Set extra spacing (kerning) between characters.
+ *   LB_label()                - Display a label string.
+ *   LO_label_origin()         - Set the label origin.
+ *   SA_select_alternate()     - Select the alternate font.
+ *   SD_define_standard()      - Define the standard font...
+ *   SI_absolute_size()        - Set the absolute size of text.
+ *   SL_character_slant()      - Set the slant of text.
+ *   SR_relative_size()        - Set the relative size of text.
+ *   SS_select_standard()      - Select the standard font for text.
+ *   TD_transparent_data()     - Send transparent print data.
  */
 
 /*
@@ -273,6 +292,9 @@ void
 SA_select_alternate(int     num_params,	/* I - Number of parameters */
                     param_t *params)	/* I - Parameters */
 {
+  (void)num_params;
+  (void)params;
+
   Outputf("SA\n");
   CharFont = 1;
 }
@@ -385,6 +407,9 @@ void
 SS_select_standard(int     num_params,	/* I - Number of parameters */
                    param_t *params)	/* I - Parameters */
 {
+  (void)num_params;
+  (void)params;
+
   Outputf("SS\n");
   CharFont = 0;
 }
@@ -404,5 +429,5 @@ TD_transparent_data(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-char.c,v 1.6 1999/03/21 21:12:14 mike Exp $".
+ * End of "$Id: hpgl-char.c,v 1.7 1999/03/22 21:42:33 mike Exp $".
  */

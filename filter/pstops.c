@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.8 1999/03/21 02:10:14 mike Exp $"
+ * "$Id: pstops.c,v 1.9 1999/03/22 21:42:36 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -65,6 +65,79 @@ int	Reversed = 0,		/* Reverse pages */
 	Flip = 0;		/* Flip/mirror pages */
 float	Width = 612.0f,		/* Total page width */
 	Height = 792.0f;	/* Total page height */
+
+
+/*
+ * 'check_range()' - Check to see if the current page is selected for
+ *                   printing.
+ */
+
+static int		/* O - 1 if selected, 0 otherwise */
+check_range(void)
+{
+  char	*range;		/* Pointer into range string */
+  int	lower, upper;	/* Lower and upper page numbers */
+
+
+  if (PageSet != NULL)
+  {
+   /*
+    * See if we only print even or odd pages...
+    */
+
+    if (strcmp(PageSet, "even") == 0 && (PageNumber & 1))
+      return (0);
+    if (strcmp(PageSet, "odd") == 0 && !(PageNumber & 1))
+      return (0);
+  }
+
+  if (PageRanges == NULL)
+    return (1);		/* No range, print all pages... */
+
+  for (range = PageRanges; *range != '\0';)
+  {
+    if (*range == '-')
+    {
+      lower = 1;
+      range ++;
+      upper = strtol(range, &range, 10);
+    }
+    else
+    {
+      lower = strtol(range, &range, 10);
+
+      if (*range == '-')
+      {
+        range ++;
+	if (!isdigit(*range))
+	  upper = 65535;
+	else
+	  upper = strtol(range, &range, 10);
+      }
+      else
+        upper = lower;
+    }
+
+    if (PageNumber >= lower && PageNumber <= upper)
+      return (1);
+
+    if (*range == ',')
+      range ++;
+    else
+      break;
+  }
+
+  return (0);
+}
+
+
+  if (Landscape)
+  {
+    if (Duplex && (NumPages & 1) == 0)
+      printf("0 %.1f translate -90 rotate\n", PageWidth);
+    else
+      printf("%.1f 0 translate 90 rotate\n", PageLength);
+  }
 
 
 /*
@@ -836,5 +909,5 @@ main(int  argc,
 
 
 /*
- * End of "$Id: pstops.c,v 1.8 1999/03/21 02:10:14 mike Exp $".
+ * End of "$Id: pstops.c,v 1.9 1999/03/22 21:42:36 mike Exp $".
  */
