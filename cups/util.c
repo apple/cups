@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.78 2001/03/01 22:40:17 mike Exp $"
+ * "$Id: util.c,v 1.79 2001/03/01 22:51:29 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -1333,9 +1333,9 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
     */
 
 #ifdef O_NOFOLLOW
-    fd = open(filename, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW, 0600);
+    fd = open(filename, O_RDWR | O_CREAT | O_EXCL | O_NOFOLLOW, 0600);
 #else
-    fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0600);
+    fd = open(filename, O_RDWR | O_CREAT | O_EXCL, 0600);
 #endif /* O_NOFOLLOW */
 
     if (fd < 0 && errno == EPERM)
@@ -1525,5 +1525,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.78 2001/03/01 22:40:17 mike Exp $".
+ * End of "$Id: util.c,v 1.79 2001/03/01 22:51:29 mike Exp $".
  */

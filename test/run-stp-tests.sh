@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.2 2001/03/01 22:40:18 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.3 2001/03/01 22:51:30 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -124,14 +124,16 @@ EOF
 touch /tmp/$user/classes.conf
 touch /tmp/$user/printers.conf
 
-cp /etc/cups/mime.types /tmp/$user/mime.types
-cp /etc/cups/mime.convs /tmp/$user/mime.convs
+cp $root/conf/mime.types /tmp/$user/mime.types
+cp $root/conf/mime.convs /tmp/$user/mime.convs
 
 #
-# Setup the DSO path...
+# Setup the paths...
 #
 
 LD_LIBRARY_PATH=$root/cups:$root/filter; export LD_LIBRARY_PATH
+CUPS_SERVERROOT=/tmp/$user; export CUPS_SERVERROOT
+CUPS_DATADIR=/tmp/$user/share; export CUPS_DATADIR
 
 #
 # Set a new home directory to avoid getting user options mixed in...
@@ -187,7 +189,7 @@ for file in 4*.test; do
 	echo "Performing $file..."
 	echo "" >>$strfile
 
-	ipptest ipp://localhost:$port/printers $file >>$strfile
+	./ipptest ipp://localhost:$port/printers $file >>$strfile
 	status=$?
 
 	if test $status != 0; then
@@ -301,5 +303,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.2 2001/03/01 22:40:18 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.3 2001/03/01 22:51:30 mike Exp $"
 #

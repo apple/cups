@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.27 2001/02/06 23:40:08 mike Exp $"
+ * "$Id: image.c,v 1.28 2001/03/01 22:51:30 mike Exp $"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
@@ -761,7 +761,7 @@ flush_tile(image_t *img)	/* I - Image */
     {
       perror("ERROR: Unable to create image swap file");
       close(fd);
-      unlink(img->cachefile);
+      unlink(img->cachename);
       tile->ic    = NULL;
       tile->dirty = 0;
       return;
@@ -804,5 +804,5 @@ flush_tile(image_t *img)	/* I - Image */
 
 
 /*
- * End of "$Id: image.c,v 1.27 2001/02/06 23:40:08 mike Exp $".
+ * End of "$Id: image.c,v 1.28 2001/03/01 22:51:30 mike Exp $".
  */
