@@ -3,6 +3,7 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- Added support for IPP collections and files.
 	- Added experimental support for generic CGI scripts and
 	  programs, Java, Perl, PHP, and Python to the
 	  scheduler. See the file "CGI.txt" for more

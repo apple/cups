@@ -3,7 +3,6 @@ CHANGES.txt - 01/07/2003
 
 CHANGES IN CUPS V1.2.0a1
 
-	- New IPP collection attribute support.
 	- New cupsLangPrintf() and cupsLangPuts() for localized
 	  interfaces.
 	- Now support custom attributes and extended options in
@@ -24,7 +23,3 @@ CHANGES IN CUPS V1.2.0a1
 	- Updated the raster stream format to support more
 	  user-defined attributes and to do compression of the
 	  page data.
-	- New ippReadFile(), ippReadIO(), ippWriteFile(), and
-	  ippWriteIO() functions in CUPS API.
-	- Added Cookie, Expect, and Set-Cookie fields to HTTP
-	  request structure.
