@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.56 2003/03/19 06:07:48 mike Exp $"
+ * "$Id: job.c,v 1.124.2.57 2003/03/21 18:10:02 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1407,7 +1407,8 @@ StartJob(int       id,		/* I - Job ID */
 	  attr->value_tag == IPP_TAG_NAMELANG ||
 	  attr->value_tag == IPP_TAG_TEXTLANG ||
 	  attr->value_tag == IPP_TAG_URI ||
-	  attr->value_tag == IPP_TAG_URISCHEME)
+	  attr->value_tag == IPP_TAG_URISCHEME ||
+	  attr->value_tag == IPP_TAG_BEGIN_COLLECTION) /* Not yet supported */
 	continue;
 
       if (strncmp(attr->name, "time-", 5) == 0)
@@ -2630,5 +2631,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.56 2003/03/19 06:07:48 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.57 2003/03/21 18:10:02 mike Exp $".
  */
