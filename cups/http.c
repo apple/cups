@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.132 2004/02/25 20:14:51 mike Exp $"
+ * "$Id: http.c,v 1.133 2004/03/19 11:43:11 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -1678,6 +1678,9 @@ httpUpdate(http_t *http)		/* I - HTTP data */
   * See if there was an error...
   */
 
+  if (http->error == EPIPE && http->status > HTTP_CONTINUE)
+    return (http->status);
+
   if (http->error)
   {
     DEBUG_printf(("httpUpdate: socket error %d - %s\n", http->error,
@@ -2454,5 +2457,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.132 2004/02/25 20:14:51 mike Exp $".
+ * End of "$Id: http.c,v 1.133 2004/03/19 11:43:11 mike Exp $".
  */
