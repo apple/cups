@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.218 2003/08/01 20:00:53 mike Exp $"
+ * "$Id: job.c,v 1.219 2003/09/02 20:30:48 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -296,7 +296,7 @@ CheckJobs(void)
     * Start pending jobs if the destination is available...
     */
 
-    if (current->state->values[0].integer == IPP_JOB_PENDING)
+    if (current->state->values[0].integer == IPP_JOB_PENDING && !NeedReload)
     {
       if ((pclass = FindClass(current->dest)) != NULL)
       {
@@ -2690,5 +2690,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.218 2003/08/01 20:00:53 mike Exp $".
+ * End of "$Id: job.c,v 1.219 2003/09/02 20:30:48 mike Exp $".
  */

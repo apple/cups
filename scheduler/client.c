@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.170 2003/08/30 23:12:10 mike Exp $"
+ * "$Id: client.c,v 1.171 2003/09/02 20:30:47 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2878,6 +2878,8 @@ install_conf_file(client_t *con)	/* I - Connection */
   else
     NeedReload = RELOAD_ALL;
 
+  ReloadTime = time(NULL);
+
  /*
   * Return that the file was created successfully...
   */
@@ -3343,5 +3345,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.170 2003/08/30 23:12:10 mike Exp $".
+ * End of "$Id: client.c,v 1.171 2003/09/02 20:30:47 mike Exp $".
  */
