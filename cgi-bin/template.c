@@ -1,5 +1,5 @@
 /*
- * "$Id: template.c,v 1.17 2000/04/27 19:04:36 mike Exp $"
+ * "$Id: template.c,v 1.18 2000/09/21 19:21:42 mike Exp $"
  *
  *   CGI template function.
  *
@@ -179,7 +179,7 @@ cgi_copy(FILE *out,		/* I - Output file */
       */
 
       for (s = name; (ch = getc(in)) != EOF;)
-        if (strchr("}]<>=!", ch))
+        if (!isalpha(ch) && strchr("[#?", ch) == NULL)
           break;
         else if (s > name && ch == '?')
 	  break;
@@ -187,6 +187,13 @@ cgi_copy(FILE *out,		/* I - Output file */
           *s++ = ch;
 
       *s = '\0';
+
+      if (s == name && isspace(ch))
+      {
+        putc('{', out);
+	putc(ch, out);
+	continue;
+      }
 
      /*
       * See if it has a value...
@@ -451,5 +458,5 @@ cgi_puts(const char *s,
 
 
 /*
- * End of "$Id: template.c,v 1.17 2000/04/27 19:04:36 mike Exp $".
+ * End of "$Id: template.c,v 1.18 2000/09/21 19:21:42 mike Exp $".
  */
