@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.203 2003/04/01 22:11:12 mike Exp $"
+ * "$Id: ipp.c,v 1.204 2003/04/01 22:14:07 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -38,12 +38,12 @@
  *   check_quotas()              - Check quotas for a printer and user.
  *   copy_attribute()            - Copy a single attribute.
  *   copy_attrs()                - Copy attributes from one request to another.
- *   create_job()                - Print a file to a printer or class.
  *   copy_banner()               - Copy a banner file to the requests directory
  *                                 for the specified job.
  *   copy_file()                 - Copy a PPD file or interface script...
  *   copy_model()                - Copy a PPD model file, substituting default
  *                                 values as needed...
+ *   create_job()                - Print a file to a printer or class.
  *   delete_printer()            - Remove a printer or class from the system.
  *   get_default()               - Get the default destination.
  *   get_devices()               - Get the list of available devices on the
@@ -2210,420 +2210,6 @@ copy_attrs(ipp_t           *to,		/* I - Destination request */
 
 
 /*
- * 'create_job()' - Print a file to a printer or class.
- */
-
-static void
-create_job(client_t        *con,	/* I - Client connection */
-	   ipp_attribute_t *uri)	/* I - Printer URI */
-{
-  ipp_attribute_t	*attr;		/* Current attribute */
-  const char		*dest;		/* Destination */
-  cups_ptype_t		dtype;		/* Destination type (printer or class) */
-  int			priority;	/* Job priority */
-  char			*title;		/* Job name/title */
-  job_t			*job;		/* Current job */
-  char			job_uri[HTTP_MAX_URI],
-					/* Job URI */
-			printer_uri[HTTP_MAX_URI],
-					/* Printer URI */
-			method[HTTP_MAX_URI],
-					/* Method portion of URI */
-			username[HTTP_MAX_URI],
-					/* Username portion of URI */
-			host[HTTP_MAX_URI],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
-  printer_t		*printer;	/* Printer data */
-  int			kbytes;		/* Size of print file */
-  int			i;		/* Looping var */
-  int			lowerpagerange;	/* Page range bound */
-
-
-  LogMessage(L_DEBUG2, "create_job(%p[%d], %s)\n", con, con->http.fd,
-             uri->values[0].string.text);
-
- /*
-  * Verify that the POST operation was done to a valid URI.
-  */
-
-  if (strncmp(con->uri, "/classes/", 9) != 0 &&
-      strncmp(con->uri, "/printers/", 10) != 0)
-  {
-    LogMessage(L_ERROR, "create_job: cancel request on bad resource \'%s\'!",
-               con->uri);
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
-    return;
-  }
-
- /*
-  * Is the destination valid?
-  */
-
-  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
-
-  if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
-  {
-   /*
-    * Bad URI...
-    */
-
-    LogMessage(L_ERROR, "create_job: resource name \'%s\' no good!", resource);
-    send_ipp_error(con, IPP_NOT_FOUND);
-    return;
-  }
-
- /*
-  * See if the printer is accepting jobs...
-  */
-
-  if (dtype & CUPS_PRINTER_CLASS)
-  {
-    printer = FindClass(dest);
-    snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/classes/%s",
-             ServerName, ntohs(con->http.hostaddr.sin_port), dest);
-  }
-  else
-  {
-    printer = FindPrinter(dest);
-
-    snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/printers/%s",
-             ServerName, ntohs(con->http.hostaddr.sin_port), dest);
-  }
-
-  if (!printer->accepting)
-  {
-    LogMessage(L_INFO, "create_job: destination \'%s\' is not accepting jobs.",
-               dest);
-    send_ipp_error(con, IPP_NOT_ACCEPTING);
-    return;
-  }
-
- /*
-  * Validate job template attributes; for now just copies and page-ranges...
-  */
-
-  if ((attr = ippFindAttribute(con->request, "copies", IPP_TAG_INTEGER)) != NULL)
-  {
-    if (attr->values[0].integer < 1 || attr->values[0].integer > MaxCopies)
-    {
-      LogMessage(L_INFO, "create_job: bad copies value %d.",
-                 attr->values[0].integer);
-      send_ipp_error(con, IPP_BAD_REQUEST);
-      return;
-    }
-  }
-
-  if ((attr = ippFindAttribute(con->request, "page-ranges", IPP_TAG_RANGE)) != NULL)
-  {
-    for (i = 0, lowerpagerange = 1; i < attr->num_values; i ++)
-    {
-      if (attr->values[i].range.lower < lowerpagerange || 
-	  attr->values[i].range.lower > attr->values[i].range.upper)
-      {
-	LogMessage(L_ERROR, "create_job: bad page-ranges values %d-%d.",
-	           attr->values[i].range.lower, attr->values[i].range.upper);
-	send_ipp_error(con, IPP_BAD_REQUEST);
-	return;
-      }
-
-      lowerpagerange = attr->values[i].range.upper + 1;
-    }
-  }
-
- /*
-  * Make sure we aren't over our limit...
-  */
-
-  if (NumJobs >= MaxJobs && MaxJobs)
-    CleanJobs();
-
-  if (NumJobs >= MaxJobs && MaxJobs)
-  {
-    LogMessage(L_INFO, "create_job: too many jobs.");
-    send_ipp_error(con, IPP_NOT_POSSIBLE);
-    return;
-  }
-
-  if (!check_quotas(con, printer))
-  {
-    send_ipp_error(con, IPP_NOT_POSSIBLE);
-    return;
-  }
-
- /*
-  * Create the job and set things up...
-  */
-
-  if ((attr = ippFindAttribute(con->request, "job-priority", IPP_TAG_INTEGER)) != NULL)
-    priority = attr->values[0].integer;
-  else
-    ippAddInteger(con->request, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-priority",
-                  priority = 50);
-
-  if ((attr = ippFindAttribute(con->request, "job-name", IPP_TAG_NAME)) != NULL)
-    title = attr->values[0].string.text;
-  else
-    ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL,
-                 title = "Untitled");
-
-  if ((job = AddJob(priority, printer->name)) == NULL)
-  {
-    LogMessage(L_ERROR, "create_job: unable to add job for destination \'%s\'!",
-               dest);
-    send_ipp_error(con, IPP_INTERNAL_ERROR);
-    return;
-  }
-
-  job->dtype   = dtype;
-  job->attrs   = con->request;
-  con->request = NULL;
-
-  attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME);
-
-  if (con->username[0])
-    SetString(&job->username, con->username);
-  else if (attr != NULL)
-  {
-    LogMessage(L_DEBUG, "create_job: requesting-user-name = \'%s\'",
-               attr->values[0].string.text);
-
-    SetString(&job->username, attr->values[0].string.text);
-  }
-  else
-    SetString(&job->username, "anonymous");
-
-  if (attr == NULL)
-    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-originating-user-name",
-                 NULL, job->username);
-  else
-  {
-    attr->group_tag = IPP_TAG_JOB;
-    SetString(&attr->name, "job-originating-user-name");
-  }
-
-  if ((attr = ippFindAttribute(job->attrs, "job-originating-host-name",
-                               IPP_TAG_ZERO)) != NULL)
-  {
-   /*
-    * Request contains a job-originating-host-name attribute; validate it...
-    */
-
-    if (attr->value_tag != IPP_TAG_NAME ||
-        attr->num_values != 1 ||
-        strcmp(con->http.hostname, "localhost") != 0)
-    {
-     /*
-      * Can't override the value if we aren't connected via localhost.
-      * Also, we can only have 1 value and it must be a name value.
-      */
-
-      int i;	/* Looping var */
-
-      switch (attr->value_tag)
-      {
-        case IPP_TAG_STRING :
-	case IPP_TAG_TEXTLANG :
-	case IPP_TAG_NAMELANG :
-	case IPP_TAG_TEXT :
-	case IPP_TAG_NAME :
-	case IPP_TAG_KEYWORD :
-	case IPP_TAG_URI :
-	case IPP_TAG_URISCHEME :
-	case IPP_TAG_CHARSET :
-	case IPP_TAG_LANGUAGE :
-	case IPP_TAG_MIMETYPE :
-	   /*
-	    * Free old strings...
-	    */
-
-	    for (i = 0; i < attr->num_values; i ++)
-	    {
-	      free(attr->values[i].string.text);
-	      attr->values[i].string.text = NULL;
-	      if (attr->values[i].string.charset)
-	      {
-		free(attr->values[i].string.charset);
-		attr->values[i].string.charset = NULL;
-	      }
-            }
-
-	default :
-            break;
-      }
-
-     /*
-      * Use the default connection hostname instead...
-      */
-
-      attr->value_tag             = IPP_TAG_NAME;
-      attr->num_values            = 1;
-      attr->values[0].string.text = strdup(con->http.hostname);
-    }
-  }
-  else
-  {
-   /*
-    * No job-originating-host-name attribute, so use the hostname from
-    * the connection...
-    */
-
-    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, 
-        	 "job-originating-host-name", NULL, con->http.hostname);
-  }
-
-  ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "time-at-creation",
-                time(NULL));
-  attr = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
-                       "time-at-processing", 0);
-  attr->value_tag = IPP_TAG_NOVALUE;
-  attr = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
-                       "time-at-completed", 0);
-  attr->value_tag = IPP_TAG_NOVALUE;
-
- /*
-  * Add remaining job attributes...
-  */
-
-  ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
-  job->state = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_ENUM,
-                             "job-state", IPP_JOB_STOPPED);
-  job->sheets = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
-                              "job-media-sheets-completed", 0);
-  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
-               printer_uri);
-  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL,
-               title);
-
-  if ((attr = ippFindAttribute(job->attrs, "job-k-octets", IPP_TAG_INTEGER)) != NULL)
-    attr->values[0].integer = 0;
-  else
-    attr = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
-                         "job-k-octets", 0);
-
-  if ((attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_KEYWORD)) == NULL)
-    attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
-  if (attr == NULL)
-    attr = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-                        "job-hold-until", NULL, "no-hold");
-  if (attr != NULL && strcmp(attr->values[0].string.text, "no-hold") != 0 &&
-      !(printer->type & CUPS_PRINTER_REMOTE))
-  {
-   /*
-    * Hold job until specified time...
-    */
-
-    SetJobHoldUntil(job->id, attr->values[0].string.text);
-  }
-  else
-    job->hold_until = time(NULL) + 60;
-
-  job->state->values[0].integer = IPP_JOB_HELD;
-
-  if (!(printer->type & CUPS_PRINTER_REMOTE) || Classification)
-  {
-   /*
-    * Add job sheets options...
-    */
-
-    if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) == NULL)
-    {
-      LogMessage(L_DEBUG, "Adding default job-sheets values \"%s,%s\"...",
-                 printer->job_sheets[0], printer->job_sheets[1]);
-
-      attr = ippAddStrings(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-sheets",
-                           2, NULL, NULL);
-      attr->values[0].string.text = strdup(printer->job_sheets[0]);
-      attr->values[1].string.text = strdup(printer->job_sheets[1]);
-    }
-
-    job->job_sheets = attr;
-
-   /*
-    * Enforce classification level if set...
-    */
-
-    if (Classification)
-    {
-      if (ClassifyOverride)
-      {
-        if (strcmp(attr->values[0].string.text, "none") == 0 &&
-	    (attr->num_values == 1 ||
-	     strcmp(attr->values[1].string.text, "none") == 0))
-        {
-	 /*
-          * Force the leading banner to have the classification on it...
-	  */
-
-          SetString(&attr->values[0].string.text, Classification);
-	}
-	else if (attr->num_values == 2 &&
-	         strcmp(attr->values[0].string.text, attr->values[1].string.text) != 0 &&
-		 strcmp(attr->values[0].string.text, "none") != 0 &&
-		 strcmp(attr->values[1].string.text, "none") != 0)
-        {
-	 /*
-	  * Can't put two different security markings on the same document!
-	  */
-
-          SetString(&attr->values[1].string.text, attr->values[0].string.text);
-	}
-      }
-      else if (strcmp(attr->values[0].string.text, Classification) != 0 &&
-               (attr->num_values == 1 ||
-	       strcmp(attr->values[1].string.text, Classification) != 0))
-      {
-       /*
-        * Force the leading banner to have the classification on it...
-	*/
-
-        SetString(&attr->values[0].string.text, Classification);
-      }
-    }
-
-   /*
-    * See if we need to add the starting sheet...
-    */
-
-    if (!(printer->type & CUPS_PRINTER_REMOTE))
-    {
-      kbytes = copy_banner(con, job, attr->values[0].string.text);
-
-      UpdateQuota(printer, job->username, 0, kbytes);
-    }
-  }
-  else if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) != NULL)
-    job->sheets = attr;
-
- /*
-  * Save and log the job...
-  */
-   
-  SaveJob(job->id);
-
-  LogMessage(L_INFO, "Job %d created on \'%s\' by \'%s\'.", job->id,
-             job->dest, job->username);
-
- /*
-  * Fill in the response info...
-  */
-
-  snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	   ntohs(con->http.hostaddr.sin_port), job->id);
-  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL, job_uri);
-
-  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
-
-  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
-                job->state->values[0].integer);
-
-  con->response->request.status.status_code = IPP_OK;
-}
-
-
-/*
  * 'copy_banner()' - Copy a banner file to the requests directory for the
  *                   specified job.
  */
@@ -3094,6 +2680,420 @@ copy_model(const char *from,		/* I - Source file */
   cupsFileClose(src);
 
   return (cupsFileClose(dst));
+}
+
+
+/*
+ * 'create_job()' - Print a file to a printer or class.
+ */
+
+static void
+create_job(client_t        *con,	/* I - Client connection */
+	   ipp_attribute_t *uri)	/* I - Printer URI */
+{
+  ipp_attribute_t	*attr;		/* Current attribute */
+  const char		*dest;		/* Destination */
+  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  int			priority;	/* Job priority */
+  char			*title;		/* Job name/title */
+  job_t			*job;		/* Current job */
+  char			job_uri[HTTP_MAX_URI],
+					/* Job URI */
+			printer_uri[HTTP_MAX_URI],
+					/* Printer URI */
+			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			username[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+  printer_t		*printer;	/* Printer data */
+  int			kbytes;		/* Size of print file */
+  int			i;		/* Looping var */
+  int			lowerpagerange;	/* Page range bound */
+
+
+  LogMessage(L_DEBUG2, "create_job(%p[%d], %s)\n", con, con->http.fd,
+             uri->values[0].string.text);
+
+ /*
+  * Verify that the POST operation was done to a valid URI.
+  */
+
+  if (strncmp(con->uri, "/classes/", 9) != 0 &&
+      strncmp(con->uri, "/printers/", 10) != 0)
+  {
+    LogMessage(L_ERROR, "create_job: cancel request on bad resource \'%s\'!",
+               con->uri);
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * Is the destination valid?
+  */
+
+  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+
+  if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
+  {
+   /*
+    * Bad URI...
+    */
+
+    LogMessage(L_ERROR, "create_job: resource name \'%s\' no good!", resource);
+    send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * See if the printer is accepting jobs...
+  */
+
+  if (dtype & CUPS_PRINTER_CLASS)
+  {
+    printer = FindClass(dest);
+    snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/classes/%s",
+             ServerName, ntohs(con->http.hostaddr.sin_port), dest);
+  }
+  else
+  {
+    printer = FindPrinter(dest);
+
+    snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/printers/%s",
+             ServerName, ntohs(con->http.hostaddr.sin_port), dest);
+  }
+
+  if (!printer->accepting)
+  {
+    LogMessage(L_INFO, "create_job: destination \'%s\' is not accepting jobs.",
+               dest);
+    send_ipp_error(con, IPP_NOT_ACCEPTING);
+    return;
+  }
+
+ /*
+  * Validate job template attributes; for now just copies and page-ranges...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "copies", IPP_TAG_INTEGER)) != NULL)
+  {
+    if (attr->values[0].integer < 1 || attr->values[0].integer > MaxCopies)
+    {
+      LogMessage(L_INFO, "create_job: bad copies value %d.",
+                 attr->values[0].integer);
+      send_ipp_error(con, IPP_BAD_REQUEST);
+      return;
+    }
+  }
+
+  if ((attr = ippFindAttribute(con->request, "page-ranges", IPP_TAG_RANGE)) != NULL)
+  {
+    for (i = 0, lowerpagerange = 1; i < attr->num_values; i ++)
+    {
+      if (attr->values[i].range.lower < lowerpagerange || 
+	  attr->values[i].range.lower > attr->values[i].range.upper)
+      {
+	LogMessage(L_ERROR, "create_job: bad page-ranges values %d-%d.",
+	           attr->values[i].range.lower, attr->values[i].range.upper);
+	send_ipp_error(con, IPP_BAD_REQUEST);
+	return;
+      }
+
+      lowerpagerange = attr->values[i].range.upper + 1;
+    }
+  }
+
+ /*
+  * Make sure we aren't over our limit...
+  */
+
+  if (NumJobs >= MaxJobs && MaxJobs)
+    CleanJobs();
+
+  if (NumJobs >= MaxJobs && MaxJobs)
+  {
+    LogMessage(L_INFO, "create_job: too many jobs.");
+    send_ipp_error(con, IPP_NOT_POSSIBLE);
+    return;
+  }
+
+  if (!check_quotas(con, printer))
+  {
+    send_ipp_error(con, IPP_NOT_POSSIBLE);
+    return;
+  }
+
+ /*
+  * Create the job and set things up...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "job-priority", IPP_TAG_INTEGER)) != NULL)
+    priority = attr->values[0].integer;
+  else
+    ippAddInteger(con->request, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-priority",
+                  priority = 50);
+
+  if ((attr = ippFindAttribute(con->request, "job-name", IPP_TAG_NAME)) != NULL)
+    title = attr->values[0].string.text;
+  else
+    ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL,
+                 title = "Untitled");
+
+  if ((job = AddJob(priority, printer->name)) == NULL)
+  {
+    LogMessage(L_ERROR, "create_job: unable to add job for destination \'%s\'!",
+               dest);
+    send_ipp_error(con, IPP_INTERNAL_ERROR);
+    return;
+  }
+
+  job->dtype   = dtype;
+  job->attrs   = con->request;
+  con->request = NULL;
+
+  attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME);
+
+  if (con->username[0])
+    SetString(&job->username, con->username);
+  else if (attr != NULL)
+  {
+    LogMessage(L_DEBUG, "create_job: requesting-user-name = \'%s\'",
+               attr->values[0].string.text);
+
+    SetString(&job->username, attr->values[0].string.text);
+  }
+  else
+    SetString(&job->username, "anonymous");
+
+  if (attr == NULL)
+    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-originating-user-name",
+                 NULL, job->username);
+  else
+  {
+    attr->group_tag = IPP_TAG_JOB;
+    SetString(&attr->name, "job-originating-user-name");
+  }
+
+  if ((attr = ippFindAttribute(job->attrs, "job-originating-host-name",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+   /*
+    * Request contains a job-originating-host-name attribute; validate it...
+    */
+
+    if (attr->value_tag != IPP_TAG_NAME ||
+        attr->num_values != 1 ||
+        strcmp(con->http.hostname, "localhost") != 0)
+    {
+     /*
+      * Can't override the value if we aren't connected via localhost.
+      * Also, we can only have 1 value and it must be a name value.
+      */
+
+      int i;	/* Looping var */
+
+      switch (attr->value_tag)
+      {
+        case IPP_TAG_STRING :
+	case IPP_TAG_TEXTLANG :
+	case IPP_TAG_NAMELANG :
+	case IPP_TAG_TEXT :
+	case IPP_TAG_NAME :
+	case IPP_TAG_KEYWORD :
+	case IPP_TAG_URI :
+	case IPP_TAG_URISCHEME :
+	case IPP_TAG_CHARSET :
+	case IPP_TAG_LANGUAGE :
+	case IPP_TAG_MIMETYPE :
+	   /*
+	    * Free old strings...
+	    */
+
+	    for (i = 0; i < attr->num_values; i ++)
+	    {
+	      free(attr->values[i].string.text);
+	      attr->values[i].string.text = NULL;
+	      if (attr->values[i].string.charset)
+	      {
+		free(attr->values[i].string.charset);
+		attr->values[i].string.charset = NULL;
+	      }
+            }
+
+	default :
+            break;
+      }
+
+     /*
+      * Use the default connection hostname instead...
+      */
+
+      attr->value_tag             = IPP_TAG_NAME;
+      attr->num_values            = 1;
+      attr->values[0].string.text = strdup(con->http.hostname);
+    }
+  }
+  else
+  {
+   /*
+    * No job-originating-host-name attribute, so use the hostname from
+    * the connection...
+    */
+
+    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, 
+        	 "job-originating-host-name", NULL, con->http.hostname);
+  }
+
+  ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "time-at-creation",
+                time(NULL));
+  attr = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
+                       "time-at-processing", 0);
+  attr->value_tag = IPP_TAG_NOVALUE;
+  attr = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
+                       "time-at-completed", 0);
+  attr->value_tag = IPP_TAG_NOVALUE;
+
+ /*
+  * Add remaining job attributes...
+  */
+
+  ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
+  job->state = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_ENUM,
+                             "job-state", IPP_JOB_STOPPED);
+  job->sheets = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
+                              "job-media-sheets-completed", 0);
+  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
+               printer_uri);
+  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL,
+               title);
+
+  if ((attr = ippFindAttribute(job->attrs, "job-k-octets", IPP_TAG_INTEGER)) != NULL)
+    attr->values[0].integer = 0;
+  else
+    attr = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
+                         "job-k-octets", 0);
+
+  if ((attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_KEYWORD)) == NULL)
+    attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
+  if (attr == NULL)
+    attr = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+                        "job-hold-until", NULL, "no-hold");
+  if (attr != NULL && strcmp(attr->values[0].string.text, "no-hold") != 0 &&
+      !(printer->type & CUPS_PRINTER_REMOTE))
+  {
+   /*
+    * Hold job until specified time...
+    */
+
+    SetJobHoldUntil(job->id, attr->values[0].string.text);
+  }
+  else
+    job->hold_until = time(NULL) + 60;
+
+  job->state->values[0].integer = IPP_JOB_HELD;
+
+  if (!(printer->type & CUPS_PRINTER_REMOTE) || Classification)
+  {
+   /*
+    * Add job sheets options...
+    */
+
+    if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) == NULL)
+    {
+      LogMessage(L_DEBUG, "Adding default job-sheets values \"%s,%s\"...",
+                 printer->job_sheets[0], printer->job_sheets[1]);
+
+      attr = ippAddStrings(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-sheets",
+                           2, NULL, NULL);
+      attr->values[0].string.text = strdup(printer->job_sheets[0]);
+      attr->values[1].string.text = strdup(printer->job_sheets[1]);
+    }
+
+    job->job_sheets = attr;
+
+   /*
+    * Enforce classification level if set...
+    */
+
+    if (Classification)
+    {
+      if (ClassifyOverride)
+      {
+        if (strcmp(attr->values[0].string.text, "none") == 0 &&
+	    (attr->num_values == 1 ||
+	     strcmp(attr->values[1].string.text, "none") == 0))
+        {
+	 /*
+          * Force the leading banner to have the classification on it...
+	  */
+
+          SetString(&attr->values[0].string.text, Classification);
+	}
+	else if (attr->num_values == 2 &&
+	         strcmp(attr->values[0].string.text, attr->values[1].string.text) != 0 &&
+		 strcmp(attr->values[0].string.text, "none") != 0 &&
+		 strcmp(attr->values[1].string.text, "none") != 0)
+        {
+	 /*
+	  * Can't put two different security markings on the same document!
+	  */
+
+          SetString(&attr->values[1].string.text, attr->values[0].string.text);
+	}
+      }
+      else if (strcmp(attr->values[0].string.text, Classification) != 0 &&
+               (attr->num_values == 1 ||
+	       strcmp(attr->values[1].string.text, Classification) != 0))
+      {
+       /*
+        * Force the leading banner to have the classification on it...
+	*/
+
+        SetString(&attr->values[0].string.text, Classification);
+      }
+    }
+
+   /*
+    * See if we need to add the starting sheet...
+    */
+
+    if (!(printer->type & CUPS_PRINTER_REMOTE))
+    {
+      kbytes = copy_banner(con, job, attr->values[0].string.text);
+
+      UpdateQuota(printer, job->username, 0, kbytes);
+    }
+  }
+  else if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) != NULL)
+    job->sheets = attr;
+
+ /*
+  * Save and log the job...
+  */
+   
+  SaveJob(job->id);
+
+  LogMessage(L_INFO, "Job %d created on \'%s\' by \'%s\'.", job->id,
+             job->dest, job->username);
+
+ /*
+  * Fill in the response info...
+  */
+
+  snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
+	   ntohs(con->http.hostaddr.sin_port), job->id);
+  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL, job_uri);
+
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
+
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
+                job->state->values[0].integer);
+
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -6536,5 +6536,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.203 2003/04/01 22:11:12 mike Exp $".
+ * End of "$Id: ipp.c,v 1.204 2003/04/01 22:14:07 mike Exp $".
  */
