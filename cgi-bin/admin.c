@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.22.2.16 2002/10/02 19:29:06 mike Exp $"
+ * "$Id: admin.c,v 1.22.2.17 2002/10/15 21:30:27 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -231,6 +231,7 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
       * Do the request and get back a response...
       */
 
+      httpReconnect(http);
       if ((response = cupsDoRequest(http, request, "/")) != NULL)
       {
 	ippSetCGIVars(response, NULL, NULL);
@@ -297,6 +298,7 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
     * Do the request and get back a response...
     */
 
+    httpReconnect(http);
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
      /*
@@ -357,6 +359,7 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
     * Do the request and get back a response...
     */
 
+    httpReconnect(http);
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
       if ((attr = ippFindAttribute(response, "member-uris", IPP_TAG_URI)) != NULL)
@@ -441,13 +444,14 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
     * Do the request and get back a response...
     */
 
+    httpReconnect(http);
     if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
     {
       status = response->request.status.status_code;
       ippDelete(response);
     }
     else
-      status = IPP_NOT_AUTHORIZED;
+      status = cupsLastError();
 
     if (status > IPP_OK_CONFLICT)
     {
@@ -533,6 +537,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     * Do the request and get back a response...
     */
 
+    httpReconnect(http);
     oldinfo = cupsDoRequest(http, request, "/");
   }
   else
@@ -608,6 +613,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     * Do the request and get back a response...
     */
 
+    httpReconnect(http);
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
       ippSetCGIVars(response, NULL, NULL);
@@ -744,6 +750,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     * Do the request and get back a response...
     */
 
+    httpReconnect(http);
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
       if ((var = cgiGetVariable("PPD_MAKE")) == NULL)
@@ -864,13 +871,14 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     * Do the request and get back a response...
     */
 
+    httpReconnect(http);
     if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
     {
       status = response->request.status.status_code;
       ippDelete(response);
     }
     else
-      status = IPP_NOT_AUTHORIZED;
+      status = cupsLastError();
 
     if (status > IPP_OK_CONFLICT)
     {
@@ -1092,6 +1100,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     * Do the request and get back a response...
     */
 
+    httpReconnect(http);
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
       if ((attr = ippFindAttribute(response, "job-sheets-supported", IPP_TAG_ZERO)) != NULL)
@@ -1228,13 +1237,14 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     * Do the request and get back a response...
     */
 
+    httpReconnect(http);
     if ((response = cupsDoFileRequest(http, request, "/admin/", tempfile)) != NULL)
     {
       status = response->request.status.status_code;
       ippDelete(response);
     }
     else
-      status = IPP_NOT_AUTHORIZED;
+      status = cupsLastError();
 
     if (status > IPP_OK_CONFLICT)
     {
@@ -1308,6 +1318,7 @@ do_delete_class(http_t      *http,	/* I - HTTP connection */
   * Do the request and get back a response...
   */
 
+  httpReconnect(http);
   if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
   {
     status = response->request.status.status_code;
@@ -1315,7 +1326,7 @@ do_delete_class(http_t      *http,	/* I - HTTP connection */
     ippDelete(response);
   }
   else
-    status = IPP_GONE;
+    status = cupsLastError();
 
   if (status > IPP_OK_CONFLICT)
   {
@@ -1384,6 +1395,7 @@ do_delete_printer(http_t      *http,	/* I - HTTP connection */
   * Do the request and get back a response...
   */
 
+  httpReconnect(http);
   if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
   {
     status = response->request.status.status_code;
@@ -1391,7 +1403,7 @@ do_delete_printer(http_t      *http,	/* I - HTTP connection */
     ippDelete(response);
   }
   else
-    status = IPP_GONE;
+    status = cupsLastError();
 
   if (status > IPP_OK_CONFLICT)
   {
@@ -1455,6 +1467,7 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
   * Do the request and get back a response...
   */
 
+  httpReconnect(http);
   if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
   {
     status = response->request.status.status_code;
@@ -1462,7 +1475,7 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
     ippDelete(response);
   }
   else
-    status = IPP_GONE;
+    status = cupsLastError();
 
   if (status > IPP_OK_CONFLICT)
   {
@@ -1531,5 +1544,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.22.2.16 2002/10/02 19:29:06 mike Exp $".
+ * End of "$Id: admin.c,v 1.22.2.17 2002/10/15 21:30:27 mike Exp $".
  */
