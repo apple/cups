@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.30 2003/02/05 21:14:49 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.31 2003/03/05 20:59:38 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -483,10 +483,10 @@ ReadConfiguration(void)
   if (ServerCertificate[0] != '/')
     SetStringf(&ServerCertificate, "%s/%s", ServerRoot, ServerCertificate);
 
+#  if defined(HAVE_LIBSSL) || defined(HAVE_GNUTLS)
   chown(ServerCertificate, run_user, Group);
   chmod(ServerCertificate, ConfigFilePerm);
 
-#  if defined(HAVE_LIBSSL) || defined(HAVE_GNUTLS)
   if (ServerKey[0] != '/')
     SetStringf(&ServerKey, "%s/%s", ServerRoot, ServerKey);
 
@@ -508,7 +508,7 @@ ReadConfiguration(void)
   chmod(temp, 0711);
 
   snprintf(temp, sizeof(temp), "%s/ppd", ServerRoot);
-  chown(temp, User, Group);
+  chown(temp, run_user, Group);
   chmod(temp, 0755);
 
   snprintf(temp, sizeof(temp), "%s/ssl", ServerRoot);
@@ -521,11 +521,19 @@ ReadConfiguration(void)
 
   snprintf(temp, sizeof(temp), "%s/classes.conf", ServerRoot);
   chown(temp, run_user, Group);
+#ifdef __APPLE__
+  chmod(temp, 0600);
+#else
   chmod(temp, ConfigFilePerm);
+#endif /* __APPLE__ */
 
   snprintf(temp, sizeof(temp), "%s/printers.conf", ServerRoot);
   chown(temp, run_user, Group);
+#ifdef __APPLE__
+  chmod(temp, 0600);
+#else
   chmod(temp, ConfigFilePerm);
+#endif /* __APPLE__ */
 
   snprintf(temp, sizeof(temp), "%s/passwd.md5", ServerRoot);
   chown(temp, User, Group);
@@ -2189,5 +2197,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.30 2003/02/05 21:14:49 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.31 2003/03/05 20:59:38 mike Exp $".
  */
