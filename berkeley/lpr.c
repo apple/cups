@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.10 2000/01/04 13:45:33 mike Exp $"
+ * "$Id: lpr.c,v 1.11 2000/02/24 15:20:18 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -212,8 +212,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
       if (job_id < 1)
       {
-	fprintf(stderr, "lpr: unable to print file \'%s\' - error code %x.\n",
-	        argv[i], cupsLastError());
+	fprintf(stderr, "lpr: unable to print file \'%s\' - %s.\n",
+	        argv[i], ippErrorString(cupsLastError()));
 	return (1);
       }
       else if (deletefile)
@@ -280,8 +280,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
     if (job_id < 1)
     {
-      fprintf(stderr, "lpr: unable to print standard input - error code %x.\n",
-              cupsLastError());
+      fprintf(stderr, "lpr: unable to print standard input - %s.\n",
+              ippErrorString(cupsLastError()));
       return (1);
     }
   }
@@ -314,5 +314,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c,v 1.10 2000/01/04 13:45:33 mike Exp $".
+ * End of "$Id: lpr.c,v 1.11 2000/02/24 15:20:18 mike Exp $".
  */

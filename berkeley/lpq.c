@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.7 2000/01/04 13:45:33 mike Exp $"
+ * "$Id: lpq.c,v 1.8 2000/02/24 15:20:18 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -49,6 +49,7 @@
 
 static int	show_jobs(http_t *, const char *, const char *, const int,
 		          const int);
+static void	show_printer(http_t *, const char *);
 
 
 /*
@@ -120,10 +121,16 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   for (;;)
   {
+    if (dest)
+      show_printer(http, dest);
+
     i = show_jobs(http, dest, user, id, longstatus);
 
     if (i && interval)
+    {
+      fflush(stdout);
       sleep(interval);
+    }
     else
       break;
   }
@@ -161,8 +168,11 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 		jobsize,	/* job-k-octets */
 		jobpriority,	/* job-priority */
 		jobcount,	/* Number of jobs */
+		jobcopies,	/* Number of copies */
 		rank;		/* Rank of job */
   char		resource[1024];	/* Resource string */
+  char		rankstr[255];	/* Rank string */
+  char		namestr[1024];	/* Job name string */
   static const char *ranks[10] =/* Ranking strings */
 		{
 		  "th",
@@ -191,7 +201,6 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
   *    attributes-charset
   *    attributes-natural-language
   *    job-uri or printer-uri
-  *    [
   */
 
   request = ippNew();
@@ -236,13 +245,18 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
   * Do the request and get back a response...
   */
 
-  if (!longstatus)
-    puts("Rank\tPri   Owner      Job    Files              Total Size");
-
   jobcount = 0;
 
   if ((response = cupsDoRequest(http, request, "/jobs/")) != NULL)
   {
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    {
+      fprintf(stderr, "lpq: get-jobs failed: %s\n",
+              ippErrorString(response->request.status.status_code));
+      ippDelete(response);
+      return (0);
+    }
+
     rank = 1;
 
    /*
@@ -272,6 +286,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
       jobname     = "untitled";
       jobuser     = NULL;
       jobdest     = NULL;
+      jobcopies   = 1;
 
       while (attr != NULL && attr->group_tag == IPP_TAG_JOB)
       {
@@ -304,6 +319,10 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 	    attr->value_tag == IPP_TAG_NAME)
 	  jobname = attr->values[0].string.text;
 
+        if (strcmp(attr->name, "copies") == 0 &&
+	    attr->value_tag == IPP_TAG_INTEGER)
+	  jobcopies = attr->values[0].integer;
+
         attr = attr->next;
       }
 
@@ -319,51 +338,146 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
           continue;
       }
 
+      if (!longstatus && jobcount == 0)
+	puts("Rank   Owner      Job          Files             Total Size");
+
       jobcount ++;
 
      /*
       * Display the job...
       */
 
+      if (jobstate == IPP_JOB_PROCESSING)
+	strcpy(rankstr, "active");
+      else
+      {
+	sprintf(rankstr, "%d%s\t", rank, ranks[rank % 10]);
+	rank ++;
+      }
+
       if (longstatus)
       {
         puts("");
 
-        if (jobstate == IPP_JOB_PROCESSING)
-	  printf("%s: active\t\t\t\t ", jobuser);
+        if (jobcopies > 1)
+	  sprintf(namestr, "%d copies of %s", jobcopies, jobname);
 	else
-	{
-	  printf("%s: %d%s\t\t\t\t ", jobuser, rank, ranks[rank % 10]);
-	  rank ++;
-	}
+	  strcpy(namestr, jobname);
 
-        printf("[job %03dlocalhost]\n", jobid);
-        printf("\t%-32.32s %d bytes\n", jobname, jobsize);
+        printf("%s: %-31s [job %d localhost]\n", jobuser, rankstr, jobid);
+        printf("        %-31.31s %d bytes\n", namestr, jobsize);
       }
       else
-      {
-        if (jobstate == IPP_JOB_PROCESSING)
-	  printf("active\t");
-	else
-	{
-	  printf("%d%s\t", rank, ranks[rank % 10]);
-	  rank ++;
-	}
-
-        printf(" %-4d %-10.10s %-6d %-18.18s %d bytes\n", jobpriority, jobuser,
+        printf("%-6s %-10.10s %-15d %-27.27s %d bytes\n", rankstr, jobuser,
 	       jobid, jobname, jobsize);
-      }
+
       if (attr == NULL)
         break;
     }
 
     ippDelete(response);
   }
+  else
+  {
+    fprintf(stderr, "lpq: get-jobs failed: %s\n", ippErrorString(cupsLastError()));
+    return (0);
+  }
+
+  if (jobcount == 0)
+    puts("no entries");
 
   return (jobcount);
 }
 
 
 /*
- * End of "$Id: lpq.c,v 1.7 2000/01/04 13:45:33 mike Exp $".
+ * 'show_printer()' - Show printer status.
+ */
+
+static void
+show_printer(http_t     *http,	/* I - HTTP connection to server */
+             const char *dest)	/* I - Destination */
+{
+  ipp_t		*request,	/* IPP Request */
+		*response;	/* IPP Response */
+  ipp_attribute_t *attr;	/* Current attribute */
+  cups_lang_t	*language;	/* Default language */
+  const char	*printer,	/* Printer name */
+		*message;	/* Printer device URI */
+  ipp_pstate_t	state;		/* Printer state */
+  char		uri[HTTP_MAX_URI];
+				/* Printer URI */
+
+
+  if (http == NULL)
+    return;
+
+ /*
+  * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
+  * attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  *    printer-uri
+  */
+
+  request = ippNew();
+
+  request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+  request->request.op.request_id   = 1;
+
+  language = cupsLangDefault();
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
+
+  sprintf(uri, "ipp://localhost/printers/%s", dest);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
+               "printer-uri", NULL, uri);
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
+  {
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    {
+      fprintf(stderr, "lpq: get-printer-attributes failed: %s\n",
+              ippErrorString(response->request.status.status_code));
+      ippDelete(response);
+      return;
+    }
+
+    if ((attr = ippFindAttribute(response, "printer-state", IPP_TAG_ENUM)) != NULL)
+      state = (ipp_pstate_t)attr->values[0].integer;
+    else
+      state = IPP_PRINTER_STOPPED;
+
+    switch (state)
+    {
+      case IPP_PRINTER_IDLE :
+          printf("%s is ready\n", dest);
+	  break;
+      case IPP_PRINTER_PROCESSING :
+          printf("%s is ready and printing\n", dest);
+	  break;
+      case IPP_PRINTER_STOPPED :
+          printf("%s is not ready\n", dest);
+	  break;
+    }
+
+    ippDelete(response);
+  }
+  else
+    fprintf(stderr, "lpq: get-printer-attributes failed: %s\n",
+            ippErrorString(cupsLastError()));
+}
+
+
+/*
+ * End of "$Id: lpq.c,v 1.8 2000/02/24 15:20:18 mike Exp $".
  */
