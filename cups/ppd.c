@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.113 2003/08/20 15:54:18 mike Exp $"
+ * "$Id: ppd.c,v 1.114 2003/11/17 02:28:14 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -114,7 +114,7 @@ static ppd_size_t	*ppd_add_size(ppd_file_t *ppd, const char *name);
 static int		ppd_compare_groups(ppd_group_t *g0, ppd_group_t *g1);
 static int		ppd_compare_options(ppd_option_t *o0, ppd_option_t *o1);
 #endif /* !__APPLE__ */
-static void		ppd_decode(char *string);
+static int		ppd_decode(char *string);
 #ifndef __APPLE__
 static void		ppd_fix(char *string);
 #else
@@ -1927,7 +1927,7 @@ ppd_compare_options(ppd_option_t *o0,	/* I - First option */
  * 'ppd_decode()' - Decode a string value...
  */
 
-static void
+static int				/* O - Length of decoded string */
 ppd_decode(char *string)		/* I - String to decode */
 {
   char	*inptr,				/* Input pointer */
@@ -1972,6 +1972,8 @@ ppd_decode(char *string)		/* I - String to decode */
       *outptr++ = *inptr++;
 
   *outptr = '\0';
+
+  return (outptr - string);
 }
 
 
@@ -2193,7 +2195,8 @@ ppd_read(FILE *fp,			/* I - File to read from */
 		colon,			/* Colon seen? */
 		endquote,		/* Waiting for an end quote */
 		mask,			/* Mask to be returned */
-		startline;		/* Start line */
+		startline,		/* Start line */
+		textlen;		/* Length of text */
   char		*keyptr,		/* Keyword pointer */
 		*optptr,		/* Option pointer */
 		*textptr,		/* Text pointer */
@@ -2581,8 +2584,14 @@ ppd_read(FILE *fp,			/* I - File to read from */
         }
 
 	*textptr = '\0';
-	ppd_decode(text);
+	textlen  = ppd_decode(text);
 
+	if (textlen > PPD_MAX_TEXT && ppd_conform == PPD_CONFORM_STRICT)
+	{
+	  ppd_status = PPD_ILLEGAL_TRANSLATION;
+	  return (0);
+	}
+	    
 	mask |= PPD_TEXT;
       }
 
@@ -2643,5 +2652,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.113 2003/08/20 15:54:18 mike Exp $".
+ * End of "$Id: ppd.c,v 1.114 2003/11/17 02:28:14 mike Exp $".
  */
