@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.110 2000/12/14 22:21:58 mike Exp $"
+ * "$Id: ipp.c,v 1.111 2000/12/15 19:36:59 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -245,7 +245,12 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
                      "attributes-natural-language", NULL, DefaultLanguage);
 
       if (charset == NULL || language == NULL ||
-	  (uri == NULL && con->request->request.op.operation_id < IPP_PRIVATE))
+	  (uri == NULL &&
+	   con->request->request.op.operation_id != CUPS_GET_DEFAULT &&
+	   con->request->request.op.operation_id != CUPS_GET_PRINTERS &&
+	   con->request->request.op.operation_id != CUPS_GET_CLASSES &&
+	   con->request->request.op.operation_id != CUPS_GET_DEVICES &&
+	   con->request->request.op.operation_id != CUPS_GET_PPDS))
       {
        /*
 	* Return an error, since attributes-charset,
@@ -5114,5 +5119,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.110 2000/12/14 22:21:58 mike Exp $".
+ * End of "$Id: ipp.c,v 1.111 2000/12/15 19:36:59 mike Exp $".
  */

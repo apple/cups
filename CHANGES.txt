@@ -157,6 +157,9 @@ CHANGES IN CUPS V1.1.5
 	  files, which could prevent the banner pages from
 	  printing on some systems.
 	- The lpstat program wasn't listing remote classes.
+	- The scheduler did not verify that the printer-uri
+	  attribute was specified in all requests that required
+	  it.
 
 
 CHANGES IN CUPS v1.1.4
