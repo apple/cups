@@ -1,5 +1,5 @@
 /*
- * "$Id: testmime.c,v 1.7 2002/03/28 12:46:40 mike Exp $"
+ * "$Id: testmime.c,v 1.8 2002/12/16 20:03:21 mike Exp $"
  *
  *   MIME test program for the Common UNIX Printing System (CUPS).
  *
@@ -72,22 +72,17 @@ main(int  argc,				/* I - Number of command-line args */
       i ++;
 
       if (i < argc)
-        mime = mimeLoad(argv[i]);
+        mime = mimeLoad(argv[i], "../filter");
     }
     else if (src == NULL)
     {
       if (!mime)
-	mime = mimeLoad("../conf");
+	mime = mimeLoad("../conf", "../filter");
 
       src = mimeFileType(mime, argv[i]);
 
       if (src != NULL)
-      {
 	printf("%s: %s/%s\n", argv[i], src->super, src->type);
-	if (mime)
-	  mimeDelete(mime);
-	return (0);
-      }
       else
       {
 	printf("%s: unknown\n", argv[i]);
@@ -101,7 +96,7 @@ main(int  argc,				/* I - Number of command-line args */
       sscanf(argv[i], "%15[^/]/%31s", super, type);
       dst = mimeType(mime, super, type);
 
-      filters = mimeFilter(mime, src, dst, &num_filters);
+      filters = mimeFilter(mime, src, dst, &num_filters, 10);
 
       if (filters == NULL)
       {
@@ -121,7 +116,7 @@ main(int  argc,				/* I - Number of command-line args */
     }
 
   if (!mime)
-    mime = mimeLoad("../conf");
+    mime = mimeLoad("../conf", "../filter");
 
   if (src == NULL)
   {
@@ -237,5 +232,5 @@ print_rules(mime_magic_t *rules)	/* I - Rules to print */
 
 
 /*
- * End of "$Id: testmime.c,v 1.7 2002/03/28 12:46:40 mike Exp $".
+ * End of "$Id: testmime.c,v 1.8 2002/12/16 20:03:21 mike Exp $".
  */
