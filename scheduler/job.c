@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.59 2000/03/30 05:19:29 mike Exp $"
+ * "$Id: job.c,v 1.60 2000/04/11 18:16:48 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1095,7 +1095,7 @@ StartJob(int       id,		/* I - Job ID */
     {
       current->procs[i] = pid;
 
-      LogMessage(L_DEBUG, "Started %s (PID %d) for job %d.", command, pid,
+      LogMessage(L_INFO, "Started %s (PID %d) for job %d.", command, pid,
                  current->id);
     }
   }
@@ -1144,7 +1144,7 @@ StartJob(int       id,		/* I - Job ID */
     {
       current->procs[i] = pid;
 
-      LogMessage(L_DEBUG, "Started %s (PID %d) for job %d.", command, pid,
+      LogMessage(L_INFO, "Started %s (PID %d) for job %d.", command, pid,
                  current->id);
     }
   }
@@ -2308,5 +2308,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.59 2000/03/30 05:19:29 mike Exp $".
+ * End of "$Id: job.c,v 1.60 2000/04/11 18:16:48 mike Exp $".
  */
