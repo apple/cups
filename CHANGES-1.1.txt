@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc3
 
+	- Updated the Netatalk documentation in the SAM (STR #38
+	  and #39)
 	- The test suite sent text files to a non-PS print queue,
 	  which requires ESP Ghostscript (provided separately).
 	  Now send the JPEG test file (STR #33)
