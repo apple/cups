@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc4
 
+	- The German web interface templates did not use the
+	  right paths for job operations (STR #54)
 	- The scheduler would consume all available CPU if
 	  started with a pending job in the queue (STR #35)
 	- The polling daemon allocated an extra localization
