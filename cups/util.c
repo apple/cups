@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.80 2001/03/02 14:30:14 mike Exp $"
+ * "$Id: util.c,v 1.81 2001/03/09 20:06:07 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -32,8 +32,6 @@
  *   cupsLastError()     - Return the last IPP error that occurred.
  *   cupsPrintFile()     - Print a file to a printer or class.
  *   cupsPrintFiles()    - Print one or more files to a printer or class.
- *   cupsTempFd()        - Create a temporary file.
- *   cupsTempFile()      - Generate a temporary filename.
  *   cups_connect()      - Connect to the specified host...
  *   cups_local_auth()   - Get the local authorization certificate if
  *                         available/applicable...
@@ -1246,155 +1244,6 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
 
 
 /*
- * 'cupsTempFd()' - Create a temporary file.
- */
-
-int					/* O - New file descriptor */
-cupsTempFd(char *filename,		/* I - Pointer to buffer */
-           int  len)			/* I - Size of buffer */
-{
-  int		fd;			/* File descriptor for temp file */
-#ifdef WIN32
-  char		tmpdir[1024];		/* Windows temporary directory */
-  DWORD		curtime;		/* Current time */
-#else
-  char		*tmpdir;		/* TMPDIR environment var */
-  struct timeval curtime;		/* Current time */
-#endif /* WIN32 */
-  static char	buf[1024] = "";		/* Buffer if you pass in NULL and 0 */
-
-
- /*
-  * See if a filename was specified...
-  */
-
-  if (filename == NULL)
-  {
-    filename = buf;
-    len      = sizeof(buf);
-  }
-
- /*
-  * See if TMPDIR is defined...
-  */
-
-#ifdef WIN32
-  GetTempPath(sizeof(tmpdir), tmpdir);
-#else
-  if ((tmpdir = getenv("TMPDIR")) == NULL)
-  {
-   /*
-    * Put root temp files in restricted temp directory...
-    */
-
-    if (getuid() == 0)
-      tmpdir = CUPS_REQUESTS "/tmp";
-    else
-      tmpdir = "/var/tmp";
-  }
-#endif /* WIN32 */
-
- /*
-  * Make the temporary name using the specified directory...
-  */
-
-  do
-  {
-#ifdef WIN32
-   /*
-    * Get the current time of day...
-    */
-
-    curtime = GetTickCount();
-
-   /*
-    * Format a string using the hex time values...
-    */
-
-    snprintf(filename, len - 1, "%s/%08lx", tmpdir, curtime);
-#else
-   /*
-    * Get the current time of day...
-    */
-
-    gettimeofday(&curtime, NULL);
-
-   /*
-    * Format a string using the hex time values...
-    */
-
-    snprintf(filename, len - 1, "%s/%08lx%05lx", tmpdir,
-             curtime.tv_sec, curtime.tv_usec);
-#endif /* WIN32 */
-
-   /*
-    * Open the file in "exclusive" mode, making sure that we don't
-    * stomp on an existing file or someone's symlink crack...
-    */
-
-#ifdef O_NOFOLLOW
-    fd = open(filename, O_RDWR | O_CREAT | O_EXCL | O_NOFOLLOW, 0600);
-#else
-    fd = open(filename, O_RDWR | O_CREAT | O_EXCL, 0600);
-#endif /* O_NOFOLLOW */
-
-    if (fd < 0 && errno == EPERM)
-      break; /* Stop immediately if permission denied! */
-  }
-  while (fd < 0);
-
- /*
-  * Return the file descriptor...
-  */
-
-  return (fd);
-}
-
-
-/*
- * 'cupsTempFile()' - Generate a temporary filename.
- */
-
-char *					/* O - Filename */
-cupsTempFile(char *filename,		/* I - Pointer to buffer */
-             int  len)			/* I - Size of buffer */
-{
-  int		fd;			/* File descriptor for temp file */
-  static char	buf[1024] = "";		/* Buffer if you pass in NULL and 0 */
-
-
- /*
-  * See if a filename was specified...
-  */
-
-  if (filename == NULL)
-  {
-    filename = buf;
-    len      = sizeof(buf);
-  }
-
- /*
-  * Create the temporary file...
-  */
-
-  if ((fd = cupsTempFd(filename, len)) < 0)
-    return (NULL);
-
- /*
-  * Close the temp file - it'll be reopened later as needed...
-  */
-
-  close(fd);
-
- /*
-  * Return the temp filename...
-  */
-
-  return (filename);
-}
-
-
-/*
  * 'cups_connect()' - Connect to the specified host...
  */
 
@@ -1525,5 +1374,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.80 2001/03/02 14:30:14 mike Exp $".
+ * End of "$Id: util.c,v 1.81 2001/03/09 20:06:07 mike Exp $".
  */
