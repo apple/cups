@@ -1,7 +1,7 @@
 /*
- * "$Id: image-png.c,v 1.9 2000/04/30 22:03:57 mike Exp $"
+ * "$Id: image-pix.c,v 1.1 2000/04/30 22:03:57 mike Exp $"
  *
- *   PNG image routines for the Common UNIX Printing System (CUPS).
+ *   Alias PIX image routines for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1993-2000 by Easy Software Products.
  *
@@ -23,7 +23,8 @@
  *
  * Contents:
  *
- *   ImageReadPNG() - Read a PNG image file.
+ *   ImageReadPIX() - Read a PIX image file.
+ *   read_short()   - Read a 16-bit integer.
  */
 
 /*
@@ -32,16 +33,20 @@
 
 #include "image.h"
 
-#if defined(HAVE_LIBPNG) && defined(HAVE_LIBZ)
-#include <png.h>	/* Portable Network Graphics (PNG) definitions */
+
+/*
+ * Local functions...
+ */
+
+static short	read_short(FILE *fp);
 
 
 /*
- * 'ImageReadPNG()' - Read a PNG image file.
+ * 'ImageReadPIX()' - Read a PIX image file.
  */
 
 int					/* O - Read status */
-ImageReadPNG(image_t    *img,		/* IO - Image */
+ImageReadPIX(image_t    *img,		/* IO - Image */
              FILE       *fp,		/* I - Image file */
              int        primary,	/* I - Primary choice for colorspace */
              int        secondary,	/* I - Secondary choice for colorspace */
@@ -49,88 +54,67 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
              int        hue,		/* I - Color hue (degrees) */
 	     const ib_t *lut)		/* I - Lookup table for gamma/brightness */
 {
-  int		y;		/* Looping var */
-  png_structp	pp;		/* PNG read pointer */
-  png_infop	info;		/* PNG info pointers */
-  int		bpp;		/* Bytes per pixel */
-  ib_t		*in,		/* Input pixels */
-		*out;		/* Output pixels */
+  short		width,			/* Width of image */
+		height,			/* Height of image */
+		depth;			/* Depth of image (bits) */
+  int		count,			/* Repetition count */
+		bpp,			/* Bytes per pixel */
+		x, y;			/* Looping vars */
+  ib_t		r, g, b;		/* Red, green/gray, blue values */
+  ib_t		*in,			/* Input pixels */
+		*out,			/* Output pixels */
+		*ptr;			/* Pointer into pixels */
 
 
  /*
-  * Setup the PNG data structures...
+  * Get the image dimensions and setup the image...
   */
 
-  pp   = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-  info = png_create_info_struct(pp);
+  width  = read_short(fp);
+  height = read_short(fp);
+  read_short(fp);
+  read_short(fp);
+  depth  = read_short(fp);
 
- /*
-  * Initialize the PNG read "engine"...
-  */
-
-  png_init_io(pp, fp);
-
- /*
-  * Get the image dimensions and load the output image...
-  */
-
-  png_read_info(pp, info);
-
-  if (info->color_type == PNG_COLOR_TYPE_PALETTE)
-    png_set_expand(pp);
-
-  if (info->color_type == PNG_COLOR_TYPE_GRAY ||
-      info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+  if (depth == 8)
     img->colorspace = secondary;
   else
     img->colorspace = primary;
 
-  img->xsize = info->width;
-  img->ysize = info->height;
-
-  if (info->valid & PNG_INFO_pHYs &&
-      info->phys_unit_type == PNG_RESOLUTION_METER)
-  {
-    img->xppi = (int)((float)info->x_pixels_per_unit * 0.0254);
-    img->yppi = (int)((float)info->y_pixels_per_unit * 0.0254);
-  }
+  img->xsize = width;
+  img->ysize = height;
 
   ImageSetMaxTiles(img, 0);
 
-  if (info->bit_depth < 8)
-  {
-    png_set_packing(pp);
-
-    if (info->valid & PNG_INFO_sBIT)
-      png_set_shift(pp, &(info->sig_bit));
-  }
-  else if (info->bit_depth == 16)
-    png_set_strip_16(pp);
-
-  if (info->color_type == PNG_COLOR_TYPE_GRAY ||
-      info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
-    in = malloc(img->xsize);
-  else
-    in = malloc(img->xsize * 3);
-
+  in  = malloc(img->xsize * (depth / 8));
   bpp = ImageGetDepth(img);
   out = malloc(img->xsize * bpp);
 
  /*
-  * This doesn't work for interlaced PNG files... :(
+  * Read the image data...
   */
 
-  for (y = 0; y < img->ysize; y ++)
+  if (depth == 8)
   {
-    if (info->color_type == PNG_COLOR_TYPE_GRAY ||
-	 info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+    for (count = 0, y = 0; y < img->ysize; y ++)
     {
       if (img->colorspace == IMAGE_WHITE)
-        png_read_row(pp, (png_bytep)out, NULL);
+        ptr = out;
       else
-      {
-	png_read_row(pp, (png_bytep)in, NULL);
+        ptr = in;
 
+      for (x = img->xsize; x > 0; x --, count --)
+      {
+        if (count == 0)
+	{
+          count = getc(fp);
+	  g     = getc(fp);
+	}
+
+        *ptr++ = g;
+      }
+
+      if (img->colorspace != IMAGE_WHITE)
 	switch (img->colorspace)
 	{
 	  case IMAGE_RGB :
@@ -146,22 +130,45 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
 	      ImageWhiteToCMYK(in, out, img->xsize);
 	      break;
 	}
-      }
+
+      if (lut)
+	ImageLut(out, img->xsize * bpp, lut);
+
+      ImagePutRow(img, 0, y, img->xsize, out);
     }
-    else
+  }
+  else
+  {
+    for (count = 0, y = 0; y < img->ysize; y ++)
     {
       if (img->colorspace == IMAGE_RGB)
-      {
-        png_read_row(pp, (png_bytep)out, NULL);
+        ptr = out;
+      else
+        ptr = in;
 
+      for (x = img->xsize; x > 0; x --, count --)
+      {
+        if (count == 0)
+	{
+          count = getc(fp);
+	  b     = getc(fp);
+	  g     = getc(fp);
+	  r     = getc(fp);
+	}
+
+        *ptr++ = r;
+        *ptr++ = g;
+        *ptr++ = b;
+      }
+
+      if (img->colorspace == IMAGE_RGB)
+      {
 	if (saturation != 100 || hue != 0)
 	  ImageRGBAdjust(out, img->xsize, saturation, hue);
       }
       else
       {
-	png_read_row(pp, (png_bytep)in, NULL);
-
-	if ((saturation != 100 || hue != 0) && bpp > 1)
+	if (saturation != 100 || hue != 0)
 	  ImageRGBAdjust(in, img->xsize, saturation, hue);
 
 	switch (img->colorspace)
@@ -180,16 +187,13 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
 	      break;
 	}
       }
+
+      if (lut)
+	ImageLut(out, img->xsize * bpp, lut);
+
+      ImagePutRow(img, 0, y, img->xsize, out);
     }
-
-    if (lut)
-      ImageLut(out, img->xsize * bpp, lut);
-
-    ImagePutRow(img, 0, y, img->xsize, out);
   }
-
-  png_read_end(pp, info);
-  png_read_destroy(pp, info, NULL);
 
   fclose(fp);
   free(in);
@@ -199,9 +203,21 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
 }
 
 
-#endif /* HAVE_LIBPNG && HAVE_LIBZ */
+/*
+ * 'read_short()' - Read a 16-bit integer.
+ */
+
+static short			/* O - Value from file */
+read_short(FILE *fp)		/* I - File to read from */
+{
+  int	ch;			/* Character from file */
+
+
+  ch = getc(fp);
+  return ((ch << 8) | getc(fp));
+}
 
 
 /*
- * End of "$Id: image-png.c,v 1.9 2000/04/30 22:03:57 mike Exp $".
+ * End of "$Id: image-pix.c,v 1.1 2000/04/30 22:03:57 mike Exp $".
  */

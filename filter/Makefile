@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.30 2000/04/20 19:56:38 mike Exp $"
+# "$Id: Makefile,v 1.31 2000/04/30 22:03:56 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -29,9 +29,10 @@ TARGETS	=	hpgltops texttops pstops imagetops imagetoraster \
 
 HPGLOBJS =	hpgl-attr.o hpgl-config.o hpgl-main.o hpgl-prolog.o \
 		hpgl-char.o hpgl-input.o hpgl-polygon.o hpgl-vector.o
-IMAGEOBJS =	image-colorspace.o image-photocd.o image-sgilib.o \
-		image-tiff.o image-gif.o image-png.o image-sgi.o image-zoom.o \
-		image-jpeg.o image-pnm.o image-sun.o image.o
+IMAGEOBJS =	image-bmp.o image-colorspace.o image-gif.o image-jpeg.o \
+		image-photocd.o image-pix.o image-png.o image-pnm.o \
+		image-sgi.o image-sgilib.o image-sun.o image-tiff.o \
+		image-zoom.o image.o raster.o
 FORMOBJS =	form-attr.o form-main.o form-ps.o form-text.o form-tree.o
 OBJS	=	$(HPGLOBJS) $(IMAGEOBJS) $(FORMOBJS) \
 		imagetops.o imagetoraster.o common.o pstops.o raster.o \
@@ -197,5 +198,5 @@ $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 
 #
-# End of "$Id: Makefile,v 1.30 2000/04/20 19:56:38 mike Exp $".
+# End of "$Id: Makefile,v 1.31 2000/04/30 22:03:56 mike Exp $".
 #

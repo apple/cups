@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.24 2000/04/24 20:52:04 mike Exp $"
+ * "$Id: image.c,v 1.25 2000/04/30 22:03:57 mike Exp $"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
@@ -143,6 +143,8 @@ ImageOpen(char       *filename,	/* I - Filename of image */
   if (memcmp(header, "GIF87a", 6) == 0 ||
            memcmp(header, "GIF89a", 6) == 0)
     status = ImageReadGIF(img, fp, primary, secondary, saturation, hue, lut);
+  else if (memcmp(header, "BM", 2) == 0)
+    status = ImageReadBMP(img, fp, primary, secondary, saturation, hue, lut);
   else if (header[0] == 0x01 && header[1] == 0xda)
     status = ImageReadSGI(img, fp, primary, secondary, saturation, hue, lut);
   else if (header[0] == 0x59 && header[1] == 0xa6 &&
@@ -152,6 +154,9 @@ ImageOpen(char       *filename,	/* I - Filename of image */
     status = ImageReadPNM(img, fp, primary, secondary, saturation, hue, lut);
   else if (memcmp(header2, "PCD_IPI", 7) == 0)
     status = ImageReadPhotoCD(img, fp, primary, secondary, saturation, hue, lut);
+  else if (memcmp(header + 8, "\000\010", 2) == 0 ||
+           memcmp(header + 8, "\000\030", 2) == 0)
+    status = ImageReadPIX(img, fp, primary, secondary, saturation, hue, lut);
 #if defined(HAVE_LIBPNG) && defined(HAVE_LIBZ)
   else if (memcmp(header, "\211PNG", 4) == 0)
     status = ImageReadPNG(img, fp, primary, secondary, saturation, hue, lut);
@@ -791,5 +796,5 @@ flush_tile(image_t *img)	/* I - Image */
 
 
 /*
- * End of "$Id: image.c,v 1.24 2000/04/24 20:52:04 mike Exp $".
+ * End of "$Id: image.c,v 1.25 2000/04/30 22:03:57 mike Exp $".
  */

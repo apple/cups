@@ -1,5 +1,5 @@
 /*
- * "$Id: image.h,v 1.9 2000/01/04 13:45:46 mike Exp $"
+ * "$Id: image.h,v 1.10 2000/04/30 22:03:57 mike Exp $"
  *
  *   Image library definitions for the Common UNIX Printing System (CUPS).
  *
@@ -168,10 +168,16 @@ extern int	ImagePutRow(image_t *img, int x, int y, int width, const ib_t *pixels
  * File formats...
  */
 
+extern int	ImageReadBMP(image_t *img, FILE *fp, int primary, int secondary,
+		             int saturation, int hue, const ib_t *lut);
+extern int	ImageReadFPX(image_t *img, FILE *fp, int primary, int secondary,
+		             int saturation, int hue, const ib_t *lut);
 extern int	ImageReadGIF(image_t *img, FILE *fp, int primary, int secondary,
 		             int saturation, int hue, const ib_t *lut);
 extern int	ImageReadJPEG(image_t *img, FILE *fp, int primary, int secondary,
 		              int saturation, int hue, const ib_t *lut);
+extern int	ImageReadPIX(image_t *img, FILE *fp, int primary, int secondary,
+		             int saturation, int hue, const ib_t *lut);
 extern int	ImageReadPNG(image_t *img, FILE *fp, int primary, int secondary,
 		             int saturation, int hue, const ib_t *lut);
 extern int	ImageReadPNM(image_t *img, FILE *fp, int primary, int secondary,
@@ -221,5 +227,5 @@ extern void	ImageZoomFree(izoom_t *z);
 #endif /* !_IMAGE_H_ */
 
 /*
- * End of "$Id: image.h,v 1.9 2000/01/04 13:45:46 mike Exp $".
+ * End of "$Id: image.h,v 1.10 2000/04/30 22:03:57 mike Exp $".
  */
