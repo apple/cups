@@ -191,8 +191,14 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <LI><A HREF="#Timeout">Timeout</A></LI>
 <LI><A HREF="#User">User</A></LI>
 </UL>
-<LI><A HREF="#7_5">Changing the Printer Configuration</A></LI>
-<LI><A HREF="#7_6">Printer Directives</A></LI>
+<LI><A HREF="#7_5">Changing the Client Configuration</A></LI>
+<LI><A HREF="#7_6">Client Directives</A></LI>
+<UL>
+<LI><A HREF="#Encryption">Encryption</A></LI>
+<LI><A HREF="#ServerName">ServerName</A></LI>
+</UL>
+<LI><A HREF="#7_7">Changing the Printer Configuration</A></LI>
+<LI><A HREF="#7_8">Printer Directives</A></LI>
 <UL>
 <LI><A HREF="#Accepting">Accepting</A></LI>
 <LI><A HREF="#AllowUser">AllowUser</A></LI>
@@ -209,26 +215,44 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <LI><A HREF="#State">State</A></LI>
 <LI><A HREF="#StateMessage">StateMessage</A></LI>
 </UL>
+<LI><A HREF="#7_9">Changing the Classes Configuration</A></LI>
+<LI><A HREF="#7_10">Classes Directives</A></LI>
+<UL>
+<LI><A HREF="#ClassAccepting">Accepting</A></LI>
+<LI><A HREF="#ClassAllowUser">AllowUser</A></LI>
+<LI><A HREF="#Class">Class</A></LI>
+<LI><A HREF="#DefaultClass">DefaultClass</A></LI>
+<LI><A HREF="#ClassDenyUser">DenyUser</A></LI>
+<LI><A HREF="#ClassInfo">Info</A></LI>
+<LI><A HREF="#ClassJobSheets">JobSheets</A></LI>
+<LI><A HREF="#ClassKLimit">KLimit</A></LI>
+<LI><A HREF="#ClassLocation">Location</A></LI>
+<LI><A HREF="#ClassPageLimit">PageLimit</A></LI>
+<LI><A HREF="#ClassPrinter">Printer</A></LI>
+<LI><A HREF="#ClassQuotaPeriod">QuotaPeriod</A></LI>
+<LI><A HREF="#ClassState">State</A></LI>
+<LI><A HREF="#ClassStateMessage">StateMessage</A></LI>
+</UL>
 <LI><A HREF="#PRINTING_SECURITY">Printing System Security</A></LI>
 <UL>
 <LI><A HREF="#CERTIFICATES">Authentication Using Certificates</A></LI>
-<LI><A HREF="#7_7_2">Using Basic Authentication</A></LI>
-<LI><A HREF="#7_7_3">Using Digest Authentication</A></LI>
-<LI><A HREF="#7_7_4">System and Group Authentication</A></LI>
+<LI><A HREF="#7_11_2">Using Basic Authentication</A></LI>
+<LI><A HREF="#7_11_3">Using Digest Authentication</A></LI>
+<LI><A HREF="#7_11_4">System and Group Authentication</A></LI>
 </UL>
 <LI><A HREF="#PRINTER_ACCOUNTING">Printer Accounting</A></LI>
 <UL>
-<LI><A HREF="#7_8_1">The access_log File</A></LI>
-<LI><A HREF="#7_8_2">The error_log File</A></LI>
-<LI><A HREF="#7_8_3">The page_log File</A></LI>
+<LI><A HREF="#7_12_1">The access_log File</A></LI>
+<LI><A HREF="#7_12_2">The error_log File</A></LI>
+<LI><A HREF="#7_12_3">The page_log File</A></LI>
 </UL>
 <LI><A HREF="#FILE_TYPING_FILTERING">File Typing and Filtering</A></LI>
 <UL>
-<LI><A HREF="#7_9_1">mime.types</A></LI>
-<LI><A HREF="#7_9_2">mime.convs</A></LI>
-<LI><A HREF="#7_9_3">Adding Filetypes and Filters</A></LI>
-<LI><A HREF="#7_9_4">Printer Drivers and PPD Files</A></LI>
-<LI><A HREF="#7_9_5">Writing Your Own Filter or Printer Driver</A></LI>
+<LI><A HREF="#7_13_1">mime.types</A></LI>
+<LI><A HREF="#7_13_2">mime.convs</A></LI>
+<LI><A HREF="#7_13_3">Adding Filetypes and Filters</A></LI>
+<LI><A HREF="#7_13_4">Printer Drivers and PPD Files</A></LI>
+<LI><A HREF="#7_13_5">Writing Your Own Filter or Printer Driver</A></LI>
 </UL>
 </UL>
 <B><A HREF="#PRINTING_OTHER">7 - Printing with Other Systems</A></B>
@@ -3040,7 +3064,62 @@ User guest
 <H4>Description</H4>
 <P>The <CODE>User</CODE> directive specifies the UNIX user that filter
  and CGI programs run as. The default user is <CODE>lp</CODE>.</P>
-<H2><A NAME="7_5">Changing the Printer Configuration</A></H2>
+<H2><A NAME="7_5">Changing the Client Configuration</A></H2>
+<P>The CUPS client application (<CODE>lp</CODE>, <CODE>lpr</CODE>, and
+ so forth) use the<VAR> /etc/cups/client.conf</VAR> file for default
+ settings. The client application also look in the user's home directory
+ for a file called<VAR> .cupsrc</VAR>. Each directive is listed on a
+ line by itself followed by its value. Comments are introduced using the
+ number sign (&quot;#&quot;) character at the beginning of a line.</P>
+<P>Since the client configuration file consists of plain text, you can
+ use your favorite text editor to make changes to it.
+<!-- NEED 4in -->
+</P>
+<H2><A NAME="7_6">Client Directives</A></H2>
+<P>The<VAR> client.conf</VAR> file contains many directives that
+ determine how the client behaves:</P>
+<UL>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR><TD VALIGN="TOP">
+<LI><A HREF="#Encryption"><CODE>Encryption</CODE></A></LI>
+<LI><A HREF="#ServerName"><CODE>ServerName</CODE></A></LI>
+</TD></TR>
+</TABLE>
+</UL>
+
+<!-- NEED 3in -->
+<H3><A NAME="Encryption">Encryption</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+Encryption Never
+Encryption IfRequested
+Encryption Required
+Encryption Always
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>Encryption</CODE> directive specifies the default
+ encryption settings for the client. The default setting is<VAR>
+ IfRequested</VAR>.
+<!-- NEED 3in -->
+</P>
+<H3><A NAME="ServerName">ServerName</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+ServerName foo.bar.com
+ServerName 11.22.33.44
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>ServerName</CODE> directive specifies sets the remote
+ server that is to be used for all client operations. That is, it
+ redirects all client requests to the remote server. The default is to
+ use the local server (&quot;<VAR>localhost</VAR>&quot;).</P>
+<H2><A NAME="7_7">Changing the Printer Configuration</A></H2>
 <P>The CUPS scheduler (cupsd) uses the<VAR> /etc/cups/printers.conf</VAR>
  file to store the list of available printers. This file contains only
  locally defined printers, but not remote printers that are created
@@ -3051,7 +3130,7 @@ User guest
  use your favorite text editor to make changes to it.
 <!-- NEED 4in -->
 </P>
-<H2><A NAME="7_6">Printer Directives</A></H2>
+<H2><A NAME="7_8">Printer Directives</A></H2>
 <P>The<VAR> printers.conf</VAR> file contains many directives that
  determine how the printer behaves:</P>
 <UL>
@@ -3361,6 +3440,324 @@ StateMessage Ready to print.
 <P>This directive must appear inside a<A HREF="#Printer"> <CODE>Printer</CODE>
 </A> or<A HREF="#DefaultPrinter"> <CODE>DefaultPrinter</CODE></A>
  directive.</P>
+<H2><A NAME="7_9">Changing the Classes Configuration</A></H2>
+<P>The CUPS scheduler (cupsd) uses the<VAR> /etc/cups/classes.conf</VAR>
+ file to store the list of available classes. This file contains only
+ locally defined classes, but not remote or implicit classes that are
+ created automatically. Each directive is listed on a line by itself
+ followed by its value. Comments are introduced using the number sign
+ (&quot;#&quot;) character at the beginning of a line.</P>
+<P>Since the classes configuration file consists of plain text, you can
+ use your favorite text editor to make changes to it.
+<!-- NEED 4in -->
+</P>
+<H2><A NAME="7_10">Classes Directives</A></H2>
+<P>The<VAR> classes.conf</VAR> file contains many directives that
+ determine how the classes behaves:</P>
+<UL>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR><TD VALIGN="TOP">
+<LI><A HREF="#ClassAccepting"><CODE>Accepting</CODE></A></LI>
+<LI><A HREF="#ClassAllowUser"><CODE>AllowUser</CODE></A></LI>
+<LI><A HREF="#Class"><CODE>Class</CODE></A></LI>
+<LI><A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A></LI>
+<LI><A HREF="#ClassDenyUser"><CODE>DenyUser</CODE></A></LI>
+</TD><TD VALIGN="TOP"> &nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
+<LI><A HREF="#ClassInfo"><CODE>Info</CODE></A></LI>
+<LI><A HREF="#ClassJobSheets"><CODE>JobSheets</CODE></A></LI>
+<LI><A HREF="#ClassKLimit"><CODE>KLimit</CODE></A></LI>
+<LI><A HREF="#ClassLocation"><CODE>Location</CODE></A></LI>
+<LI><A HREF="#ClassPageLimit"><CODE>PageLimit</CODE></A></LI>
+</TD><TD VALIGN="TOP"> &nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
+<LI><A HREF="#ClassPrinter"><CODE>Printer</CODE></A></LI>
+<LI><A HREF="#ClassQuotaPeriod"><CODE>QuotaPeriod</CODE></A></LI>
+<LI><A HREF="#ClassState"><CODE>State</CODE></A></LI>
+<LI><A HREF="#ClassStateMessage"><CODE>StateMessage</CODE></A></LI>
+</TD></TR>
+</TABLE>
+</UL>
+
+<!-- NEED 3in -->
+<H3><A NAME="ClassAccepting">Accepting</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+Accepting yes
+
+Accepting no
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>Accepting</CODE> directive defines the initial Boolean
+ value for the<VAR> printer-is-accepting-job</VAR> attribute which can
+ be set by the <CODE>accept</CODE> and <CODE>reject</CODE> commands.</P>
+<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
+</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.
+<!-- NEED 3in -->
+</P>
+<H3><A NAME="ClassAllowUser">AllowUser</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+AllowUser foo_user
+AllowUser bar_user
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>AllowUser</CODE> directive adds a username to the<VAR>
+ requesting-user-name-allowed</VAR> attribute which can be set by the <CODE>
+lpadmin -u</CODE> command.</P>
+<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
+</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.
+<!-- NEED 3in -->
+</P>
+<H3><A NAME="Class">Class</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+&lt;Class name/&gt;
+...
+&lt;/Class&gt;
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>Class</CODE> directive begins a class definition. It can be
+ added by the <CODE>lpadmin -c</CODE> command.</P>
+
+<!-- NEED 3in -->
+<H3><A NAME="DefaultClass">DefaultClass</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+&lt;DefaultClass name/&gt;
+...
+&lt;/DefaultClass&gt;
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>DefaultClass</CODE> directive begins a class definition for
+ the default server destination. It can be added by the <CODE>lpadmin -c</CODE>
+ command or if already defined, set as default by the <CODE>lpoptions -d</CODE>
+ command.</P>
+
+<!-- NEED 3in -->
+<H3><A NAME="ClassDenyUser">DenyUser</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+DenyUser foo_user
+DenyUser bar_user
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>DenyUser</CODE> directive adds a username to the<VAR>
+ requesting-user-name-allowed</VAR> attribute which can be set by the <CODE>
+lpadmin -u</CODE> command.</P>
+<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
+</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.
+<!-- NEED 3in -->
+</P>
+<H3><A NAME="ClassInfo">Info</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+Info My Printer
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>Info</CODE> directive defines the string for the<VAR>
+ printer-info</VAR> attribute which can be set by the <CODE>lpadmin -D</CODE>
+ command.</P>
+<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
+</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.
+<!-- NEED 6in -->
+</P>
+<H3><A NAME="ClassJobSheets">JobSheets</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+JobSheets none,standard
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>JobSheets</CODE> directive specifies the default banner
+ pages to print before and after a print job. In the above example, only
+ a<VAR> standard</VAR> banner will print after each job.</P>
+<P>The <CODE>lpoptions -o job-sheets=</CODE> command can be used to set
+ banners. For example, the following command would produce the same
+ results of a<VAR> standard</VAR> banner at the end of each print job
+ for the default class.</P>
+<UL><B> lpoptions -o job-sheets=none,standard</B></UL>
+<P>If only one banner file is specified, it will be printed before the
+ files in the job. If a second banner file is specified, it is printed
+ after the files in the job.</P>
+<P>The available banner pages depend on the local system configuration;
+ CUPS includes the following banner files:</P>
+<UL>
+<LI><CODE>none</CODE> - Do not produce a banner page.</LI>
+<LI><CODE>classified</CODE> - A banner page with a &quot;classified&quot; label at
+ the top and bottom.</LI>
+<LI><CODE>confidential</CODE> - A banner page with a &quot;confidential&quot;
+ label at the top and bottom.</LI>
+<LI><CODE>secret</CODE> - A banner page with a &quot;secret&quot; label at the top
+ and bottom.</LI>
+<LI><CODE>standard</CODE> - A banner page with no label at the top and
+ bottom.</LI>
+<LI><CODE>topsecret</CODE> - A banner page with a &quot;top secret&quot; label at
+ the top and bottom.</LI>
+<LI><CODE>unclassified</CODE> - A banner page with an &quot;unclassified&quot;
+ label at the top and bottom.</LI>
+</UL>
+<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
+</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.
+<!-- NEED 3in -->
+</P>
+<H3><A NAME="ClassKLimit">KLimit</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+KLimit 1234
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>KLimit</CODE> directive defines the value of the<VAR>
+ job-k-limit</VAR> attribute which can be set by the <CODE>lpadmin -o
+ job-k-limit=</CODE> command.</P>
+<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
+</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.
+<!-- NEED 6in -->
+</P>
+<H3><A NAME="ClassLocation">Location</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+Location Building 3321
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>Location</CODE> directive defines the string for the<VAR>
+ printer-location</VAR> attribute which can be set by the <CODE>lpadmin
+ -L</CODE> command.</P>
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B> NOTE:</B>
+<P>Do not confuse this <CODE>Location</CODE> directive with the one for
+ cupsd.conf. They are completely different.</P>
+</TD></TR>
+</TABLE>
+</CENTER>
+<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
+</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.
+<!-- NEED 3in -->
+</P>
+<H3><A NAME="ClassPageLimit">PageLimit</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+PageLimit 1234
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>PageLimit</CODE> directive defines the value of the<VAR>
+ job-page-limit</VAR> attribute which can be set by the <CODE>lpadmin -o
+ job-page-limit=</CODE> command.</P>
+<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
+</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.
+<!-- NEED 3in -->
+</P>
+<H3><A NAME="ClassPrinter">Printer</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+Printer foo
+Printer bar
+Printer foo@bar
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>Printer</CODE> directive adds a printer to the class. It
+ can be added by the <CODE>lpadmin -c</CODE> command.</P>
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B> NOTE:</B>
+<P>Do not confuse this <CODE>Printer</CODE> directive with the one for
+ printers.conf. They are completely different.</P>
+</TD></TR>
+</TABLE>
+</CENTER>
+<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
+</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.</P>
+
+<!-- NEED 3in -->
+<H3><A NAME="ClassQuotaPeriod">QuotaPeriod</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+QuotaPeriod 604800
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>QuotaPeriod</CODE> directive defines the value of the<VAR>
+ job-quota-period</VAR> attribute which can be set by the <CODE>lpadmin
+ -o job-quota-period=</CODE> command.</P>
+<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
+</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.
+<!-- NEED 3in -->
+</P>
+<H3><A NAME="ClassState">State</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+State stopped
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>State</CODE> directive defines the initial value of the<VAR>
+ printer-state</VAR> attribute. The strings<VAR> idle</VAR> and<VAR>
+ stopped</VAR> correspond to the IPP enumeration values.</P>
+<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
+</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.
+<!-- NEED 6in -->
+</P>
+<H3><A NAME="ClassStateMessage">StateMessage</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+StateMessage Ready to print.
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>StateMessage</CODE> directive defines the initial string
+ for the<VAR> printer-state-message</VAR> attribute. The following are
+ some example messages:</P>
+<UL>
+<LI>Connected to<VAR> host_name</VAR>...</LI>
+<LI>Connecting to<VAR> class_queue</VAR> on port<VAR> port_number</VAR>
+...</LI>
+<LI>Network host<VAR> host_name</VAR> is busy; will retry in 30
+ seconds...</LI>
+<LI>Printer busy; will retry in 10 seconds...</LI>
+<LI>Printer is busy; retrying print job...</LI>
+<LI>Print file accepted - job ID<VAR> id_number</VAR>.</LI>
+<LI>Ready to print.</LI>
+<LI>Waiting for job to complete</LI>
+</UL>
+<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
+</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.</P>
 
 <!-- NEW PAGE -->
 <H2><A NAME="PRINTING_SECURITY">Printing System Security</A></H2>
@@ -3436,7 +3833,7 @@ Group</CODE></A> defined in the<VAR> cupsd.conf</VAR> file. When the CGI
  super-user or another user that is part of the group defined by the<A HREF="#SystemGroup">
  <CODE>SystemGroup</CODE></A> directive. The root certificate is
  automatically regenerated every 5 minutes.</P>
-<H3><A NAME="7_7_2">Using Basic Authentication</A></H3>
+<H3><A NAME="7_11_2">Using Basic Authentication</A></H3>
 <P>Basic authentication uses UNIX users and passwords to authenticate
  access to resources such as printers and classes, and to limit access
  to administrative functions.</P>
@@ -3476,7 +3873,7 @@ AuthType Basic
 </UL>
 
 <!-- NEED 7in -->
-<H3><A NAME="7_7_3">Using Digest Authentication</A></H3>
+<H3><A NAME="7_11_3">Using Digest Authentication</A></H3>
 <P>Digest authentication uses users and passwords defined in the<VAR>
  /etc/cups/passwd.md5</VAR> file to authenticate access to resources
  such as printers and classes, and to limit access to administrative
@@ -3553,7 +3950,7 @@ Password again: <B>(password) ENTER</B> [password is not echoed]
 AuthType Digest
 </PRE>
 </UL>
-<H3><A NAME="7_7_4">System and Group Authentication</A></H3>
+<H3><A NAME="7_11_4">System and Group Authentication</A></H3>
 <P>The<A HREF="#AuthClass"> <CODE>AuthClass</CODE></A> directive
  controls the level of authentication to perform. <CODE>System</CODE>
  and <CODE>Group</CODE> authentication extend the normal user-based
@@ -3591,7 +3988,7 @@ Password again: <B>(password) ENTER</B> [password is not echoed]
  printed. The log files are normally stored in the<VAR> /var/log/cups</VAR>
  directory. You can change this by editing the<VAR> /etc/cups/cupsd.conf</VAR>
  configuration file.</P>
-<H3><A NAME="7_8_1">The access_log File</A></H3>
+<H3><A NAME="7_12_1">The access_log File</A></H3>
 <P>The<VAR> access_log</VAR> file lists each HTTP resource that is
  accessed by a web browser or CUPS/IPP client. Each line is in the
  so-called &quot;Common Log Format&quot; used by many web servers and web
@@ -3632,7 +4029,7 @@ host group user date-time \&quot;method resource version\&quot; status bytes
 <P>The<I> bytes</I> field contains the number of bytes in the request.
  For POST requests the<I> bytes</I> field contains the number of bytes
  that was received from the client.</P>
-<H3><A NAME="7_8_2">The error_log File</A></H3>
+<H3><A NAME="7_12_2">The error_log File</A></H3>
 <P>The<VAR> error_log</VAR> file lists messages from the scheduler
  (errors, warnings, etc.):</P>
 <UL>
@@ -3655,7 +4052,7 @@ I [20/May/1999:19:22:24 +0000] Job 2 was cancelled by 'mike'.
  page started printing. The format of this field is identical to the<I>
  data-time</I> field in the<VAR> access_log</VAR> file.</P>
 <P>The<I> message</I> fields contains a free-form textual message.</P>
-<H3><A NAME="7_8_3">The page_log File</A></H3>
+<H3><A NAME="7_12_3">The page_log File</A></H3>
 <P>The<VAR> page_log</VAR> file lists each page that is sent to a
  printer. Each line contains the following information:</P>
 <UL>
@@ -3696,7 +4093,7 @@ ServerRoot</CODE></A> directive) to build a file type and conversion
  be edited with your favorite text editor.</P>
 <P>The<VAR> mime.types</VAR> and<VAR> mime.convs</VAR> files define the
  standard file types and filters that are available on the system.</P>
-<H3><A NAME="7_9_1">mime.types</A></H3>
+<H3><A NAME="7_13_1">mime.types</A></H3>
 <P>The<VAR> mime.types</VAR> file defines the known file types. Each
  line of the file starts with the MIME type and may be followed by one
  or more file type recognition rules. For example, the <CODE>text/html</CODE>
@@ -3704,8 +4101,8 @@ ServerRoot</CODE></A> directive) to build a file type and conversion
 <UL>
 <PRE>
 text/html       html htm \
-                printable(0,1024) + \
-                (string(0,&quot;&lt;HTML&gt;&quot;) string(0,&quot;&lt;!DOCTYPE&quot;))
+	printable(0,1024) + \
+	(string(0,&quot;&lt;HTML&gt;&quot;) string(0,&quot;&lt;!DOCTYPE&quot;))
 </PRE>
 </UL>
 <P>The first two rules say that any file with an extension of<VAR> .html</VAR>
@@ -3763,10 +4160,10 @@ string
 <UL>
 <PRE>
 image/jpeg      jpeg jpg jpe string(0,&lt;FFD8FF&gt;) &amp;&amp;\
-                (char(3,0xe0) char(3,0xe1) char(3,0xe2) char(3,0xe3)\
-                 char(3,0xe4) char(3,0xe5) char(3,0xe6) char(3,0xe7)\
-                 char(3,0xe8) char(3,0xe9) char(3,0xea) char(3,0xeb)\
-                 char(3,0xec) char(3,0xed) char(3,0xee) char(3,0xef))
+	(char(3,0xe0) char(3,0xe1) char(3,0xe2) char(3,0xe3)\
+	 char(3,0xe4) char(3,0xe5) char(3,0xe6) char(3,0xe7)\
+	 char(3,0xe8) char(3,0xe9) char(3,0xea) char(3,0xeb)\
+	 char(3,0xec) char(3,0xed) char(3,0xee) char(3,0xef))
 </PRE>
 </UL>
 <P>This rule states that any file with an extension of<VAR> .jpeg</VAR>,<VAR>
@@ -3775,7 +4172,7 @@ image/jpeg      jpeg jpg jpe string(0,&lt;FFD8FF&gt;) &amp;&amp;\
  Start-Of-Image) followed by a character between and including <CODE>
 0xe0</CODE> and <CODE>0xef</CODE> (JPEG APPn markers) is also a JPEG
  file.</P>
-<H3><A NAME="7_9_2">mime.convs</A></H3>
+<H3><A NAME="7_13_2">mime.convs</A></H3>
 <P>The<VAR> mime.convs</VAR> file defines all of the filter programs
  that are known to the system. Each line consists of:</P>
 <UL>
@@ -3815,7 +4212,7 @@ program job user title options [filename]
  All filtered output must go to the standard output.
 <!-- NEED 4in -->
 </P>
-<H3><A NAME="7_9_3">Adding Filetypes and Filters</A></H3>
+<H3><A NAME="7_13_3">Adding Filetypes and Filters</A></H3>
 <P>Adding a new file type or filter is fairly straight-forward. Rather
  than adding the new type and filter to the<VAR> mime.types</VAR> and<VAR>
  mime.convs</VAR> files which are overwritten when you upgrade to a new
@@ -3843,7 +4240,7 @@ acme.msword.convs
  have created the files, restart the <CODE>cupsd</CODE> process as
  described earlier in<A HREF="#RESTARTING"> &quot;Restarting the CUPS Server&quot;</A>
 .</P>
-<H3><A NAME="7_9_4">Printer Drivers and PPD Files</A></H3>
+<H3><A NAME="7_13_4">Printer Drivers and PPD Files</A></H3>
 <P>Most CUPS printer drivers utilize one or more printer-specific
  filters and a PPD file for each printer model. Printer driver filters
  are registered via the PPD file using <CODE>cupsFilter</CODE>
@@ -3856,7 +4253,7 @@ acme.msword.convs
 <P>The filter is specified using the source file type only; the
  destination file type is assumed to be <CODE>printer/name</CODE> -
  suitable for sending to the printer.</P>
-<H3><A NAME="7_9_5">Writing Your Own Filter or Printer Driver</A></H3>
+<H3><A NAME="7_13_5">Writing Your Own Filter or Printer Driver</A></H3>
 <P>CUPS supports an unlimited number of file formats and filters, and
  can handle any printer. If you'd like to write a filter or printer
  driver for your favorite file format or printer, consult the CUPS
@@ -3904,11 +4301,11 @@ HUP</CODE> signal or reboot the system:</P>
 <PRE>
 service printer
 {
-    socket_type = stream
-    protocol = tcp
-    wait = no
-    user = lp
-    server = /usr/lib/cups/daemon/cups-lpd
+socket_type = stream
+protocol = tcp
+wait = no
+user = lp
+server = /usr/lib/cups/daemon/cups-lpd
 }
 </PRE>
 </UL>
@@ -3988,9 +4385,9 @@ lwsrv -n &quot;<I>Name</I>&quot; -p <I>printer</I> -a /usr/lib/adicts -f /usr/li
 <UL>
 <PRE>
 Printer Description:MyPrinter@MyServer:\
-        :pr=|/usr/bin/lp -d MyPrinter:\
-        :op=daemon:\
-        :pd=/etc/cups/ppd/MyPrinter.ppd:
+:pr=|/usr/bin/lp -d MyPrinter:\
+:op=daemon:\
+:pd=/etc/cups/ppd/MyPrinter.ppd:
 </PRE>
 </UL>
 
@@ -4017,8 +4414,8 @@ Printer Description:MyPrinter@MyServer:\
 # No arguments means show available devices...
 
 if test ${#argv} = 0; then
-	echo &quot;network cap \&quot;Unknown\&quot; \&quot;Mac OS Printer via CAP\&quot;&quot;
-	exit 0
+echo &quot;network cap \&quot;Unknown\&quot; \&quot;Mac OS Printer via CAP\&quot;&quot;
+exit 0
 fi
 
 # Collect arguments...
@@ -4027,20 +4424,20 @@ user=$2
 copies=$4
 
 if test ${#argv} = 5; then
-	# Get print file from stdin; copies have already been handled...
-	file=/var/tmp/$$.prn
-	copies=1
-	cat &gt; $file
+# Get print file from stdin; copies have already been handled...
+file=/var/tmp/$$.prn
+copies=1
+cat &gt; $file
 else
-	# Print file is on command-line...
-	file=$6
+# Print file is on command-line...
+file=$6
 fi
 
 # Create a dummy cap.printers file for this printer based
 # upon a device URI of &quot;cap://server/printer&quot;...
 
 echo $PRINTER/$DEVICE_URI | \
-	awk -F/ '{print $1 &quot;=&quot; $5 &quot;:LaserWriter@&quot; $4}' &gt; /var/tmp/$$.cap
+awk -F/ '{print $1 &quot;=&quot; $5 &quot;:LaserWriter@&quot; $4}' &gt; /var/tmp/$$.cap
 
 CAPPRINTERS=/var/tmp/$$.cap; export CAPPRINTERS
 
@@ -4048,14 +4445,14 @@ CAPPRINTERS=/var/tmp/$$.cap; export CAPPRINTERS
 # have properly initialized the cap.printers file...
 
 while [ $copies -gt 0 ]; do
-	papif -n $user &lt; $file
+papif -n $user &lt; $file
 
-        copies=`expr $copies - 1`
+copies=`expr $copies - 1`
 done
 
 # Remove any temporary files...
 if test ${#argv} = 5; then
-	/bin/rm -f $file
+/bin/rm -f $file
 fi
 
 /bin/rm -f /var/tmp/$$.cap
@@ -4115,27 +4512,27 @@ PSMON.DLL
 <UL>
 <PRE>
 [global]
-   load printers = yes
-   printing = cups
-   printcap name = cups
+load printers = yes
+printing = cups
+printcap name = cups
 
 [printers]
-   comment = All Printers
-   path = /var/spool/samba
-   browseable = no
-   public = yes
-   guest ok = yes
-   writable = no
-   printable = yes
-   printer admin = root
+comment = All Printers
+path = /var/spool/samba
+browseable = no
+public = yes
+guest ok = yes
+writable = no
+printable = yes
+printer admin = root
 
 [print$]
-   comment = Printer Drivers
-   path = /etc/samba/drivers
-   browseable = yes
-   guest ok = no
-   read only = yes
-   write list = root
+comment = Printer Drivers
+path = /etc/samba/drivers
+browseable = yes
+guest ok = no
+read only = yes
+write list = root
 </PRE>
 </UL>
 <P>This configuration assumes a FHS-compliant installation of SAMBA;

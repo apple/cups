@@ -3154,6 +3154,77 @@ User guest
 <P>The <CODE>User</CODE> directive specifies the UNIX user that
 filter and CGI programs run as. The default user is <CODE>lp</CODE>.
 
+
+
+<H2>Changing the Client Configuration</H2>
+
+<P>The CUPS client application (<CODE>lp</CODE>, <CODE>lpr</CODE>, and so forth)
+use the <VAR>/etc/cups/client.conf</VAR> file for default settings.
+The client application also look in the user's home directory for a file called <VAR>.cupsrc</VAR>.
+Each directive is listed on a line by itself followed by its value. Comments are introduced
+using the number sign ("#") character at the beginning of a line.
+
+<P>Since the client configuration file consists of plain text, you can
+use your favorite text editor to make changes to it.
+
+<!-- NEED 4in -->
+<H2>Client Directives</H2>
+
+<P>The <VAR>client.conf</VAR> file contains many directives that
+determine how the client behaves:</P>
+
+<UL>
+<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0">
+<TR>
+<TD VALIGN="TOP">
+
+        <LI><A HREF="#Encryption"><CODE>Encryption</CODE></A>
+        <LI><A HREF="#ServerName"><CODE>ServerName</CODE></A>
+
+</TD>
+</TR>
+</TABLE>
+</UL>
+
+<!-- NEED 3in -->
+<H3><A NAME="Encryption">Encryption</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+Encryption Never
+Encryption IfRequested
+Encryption Required
+Encryption Always
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>Encryption</CODE> directive specifies the default encryption settings for the client.
+The default setting is <VAR>IfRequested</VAR>.
+
+
+<!-- NEED 3in -->
+<H3><A NAME="ServerName">ServerName</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+ServerName foo.bar.com
+ServerName 11.22.33.44
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>ServerName</CODE> directive specifies sets the remote server that is to be used
+for all client operations.  That is, it redirects all client requests to the remote server.
+
+The default is to use the local server ("<VAR>localhost</VAR>").
+
+
+
 <H2>Changing the Printer Configuration</H2>
 
 <P>The CUPS scheduler (cupsd) uses the <VAR>/etc/cups/printers.conf</VAR> file 
@@ -3201,9 +3272,9 @@ determine how the printer behaves:</P>
 <TD VALIGN="TOP">
 
 	<LI><A HREF="#Printer"><CODE>Printer</CODE></A>
-	<LI><A HREF="#QuotaPeriod"><CODE>QuotaPeriod</CODE></A>
-	<LI><A HREF="#State"><CODE>State</CODE></A>
-	<LI><A HREF="#StateMessage"><CODE>StateMessage</CODE></A>
+<LI><A HREF="#QuotaPeriod"><CODE>QuotaPeriod</CODE></A>
+<LI><A HREF="#State"><CODE>State</CODE></A>
+<LI><A HREF="#StateMessage"><CODE>StateMessage</CODE></A>
 
 </TD>
 </TR>
@@ -3525,6 +3596,395 @@ The following are some example messages:</P>
 <P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE></A> 
 or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A> directive.</P>
 
+
+
+<H2>Changing the Classes Configuration</H2>
+
+<P>The CUPS scheduler (cupsd) uses the <VAR>/etc/cups/classes.conf</VAR> file
+to store the list of available classes.  This file contains only locally defined
+classes, but not remote or implicit classes that are created automatically.
+Each directive is listed on a line by itself followed by its value.
+Comments are introduced using the number sign ("#") character at the beginning of a line.
+
+<P>Since the classes configuration file consists of plain text, you can
+use your favorite text editor to make changes to it.
+
+<!-- NEED 4in -->
+<H2>Classes Directives</H2>
+
+<P>The <VAR>classes.conf</VAR> file contains many directives that
+determine how the classes behaves:</P>
+
+<UL>
+<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0">
+<TR>
+<TD VALIGN="TOP">
+
+        <LI><A HREF="#ClassAccepting"><CODE>Accepting</CODE></A>
+        <LI><A HREF="#ClassAllowUser"><CODE>AllowUser</CODE></A>
+        <LI><A HREF="#Class"><CODE>Class</CODE></A>
+        <LI><A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
+        <LI><A HREF="#ClassDenyUser"><CODE>DenyUser</CODE></A>
+
+</TD>
+<TD VALIGN="TOP">
+&nbsp;&nbsp;&nbsp;
+</TD>
+<TD VALIGN="TOP">
+
+        <LI><A HREF="#ClassInfo"><CODE>Info</CODE></A>
+        <LI><A HREF="#ClassJobSheets"><CODE>JobSheets</CODE></A>
+        <LI><A HREF="#ClassKLimit"><CODE>KLimit</CODE></A>
+        <LI><A HREF="#ClassLocation"><CODE>Location</CODE></A>
+        <LI><A HREF="#ClassPageLimit"><CODE>PageLimit</CODE></A>
+
+</TD>
+<TD VALIGN="TOP">
+&nbsp;&nbsp;&nbsp;
+</TD>
+<TD VALIGN="TOP">
+
+        <LI><A HREF="#ClassPrinter"><CODE>Printer</CODE></A>
+        <LI><A HREF="#ClassQuotaPeriod"><CODE>QuotaPeriod</CODE></A>
+        <LI><A HREF="#ClassState"><CODE>State</CODE></A>
+        <LI><A HREF="#ClassStateMessage"><CODE>StateMessage</CODE></A>
+
+</TD>
+</TR>
+</TABLE>
+</UL>
+
+<!-- NEED 3in -->
+<H3><A NAME="ClassAccepting">Accepting</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+Accepting yes
+
+Accepting no
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>Accepting</CODE> directive defines the initial Boolean
+value for the <VAR>printer-is-accepting-job</VAR> attribute which can
+be set by the <CODE>accept</CODE> and <CODE>reject</CODE> commands.
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A>
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
+
+<!-- NEED 3in -->
+<H3><A NAME="ClassAllowUser">AllowUser</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+AllowUser foo_user
+AllowUser bar_user
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>AllowUser</CODE> directive adds a username to the
+<VAR>requesting-user-name-allowed</VAR> attribute which can be set
+by the <CODE>lpadmin -u</CODE> command.
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A>
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
+
+
+<!-- NEED 3in -->
+<H3><A NAME="Class">Class</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+&lt;Class name/&gt;
+...
+&lt;/Class&gt;
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>Class</CODE> directive begins a class definition.
+It can be added by the <CODE>lpadmin -c</CODE> command.</P>
+
+<!-- NEED 3in -->
+<H3><A NAME="DefaultClass">DefaultClass</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+&lt;DefaultClass name/&gt;
+...
+&lt;/DefaultClass&gt;
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>DefaultClass</CODE> directive begins a class definition
+for the default server destination.
+It can be added by the <CODE>lpadmin -c</CODE> command or if already defined,
+set as default by the <CODE>lpoptions -d</CODE> command.</P>
+
+<!-- NEED 3in -->
+<H3><A NAME="ClassDenyUser">DenyUser</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+DenyUser foo_user
+DenyUser bar_user
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>DenyUser</CODE> directive adds a username to the
+<VAR>requesting-user-name-allowed</VAR> attribute which can be set
+by the <CODE>lpadmin -u</CODE> command.</P>
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A>
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
+
+<!-- NEED 3in -->
+<H3><A NAME="ClassInfo">Info</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+Info My Printer
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>Info</CODE> directive defines the string for the
+<VAR>printer-info</VAR> attribute which can be set by the
+<CODE>lpadmin -D</CODE> command.</P>
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A>
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
+
+<!-- NEED 6in -->
+<H3><A NAME="ClassJobSheets">JobSheets</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+JobSheets none,standard
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>JobSheets</CODE> directive specifies the default banner pages
+to print before and after a print job.
+In the above example, only a <VAR>standard</VAR> banner will print after each job.</P>
+
+<P>The <CODE>lpoptions -o job-sheets=</CODE> command can be used to set banners.
+For example, the following command would produce the same results of a
+<VAR>standard</VAR> banner at the end of each print job for the default class.</P>
+
+<UL><B>
+lpoptions -o job-sheets=none,standard
+</B></UL>
+
+<P>If only one banner file is specified, it will be printed before the
+files in the job. If a second banner file is specified, it is printed
+after the files in the job.</P>
+
+<P>The available banner pages depend on the local system configuration;
+ CUPS includes the following banner files:</P>
+
+<UL>
+<LI><CODE>none</CODE> - Do not produce a banner page.</LI>
+<LI><CODE>classified</CODE> - A banner page with a &quot;classified&quot; label at the top and bottom.</LI>
+<LI><CODE>confidential</CODE> - A banner page with a &quot;confidential&quot; label at the top and bottom.</LI>
+<LI><CODE>secret</CODE> - A banner page with a &quot;secret&quot; label at the top and bottom.</LI>
+<LI><CODE>standard</CODE> - A banner page with no label at the top and bottom.</LI>
+<LI><CODE>topsecret</CODE> - A banner page with a &quot;top secret&quot; label at the top and bottom.</LI>
+<LI><CODE>unclassified</CODE> - A banner page with an &quot;unclassified&quot; label at the top and bottom.</LI>
+</UL>
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A>
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
+
+<!-- NEED 3in -->
+<H3><A NAME="ClassKLimit">KLimit</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+KLimit 1234
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>KLimit</CODE> directive defines the value of the
+<VAR>job-k-limit</VAR> attribute which can be set by the
+<CODE>lpadmin -o job-k-limit=</CODE> command.
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A>
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
+
+<!-- NEED 6in -->
+<H3><A NAME="ClassLocation">Location</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+Location Building 3321
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>Location</CODE> directive defines the string for the
+<VAR>printer-location</VAR> attribute which can be set by the
+<CODE>lpadmin -L</CODE> command.</P>
+
+<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
+<TR>
+        <TD>
+        <B>NOTE:</B>
+
+        <P>Do not confuse this <CODE>Location</CODE> directive with the
+        one for cupsd.conf.  They are completely different.
+        </TD>
+</TR>
+</TABLE></CENTER>
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A>
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
+
+<!-- NEED 3in -->
+<H3><A NAME="ClassPageLimit">PageLimit</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+PageLimit 1234
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>PageLimit</CODE> directive defines the value of the
+<VAR>job-page-limit</VAR> attribute which can be set
+by the <CODE>lpadmin -o job-page-limit=</CODE> command.</P>
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A>
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
+
+<!-- NEED 3in -->
+<H3><A NAME="ClassPrinter">Printer</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+Printer foo
+Printer bar
+Printer foo@bar
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>Printer</CODE> directive adds a printer to the class.
+It can be added by the <CODE>lpadmin -c</CODE> command.</P>
+
+<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
+<TR>
+        <TD>
+        <B>NOTE:</B>
+
+        <P>Do not confuse this <CODE>Printer</CODE> directive with the
+        one for printers.conf.  They are completely different.
+        </TD>
+</TR>
+</TABLE></CENTER>
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A>
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.</P>
+
+<!-- NEED 3in -->
+<H3><A NAME="ClassQuotaPeriod">QuotaPeriod</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+QuotaPeriod 604800
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>QuotaPeriod</CODE> directive defines the value of the
+<VAR>job-quota-period</VAR> attribute which can be set
+by the <CODE>lpadmin -o job-quota-period=</CODE> command.</P>
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A>
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
+
+<!-- NEED 3in -->
+<H3><A NAME="ClassState">State</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+State stopped
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>State</CODE> directive defines the initial value of the
+<VAR>printer-state</VAR> attribute.  The strings <VAR>idle</VAR> and
+<VAR>stopped</VAR> correspond to the IPP enumeration values.</P>
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A>
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
+
+<!-- NEED 6in -->
+<H3><A NAME="ClassStateMessage">StateMessage</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+StateMessage Ready to print.
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>StateMessage</CODE> directive defines the initial string for the
+<VAR>printer-state-message</VAR> attribute.
+The following are some example messages:</P>
+
+<UL>
+<LI>Connected to <VAR>host_name</VAR>...
+<LI>Connecting to <VAR>class_queue</VAR> on port <VAR>port_number</VAR>...
+<LI>Network host <VAR>host_name</VAR> is busy; will retry in 30 seconds...
+<LI>Printer busy; will retry in 10 seconds...
+<LI>Printer is busy; retrying print job...
+<LI>Print file accepted - job ID <VAR>id_number</VAR>.
+<LI>Ready to print.
+<LI>Waiting for job to complete
+</UL>
+
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A>
+or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.</P>
+
+
+
+
 <!-- NEW PAGE -->
 <H2><A NAME="PRINTING_SECURITY">Printing System Security</A></H2>
 
@@ -3560,40 +4020,40 @@ and printers:
 
 <CENTER><TABLE BORDER="1">
 <TR>
-	<TH>Location</TH>
-	<TH>Description</TH>
+<TH>Location</TH>
+<TH>Description</TH>
 </TR>
 <TR>
-	<TD>/admin</TD>
-	<TD>The path for all administration operations.</TD>
+<TD>/admin</TD>
+<TD>The path for all administration operations.</TD>
 </TR>
 <TR>
-	<TD>/classes</TD>
-	<TD>The path for all classes.</TD>
+<TD>/classes</TD>
+<TD>The path for all classes.</TD>
 </TR>
 <TR>
-	<TD>/classes/name</TD>
-	<TD>The resource for class <CODE>name</CODE>.</TD>
+<TD>/classes/name</TD>
+<TD>The resource for class <CODE>name</CODE>.</TD>
 </TR>
 <TR>
-	<TD>/jobs</TD>
-	<TD>The path for all jobs.</TD>
+<TD>/jobs</TD>
+<TD>The path for all jobs.</TD>
 </TR>
 <TR>
-	<TD>/jobs/id</TD>
-	<TD>The resource for job <CODE>id</CODE>.</TD>
+<TD>/jobs/id</TD>
+<TD>The resource for job <CODE>id</CODE>.</TD>
 </TR>
 <TR>
-	<TD>/printers</TD>
-	<TD>The path for all printers.</TD>
+<TD>/printers</TD>
+<TD>The path for all printers.</TD>
 </TR>
 <TR>
-	<TD>/printers/name</TD>
-	<TD>The path for printer <CODE>name</CODE>.</TD>
+<TD>/printers/name</TD>
+<TD>The path for printer <CODE>name</CODE>.</TD>
 </TR>
 <TR>
-	<TD>/printers/name.ppd</TD>
-	<TD>The PPD file path for printer <CODE>name</CODE>.</TD>
+<TD>/printers/name.ppd</TD>
+<TD>The PPD file path for printer <CODE>name</CODE>.</TD>
 </TR>
 </TABLE></CENTER>
 
@@ -3639,16 +4099,16 @@ to administrative functions.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
-	<TD>
-	<B>NOTE:</B>
+<TD>
+<B>NOTE:</B>
 
-	<P>Basic authentication sends the username and password Base64
-	encoded from the client to the server, so it offers no
-	protection against eavesdropping. This means that a malicious
-	user can monitor network packets and discover valid users and
-	passwords that could result in a serious compromise in network
-	security. Use Basic authentication with extreme care.
-	</TD>
+<P>Basic authentication sends the username and password Base64
+encoded from the client to the server, so it offers no
+protection against eavesdropping. This means that a malicious
+user can monitor network packets and discover valid users and
+passwords that could result in a serious compromise in network
+security. Use Basic authentication with extreme care.
+</TD>
 </TR>
 </TABLE></CENTER>
 
@@ -3662,12 +4122,12 @@ additional group membership requirements are checked.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
-	<TD>
-	<B>NOTE:</B>
+<TD>
+<B>NOTE:</B>
 
-	<P>The root user is considered by CUPS to be a member of every
-	group.
-	</TD>
+<P>The root user is considered by CUPS to be a member of every
+group.
+</TD>
 </TR>
 </TABLE></CENTER>
 
@@ -3688,34 +4148,34 @@ administrative functions.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
-	<TD>
-	<B>NOTE:</B>
+<TD>
+<B>NOTE:</B>
 
-	<P>Unlike Basic authentication, Digest passes the MD5 sum
-	(basically a complicated checksum) of the username and password
-	instead of the strings themselves. Also, Digest authentication
-	does not use the UNIX password file, so if an attacker does
-	discover the original password it is less likely to result in a
-	serious security problem so long as you use a different UNIX
-	password than the corresponding Digest password.
+<P>Unlike Basic authentication, Digest passes the MD5 sum
+(basically a complicated checksum) of the username and password
+instead of the strings themselves. Also, Digest authentication
+does not use the UNIX password file, so if an attacker does
+discover the original password it is less likely to result in a
+serious security problem so long as you use a different UNIX
+password than the corresponding Digest password.
 
-	<P>The current CUPS implementation of Digest authentication
-	uses the client's hostname or IP address for the "nonce" value.
-	The nonce value is an additional string added to the username
-	and password to make guessing the password more difficult. The
-	server checks that the nonce value matches the client's hostname
-	or address and rejects the MD5 sum if it doesn't.  Future versions
-	of CUPS will support Digest "session" authentication which adds
-	the request data to the MD5 sum, providing even better
-	authentication and security.
+<P>The current CUPS implementation of Digest authentication
+uses the client's hostname or IP address for the "nonce" value.
+The nonce value is an additional string added to the username
+and password to make guessing the password more difficult. The
+server checks that the nonce value matches the client's hostname
+or address and rejects the MD5 sum if it doesn't.  Future versions
+of CUPS will support Digest "session" authentication which adds
+the request data to the MD5 sum, providing even better
+authentication and security.
 
-	<P>Digest authentication does not guarantee that an attacker
-	cannot gain unauthorized access, but it is safer than Basic
-	authentication and should be used in place of Basic
-	authentication whenever possible. <B>Support for Digest
-	authentication in web browsers is not yet universally
-	available.</B>
-	</TD>
+<P>Digest authentication does not guarantee that an attacker
+cannot gain unauthorized access, but it is safer than Basic
+authentication and should be used in place of Basic
+authentication whenever possible. <B>Support for Digest
+authentication in web browsers is not yet universally
+available.</B>
+</TD>
 </TR>
 </TABLE></CENTER>
 
@@ -3752,12 +4212,12 @@ additional group membership requirements are checked.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
-	<TD>
-	<B>NOTE:</B>
+<TD>
+<B>NOTE:</B>
 
-	<P>The root user is considered by CUPS to be a member of every
-	group.
-	</TD>
+<P>The root user is considered by CUPS to be a member of every
+group.
+</TD>
 </TR>
 </TABLE></CENTER>
 
@@ -3873,13 +4333,13 @@ I [20/May/1999:19:22:24 +0000] Job 2 was cancelled by 'mike'.
 
 <UL>
 
-	<LI><CODE>E</CODE> - An error occurred.
+<LI><CODE>E</CODE> - An error occurred.
 
-	<LI><CODE>W</CODE> - The server was unable to perform some action.
+<LI><CODE>W</CODE> - The server was unable to perform some action.
 
-	<LI><CODE>I</CODE> - Informational message.
+<LI><CODE>I</CODE> - Informational message.
 
-	<LI><CODE>D</CODE> - Debugging message.
+<LI><CODE>D</CODE> - Debugging message.
 
 </UL>
 
@@ -3948,8 +4408,8 @@ more file type recognition rules. For example, the
 
 <UL><PRE>
 text/html       html htm \
-                printable(0,1024) + \
-                (string(0,"&lt;HTML&gt;") string(0,"&lt;!DOCTYPE"))
+	printable(0,1024) + \
+	(string(0,"&lt;HTML&gt;") string(0,"&lt;!DOCTYPE"))
 </PRE></UL>
 
 <P>The first two rules say that any file with an extension of
@@ -3968,40 +4428,40 @@ file type based upon the contents of the file instead.
 
 <UL>
 
-	<LI><CODE>( expr )</CODE> - Parenthesis for expression grouping
+<LI><CODE>( expr )</CODE> - Parenthesis for expression grouping
 
-	<LI><CODE>+</CODE> - Logical AND
+<LI><CODE>+</CODE> - Logical AND
 
-	<LI><CODE>,</CODE> or whitespace - Logical OR
+<LI><CODE>,</CODE> or whitespace - Logical OR
 
-	<LI><CODE>!</CODE> - Logical NOT
+<LI><CODE>!</CODE> - Logical NOT
 
-	<LI><CODE>match("pattern")</CODE> - Pattern match on filename
+<LI><CODE>match("pattern")</CODE> - Pattern match on filename
 
-	<LI><CODE>extension</CODE> - Pattern match on "*.extension"
+<LI><CODE>extension</CODE> - Pattern match on "*.extension"
 
-	<LI><CODE>ascii(offset,length)</CODE> - True if bytes are valid
-	printable ASCII (CR, NL, TAB, BS, 32-126)
+<LI><CODE>ascii(offset,length)</CODE> - True if bytes are valid
+printable ASCII (CR, NL, TAB, BS, 32-126)
 
-	<LI><CODE>printable(offset,length)</CODE> - True if bytes are
-	printable 8-bit chars (CR, NL, TAB, BS, 32-126, 160-254)
+<LI><CODE>printable(offset,length)</CODE> - True if bytes are
+printable 8-bit chars (CR, NL, TAB, BS, 32-126, 160-254)
 
-	<LI><CODE>string(offset,"string")</CODE> - True if bytes are
-	identical to string
+<LI><CODE>string(offset,"string")</CODE> - True if bytes are
+identical to string
 
-	<LI><CODE>contains(offset,range,"string")</CODE> - True if the
-	range of bytes contains the string
+<LI><CODE>contains(offset,range,"string")</CODE> - True if the
+range of bytes contains the string
 
-	<LI><CODE>char(offset,value)</CODE> - True if byte is identical
+<LI><CODE>char(offset,value)</CODE> - True if byte is identical
 
-	<LI><CODE>short(offset,value)</CODE> - True if 16-bit integer
-	is identical (network or "big-endian" byte order)
+<LI><CODE>short(offset,value)</CODE> - True if 16-bit integer
+is identical (network or "big-endian" byte order)
 
-	<LI><CODE>int(offset,value)</CODE> - True if 32-bit integer is
-	identical (network or "big-endian" byte order)
+<LI><CODE>int(offset,value)</CODE> - True if 32-bit integer is
+identical (network or "big-endian" byte order)
 
-	<LI><CODE>locale("string")</CODE> - True if current locale
-	matches string
+<LI><CODE>locale("string")</CODE> - True if current locale
+matches string
 
 </UL>
 
@@ -4026,10 +4486,10 @@ the <CODE>image/jpeg</CODE> rules:
 
 <UL><PRE>
 image/jpeg      jpeg jpg jpe string(0,&lt;FFD8FF&gt;) &amp;&amp;\
-                (char(3,0xe0) char(3,0xe1) char(3,0xe2) char(3,0xe3)\
-                 char(3,0xe4) char(3,0xe5) char(3,0xe6) char(3,0xe7)\
-                 char(3,0xe8) char(3,0xe9) char(3,0xea) char(3,0xeb)\
-                 char(3,0xec) char(3,0xed) char(3,0xee) char(3,0xef))
+	(char(3,0xe0) char(3,0xe1) char(3,0xe2) char(3,0xe3)\
+	 char(3,0xe4) char(3,0xe5) char(3,0xe6) char(3,0xe7)\
+	 char(3,0xe8) char(3,0xe9) char(3,0xea) char(3,0xeb)\
+	 char(3,0xec) char(3,0xed) char(3,0xee) char(3,0xef))
 </PRE></UL>
 
 <P>This rule states that any file with an extension of
@@ -4185,11 +4645,11 @@ following lines:
 <UL><PRE>
 service printer
 {
-    socket_type = stream
-    protocol = tcp
-    wait = no
-    user = lp
-    server = /usr/lib/cups/daemon/cups-lpd
+socket_type = stream
+protocol = tcp
+wait = no
+user = lp
+server = /usr/lib/cups/daemon/cups-lpd
 }
 </PRE></UL>
 
@@ -4198,23 +4658,23 @@ configuration file and enables LPD printing support.
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
-	<TD><B>Warning:</B>
+<TD><B>Warning:</B>
 
-	<P><CODE>cups-lpd</CODE> currently does not perform any
-	access control based on the settings in
-	<VAR>cupsd.conf</VAR> or in the <VAR>hosts.allow</VAR>
-	or <VAR>hosts.deny</VAR> files used by TCP wrappers.
-	Therefore, running <CODE>cups-lpd</CODE> on your server
-	will allow any computer on your network (and perhaps the
-	entire Internet) to print to your server.
+<P><CODE>cups-lpd</CODE> currently does not perform any
+access control based on the settings in
+<VAR>cupsd.conf</VAR> or in the <VAR>hosts.allow</VAR>
+or <VAR>hosts.deny</VAR> files used by TCP wrappers.
+Therefore, running <CODE>cups-lpd</CODE> on your server
+will allow any computer on your network (and perhaps the
+entire Internet) to print to your server.
 
-	<P>While <CODE>xinetd</CODE> has built-in access control
-	support, you should use the TCP wrappers package with
-	<CODE>inetd</CODE> to limit access to only those
-	computers that should be able to print through your
-	server.
+<P>While <CODE>xinetd</CODE> has built-in access control
+support, you should use the TCP wrappers package with
+<CODE>inetd</CODE> to limit access to only those
+computers that should be able to print through your
+server.
 
-	</TD>
+</TD>
 </TR>
 </TABLE></CENTER>
 
@@ -4268,12 +4728,12 @@ would look like:
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
-	<TD>
-	<B>NOTE:</B>
+<TD>
+<B>NOTE:</B>
 
-	<P>Enter the text above on a single line without the backslash (\)
-	character.
-	</TD>
+<P>Enter the text above on a single line without the backslash (\)
+character.
+</TD>
 </TR>
 </TABLE></CENTER>
 
@@ -4287,9 +4747,9 @@ would look like:
 
 <UL><PRE>
 Printer Description:MyPrinter@MyServer:\
-        :pr=|/usr/bin/lp -d MyPrinter:\
-        :op=daemon:\
-        :pd=/etc/cups/ppd/MyPrinter.ppd:
+:pr=|/usr/bin/lp -d MyPrinter:\
+:op=daemon:\
+:pd=/etc/cups/ppd/MyPrinter.ppd:
 </PRE></UL>
 
 <!-- NEED 2in -->
@@ -4318,8 +4778,8 @@ backend with a print queue.
 # No arguments means show available devices...
 
 if test ${#argv} = 0; then
-	echo "network cap \"Unknown\" \"Mac OS Printer via CAP\""
-	exit 0
+echo "network cap \"Unknown\" \"Mac OS Printer via CAP\""
+exit 0
 fi
 
 # Collect arguments...
@@ -4328,20 +4788,20 @@ user=$2
 copies=$4
 
 if test ${#argv} = 5; then
-	# Get print file from stdin; copies have already been handled...
-	file=/var/tmp/$$.prn
-	copies=1
-	cat &gt; $file
+# Get print file from stdin; copies have already been handled...
+file=/var/tmp/$$.prn
+copies=1
+cat &gt; $file
 else
-	# Print file is on command-line...
-	file=$6
+# Print file is on command-line...
+file=$6
 fi
 
 # Create a dummy cap.printers file for this printer based
 # upon a device URI of "cap://server/printer"...
 
 echo $PRINTER/$DEVICE_URI | \
-	awk -F/ '{print $1 "=" $5 ":LaserWriter@" $4}' &gt; /var/tmp/$$.cap
+awk -F/ '{print $1 "=" $5 ":LaserWriter@" $4}' &gt; /var/tmp/$$.cap
 
 CAPPRINTERS=/var/tmp/$$.cap; export CAPPRINTERS
 
@@ -4349,14 +4809,14 @@ CAPPRINTERS=/var/tmp/$$.cap; export CAPPRINTERS
 # have properly initialized the cap.printers file...
 
 while [ $copies -gt 0 ]; do
-	papif -n $user &lt; $file
+papif -n $user &lt; $file
 
-        copies=`expr $copies - 1`
+copies=`expr $copies - 1`
 done
 
 # Remove any temporary files...
 if test ${#argv} = 5; then
-	/bin/rm -f $file
+/bin/rm -f $file
 fi
 
 /bin/rm -f /var/tmp/$$.cap
@@ -4420,27 +4880,27 @@ through CUPS and provide a printer driver download share, as follows:
 
 <UL><PRE>
 [global]
-   load printers = yes
-   printing = cups
-   printcap name = cups
+load printers = yes
+printing = cups
+printcap name = cups
 
 [printers]
-   comment = All Printers
-   path = /var/spool/samba
-   browseable = no
-   public = yes
-   guest ok = yes
-   writable = no
-   printable = yes
-   printer admin = root
+comment = All Printers
+path = /var/spool/samba
+browseable = no
+public = yes
+guest ok = yes
+writable = no
+printable = yes
+printer admin = root
 
 [print$]
-   comment = Printer Drivers
-   path = /etc/samba/drivers
-   browseable = yes
-   guest ok = no
-   read only = yes
-   write list = root
+comment = Printer Drivers
+path = /etc/samba/drivers
+browseable = yes
+guest ok = no
+read only = yes
+write list = root
 </PRE></UL>
 
 <P>This configuration assumes a FHS-compliant installation of SAMBA;
@@ -4614,14 +5074,14 @@ the last part of the line blank.</P>
 <!-- NEED 2in -->
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
-	<TD>
-	<B>NOTE:</B>
+<TD>
+<B>NOTE:</B>
 
-	<P>Some versions of UNIX do not enable the BOOTP service by
-	default. The <VAR>/etc/inetd.conf</VAR> usually contains a
-	line for the BOOTP service that can be uncommented if
-	needed.
-	</TD>
+<P>Some versions of UNIX do not enable the BOOTP service by
+default. The <VAR>/etc/inetd.conf</VAR> usually contains a
+line for the BOOTP service that can be uncommented if
+needed.
+</TD>
 </TR>
 </TABLE></CENTER>
 
@@ -4661,114 +5121,114 @@ CUPS:
 
 <CENTER><TABLE BORDER="1">
 <TR VALIGN="TOP" ALIGN="LEFT">
-	<TH>Model/Manufacturer</TH>
-	<TH>Device URI(s)</TH>
+<TH>Model/Manufacturer</TH>
+<TH>Device URI(s)</TH>
 </TR>
 <TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>Apple LaserWriter</TD>
-	<TD>lpd://<I>address</I>/PASSTHRU</TD>
-</TR>
-<!-- NEED 1in -->
-<TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>Axis w/o IPP<BR>
-	<A HREF="#AXIS">(see directions)</A></TD>
-	<TD>socket://<I>address</I>:9100<BR>
-	socket://<I>address</I>:9101<BR>
-	socket://<I>address</I>:9102</TD>
+<TD>Apple LaserWriter</TD>
+<TD>lpd://<I>address</I>/PASSTHRU</TD>
 </TR>
 <!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>Axis w/IPP</TD>
-	<TD>ipp://<I>address</I>/LPT1<BR>
-	ipp://<I>address</I>/LPT2<BR>
-	ipp://<I>address</I>/COM1</TD>
+<TD>Axis w/o IPP<BR>
+<A HREF="#AXIS">(see directions)</A></TD>
+<TD>socket://<I>address</I>:9100<BR>
+socket://<I>address</I>:9101<BR>
+socket://<I>address</I>:9102</TD>
 </TR>
 <!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>Castelle LANpress<SUP>TM</SUP></TD>
-	<TD>lpd://<I>address</I>/pr1<BR>
-	lpd://<I>address</I>/pr2<BR>
-	lpd://<I>address</I>/pr3</TD>
+<TD>Axis w/IPP</TD>
+<TD>ipp://<I>address</I>/LPT1<BR>
+ipp://<I>address</I>/LPT2<BR>
+ipp://<I>address</I>/COM1</TD>
 </TR>
 <!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>DPI NETPrint</TD>
-	<TD>lpd://<I>address</I>/pr1<BR>
-	lpd://<I>address</I>/pr2<BR>
-	lpd://<I>address</I>/pr3</TD>
-</TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>EFI&reg; Fiery&reg; RIP</TD>
-	<TD>lpd://<I>address</I>/print</TD>
-</TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>EPSON&reg; Multiprotocol Ethernet Interface Board</TD>
-	<TD>socket://<I>address</I></TD>
+<TD>Castelle LANpress<SUP>TM</SUP></TD>
+<TD>lpd://<I>address</I>/pr1<BR>
+lpd://<I>address</I>/pr2<BR>
+lpd://<I>address</I>/pr3</TD>
 </TR>
 <!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>Extended System ExtendNET</TD>
-	<TD>lpd://<I>address</I>/pr1<BR>
-	lpd://<I>address</I>/pr2<BR>
-	lpd://<I>address</I>/pr3</TD>
+<TD>DPI NETPrint</TD>
+<TD>lpd://<I>address</I>/pr1<BR>
+lpd://<I>address</I>/pr2<BR>
+lpd://<I>address</I>/pr3</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+<TD>EFI&reg; Fiery&reg; RIP</TD>
+<TD>lpd://<I>address</I>/print</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+<TD>EPSON&reg; Multiprotocol Ethernet Interface Board</TD>
+<TD>socket://<I>address</I></TD>
 </TR>
 <!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>Hewlett Packard JetDirect w/o IPP</TD>
-	<TD>socket://<I>address</I>:9100<BR>
-	socket://<I>address</I>:9101<BR>
-	socket://<I>address</I>:9102</TD>
+<TD>Extended System ExtendNET</TD>
+<TD>lpd://<I>address</I>/pr1<BR>
+lpd://<I>address</I>/pr2<BR>
+lpd://<I>address</I>/pr3</TD>
 </TR>
 <!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>Hewlett Packard JetDirect w/IPP</TD>
-	<TD>ipp://<I>address</I>/ipp<BR>
-	ipp://<I>address</I>/ipp/port1<BR>
-	ipp://<I>address</I>/ipp/port2<BR>
-	ipp://<I>address</I>/ipp/port3</TD>
+<TD>Hewlett Packard JetDirect w/o IPP</TD>
+<TD>socket://<I>address</I>:9100<BR>
+socket://<I>address</I>:9101<BR>
+socket://<I>address</I>:9102</TD>
 </TR>
 <!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>Intel® NetportExpress XL, PRO/100</TD>
-	<TD>lpd://<I>address</I>/LPT1_PASSTHRU<BR>
-	lpd://<I>address</I>/LPT2_PASSTHRU<BR>
-	lpd://<I>address</I>/COM1_PASSTHRU</TD>
-</TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>Lexmark<SUP>TM</SUP> MarkNet</TD>
-	<TD>lpd://<I>address</I>/ps</TD>
+<TD>Hewlett Packard JetDirect w/IPP</TD>
+<TD>ipp://<I>address</I>/ipp<BR>
+ipp://<I>address</I>/ipp/port1<BR>
+ipp://<I>address</I>/ipp/port2<BR>
+ipp://<I>address</I>/ipp/port3</TD>
 </TR>
 <!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>Linksys EtherFast&reg;<BR>
-	<A HREF="#LINKSYS">(see directions)</A></TD>
-	<TD>socket://<I>address</I>:4010<BR>
-	socket://<I>address</I>:4020<BR>
-	socket://<I>address</I>:4030</TD>
+<TD>Intel® NetportExpress XL, PRO/100</TD>
+<TD>lpd://<I>address</I>/LPT1_PASSTHRU<BR>
+lpd://<I>address</I>/LPT2_PASSTHRU<BR>
+lpd://<I>address</I>/COM1_PASSTHRU</TD>
 </TR>
 <TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>Kodak&reg;</TD>
-	<TD>lpd://<I>address</I>/ps</TD>
+<TD>Lexmark<SUP>TM</SUP> MarkNet</TD>
+<TD>lpd://<I>address</I>/ps</TD>
+</TR>
+<!-- NEED 1in -->
+<TR ALIGN="LEFT" VALIGN="TOP">
+<TD>Linksys EtherFast&reg;<BR>
+<A HREF="#LINKSYS">(see directions)</A></TD>
+<TD>socket://<I>address</I>:4010<BR>
+socket://<I>address</I>:4020<BR>
+socket://<I>address</I>:4030</TD>
 </TR>
 <TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>QMS&reg; CrownNet<SUP>TM</SUP></TD>
-	<TD>lpd://<I>address</I>/ps</TD>
+<TD>Kodak&reg;</TD>
+<TD>lpd://<I>address</I>/ps</TD>
 </TR>
 <TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>Tektronix&reg; PhaserShare<SUP>TM</SUP></TD>
-	<TD>socket://<I>address</I>:9100</TD>
+<TD>QMS&reg; CrownNet<SUP>TM</SUP></TD>
+<TD>lpd://<I>address</I>/ps</TD>
 </TR>
 <TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>XEROX&reg; 4512 NIC</TD>
-	<TD>lpd://<I>address</I>/PORT1</TD>
+<TD>Tektronix&reg; PhaserShare<SUP>TM</SUP></TD>
+<TD>socket://<I>address</I>:9100</TD>
 </TR>
 <TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>XEROX&reg; XNIC</TD>
-	<TD>lpd://<I>address</I>/PASSTHRU</TD>
+<TD>XEROX&reg; 4512 NIC</TD>
+<TD>lpd://<I>address</I>/PORT1</TD>
 </TR>
 <TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>XEROX&reg; (most others)</TD>
-	<TD>socket://<I>address</I>:5503</TD>
+<TD>XEROX&reg; XNIC</TD>
+<TD>lpd://<I>address</I>/PASSTHRU</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+<TD>XEROX&reg; (most others)</TD>
+<TD>socket://<I>address</I>:5503</TD>
 </TR>
 </TABLE></CENTER>
 
@@ -4953,17 +5413,17 @@ ftp> <B>quit ENTER</B>
 
 <UL>
 
-	<LI><A HREF="#EPSON9">EPSON 9-pin Dot Matrix</A>, <VAR>epson9.ppd</VAR>
+<LI><A HREF="#EPSON9">EPSON 9-pin Dot Matrix</A>, <VAR>epson9.ppd</VAR>
 
-	<LI><A HREF="#EPSON24">EPSON 24-pin Dot Matrix</A>, <VAR>epson24.ppd</VAR>
+<LI><A HREF="#EPSON24">EPSON 24-pin Dot Matrix</A>, <VAR>epson24.ppd</VAR>
 
-	<LI><A HREF="#STCOLOR">EPSON Stylus Color</A>, <VAR>stcolor.ppd</VAR>
+<LI><A HREF="#STCOLOR">EPSON Stylus Color</A>, <VAR>stcolor.ppd</VAR>
 
-	<LI><A HREF="#STPHOTO">EPSON Stylus Photo</A>, <VAR>stphoto.ppd</VAR>
+<LI><A HREF="#STPHOTO">EPSON Stylus Photo</A>, <VAR>stphoto.ppd</VAR>
 
-	<LI><A HREF="#DESKJET">HP DeskJet</A>, <VAR>deskjet.ppd</VAR>
+<LI><A HREF="#DESKJET">HP DeskJet</A>, <VAR>deskjet.ppd</VAR>
 
-	<LI><A HREF="#LASERJET">HP LaserJet</A>, <VAR>laserjet.ppd</VAR>
+<LI><A HREF="#LASERJET">HP LaserJet</A>, <VAR>laserjet.ppd</VAR>
 
 </UL>
 
@@ -5024,221 +5484,221 @@ the Common UNIX Printing System.
 
 <CENTER><TABLE BORDER="1" WIDTH="80%">
 <TR VALIGN="TOP">
-	<TH>Pathname</TH>
-	<TH>Description</TH>
+<TH>Pathname</TH>
+<TH>Description</TH>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/etc/cups/certs/</TD>
-	<TD>The location of authentication certificate files for local
-	HTTP clients.</TD>
+<TD>/etc/cups/certs/</TD>
+<TD>The location of authentication certificate files for local
+HTTP clients.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/etc/cups/classes.conf</TD>
-	<TD>The printer classes configuration file for the scheduler.</TD>
+<TD>/etc/cups/classes.conf</TD>
+<TD>The printer classes configuration file for the scheduler.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/etc/cups/cupsd.conf</TD>
-	<TD>The scheduler configuration file.</TD>
+<TD>/etc/cups/cupsd.conf</TD>
+<TD>The scheduler configuration file.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/etc/cups/interfaces/</TD>
-	<TD>The location of System V interface scripts for printers.</TD>
+<TD>/etc/cups/interfaces/</TD>
+<TD>The location of System V interface scripts for printers.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/etc/cups/mime.convs</TD>
-	<TD>The list of standard file filters included with CUPS.</TD>
+<TD>/etc/cups/mime.convs</TD>
+<TD>The list of standard file filters included with CUPS.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/etc/cups/mime.types</TD>
-	<TD>The list of recognized file types for CUPS.</TD>
+<TD>/etc/cups/mime.types</TD>
+<TD>The list of recognized file types for CUPS.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/etc/cups/ppd/</TD>
-	<TD>The location of PostScript Printer Description ("PPD") files for
-	printers.</TD>
+<TD>/etc/cups/ppd/</TD>
+<TD>The location of PostScript Printer Description ("PPD") files for
+printers.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/etc/cups/printers.conf</TD>
-	<TD>The printer configuration file for the scheduler.</TD>
+<TD>/etc/cups/printers.conf</TD>
+<TD>The printer configuration file for the scheduler.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/bin/cancel</TD>
-	<TD>The System V cancel job(s) command.</TD>
+<TD>/usr/bin/cancel</TD>
+<TD>The System V cancel job(s) command.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/bin/disable</TD>
-	<TD>The System V disable printer command.</TD>
+<TD>/usr/bin/disable</TD>
+<TD>The System V disable printer command.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/bin/enable</TD>
-	<TD>The System V enable printer command.</TD>
+<TD>/usr/bin/enable</TD>
+<TD>The System V enable printer command.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/bin/lp</TD>
-	<TD>The System V print command.</TD>
+<TD>/usr/bin/lp</TD>
+<TD>The System V print command.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/bin/lpoptions</TD>
-	<TD>Sets user-defined printing options and defaults.</TD>
+<TD>/usr/bin/lpoptions</TD>
+<TD>Sets user-defined printing options and defaults.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/bin/lppasswd</TD>
-	<TD>Adds, changes, or removes Digest password accounts.</TD>
+<TD>/usr/bin/lppasswd</TD>
+<TD>Adds, changes, or removes Digest password accounts.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/bin/lpq</TD>
-	<TD>The Berkeley status command.</TD>
+<TD>/usr/bin/lpq</TD>
+<TD>The Berkeley status command.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/bin/lpr</TD>
-	<TD>The Berkeley print command.</TD>
+<TD>/usr/bin/lpr</TD>
+<TD>The Berkeley print command.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/bin/lprm</TD>
-	<TD>The Berkeley cancel job(s) command.</TD>
+<TD>/usr/bin/lprm</TD>
+<TD>The Berkeley cancel job(s) command.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/bin/lpstat</TD>
-	<TD>The System V status command.</TD>
+<TD>/usr/bin/lpstat</TD>
+<TD>The System V status command.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/include/cups/</TD>
-	<TD>CUPS API header files.</TD>
+<TD>/usr/include/cups/</TD>
+<TD>CUPS API header files.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/lib32/libcups.a<BR>
-	/usr/lib32/libcupsimage.a</TD>
-	<TD>Static libraries (IRIX 6.5)</TD>
+<TD>/usr/lib32/libcups.a<BR>
+/usr/lib32/libcupsimage.a</TD>
+<TD>Static libraries (IRIX 6.5)</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/lib/libcups.a<BR>
-	/usr/lib/libcupsimage.a</TD>
-	<TD>Static libraries (all others)</TD>
+<TD>/usr/lib/libcups.a<BR>
+/usr/lib/libcupsimage.a</TD>
+<TD>Static libraries (all others)</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/lib/libcups.sl.2<BR>
-	/usr/lib/libcupsimage.sl.2</TD>
-	<TD>Shared libraries (HP-UX)</TD>
+<TD>/usr/lib/libcups.sl.2<BR>
+/usr/lib/libcupsimage.sl.2</TD>
+<TD>Shared libraries (HP-UX)</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/lib32/libcups.so.2<BR>
-	/usr/lib32/libcupsimage.so.2</TD>
-	<TD>Shared libraries (IRIX 6.5)</TD>
+<TD>/usr/lib32/libcups.so.2<BR>
+/usr/lib32/libcupsimage.so.2</TD>
+<TD>Shared libraries (IRIX 6.5)</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/lib/libcups.so.2<BR>
-	/usr/lib/libcupsimage.so.2</TD>
-	<TD>Shared libraries (all others)</TD>
+<TD>/usr/lib/libcups.so.2<BR>
+/usr/lib/libcupsimage.so.2</TD>
+<TD>Shared libraries (all others)</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/lib/cups/backend/</TD>
-	<TD>Backends for various types of printer connections.</TD>
+<TD>/usr/lib/cups/backend/</TD>
+<TD>Backends for various types of printer connections.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/lib/cups/cgi-bin/</TD>
-	<TD>CGI programs for the scheduler.</TD>
+<TD>/usr/lib/cups/cgi-bin/</TD>
+<TD>CGI programs for the scheduler.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/lib/cups/daemon/</TD>
-	<TD>Daemons for polling and LPD support.</TD>
+<TD>/usr/lib/cups/daemon/</TD>
+<TD>Daemons for polling and LPD support.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/lib/cups/filter/</TD>
-	<TD>Filters for various types of files.</TD>
+<TD>/usr/lib/cups/filter/</TD>
+<TD>Filters for various types of files.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/lib/locale/</TD>
-	<TD>The location of language-specific message files. (System V)</TD>
+<TD>/usr/lib/locale/</TD>
+<TD>The location of language-specific message files. (System V)</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/lib/nls/msg/</TD>
-	<TD>The location of language-specific message files. (Compaq Tru64 UNIX)</TD>
+<TD>/usr/lib/nls/msg/</TD>
+<TD>The location of language-specific message files. (Compaq Tru64 UNIX)</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/share/locale/</TD>
-	<TD>The location of language-specific message files. (Linux, *BSD)</TD>
+<TD>/usr/share/locale/</TD>
+<TD>The location of language-specific message files. (Linux, *BSD)</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/sbin/accept</TD>
-	<TD>The accept-jobs command.</TD>
+<TD>/usr/sbin/accept</TD>
+<TD>The accept-jobs command.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/sbin/cupsd</TD>
-	<TD>The CUPS print scheduler.</TD>
+<TD>/usr/sbin/cupsd</TD>
+<TD>The CUPS print scheduler.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/sbin/lpadmin</TD>
-	<TD>The System V printer administration tool.</TD>
+<TD>/usr/sbin/lpadmin</TD>
+<TD>The System V printer administration tool.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/sbin/lpc</TD>
-	<TD>The Berkeley printer administration tool.</TD>
+<TD>/usr/sbin/lpc</TD>
+<TD>The Berkeley printer administration tool.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/sbin/lpinfo</TD>
-	<TD>The get-devices and get-ppds command.</TD>
+<TD>/usr/sbin/lpinfo</TD>
+<TD>The get-devices and get-ppds command.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/sbin/lpmove</TD>
-	<TD>The move-jobs command.</TD>
+<TD>/usr/sbin/lpmove</TD>
+<TD>The move-jobs command.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/sbin/reject</TD>
-	<TD>The reject-jobs command.</TD>
+<TD>/usr/sbin/reject</TD>
+<TD>The reject-jobs command.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/share/catman/a_man/<BR>
-	/usr/share/catman/u_man/</TD>
-	<TD>Man pages (IRIX)</TD>
+<TD>/usr/share/catman/a_man/<BR>
+/usr/share/catman/u_man/</TD>
+<TD>Man pages (IRIX)</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/share/man/</TD>
-	<TD>Man pages (Compaq Tru64 UNIX, HP-UX, Solaris)</TD>
+<TD>/usr/share/man/</TD>
+<TD>Man pages (Compaq Tru64 UNIX, HP-UX, Solaris)</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/man/</TD>
-	<TD>Man pages (all others)</TD>
+<TD>/usr/man/</TD>
+<TD>Man pages (all others)</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/share/cups/data/</TD>
-	<TD>The location of filter data files.</TD>
+<TD>/usr/share/cups/data/</TD>
+<TD>The location of filter data files.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/share/cups/data/testprint.ps</TD>
-	<TD>The PostScript test page file.</TD>
+<TD>/usr/share/cups/data/testprint.ps</TD>
+<TD>The PostScript test page file.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/share/cups/fonts/</TD>
-	<TD>The location of PostScript fonts for the PostScript RIP.</TD>
+<TD>/usr/share/cups/fonts/</TD>
+<TD>The location of PostScript fonts for the PostScript RIP.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/share/cups/model/</TD>
-	<TD>The location of PostScript Printer Description ("PPD") files and
-	interface scripts that may be used to setup a printer queue.</TD>
+<TD>/usr/share/cups/model/</TD>
+<TD>The location of PostScript Printer Description ("PPD") files and
+interface scripts that may be used to setup a printer queue.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/share/cups/pstoraster/</TD>
-	<TD>Other PostScript RIP initialization files.</TD>
+<TD>/usr/share/cups/pstoraster/</TD>
+<TD>Other PostScript RIP initialization files.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/share/cups/pstoraster/Fontmap</TD>
-	<TD>The font mapping file (converts filenames to fontnames)</TD>
+<TD>/usr/share/cups/pstoraster/Fontmap</TD>
+<TD>The font mapping file (converts filenames to fontnames)</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/share/cups/templates/</TD>
-	<TD>The location of HTML template files for the web interfaces.</TD>
+<TD>/usr/share/cups/templates/</TD>
+<TD>The location of HTML template files for the web interfaces.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/usr/share/doc/cups/</TD>
-	<TD>Documentation and web page data for the scheduler.</TD>
+<TD>/usr/share/doc/cups/</TD>
+<TD>Documentation and web page data for the scheduler.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/var/log/cups/</TD>
-	<TD>The location of scheduler log files.</TD>
+<TD>/var/log/cups/</TD>
+<TD>The location of scheduler log files.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/var/spool/cups/</TD>
-	<TD>The location of print files waiting to be printed.</TD>
+<TD>/var/spool/cups/</TD>
+<TD>The location of print files waiting to be printed.</TD>
 </TR>
 </TABLE></CENTER>
 
@@ -5253,12 +5713,12 @@ For more information please contact us at:
 
 <UL>
 
-	<LI>WWW: <A HREF="http://www.easysw.com">
-	<CODE>http://www.easysw.com</CODE></A>
+<LI>WWW: <A HREF="http://www.easysw.com">
+<CODE>http://www.easysw.com</CODE></A>
 
-	<LI>EMail: <A HREF="mailto:info@easysw.com">info@easysw.com</A>
+<LI>EMail: <A HREF="mailto:info@easysw.com">info@easysw.com</A>
 
-	<LI>Telephone (M-F, 9-5 EST): +1.301.373.9600
+<LI>Telephone (M-F, 9-5 EST): +1.301.373.9600
 
 </UL>
 
@@ -5302,13 +5762,13 @@ Management"</A>.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
-	<TD>
-	<B>NOTE:</B>
+<TD>
+<B>NOTE:</B>
 
-	<P>Disabling password checks will allow any local user to
-	change your printer and class configuration, but remote
-	administration from another machine will still not be allowed.
-	</TD>
+<P>Disabling password checks will allow any local user to
+change your printer and class configuration, but remote
+administration from another machine will still not be allowed.
+</TD>
 </TR>
 </TABLE></CENTER>
 
@@ -5330,14 +5790,14 @@ Management"</A>.</P>
 
 <CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
 <TR>
-	<TD>
-	<B>NOTE:</B>
+<TD>
+<B>NOTE:</B>
 
-	<P>Allowing administration access from all hosts is a potential
-	security risk. Please read <A HREF="#PRINTING_SECURITY">Chapter
-	6, "Printing System Management"</A> for a description of these
-	risks and ways to minimize them.
-	</TD>
+<P>Allowing administration access from all hosts is a potential
+security risk. Please read <A HREF="#PRINTING_SECURITY">Chapter
+6, "Printing System Management"</A> for a description of these
+risks and ways to minimize them.
+</TD>
 </TR>
 </TABLE></CENTER>
 
@@ -5348,25 +5808,25 @@ Management"</A>.</P>
 
 <OL>
 
-	<LI>not specifying the correct password for the
-	root account.
+<LI>not specifying the correct password for the
+root account.
 
-	<LI>accessing the CUPS server using the hostname or IP
-	address of the server without enabling remote access for
-	administration functions. This can be corrected by following
-	the instructions in the <A HREF="#ALLOW_REMOTE">"I Can't Do
-	Administration Tasks from Another Machine!"</A> section earlier
-	in this appendix.
+<LI>accessing the CUPS server using the hostname or IP
+address of the server without enabling remote access for
+administration functions. This can be corrected by following
+the instructions in the <A HREF="#ALLOW_REMOTE">"I Can't Do
+Administration Tasks from Another Machine!"</A> section earlier
+in this appendix.
 
-	<LI>not setting a password on the root account. CUPS will not
-	authenticate a user account that does not have a password for
-	security reasons.
+<LI>not setting a password on the root account. CUPS will not
+authenticate a user account that does not have a password for
+security reasons.
 
-	<LI>authenticating using an account other than root, but the
-	account you are using is not a member of the system group.
+<LI>authenticating using an account other than root, but the
+account you are using is not a member of the system group.
 
-	<LI>configuring CUPS to use Digest authentication, but
-	your web browser does not support Digest authentication.
+<LI>configuring CUPS to use Digest authentication, but
+your web browser does not support Digest authentication.
 
 </OL>
 
