@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in,v 1.6 2001/08/03 21:15:40 mike Exp $"
+# "$Id: cups.list.in,v 1.7 2001/09/18 19:57:38 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -29,7 +29,7 @@
 %vendor Easy Software Products
 %license LICENSE.txt
 %readme README.txt
-%version 1.1.10-0
+%version 1.1.11-0
 %incompat printpro
 %provides cups
 %provides cupsys
@@ -134,6 +134,7 @@ l 0555 root sys $LIBDIR/accept $SBINDIR/accept
 l 0555 root sys $LIBDIR/lpadmin $SBINDIR/lpadmin
 l 0555 root sys $LIBDIR/reject accept
 f 0555 root sys $SBINDIR/accept systemv/accept
+f 0555 root sys $SBINDIR/cupsaddsmb systemv/cupsaddsmb
 f 0555 root sys $SBINDIR/lpadmin systemv/lpadmin
 f 0555 root sys $SBINDIR/lpc berkeley/lpc
 f 0555 root sys $SBINDIR/lpinfo systemv/lpinfo
@@ -309,6 +310,7 @@ f 0444 root sys $MANDIR/cat5/printers.conf.$CAT5EXT man/printers.conf.$CAT5EXT
 
 f 0444 root sys $AMANDIR/cat$MAN8DIR/accept.$CAT8EXT man/accept.$CAT8EXT
 l 0444 root sys $AMANDIR/cat$MAN8DIR/reject.$CAT8EXT accept.$CAT8EXT
+f 0444 root sys $AMANDIR/cat$MAN8DIR/cupsaddsmb.$CAT8EXT man/cupsaddsmb.$CAT8EXT
 f 0444 root sys $AMANDIR/cat$MAN8DIR/cups-lpd.$CAT8EXT man/cups-lpd.$CAT8EXT
 f 0444 root sys $AMANDIR/cat$MAN8DIR/cups-polld.$CAT8EXT man/cups-polld.$CAT8EXT
 f 0444 root sys $AMANDIR/cat$MAN8DIR/cupsd.$CAT8EXT man/cupsd.$CAT8EXT
@@ -338,6 +340,7 @@ f 0444 root sys $MANDIR/man5/printers.conf.$MAN5EXT man/printers.conf.man
 
 f 0444 root sys $AMANDIR/man$MAN8DIR/accept.$MAN8EXT man/accept.man
 l 0444 root sys $AMANDIR/man$MAN8DIR/reject.$MAN8EXT accept.man
+f 0444 root sys $AMANDIR/man$MAN8DIR/cupsaddsmb.$MAN8EXT man/cupsaddsmb.man
 f 0444 root sys $AMANDIR/man$MAN8DIR/cups-lpd.$MAN8EXT man/cups-lpd.man
 f 0444 root sys $AMANDIR/man$MAN8DIR/cups-polld.$MAN8EXT man/cups-polld.man
 f 0444 root sys $AMANDIR/man$MAN8DIR/cupsd.$MAN8EXT man/cupsd.man
@@ -353,5 +356,5 @@ f 0444 root sys $AMANDIR/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list.in,v 1.6 2001/08/03 21:15:40 mike Exp $".
+# End of "$Id: cups.list.in,v 1.7 2001/09/18 19:57:38 mike Exp $".
 #
