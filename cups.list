@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.5 1999/06/15 20:38:06 mike Exp $"
+# "$Id: cups.list,v 1.6 1999/06/17 20:02:21 mike Exp $"
 #
 #   Installation list for the Common UNIX Printing System (CUPS).
 #
@@ -28,6 +28,8 @@
 %license LICENSE.cups
 %readme README.cups
 %version 1.0b3
+%incompat print
+%incompat printpro
 
 %system all
 # Server files
@@ -37,7 +39,9 @@ f 0555 root sys /var/cups/backend/parallel backend/parallel
 f 0555 root sys /var/cups/backend/serial backend/serial
 f 0555 root sys /var/cups/backend/smb backend/smb
 f 0555 root sys /var/cups/backend/socket backend/socket
-F 0500 root sys /usr/sbin/cupsd scheduler/cupsd
+f 0500 root sys /usr/sbin/cupsd scheduler/cupsd
+f 0555 root sys /var/cups/cgi-bin/classes.cgi cgi-bin/classes.cgi
+f 0555 root sys /var/cups/cgi-bin/jobs.cgi cgi-bin/jobs.cgi
 f 0555 root sys /var/cups/cgi-bin/printers.cgi cgi-bin/printers.cgi
 f 0555 root sys /var/cups/filter/pstoraster pstoraster/pstoraster
 f 0555 root sys /var/cups/filter/imagetops filter/imagetops
@@ -173,7 +177,7 @@ f 0444 root sys /usr/share/cups/model/laserjet.ppd ppd/laserjet.ppd
 
 # Config files
 c 0600 root sys /var/cups/conf/classes.conf conf/classes.conf
-C 0600 root sys /var/cups/conf/cupsd.conf conf/cupsd.conf
+c 0600 root sys /var/cups/conf/cupsd.conf conf/cupsd.conf
 c 0600 root sys /var/cups/conf/mime.convs conf/mime.convs
 c 0600 root sys /var/cups/conf/mime.types conf/mime.types
 c 0600 root sys /var/cups/conf/printers.conf conf/printers.conf
@@ -182,10 +186,10 @@ c 0600 root sys /var/cups/conf/printers.conf conf/printers.conf
 f 0444 root sys /usr/share/cups/doc/cmp.html doc/cmp.html
 f 0444 root sys /usr/share/cups/doc/cmp.pdf doc/cmp.pdf
 f 0444 root sys /usr/share/cups/doc/cupsdoc.css doc/cupsdoc.css
-F 0444 root sys /usr/share/cups/doc/cups.css doc/cups.css
-F 0444 root sys /usr/share/cups/doc/documentation.html doc/documentation.html
-F 0444 root sys /usr/share/cups/doc/idd.html doc/idd.html
-F 0444 root sys /usr/share/cups/doc/idd.pdf doc/idd.pdf
+f 0444 root sys /usr/share/cups/doc/cups.css doc/cups.css
+f 0444 root sys /usr/share/cups/doc/documentation.html doc/documentation.html
+f 0444 root sys /usr/share/cups/doc/idd.html doc/idd.html
+f 0444 root sys /usr/share/cups/doc/idd.pdf doc/idd.pdf
 f 0444 root sys /usr/share/cups/doc/images/cups-bar.gif doc/images/cups-bar.gif
 f 0444 root sys /usr/share/cups/doc/images/cups-block-diagram.gif doc/images/cups-block-diagram.gif
 f 0444 root sys /usr/share/cups/doc/images/cups-large.gif doc/images/cups-large.gif
@@ -196,19 +200,19 @@ f 0444 root sys /usr/share/cups/doc/images/navbar.gif doc/images/navbar.gif
 f 0444 root sys /usr/share/cups/doc/images/printer-idle.gif doc/images/printer-idle.gif
 f 0444 root sys /usr/share/cups/doc/images/printer-processing.gif doc/images/printer-processing.gif
 f 0444 root sys /usr/share/cups/doc/images/printer-stopped.gif doc/images/printer-stopped.gif
-F 0444 root sys /usr/share/cups/doc/index.html doc/index.html
+f 0444 root sys /usr/share/cups/doc/index.html doc/index.html
 f 0444 root sys /usr/share/cups/doc/overview.html doc/overview.html
 f 0444 root sys /usr/share/cups/doc/overview.pdf doc/overview.pdf
-F 0444 root sys /usr/share/cups/doc/sam.html doc/sam.html
-F 0444 root sys /usr/share/cups/doc/sam.pdf doc/sam.pdf
+f 0444 root sys /usr/share/cups/doc/sam.html doc/sam.html
+f 0444 root sys /usr/share/cups/doc/sam.pdf doc/sam.pdf
 f 0444 root sys /usr/share/cups/doc/sdd.html doc/sdd.html
 f 0444 root sys /usr/share/cups/doc/sdd.pdf doc/sdd.pdf
 f 0444 root sys /usr/share/cups/doc/ssr.html doc/ssr.html
 f 0444 root sys /usr/share/cups/doc/ssr.pdf doc/ssr.pdf
 f 0444 root sys /usr/share/cups/doc/stp.html doc/stp.html
 f 0444 root sys /usr/share/cups/doc/stp.pdf doc/stp.pdf
-F 0444 root sys /usr/share/cups/doc/sum.html doc/sum.html
-F 0444 root sys /usr/share/cups/doc/sum.pdf doc/sum.pdf
+f 0444 root sys /usr/share/cups/doc/sum.html doc/sum.html
+f 0444 root sys /usr/share/cups/doc/sum.pdf doc/sum.pdf
 f 0444 root sys /usr/share/cups/doc/svd.html doc/svd.html
 f 0444 root sys /usr/share/cups/doc/svd.pdf doc/svd.pdf
 
@@ -233,7 +237,7 @@ l 0444 root sys /usr/share/catman/u_man/cat1/cancel.z lp.z
 f 0444 root sys /usr/share/catman/u_man/cat5/mime.convs.z man/mime.convs.z
 f 0444 root sys /usr/share/catman/u_man/cat5/mime.types.z man/mime.types.z
 f 0444 root sys /usr/share/catman/u_man/cat5/printers.conf.z man/printers.conf.z
-%system hpux linux osf1 sunos
+%system hpux linux dunix sunos
 f 0444 root sys /usr/man/man8/accept.8 man/accept.8
 l 0444 root sys /usr/man/man8/reject.8 accept.8
 f 0444 root sys /usr/man/man1/backend.1 man/backend.1
@@ -281,7 +285,7 @@ l 0555 root sys /etc/rc.d/rc5.d/S60lpd ../init.d/lpd
 l 0555 root sys /etc/rc.d/rc0.d/K60lpd ../init.d/lpd
 l 0555 root sys /etc/rc.d/rc1.d/K60lpd ../init.d/lpd
 l 0555 root sys /etc/rc.d/rc6.d/K60lpd ../init.d/lpd
-%system osf1
+%system dunix
 %install /sbin/init.d/lpd start
 %remove /sbin/init.d/lpd stop
 %patch /sbin/init.d/lpd stop
@@ -298,5 +302,5 @@ l 0555 root sys /etc/rc0.d/K20lp ../init.d/lp
 l 0555 root sys /etc/rc2.d/S80lp ../init.d/lp
 
 #
-# End of "$Id: cups.list,v 1.5 1999/06/15 20:38:06 mike Exp $".
+# End of "$Id: cups.list,v 1.6 1999/06/17 20:02:21 mike Exp $".
 #
