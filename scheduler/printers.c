@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.21 1999/06/19 12:30:11 mike Exp $"
+ * "$Id: printers.c,v 1.22 1999/06/23 15:11:25 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -68,6 +68,7 @@ AddPrinter(char *name)		/* I - Name of printer */
     return (NULL);
 
   strcpy(p->name, name);
+  strcpy(p->hostname, ServerName);
   p->state     = IPP_PRINTER_STOPPED;
   p->accepting = 0;
   p->filetype  = mimeAddType(MimeDatabase, "printer", name);
@@ -948,5 +949,5 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 
 
 /*
- * End of "$Id: printers.c,v 1.21 1999/06/19 12:30:11 mike Exp $".
+ * End of "$Id: printers.c,v 1.22 1999/06/23 15:11:25 mike Exp $".
  */
