@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.36.2.14 2003/01/24 20:45:13 mike Exp $"
+ * "$Id: ipp.h,v 1.36.2.15 2003/03/14 22:14:33 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -25,8 +25,8 @@
  *   This file is subject to the Apple OS-Developed Software exception.
  */
 
-#ifndef _IPP_IPP_H_
-#  define _IPP_IPP_H_
+#ifndef _CUPS_IPP_H_
+#  define _CUPS_IPP_H_
 
 /*
  * Include necessary headers...
@@ -307,6 +307,7 @@ typedef enum			/**** IPP status codes... ****/
 
 typedef unsigned char ipp_uchar_t;/**** Unsigned 8-bit integer/character ****/
 
+/**** New in CUPS 1.1.19 ****/
 typedef int	(*ipp_iocb_t)(void *, ipp_uchar_t *, int);
 				/**** IPP IO Callback Function ****/
 
@@ -318,13 +319,6 @@ typedef union			/**** Request Header ****/
     int		op_status;	/* Operation ID or status code*/
     int		request_id;	/* Request ID */
   }		any;
-
-  struct			/* Event Header */
-  {
-    ipp_uchar_t	version[2];	/* Protocol version number */
-    int		status_code;	/* Status code */
-    int		request_id;	/* Request ID */
-  }		event;
 
   struct			/* Operation Header */
   {
@@ -339,8 +333,17 @@ typedef union			/**** Request Header ****/
     ipp_status_t status_code;	/* Status code */
     int		request_id;	/* Request ID */
   }		status;
-} ipp_header_t;
 
+  /**** New in CUPS 1.1.19 ****/
+  struct			/* Event Header */
+  {
+    ipp_uchar_t	version[2];	/* Protocol version number */
+    int		status_code;	/* Status code */
+    int		request_id;	/* Request ID */
+  }		event;
+} ipp_request_t;
+
+/**** New in CUPS 1.1.19 ****/
 typedef struct ipp_str ipp_t;
 
 typedef union			/**** Attribute Value ****/
@@ -348,8 +351,6 @@ typedef union			/**** Attribute Value ****/
   int		integer;	/* Integer/enumerated value */
 
   char		boolean;	/* Boolean value */
-
-  ipp_t		*collection;	/* Collection value */
 
   ipp_uchar_t	date[11];	/* Date/time value */
 
@@ -377,6 +378,9 @@ typedef union			/**** Attribute Value ****/
     int		length;		/* Length of attribute */
     void	*data;		/* Data in attribute */
   }		unknown;	/* Unknown attribute type */
+
+/**** New in CUPS 1.1.19 ****/
+  ipp_t		*collection;	/* Collection value */
 } ipp_value_t;
 
 typedef struct ipp_attribute_s	/**** Attribute ****/
@@ -392,7 +396,7 @@ typedef struct ipp_attribute_s	/**** Attribute ****/
 struct ipp_str			/**** IPP Request/Response/Notification ****/
 {
   ipp_state_t	state;		/* State of request */
-  ipp_header_t	request;	/* Request header */
+  ipp_request_t	request;	/* Request header */
   ipp_attribute_t *attrs,	/* Attributes */
 		*last,		/* Last attribute in list */
 		*current;	/* Current attribute (for read/write) */
@@ -406,8 +410,6 @@ struct ipp_str			/**** IPP Request/Response/Notification ****/
 
 extern ipp_attribute_t	*ippAddBoolean(ipp_t *ipp, ipp_tag_t group, const char *name, char value);
 extern ipp_attribute_t	*ippAddBooleans(ipp_t *ipp, ipp_tag_t group, const char *name, int num_values, const char *values);
-extern ipp_attribute_t	*ippAddCollection(ipp_t *ipp, ipp_tag_t group, const char *name, ipp_t *value);
-extern ipp_attribute_t	*ippAddCollections(ipp_t *ipp, ipp_tag_t group, const char *name, int num_values, const ipp_t **values);
 extern ipp_attribute_t	*ippAddDate(ipp_t *ipp, ipp_tag_t group, const char *name, const ipp_uchar_t *value);
 extern ipp_attribute_t	*ippAddInteger(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, const char *name, int value);
 extern ipp_attribute_t	*ippAddIntegers(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, const char *name, int num_values, const int *values);
@@ -420,7 +422,6 @@ extern ipp_attribute_t	*ippAddString(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type
 extern ipp_attribute_t	*ippAddStrings(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, const char *name, int num_values, const char *charset, const char * const *values);
 extern time_t		ippDateToTime(const ipp_uchar_t *date);
 extern void		ippDelete(ipp_t *ipp);
-extern void		ippDeleteAttribute(ipp_t *ipp, ipp_attribute_t *attr);
 extern const char	*ippErrorString(ipp_status_t error);
 extern ipp_attribute_t	*ippFindAttribute(ipp_t *ipp, const char *name,
 			                  ipp_tag_t type);
@@ -429,14 +430,19 @@ extern ipp_attribute_t	*ippFindNextAttribute(ipp_t *ipp, const char *name,
 extern size_t		ippLength(ipp_t *ipp);
 extern ipp_t		*ippNew(void);
 extern ipp_state_t	ippRead(http_t *http, ipp_t *ipp);
-extern ipp_state_t	ippReadFile(int fd, ipp_t *ipp);
-extern ipp_state_t	ippReadIO(void *src, ipp_iocb_t cb, int blocking, ipp_t *parent, ipp_t *ipp);
 extern const ipp_uchar_t *ippTimeToDate(time_t t);
 extern ipp_state_t	ippWrite(http_t *http, ipp_t *ipp);
-extern ipp_state_t	ippWriteFile(int fd, ipp_t *ipp);
-extern ipp_state_t	ippWriteIO(void *dst, ipp_iocb_t cb, int blocking, ipp_t *parent, ipp_t *ipp);
 extern int		ippPort(void);
 extern void		ippSetPort(int p);
+
+/**** New in CUPS 1.1.19 ****/
+extern ipp_attribute_t	*ippAddCollection(ipp_t *ipp, ipp_tag_t group, const char *name, ipp_t *value);
+extern ipp_attribute_t	*ippAddCollections(ipp_t *ipp, ipp_tag_t group, const char *name, int num_values, const ipp_t **values);
+extern void		ippDeleteAttribute(ipp_t *ipp, ipp_attribute_t *attr);
+extern ipp_state_t	ippReadFile(int fd, ipp_t *ipp);
+extern ipp_state_t	ippReadIO(void *src, ipp_iocb_t cb, int blocking, ipp_t *parent, ipp_t *ipp);
+extern ipp_state_t	ippWriteFile(int fd, ipp_t *ipp);
+extern ipp_state_t	ippWriteIO(void *dst, ipp_iocb_t cb, int blocking, ipp_t *parent, ipp_t *ipp);
 
 
 /*
@@ -454,8 +460,8 @@ extern void		_ipp_free_attr(ipp_attribute_t *);
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */
-#endif /* !_IPP_IPP_H_ */
+#endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.36.2.14 2003/01/24 20:45:13 mike Exp $".
+ * End of "$Id: ipp.h,v 1.36.2.15 2003/03/14 22:14:33 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.29 2003/02/11 18:23:29 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.30 2003/03/14 22:14:32 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -61,9 +61,7 @@
  *                            collection value.
  *   ipp_read_http()        - Semi-blocking read on a HTTP connection...
  *   ipp_read_file()        - Read IPP data from a file.
- *   ipp_read_mem()         - Read IPP data from memory.
  *   ipp_write_file()       - Write IPP data to a file.
- *   ipp_write_mem()        - Write IPP data to memory.
  */
 
 /*
@@ -81,26 +79,13 @@
 
 
 /*
- * Memory read/write info...
- */
-
-typedef struct
-{
-  ipp_uchar_t	*current,			/* Current byte in buffer */
-		*end;				/* Last byte in buffer */
-} ipp_mem_t;
-
-
-/*
  * Local functions...
  */
 
 static size_t		ipp_length(ipp_t *ipp, int collection);
 static int		ipp_read_http(http_t *http, ipp_uchar_t *buffer, int length);
 static int		ipp_read_file(int *fd, ipp_uchar_t *buffer, int length);
-static int		ipp_read_mem(ipp_mem_t *m, ipp_uchar_t *buffer, int length);
 static int		ipp_write_file(int *fd, ipp_uchar_t *buffer, int length);
-static int		ipp_write_mem(ipp_mem_t *m, ipp_uchar_t *buffer, int length);
 
 
 /*
@@ -2477,33 +2462,6 @@ ipp_read_file(int         *fd,			/* I - File descriptor */
 
 
 /*
- * 'ipp_read_mem()' - Read IPP data from memory.
- */
-
-static int					/* O - Number of bytes read */
-ipp_read_mem(ipp_mem_t   *m,			/* I - Memory buffer */
-             ipp_uchar_t *buffer,		/* O - Read buffer */
-	     int         length)		/* I - Number of bytes to read */
-{
-  int avail;					/* Number of bytes in buffer */
-
-
-  avail = m->end - m->current;
-
-  if (avail == 0)
-    return (-1);
-
-  if (length > avail)
-    length = avail;
-
-  memcpy(buffer, m->current, length);
-  m->current += length;
-
-  return (length);
-}
-
-
-/*
  * 'ipp_write_file()' - Write IPP data to a file.
  */
 
@@ -2517,32 +2475,5 @@ ipp_write_file(int         *fd,			/* I - File descriptor */
 
 
 /*
- * 'ipp_write_mem()' - Write IPP data to memory.
- */
-
-static int					/* O - Number of bytes written */
-ipp_write_mem(ipp_mem_t   *m,			/* I - Memory buffer */
-              ipp_uchar_t *buffer,		/* I - Data to write */
-	      int         length)		/* I - Number of bytes to write */
-{
-  int avail;					/* Number of bytes in buffer */
-
-
-  avail = m->end - m->current;
-
-  if (avail == 0)
-    return (-1);
-
-  if (length > avail)
-    length = avail;
-
-  memcpy(m->current, buffer, length);
-  m->current += length;
-
-  return (length);
-}
-
-
-/*
- * End of "$Id: ipp.c,v 1.55.2.29 2003/02/11 18:23:29 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.30 2003/03/14 22:14:32 mike Exp $".
  */
