@@ -1,5 +1,5 @@
 //
-// "$Id: pdftops.cxx,v 1.6.2.10 2004/07/03 03:30:43 mike Exp $"
+// "$Id: pdftops.cxx,v 1.6.2.11 2004/07/03 03:49:03 mike Exp $"
 //
 //   PDF to PostScript filter front-end for the Common UNIX Printing
 //   System (CUPS).
@@ -285,7 +285,8 @@ main(int  argc,				// I - Number of command-line args
   globalParams->setPSPaperHeight(length);
   globalParams->setPSImageableArea(left, bottom, right, top);
   globalParams->setPSDuplex(duplex);
-//  globalParams->setPSFit(fit);
+  globalParams->setPSExpandSmaller(fit);
+  globalParams->setPSShrinkLarger(fit);
   globalParams->setPSLevel(level);
   globalParams->setPSASCIIHex(level == psLevel1);
   globalParams->setPSEmbedType1(1);
@@ -339,5 +340,5 @@ main(int  argc,				// I - Number of command-line args
 
 
 //
-// End of "$Id: pdftops.cxx,v 1.6.2.10 2004/07/03 03:30:43 mike Exp $".
+// End of "$Id: pdftops.cxx,v 1.6.2.11 2004/07/03 03:49:03 mike Exp $".
 //

@@ -67,6 +67,7 @@ static char *prolog[] = {
   "/pdfSetup {",
   "  3 1 roll 2 array astore",
   "  /setpagedevice where {",
+#if 0 /* NOT FOR CUPS */
   "    pop 3 dict begin",
   "      /PageSize exch def",
   "      /ImagingBBox null def",
@@ -76,6 +77,9 @@ static char *prolog[] = {
   "  } {",
   "    pop pop",
   "  } ifelse",
+#else
+  "  pop pop pop",
+#endif /* 0 */
   "} def",
   "~1sn",
   "/pdfOpNames [",
