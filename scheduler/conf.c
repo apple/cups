@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.62 2000/11/17 19:57:13 mike Exp $"
+ * "$Id: conf.c,v 1.63 2000/11/29 15:26:46 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -432,21 +432,6 @@ ReadConfiguration(void)
 
   snprintf(directory, sizeof(directory), "%s/backend", ServerBin);
   LoadDevices(directory);
-
- /*
-  * Add a default browser if browsing is enabled and no browser addresses
-  * were defined...
-  */
-
-  if (Browsing && NumBrowsers == 0)
-  {
-    NumBrowsers ++;
-
-    memset(Browsers + 0, 0, sizeof(Browsers[0]));
-    Browsers[0].sin_addr.s_addr = htonl(INADDR_BROADCAST);
-    Browsers[0].sin_family      = AF_INET;
-    Browsers[0].sin_port        = htons(BrowsePort);
-  }
 
  /*
   * Startup all the networking stuff...
@@ -1422,5 +1407,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.62 2000/11/17 19:57:13 mike Exp $".
+ * End of "$Id: conf.c,v 1.63 2000/11/29 15:26:46 mike Exp $".
  */

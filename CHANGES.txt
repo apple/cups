@@ -3,6 +3,9 @@ CHANGES.txt - 11/17/2000
 
 CHANGES IN CUPS V1.1.5
 
+	- Security updates - new default configuration does
+	  not broadcast printer information and only allows
+	  access from the local system.
 	- Documentation updates.
 	- Makefile/configure script updates.
 	- The RPM spec file didn't work out-of-the-box under
@@ -134,10 +137,12 @@ CHANGES IN CUPS V1.1.5
 	- Some DEC PPD files incorrectly use "Off" for the null
 	  value in UI constraints. Added "Off" to the list of
 	  accepted null values.
-	- Changed the *BSD define constants to __*BSD__ for all
+	- Changed the *BSD define constants to __*BSD__ in all
 	  of the backends.
 	- Added support for "lpstat printername", which is an
 	  undocumented feature in Solaris.
+	- The HP-GL/2 filter now only sets the plot size if it
+	  is set in the plot file.
 
 
 CHANGES IN CUPS v1.1.4
