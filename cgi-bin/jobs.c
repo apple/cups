@@ -1,5 +1,5 @@
 /*
- * "$Id: jobs.c,v 1.18 2002/05/27 14:40:41 mike Exp $"
+ * "$Id: jobs.c,v 1.19 2002/09/26 15:12:00 mike Exp $"
  *
  *   Job status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -182,7 +182,6 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
 		*response;		/* IPP response */
   char		uri[HTTP_MAX_URI];	/* Job URI */
   const char	*job;			/* Job ID */
-  const char	*printer;		/* Printer name (purge-jobs) */
   ipp_status_t	status;			/* Operation status... */
 
 
@@ -256,5 +255,5 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: jobs.c,v 1.18 2002/05/27 14:40:41 mike Exp $".
+ * End of "$Id: jobs.c,v 1.19 2002/09/26 15:12:00 mike Exp $".
  */
