@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.4 1999/06/18 18:36:01 mike Exp $"
+# "$Id: Makefile,v 1.5 1999/06/21 18:44:57 mike Exp $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -54,6 +54,7 @@ install:
 #
 
 ipp:	ipp.o ../cups/libcups.a
+	echo Linking $<...
 	$(CC) $(LDFLAGS) -o ipp ipp.o $(LIBS)
 
 ipp.o:	../cups/cups.h ../Makedefs
@@ -63,6 +64,7 @@ ipp.o:	../cups/cups.h ../Makedefs
 #
 
 lpd:	lpd.o ../cups/libcups.a
+	echo Linking $<...
 	$(CC) $(LDFLAGS) -o lpd lpd.o $(LIBS)
 
 lpd.o:	../cups/cups.h ../Makedefs
@@ -72,6 +74,7 @@ lpd.o:	../cups/cups.h ../Makedefs
 #
 
 parallel:	parallel.o ../cups/libcups.a
+	echo Linking $<...
 	$(CC) $(LDFLAGS) -o parallel parallel.o $(LIBS)
 
 parallel.o:	../cups/cups.h ../Makedefs
@@ -81,6 +84,7 @@ parallel.o:	../cups/cups.h ../Makedefs
 #
 
 serial:	serial.o ../cups/libcups.a
+	echo Linking $<...
 	$(CC) $(LDFLAGS) -o serial serial.o $(LIBS)
 
 serial.o:	../cups/cups.h ../Makedefs
@@ -88,10 +92,14 @@ serial.o:	../cups/cups.h ../Makedefs
 #
 # smb
 #
+# Note: reading through these commands is a good way to get a headache... :)
+#
 
 smb:	smb.sh ../Makedefs
+	echo Generating $<...
 	$(RM) smb
-	$(SED) -e "1,$$s/^SMBCLIENT=.*/SMBCLIENT=$(SMBCLIENT)/" <smb.sh >smb
+	sedcmd="1,\$$s/^SMBCLIENT=.\*/SMBCLIENT=`echo $(SMBCLIENT) | sed -e '1,$$s/\\//\\\\\\//g'`/" ;\
+	$(SED) -e "$$sedcmd" <smb.sh >smb
 	$(CHMOD) +x smb
 
 #
@@ -99,10 +107,11 @@ smb:	smb.sh ../Makedefs
 #
 
 socket:	socket.o ../cups/libcups.a
+	echo Linking $<...
 	$(CC) $(LDFLAGS) -o socket socket.o $(LIBS)
 
 socket.o:	../cups/cups.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.4 1999/06/18 18:36:01 mike Exp $".
+# End of "$Id: Makefile,v 1.5 1999/06/21 18:44:57 mike Exp $".
 #
