@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.24.2.9 2003/01/07 18:26:29 mike Exp $"
+ * "$Id: ppd.h,v 1.24.2.10 2003/01/28 15:29:42 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -146,8 +146,8 @@ typedef struct			/**** Options ****/
 typedef struct ppd_group_str	/**** Groups ****/
 {
   /**** Group text strings are limited to 39 chars + nul in order to
-   **** preserve binary compatibility with CUPS 1.1.x and allow
-   **** applications to get the group's keyword name.
+   **** preserve binary compatibility and allow applications to get
+   **** the group's keyword name.
    ****/
   char		text[PPD_MAX_TEXT - PPD_MAX_NAME],
   				/* Human-readable group name */
@@ -260,7 +260,6 @@ typedef struct			/**** Files ****/
 		*jcl_end,	/* End JCL commands */
 		*lang_encoding,	/* Language encoding */
 		*lang_version,	/* Language version (English, Spanish, etc.) */
-		*pcfilename,	/* PC filename */
 		*modelname,	/* Model name (general) */
 		*ttrasterizer,	/* Truetype rasterizer */
 		*manufacturer,	/* Manufacturer name */
@@ -283,15 +282,19 @@ typedef struct			/**** Files ****/
   int		num_filters;	/* Number of filters */
   char		**filters;	/* Filter strings... */
 
-  /**** New for CUPS 1.1 ****/
+  /**** New in CUPS 1.1 ****/
   int		flip_duplex;	/* 1 = Flip page for back sides */
+
+  /**** New in CUPS 1.1.19 ****/
+  char		*protocols,	/* Protocols (BCP, TBCP) string */
+		*pcfilename;	/* PCFileName string */
+  int		num_attrs,	/* Number of attributes */
+		cur_attr;	/* Current attribute */
+  ppd_attr_t	**attrs;	/* Attributes */
 
   /**** New for CUPS 1.2 ****/
   int		num_extended;	/* Number of extended options */
   ppd_ext_option_t **extended;	/* Extended options */
-  int		num_attrs,	/* Number of attributes */
-		cur_attr;	/* Current attribute */
-  ppd_attr_t	**attrs;	/* Attributes */
 } ppd_file_t;
 
 
@@ -324,12 +327,14 @@ extern float		ppdPageLength(ppd_file_t *ppd, const char *name);
 extern ppd_size_t	*ppdPageSize(ppd_file_t *ppd, const char *name);
 extern float		ppdPageWidth(ppd_file_t *ppd, const char *name);
 
-/**** New for CUPS 1.2 ****/
+/**** New in CUPS 1.1.19 ****/
 extern const char	*ppdFindAttr(ppd_file_t *ppd, const char *name,
 			             const char *spec);
-extern ppd_ext_option_t	*ppdFindExtOption(ppd_file_t *ppd, const char *keyword);
 extern const char	*ppdFindNextAttr(ppd_file_t *ppd, const char *name,
 			                 const char *spec);
+
+/**** New in CUPS 1.2 ****/
+extern ppd_ext_option_t	*ppdFindExtOption(ppd_file_t *ppd, const char *keyword);
 extern int		ppdMarkCurve(ppd_file_t *ppd, const char *keyword,
 			             float low, float high, float gvalue);
 extern int		ppdMarkGamma(ppd_file_t *ppd, const char *keyword,
@@ -359,5 +364,5 @@ extern int		ppdSaveFile(ppd_file_t *ppd, const char *filename);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.24.2.9 2003/01/07 18:26:29 mike Exp $".
+ * End of "$Id: ppd.h,v 1.24.2.10 2003/01/28 15:29:42 mike Exp $".
  */

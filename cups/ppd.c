@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.26 2003/01/24 20:45:14 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.27 2003/01/28 15:29:40 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -419,63 +419,81 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       ppd->language_level = atoi(string);
     else if (strcmp(keyword, "LanguageEncoding") == 0)
     {
+      ppd_free(ppd->lang_encoding);
       ppd->lang_encoding = string;
       string = NULL;			/* Don't free this string below */
     }
     else if (strcmp(keyword, "LanguageVersion") == 0)
     {
+      ppd_free(ppd->lang_version);
       ppd->lang_version = string;
       string = NULL;			/* Don't free this string below */
     }
     else if (strcmp(keyword, "Manufacturer") == 0)
     {
+      ppd_free(ppd->manufacturer);
       ppd->manufacturer = string;
       string = NULL;			/* Don't free this string below */
     }
     else if (strcmp(keyword, "ModelName") == 0)
     {
+      ppd_free(ppd->modelname);
       ppd->modelname = string;
+      string = NULL;			/* Don't free this string below */
+    }
+    else if (strcmp(keyword, "Protocols") == 0)
+    {
+      ppd_free(ppd->protocols);
+      ppd->protocols = string;
       string = NULL;			/* Don't free this string below */
     }
     else if (strcmp(keyword, "PCFileName") == 0)
     {
+      ppd_free(ppd->pcfilename);
       ppd->pcfilename = string;
       string = NULL;			/* Don't free this string below */
     }
     else if (strcmp(keyword, "NickName") == 0)
     {
+      ppd_free(ppd->nickname);
       ppd->nickname = string;
       string = NULL;			/* Don't free this string below */
     }
     else if (strcmp(keyword, "Product") == 0)
     {
+      ppd_free(ppd->product);
       ppd->product = string;
       string = NULL;			/* Don't free this string below */
     }
     else if (strcmp(keyword, "ShortNickName") == 0)
     {
+      ppd_free(ppd->shortnickname);
       ppd->shortnickname = string;
       string = NULL;			/* Don't free this string below */
     }
     else if (strcmp(keyword, "TTRasterizer") == 0)
     {
+      ppd_free(ppd->ttrasterizer);
       ppd->ttrasterizer = string;
       string = NULL;			/* Don't free this string below */
     }
     else if (strcmp(keyword, "JCLBegin") == 0)
     {
+      ppd_free(ppd->jcl_begin);
       ppd_decode(string);		/* Decode quoted string */
       ppd->jcl_begin = string;
       string = NULL;			/* Don't free this string below */
     }
     else if (strcmp(keyword, "JCLEnd") == 0)
     {
+      ppd_free(ppd->jcl_end);
       ppd_decode(string);		/* Decode quoted string */
       ppd->jcl_end = string;
       string = NULL;			/* Don't free this string below */
     }
     else if (strcmp(keyword, "JCLToPSInterpreter") == 0)
     {
+      ppd_free(ppd->jcl_ps);
       ppd_decode(string);		/* Decode quoted string */
       ppd->jcl_ps = string;
       string = NULL;			/* Don't free this string below */
@@ -2582,5 +2600,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.26 2003/01/24 20:45:14 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.27 2003/01/28 15:29:40 mike Exp $".
  */
