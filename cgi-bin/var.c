@@ -1,5 +1,5 @@
 /*
- * "$Id: var.c,v 1.2 1997/05/08 20:14:19 mike Exp $"
+ * "$Id: var.c,v 1.3 1997/05/13 14:56:37 mike Exp $"
  *
  *   CGI form variable functions.
  *
@@ -8,6 +8,7 @@
  * Contents:
  *
  *   cgiInitialize()         - Initialize the CGI variable "database"...
+ *   cgiCheckVariables()     - Check for the presence of "required" variables.
  *   cgiGetVariable()        - Get a CGI variable from the database...
  *   cgiSetVariable()        - Set a CGI variable in the database...
  *   cgi_sort_variables()    - Sort all form variables for faster lookup.
@@ -20,7 +21,10 @@
  * Revision History:
  *
  *   $Log: var.c,v $
- *   Revision 1.2  1997/05/08 20:14:19  mike
+ *   Revision 1.3  1997/05/13 14:56:37  mike
+ *   Added cgiCheckVariables() function to check for required variables.
+ *
+ *   Revision 1.2  1997/05/08  20:14:19  mike
  *   Renamed CGI_Name functions to cgiName functions.
  *   Updated documentation.
  *
@@ -83,6 +87,43 @@ cgiInitialize(int need_content)	/* I - True if input is required */
     return (cgi_initialize_post(need_content));
   else
     return (!need_content);
+}
+
+
+/*
+ * 'cgiCheckVariables()' - Check for the presence of "required" variables.
+ *
+ * Returns 1 if all variables are present, 0 otherwise.  Name may be separated
+ * by spaces and/or commas.
+ */
+
+int
+cgiCheckVariables(char *names)	/* I - Variables to look for */
+{
+  char	name[255],	/* Current variable name */
+	*s;		/* Pointer in string */
+
+
+  if (names == NULL)
+    return (1);
+
+  while (*names != '\0')
+  {
+    while (*names == ' ' || *names == ',')
+      names ++;
+
+    for (s = name; *names != '\0' && *names != ' ' && *names != ','; s ++, names ++)
+      *s = *names;
+
+    *s = 0;
+    if (name[0] == '\0')
+      break;
+
+    if (cgiGetVariable(name) == NULL)
+      return (0);
+  };
+
+  return (1);
 }
 
 
@@ -378,5 +419,5 @@ cgi_initialize_post(int need_content)	/* I - True if input is required */
 
 
 /*
- * End of "$Id: var.c,v 1.2 1997/05/08 20:14:19 mike Exp $".
+ * End of "$Id: var.c,v 1.3 1997/05/13 14:56:37 mike Exp $".
  */
