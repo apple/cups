@@ -1,5 +1,5 @@
 #
-# "$Id: cups.mak,v 1.4 2002/12/17 19:00:11 swdev Exp $"
+# "$Id: cups.mak,v 1.5 2003/07/20 22:47:42 mike Exp $"
 #
 # CUPS driver makefile for Ghostscript.
 #
@@ -26,6 +26,7 @@ cups_=	$(GLOBJ)gdevcups.$(OBJ)
 
 CUPSSERVER= $(install_prefix)`cups-config --serverbin`
 CUPSCONFIG= $(install_prefix)`cups-config --serverroot`
+CUPSDATA= $(install_prefix)`cups-config --datadir`
 
 $(DD)cups.dev:	$(cups_) $(GLD)page.dev
 	$(ADDMOD) $(DD)cups -lib cupsimage -lib cups
@@ -39,10 +40,14 @@ install:	install-cups
 install-cups:
 	-mkdir -p $(CUPSSERVER)/filter
 	$(INSTALL_PROGRAM) pstoraster/pstoraster $(CUPSSERVER)/filter
+	$(INSTALL_PROGRAM) pstoraster/pstopcl6 $(CUPSSERVER)/filter
 	-mkdir -p $(CUPSCONFIG)
 	$(INSTALL_DATA) pstoraster/pstoraster.convs $(CUPSCONFIG)
+	-mkdir -p $(CUPSDATA)/model
+	$(INSTALL_DATA) pstoraster/pxlcolor.ppd $(CUPSDATA)/model
+	$(INSTALL_DATA) pstoraster/pxlmono.ppd $(CUPSDATA)/model
 
 
 #
-# End of "$Id: cups.mak,v 1.4 2002/12/17 19:00:11 swdev Exp $".
+# End of "$Id: cups.mak,v 1.5 2003/07/20 22:47:42 mike Exp $".
 #
