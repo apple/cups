@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.190 2004/08/06 13:55:51 mike Exp $"
+ * "$Id: client.c,v 1.191 2004/08/19 15:32:48 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1282,12 +1282,11 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      else
 	      {
 		SetStringf(&con->command, "%s/cgi-bin/jobs.cgi", ServerBin);
-
-		if (con->uri[5] == '/')
-		  SetString(&con->options, con->uri + 6);
-		else
-		  SetString(&con->options, con->uri + 5);
+                SetString(&con->options, con->uri + 5);
 	      }
+
+              if (con->options[0] == '/')
+	        cups_strcpy(con->options, con->options + 1);
 
               if (!SendCommand(con, con->command, con->options))
 	      {
@@ -1423,7 +1422,11 @@ ReadClient(client_t *con)		/* I - Client to read from */
               if (strncmp(con->uri, "/admin", 6) == 0)
 	      {
 		SetStringf(&con->command, "%s/cgi-bin/admin.cgi", ServerBin);
-		SetString(&con->options, con->uri + 6);
+
+		if ((ptr = strchr(con->uri + 6, '?')) != NULL)
+		  SetStringf(&con->options, "admin%s", ptr);
+		else
+		  SetString(&con->options, "admin");
 	      }
               else if (strncmp(con->uri, "/printers", 9) == 0)
 	      {
@@ -3422,5 +3425,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.190 2004/08/06 13:55:51 mike Exp $".
+ * End of "$Id: client.c,v 1.191 2004/08/19 15:32:48 mike Exp $".
  */
