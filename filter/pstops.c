@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.32 2003/01/23 15:37:10 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.33 2003/01/28 16:23:51 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -32,6 +32,8 @@
  *   do_setup()    - Send the necessary document setup commands...
  *   end_nup()     - End processing for N-up printing...
  *   psgets()      - Get a line from a file.
+ *   psprotocol()  - Enable the binary transmission protocol on the printer.
+ *   pswrite()     - Write data from a file.
  *   start_nup()   - Start processing for N-up printing...
  */
 
@@ -48,25 +50,29 @@
 
 #define MAX_PAGES	10000
 
-#define BORDER_NONE	0	/* No border or hairline border */
-#define BORDER_THICK	1	/* Think border */
-#define BORDER_SINGLE	2	/* Single-line hairline border */
-#define BORDER_SINGLE2	3	/* Single-line thick border */
-#define BORDER_DOUBLE	4	/* Double-line hairline border */
-#define BORDER_DOUBLE2	5	/* Double-line thick border */
+#define BORDER_NONE	0		/* No border or hairline border */
+#define BORDER_THICK	1		/* Think border */
+#define BORDER_SINGLE	2		/* Single-line hairline border */
+#define BORDER_SINGLE2	3		/* Single-line thick border */
+#define BORDER_DOUBLE	4		/* Double-line hairline border */
+#define BORDER_DOUBLE2	5		/* Double-line thick border */
 
-#define LAYOUT_LRBT	0	/* Left to right, bottom to top */
-#define LAYOUT_LRTB	1	/* Left to right, top to bottom */
-#define LAYOUT_RLBT	2	/* Right to left, bottom to top */
-#define LAYOUT_RLTB	3	/* Right to left, top to bottom */
-#define LAYOUT_BTLR	4	/* Bottom to top, left to right */
-#define LAYOUT_TBLR	5	/* Top to bottom, left to right */
-#define LAYOUT_BTRL	6	/* Bottom to top, right to left */
-#define LAYOUT_TBRL	7	/* Top to bottom, right to left */
+#define LAYOUT_LRBT	0		/* Left to right, bottom to top */
+#define LAYOUT_LRTB	1		/* Left to right, top to bottom */
+#define LAYOUT_RLBT	2		/* Right to left, bottom to top */
+#define LAYOUT_RLTB	3		/* Right to left, top to bottom */
+#define LAYOUT_BTLR	4		/* Bottom to top, left to right */
+#define LAYOUT_TBLR	5		/* Top to bottom, left to right */
+#define LAYOUT_BTRL	6		/* Bottom to top, right to left */
+#define LAYOUT_TBRL	7		/* Top to bottom, right to left */
 
-#define LAYOUT_NEGATEY	1
-#define LAYOUT_NEGATEX	2
+#define LAYOUT_NEGATEY	1		/* The bits for the layout */
+#define LAYOUT_NEGATEX	2		/* definitions above... */
 #define LAYOUT_VERTICAL	4
+
+#define PROT_STANDARD	0		/* Adobe standard protocol */
+#define PROT_BCP	1		/* Adobe BCP protocol */
+#define PROT_TBCP	2		/* Adobe TBCP protocol */
 
 
 /*
@@ -87,7 +93,9 @@ int		Order = 0,		/* 0 = normal, 1 = reverse pages */
 		UseESPsp = 0,		/* Use ESPshowpage? */
 		Border = BORDER_NONE,	/* Border around pages */
 		Layout = LAYOUT_LRTB,	/* Layout of N-up pages */
-		NormalLandscape = 0;	/* Normal rotation for landscape? */
+		NormalLandscape = 0,	/* Normal rotation for landscape? */
+		Protocol = PROT_STANDARD;
+					/* Transmission protocol to use */
 
 
 /*
@@ -103,7 +111,9 @@ static void	end_nup(int number);
 #define		is_first_page(p)	(NUp == 1 || (((p)+1) % NUp) == 1)
 #define		is_last_page(p)		(NUp > 1 && (((p)+1) % NUp) == 0)
 #define 	is_not_last_page(p)	(NUp > 1 && ((p) % NUp) != 0)
-static char	*psgets(char *buf, size_t len, FILE *fp);
+static char	*psgets(char *buf, size_t *bytes, FILE *fp);
+static void	psprotocol(ppd_file_t *ppd);
+static size_t	pswrite(const char *buf, size_t bytes, FILE *fp);
 static void	start_nup(int number, int show_border);
 
 
@@ -128,6 +138,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		sloworder;	/* 1 if we need to order manually */
   int		slowduplex;	/* 1 if we need an even number of pages */
   char		line[8192];	/* Line buffer */
+  size_t	len;		/* Length of line buffer */
   float		g;		/* Gamma correction value */
   float		b;		/* Brightness factor */
   int		level;		/* Nesting level for embedded files */
@@ -335,6 +346,21 @@ main(int  argc,			/* I - Number of command-line arguments */
   ppdEmit(ppd, stdout, PPD_ORDER_EXIT);
 
  /*
+  * See if we support a binary transmission protocol...
+  */
+
+  if (ppd && ppd->protocols)
+  {
+    if (strstr(ppd->protocols, "TBCP"))
+      Protocol = PROT_TBCP;
+    else if (strstr(ppd->protocols, "BCP"))
+      Protocol = PROT_BCP;
+
+    if (Protocol)
+      psprotocol(ppd);
+  }
+
+ /*
   * Write any JCL commands that are needed to print PostScript code...
   */
 
@@ -344,7 +370,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Read the first line to see if we have DSC comments...
   */
 
-  if (psgets(line, sizeof(line), fp) == NULL)
+  len = sizeof(line);
+  if (psgets(line, &len, fp) == NULL)
   {
     fputs("ERROR: Empty print file!\n", stderr);
     ppdClose(ppd);
@@ -355,7 +382,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Start sending the document with any commands needed...
   */
 
-  fputs(line, stdout);
+  pswrite(line, len, stdout);
 
   saweof      = 0;
   sent_espsp  = 0;
@@ -425,8 +452,12 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     level = 0;
 
-    while (psgets(line, sizeof(line), fp) != NULL)
+    while (!feof(fp))
     {
+      len = sizeof(line);
+      if (psgets(line, &len, fp) == NULL)
+        break;
+
       if (strncmp(line, "%%", 2) == 0)
         fprintf(stderr, "DEBUG: %d %s", level, line);
       else if (line[0] != '%' && line[0] && !sent_espsp && UseESPsp)
@@ -523,12 +554,12 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    return (1);
 	  }
 
-	  fwrite(line, 1, nbytes, stdout);
+	  pswrite(line, nbytes, stdout);
 	  tbytes -= nbytes;
 	}
       }
       else if (strncmp(line, "%%Pages:", 8) != 0)
-        fputs(line, stdout);
+        pswrite(line, len, stdout);
     }
 
    /*
@@ -613,8 +644,12 @@ main(int  argc,			/* I - Number of command-line arguments */
       {
 	if (!check_range(real_page))
 	{
-	  while (psgets(line, sizeof(line), fp) != NULL)
+	  while (!feof(fp))
 	  {
+	    len = sizeof(line);
+	    if (psgets(line, &len, fp) == NULL)
+	      break;
+
 	    if (strncmp(line, "%%", 2) == 0)
               fprintf(stderr, "DEBUG: %d %s", level, line);
 
@@ -712,7 +747,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  }
 
           if (!sloworder)
-	    fwrite(line, 1, nbytes, stdout);
+	    pswrite(line, nbytes, stdout);
 
           if (slowcollate || sloworder)
 	    fwrite(line, 1, nbytes, temp);
@@ -728,13 +763,14 @@ main(int  argc,			/* I - Number of command-line arguments */
       else
       {
         if (!sloworder)
-          fputs(line, stdout);
+          pswrite(line, len, stdout);
 
 	if (slowcollate || sloworder)
-	  fputs(line, temp);
+	  fwrite(line, 1, len, temp);
       }
 
-      if (psgets(line, sizeof(line), fp) == NULL)
+      len = sizeof(line);
+      if (psgets(line, &len, fp) == NULL)
         break;
     }
 
@@ -888,11 +924,15 @@ main(int  argc,			/* I - Number of command-line arguments */
     if (UseESPsp)
       puts("userdict/showpage/ESPshowpage load put\n");
 
-    while (psgets(line, sizeof(line), fp) != NULL)
+    while (!feof(fp))
     {
+      len = sizeof(line);
+      if (psgets(line, &len, fp) == NULL)
+        break;
+
       if (strcmp(line, "\004") != 0 &&
           strncmp(line, "%%Pages:", 8) != 0)
-        fputs(line, stdout);
+        pswrite(line, len, stdout);
 
       if (strncmp(line, "%%EOF", 5) == 0)
       {
@@ -934,7 +974,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     while ((nbytes = fread(line, 1, sizeof(line), fp)) > 0)
     {
-      fwrite(line, 1, nbytes, stdout);
+      pswrite(line, nbytes, stdout);
 
       if (slowcollate)
 	fwrite(line, 1, nbytes, temp);
@@ -1090,7 +1130,7 @@ copy_bytes(FILE   *fp,		/* I - File to read from */
 
     nleft -= nbytes;
 
-    fwrite(buffer, 1, nbytes, stdout);
+    pswrite(buffer, nbytes, stdout);
   }
 }
 
@@ -1244,16 +1284,17 @@ end_nup(int number)	/* I - Page number */
  *   lines.
  */
 
-static char *		/* O - String or NULL if EOF */
-psgets(char   *buf,	/* I - Buffer to read into */
-       size_t len,	/* I - Length of buffer */
-       FILE   *fp)	/* I - File to read from */
+static char *				/* O  - String or NULL if EOF */
+psgets(char   *buf,			/* I  - Buffer to read into */
+       size_t *bytes,			/* IO - Length of buffer */
+       FILE   *fp)			/* I  - File to read from */
 {
-  char	*bufptr;	/* Pointer into buffer */
-  int	ch;		/* Character from file */
+  char		*bufptr;		/* Pointer into buffer */
+  int		ch;			/* Character from file */
+  size_t	len;			/* Max length of string */
 
 
-  len --;
+  len    = *bytes - 1;
   bufptr = buf;
   ch     = EOF;
 
@@ -1262,20 +1303,24 @@ psgets(char   *buf,	/* I - Buffer to read into */
     if ((ch = getc(fp)) == EOF)
       break;
 
-    if (ch == 0x0d)
+    if (ch == '\r')
     {
      /*
       * Got a CR; see if there is a LF as well...
       */
 
       ch = getc(fp);
-      if (ch != EOF && ch != 0x0a)
-        ungetc(ch, fp);	/* Nope, save it for later... */
 
-      ch = 0x0a;
+      if (ch != EOF && ch != '\n')
+      {
+        ungetc(ch, fp);	/* Nope, save it for later... */
+        ch = '\r';
+      }
+      else
+        *bufptr++ = '\r';
       break;
     }
-    else if (ch == 0x0a)
+    else if (ch == '\n')
       break;
     else
       *bufptr++ = ch;
@@ -1285,14 +1330,20 @@ psgets(char   *buf,	/* I - Buffer to read into */
   * Add a trailing newline if it is there...
   */
 
-  if (ch == '\n')
-    *bufptr++ = '\n';
+  if (ch == '\n' || ch == '\r')
+  {
+    if ((bufptr - buf) < len)
+      *bufptr++ = ch;
+    else
+      ungetc(ch, fp);
+  }
 
  /*
   * Nul-terminate the string and return it (or NULL for EOF).
   */
 
   *bufptr = '\0';
+  *bytes  = bufptr - buf;
 
   if (ch == EOF && bufptr == buf)
     return (NULL);
@@ -1302,18 +1353,65 @@ psgets(char   *buf,	/* I - Buffer to read into */
 
 
 /*
+ * 'psprotocol()' - Enable the binary transmission protocol on the printer.
+ */
+
+static void
+psprotocol(ppd_file_t *ppd)		/* I - PPD file */
+{
+#if 0
+  if (ppd->jcl_begin)
+    fputs(ppd->jcl_begin, stdout);
+  if (ppd->jcl_ps)
+    fputs(ppd->jcl_ps, stdout);
+
+
+  if (ppd->jcl_end)
+    fputs(ppd->jcl_end, stdout);
+#endif /* 0 */
+}
+
+
+/*
+ * 'pswrite()' - Write data from a file.
+ */
+
+static size_t				/* O - Number of bytes written */
+pswrite(const char *buf,		/* I - Buffer to write */
+        size_t     bytes,		/* I - Bytes to write */
+	FILE       *fp)			/* I - File to write to */
+{
+#if 0
+  switch (Protocol)
+  {
+    case PROT_STANDARD :
+        return (fwrite(buf, 1, bytes, fp));
+
+    case PROT_BCP :
+        return (bytes);
+
+    case PROT_TBCP :
+        return (bytes);
+  }
+#else
+  return (fwrite(buf, 1, bytes, fp));
+#endif /* 0 */
+}
+
+
+/*
  * 'start_nup()' - Start processing for N-up printing...
  */
 
 static void
-start_nup(int number,		/* I - Page number */
-          int show_border)	/* I - Show the page border? */
+start_nup(int number,			/* I - Page number */
+          int show_border)		/* I - Show the page border? */
 {
-  int	pos;			/* Position on page */
-  int	x, y;			/* Relative position of subpage */
-  float	w, l,			/* Width and length of subpage */
-	tx, ty;			/* Translation values for subpage */
-  float	pw, pl;			/* Printable width and length of full page */
+  int	pos;				/* Position on page */
+  int	x, y;				/* Relative position of subpage */
+  float	w, l,				/* Width and length of subpage */
+	tx, ty;				/* Translation values for subpage */
+  float	pw, pl;				/* Printable width and length of full page */
 
 
   if (Flip || Orientation || NUp > 1)
@@ -1669,5 +1767,5 @@ start_nup(int number,		/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.32 2003/01/23 15:37:10 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.33 2003/01/28 16:23:51 mike Exp $".
  */
