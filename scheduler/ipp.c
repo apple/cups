@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.117 2001/02/07 19:41:37 mike Exp $"
+ * "$Id: ipp.c,v 1.118 2001/02/22 14:46:04 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -167,6 +167,7 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
     LogMessage(L_ERROR, "ProcessIPPRequest: bad request version (%d.%d)!",
                con->request->request.any.version[0],
 	       con->request->request.any.version[1]);
+
     send_ipp_error(con, IPP_VERSION_NOT_SUPPORTED);
   }  
   else if (con->request->attrs == NULL)
@@ -4458,6 +4459,15 @@ send_ipp_error(client_t     *con,	/* I - Client connection */
     unlink(con->filename);
 
   con->response->request.status.status_code = status;
+
+  if (ippFindAttribute(con->response, "attributes-charset", IPP_TAG_ZERO) == NULL)
+    ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+                 "attributes-charset", NULL, DefaultCharset);
+
+  if (ippFindAttribute(con->response, "attributes-natural-language",
+                       IPP_TAG_ZERO) == NULL)
+    ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                 "attributes-natural-language", NULL, DefaultLanguage);
 }
 
 
@@ -5136,5 +5146,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.117 2001/02/07 19:41:37 mike Exp $".
+ * End of "$Id: ipp.c,v 1.118 2001/02/22 14:46:04 mike Exp $".
  */
