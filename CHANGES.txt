@@ -1,4 +1,4 @@
-CHANGES.txt - 07/10/2000
+CHANGES.txt - 07/21/2000
 ------------------------
 
 CHANGES IN CUPS v1.1.1
