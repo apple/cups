@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.44 2003/02/20 03:50:34 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.45 2003/02/20 14:50:34 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -564,7 +564,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       ui_keyword = 0;
     }
 
-    if (option == NULL)
+    if (option == NULL &&
+        (mask & (PPD_KEYWORD | PPD_OPTION | PPD_STRING)) ==
+	    (PPD_KEYWORD | PPD_OPTION | PPD_STRING))
     {
       for (i = 0; i < (int)(sizeof(ui_keywords) / sizeof(ui_keywords[0])); i ++)
         if (!strcmp(keyword, ui_keywords[i]))
@@ -1651,42 +1653,15 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
       if (option == NULL)
       {
-        ppd_group_t	*temp;
-
-
-       /*
-        * Only valid for Non-UI options...
-	*/
-
-        for (i = ppd->num_groups, temp = ppd->groups; i > 0; i --, temp ++)
-          if (temp->text[0] == '\0')
-	    break;
-
-        if (i > 0)
+        if ((option = ppdFindOption(ppd, keyword + 7)) != NULL)
 	{
-          for (i = 0; i < temp->num_options; i ++)
-	    if (strcmp(keyword + 7, temp->options[i].keyword) == 0)
-	    {
-	      strlcpy(temp->options[i].defchoice, string,
-                      sizeof(temp->options[i].defchoice));
-	      break;
-	    }
-
-          if (i >= temp->num_options)
-	  {
-	   /*
-	    * Option not found; add this as an attribute...
-	    */
-
-            ppd_add_attr(ppd, keyword, "", string);
-
-            string = NULL;		/* Don't free this string below */
-	  }
+	  strlcpy(option->defchoice, string, sizeof(option->defchoice));
+	  option = NULL;
 	}
 	else
 	{
 	 /*
-	  * Default group not found; add this as an attribute...
+	  * Option not found; add this as an attribute...
 	  */
 
           ppd_add_attr(ppd, keyword, "", string);
@@ -3263,5 +3238,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.44 2003/02/20 03:50:34 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.45 2003/02/20 14:50:34 mike Exp $".
  */
