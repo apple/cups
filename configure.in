@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.18 1999/07/09 14:45:57 mike Exp $"
+dnl "$Id: configure.in,v 1.19 1999/07/14 12:49:51 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -133,15 +133,18 @@ dnl Check for libraries...
 AC_CHECK_LIB(c,crypt,LIBS="$LIBS",AC_CHECK_LIB(crypt,crypt))
 AC_CHECK_HEADER(crypt.h, AC_DEFINE(HAVE_CRYPT_H))
 AC_CHECK_LIB(sec,getspent)
+
+NETLIBS=""
+AC_SUBST(NETLIBS)
 AC_CHECK_LIB(socket,socket,
 if test "$uname" != "IRIX"; then
-	LIBS="$LIBS -lsocket"
+	NETLIBS="-lsocket"
 else
 	echo "Not using -lsocket since you are running IRIX."
 fi)
 AC_CHECK_LIB(nsl,gethostbyaddr,
 if test "$uname" != "IRIX"; then
-	LIBS="$LIBS -lnsl"
+	NETLIBS="$NETLIBS -lnsl"
 else
 	echo "Not using -lnsl since you are running IRIX."
 fi)
@@ -238,6 +241,19 @@ if test "$DSO" != ":"; then
 	# a single DSO rather than a bunch...
 	DSOLIBS="\$(LIBJPEG) \$(LIBPNG) \$(LIBTIFF) \$(LIBZ)"
 	IMGLIBS=""
+
+	# The HP-UX and Solaris run-time linkers are EXTREMELY stupid when
+	# it comes to deciding where to find a DSO.  Add linker options to
+	# tell them where to find the DSO (usually in /usr/lib...  duh!)
+	case $uname in
+		HP-UX*)
+			LDFLAGS="$LDFLAGS -Wl,+b,$libdir,+fb"
+			;;
+		SunOS*)
+			# Solaris
+			LDFLAGS="-R$libdir"
+			;;
+	esac
 else
 	DSOLIBS=""
 	IMGLIBS="\$(LIBJPEG) \$(LIBPNG) \$(LIBTIFF) \$(LIBZ)"
@@ -295,5 +311,5 @@ AC_SUBST(CUPS_DATADIR)
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.18 1999/07/09 14:45:57 mike Exp $".
+dnl End of "$Id: configure.in,v 1.19 1999/07/14 12:49:51 mike Exp $".
 dnl
