@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.80 2004/10/04 20:41:48 mike Exp $"
+# "$Id: cups.spec,v 1.81 2004/10/13 21:08:18 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -17,7 +17,7 @@
 #       Attn: CUPS Licensing Information
 #       Easy Software Products
 #       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636-3142 USA
+#       Hollywood, Maryland 20636 USA
 #
 #       Voice: (301) 373-9600
 #       EMail: cups-info@cups.org
@@ -26,7 +26,7 @@
 
 Summary: Common Unix Printing System
 Name: cups
-Version: 1.1.22rc1
+Version: 1.1.22rc2
 Release: 1
 Copyright: GPL
 Group: System Environment/Daemons
@@ -253,5 +253,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/*.so*
 
 #
-# End of "$Id: cups.spec,v 1.80 2004/10/04 20:41:48 mike Exp $".
+# End of "$Id: cups.spec,v 1.81 2004/10/13 21:08:18 mike Exp $".
 #

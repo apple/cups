@@ -1,7 +1,7 @@
-CHANGES.txt - 10/04/2004
+CHANGES.txt - 10/13/2004
 ------------------------
 
-CHANGES IN CUPS V1.1.22
+CHANGES IN CUPS V1.1.22rc2
 
 	- Also sanitize device URI in argv[0] (STR #933)
 	- cupsRasterReadHeader() didn't swap bytes for the
