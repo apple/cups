@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.125 2003/03/05 20:42:28 mike Exp $"
+ * "$Id: conf.c,v 1.126 2003/03/17 20:12:53 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -650,11 +650,10 @@ ReadConfiguration(void)
   StartServer();
 
  /*
-  * Check for queued jobs...
+  * Load queued jobs...
   */
 
   LoadAllJobs();
-  CheckJobs();
 
   return (1);
 }
@@ -2057,5 +2056,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.125 2003/03/05 20:42:28 mike Exp $".
+ * End of "$Id: conf.c,v 1.126 2003/03/17 20:12:53 mike Exp $".
  */
