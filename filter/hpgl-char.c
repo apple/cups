@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-char.c,v 1.8 1999/10/28 21:33:43 mike Exp $"
+ * "$Id: hpgl-char.c,v 1.9 1999/12/07 21:55:51 mike Exp $"
  *
  *   HP-GL/2 character processing for the Common UNIX Printing System (CUPS).
  *
@@ -312,7 +312,14 @@ LB_label(int     num_params,		/* I - Number of parameters */
   if (CharFillMode != 1)
     Outputf("FI\n");
   if (CharFillMode == 1 || CharFillMode == 3)
-    Outputf("P%d ST\n", CharPen);
+  {
+    Outputf("%.3f %.3f %.3f %.2f SP ST\n", Pens[CharPen].rgb[0],
+	    Pens[CharPen].rgb[CharPen], Pens[CharPen].rgb[2],
+	    Pens[CharPen].width * PenScaling);
+    Outputf("%.3f %.3f %.3f %.2f SP\n", Pens[PenNumber].rgb[0],
+	    Pens[PenNumber].rgb[PenNumber], Pens[PenNumber].rgb[2],
+	    Pens[PenNumber].width * PenScaling);
+  }
 
   Outputf("setmiterlimit\n");
   Outputf("grestore\n");
@@ -487,5 +494,5 @@ TD_transparent_data(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-char.c,v 1.8 1999/10/28 21:33:43 mike Exp $".
+ * End of "$Id: hpgl-char.c,v 1.9 1999/12/07 21:55:51 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.18 1999/11/01 16:53:42 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.19 1999/12/07 21:55:51 mike Exp $"
  *
  *   HP-GL/2 configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -249,17 +249,22 @@ update_transform(void)
           Transform[0][0], Transform[1][0], Transform[0][1],
 	  Transform[1][1], Transform[0][2], Transform[1][2]);
 
-  if (WidthUnits)
-    PenScaling = page_width * scaling * 0.01f;
+  if (FitPlot)
+  {
+    if (Rotation == 0 || Rotation == 180)
+      PenScaling *= page_width / PlotSize[1];
+    else
+      PenScaling *= page_width / PlotSize[0];
+  }
   else
-    PenScaling = page_width / PageWidth * 72.0f / 25.4f;
+    PenScaling = 1.0;
 
   if (PenScaling < 0.0)
     PenScaling = -PenScaling;
 
   if (PageDirty)
   {
-    printf("/PenScaling %.3f def W%d\n", PenScaling, PenNumber);
+    printf("%.2f setlinewidth\n", Pens[PenNumber].width * PenScaling);
 
     if (IW1[0] != IW2[0] && IW1[1] != IW2[1])
     {
@@ -638,5 +643,5 @@ SC_scale(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.18 1999/11/01 16:53:42 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.19 1999/12/07 21:55:51 mike Exp $".
  */

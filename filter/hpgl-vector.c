@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-vector.c,v 1.9 1999/04/21 21:19:34 mike Exp $"
+ * "$Id: hpgl-vector.c,v 1.10 1999/12/07 21:55:51 mike Exp $"
  *
  *   HP-GL/2 vector routines for the Common UNIX Printing System (CUPS).
  *
@@ -380,8 +380,11 @@ PE_polyline_encoded(int     num_params,	/* I - Number of parameters */
           break;
       case ':' :	/* Select pen */
           s ++;
-          temp = (int)decode_number(&s, base_bits, 1.0);
-          Outputf("P%d W%d\n", temp, temp);
+          PenNumber = (int)decode_number(&s, base_bits, 1.0);
+	  if (PageDirty)
+	    printf("%.3f %.3f %.3f %.2f SP\n", Pens[PenNumber].rgb[0],
+		   Pens[PenNumber].rgb[PenNumber], Pens[PenNumber].rgb[2],
+		   Pens[PenNumber].width * PenScaling);
           break;
       case '<' :	/* Next coords are a move-to */
           draw = 0;
@@ -700,5 +703,5 @@ plot_points(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-vector.c,v 1.9 1999/04/21 21:19:34 mike Exp $".
+ * End of "$Id: hpgl-vector.c,v 1.10 1999/12/07 21:55:51 mike Exp $".
  */

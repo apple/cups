@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.18 1999/11/01 16:53:42 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.19 1999/12/07 21:55:51 mike Exp $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
@@ -300,16 +300,8 @@ Outputf(const char *format,	/* I - Printf-style string */
     printf("%d setlinecap\n", LineCap);
     printf("%d setlinejoin\n", LineJoin);
 
-    for (i = 0; i <= PenCount; i ++)
-    {
-      printf("/W%d { %.1f PenScaling mul setlinewidth } bind def\n", i,
-             Pens[i].width);
-
-      printf("/P%d { %.3f %.3f %.3f setrgbcolor } bind def\n",
-             i, Pens[i].rgb[0], Pens[i].rgb[1], Pens[i].rgb[2]);
-    }
-
-    puts("P1 W1");
+    printf("%.3f %.3f %.3f %.2f SP\n", Pens[1].rgb[0], Pens[1].rgb[1],
+           Pens[1].rgb[2], Pens[1].width * PenScaling);
 
     puts("gsave");
 
@@ -373,5 +365,5 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.18 1999/11/01 16:53:42 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.19 1999/12/07 21:55:51 mike Exp $".
  */

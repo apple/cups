@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-attr.c,v 1.12 1999/11/01 16:53:42 mike Exp $"
+ * "$Id: hpgl-attr.c,v 1.13 1999/12/07 21:55:51 mike Exp $"
  *
  *   HP-GL/2 attribute processing for the Common UNIX Printing System (CUPS).
  *
@@ -208,14 +208,10 @@ NP_number_pens(int     num_params,	/* I - Number of parameters */
     fprintf(stderr, "WARNING: HP-GL/2 \'NP\' command with invalid number of parameters (%d)!\n",
             num_params);
 
-  PC_pen_color(0, NULL);
-
   for (i = 0; i <= PenCount; i ++)
     Pens[i].width = PenWidth;
 
-  if (PageDirty)
-    for (i = 0; i <= PenCount; i ++)
-      printf("/W%d { DefaultPenWidth PenScaling mul setlinewidth } bind def\n", i);
+  PC_pen_color(0, NULL);
 }
 
 
@@ -257,9 +253,9 @@ PC_pen_color(int     num_params,	/* I - Number of parameters */
       }
 
     if (PageDirty)
-      for (i = 0; i <= PenCount; i ++)
-	Outputf("/P%d { %.3f %.3f %.3f setrgbcolor } bind def\n",
-        	i, Pens[i].rgb[0], Pens[i].rgb[1], Pens[i].rgb[2]);
+      printf("%.3f %.3f %.3f %.2f SP\n", Pens[PenNumber].rgb[0],
+	     Pens[PenNumber].rgb[PenNumber], Pens[PenNumber].rgb[2],
+	     Pens[PenNumber].width * PenScaling);
   }
   else if (num_params == 1 || num_params == 4)
   {
@@ -278,9 +274,10 @@ PC_pen_color(int     num_params,	/* I - Number of parameters */
       Pens[i].rgb[2] = params[3].value.number;
     }
 
-    if (PageDirty)
-      Outputf("/P%d { %.3f %.3f %.3f setrgbcolor } bind def\n",
-              i, Pens[i].rgb[0], Pens[i].rgb[1], Pens[i].rgb[2]);
+    if (PageDirty && i == PenNumber)
+      printf("%.3f %.3f %.3f %.2f SP\n", Pens[PenNumber].rgb[0],
+	     Pens[PenNumber].rgb[PenNumber], Pens[PenNumber].rgb[2],
+	     Pens[PenNumber].width * PenScaling);
   }
   else
     fprintf(stderr, "WARNING: HP-GL/2 \'PC\' command with invalid number of parameters (%d)!\n",
@@ -331,12 +328,10 @@ PW_pen_width(int     num_params,	/* I - Number of parameters */
 
     Pens[pen].width = w;
 
-    if (PageDirty)
-    {
-      Outputf("/W%d { %.1f PenScaling mul setlinewidth } bind def\n", pen, w);
-      if (pen == PenNumber)
-        Outputf("W%d\n", PenNumber);
-    }
+    if (PageDirty && pen == PenNumber)
+      printf("%.3f %.3f %.3f %.2f SP\n", Pens[PenNumber].rgb[0],
+	     Pens[PenNumber].rgb[PenNumber], Pens[PenNumber].rgb[2],
+	     Pens[PenNumber].width * PenScaling);
   }
   else if (num_params < 2)
   {
@@ -348,13 +343,9 @@ PW_pen_width(int     num_params,	/* I - Number of parameters */
       Pens[pen].width = w;
 
     if (PageDirty)
-    {
-      for (pen = 0; pen <= PenCount; pen ++)
-	Outputf("/W%d { %.1f PenScaling mul setlinewidth } bind def\n",
-        	pen, w);
-
-      Outputf("W%d\n", PenNumber);
-    }
+      printf("%.3f %.3f %.3f %.2f SP\n", Pens[PenNumber].rgb[0],
+	     Pens[PenNumber].rgb[PenNumber], Pens[PenNumber].rgb[2],
+	     Pens[PenNumber].width * PenScaling);
   }
   else
     fprintf(stderr, "WARNING: HP-GL/2 \'PW\' command with invalid number of parameters (%d)!\n",
@@ -408,7 +399,10 @@ SP_select_pen(int     num_params,	/* I - Number of parameters */
     fprintf(stderr, "WARNING: HP-GL/2 \'SP\' command with invalid number or value of parameters (%d, %d)!\n",
             num_params, (int)params[0].value.number);
 
-  Outputf("P%d W%d\n", PenNumber, PenNumber);
+  if (PageDirty)
+    printf("%.3f %.3f %.3f %.2f SP\n", Pens[PenNumber].rgb[0],
+	   Pens[PenNumber].rgb[PenNumber], Pens[PenNumber].rgb[2],
+	   Pens[PenNumber].width * PenScaling);
 }
 
 
@@ -444,5 +438,5 @@ WU_width_units(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-attr.c,v 1.12 1999/11/01 16:53:42 mike Exp $".
+ * End of "$Id: hpgl-attr.c,v 1.13 1999/12/07 21:55:51 mike Exp $".
  */
