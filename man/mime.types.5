@@ -1,33 +1,87 @@
 
 
 
-Easy Software Products                              mime.types(5)
+mime.types(5)         Easy Software Products        mime.types(5)
+
+
+NNAAMMEE
+       mime.types - mime type description file for cups
+
+DDEESSCCRRIIPPTTIIOONN
+       The _m_i_m_e_._t_y_p_e_s file defines the recognized file types.
+
+       Additional  file  types  can  be added to _m_i_m_e_._t_y_p_e_s or in
+       additional files in the configuration directory  //eettcc//ccuuppss
+       with the extension ".types".
+
+       Each  line  in the _m_i_m_e_._t_y_p_e_s file is a comment, blank, or
+       rule line. Comment lines start with the # character.  Rule
+       lines  start  with  the  MIME type name and are optionally
+       followed by a series of file recognition  rules  that  are
+       used to automatically identify print and web files:
+
+           super/type rule [ ... ruleN]
+       The  rules  may be grouped using parenthesis, joined using
+       "+" for a logical AND and "," or whitespace for a  logical
+       OR, and negated using "!".
+
+RRUULLEESS
+       Rules  take two forms - a filename extension by itself and
+       functions with test values inside parenthesis. The follow-
+       ing functions are available:
+
+       match("pattern")
+            Pattern match on filename
+
+       ascii(offset,length)
+            True if bytes are valid printable ASCII (CR, NL, TAB,
+            BS, 32-126)
+
+       printable(offset,length)
+            True if bytes are printable 8-bit chars (CR, NL, TAB,
+            BS, 32-126, 128-254)
+
+       string(offset,"string")
+            True if bytes are identical to string
+
+       char(offset,value)
+            True if byte is identical
+
+       short(offset,value)
+            True if 16-bit integer is identical
+
+       int(offset,value)
+            True if 32-bit integer is identical
+
+       locale("string")
+            True if current locale matches string
+
+       contains(offset,range,"string")
+            True if the range contains the string
 
 
 
-NNNNAAAAMMMMEEEE
-     mime.types - mime type description file for cups
-
-DDDDEEEESSSSCCCCRRRRIIIIPPPPTTTTIIIIOOOONNNN
-     The _m_i_m_e._t_y_p_e_s file defines the recognized file types.
-
-     Additional file types can be added to _m_i_m_e._t_y_p_e_s or in addi-
-     tional  files  in the configuration directory ////vvvvaaaarrrr////ccccuuuuppppssss////ccccoooonnnnffff
-     with the extension ".types".
-
-SSSSEEEEEEEE AAAALLLLSSSSOOOO
-     classes.conf(5),  cupsd(8),  cupsd.conf(5),   mime.convs(5),
-     printers.conf(5),  CUPS Software Administrators Manual, CUPS
-     Interface Design Description
-
-CCCCOOOOPPPPYYYYRRRRIIIIGGGGHHHHTTTT
-     Copyright 1993-2000 by Easy Software  Products,  All  Rights
-     Reserved.
+22 June 2000       Common UNIX Printing System                  1
 
 
 
 
 
+mime.types(5)         Easy Software Products        mime.types(5)
+
+
+SSTTRRIINNGG CCOONNSSTTAANNTTSS
+       String  constants  can be specified inside quotes ("") for
+       strings containing whitespace and angle brackets (<>)  for
+       hexadecimal strings.
+
+SSEEEE AALLSSOO
+       classes.conf(5),  cupsd(8),  cupsd.conf(5), mime.convs(5),
+       printers.conf(5), CUPS Software Administrators Manual
+
+CCOOPPYYRRIIGGHHTT
+       Copyright 1993-2000 by Easy Software Products, All  Rights
+       Reserved.
 
 
 
@@ -60,7 +114,19 @@ CCCCOOOOPPPPYYYYRRRRIIIIGGGGHHHHTTTT
 
 
 
-22 September 1999Last change: Common UNIX Printing System           1
 
+
+
+
+
+
+
+
+
+
+
+
+
+22 June 2000       Common UNIX Printing System                  2
 
 

@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsd.conf.man,v 1.1 2000/02/23 03:17:04 mike Exp $"
+.\" "$Id: cupsd.conf.man,v 1.2 2000/06/22 18:21:40 mike Exp $"
 .\"
 .\"   cupsd.conf man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,17 +21,215 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsd.conf 5 "Common UNIX Printing System" "22 September 1999" "Easy Software Products"
+.TH cupsd.conf 5 "Common UNIX Printing System" "22 June 2000" "Easy Software Products"
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
-The \fIcupsd.conf\fR file configures the CUPS scheduler, \fIcupsd(8)\fR.
+The \fIcupsd.conf\fR file configures the CUPS scheduler, \fIcupsd(8)\fR.  It
+is normally located in the \fI/etc/cups\fR directory.
+.LP
+Each line in the file can be a configuration directive, a blank line,
+or a comment. Comment lines start with the # character. The
+configuration directives are intentionally similar to those used by the
+popular Apache web server software and are described below.
+.SH DIRECTIVES
+The following directives are understood by \fIcupsd\fR. Consult the CUPS
+Software Administrators Manual for a detailed description:
+.TP 5
+AccessLog
+.br
+Defines the access log filename.
+.TP 5
+Allow
+.br
+Allows access from the named hosts or addresses.
+.TP 5
+AuthClass
+.br
+Specifies the authentication class (User, Group, System)
+.TP 5
+AuthType
+.br
+Specifies the authentication type (None, Basic, Digest)
+.TP 5
+BrowseAddress
+.br
+Specifies a broadcast address for outgoing printer information packets.
+.TP 5
+BrowseAllow
+.br
+Allows incoming printer information packets from the named host or address.
+.TP 5
+BrowseDeny
+.br
+Denies incoming printer information packets from the named host or address.
+.TP 5
+BrowseInterval
+.br
+Specifies the maximum interval between printer information broadcasts.
+.TP 5
+BrowseOrder
+.br
+Specifies the order of printer information access control (allow,deny or deny,allow)
+.TP 5
+BrowsePoll
+.br
+Specifies a server to poll for printer information.
+.TP 5
+BrowsePort
+.br
+Specifies the port to listen to for printer information packets.
+.TP 5
+BrowseRelay
+.br
+Specifies that printer information packets should be relayed from one host or
+network to another.
+.TP 5
+BrowseTimeout
+.br
+Specifies the maximum interval between printer information updates before
+remote printers will be removed from the list of available printers.
+.TP 5
+Browsing
+.br
+Specifies whether or not remote printer browsing should be enabled.
+.TP 5
+DefaultCharset
+.br
+Specifies the default character set to use for text.
+.TP 5
+DefaultLanguage
+.br
+Specifies the default language to use for text and web content.
+.TP 5
+Deny
+.br
+Denies access to the named host or address.
+.TP 5
+DocumentRoot
+.br
+Specifies the root directory for the internal web server documents.
+.TP 5
+ErrorLog
+.br
+Specifies the error log filename.
+.TP 5
+Group
+.br
+Specifies the group name or ID that will be used when executing
+external programs.
+.TP 5
+HostNameLookups
+.br
+Specifies whether or not to do reverse lookups on client addresses.
+.TP 5
+ImplicitClasses
+.br
+Specifies whether or not to create implicit classes from identical
+remote printers.
+.TP 5
+KeepAlive
+.br
+Specifies whether or not to support HTTP Keep-Alive.
+.TP 5
+KeepAliveTimeout
+.br
+Specifies the connection timeout for HTTP Keep-Alive.
+.TP 5
+<Location /path> ... </Location>
+.br
+Specifies access control for the named location.
+.TP 5
+LogLevel
+.br
+Specifies the logging level (none, warn, error, info, or debug)
+.TP 5
+MaxClients
+.br
+Specifies the maximum number of simultaneous clients to support.
+.TP 5
+MaxLogSize
+.br
+Specifies the maximum size of the log files before they are
+rotated (0 to disable rotation)
+.TP 5
+MaxRequestSize
+.br
+Specifies the maximum request/file size in bytes (0 for no limit)
+.TP 5
+Order
+.br
+Specifies the order of HTTP access control (allow,deny or deny,allow)
+.TP 5
+PageLog
+.br
+Specifies the page log filename.
+.TP 5
+Port
+.br
+Specifies a port number to listen to for HTTP requests.
+.TP 5
+PreserveJobFiles
+.br
+Specifies whether or not to preserve job files after they are printed.
+.TP 5
+PreserveJobHistory
+.br
+Specifies whether or not to preserve the job history after they are
+printed.
+.TP 5
+Printcap
+.br
+Specifies the filename for a printcap file that is updated automatically
+with a list of available printers (needed for legacy applications)
+.TP 5
+RIPCache
+.br
+Specifies the maximum amount of memory to use when converting images
+and PostScript files to bitmaps for a printer.
+.TP 5
+RequestRoot
+.br
+Specifies the directory to store print jobs and other HTTP request
+data.
+.TP 5
+ServerAdmin
+.br
+Specifies the email address of the server administrator.
+.TP 5
+ServerBin
+.br
+Specifies the directory where backends, CGIs, daemons, and filters may
+be found.
+.TP 5
+ServerName
+.br
+Specifies the fully-qualified hostname of the server.
+.TP 5
+ServerRoot
+.br
+Specifies the directory where the server configuration files can be found.
+.TP 5
+SystemGroup
+.br
+Specifies the group to use for System class authentication.
+.TP 5
+TempDir
+.br
+Specifies the directory where temporary files are stored.
+.TP 5
+Timeout
+.br
+Specifies the HTTP request timeout in seconds.
+.TP 5
+User
+.br
+Specifies the user name or ID that is used when running external programs.
 .SH SEE ALSO
 classes.conf(5), cupsd(8), mime.convs(5), mime.types(5), printers.conf(5),
-CUPS Software Administrators Manual,
-CUPS Interface Design Description
+CUPS Software Administrators Manual
 .SH COPYRIGHT
 Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupsd.conf.man,v 1.1 2000/02/23 03:17:04 mike Exp $".
+.\" End of "$Id: cupsd.conf.man,v 1.2 2000/06/22 18:21:40 mike Exp $".
 .\"

@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: backend.man,v 1.1 2000/02/23 03:17:04 mike Exp $"
+.\" "$Id: backend.man,v 1.2 2000/06/22 18:21:39 mike Exp $"
 .\"
 .\"   backend man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,20 +21,21 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH backend 1 "Common UNIX Printing System" "22 September 1999" "Easy Software Products"
+.TH backend 1 "Common UNIX Printing System" "22 June 2000" "Easy Software Products"
 .SH NAME
-backend \- backend transmission interfaces
+backend \- cups backend transmission interfaces
 .SH SYNOPSIS
 .B backend
-job user title num-copies options
-.I [ filename ]
+job user title num-copies options [
+.I filename
+]
 .SH DESCRIPTION
 The CUPS backend interface provides a standard method for sending document
 files to different physical interfaces.
 .LP
 Backends must be capable of reading from a filename on the command-line
-or from the standard input, copying stdin to a temporary if required by
-the physical interface.
+or from the standard input, copying the standard input to a temporary file
+if required by the physical interface.
 .LP
 The command name (argv[0]) is set to the device URI of the destination printer.
 .SH ENVIRONMENT VARIABLES
@@ -82,7 +83,7 @@ The root directory of the server.
 .TP 5
 SOFTWARE
 .br
-The name and version number of the server (typically CUPS/1.0).
+The name and version number of the server (typically CUPS/1.1).
 .TP 5
 TZ
 .br
@@ -93,10 +94,11 @@ USER
 The user executing the backend (typically lp).
 .SH SEE ALSO
 cupsd(8), filter(1)
+CUPS Interface Design Description,
 CUPS Software Administrators Manual,
-CUPS Interface Design Description
+CUPS Software Programmers Manual
 .SH COPYRIGHT
 Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: backend.man,v 1.1 2000/02/23 03:17:04 mike Exp $".
+.\" End of "$Id: backend.man,v 1.2 2000/06/22 18:21:39 mike Exp $".
 .\"

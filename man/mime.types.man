@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: mime.types.man,v 1.1 2000/02/23 03:17:05 mike Exp $"
+.\" "$Id: mime.types.man,v 1.2 2000/06/22 18:21:40 mike Exp $"
 .\"
 .\"   mime.types man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,20 +21,77 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH mime.types 5 "Common UNIX Printing System" "22 September 1999" "Easy Software Products"
+.TH mime.types 5 "Common UNIX Printing System" "22 June 2000" "Easy Software Products"
 .SH NAME
 mime.types \- mime type description file for cups
 .SH DESCRIPTION
 The \fImime.types\fR file defines the recognized file types.
 .LP
-Additional file types can be added to \fImime.types\fR or in additional files
-in the configuration directory \fB/var/cups/conf\fR with the extension ".types".
+Additional file types can be added to \fImime.types\fR or in additional
+files in the configuration directory \fB/etc/cups\fR with the extension
+".types".
+.LP
+Each line in the \fImime.types\fR file is a comment, blank, or rule
+line. Comment lines start with the # character. Rule lines start with
+the MIME type name and are optionally followed by a series of file
+recognition rules that are used to automatically identify print and web
+files:
+.br
+.nf
+
+    super/type rule [ ... ruleN]
+.fi
+The rules may be grouped using parenthesis, joined using "+" for a
+logical AND and "," or whitespace for a logical OR, and negated using
+"!".
+.SH RULES
+Rules take two forms - a filename extension by itself and functions with test
+values inside parenthesis. The following functions are available:
+.TP 5
+match("pattern")
+.br
+Pattern match on filename
+.TP 5
+ascii(offset,length)
+.br
+True if bytes are valid printable ASCII (CR, NL, TAB, BS, 32-126)
+.TP 5
+printable(offset,length)
+.br
+True if bytes are printable 8-bit chars (CR, NL, TAB, BS, 32-126, 128-254)
+.TP 5
+string(offset,"string")
+.br
+True if bytes are identical to string
+.TP 5
+char(offset,value)
+.br
+True if byte is identical
+.TP 5
+short(offset,value)
+.br
+True if 16-bit integer is identical
+.TP 5
+int(offset,value)
+.br
+True if 32-bit integer is identical
+.TP 5
+locale("string")
+.br
+True if current locale matches string
+.TP 5
+contains(offset,range,"string")
+.br
+True if the range contains the string
+.SH STRING CONSTANTS
+String constants can be specified inside quotes ("") for strings
+containing whitespace and angle brackets (<>) for hexadecimal
+strings.
 .SH SEE ALSO
 classes.conf(5), cupsd(8), cupsd.conf(5), mime.convs(5), printers.conf(5),
-CUPS Software Administrators Manual,
-CUPS Interface Design Description
+CUPS Software Administrators Manual
 .SH COPYRIGHT
 Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: mime.types.man,v 1.1 2000/02/23 03:17:05 mike Exp $".
+.\" End of "$Id: mime.types.man,v 1.2 2000/06/22 18:21:40 mike Exp $".
 .\"

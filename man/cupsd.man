@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsd.man,v 1.1 2000/02/23 03:17:04 mike Exp $"
+.\" "$Id: cupsd.man,v 1.2 2000/06/22 18:21:40 mike Exp $"
 .\"
 .\"   cupsd man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,28 +21,30 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsd 8 "Common UNIX Printing System" "22 September 1999" "Easy Software Products"
+.TH cupsd 8 "Common UNIX Printing System" "22 June 2000" "Easy Software Products"
 .SH NAME
 cupsd \- common unix printing system daemon
 .SH SYNOPSIS
 .B cupsd
 .I [ \-c config-file ]
 .SH DESCRIPTION
-\fIcupsd\fR is the scheduler for the Common UNIX Printing System. It implements
-a printing system based upon the Internet Printing Protocol, version 1.0.  If
-no options are specified on the command-line then the default configuration file
-(usually \fI/var/cups/conf/cupsd.conf\fR) will be used.
+\fIcupsd\fR is the scheduler for the Common UNIX Printing System. It
+implements a printing system based upon the Internet Printing Protocol,
+version 1.1.  If no options are specified on the command-line then the
+default configuration file (usually \fI/etc/cups/cupsd.conf\fR) will be
+used.
 .SH COMPATIBILITY
-\fIcupsd\fR implements all of the required IPP/1.0 attributes and operations.
-It also implements optional operation set 1 and several CUPS-specific
-administation operations.
+\fIcupsd\fR implements all of the required IPP/1.1 attributes and
+operations. It also implements several CUPS-specific administation
+operations.
 .SH SEE ALSO
 backend(1), classes.conf(5), cupsd.conf(5), filter(1), mime.convs(5),
 mime.types(5), printers.conf(5),
-CUPS Software Administrators Manual,
-CUPS Interface Design Description
+CUPS Implementation of IPP,
+CUPS Interface Design Description,
+CUPS Software Administrators Manual
 .SH COPYRIGHT
 Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupsd.man,v 1.1 2000/02/23 03:17:04 mike Exp $".
+.\" End of "$Id: cupsd.man,v 1.2 2000/06/22 18:21:40 mike Exp $".
 .\"

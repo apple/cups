@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: filter.man,v 1.1 2000/02/23 03:17:04 mike Exp $"
+.\" "$Id: filter.man,v 1.2 2000/06/22 18:21:40 mike Exp $"
 .\"
 .\"   filter man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,22 +21,24 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH filter 1 "Common UNIX Printing System" "22 September 1999" "Easy Software Products"
+.TH filter 1 "Common UNIX Printing System" "22 June 2000" "Easy Software Products"
 .SH NAME
-filter \- file conversion filter interfaces
+filter \- cups file conversion filter interfaces
 .SH SYNOPSIS
 .B filter
-job user title num-copies options
-.I [ filename ]
+job user title num-copies options [
+.I filename
+]
 .SH DESCRIPTION
 The CUPS filter interface provides a standard method for adding support for
 new document types to CUPS. Each filter is capable of converting from one
 or more input formats to another format that can either be printed directly
 or piped into another filter to get it to a printable format.
 .LP
-Filters must be capable of reading from a filename on the command-line or from
-the standard input, copying stdin to a temporary if required by the file
-format.
+Filters must be capable of reading from a filename on the command-line
+or from the standard input, copying the standard input to a temporary
+file as required by the file format. All output must be sent to the
+standard output.
 .LP
 The command name (argv[0]) is set to the name of the destination printer.
 .SH ENVIRONMENT VARIABLES
@@ -83,7 +85,7 @@ The root directory of the server.
 .TP 5
 SOFTWARE
 .br
-The name and version number of the server (typically CUPS/1.0).
+The name and version number of the server (typically CUPS/1.1).
 .TP 5
 TZ
 .br
@@ -99,10 +101,11 @@ only filter.  Typically the interface script will be provided via the
 \fBlpadmin(8)\fR command using the \fI-i\fR option.
 .SH SEE ALSO
 backend(1), cupsd(8),
+CUPS Interface Design Description,
 CUPS Software Administrators Manual,
-CUPS Interface Design Description
+CUPS Software Programmers Manual
 .SH COPYRIGHT
 Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: filter.man,v 1.1 2000/02/23 03:17:04 mike Exp $".
+.\" End of "$Id: filter.man,v 1.2 2000/06/22 18:21:40 mike Exp $".
 .\"

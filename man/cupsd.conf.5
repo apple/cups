@@ -1,29 +1,242 @@
 
 
 
-Easy Software Products                              cupsd.conf(5)
+cupsd.conf(5)         Easy Software Products        cupsd.conf(5)
+
+
+NNAAMMEE
+       cupsd.conf - server configuration file for cups
+
+DDEESSCCRRIIPPTTIIOONN
+       The   _c_u_p_s_d_._c_o_n_f   file  configures  the  CUPS  scheduler,
+       _c_u_p_s_d_(_8_).  It is normally located in the _/_e_t_c_/_c_u_p_s  direc-
+       tory.
+
+       Each  line in the file can be a configuration directive, a
+       blank line, or a comment. Comment lines start with  the  #
+       character.  The configuration directives are intentionally
+       similar to those used by the  popular  Apache  web  server
+       software and are described below.
+
+DDIIRREECCTTIIVVEESS
+       The  following directives are understood by _c_u_p_s_d. Consult
+       the CUPS Software Administrators  Manual  for  a  detailed
+       description:
+
+       AccessLog
+            Defines the access log filename.
+
+       Allow
+            Allows access from the named hosts or addresses.
+
+       AuthClass
+            Specifies the authentication class (User, Group, Sys-
+            tem)
+
+       AuthType
+            Specifies  the  authentication  type  (None,   Basic,
+            Digest)
+
+       BrowseAddress
+            Specifies  a  broadcast  address for outgoing printer
+            information packets.
+
+       BrowseAllow
+            Allows incoming printer information packets from  the
+            named host or address.
+
+       BrowseDeny
+            Denies  incoming printer information packets from the
+            named host or address.
+
+       BrowseInterval
+            Specifies the maximum interval between printer infor-
+            mation broadcasts.
+
+       BrowseOrder
+            Specifies  the  order  of  printer information access
+            control (allow,deny or deny,allow)
 
 
 
-NNNNAAAAMMMMEEEE
-     cupsd.conf - server configuration file for cups
 
-DDDDEEEESSSSCCCCRRRRIIIIPPPPTTTTIIIIOOOONNNN
-     The _c_u_p_s_d._c_o_n_f file configures the CUPS scheduler, _c_u_p_s_d(_8).
 
-SSSSEEEEEEEE AAAALLLLSSSSOOOO
-     classes.conf(5),  cupsd(8),  mime.convs(5),   mime.types(5),
-     printers.conf(5),  CUPS Software Administrators Manual, CUPS
-     Interface Design Description
-
-CCCCOOOOPPPPYYYYRRRRIIIIGGGGHHHHTTTT
-     Copyright 1993-2000 by Easy Software  Products,  All  Rights
-     Reserved.
+22 June 2000       Common UNIX Printing System                  1
 
 
 
 
 
+cupsd.conf(5)         Easy Software Products        cupsd.conf(5)
+
+
+       BrowsePoll
+            Specifies a server to poll for printer information.
+
+       BrowsePort
+            Specifies the port to listen to for printer  informa-
+            tion packets.
+
+       BrowseRelay
+            Specifies  that printer information packets should be
+            relayed from one host or network to another.
+
+       BrowseTimeout
+            Specifies the maximum interval between printer infor-
+            mation updates before remote printers will be removed
+            from the list of available printers.
+
+       Browsing
+            Specifies whether  or  not  remote  printer  browsing
+            should be enabled.
+
+       DefaultCharset
+            Specifies  the default character set to use for text.
+
+       DefaultLanguage
+            Specifies the default language to use  for  text  and
+            web content.
+
+       Deny
+            Denies access to the named host or address.
+
+       DocumentRoot
+            Specifies  the  root  directory  for the internal web
+            server documents.
+
+       ErrorLog
+            Specifies the error log filename.
+
+       Group
+            Specifies the group name or ID that will be used when
+            executing external programs.
+
+       HostNameLookups
+            Specifies  whether  or  not  to do reverse lookups on
+            client addresses.
+
+       ImplicitClasses
+            Specifies whether or not to create  implicit  classes
+            from identical remote printers.
+
+       KeepAlive
+            Specifies  whether or not to support HTTP Keep-Alive.
+
+       KeepAliveTimeout
+            Specifies the connection timeout for HTTP Keep-Alive.
+
+
+
+22 June 2000       Common UNIX Printing System                  2
+
+
+
+
+
+cupsd.conf(5)         Easy Software Products        cupsd.conf(5)
+
+
+       <Location /path> ... </Location>
+            Specifies access control for the named location.
+
+       LogLevel
+            Specifies the logging level (none, warn, error, info,
+            or debug)
+
+       MaxClients
+            Specifies the maximum number of simultaneous  clients
+            to support.
+
+       MaxLogSize
+            Specifies  the  maximum  size of the log files before
+            they are rotated (0 to disable rotation)
+
+       MaxRequestSize
+            Specifies the maximum request/file size in  bytes  (0
+            for no limit)
+
+       Order
+            Specifies   the   order   of   HTTP   access  control
+            (allow,deny or deny,allow)
+
+       PageLog
+            Specifies the page log filename.
+
+       Port
+            Specifies  a  port  number  to  listen  to  for  HTTP
+            requests.
+
+       PreserveJobFiles
+            Specifies  whether or not to preserve job files after
+            they are printed.
+
+       PreserveJobHistory
+            Specifies whether or not to preserve the job  history
+            after they are printed.
+
+       Printcap
+            Specifies  the  filename  for a printcap file that is
+            updated automatically with a list of available print-
+            ers (needed for legacy applications)
+
+       RIPCache
+            Specifies  the  maximum  amount of memory to use when
+            converting images and PostScript files to bitmaps for
+            a printer.
+
+       RequestRoot
+            Specifies the directory to store print jobs and other
+            HTTP request data.
+
+       ServerAdmin
+            Specifies   the   email   address   of   the   server
+
+
+
+22 June 2000       Common UNIX Printing System                  3
+
+
+
+
+
+cupsd.conf(5)         Easy Software Products        cupsd.conf(5)
+
+
+            administrator.
+
+       ServerBin
+            Specifies  the  directory  where backends, CGIs, dae-
+            mons, and filters may be found.
+
+       ServerName
+            Specifies the fully-qualified hostname of the server.
+
+       ServerRoot
+            Specifies  the  directory where the server configura-
+            tion files can be found.
+
+       SystemGroup
+            Specifies the group to use for System class authenti-
+            cation.
+
+       TempDir
+            Specifies  the  directory  where  temporary files are
+            stored.
+
+       Timeout
+            Specifies the HTTP request timeout in seconds.
+
+       User
+            Specifies the user name or ID that is used when  run-
+            ning external programs.
+
+SSEEEE AALLSSOO
+       classes.conf(5),  cupsd(8),  mime.convs(5), mime.types(5),
+       printers.conf(5), CUPS Software Administrators Manual
+
+CCOOPPYYRRIIGGHHTT
+       Copyright 1993-2000 by Easy Software Products, All  Rights
+       Reserved.
 
 
 
@@ -46,21 +259,6 @@ CCCCOOOOPPPPYYYYRRRRIIIIGGGGHHHHTTTT
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-22 September 1999Last change: Common UNIX Printing System           1
-
+22 June 2000       Common UNIX Printing System                  4
 
 

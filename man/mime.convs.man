@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: mime.convs.man,v 1.1 2000/02/23 03:17:05 mike Exp $"
+.\" "$Id: mime.convs.man,v 1.2 2000/06/22 18:21:40 mike Exp $"
 .\"
 .\"   mime.convs man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH mime.convs 5 "Common UNIX Printing System" "22 September 1999" "Easy Software Products"
+.TH mime.convs 5 "Common UNIX Printing System" "22 June 2000" "Easy Software Products"
 .SH NAME
 mime.convs \- mime type conversion file for cups
 .SH DESCRIPTION
@@ -30,14 +30,24 @@ converting files from one format to another. The standard filters
 support text, PDF, PostScript, HP-GL/2, and many types of image files.
 .LP
 Additional filters can be added to the \fImime.convs\fR file or to
-other files in the configuration directory (\fB/var/cups/conf\fR) with
+other files in the configuration directory (\fB/etc/cups\fR) with
 the extension ".convs".
+.LP
+Each line in the \fImime.types\fR file is a comment, blank, or filter
+line. Comment lines start with the # character. Filter lines specify
+the source and destination MIME types along with a relative cost
+associated with the filter and the filter to run:
+.br
+.nf
+
+super/type super/type cost filter
+application/postscript application/vnd.cups-raster 50 pstoraster
+.fi
 .SH SEE ALSO
 classes.conf(5), cupsd(8), cupsd.conf(5), mime.types(5), printers.conf(5),
-CUPS Software Administrators Manual,
-CUPS Interface Design Description
+CUPS Software Administrators Manual
 .SH COPYRIGHT
 Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: mime.convs.man,v 1.1 2000/02/23 03:17:05 mike Exp $".
+.\" End of "$Id: mime.convs.man,v 1.2 2000/06/22 18:21:40 mike Exp $".
 .\"
