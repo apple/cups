@@ -1,5 +1,5 @@
 #
-# "$Id: mime.convs,v 1.14 2002/01/02 17:58:38 mike Exp $"
+# "$Id: mime.convs,v 1.15 2002/01/23 22:30:41 mike Exp $"
 #
 #   MIME converts file for the Common UNIX Printing System (CUPS).
 #
@@ -80,8 +80,8 @@ application/vnd.cups-postscript	application/vnd.cups-raster	100	pstoraster
 # option.
 #
 
-#*/*			application/vnd.cups-raw	0	-
+#application/octet-stream	application/vnd.cups-raw	0	-
 
 #
-# End of "$Id: mime.convs,v 1.14 2002/01/02 17:58:38 mike Exp $".
+# End of "$Id: mime.convs,v 1.15 2002/01/23 22:30:41 mike Exp $".
 #
