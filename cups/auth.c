@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.7 2004/02/25 20:14:51 mike Exp $"
+ * "$Id: auth.c,v 1.8 2004/02/26 16:26:28 mike Exp $"
  *
  *   Authentication functions for the Common UNIX Printing System (CUPS).
  *
@@ -95,11 +95,10 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
   }
 
  /*
-  * Nope, see if we should retry the current digest password...
+  * Nope, see if we should retry the current username:password...
   */
 
-  if (strncasecmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5) == 0 ||
-      http->digest_tries > 1 || !http->userpass[0])
+  if (http->digest_tries > 1 || !http->userpass[0])
   {
    /*
     * Nope - get a new password from the user...
@@ -108,7 +107,8 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     snprintf(prompt, sizeof(prompt), "Password for %s on %s? ", cupsUser(),
              http->hostname);
 
-    http->digest_tries  = 0;
+    http->digest_tries  = strncasecmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE],
+                                      "Basic", 5) == 0;
     http->userpass[0]   = '\0';
 
     if ((password = cupsGetPassword(prompt)) == NULL)
@@ -120,7 +120,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     snprintf(http->userpass, sizeof(http->userpass), "%s:%s", cupsUser(),
              password);
   }
-  else
+  else if (http->status == HTTP_UNAUTHORIZED)
     http->digest_tries ++;
 
  /*
@@ -243,5 +243,5 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: auth.c,v 1.7 2004/02/25 20:14:51 mike Exp $".
+ * End of "$Id: auth.c,v 1.8 2004/02/26 16:26:28 mike Exp $".
  */
