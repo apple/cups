@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.56 2000/07/20 16:31:38 mike Exp $"
+ * "$Id: util.c,v 1.57 2000/07/24 15:38:07 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -50,6 +50,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <sys/stat.h>
 #if defined(WIN32) || defined(__EMX__)
 #  include <io.h>
@@ -1331,7 +1332,9 @@ char *					/* O - Filename */
 cupsTempFile(char *filename,		/* I - Pointer to buffer */
              int  len)			/* I - Size of buffer */
 {
+  int		fd;			/* File descriptor for temp file */
   char		*tmpdir;		/* TMPDIR environment var */
+  struct timeval curtime;		/* Current time */
   static char	buf[1024] = "";		/* Buffer if you pass in NULL and 0 */
 
 
@@ -1369,8 +1372,45 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
   * Make the temporary name using the specified directory...
   */
 
-  snprintf(filename, len, "%s/XXXXXX", tmpdir);
-  return (mktemp(filename));
+  do
+  {
+   /*
+    * Get the current time of day...
+    */
+
+    gettimeofday(&curtime, NULL);
+
+   /*
+    * Format a string using the hex time values...
+    */
+
+    snprintf(filename, len, "%s/%08x%05x", tmpdir,
+             curtime.tv_sec, curtime.tv_usec);
+
+   /*
+    * Open the file in "exclusive" mode, making sure that we don't
+    * stomp on an existing file or someone's symlink crack...
+    */
+
+#ifdef O_NOFOLLOW
+    fd = open(filename, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW, 0600);
+#else
+    fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0600);
+#endif /* O_NOFOLLOW */
+  }
+  while (fd < 0);
+
+ /*
+  * Close the temp file - it'll be reopened later as needed...
+  */
+
+  close(fd);
+
+ /*
+  * Return the temp filename...
+  */
+
+  return (filename);
 }
 
 
@@ -1496,5 +1536,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.56 2000/07/20 16:31:38 mike Exp $".
+ * End of "$Id: util.c,v 1.57 2000/07/24 15:38:07 mike Exp $".
  */
