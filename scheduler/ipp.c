@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.27 2002/10/02 16:39:39 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.28 2002/10/04 15:01:50 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -4059,7 +4059,8 @@ print_job(client_t        *con,		/* I - Client connection */
 
   if (NumJobs >= MaxJobs && MaxJobs)
   {
-    LogMessage(L_INFO, "print_job: too many jobs.");
+    LogMessage(L_INFO, "print_job: too many jobs - %d jobs, max jobs is %d.",
+               NumJobs, MaxJobs);
     send_ipp_error(con, IPP_NOT_POSSIBLE);
     return;
   }
@@ -6026,5 +6027,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.27 2002/10/02 16:39:39 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.28 2002/10/04 15:01:50 mike Exp $".
  */
