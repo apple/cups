@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.46 2002/10/11 16:11:16 mike Exp $"
+ * "$Id: serial.c,v 1.47 2002/10/11 16:17:20 swdev Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -935,7 +935,6 @@ list_devices(void)
 	    IORegistryEntryCreateCFProperty(serialService,
 	                                    CFSTR(kIOTTYDeviceKey),
 					    kCFAllocatorDefault, 0);
-														  kCFAllocatorDefault, 0);
 	if (serialNameAsCFString)
 	{
 	  result = CFStringGetCString(serialNameAsCFString, serialName,
@@ -974,5 +973,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.46 2002/10/11 16:11:16 mike Exp $".
+ * End of "$Id: serial.c,v 1.47 2002/10/11 16:17:20 swdev Exp $".
  */
