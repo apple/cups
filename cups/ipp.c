@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.18 1999/06/21 18:46:13 mike Exp $"
+ * "$Id: ipp.c,v 1.19 1999/06/25 12:41:22 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -1381,7 +1381,7 @@ ippPort(void)
   struct servent *port;		/* Port number info */  
 
 
-  if ((server_port = getenv("SERVER_PORT")) != NULL)
+  if ((server_port = getenv("IPP_PORT")) != NULL)
     return (atoi(server_port));
   else if ((port = getservbyname("ipp", NULL)) == NULL)
     return (IPP_PORT);
@@ -1456,5 +1456,5 @@ ipp_read(http_t *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.18 1999/06/21 18:46:13 mike Exp $".
+ * End of "$Id: ipp.c,v 1.19 1999/06/25 12:41:22 mike Exp $".
  */
