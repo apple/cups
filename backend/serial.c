@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.32.2.8 2002/03/01 21:19:22 mike Exp $"
+ * "$Id: serial.c,v 1.32.2.9 2002/03/19 19:08:52 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -293,18 +293,24 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	      cfsetispeed(&opts, B38400);
 	      cfsetospeed(&opts, B38400);
 	      break;
-#ifdef B57600
+#  ifdef B57600
 	  case 57600 :
 	      cfsetispeed(&opts, B57600);
 	      cfsetospeed(&opts, B57600);
 	      break;
-#endif /* B57600 */
-#ifdef B115200
+#  endif /* B57600 */
+#  ifdef B115200
 	  case 115200 :
 	      cfsetispeed(&opts, B115200);
 	      cfsetospeed(&opts, B115200);
 	      break;
-#endif /* B115200 */
+#  endif /* B115200 */
+#  ifdef B230400
+	  case 230400 :
+	      cfsetispeed(&opts, B230400);
+	      cfsetospeed(&opts, B230400);
+	      break;
+#  endif /* B230400 */
           default :
 	      fprintf(stderr, "WARNING: Unsupported baud rate %s!\n", value);
 	      break;
@@ -456,7 +462,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     }
 
     tbytes = 0;
-    while ((nbytes = read(fp, buffer, sizeof(buffer))) > 0)
+    while ((nbytes = read(fp, buffer, bufsize)) > 0)
     {
      /*
       * Write the print data to the printer...
@@ -496,6 +502,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   close(fd);
   if (fp != 0)
     close(fp);
+
+  fputs("INFO: Ready to print.\n", stderr);
 
   return (0);
 }
@@ -871,5 +879,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.32.2.8 2002/03/01 21:19:22 mike Exp $".
+ * End of "$Id: serial.c,v 1.32.2.9 2002/03/19 19:08:52 mike Exp $".
  */
