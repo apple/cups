@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.39 2000/07/18 19:45:53 mike Exp $"
+ * "$Id: pstops.c,v 1.40 2000/07/19 18:40:05 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -307,7 +307,11 @@ main(int  argc,			/* I - Number of command-line arguments */
         tbytes = atoi(strchr(line, ':') + 1);
 	while (tbytes > 0)
 	{
-	  nbytes = fread(line, 1, sizeof(line), fp);
+	  if (tbytes > sizeof(line))
+	    nbytes = fread(line, 1, sizeof(line), fp);
+	  else
+	    nbytes = fread(line, 1, tbytes, fp);
+
 	  fwrite(line, 1, nbytes, stdout);
 	  tbytes -= nbytes;
 	}
@@ -884,5 +888,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.39 2000/07/18 19:45:53 mike Exp $".
+ * End of "$Id: pstops.c,v 1.40 2000/07/19 18:40:05 mike Exp $".
  */
