@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.h,v 1.2.2.10 2004/06/29 13:15:09 mike Exp $"
+ * "$Id: raster.h,v 1.2.2.11 2004/08/02 13:15:07 mike Exp $"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -38,7 +38,7 @@
  * Include necessary headers...
  */
 
-#  include <stdio.h>
+#  include <cups/ppd.h>
 
 #  ifdef __cplusplus
 extern "C" {
@@ -319,6 +319,8 @@ typedef struct
  */
 
 extern void		cupsRasterClose(cups_raster_t *r);
+extern int		cupsRasterInterpretPPD(cups_page_header2_t *h,
+			                       ppd_file_t *ppd);
 extern cups_raster_t	*cupsRasterOpen(int fd, cups_mode_t mode);
 extern unsigned		cupsRasterReadHeader(cups_raster_t *r,
 			                     cups_page_header_t *h);
@@ -333,6 +335,7 @@ extern unsigned		cupsRasterWriteHeader2(cups_raster_t *r,
 extern unsigned		cupsRasterWritePixels(cups_raster_t *r,
 			                      unsigned char *p, unsigned len);
 
+
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */
@@ -340,5 +343,5 @@ extern unsigned		cupsRasterWritePixels(cups_raster_t *r,
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h,v 1.2.2.10 2004/06/29 13:15:09 mike Exp $".
+ * End of "$Id: raster.h,v 1.2.2.11 2004/08/02 13:15:07 mike Exp $".
  */
