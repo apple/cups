@@ -24,8 +24,11 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <UL>
 <LI><A HREF=#2_1>The Printing Problem</A></LI>
 <LI><A HREF=#2_2>The Technology</A></LI>
-<LI><A HREF=#2_3>Filters</A></LI>
-<LI><A HREF=#2_4>Printer Drivers</A></LI>
+<LI><A HREF=#2_3>Jobs</A></LI>
+<LI><A HREF=#2_4>Classes</A></LI>
+<LI><A HREF=#2_5>Filters</A></LI>
+<LI><A HREF=#2_6>Printer Drivers</A></LI>
+<LI><A HREF=#2_7>Networking</A></LI>
 </UL>
 <B><A HREF=#3>2 - Building and Installing CUPS</A></B>
 <UL>
@@ -44,7 +47,6 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF=#4_2>Adding and Modifying Printers</A></LI>
 <UL>
 <LI><A HREF=#4_2_1>Using Standard Printer Drivers</A></LI>
-<LI><A HREF=#4_2_2>Enabling New Printer Queues</A></LI>
 </UL>
 <LI><A HREF=#4_3>Removing Printers</A></LI>
 <LI><A HREF=#4_4>Printer Classes</A></LI>
@@ -54,28 +56,30 @@ Copyright 1997-1999, All Rights Reserved<BR>
 </UL>
 <B><A HREF=#5>4 - Printing System Management</A></B>
 <UL>
-<LI><A HREF=#5_1>Network Configuration</A></LI>
+<LI><A HREF=#5_1>Changing the Configuration Files</A></LI>
+<LI><A HREF=#5_2>Temporary Files</A></LI>
+<LI><A HREF=#5_3>Network Configuration</A></LI>
 <UL>
-<LI><A HREF=#5_1_1>Port</A></LI>
-<LI><A HREF=#5_1_2>Listen</A></LI>
-<LI><A HREF=#5_1_3>BrowsePort</A></LI>
-<LI><A HREF=#5_1_4>BrowseAddress</A></LI>
+<LI><A HREF=#5_3_1>Port</A></LI>
+<LI><A HREF=#5_3_2>Listen</A></LI>
+<LI><A HREF=#5_3_3>BrowsePort</A></LI>
+<LI><A HREF=#5_3_4>BrowseAddress</A></LI>
 </UL>
-<LI><A HREF=#5_2>Printer Security</A></LI>
+<LI><A HREF=#5_4>Printer Security</A></LI>
 <UL>
-<LI><A HREF=#5_2_1>Location</A></LI>
-<LI><A HREF=#5_2_2>Order</A></LI>
-<LI><A HREF=#5_2_3>Allow</A></LI>
-<LI><A HREF=#5_2_4>Deny</A></LI>
-<LI><A HREF=#5_2_5>AuthType</A></LI>
-<LI><A HREF=#5_2_6>AuthClass</A></LI>
-<LI><A HREF=#5_2_7>AuthGroupName</A></LI>
-<LI><A HREF=#5_2_8>SystemGroup</A></LI>
+<LI><A HREF=#5_4_1>Location</A></LI>
+<LI><A HREF=#5_4_2>Order</A></LI>
+<LI><A HREF=#5_4_3>Allow</A></LI>
+<LI><A HREF=#5_4_4>Deny</A></LI>
+<LI><A HREF=#5_4_5>AuthType</A></LI>
+<LI><A HREF=#5_4_6>AuthClass</A></LI>
+<LI><A HREF=#5_4_7>AuthGroupName</A></LI>
+<LI><A HREF=#5_4_8>SystemGroup</A></LI>
 </UL>
-<LI><A HREF=#5_3>File Formats</A></LI>
+<LI><A HREF=#5_5>File Formats</A></LI>
 <UL>
-<LI><A HREF=#5_3_1>mime.types</A></LI>
-<LI><A HREF=#5_3_2>mime.convs</A></LI>
+<LI><A HREF=#5_5_1>mime.types</A></LI>
+<LI><A HREF=#5_5_2>mime.convs</A></LI>
 </UL>
 </UL>
 <B><A HREF=#6>5 - Printer Accounting</A></B>
@@ -160,7 +164,17 @@ using their web browser. </P>
 Basic authentication and domain or IP-based access control. Digest 
 authentication and TLS encryption will be available in future versions 
 of CUPS. </P>
-<H2><A NAME=2_3>Filters</A></H2>
+<H2><A NAME=2_3>Jobs</A></H2>
+<P>Each file that is submitted for printing is called a <I>job</I>. 
+ Jobs are identified by a unique number starting at 1 and are assigned 
+to a particular destination (usually a printer). Jobs can also have 
+options associated with them such as media size, number of copies, and 
+priority. </P>
+<H2><A NAME=2_4>Classes</A></H2>
+<P>CUPS supports collections of printers known as <I>classes</I>. Jobs 
+sent to a class are forwarded to the first available printer in the 
+class. </P>
+<H2><A NAME=2_5>Filters</A></H2>
 <P>Filters allow a user or application to print many types of files 
 without extra effort. Print jobs sent to a CUPS server are filtered 
 before sending them to a printer. Some filters convert job files to 
@@ -176,12 +190,28 @@ printer. </P>
 <P>CUPS provides backends for printing over parallel and serial ports, 
 and over the network via the JetDirect (AppSocket), Server Message 
 Block, and Line Printer Daemon protocols. </P>
-<H2><A NAME=2_4>Printer Drivers</A></H2>
+<H2><A NAME=2_6>Printer Drivers</A></H2>
 <P>Printer drivers in CUPS consist of one of more filters specific to a 
 printer. CUPS includes a sample printer driver for Hewlett-Packard 
 LaserJet and DeskJet printers. While this driver does not generate 
 optimal output for different printer models, it does demonstrate how 
 you can write your own printer drivers and incorporate them into CUPS. </P>
+<H2><A NAME=2_7>Networking</A></H2>
+<P>Printers and classes on the local system are automatically shared 
+with other systems on the network. This allows you to setup one system 
+to print to a printer and use this system as a printer server or spool 
+host for all of the others.  If there is only one occurrence of a 
+printer on a network, then that printer can be accessed using its name 
+alone. If more than one printer exists with the same name, users must 
+select the printer by specifying which server to use (e.g. 
+&quot;printer@host1&quot; or &quot;printer@host2&quot;.) </P>
+<P>CUPS also provides <I>implicit classes</I>, which are collections of 
+printers and/or classes with the same name. This allows you to setup 
+multiple servers pointing to the same physical network printer, for 
+example, so that you aren't relying on a single system for printing. 
+Because this also works with printer classes, you can setup multiple 
+servers and printers and never worry about a &quot;single point of failure&quot; 
+unless all of the printers and servers goes down! </P>
 <H1 ALIGN=RIGHT><A NAME=3>2 - Building and Installing CUPS</A></H1>
 <P>This chapter shows how to build and install the Common UNIX Printing 
 System. If you are installing a binary distribution from the CUPS web 
@@ -300,7 +330,7 @@ administration tasks from the command-line. Since <CODE>lpadmin</CODE>
  command with the &quot;-p&quot; option: </P>
 <UL>
 <PRE>
-% /usr/lib/lpadmin -p<I>printer</I> -v<I>device</I> -P<I>ppd</I> ENTER
+% /usr/lib/lpadmin -p<I>printer</I> -E -v<I>device</I> -P<I>ppd</I> ENTER
 </PRE>
 </UL>
 <P>Spaces between the option letter and value are optional. </P>
@@ -349,7 +379,7 @@ files and interface scripts located in the <CODE>/usr/share/cups/model</CODE>
  directory with the &quot;-m&quot; option: </P>
 <UL>
 <PRE>
-% /usr/lib/lpadmin -p<I>printer</I> -v<I>device</I> -m<I>model</I> ENTER
+% /usr/lib/lpadmin -p<I>printer</I> -E -v<I>device</I> -m<I>model</I> ENTER
 </PRE>
 </UL>
 <P>The <I>model</I> argument specifies the name of the PPD file or 
@@ -358,23 +388,9 @@ DeskJet series driver connected to parallel port 1 under Linux you
 would use: </P>
 <UL>
 <PRE>
-% /usr/lib/lpadmin -pDeskJet -vparallel:/dev/par1 -mdeskjet.ppd ENTER
+% /usr/lib/lpadmin -pDeskJet -E -vparallel:/dev/par1 -mdeskjet.ppd ENTER
 </PRE>
 </UL>
-<H3><A NAME=4_2_2>Enabling New Printer Queues</A></H3>
-<P>Before you can print to your new printer queue you need to enable it 
-with the following two commands: </P>
-<UL>
-<PRE>
-% /usr/bin/enable <I>printer</I> ENTER
-% /usr/lib/accept <I>printer</I> ENTER
-</PRE>
-</UL>
-<P>The <CODE>enable</CODE> command tells the scheduler to start the 
-named printer. Otherwise any jobs you submitted would sit in the queue 
-without being printed! </P>
-<P>The <CODE>accept</CODE> command tells the scheduler to start 
-accepting print jobs for that printer. </P>
 <H2><A NAME=4_3>Removing Printers</A></H2>
 <P>To remove a printer to CUPS you simply run the <CODE>lpadmin</CODE>
  command with the &quot;-x&quot; option: </P>
@@ -439,19 +455,53 @@ maintenance on the printer and will not have it available to users for
 a long period of time. </P>
 <H1 ALIGN=RIGHT><A NAME=5>4 - Printing System Management</A></H1>
 <P>This chapter shows how you can configure the CUPS server. </P>
-<H2><A NAME=5_1>Network Configuration</A></H2>
+<H2><A NAME=5_1>Changing the Configuration Files</A></H2>
+<P>All of the server configuration files are located in the <CODE>
+/var/cups/conf</CODE> directory. Once you have made a change to a file 
+you need to restart the CUPS server by sending it a HUP signal or using 
+the supplied script &quot;<CODE>cups.sh</CODE>&quot;: </P>
+<UL>
+<PRE>
+% ./cups.sh restart ENTER
+</PRE>
+</UL>
+<P>The binary distribution installs the script in the <CODE>init.d</CODE>
+ directory with the name <CODE>lp</CODE> or <CODE>lpd</CODE> depending 
+on the vendor-supplied printing system. </P>
+<H2><A NAME=5_2>Temporary Files</A></H2>
+<P>Normally CUPS puts all of its temporary files in <CODE>/var/tmp</CODE>
+. If you'd like to change this directory you'll need to edit the <CODE>
+/var/cups/conf/cupsd.conf</CODE> file. </P>
+<P>Start by creating the new temporary directory and setting the 
+appropriate permissions: </P>
+<UL>
+<PRE>
+% mkdir <I>/foo/bar/tmp</I> ENTER
+% chmod a+rwxt <I>/foo/bar/tmp</I> ENTER
+</PRE>
+</UL>
+<P>Then change the line containing the <CODE>TempDir</CODE> directive 
+in the <CODE>cupsd.conf</CODE> to the directory that you've created: </P>
+<UL>
+<PRE>
+TempDir <I>/foo/bar/tmp</I>
+</PRE>
+</UL>
+<P>Finally, restart the server as outlined in the first section of this 
+chapter. </P>
+<H2><A NAME=5_3>Network Configuration</A></H2>
 <P>The default configuration of the CUPS server listens for connections 
 from all network interfaces on port 631 (the standard IPP port). 
 Administration functions are limited to local connections with the 
 appropriate username and password. </P>
 <P>If you'd like to limit access to your system you'll need to edit the <CODE>
 /var/cups/conf/cupsd.conf</CODE> file. </P>
-<H3><A NAME=5_1_1>Port</A></H3>
+<H3><A NAME=5_3_1>Port</A></H3>
 <P>The <CODE>Port</CODE> directive specifies a port to listen on for 
 all interfaces. Besides the standard IPP port (631) you can also setup 
 your server to listen on the HTTP port (80) to use your CUPS server as 
 a standard web server as well. </P>
-<H3><A NAME=5_1_2>Listen</A></H3>
+<H3><A NAME=5_3_2>Listen</A></H3>
 <P>The <CODE>Listen</CODE> directive specifies a listening address and 
 port, extending the functionality of the <CODE>Port</CODE> directive. 
 If you want to allow connections only from the local machine you can 
@@ -465,7 +515,7 @@ Listen 127.0.0.1:631
 <P>If you want to limit access to a specific network/subnet, make sure 
 you specify only the network address and not your system's network 
 address! </P>
-<H3><A NAME=5_1_3>BrowsePort</A></H3>
+<H3><A NAME=5_3_3>BrowsePort</A></H3>
 <P>The <CODE>BrowsePort</CODE> directive controls which port is 
 monitored for remote printers. By default it is set to the IPP port 
 (631), however you can change it as needed. </P>
@@ -473,7 +523,7 @@ monitored for remote printers. By default it is set to the IPP port
 <P>You must set the <CODE>BrowsePort</CODE> to the same value  on all 
 of the systems that you want to see. </P>
 </UL>
-<H3><A NAME=5_1_4>BrowseAddress</A></H3>
+<H3><A NAME=5_3_4>BrowseAddress</A></H3>
 <P>The <CODE>BrowseAddress</CODE> directive specifies a broadcast 
 address to use when sending printer status updates over the network. 
 The default browse address is <CODE>255.255.255.255</CODE> which will 
@@ -483,10 +533,10 @@ send printer information to all subnets. </P>
 bits, printer browsing (and in fact all broadcast  reception) will not 
 work. This problem appears to be fixed in  HP-UX 11.0. </P>
 </UL>
-<H2><A NAME=5_2>Printer Security</A></H2>
+<H2><A NAME=5_4>Printer Security</A></H2>
 <P>CUPS provides IP and domain-name based access control and Basic 
 authentication for authentication. </P>
-<H3><A NAME=5_2_1>Location</A></H3>
+<H3><A NAME=5_4_1>Location</A></H3>
 <P>The <CODE>Location</CODE> directive defines access control for a 
 specific HTTP directory. The following pseudo directories are provided 
 by the CUPS server: </P>
@@ -517,7 +567,7 @@ Allow From 127.0.0.1
 &lt;/Location&gt;
 </PRE>
 </UL>
-<H3><A NAME=5_2_2>Order</A></H3>
+<H3><A NAME=5_4_2>Order</A></H3>
 <P>The <CODE>Order</CODE> directive defines the default access control. 
 The following values are supported: </P>
 <UL>
@@ -528,7 +578,7 @@ listed in an <CODE>Allow</CODE> directive. </LI>
 </UL>
 <P>The <CODE>Order</CODE> directive must appear inside a <CODE>Location</CODE>
  directive. </P>
-<H3><A NAME=5_2_3>Allow</A></H3>
+<H3><A NAME=5_4_3>Allow</A></H3>
 <P>The <CODE>Allow</CODE> directive specifies a hostname, IP address, 
 or network that is allowed access to the server: </P>
 <UL>
@@ -551,7 +601,7 @@ Allow</CODE> directives can be used to allow access for multiple hosts
 or networks. </P>
 <P>The <CODE>Allow</CODE> directive must appear inside a <CODE>Location</CODE>
  directive. </P>
-<H3><A NAME=5_2_4>Deny</A></H3>
+<H3><A NAME=5_4_4>Deny</A></H3>
 <P>The <CODE>Deny</CODE> directive specifies a hostname, IP address, or 
 network that is allowed access to the server: </P>
 <UL>
@@ -573,7 +623,7 @@ Deny from nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
  directives can be used to allow access for multiple hosts or networks. </P>
 <P>The <CODE>Deny</CODE> directive must appear inside a <CODE>Location</CODE>
  directive. </P>
-<H3><A NAME=5_2_5>AuthType</A></H3>
+<H3><A NAME=5_4_5>AuthType</A></H3>
 <P>The <CODE>AuthType</CODE> directive defines the type of 
 authentication to perform: </P>
 <UL>
@@ -584,7 +634,7 @@ using the UNIX password and group files. </LI>
 </UL>
 <P>The <CODE>AuthType</CODE> directive must appear inside a <CODE>
 Location</CODE> directive. </P>
-<H3><A NAME=5_2_6>AuthClass</A></H3>
+<H3><A NAME=5_4_6>AuthClass</A></H3>
 <P>The <CODE>AuthClass</CODE> directive defines what level of <CODE>
 Basic</CODE> access is required: </P>
 <UL>
@@ -600,21 +650,21 @@ AuthGroupName</CODE> directive. </LI>
 </UL>
 <P>The <CODE>AuthClass</CODE> directive must appear inside a <CODE>
 Location</CODE> directive. </P>
-<H3><A NAME=5_2_7>AuthGroupName</A></H3>
+<H3><A NAME=5_4_7>AuthGroupName</A></H3>
 <P>The <CODE>AuthGroupName</CODE> directive sets the group to use for <CODE>
 Group</CODE> authentication. </P>
 <P>The <CODE>AuthGroupName</CODE> directive must appear inside a <CODE>
 Location</CODE> directive. </P>
-<H3><A NAME=5_2_8>SystemGroup</A></H3>
+<H3><A NAME=5_4_8>SystemGroup</A></H3>
 <P>The <CODE>SystemGroup</CODE> directive sets the administration group 
 used when authenticating the <CODE>System</CODE> type. It defaults to 
 the &quot;sys&quot; group. </P>
-<H2><A NAME=5_3>File Formats</A></H2>
+<H2><A NAME=5_5>File Formats</A></H2>
 <P>CUPS provides a MIME-based file typing and filtering mechanism to 
 convert files to a printable format for each printer. The <CODE>
 mime.types</CODE> and <CODE>mime.convs</CODE> files define the file 
 type and filters that are available on the system. </P>
-<H3><A NAME=5_3_1>mime.types</A></H3>
+<H3><A NAME=5_5_1>mime.types</A></H3>
 <P>The <CODE>mime.types</CODE> defines the known file types. Each line 
 of the file starts with the MIME type and may be followed by one or 
 more file type recognition rules. For example, the <CODE>text/html</CODE>
@@ -656,7 +706,7 @@ identical (network or &quot;big-endian&quot; byte order) </LI>
 <LI><CODE>locale(&quot;string&quot;)</CODE> - True if current locale  matches 
 string </LI>
 </UL>
-<H3><A NAME=5_3_2>mime.convs</A></H3>
+<H3><A NAME=5_5_2>mime.convs</A></H3>
 <P>The <CODE>mime.convs</CODE> file defines all of the filter programs 
 that are known to the system. Each line consists of: </P>
 <UL>

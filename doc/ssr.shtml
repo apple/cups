@@ -41,8 +41,8 @@ can be used to support non-PostScript printers.
 <UL>
 	<LI>1 - Scope</LI>
 	<LI>2 - References</LI>
-	<LI>3 - Risk Identification</LI>
-	<LI>4 - Risk Assessment</LI>
+	<LI>3 - Local Access Risks</LI>
+	<LI>4 - Remote Access Risks</LI>
 	<LI>A - Glossary</LI>
 </UL>
 
@@ -77,17 +77,99 @@ The following non-CUPS documents are referenced by this document:
 	<LI>RFC 1179, Line Printer Daemon Protocol 
 </UL>
 
-<H1>Risk Identification</H1>
+<H1>3 - Local Access Risks</H1>
 
-<H2>Local Access Risks</H2>
+<P>Local access risks are those that can be exploited only with a local user
+account. This section does not address issues related to dissemination of the
+root password or other security issues associated with the UNIX operating
+system.
 
-<H2>Remote Access Risks</H2>
+<H2>Security Breaches</H2>
 
-<H1>Risk Assessment</H2>
+<P>Since the default installation creates a world-readable request directory,
+it is possible for local users to read the contents of print files before they
+are printed.
 
-<H2>Local Access Risks</H2>
+<P>This problem can be alleviated by making the request directory readable only
+by the user specified in the CUPS configuration file.
 
-<H2>Remote Access Risks</H2>
+<H1>4 - Remote Access Risks</H1>
+
+<P>Remote access risks are those that can be exploited without a local user
+account and/or from a remote system. This section does not address issues
+related to network or firewall security.
+
+<H3>Denial of Service Attacks</H3>
+
+<P>Like all internet services, the CUPS server is vulnerable to denial of
+service attacks, including:
+
+<OL>
+
+	<LI>Establishing multiple connections to the server until the server
+	will accept no more.
+
+	<P>This cannot be protected against by the current software. It
+	is possible that future versions of the CUPS software could be
+	configured to limit the number of connections allowed from a
+	single host, however that still would not prevent a determined
+	attack.
+
+	<LI>Repeatedly opening and closing connections to the server as fast
+	as possible.
+
+	<P>There is no easy way of protecting against this in the CUPS
+	software. If the attack is coming from outside the local
+	network it might be possible to filter such an attack, however
+	once the connection request has been received by the server it
+	must at least accept the connection to find out who is
+	connecting.
+
+	<LI>Flooding the network with broadcast packets on port 631.
+
+	<P>It might be possible to disable browsing if this condition
+	is detected by the CUPS software, however if there are large
+	numbers of printers available on the network such an algorithm
+	might think that an attack was occurring when instead a valid
+	update was being received.
+
+	<LI>Sending partial IPP requests; specifically, sending part of an
+	attribute value and then stopping transmission.
+
+	<P>The current code is structured to read and write the IPP
+	request data on-the-fly, so there is no easy way to protect
+	against this for large attribute values.
+
+	<LI>Sending large/long print jobs to printers, preventing other users
+	from printing.
+
+	<P>There are limited facilities for protecting against large print
+	jobs (the <CODE>MaxRequestSize</CODE> attribute), however this will
+	not protect printers from malicious users and print files that
+	generate hundreds or thousands of pages. In general, we recommend
+	restricting printer access to known hosts or networks, and adding
+	user-level access control as needed for expensive printers.
+
+</OL>
+
+<H3>Security Breaches</H3>
+
+<P>The current CUPS server only supports Basic authentication with
+usernames and passwords. This essentially places the clear text of the
+username and password on the network. Since CUPS uses the UNIX username
+and password account information, the authentication information could
+be used to gain access to accounts (possibly priviledged accounts) on
+the server.
+
+<P>The default CUPS configuration disables remote administration. We do
+not recommend that remote administration be enabled for all hosts,
+however if you have a trusted network or subnet access can be
+restricted accordingly.
+
+<P>The next minor release of CUPS will support Digest authentication of
+the entire message body using separate MD5-based username and password
+files. This will protect password information and prevent unauthorized
+access due to compromised account passwords.
 
 <H1 TYPE=A VALUE=1>Glossary</H1>
 

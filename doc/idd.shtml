@@ -434,6 +434,10 @@ followed by its value. The following directives are understood:
 	<TD></TD>
 </TR>
 <TR>
+	<TD>TempDir</TD>
+	<TD></TD>
+</TR>
+<TR>
 	<TD>Timeout</TD>
 	<TD></TD>
 </TR>
@@ -527,7 +531,8 @@ capability/type bits:
 <TR>
 	<TD>1</TD>
 	<TD>0 = local<BR>
-	1 = remote</TD>
+	1 = remote<BR>
+	(always 1)</TD>
 </TR>
 <TR>
 	<TD>2</TD>

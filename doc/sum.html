@@ -24,8 +24,11 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <UL>
 <LI><A HREF=#2_1>The Printing Problem</A></LI>
 <LI><A HREF=#2_2>The Technology</A></LI>
-<LI><A HREF=#2_3>Filters</A></LI>
-<LI><A HREF=#2_4>Printer Drivers</A></LI>
+<LI><A HREF=#2_3>Jobs</A></LI>
+<LI><A HREF=#2_4>Classes</A></LI>
+<LI><A HREF=#2_5>Filters</A></LI>
+<LI><A HREF=#2_6>Printer Drivers</A></LI>
+<LI><A HREF=#2_7>Networking</A></LI>
 </UL>
 <B><A HREF=#3>2 - Using the Printing System</A></B>
 <UL>
@@ -136,7 +139,17 @@ using their web browser. </P>
 Basic authentication and domain or IP-based access control. Digest 
 authentication and TLS encryption will be available in future versions 
 of CUPS. </P>
-<H2><A NAME=2_3>Filters</A></H2>
+<H2><A NAME=2_3>Jobs</A></H2>
+<P>Each file that is submitted for printing is called a <I>job</I>. 
+ Jobs are identified by a unique number starting at 1 and are assigned 
+to a particular destination (usually a printer). Jobs can also have 
+options associated with them such as media size, number of copies, and 
+priority. </P>
+<H2><A NAME=2_4>Classes</A></H2>
+<P>CUPS supports collections of printers known as <I>classes</I>. Jobs 
+sent to a class are forwarded to the first available printer in the 
+class. </P>
+<H2><A NAME=2_5>Filters</A></H2>
 <P>Filters allow a user or application to print many types of files 
 without extra effort. Print jobs sent to a CUPS server are filtered 
 before sending them to a printer. Some filters convert job files to 
@@ -152,12 +165,28 @@ printer. </P>
 <P>CUPS provides backends for printing over parallel and serial ports, 
 and over the network via the JetDirect (AppSocket), Server Message 
 Block, and Line Printer Daemon protocols. </P>
-<H2><A NAME=2_4>Printer Drivers</A></H2>
+<H2><A NAME=2_6>Printer Drivers</A></H2>
 <P>Printer drivers in CUPS consist of one of more filters specific to a 
 printer. CUPS includes a sample printer driver for Hewlett-Packard 
 LaserJet and DeskJet printers. While this driver does not generate 
 optimal output for different printer models, it does demonstrate how 
 you can write your own printer drivers and incorporate them into CUPS. </P>
+<H2><A NAME=2_7>Networking</A></H2>
+<P>Printers and classes on the local system are automatically shared 
+with other systems on the network. This allows you to setup one system 
+to print to a printer and use this system as a printer server or spool 
+host for all of the others.  If there is only one occurrence of a 
+printer on a network, then that printer can be accessed using its name 
+alone. If more than one printer exists with the same name, users must 
+select the printer by specifying which server to use (e.g. 
+&quot;printer@host1&quot; or &quot;printer@host2&quot;.) </P>
+<P>CUPS also provides <I>implicit classes</I>, which are collections of 
+printers and/or classes with the same name. This allows you to setup 
+multiple servers pointing to the same physical network printer, for 
+example, so that you aren't relying on a single system for printing. 
+Because this also works with printer classes, you can setup multiple 
+servers and printers and never worry about a &quot;single point of failure&quot; 
+unless all of the printers and servers goes down! </P>
 <H1 ALIGN=RIGHT><A NAME=3>2 - Using the Printing System</A></H1>
 <P>This chapter shows you how to submit, query, and cancel print jobs 
 to different printers. </P>

@@ -98,6 +98,19 @@ web browser.
 authentication and domain or IP-based access control. Digest authentication
 and TLS encryption will be available in future versions of CUPS.
 
+<H2>Jobs</H2>
+
+<P>Each file that is submitted for printing is called a <I>job</I>. 
+Jobs are identified by a unique number starting at 1 and are assigned
+to a particular destination (usually a printer). Jobs can also have
+options associated with them such as media size, number of copies, and
+priority.
+
+<H2>Classes</H2>
+
+<P>CUPS supports collections of printers known as <I>classes</I>. Jobs sent
+to a class are forwarded to the first available printer in the class.
+
 <H2>Filters</H2>
 
 <P>Filters allow a user or application to print many types of files
@@ -125,6 +138,24 @@ printer. CUPS includes a sample printer driver for Hewlett-Packard
 LaserJet and DeskJet printers. While this driver does not generate
 optimal output for different printer models, it does demonstrate how
 you can write your own printer drivers and incorporate them into CUPS.
+
+<H2>Networking</H2>
+
+<P>Printers and classes on the local system are automatically shared with
+other systems on the network. This allows you to setup one system to print
+to a printer and use this system as a printer server or spool host for all
+of the others.  If there is only one occurrence of a printer on a network,
+then that printer can be accessed using its name alone. If more than one
+printer exists with the same name, users must select the printer by specifying
+which server to use (e.g. "printer@host1" or "printer@host2".)
+
+<P>CUPS also provides <I>implicit classes</I>, which are collections of
+printers and/or classes with the same name. This allows you to setup multiple
+servers pointing to the same physical network printer, for example, so that
+you aren't relying on a single system for printing. Because this also works
+with printer classes, you can setup multiple servers and printers and never
+worry about a "single point of failure" unless all of the printers and servers
+goes down!
 
 <H1 ALIGN=RIGHT>2 - Building and Installing CUPS</H1>
 
@@ -264,7 +295,7 @@ is also a System V printing system command, it is located in the
 with the "-p" option:
 
 <UL><PRE>
-% /usr/lib/lpadmin -p<I>printer</I> -v<I>device</I> -P<I>ppd</I> ENTER
+% /usr/lib/lpadmin -p<I>printer</I> -E -v<I>device</I> -P<I>ppd</I> ENTER
 </PRE></UL>
 
 <P>Spaces between the option letter and value are optional.
@@ -329,7 +360,7 @@ and interface scripts located in the <CODE>/usr/share/cups/model</CODE>
 directory with the "-m" option:
 
 <UL><PRE>
-% /usr/lib/lpadmin -p<I>printer</I> -v<I>device</I> -m<I>model</I> ENTER
+% /usr/lib/lpadmin -p<I>printer</I> -E -v<I>device</I> -m<I>model</I> ENTER
 </PRE></UL>
 
 <P>The <I>model</I> argument specifies the name of the PPD file or interface
@@ -337,25 +368,8 @@ script. For example, to add a printer using the sample HP DeskJet series
 driver connected to parallel port 1 under Linux you would use:
 
 <UL><PRE>
-% /usr/lib/lpadmin -pDeskJet -vparallel:/dev/par1 -mdeskjet.ppd ENTER
+% /usr/lib/lpadmin -pDeskJet -E -vparallel:/dev/par1 -mdeskjet.ppd ENTER
 </PRE></UL>
-
-<H3>Enabling New Printer Queues</H3>
-
-<P>Before you can print to your new printer queue you need to enable it
-with the following two commands:
-
-<UL><PRE>
-% /usr/bin/enable <I>printer</I> ENTER
-% /usr/lib/accept <I>printer</I> ENTER
-</PRE></UL>
-
-<P>The <CODE>enable</CODE> command tells the scheduler to start the
-named printer. Otherwise any jobs you submitted would sit in the queue without
-being printed!
-
-<P>The <CODE>accept</CODE> command tells the scheduler to start accepting
-print jobs for that printer.
 
 <H2>Removing Printers</H2>
 
@@ -431,6 +445,45 @@ a long period of time.
 <H1 ALIGN=RIGHT>4 - Printing System Management</H1>
 
 <P>This chapter shows how you can configure the CUPS server.
+
+<H2>Changing the Configuration Files</H2>
+
+<P>All of the server configuration files are located in the
+<CODE>/var/cups/conf</CODE> directory. Once you have made a change to a
+file you need to restart the CUPS server by sending it a HUP signal or
+using the supplied script "<CODE>cups.sh</CODE>":
+
+<UL><PRE>
+% ./cups.sh restart ENTER
+</PRE></UL>
+
+<P>The binary distribution installs the script in the
+<CODE>init.d</CODE> directory with the name <CODE>lp</CODE> or
+<CODE>lpd</CODE> depending on the vendor-supplied printing system.
+
+<H2>Temporary Files</H2>
+
+<P>Normally CUPS puts all of its temporary files in <CODE>/var/tmp</CODE>.
+If you'd like to change this directory you'll need to edit the
+<CODE>/var/cups/conf/cupsd.conf</CODE> file.
+
+<P>Start by creating the new temporary directory and setting the appropriate
+permissions:
+
+<UL><PRE>
+% mkdir <I>/foo/bar/tmp</I> ENTER
+% chmod a+rwxt <I>/foo/bar/tmp</I> ENTER
+</PRE></UL>
+
+<P>Then change the line containing the <CODE>TempDir</CODE> directive in
+the <CODE>cupsd.conf</CODE> to the directory that you've created:
+
+<UL><PRE>
+TempDir <I>/foo/bar/tmp</I>
+</PRE></UL>
+
+<P>Finally, restart the server as outlined in the first section of this
+chapter.
 
 <H2>Network Configuration</H2>
 
