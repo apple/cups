@@ -1,5 +1,5 @@
 /*
- * "$Id: server.c,v 1.2.2.10 2003/03/28 22:29:49 mike Exp $"
+ * "$Id: server.c,v 1.2.2.11 2003/03/30 20:01:49 mike Exp $"
  *
  *   Server start/stop routines for the Common UNIX Printing System (CUPS).
  *
@@ -141,21 +141,21 @@ StopServer(void)
 
   if (AccessFile != NULL)
   {
-    fclose(AccessFile);
+    cupsFileClose(AccessFile);
 
     AccessFile = NULL;
   }
 
   if (ErrorFile != NULL)
   {
-    fclose(ErrorFile);
+    cupsFileClose(ErrorFile);
 
     ErrorFile = NULL;
   }
 
   if (PageFile != NULL)
   {
-    fclose(PageFile);
+    cupsFileClose(PageFile);
 
     PageFile = NULL;
   }
@@ -170,5 +170,5 @@ StopServer(void)
 
 
 /*
- * End of "$Id: server.c,v 1.2.2.10 2003/03/28 22:29:49 mike Exp $".
+ * End of "$Id: server.c,v 1.2.2.11 2003/03/30 20:01:49 mike Exp $".
  */

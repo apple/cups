@@ -1,5 +1,5 @@
 /*
- * "$Id: file.c,v 1.1.2.1 2003/03/29 21:42:13 mike Exp $"
+ * "$Id: file.c,v 1.1.2.2 2003/03/30 20:01:44 mike Exp $"
  *
  *   File functions for the Common UNIX Printing System (CUPS).
  *
@@ -29,11 +29,16 @@
  * Contents:
  *
  *   cupsFileClose()   - Close a CUPS file.
+ *   cupsFileFlush()   - Flush pending output.
  *   cupsFileGetChar() - Get a single character from a file.
  *   cupsFileGets()    - Get a CR and/or LF-terminated line.
  *   cupsFileOpen()    - Open a CUPS file.
  *   cupsFilePrintf()  - Write a formatted string.
+ *   cupsFilePutChar() - Write a character.
  *   cupsFilePuts()    - Write a string.
+ *   cupsFileRead()    - Read from a file.
+ *   cupsFileSeek()    - Seek in a file.
+ *   cupsFileWrite()   - Write to a file.
  *   cups_fill()       - Fill the input buffer...
  *   cups_read()       - Read from a file descriptor.
  *   cups_write()      - Write to a file descriptor.
@@ -94,6 +99,9 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
     inflateEnd(&fp->stream);
 #endif /* HAVE_LIBZ */
 
+  if (fp->mode == 'w')
+    cupsFileFlush(fp);
+
  /*
   * Save the file descriptor we used and free memory...
   */
@@ -107,6 +115,37 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
   */
 
   return (close(fd));
+}
+
+
+/*
+ * 'cupsFileFlush()' - Flush pending output.
+ */
+
+int					/* O - 0 on success, -1 on error */
+cupsFileFlush(cups_file_t *fp)		/* I - CUPS file */
+{
+  int	bytes;				/* Bytes to write */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!fp || fp->mode != 'w')
+    return (-1);
+
+  bytes = fp->ptr - fp->buf;
+
+  if (bytes > 0)
+  {
+    if (cups_write(fp->fd, fp->buf, bytes) < bytes)
+      return (-1);
+
+    fp->ptr = fp->buf;
+  }
+   
+  return (0);
 }
 
 
@@ -227,7 +266,7 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
   * Range check input...
   */
 
-  if (!filename || !mode || (*mode != 'r' && *mode != 'w'))
+  if (!filename || !mode || (*mode != 'r' && *mode != 'w' && *mode != 'a'))
     return (NULL);
 
  /*
@@ -241,10 +280,23 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
   * Open the file...
   */
 
-  if (*mode == 'r')
-    o = O_RDONLY;
-  else
-    o = O_WRONLY | O_TRUNC | O_CREAT;
+  switch (*mode)
+  {
+    case 'a' :
+        o = O_RDWR | O_CREAT;
+	fp->mode = 'w';
+        break;
+
+    case 'r' :
+	o        = O_RDONLY;
+	fp->mode = 'r';
+	break;
+
+    case 'w' :
+        o = O_WRONLY | O_TRUNC | O_CREAT;
+	fp->mode = 'w';
+        break;
+  }
 
   if ((fp->fd = open(filename, o, 0644)) < 0)
   {
@@ -256,7 +308,16 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
     return (NULL);
   }
 
-  fp->mode = *mode;
+  if (*mode == 'a')
+    fp->pos = lseek(fp->fd, 0, SEEK_END);
+  else
+    fp->pos = 0;
+
+  if (*mode != 'r')
+  {
+    fp->ptr = fp->buf;
+    fp->end = fp->buf + sizeof(fp->buf);
+  }
 
   return (fp);
 }
@@ -273,16 +334,60 @@ cupsFilePrintf(cups_file_t *fp,		/* I - CUPS file */
 {
   va_list	ap;			/* Argument list */
   int		bytes;			/* Formatted size */
+  char		buf[2048];		/* Formatted text */
 
 
   if (!fp || !format || fp->mode != 'w')
     return (-1);
 
   va_start(ap, format);
-  bytes = vsnprintf(fp->buf, sizeof(fp->buf), format, ap);
+  bytes = vsnprintf(buf, sizeof(buf), format, ap);
   va_end(ap);
 
-  return (cups_write(fp->fd, fp->buf, bytes));
+  if ((fp->ptr + bytes) > fp->end)
+    if (cupsFileFlush(fp))
+      return (-1);
+
+  fp->pos += bytes;
+
+  if (bytes > sizeof(fp->buf))
+    return (cups_write(fp->fd, buf, bytes));
+  else
+  {
+    memcpy(fp->ptr, buf, bytes);
+    fp->ptr += bytes;
+    return (bytes);
+  }
+}
+
+
+/*
+ * 'cupsFilePutChar()' - Write a character.
+ */
+
+int					/* O - 0 on success, -1 on error */
+cupsFilePutChar(cups_file_t *fp,	/* I - CUPS file */
+                int         c)		/* I - Character to write */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!fp || fp->mode != 'w')
+    return (-1);
+
+ /*
+  * Buffer it up...
+  */
+
+  if (fp->ptr >= fp->end)
+    if (cupsFileFlush(fp))
+      return (-1);
+
+  *(fp->ptr) ++ = c;
+  fp->pos ++;
+
+  return (0);
 }
 
 
@@ -294,6 +399,9 @@ int					/* O - Number of bytes written or -1 */
 cupsFilePuts(cups_file_t *fp,		/* I - CUPS file */
              const char  *s)		/* I - String to write */
 {
+  int	bytes;				/* Bytes to write */
+
+
  /*
   * Range check input...
   */
@@ -305,7 +413,22 @@ cupsFilePuts(cups_file_t *fp,		/* I - CUPS file */
   * Write the string...
   */
 
-  return (cups_write(fp->fd, s, strlen(s)));
+  bytes = strlen(s);
+
+  if ((fp->ptr + bytes) > fp->end)
+    if (cupsFileFlush(fp))
+      return (-1);
+
+  fp->pos += bytes;
+
+  if (bytes > sizeof(fp->buf))
+    return (cups_write(fp->fd, s, bytes));
+  else
+  {
+    memcpy(fp->ptr, s, bytes);
+    fp->ptr += bytes;
+    return (bytes);
+  }
 }
 
 
@@ -462,6 +585,43 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
   }
 
   return (pos);
+}
+
+
+/*
+ * 'cupsFileWrite()' - Write to a file.
+ */
+
+int					/* O - Number of bytes written */
+cupsFileWrite(cups_file_t *fp,		/* I - CUPS file */
+              const char  *buf,		/* I - Buffer */
+	      int         bytes)	/* I - Number of bytes to write */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!fp || !buf || bytes <= 0 || fp->mode != 'w')
+    return (-1);
+
+ /*
+  * Write the buffer...
+  */
+
+  if ((fp->ptr + bytes) > fp->end)
+    if (cupsFileFlush(fp))
+      return (-1);
+
+  fp->pos += bytes;
+
+  if (bytes > sizeof(fp->buf))
+    return (cups_write(fp->fd, buf, bytes));
+  else
+  {
+    memcpy(fp->ptr, buf, bytes);
+    fp->ptr += bytes;
+    return (bytes);
+  }
 }
 
 
@@ -806,5 +966,5 @@ cups_write(int        fd,		/* I - File descriptor */
 
 
 /*
- * End of "$Id: file.c,v 1.1.2.1 2003/03/29 21:42:13 mike Exp $".
+ * End of "$Id: file.c,v 1.1.2.2 2003/03/30 20:01:44 mike Exp $".
  */

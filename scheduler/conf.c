@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.33 2003/03/19 06:07:40 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.34 2003/03/30 20:01:43 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -189,8 +189,8 @@ static CFArrayRef CDSAGetServerCerts();
  * Local functions...
  */
 
-static int	read_configuration(FILE *fp);
-static int	read_location(FILE *fp, char *name, int linenum);
+static int	read_configuration(cups_file_t *fp);
+static int	read_location(cups_file_t *fp, char *name, int linenum);
 static int	get_address(const char *value, unsigned defaddress, int defport,
 		            int deffamily, http_addr_t *address);
 static int	get_addr_and_mask(const char *value, unsigned *ip,
@@ -205,7 +205,7 @@ int					/* O - 1 on success, 0 otherwise */
 ReadConfiguration(void)
 {
   int		i;			/* Looping var */
-  FILE		*fp;			/* Configuration file */
+  cups_file_t	*fp;			/* Configuration file */
   int		status;			/* Return status */
   char		temp[1024],		/* Temporary buffer */
 		*slash;			/* Directory separator */
@@ -422,12 +422,12 @@ ReadConfiguration(void)
   * Read the configuration file...
   */
 
-  if ((fp = fopen(ConfigurationFile, "r")) == NULL)
+  if ((fp = cupsFileOpen(ConfigurationFile, "r")) == NULL)
     return (0);
 
   status = read_configuration(fp);
 
-  fclose(fp);
+  cupsFileClose(fp);
 
   if (!status)
     return (0);
@@ -689,7 +689,7 @@ ReadConfiguration(void)
  */
 
 static int				/* O - 1 on success, 0 on failure */
-read_configuration(FILE *fp)		/* I - File to read from */
+read_configuration(cups_file_t *fp)	/* I - File to read from */
 {
   int		i;			/* Looping var */
   int		linenum;		/* Current line number */
@@ -706,7 +706,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
   dirsvc_poll_t	*poll;			/* Polling data */
   http_addr_t	polladdr;		/* Polling address */
   location_t	*location;		/* Browse location */
-  FILE		*incfile;		/* Include file */
+  cups_file_t	*incfile;		/* Include file */
   char		incname[1024];		/* Include filename */
 
 
@@ -716,7 +716,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
 
   linenum = 0;
 
-  while (fgets(line, sizeof(line), fp) != NULL)
+  while (cupsFileGets(fp, line, sizeof(line)) != NULL)
   {
     linenum ++;
 
@@ -771,13 +771,13 @@ read_configuration(FILE *fp)		/* I - File to read from */
       else
         snprintf(incname, sizeof(incname), "%s/%s", ServerRoot, value);
 
-      if ((incfile = fopen(incname, "rb")) == NULL)
+      if ((incfile = cupsFileOpen(incname, "rb")) == NULL)
         LogMessage(L_ERROR, "Unable to include config file \"%s\" - %s",
 	           incname, strerror(errno));
       else
       {
         read_configuration(incfile);
-	fclose(incfile);
+	cupsFileClose(incfile);
       }
     }
     else if (strcasecmp(name, "<Location") == 0)
@@ -1479,10 +1479,10 @@ read_configuration(FILE *fp)		/* I - File to read from */
  * 'read_location()' - Read a <Location path> definition.
  */
 
-static int			/* O - New line number or 0 on error */
-read_location(FILE *fp,		/* I - Configuration file */
-              char *location,	/* I - Location name/path */
-	      int  linenum)	/* I - Current line number */
+static int				/* O - New line number or 0 on error */
+read_location(cups_file_t *fp,		/* I - Configuration file */
+              char        *location,	/* I - Location name/path */
+	      int         linenum)	/* I - Current line number */
 {
   int		i;			/* Looping var */
   location_t	*loc,			/* New location */
@@ -1503,7 +1503,7 @@ read_location(FILE *fp,		/* I - Configuration file */
   parent->limit = AUTH_LIMIT_ALL;
   loc           = parent;
 
-  while (fgets(line, sizeof(line), fp) != NULL)
+  while (cupsFileGets(fp, line, sizeof(line)) != NULL)
   {
     linenum ++;
 
@@ -2198,5 +2198,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.33 2003/03/19 06:07:40 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.34 2003/03/30 20:01:43 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.19.2.10 2003/03/10 15:05:54 mike Exp $"
+ * "$Id: log.c,v 1.19.2.11 2003/03/30 20:01:47 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -46,7 +46,7 @@
  * Local functions...
  */
 
-static int	check_log_file(FILE **, const char *);
+static int	check_log_file(cups_file_t **, const char *);
 
 
 /*
@@ -187,7 +187,7 @@ LogMessage(int        level,	/* I - Log level */
   * Print the log level and date/time...
   */
 
-  fprintf(ErrorFile, "%c %s ", levels[level], GetDateTime(time(NULL)));
+  cupsFilePrintf(ErrorFile, "%c %s ", levels[level], GetDateTime(time(NULL)));
 
  /*
   * Then the log message...
@@ -201,11 +201,12 @@ LogMessage(int        level,	/* I - Log level */
   * Then a newline...
   */
 
-  fputs(line, ErrorFile);
   if (len > 0 && line[len - 1] != '\n')
-    putc('\n', ErrorFile);
+    cupsFilePrintf(ErrorFile, "%s\n", line);
+  else
+    cupsFilePuts(ErrorFile, line);
 
-  fflush(ErrorFile);
+  cupsFileFlush(ErrorFile);
 
   ReleaseSignals();
 
@@ -267,12 +268,12 @@ LogPage(job_t       *job,	/* I - Job being printed */
   *        billing hostname
   */
 
-  fprintf(PageFile, "%s %s %d %s %s %s %s\n", job->printer->name,
-          job->username ? job->username : "-",
-          job->id, GetDateTime(time(NULL)), page,
-	  billing ? billing->values[0].string.text : "-",
-          hostname->values[0].string.text);
-  fflush(PageFile);
+  cupsFilePrintf(PageFile, "%s %s %d %s %s %s %s\n", job->printer->name,
+        	 job->username ? job->username : "-",
+        	 job->id, GetDateTime(time(NULL)), page,
+		 billing ? billing->values[0].string.text : "-",
+        	 hostname->values[0].string.text);
+  cupsFileFlush(PageFile);
 
   ReleaseSignals();
 
@@ -343,12 +344,12 @@ LogRequest(client_t      *con,	/* I - Request to log */
   * Write a log of the request in "common log format"...
   */
 
-  fprintf(AccessFile, "%s - %s %s \"%s %s HTTP/%d.%d\" %d %d\n",
-          con->http.hostname, con->username[0] != '\0' ? con->username : "-",
-	  GetDateTime(con->start), states[con->operation], con->uri,
-	  con->http.version / 100, con->http.version % 100,
-	  code, con->bytes);
-  fflush(AccessFile);
+  cupsFilePrintf(AccessFile, "%s - %s %s \"%s %s HTTP/%d.%d\" %d %d\n",
+        	 con->http.hostname, con->username[0] != '\0' ? con->username : "-",
+		 GetDateTime(con->start), states[con->operation], con->uri,
+		 con->http.version / 100, con->http.version % 100,
+		 code, con->bytes);
+  cupsFileFlush(AccessFile);
 
   ReleaseSignals();
 
@@ -361,8 +362,8 @@ LogRequest(client_t      *con,	/* I - Request to log */
  */
 
 static int				/* O  - 1 if log file open */
-check_log_file(FILE       **log,	/* IO - Log file */
-	       const char *logname)	/* I  - Log filename */
+check_log_file(cups_file_t **log,	/* IO - Log file */
+	       const char  *logname)	/* I  - Log filename */
 {
   char	backname[1024],			/* Backup log filename */
 	filename[1024],			/* Formatted log filename */
@@ -381,7 +382,7 @@ check_log_file(FILE       **log,	/* IO - Log file */
   */
 
   if (*log == NULL ||
-      (ftell(*log) > MaxLogSize && MaxLogSize > 0))
+      (cupsFileTell(*log) > MaxLogSize && MaxLogSize > 0))
   {
    /*
     * Handle format strings...
@@ -441,24 +442,24 @@ check_log_file(FILE       **log,	/* IO - Log file */
     * Nope, open the log file...
     */
 
-    if ((*log = fopen(filename, "a")) == NULL)
+    if ((*log = cupsFileOpen(filename, "a")) == NULL)
       return (0);
 
-    fchown(fileno(*log), User, Group);
-    fchmod(fileno(*log), LogFilePerm);
+    fchown(cupsFileNumber(*log), User, Group);
+    fchmod(cupsFileNumber(*log), LogFilePerm);
   }
 
  /*
   * Do we need to rotate the log?
   */
 
-  if (ftell(*log) > MaxLogSize && MaxLogSize > 0)
+  if (cupsFileTell(*log) > MaxLogSize && MaxLogSize > 0)
   {
    /*
     * Rotate log file...
     */
 
-    fclose(*log);
+    cupsFileClose(*log);
 
     strcpy(backname, filename);
     strlcat(backname, ".O", sizeof(backname));
@@ -466,11 +467,11 @@ check_log_file(FILE       **log,	/* IO - Log file */
     unlink(backname);
     rename(filename, backname);
 
-    if ((*log = fopen(filename, "a")) == NULL)
+    if ((*log = cupsFileOpen(filename, "a")) == NULL)
       return (0);
 
-    fchown(fileno(*log), User, Group);
-    fchmod(fileno(*log), LogFilePerm);
+    fchown(cupsFileNumber(*log), User, Group);
+    fchmod(cupsFileNumber(*log), LogFilePerm);
   }
 
   return (1);
@@ -478,5 +479,5 @@ check_log_file(FILE       **log,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c,v 1.19.2.10 2003/03/10 15:05:54 mike Exp $".
+ * End of "$Id: log.c,v 1.19.2.11 2003/03/30 20:01:47 mike Exp $".
  */

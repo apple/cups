@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.54 2003/03/28 17:32:44 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.55 2003/03/30 20:01:44 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -972,11 +972,7 @@ add_printer(client_t        *con,	/* I - Client connection */
   int			port;		/* Port portion of URI */
   printer_t		*printer;	/* Printer/class */
   ipp_attribute_t	*attr;		/* Printer attribute */
-#ifdef HAVE_LIBZ
-  gzFile		fp;		/* Script/PPD file */
-#else
-  FILE			*fp;		/* Script/PPD file */
-#endif /* HAVE_LIBZ */
+  cups_file_t		*fp;		/* Script/PPD file */
   char			line[1024];	/* Line from file... */
   char			srcfile[1024],	/* Source Script/PPD file */
 			dstfile[1024];	/* Destination Script/PPD file */
@@ -1291,24 +1287,15 @@ add_printer(client_t        *con,	/* I - Client connection */
              printer->name);
     unlink(dstfile);
   }
-#ifdef HAVE_LIBZ
-  else if (srcfile[0] && (fp = gzopen(srcfile, "rb")) != NULL)
-#else
-  else if (srcfile[0] && (fp = fopen(srcfile, "rb")) != NULL)
-#endif /* HAVE_LIBZ */
+  else if (srcfile[0] && (fp = cupsFileOpen(srcfile, "rb")) != NULL)
   {
    /*
     * Yes; get the first line from it...
     */
 
     line[0] = '\0';
-#ifdef HAVE_LIBZ
-    gzgets(fp, line, sizeof(line));
-    gzclose(fp);
-#else
-    fgets(line, sizeof(line), fp);
-    fclose(fp);
-#endif /* HAVE_LIBZ */
+    cupsFileGets(fp, line, sizeof(line));
+    cupsFileClose(fp);
 
    /*
     * Then see what kind of file it is...
@@ -2599,8 +2586,8 @@ copy_banner(client_t   *con,	/* I - Client connection */
   int		kbytes;		/* Size of banner file in kbytes */
   char		filename[1024];	/* Job filename */
   banner_t	*banner;	/* Pointer to banner */
-  FILE		*in;		/* Input file */
-  FILE		*out;		/* Output file */
+  cups_file_t	*in;		/* Input file */
+  cups_file_t	*out;		/* Output file */
   int		ch;		/* Character from file */
   char		attrname[255],	/* Name of attribute */
 		*s;		/* Pointer into name */
@@ -2631,7 +2618,7 @@ copy_banner(client_t   *con,	/* I - Client connection */
 
   snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot, job->id,
            job->num_files);
-  if ((out = fopen(filename, "w")) == NULL)
+  if ((out = cupsFileOpen(filename, "w")) == NULL)
   {
     LogMessage(L_ERROR, "copy_banner: Unable to create banner job file %s - %s",
                filename, strerror(errno));
@@ -2639,8 +2626,8 @@ copy_banner(client_t   *con,	/* I - Client connection */
     return (0);
   }
 
-  fchmod(fileno(out), 0640);
-  fchown(fileno(out), User, Group);
+  fchmod(cupsFileNumber(out), 0640);
+  fchown(cupsFileNumber(out), User, Group);
 
   if (con->language)
   {
@@ -2684,9 +2671,9 @@ copy_banner(client_t   *con,	/* I - Client connection */
     snprintf(filename, sizeof(filename), "%s/banners/%s", DataDir, name);
   }
 
-  if ((in = fopen(filename, "r")) == NULL)
+  if ((in = cupsFileOpen(filename, "r")) == NULL)
   {
-    fclose(out);
+    cupsFileClose(out);
     unlink(filename);
     LogMessage(L_ERROR, "copy_banner: Unable to open banner template file %s - %s",
                filename, strerror(errno));
@@ -2698,14 +2685,14 @@ copy_banner(client_t   *con,	/* I - Client connection */
   * Parse the file to the end...
   */
 
-  while ((ch = getc(in)) != EOF)
+  while ((ch = cupsFileGetChar(in)) != EOF)
     if (ch == '{')
     {
      /*
       * Get an attribute name...
       */
 
-      for (s = attrname; (ch = getc(in)) != EOF;)
+      for (s = attrname; (ch = cupsFileGetChar(in)) != EOF;)
         if (!isalpha(ch) && ch != '-' && ch != '?')
           break;
 	else if (s < (attrname + sizeof(attrname) - 1))
@@ -2721,9 +2708,7 @@ copy_banner(client_t   *con,	/* I - Client connection */
         * Ignore { followed by stuff that is not an attribute name...
 	*/
 
-        putc('{', out);
-	fputs(attrname, out);
-	putc(ch, out);
+        cupsFilePrintf(out, "{%s}", attrname);
 	continue;
       }
 
@@ -2738,7 +2723,7 @@ copy_banner(client_t   *con,	/* I - Client connection */
 
       if (strcmp(s, "printer-name") == 0)
       {
-        fputs(job->dest, out);
+        cupsFilePuts(out, job->dest);
 	continue;
       }
       else if ((attr = ippFindAttribute(job->attrs, s, IPP_TAG_ZERO)) == NULL)
@@ -2753,9 +2738,7 @@ copy_banner(client_t   *con,	/* I - Client connection */
           * Nope, write to file as-is; probably a PostScript procedure...
 	  */
 
-	  putc('{', out);
-	  fputs(attrname, out);
-	  putc('}', out);
+	  cupsFilePrintf(out, "{%s}", attrname);
         }
 
         continue;
@@ -2768,33 +2751,33 @@ copy_banner(client_t   *con,	/* I - Client connection */
       for (i = 0; i < attr->num_values; i ++)
       {
 	if (i)
-	  putc(',', out);
+	  cupsFilePutChar(out, ',');
 
 	switch (attr->value_tag)
 	{
 	  case IPP_TAG_INTEGER :
 	  case IPP_TAG_ENUM :
 	      if (strncmp(s, "time-at-", 8) == 0)
-	        fputs(GetDateTime(attr->values[i].integer), out);
+	        cupsFilePuts(out, GetDateTime(attr->values[i].integer));
 	      else
-	        fprintf(out, "%d", attr->values[i].integer);
+	        cupsFilePrintf(out, "%d", attr->values[i].integer);
 	      break;
 
 	  case IPP_TAG_BOOLEAN :
-	      fprintf(out, "%d", attr->values[i].boolean);
+	      cupsFilePrintf(out, "%d", attr->values[i].boolean);
 	      break;
 
 	  case IPP_TAG_NOVALUE :
-	      fputs("novalue", out);
+	      cupsFilePuts(out, "novalue");
 	      break;
 
 	  case IPP_TAG_RANGE :
-	      fprintf(out, "%d-%d", attr->values[i].range.lower,
+	      cupsFilePrintf(out, "%d-%d", attr->values[i].range.lower,
 		      attr->values[i].range.upper);
 	      break;
 
 	  case IPP_TAG_RESOLUTION :
-	      fprintf(out, "%dx%d%s", attr->values[i].resolution.xres,
+	      cupsFilePrintf(out, "%dx%d%s", attr->values[i].resolution.xres,
 		      attr->values[i].resolution.yres,
 		      attr->values[i].resolution.units == IPP_RES_PER_INCH ?
 			  "dpi" : "dpc");
@@ -2819,17 +2802,17 @@ copy_banner(client_t   *con,	/* I - Client connection */
 		{
 		  if (*p == '(' || *p == ')' || *p == '\\')
 		  {
-		    putc('\\', out);
-		    putc(*p, out);
+		    cupsFilePutChar(out, '\\');
+		    cupsFilePutChar(out, *p);
 		  }
 		  else if (*p < 32 || *p > 126)
-		    fprintf(out, "\\%03o", *p);
+		    cupsFilePrintf(out, "\\%03o", *p);
 		  else
-		    putc(*p, out);
+		    cupsFilePutChar(out, *p);
 		}
 	      }
 	      else
-		fputs(attr->values[i].string.text, out);
+		cupsFilePuts(out, attr->values[i].string.text);
 	      break;
 
           default :
@@ -2839,24 +2822,24 @@ copy_banner(client_t   *con,	/* I - Client connection */
     }
     else if (ch == '\\')	/* Quoted char */
     {
-      ch = getc(in);
+      ch = cupsFileGetChar(in);
 
       if (ch != '{')		/* Only do special handling for \{ */
-        putc('\\', out);
+        cupsFilePutChar(out, '\\');
 
-      putc(ch, out);
+      cupsFilePutChar(out, ch);
     }
     else
-      putc(ch, out);
+      cupsFilePutChar(out, ch);
 
-  fclose(in);
+  cupsFileClose(in);
 
-  kbytes = (ftell(out) + 1023) / 1024;
+  kbytes = (cupsFileTell(out) + 1023) / 1024;
 
   if ((attr = ippFindAttribute(job->attrs, "job-k-octets", IPP_TAG_INTEGER)) != NULL)
     attr->values[0].integer += kbytes;
 
-  fclose(out);
+  cupsFileClose(out);
 
   return (kbytes);
 }
@@ -6353,5 +6336,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.54 2003/03/28 17:32:44 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.55 2003/03/30 20:01:44 mike Exp $".
  */

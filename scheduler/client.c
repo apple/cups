@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.54 2003/03/28 22:29:47 mike Exp $"
+ * "$Id: client.c,v 1.91.2.55 2003/03/30 20:01:42 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2747,7 +2747,7 @@ get_file(client_t    *con,	/* I  - Client connection */
 static http_status_t			/* O - Status */
 install_conf_file(client_t *con)	/* I - Connection */
 {
-  FILE		*in,			/* Input file */
+  cups_file_t	*in,			/* Input file */
 		*out;			/* Output file */
   char		buffer[1024];		/* Copy buffer */
   int		bytes;			/* Number of bytes */
@@ -2784,36 +2784,36 @@ install_conf_file(client_t *con)	/* I - Connection */
   * Open the request file and new config file...
   */
 
-  if ((in = fopen(con->filename, "rb")) == NULL)
+  if ((in = cupsFileOpen(con->filename, "rb")) == NULL)
   {
     LogMessage(L_ERROR, "Unable to open request file \"%s\" - %s",
                con->filename, strerror(errno));
     return (HTTP_SERVER_ERROR);
   }
 
-  if ((out = fopen(newfile, "wb")) == NULL)
+  if ((out = cupsFileOpen(newfile, "wb")) == NULL)
   {
-    fclose(in);
+    cupsFileClose(in);
     LogMessage(L_ERROR, "Unable to open config file \"%s\" - %s",
                newfile, strerror(errno));
     return (HTTP_SERVER_ERROR);
   }
 
-  fchmod(fileno(out), confinfo.st_mode);
-  fchown(fileno(out), confinfo.st_uid, confinfo.st_gid);
+  fchmod(cupsFileNumber(out), confinfo.st_mode);
+  fchown(cupsFileNumber(out), confinfo.st_uid, confinfo.st_gid);
 
  /*
   * Copy from the request to the new config file...
   */
 
-  while ((bytes = fread(buffer, 1, sizeof(buffer), in)) > 0)
-    if (fwrite(buffer, 1, bytes, out) < bytes)
+  while ((bytes = cupsFileRead(in, buffer, sizeof(buffer))) > 0)
+    if (cupsFileWrite(out, buffer, bytes) < bytes)
     {
       LogMessage(L_ERROR, "Unable to copy to config file \"%s\" - %s",
         	 newfile, strerror(errno));
 
-      fclose(in);
-      fclose(out);
+      cupsFileClose(in);
+      cupsFileClose(out);
       unlink(newfile);
 
       return (HTTP_SERVER_ERROR);
@@ -2823,8 +2823,8 @@ install_conf_file(client_t *con)	/* I - Connection */
   * Close the files...
   */
 
-  fclose(in);
-  if (fclose(out))
+  cupsFileClose(in);
+  if (cupsFileClose(out))
   {
     LogMessage(L_ERROR, "Error file closing config file \"%s\" - %s",
                newfile, strerror(errno));
@@ -3330,5 +3330,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.54 2003/03/28 22:29:47 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.55 2003/03/30 20:01:42 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.14.2.9 2003/01/07 18:27:26 mike Exp $"
+ * "$Id: ppds.c,v 1.14.2.10 2003/03/30 20:01:48 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -40,15 +40,6 @@
 #include "cupsd.h"
 #include <ctype.h>
 
-#ifdef HAVE_LIBZ
-#  include <zlib.h>
-#else
-#  define gzFile	FILE *
-#  define gzclose	fclose
-#  define gzread(f,b,l)	fread((b), 1, (l), (f))
-#  define gzopen	fopen
-#endif /* HAVE_LIBZ */
-
 
 /*
  * PPD information structures...
@@ -72,19 +63,6 @@ typedef struct
 
 
 /*
- * Buffered file structure...
- */
-
-typedef struct
-{
-  gzFile	fp;			/* Pointer to file */
-  char		*ptr,			/* Pointer in buffer */
-		*end,			/* End of buffer */
-		buf[1024];		/* Buffer */
-} buf_t;
-
-
-/*
  * Local globals...
  */
 
@@ -98,11 +76,9 @@ static int		changed_ppd;	/* Did we change the PPD database? */
  * Local functions...
  */
 
-static int	buf_read(buf_t *fp);
 static int	compare_names(const ppd_info_t *p0, const ppd_info_t *p1);
 static int	compare_ppds(const ppd_info_t *p0, const ppd_info_t *p1);
 static void	load_ppds(const char *d, const char *p);
-static char	*ppd_gets(buf_t *fp, char *buf, int buflen);
 
 
 /*
@@ -110,13 +86,13 @@ static char	*ppd_gets(buf_t *fp, char *buf, int buflen);
  */
 
 void
-LoadPPDs(const char *d)		/* I - Directory to scan... */
+LoadPPDs(const char *d)			/* I - Directory to scan... */
 {
-  int		i;		/* Looping var */
-  ppd_info_t	*ppd;		/* Current PPD file */
-  FILE		*fp;		/* ppds.dat file */
-  struct stat	fileinfo;	/* ppds.dat information */
-  char		filename[1024];	/* ppds.dat filename */
+  int		i;			/* Looping var */
+  ppd_info_t	*ppd;			/* Current PPD file */
+  cups_file_t	*fp;			/* ppds.dat file */
+  struct stat	fileinfo;		/* ppds.dat information */
+  char		filename[1024];		/* ppds.dat filename */
 
 
  /*
@@ -145,15 +121,15 @@ LoadPPDs(const char *d)		/* I - Directory to scan... */
       num_ppds   = 0;
       alloc_ppds = 0;
     }
-    else if ((fp = fopen(filename, "rb")) != NULL)
+    else if ((fp = cupsFileOpen(filename, "rb")) != NULL)
     {
       for (i = num_ppds, ppd = ppds; i > 0; i --, ppd ++)
       {
-        fread(&(ppd->record), 1, sizeof(ppd_rec_t), fp);
+        cupsFileRead(fp, (char *)&(ppd->record), sizeof(ppd_rec_t));
 	ppd->found = 0;
       }
 
-      fclose(fp);
+      cupsFileClose(fp);
 
       LogMessage(L_INFO, "LoadPPDs: Read \"%s\", %d PPDs...", filename,
                  num_ppds);
@@ -212,12 +188,12 @@ LoadPPDs(const char *d)		/* I - Directory to scan... */
 
   if (changed_ppd)
   {
-    if ((fp = fopen(filename, "wb")) != NULL)
+    if ((fp = cupsFileOpen(filename, "wb")) != NULL)
     {
       for (i = num_ppds, ppd = ppds; i > 0; i --, ppd ++)
-	fwrite(&(ppd->record), 1, sizeof(ppd_rec_t), fp);
+	cupsFileWrite(fp, (char *)&(ppd->record), sizeof(ppd_rec_t));
 
-      fclose(fp);
+      cupsFileClose(fp);
 
       LogMessage(L_INFO, "LoadPPDs: Wrote \"%s\", %d PPDs...", filename,
         	 num_ppds);
@@ -275,31 +251,6 @@ LoadPPDs(const char *d)		/* I - Directory to scan... */
     free(ppds);
     alloc_ppds = 0;
   }
-}
-
-
-/*
- * 'buf_read()' - Read a buffer of data into memory...
- */
-
-static int			/* O - Number of bytes read */
-buf_read(buf_t *fp)		/* I - File to read from */
-{
-  int	count;			/* Number of bytes read */
-
-
-  if ((count = gzread(fp->fp, fp->buf, sizeof(fp->buf))) > 0)
-  {
-    fp->ptr = fp->buf;
-    fp->end = fp->buf + count;
-  }
-  else
-  {
-    fp->ptr = NULL;
-    fp->end = NULL;
-  }
-
-  return (count);
 }
 
 
@@ -452,7 +403,7 @@ load_ppds(const char *d,		/* I - Actual directory */
           const char *p)		/* I - Virtual path in name */
 {
   int		i;			/* Looping var */
-  buf_t		fp;			/* Pointer to file */
+  cups_file_t	*fp;			/* Pointer to file */
   DIR		*dir;			/* Directory pointer */
   DIRENT	*dent;			/* Directory entry */
   struct stat	fileinfo;		/* File information */
@@ -562,17 +513,15 @@ load_ppds(const char *d,		/* I - Actual directory */
     * No, file is new/changed, so re-scan it...
     */
 
-    if ((fp.fp = gzopen(filename, "rb")) == NULL)
+    if ((fp = cupsFileOpen(filename, "rb")) == NULL)
       continue;
-
-    fp.ptr = fp.end = NULL;
 
    /*
     * Now see if this is a PPD file...
     */
 
     line[0] = '\0';
-    ppd_gets(&fp, line, sizeof(line));
+    cupsFileGets(fp, line, sizeof(line));
 
     if (strncmp(line, "*PPD-Adobe:", 11) != 0)
     {
@@ -580,7 +529,7 @@ load_ppds(const char *d,		/* I - Actual directory */
       * Nope, close the file and continue...
       */
 
-      gzclose(fp.fp);
+      cupsFileClose(fp);
 
       continue;
     }
@@ -594,7 +543,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     manufacturer[0] = '\0';
     strcpy(language, "en");
 
-    while (ppd_gets(&fp, line, sizeof(line)) != NULL)
+    while (cupsFileGets(fp, line, sizeof(line)) != NULL)
     {
       if (strncmp(line, "*Manufacturer:", 14) == 0)
 	sscanf(line, "%*[^\"]\"%255[^\"]", manufacturer);
@@ -628,7 +577,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     * Close the file...
     */
 
-    gzclose(fp.fp);
+    cupsFileClose(fp);
 
    /*
     * See if we got all of the required info...
@@ -832,66 +781,5 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * 'ppd_gets()' - Read a line from a PPD file.
- */
-
-static char *			/* O - Line from file or NULL on EOF */
-ppd_gets(buf_t *fp,		/* I - File to read from */
-         char  *buf,		/* I - Line buffer */
-	 int   buflen)		/* I - Length of buffer */
-{
-  int		ch;		/* Character from file */
-  char		*ptr,		/* Current position in line buffer */
-		*end;		/* End of line buffer */
-
- /*
-  * Range check everything...
-  */
-
-  if (fp == NULL || buf == NULL || buflen < 2)
-    return (NULL);
-
- /*
-  * Now loop until we have a valid line...
-  */
-
-  ptr = buf;
-  end = buf + buflen - 1;
-
-  for (;;)
-  {
-    if (fp->ptr >= fp->end)
-      if (buf_read(fp) <= 0)
-        break;
-
-    ch = *(fp->ptr)++;
-
-    if (ch == '\r' || ch == '\n')
-    {
-     /*
-      * Line feed or carriage return...
-      */
-
-      if (ptr == buf)		/* Skip blank lines */
-        continue;
-
-      break;
-    }
-    else if (ptr < end)
-      *ptr++ = ch;
-  }
-
-  if (ptr > buf)
-  {
-    *ptr = '\0';
-
-    return (buf);
-  }
-  else
-    return (NULL);
-}
-
-
-/*
- * End of "$Id: ppds.c,v 1.14.2.9 2003/01/07 18:27:26 mike Exp $".
+ * End of "$Id: ppds.c,v 1.14.2.10 2003/03/30 20:01:48 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cert.c,v 1.7.2.9 2003/01/24 20:45:18 mike Exp $"
+ * "$Id: cert.c,v 1.7.2.10 2003/03/30 20:01:41 mike Exp $"
  *
  *   Authentication certificate routines for the Common UNIX
  *   Printing System (CUPS).
@@ -247,7 +247,7 @@ FindCert(const char *certificate)	/* I - Certificate */
 void
 InitCerts(void)
 {
-  FILE		*fp;			/* /dev/random file */
+  cups_file_t	*fp;			/* /dev/random file */
   unsigned	seed;			/* Seed for random number generator */
   struct timeval tod;			/* Time of day */
 
@@ -257,7 +257,7 @@ InitCerts(void)
   * the current time, as available...
   */
 
-  if ((fp = fopen("/dev/urandom", "rb")) == NULL)
+  if ((fp = cupsFileOpen("/dev/urandom", "rb")) == NULL)
   {
    /*
     * Get the time in usecs and use it as the initial seed...
@@ -274,12 +274,12 @@ InitCerts(void)
     * them as the seed...
     */
 
-    seed = getc(fp);
-    seed = (seed << 8) | getc(fp);
-    seed = (seed << 8) | getc(fp);
-    seed = (seed << 8) | getc(fp);
+    seed = cupsFileGetChar(fp);
+    seed = (seed << 8) | cupsFileGetChar(fp);
+    seed = (seed << 8) | cupsFileGetChar(fp);
+    seed = (seed << 8) | cupsFileGetChar(fp);
 
-    fclose(fp);
+    cupsFileClose(fp);
   }
 
   srandom(seed);
@@ -293,5 +293,5 @@ InitCerts(void)
 
 
 /*
- * End of "$Id: cert.c,v 1.7.2.9 2003/01/24 20:45:18 mike Exp $".
+ * End of "$Id: cert.c,v 1.7.2.10 2003/03/30 20:01:41 mike Exp $".
  */

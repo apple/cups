@@ -1,5 +1,5 @@
 /*
- * "$Id: file.h,v 1.1.2.1 2003/03/29 21:42:13 mike Exp $"
+ * "$Id: file.h,v 1.1.2.2 2003/03/30 20:01:44 mike Exp $"
  *
  *   File definitions for the Common UNIX Printing System (CUPS).
  *
@@ -75,13 +75,19 @@ typedef struct
  */
 
 extern int		cupsFileClose(cups_file_t *fp);
+#define			cupsFileCompressed(fp) (fp)->compressed
+extern int		cupsFileFlush(cups_file_t *fp);
 extern int		cupsFileGetChar(cups_file_t *fp);
 extern char		*cupsFileGets(cups_file_t *fp, char *buf, int buflen);
+#define			cupsFileNumber(fp) (fp)->fd
 extern cups_file_t	*cupsFileOpen(const char *filename, const char *mode);
 extern int		cupsFilePrintf(cups_file_t *fp, const char *format, ...);
+extern int		cupsFilePutChar(cups_file_t *fp, int c);
 extern int		cupsFilePuts(cups_file_t *fp, const char *s);
 extern int		cupsFileRead(cups_file_t *fp, char *buf, int bytes);
 extern int		cupsFileSeek(cups_file_t *fp, int pos);
+#define			cupsFileTell(fp) (fp)->pos
+extern int		cupsFileWrite(cups_file_t *fp, const char *buf, int bytes);
 
 
 #  ifdef _cplusplus
@@ -90,5 +96,5 @@ extern int		cupsFileSeek(cups_file_t *fp, int pos);
 #endif /* !_CUPS_FILE_H_ */
 
 /*
- * End of "$Id: file.h,v 1.1.2.1 2003/03/29 21:42:13 mike Exp $".
+ * End of "$Id: file.h,v 1.1.2.2 2003/03/30 20:01:44 mike Exp $".
  */

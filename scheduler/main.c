@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.40 2003/03/21 15:09:47 mike Exp $"
+ * "$Id: main.c,v 1.57.2.41 2003/03/30 20:01:48 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -100,7 +100,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   struct sigaction	action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 #ifdef __sgi
-  FILE			*fp;		/* Fake lpsched lock file */
+  cups_file_t		*fp;		/* Fake lpsched lock file */
 #endif /* __sgi */
 
 
@@ -350,7 +350,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * printing...
   */
 
-  if ((fp = fopen("/var/spool/lp/SCHEDLOCK", "a")) == NULL)
+  if ((fp = cupsFileOpen("/var/spool/lp/SCHEDLOCK", "w")) == NULL)
   {
     syslog(LOG_LPR, "Unable to create fake lpsched lock file "
                     "\"/var/spool/lp/SCHEDLOCK\"\' - %s!",
@@ -358,10 +358,10 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
   else
   {
-    fclose(fp);
+    fchmod(cupsFileNumber(fp), 0644);
+    fchown(cupsFileNumber(fp), User, Group);
 
-    chmod("/var/spool/lp/SCHEDLOCK", 0644);
-    chown("/var/spool/lp/SCHEDLOCK", User, Group);
+    cupsFileClose(fp);
   }
 #endif /* __sgi */
 
@@ -1037,13 +1037,13 @@ sigterm_handler(int sig)		/* I - Signal */
   FreeAllJobs();
 
   if (AccessFile != NULL)
-    fclose(AccessFile);
+    cupsFileClose(AccessFile);
 
   if (ErrorFile != NULL)
-    fclose(ErrorFile);
+    cupsFileClose(ErrorFile);
 
   if (PageFile != NULL)
-    fclose(PageFile);
+    cupsFileClose(PageFile);
 
   DeleteAllLocations();
 
@@ -1100,5 +1100,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.40 2003/03/21 15:09:47 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.41 2003/03/30 20:01:48 mike Exp $".
  */

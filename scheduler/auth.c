@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.41.2.20 2003/01/31 17:48:38 mike Exp $"
+ * "$Id: auth.c,v 1.41.2.21 2003/03/30 20:01:41 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -822,24 +822,24 @@ GetMD5Passwd(const char *username,	/* I - Username */
              const char *group,		/* I - Group */
              char       passwd[33])	/* O - MD5 password string */
 {
-  FILE	*fp;				/* passwd.md5 file */
-  char	filename[1024],			/* passwd.md5 filename */
-	line[256],			/* Line from file */
-	tempuser[33],			/* User from file */
-	tempgroup[33];			/* Group from file */
+  cups_file_t	*fp;			/* passwd.md5 file */
+  char		filename[1024],		/* passwd.md5 filename */
+		line[256],		/* Line from file */
+		tempuser[33],		/* User from file */
+		tempgroup[33];		/* Group from file */
 
 
   LogMessage(L_DEBUG2, "GetMD5Passwd(username=\"%s\", group=\"%s\", passwd=%p)",
              username, group ? group : "(null)", passwd);
 
   snprintf(filename, sizeof(filename), "%s/passwd.md5", ServerRoot);
-  if ((fp = fopen(filename, "r")) == NULL)
+  if ((fp = cupsFileOpen(filename, "r")) == NULL)
   {
     LogMessage(L_ERROR, "Unable to open %s - %s", filename, strerror(errno));
     return (NULL);
   }
 
-  while (fgets(line, sizeof(line), fp) != NULL)
+  while (cupsFileGets(fp, line, sizeof(line)) != NULL)
   {
     if (sscanf(line, "%32[^:]:%32[^:]:%32s", tempuser, tempgroup, passwd) != 3)
     {
@@ -857,7 +857,7 @@ GetMD5Passwd(const char *username,	/* I - Username */
       LogMessage(L_DEBUG2, "Found MD5 user %s, group %s...", username,
                  tempgroup);
 
-      fclose(fp);
+      cupsFileClose(fp);
       return (passwd);
     }
   }
@@ -866,7 +866,7 @@ GetMD5Passwd(const char *username,	/* I - Username */
   * Didn't find a password entry - return NULL!
   */
 
-  fclose(fp);
+  cupsFileClose(fp);
   return (NULL);
 }
 
@@ -1746,5 +1746,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.41.2.20 2003/01/31 17:48:38 mike Exp $".
+ * End of "$Id: auth.c,v 1.41.2.21 2003/03/30 20:01:41 mike Exp $".
  */
