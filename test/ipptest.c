@@ -1,5 +1,5 @@
 /*
- * "$Id: ipptest.c,v 1.7 2001/02/22 16:48:14 mike Exp $"
+ * "$Id: ipptest.c,v 1.8 2001/02/23 19:30:12 mike Exp $"
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
@@ -285,7 +285,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	    }
 	    else if (strncasecmp(tempptr + 1, "port", 4) == 0)
 	    {
-	      snprintf(tempptr, sizeof(token) - 1 - (tokenptr - token),
+	      snprintf(tokenptr, sizeof(token) - 1 - (tokenptr - token),
 	               "%d", port);
 	      tempptr += 5;
 	    }
@@ -296,7 +296,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	    }
 	    else if (strncasecmp(tempptr + 1, "job-id", 6) == 0)
 	    {
-	      snprintf(tempptr, sizeof(token) - 1 - (tokenptr - token),
+	      snprintf(tokenptr, sizeof(token) - 1 - (tokenptr - token),
 	               "%d", job_id);
 	      tempptr += 7;
 	    }
@@ -797,5 +797,5 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 
 
 /*
- * End of "$Id: ipptest.c,v 1.7 2001/02/22 16:48:14 mike Exp $".
+ * End of "$Id: ipptest.c,v 1.8 2001/02/23 19:30:12 mike Exp $".
  */

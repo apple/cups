@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.29 2001/02/02 16:37:43 mike Exp $"
+# "$Id: Makefile,v 1.30 2001/02/23 19:30:11 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -100,6 +100,16 @@ install:
 		$(CHMOD) ugo+rx $(prefix)/$(INITDDIR)/cups; \
 	fi
 
+
+#
+# Run the test suite...
+#
+
+test:	all
+	echo Running CUPS test suite...
+	cd test; ./do-ipp-tests.sh
+
+
 #
 # Make software distributions using EPM (http://www.easysw.com/epm)...
 #
@@ -132,5 +142,5 @@ tardist:
 	epm $(EPMFLAGS) -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.29 2001/02/02 16:37:43 mike Exp $".
+# End of "$Id: Makefile,v 1.30 2001/02/23 19:30:11 mike Exp $".
 #

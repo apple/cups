@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: do-ipp-tests.sh,v 1.2 2001/02/23 01:15:16 mike Exp $"
+# "$Id: do-ipp-tests.sh,v 1.3 2001/02/23 19:30:12 mike Exp $"
 #
 #  Perform the complete set of IPP compliance tests specified in the
 #  CUPS Software Test Plan.
@@ -169,12 +169,12 @@ if test $status != 0; then
 	echo ""
 	echo "    ipp-test.report"
 	echo "    /tmp/$user/log/error_log"
+	echo ""
 else
 	echo "All tests passed."
 	echo ""
-	echo "See the following files for details:"
+	echo "See the file ipp-test.report for details."
 	echo ""
-	echo "    ipp-test.report"
 fi
 
 #
@@ -198,5 +198,5 @@ done
 kill $cupsd
 
 #
-# End of "$Id: do-ipp-tests.sh,v 1.2 2001/02/23 01:15:16 mike Exp $"
+# End of "$Id: do-ipp-tests.sh,v 1.3 2001/02/23 19:30:12 mike Exp $"
 #
