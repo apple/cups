@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.111 2003/03/14 21:40:39 mike Exp $"
+ * "$Id: dirsvc.c,v 1.112 2003/04/02 13:17:38 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -618,7 +618,9 @@ SendCUPSBrowse(printer_t *p)		/* I - Printer to send */
 	  snprintf(packet, sizeof(packet), "%x %x ipp://%s/%s/%s \"%s\" \"%s\" \"%s\"\n",
         	   p->type | CUPS_PRINTER_REMOTE, p->state, iface->hostname,
 		   (p->type & CUPS_PRINTER_CLASS) ? "classes" : "printers",
-		   p->name, p->location, p->info, p->make_model);
+		   p->name, p->location ? p->location : "",
+		   p->info ? p->info : "",
+		   p->make_model ? p->make_model : "Unknown");
 
 	  bytes = strlen(packet);
 
@@ -641,7 +643,9 @@ SendCUPSBrowse(printer_t *p)		/* I - Printer to send */
 	snprintf(packet, sizeof(packet), "%x %x ipp://%s/%s/%s \"%s\" \"%s\" \"%s\"\n",
         	 p->type | CUPS_PRINTER_REMOTE, p->state, iface->hostname,
 		 (p->type & CUPS_PRINTER_CLASS) ? "classes" : "printers",
-		 p->name, p->location, p->info, p->make_model);
+		 p->name, p->location ? p->location : "",
+		 p->info ? p->info : "",
+		 p->make_model ? p->make_model : "Unknown");
 
 	bytes = strlen(packet);
 
@@ -664,7 +668,9 @@ SendCUPSBrowse(printer_t *p)		/* I - Printer to send */
 
       snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"\n",
                p->type | CUPS_PRINTER_REMOTE, p->state, p->uri,
-	       p->location, p->info, p->make_model);
+	       p->location ? p->location : "",
+	       p->info ? p->info : "",
+	       p->make_model ? p->make_model : "Unknown");
 
       bytes = strlen(packet);
       LogMessage(L_DEBUG2, "SendBrowseList: (%d bytes to %x) %s", bytes,
@@ -1886,5 +1892,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.111 2003/03/14 21:40:39 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.112 2003/04/02 13:17:38 mike Exp $".
  */
