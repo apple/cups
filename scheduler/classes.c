@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.39 2001/09/17 20:03:26 mike Exp $"
+ * "$Id: classes.c,v 1.40 2002/01/02 16:09:18 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -516,31 +516,28 @@ LoadAllClasses(void)
     }
     else if (strcmp(name, "JobSheets") == 0)
     {
-      if (!Classification[0])
-      {
-       /*
-	* Set the initial job sheets...
-	*/
+     /*
+      * Set the initial job sheets...
+      */
 
-	for (valueptr = value; *valueptr && !isspace(*valueptr); valueptr ++);
+      for (valueptr = value; *valueptr && !isspace(*valueptr); valueptr ++);
+
+      if (*valueptr)
+        *valueptr++ = '\0';
+
+      strncpy(p->job_sheets[0], value, sizeof(p->job_sheets[0]) - 1);
+
+      while (isspace(*valueptr))
+        valueptr ++;
+
+      if (*valueptr)
+      {
+        for (value = valueptr; *valueptr && !isspace(*valueptr); valueptr ++);
 
 	if (*valueptr)
           *valueptr++ = '\0';
 
-	strncpy(p->job_sheets[0], value, sizeof(p->job_sheets[0]) - 1);
-
-	while (isspace(*valueptr))
-          valueptr ++;
-
-	if (*valueptr)
-	{
-          for (value = valueptr; *valueptr && !isspace(*valueptr); valueptr ++);
-
-	  if (*valueptr)
-            *valueptr++ = '\0';
-
-	  strncpy(p->job_sheets[1], value, sizeof(p->job_sheets[1]) - 1);
-	}
+	strncpy(p->job_sheets[1], value, sizeof(p->job_sheets[1]) - 1);
       }
     }
     else if (strcmp(name, "AllowUser") == 0)
@@ -694,5 +691,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.39 2001/09/17 20:03:26 mike Exp $".
+ * End of "$Id: classes.c,v 1.40 2002/01/02 16:09:18 mike Exp $".
  */
