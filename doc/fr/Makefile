@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.1 2002/07/18 21:14:08 mike Exp $"
+# "$Id: Makefile,v 1.2 2002/07/20 04:08:18 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -47,8 +47,6 @@ include ../../Makedefs
 #
 
 DOCUMENTS	=	sam.shtml sum.shtml
-DOCIMAGES	=	images/cups-block-diagram.gif images/cups-large.gif \
-			images/cups-medium.gif images/cups-small.gif
 WEBPAGES	=	cups.css cupsdoc.css index.html documentation.html
 WEBIMAGES	=	images/accept-jobs.gif \
 			images/add-class.gif \
@@ -121,7 +119,7 @@ install:
 		$(INSTALL_MAN) $$file $(DOCDIR)/fr; \
 	done
 	$(INSTALL_DIR) $(DOCDIR)/fr/images
-	for file in $(WEBIMAGES) $(DOCIMAGES); do \
+	for file in $(WEBIMAGES); do \
 		$(INSTALL_MAN) $$file $(DOCDIR)/fr/images; \
 	done
 
