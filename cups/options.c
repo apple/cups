@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c,v 1.21.2.5 2002/03/01 19:55:13 mike Exp $"
+ * "$Id: options.c,v 1.21.2.6 2002/12/10 19:56:43 mike Exp $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -353,22 +353,42 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
         * Mark it...
 	*/
 
-	if (ppdMarkOption(ppd, "PageSize", s))
-          conflict = 1;
-	if (ppdMarkOption(ppd, "InputSlot", s))
-          conflict = 1;
-	if (ppdMarkOption(ppd, "MediaType", s))
-          conflict = 1;
-	if (ppdMarkOption(ppd, "EFMediaQualityMode", s))	/* EFI */
-          conflict = 1;
-	if (strcasecmp(s, "manual") == 0)
+        if (cupsGetOption("PageSize", num_options, options) == NULL)
+	  if (ppdMarkOption(ppd, "PageSize", s))
+            conflict = 1;
+
+        if (cupsGetOption("InputSlot", num_options, options) == NULL)
+	  if (ppdMarkOption(ppd, "InputSlot", s))
+            conflict = 1;
+
+        if (cupsGetOption("MediaType", num_options, options) == NULL)
+	  if (ppdMarkOption(ppd, "MediaType", s))
+            conflict = 1;
+
+        if (cupsGetOption("EFMediaQualityMode", num_options, options) == NULL)
+	  if (ppdMarkOption(ppd, "EFMediaQualityMode", s))	/* EFI */
+            conflict = 1;
+
+	if (strcasecmp(s, "manual") == 0 &&
+	    cupsGetOption("ManualFeed", num_options, options) == NULL)
           if (ppdMarkOption(ppd, "ManualFeed", "True"))
 	    conflict = 1;
       }
     }
     else if (strcasecmp(options->name, "sides") == 0)
     {
-      if (strcasecmp(options->value, "one-sided") == 0)
+      if (cupsGetOption("Duplex", num_options, options) != NULL ||
+          cupsGetOption("JCLDuplex", num_options, options) != NULL ||
+          cupsGetOption("EFDuplex", num_options, options) != NULL ||
+          cupsGetOption("KD03Duplex", num_options, options) != NULL)
+      {
+       /*
+        * Don't override the PPD option with the IPP attribute...
+	*/
+
+        continue;
+      }
+      else if (strcasecmp(options->value, "one-sided") == 0)
       {
         if (ppdMarkOption(ppd, "Duplex", "None"))
 	  conflict = 1;
@@ -417,8 +437,9 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
     }
     else if (strcasecmp(options->name, "output-bin") == 0)
     {
-      if (ppdMarkOption(ppd, "OutputBin", options->value))
-        conflict = 1;
+      if (cupsGetOption("OutputBin", num_options, options) == NULL)
+        if (ppdMarkOption(ppd, "OutputBin", options->value))
+          conflict = 1;
     }
     else if (ppdMarkOption(ppd, options->name, options->value))
       conflict = 1;
@@ -428,5 +449,5 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: options.c,v 1.21.2.5 2002/03/01 19:55:13 mike Exp $".
+ * End of "$Id: options.c,v 1.21.2.6 2002/12/10 19:56:43 mike Exp $".
  */

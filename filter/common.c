@@ -1,5 +1,5 @@
 /*
- * "$Id: common.c,v 1.15.2.10 2002/10/28 17:33:30 mike Exp $"
+ * "$Id: common.c,v 1.15.2.11 2002/12/10 19:56:44 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -201,29 +201,14 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
   if (change_size)
     UpdatePageVars();
 
-  if ((val = cupsGetOption("sides", num_options, options)) != NULL &&
-      strncasecmp(val, "two-", 4) == 0)
-    Duplex = 1;
-  else if ((val = cupsGetOption("Duplex", num_options, options)) != NULL &&
-           strncasecmp(val, "Duplex", 6) == 0)
-    Duplex = 1;
-  else if ((val = cupsGetOption("JCLDuplex", num_options, options)) != NULL &&
-           strncasecmp(val, "Duplex", 6) == 0)
-    Duplex = 1;
-  else if ((val = cupsGetOption("EFDuplex", num_options, options)) != NULL &&
-           strncasecmp(val, "Duplex", 6) == 0)
-    Duplex = 1;
-  else if ((val = cupsGetOption("KD03Duplex", num_options, options)) != NULL &&
-           strncasecmp(val, "Duplex", 6) == 0)
-    Duplex = 1;
-  else if (ppdIsMarked(ppd, "Duplex", "DuplexNoTumble") ||
-           ppdIsMarked(ppd, "Duplex", "DuplexTumble") ||
-	   ppdIsMarked(ppd, "JCLDuplex", "DuplexNoTumble") ||
-           ppdIsMarked(ppd, "JCLDuplex", "DuplexTumble") ||
-	   ppdIsMarked(ppd, "EFDuplex", "DuplexNoTumble") ||
-           ppdIsMarked(ppd, "EFDuplex", "DuplexTumble") ||
-	   ppdIsMarked(ppd, "KD03Duplex", "DuplexNoTumble") ||
-           ppdIsMarked(ppd, "KD03Duplex", "DuplexTumble"))
+  if (ppdIsMarked(ppd, "Duplex", "DuplexNoTumble") ||
+      ppdIsMarked(ppd, "Duplex", "DuplexTumble") ||
+      ppdIsMarked(ppd, "JCLDuplex", "DuplexNoTumble") ||
+      ppdIsMarked(ppd, "JCLDuplex", "DuplexTumble") ||
+      ppdIsMarked(ppd, "EFDuplex", "DuplexNoTumble") ||
+      ppdIsMarked(ppd, "EFDuplex", "DuplexTumble") ||
+      ppdIsMarked(ppd, "KD03Duplex", "DuplexNoTumble") ||
+      ppdIsMarked(ppd, "KD03Duplex", "DuplexTumble"))
     Duplex = 1;
 
   return (ppd);
@@ -475,5 +460,5 @@ WriteLabels(int orient)	/* I - Orientation of the page */
 
 
 /*
- * End of "$Id: common.c,v 1.15.2.10 2002/10/28 17:33:30 mike Exp $".
+ * End of "$Id: common.c,v 1.15.2.11 2002/12/10 19:56:44 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.29 2002/10/28 15:59:26 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.30 2002/12/10 19:56:46 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -841,7 +841,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   ppd_option_t	*input_slot,		/* InputSlot options */
 		*media_type,		/* MediaType options */
 		*page_size,		/* PageSize options */
-		*output_bin;		/* OutputBin options */
+		*output_bin,		/* OutputBin options */
+		*media_quality;		/* EFMediaQualityMode options */
   ipp_attribute_t *attr;		/* Attribute data */
   ipp_value_t	*val;			/* Attribute value */
   int		nups[] =		/* number-up-supported values */
@@ -1250,6 +1251,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	if ((page_size = ppdFindOption(ppd, "PageSize")) != NULL)
 	  num_media += page_size->num_choices;
 
+	if ((media_quality = ppdFindOption(ppd, "EFMediaQualityMode")) != NULL)
+	  num_media += media_quality->num_choices;
+
 	attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                              "media-supported", num_media, NULL, NULL);
         if (attr != NULL)
@@ -1263,6 +1267,10 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	  if (media_type != NULL)
 	    for (i = 0; i < media_type->num_choices; i ++, val ++)
 	      val->string.text = strdup(media_type->choices[i].choice);
+
+	  if (media_quality != NULL)
+	    for (i = 0; i < media_quality->num_choices; i ++, val ++)
+	      val->string.text = strdup(media_quality->choices[i].choice);
 
 	  if (page_size != NULL)
 	  {
@@ -1278,6 +1286,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	  else if (media_type != NULL)
 	    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
                 	 NULL, media_type->defchoice);
+	  else if (media_quality != NULL)
+	    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
+                	 NULL, media_quality->defchoice);
 	  else
 	    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
                 	 NULL, "none");
@@ -2090,5 +2101,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.29 2002/10/28 15:59:26 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.30 2002/12/10 19:56:46 mike Exp $".
  */

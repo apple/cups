@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.25 2002/12/10 18:45:56 mike Exp $"
+ * "$Id: main.c,v 1.57.2.26 2002/12/10 19:56:45 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -40,6 +40,7 @@
 #include "cupsd.h"
 #include <sys/resource.h>
 #include <syslog.h>
+#include <grp.h>
 
 #if defined(HAVE_MALLOC_H) && defined(HAVE_MALLINFO)
 #  include <malloc.h>
@@ -926,5 +927,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.25 2002/12/10 18:45:56 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.26 2002/12/10 19:56:45 mike Exp $".
  */

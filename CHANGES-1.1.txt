@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.18
 
+	- The IPP media, output-bin, and sides attributes took
+	  precedence over the corresponding PPD options, which
+	  caused inconsistent behavior under MacOS X with some
+	  PPD files.
 	- The cupsaddsmb utility specified the wrong number of
 	  arguments to the adddriver command when adding the
 	  Win9x PostScript drivers.
