@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.96 2001/06/26 20:11:08 mike Exp $"
+dnl "$Id: configure.in,v 1.97 2001/06/27 05:59:37 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -96,8 +96,8 @@ if test x$enable_shared != xno; then
 			DSOFLAGS="$DSOFLAGS -soname \$@ -shared \$(OPTIM)"
 			;;
 		AIX*)
-			LIBCUPS="libcups.so.2"
-			LIBCUPSIMAGE="libcupsimage.so.2"
+			LIBCUPS="libcups_s.a"
+			LIBCUPSIMAGE="libcupsimage_s.a"
 			DSO="ld"
 			DSOFLAGS="$DSOFLAGS -G -o \$@"
 			;;
@@ -125,11 +125,18 @@ if test x$LIBTOOL != x; then
 	DSO=":"
 	DSOFLAGS=""
 else
-	LINKCUPS="-L../cups -lcups"
-	LINKCUPSIMAGE="-L../filter -lcupsimage"
-
 	if test x$enable_shared = xno; then
+		LINKCUPS="-L../cups -lcups"
+		LINKCUPSIMAGE="-L../filter -lcupsimage"
 		LINKCUPS="$LINKCUPS \$(SSLLIBS)"
+	else
+		if test $uname = AIX; then
+			LINKCUPS="-L../cups -lcups_s"
+			LINKCUPSIMAGE="-L../filter -lcupsimage_s"
+		else
+			LINKCUPS="-L../cups -lcups"
+			LINKCUPSIMAGE="-L../filter -lcupsimage"
+		fi
 	fi
 fi
 
@@ -727,5 +734,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.96 2001/06/26 20:11:08 mike Exp $".
+dnl End of "$Id: configure.in,v 1.97 2001/06/27 05:59:37 mike Exp $".
 dnl
