@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gsiodev.c,v 1.2 2000/03/08 23:14:43 mike Exp $ */
+/*$Id: gsiodev.c,v 1.3 2000/03/09 15:09:28 mike Exp $ */
 /* IODevice implementation for Ghostscript */
 #include "errno_.h"
 #include "string_.h"
@@ -240,16 +240,15 @@ gs_getiodevice(int index)
 gx_io_device *
 gs_findiodevice(const byte * str, uint len)
 {
-    int i;
+    gx_io_device **pftab;
 
     if (len > 1 && str[len - 1] == '%')
 	len--;
-    for (i = 0; i < gx_io_device_table_count; ++i) {
-	gx_io_device *iodev = io_device_table[i];
-	const char *dname = iodev->dname;
+    for (pftab = io_device_table; *pftab != NULL; pftab++) {
+	const char *dname = (*pftab)->dname;
 
 	if (strlen(dname) == len + 1 && !memcmp(str, dname, len))
-	    return iodev;
+	    return *pftab;
     }
     return 0;
 }

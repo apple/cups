@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gdevpsdi.c,v 1.1 2000/03/08 23:14:25 mike Exp $ */
+/*$Id: gdevpsdi.c,v 1.2 2000/03/09 15:09:28 mike Exp $ */
 /* Image compression for PostScript and PDF writers */
 #include "math_.h"
 #include "gx.h"
@@ -136,9 +136,8 @@ setup_image_compression(psdf_binary_writer * pbw, const psdf_image_params * pdip
 	}
 	ss->Columns = pim->Width;
 	ss->Rows = (ss->EndOfBlock ? 0 : pim->Height);
-    } else if ((template == &s_LZWE_template ||
-		template == &s_zlibE_template) &&
-	       pdev->version >= psdf_version_ll3) {
+    } else if (template == &s_LZWE_template ||
+	       template == &s_zlibE_template) {
 	/* Add a PNGPredictor filter. */
 	int code = psdf_encode_binary(pbw, template, st);
 

@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gstype42.c,v 1.2 2000/03/08 23:14:49 mike Exp $ */
+/*$Id: gstype42.c,v 1.3 2000/03/09 15:09:29 mike Exp $ */
 /* Type 42 (TrueType) font library routines */
 #include "memory_.h"
 #include "gx.h"
@@ -116,11 +116,10 @@ gs_type42_font_init(gs_font_type42 * pfont)
 
     access(0, 12, OffsetTable);
     {
-	static const byte version1_0[4] = {0, 1, 0, 0};
-	static const byte * const version_true = (const byte *)"true";
+	static const byte version1_0[4] =
+	{0, 1, 0, 0};
 
-	if (memcmp(OffsetTable, version1_0, 4) &&
-	    memcmp(OffsetTable, version_true, 4))
+	if (memcmp(OffsetTable, version1_0, 4))
 	    return_error(gs_error_invalidfont);
     }
     numTables = u16(OffsetTable + 4);

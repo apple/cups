@@ -21,7 +21,7 @@
 % Ghostscript, as distributed by Aladdin Enterprises, does not require any
 % GNU software to build or run it.
 
-% $Id: pdf_draw.ps,v 1.3 2000/03/08 23:15:19 mike Exp $
+% $Id: pdf_draw.ps,v 1.4 2000/03/09 15:09:29 mike Exp $
 % pdf_draw.ps
 % PDF drawing operations (graphics, text, and images).
 
@@ -367,36 +367,30 @@ end
    if
    count 1 gt
  } bdef
-/resolvepattern {	% <patternstreamdict> resolvepattern <patterndict>
-		% Don't do the resolvestream now: just capture the data
+/resolvepattern		% <patternstreamdict> resolvepattern <patterndict>
+ {		% Don't do the resolvestream now: just capture the data
 		% from the file if necessary.
-  dup length dict copy
-  dup /FilePosition .knownget {
-    1 index /File get dup fileposition 3 1 roll
+   dup length dict copy
+   dup /FilePosition .knownget
+    { 1 index /File get dup fileposition 3 1 roll
 		% Stack: dict savepos pos file
-    dup 3 -1 roll setfileposition
-    dup 3 index /Length get string readstring pop
+      dup 3 -1 roll setfileposition
+      dup 3 index /Length get string readstring pop
 		% Stack: dict savepos file string
-    3 1 roll exch setfileposition
-    1 index /File 3 -1 roll put
-    dup /FilePosition undef
-  } if
-  dup /PaintProc {
-    DEBUG { (%Begin PaintProc) = flush } if
-		% For uncolored patterns, we have to unbind the current
-		% color and color space before running the PaintProc.
-		% There's no harm in doing this for colored patterns,
-		% so for simplicity, we always do it.
-    q
-    null sc1 null SC1
-    false resolvestream pdfopdict .pdfrun
-    Q
-    DEBUG { (%End PaintProc) = flush } if
-  } put
-  DEBUG {
-    (%Pattern: ) print dup === flush
-  } if
-} bdef
+      3 1 roll exch setfileposition
+      1 index /File 3 -1 roll put
+      dup /FilePosition undef
+    }
+   if
+   dup /PaintProc {
+     DEBUG { (%Begin PaintProc) = flush } if
+     false resolvestream pdfopdict .pdfrun
+     DEBUG { (%End PaintProc) = flush } if
+   } put
+   DEBUG {
+     (%Pattern: ) print dup === flush
+   } if
+ } bdef
 
 drawopdict begin
   /g { /DeviceGray cssubst { cs sc1 } { g } ifelse } bdef
