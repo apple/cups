@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: backend.man,v 1.6.2.4 2003/01/07 18:27:05 mike Exp $"
+.\" "$Id: backend.man,v 1.6.2.5 2003/03/06 16:37:01 mike Exp $"
 .\"
 .\"   backend man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -101,7 +101,8 @@ The timezone of the server.
 .TP 5
 USER
 .br
-The user executing the backend (typically lp).
+The user executing the backend, typically root; consult the cupsd.conf file for
+the current setting.
 .SH SEE ALSO
 cupsd(8), filter(1)
 CUPS Interface Design Description,
@@ -111,5 +112,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2003 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: backend.man,v 1.6.2.4 2003/01/07 18:27:05 mike Exp $".
+.\" End of "$Id: backend.man,v 1.6.2.5 2003/03/06 16:37:01 mike Exp $".
 .\"
