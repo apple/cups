@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.61 2001/09/14 16:52:06 mike Exp $"
+ * "$Id: ipp.c,v 1.62 2001/10/17 15:54:17 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -1027,12 +1027,39 @@ ippRead(http_t *http,		/* I - HTTP data */
 	      return (IPP_ERROR);
 
            /*
-	    * Finally, make sure we don't have too many elements in the
-	    * attribute array...
+	    * Finally, reallocate the attribute array as needed...
 	    */
 
-	    if (attr->num_values >= IPP_MAX_VALUES)
-	      return (IPP_ERROR);
+	    if ((attr->num_values % IPP_MAX_VALUES) == 0)
+	    {
+	      ipp_attribute_t	*temp,	/* Pointer to new buffer */
+				*ptr;	/* Pointer in attribute list */
+
+
+             /*
+	      * Reallocate memory...
+	      */
+
+              if ((temp = realloc(attr, sizeof(ipp_attribute_t) +
+	                                (attr->num_values + IPP_MAX_VALUES - 1) *
+					sizeof(ipp_value_t))) == NULL)
+	        return (IPP_ERROR);
+
+             /*
+	      * Reset pointers in the list...
+	      */
+
+	      for (ptr = ipp->attrs;
+	           ptr && ptr->next != ipp->current;
+		   ptr = ptr->next);
+
+              if (ptr)
+	        ptr->next = temp;
+              else
+	        ipp->attrs = temp;
+
+              attr = ipp->current = temp;
+	    }
 	  }
 	  else
 	  {
@@ -1956,5 +1983,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.61 2001/09/14 16:52:06 mike Exp $".
+ * End of "$Id: ipp.c,v 1.62 2001/10/17 15:54:17 mike Exp $".
  */

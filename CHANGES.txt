@@ -1,4 +1,4 @@
-CHANGES.txt - 09/28/2001
+CHANGES.txt - 10/17/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.11
@@ -9,6 +9,14 @@ CHANGES IN CUPS V1.1.11
 	  files.
 	- Added new "cupsaddsmb" utility for exporting
 	  CUPS printer drivers to SAMBA/Windows clients.
+	- The ippRead() and ipp_read_file() functions could not
+	  handle more than IPP_MAX_VALUES (100) values in a
+	  1setOf attribute.  These functions have been updated
+	  to dynamically allocate more memory as needed, and the
+	  IPP_MAX_VALUES constant now represents the allocation
+	  increment.  [this caused some versions of the
+	  GIMP-print drivers to fail since the number of media
+	  options exceeded 100...]
 	- The scheduler could crash when BrowseShortNames
 	  was set to "No".
 	- The scheduler did not prevent MaxClients from being

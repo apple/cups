@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.136 2001/09/25 13:42:45 mike Exp $"
+ * "$Id: job.c,v 1.137 2001/10/17 15:54:19 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2116,10 +2116,42 @@ ipp_read_file(const char *filename,	/* I - File to read from */
 
             attr = ipp->current;
 
-	    if (attr->num_values >= IPP_MAX_VALUES)
+           /*
+	    * Finally, reallocate the attribute array as needed...
+	    */
+
+	    if ((attr->num_values % IPP_MAX_VALUES) == 0)
 	    {
-	      close(fd);
-              return (IPP_ERROR);
+	      ipp_attribute_t	*temp,	/* Pointer to new buffer */
+				*ptr;	/* Pointer in attribute list */
+
+
+             /*
+	      * Reallocate memory...
+	      */
+
+              if ((temp = realloc(attr, sizeof(ipp_attribute_t) +
+	                                (attr->num_values + IPP_MAX_VALUES - 1) *
+					sizeof(ipp_value_t))) == NULL)
+	      {
+		close(fd);
+        	return (IPP_ERROR);
+	      }
+
+             /*
+	      * Reset pointers in the list...
+	      */
+
+	      for (ptr = ipp->attrs;
+	           ptr && ptr->next != ipp->current;
+		   ptr = ptr->next);
+
+              if (ptr)
+	        ptr->next = temp;
+              else
+	        ipp->attrs = temp;
+
+              attr = ipp->current = temp;
 	    }
 	  }
 	  else
@@ -2951,5 +2983,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.136 2001/09/25 13:42:45 mike Exp $".
+ * End of "$Id: job.c,v 1.137 2001/10/17 15:54:19 mike Exp $".
  */

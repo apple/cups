@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.40 2001/05/17 13:57:16 mike Exp $"
+ * "$Id: ipp.h,v 1.41 2001/10/17 15:54:18 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -61,7 +61,7 @@ extern "C" {
  */
 
 #  define IPP_MAX_NAME		256
-#  define IPP_MAX_VALUES	100
+#  define IPP_MAX_VALUES	10	/* Now just an allocation increment */
 
 
 /*
@@ -364,8 +364,7 @@ typedef union			/**** Attribute Value ****/
 
 typedef struct ipp_attribute_s	/**** Attribute ****/
 {
-  struct ipp_attribute_s	*next;
-  				/* Next atrtribute in list */
+  struct ipp_attribute_s *next;	/* Next attribute in list */
   ipp_tag_t	group_tag,	/* Job/Printer/Operation group tag */
 		value_tag;	/* What type of value is it? */
   char		*name;		/* Name of attribute */
@@ -429,5 +428,5 @@ extern void		_ipp_free_attr(ipp_attribute_t *);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.40 2001/05/17 13:57:16 mike Exp $".
+ * End of "$Id: ipp.h,v 1.41 2001/10/17 15:54:18 mike Exp $".
  */

@@ -152,6 +152,9 @@ int main(int argc, char *argv[]) {
 #ifdef HAVE_LIBCUPS
   }
 
+  // Support "printCommands" debug option...
+  if (getenv("DEBUG") != NULL) printCommands = 1;
+
   // Get PPD and initialize options as needed...
   if ((ppd = ppdOpenFile(getenv("PPD"))) != NULL) {
     fprintf(stderr, "DEBUG: pdftops - opened PPD file \"%s\"...\n", getenv("PPD"));
