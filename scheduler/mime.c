@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.7.2.9 2003/01/07 18:27:25 mike Exp $"
+ * "$Id: mime.c,v 1.7.2.10 2003/03/28 22:29:49 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -292,7 +292,7 @@ static void
 load_types(mime_t     *mime,		/* I - MIME database */
            const char *filename)	/* I - Types file to load */
 {
-  FILE		*fp;			/* Types file */
+  cups_file_t	*fp;			/* Types file */
   int		linelen;		/* Length of line */
   char		line[65536],		/* Input line from file */
 		*lineptr,		/* Current position in line */
@@ -306,20 +306,20 @@ load_types(mime_t     *mime,		/* I - MIME database */
   * First try to open the file...
   */
 
-  if ((fp = fopen(filename, "r")) == NULL)
+  if ((fp = cupsFileOpen(filename, "r")) == NULL)
     return;
 
  /*
   * Then read each line from the file, skipping any comments in the file...
   */
 
-  while (fgets(line, sizeof(line), fp) != NULL)
+  while (cupsFileGets(fp, line, sizeof(line)) != NULL)
   {
    /*
     * Skip blank lines and lines starting with a #...
     */
 
-    if (line[0] == '\n' || line[0] == '#')
+    if (!line[0] || line[0] == '#')
       continue;
 
    /*
@@ -329,27 +329,14 @@ load_types(mime_t     *mime,		/* I - MIME database */
 
     linelen = strlen(line);
 
-    if (line[linelen - 1] == '\n')
-    {
-      line[linelen - 1] = '\0';
-      linelen --;
-    }
-
     while (line[linelen - 1] == '\\')
     {
       linelen --;
 
-      if (fgets(line + linelen, sizeof(line) - linelen, fp) == NULL)
+      if (cupsFileGets(fp, line + linelen, sizeof(line) - linelen) == NULL)
         line[linelen] = '\0';
       else
-      {
         linelen += strlen(line + linelen);
-	if (line[linelen - 1] == '\n')
-	{
-	  line[linelen - 1] = '\0';
-	  linelen --;
-	}
-      }
     }
 
    /*
@@ -385,7 +372,7 @@ load_types(mime_t     *mime,		/* I - MIME database */
     mimeAddTypeRule(typeptr, lineptr);
   }
 
-  fclose(fp);
+  cupsFileClose(fp);
 }
 
 
@@ -399,7 +386,7 @@ load_convs(mime_t     *mime,		/* I - MIME database */
            const char *filterpath)	/* I - Directory to load */
 {
   int		i;			/* Looping var */
-  FILE		*fp;			/* Convs file */
+  cups_file_t	*fp;			/* Convs file */
   char		line[1024],		/* Input line from file */
 		*lineptr,		/* Current position in line */
 		super[MIME_MAX_SUPER],	/* Super-type name */
@@ -416,20 +403,20 @@ load_convs(mime_t     *mime,		/* I - MIME database */
   * First try to open the file...
   */
 
-  if ((fp = fopen(filename, "r")) == NULL)
+  if ((fp = cupsFileOpen(filename, "r")) == NULL)
     return;
 
  /*
   * Then read each line from the file, skipping any comments in the file...
   */
 
-  while (fgets(line, sizeof(line), fp) != NULL)
+  while (cupsFileGets(fp, line, sizeof(line)) != NULL)
   {
    /*
     * Skip blank lines and lines starting with a #...
     */
 
-    if (line[0] == '\n' || line[0] == '#')
+    if (!line[0] || line[0] == '#')
       continue;
 
    /*
@@ -564,7 +551,7 @@ load_convs(mime_t     *mime,		/* I - MIME database */
 	mimeAddFilter(mime, *temptype, dsttype, cost, filter);
   }
 
-  fclose(fp);
+  cupsFileClose(fp);
 }
 
 
@@ -596,5 +583,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.7.2.9 2003/01/07 18:27:25 mike Exp $".
+ * End of "$Id: mime.c,v 1.7.2.10 2003/03/28 22:29:49 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.h,v 1.3.2.5 2003/01/07 18:27:25 mike Exp $"
+ * "$Id: mime.h,v 1.3.2.6 2003/03/28 22:29:49 mike Exp $"
  *
  *   MIME type/conversion database definitions for the Common UNIX Printing System (CUPS).
  *
@@ -22,10 +22,11 @@
  *         WWW: http://www.cups.org
  */
 
-#ifndef _MIME_H_
-#  define _MIME_H_
+#ifndef _CUPS_MIME_H_
+#  define _CUPS_MIME_H_
 
 #  include <cups/ipp.h>
+#  include "file.h"
 
 
 /*
@@ -137,8 +138,8 @@ extern mime_filter_t	*mimeFilter(mime_t *mime, mime_type_t *src, mime_type_t *ds
 #  ifdef _cplusplus
 }
 #  endif /* _cplusplus */
-#endif /* !_MIME_H_ */
+#endif /* !_CUPS_MIME_H_ */
 
 /*
- * End of "$Id: mime.h,v 1.3.2.5 2003/01/07 18:27:25 mike Exp $".
+ * End of "$Id: mime.h,v 1.3.2.6 2003/03/28 22:29:49 mike Exp $".
  */

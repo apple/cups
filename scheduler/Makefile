@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.36.2.9 2003/03/06 16:37:02 mike Exp $"
+# "$Id: Makefile,v 1.36.2.10 2003/03/28 22:29:47 mike Exp $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -27,16 +27,16 @@ include ../Makedefs
 CUPSDOBJS =	auth.o banners.o cert.o classes.o client.o conf.o devices.o \
 		dirsvc.o main.o ipp.o listen.o job.o log.o network.o \
 		policy.o ppds.o printers.o quotas.o server.o
-MIMEOBJS =	filter.o mime.o type.o
+MIMEOBJS =	file.o filter.o mime.o type.o
 OBJS	=	$(CUPSDOBJS) $(MIMEOBJS) cups-lpd.o cups-polld.o testmime.o \
 		testspeed.o
-
+TARGETS	=	cupsd cups-lpd cups-polld libmime.a testmime testspeed
 
 #
 # Make everything...
 #
 
-all:	cupsd cups-lpd cups-polld libmime.a
+all:		$(TARGETS)
 
 
 #
@@ -44,7 +44,8 @@ all:	cupsd cups-lpd cups-polld libmime.a
 #
 
 clean:
-	$(RM) $(OBJS) cupsd cups-lpd cups-polld libmime.a testmime testspeed
+	$(RM) $(OBJS)
+	$(RM) $(TARGETS)
 
 
 #
@@ -118,7 +119,7 @@ libmime.a:	$(MIMEOBJS)
 
 testmime:	testmime.o libmime.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testmime.o libmime.a ../cups/libcups.a
+	$(CC) $(LDFLAGS) -o $@ testmime.o libmime.a ../cups/libcups.a $(LIBZ)
 
 
 #
@@ -138,5 +139,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.36.2.9 2003/03/06 16:37:02 mike Exp $".
+# End of "$Id: Makefile,v 1.36.2.10 2003/03/28 22:29:47 mike Exp $".
 #

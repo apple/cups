@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.11.2.8 2003/01/24 14:44:10 mike Exp $"
+ * "$Id: type.c,v 1.11.2.9 2003/03/28 22:29:49 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -51,7 +51,7 @@
  */
 
 static int	compare(mime_type_t **, mime_type_t **);
-static int	checkrules(const char *, FILE *, mime_magic_t *);
+static int	checkrules(const char *, cups_file_t *, mime_magic_t *);
 static int	patmatch(const char *, const char *);
 
 
@@ -538,10 +538,10 @@ mime_type_t *				/* O - Type of file */
 mimeFileType(mime_t     *mime,		/* I - MIME database */
              const char *pathname)	/* I - Name of file to check */
 {
-  int		i;		/* Looping var */
-  FILE		*fp;		/* File pointer */
-  mime_type_t	**types;	/* File types */
-  const char	*filename;	/* Base filename of file */
+  int		i;			/* Looping var */
+  cups_file_t	*fp;			/* File pointer */
+  mime_type_t	**types;		/* File types */
+  const char	*filename;		/* Base filename of file */
 
 
  /*
@@ -555,7 +555,7 @@ mimeFileType(mime_t     *mime,		/* I - MIME database */
   * Try to open the file...
   */
 
-  if ((fp = fopen(pathname, "r")) == NULL)
+  if ((fp = cupsFileOpen(pathname, "r")) == NULL)
     return (NULL);
 
  /*
@@ -579,7 +579,7 @@ mimeFileType(mime_t     *mime,		/* I - MIME database */
   * Finally, close the file and return a match (if any)...
   */
 
-  fclose(fp);
+  cupsFileClose(fp);
 
   if (i > 0)
     return (*types);
@@ -659,7 +659,7 @@ compare(mime_type_t **t0,	/* I - First type */
 
 static int				/* O - 1 if match, 0 if no match */
 checkrules(const char   *filename,	/* I - Filename */
-           FILE         *fp,		/* I - File to check */
+           cups_file_t  *fp,		/* I - File to check */
            mime_magic_t *rules)		/* I - Rules to check */
 {
   int		n;			/* Looping var */
@@ -710,8 +710,8 @@ checkrules(const char   *filename,	/* I - Filename */
 	    * Reload file buffer...
 	    */
 
-            fseek(fp, rules->offset, SEEK_SET);
-	    buflength = fread(buffer, 1, sizeof(buffer), fp);
+            cupsFileSeek(fp, rules->offset);
+	    buflength = cupsFileRead(fp, buffer, sizeof(buffer));
 	    bufoffset = rules->offset;
 	  }
 
@@ -751,8 +751,8 @@ checkrules(const char   *filename,	/* I - Filename */
 	    * Reload file buffer...
 	    */
 
-            fseek(fp, rules->offset, SEEK_SET);
-	    buflength = fread(buffer, 1, sizeof(buffer), fp);
+            cupsFileSeek(fp, rules->offset);
+	    buflength = cupsFileRead(fp, buffer, sizeof(buffer));
 	    bufoffset = rules->offset;
 	  }
 
@@ -794,8 +794,8 @@ checkrules(const char   *filename,	/* I - Filename */
 	    * Reload file buffer...
 	    */
 
-            fseek(fp, rules->offset, SEEK_SET);
-	    buflength = fread(buffer, 1, sizeof(buffer), fp);
+            cupsFileSeek(fp, rules->offset);
+	    buflength = cupsFileRead(fp, buffer, sizeof(buffer));
 	    bufoffset = rules->offset;
 	  }
 
@@ -822,8 +822,8 @@ checkrules(const char   *filename,	/* I - Filename */
 	    * Reload file buffer...
 	    */
 
-            fseek(fp, rules->offset, SEEK_SET);
-	    buflength = fread(buffer, 1, sizeof(buffer), fp);
+            cupsFileSeek(fp, rules->offset);
+	    buflength = cupsFileRead(fp, buffer, sizeof(buffer));
 	    bufoffset = rules->offset;
 	  }
 
@@ -850,8 +850,8 @@ checkrules(const char   *filename,	/* I - Filename */
 	    * Reload file buffer...
 	    */
 
-            fseek(fp, rules->offset, SEEK_SET);
-	    buflength = fread(buffer, 1, sizeof(buffer), fp);
+            cupsFileSeek(fp, rules->offset);
+	    buflength = cupsFileRead(fp, buffer, sizeof(buffer));
 	    bufoffset = rules->offset;
 	  }
 
@@ -882,8 +882,8 @@ checkrules(const char   *filename,	/* I - Filename */
 	    * Reload file buffer...
 	    */
 
-            fseek(fp, rules->offset, SEEK_SET);
-	    buflength = fread(buffer, 1, sizeof(buffer), fp);
+            cupsFileSeek(fp, rules->offset);
+	    buflength = cupsFileRead(fp, buffer, sizeof(buffer));
 	    bufoffset = rules->offset;
 	  }
 
@@ -923,8 +923,8 @@ checkrules(const char   *filename,	/* I - Filename */
 	    * Reload file buffer...
 	    */
 
-            fseek(fp, rules->offset, SEEK_SET);
-	    buflength = fread(buffer, 1, sizeof(buffer), fp);
+            cupsFileSeek(fp, rules->offset);
+	    buflength = cupsFileRead(fp, buffer, sizeof(buffer));
 	    bufoffset = rules->offset;
 	  }
 
@@ -1092,5 +1092,5 @@ patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.11.2.8 2003/01/24 14:44:10 mike Exp $".
+ * End of "$Id: type.c,v 1.11.2.9 2003/03/28 22:29:49 mike Exp $".
  */
