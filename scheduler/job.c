@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.94 2000/11/03 14:13:29 mike Exp $"
+ * "$Id: job.c,v 1.95 2000/11/06 16:18:12 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1079,7 +1079,7 @@ StartJob(int       id,		/* I - Job ID */
   optptr  = options;
   *optptr = '\0';
 
-  sprintf(title, "%s-%d", printer->name, current->id);
+  snprintf(title, sizeof(title), "%s-%d", printer->name, current->id);
   strcpy(copies, "1");
 
   for (attr = current->attrs->attrs; attr != NULL; attr = attr->next)
@@ -1102,7 +1102,10 @@ StartJob(int       id,		/* I - Job ID */
     else if (strcmp(attr->name, "job-name") == 0 &&
 	     (attr->value_tag == IPP_TAG_NAME ||
 	      attr->value_tag == IPP_TAG_NAMELANG))
-      strcpy(title, attr->values[0].string.text);
+    {
+      strncpy(title, attr->values[0].string.text, sizeof(title) - 1);
+      title[sizeof(title) - 1] = '\0';
+    }
     else if (attr->group_tag == IPP_TAG_JOB &&
 	     (optptr - options) < (sizeof(options) - 128))
     {
@@ -1162,10 +1165,11 @@ StartJob(int       id,		/* I - Job ID */
 	      break;
 
 	  case IPP_TAG_RESOLUTION :
-	      sprintf(optptr, "%dx%d%s", attr->values[i].resolution.xres,
-		      attr->values[i].resolution.yres,
-		      attr->values[i].resolution.units == IPP_RES_PER_INCH ?
-			  "dpi" : "dpc");
+	      snprintf(optptr, sizeof(optptr), "%dx%d%s",
+	               attr->values[i].resolution.xres,
+		       attr->values[i].resolution.yres,
+		       attr->values[i].resolution.units == IPP_RES_PER_INCH ?
+			   "dpi" : "dpc");
 	      break;
 
           case IPP_TAG_STRING :
@@ -1212,8 +1216,8 @@ StartJob(int       id,		/* I - Job ID */
   */
 
   sprintf(jobid, "%d", current->id);
-  sprintf(filename, "%s/d%05d-%03d", RequestRoot, current->id,
-          current->current_file + 1);
+  snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
+           current->id, current->current_file + 1);
 
   argv[0] = printer->name;
   argv[1] = jobid;
@@ -1233,26 +1237,27 @@ StartJob(int       id,		/* I - Job ID */
 
   attr = ippFindAttribute(current->attrs, "attributes-natural-language",
                           IPP_TAG_LANGUAGE);
-  sprintf(language, "LANG=%s", attr->values[0].string.text);
+  snprintf(language, sizeof(language), "LANG=%s", attr->values[0].string.text);
 
   attr = ippFindAttribute(current->attrs, "document-format",
                           IPP_TAG_MIMETYPE);
   if (attr != NULL &&
       (optptr = strstr(attr->values[0].string.text, "charset=")) != NULL)
-    sprintf(charset, "CHARSET=%s", optptr + 8);
+    snprintf(charset, sizeof(charset), "CHARSET=%s", optptr + 8);
   else
   {
     attr = ippFindAttribute(current->attrs, "attributes-charset",
 	                    IPP_TAG_CHARSET);
-    sprintf(charset, "CHARSET=%s", attr->values[0].string.text);
+    snprintf(charset, sizeof(charset), "CHARSET=%s",
+             attr->values[0].string.text);
   }
 
-  sprintf(content_type, "CONTENT_TYPE=%s/%s",
-          current->filetypes[current->current_file]->super,
-          current->filetypes[current->current_file]->type);
+  snprintf(content_type, sizeof(content_type), "CONTENT_TYPE=%s/%s",
+           current->filetypes[current->current_file]->super,
+           current->filetypes[current->current_file]->type);
   snprintf(device_uri, sizeof(device_uri), "DEVICE_URI=%s", printer->device_uri);
   snprintf(ppd, sizeof(ppd), "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
-  sprintf(printer_name, "PRINTER=%s", printer->name);
+  snprintf(printer_name, sizeof(printer_name), "PRINTER=%s", printer->name);
   snprintf(cache, sizeof(cache), "RIP_MAX_CACHE=%s", RIPCache);
   snprintf(root, sizeof(root), "CUPS_SERVERROOT=%s", ServerRoot);
   snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
@@ -1301,8 +1306,8 @@ StartJob(int       id,		/* I - Job ID */
     LogMessage(L_ERROR, "Unable to create job status pipes - %s.",
 	       strerror(errno));
     StopPrinter(printer);
-    sprintf(printer->state_message, "Unable to create status pipes - %s.",
-            strerror(errno));
+    snprintf(printer->state_message, sizeof(printer->state_message),
+             "Unable to create status pipes - %s.", strerror(errno));
     return;
   }
 
@@ -1328,9 +1333,13 @@ StartJob(int       id,		/* I - Job ID */
       argv[6] = NULL;
 
     if (filters[i].filter[0] != '/')
-      sprintf(command, "%s/filter/%s", ServerBin, filters[i].filter);
+      snprintf(command, sizeof(command), "%s/filter/%s", ServerBin,
+               filters[i].filter);
     else
-      strcpy(command, filters[i].filter);
+    {
+      strncpy(command, filters[i].filter, sizeof(command) - 1);
+      command[sizeof(command) - 1] = '\0';
+    }
 
     if (i < (num_filters - 1) ||
 	strncmp(printer->device_uri, "file:", 5) != 0)
@@ -1361,8 +1370,9 @@ StartJob(int       id,		/* I - Job ID */
       LogMessage(L_ERROR, "Unable to start filter \"%s\" - %s.",
                  filters[i].filter, strerror(errno));
       StopPrinter(current->printer);
-      sprintf(printer->state_message, "Unable to start filter \"%s\" - %s.",
-              filters[i].filter, strerror(errno));
+      snprintf(printer->state_message, sizeof(printer->state_message),
+               "Unable to start filter \"%s\" - %s.",
+               filters[i].filter, strerror(errno));
       return;
     }
     else
@@ -1384,7 +1394,7 @@ StartJob(int       id,		/* I - Job ID */
   if (strncmp(printer->device_uri, "file:", 5) != 0)
   {
     sscanf(printer->device_uri, "%254[^:]", method);
-    sprintf(command, "%s/backend/%s", ServerBin, method);
+    snprintf(command, sizeof(command), "%s/backend/%s", ServerBin, method);
 
     argv[0] = printer->device_uri;
     if (num_filters)
@@ -1408,8 +1418,8 @@ StartJob(int       id,		/* I - Job ID */
       LogMessage(L_ERROR, "Unable to start backend \"%s\" - %s.",
                  method, strerror(errno));
       StopPrinter(current->printer);
-      sprintf(printer->state_message, "Unable to start backend \"%s\" - %s.",
-              method, strerror(errno));
+      snprintf(printer->state_message, sizeof(printer->state_message),
+               "Unable to start backend \"%s\" - %s.", method, strerror(errno));
       return;
     }
     else
@@ -2579,5 +2589,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.94 2000/11/03 14:13:29 mike Exp $".
+ * End of "$Id: job.c,v 1.95 2000/11/06 16:18:12 mike Exp $".
  */

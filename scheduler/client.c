@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.74 2000/11/03 14:13:28 mike Exp $"
+ * "$Id: client.c,v 1.75 2000/11/06 16:18:11 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -517,7 +517,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
             con->uri[strlen(con->uri) - 4] = '\0';	/* Drop ".ppd" */
 
             if ((p = FindPrinter(con->uri + 10)) != NULL)
-	      sprintf(con->uri, "/ppd/%s.ppd", p->name);
+	      snprintf(con->uri, sizeof(con->uri), "/ppd/%s.ppd", p->name);
 	    else
 	    {
 	      if (!SendError(con, HTTP_NOT_FOUND))
@@ -609,7 +609,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      if (type == NULL)
 	        strcpy(line, "text/plain");
 	      else
-	        sprintf(line, "%s/%s", type->super, type->type);
+	        snprintf(line, sizeof(line), "%s/%s", type->super, type->type);
 
               if (!SendFile(con, HTTP_OK, filename, line, &filestats))
 	      {
@@ -777,7 +777,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	    if (type == NULL)
 	      strcpy(line, "text/plain");
 	    else
-	      sprintf(line, "%s/%s", type->super, type->type);
+	      snprintf(line, sizeof(line), "%s/%s", type->super, type->type);
 
             if (!SendHeader(con, HTTP_OK, line))
 	    {
@@ -1464,7 +1464,10 @@ decode_auth(client_t *con)		/* I - Client to decode to */
       s ++;
 
     if ((username = FindCert(s)) != NULL)
-      strcpy(con->username, username);
+    {
+      strncpy(con->username, username, sizeof(con->username) - 1);
+      con->username[sizeof(con->username) - 1] = '\0';
+    }
   }
   else if (strncmp(s, "Digest", 5) == 0)
   {
@@ -1656,7 +1659,8 @@ pipe_command(client_t *con,	/* I - Client connection */
   * Setup the environment variables as needed...
   */
 
-  sprintf(lang, "LANG=%s", con->language ? con->language->language : "C");
+  snprintf(lang, sizeof(lang), "LANG=%s",
+           con->language ? con->language->language : "C");
   sprintf(ipp_port, "IPP_PORT=%d", ntohs(con->http.hostaddr.sin_port));
   sprintf(server_port, "SERVER_PORT=%d", ntohs(con->http.hostaddr.sin_port));
   snprintf(server_name, sizeof(server_name), "SERVER_NAME=%s", ServerName);
@@ -1807,5 +1811,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.74 2000/11/03 14:13:28 mike Exp $".
+ * End of "$Id: client.c,v 1.75 2000/11/06 16:18:11 mike Exp $".
  */

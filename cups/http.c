@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.68 2000/11/03 14:13:26 mike Exp $"
+ * "$Id: http.c,v 1.69 2000/11/06 16:18:09 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1219,9 +1219,9 @@ httpGetDateString(time_t t)		/* I - UNIX time */
 
 
   tdate = gmtime(&t);
-  sprintf(datetime, "%s, %02d %s %d %02d:%02d:%02d GMT",
-          days[tdate->tm_wday], tdate->tm_mday, months[tdate->tm_mon],
-	  tdate->tm_year + 1900, tdate->tm_hour, tdate->tm_min, tdate->tm_sec);
+  snprintf(datetime, sizeof(datetime), "%s, %02d %s %d %02d:%02d:%02d GMT",
+           days[tdate->tm_wday], tdate->tm_mday, months[tdate->tm_mon],
+	   tdate->tm_year + 1900, tdate->tm_hour, tdate->tm_min, tdate->tm_sec);
 
   return (datetime);
 }
@@ -1668,5 +1668,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.68 2000/11/03 14:13:26 mike Exp $".
+ * End of "$Id: http.c,v 1.69 2000/11/06 16:18:09 mike Exp $".
  */

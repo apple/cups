@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.19 2000/04/19 15:18:55 mike Exp $"
+ * "$Id: classes.c,v 1.20 2000/11/06 16:18:11 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -58,8 +58,8 @@ AddClass(const char *name)	/* I - Name of class */
   if ((c = AddPrinter(name)) != NULL)
   {
     c->type = CUPS_PRINTER_CLASS;
-    sprintf(c->uri, "ipp://%s:%d/classes/%s", ServerName,
-            ntohs(Listeners[0].address.sin_port), name);
+    snprintf(c->uri, sizeof(c->uri), "ipp://%s:%d/classes/%s", ServerName,
+             ntohs(Listeners[0].address.sin_port), name);
     strcpy(c->more_info, c->uri);
     SetPrinterAttrs(c);
   }
@@ -299,7 +299,7 @@ LoadAllClasses(void)
   * Open the classes.conf file...
   */
 
-  sprintf(line, "%s/classes.conf", ServerRoot);
+  snprintf(line, sizeof(line), "%s/classes.conf", ServerRoot);
   if ((fp = fopen(line, "r")) == NULL)
     return;
 
@@ -431,7 +431,7 @@ LoadAllClasses(void)
       while (isspace(*value))
         value ++;
 
-      strcpy(p->state_message, value);
+      strncpy(p->state_message, value, sizeof(p->state_message) - 1);
     }
     else if (strcmp(name, "Accepting") == 0)
     {
@@ -478,7 +478,7 @@ SaveAllClasses(void)
   * Create the classes.conf file...
   */
 
-  sprintf(temp, "%s/classes.conf", ServerRoot);
+  snprintf(temp, sizeof(temp), "%s/classes.conf", ServerRoot);
   if ((fp = fopen(temp, "w")) == NULL)
   {
     LogMessage(L_ERROR, "Unable to save classes.conf - %s", strerror(errno));
@@ -549,5 +549,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.19 2000/04/19 15:18:55 mike Exp $".
+ * End of "$Id: classes.c,v 1.20 2000/11/06 16:18:11 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.78 2000/11/02 18:20:09 mike Exp $"
+ * "$Id: printers.c,v 1.79 2000/11/06 16:18:12 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -83,10 +83,10 @@ AddPrinter(const char *name)	/* I - Name of printer */
   if ((p = calloc(sizeof(printer_t), 1)) == NULL)
     return (NULL);
 
-  strcpy(p->name, name);
-  strcpy(p->hostname, ServerName);
-  sprintf(p->uri, "ipp://%s:%d/printers/%s", ServerName,
-          ntohs(Listeners[0].address.sin_port), name);
+  strncpy(p->name, name, sizeof(p->name) - 1);
+  strncpy(p->hostname, ServerName, sizeof(p->hostname) - 1);
+  snprintf(p->uri, sizeof(p->uri), "ipp://%s:%d/printers/%s", ServerName,
+           ntohs(Listeners[0].address.sin_port), name);
   strcpy(p->more_info, p->uri);
 
   p->state     = IPP_PRINTER_STOPPED;
@@ -234,12 +234,6 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
     return;
 
  /*
-  * Stop printing on this printer...
-  */
-
-  StopPrinter(p);
-
- /*
   * Remove the printer from the list...
   */
 
@@ -261,26 +255,31 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
   else
     prev->next = p->next;
 
+
  /*
-  * Write a new /etc/printcap file, and delete the dummy interface and GUI
-  * scripts to fool SGI's stupid printing tools.
+  * Stop printing on this printer...
   */
 
-  write_printcap();
+  StopPrinter(p);
+
+ /*
+  * Remove the dummy interface/icon/option files under IRIX...
+  */
 
 #ifdef __sgi
-  sprintf(filename, "/var/spool/lp/interface/%s", p->name);
+  snprintf(filename, sizeof(filename), "/var/spool/lp/interface/%s", p->name);
   unlink(filename);
 
-  sprintf(filename, "/var/spool/lp/gui_interface/ELF/%s.gui", p->name);
+  snprintf(filename, sizeof(filename), "/var/spool/lp/gui_interface/ELF/%s.gui",
+           p->name);
   unlink(filename);
 
-  sprintf(filename, "/var/spool/lp/activeicons/%s", p->name);
+  snprintf(filename, sizeof(filename), "/var/spool/lp/activeicons/%s", p->name);
   unlink(filename);
 #endif /* __sgi */
 
  /*
-  * Free all memory used...
+  * Free all memory used by the printer...
   */
 
   if (p->printers != NULL)
@@ -298,6 +297,12 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
 
   if (p == DefaultPrinter)
     DefaultPrinter = Printers;
+
+ /*
+  * Write a new /etc/printcap file...
+  */
+
+  write_printcap();
 }
 
 
@@ -391,7 +396,7 @@ LoadAllPrinters(void)
   * Open the printer.conf file...
   */
 
-  sprintf(line, "%s/printers.conf", ServerRoot);
+  snprintf(line, sizeof(line), "%s/printers.conf", ServerRoot);
   if ((fp = fopen(line, "r")) == NULL)
     return;
 
@@ -525,7 +530,7 @@ LoadAllPrinters(void)
       while (isspace(*value))
         value ++;
 
-      strcpy(p->state_message, value);
+      strncpy(p->state_message, value, sizeof(p->state_message) - 1);
     }
     else if (strcmp(name, "Accepting") == 0)
     {
@@ -598,7 +603,7 @@ SaveAllPrinters(void)
   * Create the printers.conf file...
   */
 
-  sprintf(temp, "%s/printers.conf", ServerRoot);
+  snprintf(temp, sizeof(temp), "%s/printers.conf", ServerRoot);
   if ((fp = fopen(temp, "w")) == NULL)
   {
     LogMessage(L_ERROR, "Unable to save printers.conf - %s", strerror(errno));
@@ -807,12 +812,12 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
     if (p->type & CUPS_PRINTER_CLASS)
     {
       auth_len = 8;
-      sprintf(resource, "/classes/%s", p->name);
+      snprintf(resource, sizeof(resource), "/classes/%s", p->name);
     }
     else
     {
       auth_len = 9;
-      sprintf(resource, "/printers/%s", p->name);
+      snprintf(resource, sizeof(resource), "/printers/%s", p->name);
     }
 
     for (i = NumLocations, auth = Locations; i > 0; i --, auth ++)
@@ -1002,9 +1007,10 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
         httpSeparate(p->device_uri, method, username, host, &port, resource);
 	if (port)
-	  sprintf(uri, "%s://%s:%d%s", method, host, port, resource);
+	  snprintf(uri, sizeof(uri), "%s://%s:%d%s", method, host, port,
+	           resource);
 	else
-	  sprintf(uri, "%s://%s%s", method, host, resource);
+	  snprintf(uri, sizeof(uri), "%s://%s%s", method, host, resource);
       }
       else
       {
@@ -1026,7 +1032,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
       finishings[0]  = IPP_FINISH_NONE;
       num_finishings = 1;
 
-      sprintf(filename, "%s/ppd/%s.ppd", ServerRoot, p->name);
+      snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd", ServerRoot,
+               p->name);
+
       if ((ppd = ppdOpenFile(filename)) != NULL)
       {
        /*
@@ -1176,7 +1184,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	* If we have an interface script, add a filter entry for it...
 	*/
 
-	sprintf(filename, "%s/interfaces/%s", ServerRoot, p->name);
+	snprintf(filename, sizeof(filename), "%s/interfaces/%s", ServerRoot,
+	         p->name);
 	if (access(filename, X_OK) == 0)
 	{
 	 /*
@@ -1186,7 +1195,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
                        "printer-make-and-model", NULL, "Local System V Printer");
 
-	  sprintf(filename, "*/* 0 %s/interfaces/%s", ServerRoot, p->name);
+	  snprintf(filename, sizeof(filename), "*/* 0 %s/interfaces/%s",
+	           ServerRoot, p->name);
 	  AddPrinterFilter(p, filename);
 	}
 	else
@@ -1225,7 +1235,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   * tools.
   */
 
-  sprintf(filename, "/var/spool/lp/interface/%s", p->name);
+  snprintf(filename, sizeof(filename), "/var/spool/lp/interface/%s", p->name);
   if ((fp = fopen(filename, "w")) != NULL)
   {
     fputs("#!/bin/sh\n", fp);
@@ -1247,7 +1257,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
     chmod(filename, 0755);
   }
 
-  sprintf(filename, "/var/spool/lp/member/%s", p->name);
+  snprintf(filename, sizeof(filename), "/var/spool/lp/member/%s", p->name);
   if ((fp = fopen(filename, "w")) != NULL)
   {
     fputs("/dev/null\n", fp);
@@ -1255,7 +1265,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
     chmod(filename, 0644);
   }
 
-  sprintf(filename, "/var/spool/lp/gui_interface/ELF/%s.gui", p->name);
+  snprintf(filename, sizeof(filename), "/var/spool/lp/gui_interface/ELF/%s.gui", p->name);
   if ((fp = fopen(filename, "w")) != NULL)
   {
     fputs("#!/bin/sh\n", fp);
@@ -1264,7 +1274,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
     chmod(filename, 0755);
   }
 
-  sprintf(filename, "/var/spool/lp/activeicons/%s", p->name);
+  snprintf(filename, sizeof(filename), "/var/spool/lp/activeicons/%s", p->name);
   if ((fp = fopen(filename, "w")) != NULL)
   {
     fputs("#!/bin/sh\n", fp);
@@ -1577,5 +1587,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.78 2000/11/02 18:20:09 mike Exp $".
+ * End of "$Id: printers.c,v 1.79 2000/11/06 16:18:12 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: template.c,v 1.20 2000/09/26 13:45:26 mike Exp $"
+ * "$Id: template.c,v 1.21 2000/11/06 16:18:09 mike Exp $"
  *
  *   CGI template function.
  *
@@ -110,14 +110,14 @@ cgiCopyTemplateLang(FILE       *out,		/* I - Output file */
   * See if we have a template file for this language...
   */
 
-  sprintf(filename, "%s/%s/%s", directory, locale, tmpl);
+  snprintf(filename, sizeof(filename), "%s/%s/%s", directory, locale, tmpl);
   if (access(filename, 0))
   {
     locale[2] = '\0';
 
-    sprintf(filename, "%s/%s/%s", directory, locale, tmpl);
+    snprintf(filename, sizeof(filename), "%s/%s/%s", directory, locale, tmpl);
     if (access(filename, 0))
-      sprintf(filename, "%s/%s", directory, tmpl);
+      snprintf(filename, sizeof(filename), "%s/%s", directory, tmpl);
   }
 
  /*
@@ -285,7 +285,7 @@ cgi_copy(FILE *out,		/* I - Output file */
 	  *nameptr++ = '\0';
 	  if ((value = cgiGetArray(name, atoi(nameptr) - 1)) == NULL)
           {
-	    sprintf(outval, "{%s}", name);
+	    snprintf(outval, sizeof(outval), "{%s}", name);
 	    outptr = outval;
 	  }
 	  else
@@ -293,7 +293,7 @@ cgi_copy(FILE *out,		/* I - Output file */
 	}
 	else if ((value = cgiGetArray(name, element)) == NULL)
         {
-	  sprintf(outval, "{%s}", name);
+	  snprintf(outval, sizeof(outval), "{%s}", name);
 	  outptr = outval;
 	}
 	else
@@ -389,7 +389,7 @@ cgi_copy(FILE *out,		/* I - Output file */
 	      }
             }
 	    else if ((innerval = cgiGetArray(innername, element)) == NULL)
-	      sprintf(s, "{%s}", innername);
+	      snprintf(s, sizeof(s), "{%s}", innername);
 	    else
 	    {
 	      strncpy(s, innerval, sizeof(compare) - (s - compare) - 1);
@@ -495,5 +495,5 @@ cgi_puts(const char *s,
 
 
 /*
- * End of "$Id: template.c,v 1.20 2000/09/26 13:45:26 mike Exp $".
+ * End of "$Id: template.c,v 1.21 2000/11/06 16:18:09 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.5 2000/11/03 14:13:30 mike Exp $"
+ * "$Id: mime.c,v 1.6 2000/11/06 16:18:12 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -132,6 +132,9 @@ mimeMerge(mime_t     *mime,	/* I - MIME database to add to */
   filename[sizeof(filename) - 1] = '\0';
 
   pathsep = filename + strlen(filename);
+  if ((pathsep - filename + 9) > sizeof(filename))
+    return (NULL);
+
   if (pathsep == filename ||
       (pathsep[-1] != '/' && pathsep[-1] != '\\'))
   {
@@ -162,6 +165,9 @@ mimeMerge(mime_t     *mime,	/* I - MIME database to add to */
     * Load a mime.types file...
     */
 
+    if ((pathsep - filename + strlen(dent.cFileName)) >= sizeof(filename))
+      continue;
+
     strcpy(pathsep, dent.cFileName);
     load_types(mime, filename);
   }
@@ -183,6 +189,9 @@ mimeMerge(mime_t     *mime,	/* I - MIME database to add to */
    /*
     * Load a mime.convs file...
     */
+
+    if ((pathsep - filename + strlen(dent.cFileName)) >= sizeof(filename))
+      continue;
 
     strcpy(pathsep, dent.cFileName);
     load_convs(mime, filename);
@@ -559,5 +568,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.5 2000/11/03 14:13:30 mike Exp $".
+ * End of "$Id: mime.c,v 1.6 2000/11/06 16:18:12 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.19 2000/09/18 16:16:09 mike Exp $"
+ * "$Id: emit.c,v 1.20 2000/11/06 16:18:09 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -275,8 +275,9 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
       * Send DSC comments with option...
       */
 
-      sprintf(buf, "%%%%BeginFeature: %s %s\n",
-              ((ppd_option_t *)choices[i]->option)->keyword, choices[i]->choice);
+      snprintf(buf, sizeof(buf), "%%%%BeginFeature: %s %s\n",
+               ((ppd_option_t *)choices[i]->option)->keyword,
+	       choices[i]->choice);
 
       if (write(fd, buf, strlen(buf)) < 1)
       {
@@ -331,5 +332,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c,v 1.19 2000/09/18 16:16:09 mike Exp $".
+ * End of "$Id: emit.c,v 1.20 2000/11/06 16:18:09 mike Exp $".
  */

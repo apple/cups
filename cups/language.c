@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.18 2000/11/03 14:13:26 mike Exp $"
+ * "$Id: language.c,v 1.19 2000/11/06 16:18:10 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -263,7 +263,10 @@ cupsLangGet(const char *language) /* I - Language or locale */
   */
 
   if (fp == NULL)
-    strcpy(line, lang_default[0]);
+  {
+    strncpy(line, lang_default[0], sizeof(line) - 1);
+    line[sizeof(line) - 1] = '\0';
+  }
   else if (fgets(line, sizeof(line), fp) == NULL)
   {
    /*
@@ -320,7 +323,8 @@ cupsLangGet(const char *language) /* I - Language or locale */
   */
 
   lang->used ++;
-  strcpy(lang->language, langname);
+  strncpy(lang->language, langname, sizeof(lang->language) - 1);
+  lang->language[sizeof(lang->language) - 1] = '\0';
 
   for (i = 0; i < (sizeof(lang_encodings) / sizeof(lang_encodings[0])); i ++)
     if (strcmp(lang_encodings[i], line) == 0)
@@ -347,7 +351,8 @@ cupsLangGet(const char *language) /* I - Language or locale */
       if (lang_default[count] == NULL)
         break;
 
-      strcpy(line, lang_default[count]);
+      strncpy(line, lang_default[count], sizeof(line) - 1);
+      /* Already set last byte to 0 above... */
     }
     else if (fgets(line, sizeof(line), fp) == NULL)
       break;
@@ -398,5 +403,5 @@ cupsLangGet(const char *language) /* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.18 2000/11/03 14:13:26 mike Exp $".
+ * End of "$Id: language.c,v 1.19 2000/11/06 16:18:10 mike Exp $".
  */

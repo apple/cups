@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.27 2000/10/13 03:29:19 mike Exp $"
+ * "$Id: lpstat.c,v 1.28 2000/11/06 16:18:13 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -1607,7 +1607,8 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
                 	"requested-attributes",
 		        sizeof(jattrs) / sizeof(jattrs[0]), NULL, jattrs);
 
-          sprintf(printer_uri, "ipp://%s/printers/%s", http->hostname, printer);
+          snprintf(printer_uri, sizeof(printer_uri), "ipp://%s/printers/%s",
+	           http->hostname, printer);
 	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
 	               "printer-uri", NULL, printer_uri);
 
@@ -1742,5 +1743,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.27 2000/10/13 03:29:19 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.28 2000/11/06 16:18:13 mike Exp $".
  */

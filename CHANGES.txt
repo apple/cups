@@ -51,12 +51,28 @@ CHANGES IN CUPS V1.1.5
 	- ippDelete() could free the character set string
 	  multiple times in name-with-language and
 	  text-with-language attributes.
-	- The scheduler's DeletePrinter() function would
-	  access freed memory under IRIX.
+	- The scheduler would access freed memory right after
+	  freeing it (for debug messages); these parts of the
+	  code have been reordered to avoid this situation
+	  which was causing sporatic errors and crashes.
 	- The ppdClose() function didn't free all of the strings
 	  in the ppd_file_t structure.
 	- The LoadAllJobs() function in the scheduler did not
 	  close the spool directory.
+	- Changed all sprintf's that use string formats to
+	  snprintf's, even if the destination buffer is
+	  larger than the source string(s); this protects
+	  against buffer overflows caused outside of CUPS...
+	- Changed all strcpy's to strncpy's between local and
+	  global variables, even if the destination buffer is
+	  larger than the source string; this protects
+	  against buffer overflows caused outside of CUPS...
+	- The CUPS certificate functions didn't use the
+	  CUPS_SERVERROOT environment variable when set.
+	- The directory services code was copying instead of
+	  comparing the remote printer info, resulting in
+	  unnecessary updates of the printer attributes for
+	  remote printers.
 
 
 CHANGES IN CUPS v1.1.4

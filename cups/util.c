@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.65 2000/11/03 14:13:27 mike Exp $"
+ * "$Id: util.c,v 1.66 2000/11/06 16:18:10 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -572,10 +572,10 @@ cupsGetDefault(void)
   * Next check to see if we have a client.conf file...
   */
 
-  if ((var = getenv("CUPS_SERVERROOT")) != NULL)
-    snprintf(line, sizeof(line), "%s/client.conf", var);
-  else
-    strcpy(line, CUPS_SERVERROOT "/client.conf");
+  if ((var = getenv("CUPS_SERVERROOT")) == NULL)
+    var = CUPS_SERVERROOT;
+
+  snprintf(line, sizeof(line), "%s/client.conf", var);
 
   if ((fp = fopen(line, "r")) != NULL)
   {
@@ -777,7 +777,8 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 	  * Found a printer!
 	  */
 
-	  strcpy(printer, resource + 10);
+	  strncpy(printer, resource + 10, sizeof(printer) - 1);
+	  printer[sizeof(printer) - 1] = '\0';
 	  break;
 	}
       }
@@ -791,7 +792,8 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 
       httpSeparate(attr->values[0].string.text, method, username, hostname,
 	           &port, resource);
-      strcpy(printer, strrchr(resource, '/') + 1);
+      strncpy(printer, strrchr(resource, '/') + 1, sizeof(printer) - 1);
+      printer[sizeof(printer) - 1] = '\0';
     }
 
     ippDelete(response);
@@ -1426,10 +1428,11 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
   return (0);
 #else
-  int	pid;			/* Current process ID */
-  FILE	*fp;			/* Certificate file */
-  char	filename[1024],		/* Certificate filename */
-	certificate[33];	/* Certificate string */
+  int		pid;		/* Current process ID */
+  FILE		*fp;		/* Certificate file */
+  char		filename[1024],	/* Certificate filename */
+		certificate[33];/* Certificate string */
+  const char	*root;		/* Server root directory */
 
 
  /*
@@ -1445,10 +1448,16 @@ cups_local_auth(http_t *http)	/* I - Connection */
   * try the root certificate...
   */
 
+  if ((root = getenv("CUPS_SERVERROOT")) == NULL)
+    root = CUPS_SERVERROOT;
+
   pid = getpid();
-  sprintf(filename, CUPS_SERVERROOT "/certs/%d", pid);
+  snprintf(filename, sizeof(filename), "%s/certs/%d", root, pid);
   if ((fp = fopen(filename, "r")) == NULL && pid > 0)
-    fp = fopen(CUPS_SERVERROOT "/certs/0", "r");
+  {
+    snprintf(filename, sizeof(filename), "%s/certs/0", root);
+    fp = fopen(filename, "r");
+  }
 
   if (fp == NULL)
     return (0);
@@ -1464,7 +1473,7 @@ cups_local_auth(http_t *http)	/* I - Connection */
   * Set the authorization string and return...
   */
 
-  sprintf(authstring, "Local %s", certificate);
+  snprintf(authstring, sizeof(authstring), "Local %s", certificate);
 
   return (1);
 #endif /* WIN32 || __EMX__ */
@@ -1472,5 +1481,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.65 2000/11/03 14:13:27 mike Exp $".
+ * End of "$Id: util.c,v 1.66 2000/11/06 16:18:10 mike Exp $".
  */

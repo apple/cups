@@ -1,5 +1,5 @@
 /*
- * "$Id: cert.c,v 1.4 2000/07/24 17:48:21 mike Exp $"
+ * "$Id: cert.c,v 1.5 2000/11/06 16:18:11 mike Exp $"
  *
  *   Authentication certificate routines for the Common UNIX
  *   Printing System (CUPS).
@@ -79,7 +79,7 @@ AddCert(int        pid,			/* I - Process ID */
   * (or root and SystemGroup for PID == 0)...
   */
 
-  sprintf(filename, "%s/certs/%d", ServerRoot, pid);
+  snprintf(filename, sizeof(filename), "%s/certs/%d", ServerRoot, pid);
 
   if ((fp = fopen(filename, "w")) == NULL)
   {
@@ -156,7 +156,7 @@ DeleteCert(int pid)			/* I - Process ID */
       * Delete the file and return...
       */
 
-      sprintf(filename, "%s/certs/%d", ServerRoot, pid);
+      snprintf(filename, sizeof(filename), "%s/certs/%d", ServerRoot, pid);
       unlink(filename);
       return;
     }
@@ -185,7 +185,7 @@ DeleteAllCerts(void)
     * Delete the file...
     */
 
-    sprintf(filename, "%s/certs/%d", ServerRoot, cert->pid);
+    snprintf(filename, sizeof(filename), "%s/certs/%d", ServerRoot, cert->pid);
     unlink(filename);
 
    /*
@@ -271,5 +271,5 @@ InitCerts(void)
 
 
 /*
- * End of "$Id: cert.c,v 1.4 2000/07/24 17:48:21 mike Exp $".
+ * End of "$Id: cert.c,v 1.5 2000/11/06 16:18:11 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lppasswd.c,v 1.7 2000/07/20 23:20:03 mike Exp $"
+ * "$Id: lppasswd.c,v 1.8 2000/11/06 16:18:13 mike Exp $"
  *
  *   MD5 password program for the Common UNIX Printing System (CUPS).
  *
@@ -91,16 +91,11 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Find the server directory...
   */
 
-  if ((root = getenv("CUPS_SERVERROOT")) != NULL)
-  {
-    snprintf(passwdmd5, sizeof(passwdmd5), "%s/passwd.md5", root);
-    snprintf(passwdold, sizeof(passwdold), "%s/passwd.old", root);
-  }
-  else
-  {
-    strcpy(passwdmd5, CUPS_SERVERROOT "/passwd.md5");
-    strcpy(passwdold, CUPS_SERVERROOT "/passwd.old");
-  }
+  if ((root = getenv("CUPS_SERVERROOT")) == NULL)
+    root = CUPS_SERVERROOT;
+
+  snprintf(passwdmd5, sizeof(passwdmd5), "%s/passwd.md5", root);
+  snprintf(passwdold, sizeof(passwdold), "%s/passwd.old", root);
 
  /*
   * Find the default system group: "sys", "system", or "root"...
@@ -306,7 +301,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       return (0);
     }
 
-    strcpy(line, passwd);
+    strncpy(line, passwd, sizeof(line) - 1);
+    line[sizeof(line) - 1] = '\0';
       
     if ((passwd  = cupsGetPassword("Enter password again:")) == NULL)
     {
@@ -413,5 +409,5 @@ usage(FILE *fp)		/* I - File to send usage to */
 
 
 /*
- * End of "$Id: lppasswd.c,v 1.7 2000/07/20 23:20:03 mike Exp $".
+ * End of "$Id: lppasswd.c,v 1.8 2000/11/06 16:18:13 mike Exp $".
  */

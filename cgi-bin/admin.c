@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.17 2000/09/27 15:04:38 mike Exp $"
+ * "$Id: admin.c,v 1.18 2000/11/06 16:18:08 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -699,7 +699,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
       int		bytes;			/* Number of bytes */
 
 
-      sprintf(uri, "/printers/%s.ppd", name);
+      snprintf(uri, sizeof(uri), "/printers/%s.ppd", name);
       cupsTempFile(filename, sizeof(filename));
 
       if (httpGet(http, uri))
@@ -847,7 +847,8 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME, "ppd-name",
                  NULL, cgiGetVariable("PPD_NAME"));
 
-    strcpy(uri, cgiGetVariable("DEVICE_URI"));
+    strncpy(uri, cgiGetVariable("DEVICE_URI"), sizeof(uri) - 1);
+    uri[sizeof(uri) - 1] = '\0';
     if (strncmp(uri, "serial:", 7) == 0)
     {
      /*
@@ -857,9 +858,10 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
       if ((uriptr = strchr(uri, '?')) == NULL)
         uriptr = uri + strlen(uri);
 
-      sprintf(uriptr, "?baud=%s+bits=%s+parity=%s+flow=%s",
-              cgiGetVariable("BAUDRATE"), cgiGetVariable("BITS"),
-	      cgiGetVariable("PARITY"), cgiGetVariable("FLOW"));
+      snprintf(uriptr, sizeof(uri) - (uriptr - uri),
+               "?baud=%s+bits=%s+parity=%s+flow=%s",
+               cgiGetVariable("BAUDRATE"), cgiGetVariable("BITS"),
+	       cgiGetVariable("PARITY"), cgiGetVariable("FLOW"));
     }
 
     ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_URI, "device-uri",
@@ -1126,7 +1128,8 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
         * Get default option name...
 	*/
 
-        strcpy(keyword, line + 8);
+        strncpy(keyword, line + 8, sizeof(keyword) - 1);
+	keyword[sizeof(keyword) - 1] = '\0';
 
 	for (keyptr = keyword; *keyptr; keyptr ++)
 	  if (*keyptr == ':' || isspace(*keyptr))
@@ -1578,5 +1581,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.17 2000/09/27 15:04:38 mike Exp $".
+ * End of "$Id: admin.c,v 1.18 2000/11/06 16:18:08 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.12 2000/09/07 12:35:13 mike Exp $"
+ * "$Id: lpq.c,v 1.13 2000/11/06 16:18:08 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -378,7 +378,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 	strcpy(rankstr, "active");
       else
       {
-	sprintf(rankstr, "%d%s", rank, ranks[rank % 10]);
+	snprintf(rankstr, sizeof(rankstr), "%d%s", rank, ranks[rank % 10]);
 	rank ++;
       }
 
@@ -468,7 +468,7 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
 
-  sprintf(uri, "ipp://localhost/printers/%s", dest);
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", dest);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, uri);
 
@@ -513,5 +513,5 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpq.c,v 1.12 2000/09/07 12:35:13 mike Exp $".
+ * End of "$Id: lpq.c,v 1.13 2000/11/06 16:18:08 mike Exp $".
  */

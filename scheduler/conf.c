@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.60 2000/11/03 14:13:28 mike Exp $"
+ * "$Id: conf.c,v 1.61 2000/11/06 16:18:11 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -339,19 +339,22 @@ ReadConfiguration(void)
   if (DocumentRoot[0] != '/')
   {
     snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, DocumentRoot);
-    strcpy(DocumentRoot, directory);
+    strncpy(DocumentRoot, directory, sizeof(DocumentRoot) - 1);
+    DocumentRoot[sizeof(DocumentRoot) - 1] = '\0';
   }
 
   if (RequestRoot[0] != '/')
   {
     snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, RequestRoot);
-    strcpy(RequestRoot, directory);
+    strncpy(RequestRoot, directory, sizeof(RequestRoot) - 1);
+    RequestRoot[sizeof(RequestRoot) - 1] = '\0';
   }
 
   if (ServerBin[0] != '/')
   {
     snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, ServerBin);
-    strcpy(ServerBin, directory);
+    strncpy(ServerBin, directory, sizeof(ServerBin) - 1);
+    ServerBin[sizeof(ServerBin) - 1] = '\0';
   }
 
 #ifdef HAVE_VSYSLOG
@@ -1304,7 +1307,7 @@ read_location(FILE *fp,		/* I - Configuration file */
       else if (strcasecmp(value, "system") == 0)
       {
         loc->level = AUTH_GROUP;
-	strcpy(loc->group_name, SystemGroup);
+	strncpy(loc->group_name, SystemGroup, sizeof(loc->group_name) - 1);
       }
       else
         LogMessage(L_WARN, "Unknown authorization class %s on line %d.",
@@ -1359,7 +1362,8 @@ get_address(char               *value,		/* I - Value string */
 	  * Hostname is a port number...
 	  */
 
-	  strcpy(portname, hostname);
+	  strncpy(portname, hostname, sizeof(portname) - 1);
+	  portname[sizeof(portname) - 1] = '\0';
 	  hostname[0] = '\0';
 	}
         else
@@ -1416,5 +1420,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.60 2000/11/03 14:13:28 mike Exp $".
+ * End of "$Id: conf.c,v 1.61 2000/11/06 16:18:11 mike Exp $".
  */

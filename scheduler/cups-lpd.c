@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.14 2000/11/03 14:13:28 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.15 2000/11/06 16:18:12 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -531,13 +531,16 @@ recv_print_job(const char    *dest,	/* I - Destination */
 	switch (line[0])
 	{
 	  case 'J' : /* Job name */
-	      strcpy(title, line + 1);
+	      strncpy(title, line + 1, sizeof(title) - 1);
+	      title[sizeof(title) - 1] = '\0';
 	      break;
 	  case 'N' : /* Document name */
-	      strcpy(docname, line + 1);
+	      strncpy(docname, line + 1, sizeof(docname) - 1);
+	      docname[sizeof(docname) - 1] = '\0';
 	      break;
 	  case 'P' : /* User identification */
-	      strcpy(user, line + 1);
+	      strncpy(user, line + 1, sizeof(user) - 1);
+	      user[sizeof(user) - 1] = '\0';
 	      break;
 	  case 'L' : /* Print banner page */
 	      banner = 1;
@@ -731,7 +734,7 @@ send_state(const char *dest,		/* I - Destination */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
 
-  sprintf(uri, "ipp://localhost/printers/%s", queue);
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", queue);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, uri);
 
@@ -916,7 +919,7 @@ send_state(const char *dest,		/* I - Destination */
 	strcpy(rankstr, "active");
       else
       {
-	sprintf(rankstr, "%d%s", rank, ranks[rank % 10]);
+	snprintf(rankstr, sizeof(rankstr), "%d%s", rank, ranks[rank % 10]);
 	rank ++;
       }
 
@@ -1067,5 +1070,5 @@ remove_jobs(const char *dest,		/* I - Destination */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.14 2000/11/03 14:13:28 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.15 2000/11/06 16:18:12 mike Exp $".
  */

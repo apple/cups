@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.15 2000/11/03 14:13:30 mike Exp $"
+ * "$Id: log.c,v 1.16 2000/11/06 16:18:12 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -91,13 +91,13 @@ GetDateTime(time_t t)		/* I - Time value */
 
   date = localtime(&t);
 
-  sprintf(s, "[%02d/%s/%04d:%02d:%02d:%02d %+03ld%02ld]",
-	  date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
-	  date->tm_hour, date->tm_min, date->tm_sec,
+  snprintf(s, sizeof(s), "[%02d/%s/%04d:%02d:%02d:%02d %+03ld%02ld]",
+	   date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
+	   date->tm_hour, date->tm_min, date->tm_sec,
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
-          -date->tm_gmtoff / 3600, (date->tm_gmtoff / 60) % 60);
+           -date->tm_gmtoff / 3600, (date->tm_gmtoff / 60) % 60);
 #else
-          -timezone / 3600, (timezone / 60) % 60);
+           -timezone / 3600, (timezone / 60) % 60);
 #endif /* __*BSD__ */
  
   return (s);
@@ -122,7 +122,8 @@ LogMessage(int        level,	/* I - Log level */
 		  'E',
 		  'W',
 		  'I',
-		  'D'
+		  'D',
+		  'd'
 		};
 #ifdef HAVE_VSYSLOG
   static int	syslevels[] =	/* SYSLOG levels... */
@@ -178,9 +179,6 @@ LogMessage(int        level,	/* I - Log level */
   va_start(ap, message);
   len = vsnprintf(line, sizeof(line), message, ap);
   va_end(ap);
-
-  if (len >= sizeof(line))
-    fprintf(stderr, "Error: len = %d from vsnprintf!\n", len);
 
  /*
   * Then a newline...
@@ -390,5 +388,5 @@ check_log_file(FILE       **log,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c,v 1.15 2000/11/03 14:13:30 mike Exp $".
+ * End of "$Id: log.c,v 1.16 2000/11/06 16:18:12 mike Exp $".
  */

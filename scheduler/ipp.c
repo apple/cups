@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.104 2000/11/03 14:13:29 mike Exp $"
+ * "$Id: ipp.c,v 1.105 2000/11/06 16:18:12 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1077,7 +1077,10 @@ add_printer(client_t        *con,	/* I - Client connection */
   */
 
   if (con->filename[0])
-    strcpy(srcfile, con->filename);
+  {
+    strncpy(srcfile, con->filename, sizeof(srcfile) - 1);
+    srcfile[sizeof(srcfile) - 1] = '\0';
+  }
   else if ((attr = ippFindAttribute(con->request, "ppd-name", IPP_TAG_NAME)) != NULL)
     snprintf(srcfile, sizeof(srcfile), "%s/model/%s", DataDir,
              attr->values[0].string.text);
@@ -1710,15 +1713,15 @@ create_job(client_t        *con,	/* I - Client connection */
   if (dtype == CUPS_PRINTER_CLASS)
   {
     printer = FindClass(dest);
-    sprintf(printer_uri, "http://%s:%d/classes/%s", ServerName,
-	    ntohs(con->http.hostaddr.sin_port), dest);
+    snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/classes/%s",
+             ServerName, ntohs(con->http.hostaddr.sin_port), dest);
   }
   else
   {
     printer = FindPrinter(dest);
 
-    sprintf(printer_uri, "http://%s:%d/printers/%s", ServerName,
-	    ntohs(con->http.hostaddr.sin_port), dest);
+    snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/printers/%s",
+             ServerName, ntohs(con->http.hostaddr.sin_port), dest);
   }
 
   if (!printer->accepting)
@@ -1762,13 +1765,17 @@ create_job(client_t        *con,	/* I - Client connection */
   attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME);
 
   if (con->username[0])
-    strcpy(job->username, con->username);
+  {
+    strncpy(job->username, con->username, sizeof(job->username) - 1);
+    job->username[sizeof(job->username) - 1] = '\0';
+  }
   else if (attr != NULL)
   {
     LogMessage(L_DEBUG, "create_job: requesting-user-name = \'%s\'",
                attr->values[0].string.text);
 
-    strncpy(job->username, attr->values[0].string.text, sizeof(job->username) - 1);
+    strncpy(job->username, attr->values[0].string.text,
+            sizeof(job->username) - 1);
     job->username[sizeof(job->username) - 1] = '\0';
   }
   else
@@ -1865,8 +1872,8 @@ create_job(client_t        *con,	/* I - Client connection */
   * Fill in the response info...
   */
 
-  sprintf(job_uri, "http://%s:%d/jobs/%d", ServerName,
-	  ntohs(con->http.hostaddr.sin_port), job->id);
+  snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
+	   ntohs(con->http.hostaddr.sin_port), job->id);
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL, job_uri);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
@@ -1918,7 +1925,8 @@ copy_banner(client_t   *con,	/* I - Client connection */
   if (add_file(con, job, banner->filetype))
     return;
 
-  sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
+  snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot, job->id,
+           job->num_files);
   if ((out = fopen(filename, "w")) == NULL)
   {
     LogMessage(L_ERROR, "copy_banner: Unable to create banner job file %s - %s",
@@ -2195,32 +2203,33 @@ delete_printer(client_t        *con,	/* I - Client connection */
   else
     printer = FindPrinter(dest);
 
-  CancelJobs(dest);
-  DeletePrinter(printer);
-
  /*
   * Remove any old PPD or script files...
   */
 
-  sprintf(filename, "%s/interfaces/%s", ServerRoot, dest);
+  CancelJobs(dest);
+
+  snprintf(filename, sizeof(filename), "%s/interfaces/%s", ServerRoot, dest);
   unlink(filename);
 
-  sprintf(filename, "%s/ppd/%s.ppd", ServerRoot, dest);
+  snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd", ServerRoot, dest);
   unlink(filename);
 
   if (dtype == CUPS_PRINTER_CLASS)
   {
-    SaveAllClasses();
-
     LogMessage(L_INFO, "Class \'%s\' deleted by \'%s\'.", dest,
                con->username);
+
+    DeletePrinter(printer);
+    SaveAllClasses();
   }
   else
   {
-    SaveAllPrinters();
-
     LogMessage(L_INFO, "Printer \'%s\' deleted by \'%s\'.", dest,
                con->username);
+
+    DeletePrinter(printer);
+    SaveAllPrinters();
   }
 
  /*
@@ -2360,7 +2369,10 @@ get_jobs(client_t        *con,		/* I - Client connection */
       attr->values[0].boolean)
   {
     if (con->username[0])
-      strcpy(username, con->username);
+    {
+      strncpy(username, con->username, sizeof(username) - 1);
+      username[sizeof(username) - 1] = '\0';
+    }
     else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
     {
       strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
@@ -2408,8 +2420,8 @@ get_jobs(client_t        *con,		/* I - Client connection */
     * Send the requested attributes for each job...
     */
 
-    sprintf(job_uri, "http://%s:%d/jobs/%d", ServerName,
-	    ntohs(con->http.hostaddr.sin_port), job->id);
+    snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
+	     ntohs(con->http.hostaddr.sin_port), job->id);
 
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
                  "job-more-info", NULL, job_uri);
@@ -2527,8 +2539,9 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
   * Put out the standard attributes...
   */
 
-  sprintf(job_uri, "http://%s:%d/jobs/%d", ServerName,
-	  ntohs(con->http.hostaddr.sin_port), job->id);
+  snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d",
+	   ServerName, ntohs(con->http.hostaddr.sin_port),
+	   job->id);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
 
@@ -2906,19 +2919,13 @@ hold_job(client_t        *con,	/* I - Client connection */
       attr->value_tag = IPP_TAG_KEYWORD;
       attr->values[0].string.text = strdup("indefinite");
     }
-  }
-  else
-  {
-    LogMessage(L_ERROR, "Lost the job's job-hold-until attribute!");
-    send_ipp_error(con, IPP_INTERNAL_ERROR);
-    return;
-  }
 
- /*
-  * Hold job until specified time...
-  */
+   /*
+    * Hold job until specified time...
+    */
 
-  SetJobHoldUntil(job->id, attr->values[0].string.text);
+    SetJobHoldUntil(job->id, attr->values[0].string.text);
+  }
 
   LogMessage(L_INFO, "Job %d was held by \'%s\'.", jobid, username);
 
@@ -3207,7 +3214,8 @@ print_job(client_t        *con,		/* I - Client connection */
       * Replace the document-format attribute value with the auto-typed one.
       */
 
-      sprintf(mimetype, "%s/%s", filetype->super, filetype->type);
+      snprintf(mimetype, sizeof(mimetype), "%s/%s", filetype->super,
+               filetype->type);
 
       if (format != NULL)
       {
@@ -3261,15 +3269,15 @@ print_job(client_t        *con,		/* I - Client connection */
   if (dtype == CUPS_PRINTER_CLASS)
   {
     printer = FindClass(dest);
-    sprintf(printer_uri, "http://%s:%d/classes/%s", ServerName,
-	    ntohs(con->http.hostaddr.sin_port), dest);
+    snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/classes/%s",
+             ServerName, ntohs(con->http.hostaddr.sin_port), dest);
   }
   else
   {
     printer = FindPrinter(dest);
 
-    sprintf(printer_uri, "http://%s:%d/printers/%s", ServerName,
-	    ntohs(con->http.hostaddr.sin_port), dest);
+    snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/printers/%s",
+             ServerName, ntohs(con->http.hostaddr.sin_port), dest);
   }
 
   if (!printer->accepting)
@@ -3317,7 +3325,10 @@ print_job(client_t        *con,		/* I - Client connection */
   attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME);
 
   if (con->username[0])
-    strcpy(job->username, con->username);
+  {
+    strncpy(job->username, con->username, sizeof(job->username) - 1);
+    job->username[sizeof(job->username) - 1] = '\0';
+  }
   if (attr != NULL)
   {
     LogMessage(L_DEBUG, "print_job: requesting-user-name = \'%s\'",
@@ -3413,7 +3424,8 @@ print_job(client_t        *con,		/* I - Client connection */
   if (add_file(con, job, filetype))
     return;
 
-  sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
+  snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot, job->id,
+           job->num_files);
   rename(con->filename, filename);
   con->filename[0] = '\0';
 
@@ -3449,8 +3461,8 @@ print_job(client_t        *con,		/* I - Client connection */
   * Fill in the response info...
   */
 
-  sprintf(job_uri, "http://%s:%d/jobs/%d", ServerName,
-	  ntohs(con->http.hostaddr.sin_port), job->id);
+  snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
+	   ntohs(con->http.hostaddr.sin_port), job->id);
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL, job_uri);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
@@ -4047,7 +4059,8 @@ send_document(client_t        *con,	/* I - Client connection */
       * Replace the document-format attribute value with the auto-typed one.
       */
 
-      sprintf(mimetype, "%s/%s", filetype->super, filetype->type);
+      snprintf(mimetype, sizeof(mimetype), "%s/%s", filetype->super,
+               filetype->type);
 
       if (format != NULL)
       {
@@ -4088,7 +4101,8 @@ send_document(client_t        *con,	/* I - Client connection */
       !stat(con->filename, &fileinfo))
     attr->values[0].integer += (fileinfo.st_size + 1023) / 1024;
 
-  sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
+  snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot, job->id,
+           job->num_files);
   rename(con->filename, filename);
 
   con->filename[0] = '\0';
@@ -4154,8 +4168,8 @@ send_document(client_t        *con,	/* I - Client connection */
   * Fill in the response info...
   */
 
-  sprintf(job_uri, "http://%s:%d/jobs/%d", ServerName,
-	  ntohs(con->http.hostaddr.sin_port), job->id);
+  snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
+	   ntohs(con->http.hostaddr.sin_port), job->id);
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL,
                job_uri);
 
@@ -4846,5 +4860,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.104 2000/11/03 14:13:29 mike Exp $".
+ * End of "$Id: ipp.c,v 1.105 2000/11/06 16:18:12 mike Exp $".
  */
