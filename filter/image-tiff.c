@@ -1,5 +1,5 @@
 /*
- * "$Id: image-tiff.c,v 1.17.2.2 2002/01/02 18:04:46 mike Exp $"
+ * "$Id: image-tiff.c,v 1.17.2.3 2002/01/21 22:26:41 mike Exp $"
  *
  *   TIFF file routines for the Common UNIX Printing System (CUPS).
  *
@@ -59,7 +59,8 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 		resunit,		/* Units for resolution */
 		samples,		/* Number of samples/pixel */
 		bits,			/* Number of bits/pixel */
-		inkset;			/* Ink set for color separations */
+		inkset,			/* Ink set for color separations */
+		numinks;		/* Number of inks in set */
   float		xres,			/* Horizontal resolution */
 		yres;			/* Vertical resolution */
   uint16	*redcmap,		/* Red colormap information */
@@ -625,6 +626,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
     case PHOTOMETRIC_PALETTE :
 	if (!TIFFGetField(tif, TIFFTAG_COLORMAP, &redcmap, &greencmap, &bluecmap))
 	{
+          fputs("ERROR: No colormap tag in the file!\n", stderr);
 	  fclose(fp);
 	  return (-1);
 	}
@@ -1208,9 +1210,15 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
         break;
 
     case PHOTOMETRIC_SEPARATED :
-        TIFFGetField(tif, TIFFTAG_INKSET, &inkset);
+        if (!TIFFGetField(tif, TIFFTAG_INKSET, &inkset) &&
+	    !TIFFGetField(tif, TIFFTAG_NUMBEROFINKS, &numinks))
+	{
+          fputs("ERROR: No inkset or number-of-inks tag in the file!\n", stderr);
+	  fclose(fp);
+	  return (-1);
+	}
 
-	if (inkset == INKSET_CMYK)
+	if (inkset == INKSET_CMYK || numinks == 4)
 	{
           if (orientation < ORIENTATION_LEFTTOP)
           {
@@ -1354,7 +1362,12 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
                   }
         	}
               }
-              else
+              else if (img->colorspace == IMAGE_CMYK)
+	      {
+	        TIFFReadScanline(tif, scanline, row, 0);
+		ImagePutRow(img, 0, y, img->xsize, scanline);
+	      }
+	      else
               {
         	TIFFReadScanline(tif, scanline, row, 0);
 
@@ -1575,6 +1588,11 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
                   }
         	}
               }
+              else if (img->colorspace == IMAGE_CMYK)
+	      {
+	        TIFFReadScanline(tif, scanline, row, 0);
+		ImagePutCol(img, x, 0, img->ysize, scanline);
+	      }
               else
               {
         	TIFFReadScanline(tif, scanline, row, 0);
@@ -1664,6 +1682,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 	free(out);
 
 	TIFFClose(tif);
+	fputs("ERROR: Unknown TIFF photometric value!\n", stderr);
 	return (-1);
   }
 
@@ -1684,5 +1703,5 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-tiff.c,v 1.17.2.2 2002/01/02 18:04:46 mike Exp $".
+ * End of "$Id: image-tiff.c,v 1.17.2.3 2002/01/21 22:26:41 mike Exp $".
  */
