@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c,v 1.14.2.12 2004/06/29 20:33:11 mike Exp $"
+ * "$Id: usersys.c,v 1.14.2.13 2004/10/20 17:25:51 mike Exp $"
  *
  *   User, system, and password routines for the Common UNIX Printing
  *   System (CUPS).
@@ -460,7 +460,7 @@ cups_get_line(char *buf,	/* I - Line buffer */
   if (bufptr < buf)
     return (NULL);
 
-  while (isspace(*bufptr & 255) && bufptr >= buf)
+  while (bufptr >= buf && isspace(*bufptr & 255))
     *bufptr-- = '\0';
 
   return (buf);
@@ -468,5 +468,5 @@ cups_get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: usersys.c,v 1.14.2.12 2004/06/29 20:33:11 mike Exp $".
+ * End of "$Id: usersys.c,v 1.14.2.13 2004/10/20 17:25:51 mike Exp $".
  */
