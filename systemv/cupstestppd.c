@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.21 2003/05/14 00:04:32 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.22 2003/05/23 15:25:11 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -27,8 +27,9 @@
  *
  * Contents:
  *
- *   main()  - Main entry for test program.
- *   usage() - Show program usage...
+ *   main()           - Main entry for test program.
+ *   show_conflicts() - Show option conflicts in a PPD file.
+ *   usage()          - Show program usage...
  */
 
 /*
@@ -56,6 +57,7 @@
  * Local functions...
  */
 
+void	show_conflicts(ppd_file_t *ppd);
 void	usage(void);
 
 
@@ -660,7 +662,11 @@ main(int  argc,			/* I - Number of command-line arguments */
       {
         ppdMarkDefaults(ppd);
 	if (ppdConflicts(ppd))
+	{
 	  puts("        WARN    Default choices conflicting!");
+
+          show_conflicts(ppd);
+        }
 
         if (ppdversion < 43)
 	{
@@ -861,6 +867,105 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
+ * 'show_conflicts()' - Show option conflicts in a PPD file.
+ */
+
+void
+show_conflicts(ppd_file_t *ppd)		/* I - PPD to check */
+{
+  int		i, j;			/* Looping variables */
+  ppd_const_t	*c;			/* Current constraint */
+  ppd_option_t	*o1, *o2;		/* Options */
+  ppd_choice_t	*c1, *c2;		/* Choices */
+
+
+ /*
+  * Loop through all of the UI constraints and report any options
+  * that conflict...
+  */
+
+  for (i = ppd->num_consts, c = ppd->consts; i > 0; i --, c ++)
+  {
+   /*
+    * Grab pointers to the first option...
+    */
+
+    o1 = ppdFindOption(ppd, c->option1);
+
+    if (o1 == NULL)
+      continue;
+    else if (c->choice1[0] != '\0')
+    {
+     /*
+      * This constraint maps to a specific choice.
+      */
+
+      c1 = ppdFindChoice(o1, c->choice1);
+    }
+    else
+    {
+     /*
+      * This constraint applies to any choice for this option.
+      */
+
+      for (j = o1->num_choices, c1 = o1->choices; j > 0; j --, c1 ++)
+        if (c1->marked)
+	  break;
+
+      if (j == 0 ||
+          strcasecmp(c1->choice, "None") == 0 ||
+          strcasecmp(c1->choice, "Off") == 0 ||
+          strcasecmp(c1->choice, "False") == 0)
+        c1 = NULL;
+    }
+
+   /*
+    * Grab pointers to the second option...
+    */
+
+    o2 = ppdFindOption(ppd, c->option2);
+
+    if (o2 == NULL)
+      continue;
+    else if (c->choice2[0] != '\0')
+    {
+     /*
+      * This constraint maps to a specific choice.
+      */
+
+      c2 = ppdFindChoice(o2, c->choice2);
+    }
+    else
+    {
+     /*
+      * This constraint applies to any choice for this option.
+      */
+
+      for (j = o2->num_choices, c2 = o2->choices; j > 0; j --, c2 ++)
+        if (c2->marked)
+	  break;
+
+      if (j == 0 ||
+          strcasecmp(c2->choice, "None") == 0 ||
+          strcasecmp(c2->choice, "Off") == 0 ||
+          strcasecmp(c2->choice, "False") == 0)
+        c2 = NULL;
+    }
+
+   /*
+    * If both options are marked then there is a conflict...
+    */
+
+    if (c1 != NULL && c1->marked && c2 != NULL && c2->marked)
+      printf("        WARN    \"%s %s\" conflicts with \"%s %s\"\n"
+             "                (constraint=\"%s %s %s %s\")\n",
+             o1->keyword, c1->choice, o2->keyword, c2->choice,
+	     c->option1, c->choice1, c->option2, c->choice2);
+  }
+}
+
+
+/*
  * 'usage()' - Show program usage...
  */
 
@@ -875,5 +980,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.21 2003/05/14 00:04:32 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.22 2003/05/23 15:25:11 mike Exp $".
  */
