@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.19 1999/11/01 16:53:43 mike Exp $"
+ * "$Id: imagetops.c,v 1.20 1999/11/12 16:00:44 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -469,7 +469,8 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
   {
     if (length > 0)
     {
-      for (b = 0, i = length; i > 0; b = (b << 8) | data[0], data ++, i --);
+      memset(data + length, 0, 4 - length);
+      b = (((((data[0] << 8) | data[1]) << 8) | data[2]) << 8) | data[3];
 
       c[4] = (b % 85) + '!';
       b /= 85;
@@ -490,5 +491,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.19 1999/11/01 16:53:43 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.20 1999/11/12 16:00:44 mike Exp $".
  */
