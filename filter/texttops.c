@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.43 2002/03/14 22:20:03 mike Exp $"
+ * "$Id: texttops.c,v 1.44 2002/04/23 17:49:34 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -703,7 +703,9 @@ WriteProlog(const char *title,		/* I - Title of job */
     else
       j = 0;
 
-    if (ppd != NULL && j >= ppd->num_fonts)
+    if ((ppd != NULL && j >= ppd->num_fonts) ||
+        strncmp(fonts[i], "Courier", 7) == 0 ||
+	strcmp(fonts[i], "Symbol") == 0)
     {
      /*
       * Need to embed this font...
@@ -732,7 +734,9 @@ WriteProlog(const char *title,		/* I - Title of job */
     else
       j = 0;
 
-    if (ppd != NULL && j >= ppd->num_fonts)
+    if ((ppd != NULL && j >= ppd->num_fonts) ||
+        strncmp(fonts[i], "Courier", 7) == 0 ||
+	strcmp(fonts[i], "Symbol") == 0)
     {
      /*
       * Need to embed this font...
@@ -1300,5 +1304,5 @@ write_text(const char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c,v 1.43 2002/03/14 22:20:03 mike Exp $".
+ * End of "$Id: texttops.c,v 1.44 2002/04/23 17:49:34 mike Exp $".
  */
