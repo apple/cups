@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.6 2000/09/14 18:54:14 mike Exp $"
+ * "$Id: listen.c,v 1.7 2000/11/21 20:59:56 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -51,7 +51,10 @@ PauseListening(void)
   if (!FD_ISSET(Listeners[0].fd, &InputSet))
     return;
 
-  LogMessage(L_DEBUG, "PauseListening() clearing input bits...");
+  if (NumClients == MaxClients)
+    LogMessage(L_WARN, "Max clients reached, holding new connections...");
+
+  LogMessage(L_DEBUG, "PauseListening: clearing input bits...");
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
     FD_CLR(lis->fd, &InputSet);
@@ -72,7 +75,10 @@ ResumeListening(void)
   if (FD_ISSET(Listeners[0].fd, &InputSet))
     return;
 
-  LogMessage(L_DEBUG, "ResumeListening() setting input bits...");
+  if (NumClients >= (MaxClients - 1))
+    LogMessage(L_WARN, "Resuming new connection processing...");
+
+  LogMessage(L_DEBUG, "ResumeListening: setting input bits...");
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
     FD_SET(lis->fd, &InputSet);
@@ -92,7 +98,7 @@ StartListening(void)
   struct hostent *host;		/* Host entry for server address */
 
 
-  LogMessage(L_DEBUG, "StartListening() NumListeners=%d", NumListeners);
+  LogMessage(L_DEBUG, "StartListening: NumListeners=%d", NumListeners);
 
  /*
   * Get the server's IP address...
@@ -115,7 +121,7 @@ StartListening(void)
     * Didn't find it!  Use an address of 0...
     */
 
-    LogMessage(L_ERROR, "StartListening() Unable to find IP address for server name \"%s\"!\n",
+    LogMessage(L_ERROR, "StartListening: Unable to find IP address for server name \"%s\"!\n",
                ServerName);
 
     ServerAddr.sin_family = AF_INET;
@@ -127,13 +133,13 @@ StartListening(void)
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
   {
-    LogMessage(L_DEBUG, "StartListening() address=%08x port=%d",
+    LogMessage(L_DEBUG, "StartListening: address=%08x port=%d",
                ntohl(lis->address.sin_addr.s_addr),
 	       ntohs(lis->address.sin_port));
 
     if ((lis->fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
-      LogMessage(L_ERROR, "StartListening() Unable to open listen socket - %s.",
+      LogMessage(L_ERROR, "StartListening: Unable to open listen socket - %s.",
                  strerror(errno));
       exit(errno);
     }
@@ -157,7 +163,7 @@ StartListening(void)
 
     if (bind(lis->fd, (struct sockaddr *)&(lis->address), sizeof(lis->address)) < 0)
     {
-      LogMessage(L_ERROR, "StartListening() Unable to bind socket - %s.", strerror(errno));
+      LogMessage(L_ERROR, "StartListening: Unable to bind socket - %s.", strerror(errno));
       exit(errno);
     }
 
@@ -167,7 +173,7 @@ StartListening(void)
 
     if (listen(lis->fd, SOMAXCONN) < 0)
     {
-      LogMessage(L_ERROR, "StartListening() Unable to listen for clients - %s.",
+      LogMessage(L_ERROR, "StartListening: Unable to listen for clients - %s.",
                  strerror(errno));
       exit(errno);
     }
@@ -188,7 +194,7 @@ StopListening(void)
   listener_t	*lis;		/* Current listening socket */
 
 
-  LogMessage(L_DEBUG, "StopListening()");
+  LogMessage(L_DEBUG, "StopListening: closing all listen sockets.");
 
   PauseListening();
 
@@ -202,5 +208,5 @@ StopListening(void)
 
 
 /*
- * End of "$Id: listen.c,v 1.6 2000/09/14 18:54:14 mike Exp $".
+ * End of "$Id: listen.c,v 1.7 2000/11/21 20:59:56 mike Exp $".
  */
