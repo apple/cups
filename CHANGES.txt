@@ -133,11 +133,18 @@ CHANGES IN CUPS V1.1.7
 	  clients or start print jobs as the load allows.
 	- Fixed a bug in the Set-Job-Attributes code that could
 	  crash the scheduler (patch from Martin Zielinski)
-	- cupsSetDests() did not quote option values with embedded
-	  spaces.
-	- Added support for the Enable-Printer and Disable-Printer
-	  extension operations (same as CUPS-Accept-Jobs and
-	  CUPS-Reject-Jobs.)
+	- cupsSetDests() did not quote option values with
+	  embedded spaces.
+	- Added support for the Enable-Printer and
+	  Disable-Printer extension operations (same as
+	  CUPS-Accept-Jobs and CUPS-Reject-Jobs.)
+	- The AppSocket and IPP backends now wait for the print
+	  job to be finished before exiting; this should prevent
+	  the loss of print jobs with older JetDirect firmware
+	  and make consecutive print jobs print faster.
+	- The BMP loading code did not handle resolution values
+	  of 0.  This is a problem with BMP image files produced
+	  by the GIMP.
 
 
 CHANGES IN CUPS V1.1.6-3

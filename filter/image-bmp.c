@@ -1,5 +1,5 @@
 /*
- * "$Id: image-bmp.c,v 1.3 2001/01/22 15:03:38 mike Exp $"
+ * "$Id: image-bmp.c,v 1.4 2001/04/12 17:25:03 mike Exp $"
  *
  *   BMP image routines for the Common UNIX Printing System (CUPS).
  *
@@ -118,6 +118,15 @@ ImageReadBMP(image_t    *img,		/* IO - Image */
   img->yppi        = read_long(fp) * 0.0254 + 0.5;
   colors_used      = read_dword(fp);
   colors_important = read_dword(fp);
+
+ /*
+  * Make sure the resolution info is valid...
+  */
+
+  if (img->xppi == 0)
+    img->xppi = 128;
+  if (img->yppi == 0)
+    img->yppi = 128;
 
   fprintf(stderr, "info_size = %d, xsize = %d, ysize = %d, planes = %d, depth = %d\n",
           info_size, img->xsize, img->ysize, planes, depth);
@@ -495,5 +504,5 @@ read_long(FILE *fp)               /* I - File to read from */
 
 
 /*
- * End of "$Id: image-bmp.c,v 1.3 2001/01/22 15:03:38 mike Exp $".
+ * End of "$Id: image-bmp.c,v 1.4 2001/04/12 17:25:03 mike Exp $".
  */
