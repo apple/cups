@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.12 1999/10/26 14:40:57 mike Exp $"
+ * "$Id: lp.c,v 1.13 1999/12/14 15:01:38 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cups/cups.h>
+#include <cups/string.h>
 
 
 #ifndef WIN32
@@ -75,10 +76,11 @@ main(int  argc,		/* I - Number of command-line arguments */
   int		silent;		/* Silent or verbose output? */
   char		buffer[8192];	/* Copy buffer */
   FILE		*temp;		/* Temporary file pointer */
+  char		server[1024];	/* Server name */
 
 
   silent      = 0;
-  dest        = cupsGetDefault();
+  dest        = NULL;
   num_options = 0;
   options     = NULL;
   num_files   = 0;
@@ -99,6 +101,17 @@ main(int  argc,		/* I - Number of command-line arguments */
 	      i ++;
 	      dest = argv[i];
 	    }
+	    break;
+
+        case 'h' : /* Destination host */
+	    if (argv[i][2] != '\0')
+	      snprintf(server, sizeof(server), "CUPS_SERVER=%s", argv[i] + 2);
+	    else
+	    {
+	      i ++;
+	      snprintf(server, sizeof(server), "CUPS_SERVER=%s", argv[i]);
+	    }
+	    putenv(server);
 	    break;
 
 	case 'm' : /* Send email when job is done */
@@ -179,6 +192,9 @@ main(int  argc,		/* I - Number of command-line arguments */
       */
 
       if (dest == NULL)
+        dest = cupsGetDefault();
+
+      if (dest == NULL)
       {
 	fputs("lp: error - no default destination available.\n", stderr);
 	return (1);
@@ -215,6 +231,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (num_files == 0)
   {
+    if (dest == NULL)
+      dest = cupsGetDefault();
+
     if (dest == NULL)
     {
       fputs("lp: error - no default destination available.\n", stderr);
@@ -284,5 +303,5 @@ sighandler(void)
 
 
 /*
- * End of "$Id: lp.c,v 1.12 1999/10/26 14:40:57 mike Exp $".
+ * End of "$Id: lp.c,v 1.13 1999/12/14 15:01:38 mike Exp $".
  */
