@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.15 1999/07/27 18:55:52 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.16 1999/10/27 20:20:15 mike Exp $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
@@ -124,6 +124,7 @@ Outputf(const char *format,	/* I - Printf-style string */
 {
   va_list	ap;		/* Argument pointer */
   int		bytes;		/* Number of bytes written */
+  float		iw1[2], iw2[2];	/* Clipping window */
 
 
  /*
@@ -173,6 +174,17 @@ Outputf(const char *format,	/* I - Printf-style string */
             printf("%.1f %.1f translate\n", PageLength - PageTop, PageLeft);
 	    break;
       }
+
+    if (IW1[0] != IW2[0] && IW1[1] != IW2[1])
+    {
+      iw1[0] = IW1[0] * 72.0f / 1016.0f;
+      iw1[1] = IW1[1] * 72.0f / 1016.0f;
+      iw2[0] = IW2[0] * 72.0f / 1016.0f;
+      iw2[1] = IW2[1] * 72.0f / 1016.0f;
+
+      printf("initclip MP %.3f %.3f MO %.3f %.3f LI %.3f %.3f LI %.3f %.3f LI CP clip\n",
+	     iw1[0], iw1[1], iw1[0], iw2[1], iw2[0], iw2[1], iw2[0], iw1[1]);
+    }
   }
 
  /*
@@ -188,5 +200,5 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.15 1999/07/27 18:55:52 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.16 1999/10/27 20:20:15 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgltops.h,v 1.10 1999/03/23 20:10:18 mike Exp $"
+ * "$Id: hpgltops.h,v 1.11 1999/10/27 20:20:15 mike Exp $"
  *
  *   HP-GL/2 to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -65,6 +65,8 @@ typedef struct
 #  define VALUE(x)
 #  define VALUE2(x,y)
 #endif /* _HPGL_MAIN_C_ */
+
+VAR ppd_file_t	*PPD VALUE(NULL);		/* PPD file */
 
 VAR float	P1[2],				/* Lower-lefthand physical limit */
 		P2[2],				/* Upper-righthand physical limit */
@@ -192,5 +194,5 @@ extern void	OutputTrailer(void);
 extern int	Outputf(const char *format, ...);
 
 /*
- * End of "$Id: hpgltops.h,v 1.10 1999/03/23 20:10:18 mike Exp $".
+ * End of "$Id: hpgltops.h,v 1.11 1999/10/27 20:20:15 mike Exp $".
  */

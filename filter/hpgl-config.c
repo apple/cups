@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.15 1999/03/23 18:39:05 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.16 1999/10/27 20:20:14 mike Exp $"
  *
  *   HP-GL/2 configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -51,19 +51,96 @@
 void
 update_transform(void)
 {
-  float	width,		/* Plot width */
-	height;		/* Plot height */
-  float	page_width,	/* Actual page width in points */
-	page_length;	/* Actual page length in points */
+  float	page_width,	/* Actual page width */
+	page_height;	/* Actual page height */
   float	scaling;	/* Scaling factor */
+  float	left, right,	/* Scaling window */
+	bottom, top;
+  float	width, height;	/* Scaling width and height */
+  float	iw1[2], iw2[2];	/* Clipping window */
 
 
  /*
   * Get the page and input window sizes...
   */
 
-  width  = IW2[0] - IW1[0];
-  height = IW2[1] - IW1[1];
+  if (FitPlot)
+  {
+    page_width  = PageRight - PageLeft;
+    page_height = PageTop - PageBottom;
+  }
+  else
+  {
+    page_width  = P2[0] - P1[0];
+    page_height = P2[1] - P1[1];
+  }
+
+  if (page_width == 0 || page_height == 0)
+    return;
+
+  page_width  *= 72.0f / 1016.0f;
+  page_height *= 72.0f / 1016.0f;
+
+ /*
+  * Set the scaling window...
+  */
+
+  switch (ScalingType)
+  {
+    case -1 : /* No user scaling */
+        left   = P1[0];
+	bottom = P1[1];
+	right  = P2[0];
+	top    = P2[1];
+        break;
+
+    case 0 : /* Anisotropic (non-uniform) scaling */
+        left   = Scaling1[0];
+	bottom = Scaling1[1];
+	right  = Scaling2[0];
+	top    = Scaling2[1];
+        break;
+
+    case 1 : /* Isotropic (uniform) scaling */
+        left   = Scaling1[0];
+	bottom = Scaling1[1];
+	right  = Scaling2[0];
+	top    = Scaling2[1];
+
+	width  = right - left;
+	height = top - bottom;
+        
+	if (width == 0 || height == 0)
+	  return;
+
+        if ((width * page_height) != (height * page_width))
+	{
+	  scaling = height * page_width / page_height;
+	  if (width < scaling)
+	  {
+	    width = scaling;
+	    left  = 0.5f * (left + right - width);
+	    right = left + width;
+	  }
+	  else
+	  {
+	    height = width * page_height / page_width;
+	    bottom = 0.5f * (bottom + top - height);
+	    top    = bottom + height;
+	  }
+	}
+        break;
+
+    case 2 :
+        left   = Scaling1[0];
+	bottom = Scaling1[1];
+	right  = left + page_width * Scaling2[0];
+	top    = bottom + page_height * Scaling2[1];
+        break;
+  }
+
+  width  = right - left;
+  height = top - bottom;
 
   if (width == 0 || height == 0)
     return;
@@ -72,33 +149,24 @@ update_transform(void)
   * Scale the plot as needed...
   */
 
+  if (Rotation == 0 || Rotation == 180)
+    scaling = page_width / width;
+  else
+    scaling = page_width / height;
+
+ /*
+  * Offset for the current P1 location...
+  */
+
   if (FitPlot)
   {
-    page_width  = PageRight - PageLeft;
-    page_length = PageTop - PageBottom;
-
-    if (Rotation == 0 || Rotation == 180)
-    {
-      scaling = page_width / width;
-      if (scaling > (page_length / width))
-        scaling = page_length / width;
-    }
-    else
-    {
-      scaling = page_width / height;
-      if (scaling > (page_length / height))
-        scaling = page_length / height;
-    }
+    left   = 0;
+    bottom = 0;
   }
   else
   {
-    page_width  = PlotSize[0];
-    page_length = PlotSize[1];
-
-    if (Rotation == 0 || Rotation == 180)
-      scaling = page_width / width;
-    else
-      scaling = page_width / height;
+    left   = P1[0] * 72.0f / 1016.0f;
+    bottom = P1[1] * 72.0f / 1016.0f;
   }
 
  /*
@@ -110,47 +178,69 @@ update_transform(void)
     case 0 :
 	Transform[0][0] = scaling;
 	Transform[0][1] = 0.0;
-	Transform[0][2] = -IW1[0] * scaling;
+	Transform[0][2] = -left;
 	Transform[1][0] = 0.0;
 	Transform[1][1] = scaling;
-	Transform[1][2] = -IW1[1] * scaling;
+	Transform[1][2] = -bottom;
 	break;
 
     case 90 :
 	Transform[0][0] = 0.0;
 	Transform[0][1] = -scaling;
-	Transform[0][2] = (height - IW1[0]) * scaling;
+	Transform[0][2] = PageLength - left;
 	Transform[1][0] = scaling;
 	Transform[1][1] = 0.0;
-	Transform[1][2] = -IW1[1] * scaling;
+	Transform[1][2] = -bottom;
 	break;
 
     case 180 :
 	Transform[0][0] = -scaling;
 	Transform[0][1] = 0.0;
-	Transform[0][2] = (height - IW1[0]) * scaling;
+	Transform[0][2] = PageLength - left;
 	Transform[1][0] = 0.0;
 	Transform[1][1] = -scaling;
-	Transform[1][2] = (width - IW1[1]) * scaling;
+	Transform[1][2] = PageWidth - bottom;
 	break;
 
     case 270 :
 	Transform[0][0] = 0.0;
 	Transform[0][1] = scaling;
-	Transform[0][2] = -IW1[0] * scaling;
+	Transform[0][2] = -left;
 	Transform[1][0] = -scaling;
 	Transform[1][1] = 0.0;
-	Transform[1][2] = (width - IW1[1]) * scaling;
+	Transform[1][2] = PageWidth - bottom;
 	break;
   }
 
-  PenScaling = Transform[0][0] + Transform[0][1];
+  fprintf(stderr, "DEBUG: Transform = [ %.3f %.3f\n"
+                  "DEBUG:               %.3f %.3f\n"
+                  "DEBUG:               %.3f %.3f ]\n",
+          Transform[0][0], Transform[1][0], Transform[0][1],
+	  Transform[1][1], Transform[0][2], Transform[1][2]);
+
+  if (WidthUnits)
+    PenScaling = page_width * scaling * 0.01f;
+  else
+    PenScaling = page_width / PageWidth * 72.0f / 25.4f;
 
   if (PenScaling < 0.0)
     PenScaling = -PenScaling;
 
   if (PageDirty)
+  {
     printf("/PenScaling %.3f def W%d\n", PenScaling, PenNumber);
+
+    if (IW1[0] != IW2[0] && IW1[1] != IW2[1])
+    {
+      iw1[0] = IW1[0] * 72.0f / 1016.0f;
+      iw1[1] = IW1[1] * 72.0f / 1016.0f;
+      iw2[0] = IW2[0] * 72.0f / 1016.0f;
+      iw2[1] = IW2[1] * 72.0f / 1016.0f;
+
+      printf("initclip MP %.3f %.3f MO %.3f %.3f LI %.3f %.3f LI %.3f %.3f LI CP clip\n",
+	     iw1[0], iw1[1], iw1[0], iw2[1], iw2[0], iw2[1], iw2[0], iw1[1]);
+    }
+  }
 }
 
 
@@ -235,10 +325,10 @@ IP_input_absolute(int     num_params,	/* I - Number of parameters */
 {
   if (num_params == 0)
   {
-    P1[0] = 0.0;
-    P1[1] = 0.0;
-    P2[0] = PlotSize[0] / 72.0f * 1016.0f;
-    P2[1] = PlotSize[1] / 72.0f * 1016.0f;
+    P1[0] = PageLeft / 72.0f * 1016.0f;
+    P1[1] = PageBottom / 72.0f * 1016.0f;
+    P2[0] = PageRight / 72.0f * 1016.0f;
+    P2[1] = PageTop / 72.0f * 1016.0f;
   }
   else if (num_params == 2)
   {
@@ -261,6 +351,14 @@ IP_input_absolute(int     num_params,	/* I - Number of parameters */
   IW1[1] = P1[1];
   IW2[0] = P2[0];
   IW2[1] = P2[1];
+
+  if (ScalingType < 0)
+  {
+    Scaling1[0] = P1[0];
+    Scaling1[0] = P1[1];
+    Scaling2[0] = P2[0];
+    Scaling2[1] = P2[1];
+  }
 
   update_transform();
 }
@@ -303,6 +401,14 @@ IR_input_relative(int     num_params,	/* I - Number of parameters */
   IW2[0] = P2[0];
   IW2[1] = P2[1];
 
+  if (ScalingType < 0)
+  {
+    Scaling1[0] = P1[0];
+    Scaling1[0] = P1[1];
+    Scaling2[0] = P2[0];
+    Scaling2[1] = P2[1];
+  }
+
   update_transform();
 }
 
@@ -317,18 +423,43 @@ IW_input_window(int     num_params,	/* I - Number of parameters */
 {
   if (num_params == 0)
   {
-    IW1[0] = P1[0];
-    IW1[1] = P1[1];
-    IW2[0] = P2[0];
-    IW2[1] = P2[1];
+    IW1[0] = PageLeft / 72.0f * 1016.0f;
+    IW1[1] = PageBottom / 72.0f * 1016.0f;
+    IW2[0] = PageRight / 72.0f * 1016.0f;
+    IW2[1] = PageTop / 72.0f * 1016.0f;
   }
   else if (num_params == 4)
   {
-    IW1[0] = params[0].value.number;
-    IW1[1] = params[1].value.number;
-    IW2[0] = params[2].value.number;
-    IW2[1] = params[3].value.number;
+
+    if (ScalingType < 0)
+    {
+      IW1[0] = params[0].value.number;
+      IW1[1] = params[1].value.number;
+      IW2[0] = params[2].value.number;
+      IW2[1] = params[3].value.number;
+    }
+    else
+    {
+      IW1[0] = (Transform[0][0] * params[0].value.number +
+                Transform[0][1] * params[1].value.number +
+                Transform[0][2]) / 72.0f * 1016.0f;
+      IW1[1] = (Transform[1][0] * params[0].value.number +
+                Transform[1][1] * params[1].value.number +
+                Transform[1][2]) / 72.0f * 1016.0f;
+      IW2[0] = (Transform[0][0] * params[2].value.number +
+                Transform[0][1] * params[3].value.number +
+                Transform[0][2]) / 72.0f * 1016.0f;
+      IW2[1] = (Transform[1][0] * params[2].value.number +
+                Transform[1][1] * params[3].value.number +
+                Transform[1][2]) / 72.0f * 1016.0f;
+    }
+
+    fprintf(stderr, "DEBUG: IW%.0f,%.0f,%.0f,%.0f = [ %.0f %.0f %.0f %.0f ]\n",
+	    params[0].value.number, params[1].value.number,
+	    params[2].value.number, params[3].value.number,
+	    IW1[0], IW1[1], IW2[0], IW2[1]);
   }
+
 
   update_transform();
 }
@@ -363,19 +494,33 @@ void
 PS_plot_size(int     num_params,	/* I - Number of parameters */
              param_t *params)		/* I - Parameters */
 {
+#if 0
+  int		i;			/* Looping var */
+  ppd_size_t	*size;			/* Page size */
+  ppd_option_t	*option;		/* Page size option */
+  ppd_choice_t	*choice;		/* Page size choice */
+  float		width, length;		/* Page dimensions */
+#endif /* 0 */
+
+
   switch (num_params)
   {
     case 0 :
         if (Rotation == 0 || Rotation == 180)
         {
-          PlotSize[0] = PageRight - PageLeft;
-          PlotSize[1] = PageTop - PageBottom;
+          PlotSize[0] = PageWidth;
+          PlotSize[1] = PageLength;
 	}
 	else
 	{
-          PlotSize[0] = PageTop - PageBottom;
-          PlotSize[1] = PageRight - PageLeft;
+          PlotSize[0] = PageLength;
+          PlotSize[1] = PageWidth;
 	}
+
+#if 0
+	width  = PageWidth;
+	length = PageLength;
+#endif /* 0 */
         break;
     case 1 :
         if (Rotation == 0 || Rotation == 180)
@@ -388,6 +533,11 @@ PS_plot_size(int     num_params,	/* I - Number of parameters */
           PlotSize[0] = 72.0f * params[0].value.number / 1016.0f;
           PlotSize[1] = 0.75f * PlotSize[0];
         }
+
+#if 0
+	length = 72.0f * params[0].value.number / 1016.0f;
+	width  = 0.75f * length;
+#endif /* 0 */
         break;
     case 2 :
         if (Rotation == 0 || Rotation == 180)
@@ -400,8 +550,69 @@ PS_plot_size(int     num_params,	/* I - Number of parameters */
           PlotSize[0] = 72.0f * params[0].value.number / 1016.0f;
           PlotSize[1] = 72.0f * params[1].value.number / 1016.0f;
         }
+
+#if 0
+	length = 72.0f * params[0].value.number / 1016.0f;
+	width  = 72.0f * params[1].value.number / 1016.0f;
+#endif /* 0 */
         break;
   }
+
+#if 0
+ /*
+  * If we have a PPD file, lookup the closest PageSize and set it...
+  */
+
+  if (PPD != NULL)
+  {
+    for (i = PPD->num_sizes, size = PPD->sizes; i > 0; i --, size ++)
+      if ((fabs(length - size->length) < 36.0 && size->width >= width) ||
+          (fabs(length - size->width) < 36.0 && size->length >= width))
+	break;
+
+    if (i > 0)
+    {
+     /*
+      * Found a matching size...
+      */
+
+      option = ppdFindOption(PPD, "PageSize");
+      choice = ppdFindChoice(option, size->name);
+
+      if (choice->code)
+        Outputf("%s\n", choice->code);
+
+      if (fabs(length - size->width) < 36.0)
+      {
+       /*
+        * Do landscape orientation...
+	*/
+
+	PageLeft   = size->bottom;
+	PageRight  = size->top;
+	PageWidth  = size->length;
+	PageBottom = size->left;
+	PageTop    = size->right;
+	PageLength = size->width;
+
+        printf("%.0f 0 translate 90 rotate\n", PageLength);
+      }
+      else
+      {
+       /*
+        * Do portrait orientation...
+	*/
+
+	PageLeft   = size->left;
+	PageRight  = size->right;
+	PageWidth  = size->width;
+	PageBottom = size->bottom;
+	PageTop    = size->top;
+	PageLength = size->length;
+      }
+    }
+  }
+#endif /* 0 */
 
  /*
   * This is required for buggy files that don't set the input window.
@@ -450,7 +661,13 @@ SC_scale(int     num_params,	/* I - Number of parameters */
          param_t *params)	/* I - Parameters */
 {
   if (num_params == 0)
+  {
     ScalingType = -1;
+    Scaling1[0] = P1[0];
+    Scaling1[0] = P1[1];
+    Scaling2[0] = P2[0];
+    Scaling2[1] = P2[1];
+  }
   else if (num_params > 3)
   {
     Scaling1[0] = params[0].value.number;
@@ -469,5 +686,5 @@ SC_scale(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.15 1999/03/23 18:39:05 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.16 1999/10/27 20:20:14 mike Exp $".
  */
