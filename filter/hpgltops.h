@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgltops.h,v 1.11 1999/10/27 20:20:15 mike Exp $"
+ * "$Id: hpgltops.h,v 1.12 1999/10/28 21:33:44 mike Exp $"
  *
  *   HP-GL/2 to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -53,6 +53,20 @@ typedef struct
 
 
 /*
+ * Font information...
+ */
+
+typedef struct
+{
+  int	typeface,	/* Typeface number */
+	posture,	/* Posture number */
+	weight;		/* Weight number */
+  float	height;		/* Height/size of font */
+  float	x, y;		/* X and Y direction/scaling */
+} font_t;
+
+
+/*
  * Globals...
  */
 
@@ -80,6 +94,8 @@ VAR float	Transform[2][3];		/* Transform matrix */
 VAR int		PageRotation	VALUE(0);	/* Page/plot rotation */
 
 VAR char	StringTerminator VALUE('\003');	/* Terminator for labels */
+VAR font_t	StandardFont,			/* Standard font */
+		AlternateFont;			/* Alternate font */
 VAR float	PenPosition[2]	VALUE2(0.0f, 0.0f),
 						/* Current pen position */
 		PenScaling	VALUE(1.0f);	/* Pen width scaling factor */
@@ -108,6 +124,11 @@ VAR float	ColorRange[3][2]		/* Range of color values */
 		}
 #endif /* _HPGL_MAIN_C_ */
 ;
+
+VAR int		LineCap		VALUE(0);	/* Line capping */
+VAR int		LineJoin	VALUE(0);	/* Line joining */
+VAR float	MiterLimit	VALUE(3.0f);	/* Miter limit at joints */
+
 
 /*
  * Prototypes...
@@ -194,5 +215,5 @@ extern void	OutputTrailer(void);
 extern int	Outputf(const char *format, ...);
 
 /*
- * End of "$Id: hpgltops.h,v 1.11 1999/10/27 20:20:15 mike Exp $".
+ * End of "$Id: hpgltops.h,v 1.12 1999/10/28 21:33:44 mike Exp $".
  */

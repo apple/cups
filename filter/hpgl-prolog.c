@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.16 1999/10/27 20:20:15 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.17 1999/10/28 21:33:44 mike Exp $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
@@ -125,6 +125,12 @@ Outputf(const char *format,	/* I - Printf-style string */
   va_list	ap;		/* Argument pointer */
   int		bytes;		/* Number of bytes written */
   float		iw1[2], iw2[2];	/* Clipping window */
+  int		i;		/* Looping var */
+  ppd_size_t	*size;		/* Page size */
+  ppd_option_t	*option;	/* Page size option */
+  ppd_choice_t	*choice;	/* Page size choice */
+  float		width, length;	/* Page dimensions */
+  int		landscape;	/* Rotate for landscape orientation? */
 
 
  /*
@@ -137,11 +143,175 @@ Outputf(const char *format,	/* I - Printf-style string */
     PageCount ++;
 
     printf("%%%%Page: %d %d\n", PageCount, PageCount);
+
+#if 0
+    if (PPD != NULL && !FitPlot)
+    {
+     /*
+      * Set the page size for this page...
+      */
+
+      if (Rotation == 0 || Rotation == 180)
+      {
+	width  = PlotSize[0];
+	length = PlotSize[1];
+      }
+      else
+      {
+	width  = PlotSize[1];
+	length = PlotSize[0];
+      }
+
+      landscape = 0;
+
+     /*
+      * Lookup the closest PageSize and set it...
+      */
+
+      for (i = PPD->num_sizes, size = PPD->sizes; i > 0; i --, size ++)
+	if ((fabs(length - size->length) < 36.0 && size->width >= width) ||
+            (fabs(length - size->width) < 36.0 && size->length >= width))
+	  break;
+
+      if (i == 0 && PPD->variable_sizes)
+      {
+        for (i = PPD->num_sizes, size = PPD->sizes; i > 0; i --, size ++)
+	  if (strcasecmp(size->name, "custom") == 0)
+	    break;
+      } 
+       
+      if (i > 0)
+      {
+       /*
+	* Found a matching size...
+	*/
+
+	option = ppdFindOption(PPD, "PageSize");
+	choice = ppdFindChoice(option, size->name);
+
+        puts("%%BeginPageSetup");
+        printf("%%%%BeginFeature: PageSize %s\n", size->name);
+
+        if (strcasecmp(size->name, "custom") == 0)
+	{
+	  PageLeft   = PPD->custom_margins[0];
+	  PageRight  = width - PPD->custom_margins[2];
+	  PageWidth  = width;
+	  PageBottom = PPD->custom_margins[1];
+	  PageTop    = length - PPD->custom_margins[3];
+	  PageLength = length;
+
+          printf("%.0f %.0f 0 0 0\n", width, length);
+
+	  if (choice->code == NULL)
+	  {
+	   /*
+	    * This can happen with certain buggy PPD files that don't include
+	    * a CustomPageSize command sequence...  We just use a generic
+	    * Level 2 command sequence...
+	    */
+
+	    puts("pop pop pop");
+	    puts("<</PageSize[5 -2 roll]/ImagingBBox null>>setpagedevice\n");
+	  }
+          else
+	  {
+	   /*
+	    * Use the vendor-supplied command...
+	    */
+
+	    printf("%s\n", choice->code);
+	  }
+	}
+	else
+	{
+	  if (choice->code)
+            printf("%s\n", choice->code);
+
+	  if (fabs(length - size->width) < 36.0)
+	  {
+	   /*
+            * Do landscape orientation...
+	    */
+
+	    PageLeft   = size->bottom;
+	    PageRight  = size->top;
+	    PageWidth  = size->length;
+	    PageBottom = size->left;
+	    PageTop    = size->right;
+	    PageLength = size->width;
+
+            landscape = 1;
+	  }
+	  else
+	  {
+	   /*
+            * Do portrait orientation...
+	    */
+
+	    PageLeft   = size->left;
+	    PageRight  = size->right;
+	    PageWidth  = size->width;
+	    PageBottom = size->bottom;
+	    PageTop    = size->top;
+	    PageLength = size->length;
+	  }
+	}
+
+	puts("%%EndFeature");
+	puts("%%EndSetup");
+      }
+    }
+#else
+    landscape = 0;
+#endif /* 0 */
+
     printf("/PenScaling %.3f def\n", PenScaling);
+
+    printf("/SA {\n"
+           "	/%s%s%s%s findfont\n"
+	   "	[ %f %f %f %f 0.0 0.0 ] makefont\n"
+	   "	setfont\n"
+	   "} bind def\n",
+           AlternateFont.typeface == 48 ? "Courier" : "Helvetica",
+           (AlternateFont.weight != 0 || AlternateFont.posture != 0) ? "-" : "",
+           AlternateFont.weight != 0 ? "Bold" : "",
+           AlternateFont.posture != 0 ? "Oblique" : "",
+           AlternateFont.x * AlternateFont.height,
+	   -AlternateFont.y * AlternateFont.height,
+	   AlternateFont.y * AlternateFont.height,
+	   AlternateFont.x * AlternateFont.height);
+
+    printf("/SS {\n"
+           "	/%s%s%s%s findfont\n"
+	   "	[ %f %f %f %f 0.0 0.0 ] makefont\n"
+	   "	setfont\n"
+	   "} bind def\n",
+           StandardFont.typeface == 48 ? "Courier" : "Helvetica",
+           (StandardFont.weight != 0 || StandardFont.posture != 0) ? "-" : "",
+           StandardFont.weight != 0 ? "Bold" : "",
+           StandardFont.posture != 0 ? "Oblique" : "",
+           StandardFont.x * StandardFont.height,
+	   -StandardFont.y * StandardFont.height,
+	   StandardFont.y * StandardFont.height,
+	   StandardFont.x * StandardFont.height);
+
+    if (CharFont)
+      puts("SA");
+    else
+      puts("SS");
+
+    printf("%.1f setmiterlimit\n", MiterLimit);
+    printf("%d setlinecap\n", LineCap);
+    printf("%d setlinejoin\n", LineJoin);
+
+    for (i = 0; i <= PenCount; i ++)
+      printf("/W%d { DefaultPenWidth PenScaling mul setlinewidth } bind def\n", i);
+
     puts("gsave");
 
     if (Duplex && (PageCount & 1) == 0)
-      switch ((PageRotation / 90) & 3)
+      switch ((PageRotation / 90 + landscape) & 3)
       {
 	case 0 :
             printf("%.1f %.1f translate\n", PageWidth - PageRight, PageBottom);
@@ -158,7 +328,7 @@ Outputf(const char *format,	/* I - Printf-style string */
 	    break;
       }
     else
-      switch ((PageRotation / 90) & 3)
+      switch ((PageRotation / 90 + landscape) & 3)
       {
 	case 0 :
             printf("%.1f %.1f translate\n", PageLeft, PageBottom);
@@ -200,5 +370,5 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.16 1999/10/27 20:20:15 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.17 1999/10/28 21:33:44 mike Exp $".
  */

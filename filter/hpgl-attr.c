@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-attr.c,v 1.10 1999/03/22 21:42:33 mike Exp $"
+ * "$Id: hpgl-attr.c,v 1.11 1999/10/28 21:33:43 mike Exp $"
  *
  *   HP-GL/2 attribute processing for the Common UNIX Printing System (CUPS).
  *
@@ -131,17 +131,16 @@ LA_line_attributes(int     num_params,	/* I - Number of parameters */
 
   if (num_params == 0)
   {
-    Outputf("3.0 setmiterlimit\n");
-    Outputf("0 setlinecap\n");
-    Outputf("0 setlinejoin\n");
+    MiterLimit = 3.0f;
+    LineCap    = 0;
+    LineJoin   = 0;
   }
   else for (i = 0; i < (num_params - 1); i += 2)
     switch ((int)params[i].value.number)
     {
       case 1 :
-          Outputf("%d setlinecap\n",
-                  params[i + 1].value.number == 1 ? 0 :
-                  params[i + 1].value.number == 4 ? 1 : 2);
+          LineCap = params[i + 1].value.number == 1 ? 0 :
+                    params[i + 1].value.number == 4 ? 1 : 2;
           break;
       case 2 :
           switch ((int)params[i + 1].value.number)
@@ -149,21 +148,27 @@ LA_line_attributes(int     num_params,	/* I - Number of parameters */
             case 1 :
             case 2 :
             case 3 :
-                Outputf("0 setlinejoin\n");
+                LineJoin = 0;
                 break;
             case 5 :
-                Outputf("2 setlinejoin\n");
+                LineJoin = 2;
                 break;
             default :
-                Outputf("1 setlinejoin\n");
+                LineJoin = 1;
                 break;
           }
           break;
       case 3 :
-          Outputf("%f setmiterlimit\n",
-                  1.0 + 0.5 * (params[i + 1].value.number - 1.0));
+          MiterLimit = 1.0 + 0.5 * (params[i + 1].value.number - 1.0);
           break;
     }
+
+  if (PageDirty)
+  {
+    printf("%.1f setmiterlimit\n", MiterLimit);
+    printf("%d setlinecap\n", LineCap);
+    printf("%d setlinejoin\n", LineJoin);
+  }
 }
 
 
@@ -205,8 +210,9 @@ NP_number_pens(int     num_params,	/* I - Number of parameters */
 
   PC_pen_color(0, NULL);
 
-  for (i = 0; i <= PenCount; i ++)
-    Outputf("/W%d { DefaultPenWidth PenScaling mul setlinewidth } bind def\n", i);
+  if (PageDirty)
+    for (i = 0; i <= PenCount; i ++)
+      printf("/W%d { DefaultPenWidth PenScaling mul setlinewidth } bind def\n", i);
 }
 
 
@@ -401,5 +407,5 @@ WU_width_units(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-attr.c,v 1.10 1999/03/22 21:42:33 mike Exp $".
+ * End of "$Id: hpgl-attr.c,v 1.11 1999/10/28 21:33:43 mike Exp $".
  */

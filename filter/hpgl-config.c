@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.16 1999/10/27 20:20:14 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.17 1999/10/28 21:33:43 mike Exp $"
  *
  *   HP-GL/2 configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -71,15 +71,15 @@ update_transform(void)
   }
   else
   {
-    page_width  = P2[0] - P1[0];
-    page_height = P2[1] - P1[1];
+    page_width  = (P2[0] - P1[0]) * 72.0f / 1016.0f;
+    page_height = (P2[1] - P1[1]) * 72.0f / 1016.0f;
   }
+
+  fprintf(stderr, "DEBUG: page_width = %.0f, page_height = %.0f\n",
+          page_width, page_height);
 
   if (page_width == 0 || page_height == 0)
     return;
-
-  page_width  *= 72.0f / 1016.0f;
-  page_height *= 72.0f / 1016.0f;
 
  /*
   * Set the scaling window...
@@ -153,6 +153,14 @@ update_transform(void)
     scaling = page_width / width;
   else
     scaling = page_width / height;
+
+  if (FitPlot)
+  {
+    if (Rotation == 0 || Rotation == 180)
+      scaling *= page_width / PlotSize[1];
+    else
+      scaling *= page_width / PlotSize[0];
+  }
 
  /*
   * Offset for the current P1 location...
@@ -494,15 +502,6 @@ void
 PS_plot_size(int     num_params,	/* I - Number of parameters */
              param_t *params)		/* I - Parameters */
 {
-#if 0
-  int		i;			/* Looping var */
-  ppd_size_t	*size;			/* Page size */
-  ppd_option_t	*option;		/* Page size option */
-  ppd_choice_t	*choice;		/* Page size choice */
-  float		width, length;		/* Page dimensions */
-#endif /* 0 */
-
-
   switch (num_params)
   {
     case 0 :
@@ -516,11 +515,6 @@ PS_plot_size(int     num_params,	/* I - Number of parameters */
           PlotSize[0] = PageLength;
           PlotSize[1] = PageWidth;
 	}
-
-#if 0
-	width  = PageWidth;
-	length = PageLength;
-#endif /* 0 */
         break;
     case 1 :
         if (Rotation == 0 || Rotation == 180)
@@ -533,11 +527,6 @@ PS_plot_size(int     num_params,	/* I - Number of parameters */
           PlotSize[0] = 72.0f * params[0].value.number / 1016.0f;
           PlotSize[1] = 0.75f * PlotSize[0];
         }
-
-#if 0
-	length = 72.0f * params[0].value.number / 1016.0f;
-	width  = 0.75f * length;
-#endif /* 0 */
         break;
     case 2 :
         if (Rotation == 0 || Rotation == 180)
@@ -550,69 +539,8 @@ PS_plot_size(int     num_params,	/* I - Number of parameters */
           PlotSize[0] = 72.0f * params[0].value.number / 1016.0f;
           PlotSize[1] = 72.0f * params[1].value.number / 1016.0f;
         }
-
-#if 0
-	length = 72.0f * params[0].value.number / 1016.0f;
-	width  = 72.0f * params[1].value.number / 1016.0f;
-#endif /* 0 */
         break;
   }
-
-#if 0
- /*
-  * If we have a PPD file, lookup the closest PageSize and set it...
-  */
-
-  if (PPD != NULL)
-  {
-    for (i = PPD->num_sizes, size = PPD->sizes; i > 0; i --, size ++)
-      if ((fabs(length - size->length) < 36.0 && size->width >= width) ||
-          (fabs(length - size->width) < 36.0 && size->length >= width))
-	break;
-
-    if (i > 0)
-    {
-     /*
-      * Found a matching size...
-      */
-
-      option = ppdFindOption(PPD, "PageSize");
-      choice = ppdFindChoice(option, size->name);
-
-      if (choice->code)
-        Outputf("%s\n", choice->code);
-
-      if (fabs(length - size->width) < 36.0)
-      {
-       /*
-        * Do landscape orientation...
-	*/
-
-	PageLeft   = size->bottom;
-	PageRight  = size->top;
-	PageWidth  = size->length;
-	PageBottom = size->left;
-	PageTop    = size->right;
-	PageLength = size->width;
-
-        printf("%.0f 0 translate 90 rotate\n", PageLength);
-      }
-      else
-      {
-       /*
-        * Do portrait orientation...
-	*/
-
-	PageLeft   = size->left;
-	PageRight  = size->right;
-	PageWidth  = size->width;
-	PageBottom = size->bottom;
-	PageTop    = size->top;
-	PageLength = size->length;
-      }
-    }
-  }
-#endif /* 0 */
 
  /*
   * This is required for buggy files that don't set the input window.
@@ -678,7 +606,7 @@ SC_scale(int     num_params,	/* I - Number of parameters */
     if (num_params > 4)
       ScalingType = (int)params[4].value.number;
     else
-      ScalingType = 0;
+      ScalingType = 1;
   }
 
   update_transform();
@@ -686,5 +614,5 @@ SC_scale(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.16 1999/10/27 20:20:14 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.17 1999/10/28 21:33:43 mike Exp $".
  */

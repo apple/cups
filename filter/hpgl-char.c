@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-char.c,v 1.7 1999/03/22 21:42:33 mike Exp $"
+ * "$Id: hpgl-char.c,v 1.8 1999/10/28 21:33:43 mike Exp $"
  *
  *   HP-GL/2 character processing for the Common UNIX Printing System (CUPS).
  *
@@ -60,20 +60,16 @@ AD_define_alternate(int     num_params,	/* I - Number of parameters */
                     param_t *params)	/* I - Parameters */
 {
   int	i;				/* Looping var */
-  int	typeface,			/* Typeface number */
-	posture,			/* Posture number */
-	weight;				/* Weight number */
-  float	height;				/* Height/size of font */
 
 
  /*
   * Set default font attributes...
   */
 
-  typeface = 48;
-  posture  = 0;
-  weight   = 0;
-  height   = 11.5;
+  AlternateFont.typeface = 48;
+  AlternateFont.posture  = 0;
+  AlternateFont.weight   = 0;
+  AlternateFont.height   = 11.5;
 
  /*
   * Loop through parameter value pairs...
@@ -83,16 +79,16 @@ AD_define_alternate(int     num_params,	/* I - Number of parameters */
     switch ((int)params[i].value.number)
     {
       case 4 :
-          height = params[i + 1].value.number;
+          AlternateFont.height = params[i + 1].value.number;
           break;
       case 5 :
-          posture = (int)params[i + 1].value.number;
+          AlternateFont.posture = (int)params[i + 1].value.number;
           break;
       case 6 :
-          weight = (int)params[i + 1].value.number;
+          AlternateFont.weight = (int)params[i + 1].value.number;
           break;
       case 7 :
-          typeface = (int)params[i + 1].value.number;
+          AlternateFont.typeface = (int)params[i + 1].value.number;
           break;
     }
 
@@ -100,14 +96,22 @@ AD_define_alternate(int     num_params,	/* I - Number of parameters */
   * Define the font...
   */
 
-  Outputf("/SA { /%s%s%s%s findfont %.1f scalefont setfont } def\n",
-          typeface == 48 ? "Courier" : "Helvetica",
-          (weight != 0 || posture != 0) ? "-" : "",
-          weight != 0 ? "Bold" : "",
-          posture != 0 ? "Oblique" : "",
-          height);
+  if (PageDirty)
+    printf("/SA {\n"
+           "	/%s%s%s%s findfont\n"
+	   "	[ %f %f %f %f 0.0 0.0 ] makefont\n"
+	   "	setfont\n"
+	   "} bind def\n",
+           AlternateFont.typeface == 48 ? "Courier" : "Helvetica",
+           (AlternateFont.weight != 0 || AlternateFont.posture != 0) ? "-" : "",
+           AlternateFont.weight != 0 ? "Bold" : "",
+           AlternateFont.posture != 0 ? "Oblique" : "",
+           AlternateFont.x * AlternateFont.height,
+	   -AlternateFont.y * AlternateFont.height,
+	   AlternateFont.y * AlternateFont.height,
+	   AlternateFont.x * AlternateFont.height);
 
-  CharHeight[1] = height;
+  CharHeight[1] = AlternateFont.height;
 }
 
 
@@ -171,12 +175,56 @@ void
 DI_absolute_direction(int     num_params,	/* I - Number of parameters */
                       param_t *params)		/* I - Parameters */
 {
-  Outputf(CharFont == 0 ? "SS\n" : "SA\n");
+  if (CharFont)
+  {
+    if (num_params == 2)
+    {
+      AlternateFont.x = params[0].value.number;
+      AlternateFont.y = params[1].value.number;
+    }
 
-  if (num_params == 2)
-    Outputf("currentfont [ %f %f %f %f 0.0 0.0 ] makefont setfont\n",
-            params[0].value.number, -params[1].value.number,
-            params[1].value.number, params[0].value.number);
+    if (PageDirty)
+    {
+      printf("/SA {\n"
+             "	/%s%s%s%s findfont\n"
+	     "	[ %f %f %f %f 0.0 0.0 ] makefont\n"
+	     "	setfont\n"
+	     "} bind def\n",
+             AlternateFont.typeface == 48 ? "Courier" : "Helvetica",
+             (AlternateFont.weight != 0 || AlternateFont.posture != 0) ? "-" : "",
+             AlternateFont.weight != 0 ? "Bold" : "",
+             AlternateFont.posture != 0 ? "Oblique" : "",
+             AlternateFont.x * AlternateFont.height,
+	     -AlternateFont.y * AlternateFont.height,
+	     AlternateFont.y * AlternateFont.height,
+	     AlternateFont.x * AlternateFont.height);
+    }
+  }
+  else
+  {
+    if (num_params == 2)
+    {
+      StandardFont.x = params[0].value.number;
+      StandardFont.y = params[1].value.number;
+    }
+
+    if (PageDirty)
+    {
+      printf("/SS {\n"
+             "	/%s%s%s%s findfont\n"
+	     "	[ %f %f %f %f 0.0 0.0 ] makefont\n"
+	     "	setfont\n"
+	     "} bind def\n",
+             StandardFont.typeface == 48 ? "Courier" : "Helvetica",
+             (StandardFont.weight != 0 || StandardFont.posture != 0) ? "-" : "",
+             StandardFont.weight != 0 ? "Bold" : "",
+             StandardFont.posture != 0 ? "Oblique" : "",
+             StandardFont.x * StandardFont.height,
+	     -StandardFont.y * StandardFont.height,
+	     StandardFont.y * StandardFont.height,
+	     StandardFont.x * StandardFont.height);
+    }
+  }
 }
 
 
@@ -249,7 +297,7 @@ LB_label(int     num_params,		/* I - Number of parameters */
     return;
 
   Outputf("gsave\n");
-  Outputf("currentmiterlimit 1.0 setmiterlimit\n");
+  Outputf("currentmiterlimit 1.0 \n");
   Outputf("MP\n");
   Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
 
@@ -295,7 +343,9 @@ SA_select_alternate(int     num_params,	/* I - Number of parameters */
   (void)num_params;
   (void)params;
 
-  Outputf("SA\n");
+  if (PageDirty)
+    puts("SA");
+
   CharFont = 1;
 }
 
@@ -309,20 +359,18 @@ SD_define_standard(int     num_params,	/* I - Number of parameters */
                    param_t *params)	/* I - Parameters */
 {
   int	i;				/* Looping var */
-  int	typeface,			/* Typeface number */
-	posture,			/* Posture number */
-	weight;				/* Weight number */
-  float	height;				/* Height/size of font */
 
 
  /*
   * Set default font attributes...
   */
 
-  typeface = 48;
-  posture  = 0;
-  weight   = 0;
-  height   = 11.5;
+  StandardFont.typeface = 48;
+  StandardFont.posture  = 0;
+  StandardFont.weight   = 0;
+  StandardFont.height   = 11.5;
+  StandardFont.x        = 1.0;
+  StandardFont.y        = 0.0;
 
  /*
   * Loop through parameter value pairs...
@@ -332,16 +380,16 @@ SD_define_standard(int     num_params,	/* I - Number of parameters */
     switch ((int)params[i].value.number)
     {
       case 4 :
-          height = params[i + 1].value.number;
+          StandardFont.height = params[i + 1].value.number;
           break;
       case 5 :
-          posture = (int)params[i + 1].value.number;
+          StandardFont.posture = (int)params[i + 1].value.number;
           break;
       case 6 :
-          weight = (int)params[i + 1].value.number;
+          StandardFont.weight = (int)params[i + 1].value.number;
           break;
       case 7 :
-          typeface = (int)params[i + 1].value.number;
+          StandardFont.typeface = (int)params[i + 1].value.number;
           break;
     }
 
@@ -349,14 +397,22 @@ SD_define_standard(int     num_params,	/* I - Number of parameters */
   * Define the font...
   */
 
-  Outputf("/SS { /%s%s%s%s findfont %.1f scalefont setfont } def\n",
-          typeface == 48 ? "Courier" : "Helvetica",
-          (weight != 0 || posture != 0) ? "-" : "",
-          weight != 0 ? "Bold" : "",
-          posture != 0 ? "Oblique" : "",
-          height);
+  if (PageDirty)
+    printf("/SS {\n"
+           "	/%s%s%s%s findfont\n"
+	   "	[ %f %f %f %f 0.0 0.0 ] makefont\n"
+	   "	setfont\n"
+	   "} bind def\n",
+           StandardFont.typeface == 48 ? "Courier" : "Helvetica",
+           (StandardFont.weight != 0 || StandardFont.posture != 0) ? "-" : "",
+           StandardFont.weight != 0 ? "Bold" : "",
+           StandardFont.posture != 0 ? "Oblique" : "",
+           StandardFont.x * StandardFont.height,
+	   -StandardFont.y * StandardFont.height,
+	   StandardFont.y * StandardFont.height,
+	   StandardFont.x * StandardFont.height);
 
-  CharHeight[0] = height;
+  CharHeight[0] = StandardFont.height;
 }
 
 
@@ -410,7 +466,9 @@ SS_select_standard(int     num_params,	/* I - Number of parameters */
   (void)num_params;
   (void)params;
 
-  Outputf("SS\n");
+  if (PageDirty)
+    puts("SS");
+
   CharFont = 0;
 }
 
@@ -429,5 +487,5 @@ TD_transparent_data(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-char.c,v 1.7 1999/03/22 21:42:33 mike Exp $".
+ * End of "$Id: hpgl-char.c,v 1.8 1999/10/28 21:33:43 mike Exp $".
  */

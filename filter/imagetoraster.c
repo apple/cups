@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.32 1999/10/25 16:21:07 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.33 1999/10/28 21:33:44 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -165,6 +165,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   char		*resolution,	/* Output resolution */
 		*media_type;	/* Media type */
   ppd_profile_t	*profile;	/* Color profile */
+  ppd_profile_t	userprofile;	/* User-specified profile */
   cups_raster_t	*ras;		/* Raster stream */
   cups_page_header_t header;	/* Page header */
   int		num_options;	/* Number of print options */
@@ -386,7 +387,31 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Find a color profile matching the current options...
   */
 
-  if (ppd != NULL)
+  if ((val = cupsGetOption("profile", num_options, options)) != NULL)
+  {
+    profile = &userprofile;
+    sscanf(val, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f",
+           &(userprofile.density), &(userprofile.gamma),
+	   userprofile.matrix[0] + 0, userprofile.matrix[0] + 1,
+	   userprofile.matrix[0] + 2,
+	   userprofile.matrix[1] + 0, userprofile.matrix[1] + 1,
+	   userprofile.matrix[1] + 2,
+	   userprofile.matrix[2] + 0, userprofile.matrix[2] + 1,
+	   userprofile.matrix[2] + 2);
+
+    userprofile.density      *= 0.001f;
+    userprofile.gamma        *= 0.001f;
+    userprofile.matrix[0][0] *= 0.001f;
+    userprofile.matrix[0][1] *= 0.001f;
+    userprofile.matrix[0][2] *= 0.001f;
+    userprofile.matrix[1][0] *= 0.001f;
+    userprofile.matrix[1][1] *= 0.001f;
+    userprofile.matrix[1][2] *= 0.001f;
+    userprofile.matrix[2][0] *= 0.001f;
+    userprofile.matrix[2][1] *= 0.001f;
+    userprofile.matrix[2][2] *= 0.001f;
+  }
+  else if (ppd != NULL)
   {
     fprintf(stderr, "DEBUG: Searching for profile \"%s/%s\"...\n",
             resolution, media_type);
@@ -412,9 +437,12 @@ main(int  argc,		/* I - Number of command-line arguments */
     * If we found a color profile, use it!
     */
 
-    if (i < ppd->num_profiles)
-      ImageSetProfile(profile->density, profile->gamma, profile->matrix);
+    if (i >= ppd->num_profiles)
+      profile = NULL;
   }
+
+  if (profile)
+    ImageSetProfile(profile->density, profile->gamma, profile->matrix);
 
  /*
   * Create a gamma/brightness LUT...
@@ -3848,5 +3876,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.32 1999/10/25 16:21:07 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.33 1999/10/28 21:33:44 mike Exp $".
  */

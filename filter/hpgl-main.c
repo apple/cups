@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-main.c,v 1.16 1999/10/27 20:20:14 mike Exp $"
+ * "$Id: hpgl-main.c,v 1.17 1999/10/28 21:33:44 mike Exp $"
  *
  *   HP-GL/2 filter main entry for the Common UNIX Printing System (CUPS).
  *
@@ -174,6 +174,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   PPD = SetCommonOptions(num_options, options, 1);
 
+  PlotSize[0] = PageWidth;
+  PlotSize[1] = PageLength;
+
   shading  = 1;
   penwidth = 1.0;
 
@@ -249,5 +252,5 @@ compare_names(const void *p1,	/* I - First name */
 
 
 /*
- * End of "$Id: hpgl-main.c,v 1.16 1999/10/27 20:20:14 mike Exp $".
+ * End of "$Id: hpgl-main.c,v 1.17 1999/10/28 21:33:44 mike Exp $".
  */
