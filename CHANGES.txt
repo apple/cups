@@ -103,6 +103,9 @@ CHANGES IN CUPS V1.1.5
 	- The serial backend now supports DTR/DSR flow control,
 	  which is popular on dot-matrix printers (access with
 	  "flow=dtrdsr" in the device URI)
+	- Added new job-originating-host-name attribute for
+	  jobs.  The new attribute provides the hostname or
+	  IP address of the machine that submitted the job.
 
 
 CHANGES IN CUPS v1.1.4

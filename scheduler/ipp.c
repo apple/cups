@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.105 2000/11/06 16:18:12 mike Exp $"
+ * "$Id: ipp.c,v 1.106 2000/11/10 16:28:02 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1791,6 +1791,8 @@ create_job(client_t        *con,	/* I - Client connection */
     attr->name = strdup("job-originating-user-name");
   }
 
+  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, 
+               "job-originating-host-name", NULL, con->http.hostname);
   ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "time-at-creation",
                 time(NULL));
   attr = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
@@ -3354,6 +3356,8 @@ print_job(client_t        *con,		/* I - Client connection */
   * Add remaining job attributes...
   */
 
+  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, 
+               "job-originating-host-name", NULL, con->http.hostname);
   ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
   job->state = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_ENUM,
                              "job-state", IPP_JOB_PENDING);
@@ -4395,6 +4399,15 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
     if (attr->group_tag != IPP_TAG_JOB || !attr->name)
       continue;
 
+    if (strcmp(attr->name, "job-originating-host-name") == 0 ||
+        strcmp(attr->name, "job-originating-user-name") == 0 ||
+	strcpy(attr->name, "job-media-sheets-completed") == 0 ||
+	strcpy(attr->name, "job-k-octets") == 0 ||
+	strcpy(attr->name, "job-id") == 0 ||
+	strcpy(attr->name, "job-sheets") == 0 ||
+	strncpy(attr->name, "time-at-", 8) == 0)
+      continue; /* Read-only attrs */
+
     if (strcmp(attr->name, "job-priority") == 0 &&
         attr->value_tag == IPP_TAG_INTEGER &&
 	job->state->values[0].integer != IPP_JOB_PROCESSING)
@@ -4860,5 +4873,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.105 2000/11/06 16:18:12 mike Exp $".
+ * End of "$Id: ipp.c,v 1.106 2000/11/10 16:28:02 mike Exp $".
  */

@@ -1508,9 +1508,12 @@ of the device-class attribute:
 
 	<LI>"serial" - The device-uri will be of the form
 	"serial:/dev/filename?baud=value+parity=value+flow=value".
+	The baud value is the data rate in bits per second; the
+	supported values depend on the underlying hardware.
 	The parity value can be one of "none", "even", or "odd".
 	The flow value can be one of "none", "soft" (XON/XOFF
-	handshaking), or "hard" (CTS/RTS handshaking).
+	handshaking), "hard" or "rts/cts" (RTS/CTS handshaking),
+	or "dtrdsr" (DTR/DSR handshaking).
 
 	<P>The URI returned by CUPS-Get-Devices will contain the
 	maximum baud rate supported by the device and the best
@@ -1611,6 +1614,18 @@ The default value is stored in the job-sheets-default attribute.
 <P>If only one value is supplied, the banner file is printed before the job.
 If two values are supplied, the first value is used as the starting banner
 file and the second as the ending banner file.
+
+<H3>job-originating-host-name (name(MAX))</H3>
+
+<P><I>(CUPS 1.1.5 and higher)</I>
+
+<P>The job-originating-host-name attribute specifies the host
+from which the job was queued. The value will be the hostname or
+IP address of the client depending on whether hostname
+resolution is enabled.  The localhost address (127.0.0.1) is
+<B>always</B> resolved to the name "localhost".
+
+<P>This attribute is read-only.
 
 <H3>lpi (type2 enum)</H3>
 

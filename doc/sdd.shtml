@@ -138,6 +138,20 @@ The options can be any combination of the following:
 
 	<LI><CODE>parity=<I>none</I></CODE> - Turns parity checking off.
 
+	<LI><CODE>flow=dtrdsr<I></I></CODE> - Turns DTR/DSR (hardware) flow
+	control on.
+
+	<LI><CODE>flow=hard<I></I></CODE> - Turns RTS/CTS
+	(hardware) flow control on.
+
+	<LI><CODE>flow=none<I></I></CODE> - Turns flow control off.
+
+	<LI><CODE>flow=rtscts<I></I></CODE> - Turns RTS/CTS
+	(hardware) flow control on.
+
+	<LI><CODE>flow=xonxoff<I></I></CODE> - Turns XON/XOFF
+	(software) flow control on.
+
 </UL>
 
 <H3>socket</H3>
