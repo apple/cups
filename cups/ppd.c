@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.29 1999/07/15 14:05:02 mike Exp $"
+ * "$Id: ppd.c,v 1.30 1999/07/15 16:37:55 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -70,6 +70,8 @@
 #  define WRITE_BINARY	"w"		/* Open a binary file for writing */
 #endif /* WIN32 || __EMX__ */
 
+#define safe_free(p)	if (p) free(p)	/* Safe free macro */
+
 #define PPD_KEYWORD	1		/* Line contained a keyword */
 #define PPD_OPTION	2		/* Line contained an option name */
 #define PPD_TEXT	4		/* Line contained human-readable text */
@@ -119,14 +121,14 @@ ppdClose(ppd_file_t *ppd)	/* I - PPD file record */
   * Free all strings at the top level...
   */
 
-  free(ppd->lang_encoding);
-  free(ppd->lang_version);
-  free(ppd->modelname);
-  free(ppd->ttrasterizer);
-  free(ppd->manufacturer);
-  free(ppd->product);
-  free(ppd->nickname);
-  free(ppd->shortnickname);
+  safe_free(ppd->lang_encoding);
+  safe_free(ppd->lang_version);
+  safe_free(ppd->modelname);
+  safe_free(ppd->ttrasterizer);
+  safe_free(ppd->manufacturer);
+  safe_free(ppd->product);
+  safe_free(ppd->nickname);
+  safe_free(ppd->shortnickname);
 
  /*
   * Free any emulations...
@@ -136,11 +138,11 @@ ppdClose(ppd_file_t *ppd)	/* I - PPD file record */
   {
     for (i = ppd->num_emulations, emul = ppd->emulations; i > 0; i --, emul ++)
     {
-      free(emul->start);
-      free(emul->stop);
+      safe_free(emul->start);
+      safe_free(emul->stop);
     }
 
-    free(ppd->emulations);
+    safe_free(ppd->emulations);
   }
 
  /*
@@ -152,7 +154,7 @@ ppdClose(ppd_file_t *ppd)	/* I - PPD file record */
     for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
       ppd_free_group(group);
 
-    free(ppd->groups);
+    safe_free(ppd->groups);
   }
 
  /*
@@ -160,14 +162,14 @@ ppdClose(ppd_file_t *ppd)	/* I - PPD file record */
   */
 
   if (ppd->num_sizes > 0)
-    free(ppd->sizes);
+    safe_free(ppd->sizes);
 
  /*
   * Free any constraints...
   */
 
   if (ppd->num_consts > 0)
-    free(ppd->consts);
+    safe_free(ppd->consts);
 
  /*
   * Free any fonts...
@@ -176,9 +178,9 @@ ppdClose(ppd_file_t *ppd)	/* I - PPD file record */
   if (ppd->num_fonts > 0)
   {
     for (i = ppd->num_fonts, font = ppd->fonts; i > 0; i --, font ++)
-      free(*font);
+      safe_free(*font);
 
-    free(ppd->fonts);
+    safe_free(ppd->fonts);
   }
 
  /*
@@ -186,13 +188,13 @@ ppdClose(ppd_file_t *ppd)	/* I - PPD file record */
   */
 
   if (ppd->num_profiles > 0)
-    free(ppd->profiles);
+    safe_free(ppd->profiles);
 
  /*
   * Free the whole record...
   */
 
-  free(ppd);
+  safe_free(ppd);
 }
 
 
@@ -215,7 +217,7 @@ ppd_free_group(ppd_group_t *group)	/* I - Group to free */
 	 i --, option ++)
       ppd_free_option(option);
 
-    free(group->options);
+    safe_free(group->options);
   }
 
   if (group->num_subgroups > 0)
@@ -225,7 +227,7 @@ ppd_free_group(ppd_group_t *group)	/* I - Group to free */
 	 i --, subgroup ++)
       ppd_free_group(subgroup);
 
-    free(group->subgroups);
+    safe_free(group->subgroups);
   }
 }
 
@@ -246,9 +248,9 @@ ppd_free_option(ppd_option_t *option)	/* I - Option to free */
     for (i = option->num_choices, choice = option->choices;
          i > 0;
          i --, choice ++)
-      free(choice->code);
+      safe_free(choice->code);
 
-    free(option->choices);
+    safe_free(option->choices);
   }
 }
 
@@ -449,14 +451,12 @@ ppdOpen(FILE *fp)		/* I - File to read from */
     * Either this is not a PPD file, or it is not a 4.x PPD file.
     */
 
-    if (string != NULL)
-      free(string);
+    safe_free(string);
 
     return (NULL);
   }
 
-  if (string != NULL)
-    free(string);
+  safe_free(string);
 
  /*
   * Allocate memory for the PPD file record...
@@ -646,21 +646,21 @@ ppdOpen(FILE *fp)		/* I - File to read from */
                                                 CUPS_MSG_GENERAL))) == NULL)
       {
         ppdClose(ppd);
-	free(string);
+	safe_free(string);
 	return (NULL);
       }
 
       if ((option = ppd_get_option(group, "PageSize")) == NULL)
       {
         ppdClose(ppd);
-	free(string);
+	safe_free(string);
 	return (NULL);
       }
 
       if ((choice = ppd_add_choice(option, "Custom")) == NULL)
       {
         ppdClose(ppd);
-	free(string);
+	safe_free(string);
 	return (NULL);
       }
 
@@ -693,14 +693,14 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       if ((option = ppdFindOption(ppd, "PageSize")) == NULL)
       {
 	ppdClose(ppd);
-	free(string);
+	safe_free(string);
 	return (NULL);
       }
 
       if ((choice = ppdFindChoice(option, "Custom")) == NULL)
       {
         ppdClose(ppd);
-	free(string);
+	safe_free(string);
 	return (NULL);
       }
 
@@ -814,7 +814,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
         if (group == NULL)
 	{
 	  ppdClose(ppd);
-	  free(string);
+	  safe_free(string);
 	  return (NULL);
 	}
 
@@ -827,7 +827,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       if (option == NULL)
       {
 	ppdClose(ppd);
-	free(string);
+	safe_free(string);
 	return (NULL);
       }
 
@@ -881,7 +881,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       if (group == NULL)
       {
         ppdClose(ppd);
-	free(string);
+	safe_free(string);
 	return (NULL);
       }
 
@@ -897,7 +897,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       if (option == NULL)
       {
         ppdClose(ppd);
-	free(string);
+	safe_free(string);
 	return (NULL);
       }
 
@@ -929,7 +929,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       if (group != NULL)
       {
         ppdClose(ppd);
-	free(string);
+	safe_free(string);
 	return (NULL);
       }
 
@@ -951,7 +951,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       if (group == NULL || subgroup != NULL)
       {
         ppdClose(ppd);
-	free(string);
+	safe_free(string);
 	return (NULL);
       }
 
@@ -964,7 +964,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       if (subgroup == NULL)
       {
 	ppdClose(ppd);
-	free(string);
+	safe_free(string);
 	return (NULL);
       }
 
@@ -985,7 +985,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       if (sscanf(string, "%f%s%s", &order, name, keyword) != 3)
       {
         ppdClose(ppd);
-	free(string);
+	safe_free(string);
 	return (NULL);
       }
 
@@ -1076,7 +1076,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       if (constraint == NULL)
       {
 	ppdClose(ppd);
-	free(string);
+	safe_free(string);
 	return (NULL);
       }
 
@@ -1091,7 +1091,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
         case 0 : /* Error */
 	case 1 : /* Error */
 	    ppdClose(ppd);
-  	    free(string);
+  	    safe_free(string);
 	    break;
 
 	case 2 : /* Two options... */
@@ -1184,8 +1184,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       string = NULL;			/* Don't free this string below */
     }
 
-    if (string != NULL)
-      free(string);
+    safe_free(string);
   }
 
 #ifdef DEBUG
@@ -1273,7 +1272,7 @@ ppdOpenFd(int fd)		/* I - File to read from */
 
     ppd = ppdOpen(fp);
 
-    free(fp);
+    safe_free(fp);
   }
   else
     ppd = NULL;
@@ -1761,5 +1760,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.29 1999/07/15 14:05:02 mike Exp $".
+ * End of "$Id: ppd.c,v 1.30 1999/07/15 16:37:55 mike Exp $".
  */
