@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.121 2003/01/31 17:48:23 mike Exp $"
+ * "$Id: conf.c,v 1.122 2003/02/04 05:44:52 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -157,7 +157,9 @@ static var_t	variables[] =
   { "ServerBin",		&ServerBin,		VAR_STRING },
 #ifdef HAVE_SSL
   { "ServerCertificate",	&ServerCertificate,	VAR_STRING },
+#  if defined(HAVE_LIBSSL) || defined(HAVE_GNUTLS)
   { "ServerKey",		&ServerKey,		VAR_STRING },
+#  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
 #endif /* HAVE_SSL */
   { "ServerName",		&ServerName,		VAR_STRING },
   { "ServerRoot",		&ServerRoot,		VAR_STRING },
@@ -309,9 +311,9 @@ ReadConfiguration(void)
   SetString(&RIPCache, "8m");
 
   if (getenv("TMPDIR") == NULL)
-    SetStringf(&TempDir, "TMPDIR=%s", CUPS_REQUESTS "/tmp");
+    SetString(&TempDir, CUPS_REQUESTS "/tmp");
   else
-    SetStringf(&TempDir, "TMPDIR=%s", getenv("TMPDIR"));
+    SetString(&TempDir, getenv("TMPDIR"));
 
  /*
   * Find the default system group: "sys", "system", or "root"...
@@ -2043,5 +2045,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.121 2003/01/31 17:48:23 mike Exp $".
+ * End of "$Id: conf.c,v 1.122 2003/02/04 05:44:52 mike Exp $".
  */
