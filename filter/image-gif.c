@@ -1,5 +1,5 @@
 /*
- * "$Id: image-gif.c,v 1.14 2002/12/12 20:56:31 mike Exp $"
+ * "$Id: image-gif.c,v 1.15 2002/12/13 15:52:20 mike Exp $"
  *
  *   GIF image routines for the Common UNIX Printing System (CUPS).
  *
@@ -233,7 +233,12 @@ ImageReadGIF(image_t    *img,		/* IO - Image */
           img->xsize = (buf[5] << 8) | buf[4];
           img->ysize = (buf[7] << 8) | buf[6];
 
-          if (img->xsize <= 0 || img->ysize <= 0)
+         /*
+	  * Check the dimensions of the image; since the dimensions are
+	  * a 16-bit integer we just need to check for 0...
+	  */
+
+          if (img->xsize == 0 || img->ysize == 0)
 	  {
 	    fprintf(stderr, "ERROR: Bad GIF image dimensions: %dx%d\n",
 	            img->xsize, img->ysize);
@@ -666,5 +671,5 @@ gif_read_image(FILE       *fp,		/* I - Input file */
 
 
 /*
- * End of "$Id: image-gif.c,v 1.14 2002/12/12 20:56:31 mike Exp $".
+ * End of "$Id: image-gif.c,v 1.15 2002/12/13 15:52:20 mike Exp $".
  */
