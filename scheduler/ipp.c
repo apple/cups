@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.42 2003/02/05 21:14:51 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.43 2003/02/10 17:58:48 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2097,6 +2097,8 @@ create_job(client_t        *con,	/* I - Client connection */
   int			port;		/* Port portion of URI */
   printer_t		*printer;	/* Printer data */
   int			kbytes;		/* Size of print file */
+  int			i;		/* Looping var */
+  int			lowerpagerange;	/* Page range bound */
 
 
   LogMessage(L_DEBUG2, "create_job(%d, %s)\n", con->http.fd,
@@ -2172,7 +2174,7 @@ create_job(client_t        *con,	/* I - Client connection */
   }
 
  /*
-  * Validate job template attributes; for now just copies...
+  * Validate job template attributes; for now just copies and page-ranges...
   */
 
   if ((attr = ippFindAttribute(con->request, "copies", IPP_TAG_INTEGER)) != NULL)
@@ -2181,8 +2183,25 @@ create_job(client_t        *con,	/* I - Client connection */
     {
       LogMessage(L_INFO, "create_job: bad copies value %d.",
                  attr->values[0].integer);
-      send_ipp_error(con, IPP_ATTRIBUTES);
+      send_ipp_error(con, IPP_BAD_REQUEST);
       return;
+    }
+  }
+
+  if ((attr = ippFindAttribute(con->request, "page-ranges", IPP_TAG_RANGE)) != NULL)
+  {
+    for (i = 0, lowerpagerange = 1; i < attr->num_values; i ++)
+    {
+      if (attr->values[i].range.lower < lowerpagerange || 
+	  attr->values[i].range.lower > attr->values[i].range.upper)
+      {
+	LogMessage(L_ERROR, "create_job: bad page-ranges values %d-%d.",
+	           attr->values[i].range.lower, attr->values[i].range.upper);
+	send_ipp_error(con, IPP_BAD_REQUEST);
+	return;
+      }
+
+      lowerpagerange = attr->values[i].range.upper + 1;
     }
   }
 
@@ -3883,6 +3902,8 @@ print_job(client_t        *con,		/* I - Client connection */
   printer_t		*printer;	/* Printer data */
   struct stat		fileinfo;	/* File information */
   int			kbytes;		/* Size of file */
+  int			i;		/* Looping var */
+  int			lowerpagerange;	/* Page range bound */
 
 
   LogMessage(L_DEBUG2, "print_job(%d, %s)\n", con->http.fd,
@@ -3902,7 +3923,7 @@ print_job(client_t        *con,		/* I - Client connection */
   }
 
  /*
-  * Validate job template attributes; for now just copies...
+  * Validate job template attributes; for now just copies and page-ranges...
   */
 
   if ((attr = ippFindAttribute(con->request, "copies", IPP_TAG_INTEGER)) != NULL)
@@ -3911,8 +3932,25 @@ print_job(client_t        *con,		/* I - Client connection */
     {
       LogMessage(L_INFO, "print_job: bad copies value %d.",
                  attr->values[0].integer);
-      send_ipp_error(con, IPP_ATTRIBUTES);
+      send_ipp_error(con, IPP_BAD_REQUEST);
       return;
+    }
+  }
+
+  if ((attr = ippFindAttribute(con->request, "page-ranges", IPP_TAG_RANGE)) != NULL)
+  {
+    for (i = 0, lowerpagerange = 1; i < attr->num_values; i ++)
+    {
+      if (attr->values[i].range.lower < lowerpagerange || 
+	  attr->values[i].range.lower > attr->values[i].range.upper)
+      {
+	LogMessage(L_ERROR, "print_job: bad page-ranges values %d-%d.",
+		   attr->values[i].range.lower, attr->values[i].range.upper);
+	send_ipp_error(con, IPP_BAD_REQUEST);
+	return;
+      }
+
+      lowerpagerange = attr->values[i].range.upper + 1;
     }
   }
 
@@ -6076,5 +6114,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.42 2003/02/05 21:14:51 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.43 2003/02/10 17:58:48 mike Exp $".
  */
