@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.12.2.2 2002/03/08 20:23:04 mike Exp $"
+# "$Id: Makefile,v 1.12.2.3 2002/05/21 20:05:48 mike Exp $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1993-1999 by Easy Software Products.
+#   Copyright 1993-2002 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -23,24 +23,14 @@
 #
 
 include ../Makedefs
+include Makefile.common
+
 
 #
-# Man pages...
+# Other languages...
 #
 
-MAN1	=	backend.man filter.man lp.man lpoptions.man lppasswd.man \
-		lpq.man lprm.man lpr.man lpstat.man
-MAN3	=	cups-config.man
-MAN5	=	classes.conf.man cupsd.conf.man mime.convs.man mime.types.man \
-		printers.conf.man
-MAN8	=	accept.man cupsaddsmb.man cups-lpd.man cups-polld.man \
-		cupsd.man enable.man lpadmin.man lpinfo.man lpmove.man \
-		lpc.man
-
-CAT1	=	$(MAN1:.man=.$(CAT1EXT))
-CAT3	=	$(MAN3:.man=.$(CAT3EXT))
-CAT5	=	$(MAN5:.man=.$(CAT5EXT))
-CAT8	=	$(MAN8:.man=.$(CAT8EXT))
+LANGDIRS =	fr
 
 
 #
@@ -48,6 +38,10 @@ CAT8	=	$(MAN8:.man=.$(CAT8EXT))
 #
 
 all:	$(CAT1) $(CAT3) $(CAT5) $(CAT8)
+	for dir in $(LANGDIRS); do \
+		echo "Making all in man/$$dir..."; \
+		(cd $$dir; make all); \
+	done
 
 
 #
@@ -56,6 +50,10 @@ all:	$(CAT1) $(CAT3) $(CAT5) $(CAT8)
 
 clean:
 	$(RM) $(CAT1) $(CAT3) $(CAT5) $(CAT8)
+	for dir in $(LANGDIRS); do \
+		echo "Cleaning all in man/$$dir..."; \
+		(cd $$dir; make clean); \
+	done
 
 
 #
@@ -114,8 +112,12 @@ install:	all
 	$(LN) accept.$(CAT8EXT) $(AMANDIR)/cat$(MAN8EXT)/reject.$(CAT8EXT)
 	$(RM) $(AMANDIR)/cat$(MAN8EXT)/disable.$(CAT8EXT)
 	$(LN) enable.$(CAT8EXT) $(AMANDIR)/cat$(MAN8EXT)/disable.$(CAT8EXT)
+	for dir in $(LANGDIRS); do \
+		echo "Installing all in man/$$dir..."; \
+		(cd $$dir; make install); \
+	done
 
 
 #
-# End of "$Id: Makefile,v 1.12.2.2 2002/03/08 20:23:04 mike Exp $".
+# End of "$Id: Makefile,v 1.12.2.3 2002/05/21 20:05:48 mike Exp $".
 #

@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.30.2.8 2002/03/26 20:38:48 mike Exp $"
+# "$Id: cups.spec,v 1.30.2.9 2002/05/21 20:05:48 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -38,13 +38,10 @@ Vendor: Easy Software Products
 # Use buildroot so as not to disturb the version already installed
 BuildRoot: /var/tmp/%{name}-root
 
-Provides: ipp
-
 %package devel
 Summary: Common Unix Printing System - development environment
 Group: Development/Libraries
 Provides: libcups1
-Provides: ipp-devel
 
 %description
 The Common UNIX Printing System provides a portable printing layer for
@@ -146,28 +143,15 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/lp*
 /usr/lib/*.so*
 %dir /usr/lib/cups
-%dir /usr/lib/cups/backend
-/usr/lib/cups/backend/*
-%dir /usr/lib/cups/cgi-bin
-/usr/lib/cups/cgi-bin/*
-%dir /usr/lib/cups/filter
-/usr/lib/cups/filter/*
+/usr/lib/cups/*
 /usr/sbin/*
 %dir /usr/share/cups
-%dir /usr/share/cups/banners
-/usr/share/cups/banners/*
-%dir /usr/share/cups/charsets
-/usr/share/cups/charsets/*
-%dir /usr/share/cups/data
-/usr/share/cups/data/*
-%dir /usr/share/cups/model
-/usr/share/cups/model/*
-%dir /usr/share/cups/templates
-/usr/share/cups/templates/*
+/usr/share/cups/*
 %dir /usr/share/doc/cups
 /usr/share/doc/cups/*
 %dir /usr/share/locale
 /usr/share/locale/*
+
 %dir /usr/share/man/cat1
 /usr/share/man/cat1/*
 %dir /usr/share/man/cat5
@@ -181,6 +165,19 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/man8
 /usr/share/man/man8/*
 
+%dir /usr/share/man/fr/cat1
+/usr/share/man/fr/cat1/*
+%dir /usr/share/man/fr/cat5
+/usr/share/man/fr/cat5/*
+%dir /usr/share/man/fr/cat8
+/usr/share/man/fr/cat8/*
+%dir /usr/share/man/fr/man1
+/usr/share/man/fr/man1/*
+%dir /usr/share/man/fr/man5
+/usr/share/man/fr/man5/*
+%dir /usr/share/man/fr/man8
+/usr/share/man/fr/man8/*
+
 %attr(0700,lp,root) %dir /var/spool/cups
 %attr(1700,lp,root) %dir /var/spool/cups/tmp
 
@@ -188,14 +185,18 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/cups-config
 %dir /usr/include/cups
 /usr/include/cups/*
-%dir /usr/include/ipp
-/usr/include/ipp/*
 /usr/lib/*.a
+
 %dir /usr/share/man/cat3
 /usr/share/man/cat3/*
 %dir /usr/share/man/man3
 /usr/share/man/man3/*
 
+%dir /usr/share/man/fr/cat3
+/usr/share/man/fr/cat3/*
+%dir /usr/share/man/fr/man3
+/usr/share/man/fr/man3/*
+
 #
-# End of "$Id: cups.spec,v 1.30.2.8 2002/03/26 20:38:48 mike Exp $".
+# End of "$Id: cups.spec,v 1.30.2.9 2002/05/21 20:05:48 mike Exp $".
 #
