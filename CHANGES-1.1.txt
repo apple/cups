@@ -1,7 +1,15 @@
 CHANGES-1.1.txt
 ---------------
 
-CHANGES IN CUPS V1.1.21rc3
+CHANGES IN CUPS V1.1.22rc1
+
+	- Browsing would turn off if the scheduler got an EAGAIN
+	  error (STR #924)
+	- The mime.types file didn't recognize PostScript as a
+	  PJL language name (STR #925)
+
+
+CHANGES IN CUPS V1.1.21
 
 	- The scheduler did not separate Digest authentication
 	  parameters with commas (STR #882)

@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.58 2004/09/09 15:10:29 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.59 2004/09/30 14:39:06 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1301,7 +1301,7 @@ UpdateCUPSBrowse(void)
     * error here and ignore it for now...
     */
 
-    if (errno != ECONNREFUSED)
+    if (errno != ECONNREFUSED && errno != EAGAIN)
     {
       LogMessage(L_ERROR, "Browse recv failed - %s.", strerror(errno));
       LogMessage(L_ERROR, "Browsing turned off.");
@@ -2114,5 +2114,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.58 2004/09/09 15:10:29 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.59 2004/09/30 14:39:06 mike Exp $".
  */
