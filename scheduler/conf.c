@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.129 2003/03/31 16:31:36 mike Exp $"
+ * "$Id: conf.c,v 1.130 2003/03/31 16:45:38 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -899,51 +899,52 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       else
         temp = realloc(Browsers, (NumBrowsers + 1) * sizeof(dirsvc_addr_t));
 
-      if (temp)
+      if (!temp)
       {
-        Browsers = temp;
-	temp     += NumBrowsers;
-
-        memset(temp, 0, sizeof(dirsvc_addr_t));
-
-        if (strcasecmp(value, "@LOCAL") == 0)
-	{
-	 /*
-	  * Send browse data to all local interfaces...
-	  */
-
-	  strcpy(temp->iface, "*");
-	  NumBrowsers ++;
-	}
-	else if (strncasecmp(value, "@IF(", 4) == 0)
-	{
-	 /*
-	  * Send browse data to the named interface...
-	  */
-
-	  strlcpy(temp->iface, value + 4, sizeof(Browsers[0].iface));
-
-          nameptr = temp->iface + strlen(temp->iface) - 1;
-          if (*nameptr == ')')
-	    *nameptr = '\0';
-
-	  NumBrowsers ++;
-	}
-	else if (get_address(value, INADDR_NONE, BrowsePort, &(temp->to)))
-        {
-          LogMessage(L_INFO, "Sending browsing info to %x:%d",
-                     (unsigned)ntohl(temp->to.sin_addr.s_addr),
-                     ntohs(temp->to.sin_port));
-
-	  NumBrowsers ++;
-        }
-	else
-          LogMessage(L_ERROR, "Bad BrowseAddress %s at line %d.", value,
-	             linenum);
-      }
-      else
         LogMessage(L_ERROR, "Unable to allocate BrowseAddress at line %d - %s.",
 	           linenum, strerror(errno));
+        continue;
+      }
+
+      Browsers = temp;
+      temp     += NumBrowsers;
+
+      memset(temp, 0, sizeof(dirsvc_addr_t));
+
+      if (strcasecmp(value, "@LOCAL") == 0)
+      {
+       /*
+	* Send browse data to all local interfaces...
+	*/
+
+	strcpy(temp->iface, "*");
+	NumBrowsers ++;
+      }
+      else if (strncasecmp(value, "@IF(", 4) == 0)
+      {
+       /*
+	* Send browse data to the named interface...
+	*/
+
+	strlcpy(temp->iface, value + 4, sizeof(Browsers[0].iface));
+
+        nameptr = temp->iface + strlen(temp->iface) - 1;
+        if (*nameptr == ')')
+	  *nameptr = '\0';
+
+	NumBrowsers ++;
+      }
+      else if (get_address(value, INADDR_NONE, BrowsePort, &(temp->to)))
+      {
+        LogMessage(L_INFO, "Sending browsing info to %x:%d",
+                   (unsigned)ntohl(temp->to.sin_addr.s_addr),
+                   ntohs(temp->to.sin_port));
+
+	NumBrowsers ++;
+      }
+      else
+        LogMessage(L_ERROR, "Bad BrowseAddress %s at line %d.", value,
+	           linenum);
     }
     else if (strcasecmp(name, "BrowseOrder") == 0)
     {
@@ -2123,5 +2124,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.129 2003/03/31 16:31:36 mike Exp $".
+ * End of "$Id: conf.c,v 1.130 2003/03/31 16:45:38 mike Exp $".
  */
