@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.60 2002/03/01 19:53:29 mike Exp $"
+ * "$Id: ppd.c,v 1.61 2002/03/02 11:43:52 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -1331,7 +1331,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       else
         strncpy(choice->text, name, sizeof(choice->text) - 1);
 
-      if (strncmp(keyword, "JCL", 3) == 0)
+      if (option->section == PPD_ORDER_JCL)
         ppd_decode(string);		/* Decode quoted string */
 
       choice->code = string;
@@ -2004,5 +2004,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.60 2002/03/01 19:53:29 mike Exp $".
+ * End of "$Id: ppd.c,v 1.61 2002/03/02 11:43:52 mike Exp $".
  */
