@@ -1,8 +1,10 @@
-CHANGES.txt - 04/25/2003
+CHANGES.txt - 04/26/2003
 ------------------------
 
 CHANGES IN CUPS V1.1.19rc3
 
+	- Updated the French man pages (translation provided by
+	  Gilles QUERRET)
 	- The scheduler would delete all printers from
 	  printers.conf if a job was active when a HUP signal
 	  was handled (STR #47)

@@ -1,8 +1,8 @@
 .\"
-.\" "$Id: lpadmin.man,v 1.3 2003/03/12 20:41:42 mike Exp $"
+.\" "$Id: lpadmin.man,v 1.4 2003/04/26 17:09:54 mike Exp $"
 .\"
 .\"   lpadmin man page for the Common UNIX Printing System (CUPS).
-.\"   Based on cvs revision 1.9
+.\"   Based on cvs revision 1.11
 .\"
 .\"   Copyright 1997-2003 by Easy Software Products.
 .\"
@@ -84,12 +84,12 @@ Définit un script d'interface System V ou un fichier PPD à utiliser.
 \-o \fIname=value\fR
 .br
 Définit une option PPD ou serveur pour une imprimante. La liste des options
-PPD peut être obtenu en utilisant la commande \fIlptions -l\fR.
+PPD peut être obtenue en utilisant la commande \fIlpoptions -l\fR.
 .TP 5
 \-o \fIjob-k-limit=valeur\fR
 .br
 Définit les quotas par utilisateur en kilo-octets. La valeur est un nombre
-entier de kilo-octets (valant 1024 octets).
+entier de kilo-octets (valant 1\ 024 octets).
 .TP 5
 \-o \fIjob-page-limit=valeur\fR
 .br
@@ -101,19 +101,25 @@ pages.
 .br
 Définit les quotas par utilisateur en impressions par intervalle de temps. La
 valeur est un nombre entier définissant le nombre de secondes entre chaque
-impression. Une journée contient 86400 secondes.
+impression. Une journée contient 86\ 400 secondes.
+.TP 5
+\-o \fIprotocol=nom\fR
+Définit le protocole à utiliser lors des communications binaires pour les
+impressions. Les protocoles sont None (Aucun), BCP et TBCP. Le protocole
+par défaut est None.
 .TP 5
 \-r \fIclasse\fR
 .br
 Supprime \fIl'imprimante\fR de la \fIclasse\fR. Si la classe d'imprimante devient
 vide, celle-ci est supprimée.
 .TP 5
-\-u \fIallow:user,user\fR
-\-u \fIdeny:user,user\fR
+\-u \fIallow:utilisateur,utilisateur,@groupe\fR
+\-u \fIdeny:utilisateur,utilisateur,@groupe\fR
 \-u \fIallow:all\fR
 \-u \fIdeny:none\fR
 .br
-Définit les accès par utilisateur sur une imprimante. Les deux dernières expressions
+Définit les accès par utilisateur sur une imprimante. Les noms commençant par le symbole
+@ sont des noms de groupes UNIX. Les deux dernières expressions
 suppriment les contrôles d'accès par utilisateur.
 .TP 5
 \-v \fIdevice-uri\fR
@@ -158,5 +164,5 @@ Copyright 1993-2003 Easy Software Products, Tous droits réservés.
 .SH TRADUCTION
 Gilles QUERRET <gilles.querret@nerim.net>
 .\"
-.\" End of "$Id: lpadmin.man,v 1.3 2003/03/12 20:41:42 mike Exp $".
+.\" End of "$Id: lpadmin.man,v 1.4 2003/04/26 17:09:54 mike Exp $".
 .\"

@@ -1,8 +1,8 @@
 .\"
-.\" "$Id: backend.man,v 1.3 2003/03/12 20:41:41 mike Exp $"
+.\" "$Id: backend.man,v 1.4 2003/04/26 17:09:53 mike Exp $"
 .\"
 .\"   backend man page for the Common UNIX Printing System (CUPS).
-.\"   Based on cvs revision 1.10
+.\"   Based on cvs revision 1.11
 .\"
 .\"   Copyright 1997-2003 by Easy Software Products.
 .\"
@@ -101,7 +101,7 @@ Le fuseau horaire du serveur.
 .TP 5
 USER
 .br
-L'utilisateur exécutant le programme (généralement lp). Vous pouvez
+L'utilisateur exécutant le programme (généralement root). Vous pouvez
 trouver cette information dans le fichier cupsd.conf.
 .SH VOIR AUSSI
 cupsd(8), filter(1)
@@ -114,5 +114,5 @@ Copyright 1993-2003 Easy Software Products, Tous droits réservés.
 .SH TRADUCTION
 Gilles QUERRET <gilles.querret@nerim.net>
 .\"
-.\" End of "$Id: backend.man,v 1.3 2003/03/12 20:41:41 mike Exp $".
+.\" End of "$Id: backend.man,v 1.4 2003/04/26 17:09:53 mike Exp $".
 .\"

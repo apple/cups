@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsd.conf.man,v 1.4 2003/03/12 20:41:41 mike Exp $"
+.\" "$Id: cupsd.conf.man,v 1.5 2003/04/26 17:09:54 mike Exp $"
 .\"
 .\"   cupsd.conf man page for the Common UNIX Printing System (CUPS).
 .\"   Based on cvs revision 1.10
@@ -241,7 +241,7 @@ Définit le nombre maximum de travaux simultanés par utilisateur.
 .TP 5
 MaxLogSize
 .br
-Définit la taille maximale des fichiers de trace. Au delà de cette taille, les fichiers
+Définit la taille maximale des fichiers de trace. Au-delà de cette taille, les fichiers
 sont recyclés (on ne garde que les entrées les plus récentes pour supprimer les plus vieilles).
 Indiquer 0 pour supprimer la rotation des fichiers.
 .TP 5
@@ -287,11 +287,11 @@ Définit le nom d'utilisateur associé aux accès root non identifié.
 .TP 5
 RequestRoot
 .br
-Définit le répertoire où sont stockées les fichiers de travail et les données des requêtes HTTP.
+Définit le répertoire où sont stockés les fichiers de travail et les données des requêtes HTTP.
 .TP 5
 Require
 .br
-Définit qu'un identification par utilisateur ou par groupe est nécessaire.
+Définit qu'une identification par utilisateur ou par groupe est nécessaire.
 .TP 5
 RIPCache
 .br
@@ -355,5 +355,5 @@ Copyright 1993-2003 Easy Software Products, Tous droits réservés.
 .SH TRADUCTION
 Gilles QUERRET <gilles.querret@nerim.net>
 .\"
-.\" End of "$Id: cupsd.conf.man,v 1.4 2003/03/12 20:41:41 mike Exp $".
+.\" End of "$Id: cupsd.conf.man,v 1.5 2003/04/26 17:09:54 mike Exp $".
 .\"

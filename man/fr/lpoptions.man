@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpoptions.man,v 1.4 2003/03/12 20:41:42 mike Exp $"
+.\" "$Id: lpoptions.man,v 1.5 2003/04/26 17:09:54 mike Exp $"
 .\"
 .\"   lpoptions man page for the Common UNIX Printing System (CUPS).
 .\"   Based on cvs revision 1.11
@@ -81,7 +81,7 @@ Définit le serveur CUPS avec lequel communiquer.
 .TP 5
 \-l
 .br
-Affiche les options spécifiques d'une imprimante et leur paramétrage.
+Affiche les options spécifiques d'une imprimante et ses paramétrages.
 .TP 5
 \-o \fIoption=valeur\fR
 .br
@@ -123,5 +123,5 @@ Copyright 1993-2003 Easy Software Products, Tous droits réservés.
 .SH TRADUCTION
 Gilles QUERRET <gilles.querret@nerim.net>
 .\"
-.\" End of "$Id: lpoptions.man,v 1.4 2003/03/12 20:41:42 mike Exp $".
+.\" End of "$Id: lpoptions.man,v 1.5 2003/04/26 17:09:54 mike Exp $".
 .\"

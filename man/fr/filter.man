@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: filter.man,v 1.4 2003/04/16 19:03:38 mike Exp $"
+.\" "$Id: filter.man,v 1.5 2003/04/26 17:09:54 mike Exp $"
 .\"
 .\"   filter man page for the Common UNIX Printing System (CUPS).
 .\"   Based on cvs revision 1.10
@@ -37,7 +37,7 @@ formats en entrée, et générer un fichier en sortie, dont le format est soit dire
 compréhensible par CUPS, soit retraité par un autre filtre pour obtenir
 un format imprimable.
 .LP
-Ces programmes doivent être capable de lire un fichier de la ligne de
+Ces programmes doivent être capables de lire un fichier de la ligne de
 commande ou via l'entrée standard, si besoin est en recopiant son contenu
 dans un fichier temporaire. Toute sortie doit être faite sur la sortie standard.
 .LP
@@ -49,11 +49,11 @@ lors de l'exécution d'un filtre\ :
 CHARSET
 .br
 Le jeu de caractères par défaut (généralement us-ascii ou iso-8859-1).
-.TP 5
+.TP5
 CLASS
 .br
 Contient le nom de la classe lorsqu'un travail d'impression est envoyé à une cla
-sse d'imprimante. Cette variable n'est pas définie si le travail d'impression n'
+sse d'imprimantes. Cette variable n'est pas définie si le travail d'impression n'
 est pas envoyé à une classe.
 .TP 5
 CONTENT_TYPE
@@ -123,5 +123,5 @@ Copyright 1993-2003 Easy Software Products, Tous droits réservés.
 .SH TRADUCTION
 Gilles QUERRET <gilles.querret@nerim.net>
 .\"
-.\" End of "$Id: filter.man,v 1.4 2003/04/16 19:03:38 mike Exp $".
+.\" End of "$Id: filter.man,v 1.5 2003/04/26 17:09:54 mike Exp $".
 .\"

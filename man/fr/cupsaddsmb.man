@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsaddsmb.man,v 1.3 2003/03/12 20:41:41 mike Exp $"
+.\" "$Id: cupsaddsmb.man,v 1.4 2003/04/26 17:09:54 mike Exp $"
 .\"
 .\"   cupsaddsmb man page for the Common UNIX Printing System (CUPS).
 .\"   Based on cvs revision 1.6
@@ -24,7 +24,7 @@
 .\"
 .TH cupsaddsmb 8 "Common UNIX Printing System" "27 septembre 2002" "Easy Software Products"
 .SH NOM
-cupsaddsmb \- Export d'imprimante vers Samba pour les clients Windows
+cupsaddsmb \- Exportation d'imprimantes vers Samba pour les clients Windows
 .SH SYNOPSIS
 .B cupsaddsmb
 [ -a ] [ -U
@@ -94,7 +94,7 @@ Windows, disponibles sur le site Internet de CUPS.
 Il est recommandé d'utiliser ces pilotes CUPS car ils permettent le comptage
 du nombre de pages, les pages de garde et les labels sur tous les types
 d'imprimantes. Ces pilotes ne sont cependant disponibles que pour les
-plateformes Windows NT, 2000 et XP. Pour des plateformes Windows 95, 98 et Me,
+plates-formes Windows NT, 2000 et XP. Pour des plates-formes Windows 95, 98 et Me,
 il est nécessaire d'utiliser les pilotes Adobe.
 .LP
 Après décompression des fichiers, créer un répertoire «\ drivers\ » dans le
@@ -115,7 +115,7 @@ disponibles en téléchargement sur le site web d'Adobe (http://www.adobe.com).
 Il est recommandé d'utiliser ces pilotes CUPS car ils permettent le comptage
 du nombre de pages, les pages de garde et les labels sur tous les types
 d'imprimantes. Ces pilotes ne sont cependant disponibles que pour les
-plateformes Windows NT, 2000 et XP. Pour des plateformes Windows 95, 98 et Me,
+plates-formes Windows NT, 2000 et XP. Pour des plates-formes Windows 95, 98 et Me,
 il est nécessaire d'utiliser les pilotes Adobe.
 .LP
 Une fois les fichiers décompressés, créez un répertoire «\ drivers\ » dans
@@ -147,5 +147,5 @@ Copyright 1993-2003 Easy Software Products, Tous droits réservés.
 .SH TRADUCTION
 Gilles QUERRET <gilles.querret@nerim.net>
 .\"
-.\" End of "$Id: cupsaddsmb.man,v 1.3 2003/03/12 20:41:41 mike Exp $".
+.\" End of "$Id: cupsaddsmb.man,v 1.4 2003/04/26 17:09:54 mike Exp $".
 .\"

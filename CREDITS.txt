@@ -1,4 +1,4 @@
-CREDITS.txt - 04/23/2003
+CREDITS.txt - 04/26/2003
 ------------------------
 
 Few projects are completed by one person, and CUPS is no exception.  We'd
@@ -24,6 +24,7 @@ like to thank the following individuals for their contributions:
     Ulrich Oldendorf    - German locale.
     Giulio Orsero       - Bug fixes and testing.
     Kurt Pfeifle        - Bug fixes, beta testing, evangelism.
+    Gilles QUERRET      - French man pages.
     Petter Reinholdtsen - HP-UX compiler stuff.
     Stuart Stevens      - HP JetDirect IPP information.
     Andrea Suatoni      - IRIX desktop integration and testing.

@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cups-config.man,v 1.3 2003/03/12 20:41:41 mike Exp $"
+.\" "$Id: cups-config.man,v 1.4 2003/04/26 17:09:53 mike Exp $"
 .\"
 .\"   cups-config man page for the Common UNIX Printing System (CUPS).
 .\"   Based on cvs revision 1.3
@@ -58,7 +58,7 @@ cups-config \- Récupère les informations concernant les API, la compilation, les
 --version
 .br
 .SH DESCRIPTION
-\fBcups-config\fR est le programme visualisation de la configuration de CUPS. Il doit être
+\fBcups-config\fR est le programme de visualisation de la configuration de CUPS. Il doit être
 utilisé par les développeurs pour déterminer les options du compilateur et du linkeur,
 ainsi que l'endroit où ont été installés les filtres,
 fichiers de configuration et pilotes.
@@ -93,5 +93,5 @@ Copyright 1993-2003 Easy Software Products, Tous droits réservés.
 .SH TRADUCTION
 Gilles QUERRET <gilles.querret@nerim.net>
 .\"
-.\" End of "$Id: cups-config.man,v 1.3 2003/03/12 20:41:41 mike Exp $".
+.\" End of "$Id: cups-config.man,v 1.4 2003/04/26 17:09:53 mike Exp $".
 .\"

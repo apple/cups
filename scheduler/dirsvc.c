@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.112 2003/04/02 13:17:38 mike Exp $"
+ * "$Id: dirsvc.c,v 1.113 2003/04/26 17:09:55 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -547,7 +547,7 @@ SendBrowseList(void)
       {
         LogMessage(L_INFO, "Remote destination \"%s\" has timed out; deleting it...",
 	           p->name);
-        DeletePrinter(p);
+        DeletePrinter(p, 1);
       }
     }
     else if (p->browse_time < ut && count > 0 &&
@@ -1892,5 +1892,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.112 2003/04/02 13:17:38 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.113 2003/04/26 17:09:55 mike Exp $".
  */

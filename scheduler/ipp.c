@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.212 2003/04/25 15:23:21 mike Exp $"
+ * "$Id: ipp.c,v 1.213 2003/04/26 17:09:55 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -682,7 +682,7 @@ add_class(client_t        *con,		/* I - Client connection */
       SortPrinters();
     }
     else
-      DeletePrinter(pclass);
+      DeletePrinter(pclass, 1);
 
    /*
     * Add the class as a new local class...
@@ -1119,7 +1119,7 @@ add_printer(client_t        *con,	/* I - Client connection */
       SortPrinters();
     }
     else
-      DeletePrinter(printer);
+      DeletePrinter(printer, 1);
 
    /*
     * Add the printer as a new local printer...
@@ -3235,7 +3235,7 @@ delete_printer(client_t        *con,	/* I - Client connection */
     LogMessage(L_INFO, "Class \'%s\' deleted by \'%s\'.", dest,
                con->username);
 
-    DeletePrinter(printer);
+    DeletePrinter(printer, 0);
     SaveAllClasses();
   }
   else
@@ -3243,7 +3243,7 @@ delete_printer(client_t        *con,	/* I - Client connection */
     LogMessage(L_INFO, "Printer \'%s\' deleted by \'%s\'.", dest,
                con->username);
 
-    DeletePrinter(printer);
+    DeletePrinter(printer, 0);
     SaveAllPrinters();
   }
 
@@ -6576,5 +6576,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.212 2003/04/25 15:23:21 mike Exp $".
+ * End of "$Id: ipp.c,v 1.213 2003/04/26 17:09:55 mike Exp $".
  */
