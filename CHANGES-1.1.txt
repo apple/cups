@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- A denial-of-service attack warning message was being
+	  written to the log files by the scheduler for every
+	  detection.  This caused a DoS of its own in some
+	  situations. The warning message is now written no more
+	  than once per minute.
 	- Fixed the CIE colorspace support code in the image and
 	  PS RIPs.
 	- The job-quota-period, job-page-limit, and job-k-limit

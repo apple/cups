@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.31 2003/01/07 18:27:16 mike Exp $"
+ * "$Id: client.c,v 1.91.2.32 2003/01/13 18:41:42 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -83,6 +83,8 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   const struct hostent	*host;	/* Host entry for address */
   char			*hostname;/* Hostname for address */
   http_addr_t		temp;	/* Temporary address variable */
+  static time_t		last_dos = 0;
+				/* Time of last DoS attack */
 
 
   LogMessage(L_DEBUG2, "AcceptClient(%p) %d NumClients = %d",
@@ -140,8 +142,12 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 
   if (count >= MaxClientsPerHost)
   {
-    LogMessage(L_WARN, "Possible DoS attack - more than %d clients connecting from %s!",
-	       MaxClientsPerHost, Clients[i].http.hostname);
+    if ((time(NULL) - last_dos) >= 60)
+    {
+      last_dos = time(NULL);
+      LogMessage(L_WARN, "Possible DoS attack - more than %d clients connecting from %s!",
+	         MaxClientsPerHost, Clients[i].http.hostname);
+    }
 
 #ifdef WIN32
     closesocket(con->http.fd);
@@ -2690,5 +2696,5 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.31 2003/01/07 18:27:16 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.32 2003/01/13 18:41:42 mike Exp $".
  */
