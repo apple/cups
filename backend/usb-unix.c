@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-unix.c,v 1.2.2.5 2004/12/09 14:53:52 mike Exp $"
+ * "$Id: usb-unix.c,v 1.2.2.6 2004/12/13 15:58:42 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -716,7 +716,7 @@ open_device(const char *uri)		/* I - Device URI */
 
     do
     {
-      for (i = 0; i < 8; i ++)
+      for (i = 0, busy = 0; i < 8; i ++)
       {
 	sprintf(device, "/dev/usb/printer%d", i);
 
@@ -803,5 +803,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb-unix.c,v 1.2.2.5 2004/12/09 14:53:52 mike Exp $".
+ * End of "$Id: usb-unix.c,v 1.2.2.6 2004/12/13 15:58:42 mike Exp $".
  */
