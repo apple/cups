@@ -35,6 +35,15 @@ CHANGES IN CUPS v1.1.1
 	  printers lacking the @server in the name.
 	- The configure script didn't work right when only
 	  --prefix was specified.
+	- The ppdEmit() code now wraps all printer commands so
+	  that buggy PostScript printers will still print a file
+	  after receiving an option that isn't available.
+	- Fixed the DeskJet margin bug, and disabled 600dpi
+	  color mode until it can be fixed.
+	- The cupsAddDest() function didn't sort instances
+	  correctly in all cases.
+	- The time-at-xyz attributes now expand to the date and
+	  time in banner files.
 
 
 CHANGES IN CUPS v1.1
