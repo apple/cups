@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.26 2000/05/11 15:16:23 mike Exp $"
+ * "$Id: ipp.c,v 1.27 2000/05/31 14:13:29 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -216,11 +216,11 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     request->request.op.request_id   = 1;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
+        	 "attributes-charset", NULL, "utf-8");
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
         	 "attributes-natural-language", NULL,
-        	 language != NULL ? language->language : "C");
+        	 language != NULL ? language->language : "en");
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
         	 NULL, uri);
@@ -394,11 +394,11 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     request->request.op.request_id   = 1;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
+        	 "attributes-charset", NULL, "utf-8");
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
         	 "attributes-natural-language", NULL,
-        	 language != NULL ? language->language : "C");
+        	 language != NULL ? language->language : "en");
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
         	 NULL, uri);
@@ -697,5 +697,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.26 2000/05/11 15:16:23 mike Exp $".
+ * End of "$Id: ipp.c,v 1.27 2000/05/31 14:13:29 mike Exp $".
  */
