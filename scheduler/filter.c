@@ -1,5 +1,5 @@
 /*
- * "$Id: filter.c,v 1.3.2.2 2002/05/16 14:00:10 mike Exp $"
+ * "$Id: filter.c,v 1.3.2.3 2002/07/02 19:15:25 mike Exp $"
  *
  *   File type conversion routines for the Common UNIX Printing System (CUPS).
  *
@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+#include <cups/debug.h>
 #include <cups/string.h>
 #include "mime.h"
 
@@ -157,6 +158,11 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
   * Range-check the input...
   */
 
+  DEBUG_printf(("mimeFilter(mime=%p, src=%p(%s/%s), dst=%p(%s/%s), num_filters=%p(%d))\n",
+        	mime, src, src ? src->super : "?", src ? src->type : "?",
+		dst, dst ? dst->super : "?", dst ? dst->type : "?",
+		num_filters, num_filters ? *num_filters : 0));
+
   if (mime == NULL || src == NULL || dst == NULL || num_filters == NULL)
     return (NULL);
 
@@ -177,6 +183,10 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
 
     memcpy(filters, temp, sizeof(mime_filter_t));
     *num_filters = 1;
+
+    DEBUG_puts("    Returning 1 filter:");
+    DEBUG_printf(("    %s\n", filters->filter));
+
     return (filters);
   }
 
@@ -243,8 +253,16 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
 
     *num_filters = num_mintemp + 1;
 
+#ifdef DEBUG
+    printf("    Returning %d filters:\n", *num_filters);
+    for (i = 0; i <= num_mintemp; i ++)
+      printf("    %s\n", filters[i].filter);
+#endif /* DEBUG */
+
     return (filters);
   }
+
+  DEBUG_puts("    Returning zippo...");
 
   return (NULL);
 }
@@ -295,5 +313,5 @@ lookup(mime_t      *mime,	/* I - MIME database */
 
 
 /*
- * End of "$Id: filter.c,v 1.3.2.2 2002/05/16 14:00:10 mike Exp $".
+ * End of "$Id: filter.c,v 1.3.2.3 2002/07/02 19:15:25 mike Exp $".
  */

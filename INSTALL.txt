@@ -6,6 +6,10 @@ code. For more information on CUPS see the file called
 "README.txt".  A complete change log can be found in
 "CHANGES.txt".
 
+**** IF YOU HAVE A NON-POSTSCRIPT PRINTER, YOU WILL ALSO  ****
+**** NEED TO INSTALL ESP GHOSTSCRIPT OR A PATCHED VERSION ****
+**** OF THE STANDARD GHOSTSCRIPT RELEASES.                ****
+
 
 BEFORE YOU BEGIN
 
@@ -28,6 +32,13 @@ Besides these tools you'll want the following libraries:
 
 CUPS will compile and run without these, however you'll miss out on
 many of the features provided by CUPS.
+
+Also, please note that CUPS no longer includes the Ghostscript-
+based pstoraster filter.  You *must* download Ghostscript
+separately and patch it using the files in the pstoraster
+subdirectory, or download the ESP Ghostscript distribution from
+the CUPS web site. For more information see the README file in
+the pstoraster subdirectory.
 
 
 COMPILING FROM CVS

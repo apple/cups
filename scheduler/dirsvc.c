@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.15 2002/06/27 15:10:39 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.16 2002/07/02 19:15:24 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1155,12 +1155,12 @@ UpdateCUPSBrowse(void)
 
   if (auth == AUTH_DENY)
   {
-    LogMessage(L_DEBUG, "UpdateBrowseList: Refused %d bytes from %s", bytes,
+    LogMessage(L_DEBUG, "UpdateCUPSBrowse: Refused %d bytes from %s", bytes,
                srcname);
     return;
   }
 
-  LogMessage(L_DEBUG2, "UpdateBrowseList: (%d bytes from %s) %s", bytes, srcname,
+  LogMessage(L_DEBUG2, "UpdateCUPSBrowse: (%d bytes from %s) %s", bytes, srcname,
              packet);
 
  /*
@@ -1170,7 +1170,7 @@ UpdateCUPSBrowse(void)
   if (sscanf(packet, "%x%x%1023s", (unsigned *)&type, (unsigned *)&state,
              uri) < 3)
   {
-    LogMessage(L_WARN, "UpdateBrowseList: Garbled browse packet - %s",
+    LogMessage(L_WARN, "UpdateCUPSBrowse: Garbled browse packet - %s",
                packet);
     return;
   }
@@ -1265,7 +1265,7 @@ UpdateCUPSBrowse(void)
                  (struct sockaddr *)&(Relays[i].to),
 		 sizeof(http_addr_t)) <= 0)
       {
-	LogMessage(L_ERROR, "UpdateBrowseList: sendto failed for relay %d - %s.",
+	LogMessage(L_ERROR, "UpdateCUPSBrowse: sendto failed for relay %d - %s.",
 	           i + 1, strerror(errno));
 	return;
       }
@@ -1851,5 +1851,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.15 2002/06/27 15:10:39 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.16 2002/07/02 19:15:24 mike Exp $".
  */

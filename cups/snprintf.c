@@ -1,5 +1,5 @@
 /*
- * "$Id: snprintf.c,v 1.4.2.5 2002/05/15 01:57:00 mike Exp $"
+ * "$Id: snprintf.c,v 1.4.2.6 2002/07/02 19:15:24 mike Exp $"
  *
  *   snprintf functions for the Common UNIX Printing System (CUPS).
  *
@@ -59,7 +59,6 @@ cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 		prec;			/* Number of characters of precision */
   char		tformat[100],		/* Temporary format string for sprintf() */
 		temp[1024];		/* Buffer for formatted numbers */
-  int		*chars;			/* Pointer to integer for %p */
   char		*s;			/* Pointer to string */
   int		slen;			/* Length of string */
 
@@ -176,8 +175,26 @@ cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 	    break;
 	    
 	case 'p' : /* Pointer value */
-	    if ((chars = va_arg(ap, int *)) != NULL)
-	      *chars = bufptr - buffer;
+	    if ((format - bufformat + 1) > sizeof(tformat) ||
+	        (width + 2) > sizeof(temp))
+	      break;
+
+	    strncpy(tformat, bufformat, format - bufformat);
+	    tformat[format - bufformat] = '\0';
+
+	    sprintf(temp, tformat, va_arg(ap, void *));
+
+	    if ((bufptr + strlen(temp)) > bufend)
+	    {
+	      strncpy(bufptr, temp, bufend - bufptr);
+	      bufptr = bufend;
+	      break;
+	    }
+	    else
+	    {
+	      strcpy(bufptr, temp);
+	      bufptr += strlen(temp);
+	    }
 	    break;
 
         case 'c' : /* Character or character array */
@@ -284,6 +301,6 @@ cups_snprintf(char       *buffer,	/* O - Output buffer */
 
 
 /*
- * End of "$Id: snprintf.c,v 1.4.2.5 2002/05/15 01:57:00 mike Exp $".
+ * End of "$Id: snprintf.c,v 1.4.2.6 2002/07/02 19:15:24 mike Exp $".
  */
 

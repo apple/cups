@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- Fixed a bug in the vsnprintf() emulation function,
+	  which was used on old versions of HP-UX, IRIX, and
+	  Solaris.
 	- The number-up option was incorrectly being used when
 	  printing banner pages.
 	- Added support for Greek and Slovak PPD files.
