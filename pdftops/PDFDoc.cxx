@@ -207,7 +207,7 @@ void PDFDoc::displayPage(OutputDev *out, int page, double hDPI, double vDPI,
   Page *p;
 
   if (globalParams->getPrintCommands()) {
-    printf("***** page %d *****\n", page);
+    fprintf(stderr, "DEBUG2: ***** page %d *****\n", page);
   }
   p = catalog->getPage(page);
   if (doLinks) {

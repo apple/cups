@@ -540,13 +540,14 @@ void Gfx::go(GBool topLevel) {
     // got a command - execute it
     if (obj.isCmd()) {
       if (printCommands) {
-	obj.print(stdout);
+        fputs("DEBUG2: ", stderr);
+	obj.print(stderr);
 	for (i = 0; i < numArgs; ++i) {
-	  printf(" ");
-	  args[i].print(stdout);
+	  putc(' ', stderr);
+	  args[i].print(stderr);
 	}
-	printf("\n");
-	fflush(stdout);
+	putc('\n', stderr);
+	fflush(stderr);
       }
       execOp(&obj, args, numArgs);
       obj.free();
@@ -578,10 +579,10 @@ void Gfx::go(GBool topLevel) {
     } else {
       error(getPos(), "Too many args in content stream");
       if (printCommands) {
-	printf("throwing away arg: ");
-	obj.print(stdout);
-	printf("\n");
-	fflush(stdout);
+	fputs("DEBUG2: throwing away arg: ", stderr);
+	obj.print(stderr);
+	putc('\n', stderr);
+	fflush(stderr);
       }
       obj.free();
     }
@@ -595,13 +596,13 @@ void Gfx::go(GBool topLevel) {
   if (numArgs > 0) {
     error(getPos(), "Leftover args in content stream");
     if (printCommands) {
-      printf("%d leftovers:", numArgs);
+      fprintf(stderr, "DEBUG2: %d leftovers:", numArgs);
       for (i = 0; i < numArgs; ++i) {
-	printf(" ");
-	args[i].print(stdout);
+	putc(' ', stderr);
+	args[i].print(stderr);
       }
-      printf("\n");
-      fflush(stdout);
+      putc('\n', stderr);
+      fflush(stderr);
     }
     for (i = 0; i < numArgs; ++i)
       args[i].free();
@@ -2139,11 +2140,11 @@ void Gfx::opSetFont(Object args[], int numArgs) {
     return;
   }
   if (printCommands) {
-    printf("  font: tag=%s name='%s' %g\n",
-	   font->getTag()->getCString(),
-	   font->getName() ? font->getName()->getCString() : "???",
-	   args[1].getNum());
-    fflush(stdout);
+    fprintf(stderr, "DEBUG2:   font: tag=%s name='%s' %g\n",
+	    font->getTag()->getCString(),
+	    font->getName() ? font->getName()->getCString() : "???",
+	    args[1].getNum());
+    fflush(stderr);
   }
   state->setFont(font, args[1].getNum());
   fontChanged = gTrue;
@@ -3032,11 +3033,11 @@ void Gfx::opEndIgnoreUndef(Object args[], int numArgs) {
 
 void Gfx::opBeginMarkedContent(Object args[], int numArgs) {
   if (printCommands) {
-    printf("  marked content: %s ", args[0].getName());
+    fprintf(stderr, "DEBUG2:   marked content: %s ", args[0].getName());
     if (numArgs == 2)
-      args[2].print(stdout);
-    printf("\n");
-    fflush(stdout);
+      args[2].print(stderr);
+    putc('\n', stderr);
+    fflush(stderr);
   }
 }
 
@@ -3045,11 +3046,11 @@ void Gfx::opEndMarkedContent(Object args[], int numArgs) {
 
 void Gfx::opMarkPoint(Object args[], int numArgs) {
   if (printCommands) {
-    printf("  mark point: %s ", args[0].getName());
+    fprintf(stderr, "DEBUG2:   mark point: %s ", args[0].getName());
     if (numArgs == 2)
-      args[2].print(stdout);
-    printf("\n");
-    fflush(stdout);
+      args[2].print(stderr);
+    putc('\n', stderr);
+    fflush(stderr);
   }
 }
 
