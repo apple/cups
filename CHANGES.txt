@@ -1,4 +1,4 @@
-CHANGES.txt - 07/06/2001
+CHANGES.txt - 07/11/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.9-1
@@ -10,6 +10,10 @@ CHANGES IN CUPS V1.1.9-1
 	- The pstoraster filter did not correctly support
 	  DuplexTumble mode for printers that used flip
 	  duplexing.
+	- The cups.list.in file was missing from the
+	  distribution.
+	- The New DeskJet series driver did not use the
+	  correct OrderDependency for the Duplex option.
 
 
 CHANGES IN CUPS V1.1.9
