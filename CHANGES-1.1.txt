@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- The cupsGetFile() and cupsPutFile() code did not
+	  support CDSA or GNUTLS (STR #794)
+	- The httpSeparate() function did not decode all
+	  character escapes (STR #795)
 	- The cupstestppd program now checks for invalid Duplex
 	  option choices and fails PPD files that use
 	  non-standard values (STR #791)

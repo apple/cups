@@ -1,5 +1,5 @@
 /*
- * "$Id: http-support.c,v 1.1.2.8 2004/06/29 13:15:08 mike Exp $"
+ * "$Id: http-support.c,v 1.1.2.9 2004/07/01 21:28:38 mike Exp $"
  *
  *   HTTP support routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -75,12 +75,39 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 
  /*
   * Copy the URL to a local string to make sure we don't have a URL
-  * longer than HTTP_MAX_URI characters long...
+  * longer than HTTP_MAX_URI characters long...  We also decode any
+  * character escapes...
   */
 
-  strlcpy(safeuri, uri, sizeof(safeuri));
+  for (ptr = safeuri; *uri; uri ++)
+    if (ptr < (safeuri + sizeof(safeuri) - 1))
+    {
+      if (*uri == '%' && isxdigit(uri[1] & 255) && isxdigit(uri[2] & 255))
+      {
+       /*
+	* Grab a hex-encoded character...
+	*/
 
-  uri = safeuri;
+        uri ++;
+	if (isalpha(*uri))
+	  quoted = (tolower(*uri) - 'a' + 10) << 4;
+	else
+	  quoted = (*uri - '0') << 4;
+
+        uri ++;
+	if (isalpha(*uri))
+	  quoted |= tolower(*uri) - 'a' + 10;
+	else
+	  quoted |= *uri - '0';
+
+        *ptr++ = quoted;
+      }
+      else
+	*ptr++ = *uri;
+    }
+
+  *ptr = '\0';
+  uri  = safeuri;
 
  /*
   * Grab the method portion of the URI...
@@ -102,7 +129,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 
     for (ptr = host; *uri != ':' && *uri != '\0'; uri ++)
       if (ptr < (host + HTTP_MAX_URI - 1))
-        *ptr++ = *uri;
+	*ptr++ = *uri;
 
     *ptr = '\0';
     if (*uri == ':')
@@ -170,38 +197,18 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 
   if ((atsign = strchr(uri, '@')) != NULL && atsign < slash)
   {
+   /**** TODO: get LAST @ before / ****/
    /*
     * Got a username:password combo...
     */
 
-    for (ptr = username; uri < atsign; uri ++)
-      if (ptr < (username + HTTP_MAX_URI - 1))
-      {
-        if (*uri == '%' && isxdigit(uri[1] & 255) && isxdigit(uri[2] & 255))
-	{
-	 /*
-	  * Grab a hex-encoded username and password...
-	  */
-
-          uri ++;
-	  if (isalpha(*uri))
-	    quoted = (tolower(*uri) - 'a' + 10) << 4;
-	  else
-	    quoted = (*uri - '0') << 4;
-
-          uri ++;
-	  if (isalpha(*uri))
-	    quoted |= tolower(*uri) - 'a' + 10;
-	  else
-	    quoted |= *uri - '0';
-
-          *ptr++ = quoted;
-	}
-	else
-	  *ptr++ = *uri;
-      }
-
-    *ptr = '\0';
+    if ((atsign - uri) < HTTP_MAX_URI)
+    {
+      strncpy(username, uri, atsign - uri);
+      username[atsign - uri] = '\0';
+    }
+    else
+      strlcpy(username, uri, HTTP_MAX_URI);
 
     uri = atsign + 1;
   }
@@ -341,5 +348,5 @@ cups_hstrerror(int error)		/* I - Error number */
 
 
 /*
- * End of "$Id: http-support.c,v 1.1.2.8 2004/06/29 13:15:08 mike Exp $".
+ * End of "$Id: http-support.c,v 1.1.2.9 2004/07/01 21:28:38 mike Exp $".
  */
