@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.40 2004/06/29 03:44:52 mike Exp $"
+# "$Id: Makefile,v 1.41 2004/07/01 21:26:41 mike Exp $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -141,6 +141,7 @@ socket:	socket.o ../cups/$(LIBCUPS)
 usb:	usb.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o usb usb.o $(BACKLIBS) $(LIBS)
+usb.o:	usb.c usb-darwin.c usb-unix.c
 
 
 #
@@ -151,5 +152,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.40 2004/06/29 03:44:52 mike Exp $".
+# End of "$Id: Makefile,v 1.41 2004/07/01 21:26:41 mike Exp $".
 #
