@@ -1,5 +1,5 @@
 /*
- * "$Id: ipptest.c,v 1.12 2002/03/08 19:49:00 mike Exp $"
+ * "$Id: ipptest.c,v 1.13 2002/04/05 15:37:19 mike Exp $"
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
@@ -535,6 +535,9 @@ get_operation(const char *name)
     if (strcasecmp(name, ipp_ops[i]) == 0)
       return ((ipp_op_t)i);
 
+  if (strcasecmp(name, "windows-ext") == 0)
+    return (IPP_PRIVATE);
+
   for (i = 0; i < (sizeof(cups_ops) / sizeof(cups_ops[0])); i ++)
     if (strcasecmp(name, cups_ops[i]) == 0)
       return ((ipp_op_t)(i + 0x4001));
@@ -807,5 +810,5 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 
 
 /*
- * End of "$Id: ipptest.c,v 1.12 2002/03/08 19:49:00 mike Exp $".
+ * End of "$Id: ipptest.c,v 1.13 2002/04/05 15:37:19 mike Exp $".
  */
