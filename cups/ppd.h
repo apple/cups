@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.22 2001/01/22 15:03:31 mike Exp $"
+ * "$Id: ppd.h,v 1.23 2001/02/09 16:23:35 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -59,6 +59,15 @@ extern "C" {
 
 
 /*
+ * PPD size limits (defined in Adobe spec)
+ */
+
+#  define PPD_MAX_NAME	41	/* Maximum size of name + 1 for nul */
+#  define PPD_MAX_TEXT	81	/* Maximum size of text + 1 for nul */
+#  define PPD_MAX_LINE	256	/* Maximum size of line + 1 for nul */
+
+
+/*
  * Types and structures...
  */
 
@@ -92,8 +101,10 @@ typedef enum			/**** Colorspaces ****/
 typedef struct			/**** Option choices ****/
 {
   char		marked,		/* 0 if not selected, 1 otherwise */
-		choice[41],	/* Computer-readable option name */
-		text[81],	/* Human-readable option name */
+		choice[PPD_MAX_NAME],
+				/* Computer-readable option name */
+		text[PPD_MAX_TEXT],
+				/* Human-readable option name */
 		*code;		/* Code to send for this option */
   void		*option;	/* Pointer to parent option structure */
 } ppd_choice_t;
@@ -101,9 +112,12 @@ typedef struct			/**** Option choices ****/
 typedef struct			/**** Options ****/
 {
   char		conflicted,	/* 0 if no conflicts exist, 1 otherwise */
-		keyword[41],	/* Option keyword name ("PageSize", etc.) */
-		defchoice[41],	/* Default option choice */
-		text[81];	/* Human-readable text */
+		keyword[PPD_MAX_NAME],
+				/* Option keyword name ("PageSize", etc.) */
+		defchoice[PPD_MAX_NAME],
+				/* Default option choice */
+		text[PPD_MAX_TEXT];
+				/* Human-readable text */
   ppd_ui_t	ui;		/* Type of UI option */
   ppd_section_t	section;	/* Section for command */
   float		order;		/* Order number */
@@ -113,7 +127,8 @@ typedef struct			/**** Options ****/
 
 typedef struct ppd_group_str	/**** Groups ****/
 {
-  char		text[81];	/* Human-readable group name */
+  char		text[PPD_MAX_TEXT];
+  				/* Human-readable group name */
   int		num_options;	/* Number of options */
   ppd_option_t	*options;	/* Options */
   int		num_subgroups;	/* Number of sub-groups */
@@ -123,16 +138,21 @@ typedef struct ppd_group_str	/**** Groups ****/
 
 typedef struct			/**** Constraints ****/
 {
-  char		option1[41],	/* First keyword */
-		choice1[41],	/* First option/choice (blank for all) */
-		option2[41],	/* Second keyword */
-		choice2[41];	/* Second option/choice (blank for all) */
+  char		option1[PPD_MAX_NAME],
+  				/* First keyword */
+		choice1[PPD_MAX_NAME],
+				/* First option/choice (blank for all) */
+		option2[PPD_MAX_NAME],
+				/* Second keyword */
+		choice2[PPD_MAX_NAME];
+				/* Second option/choice (blank for all) */
 } ppd_const_t;
 
 typedef struct			/**** Page Sizes ****/
 {
   int		marked;		/* Page size selected? */
-  char		name[41];	/* Media size option */
+  char		name[PPD_MAX_NAME];
+  				/* Media size option */
   float		width,		/* Width of media in points */
 		length,		/* Length of media in points */
 		left,		/* Left printable margin in points */
@@ -143,15 +163,18 @@ typedef struct			/**** Page Sizes ****/
 
 typedef struct			/**** Emulators ****/
 {
-  char		name[41],	/* Emulator name */
+  char		name[PPD_MAX_NAME],
+  				/* Emulator name */
 		*start,		/* Code to switch to this emulation */
 		*stop;		/* Code to stop this emulation */
 } ppd_emul_t;
 
 typedef struct			/**** sRGB Color Profiles ****/
 {
-  char		resolution[41],	/* Resolution or "-" */
-		media_type[41];	/* Media type of "-" */
+  char		resolution[PPD_MAX_NAME],
+  				/* Resolution or "-" */
+		media_type[PPD_MAX_NAME];
+				/* Media type of "-" */
   float		density,	/* Ink density to use */
 		gamma,		/* Gamma correction to use */
 		matrix[3][3];	/* Transform matrix */
@@ -239,5 +262,5 @@ extern float		ppdPageWidth(ppd_file_t *ppd, const char *name);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.22 2001/01/22 15:03:31 mike Exp $".
+ * End of "$Id: ppd.h,v 1.23 2001/02/09 16:23:35 mike Exp $".
  */

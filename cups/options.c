@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c,v 1.18 2001/01/22 15:03:30 mike Exp $"
+ * "$Id: options.c,v 1.19 2001/02/09 16:23:35 mike Exp $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -56,7 +56,7 @@ cupsAddOption(const char    *name,		/* I - Name of option */
   cups_option_t	*temp;				/* Pointer to new option */
 
 
-  if (name == NULL || value == NULL || options == NULL)
+  if (name == NULL || value == NULL || options == NULL || num_options < 0)
     return (0);
 
  /*
@@ -381,7 +381,7 @@ cupsFreeOptions(int           num_options,	/* I - Number of options */
   int	i;					/* Looping var */
 
 
-  if (num_options == 0 || options == NULL)
+  if (num_options <= 0 || options == NULL)
     return;
 
   for (i = 0; i < num_options; i ++)
@@ -406,7 +406,7 @@ cupsGetOption(const char    *name,	/* I - Name of option */
   int	i;				/* Looping var */
 
 
-  if (name == NULL || num_options == 0 || options == NULL)
+  if (name == NULL || num_options <= 0 || options == NULL)
     return (NULL);
 
   for (i = 0; i < num_options; i ++)
@@ -432,7 +432,7 @@ cupsParseOptions(const char    *arg,		/* I - Argument to parse */
 	*value;					/* Pointer to value */
 
 
-  if (arg == NULL || options == NULL)
+  if (arg == NULL || options == NULL || num_options < 0)
     return (0);
 
  /*
@@ -565,6 +565,17 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 	s[255];					/* Temporary string */
 
 
+ /*
+  * Check arguments...
+  */
+
+  if (ppd == NULL || num_options <= 0 || options == NULL)
+    return (0);
+
+ /*
+  * Mark options...
+  */
+
   conflict = 0;
 
   for (i = num_options; i > 0; i --, options ++)
@@ -661,5 +672,5 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: options.c,v 1.18 2001/01/22 15:03:30 mike Exp $".
+ * End of "$Id: options.c,v 1.19 2001/02/09 16:23:35 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.75 2001/02/08 19:24:14 mike Exp $"
+ * "$Id: util.c,v 1.76 2001/02/09 16:23:36 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -177,7 +177,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
   char		realm[HTTP_MAX_VALUE],	/* realm="xyz" string */
 		nonce[HTTP_MAX_VALUE],	/* nonce="xyz" string */
 		plain[255],		/* Plaintext username:password */
-		encode[255];		/* Encoded username:password */
+		encode[512];		/* Encoded username:password */
   char		prompt[1024];		/* Prompt string */
 
 
@@ -647,7 +647,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   char		realm[HTTP_MAX_VALUE],	/* realm="xyz" string */
 		nonce[HTTP_MAX_VALUE],	/* nonce="xyz" string */
 		plain[255],		/* Plaintext username:password */
-		encode[255];		/* Encoded username:password */
+		encode[512];		/* Encoded username:password */
   http_status_t	status;			/* HTTP status from server */
   char		prompt[1024];		/* Prompt string */
   static char	filename[HTTP_MAX_URI];	/* Local filename */
@@ -1510,5 +1510,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.75 2001/02/08 19:24:14 mike Exp $".
+ * End of "$Id: util.c,v 1.76 2001/02/09 16:23:36 mike Exp $".
  */

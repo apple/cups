@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.49 2001/01/22 15:03:30 mike Exp $"
+ * "$Id: ppd.c,v 1.50 2001/02/09 16:23:35 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -428,9 +428,12 @@ ppdOpen(FILE *fp)		/* I - File to read from */
   ppd_const_t	*constraint;	/* Current constraint */
   ppd_size_t	*size;		/* Current page size */
   int		mask;		/* Line data mask */
-  char		keyword[41],	/* Keyword from file */
-		name[41],	/* Option from file */
-		text[81],	/* Human-readable text from file */
+  char		keyword[PPD_MAX_NAME],
+  				/* Keyword from file */
+		name[PPD_MAX_NAME],
+				/* Option from file */
+		text[PPD_MAX_TEXT],
+				/* Human-readable text from file */
 		*string,	/* Code/text from file */
 		*sptr,		/* Pointer into string */
 		*nameptr;	/* Pointer into name */
@@ -833,8 +836,11 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 
       for (i = 0, sptr = string; i < count; i ++)
       {
-        for (nameptr = ppd->emulations[i].name; *sptr != '\0' && *sptr != ' ';)
-	  *nameptr ++ = *sptr ++;
+        for (nameptr = ppd->emulations[i].name;
+	     *sptr != '\0' && *sptr != ' ';
+	     sptr ++)
+	  if (nameptr < (ppd->emulations[i].name + sizeof(ppd->emulations[i].name) - 1))
+	    *nameptr++ = *sptr;
 
 	*nameptr = '\0';
 
@@ -1163,6 +1169,11 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	    break;
 
 	case 2 : /* Two options... */
+	   /*
+	    * The following strcpy's are safe, as optionN and
+	    * choiceN are all the same size (size defined by PPD spec...)
+	    */
+
 	    if (constraint->option1[0] == '*')
 	      strcpy(constraint->option1, constraint->option1 + 1);
 
@@ -1176,6 +1187,11 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	    break;
 	    
 	case 3 : /* Two options, one choice... */
+	   /*
+	    * The following strcpy's are safe, as optionN and
+	    * choiceN are all the same size (size defined by PPD spec...)
+	    */
+
 	    if (constraint->option1[0] == '*')
 	      strcpy(constraint->option1, constraint->option1 + 1);
 
@@ -1718,7 +1734,7 @@ ppd_read(FILE *fp,		/* I - File to read from */
     keyptr = keyword;
 
     while (*lineptr != '\0' && *lineptr != ':' && !isspace(*lineptr) &&
-	   (keyptr - keyword) < 40)
+	   (keyptr - keyword) < (PPD_MAX_NAME - 1))
       *keyptr++ = *lineptr++;
 
     *keyptr = '\0';
@@ -1753,7 +1769,7 @@ ppd_read(FILE *fp,		/* I - File to read from */
 	textptr = text;
 
 	while (*lineptr != '\0' && *lineptr != '\n' && *lineptr != ':' &&
-               (textptr - text) < 80)
+               (textptr - text) < (PPD_MAX_TEXT - 1))
 	  *textptr++ = *lineptr++;
 
 	*textptr = '\0';
@@ -1900,5 +1916,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.49 2001/01/22 15:03:30 mike Exp $".
+ * End of "$Id: ppd.c,v 1.50 2001/02/09 16:23:35 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.49 2001/02/07 18:27:16 mike Exp $"
+ * "$Id: ipp.c,v 1.50 2001/02/09 16:23:35 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -804,7 +804,7 @@ ippNew(void)
   ipp_t	*temp;			/* New IPP request */
 
 
-  if ((temp = (ipp_t *)calloc(sizeof(ipp_t), 1)) != NULL)
+  if ((temp = (ipp_t *)calloc(1, sizeof(ipp_t))) != NULL)
   {
    /*
     * Default to IPP 1.1...
@@ -1283,7 +1283,8 @@ ippWrite(http_t *http,		/* I - HTTP data */
 	    *bufptr++ = attr->group_tag;
 	  }
 
-          n = strlen(attr->name);
+          if ((n = strlen(attr->name)) > (sizeof(buffer) - 3))
+	    return (IPP_ERROR);
 
           DEBUG_printf(("ippWrite: writing value tag = %x\n", attr->value_tag));
           DEBUG_printf(("ippWrite: writing name = %d, \'%s\'\n", n, attr->name));
@@ -1300,6 +1301,17 @@ ippWrite(http_t *http,		/* I - HTTP data */
 	    case IPP_TAG_ENUM :
 	        for (i = 0; i < attr->num_values; i ++)
 		{
+                  if ((sizeof(buffer) - (bufptr - buffer)) < 9)
+		  {
+                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+	            {
+	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              return (IPP_ERROR);
+	            }
+
+		    bufptr = buffer;
+		  }
+
 		  if (i)
 		  {
 		   /*
@@ -1324,6 +1336,17 @@ ippWrite(http_t *http,		/* I - HTTP data */
 	    case IPP_TAG_BOOLEAN :
 	        for (i = 0; i < attr->num_values; i ++)
 		{
+                  if ((sizeof(buffer) - (bufptr - buffer)) < 6)
+		  {
+                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+	            {
+	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              return (IPP_ERROR);
+	            }
+
+		    bufptr = buffer;
+		  }
+
 		  if (i)
 		  {
 		   /*
@@ -1364,12 +1387,26 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		                  attr->value_tag));
         	    DEBUG_printf(("ippWrite: writing name = 0, \'\'\n"));
 
+                    if ((sizeof(buffer) - (bufptr - buffer)) < 3)
+		    {
+                      if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+	              {
+	        	DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	        	return (IPP_ERROR);
+	              }
+
+		      bufptr = buffer;
+		    }
+
                     *bufptr++ = attr->value_tag;
 		    *bufptr++ = 0;
 		    *bufptr++ = 0;
 		  }
 
                   n = strlen(attr->values[i].string.text);
+
+                  if (n > sizeof(buffer))
+		    return (IPP_ERROR);
 
                   DEBUG_printf(("ippWrite: writing string = %d, \'%s\'\n", n,
 		                attr->values[i].string.text));
@@ -1395,6 +1432,17 @@ ippWrite(http_t *http,		/* I - HTTP data */
 	    case IPP_TAG_DATE :
 	        for (i = 0; i < attr->num_values; i ++)
 		{
+                  if ((sizeof(buffer) - (bufptr - buffer)) < 16)
+		  {
+                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+	            {
+	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              return (IPP_ERROR);
+	            }
+
+		    bufptr = buffer;
+		  }
+
 		  if (i)
 		  {
 		   /*
@@ -1417,6 +1465,17 @@ ippWrite(http_t *http,		/* I - HTTP data */
 	    case IPP_TAG_RESOLUTION :
 	        for (i = 0; i < attr->num_values; i ++)
 		{
+                  if ((sizeof(buffer) - (bufptr - buffer)) < 14)
+		  {
+                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+	            {
+	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              return (IPP_ERROR);
+	            }
+
+		    bufptr = buffer;
+		  }
+
 		  if (i)
 		  {
 		   /*
@@ -1446,6 +1505,17 @@ ippWrite(http_t *http,		/* I - HTTP data */
 	    case IPP_TAG_RANGE :
 	        for (i = 0; i < attr->num_values; i ++)
 		{
+                  if ((sizeof(buffer) - (bufptr - buffer)) < 13)
+		  {
+                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+	            {
+	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              return (IPP_ERROR);
+	            }
+
+		    bufptr = buffer;
+		  }
+
 		  if (i)
 		  {
 		   /*
@@ -1482,6 +1552,17 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		    * values with a zero-length name...
 		    */
 
+                    if ((sizeof(buffer) - (bufptr - buffer)) < 3)
+		    {
+                      if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+	              {
+	        	DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	        	return (IPP_ERROR);
+	              }
+
+		      bufptr = buffer;
+		    }
+
                     *bufptr++ = attr->value_tag;
 		    *bufptr++ = 0;
 		    *bufptr++ = 0;
@@ -1490,6 +1571,9 @@ ippWrite(http_t *http,		/* I - HTTP data */
                   n = strlen(attr->values[i].string.charset) +
 		      strlen(attr->values[i].string.text) +
 		      4;
+
+                  if (n > sizeof(buffer))
+		    return (IPP_ERROR);
 
                   if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
 		  {
@@ -1536,12 +1620,26 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		    * values with a zero-length name...
 		    */
 
+                    if ((sizeof(buffer) - (bufptr - buffer)) < 3)
+		    {
+                      if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+	              {
+	        	DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	        	return (IPP_ERROR);
+	              }
+
+		      bufptr = buffer;
+		    }
+
                     *bufptr++ = attr->value_tag;
 		    *bufptr++ = 0;
 		    *bufptr++ = 0;
 		  }
 
                   n = attr->values[i].unknown.length;
+
+                  if (n > sizeof(buffer))
+		    return (IPP_ERROR);
 
                   if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
 		  {
@@ -1764,5 +1862,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.49 2001/02/07 18:27:16 mike Exp $".
+ * End of "$Id: ipp.c,v 1.50 2001/02/09 16:23:35 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.79 2001/02/07 20:09:06 mike Exp $"
+ * "$Id: http.c,v 1.80 2001/02/09 16:23:35 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -578,7 +578,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
   * longer than HTTP_MAX_URI characters long...
   */
 
-  strncpy(safeuri, uri, sizeof(safeuri) - 1);
+  strncpy(safeuri, uri, sizeof(safeuri));
   safeuri[sizeof(safeuri) - 1] = '\0';
 
   uri = safeuri;
@@ -601,9 +601,9 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
     * Standard URI with method...
     */
 
-    ptr = host;
-    while (*uri != ':' && *uri != '\0')
-      *ptr++ = *uri++;
+    for (ptr = host; *uri != ':' && *uri != '\0'; uri ++)
+      if (ptr < (host + HTTP_MAX_URI - 1))
+        *ptr++ = *uri;
 
     *ptr = '\0';
     if (*uri == ':')
@@ -618,7 +618,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
     {
       if ((ptr = strchr(host, '/')) != NULL)
       {
-	strncpy(resource, ptr, HTTP_MAX_URI - 1);
+	strncpy(resource, ptr, HTTP_MAX_URI);
 	resource[HTTP_MAX_URI - 1] = '\0';
 	*ptr = '\0';
       }
@@ -635,7 +635,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 
 	if (*uri == '/')
 	{
-          strncpy(resource, uri, HTTP_MAX_URI - 1);
+          strncpy(resource, uri, HTTP_MAX_URI);
           resource[HTTP_MAX_URI - 1] = '\0';
 	}
       }
@@ -669,7 +669,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
   }
 
  /*
-  * Grab the usenname, if any...
+  * Grab the username, if any...
   */
 
   while (*uri == '/')
@@ -684,9 +684,9 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
     * Got a username:password combo...
     */
 
-    for (ptr = username;
-         uri < atsign && ptr < (username + HTTP_MAX_URI - 1);
-	 *ptr++ = *uri++);
+    for (ptr = username; uri < atsign; uri ++)
+      if (ptr < (username + HTTP_MAX_URI - 1))
+	*ptr++ = *uri;
 
     *ptr = '\0';
 
@@ -699,9 +699,9 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
   * Grab the hostname...
   */
 
-  ptr = host;
-  while (*uri != ':' && *uri != '/' && *uri != '\0')
-    *ptr ++ = *uri ++;
+  for (ptr = host; *uri != ':' && *uri != '/' && *uri != '\0'; uri ++)
+    if (ptr < (host + HTTP_MAX_URI - 1))
+      *ptr++ = *uri;
 
   *ptr = '\0';
 
@@ -748,7 +748,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
   * The remaining portion is the resource string...
   */
 
-  strncpy(resource, uri, HTTP_MAX_URI - 1);
+  strncpy(resource, uri, HTTP_MAX_URI);
   resource[HTTP_MAX_URI - 1] = '\0';
 }
 
@@ -1865,12 +1865,15 @@ http_send(http_t       *http,	/* I - HTTP data */
   * Encode the URI as needed...
   */
 
-  for (ptr = buf; *uri != '\0'; uri ++)
+  for (ptr = buf; *uri != '\0' && ptr < (buf + sizeof(buf) - 1); uri ++)
     if (*uri <= ' ' || *uri >= 127)
     {
-      *ptr ++ = '%';
-      *ptr ++ = hex[(*uri >> 4) & 15];
-      *ptr ++ = hex[*uri & 15];
+      if (ptr < (buf + sizeof(buf) - 1))
+        *ptr ++ = '%';
+      if (ptr < (buf + sizeof(buf) - 1))
+        *ptr ++ = hex[(*uri >> 4) & 15];
+      if (ptr < (buf + sizeof(buf) - 1))
+        *ptr ++ = hex[*uri & 15];
     }
     else
       *ptr ++ = *uri;
@@ -2025,5 +2028,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.79 2001/02/07 20:09:06 mike Exp $".
+ * End of "$Id: http.c,v 1.80 2001/02/09 16:23:35 mike Exp $".
  */

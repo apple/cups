@@ -16,6 +16,13 @@ CHANGES IN CUPS V1.1.6-3
 	  fails.
 	- SuSE fix: Added setgroups() calls after setgid() and
 	  setuid() calls.
+	- SuSE fix: potential buffer overflows in httpEncode64()
+	  calls.
+	- SuSE fix: potential buffer overflows in httpSeparate()
+	- SuSE fix: potential buffer overflows in ippWrite() for
+	  bad input.
+	- SuSE fix: potential nul skip in ppd_decode() for
+	  missing hex digits.
 
 
 CHANGES IN CUPS V1.1.6-2

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.109 2001/02/08 19:24:15 mike Exp $"
+ * "$Id: job.c,v 1.110 2001/02/09 16:23:36 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2176,7 +2176,8 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 	    *bufptr++ = attr->group_tag;
 	  }
 
-          n = strlen(attr->name);
+          if ((n = strlen(attr->name)) > (sizeof(buffer) - 3))
+	    return (IPP_ERROR);
 
           DEBUG_printf(("ipp_write_file: writing value tag = %x\n", attr->value_tag));
           DEBUG_printf(("ipp_write_file: writing name = %d, \'%s\'\n", n, attr->name));
@@ -2193,6 +2194,17 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 	    case IPP_TAG_ENUM :
 	        for (i = 0; i < attr->num_values; i ++)
 		{
+                  if ((sizeof(buffer) - (bufptr - buffer)) < 9)
+		  {
+                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+	            {
+	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              return (IPP_ERROR);
+	            }
+
+		    bufptr = buffer;
+		  }
+
 		  if (i)
 		  {
 		   /*
@@ -2217,6 +2229,17 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 	    case IPP_TAG_BOOLEAN :
 	        for (i = 0; i < attr->num_values; i ++)
 		{
+                  if ((sizeof(buffer) - (bufptr - buffer)) < 6)
+		  {
+                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+	            {
+	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              return (IPP_ERROR);
+	            }
+
+		    bufptr = buffer;
+		  }
+
 		  if (i)
 		  {
 		   /*
@@ -2257,12 +2280,26 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 		                  attr->value_tag));
         	    DEBUG_printf(("ipp_write_file: writing name = 0, \'\'\n"));
 
+                    if ((sizeof(buffer) - (bufptr - buffer)) < 3)
+		    {
+                      if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+	              {
+	        	DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	        	return (IPP_ERROR);
+	              }
+
+		      bufptr = buffer;
+		    }
+
                     *bufptr++ = attr->value_tag;
 		    *bufptr++ = 0;
 		    *bufptr++ = 0;
 		  }
 
                   n = strlen(attr->values[i].string.text);
+
+                  if (n > sizeof(buffer))
+		    return (IPP_ERROR);
 
                   DEBUG_printf(("ipp_write_file: writing string = %d, \'%s\'\n", n,
 		                attr->values[i].string.text));
@@ -2289,6 +2326,17 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 	    case IPP_TAG_DATE :
 	        for (i = 0; i < attr->num_values; i ++)
 		{
+                  if ((sizeof(buffer) - (bufptr - buffer)) < 16)
+		  {
+                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+	            {
+	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              return (IPP_ERROR);
+	            }
+
+		    bufptr = buffer;
+		  }
+
 		  if (i)
 		  {
 		   /*
@@ -2311,6 +2359,17 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 	    case IPP_TAG_RESOLUTION :
 	        for (i = 0; i < attr->num_values; i ++)
 		{
+                  if ((sizeof(buffer) - (bufptr - buffer)) < 14)
+		  {
+                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+	            {
+	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              return (IPP_ERROR);
+	            }
+
+		    bufptr = buffer;
+		  }
+
 		  if (i)
 		  {
 		   /*
@@ -2340,6 +2399,17 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 	    case IPP_TAG_RANGE :
 	        for (i = 0; i < attr->num_values; i ++)
 		{
+                  if ((sizeof(buffer) - (bufptr - buffer)) < 13)
+		  {
+                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+	            {
+	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              return (IPP_ERROR);
+	            }
+
+		    bufptr = buffer;
+		  }
+
 		  if (i)
 		  {
 		   /*
@@ -2376,6 +2446,17 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 		    * values with a zero-length name...
 		    */
 
+                    if ((sizeof(buffer) - (bufptr - buffer)) < 3)
+		    {
+                      if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+	              {
+	        	DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	        	return (IPP_ERROR);
+	              }
+
+		      bufptr = buffer;
+		    }
+
                     *bufptr++ = attr->value_tag;
 		    *bufptr++ = 0;
 		    *bufptr++ = 0;
@@ -2384,6 +2465,9 @@ ipp_write_file(const char *filename,	/* I - File to write to */
                   n = strlen(attr->values[i].string.charset) +
 		      strlen(attr->values[i].string.text) +
 		      4;
+
+                  if (n > sizeof(buffer))
+		    return (IPP_ERROR);
 
                   if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
 		  {
@@ -2430,12 +2514,26 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 		    * values with a zero-length name...
 		    */
 
+                    if ((sizeof(buffer) - (bufptr - buffer)) < 3)
+		    {
+                      if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+	              {
+	        	DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	        	return (IPP_ERROR);
+	              }
+
+		      bufptr = buffer;
+		    }
+
                     *bufptr++ = attr->value_tag;
 		    *bufptr++ = 0;
 		    *bufptr++ = 0;
 		  }
 
                   n = attr->values[i].unknown.length;
+
+                  if (n > sizeof(buffer))
+		    return (IPP_ERROR);
 
                   if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
 		  {
@@ -2628,5 +2726,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.109 2001/02/08 19:24:15 mike Exp $".
+ * End of "$Id: job.c,v 1.110 2001/02/09 16:23:36 mike Exp $".
  */
