@@ -3,6 +3,12 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.13
 
+	- Added --with-optim="flags" option to configure script.
+	- Updated the Italian message translations.
+	- Updated the cups.list file to install the correct
+	  files.
+	- The pstoraster filter accessed the third element of a
+	  2 element array.
 	- The scheduler did not setup a status pipe for polling
 	  processes, so error messages went to whatever file
 	  descriptor 2 was pointing to when they were started.

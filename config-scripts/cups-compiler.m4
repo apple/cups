@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4,v 1.9.2.2 2002/01/02 18:50:23 mike Exp $"
+dnl "$Id: cups-compiler.m4,v 1.9.2.3 2002/01/14 20:36:31 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -32,6 +32,8 @@ AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging [default=no]],
 		OPTIM="-g"
 	fi])
 
+AC_ARG_WITH(optim, [  --with-optim=\"flags\"    set optimization flags ])
+
 dnl Update compiler options...
 if test -n "$GCC"; then
 	# Starting with GCC 3.0, you must link C++ programs against either
@@ -60,11 +62,15 @@ if test -n "$GCC"; then
 	CXX="$CC"
 
 	if test -z "$OPTIM"; then
-		if test $uname = HP-UX; then
-			# GCC under HP-UX has bugs with -O2
-			OPTIM="-O1"
+		if test "x$with_optim" = x; then
+			if test $uname = HP-UX; then
+				# GCC under HP-UX has bugs with -O2
+				OPTIM="-O1"
+			else
+		       		OPTIM="-O2"
+			fi
 		else
-		       	OPTIM="-O2"
+			OPTIM="$with_optim $OPTIM"
 		fi
 	fi
 
@@ -77,17 +83,27 @@ else
 	case $uname in
 		AIX*)
 			if test -z "$OPTIM"; then
-				OPTIM="-O2 -qmaxmem=6000"
+				if test "x$with_optim" = x; then
+					OPTIM="-O2 -qmaxmem=6000"
+				else
+					OPTIM="$with_optim $OPTIM"
+				fi
 			fi
 			;;
 		HP-UX*)
 			if test -z "$OPTIM"; then
-				OPTIM="+O2"
+				if test "x$with_optim" = x; then
+					OPTIM="+O2"
+				else
+					OPTIM="$with_optim $OPTIM"
+				fi
 			fi
 
 			CFLAGS="-Ae $CFLAGS"
 
-			OPTIM="+DAportable $OPTIM"
+			if test "x$with_optim" = x; then
+				OPTIM="+DAportable $OPTIM"
+			fi
 
 			if test $PICFLAG = 1; then
 				OPTIM="+z $OPTIM"
@@ -95,10 +111,14 @@ else
 			;;
         	IRIX*)
 			if test -z "$OPTIM"; then
-        			OPTIM="-O2"
+				if test "x$with_optim" = x; then
+					OPTIM="-O2"
+				else
+					OPTIM="$with_optim $OPTIM"
+				fi
 			fi
 
-			if test $uversion -ge 62; then
+			if test $uversion -ge 62 -a "x$with_optim" = x; then
 				OPTIM="$OPTIM -n32 -mips3"
 			fi
 
@@ -107,10 +127,16 @@ else
 		SunOS*)
 			# Solaris
 			if test -z "$OPTIM"; then
-				OPTIM="-xO4"
+				if test "x$with_optim" = x; then
+					OPTIM="-xO4"
+				else
+					OPTIM="$with_optim $OPTIM"
+				fi
 			fi
 
-			OPTIM="$OPTIM -xarch=generic"
+			if test "x$with_optim" = x; then
+				OPTIM="$OPTIM -xarch=generic"
+			fi
 
 			if test $PICFLAG = 1; then
 				OPTIM="-KPIC $OPTIM"
@@ -119,7 +145,11 @@ else
 		UNIX_SVR*)
 			# UnixWare
 			if test -z "$OPTIM"; then
-				OPTIM="-O"
+				if test "x$with_optim" = x; then
+					OPTIM="-O"
+				else
+					OPTIM="$with_optim $OPTIM"
+				fi
 			fi
 
 			if test $PICFLAG = 1; then
@@ -148,5 +178,5 @@ case $uname in
 esac
 
 dnl
-dnl End of "$Id: cups-compiler.m4,v 1.9.2.2 2002/01/02 18:50:23 mike Exp $".
+dnl End of "$Id: cups-compiler.m4,v 1.9.2.3 2002/01/14 20:36:31 mike Exp $".
 dnl

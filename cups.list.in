@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in,v 1.13.2.4 2002/01/02 18:04:17 mike Exp $"
+# "$Id: cups.list.in,v 1.13.2.5 2002/01/14 20:36:30 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -131,6 +131,7 @@ f 0555 root sys $SERVERBIN/filter/pdftops pdftops/pdftops
 f 0555 root sys $SERVERBIN/filter/imagetops filter/imagetops
 f 0555 root sys $SERVERBIN/filter/pstops filter/pstops
 f 0555 root sys $SERVERBIN/filter/texttops filter/texttops
+f 0555 root sys $SERVERBIN/filter/rastertodymo filter/rastertodymo
 f 0555 root sys $SERVERBIN/filter/rastertoepson filter/rastertoepson
 f 0555 root sys $SERVERBIN/filter/rastertohp filter/rastertohp
 f 0555 root sys $SERVERBIN/filter/hpgltops filter/hpgltops
@@ -193,6 +194,7 @@ d 1700 $CUPS_USER sys $REQUESTS/tmp -
 
 # Data files
 f 0444 root sys $LOCALEDIR/C/cups_C locale/C/cups_C
+f 0444 root sys $LOCALEDIR/cs/cups_cs locale/cs/cups_cs
 f 0444 root sys $LOCALEDIR/de/cups_de locale/de/cups_de
 f 0444 root sys $LOCALEDIR/en/cups_en locale/en/cups_en
 f 0444 root sys $LOCALEDIR/es/cups_es locale/es/cups_es
@@ -221,8 +223,6 @@ f 0444 root sys $DATADIR/charsets/windows-1256 data/windows-1256
 f 0444 root sys $DATADIR/charsets/windows-1257 data/windows-1257
 f 0444 root sys $DATADIR/charsets/windows-1258 data/windows-1258
 f 0444 root sys $DATADIR/charsets/iso-8859-1 data/iso-8859-1
-f 0444 root sys $DATADIR/charsets/iso-8859-14 data/iso-8859-14
-f 0444 root sys $DATADIR/charsets/iso-8859-15 data/iso-8859-15
 f 0444 root sys $DATADIR/charsets/iso-8859-2 data/iso-8859-2
 f 0444 root sys $DATADIR/charsets/iso-8859-3 data/iso-8859-3
 f 0444 root sys $DATADIR/charsets/iso-8859-4 data/iso-8859-4
@@ -231,6 +231,10 @@ f 0444 root sys $DATADIR/charsets/iso-8859-6 data/iso-8859-6
 f 0444 root sys $DATADIR/charsets/iso-8859-7 data/iso-8859-7
 f 0444 root sys $DATADIR/charsets/iso-8859-8 data/iso-8859-8
 f 0444 root sys $DATADIR/charsets/iso-8859-9 data/iso-8859-9
+f 0444 root sys $DATADIR/charsets/iso-8859-10 data/iso-8859-10
+f 0444 root sys $DATADIR/charsets/iso-8859-13 data/iso-8859-13
+f 0444 root sys $DATADIR/charsets/iso-8859-14 data/iso-8859-14
+f 0444 root sys $DATADIR/charsets/iso-8859-15 data/iso-8859-15
 f 0444 root sys $DATADIR/charsets/utf-8 data/utf-8
 
 d 0555 root sys $DATADIR/data -
@@ -246,12 +250,12 @@ c 0444 root sys $DATADIR/templates templates/*.tmpl
 
 # Config files
 d 0555 root sys $SERVERROOT -
-d 0711 root sys $SERVERROOT/certs -
+d 0711 $CUPS_USER $CUPS_GROUP $SERVERROOT/certs -
 d 0755 root sys $SERVERROOT/interfaces -
 d 0755 root sys $SERVERROOT/ppd -
-c 0644 root sys $SERVERROOT conf/*.conf
-c 0644 root sys $SERVERROOT/mime.convs conf/mime.convs
-c 0644 root sys $SERVERROOT/mime.types conf/mime.types
+c 0600 root sys $SERVERROOT conf/*.conf
+c 0600 root sys $SERVERROOT/mime.convs conf/mime.convs
+c 0600 root sys $SERVERROOT/mime.types conf/mime.types
 
 %system linux
 d 0555 root sys $PAMDIR -
@@ -279,7 +283,7 @@ f 0444 root sys $LIBDIR/libcupsimage.a filter/libcupsimage.a
 
 # Documentation files
 d 0555 root sys $DOCDIR -
-f 0444 root sys $DOCDIR/cups.css doc/cups.css
+f 0444 root sys $DOCDIR doc/*.css
 f 0444 root sys $DOCDIR doc/*.html
 f 0444 root sys $DOCDIR doc/*.pdf
 d 0555 root sys $DOCDIR/images -
@@ -366,5 +370,5 @@ f 0444 root sys $AMANDIR/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list.in,v 1.13.2.4 2002/01/02 18:04:17 mike Exp $".
+# End of "$Id: cups.list.in,v 1.13.2.5 2002/01/14 20:36:30 mike Exp $".
 #

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-openssl.m4,v 1.4.2.2 2002/01/02 18:50:23 mike Exp $"
+dnl "$Id: cups-openssl.m4,v 1.4.2.3 2002/01/14 20:36:31 mike Exp $"
 dnl
 dnl   OpenSSL stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -23,7 +23,7 @@ dnl         WWW: http://www.cups.org
 dnl
 
 AC_ARG_ENABLE(ssl, [  --enable-ssl            turn on SSL/TLS support [default=yes]])
-AC_ARG_WITH(openssl-libs, [  --with-openssl-libs set directory for OpenSSL library],
+AC_ARG_WITH(openssl-libs, [  --with-openssl-libs     set directory for OpenSSL library],
     LDFLAGS="-L$withval $LDFLAGS"
     DSOFLAGS="-L$withval $DSOFLAGS",)
 AC_ARG_WITH(openssl-includes, [  --with-openssl-includes set directory for OpenSSL includes],
@@ -65,5 +65,5 @@ fi
 AC_SUBST(SSLLIBS)
 
 dnl
-dnl End of "$Id: cups-openssl.m4,v 1.4.2.2 2002/01/02 18:50:23 mike Exp $".
+dnl End of "$Id: cups-openssl.m4,v 1.4.2.3 2002/01/14 20:36:31 mike Exp $".
 dnl

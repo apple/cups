@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-openslp.m4,v 1.2.2.2 2002/01/02 18:50:23 mike Exp $"
+dnl "$Id: cups-openslp.m4,v 1.2.2.3 2002/01/14 20:36:31 mike Exp $"
 dnl
 dnl   OpenSLP configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -23,10 +23,10 @@ dnl         WWW: http://www.cups.org
 dnl
 
 AC_ARG_ENABLE(slp, [  --enable-slp            turn on SLP support [default=yes]])
-AC_ARG_WITH(openslp-libs, [  --with-openslp-libs    set directory for OpenSLP library],
+AC_ARG_WITH(openslp-libs, [  --with-openslp-libs     set directory for OpenSLP library],
     LDFLAGS="-L$withval $LDFLAGS"
     DSOFLAGS="-L$withval $DSOFLAGS",)
-AC_ARG_WITH(openslp-includes, [  --with-openslp-includes    set directory for OpenSLP includes],
+AC_ARG_WITH(openslp-includes, [  --with-openslp-includes set directory for OpenSLP includes],
     CFLAGS="-I$withval $CFLAGS"
     CXXFLAGS="-I$withval $CXXFLAGS",)
 
@@ -43,5 +43,5 @@ AC_SUBST(LIBSLP)
 
 
 dnl
-dnl End of "$Id: cups-openslp.m4,v 1.2.2.2 2002/01/02 18:50:23 mike Exp $".
+dnl End of "$Id: cups-openslp.m4,v 1.2.2.3 2002/01/14 20:36:31 mike Exp $".
 dnl
