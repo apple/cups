@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.34 2003/01/28 19:27:13 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.35 2003/01/28 20:37:07 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -379,6 +379,35 @@ main(int  argc,			/* I - Number of command-line arguments */
     return (1);
   }
 
+  fwrite(line, 1, len, stdout);
+
+ /*
+  * Handle leading PJL fun...
+  */
+
+  while (strncmp(line, "\033%-12345X", 9) == 0)
+  {
+   /*
+    * Yup, we have leading PJL fun, so copy it until we hit the line
+    * with "ENTER LANGUAGE"...
+    */
+
+    fputs("DEBUG: Skipping PJL header...\n", stderr);
+
+    while (strstr(line, "ENTER LANGUAGE") == NULL)
+    {
+      len = sizeof(line);
+      if (psgets(line, &len, fp) == NULL)
+        break;
+
+      fwrite(line, 1, len, stdout);
+    }
+
+    len = sizeof(line);
+    if (psgets(line, &len, fp) == NULL)
+      break;
+  }
+
  /*
   * Switch to TBCP mode as needed...
   */
@@ -389,8 +418,6 @@ main(int  argc,			/* I - Number of command-line arguments */
  /*
   * Start sending the document with any commands needed...
   */
-
-  pswrite(line, len, stdout);
 
   saweof      = 0;
   sent_espsp  = 0;
@@ -1850,5 +1877,5 @@ start_nup(int number,			/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.34 2003/01/28 19:27:13 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.35 2003/01/28 20:37:07 mike Exp $".
  */
