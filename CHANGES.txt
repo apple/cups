@@ -1,6 +1,12 @@
 CHANGES.txt - 09/18/2000
 ------------------------
 
+CHANGES IN CUPS v1.1.4
+
+	- The web admin interface now displays an error if it
+	  can't get the list of printer drivers from cupsd.
+
+
 CHANGES IN CUPS v1.1.3
 
 	- Makefile fixes.
