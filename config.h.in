@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.55 2002/03/27 19:33:44 mike Exp $"
+ * "$Id: config.h.in,v 1.56 2002/03/28 21:48:43 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -217,6 +217,13 @@
 
 
 /*
+ * Do we have the <sys/sockio.h> header file?
+ */
+
+#undef HAVE_SYS_SOCKIO_H
+
+
+/*
  * Does the sockaddr structure contain an sa_len parameter?
  */
 
@@ -224,5 +231,5 @@
 
 
 /*
- * End of "$Id: config.h.in,v 1.55 2002/03/27 19:33:44 mike Exp $".
+ * End of "$Id: config.h.in,v 1.56 2002/03/28 21:48:43 mike Exp $".
  */
