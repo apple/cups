@@ -22,13 +22,14 @@
   GNU software to build or run it.
 */
 
-/*$Id: gxclmem.c,v 1.3 2000/03/08 23:14:53 mike Exp $ */
+/*$Id: gxclmem.c,v 1.4 2000/06/22 20:33:31 mike Exp $ */
 /* RAM-based command list implementation */
 #include "memory_.h"
 #include "gx.h"
 #include "gserrors.h"
 #include "gsmalloc.h"		/* for gs_memory_default */
 #include "gxclmem.h"
+#include <config.h>
 
 /*
  * Based on: memfile.c        Version: 1.4 3/21/95 14:59:33 by Ray Johnston.
@@ -545,6 +546,7 @@ memfile_next_blk(MEMFILE * f)
 	newbp->raw_block = NULL;
 	f->log_curr_blk = newbp;
 
+#ifdef HAVE_LIBZ
 	/* check if need to start compressing                             */
 	if (NEED_TO_COMPRESS(f)) {
 	    if_debug0(':', "[:]Beginning compression\n");
@@ -591,10 +593,12 @@ memfile_next_blk(MEMFILE * f)
 	    newphys->data_limit = NULL;		/* raw                  */
 
 	}			/* end convert file to compressed                                 */
+#endif /* HAVE_LIBZ */
 	newbp->phys_blk = newphys;
 	f->pdata = newphys->data;
 	f->pdata_end = newphys->data + MEMFILE_DATA_SIZE;
     }    /* end if NOT compressing                                 */
+#ifdef HAVE_LIBZ
     /* File IS being compressed                                       */ 
     else {
 	int code;
@@ -619,6 +623,7 @@ memfile_next_blk(MEMFILE * f)
 	f->pdata_end = f->pdata + MEMFILE_DATA_SIZE;
 	f->log_curr_blk = newbp;
     }				/* end else (when we are compressing)                           */
+#endif /* HAVE_LIBZ */
 
     return (0);
 }
@@ -694,7 +699,9 @@ memfile_get_pdata(MEMFILE * f)
 	    f->pdata_end = f->pdata + f->log_length - i;
 	else
 	    f->pdata_end = f->pdata + MEMFILE_DATA_SIZE;
-    } else {
+    }
+#ifdef HAVE_LIBZ
+    else {
 	/* data was compressed                                            */
 	if (f->raw_head == NULL) {
 	    /* need to allocate the raw buffer pool                        */
@@ -830,6 +837,7 @@ memfile_get_pdata(MEMFILE * f)
 	/* NOTE: last block is never compressed, so a compressed block    */
 	/*        is always full size.                                    */
     }				/* end else (when data was compressed)                             */
+#endif /* HAVE_LIBZ */
 
     return (0);
 }
@@ -1071,6 +1079,7 @@ memfile_free_mem(MEMFILE * f)
 
     f->log_head = NULL;
 
+#ifdef HAVE_LIBZ
     /* Free any internal compressor state. */
     if (f->compressor_initialized) {
 	if (f->decompress_state->template->release != 0)
@@ -1079,6 +1088,8 @@ memfile_free_mem(MEMFILE * f)
 	    (*f->compress_state->template->release) (f->compress_state);
 	f->compressor_initialized = false;
     }
+#endif /* HAVE_LIBZ */
+
     /* free the raw buffers                                           */
     while (f->raw_head != NULL) {
 	RAW_BUFFER *tmpraw = f->raw_head->fwd;

@@ -26,7 +26,7 @@
 #include <config.h>
 #ifdef HAVE_LIBJPEG
 
-/*$Id: sdctd.c,v 1.4 2000/03/14 13:52:35 mike Exp $ */
+/*$Id: sdctd.c,v 1.5 2000/06/22 20:33:31 mike Exp $ */
 /* DCT decoding filter stream */
 #include "memory_.h"
 #include "stdio_.h"
@@ -285,7 +285,6 @@ s_DCTD_release(stream_state * st)
     stream_DCT_state *const ss = (stream_DCT_state *) st;
 
     gs_jpeg_destroy(ss);
-#endif /* HAVE_LIBJPEG */
     if (ss->data.decompress->scanline_buffer != NULL)
 	gs_free_object(ss->data.common->memory,
 		       ss->data.decompress->scanline_buffer,
@@ -301,3 +300,4 @@ const stream_template s_DCTD_template =
 {&st_DCT_state, s_DCTD_init, s_DCTD_process, 2000, 4000, s_DCTD_release,
  s_DCTD_set_defaults
 };
+#endif /* HAVE_LIBJPEG */

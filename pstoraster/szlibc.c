@@ -26,7 +26,7 @@
 #include <config.h>
 #ifdef HAVE_LIBZ
 
-/*$Id: szlibc.c,v 1.4 2000/03/14 13:52:36 mike Exp $ */
+/*$Id: szlibc.c,v 1.5 2000/06/22 20:33:31 mike Exp $ */
 /* Code common to zlib encoding and decoding streams */
 #include "std.h"
 #include "gserror.h"
@@ -48,7 +48,6 @@ void
 s_zlib_set_defaults(stream_state * st)
 {
     stream_zlib_state *const ss = (stream_zlib_state *)st;
-#endif
 
     ss->windowBits = MAX_WBITS;
     ss->no_wrapper = false;
@@ -138,3 +137,4 @@ s_zlib_free(void *zmem, void *data)
 	zds->blocks = block->next;
     gs_free_object(mem, block, "s_zlib_free(block)");
 }
+#endif

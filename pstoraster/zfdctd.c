@@ -26,7 +26,7 @@
 #include <config.h>
 #ifdef HAVE_LIBJPEG
 
-/*$Id: zfdctd.c,v 1.4 2000/03/14 13:52:36 mike Exp $ */
+/*$Id: zfdctd.c,v 1.5 2000/06/22 20:33:31 mike Exp $ */
 /* DCTDecode filter creation */
 #include "memory_.h"
 #include "stdio_.h"		/* for jpeglib.h */
@@ -103,8 +103,8 @@ fail:
 
 const op_def zfdctd_op_defs[] =
 {
-#endif /* HAVE_LIBJPEG */
     op_def_begin_filter(),
     {"2DCTDecode", zDCTD},
     op_def_end(0)
 };
+#endif /* HAVE_LIBJPEG */

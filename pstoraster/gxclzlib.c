@@ -25,14 +25,15 @@
 */
 
 #include <config.h>
-#ifdef HAVE_LIBZ
-/*$Id: gxclzlib.c,v 1.2 2000/03/14 13:52:35 mike Exp $ */
+/*$Id: gxclzlib.c,v 1.3 2000/06/22 20:33:31 mike Exp $ */
 /* zlib filter initialization for RAM-based band lists */
 /* Must be compiled with -I$(ZSRCDIR) */
 #include "std.h"
 #include "gstypes.h"
 #include "gsmemory.h"
 #include "gxclmem.h"
+
+#ifdef HAVE_LIBZ
 #include "szlibx.h"
 
 private stream_zlib_state cl_zlibE_state;
@@ -60,5 +61,16 @@ const stream_state *
 clist_decompressor_state(void *client_data)
 {
     return (const stream_state *)&cl_zlibD_state;
+}
+#else
+const stream_state *
+clist_compressor_state(void *client_data)
+{
+    return (const stream_state *)0;
+}
+const stream_state *
+clist_decompressor_state(void *client_data)
+{
+    return (const stream_state *)0;
 }
 #endif /* HAVE_LIBZ */

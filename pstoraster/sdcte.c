@@ -26,7 +26,7 @@
 #include <config.h>
 #ifdef HAVE_LIBJPEG
 
-/*$Id: sdcte.c,v 1.4 2000/03/14 13:52:35 mike Exp $ */
+/*$Id: sdcte.c,v 1.5 2000/06/22 20:33:31 mike Exp $ */
 /* DCT encoding filter stream */
 #include "memory_.h"
 #include "stdio_.h"
@@ -183,7 +183,6 @@ s_DCTE_process(stream_state * st, stream_cursor_read * pr,
 }
 
 /* Release the stream */
-#endif /* HAVE_LIBJPEG */
 private void
 s_DCTE_release(stream_state * st)
 {
@@ -201,3 +200,4 @@ const stream_template s_DCTE_template =
 {&st_DCT_state, s_DCTE_init, s_DCTE_process, 1000, 4000, s_DCTE_release,
  s_DCTE_set_defaults
 };
+#endif /* HAVE_LIBJPEG */
