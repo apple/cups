@@ -133,6 +133,8 @@ CHANGES IN CUPS V1.1.7
 	  clients or start print jobs as the load allows.
 	- Fixed a bug in the Set-Job-Attributes code that could
 	  crash the scheduler (patch from Martin Zielinski)
+	- cupsSetDests() did not quote option values with embedded
+	  spaces.
 
 
 CHANGES IN CUPS V1.1.6-3
