@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c,v 1.7 1999/06/28 22:55:08 mike Exp $"
+ * "$Id: options.c,v 1.8 1999/06/29 11:53:17 mike Exp $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -292,6 +292,11 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
         conflict = 1;
       if (ppdMarkOption(ppd, "MediaType", options->value))
         conflict = 1;
+      if (ppdMarkOption(ppd, "EFMediaQualityMode", options->value))	/* EFI */
+        conflict = 1;
+      if (strcasecmp(options->value, "manual") == 0)
+        if (ppdMarkOption(ppd, "ManualFeed", "True"))
+	  conflict = 1;
     }
     else if (strcmp(options->name, "sides") == 0)
     {
@@ -299,15 +304,27 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
       {
         if (ppdMarkOption(ppd, "Duplex", "None"))
 	  conflict = 1;
+        if (ppdMarkOption(ppd, "EFDuplex", "None"))	/* EFI */
+	  conflict = 1;
+        if (ppdMarkOption(ppd, "KD03Duplex", "None"))	/* Kodak */
+	  conflict = 1;
       }
       else if (strcmp(options->value, "two-sided-long-edge") == 0)
       {
         if (ppdMarkOption(ppd, "Duplex", "DuplexNoTumble"))
 	  conflict = 1;
+        if (ppdMarkOption(ppd, "EFDuplex", "DuplexNoTumble"))	/* EFI */
+	  conflict = 1;
+        if (ppdMarkOption(ppd, "KD03Duplex", "DuplexNoTumble"))	/* Kodak */
+	  conflict = 1;
       }
       else if (strcmp(options->value, "two-sided-short-edge") == 0)
       {
         if (ppdMarkOption(ppd, "Duplex", "DuplexTumble"))
+	  conflict = 1;
+        if (ppdMarkOption(ppd, "EFDuplex", "DuplexTumble"))	/* EFI */
+	  conflict = 1;
+        if (ppdMarkOption(ppd, "KD03Duplex", "DuplexTumble"))	/* Kodak */
 	  conflict = 1;
       }
     }
@@ -315,7 +332,12 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
     {
       if (ppdMarkOption(ppd, "Resolution", options->value))
         conflict = 1;
-      if (ppdMarkOption(ppd, "JCLResolution", options->value))
+      if (ppdMarkOption(ppd, "SetResolution", options->value))
+      	/* Calcomp, Linotype, QMS, Summagraphics, Tektronix, Varityper */
+        conflict = 1;
+      if (ppdMarkOption(ppd, "JCLResolution", options->value))	/* HP */
+        conflict = 1;
+      if (ppdMarkOption(ppd, "CNRes_PGP", options->value))	/* Canon */
         conflict = 1;
     }
     else if (ppdMarkOption(ppd, options->name, options->value))
@@ -326,5 +348,5 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: options.c,v 1.7 1999/06/28 22:55:08 mike Exp $".
+ * End of "$Id: options.c,v 1.8 1999/06/29 11:53:17 mike Exp $".
  */
