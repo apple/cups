@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.12 1999/04/23 17:09:19 mike Exp $"
+ * "$Id: dirsvc.c,v 1.13 1999/04/23 17:36:42 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -65,7 +65,19 @@ StartBrowsing(void)
 
   val = 1;
   if (setsockopt(BrowseSocket, SOL_SOCKET, SO_BROADCAST, &val, sizeof(val)))
-    perror("StartBrowsing/SO_BROADCAST");
+  {
+    LogMessage(LOG_ERROR, "StartBrowsing: Unable to set broadcast mode - %s.",
+               strerror(errno));
+
+#if defined(WIN32) || defined(__EMX__)
+    closesocket(BrowseSocket);
+#else
+    close(BrowseSocket);
+#endif /* WIN32 || __EMX__ */
+
+    BrowseSocket = -1;
+    return;
+  }
 
  /*
   * Bind the socket to browse port...
@@ -283,12 +295,12 @@ SendBrowseList(void)
 	if (sendto(BrowseSocket, packet, bytes, 0, Browsers + i,
 	           sizeof(Browsers[0])) <= 0)
 	  LogMessage(LOG_ERROR, "SendBrowseList: sendto failed for browser %d - %s.",
-	           i + 1, strerror(errno));
+	             i + 1, strerror(errno));
     }
   }
 }
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.12 1999/04/23 17:09:19 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.13 1999/04/23 17:36:42 mike Exp $".
  */

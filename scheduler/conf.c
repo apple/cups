@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.13 1999/04/23 17:09:18 mike Exp $"
+ * "$Id: conf.c,v 1.14 1999/04/23 17:36:42 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -226,6 +226,7 @@ ReadConfiguration(void)
   {
     NumBrowsers ++;
 
+    memset(Browsers + 0, 0, sizeof(Browsers[0]));
     Browsers[0].sin_addr.s_addr = htonl(INADDR_BROADCAST);
     Browsers[0].sin_family      = AF_INET;
     Browsers[0].sin_port        = htons(BrowsePort);
@@ -960,5 +961,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.13 1999/04/23 17:09:18 mike Exp $".
+ * End of "$Id: conf.c,v 1.14 1999/04/23 17:36:42 mike Exp $".
  */
