@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.4 1998/07/28 20:48:30 mike Exp $"
+ * "$Id: imagetops.c,v 1.5 1998/08/10 15:51:04 mike Exp $"
  *
  *   Image file to PostScript conversion program for espPrint, a collection
  *   of printer drivers.
@@ -17,7 +17,11 @@
  * Revision History:
  *
  *   $Log: imagetops.c,v $
- *   Revision 1.4  1998/07/28 20:48:30  mike
+ *   Revision 1.5  1998/08/10 15:51:04  mike
+ *   Fixed scaling problems.
+ *   FIxed offset problems.
+ *
+ *   Revision 1.4  1998/07/28  20:48:30  mike
  *   Updated size/page computation code to work properly.
  *
  *   Revision 1.3  1998/04/23  15:52:20  mike
@@ -133,6 +137,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   int			hue, sat;
   int			out_offset,
 			out_length;
+  float			left, bottom;
 
 
  /*
@@ -407,29 +412,27 @@ main(int  argc,		/* I - Number of command-line arguments */
     * Scale the image as neccesary to match the desired pixels-per-inch.
     */
     
-    xinches = (float)img->xsize / (float)xppi;
-    yinches = (float)img->ysize / (float)yppi;
 
     if (rotation == 0)
     {
-      xzoom = xinches / xprint;
-      yzoom = yinches / yprint;
+      xinches = (float)img->xsize / (float)xppi;
+      yinches = (float)img->ysize / (float)yppi;
     }
     else if (rotation == 1)
     {
-      xzoom = yinches / xprint;
-      yzoom = xinches / yprint;
+      xinches = (float)img->ysize / (float)yppi;
+      yinches = (float)img->xsize / (float)xppi;
     }
     else
     {
-      xzoom = xinches / xprint;
-      yzoom = yinches / yprint;
+      xinches  = (float)img->xsize / (float)xppi;
+      yinches  = (float)img->ysize / (float)yppi;
       rotation = 0;
 
       if (xinches > xprint && xinches <= yprint)
       {
-	xzoom = yinches / xprint;
-	yzoom = xinches / yprint;
+	xinches  = (float)img->ysize / (float)yppi;
+	yinches  = (float)img->xsize / (float)xppi;
         rotation = 1;
       };
     };
@@ -444,6 +447,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     {
       xsize = xprint * xzoom;
       ysize = xsize * img->ysize / img->xsize;
+
       if (ysize > (yprint * yzoom))
       {
         ysize = yprint * yzoom;
@@ -452,18 +456,20 @@ main(int  argc,		/* I - Number of command-line arguments */
     }
     else if (rotation == 1)
     {
-      xsize = xprint * xzoom;
-      ysize = xsize * img->xsize / img->ysize;
-      if (ysize > (yprint * yzoom))
+      ysize = xprint * yzoom;
+      xsize = ysize * img->xsize / img->ysize;
+
+      if (xsize > (yprint * xzoom))
       {
-        ysize = yprint * yzoom;
-        xsize = ysize * img->ysize / img->xsize;
+        xsize = yprint * xzoom;
+        ysize = xsize * img->ysize / img->xsize;
       };
     }
     else
     {
       xsize = xprint * xzoom;
       ysize = xsize * img->ysize / img->xsize;
+
       if (ysize > (yprint * yzoom))
       {
         ysize = yprint * yzoom;
@@ -472,6 +478,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
       ytemp = xprint * yzoom;
       xtemp = ytemp * img->xsize / img->ysize;
+
       if (xtemp > (yprint * xzoom))
       {
         xtemp = yprint * xzoom;
@@ -489,8 +496,16 @@ main(int  argc,		/* I - Number of command-line arguments */
         rotation = 0;
     };
 
-    xinches = xsize;
-    yinches = ysize;
+    if (rotation)
+    {
+      xinches = ysize;
+      yinches = xsize;
+    }
+    else
+    {
+      xinches = xsize;
+      yinches = ysize;
+    };
   };
 
   xpages = ceil(xinches / xprint);
@@ -524,12 +539,19 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Output the pages...
   */
 
+  xprint = xinches / xpages;
+  yprint = yinches / ypages;
+  left   = 36.0 * (size->width - xprint);
+  bottom = 36.0 * (size->length - yprint);
+
+  fprintf(stderr, "xprint = %.2f, yprint = %.2f, width = %.2f, length = %.2f\n"
+                  "xinches = %.2f, yinches = %.2f, left = %.0f, bottom = %.0f\n",
+          xprint, yprint, size->width, size->length, xinches, yinches,
+	  left, bottom);
+
   fputs("%!PS-Adobe-3.0\n", out);
-  fprintf(out, "%%%%BoundingBox: %.1f %.1f %.1f %.1f\n",
-          72.0 * size->left_margin, 
-          72.0 * (size->length - yprint - size->top_margin), 
-          72.0 * (xprint + size->left_margin), 
-          72.0 * (size->length - size->top_margin));
+  fprintf(out, "%%%%BoundingBox: %.1f %.1f %.1f %.1f\n", left, bottom,
+          left + 72.0 * xprint, bottom + 72.0 * yprint);
   fprintf(out, "%%%%LanguageLevel: %d\n", level);
   fputs("%%Creator: img2ps " SVERSION " Copyright 1993-1998 Easy Software Products\n", out);
   fprintf(out, "%%Pages: %d\n", xpages * ypages);
@@ -542,7 +564,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   for (xpage = 0; xpage < xpages; xpage ++)
     for (ypage = 0; ypage < ypages; ypage ++)
     {
-      fprintf(out, "%%Page: %d\n", xpage * ypages + ypage + 1);
+      fprintf(out, "%%Page: %d %d\n", xpage * ypages + ypage + 1,
+              xpage * ypages + ypage + 1);
       fputs("gsave\n", out);
 
       if (rotation == 0)
@@ -560,26 +583,20 @@ main(int  argc,		/* I - Number of command-line arguments */
 	y1 = img->ysize * (xpage + 1) / xpages - 1;
       };
 
-      xprint = xinches / xpages;
-      yprint = yinches / ypages;
-
-      if (flip)
-	fprintf(out, "\t%.1f %.1f translate\n",
-        	(size->width + xprint) * 36.0,
-        	(size->length - yprint) * 36.0);
-      else
-	fprintf(out, "\t%.1f %.1f translate\n",
-        	(size->width - xprint) * 36.0,
-        	(size->length - yprint) * 36.0);
-
-      if (rotation == 0)
+      if (rotation)
+      {
+        fprintf(out, "\t%.1f %.1f translate\n", left, bottom);
 	fprintf(out, "\t%.3f %.3f scale\n\n",
-	        xprint * 72.0 / (x1 - x0 + 1),
-	        yprint * 72.0 / (y1 - y0 + 1));
+		xprint * 72.0 / (y1 - y0 + 1),
+		yprint * 72.0 / (x1 - x0 + 1));
+      }
       else
+      {
+        fprintf(out, "\t%.1f %.1f translate\n", left, bottom + 72.0 * yprint);
 	fprintf(out, "\t%.3f %.3f scale\n\n",
-	        xprint * 72.0 / (y1 - y0 + 1),
-	        yprint * 72.0 / (x1 - x0 + 1));
+		xprint * 72.0 / (x1 - x0 + 1),
+		yprint * 72.0 / (y1 - y0 + 1));
+      };
 
       if (level == 1)
       {
@@ -915,5 +932,5 @@ print_prolog(FILE  *out,
 
 
 /*
- * End of "$Id: imagetops.c,v 1.4 1998/07/28 20:48:30 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.5 1998/08/10 15:51:04 mike Exp $".
  */
