@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.86 2003/02/14 20:01:24 mike Exp $"
+ * "$Id: ppd.c,v 1.87 2003/02/14 20:12:53 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -2558,7 +2558,6 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
     if (line[0] != '*')			/* All lines start with an asterisk */
     {
-      ppd_line --;
       ppd_status = PPD_MISSING_ASTERISK;
       return (0);
     }
@@ -2574,7 +2573,6 @@ ppd_read(FILE *fp,			/* I - File to read from */
       if (*lineptr <= ' ' || *lineptr > 126 || *lineptr == '/' ||
           (keyptr - keyword) >= (PPD_MAX_NAME - 1))
       {
-	ppd_line --;
         ppd_status = PPD_ILLEGAL_MAIN_KEYWORD;
 	return (0);
       }
@@ -2608,7 +2606,6 @@ ppd_read(FILE *fp,			/* I - File to read from */
 	if (*lineptr <= ' ' || *lineptr > 126 ||
 	    (optptr - option) >= (PPD_MAX_NAME - 1))
         {
-	  ppd_line --;
           ppd_status = PPD_ILLEGAL_OPTION_KEYWORD;
 	  return (0);
 	}
@@ -2636,7 +2633,6 @@ ppd_read(FILE *fp,			/* I - File to read from */
 	  if ((*lineptr < ' ' && *lineptr != '\t') ||
 	      (textptr - text) >= (PPD_MAX_LINE - 1))
 	  {
-	    ppd_line --;
 	    ppd_status = PPD_ILLEGAL_TRANSLATION;
 	    return (0);
 	  }
@@ -2684,5 +2680,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.86 2003/02/14 20:01:24 mike Exp $".
+ * End of "$Id: ppd.c,v 1.87 2003/02/14 20:12:53 mike Exp $".
  */
