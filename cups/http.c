@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.58 2000/01/04 13:45:34 mike Exp $"
+ * "$Id: http.c,v 1.59 2000/01/25 03:12:58 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -503,18 +503,20 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
   else
     username[0] = '\0';
 
-  if (*uri == '\0')
+  if (*uri != ':')
   {
-   /*
-    * Hostname but no port or path...
-    */
-
-    *port = 0;
-    resource[0] = '/';
-    resource[1] = '\0';
-    return;
+    if (strcasecmp(method, "http") == 0)
+      *port = 80;
+    else if (strcasecmp(method, "https") == 0)
+      *port = 443;
+    else if (strcasecmp(method, "ipp") == 0)	/* Not registered yet... */
+      *port = ippPort();
+    else if (strcasecmp(method, "socket") == 0)	/* Not registered yet... */
+      *port = 9100;
+    else
+      *port = 0;
   }
-  else if (*uri == ':')
+  else
   {
    /*
     * Parse port number...
@@ -528,22 +530,16 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
       uri ++;
     }
   }
-  else
+
+  if (*uri == '\0')
   {
    /*
-    * Figure out the default port number based on the method...
+    * Hostname but no port or path...
     */
 
-    if (strcasecmp(method, "http") == 0)
-      *port = 80;
-    else if (strcasecmp(method, "https") == 0)
-      *port = 443;
-    else if (strcasecmp(method, "ipp") == 0)	/* Not registered yet... */
-      *port = ippPort();
-    else if (strcasecmp(method, "socket") == 0)	/* Not registered yet... */
-      *port = 9100;
-    else
-      *port = 0;
+    resource[0] = '/';
+    resource[1] = '\0';
+    return;
   }
 
  /*
@@ -1528,5 +1524,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.58 2000/01/04 13:45:34 mike Exp $".
+ * End of "$Id: http.c,v 1.59 2000/01/25 03:12:58 mike Exp $".
  */
