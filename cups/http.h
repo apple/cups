@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.33.2.12 2002/05/15 01:57:00 mike Exp $"
+ * "$Id: http.h,v 1.33.2.13 2002/08/23 02:40:12 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -61,6 +61,29 @@
 #  ifdef __cplusplus
 extern "C" {
 #  endif /* __cplusplus */
+
+
+/*
+ * Oh, the wonderful world of IPv6 compatibility.  Apparently some
+ * implementations expose the (more logical) 32-bit address parts
+ * to everyone, while others only expose it to kernel code...  To
+ * make supporting IPv6 even easier, each vendor chose different
+ * core structure and union names, so the same defines or code
+ * can't be used on all platforms.
+ *
+ * The following will likely need tweeking on new platforms that
+ * support IPv6 - the "s6_addr32" define maps to the 32-bit integer
+ * array in the in6_addr union, which is named differently on various
+ * platforms.
+ */
+
+#if defined(AF_INET6) && !defined(s6_addr32)
+#  if defined(__sun)
+#    define s6_addr32	_S6_un._S6_u32
+#  elif defined(__FreeBSD__) || defined(__APPLE__)
+#    define s6_addr32	__u6_addr.__u6_addr32
+#  endif /* __sun */
+#endif /* AF_INET6 && !s6_addr32 */
 
 
 /*
@@ -377,5 +400,5 @@ extern char		*httpAddrString(const http_addr_t *addr,
 #endif /* !_IPP_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.33.2.12 2002/05/15 01:57:00 mike Exp $".
+ * End of "$Id: http.h,v 1.33.2.13 2002/08/23 02:40:12 mike Exp $".
  */
