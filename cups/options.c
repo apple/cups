@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c,v 1.21.2.8 2003/01/07 18:26:28 mike Exp $"
+ * "$Id: options.c,v 1.21.2.9 2003/03/21 18:07:34 mike Exp $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -242,7 +242,12 @@ cupsParseOptions(const char    *arg,		/* I - Argument to parse */
       value = ptr;
 
       while (*ptr != '\'' && *ptr != '\0')
+      {
+        if (*ptr == '\\')
+	  strcpy(ptr, ptr + 1);
+
         ptr ++;
+      }
 
       if (*ptr != '\0')
         *ptr++ = '\0';
@@ -257,7 +262,42 @@ cupsParseOptions(const char    *arg,		/* I - Argument to parse */
       value = ptr;
 
       while (*ptr != '\"' && *ptr != '\0')
+      {
+        if (*ptr == '\\')
+	  strcpy(ptr, ptr + 1);
+
         ptr ++;
+      }
+
+      if (*ptr != '\0')
+        *ptr++ = '\0';
+    }
+    else if (*ptr == '{')
+    {
+     /*
+      * Collection value...
+      */
+
+      int depth;
+
+      value = ptr;
+
+      for (depth = 1; *ptr; ptr ++)
+        if (*ptr == '{')
+	  depth ++;
+	else if (*ptr == '}')
+	{
+	  depth --;
+	  if (!depth)
+	  {
+	    ptr ++;
+
+	    if (*ptr != ',')
+	      break;
+	  }
+        }
+        else if (*ptr == '\\')
+	  strcpy(ptr, ptr + 1);
 
       if (*ptr != '\0')
         *ptr++ = '\0';
@@ -271,7 +311,12 @@ cupsParseOptions(const char    *arg,		/* I - Argument to parse */
       value = ptr;
 
       while (!isspace(*ptr) && *ptr != '\0')
-	ptr ++;
+      {
+        if (*ptr == '\\')
+	  strcpy(ptr, ptr + 1);
+
+        ptr ++;
+      }
     }
 
    /*
@@ -450,5 +495,5 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: options.c,v 1.21.2.8 2003/01/07 18:26:28 mike Exp $".
+ * End of "$Id: options.c,v 1.21.2.9 2003/03/21 18:07:34 mike Exp $".
  */
