@@ -130,6 +130,9 @@ CHANGES IN CUPS V1.1.9
 	  multiple groups.
 	- Added new Include directive to cupsd.conf, a la
 	  Apache.
+	- Added new pseudo-driver/PPD called "raw" that can be
+	  used to create/convert a raw queue.  This also allows
+	  raw queues to be created in the web interface.
 
 
 CHANGES IN CUPS V1.1.8

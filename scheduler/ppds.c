@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.17 2001/06/06 20:16:44 mike Exp $"
+ * "$Id: ppds.c,v 1.18 2001/06/22 20:22:38 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -235,10 +235,26 @@ LoadPPDs(const char *d)		/* I - Directory to scan... */
 
   PPDs = ippNew();
 
+ /*
+  * First the raw driver...
+  */
+
+  ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+               "ppd-name", NULL, "raw");
+  ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+               "ppd-make", NULL, "Raw");
+  ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+               "ppd-make-and-model", NULL, "Raw Queue");
+  ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
+               "ppd-natural-language", NULL, "en");
+
+ /*
+  * Then the PPD files...
+  */
+
   for (i = num_ppds, ppd = ppds; i > 0; i --, ppd ++)
   {
-    if (i)
-      ippAddSeparator(PPDs);
+    ippAddSeparator(PPDs);
 
     ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_NAME,
                  "ppd-name", NULL, ppd->record.ppd_name);
@@ -819,5 +835,5 @@ ppd_gets(buf_t *fp,		/* I - File to read from */
 
 
 /*
- * End of "$Id: ppds.c,v 1.17 2001/06/06 20:16:44 mike Exp $".
+ * End of "$Id: ppds.c,v 1.18 2001/06/22 20:22:38 mike Exp $".
  */

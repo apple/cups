@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.138 2001/06/22 19:47:19 mike Exp $"
+ * "$Id: ipp.c,v 1.139 2001/06/22 20:22:37 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1246,17 +1246,36 @@ add_printer(client_t        *con,	/* I - Client connection */
     srcfile[sizeof(srcfile) - 1] = '\0';
   }
   else if ((attr = ippFindAttribute(con->request, "ppd-name", IPP_TAG_NAME)) != NULL)
-    snprintf(srcfile, sizeof(srcfile), "%s/model/%s", DataDir,
-             attr->values[0].string.text);
+  {
+    if (strcmp(attr->values[0].string.text, "raw") == 0)
+      strcpy(srcfile, "raw");
+    else
+      snprintf(srcfile, sizeof(srcfile), "%s/model/%s", DataDir,
+               attr->values[0].string.text);
+  }
   else
     srcfile[0] = '\0';
 
   LogMessage(L_DEBUG, "add_printer: srcfile = \"%s\"", srcfile);
 
+  if (strcmp(srcfile, "raw") == 0)
+  {
+   /*
+    * Raw driver, remove any existing PPD or interface script files.
+    */
+
+    snprintf(dstfile, sizeof(dstfile), "%s/interfaces/%s", ServerRoot,
+             printer->name);
+    unlink(dstfile);
+
+    snprintf(dstfile, sizeof(dstfile), "%s/ppd/%s.ppd", ServerRoot,
+             printer->name);
+    unlink(dstfile);
+  }
 #ifdef HAVE_LIBZ
-  if (srcfile[0] && (fp = gzopen(srcfile, "rb")) != NULL)
+  else if (srcfile[0] && (fp = gzopen(srcfile, "rb")) != NULL)
 #else
-  if (srcfile[0] && (fp = fopen(srcfile, "rb")) != NULL)
+  else if (srcfile[0] && (fp = fopen(srcfile, "rb")) != NULL)
 #endif /* HAVE_LIBZ */
   {
    /*
@@ -5468,5 +5487,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.138 2001/06/22 19:47:19 mike Exp $".
+ * End of "$Id: ipp.c,v 1.139 2001/06/22 20:22:37 mike Exp $".
  */
