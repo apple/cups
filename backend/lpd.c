@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.28.2.13 2002/10/03 14:48:08 mike Exp $"
+ * "$Id: lpd.c,v 1.28.2.14 2002/10/15 14:48:43 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -614,9 +614,8 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
     }
 
     snprintf(cptr, sizeof(control) - (cptr - control),
-             "UdfA%03d%s\nNdfA%03d%s\n",
-             getpid() % 1000, localhost,
-             getpid() % 1000, localhost);
+             "UdfA%03d%s\nN%s\n",
+             getpid() % 1000, localhost, title);
 
     fprintf(stderr, "DEBUG: Control file is:\n%s", control);
 
@@ -908,5 +907,5 @@ rresvport(int *port)		/* IO - Port number to bind to */
 #endif /* !HAVE_RRESVPORT */
 
 /*
- * End of "$Id: lpd.c,v 1.28.2.13 2002/10/03 14:48:08 mike Exp $".
+ * End of "$Id: lpd.c,v 1.28.2.14 2002/10/15 14:48:43 mike Exp $".
  */
