@@ -138,6 +138,9 @@ CHANGES IN CUPS V1.1.9
 	- The pstops filter counted pages wrong when using the
 	  N-up and even/odd printing options.  This prevented
 	  the page-ranges option from working properly.
+	- Added another fix to pstoraster for a bus error
+	  condition caused by a lack of parenthesis in the
+	  Ghostscript code.
 
 
 CHANGES IN CUPS V1.1.8
