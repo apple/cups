@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.39.2.11 2002/05/29 16:39:16 mike Exp $"
+ * "$Id: config.h.in,v 1.39.2.12 2002/06/12 11:35:04 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -106,11 +106,12 @@
 
 
 /*
- * Use <string.h>, <strings.h>, or both?
+ * Use <string.h>, <strings.h>, and/or <bstring.h>?
  */
 
 #undef HAVE_STRING_H
 #undef HAVE_STRINGS_H
+#undef HAVE_BSTRING_H
 
 
 /*
@@ -228,5 +229,5 @@
 
 
 /*
- * End of "$Id: config.h.in,v 1.39.2.11 2002/05/29 16:39:16 mike Exp $".
+ * End of "$Id: config.h.in,v 1.39.2.12 2002/06/12 11:35:04 mike Exp $".
  */

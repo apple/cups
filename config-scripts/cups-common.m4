@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.12.2.9 2002/06/04 21:15:57 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.12.2.10 2002/06/12 11:35:05 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -96,6 +96,7 @@ AC_CHECK_HEADER(malloc.h,AC_DEFINE(HAVE_MALLOC_H))
 AC_CHECK_HEADER(shadow.h,AC_DEFINE(HAVE_SHADOW_H))
 AC_CHECK_HEADER(string.h,AC_DEFINE(HAVE_STRING_H))
 AC_CHECK_HEADER(strings.h,AC_DEFINE(HAVE_STRINGS_H))
+AC_CHECK_HEADER(bstring.h,AC_DEFINE(HAVE_BSTRING_H))
 AC_CHECK_HEADER(usersec.h,AC_DEFINE(HAVE_USERSEC_H))
 AC_CHECK_HEADER(sys/ioctl.h,AC_DEFINE(HAVE_SYS_IOCTL_H))
 
@@ -161,5 +162,5 @@ esac
 AC_SUBST(ARFLAGS)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.12.2.9 2002/06/04 21:15:57 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.12.2.10 2002/06/12 11:35:05 mike Exp $".
 dnl

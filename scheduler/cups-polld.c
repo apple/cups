@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-polld.c,v 1.5.2.7 2002/05/09 03:08:01 mike Exp $"
+ * "$Id: cups-polld.c,v 1.5.2.8 2002/06/12 11:38:22 mike Exp $"
  *
  *   Polling daemon for the Common UNIX Printing System (CUPS).
  *
@@ -33,6 +33,7 @@
 
 #include <cups/cups.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <cups/language.h>
 #include <cups/string.h>
 
@@ -83,24 +84,13 @@ main(int  argc,				/* I - Number of command-line arguments */
   port     = atoi(argv[4]);
 
  /*
-  * Open a connection to the server...
-  */
-
-  if ((http = httpConnectEncrypt(argv[1], atoi(argv[2]),
-                                 cupsEncryption())) == NULL)
-  {
-    perror("cups-polld");
-    return (1);
-  }
-
- /*
-  * Open a broadcast sock...
+  * Open a broadcast socket...
   */
 
   if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
   {
-    perror("cups-polld");
-    httpClose(http);
+    fprintf(stderr, "cups-polld: Unable to open broadcast socket: %s\n",
+            strerror(errno));
     return (1);
   }
 
@@ -111,11 +101,23 @@ main(int  argc,				/* I - Number of command-line arguments */
   val = 1;
   if (setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &val, sizeof(val)))
   {
-    perror("cups-polld");
+    fprintf(stderr, "cups-polld: Unable to put socket in broadcast mode: %s\n",
+            strerror(errno));
 
     close(sock);
-    httpClose(http);
     return (1);
+  }
+
+ /*
+  * Open a connection to the server...
+  */
+
+  while ((http = httpConnectEncrypt(argv[1], atoi(argv[2]),
+                                    cupsEncryption())) == NULL)
+  {
+    fprintf(stderr, "cups-polld: Unable to connect to %s on port %s: %s\n",
+            argv[1], argv[2], strerror(errno));
+    sleep (interval);
   }
 
  /*
@@ -377,5 +379,5 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: cups-polld.c,v 1.5.2.7 2002/05/09 03:08:01 mike Exp $".
+ * End of "$Id: cups-polld.c,v 1.5.2.8 2002/06/12 11:38:22 mike Exp $".
  */

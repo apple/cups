@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The polling daemon now retries the initial connection
+	  to the remote server; this fixes a problem when the
+	  remote server is unavailable when the scheduler starts
+	  up...
 	- The scheduler didn't validate Digest users against the
 	  system group(s), so Digest and BasicDigest
 	  authentication didn't work for administration

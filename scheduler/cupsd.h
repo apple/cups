@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.28.2.6 2002/04/20 19:40:13 mike Exp $"
+ * "$Id: cupsd.h,v 1.28.2.7 2002/06/12 11:35:06 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -28,12 +28,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <limits.h>
 #include <errno.h>
 #include <time.h>
 #include <signal.h>
 #include <fcntl.h>
+#include <math.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/stat.h>
@@ -172,5 +172,5 @@ extern void	StopServer(void);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.28.2.6 2002/04/20 19:40:13 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.28.2.7 2002/06/12 11:35:06 mike Exp $".
  */
