@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.1 1998/02/19 20:43:33 mike Exp $"
+ * "$Id: image.c,v 1.2 1998/03/19 16:15:15 mike Exp $"
  *
  *   Base image support for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,10 @@
  * Revision History:
  *
  *   $Log: image.c,v $
- *   Revision 1.1  1998/02/19 20:43:33  mike
+ *   Revision 1.2  1998/03/19 16:15:15  mike
+ *   Added lseek() after rewind() to fix bug in HP-UX version of image library.
+ *
+ *   Revision 1.1  1998/02/19  20:43:33  mike
  *   Initial revision
  *
  */
@@ -72,6 +75,9 @@ ImageOpen(char *filename,
   };
 
   rewind(fp);
+#ifdef hpux /* work around an optimization in the HP C library... */
+  lseek(fileno(fp), 0, SEEK_SET);
+#endif /* hpux */
 
  /*
   * Allocate memory...
@@ -567,5 +573,5 @@ flush_tile(image_t *img)
 
 
 /*
- * End of "$Id: image.c,v 1.1 1998/02/19 20:43:33 mike Exp $".
+ * End of "$Id: image.c,v 1.2 1998/03/19 16:15:15 mike Exp $".
  */
