@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38 2000/06/12 13:47:07 mike Exp $"
+ * "$Id: ipp.c,v 1.39 2000/06/12 15:42:45 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -61,6 +61,7 @@
 
 #include "ipp.h"
 #include "debug.h"
+#include <ctype.h>
 
 
 /*
@@ -1695,5 +1696,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38 2000/06/12 13:47:07 mike Exp $".
+ * End of "$Id: ipp.c,v 1.39 2000/06/12 15:42:45 mike Exp $".
  */

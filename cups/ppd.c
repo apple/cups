@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.42 2000/05/02 17:42:37 mike Exp $"
+ * "$Id: ppd.c,v 1.43 2000/06/12 15:42:46 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -633,6 +633,28 @@ ppdOpen(FILE *fp)		/* I - File to read from */
     }
     else if (strcmp(keyword, "Throughput") == 0)
       ppd->throughput = atoi(string);
+    else if (strcmp(keyword, "Font") == 0)
+    {
+     /*
+      * Add this font to the list of available fonts...
+      */
+
+      if (ppd->num_fonts == 0)
+        ppd->fonts = (char **)malloc(sizeof(char *));
+      else
+        ppd->fonts = (char **)realloc(ppd->fonts,
+	                              sizeof(char *) * (ppd->num_fonts + 1));
+
+      if (ppd->fonts == NULL)
+      {
+        ppdClose(ppd);
+	return (NULL);
+      }
+        
+      ppd->fonts[ppd->num_fonts] = string;
+      ppd->num_fonts ++;
+      string = NULL;
+    }
     else if (strcmp(keyword, "VariablePaperSize") == 0 &&
              strcmp(string, "True") == 0 &&
 	     !ppd->variable_sizes)
@@ -1835,5 +1857,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.42 2000/05/02 17:42:37 mike Exp $".
+ * End of "$Id: ppd.c,v 1.43 2000/06/12 15:42:46 mike Exp $".
  */
