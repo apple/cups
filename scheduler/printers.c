@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.63 2000/05/02 19:16:52 mike Exp $"
+ * "$Id: printers.c,v 1.64 2000/06/27 20:09:01 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1054,11 +1054,22 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	    val->string.text = strdup(media_type->choices[i].choice);
 
 	if (page_size != NULL)
+	{
 	  for (i = 0; i < page_size->num_choices; i ++, val ++)
 	    val->string.text = strdup(page_size->choices[i].choice);
 
-	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
-                     NULL, page_size->defchoice);
+	  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
+                       NULL, page_size->defchoice);
+        }
+	else if (input_slot != NULL)
+	  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
+                       NULL, input_slot->defchoice);
+	else if (media_type != NULL)
+	  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
+                       NULL, media_type->defchoice);
+	else
+	  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
+                       NULL, "none");
 
        /*
         * Output bin...
@@ -1398,5 +1409,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.63 2000/05/02 19:16:52 mike Exp $".
+ * End of "$Id: printers.c,v 1.64 2000/06/27 20:09:01 mike Exp $".
  */
