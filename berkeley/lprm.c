@@ -1,5 +1,5 @@
 /*
- * "$Id: lprm.c,v 1.11 2000/09/05 20:14:42 mike Exp $"
+ * "$Id: lprm.c,v 1.12 2000/09/07 12:35:13 mike Exp $"
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
@@ -50,6 +50,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		i;		/* Looping var */
   int		job_id;		/* Job ID */
   const char	*dest;		/* Destination printer */
+  char		*instance;	/* Pointer to instance name */
   char		uri[1024];	/* Printer or job URI */
   ipp_t		*request;	/* IPP request */
   ipp_t		*response;	/* IPP response */
@@ -102,6 +103,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      i ++;
 	      dest = argv[i];
 	    }
+
+	    if ((instance = strchr(dest, '/')) != NULL)
+	      *instance = '\0';
 	    break;
 
 	default :
@@ -235,5 +239,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lprm.c,v 1.11 2000/09/05 20:14:42 mike Exp $".
+ * End of "$Id: lprm.c,v 1.12 2000/09/07 12:35:13 mike Exp $".
  */
