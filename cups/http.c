@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.48 2004/05/27 18:04:39 mike Exp $"
+ * "$Id: http.c,v 1.82.2.49 2004/05/27 18:18:11 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -2058,7 +2058,7 @@ http_wait(http_t *http,			/* I - HTTP data */
 
     getrlimit(RLIMIT_NOFILE, &limit);
 
-    set_size = (limit.rlim_cur + 31) / 8;
+    set_size = (limit.rlim_cur + 31) / 8 + 4;
     if (set_size < sizeof(fd_set))
       set_size = sizeof(fd_set);
 
@@ -2462,5 +2462,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.48 2004/05/27 18:04:39 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.49 2004/05/27 18:18:11 mike Exp $".
  */
