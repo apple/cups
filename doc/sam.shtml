@@ -4298,8 +4298,9 @@ and is in the format:
 [DD/MON/YYYY:HH:MM:SS +ZZZZ]
 </PRE></UL>
 
-<P>where <I>ZZZZ</I> is the timezone offset in hours and minutes from Greenwich
-Mean Time (a.k.a. GMT a.k.a. ZULU.)
+<P>where <I>ZZZZ</I> is the timezone offset in hours and minutes
+from coordinated universal time (UTC). UTC may sometimes be
+referred to as GMT or ZULU on legacy systems.</P>
 
 <P>The <I>method</I> field is the HTTP method used ("GET", "PUT", "POST", etc.)
 
