@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.10 1999/04/21 14:14:57 mike Exp $"
+ * "$Id: printers.c,v 1.11 1999/04/21 19:33:16 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -424,10 +424,9 @@ void
 StartPrinter(printer_t *p)	/* I - Printer to start */
 {
   if (p->state == IPP_PRINTER_STOPPED)
-  {
     p->state = IPP_PRINTER_IDLE;
-    CheckJobs();
-  }
+
+  CheckJobs();
 }
 
 
@@ -635,5 +634,5 @@ set_printer_attrs(printer_t *p)	/* I - Printer to setup */
 
 
 /*
- * End of "$Id: printers.c,v 1.10 1999/04/21 14:14:57 mike Exp $".
+ * End of "$Id: printers.c,v 1.11 1999/04/21 19:33:16 mike Exp $".
  */
