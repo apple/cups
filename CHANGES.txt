@@ -1,4 +1,4 @@
-CHANGES.txt - 05/07/2001
+CHANGES.txt - 05/16/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.8
@@ -40,6 +40,10 @@ CHANGES IN CUPS V1.1.8
 	   options.)
 	- The updated pdftops filter was looking for an options
 	  file called xpdf.conf instead of pdftops.conf.
+	- The scheduler would not force the default job sheets
+	  for printers to the current classification setting.
+	- Added a new ippFindNextAttribute() function to the
+	  CUPS API.
 
 
 CHANGES IN CUPS V1.1.7
