@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.26 2000/04/19 21:26:00 mike Exp $"
+# "$Id: Makefile,v 1.27 2000/06/14 20:33:28 mike Exp $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -35,7 +35,7 @@ OBJS	=	$(CUPSDOBJS) $(MIMEOBJS) cups-lpd.o cups-polld.o testmime.o \
 # Make everything...
 #
 
-all:	cupsd cups-lpd cups-polld libmime.a testmime testspeed
+all:	cupsd cups-lpd cups-polld libmime.a
 
 
 #
@@ -121,7 +121,7 @@ $(MIMEOBJS):	mime.h
 
 testmime:	testmime.o libmime.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testmime.o libmime.a
+	$(CC) $(LDFLAGS) -o $@ testmime.o libmime.a ../cups/libcups.a
 
 testmime.o:	mime.h
 
@@ -139,5 +139,5 @@ $(OBJS):	../config.h ../Makedefs
 
 
 #
-# End of "$Id: Makefile,v 1.26 2000/04/19 21:26:00 mike Exp $".
+# End of "$Id: Makefile,v 1.27 2000/06/14 20:33:28 mike Exp $".
 #
