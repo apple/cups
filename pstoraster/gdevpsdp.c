@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gdevpsdp.c,v 1.2 2000/03/14 13:52:35 mike Exp $ */
+/*$Id: gdevpsdp.c,v 1.3 2000/05/17 14:25:16 mike Exp $ */
 /* (Distiller) parameter handling for PostScript and PDF writers */
 #include "string_.h"
 #include "gx.h"
@@ -511,6 +511,7 @@ psdf_put_image_params(const gx_device_psdf * pdev, gs_param_list * plist,
     int dsti = params->DownsampleType;
     int code;
 
+#ifdef HAVE_LIBJPEG
     if ((pname = pnames->ACSDict) != 0) {
 	code = psdf_put_image_dict_param(plist, pname, &params->ACSDict,
 					 &s_DCTE_template,
@@ -518,6 +519,7 @@ psdf_put_image_params(const gx_device_psdf * pdev, gs_param_list * plist,
 	if (code < 0)
 	    ecode = code;
     }
+#endif /* HAVE_LIBJPEG */
     ecode = psdf_put_bool_param(plist, pnames->AntiAlias,
 				&params->AntiAlias, ecode);
     if (pnames->AutoFilter)
