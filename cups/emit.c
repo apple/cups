@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.23.2.15 2004/06/29 13:15:08 mike Exp $"
+ * "$Id: emit.c,v 1.23.2.16 2004/09/08 20:31:30 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -241,10 +241,28 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
 
 	values[pos] = (int)size->length;
 
-        if (size->width < size->length)
-	  orientation = 1;
-	else
-	  orientation = 0;
+       /*
+        * According to the Adobe PPD specification, an orientation of 1
+	* will produce a print that comes out upside-down with the X
+	* axis perpendicular to the direction of feed, which is exactly
+	* what we want to be consistent with non-PS printers.
+	*
+	* We could also use an orientation of 3 to produce output that
+	* comes out rightside-up (this is the default for many large format
+	* printer PPDs), however for consistency we will stick with the
+	* value 1.
+	*
+	* If we wanted to get fancy, we could use orientations of 0 or
+	* 2 and swap the width and length, however we don't want to get
+	* fancy, we just want it to work consistently.
+	*
+	* The orientation value is range limited by the Orientation
+	* parameter definition, so certain non-PS printer drivers that
+	* only support an Orientation of 0 will get the value 0 as
+	* expected.
+	*/
+
+        orientation = 1;
 
 	if ((attr = ppdFindAttr(ppd, "ParamCustomPageSize",
 	                        "Orientation")) != NULL)
@@ -719,5 +737,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c,v 1.23.2.15 2004/06/29 13:15:08 mike Exp $".
+ * End of "$Id: emit.c,v 1.23.2.16 2004/09/08 20:31:30 mike Exp $".
  */
