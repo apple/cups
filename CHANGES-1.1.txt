@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The pstops filter didn't include the page-label and
+	  classification boxes when printing EPS or non-
+	  conformant PS files.
 	- The imagetops filter didn't always correctly position
 	  the image on the page when printing in landscape
 	  orientation.

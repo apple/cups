@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.36 2003/01/31 20:09:52 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.37 2003/02/28 16:38:58 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -993,6 +993,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	   "userdict/showpage{}put");
 
     puts("%%BeginProlog");
+    WriteLabelProlog(val, PageBottom, PageTop, PageWidth);
     do_prolog(ppd);
     puts("%%EndProlog");
 
@@ -1016,7 +1017,10 @@ main(int  argc,			/* I - Number of command-line arguments */
     }
 
     if (UseESPsp)
+    {
+      WriteLabels(Orientation);
       puts("ESPshowpage");
+    }
 
     if (slowcollate)
     {
@@ -1031,7 +1035,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 	Copies --;
 
         if (UseESPsp)
+	{
+	  WriteLabels(Orientation);
           puts("ESPshowpage");
+	}
       }
     }
   }
@@ -1877,5 +1884,5 @@ start_nup(int number,			/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.36 2003/01/31 20:09:52 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.37 2003/02/28 16:38:58 mike Exp $".
  */
