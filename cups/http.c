@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.9 1999/01/28 22:00:44 mike Exp $"
+ * "$Id: http.c,v 1.10 1999/01/29 16:18:05 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -50,6 +50,8 @@
  *   httpDecode64()      - Base64-decode a string.
  *   httpEncode64()      - Base64-encode a string.
  *   http_field()        - Return the field index for a field name.
+ *   http_send()         - Send a request with all fields and the trailing
+ *                         blank line.
  *   http_sighandler()   - Handle broken pipe signals from lost network
  *                         clients.
  */
@@ -67,6 +69,7 @@
  */
 
 static http_field_t	http_field(char *name);
+static int		http_send(http_t *http, http_state_t request, char *uri);
 static void		http_sighandler(int sig);
 
 
@@ -227,6 +230,7 @@ httpConnect(char *host,		/* I - Host to connect to */
   if (http == NULL)
     return (NULL);
 
+  http->version  = HTTP_1_1;
   http->activity = time(NULL);
 
  /*
@@ -478,6 +482,7 @@ int					/* O - Status of call (0 = success) */
 httpDelete(http_t *http,		/* I - HTTP data */
            char   *uri)			/* I - URI to delete */
 {
+  return (http_send(http, HTTP_DELETE, uri));
 }
 
 
@@ -489,6 +494,7 @@ int					/* O - Status of call (0 = success) */
 httpGet(http_t *http,			/* I - HTTP data */
         char   *uri)			/* I - URI to get */
 {
+  return (http_send(http, HTTP_GET, uri));
 }
 
 
@@ -500,6 +506,7 @@ int					/* O - Status of call (0 = success) */
 httpHead(http_t *http,			/* I - HTTP data */
          char   *uri)			/* I - URI for head */
 {
+  return (http_send(http, HTTP_HEAD, uri));
 }
 
 
@@ -511,6 +518,7 @@ int					/* O - Status of call (0 = success) */
 httpOptions(http_t *http,		/* I - HTTP data */
             char   *uri)		/* I - URI for options */
 {
+  return (http_send(http, HTTP_OPTIONS, uri));
 }
 
 
@@ -522,6 +530,7 @@ int					/* O - Status of call (0 = success) */
 httpPost(http_t *http,			/* I - HTTP data */
          char   *uri)			/* I - URI for post */
 {
+  return (http_send(http, HTTP_POST, uri));
 }
 
 
@@ -533,6 +542,7 @@ int					/* O - Status of call (0 = success) */
 httpPut(http_t *http,			/* I - HTTP data */
         char   *uri)			/* I - URI to put */
 {
+  return (http_send(http, HTTP_PUT, uri));
 }
 
 
@@ -544,6 +554,7 @@ int					/* O - Status of call (0 = success) */
 httpTrace(http_t *http,			/* I - HTTP data */
           char   *uri)			/* I - URI for trace */
 {
+  return (http_send(http, HTTP_TRACE, uri));
 }
 
 
@@ -869,7 +880,9 @@ httpGetDateString(time_t t)		/* I - UNIX time */
 
 
   tdate = gmtime(&t);
-  strftime(datetime, sizeof(datetime) - 1, "%a, %d %h %Y %T GMT", tdate);
+  sprintf(datetime, "%s, %02d %s %d %02d:%02d:%02d GMT",
+          days[tdate->tm_wday], tdate->tm_mday, months[tdate->tm_mon],
+	  tdate->tm_year + 1900, tdate->tm_hour, tdate->tm_min, tdate->tm_sec);
 
   return (datetime);
 }
@@ -882,6 +895,32 @@ httpGetDateString(time_t t)		/* I - UNIX time */
 time_t					/* O - UNIX time */
 httpGetDateTime(char *s)		/* I - Date/time string */
 {
+  int		i;			/* Looping var */
+  struct tm	tdate;			/* Time/date structure */
+  char		mon[16];		/* Abbreviated month name */
+  int		day, year;		/* Day of month and year */
+  int		hour, min, sec;		/* Time */
+
+
+  if (sscanf(s, "%*s%d%s%d%d:%d:%d", &day, mon, &year, &hour, &min, &sec) != 6)
+    return (0);
+
+  for (i = 0; i < 12; i ++)
+    if (strcasecmp(mon, months[i]) == 0)
+      break;
+
+  if (i >= 12)
+    return (0);
+
+  tdate.tm_mon   = i;
+  tdate.tm_mday  = day;
+  tdate.tm_year  = year - 1900;
+  tdate.tm_hour  = hour;
+  tdate.tm_min   = min;
+  tdate.tm_sec   = sec;
+  tdate.tm_isdst = 0;
+
+  return (mktime(&tdate));
 }
 
 
@@ -889,567 +928,80 @@ httpGetDateTime(char *s)		/* I - Date/time string */
  * 'httpUpdate()' - Update the current HTTP state for incoming data.
  */
 
-int					/* O - 0 if nothing happened */
+http_status_t				/* O - HTTP status */
 httpUpdate(http_t *http)		/* I - HTTP data */
 {
-#if 0
-  char		line[1024],		/* Line from socket... */
-		name[256],		/* Name on request line */
-		value[1024],		/* Value on request line */
-		version[64],		/* Protocol version on request line */
-		*valptr;		/* Pointer to value */
+  char		line[1024],		/* Line from connection... */
+		*value;			/* Pointer to value on line */
+  http_field_t	field;			/* Field index */
   int		major, minor;		/* HTTP version numbers */
-  int		start;			/* TRUE if we need to start the transfer */
   http_status_t	status;			/* Authorization status */
-  int		bytes;			/* Number of bytes to POST */
-  char		*filename,		/* Name of file for GET/HEAD */
-		*extension,		/* Extension of file */
-		*type;			/* MIME type */
-  struct stat	filestats;		/* File information */
 
-
-  start = 0;
-
-  switch (http->state)
-  {
-    case HTTP_WAITING :
-       /*
-        * See if we've received a request line...
-	*/
-
-        if (get_line(con, line, sizeof(line) - 1) == NULL)
-	  break;
-
-       /*
-        * Ignore blank request lines...
-	*/
-
-        if (line[0] == '\0')
-	  break;
-
-       /*
-        * Clear other state variables...
-	*/
-
-        http->activity        = time(NULL);
-        http->version         = HTTP_1_0;
-	http->keep_alive      = 0;
-	http->data_encoding   = HTTP_DATA_SINGLE;
-	http->data_length     = 0;
-	http->file            = 0;
-	http->pipe_pid        = 0;
-        http->host[0]         = '\0';
-	http->user_agent[0]   = '\0';
-	http->username[0]     = '\0';
-	http->password[0]     = '\0';
-	http->uri[0]          = '\0';
-	http->content_type[0] = '\0';
-	http->remote_time     = 0;
-	http->remote_size     = 0;
-
-	strcpy(http->language, "en");
-
-       /*
-        * Grab the request line...
-	*/
-
-        switch (sscanf(line, "%255s%1023s%s", name, value, version))
-	{
-	  case 1 :
-	      SendError(con, HTTP_BAD_REQUEST);
-	      CloseClient(con);
-	      return (0);
-	  case 2 :
-	      http->version = HTTP_0_9;
-	      break;
-	  case 3 :
-	      sscanf(version, "HTTP/%d.%d", &major, &minor);
-
-	      if (major == 1 && minor == 1)
-	      {
-	        http->version    = HTTP_1_1;
-		http->keep_alive = 1;
-	      }
-	      else if (major == 1 && minor == 0)
-	        http->version = HTTP_1_0;
-	      else if (major == 0 && minor == 9)
-	        http->version = HTTP_0_9;
-	      else
-	      {
-	        SendError(con, HTTP_NOT_SUPPORTED);
-	        CloseClient(con);
-	        return (0);
-	      };
-	      break;
-	}
-
-       /*
-        * Copy the request URI...
-	*/
-
-        if (strncmp(value, "http://", 7) == 0)
-	{
-	  if ((valptr = strchr(value + 7, '/')) == NULL)
-	    valptr = "/";
-
-	  strcpy(http->uri, valptr);
-	}
-	else
-	  strcpy(http->uri, value);
-
-       /*
-        * Process the request...
-	*/
-
-        if (strcmp(name, "GET") == 0)
-	{
-	  http->state = HTTP_GET;
-	  start      = (http->version == HTTP_0_9);
-	}
-        else if (strcmp(name, "PUT") == 0)
-	{
-	  http->state = HTTP_PUT;
-	  start      = (http->version == HTTP_0_9);
-	}
-        else if (strcmp(name, "POST") == 0)
-	{
-	  http->state = HTTP_POST;
-	  start      = (http->version == HTTP_0_9);
-	}
-        else if (strcmp(name, "DELETE") == 0)
-	{
-	  http->state = HTTP_DELETE;
-	  start      = (http->version == HTTP_0_9);
-	}
-        else if (strcmp(name, "TRACE") == 0)
-	{
-	  http->state = HTTP_TRACE;
-	  start      = (http->version == HTTP_0_9);
-	}
-        else if (strcmp(name, "CLOSE") == 0)
-	{
-	  http->state = HTTP_CLOSE;
-	  start      = (http->version == HTTP_0_9);
-	}
-        else if (strcmp(name, "OPTIONS") == 0)
-	{
-	  http->state = HTTP_OPTIONS;
-	  start      = (http->version == HTTP_0_9);
-	}
-        else if (strcmp(name, "HEAD") == 0)
-	{
-	  http->state = HTTP_HEAD;
-	  start      = (http->version == HTTP_0_9);
-	}
-	else
-	{
-	  SendError(con, HTTP_BAD_REQUEST);
-	  CloseClient(con);
-	}
-        break;
-
-    case HTTP_GET :
-    case HTTP_PUT :
-    case HTTP_POST :
-    case HTTP_DELETE :
-    case HTTP_TRACE :
-    case HTTP_CLOSE :
-    case HTTP_HEAD :
-       /*
-        * See if we've received a request line...
-	*/
-
-        if (get_line(con, line, sizeof(line) - 1) == NULL)
-	  break;
-
-       /*
-        * A blank request line starts the transfer...
-	*/
-
-        if (line[0] == '\0')
-	{
-	  fputs("cupsd: START\n", stderr);
-	  start = 1;
-	  break;
-	}
-
-       /*
-        * Grab the name:value line...
-        */
-
-        if (sscanf(line, "%255[^:]:%1023s", name, value) < 2)
-	{
-	  SendError(con, HTTP_BAD_REQUEST);
-	  CloseClient(con);
-	  return (0);
-	}
-
-       /*
-	* Copy the parameters that we need...
-	*/
-
-	if (strcasecmp(name, "Content-type") == 0)
-	{
-	  strncpy(http->content_type, value, sizeof(http->content_type) - 1);
-	  http->content_type[sizeof(http->content_type) - 1] = '\0';
-	}
-	else if (strcasecmp(name, "Content-length") == 0)
-	{
-	  http->data_encoding  = HTTP_DATA_SINGLE;
-	  http->data_length    = atoi(value);
-	  http->data_remaining = http->data_length;
-	}
-	else if (strcasecmp(name, "Accept-Language") == 0)
-	{
-	  strncpy(http->language, value, sizeof(http->language) - 1);
-	  http->language[sizeof(http->language) - 1] = '\0';
-
-         /*
-	  * Strip trailing data in language string...
-	  */
-
-	  for (valptr = http->language; *valptr != '\0'; valptr ++)
-	    if (!isalnum(*valptr) && *valptr != '-')
-	    {
-	      *valptr = '\0';
-	      break;
-	    }
-	}
-	else if (strcasecmp(name, "Authorization") == 0)
-	{
-	 /*
-	  * Get the authorization string...
-	  */
-
-          valptr = strstr(line, value);
-	  valptr += strlen(value);
-	  while (*valptr == ' ' || *valptr == '\t')
-	    valptr ++;
-
-	 /*
-	  * Decode the string as needed...
-	  */
-
-	  if (strcmp(value, "Basic") == 0)
-	    decode_basic_auth(con, valptr);
-	  else
-	  {
-	    SendError(con, HTTP_NOT_IMPLEMENTED);
-	    CloseClient(con);
-	    return (0);
-	  }
-	}
-	else if (strcasecmp(name, "Transfer-Encoding") == 0)
-	{
-	  if (strcasecmp(value, "chunked") == 0)
-	  {
-	    http->data_encoding = HTTP_DATA_CHUNKED;
-	    http->data_length   = 0;
-          }
-	  else
-	  {
-	    SendError(con, HTTP_NOT_IMPLEMENTED);
-	    CloseClient(con);
-	    return (0);
-	  }
-	}
-	else if (strcasecmp(name, "User-Agent") == 0)
-	{
-	  strncpy(http->user_agent, value, sizeof(http->user_agent) - 1);
-	  http->user_agent[sizeof(http->user_agent) - 1] = '\0';
-	}
-	else if (strcasecmp(name, "Host") == 0)
-	{
-	  strncpy(http->host, value, sizeof(http->host) - 1);
-	  http->host[sizeof(http->host) - 1] = '\0';
-	}
-	else if (strcasecmp(name, "Connection") == 0)
-	{
-	  if (strcmp(value, "Keep-Alive") == 0)
-	    http->keep_alive = 1;
-	}
-	else if (strcasecmp(name, "If-Modified-Since") == 0)
-	{
-	  valptr = strchr(line, ':') + 1;
-	  while (*valptr == ' ' || *valptr == '\t')
-	    valptr ++;
-	  
-	  decode_if_modified(con, valptr);
-	}
-	break;
-  }
 
  /*
-  * Handle new transfers...
+  * If we haven't issued any commands, then there is nothing to "update"...
   */
 
-  if (start)
+  if (http->state == HTTP_WAITING)
+    return (HTTP_CONTINUE);
+
+ /*
+  * Grab all of the lines we can from the connection...
+  */
+
+  while (httpGets(line, sizeof(line), http) != NULL)
   {
-    if (http->host[0] == '\0' && http->version >= HTTP_1_0)
-    {
-      if (!SendError(con, HTTP_BAD_REQUEST))
-      {
-	CloseClient(con);
-	return (0);
-      }
-    }
-    else if ((status = IsAuthorized(con)) != HTTP_OK)
-    {
-      if (!SendError(con, status))
-      {
-	CloseClient(con);
-        return (0);
-      }
-    }
-    else if (strncmp(http->uri, "..", 2) == 0)
+    if (line[0] == '\0')
     {
      /*
-      * Protect against malicious users!
+      * Blank line means the start of the data section (if any).  Return
+      * the result code, too...
       */
 
-      if (!SendError(con, HTTP_FORBIDDEN))
-      {
-	CloseClient(con);
-        return (0);
-      }
+      if (http->status != HTTP_OK ||
+          http->state != HTTP_POST_RECV)
+	http->state = HTTP_WAITING;
+      else
+        http->state ++;
+
+      return (http->status);
     }
-    else switch (http->state)
+    else if (strncmp(line, "HTTP/", 5) == 0)
     {
-      case HTTP_GET :
-	  if (strncmp(http->uri, "/printers", 9) == 0)
-	  {
-	   /*
-	    * Show printer status...
-	    */
+     /*
+      * Got the beginning of a response...
+      */
 
-            if (!show_printer_status(con))
-	    {
-	      if (!SendError(con, HTTP_NOT_FOUND))
-	      {
-	        CloseClient(con);
-		return (0);
-	      }
-            }
+      if (sscanf(line, "HTTP/%d.%d%d", &major, &minor, &status) != 3)
+        return (HTTP_ERROR);
 
-            http->state = HTTP_WAITING;
-
-	    if (http->data_length == 0 &&
-	        http->data_encoding == HTTP_DATA_SINGLE &&
-		http->version <= HTTP_1_0)
-	      http->keep_alive = 0;
-	  }
-	  else
-	  {
-	   /*
-	    * Serve a file...
-	    */
-
-            if ((filename = get_file(con, &filestats)) == NULL)
-	    {
-	      if (!SendError(con, HTTP_NOT_FOUND))
-	      {
-	        CloseClient(con);
-		return (0);
-	      }
-	    }
-	    else if (filestats.st_size == http->remote_size &&
-	             filestats.st_mtime == http->remote_time)
-            {
-              if (!SendError(con, HTTP_NOT_MODIFIED))
-	      {
-		CloseClient(con);
-		return (0);
-	      }
-	    }
-	    else
-            {
-	      extension = get_extension(filename);
-	      type      = get_type(extension);
-
-              if (!SendFile(con, HTTP_OK, filename, type, &filestats))
-	      {
-		CloseClient(con);
-		return (0);
-	      }
-
-              http->state = HTTP_GET_DATA;
-	    }
-	  }
-          break;
-
-      case HTTP_POST :
-          sprintf(http->filename, "%s/requests/XXXXXX", ServerRoot);
-	  http->file = mkstemp(http->filename);
-
-          fprintf(stderr, "cupsd: POST %s, http->file = %d...\n", http->filename,
-	          http->file);
-
-	  if (http->file < 0)
-	  {
-	    if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
-	    {
-	      CloseClient(con);
-	      return (0);
-	    }
-	  }
-	  else
-	    http->state = HTTP_POST_DATA;
-	  break;
-
-      case HTTP_PUT :
-      case HTTP_DELETE :
-      case HTTP_TRACE :
-          SendError(con, HTTP_NOT_IMPLEMENTED);
-
-      case HTTP_CLOSE :
-          CloseClient(con);
-	  return (0);
-
-      case HTTP_HEAD :
-	  if (strncmp(http->uri, "/printers/", 10) == 0)
-	  {
-	   /*
-	    * Do a command...
-	    */
-
-            if (!SendHeader(con, HTTP_OK, "text/plain"))
-	    {
-	      CloseClient(con);
-	      return (0);
-	    }
-
-	    if (conprintf(con, "\r\n") < 0)
-	    {
-	      CloseClient(con);
-	      return (0);
-	    }
-	  }
-	  else if (filestats.st_size == http->remote_size &&
-	           filestats.st_mtime == http->remote_time)
-          {
-            if (!SendError(con, HTTP_NOT_MODIFIED))
-	    {
-              CloseClient(con);
-	      return (0);
-	    }
-	  }
-	  else
-	  {
-	   /*
-	    * Serve a file...
-	    */
-
-            if ((filename = get_file(con, &filestats)) == NULL)
-	    {
-	      if (!SendHeader(con, HTTP_NOT_FOUND, "text/html"))
-	      {
-		CloseClient(con);
-		return (0);
-	      }
-	    }
-	    else
-            {
-	      extension = get_extension(filename);
-	      type      = get_type(extension);
-
-              if (!SendHeader(con, HTTP_OK, type))
-	      {
-		CloseClient(con);
-		return (0);
-	      }
-
-	      if (conprintf(con, "Last-Modified: %s\r\n",
-	                    get_datetime(filestats.st_mtime)) < 0)
-	      {
-		CloseClient(con);
-		return (0);
-	      }
-
-	      if (conprintf(con, "Content-Length: %d\r\n", filestats.st_size) < 0)
-	      {
-		CloseClient(con);
-		return (0);
-	      }
-	    }
-	  }
-
-          if (conprintf(con, "\r\n") < 0)
-	  {
-	    CloseClient(con);
-	    return (0);
-	  }
-
-          http->state = HTTP_WAITING;
-          break;
+      http->version = (http_version_t)(major * 100 + minor);
+      http->status  = status;
     }
+    else if ((value = strchr(line, ':')) != NULL)
+    {
+     /*
+      * Got a value...
+      */
+
+      *value++ = '\0';
+      while (isspace(*value))
+        value ++;
+
+      if ((field = http_field(line)) == HTTP_FIELD_UNKNOWN)
+        return (HTTP_ERROR);
+
+      httpSetField(http, field, value);
+    }
+    else
+      return (HTTP_ERROR);
   }
 
  /*
-  * Handle any incoming data...
+  * If we haven't already returned, then there is nothing new...
   */
 
-  switch (http->state)
-  {
-    case HTTP_PUT_DATA :
-        break;
-
-    case HTTP_POST_DATA :
-        printf("cupsd: http->data_encoding = %s, http->data_length = %d...\n",
-	       http->data_encoding == HTTP_DATA_CHUNKED ? "chunked" : "single",
-	       http->data_length);
-
-        if (http->data_encoding == HTTP_DATA_CHUNKED &&
-	    http->data_remaining == 0)
-	{
-          if (get_line(con, line, sizeof(line) - 1) == NULL)
-	    break;
-
-	  http->data_remaining = atoi(line);
-	  http->data_length    += http->data_remaining;
-	  if (http->data_remaining == 0)
-	    http->data_encoding = HTTP_DATA_SINGLE;
-	}
-
-        if (http->data_remaining > 0)
-	{
-	  if (http->data_remaining > http->used)
-	    bytes = http->used;
-	  else 
-	    bytes = http->data_remaining;
-
-          fprintf(stderr, "cupsd: Writing %d bytes to temp file...\n", bytes);
-
-          write(http->file, http->buffer, bytes);
-
-	  http->used        -= bytes;
-	  http->data_remaining -= bytes;
-
-	  if (http->used > 0)
-	    memcpy(http->buffer, http->buffer + bytes, http->used);
-	}
-
-	if (http->data_remaining == 0 &&
-	    http->data_encoding == HTTP_DATA_SINGLE)
-	{
-	  close(http->file);
-	  
-          if (!SendError(con, HTTP_ACCEPTED))
-	  {
-	    CloseClient(con);
-	    return (0);
-	  }
-	}
-        break;
-  }
-
-  if (!http->keep_alive && http->state == HTTP_WAITING)
-  {
-    CloseClient(con);
-    return (0);
-  }
-  else
-    return (1);
-#endif /* 0 */
+  return (HTTP_CONTINUE);
 }
 
 
@@ -1594,6 +1146,103 @@ http_field(char *name)		/* I - String name */
 
 
 /*
+ * 'http_send()' - Send a request with all fields and the trailing blank line.
+ */
+
+static int			/* O - 0 on success, non-zero on error */
+http_send(http_t       *http,	/* I - HTTP data */
+          http_state_t request,	/* I - Request code */
+	  char         *uri)	/* I - URI */
+{
+  int		i;		/* Looping var */
+  char		*ptr,		/* Pointer in buffer */
+		buf[1024];	/* Encoded URI buffer */
+  static char	*codes[] =	/* Request code strings */
+		{
+		  NULL,
+		  "OPTIONS",
+		  "GET",
+		  NULL,
+		  "HEAD",
+		  "POST",
+		  NULL,
+		  NULL,
+		  "PUT",
+		  NULL,
+		  "DELETE",
+		  "TRACE",
+		  "CLOSE"
+		};
+  static char	*hex = "0123456789ABCDEF";
+				/* Hex digits */
+
+
+  if (http == NULL || uri == NULL)
+    return (-1);
+
+ /*
+  * Encode the URI as needed...
+  */
+
+  for (ptr = buf; *uri != '\0'; uri ++)
+    if (*uri <= ' ' || *uri >= 127)
+    {
+      *ptr ++ = '%';
+      *ptr ++ = hex[(*uri >> 4) & 15];
+      *ptr ++ = hex[*uri & 15];
+    }
+    else
+      *ptr ++ = *uri;
+
+  *ptr = '\0';
+
+ /*
+  * Send the request header...
+  */
+
+  http->state = request;
+  if (httpPrintf(http, "%s %s HTTP/1.1\n", codes[request], buf) < 1)
+  {
+   /*
+    * Might have lost connection; try to reconnect...
+    */
+
+    if (httpReconnect(http))
+      return (-1);
+
+   /*
+    * OK, we've reconnected, send the request again...
+    */
+
+    if (httpPrintf(http, "%s %s HTTP/%d.%d\n", codes[request], buf,
+                   http->version / 100, http->version % 100) < 1)
+      return (-1);
+  }
+
+  for (i = 0; i < HTTP_FIELD_MAX; i ++)
+    if (http->fields[i][0] != '\0')
+      if (httpPrintf(http, "%s: %s\n", http_fields[i], http->fields[i]) < 1)
+        return (-1);
+
+  if (httpPrintf(http, "\n") < 1)
+    return (-1);
+
+  httpClearFields(http);
+
+ /*
+  * Update the state as needed...
+  */
+
+  if (codes[request + 1] == NULL)
+    http->state ++;
+  else
+    http->state = HTTP_STATUS;
+
+  return (0);
+}
+
+
+/*
  * 'http_sighandler()' - Handle 'broken pipe' signals from lost network
  *                       clients.
  */
@@ -1606,5 +1255,5 @@ http_sighandler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: http.c,v 1.9 1999/01/28 22:00:44 mike Exp $".
+ * End of "$Id: http.c,v 1.10 1999/01/29 16:18:05 mike Exp $".
  */
