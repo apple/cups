@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.3 1999/03/06 20:25:26 mike Exp $"
+# "$Id: Makefile,v 1.4 1999/03/23 18:37:06 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -26,7 +26,7 @@
 # Directorys to make...
 #
 
-DIRS	=	cups backend scheduler systemv
+DIRS	=	cups backend filter scheduler systemv
 
 #
 # Make all targets...
@@ -55,5 +55,5 @@ install:
 	done
 
 #
-# End of "$Id: Makefile,v 1.3 1999/03/06 20:25:26 mike Exp $".
+# End of "$Id: Makefile,v 1.4 1999/03/23 18:37:06 mike Exp $".
 #
