@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.39 1999/07/12 16:09:35 mike Exp $"
+ * "$Id: http.c,v 1.40 1999/07/27 12:53:23 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -66,6 +66,7 @@
 #include <ctype.h>
 #include "string.h"
 #include <fcntl.h>
+#include <errno.h>
 
 #include "http.h"
 #include "ipp.h"
@@ -1093,6 +1094,13 @@ httpUpdate(http_t *http)		/* I - HTTP data */
   }
 
  /*
+  * See if there was an error...
+  */
+
+  if (errno)
+    return (HTTP_ERROR);
+
+ /*
   * If we haven't already returned, then there is nothing new...
   */
 
@@ -1371,5 +1379,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.39 1999/07/12 16:09:35 mike Exp $".
+ * End of "$Id: http.c,v 1.40 1999/07/27 12:53:23 mike Exp $".
  */
