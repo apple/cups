@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: 5.5-lp.sh,v 1.1.2.2 2002/10/22 15:54:37 mike Exp $"
+# "$Id: 5.5-lp.sh,v 1.1.2.3 2002/10/23 20:49:24 mike Exp $"
 #
 #   Test the lp command.
 #
@@ -49,9 +49,9 @@ echo ""
 
 echo "LP Flood Test"
 echo ""
-echo "    lp -d Test1 testfile.txt (100 times in parallel)"
+echo "    lp -d Test1 testfile.txt ($1 times in parallel)"
 i=0
-while test $i -lt 100; do
+while test $i -lt $1; do
 	echo "    flood copy $i..." 1>&2
 	../systemv/lp -d Test1 testfile.txt 2>&1 &
 	lppid=$!
@@ -67,5 +67,5 @@ fi
 echo ""
 
 #
-# End of "$Id: 5.5-lp.sh,v 1.1.2.2 2002/10/22 15:54:37 mike Exp $".
+# End of "$Id: 5.5-lp.sh,v 1.1.2.3 2002/10/23 20:49:24 mike Exp $".
 #

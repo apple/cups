@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.4.2.9 2002/10/15 16:20:04 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.4.2.10 2002/10/23 20:49:24 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -29,6 +29,52 @@
 #
 
 make
+
+#
+# Greet the tester...
+#
+
+echo "Welcome to the CUPS Automated Test Script."
+echo ""
+echo "Before we begin, it is important that you understand that the larger"
+echo "tests require significant amounts of RAM and disk space.  If you"
+echo "attempt to run one of the big tests on a system that lacks sufficient"
+echo "disk and virtual memory, the UNIX kernel might decide to kill one or"
+echo "more system processes that you've grown attached to, like the X"
+echo "server.  The question you may want to ask yourself before running a"
+echo "large test is: Do you feel lucky?"
+echo ""
+echo "OK, now that we have the Dirty Harry quote out of the way, please"
+echo "choose the type of test you wish to perform:"
+echo ""
+echo "1 - Basic conformance test with no load testing (all systems)"
+echo "2 - Basic conformance test with some load testing (minimum 256MB VM)"
+echo "3 - Basic conformance test with extreme load testing (minimum 1024MB VM)"
+echo ""
+echo "Please enter the number of the test you wish to perform:"
+
+read testtype
+
+case "$testtype" in
+	2)
+		echo "Running the medium tests (2)"
+		nprinters1=10
+		nprinters2=20
+		pjobs=20
+		;;
+	3)
+		echo "Running the extreme tests (3)"
+		nprinters1=500
+		nprinters2=1000
+		pjobs=100
+		;;
+	*)
+		echo "Running the timid tests (1)"
+		nprinters1=0
+		nprinters2=0
+		pjobs=0
+		;;
+esac
 
 #
 # Information for the server/tests...
@@ -132,7 +178,7 @@ touch /tmp/$user/printers.conf
 #
 
 i=1
-while test $i -le 500; do
+while test $i -le $nprinters1; do
 	cat >>/tmp/$user/printers.conf <<EOF
 <Printer test-$i>
 Accepting Yes
@@ -150,7 +196,7 @@ EOF
 	i=`expr $i + 1`
 done
 
-while test $i -le 1000; do
+while test $i -le $nprinters2; do
 	cat >>/tmp/$user/printers.conf <<EOF
 <Printer test-$i>
 Accepting Yes
@@ -297,7 +343,7 @@ for file in 5*.sh; do
 	echo "" >>$strfile
 	echo "\"$file\":" >>$strfile
 
-	sh $file >>$strfile
+	sh $file $pjobs >>$strfile
 	status=$?
 
 	if test $status != 0; then
@@ -388,5 +434,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.4.2.9 2002/10/15 16:20:04 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.4.2.10 2002/10/23 20:49:24 mike Exp $"
 #
