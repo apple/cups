@@ -1,6 +1,6 @@
 %PDF-1.2
 %‚„œ”
-1 0 obj<</Producer(htmldoc 2.0b1 Copyright 1997-1999 Michael Sweet, All Rights Reserved.)/CreationDate(D:19991026144719Z)/Title(CUPS Software Users Manual)/Author(Easy Software Products)>>endobj
+1 0 obj<</Producer(htmldoc 2.0b1 Copyright 1997-1999 Michael Sweet, All Rights Reserved.)/CreationDate(D:19991029131930Z)/Title(CUPS Software Users Manual)/Author(Easy Software Products)>>endobj
 2 0 obj<</Type/Encoding/BaseEncoding/WinAnsiEncoding>>endobj
 3 0 obj<</Type/Font/Subtype/Type1/BaseFont/Courier/Encoding 2 0 R>>endobj
 4 0 obj<</Type/Font/Subtype/Type1/BaseFont/Times-Roman/Encoding 2 0 R>>endobj
@@ -114,15 +114,15 @@
 109 0 obj<</Subtype/Link/Rect[177.9 277.2 194.1 290.2]/Border[0 0 0]/Dest[243 0 R/XYZ null 474 0]>>endobj
 110 0 obj<</Subtype/Link/Rect[194.1 277.2 231.7 290.2]/Border[0 0 0]/Dest[243 0 R/XYZ null 474 0]>>endobj
 111 0 obj<</Subtype/Link/Rect[231.7 277.2 278.7 290.2]/Border[0 0 0]/Dest[243 0 R/XYZ null 474 0]>>endobj
-112 0 obj<</Subtype/Link/Rect[108.0 264.0 130.9 277.0]/Border[0 0 0]/Dest[243 0 R/XYZ null 353 0]>>endobj
-113 0 obj<</Subtype/Link/Rect[130.9 264.0 165.8 277.0]/Border[0 0 0]/Dest[243 0 R/XYZ null 353 0]>>endobj
-114 0 obj<</Subtype/Link/Rect[144.0 250.8 177.9 263.8]/Border[0 0 0]/Dest[243 0 R/XYZ null 259 0]>>endobj
-115 0 obj<</Subtype/Link/Rect[177.9 250.8 194.1 263.8]/Border[0 0 0]/Dest[243 0 R/XYZ null 259 0]>>endobj
-116 0 obj<</Subtype/Link/Rect[194.1 250.8 232.9 263.8]/Border[0 0 0]/Dest[243 0 R/XYZ null 259 0]>>endobj
-117 0 obj<</Subtype/Link/Rect[232.9 250.8 244.8 263.8]/Border[0 0 0]/Dest[243 0 R/XYZ null 259 0]>>endobj
-118 0 obj<</Subtype/Link/Rect[244.8 250.8 294.6 263.8]/Border[0 0 0]/Dest[243 0 R/XYZ null 259 0]>>endobj
-119 0 obj<</Subtype/Link/Rect[294.6 250.8 312.0 263.8]/Border[0 0 0]/Dest[243 0 R/XYZ null 259 0]>>endobj
-120 0 obj<</Subtype/Link/Rect[312.0 250.8 331.6 263.8]/Border[0 0 0]/Dest[243 0 R/XYZ null 259 0]>>endobj
+112 0 obj<</Subtype/Link/Rect[108.0 264.0 130.9 277.0]/Border[0 0 0]/Dest[243 0 R/XYZ null 340 0]>>endobj
+113 0 obj<</Subtype/Link/Rect[130.9 264.0 165.8 277.0]/Border[0 0 0]/Dest[243 0 R/XYZ null 340 0]>>endobj
+114 0 obj<</Subtype/Link/Rect[144.0 250.8 177.9 263.8]/Border[0 0 0]/Dest[243 0 R/XYZ null 246 0]>>endobj
+115 0 obj<</Subtype/Link/Rect[177.9 250.8 194.1 263.8]/Border[0 0 0]/Dest[243 0 R/XYZ null 246 0]>>endobj
+116 0 obj<</Subtype/Link/Rect[194.1 250.8 232.9 263.8]/Border[0 0 0]/Dest[243 0 R/XYZ null 246 0]>>endobj
+117 0 obj<</Subtype/Link/Rect[232.9 250.8 244.8 263.8]/Border[0 0 0]/Dest[243 0 R/XYZ null 246 0]>>endobj
+118 0 obj<</Subtype/Link/Rect[244.8 250.8 294.6 263.8]/Border[0 0 0]/Dest[243 0 R/XYZ null 246 0]>>endobj
+119 0 obj<</Subtype/Link/Rect[294.6 250.8 312.0 263.8]/Border[0 0 0]/Dest[243 0 R/XYZ null 246 0]>>endobj
+120 0 obj<</Subtype/Link/Rect[312.0 250.8 331.6 263.8]/Border[0 0 0]/Dest[243 0 R/XYZ null 246 0]>>endobj
 121 0 obj<</Subtype/Link/Rect[144.0 237.6 177.9 250.6]/Border[0 0 0]/Dest[246 0 R/XYZ null 782 0]>>endobj
 122 0 obj<</Subtype/Link/Rect[177.9 237.6 194.1 250.6]/Border[0 0 0]/Dest[246 0 R/XYZ null 782 0]>>endobj
 123 0 obj<</Subtype/Link/Rect[194.1 237.6 232.9 250.6]/Border[0 0 0]/Dest[246 0 R/XYZ null 782 0]>>endobj
@@ -334,8 +334,8 @@
 187 0 obj<</D[243 0 R/XYZ null 782 null]>>endobj
 188 0 obj<</D[243 0 R/XYZ null 610 null]>>endobj
 189 0 obj<</D[243 0 R/XYZ null 474 null]>>endobj
-190 0 obj<</D[243 0 R/XYZ null 353 null]>>endobj
-191 0 obj<</D[243 0 R/XYZ null 259 null]>>endobj
+190 0 obj<</D[243 0 R/XYZ null 340 null]>>endobj
+191 0 obj<</D[243 0 R/XYZ null 246 null]>>endobj
 192 0 obj<</D[246 0 R/XYZ null 782 null]>>endobj
 193 0 obj<</D[246 0 R/XYZ null 685 null]>>endobj
 194 0 obj<</D[246 0 R/XYZ null 589 null]>>endobj
@@ -387,8 +387,8 @@ ki™'.açÀO4\•Pµ“≈⁄u>W≠ükÜ‰Ú◊•ü˝Úq€c©ÓbÌ:é´÷Hîª¬⁄·*Âñ„ç√∂G†ÓbÌ:é´÷®G•XÆ†¿
 |	$Ë@Nâ«a¡÷n◊…ï92`2‰·PbÌ´ñ∆	5T´\(Ã±◊Ö≥‰[fÜÿ´÷cüÓÕÖ7ƒ•#3∞(L—OF÷x•xÅô¿ˆiâü=æjπ§7∂%ÊF“Ö±!ˆ§â¬»áÇÒ§Ì…;£≠PΩ3∆≥∂ÔúZ˚˙^¶òel<1˚+ñ»ÙëÇÖâkﬂã=>∏†r•§≥©Õ
 »\“	LÜÊ ÏπM0),|(X2ãi^/\¥Oÿñoñ¬ñP,Ï.î¨¬\oÌòÿXØZ£aÈ„∞≤øPr'õ!±ÙR∂¢¥ÿ€Åî∞˝0,jì©zê±Zn£Å=œ∂û-Ê!ıÉ6Wr¿Íﬂté*wÙèŸπRóÁﬂSãaÒmq@s¿<Ô2Èy∞⁄◊Fù\±«-¯/ù¨i\òpIè_.Q÷ò_Ò˛˙⁄àÀ`¿vÛÏ∫ÀôTÀán.ì;†=Èˇˆ]»˛ªKC.Í2Liê◊Oçqìè´–‰q¶\πgß\\ÆV´∑O€Ú∏Z]ÖÜmiÃec¿¨óÆ¸GótêkiÅÀLG.ó{∂∂¬Â‹Äuo}·∏‰‘Ü…E8µ¢ 6Ùê\EË◊∆W6≠·Bs±v:z“¯ƒ&WÓ◊≤∞…Âå÷„é7\2úä∆”∏∏[8#àçÀ	È¿û˜R∏‰d¨ê∆ÂÄ%¢èI\£[">ÎÄ∆ïOƒ
 ©\#«øÑl"◊®ñH…}°rçÈù)«OTÆ{R“ôk¥)FK{°sç4≈àâeÆq¶Òló¡5 £fp∏(ÈÅchõkpÌ†ß Ò∏÷F ìK
-w•–ÑkHQd•sπÜ„eí±πi?É8.cÆÅcÃ\C¯gü{ë¬Ñ´S‰giqıfê|j∆’Ø*ö$rıÈ†çr†Mπ˙3K∆7Ê"ÁP˜¥0±œ’«≤≈0]›ó}Y4ø7aÖ´êvmÒ⁄ºGv∏∂∂ho»fõ¬ÆB^π3X6π,ŸÂ¶pç´êw∆2¯÷V_lrÒS´èT◊ˆzbóÀ Ωë∫=&óÃ.U\≤À∑∂˚–1/ﬁ_ıûã~∏∂Â	óÔ_ﬁ˜ÚÒΩqÌG≠√ /VO}}vü\˚aª[]®«È˙©œœÌõÎ0pª´´ã]π\≠Æüûzˇ»A∏F(ê|ˇ&}Û ﬂºˇ˝'q˚I»?â€Ë”Õ'q›‹˘„ﬂ<êã¸ó?˝˙?|˘I_˙ÚU¸·áˇ˛ÌáüˇV˛Á∂’Ω∏Ω›µ˙›|'ﬁ›~∏π{nı./˛Óˆ&∫π›’|˜i˜˚ªèáøö¸ı/Áø
-_~˘Ò∑?˛˙u_Ô˛√Õ«“˙Â˛ÚÂ?˛Ìﬂ›vÓ”wÔ∂ˇ˜ÈÔƒÁüŸÓá_Eˆ”∂Gˇ˚”èª¶â‹¢¸?´™Ôendstream
+w•–ÑkHQd•sπÜ„eí±πi?É8.cÆÅcÃ\C¯gü{ë¬Ñ´S‰giqıfê|j∆’Ø*ö$rıÈ†çr†Mπ˙3K∆7Ê"ÁP˜¥0±œ’«≤≈0]›ó}Y4ø7aÖ´êvmÒ⁄ºGv∏∂∂ho»fõ¬ÆB^π3X6π,ŸÂ¶pç´êw∆2¯÷V_lrÒS´èT◊ˆzbóÀ Ωë∫=&óÃ.U\≤À∑∂˚–1/ﬁ_ıûã~∏∂Â	óÔ_ﬁ˜ÚÒΩqÌG≠√ /VO}}vü\˚aª[]®«È˙©œœÌõÎ0pª´´ã]π\≠Æüûzˇ»A∏F(ê|ˇ&}Û ﬂºˇ˝'q˚I»?â€Ë”Õ'q›‹˘„ﬂ<êã¸ó?˝˙?|˘I_˙ÚU¸·áˇ˛ÌáüˇV˛Á∂’Ω∏Ω›µ˙›|'ﬁ›~∏π{nı./˛Óˆ&∫π€’|˜i˜˚ªèáøö¸ı/Áø
+_~˘Ò∑?˛˙u_Ô˛√Õ«“˙Â˛ÚÂ?˛Ìﬂ›vÓ”wÔ∂ˇ˜ÈÔƒÁüŸÓá_Eˆ”∂Gˇ˚”èª¶â‹¢¸?¨Ôendstream
 endobj
 203 0 obj
 6298
@@ -404,10 +404,14 @@ endobj
 endobj
 207 0 obj<</Type/Page/Parent 200 0 R/Contents 208 0 R/Resources<</ProcSet[/PDF/Text]/Font<</F4 4 0 R/F8 7 0 R/F9 8 0 R>>>>>>endobj
 208 0 obj<</Length 209 0 R/Filter/FlateDecode>>stream
-x⁄ÖTKo‚0æÛ+F=Å‘d	P(«•/!µ›lìV{»≈I&≈≠cß∂b˝éù ∫l•UN±?{æ«å?åÈã`1ÅÈäz∞Jﬂnó-!≠`Õ¬Ã3HÀa¨±bé“7BÃ ä"Ë ¡t≤'ïn∏£*ªc°5®‘L∂L@â¶–<Gµ´‹.ÿ¬ï™k%·˘q˝bÕ•ÂÚíΩ±XC6<ªzéì≥l/tW“CMªÇQ8£∞cEº/¬K«ã ”eËy˜˝ÿ¢ﬁr‹˝ÕüpìyáKˇ√§—jÀI0hî∂,Hk=F∞=j®îˆg≥…≈TÉö˘M„/0!¨-lò9ê#JÚfãÇNîêÔ·Üô=$c≠ ∂∞∆9Fjeë(Àd…ty§`îh-˘„Y0!:[î•¢}R◊gÇs˜®Õ≈—Î}qg`Ö˙Ó° kh!\"PI‘ÆLÿﬂzp—_GWwW≠N¢=öIj¨*î†`◊7Èm∞écäñuúÍ«üJ±Wá˜Ú‡MÂ^|¥ÿRQ†∞N‰‹;^æqÕ–ÂòÔ„Îsx∫Ωä¢≈2ùCBM@˚h{EX	Uº,yXπ]W·{”$¥Húõû*U¶ò0Í§§i◊	⁄é€h§úËßje·Ç`Ç€˝ó˛∞≤4@∂Ïî~Ôß\´ùqíãXõ–¥4ˆ®…èO„#¶©à„käÄ,√OM†¸æÎïØπIöD™+J`M#x¡∫≠,±kﬁØìzJΩm7Ek¨™˘o™ΩÌ∆Twèœp∑9RœÜE´5J+ˆ–U’ø®Y8ûf£æŒ&Å◊.¶ä”¨=≠cjf°†ı‹ø-•õâÉ2©d…∂ﬁV”?ó«Åè∆˝ÀÈEõ]é√%m∫≈˝ﬂ§ÉüÉ?ƒ•áendstream
+x⁄ÖTKo‚0æÛ+F=Å‘d	P(«•/!µ›lìV{»≈I&≈≠cß∂b˝éù ∫l•UN±?{æ«å?åÈã`1ÅÈäz∞Jﬂnó-!≠`Õ¬Ã3HÀa¨±bé“7BÃ ä"Ë ¡t≤'ïn∏£*ªc°5®‘L∂L@â¶–<Gµ´‹.ÿ¬ï™k%·˘q˝bÕ•ÂÚíΩ±XC6<ªzéì≥l/tW“CMªÇQ8'a«äx_Ñóé¶À–ÛÓ/˙±EΩÂ∏˚õ?·&Ûó˛áI£’ñì`–(mY.ê÷zå`{‘P)Ìœfìã9®5Ûõ∆_`BX[ÿ0s" Gî‰Õù(!ﬂ√3{H∆Zïmaçså8‘ "Q0ñ…íÈÚH¡(—ZÚ«≥`Bt*∂(KE˙§Æœ&ÁÓQõã£◊˚‚Œ¿
+ı;
+‹CA÷–B ∏D†í®]7ò∞øı‡¢øéÆÓÆZ;úD{4ì‘XU(A¡Æo“€`«-Î‡93‘=é?ïbØÔÂ¡õ Ω¯h±•¢@aù»πwº|
+‚ö°À1ﬁ«◊Át{Eãe6:áÑöÄˆ–ˆä∞™x'XÚ∞rªÆ¬˜¶Ihë87=U™L10a‘II”6Æ(¥∑–H9—O’ ¬¡∑˚/˝aeiÄlŸ)˝ﬁ)$NπV;„$;±26°iiÏQìü∆GLS«◊4YÜüö@˘}◊+_s%í4âTWî¿öFÇuZYb◊º_3&ıîz!⁄nä÷XUÛﬂT{€ç%®
+Óü·ns§ûãVkîVÏ°#™™Q≥p<ÕF'|ù	LØ]LßY{Z«‘$ÃBAÎπ[J7eR…‡ìmΩ≠¶.èç˚ó·”ã6ªáK⁄tä˚øI? »f•àendstream
 endobj
 209 0 obj
-691
+692
 endobj
 210 0 obj<</Type/Page/Parent 200 0 R/Contents 211 0 R/Resources<</ProcSet[/PDF/Text]/Font<</F4 4 0 R/F8 7 0 R/F9 8 0 R/Fc 9 0 R>>>>>>endobj
 211 0 obj<</Length 212 0 R/Filter/FlateDecode>>stream
@@ -524,14 +528,12 @@ endobj
 endobj
 243 0 obj<</Type/Page/Parent 200 0 R/Contents 244 0 R/Resources<</ProcSet[/PDF/Text]/Font<</F0 3 0 R/F4 4 0 R/F8 7 0 R/F9 8 0 R>>>>>>endobj
 244 0 obj<</Length 245 0 R/Filter/FlateDecode>>stream
-x⁄•U€é”0}ÔWåVBZ§Màìl/H˚≤UA<∞ö"ÒËMú÷‡ÿ∆vZˆÔ;Ωä.€Ç"Uâ=ÁåœœÙgè@ÇÅA
-Y ¶w_Ùﬁº…‚ä˜˙C‚_´ÎáhÆaj∏t\.^ﬂ1.B∫®(≈}U,\E
-d€<2µ˙nEEÀÆ@i«ïÀ+ùÖ¿¶7lÒÒ'hAKf°iÖ„Z0®TŸ6L:–tÅÎJ˙Ùò¥;euM¡"´B\„˘t∂’ZÃH0≈§·ó 
-rü≤V¶°ŒæÌÙ$0Íd£;Úm.‚?^Å–p$è@Õì¥a0y(&_^O/œOÑÔ}è¸9ùØXM—¥ç,‡ùÍ∏CV5 “5c.XÓ}o¯bÈ$≥ˆŸÚ~S-îTB©§3JòZ1CÖÄ«Tv∂ÂP≠”≠É÷n3˘≤ø”ÃîXﬁÌ%π∏T$MŒ∑Ï´øöÜQ«ûïë$Å5G9¬s2πrÎ%2√™C	/ÙRQÛ‹ùÎ¯{⁄4∆ l
-ﬁ›Îã}_írGrñ˚t‹õ€ﬁqêAÚˇñˇãÁœõ~˜˛Â°9ÿ/üÇL˚◊ŸU+!‘⁄;’ôbÅj-ûòc7†úßÛöÌπï~-ÌK3^RCKoaä+dπ|qöñöˇ1GùƒrG\Óâ±°Ä#Ò≈%ıâHz≤ú√ÕÒHñ≈∑–OÛx‰ëa»ŒTÌ÷‘0ò[ü˛#ï-ë˛££∂Â©ˇê|êc≠¬…¸¬§Ë}Ó˝v˘¸endstream
+x⁄•U]o”0}ÔØ∏öÑ4§%‘I◊§Ωl*å≤µH<zé”€ÿNˇûkgmZVXäT%ˆ=Áﬁ{ÓGø˜ÙÒ!0  ´{◊Ûﬁõw yö¡ºƒª·òÑ◊‚¸.YòY°ºPÀ◊ÛØh7 BZ´$ü§√`5Ø8ú%TS?rõ4ÊjEe√œ@/¥«%gﬁAd3OlÈ˛'IwP7“#9ö55W]‚πV¡=:m£,Œ)8Ñ°ad‡E¥K·f1{ ◊£-z$Ë‚≤¯KUÉ‡≤‘∂¶ﬁΩmÛÈ√§Mµÿío|ëÒ
+§ÅΩÙîBrEk”ª˘Ù˛ÛÏ4Û¡ÛN˜$ƒπ´|¡Kä¢=•¢Õ:mQªUMÚ¨E=p%˜àæ∂bYy≈ù˚cyøËU¿¥ÚVÀ”+n©î∏ÖÉ.„Õ¶∫Ò¶Ò–∏çß–!ù˘ï·ñay7Mrr5v®H÷?^≤œ°5,-ßû[å3#˝>¨¶#'W]"∞ÆêV-JÜD˜!µﬂ!¸±äﬂ“∫¶p£≠≈°m_ü¨˚2í∞-…QÍG–˛lû,{ÀAF˝ˇó¸_4&:Ïé@Ó∑=ÅÛêeW	VN´∏ãŒ‹˝Ì58√ô(£AçÆÑóÈ∏´∆ éˇ··cÕ˝uñZJΩ∫∑;†∆»ü Fº]w>–›±}sD(ÙME-e(•ÉûºW¨zq73#ûmeﬂÍ†∂ƒ¨#∆ÒÅƒ'7HpD≤ÉÕ1~
+è‰yz	√|úFd\Ÿ∫Ùkj9,\pˇÅ™Ü  K»pÇ÷…á¸–?“`4¿Z≈;íáÉÈº˜©˜pendstream
 endobj
 245 0 obj
-585
+622
 endobj
 246 0 obj<</Type/Page/Parent 200 0 R/Contents 247 0 R/Resources<</ProcSet[/PDF/Text]/Font<</F0 3 0 R/F4 4 0 R/F6 6 0 R/F8 7 0 R/F9 8 0 R>>>>>>endobj
 247 0 obj<</Length 248 0 R/Filter/FlateDecode>>stream
@@ -615,8 +617,8 @@ endobj
 288 0 obj<</Parent 283 0 R/Title(N-Up Printing)/Dest[243 0 R/XYZ null 729 null]/Prev 287 0 R/Next 289 0 R>>endobj
 289 0 obj<</Parent 283 0 R/Title(Setting the Brightness)/Dest[243 0 R/XYZ null 574 null]/Prev 288 0 R/Next 290 0 R>>endobj
 290 0 obj<</Parent 283 0 R/Title(Setting the Gamma Correction)/Dest[243 0 R/XYZ null 438 null]/Prev 289 0 R>>endobj
-291 0 obj<</Parent 282 0 R/Count -5/First 292 0 R/Last 296 0 R/Title(Text Options)/Dest[243 0 R/XYZ null 308 null]/Prev 283 0 R/Next 297 0 R>>endobj
-292 0 obj<</Parent 291 0 R/Title(Setting the Number of Characters Per Inch)/Dest[243 0 R/XYZ null 223 null]/Next 293 0 R>>endobj
+291 0 obj<</Parent 282 0 R/Count -5/First 292 0 R/Last 296 0 R/Title(Text Options)/Dest[243 0 R/XYZ null 295 null]/Prev 283 0 R/Next 297 0 R>>endobj
+292 0 obj<</Parent 291 0 R/Title(Setting the Number of Characters Per Inch)/Dest[243 0 R/XYZ null 209 null]/Next 293 0 R>>endobj
 293 0 obj<</Parent 291 0 R/Title(Setting the Number of Lines Per Inch)/Dest[246 0 R/XYZ null 729 null]/Prev 292 0 R/Next 294 0 R>>endobj
 294 0 obj<</Parent 291 0 R/Title(Setting the Number of Columns)/Dest[246 0 R/XYZ null 649 null]/Prev 293 0 R/Next 295 0 R>>endobj
 295 0 obj<</Parent 291 0 R/Title(Setting the Page Margins)/Dest[246 0 R/XYZ null 552 null]/Prev 294 0 R/Next 296 0 R>>endobj
@@ -837,101 +839,101 @@ xref
 0000026659 00000 n 
 0000026679 00000 n 
 0000026810 00000 n 
-0000027572 00000 n 
-0000027593 00000 n 
-0000027733 00000 n 
-0000028095 00000 n 
-0000028116 00000 n 
-0000028256 00000 n 
-0000029170 00000 n 
-0000029191 00000 n 
-0000029331 00000 n 
-0000030761 00000 n 
-0000030783 00000 n 
-0000030923 00000 n 
-0000031809 00000 n 
-0000031830 00000 n 
-0000031943 00000 n 
-0000032130 00000 n 
-0000032151 00000 n 
-0000032291 00000 n 
-0000032866 00000 n 
-0000032887 00000 n 
-0000033050 00000 n 
-0000034031 00000 n 
-0000034052 00000 n 
-0000034215 00000 n 
-0000035093 00000 n 
-0000035114 00000 n 
-0000035227 00000 n 
-0000035424 00000 n 
-0000035445 00000 n 
-0000035594 00000 n 
-0000036204 00000 n 
-0000036225 00000 n 
-0000036383 00000 n 
-0000037424 00000 n 
-0000037445 00000 n 
-0000037585 00000 n 
-0000038241 00000 n 
-0000038262 00000 n 
-0000038411 00000 n 
-0000039177 00000 n 
-0000039198 00000 n 
-0000039356 00000 n 
-0000040552 00000 n 
-0000040574 00000 n 
-0000040687 00000 n 
-0000040876 00000 n 
-0000040897 00000 n 
-0000041052 00000 n 
-0000043860 00000 n 
-0000043882 00000 n 
-0000043995 00000 n 
-0000044160 00000 n 
-0000044180 00000 n 
-0000044235 00000 n 
-0000044340 00000 n 
-0000044484 00000 n 
-0000044587 00000 n 
-0000044692 00000 n 
-0000044857 00000 n 
-0000044965 00000 n 
-0000045080 00000 n 
-0000045185 00000 n 
-0000045293 00000 n 
-0000045401 00000 n 
-0000045517 00000 n 
-0000045615 00000 n 
-0000045781 00000 n 
-0000045898 00000 n 
-0000046017 00000 n 
-0000046141 00000 n 
-0000046266 00000 n 
-0000046416 00000 n 
-0000046557 00000 n 
-0000046666 00000 n 
-0000046818 00000 n 
-0000046957 00000 n 
-0000047087 00000 n 
-0000047211 00000 n 
-0000047347 00000 n 
-0000047474 00000 n 
-0000047588 00000 n 
-0000047711 00000 n 
-0000047827 00000 n 
-0000047976 00000 n 
-0000048105 00000 n 
-0000048242 00000 n 
-0000048372 00000 n 
-0000048497 00000 n 
-0000048600 00000 n 
-0000048737 00000 n 
-0000048842 00000 n 
-0000048981 00000 n 
-0000049115 00000 n 
+0000027573 00000 n 
+0000027594 00000 n 
+0000027734 00000 n 
+0000028096 00000 n 
+0000028117 00000 n 
+0000028257 00000 n 
+0000029171 00000 n 
+0000029192 00000 n 
+0000029332 00000 n 
+0000030762 00000 n 
+0000030784 00000 n 
+0000030924 00000 n 
+0000031810 00000 n 
+0000031831 00000 n 
+0000031944 00000 n 
+0000032131 00000 n 
+0000032152 00000 n 
+0000032292 00000 n 
+0000032867 00000 n 
+0000032888 00000 n 
+0000033051 00000 n 
+0000034032 00000 n 
+0000034053 00000 n 
+0000034216 00000 n 
+0000035094 00000 n 
+0000035115 00000 n 
+0000035228 00000 n 
+0000035425 00000 n 
+0000035446 00000 n 
+0000035595 00000 n 
+0000036205 00000 n 
+0000036226 00000 n 
+0000036384 00000 n 
+0000037425 00000 n 
+0000037446 00000 n 
+0000037586 00000 n 
+0000038279 00000 n 
+0000038300 00000 n 
+0000038449 00000 n 
+0000039215 00000 n 
+0000039236 00000 n 
+0000039394 00000 n 
+0000040590 00000 n 
+0000040612 00000 n 
+0000040725 00000 n 
+0000040914 00000 n 
+0000040935 00000 n 
+0000041090 00000 n 
+0000043898 00000 n 
+0000043920 00000 n 
+0000044033 00000 n 
+0000044198 00000 n 
+0000044218 00000 n 
+0000044273 00000 n 
+0000044378 00000 n 
+0000044522 00000 n 
+0000044625 00000 n 
+0000044730 00000 n 
+0000044895 00000 n 
+0000045003 00000 n 
+0000045118 00000 n 
+0000045223 00000 n 
+0000045331 00000 n 
+0000045439 00000 n 
+0000045555 00000 n 
+0000045653 00000 n 
+0000045819 00000 n 
+0000045936 00000 n 
+0000046055 00000 n 
+0000046179 00000 n 
+0000046304 00000 n 
+0000046454 00000 n 
+0000046595 00000 n 
+0000046704 00000 n 
+0000046856 00000 n 
+0000046995 00000 n 
+0000047125 00000 n 
+0000047249 00000 n 
+0000047385 00000 n 
+0000047512 00000 n 
+0000047626 00000 n 
+0000047749 00000 n 
+0000047865 00000 n 
+0000048014 00000 n 
+0000048143 00000 n 
+0000048280 00000 n 
+0000048410 00000 n 
+0000048535 00000 n 
+0000048638 00000 n 
+0000048775 00000 n 
+0000048880 00000 n 
+0000049019 00000 n 
+0000049153 00000 n 
 trailer
 <</Size 302/Root 301 0 R/Info 1 0 R>>
 startxref
-49301
+49339
 %%EOF
