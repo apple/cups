@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.17.2.9 2003/01/15 04:25:47 mike Exp $"
+ * "$Id: lpq.c,v 1.17.2.10 2003/05/14 18:35:15 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -26,6 +26,7 @@
  *   main()         - Parse options and commands.
  *   show_jobs()    - Show jobs.
  *   show_printer() - Show printer status.
+ *   usage()        - Show program usage.
  */
 
 /*
@@ -51,6 +52,7 @@
 static int	show_jobs(http_t *, const char *, const char *, const int,
 		          const int);
 static void	show_printer(http_t *, const char *);
+static void	usage(void);
 
 
 /*
@@ -128,6 +130,15 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    else
 	    {
 	      i ++;
+
+	      if (i >= argc)
+	      {
+		httpClose(http);
+		cupsFreeDests(num_dests, dests);
+	        
+	        usage();
+	      }
+
 	      dest = argv[i];
 	    }
 
@@ -155,10 +166,11 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
 	default :
-	    fputs("Usage: lpq [-P dest] [-l] [+interval]\n", stderr);
 	    httpClose(http);
-            cupsFreeDests(num_dests, dests);
-	    return (1);
+	    cupsFreeDests(num_dests, dests);
+
+	    usage();
+	    break;
       }
     }
     else if (isdigit(argv[i][0]))
@@ -545,5 +557,17 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpq.c,v 1.17.2.9 2003/01/15 04:25:47 mike Exp $".
+ * 'usage()' - Show program usage.
+ */
+
+static void
+usage(void)
+{
+  fputs("Usage: lpq [-P dest] [-l] [+interval]\n", stderr);
+  exit(1);
+}
+
+
+/*
+ * End of "$Id: lpq.c,v 1.17.2.10 2003/05/14 18:35:15 mike Exp $".
  */
