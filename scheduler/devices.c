@@ -1,5 +1,5 @@
 /*
- * "$Id: devices.c,v 1.5 2000/04/27 12:18:13 mike Exp $"
+ * "$Id: devices.c,v 1.6 2000/04/27 12:19:27 mike Exp $"
  *
  *   Device scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -231,6 +231,12 @@ LoadDevices(const char *d)	/* I - Directory to scan */
 	}
       }
 
+     /*
+      * Turn the alarm clock off and close the pipe to the command...
+      */
+
+      alarm(0);
+
       pclose(fp);
 
      /*
@@ -457,5 +463,5 @@ sigalrm_handler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: devices.c,v 1.5 2000/04/27 12:18:13 mike Exp $".
+ * End of "$Id: devices.c,v 1.6 2000/04/27 12:19:27 mike Exp $".
  */
