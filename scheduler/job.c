@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.33 1999/07/21 19:39:10 mike Exp $"
+ * "$Id: job.c,v 1.34 1999/07/26 18:05:05 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -566,7 +566,7 @@ StartJob(int       id,		/* I - Job ID */
   {
     LogMessage(LOG_ERROR, "StartJob: unable to create status pipes - %s.",
 	       strerror(errno));
-    StopPrinter(printer->name);
+    StopPrinter(printer);
     sprintf(printer->state_message, "Unable to create status pipes - %s.",
             strerror(errno));
     return;
@@ -962,5 +962,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.33 1999/07/21 19:39:10 mike Exp $".
+ * End of "$Id: job.c,v 1.34 1999/07/26 18:05:05 mike Exp $".
  */
