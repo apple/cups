@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.5 2000/02/08 20:38:57 mike Exp $"
+# "$Id: Makefile,v 1.6 2000/02/22 20:45:14 mike Exp $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -37,17 +37,20 @@ MAN1	=	$(MAN1:.1=.man)
 MAN5	=	$(MAN5:.5=.man)
 MAN8	=	$(MAN8:.8=.man)
 
+
 #
 # Make everything...
 #
 
 all:	$(CAT1) $(CAT5) $(CAT8)
 
+
 #
 # Clean all config and object files...
 #
 
 clean:
+
 
 #
 # Install files...
@@ -80,5 +83,5 @@ install:
 	$(LN) enable.8 $(MANDIR)/cat8/disable.8
 
 #
-# End of "$Id: Makefile,v 1.5 2000/02/08 20:38:57 mike Exp $".
+# End of "$Id: Makefile,v 1.6 2000/02/22 20:45:14 mike Exp $".
 #
