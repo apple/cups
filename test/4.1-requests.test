@@ -1,5 +1,5 @@
 #
-# "$Id: 00000-requests.test,v 1.1 2001/02/22 16:48:13 mike Exp $"
+# "$Id: 4.1-requests.test,v 1.1 2001/03/01 20:40:16 mike Exp $"
 #
 #   Verify that the server requires the following attributes:
 #
@@ -136,5 +136,5 @@
 	EXPECT attributes-natural-language
 }
 #
-# End of "$Id: 00000-requests.test,v 1.1 2001/02/22 16:48:13 mike Exp $"
+# End of "$Id: 4.1-requests.test,v 1.1 2001/03/01 20:40:16 mike Exp $"
 #

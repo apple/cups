@@ -1,9 +1,27 @@
 #!/bin/sh
 #
-# "$Id: do-ipp-tests.sh,v 1.3 2001/02/23 19:30:12 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.1 2001/03/01 20:40:17 mike Exp $"
 #
-#  Perform the complete set of IPP compliance tests specified in the
-#  CUPS Software Test Plan.
+#   Perform the complete set of IPP compliance tests specified in the
+#   CUPS Software Test Plan.
+#
+#   Copyright 1997-2001 by Easy Software Products, all rights reserved.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Easy Software Products and are protected by Federal
+#   copyright law.  Distribution and use rights are outlined in the file
+#   "LICENSE.txt" which should have been included with this file.  If this
+#   file is missing or damaged please contact Easy Software Products
+#   at:
+#
+#       Attn: CUPS Licensing Information
+#       Easy Software Products
+#       44141 Airport View Drive, Suite 204
+#       Hollywood, Maryland 20636-3111 USA
+#
+#       Voice: (301) 373-9603
+#       EMail: cups-info@cups.org
+#         WWW: http://www.cups.org
 #
 
 #
@@ -116,6 +134,13 @@ cp /etc/cups/mime.convs /tmp/$user/mime.convs
 LD_LIBRARY_PATH=$root/cups:$root/filter; export LD_LIBRARY_PATH
 
 #
+# Set a new home directory to avoid getting user options mixed in...
+#
+
+HOME=/tmp/$user
+export HOME
+
+#
 # Start the server; run as foreground daemon in the background...
 #
 
@@ -137,45 +162,69 @@ while true; do
 done
 
 #
-# Run the tests, creating a report in the current directory...
+# Create the test report source file...
 #
 
-echo "Running tests..."
+strfile=cups-str-1.1-`date +%Y-%m-%d`-`whoami`.shtml
 
-rm -f ipp-test.report
+rm -f $strfile
+cat str-header.html >$strfile
 
-echo "IPP Test Report" >ipp-test.report
-echo "" >>ipp-test.report
-echo "Date: `date`" >>ipp-test.report
-echo "User: $user" >>ipp-test.report
-echo "Host: `hostname`" >>ipp-test.report
+#
+# Run the IPP tests...
+#
 
-for file in [0-9]*.test; do
+echo "Running IPP compliance tests..."
+
+echo "<H1>IPP Compliance Tests</H1>" >>$strfile
+echo "<P>This section provides the results to the IPP compliance tests" >>$strfile
+echo "outlined in the CUPS Software Test Plan. These tests were run on" >>$strfile
+echo `date "+%Y-%m-%d"` by `whoami` on `hostname`. >>$strfile
+echo "<PRE>" >>$strfile
+
+fail=0
+for file in 4*.test; do
 	echo "Performing $file..."
-	echo "" >>ipp-test.report
+	echo "" >>$strfile
 
-	ipptest ipp://localhost:$port/printers $file >>ipp-test.report
+	ipptest ipp://localhost:$port/printers $file >>$strfile
 	status=$?
 
 	if test $status != 0; then
-		break
+		echo Test failed.
+		fail=1
 	fi
 done
 
-if test $status != 0; then
-	echo "Test failed."
-	echo ""
-	echo "See the following files for details:"
-	echo ""
-	echo "    ipp-test.report"
-	echo "    /tmp/$user/log/error_log"
-	echo ""
-else
-	echo "All tests passed."
-	echo ""
-	echo "See the file ipp-test.report for details."
-	echo ""
-fi
+echo "</PRE>" >>$strfile
+
+#
+# Run the command tests...
+#
+
+echo "Running command tests..."
+
+echo "<H1>Command Tests</H1>" >>$strfile
+echo "<P>This section provides the results to the command tests" >>$strfile
+echo "outlined in the CUPS Software Test Plan. These tests were run on" >>$strfile
+echo `date "+%Y-%m-%d"` by `whoami` on `hostname`. >>$strfile
+echo "<PRE>" >>$strfile
+
+fail=0
+for file in 5*.sh; do
+	echo "Performing $file..."
+	echo "" >>$strfile
+
+	sh $file >>$strfile
+	status=$?
+
+	if test $status != 0; then
+		echo Test failed.
+		fail=1
+	fi
+done
+
+echo "</PRE>" >>$strfile
 
 #
 # Wait for jobs to complete...
@@ -198,5 +247,59 @@ done
 kill $cupsd
 
 #
-# End of "$Id: do-ipp-tests.sh,v 1.3 2001/02/23 19:30:12 mike Exp $"
+# Append the log files for post-mortim...
+#
+
+echo "<H1>Log Files</H1>" >>$strfile
+
+echo "<H2>access_log</H2>" >>$strfile
+echo "<PRE>" >>$strfile
+cat /tmp/$user/log/access_log >>$strfile
+echo "</PRE>" >>$strfile
+
+echo "<H2>error_log</H2>" >>$strfile
+echo "<PRE>" >>$strfile
+cat /tmp/$user/log/error_log >>$strfile
+echo "</PRE>" >>$strfile
+
+echo "<H2>page_log</H2>" >>$strfile
+echo "<PRE>" >>$strfile
+cat /tmp/$user/log/page_log >>$strfile
+echo "</PRE>" >>$strfile
+
+#
+# Format the reports and tell the user where to find them...
+#
+
+echo "Formatting reports...
+
+cat str-trailer >>$strfile
+
+htmlfile=`basename $strfile .shtml`.html
+pdffile=`basename $strfile .shtml`.pdf
+
+htmldoc --numbered --verbose --titleimage ../doc/images/cups-large.gif \
+	-f $htmlfile $strfile
+htmldoc --numbered --verbose --titleimage ../doc/images/cups-large.gif \
+	-f $pdffile $strfile
+
+rm $strfile
+
+echo ""
+
+if test $fail != 0; then
+	echo "One or more tests failed."
+else
+	echo "All tests passed."
+fi
+
+echo ""
+echo "See the following files for details:"
+echo ""
+echo "    $htmlfile"
+echo "    $pdffile"
+echo ""
+
+#
+# End of "$Id: run-stp-tests.sh,v 1.1 2001/03/01 20:40:17 mike Exp $"
 #

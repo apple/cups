@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.30 2001/02/23 19:30:11 mike Exp $"
+# "$Id: Makefile,v 1.31 2001/03/01 20:40:14 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -107,7 +107,7 @@ install:
 
 test:	all
 	echo Running CUPS test suite...
-	cd test; ./do-ipp-tests.sh
+	cd test; ./run-stp-tests.sh
 
 
 #
@@ -142,5 +142,5 @@ tardist:
 	epm $(EPMFLAGS) -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.30 2001/02/23 19:30:11 mike Exp $".
+# End of "$Id: Makefile,v 1.31 2001/03/01 20:40:14 mike Exp $".
 #

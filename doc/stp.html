@@ -1,12 +1,12 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>
 <HEAD>
-<TITLE> DRAFT - CUPS Software Test Plan</TITLE>
-<META NAME="AUTHOR" CONTENT="Easy Software Products">
-<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2001, All Rights Reserved">
-<META NAME="DOCNUMBER" CONTENT="CUPS-STP-1.1">
-<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
-<STYLE>
+<TITLE> CUPS Software Test Plan</TITLE>
+<META NAME="author" CONTENT="Easy Software Products">
+<META NAME="copyright" CONTENT="Copyright 1997-2001, All Rights Reserved">
+<META NAME="docnumber" CONTENT="CUPS-STP-1.1">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+<STYLE TYPE="text/css"><!--
 BODY { font-family: serif; font-size: 11.0pt }
 H1 { font-family: sans-serif; font-size: 20.0pt }
 H2 { font-family: sans-serif; font-size: 17.0pt }
@@ -17,11 +17,11 @@ H6 { font-family: sans-serif; font-size: 8.0pt }
 SUB { font-size: 8.0pt }
 SUP { font-size: 8.0pt }
 PRE { font-size: 9.0pt }
-</STYLE>
+--></STYLE>
 </HEAD>
 <BODY>
 <CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="100%"><BR>
-<H1> DRAFT - CUPS Software Test Plan</H1></A><BR>
+<H1> CUPS Software Test Plan</H1></A><BR>
 CUPS-STP-1.1<BR>
 Easy Software Products<BR>
 Copyright 1997-2001, All Rights Reserved<BR>
@@ -40,21 +40,37 @@ Copyright 1997-2001, All Rights Reserved<BR>
 <LI><A HREF="#2_1">2.1 CUPS Documentation</A></LI>
 <LI><A HREF="#2_2">2.2 Other Documents</A></LI>
 </UL>
-<B><A HREF="#3">3 Local Tests</A></B>
+<B><A HREF="#3">3 Test Procedure</A></B>
 <BR>
-<BR><B><A HREF="#4">4 Remote Tests</A></B>
-<BR>
-<BR><B><A HREF="#5">A Glossary</A></B>
+<BR><B><A HREF="#4">4 IPP Compliance Tests</A></B>
 <UL>
-<LI><A HREF="#5_1">A.1 Terms</A></LI>
-<LI><A HREF="#5_2">A.2 Acronyms</A></LI>
+<LI><A HREF="#4_1">4.1 Request Tests</A></LI>
+<LI><A HREF="#4_2">4.2 CUPS Printer Operation Tests</A></LI>
+<LI><A HREF="#4_3">4.3 Job Operation Tests</A></LI>
+</UL>
+<B><A HREF="#5">5 Command Tests</A></B>
+<UL>
+<LI><A HREF="#5_1">5.1 lpadmin</A></LI>
+<LI><A HREF="#5_2">5.2 lpc</A></LI>
+<LI><A HREF="#5_3">5.3 lpq</A></LI>
+<LI><A HREF="#5_4">5.4 lpstat</A></LI>
+<LI><A HREF="#5_5">5.5 lp</A></LI>
+<LI><A HREF="#5_6">5.6 lpr</A></LI>
+<LI><A HREF="#5_7">5.7 lprm</A></LI>
+<LI><A HREF="#5_8">5.8 cancel</A></LI>
+<LI><A HREF="#5_9">5.9 lpinfo</A></LI>
+</UL>
+<B><A HREF="#6">A Glossary</A></B>
+<UL>
+<LI><A HREF="#6_1">A.1 Terms</A></LI>
+<LI><A HREF="#6_2">A.2 Acronyms</A></LI>
 </UL>
 <HR>
 <H1><A NAME="1">1 Scope</A></H1>
 <H2><A NAME="1_1">1.1 Identification</A></H2>
 <P>This software test plan provides detailed tests that are used to 
-evaluate the stability of the Common UNIX Printing System (&quot;CUPS&quot;) 
-Version 1.1. </P>
+evaluate the stability and compliance of the Common UNIX Printing 
+System (&quot;CUPS&quot;) Version 1.1. </P>
 <H2><A NAME="1_2">1.2 System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating 
 systems. It has been developed by <A HREF="http://www.easysw.com">Easy 
@@ -76,8 +92,9 @@ EPSON printers are included that use these filters. </P>
 <UL>
 <LI>1 - Scope</LI>
 <LI>2 - References</LI>
-<LI>3 - Local Tests</LI>
-<LI>4 - Remote Tests</LI>
+<LI>3 - Test Procedure</LI>
+<LI>4 - IPP Compliance Tests</LI>
+<LI>5 - Command Tests</LI>
 <LI>A - Glossary</LI>
 </UL>
 <H1><A NAME="2">2 References</A></H1>
@@ -121,10 +138,81 @@ Transfer Protocol -- HTTP/1.1</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617, HTTP 
 Authentication: Basic and Digest Access</A> Authentication </LI>
 </UL>
-<H1><A NAME="3">3 Local Tests</A></H1>
-<H1><A NAME="4">4 Remote Tests</A></H1>
-<H1 TYPE="A" VALUE="1"><A NAME="5">A Glossary</A></H1>
-<H2><A NAME="5_1">A.1 Terms</A></H2>
+<H1><A NAME="3">3 Test Procedure</A></H1>
+<P>The test software and data files are located in the <VAR>test</VAR>
+ subdirectory of the source distribution. A script is provided to 
+compile the <CODE>ipptest</CODE> program and run all of the tests that 
+follow, producing a success/fail report. </P>
+<P>The <CODE>test</CODE> target of the top-level makefile can be used 
+to run this script: </P>
+<UL>
+<PRE>
+make test
+</PRE>
+</UL>
+<P>or you can run the test script directly: </P>
+<UL>
+<PRE>
+cd test
+./run-stp-tests
+</PRE>
+</UL>
+<P>A Software Test Report is stored in HTML and PDF files that are 
+generated using the <A HREF="http://www.easysw.com/htmldoc">HTMLDOC</A>
+ software. </P>
+<H1><A NAME="4">4 IPP Compliance Tests</A></H1>
+<P>This section describes the tests used to validate the IPP standards 
+compliance of the CUPS server. </P>
+<H2><A NAME="4_1">4.1 Request Tests</A></H2>
+<P>These tests verify that the CUPS scheduler only accepts valid IPP 
+requests that start with the <CODE>attributes-charset</CODE> and <CODE>
+attributes-natural-language</CODE> attributes and also contain a <CODE>
+printer-uri</CODE> or <CODE>job-uri</CODE> attribute. </P>
+<P>It also verifies that the CUPS scheduler always responds with <CODE>
+attributes-charset</CODE> and <CODE>attributes-natural-language</CODE>
+ attributes, using default values if they are not provided by the 
+client. </P>
+<H2><A NAME="4_2">4.2 CUPS Printer Operation Tests</A></H2>
+<P>These tests verify that the CUPS printer operations are supported 
+and function properly. Two printers called <CODE>Test1</CODE> and <CODE>
+Test2</CODE> are created, one as a PostScript printer and one as a 
+raster printer. </P>
+<H2><A NAME="4_3">4.3 Job Operation Tests</A></H2>
+<P>These test verify that the CUPS scheduler accepts print jobs for all 
+supported file formats and that the <CODE>cancel-job</CODE>, <CODE>
+hold-job</CODE>, and <CODE>resume-job</CODE> operations work. </P>
+<H1><A NAME="5">5 Command Tests</A></H1>
+<P>This section describes the tests used to validate the Berkeley and 
+System V commands included with CUPS. </P>
+<H2><A NAME="5_1">5.1 lpadmin</A></H2>
+<P>This test verifies that printers can be added, modified, and 
+defaulted using the <CODE>lpadmin</CODE> command. </P>
+<H2><A NAME="5_2">5.2 lpc</A></H2>
+<P>This test verifies that the <CODE>lpc</CODE> command can show the 
+current status of all print queues. </P>
+<H2><A NAME="5_3">5.3 lpq</A></H2>
+<P>This test verifies that the <CODE>lpq</CODE> command lists any jobs 
+in the queue. </P>
+<H2><A NAME="5_4">5.4 lpstat</A></H2>
+<P>This test verifies that the <CODE>lpstat</CODE> command works with 
+all reports using the &quot;<CODE>-t</CODE>&quot; option. </P>
+<H2><A NAME="5_5">5.5 lp</A></H2>
+<P>This test verifies that the <CODE>lp</CODE> command works with both 
+the default destination and a specific destination. </P>
+<H2><A NAME="5_6">5.6 lpr</A></H2>
+<P>This test verifies that the <CODE>lpr</CODE> command works with both 
+the default destination and a specific destination. </P>
+<H2><A NAME="5_7">5.7 lprm</A></H2>
+<P>This test verifies that the <CODE>lprm</CODE> command can properly 
+cancel a job. </P>
+<H2><A NAME="5_8">5.8 cancel</A></H2>
+<P>This test verifies that the <CODE>cancel</CODE> command can properly 
+cancel a job or all jobs. </P>
+<H2><A NAME="5_9">5.9 lpinfo</A></H2>
+<P>This test verifies that the <CODE>lpinfo</CODE> command returns a 
+list of available printer drivers and devices. </P>
+<H1 TYPE="A" VALUE="1"><A NAME="6">A Glossary</A></H1>
+<H2><A NAME="6_1">A.1 Terms</A></H2>
 <DL>
 <DT>C </DT>
 <DD>A computer language. </DD>
@@ -137,7 +225,7 @@ Authentication: Basic and Digest Access</A> Authentication </LI>
 <DT>socket </DT>
 <DD>A two-way network communications channel. </DD>
 </DL>
-<H2><A NAME="5_2">A.2 Acronyms</A></H2>
+<H2><A NAME="6_2">A.2 Acronyms</A></H2>
 <DL>
 <DT>ASCII </DT>
 <DD>American Standard Code for Information Interchange </DD>

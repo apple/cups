@@ -1,10 +1,10 @@
 <HTML>
 <HEAD>
 	<META NAME="Description" CONTENT="Common UNIX Printing System Software Test Plan">
-	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2000, All Rights Reserved">
+	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2001, All Rights Reserved">
 	<META NAME="DOCNUMBER" CONTENT="CUPS-STP-1.1">
 	<META NAME="Author" CONTENT="Easy Software Products">
-	<TITLE>DRAFT - CUPS Software Test Plan</TITLE>
+	<TITLE>CUPS Software Test Plan</TITLE>
 </HEAD>
 <BODY>
 
@@ -25,43 +25,118 @@ Printing System ("CUPS") Version 1.1.
 <UL>
 	<LI>1 - Scope</LI>
 	<LI>2 - References</LI>
-	<LI>3 - IPP Compliance Tests</LI>
-	<LI>4 - Command Tests</LI>
+	<LI>3 - Test Procedure</LI>
+	<LI>4 - IPP Compliance Tests</LI>
+	<LI>5 - Command Tests</LI>
 	<LI>A - Glossary</LI>
 </UL>
 
 <EMBED SRC="references.shtml">
 
-<H1>IPP Compliance Tests</H1>
-
-<P>This section describes the procedures and tests used to validate the
-IPP standards compliance of the CUPS server.
-
-<H2>Test Procedure</H2>
+<H1>Test Procedure</H1>
 
 <P>The test software and data files are located in the <VAR>test</VAR>
 subdirectory of the source distribution. A script is provided to compile
 the <CODE>ipptest</CODE> program and run all of the tests that follow,
 producing a success/fail report.
 
-<H2>00000-requests.test</H2>
+<P>The <CODE>test</CODE> target of the top-level makefile can be used to
+run this script:
 
-<P>This test verifies that the CUPS scheduler only accepts valid
+<UL><PRE>
+make test
+</PRE></UL>
+
+<P>or you can run the test script directly:
+
+<UL><PRE>
+cd test
+./run-stp-tests
+</PRE></UL>
+
+<P>A Software Test Report is stored in HTML and PDF files that
+are generated using the
+<A HREF="http://www.easysw.com/htmldoc">HTMLDOC</A> software.
+
+<H1>IPP Compliance Tests</H1>
+
+<P>This section describes the tests used to validate the IPP
+standards compliance of the CUPS server.
+
+<H2>Request Tests</H2>
+
+<P>These tests verify that the CUPS scheduler only accepts valid
 IPP requests that start with the <CODE>attributes-charset</CODE>
 and <CODE>attributes-natural-language</CODE> attributes and also
-contain a printer-uri or job-uri attribute.
+contain a <CODE>printer-uri</CODE> or <CODE>job-uri</CODE> attribute.
 
 <P>It also verifies that the CUPS scheduler always responds with
 <CODE>attributes-charset</CODE> and
 <CODE>attributes-natural-language</CODE> attributes, using
 default values if they are not provided by the client.
 
+<H2>CUPS Printer Operation Tests</H2>
 
+<P>These tests verify that the CUPS printer operations are supported
+and function properly. Two printers called <CODE>Test1</CODE> and
+<CODE>Test2</CODE> are created, one as a PostScript printer and one
+as a raster printer.
+
+<H2>Job Operation Tests</H2>
+
+<P>These test verify that the CUPS scheduler accepts print jobs for
+all supported file formats and that the <CODE>cancel-job</CODE>,
+<CODE>hold-job</CODE>, and <CODE>resume-job</CODE> operations work.
 
 <H1>Command Tests</H1>
 
+<P>This section describes the tests used to validate the
+Berkeley and System V commands included with CUPS.
 
+<H2>lpadmin</H2>
 
+<P>This test verifies that printers can be added, modified, and
+defaulted using the <CODE>lpadmin</CODE> command.
+
+<H2>lpc</H2>
+
+<P>This test verifies that the <CODE>lpc</CODE> command can show
+the current status of all print queues.
+
+<H2>lpq</H2>
+
+<P>This test verifies that the <CODE>lpq</CODE> command lists
+any jobs in the queue.
+
+<H2>lpstat</H2>
+
+<P>This test verifies that the <CODE>lpstat</CODE> command works
+with all reports using the "<CODE>-t</CODE>" option.
+
+<H2>lp</H2>
+
+<P>This test verifies that the <CODE>lp</CODE> command works
+with both the default destination and a specific destination.
+
+<H2>lpr</H2>
+
+<P>This test verifies that the <CODE>lpr</CODE> command works
+with both the default destination and a specific destination.
+
+<H2>lprm</H2>
+
+<P>This test verifies that the <CODE>lprm</CODE> command can
+properly cancel a job.
+
+<H2>cancel</H2>
+
+<P>This test verifies that the <CODE>cancel</CODE> command can
+properly cancel a job or all jobs.
+
+<H2>lpinfo</H2>
+
+<P>This test verifies that the <CODE>lpinfo</CODE> command
+returns a list of available printer drivers and devices.
 
 <EMBED SRC="glossary.shtml">
 
