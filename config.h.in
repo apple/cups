@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.12 1999/12/08 12:45:57 mike Exp $"
+ * "$Id: config.h.in,v 1.13 1999/12/15 15:18:04 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -63,6 +63,14 @@
 #undef HAVE_NDIR_H
 
 /*
+ * Do we have PAM stuff?
+ */
+
+#ifndef HAVE_LIBPAM
+#define HAVE_LIBPAM 0
+#endif /* !HAVE_LIBPAM */
+
+/*
  * Do we have <shadow.h>?
  */
 
@@ -104,5 +112,5 @@
 #undef HAVE_WAIT3
 
 /*
- * End of "$Id: config.h.in,v 1.12 1999/12/08 12:45:57 mike Exp $".
+ * End of "$Id: config.h.in,v 1.13 1999/12/15 15:18:04 mike Exp $".
  */
