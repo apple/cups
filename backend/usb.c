@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.18.2.14 2002/08/17 22:16:02 mike Exp $"
+ * "$Id: usb.c,v 1.18.2.15 2002/09/05 20:32:59 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -48,12 +48,27 @@
 #  include <termios.h>
 #endif /* WIN32 */
 
+#ifdef __linux
+#  include <sys/ioctl.h>
+#  include <linux/lp.h>
+#  define IOCNR_GET_DEVICE_ID		1
+
+/*
+ * Get device_id string
+ */
+#  define LPIOC_GET_DEVICE_ID(len)	_IOC(_IOC_READ, 'P', IOCNR_GET_DEVICE_ID, len)
+#endif /* __linux */
+
 
 /*
  * Local functions...
  */
 
+void	decode_device_id(int port, const char *device_id,
+	                 char *make_model, int mmsize,
+	                 char *serial_number, int snsize);
 void	list_devices(void);
+int	open_device(const char *uri);
 
 
 /*
@@ -68,12 +83,9 @@ int			/* O - Exit status */
 main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
      char *argv[])	/* I - Command-line arguments */
 {
-  char		method[255],	/* Method in URI */
-		hostname[1024],	/* Hostname */
-		username[255],	/* Username info (not used) */
-		resource[1024],	/* Resource info (device and options) */
-		*options;	/* Pointer to options */
-  int		port;		/* Port number (not used) */
+  char		uri[HTTP_MAX_URI],
+				/* Copy of device URI */
+		*options;	/* Pointer to options in URI */
   int		fp;		/* Print file */
   int		copies;		/* Number of copies to print */
   int		fd;		/* Parallel device */
@@ -86,6 +98,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;	/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+#ifdef __linux
+  unsigned char	status;		/* Port status (off-line, out-of-paper, etc.) */
+#endif /* __linux */
 
 
  /*
@@ -135,16 +150,16 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   }
 
  /*
-  * Extract the device name and options from the URI...
+  * Copy the device URI and remove any options...
   */
 
-  httpSeparate(argv[0], method, username, hostname, &port, resource);
+  strlcpy(uri, argv[0], sizeof(uri));
 
  /*
   * See if there are any options...
   */
 
-  if ((options = strchr(resource, '?')) != NULL)
+  if ((options = strchr(uri, '?')) != NULL)
   {
    /*
     * Yup, terminate the device name string and move to the first
@@ -160,7 +175,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
   do
   {
-    if ((fd = open(resource, O_WRONLY | O_EXCL)) == -1)
+    if ((fd = open_device(uri)) == -1)
     {
       if (errno == EBUSY)
       {
@@ -174,8 +189,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       }
       else
       {
-	fprintf(stderr, "ERROR: Unable to open USB port device file \"%s\": %s\n",
-	        resource, strerror(errno));
+	fprintf(stderr, "ERROR: Unable to open USB device \"%s\": %s\n",
+	        uri, strerror(errno));
 	return (1);
       }
     }
@@ -238,6 +253,20 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
       while (nbytes > 0)
       {
+#ifdef __linux
+        if (ioctl(fd, LPGETSTATUS, &status) == 0)
+	{
+	  fprintf(stderr, "DEBUG: LPGETSTATUS returned %02X...\n", status);
+
+	  if (status & LP_NOPA)
+	    fputs("INFO: Media tray empty!\n", stderr);
+	  else if (status & LP_ERR)
+	    fputs("INFO: Printer fault!\n", stderr);
+	  else if (status & LP_OFFL)
+	    fputs("INFO: Printer off-line.\n", stderr);
+	}
+#endif /* __linux */
+
 	if ((wbytes = write(fd, bufptr, nbytes)) < 0)
 	  if (errno == ENOTTY)
 	    wbytes = write(fd, bufptr, nbytes);
@@ -273,6 +302,121 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
+ * 'decode_device_id()' - Decode the IEEE-1284 device ID string.
+ */
+
+void
+decode_device_id(int        port,		/* I - Port number */
+                 const char *device_id,		/* I - 1284 device ID string */
+                 char       *make_model,	/* O - Make/model */
+		 int        mmsize,		/* I - Size of buffer */
+                 char       *serial_number,	/* O - Serial number */
+		 int        snsize)		/* I - Size of buffer */
+{
+  char	*attr,					/* 1284 attribute */
+  	*delim,					/* 1284 delimiter */
+	line[1024];				/* Line from devices file */
+  FILE	*fp;					/* /proc/bus/usb/devices file */
+  int	current;				/* Current printer port */
+  char	temp[1024];				/* Temp serial number */
+
+
+ /*
+  * Look for the description field...
+  */
+
+  if ((attr = strstr(device_id, "DES:")) != NULL)
+    attr += 4;
+  else if ((attr = strstr(device_id, "DESCRIPTION:")) != NULL)
+    attr += 12;
+
+  if (attr)
+  {
+    if (strncasecmp(attr, "Hewlett-Packard ", 16) == 0)
+    {
+      strlcpy(make_model, "HP ", mmsize);
+      strlcpy(make_model + 3, attr + 16, mmsize - 3);
+    }
+    else
+    {
+      strlcpy(make_model, attr, mmsize);
+    }
+
+    if ((delim = strchr(make_model, ';')) != NULL)
+      *delim = '\0';
+  }
+  else
+    strlcpy(make_model, "Unknown", mmsize);
+
+ /*
+  * Look for the serial number field...
+  */
+
+  if ((attr = strstr(device_id, "SERN:")) != NULL)
+    attr += 5;
+  else if ((attr = strstr(device_id, "SERIALNUMBER:")) != NULL)
+    attr += 13;
+
+  if (attr)
+  {
+    strlcpy(serial_number, attr, snsize);
+
+    if ((delim = strchr(serial_number, ';')) != NULL)
+      *delim = '\0';
+  }
+  else if ((fp = fopen("/proc/bus/usb/devices", "r")) != NULL)
+  {
+    serial_number[0] = '\0';
+
+    for (current = 0; fgets(line, sizeof(line), fp) != NULL;)
+    {
+      if (line[0] == 'S' && (attr = strstr(line, "SerialNumber=")) != NULL)
+      {
+       /*
+        * Copy serial number from line...
+	*/
+
+	strlcpy(temp, attr + 13, sizeof(temp));
+	if ((delim = strchr(temp, '\n')) != NULL)
+	  *delim = '\0';
+      }
+      else if (line[0] == 'I' && strstr(line, "Driver=usblp") != NULL &&
+               strstr(line, "Prot=02") != NULL)
+      {
+       /*
+        * Found printer device; if current == port, then use it!
+	*/
+
+	if (current == port)
+	{
+	  strlcpy(serial_number, temp, snsize);
+	  break;
+	}
+
+	current ++;
+      }
+    }
+
+    fclose(fp);
+  }
+
+  if (!serial_number[0])
+  {
+   /*
+    * Make the serial number contain the make and model with underscores
+    * instead of spaces...  This means only 1 model per system, but is
+    * a last resort if the serial number cannot be found...
+    */
+
+    snprintf(serial_number, snsize, "%s_%d", make_model, port + 1);
+    for (delim = serial_number; *delim; delim ++)
+      if (*delim == ' ')
+        *delim = '_';
+  }
+}
+
+
+/*
  * 'list_devices()' - List all USB devices.
  */
 
@@ -281,149 +425,61 @@ list_devices(void)
 {
 #ifdef __linux
   int	i;			/* Looping var */
+  int	length;			/* Length of device ID info */
   int	fd;			/* File descriptor */
-  char	device[255];		/* Device filename */
-  FILE	*probe;			/* /proc/bus/usb/devices file */
-  char	line[1024],		/* Line from file */
-	*delim,			/* Delimiter in file */
-	make[IPP_MAX_NAME],	/* Make from file */
-	model[IPP_MAX_NAME];	/* Model from file */
+  char	format[255],		/* Format for device filename */
+	device[255],		/* Device filename */
+	device_id[1024],	/* Device ID string */
+	make_model[1024],	/* Make and model */
+	serial_number[1024];	/* Serial number */
 
 
  /*
-  * First try opening one of the USB devices to load the driver
-  * module as needed...
+  * First figure out which USB printer filename to use...
   */
 
-  if ((fd = open("/dev/usb/lp0", O_WRONLY)) >= 0)
-    close(fd); /* 2.3.x and 2.4.x */
-  else if ((fd = open("/dev/usb/usblp0", O_WRONLY)) >= 0)
-    close(fd); /* Mandrake 7.x */
-  else if ((fd = open("/dev/usblp0", O_WRONLY)) >= 0)
-    close(fd); /* 2.2.x */
-
- /*
-  * Then look at the device list for the USB bus...
-  */
-
-  if ((probe = fopen("/proc/bus/usb/devices", "r")) != NULL)
-  {
-   /*
-    * Scan the device list...
-    */
-
-    i = 0;
-
-    memset(make, 0, sizeof(make));
-    memset(model, 0, sizeof(model));
-
-    while (fgets(line, sizeof(line), probe) != NULL)
-    {
-     /*
-      * Strip trailing newline.
-      */
-
-      if ((delim = strrchr(line, '\n')) != NULL)
-	*delim = '\0';
-
-     /*
-      * See if it is a printer device ("P: ...")
-      */
-
-      if (strncmp(line, "S:", 2) == 0)
-      {
-       /*
-        * String attribute...
-	*/
-
-        if (strncmp(line, "S:  Manufacturer=", 17) == 0)
-	{
-	  strlcpy(make, line + 17, sizeof(make));
-	  if (strcmp(make, "Hewlett-Packard") == 0)
-	    strcpy(make, "HP");
-	}
-        else if (strncmp(line, "S:  Product=", 12) == 0)
-	  strlcpy(model, line + 12, sizeof(model));
-      }
-      else if (strncmp(line, "I:", 2) == 0 &&
-               (strstr(line, "Driver=printer") != NULL ||
-	        strstr(line, "Driver=usblp") != NULL) &&
-	       make[0] && model[0])
-      {
-       /*
-        * We were processing a printer device; send the info out...
-	*/
-
-        sprintf(device, "/dev/usb/lp%d", i);
-	if (access(device, 0))
-	{
-	  sprintf(device, "/dev/usb/usblp%d", i);
-
-	  if (access(device, 0))
-	    sprintf(device, "/dev/usblp%d", i);
-	}
-
-	printf("direct usb:%s \"%s %s\" \"USB Printer #%d\"\n",
-	       device, make, model, i + 1);
-
-	i ++;
-
-	memset(make, 0, sizeof(make));
-	memset(model, 0, sizeof(model));
-      }
-    }
-
-    fclose(probe);
-
-   /*
-    * Write empty device listings for unused USB devices...
-    */
-
-    for (; i < 16; i ++)
-    {
-      sprintf(device, "/dev/usb/lp%d", i);
-
-      if (access(device, 0))
-      {
-	sprintf(device, "/dev/usb/usblp%d", i);
-
-	if (access(device, 0))
-	{
-	  sprintf(device, "/dev/usblp%d", i);
-
-	  if (access(device, 0))
-	    continue;
-	}
-      }
-
-      printf("direct usb:%s \"Unknown\" \"USB Printer #%d\"\n", device, i + 1);
-    }
-  }
+  if (access("/dev/usb/lp0", 0) == 0)
+    strcpy(format, "/dev/usb/lp%d");
+  else if (access("/dev/usb/usblp0", 0) == 0)
+    strcpy(format, "/dev/usb/usblp%d");
   else
+    strcpy(format, "/dev/usblp%d");
+
+ /*
+  * Then open each USB device...
+  */
+
+  for (i = 0; i < 16; i ++)
   {
-   /*
-    * Just check manually for USB devices...
-    */
+    sprintf(device, format, i);
 
-    for (i = 0; i < 16; i ++)
+    if ((fd = open(device, O_RDWR | O_EXCL)) >= 0)
     {
-      sprintf(device, "/dev/usb/lp%d", i);
-
-      if (access(device, 0))
+      if (ioctl(fd, LPIOC_GET_DEVICE_ID(sizeof(device_id)), device_id) == 0)
       {
-	sprintf(device, "/dev/usb/usblp%d", i);
-
-	if (access(device, 0))
-	{
-	  sprintf(device, "/dev/usblp%d", i);
-
-	  if (access(device, 0))
-	    continue;
-	}
+	length = (((unsigned)device_id[0] & 255) << 8) +
+	         ((unsigned)device_id[1] & 255);
+	memcpy(device_id, device_id + 2, length);
+	device_id[length] = '\0';
       }
+      else
+        device_id[0] = '\0';
 
-      printf("direct usb:%s \"Unknown\" \"USB Printer #%d\"\n", device, i + 1);
+      close(fd);
     }
+    else
+      device_id[0] = '\0';
+
+    if (device_id[0])
+    {
+      decode_device_id(i, device_id, make_model, sizeof(make_model),
+                       serial_number, sizeof(serial_number));
+
+      printf("direct usb://%s \"%s\" \"USB Printer #%d\"\n", serial_number,
+	     make_model, i + 1);
+    }
+    else
+      printf("direct usb:%s \"Unknown\" \"USB Printer #%d\"\n", device, i + 1);
   }
 #elif defined(__sgi)
 #elif defined(__sun)
@@ -459,5 +515,108 @@ list_devices(void)
 
 
 /*
- * End of "$Id: usb.c,v 1.18.2.14 2002/08/17 22:16:02 mike Exp $".
+ * 'open_device()' - Open a USB device...
+ */
+
+int					/* O - File descriptor or -1 on error */
+open_device(const char *uri)		/* I - Device URI */
+{
+ /*
+  * The generic implementation just treats the URI as a device filename...
+  * Specific operating systems may also support using the device serial
+  * number and/or make/model.
+  */
+
+  if (strncmp(uri, "usb:/dev/", 9) == 0)
+    return (open(uri + 4, O_RDWR | O_EXCL));
+#ifdef __linux
+  else if (strncmp(uri, "usb://", 6) == 0)
+  {
+   /*
+    * For Linux, try looking up the device serial number or model...
+    */
+
+    int		i;			/* Looping var */
+    int		length;			/* Length of device ID info */
+    int		fd;			/* File descriptor */
+    char	format[255],		/* Format for device filename */
+		device[255],		/* Device filename */
+		device_id[1024],	/* Device ID string */
+		make_model[1024],	/* Make and model */
+		serial_number[1024];	/* Serial number */
+
+
+   /*
+    * First figure out which USB printer filename to use...
+    */
+
+    if (access("/dev/usb/lp0", 0) == 0)
+      strcpy(format, "/dev/usb/lp%d");
+    else if (access("/dev/usb/usblp0", 0) == 0)
+      strcpy(format, "/dev/usb/usblp%d");
+    else
+      strcpy(format, "/dev/usblp%d");
+
+   /*
+    * Then find the correct USB device...
+    */
+
+    for (i = 0; i < 16; i ++)
+    {
+      sprintf(device, format, i);
+
+      if ((fd = open(device, O_RDWR | O_EXCL)) >= 0)
+      {
+	if (ioctl(fd, LPIOC_GET_DEVICE_ID(sizeof(device_id)), device_id) == 0)
+	{
+	  length = (((unsigned)device_id[0] & 255) << 8) +
+	           ((unsigned)device_id[1] & 255);
+	  memcpy(device_id, device_id + 2, length);
+	  device_id[length] = '\0';
+	}
+	else
+          device_id[0] = '\0';
+      }
+      else
+	device_id[0] = '\0';
+
+      if (device_id[0])
+      {
+       /*
+        * Got the device ID - is this the one?
+	*/
+
+	decode_device_id(i, device_id, make_model, sizeof(make_model),
+                	 serial_number, sizeof(serial_number));
+
+        if (strcmp(uri + 6, serial_number) == 0)
+	  return (fd);	/* Yes, return this file descriptor... */
+      }
+
+     /*
+      * This wasn't the one...
+      */
+
+      close(fd);
+    }
+
+   /*
+    * Couldn't find the printer, return "no such device or address"...
+    */
+
+    errno = ENODEV;
+
+    return (-1);
+  }
+#endif /* __linux */
+  else
+  {
+    errno = ENODEV;
+    return (-1);
+  }
+}
+
+
+/*
+ * End of "$Id: usb.c,v 1.18.2.15 2002/09/05 20:32:59 mike Exp $".
  */

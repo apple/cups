@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The USB backend now supports device URIs based on the
+	  printer serial number and/or model number under Linux.
+	  This avoids the "wrong device filename" problem when
+	  using more than one USB printer.
 	- Now just shutdown the receiving end of a client
 	  connection when sending an error that requires the
 	  server to disconnect from the client afterwards.  This
