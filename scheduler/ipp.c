@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.65 2000/05/11 15:47:12 mike Exp $"
+ * "$Id: ipp.c,v 1.66 2000/05/11 16:27:40 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1815,7 +1815,12 @@ copy_banner(client_t   *con,	/* I - Client connection */
       * See if it is defined...
       */
 
-      if ((attr = ippFindAttribute(job->attrs, attrname, IPP_TAG_ZERO)) == NULL)
+      if (strcmp(attrname, "printer-name") == 0)
+      {
+        fputs(job->dest, out);
+	continue;
+      }
+      else if ((attr = ippFindAttribute(job->attrs, attrname, IPP_TAG_ZERO)) == NULL)
         continue; /* Nope */
 
      /*
@@ -1861,7 +1866,24 @@ copy_banner(client_t   *con,	/* I - Client connection */
 	  case IPP_TAG_KEYWORD :
 	  case IPP_TAG_CHARSET :
 	  case IPP_TAG_LANGUAGE :
-	      fputs(attr->values[i].string.text, out);
+	      if (strcasecmp(banner->filetype->type, "postscript") == 0)
+	      {
+	       /*
+	        * Need to quote strings for PS banners...
+		*/
+
+	        const char *p;
+
+		for (p = attr->values[i].string.text; *p; p ++)
+		{
+		  if (*p == ')' || *p == '\\')
+		    putc('\\', out);
+
+		  putc(*p, out);
+		}
+	      }
+	      else
+		fputs(attr->values[i].string.text, out);
 	      break;
 
           default :
@@ -4777,5 +4799,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.65 2000/05/11 15:47:12 mike Exp $".
+ * End of "$Id: ipp.c,v 1.66 2000/05/11 16:27:40 mike Exp $".
  */
