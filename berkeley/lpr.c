@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.20.2.14 2004/09/08 19:02:07 mike Exp $"
+ * "$Id: lpr.c,v 1.20.2.15 2004/09/09 15:10:29 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -125,7 +125,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-		fprintf(stderr, "lpr: Expected value after -%c option!\n", ch);
+		fprintf(stderr, "lpr: error - expected value after -%c option!\n", ch);
 		return (1);
 	      }
 	    }
@@ -137,7 +137,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	case 'n' : /* Ditroff */
 	case 't' : /* Troff */
 	case 'v' : /* Raster image */
-	    fprintf(stderr, "Warning: \'%c\' format modifier not supported - output may not be correct!\n",
+	    fprintf(stderr, "lpr: warning - \'%c\' format modifier not supported - output may not be correct!\n",
 	            ch);
 	    break;
 
@@ -149,7 +149,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	      i ++;
 	      if (i >= argc)
 	      {
-	        fputs("lpr: Expected option=value after -o option!\n", stderr);
+	        fputs("lpr: error - expected option=value after -o option!\n", stderr);
 		return (1);
 	      }
 
@@ -173,7 +173,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
 	case 'm' : /* Mail on completion */
-	    fputs("Warning: email notification is not supported!\n", stderr);
+	    fputs("lpr: warning - email notification is not currently supported!\n", stderr);
 	    break;
 
 	case 'q' : /* Queue file but don't print */
@@ -193,7 +193,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	      i ++;
 	      if (i >= argc)
 	      {
-	        fputs("lpr: Expected destination after -P option!\n", stderr);
+	        fputs("lpr: error - expected destination after -P option!\n", stderr);
 		return (1);
 	      }
 
@@ -224,7 +224,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	      i ++;
 	      if (i >= argc)
 	      {
-	        fputs("lpr: Expected copy count after -# option!\n", stderr);
+	        fputs("lpr: error - expected copy count after -# option!\n", stderr);
 		return (1);
 	      }
 
@@ -245,7 +245,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	      i ++;
 	      if (i >= argc)
 	      {
-		fprintf(stderr, "lpr: Expected name after -%c option!\n", ch);
+		fprintf(stderr, "lpr: error - expected name after -%c option!\n", ch);
 		return (1);
 	      }
 
@@ -261,7 +261,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	      i ++;
 	      if (i >= argc)
 	      {
-	        fputs("lpr: Expected username after -U option!\n", stderr);
+	        fputs("lpr: error - expected username after -U option!\n", stderr);
 		return (1);
 	      }
 
@@ -270,7 +270,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
 	default :
-	    fprintf(stderr, "lpr: Unknown option \'%c\'!\n", argv[i][1]);
+	    fprintf(stderr, "lpr: error - unknown option \'%c\'!\n", argv[i][1]);
 	    return (1);
       }
     else if (num_files < 1000)
@@ -281,7 +281,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
       if (access(argv[i], R_OK) != 0)
       {
-        fprintf(stderr, "lpr: Unable to access \"%s\" - %s\n", argv[i],
+        fprintf(stderr, "lpr: error - unable to access \"%s\" - %s\n", argv[i],
 	        strerror(errno));
         return (1);
       }
@@ -298,7 +298,7 @@ main(int  argc,		/* I - Number of command-line arguments */
       }
     }
     else
-      fprintf(stderr, "lpr: Too many files - \"%s\"\n", argv[i]);
+      fprintf(stderr, "lpr: error - too many files - \"%s\"\n", argv[i]);
  /*
   * See if we have any files to print; if not, print from stdin...
   */
@@ -352,7 +352,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   {
     job_id = cupsPrintFiles(printer, num_files, files, title, num_options, options);
 
-    if (deletefile)
+    if (deletefile && job_id > 0)
     {
      /*
       * Delete print files after printing...
@@ -391,7 +391,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
     if ((temp = cupsTempFd(tempfile, sizeof(tempfile))) < 0)
     {
-      fprintf(stderr, "lpr: unable to create temporary file \"%s\" - %s\n",
+      fprintf(stderr, "lpr: error - unable to create temporary file \"%s\" - %s\n",
               tempfile, strerror(errno));
       return (1);
     }
@@ -404,7 +404,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
     if (i == 0)
     {
-      fputs("lpr: stdin is empty, so no job has been sent.\n", stderr);
+      fputs("lpr: error - stdin is empty, so no job has been sent.\n", stderr);
       return (1);
     }
 
@@ -418,7 +418,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (job_id < 1)
   {
-    fprintf(stderr, "lpr: unable to print file: %s\n",
+    fprintf(stderr, "lpr: error - unable to print file: %s\n",
 	    ippErrorString(cupsLastError()));
     return (1);
   }
@@ -451,5 +451,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c,v 1.20.2.14 2004/09/08 19:02:07 mike Exp $".
+ * End of "$Id: lpr.c,v 1.20.2.15 2004/09/09 15:10:29 mike Exp $".
  */

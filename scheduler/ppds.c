@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.14.2.16 2004/06/29 13:15:11 mike Exp $"
+ * "$Id: ppds.c,v 1.14.2.17 2004/09/09 15:10:29 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -172,7 +172,7 @@ LoadPPDs(const char *d)			/* I - Directory to scan... */
       */
 
       if (i > 1)
-        memcpy(ppd, ppd + 1, (i - 1) * sizeof(ppd_info_t));
+        memmove(ppd, ppd + 1, (i - 1) * sizeof(ppd_info_t));
 
       num_ppds --;
       ppd --;
@@ -777,5 +777,5 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * End of "$Id: ppds.c,v 1.14.2.16 2004/06/29 13:15:11 mike Exp $".
+ * End of "$Id: ppds.c,v 1.14.2.17 2004/09/09 15:10:29 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.94 2004/08/12 03:24:41 mike Exp $"
+ * "$Id: job.c,v 1.124.2.95 2004/09/09 15:10:29 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1531,16 +1531,7 @@ StartJob(int       id,			/* I - Job ID */
   if (current->current_file == 0)
   {
     set_time(current, "time-at-processing");
-    pipe(current->back_pipes);
-
-#ifdef FD_CLOEXEC
-   /*
-    * Close pipe on exec...
-    */
-
-    fcntl(current->back_pipes[0], F_SETFD, FD_CLOEXEC);
-    fcntl(current->back_pipes[1], F_SETFD, FD_CLOEXEC);
-#endif /* FD_CLOEXEC */
+    cupsdPipe(current->back_pipes);
   }
 
  /*
@@ -1960,7 +1951,7 @@ StartJob(int       id,			/* I - Job ID */
   * Now create processes for all of the filters...
   */
 
-  if (pipe(statusfds))
+  if (cupsdPipe(statusfds))
   {
     LogMessage(L_ERROR, "Unable to create job status pipes - %s.",
 	       strerror(errno));
@@ -1968,6 +1959,10 @@ StartJob(int       id,			/* I - Job ID */
              "Unable to create status pipes - %s.", strerror(errno));
 
     AddPrinterHistory(printer);
+
+    if (filters != NULL)
+      free(filters);
+
     return;
   }
 
@@ -1986,6 +1981,23 @@ StartJob(int       id,			/* I - Job ID */
 
   filterfds[1][0] = open("/dev/null", O_RDONLY);
   filterfds[1][1] = -1;
+
+  if (filterfds[1][0] < 0)
+  {
+    LogMessage(L_ERROR, "Unable to open \"/dev/null\" - %s.", strerror(errno));
+    snprintf(printer->state_message, sizeof(printer->state_message),
+             "Unable to open \"/dev/null\" - %s.", strerror(errno));
+
+    AddPrinterHistory(printer);
+
+    if (filters != NULL)
+      free(filters);
+
+    CancelJob(current->id, 0);
+    return;
+  }
+
+  fcntl(filterfds[1][0], F_SETFD, fcntl(filterfds[1][0], F_GETFD) | FD_CLOEXEC);
 
   LogMessage(L_DEBUG, "StartJob: filterfds[%d] = [ %d %d ]", 1, filterfds[1][0],
              filterfds[1][1]);
@@ -2009,13 +2021,13 @@ StartJob(int       id,			/* I - Job ID */
 #endif	/* __APPLE__ */
 
     if (i < (num_filters - 1))
-      pipe(filterfds[slot]);
+      cupsdPipe(filterfds[slot]);
     else
     {
       if (current->current_file == 1)
       {
 	if (strncmp(printer->device_uri, "file:", 5) != 0)
-	  pipe(current->print_pipes);
+	  cupsdPipe(current->print_pipes);
 	else
 	{
 	  current->print_pipes[0] = -1;
@@ -2030,14 +2042,27 @@ StartJob(int       id,			/* I - Job ID */
 	  else
 	    current->print_pipes[1] = open(printer->device_uri + 5,
 	                                   O_WRONLY | O_CREAT | O_TRUNC, 0600);
-	}
 
-#ifdef FD_CLOEXEC
-        if (current->print_pipes[0] >= 0)
-	  fcntl(current->print_pipes[0], F_SETFD, FD_CLOEXEC);
-        if (current->print_pipes[1] >= 0)
-	  fcntl(current->print_pipes[1], F_SETFD, FD_CLOEXEC);
-#endif /* FD_CLOEXEC */
+	  if (current->print_pipes[1] < 0)
+	  {
+            LogMessage(L_ERROR, "Unable to open output file \"%s\" - %s.",
+	               printer->device_uri, strerror(errno));
+            snprintf(printer->state_message, sizeof(printer->state_message),
+		     "Unable to open output file \"%s\" - %s.",
+	             printer->device_uri, strerror(errno));
+
+	    AddPrinterHistory(printer);
+
+	    if (filters != NULL)
+	      free(filters);
+
+	    CancelJob(current->id, 0);
+	    return;
+	  }
+
+	  fcntl(current->print_pipes[1], F_SETFD,
+        	fcntl(current->print_pipes[1], F_GETFD) | FD_CLOEXEC);
+	}
 
 	LogMessage(L_DEBUG2, "StartJob: print_pipes = [ %d %d ]",
                    current->print_pipes[0], current->print_pipes[1]);
@@ -2117,6 +2142,24 @@ StartJob(int       id,			/* I - Job ID */
 
       filterfds[slot][0] = -1;
       filterfds[slot][1] = open("/dev/null", O_WRONLY);
+
+      if (filterfds[slot][1] < 0)
+      {
+	LogMessage(L_ERROR, "Unable to open \"/dev/null\" - %s.", strerror(errno));
+	snprintf(printer->state_message, sizeof(printer->state_message),
+        	 "Unable to open \"/dev/null\" - %s.", strerror(errno));
+
+	AddPrinterHistory(printer);
+
+	if (filters != NULL)
+	  free(filters);
+
+	CancelJob(current->id, 0);
+	return;
+      }
+
+      fcntl(filterfds[slot][1], F_SETFD,
+            fcntl(filterfds[slot][1], F_GETFD) | FD_CLOEXEC);
 
       LogMessage(L_DEBUG, "StartJob: backend = \"%s\"", command);
       LogMessage(L_DEBUG, "StartJob: filterfds[%d] = [ %d %d ]",
@@ -2606,21 +2649,17 @@ start_process(const char *command,	/* I - Full path to command */
 
     close(0);
     dup(infd);
-    close(infd);
     close(1);
     dup(outfd);
-    close(outfd);
     if (errfd > 2)
     {
       close(2);
       dup(errfd);
-      close(errfd);
     }
     if (backfd > 3)
     {
       close(3);
       dup(backfd);
-      close(backfd);
       fcntl(3, F_SETFL, O_NDELAY);
     }
 
@@ -2765,5 +2804,5 @@ set_hold_until(job_t *job, 		/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.94 2004/08/12 03:24:41 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.95 2004/09/09 15:10:29 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.68 2004/09/08 18:38:34 mike Exp $"
+ * "$Id: main.c,v 1.57.2.69 2004/09/09 15:10:29 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -24,6 +24,7 @@
  * Contents:
  *
  *   main()               - Main entry for the CUPS scheduler.
+ *   cupsdPipe()          - Create a pipe which is closed on exec.
  *   CatchChildSignals()  - Catch SIGCHLD signals...
  *   HoldSignals()        - Hold child and termination signals.
  *   IgnoreChildSignals() - Ignore SIGCHLD signals...
@@ -792,6 +793,46 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
+ * 'cupsdPipe()' - Create a pipe which is closed on exec.
+ */
+
+int					/* O - 0 on success, -1 on error */
+cupsdPipe(int *fds)			/* O - Pipe file descriptors (2) */
+{
+ /*
+  * Create the pipe...
+  */
+
+  if (pipe(fds))
+    return (-1);
+
+ /*
+  * Set the "close on exec" flag on each end of the pipe...
+  */
+
+  if (fcntl(fds[0], F_SETFD, fcntl(fds[0], F_GETFD) | FD_CLOEXEC))
+  {
+    close(fds[0]);
+    close(fds[1]);
+    return (-1);
+  }
+
+  if (fcntl(fds[1], F_SETFD, fcntl(fds[1], F_GETFD) | FD_CLOEXEC))
+  {
+    close(fds[0]);
+    close(fds[1]);
+    return (-1);
+  }
+
+ /*
+  * Return 0 indicating success...
+  */
+
+  return (0);
+}
+
+
+/*
  * 'CatchChildSignals()' - Catch SIGCHLD signals...
  */
 
@@ -1337,5 +1378,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.68 2004/09/08 18:38:34 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.69 2004/09/09 15:10:29 mike Exp $".
  */

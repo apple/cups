@@ -3,6 +3,12 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc3
 
+	- Removed the remaining scheduler code that did not use
+	  the "close-on-exec" file descriptor flag to speed up
+	  program invocations (STR #890)
+	- The "lpr -r" command removed the print file even if it
+	  was not printed. It now only removes the file if the
+	  job is successfully created (STR #886)
 	- Revamped the custom page size orientation fix (STR
 	  #127)
 	- The lp, lpq, lpr, and lpstat commands now report when
