@@ -182,6 +182,8 @@ CHANGES IN CUPS V1.1.7
 	  if the file does not conform to at least version 3.0
 	  of the document structuring conventions.  This seems
 	  to "fix" printing with broken apps.
+	- The image filters did not handle older TIFF files that
+	  lacked the samples-per-pixel and bits-per-pixel tags.
 
 
 CHANGES IN CUPS V1.1.6-3
