@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertoepson.c,v 1.3 2000/01/21 03:45:10 mike Exp $"
+ * "$Id: rastertoepson.c,v 1.4 2000/06/07 16:54:29 mike Exp $"
  *
  *   EPSON ESC/P and ESC/P2 filter for the Common UNIX Printing System
  *   (CUPS).
@@ -47,6 +47,16 @@
 
 
 /*
+ * Model numbers...
+ */
+
+#define EPSON_9PIN	0
+#define EPSON_24PIN	1
+#define EPSON_COLOR	2
+#define EPSON_PHOTO	3
+
+
+/*
  * Macros...
  */
 
@@ -58,9 +68,17 @@
  */
 
 unsigned char	*Planes[6],		/* Output buffers */
-		*CompBuffer;		/* Compression buffer */
+		*CompBuffer,		/* Compression buffer */
+		*LineBuffers[2];	/* Line bitmap buffers */
 int		NumPlanes,		/* Number of color planes */
 		Feed;			/* Number of lines to skip */
+int		DotBit,			/* Bit in buffers */
+		DotBytes,		/* # bytes in a dot column */
+		DotColumns,		/* # columns in 1/60 inch */
+		LineCount,		/* # of lines processed */
+		EvenOffset,		/* Offset into 'even' buffers */
+		OddOffset,		/* Offset into 'odd' buffers */
+		Shingling;		/* Shingle output? */
 
 
 /*
@@ -68,13 +86,14 @@ int		NumPlanes,		/* Number of color planes */
  */
 
 void	Setup(void);
-void	StartPage(cups_page_header_t *header, ppd_file_t *ppd);
-void	EndPage(cups_page_header_t *header);
+void	StartPage(const ppd_file_t *ppd, const cups_page_header_t *header);
+void	EndPage(const cups_page_header_t *header);
 void	Shutdown(void);
 
-void	CompressData(unsigned char *line, int length, int plane, int type,
-	              int xstep, int ystep);
-void	OutputLine(cups_page_header_t *header);
+void	CompressData(const unsigned char *line, int length, int plane,
+	             int type, int xstep, int ystep);
+void	OutputLine(const cups_page_header_t *header);
+void	OutputRows(const cups_page_header_t *header, int row);
 
 
 /*
@@ -97,11 +116,11 @@ Setup(void)
  */
 
 void
-StartPage(cups_page_header_t *header,	/* I - Page header */
-          ppd_file_t         *ppd)	/* I - PPD file */
+StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
+          const cups_page_header_t *header)	/* I - Page header */
 {
-  int	n, t;				/* Numbers */
-  int	plane;				/* Looping var */
+  int	n, t;					/* Numbers */
+  int	plane;					/* Looping var */
 
 
  /*
@@ -111,32 +130,105 @@ StartPage(cups_page_header_t *header,	/* I - Page header */
   printf("\033@");
 
  /*
-  * Set graphics mode...
+  * See which type of printer we are using...
   */
 
-  pwrite("\033(G\001\000\001", 6);	/* Graphics mode */
+  switch (ppd->model_number)
+  {
+    case EPSON_9PIN :
+    case EPSON_24PIN :
+        printf("\033P");		/* Set 10 CPI */
 
- /*
-  * Set the media size...
-  */
+	if (header->HWResolution[0] == 360 || header->HWResolution[0] == 240)
+	{
+	  printf("\033x1");		/* LQ printing */
+	  printf("\033U1");		/* Unidirectional */
+	}
+	else
+	{
+	  printf("\033x0");		/* Draft printing */
+	  printf("\033U0");		/* Bidirectional */
+	}
 
-  pwrite("\033(U\001\000", 5);		/* Resolution/units */
-  putchar(3600 / header->HWResolution[1]);
+	printf("\033l%c\033Q%c", 0,	/* Side margins */
+                      (int)(10.0 * header->PageSize[0] / 72.0 + 0.5));
+	printf("\033C%c%c", 0,		/* Page length */
+                      (int)(header->PageSize[1] / 72.0 + 0.5));
+	printf("\033N%c", 0);		/* Bottom margin */
 
-  n = header->PageSize[1] * header->HWResolution[1] / 72.0;
+       /*
+	* Setup various buffer limits...
+	*/
 
-  pwrite("\033(C\002\000", 5);	/* Page length */
-  putchar(n);
-  putchar(n >> 8);
+        DotBytes   = header->cupsRowCount / 8;
+	DotColumns = header->HWResolution[0] / 60;
+        Shingling  = 0;
 
-  t = (ppd->sizes[1].length - ppd->sizes[1].top) *
-      header->HWResolution[1] / 72.0;
+        if (ppd->model_number == EPSON_9PIN)
+	  printf("\033\063\030");	/* Set line feed */
+	else
+	  switch (header->HWResolution[0])
+	  {
+	    case 60:
+	    case 120 :
+        	printf("\033\063\030");	/* Set line feed */
+		break;
 
-  pwrite("\033(c\004\000", 5);	/* Top & bottom margins */
-  putchar(t);
-  putchar(t >> 8);
-  putchar(n);
-  putchar(n >> 8);
+	    case 180 :
+	    case 360 :
+        	Shingling = 1;
+
+        	if (header->HWResolution[1] == 180)
+        	  printf("\033\063\010");/* Set line feed */
+		else
+        	  printf("\033+\010");	/* Set line feed */
+        	break;
+	  }
+        break;
+
+    case EPSON_COLOR :
+    case EPSON_PHOTO :
+       /*
+	* Set graphics mode...
+	*/
+
+	pwrite("\033(G\001\000\001", 6);	/* Graphics mode */
+
+       /*
+	* Set the media size...
+	*/
+
+	pwrite("\033(U\001\000", 5);		/* Resolution/units */
+	putchar(3600 / header->HWResolution[1]);
+
+	n = header->PageSize[1] * header->HWResolution[1] / 72.0;
+
+	pwrite("\033(C\002\000", 5);		/* Page length */
+	putchar(n);
+	putchar(n >> 8);
+
+	t = (ppd->sizes[1].length - ppd->sizes[1].top) *
+	    header->HWResolution[1] / 72.0;
+
+	pwrite("\033(c\004\000", 5);		/* Top & bottom margins */
+	putchar(t);
+	putchar(t >> 8);
+	putchar(n);
+	putchar(n >> 8);
+
+	if (header->HWResolution[1] == 720)
+	{
+	  pwrite("\033(i\001\000\001", 6);	/* Microweave */
+	  pwrite("\033(e\002\000\000\001", 7);	/* Small dots */
+	}
+
+	pwrite("\033(V\002\000\000\000", 7);	/* Set absolute position 0 */
+
+        DotBytes   = 0;
+	DotColumns = 0;
+        Shingling  = 0;
+        break;
+  }
 
  /*
   * Set other stuff...
@@ -151,26 +243,28 @@ StartPage(cups_page_header_t *header,	/* I - Page header */
   else
     NumPlanes = 1;
 
-  if (header->HWResolution[1] == 720)
-  {
-    pwrite("\033(i\001\000\001", 6);	/* Microweave */
-    pwrite("\033(e\002\000\000\001", 7);/* Small dots */
-  }
-
-  pwrite("\033(V\002\000\000\000", 7);	/* Set absolute position 0 */
-
   Feed = 0;				/* No blank lines yet */
 
  /*
-  * Allocate memory for a line of graphics...
+  * Allocate memory for a line/row of graphics...
   */
 
   Planes[0] = malloc(header->cupsBytesPerLine);
   for (plane = 1; plane < NumPlanes; plane ++)
     Planes[plane] = Planes[0] + plane * header->cupsBytesPerLine / NumPlanes;
 
-  if (header->cupsCompression)
-    CompBuffer = malloc(header->cupsBytesPerLine * 2);
+  if (header->cupsCompression || DotBytes)
+    CompBuffer = calloc(2, header->cupsWidth);
+
+  if (DotBytes)
+  {
+    LineBuffers[0] = calloc(DotBytes, header->cupsWidth * (Shingling + 1));
+    LineBuffers[1] = LineBuffers[0] + DotBytes * header->cupsWidth;
+    DotBit         = 128;
+    LineCount      = 0;
+    EvenOffset     = 0;
+    OddOffset      = 0;
+  }
 }
 
 
@@ -179,13 +273,35 @@ StartPage(cups_page_header_t *header,	/* I - Page header */
  */
 
 void
-EndPage(cups_page_header_t *header)	/* I - Page header */
+EndPage(const cups_page_header_t *header)	/* I - Page header */
 {
- /*
-  * Eject the current page...
-  */
+  if (DotBytes)
+  {
+   /*
+    * Flush remaining graphics as needed...
+    */
 
-  putchar(12);			/* Form feed */
+    if (!Shingling)
+      OutputRows(header, 0);
+    else if (OddOffset > EvenOffset)
+    {
+      OutputRows(header, 1);
+      OutputRows(header, 0);
+    }
+    else
+    {
+      OutputRows(header, 0);
+      OutputRows(header, 1);
+    }
+  }
+  else
+  {
+   /*
+    * Eject the current page...
+    */
+
+    putchar(12);		/* Form feed */
+  }
 
  /*
   * Free memory...
@@ -193,8 +309,11 @@ EndPage(cups_page_header_t *header)	/* I - Page header */
 
   free(Planes[0]);
 
-  if (header->cupsCompression)
+  if (header->cupsCompression || DotBytes)
     free(CompBuffer);
+
+  if (DotBytes)
+    free(LineBuffers[0]);
 }
 
 
@@ -218,20 +337,20 @@ Shutdown(void)
  */
 
 void
-CompressData(unsigned char *line,	/* I - Data to compress */
-             int           length,	/* I - Number of bytes */
-	     int           plane,	/* I - Color plane */
-	     int           type,	/* I - Type of compression */
-	     int           xstep,	/* I - X resolution */
-	     int           ystep)	/* I - Y resolution */
+CompressData(const unsigned char *line,	/* I - Data to compress */
+             int                 length,/* I - Number of bytes */
+	     int                 plane,	/* I - Color plane */
+	     int                 type,	/* I - Type of compression */
+	     int                 xstep,	/* I - X resolution */
+	     int                 ystep)	/* I - Y resolution */
 {
-  unsigned char	*line_ptr,		/* Current byte pointer */
-        	*line_end,		/* End-of-line byte pointer */
-        	*comp_ptr,		/* Pointer into compression buffer */
-        	*start,			/* Start of compression sequence */
-		temp;			/* Current byte */
-  int           count;			/* Count of bytes for output */
-  static int	ctable[6] = { 0, 2, 1, 4, 2, 1 };
+  const unsigned char	*line_ptr,	/* Current byte pointer */
+        		*line_end,	/* End-of-line byte pointer */
+        		*start;		/* Start of compression sequence */
+  unsigned char      	*comp_ptr,	/* Pointer into compression buffer */
+			temp;		/* Current byte */
+  int   	        count;		/* Count of bytes for output */
+  static int		ctable[6] = { 0, 2, 1, 4, 2, 1 };
 					/* KCMYcm color values */
 
 
@@ -248,7 +367,7 @@ CompressData(unsigned char *line,	/* I - Data to compress */
 
   if (ystep == 5)
   {
-    for (comp_ptr = line; comp_ptr < line_end;)
+    for (comp_ptr = (unsigned char *)line; comp_ptr < line_end;)
     {
      /*
       * Grab the current byte...
@@ -403,48 +522,290 @@ CompressData(unsigned char *line,	/* I - Data to compress */
  */
 
 void
-OutputLine(cups_page_header_t *header)	/* I - Page header */
+OutputLine(const cups_page_header_t *header)	/* I - Page header */
 {
-  int	plane;				/* Current plane */
-  int	bytes;				/* Bytes per plane */
-  int	xstep, ystep;			/* X & Y resolutions */
-
- /*
-  * Write bitmap data as needed...
-  */
-
-  xstep = 3600 / header->HWResolution[0];
-  ystep = 3600 / header->HWResolution[1];
-  bytes = header->cupsBytesPerLine / NumPlanes;
-
-  for (plane = 0; plane < NumPlanes; plane ++)
+  if (header->cupsRowCount)
   {
+    int			width;
+    unsigned char	*tempptr,
+			*evenptr,
+			*oddptr;
+    register int	x;
+    unsigned char	bit;
+    const unsigned char	*pixel;
+    unsigned char 	*temp;
+
+
    /*
-    * Skip blank data...
+    * Collect bitmap data in the line buffers and write after each buffer.
     */
 
-    if (!Planes[plane][0] &&
-        memcmp(Planes[plane], Planes[plane] + 1, bytes - 1) == 0)
-      continue;
-
-   /*
-    * Output whitespace as needed...
-    */
-
-    if (Feed > 0)
+    for (x = header->cupsWidth, bit = 128, pixel = Planes[0],
+             temp = CompBuffer;
+	 x > 0;
+	 x --, temp ++)
     {
-      pwrite("\033(v\002\000", 5);	/* Relative vertical position */
-      putchar(Feed);
-      putchar(Feed >> 8);
+      if (*pixel & bit)
+        *temp |= DotBit;
 
-      Feed = 0;
+      if (bit > 1)
+	bit >>= 1;
+      else
+      {
+	bit = 128;
+	pixel ++;
+      }
     }
 
-    CompressData(Planes[plane], bytes, plane, header->cupsCompression, xstep,
-                 ystep);
+    if (DotBit > 1)
+      DotBit >>= 1;
+    else
+    {
+     /*
+      * Copy the holding buffer to the output buffer, shingling as necessary...
+      */
+
+      if (Shingling && LineCount != 0)
+      {
+       /*
+        * Shingle the output...
+        */
+
+        if (LineCount & 1)
+        {
+          evenptr = LineBuffers[1] + OddOffset;
+          oddptr  = LineBuffers[0] + EvenOffset + DotBytes;
+        }
+        else
+        {
+          evenptr = LineBuffers[0] + EvenOffset;
+          oddptr  = LineBuffers[1] + OddOffset + DotBytes;
+        }
+
+        for (width = header->cupsWidth, tempptr = CompBuffer;
+             width > 0;
+             width -= 2, tempptr += 2, oddptr += DotBytes * 2,
+	         evenptr += DotBytes * 2)
+        {
+          evenptr[0] = tempptr[0];
+          oddptr[0]  = tempptr[1];
+        }
+      }
+      else
+      {
+       /*
+        * Don't shingle the output...
+        */
+
+        for (width = header->cupsWidth, tempptr = CompBuffer,
+                 evenptr = LineBuffers[0] + EvenOffset;
+             width >= 0;
+             width --, tempptr ++, evenptr += DotBytes)
+          *evenptr = tempptr[0];
+      }
+
+      if (Shingling && LineCount != 0)
+      {
+	EvenOffset ++;
+	OddOffset ++;
+
+	if (EvenOffset == DotBytes)
+	{
+	  EvenOffset = 0;
+	  OutputRows(header, 0);
+	}
+
+	if (OddOffset == DotBytes)
+	{
+          OddOffset = 0;
+	  OutputRows(header, 1);
+	}
+      }
+      else
+      {
+	EvenOffset ++;
+
+	if (EvenOffset == DotBytes)
+	{
+          EvenOffset = 0;
+	  OutputRows(header, 0);
+	}
+      }
+
+      DotBit = 128;
+      LineCount ++;
+
+      memset(CompBuffer, 0, header->cupsWidth);
+    }
+  }
+  else
+  {
+    int	plane;		/* Current plane */
+    int	bytes;		/* Bytes per plane */
+    int	xstep, ystep;	/* X & Y resolutions */
+
+
+   /*
+    * Write a single line of bitmap data as needed...
+    */
+
+    xstep = 3600 / header->HWResolution[0];
+    ystep = 3600 / header->HWResolution[1];
+    bytes = header->cupsBytesPerLine / NumPlanes;
+
+    for (plane = 0; plane < NumPlanes; plane ++)
+    {
+     /*
+      * Skip blank data...
+      */
+
+      if (!Planes[plane][0] &&
+          memcmp(Planes[plane], Planes[plane] + 1, bytes - 1) == 0)
+	continue;
+
+     /*
+      * Output whitespace as needed...
+      */
+
+      if (Feed > 0)
+      {
+	pwrite("\033(v\002\000", 5);	/* Relative vertical position */
+	putchar(Feed);
+	putchar(Feed >> 8);
+
+	Feed = 0;
+      }
+
+      CompressData(Planes[plane], bytes, plane, header->cupsCompression, xstep,
+                   ystep);
+    }
+
+    Feed ++;
+  }
+}
+
+
+/*
+ * 'OutputRows()' - Output 8, 24, or 48 rows.
+ */
+
+void
+OutputRows(const cups_page_header_t *header,	/* I - Page image header */
+           int                      row)	/* I - Row number (0 or 1) */
+{
+  unsigned	i, n;				/* Looping vars */
+  int		dot_count,			/* Number of bytes to print */
+                dot_min;			/* Minimum number of bytes */
+  unsigned char *dot_ptr;			/* Pointer to print data */
+
+
+  dot_min = DotBytes * DotColumns;
+
+  if (LineBuffers[row][0] != 0 ||
+      memcmp(LineBuffers[row], LineBuffers[row] + 1,
+             header->cupsWidth * DotBytes - 1))
+  {
+   /*
+    * Skip leading space...
+    */
+
+    i         = 0;
+    dot_count = header->cupsWidth * DotBytes;
+    dot_ptr   = LineBuffers[row];
+
+    while (dot_count >= dot_min && dot_ptr[0] == 0 &&
+           memcmp(dot_ptr, dot_ptr + 1, dot_min - 1) == 0)
+    {
+      i         ++;
+      dot_ptr   += dot_min;
+      dot_count -= dot_min;
+    }
+
+   /*
+    * Skip trailing space...
+    */
+
+    while (dot_count >= dot_min && dot_ptr[dot_count - dot_min] == 0 &&
+           memcmp(dot_ptr + dot_count - dot_min,
+	          dot_ptr + dot_count - dot_min + 1, dot_min - 1) == 0)
+      dot_count -= dot_min;
+
+   /*
+    * Position print head for printing...
+    */
+
+    putchar(0x1b);
+    putchar('$');
+    putchar(i & 255);
+    putchar(i >> 8);
+
+   /*
+    * Start bitmap graphics for this line...
+    */
+
+    printf("\033*");			/* Select bit image */
+    switch (header->HWResolution[0])
+    {
+      case 60 : /* 60x60/72 DPI gfx */
+          putchar(0);
+          break;
+      case 120 : /* 120x60/72 DPI gfx */
+          putchar(1);
+          break;
+      case 180 : /* 180 DPI gfx */
+          putchar(39);
+          break;
+      case 240 : /* 240x72 DPI gfx */
+          putchar(3);
+          break;
+      case 360 : /* 360x180/360 DPI gfx */
+	  if (header->HWResolution[1] == 180)
+	  {
+            if (Shingling && LineCount != 0)
+              putchar(40);		/* 360x180 fast */
+            else
+              putchar(41);		/* 360x180 slow */
+	  }
+	  else
+          {
+	    if (Shingling && LineCount != 0)
+              putchar(72);		/* 360x360 fast */
+            else
+              putchar(73);		/* 360x360 slow */
+          }
+          break;
+    }
+
+    n = (unsigned)dot_count / DotBytes;
+    putchar(n & 255);
+    putchar(n / 256);
+
+   /*
+    * Write the graphics data...
+    */
+
+    pwrite(dot_ptr, dot_count);
   }
 
-  Feed ++;
+ /*
+  * Feed the paper...
+  */
+
+  putchar('\n');
+
+  if (Shingling && row == 1)
+  {
+    if (header->HWResolution[1] == 360)
+      printf("\n\n\n\n");
+    else
+      printf("\n");
+  }
+
+ /*
+  * Clear the buffer...
+  */
+
+  memset(LineBuffers[row], 0, header->cupsWidth * DotBytes);
 }
 
 
@@ -525,7 +886,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     * Start the page...
     */
 
-    StartPage(&header, ppd);
+    StartPage(ppd, &header);
 
    /*
     * Loop for each line on the page...
@@ -592,5 +953,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertoepson.c,v 1.3 2000/01/21 03:45:10 mike Exp $".
+ * End of "$Id: rastertoepson.c,v 1.4 2000/06/07 16:54:29 mike Exp $".
  */
