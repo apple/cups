@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.193 2003/03/12 21:24:34 mike Exp $"
+ * "$Id: ipp.c,v 1.194 2003/03/13 03:28:36 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1273,7 +1273,7 @@ add_printer(client_t        *con,	/* I - Client connection */
   * See if we have an interface script or PPD file attached to the request...
   */
 
-  if (con->filename[0])
+  if (con->filename)
     strlcpy(srcfile, con->filename, sizeof(srcfile));
   else if ((attr = ippFindAttribute(con->request, "ppd-name", IPP_TAG_NAME)) != NULL)
   {
@@ -4027,7 +4027,7 @@ print_job(client_t        *con,		/* I - Client connection */
   * Do we have a file to print?
   */
 
-  if (con->filename[0] == '\0')
+  if (!con->filename)
   {
     LogMessage(L_ERROR, "print_job: No file!?!");
     send_ipp_error(con, IPP_BAD_REQUEST);
@@ -4448,7 +4448,7 @@ print_job(client_t        *con,		/* I - Client connection */
   snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot, job->id,
            job->num_files);
   rename(con->filename, filename);
-  con->filename[0] = '\0';
+  ClearString(&con->filename);
 
  /*
   * See if we need to add the ending sheet...
@@ -5216,7 +5216,7 @@ send_document(client_t        *con,	/* I - Client connection */
   * Do we have a file to print?
   */
 
-  if (con->filename[0] == '\0')
+  if (!con->filename)
   {
     LogMessage(L_ERROR, "send_document: No file!?!");
     send_ipp_error(con, IPP_BAD_REQUEST);
@@ -5329,7 +5329,7 @@ send_document(client_t        *con,	/* I - Client connection */
            job->num_files);
   rename(con->filename, filename);
 
-  con->filename[0] = '\0';
+  ClearString(&con->filename);
 
   LogMessage(L_INFO, "File of type %s/%s queued in job #%d by \'%s\'.",
              filetype->super, filetype->type, job->id, job->username);
@@ -6142,5 +6142,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.193 2003/03/12 21:24:34 mike Exp $".
+ * End of "$Id: ipp.c,v 1.194 2003/03/13 03:28:36 mike Exp $".
  */
