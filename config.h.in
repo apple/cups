@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.39.2.9 2002/03/28 21:49:28 mike Exp $"
+ * "$Id: config.h.in,v 1.39.2.10 2002/05/16 13:59:53 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -118,6 +118,8 @@
 #undef HAVE_STRDUP
 #undef HAVE_STRCASECMP
 #undef HAVE_STRNCASECMP
+#undef HAVE_STRLCAT
+#undef HAVE_STRLCPY
 
 
 /*
@@ -224,5 +226,5 @@
 
 
 /*
- * End of "$Id: config.h.in,v 1.39.2.9 2002/03/28 21:49:28 mike Exp $".
+ * End of "$Id: config.h.in,v 1.39.2.10 2002/05/16 13:59:53 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cgi.h,v 1.12.2.2 2002/01/27 21:20:27 mike Exp $"
+ * "$Id: cgi.h,v 1.12.2.3 2002/05/16 13:59:56 mike Exp $"
  *
  *   CGI support library definitions.
  *
@@ -25,9 +25,9 @@
 
 #  include <stdio.h>
 #  include <stdlib.h>
-#  include <string.h>
-#  include <ctype.h>
 #  include <time.h>
+
+#  include <cups/string.h>
 
 #  ifdef WIN32
 #    include <direct.h>
@@ -36,16 +36,6 @@
 #  else
 #    include <unistd.h>
 #  endif /* WIN32 */
-
-
-/*
- * Stuff for WIN32 and OS/2...
- */
-
-#  if defined(WIN32) || defined(__EMX__)
-#    define strcasecmp  stricmp
-#    define strncasecmp strnicmp
-#  endif /* WIN32 || __EMX__ */
 
 
 /*
@@ -92,5 +82,5 @@ extern void		cgiSetCookie(const char *name, const char *value,
 #endif /* !_CGI_H_ */
 
 /*
- * End of "$Id: cgi.h,v 1.12.2.2 2002/01/27 21:20:27 mike Exp $".
+ * End of "$Id: cgi.h,v 1.12.2.3 2002/05/16 13:59:56 mike Exp $".
  */

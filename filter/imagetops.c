@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.36.2.7 2002/04/19 16:18:11 mike Exp $"
+ * "$Id: imagetops.c,v 1.36.2.8 2002/05/16 14:00:02 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -152,10 +152,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     close(fd);
   }
   else
-  {
-    strncpy(filename, argv[6], sizeof(filename) - 1);
-    filename[sizeof(filename) - 1] = '\0';
-  }
+    strlcpy(filename, argv[6], sizeof(filename));
 
  /*
   * Process command-line options and write the prolog...
@@ -885,5 +882,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.36.2.7 2002/04/19 16:18:11 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.36.2.8 2002/05/16 14:00:02 mike Exp $".
  */

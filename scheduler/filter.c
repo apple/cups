@@ -1,5 +1,5 @@
 /*
- * "$Id: filter.c,v 1.3.2.1 2002/01/02 18:05:01 mike Exp $"
+ * "$Id: filter.c,v 1.3.2.2 2002/05/16 14:00:10 mike Exp $"
  *
  *   File type conversion routines for the Common UNIX Printing System (CUPS).
  *
@@ -88,8 +88,7 @@ mimeAddFilter(mime_t      *mime,	/* I - MIME database */
     if (temp->cost > cost)
     {
       temp->cost = cost;
-      strncpy(temp->filter, filter, sizeof(temp->filter) - 1);
-      temp->filter[sizeof(temp->filter) - 1] = '\0';
+      strlcpy(temp->filter, filter, sizeof(temp->filter));
     }
   }
   else
@@ -117,8 +116,7 @@ mimeAddFilter(mime_t      *mime,	/* I - MIME database */
     temp->src  = src;
     temp->dst  = dst;
     temp->cost = cost;
-    strncpy(temp->filter, filter, sizeof(temp->filter) - 1);
-    temp->filter[sizeof(temp->filter) - 1] = '\0';
+    strlcpy(temp->filter, filter, sizeof(temp->filter));
 
     if (mime->num_filters > 1)
       qsort(mime->filters, mime->num_filters, sizeof(mime_filter_t),
@@ -297,5 +295,5 @@ lookup(mime_t      *mime,	/* I - MIME database */
 
 
 /*
- * End of "$Id: filter.c,v 1.3.2.1 2002/01/02 18:05:01 mike Exp $".
+ * End of "$Id: filter.c,v 1.3.2.2 2002/05/16 14:00:10 mike Exp $".
  */

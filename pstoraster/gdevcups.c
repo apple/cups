@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.43.2.8 2002/04/23 15:30:57 mike Exp $"
+ * "$Id: gdevcups.c,v 1.43.2.9 2002/05/16 14:00:03 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -1808,9 +1808,7 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   } \
   else if (code == 0) \
   { \
-    strncpy(cups->header.name, (const char *)stringval.data, \
-            stringval.size); \
-    cups->header.name[stringval.size] = '\0'; \
+    strlcpy(cups->header.name, (const char *)stringval.data, 64); \
   }
 
 #define intoption(name, sname, type) \
@@ -3427,5 +3425,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.43.2.8 2002/04/23 15:30:57 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.43.2.9 2002/05/16 14:00:03 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.11.2.4 2002/05/14 01:25:44 mike Exp $"
+ * "$Id: type.c,v 1.11.2.5 2002/05/16 14:00:16 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -109,7 +109,7 @@ mimeAddType(mime_t     *mime,	/* I - MIME database */
   mime->num_types ++;
 
   *types = temp;
-  strncpy(temp->super, super, sizeof(temp->super) - 1);
+  strlcpy(temp->super, super, sizeof(temp->super));
   if ((temp->type = strdup(type)) == NULL)
   {
     mime->num_types --;
@@ -619,8 +619,7 @@ mimeType(mime_t     *mime,	/* I - MIME database */
   * Lookup the type in the array...
   */
 
-  strncpy(key.super, super, sizeof(key.super) - 1);
-  key.super[sizeof(key.super) - 1] = '\0';
+  strlcpy(key.super, super, sizeof(key.super));
   key.type = (char *)type;
 
   keyptr = &key;
@@ -1093,5 +1092,5 @@ patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.11.2.4 2002/05/14 01:25:44 mike Exp $".
+ * End of "$Id: type.c,v 1.11.2.5 2002/05/16 14:00:16 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.22.2.6 2002/05/09 03:07:57 mike Exp $"
+ * "$Id: admin.c,v 1.22.2.7 2002/05/16 13:59:55 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -635,8 +635,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     if (oldinfo &&
         (attr = ippFindAttribute(oldinfo, "device-uri", IPP_TAG_URI)) != NULL)
     {
-      strncpy(uri, attr->values[0].string.text, sizeof(uri) - 1);
-      uri[sizeof(uri) - 1] = '\0';
+      strlcpy(uri, attr->values[0].string.text, sizeof(uri));
       if ((uriptr = strchr(uri, ':')) != NULL && strncmp(uriptr, "://", 3) == 0)
         *uriptr = '\0';
 
@@ -789,8 +788,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 	* Let the user choose a model...
 	*/
 
-        strncpy(make, var, sizeof(make) - 1);
-	make[sizeof(make) - 1] = '\0';
+        strlcpy(make, var, sizeof(make));
 
         ippSetCGIVars(response, "ppd-make", make);
 	cgiCopyTemplateLang(stdout, TEMPLATES, "choose-model.tmpl",
@@ -852,8 +850,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME, "ppd-name",
                  NULL, cgiGetVariable("PPD_NAME"));
 
-    strncpy(uri, cgiGetVariable("DEVICE_URI"), sizeof(uri) - 1);
-    uri[sizeof(uri) - 1] = '\0';
+    strlcpy(uri, cgiGetVariable("DEVICE_URI"), sizeof(uri));
     if (strncmp(uri, "serial:", 7) == 0)
     {
      /*
@@ -1146,8 +1143,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
         * Get default option name...
 	*/
 
-        strncpy(keyword, line + 8, sizeof(keyword) - 1);
-	keyword[sizeof(keyword) - 1] = '\0';
+        strlcpy(keyword, line + 8, sizeof(keyword));
 
 	for (keyptr = keyword; *keyptr; keyptr ++)
 	  if (*keyptr == ':' || isspace(*keyptr))
@@ -1600,5 +1596,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.22.2.6 2002/05/09 03:07:57 mike Exp $".
+ * End of "$Id: admin.c,v 1.22.2.7 2002/05/16 13:59:55 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.20.2.5 2002/03/01 19:55:12 mike Exp $"
+ * "$Id: language.c,v 1.20.2.6 2002/05/16 13:59:59 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -176,8 +176,7 @@ cupsLangGet(const char *language) /* I - Language or locale */
     * Copy the locale string over safely...
     */
 
-    strncpy(langname, language, sizeof(langname) - 1);
-    langname[sizeof(langname) - 1] = '\0';
+    strlcpy(langname, language, sizeof(langname));
   }
 
   if (strlen(langname) < 2)
@@ -214,8 +213,7 @@ cupsLangGet(const char *language) /* I - Language or locale */
       * Add charset...
       */
 
-      strncpy(real + count, langname + count, sizeof(real) - count - 1);
-      langname[count] = '\0';
+      strlcpy(real + count, langname + count, sizeof(real) - count);
       count += strlen(real + count);
 
      /*
@@ -288,10 +286,7 @@ cupsLangGet(const char *language) /* I - Language or locale */
   */
 
   if (fp == NULL)
-  {
-    strncpy(line, lang_default[0], sizeof(line) - 1);
-    line[sizeof(line) - 1] = '\0';
-  }
+    strlcpy(line, lang_default[0], sizeof(line));
   else if (fgets(line, sizeof(line), fp) == NULL)
   {
    /*
@@ -348,8 +343,7 @@ cupsLangGet(const char *language) /* I - Language or locale */
   */
 
   lang->used ++;
-  strncpy(lang->language, langname, sizeof(lang->language) - 1);
-  lang->language[sizeof(lang->language) - 1] = '\0';
+  strlcpy(lang->language, langname, sizeof(lang->language));
 
   for (i = 0; i < (sizeof(lang_encodings) / sizeof(lang_encodings[0])); i ++)
     if (strcmp(lang_encodings[i], line) == 0)
@@ -376,8 +370,7 @@ cupsLangGet(const char *language) /* I - Language or locale */
       if (lang_default[count] == NULL)
         break;
 
-      strncpy(line, lang_default[count], sizeof(line) - 1);
-      /* Already set last byte to 0 above... */
+      strlcpy(line, lang_default[count], sizeof(line));
     }
     else if (fgets(line, sizeof(line), fp) == NULL)
       break;
@@ -428,5 +421,5 @@ cupsLangGet(const char *language) /* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.20.2.5 2002/03/01 19:55:12 mike Exp $".
+ * End of "$Id: language.c,v 1.20.2.6 2002/05/16 13:59:59 mike Exp $".
  */

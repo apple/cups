@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.12 2002/05/09 03:07:56 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.13 2002/05/16 13:59:53 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -169,10 +169,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     close(fd);
   }
   else
-  {
-    strncpy(filename, argv[6], sizeof(filename) - 1);
-    filename[sizeof(filename) - 1] = '\0';
-  }
+    strlcpy(filename, argv[6], sizeof(filename));
 
  /*
   * Extract the hostname and printer name from the URI...
@@ -820,5 +817,5 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.12 2002/05/09 03:07:56 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.13 2002/05/16 13:59:53 mike Exp $".
  */

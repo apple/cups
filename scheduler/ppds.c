@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.14.2.4 2002/01/02 18:05:05 mike Exp $"
+ * "$Id: ppds.c,v 1.14.2.5 2002/05/16 14:00:15 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -518,10 +518,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     if (p[0])
       snprintf(name, sizeof(name), "%s/%s", p, dent->d_name);
     else
-    {
-      strncpy(name, dent->d_name, sizeof(name) - 1);
-      name[sizeof(name) - 1] = '\0';
-    }
+      strlcpy(name, dent->d_name, sizeof(name));
 
     if (stat(filename, &fileinfo))
       continue;
@@ -658,7 +655,7 @@ load_ppds(const char *d,		/* I - Actual directory */
       * Nope, copy the first part of the make and model then...
       */
 
-      strncpy(manufacturer, make_model, sizeof(manufacturer) - 1);
+      strlcpy(manufacturer, make_model, sizeof(manufacturer));
 
      /*
       * Truncate at the first space, dash, or slash, or make the
@@ -807,14 +804,14 @@ load_ppds(const char *d,		/* I - Actual directory */
     ppd->record.ppd_mtime = fileinfo.st_mtime;
     ppd->record.ppd_size  = fileinfo.st_size;
 
-    strncpy(ppd->record.ppd_name, name,
-            sizeof(ppd->record.ppd_name) - 1);
-    strncpy(ppd->record.ppd_make, manufacturer,
-            sizeof(ppd->record.ppd_make) - 1);
-    strncpy(ppd->record.ppd_make_and_model, make_model,
-            sizeof(ppd->record.ppd_make_and_model) - 1);
-    strncpy(ppd->record.ppd_natural_language, language,
-            sizeof(ppd->record.ppd_natural_language) - 1);
+    strlcpy(ppd->record.ppd_name, name,
+            sizeof(ppd->record.ppd_name));
+    strlcpy(ppd->record.ppd_make, manufacturer,
+            sizeof(ppd->record.ppd_make));
+    strlcpy(ppd->record.ppd_make_and_model, make_model,
+            sizeof(ppd->record.ppd_make_and_model));
+    strlcpy(ppd->record.ppd_natural_language, language,
+            sizeof(ppd->record.ppd_natural_language));
 
     changed_ppd = 1;
 
@@ -893,5 +890,5 @@ ppd_gets(buf_t *fp,		/* I - File to read from */
 
 
 /*
- * End of "$Id: ppds.c,v 1.14.2.4 2002/01/02 18:05:05 mike Exp $".
+ * End of "$Id: ppds.c,v 1.14.2.5 2002/05/16 14:00:15 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.28.2.6 2002/03/25 17:14:13 mike Exp $"
+ * "$Id: lpd.c,v 1.28.2.7 2002/05/16 13:59:54 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -168,10 +168,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     close(fd);
   }
   else
-  {
-    strncpy(filename, argv[6], sizeof(filename) - 1);
-    filename[sizeof(filename) - 1] = '\0';
-  }
+    strlcpy(filename, argv[6], sizeof(filename));
 
  /*
   * Extract the hostname and printer name from the URI...
@@ -274,8 +271,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Sanitize the document title...
   */
 
-  strncpy(title, argv[3], sizeof(title) - 1);
-  title[sizeof(title) - 1] = '\0';
+  strlcpy(title, argv[3], sizeof(title));
 
   for (ptr = title; *ptr; ptr ++)
     if (!isalnum(*ptr) && !isspace(*ptr))
@@ -759,5 +755,5 @@ rresvport(int *port)		/* IO - Port number to bind to */
 #endif /* !HAVE_RRESVPORT */
 
 /*
- * End of "$Id: lpd.c,v 1.28.2.6 2002/03/25 17:14:13 mike Exp $".
+ * End of "$Id: lpd.c,v 1.28.2.7 2002/05/16 13:59:54 mike Exp $".
  */

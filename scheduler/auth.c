@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.41.2.9 2002/04/20 20:04:45 mike Exp $"
+ * "$Id: auth.c,v 1.41.2.10 2002/05/16 14:00:05 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -129,7 +129,7 @@ AddLocation(const char *location)	/* I - Location path */
   */
 
   memset(temp, 0, sizeof(location_t));
-  strncpy(temp->location, location, sizeof(temp->location) - 1);
+  strlcpy(temp->location, location, sizeof(temp->location));
   temp->length = strlen(temp->location);
 
   LogMessage(L_DEBUG, "AddLocation: added location \'%s\'", location);
@@ -210,8 +210,7 @@ AllowHost(location_t *loc,	/* I - Location to add to */
     * Allow *interface*...
     */
 
-    strncpy(ifname, name + 4, sizeof(ifname) - 1);
-    ifname[sizeof(ifname) - 1] = '\0';
+    strlcpy(ifname, name + 4, sizeof(ifname));
 
     ifptr = ifname + strlen(ifname);
 
@@ -641,8 +640,7 @@ DenyHost(location_t *loc,	/* I - Location to add to */
     * Deny *interface*...
     */
 
-    strncpy(ifname, name + 4, sizeof(ifname) - 1);
-    ifname[sizeof(ifname) - 1] = '\0';
+    strlcpy(ifname, name + 4, sizeof(ifname));
 
     ifptr = ifname + strlen(ifname);
 
@@ -737,8 +735,7 @@ FindBest(const char   *path,	/* I - Resource path */
   * URIs...
   */
 
-  strncpy(uri, path, sizeof(uri) - 1);
-  uri[sizeof(uri) - 1] = '\0';
+  strlcpy(uri, path, sizeof(uri));
 
   if (strncmp(uri, "/printers/", 10) == 0 ||
       strncmp(uri, "/classes/", 9) == 0)
@@ -1722,5 +1719,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.41.2.9 2002/04/20 20:04:45 mike Exp $".
+ * End of "$Id: auth.c,v 1.41.2.10 2002/05/16 14:00:05 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.56.2.8 2002/05/09 01:55:38 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.56.2.9 2002/05/16 14:00:02 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -369,10 +369,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     close(fd);
   }
   else
-  {
-    strncpy(filename, argv[6], sizeof(filename) - 1);
-    filename[sizeof(filename) - 1] = '\0';
-  }
+    strlcpy(filename, argv[6], sizeof(filename));
 
  /*
   * Process command-line options and write the prolog...
@@ -1528,13 +1525,13 @@ exec_code(cups_page_header2_t *header,	/* I - Page header */
              strcmp(name, "MediaPosition") == 0)
       header->MediaPosition = atoi(value);
     else if (strcmp(name, "MediaClass") == 0)
-      strncpy(header->MediaClass, value, sizeof(header->MediaClass) - 1);
+      strlcpy(header->MediaClass, value, sizeof(header->MediaClass));
     else if (strcmp(name, "MediaColor") == 0)
-      strncpy(header->MediaColor, value, sizeof(header->MediaColor) - 1);
+      strlcpy(header->MediaColor, value, sizeof(header->MediaColor));
     else if (strcmp(name, "MediaType") == 0)
-      strncpy(header->MediaType, value, sizeof(header->MediaType) - 1);
+      strlcpy(header->MediaType, value, sizeof(header->MediaType));
     else if (strcmp(name, "OutputType") == 0)
-      strncpy(header->OutputType, value, sizeof(header->OutputType) - 1);
+      strlcpy(header->OutputType, value, sizeof(header->OutputType));
   }
 }
 
@@ -4506,5 +4503,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.56.2.8 2002/05/09 01:55:38 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.56.2.9 2002/05/16 14:00:02 mike Exp $".
  */

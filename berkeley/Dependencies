@@ -2,8 +2,9 @@
 
 lpc.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 lpc.o: ../cups/ppd.h ../cups/language.h ../cups/debug.h
-lpq.o: ../config.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-lpq.o: ../cups/ppd.h ../cups/language.h ../cups/debug.h
+lpq.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
+lpq.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/language.h
+lpq.o: ../cups/debug.h
 lpr.o: ../config.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 lpr.o: ../cups/ppd.h
 lprm.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h

@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsaddsmb.c,v 1.3.2.5 2002/04/05 15:37:55 mike Exp $"
+ * "$Id: cupsaddsmb.c,v 1.3.2.6 2002/05/16 14:00:18 mike Exp $"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
@@ -187,10 +187,7 @@ do_samba_command(const char *command,	/* I - Command to run */
     if (Verbosity)
       printf("Running command: %s\n", temp);
     else
-    {
-      strncat(temp, " </dev/null >/dev/null 2>/dev/null", sizeof(temp) - 1);
-      temp[sizeof(temp) - 1] = '\0';
-    }
+      strlcat(temp, " </dev/null >/dev/null 2>/dev/null", sizeof(temp));
 
     if ((status = system(temp)) != 0)
     {
@@ -339,5 +336,5 @@ usage()
 
 
 /*
- * End of "$Id: cupsaddsmb.c,v 1.3.2.5 2002/04/05 15:37:55 mike Exp $".
+ * End of "$Id: cupsaddsmb.c,v 1.3.2.6 2002/05/16 14:00:18 mike Exp $".
  */

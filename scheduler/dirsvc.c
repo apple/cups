@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.12 2002/05/12 11:55:07 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.13 2002/05/16 14:00:09 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -139,9 +139,8 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
 	  if (p->type & CUPS_PRINTER_REMOTE)
 	  {
-	    /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
-            strncat(p->name, "@", sizeof(p->name) - 1);
-	    strncat(p->name, p->hostname, sizeof(p->name) - 1);
+            strlcat(p->name, "@", sizeof(p->name));
+	    strlcat(p->name, p->hostname, sizeof(p->name));
 	    SetPrinterAttrs(p);
 	    SortPrinters();
 	  }
@@ -150,25 +149,20 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 	}
 	else if (!p->hostname[0])
 	{
-	  /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
-          strncpy(p->hostname, host, sizeof(p->hostname) - 1);
-	  strncpy(p->uri, uri, sizeof(p->uri) - 1);
-	  strncpy(p->device_uri, uri, sizeof(p->device_uri) - 1);
+          strlcpy(p->hostname, host, sizeof(p->hostname));
+	  strlcpy(p->uri, uri, sizeof(p->uri));
+	  strlcpy(p->device_uri, uri, sizeof(p->device_uri));
           update = 1;
         }
       }
       else
-      {
-        strncpy(name, resource + 9, sizeof(name) - 1);
-        name[sizeof(name) - 1] = '\0';
-      }
+        strlcpy(name, resource + 9, sizeof(name));
     }
     else if (p != NULL && !p->hostname[0])
     {
-      /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
-      strncpy(p->hostname, host, sizeof(p->hostname) - 1);
-      strncpy(p->uri, uri, sizeof(p->uri) - 1);
-      strncpy(p->device_uri, uri, sizeof(p->device_uri) - 1);
+      strlcpy(p->hostname, host, sizeof(p->hostname));
+      strlcpy(p->uri, uri, sizeof(p->uri));
+      strlcpy(p->device_uri, uri, sizeof(p->device_uri));
       update = 1;
     }
 
@@ -187,10 +181,9 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
       */
 
       p->type = type;
-      /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
-      strncpy(p->uri, uri, sizeof(p->uri) - 1);
-      strncpy(p->device_uri, uri, sizeof(p->device_uri) - 1);
-      strncpy(p->hostname, host, sizeof(p->hostname) - 1);
+      strlcpy(p->uri, uri, sizeof(p->uri));
+      strlcpy(p->device_uri, uri, sizeof(p->device_uri));
+      strlcpy(p->hostname, host, sizeof(p->hostname));
 
       update = 1;
     }
@@ -220,9 +213,8 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
 	  if (p->type & CUPS_PRINTER_REMOTE)
 	  {
-	    /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
-            strncat(p->name, "@", sizeof(p->name) - 1);
-	    strncat(p->name, p->hostname, sizeof(p->name) - 1);
+            strlcat(p->name, "@", sizeof(p->name));
+	    strlcat(p->name, p->hostname, sizeof(p->name));
 	    SetPrinterAttrs(p);
 	    SortPrinters();
 	  }
@@ -231,25 +223,20 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 	}
 	else if (!p->hostname[0])
 	{
-	  /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
-          strncpy(p->hostname, host, sizeof(p->hostname) - 1);
-	  strncpy(p->uri, uri, sizeof(p->uri) - 1);
-	  strncpy(p->device_uri, uri, sizeof(p->device_uri) - 1);
+          strlcpy(p->hostname, host, sizeof(p->hostname));
+	  strlcpy(p->uri, uri, sizeof(p->uri));
+	  strlcpy(p->device_uri, uri, sizeof(p->device_uri));
           update = 1;
         }
       }
       else
-      {
-        strncpy(name, resource + 10, sizeof(name) - 1);
-        name[sizeof(name) - 1] = '\0';
-      }
+        strlcpy(name, resource + 10, sizeof(name));
     }
     else if (p != NULL && !p->hostname[0])
     {
-      /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
-      strncpy(p->hostname, host, sizeof(p->hostname) - 1);
-      strncpy(p->uri, uri, sizeof(p->uri) - 1);
-      strncpy(p->device_uri, uri, sizeof(p->device_uri) - 1);
+      strlcpy(p->hostname, host, sizeof(p->hostname));
+      strlcpy(p->uri, uri, sizeof(p->uri));
+      strlcpy(p->device_uri, uri, sizeof(p->device_uri));
       update = 1;
     }
 
@@ -268,10 +255,9 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
       */
 
       p->type = type;
-      /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
-      strncpy(p->hostname, host, sizeof(p->hostname) - 1);
-      strncpy(p->uri, uri, sizeof(p->uri) - 1);
-      strncpy(p->device_uri, uri, sizeof(p->device_uri) - 1);
+      strlcpy(p->hostname, host, sizeof(p->hostname));
+      strlcpy(p->uri, uri, sizeof(p->uri));
+      strlcpy(p->device_uri, uri, sizeof(p->device_uri));
 
       update = 1;
     }
@@ -293,15 +279,13 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
   if (strcmp(p->location, location))
   {
-    /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
-    strncpy(p->location, location, sizeof(p->location) - 1);
+    strlcpy(p->location, location, sizeof(p->location));
     update = 1;
   }
 
   if (strcmp(p->info, info))
   {
-    /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
-    strncpy(p->info, info, sizeof(p->info) - 1);
+    strlcpy(p->info, info, sizeof(p->info));
     update = 1;
   }
 
@@ -320,8 +304,7 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
   if (strcmp(p->make_model, local_make_model))
   {
-    /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
-    strncpy(p->make_model, local_make_model, sizeof(p->make_model) - 1);
+    strlcpy(p->make_model, local_make_model, sizeof(p->make_model));
     update = 1;
   }
 
@@ -1435,7 +1418,7 @@ SendSLPBrowse(printer_t *p)		/* I - Printer to register */
   if (p->type & CUPS_PRINTER_BIND)
   {
     if (finishings[0])
-      strncat(finishings, ",bind", sizeof(finishings) - 1);
+      strlcat(finishings, ",bind", sizeof(finishings));
     else
       strcpy(finishings, "bind");
   }
@@ -1443,7 +1426,7 @@ SendSLPBrowse(printer_t *p)		/* I - Printer to register */
   if (p->type & CUPS_PRINTER_PUNCH)
   {
     if (finishings[0])
-      strncat(finishings, ",punch", sizeof(finishings) - 1);
+      strlcat(finishings, ",punch", sizeof(finishings));
     else
       strcpy(finishings, "punch");
   }
@@ -1451,7 +1434,7 @@ SendSLPBrowse(printer_t *p)		/* I - Printer to register */
   if (p->type & CUPS_PRINTER_COVER)
   {
     if (finishings[0])
-      strncat(finishings, ",cover", sizeof(finishings) - 1);
+      strlcat(finishings, ",cover", sizeof(finishings));
     else
       strcpy(finishings, "cover");
   }
@@ -1459,15 +1442,13 @@ SendSLPBrowse(printer_t *p)		/* I - Printer to register */
   if (p->type & CUPS_PRINTER_SORT)
   {
     if (finishings[0])
-      strncat(finishings, ",sort", sizeof(finishings) - 1);
+      strlcat(finishings, ",sort", sizeof(finishings));
     else
       strcpy(finishings, "sort");
   }
 
   if (!finishings[0])
     strcpy(finishings, "none");
-
-  finishings[sizeof(finishings) - 1] = '\0';
 
  /*
   * Quote any commas in the make and model, location, and info strings
@@ -1756,7 +1737,7 @@ SrvUrlCallback(SLPHandle      hslp, 	/* I - SLP handle */
   * Copy the SLP service URL...
   */
 
-  strncpy(s->url, srvurl, sizeof(s->url));
+  strlcpy(s->url, srvurl, sizeof(s->url));
 
  /* 
   * Link the SLP service URL into the head of the list
@@ -1863,5 +1844,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.12 2002/05/12 11:55:07 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.13 2002/05/16 14:00:09 mike Exp $".
  */

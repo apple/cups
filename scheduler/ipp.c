@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.14 2002/05/15 01:57:02 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.15 2002/05/16 14:00:10 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -655,16 +655,10 @@ add_class(client_t        *con,		/* I - Client connection */
   */
 
   if ((attr = ippFindAttribute(con->request, "printer-location", IPP_TAG_TEXT)) != NULL)
-  {
-    strncpy(pclass->location, attr->values[0].string.text, sizeof(pclass->location) - 1);
-    pclass->location[sizeof(pclass->location) - 1] = '\0';
-  }
+    strlcpy(pclass->location, attr->values[0].string.text, sizeof(pclass->location));
 
   if ((attr = ippFindAttribute(con->request, "printer-info", IPP_TAG_TEXT)) != NULL)
-  {
-    strncpy(pclass->info, attr->values[0].string.text, sizeof(pclass->info) - 1);
-    pclass->info[sizeof(pclass->info) - 1] = '\0';
-  }
+    strlcpy(pclass->info, attr->values[0].string.text, sizeof(pclass->info));
 
   if ((attr = ippFindAttribute(con->request, "printer-is-accepting-jobs", IPP_TAG_BOOLEAN)) != NULL)
   {
@@ -693,19 +687,16 @@ add_class(client_t        *con,		/* I - Client connection */
     pclass->browse_time = 0;
   }
   if ((attr = ippFindAttribute(con->request, "printer-state-message", IPP_TAG_TEXT)) != NULL)
-  {
-    strncpy(pclass->state_message, attr->values[0].string.text,
-            sizeof(pclass->state_message) - 1);
-    pclass->state_message[sizeof(pclass->state_message) - 1] = '\0';
-  }
+    strlcpy(pclass->state_message, attr->values[0].string.text,
+            sizeof(pclass->state_message));
   if ((attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_ZERO)) != NULL &&
       !Classification[0])
   {
-    strncpy(pclass->job_sheets[0], attr->values[0].string.text,
-            sizeof(pclass->job_sheets[0]) - 1);
+    strlcpy(pclass->job_sheets[0], attr->values[0].string.text,
+            sizeof(pclass->job_sheets[0]));
     if (attr->num_values > 1)
-      strncpy(pclass->job_sheets[1], attr->values[1].string.text,
-              sizeof(pclass->job_sheets[1]) - 1);
+      strlcpy(pclass->job_sheets[1], attr->values[1].string.text,
+              sizeof(pclass->job_sheets[1]));
     else
       strcpy(pclass->job_sheets[1], "none");
   }
@@ -1068,16 +1059,12 @@ add_printer(client_t        *con,	/* I - Client connection */
   */
 
   if ((attr = ippFindAttribute(con->request, "printer-location", IPP_TAG_TEXT)) != NULL)
-  {
-    strncpy(printer->location, attr->values[0].string.text, sizeof(printer->location) - 1);
-    printer->location[sizeof(printer->location) - 1] = '\0';
-  }
+    strlcpy(printer->location, attr->values[0].string.text,
+            sizeof(printer->location));
 
   if ((attr = ippFindAttribute(con->request, "printer-info", IPP_TAG_TEXT)) != NULL)
-  {
-    strncpy(printer->info, attr->values[0].string.text, sizeof(printer->info) - 1);
-    printer->info[sizeof(printer->info) - 1] = '\0';
-  }
+    strlcpy(printer->info, attr->values[0].string.text,
+            sizeof(printer->info));
 
   if ((attr = ippFindAttribute(con->request, "device-uri", IPP_TAG_URI)) != NULL)
   {
@@ -1123,9 +1110,8 @@ add_printer(client_t        *con,	/* I - Client connection */
     LogMessage(L_INFO, "Setting %s device-uri to \"%s\" (was \"%s\".)",
                printer->name, attr->values[0].string.text, printer->device_uri);
 
-    strncpy(printer->device_uri, attr->values[0].string.text,
-            sizeof(printer->device_uri) - 1);
-    printer->device_uri[sizeof(printer->device_uri) - 1] = '\0';
+    strlcpy(printer->device_uri, attr->values[0].string.text,
+            sizeof(printer->device_uri));
   }
 
   if ((attr = ippFindAttribute(con->request, "printer-is-accepting-jobs", IPP_TAG_BOOLEAN)) != NULL)
@@ -1155,19 +1141,16 @@ add_printer(client_t        *con,	/* I - Client connection */
     printer->browse_time = 0;
   }
   if ((attr = ippFindAttribute(con->request, "printer-state-message", IPP_TAG_TEXT)) != NULL)
-  {
-    strncpy(printer->state_message, attr->values[0].string.text,
-            sizeof(printer->state_message) - 1);
-    printer->state_message[sizeof(printer->state_message) - 1] = '\0';
-  }
+    strlcpy(printer->state_message, attr->values[0].string.text,
+            sizeof(printer->state_message));
   if ((attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_ZERO)) != NULL &&
       !Classification[0])
   {
-    strncpy(printer->job_sheets[0], attr->values[0].string.text,
-            sizeof(printer->job_sheets[0]) - 1);
+    strlcpy(printer->job_sheets[0], attr->values[0].string.text,
+            sizeof(printer->job_sheets[0]));
     if (attr->num_values > 1)
-      strncpy(printer->job_sheets[1], attr->values[1].string.text,
-              sizeof(printer->job_sheets[1]) - 1);
+      strlcpy(printer->job_sheets[1], attr->values[1].string.text,
+              sizeof(printer->job_sheets[1]));
     else
       strcpy(printer->job_sheets[1], "none");
   }
@@ -1226,10 +1209,7 @@ add_printer(client_t        *con,	/* I - Client connection */
   */
 
   if (con->filename[0])
-  {
-    strncpy(srcfile, con->filename, sizeof(srcfile) - 1);
-    srcfile[sizeof(srcfile) - 1] = '\0';
-  }
+    strlcpy(srcfile, con->filename, sizeof(srcfile));
   else if ((attr = ippFindAttribute(con->request, "ppd-name", IPP_TAG_NAME)) != NULL)
   {
     if (strcmp(attr->values[0].string.text, "raw") == 0)
@@ -1747,17 +1727,13 @@ check_quotas(client_t  *con,	/* I - Client connection */
   attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME);
 
   if (con->username[0])
-  {
-    strncpy(username, con->username, sizeof(username) - 1);
-    username[sizeof(username) - 1] = '\0';
-  }
+    strlcpy(username, con->username, sizeof(username));
   else if (attr != NULL)
   {
     LogMessage(L_DEBUG, "check_quotas: requesting-user-name = \'%s\'",
                attr->values[0].string.text);
 
-    strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
-    username[sizeof(username) - 1] = '\0';
+    strlcpy(username, attr->values[0].string.text, sizeof(username));
   }
   else
     strcpy(username, "anonymous");
@@ -2187,23 +2163,19 @@ create_job(client_t        *con,	/* I - Client connection */
   job->attrs   = con->request;
   con->request = NULL;
 
-  strncpy(job->title, title, sizeof(job->title) - 1);
+  strlcpy(job->title, title, sizeof(job->title));
 
   attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME);
 
   if (con->username[0])
-  {
-    strncpy(job->username, con->username, sizeof(job->username) - 1);
-    job->username[sizeof(job->username) - 1] = '\0';
-  }
+    strlcpy(job->username, con->username, sizeof(job->username));
   else if (attr != NULL)
   {
     LogMessage(L_DEBUG, "create_job: requesting-user-name = \'%s\'",
                attr->values[0].string.text);
 
-    strncpy(job->username, attr->values[0].string.text,
-            sizeof(job->username) - 1);
-    job->username[sizeof(job->username) - 1] = '\0';
+    strlcpy(job->username, attr->values[0].string.text,
+            sizeof(job->username));
   }
   else
     strcpy(job->username, "anonymous");
@@ -3032,15 +3004,9 @@ get_jobs(client_t        *con,		/* I - Client connection */
       attr->values[0].boolean)
   {
     if (con->username[0])
-    {
-      strncpy(username, con->username, sizeof(username) - 1);
-      username[sizeof(username) - 1] = '\0';
-    }
+      strlcpy(username, con->username, sizeof(username));
     else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
-    {
-      strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
-      username[sizeof(username) - 1] = '\0';
-    }
+      strlcpy(username, attr->values[0].string.text, sizeof(username));
     else
       strcpy(username, "anonymous");
   }
@@ -4082,22 +4048,18 @@ print_job(client_t        *con,		/* I - Client connection */
   * Copy the rest of the job info...
   */
 
-  strncpy(job->title, title, sizeof(job->title) - 1);
+  strlcpy(job->title, title, sizeof(job->title));
 
   attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME);
 
   if (con->username[0])
-  {
-    strncpy(job->username, con->username, sizeof(job->username) - 1);
-    job->username[sizeof(job->username) - 1] = '\0';
-  }
+    strlcpy(job->username, con->username, sizeof(job->username));
   else if (attr != NULL)
   {
     LogMessage(L_DEBUG, "print_job: requesting-user-name = \'%s\'",
                attr->values[0].string.text);
 
-    strncpy(job->username, attr->values[0].string.text, sizeof(job->username) - 1);
-    job->username[sizeof(job->username) - 1] = '\0';
+    strlcpy(job->username, attr->values[0].string.text, sizeof(job->username));
   }
   else
     strcpy(job->username, "anonymous");
@@ -4449,11 +4411,8 @@ reject_jobs(client_t        *con,	/* I - Client connection */
                                IPP_TAG_TEXT)) == NULL)
     strcpy(printer->state_message, "Rejecting Jobs");
   else
-  {
-    strncpy(printer->state_message, attr->values[0].string.text,
-            sizeof(printer->state_message) - 1);
-    printer->state_message[sizeof(printer->state_message) - 1] = '\0';
-  }
+    strlcpy(printer->state_message, attr->values[0].string.text,
+            sizeof(printer->state_message));
 
   if (dtype == CUPS_PRINTER_CLASS)
     SaveAllClasses();
@@ -5377,7 +5336,7 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
       */
 
       if (strcmp(attr->name, "job-name") == 0)
-        strncpy(job->title, attr->values[0].string.text, sizeof(job->title) - 1);
+        strlcpy(job->title, attr->values[0].string.text, sizeof(job->title));
       else if (strcmp(attr->name, "job-hold-until") == 0)
       {
         SetJobHoldUntil(job->id, attr->values[0].string.text);
@@ -5600,9 +5559,8 @@ stop_printer(client_t        *con,	/* I - Client connection */
     strcpy(printer->state_message, "Paused");
   else
   {
-    strncpy(printer->state_message, attr->values[0].string.text,
-            sizeof(printer->state_message) - 1);
-    printer->state_message[sizeof(printer->state_message) - 1] = '\0';
+    strlcpy(printer->state_message, attr->values[0].string.text,
+            sizeof(printer->state_message));
   }
 
   if (dtype == CUPS_PRINTER_CLASS)
@@ -5766,13 +5724,11 @@ validate_user(client_t   *con,		/* I - Client connection */
   */
 
   if (con->username[0])
-    strncpy(username, con->username, userlen - 1);
+    strlcpy(username, con->username, userlen);
   else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
-    strncpy(username, attr->values[0].string.text, userlen - 1);
+    strlcpy(username, attr->values[0].string.text, userlen);
   else
-    strncpy(username, "anonymous", userlen - 1);
-
-  username[userlen - 1] = '\0';
+    strlcpy(username, "anonymous", userlen);
 
  /*
   * Check the username against the owner...
@@ -5823,5 +5779,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.14 2002/05/15 01:57:02 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.15 2002/05/16 14:00:10 mike Exp $".
  */

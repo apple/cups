@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- Now use strlcat() and strlcpy() (or emulation
+	  functions) for easier string/buffer protection.
 	- The auto-generated printcap/printers.conf files now
 	  have a small comment header explaining where the file
 	  comes from...

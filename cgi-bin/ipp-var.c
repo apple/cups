@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.23.2.3 2002/04/08 16:28:59 mike Exp $"
+ * "$Id: ipp-var.c,v 1.23.2.4 2002/05/16 13:59:56 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -177,14 +177,13 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
       * Copy values...
       */
 
-      value[0]                 = '\0';	/* Initially an empty string */
-      value[sizeof(value) - 1] = '\0';	/* In case string gets full */
-      valptr                   = value; /* Start at the beginning */
+      value[0] = '\0';	/* Initially an empty string */
+      valptr   = value; /* Start at the beginning */
 
       for (i = 0; i < attr->num_values; i ++)
       {
 	if (i)
-	  strncat(valptr, ",", sizeof(value) - (valptr - value) - 1);
+	  strlcat(valptr, ",", sizeof(value) - (valptr - value));
 
 	valptr += strlen(valptr);
 
@@ -209,7 +208,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 	      break;
 
 	  case IPP_TAG_NOVALUE :
-	      strncat(valptr, "novalue", sizeof(value) - (valptr - value) - 1);
+	      strlcat(valptr, "novalue", sizeof(value) - (valptr - value));
 	      break;
 
 	  case IPP_TAG_RANGE :
@@ -245,8 +244,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 		    * Make URI relative to the current server...
 		    */
 
-                    strncpy(uri, resource, sizeof(uri) - 1);
-		    uri[sizeof(uri) - 1] = '\0';
+                    strlcpy(uri, resource, sizeof(uri));
 		  }
 		  else
 		  {
@@ -264,7 +262,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 			       hostname, port, resource);
                   }
 
-		  strncat(valptr, uri, sizeof(value) - (valptr - value) - 1);
+		  strlcat(valptr, uri, sizeof(value) - (valptr - value));
         	  break;
         	}
               }
@@ -275,8 +273,8 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 	  case IPP_TAG_KEYWORD :
 	  case IPP_TAG_CHARSET :
 	  case IPP_TAG_LANGUAGE :
-	      strncat(valptr, attr->values[i].string.text,
-	              sizeof(value) - (valptr - value) - 1);
+	      strlcat(valptr, attr->values[i].string.text,
+	              sizeof(value) - (valptr - value));
 	      break;
 
           default :
@@ -298,5 +296,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.23.2.3 2002/04/08 16:28:59 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.23.2.4 2002/05/16 13:59:56 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: template.c,v 1.22.2.2 2002/01/02 18:04:21 mike Exp $"
+ * "$Id: template.c,v 1.22.2.3 2002/05/16 13:59:57 mike Exp $"
  *
  *   CGI template function.
  *
@@ -373,28 +373,19 @@ cgi_copy(FILE *out,		/* I - Output file */
 	      if ((innerval = cgiGetArray(innername, atoi(innerptr) - 1)) == NULL)
 	        *s = '\0';
 	      else
-	      {
-	        strncpy(s, innerval, sizeof(compare) - (s - compare) - 1);
-		compare[sizeof(compare) - 1] = '\0';
-	      }
+	        strlcpy(s, innerval, sizeof(compare) - (s - compare));
 	    }
 	    else if (innername[0] == '?')
 	    {
 	      if ((innerval = cgiGetArray(innername + 1, element)) == NULL)
 		*s = '\0';
 	      else
-	      {
-	        strncpy(s, innerval, sizeof(compare) - (s - compare) - 1);
-		compare[sizeof(compare) - 1] = '\0';
-	      }
+	        strlcpy(s, innerval, sizeof(compare) - (s - compare));
             }
 	    else if ((innerval = cgiGetArray(innername, element)) == NULL)
 	      snprintf(s, sizeof(s), "{%s}", innername);
 	    else
-	    {
-	      strncpy(s, innerval, sizeof(compare) - (s - compare) - 1);
-	      compare[sizeof(compare) - 1] = '\0';
-	    }
+	      strlcpy(s, innerval, sizeof(compare) - (s - compare));
 
             s += strlen(s);
 	  }
@@ -497,5 +488,5 @@ cgi_puts(const char *s,
 
 
 /*
- * End of "$Id: template.c,v 1.22.2.2 2002/01/02 18:04:21 mike Exp $".
+ * End of "$Id: template.c,v 1.22.2.3 2002/05/16 13:59:57 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: string.c,v 1.5.2.5 2002/05/15 01:57:01 mike Exp $"
+ * "$Id: string.c,v 1.5.2.6 2002/05/16 14:00:00 mike Exp $"
  *
  *   String functions for the Common UNIX Printing System (CUPS).
  *
@@ -28,6 +28,8 @@
  *   cups_strdup()      - Duplicate a string.
  *   cups_strcasecmp()  - Do a case-insensitive comparison.
  *   cups_strncasecmp() - Do a case-insensitive comparison on up to N chars.
+ *   cups_strlcat()     - Safely concatenate two strings.
+ *   cups_strlcpy()     - Safely copy two strings.
  */
 
 /*
@@ -119,9 +121,90 @@ cups_strncasecmp(const char *s,	/* I - First string */
   else
     return (-1);
 }
-#  endif /* !HAVE_STRNCASECMP */
+#endif /* !HAVE_STRNCASECMP */
+
+
+#ifndef HAVE_STRLCAT
+/*
+ * 'cups_strlcat()' - Safely concatenate two strings.
+ */
+
+size_t				/* O - Length of string */
+cups_strlcat(char       *dst,	/* O - Destination string */
+             const char *src,	/* I - Source string */
+	     size_t     size)	/* I - Size of destination string buffer */
+{
+  size_t	srclen;		/* Length of source string */
+  size_t	dstlen;		/* Length of destination string */
+
+
+ /*
+  * Figure out how much room is left...
+  */
+
+  dstlen = strlen(dst);
+  size   -= dstlen + 1;
+
+  if (!size)
+    return (dstlen);		/* No room, return immediately... */
+
+ /*
+  * Figure out how much room is needed...
+  */
+
+  srclen = strlen(src);
+
+ /*
+  * Copy the appropriate amount...
+  */
+
+  if (srclen > size)
+    srclen = size;
+
+  memcpy(dst + dstlen, src, srclen);
+  dst[dstlen + srclen] = '\0';
+
+  return (dstlen + srclen);
+}
+#endif /* !HAVE_STRLCAT */
+
+
+#ifndef HAVE_STRLCPY
+/*
+ * 'cups_strlcpy()' - Safely copy two strings.
+ */
+
+size_t				/* O - Length of string */
+cups_strlcpy(char       *dst,	/* O - Destination string */
+             const char *src,	/* I - Source string */
+	     size_t      size)	/* I - Size of destination string buffer */
+{
+  size_t	srclen;		/* Length of source string */
+
+
+ /*
+  * Figure out how much room is needed...
+  */
+
+  size --;
+
+  srclen = strlen(src);
+
+ /*
+  * Copy the appropriate amount...
+  */
+
+  if (srclen > size)
+    srclen = size;
+
+  memcpy(dst, src, srclen);
+  dst[srclen] = '\0';
+
+  return (srclen);
+}
+#endif /* !HAVE_STRLCPY */
 
 
 /*
- * End of "$Id: string.c,v 1.5.2.5 2002/05/15 01:57:01 mike Exp $".
+ * End of "$Id: string.c,v 1.5.2.6 2002/05/16 14:00:00 mike Exp $".
  */

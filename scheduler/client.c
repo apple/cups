@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.11 2002/05/15 01:57:01 mike Exp $"
+ * "$Id: client.c,v 1.91.2.12 2002/05/16 14:00:07 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -139,7 +139,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
     * Map accesses from the same host to the server name.
     */
 
-    strncpy(con->http.hostname, ServerName, sizeof(con->http.hostname) - 1);
+    strlcpy(con->http.hostname, ServerName, sizeof(con->http.hostname));
   }
 
   if (hostname == NULL && HostNameLookups == 2)
@@ -1962,11 +1962,8 @@ decode_auth(client_t *con)		/* I - Client to decode to */
 
     *s++ = '\0';
 
-    strncpy(con->username, value, sizeof(con->username) - 1);
-    con->username[sizeof(con->username) - 1] = '\0';
-
-    strncpy(con->password, s, sizeof(con->password) - 1);
-    con->password[sizeof(con->password) - 1] = '\0';
+    strlcpy(con->username, value, sizeof(con->username));
+    strlcpy(con->password, s, sizeof(con->password));
   }
   else if (strncmp(s, "Local", 5) == 0)
   {
@@ -1975,10 +1972,7 @@ decode_auth(client_t *con)		/* I - Client to decode to */
       s ++;
 
     if ((username = FindCert(s)) != NULL)
-    {
-      strncpy(con->username, username, sizeof(con->username) - 1);
-      con->username[sizeof(con->username) - 1] = '\0';
-    }
+      strlcpy(con->username, username, sizeof(con->username));
   }
   else if (strncmp(s, "Digest", 5) == 0)
   {
@@ -1988,17 +1982,11 @@ decode_auth(client_t *con)		/* I - Client to decode to */
 
     if (httpGetSubField(&(con->http), HTTP_FIELD_WWW_AUTHENTICATE, "username",
                         value))
-    {
-      strncpy(con->username, value, sizeof(con->username) - 1);
-      con->username[sizeof(con->username) - 1] = '\0';
-    }
+      strlcpy(con->username, value, sizeof(con->username));
 
     if (httpGetSubField(&(con->http), HTTP_FIELD_WWW_AUTHENTICATE, "response",
                         value))
-    {
-      strncpy(con->password, value, sizeof(con->password) - 1);
-      con->password[sizeof(con->password) - 1] = '\0';
-    }
+      strlcpy(con->password, value, sizeof(con->password) - 1);
   }
 
   LogMessage(L_DEBUG2, "decode_auth() %d username=\"%s\"",
@@ -2063,11 +2051,9 @@ get_file(client_t    *con,	/* I - Client connection */
   if (!status && S_ISDIR(filestats->st_mode))
   {
     if (filename[strlen(filename) - 1] == '/')
-      strncat(filename, "index.html", sizeof(filename));
+      strlcat(filename, "index.html", sizeof(filename));
     else
-      strncat(filename, "/index.html", sizeof(filename));
-
-    filename[sizeof(filename) - 1] = '\0';
+      strlcat(filename, "/index.html", sizeof(filename));
 
     status = stat(filename, filestats);
   }
@@ -2276,8 +2262,7 @@ pipe_command(client_t *con,	/* I - Client connection */
   * Copy the command string...
   */
 
-  strncpy(argbuf, options, sizeof(argbuf) - 1);
-  argbuf[sizeof(argbuf) - 1] = '\0';
+  strlcpy(argbuf, options, sizeof(argbuf));
 
  /*
   * Parse the string; arguments can be separated by + and are terminated
@@ -2536,5 +2521,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.11 2002/05/15 01:57:01 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.12 2002/05/16 14:00:07 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: accept.c,v 1.11.2.5 2002/05/09 03:08:04 mike Exp $"
+ * "$Id: accept.c,v 1.11.2.6 2002/05/16 14:00:17 mike Exp $"
  *
  *   "accept", "disable", "enable", and "reject" commands for the Common
  *   UNIX Printing System (CUPS).
@@ -33,9 +33,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
-
-#include <config.h>
+#include <cups/string.h>
 #include <cups/cups.h>
 #include <cups/language.h>
 
@@ -177,10 +175,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       */
 
       if (sscanf(argv[i], "%1023[^@]@%1023s", printer, hostname) == 1)
-      {
-	strncpy(hostname, server, sizeof(hostname) - 1);
-	hostname[sizeof(hostname) - 1] = '\0';
-      }
+	strlcpy(hostname, server, sizeof(hostname));
 
       if (http != NULL && strcasecmp(http->hostname, hostname) != 0)
       {
@@ -311,5 +306,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: accept.c,v 1.11.2.5 2002/05/09 03:08:04 mike Exp $".
+ * End of "$Id: accept.c,v 1.11.2.6 2002/05/16 14:00:17 mike Exp $".
  */

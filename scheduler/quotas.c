@@ -1,5 +1,5 @@
 /*
- * "$Id: quotas.c,v 1.4.2.2 2002/01/02 18:05:05 mike Exp $"
+ * "$Id: quotas.c,v 1.4.2.3 2002/05/16 14:00:16 mike Exp $"
  *
  *   Quota routines for the Common UNIX Printing System (CUPS).
  *
@@ -71,7 +71,7 @@ AddQuota(printer_t  *p,			/* I - Printer */
   p->num_quotas ++;
 
   memset(q, 0, sizeof(quota_t));
-  strncpy(q->username, username, sizeof(q->username) - 1);
+  strlcpy(q->username, username, sizeof(q->username));
 
   if (p->num_quotas > 1)
     qsort(p->quotas, p->num_quotas, sizeof(quota_t),
@@ -100,8 +100,7 @@ FindQuota(printer_t  *p,		/* I - Printer */
     q = NULL;
   else
   {
-    strncpy(match.username, username, sizeof(match.username) - 1);
-    match.username[sizeof(match.username) - 1] = '\0';
+    strlcpy(match.username, username, sizeof(match.username));
 
     q = bsearch(&match, p->quotas, p->num_quotas, sizeof(quota_t),
                 (int(*)(const void *, const void *))compare);
@@ -232,5 +231,5 @@ compare(const quota_t *q1,		/* I - First quota record */
 
 
 /*
- * End of "$Id: quotas.c,v 1.4.2.2 2002/01/02 18:05:05 mike Exp $".
+ * End of "$Id: quotas.c,v 1.4.2.3 2002/05/16 14:00:16 mike Exp $".
  */

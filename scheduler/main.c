@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.13 2002/05/12 11:55:08 mike Exp $"
+ * "$Id: main.c,v 1.57.2.14 2002/05/16 14:00:14 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -114,8 +114,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	        * Absolute directory...
 		*/
 
-		strncpy(ConfigurationFile, argv[i], sizeof(ConfigurationFile) - 1);
-		ConfigurationFile[sizeof(ConfigurationFile) - 1] = '\0';
+		strlcpy(ConfigurationFile, argv[i], sizeof(ConfigurationFile));
               }
 	      else
 	      {
@@ -124,9 +123,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		*/
 
                 getcwd(ConfigurationFile, sizeof(ConfigurationFile));
-		strncat(ConfigurationFile, "/", sizeof(ConfigurationFile) - 1);
-		strncat(ConfigurationFile, argv[i], sizeof(ConfigurationFile) - 1);
-		ConfigurationFile[sizeof(ConfigurationFile) - 1] = '\0';
+		strlcat(ConfigurationFile, "/", sizeof(ConfigurationFile));
+		strlcat(ConfigurationFile, argv[i], sizeof(ConfigurationFile));
               }
 	      break;
 
@@ -815,5 +813,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.13 2002/05/12 11:55:08 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.14 2002/05/16 14:00:14 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: string.h,v 1.7.2.7 2002/05/15 01:57:01 mike Exp $"
+ * "$Id: string.h,v 1.7.2.8 2002/05/16 14:00:00 mike Exp $"
  *
  *   String definitions for the Common UNIX Printing System (CUPS).
  *
@@ -24,8 +24,8 @@
  *   This file is subject to the Apple OS-Developed Software exception.
  */
 
-#ifndef _IPP_STRING_H_
-#  define _IPP_STRING_H_
+#ifndef _CUPS_STRING_H_
+#  define _CUPS_STRING_H_
 
 /*
  * Include necessary headers...
@@ -84,6 +84,16 @@ extern int	cups_strncasecmp(const char *, const char *, size_t n);
 #    define strncasecmp cups_strncasecmp
 #  endif /* !HAVE_STRNCASECMP */
 
+#  ifndef HAVE_STRLCAT
+extern size_t cups_strlcat(char *, const char *, size_t);
+#    define strlcat cups_strlcat
+#  endif /* !HAVE_STRLCAT */
+
+#  ifndef HAVE_STRLCPY
+extern size_t cups_strlcpy(char *, const char *, size_t);
+#    define strlcpy cups_strlcpy
+#  endif /* !HAVE_STRLCPY */
+
 #  ifndef HAVE_SNPRINTF
 extern int	cups_snprintf(char *, size_t, const char *, ...)
 #    ifdef __GNUC__
@@ -107,8 +117,8 @@ extern int	cups_vsnprintf(char *, size_t, const char *, va_list);
 }
 #  endif /* __cplusplus */
 
-#endif /* !_IPP_STRING_H_ */
+#endif /* !_CUPS_STRING_H_ */
 
 /*
- * End of "$Id: string.h,v 1.7.2.7 2002/05/15 01:57:01 mike Exp $".
+ * End of "$Id: string.h,v 1.7.2.8 2002/05/16 14:00:00 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: devices.c,v 1.14.2.2 2002/01/02 18:05:01 mike Exp $"
+ * "$Id: devices.c,v 1.14.2.3 2002/05/16 14:00:09 mike Exp $"
  *
  *   Device scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -225,11 +225,11 @@ LoadDevices(const char *d)	/* I - Directory to scan */
 	  num_devs ++;
 
 	  memset(dev, 0, sizeof(dev_info_t));
-	  strncpy(dev->device_class, dclass, sizeof(dev->device_class) - 1);
-	  strncpy(dev->device_info, info, sizeof(dev->device_info) - 1);
-	  strncpy(dev->device_make_and_model, make_model,
-        	  sizeof(dev->device_make_and_model) - 1);
-	  strncpy(dev->device_uri, uri, sizeof(dev->device_uri) - 1);
+	  strlcpy(dev->device_class, dclass, sizeof(dev->device_class));
+	  strlcpy(dev->device_info, info, sizeof(dev->device_info));
+	  strlcpy(dev->device_make_and_model, make_model,
+        	  sizeof(dev->device_make_and_model));
+	  strlcpy(dev->device_uri, uri, sizeof(dev->device_uri));
 
           LogMessage(L_DEBUG, "LoadDevices: Added device \"%s\"...", uri);
 	  count ++;
@@ -282,7 +282,7 @@ LoadDevices(const char *d)	/* I - Directory to scan */
 	snprintf(dev->device_info, sizeof(dev->device_info),
 	         "Unknown Network Device (%s)", dent->d_name);
 	strcpy(dev->device_make_and_model, "Unknown");
-	strncpy(dev->device_uri, dent->d_name, sizeof(dev->device_uri) - 1);
+	strlcpy(dev->device_uri, dent->d_name, sizeof(dev->device_uri));
 
         LogMessage(L_DEBUG, "LoadDevices: Compatibility device \"%s\"...",
 	           dent->d_name);
@@ -478,5 +478,5 @@ sigalrm_handler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: devices.c,v 1.14.2.2 2002/01/02 18:05:01 mike Exp $".
+ * End of "$Id: devices.c,v 1.14.2.3 2002/05/16 14:00:09 mike Exp $".
  */

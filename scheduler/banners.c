@@ -1,5 +1,5 @@
 /*
- * "$Id: banners.c,v 1.5.2.2 2002/01/02 18:04:58 mike Exp $"
+ * "$Id: banners.c,v 1.5.2.3 2002/05/16 14:00:06 mike Exp $"
  *
  *   Banner routines for the Common UNIX Printing System (CUPS).
  *
@@ -90,7 +90,7 @@ AddBanner(const char *name,	/* I - Name of banner */
   NumBanners ++;
 
   memset(temp, 0, sizeof(banner_t));
-  strncpy(temp->name, name, sizeof(temp->name) - 1);
+  strlcpy(temp->name, name, sizeof(temp->name));
   temp->filetype = filetype;
 }
 
@@ -105,8 +105,7 @@ FindBanner(const char *name)	/* I - Name of banner */
   banner_t	key;		/* Search key */
 
 
-  strncpy(key.name, name, sizeof(key.name) - 1);
-  key.name[sizeof(key.name) - 1] = '\0';
+  strlcpy(key.name, name, sizeof(key.name));
 
   return ((banner_t *)bsearch(&key, Banners, NumBanners, sizeof(banner_t),
                               (int (*)(const void *, const void *))compare));
@@ -212,5 +211,5 @@ compare(const banner_t *b0,	/* I - First banner */
 
 
 /*
- * End of "$Id: banners.c,v 1.5.2.2 2002/01/02 18:04:58 mike Exp $".
+ * End of "$Id: banners.c,v 1.5.2.3 2002/05/16 14:00:06 mike Exp $".
  */

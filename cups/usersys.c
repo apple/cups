@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c,v 1.14.2.2 2002/03/01 19:55:14 mike Exp $"
+ * "$Id: usersys.c,v 1.14.2.3 2002/05/16 14:00:00 mike Exp $"
  *
  *   User, system, and password routines for the Common UNIX Printing
  *   System (CUPS).
@@ -260,8 +260,7 @@ cupsServer(void)
     * Copy the server name over...
     */
 
-    strncpy(cups_server, server, sizeof(cups_server) - 1);
-    cups_server[sizeof(cups_server) - 1] = '\0';
+    strlcpy(cups_server, server, sizeof(cups_server));
   }
 
   return (cups_server);
@@ -290,10 +289,7 @@ void
 cupsSetServer(const char *server)	/* I - Server name */
 {
   if (server)
-  {
-    strncpy(cups_server, server, sizeof(cups_server) - 1);
-    cups_server[sizeof(cups_server) - 1] = '\0';
-  }
+    strlcpy(cups_server, server, sizeof(cups_server));
   else
     cups_server[0] = '\0';
 }
@@ -307,10 +303,7 @@ void
 cupsSetUser(const char *user)		/* I - User name */
 {
   if (user)
-  {
-    strncpy(cups_user, user, sizeof(cups_user) - 1);
-    cups_user[sizeof(cups_user) - 1] = '\0';
-  }
+    strlcpy(cups_user, user, sizeof(cups_user));
   else
     cups_user[0] = '\0';
 }
@@ -383,8 +376,7 @@ cupsUser(void)
 
       setpwent();
 
-      strncpy(cups_user, pwd->pw_name, sizeof(cups_user) - 1);
-      cups_user[sizeof(cups_user) - 1] = '\0';
+      strlcpy(cups_user, pwd->pw_name, sizeof(cups_user));
     }
 
    /*
@@ -445,5 +437,5 @@ cups_get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: usersys.c,v 1.14.2.2 2002/03/01 19:55:14 mike Exp $".
+ * End of "$Id: usersys.c,v 1.14.2.3 2002/05/16 14:00:00 mike Exp $".
  */

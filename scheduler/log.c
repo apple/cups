@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.19.2.5 2002/05/14 01:25:43 mike Exp $"
+ * "$Id: log.c,v 1.19.2.6 2002/05/16 14:00:14 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -354,8 +354,8 @@ check_log_file(FILE       **log,	/* IO - Log file */
 
     if (logname[0] != '/')
     {
-      strncpy(filename, ServerRoot, sizeof(filename) - 1);
-      strncat(filename, "/", sizeof(filename) - 1);
+      strlcpy(filename, ServerRoot, sizeof(filename));
+      strlcat(filename, "/", sizeof(filename));
     }
     else
       filename[0] = '\0';
@@ -376,7 +376,7 @@ check_log_file(FILE       **log,	/* IO - Log file */
 	  * Insert the server name...
 	  */
 
-	  strncpy(ptr, ServerName, sizeof(filename) - (ptr - filename) - 1);
+	  strlcpy(ptr, ServerName, sizeof(filename) - (ptr - filename));
 	  ptr += strlen(ptr);
 	}
         else
@@ -424,8 +424,7 @@ check_log_file(FILE       **log,	/* IO - Log file */
     fclose(*log);
 
     strcpy(backname, filename);
-    strncat(backname, ".O", sizeof(backname) - 1);
-    backname[sizeof(backname) - 1] = '\0';
+    strlcat(backname, ".O", sizeof(backname));
 
     unlink(backname);
     rename(filename, backname);
@@ -442,5 +441,5 @@ check_log_file(FILE       **log,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c,v 1.19.2.5 2002/05/14 01:25:43 mike Exp $".
+ * End of "$Id: log.c,v 1.19.2.6 2002/05/16 14:00:14 mike Exp $".
  */

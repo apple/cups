@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.18.2.10 2002/03/25 18:07:58 mike Exp $"
+ * "$Id: usb.c,v 1.18.2.11 2002/05/16 13:59:54 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -338,12 +338,12 @@ list_devices(void)
 
         if (strncmp(line, "S:  Manufacturer=", 17) == 0)
 	{
-	  strncpy(make, line + 17, sizeof(make) - 1);
+	  strlcpy(make, line + 17, sizeof(make));
 	  if (strcmp(make, "Hewlett-Packard") == 0)
 	    strcpy(make, "HP");
 	}
         else if (strncmp(line, "S:  Product=", 12) == 0)
-	  strncpy(model, line + 12, sizeof(model) - 1);
+	  strlcpy(model, line + 12, sizeof(model));
       }
       else if (strncmp(line, "I:", 2) == 0 &&
                (strstr(line, "Driver=printer") != NULL ||
@@ -456,5 +456,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: usb.c,v 1.18.2.10 2002/03/25 18:07:58 mike Exp $".
+ * End of "$Id: usb.c,v 1.18.2.11 2002/05/16 13:59:54 mike Exp $".
  */

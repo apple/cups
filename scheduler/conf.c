@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.9 2002/05/14 01:25:41 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.10 2002/05/16 14:00:08 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -259,8 +259,7 @@ ReadConfiguration(void)
   else if (strcmp(language, "C") == 0 || strcmp(language, "POSIX") == 0)
     language = "en";
 
-  strncpy(DefaultLanguage, language, sizeof(DefaultLanguage) - 1);
-  DefaultLanguage[sizeof(DefaultLanguage) - 1] = '\0';
+  strlcpy(DefaultLanguage, language, sizeof(DefaultLanguage));
 
   strcpy(DefaultCharset, DEFAULT_CHARSET);
 
@@ -269,10 +268,7 @@ ReadConfiguration(void)
   if (getenv("TMPDIR") == NULL)
     strcpy(TempDir, CUPS_REQUESTS "/tmp");
   else
-  {
-    strncpy(TempDir, getenv("TMPDIR"), sizeof(TempDir) - 1);
-    TempDir[sizeof(TempDir) - 1] = '\0';
-  }
+    strlcpy(TempDir, getenv("TMPDIR"), sizeof(TempDir));
 
  /*
   * Find the default system group: "sys", "system", or "root"...
@@ -408,30 +404,26 @@ ReadConfiguration(void)
   if (DocumentRoot[0] != '/')
   {
     snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, DocumentRoot);
-    strncpy(DocumentRoot, directory, sizeof(DocumentRoot) - 1);
-    DocumentRoot[sizeof(DocumentRoot) - 1] = '\0';
+    strlcpy(DocumentRoot, directory, sizeof(DocumentRoot));
   }
 
   if (RequestRoot[0] != '/')
   {
     snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, RequestRoot);
-    strncpy(RequestRoot, directory, sizeof(RequestRoot) - 1);
-    RequestRoot[sizeof(RequestRoot) - 1] = '\0';
+    strlcpy(RequestRoot, directory, sizeof(RequestRoot));
   }
 
   if (ServerBin[0] != '/')
   {
     snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, ServerBin);
-    strncpy(ServerBin, directory, sizeof(ServerBin) - 1);
-    ServerBin[sizeof(ServerBin) - 1] = '\0';
+    strlcpy(ServerBin, directory, sizeof(ServerBin));
   }
 
 #ifdef HAVE_LIBSSL
   if (ServerCertificate[0] != '/')
   {
     snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, ServerCertificate);
-    strncpy(ServerCertificate, directory, sizeof(ServerCertificate) - 1);
-    ServerCertificate[sizeof(ServerCertificate) - 1] = '\0';
+    strlcpy(ServerCertificate, directory, sizeof(ServerCertificate));
   }
 
   chown(ServerCertificate, User, Group);
@@ -440,8 +432,7 @@ ReadConfiguration(void)
   if (ServerKey[0] != '/')
   {
     snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, ServerKey);
-    strncpy(ServerKey, directory, sizeof(ServerKey) - 1);
-    ServerKey[sizeof(ServerKey) - 1] = '\0';
+    strlcpy(ServerKey, directory, sizeof(ServerKey));
   }
 
   chown(ServerKey, User, Group);
@@ -689,10 +680,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
       */
 
       if (value[0] == '/')
-      {
-        strncpy(incname, value, sizeof(incname) - 1);
-	incname[sizeof(incname) - 1] = '\0';
-      }
+        strlcpy(incname, value, sizeof(incname));
       else
         snprintf(incname, sizeof(incname), "%s/%s", ServerRoot, value);
 
@@ -821,8 +809,8 @@ read_configuration(FILE *fp)		/* I - File to read from */
 	  * Send browse data to the named interface...
 	  */
 
-	  strncpy(Browsers[NumBrowsers].iface, value + 4,
-	          sizeof(Browsers[0].iface) - 1);
+	  strlcpy(Browsers[NumBrowsers].iface, value + 4,
+	          sizeof(Browsers[0].iface));
 
           nameptr = Browsers[NumBrowsers].iface +
 	            strlen(Browsers[NumBrowsers].iface) - 1;
@@ -1254,8 +1242,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
         if (*valueptr)
           *valueptr++ = '\0';
 
-        strncpy(SystemGroups[i], value, sizeof(SystemGroups[0]));
-	SystemGroups[i][sizeof(SystemGroups[0]) - 1] = '\0';
+        strlcpy(SystemGroups[i], value, sizeof(SystemGroups[0]));
 
         while (*value == ',' || isspace(*value))
 	  value ++;
@@ -1389,8 +1376,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
 	    break;
 
 	case VAR_STRING :
-	    strncpy((char *)var->ptr, value, var->size - 1);
-	    value[var->size - 1] = '\0';
+	    strlcpy((char *)var->ptr, value, var->size);
 	    break;
       }
     }
@@ -1837,8 +1823,7 @@ get_address(const char  *value,		/* I - Value string */
 	  * Hostname is a port number...
 	  */
 
-	  strncpy(portname, hostname, sizeof(portname) - 1);
-	  portname[sizeof(portname) - 1] = '\0';
+	  strlcpy(portname, hostname, sizeof(portname));
 	  hostname[0] = '\0';
 	}
         else
@@ -2035,5 +2020,5 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.9 2002/05/14 01:25:41 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.10 2002/05/16 14:00:08 mike Exp $".
  */

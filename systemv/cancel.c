@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.19.2.4 2002/05/09 03:08:04 mike Exp $"
+ * "$Id: cancel.c,v 1.19.2.5 2002/05/16 14:00:17 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -32,9 +32,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
-
-#include <config.h>
+#include <cups/string.h>
 #include <cups/cups.h>
 #include <cups/language.h>
 
@@ -162,8 +160,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
       else
       {
-        strncpy(name, argv[i], sizeof(name) - 1);
-	name[sizeof(name) - 1] = '\0';
+        strlcpy(name, argv[i], sizeof(name));
 
 	dest   = name;
         job_id = 0;
@@ -281,5 +278,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c,v 1.19.2.4 2002/05/09 03:08:04 mike Exp $".
+ * End of "$Id: cancel.c,v 1.19.2.5 2002/05/16 14:00:17 mike Exp $".
  */
