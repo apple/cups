@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.11 1999/07/27 16:47:05 mike Exp $"
+ * "$Id: gdevcups.c,v 1.12 1999/09/13 12:26:13 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -578,7 +578,7 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
                    gx_color_value b)		/* I - Blue value */
 {
   gx_color_index	i;			/* Temporary index */
-  gx_color_value	ic, im, iy, ik;		/* Integral CMYKcm values */
+  gx_color_value	ic, im, iy, ik, mk;	/* Integral CMYK values */
   float			divk,			/* Black "divisor" */
 			diff;			/* Average color difference */
   int			tc, tm, ty, tk;		/* Temporary color values */
@@ -779,12 +779,18 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 	iy = gx_max_color_value - b;
         ik = min(ic, min(im, iy));
 
+#if 0
         if (ik > 0)
 	{
 	  diff = 1.0 - (float)(max(ic, max(im, iy)) - ik) /
 	               (float)gx_max_color_value;
           ik   = (int)(diff * (float)ik);
 	}
+#else
+        mk = max(ic, max(im, iy));
+        if (mk > ik)
+	  ik = ik * ik / mk;
+#endif /* 0 */
 
         if (ik == gx_max_color_value)
         {
@@ -854,12 +860,18 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 	iy = gx_max_color_value - b;
         ik = min(ic, min(im, iy));
 
+#if 0
         if (ik > 0)
 	{
 	  diff = 1.0 - (float)(max(ic, max(im, iy)) - ik) /
 	               (float)gx_max_color_value;
           ik   = (int)(diff * (float)ik);
 	}
+#else
+        mk = max(ic, max(im, iy));
+        if (mk > ik)
+	  ik = ik * ik / mk;
+#endif /* 0 */
 
         if (ik == gx_max_color_value)
         {
@@ -925,12 +937,6 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 	  iy = gx_max_color_value - b;
           ik = min(ic, min(im, iy));
 
-          if (ik > 0)
-	  {
-	    diff = 1.0 - (float)(max(ic, max(im, iy)) - ik) / (float)ik;
-            ik   = (int)(diff * (float)ik);
-	  }
-
           ic = lut_rgb_color[ic - ik];
           im = lut_rgb_color[im - ik];
           iy = lut_rgb_color[iy - ik];
@@ -960,12 +966,18 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 	iy = gx_max_color_value - b;
         ik = min(ic, min(im, iy));
 
+#if 0
         if (ik > 0)
 	{
 	  diff = 1.0 - (float)(max(ic, max(im, iy)) - ik) /
 	               (float)gx_max_color_value;
           ik   = (int)(diff * (float)ik);
 	}
+#else
+        mk = max(ic, max(im, iy));
+        if (mk > ik)
+	  ik = ik * ik / mk;
+#endif /* 0 */
 
         if (ik == gx_max_color_value)
         {
@@ -2455,5 +2467,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.11 1999/07/27 16:47:05 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.12 1999/09/13 12:26:13 mike Exp $".
  */
