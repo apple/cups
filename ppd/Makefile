@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.1 1999/05/17 18:03:38 mike Exp $"
+# "$Id: Makefile,v 1.2 1999/05/19 18:00:57 mike Exp $"
 #
 #   PPD file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -47,9 +47,9 @@ clean:
 #
 
 install:
-	-$(MKDIR) $(SERVERROOT)/ppd
-	$(CP) $(FILES) $(SERVERROOT)/ppd
+	-$(MKDIR) $(DATADIR)/model
+	$(CP) $(FILES) $(DATADIR)/model
 
 #
-# End of "$Id: Makefile,v 1.1 1999/05/17 18:03:38 mike Exp $".
+# End of "$Id: Makefile,v 1.2 1999/05/19 18:00:57 mike Exp $".
 #

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.8 1999/05/14 17:02:53 mike Exp $"
+# "$Id: Makefile,v 1.9 1999/05/19 18:00:49 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -61,7 +61,8 @@ install:
 	(cd data; make install)
 	(cd doc; make install)
 	(cd fonts; make install)
+	(cd ppd; make install)
 
 #
-# End of "$Id: Makefile,v 1.8 1999/05/14 17:02:53 mike Exp $".
+# End of "$Id: Makefile,v 1.9 1999/05/19 18:00:49 mike Exp $".
 #

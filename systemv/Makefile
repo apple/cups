@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.5 1999/05/10 21:36:09 mike Exp $"
+# "$Id: Makefile,v 1.6 1999/05/19 18:01:00 mike Exp $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -24,8 +24,8 @@
 
 include ../Makedefs
 
-TARGETS	=	accept cancel lp lpstat
-OBJS	=	accept.o cancel.o lp.o lpstat.o
+TARGETS	=	accept cancel lp lpadmin lpstat
+OBJS	=	accept.o cancel.o lp.o lpadmin.o lpstat.o
 
 #
 # Make all targets...
@@ -47,7 +47,7 @@ clean:
 install:
 	-$(MKDIR) $(BINDIR)
 	-$(MKDIR) $(LIBDIR)
-	$(CP) accept $(LIBDIR)
+	$(CP) accept lpadmin $(LIBDIR)
 	$(LN) accept $(LIBDIR)/reject
 	$(LN) $(LIBDIR)/accept $(BINDIR)/disable
 	$(LN) $(LIBDIR)/accept $(BINDIR)/enable
@@ -84,6 +84,15 @@ lp:	lp.o ../cups/libcups.a
 lp.o:	../cups/cups.h ../Makedefs
 
 #
+# lpadmin
+#
+
+lpadmin:	lpadmin.o ../cups/libcups.a
+	$(CC) $(LDFLAGS) -o lpadmin lpadmin.o $(LIBS)
+
+lpadmin.o:	../cups/cups.h ../Makedefs
+
+#
 # lpstat
 #
 
@@ -93,5 +102,5 @@ lpstat:	lpstat.o ../cups/libcups.a
 lpstat.o:	../cups/cups.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.5 1999/05/10 21:36:09 mike Exp $".
+# End of "$Id: Makefile,v 1.6 1999/05/19 18:01:00 mike Exp $".
 #

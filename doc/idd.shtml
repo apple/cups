@@ -901,7 +901,7 @@ classes known to the system. The only required attributes are
 attributes are required.
 
 <P>The <CODE>printer-location</CODE>, <CODE>printer-info</CODE>,
-<CODE>printer-more-info</CODE>, and <CODE>class-printers</CODE> attributes
+<CODE>printer-more-info</CODE>, and <CODE>member-uris</CODE> attributes
 are required when initially adding a printer and optional when modifying
 a printer.
 
@@ -938,6 +938,17 @@ specified destination. The only required attributes are
 
 <P>Reject jobs will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-found</CODE>,
 or <CODE>ipp-not-authorized</CODE>.
+
+<H4>Set Default Destination (CUPS_SET_DEFAULT = 0x400A)</H4>
+
+<P>The set default destination operation returns the printer attributes
+for the system default printer or class. The only required attributes
+are <CODE>attributes-charset</CODE>,
+<CODE>attributes-natural-language</CODE>, and <CODE>printer-uri</CODE>.
+
+<P>Set default destination will return <CODE>ipp-ok</CODE>,
+<CODE>ipp-not-authorized</CODE>, <CODE>ipp-bad-request</CODE>, or
+<CODE>ipp-not-found</CODE>.
 
 <H2>Line Printer Daemon Protocol</H2>
 
@@ -978,6 +989,9 @@ System (CIFS) protocols are described at
 
 	<DT>/usr/share/cups/fonts
 	<DD>The <CODE>pstoraster</CODE> font files reside here.
+
+	<DT>/usr/share/cups/model
+	<DD>The sample PPD files reside here.
 
 	<DT>/usr/share/cups/pstoraster
 	<DD>The <CODE>pstoraster</CODE> data files reside here.

@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.16 1999/05/13 20:40:28 mike Exp $"
+ * "$Id: util.c,v 1.17 1999/05/19 18:00:53 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -23,14 +23,14 @@
  *
  * Contents:
  *
- *   cupsCancelJob()   - Cancel a print job.
- *   cupsDoRequest()   - Do an IPP request...
- *   cupsGetClasses()  - Get a list of printer classes.
- *   cupsGetDefault()  - Get the default printer or class.
- *   cupsGetPPD()      - Get the PPD file for a printer.
- *   cupsGetPrinters() - Get a list of printers.
- *   cupsPrintFile()   - Print a file to a printer or class.
- *   cups_connect()    - Connect to the specified host...
+ *   cupsCancelJob()     - Cancel a print job.
+ *   cupsDoRequestFile() - Do an IPP request...
+ *   cupsGetClasses()    - Get a list of printer classes.
+ *   cupsGetDefault()    - Get the default printer or class.
+ *   cupsGetPPD()        - Get the PPD file for a printer.
+ *   cupsGetPrinters()   - Get a list of printers.
+ *   cupsPrintFile()     - Print a file to a printer or class.
+ *   cups_connect()      - Connect to the specified host...
  */
 
 /*
@@ -133,17 +133,22 @@ cupsCancelJob(char *name,	/* I - Name of printer or class */
 
 
 /*
- * 'cupsDoRequest()' - Do an IPP request...
+ * 'cupsDoFileRequest()' - Do an IPP request...
  */
 
-ipp_t *				/* O - Response data */
-cupsDoRequest(http_t *http,	/* I - HTTP connection to server */
-              ipp_t  *request,	/* I - IPP request */
-              char   *resource)	/* I - HTTP resource for POST */
+ipp_t *					/* O - Response data */
+cupsDoFileRequest(http_t *http,		/* I - HTTP connection to server */
+                  ipp_t  *request,	/* I - IPP request */
+                  char   *resource,	/* I - HTTP resource for POST */
+		  char   *filename)	/* I - File to send or NULL */
 {
   ipp_t		*response;	/* IPP response data */
   char		length[255];	/* Content-Length field */
   http_status_t	status;		/* Status of HTTP request */
+  FILE		*file;		/* File to send */
+  struct stat	fileinfo;	/* File information */
+  int		bytes;		/* Number of bytes read/written */
+  char		buffer[8192];	/* Output buffer */
 #if !defined(WIN32) && !defined(__EMX__)
   char		*password,	/* Password string */
 		plain[255],	/* Plaintext username:password */
@@ -154,98 +159,181 @@ cupsDoRequest(http_t *http,	/* I - HTTP connection to server */
 				/* Authorization string */
 
 
-  DEBUG_printf(("cupsDoRequest(%08x, %08s, \'%s\')\n", http, request, resource));
+  DEBUG_printf(("cupsDoFileRequest(%08x, %08s, \'%s\', \'%s\')\n",
+                http, request, resource, filename ? filename : "(null)"));
 
  /*
-  * Setup the HTTP variables needed...
+  * See if we have a file to send...
   */
 
-  sprintf(length, "%d", ippLength(request));
-  httpClearFields(http);
-  httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, length);
-  httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
-  httpSetField(http, HTTP_FIELD_AUTHORIZATION, authstring);
-
- /*
-  * Try the request...
-  */
-
-  if (httpPost(http, resource))
-    if (httpPost(http, resource))
+  if (filename != NULL)
+  {
+    if (stat(filename, &fileinfo))
     {
+     /*
+      * Can't get file information!
+      */
+
       ippDelete(request);
       return (NULL);
     }
 
- /*
-  * Send the IPP data and wait for the response...
-  */
-
-  ippWrite(http, request);
-
-  if ((status = httpUpdate(http)) == HTTP_UNAUTHORIZED)
-  {
-   /*
-    * Flush any error message...
-    */
-
-    httpFlush(http);
-
-#if !defined(WIN32) && !defined(__EMX__)
-    if ((password = getpass("Password:")) != NULL)
+    if ((file = fopen(filename, "rb")) == NULL)
     {
      /*
-      * Got a password; now send it to the server...
+      * Can't open file!
       */
 
-      sprintf(plain, "%s:%s", cuserid(NULL), password);
-      httpEncode64(encode, plain);
-      sprintf(authstring, "Basic %s", encode);
-
-      httpClearFields(http);
-      httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, length);
-      httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
-      httpSetField(http, HTTP_FIELD_AUTHORIZATION, authstring);
-
-      if (httpPost(http, resource))
-        httpPost(http, resource);
-      request->state = IPP_IDLE;
-      ippWrite(http, request);
-      status = httpUpdate(http);
+      ippDelete(request);
+      return (NULL);
     }
-#endif /* !WIN32 && !__EMX__ */
   }
 
-  if (status != HTTP_OK)
+ /*
+  * Loop until we can send the request without authorization problems.
+  */
+
+  response = NULL;
+
+  while (response == NULL)
   {
+    DEBUG_puts("cupsDoFileRequest: setup...");
+
    /*
-    * Flush any error message...
+    * Setup the HTTP variables needed...
     */
 
-    httpFlush(http);
+    if (filename != NULL)
+      sprintf(length, "%u", ippLength(request) + fileinfo.st_size);
+    else
+      sprintf(length, "%u", ippLength(request));
 
-    response = NULL;
-  }
-  else
-  {
+    httpClearFields(http);
+    httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, length);
+    httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
+    httpSetField(http, HTTP_FIELD_AUTHORIZATION, authstring);
+
    /*
-    * Read the response...
+    * Try the request...
     */
 
-    response = ippNew();
+    DEBUG_puts("cupsDoFileRequest: post...");
 
-    if (ippRead(http, response) == IPP_ERROR)
+    if (httpPost(http, resource))
+      if (httpPost(http, resource))
+        break;
+
+   /*
+    * Send the IPP data and wait for the response...
+    */
+
+    DEBUG_puts("cupsDoFileRequest: ipp write...");
+
+    request->state = IPP_IDLE;
+    if (ippWrite(http, request) == IPP_ERROR)
+      break;
+
+    if (filename != NULL)
     {
-      ippDelete(response);
-      response = NULL;
+      DEBUG_puts("cupsDoFileRequest: file write...");
 
      /*
-      * Flush any remaining data...
+      * Send the file...
+      */
+
+      rewind(file);
+
+      while ((bytes = fread(buffer, 1, sizeof(buffer), file)) > 0)
+	if (httpWrite(http, buffer, bytes) < bytes)
+	{
+          DEBUG_puts("httpWrite() failed.");
+
+	  fclose(file);
+	  ippDelete(request);
+	  return (NULL);
+	}
+    }
+
+   /*
+    * Get the server's return status...
+    */
+
+    DEBUG_puts("cupsDoFileRequest: update...");
+
+#if defined(WIN32) || defined(__EMX__)
+    status = httpUpdate(http);
+#else
+    if ((status = httpUpdate(http)) == HTTP_UNAUTHORIZED)
+    {
+      DEBUG_puts("cupsDoFileRequest: unauthorized...");
+
+     /*
+      * Flush any error message...
       */
 
       httpFlush(http);
+
+      if ((password = getpass("Password:")) != NULL)
+      {
+       /*
+	* Got a password; send it to the server...
+	*/
+
+	sprintf(plain, "%s:%s", cuserid(NULL), password);
+	httpEncode64(encode, plain);
+	sprintf(authstring, "Basic %s", encode);
+
+        continue;
+      }
+    }
+#endif /* WIN32 || __EMX__ */
+
+    if (status != HTTP_OK)
+    {
+      DEBUG_printf(("cupsDoFileRequest: error %d...\n", status));
+
+     /*
+      * Flush any error message...
+      */
+
+      httpFlush(http);
+      break;
+    }
+    else
+    {
+     /*
+      * Read the response...
+      */
+
+      DEBUG_puts("cupsDoFileRequest: response...");
+
+      response = ippNew();
+
+      if (ippRead(http, response) == IPP_ERROR)
+      {
+       /*
+        * Delete the response...
+	*/
+
+	ippDelete(response);
+	response = NULL;
+
+       /*
+	* Flush any remaining data...
+	*/
+
+	httpFlush(http);
+	break;
+      }
     }
   }
+
+ /*
+  * Close the file if needed...
+  */
+
+  if (filename != NULL)
+    fclose(file);
 
  /*
   * Delete the original request and return the response...
@@ -593,9 +681,6 @@ cupsPrintFile(char          *name,	/* I - Printer or class name */
 		printer[HTTP_MAX_URI],	/* Printer or class name */
 		uri[HTTP_MAX_URI];	/* Printer URI */
   cups_lang_t	*language;		/* Language to use */
-  struct stat	filestats;		/* File information */
-  FILE		*fp;			/* File pointer */
-  char		buffer[8192];		/* Copy buffer */
   int		jobid;			/* New job ID */
 
 
@@ -606,33 +691,16 @@ cupsPrintFile(char          *name,	/* I - Printer or class name */
     return (0);
 
  /*
-  * See if the file exists and is readable...
-  */
-
-  if (stat(filename, &filestats))
-    return (0);
-
-  if ((fp = fopen(filename, "rb")) == NULL)
-  {
-    DEBUG_puts("cupsPrintFile: Unable to open file!");
-    return (0);
-  }
-
- /*
   * Setup a connection and request data...
   */
 
   if ((request = ippNew()) == NULL)
-  {
-    fclose(fp);
     return (0);
-  }
 
   if (!cups_connect(name, printer, hostname))
   {
     DEBUG_printf(("cupsPrintFile: Unable to open connection - %s.\n",
                   strerror(errno)));
-    fclose(fp);
     ippDelete(request);
     return (0);
   }
@@ -806,76 +874,29 @@ cupsPrintFile(char          *name,	/* I - Printer or class name */
   }
 
  /*
-  * Setup the necessary HTTP fields...
-  */
-
-  httpClearFields(cups_server);
-  httpSetField(cups_server, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
-
-  sprintf(buffer, "%u", (unsigned)(ippLength(request) + filestats.st_size));
-  httpSetField(cups_server, HTTP_FIELD_CONTENT_LENGTH, buffer);
-
- /*
-  * Finally, issue a POST request for the printer and send the IPP data and
-  * file.
+  * Try printing the file...
   */
 
   sprintf(uri, "/printers/%s", printer);
 
-  response = ippNew();
-
-  if (httpPost(cups_server, uri))
+  if ((response = cupsDoFileRequest(cups_server, request, uri, filename)) == NULL)
+    jobid = 0;
+  else if (response->request.status.status_code > IPP_OK_CONFLICT)
   {
-    DEBUG_puts("httpPost() failed.");
+    DEBUG_printf(("IPP response code was 0x%x!\n",
+                  response->request.status.status_code));
     jobid = 0;
   }
-  else if (ippWrite(cups_server, request) == IPP_ERROR)
+  else if ((attr = ippFindAttribute(response, "job-id", IPP_TAG_INTEGER)) == NULL)
   {
-    DEBUG_puts("ippWrite() failed.");
+    DEBUG_puts("No job ID!");
     jobid = 0;
   }
   else
-  {
-    while ((i = fread(buffer, 1, sizeof(buffer), fp)) > 0)
-      if (httpWrite(cups_server, buffer, i) < i)
-      {
-        DEBUG_puts("httpWrite() failed.");
+    jobid = attr->values[0].integer;
 
-	fclose(fp);
-	ippDelete(request);
-	ippDelete(response);
-	httpClose(cups_server);
-	return (0);
-      }
-
-    if (httpUpdate(cups_server) == HTTP_ERROR)
-    {
-      DEBUG_puts("httpUpdate() failed.");
-      jobid = 0;
-    }
-    else if ((ippRead(cups_server, response)) == IPP_ERROR)
-    {
-      DEBUG_puts("ippRead() failed.");
-      jobid = 0;
-    }
-    else if (response->request.status.status_code > IPP_OK_CONFLICT)
-    {
-      DEBUG_printf(("IPP response code was 0x%x!\n",
-                    response->request.status.status_code));
-      jobid = 0;
-    }
-    else if ((attr = ippFindAttribute(response, "job-id", IPP_TAG_INTEGER)) == NULL)
-    {
-      DEBUG_puts("No job ID!");
-      jobid = 0;
-    }
-    else
-      jobid = attr->values[0].integer;
-  }
-
-  fclose(fp);
-  ippDelete(request);
-  ippDelete(response);
+  if (response != NULL)
+    ippDelete(response);
 
   return (jobid);
 }
@@ -928,5 +949,5 @@ cups_connect(char *name,	/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.16 1999/05/13 20:40:28 mike Exp $".
+ * End of "$Id: util.c,v 1.17 1999/05/19 18:00:53 mike Exp $".
  */

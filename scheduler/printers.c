@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.16 1999/05/18 21:21:52 mike Exp $"
+ * "$Id: printers.c,v 1.17 1999/05/19 18:00:59 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -180,6 +180,7 @@ DeleteAllPrinters(void)
 void
 DeletePrinter(printer_t *p)	/* I - Printer to delete */
 {
+  int		i;		/* Looping var */
   printer_t	*current,	/* Current printer in list */
 		*prev;		/* Previous printer in list */
 
@@ -218,7 +219,19 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
   else
     prev->next = p->next;
 
+  if (p->printers != NULL)
+    free(p->printers);
+
+  ippDelete(p->attrs);
+
   free(p);
+
+ /*
+  * If p is the default printer, assign the next one...
+  */
+
+  if (p == DefaultPrinter)
+    DefaultPrinter = Printers;
 }
 
 
@@ -848,5 +861,5 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 
 
 /*
- * End of "$Id: printers.c,v 1.16 1999/05/18 21:21:52 mike Exp $".
+ * End of "$Id: printers.c,v 1.17 1999/05/19 18:00:59 mike Exp $".
  */

@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpadmin.8,v 1.2 1999/05/17 18:12:01 mike Exp $"
+.\" "$Id: lpadmin.8,v 1.3 1999/05/19 18:00:56 mike Exp $"
 .\"
 .\"   lpadmin man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -66,6 +66,11 @@ Sets a System V style interface script for the printer.  This option cannot
 be specified with the \fI\-P\fR option (PPD file) and is intended for
 providing support for legacy printer drivers.
 .TP 5
+\-m \fImodel\fR
+.br
+Sets a standard System V interface script or PPD file from the model
+directory.
+.TP 5
 \-r \fIclass\fR
 .br
 Removes the named \fIprinter\fR from \fIclass\fR.  If the resulting class
@@ -76,6 +81,10 @@ becomes empty it is removed.
 Sets the \fIdevice-uri\fR attribute of the printer queue.  If \fIdevice-uri\fR
 is a filename it is automatically converted to the form \fBfile:/file/name\fR.
 .TP 5
+\-D \fIinfo\fR
+.br
+Provides a textual description of the printer.
+.TP 5
 \-P \fIppd-file\fR
 .br
 Specifies a PostScript Printer Description file to use with the printer. If
@@ -83,18 +92,18 @@ specified, this option overrides the \fI-i\fR option (interface script).
 .SH COMPATIBILITY
 Unlike the System V printing system, CUPS allows printer names to contain
 any printable character except SPACE and TAB. Also, printer and class names are
-\fBnot\fR case-sensitive. Also, the CUPS version of \fBlpadmin\fR may ask the
+\fBnot\fR case-sensitive. Finally, the CUPS version of \fBlpadmin\fR may ask the
 user for an access password depending on the printing system configuration.
 This differs from the System V version which requires the root user to execute
 this command.
-.LP
-The CUPS version of \fBlpadmin\fR does not support all of the System V
-printing system configuration options.
+.SH LIMITATIONS
+The CUPS version of \fBlpadmin\fR does not support all of the System V or
+Solaris printing system configuration options.
 .SH SEE ALSO
 accept(8), cancel(1), disable(8), enable(8), lp(1), lpstat(1), reject(8),
 CUPS Software Administrator's Manual
 .SH COPYRIGHT
 Copyright 1993-1999 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpadmin.8,v 1.2 1999/05/17 18:12:01 mike Exp $".
+.\" End of "$Id: lpadmin.8,v 1.3 1999/05/19 18:00:56 mike Exp $".
 .\"

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.12 1999/05/18 21:21:51 mike Exp $"
+ * "$Id: ipp.c,v 1.13 1999/05/19 18:00:59 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -71,6 +71,7 @@ static void	get_printer_attrs(client_t *con, ipp_attribute_t *uri);
 static void	print_job(client_t *con, ipp_attribute_t *uri);
 static void	reject_jobs(client_t *con, ipp_attribute_t *uri);
 static void	send_ipp_error(client_t *con, ipp_status_t status);
+static void	set_default(client_t *con, ipp_attribute_t *uri);
 static void	start_printer(client_t *con, ipp_attribute_t *uri);
 static void	stop_printer(client_t *con, ipp_attribute_t *uri);
 static char	*validate_dest(char *resource, cups_ptype_t *dtype);
@@ -275,6 +276,10 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
               reject_jobs(con, uri);
               break;
 
+	  case CUPS_SET_DEFAULT :
+              set_default(con, uri);
+              break;
+
 	  default :
               send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
 	}
@@ -365,6 +370,22 @@ static void
 add_class(client_t        *con,		/* I - Client connection */
           ipp_attribute_t *uri)		/* I - URI of class */
 {
+  int			i;		/* Looping var */
+  char			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			username[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+  printer_t		*pclass;	/* Class */
+  cups_ptype_t		dtype;		/* Destination type */
+  char			*dest;		/* Printer or class name */
+  ipp_attribute_t	*attr;		/* Printer attribute */
+
+
  /*
   * Was this operation called from the correct URI?
   */
@@ -375,7 +396,111 @@ add_class(client_t        *con,		/* I - Client connection */
     return;
   }
 
-  send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
+  DEBUG_printf(("add_class(%08x, %08x)\n", con, uri));
+
+ /*
+  * Do we have a valid URI?
+  */
+
+  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+
+  if (strncmp(resource, "/classes/", 9) != 0)
+  {
+   /*
+    * No, return an error...
+    */
+
+    send_ipp_error(con, IPP_BAD_REQUEST);
+    return;
+  }
+
+ /*
+  * See if the class already exists; if not, create a new class...
+  */
+
+  if ((pclass = FindClass(resource + 9)) == NULL)
+    pclass = AddClass(resource + 9);
+
+ /*
+  * Look for attributes and copy them over as needed...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "printer-location", IPP_TAG_TEXT)) != NULL)
+    strcpy(pclass->location, attr->values[0].string.text);
+  if ((attr = ippFindAttribute(con->request, "printer-info", IPP_TAG_TEXT)) != NULL)
+    strcpy(pclass->info, attr->values[0].string.text);
+  if ((attr = ippFindAttribute(con->request, "printer-more-info", IPP_TAG_URI)) != NULL)
+    strcpy(pclass->more_info, attr->values[0].string.text);
+
+  if ((attr = ippFindAttribute(con->request, "member-uris", IPP_TAG_URI)) != NULL)
+  {
+   /*
+    * Clear the printer array as needed...
+    */
+
+    if (pclass->num_printers > 0)
+    {
+      free(pclass->printers);
+      pclass->num_printers = 0;
+    }
+
+   /*
+    * Add each printer or class that is listed...
+    */
+
+    for (i = 0; i < attr->num_values; i ++)
+    {
+     /*
+      * Search for the printer or class URI...
+      */
+
+      httpSeparate(attr->values[i].string.text, method, username, host,
+                   &port, resource);
+
+      if ((dest = validate_dest(resource, &dtype)) == NULL)
+      {
+       /*
+	* Bad URI...
+	*/
+
+	DEBUG_printf(("add_class: resource name \'%s\' no good!\n",
+	              resource));
+	send_ipp_error(con, IPP_NOT_FOUND);
+	return;
+      }
+
+     /*
+      * Add it to the class...
+      */
+
+      if (dtype == CUPS_PRINTER_CLASS)
+        AddPrinterToClass(pclass, FindClass(dest));
+      else
+        AddPrinterToClass(pclass, FindPrinter(dest));
+    }
+  }
+
+ /*
+  * See if we have all required attributes...
+  */
+
+  if (pclass->num_printers == 0)
+  {
+   /*
+    * Nope, return an error...
+    */
+
+    send_ipp_error(con, IPP_ATTRIBUTES);
+    return;
+  }
+
+ /*
+  * Update the printer class attributes and return...
+  */
+
+  SetPrinterAttrs(pclass);
+
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -384,11 +509,9 @@ add_class(client_t        *con,		/* I - Client connection */
  */
 
 static void
-add_printer(client_t        *con,		/* I - Client connection */
-            ipp_attribute_t *uri)		/* I - URI of printer */
+add_printer(client_t        *con,	/* I - Client connection */
+            ipp_attribute_t *uri)	/* I - URI of printer */
 {
-  char			*dest;		/* Destination */
-  cups_ptype_t		dtype;		/* Destination type (printer or class) */
   char			method[HTTP_MAX_URI],
 					/* Method portion of URI */
 			username[HTTP_MAX_URI],
@@ -415,7 +538,7 @@ add_printer(client_t        *con,		/* I - Client connection */
     return;
   }
 
-  DEBUG_printf(("delete_class(%08x)\n", con));
+  DEBUG_printf(("add_printer(%08x, %08x)\n", con, uri));
 
  /*
   * Do we have a valid URI?
@@ -463,7 +586,7 @@ add_printer(client_t        *con,		/* I - Client connection */
     * Nope, return an error...
     */
 
-    send_ipp_error(IPP_ATTRIBUTES);
+    send_ipp_error(con, IPP_ATTRIBUTES);
     return;
   }
 
@@ -471,13 +594,13 @@ add_printer(client_t        *con,		/* I - Client connection */
   * See if we have an interface script or PPD file attached to the request...
   */
 
-  if (con->filename[0])
+  if (con->filename[0] &&
+      (fp = fopen(con->filename, "r")) != NULL)
   {
    /*
-    * Yes; open the file and get the first line from it...
+    * Yes; get the first line from it...
     */
 
-    fp = fopen(con->filename, "r");
     line[0] = '\0';
     fgets(line, sizeof(line), fp);
     fclose(fp);
@@ -535,7 +658,7 @@ add_printer(client_t        *con,		/* I - Client connection */
   * Update the printer attributes and return...
   */
 
-  SetPrinterAttributes(printer);
+  SetPrinterAttrs(printer);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -868,7 +991,7 @@ delete_printer(client_t        *con,	/* I - Client connection */
     return;
   }
 
-  DEBUG_printf(("delete_class(%08x)\n", con));
+  DEBUG_printf(("delete_printer(%08x, %08x)\n", con, uri));
 
  /*
   * Do we have a valid URI?
@@ -1686,6 +1809,74 @@ send_ipp_error(client_t     *con,	/* I - Client connection */
 
 
 /*
+ * 'set_default()' - Set the default destination...
+ */
+
+static void
+set_default(client_t        *con,	/* I - Client connection */
+            ipp_attribute_t *uri)	/* I - Printer URI */
+{
+  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  char			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			username[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+  char			*name;		/* Printer name */
+
+
+  DEBUG_printf(("set_default(%08x, %08x)\n", con, uri));
+
+ /*
+  * Was this operation called from the correct URI?
+  */
+
+  if (strncmp(con->uri, "/admin/", 7) != 0)
+  {
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * Is the destination valid?
+  */
+
+  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+
+  if ((name = validate_dest(resource, &dtype)) == NULL)
+  {
+   /*
+    * Bad URI...
+    */
+
+    DEBUG_printf(("set_default: resource name \'%s\' no good!\n",
+	          resource));
+    send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * Set it as the default...
+  */
+
+  if (dtype == CUPS_PRINTER_CLASS)
+    DefaultPrinter = FindClass(name);
+  else
+    DefaultPrinter = FindPrinter(name);
+
+ /*
+  * Everything was ok, so return OK status...
+  */
+
+  con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
  * 'start_printer()' - Start a printer.
  */
 
@@ -1705,6 +1896,7 @@ start_printer(client_t        *con,	/* I - Client connection */
   int			port;		/* Port portion of URI */
   char			*name;		/* Printer name */
   printer_t		*printer;	/* Printer data */
+
 
   DEBUG_printf(("start_printer(%08x, %08x)\n", con, uri));
 
@@ -1979,5 +2171,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.12 1999/05/18 21:21:51 mike Exp $".
+ * End of "$Id: ipp.c,v 1.13 1999/05/19 18:00:59 mike Exp $".
  */

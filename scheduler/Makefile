@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.8 1999/05/17 18:03:39 mike Exp $"
+# "$Id: Makefile,v 1.9 1999/05/19 18:00:58 mike Exp $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -47,7 +47,9 @@ clean:
 install:
 	-$(MKDIR) $(SBINDIR)
 	$(CP) cupsd $(SBINDIR)
+	-$(MKDIR) $(SERVERROOT)/interfaces
 	-$(MKDIR) $(SERVERROOT)/logs
+	-$(MKDIR) $(SERVERROOT)/ppd
 	-$(MKDIR) $(SERVERROOT)/requests
 
 #
@@ -62,5 +64,5 @@ $(OBJS):	auth.h classes.h client.h conf.h cupsd.h dirsvc.h job.h \
 		../cups/mime.h ../cups/string.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.8 1999/05/17 18:03:39 mike Exp $".
+# End of "$Id: Makefile,v 1.9 1999/05/19 18:00:58 mike Exp $".
 #
