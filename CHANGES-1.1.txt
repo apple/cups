@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- Revamped how strings are stored in the scheduler,
+	  providing a substantial improvement in memory usage
+	  for systems with large numbers of printers.
 	- The PostScript filter now supports binary PostScript
 	  files and files beginning with the PJL language escape
 	  sequence.

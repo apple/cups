@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.22 2003/01/24 18:00:54 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.23 2003/01/29 20:08:21 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -154,7 +154,7 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
     {
       if ((p = FindClass(resource + 9)) != NULL)
       {
-        if (strcasecmp(p->hostname, host) != 0 && p->hostname[0])
+        if (p->hostname && strcasecmp(p->hostname, host) != 0)
 	{
 	 /*
 	  * Nope, this isn't the same host; if the hostname isn't the local host,
@@ -172,22 +172,22 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
           p = NULL;
 	}
-	else if (!p->hostname[0])
+	else if (!p->hostname)
 	{
-          strlcpy(p->hostname, host, sizeof(p->hostname));
-	  strlcpy(p->uri, uri, sizeof(p->uri));
-	  strlcpy(p->device_uri, uri, sizeof(p->device_uri));
+          SetString(&p->hostname, host);
+	  SetString(&p->uri, uri);
+	  SetString(&p->device_uri, uri);
           update = 1;
         }
       }
       else
         strlcpy(name, resource + 9, sizeof(name));
     }
-    else if (p != NULL && !p->hostname[0])
+    else if (p != NULL && !p->hostname)
     {
-      strlcpy(p->hostname, host, sizeof(p->hostname));
-      strlcpy(p->uri, uri, sizeof(p->uri));
-      strlcpy(p->device_uri, uri, sizeof(p->device_uri));
+      SetString(&p->hostname, host);
+      SetString(&p->uri, uri);
+      SetString(&p->device_uri, uri);
       update = 1;
     }
 
@@ -207,9 +207,9 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
       p->type      = type;
       p->accepting = 1;
-      strlcpy(p->uri, uri, sizeof(p->uri));
-      strlcpy(p->device_uri, uri, sizeof(p->device_uri));
-      strlcpy(p->hostname, host, sizeof(p->hostname));
+      SetString(&p->uri, uri);
+      SetString(&p->device_uri, uri);
+      SetString(&p->hostname, host);
 
       update = 1;
     }
@@ -229,7 +229,7 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
     {
       if ((p = FindPrinter(resource + 10)) != NULL)
       {
-        if (strcasecmp(p->hostname, host) != 0 && p->hostname[0])
+        if (p->hostname && strcasecmp(p->hostname, host) != 0)
 	{
 	 /*
 	  * Nope, this isn't the same host; if the hostname isn't the local host,
@@ -239,30 +239,29 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
 	  if (p->type & CUPS_PRINTER_REMOTE)
 	  {
-            strlcat(p->name, "@", sizeof(p->name));
-	    strlcat(p->name, p->hostname, sizeof(p->name));
+	    SetStringf(&p->name, "%s@%s", p->name, p->hostname);
 	    SetPrinterAttrs(p);
 	    SortPrinters();
 	  }
 
           p = NULL;
 	}
-	else if (!p->hostname[0])
+	else if (!p->hostname)
 	{
-          strlcpy(p->hostname, host, sizeof(p->hostname));
-	  strlcpy(p->uri, uri, sizeof(p->uri));
-	  strlcpy(p->device_uri, uri, sizeof(p->device_uri));
+          SetString(&p->hostname, host);
+	  SetString(&p->uri, uri);
+	  SetString(&p->device_uri, uri);
           update = 1;
         }
       }
       else
         strlcpy(name, resource + 10, sizeof(name));
     }
-    else if (p != NULL && !p->hostname[0])
+    else if (p != NULL && !p->hostname)
     {
-      strlcpy(p->hostname, host, sizeof(p->hostname));
-      strlcpy(p->uri, uri, sizeof(p->uri));
-      strlcpy(p->device_uri, uri, sizeof(p->device_uri));
+      SetString(&p->hostname, host);
+      SetString(&p->uri, uri);
+      SetString(&p->device_uri, uri);
       update = 1;
     }
 
@@ -282,9 +281,9 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
       p->type      = type;
       p->accepting = 1;
-      strlcpy(p->hostname, host, sizeof(p->hostname));
-      strlcpy(p->uri, uri, sizeof(p->uri));
-      strlcpy(p->device_uri, uri, sizeof(p->device_uri));
+      SetString(&p->hostname, host);
+      SetString(&p->uri, uri);
+      SetString(&p->device_uri, uri);
 
       update = 1;
     }
@@ -303,15 +302,15 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
     update  = 1;
   }
 
-  if (strcmp(p->location, location))
+  if (!p->location || strcmp(p->location, location))
   {
-    strlcpy(p->location, location, sizeof(p->location));
+    SetString(&p->location, location);
     update = 1;
   }
 
-  if (strcmp(p->info, info))
+  if (!p->info || strcmp(p->info, info))
   {
-    strlcpy(p->info, info, sizeof(p->info));
+    SetString(&p->info, info);
     update = 1;
   }
 
@@ -328,9 +327,9 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
     snprintf(local_make_model, sizeof(local_make_model),
              "%s on %s", make_model, host);
 
-  if (strcmp(p->make_model, local_make_model))
+  if (!p->make_model || strcmp(p->make_model, local_make_model))
   {
-    strlcpy(p->make_model, local_make_model, sizeof(p->make_model));
+    SetString(&p->make_model, local_make_model);
     update = 1;
   }
 
@@ -404,8 +403,8 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 	  pclass->accepting = 1;
 	  pclass->state     = IPP_PRINTER_IDLE;
 
-          strcpy(pclass->location, p->location);
-          strcpy(pclass->info, p->info);
+          SetString(&pclass->location, p->location);
+          SetString(&pclass->info, p->info);
 
           SetPrinterAttrs(pclass);
 
@@ -1882,5 +1881,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.22 2003/01/24 18:00:54 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.23 2003/01/29 20:08:21 mike Exp $".
  */

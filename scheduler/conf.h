@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.36.2.13 2003/01/24 19:19:46 mike Exp $"
+ * "$Id: conf.h,v 1.36.2.14 2003/01/29 20:08:21 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -53,49 +53,49 @@
  * Globals...
  */
 
-VAR char		ConfigurationFile[256]	VALUE(CUPS_SERVERROOT "/cupsd.conf"),
+VAR char		*ConfigurationFile	VALUE(NULL),
 					/* Configuration file to use */
-			ServerName[256]		VALUE(""),
+			*ServerName		VALUE(NULL),
 					/* FQDN for server */
-			ServerAdmin[256]	VALUE(""),
+			*ServerAdmin		VALUE(NULL),
 					/* Administrator's email */
-			ServerRoot[1024]	VALUE(CUPS_SERVERROOT),
+			*ServerRoot		VALUE(NULL),
 					/* Root directory for scheduler */
-			ServerBin[1024]		VALUE(CUPS_SERVERBIN),
+			*ServerBin		VALUE(NULL),
 					/* Root directory for binaries */
-			RequestRoot[1024]	VALUE(CUPS_REQUESTS),
+			*RequestRoot		VALUE(NULL),
 					/* Directory for request files */
-			DocumentRoot[1024]	VALUE(CUPS_DOCROOT);
+			*DocumentRoot		VALUE(NULL);
 					/* Root directory for documents */
 VAR int			NumSystemGroups		VALUE(0);
 					/* Number of system group names */
-VAR char		SystemGroups[MAX_SYSTEM_GROUPS][32],
+VAR char		*SystemGroups[MAX_SYSTEM_GROUPS],
 					/* System group names */
-			AccessLog[1024]		VALUE(CUPS_LOGDIR "/access_log"),
+			*AccessLog		VALUE(NULL),
 					/* Access log filename */
-			ErrorLog[1024]		VALUE(CUPS_LOGDIR "/error_log"),
+			*ErrorLog		VALUE(NULL),
 					/* Error log filename */
-			PageLog[1024]		VALUE(CUPS_LOGDIR "/page_log"),
+			*PageLog		VALUE(NULL),
 					/* Page log filename */
-			DataDir[1024]		VALUE(CUPS_DATADIR),
+			*DataDir		VALUE(NULL),
 					/* Data file directory */
-			DefaultLanguage[32]	VALUE("C"),
+			*DefaultLanguage	VALUE(NULL),
 					/* Default language encoding */
-			DefaultCharset[32]	VALUE(DEFAULT_CHARSET),
+			*DefaultCharset		VALUE(NULL),
 					/* Default charset */
-			RIPCache[32]		VALUE("8m"),
+			*RIPCache		VALUE(NULL),
 					/* Amount of memory for RIPs */
-			TempDir[1024]		VALUE(CUPS_REQUESTS "/tmp"),
+			*TempDir		VALUE(NULL),
 					/* Temporary directory */
-			Printcap[1024]		VALUE(""),
+			*Printcap		VALUE(NULL),
 					/* Printcap file */
-			PrintcapGUI[1024]	VALUE("/usr/bin/glpoptions"),
+			*PrintcapGUI		VALUE(NULL),
 					/* GUI program to use for IRIX */
-			FontPath[1024]		VALUE(CUPS_FONTPATH),
+			*FontPath		VALUE(NULL),
 					/* Font search path */
-			RemoteRoot[32]		VALUE("remroot"),
+			*RemoteRoot		VALUE(NULL),
 					/* Remote root user */
-			Classification[IPP_MAX_NAME]	VALUE("");
+			*Classification		VALUE(NULL);
 					/* Classification of system */
 VAR int			ClassifyOverride	VALUE(0),
 					/* Allow overrides? */
@@ -161,9 +161,9 @@ VAR const char		**MimeTypes		VALUE(NULL);
 					/* Array of MIME types */
 
 #ifdef HAVE_SSL
-VAR char		ServerCertificate[1024]	VALUE("ssl/server.crt"),
+VAR char		*ServerCertificate	VALUE(NULL),
 					/* Server certificate file */
-			ServerKey[1024]		VALUE("ssl/server.key");
+			*ServerKey		VALUE(NULL);
 					/* Server key file */
 #endif /* HAVE_SSL */
 #ifdef HAVE_CDSASSL
@@ -188,5 +188,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.36.2.13 2003/01/24 19:19:46 mike Exp $".
+ * End of "$Id: conf.h,v 1.36.2.14 2003/01/29 20:08:21 mike Exp $".
  */

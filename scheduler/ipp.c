@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.38 2003/01/24 14:06:40 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.39 2003/01/29 20:08:22 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -675,10 +675,10 @@ add_class(client_t        *con,		/* I - Client connection */
   */
 
   if ((attr = ippFindAttribute(con->request, "printer-location", IPP_TAG_TEXT)) != NULL)
-    strlcpy(pclass->location, attr->values[0].string.text, sizeof(pclass->location));
+    SetString(&pclass->location, attr->values[0].string.text);
 
   if ((attr = ippFindAttribute(con->request, "printer-info", IPP_TAG_TEXT)) != NULL)
-    strlcpy(pclass->info, attr->values[0].string.text, sizeof(pclass->info));
+    SetString(&pclass->info, attr->values[0].string.text);
 
   if ((attr = ippFindAttribute(con->request, "printer-is-accepting-jobs", IPP_TAG_BOOLEAN)) != NULL)
   {
@@ -710,15 +710,13 @@ add_class(client_t        *con,		/* I - Client connection */
     strlcpy(pclass->state_message, attr->values[0].string.text,
             sizeof(pclass->state_message));
   if ((attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_ZERO)) != NULL &&
-      !Classification[0])
+      !Classification)
   {
-    strlcpy(pclass->job_sheets[0], attr->values[0].string.text,
-            sizeof(pclass->job_sheets[0]));
+    SetString(&pclass->job_sheets[0], attr->values[0].string.text);
     if (attr->num_values > 1)
-      strlcpy(pclass->job_sheets[1], attr->values[1].string.text,
-              sizeof(pclass->job_sheets[1]));
+      SetString(&pclass->job_sheets[1], attr->values[1].string.text);
     else
-      strcpy(pclass->job_sheets[1], "none");
+      SetString(&pclass->job_sheets[1], "none");
   }
   if ((attr = ippFindAttribute(con->request, "requesting-user-name-allowed",
                                IPP_TAG_ZERO)) != NULL)
@@ -1087,12 +1085,10 @@ add_printer(client_t        *con,	/* I - Client connection */
   */
 
   if ((attr = ippFindAttribute(con->request, "printer-location", IPP_TAG_TEXT)) != NULL)
-    strlcpy(printer->location, attr->values[0].string.text,
-            sizeof(printer->location));
+    SetString(&printer->location, attr->values[0].string.text);
 
   if ((attr = ippFindAttribute(con->request, "printer-info", IPP_TAG_TEXT)) != NULL)
-    strlcpy(printer->info, attr->values[0].string.text,
-            sizeof(printer->info));
+    SetString(&printer->info, attr->values[0].string.text);
 
   if ((attr = ippFindAttribute(con->request, "device-uri", IPP_TAG_URI)) != NULL)
   {
@@ -1156,8 +1152,7 @@ add_printer(client_t        *con,	/* I - Client connection */
     LogMessage(L_INFO, "Setting %s device-uri to \"%s\" (was \"%s\".)",
                printer->name, attr->values[0].string.text, printer->device_uri);
 
-    strlcpy(printer->device_uri, attr->values[0].string.text,
-            sizeof(printer->device_uri));
+    SetString(&printer->device_uri, attr->values[0].string.text);
   }
 
   if ((attr = ippFindAttribute(con->request, "printer-is-accepting-jobs", IPP_TAG_BOOLEAN)) != NULL)
@@ -1192,13 +1187,11 @@ add_printer(client_t        *con,	/* I - Client connection */
   if ((attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_ZERO)) != NULL &&
       !Classification[0])
   {
-    strlcpy(printer->job_sheets[0], attr->values[0].string.text,
-            sizeof(printer->job_sheets[0]));
+    SetString(&printer->job_sheets[0], attr->values[0].string.text);
     if (attr->num_values > 1)
-      strlcpy(printer->job_sheets[1], attr->values[1].string.text,
-              sizeof(printer->job_sheets[1]));
+      SetString(&printer->job_sheets[1], attr->values[1].string.text);
     else
-      strcpy(printer->job_sheets[1], "none");
+      SetString(&printer->job_sheets[1], "none");
   }
   if ((attr = ippFindAttribute(con->request, "requesting-user-name-allowed",
                                IPP_TAG_ZERO)) != NULL)
@@ -1253,8 +1246,8 @@ add_printer(client_t        *con,	/* I - Client connection */
   * See if we have all required attributes...
   */
 
-  if (printer->device_uri[0] == '\0')
-    strcpy(printer->device_uri, "file:/dev/null");
+  if (!printer->device_uri)
+    SetString(&printer->device_uri, "file:/dev/null");
 
  /*
   * See if we have an interface script or PPD file attached to the request...
@@ -2237,22 +2230,21 @@ create_job(client_t        *con,	/* I - Client connection */
   job->attrs   = con->request;
   con->request = NULL;
 
-  strlcpy(job->title, title, sizeof(job->title));
+  SetString(&job->title, title);
 
   attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME);
 
   if (con->username[0])
-    strlcpy(job->username, con->username, sizeof(job->username));
+    SetString(&job->username, con->username);
   else if (attr != NULL)
   {
     LogMessage(L_DEBUG, "create_job: requesting-user-name = \'%s\'",
                attr->values[0].string.text);
 
-    strlcpy(job->username, attr->values[0].string.text,
-            sizeof(job->username));
+    SetString(&job->username, attr->values[0].string.text);
   }
   else
-    strcpy(job->username, "anonymous");
+    SetString(&job->username, "anonymous");
 
   if (attr == NULL)
     ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-originating-user-name",
@@ -2260,8 +2252,7 @@ create_job(client_t        *con,	/* I - Client connection */
   else
   {
     attr->group_tag = IPP_TAG_JOB;
-    free(attr->name);
-    attr->name = strdup("job-originating-user-name");
+    SetString(&attr->name, "job-originating-user-name");
   }
 
   if ((attr = ippFindAttribute(job->attrs, "job-originating-host-name",
@@ -2382,7 +2373,7 @@ create_job(client_t        *con,	/* I - Client connection */
 
   job->state->values[0].integer = IPP_JOB_HELD;
 
-  if (!(printer->type & CUPS_PRINTER_REMOTE) || Classification[0])
+  if (!(printer->type & CUPS_PRINTER_REMOTE) || Classification)
   {
    /*
     * Add job sheets options...
@@ -2405,7 +2396,7 @@ create_job(client_t        *con,	/* I - Client connection */
     * Enforce classification level if set...
     */
 
-    if (Classification[0])
+    if (Classification)
     {
       if (ClassifyOverride)
       {
@@ -2417,8 +2408,7 @@ create_job(client_t        *con,	/* I - Client connection */
           * Force the leading banner to have the classification on it...
 	  */
 
-          free(attr->values[0].string.text);
-	  attr->values[0].string.text = strdup(Classification);
+          SetString(&attr->values[0].string.text, Classification);
 	}
 	else if (attr->num_values == 2 &&
 	         strcmp(attr->values[0].string.text, attr->values[1].string.text) != 0 &&
@@ -2429,8 +2419,7 @@ create_job(client_t        *con,	/* I - Client connection */
 	  * Can't put two different security markings on the same document!
 	  */
 
-          free(attr->values[1].string.text);
-	  attr->values[1].string.text = strdup(attr->values[0].string.text);
+          SetString(&attr->values[1].string.text, attr->values[0].string.text);
 	}
       }
       else if (strcmp(attr->values[0].string.text, Classification) != 0 &&
@@ -2441,8 +2430,7 @@ create_job(client_t        *con,	/* I - Client connection */
         * Force the leading banner to have the classification on it...
 	*/
 
-        free(attr->values[0].string.text);
-	attr->values[0].string.text = strdup(Classification);
+        SetString(&attr->values[0].string.text, Classification);
       }
     }
 
@@ -3480,12 +3468,9 @@ get_printers(client_t *con,		/* I - Client connection */
       {
        /*
         * Make a copy of the printer name...
-	*
-	* Note: name and printer->name are both IPP_MAX_NAME characters
-	*       in size, so strcpy() is safe...
 	*/
 
-        strcpy(name, printer->name);
+        strlcpy(name, printer->name, sizeof(name));
 
 	if ((nameptr = strchr(name, '@')) != NULL)
 	{
@@ -4151,21 +4136,21 @@ print_job(client_t        *con,		/* I - Client connection */
   * Copy the rest of the job info...
   */
 
-  strlcpy(job->title, title, sizeof(job->title));
+  SetString(&job->title, title);
 
   attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME);
 
   if (con->username[0])
-    strlcpy(job->username, con->username, sizeof(job->username));
+    SetString(&job->username, con->username);
   else if (attr != NULL)
   {
     LogMessage(L_DEBUG, "print_job: requesting-user-name = \'%s\'",
                attr->values[0].string.text);
 
-    strlcpy(job->username, attr->values[0].string.text, sizeof(job->username));
+    SetString(&job->username, attr->values[0].string.text);
   }
   else
-    strcpy(job->username, "anonymous");
+    SetString(&job->username, "anonymous");
 
   if (attr == NULL)
     ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-originating-user-name",
@@ -4173,8 +4158,7 @@ print_job(client_t        *con,		/* I - Client connection */
   else
   {
     attr->group_tag = IPP_TAG_JOB;
-    free(attr->name);
-    attr->name = strdup("job-originating-user-name");
+    SetString(&attr->name, "job-originating-user-name");
   }
 
  /*
@@ -4299,7 +4283,7 @@ print_job(client_t        *con,		/* I - Client connection */
     SetJobHoldUntil(job->id, attr->values[0].string.text);
   }
 
-  if (!(printer->type & CUPS_PRINTER_REMOTE) || Classification[0])
+  if (!(printer->type & CUPS_PRINTER_REMOTE) || Classification)
   {
    /*
     * Add job sheets options...
@@ -4322,7 +4306,7 @@ print_job(client_t        *con,		/* I - Client connection */
     * Enforce classification level if set...
     */
 
-    if (Classification[0])
+    if (Classification)
     {
       if (ClassifyOverride)
       {
@@ -4334,8 +4318,7 @@ print_job(client_t        *con,		/* I - Client connection */
           * Force the leading banner to have the classification on it...
 	  */
 
-          free(attr->values[0].string.text);
-	  attr->values[0].string.text = strdup(Classification);
+          SetString(&attr->values[0].string.text, Classification);
 	}
 	else if (attr->num_values == 2 &&
 	         strcmp(attr->values[0].string.text, attr->values[1].string.text) != 0 &&
@@ -4346,8 +4329,7 @@ print_job(client_t        *con,		/* I - Client connection */
 	  * Can't put two different security markings on the same document!
 	  */
 
-          free(attr->values[1].string.text);
-	  attr->values[1].string.text = strdup(attr->values[0].string.text);
+          SetString(&attr->values[1].string.text, attr->values[0].string.text);
 	}
       }
       else if (strcmp(attr->values[0].string.text, Classification) != 0 &&
@@ -4358,8 +4340,7 @@ print_job(client_t        *con,		/* I - Client connection */
         * Force the leading banner to have the classification on it...
 	*/
 
-        free(attr->values[0].string.text);
-	attr->values[0].string.text = strdup(Classification);
+        SetString(&attr->values[0].string.text, Classification);
       }
     }
 
@@ -5633,7 +5614,7 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
       */
 
       if (strcmp(attr->name, "job-name") == 0)
-        strlcpy(job->title, attr->values[0].string.text, sizeof(job->title));
+        SetString(&job->title, attr->values[0].string.text);
       else if (strcmp(attr->name, "job-hold-until") == 0)
       {
         SetJobHoldUntil(job->id, attr->values[0].string.text);
@@ -6096,5 +6077,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.38 2003/01/24 14:06:40 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.39 2003/01/29 20:08:22 mike Exp $".
  */

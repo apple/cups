@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h,v 1.22.2.7 2003/01/24 18:00:56 mike Exp $"
+ * "$Id: printers.h,v 1.22.2.8 2003/01/29 20:08:28 mike Exp $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -42,28 +42,25 @@ typedef struct
 typedef struct printer_str
 {
   struct printer_str *next;		/* Next printer in list */
-  char		uri[HTTP_MAX_URI],	/* Printer URI */
-		hostname[HTTP_MAX_HOST],/* Host printer resides on */
-		name[IPP_MAX_NAME],	/* Printer name */
-		location[IPP_MAX_NAME],	/* Location code */
-		make_model[IPP_MAX_NAME],
-					/* Make and model */
-		info[IPP_MAX_NAME],	/* Description */
-		op_policy[IPP_MAX_NAME],/* Operation policy name */
-		error_policy[IPP_MAX_NAME];
-					/* Error policy */
+  char		*uri,			/* Printer URI */
+		*hostname,		/* Host printer resides on */
+		*name,			/* Printer name */
+		*location,		/* Location code */
+		*make_model,		/* Make and model */
+		*info,			/* Description */
+		*op_policy,		/* Operation policy name */
+		*error_policy;		/* Error policy */
   policy_t	*op_policy_ptr;		/* Pointer to operation policy */
   int		accepting;		/* Accepting jobs? */
   ipp_pstate_t	state;			/* Printer state */
   char		state_message[1024];	/* Printer state message */
   ipp_attribute_t *state_reasons;	/* Printer state reasons */
   time_t	state_time;		/* Time at this state */
-  char		job_sheets[2][IPP_MAX_NAME];
-					/* Banners/job sheets */
+  char		*job_sheets[2];		/* Banners/job sheets */
   cups_ptype_t	type;			/* Printer type (color, small, etc.) */
   time_t	browse_time;		/* Last time update was sent/received */
-  char		device_uri[HTTP_MAX_URI],/* Device URI */
-		backend[1024];		/* Backend to use */
+  char		*device_uri,		/* Device URI */
+		*backend;		/* Backend to use */
   int		raw;			/* Raw queue? */
   mime_type_t	*filetype;		/* Pseudo-filetype for printer */
   void		*job;			/* Current job in queue */
@@ -122,5 +119,5 @@ extern void		WritePrintcap(void);
 
 
 /*
- * End of "$Id: printers.h,v 1.22.2.7 2003/01/24 18:00:56 mike Exp $".
+ * End of "$Id: printers.h,v 1.22.2.8 2003/01/29 20:08:28 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.23 2003/01/29 15:38:45 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.24 2003/01/29 20:08:20 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -95,8 +95,7 @@ typedef struct
 {
   char	*name;		/* Name of variable */
   void	*ptr;		/* Pointer to variable */
-  int	type,		/* Type (int, string, address) */
-	size;		/* Size of string */
+  int	type;		/* Type (int, string, address) */
 } var_t;
 
 #define VAR_INTEGER	0
@@ -110,64 +109,65 @@ typedef struct
 
 static var_t	variables[] =
 {
-  { "AccessLog",	AccessLog,		VAR_STRING,	sizeof(AccessLog) },
-  { "AutoPurgeJobs", 	&JobAutoPurge,		VAR_BOOLEAN,	0 },
-  { "BrowseInterval",	&BrowseInterval,	VAR_INTEGER,	0 },
-  { "BrowsePort",	&BrowsePort,		VAR_INTEGER,	0 },
-  { "BrowseShortNames",	&BrowseShortNames,	VAR_BOOLEAN,	0 },
-  { "BrowseTimeout",	&BrowseTimeout,		VAR_INTEGER,	0 },
-  { "Browsing",		&Browsing,		VAR_BOOLEAN,	0 },
-  { "Classification",	Classification,		VAR_STRING,	sizeof(Classification) },
-  { "ClassifyOverride",	&ClassifyOverride,	VAR_BOOLEAN,	0 },
-  { "ConfigFilePerm",	&ConfigFilePerm,	VAR_INTEGER,	0 },
-  { "DataDir",		DataDir,		VAR_STRING,	sizeof(DataDir) },
-  { "DefaultCharset",	DefaultCharset,		VAR_STRING,	sizeof(DefaultCharset) },
-  { "DefaultLanguage",	DefaultLanguage,	VAR_STRING,	sizeof(DefaultLanguage) },
-  { "DocumentRoot",	DocumentRoot,		VAR_STRING,	sizeof(DocumentRoot) },
-  { "ErrorLog",		ErrorLog,		VAR_STRING,	sizeof(ErrorLog) },
-  { "FileDevice",	&FileDevice,		VAR_BOOLEAN,	0 },
-  { "FilterLimit",	&FilterLimit,		VAR_INTEGER,	0 },
-  { "FilterNice",	&FilterNice,		VAR_INTEGER,	0 },
-  { "FontPath",		FontPath,		VAR_STRING,	sizeof(FontPath) },
-  { "HideImplicitMembers", &HideImplicitMembers, VAR_BOOLEAN,	0 },
-  { "ImplicitClasses",	&ImplicitClasses,	VAR_BOOLEAN,	0 },
-  { "ImplicitAnyClasses", &ImplicitAnyClasses,	VAR_BOOLEAN,	0 },
-  { "KeepAliveTimeout",	&KeepAliveTimeout,	VAR_INTEGER,	0 },
-  { "KeepAlive",	&KeepAlive,		VAR_BOOLEAN,	0 },
-  { "LimitRequestBody",	&MaxRequestSize,	VAR_INTEGER,	0 },
-  { "ListenBackLog",	&ListenBackLog,		VAR_INTEGER,	0 },
-  { "LogFilePerm",	&LogFilePerm,		VAR_INTEGER,	0 },
-  { "MaxActiveJobs",	&MaxActiveJobs,		VAR_INTEGER,	0 },
-  { "MaxClients",	&MaxClients,		VAR_INTEGER,	0 },
-  { "MaxClientsPerHost",&MaxClientsPerHost,	VAR_INTEGER,	0 },
-  { "MaxCopies",	&MaxCopies,		VAR_INTEGER,	0 },
-  { "MaxJobs",		&MaxJobs,		VAR_INTEGER,	0 },
-  { "MaxJobsPerPrinter",&MaxJobsPerPrinter,	VAR_INTEGER,	0 },
-  { "MaxJobsPerUser",	&MaxJobsPerUser,	VAR_INTEGER,	0 },
-  { "MaxLogSize",	&MaxLogSize,		VAR_INTEGER,	0 },
-  { "MaxRequestSize",	&MaxRequestSize,	VAR_INTEGER,	0 },
-  { "PageLog",		PageLog,		VAR_STRING,	sizeof(PageLog) },
-  { "PreserveJobFiles",	&JobFiles,		VAR_BOOLEAN,	0 },
-  { "PreserveJobHistory", &JobHistory,		VAR_BOOLEAN,	0 },
-  { "Printcap",		Printcap,		VAR_STRING,	sizeof(Printcap) },
-  { "PrintcapGUI",	PrintcapGUI,		VAR_STRING,	sizeof(PrintcapGUI) },
-  { "RemoteRoot",	RemoteRoot,		VAR_STRING,	sizeof(RemoteRoot) },
-  { "RequestRoot",	RequestRoot,		VAR_STRING,	sizeof(RequestRoot) },
-  { "RIPCache",		RIPCache,		VAR_STRING,	sizeof(RIPCache) },
-  { "RunAsUser", 	&RunAsUser,		VAR_BOOLEAN,	0 },
-  { "RootCertDuration", &RootCertDuration,	VAR_INTEGER,	0 },
-  { "ServerAdmin",	ServerAdmin,		VAR_STRING,	sizeof(ServerAdmin) },
-  { "ServerBin",	ServerBin,		VAR_STRING,	sizeof(ServerBin) },
+  { "AccessLog",		&AccessLog,		VAR_STRING },
+  { "AutoPurgeJobs", 		&JobAutoPurge,		VAR_BOOLEAN },
+  { "BrowseInterval",		&BrowseInterval,	VAR_INTEGER },
+  { "BrowsePort",		&BrowsePort,		VAR_INTEGER },
+  { "BrowseShortNames",		&BrowseShortNames,	VAR_BOOLEAN },
+  { "BrowseTimeout",		&BrowseTimeout,		VAR_INTEGER },
+  { "Browsing",			&Browsing,		VAR_BOOLEAN },
+  { "Classification",		&Classification,	VAR_STRING },
+  { "ClassifyOverride",		&ClassifyOverride,	VAR_BOOLEAN },
+  { "ConfigFilePerm",		&ConfigFilePerm,	VAR_INTEGER },
+  { "DataDir",			&DataDir,		VAR_STRING },
+  { "DefaultCharset",		&DefaultCharset,	VAR_STRING },
+  { "DefaultLanguage",		&DefaultLanguage,	VAR_STRING },
+  { "DocumentRoot",		&DocumentRoot,		VAR_STRING },
+  { "ErrorLog",			&ErrorLog,		VAR_STRING },
+  { "FileDevice",		&FileDevice,		VAR_BOOLEAN },
+  { "FilterLimit",		&FilterLimit,		VAR_INTEGER },
+  { "FilterNice",		&FilterNice,		VAR_INTEGER },
+  { "FontPath",			&FontPath,		VAR_STRING },
+  { "HideImplicitMembers",	&HideImplicitMembers,	VAR_BOOLEAN },
+  { "ImplicitClasses",		&ImplicitClasses,	VAR_BOOLEAN },
+  { "ImplicitAnyClasses",	&ImplicitAnyClasses,	VAR_BOOLEAN },
+  { "KeepAliveTimeout",		&KeepAliveTimeout,	VAR_INTEGER },
+  { "KeepAlive",		&KeepAlive,		VAR_BOOLEAN },
+  { "LimitRequestBody",		&MaxRequestSize,	VAR_INTEGER },
+  { "ListenBackLog",		&ListenBackLog,		VAR_INTEGER },
+  { "LogFilePerm",		&LogFilePerm,		VAR_INTEGER },
+  { "MaxActiveJobs",		&MaxActiveJobs,		VAR_INTEGER },
+  { "MaxClients",		&MaxClients,		VAR_INTEGER },
+  { "MaxClientsPerHost",	&MaxClientsPerHost,	VAR_INTEGER },
+  { "MaxCopies",		&MaxCopies,		VAR_INTEGER },
+  { "MaxJobs",			&MaxJobs,		VAR_INTEGER },
+  { "MaxJobsPerPrinter",	&MaxJobsPerPrinter,	VAR_INTEGER },
+  { "MaxJobsPerUser",		&MaxJobsPerUser,	VAR_INTEGER },
+  { "MaxLogSize",		&MaxLogSize,		VAR_INTEGER },
+  { "MaxRequestSize",		&MaxRequestSize,	VAR_INTEGER },
+  { "PageLog",			&PageLog,		VAR_STRING },
+  { "PreserveJobFiles",		&JobFiles,		VAR_BOOLEAN },
+  { "PreserveJobHistory",	&JobHistory,		VAR_BOOLEAN },
+  { "Printcap",			&Printcap,		VAR_STRING },
+  { "PrintcapGUI",		&PrintcapGUI,		VAR_STRING },
+  { "RemoteRoot",		&RemoteRoot,		VAR_STRING },
+  { "RequestRoot",		&RequestRoot,		VAR_STRING },
+  { "RIPCache",			&RIPCache,		VAR_STRING },
+  { "RunAsUser", 		&RunAsUser,		VAR_BOOLEAN },
+  { "RootCertDuration",		&RootCertDuration,	VAR_INTEGER },
+  { "ServerAdmin",		&ServerAdmin,		VAR_STRING },
+  { "ServerBin",		&ServerBin,		VAR_STRING },
 #ifdef HAVE_SSL
-  { "ServerCertificate",ServerCertificate,	VAR_STRING,	sizeof(ServerCertificate) },
-  { "ServerKey",	ServerKey,		VAR_STRING,	sizeof(ServerKey) },
+  { "ServerCertificate",	&ServerCertificate,	VAR_STRING },
+  { "ServerKey",		&ServerKey,		VAR_STRING },
 #endif /* HAVE_SSL */
-  { "ServerName",	ServerName,		VAR_STRING,	sizeof(ServerName) },
-  { "ServerRoot",	ServerRoot,		VAR_STRING,	sizeof(ServerRoot) },
-  { "TempDir",		TempDir,		VAR_STRING,	sizeof(TempDir) },
-  { "Timeout",		&Timeout,		VAR_INTEGER,	0 }
+  { "ServerName",		&ServerName,		VAR_STRING },
+  { "ServerRoot",		&ServerRoot,		VAR_STRING },
+  { "TempDir",			&TempDir,		VAR_STRING },
+  { "Timeout",			&Timeout,		VAR_INTEGER }
 };
 #define NUM_VARS	(sizeof(variables) / sizeof(variables[0]))
+
 
 static unsigned		ones[4] =
 			{
@@ -199,20 +199,21 @@ static int	get_addr_and_mask(const char *value, unsigned *ip,
  * 'ReadConfiguration()' - Read the cupsd.conf file.
  */
 
-int				/* O - 1 if file read successfully, 0 otherwise */
+int					/* O - 1 on success, 0 otherwise */
 ReadConfiguration(void)
 {
-  int		i;		/* Looping var */
-  FILE		*fp;		/* Configuration file */
-  int		status;		/* Return status */
-  char		directory[1024],/* Configuration directory */
-		*slash;		/* Directory separator */
+  int		i;			/* Looping var */
+  FILE		*fp;			/* Configuration file */
+  int		status;			/* Return status */
+  char		temp[1024],		/* Temporary buffer */
+		*slash;			/* Directory separator */
   char		type[MIME_MAX_SUPER + MIME_MAX_TYPE];
-				/* MIME type name */
-  struct rlimit	limit;		/* Runtime limit */
-  char		*language;	/* Language string */
-  struct passwd	*user;		/* Default user */
-  struct group	*group;		/* Default group */
+					/* MIME type name */
+  struct rlimit	limit;			/* Runtime limit */
+  char		*language;		/* Language string */
+  struct passwd	*user;			/* Default user */
+  struct group	*group;			/* Default group */
+  int		run_user;		/* User that will be running cupsd */
 
 
  /*
@@ -271,25 +272,28 @@ ReadConfiguration(void)
   * String options...
   */
 
-  gethostname(ServerName, sizeof(ServerName));
-  snprintf(ServerAdmin, sizeof(ServerAdmin), "root@%s", ServerName);
-  strcpy(ServerBin, CUPS_SERVERBIN);
-  strcpy(RequestRoot, CUPS_REQUESTS);
-  strcpy(DocumentRoot, CUPS_DOCROOT);
-  strcpy(DataDir, CUPS_DATADIR);
-  strcpy(AccessLog, CUPS_LOGDIR "/access_log");
-  strcpy(ErrorLog, CUPS_LOGDIR "/error_log");
-  strcpy(PageLog, CUPS_LOGDIR "/page_log");
-  strcpy(Printcap, "/etc/printcap");
-  strcpy(PrintcapGUI, "/usr/bin/glpoptions");
-  strcpy(FontPath, CUPS_FONTPATH);
-  strcpy(RemoteRoot, "remroot");
+  gethostname(temp, sizeof(temp));
+  SetString(&ServerName, temp);
+  SetStringf(&ServerAdmin, "root@%s", temp);
+  SetString(&ServerBin, CUPS_SERVERBIN);
+  SetString(&RequestRoot, CUPS_REQUESTS);
+  SetString(&DocumentRoot, CUPS_DOCROOT);
+  SetString(&DataDir, CUPS_DATADIR);
+  SetString(&AccessLog, CUPS_LOGDIR "/access_log");
+  SetString(&ErrorLog, CUPS_LOGDIR "/error_log");
+  SetString(&PageLog, CUPS_LOGDIR "/page_log");
+  SetString(&Printcap, "/etc/printcap");
+  SetString(&PrintcapGUI, "/usr/bin/glpoptions");
+  SetString(&FontPath, CUPS_FONTPATH);
+  SetString(&RemoteRoot, "remroot");
 
-  strcpy(ServerRoot, ConfigurationFile);
-  if ((slash = strrchr(ServerRoot, '/')) != NULL)
+  strlcpy(temp, ConfigurationFile, sizeof(temp));
+  if ((slash = strrchr(temp, '/')) != NULL)
     *slash = '\0';
 
-  Classification[0] = '\0';
+  SetString(&ServerRoot, temp);
+
+  ClearString(&Classification);
   ClassifyOverride  = 0;
 
 #ifdef HAVE_SSL
@@ -300,11 +304,11 @@ ReadConfiguration(void)
     ServerCertificatesArray = NULL;
   }
 
-  strcpy(ServerCertificate, "/var/root/Library/Keychains/CUPS");
+  SetString(&ServerCertificate, "/var/root/Library/Keychains/CUPS");
 
 #  else
-  strcpy(ServerCertificate, "ssl/server.crt");
-  strcpy(ServerKey, "ssl/server.key");
+  SetString(&ServerCertificate, "ssl/server.crt");
+  SetString(&ServerKey, "ssl/server.key");
 #  endif /* HAVE_CDSASSL */
 #endif /* HAVE_SSL */
 
@@ -313,16 +317,15 @@ ReadConfiguration(void)
   else if (strcmp(language, "C") == 0 || strcmp(language, "POSIX") == 0)
     language = "en";
 
-  strlcpy(DefaultLanguage, language, sizeof(DefaultLanguage));
+  SetString(&DefaultLanguage, language);
+  SetString(&DefaultCharset, DEFAULT_CHARSET);
 
-  strcpy(DefaultCharset, DEFAULT_CHARSET);
-
-  strcpy(RIPCache, "8m");
+  SetString(&RIPCache, "8m");
 
   if (getenv("TMPDIR") == NULL)
-    strcpy(TempDir, CUPS_REQUESTS "/tmp");
+    SetStringf(&TempDir, "TMPDIR=%s", CUPS_REQUESTS "/tmp");
   else
-    strlcpy(TempDir, getenv("TMPDIR"), sizeof(TempDir));
+    SetStringf(&TempDir, "TMPDIR=%s", getenv("TMPDIR"));
 
  /*
   * Find the default system group: "sys", "system", or "root"...
@@ -335,7 +338,7 @@ ReadConfiguration(void)
 
   if (group != NULL)
   {
-    strcpy(SystemGroups[0], CUPS_DEFAULT_GROUP);
+    SetString(&SystemGroups[0], CUPS_DEFAULT_GROUP);
     Group = group->gr_gid;
   }
   else
@@ -345,12 +348,12 @@ ReadConfiguration(void)
 
     if (group != NULL)
     {
-      strcpy(SystemGroups[0], group->gr_name);
+      SetString(&SystemGroups[0], group->gr_name);
       Group = 0;
     }
     else
     {
-      strcpy(SystemGroups[0], "unknown");
+      SetString(&SystemGroups[0], "unknown");
       Group = 0;
     }
   }
@@ -370,46 +373,48 @@ ReadConfiguration(void)
   * Numeric options...
   */
 
-  ConfigFilePerm    = 0600;
-  LogFilePerm       = 0644;
+  ConfigFilePerm      = 0640;
+  LogFilePerm         = 0644;
 
-  FileDevice        = FALSE;
-  FilterLevel       = 0;
-  FilterLimit       = 0;
-  FilterNice        = 0;
-  HostNameLookups   = FALSE;
-  ImplicitClasses   = TRUE;
-  KeepAlive         = TRUE;
-  KeepAliveTimeout  = DEFAULT_KEEPALIVE;
-  ListenBackLog     = SOMAXCONN;
-  LogLevel          = L_ERROR;
-  MaxClients        = 100;
-  MaxClientsPerHost = 0;
-  MaxLogSize        = 1024 * 1024;
-  MaxRequestSize    = 0;
-  RootCertDuration  = 300;
-  RunAsUser         = FALSE;
-  Timeout           = DEFAULT_TIMEOUT;
+  FileDevice          = FALSE;
+  FilterLevel         = 0;
+  FilterLimit         = 0;
+  FilterNice          = 0;
+  HostNameLookups     = FALSE;
+  ImplicitClasses     = TRUE;
+  ImplicitAnyClasses  = FALSE;
+  HideImplicitMembers = TRUE;
+  KeepAlive           = TRUE;
+  KeepAliveTimeout    = DEFAULT_KEEPALIVE;
+  ListenBackLog       = SOMAXCONN;
+  LogLevel            = L_ERROR;
+  MaxClients          = 100;
+  MaxClientsPerHost   = 0;
+  MaxLogSize          = 1024 * 1024;
+  MaxRequestSize      = 0;
+  RootCertDuration    = 300;
+  RunAsUser           = FALSE;
+  Timeout             = DEFAULT_TIMEOUT;
 
-  BrowseInterval    = DEFAULT_INTERVAL;
-  BrowsePort        = ippPort();
-  BrowseShortNames  = TRUE;
-  BrowseTimeout     = DEFAULT_TIMEOUT;
-  Browsing          = TRUE;
-  NumBrowsers       = 0;
-  NumPolled         = 0;
+  BrowseInterval      = DEFAULT_INTERVAL;
+  BrowsePort          = ippPort();
+  BrowseProtocols     = BROWSE_CUPS;
+  BrowseShortNames    = TRUE;
+  BrowseTimeout       = DEFAULT_TIMEOUT;
+  Browsing            = TRUE;
+  NumBrowsers         = 0;
+  NumPolled           = 0;
 
-  NumListeners      = 0;
+  NumListeners        = 0;
 
-  JobHistory        = DEFAULT_HISTORY;
-  JobFiles          = DEFAULT_FILES;
-  JobAutoPurge      = 0;
-
-  MaxJobs           = 0;
-  MaxActiveJobs     = 0;
-  MaxJobsPerPrinter = 0;
-  MaxJobsPerUser    = 0;
-  MaxCopies         = 100;
+  JobHistory          = DEFAULT_HISTORY;
+  JobFiles            = DEFAULT_FILES;
+  JobAutoPurge        = 0;
+  MaxJobs             = 0;
+  MaxActiveJobs       = 0;
+  MaxJobsPerPrinter   = 0;
+  MaxJobsPerUser      = 0;
+  MaxCopies           = 100;
 
  /*
   * Read the configuration file...
@@ -424,6 +429,11 @@ ReadConfiguration(void)
 
   if (!status)
     return (0);
+
+  if (RunAsUser)
+    run_user = User;
+  else
+    run_user = getuid();
 
  /*
   * Use the default system group if none was supplied in cupsd.conf...
@@ -461,40 +471,25 @@ ReadConfiguration(void)
   */
 
   if (DocumentRoot[0] != '/')
-  {
-    snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, DocumentRoot);
-    strlcpy(DocumentRoot, directory, sizeof(DocumentRoot));
-  }
+    SetStringf(&DocumentRoot, "%s/%s", ServerRoot, DocumentRoot);
 
   if (RequestRoot[0] != '/')
-  {
-    snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, RequestRoot);
-    strlcpy(RequestRoot, directory, sizeof(RequestRoot));
-  }
+    SetStringf(&RequestRoot, "%s/%s", ServerRoot, RequestRoot);
 
   if (ServerBin[0] != '/')
-  {
-    snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, ServerBin);
-    strlcpy(ServerBin, directory, sizeof(ServerBin));
-  }
+    SetStringf(&ServerBin, "%s/%s", ServerRoot, ServerBin);
 
 #ifdef HAVE_SSL
   if (ServerCertificate[0] != '/')
-  {
-    snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, ServerCertificate);
-    strlcpy(ServerCertificate, directory, sizeof(ServerCertificate));
-  }
+    SetStringf(&ServerCertificate, "%s/%s", ServerRoot, ServerCertificate);
 
-  chown(ServerCertificate, User, Group);
+  chown(ServerCertificate, run_user, Group);
   chmod(ServerCertificate, ConfigFilePerm);
 
   if (ServerKey[0] != '/')
-  {
-    snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, ServerKey);
-    strlcpy(ServerKey, directory, sizeof(ServerKey));
-  }
+    SetStringf(&ServerKey, "%s/%s", ServerRoot, ServerKey);
 
-  chown(ServerKey, User, Group);
+  chown(ServerKey, run_user, Group);
   chmod(ServerKey, ConfigFilePerm);
 #endif /* HAVE_SSL */
 
@@ -503,43 +498,43 @@ ReadConfiguration(void)
   * writable by the user and group in the cupsd.conf file...
   */
 
-  chown(ServerRoot, User, Group);
+  chown(ServerRoot, run_user, Group);
   chmod(ServerRoot, 0755);
 
-  snprintf(directory, sizeof(directory), "%s/certs", ServerRoot);
-  chown(directory, User, Group);
-  chmod(directory, 0711);
+  snprintf(temp, sizeof(temp), "%s/certs", ServerRoot);
+  chown(temp, run_user, Group);
+  chmod(temp, 0711);
 
-  snprintf(directory, sizeof(directory), "%s/ppd", ServerRoot);
-  chown(directory, User, Group);
-  chmod(directory, 0755);
+  snprintf(temp, sizeof(temp), "%s/ppd", ServerRoot);
+  chown(temp, User, Group);
+  chmod(temp, 0755);
 
-  snprintf(directory, sizeof(directory), "%s/ssl", ServerRoot);
-  chown(directory, User, Group);
-  chmod(directory, 0700);
+  snprintf(temp, sizeof(temp), "%s/ssl", ServerRoot);
+  chown(temp, run_user, Group);
+  chmod(temp, 0700);
 
-  snprintf(directory, sizeof(directory), "%s/cupsd.conf", ServerRoot);
-  chown(directory, User, Group);
-  chmod(directory, ConfigFilePerm);
+  snprintf(temp, sizeof(temp), "%s/cupsd.conf", ServerRoot);
+  chown(temp, run_user, Group);
+  chmod(temp, ConfigFilePerm);
 
-  snprintf(directory, sizeof(directory), "%s/classes.conf", ServerRoot);
-  chown(directory, User, Group);
-  chmod(directory, ConfigFilePerm);
+  snprintf(temp, sizeof(temp), "%s/classes.conf", ServerRoot);
+  chown(temp, run_user, Group);
+  chmod(temp, ConfigFilePerm);
 
-  snprintf(directory, sizeof(directory), "%s/printers.conf", ServerRoot);
-  chown(directory, User, Group);
-  chmod(directory, ConfigFilePerm);
+  snprintf(temp, sizeof(temp), "%s/printers.conf", ServerRoot);
+  chown(temp, run_user, Group);
+  chmod(temp, ConfigFilePerm);
 
-  snprintf(directory, sizeof(directory), "%s/passwd.md5", ServerRoot);
-  chown(directory, User, Group);
-  chmod(directory, 0600);
+  snprintf(temp, sizeof(temp), "%s/passwd.md5", ServerRoot);
+  chown(temp, User, Group);
+  chmod(temp, 0600);
 
  /*
   * Make sure the request and temporary directories have the right
   * permissions...
   */
 
-  chown(RequestRoot, User, Group);
+  chown(RequestRoot, run_user, Group);
   chmod(RequestRoot, 0700);
 
   if (strncmp(TempDir, RequestRoot, strlen(RequestRoot)) == 0)
@@ -549,8 +544,8 @@ ReadConfiguration(void)
     * is under the spool directory...
     */
 
-    chown(TempDir, User, Group);
-    chmod(TempDir, 01700);
+    chown(TempDir, run_user, Group);
+    chmod(TempDir, 01770);
   }
 
  /*
@@ -579,10 +574,10 @@ ReadConfiguration(void)
   if (MaxActiveJobs > (limit.rlim_max / 3))
     MaxActiveJobs = limit.rlim_max / 3;
 
-  if (strcasecmp(Classification, "none") == 0)
-    Classification[0] = '\0';
+  if (Classification && strcasecmp(Classification, "none") == 0)
+    ClearString(&Classification);
 
-  if (Classification[0])
+  if (Classification)
     LogMessage(L_INFO, "Security set to \"%s\"", Classification);
 
  /*
@@ -590,12 +585,7 @@ ReadConfiguration(void)
   */
 
   if (MaxClientsPerHost <= 0)
-  {
-    MaxClientsPerHost = MaxClients / 10;
-
-    if (MaxClientsPerHost < 4)
-      MaxClientsPerHost = 4;
-  }
+    MaxClientsPerHost = MaxClients;
 
   if (MaxClientsPerHost > MaxClients)
     MaxClientsPerHost = MaxClients;
@@ -607,10 +597,10 @@ ReadConfiguration(void)
   * Read the MIME type and conversion database...
   */
 
-  snprintf(directory, sizeof(directory), "%s/filter", ServerBin);
+  snprintf(temp, sizeof(temp), "%s/filter", ServerBin);
 
   MimeDatabase = mimeNew();
-  mimeMerge(MimeDatabase, ServerRoot, directory);
+  mimeMerge(MimeDatabase, ServerRoot, temp);
 
  /*
   * Create a list of MIME types for the document-format-supported
@@ -638,8 +628,8 @@ ReadConfiguration(void)
   * Load banners...
   */
 
-  snprintf(directory, sizeof(directory), "%s/banners", DataDir);
-  LoadBanners(directory);
+  snprintf(temp, sizeof(temp), "%s/banners", DataDir);
+  LoadBanners(temp);
 
  /*
   * Load printers and classes...
@@ -652,11 +642,11 @@ ReadConfiguration(void)
   * Load devices and PPDs...
   */
 
-  snprintf(directory, sizeof(directory), "%s/model", DataDir);
-  LoadPPDs(directory);
+  snprintf(temp, sizeof(temp), "%s/model", DataDir);
+  LoadPPDs(temp);
 
-  snprintf(directory, sizeof(directory), "%s/backend", ServerBin);
-  LoadDevices(directory);
+  snprintf(temp, sizeof(temp), "%s/backend", ServerBin);
+  LoadDevices(temp);
 
 #ifdef HAVE_CDSASSL
   ServerCertificatesArray = CDSAGetServerCerts();
@@ -1315,7 +1305,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
       char *valueptr; /* Pointer into value */
 
 
-      for (i = 0; i < MAX_SYSTEM_GROUPS; i ++)
+      for (i = NumSystemGroups; i < MAX_SYSTEM_GROUPS; i ++)
       {
         for (valueptr = value; *valueptr; valueptr ++)
 	  if (isspace(*valueptr) || *valueptr == ',')
@@ -1324,7 +1314,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
         if (*valueptr)
           *valueptr++ = '\0';
 
-        strlcpy(SystemGroups[i], value, sizeof(SystemGroups[0]));
+        SetString(SystemGroups + i, value);
 
         while (*value == ',' || isspace(*value))
 	  value ++;
@@ -1458,7 +1448,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
 	    break;
 
 	case VAR_STRING :
-	    strlcpy((char *)var->ptr, value, var->size);
+	    SetString((char **)var->ptr, value);
 	    break;
       }
     }
@@ -2191,5 +2181,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.23 2003/01/29 15:38:45 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.24 2003/01/29 20:08:20 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.28 2003/01/13 20:38:38 mike Exp $"
+ * "$Id: main.c,v 1.57.2.29 2003/01/29 20:08:26 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -26,6 +26,8 @@
  *   main()               - Main entry for the CUPS scheduler.
  *   CatchChildSignals()  - Catch SIGCHLD signals...
  *   IgnoreChildSignals() - Ignore SIGCHLD signals...
+ *   SetString()          - Set a string value.
+ *   SetStringf()         - Set a formatted string value.
  *   sigchld_handler()    - Handle 'child' signals from old processes.
  *   sighup_handler()     - Handle 'hangup' signals to reconfigure the scheduler.
  *   sigterm_handler()    - Handle 'terminate' signals that stop the scheduler.
@@ -116,7 +118,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	        * Absolute directory...
 		*/
 
-		strlcpy(ConfigurationFile, argv[i], sizeof(ConfigurationFile));
+		SetString(&ConfigurationFile, argv[i]);
               }
 	      else
 	      {
@@ -124,9 +126,11 @@ main(int  argc,			/* I - Number of command-line arguments */
 	        * Relative directory...
 		*/
 
-                getcwd(ConfigurationFile, sizeof(ConfigurationFile));
-		strlcat(ConfigurationFile, "/", sizeof(ConfigurationFile));
-		strlcat(ConfigurationFile, argv[i], sizeof(ConfigurationFile));
+                char current[1024];	/* Current directory */
+
+
+                getcwd(current, sizeof(current));
+		SetStringf(&ConfigurationFile, "%s/%s", current, argv[i]);
               }
 	      break;
 
@@ -232,9 +236,9 @@ main(int  argc,			/* I - Number of command-line arguments */
   */
 
   if (getenv("TZ") != NULL)
-    snprintf(TZ, sizeof(TZ), "TZ=%s", getenv("TZ"));
+    SetStringf(&TZ, "TZ=%s", getenv("TZ"));
   else
-    TZ[0] = '\0';
+    SetString(&TZ, "");
 
   tzset();
 
@@ -670,6 +674,21 @@ CatchChildSignals(void)
 
 
 /*
+ * 'ClearString()' - Clear a string.
+ */
+
+void
+ClearString(char **s)			/* O - String value */
+{
+  if (s && *s)
+  {
+    free(*s);
+    *s = NULL;
+  }
+}
+
+
+/*
  * 'IgnoreChildSignals()' - Ignore SIGCHLD signals...
  */
 
@@ -692,6 +711,59 @@ IgnoreChildSignals(void)
 #else
   signal(SIGCLD, SIG_IGN);	/* No, SIGCLD isn't a typo... */
 #endif /* HAVE_SIGSET */
+}
+
+
+/*
+ * 'SetString()' - Set a string value.
+ */
+
+void
+SetString(char       **s,		/* O - New string */
+          const char *v)		/* I - String value */
+{
+  if (!s)
+    return;
+
+  if (*s)
+    free(*s);
+
+  if (v)
+    *s = strdup(v);
+  else
+    *s = NULL;
+}
+
+
+/*
+ * 'SetStringf()' - Set a formatted string value.
+ */
+
+void
+SetStringf(char       **s,		/* O - New string */
+           const char *f,		/* I - Printf-style format string */
+	   ...)				/* I - Additional args as needed */
+{
+  char		v[1024];		/* Formatting string value */
+  va_list	ap;			/* Argument pointer */
+
+
+  if (!s)
+    return;
+
+  if (*s)
+    free(*s);
+
+  if (f)
+  {
+    va_start(ap, f);
+    vsnprintf(v, sizeof(v), f, ap);
+    va_end(ap);
+
+    *s = strdup(v);
+  }
+  else
+    *s = NULL;
 }
 
 
@@ -930,5 +1002,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.28 2003/01/13 20:38:38 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.29 2003/01/29 20:08:26 mike Exp $".
  */
