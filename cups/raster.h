@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.h,v 1.5 1999/04/01 18:24:03 mike Exp $"
+ * "$Id: raster.h,v 1.6 1999/04/05 13:18:47 mike Exp $"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -149,17 +149,17 @@ typedef struct
   char		OutputType[64];		/* OutputType string */
 
   /**** Standard Page Device Dictionary Integer Values ****/
-  unsigned	AdvanceDistance;	/* AdvanceDistance value in pixels */
+  unsigned	AdvanceDistance;	/* AdvanceDistance value in points */
   cups_adv_t	AdvanceMedia;		/* AdvanceMedia value (see above) */
   cups_bool_t	Collate;		/* Collated copies value */
   cups_cut_t	CutMedia;		/* CutMedia value (see above) */
   cups_bool_t	Duplex;			/* Duplexed (double-sided) value */
   unsigned	HWResolution[2];	/* Resolution in dots-per-inch */
-  unsigned	ImagingBoundingBox[4];	/* Pixel region that is painted */
+  unsigned	ImagingBoundingBox[4];	/* Pixel region that is painted (points) */
   cups_bool_t	InsertSheet;		/* InsertSheet value */
   cups_jog_t	Jog;			/* Jog value (see above) */
   cups_edge_t	LeadingEdge;		/* LeadingEdge value (see above) */
-  unsigned	Margins[2];		/* Lower-lefthand margins in pixels */
+  unsigned	Margins[2];		/* Lower-lefthand margins in points */
   cups_bool_t	ManualFeed;		/* ManualFeed value */
   unsigned	MediaPosition;		/* MediaPosition value */
   unsigned	MediaWeight;		/* MediaWeight value in grams/m^2 */
@@ -168,7 +168,7 @@ typedef struct
   unsigned	NumCopies;		/* Number of copies to produce */
   cups_orient_t	Orientation;		/* Orientation value (see above) */
   cups_bool_t	OutputFaceUp;		/* OutputFaceUp value */
-  unsigned	PageSize[2];		/* Width and length of page in pixels */
+  unsigned	PageSize[2];		/* Width and length of page in points */
   cups_bool_t	Separations;		/* Separations value */
   cups_bool_t	TraySwitch;		/* TraySwitch value */
   cups_bool_t	Tumble;			/* Tumble value */
@@ -219,5 +219,5 @@ extern unsigned		cupsRasterWritePixels(cups_raster_t *r,
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h,v 1.5 1999/04/01 18:24:03 mike Exp $".
+ * End of "$Id: raster.h,v 1.6 1999/04/05 13:18:47 mike Exp $".
  */
