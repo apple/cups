@@ -1,0 +1,106 @@
+.\"
+.\" "$Id: lpr.man,v 1.1 2002/05/21 19:59:43 mike Exp $"
+.\"
+.\"   lpr man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2002 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH lpr 1 "Common UNIX Printing System" "23 Janvier 2001" "Easy Software Products"
+.SH NOM
+lpr \- Imprime des fichiers
+.SH SYNOPSIS
+.B lpr
+[ -E ] [ \-P
+.I destination
+] [ \-#
+.I nombre de copies
+[ \-l ] [ \-o
+.I option
+] [ \-p] [ \-r ] [ \-C/J/T
+.I titre
+] [
+.I fichier(s)
+]
+.SH DESCRIPTION
+\fBlpr\fR demande l'impression de fichiers. Si des fichiers sont donnés dans la
+ligne de commande, ceux-ci sont envoyés à la destination donnée (ou la destination
+par défaut si aucune n'est fournie).
+Si aucun fichier n'est donné dans la ligne de commande, \fBlpr\fR lit les fichiers
+sur l'entrée standard.
+.SH OPTIONS
+Les options suivantes sont reconnues par \fBlpr\fR\ :
+.TP 5
+\-E
+.br
+Force le cryptage lors de la connexion au serveur.
+.TP 5
+\-P \fIdestination\fR
+.br
+Imprime les fichiers vers l'imprimante donnée.
+.TP 5
+\-# \fInombre de copies\fR
+.br
+Définit le nombre de copies (de 1 à 100).
+.TP 5
+\-C \fInom\fR
+.br
+Définit le nom du travail d'impression.
+.TP 5
+\-J \fInom\fR
+.br
+Définit le nom du travail d'impression.
+.TP 5
+\-T \fInom\fR
+.br
+Définit le nom du travail d'impression.
+.TP 5
+\-l
+.br
+Spécifie que le fichier est déjà formaté pour la destination, et qu'aucun
+filtre n'a besoin d'être appliqué. Cette option est équivalente à «\ -oraw\ ».
+.TP 5
+\-o \fIoption\fR
+.br
+Définit une option pour le travail d'impression.
+.TP 5
+\-p
+.br
+Spécifie que chaque page du fichier à imprimer doit avoir un en-tête ombré,
+contenant la date, l'heure, le nom du travail d'impression et le numéro de page.
+Cette option est équivalente à «\ -oprettyprint\ » et n'est utile que dans le cas de
+fichiers texte.
+.TP 5
+\-r
+.br
+Spécifie que les fichiers doivent être effacés après impression.
+.SH COMPATIBILITÉ
+Les options «\ c\ », «\ d\ », «\ f\ », «\ g\ », «\ i\ », «\ m\ », «\ n\ »,
+«\ t\ », «\ v\ » et «\ w\ » ne sont pas supportées par CUPS et donnent un
+message d'avertissement lorsqu'elles sont utilisées.
+.SH VOIR AUSSI
+cancel(1), lp(1), lpstat(1),
+CUPS Software Users Manual,
+http://localhost:631/documentation.html
+.SH COPYRIGHT
+Copyright 1993-2002 Easy Software Products, Tous droits réservés.
+.SH TRADUCTION
+Gilles QUERRET <gilles.querret@nerim.net>
+.\"
+.\" End of "$Id: lpr.man,v 1.1 2002/05/21 19:59:43 mike Exp $".
+.\"

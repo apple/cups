@@ -1,0 +1,94 @@
+.\"
+.\" "$Id: cups-lpd.man,v 1.1 2002/05/21 19:59:42 mike Exp $"
+.\"
+.\"   cups-lpd man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2002 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH cups-lpd 8 "Common UNIX Printing System" "13 Février 2001" "Easy Software Products"
+.SH NOM
+cups-lpd \- Reçoit les travaux d'impression et renvoie le statut des imprimantes aux clients lpd
+.SH SYNOPSIS
+.B cups-lpd
+[ -o
+.I option=valeur
+]
+.SH DESCRIPTION
+\fBcups-lpd\fR est un mini serveur Line Printer Daemon («\ LPD\ ») qui
+gère les client génériques utilisant le protocole LPD.
+\fBcups-lpd\fR ne fonctionne pas comme un démon réseau solitaire, mais 
+utilise le super-serveur \fBinetd(8)\fR. Ajoutez la ligne suivante au fichier
+\fBinetd.conf\fR pour activer le démon \fBcups-lpd\fR\ :
+.br
+.nf
+
+    printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd
+.fi
+.LP
+Si vous utilisez le super-serveur \fIxinetd(8)\fR, ajoutez la ligne suivante au fichier
+\fBxinetd.conf\fR\ :
+.br
+.nf
+
+    service printer
+    {
+        socket_type = stream
+        protocol = tcp
+        wait = no
+        user = lp
+        server = /usr/lib/cups/daemon/cups-lpd
+    }
+.fi
+.SH OPTIONS
+L'option \fI-o\fR ajoute des options à tous les travaux d'impression.
+Cette option est souvent utilisée pour désactiver le filtre «\ l\ » de manière
+à ce que les travaux passant par le réseau soient filtrés correctement.
+.br
+.nf
+
+    printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd \
+        -o document-format=application/octet-stream
+.fi
+.LP
+Dans cet exemple, le format du documet est réinitialisé à la valeur
+\fIapplication/octet-stream\fR, ce qui force l'auto-détection du type de
+fichier.
+.SH COMPATIBILITÉ
+\fBcups-lpd\fR ne se conforme pas à la RFC 1179 concernant l'utilisation
+des ports systèmes (1 à 1\|024), car l'utilisation de ces ports n'empêche pas
+un utilisateur d'envoyer un travail d'impression. Bien que ce comportement
+soit différent de celui des implémentations LPD Berkeley, il ne devrait pas
+affecter le déroulement correct des impressions.
+.LP
+Le format de sortie des demandes d'état se conforme à la RFC 2569, Mapping
+between LPD and IPP Protocols. Comme bon nombre d'implémentations LPD ne suivent
+pas cette définition, la récupération d'état par un client LPD peut être
+erronée.
+.SH VOIR AUSSI
+inetd(8), xinetd(8),
+CUPS Software Administrators Manual,
+http://localhost:631/documentation.html
+.SH COPYRIGHT
+Copyright 1993-2002 Easy Software Products, Tous droits réservés.
+.SH TRADUCTION
+Gilles QUERRET <gilles.querret@nerim.net>
+.\"
+.\" End of "$Id: cups-lpd.man,v 1.1 2002/05/21 19:59:42 mike Exp $".
+.\"
+

@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.47 2002/04/23 17:54:04 mike Exp $"
+# "$Id: cups.spec,v 1.48 2002/05/21 19:59:41 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -58,11 +58,6 @@ CUPS provides the System V and Berkeley command-line interfaces.
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This is the development package for creating
 additional printer drivers and other CUPS services.
-
-%description pstoraster
-The Common UNIX Printing System provides a portable printing layer for 
-UNIX® operating systems. This is the PostScript RIP package for
-supporting non-PostScript printer drivers.
 
 %prep
 %setup
@@ -161,6 +156,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/doc/cups/*
 %dir /usr/share/locale
 /usr/share/locale/*
+
 %dir /usr/share/man/cat1
 /usr/share/man/cat1/*
 %dir /usr/share/man/cat5
@@ -174,6 +170,19 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/man8
 /usr/share/man/man8/*
 
+%dir /usr/share/man/fr/cat1
+/usr/share/man/fr/cat1/*
+%dir /usr/share/man/fr/cat5
+/usr/share/man/fr/cat5/*
+%dir /usr/share/man/fr/cat8
+/usr/share/man/fr/cat8/*
+%dir /usr/share/man/fr/man1
+/usr/share/man/fr/man1/*
+%dir /usr/share/man/fr/man5
+/usr/share/man/fr/man5/*
+%dir /usr/share/man/fr/man8
+/usr/share/man/fr/man8/*
+
 %attr(0700,lp,root) %dir /var/spool/cups
 %attr(1700,lp,root) %dir /var/spool/cups/tmp
 
@@ -182,11 +191,17 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/include/cups
 /usr/include/cups/*
 /usr/lib/*.a
+
 %dir /usr/share/man/cat3
 /usr/share/man/cat3/*
 %dir /usr/share/man/man3
 /usr/share/man/man3/*
 
+%dir /usr/share/man/fr/cat3
+/usr/share/man/fr/cat3/*
+%dir /usr/share/man/fr/man3
+/usr/share/man/fr/man3/*
+
 #
-# End of "$Id: cups.spec,v 1.47 2002/04/23 17:54:04 mike Exp $".
+# End of "$Id: cups.spec,v 1.48 2002/05/21 19:59:41 mike Exp $".
 #

@@ -1,0 +1,62 @@
+.\"
+.\" "$Id: accept.man,v 1.1 2002/05/21 19:59:41 mike Exp $"
+.\"
+.\"   accept/reject man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2002 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH accept 8 "Common UNIX Printing System" "23 Janvier 2001" "Easy Software Products"
+.SH NOM
+accept/reject \- Accepte/refuse les travaux d'impression envoyés à une destination
+.SH SYNOPSIS
+.B accept
+destination(s)
+.br
+.B reject
+[ -E ] [ -h
+.I serveur
+] [ -r
+.I raison
+]
+destination(s)
+.SH DESCRIPTION
+\fIaccept\fR envoie l'ordre au système d'impression d'accepter les
+travaux d'impression vers les destinations spécifiées.
+.LP
+\fIreject\fR envoie l'ordre au système d'impression de refuser les
+travaux d'impression vers les destinations spécifiées. L'option \fI-r\fR
+permet de spécifier la raison du rejet des travaux d'impression. Si cette
+raison n'est pas fournie, la raison par défaut est «\ Raison inconnue\ ».
+.LP
+L'option \fI-E\fR force le cryptage lors de la connexion au serveur.
+.SH COMPATIBILITÉ
+Les versions CUPS d'\fIaccept\fR et \fIreject\fR peuvent demander à
+l'utilisateur de s'identifier suivant la configuration du système d'impression,
+à la différence des versions System V, qui demandent le mot de passe root.
+.SH VOIR AUSSI
+cancel(1), disable(8), enable(8), lp(1), lpadmin(8), lpstat(1),
+CUPS Software Administrators Manual,
+http://localhost:631/documentation.html
+.SH COPYRIGHT
+Copyright 1993-2002 Easy Software Products, Tous droits réservés.
+.SH TRADUCTION
+Gilles QUERRET <gilles.querret@nerim.net>
+.\"
+.\" End of "$Id: accept.man,v 1.1 2002/05/21 19:59:41 mike Exp $".
+.\"

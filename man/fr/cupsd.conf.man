@@ -1,0 +1,255 @@
+.\"
+.\" "$Id: cupsd.conf.man,v 1.1 2002/05/21 19:59:42 mike Exp $"
+.\"
+.\"   cupsd.conf man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2001 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH cupsd.conf 5 "Common UNIX Printing System" "22 Juin 2000" «Easy Software Products»
+.SH NOM
+cupsd.conf \- Fichier de configuration du serveur CUPS
+.SH DESCRIPTION
+Le fichier \fIcupsd.conf\fR configure l'ordonnanceur CUPS, \fIcupsd(8)\fR. Il est
+généralement situé dans le répertoire \fI/etc/cups\fR.
+.LP
+Chaque ligne de ce fichier est soit une directive de configuration, une ligne vide, ou
+un commentaire. Les lignes de commentaire commencent par le caractère #. Les directives
+de configuration sont volontairement similaires à celles utilisées par le serveur web
+Apache, et sont décrites ci-dessous.
+.SH DIRECTIVES
+Les directives suivantes sont interprétées par \fIcupsd\fR. Veuillez vous reporter au 
+Manuel d'administration CUPS pour une description plus détaillée.
+.TP 5
+AccessLog
+.br
+Définit le fichier traçant les accès.
+.TP 5
+Allow
+.br
+Permet l'accès à CUPS depuis des machines nommées ou des adresses IP.
+.TP 5
+AuthClass
+.br
+Définit la classe d'identification (User, Group, System)
+.TP 5
+AuthType
+.br
+Définit le type d'identification (None, Basic, Digest)
+.TP 5
+BrowseAddress
+.br
+Définit une adresse où broadcaster les informations sur les imprimantes.
+.TP 5
+BrowseAllow
+.br
+Accepte les paquets arrivant de machines nommées ou d'adresses IP.
+.TP 5
+BrowseDeny
+.br
+Refuse les paquets de demande d'informations sur les imprimantes arrivant
+de machines nommées ou d'adresses IP.
+.TP 5
+BrowseInterval
+.br
+Définit l'intervalle maximum entre les demandes d'information sur les
+imprimantes.
+.TP 5
+BrowseOrder
+.br
+Définit le contrôle d'accès aux informations des imprimantes (allow,deny ou deny,allow).
+.TP 5
+BrowsePoll
+.br
+Définit un serveur récupérant les informations sur les imprimantes.
+.TP 5
+BrowsePort
+.br
+Définit le port utilisé pour les demandes d'informations sur les imprimantes.
+.TP 5
+BrowseRelay
+.br
+Les paquets de demande d'information peuvent être relayés depuis une machine ou
+un réseau vers un autre.
+.TP 5
+BrowseShortNames
+.br
+Définit si les imprimantes distantes utilisent les noms abrégés («\ imprimante\ »)
+ou non («\ imprimante@serveur\ »). Cette option est ignorée si plus d'une imprimante
+distante a le même nom.
+.TP 5
+BrowseTimeout
+.br
+Définit l'intervalle maximum de temps entre deux mises à jour d'informations
+des imprimantes distantes avant que celles-ci ne soient supprimées de la liste
+des imprimantes disponibles.
+.TP 5
+Browsing
+.br
+Définit si la récupération des informations des imprimantes distantes doit être activée.
+.TP 5
+DataDir
+.br
+Définit le répertoire où se trouvent les fichiers de données.
+.TP 5
+DefaultCharset
+.br
+Définit le jeu de caractères par défaut à utiliser pour les textes.
+.TP 5
+DefaultLanguage
+.br
+Définit la langue par défaut à utiliser pour les textes et le site web.
+.TP 5
+Deny
+.br
+Interdit l'accès à une machine nommée ou à une adresse IP.
+.TP 5
+DocumentRoot
+.br
+Définit le répertoire racine des documents du serveur web interne.
+.TP 5
+ErrorLog
+.br
+Définit le nom du fichier traçant les erreurs.
+.TP 5
+Group
+.br
+Définit le nom du groupe ou l'ID qui sera utilisé lors de l'exécution de 
+programmes externes.
+.TP 5
+HostNameLookups
+.br
+Définit s'il faut effectuer ou non des recherches de noms à partir des adresses
+des clients.
+.TP 5
+ImplicitClasses
+.br
+Définit s'il faut créer ou non une classe implicite pour les imprimants distantes
+identiques.
+.TP 5
+KeepAlive
+.br
+Définit s'il faut utiliser HTTP-Keep-Alive.
+.TP 5
+KeepAliveTimeout
+.br
+Définit le timeout pour HTTP-Keep-Alive.
+.TP 5
+<Location /path> ... </Location>
+.br
+Définit les contrôles d'accès à une destination donnée.
+.TP 5
+LogLevel
+.br
+Définit le niveau de trace (none, warn, error, info ou debug).
+.TP 5
+MaxClients
+.br
+Définit le nombre maximum de clients simultanés.
+.TP 5
+MaxLogSize
+.br
+Définit la taille maximale des fichiers de trace. Au delà de cette taille, les fichiers
+sont recyclés (on ne garde que les entrées les plus récentes pour supprimer les plus vieilles).
+Indiquer 0 pour supprimer la rotation des fichiers.
+.TP 5
+MaxRequestSize
+.br
+Définit la taille maximale des fichiers et des requêtes à imprimer. La taille
+est exprimée en octets (0 indique qu'il n'y a pas de limite).
+.TP 5
+Order
+.br
+Définit le contrôle d'accès HTTP (allow,deny ou deny,allow).
+.TP 5
+PageLog
+.br
+Définit le fichier de trace des pages web visitées.
+.TP 5
+Port
+.br
+Définit le numéro du port où écouter les requêtes HTTP.
+.TP 5
+PreserveJobFiles
+.br
+Définit s'il faut conserver ou non les fichiers de travail après impression.
+.TP 5
+PreserveJobHistory
+.br
+Définit s'il faut conserver ou non l'historique des demandes d'impression
+une fois qu'elles sont terminées.
+.TP 5
+Printcap
+.br
+Définit l'emplacement du fichier printcap, contenant la liste des imprimantes,
+et qui est mis à jour automatiquement. Ce fichier est indispensable aux
+applications externes.
+.TP 5
+RIPCache
+.br
+Définit la taille maximale de mémoire à utiliser lors de la conversion d'images
+ou de fichiers PostScript en fichier bitmap pour une imprimante.
+.TP 5
+RequestRoot
+.br
+Définit le répertoire où sont stockés les fichiers de travail et les données
+des requêtes HTTP.
+.TP 5
+ServerAdmin
+.br
+Définit l'adresse électronique de l'administrateur du serveur.
+.TP 5
+ServerBin
+.br
+Définit le répertoire où les applications frontales, les CGI, les démons et
+les filtres sont stockés.
+.TP 5
+ServerName
+.br
+Définit le nom complet du serveur.
+.TP 5
+ServerRoot
+.br
+Définit le répertoire où les fichiers de configuration du serveur sont stockés.
+.TP 5
+SystemGroup
+.br
+Définit le groupe à utiliser pour les identifications système.
+.TP 5
+TempDir
+.br
+Définit le répertoire où les fichiers temporaires sont stockés.
+.TP 5
+Timeout
+.br
+Définit le timeout des requêtes HTTP (en secondes).
+.TP 5
+User
+.br
+Définit le nom ou l'identifiant de l'utilisateur utilisé lors du lancement de programmes externes.
+.SH VOIR AUSSI
+classes.conf(5), cupsd(8), mime.convs(5), mime.types(5), printers.conf(5),
+CUPS Software Administrators Manual,
+http://localhost:631/documentation.html
+.SH COPYRIGHT
+Copyright 1993-2002 Easy Software Products, Tous droits réservés.
+.SH TRADUCTION
+Gilles QUERRET <gilles.querret@nerim.net>
+.\"
+.\" End of "$Id: cupsd.conf.man,v 1.1 2002/05/21 19:59:42 mike Exp $".
+.\"
