@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.55 2000/05/01 19:50:26 mike Exp $"
+ * "$Id: client.c,v 1.56 2000/05/09 14:10:15 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -402,6 +402,9 @@ ReadClient(client_t *con)	/* I - Client to read from */
     con->language = cupsLangGet(con->http.fields[HTTP_FIELD_ACCEPT_LANGUAGE]);
 
     decode_auth(con);
+
+    if (strncmp(con->http.fields[HTTP_FIELD_CONNECTION], "Keep-Alive", 10) == 0)
+      con->http.keep_alive = HTTP_KEEPALIVE_ON;
 
     if (con->http.fields[HTTP_FIELD_HOST][0] == '\0' &&
         con->http.version >= HTTP_1_1)
@@ -1722,5 +1725,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.55 2000/05/01 19:50:26 mike Exp $".
+ * End of "$Id: client.c,v 1.56 2000/05/09 14:10:15 mike Exp $".
  */

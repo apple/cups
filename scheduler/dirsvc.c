@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.53 2000/04/19 15:18:55 mike Exp $"
+ * "$Id: dirsvc.c,v 1.54 2000/05/09 14:10:15 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -669,7 +669,11 @@ StartPolling(void)
 
 
   sprintf(bport, "%d", BrowsePort);
-  sprintf(interval, "%d", BrowseInterval);
+
+  if (BrowseInterval)
+    sprintf(interval, "%d", BrowseInterval);
+  else
+    strcpy(interval, "30");
 
   for (i = 0, poll = Polled; i < NumPolled; i ++, poll ++)
   {
@@ -723,5 +727,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.53 2000/04/19 15:18:55 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.54 2000/05/09 14:10:15 mike Exp $".
  */
