@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpmove.man,v 1.4 2001/01/23 16:26:21 mike Exp $"
+.\" "$Id: lpmove.man,v 1.5 2001/01/23 17:36:21 mike Exp $"
 .\"
 .\"   lpmove man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,11 +21,12 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpmove 8 "Common UNIX Printing System" "10 May 2000" "Easy Software Products"
+.TH lpmove 8 "Common UNIX Printing System" "23 January 2001" "Easy Software Products"
 .SH NAME
 lpmove \- move a job to a new destination
 .SH SYNOPSIS
 .B lpmove
+[ -E ]
 .I job destination
 .SH DESCRIPTION
 \fBlpmove\fR moves the specified \fIjob\fR to \fIdestination\fR. \fIjob\fR
@@ -36,6 +37,8 @@ can be the job ID number or the old destination and job ID:
      lpmove 123 newprinter
      lpmove oldprinter-123 newprinter
 .fi
+.LP
+The \fI-E\fR option forces encryption when connecting to the server.
 .SH COMPATIBILITY
 The System V version of this command also allows moving of all jobs from one
 queue to another. This functionality is currently not supported by CUPS.
@@ -46,5 +49,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2001 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpmove.man,v 1.4 2001/01/23 16:26:21 mike Exp $".
+.\" End of "$Id: lpmove.man,v 1.5 2001/01/23 17:36:21 mike Exp $".
 .\"

@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.26 2001/01/22 15:04:02 mike Exp $"
+ * "$Id: lp.c,v 1.27 2001/01/23 17:36:23 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -121,6 +121,15 @@ main(int  argc,		/* I - Number of command-line arguments */
     if (argv[i][0] == '-')
       switch (argv[i][1])
       {
+        case 'E' : /* Encrypt */
+#ifdef HAVE_LIBSSL
+	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
+#else
+            fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
+	            argv[0]);
+#endif /* HAVE_LIBSSL */
+	    break;
+
         case 'c' : /* Copy to spool dir (always enabled) */
 	    break;
 
@@ -638,5 +647,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.26 2001/01/22 15:04:02 mike Exp $".
+ * End of "$Id: lp.c,v 1.27 2001/01/23 17:36:23 mike Exp $".
  */

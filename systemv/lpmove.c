@@ -1,5 +1,5 @@
 /*
- * "$Id: lpmove.c,v 1.4 2001/01/22 15:04:02 mike Exp $"
+ * "$Id: lpmove.c,v 1.5 2001/01/23 17:36:24 mike Exp $"
  *
  *   "lpmove" command for the Common UNIX Printing System (CUPS).
  *
@@ -59,16 +59,30 @@ main(int  argc,			/* I - Number of command-line arguments */
   http_t	*http;		/* Connection to server */
   const char	*job;		/* Job name */
   const char	*dest;		/* New destination */
+  http_encryption_t encryption;	/* Encryption? */
 
 
-  http = NULL;
-  job  = NULL;
-  dest = NULL;
+  http       = NULL;
+  job        = NULL;
+  dest       = NULL;
+  encryption = cupsEncryption();
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
       switch (argv[i][1])
       {
+        case 'E' : /* Encrypt */
+#ifdef HAVE_LIBSSL
+	    encryption = HTTP_ENCRYPT_REQUIRED;
+
+	    if (http)
+	      httpEncryption(http, encryption);
+#else
+            fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
+	            argv[0]);
+#endif /* HAVE_LIBSSL */
+	    break;
+
         case 'h' : /* Connect to host */
 	    if (http)
 	      httpClose(http);
@@ -93,6 +107,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      perror("lpmove: Unable to connect to server");
 	      return (1);
 	    }
+
+	    httpEncryption(http, encryption);
 	    break;
 
 	default :
@@ -129,6 +145,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       perror("lpmove: Unable to connect to server");
       return (1);
     }
+
+    httpEncryption(http, encryption);
   }
 
   move_job(http, atoi(job), dest);
@@ -214,5 +232,5 @@ move_job(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpmove.c,v 1.4 2001/01/22 15:04:02 mike Exp $".
+ * End of "$Id: lpmove.c,v 1.5 2001/01/23 17:36:24 mike Exp $".
  */

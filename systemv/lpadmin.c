@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.19 2001/01/23 16:26:22 mike Exp $"
+ * "$Id: lpadmin.c,v 1.20 2001/01/23 17:36:23 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -90,12 +90,14 @@ main(int  argc,			/* I - Number of command-line arguments */
   const char	*datadir;	/* CUPS_DATADIR env variable */
   int		num_options;	/* Number of options */
   cups_option_t	*options;	/* Options */
+  http_encryption_t encryption;	/* Encryption? */
 
 
   http        = NULL;
   printer     = NULL;
   num_options = 0;
   options     = NULL;
+  encryption  = cupsEncryption();
 
   if ((datadir = getenv("CUPS_DATADIR")) == NULL)
     datadir = CUPS_DATADIR;
@@ -114,6 +116,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
+
+              httpEncryption(http, encryption);
             }
 
 	    if (printer == NULL)
@@ -157,6 +161,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
+
+              httpEncryption(http, encryption);
             }
 
 	    if (argv[i][2])
@@ -209,7 +215,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      return (1);
 	    }
 	    else
+	    {
+              httpEncryption(http, encryption);
 	      cupsSetServer(http->hostname);
+	    }
 	    break;
 
         case 'i' : /* Use the specified interface script */
@@ -222,6 +231,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
+
+              httpEncryption(http, encryption);
             }
 
 	    if (printer == NULL)
@@ -248,6 +259,20 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 
         case 'E' : /* Enable the printer */
+	    if (printer == NULL)
+	    {
+#ifdef HAVE_LIBSSL
+	      cupsSetEncryption(encryption = HTTP_ENCRYPT_REQUIRED);
+
+	      if (http)
+		httpEncryption(http, encryption);
+#else
+              fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
+	              argv[0]);
+#endif /* HAVE_LIBSSL */
+	      break;
+	    }
+
 	    if (!http)
 	    {
               http = httpConnect(cupsServer(), ippPort());
@@ -257,14 +282,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
-            }
 
-	    if (printer == NULL)
-	    {
-	      fputs("lpadmin: Unable to enable the printer:\n", stderr);
-	      fputs("         You must specify a printer name first!\n", stderr);
-	      return (1);
-	    }
+              httpEncryption(http, encryption);
+            }
 
             enable_printer(http, printer);
             break;
@@ -279,6 +299,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
+
+              httpEncryption(http, encryption);
             }
 
 	    if (printer == NULL)
@@ -335,6 +357,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
+
+              httpEncryption(http, encryption);
             }
 
 	    if (argv[i][2])
@@ -372,6 +396,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
+
+              httpEncryption(http, encryption);
 	    }
 	    break;
 
@@ -385,6 +411,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
+
+              httpEncryption(http, encryption);
             }
 
 	    if (printer == NULL)
@@ -458,6 +486,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
+
+              httpEncryption(http, encryption);
             }
 
 	    if (printer == NULL)
@@ -493,6 +523,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
+
+              httpEncryption(http, encryption);
             }
 
 	    if (argv[i][2])
@@ -546,6 +578,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
+
+              httpEncryption(http, encryption);
             }
 
 	    if (printer == NULL)
@@ -581,6 +615,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
+
+              httpEncryption(http, encryption);
             }
 
 	    if (printer == NULL)
@@ -616,6 +652,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpadmin: Unable to connect to server");
 		return (1);
 	      }
+
+              httpEncryption(http, encryption);
             }
 
 	    if (printer == NULL)
@@ -666,6 +704,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	perror("lpadmin: Unable to connect to server");
 	return (1);
       }
+
+      httpEncryption(http, encryption);
     }
 
     if (printer == NULL)
@@ -1759,5 +1799,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.19 2001/01/23 16:26:22 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.20 2001/01/23 17:36:23 mike Exp $".
  */

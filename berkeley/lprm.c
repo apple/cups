@@ -1,5 +1,5 @@
 /*
- * "$Id: lprm.c,v 1.13 2001/01/22 15:03:21 mike Exp $"
+ * "$Id: lprm.c,v 1.14 2001/01/23 17:36:20 mike Exp $"
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
@@ -58,17 +58,19 @@ main(int  argc,			/* I - Number of command-line arguments */
   cups_lang_t	*language;	/* Language */
   int		num_dests;	/* Number of destinations */
   cups_dest_t	*dests;		/* Destinations */
+  http_encryption_t encryption;	/* Encryption? */
 
 
  /*
   * Setup to cancel individual print jobs...
   */
 
-  op       = IPP_CANCEL_JOB;
-  job_id   = 0;
-  dest     = NULL;
-  response = NULL;
-  http     = NULL;
+  op         = IPP_CANCEL_JOB;
+  job_id     = 0;
+  dest       = NULL;
+  response   = NULL;
+  http       = NULL;
+  encryption = cupsEncryption();
 
   num_dests = cupsGetDests(&dests);
 
@@ -87,6 +89,8 @@ main(int  argc,			/* I - Number of command-line arguments */
     return (1);
   }
 
+  httpEncryption(http, encryption);
+
  /*
   * Process command-line arguments...
   */
@@ -95,6 +99,17 @@ main(int  argc,			/* I - Number of command-line arguments */
     if (argv[i][0] == '-' && argv[i][1] != '\0')
       switch (argv[i][1])
       {
+        case 'E' : /* Encrypt */
+#ifdef HAVE_LIBSSL
+	    encryption = HTTP_ENCRYPT_REQUIRED;
+
+	    httpEncryption(http, encryption);
+#else
+            fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
+	            argv[0]);
+#endif /* HAVE_LIBSSL */
+	    break;
+
         case 'P' : /* Cancel jobs on a printer */
 	    if (argv[i][2])
 	      dest = argv[i] + 2;
@@ -239,5 +254,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lprm.c,v 1.13 2001/01/22 15:03:21 mike Exp $".
+ * End of "$Id: lprm.c,v 1.14 2001/01/23 17:36:20 mike Exp $".
  */

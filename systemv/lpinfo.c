@@ -1,5 +1,5 @@
 /*
- * "$Id: lpinfo.c,v 1.2 2001/01/22 15:04:02 mike Exp $"
+ * "$Id: lpinfo.c,v 1.3 2001/01/23 17:36:23 mike Exp $"
  *
  *   "lpinfo" command for the Common UNIX Printing System (CUPS).
  *
@@ -60,15 +60,29 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		i;		/* Looping var */
   http_t	*http;		/* Connection to server */
   int		long_status;	/* Long listing? */
+  http_encryption_t encryption;	/* Encryption? */
 
 
   http        = NULL;
   long_status = 0;
+  encryption  = cupsEncryption();
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
       switch (argv[i][1])
       {
+        case 'E' : /* Encrypt */
+#ifdef HAVE_LIBSSL
+	    encryption = HTTP_ENCRYPT_REQUIRED;
+
+	    if (http)
+	      httpEncryption(http, encryption);
+#else
+            fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
+	            argv[0]);
+#endif /* HAVE_LIBSSL */
+	    break;
+
         case 'l' : /* Show long listing */
 	    long_status = 1;
 	    break;
@@ -83,6 +97,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpinfo: Unable to connect to server");
 		return (1);
 	      }
+
+	      httpEncryption(http, encryption);
             }
 
             show_models(http, long_status);
@@ -98,6 +114,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpinfo: Unable to connect to server");
 		return (1);
 	      }
+
+	      httpEncryption(http, encryption);
             }
 
             show_devices(http, long_status);
@@ -127,6 +145,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      perror("lpinfo: Unable to connect to server");
 	      return (1);
 	    }
+
+	    httpEncryption(http, encryption);
 	    break;
 
 	default :
@@ -426,5 +446,5 @@ show_models(http_t *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpinfo.c,v 1.2 2001/01/22 15:04:02 mike Exp $".
+ * End of "$Id: lpinfo.c,v 1.3 2001/01/23 17:36:23 mike Exp $".
  */

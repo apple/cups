@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.34 2001/01/22 15:04:03 mike Exp $"
+ * "$Id: lpstat.c,v 1.35 2001/01/23 17:36:24 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -74,6 +74,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   cups_dest_t	*dests;		/* User destinations */
   int		long_status;	/* Long status report? */
   int		ranking;	/* Show job ranking? */
+  http_encryption_t encryption;	/* Encryption? */
 
 
   http        = NULL;
@@ -81,6 +82,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   dests       = NULL;
   long_status = 0;
   ranking     = 0;
+  encryption  = cupsEncryption();
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -88,6 +90,18 @@ main(int  argc,			/* I - Number of command-line arguments */
       {
         case 'D' : /* Show description */
 	    long_status = 1;
+	    break;
+
+        case 'E' : /* Encrypt */
+#ifdef HAVE_LIBSSL
+	    encryption = HTTP_ENCRYPT_REQUIRED;
+
+	    if (http)
+	      httpEncryption(http, encryption);
+#else
+            fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
+	            argv[0]);
+#endif /* HAVE_LIBSSL */
 	    break;
 
         case 'P' : /* Show paper types */
@@ -112,6 +126,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpstat: Unable to connect to server");
 		return (1);
 	      }
+
+	      httpEncryption(http, encryption);
             }
 
             if (num_dests == 0)
@@ -138,6 +154,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpstat: Unable to connect to server");
 		return (1);
 	      }
+
+	      httpEncryption(http, encryption);
             }
 
 	    if (argv[i][2] != '\0')
@@ -192,6 +210,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      perror("lpstat: Unable to connect to server");
 	      return (1);
 	    }
+
+	    httpEncryption(http, encryption);
 	    break;
 
         case 'l' : /* Long status */
@@ -208,6 +228,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpstat: Unable to connect to server");
 		return (1);
 	      }
+
+	      httpEncryption(http, encryption);
             }
 
 	    if (argv[i][2] != '\0')
@@ -231,6 +253,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpstat: Unable to connect to server");
 		return (1);
 	      }
+
+	      httpEncryption(http, encryption);
             }
 
             if (num_dests == 0)
@@ -257,6 +281,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpstat: Unable to connect to server");
 		return (1);
 	      }
+
+	      httpEncryption(http, encryption);
             }
 
 	    show_scheduler(http);
@@ -272,6 +298,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpstat: Unable to connect to server");
 		return (1);
 	      }
+
+	      httpEncryption(http, encryption);
             }
 
             if (num_dests == 0)
@@ -292,6 +320,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpstat: Unable to connect to server");
 		return (1);
 	      }
+
+	      httpEncryption(http, encryption);
             }
 
             if (num_dests == 0)
@@ -316,6 +346,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpstat: Unable to connect to server");
 		return (1);
 	      }
+
+	      httpEncryption(http, encryption);
             }
 
 	    if (argv[i][2] != '\0')
@@ -339,6 +371,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		perror("lpstat: Unable to connect to server");
 		return (1);
 	      }
+
+	      httpEncryption(http, encryption);
             }
 
             if (num_dests == 0)
@@ -371,6 +405,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  perror("lpstat: Unable to connect to server");
 	  return (1);
 	}
+
+	httpEncryption(http, encryption);
       }
 
       show_jobs(http, argv[i], NULL, long_status, ranking);
@@ -387,6 +423,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	perror("lpstat: Unable to connect to server");
 	return (1);
       }
+
+      httpEncryption(http, encryption);
     }
 
     show_jobs(http, NULL, cupsUser(), long_status, ranking);
@@ -1832,5 +1870,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.34 2001/01/22 15:04:03 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.35 2001/01/23 17:36:24 mike Exp $".
  */

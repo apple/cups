@@ -1,4 +1,4 @@
-INSTALL - CUPS v1.1.5 - 12/20/2000
+INSTALL - CUPS v1.1.6 - 01/23/2001
 ----------------------------------
 
 This file describes how to compile and install CUPS from source
@@ -71,6 +71,9 @@ To enable support for encryption, you'll also want to add the
 SSL and TLS support require the OpenSSL library, available at:
 
     http://www.openssl.org
+
+See the file "ENCRYPTION.txt" for information on using the
+encryption support in CUPS.
 
 Once you have configured things, just type:
 

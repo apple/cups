@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpinfo.man,v 1.4 2001/01/23 16:26:20 mike Exp $"
+.\" "$Id: lpinfo.man,v 1.5 2001/01/23 17:36:21 mike Exp $"
 .\"
 .\"   lpinfo man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,16 +21,20 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpinfo 8 "Common UNIX Printing System" "10 May 2000" "Easy Software Products"
+.TH lpinfo 8 "Common UNIX Printing System" "23 January 2001" "Easy Software Products"
 .SH NAME
 lpinfo \- show available devices or drivers
 .SH SYNOPSIS
 .B lpinfo
-[ -l ] [ -m ] [ -v ]
+[ -E ] [ -l ] [ -m ] [ -v ]
 .SH DESCRIPTION
 \fBlpinfo\fR lists the available devices or drivers known to the CUPS
 server. One of the \fI-m\fR or \fI-v\fR options must be specified to
 get any output:
+.TP 5
+\-E
+.br
+Forces encryption when connecting to the server.
 .TP 5
 \-l
 .br
@@ -52,5 +56,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2001 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpinfo.man,v 1.4 2001/01/23 16:26:20 mike Exp $".
+.\" End of "$Id: lpinfo.man,v 1.5 2001/01/23 17:36:21 mike Exp $".
 .\"

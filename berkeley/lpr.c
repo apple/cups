@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.16 2001/01/22 15:03:21 mike Exp $"
+ * "$Id: lpr.c,v 1.17 2001/01/23 17:36:20 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -33,6 +33,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <config.h>
 #include <cups/cups.h>
 
 
@@ -97,6 +99,15 @@ main(int  argc,		/* I - Number of command-line arguments */
     if (argv[i][0] == '-')
       switch (argv[i][1])
       {
+        case 'E' : /* Encrypt */
+#ifdef HAVE_LIBSSL
+	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
+#else
+            fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
+	            argv[0]);
+#endif /* HAVE_LIBSSL */
+	    break;
+
 	case 'i' : /* indent */
 	case 'w' : /* width */
 	    if (argv[i][2] == '\0')
@@ -353,5 +364,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c,v 1.16 2001/01/22 15:03:21 mike Exp $".
+ * End of "$Id: lpr.c,v 1.17 2001/01/23 17:36:20 mike Exp $".
  */

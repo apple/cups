@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lp.man,v 1.4 2001/01/23 16:26:20 mike Exp $"
+.\" "$Id: lp.man,v 1.5 2001/01/23 17:36:21 mike Exp $"
 .\"
 .\"   lp/cancel man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,14 +21,14 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lp 1 "Common UNIX Printing System" "11 November 2000" "Easy Software Products"
+.TH lp 1 "Common UNIX Printing System" "23 January 2001" "Easy Software Products"
 .SH NAME
 lp \- print files
 .br
 cancel \- cancel jobs
 .SH SYNOPSIS
 .B lp
-[ \-c ] [ \-d
+[ -E ] [ \-c ] [ \-d
 .I destination
 ] [ \-h
 .I server
@@ -67,6 +67,10 @@ cancel \- cancel jobs
 all jobs from the specified destination.
 .SH OPTIONS
 The following options are recognized by \fBlp\fR:
+.TP 5
+\-E
+.br
+Forces encryption when connecting to the server.
 .TP 5
 \-d \fIdestination\fR
 .br
@@ -131,5 +135,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2001 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lp.man,v 1.4 2001/01/23 16:26:20 mike Exp $".
+.\" End of "$Id: lp.man,v 1.5 2001/01/23 17:36:21 mike Exp $".
 .\"

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.15 2001/01/22 15:03:21 mike Exp $"
+ * "$Id: lpq.c,v 1.16 2001/01/23 17:36:20 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -39,6 +39,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <config.h>
 #include <cups/cups.h>
 #include <cups/language.h>
 #include <cups/debug.h>
@@ -71,13 +72,18 @@ main(int  argc,		/* I - Number of command-line arguments */
 		longstatus;	/* Show file details */
   int		num_dests;	/* Number of destinations */
   cups_dest_t	*dests;		/* Destinations */
+  http_encryption_t encryption;	/* Encryption? */
 
 
  /*
   * Connect to the scheduler...
   */
 
-  http = httpConnect(cupsServer(), ippPort());
+  if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
+  {
+    fputs("lpq: Unable to contact server!\n", stderr);
+    return (1);
+  }
 
  /*
   * Check for command-line options...
@@ -102,6 +108,18 @@ main(int  argc,		/* I - Number of command-line arguments */
     {
       switch (argv[i][1])
       {
+        case 'E' : /* Encrypt */
+#ifdef HAVE_LIBSSL
+	    encryption = HTTP_ENCRYPT_REQUIRED;
+
+	    if (http)
+	      httpEncryption(http, encryption);
+#else
+            fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
+	            argv[0]);
+#endif /* HAVE_LIBSSL */
+	    break;
+
         case 'P' : /* Printer */
 	    if (argv[i][2])
 	      dest = argv[i] + 2;
@@ -513,5 +531,5 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpq.c,v 1.15 2001/01/22 15:03:21 mike Exp $".
+ * End of "$Id: lpq.c,v 1.16 2001/01/23 17:36:20 mike Exp $".
  */

@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: enable.man,v 1.3 2001/01/23 16:26:20 mike Exp $"
+.\" "$Id: enable.man,v 1.4 2001/01/23 17:36:21 mike Exp $"
 .\"
 .\"   enable/disable man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,19 +21,19 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH enable 8 "Common UNIX Printing System" "22 September 1999" "Easy Software Products"
+.TH enable 8 "Common UNIX Printing System" "23 January 2001" "Easy Software Products"
 .SH NAME
 disable, enable \- stop/start printers and classes
 .SH SYNOPSIS
 .B disable
-[ \-c ] [ -h
+[ -E ] [ \-c ] [ -h
 .I server
 ] [ \-r [
 .I reason
 ] ] destination(s)
 .br
 .B enable
-destination(s)
+[ -E ] destination(s)
 .SH DESCRIPTION
 \fIenable\fR starts the named printers or classes.
 .LP
@@ -48,6 +48,8 @@ Cancels all jobs on the named destination.
 .br
 Sets the message associated with the stopped state. If no reason is specified
 then the message is set to "Reason Unknown".
+.LP
+The \fI-E\fR option forces encryption when connecting to the server.
 .SH COMPATIBILITY
 The CUPS versions of \fIdisable\fR and \fIenable\fR may ask the user for an
 access password depending on the printing system configuration.  This differs
@@ -61,5 +63,5 @@ http://localhost:631/documentation.html
 Copyright 1993-2001 by Easy Software Products, All Rights Reserved.
 
 .\"
-.\" End of "$Id: enable.man,v 1.3 2001/01/23 16:26:20 mike Exp $".
+.\" End of "$Id: enable.man,v 1.4 2001/01/23 17:36:21 mike Exp $".
 .\"

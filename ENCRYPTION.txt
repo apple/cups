@@ -1,4 +1,4 @@
-ENCRYPTION - CUPS v1.1.5 - 12/20/2000
+ENCRYPTION - CUPS v1.1.6 - 01/23/2001
 -------------------------------------
 
 This file describes the encryption support provided by CUPS.
@@ -37,9 +37,12 @@ Stick with "https" for web browsers.
 
 The current implementation is very basic.  The CUPS client
 software (lp, lpr, etc.) uses encryption as requested by the
-server and/or as specified by the Encryption directive in the
-client.conf file or in the CUPS_ENCRYPTION environment
-variable:
+user or server.
+
+The user can specify the "-E" option with the printing commands
+to force encryption of the connection.  Encryption can also be
+specified using the Encryption directive in the client.conf file
+or in the CUPS_ENCRYPTION environment variable:
 
     Never
 
@@ -60,6 +63,7 @@ variable:
 	connection is made.  This is different than the "Always"
 	mode above since the connection is initially unsecure
 	and the client initiates the upgrade to TLS encryption.
+	(same as using the "-E" option)
 
 These keywords are also used in the cupsd.conf file to secure
 particular locations.  To secure all traffic on the server, listen

@@ -1,4 +1,4 @@
-CHANGES.txt - 01/18/2000
+CHANGES.txt - 01/23/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.6
@@ -48,6 +48,8 @@ CHANGES IN CUPS V1.1.6
 	  BrowseInterval was set to 0.
 	- The lpadmin command now supports setting of options
 	  and user-level access control.
+	- Added "-E" option to all printing commands to force
+	  encryption.
 
 
 CHANGES IN CUPS V1.1.5-2

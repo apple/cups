@@ -1,5 +1,5 @@
 /*
- * "$Id: accept.c,v 1.10 2001/01/22 15:04:02 mike Exp $"
+ * "$Id: accept.c,v 1.11 2001/01/23 17:36:22 mike Exp $"
  *
  *   "accept", "disable", "enable", and "reject" commands for the Common
  *   UNIX Printing System (CUPS).
@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+#include <config.h>
 #include <cups/cups.h>
 #include <cups/language.h>
 
@@ -61,6 +62,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   ipp_op_t	op;		/* Operation */
   cups_lang_t	*language;	/* Language */
   int		cancel;		/* Cancel jobs? */
+  http_encryption_t encryption;	/* Encryption? */
 
 
  /*
@@ -88,8 +90,9 @@ main(int  argc,			/* I - Number of command-line arguments */
     return (1);
   }
 
-  http   = NULL;
-  reason = NULL;
+  http       = NULL;
+  reason     = NULL;
+  encryption = cupsEncryption();
 
  /*
   * Process command-line arguments...
@@ -99,6 +102,18 @@ main(int  argc,			/* I - Number of command-line arguments */
     if (argv[i][0] == '-')
       switch (argv[i][1])
       {
+        case 'E' : /* Encrypt */
+#ifdef HAVE_LIBSSL
+	    encryption = HTTP_ENCRYPT_REQUIRED;
+
+	    if (http)
+	      httpEncryption(http, encryption);
+#else
+            fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
+	            argv[0]);
+#endif /* HAVE_LIBSSL */
+	    break;
+
         case 'c' : /* Cancel jobs */
 	    cancel = 1;
 	    break;
@@ -211,6 +226,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       * Do the request and get back a response...
       */
 
+      httpEncryption(http, encryption);
+
       if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
       {
         if (response->request.status.status_code > IPP_OK_CONFLICT)
@@ -289,5 +306,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: accept.c,v 1.10 2001/01/22 15:04:02 mike Exp $".
+ * End of "$Id: accept.c,v 1.11 2001/01/23 17:36:22 mike Exp $".
  */
