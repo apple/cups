@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertoepson.c,v 1.10.2.8 2004/06/29 13:15:09 mike Exp $"
+ * "$Id: rastertoepson.c,v 1.10.2.9 2004/07/22 21:08:29 mike Exp $"
  *
  *   EPSON ESC/P and ESC/P2 filter for the Common UNIX Printing System
  *   (CUPS).
@@ -176,7 +176,7 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
   {
     case EPSON_9PIN :
     case EPSON_24PIN :
-        printf("\033P");		/* Set 10 CPI */
+        printf("\033P\022");		/* Set 10 CPI */
 
 	if (header->HWResolution[0] == 360 || header->HWResolution[0] == 240)
 	{
@@ -194,6 +194,7 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
 	printf("\033C%c%c", 0,		/* Page length */
                       (int)(header->PageSize[1] / 72.0 + 0.5));
 	printf("\033N%c", 0);		/* Bottom margin */
+        printf("\033O");		/* No perforation skip */
 
        /*
 	* Setup various buffer limits...
@@ -210,6 +211,7 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
 	  {
 	    case 60:
 	    case 120 :
+	    case 240 :
         	printf("\033\063\030");	/* Set line feed */
 		break;
 
@@ -339,7 +341,10 @@ EndPage(const cups_page_header_t *header)	/* I - Page header */
     */
 
     if (!Shingling)
-      OutputRows(header, 0);
+    {
+      if (DotBit < 128 || EvenOffset)
+        OutputRows(header, 0);
+    }
     else if (OddOffset > EvenOffset)
     {
       OutputRows(header, 1);
@@ -866,10 +871,15 @@ OutputRows(const cups_page_header_t *header,	/* I - Page image header */
     * Position print head for printing...
     */
 
-    putchar(0x1b);
-    putchar('$');
-    putchar(i & 255);
-    putchar(i >> 8);
+    if (i == 0)
+      putchar('\r');
+    else
+    {
+      putchar(0x1b);
+      putchar('$');
+      putchar(i & 255);
+      putchar(i >> 8);
+    }
 
    /*
     * Start bitmap graphics for this line...
@@ -933,10 +943,15 @@ OutputRows(const cups_page_header_t *header,	/* I - Page image header */
       * Move the head back and print the odd bytes...
       */
 
-      putchar(0x1b);
-      putchar('$');
-      putchar(i & 255);
-      putchar(i >> 8);
+      if (i == 0)
+	putchar('\r');
+      else
+      {
+	putchar(0x1b);
+	putchar('$');
+	putchar(i & 255);
+	putchar(i >> 8);
+      }
 
       if (header->HWResolution[0] == 120)
       	printf("\033*\001");		/* Select bit image */
@@ -1133,5 +1148,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertoepson.c,v 1.10.2.8 2004/06/29 13:15:09 mike Exp $".
+ * End of "$Id: rastertoepson.c,v 1.10.2.9 2004/07/22 21:08:29 mike Exp $".
  */
