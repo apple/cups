@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.48 1999/09/02 15:55:11 mike Exp $"
+ * "$Id: http.c,v 1.49 1999/09/08 20:09:36 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -330,7 +330,8 @@ httpReconnect(http_t *http)	/* I - HTTP data */
 
   if ((http->fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
   {
-    http->error = errno;
+    http->error  = errno;
+    http->status = HTTP_ERROR;
     return (-1);
   }
 
@@ -354,7 +355,8 @@ httpReconnect(http_t *http)	/* I - HTTP data */
   if (connect(http->fd, (struct sockaddr *)&(http->hostaddr),
               sizeof(http->hostaddr)) < 0)
   {
-    http->error = errno;
+    http->error  = errno;
+    http->status = HTTP_ERROR;
 
 #ifdef WIN32
     closesocket(http->fd);
@@ -364,8 +366,9 @@ httpReconnect(http_t *http)	/* I - HTTP data */
 
     return (-1);
   }
-  else
-    http->error = 0;
+
+  http->error  = 0;
+  http->status = HTTP_CONTINUE;
 
   return (0);
 }
@@ -1178,7 +1181,10 @@ httpUpdate(http_t *http)		/* I - HTTP data */
       httpSetField(http, field, value);
     }
     else
+    {
+      http->status = HTTP_ERROR;
       return (HTTP_ERROR);
+    }
   }
 
  /*
@@ -1186,7 +1192,10 @@ httpUpdate(http_t *http)		/* I - HTTP data */
   */
 
   if (http->error)
+  {
+    http->status = HTTP_ERROR;
     return (HTTP_ERROR);
+  }
 
  /*
   * If we haven't already returned, then there is nothing new...
@@ -1423,6 +1432,13 @@ http_send(http_t       *http,	/* I - HTTP data */
   *ptr = '\0';
 
  /*
+  * See if we had an error the last time around; if so, reconnect...
+  */
+
+  if (http->status == HTTP_ERROR || http->status >= HTTP_BAD_REQUEST)
+    httpReconnect(http);
+
+ /*
   * Send the request header...
   */
 
@@ -1434,20 +1450,8 @@ http_send(http_t       *http,	/* I - HTTP data */
 
   if (httpPrintf(http, "%s %s HTTP/1.1\r\n", codes[request], buf) < 1)
   {
-   /*
-    * Might have lost connection; try to reconnect...
-    */
-
-    if (httpReconnect(http))
-      return (-1);
-
-   /*
-    * OK, we've reconnected, send the request again...
-    */
-
-    if (httpPrintf(http, "%s %s HTTP/%d.%d\r\n", codes[request], buf,
-                   http->version / 100, http->version % 100) < 1)
-      return (-1);
+    http->status = HTTP_ERROR;
+    return (-1);
   }
 
   for (i = 0; i < HTTP_FIELD_MAX; i ++)
@@ -1456,11 +1460,17 @@ http_send(http_t       *http,	/* I - HTTP data */
       DEBUG_printf(("%s: %s\n", http_fields[i], http->fields[i]));
 
       if (httpPrintf(http, "%s: %s\r\n", http_fields[i], http->fields[i]) < 1)
-        return (-1);
+      {
+	http->status = HTTP_ERROR;
+	return (-1);
+      }
     }
 
   if (httpPrintf(http, "\r\n") < 1)
+  {
+    http->status = HTTP_ERROR;
     return (-1);
+  }
 
   httpClearFields(http);
 
@@ -1469,5 +1479,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.48 1999/09/02 15:55:11 mike Exp $".
+ * End of "$Id: http.c,v 1.49 1999/09/08 20:09:36 mike Exp $".
  */
