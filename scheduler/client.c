@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.102 2001/07/24 14:00:07 mike Exp $"
+ * "$Id: client.c,v 1.103 2001/10/25 16:26:02 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -525,7 +525,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      if (major < 2)
 	      {
 	        con->http.version = (http_version_t)(major * 100 + minor);
-		if (con->http.version == HTTP_1_1)
+		if (con->http.version == HTTP_1_1 && KeepAlive)
 		  con->http.keep_alive = HTTP_KEEPALIVE_ON;
 		else
 		  con->http.keep_alive = HTTP_KEEPALIVE_OFF;
@@ -608,7 +608,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
     decode_auth(con);
 
-    if (strncmp(con->http.fields[HTTP_FIELD_CONNECTION], "Keep-Alive", 10) == 0)
+    if (strncmp(con->http.fields[HTTP_FIELD_CONNECTION], "Keep-Alive", 10) == 0 &&
+        KeepAlive)
       con->http.keep_alive = HTTP_KEEPALIVE_ON;
 
     if (con->http.fields[HTTP_FIELD_HOST][0] == '\0' &&
@@ -1762,6 +1763,29 @@ WriteClient(client_t *con)		/* I - Client connection */
     }
 
     con->bytes += bytes;
+
+#ifdef __APPLE__ /* Currently just test code... */
+    printf("Wrote %d initial bytes...\n", bytes);
+
+    if (!con->pipe_pid)
+    {
+     /*
+      * Copy rest of file...
+      */
+
+      while ((bytes = read(con->file, buf, HTTP_MAX_BUFFER)) > 0)
+      {
+        con->bytes += bytes;
+        printf("Writing %d more bytes...\n", bytes);
+ 
+        if (httpWrite(HTTP(con), buf, bytes) < 0)
+        {
+          CloseClient(con);
+          return (0);
+        }
+      }
+    }
+#endif /* __APPLE__ */
   }
 
   if (bytes <= 0)
@@ -2475,5 +2499,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.102 2001/07/24 14:00:07 mike Exp $".
+ * End of "$Id: client.c,v 1.103 2001/10/25 16:26:02 mike Exp $".
  */
