@@ -1,5 +1,5 @@
 /*
- * "$Id: image.h,v 1.3 1998/02/19 20:44:58 mike Exp $"
+ * "$Id: image.h,v 1.4 1998/07/28 20:48:30 mike Exp $"
  *
  *   Image library definitions for espPrint, a collection of printer drivers.
  *
@@ -14,7 +14,10 @@
  * Revision History:
  *
  *   $Log: image.h,v $
- *   Revision 1.3  1998/02/19 20:44:58  mike
+ *   Revision 1.4  1998/07/28 20:48:30  mike
+ *   Moved min, max, and abs macros from colorspace.c to here...
+ *
+ *   Revision 1.3  1998/02/19  20:44:58  mike
  *   Image file definitions.
  *
  */
@@ -47,7 +50,22 @@
  */
 
 #  define TILE_SIZE	256		/* 256x256 pixel tiles */
-#  define TILE_DEFAULT	50		/* Default maximum number of tiles */
+#  define TILE_MINIMUM	10		/* Minimum number of tiles */
+
+/*
+ * min/max/abs macros...
+ */
+
+#ifndef max
+#  define 	max(a,b)	((a) > (b) ? (a) : (b))
+#endif /* !max */
+#ifndef min
+#  define 	min(a,b)	((a) < (b) ? (a) : (b))
+#endif /* !min */
+#ifndef abs
+#  define	abs(a)		((a) < 0 ? -(a) : (a))
+#endif /* !abs */
+
 
 /*
  * Image byte type...
@@ -197,5 +215,5 @@ extern void	ImageZoomFree(izoom_t *z);
 #endif /* !_IMAGE_H_ */
 
 /*
- * End of "$Id: image.h,v 1.3 1998/02/19 20:44:58 mike Exp $".
+ * End of "$Id: image.h,v 1.4 1998/07/28 20:48:30 mike Exp $".
  */
