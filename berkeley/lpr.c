@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.1 1999/05/13 20:39:59 mike Exp $"
+ * "$Id: lpr.c,v 1.2 1999/07/07 13:44:12 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -82,6 +82,16 @@ main(int  argc,		/* I - Number of command-line arguments */
 	case 'v' : /* Raster image */
 	    fprintf(stderr, "Warning: \'%c\' format modifier not supported - output may not be correct!\n",
 	            argv[i][1]);
+	    break;
+
+	case 'o' : /* Option */
+	    if (argv[i][2] != '\0')
+	      num_options = cupsParseOptions(argv[i] + 2, num_options, &options);
+	    else
+	    {
+	      i ++;
+	      num_options = cupsParseOptions(argv[i], num_options, &options);
+	    }
 	    break;
 
 	case 'l' : /* Literal/raw */
@@ -228,5 +238,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lpr.c,v 1.1 1999/05/13 20:39:59 mike Exp $".
+ * End of "$Id: lpr.c,v 1.2 1999/07/07 13:44:12 mike Exp $".
  */
