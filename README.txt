@@ -1,4 +1,4 @@
-README - CUPS v1.1.19rc1 - 04/11/2003
+README - CUPS v1.1.19rc3 - 04/28/2003
 -------------------------------------
 
 **** THIS IS A RELEASE CANDIDATE AND NOT A PRODUCTION     ****
