@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.154 2003/09/15 19:40:47 mike Exp $"
+ * "$Id: printers.c,v 1.155 2003/10/29 16:53:12 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -972,6 +972,17 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 		  "two-long-edge",
 		  "two-short-edge"
 		};
+  static const char * const holds[] =	/* job-hold-until-supported values */
+		{
+		  "no-hold",
+		  "indefinite",
+		  "day-time",
+		  "evening",
+		  "night",
+		  "second-shift",
+		  "third-shift",
+		  "weekend"
+		};
   static const char * const versions[] =/* ipp-versions-supported values */
 		{
 		  "1.0",
@@ -1113,6 +1124,11 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
                    "orientation-requested-supported", 4, (int *)orients);
     ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                   "orientation-requested-default", IPP_PORTRAIT);
+    ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                  "job-hold-until-supported", sizeof(holds) / sizeof(holds[0]),
+		  NULL, holds);
+    ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                 "job-hold-until-default", NULL, "no-hold");
 
     if (NumBanners > 0)
     {
@@ -2378,5 +2394,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.154 2003/09/15 19:40:47 mike Exp $".
+ * End of "$Id: printers.c,v 1.155 2003/10/29 16:53:12 mike Exp $".
  */
