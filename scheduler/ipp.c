@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.69 2000/05/22 18:22:54 mike Exp $"
+ * "$Id: ipp.c,v 1.70 2000/06/01 18:09:45 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1878,10 +1878,15 @@ copy_banner(client_t   *con,	/* I - Client connection */
 
 		for (p = attr->values[i].string.text; *p; p ++)
 		{
-		  if (*p == ')' || *p == '\\')
+		  if (*p == '(' || *p == ')' || *p == '\\')
+		  {
 		    putc('\\', out);
-
-		  putc(*p, out);
+		    putc(*p, out);
+		  }
+		  else if (*p < 32 || *p > 126)
+		    fprintf(out, "\\%03o", *p);
+		  else
+		    putc(*p, out);
 		}
 	      }
 	      else
@@ -4801,5 +4806,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.69 2000/05/22 18:22:54 mike Exp $".
+ * End of "$Id: ipp.c,v 1.70 2000/06/01 18:09:45 mike Exp $".
  */
