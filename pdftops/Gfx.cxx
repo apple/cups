@@ -2472,40 +2472,32 @@ void Gfx::doForm(Object *str) {
 void Gfx::doAnnot(Object *str, double xMin, double yMin,
 		  double xMax, double yMax) {
   Dict *dict, *resDict;
-  Object matrixObj, bboxObj, resObj, subTypeObj;
+  Object matrixObj, bboxObj, resObj, flagsObj;
   Object obj1;
   double m[6], bbox[6], ictm[6];
   double *ctm;
   double formX0, formY0, formX1, formY1;
   double annotX0, annotY0, annotX1, annotY1;
   double det, x, y, sx, sy;
-  int i;
+  int i, flags;
 
   // get stream dict
   dict = str->streamGetDict();
 
-  // check if the SubType is set to Widget, and ignore if so - we don't
-  // need no stinkin' buttons in the PS output!
-  dict->lookup("SubType", &subTypeObj);
+  // get annotation flags and only print annotations that are hidden or
+  // don't have the print bit set.
+  dict->lookup("F", &flagsObj);
+  if (flagsObj.isInt()) {
+    flags = flagsObj.getInt();
+  } else {
+    flags = 0;
+  }
+  flagsObj.free();
 
-  if (!subTypeObj.isName()) {
-    if (subTypeObj.isNull()) {
-      error(getPos(), "Missing (required) SubType in Annot object");
-    } else {
-      error(getPos(), "Bad Annot object SubType of type %s", subTypeObj.getTypeName());
-    }
-
-    subTypeObj.free();
+  if ((flags & 2) == 2 || (flags & 4) == 0) {
+    // Don't print hidden or no-print annotations...
     return;
   }
-
-  if (subTypeObj.isName("Widget")) {
-    // Don't draw form widgets...
-    subTypeObj.free();
-    return;
-  }
-
-  subTypeObj.free();
 
   // get the form bounding box
   dict->lookup("BBox", &bboxObj);

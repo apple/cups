@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20
 
+	- Updated the pdftops filter to use the annotation flags
+	  instead of the subtype to determine whether to print
+	  an annotation (STR #425)
+	- The French web interface localization did not use
+	  absolute paths for the navigation bar (STR #428)
 	- The CUPS test suite did not undefine the PRINTER and
 	  LPDEST environment variables. This could lead to bogus
 	  test results (STR #380)
