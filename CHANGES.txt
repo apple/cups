@@ -16,6 +16,11 @@ CHANGES IN CUPS V1.1.6-2
 	  security bug in glibc fopen() function.  The glibc
 	  fopen() function unlinks a file before creating it,
 	  which opens up possible symlink attacks.
+	- Now reject 0-length names in add-printer and add-class
+	  requests.
+	- Fix for pstoraster when ZLIB is not available.
+	- cupsGetPPD() didn't reconnect when a HTTP connection
+	  was lost.
 
 
 CHANGES IN CUPS V1.1.6-1
