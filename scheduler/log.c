@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.19.2.13 2003/07/19 21:57:49 mike Exp $"
+ * "$Id: log.c,v 1.19.2.14 2003/07/25 16:00:23 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -114,6 +114,7 @@ LogMessage(int        level,		/* I - Log level */
 	   ...)				/* I - Additional args as needed */
 {
   int		len;			/* Length of message */
+  char		*ptr;			/* Pointer to message */
   va_list	ap;			/* Argument pointer */
   static const char levels[] =		/* Log levels... */
 		{
@@ -145,6 +146,7 @@ LogMessage(int        level,		/* I - Log level */
 #endif /* HAVE_VSYSLOG */
   static int	linesize = 0;		/* Size of line for output file */
   static char	*line = NULL;		/* Line for output file */
+  static char	sigbuf[1024];		/* Buffer for signal handlers */
 
 
  /*
@@ -194,49 +196,73 @@ LogMessage(int        level,		/* I - Log level */
   * Then the log message...
   */
 
-  va_start(ap, message);
-  len = vsnprintf(line, linesize, message, ap);
-  va_end(ap);
-
-  if (len >= linesize && !SignalCount)
+  if (SignalCount)
   {
-    len ++;
+   /*
+    * Processing a signal so use the static buffer...
+    */
 
-    if (len < 8192)
-      len = 8192;
-    else if (len > 65536)
-      len = 65536;
+    va_start(ap, message);
+    len = vsnprintf(sigbuf, sizeof(sigbuf), message, ap);
+    va_end(ap);
 
-    if (!linesize)
-      line = malloc(len);
-    else
-      line = realloc(line, len);
+    ptr = sigbuf;
 
-    if (line)
-      linesize = len;
-    else
-    {
-      cupsFilePrintf(ErrorFile,
-                     "ERROR: Unable to allocate memory for line - %s\n",
-                     strerror(errno));
-      cupsFileFlush(ErrorFile);
-
-      ReleaseSignals();
-
-      return (0);
-    }
+    if (len >= sizeof(sigbuf))
+      len = sizeof(sigbuf) - 1;
+  }
+  else
+  {
+   /*
+    * Not processing a signal so use the dynamic buffer...
+    */
 
     va_start(ap, message);
     len = vsnprintf(line, linesize, message, ap);
     va_end(ap);
+
+    if (len >= linesize)
+    {
+      len ++;
+
+      if (len < 8192)
+	len = 8192;
+      else if (len > 65536)
+	len = 65536;
+
+      if (!linesize)
+	line = malloc(len);
+      else
+	line = realloc(line, len);
+
+      if (line)
+	linesize = len;
+      else
+      {
+	cupsFilePrintf(ErrorFile,
+                       "ERROR: Unable to allocate memory for line - %s\n",
+                       strerror(errno));
+	cupsFileFlush(ErrorFile);
+
+	ReleaseSignals();
+
+	return (0);
+      }
+
+      va_start(ap, message);
+      len = vsnprintf(line, linesize, message, ap);
+      va_end(ap);
+    }
+
+    ptr = line;
+
+    if (len >= linesize)
+      len = linesize - 1;
   }
 
  /*
   * Then a newline...
   */
-
-  if (len >= linesize)
-    len = linesize - 1;
 
   cupsFilePuts(ErrorFile, line);
 
@@ -522,5 +548,5 @@ check_log_file(cups_file_t **log,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c,v 1.19.2.13 2003/07/19 21:57:49 mike Exp $".
+ * End of "$Id: log.c,v 1.19.2.14 2003/07/25 16:00:23 mike Exp $".
  */
