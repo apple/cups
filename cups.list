@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.69 2000/07/07 17:02:34 mike Exp $"
+# "$Id: cups.list,v 1.70 2000/07/07 17:24:00 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -424,7 +424,39 @@ l 0444 root sys $MANDIR/u_man/cat1/cancel.z lp.z
 f 0444 root sys $MANDIR/u_man/cat5/mime.convs.z man/mime.convs.z
 f 0444 root sys $MANDIR/u_man/cat5/mime.types.z man/mime.types.z
 f 0444 root sys $MANDIR/u_man/cat5/printers.conf.z man/printers.conf.z
-%system !irix
+
+%system solaris hpux
+d 0555 root sys $MANDIR/man1 -
+d 0555 root sys $MANDIR/man5 -
+d 0555 root sys $MANDIR/man1m -
+
+f 0444 root sys $MANDIR/man1m/accept.1m man/accept.man
+l 0444 root sys $MANDIR/man1m/reject.1m accept.man
+f 0444 root sys $MANDIR/man1/backend.1 man/backend.man
+f 0444 root sys $MANDIR/man1/classes.conf.5 man/classes.conf.man
+f 0444 root sys $MANDIR/man1m/cups-lpd.1m man/cups-lpd.man
+f 0444 root sys $MANDIR/man1m/cups-polld.1m man/cups-polld.man
+f 0444 root sys $MANDIR/man1m/cupsd.1m man/cupsd.man
+f 0444 root sys $MANDIR/man5/cupsd.conf.5 man/cupsd.conf.man
+f 0444 root sys $MANDIR/man1m/enable.1m man/enable.man
+l 0444 root sys $MANDIR/man1m/disable.1m enable.man
+f 0444 root sys $MANDIR/man1/filter.1 man/filter.man
+f 0444 root sys $MANDIR/man1m/lpadmin.1m man/lpadmin.man
+f 0444 root sys $MANDIR/man1m/lpc.1m man/lpc.man
+f 0444 root sys $MANDIR/man1m/lpinfo.1m man/lpinfo.man
+f 0444 root sys $MANDIR/man1m/lpmove.1m man/lpmove.man
+f 0444 root sys $MANDIR/man1/lpoptions.1 man/lpoptions.man
+f 0444 root sys $MANDIR/man1/lpq.1 man/lpq.man
+f 0444 root sys $MANDIR/man1/lprm.1 man/lprm.man
+f 0444 root sys $MANDIR/man1/lpr.1 man/lpr.man
+f 0444 root sys $MANDIR/man1/lpstat.1 man/lpstat.man
+f 0444 root sys $MANDIR/man1/lp.1 man/lp.man
+l 0444 root sys $MANDIR/man1/cancel.1 lp.man
+f 0444 root sys $MANDIR/man5/mime.convs.5 man/mime.convs.man
+f 0444 root sys $MANDIR/man5/mime.types.5 man/mime.types.man
+f 0444 root sys $MANDIR/man5/printers.conf.5 man/printers.conf.man
+
+%system !irix !solaris !hpux
 d 0555 root sys $MANDIR/man1 -
 d 0555 root sys $MANDIR/man5 -
 d 0555 root sys $MANDIR/man8 -
@@ -460,5 +492,5 @@ f 0444 root sys $MANDIR/man5/printers.conf.5 man/printers.conf.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.69 2000/07/07 17:02:34 mike Exp $".
+# End of "$Id: cups.list,v 1.70 2000/07/07 17:24:00 mike Exp $".
 #
