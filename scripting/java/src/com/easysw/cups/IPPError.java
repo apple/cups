@@ -27,8 +27,7 @@ package com.easysw.cups;
  */
 
 /**
- * An <code>IPP</code> object is used to hold the various
- * attributes and status of an ipp request..
+ * An <code>IPPError</code> object is used for error conversion.
  *
  * @author	TDB
  * @version	1.0

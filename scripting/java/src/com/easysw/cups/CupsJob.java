@@ -28,8 +28,8 @@ package com.easysw.cups;
 
 
 /**
- * An <code>IPP</code> object is used to hold the various
- * attributes and status of an ipp request..
+ * A <code>CupsJob</code> object holds job data, and has methods to 
+ * process cups job list responses into a usable form.
  *
  * @author	TDB
  * @version	1.0
@@ -187,7 +187,6 @@ public class CupsJob
       {
         job_state_reasons = val.text;
       }
-      // else System.out.println("Unknown field: " + a.name );
     }
 
 

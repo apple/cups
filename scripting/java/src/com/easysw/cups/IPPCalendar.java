@@ -26,8 +26,7 @@ package com.easysw.cups;
  */
 
 /**
- * An <code>IPP</code> object is used to hold the various
- * attributes and status of an ipp request..
+ * An <code>IPPCalendar</code> object is used for date/time conversion.
  *
  * @author	TDB
  * @version	1.0

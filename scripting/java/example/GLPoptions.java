@@ -499,7 +499,7 @@ for (int i=0; i < attrs.length; i++)
       int i = 0;
       if (jobSheetsOption.length() > 0)
       {
-        attrs[i] = new IPPAttribute( IPPDefs.TAG_OPERATION,
+        attrs[i] = new IPPAttribute( IPPDefs.TAG_JOB,
                                      IPPDefs.TAG_NAME,
                                      "job-sheets" );
         attrs[i].addString( "", jobSheetsOption );

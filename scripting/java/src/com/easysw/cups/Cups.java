@@ -27,11 +27,11 @@ package com.easysw.cups;
  */
 
 /**
- * An <code>IPP</code> object is used to hold the various
- * attributes and status of an ipp request..
+ * An <code>Cups</code> object is used for connecting to servers,
+ * reading and writing data, and performing common CUPS operations.
  *
  * @author	TDB
- * @version	1.0
+ * @version	1.0.1
  * @since	JDK1.3
  */
 
@@ -45,6 +45,7 @@ public class Cups
     IPP		ipp;               //  IPP Request
     IPPHttp     http;              //  Connection to server
 
+
     String      protocol;          //  Protocol name
     String      address;           //  address/name of server
     int         port;              //  Port #
@@ -52,8 +53,12 @@ public class Cups
     String      dest;              //  Name of destination printer
     String      instance;          //  Instance of printer
 
-    String      user;
-    String      passwd;
+    //
+    //  encrypt, user, and passwd are not fully implemented!
+    //
+    boolean     encrypt;           //  Open encrypted connection.
+    String      user;              //  User to login as.
+    String      passwd;            //  Password if needed.
 
     String      site;              //  URL of site.
 
@@ -74,6 +79,7 @@ public class Cups
       instance = "";
       user     = "";
       passwd   = "";
+      encrypt  = false;
     }
 
     /**
@@ -98,6 +104,9 @@ public class Cups
 
       dest     = "";
       instance = "";
+      user     = "";
+      passwd   = "";
+      encrypt  = false;
     }
 
 
@@ -115,6 +124,9 @@ public class Cups
       site     = "http://localhost:631/";
       dest     = p_dest;
       instance = "";
+      user     = "";
+      passwd   = "";
+      encrypt  = false;
     }
 
 
@@ -140,6 +152,9 @@ public class Cups
         site = site + path;
 
       dest     = p_dest;
+      user     = "";
+      passwd   = "";
+      encrypt  = false;
     }
 
     /**
@@ -157,6 +172,9 @@ public class Cups
       site     = "http://localhost:631/";
       dest     = p_dest;
       instance = p_instance;
+      user     = "";
+      passwd   = "";
+      encrypt  = false;
     }
 
     /**
@@ -168,7 +186,13 @@ public class Cups
     public void setProtocol( String p_protocol )
     {
       protocol = p_protocol;
-      site     = protocol + "://" + address + ":" + port + path + dest;
+      if (user.length() > 0 && passwd.length() > 0)
+      {
+        site = protocol + "://" + user + ":" + passwd + "@" +
+               address + ":" + port + path + dest;
+      }
+      else
+        site     = protocol + "://" + address + ":" + port + path + dest;
     }
 
     /**
@@ -180,7 +204,13 @@ public class Cups
     public void setServer( String p_server )
     {
       address = p_server;
-      site     = protocol + "://" + address + ":" + port + path + dest;
+      if (user.length() > 0 && passwd.length() > 0)
+      {
+        site = protocol + "://" + user + ":" + passwd + "@" +
+               address + ":" + port + path + dest;
+      }
+      else
+        site     = protocol + "://" + address + ":" + port + path + dest;
     }
 
 
@@ -192,7 +222,13 @@ public class Cups
     public void setPort( int p_port )
     {
       port = p_port;
-      site = protocol + "://" + address + ":" + port + path + dest;
+      if (user.length() > 0 && passwd.length() > 0)
+      {
+        site = protocol + "://" + user + ":" + passwd + "@" +
+               address + ":" + port + path + dest;
+      }
+      else
+        site = protocol + "://" + address + ":" + port + path + dest;
     }
 
 
@@ -204,6 +240,53 @@ public class Cups
     public void setUser( String p_user )
     {
       user = p_user;
+      if (user.length() > 0 && passwd.length() > 0)
+      {
+        site = protocol + "://" + user + ":" + passwd + "@" +
+               address + ":" + port + path + dest;
+      }
+      else
+        site = protocol + "://" + address + ":" + port + path + dest;
+    }
+
+
+    /**
+     * Set the value of the <code>passwd</code> member.  
+     *
+     * @param	<code>p_passwd</code>		Password.
+     */
+    public void setPasswd( String p_passwd )
+    {
+      passwd = p_passwd;
+      if (user.length() > 0 && passwd.length() > 0)
+      {
+        site = protocol + "://" + user + ":" + passwd + "@" +
+               address + ":" + port + path + dest;
+      }
+      else
+        site = protocol + "://" + address + ":" + port + path + dest;
+    }
+
+
+    /**
+     * Set the value of the <code>encrypt</code> member.  
+     *
+     * @param	<code>p_enrypt</code>		Yes or no.
+     */
+    public void setEncrypt( boolean p_encrypt )
+    {
+      encrypt = p_encrypt;
+    }
+
+
+    /**
+     * Get the value of the <code>encrypt</code> member.  
+     *
+     * @return 	<code>boolean</code>		Encryption on or off.
+     */
+    public boolean getEncrypt()
+    {
+      return(encrypt);
     }
 
 
@@ -216,7 +299,13 @@ public class Cups
     public void setPath( String p_path )
     {
       path = p_path;
-      site = protocol + "://" + address + ":" + port + path + dest;
+      if (user.length() > 0 && passwd.length() > 0)
+      {
+        site = protocol + "://" + user + ":" + passwd + "@" +
+               address + ":" + port + path + dest;
+      }
+      else
+        site = protocol + "://" + address + ":" + port + path + dest;
     }
 
 
@@ -229,7 +318,14 @@ public class Cups
     public void setDest( String p_dest )
     {
       dest = p_dest;
-      site = protocol + "://" + address + ":" + port + path + dest;
+      if (user.length() > 0 && passwd.length() > 0)
+      {
+        site = protocol + "://" + user + ":" + passwd + "@" +
+               address + ":" + port + path + dest;
+      }
+      else
+        site = protocol + "://" + address + ":" + port + path + dest;
+    
     }
 
 
@@ -626,12 +722,7 @@ public class Cups
         for (;i < ipp.attrs.size(); i++)
         {
           a = (IPPAttribute)ipp.attrs.get(i);
-          if (a != null)
-          {
-             //  Separator
-             // System.out.println("Name: " + a.name + " GT:" 
-             //         + a.group_tag + " VT: " + a.value_tag ); 
-          }
+
           if (a.group_tag == IPPDefs.TAG_ZERO) 
           {
              n++;
@@ -645,7 +736,6 @@ public class Cups
             }
             catch (ArrayIndexOutOfBoundsException e)
             {
-              System.out.println("\nArray index " + n + " out of bounds.\n");
               return(jobs);
             }
           }
@@ -909,7 +999,6 @@ public class Cups
       {
         last_error = -1;
         error_text = "File does not exist.";
-        // System.out.println(error_text);
         return(null);
       }
 
@@ -974,7 +1063,6 @@ public class Cups
           ipp.addAttribute(a);
         }
       }
-
 
       if (doRequest(file))
       {

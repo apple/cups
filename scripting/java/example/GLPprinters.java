@@ -65,7 +65,6 @@ public class GLPprinters implements ActionListener
         }
         catch (IOException e)
         {
-          // System.out.println("\nIO Exception!\n");
 	  mainPanel   = new JPanel();
           mainPanel.setLayout(new BorderLayout());
 	  mainPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
@@ -94,7 +93,6 @@ public class GLPprinters implements ActionListener
           }
           catch (IOException e)
           {
-            // System.out.println("\nIO Exception!\n");
             // return(null);
           }
         }
@@ -109,7 +107,6 @@ public class GLPprinters implements ActionListener
           num_printers = printer_names.length;
         else
           num_printers = 0;
-        //  System.out.println( printers[i] );
 
         // default_printer = c.cupsGetDefault();
 
@@ -490,7 +487,6 @@ public class GLPprinters implements ActionListener
           GLPvars.selectedPrinterName = e.getActionCommand();
           GLPvars.tabs.updateDetailPanel();
           GLPvars.tabs.tabPanel.setSelectedIndex(2);
-          // System.out.println("Chose printer: " + e.getActionCommand());
         }
     }
 

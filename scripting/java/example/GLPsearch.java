@@ -74,7 +74,6 @@ public class GLPsearch extends Thread
            host = localSubNet + "." + x;
            try
            {
-             // System.out.println("Checking " + host + "  ...");
              u    = new URL("http://" + host + ":631/printers");
              cups = new Cups(u);
              test = cups.cupsGetDefault();
@@ -85,12 +84,10 @@ public class GLPsearch extends Thread
              }
              else
              {
-               // System.out.println(thread_num + ": No server at: " + host );
              }
            }
            catch (IOException e)
            {
-             // System.out.println(thread_num + ": No server at: " + host );
            }
         }
         if (!is_done)

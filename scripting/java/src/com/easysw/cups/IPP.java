@@ -55,7 +55,7 @@ public class IPP
   public IPP()
   {
     state       = IPPDefs.IDLE;
-    attrs       = new ArrayList();
+    attrs       = new LinkedList();
     current     = -1;
     last        = -1;
     current_tag = IPPDefs.TAG_ZERO;

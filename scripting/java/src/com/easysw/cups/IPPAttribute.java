@@ -26,8 +26,8 @@ package com.easysw.cups;
  *         WWW: http://www.cups.org
  */
 /**
- * An <code>IPP</code> object is used to hold the various
- * attributes and status of an ipp request..
+ * An <code>IPPAttribute</code> object hold attributes for communicating
+ * messages to / from the CUPS server.
  *
  * @author	TDB
  * @version	1.0
@@ -496,10 +496,6 @@ public class IPPAttribute
   	    break;
       }
     }
-
-    // bytes[bi++] = (byte)IPPDefs.TAG_END;
-
-    // System.out.println("\nbi: " + bi + "\n");
 
     return(bytes);
 

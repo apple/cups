@@ -64,9 +64,7 @@ public class GLPjobTableModel extends AbstractTableModel
         if (colCount >= aColumn)
         {
           colNames[aColumn] = aName;
-          // System.out.println("Set column " + aColumn + " to " + aName );
         }
-        // else System.out.println("Could not set column name");
     }
         
     public String getColumnName(int aColumn) 

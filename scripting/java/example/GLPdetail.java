@@ -95,8 +95,6 @@ public class GLPdetail implements ActionListener
         }
         catch (IOException e)
         {
-            // System.out.println("\nIO Exception!\n");
-            // return(null);
           tmp = new JLabel("Error loading printer: " + GLPvars.selectedPrinterName);
           mainPanel.add(tmp);
           return;
@@ -195,8 +193,6 @@ public class GLPdetail implements ActionListener
         }
         catch (IOException e)
         {
-            // System.out.println("\nIO Exception!\n");
-            // return(null);
           tmp = new JLabel("Error loading printer: " + GLPvars.selectedPrinterName);
           mainPanel.add(tmp);
           return;

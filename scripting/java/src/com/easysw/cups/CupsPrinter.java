@@ -27,8 +27,8 @@ package com.easysw.cups;
  */
 
 /**
- * An <code>IPP</code> object is used to hold the various
- * attributes and status of an ipp request..
+ * A <code>CupsPrinter</code> holds printer attribute / status information,
+ * and has methods to process CUPS server responses.
  *
  * @author	TDB
  * @version	1.0

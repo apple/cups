@@ -27,8 +27,8 @@ package com.easysw.cups;
  */
 
 /**
- * An <code>IPP</code> object is used to hold the various
- * attributes and status of an ipp request..
+ * An <code>IPPHttp</code> object is used for reading/writing to the cups
+ * server, and processing responses.
  *
  * @author	TDB
  * @version	1.0
@@ -222,6 +222,7 @@ public class IPPHttp
   public  BufferedReader       br;
   public  BufferedOutputStream os;    //  Output stream.
 
+  private boolean             encrypted;
 
   public  int                 write_content_length;
   private char                write_buffer[];
@@ -245,6 +246,8 @@ public class IPPHttp
   public String               hostname;       // Hostname from URL
   public int                  port;           // Port from URL.
   public String               path;           // Path from URL.
+  public String               user;           // User name
+  public String               passwd;         // Password
 
 
 
@@ -258,6 +261,8 @@ public class IPPHttp
   public IPPHttp(String request_url )
         throws IOException, UnknownHostException
   {
+
+    encrypted = false;
     try
     {
       //
@@ -290,7 +295,6 @@ public class IPPHttp
             throw ioexception;
     }
   }
-
 
 
 
@@ -522,7 +526,6 @@ public class IPPHttp
         case IPPDefs.HEADER :
           if (read_buffer_remaining < 8)
 	  {
-	    // System.out.println("\nippRead: Unable to read header!\n" );
 	    return (null);
 	  }
 
@@ -531,8 +534,6 @@ public class IPPHttp
 	  //
 	  if (buffer[0] != (char)1)
 	  {
-	    // System.out.println("ippRead: version number is bad: " 
-            //                + (int)buffer[0] + "." + (int)buffer[1] + "\n");
 	    return (null);
 	  }
 
@@ -560,10 +561,6 @@ public class IPPHttp
           ipp.state   = IPPDefs.ATTRIBUTE;
 	  ipp.current = -1;
 	  ipp.current_tag  = IPPDefs.TAG_ZERO;
-
-          // System.out.println("ippRead: version=" + buffer[0], buffer[1]));
-	  // System.out.println("ippRead: op_status=" + ipp.request.op_status);
-          // System.out.println("ippRead: request_id=" + ipp.request.request_id);
           break;
 
       case IPPDefs.ATTRIBUTE :
@@ -579,8 +576,6 @@ public class IPPHttp
 	      //
 	      //  No more attributes left...
 	      //
-
-              // System.out.println("ippRead: IPP_TAG_END!");
 	      ipp.state = IPPDefs.DATA;
               if (attr != null)
               {
@@ -615,10 +610,8 @@ public class IPPHttp
 
 	      ipp.current_tag  = gtag;
 	      ipp.current = -1;
-	      // System.out.println("ippRead: group tag = " + gtag);
 	      continue;
 	    }
-            // System.out.println("ippRead: value tag = " + tag);
 
             //
 	    // Get the name...
@@ -626,8 +619,6 @@ public class IPPHttp
             n = ((int)buffer[bufferidx] << 8) | (int)buffer[bufferidx+1];
             bufferidx += 2;
             read_buffer_remaining -= 2;
-
-            // System.out.println("ippRead: name length = " + n);
 
             if (n == 0)
 	    {
@@ -678,32 +669,14 @@ public class IPPHttp
                 s.append((char)buffer[bufferidx++]);
                 read_buffer_remaining--;
               }
-	      // System.out.println("ippRead: name = " + s );
               attr     = new IPPAttribute( gtag, vtag, s.toString() );
 	    }
 	    n = ((short)buffer[bufferidx] << 8) | (short)buffer[bufferidx+1];
             bufferidx += 2;
             read_buffer_remaining -= 2;
-            // System.out.println("ippRead: value length = " + n );
 
 	    switch (vtag)
 	    {
-/*
-              case IPPDefs.TAG_ZERO:
-                if (attr != null)
-                {
-                  ipp.addAttribute(attr);
-                  attr = null;
-                }
-                //
-                //  Add a separator
-                //
-                attr = new IPPAttribute(IPPDefs.TAG_ZERO,IPPDefs.TAG_ZERO,"");
-                ipp.addAttribute(attr);
-                attr = null;
-                break;
-*/
-
 	      case IPPDefs.TAG_INTEGER :
 	      case IPPDefs.TAG_ENUM :
 	  	n = (int)(((int)buffer[bufferidx] << 24) |
@@ -738,7 +711,6 @@ public class IPPHttp
                   s.append( (char)buffer[bufferidx++] );
                   read_buffer_remaining --;
                 }
-		// System.out.println("ippRead: value = " + s );
                 attr.addString( "", s.toString() );
 	        break;
 
