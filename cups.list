@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.7 1999/06/21 15:27:42 mike Exp $"
+# "$Id: cups.list,v 1.8 1999/06/21 20:14:24 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -192,6 +192,7 @@ f 0444 root sys /usr/share/cups/doc/cups.css doc/cups.css
 f 0444 root sys /usr/share/cups/doc/documentation.html doc/documentation.html
 f 0444 root sys /usr/share/cups/doc/idd.html doc/idd.html
 f 0444 root sys /usr/share/cups/doc/idd.pdf doc/idd.pdf
+f 0444 root sys /usr/share/cups/doc/images/classes.gif doc/images/classes.gif
 f 0444 root sys /usr/share/cups/doc/images/cups-bar.gif doc/images/cups-bar.gif
 f 0444 root sys /usr/share/cups/doc/images/cups-block-diagram.gif doc/images/cups-block-diagram.gif
 f 0444 root sys /usr/share/cups/doc/images/cups-large.gif doc/images/cups-large.gif
@@ -304,5 +305,5 @@ l 0555 root sys /etc/rc0.d/K20lp ../init.d/lp
 l 0555 root sys /etc/rc2.d/S80lp ../init.d/lp
 
 #
-# End of "$Id: cups.list,v 1.7 1999/06/21 15:27:42 mike Exp $".
+# End of "$Id: cups.list,v 1.8 1999/06/21 20:14:24 mike Exp $".
 #
