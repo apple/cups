@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.118 2001/03/02 14:30:16 mike Exp $"
+ * "$Id: job.c,v 1.119 2001/03/14 13:45:34 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -982,6 +982,7 @@ StartJob(int       id,		/* I - Job ID */
 		*envp[20],	/* Environment variables */
 		language[255],	/* LANG environment variable */
 		charset[255],	/* CHARSET environment variable */
+		classification[1024],	/* CLASSIFICATION environmeent variable */
 		content_type[255],/* CONTENT_TYPE environment variable */
 		device_uri[1024],/* DEVICE_URI environment variable */
 		ppd[1024],	/* PPD environment variable */
@@ -1150,6 +1151,7 @@ StartJob(int       id,		/* I - Job ID */
 	continue;
 
       if (strncmp(attr->name, "job-", 4) == 0 &&
+          strcmp(attr->name, "job-billing") != 0 &&
           strcmp(attr->name, "job-sheets") != 0 &&
           strcmp(attr->name, "job-hold-until") != 0 &&
 	  strcmp(attr->name, "job-priority") != 0)
@@ -1299,7 +1301,8 @@ StartJob(int       id,		/* I - Job ID */
   snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
   snprintf(datadir, sizeof(datadir), "CUPS_DATADIR=%s", DataDir);
   snprintf(fontpath, sizeof(fontpath), "CUPS_FONTPATH=%s", FontPath);
-
+  snprintf(classification, sizeof(classification), "CLASSIFICATION=%s",
+           Classification);
   if (getenv("LD_LIBRARY_PATH") != NULL)
     snprintf(ldpath, sizeof(ldpath), "LD_LIBRARY_PATH=%s", getenv("LD_LIBRARY_PATH"));
   else
@@ -1321,15 +1324,16 @@ StartJob(int       id,		/* I - Job ID */
   envp[13] = datadir;
   envp[14] = fontpath;
   envp[15] = ldpath;
-  envp[16] = NULL;
+  envp[16] = classification;
+  envp[17] = NULL;
 
   LogMessage(L_DEBUG, "StartJob: envp = \"%s\",\"%s\",\"%s\",\"%s\","
                       "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\","
-		      "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"",
+		      "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"",
 	     envp[0], envp[1], envp[2], envp[3], envp[4],
 	     envp[5], envp[6], envp[7], envp[8], envp[9],
 	     envp[10], envp[11], envp[12], envp[13], envp[14],
-	     envp[15]);
+	     envp[15], envp[16]);
 
   current->current_file ++;
 
@@ -2785,5 +2789,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.118 2001/03/02 14:30:16 mike Exp $".
+ * End of "$Id: job.c,v 1.119 2001/03/14 13:45:34 mike Exp $".
  */

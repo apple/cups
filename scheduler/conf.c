@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.75 2001/03/12 19:26:49 mike Exp $"
+ * "$Id: conf.c,v 1.76 2001/03/14 13:45:34 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -83,6 +83,7 @@ static var_t	variables[] =
   { "BrowseShortNames",	&BrowseShortNames,	VAR_BOOLEAN,	0 },
   { "BrowseTimeout",	&BrowseTimeout,		VAR_INTEGER,	0 },
   { "Browsing",		&Browsing,		VAR_BOOLEAN,	0 },
+  { "Classification",	Classification,		VAR_STRING,	sizeof(Classification) },
   { "DataDir",		DataDir,		VAR_STRING,	sizeof(DataDir) },
   { "DefaultCharset",	DefaultCharset,		VAR_STRING,	sizeof(DefaultCharset) },
   { "DefaultLanguage",	DefaultLanguage,	VAR_STRING,	sizeof(DefaultLanguage) },
@@ -209,6 +210,8 @@ ReadConfiguration(void)
   strcpy(Printcap, "/etc/printcap");
   strcpy(FontPath, CUPS_FONTPATH);
   strcpy(RemoteRoot, "remroot");
+
+  Classification[0] = '\0';
 
 #ifdef HAVE_LIBSSL
   strcpy(ServerCertificate, "ssl/server.crt");
@@ -1626,5 +1629,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.75 2001/03/12 19:26:49 mike Exp $".
+ * End of "$Id: conf.c,v 1.76 2001/03/14 13:45:34 mike Exp $".
  */

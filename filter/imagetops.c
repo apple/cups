@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.35 2001/03/02 13:42:20 mike Exp $"
+ * "$Id: imagetops.c,v 1.36 2001/03/14 13:45:33 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -472,6 +472,8 @@ main(int  argc,		/* I - Number of command-line arguments */
     printf("{ neg 1 add dup 0 lt { pop 1 } { %.3f exp neg 1 add } "
            "ifelse %.3f mul } bind settransfer\n", g, b);
 
+  WriteLabelProlog(cupsGetOption("page-label", num_options, options));
+
   if (Copies > 1 && !slowcollate)
   {
     if (ppd == NULL || ppd->language_level == 1)
@@ -614,6 +616,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	}
 
 	puts("grestore");
+	WriteLabels();
 	puts("showpage");
       }
 
@@ -737,5 +740,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.35 2001/03/02 13:42:20 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.36 2001/03/14 13:45:33 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.52 2001/03/09 18:23:36 mike Exp $"
+ * "$Id: pstops.c,v 1.53 2001/03/14 13:45:33 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -262,15 +262,16 @@ main(int  argc,			/* I - Number of command-line arguments */
   ppdEmit(ppd, stdout, PPD_ORDER_ANY);
   ppdEmit(ppd, stdout, PPD_ORDER_PROLOG);
 
-  if (NUp > 1)
-    puts("userdict begin\n"
-         "/ESPshowpage /showpage load def\n"
-         "/showpage { } def\n"
-         "end");
+  puts("userdict begin\n"
+       "/ESPshowpage /showpage load def\n"
+       "/showpage { } def\n"
+       "end");
 
   if (g != 1.0 || b != 1.0)
     printf("{ neg 1 add dup 0 lt { pop 1 } { %.3f exp neg 1 add } "
            "ifelse %.3f mul } bind settransfer\n", g, b);
+
+  WriteLabelProlog(cupsGetOption("page-label", num_options, options));
 
   if (Copies > 1 && (!Collate || !slowcollate))
   {
@@ -690,14 +691,25 @@ end_nup(int number)	/* I - Page number */
 
   switch (NUp)
   {
+    case 1 :
+	WriteLabels();
+        puts("ESPshowpage");
+	break;
+
     case 2 :
 	if ((number & 1) == 1)
+	{
+	  WriteLabels();
           puts("ESPshowpage");
+	}
         break;
 
     case 4 :
 	if ((number & 3) == 3)
+	{
+	  WriteLabels();
           puts("ESPshowpage");
+	}
         break;
   }
 }
@@ -905,5 +917,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.52 2001/03/09 18:23:36 mike Exp $".
+ * End of "$Id: pstops.c,v 1.53 2001/03/14 13:45:33 mike Exp $".
  */

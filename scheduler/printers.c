@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.89 2001/02/21 21:26:16 mike Exp $"
+ * "$Id: printers.c,v 1.90 2001/03/14 13:45:35 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -101,7 +101,11 @@ AddPrinter(const char *name)	/* I - Name of printer */
   p->accepting = 0;
   p->filetype  = mimeAddType(MimeDatabase, "printer", name);
 
-  strcpy(p->job_sheets[0], "none");
+  if (Classification[0])
+    strcpy(p->job_sheets[0], Classification);
+  else
+    strcpy(p->job_sheets[0], "none");
+
   strcpy(p->job_sheets[1], "none");
 
  /*
@@ -1048,16 +1052,38 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
     * Setup the job-sheets-supported and job-sheets-default attributes...
     */
 
-    attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                	 "job-sheets-supported", NumBanners + 1, NULL, NULL);
-    attr->values[0].string.text = strdup("none");
-    for (i = 0; i < NumBanners; i ++)
-      attr->values[i + 1].string.text = strdup(Banners[i].name);
+    if (Classification[0])
+      attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                	   "job-sheets-supported", 2, NULL, NULL);
+    else
+      attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                	   "job-sheets-supported", NumBanners + 1, NULL, NULL);
+
+    if (attr == NULL)
+      LogMessage(L_EMERG, "SetPrinterAttrs: Unable to allocate memory for "
+                          "job-sheets-supported attribute: %s!",
+	         strerror(errno));
+    else
+    {
+      attr->values[0].string.text = strdup("none");
+
+      if (Classification[0])
+	attr->values[1].string.text = strdup(Classification);
+      else
+      {
+	for (i = 0; i < NumBanners; i ++)
+	  attr->values[i + 1].string.text = strdup(Banners[i].name);
+      }
+    }
 
     attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
                 	 "job-sheets-default", 2, NULL, NULL);
-    attr->values[0].string.text = strdup(p->job_sheets[0]);
-    attr->values[1].string.text = strdup(p->job_sheets[1]);
+
+    if (attr != NULL)
+    {
+      attr->values[0].string.text = strdup(p->job_sheets[0]);
+      attr->values[1].string.text = strdup(p->job_sheets[1]);
+    }
   }
 
   if (p->type & CUPS_PRINTER_REMOTE)
@@ -1099,12 +1125,12 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
 	attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
                              "member-uris", p->num_printers, NULL, NULL);
-
         p->type |= CUPS_PRINTER_OPTIONS;
 
 	for (i = 0; i < p->num_printers; i ++)
 	{
-          attr->values[i].string.text = strdup(p->printers[i]->uri);
+          if (attr != NULL)
+            attr->values[i].string.text = strdup(p->printers[i]->uri);
 
 	  p->type &= ~CUPS_PRINTER_OPTIONS | p->printers[i]->type;
         }
@@ -1112,8 +1138,11 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
                              "member-names", p->num_printers, NULL, NULL);
 
-	for (i = 0; i < p->num_printers; i ++)
-          attr->values[i].string.text = strdup(p->printers[i]->name);
+	if (attr != NULL)
+	{
+	  for (i = 0; i < p->num_printers; i ++)
+            attr->values[i].string.text = strdup(p->printers[i]->name);
+        }
       }
     }
     else
@@ -1199,33 +1228,36 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
 	attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                              "media-supported", num_media, NULL, NULL);
-	val  = attr->values;
-
-	if (input_slot != NULL)
-	  for (i = 0; i < input_slot->num_choices; i ++, val ++)
-	    val->string.text = strdup(input_slot->choices[i].choice);
-
-	if (media_type != NULL)
-	  for (i = 0; i < media_type->num_choices; i ++, val ++)
-	    val->string.text = strdup(media_type->choices[i].choice);
-
-	if (page_size != NULL)
+        if (attr != NULL)
 	{
-	  for (i = 0; i < page_size->num_choices; i ++, val ++)
-	    val->string.text = strdup(page_size->choices[i].choice);
+	  val = attr->values;
 
-	  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
-                       NULL, page_size->defchoice);
+	  if (input_slot != NULL)
+	    for (i = 0; i < input_slot->num_choices; i ++, val ++)
+	      val->string.text = strdup(input_slot->choices[i].choice);
+
+	  if (media_type != NULL)
+	    for (i = 0; i < media_type->num_choices; i ++, val ++)
+	      val->string.text = strdup(media_type->choices[i].choice);
+
+	  if (page_size != NULL)
+	  {
+	    for (i = 0; i < page_size->num_choices; i ++, val ++)
+	      val->string.text = strdup(page_size->choices[i].choice);
+
+	    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
+                	 NULL, page_size->defchoice);
+          }
+	  else if (input_slot != NULL)
+	    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
+                	 NULL, input_slot->defchoice);
+	  else if (media_type != NULL)
+	    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
+                	 NULL, media_type->defchoice);
+	  else
+	    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
+                	 NULL, "none");
         }
-	else if (input_slot != NULL)
-	  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
-                       NULL, input_slot->defchoice);
-	else if (media_type != NULL)
-	  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
-                       NULL, media_type->defchoice);
-	else
-	  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
-                       NULL, "none");
 
        /*
         * Output bin...
@@ -1237,11 +1269,14 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
                                "output-bin-supported", output_bin->num_choices,
 			       NULL, NULL);
 
-	  for (i = 0, val = attr->values;
-	       i < output_bin->num_choices;
-	       i ++, val ++)
-	    val->string.text = strdup(output_bin->choices[i].choice);
-        }
+          if (attr != NULL)
+	  {
+	    for (i = 0, val = attr->values;
+		 i < output_bin->num_choices;
+		 i ++, val ++)
+	      val->string.text = strdup(output_bin->choices[i].choice);
+          }
+	}
 
        /*
         * Duplexing, etc...
@@ -1747,5 +1782,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.89 2001/02/21 21:26:16 mike Exp $".
+ * End of "$Id: printers.c,v 1.90 2001/03/14 13:45:35 mike Exp $".
  */

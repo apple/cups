@@ -1,5 +1,5 @@
 /*
- * "$Id: common.c,v 1.12 2001/01/22 15:03:37 mike Exp $"
+ * "$Id: common.c,v 1.13 2001/03/14 13:45:33 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -251,5 +251,76 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
 
 
 /*
- * End of "$Id: common.c,v 1.12 2001/01/22 15:03:37 mike Exp $".
+ * 'WriteClassificationProlog()' - Write the prolog with the classification
+ *                                 and page label.
+ */
+
+void
+WriteLabelProlog(const char *label)	/* I - Page label */
+{
+  const char	*classification;	/* CLASSIFICATION environment variable */
+
+
+ /*
+  * First get the current classification...
+  */
+
+  if ((classification = getenv("CLASSIFICATION")) == NULL)
+    classification = "";
+  if (strcmp(classification, "none") == 0)
+    classification = "";
+
+ /*
+  * Set the classification + page label string...
+  */
+
+  if (strcmp(classification, "confidential") == 0)
+    printf("/espPL(CONFIDENTIAL");
+  else if (strcmp(classification, "classified") == 0)
+    printf("/espPL(CLASSIFIED");
+  else if (strcmp(classification, "secret") == 0)
+    printf("/espPL(SECRET");
+  else if (strcmp(classification, "topsecret") == 0)
+    printf("/espPL(TOP SECRET");
+  else if (strcmp(classification, "unclassified") == 0)
+    printf("/espPL(UNCLASSIFIED");
+  else
+    printf("/espPL(");
+
+  if (classification[0] && label)
+    printf(" - %s)def\n", label);
+  else if (label)
+    printf("%s)def\n", label);
+  else
+    puts(")def");
+
+ /*
+  * Then get a 14 point Helvetica-Bold font...
+  */
+
+  puts("/espPF /Helvetica-Bold findfont 14 scalefont def");
+
+ /*
+  * Finally, the procedure to write the labels on the page...
+  */
+
+  puts("/espWL{");
+  puts("  espPF setfont");
+  printf("  espPL stringwidth pop dup 12 add exch  -0.5 mul %.0f add\n",
+         PageWidth * 0.5f);
+  puts("  1 setgray");
+  printf("  dup 6 sub %.0f 3 index 20 rectfill\n", PageBottom - 2.0);
+  printf("  dup 6 sub %.0f 3 index 20 rectfill\n", PageTop - 18.0);
+  puts("  0 setgray");
+  printf("  dup 6 sub %.0f 3 index 20 rectstroke\n", PageBottom - 2.0);
+  printf("  dup 6 sub %.0f 3 index 20 rectstroke\n", PageTop - 18.0);
+  printf("  dup %.0f moveto espPL show\n", PageBottom + 2.0);
+  printf("  %.0f moveto espPL show\n", PageTop - 14.0);
+  puts("pop");
+  puts("}bind def");
+}
+
+
+/*
+ * End of "$Id: common.c,v 1.13 2001/03/14 13:45:33 mike Exp $".
  */

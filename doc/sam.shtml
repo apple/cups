@@ -830,7 +830,6 @@ determine how the server operates:
 
 <UL>
 
-
 <TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0">
 <TR>
 <TD VALIGN="TOP">
@@ -852,6 +851,7 @@ determine how the server operates:
 	<LI><A HREF="#BrowseShortNames"><CODE>BrowseShortNames</CODE></A>
 	<LI><A HREF="#BrowseTimeout"><CODE>BrowseTimeout</CODE></A>
 	<LI><A HREF="#Browsing"><CODE>Browsing</CODE></A>
+	<LI><A HREF="#Classification"><CODE>Classification</CODE></A>
 	<LI><A HREF="#DataDir"><CODE>DataDir</CODE></A>
 	<LI><A HREF="#DefaultCharset"><CODE>DefaultCharset</CODE></A>
 	<LI><A HREF="#DefaultLanguage"><CODE>DefaultLanguage</CODE></A>
@@ -1416,6 +1416,28 @@ browsing is enabled. The default setting is <CODE>On</CODE>.
 	</TD>
 </TR>
 </TABLE></CENTER>
+
+<!-- NEED 3in -->
+<H3><A NAME="Classification">Classification</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+Classification
+Classification classified
+Classification confidential
+Classification secret
+Classification topsecret
+Classification unclassified
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>Classification</CODE> directive sets the classification level
+on the server. When this option is set, at least one of the banner pages
+is forced to the classification level, and the classification is placed
+on each page of output. The default is no classification level.
 
 <!-- NEED 3in -->
 <H3><A NAME="DataDir">DataDir</A></H3>

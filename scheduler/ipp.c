@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.121 2001/03/02 17:35:04 mike Exp $"
+ * "$Id: ipp.c,v 1.122 2001/03/14 13:45:34 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -702,6 +702,24 @@ add_class(client_t        *con,		/* I - Client connection */
               sizeof(pclass->job_sheets[1]) - 1);
     else
       strcpy(pclass->job_sheets[1], "none");
+
+   /*
+    * Enforce classification level if set...
+    */
+
+    if (Classification[0])
+    {
+      if (strcmp(pclass->job_sheets[0], Classification) != 0 &&
+          strcmp(pclass->job_sheets[1], Classification) != 0)
+      {
+       /*
+        * Force the leading banner to have the classification on it...
+	*/
+
+        strcpy(pclass->job_sheets[0], Classification);
+      }
+    }
+
   }
   if ((attr = ippFindAttribute(con->request, "requesting-user-name-allowed",
                                IPP_TAG_ZERO)) != NULL)
@@ -1125,6 +1143,23 @@ add_printer(client_t        *con,	/* I - Client connection */
               sizeof(printer->job_sheets[1]) - 1);
     else
       strcpy(printer->job_sheets[1], "none");
+
+   /*
+    * Force classification if necessary...
+    */
+
+    if (Classification[0])
+    {
+      if (strcmp(pclass->job_sheets[0], Classification) != 0 &&
+          strcmp(pclass->job_sheets[1], Classification) != 0)
+      {
+       /*
+        * Force the leading banner to have the classification on it...
+	*/
+
+        strcpy(pclass->job_sheets[0], Classification);
+      }
+    }
   }
   if ((attr = ippFindAttribute(con->request, "requesting-user-name-allowed",
                                IPP_TAG_ZERO)) != NULL)
@@ -2137,7 +2172,7 @@ create_job(client_t        *con,	/* I - Client connection */
 
   job->state->values[0].integer = IPP_JOB_HELD;
 
-  if (!(printer->type & CUPS_PRINTER_REMOTE))
+  if (!(printer->type & CUPS_PRINTER_REMOTE) || Classification[0])
   {
    /*
     * Add job sheets options...
@@ -2149,6 +2184,25 @@ create_job(client_t        *con,	/* I - Client connection */
                            2, NULL, NULL);
       attr->values[0].string.text = strdup(printer->job_sheets[0]);
       attr->values[1].string.text = strdup(printer->job_sheets[1]);
+    }
+
+   /*
+    * Enforce classification level if set...
+    */
+
+    if (Classification[0])
+    {
+      if (strcmp(attr->values[0].string.text, Classification) != 0 &&
+          (attr->num_values == 1 ||
+	   strcmp(attr->values[1].string.text, Classification) != 0))
+      {
+       /*
+        * Force the leading banner to have the classification on it...
+	*/
+
+        free(attr->values[0].string.text);
+	attr->values[0].string.text = strdup(Classification);
+      }
     }
 
    /*
@@ -3752,7 +3806,7 @@ print_job(client_t        *con,		/* I - Client connection */
     SetJobHoldUntil(job->id, attr->values[0].string.text);
   }
 
-  if (!(printer->type & CUPS_PRINTER_REMOTE))
+  if (!(printer->type & CUPS_PRINTER_REMOTE) || Classification[0])
   {
    /*
     * Add job sheets options...
@@ -3764,6 +3818,25 @@ print_job(client_t        *con,		/* I - Client connection */
                            2, NULL, NULL);
       attr->values[0].string.text = strdup(printer->job_sheets[0]);
       attr->values[1].string.text = strdup(printer->job_sheets[1]);
+    }
+
+   /*
+    * Enforce classification level if set...
+    */
+
+    if (Classification[0])
+    {
+      if (strcmp(attr->values[0].string.text, Classification) != 0 &&
+          (attr->num_values == 1 ||
+	   strcmp(attr->values[1].string.text, Classification) != 0))
+      {
+       /*
+        * Force the leading banner to have the classification on it...
+	*/
+
+        free(attr->values[0].string.text);
+	attr->values[0].string.text = strdup(Classification);
+      }
     }
 
    /*
@@ -5265,5 +5338,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.121 2001/03/02 17:35:04 mike Exp $".
+ * End of "$Id: ipp.c,v 1.122 2001/03/14 13:45:34 mike Exp $".
  */

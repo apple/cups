@@ -1,4 +1,4 @@
-CHANGES.txt - 03/08/2001
+CHANGES.txt - 03/14/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.7
@@ -92,6 +92,14 @@ CHANGES IN CUPS V1.1.7
 	  attribute when altering a job.
 	- The pstops filter did not handle PostScript files with
 	  lines longer than 8191 bytes.
+	- The scheduler no longer uses inet_addr() to convert IP
+	  addresses in dot format (mmm.nnn.ooo.ppp) to the
+	  32-bit format, since it will not work for IPv6
+	  addresses.
+	- New "Classification" directive to force labeling of
+	  the current classification on each page.
+	- New "page-label" attribute to add per-page labels
+	  ("For Official Use Only", "Draft", etc.)
 	- The scheduler now sets the HTTPS environment variable
 	  for CGI programs when a client connects using
 	  encryption.

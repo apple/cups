@@ -1638,6 +1638,15 @@ The default value is 6.
 <P>The page-bottom attribute specifies the bottom margin in points (72 points
 equals 1 inch). The default value is the device physical margin.
 
+<H3>page-label (text(MAX))</H3>
+
+<P><I>(CUPS 1.1.7 and higher)</I>
+
+<P>The page-label attribute provides a text value to place in
+the header and footer on each page. If a classification level is
+set on the server, then this classification is printed before
+the page label.
+
 <H3>page-left (integer(0:MAX))</H3>
 
 <P>The page-left attribute specifies the left margin in points (72 points
