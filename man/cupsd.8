@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsd.8,v 1.1 1999/05/14 17:03:01 mike Exp $"
+.\" "$Id: cupsd.8,v 1.2 1999/09/22 20:06:36 mike Exp $"
 .\"
 .\"   cupsd man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,27 +21,28 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsd 8 "Common UNIX Printing System" "14 May 1999" "Easy Software Products"
+.TH cupsd 8 "Common UNIX Printing System" "22 September 1999" "Easy Software Products"
 .SH NAME
 cupsd \- common unix printing system daemon
 .SH SYNOPSIS
 .B cups
 .I [ \-c config-file ]
 .SH DESCRIPTION
-\fBcupsd\fR is the scheduler for the Common UNIX Printing System. It implements
+\fIcupsd\fR is the scheduler for the Common UNIX Printing System. It implements
 a printing system based upon the Internet Printing Protocol, version 1.0.  If
 no options are specified on the command-line then the default configuration file
 (usually \fI/var/cups/conf/cupsf.conf\fR) will be used.
 .SH COMPATIBILITY
-\fBcupsd\fR implements all of the required IPP/1.0 attributes and operations.
+\fIcupsd\fR implements all of the required IPP/1.0 attributes and operations.
 It also implements optional operation set 1 and several CUPS-specific
 administation operations.
 .SH SEE ALSO
-classes.conf(5), cupsd.conf(5), mime.convs(5), mime.types(5), printers.conf(5),
-CUPS Software Administrator's Manual,
+backend(1), classes.conf(5), cupsd.conf(5), filter(1), mime.convs(5),
+mime.types(5), printers.conf(5),
+CUPS Software Administrators Manual,
 CUPS Interface Design Description
 .SH COPYRIGHT
 Copyright 1993-1999 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupsd.8,v 1.1 1999/05/14 17:03:01 mike Exp $".
+.\" End of "$Id: cupsd.8,v 1.2 1999/09/22 20:06:36 mike Exp $".
 .\"

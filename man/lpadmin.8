@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpadmin.8,v 1.7 1999/06/24 17:44:18 mike Exp $"
+.\" "$Id: lpadmin.8,v 1.8 1999/09/22 20:06:39 mike Exp $"
 .\"
 .\"   lpadmin man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpadmin 8 "Common UNIX Printing System" "22 June 1999" "Easy Software Products"
+.TH lpadmin 8 "Common UNIX Printing System" "22 September 1999" "Easy Software Products"
 .SH NAME
 lpadmin \- configure cups printers and classes
 .SH SYNOPSIS
@@ -44,7 +44,7 @@ lpadmin \- configure cups printers and classes
 ] \-x
 .I destination
 .SH DESCRIPTION
-\fBlpadmin\fR configures printer and class queues provided by CUPS. It can also
+\fIlpadmin\fR configures printer and class queues provided by CUPS. It can also
 be used to set the system default printer or class.
 .LP
 The first form of the command sets the default printer or class to
@@ -93,8 +93,8 @@ Provides a textual description of the printer.
 .TP 5
 \-E
 .br
-Enables the printer; this is the same as running the \fIaccept(8)\fR and
-\fIenable(8)\fR programs on the printer.
+Enables the printer and accepts jobs; this is the same as running the
+\fIaccept(8)\fR and \fIenable(8)\fR programs on the printer.
 .TP 5
 \-L \fIlocation\fR
 .br
@@ -107,18 +107,18 @@ specified, this option overrides the \fI-i\fR option (interface script).
 .SH COMPATIBILITY
 Unlike the System V printing system, CUPS allows printer names to contain
 any printable character except SPACE and TAB. Also, printer and class names are
-\fBnot\fR case-sensitive. Finally, the CUPS version of \fBlpadmin\fR may ask the
+\fBnot\fR case-sensitive. Finally, the CUPS version of \fIlpadmin\fR may ask the
 user for an access password depending on the printing system configuration.
 This differs from the System V version which requires the root user to execute
 this command.
 .SH LIMITATIONS
-The CUPS version of \fBlpadmin\fR does not support all of the System V or
+The CUPS version of \fIlpadmin\fR does not support all of the System V or
 Solaris printing system configuration options.
 .SH SEE ALSO
 accept(8), cancel(1), disable(8), enable(8), lp(1), lpstat(1), reject(8),
-CUPS Software Administrator's Manual
+CUPS Software Administrators Manual
 .SH COPYRIGHT
 Copyright 1993-1999 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpadmin.8,v 1.7 1999/06/24 17:44:18 mike Exp $".
+.\" End of "$Id: lpadmin.8,v 1.8 1999/09/22 20:06:39 mike Exp $".
 .\"

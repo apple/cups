@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpc.8,v 1.1 1999/05/14 17:03:03 mike Exp $"
+.\" "$Id: lpc.8,v 1.2 1999/09/22 20:06:40 mike Exp $"
 .\"
 .\"   lpc man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpc 8 "Common UNIX Printing System" "14 May 1999" "Easy Software Products"
+.TH lpc 8 "Common UNIX Printing System" "22 September 1999" "Easy Software Products"
 .SH NAME
 lpc \- line printer control program
 .SH SYNOPSIS
@@ -32,14 +32,14 @@ lpc \- line printer control program
 .I parameter(s)
 ] ]
 .SH DESCRIPTION
-\fBlpc\fR provides limited control over printer and class queues provided by
+\fIlpc\fR provides limited control over printer and class queues provided by
 CUPS. It can also be used to query the state of queues.
 .LP
 If no command is specified on the command-line, \fRlpc\fR will display a
 prompt and accept commands from the standard input.
 .SH COMMANDS
-The \fBlpc\fR program accepts a subset of commands accepted by the Berkeley
-\fBlpc\fR program of the same name:
+The \fIlpc\fR program accepts a subset of commands accepted by the Berkeley
+\fIlpc\fR program of the same name:
 .TP 5
 \fIexit
 .br
@@ -61,19 +61,19 @@ Displays the status of one or more printer or class queues.
 .br
 Display a short help message.
 .SH LIMITATIONS
-Since \fBlpc\fR is geared towards the Berkeley printing system, it is impossible
-to use \fBlpc\fR to configure printer or class queues provided by CUPS.  To
-configure printer or class queues you must use the \fBlpadmin(8)\fR command
+Since \fIlpc\fR is geared towards the Berkeley printing system, it is impossible
+to use \fIlpc\fR to configure printer or class queues provided by CUPS.  To
+configure printer or class queues you must use the \fIlpadmin(8)\fR command
 or another CUPS-compatible client with that functionality.
 .SH COMPATIBILITY
-The CUPS version of \fBlpc\fR does not implement all of the standard Berkeley
+The CUPS version of \fIlpc\fR does not implement all of the standard Berkeley
 commands.
 .SH SEE ALSO
 accept(8), cancel(1), disable(8), enable(8), lp(1), lpr(1), lprm(1),
 lpstat(1), reject(8),
-CUPS Software Administrator's Manual
+CUPS Software Administrators Manual
 .SH COPYRIGHT
 Copyright 1993-1999 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpc.8,v 1.1 1999/05/14 17:03:03 mike Exp $".
+.\" End of "$Id: lpc.8,v 1.2 1999/09/22 20:06:40 mike Exp $".
 .\"

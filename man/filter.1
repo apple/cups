@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: filter.1,v 1.1 1999/05/14 17:03:02 mike Exp $"
+.\" "$Id: filter.1,v 1.2 1999/09/22 20:06:39 mike Exp $"
 .\"
 .\"   filter man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH filter 1 "Common UNIX Printing System" "14 May 1999" "Easy Software Products"
+.TH filter 1 "Common UNIX Printing System" "22 September 1999" "Easy Software Products"
 .SH NAME
 filter \- file conversion filter interfaces
 .SH SYNOPSIS
@@ -47,6 +47,14 @@ CHARSET
 .br
 The default text character set (typically us-ascii or iso-8859-1).
 .TP 5
+CONTENT_TYPE
+.br
+The MIME type associated with the file (e.g. application/postscript).
+.TP 5
+DEVICE_URI
+.br
+The device-uri associated with the printer.
+.TP 5
 LANG
 .br
 The default language locale (typically C or en).
@@ -59,6 +67,11 @@ PPD
 .br
 The full pathname of the PostScript Printer Description (PPD) file for
 this printer.
+.TP 5
+PRINTER
+.br
+The name of the printer; this is provided for shell scripts which may not be
+able to get the passed argv[0] string.
 .TP 5
 RIP_CACHE
 .br
@@ -74,11 +87,11 @@ The name and version number of the server (typically CUPS/1.0).
 .TP 5
 TZ
 .br
-The timezone of the server (typically GMT).
+The timezone of the server.
 .TP 5
 USER
 .br
-The user executing the filter (typically root).
+The user executing the filter (typically lp).
 .SH COMPATIBILITY
 While the filter interface is compatible with System V interface
 scripts, it will only work with the System V interface script as the
@@ -86,10 +99,10 @@ only filter.  Typically the interface script will be provided via the
 \fBlpadmin(8)\fR command using the \fI-i\fR option.
 .SH SEE ALSO
 backend(1), cupsd(8),
-CUPS Software Administrator's Manual,
+CUPS Software Administrators Manual,
 CUPS Interface Design Description
 .SH COPYRIGHT
 Copyright 1993-1999 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: filter.1,v 1.1 1999/05/14 17:03:02 mike Exp $".
+.\" End of "$Id: filter.1,v 1.2 1999/09/22 20:06:39 mike Exp $".
 .\"

@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: accept.8,v 1.2 1999/06/10 16:15:01 mike Exp $"
+.\" "$Id: accept.8,v 1.3 1999/09/22 20:06:35 mike Exp $"
 .\"
 .\"   accept/reject man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH accept 8 "Common UNIX Printing System" "14 May 1999" "Easy Software Products"
+.TH accept 8 "Common UNIX Printing System" "22 September 1999" "Easy Software Products"
 .SH NAME
 accept/reject \- accept/reject jobs sent to a destination
 .SH SYNOPSIS
@@ -36,22 +36,22 @@ destination(s)
 ] ]
 destination(s)
 .SH DESCRIPTION
-\fBaccept\fR instructs the printing system to accept print jobs to the
+\fIaccept\fR instructs the printing system to accept print jobs to the
 specified destinations.
 .LP
-\fBreject\fR instructs the printing system to reject print jobs to the
+\fIreject\fR instructs the printing system to reject print jobs to the
 specified destinations. The \fI-r\fR option sets the reason for rejecting
 print jobs. If not specified the reason defaults to "Reason Unknown".
 .SH COMPATIBILITY
-The CUPS versions of \fBaccept\fR and \fBreject\fR may ask the user for an
+The CUPS versions of \fIaccept\fR and \fIreject\fR may ask the user for an
 access password depending on the printing system configuration.  This differs
 from the System V versions which require the root user to execute these
 commands.
 .SH SEE ALSO
 cancel(1), disable(8), enable(8), lp(1), lpadmin(8), lpstat(1),
-CUPS Software Administrator's Manual
+CUPS Software Administrators Manual
 .SH COPYRIGHT
 Copyright 1993-1999 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: accept.8,v 1.2 1999/06/10 16:15:01 mike Exp $".
+.\" End of "$Id: accept.8,v 1.3 1999/09/22 20:06:35 mike Exp $".
 .\"
