@@ -1,15 +1,5 @@
-README - CUPS v1.0b10 - 09/27/1999
-----------------------------------
-
-BETA SOFTWARE BETA SOFTWARE BETA SOFTWARE BETA SOFTWARE BETA SOFTWARE
-
-    WARNING - This is a BETA release of CUPS, which means that it may
-	      contain "bugs" that could prevent you from printing.  If
-	      you are concerned that this may cause you lost time or
-	      money, please STOP and do not install this software!
-
-BETA SOFTWARE BETA SOFTWARE BETA SOFTWARE BETA SOFTWARE BETA SOFTWARE
-
+README - CUPS v1.0 - 10/01/1999
+-------------------------------
 
 INTRODUCTION
 
