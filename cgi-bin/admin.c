@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.22.2.7 2002/05/16 13:59:55 mike Exp $"
+ * "$Id: admin.c,v 1.22.2.8 2002/05/27 14:47:11 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -29,7 +29,6 @@
  *   do_config_printer() - Configure the default options for a printer.
  *   do_delete_class()   - Delete a class...
  *   do_delete_printer() - Delete a printer...
- *   do_job_op()         - Do a job operation.
  *   do_printer_op()     - Do a printer operation.
  *   get_line()          - Get a line that is terminated by a LF, CR, or CR LF.
  */
@@ -52,7 +51,6 @@ static void	do_am_printer(http_t *http, cups_lang_t *language, int modify);
 static void	do_config_printer(http_t *http, cups_lang_t *language);
 static void	do_delete_class(http_t *http, cups_lang_t *language);
 static void	do_delete_printer(http_t *http, cups_lang_t *language);
-static void	do_job_op(http_t *http, cups_lang_t *language, ipp_op_t op);
 static void	do_printer_op(http_t *http, cups_lang_t *language, ipp_op_t op);
 static char	*get_line(char *buf, int length, FILE *fp);
 
@@ -111,15 +109,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     * Do the operation...
     */
 
-    if (strcmp(op, "cancel-job") == 0)
-      do_job_op(http, language, IPP_CANCEL_JOB);
-    else if (strcmp(op, "hold-job") == 0)
-      do_job_op(http, language, IPP_HOLD_JOB);
-    else if (strcmp(op, "release-job") == 0)
-      do_job_op(http, language, IPP_RELEASE_JOB);
-    else if (strcmp(op, "restart-job") == 0)
-      do_job_op(http, language, IPP_RESTART_JOB);
-    else if (strcmp(op, "start-printer") == 0)
+    if (strcmp(op, "start-printer") == 0)
       do_printer_op(http, language, IPP_RESUME_PRINTER);
     else if (strcmp(op, "stop-printer") == 0)
       do_printer_op(http, language, IPP_PAUSE_PRINTER);
@@ -127,6 +117,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       do_printer_op(http, language, CUPS_ACCEPT_JOBS);
     else if (strcmp(op, "reject-jobs") == 0)
       do_printer_op(http, language, CUPS_REJECT_JOBS);
+    else if (strcmp(op, "purge-jobs") == 0)
+      do_printer_op(http, language, IPP_PURGE_JOBS);
     else if (strcmp(op, "add-class") == 0)
       do_am_class(http, language, 0);
     else if (strcmp(op, "add-printer") == 0)
@@ -1379,98 +1371,6 @@ do_delete_printer(http_t      *http,	/* I - HTTP connection */
 
 
 /*
- * 'do_job_op()' - Do a job operation.
- */
-
-static void
-do_job_op(http_t      *http,		/* I - HTTP connection */
-          cups_lang_t *language,	/* I - Client's language */
-	  ipp_op_t    op)		/* I - Operation to perform */
-{
-  ipp_t		*request,		/* IPP request */
-		*response;		/* IPP response */
-  char		uri[HTTP_MAX_URI];	/* Job URI */
-  const char	*job;			/* Job ID */
-  const char	*printer;		/* Printer name (purge-jobs) */
-  ipp_status_t	status;			/* Operation status... */
-
-
-  if ((job = cgiGetVariable("JOB_ID")) != NULL)
-    snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%s", job);
-  else if ((printer = cgiGetVariable("PRINTER_NAME")) != NULL)
-    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
-  else
-  {
-    cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
-    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
-    return;
-  }
-
- /*
-  * Build a job request, which requires the following
-  * attributes:
-  *
-  *    attributes-charset
-  *    attributes-natural-language
-  *    job-uri or printer-uri (purge-jobs)
-  *    requesting-user-name
-  */
-
-  request = ippNew();
-
-  request->request.op.operation_id = op;
-  request->request.op.request_id   = 1;
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
-
-  if (job)
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
-                 NULL, uri);
-  else
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-                 NULL, uri);
-
-  if (getenv("REMOTE_USER") != NULL)
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-                 NULL, getenv("REMOTE_USER"));
-  else
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-                 NULL, "root");
-
- /*
-  * Do the request and get back a response...
-  */
-
-  if ((response = cupsDoRequest(http, request, "/jobs")) != NULL)
-  {
-    status = response->request.status.status_code;
-
-    ippDelete(response);
-  }
-  else
-    status = IPP_GONE;
-
-  if (status > IPP_OK_CONFLICT)
-  {
-    cgiSetVariable("ERROR", ippErrorString(status));
-    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
-  }
-  else if (op == IPP_CANCEL_JOB)
-    cgiCopyTemplateLang(stdout, TEMPLATES, "job-cancel.tmpl", getenv("LANG"));
-  else if (op == IPP_HOLD_JOB)
-    cgiCopyTemplateLang(stdout, TEMPLATES, "job-hold.tmpl", getenv("LANG"));
-  else if (op == IPP_RELEASE_JOB)
-    cgiCopyTemplateLang(stdout, TEMPLATES, "job-release.tmpl", getenv("LANG"));
-  else if (op == IPP_RESTART_JOB)
-    cgiCopyTemplateLang(stdout, TEMPLATES, "job-restart.tmpl", getenv("LANG"));
-}
-
-
-/*
  * 'do_printer_op()' - Do a printer operation.
  */
 
@@ -1544,6 +1444,8 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
     cgiCopyTemplateLang(stdout, TEMPLATES, "printer-accept.tmpl", getenv("LANG"));
   else if (op == CUPS_REJECT_JOBS)
     cgiCopyTemplateLang(stdout, TEMPLATES, "printer-reject.tmpl", getenv("LANG"));
+  else if (op == IPP_PURGE_JOBS)
+    cgiCopyTemplateLang(stdout, TEMPLATES, "printer-purge.tmpl", getenv("LANG"));
 }
 
 
@@ -1596,5 +1498,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.22.2.7 2002/05/16 13:59:55 mike Exp $".
+ * End of "$Id: admin.c,v 1.22.2.8 2002/05/27 14:47:11 mike Exp $".
  */

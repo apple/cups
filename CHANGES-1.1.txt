@@ -5,6 +5,14 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- The jobs.cgi web interface now handles all job
+	  operations, allowing the administrator to allow "job
+	  administrators" or operators to manage jobs (but not
+	  queues) on the server.
+	- The cupsDoFileRequest() function now checks if the
+	  filename passed into the function is a directory, and
+	  returns the IPP_NOT_POSSIBLE error if so.
+	- New SCSI printer backend.
 	- Cleaned up handling of locales with trailing character
 	  set definitions.
 	- Fixed handling of invalid PPD attributes inside
