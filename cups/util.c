@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.37 1999/10/22 15:53:11 mike Exp $"
+ * "$Id: util.c,v 1.38 1999/10/25 16:16:11 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -409,7 +409,7 @@ cupsGetClasses(char ***classes)	/* O - Classes */
     last_error = response->request.status.status_code;
 
     for (attr = response->attrs; attr != NULL; attr = attr->next)
-      if (strcmp(attr->name, "printer-name") == 0 &&
+      if (strcasecmp(attr->name, "printer-name") == 0 &&
           attr->value_tag == IPP_TAG_NAME)
       {
         if (n == 0)
@@ -688,7 +688,7 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
     last_error = response->request.status.status_code;
 
     for (attr = response->attrs; attr != NULL; attr = attr->next)
-      if (strcmp(attr->name, "printer-name") == 0 &&
+      if (strcasecmp(attr->name, "printer-name") == 0 &&
           attr->value_tag == IPP_TAG_NAME)
       {
         if (n == 0)
@@ -822,7 +822,7 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
     * Skip the "raw" option - handled above...
     */
 
-    if (strcmp(options[i].name, "raw") == 0)
+    if (strcasecmp(options[i].name, "raw") == 0)
       continue;
 
    /*
@@ -866,7 +866,7 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
     }
     else
     {
-      if (strncmp(option, "no", 2) == 0)
+      if (strncasecmp(option, "no", 2) == 0)
       {
 	option += 2;
 	n      = 0;
@@ -906,9 +906,9 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
       {
         n2 = strtol(s + 1, &s, 0);
 
-	if (strcmp(s, "dpc") == 0)
+	if (strcasecmp(s, "dpc") == 0)
           ippAddResolution(request, IPP_TAG_JOB, option, IPP_RES_PER_CM, n, n2);
-        else if (strcmp(s, "dpi") == 0)
+        else if (strcasecmp(s, "dpi") == 0)
           ippAddResolution(request, IPP_TAG_JOB, option, IPP_RES_PER_INCH, n, n2);
         else
           ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, option, NULL, val);
@@ -1077,5 +1077,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.37 1999/10/22 15:53:11 mike Exp $".
+ * End of "$Id: util.c,v 1.38 1999/10/25 16:16:11 mike Exp $".
  */

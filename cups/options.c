@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c,v 1.11 1999/07/12 16:09:39 mike Exp $"
+ * "$Id: options.c,v 1.12 1999/10/25 16:16:11 mike Exp $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -62,7 +62,7 @@ cupsAddOption(const char    *name,		/* I - Name of option */
   */
 
   for (i = 0, temp = *options; i < num_options; i ++, temp ++)
-    if (strcmp(temp->name, name) == 0)
+    if (strcasecmp(temp->name, name) == 0)
       break;
 
   if (i >= num_options)
@@ -140,7 +140,7 @@ cupsGetOption(const char    *name,	/* I - Name of option */
     return (NULL);
 
   for (i = 0; i < num_options; i ++)
-    if (strcmp(options[i].name, name) == 0)
+    if (strcasecmp(options[i].name, name) == 0)
       return (options[i].value);
 
   return (NULL);
@@ -287,7 +287,7 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
   conflict = 0;
 
   for (i = num_options; i > 0; i --, options ++)
-    if (strcmp(options->name, "media") == 0)
+    if (strcasecmp(options->name, "media") == 0)
     {
      /*
       * Loop through the option string, separating it at commas and
@@ -324,9 +324,9 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 	    conflict = 1;
       }
     }
-    else if (strcmp(options->name, "sides") == 0)
+    else if (strcasecmp(options->name, "sides") == 0)
     {
-      if (strcmp(options->value, "one-sided") == 0)
+      if (strcasecmp(options->value, "one-sided") == 0)
       {
         if (ppdMarkOption(ppd, "Duplex", "None"))
 	  conflict = 1;
@@ -335,7 +335,7 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
         if (ppdMarkOption(ppd, "KD03Duplex", "None"))	/* Kodak */
 	  conflict = 1;
       }
-      else if (strcmp(options->value, "two-sided-long-edge") == 0)
+      else if (strcasecmp(options->value, "two-sided-long-edge") == 0)
       {
         if (ppdMarkOption(ppd, "Duplex", "DuplexNoTumble"))
 	  conflict = 1;
@@ -344,7 +344,7 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
         if (ppdMarkOption(ppd, "KD03Duplex", "DuplexNoTumble"))	/* Kodak */
 	  conflict = 1;
       }
-      else if (strcmp(options->value, "two-sided-short-edge") == 0)
+      else if (strcasecmp(options->value, "two-sided-short-edge") == 0)
       {
         if (ppdMarkOption(ppd, "Duplex", "DuplexTumble"))
 	  conflict = 1;
@@ -354,7 +354,7 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 	  conflict = 1;
       }
     }
-    else if (strcmp(options->name, "resolution") == 0)
+    else if (strcasecmp(options->name, "resolution") == 0)
     {
       if (ppdMarkOption(ppd, "Resolution", options->value))
         conflict = 1;
@@ -374,5 +374,5 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: options.c,v 1.11 1999/07/12 16:09:39 mike Exp $".
+ * End of "$Id: options.c,v 1.12 1999/10/25 16:16:11 mike Exp $".
  */

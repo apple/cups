@@ -1,5 +1,5 @@
 /*
- * "$Id: mark.c,v 1.16 1999/09/27 14:50:44 mike Exp $"
+ * "$Id: mark.c,v 1.17 1999/10/25 16:16:11 mike Exp $"
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
@@ -188,7 +188,7 @@ ppdFindChoice(ppd_option_t *o,		/* I - Pointer to option */
     return (NULL);
 
   for (i = o->num_choices, c = o->choices; i > 0; i --, c ++)
-    if (strcmp(c->choice, choice) == 0)
+    if (strcasecmp(c->choice, choice) == 0)
       return (c);
 
   return (NULL);
@@ -239,12 +239,12 @@ ppdFindOption(ppd_file_t *ppd,		/* I - PPD file data */
   for (i = ppd->num_groups, g = ppd->groups; i > 0; i --, g ++)
   {
     for (j = g->num_options, o = g->options; j > 0; j --, o ++)
-      if (strcmp(o->keyword, option) == 0)
+      if (strcasecmp(o->keyword, option) == 0)
 	return (o);
 
     for (j = g->num_subgroups, sg = g->subgroups; j > 0; j --, sg ++)
       for (k = sg->num_options, o = sg->options; k > 0; k --, o ++)
-	if (strcmp(o->keyword, option) == 0)
+	if (strcasecmp(o->keyword, option) == 0)
 	  return (o);
   }
 
@@ -320,7 +320,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
   if (ppd == NULL)
     return (0);
 
-  if (strcmp(option, "PageSize") == 0 && strncmp(choice, "Custom.", 7) == 0)
+  if (strcasecmp(option, "PageSize") == 0 && strncasecmp(choice, "Custom.", 7) == 0)
   {
    /*
     * Handle variable page sizes...
@@ -334,7 +334,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
     return (0);
 
   for (i = o->num_choices, c = o->choices; i > 0; i --, c ++)
-    if (strcmp(c->choice, choice) == 0)
+    if (strcasecmp(c->choice, choice) == 0)
       break;
 
   if (i)
@@ -347,23 +347,23 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 
     if (o->ui != PPD_UI_PICKMANY)
       for (i = o->num_choices, c = o->choices; i > 0; i --, c ++)
-	if (strcmp(c->choice, choice) != 0)
+	if (strcasecmp(c->choice, choice) != 0)
           c->marked = 0;
 
-    if (strcmp(option, "PageSize") == 0 || strcmp(option, "PageRegion") == 0)
+    if (strcasecmp(option, "PageSize") == 0 || strcasecmp(option, "PageRegion") == 0)
     {
      /*
       * Mark current page size...
       */
 
       for (i = 0; i < ppd->num_sizes; i ++)
-	ppd->sizes[i].marked = strcmp(ppd->sizes[i].name, choice) == 0;
+	ppd->sizes[i].marked = strcasecmp(ppd->sizes[i].name, choice) == 0;
 
      /*
       * Unmark the current PageSize or PageRegion setting, as appropriate...
       */
 
-      if (strcmp(option, "PageSize") == 0)
+      if (strcasecmp(option, "PageSize") == 0)
       {
 	if ((o = ppdFindOption(ppd, "PageRegion")) != NULL)
 	  for (i = 0; i < o->num_choices; i ++)
@@ -399,7 +399,7 @@ ppd_defaults(ppd_file_t  *ppd,	/* I - PPD file */
     return;
 
   for (i = g->num_options, o = g->options; i > 0; i --, o ++)
-    if (strcmp(o->keyword, "PageRegion") != 0)
+    if (strcasecmp(o->keyword, "PageRegion") != 0)
       ppdMarkOption(ppd, o->keyword, o->defchoice);
 
   for (i = g->num_subgroups, sg = g->subgroups; i > 0; i --, sg ++)
@@ -408,5 +408,5 @@ ppd_defaults(ppd_file_t  *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: mark.c,v 1.16 1999/09/27 14:50:44 mike Exp $".
+ * End of "$Id: mark.c,v 1.17 1999/10/25 16:16:11 mike Exp $".
  */

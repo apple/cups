@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.12 1999/10/12 18:19:30 mike Exp $"
+ * "$Id: ipp.c,v 1.13 1999/10/25 16:17:06 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -175,7 +175,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     * Skip the "raw" option - handled above...
     */
 
-    if (strcmp(options[i].name, "raw") == 0)
+    if (strcasecmp(options[i].name, "raw") == 0)
       continue;
 
    /*
@@ -219,7 +219,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     }
     else
     {
-      if (strncmp(option, "no", 2) == 0)
+      if (strncasecmp(option, "no", 2) == 0)
       {
 	option += 2;
 	n      = 0;
@@ -250,9 +250,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       {
         n2 = strtol(s + 1, &s, 0);
 
-	if (strcmp(s, "dpc") == 0)
+	if (strcasecmp(s, "dpc") == 0)
           ippAddResolution(request, IPP_TAG_JOB, option, IPP_RES_PER_CM, n, n2);
-        else if (strcmp(s, "dpi") == 0)
+        else if (strcasecmp(s, "dpi") == 0)
           ippAddResolution(request, IPP_TAG_JOB, option, IPP_RES_PER_INCH, n, n2);
         else
           ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, option, NULL, val);
@@ -413,5 +413,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.12 1999/10/12 18:19:30 mike Exp $".
+ * End of "$Id: ipp.c,v 1.13 1999/10/25 16:17:06 mike Exp $".
  */

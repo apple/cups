@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.13 1999/09/13 20:05:47 mike Exp $"
+ * "$Id: emit.c,v 1.14 1999/10/25 16:16:10 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -86,8 +86,8 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
         return (-1);
       }
 
-      if (strcmp(((ppd_option_t *)choices[i]->option)->keyword, "PageSize") == 0 &&
-          strcmp(choices[i]->choice, "Custom") == 0)
+      if (strcasecmp(((ppd_option_t *)choices[i]->option)->keyword, "PageSize") == 0 &&
+          strcasecmp(choices[i]->choice, "Custom") == 0)
       {
        /*
         * Variable size; write out standard size options (this should
@@ -297,5 +297,5 @@ ppd_collect(ppd_file_t    *ppd,		/* I - PPD file data */
 
 
 /*
- * End of "$Id: emit.c,v 1.13 1999/09/13 20:05:47 mike Exp $".
+ * End of "$Id: emit.c,v 1.14 1999/10/25 16:16:10 mike Exp $".
  */

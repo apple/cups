@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.16 1999/08/12 13:10:19 mike Exp $"
+ * "$Id: imagetops.c,v 1.17 1999/10/25 16:21:07 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -132,11 +132,11 @@ main(int  argc,		/* I - Number of command-line arguments */
     *   separate-documents-collated-copies allows for uncollated copies.
     */
 
-    Collate = strcmp(val, "separate-documents-collated-copies") != 0;
+    Collate = strcasecmp(val, "separate-documents-collated-copies") != 0;
   }
 
   if ((val = cupsGetOption("Collate", num_options, options)) != NULL &&
-      strcmp(val, "True") == 0)
+      strcasecmp(val, "True") == 0)
     Collate = 1;
 
   if ((val = cupsGetOption("gamma", num_options, options)) != NULL)
@@ -490,5 +490,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.16 1999/08/12 13:10:19 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.17 1999/10/25 16:21:07 mike Exp $".
  */

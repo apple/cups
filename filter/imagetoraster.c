@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.31 1999/10/10 15:40:37 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.32 1999/10/25 16:21:07 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -235,11 +235,11 @@ main(int  argc,		/* I - Number of command-line arguments */
     *   separate-documents-collated-copies allows for uncollated copies.
     */
 
-    Collate = strcmp(val, "separate-documents-collated-copies") != 0;
+    Collate = strcasecmp(val, "separate-documents-collated-copies") != 0;
   }
 
   if ((val = cupsGetOption("Collate", num_options, options)) != NULL &&
-      strcmp(val, "True") == 0)
+      strcasecmp(val, "True") == 0)
     Collate = 1;
 
   if ((val = cupsGetOption("gamma", num_options, options)) != NULL)
@@ -492,7 +492,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   yprint = yinches / ypages;
 
   if ((choice = ppdFindMarkedChoice(ppd, "PageSize")) != NULL &&
-      strcmp(choice->choice, "Custom") == 0)
+      strcasecmp(choice->choice, "Custom") == 0)
   {
     if (Orientation & 1)
     {
@@ -3848,5 +3848,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.31 1999/10/10 15:40:37 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.32 1999/10/25 16:21:07 mike Exp $".
  */

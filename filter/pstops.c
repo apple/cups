@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.23 1999/08/06 16:04:54 mike Exp $"
+ * "$Id: pstops.c,v 1.24 1999/10/25 16:21:08 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -162,15 +162,15 @@ main(int  argc,			/* I - Number of command-line arguments */
     *   separate-documents-collated-copies allows for uncollated copies.
     */
 
-    Collate = strcmp(val, "separate-documents-collated-copies") != 0;
+    Collate = strcasecmp(val, "separate-documents-collated-copies") != 0;
   }
 
   if ((val = cupsGetOption("Collate", num_options, options)) != NULL &&
-      strcmp(val, "True") == 0)
+      strcasecmp(val, "True") == 0)
     Collate = 1;
 
   if ((val = cupsGetOption("OutputOrder", num_options, options)) != NULL &&
-      strcmp(val, "Reverse") == 0)
+      strcasecmp(val, "Reverse") == 0)
     Order = 1;
 
   if ((val = cupsGetOption("number-up", num_options, options)) != NULL)
@@ -536,9 +536,9 @@ check_range(int page)	/* I - Page number */
     * See if we only print even or odd pages...
     */
 
-    if (strcmp(PageSet, "even") == 0 && (page & 1))
+    if (strcasecmp(PageSet, "even") == 0 && (page & 1))
       return (0);
-    if (strcmp(PageSet, "odd") == 0 && !(page & 1))
+    if (strcasecmp(PageSet, "odd") == 0 && !(page & 1))
       return (0);
   }
 
@@ -800,5 +800,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.23 1999/08/06 16:04:54 mike Exp $".
+ * End of "$Id: pstops.c,v 1.24 1999/10/25 16:21:08 mike Exp $".
  */
