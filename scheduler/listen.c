@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.19 2003/07/20 02:51:54 mike Exp $"
+ * "$Id: listen.c,v 1.20 2004/02/24 21:34:37 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -141,7 +141,7 @@ StartListening(void)
   * Setup socket listeners...
   */
 
-  for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+  for (i = NumListeners, lis = Listeners, LocalPort = 0; i > 0; i --, lis ++)
   {
     LogMessage(L_DEBUG, "StartListening: address=%08x port=%d",
                (unsigned)ntohl(lis->address.sin_addr.s_addr),
@@ -152,8 +152,9 @@ StartListening(void)
     * "any" address...
     */
 
-    if (ntohl(lis->address.sin_addr.s_addr) == 0x7f000001 ||
-        ntohl(lis->address.sin_addr.s_addr) == 0x00000000)
+    if (!LocalPort &&
+        (ntohl(lis->address.sin_addr.s_addr) == 0x7f000001 ||
+         ntohl(lis->address.sin_addr.s_addr) == 0x00000000))
       LocalPort = ntohs(lis->address.sin_port);
 
    /*
@@ -202,6 +203,21 @@ StartListening(void)
     }
   }
 
+ /*
+  * Make sure that we are listening on localhost!
+  */
+
+  if (!LocalPort)
+  {
+    LogMessage(L_EMERG, "No Listen or Port lines were found to allow access via localhost!");
+
+   /*
+    * Commit suicide...
+    */
+
+    kill(getpid(), SIGTERM);
+  }
+
   ResumeListening();
 }
 
@@ -231,5 +247,5 @@ StopListening(void)
 
 
 /*
- * End of "$Id: listen.c,v 1.19 2003/07/20 02:51:54 mike Exp $".
+ * End of "$Id: listen.c,v 1.20 2004/02/24 21:34:37 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.141 2004/02/05 16:17:16 mike Exp $"
+ * "$Id: conf.c,v 1.142 2004/02/24 21:34:37 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -421,6 +421,26 @@ ReadConfiguration(void)
   */
 
   LogMessage(L_INFO, "Loaded configuration file \"%s\"", ConfigurationFile);
+
+ /*
+  * Check that we have at least one listen/port line; if not, report this
+  * as an error and exit!
+  */
+
+  if (NumListeners == 0)
+  {
+   /*
+    * No listeners!
+    */
+
+    LogMessage(L_EMERG, "No valid Listen or Port lines were found in the configuration file!");
+
+   /*
+    * Commit suicide...
+    */
+
+    kill(getpid(), SIGTERM);
+  }
 
  /*
   * Set the default locale using the language and charset...
@@ -2153,5 +2173,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.141 2004/02/05 16:17:16 mike Exp $".
+ * End of "$Id: conf.c,v 1.142 2004/02/24 21:34:37 mike Exp $".
  */
