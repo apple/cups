@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.66 2000/05/11 16:27:40 mike Exp $"
+ * "$Id: ipp.c,v 1.67 2000/05/11 20:02:21 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -600,9 +600,7 @@ add_class(client_t        *con,		/* I - Client connection */
             sizeof(pclass->state_message) - 1);
     pclass->state_message[sizeof(pclass->state_message) - 1] = '\0';
   }
-  if ((attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_NAME)) == NULL)
-    attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_KEYWORD);
-  if (attr != NULL)
+  if ((attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_ZERO)) != NULL)
   {
     strncpy(pclass->job_sheets[0], attr->values[0].string.text,
             sizeof(pclass->job_sheets[0]) - 1);
@@ -932,9 +930,7 @@ add_printer(client_t        *con,	/* I - Client connection */
             sizeof(printer->state_message) - 1);
     printer->state_message[sizeof(printer->state_message) - 1] = '\0';
   }
-  if ((attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_NAME)) == NULL)
-    attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_KEYWORD);
-  if (attr != NULL)
+  if ((attr = ippFindAttribute(con->request, "job-sheets-default", IPP_TAG_ZERO)) != NULL)
   {
     strncpy(printer->job_sheets[0], attr->values[0].string.text,
             sizeof(printer->job_sheets[0]) - 1);
@@ -1691,11 +1687,7 @@ create_job(client_t        *con,	/* I - Client connection */
     * Add job sheets options...
     */
 
-    if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME)) == NULL)
-      if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_KEYWORD)) != NULL)
-        attr->value_tag = IPP_TAG_NAME;
-
-    if (attr == NULL)
+    if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) == NULL)
     {
       attr = ippAddStrings(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-sheets",
                            2, NULL, NULL);
@@ -1760,6 +1752,9 @@ copy_banner(client_t   *con,	/* I - Client connection */
  /*
   * Find the banner; return if not found or "none"...
   */
+
+  LogMessage(L_DEBUG, "copy_banner(%p, %d, \"%s\")", con, job->id,
+             name ? name : "(null)");
 
   if (name == NULL ||
       strcmp(name, "none") == 0 ||
@@ -3277,11 +3272,7 @@ print_job(client_t        *con,		/* I - Client connection */
     * Add job sheets options...
     */
 
-    if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME)) == NULL)
-      if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_KEYWORD)) != NULL)
-        attr->value_tag = IPP_TAG_NAME;
-
-    if (attr == NULL)
+    if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) == NULL)
     {
       attr = ippAddStrings(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-sheets",
                            2, NULL, NULL);
@@ -4110,7 +4101,7 @@ send_document(client_t        *con,	/* I - Client connection */
       printer = FindPrinter(job->dest);
 
     if (printer != NULL && !(printer->type & CUPS_PRINTER_REMOTE) &&
-        (attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME)) != NULL &&
+        (attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) != NULL &&
         attr->num_values > 1)
     {
      /*
@@ -4799,5 +4790,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.66 2000/05/11 16:27:40 mike Exp $".
+ * End of "$Id: ipp.c,v 1.67 2000/05/11 20:02:21 mike Exp $".
  */

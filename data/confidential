@@ -22,28 +22,28 @@
 %   to third parties or copied or duplicated in any form, in whole or
 %   in part, without the prior written consent of Easy Software Products.
 %
-/CENTER {			% Draw centered text
+/CENTER \{			% Draw centered text
 				% (name) CENTER -
   dup stringwidth pop		% Get the width of the string
   0.5 mul neg 0 rmoveto		% Shift left 1/2 of the distance
   show				% Show the string
 } bind def
-/RIGHT {			% Draw right-justified text
+/RIGHT \{			% Draw right-justified text
 				% (name) RIGHT -
   dup stringwidth pop		% Get the width of the string
   neg 0 rmoveto			% Shift left the entire distance
   show				% Show the string
 } bind def
-/NUMBER {			% Draw a number
+/NUMBER \{			% Draw a number
 				% power n NUMBER -
-  1 index 1 eq {		% power == 1?
+  1 index 1 eq \{		% power == 1?
     round cvi exch pop		% Convert "n" to integer
-  } {
+  } \{
     1 index mul round exch div	% Truncate extra decimal places
   } ifelse
   100 string cvs show		% Convert to a string and show it...
 } bind def
-/CUPSLOGO {			% Draw the CUPS logo
+/CUPSLOGO \{			% Draw the CUPS logo
 				% height CUPSLOGO
   % Start with a big C...
   /Helvetica findfont 1 index scalefont setfont
@@ -61,14 +61,14 @@
   dup 1.2 mul moveto
   (System) show
 } bind def
-/ESPLOGO {			% Draw the ESP logo
+/ESPLOGO \{			% Draw the ESP logo
 				% height ESPLOGO
   % Compute the size of the logo...
   0 0
   2 index 1.5 mul 3 index
 
   % Do the "metallic" fill from 10% black to 40% black...
-  1 -0.001 0 {
+  1 -0.001 0 \{
     dup			% loopval
     -0.15 mul		% loopval * -0.15
     0.9 add		% 0.9 - loopval * 0.15
@@ -204,7 +204,7 @@ gsave
   pageWidth 4 mul add			% y += 2 lines
   2 copy				% Copy X & Y
   moveto
-  (Job ID:) RIGHT
+  (Job ID: ) RIGHT
   moveto
   ({printer-name}-{job-id}) show
 
@@ -213,7 +213,7 @@ gsave
   pageWidth 1 mul add			% y += 1 line
   2 copy				% Copy X & Y
   moveto
-  (Title:) RIGHT
+  (Title: ) RIGHT
   moveto
   ({job-name}) show
 
@@ -222,7 +222,7 @@ gsave
   pageWidth -2 mul add			% y -= 1 line
   2 copy				% Copy X & Y
   moveto
-  (Requesting User:) RIGHT
+  (Requesting User: ) RIGHT
   moveto
   ({job-originating-user-name}) show
 
@@ -231,7 +231,7 @@ gsave
   pageWidth -5 mul add			% y -= 2 lines
   2 copy				% Copy X & Y
   moveto
-  (Billing Info:) RIGHT
+  (Billing Info: ) RIGHT
   moveto
   ({job-billing}) show
 
@@ -254,6 +254,6 @@ gsave
 grestore
 showpage
 %
-% End of "$Id: confidential,v 1.2 2000/05/11 16:51:06 mike Exp $".
+% End of "$Id: confidential,v 1.3 2000/05/11 20:02:19 mike Exp $".
 %
 %%EOF

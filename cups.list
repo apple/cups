@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.61 2000/05/11 17:36:44 mike Exp $"
+# "$Id: cups.list,v 1.62 2000/05/11 20:02:18 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -66,6 +66,8 @@ l 0555 root sys /usr/lib/reject accept
 f 0555 root sys /usr/sbin/accept systemv/accept
 f 0555 root sys /usr/sbin/lpadmin systemv/lpadmin
 f 0555 root sys /usr/sbin/lpc berkeley/lpc
+f 0555 root sys /usr/sbin/lpinfo systemv/lpinfo
+f 0555 root sys /usr/sbin/lpmove systemv/lpmove
 l 0555 root sys /usr/sbin/reject accept
 
 # User commands
@@ -456,5 +458,5 @@ f 0444 root sys /usr/man/man5/printers.conf.5 man/printers.conf.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.61 2000/05/11 17:36:44 mike Exp $".
+# End of "$Id: cups.list,v 1.62 2000/05/11 20:02:18 mike Exp $".
 #
