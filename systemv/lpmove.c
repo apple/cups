@@ -1,5 +1,5 @@
 /*
- * "$Id: lpmove.c,v 1.5.2.5 2002/06/27 19:49:15 mike Exp $"
+ * "$Id: lpmove.c,v 1.5.2.6 2002/08/22 01:43:40 mike Exp $"
  *
  *   "lpmove" command for the Common UNIX Printing System (CUPS).
  *
@@ -61,15 +61,13 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		num_dests;	/* Number of destinations */
   cups_dest_t	*dests;		/* Destinations */
   const char	*dest;		/* New destination */
-  http_encryption_t encryption;	/* Encryption? */
 
 
-  http       = NULL;
-  job        = NULL;
-  dest       = NULL;
-  encryption = cupsEncryption();
-  num_dests  = 0;
-  dests      = NULL;
+  http      = NULL;
+  job       = NULL;
+  dest      = NULL;
+  num_dests = 0;
+  dests     = NULL;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -77,10 +75,10 @@ main(int  argc,			/* I - Number of command-line arguments */
       {
         case 'E' : /* Encrypt */
 #ifdef HAVE_LIBSSL
-	    encryption = HTTP_ENCRYPT_REQUIRED;
+	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 
 	    if (http)
-	      httpEncryption(http, encryption);
+	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
             fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
 	            argv[0]);
@@ -89,10 +87,13 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         case 'h' : /* Connect to host */
 	    if (http)
+	    {
 	      httpClose(http);
+	      http = NULL;
+	    }
 
 	    if (argv[i][2] != '\0')
-	      http = httpConnectEncrypt(argv[i] + 2, ippPort(), encryption);
+	      cupsSetServer(argv[i] + 2);
 	    else
 	    {
 	      i ++;
@@ -103,13 +104,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 		return (1);
               }
 
-	      http = httpConnectEncrypt(argv[i], ippPort(), encryption);
-	    }
-
-	    if (http == NULL)
-	    {
-	      perror("lpmove: Unable to connect to server");
-	      return (1);
+	      cupsSetServer(argv[i]);
 	    }
 	    break;
 
@@ -144,7 +139,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if (!http)
   {
-    http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+    http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
     if (http == NULL)
     {
@@ -236,5 +231,5 @@ move_job(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpmove.c,v 1.5.2.5 2002/06/27 19:49:15 mike Exp $".
+ * End of "$Id: lpmove.c,v 1.5.2.6 2002/08/22 01:43:40 mike Exp $".
  */

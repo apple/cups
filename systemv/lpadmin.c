@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.22.2.12 2002/08/15 19:48:37 mike Exp $"
+ * "$Id: lpadmin.c,v 1.22.2.13 2002/08/22 01:43:39 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -90,14 +90,12 @@ main(int  argc,			/* I - Number of command-line arguments */
 		*val;		/* Pointer to allow/deny value */
   int		num_options;	/* Number of options */
   cups_option_t	*options;	/* Options */
-  http_encryption_t encryption;	/* Encryption? */
 
 
   http        = NULL;
   printer     = NULL;
   num_options = 0;
   options     = NULL;
-  encryption  = cupsEncryption();
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -106,7 +104,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'c' : /* Add printer to class */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -149,7 +148,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'd' : /* Set as default destination */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -185,10 +185,13 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         case 'h' : /* Connect to host */
 	    if (http)
+	    {
 	      httpClose(http);
+	      http = NULL;
+	    }
 
 	    if (argv[i][2] != '\0')
-	      http = httpConnectEncrypt(argv[i] + 2, ippPort(), encryption);
+	      cupsSetServer(argv[i] + 2);
 	    else
 	    {
 	      i ++;
@@ -198,23 +201,16 @@ main(int  argc,			/* I - Number of command-line arguments */
 	        fputs("lpadmin: Expected hostname after \'-h\' option!\n", stderr);
 		return (1);
               }
-	      else
-		http = httpConnectEncrypt(argv[i], ippPort(), encryption);
-	    }
 
-	    if (http == NULL)
-	    {
-	      perror("lpadmin: Unable to connect to server");
-	      return (1);
+              cupsSetServer(argv[i]);
 	    }
-	    else
-	      cupsSetServer(http->hostname);
 	    break;
 
         case 'i' : /* Use the specified interface script */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -250,10 +246,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    if (printer == NULL)
 	    {
 #ifdef HAVE_LIBSSL
-	      cupsSetEncryption(encryption = HTTP_ENCRYPT_REQUIRED);
+	      cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 
 	      if (http)
-		httpEncryption(http, encryption);
+		httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
               fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
 	              argv[0]);
@@ -263,7 +259,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -278,7 +275,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'm' : /* Use the specified standard script/PPD file */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -330,7 +328,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'p' : /* Add/modify a printer */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -364,7 +363,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'r' : /* Remove printer from class */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -437,7 +437,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'v' : /* Set the device-uri attribute */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -472,7 +473,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'x' : /* Delete a printer */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -509,7 +511,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'D' : /* Set the printer-info attribute */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -556,7 +559,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'L' : /* Set the printer-location attribute */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -591,7 +595,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'P' : /* Use the specified PPD file */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -641,7 +646,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   {
     if (!http)
     {
-      http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+      http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
       if (http == NULL)
       {
@@ -1863,5 +1868,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.22.2.12 2002/08/15 19:48:37 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.22.2.13 2002/08/22 01:43:39 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.37.2.8 2002/08/09 00:05:30 mike Exp $"
+ * "$Id: lpstat.c,v 1.37.2.9 2002/08/22 01:43:40 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -73,7 +73,6 @@ main(int  argc,			/* I - Number of command-line arguments */
   cups_dest_t	*dests;		/* User destinations */
   int		long_status;	/* Long status report? */
   int		ranking;	/* Show job ranking? */
-  http_encryption_t encryption;	/* Encryption? */
 
 
   http        = NULL;
@@ -81,7 +80,6 @@ main(int  argc,			/* I - Number of command-line arguments */
   dests       = NULL;
   long_status = 0;
   ranking     = 0;
-  encryption  = cupsEncryption();
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -93,10 +91,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         case 'E' : /* Encrypt */
 #ifdef HAVE_LIBSSL
-	    encryption = HTTP_ENCRYPT_REQUIRED;
+	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 
 	    if (http)
-	      httpEncryption(http, encryption);
+	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
             fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
 	            argv[0]);
@@ -118,7 +116,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'a' : /* Show acceptance status */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -145,7 +144,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'b' : /* Show both the local and remote status */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -181,7 +181,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'c' : /* Show classes and members */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -215,13 +216,13 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    
         case 'h' : /* Connect to host */
 	    if (http)
+	    {
 	      httpClose(http);
+	      http = NULL;
+	    }
 
 	    if (argv[i][2] != '\0')
-	    {
-	      http = httpConnectEncrypt(argv[i] + 2, ippPort(), encryption);
 	      cupsSetServer(argv[i] + 2);
-	    }
 	    else
 	    {
 	      i ++;
@@ -232,14 +233,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 		return (1);
               }
 
-	      http = httpConnectEncrypt(argv[i], ippPort(), encryption);
 	      cupsSetServer(argv[i]);
-	    }
-
-	    if (http == NULL)
-	    {
-	      perror("lpstat: Unable to connect to server");
-	      return (1);
 	    }
 	    break;
 
@@ -247,7 +241,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 #ifdef __sgi
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -266,7 +261,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'o' : /* Show jobs by destination */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -289,7 +285,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'p' : /* Show printers */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -315,7 +312,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'r' : /* Show scheduler status */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -330,7 +328,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 's' : /* Show summary */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -350,7 +349,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 't' : /* Show all info */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -374,7 +374,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'u' : /* Show jobs by user */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -397,7 +398,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'v' : /* Show printer devices */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
 
 	      if (http == NULL)
 	      {
@@ -429,7 +431,8 @@ main(int  argc,			/* I - Number of command-line arguments */
     {
       if (!http)
       {
-	http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+	http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                          cupsEncryption());
 
 	if (http == NULL)
 	{
@@ -445,7 +448,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   {
     if (!http)
     {
-      http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+      http = httpConnectEncrypt(cupsServer(), ippPort(),
+                                cupsEncryption());
 
       if (http == NULL)
       {
@@ -1929,5 +1933,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.37.2.8 2002/08/09 00:05:30 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.37.2.9 2002/08/22 01:43:40 mike Exp $".
  */
