@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h,v 1.22 2000/01/26 02:43:23 mike Exp $"
+ * "$Id: cups.h,v 1.23 2000/01/27 03:25:35 mike Exp $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -81,8 +81,8 @@ enum					/* Not a typedef'd enum so we can OR */
 
 typedef struct				/**** Printer Options ****/
 {
-  char		*name,			/* Name of option */
-		*value;			/* Value of option */
+  char		*name;			/* Name of option */
+  char		*value;			/* Value of option */
 } cups_option_t;
 
 typedef struct				/**** Destination ****/
@@ -113,13 +113,13 @@ extern int		cupsPrintFile(const char *printer, const char *filename,
 				      cups_option_t *options);
 extern char		*cupsTempFile(char *filename, int len);
 
-extern int		cupsAddDest(const char *name, int num_dests,
-			            cups_dest_t **dests);
-extern void		cupsFreeDests(int num_dests, cups_dest_t **dests);
-extern cups_dest_t	*cupsGetDest(const char *name, int num_dests,
-			             cups_dest_t **dests);
+extern int		cupsAddDest(const char *name, const char *instance,
+			            int num_dests, cups_dest_t **dests);
+extern void		cupsFreeDests(int num_dests, cups_dest_t *dests);
+extern cups_dest_t	*cupsGetDest(const char *name, const char *instance,
+			             int num_dests, cups_dest_t *dests);
 extern int		cupsGetDests(cups_dest_t **dests);
-extern void		cupsSetDests(int num_dests, cups_dest_t **dests);
+extern void		cupsSetDests(int num_dests, cups_dest_t *dests);
 
 extern int		cupsAddOption(const char *name, const char *value,
 			              int num_options, cups_option_t **options);
@@ -142,5 +142,5 @@ extern const char	*cupsUser(void);
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.22 2000/01/26 02:43:23 mike Exp $".
+ * End of "$Id: cups.h,v 1.23 2000/01/27 03:25:35 mike Exp $".
  */

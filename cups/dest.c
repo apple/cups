@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.1 2000/01/26 00:03:25 mike Exp $"
+ * "$Id: dest.c,v 1.2 2000/01/27 03:25:35 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -36,6 +36,8 @@
  */
 
 #include "cups.h"
+#include "string.h"
+#include <stdlib.h>
 
 
 /*
@@ -50,11 +52,59 @@ static int	cups_get_dests(const char *filename, int num_dests,
  * 'cupsAddDest()' - Add a destination to the list of destinations.
  */
 
-int
-cupsAddDest(const char  *name,
-            int         num_dests,
-            cups_dest_t **dests)
+int					/* O - New number of destinations */
+cupsAddDest(const char  *name,		/* I - Name of destination */
+            const char	*instance,	/* I - Instance of destination */
+            int         num_dests,	/* I - Number of destinations */
+            cups_dest_t **dests)	/* IO - Destinations */
 {
+  int		i;			/* Looping var */
+  cups_dest_t	*dest;			/* Destination pointer */
+
+
+  if (name == NULL || dests == NULL)
+    return (0);
+
+  if ((dest = cupsGetDest(name, instance, num_dests, *dests)) != NULL)
+    return (num_dests);
+
+ /*
+  * Add new destination...
+  */
+
+  if (num_dests == 0)
+    dest = malloc(sizeof(cups_dest_t));
+  else
+    dest = realloc(*dests, sizeof(cups_dest_t) * (num_dests + 1));
+
+  if (dest == NULL)
+    return (num_dests);
+
+  *dests = dest;
+
+  for (i = num_dests; i > 0; i --, dest ++)
+    if (strcasecmp(name, dest->name) < 0)
+      break;
+    else if (instance == NULL && dest->instance != NULL)
+      break;
+    else if (instance != NULL && dest->instance == NULL &&
+             strcasecmp(instance, dest->instance) < 0)
+      break;
+
+  if (i > 0)
+    memmove(dest + 1, dest, i * sizeof(cups_dest_t));
+
+  dest->name        = strdup(name);
+  dest->is_default  = 0;
+  dest->num_options = 0;
+  dest->options     = (cups_option_t *)0;
+
+  if (instance == NULL)
+    dest->instance = NULL;
+  else
+    dest->instance = strdup(instance);
+
+  return (num_dests + 1);
 }
 
 
@@ -63,9 +113,27 @@ cupsAddDest(const char  *name,
  */
 
 void
-cupsFreeDests(int         num_dests,
-              cups_dest_t **dests)
+cupsFreeDests(int         num_dests,	/* I - Number of destinations */
+              cups_dest_t *dests)	/* I - Destinations */
 {
+  int		i;			/* Looping var */
+  cups_dest_t	*dest;			/* Current destination */
+
+
+  if (num_dests == 0 || dests == NULL)
+    return;
+
+  for (i = num_dests, dest = dests; i > 0; i --, dest ++)
+  {
+    free(dest->name);
+
+    if (dest->instance)
+      free(dest->instance);
+
+    cupsFreeOptions(dest->num_options, dest->options);
+  }
+
+  free(dests);
 }
 
 
@@ -73,11 +141,35 @@ cupsFreeDests(int         num_dests,
  * 'cupsGetDest()' - Get the named destination from the list.
  */
 
-cups_dest_t *
-cupsGetDest(const char  *name,
-            int         num_dests,
-            cups_dest_t **dests)
+cups_dest_t *				/* O - Destination pointer or NULL */
+cupsGetDest(const char  *name,		/* I - Name of destination */
+            const char	*instance,	/* I - Instance of destination */
+            int         num_dests,	/* I - Number of destinations */
+            cups_dest_t *dests)		/* I - Destinations */
 {
+  int	comp;				/* Result of comparison */
+
+
+  if (name == NULL || num_dests == 0 || dests == NULL)
+    return (NULL);
+
+  while (num_dests > 0)
+  {
+    if ((comp = strcasecmp(name, dests->name)) > 0)
+      return (NULL);
+    else if (comp == 0)
+    {
+      if ((instance == NULL && dests->instance == NULL) ||
+          (instance != NULL && dests->instance != NULL &&
+	   strcasecmp(instance, dests->instance) == 0))
+	return (dests);
+    }
+
+    num_dests --;
+    dests ++;
+  }
+
+  return (NULL);
 }
 
 
@@ -93,6 +185,8 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
   int		count;			/* Number of printers/classes */
   char		**names;		/* Printer/class names */
   cups_dest_t	*dest;			/* Destination pointer */
+  const char	*home;			/* HOME environment variable */
+  char		filename[1024];		/* Local ~/.lpoptions file */
 
 
  /*
@@ -110,7 +204,7 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
   {
     for (i = 0; i < count; i ++)
     {
-      num_dests = cupsAddDest(names[i], num_dests, dests);
+      num_dests = cupsAddDest(names[i], NULL, num_dests, dests);
       free(names[i]);
     }
 
@@ -125,7 +219,7 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
   {
     for (i = 0; i < count; i ++)
     {
-      num_dests = cupsAddDest(names[i], num_dests, dests);
+      num_dests = cupsAddDest(names[i], NULL, num_dests, dests);
       free(names[i]);
     }
 
@@ -136,15 +230,26 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
   * Grab the default destination...
   */
 
-  if ((dest = cupsGetDest(cupsGetDefault(), num_dests, *dests)) != NULL)
+  if ((dest = cupsGetDest(cupsGetDefault(), NULL, num_dests, *dests)) != NULL)
     dest->is_default = 1;
 
  /*
   * Load the /etc/cups/lpoptions and ~/.lpoptions files...
   */
 
-  num_dests = cups_get_dests(
+  num_dests = cups_get_dests(CUPS_SERVERROOT "/lpoptions", num_dests, dests);
 
+  if ((home = getenv("HOME")) != NULL)
+  {
+    snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
+    num_dests = cups_get_dests(filename, num_dests, dests);
+  }
+
+ /*
+  * Return the number of destinations...
+  */
+
+  return (num_dests);
 }
 
 
@@ -153,9 +258,61 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
  */
 
 void
-cupsSetDests(int         num_dests,
-             cups_dest_t **dests)
+cupsSetDests(int         num_dests,	/* I - Number of destinations */
+             cups_dest_t *dests)	/* I - Destinations */
 {
+  int		i, j;			/* Looping vars */
+  cups_dest_t	*dest;			/* Current destination */
+  cups_option_t	*option;		/* Current option */
+  FILE		*fp;			/* File pointer */
+  const char	*home;			/* HOME environment variable */
+  char		filename[1024];		/* lpoptions file */
+
+
+ /*
+  * Figure out which file to write to...
+  */
+
+  if (getuid() == 0)
+    strcpy(filename, CUPS_SERVERROOT "/lpoptions");
+  else if ((home = getenv("HOME")) != NULL)
+    snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
+  else
+    return;
+
+ /*
+  * Try to open the file...
+  */
+
+  if ((fp = fopen(filename, "w")) == NULL)
+    return;
+
+ /*
+  * Write each printer; each line looks like:
+  *
+  *    Dest name[/instance] options
+  *    Default name[/instance] options
+  */
+
+  for (i = num_dests, dest = dests; i > 0; i --, dest ++)
+    if (dest->instance != NULL || dest->num_options != 0)
+    {
+      fprintf(fp, "%s %s", dest->is_default ? "Default" : "Dest",
+              dest->name);
+      if (dest->instance)
+	fprintf(fp, "/%s", dest->instance);
+
+      for (j = dest->num_options, option = dest->options; j > 0; j --, option ++)
+	fprintf(fp, " %s=%s", option->name, option->value);
+
+      fputs("\n", fp);
+    }
+
+ /*
+  * Close the file and return...
+  */
+
+  fclose(fp);      
 }
 
 
@@ -168,9 +325,159 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
                int         num_dests,	/* I - Number of destinations */
                cups_dest_t **dests)	/* IO - Destinations */
 {
+  cups_dest_t	*dest;			/* Current destination */
+  cups_option_t	*option;		/* Current option */
+  FILE		*fp;			/* File pointer */
+  char		line[8192],		/* Line from file */
+		*lineptr,		/* Pointer into line */
+		*name,			/* Name of destination/option */
+		*instance,		/* Instance of destination */
+		*value;			/* Pointer to value */
+
+
+ /*
+  * Try to open the file...
+  */
+
+  if ((fp = fopen(filename, "r")) == NULL)
+    return;
+
+ /*
+  * Read each printer; each line looks like:
+  *
+  *    Dest name[/instance] options
+  *    Default name[/instance] options
+  */
+
+  while (fgets(line, sizeof(line), fp) != NULL)
+  {
+   /*
+    * See what type of line it is...
+    */
+
+    if (strncasecmp(line, "dest", 4) == 0 && isspace(line[4]))
+      lineptr = line + 4;
+    else if (strncasecmp(line, "default ", 7) == 0 && isspace(line[7]))
+      lineptr = line + 7;
+    else
+      continue;
+
+   /*
+    * Skip leading whitespace...
+    */
+
+    while (isspace(*lineptr))
+      lineptr ++;
+
+    if (!*lineptr)
+      continue;
+
+    name = lineptr;
+
+   /*
+    * Search for an instance...
+    */
+
+    while (!isspace(*lineptr) && *lineptr && *lineptr != '/')
+      lineptr ++;
+
+    if (!*lineptr)
+      continue;
+
+    if (*lineptr == '/')
+    {
+     /*
+      * Found an instance...
+      */
+
+      *lineptr++ = '\0';
+      instance = lineptr;
+
+     /*
+      * Search for an instance...
+      */
+
+      while (!isspace(*lineptr) && *lineptr)
+	lineptr ++;
+    }
+    else
+      instance = NULL;
+
+    *lineptr++ = '\0';
+
+   /*
+    * Add the destination...
+    */
+
+    num_dests = cupsAddDest(name, instance, num_dests, dests);
+
+    if ((dest = cupsGetDest(name, instance, num_dests, *dests)) == NULL)
+    {
+     /*
+      * Out of memory!
+      */
+
+      fclose(fp);
+      return;
+    }
+
+   /*
+    * Add options until we hit the end of the line...
+    */
+
+    while (*lineptr)
+    {
+     /*
+      * Skip leading whitespace...
+      */
+
+      while (isspace(*lineptr))
+        lineptr ++;
+
+      if (!*lineptr)
+        break;
+
+     /*
+      * Grab the name...
+      */
+
+      name = lineptr;
+      while (!isspace(*lineptr) && *lineptr && *lineptr != '=')
+        lineptr ++;
+
+      if (*lineptr != '=')
+        break;
+
+      *lineptr++ = '\0';
+
+     /*
+      * Grab the value...
+      */
+
+      value = lineptr;
+      while (!isspace(*lineptr) && *lineptr)
+        lineptr ++;
+
+      if (*lineptr)
+        *lineptr++ = '\0';
+
+     /*
+      * Add the option...
+      */
+
+      dest->num_options = cupsAddOption(name, value, dest->num_options,
+                                        &(dest->options));
+    }
+  }
+
+ /*
+  * Close the file and return...
+  */
+
+  fclose(fp);      
 }
 
 
 /*
- * End of "$Id: dest.c,v 1.1 2000/01/26 00:03:25 mike Exp $".
+ * End of "$Id: dest.c,v 1.2 2000/01/27 03:25:35 mike Exp $".
  */
