@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc5
 
+	- cupsLangGet() could fail on OSX due to a corrupt
+	  language preference (STR #78)
 	- Added more checks for HTTP request timeouts.
 	- The scheduler dropped the first non-alpha character
 	  after an open brace when doing attribute substitutions

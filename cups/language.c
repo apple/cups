@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.20.2.17 2003/04/23 14:42:09 mike Exp $"
+ * "$Id: language.c,v 1.20.2.18 2003/05/09 18:44:41 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -682,7 +682,8 @@ appleLangDefault(void)
                                                  kCFPreferencesCurrentApplication);
 
     if (localizationList != NULL &&
-        CFGetTypeID(localizationList) == CFArrayGetTypeID())
+        CFGetTypeID(localizationList) == CFArrayGetTypeID() &&
+	CFArrayGetCount(localizationList) > 0)
     {
       localizationName = CFArrayGetValueAtIndex(localizationList, 0);
 
@@ -730,5 +731,5 @@ appleLangDefault(void)
 
 
 /*
- * End of "$Id: language.c,v 1.20.2.17 2003/04/23 14:42:09 mike Exp $".
+ * End of "$Id: language.c,v 1.20.2.18 2003/05/09 18:44:41 mike Exp $".
  */
