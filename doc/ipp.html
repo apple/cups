@@ -153,8 +153,8 @@ Copyright 1997-2002 All Rights Reserved<BR>
 <LI><A HREF="#5_2_11">5.2.11 job-originating-host-name (name(MAX))</A></LI>
 <LI><A HREF="#5_2_12">5.2.12 lpi (type2 enum)</A></LI>
 <LI><A HREF="#5_2_13">5.2.13 natural-scaling (integer(1:1000))</A></LI>
-<LI><A HREF="#5_2_14">5.2.14 number-up-border (type2 keyword)</A></LI>
-<LI><A HREF="#5_2_15">5.2.15 number-up-layout (type2 keyword)</A></LI>
+<LI><A HREF="#5_2_14">5.2.14 number-up-layout (type2 keyword)</A></LI>
+<LI><A HREF="#5_2_15">5.2.15 page-border (type2 keyword)</A></LI>
 <LI><A HREF="#5_2_16">5.2.16 page-bottom (integer(0:MAX))</A></LI>
 <LI><A HREF="#5_2_17">5.2.17 page-label (text(MAX))</A></LI>
 <LI><A HREF="#5_2_18">5.2.18 page-left (integer(0:MAX))</A></LI>
@@ -1211,18 +1211,7 @@ VALIGN="TOP">0x4006</TD><TD VALIGN="TOP">Add or modify a printer class.</TD>
  100.</P>
 <P>The ppi option can be used to override the natural resolution of the
  image, which controls the natural size.</P>
-<H3><A NAME="5_2_14">5.2.14 number-up-border (type2 keyword)</A></H3>
-<P><I>(CUPS 1.1.15 and higher)</I></P>
-<P>The number-up-border attribute specifies whether a border is draw
- around each page. The following keywords are presently defined:</P>
-<UL>
-<LI><CODE>double</CODE> - Two hairline borders are drawn</LI>
-<LI><CODE>double-thick</CODE> - Two 1pt borders are drawn</LI>
-<LI><CODE>none</CODE> - No border is drawn (default)</LI>
-<LI><CODE>single</CODE> - A single hairline border is drawn</LI>
-<LI><CODE>single-thick</CODE> - A single 1pt border is drawn</LI>
-</UL>
-<H3><A NAME="5_2_15">5.2.15 number-up-layout (type2 keyword)</A></H3>
+<H3><A NAME="5_2_14">5.2.14 number-up-layout (type2 keyword)</A></H3>
 <P><I>(CUPS 1.1.15 and higher)</I></P>
 <P>The number-up-layout attribute specifies the order each input page is
  placed on each output page. The following keywords are presently
@@ -1236,6 +1225,17 @@ VALIGN="TOP">0x4006</TD><TD VALIGN="TOP">Add or modify a printer class.</TD>
 <LI><CODE>rltb</CODE> - Right to left, top to bottom</LI>
 <LI><CODE>tblr</CODE> - Top to bottom, left to right</LI>
 <LI><CODE>tbrl</CODE> - Top to bottom, right to left</LI>
+</UL>
+<H3><A NAME="5_2_15">5.2.15 page-border (type2 keyword)</A></H3>
+<P><I>(CUPS 1.1.15 and higher)</I></P>
+<P>The page-border attribute specifies whether a border is draw around
+ each page. The following keywords are presently defined:</P>
+<UL>
+<LI><CODE>double</CODE> - Two hairline borders are drawn</LI>
+<LI><CODE>double-thick</CODE> - Two 1pt borders are drawn</LI>
+<LI><CODE>none</CODE> - No border is drawn (default)</LI>
+<LI><CODE>single</CODE> - A single hairline border is drawn</LI>
+<LI><CODE>single-thick</CODE> - A single 1pt border is drawn</LI>
 </UL>
 <H3><A NAME="5_2_16">5.2.16 page-bottom (integer(0:MAX))</A></H3>
 <P>The page-bottom attribute specifies the bottom margin in points (72

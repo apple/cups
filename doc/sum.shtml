@@ -460,15 +460,15 @@ CUPS supports 1, 2, 4, 6, 9, and 16-Up formats; the default format is
 <B>lpr -o number-up=16 filename ENTER</B>
 </PRE></UL>
 
-<P>The <CODE>-o number-up-border=value</CODE> option chooses the border
+<P>The <CODE>-o page-border=value</CODE> option chooses the border
 to draw around each page:
 
 <UL>
-	<LI><CODE>-o number-up-border=double</CODE>; draw two hairline borders around each page</LI>
-	<LI><CODE>-o number-up-border=double-thick</CODE>; draw two 1pt borders around each page</LI>
-	<LI><CODE>-o number-up-border=none</CODE>; do not draw a border (default)</LI>
-	<LI><CODE>-o number-up-border=single</CODE>; draw one hairline border around each page</LI>
-	<LI><CODE>-o number-up-border=single-thick</CODE>; draw one 1pt border around each page</LI>
+	<LI><CODE>-o page-border=double</CODE>; draw two hairline borders around each page</LI>
+	<LI><CODE>-o page-border=double-thick</CODE>; draw two 1pt borders around each page</LI>
+	<LI><CODE>-o page-border=none</CODE>; do not draw a border (default)</LI>
+	<LI><CODE>-o page-border=single</CODE>; draw one hairline border around each page</LI>
+	<LI><CODE>-o page-border=single-thick</CODE>; draw one 1pt border around each page</LI>
 </UL>
 
 <P>The <CODE>-o number-up-layout=value</CODE> option chooses the layout

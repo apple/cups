@@ -1645,28 +1645,6 @@ and 200 is twice the natural size. The default value is 100.
 <P>The ppi option can be used to override the natural resolution of the
 image, which controls the natural size.
 
-<H3>number-up-border (type2 keyword)</H3>
-
-<P><I>(CUPS 1.1.15 and higher)</I>
-
-<P>The number-up-border attribute specifies whether a border is
-draw around each page. The following keywords are presently
-defined:
-
-<UL>
-
-	<LI><CODE>double</CODE> - Two hairline borders are drawn</LI>
-
-	<LI><CODE>double-thick</CODE> - Two 1pt borders are drawn</LI>
-
-	<LI><CODE>none</CODE> - No border is drawn (default)</LI>
-
-	<LI><CODE>single</CODE> - A single hairline border is drawn</LI>
-
-	<LI><CODE>single-thick</CODE> - A single 1pt border is drawn</LI>
-
-</UL>
-
 <H3>number-up-layout (type2 keyword)</H3>
 
 <P><I>(CUPS 1.1.15 and higher)</I>
@@ -1692,6 +1670,28 @@ presently defined:
 	<LI><CODE>tblr</CODE> - Top to bottom, left to right</LI>
 
 	<LI><CODE>tbrl</CODE> - Top to bottom, right to left</LI>
+
+</UL>
+
+<H3>page-border (type2 keyword)</H3>
+
+<P><I>(CUPS 1.1.15 and higher)</I>
+
+<P>The page-border attribute specifies whether a border is
+draw around each page. The following keywords are presently
+defined:
+
+<UL>
+
+	<LI><CODE>double</CODE> - Two hairline borders are drawn</LI>
+
+	<LI><CODE>double-thick</CODE> - Two 1pt borders are drawn</LI>
+
+	<LI><CODE>none</CODE> - No border is drawn (default)</LI>
+
+	<LI><CODE>single</CODE> - A single hairline border is drawn</LI>
+
+	<LI><CODE>single-thick</CODE> - A single 1pt border is drawn</LI>
 
 </UL>
 
