@@ -1,22 +1,26 @@
 /*
- * "$Id: pstops.c,v 1.2 1996/10/23 20:06:28 mike Exp $"
+ * "$Id: pstops.c,v 1.3 1997/06/19 20:05:05 mike Exp $"
  *
- *   PostScript filter for espPrint, a collection of printer/image software.
+ *   PostScript filter for espPrint, a collection of printer drivers.
  *
- *   Copyright 1993-1995 by Easy Software Products
+ *   Copyright 1993-1997 by Easy Software Products
  *
- *   These coded instructions, statements, and computer  programs  contain
- *   unpublished  proprietary  information  of Easy Software Products, and
- *   are protected by Federal copyright law.  They may  not  be  disclosed
- *   to  third  parties  or  copied or duplicated in any form, in whole or
+ *   These coded instructions, statements, and computer programs contain
+ *   unpublished proprietary information of Easy Software Products, and
+ *   are protected by Federal copyright law.  They may not be disclosed
+ *   to third parties or copied or duplicated in any form, in whole or
  *   in part, without the prior written consent of Easy Software Products.
  *
  * Contents:
  *
+ *
  * Revision History:
  *
  *   $Log: pstops.c,v $
- *   Revision 1.2  1996/10/23 20:06:28  mike
+ *   Revision 1.3  1997/06/19 20:05:05  mike
+ *   Optimized code so that non-filtered output is just copied to stdout.
+ *
+ *   Revision 1.2  1996/10/23  20:06:28  mike
  *   Added gamma and brightness correction.
  *   Added 1/2/4up printing.
  *   Added 'userdict' code around gamma/brightness stuff.
@@ -146,12 +150,12 @@ copy_bytes(FILE *fp,
  * 'print_page()' - Print the specified page...
  */
 
-void
+int
 print_page(FILE *fp,
            int  number)
 {
   if (number < 1 || number > PrintNumPages || !test_page(number))
-    return;
+    return (0);
 
   if (Verbosity)
     fprintf(stderr, "psfilter: Printing page %d\n", number);
@@ -161,6 +165,8 @@ print_page(FILE *fp,
     fseek(fp, PrintPages[number], SEEK_SET);
 
   copy_bytes(fp, PrintPages[number + 1] - PrintPages[number]);
+
+  return (1);
 }
 
 
@@ -217,15 +223,15 @@ scan_file(FILE *fp)
 	pushdoc(PS_FONT)
       else if (strncmp(line, "%%BeginFile", 11) == 0)
 	pushdoc(PS_FILE)
-      else if (strncmp(line, "%%BeginResource", 13) == 0)
+      else if (strncmp(line, "%%BeginResource", 15) == 0)
 	pushdoc(PS_RESOURCE)
-      else if (strcmp(line, "%%EndDocument") == 0)
+      else if (strncmp(line, "%%EndDocument", 13) == 0)
 	popdoc(PS_DOCUMENT)
-      else if (strcmp(line, "%%EndFont") == 0)
+      else if (strncmp(line, "%%EndFont", 9) == 0)
 	popdoc(PS_FONT)
-      else if (strcmp(line, "%%EndFile") == 0)
+      else if (strncmp(line, "%%EndFile", 9) == 0)
 	popdoc(PS_FILE)
-      else if (strcmp(line, "%%EndResource") == 0)
+      else if (strncmp(line, "%%EndResource", 13) == 0)
 	popdoc(PS_RESOURCE)
       else if (strncmp(line, "%%Page:", 7) == 0 && doclevel < 0)
       {
@@ -264,35 +270,14 @@ scan_file(FILE *fp)
 
 
 /*
- * 'print_file()' - Print a file...
+ * 'print_header()' - Print the output header...
  */
 
 void
-print_file(char  *filename,
-           float gammaval[2],
-           int   brightness[2],
-           int   nup)
+print_header(float gammaval[2],
+             int   brightness[2])
 {
-  FILE	*fp;
-  int	number,
-	endpage,
-	dir,
-	x, y;
-  float	w, l,
-	tx, ty;
-  long	end;
-
-
-  if ((fp = fopen(filename, "r")) == NULL)
-  {
-    fprintf(stderr, "psfilter: Unable to open file \'%s\' for reading - %s\n",
-            filename, strerror(errno));
-    exit(1);
-  };
-
-  scan_file(fp);
-
-  copy_bytes(fp, PrintPages[0]);
+  puts("%!PS-Adobe-3.0");
 
  /*
   * Gamma correct the output...
@@ -329,6 +314,39 @@ print_file(char  *filename,
            "/settransfer { pop } def\n"
            "end\n",
            gammaval[0], 100.0 / brightness[0]);
+}
+
+
+/*
+ * 'print_file()' - Print a file...
+ */
+
+void
+print_file(char  *filename,
+           float gammaval[2],
+           int   brightness[2],
+           int   nup)
+{
+  FILE	*fp;
+  int	number,
+	endpage,
+	dir,
+	x, y;
+  float	w, l,
+	tx, ty;
+  long	end;
+
+
+  if ((fp = fopen(filename, "r")) == NULL)
+  {
+    fprintf(stderr, "psfilter: Unable to open file \'%s\' for reading - %s\n",
+            filename, strerror(errno));
+    exit(1);
+  };
+
+  scan_file(fp);
+
+  print_header(gammaval, brightness);
 
   if (PrintReversed)
   {
@@ -346,6 +364,8 @@ print_file(char  *filename,
   switch (nup)
   {
     case 1 :
+        copy_bytes(fp, PrintPages[0]);
+
         for (; number != endpage; number += dir)
         {
           if (PrintFlip)
@@ -373,13 +393,20 @@ print_file(char  *filename,
         tx = (float)PrintLength * 0.5 - w;
         ty = ((float)PrintWidth - l) * 0.5;
 
-        puts("/ESPshowpage /showpage load def\n"
-             "/showpage { } def");
+        puts("userdict begin\n"
+             "/ESPshowpage /showpage load def\n"
+             "/showpage { } def\n"
+             "end");
 
-        for (x = 0; number != endpage; number += dir, x = 1 - x)
+        copy_bytes(fp, PrintPages[0]);
+
+        for (x = 0; number != endpage;)
         {
-          printf("gsave\n"
-                 "%f %f translate\n"
+          puts("gsave");
+          printf("%d 0.0 translate\n"
+                 "90 rotate\n",
+                 PrintWidth);
+          printf("%f %f translate\n"
                  "%f %f scale\n",
                  tx + w * x, ty,
                  w / (float)PrintWidth, l / (float)PrintLength);
@@ -395,24 +422,35 @@ print_file(char  *filename,
                    "-1 1 scale\n",
                    PrintWidth);
 
-          print_page(fp, number);
+          if (print_page(fp, number))
+          {
+            number += dir;
+            x = 1 - x;
+          };
+
           puts("grestore");
-          if (x == 1)
+
+          if (x == 0)
             puts("ESPshowpage");
         };
 
-        if (x == 1)
+        if (x)
           puts("ESPshowpage");
         break;
 
     case 4 :
-        puts("/ESPshowpage /showpage load def\n"
-             "/showpage { } def");
+        puts("userdict begin\n"
+             "/ESPshowpage /showpage load def\n"
+             "/showpage { } def\n"
+             "end");
+
 
         w = (float)PrintWidth * 0.5;
         l = (float)PrintLength * 0.5;
 
-        for (x = 0, y = 1; number != endpage; number += dir, x = 1 - x)
+        copy_bytes(fp, PrintPages[0]);
+
+        for (x = 0, y = 1; number != endpage;)
         {
           printf("gsave\n"
                  "%f %f translate\n"
@@ -430,9 +468,15 @@ print_file(char  *filename,
                    "-1 1 scale\n",
                    PrintWidth);
 
-          print_page(fp, number);
+          if (print_page(fp, number))
+          {
+            number += dir;
+            x = 1 - x;
+          };
+
           puts("grestore");
-          if (x == 1)
+
+          if (x == 0)
           {
             y = 1 - y;
             if (y == 1)
@@ -440,7 +484,7 @@ print_file(char  *filename,
           };
         };
 
-        if (y != 1 || x != 0)
+        if (y != 1 || x != 1)
           puts("ESPshowpage");
         break;
   };
@@ -471,7 +515,7 @@ void
 main(int  argc,
      char *argv[])
 {
-  int			i, nfiles;
+  int			i, n, nfiles;
   char			*opt;
   char			tempfile[255];
   FILE			*temp;
@@ -563,30 +607,70 @@ main(int  argc,
         }
     else
     {
-      print_file(argv[i], gammaval, brightness, nup);
+      if (nup == 1 && PrintEvenPages && PrintOddPages && PrintRange == NULL &&
+	  !PrintReversed)
+      {
+       /*
+	* Just cat the file to stdout - we don't need to to any processing.
+	*/
+
+        print_header(gammaval, brightness);
+
+        if ((temp = fopen(argv[i], "r")) != NULL)
+        {
+          while ((n = fread(buffer, 1, sizeof(buffer), temp)) > 0)
+            fwrite(buffer, 1, n, stdout);
+
+          fclose(temp);
+        };
+      }
+      else
+      {
+       /*
+        * Filter the file as necessary...
+        */
+
+        print_file(argv[i], gammaval, brightness, nup);
+      };
+
       nfiles ++;
     };
 
   if (nfiles == 0)
   {
-   /*
-    * Copy stdin to a temporary file and filter the temporary file.
-    */
+    if (nup == 1 && PrintEvenPages && PrintOddPages && PrintRange == NULL &&
+	!PrintReversed)
+    {
+     /*
+      * Just cat stdin to stdout - we don't need to to any processing.
+      */
 
-    if ((temp = fopen(tmpnam(tempfile), "w")) == NULL)
-      exit(ERR_DATA_BUFFER);
+      print_header(gammaval, brightness);
 
-    while (fgets(buffer, sizeof(buffer), stdin) != NULL)
-      fputs(buffer, temp);
-    fclose(temp);
+      while ((n = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
+        fwrite(buffer, 1, n, stdout);
+    }
+    else
+    {
+     /*
+      * Copy stdin to a temporary file and filter the temporary file.
+      */
 
-    print_file(tempfile, gammaval, brightness, nup);
+      if ((temp = fopen(tmpnam(tempfile), "w")) == NULL)
+	exit(ERR_DATA_BUFFER);
 
-    unlink(tempfile);
+      while (fgets(buffer, sizeof(buffer), stdin) != NULL)
+	fputs(buffer, temp);
+      fclose(temp);
+
+      print_file(tempfile, gammaval, brightness, nup);
+
+      unlink(tempfile);
+    };
   };
 }
 
 
 /*
- * End of "$Id: pstops.c,v 1.2 1996/10/23 20:06:28 mike Exp $".
+ * End of "$Id: pstops.c,v 1.3 1997/06/19 20:05:05 mike Exp $".
  */
