@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4,v 1.23 2003/02/12 14:13:12 mike Exp $"
+dnl "$Id: cups-compiler.m4,v 1.24 2003/03/25 16:25:55 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -184,8 +184,12 @@ if test $uname = HP-UX; then
 	# HP-UX 10.20 (at least) needs this definition to get the
 	# h_errno global...
 	OPTIM="$OPTIM -D_XOPEN_SOURCE_EXTENDED"
+
+	# HP-UX 11.00 (at least) needs this definition to get the
+	# u_short type used by the IP headers...
+	OPTIM="$OPTIM -D_INCLUDE_HPUX_SOURCE"
 fi
 
 dnl
-dnl End of "$Id: cups-compiler.m4,v 1.23 2003/02/12 14:13:12 mike Exp $".
+dnl End of "$Id: cups-compiler.m4,v 1.24 2003/03/25 16:25:55 mike Exp $".
 dnl
