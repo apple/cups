@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.57 2003/03/21 18:10:02 mike Exp $"
+ * "$Id: job.c,v 1.124.2.58 2003/03/24 21:30:08 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2200,20 +2200,22 @@ UpdateJob(job_t *job)		/* I - Job to check */
 
       if (job->sheets != NULL)
       {
-	if (!sscanf(message, "%*d%d", &copies))
+        if (!strncasecmp(message, "total ", 6))
 	{
-          job->sheets->values[0].integer ++;
+	 /*
+	  * Got a total count of pages from a backend or filter...
+	  */
 
-	  if (job->printer->page_limit)
-	    UpdateQuota(job->printer, job->username, 1, 0);
-        }
-	else
-	{
-          job->sheets->values[0].integer += copies;
+	  copies = atoi(message + 6);
+	  copies -= job->sheets->values[0].integer; /* Just track the delta */
+	}
+	else if (!sscanf(message, "%*d%d", &copies))
+	  copies = 1;
+	  
+        job->sheets->values[0].integer += copies;
 
-	  if (job->printer->page_limit)
-	    UpdateQuota(job->printer, job->username, copies, 0);
-        }
+	if (job->printer->page_limit)
+	  UpdateQuota(job->printer, job->username, copies, 0);
       }
 
       LogPage(job, message);
@@ -2631,5 +2633,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.57 2003/03/21 18:10:02 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.58 2003/03/24 21:30:08 mike Exp $".
  */
