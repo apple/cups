@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.33 2002/06/28 20:14:25 mike Exp $"
+ * "$Id: lpadmin.c,v 1.34 2002/08/15 19:47:57 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -1702,7 +1702,10 @@ set_printer_options(http_t        *http,	/* I - Server connection */
     if ((attr = ippFindAttribute(response, "printer-type", IPP_TAG_ENUM)) != NULL)
     {
       if (attr->values[0].integer & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
+      {
         op = CUPS_ADD_CLASS;
+        snprintf(uri, sizeof(uri), "ipp://localhost/classes/%s", printer);
+      }
     }
 
     ippDelete(response);
@@ -1860,5 +1863,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.33 2002/06/28 20:14:25 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.34 2002/08/15 19:47:57 mike Exp $".
  */
