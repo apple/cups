@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.8 2000/06/14 15:11:04 mike Exp $"
+ * "$Id: ipp-var.c,v 1.9 2000/07/10 15:18:22 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -32,6 +32,33 @@
  */
 
 #include "ipp-var.h"
+
+
+/*
+ * 'ippGetTemplateDir()' - Get the templates directory...
+ */
+
+char *					/* O - Template directory */
+ippGetTemplateDir(void)
+{
+  const char	*datadir;		/* CUPS_DATADIR env var */
+  static char	templates[1024] = "";	/* Template directory */
+
+
+  if (!templates[0])
+  {
+   /*
+    * Build the template directory pathname...
+    */
+
+    if ((datadir = getenv("CUPS_DATADIR")) == NULL)
+      datadir = CUPS_DATADIR;
+
+    snprintf(templates, sizeof(templates), "%s/templates", datadir);
+  }
+
+  return (templates);
+}
 
 
 /*
@@ -222,5 +249,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.8 2000/06/14 15:11:04 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.9 2000/07/10 15:18:22 mike Exp $".
  */

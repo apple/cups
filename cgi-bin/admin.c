@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.10 2000/06/27 16:26:43 mike Exp $"
+ * "$Id: admin.c,v 1.11 2000/07/10 15:18:22 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -201,6 +201,8 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
   ipp_attribute_t *attr;		/* member-uris attribute */
   ipp_status_t	status;			/* Request status */
   char		uri[HTTP_MAX_URI];	/* Device or printer URI */
+  const char	*name,			/* Pointer to class name */
+		*ptr;			/* Pointer to CGI variable */
 
 
   if (cgiGetVariable("PRINTER_LOCATION") == NULL)
@@ -256,8 +258,24 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
 
       cgiCopyTemplateLang(stdout, TEMPLATES, "add-class.tmpl", getenv("LANG"));
     }
+
+    return;
   }
-  else if (cgiGetVariable("MEMBER_URIS") == NULL)
+
+  name = cgiGetVariable("PRINTER_NAME");
+  for (ptr = name; *ptr; ptr ++)
+    if (!isalnum(*ptr) && *ptr != '_')
+      break;
+
+  if (*ptr || ptr == name)
+  {
+    cgiSetVariable("ERROR", "The class name may only contain letters, "
+                            "numbers, and the underscore.");
+    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    return;
+  }
+
+  if (cgiGetVariable("MEMBER_URIS") == NULL)
   {
    /*
     * Build a CUPS_GET_PRINTERS request, which requires the
@@ -472,6 +490,8 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 		*uriptr;		/* Pointer into URI */
   int		maxrate;		/* Maximum baud rate */
   char		baudrate[255];		/* Baud rate string */
+  const char	*name,			/* Pointer to class name */
+		*ptr;			/* Pointer to CGI variable */
   static int	baudrates[] =		/* Baud rates */
 		{
 		  1200,
@@ -540,8 +560,24 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 
       cgiCopyTemplateLang(stdout, TEMPLATES, "add-printer.tmpl", getenv("LANG"));
     }
+
+    return;
   }
-  else if ((var = cgiGetVariable("DEVICE_URI")) == NULL)
+
+  name = cgiGetVariable("PRINTER_NAME");
+  for (ptr = name; *ptr; ptr ++)
+    if (!isalnum(*ptr) && *ptr != '_')
+      break;
+
+  if (*ptr || ptr == name)
+  {
+    cgiSetVariable("ERROR", "The printer name may only contain letters, "
+                            "numbers, and the underscore.");
+    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    return;
+  }
+
+  if ((var = cgiGetVariable("DEVICE_URI")) == NULL)
   {
    /*
     * Build a CUPS_GET_DEVICES request, which requires the following
@@ -1451,5 +1487,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.10 2000/06/27 16:26:43 mike Exp $".
+ * End of "$Id: admin.c,v 1.11 2000/07/10 15:18:22 mike Exp $".
  */
