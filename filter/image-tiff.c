@@ -1,5 +1,5 @@
 /*
- * "$Id: image-tiff.c,v 1.8 1999/08/30 15:50:14 mike Exp $"
+ * "$Id: image-tiff.c,v 1.9 1999/09/03 19:58:40 mike Exp $"
  *
  *   TIFF file routines for the Common UNIX Printing System (CUPS).
  *
@@ -89,9 +89,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
   * Open the TIFF file and get the required parameters...
   */
 
-#ifdef __hpux
-  lseek(fileno(fp), 0, SEEK_SET); /* Work around "feature" in HP-UX stdio */
-#endif /* __hpux */
+  lseek(fileno(fp), 0, SEEK_SET); /* Work around "feature" in some stdio's */
 
   if ((tif = TIFFFdOpen(fileno(fp), "", "r")) == NULL)
   {
@@ -1618,5 +1616,5 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-tiff.c,v 1.8 1999/08/30 15:50:14 mike Exp $".
+ * End of "$Id: image-tiff.c,v 1.9 1999/09/03 19:58:40 mike Exp $".
  */

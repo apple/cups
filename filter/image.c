@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.16 1999/08/30 15:50:15 mike Exp $"
+ * "$Id: image.c,v 1.17 1999/09/03 19:58:40 mike Exp $"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
@@ -105,7 +105,6 @@ ImageOpen(char       *filename,	/* I - Filename of image */
   memset(header2, 0, sizeof(header2));
   fread(header2, 1, sizeof(header2), fp);
   fseek(fp, 0, SEEK_SET);
-  lseek(fileno(fp), 0, SEEK_SET); /* Avoid standard C library bugs */
 
  /*
   * Allocate memory...
@@ -756,5 +755,5 @@ flush_tile(image_t *img)	/* I - Image */
 
 
 /*
- * End of "$Id: image.c,v 1.16 1999/08/30 15:50:15 mike Exp $".
+ * End of "$Id: image.c,v 1.17 1999/09/03 19:58:40 mike Exp $".
  */
