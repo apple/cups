@@ -1,5 +1,5 @@
 /*
- * "$Id: lppasswd.c,v 1.16 2004/02/25 20:14:54 mike Exp $"
+ * "$Id: lppasswd.c,v 1.17 2004/12/16 19:42:22 mike Exp $"
  *
  *   MD5 password program for the Common UNIX Printing System (CUPS).
  *
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -43,6 +43,11 @@
 #include <cups/cups.h>
 #include <cups/md5.h>
 #include <cups/string.h>
+
+#ifndef WIN32
+#  include <unistd.h>
+#  include <signal.h>
+#endif /* !WIN32 */
 
 
 /*
@@ -90,7 +95,27 @@ main(int  argc,			/* I - Number of command-line arguments */
   		*oldpass;	/* old password */
   int		flag;		/* Password check flags... */
   int		fd;		/* Password file descriptor */
+  int		error;		/* Write error */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;	/* Signal action */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET*/
 
+
+ /*
+  * Check to see if stdin, stdout, and stderr are still open...
+  */
+
+  if (fcntl(0, F_GETFD, &i) ||
+      fcntl(1, F_GETFD, &i) ||
+      fcntl(2, F_GETFD, &i))
+  {
+   /*
+    * No, return exit status 2 and don't try to send any output since
+    * someone is trying to bypass the security on the server.
+    */
+
+    return (2);
+  }
 
  /*
   * Find the server directory...
@@ -253,6 +278,40 @@ main(int  argc,			/* I - Number of command-line arguments */
   }
 
  /*
+  * Ignore SIGHUP, SIGINT, SIGTERM, and SIGXFSZ (if defined) for the
+  * remainder of the time so that we won't end up with bogus password
+  * files...
+  */
+
+#ifndef WIN32
+#  if defined(HAVE_SIGSET)
+  sigset(SIGHUP, SIG_IGN);
+  sigset(SIGINT, SIG_IGN);
+  sigset(SIGTERM, SIG_IGN);
+#    ifdef SIGXFSZ
+  sigset(SIGXFSZ, SIG_IGN);
+#    endif /* SIGXFSZ */
+#  elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+  action.sa_handler = SIG_IGN;
+
+  sigaction(SIGHUP, &action, NULL);
+  sigaction(SIGINT, &action, NULL);
+  sigaction(SIGTERM, &action, NULL);
+#    ifdef SIGXFSZ
+  sigaction(SIGXFSZ, &action, NULL);
+#    endif /* SIGXFSZ */
+#  else
+  signal(SIGHUP, SIG_IGN);
+  signal(SIGINT, SIG_IGN);
+  signal(SIGTERM, SIG_IGN);
+#    ifdef SIGXFSZ
+  signal(SIGXFSZ, SIG_IGN);
+#    endif /* SIGXFSZ */
+#  endif
+#endif /* !WIN32 */
+
+ /*
   * Open the output file.
   */
 
@@ -275,6 +334,8 @@ main(int  argc,			/* I - Number of command-line arguments */
     return (1);
   }
 
+  setbuf(outfile, NULL);
+
  /*
   * Open the existing password file and create a new one...
   */
@@ -282,7 +343,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   infile = fopen(passwdmd5, "r");
   if (infile == NULL && errno != ENOENT && op != ADD)
   {
-    fputs("lppasswd: No password file to change or delete from!\n", stderr);
+    perror("lppasswd: Unable to open password file");
 
     fclose(outfile);
 
@@ -297,6 +358,11 @@ main(int  argc,			/* I - Number of command-line arguments */
   *   username:group:MD5-sum
   */
 
+  error        = 0;
+  userline[0]  = '\0';
+  groupline[0] = '\0';
+  md5line[0]   = '\0';
+
   if (infile)
   {
     while (fgets(line, sizeof(line), infile) != NULL)
@@ -308,60 +374,87 @@ main(int  argc,			/* I - Number of command-line arguments */
           strcmp(groupname, groupline) == 0)
 	break;
 
-      fputs(line, outfile);
+      if (fputs(line, outfile) == EOF)
+      {
+        perror("lppasswd: Unable to write to password file");
+        error = 1;
+	break;
+      }
     }
 
-    while (fgets(line, sizeof(line), infile) != NULL)
-      fputs(line, outfile);
-  }
-  else
-  {
-    userline[0]  = '\0';
-    groupline[0] = '\0';
-    md5line[0]   = '\0';
+    if (!error)
+    {
+      while (fgets(line, sizeof(line), infile) != NULL)
+	if (fputs(line, outfile) == EOF)
+	{
+          perror("lppasswd: Unable to write to password file");
+	  error = 1;
+	  break;
+	}
+    }
   }
 
   if (op == CHANGE &&
-      (strcmp(username, userline) != 0 ||
-       strcmp(groupname, groupline) != 0))
+      (strcmp(username, userline) || strcmp(groupname, groupline)))
+  {
     fprintf(stderr, "lppasswd: user \"%s\" and group \"%s\" do not exist.\n",
             username, groupname);
+    error = 1;
+  }
   else if (op != DELETE)
   {
     if (oldpass &&
         strcmp(httpMD5(username, "CUPS", oldpass, md5new), md5line) != 0)
     {
       fputs("lppasswd: Sorry, password doesn't match!\n", stderr);
-
-      if (infile)
-	fclose(infile);
-
-      fclose(outfile);
-
-      unlink(passwdnew);
-
-      return (1);
+      error = 1;
     }
-
-    fprintf(outfile, "%s:%s:%s\n", username, groupname,
-            httpMD5(username, "CUPS", newpass, md5new));
+    else
+    {
+      snprintf(line, sizeof(line), "%s:%s:%s\n", username, groupname,
+               httpMD5(username, "CUPS", newpass, md5new));
+      if (fputs(line, outfile) == EOF)
+      {
+        perror("lppasswd: Unable to write to password file");
+        error = 1;
+      }
+    }
   }
 
  /*
-  * Close the files and remove the old password file...
+  * Close the files...
   */
 
   if (infile)
     fclose(infile);
 
-  fclose(outfile);
+  if (fclose(outfile) == EOF)
+    error = 1;
+
+ /*
+  * Error out gracefully as needed...
+  */
+
+  if (error)
+  {
+    fputs("lppasswd: Password file not updated!\n", stderr);
+    
+    unlink(passwdnew);
+
+    return (1);
+  }
 
  /*
   * Save old passwd file
   */
 
   unlink(passwdold);
-  link(passwdmd5, passwdold);
+  if (link(passwdmd5, passwdold))
+  {
+    perror("lppasswd: failed to backup old password file");
+    unlink(passwdnew);
+    return (1);
+  }
 
  /*
   * Install new password file
@@ -369,7 +462,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if (rename(passwdnew, passwdmd5) < 0)
   {
-    perror("lppasswd: failed to rename passwd file");
+    perror("lppasswd: failed to rename password file");
     unlink(passwdnew);
     return (1);
   }
@@ -401,5 +494,5 @@ usage(FILE *fp)		/* I - File to send usage to */
 
 
 /*
- * End of "$Id: lppasswd.c,v 1.16 2004/02/25 20:14:54 mike Exp $".
+ * End of "$Id: lppasswd.c,v 1.17 2004/12/16 19:42:22 mike Exp $".
  */
