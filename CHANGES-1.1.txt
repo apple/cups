@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The IPP backend now detects if the destination queue
+	  has gone away and reports an error.
 	- The scheduler now allocates its select() sets to
 	  support larger numbers of clients on systems that
 	  support it.
