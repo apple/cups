@@ -3,6 +3,8 @@ CHANGES.txt - 10/20/2004
 
 CHANGES IN CUPS V1.1.22
 
+	- cupsDoFileRequest() now sets cupsLastError() to
+	  IPP_ERROR on network errors (STR #953)
 	- The pdftops filter didn't scale small pages up to the
 	  output page size when the fitplot option was used (STR
 	  #984)
