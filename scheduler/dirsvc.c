@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.21 1999/06/23 14:12:03 mike Exp $"
+ * "$Id: dirsvc.c,v 1.22 1999/06/23 15:10:19 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -236,6 +236,7 @@ UpdateBrowseList(void)
 
       strcpy(p->uri, uri);
       strcpy(p->device_uri, uri);
+      strcpy(p->hostname, host);
       free(p->attrs->attrs->values[0].string.text);
       p->attrs->attrs->values[0].string.text = strdup(uri);
     }
@@ -270,6 +271,7 @@ UpdateBrowseList(void)
 
 	strcpy(p->uri, uri);
 	strcpy(p->device_uri, uri);
+        strcpy(p->hostname, host);
 	free(p->attrs->attrs->values[0].string.text);
 	p->attrs->attrs->values[0].string.text = strdup(uri);
       }
@@ -300,6 +302,7 @@ UpdateBrowseList(void)
 
       strcpy(p->uri, uri);
       strcpy(p->device_uri, uri);
+      strcpy(p->hostname, host);
       free(p->attrs->attrs->values[0].string.text);
       p->attrs->attrs->values[0].string.text = strdup(uri);
     }
@@ -334,6 +337,7 @@ UpdateBrowseList(void)
 
 	strcpy(p->uri, uri);
 	strcpy(p->device_uri, uri);
+        strcpy(p->hostname, host);
 	free(p->attrs->attrs->values[0].string.text);
 	p->attrs->attrs->values[0].string.text = strdup(uri);
       }
@@ -509,5 +513,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.21 1999/06/23 14:12:03 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.22 1999/06/23 15:10:19 mike Exp $".
  */
