@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.1 1999/06/09 20:03:47 mike Exp $"
+ * "$Id: lpq.c,v 1.2 1999/06/09 20:16:57 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -179,7 +179,7 @@ show_jobs(http_t *http,		/* I - HTTP connection to server */
                 longstatus));
 
   if (http == NULL)
-    return;
+    return (0);
 
  /*
   * Build an IPP_GET_JOBS or IPP_GET_JOB_ATTRIBUTES request, which requires
@@ -362,5 +362,5 @@ show_jobs(http_t *http,		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpq.c,v 1.1 1999/06/09 20:03:47 mike Exp $".
+ * End of "$Id: lpq.c,v 1.2 1999/06/09 20:16:57 mike Exp $".
  */
