@@ -24,8 +24,19 @@
 /* gxlum.h */
 /* Luminance computation parameters for Ghostscript */
 
-/* Color weights used for computing luminance. */
-#define lum_red_weight	30
-#define lum_green_weight	59
-#define lum_blue_weight	11
+/*
+ * Color weights used for computing luminance.
+ *
+ * The original ones used here were for NTSC video displays.  Of course,
+ * if you want to print instead of display things are different...
+ */
+#ifdef NTSC_LUM
+#  define lum_red_weight	30
+#  define lum_green_weight	59
+#  define lum_blue_weight	11
+#else
+#  define lum_red_weight	31
+#  define lum_green_weight	61
+#  define lum_blue_weight	8
+#endif /* NTSC_LUN */
 #define lum_all_weights	(lum_red_weight + lum_green_weight + lum_blue_weight)

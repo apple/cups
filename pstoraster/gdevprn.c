@@ -68,10 +68,47 @@ gdev_prn_alloc(gx_device *pdev)
 {	ulong mem_space;
 	byte *base = 0;
 	void *left = 0;
+  int	cache_size;			/* Size of tile cache in bytes */
+  char	*cache_env,			/* Cache size environment variable */
+	cache_units[255];		/* Cache size units */
+
 
 	memset(ppdev->skip, 0, sizeof(ppdev->skip));
 	ppdev->orig_procs = pdev->std_procs;
 	ppdev->ccfile = ppdev->cbfile = NULL;
+
+       /*
+	* MRS - reset max_bitmap to the value of RIP_MAX_CACHE as necessary...
+	*/
+
+	if ((cache_env = getenv("RIP_MAX_CACHE")) != NULL)
+	{
+	  switch (sscanf(cache_env, "%d%s", &cache_size, cache_units))
+	  {
+	    case 0 :
+        	cache_size = 32 * 1024 * 1024;
+		break;
+	    case 1 :
+                cache_size *= 4 * 256 * 256;
+		break;
+	    case 2 :
+        	if (tolower(cache_units[0]) == 'g')		/* Gigabytes */
+		  cache_size *= 1024 * 1024 * 1024;
+        	else if (tolower(cache_units[0]) == 'm')	/* Megabytes */
+		  cache_size *= 1024 * 1024;
+		else if (tolower(cache_units[0]) == 'k')	/* Kilobytes */
+		  cache_size *= 1024;
+		else if (tolower(cache_units[0]) == 't')	/* Tiles */
+		  cache_size *= 4 * 256 * 256;
+		break;
+	  }
+	}
+	else
+          cache_size = 32 * 1024 * 1024;
+
+        ppdev->max_bitmap       = cache_size;
+	ppdev->use_buffer_space = cache_size / 8;
+
 	mem_space = gdev_mem_bitmap_size(pmemdev);
 
 	if ( mem_space >= ppdev->max_bitmap ||
@@ -582,7 +619,11 @@ gdev_prn_output_page(gx_device *pdev, int num_copies, int flush)
 		  (*ppdev->printer_procs.print_page_copies)(ppdev,
 							    ppdev->file,
 							    num_copies);
-		errcode = (ferror(ppdev->file) ? gs_error_ioerror : 0);
+                if (ppdev->file != NULL)
+		  errcode = (ferror(ppdev->file) ? gs_error_ioerror : 0);
+		else
+		  errcode = 0;
+
 		closecode = gdev_prn_close_printer(pdev);
 	  }
 	else
