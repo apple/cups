@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.28.2.16 2002/10/15 21:01:59 mike Exp $"
+ * "$Id: lpd.c,v 1.28.2.17 2002/11/27 15:15:14 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -453,6 +453,7 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
   char			status;		/* Status byte from command */
   struct sockaddr_in	addr;		/* Socket address */
   struct hostent	*hostaddr;	/* Host address */
+  int			copy;		/* Copies written */
   size_t		nbytes,		/* Number of bytes written */
 			tbytes;		/* Total bytes written */
   char			buffer[8192];	/* Output buffer */
@@ -684,7 +685,7 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
               (unsigned)filestats.st_size);
 
       tbytes = 0;
-      while (manual_copies > 0)
+      for (copy = 0; copy < manual_copies; copy ++)
       {
 	rewind(fp);
 
@@ -701,8 +702,6 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 	  else
             tbytes += nbytes;
 	}
-
-	manual_copies --;
       }
 
       if (tbytes < filestats.st_size)
@@ -925,5 +924,5 @@ rresvport(int *port)		/* IO - Port number to bind to */
 #endif /* !HAVE_RRESVPORT */
 
 /*
- * End of "$Id: lpd.c,v 1.28.2.16 2002/10/15 21:01:59 mike Exp $".
+ * End of "$Id: lpd.c,v 1.28.2.17 2002/11/27 15:15:14 mike Exp $".
  */
