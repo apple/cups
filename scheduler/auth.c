@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.7 1999/04/21 21:19:35 mike Exp $"
+ * "$Id: auth.c,v 1.8 1999/04/22 17:00:11 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -328,6 +328,9 @@ IsAuthorized(client_t *con)	/* I - Connection */
   if (best->level == AUTH_ANON)		/* Anonymous access - allow it */
     return (HTTP_OK);
 
+  DEBUG_printf(("IsAuthorized: username = \"%s\", password = \"%s\"\n",
+		con->username, con->password));
+
   if (con->username[0] == '\0' || con->password[0] == '\0')
     return (HTTP_UNAUTHORIZED);		/* Non-anonymous needed user/pass */
 
@@ -371,11 +374,17 @@ IsAuthorized(client_t *con)	/* I - Connection */
   * OK, the password isn't blank, so compare with what came from the client...
   */
 
+  DEBUG_printf(("IsAuthorized: pw_passwd = %s, crypt = %s\n",
+		pw->pw_passwd, crypt(con->password, pw->pw_passwd)));
+
   if (strcmp(pw->pw_passwd, crypt(con->password, pw->pw_passwd)) != 0)
   {
 #ifdef HAVE_SHADOW_H
     if (spw != NULL)
     {
+      DEBUG_printf(("IsAuthorized: sp_pwdp = %s, crypt = %s\n",
+		    spw->sp_pwdp, crypt(con->password, spw->sp_pwdp)));
+
       if (strcmp(spw->sp_pwdp, crypt(con->password, spw->sp_pwdp)) != 0)
 	return (HTTP_UNAUTHORIZED);
     }
@@ -413,6 +422,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
  /*
   * The user isn't part of the specified group, so deny access...
   */
+
+  DEBUG_puts("IsAuthorized: user not in group!");
 
   return (HTTP_UNAUTHORIZED);
 }
@@ -555,5 +566,5 @@ check_auth(unsigned   ip,	/* I - Client address */
 
 
 /*
- * End of "$Id: auth.c,v 1.7 1999/04/21 21:19:35 mike Exp $".
+ * End of "$Id: auth.c,v 1.8 1999/04/22 17:00:11 mike Exp $".
  */
