@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.115 2002/06/07 20:39:27 mike Exp $"
+ * "$Id: client.c,v 1.116 2002/08/20 19:24:11 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2230,6 +2230,7 @@ pipe_command(client_t *con,	/* I - Client connection */
 	     char     *command,	/* I - Command to run */
 	     char     *options)	/* I - Options for command */
 {
+  int	i;			/* Looping var */
   int	pid;			/* Process ID */
   char	*commptr;		/* Command string pointer */
   int	fd;			/* Looping var */
@@ -2400,6 +2401,12 @@ pipe_command(client_t *con,	/* I - Client connection */
 
   envp[envc] = NULL;
 
+  if (LogLevel == L_DEBUG2)
+  {
+    for (i = 0; i < envc; i ++)
+      LogMessage(L_DEBUG2, "envp[%d] = \"%s\"", i, envp[i]);
+  }
+
  /*
   * Create a pipe for the output...
   */
@@ -2511,5 +2518,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.115 2002/06/07 20:39:27 mike Exp $".
+ * End of "$Id: client.c,v 1.116 2002/08/20 19:24:11 mike Exp $".
  */
