@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.46 2003/04/09 15:40:45 mike Exp $"
+# "$Id: Makefile,v 1.47 2003/05/26 00:18:20 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -103,7 +103,6 @@ all:	$(DOCUMENTS:.shtml=.pdf) $(DOCUMENTS:.shtml=.html) overview.pdf
 #
 
 ps:	$(DOCUMENTS:.shtml=.ps) overview.ps
-	cd de; $(MAKE) $(MFLAGS) ps
 	cd fr; $(MAKE) $(MFLAGS) ps
 
 
