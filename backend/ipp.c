@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.82 2004/05/13 15:13:42 mike Exp $"
+ * "$Id: ipp.c,v 1.83 2004/05/13 20:21:45 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -891,7 +891,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
           fprintf(stderr, "ERROR: Unable to get job %d attributes (%s)!\n",
 	          job_id, ippErrorString(ipp_status));
-          break;
+	  break;
 	}
       }
 
@@ -1316,5 +1316,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c,v 1.82 2004/05/13 15:13:42 mike Exp $".
+ * End of "$Id: ipp.c,v 1.83 2004/05/13 20:21:45 mike Exp $".
  */
