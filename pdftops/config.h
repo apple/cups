@@ -50,9 +50,16 @@
 #define xpdfSysConfigFile SYSTEM_XPDFRC
 
 // Support Unicode/etc.
-#define JAPANESE_SUPPORT 1
-#define CHINESE_GB_SUPPORT 1
-#define CHINESE_CNS_SUPPORT 1
+//
+// The IBM AIX GNUPro compilers seem not to like the Asian font
+// code, causing a "virtual memory exhausted" error.  Only support
+// Asian fonts on platforms that will compile it...
+
+#if !defined(_AIX) || __GNUC__ != 2 || __GNUC_MINOR__ != 9
+#  define JAPANESE_SUPPORT 1
+#  define CHINESE_GB_SUPPORT 1
+#  define CHINESE_CNS_SUPPORT 1
+#endif // !_AIX || !GCC 2.9
 
 //------------------------------------------------------------------------
 // X-related constants
