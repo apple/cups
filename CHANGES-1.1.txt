@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.17
 
+	- The scheduler used a fixed-size (16k) buffer for
+	  encoding job options for filters; it now dynamically
+	  allocates and expands the buffer as needed depending
+	  on the options that are sent in a job.
 	- The pdftops filter didn't support all of the MacOS
 	  characters for MacRoman encoded fonts.
 	- The cupsEncodeOptions() and cupsParseOptions()

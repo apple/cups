@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.39 2002/10/28 17:53:43 mike Exp $"
+ * "$Id: job.c,v 1.124.2.40 2002/11/18 19:03:03 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1130,7 +1130,6 @@ StartJob(int       id,		/* I - Job ID */
 		title[IPP_MAX_NAME],
 				/* Job title string */
 		copies[255],	/* # copies string */
-		options[16384],	/* Full list of options */
 		*envp[20],	/* Environment variables */
 		path[1024],	/* PATH environment variable */
 		language[255],	/* LANG environment variable */
@@ -1153,6 +1152,8 @@ StartJob(int       id,		/* I - Job ID */
 		nlspath[1024],	/* NLSPATH environment variable */
 		datadir[1024],	/* CUPS_DATADIR environment variable */
 		fontpath[1050];	/* CUPS_FONTPATH environment variable */
+  static char	*options = NULL;/* Full list of options */
+  static int	optlength = 0;	/* Length of option buffer */
 
 
   LogMessage(L_DEBUG, "StartJob(%d, %p)", id, printer);
@@ -1330,6 +1331,45 @@ StartJob(int       id,		/* I - Job ID */
   * Building the options string is harder than it needs to be, but
   * for the moment we need to pass strings for command-line args and
   * not IPP attribute pointers... :)
+  *
+  * First allocate/reallocate the option buffer as needed...  Using
+  * twice the raw length of the IPP attributes provides enough space for
+  * all options that are encoded as text, as we only need 1 byte of
+  * overhead for normal attributes and 6 bytes for boolean attributes,
+  * and each attribute has at least 5 bytes of overhead in the IPP
+  * message...
+  */
+
+  i = 2 * ippLength(current->attrs);
+
+  if (i > optlength)
+  {
+    if (optlength == 0)
+      optptr = malloc(i);
+    else
+      optptr = realloc(options, i);
+
+    if (optptr == NULL)
+    {
+      LogMessage(L_CRIT, "StartJob: Unable to allocate %d bytes for option buffer for job %d!",
+                 i, id);
+
+      if (filters != NULL)
+        free(filters);
+
+      FilterLevel -= current->cost;
+      
+      CancelJob(id, 0);
+      return;
+    }
+
+    options   = optptr;
+    optlength = i;
+  }
+
+ /*
+  * Now loop through the attributes and convert them to the textual
+  * representation used by the filters...
   */
 
   optptr  = options;
@@ -2440,5 +2480,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.39 2002/10/28 17:53:43 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.40 2002/11/18 19:03:03 mike Exp $".
  */
