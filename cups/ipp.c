@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.31 2003/03/20 02:45:48 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.32 2003/03/26 20:20:18 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -2275,32 +2275,6 @@ ipp_length(ipp_t *ipp,				/* I - IPP request or collection */
     bytes += 2 * attr->num_values;	/* Name lengths */
     bytes += 2 * attr->num_values;	/* Value lengths */
 
-    if (collection)
-    {
-     /*
-      * Collections are encoded in a rather bizarr way which can only
-      * be explained by how the writers of RFC 3382 implemented IPP.
-      *
-      * Collection members are encoded as a series of 1setOf values for
-      * the collection attribute itself; this is supposed to allow
-      * clients that can't handle collections to ignore them gracefully,
-      * but in reality it imposes some considerable implementation
-      * overhead should you want to save the data.
-      *
-      * Basically, each member attribute looks like this:
-      *
-      *    IPP_TAG_MEMBERNAME namelen name
-      *    IPP_TAG_whatever 0 value
-      *    [IPP_TAG_whatever 0 value2]
-      *    ...
-      *    [IPP_TAG_whatever 0 valueN]
-      *
-      * This adds an overhead of 3 bytes per attribute...
-      */
-
-      bytes += 3;
-    }
-
     switch (attr->value_tag & ~IPP_TAG_COPY)
     {
       case IPP_TAG_INTEGER :
@@ -2360,7 +2334,11 @@ ipp_length(ipp_t *ipp,				/* I - IPP request or collection */
 	  for (i = 0, value = attr->values;
 	       i < attr->num_values;
 	       i ++, value ++)
+	  {
+            bytes += 5;		/* Overhead of begCollection */
             bytes += ipp_length(attr->values[i].collection, 1);
+            bytes += 5;		/* Overhead of endCollection */
+	  }
 	  break;
 
       default :
@@ -2496,5 +2474,5 @@ ipp_write_file(int         *fd,			/* I - File descriptor */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.31 2003/03/20 02:45:48 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.32 2003/03/26 20:20:18 mike Exp $".
  */
