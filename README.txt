@@ -1,4 +1,4 @@
-README - CUPS v1.0b6 - 07/30/1999
+README - CUPS v1.0b7 - 08/24/1999
 ---------------------------------
 
 BETA SOFTWARE BETA SOFTWARE BETA SOFTWARE BETA SOFTWARE BETA SOFTWARE
@@ -57,7 +57,7 @@ the binary distributions from Easy Software Products:
     - Digital UNIX (aka OSF1 aka Compaq Tru64 UNIX) 4.0 or higher
     - HP-UX 10.20 or higher
     - IRIX 5.3 or higher
-    - Linux 2.0.36 with glibc2 or higher (tested with RedHat 5.2)
+    - Linux 2.0 with glibc2 or higher (tested with RedHat 5.2)
     - Solaris 2.5 or higher (SPARC or Intel)
 
 
@@ -124,6 +124,11 @@ Similarly, for the sample LaserJet driver you can use "LaserJet" and
 For other printers and interfaces see the CUPS System Administator's
 Manual included with this software.
 
+If you're interested in a complete, commercial printing solution for
+UNIX, check out our ESP Print Pro software at:
+
+    http://www.easysw.com/printpro
+
 
 PRINTING FILES
 
@@ -188,8 +193,3 @@ licensing information, please contact:
     Voice: +1.301.373.9603
     Email: cups-info@cups.org
     WWW: http://www.cups.org
-
-If you're interested in a complete, commercial printing solution for
-UNIX, check out our ESP Print Pro software at:
-
-    http://www.easysw.com/printpro
