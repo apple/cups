@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.86 2004/06/29 03:17:59 mike Exp $"
+ * "$Id: ipp.c,v 1.87 2004/08/26 18:25:50 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -438,7 +438,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       if (errno == ECONNREFUSED || errno == EHOSTDOWN ||
           errno == EHOSTUNREACH)
       {
-	fprintf(stderr, "INFO: Network host \'%s\' is busy; will retry in 30 seconds...",
+	fprintf(stderr, "INFO: Network host \'%s\' is busy; will retry in 30 seconds...\n",
                 hostname);
 	sleep(30);
       }
@@ -1378,5 +1378,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c,v 1.86 2004/06/29 03:17:59 mike Exp $".
+ * End of "$Id: ipp.c,v 1.87 2004/08/26 18:25:50 mike Exp $".
  */
