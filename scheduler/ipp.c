@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.15 1999/05/20 16:50:20 mike Exp $"
+ * "$Id: ipp.c,v 1.16 1999/05/21 20:55:46 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -840,7 +840,7 @@ cancel_job(client_t        *con,	/* I - Client connection */
   CheckJobs();
 
   LogMessage(LOG_INFO, "Job %d was cancelled by \'%s\'.", jobid,
-             con->username);
+             con->username[0] ? con->username : "unknown");
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -1719,7 +1719,7 @@ print_job(client_t        *con,		/* I - Client connection */
   CheckJobs();
 
   LogMessage(LOG_INFO, "Job %d queued on \'%s\' by \'%s\'.", job->id,
-             job->dest, con->username);
+             job->dest, job->username);
 
  /*
   * Fill in the response info...
@@ -2241,5 +2241,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.15 1999/05/20 16:50:20 mike Exp $".
+ * End of "$Id: ipp.c,v 1.16 1999/05/21 20:55:46 mike Exp $".
  */
