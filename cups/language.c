@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.20.2.6 2002/05/16 13:59:59 mike Exp $"
+ * "$Id: language.c,v 1.20.2.7 2002/05/23 20:13:28 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -148,6 +148,7 @@ cupsLangGet(const char *language) /* I - Language or locale */
 {
   int		i, count;	/* Looping vars */
   char		langname[32],	/* Requested language name */
+		*langptr,	/* Pointer into language name */
 		real[32],	/* Real language name */
 		*realptr,	/* Pointer into real language name */
 		filename[1024],	/* Filename for language locale file */
@@ -191,42 +192,42 @@ cupsLangGet(const char *language) /* I - Language or locale */
 
     real[0] = tolower(langname[0]);
     real[1] = tolower(langname[1]);
+    realptr = real + 2;
+    langptr = langname + 2;
 
-    count = 2;
-
-    if (langname[count] == '_' || langname[count] == '-')
+    if (*langptr == '_' || *langptr == '-')
     {
      /*
       * Add country code...
       */
 
-      real[count]     = '_';
-      real[count + 1] = toupper(langname[count + 1]);
-      real[count + 2] = toupper(langname[count + 2]);
+      *realptr++ = '_';
+      langptr ++;
 
-      count += 3;
+      *realptr++ = toupper(*langptr++);
+      *realptr++ = toupper(*langptr++);
     }
 
-    if (langname[count] == '.')
+    if (*langptr == '.')
     {
      /*
       * Add charset...
       */
 
-      strlcpy(real + count, langname + count, sizeof(real) - count);
-      count += strlen(real + count);
+      *langptr++ = '\0';
+      *realptr++ = '.';
 
-     /*
-      * Make sure count stays within the bounds of langname and real
-      * (both vars are the same size...)
-      */
-
-      if (count >= sizeof(real))
-        count = sizeof(real) - 1;
+      while (*langptr)
+      {
+        if ((realptr - real) < (sizeof(real) - 1) &&
+	    *langptr != '-' && *langptr != '_')
+	  *realptr++ = tolower(*langptr++);
+        else
+          langptr ++;
+      }
     }
 
-    langname[count] = '\0';
-    real[count]     = '\0';
+    *realptr = '\0';
   }
 
  /*
@@ -421,5 +422,5 @@ cupsLangGet(const char *language) /* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.20.2.6 2002/05/16 13:59:59 mike Exp $".
+ * End of "$Id: language.c,v 1.20.2.7 2002/05/23 20:13:28 mike Exp $".
  */

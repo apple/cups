@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- Cleaned up handling of locales with trailing character
+	  set definitions.
 	- Fixed handling of invalid PPD attributes inside
 	  OpenUI/CloseUI.
 	- Fixed a problem with SSL and the job, printer, and
