@@ -20,9 +20,6 @@ CHANGES IN CUPS V1.1.7
 	- Added support for "double" HostNameLookups.
 	- Added new "RunAsUser" directive to support non-root
 	  configurations on the standard (priviledged) ports.
-	- The startup script no longer sends a HUP signal
-	  to restart the scheduler (change to support
-	  RunAsUser directive properly)
 	- Added support for non-root invocation of the lpd
 	  backend (does no reserve a priviledged port, which
 	  might not work with some LPD servers...)
@@ -134,6 +131,8 @@ CHANGES IN CUPS V1.1.7
 	  create the status pipe or run the filters or backend.
 	  This will allow heavily loaded servers to service
 	  clients or start print jobs as the load allows.
+	- Fixed a bug in the Set-Job-Attributes code that could
+	  crash the scheduler (patch from Martin Zielinski)
 
 
 CHANGES IN CUPS V1.1.6-3
