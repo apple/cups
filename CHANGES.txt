@@ -1,4 +1,4 @@
-CHANGES.txt - 03/21/2001
+CHANGES.txt - 03/29/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.7
@@ -126,6 +126,14 @@ CHANGES IN CUPS V1.1.7
 	- Re-added black reduction for colorful colors; this
 	  helps to prevent dark colors from getting desaturated.
 	  (only used when converting RGB to CMYK)
+	- Added two new directives - MaxJobsPerPrinter and
+	  MaxJobsPerUser - to allow an administrator to set
+	  the maximum number of pending jobs in a queue or
+	  submitted by a user.
+	- The scheduler no longer stops a printer if it can't
+	  create the status pipe or run the filters or backend.
+	  This will allow heavily loaded servers to service
+	  clients or start print jobs as the load allows.
 
 
 CHANGES IN CUPS V1.1.6-3

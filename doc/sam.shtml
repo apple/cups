@@ -881,11 +881,12 @@ determine how the server operates:
 	<LI><A HREF="#LogLevel"><CODE>LogLevel</CODE></A>
 	<LI><A HREF="#MaxClients"><CODE>MaxClients</CODE></A>
 	<LI><A HREF="#MaxJobs"><CODE>MaxJobs</CODE></A>
+	<LI><A HREF="#MaxJobsPerPrinter"><CODE>MaxJobsPerPrinter</CODE></A>
+	<LI><A HREF="#MaxJobsPerUser"><CODE>MaxJobsPerUser</CODE></A>
 	<LI><A HREF="#MaxLogSize"><CODE>MaxLogSize</CODE></A>
 	<LI><A HREF="#MaxRequestSize"><CODE>MaxRequestSize</CODE></A>
 	<LI><A HREF="#Order"><CODE>Order</CODE></A>
 	<LI><A HREF="#PageLog"><CODE>PageLog</CODE></A>
-	<LI><A HREF="#Port"><CODE>Port</CODE></A>
 
 </TD>
 <TD VALIGN="TOP">
@@ -893,6 +894,7 @@ determine how the server operates:
 </TD>
 <TD VALIGN="TOP">
 
+	<LI><A HREF="#Port"><CODE>Port</CODE></A>
 	<LI><A HREF="#PreserveJobFiles"><CODE>PreserveJobFiles</CODE></A>
 	<LI><A HREF="#PreserveJobHistory"><CODE>PreserveJobHistory</CODE></A>
 	<LI><A HREF="#Printcap"><CODE>Printcap</CODE></A>
@@ -1993,7 +1995,49 @@ oldest completed job is automatically purged from the system to make room
 for the new one. If all of the known jobs are still pending or active then
 the new job will be rejected.
 
-<P>Setting the maximum size to 0 disables this functionality. The default
+<P>Setting the maximum to 0 disables this functionality. The default
+setting is 0.
+
+<!-- NEED 3in -->
+<H3><A NAME="MaxJobsPerPrinter">MaxJobsPerPrinter</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+MaxJobsPerPrinter 100
+MaxJobsPerPrinter 9999
+MaxJobsPerPrinter 0
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>MaxJobsPerPrinter</CODE> directive controls the maximum number of active jobs
+that are allowed for each printer or class. Once a printer or class reaches the limit, new jobs will be
+rejected until one of the active jobs is completed, stopped, aborted, or cancelled.
+
+<P>Setting the maximum to 0 disables this functionality. The default
+setting is 0.
+
+<!-- NEED 3in -->
+<H3><A NAME="MaxJobsPerUser">MaxJobsPerUser</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+MaxJobsPerUser 100
+MaxJobsPerUser 9999
+MaxJobsPerUser 0
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>MaxJobsPerUser</CODE> directive controls the maximum number of active jobs
+that are allowed for each user. Once a user reaches the limit, new jobs will be
+rejected until one of the active jobs is completed, stopped, aborted, or cancelled.
+
+<P>Setting the maximum to 0 disables this functionality. The default
 setting is 0.
 
 <!-- NEED 3in -->

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.122 2001/03/30 03:07:53 mike Exp $"
+ * "$Id: job.c,v 1.123 2001/03/30 03:20:40 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1397,7 +1397,6 @@ StartJob(int       id,		/* I - Job ID */
   {
     LogMessage(L_ERROR, "Unable to create job status pipes - %s.",
 	       strerror(errno));
-    StopPrinter(printer);
     snprintf(printer->state_message, sizeof(printer->state_message),
              "Unable to create status pipes - %s.", strerror(errno));
     return;
@@ -1461,7 +1460,6 @@ StartJob(int       id,		/* I - Job ID */
     {
       LogMessage(L_ERROR, "Unable to start filter \"%s\" - %s.",
                  filters[i].filter, strerror(errno));
-      StopPrinter(current->printer);
       snprintf(printer->state_message, sizeof(printer->state_message),
                "Unable to start filter \"%s\" - %s.",
                filters[i].filter, strerror(errno));
@@ -1509,7 +1507,6 @@ StartJob(int       id,		/* I - Job ID */
     {
       LogMessage(L_ERROR, "Unable to start backend \"%s\" - %s.",
                  method, strerror(errno));
-      StopPrinter(current->printer);
       snprintf(printer->state_message, sizeof(printer->state_message),
                "Unable to start backend \"%s\" - %s.", method, strerror(errno));
       return;
@@ -2841,5 +2838,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.122 2001/03/30 03:07:53 mike Exp $".
+ * End of "$Id: job.c,v 1.123 2001/03/30 03:20:40 mike Exp $".
  */
