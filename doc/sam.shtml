@@ -820,9 +820,10 @@ determine how the server operates:
 	<LI><A HREF="#BrowsePoll"><CODE>BrowsePoll</CODE></A>
 	<LI><A HREF="#BrowsePort"><CODE>BrowsePort</CODE></A>
 	<LI><A HREF="#BrowseRelay"><CODE>BrowseRelay</CODE></A>
+	<LI><A HREF="#BrowseShortNames"><CODE>BrowseShortNames</CODE></A>
 	<LI><A HREF="#BrowseTimeout"><CODE>BrowseTimeout</CODE></A>
 	<LI><A HREF="#Browsing"><CODE>Browsing</CODE></A>
-	<LI><A HREF="#DefaultCharset"><CODE>DefaultCharset</CODE></A>
+	<LI><A HREF="#DataDir"><CODE>DataDir</CODE></A>
 
 </TD>
 <TD VALIGN="TOP">
@@ -830,6 +831,7 @@ determine how the server operates:
 </TD>
 <TD VALIGN="TOP">
 
+	<LI><A HREF="#DefaultCharset"><CODE>DefaultCharset</CODE></A>
 	<LI><A HREF="#DefaultLanguage"><CODE>DefaultLanguage</CODE></A>
 	<LI><A HREF="#Deny"><CODE>Deny</CODE></A>
 	<LI><A HREF="#DocumentRoot"><CODE>DocumentRoot</CODE></A>
@@ -845,7 +847,6 @@ determine how the server operates:
 	<LI><A HREF="#MaxClients"><CODE>MaxClients</CODE></A>
 	<LI><A HREF="#MaxLogSize"><CODE>MaxLogSize</CODE></A>
 	<LI><A HREF="#MaxRequestSize"><CODE>MaxRequestSize</CODE></A>
-	<LI><A HREF="#Order"><CODE>Order</CODE></A>
 
 </TD>
 <TD VALIGN="TOP">
@@ -853,6 +854,7 @@ determine how the server operates:
 </TD>
 <TD VALIGN="TOP">
 
+	<LI><A HREF="#Order"><CODE>Order</CODE></A>
 	<LI><A HREF="#PageLog"><CODE>PageLog</CODE></A>
 	<LI><A HREF="#Port"><CODE>Port</CODE></A>
 	<LI><A HREF="#PreserveJobFiles"><CODE>PreserveJobFiles</CODE></A>
@@ -882,6 +884,7 @@ determine how the server operates:
 
 <UL><PRE>
 AccessLog /var/log/cups/access_log
+AccessLog /var/log/cups/access_log-%s
 AccessLog syslog
 </PRE></UL>
 
@@ -895,6 +898,9 @@ web access reporting tool to generate a report on CUPS server activity.
 
 <P>The special name "syslog" can be used to send the access information
 to the system log instead of a plain file.
+
+<P>The server name can be included in the filename by using
+<CODE>%s</CODE> in the name.
 
 <P>The default access log file is <VAR>/var/log/cups/access_log</VAR>.
 
@@ -1278,6 +1284,27 @@ BrowseRelay 127.0.0.1 255.255.255.255
 on the LAN(s).
 
 <!-- NEED 3in -->
+<H3><A NAME="BrowseShortNames">BrowseShortNames</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+BrowseShortNames Yes
+BrowseShortNames No
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>BrowseShortNames</CODE> directive specifies whether or not
+short names are used for remote printers when possible. Short names are
+just the remote printer name, without the server ("printer"). If more than
+one remote printer is detected with the same name, the printers will have
+long names ("printer@server1", "printer@server2".)
+
+<P>The default value for this option is <CODE>Yes</CODE>.
+
+<!-- NEED 3in -->
 <H3><A NAME="BrowseTimeout">BrowseTimeout</A></H3>
 <HR>
 
@@ -1327,6 +1354,21 @@ browsing is enabled. The default setting is <CODE>On</CODE>.
 	</TD>
 </TR>
 </TABLE></CENTER>
+
+<!-- NEED 3in -->
+<H3><A NAME="DataDir">DataDir</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+DataDir /usr/share/cups
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>DataDir</CODE> directive sets the directory to use for data
+files.
 
 <!-- NEED 3in -->
 <H3><A NAME="DefaultCharset">DefaultCharset</A></H3>
@@ -1458,13 +1500,14 @@ and then directly under the <CODE>DocumentRoot</CODE> directory
 the web content by providing subdirectories for each language needed.
 
 <!-- NEED 3in -->
-<H3><A NAME="ErrorLog">ErrorLog</A></H3>
+<H3><A NAME="Access">ErrorLog</A></H3>
 <HR>
 
 <H4>Examples</H4>
 
 <UL><PRE>
 ErrorLog /var/log/cups/error_log
+ErrorLog /var/log/cups/error_log-%s
 ErrorLog syslog
 </PRE></UL>
 
@@ -1477,6 +1520,9 @@ default error log file is <VAR>/var/log/cups/error_log</VAR>.
 
 <P>The special name "syslog" can be used to send the error information
 to the system log instead of a plain file.
+
+<P>The server name can be included in the filename by using
+<CODE>%s</CODE> in the name.
 
 <!-- NEED 3in -->
 <H3><A NAME="Group">Group</A></H3>
@@ -1764,6 +1810,7 @@ The following values are supported:
 
 <UL><PRE>
 PageLog /var/log/cups/page_log
+PageLog /var/log/cups/page_log-%s
 PageLog syslog
 </PRE></UL>
 
@@ -1776,6 +1823,9 @@ default page log file is <VAR>/var/log/cups/page_log</VAR>.
 
 <P>The special name "syslog" can be used to send the page information
 to the system log instead of a plain file.
+
+<P>The server name can be included in the filename by using
+<CODE>%s</CODE> in the name.
 
 <!-- NEED 3in -->
 <H3><A NAME="Port">Port</A></H3>
