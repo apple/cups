@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.88 2000/08/18 17:13:08 mike Exp $"
+ * "$Id: ipp.c,v 1.89 2000/08/18 17:43:23 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -130,6 +130,7 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
   ipp_attribute_t	*charset;	/* Character set attribute */
   ipp_attribute_t	*language;	/* Language attribute */
   ipp_attribute_t	*uri;		/* Printer URI attribute */
+  ipp_attribute_t	*username;	/* requesting-user-name attr */
 
 
   DEBUG_printf(("ProcessIPPRequest(%08x)\n", con));
@@ -259,7 +260,31 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
       else
       {
        /*
-	* OK, all the checks pass so far; try processing the operation...
+	* OK, all the checks pass so far; make sure requesting-user-name is
+	* not "root" from a remote host...
+	*/
+
+        if ((username = ippFindAttribute(con->request, "requesting-user-name", IPP_NAME)) != NULL)
+	{
+	 /*
+	  * Check for root user...
+	  */
+
+	  if (strcmp(username->values[0].string.text, "root") == 0 &&
+	      ntohl(con->http.hostaddr.sin_addr.s_addr) != 0x7f000001 &&
+	      strcmp(con->username, "root") != 0)
+	  {
+	   /*
+	    * Remote unauthenticated user masquerading as local root...
+	    */
+
+	    free(username->values[0].string.text);
+	    username->values[0].string.text = strdup("root-remote");
+	  }
+	}
+
+       /*
+        * Then try processing the operation...
 	*/
 
 	switch (con->request->request.op.operation_id)
@@ -1461,8 +1486,7 @@ cancel_job(client_t        *con,	/* I - Client connection */
   CancelJob(jobid, 0);
   CheckJobs();
 
-  LogMessage(L_INFO, "Job %d was cancelled by \'%s\'.", jobid,
-             con->username[0] ? con->username : "unknown");
+  LogMessage(L_INFO, "Job %d was cancelled by \'%s\'.", jobid, username);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -2959,8 +2983,7 @@ hold_job(client_t        *con,	/* I - Client connection */
     SetJobHoldUntil(job->id, attr->values[0].string.text);
   }
 
-  LogMessage(L_INFO, "Job %d was held by \'%s\'.", jobid,
-             con->username[0] ? con->username : "unknown");
+  LogMessage(L_INFO, "Job %d was held by \'%s\'.", jobid, username);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -3816,8 +3839,7 @@ release_job(client_t        *con,	/* I - Client connection */
 
   ReleaseJob(jobid);
 
-  LogMessage(L_INFO, "Job %d was released by \'%s\'.", jobid,
-             con->username[0] ? con->username : "unknown");
+  LogMessage(L_INFO, "Job %d was released by \'%s\'.", jobid, username);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -4008,8 +4030,7 @@ restart_job(client_t        *con,	/* I - Client connection */
 
   RestartJob(jobid);
 
-  LogMessage(L_INFO, "Job %d was restarted by \'%s\'.", jobid,
-             con->username[0] ? con->username : "unknown");
+  LogMessage(L_INFO, "Job %d was restarted by \'%s\'.", jobid, username);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -5034,5 +5055,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.88 2000/08/18 17:13:08 mike Exp $".
+ * End of "$Id: ipp.c,v 1.89 2000/08/18 17:43:23 mike Exp $".
  */
