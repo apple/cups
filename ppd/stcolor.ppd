@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: stcolor.ppd,v 1.4 2000/06/07 13:38:30 mike Exp $"
+*% "$Id: stcolor.ppd,v 1.5 2000/06/07 17:04:02 mike Exp $"
 *%
 *%   Sample EPSON Stylus Color driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -32,6 +32,7 @@
 *Product:	"(CUPS v1.1)"
 *cupsVersion:	1.1
 *cupsManualCopies: True
+*cupsModelNumber:	2
 *cupsFilter:	"application/vnd.cups-raster 0 rastertoepson"
 *cupsColorProfile 180dpi/-: "1.0 1.0 1.0 0.0 -0.2 -0.4 1.0 0.0 -0.2 0.0 1.0"
 *cupsColorProfile 360dpi/-: "1.0 1.5 1.0 0.0 -0.2 -0.4 1.0 0.0 -0.2 0.0 1.0"
@@ -127,5 +128,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: stcolor.ppd,v 1.4 2000/06/07 13:38:30 mike Exp $".
+*% End of "$Id: stcolor.ppd,v 1.5 2000/06/07 17:04:02 mike Exp $".
 *%

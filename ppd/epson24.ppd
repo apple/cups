@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: epson24.ppd,v 1.1 2000/06/07 13:38:30 mike Exp $"
+*% "$Id: epson24.ppd,v 1.2 2000/06/07 17:04:02 mike Exp $"
 *%
 *%   Sample EPSON 24-Pin driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -32,6 +32,7 @@
 *Product:	"(CUPS v1.1)"
 *cupsVersion:	1.1
 *cupsManualCopies: True
+*cupsModelNumber:	1
 *cupsFilter:	"application/vnd.cups-raster 0 rastertoepson"
 *ModelName:     "EPSON 24-Pin Series"
 *ShortNickName: "EPSON 24-Pin Series"
@@ -65,10 +66,10 @@
 *CloseUI: *PageRegion
 
 *DefaultImageableArea: Letter 
-*ImageableArea Letter:	"18.0 0.0 594.0 792.0"
-*ImageableArea Legal:	"18.0 0.0 594.0 1008.0"
-*ImageableArea A4:	"18.0 0.0 577.0 842.0"
-*ImageableArea FanFoldUS: "18.0 0.0 1053.0 792.0"
+*ImageableArea Letter:	"18.0 18.0 594.0 774.0"
+*ImageableArea Legal:	"18.0 18.0 594.0 990.0"
+*ImageableArea A4:	"18.0 18.0 577.0 824.0"
+*ImageableArea FanFoldUS: "18.0 18.0 1053.0 774.0"
 
 *DefaultPaperDimension: Letter
 *PaperDimension Letter:	"612 792"
@@ -78,7 +79,7 @@
 
 *OpenUI *Resolution/Output Resolution: PickOne
 *OrderDependency: 20 AnySetup *Resolution
-*DefaultResolution: 360dpi
+*DefaultResolution: 120dpi
 *Resolution 60dpi/60 DPI: "<</HWResolution[60 60]/cupsRowCount 8>>setpagedevice"
 *Resolution 120dpi/120x60 DPI: "<</HWResolution[120 60]/cupsRowCount 8>>setpagedevice"
 *Resolution 180dpi/180 DPI: "<</HWResolution[180 180]/cupsRowCount 24>>setpagedevice"
@@ -123,5 +124,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: epson24.ppd,v 1.1 2000/06/07 13:38:30 mike Exp $".
+*% End of "$Id: epson24.ppd,v 1.2 2000/06/07 17:04:02 mike Exp $".
 *%
