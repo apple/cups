@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.50 1999/10/07 19:13:34 mike Exp $"
+ * "$Id: http.c,v 1.51 1999/10/10 13:42:11 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1061,7 +1061,7 @@ httpGetDateTime(const char *s)		/* I - Date/time string */
   int		hour, min, sec;		/* Time */
 
 
-  if (sscanf(s, "%*s%d%s%d%d:%d:%d", &day, mon, &year, &hour, &min, &sec) < 6)
+  if (sscanf(s, "%*s%d%15s%d%d:%d:%d", &day, mon, &year, &hour, &min, &sec) < 6)
     return (0);
 
   for (i = 0; i < 12; i ++)
@@ -1482,5 +1482,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.50 1999/10/07 19:13:34 mike Exp $".
+ * End of "$Id: http.c,v 1.51 1999/10/10 13:42:11 mike Exp $".
  */

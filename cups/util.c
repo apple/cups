@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.33 1999/09/09 19:04:13 mike Exp $"
+ * "$Id: util.c,v 1.34 1999/10/10 13:42:13 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -956,7 +956,7 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
   if (name == NULL)
     return (NULL);
 
-  if (sscanf(name, "%[^@]@%s", printerbuf, hostbuf) == 1)
+  if (sscanf(name, "%1023[^@]@%1023s", printerbuf, hostbuf) == 1)
     strcpy(hostbuf, cupsServer());
 
   if (hostname != NULL)
@@ -985,5 +985,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.33 1999/09/09 19:04:13 mike Exp $".
+ * End of "$Id: util.c,v 1.34 1999/10/10 13:42:13 mike Exp $".
  */

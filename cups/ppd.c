@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.34 1999/09/13 20:18:37 mike Exp $"
+ * "$Id: ppd.c,v 1.35 1999/10/10 13:42:12 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -1028,7 +1028,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
     else if (strcmp(keyword, "OrderDependency") == 0 ||
              strcmp(keyword, "NonUIOrderDependency") == 0)
     {
-      if (sscanf(string, "%f%s%s", &order, name, keyword) != 3)
+      if (sscanf(string, "%f%40s%40s", &order, name, keyword) != 3)
       {
         ppdClose(ppd);
 	safe_free(string);
@@ -1810,5 +1810,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.34 1999/09/13 20:18:37 mike Exp $".
+ * End of "$Id: ppd.c,v 1.35 1999/10/10 13:42:12 mike Exp $".
  */

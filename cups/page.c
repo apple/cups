@@ -1,5 +1,5 @@
 /*
- * "$Id: page.c,v 1.8 1999/07/12 16:09:40 mike Exp $"
+ * "$Id: page.c,v 1.9 1999/10/10 13:42:12 mike Exp $"
  *
  *   Page size functions for the Common UNIX Printing System (CUPS).
  *
@@ -80,7 +80,7 @@ ppdPageSize(ppd_file_t *ppd,	/* I - PPD file record */
       */
 
       units[0] = '\0';
-      if (sscanf(name + 7, "%fx%f%s", &w, &l, units) < 2)
+      if (sscanf(name + 7, "%fx%f%254s", &w, &l, units) < 2)
         return (NULL);
 
       if (strcasecmp(units, "in") == 0)
@@ -185,5 +185,5 @@ ppdPageLength(ppd_file_t *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: page.c,v 1.8 1999/07/12 16:09:40 mike Exp $".
+ * End of "$Id: page.c,v 1.9 1999/10/10 13:42:12 mike Exp $".
  */
