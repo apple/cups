@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.35 1999/10/10 13:42:12 mike Exp $"
+ * "$Id: ppd.c,v 1.36 1999/11/01 19:07:45 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -831,90 +831,100 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       if (name[0] == '*')
         strcpy(name, name + 1);
 
-      if (string == NULL)
-      {
-        ppdClose(ppd);
-	return (NULL);
-      }
+     /*
+      * See if this is the infamous HPNup option which screws up our own
+      * number-up option...  If so, dump it!
+      */
 
-      if (subgroup != NULL)
-        option = ppd_get_option(subgroup, name);
-      else if (group == NULL)
+      if (strcasecmp(name, "HPNup") == 0)
+        option = NULL;
+      else
       {
-        if (strcmp(name, "Collate") != 0 &&
-            strcmp(name, "Duplex") != 0 &&
-            strcmp(name, "InputSlot") != 0 &&
-            strcmp(name, "ManualFeed") != 0 &&
-            strcmp(name, "MediaType") != 0 &&
-            strcmp(name, "MediaColor") != 0 &&
-            strcmp(name, "MediaWeight") != 0 &&
-            strcmp(name, "OutputBin") != 0 &&
-            strcmp(name, "OutputMode") != 0 &&
-            strcmp(name, "OutputOrder") != 0 &&
-	    strcmp(name, "PageSize") != 0 &&
-            strcmp(name, "PageRegion") != 0)
-	  group = ppd_get_group(ppd, cupsLangString(language, CUPS_MSG_EXTRA));
+	if (string == NULL)
+	{
+          ppdClose(ppd);
+	  return (NULL);
+	}
+
+	if (subgroup != NULL)
+          option = ppd_get_option(subgroup, name);
+	else if (group == NULL)
+	{
+          if (strcmp(name, "Collate") != 0 &&
+              strcmp(name, "Duplex") != 0 &&
+              strcmp(name, "InputSlot") != 0 &&
+              strcmp(name, "ManualFeed") != 0 &&
+              strcmp(name, "MediaType") != 0 &&
+              strcmp(name, "MediaColor") != 0 &&
+              strcmp(name, "MediaWeight") != 0 &&
+              strcmp(name, "OutputBin") != 0 &&
+              strcmp(name, "OutputMode") != 0 &&
+              strcmp(name, "OutputOrder") != 0 &&
+	      strcmp(name, "PageSize") != 0 &&
+              strcmp(name, "PageRegion") != 0)
+	    group = ppd_get_group(ppd, cupsLangString(language, CUPS_MSG_EXTRA));
+	  else
+	    group = ppd_get_group(ppd, cupsLangString(language, CUPS_MSG_GENERAL));
+
+          if (group == NULL)
+	  {
+	    ppdClose(ppd);
+	    safe_free(string);
+	    return (NULL);
+	  }
+
+          option = ppd_get_option(group, name);
+	  group  = NULL;
+	}
 	else
-	  group = ppd_get_group(ppd, cupsLangString(language, CUPS_MSG_GENERAL));
+          option = ppd_get_option(group, name);
 
-        if (group == NULL)
+	if (option == NULL)
 	{
 	  ppdClose(ppd);
 	  safe_free(string);
 	  return (NULL);
 	}
 
-        option = ppd_get_option(group, name);
-	group  = NULL;
+       /*
+	* Now fill in the initial information for the option...
+	*/
+
+	if (strcmp(string, "PickMany") == 0)
+          option->ui = PPD_UI_PICKMANY;
+	else if (strcmp(string, "Boolean") == 0)
+          option->ui = PPD_UI_BOOLEAN;
+	else
+          option->ui = PPD_UI_PICKONE;
+
+	if (text[0])
+	{
+          strncpy(option->text, text, sizeof(option->text) - 1);
+	  ppd_fix(option->text);
+	}
+	else
+	{
+          if (strcmp(name, "PageSize") == 0)
+	    strncpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_SIZE),
+                    sizeof(option->text) - 1);
+	  else if (strcmp(name, "MediaType") == 0)
+	    strncpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_TYPE),
+                    sizeof(option->text) - 1);
+	  else if (strcmp(name, "InputSlot") == 0)
+	    strncpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_SOURCE),
+                    sizeof(option->text) - 1);
+	  else if (strcmp(name, "ColorModel") == 0)
+	    strncpy(option->text, cupsLangString(language, CUPS_MSG_OUTPUT_MODE),
+                    sizeof(option->text) - 1);
+	  else if (strcmp(name, "Resolution") == 0)
+	    strncpy(option->text, cupsLangString(language, CUPS_MSG_RESOLUTION),
+                    sizeof(option->text) - 1);
+          else
+	    strncpy(option->text, name, sizeof(option->text) - 1);
+	}
+
+	option->section = PPD_ORDER_ANY;
       }
-      else
-        option = ppd_get_option(group, name);
-
-      if (option == NULL)
-      {
-	ppdClose(ppd);
-	safe_free(string);
-	return (NULL);
-      }
-
-     /*
-      * Now fill in the initial information for the option...
-      */
-
-      if (strcmp(string, "PickMany") == 0)
-        option->ui = PPD_UI_PICKMANY;
-      else if (strcmp(string, "Boolean") == 0)
-        option->ui = PPD_UI_BOOLEAN;
-      else
-        option->ui = PPD_UI_PICKONE;
-
-      if (text[0])
-      {
-        strncpy(option->text, text, sizeof(option->text) - 1);
-	ppd_fix(option->text);
-      }
-      else
-      {
-        if (strcmp(name, "PageSize") == 0)
-	  strncpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_SIZE),
-                  sizeof(option->text) - 1);
-	else if (strcmp(name, "MediaType") == 0)
-	  strncpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_TYPE),
-                  sizeof(option->text) - 1);
-	else if (strcmp(name, "InputSlot") == 0)
-	  strncpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_SOURCE),
-                  sizeof(option->text) - 1);
-	else if (strcmp(name, "ColorModel") == 0)
-	  strncpy(option->text, cupsLangString(language, CUPS_MSG_OUTPUT_MODE),
-                  sizeof(option->text) - 1);
-	else if (strcmp(name, "Resolution") == 0)
-	  strncpy(option->text, cupsLangString(language, CUPS_MSG_RESOLUTION),
-                  sizeof(option->text) - 1);
-        else
-	  strncpy(option->text, name, sizeof(option->text) - 1);
-      }
-
-      option->section = PPD_ORDER_ANY;
     }
     else if (strcmp(keyword, "JCLOpenUI") == 0)
     {
@@ -1810,5 +1820,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.35 1999/10/10 13:42:12 mike Exp $".
+ * End of "$Id: ppd.c,v 1.36 1999/11/01 19:07:45 mike Exp $".
  */
