@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.20 2000/07/07 15:18:40 mike Exp $"
+# "$Id: Makefile,v 1.21 2000/07/07 18:19:23 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,7 +28,7 @@ include Makedefs
 # Directories to make...
 #
 
-DIRS	=	cups backend berkeley cgi-bin filter man pdftops pstoraster \
+DIRS	=	cups backend berkeley cgi-bin doc filter man pdftops pstoraster \
 		scheduler systemv
 
 #
@@ -64,8 +64,6 @@ install:
 	(cd conf; $(MAKE) $(MFLAGS) install)
 	echo Installing in data...
 	(cd data; $(MAKE) $(MFLAGS) install)
-	echo Installing in doc...
-	(cd doc; $(MAKE) $(MFLAGS) install)
 	echo Installing in fonts...
 	(cd fonts; $(MAKE) $(MFLAGS) install)
 	(cd fonts; $(MAKE) $(MFLAGS) install)
@@ -126,5 +124,5 @@ tardist:
 	epm $(EPMFLAGS) -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.20 2000/07/07 15:18:40 mike Exp $".
+# End of "$Id: Makefile,v 1.21 2000/07/07 18:19:23 mike Exp $".
 #
