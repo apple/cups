@@ -1,5 +1,5 @@
 /*
- * "$Id: testspeed.c,v 1.3.2.3 2003/09/04 16:04:17 mike Exp $"
+ * "$Id: testspeed.c,v 1.3.2.4 2003/09/17 20:26:34 mike Exp $"
  *
  *   Scheduler speed test for the Common UNIX Printing System (CUPS).
  *
@@ -185,7 +185,7 @@ do_test(const char        *server,	/* I - Server to use */
   double	elapsed;		/* Elapsed time */
   static ipp_op_t ops[4] =		/* Operations to test... */
 		{
-		  CUPS_GET_DEFAULT,
+		  IPP_PRINT_JOB,
 		  CUPS_GET_PRINTERS,
 		  CUPS_GET_CLASSES,
 		  IPP_GET_JOBS
@@ -235,12 +235,26 @@ do_test(const char        *server,	/* I - Server to use */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
         	 "attributes-natural-language", NULL, language->language);
 
-    if (ops[i & 3] == IPP_GET_JOBS)
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-                   NULL, "ipp://localhost/printers/");
-
     gettimeofday(&start, NULL);
-    response = cupsDoRequest(http, request, "/");
+
+    switch (request->request.op.operation_id)
+    {
+      case IPP_GET_JOBS :
+	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+                       NULL, "ipp://localhost/printers/");
+
+      default :
+	  response = cupsDoRequest(http, request, "/");
+          break;
+
+      case IPP_PRINT_JOB :
+	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+                       NULL, "ipp://localhost/printers/test");
+	  response = cupsDoFileRequest(http, request, "/printers/test",
+	                               "../data/testprint.ps");
+          break;
+    }
+
     gettimeofday(&end, NULL);
 
     if (response != NULL)
@@ -274,5 +288,5 @@ usage(void)
 
 
 /*
- * End of "$Id: testspeed.c,v 1.3.2.3 2003/09/04 16:04:17 mike Exp $".
+ * End of "$Id: testspeed.c,v 1.3.2.4 2003/09/17 20:26:34 mike Exp $".
  */
