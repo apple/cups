@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.29.2.4 2002/03/22 15:47:31 mike Exp $"
+ * "$Id: lp.c,v 1.29.2.5 2002/04/22 21:10:25 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -86,6 +86,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   int		temp;		/* Temporary file descriptor */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;	/* Signal action */
+  struct sigaction oldaction;	/* Old signal action */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET*/
 
 
@@ -506,18 +507,22 @@ main(int  argc,		/* I - Number of command-line arguments */
 #ifndef WIN32
 #  if defined(HAVE_SIGSET)
     sigset(SIGHUP, sighandler);
-    sigset(SIGINT, sighandler);
+    if (sigset(SIGINT, sighandler) == SIG_IGN)
+      sigset(SIGINT, SIG_IGN);
     sigset(SIGTERM, sighandler);
 #  elif defined(HAVE_SIGACTION)
     memset(&action, 0, sizeof(action));
     action.sa_handler = sighandler;
 
     sigaction(SIGHUP, &action, NULL);
-    sigaction(SIGINT, &action, NULL);
+    sigaction(SIGINT, NULL, &oldaction);
+    if (oldaction.sa_handler != SIG_IGN)
+      sigaction(SIGINT, &action, NULL);
     sigaction(SIGTERM, &action, NULL);
 #  else
     signal(SIGHUP, sighandler);
-    signal(SIGINT, sighandler);
+    if (signal(SIGINT, sighandler) == SIG_IGN)
+      signal(SIGINT, SIG_IGN);
     signal(SIGTERM, sighandler);
 #  endif
 #endif /* !WIN32 */
@@ -650,5 +655,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.29.2.4 2002/03/22 15:47:31 mike Exp $".
+ * End of "$Id: lp.c,v 1.29.2.5 2002/04/22 21:10:25 mike Exp $".
  */

@@ -5,6 +5,10 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- The lp and lpr commands now only override the SIGINT
+	  handler if it is not being ignored (patch from Robert
+	  Ambrose for some interactive software that catches
+	  SIGINT and will gracefully cancel the print...)
 	- The PostScript image filter (imagetops) now supports
 	  printing CMYK images using the CMYK colorspace.
 	- The image filters now support CMYK JPEG files, and
