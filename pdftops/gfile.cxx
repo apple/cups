@@ -482,6 +482,21 @@ GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) 
   char *s;
   int fd;
 
+  // MRS: Currently there is no standard function for creating a temporary
+  //      file with an extension; this is required when uncompressing
+  //      LZW data using the uncompress program on some UNIX, which is
+  //      looking for a ".Z" extension on the temporary filename.  Sooo,
+  //      when you print an *OLD* PDF file that uses LZW compression,
+  //      the tmpnam() function is usually the one that is called to
+  //      create the temporary file.  Under *BSD, the safer mkstemps()
+  //      function is used instead.
+  //
+  //      That said, all CUPS filters are run with TMPDIR pointing to
+  //      a private temporary directory, which by default is only
+  //      accessible to the 'lp' user.  Also, most files use Flate
+  //      compression now and will be able to use the (safer)
+  //      mkstemp() function for any temporary files...
+
   if (ext) {
 #  if HAVE_MKSTEMPS
     if ((s = getenv("TMPDIR"))) {

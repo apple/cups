@@ -1827,7 +1827,7 @@ void Gfx::doShowText(GString *s) {
   GString *s16;
   char s16a[2];
   int m, n;
-#if 0 //~type3
+#if 1 //~type3
   double dx, dy, width, height, w, h, x, y;
   double oldCTM[6], newCTM[6];
   double *mat;
@@ -1897,7 +1897,7 @@ void Gfx::doShowText(GString *s) {
 
   //----- 8-bit font
   } else {
-#if 0 //~type3
+#if 1 //~type3
     //~ also check out->renderType3()
     if (font->getType() == fontType3) {
       out->beginString(state, s);
@@ -2460,11 +2460,11 @@ void Gfx::opEndImage(Object args[], int numArgs) {
 //------------------------------------------------------------------------
 
 void Gfx::opSetCharWidth(Object args[], int numArgs) {
-  error(getPos(), "Encountered 'd0' operator in content stream");
+//  error(getPos(), "Encountered 'd0' operator in content stream");
 }
 
 void Gfx::opSetCacheDevice(Object args[], int numArgs) {
-  error(getPos(), "Encountered 'd1' operator in content stream");
+//  error(getPos(), "Encountered 'd1' operator in content stream");
 }
 
 //------------------------------------------------------------------------

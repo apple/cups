@@ -2,6 +2,7 @@ config.cache
 config.h
 config.log
 config.status
+configure
 cups-config
 cups.list
 cups.sh
