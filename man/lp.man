@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lp.man,v 1.10 2002/12/17 18:59:57 swdev Exp $"
+.\" "$Id: lp.man,v 1.11 2003/01/24 16:52:40 mike Exp $"
 .\"
 .\"   lp/cancel man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lp 1 "Common UNIX Printing System" "25 September 2001" "Easy Software Products"
+.TH lp 1 "Common UNIX Printing System" "24 January 2003" "Easy Software Products"
 .SH NAME
 lp \- print files
 .br
@@ -142,6 +142,8 @@ Specifies when the job should be printed. A value of
 \fIhold\fR will hold the job indefinitely, and a time value
 (HH:MM) will hold the job until the specified time. Use a value
 of \fIresume\fR with the \fI-i\fR option to resume a held job.
+Use a value of \fIrestart\fR with the \fI-i\fR option to restart
+a completed job.
 .TP 5
 \-P \fIpage-list\fR
 .br
@@ -164,5 +166,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2003 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lp.man,v 1.10 2002/12/17 18:59:57 swdev Exp $".
+.\" End of "$Id: lp.man,v 1.11 2003/01/24 16:52:40 mike Exp $".
 .\"
