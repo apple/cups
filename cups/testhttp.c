@@ -1,5 +1,5 @@
 /*
- * "$Id: testhttp.c,v 1.9 2000/03/21 04:03:25 mike Exp $"
+ * "$Id: testhttp.c,v 1.10 2001/01/08 19:09:55 mike Exp $"
  *
  *   HTTP test program for the Common UNIX Printing System (CUPS).
  *
@@ -45,25 +45,20 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		i;		/* Looping var */
   http_t	*http;		/* HTTP connection */
   http_status_t	status;		/* Status of GET command */
-  char		buffer[1024];	/* Input buffer */
+  char		buffer[8192];	/* Input buffer */
   long		bytes;		/* Number of bytes read */
   FILE		*out;		/* Output file */
+  char		host[HTTP_MAX_URI],
+		method[HTTP_MAX_URI],
+		username[HTTP_MAX_URI],
+		resource[HTTP_MAX_URI];
+  int		port;
+  long		length, total;
+  time_t	start, current;
 
-#define HOST "dns.easysw.com"
-#define PORT 80
 
-  puts("Connecting to " HOST "...");
 
-  httpInitialize();
-  http = httpConnect(HOST, PORT);
-  if (http == NULL)
-  {
-    puts("Unable to connect to " HOST "!");
-    return (1);
-  }
-
-  puts("Connected to " HOST "...");
-
+  http = NULL;
   out = stdout;
 
   for (i = 1; i < argc; i ++)
@@ -75,22 +70,42 @@ main(int  argc,			/* I - Number of command-line arguments */
       continue;
     }
 
-    printf("Requesting file \"%s\"...\n", argv[i]);
+    httpSeparate(argv[i], method, username, host, &port, resource);
+
+    http = httpConnect(host, port);
+    if (http == NULL)
+    {
+      perror(host);
+      continue;
+    }
+    printf("Requesting file \"%s\"...\n", resource);
     httpClearFields(http);
     httpSetField(http, HTTP_FIELD_ACCEPT_LANGUAGE, "en");
-    httpGet(http, argv[i]);
-    status = httpUpdate(http);
+    httpGet(http, resource);
+    while ((status = httpUpdate(http)) == HTTP_CONTINUE);
 
     if (status == HTTP_OK)
       puts("GET OK:");
     else
       printf("GET failed with status %d...\n", status);
 
+
+    start = time(NULL);
+    length = atoi(httpGetField(http, HTTP_FIELD_CONTENT_LENGTH));
+    total  = 0;
+
     while ((bytes = httpRead(http, buffer, sizeof(buffer))) > 0)
     {
+      total += bytes;
       fwrite(buffer, bytes, 1, out);
       if (out != stdout)
-        printf("Read %ld bytes, %ld total...\n", bytes, ftell(out));
+      {
+        current = time(NULL);
+        if (current == start) current ++;
+        printf("\r%ld/%ld bytes (%ld bytes/sec)      ", total, length,
+               total / (current - start));
+        fflush(stdout);
+      }
     }
   }
 
@@ -105,5 +120,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testhttp.c,v 1.9 2000/03/21 04:03:25 mike Exp $".
+ * End of "$Id: testhttp.c,v 1.10 2001/01/08 19:09:55 mike Exp $".
  */

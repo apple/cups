@@ -1,6 +1,13 @@
 CHANGES.txt - 01/03/2000
 ------------------------
 
+CHANGES IN CUPS V1.1.5-3
+
+	- Fixed another possible DoS attack in httpGets()
+	- Resolution options were not being passed into the
+	  filter programs properly.
+
+
 CHANGES IN CUPS V1.1.5-2
 
 	- Fixed configure check for OpenSSL to work with RSA
