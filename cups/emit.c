@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.30 2003/02/18 22:23:38 mike Exp $"
+ * "$Id: emit.c,v 1.31 2003/02/28 21:06:08 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -488,7 +488,7 @@ ppd_handle_media(ppd_file_t *ppd)
 		*input_slot,		/* InputSlot choice, if any */
 		*page;			/* PageSize/PageRegion */
   ppd_size_t	*size;			/* Current media size */
-  const char	*rpr;			/* RequiresPageRegion value */
+  ppd_attr_t	*rpr;			/* RequiresPageRegion value */
 
 
  /*
@@ -533,7 +533,8 @@ ppd_handle_media(ppd_file_t *ppd)
 
     ppdMarkOption(ppd, "PageRegion", size->name);
 
-    if ((rpr && !strcmp(rpr, "False")) || (!rpr && !ppd->num_filters))
+    if ((rpr && rpr->value && !strcmp(rpr->value, "False")) ||
+        (!rpr && !ppd->num_filters))
     {
      /*
       * Either the PPD file specifies no PageRegion code or the PPD file
@@ -569,5 +570,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c,v 1.30 2003/02/18 22:23:38 mike Exp $".
+ * End of "$Id: emit.c,v 1.31 2003/02/28 21:06:08 mike Exp $".
  */

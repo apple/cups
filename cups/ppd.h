@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.32 2003/02/18 22:43:07 mike Exp $"
+ * "$Id: ppd.h,v 1.33 2003/02/28 21:06:08 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -127,8 +127,10 @@ typedef struct			/**** PPD Attribute Structure ****/
 {
   char		name[PPD_MAX_NAME],
   				/* Name of attribute (cupsXYZ) */
-		spec[PPD_MAX_NAME + PPD_MAX_TEXT],
+		spec[PPD_MAX_NAME],
 				/* Specifier string, if any */
+		text[PPD_MAX_TEXT],
+				/* Human-readable text, if any */
 		*value;		/* Value string */
 } ppd_attr_t;
 
@@ -305,9 +307,9 @@ extern float		ppdPageWidth(ppd_file_t *ppd, const char *name);
 
 /**** New in CUPS 1.1.19 ****/
 extern const char	*ppdErrorString(ppd_status_t status);
-extern const char	*ppdFindAttr(ppd_file_t *ppd, const char *name,
+extern ppd_attr_t	*ppdFindAttr(ppd_file_t *ppd, const char *name,
 			             const char *spec);
-extern const char	*ppdFindNextAttr(ppd_file_t *ppd, const char *name,
+extern ppd_attr_t	*ppdFindNextAttr(ppd_file_t *ppd, const char *name,
 			                 const char *spec);
 extern ppd_status_t	ppdLastError(int *line);
 
@@ -321,5 +323,5 @@ extern ppd_status_t	ppdLastError(int *line);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.32 2003/02/18 22:43:07 mike Exp $".
+ * End of "$Id: ppd.h,v 1.33 2003/02/28 21:06:08 mike Exp $".
  */

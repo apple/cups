@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.100 2003/02/28 10:28:25 mike Exp $"
+ * "$Id: ppd.c,v 1.101 2003/02/28 21:06:08 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -103,7 +103,8 @@ static int		ppd_line = 0;	/* Current line number */
  */
 
 static ppd_attr_t	*ppd_add_attr(ppd_file_t *ppd, const char *name,
-			              const char *spec, const char *value);
+			              const char *spec, const char *text,
+				      const char *value);
 static ppd_choice_t	*ppd_add_choice(ppd_option_t *option, const char *name);
 static ppd_size_t	*ppd_add_size(ppd_file_t *ppd, const char *name);
 #ifndef __APPLE__
@@ -719,7 +720,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       * Add each Product keyword as an attribute...
       */
 
-      ppd_add_attr(ppd, keyword, "", string);
+      ppd_add_attr(ppd, keyword, "", "", string);
 
      /*
       * Save the last one in the product element...
@@ -1663,7 +1664,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	  * Option not found; add this as an attribute...
 	  */
 
-          ppd_add_attr(ppd, keyword, "", string);
+          ppd_add_attr(ppd, keyword, "", "", string);
 
           string = NULL;		/* Don't free this string below */
 	}
@@ -1676,7 +1677,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	* Default doesn't match this option; add as an attribute...
 	*/
 
-        ppd_add_attr(ppd, keyword, "", string);
+        ppd_add_attr(ppd, keyword, "", "", string);
 
         string = NULL;			/* Don't free this string below */
       }
@@ -1880,15 +1881,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
     else if (strcmp(keyword, "OpenSubGroup") != 0 &&
              strcmp(keyword, "CloseSubGroup") != 0)
     {
-      char	spec[PPD_MAX_NAME + PPD_MAX_TEXT];
-
-      if (text[0])
-      {
-        snprintf(spec, sizeof(spec), "%s/%s", name, text);
-        ppd_add_attr(ppd, keyword, spec, string);
-      }
-      else
-        ppd_add_attr(ppd, keyword, name, string);
+      ppd_add_attr(ppd, keyword, name, text, string);
 
       string = NULL;			/* Don't free this string below */
     }
@@ -2123,6 +2116,7 @@ static ppd_attr_t *			/* O - New attribute */
 ppd_add_attr(ppd_file_t *ppd,		/* I - PPD file data */
              const char *name,		/* I - Attribute name */
              const char *spec,		/* I - Specifier string, if any */
+	     const char *text,		/* I - Text string, if any */
 	     const char *value)		/* I - Value of attribute */
 {
   ppd_attr_t	**ptr,			/* New array */
@@ -2164,6 +2158,7 @@ ppd_add_attr(ppd_file_t *ppd,		/* I - PPD file data */
 
   strlcpy(temp->name, name, sizeof(temp->name));
   strlcpy(temp->spec, spec, sizeof(temp->spec));
+  strlcpy(temp->text, text, sizeof(temp->text));
   temp->value = (char *)value;
 
  /*
@@ -2979,5 +2974,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.100 2003/02/28 10:28:25 mike Exp $".
+ * End of "$Id: ppd.c,v 1.101 2003/02/28 21:06:08 mike Exp $".
  */
