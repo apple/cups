@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.97 2002/05/16 13:44:53 mike Exp $"
+ * "$Id: http.c,v 1.98 2002/06/27 14:25:20 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -626,6 +626,7 @@ httpReconnect(http_t *http)	/* I - HTTP data */
 struct hostent *			/* O - Host entry */
 httpGetHostByName(const char *name)	/* I - Hostname or IP address */
 {
+  const char		*nameptr;	/* Pointer into name */
   unsigned		ip[4];		/* IP address components */
   static unsigned	packed_ip;	/* Packed IPv4 address */
   static char		*packed_ptr[2];	/* Pointer to packed address */
@@ -648,7 +649,9 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
   * htonl() macro to get the right byte order for the address.
   */
 
-  if (isdigit(name[0]))
+  for (nameptr = name; isdigit(*nameptr) || *nameptr == '.'; nameptr ++);
+
+  if (!*nameptr)
   {
    /*
     * We have an IP address; break it up and provide the host entry
@@ -2269,5 +2272,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.97 2002/05/16 13:44:53 mike Exp $".
+ * End of "$Id: http.c,v 1.98 2002/06/27 14:25:20 mike Exp $".
  */
