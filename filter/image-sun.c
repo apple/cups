@@ -1,5 +1,5 @@
 /*
- * "$Id: image-sun.c,v 1.1 1998/02/19 20:44:58 mike Exp $"
+ * "$Id: image-sun.c,v 1.2 1998/08/12 15:03:55 mike Exp $"
  *
  *   Sun Raster image file routines for espPrint, a collection of printer
  *   drivers.
@@ -17,9 +17,11 @@
  * Revision History:
  *
  *   $Log: image-sun.c,v $
- *   Revision 1.1  1998/02/19 20:44:58  mike
- *   Initial revision
+ *   Revision 1.2  1998/08/12 15:03:55  mike
+ *   Added support for colormapped images.
  *
+ *   Revision 1.1  1998/02/19  20:44:58  mike
+ *   Initial revision
  */
 
 /*
@@ -89,6 +91,7 @@ ImageReadSunRaster(image_t *img,
 		ras_type,		/* type of file; see RT_* below */
 		ras_maptype,		/* type of colormap; see RMT_* below */
 		ras_maplength;		/* length (bytes) of following map */
+  unsigned char	cmap[3][256];		/* colormap */
 
 
  /*
@@ -106,7 +109,11 @@ ImageReadSunRaster(image_t *img,
   ras_maplength = read_unsigned(fp);
 
   if (ras_maplength > 0)
-    fseek(fp, ras_maplength, SEEK_CUR);
+  {
+    fread(cmap[0], 1, ras_maplength / 3, fp);
+    fread(cmap[1], 1, ras_maplength / 3, fp);
+    fread(cmap[2], 1, ras_maplength / 3, fp);
+  };
 
  /*
   * Compute the width of each line and allocate memory as needed...
@@ -116,7 +123,7 @@ ImageReadSunRaster(image_t *img,
   if (scanwidth & 1)
     scanwidth ++;
 
-  if (ras_depth < 24)
+  if (ras_depth < 24 && ras_maplength == 0)
   {
     img->colorspace = secondary;
     in = malloc(img->xsize + 1);
@@ -134,7 +141,7 @@ ImageReadSunRaster(image_t *img,
 
   for (y = 0; y < img->ysize; y ++)
   {
-    if (ras_depth != 8)
+    if (ras_depth != 8 || ras_maplength > 0)
       p = scanline;
     else
       p = in;
@@ -168,8 +175,12 @@ ImageReadSunRaster(image_t *img,
       };
     };
 
-    if (ras_depth == 1)
+    if (ras_depth == 1 && ras_maplength == 0)
     {
+     /*
+      * 1-bit B&W image...
+      */
+
       for (x = img->xsize, bit = 128, scanptr = scanline, p = in;
            x > 0;
            x --, p ++)
@@ -188,6 +199,53 @@ ImageReadSunRaster(image_t *img,
           bit >>= 1;
       };
     }
+    else if (ras_depth == 1)
+    {
+     /*
+      * 1-bit colormapped image...
+      */
+
+      for (x = img->xsize, bit = 128, scanptr = scanline, p = in;
+           x > 0;
+           x --)
+      {
+	if (*scanptr & bit)
+	{
+          *p++ = cmap[0][1];
+          *p++ = cmap[1][1];
+          *p++ = cmap[2][1];
+	}
+        else
+	{
+          *p++ = cmap[0][0];
+          *p++ = cmap[1][0];
+          *p++ = cmap[2][0];
+	};
+
+	if (bit > 1)
+	{
+          bit = 128;
+          scanptr ++;
+	}
+	else
+          bit >>= 1;
+      };
+    }
+    else if (ras_depth == 8 && ras_maplength > 0)
+    {
+     /*
+      * 8-bit colormapped image.
+      */
+
+      for (x = img->xsize, scanptr = scanline, p = in;
+           x > 0;
+           x --)
+      {
+        *p++ = cmap[0][*scanptr];
+        *p++ = cmap[1][*scanptr];
+        *p++ = cmap[2][*scanptr++];
+      };
+    }
     else if (ras_depth == 24 && ras_type != RT_FORMAT_RGB)
     {
      /*
@@ -196,11 +254,11 @@ ImageReadSunRaster(image_t *img,
 
       for (x = img->xsize, scanptr = scanline, p = in;
            x > 0;
-           x --, scanptr += 3, p += 3)
+           x --, scanptr += 3)
       {
-        p[0] = scanptr[2];
-        p[1] = scanptr[1];
-        p[2] = scanptr[0];
+        *p++ = scanptr[2];
+        *p++ = scanptr[1];
+        *p++ = scanptr[0];
       };
     };
 
@@ -290,5 +348,5 @@ read_unsigned(FILE *fp)
 
 
 /*
- * End of "$Id: image-sun.c,v 1.1 1998/02/19 20:44:58 mike Exp $".
+ * End of "$Id: image-sun.c,v 1.2 1998/08/12 15:03:55 mike Exp $".
  */
