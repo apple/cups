@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.113 2003/02/12 19:31:11 mike Exp $"
+ * "$Id: http.c,v 1.114 2003/03/03 17:59:56 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -79,8 +79,6 @@
 #include "string.h"
 #include <fcntl.h>
 #include <errno.h>
-#include <sys/time.h>
-#include <sys/resource.h>
 
 #include "http.h"
 #include "http-private.h"
@@ -88,8 +86,9 @@
 
 #ifndef WIN32
 #  include <signal.h>
+#  include <sys/time.h>
+#  include <sys/resource.h>
 #endif /* !WIN32 */
-
 
 
 /*
@@ -1021,8 +1020,11 @@ int					/* O - 1 if data is available, 0 otherwise */
 httpWait(http_t *http,			/* I - HTTP data */
          int    msec)			/* I - Milliseconds to wait */
 {
+#ifndef WIN32
   struct rlimit		limit;          /* Runtime limit */
+#endif /* !WIN32 */
   struct timeval	timeout;	/* Timeout */
+  int			nfds;		/* Result from select() */
 
 
  /*
@@ -1041,6 +1043,15 @@ httpWait(http_t *http,			/* I - HTTP data */
 
   if (!http->input_set)
   {
+#ifdef WIN32
+   /*
+    * Windows has a fixed-size select() structure, different (surprise,
+    * surprise!) from all UNIX implementations.  Just allocate this
+    * fixed structure...
+    */
+
+    http->input_set = calloc(1, sizeof(fd_set));
+#else
    /*
     * Allocate the select() input set based upon the max number of file
     * descriptors available for this process...
@@ -1049,6 +1060,7 @@ httpWait(http_t *http,			/* I - HTTP data */
     getrlimit(RLIMIT_NOFILE, &limit);
 
     http->input_set = calloc(1, (limit.rlim_cur + 7) / 8);
+#endif /* WIN32 */
 
     if (!http->input_set)
       return (0);
@@ -1061,10 +1073,14 @@ httpWait(http_t *http,			/* I - HTTP data */
     timeout.tv_sec  = msec / 1000;
     timeout.tv_usec = (msec % 1000) * 1000;
 
-    return (select(http->fd + 1, http->input_set, NULL, NULL, &timeout) > 0);
+    nfds = select(http->fd + 1, http->input_set, NULL, NULL, &timeout);
   }
   else
-    return (select(http->fd + 1, http->input_set, NULL, NULL, NULL) > 0);
+    nfds = select(http->fd + 1, http->input_set, NULL, NULL, NULL);
+
+  FD_CLR(http->fd, http->input_set);
+
+  return (nfds > 0);
 }
 
 
@@ -2271,5 +2287,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.113 2003/02/12 19:31:11 mike Exp $".
+ * End of "$Id: http.c,v 1.114 2003/03/03 17:59:56 mike Exp $".
  */
