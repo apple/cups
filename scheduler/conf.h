@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.22 2000/03/10 16:56:01 mike Exp $"
+ * "$Id: conf.h,v 1.23 2000/03/21 18:35:38 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -69,7 +69,7 @@ VAR char		ConfigurationFile[256]	VALUE(CUPS_SERVERROOT "/cupsd.conf"),
 					/* Amount of memory for RIPs */
 			TempDir[1024]		VALUE("/var/tmp"),
 					/* Temporary directory */
-			Printcap[1024]		VALUE("/etc/printcap");
+			Printcap[1024]		VALUE("");
 					/* Printcap file */
 VAR int			User			VALUE(1),
 					/* User ID for server */
@@ -114,5 +114,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.22 2000/03/10 16:56:01 mike Exp $".
+ * End of "$Id: conf.h,v 1.23 2000/03/21 18:35:38 mike Exp $".
  */

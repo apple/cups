@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.7 2000/03/11 15:48:41 mike Exp $"
+ * "$Id: log.c,v 1.8 2000/03/21 18:35:38 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -422,9 +422,9 @@ get_datetime(time_t t)		/* I - Time value */
 	  date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
 	  date->tm_hour, date->tm_min, date->tm_sec,
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
-          date->tm_gmtoff / 3600, (date->tm_gmtoff / 60) % 60);
+          -date->tm_gmtoff / 3600, (date->tm_gmtoff / 60) % 60);
 #else
-          timezone / 3600, (timezone / 60) % 60);
+          -timezone / 3600, (timezone / 60) % 60);
 #endif /* __*BSD__ */
  
   return (s);
@@ -432,5 +432,5 @@ get_datetime(time_t t)		/* I - Time value */
 
 
 /*
- * End of "$Id: log.c,v 1.7 2000/03/11 15:48:41 mike Exp $".
+ * End of "$Id: log.c,v 1.8 2000/03/21 18:35:38 mike Exp $".
  */
