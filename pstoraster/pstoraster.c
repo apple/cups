@@ -1,5 +1,5 @@
 /*
- * "$Id: pstoraster.c,v 1.6 1999/07/26 19:21:30 mike Exp $"
+ * "$Id: pstoraster.c,v 1.7 1999/07/29 20:33:38 mike Exp $"
  *
  *   PostScript RIP filter main entry for the Common UNIX Printing System
  *   (CUPS).
@@ -31,6 +31,8 @@
  *
  * Contents:
  *
+ *   main()          - Main entry for pstoraster.
+ *   define_string() - Define a string value...
  */
 
 /*
@@ -38,6 +40,7 @@
  */
 
 #include <cups/string.h>
+#include <stdlib.h>
 #include "ghost.h"
 #include "imain.h"
 #include "iminst.h"
@@ -67,6 +70,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   int			code;		/* Run status code */
   int			exit_code;	/* Exit code */
   ref			error_object;	/* Error object */
+  char			*content_type;	/* CONTENT_TYPE environment variable */
 
 
  /*
@@ -112,7 +116,14 @@ main(int  argc,		/* I - Number of command-line arguments */
   gs_main_init1(minst);
   initial_enter_name("QUIET", &vtrue);
   initial_enter_name("NOPAUSE", &vtrue);
-  define_string("OutputFile", "-");
+  if ((content_type = getenv("CONTENT_TYPE")) != NULL &&
+      strcmp(content_type, "application/pdf") == 0)
+  {
+    define_string("PSFile", "%stdout");
+    initial_enter_name("NODISPLAY", &vtrue);
+  }
+  else
+    define_string("OutputFile", "-");
   define_string("FONTPATH", CUPS_DATADIR "/fonts");
 
  /*
@@ -180,5 +191,5 @@ define_string(char *name,	/* I - Variable to set */
 
 
 /*
- * End of "$Id: pstoraster.c,v 1.6 1999/07/26 19:21:30 mike Exp $".
+ * End of "$Id: pstoraster.c,v 1.7 1999/07/29 20:33:38 mike Exp $".
  */

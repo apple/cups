@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.12 1999/07/08 14:22:10 mike Exp $"
+# "$Id: Makefile,v 1.13 1999/07/29 20:33:30 mike Exp $"
 #
 #   GNU Ghostscript makefile for the Common UNIX Printing System (CUPS).
 #
@@ -34,7 +34,7 @@ include ../Makedefs
 # Object files...
 #
 
-OBJS	=	gconf.o gdevabuf.o gdevcups.o gdevddrw.o gdevdflt.o \
+LIBOBJS	=	gconf.o gdevabuf.o gdevcups.o gdevddrw.o gdevdflt.o \
 		gdevemap.o gdevm1.o gdevm16.o gdevm2.o gdevm24.o \
 		gdevm32.o gdevm4.o gdevm8.o gdevmem.o gdevmpla.o \
 		gdevmrop.o gdevnfwd.o gdevpipe.o gdevprn.o gp_nofb.o \
@@ -58,7 +58,7 @@ OBJS	=	gconf.o gdevabuf.o gdevcups.o gdevddrw.o gdevdflt.o \
 		idparam.o igc.o igcref.o igcstr.o iinit.o ilocate.o \
 		imain.o iname.o interp.o iparam.o ireclaim.o isave.o \
 		iscan.o iscanbin.o iscannum.o iscantab.o istack.o \
-		iutil.o iutil2.o pstoraster.o sbcp.o sbhc.o sbwbs.o \
+		iutil.o iutil2.o sbcp.o sbhc.o sbwbs.o \
 		scfd.o scfdtab.o scfe.o scfetab.o sdctc.o sdctd.o \
 		sdcte.o seexec.o sfile.o sfilter1.o sfilter2.o shc.o \
 		shcgen.o siscale.o sjpegc.o sjpegd.o sjpege.o \
@@ -77,6 +77,7 @@ OBJS	=	gconf.o gdevabuf.o gdevcups.o gdevddrw.o gdevdflt.o \
 		zpacked.o zpaint.o zpath.o zpath1.o zpcolor.o zrelbit.o \
 		zstack.o zstring.o zsysvm.o ztoken.o ztype.o zupath.o \
 		zusparam.o zvmem.o zvmem2.o
+OBJS	=	$(LIBOBJS) genarch.o pstoraster.o
 
 #
 # Data files...
@@ -98,7 +99,7 @@ DFILES	=	Fontmap gs_btokn.ps gs_ccfnt.ps gs_cidfn.ps gs_cmap.ps \
 # Targets...
 #
 
-TARGETS	=	genarch arch.h pstoraster
+TARGETS	=	genarch arch.h libgs.a pstoraster
 
 #
 # Make everything...
@@ -121,6 +122,7 @@ clean:
 install:	$(TARGETS)
 	-$(MKDIR) $(SERVERROOT)/filter
 	$(CP) pstoraster $(SERVERROOT)/filter
+	-$(LN) pstoraster $(SERVERROOT)/filter/pdftops
 	-$(MKDIR) $(DATADIR)/pstoraster
 	$(CP) $(DFILES) $(DATADIR)/pstoraster
 
@@ -136,17 +138,30 @@ arch.h:		genarch
 	./genarch arch.h
 
 #
-# pstoraster - PostScript conversion filter.
+# libgs.a - GhostScript interpreter library...
 #
 
-pstoraster:	$(OBJS) ../Makedefs ../cups/$(LIBCUPS)
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o pstoraster $(OBJS) $(LIBJPEG) $(LIBZ) $(LIBS) -lm
+libgs.a:	$(LIBOBJS) ../Makedefs
+	echo Archiving $@...
+	$(RM) $@
+	$(AR) $(ARFLAGS) $@ $(LIBOBJS)
+	$(RANLIB) $@
 
 gdevcups.o:	../cups/raster.h
-$(OBJS):	arch.h ../config.h ../Makedefs
 gconf.o iconf.o gscdef.o:	gconfig.h
+$(LIBOBJS):	arch.h ../config.h ../Makedefs
+
 
 #
-# End of "$Id: Makefile,v 1.12 1999/07/08 14:22:10 mike Exp $".
+# pstoraster - PostScript RIP filter.
+#
+
+pstoraster:	pstoraster.o libgs.a ../Makedefs ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o pstoraster pstoraster.o libgs.a \
+		$(LIBJPEG) $(LIBZ) $(LIBS) -lm
+pstoraster.o:	arch.h ../config.h ../Makedefs
+
+#
+# End of "$Id: Makefile,v 1.13 1999/07/29 20:33:30 mike Exp $".
 #
