@@ -1,8 +1,10 @@
-CHANGES.txt - 04/23/2003
+CHANGES.txt - 04/25/2003
 ------------------------
 
 CHANGES IN CUPS V1.1.19rc3
 
+	- The text filter did not default to wrapping text as
+	  defined by the IPP implementation document.
 	- Scan backends first, PPDs second (STR #37)
 	- Updated the Netatalk documentation in the SAM (STR #38
 	  and #39)
