@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.51 2002/01/02 17:58:33 mike Exp $"
+ * "$Id: config.h.in,v 1.52 2002/01/27 21:16:08 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -203,5 +203,12 @@
 
 
 /*
- * End of "$Id: config.h.in,v 1.51 2002/01/02 17:58:33 mike Exp $".
+ * Do we have rresvport()?
+ */
+
+#undef HAVE_RRESVPORT
+
+
+/*
+ * End of "$Id: config.h.in,v 1.52 2002/01/27 21:16:08 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.32 2002/01/02 17:59:15 mike Exp $"
+ * "$Id: cupsd.h,v 1.33 2002/01/27 21:16:13 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -39,11 +39,11 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 
-#if defined(WIN32) || defined(__EMX__)
+#ifdef WIN32
 #  include <direct.h>
 #else
 #  include <unistd.h>
-#endif /* WIN32 || __EMX__ */
+#endif /* WIN32 */
 
 #include <cups/cups.h>
 #include <cups/string.h>
@@ -172,5 +172,5 @@ extern void	StopServer(void);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.32 2002/01/02 17:59:15 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.33 2002/01/27 21:16:13 mike Exp $".
  */

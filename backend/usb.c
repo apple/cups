@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.22 2002/01/18 16:48:17 mike Exp $"
+ * "$Id: usb.c,v 1.23 2002/01/27 21:16:09 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -38,13 +38,13 @@
 #include <cups/string.h>
 #include <signal.h>
 
-#if defined(WIN32) || defined(__EMX__)
+#ifdef WIN32
 #  include <io.h>
 #else
 #  include <unistd.h>
 #  include <fcntl.h>
 #  include <termios.h>
-#endif /* WIN32 || __EMX__ */
+#endif /* WIN32 */
 
 
 /*
@@ -450,5 +450,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: usb.c,v 1.22 2002/01/18 16:48:17 mike Exp $".
+ * End of "$Id: usb.c,v 1.23 2002/01/27 21:16:09 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c,v 1.34 2002/01/18 16:48:16 mike Exp $"
+ * "$Id: parallel.c,v 1.35 2002/01/27 21:16:08 mike Exp $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -38,13 +38,13 @@
 #include <cups/string.h>
 #include <signal.h>
 
-#if defined(WIN32) || defined(__EMX__)
+#ifdef WIN32
 #  include <io.h>
 #else
 #  include <unistd.h>
 #  include <fcntl.h>
 #  include <termios.h>
-#endif /* WIN32 || __EMX__ */
+#endif /* WIN32 */
 
 #ifdef __sgi
 #  include <invent.h>
@@ -639,5 +639,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c,v 1.34 2002/01/18 16:48:16 mike Exp $".
+ * End of "$Id: parallel.c,v 1.35 2002/01/27 21:16:08 mike Exp $".
  */
