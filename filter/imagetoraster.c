@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.42 2000/03/21 04:03:27 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.43 2000/04/12 14:41:43 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -1069,7 +1069,8 @@ exec_choice(cups_page_header_t *header,	/* I - Page header */
       header->CutMedia = (cups_cut_t)atoi(value);
     else if (strcmp(name, "HWResolution") == 0)
       sscanf(value, "%d%d", header->HWResolution + 0, header->HWResolution + 1);
-    else if (strcmp(name, "cupsMediaPosition") == 0)
+    else if (strcmp(name, "cupsMediaPosition") == 0 || /* Compatibility */
+             strcmp(name, "MediaPosition") == 0)
       header->MediaPosition = atoi(value);
     else if (strcmp(name, "MediaType") == 0)
       strncpy(header->MediaType, value, sizeof(header->MediaType) - 1);
@@ -3970,5 +3971,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.42 2000/03/21 04:03:27 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.43 2000/04/12 14:41:43 mike Exp $".
  */
