@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.30 2002/08/23 20:59:44 mike Exp $"
+ * "$Id: job.c,v 1.124.2.31 2002/08/26 00:07:54 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2009,14 +2009,18 @@ UpdateJob(job_t *job)		/* I - Job to check */
   {
     job->bufused += bytes;
     job->buffer[job->bufused] = '\0';
-    lineptr = strchr(job->buffer, '\n');
+
+    if (job->bufused == (JOB_BUFFER_SIZE - 1))
+      lineptr = job->buffer + JOB_BUFFER_SIZE - 1;
+    else
+      lineptr = strchr(job->buffer, '\n');
   }
   else if (bytes < 0 && errno == EINTR)
     return;
   else
   {
-    lineptr    = job->buffer + job->bufused;
-    lineptr[1] = 0;
+    lineptr  = job->buffer + job->bufused;
+    *lineptr = '\0';
   }
 
   if (job->bufused == 0 && bytes == 0)
@@ -2405,5 +2409,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.30 2002/08/23 20:59:44 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.31 2002/08/26 00:07:54 mike Exp $".
  */

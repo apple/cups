@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- Filter status lines longer than 1023 characters could
+	  cause the scheduler to get into an infinite loop.
 	- The scheduler didn't reset the job state to pending
 	  when modifying an active printer.
 	- Now limit the maximum number of recursion steps when
