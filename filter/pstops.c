@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.42 2000/07/20 16:48:36 mike Exp $"
+ * "$Id: pstops.c,v 1.43 2000/08/21 20:37:51 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -403,14 +403,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	}
       }
       else if (strcmp(line, "%%Trailer") == 0 && level == 0)
-      {
-       /*
-        * Assume that a file with a %%Trailer will likely also have %%EOF...
-	*/
-
-        saweof = 1;
         break;
-      }
       else
       {
         if (!sloworder)
@@ -908,5 +901,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.42 2000/07/20 16:48:36 mike Exp $".
+ * End of "$Id: pstops.c,v 1.43 2000/08/21 20:37:51 mike Exp $".
  */
