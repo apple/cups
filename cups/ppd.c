@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.38 2003/02/18 22:29:54 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.39 2003/02/18 22:43:26 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -292,8 +292,8 @@ ppdErrorString(ppd_status_t status)	/* I - PPD status */
 		  "OK",
 		  "Unable to open PPD file",
 		  "NULL PPD file pointer",
-		  "Missing PPD-Adobe-4.x header",
 		  "Memory allocation error",
+		  "Missing PPD-Adobe-4.x header",
 		  "Missing value string",
 		  "Internal error",
 		  "Bad OpenGroup",
@@ -3218,5 +3218,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.38 2003/02/18 22:29:54 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.39 2003/02/18 22:43:26 mike Exp $".
  */
