@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.5 2001/06/05 21:32:02 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.6 2002/01/11 18:04:25 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -133,7 +133,14 @@ cp $root/conf/mime.convs /tmp/$user/mime.convs
 # Setup the paths...
 #
 
-LD_LIBRARY_PATH=$root/cups:$root/filter; export LD_LIBRARY_PATH
+if test "x$LD_LIBRARY_PATH" = x; then
+	LD_LIBRARY_PATH="$root/cups:$root/filter"
+else
+	LD_LIBRARY_PATH="$root/cups:$root/filter:$LD_LIBRARY_PATH"
+fi
+
+export LD_LIBRARY_PATH
+
 CUPS_SERVERROOT=/tmp/$user; export CUPS_SERVERROOT
 CUPS_DATADIR=/tmp/$user/share; export CUPS_DATADIR
 
@@ -156,7 +163,7 @@ cupsd=$!
 echo "Scheduler is PID $cupsd; run debugger now if you need to."
 echo ""
 echo "Press ENTER to continue..."
-read $junk
+read junk
 
 IPP_PORT=$port; export IPP_PORT
 
@@ -201,7 +208,7 @@ for file in 4*.test; do
 
 	if test $status != 0; then
 		echo Test failed.
-		fail=1
+		fail=`expr $fail + 1`
 	fi
 done
 
@@ -219,7 +226,6 @@ echo "outlined in the CUPS Software Test Plan. These tests were run on" >>$strfi
 echo `date "+%Y-%m-%d"` by `whoami` on `hostname`. >>$strfile
 echo "<PRE>" >>$strfile
 
-fail=0
 for file in 5*.sh; do
 	echo "Performing $file..."
 	echo "" >>$strfile
@@ -230,7 +236,7 @@ for file in 5*.sh; do
 
 	if test $status != 0; then
 		echo Test failed.
-		fail=1
+		fail=`expr $fail + 1`
 	fi
 done
 
@@ -293,14 +299,12 @@ htmldoc --numbered --verbose --titleimage ../doc/images/cups-large.gif \
 htmldoc --numbered --verbose --titleimage ../doc/images/cups-large.gif \
 	-f $pdffile $strfile
 
-rm $strfile
-
 echo ""
 
 if test $fail != 0; then
-	echo "One or more tests failed."
+	echo "$fail tests failed."
 else
-	echo "All tests passed."
+	echo "All tests were successful."
 fi
 
 echo ""
@@ -311,5 +315,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.5 2001/06/05 21:32:02 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.6 2002/01/11 18:04:25 mike Exp $"
 #
