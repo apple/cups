@@ -1,5 +1,5 @@
 /*
- * "$Id: var.c,v 1.9 1999/09/10 13:38:33 mike Exp $"
+ * "$Id: var.c,v 1.10 1999/09/10 15:44:13 mike Exp $"
  *
  *   CGI form variable and array functions.
  *
@@ -57,8 +57,8 @@ static void	cgi_add_variable(const char *name, int element,
 		                 const char *value);
 static int	cgi_compare_variables(const var_t *v1, const var_t *v2);
 static var_t	*cgi_find_variable(const char *name);
-static int	cgi_initialize_get(int need_content);
-static int	cgi_initialize_post(int need_content);
+static int	cgi_initialize_get(void);
+static int	cgi_initialize_post(void);
 static int	cgi_initialize_string(const char *data);
 static void	cgi_sort_variables(void);
 
@@ -67,10 +67,10 @@ static void	cgi_sort_variables(void);
  * 'cgiInitialize()' - Initialize the CGI variable "database"...
  */
 
-int				/* O - Non-zero if there was form data */
-cgiInitialize(int need_content)	/* I - True if input is required */
+int			/* O - Non-zero if there was form data */
+cgiInitialize(void)
 {
-  char	*method;		/* Form posting method */
+  char	*method;	/* Form posting method */
  
 
 #ifdef DEBUG
@@ -84,9 +84,9 @@ cgiInitialize(int need_content)	/* I - True if input is required */
     return (0);
 
   if (strcasecmp(method, "GET") == 0)
-    return (cgi_initialize_get(need_content));
+    return (cgi_initialize_get());
   else if (strcasecmp(method, "POST") == 0)
-    return (cgi_initialize_post(need_content));
+    return (cgi_initialize_post());
   else
     return (0);
 }
@@ -364,10 +364,10 @@ cgi_find_variable(const char *name)	/* I - Name of variable */
  * 'cgi_initialize_get()' - Initialize form variables using the GET method.
  */
 
-static int
-cgi_initialize_get(int need_content)	/* I - True if input is required */
+static int		/* O - 1 if form data read */
+cgi_initialize_get(void)
 {
-  char	*data;	/* Pointer to form data string */
+  char	*data;		/* Pointer to form data string */
 
 
 #ifdef DEBUG
@@ -394,8 +394,8 @@ cgi_initialize_get(int need_content)	/* I - True if input is required */
  * 'cgi_initialize_post()' - Initialize variables using the POST method.
  */
 
-static int
-cgi_initialize_post(int need_content)	/* I - True if input is required */
+static int			/* O - 1 if form data was read */
+cgi_initialize_post(void)
 {
   char	*content_length,	/* Length of input data (string) */
 	*data;			/* Pointer to form data string */
@@ -591,5 +591,5 @@ cgi_sort_variables(void)
 
 
 /*
- * End of "$Id: var.c,v 1.9 1999/09/10 13:38:33 mike Exp $".
+ * End of "$Id: var.c,v 1.10 1999/09/10 15:44:13 mike Exp $".
  */
