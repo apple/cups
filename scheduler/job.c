@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.32 1999/07/13 13:06:21 mike Exp $"
+ * "$Id: job.c,v 1.33 1999/07/21 19:39:10 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -566,12 +566,16 @@ StartJob(int       id,		/* I - Job ID */
   {
     LogMessage(LOG_ERROR, "StartJob: unable to create status pipes - %s.",
 	       strerror(errno));
+    StopPrinter(printer->name);
+    sprintf(printer->state_message, "Unable to create status pipes - %s.",
+            strerror(errno));
     return;
   }
 
   DEBUG_printf(("statusfds = %d, %d\n", statusfds[0], statusfds[1]));
 
-  current->pipe = statusfds[0];
+  current->pipe   = statusfds[0];
+  current->status = 0;
   memset(current->procs, 0, sizeof(current->procs));
 
   if (num_filters > 0 && strcmp(filters[num_filters - 1].filter, "-") == 0)
@@ -620,7 +624,11 @@ StartJob(int       id,		/* I - Job ID */
 
     if (pid == 0)
     {
+      LogMessage(LOG_ERROR, "Unable to start filter \"%s\" - %s.",
+                 filters[i].filter, strerror(errno));
       StopPrinter(current->printer);
+      sprintf(printer->state_message, "Unable to start filter \"%s\" - %s.",
+              filters[i].filter, strerror(errno));
       return;
     }
     else
@@ -664,7 +672,11 @@ StartJob(int       id,		/* I - Job ID */
 
     if (pid == 0)
     {
+      LogMessage(LOG_ERROR, "Unable to start backend \"%s\" - %s.",
+                 method, strerror(errno));
       StopPrinter(current->printer);
+      sprintf(printer->state_message, "Unable to start backend \"%s\" - %s.",
+              method, strerror(errno));
       return;
     }
     else
@@ -831,7 +843,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
 	if (loglevel != LOG_INFO)
 	  LogMessage(loglevel, "%s", message);
 
-	if ((loglevel <= LOG_INFO && !job->state) ||
+	if ((loglevel >= LOG_INFO && !job->state) ||
 	    loglevel == LOG_ERROR)
           strncpy(job->printer->state_message, message,
                   sizeof(job->printer->state_message) - 1);
@@ -950,5 +962,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.32 1999/07/13 13:06:21 mike Exp $".
+ * End of "$Id: job.c,v 1.33 1999/07/21 19:39:10 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.38 1999/06/25 17:37:42 mike Exp $"
+ * "$Id: dirsvc.c,v 1.39 1999/07/21 19:39:09 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -351,7 +351,8 @@ UpdateBrowseList(void)
   p->browse_time = time(NULL);
 
  /*
-  * See if we have a default printer...
+  * See if we have a default printer...  If not, make the first printer the
+  * default.
   */
 
   if (DefaultPrinter == NULL && Printers != NULL)
@@ -538,5 +539,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.38 1999/06/25 17:37:42 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.39 1999/07/21 19:39:09 mike Exp $".
  */

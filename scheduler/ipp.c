@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.22 1999/07/08 17:27:10 mike Exp $"
+ * "$Id: ipp.c,v 1.23 1999/07/21 19:39:09 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -422,7 +422,42 @@ add_class(client_t        *con,		/* I - Client connection */
   */
 
   if ((pclass = FindClass(resource + 9)) == NULL)
+  {
+   /*
+    * Class doesn't exist; see if we have a printer of the same name...
+    */
+
+    if (FindPrinter(resource + 9) != NULL)
+    {
+     /*
+      * Yes, return an error...
+      */
+
+      send_ipp_error(con, IPP_NOT_POSSIBLE);
+      return;
+    }
+    else
+    {
+     /*
+      * No, add the pclass...
+      */
+
+      pclass = AddClass(resource + 9);
+    }
+  }
+  else if (pclass->type & CUPS_PRINTER_REMOTE)
+  {
+   /*
+    * We found a remote class; rename it and then add the pclass.
+    */
+
+    strcat(pclass->name, "@");
+    strcat(pclass->name, pclass->hostname);
+    SetPrinterAttrs(pclass);
+    SortPrinters();
+
     pclass = AddClass(resource + 9);
+  }
 
  /*
   * Look for attributes and copy them over as needed...
@@ -434,6 +469,38 @@ add_class(client_t        *con,		/* I - Client connection */
     strcpy(pclass->info, attr->values[0].string.text);
   if ((attr = ippFindAttribute(con->request, "printer-more-info", IPP_TAG_URI)) != NULL)
     strcpy(pclass->more_info, attr->values[0].string.text);
+  if ((attr = ippFindAttribute(con->request, "printer-is-accepting-jobs", IPP_TAG_BOOLEAN)) != NULL)
+  {
+    LogMessage(LOG_INFO, "Setting %s printer-is-accepting-jobs to %d (was %d.)",
+               pclass->name, attr->values[0].boolean, pclass->accepting);
+
+    pclass->accepting = attr->values[0].boolean;
+  }
+  if ((attr = ippFindAttribute(con->request, "printer-state", IPP_TAG_ENUM)) != NULL)
+  {
+    LogMessage(LOG_INFO, "Setting %s printer-state to %d (was %d.)", pclass->name,
+               attr->values[0].integer, pclass->state);
+
+    if (pclass->state == IPP_PRINTER_STOPPED &&
+        attr->values[0].integer != IPP_PRINTER_STOPPED)
+      pclass->state = IPP_PRINTER_IDLE;
+    else if (pclass->state != IPP_PRINTER_STOPPED &&
+             attr->values[0].integer == IPP_PRINTER_STOPPED)
+    {
+      if (pclass->state == IPP_PRINTER_PROCESSING)
+        StopJob(((job_t *)pclass->job)->id);
+
+      pclass->state = IPP_PRINTER_STOPPED;
+    }
+
+    pclass->browse_time = 0;
+  }
+  if ((attr = ippFindAttribute(con->request, "printer-state-message", IPP_TAG_TEXT)) != NULL)
+  {
+    strncpy(pclass->state_message, attr->values[0].string.text,
+            sizeof(pclass->state_message) - 1);
+    pclass->state_message[sizeof(pclass->state_message) - 1] = '\0';
+  }
 
   if ((attr = ippFindAttribute(con->request, "member-uris", IPP_TAG_URI)) != NULL)
   {
@@ -481,20 +548,6 @@ add_class(client_t        *con,		/* I - Client connection */
       else
         AddPrinterToClass(pclass, FindPrinter(dest));
     }
-  }
-
- /*
-  * See if we have all required attributes...
-  */
-
-  if (pclass->num_printers == 0)
-  {
-   /*
-    * Nope, return an error...
-    */
-
-    send_ipp_error(con, IPP_ATTRIBUTES);
-    return;
   }
 
  /*
@@ -568,7 +621,42 @@ add_printer(client_t        *con,	/* I - Client connection */
   */
 
   if ((printer = FindPrinter(resource + 10)) == NULL)
+  {
+   /*
+    * Printer doesn't exist; see if we have a class of the same name...
+    */
+
+    if (FindClass(resource + 10) != NULL)
+    {
+     /*
+      * Yes, return an error...
+      */
+
+      send_ipp_error(con, IPP_NOT_POSSIBLE);
+      return;
+    }
+    else
+    {
+     /*
+      * No, add the printer...
+      */
+
+      printer = AddPrinter(resource + 10);
+    }
+  }
+  else if (printer->type & CUPS_PRINTER_REMOTE)
+  {
+   /*
+    * We found a remote printer; rename it and then add the printer.
+    */
+
+    strcat(printer->name, "@");
+    strcat(printer->name, printer->hostname);
+    SetPrinterAttrs(printer);
+    SortPrinters();
+
     printer = AddPrinter(resource + 10);
+  }
 
  /*
   * Look for attributes and copy them over as needed...
@@ -690,6 +778,13 @@ add_printer(client_t        *con,	/* I - Client connection */
       unlink(filename);
     }
   }
+
+ /*
+  * Make this printer the default if there is none...
+  */
+
+  if (DefaultPrinter == NULL)
+    DefaultPrinter = printer;
 
  /*
   * Update the printer attributes and return...
@@ -2319,5 +2414,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.22 1999/07/08 17:27:10 mike Exp $".
+ * End of "$Id: ipp.c,v 1.23 1999/07/21 19:39:09 mike Exp $".
  */
