@@ -1,5 +1,5 @@
 /*
- * "$Id: image-jpeg.c,v 1.3 1998/03/19 16:58:45 mike Exp $"
+ * "$Id: image-jpeg.c,v 1.4 1998/04/01 21:47:31 mike Exp $"
  *
  *   JPEG image routines for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,10 @@
  * Revision History:
  *
  *   $Log: image-jpeg.c,v $
- *   Revision 1.3  1998/03/19 16:58:45  mike
+ *   Revision 1.4  1998/04/01 21:47:31  mike
+ *   Fixed problem with outputting B&W from color JPEG images...
+ *
+ *   Revision 1.3  1998/03/19  16:58:45  mike
  *   Fixed PPI calculation - was dividing instead of multiplying...
  *
  *   Revision 1.2  1998/02/24  18:39:46  mike
@@ -95,6 +98,8 @@ ImageReadJPEG(image_t *img,
   in = malloc(img->xsize * cinfo.output_components);
   if (primary < 0)
     out = malloc(-img->xsize * primary);
+  else
+    out = malloc(img->xsize * primary);
 
   jpeg_start_decompress(&cinfo);
 
@@ -151,8 +156,7 @@ ImageReadJPEG(image_t *img,
   };
 
   free(in);
-  if (primary < 0)
-    free(out);
+  free(out);
 
   jpeg_finish_decompress(&cinfo);
   jpeg_destroy_decompress(&cinfo);
@@ -164,5 +168,5 @@ ImageReadJPEG(image_t *img,
 
 
 /*
- * End of "$Id: image-jpeg.c,v 1.3 1998/03/19 16:58:45 mike Exp $".
+ * End of "$Id: image-jpeg.c,v 1.4 1998/04/01 21:47:31 mike Exp $".
  */
