@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.87 2003/02/14 20:12:53 mike Exp $"
+ * "$Id: ppd.c,v 1.88 2003/02/14 20:25:04 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -2558,8 +2558,21 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
     if (line[0] != '*')			/* All lines start with an asterisk */
     {
-      ppd_status = PPD_MISSING_ASTERISK;
-      return (0);
+     /*
+      * Allow lines consisting of just whitespace...
+      */
+
+      for (lineptr = line; *lineptr; lineptr ++)
+        if (!isspace(*lineptr))
+	  break;
+
+      if (*lineptr)
+      {
+        ppd_status = PPD_MISSING_ASTERISK;
+        return (0);
+      }
+      else
+        continue;
     }
 
    /*
@@ -2680,5 +2693,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.87 2003/02/14 20:12:53 mike Exp $".
+ * End of "$Id: ppd.c,v 1.88 2003/02/14 20:25:04 mike Exp $".
  */
