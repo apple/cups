@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.114 2004/06/29 04:09:07 mike Exp $"
+ * "$Id: pstops.c,v 1.115 2004/06/29 04:14:13 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -556,6 +556,12 @@ main(int  argc,			/* I - Number of command-line arguments */
 	*/
 
         fputs(line, stdout);
+
+	if (!sent_prolog)
+	{
+	  sent_prolog = 1;
+          do_prolog(ppd);
+	}
 
 	if (!sent_setup)
 	{
@@ -1890,5 +1896,5 @@ start_nup(int number,			/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.114 2004/06/29 04:09:07 mike Exp $".
+ * End of "$Id: pstops.c,v 1.115 2004/06/29 04:14:13 mike Exp $".
  */
