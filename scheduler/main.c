@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.9 1999/04/16 20:47:48 mike Exp $"
+ * "$Id: main.c,v 1.10 1999/04/19 21:17:10 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -209,8 +209,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       * Write data as needed...
       */
 
-      if (FD_ISSET(con->http.fd, &output) ||
-          FD_ISSET(con->file, &output))
+      if (FD_ISSET(con->http.fd, &output) &&
+          (!con->pipe_pid || FD_ISSET(con->file, &input)))
         if (!WriteClient(con))
 	{
 	  con --;
@@ -316,7 +316,10 @@ sigcld_handler(int sig)	/* I - Signal number */
 
           DEBUG_printf(("sigcld_handler: job %d is completed.\n", job->id));
 
+          job->printer->state_message[0] = '\0';
+
           CancelJob(job->id);
+	  CheckJobs();
 	}
 
 	break;
@@ -353,5 +356,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.9 1999/04/16 20:47:48 mike Exp $".
+ * End of "$Id: main.c,v 1.10 1999/04/19 21:17:10 mike Exp $".
  */

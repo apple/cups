@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.10 1999/04/16 20:47:48 mike Exp $"
+ * "$Id: job.c,v 1.11 1999/04/19 21:17:10 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -165,6 +165,8 @@ CancelJobs(char *dest)	/* I - Destination to cancel */
     }
     else
       current = current->next;
+
+  CheckJobs();
 }
 
 
@@ -344,7 +346,8 @@ StartJob(int       id,		/* I - Job ID */
 	    attr->value_tag == IPP_TAG_INTEGER)
 	  sprintf(copies, "%d", attr->values[0].integer);
         else if (strcmp(attr->name, "job-name") == 0 &&
-	         attr->value_tag == IPP_TAG_NAME)
+	         (attr->value_tag == IPP_TAG_NAME ||
+		  attr->value_tag == IPP_TAG_NAMELANG))
 	  strcpy(title, attr->values[0].string.text);
 	else if ((attr->group_tag == IPP_TAG_JOB ||
 	          attr->group_tag == IPP_TAG_EXTENSION) &&
@@ -680,18 +683,81 @@ StopJob(int id)
  */
 
 void
-UpdateJob(job_t *job)	/* I - Job to check */
+UpdateJob(job_t *job)		/* I - Job to check */
 {
-  int	bytes;		/* Number of bytes read */
-  char	buffer[8192];	/* Data buffer */
+  int		bytes;		/* Number of bytes read */
+  char		*lineptr,	/* Pointer to end of line in buffer */
+		*message;	/* Pointer to message text */
+  int		loglevel;	/* Log level for message */
+  static int	bufused = 0;	/* Amount of buffer used */
+  static char	buffer[8192];	/* Data buffer */
 
 
-  if ((bytes = read(job->pipe, buffer, sizeof(buffer))) > 0)
-    fwrite(buffer, bytes, 1, stderr);
+  if ((bytes = read(job->pipe, buffer + bufused, sizeof(buffer) - bufused - 1)) > 0)
+  {
+    bufused += bytes;
+    buffer[bufused] = '\0';
+
+    while ((lineptr = strchr(buffer, '\n')) != NULL)
+    {
+     /*
+      * Terminate each line and process it...
+      */
+
+      *lineptr++ = '\0';
+
+     /*
+      * Figure out the logging level...
+      */
+
+      if (strncmp(buffer, "ERROR:", 6) == 0)
+      {
+        loglevel = LOG_ERROR;
+	message  = buffer + 7;
+      }
+      else if (strncmp(buffer, "WARNING:", 8) == 0)
+      {
+        loglevel = LOG_WARN;
+	message  = buffer + 9;
+      }
+      if (strncmp(buffer, "INFO:", 5) == 0)
+      {
+        loglevel = LOG_INFO;
+	message  = buffer + 6;
+      }
+      else if (strncmp(buffer, "DEBUG:", 6) == 0)
+      {
+        loglevel = LOG_DEBUG;
+	message  = buffer + 7;
+      }
+      else
+      {
+        loglevel = LOG_DEBUG;
+	message  = buffer;
+      }
+
+     /*
+      * Send it to the log file and printer state message as needed...
+      */
+
+      LogMessage(loglevel, "%s", message);
+
+      if (loglevel <= LOG_INFO)
+        strncpy(job->printer->state_message, message,
+                sizeof(job->printer->state_message) - 1);
+
+     /*
+      * Update the input buffer...
+      */
+
+      strcpy(buffer, lineptr);
+      bufused -= lineptr - buffer;
+    }
+  }
   else
   {
     DEBUG_printf(("UpdateJob: job %d is complete.\n", job->id));
-    CancelJob(job->id);
+    FD_CLR(job->pipe, &InputSet);
   }
 }
 
@@ -775,5 +841,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.10 1999/04/16 20:47:48 mike Exp $".
+ * End of "$Id: job.c,v 1.11 1999/04/19 21:17:10 mike Exp $".
  */

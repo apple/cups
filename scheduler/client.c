@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.9 1999/04/16 20:47:47 mike Exp $"
+ * "$Id: client.c,v 1.10 1999/04/19 21:17:09 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -38,8 +38,6 @@
  *   decode_basic_auth()   - Decode a Basic authorization string.
  *   get_file()            - Get a filename and state info.
  *   pipe_command()        - Pipe the output of a command to the remote client.
- *   sigpipe_handler()     - Handle 'broken pipe' signals from lost network
- *                           clients.
  */
 
 /*
@@ -57,7 +55,6 @@ static int	check_if_modified(client_t *con, struct stat *filestats);
 static void	decode_basic_auth(client_t *con);
 static char	*get_file(client_t *con, struct stat *filestats);
 static int	pipe_command(client_t *con, int infile, int *outfile, char *command, char *options);
-static void	sigpipe_handler(int sig);
 
 
 /*
@@ -455,17 +452,17 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
             if (strncmp(con->uri, "/printers", 9) == 0)
 	    {
-	      sprintf(command, "%s/cgi-bin/printers", ServerRoot);
+	      sprintf(command, "%s/cgi-bin/printers.cgi", ServerRoot);
 	      options = con->uri + 9;
 	    }
 	    else if (strncmp(con->uri, "/classes", 8) == 0)
 	    {
-	      sprintf(command, "%s/cgi-bin/classes", ServerRoot);
+	      sprintf(command, "%s/cgi-bin/classes.cgi", ServerRoot);
 	      options = con->uri + 8;
 	    }
 	    else
 	    {
-	      sprintf(command, "%s/cgi-bin/jobs", ServerRoot);
+	      sprintf(command, "%s/cgi-bin/jobs.cgi", ServerRoot);
 	      options = con->uri + 5;
 	    }
 
@@ -809,7 +806,7 @@ SendCommand(client_t      *con,
   FD_SET(con->file, &InputSet);
   FD_SET(con->http.fd, &OutputSet);
 
-  if (!SendHeader(con, HTTP_OK, "text/html"))
+  if (!SendHeader(con, HTTP_OK, NULL))
     return (0);
 
   if (con->http.version == HTTP_1_1)
@@ -819,9 +816,6 @@ SendCommand(client_t      *con,
     if (httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n") < 0)
       return (0);
   }
-
-  if (httpPrintf(HTTP(con), "\r\n") < 0)
-    return (0);
 
   return (1);
 }
@@ -1015,7 +1009,7 @@ StartListening(void)
   * Setup a 'broken pipe' signal handler for lost clients.
   */
 
-  sigset(SIGPIPE, sigpipe_handler);
+  sigset(SIGPIPE, SIG_IGN);
 #endif /* !WIN32 */
 
  /*
@@ -1153,6 +1147,8 @@ WriteClient(client_t *con)
       }
     }
 
+    con->http.state = HTTP_WAITING;
+
     FD_CLR(con->http.fd, &OutputSet);
 
     if (con->file)
@@ -1161,24 +1157,12 @@ WriteClient(client_t *con)
       FD_CLR(con->file, &InputSet);
 
       if (con->pipe_pid)
-      {
-	kill(con->pipe_pid, SIGKILL);
-	waitpid(con->pipe_pid, &status, WNOHANG);
-      }
+	kill(con->pipe_pid, SIGTERM);
 
       close(con->file);
-      con->file = 0;
+      con->file     = 0;
+      con->pipe_pid = 0;
     }
-
-    if (!con->http.keep_alive)
-    {
-      CloseClient(con);
-      return (0);
-    }
-
-    con->http.state = HTTP_WAITING;
-    con->file       = 0;
-    con->pipe_pid   = 0;
 
     if (con->request != NULL)
     {
@@ -1190,6 +1174,12 @@ WriteClient(client_t *con)
     {
       ippDelete(con->response);
       con->response = NULL;
+    }
+
+    if (!con->http.keep_alive)
+    {
+      CloseClient(con);
+      return (0);
     }
   }
 
@@ -1361,10 +1351,12 @@ pipe_command(client_t *con,	/* I - Client connection */
   char	argbuf[1024],		/* Argument buffer */
 	*argv[100],		/* Argument strings */
 	*envp[100];		/* Environment variables */
+  char	hostname[1024];		/* Hostname string */
   static char	lang[1024];		/* LANG env variable */
   static char	content_length[1024];	/* CONTENT_LENGTH env variable */
   static char	content_type[1024];	/* CONTENT_TYPE env variable */
   static char	server_port[1024];	/* Default listen port */
+  static char	server_name[1024];	/* Default listen hostname */
   static char	remote_host[1024];	/* REMOTE_HOST env variable */
   static char	remote_user[1024];	/* REMOTE_HOST env variable */
 
@@ -1422,16 +1414,19 @@ pipe_command(client_t *con,	/* I - Client connection */
   * Setup the environment variables as needed...
   */
 
+  gethostname(hostname, sizeof(hostname) - 1);
+
   sprintf(lang, "LANG=%s", con->language ? con->language->language : "C");
   sprintf(server_port, "SERVER_PORT=%d", ntohs(con->http.hostaddr.sin_port));
+  sprintf(server_name, "SERVER_NAME=%s", hostname);
   sprintf(remote_host, "REMOTE_HOST=%s", con->http.hostname);
   sprintf(remote_user, "REMOTE_USER=%s", con->username);
 
   envp[0] = "PATH=/bin:/usr/bin";
   envp[1] = "SERVER_SOFTWARE=CUPS/1.0";
-  envp[2] = "SERVER_NAME=localhost";	/* This isn't 100% correct... */
-  envp[3] = "GATEWAY_INTERFACE=CGI/1.1";
-  envp[4] = "SERVER_PROTOCOL=HTTP/1.1";
+  envp[2] = "GATEWAY_INTERFACE=CGI/1.1";
+  envp[3] = "SERVER_PROTOCOL=HTTP/1.1";
+  envp[4] = server_name;
   envp[5] = server_port;
   envp[6] = remote_host;
   envp[7] = remote_user;
@@ -1492,7 +1487,8 @@ pipe_command(client_t *con,	/* I - Client connection */
     */
 
     execve(command, argv, envp);
-    exit(1);
+    perror("execve failed");
+    exit(errno);
     return (0);
   }
   else if (pid < 0)
@@ -1520,121 +1516,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * 'sigpipe_handler()' - Handle 'broken pipe' signals from lost network
- *                       clients.
- */
-
-static void
-sigpipe_handler(int sig)	/* I - Signal number */
-{
-  (void)sig;
-/* IGNORE */
-}
-
-
-/*
- * 'show_printer_status()' - Show the current printer status.
- */
-
-static int
-show_printer_status(client_t *con)
-{
-  printer_t	*p;
-  char		buffer[HTTP_MAX_BUFFER];
-  static char	*states[] =
-		{
-		  "", "", "", "Idle", "Processing", "Stopped"
-		};
-
-
-  p = NULL;
-  if (con->uri[10] != '\0')
-    if ((p = FindPrinter(con->uri + 10)) == NULL)
-      return (0);
-
-  if (!SendHeader(con, HTTP_OK, "text/html"))
-    return (0);
-
-  if (con->http.version == HTTP_1_1)
-  {
-    con->http.data_encoding = HTTP_ENCODE_CHUNKED;
-
-    if (httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n") < 0)
-      return (0);
-  }
-
-  if (httpPrintf(HTTP(con), "\r\n") < 0)
-    return (0);
-
-  if (p != NULL)
-  {
-   /*
-    * Send printer information...
-    */
-
-    sprintf(buffer, "<HTML>\n"
-                    "<HEAD>\n"
-		    "\t<TITLE>Printer Status for %s</TITLE>\n"
-		    "\t<META HTTP-EQUIV=\"Refresh\" CONTENT=\"10\">\n"
-		    "</HEAD>\n"
-		    "<BODY BGCOLOR=#ffffff>\n"
-		    "<TABLE WIDTH=100%%><TR>\n"
-		    "\t<TD ALIGN=LEFTV ALIGN=MIDDLE><IMG SRC=\"/images/cups-small.gif\"></TD>\n"
-		    "\t<TD ALIGN=CENTER VALIGN=MIDDLE><H1>Printer Status for %s</H1></TD>\n"
-		    "\t<TD ALIGN=RIGHT VALIGN=MIDDLE><IMG SRC=\"/images/vendor.gif\"></TD>\n"
-		    "</TR></TABLE>\n"
-                    "<CENTER><TABLE BORDER=1 WIDTH=80%%>\n"
-                    "<TR><TH>Name</TH><TH>Value</TH></TR>\n"
-		    "<TR><TD>Info</TD><TD>%s</TD></TR>\n"
-		    "<TR><TD>MoreInfo</TD><TD>%s</TD></TR>\n"
-		    "<TR><TD>Location</TD><TD>%s</TD></TR>\n"
-		    "<TR><TD>Device URI</TD><TD>%s</TD></TR>\n"
-		    "<TR><TD>PPDFile</TD><TD>%s</TD></TR>\n",
-		    p->name, p->name, p->info, p->more_info,
-		    p->location, p->device_uri, p->ppd);
-
-    con->bytes += httpWrite(HTTP(con), buffer, strlen(buffer));
-  }
-  else
-  {
-    strcpy(buffer, "<HTML>\n"
-                   "<HEAD>\n"
-		   "\t<TITLE>Available Printers</TITLE>\n"
-		   "\t<META HTTP-EQUIV=\"Refresh\" CONTENT=\"10\">\n"
-		   "</HEAD>\n"
-		   "<BODY BGCOLOR=#ffffff>\n"
-		   "<TABLE WIDTH=100%%><TR>\n"
-		   "\t<TD ALIGN=LEFT VALIGN=MIDDLE><IMG SRC=\"/images/cups-small.gif\"></TD>\n"
-		   "\t<TD ALIGN=CENTER VALIGN=MIDDLE><H1>Available Printers</H1></TD>\n"
-		   "\t<TD ALIGN=RIGHT VALIGN=MIDDLE><IMG SRC=\"/images/vendor.gif\"></TD>\n"
-		   "</TR></TABLE>\n"
-		   "<CENTER><TABLE BORDER=1 WIDTH=80%%>\n"
-                   "<TR><TH>Name</TH><TH>State</TH><TH>Info</TH></TR>\n");
-
-    con->bytes += httpWrite(HTTP(con), buffer, strlen(buffer));
-
-    for (p = Printers; p != NULL; p = p->next)
-    {
-      sprintf(buffer, "<TR><TD><A HREF=/printers/%s>%s</A></TD><TD>%s</TD><TD>%s</TD></TR>\n",
-	      p->name, p->name, states[p->state], p->info);
-      con->bytes += httpWrite(HTTP(con), buffer, strlen(buffer));
-    }
-  }
-
-  strcpy(buffer, "</TABLE></CENTER>\n"
-                 "<HR>\n"
-		 "CUPS Copyright 1997-1999 by Easy Software Products, "
-		 "All Rights Reserved.  CUPS and the CUPS logo are the "
-		 "trademark property of Easy Software Products.\n"
-		 "</BODY>\n"
-                 "</HTML>\n");
-  con->bytes += httpWrite(HTTP(con), buffer, strlen(buffer));
-  httpWrite(HTTP(con), buffer, 0);
-
-  return (1);
-}
-
-
-/*
- * End of "$Id: client.c,v 1.9 1999/04/16 20:47:47 mike Exp $".
+ * End of "$Id: client.c,v 1.10 1999/04/19 21:17:09 mike Exp $".
  */

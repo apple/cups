@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.6 1999/03/24 16:10:24 mike Exp $"
+ * "$Id: ipp.c,v 1.7 1999/04/19 21:17:09 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -369,6 +369,7 @@ cancel_job(client_t        *con,	/* I - Client connection */
   */
 
   CancelJob(jobid);
+  CheckJobs();
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -571,7 +572,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
   struct stat		filestats;	/* Print file information */
 
 
-  DEBUG_printf(("get_printer_attrs(%08x, %08x)\n", con, uri));
+  DEBUG_printf(("get_jobs(%08x, %08x)\n", con, uri));
 
  /*
   * Is the destination valid?
@@ -596,7 +597,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
     * Bad URI...
     */
 
-    DEBUG_printf(("get_printer_attrs: resource name \'%s\' no good!\n",
+    DEBUG_printf(("get_jobs: resource name \'%s\' no good!\n",
 	          resource));
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
@@ -604,7 +605,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
 
  /*
   * See if the "which-jobs" attribute have been specified; if so, return
-  * right away if they specify "completed" (we don't keep old job records...
+  * right away if they specify "completed" - we don't keep old job records...
   */
 
   if ((attr = ippFindAttribute(con->request, "which-jobs", IPP_TAG_KEYWORD)) != NULL &&
@@ -652,6 +653,8 @@ get_jobs(client_t        *con,		/* I - Client connection */
     * Filter out jobs that don't match...
     */
 
+    DEBUG_printf(("get_jobs: job->id = %d\n", job->id));
+
     if ((dest != NULL && strcmp(job->dest, dest) != 0))
       continue;
     if (job->dtype != dtype &&
@@ -661,6 +664,8 @@ get_jobs(client_t        *con,		/* I - Client connection */
       continue;
 
     count ++;
+
+    DEBUG_printf(("get_jobs: count = %d\n", count));
 
    /*
     * Send the following attributes for each job:
@@ -856,19 +861,23 @@ get_printers(client_t *con)		/* I - Client connection */
     * Send the following attributes for each printer:
     *
     *    printer-state
+    *    printer-state-message
     *    printer-is-accepting-jobs
     *    printer-device-uri
     *    + all printer attributes
     */
 
-    attr = ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-                         "printer-state", printer->state);
+    ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM,
+                  "printer-state", printer->state);
 
-    attr = ippAddBoolean(con->response, IPP_TAG_PRINTER,
-                         "printer-is-accepting-jobs", 1);
+    if (printer->state_message[0])
+      ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                   "printer-state-message", NULL, printer->state_message);
 
-    attr = ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_URI,
-                        "printer-device-uri", NULL, printer->device_uri);
+    ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs", 1);
+
+    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_URI,
+                 "printer-device-uri", NULL, printer->device_uri);
 
     copy_attrs(con->response, printer->attrs);
 
@@ -944,6 +953,13 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
     printer = FindPrinter(dest);
 
   copy_attrs(con->response, printer->attrs);
+
+  ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state",
+                printer->state);
+
+  if (printer->state_message[0])
+    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                 "printer-state-message", NULL, printer->state_message);
 
   if (ippFindAttribute(con->request, "requested-attributes", IPP_TAG_KEYWORD) != NULL)
     con->response->request.status.status_code = IPP_OK_SUBST;
@@ -1310,5 +1326,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.6 1999/03/24 16:10:24 mike Exp $".
+ * End of "$Id: ipp.c,v 1.7 1999/04/19 21:17:09 mike Exp $".
  */
