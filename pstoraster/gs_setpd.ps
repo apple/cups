@@ -21,7 +21,7 @@
 % Ghostscript, as distributed by Aladdin Enterprises, does not require any
 % GNU software to build or run it.
 
-% $Id: gs_setpd.ps,v 1.6 2000/06/26 15:50:17 mike Exp $
+% $Id: gs_setpd.ps,v 1.7 2000/08/16 17:00:18 mike Exp $
 % The current implementation of setpagedevice has the following limitations:
 %	- It doesn't attempt to "interact with the user" for Policy = 2.
 
@@ -281,29 +281,18 @@ level2dict begin
 
 % Define the keys used in input attribute matching.
 /.inputattrkeys [
-%%%% MRS - The current CUPS backend driver does not register any of
-%%%%       these attributes with GhostScript from the PPD file.  As
-%%%%       a result, we must comment out everything but PageSize
-%%%%       which is processed differently from all other attributes.
-%  /PageSize /MediaColor /MediaWeight /MediaType /InsertSheet
+  /PageSize /MediaColor /MediaWeight /MediaType /InsertSheet
 	% The following are documented in Adobe's supplement for v2017.
-%  /LeadingEdge /MediaClass
-  /PageSize
+  /LeadingEdge /MediaClass
 ] readonly def
 % Define other keys used in media selection.
 /.inputselectionkeys [
-%%%% MRS - The current CUPS backend driver does not register any of
-%%%%       these attributes with GhostScript from the PPD file.  As
-%%%%       a result, we must comment out everything.
-%  /MediaPosition /Orientation
+  /MediaPosition /Orientation
 ] readonly def
 
 % Define the keys used in output attribute matching.
 /.outputattrkeys [
-%%%% MRS - The current CUPS backend driver does not register any of
-%%%%       these attributes with GhostScript from the PPD file.  As
-%%%%       a result, we must comment out everything.
-%  /OutputType
+  /OutputType
 ] readonly def
 
 % Define all the parameters that should always be copied to the merged
@@ -404,11 +393,17 @@ level2dict begin
 % They are expected to consume the top 2 operands.
 % NOTE: we currently treat all values other than 0, 1, or 7 (for PageSize)
 % the same as 0, i.e., we signal an error.
-  0 {		% Set errorinfo and signal a configurationerror.
-	pop dup 4 index exch get 2 array astore
-	$error /errorinfo 3 -1 roll put
-	cleartomark
-	/setpagedevice load /configurationerror signalerror
+%  0 {		% Set errorinfo and signal a configurationerror.
+%	pop dup 4 index exch get 2 array astore
+%	$error /errorinfo 3 -1 roll put
+%	cleartomark
+%	/setpagedevice load /configurationerror signalerror
+%  } bind
+%%%% MRS - The current CUPS backend driver does not register any of
+%%%%       these attributes with GhostScript from the PPD file.  As
+%%%%       a result, we must allow all attributes and values.
+  0 {		% For all attributes just impose the request.
+	 pop pop
   } bind
   1 {		% Roll back the failed request to its previous status.
 DEBUG { (Rolling back.\n) print pstack flush } if
