@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.20.2.32 2004/08/19 14:10:27 mike Exp $"
+ * "$Id: language.c,v 1.20.2.33 2004/10/20 15:28:00 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -335,7 +335,14 @@ cupsLangGet(const char *language)	/* I - Language or locale */
                   ptr ? ptr : "(null)"));
 
     if (!ptr || !strcmp(ptr, "C") || !strcmp(ptr, "POSIX"))
+#  ifdef LC_MESSAGES
+    {
+      ptr = setlocale(LC_MESSAGES, "");
+      setlocale(LC_CTYPE, "");
+    }
+#  else
       ptr = setlocale(LC_ALL, "");
+#  endif /* LC_MESSAGES */
 
     if (ptr)
     {
@@ -1056,5 +1063,5 @@ cups_cache_lookup(const char      *name,/* I - Name of locale */
 
 
 /*
- * End of "$Id: language.c,v 1.20.2.32 2004/08/19 14:10:27 mike Exp $".
+ * End of "$Id: language.c,v 1.20.2.33 2004/10/20 15:28:00 mike Exp $".
  */
