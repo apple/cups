@@ -5,7 +5,7 @@ accept.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/language.h
 cancel.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
 cancel.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/language.h
 cupsaddsmb.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-cupsaddsmb.o: ../cups/ppd.h ../cups/string.h ../config.h
+cupsaddsmb.o: ../cups/ppd.h ../cups/language.h ../cups/string.h ../config.h
 lp.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h ../cups/ppd.h
 lp.o: ../cups/string.h ../config.h ../cups/language.h
 lpadmin.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h

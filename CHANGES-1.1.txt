@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.18
 
+	- Now install CUPS PPD file test utility (cupstestppd)
+	  to support basic conformance testing of PPD files.
+	- The scheduler now logs an error message when it sees a
+	  non-conforming PPD file.
 	- Upgraded pdftops filter to Xpdf 2.01 with fixes for
 	  TrueType fonts.
 	- Added a MaxClientsPerHost configuration directive to

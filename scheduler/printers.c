@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.30 2002/12/10 19:56:46 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.31 2002/12/13 21:22:04 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1254,44 +1254,53 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	if ((media_quality = ppdFindOption(ppd, "EFMediaQualityMode")) != NULL)
 	  num_media += media_quality->num_choices;
 
-	attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-                             "media-supported", num_media, NULL, NULL);
-        if (attr != NULL)
+        if (num_media == 0)
 	{
-	  val = attr->values;
-
-	  if (input_slot != NULL)
-	    for (i = 0; i < input_slot->num_choices; i ++, val ++)
-	      val->string.text = strdup(input_slot->choices[i].choice);
-
-	  if (media_type != NULL)
-	    for (i = 0; i < media_type->num_choices; i ++, val ++)
-	      val->string.text = strdup(media_type->choices[i].choice);
-
-	  if (media_quality != NULL)
-	    for (i = 0; i < media_quality->num_choices; i ++, val ++)
-	      val->string.text = strdup(media_quality->choices[i].choice);
-
-	  if (page_size != NULL)
+	  LogMessage(L_CRIT, "SetPrinterAttrs: The PPD file for printer %s "
+	                     "contains no media options and is therefore "
+			     "invalid!", p->name);
+	}
+	else
+	{
+	  attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                               "media-supported", num_media, NULL, NULL);
+          if (attr != NULL)
 	  {
-	    for (i = 0; i < page_size->num_choices; i ++, val ++)
-	      val->string.text = strdup(page_size->choices[i].choice);
+	    val = attr->values;
 
-	    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
-                	 NULL, page_size->defchoice);
+	    if (input_slot != NULL)
+	      for (i = 0; i < input_slot->num_choices; i ++, val ++)
+		val->string.text = strdup(input_slot->choices[i].choice);
+
+	    if (media_type != NULL)
+	      for (i = 0; i < media_type->num_choices; i ++, val ++)
+		val->string.text = strdup(media_type->choices[i].choice);
+
+	    if (media_quality != NULL)
+	      for (i = 0; i < media_quality->num_choices; i ++, val ++)
+		val->string.text = strdup(media_quality->choices[i].choice);
+
+	    if (page_size != NULL)
+	    {
+	      for (i = 0; i < page_size->num_choices; i ++, val ++)
+		val->string.text = strdup(page_size->choices[i].choice);
+
+	      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
+                	   NULL, page_size->defchoice);
+            }
+	    else if (input_slot != NULL)
+	      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
+                	   NULL, input_slot->defchoice);
+	    else if (media_type != NULL)
+	      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
+                	   NULL, media_type->defchoice);
+	    else if (media_quality != NULL)
+	      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
+                	   NULL, media_quality->defchoice);
+	    else
+	      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
+                	   NULL, "none");
           }
-	  else if (input_slot != NULL)
-	    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
-                	 NULL, input_slot->defchoice);
-	  else if (media_type != NULL)
-	    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
-                	 NULL, media_type->defchoice);
-	  else if (media_quality != NULL)
-	    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
-                	 NULL, media_quality->defchoice);
-	  else
-	    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
-                	 NULL, "none");
         }
 
        /*
@@ -2101,5 +2110,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.30 2002/12/10 19:56:46 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.31 2002/12/13 21:22:04 mike Exp $".
  */

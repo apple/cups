@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile.common,v 1.1.2.1 2002/05/21 20:05:48 mike Exp $"
+# "$Id: Makefile.common,v 1.1.2.2 2002/12/13 21:22:03 mike Exp $"
 #
 #   Man pages definitions for the Common UNIX Printing System (CUPS).
 #
@@ -27,6 +27,7 @@
 #
 
 MAN1	=	backend.man \
+		cupstestppd.man \
 		filter.man \
 		lp.man \
 		lpoptions.man \
@@ -53,6 +54,7 @@ MAN8	=	accept.man \
 		lpc.man
 
 CAT1	=	backend.$(CAT1EXT) \
+		cupstestppd.$(CAT1EXT) \
 		filter.$(CAT1EXT) \
 		lp.$(CAT1EXT) \
 		lpoptions.$(CAT1EXT) \
@@ -80,5 +82,5 @@ CAT8	=	accept.$(CAT8EXT) \
 
 
 #
-# End of "$Id: Makefile.common,v 1.1.2.1 2002/05/21 20:05:48 mike Exp $".
+# End of "$Id: Makefile.common,v 1.1.2.2 2002/12/13 21:22:03 mike Exp $".
 #

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.53.2.18 2002/09/04 02:38:41 mike Exp $"
+# "$Id: Makefile,v 1.53.2.19 2002/12/13 21:22:02 mike Exp $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -34,7 +34,7 @@ LIBOBJS	=	attr.o dest.o emit.o encode.o extended.o http.o http-addr.o \
 		http-support.o ipp.o langprintf.o language.o mark.o md5.o \
 		md5passwd.o normalize.o options.o page.o ppd.o snprintf.o \
 		string.o tempfile.o transcode.o usersys.o util.o
-OBJS	=	$(LIBOBJS) testhttp.o testi18n.o testlang.o testppd.o
+OBJS	=	$(LIBOBJS) testhttp.o testi18n.o testlang.o
 
 
 #
@@ -50,7 +50,7 @@ HEADERS	=	cups.h http.h ipp.h language.h md5.h normalize.h ppd.h \
 #
 
 TARGETS	=	$(LIBCUPS) libcups.a \
-		testhttp testi18n testlang testppd
+		testhttp testi18n testlang
 
 
 #
@@ -200,15 +200,6 @@ testlang:	testlang.o libcups.a
 
 
 #
-# testppd (dependency on static CUPS library is intentional)
-#
-
-testppd:	testppd.o libcups.a
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testppd.o libcups.a $(NETLIBS) $(SSLLIBS)
-
-
-#
 # Dependencies...
 #
 
@@ -216,5 +207,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.53.2.18 2002/09/04 02:38:41 mike Exp $".
+# End of "$Id: Makefile,v 1.53.2.19 2002/12/13 21:22:02 mike Exp $".
 #
