@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The scheduler did not send a printer-state-message
+	  attribute if the string was empty; it now always sends
+	  this attribute.  This caused the printer message to be
+	  displayed for other printers in the web interface.
 	- The LPD backend now supports a "manual_copies" option,
 	  e.g.: "lpd://server/queue?manual_copies=no", in order
 	  to handle copies for raw jobs to printers that don't
