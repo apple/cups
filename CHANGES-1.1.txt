@@ -1,6 +1,15 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.16
+
+	- The scheduler now maps accesses from the loopback
+	  interface to "localhost".
+	- The cups-lpd mini-daemon sent a status code byte in
+	  response to queue state commands, but those commands
+	  only return textual data.
+
+
 CHANGES IN CUPS V1.1.15-1
 
 	- The lpc and lprm sources didn't include the CUPS

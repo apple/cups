@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.13 2002/05/22 20:31:04 mike Exp $"
+ * "$Id: client.c,v 1.91.2.14 2002/06/07 15:49:21 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -133,7 +133,15 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
                    sizeof(con->http.hostname));
   }
 
-  if (httpAddrEqual(&(con->http.hostaddr), &ServerAddr))
+  if (httpAddrLocalhost(&(con->http.hostaddr)))
+  {
+   /*
+    * Map accesses from the loopback interface to "localhost"...
+    */
+
+    strlcpy(con->http.hostname, "localhost", sizeof(con->http.hostname));
+  }
+  else if (httpAddrEqual(&(con->http.hostaddr), &ServerAddr))
   {
    /*
     * Map accesses from the same host to the server name.
@@ -2526,5 +2534,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.13 2002/05/22 20:31:04 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.14 2002/06/07 15:49:21 mike Exp $".
  */
