@@ -1,6 +1,18 @@
 CHANGES.txt - 10/04/2000
 ------------------------
 
+CHANGES IN CUPS V1.1.5
+
+	- cupsTempFile() was using %p for the temporary
+	  filename; this should have been %08x (just 8 digit
+	  hex)
+	- Deleting a printer with active print jobs would still
+	  crash the server.
+	- ippWrite() and ipp_write_file() didn't send the
+	  correct value length for name-with-language and
+	  text-with-language attributes.
+
+
 CHANGES IN CUPS v1.1.4
 
 	- Makefile and configure script fixes.

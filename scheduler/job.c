@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.90 2000/10/12 01:52:42 mike Exp $"
+ * "$Id: job.c,v 1.91 2000/10/12 03:18:05 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2344,7 +2344,7 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 
                   n = strlen(attr->values[i].string.charset) +
 		      strlen(attr->values[i].string.text) +
-		      2;
+		      4;
 
                   if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
 		  {
@@ -2576,5 +2576,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.90 2000/10/12 01:52:42 mike Exp $".
+ * End of "$Id: job.c,v 1.91 2000/10/12 03:18:05 mike Exp $".
  */

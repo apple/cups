@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.60 2000/09/14 15:03:42 mike Exp $"
+ * "$Id: util.c,v 1.61 2000/10/12 03:18:04 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -1277,7 +1277,7 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
     * Format a string using the hex time values...
     */
 
-    snprintf(filename, len, "%s/%p%05x", tmpdir,
+    snprintf(filename, len, "%s/%08x%05x", tmpdir,
              curtime.tv_sec, curtime.tv_usec);
 
    /*
@@ -1429,5 +1429,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.60 2000/09/14 15:03:42 mike Exp $".
+ * End of "$Id: util.c,v 1.61 2000/10/12 03:18:04 mike Exp $".
  */
