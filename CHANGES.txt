@@ -186,6 +186,9 @@ CHANGES IN CUPS V1.1.7
 	  lacked the samples-per-pixel and bits-per-pixel tags.
 	- Added new cupsGetJobs() and cupsFreeJobs() functions
 	  to manage print jobs.
+	- cupsEncodeOptions() would encode names of 0 length and
+	  cupsAddOption() and cupsParseOptions() would add names
+	  of 0 length.
 
 
 CHANGES IN CUPS V1.1.6-3

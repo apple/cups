@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.83 2001/04/29 21:15:30 mike Exp $"
+ * "$Id: util.c,v 1.84 2001/04/30 15:34:04 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -1555,6 +1555,8 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 					/* Name of printer or class */
 
 
+  DEBUG_printf(("cups_connect(\"%s\", %p, %p)\n", name, printer, hostname));
+
   if (name == NULL)
   {
     last_error = IPP_BAD_REQUEST;
@@ -1590,6 +1592,8 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
     httpClose(cups_server);
   }
+
+  DEBUG_printf(("connecting to %s on port %d...\n", hostname, ippPort()));
 
   if ((cups_server = httpConnect(hostname, ippPort())) == NULL)
   {
@@ -1672,5 +1676,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.83 2001/04/29 21:15:30 mike Exp $".
+ * End of "$Id: util.c,v 1.84 2001/04/30 15:34:04 mike Exp $".
  */
