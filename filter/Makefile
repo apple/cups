@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.52 2002/01/02 17:58:56 mike Exp $"
+# "$Id: Makefile,v 1.53 2002/01/14 20:29:17 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -74,6 +74,7 @@ install:
 		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/libcupsimage.dylib; \
 	fi
 	$(INSTALL_DIR) $(INCLUDEDIR)/cups
+	$(INSTALL_DATA) image.h $(INCLUDEDIR)/cups
 	$(INSTALL_DATA) raster.h $(INCLUDEDIR)/cups
 
 
@@ -237,5 +238,5 @@ $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 
 #
-# End of "$Id: Makefile,v 1.52 2002/01/02 17:58:56 mike Exp $".
+# End of "$Id: Makefile,v 1.53 2002/01/14 20:29:17 mike Exp $".
 #

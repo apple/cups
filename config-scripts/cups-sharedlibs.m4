@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-sharedlibs.m4,v 1.7 2002/01/02 18:50:43 mike Exp $"
+dnl "$Id: cups-sharedlibs.m4,v 1.8 2002/01/14 20:29:16 mike Exp $"
 dnl
 dnl   Shared library support for the Common UNIX Printing System (CUPS).
 dnl
@@ -41,13 +41,19 @@ if test x$enable_shared != xno; then
 			DSO="ld"
 			DSOFLAGS="$DSOFLAGS -b -z +h \$@"
 			;;
-		OSF1* | Linux* | IRIX* | FreeBSD* | NetBSD* | OpenBSD*)
+		IRIX*)
+			LIBCUPS="libcups.so.2"
+			LIBCUPSIMAGE="libcupsimage.so.2"
+			DSO="\$(CC)"
+			DSOFLAGS="$DSOFLAGS -Wl,-rpath,\$(libdir),-set_version,sgi2.4,-soname,\$@ -shared \$(OPTIM)"
+			;;
+		OSF1* | Linux*)
 			LIBCUPS="libcups.so.2"
 			LIBCUPSIMAGE="libcupsimage.so.2"
 			DSO="\$(CC)"
 			DSOFLAGS="$DSOFLAGS -Wl,-soname,\$@ -shared \$(OPTIM)"
 			;;
-		Darwin*)
+		Darwin* *BSD*)
 			LIBCUPS="libcups.2.dylib"
 			LIBCUPSIMAGE="libcupsimage.2.dylib"
 			DSO="ld"
@@ -86,7 +92,6 @@ if test x$enable_shared = xno; then
 	LINKCUPS="$LINKCUPS \$(SSLLIBS)"
 else
 	if test $uname = AIX; then
-		
 		LINKCUPS="-L../cups -lcups_s"
 		LINKCUPSIMAGE="-L../filter -lcupsimage_s"
 	else
@@ -121,7 +126,7 @@ if test "$DSO" != ":"; then
                 	DSOFLAGS="-R$libdir $DSOFLAGS"
                 	LDFLAGS="$LDFLAGS -R$libdir"
                 	;;
-                FreeBSD* | NetBSD* | OpenBSD*)
+                *BSD* | Darwin*)
                         # *BSD
                 	DSOFLAGS="-Wl,-R$libdir $DSOFLAGS"
                         LDFLAGS="$LDFLAGS -Wl,-R$libdir"
@@ -141,5 +146,5 @@ AC_SUBST(DSOLIBS)
 AC_SUBST(IMGLIBS)
 
 dnl
-dnl End of "$Id: cups-sharedlibs.m4,v 1.7 2002/01/02 18:50:43 mike Exp $".
+dnl End of "$Id: cups-sharedlibs.m4,v 1.8 2002/01/14 20:29:16 mike Exp $".
 dnl

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.14 2002/01/12 21:31:01 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.15 2002/01/14 20:29:16 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -22,10 +22,15 @@ dnl       EMail: cups-info@cups.org
 dnl         WWW: http://www.cups.org
 dnl
 
+dnl We need at least autoconf 2.13...
+AC_PREREQ(2.13)
+
+dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
 
 dnl Default compiler flags...
 CFLAGS="${CFLAGS:=}"
+CPPFLAGS="${CPPFLAGS:=}"
 CXXFLAGS="${CXXFLAGS:=}"
 LDFLAGS="${LDFLAGS:=}"
 
@@ -146,5 +151,5 @@ esac
 AC_SUBST(ARFLAGS)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.14 2002/01/12 21:31:01 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.15 2002/01/14 20:29:16 mike Exp $".
 dnl

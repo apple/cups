@@ -1,133 +1,133 @@
 iso-8859-1
-Procedi 
+Continua
 Annulla
-Aiuto 
-Esci 
-Chiudi 
-Sì 
-No 
-Attivo 
+Aiuto
+Esci
+Chiudi
+Sì
+No
+Attivo
 Inattivo
-Salva 
-Scarta 
-Standard 
-Opzioni 
-Più Informazioni 
-Nero 
-Colore 
-Ciano 
-Fucsia 
-Giallo 
-Copyright 1993-2002 di Easy Software Products, tutti i diritti riservati. 
+Salva
+Abbandona
+Predefinito
+Opzioni
+Maggiori informazioni
+Nero
+Colore
+Ciano
+Fucsia
+Giallo
+Copyright 1993-2002 Easy Software Products, tutti i diritti riservati.
 Generale
-Stampante 
+Stampante
 Immagini
 HP-GL/2
-Extra 
-Documento 
-Altro 
-Stampa delle pagine: 
-Intero Documento 
-Stampa intervallo: 
-Ordine inverso: 
-Formato della pagina: 
- 1-Up 
- 2-Up 
- 4-Up 
-Scaling dell'immagine: 
-Usa formato naturale dell'immagine
-Zoom in percentuale 
-Zoom in PPI 
-Immagine riflessa: 
-Saturazione del colore: 
-Tonalità del colore: 
-Adatta alla pagina: 
-Ombreggiatura: 
-Larghezza della penna: 
-Correzione Gamma: 
-Luminosità: 
-Aggiungi 
-Cancella 
-Modifica 
-URI della stampante 
-Nome della stampante 
-Collocazione della stampante 
-Informazioni sulla stampante 
-Produttore e modello della stampante 
-URI Del Dispositivo 
-Preparazione della pagina 
-Stampa della  Pagina 
-Inizializzazione Stampante 
-Condizione della stampante 
-Sto accettando le richieste di stampa
-Non sto accettando le richieste di stampa 
-Richieste di stampa 
-Codice categoria 
-Locale 
-Remoto 
+Extra
+Documento
+Altro
+Stampa delle pagine:
+Intero Documento
+Stampa intervallo:
+Ordine inverso:
+Formato della pagina:
+ 1-Up
+ 2-Up
+ 4-Up
+Dimensione dell'immagine:
+Usa dimensione originale dell'immagine
+Zoom in percentuale
+Zoom in PPI
+Immagine riflessa:
+Saturazione del colore:
+Tonalità del colore:
+Adatta alla pagina:
+Ombreggiatura:
+Larghezza della penna:
+Correzione gamma:
+Luminosità:
+Aggiungi
+Cancella
+Modifica
+URI della stampante
+Nome della stampante
+Collocazione della stampante
+Informazioni sulla stampante
+Produttore e modello della stampante
+URI del dispositivo
+Preparazione della pagina
+Stampa della pagina
+Inizializzazione della stampante
+Stato della stampante
+Accettazione dei lavori di stampa abilitata
+Accettazione dei lavori di stampa disabilitata
+Richieste di stampa
+Categoria
+Locale
+Remoto
 Fronte-retro
-Sto cucendo con punti metallici 
+Spillatura in corso
 Copie veloci
 Copie fascicolate
 Perforazione delle pagine (per fascicolatura)
-Inserendo copertina 
-Applicando fascicolatura 
-Ordinando 
-Piccolo (fino a 9.5x1în) 
-Medio (9.5x1în - 13x19in) 
-Grande (13x19in e più grande) 
-Formato personalizzato 
-Idle 
-Elaborando 
-Arrestato 
-Tutto 
-Dispari 
+Inserimento copertina in corso
+Fascicolatura in corso
+Ordinamento in corso
+Piccolo (fino a 9.5x14")
+Medio (da 9.5x14" a 13x19")
+Grande (13x19" o maggiore)
+Formato personalizzato
+In attesa
+In elaborazione
+Fermo
+Tutto
+Dispari
 Pari
-Più Scuro       Più Luminoso 
-Formato del supporto 
-Tipo del supporto 
-Sorgente del supporto 
-Orientamento: 
-Verticale 
-Orizzontale 
-Condizione di lavoro
-Nome di lavoro
-Nome dell' utente
-Priorita'
+Più scuro       Più chiaro
+Formato del supporto
+Tipo del supporto
+Sorgente del supporto
+Orientamento:
+Verticale
+Orizzontale
+Stato del processo
+Nome del processo
+Nome dell'utente
+Priorità
 Copie
 Dimensioni del file
 In attesa
 Modo stampa
 Risoluzione
 Testo
-Speciale stampa 
+Stampa di qualità
 Margini
-Sinistra
-Destra
+Sinistro
+Destro
 Inferiore
 Superiore
-Nome(s)
+Nome/i file
 Stampa
-400 Il vostro browser ha trasmesso una richiesta che questo server non ha capito 
-Questo server non ha potuto verificare che siete autorizzati ad accedere alla risorsa. 
-Dovete pagare accedere a questo server. 
-Non avete il permesso di accedere alla risorsa richiesta su questo server. 
-La risorsa chiesta non è stata trovata su questo server. 
-Il metodo richiesto non è consentito con la risorsa desiderata. 
-Una rappresentazione adatta per la risorsa non è stata trovata su questo server. 
+400 Il vostro browser ha inviato una richiesta che non può essere eseguita su questo server.
+Questo server non ha potuto verificare la vostra autorizzazione ad accedere alla risorsa.
+L'accesso a questo servizio è a pagamento.
+Non avete il permesso di accedere alla risorsa richiesta su questo server.
+La risorsa richiesta non è disponibile su questo server.
+Il metodo richiesto non è consentito con la risorsa selezionata.
+Una rappresentazione adatta per la risorsa non è disponibile su questo server.
 Non avete il permesso utilizzare questo server come proxy.
-La richiesta ha impiegato troppo tempo per essere completata ed è stata abbandonata. 
-La risorsa chiesta ha più di un valore. 
-La risorsa chiesta non e' piu' disponibile e non è stata ancora rimpiazzata. 
-Il metodo chiesto richiede un campo "Content-Length"  valido.
-I prerequisiti per la richiesta non sono soddisfatti.
-La richiesta è troppo grande per essere elaborata da questo server.
-L'URI della richiesta è troppo grande per essere elaborato da questo server.
-Il formato della richiesta non è capito da questo server. 
-426 An upgrade to a secure connection is required. If you are seeing this message in a web browser then it does not support HTTP encryption upgrades.
-500 Il server ha rilevato un errore non recuperabile e non può elaborare la vostra richiesta. 
-Il metodo chiesto non è implementato da questo server. 
+La richiesta ha impiegato troppo tempo per essere completata ed è stata annullata.
+La risorsa richiesta ha più di un valore.
+La risorsa richiesta non è più disponibile e non è stata ancora sostituita.
+Il metodo chiesto richiede un campo "Content-Length" valido.
+I prerequisiti per la richiesta non possono essere soddisfatti.
+La richiesta è troppo grande per essere eseguita da questo server.
+L'URI richiesta è troppo grande per essere eseguita da questo server.
+Il formato della richiesta non è valido su questo server.
+426 È richiesto il passaggio ad una connessione sicura. Se state leggendo questo messaggio nella finestra del vostro browser web vuol dire che non è in grado di supportare il funzionamento con HTTP crittografato.
+500 Il server ha rilevato un errore non recuperabile e non può eseguire la vostra richiesta.
+Il metodo richiesto non è implementato da questo server.
 Il proxy server ha ricevuto una risposta non valida da un server di livello superiore.
-La risorsa chiesta è attualmente non disponibile su questo server. 
-Il proxy server ha impiegato troppo tempo per rispondere a questo server. 
-Questo server non supporta la versione HTTP richiesta dal vostro browser. 
+La risorsa richiesta non è attualmente disponibile su questo server.
+Il proxy server ha impiegato troppo tempo per rispondere a questo server.
+Questo server non supporta la versione HTTP richiesta dal vostro browser.
