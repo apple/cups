@@ -1,5 +1,5 @@
 /*
- * "$Id: image-photocd.c,v 1.4 1999/03/25 20:39:06 mike Exp $"
+ * "$Id: image-photocd.c,v 1.5 1999/03/25 21:49:38 mike Exp $"
  *
  *   PhotoCD routines for the Common UNIX Printing System (CUPS).
  *
@@ -38,17 +38,24 @@
  * require a lot of extra code...
  */
 
-int
-ImageReadPhotoCD(image_t *img,
-                 FILE    *fp,
-                 int     primary,
-                 int     secondary,
-        	 int     saturation,
-        	 int     hue)
+/*
+ * 'ImageReadPhotoCD()' - Read a PhotoCD image from the specified file.
+ */
+
+int					/* O - 0 = success, non-0 = failure */
+ImageReadPhotoCD(image_t *img,		/* I - Image to store in */
+                 FILE    *fp,		/* I - File to read from */
+                 int     primary,	/* I - Primary colorspace */
+                 int     secondary,	/* I - Secondary colorspace */
+        	 int     saturation,	/* I - Desired color saturation */
+        	 int     hue)		/* I - Desired color hue */
 {
   int		x, y;		/* Looping vars */
+  int		xdir,		/* X direction */
+		xstart;		/* X starting point */
   int		bpp;		/* Bytes per pixel */
   int		pass;		/* Pass number */
+  int		rotation;	/* 0 for 768x512, 1 for 512x768 */
   int		temp,		/* Adjusted luminance */
 		temp2,		/* Red, green, and blue values */
 		cb, cr;		/* Adjusted chroma values */
@@ -64,35 +71,62 @@ ImageReadPhotoCD(image_t *img,
   (void)secondary;
 
  /*
+  * Get the image orientation...
+  */
+
+  fseek(fp, 72, SEEK_SET);
+  rotation = (getc(fp) & 63) != 8;
+
+ /*
   * Seek to the start of the base image...
   */
 
   fseek(fp, 0x30000, SEEK_SET);
 
  /*
-  * Allocate the initialize...
+  * Allocate and initialize...
   */
 
   img->colorspace = primary;
-  img->xsize      = 768;
-  img->ysize      = 512;
   img->xppi       = 128;
   img->yppi       = 128;
+
+  if (rotation)
+  {
+    img->xsize = 512;
+    img->ysize = 768;
+  }
+  else
+  {
+    img->xsize = 768;
+    img->ysize = 512;
+  }
 
   ImageSetMaxTiles(img, 0);
 
   bpp = ImageGetDepth(img);
   in  = malloc(768 * 3);
-  out = malloc(img->xsize * bpp);
+  out = malloc(768 * bpp);
 
   if (bpp > 1)
     rgb = malloc(768 * 3);
+
+  if (rotation)
+  {
+    xstart = 767 * bpp;
+    xdir   = -2 * bpp;
+  }
+  else
+  {
+    xstart = 0;
+    xdir   = 0;
+  }
 
  /*
   * Read the image file...
   */
 
-  for (y = 0; y < img->ysize; y += 2)
+  for (y = 0; y < 512; y += 2)
   {
    /*
     * Grab the next two scanlines:
@@ -129,13 +163,32 @@ ImageReadPhotoCD(image_t *img,
 
         if (primary == IMAGE_BLACK)
 	{
-          ImageWhiteToBlack(iy, out, img->xsize);
-          ImagePutRow(img, 0, y + pass, img->xsize, out);
+	  if (rotation)
+	  {
+	    for (rgbptr = out + xstart, x = 0; x < 768; x ++)
+	      *rgbptr-- = 255 - *iy++;
+
+            ImagePutCol(img, 511 - y - pass, 0, 768, out);
+	  }
+	  else
+	  {
+            ImageWhiteToBlack(iy, out, 768);
+            ImagePutRow(img, 0, y + pass, 768, out);
+            iy += 768;
+	  }
+	}
+	else if (rotation)
+	{
+	  for (rgbptr = out + xstart, x = 0; x < 768; x ++)
+	    *rgbptr-- = 255 - *iy++;
+
+          ImagePutCol(img, 511 - y - pass, 0, 768, out);
 	}
 	else
-          ImagePutRow(img, 0, y + pass, img->xsize, iy);
-
-        iy += 768;
+	{
+          ImagePutRow(img, 0, y + pass, 768, iy);
+          iy += 768;
+	}
       }
       else
       {
@@ -144,9 +197,9 @@ ImageReadPhotoCD(image_t *img,
 	* value, adjacent pixels share chroma information.
 	*/
 
-        for (x = 0, rgbptr = rgb, icb = in + 1536, icr = in + 1920;
-	     x < img->xsize;
-	     x ++, iy ++)
+        for (x = 0, rgbptr = rgb + xstart, icb = in + 1536, icr = in + 1920;
+	     x < 768;
+	     x ++, iy ++, rgbptr += xdir)
 	{
 	  if (!(x & 1))
 	  {
@@ -194,7 +247,7 @@ ImageReadPhotoCD(image_t *img,
 	*/
 
 	if (saturation != 100 || hue != 0)
-	  ImageRGBAdjust(rgb, img->xsize, saturation, hue);
+	  ImageRGBAdjust(rgb, 768, saturation, hue);
 
        /*
         * Then convert the RGB data to the appropriate colorspace and
@@ -202,20 +255,28 @@ ImageReadPhotoCD(image_t *img,
 	*/
 
         if (img->colorspace == IMAGE_RGB)
-          ImagePutRow(img, 0, y + pass, img->xsize, rgb);
+	{
+	  if (rotation)
+            ImagePutCol(img, 511 - y - pass, 0, 768, rgb);
+	  else
+            ImagePutRow(img, 0, y + pass, 768, rgb);
+	}
 	else
 	{
 	  switch (img->colorspace)
 	  {
 	    case IMAGE_CMY :
-		ImageRGBToCMY(rgb, out, img->xsize);
+		ImageRGBToCMY(rgb, out, 768);
 		break;
 	    case IMAGE_CMYK :
-		ImageRGBToCMYK(rgb, out, img->xsize);
+		ImageRGBToCMYK(rgb, out, 768);
 		break;
 	  }
 
-          ImagePutRow(img, 0, y + pass, img->xsize, out);
+	  if (rotation)
+            ImagePutCol(img, 511 - y - pass, 0, 768, out);
+	  else
+            ImagePutRow(img, 0, y + pass, 768, out);
 	}
       }
     }
@@ -235,5 +296,5 @@ ImageReadPhotoCD(image_t *img,
 
 
 /*
- * End of "$Id: image-photocd.c,v 1.4 1999/03/25 20:39:06 mike Exp $".
+ * End of "$Id: image-photocd.c,v 1.5 1999/03/25 21:49:38 mike Exp $".
  */
