@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.79 2000/11/06 16:18:12 mike Exp $"
+ * "$Id: printers.c,v 1.80 2000/11/17 19:57:14 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -25,10 +25,12 @@
  *
  *   AddPrinter()           - Add a printer to the system.
  *   AddPrinterFilter()     - Add a MIME filter for a printer.
+ *   AddPrinterUser()       - Add a user to the ACL.
  *   DeleteAllPrinters()    - Delete all printers from the system.
  *   DeletePrinter()        - Delete a printer from the system.
  *   DeletePrinterFilters() - Delete all MIME filters for a printer.
  *   FindPrinter()          - Find a printer in the list.
+ *   FindPrinterUsers()     - Free allow/deny users.
  *   LoadAllPrinters()      - Load printers from the printers.conf file.
  *   SaveAllPrinters()      - Save all printer definitions to the printers.conf
  *   SetPrinterAttrs()      - Set printer attributes based upon the PPD file.
@@ -138,8 +140,8 @@ AddPrinter(const char *name)	/* I - Name of printer */
  */
 
 void
-AddPrinterFilter(printer_t *p,		/* I - Printer to add to */
-                 char      *filter)	/* I - Filter to add */
+AddPrinterFilter(printer_t  *p,		/* I - Printer to add to */
+                 const char *filter)	/* I - Filter to add */
 {
   int		i;			/* Looping var */
   char		super[MIME_MAX_SUPER],	/* Super-type for filter */
@@ -186,6 +188,36 @@ AddPrinterFilter(printer_t *p,		/* I - Printer to add to */
                  cost, program);
       mimeAddFilter(MimeDatabase, *temptype, p->filetype, cost, program);
     }
+}
+
+
+/*
+ * 'AddPrinterUser()' - Add a user to the ACL.
+ */
+
+void
+AddPrinterUser(printer_t  *p,		/* I - Printer */
+               const char *username)	/* I - User */
+{
+  const char	**temp;			/* Temporary array pointer */
+
+
+  if (!p || !username)
+    return;
+
+  if (p->num_users == 0)
+    temp = malloc(sizeof(char **));
+  else
+    temp = realloc(p->users, sizeof(char **) * (p->num_users + 1));
+
+  if (!temp)
+    return;
+
+  p->users = temp;
+  temp     += p->num_users;
+
+  if ((*temp = strdup(username)) != NULL)
+    p->num_users ++;
 }
 
 
@@ -289,6 +321,11 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
 
   DeletePrinterFilters(p);
 
+  FreePrinterUsers(p);
+
+  if (p->num_quotas)
+    free(p->quotas);
+
   free(p);
 
  /*
@@ -371,6 +408,29 @@ FindPrinter(const char *name)	/* I - Name of printer to find */
     }
 
   return (NULL);
+}
+
+
+/*
+ * 'FindPrinterUsers()' - Free allow/deny users.
+ */
+
+void
+FreePrinterUsers(printer_t *p)	/* I - Printer */
+{
+  int	i;			/* Looping var */
+
+
+  if (!p || !p->num_users)
+    return;
+
+  for (i = 0; i < p->num_users; i ++)
+    free((void *)p->users[i]);
+
+  free(p->users);
+
+  p->num_users = 0;
+  p->users     = NULL;
 }
 
 
@@ -503,7 +563,6 @@ LoadAllPrinters(void)
 	         linenum);
       return;
     }
-    
     else if (strcmp(name, "Info") == 0)
       strncpy(p->info, value, sizeof(p->info) - 1);
     else if (strcmp(name, "Location") == 0)
@@ -569,6 +628,22 @@ LoadAllPrinters(void)
 	strncpy(p->job_sheets[1], value, sizeof(p->job_sheets[1]) - 1);
       }
     }
+    else if (strcmp(name, "AllowUser") == 0)
+    {
+      p->deny_users = 0;
+      AddPrinterUser(p, value);
+    }
+    else if (strcmp(name, "DenyUser") == 0)
+    {
+      p->deny_users = 1;
+      AddPrinterUser(p, value);
+    }
+    else if (strcmp(name, "QuotaPeriod") == 0)
+      p->quota_period = atoi(value);
+    else if (strcmp(name, "PageLimit") == 0)
+      p->page_limit = atoi(value);
+    else if (strcmp(name, "KLimit") == 0)
+      p->k_limit = atoi(value);
     else
     {
      /*
@@ -592,6 +667,7 @@ LoadAllPrinters(void)
 void
 SaveAllPrinters(void)
 {
+  int		i;			/* Looping var */
   FILE		*fp;			/* printers.conf file */
   char		temp[1024];		/* Temporary string */
   printer_t	*printer;		/* Current printer class */
@@ -666,6 +742,17 @@ SaveAllPrinters(void)
       fputs("Accepting No\n", fp);
     fprintf(fp, "JobSheets %s %s\n", printer->job_sheets[0],
             printer->job_sheets[1]);
+
+    if (printer->quota_period)
+    {
+      fprintf(fp, "QuotaPeriod %d\n", printer->quota_period);
+      fprintf(fp, "PageLimit %d\n", printer->page_limit);
+      fprintf(fp, "KLimit %d\n", printer->k_limit);
+    }
+
+    for (i = 0; i < printer->num_users; i ++)
+      fprintf(fp, "%sUser %s\n", printer->deny_users ? "Deny" : "Allow",
+              printer->users[i]);
 
     fputs("</Printer>\n", fp);
   }
@@ -917,6 +1004,18 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
                  "orientation-requested-supported", 4, (int *)orients);
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                 "orientation-requested-default", IPP_PORTRAIT);
+
+  if (p->num_users)
+  {
+    if (p->deny_users)
+      ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                    "requesting-user-name-denied", p->num_users, NULL,
+		    p->users);
+    else
+      ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                    "requesting-user-name-allowed", p->num_users, NULL,
+		    p->users);
+  }
 
   if (NumBanners > 0)
   {
@@ -1587,5 +1686,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.79 2000/11/06 16:18:12 mike Exp $".
+ * End of "$Id: printers.c,v 1.80 2000/11/17 19:57:14 mike Exp $".
  */

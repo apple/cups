@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h,v 1.19 2000/11/10 15:32:40 mike Exp $"
+ * "$Id: printers.h,v 1.20 2000/11/17 19:57:14 mike Exp $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -21,6 +21,19 @@
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  */
+
+/*
+ * Quota data...
+ */
+
+typedef struct
+{
+  char		username[33];	/* User data */
+  time_t	next_update;	/* Next update time */
+  int		page_count,	/* Count of pages */
+		k_count;	/* Count of kilobytes */
+} quota_t;
+
 
 /*
  * Printer/class information structure...
@@ -52,6 +65,14 @@ typedef struct printer_str
   int		num_printers,		/* Number of printers in class */
 		last_printer;		/* Last printer job was sent to */
   struct printer_str **printers;	/* Printers in class */
+  int		quota_period,		/* Period for quotas */
+		page_limit,		/* Maximum number of pages */
+		k_limit,		/* Maximum number of kilobytes */
+		num_quotas;		/* Number of quota records */
+  quota_t	*quotas;		/* Quota records */
+  int		deny_users,		/* 1 = deny, 0 = allow */
+		num_users;		/* Number of allowed/denied users */
+  const char	**users;		/* Allowed/denied users */
 } printer_t;
 
 
@@ -68,11 +89,15 @@ VAR printer_t		*DefaultPrinter VALUE(NULL);
  */
 
 extern printer_t	*AddPrinter(const char *name);
-extern void		AddPrinterFilter(printer_t *p, char *filter);
+extern void		AddPrinterFilter(printer_t *p, const char *filter);
+extern void		AddPrinterUser(printer_t *p, const char *username);
+extern quota_t		*AddQuota(printer_t *p, const char *username);
 extern void		DeleteAllPrinters(void);
 extern void		DeletePrinter(printer_t *p);
 extern void		DeletePrinterFilters(printer_t *p);
 extern printer_t	*FindPrinter(const char *name);
+extern quota_t		*FindQuota(printer_t *p, const char *username);
+extern void		FreePrinterUsers(printer_t *p);
 extern void		LoadAllPrinters(void);
 extern void		SaveAllPrinters(void);
 extern void		SetPrinterAttrs(printer_t *p);
@@ -80,11 +105,13 @@ extern void		SetPrinterState(printer_t *p, ipp_pstate_t s);
 extern void		SortPrinters(void);
 #define			StartPrinter(p) SetPrinterState((p), IPP_PRINTER_IDLE)
 extern void		StopPrinter(printer_t *p);
+extern quota_t		*UpdateQuota(printer_t *p, const char *username,
+			             int pages, int k);
 extern const char	*ValidateDest(const char *hostname,
 			              const char *resource,
 			              cups_ptype_t *dtype);
 
 
 /*
- * End of "$Id: printers.h,v 1.19 2000/11/10 15:32:40 mike Exp $".
+ * End of "$Id: printers.h,v 1.20 2000/11/17 19:57:14 mike Exp $".
  */

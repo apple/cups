@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.97 2000/11/14 20:06:54 mike Exp $"
+ * "$Id: job.c,v 1.98 2000/11/17 19:57:14 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -28,6 +28,7 @@
  *   CancelJobs()      - Cancel all jobs on the given printer or class.
  *   CheckJobs()       - Check the pending jobs and start any if the
  *                       destination is available.
+ *   CleanJobs()       - Clean out old jobs.
  *   FindJob()         - Find the specified job.
  *   HoldJob()         - Hold the specified job.
  *   LoadAllJobs()     - Load all jobs from disk.
@@ -313,6 +314,30 @@ CheckJobs(void)
     }
     else
       current = current->next;
+  }
+}
+
+
+/*
+ * 'CleanJobs()' - Clean out old jobs.
+ */
+
+void
+CleanJobs(void)
+{
+  job_t	*job,		/* Current job */
+	*next;		/* Next job */
+
+
+  if (MaxJobs == 0)
+    return;
+
+  for (job = Jobs; job && NumJobs >= MaxJobs; job = next)
+  {
+    next = job->next;
+
+    if (job->state->values[0].integer >= IPP_JOB_CANCELLED)
+      CancelJob(job->id, 1);
   }
 }
 
@@ -2590,5 +2615,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.97 2000/11/14 20:06:54 mike Exp $".
+ * End of "$Id: job.c,v 1.98 2000/11/17 19:57:14 mike Exp $".
  */

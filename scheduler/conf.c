@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.61 2000/11/06 16:18:11 mike Exp $"
+ * "$Id: conf.c,v 1.62 2000/11/17 19:57:13 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -109,6 +109,8 @@ static var_t	variables[] =
   { "MaxRequestSize",	&MaxRequestSize,	VAR_INTEGER,	0 },
   { "PreserveJobHistory", &JobHistory,		VAR_BOOLEAN,	0 },
   { "PreserveJobFiles",	&JobFiles,		VAR_BOOLEAN,	0 },
+  { "MaxJobs",		&MaxJobs,		VAR_BOOLEAN,	0 },
+  { "AutoPurgeJobs", 	&JobAutoPurge,		VAR_BOOLEAN,	0 },
   { "FilterLimit",	&FilterLimit,		VAR_INTEGER,	0 }
 };
 #define NUM_VARS	(sizeof(variables) / sizeof(variables[0]))
@@ -1420,5 +1422,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.61 2000/11/06 16:18:11 mike Exp $".
+ * End of "$Id: conf.c,v 1.62 2000/11/17 19:57:13 mike Exp $".
  */

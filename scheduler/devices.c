@@ -1,5 +1,5 @@
 /*
- * "$Id: devices.c,v 1.11 2000/11/03 14:13:29 mike Exp $"
+ * "$Id: devices.c,v 1.12 2000/11/17 19:57:13 mike Exp $"
  *
  *   Device scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -121,6 +121,12 @@ LoadDevices(const char *d)	/* I - Directory to scan */
   alloc_devs = 0;
   num_devs   = 0;
   devs       = (dev_info_t *)0;
+
+ /*
+  * Ignore child signals...
+  */
+
+  IgnoreChildSignals();
 
  /*
   * Loop through all of the device backends...
@@ -294,6 +300,12 @@ LoadDevices(const char *d)	/* I - Directory to scan */
   }
 
   closedir(dir);
+
+ /*
+  * Catch child signals...
+  */
+
+  CatchChildSignals();
 
  /*
   * Sort the available devices...
@@ -470,5 +482,5 @@ sigalrm_handler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: devices.c,v 1.11 2000/11/03 14:13:29 mike Exp $".
+ * End of "$Id: devices.c,v 1.12 2000/11/17 19:57:13 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.51 2000/11/12 20:13:11 mike Exp $"
+ * "$Id: main.c,v 1.52 2000/11/17 19:57:14 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -23,11 +23,13 @@
  *
  * Contents:
  *
- *   main()            - Main entry for the CUPS scheduler.
- *   sigchld_handler() - Handle 'child' signals from old processes.
- *   sighup_handler()  - Handle 'hangup' signals to reconfigure the scheduler.
- *   sigterm_handler() - Handle 'terminate' signals that stop the scheduler.
- *   usage()           - Show scheduler usage.
+ *   main()               - Main entry for the CUPS scheduler.
+ *   CatchChildSignals()  - Catch SIGCHLD signals...
+ *   IgnoreChildSignals() - Ignore SIGCHLD signals...
+ *   sigchld_handler()    - Handle 'child' signals from old processes.
+ *   sighup_handler()     - Handle 'hangup' signals to reconfigure the scheduler.
+ *   sigterm_handler()    - Handle 'terminate' signals that stop the scheduler.
+ *   usage()              - Show scheduler usage.
  */
 
 /*
@@ -204,7 +206,6 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 #ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
   sigset(SIGHUP, sighup_handler);
-  sigset(SIGCHLD, sigchld_handler);
   sigset(SIGPIPE, SIG_IGN);
   sigset(SIGTERM, sigterm_handler);
 #elif defined(HAVE_SIGACTION)
@@ -216,11 +217,6 @@ main(int  argc,			/* I - Number of command-line arguments */
   sigaction(SIGHUP, &action, NULL);
 
   sigemptyset(&action.sa_mask);
-  sigaddset(&action.sa_mask, SIGCHLD);
-  action.sa_handler = sigchld_handler;
-  sigaction(SIGCHLD, &action, NULL);
-
-  sigemptyset(&action.sa_mask);
   action.sa_handler = SIG_IGN;
   sigaction(SIGPIPE, &action, NULL);
 
@@ -230,7 +226,6 @@ main(int  argc,			/* I - Number of command-line arguments */
   sigaction(SIGTERM, &action, NULL);
 #else
   signal(SIGHUP, sighup_handler);
-  signal(SIGCLD, sigchld_handler);	/* No, SIGCLD isn't a typo... */
   signal(SIGPIPE, SIG_IGN);
   signal(SIGTERM, sigterm_handler);
 #endif /* HAVE_SIGSET */
@@ -488,6 +483,59 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
+ * 'CatchChildSignals()' - Catch SIGCHLD signals...
+ */
+
+void
+CatchChildSignals(void)
+{
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction	action;		/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+
+
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+  sigset(SIGCHLD, sigchld_handler);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+
+  sigemptyset(&action.sa_mask);
+  sigaddset(&action.sa_mask, SIGCHLD);
+  action.sa_handler = sigchld_handler;
+  sigaction(SIGCHLD, &action, NULL);
+#else
+  signal(SIGCLD, sigchld_handler);	/* No, SIGCLD isn't a typo... */
+#endif /* HAVE_SIGSET */
+}
+
+
+/*
+ * 'IgnoreChildSignals()' - Ignore SIGCHLD signals...
+ */
+
+void
+IgnoreChildSignals(void)
+{
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction	action;		/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+  sigset(SIGCHLD, SIG_IGN);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+
+  sigemptyset(&action.sa_mask);
+  sigaddset(&action.sa_mask, SIGCHLD);
+  action.sa_handler = SIG_IGN;
+  sigaction(SIGCHLD, &action, NULL);
+#else
+  signal(SIGCLD, SIG_IGN);	/* No, SIGCLD isn't a typo... */
+#endif /* HAVE_SIGSET */
+}
+
+
+/*
  * 'sigchld_handler()' - Handle 'child' signals from old processes.
  */
 
@@ -667,5 +715,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.51 2000/11/12 20:13:11 mike Exp $".
+ * End of "$Id: main.c,v 1.52 2000/11/17 19:57:14 mike Exp $".
  */

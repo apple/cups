@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.22 2000/11/14 20:06:54 mike Exp $"
+ * "$Id: classes.c,v 1.23 2000/11/17 19:57:12 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -457,6 +457,22 @@ LoadAllClasses(void)
       else
         p->accepting = 0;
     }
+    else if (strcmp(name, "AllowUser") == 0)
+    {
+      p->deny_users = 0;
+      AddPrinterUser(p, value);
+    }
+    else if (strcmp(name, "DenyUser") == 0)
+    {
+      p->deny_users = 1;
+      AddPrinterUser(p, value);
+    }
+    else if (strcmp(name, "QuotaPeriod") == 0)
+      p->quota_period = atoi(value);
+    else if (strcmp(name, "PageLimit") == 0)
+      p->page_limit = atoi(value);
+    else if (strcmp(name, "KLimit") == 0)
+      p->k_limit = atoi(value);
     else
     {
      /*
@@ -554,6 +570,17 @@ SaveAllClasses(void)
     for (i = 0; i < pclass->num_printers; i ++)
       fprintf(fp, "Printer %s\n", pclass->printers[i]->name);
 
+    if (pclass->quota_period)
+    {
+      fprintf(fp, "QuotaPeriod %d\n", pclass->quota_period);
+      fprintf(fp, "PageLimit %d\n", pclass->page_limit);
+      fprintf(fp, "KLimit %d\n", pclass->k_limit);
+    }
+
+    for (i = 0; i < pclass->num_users; i ++)
+      fprintf(fp, "%sUser %s\n", pclass->deny_users ? "Deny" : "Allow",
+              pclass->users[i]);
+
     fputs("</Class>\n", fp);
   }
 
@@ -562,5 +589,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.22 2000/11/14 20:06:54 mike Exp $".
+ * End of "$Id: classes.c,v 1.23 2000/11/17 19:57:12 mike Exp $".
  */

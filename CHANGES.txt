@@ -1,4 +1,4 @@
-CHANGES.txt - 11/11/2000
+CHANGES.txt - 11/17/2000
 ------------------------
 
 CHANGES IN CUPS V1.1.5
@@ -117,6 +117,11 @@ CHANGES IN CUPS V1.1.5
 	  descriptors to the maximum select() set size.  This
           was causing problems on Solaris systems where the
           max FD count was increased beyond 1024.
+	- The scheduler's LoadDevices() function was getting
+	  interrupted by the SIGCHLD signal handler; now ignore
+	  child signals while loading devices.
+	- Added quota and allow/deny user support for printers
+	  and classes.
 
 
 CHANGES IN CUPS v1.1.4

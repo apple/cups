@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.106 2000/11/10 16:28:02 mike Exp $"
+ * "$Id: ipp.c,v 1.107 2000/11/17 19:57:13 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1652,6 +1652,7 @@ static void
 create_job(client_t        *con,	/* I - Client connection */
 	   ipp_attribute_t *uri)	/* I - Printer URI */
 {
+  int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Current attribute */
   const char		*dest;		/* Destination */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
@@ -1731,6 +1732,44 @@ create_job(client_t        *con,	/* I - Client connection */
     send_ipp_error(con, IPP_NOT_ACCEPTING);
     return;
   }
+
+ /*
+  * Make sure we aren't over our limit...
+  */
+
+  if (NumJobs >= MaxJobs && MaxJobs)
+    CleanJobs();
+
+  if (NumJobs >= MaxJobs && MaxJobs)
+  {
+    LogMessage(L_INFO, "create_job: too many jobs.");
+    send_ipp_error(con, IPP_NOT_POSSIBLE);
+    return;
+  }
+
+ /*
+  * Figure out who is printing...
+  */
+
+  attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME);
+
+  if (con->username[0])
+  {
+    strncpy(job->username, con->username, sizeof(job->username) - 1);
+    job->username[sizeof(job->username) - 1] = '\0';
+  }
+  else if (attr != NULL)
+  {
+    LogMessage(L_DEBUG, "create_job: requesting-user-name = \'%s\'",
+               attr->values[0].string.text);
+
+    strncpy(job->username, attr->values[0].string.text,
+            sizeof(job->username) - 1);
+    job->username[sizeof(job->username) - 1] = '\0';
+  }
+  else
+    strcpy(job->username, "anonymous");
+
 
  /*
   * Create the job and set things up...
@@ -3287,6 +3326,20 @@ print_job(client_t        *con,		/* I - Client connection */
     LogMessage(L_INFO, "print_job: destination \'%s\' is not accepting jobs.",
                dest);
     send_ipp_error(con, IPP_NOT_ACCEPTING);
+    return;
+  }
+
+ /*
+  * Make sure we aren't over our limit...
+  */
+
+  if (NumJobs >= MaxJobs && MaxJobs)
+    CleanJobs();
+
+  if (NumJobs >= MaxJobs && MaxJobs)
+  {
+    LogMessage(L_INFO, "print_job: too many jobs.");
+    send_ipp_error(con, IPP_NOT_POSSIBLE);
     return;
   }
 
@@ -4873,5 +4926,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.106 2000/11/10 16:28:02 mike Exp $".
+ * End of "$Id: ipp.c,v 1.107 2000/11/17 19:57:13 mike Exp $".
  */
