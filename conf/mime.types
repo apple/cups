@@ -1,5 +1,5 @@
 #
-# "$Id: mime.types,v 1.7 2000/04/18 19:41:07 mike Exp $"
+# "$Id: mime.types,v 1.8 2000/04/24 21:01:27 mike Exp $"
 #
 #   MIME types file for the Common UNIX Printing System (CUPS).
 #
@@ -82,7 +82,11 @@ application/vnd.hp-HPGL		hpgl string(0,<1b>%) string(0,<1b>&)\
 
 image/gif			gif string(0,GIF87a) string(0,GIF89a)
 image/png			png string(0,<89>PNG)
-image/jpeg			jpeg jpg jpe string(6,JFIF)
+image/jpeg			jpeg jpg jpe string(0,<FFD8FF>) &&\
+				(char(3,0xe0) char(3,0xe1) char(3,0xe2) char(3,0xe3)\
+				 char(3,0xe4) char(3,0xe5) char(3,0xe6) char(3,0xe7)\
+				 char(3,0xe8) char(3,0xe9) char(3,0xea) char(3,0xeb)\
+				 char(3,0xec) char(3,0xed) char(3,0xee) char(3,0xef))
 image/tiff			tiff tif string(0,MM) string(0,II)
 image/x-photocd			pcd string(2048,PCD_IPI)
 image/x-portable-anymap		pnm
@@ -120,5 +124,5 @@ application/vnd.cups-raster	string(0,"RaSt") string(0,"tSaR")
 application/vnd.cups-raw
 
 #
-# End of "$Id: mime.types,v 1.7 2000/04/18 19:41:07 mike Exp $".
+# End of "$Id: mime.types,v 1.8 2000/04/24 21:01:27 mike Exp $".
 #
