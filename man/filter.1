@@ -40,6 +40,9 @@ EENNVVIIRROONNMMEENNTT VVAARRIIAABBLLEESS
        CUPS_DATADIR
             The directory where data files can be found.
 
+       CUPS_SERVERROOT
+            The root directory of the server.
+
        DEVICE_URI
             The device-uri associated with the printer.
 
@@ -54,10 +57,7 @@ EENNVVIIRROONNMMEENNTT VVAARRIIAABBLLEESS
             The full pathname of the PostScript Printer  Descrip-
             tion (PPD) file for this printer.
 
-       PRINTER
-            The  name  of the printer; this is provided for shell
-            scripts which may not  be  able  to  get  the  passed
-            argv[0] string.
+
 
 
 
@@ -70,12 +70,14 @@ EENNVVIIRROONNMMEENNTT VVAARRIIAABBLLEESS
 filter(1)             Easy Software Products            filter(1)
 
 
+       PRINTER
+            The  name  of the printer; this is provided for shell
+            scripts which may not  be  able  to  get  the  passed
+            argv[0] string.
+
        RIP_CACHE
             The  recommended  amount  of memory to use for Raster
             Image Processors (RIPs).
-
-       SERVER_ROOT
-            The root directory of the server.
 
        SOFTWARE
             The name and version number of the server  (typically
@@ -102,8 +104,6 @@ SSEEEE AALLSSOO
 CCOOPPYYRRIIGGHHTT
        Copyright  1993-2000 by Easy Software Products, All Rights
        Reserved.
-
-
 
 
 
