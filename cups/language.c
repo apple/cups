@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.34 2003/04/18 13:25:06 mike Exp $"
+ * "$Id: language.c,v 1.35 2003/04/18 13:27:08 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -86,8 +86,8 @@ static const char * const lang_encodings[] =	/* Encoding strings */
 			  "windows-1256",
 			  "windows-1257",
 			  "windows-1258",
-			  "koi8r",
-			  "koi8u"
+			  "koi8-r",
+			  "koi8-u"
 			};
 static const char * const lang_default[] =	/* Default POSIX locale */
 			{
@@ -197,8 +197,8 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 		  "CP1256",
 		  "CP1257",
 		  "CP1258",
-		  "KOI8-R",
-		  "KOI8-U"
+		  "KOI8R",
+		  "KOI8U"
 		};
 
 
@@ -639,5 +639,5 @@ appleLangDefault(void)
 
 
 /*
- * End of "$Id: language.c,v 1.34 2003/04/18 13:25:06 mike Exp $".
+ * End of "$Id: language.c,v 1.35 2003/04/18 13:27:08 mike Exp $".
  */
