@@ -2,7 +2,7 @@
 <HEAD>
 	<META NAME="Description" CONTENT="Common UNIX Printing System Software Users Manual">
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SUM-1.0.0">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SUM-1.0.1">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Users Manual</TITLE>
 </HEAD>
@@ -11,7 +11,7 @@
 <H1 ALIGN=RIGHT>Preface</H1>
 
 This software users manual describes how to use the Common UNIX Printing
-System ("CUPS") Version 1.0.0.
+System ("CUPS") Version 1.0.1.
 
 <H2>System Overview</H2>
 
@@ -359,14 +359,15 @@ landscape orientation:
 
 <H3>Printing On Both Sides of the Paper</H3>
 
-<P>The "-o sides=two-sided-short" and "-o sides=two-sided-long" options will
-enable duplexing on the printer (if the printer supports it.) The "two-sided-short"
-option is suitable for landscape pages, while the "two-sided-long" option is
-suitable for portrait pages:
+<P>The "-o sides=two-sided-short-edge" and "-o
+sides=two-sided-long-edge" options will enable duplexing on the
+printer (if the printer supports it.) The "two-sided-short"
+option is suitable for landscape pages, while the
+"two-sided-long" option is suitable for portrait pages:
 
 <UL><PRE>
-% lp -o sides=two-sided-short filename ENTER
-% lp -o sides=two-sided-long filename ENTER
+% lp -o sides=two-sided-short-edge filename ENTER
+% lp -o sides=two-sided-long-edge filename ENTER
 </PRE></UL>
 
 <H3>Selecting a Range of Pages</H3>
