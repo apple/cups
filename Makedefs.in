@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.4 1999/04/21 22:50:17 mike Exp $"
+# "$Id: Makedefs.in,v 1.5 1999/04/22 20:18:16 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -29,6 +29,7 @@
 #
 
 AR	=	@AR@
+AWK	=	@AWK@
 CC	=	@CC@
 CP	=	@CP@
 CXX	=	@CXX@
@@ -112,5 +113,5 @@ SBINDIR	=	@sbindir@
 	mv t $@
 
 #
-# End of "$Id: Makedefs.in,v 1.4 1999/04/21 22:50:17 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.5 1999/04/22 20:18:16 mike Exp $"
 #

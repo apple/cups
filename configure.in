@@ -1,33 +1,33 @@
-dnl#
-dnl# "$Id: configure.in,v 1.6 1999/04/22 15:02:37 mike Exp $"
-dnl#
-dnl#   Configuration script for the Common UNIX Printing System (CUPS).
-dnl#
-dnl#   Copyright 1997-1999 by Easy Software Products, all rights reserved.
-dnl#
-dnl#   These coded instructions, statements, and computer programs are the
-dnl#   property of Easy Software Products and are protected by Federal
-dnl#   copyright law.  Distribution and use rights are outlined in the file
-dnl#   "LICENSE.txt" which should have been included with this file.  If this
-dnl#   file is missing or damaged please contact Easy Software Products
-dnl#   at:
-dnl#
-dnl#       Attn: CUPS Licensing Information
-dnl#       Easy Software Products
-dnl#       44145 Airport View Drive, Suite 204
-dnl#       Hollywood, Maryland 20636-3111 USA
-dnl#
-dnl#       Voice: (301) 373-9603
-dnl#       EMail: cups-info@cups.org
-dnl#         WWW: http://www.cups.org
-dnl#
+dnl
+dnl "$Id: configure.in,v 1.7 1999/04/22 20:18:17 mike Exp $"
+dnl
+dnl   Configuration script for the Common UNIX Printing System (CUPS).
+dnl
+dnl   Copyright 1997-1999 by Easy Software Products, all rights reserved.
+dnl
+dnl   These coded instructions, statements, and computer programs are the
+dnl   property of Easy Software Products and are protected by Federal
+dnl   copyright law.  Distribution and use rights are outlined in the file
+dnl   "LICENSE.txt" which should have been included with this file.  If this
+dnl   file is missing or damaged please contact Easy Software Products
+dnl   at:
+dnl
+dnl       Attn: CUPS Licensing Information
+dnl       Easy Software Products
+dnl       44145 Airport View Drive, Suite 204
+dnl       Hollywood, Maryland 20636-3111 USA
+dnl
+dnl       Voice: (301) 373-9603
+dnl       EMail: cups-info@cups.org
+dnl         WWW: http://www.cups.org
+dnl
 
 AC_INIT(cups/cups.h)
 AC_CONFIG_HEADER(config.h)
 AC_PREFIX_DEFAULT(/usr)
 
-dnl# Clear default debugging options and set normal optimization by
-dnl# default unless the user asks for debugging specifically.
+dnl Clear default debugging options and set normal optimization by
+dnl default unless the user asks for debugging specifically.
 
 CFLAGS="${CFLAGS:=}"
 CXXFLAGS="${CXXFLAGS:=}"
@@ -39,7 +39,8 @@ if eval "test x$enable_debug = xyes"; then
 	OPTIM="-g"
 fi)
 
-dnl# Checks for programs...
+dnl Checks for programs...
+AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_CPP
@@ -52,15 +53,15 @@ AC_PATH_PROG(FLUID,fluid)
 AC_PATH_PROG(GROFF,groff)
 AC_PATH_PROG(HTMLDOC,htmldoc)
 
-dnl# Architecture checks...
+dnl Architecture checks...
 AC_C_BIGENDIAN
 uname=`uname`
 if test "$uname" = "IRIX64"; then
 	uname=IRIX
 fi
 
-dnl# Check for libraries...
-AC_CHECK_LIB(crypt,crypt)
+dnl Check for libraries...
+AC_CHECK_LIB(c,crypt,LIBS="$LIBS",AC_CHECK_LIB(crypt,crypt))
 AC_CHECK_LIB(sec,getspent)
 AC_CHECK_LIB(socket,socket,
 if test "$uname" != "IRIX"; then
@@ -78,21 +79,21 @@ fi)
 AC_PATH_X
 if test "$x_libraries" = "/usr/lib"; then
 	echo "Ignoring X library directory \"$x_libraries\" requested by configure."
-	x_libraries=""
+	x_libraries="NONE"
 fi
 if test "$x_includes" = "/usr/include"; then
 	echo "Ignoring X include directory \"$x_includes\" requested by configure."
-	x_includes=""
+	x_includes="NONE"
 fi
 GUILIBS=""
 AC_SUBST(GUILIBS)
 AC_CHECK_HEADER(FL/Fl.H,AC_DEFINE(HAVE_LIBFLTK)
-if test "$x_libraries" = ""; then
+if test "$x_libraries" = "NONE"; then
 	GUILIBS="-lfltk -lX11 -lXext"
 else
 	GUILIBS="-L$x_libraries -lfltk -lX11 -lXext"
 fi
-if test "$x_includes" != ""; then
+if test "$x_includes" != "NONE"; then
 	CFLAGS="$CFLAGS -I$x_includes"
 	CXXFLAGS="$CXXFLAGS -I$x_includes"
 fi)
@@ -108,33 +109,33 @@ IMGLIBS="$IMGLIBS -ltiff")
 AC_CHECK_LIB(z,deflate,AC_DEFINE(HAVE_LIBZ)
 IMGLIBS="$IMGLIBS -lz")
 
-dnl# Checks for header files.
+dnl Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_DIRENT
 AC_CHECK_HEADER(shadow.h,AC_DEFINE(HAVE_SHADOW_H))
 
-dnl# Checks for string functions.
+dnl Checks for string functions.
 AC_CHECK_FUNCS(strdup)
 AC_CHECK_FUNCS(strcasecmp)
 AC_CHECK_FUNCS(strncasecmp)
 
-dnl# Fix "prefix" variable if it hasn't been specified...
+dnl Fix "prefix" variable if it hasn't been specified...
 if test "$prefix" = "NONE"; then
 	prefix="/usr"
 fi
 
-dnl# SERVERDIR needs special attention for the default location...
+dnl SERVERDIR needs special attention for the default location...
 if test "$prefix" = "/usr"; then
 	AC_DEFINE(SERVERDIR, "/var/cups")
 else
 	AC_DEFINE_UNQUOTED(SERVERDIR, "$prefix/var/cups")
 fi
 
-dnl# Set the LOCALE directory...
+dnl Set the LOCALE directory...
 AC_DEFINE_UNQUOTED(LOCALEDIR, "$prefix/lib/locale")
 
 AC_OUTPUT(Makedefs)
 
-dnl#
-dnl# End of "$Id: configure.in,v 1.6 1999/04/22 15:02:37 mike Exp $".
-dnl#
+dnl
+dnl End of "$Id: configure.in,v 1.7 1999/04/22 20:18:17 mike Exp $".
+dnl
