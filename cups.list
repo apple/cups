@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.8 1999/06/21 20:14:24 mike Exp $"
+# "$Id: cups.list,v 1.9 1999/06/30 21:07:14 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -57,7 +57,7 @@ f 0555 root sys /var/cups/filter/imagetoraster filter/imagetoraster
 f 0555 root sys /usr/bin/lp systemv/lp
 f 0555 root sys /usr/bin/lpstat systemv/lpstat
 f 0555 root sys /usr/lib/lpadmin systemv/lpadmin
-f 0555 root sys /usr/lib/cancel systemv/cancel
+f 0555 root sys /usr/bin/cancel systemv/cancel
 f 0555 root sys /usr/lib/accept systemv/accept
 l 0555 root sys /usr/lib/reject accept
 l 0555 root sys /usr/bin/disable /usr/lib/accept
@@ -305,5 +305,5 @@ l 0555 root sys /etc/rc0.d/K20lp ../init.d/lp
 l 0555 root sys /etc/rc2.d/S80lp ../init.d/lp
 
 #
-# End of "$Id: cups.list,v 1.8 1999/06/21 20:14:24 mike Exp $".
+# End of "$Id: cups.list,v 1.9 1999/06/30 21:07:14 mike Exp $".
 #
