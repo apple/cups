@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-input.c,v 1.2 1996/10/14 16:50:14 mike Exp $"
+ * "$Id: hpgl-input.c,v 1.3 1997/05/02 14:52:03 mike Exp $"
  *
  *   HPGL input processing for espPrint, a collection of printer drivers.
  *
@@ -19,7 +19,11 @@
  * Revision History:
  *
  *   $Log: hpgl-input.c,v $
- *   Revision 1.2  1996/10/14 16:50:14  mike
+ *   Revision 1.3  1997/05/02 14:52:03  mike
+ *   Updated ParseCommand() to range-check parameter buffer additions.
+ *   Increased the maximum number of parameters from 1000 to 16384.
+ *
+ *   Revision 1.2  1996/10/14  16:50:14  mike
  *   Updated for 3.2 release.
  *   Added 'blackplot', grayscale, and default pen width options.
  *   Added encoded polyline support.
@@ -37,7 +41,7 @@
 #include "hpgl2ps.h"
 #include <ctype.h>
 
-#define MAX_PARAMS 1000
+#define MAX_PARAMS 16384
 
 
 /*
@@ -53,8 +57,8 @@ ParseCommand(char    *name,	/* O - Name of command */
   int	num_params,	/* Number of parameters seen */
 	ch,		/* Current char */
 	done;		/* Non-zero when the current command is read */
-  int	i;
-  char	buf[262144];
+  int	i;		/* Looping var */
+  char	buf[262144];	/* String buffer */
   static param_t	p[MAX_PARAMS];
   			/* Parameter buffer */
 
@@ -164,17 +168,23 @@ ParseCommand(char    *name,	/* O - Name of command */
 
       case '\"' :
           fscanf(InputFile, "%[^\"]\"", buf);
-          p[num_params].type = PARAM_STRING;
-          p[num_params].value.string = strdup(buf);
-          num_params ++;
+          if (num_params < MAX_PARAMS)
+          {
+            p[num_params].type = PARAM_STRING;
+            p[num_params].value.string = strdup(buf);
+            num_params ++;
+          };
           break;
 
       case '-' :
       case '+' :
           ungetc(ch, InputFile);
           fscanf(InputFile, "%f", &(p[num_params].value.number));
-          p[num_params].type = PARAM_RELATIVE;
-          num_params ++;
+          if (num_params < MAX_PARAMS)
+          {
+            p[num_params].type = PARAM_RELATIVE;
+            num_params ++;
+          };
           break;
       case '0' :
       case '1' :
@@ -189,8 +199,11 @@ ParseCommand(char    *name,	/* O - Name of command */
       case '.' :
           ungetc(ch, InputFile);
           fscanf(InputFile, "%f", &(p[num_params].value.number));
-          p[num_params].type = PARAM_ABSOLUTE;
-          num_params ++;
+          if (num_params < MAX_PARAMS)
+          {
+            p[num_params].type = PARAM_ABSOLUTE;
+            num_params ++;
+          };
           break;
       default :
           ungetc(ch, InputFile);
@@ -221,5 +234,5 @@ FreeParameters(int     num_params, /* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-input.c,v 1.2 1996/10/14 16:50:14 mike Exp $".
+ * End of "$Id: hpgl-input.c,v 1.3 1997/05/02 14:52:03 mike Exp $".
  */
