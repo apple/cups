@@ -1,4 +1,4 @@
-CHANGES.txt - 07/18/2001
+CHANGES.txt - 07/20/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.10
@@ -18,6 +18,11 @@ CHANGES IN CUPS V1.1.10
 	- The scheduler did not properly handle trailing null
 	  ("-") filters when testing a driver that sent data
 	  to the file: pseudo-backend.
+	- The IPP backend now only sends a document-format of
+	  "application/vnd.cups-raw" when printing to another
+	  CUPS server using a local printer driver or interface
+	  script.  Previously the job's document format was
+	  used, which was incorrect.
 
 
 CHANGES IN CUPS V1.1.9-1

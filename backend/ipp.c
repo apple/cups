@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.49 2001/07/20 17:00:37 mike Exp $"
+ * "$Id: ipp.c,v 1.50 2001/07/20 17:04:09 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -434,7 +434,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     if (argc > 6)
       content_type = getenv("CONTENT_TYPE");
     else
-      content_type = NULL;
+      content_type = "application/vnd.cups-raw";
 
     if (content_type != NULL && format_sup != NULL)
     {
@@ -644,5 +644,5 @@ password_cb(const char *prompt)	/* I - Prompt (not used) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.49 2001/07/20 17:00:37 mike Exp $".
+ * End of "$Id: ipp.c,v 1.50 2001/07/20 17:04:09 mike Exp $".
  */
