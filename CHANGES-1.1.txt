@@ -3,6 +3,12 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The test suite no longer generates a printcap file,
+	  which caused problems when testing as the root user
+	  (STR #693)
+	- The scheduler now updates the accepting state of an
+	  implicit class based upon the accepting state of its
+	  member printers (STR #697)
 	- The pstops filter didn't properly skip leading PJL
 	  commands (STR #664)
 	- The reinterpret_cast keyword was not highlighted when
