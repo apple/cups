@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.12 1999/04/21 14:12:16 mike Exp $"
+ * "$Id: emit.c,v 1.13 1999/09/13 20:05:47 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -107,7 +107,7 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
 	  */
 
 	  fputs("pop pop pop\n", fp);
-	  fputs("<</PageSize[7 -2 roll]/ImagingBBox null>>setpagedevice\n", fp);
+	  fputs("<</PageSize[5 -2 roll]/ImagingBBox null>>setpagedevice\n", fp);
 	}
       }
 
@@ -297,5 +297,5 @@ ppd_collect(ppd_file_t    *ppd,		/* I - PPD file data */
 
 
 /*
- * End of "$Id: emit.c,v 1.12 1999/04/21 14:12:16 mike Exp $".
+ * End of "$Id: emit.c,v 1.13 1999/09/13 20:05:47 mike Exp $".
  */
