@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.20 2003/02/28 21:07:35 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.21 2003/05/14 00:04:32 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -658,6 +658,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 	 
       if (verbose >= 0)
       {
+        ppdMarkDefaults(ppd);
+	if (ppdConflicts(ppd))
+	  puts("        WARN    Default choices conflicting!");
+
         if (ppdversion < 43)
 	{
           printf("        WARN    Obsolete PPD version %.1f!\n",
@@ -871,5 +875,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.20 2003/02/28 21:07:35 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.21 2003/05/14 00:04:32 mike Exp $".
  */
