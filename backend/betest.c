@@ -1,9 +1,9 @@
 /*
- * "$Id: betest.c,v 1.3.2.2 2002/03/01 19:55:07 mike Exp $"
+ * "$Id: betest.c,v 1.3.2.3 2003/01/07 18:26:14 mike Exp $"
  *
  *   Backend test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -83,5 +83,5 @@ main(int  argc,		/* I - Number of command-line arguments (7 or 8) */
 
 
 /*
- * End of "$Id: betest.c,v 1.3.2.2 2002/03/01 19:55:07 mike Exp $".
+ * End of "$Id: betest.c,v 1.3.2.3 2003/01/07 18:26:14 mike Exp $".
  */

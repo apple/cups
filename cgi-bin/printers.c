@@ -1,9 +1,9 @@
 /*
- * "$Id: printers.c,v 1.21.2.6 2002/12/10 19:14:05 mike Exp $"
+ * "$Id: printers.c,v 1.21.2.7 2003/01/07 18:26:20 mike Exp $"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -356,5 +356,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: printers.c,v 1.21.2.6 2002/12/10 19:14:05 mike Exp $".
+ * End of "$Id: printers.c,v 1.21.2.7 2003/01/07 18:26:20 mike Exp $".
  */

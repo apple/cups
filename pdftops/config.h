@@ -2,7 +2,7 @@
 //
 // config.h
 //
-// Copyright 1996-2002 Glyph & Cog, LLC
+// Copyright 1996-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -25,11 +25,11 @@
 #define supportedPDFVersionNum 1.4
 
 // copyright notice
-#define xpdfCopyright "Copyright 1996-2002 Glyph & Cog, LLC"
+#define xpdfCopyright "Copyright 1996-2003 Glyph & Cog, LLC"
 
 // Windows resource file stuff
 #define winxpdfVersion "WinXpdf 2.01"
-#define xpdfCopyrightAmp "Copyright 1996-2002 Glyph && Cog, LLC"
+#define xpdfCopyrightAmp "Copyright 1996-2003 Glyph && Cog, LLC"
 
 //------------------------------------------------------------------------
 // paper size

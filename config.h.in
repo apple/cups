@@ -1,11 +1,11 @@
 /*
- * "$Id: config.h.in,v 1.39.2.12 2002/06/12 11:35:04 mike Exp $"
+ * "$Id: config.h.in,v 1.39.2.13 2003/01/07 18:26:13 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
  *   @configure_input@
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -37,6 +37,13 @@
 
 #define CUPS_DEFAULT_USER	"lp"
 #define CUPS_DEFAULT_GROUP	"sys"
+
+
+/*
+ * Default IPP port...
+ */
+
+#define CUPS_DEFAULT_IPP_PORT	631
 
 
 /*
@@ -229,5 +236,5 @@
 
 
 /*
- * End of "$Id: config.h.in,v 1.39.2.12 2002/06/12 11:35:04 mike Exp $".
+ * End of "$Id: config.h.in,v 1.39.2.13 2003/01/07 18:26:13 mike Exp $".
  */

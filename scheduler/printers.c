@@ -1,9 +1,9 @@
 /*
- * "$Id: printers.c,v 1.93.2.31 2002/12/13 21:22:04 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.32 2003/01/07 18:27:26 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -2110,5 +2110,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.31 2002/12/13 21:22:04 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.32 2003/01/07 18:27:26 mike Exp $".
  */

@@ -1,9 +1,9 @@
 #
-# "$Id: Makedefs.in,v 1.36.2.11 2002/08/23 02:32:38 mike Exp $"
+# "$Id: Makedefs.in,v 1.36.2.12 2003/01/07 18:26:12 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2003 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -179,5 +179,5 @@ MAN8DIR		=	@MAN8DIR@
 	$(MV) t.z $@
 
 #
-# End of "$Id: Makedefs.in,v 1.36.2.11 2002/08/23 02:32:38 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.36.2.12 2003/01/07 18:26:12 mike Exp $"
 #

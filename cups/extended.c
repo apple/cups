@@ -1,9 +1,9 @@
 /*
- * "$Id: extended.c,v 1.1.2.2 2002/08/12 00:44:37 mike Exp $"
+ * "$Id: extended.c,v 1.1.2.3 2003/01/07 18:26:24 mike Exp $"
  *
  *   Extended option routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -244,5 +244,5 @@ ppd_unmark_choices(ppd_option_t *option)	/* I - Option choice */
 
 
 /*
- * End of "$Id: extended.c,v 1.1.2.2 2002/08/12 00:44:37 mike Exp $".
+ * End of "$Id: extended.c,v 1.1.2.3 2003/01/07 18:26:24 mike Exp $".
  */

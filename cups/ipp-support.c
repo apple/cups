@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-support.c,v 1.2 2002/12/17 18:56:42 swdev Exp $"
+ * "$Id: ipp-support.c,v 1.2.2.1 2003/01/07 18:26:25 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -153,7 +153,7 @@ ippPort(void)
   else if ((server_port = getenv("IPP_PORT")) != NULL)
     return (ipp_port = atoi(server_port));
   else if ((port = getservbyname("ipp", NULL)) == NULL)
-    return (ipp_port = IPP_PORT);
+    return (ipp_port = CUPS_DEFAULT_IPP_PORT);
   else
     return (ipp_port = ntohs(port->s_port));
 }
@@ -171,5 +171,5 @@ ippSetPort(int p)		/* I - Port number to use */
 
 
 /*
- * End of "$Id: ipp-support.c,v 1.2 2002/12/17 18:56:42 swdev Exp $".
+ * End of "$Id: ipp-support.c,v 1.2.2.1 2003/01/07 18:26:25 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: jobs.c,v 1.15.2.7 2002/12/10 19:14:05 mike Exp $"
+ * "$Id: jobs.c,v 1.15.2.8 2003/01/07 18:26:19 mike Exp $"
  *
  *   Job status CGI for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -255,5 +255,5 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: jobs.c,v 1.15.2.7 2002/12/10 19:14:05 mike Exp $".
+ * End of "$Id: jobs.c,v 1.15.2.8 2003/01/07 18:26:19 mike Exp $".
  */

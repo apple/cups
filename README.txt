@@ -254,7 +254,7 @@ file.
 
 LEGAL STUFF
 
-CUPS is Copyright 1993-2002 by Easy Software Products.  CUPS,
+CUPS is Copyright 1993-2003 by Easy Software Products.  CUPS,
 the CUPS logo, and the Common UNIX Printing System are the
 trademark property of Easy Software Products.
 
@@ -265,7 +265,7 @@ Ghostscript 5.50 core, Copyright 1986-1998 by Aladdin
 Enterprises.
 
 The PDF filter (pdftops) is based on the Xpdf 0.92 software,
-Copyright 1996-2002 by Derek B. Noonburg.
+Copyright 1996-2003 by Derek B. Noonburg.
 
 This software is based in part on the work of the Independent
 JPEG Group.

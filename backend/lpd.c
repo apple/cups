@@ -1,9 +1,9 @@
 /*
- * "$Id: lpd.c,v 1.28.2.17 2002/11/27 15:15:14 mike Exp $"
+ * "$Id: lpd.c,v 1.28.2.18 2003/01/07 18:26:15 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -924,5 +924,5 @@ rresvport(int *port)		/* IO - Port number to bind to */
 #endif /* !HAVE_RRESVPORT */
 
 /*
- * End of "$Id: lpd.c,v 1.28.2.17 2002/11/27 15:15:14 mike Exp $".
+ * End of "$Id: lpd.c,v 1.28.2.18 2003/01/07 18:26:15 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: image-colorspace.c,v 1.22.2.7 2003/01/07 16:55:30 mike Exp $"
+ * "$Id: image-colorspace.c,v 1.22.2.8 2003/01/07 18:26:53 mike Exp $"
  *
  *   Colorspace conversions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2002 by Easy Software Products.
+ *   Copyright 1993-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1504,5 +1504,5 @@ zshear(float mat[3][3],	/* I - Matrix */
 
 
 /*
- * End of "$Id: image-colorspace.c,v 1.22.2.7 2003/01/07 16:55:30 mike Exp $".
+ * End of "$Id: image-colorspace.c,v 1.22.2.8 2003/01/07 18:26:53 mike Exp $".
  */

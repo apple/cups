@@ -1,9 +1,9 @@
 /*
- * "$Id: server.c,v 1.2.2.2 2002/11/23 01:06:17 mike Exp $"
+ * "$Id: server.c,v 1.2.2.3 2003/01/07 18:27:27 mike Exp $"
  *
  *   Server start/stop routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -146,5 +146,5 @@ StopServer(void)
 
 
 /*
- * End of "$Id: server.c,v 1.2.2.2 2002/11/23 01:06:17 mike Exp $".
+ * End of "$Id: server.c,v 1.2.2.3 2003/01/07 18:27:27 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: hpgl-polygon.c,v 1.9.2.2 2002/03/01 19:55:17 mike Exp $"
+ * "$Id: hpgl-polygon.c,v 1.9.2.3 2003/01/07 18:26:52 mike Exp $"
  *
  *   HP-GL/2 polygon routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2002 by Easy Software Products.
+ *   Copyright 1993-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -378,5 +378,5 @@ WG_fill_wedge(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-polygon.c,v 1.9.2.2 2002/03/01 19:55:17 mike Exp $".
+ * End of "$Id: hpgl-polygon.c,v 1.9.2.3 2003/01/07 18:26:52 mike Exp $".
  */

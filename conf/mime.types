@@ -1,9 +1,9 @@
 #
-# "$Id: mime.types,v 1.17.2.7 2002/11/24 22:32:23 mike Exp $"
+# "$Id: mime.types,v 1.17.2.8 2003/01/07 18:26:21 mike Exp $"
 #
 #   MIME types file for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2002 by Easy Software Products.
+#   Copyright 1997-2003 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -154,5 +154,5 @@ application/vnd.cups-raw	(string(0,<1B>E) + !string(2,<1B>%0B)) \
 #application/octet-stream
 
 #
-# End of "$Id: mime.types,v 1.17.2.7 2002/11/24 22:32:23 mike Exp $".
+# End of "$Id: mime.types,v 1.17.2.8 2003/01/07 18:26:21 mike Exp $".
 #

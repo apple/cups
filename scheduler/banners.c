@@ -1,9 +1,9 @@
 /*
- * "$Id: banners.c,v 1.5.2.3 2002/05/16 14:00:06 mike Exp $"
+ * "$Id: banners.c,v 1.5.2.4 2003/01/07 18:27:15 mike Exp $"
  *
  *   Banner routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -211,5 +211,5 @@ compare(const banner_t *b0,	/* I - First banner */
 
 
 /*
- * End of "$Id: banners.c,v 1.5.2.3 2002/05/16 14:00:06 mike Exp $".
+ * End of "$Id: banners.c,v 1.5.2.4 2003/01/07 18:27:15 mike Exp $".
  */

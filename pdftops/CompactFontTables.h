@@ -2,7 +2,7 @@
 //
 // CompactFontTables.h
 //
-// Copyright 1999-2002 Glyph & Cog, LLC
+// Copyright 1999-2003 Glyph & Cog, LLC
 //
 //========================================================================
 

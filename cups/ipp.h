@@ -1,10 +1,10 @@
 /*
- * "$Id: ipp.h,v 1.36.2.11 2002/05/09 03:08:00 mike Exp $"
+ * "$Id: ipp.h,v 1.36.2.12 2003/01/07 18:26:26 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -51,9 +51,11 @@ extern "C" {
 #  define IPP_VERSION		"\001\001"
 
 /*
- * IPP registered port number...  This is the default value - applications
- * should use the ippPort() function so that you can customize things in
- * /etc/services if needed!
+ * IPP registered port number...
+ *
+ * Note: Applications should never use IPP_PORT, but instead use the
+ * ippPort() function to allow overrides via the IPP_PORT environment
+ * variable and services file if needed!
  */
 
 #  define IPP_PORT		631
@@ -442,5 +444,5 @@ extern void		_ipp_free_attr(ipp_attribute_t *);
 #endif /* !_IPP_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.36.2.11 2002/05/09 03:08:00 mike Exp $".
+ * End of "$Id: ipp.h,v 1.36.2.12 2003/01/07 18:26:26 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: normalize.c,v 1.1.2.3 2002/09/26 16:58:46 mike Exp $"
+ * "$Id: normalize.c,v 1.1.2.4 2003/01/07 18:26:27 mike Exp $"
  *
  *   Unicode normalization for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are
  *   the property of Easy Software Products and are protected by Federal
@@ -1915,5 +1915,5 @@ compare_propchar(const void *k1,        /* I - Key char */
 }
 
 /*
- * End of "$Id: normalize.c,v 1.1.2.3 2002/09/26 16:58:46 mike Exp $"
+ * End of "$Id: normalize.c,v 1.1.2.4 2003/01/07 18:26:27 mike Exp $"
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: testlang.c,v 1.1.2.1 2002/05/23 20:13:28 mike Exp $"
+ * "$Id: testlang.c,v 1.1.2.2 2003/01/07 18:26:30 mike Exp $"
  *
  *   HTTP test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -92,5 +92,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testlang.c,v 1.1.2.1 2002/05/23 20:13:28 mike Exp $".
+ * End of "$Id: testlang.c,v 1.1.2.2 2003/01/07 18:26:30 mike Exp $".
  */

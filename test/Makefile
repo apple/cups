@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.2.2.3 2002/03/22 16:24:36 mike Exp $"
+# "$Id: Makefile,v 1.2.2.4 2003/01/07 18:27:33 mike Exp $"
 #
 #   IPP test makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2003 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -68,5 +68,5 @@ purify:	ipptest.o ../cups/$(LIBCUPS)
 
 
 #
-# End of "$Id: Makefile,v 1.2.2.3 2002/03/22 16:24:36 mike Exp $".
+# End of "$Id: Makefile,v 1.2.2.4 2003/01/07 18:27:33 mike Exp $".
 #

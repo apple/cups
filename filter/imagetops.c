@@ -1,9 +1,9 @@
 /*
- * "$Id: imagetops.c,v 1.36.2.11 2002/09/24 13:34:05 mike Exp $"
+ * "$Id: imagetops.c,v 1.36.2.12 2003/01/07 18:26:57 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2002 by Easy Software Products.
+ *   Copyright 1993-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -911,5 +911,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.36.2.11 2002/09/24 13:34:05 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.36.2.12 2003/01/07 18:26:57 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: http-addr.c,v 1.1.2.7 2002/08/23 02:40:12 mike Exp $"
+ * "$Id: http-addr.c,v 1.1.2.8 2003/01/07 18:26:24 mike Exp $"
  *
  *   HTTP address routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -202,5 +202,5 @@ httpAddrString(const http_addr_t *addr,		/* I - Address to convert */
 
 
 /*
- * End of "$Id: http-addr.c,v 1.1.2.7 2002/08/23 02:40:12 mike Exp $".
+ * End of "$Id: http-addr.c,v 1.1.2.8 2003/01/07 18:26:24 mike Exp $".
  */

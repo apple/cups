@@ -1,10 +1,10 @@
 /*
- * "$Id: dest.c,v 1.18.2.10 2002/05/16 13:59:57 mike Exp $"
+ * "$Id: dest.c,v 1.18.2.11 2003/01/07 18:26:24 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -794,5 +794,5 @@ cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
 
 
 /*
- * End of "$Id: dest.c,v 1.18.2.10 2002/05/16 13:59:57 mike Exp $".
+ * End of "$Id: dest.c,v 1.18.2.11 2003/01/07 18:26:24 mike Exp $".
  */

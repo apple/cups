@@ -1,9 +1,9 @@
 /*
- * "$Id: testi18n.c,v 1.1.2.2 2002/09/26 16:58:47 mike Exp $"
+ * "$Id: testi18n.c,v 1.1.2.3 2003/01/07 18:26:30 mike Exp $"
  *
  *   Internationalization test for Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are
  *   the property of Easy Software Products and are protected by Federal
@@ -755,5 +755,5 @@ test_normalize(const int verbose)       /* I - Verbose flag */
 
 
 /*
- * End of "$Id: testi18n.c,v 1.1.2.2 2002/09/26 16:58:47 mike Exp $"
+ * End of "$Id: testi18n.c,v 1.1.2.3 2003/01/07 18:26:30 mike Exp $"
  */

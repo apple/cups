@@ -1,9 +1,9 @@
 /*
- * "$Id: textcommon.c,v 1.16.2.10 2002/08/19 16:49:52 mike Exp $"
+ * "$Id: textcommon.c,v 1.16.2.11 2003/01/07 18:27:01 mike Exp $"
  *
  *   Common text filter routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1181,5 +1181,5 @@ getutf8(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: textcommon.c,v 1.16.2.10 2002/08/19 16:49:52 mike Exp $".
+ * End of "$Id: textcommon.c,v 1.16.2.11 2003/01/07 18:27:01 mike Exp $".
  */

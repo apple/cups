@@ -1,9 +1,9 @@
 /*
- * "$Id: hpgl-main.c,v 1.22.2.2 2002/03/01 19:55:17 mike Exp $"
+ * "$Id: hpgl-main.c,v 1.22.2.3 2003/01/07 18:26:52 mike Exp $"
  *
  *   HP-GL/2 filter main entry for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2002 by Easy Software Products.
+ *   Copyright 1993-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -263,5 +263,5 @@ compare_names(const void *p1,	/* I - First name */
 
 
 /*
- * End of "$Id: hpgl-main.c,v 1.22.2.2 2002/03/01 19:55:17 mike Exp $".
+ * End of "$Id: hpgl-main.c,v 1.22.2.3 2003/01/07 18:26:52 mike Exp $".
  */

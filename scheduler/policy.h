@@ -1,10 +1,10 @@
 /*
- * "$Id: policy.h,v 1.1.2.3 2002/06/06 03:01:54 mike Exp $"
+ * "$Id: policy.h,v 1.1.2.4 2003/01/07 18:27:26 mike Exp $"
  *
  *   Policy definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
  *
- *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -86,5 +86,5 @@ extern policyop_t	*FindPolicyOp(policy_t *p, ipp_op_t op);
 
 
 /*
- * End of "$Id: policy.h,v 1.1.2.3 2002/06/06 03:01:54 mike Exp $".
+ * End of "$Id: policy.h,v 1.1.2.4 2003/01/07 18:27:26 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: type.c,v 1.11.2.6 2002/05/24 15:36:21 mike Exp $"
+ * "$Id: type.c,v 1.11.2.7 2003/01/07 18:27:28 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1092,5 +1092,5 @@ patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.11.2.6 2002/05/24 15:36:21 mike Exp $".
+ * End of "$Id: type.c,v 1.11.2.7 2003/01/07 18:27:28 mike Exp $".
  */

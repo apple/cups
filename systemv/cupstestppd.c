@@ -1,9 +1,9 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.1 2002/12/13 21:22:06 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.2 2003/01/07 18:27:29 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -374,5 +374,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.1 2002/12/13 21:22:06 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.2 2003/01/07 18:27:29 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: raster.h,v 1.2.2.7 2002/10/04 19:54:08 mike Exp $"
+ * "$Id: raster.h,v 1.2.2.8 2003/01/07 18:27:00 mike Exp $"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -340,5 +340,5 @@ extern unsigned		cupsRasterWritePixels(cups_raster_t *r,
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h,v 1.2.2.7 2002/10/04 19:54:08 mike Exp $".
+ * End of "$Id: raster.h,v 1.2.2.8 2003/01/07 18:27:00 mike Exp $".
  */

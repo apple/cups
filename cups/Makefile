@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.53.2.19 2002/12/13 21:22:02 mike Exp $"
+# "$Id: Makefile,v 1.53.2.20 2003/01/07 18:26:23 mike Exp $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2003 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -31,9 +31,9 @@ include ../Makedefs
 #
 
 LIBOBJS	=	attr.o dest.o emit.o encode.o extended.o http.o http-addr.o \
-		http-support.o ipp.o langprintf.o language.o mark.o md5.o \
-		md5passwd.o normalize.o options.o page.o ppd.o snprintf.o \
-		string.o tempfile.o transcode.o usersys.o util.o
+		http-support.o ipp.o ipp-support.o langprintf.o language.o \
+		mark.o md5.o md5passwd.o normalize.o options.o page.o ppd.o \
+		snprintf.o string.o tempfile.o transcode.o usersys.o util.o
 OBJS	=	$(LIBOBJS) testhttp.o testi18n.o testlang.o
 
 
@@ -207,5 +207,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.53.2.19 2002/12/13 21:22:02 mike Exp $".
+# End of "$Id: Makefile,v 1.53.2.20 2003/01/07 18:26:23 mike Exp $".
 #

@@ -1,10 +1,10 @@
 /*
- * "$Id: rastertohp.c,v 1.15.2.5 2002/09/26 15:16:22 mike Exp $"
+ * "$Id: rastertohp.c,v 1.15.2.6 2003/01/07 18:27:00 mike Exp $"
  *
  *   Hewlett-Packard Page Control Language filter for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 1993-2002 by Easy Software Products.
+ *   Copyright 1993-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -804,5 +804,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertohp.c,v 1.15.2.5 2002/09/26 15:16:22 mike Exp $".
+ * End of "$Id: rastertohp.c,v 1.15.2.6 2003/01/07 18:27:00 mike Exp $".
  */

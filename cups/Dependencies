@@ -9,7 +9,8 @@ http.o: string.h ../config.h http.h md5.h ipp.h debug.h
 http-addr.o: http.h string.h ../config.h md5.h debug.h
 http-support.o: string.h ../config.h http.h md5.h ipp.h
 ipp.o: string.h ../config.h ipp.h http.h md5.h debug.h
-langprintf.o: string.h ../config.h language.h
+ipp-support.o: string.h ../config.h language.h ipp.h http.h md5.h debug.h
+langprintf.o: string.h ../config.h language.h transcode.h
 language.o: string.h ../config.h language.h cups_C.h
 mark.o: ppd.h string.h ../config.h debug.h
 md5.o: md5.h string.h ../config.h
@@ -28,4 +29,3 @@ util.o: debug.h
 testhttp.o: http.h string.h ../config.h md5.h
 testi18n.o: language.h string.h ../config.h transcode.h normalize.h
 testlang.o: language.h
-testppd.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h
