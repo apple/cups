@@ -1,5 +1,5 @@
 /*
- * "$Id: http-support.c,v 1.1.2.9 2004/07/01 21:28:38 mike Exp $"
+ * "$Id: http-support.c,v 1.1.2.10 2004/07/02 03:47:41 mike Exp $"
  *
  *   HTTP support routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -25,10 +25,11 @@
  *
  * Contents:
  *
- *   httpSeparate()   - Separate a Universal Resource Identifier into its
- *                      components.
- *   httpStatus()     - Return a short string describing a HTTP status code.
- *   cups_hstrerror() - hstrerror() emulation function for Solaris and others...
+ *   httpSeparate()     - Separate a Universal Resource Identifier into its
+ *                        components.
+ *   httpStatus()       - Return a short string describing a HTTP status code.
+ *   cups_hstrerror()   - hstrerror() emulation function for Solaris and others...
+ *   http_copy_decode() - Copy and decode a URI.
  */
 
 /*
@@ -46,6 +47,14 @@
 
 
 /*
+ * Local functions...
+ */
+
+static const char	*http_copy_decode(char *dst, const char *src,
+			                  int dstsize, const char *term);
+
+
+/*
  * 'httpSeparate()' - Separate a Universal Resource Identifier into its
  *                    components.
  */
@@ -53,8 +62,8 @@
 void
 httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
              char       *method,	/* O - Method [32] (http, https, etc.) */
-	     char       *username,	/* O - Username [32] */
-	     char       *host,		/* O - Hostname [32] */
+	     char       *username,	/* O - Username [1024] */
+	     char       *host,		/* O - Hostname [1024] */
 	     int        *port,		/* O - Port number to use */
              char       *resource)	/* O - Resource/filename [1024] */
 {
@@ -62,7 +71,6 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
   const char	*atsign,		/* @ sign */
 		*slash;			/* Separator */
   char		safeuri[HTTP_MAX_URI];	/* "Safe" local copy of URI */
-  char		quoted;			/* Quoted character */
 
 
  /*
@@ -75,39 +83,12 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 
  /*
   * Copy the URL to a local string to make sure we don't have a URL
-  * longer than HTTP_MAX_URI characters long...  We also decode any
-  * character escapes...
+  * longer than HTTP_MAX_URI characters long...
   */
 
-  for (ptr = safeuri; *uri; uri ++)
-    if (ptr < (safeuri + sizeof(safeuri) - 1))
-    {
-      if (*uri == '%' && isxdigit(uri[1] & 255) && isxdigit(uri[2] & 255))
-      {
-       /*
-	* Grab a hex-encoded character...
-	*/
+  strlcpy(safeuri, uri, sizeof(safeuri));
 
-        uri ++;
-	if (isalpha(*uri))
-	  quoted = (tolower(*uri) - 'a' + 10) << 4;
-	else
-	  quoted = (*uri - '0') << 4;
-
-        uri ++;
-	if (isalpha(*uri))
-	  quoted |= tolower(*uri) - 'a' + 10;
-	else
-	  quoted |= *uri - '0';
-
-        *ptr++ = quoted;
-      }
-      else
-	*ptr++ = *uri;
-    }
-
-  *ptr = '\0';
-  uri  = safeuri;
+  uri = safeuri;
 
  /*
   * Grab the method portion of the URI...
@@ -127,11 +108,8 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
     * Standard URI with method...
     */
 
-    for (ptr = host; *uri != ':' && *uri != '\0'; uri ++)
-      if (ptr < (host + HTTP_MAX_URI - 1))
-	*ptr++ = *uri;
+    uri = http_copy_decode(host, uri, HTTP_MAX_URI, ":");
 
-    *ptr = '\0';
     if (*uri == ':')
       uri ++;
 
@@ -197,20 +175,11 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 
   if ((atsign = strchr(uri, '@')) != NULL && atsign < slash)
   {
-   /**** TODO: get LAST @ before / ****/
    /*
     * Got a username:password combo...
     */
 
-    if ((atsign - uri) < HTTP_MAX_URI)
-    {
-      strncpy(username, uri, atsign - uri);
-      username[atsign - uri] = '\0';
-    }
-    else
-      strlcpy(username, uri, HTTP_MAX_URI);
-
-    uri = atsign + 1;
+    uri = http_copy_decode(username, uri, HTTP_MAX_URI, "@") + 1;
   }
   else
     username[0] = '\0';
@@ -219,11 +188,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
   * Grab the hostname...
   */
 
-  for (ptr = host; *uri != ':' && *uri != '/' && *uri != '\0'; uri ++)
-    if (ptr < (host + HTTP_MAX_URI - 1))
-      *ptr++ = *uri;
-
-  *ptr = '\0';
+  uri = http_copy_decode(host, uri, HTTP_MAX_URI, ":/");
 
   if (*uri != ':')
   {
@@ -246,13 +211,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
     * Parse port number...
     */
 
-    *port = 0;
-    uri ++;
-    while (isdigit(*uri & 255))
-    {
-      *port = (*port * 10) + *uri - '0';
-      uri ++;
-    }
+    *port = strtol(uri + 1, (char **)&uri, 10);
   }
 
   if (*uri == '\0')
@@ -270,7 +229,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
   * The remaining portion is the resource string...
   */
 
-  strlcpy(resource, uri, HTTP_MAX_URI);
+  http_copy_decode(resource, uri, HTTP_MAX_URI, "");
 }
 
 
@@ -348,5 +307,58 @@ cups_hstrerror(int error)		/* I - Error number */
 
 
 /*
- * End of "$Id: http-support.c,v 1.1.2.9 2004/07/01 21:28:38 mike Exp $".
+ * 'http_copy_decode()' - Copy and decode a URI.
+ */
+
+static const char *			/* O - New source pointer */
+http_copy_decode(char       *dst,	/* O - Destination buffer */ 
+                 const char *src,	/* I - Source pointer */
+		 int        dstsize,	/* I - Destination size */
+		 const char *term)	/* I - Terminating characters */
+{
+  char	*ptr,				/* Pointer into buffer */
+	*end;				/* End of buffer */
+  int	quoted;				/* Quoted character */
+
+
+ /*
+  * Copy the src to the destination until we hit a terminating character
+  * or the end of the string.
+  */
+
+  for (ptr = dst, end = dst + dstsize - 1; *src && !strchr(term, *src); src ++)
+    if (ptr < end)
+    {
+      if (*src == '%' && isxdigit(src[1] & 255) && isxdigit(src[2] & 255))
+      {
+       /*
+	* Grab a hex-encoded character...
+	*/
+
+        src ++;
+	if (isalpha(*src))
+	  quoted = (tolower(*src) - 'a' + 10) << 4;
+	else
+	  quoted = (*src - '0') << 4;
+
+        src ++;
+	if (isalpha(*src))
+	  quoted |= tolower(*src) - 'a' + 10;
+	else
+	  quoted |= *src - '0';
+
+        *ptr++ = quoted;
+      }
+      else
+	*ptr++ = *src;
+    }
+
+  *ptr = '\0';
+
+  return (src);
+}
+
+
+/*
+ * End of "$Id: http-support.c,v 1.1.2.10 2004/07/02 03:47:41 mike Exp $".
  */
