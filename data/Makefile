@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.4 2000/02/08 20:38:47 mike Exp $"
+# "$Id: Makefile,v 1.5 2000/02/26 19:38:02 mike Exp $"
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,8 +28,31 @@ include ../Makedefs
 # Data files...
 #
 
-FILES	=	8859-1 8859-14 8859-15 8859-2 8859-3 8859-4 8859-5 \
-		8859-6 8859-7 8859-8 8859-9 HPGLprolog psglyphs testprint.ps
+CHARSETS =	cp874 \
+		cp1250 \
+		cp1251 \
+		cp1252 \
+		cp1253 \
+		cp1254 \
+		cp1255 \
+		cp1256 \
+		cp1257 \
+		cp1258 \
+		iso-8859-1 \
+		iso-8859-2 \
+		iso-8859-3 \
+		iso-8859-4 \
+		iso-8859-5 \
+		iso-8859-6 \
+		iso-8859-7 \
+		iso-8859-8 \
+		iso-8859-9 \
+		iso-8859-10 \
+		iso-8859-13 \
+		iso-8859-14 \
+		iso-8859-15 \
+		utf-8
+DATAFILES =	HPGLprolog psglyphs
 
 
 #
@@ -51,10 +74,13 @@ clean:
 #
 
 install:
+	-$(MKDIR) $(DATADIR)
 	-$(MKDIR) $(DATADIR)/data
-	$(CP) $(FILES) $(DATADIR)/data
+	$(CP) $(DATAFILES) $(DATADIR)/data
+	-$(MKDIR) $(DATADIR)/charsets
+	$(CP) $(CHARSETS) $(DATADIR)/charsets
 
 
 #
-# End of "$Id: Makefile,v 1.4 2000/02/08 20:38:47 mike Exp $".
+# End of "$Id: Makefile,v 1.5 2000/02/26 19:38:02 mike Exp $".
 #
