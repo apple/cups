@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.17 2001/01/22 15:04:00 mike Exp $"
+ * "$Id: log.c,v 1.18 2001/02/07 19:41:37 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -319,8 +319,71 @@ check_log_file(FILE       **log,	/* IO - Log file */
 	       const char *logname)	/* I  - Log filename */
 {
   char	backname[1024],			/* Backup log filename */
-	filename[1024];			/* Formatted log filename */
+	filename[1024],			/* Formatted log filename */
+	*ptr;				/* Pointer into filename */
 
+
+ /*
+  * See if we have a log file to check...
+  */
+
+  if (log == NULL || logname == NULL || !logname[0])
+    return (1);
+
+ /*
+  * Format the filename as needed...
+  */
+
+  if (*log == NULL ||
+      (ftell(*log) > MaxLogSize && MaxLogSize > 0))
+  {
+   /*
+    * Handle format strings...
+    */
+
+    filename[sizeof(filename) - 1] = '\0';
+
+    if (logname[0] != '/')
+    {
+      strncpy(filename, ServerRoot, sizeof(filename) - 1);
+      strncat(filename, "/", sizeof(filename) - 1);
+    }
+    else
+      filename[0] = '\0';
+
+    for (ptr = filename + strlen(filename);
+         *logname && ptr < (filename + sizeof(filename) - 1);
+	 logname ++)
+      if (*logname == '%')
+      {
+       /*
+        * Format spec...
+	*/
+
+        logname ++;
+	if (*logname == 's')
+	{
+	 /*
+	  * Insert the server name...
+	  */
+
+	  strncpy(ptr, ServerName, sizeof(filename) - (ptr - filename) - 1);
+	  ptr += strlen(ptr);
+	}
+        else
+	{
+	 /*
+	  * Otherwise just insert the character...
+	  */
+
+	  *ptr++ = *logname;
+	}
+      }
+      else
+	*ptr++ = *logname;
+
+    *ptr = '\0';
+  }
 
  /*
   * See if the log file is open...
@@ -331,18 +394,6 @@ check_log_file(FILE       **log,	/* IO - Log file */
    /*
     * Nope, open the log file...
     */
-
-    if (logname[0] == '\0')
-      return (1);
-    else if (logname[0] != '/')
-      snprintf(backname, sizeof(backname), "%s/%s", ServerRoot, logname);
-    else
-    {
-      strncpy(backname, logname, sizeof(backname) - 1);
-      backname[sizeof(backname) - 1] = '\0';
-    }
-
-    snprintf(filename, sizeof(filename), backname, ServerName);
 
     if ((*log = fopen(filename, "a")) == NULL)
       return (0);
@@ -360,18 +411,6 @@ check_log_file(FILE       **log,	/* IO - Log file */
 
     fclose(*log);
 
-    if (logname[0] == '\0')
-      return (1);
-    else if (logname[0] != '/')
-      snprintf(backname, sizeof(backname), "%s/%s", ServerRoot, logname);
-    else
-    {
-      strncpy(backname, logname, sizeof(backname) - 1);
-      backname[sizeof(backname) - 1] = '\0';
-    }
-
-    snprintf(filename, sizeof(filename), backname, ServerName);
-
     strcpy(backname, filename);
     strncat(backname, ".O", sizeof(backname) - 1);
     backname[sizeof(backname) - 1] = '\0';
@@ -388,5 +427,5 @@ check_log_file(FILE       **log,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c,v 1.17 2001/01/22 15:04:00 mike Exp $".
+ * End of "$Id: log.c,v 1.18 2001/02/07 19:41:37 mike Exp $".
  */

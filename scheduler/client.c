@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.81 2001/01/24 14:16:01 mike Exp $"
+ * "$Id: client.c,v 1.82 2001/02/07 19:41:36 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -856,17 +856,28 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	    return (0);
 
 	case HTTP_HEAD :
-            if (strncmp(con->uri, "/printers", 9) == 0 &&
+            if (strncmp(con->uri, "/printers/", 10) == 0 &&
 		strcmp(con->uri + strlen(con->uri) - 4, ".ppd") == 0)
 	    {
 	     /*
-	      * Send PPD file...
+	      * Send PPD file - get the real printer name since printer
+	      * names are not case sensitive but filenames can be...
 	      */
 
-              snprintf(con->command, sizeof(con->command),
-	               "/ppd/%s", con->uri + 10);
-	      strcpy(con->uri, con->command);
-	      con->command[0] = '\0';
+              con->uri[strlen(con->uri) - 4] = '\0';	/* Drop ".ppd" */
+
+              if ((p = FindPrinter(con->uri + 10)) != NULL)
+		snprintf(con->uri, sizeof(con->uri), "/ppd/%s.ppd", p->name);
+	      else
+	      {
+		if (!SendError(con, HTTP_NOT_FOUND))
+		{
+	          CloseClient(con);
+		  return (0);
+		}
+
+		break;
+	      }
 	    }
 
 	    if (strncmp(con->uri, "/admin/", 7) == 0 ||
@@ -1708,9 +1719,11 @@ get_file(client_t    *con,	/* I - Client connection */
   if (!status && S_ISDIR(filestats->st_mode))
   {
     if (filename[strlen(filename) - 1] == '/')
-      strcat(filename, "index.html");
+      strncat(filename, "index.html", sizeof(filename));
     else
-      strcat(filename, "/index.html");
+      strncat(filename, "/index.html", sizeof(filename));
+
+    filename[sizeof(filename) - 1] = '\0';
 
     status = stat(filename, filestats);
   }
@@ -1968,5 +1981,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.81 2001/01/24 14:16:01 mike Exp $".
+ * End of "$Id: client.c,v 1.82 2001/02/07 19:41:36 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.116 2001/02/07 01:25:40 mike Exp $"
+ * "$Id: ipp.c,v 1.117 2001/02/07 19:41:37 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -5074,6 +5074,13 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
  /*
+  * Validate input...
+  */
+
+  if (con == NULL || owner == NULL || username == NULL || userlen <= 0)
+    return (0);
+
+ /*
   * Get the best authenticated username that is available.
   */
 
@@ -5129,5 +5136,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.116 2001/02/07 01:25:40 mike Exp $".
+ * End of "$Id: ipp.c,v 1.117 2001/02/07 19:41:37 mike Exp $".
  */

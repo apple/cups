@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.68 2001/01/24 14:16:01 mike Exp $"
+ * "$Id: conf.c,v 1.69 2001/02/07 19:41:36 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -575,7 +575,8 @@ read_configuration(FILE *fp)		/* I - File to read from */
 
     for (value = line; isspace(*value); value ++);
 
-    for (nameptr = name; *value != '\0' && !isspace(*value);)
+    for (nameptr = name; *value != '\0' && !isspace(*value) &&
+                             nameptr < (name + sizeof(name) - 1);)
       *nameptr++ = *value++;
     *nameptr = '\0';
 
@@ -1161,7 +1162,8 @@ read_location(FILE *fp,		/* I - Configuration file */
 
     for (value = line; isspace(*value); value ++);
 
-    for (nameptr = name; *value != '\0' && !isspace(*value);)
+    for (nameptr = name; *value != '\0' && !isspace(*value) &&
+                             nameptr < (name + sizeof(name) - 1);)
       *nameptr++ = *value++;
     *nameptr = '\0';
 
@@ -1481,5 +1483,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.68 2001/01/24 14:16:01 mike Exp $".
+ * End of "$Id: conf.c,v 1.69 2001/02/07 19:41:36 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.10 2001/02/02 19:38:45 mike Exp $"
+ * "$Id: type.c,v 1.11 2001/02/07 19:41:38 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -326,7 +326,8 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 
 	      quote = *rule++;
 
-	      while (*rule != '\0' && *rule != quote)
+	      while (*rule != '\0' && *rule != quote &&
+	             (ptr - value[num_values]) < (sizeof(value[0]) - 1))
 	        *ptr++ = *rule++;
 
               if (*rule == quote)
@@ -338,7 +339,8 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	    {
 	      rule ++;
 
-	      while (*rule != '>' && *rule != '\0')
+	      while (*rule != '>' && *rule != '\0' &&
+	             (ptr - value[num_values]) < (sizeof(value[0]) - 1))
 	      {
 	        if (isxdigit(rule[0]) && isxdigit(rule[1]))
 		{
@@ -1084,5 +1086,5 @@ patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.10 2001/02/02 19:38:45 mike Exp $".
+ * End of "$Id: type.c,v 1.11 2001/02/07 19:41:38 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.107 2001/01/22 15:04:00 mike Exp $"
+ * "$Id: job.c,v 1.108 2001/02/07 19:41:37 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1116,8 +1116,7 @@ StartJob(int       id,		/* I - Job ID */
       strncpy(title, attr->values[0].string.text, sizeof(title) - 1);
       title[sizeof(title) - 1] = '\0';
     }
-    else if (attr->group_tag == IPP_TAG_JOB &&
-	     (optptr - options) < (sizeof(options) - 128))
+    else if (attr->group_tag == IPP_TAG_JOB)
     {
      /*
       * Filter out other unwanted attributes...
@@ -1139,18 +1138,18 @@ StartJob(int       id,		/* I - Job ID */
       */
 
       if (optptr > options)
-	strcat(optptr, " ");
+	strncat(optptr, " ", sizeof(options) - (optptr - options) - 1);
 
       if (attr->value_tag != IPP_TAG_BOOLEAN)
       {
-	strcat(optptr, attr->name);
-	strcat(optptr, "=");
+	strncat(optptr, attr->name, sizeof(options) - (optptr - options) - 1);
+	strncat(optptr, "=", sizeof(options) - (optptr - options) - 1);
       }
 
       for (i = 0; i < attr->num_values; i ++)
       {
 	if (i)
-	  strcat(optptr, ",");
+	  strncat(optptr, ",", sizeof(options) - (optptr - options) - 1);
 
 	optptr += strlen(optptr);
 
@@ -1158,27 +1157,31 @@ StartJob(int       id,		/* I - Job ID */
 	{
 	  case IPP_TAG_INTEGER :
 	  case IPP_TAG_ENUM :
-	      sprintf(optptr, "%d", attr->values[i].integer);
+	      snprintf(optptr, sizeof(options) - (optptr - options) - 1,
+	               "%d", attr->values[i].integer);
 	      break;
 
 	  case IPP_TAG_BOOLEAN :
 	      if (!attr->values[i].boolean)
-		strcat(optptr, "no");
+		strncat(optptr, "no", sizeof(options) - (optptr - options) - 1);
 
 	  case IPP_TAG_NOVALUE :
-	      strcat(optptr, attr->name);
+	      strncat(optptr, attr->name,
+	              sizeof(options) - (optptr - options) - 1);
 	      break;
 
 	  case IPP_TAG_RANGE :
-	      sprintf(optptr, "%d-%d", attr->values[i].range.lower,
-		      attr->values[i].range.upper);
+	      snprintf(optptr, sizeof(options) - (optptr - options) - 1,
+	               "%d-%d", attr->values[i].range.lower,
+		       attr->values[i].range.upper);
 	      break;
 
 	  case IPP_TAG_RESOLUTION :
-	      sprintf(optptr, "%dx%d%s", attr->values[i].resolution.xres,
-		      attr->values[i].resolution.yres,
-		      attr->values[i].resolution.units == IPP_RES_PER_INCH ?
-			  "dpi" : "dpc");
+	      snprintf(optptr, sizeof(options) - (optptr - options) - 1,
+	               "%dx%d%s", attr->values[i].resolution.xres,
+		       attr->values[i].resolution.yres,
+		       attr->values[i].resolution.units == IPP_RES_PER_INCH ?
+			   "dpi" : "dpc");
 	      break;
 
           case IPP_TAG_STRING :
@@ -1191,12 +1194,14 @@ StartJob(int       id,		/* I - Job ID */
 		  strchr(attr->values[i].string.text, '\t') != NULL ||
 		  strchr(attr->values[i].string.text, '\n') != NULL)
 	      {
-		strcat(optptr, "\'");
-		strcat(optptr, attr->values[i].string.text);
-		strcat(optptr, "\'");
+		strncat(optptr, "\'", sizeof(options) - (optptr - options) - 1);
+		strncat(optptr, attr->values[i].string.text,
+		        sizeof(options) - (optptr - options) - 1);
+		strncat(optptr, "\'", sizeof(options) - (optptr - options) - 1);
 	      }
 	      else
-		strcat(optptr, attr->values[i].string.text);
+		strncat(optptr, attr->values[i].string.text,
+		        sizeof(options) - (optptr - options) - 1);
 	      break;
 
           default :
@@ -1361,7 +1366,7 @@ StartJob(int       id,		/* I - Job ID */
 	                           O_WRONLY | O_EXCL);
       else
 	filterfds[i & 1][1] = open(printer->device_uri + 5,
-	                           O_WRONLY | O_CREAT, 0666);
+	                           O_WRONLY | O_CREAT, 0600);
     }
 
     LogMessage(L_DEBUG, "StartJob: filter = \"%s\"", command);
@@ -1665,7 +1670,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
     }
 
    /*
-    * Update the input buffer...
+    * Copy over the buffer data we've used up...
     */
 
     strcpy(buffer, lineptr);
@@ -2097,10 +2102,10 @@ ipp_write_file(const char *filename,	/* I - File to write to */
   if (filename == NULL || ipp == NULL)
     return (IPP_ERROR);
 
-  if ((fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0640)) == -1)
+  if ((fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0600)) == -1)
     return (IPP_ERROR);
 
-  fchmod(fd, 0640);
+  fchmod(fd, 0600);
   fchown(fd, User, Group);
 
  /*
@@ -2610,5 +2615,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.107 2001/01/22 15:04:00 mike Exp $".
+ * End of "$Id: job.c,v 1.108 2001/02/07 19:41:37 mike Exp $".
  */

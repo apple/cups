@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.86 2001/01/26 14:21:59 mike Exp $"
+ * "$Id: printers.c,v 1.87 2001/02/07 19:41:37 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -82,13 +82,19 @@ AddPrinter(const char *name)	/* I - Name of printer */
   * Create a new printer entity...
   */
 
-  if ((p = calloc(sizeof(printer_t), 1)) == NULL)
+  if ((p = calloc(1, sizeof(printer_t))) == NULL)
     return (NULL);
 
   strncpy(p->name, name, sizeof(p->name) - 1);
   strncpy(p->hostname, ServerName, sizeof(p->hostname) - 1);
   snprintf(p->uri, sizeof(p->uri), "ipp://%s:%d/printers/%s", ServerName,
            ntohs(Listeners[0].address.sin_port), name);
+
+ /*
+  * Since uri and more_info are URIs and use the HTTP_MAX_URI constant
+  * to determine the size of the strings, this copy is safe.
+  */
+
   strcpy(p->more_info, p->uri);
 
   p->state     = IPP_PRINTER_STOPPED;
@@ -494,7 +500,8 @@ LoadAllPrinters(void)
 
     for (value = line; isspace(*value); value ++);
 
-    for (nameptr = name; *value != '\0' && !isspace(*value);)
+    for (nameptr = name; *value != '\0' && !isspace(*value) &&
+                             nameptr < (name + sizeof(name) - 1);)
       *nameptr++ = *value++;
     *nameptr = '\0';
 
@@ -1698,5 +1705,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.86 2001/01/26 14:21:59 mike Exp $".
+ * End of "$Id: printers.c,v 1.87 2001/02/07 19:41:37 mike Exp $".
  */
