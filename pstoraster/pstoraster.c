@@ -1,5 +1,5 @@
 /*
- * "$Id: pstoraster.c,v 1.9 1999/09/27 17:36:09 mike Exp $"
+ * "$Id: pstoraster.c,v 1.10 1999/11/01 16:54:17 mike Exp $"
  *
  *   PostScript RIP filter main entry for the Common UNIX Printing System
  *   (CUPS).
@@ -39,24 +39,35 @@
  * Include necessary headers...
  */
 
-#include <cups/string.h>
 #define bool bool_              /* (maybe not needed) */
 #define uchar uchar_
 #define uint uint_
 #define ushort ushort_
 #define ulong ulong_
+
+#include <cups/cups.h>
+#include <cups/string.h>
 #include <stdlib.h>
+
 #undef bool
 #undef uchar
 #undef uint
 #undef ushort
 #undef ulong
+
 #include "ghost.h"
 #include "imain.h"
 #include "iminst.h"
 #include "ostack.h"
 #include "gscdefs.h"
 #include "store.h"
+
+
+/*
+ * Globals...
+ */
+
+const char	*cupsProfile = NULL;
 
 
 /*
@@ -81,6 +92,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   int			exit_code;	/* Exit code */
   ref			error_object;	/* Error object */
   char			*content_type;	/* CONTENT_TYPE environment variable */
+  int			num_options;	/* Number of job options */
+  cups_option_t		*options;	/* Job options */
 
 
  /*
@@ -100,6 +113,14 @@ main(int  argc,		/* I - Number of command-line arguments */
   */
 
   gs_get_real_stdio(stdfiles);
+
+ /*
+  * Grab any job options...
+  */
+
+  num_options = cupsParseOptions(argv[5], 0, &options);
+
+  cupsProfile = cupsGetOption("profile", num_options, options);
 
  /*
   * Initialize basic interpreter stuff and read from the named file or
@@ -202,5 +223,5 @@ define_string(char *name,	/* I - Variable to set */
 
 
 /*
- * End of "$Id: pstoraster.c,v 1.9 1999/09/27 17:36:09 mike Exp $".
+ * End of "$Id: pstoraster.c,v 1.10 1999/11/01 16:54:17 mike Exp $".
  */

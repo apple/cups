@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.13 1999/10/01 14:36:52 mike Exp $"
+ * "$Id: gdevcups.c,v 1.14 1999/11/01 16:54:16 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -60,6 +60,13 @@
 #include <cups/raster.h>
 #include <cups/ppd.h>
 #include <math.h>
+
+
+/*
+ * Globals...
+ */
+
+extern const char	*cupsProfile;
 
 
 /*
@@ -1441,6 +1448,7 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
 {
   int		i, j, k;		/* Looping vars */
   float		d, g;			/* Density and gamma correction */
+  float		m[3][3];		/* Color correction matrix */
   char		resolution[41];		/* Resolution string */
   ppd_profile_t	*profile;		/* Color profile information */
 
@@ -1548,7 +1556,27 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
 
   cupsHaveProfile = 0;
 
-  if (cups->ppd != NULL && cups->header.cupsBitsPerColor == 8)
+  if (cupsProfile && cups->header.cupsBitsPerColor == 8)
+  {
+    cupsHaveProfile = 1;
+    sscanf(cupsProfile, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f", &d, &g,
+           m[0] + 0, m[0] + 1, m[0] + 2,
+           m[1] + 0, m[1] + 1, m[1] + 2,
+           m[2] + 0, m[2] + 1, m[2] + 2);
+
+    d       *= 0.001f;
+    g       *= 0.001f;
+    m[0][0] *= 0.001f;
+    m[0][1] *= 0.001f;
+    m[0][2] *= 0.001f;
+    m[1][0] *= 0.001f;
+    m[1][1] *= 0.001f;
+    m[1][2] *= 0.001f;
+    m[2][0] *= 0.001f;
+    m[2][1] *= 0.001f;
+    m[2][2] *= 0.001f;
+  }
+  else if (cups->ppd != NULL && cups->header.cupsBitsPerColor == 8)
   {
    /*
     * Find the appropriate color profile...
@@ -1581,32 +1609,39 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
 
       cupsHaveProfile = 1;
 
-      for (i = 0; i < 3; i ++)
-	for (j = 0; j < 3; j ++)
-	  for (k = 0; k <= gx_max_color_value; k ++)
-	  {
-            cupsMatrix[i][j][k] = (int)((float)k * profile->matrix[i][j] + 0.5);
-
-#ifdef DEBUG
-            if ((k & 4095) == 0)
-              fprintf(stderr, "DEBUG: cupsMatrix[%d][%d][%d] = %d\n",
-	              i, j, k, cupsMatrix[i][j][k]);
-#endif /* DEBUG */
-          }
-
       d = profile->density;
       g = profile->gamma;
+      
+      memcpy(m, profile->matrix, sizeof(m));
+    }
+  }
 
-      for (k = 0; k <= gx_max_color_value; k ++)
-      {
-	cupsDensity[k] = (int)((float)gx_max_color_value * d *
-	                       pow((float)k / (float)gx_max_color_value, g) +
-			       0.5);
+  if (cupsHaveProfile)
+  {
+    for (i = 0; i < 3; i ++)
+      for (j = 0; j < 3; j ++)
+	for (k = 0; k <= gx_max_color_value; k ++)
+	{
+          cupsMatrix[i][j][k] = (int)((float)k * m[i][j] + 0.5);
+
 #ifdef DEBUG
-        if ((k & 4095) == 0)
-          fprintf(stderr, "DEBUG: cupsDensity[%d] = %d\n", k, cupsDensity[k]);
+          if ((k & 4095) == 0)
+            fprintf(stderr, "DEBUG: cupsMatrix[%d][%d][%d] = %d\n",
+	            i, j, k, cupsMatrix[i][j][k]);
 #endif /* DEBUG */
-      }
+        }
+
+
+    for (k = 0; k <= gx_max_color_value; k ++)
+    {
+      cupsDensity[k] = (int)((float)gx_max_color_value * d *
+	                     pow((float)k / (float)gx_max_color_value, g) +
+			     0.5);
+
+#ifdef DEBUG
+      if ((k & 4095) == 0)
+        fprintf(stderr, "DEBUG: cupsDensity[%d] = %d\n", k, cupsDensity[k]);
+#endif /* DEBUG */
     }
   }
 }
@@ -2440,5 +2475,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.13 1999/10/01 14:36:52 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.14 1999/11/01 16:54:16 mike Exp $".
  */
