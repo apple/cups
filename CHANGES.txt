@@ -3,6 +3,8 @@ CHANGES.txt - 09/08/2004
 
 CHANGES IN CUPS V1.1.21rc3
 
+	- Revamped the custome page size orientation fix (STR
+	  #127)
 	- The lp, lpq, lpr, and lpstat commands now report when
 	  an environment variable is pointing to a non-existent
 	  printer instead of just saying "no default
