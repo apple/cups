@@ -1,5 +1,5 @@
 /*
- * "$Id: lprm.c,v 1.14 2001/01/23 17:36:20 mike Exp $"
+ * "$Id: lprm.c,v 1.15 2001/03/02 17:35:03 mike Exp $"
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
@@ -150,7 +150,10 @@ main(int  argc,			/* I - Number of command-line arguments */
         op = IPP_PURGE_JOBS;
       }
       else
+      {
+        dest   = argv[i];
         job_id = 0;
+      }
 
      /*
       * Build an IPP request, which requires the following
@@ -221,6 +224,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      break;
 	}
 
+        if (response->request.status.status_code > IPP_OK_CONFLICT)
+	{
+          ippDelete(response);
+          cupsFreeDests(num_dests, dests);
+          httpClose(http);
+	  return (1);
+	}
+
         ippDelete(response);
       }
       else
@@ -254,5 +265,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lprm.c,v 1.14 2001/01/23 17:36:20 mike Exp $".
+ * End of "$Id: lprm.c,v 1.15 2001/03/02 17:35:03 mike Exp $".
  */

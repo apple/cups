@@ -23,7 +23,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gp_unifs.c,v 1.5 2001/02/15 13:34:16 mike Exp $ */
+/*$Id: gp_unifs.c,v 1.6 2001/03/02 17:35:03 mike Exp $ */
 /* "Unix-like" file system platform routines for Ghostscript */
 #include "memory_.h"
 #include "string_.h"
@@ -34,6 +34,7 @@
 #include "stat_.h"
 #include "dirent_.h"
 #include <sys/param.h>		/* for MAXPATHLEN */
+#include <cups/cups.h>
 
 /* Some systems (Interactive for example) don't define MAXPATHLEN,
  * so we define it here.  (This probably should be done via a Config-Script.)
@@ -42,9 +43,6 @@
 #ifndef MAXPATHLEN
 #  define MAXPATHLEN 1024
 #endif
-
-/* Library routines not declared in a standard header */
-extern char *mktemp(P1(char *));
 
 /* ------ File naming and accessing ------ */
 
@@ -62,28 +60,11 @@ const char gp_current_directory_name[] = ".";
 FILE *
 gp_open_scratch_file(const char *prefix, char fname[gp_file_name_sizeof],
 		     const char *mode)
-{				/* The -8 is for XXXXXX plus a possible final / and -. */
-    int fd;
-    int len = gp_file_name_sizeof - strlen(prefix) - 8;
+{
+    int fd;			/* File descriptor for temp file */
 
-   /*
-    * MRS - Hello? TEMP is a DOS thing, TMPDIR is the UNIX thing.
-    *       Also, we should default to /var/tmp, since the root
-    *       partition is often small.
-    */
 
-    if (gp_getenv("TMPDIR", fname, &len) != 0)
-	strcpy(fname, "/var/tmp/");
-    else {
-	if (strlen(fname) != 0 && fname[strlen(fname) - 1] != '/')
-	    strcat(fname, "/");
-    }
-    strcat(fname, prefix);
-    /* Prevent trailing X's in path from being converted by mktemp. */
-    if (*fname != 0 && fname[strlen(fname) - 1] == 'X')
-	strcat(fname, "-");
-    strcat(fname, "XXXXXX");
-    if ((fd = mkstemp(fname)) < 0)
+    if ((fd = cupsTempFd(fname, gp_file_name_sizeof)) < 0)
       return (NULL);
     else
       return (fdopen(fd, mode));

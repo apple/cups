@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.120 2001/03/01 22:40:17 mike Exp $"
+ * "$Id: ipp.c,v 1.121 2001/03/02 17:35:04 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1390,6 +1390,7 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
 			resource[HTTP_MAX_URI];
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
+  printer_t		*printer;	/* Current printer */
 
 
   LogMessage(L_DEBUG2, "cancel_all_jobs(%d, %s)\n", con->http.fd,
@@ -1429,21 +1430,37 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
   if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
   {
    /*
-    * Bad URI...
+    * Bad URI?
     */
 
-    LogMessage(L_ERROR, "cancel_all_jobs: resource name \'%s\' no good!", resource);
-    send_ipp_error(con, IPP_NOT_FOUND);
-    return;
+    if (strcmp(resource, "/printers/") != 0)
+    {
+      LogMessage(L_ERROR, "cancel_all_jobs: resource name \'%s\' no good!", resource);
+      send_ipp_error(con, IPP_NOT_FOUND);
+      return;
+    }
+
+   /*
+    * Cancel all jobs on all printers...
+    */
+
+    for (printer = Printers; printer; printer = printer->next)
+    {
+      CancelJobs(printer->name);
+      LogMessage(L_INFO, "All jobs on \'%s\' were cancelled by \'%s\'.",
+                 printer->name, con->username);
+    }
   }
+  else
+  {
+   /*
+    * Cancel all of the jobs on the named printer...
+    */
 
- /*
-  * Cancel all of the jobs and return...
-  */
-
-  CancelJobs(dest);
-  LogMessage(L_INFO, "All jobs on \'%s\' were cancelled by \'%s\'.", dest,
-             con->username);
+    CancelJobs(dest);
+    LogMessage(L_INFO, "All jobs on \'%s\' were cancelled by \'%s\'.", dest,
+               con->username);
+  }
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -1469,6 +1486,9 @@ cancel_job(client_t        *con,	/* I - Client connection */
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
   job_t			*job;		/* Job information */
+  const char		*dest;		/* Destination */
+  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  printer_t		*printer;	/* Printer data */
 
 
   LogMessage(L_DEBUG2, "cancel_job(%d, %s)\n", con->http.fd,
@@ -1505,7 +1525,57 @@ cancel_job(client_t        *con,	/* I - Client connection */
       return;
     }
 
-    jobid = attr->values[0].integer;
+    if ((jobid = attr->values[0].integer) == 0)
+    {
+     /*
+      * Find the current job on the specified printer...
+      */
+
+      httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+
+      if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
+      {
+       /*
+	* Bad URI...
+	*/
+
+	LogMessage(L_ERROR, "cancel_job: resource name \'%s\' no good!", resource);
+	send_ipp_error(con, IPP_NOT_FOUND);
+	return;
+      }
+
+      if (dtype & CUPS_PRINTER_CLASS)
+        printer = FindClass(dest);
+      else
+        printer = FindPrinter(dest);
+
+     /*
+      * See if the printer is currently printing a job...
+      */
+
+      if (printer->job)
+        jobid = ((job_t *)printer->job)->id;
+      else
+      {
+       /*
+        * No, see if there are any pending jobs...
+	*/
+
+        for (job = Jobs; job != NULL; job = job->next)
+	  if (job->state->values[0].integer <= IPP_JOB_PROCESSING &&
+	      strcasecmp(job->dest, dest) == 0)
+	    break;
+
+	if (job != NULL)
+	  jobid = job->id;
+	else
+	{
+	  LogMessage(L_ERROR, "cancel_job: No active jobs on %s!", dest);
+	  send_ipp_error(con, IPP_NOT_POSSIBLE);
+	  return;
+	}
+      }
+    }
   }
   else
   {
@@ -5195,5 +5265,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.120 2001/03/01 22:40:17 mike Exp $".
+ * End of "$Id: ipp.c,v 1.121 2001/03/02 17:35:04 mike Exp $".
  */

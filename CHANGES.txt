@@ -49,6 +49,14 @@ CHANGES IN CUPS V1.1.7
 	  PJL commands from PPD files.
 	- A bug in UpdateJob() would cause the scheduler to
 	  consume 100% CPU until another request was submitted.
+	- The cancel command did not support the "-" option to
+	  cancel all jobs on all printers.
+	- The cancel and lprm commands did not support cancelling
+	  the next/current job in the queue.
+	- The pdftops and pstoraster filters were using unsafe
+	  temporary file functions; while this is not a problem
+	  in normal configurations (the CUPS temporary directory
+	  is restricted), they now use the cupsTempFd() function.
 
 
 CHANGES IN CUPS V1.1.6-3

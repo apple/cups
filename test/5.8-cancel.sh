@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: 5.8-cancel.sh,v 1.1 2001/03/01 20:40:16 mike Exp $"
+# "$Id: 5.8-cancel.sh,v 1.2 2001/03/02 17:35:05 mike Exp $"
 #
 #   Test the cancel command.
 #
@@ -37,8 +37,8 @@ echo ""
 
 echo "Cancel All Test"
 echo ""
-echo "    cancel -a"
-../systemv/cancel -a 2>&1
+echo "    cancel -a -"
+../systemv/cancel -a - 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
@@ -48,5 +48,5 @@ fi
 echo ""
 
 #
-# End of "$Id: 5.8-cancel.sh,v 1.1 2001/03/01 20:40:16 mike Exp $".
+# End of "$Id: 5.8-cancel.sh,v 1.2 2001/03/02 17:35:05 mike Exp $".
 #

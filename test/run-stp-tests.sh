@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.3 2001/03/01 22:51:30 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.4 2001/03/02 17:35:05 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -74,6 +74,7 @@ ln -s $root/filter/pstops /tmp/$user/bin/filter
 ln -s $root/filter/rastertoepson /tmp/$user/bin/filter
 ln -s $root/filter/rastertohp /tmp/$user/bin/filter
 ln -s $root/filter/texttops /tmp/$user/bin/filter
+ln -s $root/pdftops/pdftops /tmp/$user/bin/filter
 ln -s $root/pstoraster/pstoraster /tmp/$user/bin/filter
 
 ln -s $root/data/classified /tmp/$user/share/banners
@@ -100,13 +101,14 @@ User $user
 ServerRoot /tmp/$user
 ServerBin /tmp/$user/bin
 DataDir /tmp/$user/share
+FontPath /tmp/$user/share/fonts
 DocumentRoot $root/doc
 RequestRoot /tmp/$user/spool
 TempDir /tmp/$user/spool/temp
 AccessLog /tmp/$user/log/access_log
 ErrorLog /tmp/$user/log/error_log
 PageLog /tmp/$user/log/page_log
-LogLevel debug2
+LogLevel info
 PreserveJobHistory Yes
 <Location />
 Order deny,allow
@@ -216,6 +218,7 @@ fail=0
 for file in 5*.sh; do
 	echo "Performing $file..."
 	echo "" >>$strfile
+	echo "\"$file\":" >>$strfile
 
 	sh $file >>$strfile
 	status=$?
@@ -303,5 +306,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.3 2001/03/01 22:51:30 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.4 2001/03/02 17:35:05 mike Exp $"
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.18 2001/01/23 17:36:22 mike Exp $"
+ * "$Id: cancel.c,v 1.19 2001/03/02 17:35:04 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -51,7 +51,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		i;		/* Looping var */
   int		job_id;		/* Job ID */
   char		*dest,		/* Destination printer */
-		*host;		/* Host name */
+		*host,		/* Host name */
+		*job;		/* Job ID pointer */
   char		name[255];	/* Printer name */
   char		uri[1024];	/* Printer or job URI */
   ipp_t		*request;	/* IPP request */
@@ -76,7 +77,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   */
 
   for (i = 1; i < argc; i ++)
-    if (argv[i][0] == '-')
+    if (argv[i][0] == '-' && argv[i][1])
       switch (argv[i][1])
       {
         case 'E' : /* Encrypt */
@@ -154,11 +155,26 @@ main(int  argc,			/* I - Number of command-line arguments */
 	op     = IPP_CANCEL_JOB;
         job_id = atoi(argv[i]);
       }
+      else if (argv[i][0] == '-')
+      {
+        dest   = "";
+	job_id = 0;
+      }
       else
       {
+        strncpy(name, argv[i], sizeof(name) - 1);
+	name[sizeof(name) - 1] = '\0';
+
 	dest   = name;
         job_id = 0;
-	sscanf(argv[i], "%254[^-]-%d", name, &job_id);
+
+	if ((job = strrchr(name, '-')) != NULL)
+	  if (isdigit(job[1]))
+	  {
+	    *job++ = '\0';
+	    job_id = atoi(job);
+	  }
+	    
 	if (job_id)
 	  op = IPP_CANCEL_JOB;
 
@@ -266,5 +282,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c,v 1.18 2001/01/23 17:36:22 mike Exp $".
+ * End of "$Id: cancel.c,v 1.19 2001/03/02 17:35:04 mike Exp $".
  */
