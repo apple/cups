@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.15 2000/09/26 20:40:20 mike Exp $"
+ * "$Id: admin.c,v 1.16 2000/09/26 20:53:42 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -78,8 +78,6 @@ main(int  argc,			/* I - Number of command-line arguments */
  /*
   * Send a standard header...
   */
-
-  setbuf(stdout, NULL);
 
   printf("Content-Type: text/html;charset=%s\n\n", cupsLangEncoding(language));
 
@@ -1580,5 +1578,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.15 2000/09/26 20:40:20 mike Exp $".
+ * End of "$Id: admin.c,v 1.16 2000/09/26 20:53:42 mike Exp $".
  */
