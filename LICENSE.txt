@@ -93,12 +93,7 @@ In addition, as the copyright holder of CUPS, Easy Software Products
 grants the following special exception:
 
     Easy Software Products explicitly allows the compilation and
-    distribution of the CUPS software with the OpenSSL Toolkit. The
-    requirement for disclosure of the use of OpenSSL in CUPS-derived
-    software is not deemed by Easy Software Products to constitute a
-    violation of the distribution terms of the GNU GPL, since the GNU GPL
-    specifically requires acknowledgement of the original copyright holder
-    in derived works.
+    distribution of the CUPS software with the OpenSSL Toolkit.
 
 
 TRADEMARKS
