@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.9 1999/07/13 12:03:09 mike Exp $"
+# "$Id: Makefile,v 1.10 1999/09/20 14:15:59 mike Exp $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -92,19 +92,6 @@ serial:	serial.o ../cups/$(LIBCUPS)
 serial.o:	../cups/cups.h ../Makedefs
 
 #
-# smb
-#
-# Note: reading through these commands is a good way to get a headache... :)
-#
-
-smb:	smb.sh ../Makedefs
-	echo Generating $@...
-	$(RM) smb
-	sedcmd="1,\$$s/^SMBCLIENT=.\*/SMBCLIENT=`echo $(SMBCLIENT) | sed -e '1,$$s/\\//\\\\\\//g'`/" ;\
-	$(SED) -e "$$sedcmd" <smb.sh >smb
-	$(CHMOD) +x smb
-
-#
 # socket
 #
 
@@ -115,5 +102,5 @@ socket:	socket.o ../cups/$(LIBCUPS)
 socket.o:	../cups/cups.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.9 1999/07/13 12:03:09 mike Exp $".
+# End of "$Id: Makefile,v 1.10 1999/09/20 14:15:59 mike Exp $".
 #
