@@ -371,15 +371,21 @@ gx_device_set_margins(gx_device *dev, const float *margins /*[4]*/,
 	{	dev->Margins[0] = -margins[0] * dev->MarginsHWResolution[0];
 		dev->Margins[1] = -margins[3] * dev->MarginsHWResolution[1];
 	}
+
+	dev->width = (dev->MediaSize[0] - dev->HWMargins[0] - dev->HWMargins[2]) *
+	             dev->x_pixels_per_inch / 72.0 + 0.5;
+	dev->height = (dev->MediaSize[1] - dev->HWMargins[1] - dev->HWMargins[3]) *
+	              dev->y_pixels_per_inch / 72.0 + 0.5;
 }
 
 /* Set the width and height, updating MediaSize to remain consistent. */
 void
 gx_device_set_width_height(gx_device *dev, int width, int height)
-{	dev->width = width - dev->x_pixels_per_inch *
-                     (dev->HWMargins[0] - dev->HWMargins[2]) / 72.0;
+{
+	dev->width = width - dev->x_pixels_per_inch *
+                     (dev->HWMargins[0] + dev->HWMargins[2]) / 72.0;
 	dev->height = height - dev->y_pixels_per_inch *
-	              (dev->HWMargins[1] - dev->HWMargins[3]) / 72.0;
+	              (dev->HWMargins[1] + dev->HWMargins[3]) / 72.0;
 	dev->MediaSize[0] = width * 72.0 / dev->x_pixels_per_inch;
 	dev->MediaSize[1] = height * 72.0 / dev->y_pixels_per_inch;
 }
@@ -400,7 +406,8 @@ gx_device_set_resolution(gx_device *dev, floatp x_dpi, floatp y_dpi)
 /* Set the MediaSize, updating width and height to remain consistent. */
 void
 gx_device_set_media_size(gx_device *dev, floatp media_width, floatp media_height)
-{	dev->MediaSize[0] = media_width;
+{
+	dev->MediaSize[0] = media_width;
 	dev->MediaSize[1] = media_height;
 	dev->width = (dev->MediaSize[0] - dev->HWMargins[0] - dev->HWMargins[2]) *
 	             dev->x_pixels_per_inch / 72.0 + 0.5;

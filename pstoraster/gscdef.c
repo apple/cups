@@ -49,13 +49,13 @@ const char *gs_copyright = GS_COPYRIGHT;
 
 #ifndef GS_PRODUCT
 #  define GS_PRODUCT\
-	"ESP Print PostScript RIP"
+	"ESP Print v4.0"
 #endif
 const char *gs_product = GS_PRODUCT;
 
 #ifndef GS_REVISION
 #  define GS_REVISION\
-	400000		/* MMmmPP */
+	40000		/* MMmmPP */
 #endif
 long gs_revision = GS_REVISION;		/* should be const, see gscdefs.h */
 
@@ -67,7 +67,7 @@ long gs_revisiondate = GS_REVISIONDATE;	/* should be const, see gscdefs.h */
 
 #ifndef GS_SERIALNUMBER
 #  define GS_SERIALNUMBER\
-	40000		/* MAJOR minor BBB (build) */
+	40000		/* MMmmPP */
 #endif
 long gs_serialnumber = GS_SERIALNUMBER;	/* should be const, see gscdefs.h */
 
