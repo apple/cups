@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.14.2.11 2003/07/20 12:51:53 mike Exp $"
+ * "$Id: ppds.c,v 1.14.2.12 2003/09/04 14:48:14 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -30,7 +30,6 @@
  *   compare_names() - Compare PPD filenames for sorting.
  *   compare_ppds()  - Compare PPD file make and model names for sorting.
  *   load_ppds()     - Load PPD files recursively.
- *   ppd_gets()      - Read a line from a PPD file.
  */
 
 /*
@@ -781,5 +780,5 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * End of "$Id: ppds.c,v 1.14.2.11 2003/07/20 12:51:53 mike Exp $".
+ * End of "$Id: ppds.c,v 1.14.2.12 2003/09/04 14:48:14 mike Exp $".
  */
