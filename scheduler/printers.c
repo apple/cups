@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.13 2002/01/29 21:18:16 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.14 2002/01/30 16:14:09 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -39,6 +39,8 @@
  *                            changed.
  *   StopPrinter()          - Stop a printer from printing any jobs...
  *   ValidateDest()         - Validate a printer/class destination.
+ *   write_irix_config()    - Update the config files used by the IRIX
+ *                            desktop tools.
  *   write_irix_state()     - Update the status files used by IRIX printing
  *                            desktop tools.
  *   write_printcap()       - Write a pseudo-printcap file for older
@@ -338,8 +340,13 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
     DefaultPrinter = Printers;
 
 #ifdef __sgi
-    if (DefaultPrinter)
-      write_irix_state(DefaultPrinter);
+   /*
+    * Update the IRIX printer state for the new default printer; if
+    * no printers remain, then the default printer file will be
+    * removed...
+    */
+
+    write_irix_state(DefaultPrinter);
 #endif /* __sgi */
   }
 
@@ -805,13 +812,13 @@ SaveAllPrinters(void)
               printer->users[i]);
 
     fputs("</Printer>\n", fp);
+
 #ifdef __sgi
     /*
      * Make IRIX desktop & printer status happy
      */
 
     write_irix_state(printer);
-
 #endif /* __sgi */
   }
 
@@ -1445,109 +1452,10 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
 #ifdef __sgi
  /*
-  * Add dummy interface and GUI scripts to fool SGI's "challenged" printing
-  * tools.  First the interface script that tells the tools what kind of
-  * printer we have...
+  * Write the IRIX printer config and status files...
   */
 
-  snprintf(filename, sizeof(filename), "/var/spool/lp/interface/%s", p->name);
-
-  if ((fp = fopen(filename, "w")) != NULL)
-  {
-    fputs("#!/bin/sh\n", fp);
-
-    if ((attr = ippFindAttribute(p->attrs, "printer-make-and-model",
-                                 IPP_TAG_TEXT)) != NULL)
-      fprintf(fp, "NAME=\"%s\"\n", attr->values[0].string.text);
-    else if (p->type & CUPS_PRINTER_CLASS)
-      fputs("NAME=\"Printer Class\"\n", fp);
-    else
-      fputs("NAME=\"Remote Destination\"\n", fp);
-
-    if (p->type & CUPS_PRINTER_COLOR)
-      fputs("TYPE=ColorPostScript\n", fp);
-    else
-      fputs("TYPE=MonoPostScript\n", fp);
-
-    fprintf(fp, "HOSTNAME=%s\n", ServerName);
-    fprintf(fp, "HOSTPRINTER=%s\n", p->name);
-
-    fclose(fp);
-
-    chmod(filename, 0755);
-    chown(filename, User, Group);
-  }
-
- /*
-  * Then the member file that tells which device file the queue is connected
-  * to...  Networked printers use "/dev/null" in this file, so that's what
-  * we use (the actual device URI can confuse some apps...)
-  */
-
-  snprintf(filename, sizeof(filename), "/var/spool/lp/member/%s", p->name);
-  if ((fp = fopen(filename, "w")) != NULL)
-  {
-    fputs("/dev/null\n", fp);
-
-    fclose(fp);
-
-    chmod(filename, 0644);
-    chown(filename, User, Group);
-  }
-
- /*
-  * The gui_interface file is a script or program that launches a GUI
-  * option panel for the printer, using options specified on the
-  * command-line in the third argument.  The option panel must send
-  * any printing options to stdout on a single line when the user
-  * accepts them, or nothing if the user cancels the dialog.
-  *
-  * The default options panel program is /usr/bin/glpoptions, from
-  * the ESP Print Pro software.  You can select another using the
-  * PrintcapGUI option.
-  */
-
-  snprintf(filename, sizeof(filename), "/var/spool/lp/gui_interface/ELF/%s.gui", p->name);
-
-  if ((fp = fopen(filename, "w")) != NULL)
-  {
-    fputs("#!/bin/sh\n", fp);
-    fprintf(fp, "%s -d %s -o \"$3\"\n", PrintcapGUI, p->name);
-
-    fclose(fp);
-
-    chmod(filename, 0755);
-    chown(filename, User, Group);
-  }
-
- /*
-  * The POD config file is needed by the printstatus command to show
-  * the printer location and device.
-  */
-
-  snprintf(filename, sizeof(filename), "/var/spool/lp/pod/%s.config", p->name);
-  if ((fp = fopen(filename, "w")) != NULL)
-  {
-    fprintf(fp, "Printer Class      | %s\n",
-            (p->type & CUPS_PRINTER_COLOR) ? "ColorPostScript" : "MonoPostScript");
-    fprintf(fp, "Printer Model      | %s\n", p->make_model);
-    fprintf(fp, "Location Code      | %s\n", p->location);
-    fprintf(fp, "Physical Location  | %s\n", p->info);
-    fprintf(fp, "Port Path          | %s\n", p->device_uri);
-    fprintf(fp, "Config Path        | /var/spool/lp/pod/%s.config\n", p->name);
-    fprintf(fp, "Active Status Path | /var/spool/lp/pod/%s.status\n", p->name);
-    fputs("Status Update Wait | 10 seconds\n", fp);
-
-    fclose(fp);
-
-    chmod(filename, 0664);
-    chown(filename, User, Group);
-  }
-
- /*
-  * Write the IRIX printer status files...
-  */
-
+  write_irix_config(p);
   write_irix_state(p);
 #endif /* __sgi */
 }
@@ -1898,6 +1806,131 @@ write_printcap(void)
 
 #ifdef __sgi
 /*
+ * 'write_irix_config()' - Update the config files used by the IRIX
+ *                         desktop tools.
+ */
+
+static void
+write_irix_config(printer_t *p)	/* I - Printer to update */
+{
+  char	filename[1024];		/* Interface script filename */
+  FILE	*fp;			/* Interface script file */
+  int	tag;			/* Status tag value */
+
+
+
+ /*
+  * Add dummy interface and GUI scripts to fool SGI's "challenged" printing
+  * tools.  First the interface script that tells the tools what kind of
+  * printer we have...
+  */
+
+  snprintf(filename, sizeof(filename), "/var/spool/lp/interface/%s", p->name);
+
+  if (p->type & CUPS_PRINTER_CLASS)
+    unlink(filename);
+  else if ((fp = fopen(filename, "w")) != NULL)
+  {
+    fputs("#!/bin/sh\n", fp);
+
+    if ((attr = ippFindAttribute(p->attrs, "printer-make-and-model",
+                                 IPP_TAG_TEXT)) != NULL)
+      fprintf(fp, "NAME=\"%s\"\n", attr->values[0].string.text);
+    else if (p->type & CUPS_PRINTER_CLASS)
+      fputs("NAME=\"Printer Class\"\n", fp);
+    else
+      fputs("NAME=\"Remote Destination\"\n", fp);
+
+    if (p->type & CUPS_PRINTER_COLOR)
+      fputs("TYPE=ColorPostScript\n", fp);
+    else
+      fputs("TYPE=MonoPostScript\n", fp);
+
+    fprintf(fp, "HOSTNAME=%s\n", ServerName);
+    fprintf(fp, "HOSTPRINTER=%s\n", p->name);
+
+    fclose(fp);
+
+    chmod(filename, 0755);
+    chown(filename, User, Group);
+  }
+
+ /*
+  * Then the member file that tells which device file the queue is connected
+  * to...  Networked printers use "/dev/null" in this file, so that's what
+  * we use (the actual device URI can confuse some apps...)
+  */
+
+  snprintf(filename, sizeof(filename), "/var/spool/lp/member/%s", p->name);
+
+  if (p->type & CUPS_PRINTER_CLASS)
+    unlink(filename);
+  else if ((fp = fopen(filename, "w")) != NULL)
+  {
+    fputs("/dev/null\n", fp);
+
+    fclose(fp);
+
+    chmod(filename, 0644);
+    chown(filename, User, Group);
+  }
+
+ /*
+  * The gui_interface file is a script or program that launches a GUI
+  * option panel for the printer, using options specified on the
+  * command-line in the third argument.  The option panel must send
+  * any printing options to stdout on a single line when the user
+  * accepts them, or nothing if the user cancels the dialog.
+  *
+  * The default options panel program is /usr/bin/glpoptions, from
+  * the ESP Print Pro software.  You can select another using the
+  * PrintcapGUI option.
+  */
+
+  snprintf(filename, sizeof(filename), "/var/spool/lp/gui_interface/ELF/%s.gui", p->name);
+
+  if (p->type & CUPS_PRINTER_CLASS)
+    unlink(filename);
+  else if ((fp = fopen(filename, "w")) != NULL)
+  {
+    fputs("#!/bin/sh\n", fp);
+    fprintf(fp, "%s -d %s -o \"$3\"\n", PrintcapGUI, p->name);
+
+    fclose(fp);
+
+    chmod(filename, 0755);
+    chown(filename, User, Group);
+  }
+
+ /*
+  * The POD config file is needed by the printstatus command to show
+  * the printer location and device.
+  */
+
+  snprintf(filename, sizeof(filename), "/var/spool/lp/pod/%s.config", p->name);
+
+  if (p->type & CUPS_PRINTER_CLASS)
+    unlink(filename);
+  else if ((fp = fopen(filename, "w")) != NULL)
+  {
+    fprintf(fp, "Printer Class      | %s\n",
+            (p->type & CUPS_PRINTER_COLOR) ? "ColorPostScript" : "MonoPostScript");
+    fprintf(fp, "Printer Model      | %s\n", p->make_model);
+    fprintf(fp, "Location Code      | %s\n", p->location);
+    fprintf(fp, "Physical Location  | %s\n", p->info);
+    fprintf(fp, "Port Path          | %s\n", p->device_uri);
+    fprintf(fp, "Config Path        | /var/spool/lp/pod/%s.config\n", p->name);
+    fprintf(fp, "Active Status Path | /var/spool/lp/pod/%s.status\n", p->name);
+    fputs("Status Update Wait | 10 seconds\n", fp);
+
+    fclose(fp);
+
+    chmod(filename, 0664);
+    chown(filename, User, Group);
+  }
+
+
+/*
  * 'write_irix_state()' - Update the status files used by IRIX printing
  *                        desktop tools.
  */
@@ -1910,87 +1943,94 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
   int	tag;			/* Status tag value */
 
 
- /*
-  * The POD status file is needed for the printstatus window to
-  * provide the current status of the printer.
-  */
-
-  snprintf(filename, sizeof(filename), "/var/spool/lp/pod/%s.status", p->name);
-
-  if ((fp = fopen(filename, "w")) != NULL)
+  if (p)
   {
-    fprintf(fp, "Operational Status | %s\n",
-            (p->state == IPP_PRINTER_IDLE)       ? "Idle" :
-            (p->state == IPP_PRINTER_PROCESSING) ? "Busy" :
-                                                   "Faulted");
-    fprintf(fp, "Information        | 01 00 00 | %s\n", CUPS_SVERSION);
-    fprintf(fp, "Information        | 02 00 00 | Device URI: %s\n", p->device_uri);
-    fprintf(fp, "Information        | 03 00 00 | %s jobs\n",
-            p->accepting ? "Accepting" : "Not accepting");
-    fprintf(fp, "Information        | 04 00 00 | %s\n", p->state_message);
+   /*
+    * The POD status file is needed for the printstatus window to
+    * provide the current status of the printer.
+    */
 
-    fclose(fp);
+    snprintf(filename, sizeof(filename), "/var/spool/lp/pod/%s.status", p->name);
 
-    chmod(filename, 0664);
-    chown(filename, User, Group);
-  }
+    if (p->type & CUPS_PRINTER_CLASS)
+      unlink(filename);
+    else if ((fp = fopen(filename, "w")) != NULL)
+    {
+      fprintf(fp, "Operational Status | %s\n",
+              (p->state == IPP_PRINTER_IDLE)       ? "Idle" :
+              (p->state == IPP_PRINTER_PROCESSING) ? "Busy" :
+                                                     "Faulted");
+      fprintf(fp, "Information        | 01 00 00 | %s\n", CUPS_SVERSION);
+      fprintf(fp, "Information        | 02 00 00 | Device URI: %s\n", p->device_uri);
+      fprintf(fp, "Information        | 03 00 00 | %s jobs\n",
+              p->accepting ? "Accepting" : "Not accepting");
+      fprintf(fp, "Information        | 04 00 00 | %s\n", p->state_message);
 
- /*
-  * The activeicons file is needed to provide desktop icons for printers:
-  *
-  * [ quoted from /usr/lib/print/tagit ]
-  *
-  * --- Type of printer tags (base values)
-  *
-  * Dumb=66048			# 0x10200
-  * DumbColor=66080		# 0x10220
-  * Raster=66112		# 0x10240
-  * ColorRaster=66144		# 0x10260
-  * Plotter=66176		# 0x10280
-  * PostScript=66208		# 0x102A0
-  * ColorPostScript=66240	# 0x102C0
-  * MonoPostScript=66272	# 0x102E0
-  *
-  * --- Printer state modifiers for local printers
-  *
-  * Idle=0			# 0x0
-  * Busy=1			# 0x1
-  * Faulted=2			# 0x2
-  * Unknown=3			# 0x3 (Faulted due to unknown reason)
-  *
-  * --- Printer state modifiers for network printers
-  *
-  * NetIdle=8			# 0x8
-  * NetBusy=9			# 0x9
-  * NetFaulted=10		# 0xA
-  * NetUnknown=11		# 0xB (Faulted due to unknown reason)
-  */
+      fclose(fp);
 
-  snprintf(filename, sizeof(filename), "/var/spool/lp/activeicons/%s", p->name);
+      chmod(filename, 0664);
+      chown(filename, User, Group);
+    }
 
-  if ((fp = fopen(filename, "w")) != NULL)
-  {
-    if (p->type & CUPS_PRINTER_COLOR)
-      tag = 66240;
-    else
-      tag = 66272;
+   /*
+    * The activeicons file is needed to provide desktop icons for printers:
+    *
+    * [ quoted from /usr/lib/print/tagit ]
+    *
+    * --- Type of printer tags (base values)
+    *
+    * Dumb=66048			# 0x10200
+    * DumbColor=66080		# 0x10220
+    * Raster=66112		# 0x10240
+    * ColorRaster=66144		# 0x10260
+    * Plotter=66176		# 0x10280
+    * PostScript=66208		# 0x102A0
+    * ColorPostScript=66240	# 0x102C0
+    * MonoPostScript=66272	# 0x102E0
+    *
+    * --- Printer state modifiers for local printers
+    *
+    * Idle=0			# 0x0
+    * Busy=1			# 0x1
+    * Faulted=2			# 0x2
+    * Unknown=3			# 0x3 (Faulted due to unknown reason)
+    *
+    * --- Printer state modifiers for network printers
+    *
+    * NetIdle=8			# 0x8
+    * NetBusy=9			# 0x9
+    * NetFaulted=10		# 0xA
+    * NetUnknown=11		# 0xB (Faulted due to unknown reason)
+    */
 
-    if (p->type & CUPS_PRINTER_REMOTE)
-      tag |= 8;
+    snprintf(filename, sizeof(filename), "/var/spool/lp/activeicons/%s", p->name);
 
-    if (p->state == IPP_PRINTER_PROCESSING)
-      tag |= 1;
+    if (p->type & CUPS_PRINTER_CLASS)
+      unlink(filename);
+    else if ((fp = fopen(filename, "w")) != NULL)
+    {
+      if (p->type & CUPS_PRINTER_COLOR)
+	tag = 66240;
+      else
+	tag = 66272;
 
-    else if (p->state == IPP_PRINTER_STOPPED)
-      tag |= 2;
+      if (p->type & CUPS_PRINTER_REMOTE)
+	tag |= 8;
 
-    fputs("#!/bin/sh\n", fp);
-    fprintf(fp, "#Tag %d\n", tag);
+      if (p->state == IPP_PRINTER_PROCESSING)
+	tag |= 1;
 
-    fclose(fp);
+      else if (p->state == IPP_PRINTER_STOPPED)
+	tag |= 2;
 
-    chmod(filename, 0755);
-    chown(filename, User, Group);
+      fputs("#!/bin/sh\n", fp);
+      fprintf(fp, "#Tag %d\n", tag);
+
+      fclose(fp);
+
+      chmod(filename, 0755);
+      chown(filename, User, Group);
+    }
   }
 
  /*
@@ -2019,5 +2059,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.13 2002/01/29 21:18:16 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.14 2002/01/30 16:14:09 mike Exp $".
  */
