@@ -1,5 +1,5 @@
 /*
- * "$Id: lpoptions.c,v 1.9.2.3 2002/05/14 01:25:45 mike Exp $"
+ * "$Id: lpoptions.c,v 1.9.2.4 2002/08/18 17:24:28 mike Exp $"
  *
  *   Printer option program for the Common UNIX Printing System (CUPS).
  *
@@ -272,11 +272,26 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    }
 
             cupsFreeOptions(dest->num_options, dest->options);
-	    num_dests --;
 
-	    j = dest - dests;
-	    if (j < num_dests)
-	      memcpy(dest, dest + 1, (num_dests - j) * sizeof(cups_dest_t));
+           /*
+	    * If we are "deleting" the default printer, then just set the
+	    * number of options to 0; if it is also the system default
+	    * then cupsSetDests() will remove it for us...
+	    */
+
+	    if (dest->is_default)
+	    {
+	      dest->num_options = 0;
+	      dest->options     = NULL;
+	    }
+	    else
+	    {
+	      num_dests --;
+
+	      j = dest - dests;
+	      if (j < num_dests)
+		memcpy(dest, dest + 1, (num_dests - j) * sizeof(cups_dest_t));
+	    }
 
 	    cupsSetDests(num_dests, dests);
 	    dest = NULL;
@@ -432,5 +447,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpoptions.c,v 1.9.2.3 2002/05/14 01:25:45 mike Exp $".
+ * End of "$Id: lpoptions.c,v 1.9.2.4 2002/08/18 17:24:28 mike Exp $".
  */

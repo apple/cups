@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- "lpoptions -x printer" no longer clears the "default
+	  printer" status of the printer.
 	- cupsTempFd() now stops trying to create a temporary
 	  file after 1000 tries, and aborts on any error other
 	  than EEXIST.  This should prevent lp/lpr hangs due to
