@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c,v 1.14.2.3 2002/05/16 14:00:00 mike Exp $"
+ * "$Id: usersys.c,v 1.14.2.4 2002/10/22 19:58:37 mike Exp $"
  *
  *   User, system, and password routines for the Common UNIX Printing
  *   System (CUPS).
@@ -46,6 +46,10 @@
 #include "string.h"
 #include <stdlib.h>
 #include <ctype.h>
+
+#ifdef WIN32
+#  include <windows.h>
+#endif /* WIN32 */
 
 
 /*
@@ -309,9 +313,9 @@ cupsSetUser(const char *user)		/* I - User name */
 }
 
 
-#if defined(WIN32) || defined(__EMX__)
+#if defined(WIN32)
 /*
- * WIN32 and OS/2 username and password stuff...
+ * WIN32 username and password stuff...
  */
 
 /*
@@ -322,7 +326,20 @@ const char *				/* O - User name */
 cupsUser(void)
 {
   if (!cups_user[0])
-    strcpy(cups_user, "WindowsUser");
+  {
+    DWORD	size;		/* Size of string */
+
+
+    size = sizeof(cups_user);
+    if (!GetUserName(cups_user, &size))
+    {
+     /*
+      * Use the default username...
+      */
+
+      strcpy(cups_user, "unknown");
+    }
+  }
 
   return (cups_user);
 }
@@ -399,7 +416,7 @@ cups_get_password(const char *prompt)	/* I - Prompt string */
 {
   return (getpass(prompt));
 }
-#endif /* WIN32 || __EMX__ */
+#endif /* WIN32 */
 
 
 /*
@@ -437,5 +454,5 @@ cups_get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: usersys.c,v 1.14.2.3 2002/05/16 14:00:00 mike Exp $".
+ * End of "$Id: usersys.c,v 1.14.2.4 2002/10/22 19:58:37 mike Exp $".
  */
