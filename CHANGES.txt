@@ -131,6 +131,11 @@ CHANGES IN CUPS V1.1.5
 	  Solaris printing system did not understand.
         - Updated the lpq program to use the Solaris format
 	  except under Tru64 UNIX.
+	- Some DEC PPD files incorrectly use "Off" for the null
+	  value in UI constraints. Added "Off" to the list of
+	  accepted null values.
+	- Changed the *BSD define constants to __*BSD__ for all
+	  of the backends.
 
 
 CHANGES IN CUPS v1.1.4

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.99 2000/11/17 21:56:19 mike Exp $"
+ * "$Id: job.c,v 1.100 2000/11/20 20:14:02 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -242,7 +242,7 @@ CheckJobs(void)
 
   for (current = Jobs, prev = NULL; current != NULL; prev = current)
   {
-    LogMessage(L_DEBUG, "CheckJobs: current->state->values[0].integer = %d\n",
+    LogMessage(L_DEBUG2, "CheckJobs: current->state->values[0].integer = %d\n",
                current->state->values[0].integer);
 
    /*
@@ -404,8 +404,7 @@ LoadAllJobs(void)
   int		jobid,		/* Current job ID */
 		fileid;		/* Current file ID */
   ipp_attribute_t *attr;	/* Job attribute */
-  char		uri[HTTP_MAX_URI],/* URI for remote printer/class */
-		method[HTTP_MAX_URI],
+  char		method[HTTP_MAX_URI],
 				/* Method portion of URI */
 		username[HTTP_MAX_URI],
 				/* Username portion of URI */
@@ -490,42 +489,32 @@ LoadAllJobs(void)
                    &port, resource);
 
       if ((dest = ValidateDest(host, resource, &(job->dtype))) == NULL)
-        if (strcasecmp(host, "localhost") != 0 &&
-	    strcasecmp(host, ServerName) != 0)
+      {
+       /*
+	* Job queued on remote printer or class, so add it...
+	*/
+
+	if (strncmp(resource, "/classes/", 9) == 0)
 	{
-	 /*
-	  * Job queued on remote printer or class, so add it...
-	  */
+	  p = AddClass(resource + 9);
+	  strcpy(p->make_model, "Remote Class on unknown");
+	}
+	else
+	{
+	  p = AddPrinter(resource + 10);
+	  strcpy(p->make_model, "Remote Printer on unknown");
+	}
 
-	  if (strncmp(resource, "/classes/", 9) == 0)
-	  {
-	    p = AddClass(resource + 9);
-	    snprintf(p->make_model, sizeof(p->make_model),
-	             "Remote Class on %s", host);
-	  }
-	  else
-	  {
-	    p = AddPrinter(resource + 10);
-	    snprintf(p->make_model, sizeof(p->make_model),
-	             "Remote Printer on %s", host);
-	  }
+        p->state       = IPP_PRINTER_STOPPED;
+	p->type        |= CUPS_PRINTER_REMOTE;
+	p->browse_time = 2147483647;
 
-	  p->type        |= CUPS_PRINTER_REMOTE;
-	  p->browse_time = 2147483647;
+	strcpy(p->location, "Location Unknown");
+	strcpy(p->info, "No Information Available");
 
-	  *strchr(resource, '@') = '\0';
-	  snprintf(uri, sizeof(uri), "ipp://%s:%d%s", host, port, resource);
-
-	  strcpy(p->uri, uri);
-	  strcpy(p->more_info, uri);
-	  strcpy(p->device_uri, uri);
-	  strcpy(p->hostname, host);
-	  strcpy(p->location, "Location Unknown");
-	  strcpy(p->info, "No Information Available");
-
-	  SetPrinterAttrs(p);
-	  dest = p->name;
-        }
+	SetPrinterAttrs(p);
+	dest = p->name;
+      }
 
       if (dest == NULL)
       {
@@ -2625,5 +2614,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.99 2000/11/17 21:56:19 mike Exp $".
+ * End of "$Id: job.c,v 1.100 2000/11/20 20:14:02 mike Exp $".
  */

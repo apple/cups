@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.64 2000/11/06 16:18:12 mike Exp $"
+ * "$Id: dirsvc.c,v 1.65 2000/11/20 20:14:02 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -430,7 +430,7 @@ UpdateBrowseList(void)
     {
       if ((p = FindClass(resource + 9)) != NULL)
       {
-        if (strcasecmp(p->hostname, host) != 0)
+        if (strcasecmp(p->hostname, host) != 0 && p->hostname[0])
 	{
 	 /*
 	  * Nope, this isn't the same host; if the hostname isn't the local host,
@@ -440,21 +440,36 @@ UpdateBrowseList(void)
 
 	  if (p->type & CUPS_PRINTER_REMOTE)
 	  {
-            DeletePrinterFilters(p);
-            strcat(p->name, "@");
-	    strcat(p->name, p->hostname);
+            strncat(p->name, "@", sizeof(p->name) - 1);
+	    strncat(p->name, p->hostname, sizeof(p->name) - 1);
 	    SetPrinterAttrs(p);
 	    SortPrinters();
 	  }
 
           p = NULL;
 	}
+	else if (!p->hostname[0])
+	{
+          strncpy(p->hostname, host, sizeof(p->hostname) - 1);
+	  strncpy(p->uri, uri, sizeof(p->uri) - 1);
+	  strncpy(p->more_info, uri, sizeof(p->more_info) - 1);
+	  strncpy(p->device_uri, uri, sizeof(p->device_uri) - 1);
+          update = 1;
+        }
       }
       else
       {
         strncpy(name, resource + 9, sizeof(name) - 1);
         name[sizeof(name) - 1] = '\0';
       }
+    }
+    else if (!p->hostname[0])
+    {
+      strncpy(p->hostname, host, sizeof(p->hostname) - 1);
+      strncpy(p->uri, uri, sizeof(p->uri) - 1);
+      strncpy(p->more_info, uri, sizeof(p->more_info) - 1);
+      strncpy(p->device_uri, uri, sizeof(p->device_uri) - 1);
+      update = 1;
     }
 
     if (p == NULL)
@@ -470,10 +485,10 @@ UpdateBrowseList(void)
       */
 
       p->type = type;
-      strcpy(p->uri, uri);
-      strcpy(p->more_info, uri);
-      strcpy(p->device_uri, uri);
-      strcpy(p->hostname, host);
+      strncpy(p->uri, uri, sizeof(p->uri) - 1);
+      strncpy(p->more_info, uri, sizeof(p->more_info) - 1);
+      strncpy(p->device_uri, uri, sizeof(p->device_uri) - 1);
+      strncpy(p->hostname, host, sizeof(p->hostname) - 1);
 
       update = 1;
     }
@@ -493,7 +508,7 @@ UpdateBrowseList(void)
     {
       if ((p = FindPrinter(resource + 10)) != NULL)
       {
-        if (strcasecmp(p->hostname, host) != 0)
+        if (strcasecmp(p->hostname, host) != 0 && p->hostname[0])
 	{
 	 /*
 	  * Nope, this isn't the same host; if the hostname isn't the local host,
@@ -503,21 +518,36 @@ UpdateBrowseList(void)
 
 	  if (p->type & CUPS_PRINTER_REMOTE)
 	  {
-            DeletePrinterFilters(p);
-            strcat(p->name, "@");
-	    strcat(p->name, p->hostname);
+            strncat(p->name, "@", sizeof(p->name) - 1);
+	    strncat(p->name, p->hostname, sizeof(p->name) - 1);
 	    SetPrinterAttrs(p);
 	    SortPrinters();
 	  }
 
           p = NULL;
 	}
+	else if (!p->hostname[0])
+	{
+          strncpy(p->hostname, host, sizeof(p->hostname) - 1);
+	  strncpy(p->uri, uri, sizeof(p->uri) - 1);
+	  strncpy(p->more_info, uri, sizeof(p->more_info) - 1);
+	  strncpy(p->device_uri, uri, sizeof(p->device_uri) - 1);
+          update = 1;
+        }
       }
       else
       {
         strncpy(name, resource + 10, sizeof(name) - 1);
         name[sizeof(name) - 1] = '\0';
       }
+    }
+    else if (!p->hostname[0])
+    {
+      strncpy(p->hostname, host, sizeof(p->hostname) - 1);
+      strncpy(p->uri, uri, sizeof(p->uri) - 1);
+      strncpy(p->more_info, uri, sizeof(p->more_info) - 1);
+      strncpy(p->device_uri, uri, sizeof(p->device_uri) - 1);
+      update = 1;
     }
 
     if (p == NULL)
@@ -533,10 +563,10 @@ UpdateBrowseList(void)
       */
 
       p->type = type;
-      strcpy(p->uri, uri);
-      strcpy(p->more_info, uri);
-      strcpy(p->device_uri, uri);
-      strcpy(p->hostname, host);
+      strncpy(p->hostname, host, sizeof(p->hostname) - 1);
+      strncpy(p->uri, uri, sizeof(p->uri) - 1);
+      strncpy(p->more_info, uri, sizeof(p->more_info) - 1);
+      strncpy(p->device_uri, uri, sizeof(p->device_uri) - 1);
 
       update = 1;
     }
@@ -878,5 +908,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.64 2000/11/06 16:18:12 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.65 2000/11/20 20:14:02 mike Exp $".
  */
