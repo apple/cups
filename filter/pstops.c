@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.28 2002/12/11 18:39:21 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.29 2002/12/17 16:20:00 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -314,7 +314,13 @@ main(int  argc,			/* I - Number of command-line arguments */
   if (sloworder || slowcollate)
   {
     tempfd = cupsTempFd(tempfile, sizeof(tempfile));
-    temp   = fdopen(tempfd, "wb+");
+    if (tempfd < 0)
+    {
+      perror("ERROR: Unable to open temp file");
+      temp = NULL;
+    }
+    else
+      temp = fdopen(tempfd, "wb+");
 
     if (temp == NULL)
       slowcollate = sloworder = 0;
@@ -1670,5 +1676,5 @@ start_nup(int number,		/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.28 2002/12/11 18:39:21 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.29 2002/12/17 16:20:00 mike Exp $".
  */
