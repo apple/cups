@@ -1,8 +1,8 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: stcolor.ppd,v 1.4 2000/06/07 13:38:30 mike Exp $"
+*% "$Id: epson24.ppd,v 1.1 2000/06/07 13:38:30 mike Exp $"
 *%
-*%   Sample EPSON Stylus Color driver PPD file for the Common UNIX Printing
+*%   Sample EPSON 24-Pin driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
 *%
 *%   Copyright 1997-2000 by Easy Software Products.
@@ -27,22 +27,19 @@
 *FileVersion:	"1.1"
 *LanguageVersion: English 
 *LanguageEncoding: ISOLatin1
-*PCFileName:	"STCOLOR.PPD"
+*PCFileName:	"EPSON24.PPD"
 *Manufacturer:	"ESP"
 *Product:	"(CUPS v1.1)"
 *cupsVersion:	1.1
 *cupsManualCopies: True
 *cupsFilter:	"application/vnd.cups-raster 0 rastertoepson"
-*cupsColorProfile 180dpi/-: "1.0 1.0 1.0 0.0 -0.2 -0.4 1.0 0.0 -0.2 0.0 1.0"
-*cupsColorProfile 360dpi/-: "1.0 1.5 1.0 0.0 -0.2 -0.4 1.0 0.0 -0.2 0.0 1.0"
-*cupsColorProfile 720dpi/-: "1.0 2.5 1.0 0.0 -0.2 -0.4 1.0 0.0 -0.2 0.0 1.0"
-*ModelName:     "EPSON Stylus Color Series"
-*ShortNickName: "EPSON Stylus Color Series"
-*NickName:      "EPSON Stylus Color Series CUPS v1.1"
+*ModelName:     "EPSON 24-Pin Series"
+*ShortNickName: "EPSON 24-Pin Series"
+*NickName:      "EPSON 24-Pin Series CUPS v1.1"
 *PSVersion:	"(3010.000) 550"
 *LanguageLevel:	"3"
-*ColorDevice:	True
-*DefaultColorSpace: RGB
+*ColorDevice:	False
+*DefaultColorSpace: Gray
 *FileSystem:	False
 *Throughput:	"1"
 *LandscapeOrientation: Plus90
@@ -55,6 +52,7 @@
 *PageSize Letter:	"<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
 *PageSize Legal:	"<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
 *PageSize A4:		"<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+*PageSize FanFoldUS:	"<</PageSize[1071 792]/ImagingBBox null>>setpagedevice"
 *CloseUI: *PageSize
 
 *OpenUI *PageRegion: PickOne
@@ -63,32 +61,30 @@
 *PageRegion Letter:	"<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
 *PageRegion Legal:	"<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
 *PageRegion A4:		"<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+*PageRegion FanFoldUS:	"<</PageSize[1071 792]/ImagingBBox null>>setpagedevice"
 *CloseUI: *PageRegion
 
 *DefaultImageableArea: Letter 
-*ImageableArea Letter:	"8.60 39.60 603.40 766.49"
-*ImageableArea Legal:	"8.60 39.60 603.40 982.49"
-*ImageableArea A4:	"8.60 39.60 586.40 816.49"
+*ImageableArea Letter:	"18.0 0.0 594.0 792.0"
+*ImageableArea Legal:	"18.0 0.0 594.0 1008.0"
+*ImageableArea A4:	"18.0 0.0 577.0 842.0"
+*ImageableArea FanFoldUS: "18.0 0.0 1053.0 792.0"
 
 *DefaultPaperDimension: Letter
 *PaperDimension Letter:	"612 792"
 *PaperDimension Legal:	"612 1008"
 *PaperDimension A4:	"595 842"
+*PaperDimension FanFoldUS: "1071 792"
 
 *OpenUI *Resolution/Output Resolution: PickOne
 *OrderDependency: 20 AnySetup *Resolution
 *DefaultResolution: 360dpi
-*Resolution 180dpi/180 DPI: "<</HWResolution[180 180]>>setpagedevice"
-*Resolution 360dpi/360 DPI: "<</HWResolution[360 360]>>setpagedevice{0.6666 exp}bind settransfer"
-*Resolution 720dpi/720 DPI: "<</HWResolution[720 720]>>setpagedevice{0.4 exp}bind settransfer"
+*Resolution 60dpi/60 DPI: "<</HWResolution[60 60]/cupsRowCount 8>>setpagedevice"
+*Resolution 120dpi/120x60 DPI: "<</HWResolution[120 60]/cupsRowCount 8>>setpagedevice"
+*Resolution 180dpi/180 DPI: "<</HWResolution[180 180]/cupsRowCount 24>>setpagedevice"
+*Resolution 360x180dpi/360x180 DPI: "<</HWResolution[360 180]/cupsRowCount 24>>setpagedevice"
+*Resolution 360dpi/360 DPI: "<</HWResolution[360 360]/cupsRowCount 48>>setpagedevice"
 *CloseUI: *Resolution
-
-*OpenUI *ColorModel/Output Mode: PickOne
-*OrderDependency: 10 AnySetup *ColorModel
-*DefaultColorModel: CMYK
-*ColorModel CMYK/Color: "<</cupsColorOrder 1/cupsColorSpace 8/cupsCompression 1>>setpagedevice"
-*ColorModel Gray/Grayscale: "<</cupsColorOrder 0/cupsColorSpace 3/cupsCompression 1>>setpagedevice"
-*CloseUI: *ColorModel
 
 *DefaultFont: Courier
 *Font AvantGarde-Book: Standard "(001.006S)" Standard ROM
@@ -127,5 +123,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: stcolor.ppd,v 1.4 2000/06/07 13:38:30 mike Exp $".
+*% End of "$Id: epson24.ppd,v 1.1 2000/06/07 13:38:30 mike Exp $".
 *%

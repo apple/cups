@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: stphoto.ppd,v 1.3 2000/01/21 03:45:10 mike Exp $"
+*% "$Id: stphoto.ppd,v 1.4 2000/06/07 13:38:30 mike Exp $"
 *%
 *%   Sample EPSON Stylus Photo driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -39,8 +39,8 @@
 *ModelName:     "EPSON Stylus Photo Series"
 *ShortNickName: "EPSON Stylus Photo Series"
 *NickName:      "EPSON Stylus Photo Series CUPS v1.1"
-*PSVersion:	"(2017.000) 0"
-*LanguageLevel:	"2"
+*PSVersion:	"(3010.000) 550"
+*LanguageLevel:	"3"
 *ColorDevice:	True
 *DefaultColorSpace: RGB
 *FileSystem:	False
@@ -127,5 +127,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: stphoto.ppd,v 1.3 2000/01/21 03:45:10 mike Exp $".
+*% End of "$Id: stphoto.ppd,v 1.4 2000/06/07 13:38:30 mike Exp $".
 *%
