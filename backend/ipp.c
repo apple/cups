@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.19 2003/01/23 19:25:29 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.20 2003/01/28 19:27:12 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -216,7 +216,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     * Change the MIME type to application/vnd.cups-postscript...
     */
 
-    content_type = "application/vnd.cups-postscript";
+    content_type = "application/postscript";
   }
 #endif /* __APPLE__ */
   else
@@ -1078,5 +1078,5 @@ run_pictwps_filter(char **argv,			/* I - Command-line arguments */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.19 2003/01/23 19:25:29 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.20 2003/01/28 19:27:12 mike Exp $".
  */

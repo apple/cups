@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.33 2003/01/28 16:23:51 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.34 2003/01/28 19:27:13 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -31,8 +31,8 @@
  *   do_prolog()   - Send the necessary document prolog commands...
  *   do_setup()    - Send the necessary document setup commands...
  *   end_nup()     - End processing for N-up printing...
+ *   psbcp()       - Enable the binary communications protocol on the printer.
  *   psgets()      - Get a line from a file.
- *   psprotocol()  - Enable the binary transmission protocol on the printer.
  *   pswrite()     - Write data from a file.
  *   start_nup()   - Start processing for N-up printing...
  */
@@ -111,8 +111,8 @@ static void	end_nup(int number);
 #define		is_first_page(p)	(NUp == 1 || (((p)+1) % NUp) == 1)
 #define		is_last_page(p)		(NUp > 1 && (((p)+1) % NUp) == 0)
 #define 	is_not_last_page(p)	(NUp > 1 && ((p) % NUp) != 0)
+static void	psbcp(ppd_file_t *ppd);
 static char	*psgets(char *buf, size_t *bytes, FILE *fp);
-static void	psprotocol(ppd_file_t *ppd);
 static size_t	pswrite(const char *buf, size_t bytes, FILE *fp);
 static void	start_nup(int number, int show_border);
 
@@ -340,12 +340,6 @@ main(int  argc,			/* I - Number of command-line arguments */
     temp = NULL;
 
  /*
-  * Write any "exit server" options that have been selected...
-  */
-
-  ppdEmit(ppd, stdout, PPD_ORDER_EXIT);
-
- /*
   * See if we support a binary transmission protocol...
   */
 
@@ -354,11 +348,18 @@ main(int  argc,			/* I - Number of command-line arguments */
     if (strstr(ppd->protocols, "TBCP"))
       Protocol = PROT_TBCP;
     else if (strstr(ppd->protocols, "BCP"))
+    {
       Protocol = PROT_BCP;
 
-    if (Protocol)
-      psprotocol(ppd);
+      psbcp(ppd);
+    }
   }
+
+ /*
+  * Write any "exit server" options that have been selected...
+  */
+
+  ppdEmit(ppd, stdout, PPD_ORDER_EXIT);
 
  /*
   * Write any JCL commands that are needed to print PostScript code...
@@ -377,6 +378,13 @@ main(int  argc,			/* I - Number of command-line arguments */
     ppdClose(ppd);
     return (1);
   }
+
+ /*
+  * Switch to TBCP mode as needed...
+  */
+
+  if (Protocol == PROT_TBCP)
+    fputs("\001M", stdout);
 
  /*
   * Start sending the document with any commands needed...
@@ -1275,6 +1283,61 @@ end_nup(int number)	/* I - Page number */
 
 
 /*
+ * 'psbcp()' - Enable the binary communications protocol on the printer.
+ */
+
+static void
+psbcp(ppd_file_t *ppd)		/* I - PPD file */
+{
+  if (ppd->jcl_begin)
+    fputs(ppd->jcl_begin, stdout);
+  if (ppd->jcl_ps)
+    fputs(ppd->jcl_ps, stdout);
+
+  if (ppd->language_level == 1)
+  {
+   /*
+    * Use setsoftwareiomode for BCP mode...
+    */
+
+    fputs("%!PS-Adobe-3.0 ExitServer\n", stdout);
+    fputs("%%Title: (BCP - Level 1)\n", stdout);
+    fputs("%%EndComments\n", stdout);
+    fputs("%%BeginExitServer: 0\n", stdout);
+    fputs("serverdict begin 0 exitserver\n", stdout);
+    fputs("%%EndExitServer\n", stdout);
+    fputs("statusdict begin\n", stdout);
+    fputs("/setsoftwareiomode known {100 setsoftwareiomode}\n", stdout);
+    fputs("end\n", stdout);
+    fputs("%EOF\n", stdout);
+  }
+  else
+  {
+   /*
+    * Use setdevparams for BCP mode...
+    */
+
+    fputs("%!PS-Adobe-3.0\n", stdout);
+    fputs("%%Title: (BCP - Level 2)\n", stdout);
+    fputs("%%EndComments\n", stdout);
+    fputs("currentsysparams\n", stdout);
+    fputs("/CurInputDevice 2 copy known {\n", stdout);
+    fputs("get\n", stdout);
+    fputs("<</Protocol /Binary>> setdevparams\n", stdout);
+    fputs("}{\n", stdout);
+    fputs("pop pop\n", stdout);
+    fputs("} ifelse\n", stdout);
+    fputs("%EOF\n", stdout);
+  }
+
+  if (ppd->jcl_end)
+    fputs(ppd->jcl_end, stdout);
+  else if (ppd->num_filters == 0)
+    putchar(0x04);
+}
+
+
+/*
  * 'psgets()' - Get a line from a file.
  *
  * Note:
@@ -1353,26 +1416,6 @@ psgets(char   *buf,			/* I  - Buffer to read into */
 
 
 /*
- * 'psprotocol()' - Enable the binary transmission protocol on the printer.
- */
-
-static void
-psprotocol(ppd_file_t *ppd)		/* I - PPD file */
-{
-#if 0
-  if (ppd->jcl_begin)
-    fputs(ppd->jcl_begin, stdout);
-  if (ppd->jcl_ps)
-    fputs(ppd->jcl_ps, stdout);
-
-
-  if (ppd->jcl_end)
-    fputs(ppd->jcl_end, stdout);
-#endif /* 0 */
-}
-
-
-/*
  * 'pswrite()' - Write data from a file.
  */
 
@@ -1381,21 +1424,61 @@ pswrite(const char *buf,		/* I - Buffer to write */
         size_t     bytes,		/* I - Bytes to write */
 	FILE       *fp)			/* I - File to write to */
 {
-#if 0
+  size_t	count;			/* Remaining bytes */
+
+
   switch (Protocol)
   {
     case PROT_STANDARD :
         return (fwrite(buf, 1, bytes, fp));
 
     case PROT_BCP :
+        for (count = bytes; count > 0; count --, buf ++)
+	  switch (*buf)
+	  {
+	    case 0x01 : /* CTRL-A */
+	    case 0x03 : /* CTRL-C */
+	    case 0x04 : /* CTRL-D */
+	    case 0x05 : /* CTRL-E */
+	    case 0x11 : /* CTRL-Q */
+	    case 0x13 : /* CTRL-S */
+	    case 0x14 : /* CTRL-T */
+	    case 0x1c : /* CTRL-\ */
+	        putchar(0x01);
+		putchar(*buf ^ 0x40);
+	        break;
+
+	    default :
+	        putchar(*buf);
+		break;
+	  }
         return (bytes);
 
     case PROT_TBCP :
+        for (count = bytes; count > 0; count --, buf ++)
+	  switch (*buf)
+	  {
+	    case 0x01 : /* CTRL-A */
+	    case 0x03 : /* CTRL-C */
+	    case 0x04 : /* CTRL-D */
+	    case 0x05 : /* CTRL-E */
+	    case 0x11 : /* CTRL-Q */
+	    case 0x13 : /* CTRL-S */
+	    case 0x14 : /* CTRL-T */
+	    case 0x1b : /* CTRL-[ (aka ESC) */
+	    case 0x1c : /* CTRL-\ */
+	        putchar(0x01);
+		putchar(*buf ^ 0x40);
+	        break;
+
+	    default :
+	        putchar(*buf);
+		break;
+	  }
         return (bytes);
   }
-#else
+
   return (fwrite(buf, 1, bytes, fp));
-#endif /* 0 */
 }
 
 
@@ -1767,5 +1850,5 @@ start_nup(int number,			/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.33 2003/01/28 16:23:51 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.34 2003/01/28 19:27:13 mike Exp $".
  */

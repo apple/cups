@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The PostScript filter now supports binary PostScript
+	  files.
 	- The PPD API now provides additional information from
 	  the PPD file.
 	- The USB backend didn't compile on Solaris Intel.
