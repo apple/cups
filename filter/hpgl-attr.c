@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-attr.c,v 1.5 1999/02/17 21:51:57 mike Exp $"
+ * "$Id: hpgl-attr.c,v 1.6 1999/02/25 17:58:05 mike Exp $"
  *
  *   HPGL attribute processing for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,10 @@
  * Revision History:
  *
  *   $Log: hpgl-attr.c,v $
- *   Revision 1.5  1999/02/17 21:51:57  mike
+ *   Revision 1.6  1999/02/25 17:58:05  mike
+ *   PW command should set widths of all pens if no pen number specified.
+ *
+ *   Revision 1.5  1999/02/17  21:51:57  mike
  *   Updated scaling code to ignore the PlotSize.
  *
  *   Added support for IW command.
@@ -209,6 +212,7 @@ PC_pen_color(int num_params, param_t *params)
 void
 PW_pen_width(int num_params, param_t *params)
 {
+  int	pen;
   float	w;
 
 
@@ -241,8 +245,17 @@ PW_pen_width(int num_params, param_t *params)
     fprintf(OutputFile, "/W%d { %.1f PenScaling mul setlinewidth } bind def W%d\n",
             (int)params[1].value.number, w, (int)params[1].value.number);
   else
-    fprintf(OutputFile, "/W%d { %.1f PenScaling mul setlinewidth } bind def W%d\n", PenNumber,
-            w, PenNumber);
+  {
+   /*
+    * Set width for all pens...
+    */
+
+    for (pen = 1; pen <= PenCount; pen ++)
+      fprintf(OutputFile, "/W%d { %.1f PenScaling mul setlinewidth } bind def\n",
+              pen, w);
+
+    fprintf(OutputFile, "W%d\n", PenNumber);
+  }
 }
 
 
@@ -287,5 +300,5 @@ WU_width_units(int num_params, param_t *params)
 
 
 /*
- * End of "$Id: hpgl-attr.c,v 1.5 1999/02/17 21:51:57 mike Exp $".
+ * End of "$Id: hpgl-attr.c,v 1.6 1999/02/25 17:58:05 mike Exp $".
  */
