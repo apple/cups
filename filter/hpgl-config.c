@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.26 2000/08/03 19:02:34 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.27 2000/08/17 14:35:37 mike Exp $"
  *
  *   HP-GL/2 configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -42,6 +42,8 @@
  */
 
 #include "hpgltops.h"
+
+#define max(a,b) ((a) < (b) ? (b) : (a))
 
 
 /*
@@ -155,12 +157,7 @@ update_transform(void)
     scaling = page_width / height;
 
   if (FitPlot)
-  {
-    if (Rotation == 0 || Rotation == 180)
-      scaling *= page_width / PlotSize[1];
-    else
-      scaling *= page_width / PlotSize[0];
-  }
+    scaling *= max(page_width, page_height) / max(PlotSize[1], PlotSize[0]);
 
  /*
   * Offset for the current P1 location...
@@ -540,7 +537,7 @@ PS_plot_size(int     num_params,	/* I - Number of parameters */
 	* sends a two-argument PS command as documented in the
 	* HP-GL/2 Reference Manual from HP.  Instead, applications
 	* send the width before the length, which causes all sorts
-	* of problems.
+	* of problems when scaling.
 	*
 	* Rather than fight it, we now look for them as width,length
 	* instead of length,width.
@@ -634,5 +631,5 @@ SC_scale(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.26 2000/08/03 19:02:34 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.27 2000/08/17 14:35:37 mike Exp $".
  */
