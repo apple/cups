@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- Added new httpDecode64_2(), httpEncode64_2(), and
+	  httpSeparate2() functions which offer buffer size
+	  arguments (STR #797)
 	- The cupsGetFile() and cupsPutFile() code did not
 	  support CDSA or GNUTLS (STR #794)
 	- The httpSeparate() function did not decode all

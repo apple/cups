@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.53 2004/06/29 18:54:17 mike Exp $"
+ * "$Id: http.c,v 1.82.2.54 2004/07/02 04:08:59 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -55,7 +55,9 @@
  *   httpGetDateTime()    - Get a time value from a formatted date/time string.
  *   httpUpdate()         - Update the current HTTP state for incoming data.
  *   httpDecode64()       - Base64-decode a string.
+ *   httpDecode64_2()     - Base64-decode a string.
  *   httpEncode64()       - Base64-encode a string.
+ *   httpEncode64_2()     - Base64-encode a string.
  *   httpGetLength()      - Get the amount of data remaining from the
  *                          content-length or transfer-encoding fields.
  *   http_field()         - Return the field index for a field name.
@@ -1717,16 +1719,30 @@ httpUpdate(http_t *http)		/* I - HTTP data */
  * 'httpDecode64()' - Base64-decode a string.
  */
 
-char *				/* O - Decoded string */
-httpDecode64(char       *out,	/* I - String to write to */
-             const char *in)	/* I - String to read from */
+char *					/* O - Decoded string */
+httpDecode64(char       *out,		/* I - String to write to */
+             const char *in)		/* I - String to read from */
 {
-  int	pos,			/* Bit position */
-	base64;			/* Value of this character */
-  char	*outptr;		/* Output pointer */
+  return (httpDecode64_2(out, in, 512));
+}
 
 
-  for (outptr = out, pos = 0; *in != '\0'; in ++)
+/*
+ * 'httpDecode64_2()' - Base64-decode a string.
+ */
+
+char *					/* O - Decoded string */
+httpDecode64_2(char       *out,		/* I - String to write to */
+               const char *in,		/* I - String to read from */
+	       int        outlen)	/* I - Size of output string */
+{
+  int	pos,				/* Bit position */
+	base64;				/* Value of this character */
+  char	*outptr,			/* Output pointer */
+	*outend;			/* End of output buffer */
+
+
+  for (outptr = out, outend = out + outlen - 1, pos = 0; *in != '\0'; in ++)
   {
    /*
     * Decode this character into a number from 0 to 63...
@@ -1754,21 +1770,27 @@ httpDecode64(char       *out,	/* I - String to write to */
     switch (pos)
     {
       case 0 :
-          *outptr = base64 << 2;
+          if (outptr < outend)
+            *outptr = base64 << 2;
 	  pos ++;
 	  break;
       case 1 :
-          *outptr++ |= (base64 >> 4) & 3;
-	  *outptr = (base64 << 4) & 255;
+          if (outptr < outend)
+            *outptr++ |= (base64 >> 4) & 3;
+          if (outptr < outend)
+	    *outptr = (base64 << 4) & 255;
 	  pos ++;
 	  break;
       case 2 :
-          *outptr++ |= (base64 >> 2) & 15;
-	  *outptr = (base64 << 6) & 255;
+          if (outptr < outend)
+            *outptr++ |= (base64 >> 2) & 15;
+          if (outptr < outend)
+	    *outptr = (base64 << 6) & 255;
 	  pos ++;
 	  break;
       case 3 :
-          *outptr++ |= base64;
+          if (outptr < outend)
+            *outptr++ |= base64;
 	  pos = 0;
 	  break;
     }
@@ -1788,12 +1810,26 @@ httpDecode64(char       *out,	/* I - String to write to */
  * 'httpEncode64()' - Base64-encode a string.
  */
 
-char *				/* O - Encoded string */
-httpEncode64(char       *out,	/* I - String to write to */
-             const char *in)	/* I - String to read from */
+char *					/* O - Encoded string */
+httpEncode64(char       *out,		/* I - String to write to */
+             const char *in)		/* I - String to read from */
 {
-  char		*outptr;	/* Output pointer */
-  static const char base64[] =	/* Base64 characters... */
+  return (httpEncode64_2(out, in, 512));
+}
+
+
+/*
+ * 'httpEncode64_2()' - Base64-encode a string.
+ */
+
+char *					/* O - Encoded string */
+httpEncode64_2(char       *out,		/* I - String to write to */
+               const char *in,		/* I - String to read from */
+	       int        outlen)	/* I - Size of output string */
+{
+  char		*outptr,		/* Output pointer */
+		*outend;		/* End of output buffer */
+  static const char base64[] =		/* Base64 characters... */
   		{
 		  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		  "abcdefghijklmnopqrstuvwxyz"
@@ -1802,33 +1838,40 @@ httpEncode64(char       *out,	/* I - String to write to */
   		};
 
 
-  for (outptr = out; *in != '\0'; in ++)
+  for (outptr = out, outend = out + outlen - 1; *in != '\0'; in ++)
   {
    /*
     * Encode the up to 3 characters as 4 Base64 numbers...
     */
 
-    *outptr ++ = base64[in[0] >> 2];
-    *outptr ++ = base64[((in[0] << 4) | (in[1] >> 4)) & 63];
+    if (outptr < outend)
+      *outptr ++ = base64[in[0] >> 2];
+    if (outptr < outend)
+      *outptr ++ = base64[((in[0] << 4) | (in[1] >> 4)) & 63];
 
     in ++;
     if (*in == '\0')
     {
-      *outptr ++ = '=';
-      *outptr ++ = '=';
+      if (outptr < outend)
+        *outptr ++ = '=';
+      if (outptr < outend)
+        *outptr ++ = '=';
       break;
     }
 
-    *outptr ++ = base64[((in[0] << 2) | (in[1] >> 6)) & 63];
+    if (outptr < outend)
+      *outptr ++ = base64[((in[0] << 2) | (in[1] >> 6)) & 63];
 
     in ++;
     if (*in == '\0')
     {
-      *outptr ++ = '=';
+      if (outptr < outend)
+        *outptr ++ = '=';
       break;
     }
 
-    *outptr ++ = base64[in[0] & 63];
+    if (outptr < outend)
+      *outptr ++ = base64[in[0] & 63];
   }
 
   *outptr = '\0';
@@ -2478,5 +2521,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.53 2004/06/29 18:54:17 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.54 2004/07/02 04:08:59 mike Exp $".
  */

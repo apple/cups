@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.33.2.23 2004/06/29 18:54:17 mike Exp $"
+ * "$Id: http.h,v 1.33.2.24 2004/07/02 04:08:59 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -338,6 +338,15 @@ typedef struct
   http_addr_t		hostaddr;	/* Host address and port */
 } http_t;
 
+/**** New in CUPS 1.1.21 ****/
+extern char		*httpDecode64_2(char *out, const char *in, int outlen);
+extern char		*httpEncode64_2(char *out, const char *in, int outlen);
+extern void		httpSeparate2(const char *uri,
+			              char *method, int methodlen,
+			              char *username, int usernamelen,
+				      char *host, int hostlen, int *port,
+				      char *resource, int resourcelen);
+
 
 /*
  * Prototypes...
@@ -422,5 +431,5 @@ extern char		*httpAddrString(const http_addr_t *addr,
 #endif /* !_IPP_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.33.2.23 2004/06/29 18:54:17 mike Exp $".
+ * End of "$Id: http.h,v 1.33.2.24 2004/07/02 04:08:59 mike Exp $".
  */

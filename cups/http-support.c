@@ -1,5 +1,5 @@
 /*
- * "$Id: http-support.c,v 1.1.2.10 2004/07/02 03:47:41 mike Exp $"
+ * "$Id: http-support.c,v 1.1.2.11 2004/07/02 04:08:59 mike Exp $"
  *
  *   HTTP support routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -26,6 +26,8 @@
  * Contents:
  *
  *   httpSeparate()     - Separate a Universal Resource Identifier into its
+ *                        components.
+ *   httpSeparate2()    - Separate a Universal Resource Identifier into its
  *                        components.
  *   httpStatus()       - Return a short string describing a HTTP status code.
  *   cups_hstrerror()   - hstrerror() emulation function for Solaris and others...
@@ -67,10 +69,31 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 	     int        *port,		/* O - Port number to use */
              char       *resource)	/* O - Resource/filename [1024] */
 {
+  httpSeparate2(uri, method, 32, username, HTTP_MAX_URI, host, HTTP_MAX_URI,
+                port, resource, HTTP_MAX_URI);
+}
+
+
+/*
+ * 'httpSeparate2()' - Separate a Universal Resource Identifier into its
+ *                     components.
+ */
+
+void
+httpSeparate2(const char *uri,		/* I - Universal Resource Identifier */
+              char       *method,	/* O - Method (http, https, etc.) */
+	      int        methodlen,	/* I - Size of method buffer */
+	      char       *username,	/* O - Username */
+	      int        usernamelen,	/* I - Size of username buffer */
+	      char       *host,		/* O - Hostname */
+	      int        hostlen,	/* I - Size of hostname buffer */
+	      int        *port,		/* O - Port number to use */
+              char       *resource,	/* O - Resource/filename */
+	      int        resourcelen)	/* I - Size of resource buffer */
+{
   char		*ptr;			/* Pointer into string... */
   const char	*atsign,		/* @ sign */
 		*slash;			/* Separator */
-  char		safeuri[HTTP_MAX_URI];	/* "Safe" local copy of URI */
 
 
  /*
@@ -82,15 +105,6 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
     return;
 
  /*
-  * Copy the URL to a local string to make sure we don't have a URL
-  * longer than HTTP_MAX_URI characters long...
-  */
-
-  strlcpy(safeuri, uri, sizeof(safeuri));
-
-  uri = safeuri;
-
- /*
   * Grab the method portion of the URI...
   */
 
@@ -100,7 +114,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
     * Workaround for HP IPP client bug...
     */
 
-    strcpy(method, "ipp");
+    strlcpy(method, "ipp", methodlen);
   }
   else
   {
@@ -108,7 +122,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
     * Standard URI with method...
     */
 
-    uri = http_copy_decode(host, uri, HTTP_MAX_URI, ":");
+    uri = http_copy_decode(host, uri, hostlen, ":");
 
     if (*uri == ':')
       uri ++;
@@ -122,7 +136,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
     {
       if ((ptr = strchr(host, '/')) != NULL)
       {
-	strlcpy(resource, ptr, HTTP_MAX_URI);
+	strlcpy(resource, ptr, resourcelen);
 	*ptr = '\0';
       }
       else
@@ -137,17 +151,17 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 	*port = strtol(uri, (char **)&uri, 10);
 
 	if (*uri == '/')
-          strlcpy(resource, uri, HTTP_MAX_URI);
+          strlcpy(resource, uri, resourcelen);
       }
       else
 	*port = 631;
 
-      strcpy(method, "http");
+      strlcpy(method, "http", methodlen);
       username[0] = '\0';
       return;
     }
     else
-      strlcpy(method, host, 32);
+      strlcpy(method, host, methodlen);
   }
 
  /*
@@ -156,7 +170,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 
   if (strncmp(uri, "//", 2) != 0)
   {
-    strlcpy(resource, uri, HTTP_MAX_URI);
+    strlcpy(resource, uri, resourcelen);
 
     username[0] = '\0';
     host[0]     = '\0';
@@ -179,7 +193,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
     * Got a username:password combo...
     */
 
-    uri = http_copy_decode(username, uri, HTTP_MAX_URI, "@") + 1;
+    uri = http_copy_decode(username, uri, usernamelen, "@") + 1;
   }
   else
     username[0] = '\0';
@@ -188,7 +202,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
   * Grab the hostname...
   */
 
-  uri = http_copy_decode(host, uri, HTTP_MAX_URI, ":/");
+  uri = http_copy_decode(host, uri, hostlen, ":/");
 
   if (*uri != ':')
   {
@@ -229,7 +243,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
   * The remaining portion is the resource string...
   */
 
-  http_copy_decode(resource, uri, HTTP_MAX_URI, "");
+  http_copy_decode(resource, uri, resourcelen, "");
 }
 
 
@@ -360,5 +374,5 @@ http_copy_decode(char       *dst,	/* O - Destination buffer */
 
 
 /*
- * End of "$Id: http-support.c,v 1.1.2.10 2004/07/02 03:47:41 mike Exp $".
+ * End of "$Id: http-support.c,v 1.1.2.11 2004/07/02 04:08:59 mike Exp $".
  */
