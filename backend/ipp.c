@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.7 1999/07/20 14:05:45 mike Exp $"
+ * "$Id: ipp.c,v 1.8 1999/07/24 10:59:33 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,7 @@
  *
  * Contents:
  *
+ *   main() - Send a file to the printer or server.
  */
 
 /*
@@ -146,12 +147,10 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
 
-  ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME, "requesting-user-name",
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
                NULL, argv[2]);
 
-  ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL, argv[3]);
-
-  ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies", atoi(argv[4]));
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL, argv[3]);
 
  /*
   * Handle options on the command-line...
@@ -161,11 +160,13 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   num_options = cupsParseOptions(argv[5], 0, &options);
 
   if (cupsGetOption("raw", num_options, options))
-    ippAddString(request, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format",
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
         	 NULL, "application/vnd.cups-raw");
   else
-    ippAddString(request, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format",
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
         	 NULL, "application/octet-stream");
+
+  ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies", atoi(argv[4]));
 
   for (i = 0; i < num_options; i ++)
   {
@@ -396,5 +397,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.7 1999/07/20 14:05:45 mike Exp $".
+ * End of "$Id: ipp.c,v 1.8 1999/07/24 10:59:33 mike Exp $".
  */

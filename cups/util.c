@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.27 1999/07/15 14:05:02 mike Exp $"
+ * "$Id: util.c,v 1.28 1999/07/24 11:03:35 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -118,7 +118,7 @@ cupsCancelJob(const char *name,	/* I - Name of printer or class */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
 
-  ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job);
+  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-id", job);
 
  /*
   * Do the request...
@@ -723,17 +723,17 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
   */
 
   if (cupsGetOption("raw", num_options, options))
-    ippAddString(request, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format",
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
         	 NULL, "application/vnd.cups-raw");
   else
-    ippAddString(request, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format",
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
         	 NULL, "application/octet-stream");
 
-  ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME, "requesting-user-name",
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
                NULL, cupsUser());
 
   if (title)
-    ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL, title);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL, title);
 
  /*
   * Then add all options on the command-line...
@@ -935,5 +935,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.27 1999/07/15 14:05:02 mike Exp $".
+ * End of "$Id: util.c,v 1.28 1999/07/24 11:03:35 mike Exp $".
  */
