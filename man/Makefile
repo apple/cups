@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.8 2000/03/30 05:19:26 mike Exp $"
+# "$Id: Makefile,v 1.9 2000/05/10 21:07:04 mike Exp $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,10 +28,11 @@ include ../Makedefs
 # Man pages...
 #
 
-CAT1	=	backend.1 filter.1 lp.1 lpq.1 lprm.1 lpr.1 lpstat.1
+CAT1	=	backend.1 filter.1 lp.1 lpoptions.1 lpq.1 lprm.1 lpr.1 lpstat.1
 CAT5	=	classes.conf.5 cupsd.conf.5 mime.convs.5 mime.types.5 \
 		printers.conf.5
-CAT8	=	accept.8 cupsd.8 enable.8 lpadmin.8 lpc.8
+CAT8	=	accept.8 cups-lpd.8 cups-polld.8 cupsd.8 enable.8 \
+		lpadmin.8 lpinfo.8 lpmove.8 lpc.8
 
 MAN1	=	$(CAT1:.1=.man)
 MAN5	=	$(CAT5:.5=.man)
@@ -114,5 +115,5 @@ install-bsdcat:
 
 
 #
-# End of "$Id: Makefile,v 1.8 2000/03/30 05:19:26 mike Exp $".
+# End of "$Id: Makefile,v 1.9 2000/05/10 21:07:04 mike Exp $".
 #

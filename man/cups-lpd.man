@@ -1,0 +1,57 @@
+.\"
+.\" "$Id: cups-lpd.man,v 1.1 2000/05/10 21:07:04 mike Exp $"
+.\"
+.\"   cups-lpd man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2000 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH cups-lpd 8 "Common UNIX Printing System" "10 May 2000" "Easy Software Products"
+.SH NAME
+cups-lpd \- receive print jobs and report printer status to lpd clients
+.SH SYNOPSIS
+.B cups-lpd
+.SH DESCRIPTION
+\fBcups-lpd\fR is the CUPS Line Printer Daemon ("LPD") mini-server that
+supports legacy client systems that use the LPD protocol.
+\fBcups-lpd\fR does not act as a standalone network daemon but instead
+operates using the Internet "super-server" \fBinetd(8)\fR. Add the
+following line to the \fBinetd.conf\fR file to enable the
+\fBcups-lpd\fR daemon:
+.br
+.nf
+
+printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd
+.fi
+.SH COMPATIBILITY
+\fBcups-lpd\fR does not enforce the restricted source port number specified
+in RFC 1179, as using restricted ports does not prevent determined users
+from submitting print jobs. While this behavior is different than standard
+Berkeley LPD implementations, it should not affect normal client operations.
+.LP
+The output of the status requests follows RFC 2569, Mapping between
+LPD and IPP Protocols. Since many LPD implementations stray from this
+definition, remote status reporting to LPD clients may be unreliable.
+.SH SEE ALSO
+inetd(8),
+CUPS Software Administrators Manual
+.SH COPYRIGHT
+Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
+.\"
+.\" End of "$Id: cups-lpd.man,v 1.1 2000/05/10 21:07:04 mike Exp $".
+.\"

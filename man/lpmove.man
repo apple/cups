@@ -1,0 +1,125 @@
+.\"
+.\" "$Id: lpmove.man,v 1.1 2000/05/10 21:07:04 mike Exp $"
+.\"
+.\"   lpmove man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2000 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH lpmove 1 "Common UNIX Printing System" "1 May 2000" "Easy Software Products"
+.SH NAME
+lpmove \- print cups status information
+.SH SYNOPSIS
+.B lpmove
+[ -a [
+.I destination(s)
+] ] [ -c [
+.I class(es)
+] [ -d ] [ -h
+.I server
+] [ -l ] [ -o [
+.I destination(s)
+] ] [ -p [
+.I printer(s)
+] ] [ -r ] [ -R ] [ -s ] [ -t ] [ -u [
+.I user(s)
+] ] [ -v [
+.I printer(s)
+] ]
+.SH DESCRIPTION
+\fBlpmove\fR displays status information about the current classes, jobs, and
+printers. When run with no arguments, \fBlpmove\fR will list jobs queued by
+the user. Other options include:
+.TP 5
+\-a [\fIprinter(s)\fR]
+.br
+Shows the accepting state of printer queues. If no printers are
+specified then all printers are listed.
+.TP 5
+\-c [\fIclass(es)\fR]
+.br
+Shows the printer classes and the printers that belong to them. If no
+classes are specified then all classes are listed.
+.TP 5
+\-d
+.br
+Shows the current default destination.
+.TP 5
+\-h \fIserver\fR
+.br
+Specifies the CUPS server to communicate with.
+.TP 5
+\-l
+.br
+Shows a long listing of printers, classes, or jobs.
+.TP 5
+\-o [\fIdestination(s)\fR]
+.br
+Shows the jobs queue on the specified destinations. If no destinations are
+specified all jobs are shown.
+.TP 5
+\-p [\fIprinter(s)\fR]
+.br
+Shows the printers and whether or not they are enabled for printing. If
+no printers are specified then all printers are listed.
+.TP 5
+\-r
+.br
+Shows whether or not the CUPS server is running.
+.TP 5
+\-R
+.br
+Shows the ranking of print jobs.
+.TP 5
+\-s
+.br
+Shows a status summary, including the system default destination, a
+list of classes and their member printers, and a list of printers and
+their associated devices. This is equivalent to using the "-d", "-c",
+and "-p" options.
+.TP 5
+\-t
+.br
+Shows all status information. This is equivalent to using the "-r",
+"-d", "-c", "-d", "-v", "-a", "-p", and "-o" options.
+.TP 5
+\-u [\fIuser(s)\fR]
+.br
+Shows a list of print jobs queued by the specified users. If no users
+are specified, lists the jobs queued by the current user.
+.TP 5
+\-v [\fIprinter(s)\fR]
+.br
+Shows the printers and what device they are attached to. If no printers
+are specified then all printers are listed.
+.SH COMPATIBILITY
+Unlike the System V printing system, CUPS allows printer names to contain
+any printable character except SPACE and TAB. Also, printer and class names are
+\fBnot\fR case-sensitive.
+.LP
+The "-h" option is not a standard System V option.
+.LP
+The Solaris "-f", "-P", and "-S" options are silently ignored.
+.SH SEE ALSO
+cancel(1), lp(1),
+CUPS Software Users Manual
+.SH COPYRIGHT
+Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
+.\"
+.\" End of "$Id: lpmove.man,v 1.1 2000/05/10 21:07:04 mike Exp $".
+.\"

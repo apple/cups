@@ -1,0 +1,45 @@
+.\"
+.\" "$Id: cups-polld.man,v 1.1 2000/05/10 21:07:04 mike Exp $"
+.\"
+.\"   cups-polld man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2000 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH cups-polld 8 "Common UNIX Printing System" "10 May 2000" "Easy Software Products"
+.SH NAME
+cups-polld \- cups printer polling daemon
+.SH SYNOPSIS
+.B cups-polld
+.I address ipp-port interval browse-port
+.SH DESCRIPTION
+\fBcups-polld\fR polls remote servers for a list of available printers
+and printer classes every \fIinterval\fR seconds. Printer and class
+information is then broadcast to the localhost interface (127.0.0.1)
+for reception by \fBcupsd(8)\fR.
+.PP
+This program is started automatically by \fBcupsd\fR for each
+BrowsePoll directive found in the \fBcupsd.conf\fR file.
+.SH SEE ALSO
+cupsd.conf(5),
+CUPS Software Administrators Manual
+.SH COPYRIGHT
+Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
+.\"
+.\" End of "$Id: cups-polld.man,v 1.1 2000/05/10 21:07:04 mike Exp $".
+.\"
