@@ -1,6 +1,13 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.19rc3
+
+	- Updated all of the Western European locales to default
+	  to ISO-8859-15 (for Euro support)
+	- Updated the German message catalog.
+
+
 CHANGES IN CUPS V1.1.19rc2
 
 	- cupsLangGet() now sets the encoding field based on the
