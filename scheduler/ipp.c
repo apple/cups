@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.81 2004/04/20 13:40:30 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.82 2004/06/01 14:42:28 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -672,7 +672,7 @@ add_class(client_t        *con,		/* I - Client connection */
 
     if (ImplicitAnyClasses)
     {
-      snprintf(pclass->name, sizeof(pclass->name), "Any%s", resource + 9);
+      SetStringf(&pclass->name, "Any%s", resource + 9);
       SortPrinters();
     }
     else
@@ -692,8 +692,7 @@ add_class(client_t        *con,		/* I - Client connection */
     */
 
     DeletePrinterFilters(pclass);
-    snprintf(pclass->name, sizeof(pclass->name), "%s@%s", resource + 9,
-             pclass->hostname);
+    SetStringf(&pclass->name, "%s@%s", resource + 9, pclass->hostname);
     SetPrinterAttrs(pclass);
     SortPrinters();
 
@@ -1099,7 +1098,7 @@ add_printer(client_t        *con,	/* I - Client connection */
 
     if (ImplicitAnyClasses)
     {
-      snprintf(printer->name, sizeof(printer->name), "Any%s", resource + 10);
+      SetStringf(&printer->name, "Any%s", resource + 10);
       SortPrinters();
     }
     else
@@ -1119,8 +1118,7 @@ add_printer(client_t        *con,	/* I - Client connection */
     */
 
     DeletePrinterFilters(printer);
-    snprintf(printer->name, sizeof(printer->name), "%s@%s", resource + 10,
-             printer->hostname);
+    SetStringf(&printer->name, "%s@%s", resource + 10, printer->hostname);
     SetPrinterAttrs(printer);
     SortPrinters();
 
@@ -6914,5 +6912,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.81 2004/04/20 13:40:30 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.82 2004/06/01 14:42:28 mike Exp $".
  */

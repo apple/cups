@@ -1,6 +1,12 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.21rc2
+
+	- Changed some calls to snprintf() in the scheduler to
+	  SetStringf() (STR #740)
+
+
 CHANGES IN CUPS V1.1.21rc1
 
 	- Fixed some "type-punned" warnings produced by GCC when
