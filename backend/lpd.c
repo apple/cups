@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.28.2.10 2002/09/05 20:46:36 mike Exp $"
+ * "$Id: lpd.c,v 1.28.2.11 2002/09/25 13:08:43 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -396,7 +396,7 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
   alarm(30);
 
   if (recv(fd, &status, 1, 0) < 1)
-    return (-1);
+    status = errno;
 
   alarm(0);
 
@@ -424,7 +424,6 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 	  int  reserve,		/* I - Reserve ports? */
 	  int  manual_copies)	/* I - Do copies by hand... */
 {
-  int			tries;		/* Number of tries */
   FILE			*fp;		/* Job file */
   char			localhost[255];	/* Local host name */
   int			error;		/* Error number */
@@ -444,8 +443,27 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
+ /*
+  * Setup an alarm handler for timeouts...
+  */
 
-  for (tries = 0; tries < 10; tries ++)
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+  sigset(SIGALRM, lpd_timeout);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+
+  sigemptyset(&action.sa_mask);
+  action.sa_handler = lpd_timeout;
+  sigaction(SIGALRM, &action, NULL);
+#else
+  signal(SIGALRM, lpd_timeout);
+#endif /* HAVE_SIGSET */
+
+ /*
+  * Loop forever trying to print the file...
+  */
+
+  for (;;) /* FOREVER */
   {
    /*
     * First try to reserve a port for this connection...
@@ -479,6 +497,8 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
           perror("ERROR: Unable to create socket");
           return (1);
 	}
+
+	port = 515;
       }
       else
       {
@@ -549,22 +569,6 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
     }
 
    /*
-    * Setup an alarm handler for timeouts...
-    */
-
-#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-    sigset(SIGALRM, lpd_timeout);
-#elif defined(HAVE_SIGACTION)
-    memset(&action, 0, sizeof(action));
-
-    sigemptyset(&action.sa_mask);
-    action.sa_handler = lpd_timeout;
-    sigaction(SIGALRM, &action, NULL);
-#else
-    signal(SIGALRM, lpd_timeout);
-#endif /* HAVE_SIGSET */
-
-   /*
     * Next, open the print file and figure out its size...
     */
 
@@ -621,7 +625,8 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
       lpd_command(fd, "\002%d cfA%03.3d%s\n", strlen(control), getpid() % 1000,
         	  localhost);
 
-      fprintf(stderr, "INFO: Sending control file (%lu bytes)\n", (unsigned long)strlen(control));
+      fprintf(stderr, "INFO: Sending control file (%lu bytes)\n",
+              (unsigned long)strlen(control));
 
       alarm(30);
 
@@ -709,7 +714,8 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
       lpd_command(fd, "\002%d cfA%03.3d%s\n", strlen(control), getpid() % 1000,
         	  localhost);
 
-      fprintf(stderr, "INFO: Sending control file (%lu bytes)\n", (unsigned long)strlen(control));
+      fprintf(stderr, "INFO: Sending control file (%lu bytes)\n",
+              (unsigned long)strlen(control));
 
       alarm(30);
 
@@ -743,18 +749,29 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
     fclose(fp);
 
     if (status == 0)
-      break;
+      return (0);
+
+   /*
+    * Restore the SIGTERM handler if we are waiting for a retry...
+    */
+
+    if (fromstdin)
+    {
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+      sigset(SIGTERM, SIG_DFL);
+#elif defined(HAVE_SIGACTION)
+      memset(&action, 0, sizeof(action));
+
+      sigemptyset(&action.sa_mask);
+      action.sa_handler = SIG_DFL;
+      sigaction(SIGTERM, &action, NULL);
+#else
+      signal(SIGTERM, SIG_DFL);
+#endif /* HAVE_SIGSET */
+    }
+
+    sleep(30);
   }
-
-  if (status)
-  {
-    fputs("ERROR: Unable to queue job on remote printer after 10 "
-          "connections - aborting!\n", stderr);
-
-    return (status);
-  }
-
-  return (0);
 }
 
 
@@ -891,5 +908,5 @@ rresvport(int *port)		/* IO - Port number to bind to */
 #endif /* !HAVE_RRESVPORT */
 
 /*
- * End of "$Id: lpd.c,v 1.28.2.10 2002/09/05 20:46:36 mike Exp $".
+ * End of "$Id: lpd.c,v 1.28.2.11 2002/09/25 13:08:43 mike Exp $".
  */
