@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertodymo.c,v 1.1 2001/07/18 01:00:05 mike Exp $"
+ * "$Id: rastertodymo.c,v 1.2 2001/07/18 01:10:01 mike Exp $"
  *
  *   DYMO label printer filter for the Common UNIX Printing System (CUPS).
  *
@@ -51,7 +51,8 @@
  */
 
 unsigned char	*Buffer;		/* Output buffer */
-int		Feed;			/* Number of lines to skip */
+int		Page,			/* Current page */
+		Feed;			/* Number of lines to skip */
 
 
 /*
@@ -380,5 +381,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertodymo.c,v 1.1 2001/07/18 01:00:05 mike Exp $".
+ * End of "$Id: rastertodymo.c,v 1.2 2001/07/18 01:10:01 mike Exp $".
  */
