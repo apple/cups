@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.111 2002/01/28 19:09:52 mike Exp $"
+ * "$Id: printers.c,v 1.112 2002/01/29 02:53:09 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1669,7 +1669,7 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
     * Stop it...
     */
 
-    StopJob(job->id);
+    StopJob(job->id, 0);
 
    /*
     * Reset the state to pending...
@@ -2004,5 +2004,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.111 2002/01/28 19:09:52 mike Exp $".
+ * End of "$Id: printers.c,v 1.112 2002/01/29 02:53:09 mike Exp $".
  */

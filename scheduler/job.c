@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.143 2002/01/26 21:35:09 mike Exp $"
+ * "$Id: job.c,v 1.144 2002/01/29 02:53:08 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -137,7 +137,7 @@ CancelJob(int id,		/* I - Job to cancel */
       DEBUG_puts("CancelJob: found job in list.");
 
       if (current->state->values[0].integer == IPP_JOB_PROCESSING)
-	StopJob(current->id);
+	StopJob(current->id, 0);
 
       current->state->values[0].integer = IPP_JOB_CANCELLED;
 
@@ -429,7 +429,7 @@ HoldJob(int id)			/* I - Job ID */
     return;
 
   if (job->state->values[0].integer == IPP_JOB_PROCESSING)
-    StopJob(id);
+    StopJob(id, 0);
 
   DEBUG_puts("HoldJob: setting state to held...");
 
@@ -1657,7 +1657,7 @@ StopAllJobs(void)
   for (current = Jobs; current != NULL; current = current->next)
     if (current->state->values[0].integer == IPP_JOB_PROCESSING)
     {
-      StopJob(current->id);
+      StopJob(current->id, 1);
       current->state->values[0].integer = IPP_JOB_PENDING;
     }
 }
@@ -1668,13 +1668,14 @@ StopAllJobs(void)
  */
 
 void
-StopJob(int id)			/* I - Job ID */
+StopJob(int id,			/* I - Job ID */
+        int force)		/* I - 1 = Force all filters to stop */
 {
   int	i;			/* Looping var */
   job_t	*current;		/* Current job */
 
 
-  LogMessage(L_DEBUG, "StopJob: id = %d", id);
+  LogMessage(L_DEBUG, "StopJob: id = %d, force = %d", id, force);
 
   for (current = Jobs; current != NULL; current = current->next)
     if (current->id == id)
@@ -1703,7 +1704,7 @@ StopJob(int id)			/* I - Job ID */
         for (i = 0; current->procs[i]; i ++)
 	  if (current->procs[i] > 0)
 	  {
-	    kill(current->procs[i], SIGTERM);
+	    kill(current->procs[i], force ? SIGKILL : SIGTERM);
 	    current->procs[i] = 0;
 	  }
 
@@ -1930,7 +1931,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
       * Backend had errors; stop it...
       */
 
-      StopJob(job->id);
+      StopJob(job->id, 0);
       job->state->values[0].integer = IPP_JOB_PENDING;
       SaveJob(job->id);
     }
@@ -2992,5 +2993,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.143 2002/01/26 21:35:09 mike Exp $".
+ * End of "$Id: job.c,v 1.144 2002/01/29 02:53:08 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.h,v 1.27 2002/01/02 17:59:16 mike Exp $"
+ * "$Id: job.h,v 1.28 2002/01/29 02:53:09 mike Exp $"
  *
  *   Print job definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -98,10 +98,10 @@ extern void	SetJobHoldUntil(int id, const char *when);
 extern void	SetJobPriority(int id, int priority);
 extern void	StartJob(int id, printer_t *printer);
 extern void	StopAllJobs(void);
-extern void	StopJob(int id);
+extern void	StopJob(int id, int force);
 extern void	UpdateJob(job_t *job);
 
 
 /*
- * End of "$Id: job.h,v 1.27 2002/01/02 17:59:16 mike Exp $".
+ * End of "$Id: job.h,v 1.28 2002/01/29 02:53:09 mike Exp $".
  */
