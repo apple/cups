@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.12 2002/05/16 14:00:07 mike Exp $"
+ * "$Id: client.c,v 1.91.2.13 2002/05/22 20:31:04 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -271,6 +271,8 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
    /*
     * https connection; go secure...
     */
+
+    con->http.encryption = HTTP_ENCRYPT_ALWAYS;
 
     EncryptClient(con);
   }
@@ -2405,8 +2407,11 @@ pipe_command(client_t *con,	/* I - Client connection */
   * Tell the CGI if we are using encryption...
   */
 
-  if (con->http.encryption >= HTTP_ENCRYPT_REQUIRED)
+  if (con->http.encryption == HTTP_ENCRYPT_ALWAYS)
+  {
     envp[envc ++] = "HTTPS=ON";
+    envp[envc ++] = "CUPS_ENCRYPTION=Always";
+  }
 
   envp[envc] = NULL;
 
@@ -2521,5 +2526,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.12 2002/05/16 14:00:07 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.13 2002/05/22 20:31:04 mike Exp $".
  */
