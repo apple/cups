@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.12 1999/03/21 21:12:14 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.13 1999/03/22 01:19:44 mike Exp $"
  *
  *   HP-GL/2 configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -336,7 +336,6 @@ PG_advance_page(int     num_params,	/* I - Number of parameters */
   {
     puts("grestore");
     puts("showpage");
-    puts("%%EndPage");
 
     PageDirty = 0;
   }
@@ -453,5 +452,5 @@ SC_scale(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.12 1999/03/21 21:12:14 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.13 1999/03/22 01:19:44 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.9 1999/03/21 21:12:19 mike Exp $"
+ * "$Id: texttops.c,v 1.10 1999/03/22 01:19:45 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -89,12 +89,12 @@ int	Reversed = 0,		/* Reverse pages */
 	Flip = 0;		/* Flip/mirror pages */
 int	CharsPerInch = 10;	/* Number of character columns per inch */
 int	LinesPerInch = 6;	/* Number of lines per inch */
-float	Left = 18.0f,		/* Left margin */
-	Right = 594.0f,		/* Right margin */
-	Bottom = 36.0f,		/* Bottom margin */
-	Top = 756.0f,		/* Top margin */
-	Width = 612.0f,		/* Total page width */
-	Length = 792.0f;	/* Total page length */
+float	PageLeft = 18.0f,	/* Left margin */
+	PageRight = 594.0f,	/* Right margin */
+	PageBottom = 36.0f,	/* Bottom margin */
+	PageTop = 756.0f,	/* Top margin */
+	PageWidth = 612.0f,	/* Total page width */
+	PageLength = 792.0f;	/* Total page length */
 int	UTF8 = 0;		/* Use UTF-8 encoding? */
 char	*Glyphs[65536];		/* PostScript glyphs for Unicode */
 
@@ -108,7 +108,7 @@ static int	getutf8(FILE *fp);
 static void	write_epilogue(ppd_file_t *ppd);
 static void	write_line(int row, lchar_t *line);
 static void	write_page(ppd_file_t *ppd);
-static void	write_prolog(ppd_file_t *ppd, char *title, int num_copies);
+static void	write_prolog(ppd_file_t *ppd, char *title, char *user, int num_copies);
 static void	write_string(int col, int row, int len, lchar_t *s);
 
 
@@ -340,7 +340,6 @@ write_page(ppd_file_t *ppd)	/* I - PPD file */
 
     puts("grestore");
     puts("showpage");
-    puts("%%EndPage");
   }
 
   memset(Page[0], 0, sizeof(lchar_t) * SizeColumns * SizeLines);
@@ -354,6 +353,7 @@ write_page(ppd_file_t *ppd)	/* I - PPD file */
 static void
 write_prolog(ppd_file_t *ppd,		/* I - PPD file */
              char       *title,		/* I - Title of job */
+	     char	*user,		/* I - Username */
              int        num_copies)	/* I - Number of copies */
 {
   int	line;				/* Current output line */
@@ -371,7 +371,8 @@ write_prolog(ppd_file_t *ppd,		/* I - PPD file */
   ppdEmit(ppd, stdout, PPD_ORDER_JCL);
 
   puts("%!PS-Adobe-3.0");
-  printf("%%%%BoundingBox: %.0f %.0f %.0f %.0f\n", Left, Bottom, Right, Top);
+  printf("%%%%BoundingBox: %.0f %.0f %.0f %.0f\n", PageLeft, PageBottom,
+         PageRight, PageTop);
   if (ppd)
     printf("%%%%LanguageLevel: %d\n", ppd->language_level);
   else
@@ -384,21 +385,21 @@ write_prolog(ppd_file_t *ppd,		/* I - PPD file */
 
   if (Landscape)
   {
-    temp   = Left;
-    Left   = Bottom;
-    Bottom = temp;
+    temp       = PageLeft;
+    PageLeft   = PageBottom;
+    PageBottom = temp;
 
-    temp   = Right;
-    Right  = Top;
-    Top    = temp;
+    temp       = PageRight;
+    PageRight  = PageTop;
+    PageTop    = temp;
 
-    temp   = Width;
-    Width  = Length;
-    Length = temp;
+    temp       = PageWidth;
+    PageWidth  = PageLength;
+    PageLength = temp;
   }
 
-  SizeColumns = (Right - Left) / 72.0 * CharsPerInch;
-  SizeLines   = (Top - Bottom) / 72.0 * LinesPerInch;
+  SizeColumns = (PageRight - PageLeft) / 72.0 * CharsPerInch;
+  SizeLines   = (PageTop - PageBottom) / 72.0 * LinesPerInch;
 
   Page    = calloc(sizeof(lchar_t *), SizeLines);
   Page[0] = calloc(sizeof(lchar_t), SizeColumns * SizeLines);
@@ -413,6 +414,7 @@ write_prolog(ppd_file_t *ppd,		/* I - PPD file */
   else
     ColumnWidth = SizeColumns;
 
+  /**** Is this the right order??? ****/
   puts("%%BeginDocumentSetup");
   ppdEmit(ppd, stdout, PPD_ORDER_DOCUMENT);
   ppdEmit(ppd, stdout, PPD_ORDER_ANY);
@@ -425,6 +427,8 @@ write_prolog(ppd_file_t *ppd,		/* I - PPD file */
   * Get the output character set; if it is undefined or "us-ascii", do
   * nothing because we can use the default encoding...
   */
+
+  puts("%%BeginResource procset texttops 4.0 0");
 
   charset = getenv("CHARSET");
   if (charset != NULL && strcmp(charset, "us-ascii") != 0)
@@ -530,6 +534,8 @@ write_prolog(ppd_file_t *ppd,		/* I - PPD file */
   puts("/U { dup 0 rlineto stroke neg 0 rmoveto } bind def");
   puts("/S { show } bind def");
 
+  puts("%%EndResource");
+
   puts("% Number copies");
   printf("/#copies %d def\n", num_copies);
 
@@ -557,13 +563,13 @@ write_string(int     col,	/* I - Start column */
 
   if (Duplex && (NumPages & 1) == 0)
   {
-    x = Width - Right;
-    y = Length - Bottom;
+    x = PageWidth - PageRight;
+    y = PageLength - PageBottom;
   }
   else
   {
-    x = Left;
-    y = Top;
+    x = PageLeft;
+    y = PageTop;
   }
 
   x += (float)col * 72.0 / (float)CharsPerInch;
@@ -706,12 +712,12 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if ((pagesize = ppdPageSize(ppd, NULL)) != NULL)
   {
-    Width  = pagesize->width;
-    Length = pagesize->length;
-    Top    = pagesize->top;
-    Bottom = pagesize->bottom;
-    Left   = pagesize->left;
-    Right  = pagesize->right;
+    PageWidth  = pagesize->width;
+    PageLength = pagesize->length;
+    PageTop    = pagesize->top;
+    PageBottom = pagesize->bottom;
+    PageLeft   = pagesize->left;
+    PageRight  = pagesize->right;
   }
 
   Landscape = cupsGetOption("landscape", num_options, options) != NULL;
@@ -931,5 +937,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: texttops.c,v 1.9 1999/03/21 21:12:19 mike Exp $".
+ * End of "$Id: texttops.c,v 1.10 1999/03/22 01:19:45 mike Exp $".
  */

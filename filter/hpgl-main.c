@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-main.c,v 1.8 1999/03/21 21:12:17 mike Exp $"
+ * "$Id: hpgl-main.c,v 1.9 1999/03/22 01:19:44 mike Exp $"
  *
  *   HP-GL/2 filter main entry for the Common UNIX Printing System (CUPS).
  *
@@ -211,7 +211,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Write the PostScript prolog and initialize the plotting "engine"...
   */
 
-  OutputProlog(argv[3], shading, penwidth);
+  OutputProlog(argv[3], argv[2], shading, penwidth);
 
   IP_input_absolute(0, NULL);
 
@@ -267,5 +267,5 @@ compare_names(const void *p1,	/* I - First name */
 
 
 /*
- * End of "$Id: hpgl-main.c,v 1.8 1999/03/21 21:12:17 mike Exp $".
+ * End of "$Id: hpgl-main.c,v 1.9 1999/03/22 01:19:44 mike Exp $".
  */

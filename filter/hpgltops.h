@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgltops.h,v 1.7 1999/03/21 21:12:19 mike Exp $"
+ * "$Id: hpgltops.h,v 1.8 1999/03/22 01:19:45 mike Exp $"
  *
  *   HP-GL/2 to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -201,10 +201,10 @@ extern void	UL_user_line_type(int num_params, param_t *params);
 extern void	WU_width_units(int num_params, param_t *params);
 
 /* hpgl-prolog.c */
-extern void	OutputProlog(char *title, int shading, float penwidth);
+extern void	OutputProlog(char *title, char *user, int shading, float penwidth);
 extern void	OutputTrailer(void);
 extern int	Outputf(const char *format, ...);
 
 /*
- * End of "$Id: hpgltops.h,v 1.7 1999/03/21 21:12:19 mike Exp $".
+ * End of "$Id: hpgltops.h,v 1.8 1999/03/22 01:19:45 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.9 1999/03/21 21:12:18 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.10 1999/03/22 01:19:45 mike Exp $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
@@ -43,6 +43,7 @@
 
 void
 OutputProlog(char  *title,	/* I - Job title */
+             char  *user,	/* I - Username */
              int   shading,	/* I - Type of shading */
              float penwidth)	/* I - Default pen width */
 {
@@ -58,18 +59,22 @@ OutputProlog(char  *title,	/* I - Job title */
   curtm   = localtime(&curtime);
 
   puts("%!PS-Adobe-3.0");
+  printf("%%%%BoundingBox: %.0f %.0f %.0f %.0f\n",
+         PageLeft, PageBottom, PageRight, PageTop);
+  puts("%%Pages: (atend)");
+  printf("%%LanguageLevel: %d\n", LanguageLevel);
+  puts("%%DocumentData: Clean7Bit");
+  puts("%%DocumentSuppliedResources: procset hpgltops 4.0 0");
+  puts("%%DocumentNeededResources: font Courier sHelvetica");
   puts("%%Creator: hpgltops/CUPS-" CUPS_SVERSION);
-  printf("%%%%Title: %s\n", title);
   strftime(line, sizeof(line), "%%%%CreationDate: %c", curtm);
   puts(line);
-  printf("%%LanguageLevel: %d\n", LanguageLevel);
-  puts("%%Pages: (atend)");
-  printf("%%%%BoundingBox: %.0f %.0f %.0f %.0f\n",
-          PageLeft, PageBottom, PageRight, PageTop);
-  puts("%%DocumentData: Clean7Bit");
+  printf("%%%%Title: %s\n", title);
+  printf("%%%%For: %s\n", user);
   puts("%%EndComments");
   puts("%%BeginProlog");
   printf("/DefaultPenWidth %.2f def\n", penwidth * 72.0 / 25.4);
+  puts("3.0 setmiterlimit");
   if (!shading)			/* Black only */
     puts("/setrgbcolor { pop pop pop } bind def");
   else if (!ColorDevice)	/* Greyscale */
@@ -110,8 +115,6 @@ OutputTrailer(void)
 
   puts("%%BeginTrailer");
   printf("%%%%Pages: %d\n", PageCount);
-  puts("%%EndTrailer");
-
   puts("%%EOF");
 }
 
@@ -173,5 +176,5 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.9 1999/03/21 21:12:18 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.10 1999/03/22 01:19:45 mike Exp $".
  */
