@@ -3,14 +3,22 @@ CHANGES.txt - 02/20/2001
 
 CHANGES IN CUPS V1.1.7
 
+	- Documentation updates for encryption, SLP, etc.
 	- All scheduler configuration files are now case
 	  insensitive to match Apache.
 	- Added support for Apache ListenBackLog, LogFormat,
 	  PassEnv, SetEnv, UnsetEnv, Require, UseCanonicalName,
 	  Satisfy, <Limit>, <LimitExcept>, LimitRequestSize, and
 	  Options directives.
+	- Added support for all Apache log levels...
 	- Added new "RunAsUser" directive to support non-root
-	  configurations on the standard ports.
+	  configurations on the standard (priviledged) ports.
+	- Added support for non-root invocation of the lpd
+	  backend (does no reserve a priviledged port, which
+	  might not work with some LPD servers...)
+	- Added new PrintcapFormat directive to control the
+	  output format of the printcap file (BSD or Solaris
+	  formats are supported at present.)
 
 
 CHANGES IN CUPS V1.1.6-3

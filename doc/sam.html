@@ -4,9 +4,9 @@
 <TITLE> CUPS Software Administrators Manual</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
 <META NAME="copyright" CONTENT="Copyright 1997-2001, All Rights Reserved">
-<META NAME="docnumber" CONTENT="CUPS-SAM-1.1.6">
+<META NAME="docnumber" CONTENT="CUPS-SAM-1.1.7">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
-<STYLE><!--
+<STYLE TYPE="text/css"><!--
 BODY { font-family: serif; font-size: 11.0pt }
 H1 { font-family: sans-serif; font-size: 20.0pt }
 H2 { font-family: sans-serif; font-size: 17.0pt }
@@ -22,14 +22,14 @@ PRE { font-size: 9.0pt }
 <BODY BGCOLOR="#ffffff">
 <CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="100%"><BR>
 <H1> CUPS Software Administrators Manual</H1></A><BR>
-CUPS-SAM-1.1.6<BR>
+CUPS-SAM-1.1.7<BR>
 Easy Software Products<BR>
 Copyright 1997-2001, All Rights Reserved<BR>
 </CENTER>
 <HR>
 <H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
-<BR></BR>
-<BR></BR><B><A HREF="#1">Preface</A></B>
+<BR>
+<BR><B><A HREF="#1">Preface</A></B>
 <UL>
 <LI><A HREF="#1_1">System Overview</A></LI>
 <LI><A HREF="#1_2">Document Overview</A></LI>
@@ -128,13 +128,18 @@ Copyright 1997-2001, All Rights Reserved<BR>
 <LI><A HREF="#DefaultLanguage">DefaultLanguage</A></LI>
 <LI><A HREF="#Deny">Deny</A></LI>
 <LI><A HREF="#DocumentRoot">DocumentRoot</A></LI>
+<LI><A HREF="#Encryption">Encryption</A></LI>
 <LI><A HREF="#ErrorLog">ErrorLog</A></LI>
 <LI><A HREF="#FilterLimit">FilterLimit</A></LI>
+<LI><A HREF="#FontPath">FontPath</A></LI>
 <LI><A HREF="#Group">Group</A></LI>
 <LI><A HREF="#HostNameLookups">HostNameLookups</A></LI>
 <LI><A HREF="#ImplicitClasses">ImplicitClasses</A></LI>
 <LI><A HREF="#KeepAlive">KeepAlive</A></LI>
 <LI><A HREF="#KeepAliveTimeout">KeepAliveTimeout</A></LI>
+<LI><A HREF="#Limit">Limit</A></LI>
+<LI><A HREF="#LimitExcept">LimitExcept</A></LI>
+<LI><A HREF="#LimitRequestBody">LimitRequestBody</A></LI>
 <LI><A HREF="#Listen">Listen</A></LI>
 <LI><A HREF="#Location">Location</A></LI>
 <LI><A HREF="#LogLevel">LogLevel</A></LI>
@@ -148,13 +153,19 @@ Copyright 1997-2001, All Rights Reserved<BR>
 <LI><A HREF="#PreserveJobHistory">PreserveJobHistory</A></LI>
 <LI><A HREF="#PreserveJobFiles">PreserveJobFiles</A></LI>
 <LI><A HREF="#Printcap">Printcap</A></LI>
+<LI><A HREF="#Printcap">PrintcapFormat</A></LI>
 <LI><A HREF="#RemoteRoot">RemoteRoot</A></LI>
 <LI><A HREF="#RequestRoot">RequestRoot</A></LI>
 <LI><A HREF="#RIPCache">RIPCache</A></LI>
+<LI><A HREF="#RunAsUser">RunAsUser</A></LI>
 <LI><A HREF="#ServerAdmin">ServerAdmin</A></LI>
 <LI><A HREF="#ServerBin">ServerBin</A></LI>
+<LI><A HREF="#ServerCertificate">ServerCertificate</A></LI>
+<LI><A HREF="#ServerKey">ServerKey</A></LI>
 <LI><A HREF="#ServerName">ServerName</A></LI>
 <LI><A HREF="#ServerRoot">ServerRoot</A></LI>
+<LI><A HREF="#SSLListen">SSLListen</A></LI>
+<LI><A HREF="#SSLPort">SSLPort</A></LI>
 <LI><A HREF="#SystemGroup">SystemGroup</A></LI>
 <LI><A HREF="#TempDir">TempDir</A></LI>
 <LI><A HREF="#Timeout">Timeout</A></LI>
@@ -233,8 +244,8 @@ Copyright 1997-2001, All Rights Reserved<BR>
 <LI><A HREF="#LASERJET">HP LaserJet</A></LI>
 </UL>
 <B><A HREF="#FILES">D - List of Files</A></B>
-<BR></BR>
-<BR></BR><B><A HREF="#FAQ">E - Troubleshooting Common Problems</A></B>
+<BR>
+<BR><B><A HREF="#FAQ">E - Troubleshooting Common Problems</A></B>
 <UL>
 <LI><A HREF="#13_1">My Applications Don't See the Available Printers</A></LI>
 <LI><A HREF="#13_2">CUPS Doesn't Recognize My Username or Password!</A></LI>
@@ -249,7 +260,7 @@ Machine!</A></LI>
 <H1 ALIGN="RIGHT"><A NAME="1">Preface</A></H1>
 <P>This software administrators manual provides printer administration 
 information for the Common UNIX Printing System<SUP>TM</SUP> (&quot;CUPS<SUP>
-TM</SUP>&quot;), version 1.1.6. </P>
+TM</SUP>&quot;), version 1.1.7. </P>
 <H2><A NAME="1_1">System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating 
 systems. It has been developed by <A HREF="http://www.easysw.com">Easy 
@@ -294,12 +305,12 @@ and their meanings and uses are explained below:
 <TR><TH>Example</TH><TD>&nbsp;&nbsp;&nbsp;</TD><TH>Description</TH></TR>
 <TR><TD>&nbsp;</TD></TR>
 <TR VALIGN="TOP"><TD><CODE>lpstat</CODE>
-<BR></BR><CODE> lpstat(1)</CODE></TD><TD>&nbsp;&nbsp;&nbsp;</TD><TD>The names of 
-commands; the first mention of a command or  function in a chapter is 
-followed by a manual page section  number.</TD></TR>
+<BR><CODE> lpstat(1)</CODE></TD><TD>&nbsp;&nbsp;&nbsp;</TD><TD>The names of commands; 
+the first mention of a command or  function in a chapter is followed by 
+a manual page section  number.</TD></TR>
 <TR><TD>&nbsp;</TD></TR>
 <TR VALIGN="TOP"><TD><VAR>/var</VAR>
-<BR></BR><VAR> /usr/share/cups/data/testprint.ps</VAR></TD><TD>&nbsp;&nbsp;&nbsp;</TD><TD>
+<BR><VAR> /usr/share/cups/data/testprint.ps</VAR></TD><TD>&nbsp;&nbsp;&nbsp;</TD><TD>
 File and directory names.</TD></TR>
 <TR><TD>&nbsp;</TD></TR>
 <TR VALIGN="TOP"><TD NOWRAP><TT>Request ID is Printer-123</TT></TD><TD>
@@ -322,13 +333,13 @@ written using the period (.) to indicate  the decimal point.</TD></TR>
 <DL>
 <DT>kb </DT>
 <DD>Kilobytes, or 1024 bytes
-<BR></BR>&nbsp; </DD>
+<BR>&nbsp; </DD>
 <DT>Mb </DT>
 <DD>Megabytes, or 1048576 bytes
-<BR></BR>&nbsp; </DD>
+<BR>&nbsp; </DD>
 <DT>Gb </DT>
 <DD>Gigabytes, or 1073741824 bytes
-<BR></BR>&nbsp; </DD>
+<BR>&nbsp; </DD>
 </DL>
 </UL>
 <H2><A NAME="1_5">Other References</A></H2>
@@ -337,10 +348,10 @@ written using the period (.) to indicate  the decimal point.</TD></TR>
 <DT>CUPS Software Programmers Manual </DT>
 <DD>A programmer guide for interfacing with and/or extending the CUPS 
  software.
-<BR></BR>&nbsp; </DD>
+<BR>&nbsp; </DD>
 <DT>CUPS Software Users Manual </DT>
 <DD>An end-user guide for using the CUPS software.
-<BR></BR>&nbsp; </DD>
+<BR>&nbsp; </DD>
 </DL>
 </UL>
 <H1 ALIGN="RIGHT"><A NAME="OVERVIEW">1 - Printing System Overview</A></H1>
@@ -509,6 +520,7 @@ to running configure: </P>
 <B>setenv CFLAGS &quot;-I/some/directory&quot; ENTER</B>
 <B>setenv CXXFLAGS &quot;-I/some/directory&quot; ENTER</B>
 <B>setenv LDFLAGS &quot;-L/some/directory&quot; ENTER</B>
+<B>setenv DSOFLAGS &quot;-L/some/directory&quot; ENTER</B>
 <B>./configure ... ENTER</B>
 </PRE>
 </UL>
@@ -518,6 +530,7 @@ to running configure: </P>
 <B>CFLAGS=&quot;-I/some/directory&quot;; export CFLAGS ENTER</B>
 <B>CXXFLAGS=&quot;-I/some/directory&quot;; export CXXFLAGS ENTER</B>
 <B>LDFLAGS=&quot;-L/some/directory&quot;; export LDFLAGS ENTER</B>
+<B>DSOFLAGS=&quot;-L/some/directory&quot;; export DSOFLAGS ENTER</B>
 <B>./configure ... ENTER</B>
 </PRE>
 </UL>
@@ -971,39 +984,39 @@ configuration files are located in the <VAR>/etc/cups</VAR> directory: </P>
 <DD>This file contains information on each printer class.  Normally you 
 manipulate this file using the <CODE> lpadmin</CODE> command or the Web 
 interface.
-<BR></BR>&nbsp; 
+<BR>&nbsp; 
 <!-- NEED 1in -->
 </!--></DD>
 <DT>client.conf </DT>
 <DD>This file provides the default server name for client  machines. 
 See <A HREF="#CLIENT_SETUP">Chapter 5, &quot;Client  Setup&quot;</A> for more 
 information.
-<BR></BR>&nbsp; 
+<BR>&nbsp; 
 <!-- NEED 1in -->
 </!--></DD>
 <DT>cupsd.conf </DT>
 <DD>This file controls how the CUPS server  (<VAR>/usr/sbin/cupsd</VAR>
 ) operates and is normally edited by  hand.
-<BR></BR>&nbsp; 
+<BR>&nbsp; 
 <!-- NEED 1in -->
 </!--></DD>
 <DT>mime.convs </DT>
 <DD>This file contains a list of standard file conversion filters  and 
 their costs. You normally do not edit this file.
-<BR></BR>&nbsp; 
+<BR>&nbsp; 
 <!-- NEED 1in -->
 </!--></DD>
 <DT>mime.types </DT>
 <DD>This file contains a list of standard file formats and how to 
  recognize them. You normally do not edit this file.
-<BR></BR>&nbsp; 
+<BR>&nbsp; 
 <!-- NEED 1in -->
 </!--></DD>
 <DT>printers.conf </DT>
 <DD>This file contains information on each printer. Normally  you 
 manipulate this file using the <CODE>lpadmin</CODE> command  or the Web 
 Interface.
-<BR></BR>&nbsp; </DD>
+<BR>&nbsp; </DD>
 </DL>
 </UL>
 <H2><A NAME="RESTARTING">Restarting the CUPS Server</A></H2>
@@ -1052,18 +1065,23 @@ determine how the server operates: </P>
 <LI><A HREF="#BrowseTimeout"><CODE>BrowseTimeout</CODE></A></LI>
 <LI><A HREF="#Browsing"><CODE>Browsing</CODE></A></LI>
 <LI><A HREF="#DataDir"><CODE>DataDir</CODE></A></LI>
-</TD><TD VALIGN="TOP"> &nbsp;&nbsp;&nbsp; </TD><TD VALIGN="TOP">
 <LI><A HREF="#DefaultCharset"><CODE>DefaultCharset</CODE></A></LI>
 <LI><A HREF="#DefaultLanguage"><CODE>DefaultLanguage</CODE></A></LI>
 <LI><A HREF="#Deny"><CODE>Deny</CODE></A></LI>
 <LI><A HREF="#DocumentRoot"><CODE>DocumentRoot</CODE></A></LI>
+</TD><TD VALIGN="TOP"> &nbsp;&nbsp;&nbsp; </TD><TD VALIGN="TOP">
+<LI><A HREF="#Encryption"><CODE>Encryption</CODE></A></LI>
 <LI><A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A></LI>
 <LI><A HREF="#FilterLimit"><CODE>FilterLimit</CODE></A></LI>
+<LI><A HREF="#FontPath"><CODE>FontPath</CODE></A></LI>
 <LI><A HREF="#Group"><CODE>Group</CODE></A></LI>
 <LI><A HREF="#HostNameLookups"><CODE>HostNameLookups</CODE></A></LI>
 <LI><A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A></LI>
 <LI><A HREF="#KeepAliveTimeout"><CODE>KeepAliveTimeout</CODE></A></LI>
 <LI><A HREF="#KeepAlive"><CODE>KeepAlive</CODE></A></LI>
+<LI><A HREF="#Limit"><CODE>Limit</CODE></A></LI>
+<LI><A HREF="#LimitExcept"><CODE>LimitExcept</CODE></A></LI>
+<LI><A HREF="#LimitRequestBody"><CODE>LimitRequestBody</CODE></A></LI>
 <LI><A HREF="#Listen"><CODE>Listen</CODE></A></LI>
 <LI><A HREF="#Location"><CODE>Location</CODE></A></LI>
 <LI><A HREF="#LogLevel"><CODE>LogLevel</CODE></A></LI>
@@ -1071,20 +1089,28 @@ determine how the server operates: </P>
 <LI><A HREF="#MaxJobs"><CODE>MaxJobs</CODE></A></LI>
 <LI><A HREF="#MaxLogSize"><CODE>MaxLogSize</CODE></A></LI>
 <LI><A HREF="#MaxRequestSize"><CODE>MaxRequestSize</CODE></A></LI>
-</TD><TD VALIGN="TOP"> &nbsp;&nbsp;&nbsp; </TD><TD VALIGN="TOP">
 <LI><A HREF="#Order"><CODE>Order</CODE></A></LI>
 <LI><A HREF="#PageLog"><CODE>PageLog</CODE></A></LI>
 <LI><A HREF="#Port"><CODE>Port</CODE></A></LI>
+</TD><TD VALIGN="TOP"> &nbsp;&nbsp;&nbsp; </TD><TD VALIGN="TOP">
 <LI><A HREF="#PreserveJobFiles"><CODE>PreserveJobFiles</CODE></A></LI>
 <LI><A HREF="#PreserveJobHistory"><CODE>PreserveJobHistory</CODE></A></LI>
 <LI><A HREF="#Printcap"><CODE>Printcap</CODE></A></LI>
+<LI><A HREF="#PrintcapFormat"><CODE>PrintcapFormat</CODE></A></LI>
 <LI><A HREF="#RemoteRoot"><CODE>RemoteRoot</CODE></A></LI>
 <LI><A HREF="#RequestRoot"><CODE>RequestRoot</CODE></A></LI>
+<LI><A HREF="#Require"><CODE>Require</CODE></A></LI>
 <LI><A HREF="#RIPCache"><CODE>RIPCache</CODE></A></LI>
+<LI><A HREF="#RunAsUser"><CODE>RunAsUser</CODE></A></LI>
+<LI><A HREF="#Satisfy"><CODE>Satisfy</CODE></A></LI>
 <LI><A HREF="#ServerAdmin"><CODE>ServerAdmin</CODE></A></LI>
 <LI><A HREF="#ServerBin"><CODE>ServerBin</CODE></A></LI>
+<LI><A HREF="#ServerCertificate"><CODE>ServerCertificate</CODE></A></LI>
+<LI><A HREF="#ServerKey"><CODE>ServerKey</CODE></A></LI>
 <LI><A HREF="#ServerName"><CODE>ServerName</CODE></A></LI>
 <LI><A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A></LI>
+<LI><A HREF="#SSLListen"><CODE>SSLListen</CODE></A></LI>
+<LI><A HREF="#SSLPort"><CODE>SSLPort</CODE></A></LI>
 <LI><A HREF="#SystemGroup"><CODE>SystemGroup</CODE></A></LI>
 <LI><A HREF="#TempDir"><CODE>TempDir</CODE></A></LI>
 <LI><A HREF="#Timeout"><CODE>Timeout</CODE></A></LI>
@@ -1096,7 +1122,7 @@ determine how the server operates: </P>
 <!-- NEED 3in -->
 </!-->
 <H3><A NAME="AccessLog">AccessLog</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1120,7 +1146,7 @@ to the system log instead of a plain file. </P>
 </!-->
 </P>
 <H3><A NAME="Allow">Allow</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1163,7 +1189,7 @@ mm</TH><TH WIDTH="20%">netmask</TH></TR>
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="AuthClass">AuthClass</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1193,7 +1219,7 @@ AuthGroupName</CODE> directive. </LI>
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="AuthGroupName">AuthGroupName</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1209,7 +1235,7 @@ Group</CODE> authentication. </P>
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="AuthType">AuthType</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1237,7 +1263,7 @@ also authenticate using <A HREF="#CERTIFICATES">certificates</A>. </P>
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="AutoPurgeJobs">AutoPurgeJobs</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1253,7 +1279,7 @@ No</CODE>.
 <!-- NEED 5in -->
 </!--></P>
 <H3><A NAME="BrowseAddress">BrowseAddress</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1282,7 +1308,7 @@ work. This problem appears to be fixed in  HP-UX 11.0. </P>
 <!-- NEED 4in -->
 </!--></P>
 <H3><A NAME="BrowseAllow">BrowseAllow</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1307,7 +1333,7 @@ count.
 <!-- NEED 4in -->
 </!--></P>
 <H3><A NAME="BrowseDeny">BrowseDeny</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1332,7 +1358,7 @@ count.
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="BrowseOrder">BrowseOrder</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1353,7 +1379,7 @@ allow/deny processing. The default order is <CODE>deny,allow</CODE>: </P>
 <!-- NEED 3in -->
 </!-->
 <H3><A NAME="BrowseInterval">BrowseInterval</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1373,7 +1399,7 @@ updates.
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="BrowsePoll">BrowsePoll</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1391,7 +1417,7 @@ once every 30 seconds.
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="BrowsePort">BrowsePort</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1414,7 +1440,7 @@ of the systems that you want to see. </P>
 <!-- NEED 4in -->
 </!--></P>
 <H3><A NAME="BrowseRelay">BrowseRelay</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1443,7 +1469,7 @@ clients on the LAN(s).
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="BrowseShortNames">BrowseShortNames</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1461,7 +1487,7 @@ will have long names (&quot;printer@server1&quot;, &quot;printer@server2&quot;.)
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="BrowseTimeout">BrowseTimeout</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1481,7 +1507,7 @@ between updates.
 <!-- NEED 4in -->
 </!--></P>
 <H3><A NAME="Browsing">Browsing</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1505,7 +1531,7 @@ work. This problem appears to be fixed in  HP-UX 11.0. </P>
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="DataDir">DataDir</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1518,7 +1544,7 @@ data files.
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="DefaultCharset">DefaultCharset</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1536,7 +1562,7 @@ specified by the client or the <CODE>DefaultLanguage</CODE> directive.
 </!-->
 </P>
 <H3><A NAME="DefaultLanguage">DefaultLanguage</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1555,7 +1581,7 @@ exists for it.  The default language is &quot;en&quot; for English.
 <!-- NEED 5in -->
 </!--></P>
 <H3><A NAME="Deny">Deny</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1598,7 +1624,7 @@ mm</TH><TH WIDTH="20%">netmask</TH></TR>
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="DocumentRoot">DocumentRoot</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1619,8 +1645,26 @@ language requested by the client (e.g. <VAR>/usr/share/doc/cups/fr/...</VAR>
 content by providing subdirectories for each language needed. 
 <!-- NEED 3in -->
 </!--></P>
+<H3><A NAME="Encryption">Encryption</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+Encryption Never
+Encryption IfRequested
+Encryption Required
+Encryption Always
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>Encryption</CODE> directive must appear instead a <A HREF="#Location">
+<CODE>Location</CODE></A> section and specifies the encryption settings 
+for that location. The default setting is <CODE>IfRequested</CODE> for 
+all locations. 
+<!-- NEED 3in -->
+</!--></P>
 <H3><A NAME="ErrorLog">ErrorLog</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1641,7 +1685,7 @@ to the system log instead of a plain file.
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="FilterLimit">FilterLimit</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1662,8 +1706,23 @@ to printing a single job at any time. </P>
 <P>The default limit is 0. 
 <!-- NEED 3in -->
 </!--></P>
+<H3><A NAME="FontPath">FontPath</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+FontPath /foo/bar/fonts
+FontPath /usr/share/cups/fonts:/foo/bar/fonts
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>FontPath</CODE> directive specifies the font path to use 
+when searching for fonts. The default font path is <CODE>
+/usr/share/cups/fonts</CODE>. 
+<!-- NEED 3in -->
+</!--></P>
 <H3><A NAME="Group">Group</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1680,24 +1739,29 @@ system</CODE>, or <CODE>root</CODE> depending on the operating system.
 </!-->
 </P>
 <H3><A NAME="HostNameLookups">HostNameLookups</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
 HostNameLookups On
 HostNameLookups Off
+HostNameLookups Double
 </PRE>
 </UL>
 <H4>Description</H4>
 <P>The <CODE>HostNameLookups</CODE> directive controls whether or not 
-CUPS looks up the hostname for connecting clients. The default is <CODE>
-Off</CODE> to avoid the potential server performance problems with 
-hostname lookups. Turn this option <CODE>On</CODE> only if absolutely 
-required. 
+CUPS looks up the hostname for connecting clients. The <CODE>Double</CODE>
+ setting causes CUPS to verify that the hostname resolved from the 
+address matches one of the addresses returned for that hostname. <CODE>
+Double</CODE> lookups also prevent clients with unregistered addresses 
+from connecting to your server.  The default is <CODE>Off</CODE> to 
+avoid the potential server performance problems with hostname lookups. 
+Set this option to <CODE>On</CODE> or <CODE>Double</CODE> only if 
+absolutely required. 
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="ImplicitClasses">ImplicitClasses</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1714,7 +1778,7 @@ turned <CODE>Off</CODE> if <A HREF="#Browsing"><CODE>Browsing</CODE></A>
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="KeepAlive">KeepAlive</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1732,7 +1796,7 @@ each request.
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="KeepAliveTimeout">KeepAliveTimeout</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1746,8 +1810,69 @@ persistent HTTP connection will remain open after the last request. The
 default is 60 seconds. 
 <!-- NEED 3in -->
 </!--></P>
+<H3><A NAME="Limit">Limit</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+&lt;Limit GET POST&gt;
+...
+&lt;/Limit&gt;
+
+&lt;Limit ALL&gt;
+...
+&lt;/Limit&gt;
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>Limit</CODE> directive groups access control directives 
+for specific types of HTTP requests and must appear inside a <A HREF="#Location">
+<CODE>Location</CODE></A> section. Access can be limited for individual 
+request types (<CODE>DELETE</CODE>, <CODE>GET</CODE>, <CODE>HEAD</CODE>
+, <CODE>OPTIONS</CODE>, <CODE>POST</CODE>, <CODE>PUT</CODE>, and <CODE>
+TRACE</CODE>) or for all request types (<CODE>ALL</CODE>). The request 
+type names are case-sensitive for compatibility with Apache. 
+<!-- NEED 3in -->
+</!--></P>
+<H3><A NAME="LimitExcept">LimitExcept</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+&lt;LimitExcept GET POST&gt;
+...
+&lt;/LimitExcept&gt;
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>LimitExcept</CODE> directive groups access control 
+directives for specific types of HTTP requests and must appear inside a <A
+HREF="#Location"><CODE>Location</CODE></A> section. Unlike the <A HREF="#Limit">
+<CODE>Limit</CODE></A> directive, <CODE>LimitExcept</CODE> restricts 
+access for all requests <I>except</I> those listed on the <CODE>
+LimitExcept</CODE> line. 
+<!-- NEED 3in -->
+</!--></P>
+<H3><A NAME="LimitRequestBody">LimitRequestBody</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+LimitRequestBody 10485760
+LimitRequestBody 10m
+LimitRequestBody 0
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>LimitRequestBody</CODE> directive controls the maximum 
+size of print files, IPP requests, and HTML form data in HTTP POST 
+requests. The default limit is 0 which disables the limit check. </P>
+<P>Also see the identical <A HREF="#MaxRequestSize"><CODE>MaxRequestSize</CODE>
+</A> directive. 
+<!-- NEED 3in -->
+</!--></P>
 <H3><A NAME="Listen">Listen</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1759,14 +1884,13 @@ Listen 192.0.2.1:631
 <P>The <CODE>Listen</CODE> directive specifies a network address and 
 port to listen for connections. Multiple <CODE>Listen</CODE> directives 
 can be provided to listen on multiple addresses. </P>
-<H4>Description</H4>
 <P>The <CODE>Listen</CODE> directive is similar to the <A HREF="#Port"><CODE>
 Port</CODE></A> directive but allows you to restrict access to specific 
 interfaces or networks. 
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="Location">Location</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1791,33 +1915,46 @@ information can be found later in this chapter in <A HREF="#PRINTING_SECURITY">
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="LogLevel">LogLevel</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
-LogLevel debug
-LogLevel error
-LogLevel info
 LogLevel none
+LogLevel emerg
+LogLevel alert
+LogLevel crit
+LogLevel error
 LogLevel warn
+LogLevel notice
+LogLevel info
+LogLevel debug
+LogLevel debug2
 </PRE>
 </UL>
 <H4>Description</H4>
 <P>The <CODE>LogLevel</CODE> directive specifies the level of logging 
 for the <A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A> file. The 
-following values are recognized: </P>
+following values are recognized (each level logs everything under the 
+preceding levels): </P>
 <UL>
-<LI><CODE>debug</CODE> - Log everything. </LI>
-<LI><CODE>info</CODE> - Log all requests and state changes (default). </LI>
-<LI><CODE>warn</CODE> - Log errors and warnings. </LI>
-<LI><CODE>error</CODE> - Log only errors. </LI>
 <LI><CODE>none</CODE> - Log nothing. </LI>
+<LI><CODE>emerg</CODE> - Log emergency conditions that prevent the 
+ server from running. </LI>
+<LI><CODE>alert</CODE> - Log alerts that must be handled immediately. </LI>
+<LI><CODE>crit</CODE> - Log critical errors that don't prevent  the 
+server from running. </LI>
+<LI><CODE>error</CODE> - Log general errors. </LI>
+<LI><CODE>warn</CODE> - Log errors and warnings. </LI>
+<LI><CODE>notice</CODE> - Log temporary error conditions. </LI>
+<LI><CODE>info</CODE> - Log all requests and state changes (default). </LI>
+<LI><CODE>debug</CODE> - Log basic debugging information. </LI>
+<LI><CODE>debug2</CODE> - Log all debugging information. </LI>
 </UL>
 
 <!-- NEED 3in -->
 </!-->
 <H3><A NAME="MaxClients">MaxClients</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1843,7 +1980,7 @@ problems when printing large numbers of jobs. </P>
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="MaxJobs">MaxJobs</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1863,7 +2000,7 @@ default setting is 0.
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="MaxLogSize">MaxLogSize</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1881,7 +2018,7 @@ rotate the logs automatically. The default size is 1048576 bytes (1MB). </P>
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="MaxRequestSize">MaxRequestSize</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1893,11 +2030,13 @@ MaxRequestSize 0
 <H4>Description</H4>
 <P>The <CODE>MaxRequestSize</CODE> directive controls the maximum size 
 of print files, IPP requests, and HTML form data in HTTP POST requests. 
-The default limit is 0 which disables the limit check. 
+The default limit is 0 which disables the limit check. </P>
+<P>Also see the identical <A HREF="#LimitRequestBody"><CODE>
+LimitRequestBody</CODE></A> directive. 
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="Order">Order</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1919,7 +2058,7 @@ an <CODE>Allow</CODE> directive. </LI>
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="PageLog">PageLog</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1940,7 +2079,7 @@ to the system log instead of a plain file.
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="Port">Port</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1951,16 +2090,11 @@ Port 80
 <H4>Description</H4>
 <P>The <CODE>Port</CODE> directive specifies a port to listen on. 
 Multiple <CODE>Port</CODE> lines can be specified to listen on multiple 
-ports. The default port is 631. </P>
-<H4>Description</H4>
-<P>The <CODE>Port</CODE> directive will listen for connections on all 
-network interfaces. To limit connections to a single interface use the <A
-HREF="#Listen"><CODE>Listen</CODE></A> directive with the interface 
-address. 
+ports. The default port is 631. 
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="PreserveJobHistory">PreserveJobHistory</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1979,7 +2113,7 @@ each job is completed, cancelled, or aborted.
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="PreserveJobFiles">PreserveJobFiles</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -1999,12 +2133,13 @@ soon as each job is completed, cancelled, or aborted.
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="Printcap">Printcap</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
 Printcap
 Printcap /etc/printcap
+Printcap /etc/printers.conf
 </PRE>
 </UL>
 <H4>Description</H4>
@@ -2019,8 +2154,23 @@ printcap file can then be used by applications that are hardcoded to
 look at the printcap file for the available printers. 
 <!-- NEED 3in -->
 </!--></P>
+<H3><A NAME="Printcap">PrintcapFormat</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+PrintcapFormat BSD
+PrintcapFormat Solaris
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>PrintcapFormat</CODE> directive controls the output format 
+of the printcap file. The default is to generate a BSD printcap file. 
+<!-- NEED 3in -->
+</!-->
+</P>
 <H3><A NAME="RemoteRoot">RemoteRoot</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -2036,7 +2186,7 @@ is <VAR>remroot</VAR>. Setting <CODE>RemoteRoot</CODE> to <VAR>root</VAR>
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="RequestRoot">RequestRoot</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -2053,7 +2203,7 @@ ServerRoot</CODE></A> directory. The default request directory is <VAR>
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="RIPCache">RIPCache</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -2070,8 +2220,30 @@ suffixed with a &quot;k&quot; for kilobytes, &quot;m&quot; for megabytes, or &qu
 gigabytes. The default cache size is &quot;8m&quot;, or 8 megabytes. 
 <!-- NEED 3in -->
 </!--></P>
+<H3><A NAME="RunAsUser">RunAsUser</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+RunAsUser Yes
+RunAsUser No
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>RunAsUser</CODE> directive controls whether the scheduler 
+runs as the unpriviledged user account (usually <CODE>lp</CODE>). The 
+default is <CODE>No</CODE> which leaves the scheduler running as the <CODE>
+root</CODE> user. </P>
+<P><B>Note:</B> Running as a non-priviledged user may prevent LPD and 
+locally connected printers from working due to permission problems. The <CODE>
+lpd</CODE> backend will automatically use a non-priviledged mode that 
+is not 100% compliant with RFC 1179. The <CODE>parallel</CODE>, <CODE>
+serial</CODE>, and <CODE>usb</CODE> backends will need write access to 
+the corresponding device files. 
+<!-- NEED 3in -->
+</!--></P>
 <H3><A NAME="ServerAdmin">ServerAdmin</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -2087,7 +2259,7 @@ server name.
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="ServerBin">ServerBin</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -2103,8 +2275,40 @@ assumed to be relative to the <A HREF="#ServerRoot"><CODE>ServerRoot</CODE>
  or <VAR>/usr/lib32/cups</VAR> (IRIX 6.5). 
 <!-- NEED 3in -->
 </!--></P>
+<H3><A NAME="ServerCertificate">ServerCertificate</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+ServerCertificate /etc/cups/ssl/server.crt
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>ServerCertificate</CODE> directive specifies the location 
+of the SSL certificate file used by the server when negotiating 
+encrypted connections. The certificate must not be encrypted (password 
+protected) since the scheduler normally runs in the background and will 
+be unable to ask for a password. The default certificate file is <VAR>
+/etc/cups/ssl/server.crt</VAR>. 
+<!-- NEED 3in -->
+</!--></P>
+<H3><A NAME="ServerKey">ServerKey</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+ServerKey /etc/cups/ssl/server.key
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>ServerKey</CODE> directive specifies the location of the 
+SSL private key file used by the server when negotiating encrypted 
+connections. The default key file is <VAR>/etc/cups/ssl/server.crt</VAR>
+. 
+<!-- NEED 3in -->
+</!--></P>
 <H3><A NAME="ServerName"></A>ServerName</H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -2118,7 +2322,7 @@ reported to clients. By default the server name is the hostname.
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="ServerRoot">ServerRoot</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -2133,8 +2337,40 @@ relative paths in the <VAR>cupsd.conf</VAR> file. The default server
 directory is <VAR>/etc/cups</VAR>. 
 <!-- NEED 3in -->
 </!--></P>
+<H3><A NAME="SSLListen">SSLListen</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+SSLListen 127.0.0.1:443
+SSLListen 192.0.2.1:443
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>SSLListen</CODE> directive specifies a network address and 
+port to listen for secure connections. Multiple <CODE>SSLListen</CODE>
+ directives can be provided to listen on multiple addresses. </P>
+<P>The <CODE>SSLListen</CODE> directive is similar to the <A HREF="#SSLPort">
+<CODE>SSLPort</CODE></A> directive but allows you to restrict access to 
+specific interfaces or networks. 
+<!-- NEED 3in -->
+</!--></P>
+<H3><A NAME="SSLPort">SSLPort</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+SSLPort 443
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>SSLPort</CODE> directive specifies a port to listen on for 
+secure connections. Multiple <CODE>SSLPort</CODE> lines can be 
+specified to listen on multiple ports. 
+<!-- NEED 3in -->
+</!--></P>
 <H3><A NAME="SystemGroup">SystemGroup</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -2151,7 +2387,7 @@ information can be found later in this chapter in <A HREF="#PRINTING_SECURITY">
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="TempDir">TempDir</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -2177,7 +2413,7 @@ appropriate temporary directory called <VAR>/foo/bar/tmp</VAR>: </P>
 <!-- NEED 3in -->
 </!-->
 <H3><A NAME="Timeout">Timeout</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -2192,7 +2428,7 @@ timeout is 300 seconds.
 <!-- NEED 3in -->
 </!--></P>
 <H3><A NAME="User">User</A></H3>
-<HR></HR>
+<HR>
 <H4>Examples</H4>
 <UL>
 <PRE>
@@ -2941,12 +3177,12 @@ with passwords enabled under Windows 95 and 98. </P>
 <H2 ALIGN="CENTER"><A NAME="9_1">Common UNIX Printing System License 
 Agreement</A></H2>
 <P ALIGN="CENTER">Copyright 1997-2000 by Easy Software Products
-<BR></BR> 44141 AIRPORT VIEW DR STE 204
-<BR></BR> HOLLYWOOD, MARYLAND 20636-3111 USA
-<BR></BR>
-<BR></BR> Voice: +1.301.373.9603
-<BR></BR> Email: <A HREF="mailto:cups-info@cups.org">cups-info@cups.org</A>
-<BR></BR> WWW: <A HREF="http://www.cups.org">http://www.cups.org</A></P>
+<BR> 44141 AIRPORT VIEW DR STE 204
+<BR> HOLLYWOOD, MARYLAND 20636-3111 USA
+<BR>
+<BR> Voice: +1.301.373.9603
+<BR> Email: <A HREF="mailto:cups-info@cups.org">cups-info@cups.org</A>
+<BR> WWW: <A HREF="http://www.cups.org">http://www.cups.org</A></P>
 <H3><A NAME="9_1_1">Introduction</A></H3>
 <P>The Common UNIX Printing System<SUP>TM</SUP>, (&quot;CUPS<SUP>TM</SUP>&quot;), 
 is provided under the GNU General Public License (&quot;GPL&quot;) and GNU 
@@ -2996,19 +3232,19 @@ the address shown above. </P>
 utilizes the GNU GhostScript 5.50 core to convert PostScript files into 
 a stream of raster images. For binary distribution licensing of this 
 software, please contact: <BLOCKQUOTE> Miles Jones
-<BR></BR> Director of Marketing
-<BR></BR> Artifex Software Inc.
-<BR></BR> 454 Las Gallinas Ave., Suite 108
-<BR></BR> San Rafael, CA 94903 USA
-<BR></BR> Voice: +1.415.492.9861
-<BR></BR> Fax: +1.415.492.9862
-<BR></BR> EMail: <A HREF="mailto:info@arsoft.com">info@arsoft.com</A></BLOCKQUOTE>
+<BR> Director of Marketing
+<BR> Artifex Software Inc.
+<BR> 454 Las Gallinas Ave., Suite 108
+<BR> San Rafael, CA 94903 USA
+<BR> Voice: +1.415.492.9861
+<BR> Fax: +1.415.492.9862
+<BR> EMail: <A HREF="mailto:info@arsoft.com">info@arsoft.com</A></BLOCKQUOTE>
 </P>
 <P>The &quot;pdftops&quot; filter is based on the Xpdf 0.90 software. For binary 
 distribution licensing of this software, please contact: <BLOCKQUOTE>
  Derek B. Noonburg
-<BR></BR> Email: <A HREF="mailto:derekn@foolabs.com">derekn@foolabs.com</A>
-<BR></BR> WWW: <A HREF="http://www.foolabs.com/xpdf/">
+<BR> Email: <A HREF="mailto:derekn@foolabs.com">derekn@foolabs.com</A>
+<BR> WWW: <A HREF="http://www.foolabs.com/xpdf/">
 http://www.foolabs.com/xpdf/</A></BLOCKQUOTE></P>
 <H3><A NAME="9_1_4">Support</A></H3>
 <P>Easy Software Products sells software support for CUPS as well as a 
@@ -3076,8 +3312,7 @@ patent must be licensed for everyone's free use or not licensed at all. </P>
 <P>The precise terms and conditions for copying, distribution and 
 modification follow. </P>
 <H4>GNU GENERAL PUBLIC LICENSE
-<BR></BR> TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND 
-MODIFICATION</H4>
+<BR> TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION</H4>
 <OL START="0">
 <LI>This License applies to any program or other work which contains a 
 notice placed by the copyright holder saying it may be distributed 
@@ -3808,31 +4043,31 @@ address</I>/PASSTHRU</TD></TR>
 <!-- NEED 1in -->
 </!-->
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Axis w/o IPP
-<BR></BR><A HREF="#AXIS"> (see directions)</A></TD><TD>socket://<I>
-address</I>:9100
-<BR></BR> socket://<I>address</I>:9101
-<BR></BR> socket://<I>address</I>:9102</TD></TR>
+<BR><A HREF="#AXIS"> (see directions)</A></TD><TD>socket://<I>address</I>
+:9100
+<BR> socket://<I>address</I>:9101
+<BR> socket://<I>address</I>:9102</TD></TR>
 
 <!-- NEED 1in -->
 </!-->
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Axis w/IPP</TD><TD>ipp://<I>address</I>
 /LPT1
-<BR></BR> ipp://<I>address</I>/LPT2
-<BR></BR> ipp://<I>address</I>/COM1</TD></TR>
+<BR> ipp://<I>address</I>/LPT2
+<BR> ipp://<I>address</I>/COM1</TD></TR>
 
 <!-- NEED 1in -->
 </!-->
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Castelle LANpress<SUP>TM</SUP></TD><TD>
 lpd://<I>address</I>/pr1
-<BR></BR> lpd://<I>address</I>/pr2
-<BR></BR> lpd://<I>address</I>/pr3</TD></TR>
+<BR> lpd://<I>address</I>/pr2
+<BR> lpd://<I>address</I>/pr3</TD></TR>
 
 <!-- NEED 1in -->
 </!-->
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>DPI NETPrint</TD><TD>lpd://<I>address</I>
 /pr1
-<BR></BR> lpd://<I>address</I>/pr2
-<BR></BR> lpd://<I>address</I>/pr3</TD></TR>
+<BR> lpd://<I>address</I>/pr2
+<BR> lpd://<I>address</I>/pr3</TD></TR>
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>EFI&reg; Fiery&reg; RIP</TD><TD>lpd://<I>
 address</I>/print</TD></TR>
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>EPSON&reg; Multiprotocol Ethernet 
@@ -3842,40 +4077,40 @@ Interface Board</TD><TD>socket://<I>address</I></TD></TR>
 </!-->
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Extended System ExtendNET</TD><TD>
 lpd://<I>address</I>/pr1
-<BR></BR> lpd://<I>address</I>/pr2
-<BR></BR> lpd://<I>address</I>/pr3</TD></TR>
+<BR> lpd://<I>address</I>/pr2
+<BR> lpd://<I>address</I>/pr3</TD></TR>
 
 <!-- NEED 1in -->
 </!-->
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Hewlett Packard JetDirect w/o IPP</TD><TD>
 socket://<I>address</I>:9100
-<BR></BR> socket://<I>address</I>:9101
-<BR></BR> socket://<I>address</I>:9102</TD></TR>
+<BR> socket://<I>address</I>:9101
+<BR> socket://<I>address</I>:9102</TD></TR>
 
 <!-- NEED 1in -->
 </!-->
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Hewlett Packard JetDirect w/IPP</TD><TD>
 ipp://<I>address</I>/ipp
-<BR></BR> ipp://<I>address</I>/ipp/port1
-<BR></BR> ipp://<I>address</I>/ipp/port2
-<BR></BR> ipp://<I>address</I>/ipp/port3</TD></TR>
+<BR> ipp://<I>address</I>/ipp/port1
+<BR> ipp://<I>address</I>/ipp/port2
+<BR> ipp://<I>address</I>/ipp/port3</TD></TR>
 
 <!-- NEED 1in -->
 </!-->
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Intel&reg; NetportExpress XL, PRO/100</TD><TD>
 lpd://<I>address</I>/LPT1_PASSTHRU
-<BR></BR> lpd://<I>address</I>/LPT2_PASSTHRU
-<BR></BR> lpd://<I>address</I>/COM1_PASSTHRU</TD></TR>
+<BR> lpd://<I>address</I>/LPT2_PASSTHRU
+<BR> lpd://<I>address</I>/COM1_PASSTHRU</TD></TR>
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Lexmark<SUP>TM</SUP> MarkNet</TD><TD>
 lpd://<I>address</I>/ps</TD></TR>
 
 <!-- NEED 1in -->
 </!-->
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Linksys EtherFast&reg;
-<BR></BR><A HREF="#LINKSYS"> (see directions)</A></TD><TD>socket://<I>
-address</I>:4010
-<BR></BR> socket://<I>address</I>:4020
-<BR></BR> socket://<I>address</I>:4030</TD></TR>
+<BR><A HREF="#LINKSYS"> (see directions)</A></TD><TD>socket://<I>address</I>
+:4010
+<BR> socket://<I>address</I>:4020
+<BR> socket://<I>address</I>:4030</TD></TR>
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Kodak&reg;</TD><TD>lpd://<I>address</I>/ps</TD>
 </TR>
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>QMS&reg; CrownNet<SUP>TM</SUP></TD><TD>
@@ -4161,20 +4396,17 @@ command.</TD></TR>
 <TR VALIGN="TOP"><TD>/usr/include/cups/</TD><TD>CUPS API header files.</TD>
 </TR>
 <TR VALIGN="TOP"><TD>/usr/lib32/libcups.a
-<BR></BR> /usr/lib32/libcupsimage.a</TD><TD>Static libraries (IRIX 6.5)</TD>
-</TR>
+<BR> /usr/lib32/libcupsimage.a</TD><TD>Static libraries (IRIX 6.5)</TD></TR>
 <TR VALIGN="TOP"><TD>/usr/lib/libcups.a
-<BR></BR> /usr/lib/libcupsimage.a</TD><TD>Static libraries (all others)</TD>
-</TR>
+<BR> /usr/lib/libcupsimage.a</TD><TD>Static libraries (all others)</TD></TR>
 <TR VALIGN="TOP"><TD>/usr/lib/libcups.sl.2
-<BR></BR> /usr/lib/libcupsimage.sl.2</TD><TD>Shared libraries (HP-UX)</TD>
-</TR>
+<BR> /usr/lib/libcupsimage.sl.2</TD><TD>Shared libraries (HP-UX)</TD></TR>
 <TR VALIGN="TOP"><TD>/usr/lib32/libcups.so.2
-<BR></BR> /usr/lib32/libcupsimage.so.2</TD><TD>Shared libraries (IRIX 
-6.5)</TD></TR>
+<BR> /usr/lib32/libcupsimage.so.2</TD><TD>Shared libraries (IRIX 6.5)</TD>
+</TR>
 <TR VALIGN="TOP"><TD>/usr/lib/libcups.so.2
-<BR></BR> /usr/lib/libcupsimage.so.2</TD><TD>Shared libraries (all 
-others)</TD></TR>
+<BR> /usr/lib/libcupsimage.so.2</TD><TD>Shared libraries (all others)</TD>
+</TR>
 <TR VALIGN="TOP"><TD>/usr/lib/cups/backend/</TD><TD>Backends for 
 various types of printer connections.</TD></TR>
 <TR VALIGN="TOP"><TD>/usr/lib/cups/cgi-bin/</TD><TD>CGI programs for 
@@ -4204,7 +4436,7 @@ get-ppds command.</TD></TR>
 <TR VALIGN="TOP"><TD>/usr/sbin/reject</TD><TD>The reject-jobs command.</TD>
 </TR>
 <TR VALIGN="TOP"><TD>/usr/share/catman/a_man/
-<BR></BR> /usr/share/catman/u_man/</TD><TD>Man pages (IRIX)</TD></TR>
+<BR> /usr/share/catman/u_man/</TD><TD>Man pages (IRIX)</TD></TR>
 <TR VALIGN="TOP"><TD>/usr/share/man/</TD><TD>Man pages (Compaq Tru64 
 UNIX, HP-UX, Solaris)</TD></TR>
 <TR VALIGN="TOP"><TD>/usr/man/</TD><TD>Man pages (all others)</TD></TR>

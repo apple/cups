@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: cups.sh.in,v 1.7 2001/02/02 16:38:16 mike Exp $"
+# "$Id: cups.sh.in,v 1.8 2001/02/21 21:39:07 mike Exp $"
 #
 #   Startup/shutdown script for the Common UNIX Printing System (CUPS).
 #
@@ -97,20 +97,15 @@ esac
 case $1 in
 	start | restart | reload)
 		if test "$pid" != ""; then
-			if $IS_ON cups; then
-				kill -HUP $pid
-				$ECHO "cups: scheduler restarted."
-			else
-				kill $pid
-				$ECHO "cups: scheduler stopped."
-			fi
+			kill $pid
+		fi
+		if $IS_ON cups; then
+			prefix=@prefix@
+			exec_prefix=@exec_prefix@
+			@sbindir@/cupsd
+			$ECHO "cups: scheduler ${1}ed."
 		else
-			if $IS_ON cups; then
-				prefix=@prefix@
-				exec_prefix=@exec_prefix@
-				@sbindir@/cupsd
-				$ECHO "cups: scheduler started."
-			fi
+			$ECHO "cups: scheduler stopped."
 		fi
 		;;
 
@@ -143,5 +138,5 @@ exit 0
 
 
 #
-# End of "$Id: cups.sh.in,v 1.7 2001/02/02 16:38:16 mike Exp $".
+# End of "$Id: cups.sh.in,v 1.8 2001/02/21 21:39:07 mike Exp $".
 #

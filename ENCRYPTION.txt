@@ -1,4 +1,4 @@
-ENCRYPTION - CUPS v1.1.6 - 01/23/2001
+ENCRYPTION - CUPS v1.1.7 - 02/21/2001
 -------------------------------------
 
 This file describes the encryption support provided by CUPS.
@@ -69,7 +69,12 @@ These keywords are also used in the cupsd.conf file to secure
 particular locations.  To secure all traffic on the server, listen
 on port 443 (https port) instead of port 631 and change the "ipp"
 service listing (or add it if you don't have one) in /etc/services
-to 443.
+to 443.  To provide both secure and normal methods, add a line
+reading:
+
+    SSLPort 443
+
+to /etc/cups/cupsd.conf.
 
 
 BEFORE YOU BEGIN

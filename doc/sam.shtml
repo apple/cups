@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2001, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.1.6">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.1.7">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Administrators Manual</TITLE>
 </HEAD>
@@ -11,7 +11,7 @@
 
 <P>This software administrators manual provides printer administration
 information for the Common UNIX Printing System<SUP>TM</SUP>
-("CUPS<SUP>TM</SUP>"), version 1.1.6.
+("CUPS<SUP>TM</SUP>"), version 1.1.7.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -207,6 +207,7 @@ prior to running configure:
 <B>setenv CFLAGS "-I/some/directory" ENTER</B>
 <B>setenv CXXFLAGS "-I/some/directory" ENTER</B>
 <B>setenv LDFLAGS "-L/some/directory" ENTER</B>
+<B>setenv DSOFLAGS "-L/some/directory" ENTER</B>
 <B>./configure ... ENTER</B>
 </PRE></UL>
 
@@ -216,6 +217,7 @@ prior to running configure:
 <B>CFLAGS="-I/some/directory"; export CFLAGS ENTER</B>
 <B>CXXFLAGS="-I/some/directory"; export CXXFLAGS ENTER</B>
 <B>LDFLAGS="-L/some/directory"; export LDFLAGS ENTER</B>
+<B>DSOFLAGS="-L/some/directory"; export DSOFLAGS ENTER</B>
 <B>./configure ... ENTER</B>
 </PRE></UL>
 
@@ -828,6 +830,7 @@ determine how the server operates:
 
 <UL>
 
+
 <TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0">
 <TR>
 <TD VALIGN="TOP">
@@ -850,6 +853,10 @@ determine how the server operates:
 	<LI><A HREF="#BrowseTimeout"><CODE>BrowseTimeout</CODE></A>
 	<LI><A HREF="#Browsing"><CODE>Browsing</CODE></A>
 	<LI><A HREF="#DataDir"><CODE>DataDir</CODE></A>
+	<LI><A HREF="#DefaultCharset"><CODE>DefaultCharset</CODE></A>
+	<LI><A HREF="#DefaultLanguage"><CODE>DefaultLanguage</CODE></A>
+	<LI><A HREF="#Deny"><CODE>Deny</CODE></A>
+	<LI><A HREF="#DocumentRoot"><CODE>DocumentRoot</CODE></A>
 
 </TD>
 <TD VALIGN="TOP">
@@ -857,17 +864,18 @@ determine how the server operates:
 </TD>
 <TD VALIGN="TOP">
 
-	<LI><A HREF="#DefaultCharset"><CODE>DefaultCharset</CODE></A>
-	<LI><A HREF="#DefaultLanguage"><CODE>DefaultLanguage</CODE></A>
-	<LI><A HREF="#Deny"><CODE>Deny</CODE></A>
-	<LI><A HREF="#DocumentRoot"><CODE>DocumentRoot</CODE></A>
+	<LI><A HREF="#Encryption"><CODE>Encryption</CODE></A>
 	<LI><A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A>
 	<LI><A HREF="#FilterLimit"><CODE>FilterLimit</CODE></A>
+	<LI><A HREF="#FontPath"><CODE>FontPath</CODE></A>
 	<LI><A HREF="#Group"><CODE>Group</CODE></A>
 	<LI><A HREF="#HostNameLookups"><CODE>HostNameLookups</CODE></A>
 	<LI><A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>
 	<LI><A HREF="#KeepAliveTimeout"><CODE>KeepAliveTimeout</CODE></A>
 	<LI><A HREF="#KeepAlive"><CODE>KeepAlive</CODE></A>
+	<LI><A HREF="#Limit"><CODE>Limit</CODE></A>
+	<LI><A HREF="#LimitExcept"><CODE>LimitExcept</CODE></A>
+	<LI><A HREF="#LimitRequestBody"><CODE>LimitRequestBody</CODE></A>
 	<LI><A HREF="#Listen"><CODE>Listen</CODE></A>
 	<LI><A HREF="#Location"><CODE>Location</CODE></A>
 	<LI><A HREF="#LogLevel"><CODE>LogLevel</CODE></A>
@@ -875,6 +883,9 @@ determine how the server operates:
 	<LI><A HREF="#MaxJobs"><CODE>MaxJobs</CODE></A>
 	<LI><A HREF="#MaxLogSize"><CODE>MaxLogSize</CODE></A>
 	<LI><A HREF="#MaxRequestSize"><CODE>MaxRequestSize</CODE></A>
+	<LI><A HREF="#Order"><CODE>Order</CODE></A>
+	<LI><A HREF="#PageLog"><CODE>PageLog</CODE></A>
+	<LI><A HREF="#Port"><CODE>Port</CODE></A>
 
 </TD>
 <TD VALIGN="TOP">
@@ -882,19 +893,24 @@ determine how the server operates:
 </TD>
 <TD VALIGN="TOP">
 
-	<LI><A HREF="#Order"><CODE>Order</CODE></A>
-	<LI><A HREF="#PageLog"><CODE>PageLog</CODE></A>
-	<LI><A HREF="#Port"><CODE>Port</CODE></A>
 	<LI><A HREF="#PreserveJobFiles"><CODE>PreserveJobFiles</CODE></A>
 	<LI><A HREF="#PreserveJobHistory"><CODE>PreserveJobHistory</CODE></A>
 	<LI><A HREF="#Printcap"><CODE>Printcap</CODE></A>
+	<LI><A HREF="#PrintcapFormat"><CODE>PrintcapFormat</CODE></A>
 	<LI><A HREF="#RemoteRoot"><CODE>RemoteRoot</CODE></A>
 	<LI><A HREF="#RequestRoot"><CODE>RequestRoot</CODE></A>
+	<LI><A HREF="#Require"><CODE>Require</CODE></A>
 	<LI><A HREF="#RIPCache"><CODE>RIPCache</CODE></A>
+	<LI><A HREF="#RunAsUser"><CODE>RunAsUser</CODE></A>
+	<LI><A HREF="#Satisfy"><CODE>Satisfy</CODE></A>
 	<LI><A HREF="#ServerAdmin"><CODE>ServerAdmin</CODE></A>
 	<LI><A HREF="#ServerBin"><CODE>ServerBin</CODE></A>
+	<LI><A HREF="#ServerCertificate"><CODE>ServerCertificate</CODE></A>
+	<LI><A HREF="#ServerKey"><CODE>ServerKey</CODE></A>
 	<LI><A HREF="#ServerName"><CODE>ServerName</CODE></A>
 	<LI><A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A>
+	<LI><A HREF="#SSLListen"><CODE>SSLListen</CODE></A>
+	<LI><A HREF="#SSLPort"><CODE>SSLPort</CODE></A>
 	<LI><A HREF="#SystemGroup"><CODE>SystemGroup</CODE></A>
 	<LI><A HREF="#TempDir"><CODE>TempDir</CODE></A>
 	<LI><A HREF="#Timeout"><CODE>Timeout</CODE></A>
@@ -1546,6 +1562,26 @@ and then directly under the <CODE>DocumentRoot</CODE> directory
 the web content by providing subdirectories for each language needed.
 
 <!-- NEED 3in -->
+<H3><A NAME="Encryption">Encryption</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+Encryption Never
+Encryption IfRequested
+Encryption Required
+Encryption Always
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>Encryption</CODE> directive must appear instead a
+<A HREF="#Location"><CODE>Location</CODE></A>
+section and specifies the encryption settings for that location.
+The default setting is <CODE>IfRequested</CODE> for all locations.
+
+<!-- NEED 3in -->
 <H3><A NAME="ErrorLog">ErrorLog</A></H3>
 <HR>
 
@@ -1598,6 +1634,23 @@ limit the scheduler to printing a single job at any time.
 <P>The default limit is 0.
 
 <!-- NEED 3in -->
+<H3><A NAME="FontPath">FontPath</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+FontPath /foo/bar/fonts
+FontPath /usr/share/cups/fonts:/foo/bar/fonts
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>FontPath</CODE> directive specifies the font path to use when
+searching for fonts. The default font path is
+<CODE>/usr/share/cups/fonts</CODE>.
+
+<!-- NEED 3in -->
 <H3><A NAME="Group">Group</A></H3>
 <HR>
 
@@ -1625,15 +1678,23 @@ system.
 <UL><PRE>
 HostNameLookups On
 HostNameLookups Off
+HostNameLookups Double
 </PRE></UL>
 
 <H4>Description</H4>
 
-<P>The <CODE>HostNameLookups</CODE> directive controls whether or not
-CUPS looks up the hostname for connecting clients. The default is
-<CODE>Off</CODE> to avoid the potential server performance problems
-with hostname lookups. Turn this option <CODE>On</CODE> only if
-absolutely required.
+<P>The <CODE>HostNameLookups</CODE> directive controls whether
+or not CUPS looks up the hostname for connecting clients. The
+<CODE>Double</CODE> setting causes CUPS to verify that the
+hostname resolved from the address matches one of the addresses
+returned for that hostname. <CODE>Double</CODE> lookups also
+prevent clients with unregistered addresses from connecting
+to your server.
+
+The default is <CODE>Off</CODE> to avoid the potential server
+performance problems with hostname lookups. Set this option to
+<CODE>On</CODE> or <CODE>Double</CODE> only if absolutely
+required.
 
 <!-- NEED 3in -->
 <H3><A NAME="ImplicitClasses">ImplicitClasses</A></H3>
@@ -1693,6 +1754,74 @@ persistent HTTP connection will remain open after the last request. The
 default is 60 seconds.
 
 <!-- NEED 3in -->
+<H3><A NAME="Limit">Limit</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+&lt;Limit GET POST&gt;
+...
+&lt;/Limit&gt;
+
+&lt;Limit ALL&gt;
+...
+&lt;/Limit&gt;
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>Limit</CODE> directive groups access control directives for
+specific types of HTTP requests and must appear inside a
+<A HREF="#Location"><CODE>Location</CODE></A> section. Access can be limited
+for individual request types (<CODE>DELETE</CODE>, <CODE>GET</CODE>,
+<CODE>HEAD</CODE>, <CODE>OPTIONS</CODE>, <CODE>POST</CODE>, <CODE>PUT</CODE>,
+and <CODE>TRACE</CODE>) or for all request types (<CODE>ALL</CODE>). The
+request type names are case-sensitive for compatibility with Apache.
+
+<!-- NEED 3in -->
+<H3><A NAME="LimitExcept">LimitExcept</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+&lt;LimitExcept GET POST&gt;
+...
+&lt;/LimitExcept&gt;
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>LimitExcept</CODE> directive groups access control directives for
+specific types of HTTP requests and must appear inside a
+<A HREF="#Location"><CODE>Location</CODE></A> section. Unlike the
+<A HREF="#Limit"><CODE>Limit</CODE></A> directive, <CODE>LimitExcept</CODE>
+restricts access for all requests <I>except</I> those listed on the
+<CODE>LimitExcept</CODE> line.
+
+<!-- NEED 3in -->
+<H3><A NAME="LimitRequestBody">LimitRequestBody</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+LimitRequestBody 10485760
+LimitRequestBody 10m
+LimitRequestBody 0
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>LimitRequestBody</CODE> directive controls the maximum size of
+print files, IPP requests, and HTML form data in HTTP POST requests. The
+default limit is 0 which disables the limit check.
+
+<P>Also see the identical
+<A HREF="#MaxRequestSize"><CODE>MaxRequestSize</CODE></A> directive.
+
+<!-- NEED 3in -->
 <H3><A NAME="Listen">Listen</A></H3>
 <HR>
 
@@ -1708,8 +1837,6 @@ Listen 192.0.2.1:631
 <P>The <CODE>Listen</CODE> directive specifies a network address and port
 to listen for connections. Multiple <CODE>Listen</CODE> directives can be
 provided to listen on multiple addresses.
-
-<H4>Description</H4>
 
 <P>The <CODE>Listen</CODE> directive is similar to the
 <A HREF="#Port"><CODE>Port</CODE></A> directive but allows you to restrict
@@ -1749,30 +1876,48 @@ information can be found later in this chapter in
 <H4>Examples</H4>
 
 <UL><PRE>
-LogLevel debug
-LogLevel error
-LogLevel info
 LogLevel none
+LogLevel emerg
+LogLevel alert
+LogLevel crit
+LogLevel error
 LogLevel warn
+LogLevel notice
+LogLevel info
+LogLevel debug
+LogLevel debug2
 </PRE></UL>
 
 <H4>Description</H4>
 
 <P>The <CODE>LogLevel</CODE> directive specifies the level of logging
 for the <A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A> file. The
-following values are recognized:
+following values are recognized (each level logs everything under the
+preceding levels):
 
 <UL>
 
-	<LI><CODE>debug</CODE> - Log everything.
+	<LI><CODE>none</CODE> - Log nothing.
 
-	<LI><CODE>info</CODE> - Log all requests and state changes (default).
+	<LI><CODE>emerg</CODE> - Log emergency conditions that prevent the
+	server from running.
+
+	<LI><CODE>alert</CODE> - Log alerts that must be handled immediately.
+
+	<LI><CODE>crit</CODE> - Log critical errors that don't prevent
+	the server from running.
+
+	<LI><CODE>error</CODE> - Log general errors.
 
 	<LI><CODE>warn</CODE> - Log errors and warnings.
 
-	<LI><CODE>error</CODE> - Log only errors.
+	<LI><CODE>notice</CODE> - Log temporary error conditions.
 
-	<LI><CODE>none</CODE> - Log nothing.
+	<LI><CODE>info</CODE> - Log all requests and state changes (default).
+
+	<LI><CODE>debug</CODE> - Log basic debugging information.
+
+	<LI><CODE>debug2</CODE> - Log all debugging information.
 
 </UL>
 
@@ -1868,6 +2013,9 @@ MaxRequestSize 0
 print files, IPP requests, and HTML form data in HTTP POST requests. The
 default limit is 0 which disables the limit check.
 
+<P>Also see the identical
+<A HREF="#LimitRequestBody"><CODE>LimitRequestBody</CODE></A> directive.
+
 <!-- NEED 3in -->
 <H3><A NAME="Order">Order</A></H3>
 <HR>
@@ -1940,13 +2088,6 @@ Port 80
 Multiple <CODE>Port</CODE> lines can be specified to listen on multiple
 ports. The default port is 631.
 
-<H4>Description</H4>
-
-<P>The <CODE>Port</CODE> directive will listen for connections on all
-network interfaces. To limit connections to a single interface use the
-<A HREF="#Listen"><CODE>Listen</CODE></A> directive with the interface
-address.
-
 <!-- NEED 3in -->
 <H3><A NAME="PreserveJobHistory">PreserveJobHistory</A></H3>
 <HR>
@@ -2004,6 +2145,7 @@ soon as each job is completed, cancelled, or aborted.
 <UL><PRE>
 Printcap
 Printcap /etc/printcap
+Printcap /etc/printers.conf
 </PRE></UL>
 
 <H4>Description</H4>
@@ -2018,6 +2160,23 @@ file named <VAR>/etc/printcap</VAR>.
 printcap file is written whenever a printer is added or removed. The
 printcap file can then be used by applications that are hardcoded to
 look at the printcap file for the available printers.
+
+<!-- NEED 3in -->
+<H3><A NAME="Printcap">PrintcapFormat</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+PrintcapFormat BSD
+PrintcapFormat Solaris
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>PrintcapFormat</CODE> directive controls the output
+format of the printcap file. The default is to generate a BSD
+printcap file.
 
 <!-- NEED 3in -->
 <H3><A NAME="RemoteRoot">RemoteRoot</A></H3>
@@ -2077,6 +2236,32 @@ be suffixed with a "k" for kilobytes, "m" for megabytes, or
 "g" for gigabytes. The default cache size is "8m", or 8 megabytes.
 
 <!-- NEED 3in -->
+<H3><A NAME="RunAsUser">RunAsUser</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+RunAsUser Yes
+RunAsUser No
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>RunAsUser</CODE> directive controls whether the
+scheduler runs as the unpriviledged user account (usually <CODE>lp</CODE>).
+The default is <CODE>No</CODE> which leaves the scheduler running as
+the <CODE>root</CODE> user.
+
+<P><B>Note:</B> Running as a non-priviledged user may prevent
+LPD and locally connected printers from working due to
+permission problems. The <CODE>lpd</CODE> backend will
+automatically use a non-priviledged mode that is not 100%
+compliant with RFC 1179. The <CODE>parallel</CODE>,
+<CODE>serial</CODE>, and <CODE>usb</CODE> backends will need
+write access to the corresponding device files.
+
+<!-- NEED 3in -->
 <H3><A NAME="ServerAdmin">ServerAdmin</A></H3>
 <HR>
 
@@ -2114,6 +2299,42 @@ default executable directory is <VAR>/usr/lib/cups</VAR> or
 <VAR>/usr/lib32/cups</VAR> (IRIX 6.5).
 
 <!-- NEED 3in -->
+<H3><A NAME="ServerCertificate">ServerCertificate</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+ServerCertificate /etc/cups/ssl/server.crt
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>ServerCertificate</CODE> directive specifies the
+location of the SSL certificate file used by the server when
+negotiating encrypted connections. The certificate must not be
+encrypted (password protected) since the scheduler normally runs
+in the background and will be unable to ask for a password.
+The default certificate file is <VAR>/etc/cups/ssl/server.crt</VAR>.
+
+<!-- NEED 3in -->
+<H3><A NAME="ServerKey">ServerKey</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+ServerKey /etc/cups/ssl/server.key
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>ServerKey</CODE> directive specifies the location
+of the SSL private key file used by the server when negotiating
+encrypted connections. The default key file is
+<VAR>/etc/cups/ssl/server.crt</VAR>.
+
+<!-- NEED 3in -->
 <H3><A NAME="ServerName"></A>ServerName</H3>
 <HR>
 
@@ -2146,6 +2367,44 @@ ServerRoot /foo/bar/cups
 the server configuration and state files. It is also used to resolve
 relative paths in the <VAR>cupsd.conf</VAR> file. The default server
 directory is <VAR>/etc/cups</VAR>.
+
+<!-- NEED 3in -->
+<H3><A NAME="SSLListen">SSLListen</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+SSLListen 127.0.0.1:443
+SSLListen 192.0.2.1:443
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>SSLListen</CODE> directive specifies a network
+address and port to listen for secure connections. Multiple
+<CODE>SSLListen</CODE> directives can be provided to listen on
+multiple addresses.
+
+<P>The <CODE>SSLListen</CODE> directive is similar to the
+<A HREF="#SSLPort"><CODE>SSLPort</CODE></A> directive but allows
+you to restrict access to specific interfaces or networks.
+
+<!-- NEED 3in -->
+<H3><A NAME="SSLPort">SSLPort</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+SSLPort 443
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>SSLPort</CODE> directive specifies a port to listen
+on for secure connections. Multiple <CODE>SSLPort</CODE> lines
+can be specified to listen on multiple ports.
 
 <!-- NEED 3in -->
 <H3><A NAME="SystemGroup">SystemGroup</A></H3>
