@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.24 2003/01/31 01:28:59 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.25 2003/02/05 21:14:50 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -796,7 +796,7 @@ StartBrowsing(void)
     LogMessage(L_DEBUG2, "StartBrowsing: Adding fd %d to InputSet...",
                BrowseSocket);
 
-    FD_SET(BrowseSocket, &InputSet);
+    FD_SET(BrowseSocket, InputSet);
   }
 
 #ifdef HAVE_LIBSLP
@@ -953,7 +953,7 @@ StartPolling(void)
   LogMessage(L_DEBUG2, "StartPolling: Adding fd %d to InputSet...",
              PollPipe);
 
-  FD_SET(PollPipe, &InputSet);
+  FD_SET(PollPipe, InputSet);
 }
 
 
@@ -984,7 +984,7 @@ StopBrowsing(void)
       LogMessage(L_DEBUG2, "StopBrowsing: Removing fd %d from InputSet...",
         	 BrowseSocket);
 
-      FD_CLR(BrowseSocket, &InputSet);
+      FD_CLR(BrowseSocket, InputSet);
       BrowseSocket = 0;
     }
   }
@@ -1019,7 +1019,7 @@ StopPolling(void)
 
     LogMessage(L_DEBUG2, "StopPolling: removing fd %d from InputSet.",
                PollPipe);
-    FD_CLR(PollPipe, &InputSet);
+    FD_CLR(PollPipe, InputSet);
 
     PollPipe = -1;
   }
@@ -1880,5 +1880,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.24 2003/01/31 01:28:59 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.25 2003/02/05 21:14:50 mike Exp $".
  */

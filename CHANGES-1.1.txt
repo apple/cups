@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The scheduler now allocates its select() sets to
+	  support larger numbers of clients on systems that
+	  support it.
 	- The scheduler now sets the CFProcessPath environment
 	  variable under MacOS X.
 	- The cupsLangDefault() function now uses the

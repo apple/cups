@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.41 2003/01/31 17:48:40 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.42 2003/02/05 21:14:51 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -440,7 +440,7 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
     LogMessage(L_DEBUG2, "ProcessIPPRequest: Adding fd %d to OutputSet...",
                con->http.fd);
 
-    FD_SET(con->http.fd, &OutputSet);
+    FD_SET(con->http.fd, OutputSet);
 
    /*
     * Tell the caller the response header was sent successfully...
@@ -6076,5 +6076,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.41 2003/01/31 17:48:40 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.42 2003/02/05 21:14:51 mike Exp $".
  */

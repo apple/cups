@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.28.2.13 2003/01/29 20:08:21 mike Exp $"
+ * "$Id: cupsd.h,v 1.28.2.14 2003/02/05 21:14:50 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -21,6 +21,15 @@
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  */
+
+/*
+ * Define FD_SETSIZE to 2048; on platforms that support this, this will
+ * ensure that the correct version of select() is used for large numbers
+ * of file descriptors.
+ */
+
+#define FD_SETSIZE	2048
+
 
 /*
  * Include necessary headers.
@@ -161,9 +170,10 @@ typedef struct direct DIRENT;
  * Globals...
  */
 
-VAR int			MaxFDs;		/* Maximum number of files */
-VAR fd_set		InputSet,	/* Input files for select() */
-			OutputSet;	/* Output files for select() */
+VAR int			MaxFDs,		/* Maximum number of files */
+			SetSize;	/* The size of the input/output sets */
+VAR fd_set		*InputSet,	/* Input files for select() */
+			*OutputSet;	/* Output files for select() */
 
 VAR int			NeedReload	VALUE(TRUE);
 					/* Need to load configuration? */
@@ -192,5 +202,5 @@ extern void	StopServer(void);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.28.2.13 2003/01/29 20:08:21 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.28.2.14 2003/02/05 21:14:50 mike Exp $".
  */

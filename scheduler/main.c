@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.31 2003/01/31 01:29:04 mike Exp $"
+ * "$Id: main.c,v 1.57.2.32 2003/02/05 21:14:56 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -48,10 +48,6 @@
 #  include <malloc.h>
 #endif /* HAVE_MALLOC_H && HAVE_MALLINFO */
 
-#ifndef FD_SETSIZE
-#  define FD_SETSIZE	1024
-#endif /* !FD_SETSIZE */
-
 
 /*
  * Local functions...
@@ -75,8 +71,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   int			i;		/* Looping var */
   char			*opt;		/* Option character */
   int			fg;		/* Run in the foreground */
-  fd_set		input,		/* Input set for select() */
-			output;		/* Output set for select() */
+  fd_set		*input,		/* Input set for select() */
+			*output;	/* Output set for select() */
   client_t		*con;		/* Current client */
   job_t			*job,		/* Current job */
 			*next;		/* Next job */
@@ -254,13 +250,24 @@ main(int  argc,			/* I - Number of command-line arguments */
   */
 
   getrlimit(RLIMIT_NOFILE, &limit);
-  if (limit.rlim_max > FD_SETSIZE)	/* Can't exceed size of FD set! */
-    MaxFDs = FD_SETSIZE;
-  else
-    MaxFDs = limit.rlim_max;
-
-  limit.rlim_cur = MaxFDs;
+  limit.rlim_cur = MaxFDs = limit.rlim_max;
   setrlimit(RLIMIT_NOFILE, &limit);
+
+ /*
+  * Allocate memory for the input and output sets...
+  */
+
+  SetSize   = (MaxFDs + 7) / 8;
+  InputSet  = (fd_set *)calloc(1, SetSize);
+  OutputSet = (fd_set *)calloc(1, SetSize);
+  input     = (fd_set *)calloc(1, SetSize);
+  output    = (fd_set *)calloc(1, SetSize);
+
+  if (InputSet == NULL || OutputSet == NULL || input == NULL || output == NULL)
+  {
+    syslog(LOG_LPR, "Unable to allocate memory for select() sets - exiting!");
+    return (1);
+  }
 
  /*
   * Catch hangup and child signals and ignore broken pipes...
@@ -271,6 +278,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     sigset(SIGHUP, sigterm_handler);
   else
     sigset(SIGHUP, sighup_handler);
+
   sigset(SIGPIPE, SIG_IGN);
   sigset(SIGTERM, sigterm_handler);
 #elif defined(HAVE_SIGACTION)
@@ -411,8 +419,8 @@ main(int  argc,			/* I - Number of command-line arguments */
     * times.
     */
 
-    input  = InputSet;
-    output = OutputSet;
+    memcpy(input, InputSet, SetSize);
+    memcpy(output, OutputSet, SetSize);
 
     for (i = NumClients, con = Clients; i > 0; i --, con ++)
       if (con->http.used > 0)
@@ -434,7 +442,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       timeout.tv_usec = 0;
     }
 
-    if ((i = select(MaxFDs, &input, &output, NULL, &timeout)) < 0)
+    if ((i = select(MaxFDs, input, output, NULL, &timeout)) < 0)
     {
       char	s[16384],	/* String buffer */
 		*sptr;		/* Pointer into buffer */
@@ -459,7 +467,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       sptr = s + 10;
 
       for (i = 0; i < MaxFDs; i ++)
-        if (FD_ISSET(i, &InputSet))
+        if (FD_ISSET(i, InputSet))
 	{
           snprintf(sptr, sizeof(s) - slen, " %d", i);
 	  slen += strlen(sptr);
@@ -473,7 +481,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       sptr = s + 11;
 
       for (i = 0; i < MaxFDs; i ++)
-        if (FD_ISSET(i, &OutputSet))
+        if (FD_ISSET(i, OutputSet))
 	{
           snprintf(sptr, sizeof(s) - slen, " %d", i);
 	  slen += strlen(sptr);
@@ -501,7 +509,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     }
 
     for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
-      if (FD_ISSET(lis->fd, &input))
+      if (FD_ISSET(lis->fd, input))
         AcceptClient(lis);
 
     for (i = NumClients, con = Clients; i > 0; i --, con ++)
@@ -510,7 +518,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       * Process the input buffer...
       */
 
-      if (FD_ISSET(con->http.fd, &input) || con->http.used)
+      if (FD_ISSET(con->http.fd, input) || con->http.used)
         if (!ReadClient(con))
 	{
 	  con --;
@@ -521,8 +529,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       * Write data as needed...
       */
 
-      if (FD_ISSET(con->http.fd, &output) &&
-          (!con->pipe_pid || FD_ISSET(con->file, &input)))
+      if (FD_ISSET(con->http.fd, output) &&
+          (!con->pipe_pid || FD_ISSET(con->file, input)))
         if (!WriteClient(con))
 	{
 	  con --;
@@ -553,14 +561,14 @@ main(int  argc,			/* I - Number of command-line arguments */
     {
       next = job->next;
 
-      if (job->status_pipe >= 0 && FD_ISSET(job->status_pipe, &input))
+      if (job->status_pipe >= 0 && FD_ISSET(job->status_pipe, input))
       {
        /*
         * Clear the input bit to avoid updating the next job
 	* using the same status pipe file descriptor...
 	*/
 
-        FD_CLR(job->status_pipe, &input);
+        FD_CLR(job->status_pipe, input);
 
        /*
         * Read any status messages from the filters...
@@ -576,10 +584,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     if (Browsing && BrowseProtocols)
     {
-      if (BrowseSocket >= 0 && FD_ISSET(BrowseSocket, &input))
+      if (BrowseSocket >= 0 && FD_ISSET(BrowseSocket, input))
         UpdateCUPSBrowse();
 
-      if (PollPipe >= 0 && FD_ISSET(PollPipe, &input))
+      if (PollPipe >= 0 && FD_ISSET(PollPipe, input))
         UpdatePolling();
 
 #ifdef HAVE_LIBSLP
@@ -1008,5 +1016,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.31 2003/01/31 01:29:04 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.32 2003/02/05 21:14:56 mike Exp $".
  */

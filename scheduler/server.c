@@ -1,5 +1,5 @@
 /*
- * "$Id: server.c,v 1.2.2.4 2003/01/15 04:25:56 mike Exp $"
+ * "$Id: server.c,v 1.2.2.5 2003/02/05 21:14:56 mike Exp $"
  *
  *   Server start/stop routines for the Common UNIX Printing System (CUPS).
  *
@@ -148,11 +148,11 @@ StopServer(void)
   * Clear the input and output sets...
   */
 
-  FD_ZERO(&InputSet);
-  FD_ZERO(&OutputSet);
+  memset(InputSet, 0, SetSize);
+  memset(OutputSet, 0, SetSize);
 }
 
 
 /*
- * End of "$Id: server.c,v 1.2.2.4 2003/01/15 04:25:56 mike Exp $".
+ * End of "$Id: server.c,v 1.2.2.5 2003/02/05 21:14:56 mike Exp $".
  */
