@@ -158,6 +158,11 @@ CHANGES IN CUPS V1.1.9
 	  size instead of percent of page size.)
 	- The lppasswd program is now setuid to the CUPS user
 	  instead of root.
+	- The PPD functions did not allow for PPD files that
+	  defined the page sizes and margins before the page
+	  size options.
+	- The mime.types file now checks for the PJL "LANGUAGE =
+	  Postscript" command for PostScript files.
 
 
 CHANGES IN CUPS V1.1.8

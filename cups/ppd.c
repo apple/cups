@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.52 2001/04/18 16:28:34 mike Exp $"
+ * "$Id: ppd.c,v 1.53 2001/06/28 18:01:17 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -1240,14 +1240,40 @@ ppdOpen(FILE *fp)		/* I - File to read from */
     }
     else if (strcmp(keyword, "PaperDimension") == 0)
     {
-      if ((size = ppdPageSize(ppd, name)) != NULL)
-        sscanf(string, "%f%f", &(size->width), &(size->length));
+      if ((size = ppdPageSize(ppd, name)) == NULL)
+	size = ppd_add_size(ppd, name);
+
+      if (size == NULL)
+      {
+       /*
+        * Unable to add or find size!
+	*/
+
+        ppdClose(ppd);
+	safe_free(string);
+	return (NULL);
+      }
+
+      sscanf(string, "%f%f", &(size->width), &(size->length));
     }
     else if (strcmp(keyword, "ImageableArea") == 0)
     {
-      if ((size = ppdPageSize(ppd, name)) != NULL)
-	sscanf(string, "%f%f%f%f", &(size->left), &(size->bottom),
-	       &(size->right), &(size->top));
+      if ((size = ppdPageSize(ppd, name)) == NULL)
+	size = ppd_add_size(ppd, name);
+
+      if (size == NULL)
+      {
+       /*
+        * Unable to add or find size!
+	*/
+
+        ppdClose(ppd);
+	safe_free(string);
+	return (NULL);
+      }
+
+      sscanf(string, "%f%f%f%f", &(size->left), &(size->bottom),
+	     &(size->right), &(size->top));
     }
     else if (option != NULL &&
              (mask & (PPD_KEYWORD | PPD_OPTION | PPD_STRING)) ==
@@ -1261,7 +1287,8 @@ ppdOpen(FILE *fp)		/* I - File to read from */
         * Add a page size...
 	*/
 
-	ppd_add_size(ppd, name);
+        if (ppdPageSize(ppd, name) == NULL)
+	  ppd_add_size(ppd, name);
       }
 
      /*
@@ -1935,5 +1962,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.52 2001/04/18 16:28:34 mike Exp $".
+ * End of "$Id: ppd.c,v 1.53 2001/06/28 18:01:17 mike Exp $".
  */
