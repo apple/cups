@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.20 2000/01/25 15:41:28 mike Exp $"
+ * "$Id: texttops.c,v 1.21 2000/02/25 19:23:30 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -292,7 +292,8 @@ WriteProlog(char       *title,	/* I - Title of job */
 
   puts("/N { FN setfont moveto } bind def");
   puts("/B { FB setfont moveto } bind def");
-  puts("/U { gsave 0 rlineto stroke grestore } bind def");
+  printf("/U { gsave 0.5 setlinewidth 0 %.2f rmoveto "
+         "0 rlineto stroke grestore } bind def\n", -6.8 / LinesPerInch);
 
   if (PrettyPrint)
   {
@@ -573,5 +574,5 @@ write_string(int     col,	/* I - Start column */
 
 
 /*
- * End of "$Id: texttops.c,v 1.20 2000/01/25 15:41:28 mike Exp $".
+ * End of "$Id: texttops.c,v 1.21 2000/02/25 19:23:30 mike Exp $".
  */
