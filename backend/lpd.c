@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.28.2.9 2002/08/27 18:36:16 mike Exp $"
+ * "$Id: lpd.c,v 1.28.2.10 2002/09/05 20:46:36 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -28,6 +28,7 @@
  *   main()        - Send a file to the printer or server.
  *   lpd_command() - Send an LPR command sequence and wait for a reply.
  *   lpd_queue()   - Queue a file using the Line Printer Daemon protocol.
+ *   lpd_timeout() - Handle timeout alarms...
  *   lpd_write()   - Write a buffer of data to an LPD server.
  */
 
@@ -80,6 +81,7 @@ static int	lpd_queue(char *hostname, char *printer, char *filename,
 		          int fromstdin, char *user, char *title, int copies,
 			  int banner, int format, int order, int reserve,
 			  int manual_copies);
+static void	lpd_timeout(int sig);
 static int	lpd_write(int lpd_fd, char *buffer, int length);
 
 
@@ -380,6 +382,8 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
 
   fprintf(stderr, "DEBUG: Sending command string (%d bytes)...\n", bytes);
 
+  alarm(30);
+
   if (lpd_write(fd, buf, bytes) < bytes)
     return (-1);
 
@@ -389,8 +393,12 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
 
   fprintf(stderr, "DEBUG: Reading command status...\n");
 
+  alarm(30);
+
   if (recv(fd, &status, 1, 0) < 1)
     return (-1);
+
+  alarm(0);
 
   fprintf(stderr, "DEBUG: lpd_command returning %d\n", status);
 
@@ -416,6 +424,7 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 	  int  reserve,		/* I - Reserve ports? */
 	  int  manual_copies)	/* I - Do copies by hand... */
 {
+  int			tries;		/* Number of tries */
   FILE			*fp;		/* Job file */
   char			localhost[255];	/* Local host name */
   int			error;		/* Error number */
@@ -435,261 +444,332 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
- /*
-  * First try to reserve a port for this connection...
-  */
 
-  if ((hostaddr = httpGetHostByName(hostname)) == NULL)
+  for (tries = 0; tries < 10; tries ++)
   {
-    fprintf(stderr, "ERROR: Unable to locate printer \'%s\' - %s",
-            hostname, strerror(errno));
-    return (1);
-  }
+   /*
+    * First try to reserve a port for this connection...
+    */
 
-  fprintf(stderr, "INFO: Attempting to connect to host %s for printer %s\n",
-          hostname, printer);
-
-  memset(&addr, 0, sizeof(addr));
-  memcpy(&(addr.sin_addr), hostaddr->h_addr, hostaddr->h_length);
-  addr.sin_family = hostaddr->h_addrtype;
-  addr.sin_port   = htons(515);	/* LPD/printer service */
-
-  for (port = 732;;)
-  {
-    if (getuid() || !reserve)
+    if ((hostaddr = httpGetHostByName(hostname)) == NULL)
     {
-     /*
-      * Just create a regular socket...
-      */
-
-      if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-      {
-        perror("ERROR: Unable to create socket");
-        return (1);
-      }
-    }
-    else
-    {
-     /*
-      * We're running as root and want to comply with RFC 1179.  Reserve a
-      * priviledged port between 721 and 732...
-      */
-
-      if ((fd = rresvport(&port)) < 0)
-      {
-	perror("ERROR: Unable to reserve port");
-	sleep(30);
-	continue;
-      }
+      fprintf(stderr, "ERROR: Unable to locate printer \'%s\' - %s",
+              hostname, strerror(errno));
+      return (1);
     }
 
-    if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
-    {
-      error = errno;
-      close(fd);
-      fd = -1;
+    fprintf(stderr, "INFO: Attempting to connect to host %s for printer %s\n",
+            hostname, printer);
 
-      if (error == ECONNREFUSED || error == EHOSTDOWN ||
-          error == EHOSTUNREACH)
+    memset(&addr, 0, sizeof(addr));
+    memcpy(&(addr.sin_addr), hostaddr->h_addr, hostaddr->h_length);
+    addr.sin_family = hostaddr->h_addrtype;
+    addr.sin_port   = htons(515);	/* LPD/printer service */
+
+    for (port = 732;;)
+    {
+      if (getuid() || !reserve)
       {
-	fprintf(stderr, "INFO: Network host \'%s\' is busy; will retry in 30 seconds...",
-                hostname);
-	sleep(30);
-      }
-      else if (error == EADDRINUSE)
-      {
-	port --;
-	if (port < 721)
-	  port = 732;
+       /*
+	* Just create a regular socket...
+	*/
+
+	if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+	{
+          perror("ERROR: Unable to create socket");
+          return (1);
+	}
       }
       else
       {
-	perror("ERROR: Unable to connect to printer");
-        sleep(30);
+       /*
+	* We're running as root and want to comply with RFC 1179.  Reserve a
+	* priviledged port between 721 and 732...
+	*/
+
+	if ((fd = rresvport(&port)) < 0)
+	{
+	  perror("ERROR: Unable to reserve port");
+	  sleep(30);
+	  continue;
+	}
       }
+
+      if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+      {
+	error = errno;
+	close(fd);
+	fd = -1;
+
+	if (error == ECONNREFUSED || error == EHOSTDOWN ||
+            error == EHOSTUNREACH)
+	{
+	  fprintf(stderr, "INFO: Network host \'%s\' is busy; will retry in 30 seconds...",
+                  hostname);
+	  sleep(30);
+	}
+	else if (error == EADDRINUSE)
+	{
+	  port --;
+	  if (port < 721)
+	    port = 732;
+	}
+	else
+	{
+	  perror("ERROR: Unable to connect to printer");
+          sleep(30);
+	}
+      }
+      else
+	break;
     }
-    else
-      break;
-  }
 
-  fprintf(stderr, "INFO: Connected from port %d...\n", port);
+    fprintf(stderr, "INFO: Connected from port %d...\n", port);
 
- /*
-  * Now that we are "connected" to the port, ignore SIGTERM so that we
-  * can finish out any page data the driver sends (e.g. to eject the
-  * current page...  Only ignore SIGTERM if we are printing data from
-  * stdin (otherwise you can't cancel raw jobs...)
-  */
+   /*
+    * Now that we are "connected" to the port, ignore SIGTERM so that we
+    * can finish out any page data the driver sends (e.g. to eject the
+    * current page...  Only ignore SIGTERM if we are printing data from
+    * stdin (otherwise you can't cancel raw jobs...)
+    */
 
-  if (fromstdin)
-  {
+    if (fromstdin)
+    {
 #ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-    sigset(SIGTERM, SIG_IGN);
+      sigset(SIGTERM, SIG_IGN);
+#elif defined(HAVE_SIGACTION)
+      memset(&action, 0, sizeof(action));
+
+      sigemptyset(&action.sa_mask);
+      action.sa_handler = SIG_IGN;
+      sigaction(SIGTERM, &action, NULL);
+#else
+      signal(SIGTERM, SIG_IGN);
+#endif /* HAVE_SIGSET */
+    }
+
+   /*
+    * Setup an alarm handler for timeouts...
+    */
+
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+    sigset(SIGALRM, lpd_timeout);
 #elif defined(HAVE_SIGACTION)
     memset(&action, 0, sizeof(action));
 
     sigemptyset(&action.sa_mask);
-    action.sa_handler = SIG_IGN;
-    sigaction(SIGTERM, &action, NULL);
+    action.sa_handler = lpd_timeout;
+    sigaction(SIGALRM, &action, NULL);
 #else
-    signal(SIGTERM, SIG_IGN);
+    signal(SIGALRM, lpd_timeout);
 #endif /* HAVE_SIGSET */
-  }
 
- /*
-  * Next, open the print file and figure out its size...
-  */
-
-  if (stat(filename, &filestats))
-  {
-    perror("ERROR: unable to stat print file");
-    return (1);
-  }
-
-  filestats.st_size *= manual_copies;
-
-  if ((fp = fopen(filename, "rb")) == NULL)
-  {
-    perror("ERROR: unable to open print file for reading");
-    return (1);
-  }
-
- /*
-  * Send a job header to the printer, specifying no banner page and
-  * literal output...
-  */
-
-  lpd_command(fd, "\002%s\n", printer);	/* Receive print job(s) */
-
-  gethostname(localhost, sizeof(localhost));
-  localhost[31] = '\0'; /* RFC 1179, Section 7.2 - host name < 32 chars */
-
-  snprintf(control, sizeof(control), "H%s\nP%s\nJ%s\n", localhost, user, title);
-  cptr = control + strlen(control);
-
-  if (banner)
-  {
-    snprintf(cptr, sizeof(control) - (cptr - control), "L%s\n", user);
-    cptr   += strlen(cptr);
-  }
-
-  while (copies > 0)
-  {
-    snprintf(cptr, sizeof(control) - (cptr - control), "%cdfA%03d%s\n", format,
-             getpid() % 1000, localhost);
-    cptr   += strlen(cptr);
-    copies --;
-  }
-
-  snprintf(cptr, sizeof(control) - (cptr - control),
-           "UdfA%03d%s\nNdfA%03d%s\n",
-           getpid() % 1000, localhost,
-           getpid() % 1000, localhost);
-
-  fprintf(stderr, "DEBUG: Control file is:\n%s", control);
-
-  if (order == ORDER_CONTROL_DATA)
-  {
-    lpd_command(fd, "\002%d cfA%03.3d%s\n", strlen(control), getpid() % 1000,
-        	localhost);
-
-    fprintf(stderr, "INFO: Sending control file (%lu bytes)\n", (unsigned long)strlen(control));
-
-    if (lpd_write(fd, control, strlen(control) + 1) < (strlen(control) + 1))
-    {
-      status = errno;
-      perror("ERROR: Unable to write control file");
-    }
-    else if (read(fd, &status, 1) < 1)
-      status = errno;
-
-    if (status != 0)
-      fprintf(stderr, "ERROR: Remote host did not accept control file (%d)\n",
-              status);
-    else
-      fputs("INFO: Control file sent successfully\n", stderr);
-  }
-  else
-    status = 0;
-
-  if (status == 0)
-  {
    /*
-    * Send the print file...
+    * Next, open the print file and figure out its size...
     */
 
-    lpd_command(fd, "\003%u dfA%03.3d%s\n", (unsigned)filestats.st_size,
-                getpid() % 1000, localhost);
-
-    fprintf(stderr, "INFO: Sending data file (%u bytes)\n",
-            (unsigned)filestats.st_size);
-
-    tbytes = 0;
-    while (manual_copies > 0)
+    if (stat(filename, &filestats))
     {
-      rewind(fp);
+      perror("ERROR: unable to stat print file");
+      return (1);
+    }
 
-      while ((nbytes = fread(buffer, 1, sizeof(buffer), fp)) > 0)
+    filestats.st_size *= manual_copies;
+
+    if ((fp = fopen(filename, "rb")) == NULL)
+    {
+      perror("ERROR: unable to open print file for reading");
+      return (1);
+    }
+
+   /*
+    * Send a job header to the printer, specifying no banner page and
+    * literal output...
+    */
+
+    lpd_command(fd, "\002%s\n", printer);	/* Receive print job(s) */
+
+    gethostname(localhost, sizeof(localhost));
+    localhost[31] = '\0'; /* RFC 1179, Section 7.2 - host name < 32 chars */
+
+    snprintf(control, sizeof(control), "H%s\nP%s\nJ%s\n", localhost, user, title);
+    cptr = control + strlen(control);
+
+    if (banner)
+    {
+      snprintf(cptr, sizeof(control) - (cptr - control), "L%s\n", user);
+      cptr   += strlen(cptr);
+    }
+
+    while (copies > 0)
+    {
+      snprintf(cptr, sizeof(control) - (cptr - control), "%cdfA%03d%s\n", format,
+               getpid() % 1000, localhost);
+      cptr   += strlen(cptr);
+      copies --;
+    }
+
+    snprintf(cptr, sizeof(control) - (cptr - control),
+             "UdfA%03d%s\nNdfA%03d%s\n",
+             getpid() % 1000, localhost,
+             getpid() % 1000, localhost);
+
+    fprintf(stderr, "DEBUG: Control file is:\n%s", control);
+
+    if (order == ORDER_CONTROL_DATA)
+    {
+      lpd_command(fd, "\002%d cfA%03.3d%s\n", strlen(control), getpid() % 1000,
+        	  localhost);
+
+      fprintf(stderr, "INFO: Sending control file (%lu bytes)\n", (unsigned long)strlen(control));
+
+      alarm(30);
+
+      if (lpd_write(fd, control, strlen(control) + 1) < (strlen(control) + 1))
       {
-	fprintf(stderr, "INFO: Spooling LPR job, %u%% complete...\n",
-        	(unsigned)(100.0f * tbytes / filestats.st_size));
+	status = errno;
+	perror("ERROR: Unable to write control file");
+      }
+      else
+      {
+        alarm(30);
 
-	if (lpd_write(fd, buffer, nbytes) < nbytes)
-	{
-          perror("ERROR: Unable to send print file to printer");
-          break;
-	}
-	else
-          tbytes += nbytes;
+        if (read(fd, &status, 1) < 1)
+	  status = errno;
+
+        alarm(0);
       }
 
-      manual_copies --;
+      if (status != 0)
+	fprintf(stderr, "ERROR: Remote host did not accept control file (%d)\n",
+        	status);
+      else
+	fputs("INFO: Control file sent successfully\n", stderr);
     }
-
-    if (tbytes < filestats.st_size)
-      status = errno;
-    else if (lpd_write(fd, "", 1) < 1)
-      status = errno;
-    else if (recv(fd, &status, 1, 0) < 1)
-      status = errno;
-
-    if (status != 0)
-      fprintf(stderr, "ERROR: Remote host did not accept data file (%d)\n",
-              status);
     else
-      fputs("INFO: Data file sent successfully\n", stderr);
-  }
+      status = 0;
 
-  if (status == 0 && order == ORDER_DATA_CONTROL)
-  {
-    lpd_command(fd, "\002%d cfA%03.3d%s\n", strlen(control), getpid() % 1000,
-        	localhost);
-
-    fprintf(stderr, "INFO: Sending control file (%lu bytes)\n", (unsigned long)strlen(control));
-
-    if (lpd_write(fd, control, strlen(control) + 1) < (strlen(control) + 1))
+    if (status == 0)
     {
-      status = errno;
-      perror("ERROR: Unable to write control file");
-    }
-    else if (read(fd, &status, 1) < 1)
-      status = errno;
+     /*
+      * Send the print file...
+      */
 
-    if (status != 0)
-      fprintf(stderr, "ERROR: Remote host did not accept control file (%d)\n",
-              status);
-    else
-      fputs("INFO: Control file sent successfully\n", stderr);
+      lpd_command(fd, "\003%u dfA%03.3d%s\n", (unsigned)filestats.st_size,
+                  getpid() % 1000, localhost);
+
+      fprintf(stderr, "INFO: Sending data file (%u bytes)\n",
+              (unsigned)filestats.st_size);
+
+      tbytes = 0;
+      while (manual_copies > 0)
+      {
+	rewind(fp);
+
+	while ((nbytes = fread(buffer, 1, sizeof(buffer), fp)) > 0)
+	{
+	  fprintf(stderr, "INFO: Spooling LPR job, %u%% complete...\n",
+        	  (unsigned)(100.0f * tbytes / filestats.st_size));
+
+	  if (lpd_write(fd, buffer, nbytes) < nbytes)
+	  {
+            perror("ERROR: Unable to send print file to printer");
+            break;
+	  }
+	  else
+            tbytes += nbytes;
+	}
+
+	manual_copies --;
+      }
+
+      if (tbytes < filestats.st_size)
+	status = errno;
+      else if (lpd_write(fd, "", 1) < 1)
+	status = errno;
+      else
+      {
+        alarm(30);
+
+        if (recv(fd, &status, 1, 0) < 1)
+	  status = errno;
+
+	alarm(0);
+      }
+
+      if (status != 0)
+	fprintf(stderr, "ERROR: Remote host did not accept data file (%d)\n",
+        	status);
+      else
+	fputs("INFO: Data file sent successfully\n", stderr);
+    }
+
+    if (status == 0 && order == ORDER_DATA_CONTROL)
+    {
+      lpd_command(fd, "\002%d cfA%03.3d%s\n", strlen(control), getpid() % 1000,
+        	  localhost);
+
+      fprintf(stderr, "INFO: Sending control file (%lu bytes)\n", (unsigned long)strlen(control));
+
+      alarm(30);
+
+      if (lpd_write(fd, control, strlen(control) + 1) < (strlen(control) + 1))
+      {
+	status = errno;
+	perror("ERROR: Unable to write control file");
+      }
+      else
+      {
+        alarm(30);
+
+	if (read(fd, &status, 1) < 1)
+	  status = errno;
+
+	alarm(0);
+      }
+
+      if (status != 0)
+	fprintf(stderr, "ERROR: Remote host did not accept control file (%d)\n",
+        	status);
+      else
+	fputs("INFO: Control file sent successfully\n", stderr);
+    }
+
+   /*
+    * Close the socket connection and input file...
+    */
+
+    close(fd);
+    fclose(fp);
+
+    if (status == 0)
+      break;
   }
 
- /*
-  * Close the socket connection and input file and return...
-  */
+  if (status)
+  {
+    fputs("ERROR: Unable to queue job on remote printer after 10 "
+          "connections - aborting!\n", stderr);
 
-  close(fd);
-  fclose(fp);
-  
-  return (status);
+    return (status);
+  }
+
+  return (0);
+}
+
+
+/*
+ * 'lpd_timeout()' - Handle timeout alarms...
+ */
+
+static void
+lpd_timeout(int sig)		/* I - Signal number */
+{
+  (void)sig;
+
+#if !defined(HAVE_SIGSET) && !defined(HAVE_SIGACTION)
+  signal(SIGALRM, lpd_timeout);
+#endif /* !HAVE_SIGSET && !HAVE_SIGACTION */
 }
 
 
@@ -811,5 +891,5 @@ rresvport(int *port)		/* IO - Port number to bind to */
 #endif /* !HAVE_RRESVPORT */
 
 /*
- * End of "$Id: lpd.c,v 1.28.2.9 2002/08/27 18:36:16 mike Exp $".
+ * End of "$Id: lpd.c,v 1.28.2.10 2002/09/05 20:46:36 mike Exp $".
  */

@@ -3,6 +3,12 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The LPD backend now uses a 30-second timeout when
+	  sending commands and control files, and a 30-second
+	  timeout when retrieving responses from an LPD server. 
+	  If a timeout occurs, it retries up to 10 times.  This
+	  helps to make LPD printing over VPNs work more
+	  reliably.
 	- The USB backend now supports device URIs based on the
 	  printer serial number and/or model number under Linux.
 	  This avoids the "wrong device filename" problem when
