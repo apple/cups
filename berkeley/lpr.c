@@ -1,9 +1,9 @@
 /*
- * "$Id: lpr.c,v 1.26 2002/10/01 17:31:02 mike Exp $"
+ * "$Id: lpr.c,v 1.27 2002/12/17 18:56:35 swdev Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -429,5 +429,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c,v 1.26 2002/10/01 17:31:02 mike Exp $".
+ * End of "$Id: lpr.c,v 1.27 2002/12/17 18:56:35 swdev Exp $".
  */

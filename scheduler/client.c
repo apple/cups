@@ -1,9 +1,9 @@
 /*
- * "$Id: client.c,v 1.130 2002/12/13 16:24:05 mike Exp $"
+ * "$Id: client.c,v 1.131 2002/12/17 19:00:14 swdev Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -2667,5 +2667,5 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.130 2002/12/13 16:24:05 mike Exp $".
+ * End of "$Id: client.c,v 1.131 2002/12/17 19:00:14 swdev Exp $".
  */

@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-network.m4,v 1.6 2002/03/28 22:13:20 mike Exp $"
+dnl "$Id: cups-network.m4,v 1.7 2002/12/17 18:56:39 swdev Exp $"
 dnl
 dnl   Networking stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2003 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -37,5 +37,5 @@ AC_CHECK_HEADER(sys/sockio.h,AC_DEFINE(HAVE_SYS_SOCKIO_H))
 AC_SUBST(NETLIBS)
 
 dnl
-dnl End of "$Id: cups-network.m4,v 1.6 2002/03/28 22:13:20 mike Exp $".
+dnl End of "$Id: cups-network.m4,v 1.7 2002/12/17 18:56:39 swdev Exp $".
 dnl

@@ -1,9 +1,9 @@
 /*
- * "$Id: options.c,v 1.28 2002/12/17 15:15:02 mike Exp $"
+ * "$Id: options.c,v 1.29 2002/12/17 18:56:43 swdev Exp $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -450,5 +450,5 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: options.c,v 1.28 2002/12/17 15:15:02 mike Exp $".
+ * End of "$Id: options.c,v 1.29 2002/12/17 18:56:43 swdev Exp $".
  */

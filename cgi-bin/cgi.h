@@ -1,9 +1,9 @@
 /*
- * "$Id: cgi.h,v 1.15 2002/05/16 13:44:52 mike Exp $"
+ * "$Id: cgi.h,v 1.16 2002/12/17 18:56:36 swdev Exp $"
  *
  *   CGI support library definitions.
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   This program is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU General Public License as published by the Free
@@ -82,5 +82,5 @@ extern void		cgiSetCookie(const char *name, const char *value,
 #endif /* !_CGI_H_ */
 
 /*
- * End of "$Id: cgi.h,v 1.15 2002/05/16 13:44:52 mike Exp $".
+ * End of "$Id: cgi.h,v 1.16 2002/12/17 18:56:36 swdev Exp $".
  */

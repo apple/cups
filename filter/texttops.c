@@ -1,9 +1,9 @@
 /*
- * "$Id: texttops.c,v 1.48 2002/09/24 18:33:23 mike Exp $"
+ * "$Id: texttops.c,v 1.49 2002/12/17 18:59:30 swdev Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2002 by Easy Software Products.
+ *   Copyright 1993-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1307,5 +1307,5 @@ write_text(const char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c,v 1.48 2002/09/24 18:33:23 mike Exp $".
+ * End of "$Id: texttops.c,v 1.49 2002/12/17 18:59:30 swdev Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: scsi.c,v 1.5 2002/10/15 16:40:11 mike Exp $"
+ * "$Id: scsi.c,v 1.6 2002/12/17 18:56:34 swdev Exp $"
  *
  *   SCSI printer backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2002 by Easy Software Products, all rights reserved.
+ *   Copyright 2003 by Easy Software Products, all rights reserved.
  *
  *   Redistribution and use in source and binary forms, with or
  *   without modification, are permitted provided that the
@@ -219,5 +219,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: scsi.c,v 1.5 2002/10/15 16:40:11 mike Exp $".
+ * End of "$Id: scsi.c,v 1.6 2002/12/17 18:56:34 swdev Exp $".
  */

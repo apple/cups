@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.78 2002/12/13 21:18:05 mike Exp $"
+# "$Id: Makefile,v 1.79 2002/12/17 18:56:40 swdev Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2003 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -198,5 +198,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.78 2002/12/13 21:18:05 mike Exp $".
+# End of "$Id: Makefile,v 1.79 2002/12/17 18:56:40 swdev Exp $".
 #

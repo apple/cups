@@ -1,11 +1,11 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.13 2002/10/23 20:49:02 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.14 2002/12/17 19:00:25 swdev Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
 #
-#   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2003 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -421,5 +421,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.13 2002/10/23 20:49:02 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.14 2002/12/17 19:00:25 swdev Exp $"
 #

@@ -1,9 +1,9 @@
 /*
- * "$Id: mime.c,v 1.15 2002/11/21 21:46:12 mike Exp $"
+ * "$Id: mime.c,v 1.16 2002/12/17 19:00:17 swdev Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -596,5 +596,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.15 2002/11/21 21:46:12 mike Exp $".
+ * End of "$Id: mime.c,v 1.16 2002/12/17 19:00:17 swdev Exp $".
  */

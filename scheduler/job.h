@@ -1,9 +1,9 @@
 /*
- * "$Id: job.h,v 1.29 2002/07/18 10:50:34 mike Exp $"
+ * "$Id: job.h,v 1.30 2002/12/17 19:00:16 swdev Exp $"
  *
  *   Print job definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -104,5 +104,5 @@ extern void	UpdateJob(job_t *job);
 
 
 /*
- * End of "$Id: job.h,v 1.29 2002/07/18 10:50:34 mike Exp $".
+ * End of "$Id: job.h,v 1.30 2002/12/17 19:00:16 swdev Exp $".
  */

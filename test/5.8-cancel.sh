@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-# "$Id: 5.8-cancel.sh,v 1.3 2002/01/11 18:05:25 mike Exp $"
+# "$Id: 5.8-cancel.sh,v 1.4 2002/12/17 19:00:24 swdev Exp $"
 #
 #   Test the cancel command.
 #
-#   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2003 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -48,5 +48,5 @@ fi
 echo ""
 
 #
-# End of "$Id: 5.8-cancel.sh,v 1.3 2002/01/11 18:05:25 mike Exp $".
+# End of "$Id: 5.8-cancel.sh,v 1.4 2002/12/17 19:00:24 swdev Exp $".
 #

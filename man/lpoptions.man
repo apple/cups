@@ -1,9 +1,9 @@
 .\"
-.\" "$Id: lpoptions.man,v 1.10 2002/10/21 13:45:17 mike Exp $"
+.\" "$Id: lpoptions.man,v 1.11 2002/12/17 18:59:57 swdev Exp $"
 .\"
 .\"   lpoptions man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2002 by Easy Software Products.
+.\"   Copyright 1997-2003 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -122,7 +122,7 @@ cancel(1), lp(1),
 CUPS Software Users Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2002 by Easy Software Products, All Rights Reserved.
+Copyright 1993-2003 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpoptions.man,v 1.10 2002/10/21 13:45:17 mike Exp $".
+.\" End of "$Id: lpoptions.man,v 1.11 2002/12/17 18:59:57 swdev Exp $".
 .\"

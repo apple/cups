@@ -1,9 +1,9 @@
 /*
- * "$Id: printers.h,v 1.26 2002/10/28 15:59:08 mike Exp $"
+ * "$Id: printers.h,v 1.27 2002/12/17 19:00:18 swdev Exp $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -115,5 +115,5 @@ extern void		WritePrintcap(void);
 
 
 /*
- * End of "$Id: printers.h,v 1.26 2002/10/28 15:59:08 mike Exp $".
+ * End of "$Id: printers.h,v 1.27 2002/12/17 19:00:18 swdev Exp $".
  */

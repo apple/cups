@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-sharedlibs.m4,v 1.17 2002/06/07 21:02:33 mike Exp $"
+dnl "$Id: cups-sharedlibs.m4,v 1.18 2002/12/17 18:56:40 swdev Exp $"
 dnl
 dnl   Shared library support for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2003 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -145,5 +145,5 @@ AC_SUBST(DSOLIBS)
 AC_SUBST(IMGLIBS)
 
 dnl
-dnl End of "$Id: cups-sharedlibs.m4,v 1.17 2002/06/07 21:02:33 mike Exp $".
+dnl End of "$Id: cups-sharedlibs.m4,v 1.18 2002/12/17 18:56:40 swdev Exp $".
 dnl

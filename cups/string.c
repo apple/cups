@@ -1,9 +1,9 @@
 /*
- * "$Id: string.c,v 1.8 2002/05/16 13:44:54 mike Exp $"
+ * "$Id: string.c,v 1.9 2002/12/17 18:56:43 swdev Exp $"
  *
  *   String functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -206,5 +206,5 @@ cups_strlcpy(char       *dst,	/* O - Destination string */
 
 
 /*
- * End of "$Id: string.c,v 1.8 2002/05/16 13:44:54 mike Exp $".
+ * End of "$Id: string.c,v 1.9 2002/12/17 18:56:43 swdev Exp $".
  */

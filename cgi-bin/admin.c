@@ -1,9 +1,9 @@
 /*
- * "$Id: admin.c,v 1.39 2002/12/10 19:13:33 mike Exp $"
+ * "$Id: admin.c,v 1.40 2002/12/17 18:56:36 swdev Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1547,5 +1547,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.39 2002/12/10 19:13:33 mike Exp $".
+ * End of "$Id: admin.c,v 1.40 2002/12/17 18:56:36 swdev Exp $".
  */

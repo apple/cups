@@ -1,9 +1,9 @@
 /*
- * "$Id: config.h,v 1.9 2002/10/18 17:39:21 mike Exp $"
+ * "$Id: config.h,v 1.10 2002/12/17 19:00:27 swdev Exp $"
  *
  *   Configuration file for ESP Print Pro.
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -243,5 +243,5 @@
 
 
 /*
- * End of "$Id: config.h,v 1.9 2002/10/18 17:39:21 mike Exp $".
+ * End of "$Id: config.h,v 1.10 2002/12/17 19:00:27 swdev Exp $".
  */

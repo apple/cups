@@ -1,9 +1,9 @@
 /*
- * "$Id: encode.c,v 1.9 2002/11/05 20:42:40 mike Exp $"
+ * "$Id: encode.c,v 1.10 2002/12/17 18:56:41 swdev Exp $"
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -377,5 +377,5 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 
 
 /*
- * End of "$Id: encode.c,v 1.9 2002/11/05 20:42:40 mike Exp $".
+ * End of "$Id: encode.c,v 1.10 2002/12/17 18:56:41 swdev Exp $".
  */

@@ -1,9 +1,9 @@
 .\"
-.\" "$Id: cupsd.conf.man,v 1.2 2002/12/04 20:21:48 swdev Exp $"
+.\" "$Id: cupsd.conf.man,v 1.3 2002/12/17 19:00:00 swdev Exp $"
 .\"
 .\"   cupsd.conf man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2002 by Easy Software Products.
+.\"   Copyright 1997-2003 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -247,9 +247,9 @@ classes.conf(5), cupsd(8), mime.convs(5), mime.types(5), printers.conf(5),
 CUPS Software Administrators Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2002 Easy Software Products, Tous droits réservés.
+Copyright 1993-2003 by Easy Software Products, Tous droits réservés.
 .SH TRADUCTION
 Gilles QUERRET <gilles.querret@nerim.net>
 .\"
-.\" End of "$Id: cupsd.conf.man,v 1.2 2002/12/04 20:21:48 swdev Exp $".
+.\" End of "$Id: cupsd.conf.man,v 1.3 2002/12/17 19:00:00 swdev Exp $".
 .\"

@@ -1,10 +1,10 @@
 /*
- * "$Id: gdevcups.c,v 1.58 2002/10/04 19:53:36 mike Exp $"
+ * "$Id: gdevcups.c,v 1.59 2002/12/17 19:00:11 swdev Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 1993-2002 by Easy Software Products.
+ *   Copyright 1993-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -3640,5 +3640,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.58 2002/10/04 19:53:36 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.59 2002/12/17 19:00:11 swdev Exp $".
  */

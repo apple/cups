@@ -1,9 +1,9 @@
 /*
- * "$Id: language.c,v 1.28 2002/05/23 20:07:34 mike Exp $"
+ * "$Id: language.c,v 1.29 2002/12/17 18:56:42 swdev Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -423,5 +423,5 @@ cupsLangGet(const char *language) /* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.28 2002/05/23 20:07:34 mike Exp $".
+ * End of "$Id: language.c,v 1.29 2002/12/17 18:56:42 swdev Exp $".
  */

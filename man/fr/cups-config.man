@@ -1,9 +1,9 @@
 .\"
-.\" "$Id: cups-config.man,v 1.1 2002/05/21 19:59:42 mike Exp $"
+.\" "$Id: cups-config.man,v 1.2 2002/12/17 18:59:59 swdev Exp $"
 .\"
 .\"   cups-config man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2002 by Easy Software Products.
+.\"   Copyright 1997-2003 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -88,11 +88,11 @@ La commande \fI--version\fR affiche le numéro complet de version de CUPS
 CUPS Software Programmers Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2002 Easy Software Products, Tous droits réservés.
+Copyright 1993-2003 by Easy Software Products, Tous droits réservés.
 .SH TRADUCTION
 Gilles QUERRET <gilles.querret@nerim.net>
 .\"
-.\" End of "$Id: cups-config.man,v 1.1 2002/05/21 19:59:42 mike Exp $".
+.\" End of "$Id: cups-config.man,v 1.2 2002/12/17 18:59:59 swdev Exp $".
 .\"
 
 

@@ -1,9 +1,9 @@
 /*
- * "$Id: tempfile.c,v 1.7 2002/10/22 20:13:33 mike Exp $"
+ * "$Id: tempfile.c,v 1.8 2002/12/17 18:56:43 swdev Exp $"
  *
  *   Temp file utilities for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -204,5 +204,5 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
 
 
 /*
- * End of "$Id: tempfile.c,v 1.7 2002/10/22 20:13:33 mike Exp $".
+ * End of "$Id: tempfile.c,v 1.8 2002/12/17 18:56:43 swdev Exp $".
  */

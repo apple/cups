@@ -1,9 +1,9 @@
 /*
- * "$Id: ipp.c,v 1.65 2002/11/01 21:04:45 mike Exp $"
+ * "$Id: ipp.c,v 1.66 2002/12/17 18:56:33 swdev Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2003 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -902,5 +902,5 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
 
 
 /*
- * End of "$Id: ipp.c,v 1.65 2002/11/01 21:04:45 mike Exp $".
+ * End of "$Id: ipp.c,v 1.66 2002/12/17 18:56:33 swdev Exp $".
  */

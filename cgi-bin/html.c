@@ -1,9 +1,9 @@
 /*
- * "$Id: html.c,v 1.7 2002/01/02 17:58:36 mike Exp $"
+ * "$Id: html.c,v 1.8 2002/12/17 18:56:36 swdev Exp $"
  *
  *   CGI HTML functions.
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2003 by Easy Software Products.
  *
  *   This program is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU General Public License as published by the Free
@@ -85,5 +85,5 @@ cgiEndHTML(FILE *out)	/* I - Output file to use */
 
 
 /*
- * End of "$Id: html.c,v 1.7 2002/01/02 17:58:36 mike Exp $".
+ * End of "$Id: html.c,v 1.8 2002/12/17 18:56:36 swdev Exp $".
  */
