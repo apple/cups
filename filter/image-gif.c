@@ -1,5 +1,5 @@
 /*
- * "$Id: image-gif.c,v 1.8.2.9 2003/01/24 20:45:16 mike Exp $"
+ * "$Id: image-gif.c,v 1.8.2.10 2003/03/11 15:11:35 mike Exp $"
  *
  *   GIF image routines for the Common UNIX Printing System (CUPS).
  *
@@ -367,13 +367,13 @@ gif_get_code(FILE *fp,		/* I - File to read from */
     * Just initialize the input buffer...
     */
 
-    curbit  = 0;
-    lastbit = 0;
-    done    = 0;
+    curbit    = 0;
+    lastbit   = 0;
+    last_byte = 0;
+    done      = 0;
 
     return (0);
   }
-
 
   if ((curbit + code_size) >= lastbit)
   {
@@ -690,5 +690,5 @@ gif_read_image(FILE       *fp,		/* I - Input file */
 
 
 /*
- * End of "$Id: image-gif.c,v 1.8.2.9 2003/01/24 20:45:16 mike Exp $".
+ * End of "$Id: image-gif.c,v 1.8.2.10 2003/03/11 15:11:35 mike Exp $".
  */
