@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.1 1999/05/10 21:34:06 mike Exp $"
+# "$Id: Makefile,v 1.2 1999/06/15 20:41:48 mike Exp $"
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -34,7 +34,7 @@ LOCALES	=	C de en es fr it
 # Make everything...
 #
 
-all:
+all:	translate
 
 #
 # Clean all config and object files...
@@ -56,5 +56,17 @@ install:
 	done
 
 #
-# End of "$Id: Makefile,v 1.1 1999/05/10 21:34:06 mike Exp $".
+# translate - a simple utility to use Bablefish to translate the POSIX message
+#             file to one of several languages.
+#
+# translate outfile language
+#
+
+translate:	translate.o ../cups/libcups.a
+	$(CC) $(LDFLAGS) -o translate translate.o $(LIBS)
+
+translate.o:	../cups/http.h
+
+#
+# End of "$Id: Makefile,v 1.2 1999/06/15 20:41:48 mike Exp $".
 #
