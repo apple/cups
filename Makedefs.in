@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.10 1999/06/24 17:48:06 mike Exp $"
+# "$Id: Makedefs.in,v 1.11 1999/07/07 18:42:47 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -97,7 +97,7 @@ top_srcdir	=	@top_srcdir@
 
 BINDIR		=	@bindir@
 DATADIR		=	@CUPS_DATADIR@
-INCLUDEDIR	=	$(includedir)/cups
+INCLUDEDIR	=	$(includedir)
 LIBDIR		=	$(libdir)
 LOCALEDIR	= 	@CUPS_LOCALEDIR@
 MANDIR		=	@mandir@
@@ -119,5 +119,5 @@ SERVERROOT	= 	@CUPS_SERVERROOT@
 	-mv t.$(CAT) $@
 
 #
-# End of "$Id: Makedefs.in,v 1.10 1999/06/24 17:48:06 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.11 1999/07/07 18:42:47 mike Exp $"
 #
