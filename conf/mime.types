@@ -1,5 +1,5 @@
 #
-# "$Id: mime.types,v 1.4 1999/03/24 18:38:50 mike Exp $"
+# "$Id: mime.types,v 1.5 1999/06/30 21:07:52 mike Exp $"
 #
 #   MIME types file for the Common UNIX Printing System (CUPS).
 #
@@ -114,10 +114,10 @@ text/plain			txt printable(0,1024)
 # CUPS-specific types...
 #
 
-application/vnd.cups-postscript
+application/vnd.cups-postscript	string(0,<1B>%-12345X)
 application/vnd.cups-raster	string(0,"RaSt") string(0,"tSaR")
 application/vnd.cups-raw
 
 #
-# End of "$Id: mime.types,v 1.4 1999/03/24 18:38:50 mike Exp $".
+# End of "$Id: mime.types,v 1.5 1999/06/30 21:07:52 mike Exp $".
 #
