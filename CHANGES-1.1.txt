@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The scheduler no longer passes the page-border and
+	  number-up-layout attributes to filters when printing
+	  banner pages.
 	- The LPD backend now uses a 30-second timeout when
 	  sending commands and control files, and a 30-second
 	  timeout when retrieving responses from an LPD server. 
