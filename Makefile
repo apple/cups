@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.18 2000/06/20 16:56:43 mike Exp $"
+# "$Id: Makefile,v 1.19 2000/06/26 15:09:37 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -74,6 +74,22 @@ install:
 	(cd ppd; $(MAKE) -$(MAKEFLAGS) install)
 	echo Installing in templates...
 	(cd templates; $(MAKE) -$(MAKEFLAGS) install)
+	echo Installing startup script...
+	if test -d /sbin/init.d; then \
+		cp cups.sh /sbin/init.d/cups; \
+		ln -s ../init.d/cups /sbin/rc0.d/K000cups; \
+		ln -s ../init.d/cups /sbin/rc2.d/S999cups; \
+	fi
+	if test -d /etc/rc.d/init.d; then \
+		cp cups.sh /etc/rc.d/init.d/cups; \
+		ln -s ../init.d/cups /etc/rc.d/rc0.d/K00cups; \
+		ln -s ../init.d/cups /etc/rc.d/rc2.d/S99cups; \
+	fi
+	if test -d /etc/init.d; then \
+		cp cups.sh /etc/init.d/cups; \
+		ln -s ../init.d/cups /etc/rc0.d/K00cups; \
+		ln -s ../init.d/cups /etc/rc2.d/S99cups; \
+	fi
 
 #
 # Make a software distribution...
@@ -98,5 +114,5 @@ tardist:
 	epm -v -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.18 2000/06/20 16:56:43 mike Exp $".
+# End of "$Id: Makefile,v 1.19 2000/06/26 15:09:37 mike Exp $".
 #
