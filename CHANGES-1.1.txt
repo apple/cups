@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc2
 
+	- cupsLangGet() now sets the encoding field based on the
+	  trailing charset in the locale name, and doesn't look
+	  for a message catalog in a specific locale.charset
+	  directory.  This fixes STR #26 and is more in line
+	  with the CUPS 1.2 implementation.
 	- The configure script now aborts if the "ar" command or
 	  compilers cannot be found.
 	- The static cupsimage library was not built by default.

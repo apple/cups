@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in,v 1.13.2.16 2003/04/18 02:30:19 mike Exp $"
+# "$Id: cups.list.in,v 1.13.2.17 2003/04/18 13:37:35 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -208,12 +208,18 @@ d 1700 $CUPS_USER sys $REQUESTS/tmp -
 
 # Data files
 f 0444 root sys $LOCALEDIR/C/cups_C locale/C/cups_C
+f 0444 root sys $LOCALEDIR/be/cups_be locale/be/cups_be
 f 0444 root sys $LOCALEDIR/cs/cups_cs locale/cs/cups_cs
 f 0444 root sys $LOCALEDIR/de/cups_de locale/de/cups_de
 f 0444 root sys $LOCALEDIR/en/cups_en locale/en/cups_en
+f 0444 root sys $LOCALEDIR/en_US/cups_en_US locale/en/cups_en_US
 f 0444 root sys $LOCALEDIR/es/cups_es locale/es/cups_es
 f 0444 root sys $LOCALEDIR/fr/cups_fr locale/fr/cups_fr
 f 0444 root sys $LOCALEDIR/it/cups_it locale/it/cups_it
+f 0444 root sys $LOCALEDIR/ru_RU/cups_ru_RU locale/ru_RU/cups_ru_RU
+f 0444 root sys $LOCALEDIR/sv/cups_sv locale/sv/cups_sv
+f 0444 root sys $LOCALEDIR/uk/cups_uk locale/uk/cups_uk
+f 0444 root sys $LOCALEDIR/uk_UA/cups_uk_UA locale/uk_UA/cups_uk_UA
 f 0444 root sys $LOCALEDIR/zh_CN/cups_zh_CN locale/zh_CN/cups_zh_CN
 
 d 0555 root sys $DATADIR -
@@ -399,5 +405,5 @@ f 0444 root sys $AMANDIR/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list.in,v 1.13.2.16 2003/04/18 02:30:19 mike Exp $".
+# End of "$Id: cups.list.in,v 1.13.2.17 2003/04/18 13:37:35 mike Exp $".
 #

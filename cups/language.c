@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.20.2.15 2003/02/04 20:33:44 mike Exp $"
+ * "$Id: language.c,v 1.20.2.16 2003/04/18 13:37:36 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -41,10 +41,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#ifdef WIN32
+#  include <io.h>
+#else
+#  include <unistd.h>
+#endif /* WIN32 */
 #include "string.h"
 #include "language.h"
 
-#if defined(__APPLE__)
+#ifdef __APPLE__
 #  include <CoreFoundation/CoreFoundation.h>
 static const char *appleLangDefault(void);
 #endif /* __APPLE__ */
@@ -206,21 +211,63 @@ cupsLangFree(cups_lang_t *lang)	/* I - Language to free */
  * 'cupsLangGet()' - Get a language.
  */
 
-cups_lang_t *			/* O - Language data */
-cupsLangGet(const char *language) /* I - Language or locale */
+cups_lang_t *				/* O - Language data */
+cupsLangGet(const char *language)	/* I - Language or locale */
 {
-  int		i, count;	/* Looping vars */
-  char		langname[32],	/* Requested language name */
-		*langptr,	/* Pointer into language name */
-		real[32],	/* Real language name */
-		*realptr,	/* Pointer into real language name */
-		filename[1024],	/* Filename for language locale file */
-		*localedir;	/* Directory for locale files */
-  FILE		*fp;		/* Language locale file pointer */
-  char		line[1024];	/* Line from file */
-  cups_msg_t	msg;		/* Message number */
-  char		*text;		/* Message text */
-  cups_lang_t	*lang;		/* Current language... */
+  int			i, count;	/* Looping vars */
+  char			langname[16],	/* Requested language name */
+			country[16],	/* Country code */
+			charset[16],	/* Character set */
+			*ptr,		/* Pointer into language/ */
+			real[48],	/* Real language name */
+			filename[1024],	/* Filename for language locale file */
+			*localedir;	/* Directory for locale files */
+  cups_encoding_t	encoding;	/* Encoding to use */
+  FILE			*fp;		/* Language locale file pointer */
+  char			line[1024];	/* Line from file */
+  cups_msg_t		msg;		/* Message number */
+  char			*text;		/* Message text */
+  cups_lang_t		*lang;		/* Current language... */
+  static const char * const locale_encodings[] =
+		{			/* Locale charset names */
+		  "ASCII",	"ISO8859-1",	"ISO8859-2",	"ISO8859-3",
+		  "ISO8859-4",	"ISO8859-5",	"ISO8859-6",	"ISO8859-7",
+		  "ISO8859-8",	"ISO8859-9",	"ISO8859-10",	"UTF-8",
+		  "ISO8859-13",	"ISO8859-14",	"ISO8859-15",	"CP874",
+		  "CP1250",	"CP1251",	"CP1252",	"CP1253",
+		  "CP1254",	"CP1255",	"CP1256",	"CP1257",
+		  "CP1258",	"KOI8R",	"KOI8U",	"ISO8859-11",
+		  "ISO8859-16",	"",		"",		"",
+
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+
+		  "CP932",	"CP936",	"CP949",	"CP950",
+		  "CP1361",	"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+
+		  "EUC-CN",	"EUC-JP",	"EUC-KR",	"EUC-TW"
+		};
 
 
 #ifdef __APPLE__
@@ -243,73 +290,98 @@ cupsLangGet(const char *language) /* I - Language or locale */
 #endif /* __APPLE__ */
 
  /*
-  * Convert the language string passed in to a locale string. "C" is the
+  * Parse the language string passed in to a locale string. "C" is the
   * standard POSIX locale and is copied unchanged.  Otherwise the
-  * language string is converted from ll-cc (language-country) to ll_cc
-  * to match the file naming convention used by all POSIX-compliant
-  * operating systems.
+  * language string is converted from ll-cc[.charset] (language-country)
+  * to ll_CC[.CHARSET] to match the file naming convention used by all
+  * POSIX-compliant operating systems.  Invalid language names are mapped
+  * to the POSIX locale.
   */
 
-  if (language == NULL || language[0] == '\0' ||
+  country[0] = '\0';
+  charset[0] = '\0';
+
+  if (language == NULL || !language[0] ||
       strcmp(language, "POSIX") == 0)
     strcpy(langname, "C");
   else
   {
    /*
-    * Copy the locale string over safely...
+    * Copy the parts of the locale string over safely...
     */
 
-    strlcpy(langname, language, sizeof(langname));
+    for (ptr = langname; *language; language ++)
+      if (*language == '_' || *language == '-')
+      {
+        language ++;
+	break;
+      }
+      else if (ptr < (langname + sizeof(langname) - 1))
+        *ptr++ = tolower(*language);
+
+    *ptr = '\0';
+
+    for (ptr = country; *language; language ++)
+      if (*language == '.')
+      {
+        language ++;
+	break;
+      }
+      else if (ptr < (country + sizeof(country) - 1))
+        *ptr++ = toupper(*language);
+
+    *ptr = '\0';
+
+    for (ptr = charset; *language; language ++)
+      if (ptr < (charset + sizeof(charset) - 1))
+        *ptr++ = toupper(*language);
+
+    *ptr = '\0';
+
+   /*
+    * Force a POSIX locale for an invalid language name...
+    */
+
+    if (strlen(langname) != 2)
+    {
+      strcpy(langname, "C");
+      country[0] = '\0';
+      charset[0] = '\0';
+    }
   }
 
-  if (strlen(langname) < 2)
-    strcpy(real, "C");
+ /*
+  * Figure out the desired encoding...
+  */
+
+  encoding = CUPS_US_ASCII;
+
+  for (i = 0; i < (int)(sizeof(locale_encodings) / sizeof(locale_encodings[0])); i ++)
+    if (!strcmp(charset, locale_encodings[i]))
+    {
+      encoding = (cups_encoding_t)i;
+      break;
+    }
+
+ /*
+  * Now find the message catalog for this locale...
+  */
+
+  if ((localedir = getenv("LOCALEDIR")) == NULL)
+    localedir = CUPS_LOCALEDIR;
+
+  snprintf(filename, sizeof(filename), "%s/%s_%s/cups_%s_%s", localedir,
+           langname, country, langname, country);
+  if (!access(filename, 0))
+    snprintf(real, sizeof(real), "%s_%s", langname, country);
   else
   {
-   /*
-    * Convert the language name to a normalized form, e.g.:
-    *
-    *     ll[_CC[.charset]]
-    */
-
-    real[0] = tolower(langname[0]);
-    real[1] = tolower(langname[1]);
-    realptr = real + 2;
-    langptr = langname + 2;
-
-    if (*langptr == '_' || *langptr == '-')
-    {
-     /*
-      * Add country code...
-      */
-
-      *realptr++ = '_';
-      langptr ++;
-
-      *realptr++ = toupper(*langptr++);
-      *realptr++ = toupper(*langptr++);
-    }
-
-    if (*langptr == '.')
-    {
-     /*
-      * Add charset...
-      */
-
-      *langptr++ = '\0';
-      *realptr++ = '.';
-
-      while (*langptr)
-      {
-        if ((realptr - real) < (sizeof(real) - 1) &&
-	    *langptr != '-' && *langptr != '_')
-	  *realptr++ = tolower(*langptr++);
-        else
-          langptr ++;
-      }
-    }
-
-    *realptr = '\0';
+    snprintf(filename, sizeof(filename), "%s/%s/cups_%s", localedir,
+             langname, langname);
+    if (!access(filename, 0))
+      strcpy(real, langname);
+    else
+      strcpy(real, "C");
   }
 
  /*
@@ -317,43 +389,17 @@ cupsLangGet(const char *language) /* I - Language or locale */
   */
 
   for (lang = lang_cache; lang != NULL; lang = lang->next)
-    if (strcmp(lang->language, langname) == 0)
+    if (!strcmp(lang->language, real) == 0 && encoding == lang->encoding)
     {
       lang->used ++;
 
       return (lang);
     }
 
-
  /*
-  * Next try to open a locale file; we will try the charset-localized
-  * file first, then the country-localized file, and finally look for
-  * a generic language file.  If all else fails we will use the POSIX
-  * locale.
-  */
-
-  if ((localedir = getenv("LOCALEDIR")) == NULL)
-    localedir = CUPS_LOCALEDIR;
-
-  do
-  {
-    snprintf(filename, sizeof(filename), "%s/%s/cups_%s", localedir,
-             real, real);
-
-    if ((fp = fopen(filename, "r")) == NULL)
-    {
-      if ((realptr = strchr(real, '.')) != NULL)
-        *realptr = '\0';
-      else if ((realptr = strchr(real, '_')) != NULL)
-        *realptr = '\0';
-    }
-  }
-  while (fp == NULL && strchr(real, '_') != NULL && strchr(real, '.') != NULL);
-
- /*
-  * OK, we have an open messages file; the first line will contain the
-  * language encoding (us-ascii, iso-8859-1, etc.), and the rest will
-  * be messages consisting of:
+  * Open the messages file; the first line contains the default
+  * language encoding (us-ascii, iso-8859-1, etc.), and the rest are
+  * messages consisting of:
   *
   *    #### SP message text
   *
@@ -367,6 +413,8 @@ cupsLangGet(const char *language) /* I - Language or locale */
   *
   * All leading whitespace is deleted.
   */
+
+  fp = fopen(filename, "r");
 
   if (fp == NULL)
     strlcpy(line, lang_default[0], sizeof(line));
@@ -426,14 +474,19 @@ cupsLangGet(const char *language) /* I - Language or locale */
   */
 
   lang->used ++;
-  strlcpy(lang->language, langname, sizeof(lang->language));
+  strlcpy(lang->language, real, sizeof(lang->language));
 
-  for (i = 0; i < (sizeof(lang_encodings) / sizeof(lang_encodings[0])); i ++)
-    if (strcmp(lang_encodings[i], line) == 0)
-    {
-      lang->encoding = (cups_encoding_t)i;
-      break;
-    }
+  if (charset[0])
+    lang->encoding = encoding;
+  else
+  {
+    for (i = 0; i < (sizeof(lang_encodings) / sizeof(lang_encodings[0])); i ++)
+      if (strcmp(lang_encodings[i], line) == 0)
+      {
+	lang->encoding = (cups_encoding_t)i;
+	break;
+      }
+  }
 
  /*
   * Read the strings from the file...
@@ -520,36 +573,65 @@ typedef struct
 
 static const apple_name_locale_t apple_name_locale[] =
 {
-  { "English"    , "en_US" },{ "French"     , "fr" },  { "German"      , "de" },  { "Italian"   , "it" },  
-  { "Dutch"      , "nl" },   { "Swedish"    , "sv" },  { "Spanish"     , "es" },  { "Danish"    , "da" },  
-  { "Portuguese" , "pt" },   { "Norwegian"  , "no" },  { "Hebrew"      , "he" },  { "Japanese"  , "ja" },  
-  { "Arabic"     , "ar" },   { "Finnish"    , "fi" },  { "Greek"       , "el" },  { "Icelandic" , "is" },  
-  { "Maltese"    , "mt" },   { "Turkish"    , "tr" },  { "Croatian"    , "hr" },  { "Chinese"   , "zh" },  
-  { "Urdu"       , "ur" },   { "Hindi"      , "hi" },  { "Thai"        , "th" },  { "Korean"    , "ko" },  
-  { "Lithuanian" , "lt" },   { "Polish"     , "pl" },  { "Hungarian"   , "hu" },  { "Estonian"  , "et" },  
-  { "Latvian"    , "lv" },   { "Sami"       , "se" },  { "Faroese"     , "fo" },  { "Farsi"     , "fa" },  
-  { "Russian"    , "ru" },   { "Chinese"    , "zh" },  { "Dutch"       , "nl" },  { "Irish"     , "ga" },  
-  { "Albanian"   , "sq" },   { "Romanian"   , "ro" },  { "Czech"       , "cs" },  { "Slovak"    , "sk" },  
-  { "Slovenian"  , "sl" },   { "Yiddish"    , "yi" },  { "Serbian"     , "sr" },  { "Macedonian", "mk" },  
-  { "Bulgarian"  , "bg" },   { "Ukrainian"  , "uk" },  { "Byelorussian", "be" },  { "Uzbek"     , "uz" },  
-  { "Kazakh"     , "kk" },   { "Azerbaijani", "az" },  { "Azerbaijani" , "az" },  { "Armenian"  , "hy" },  
-  { "Georgian"   , "ka" },   { "Moldavian"  , "mo" },  { "Kirghiz"     , "ky" },  { "Tajiki"    , "tg" },  
-  { "Turkmen"    , "tk" },   { "Mongolian"  , "mn" },  { "Mongolian"   , "mn" },  { "Pashto"    , "ps" },  
-  { "Kurdish"    , "ku" },   { "Kashmiri"   , "ks" },  { "Sindhi"      , "sd" },  { "Tibetan"   , "bo" },  
-  { "Nepali"     , "ne" },   { "Sanskrit"   , "sa" },  { "Marathi"     , "mr" },  { "Bengali"   , "bn" },  
-  { "Assamese"   , "as" },   { "Gujarati"   , "gu" },  { "Punjabi"     , "pa" },  { "Oriya"     , "or" },  
-  { "Malayalam"  , "ml" },   { "Kannada"    , "kn" },  { "Tamil"       , "ta" },  { "Telugu"    , "te" },  
-  { "Sinhalese"  , "si" },   { "Burmese"    , "my" },  { "Khmer"       , "km" },  { "Lao"       , "lo" },  
-  { "Vietnamese" , "vi" },   { "Indonesian" , "id" },  { "Tagalog"     , "tl" },  { "Malay"     , "ms" },  
-  { "Malay"      , "ms" },   { "Amharic"    , "am" },  { "Tigrinya"    , "ti" },  { "Oromo"     , "om" },  
-  { "Somali"     , "so" },   { "Swahili"    , "sw" },  { "Kinyarwanda" , "rw" },  { "Rundi"     , "rn" },  
-  { "Nyanja"     , ""   },   { "Malagasy"   , "mg" },  { "Esperanto"   , "eo" },  { "Welsh"     , "cy" },  
-  { "Basque"     , "eu" },   { "Catalan"    , "ca" },  { "Latin"       , "la" },  { "Quechua"   , "qu" },  
-  { "Guarani"    , "gn" },   { "Aymara"     , "ay" },  { "Tatar"       , "tt" },  { "Uighur"    , "ug" },  
-  { "Dzongkha"   , "dz" },   { "Javanese"   , "jv" },  { "Sundanese"   , "su" },  { "Galician"  , "gl" },  
-  { "Afrikaans"  , "af" },   { "Breton"     , "br" },  { "Inuktitut"   , "iu" },  { "Scottish"  , "gd" },  
-  { "Manx"       , "gv" },   { "Irish"      , "ga" },  { "Tongan"      , "to" },  { "Greek"     , "el" },  
-  { "Greenlandic", "kl" },   { "Azerbaijani", "az" }
+  { "English"     , "en_US.UTF-8" },	{ "French"     , "fr.UTF-8" },
+  { "German"      , "de.UTF-8" },	{ "Italian"    , "it.UTF-8" },  
+  { "Dutch"       , "nl.UTF-8" },	{ "Swedish"    , "sv.UTF-8" },
+  { "Spanish"     , "es.UTF-8" },	{ "Danish"     , "da.UTF-8" },  
+  { "Portuguese"  , "pt.UTF-8" },	{ "Norwegian"  , "no.UTF-8" },
+  { "Hebrew"      , "he.UTF-8" },	{ "Japanese"   , "ja.UTF-8" },  
+  { "Arabic"      , "ar.UTF-8" },	{ "Finnish"    , "fi.UTF-8" },
+  { "Greek"       , "el.UTF-8" },	{ "Icelandic"  , "is.UTF-8" },  
+  { "Maltese"     , "mt.UTF-8" },	{ "Turkish"    , "tr.UTF-8" },
+  { "Croatian"    , "hr.UTF-8" },	{ "Chinese"    , "zh.UTF-8" },  
+  { "Urdu"        , "ur.UTF-8" },	{ "Hindi"      , "hi.UTF-8" },
+  { "Thai"        , "th.UTF-8" },	{ "Korean"     , "ko.UTF-8" },  
+  { "Lithuanian"  , "lt.UTF-8" },	{ "Polish"     , "pl.UTF-8" },
+  { "Hungarian"   , "hu.UTF-8" },	{ "Estonian"   , "et.UTF-8" },  
+  { "Latvian"     , "lv.UTF-8" },	{ "Sami"       , "se.UTF-8" },
+  { "Faroese"     , "fo.UTF-8" },	{ "Farsi"      , "fa.UTF-8" },  
+  { "Russian"     , "ru.UTF-8" },	{ "Chinese"    , "zh.UTF-8" },
+  { "Dutch"       , "nl.UTF-8" },	{ "Irish"      , "ga.UTF-8" },  
+  { "Albanian"    , "sq.UTF-8" },	{ "Romanian"   , "ro.UTF-8" },
+  { "Czech"       , "cs.UTF-8" },	{ "Slovak"     , "sk.UTF-8" },  
+  { "Slovenian"   , "sl.UTF-8" },	{ "Yiddish"    , "yi.UTF-8" },
+  { "Serbian"     , "sr.UTF-8" },	{ "Macedonian" , "mk.UTF-8" },  
+  { "Bulgarian"   , "bg.UTF-8" },	{ "Ukrainian"  , "uk.UTF-8" },
+  { "Byelorussian", "be.UTF-8" },	{ "Uzbek"      , "uz.UTF-8" },  
+  { "Kazakh"      , "kk.UTF-8" },	{ "Azerbaijani", "az.UTF-8" },
+  { "Azerbaijani" , "az.UTF-8" },	{ "Armenian"   , "hy.UTF-8" },  
+  { "Georgian"    , "ka.UTF-8" },	{ "Moldavian"  , "mo.UTF-8" },
+  { "Kirghiz"     , "ky.UTF-8" },	{ "Tajiki"     , "tg.UTF-8" },  
+  { "Turkmen"     , "tk.UTF-8" },	{ "Mongolian"  , "mn.UTF-8" },
+  { "Mongolian"   , "mn.UTF-8" },	{ "Pashto"     , "ps.UTF-8" },  
+  { "Kurdish"     , "ku.UTF-8" },	{ "Kashmiri"   , "ks.UTF-8" },
+  { "Sindhi"      , "sd.UTF-8" },	{ "Tibetan"    , "bo.UTF-8" },  
+  { "Nepali"      , "ne.UTF-8" },	{ "Sanskrit"   , "sa.UTF-8" },
+  { "Marathi"     , "mr.UTF-8" },	{ "Bengali"    , "bn.UTF-8" },  
+  { "Assamese"    , "as.UTF-8" },	{ "Gujarati"   , "gu.UTF-8" },
+  { "Punjabi"     , "pa.UTF-8" },	{ "Oriya"      , "or.UTF-8" },  
+  { "Malayalam"   , "ml.UTF-8" },	{ "Kannada"    , "kn.UTF-8" },
+  { "Tamil"       , "ta.UTF-8" },	{ "Telugu"     , "te.UTF-8" },  
+  { "Sinhalese"   , "si.UTF-8" },	{ "Burmese"    , "my.UTF-8" },
+  { "Khmer"       , "km.UTF-8" },	{ "Lao"        , "lo.UTF-8" },  
+  { "Vietnamese"  , "vi.UTF-8" },	{ "Indonesian" , "id.UTF-8" },
+  { "Tagalog"     , "tl.UTF-8" },	{ "Malay"      , "ms.UTF-8" },  
+  { "Malay"       , "ms.UTF-8" },	{ "Amharic"    , "am.UTF-8" },
+  { "Tigrinya"    , "ti.UTF-8" },	{ "Oromo"      , "om.UTF-8" },  
+  { "Somali"      , "so.UTF-8" },	{ "Swahili"    , "sw.UTF-8" },
+  { "Kinyarwanda" , "rw.UTF-8" },	{ "Rundi"      , "rn.UTF-8" },  
+  { "Nyanja"      , ""   },		{ "Malagasy"   , "mg.UTF-8" },
+  { "Esperanto"   , "eo.UTF-8" },	{ "Welsh"      , "cy.UTF-8" },  
+  { "Basque"      , "eu.UTF-8" },	{ "Catalan"    , "ca.UTF-8" },
+  { "Latin"       , "la.UTF-8" },	{ "Quechua"    , "qu.UTF-8" },  
+  { "Guarani"     , "gn.UTF-8" },	{ "Aymara"     , "ay.UTF-8" },
+  { "Tatar"       , "tt.UTF-8" },	{ "Uighur"     , "ug.UTF-8" },  
+  { "Dzongkha"    , "dz.UTF-8" },	{ "Javanese"   , "jv.UTF-8" },
+  { "Sundanese"   , "su.UTF-8" },	{ "Galician"   , "gl.UTF-8" },  
+  { "Afrikaans"   , "af.UTF-8" },	{ "Breton"     , "br.UTF-8" },
+  { "Inuktitut"   , "iu.UTF-8" },	{ "Scottish"   , "gd.UTF-8" },  
+  { "Manx"        , "gv.UTF-8" },	{ "Irish"      , "ga.UTF-8" },
+  { "Tongan"      , "to.UTF-8" },	{ "Greek"      , "el.UTF-8" },  
+  { "Greenlandic" , "kl.UTF-8" },	{ "Azerbaijani", "az.UTF-8" }
 };
 
 
@@ -625,5 +707,5 @@ appleLangDefault(void)
 
 
 /*
- * End of "$Id: language.c,v 1.20.2.15 2003/02/04 20:33:44 mike Exp $".
+ * End of "$Id: language.c,v 1.20.2.16 2003/04/18 13:37:36 mike Exp $".
  */
