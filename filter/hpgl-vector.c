@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-vector.c,v 1.17 2002/12/17 18:59:25 swdev Exp $"
+ * "$Id: hpgl-vector.c,v 1.18 2003/03/21 02:44:26 mike Exp $"
  *
  *   HP-GL/2 vector routines for the Common UNIX Printing System (CUPS).
  *
@@ -456,8 +456,12 @@ PE_polyline_encoded(int     num_params,	/* I - Number of parameters */
 	    }
 
             if (draw)
-              Outputf("%.3f %.3f LI\n", tx, ty);
-            else
+	    {
+	      if (fabs(PenPosition[0] - tx) > 0.001 ||
+        	  fabs(PenPosition[1] - ty) > 0.001)
+        	Outputf("%.3f %.3f LI\n", tx, ty);
+            }
+	    else
               Outputf("%.3f %.3f MO\n", tx, ty);
 
 	    PenPosition[0] = (float)tx;
@@ -687,9 +691,10 @@ plot_points(int     num_params,	/* I - Number of parameters */
   if (PenDown)
   {
     if (!PolygonMode)
+    {
       Outputf("MP\n");
-
-    Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+      Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+    }
   }
 
   for (i = 0; i < num_params; i += 2)
@@ -714,7 +719,13 @@ plot_points(int     num_params,	/* I - Number of parameters */
     }
 
     if (PenDown)
-      Outputf("%.3f %.3f LI\n", x, y);
+    {
+      if (PolygonMode && i == 0)
+        Outputf("%.3f %.3f MO\n", x, y);
+      else if (fabs(PenPosition[0] - x) > 0.001 ||
+               fabs(PenPosition[1] - y) > 0.001)
+        Outputf("%.3f %.3f LI\n", x, y);
+    }
 
     PenPosition[0] = x;
     PenPosition[1] = y;
@@ -729,5 +740,5 @@ plot_points(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-vector.c,v 1.17 2002/12/17 18:59:25 swdev Exp $".
+ * End of "$Id: hpgl-vector.c,v 1.18 2003/03/21 02:44:26 mike Exp $".
  */

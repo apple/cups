@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-polygon.c,v 1.12 2002/12/17 18:59:25 swdev Exp $"
+ * "$Id: hpgl-polygon.c,v 1.13 2003/03/21 02:44:26 mike Exp $"
  *
  *   HP-GL/2 polygon routines for the Common UNIX Printing System (CUPS).
  *
@@ -227,7 +227,7 @@ PM_polygon_mode(int     num_params,	/* I - Number of parameters */
       params[0].value.number == 0)
   {
     Outputf("MP\n");
-    Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+/*    Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);*/
     PolygonMode = 1;
   }
   else if (params[0].value.number == 2)
@@ -378,5 +378,5 @@ WG_fill_wedge(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-polygon.c,v 1.12 2002/12/17 18:59:25 swdev Exp $".
+ * End of "$Id: hpgl-polygon.c,v 1.13 2003/03/21 02:44:26 mike Exp $".
  */

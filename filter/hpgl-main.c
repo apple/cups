@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-main.c,v 1.25 2002/12/17 18:59:25 swdev Exp $"
+ * "$Id: hpgl-main.c,v 1.26 2003/03/21 02:44:26 mike Exp $"
  *
  *   HP-GL/2 filter main entry for the Common UNIX Printing System (CUPS).
  *
@@ -144,6 +144,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Make sure status messages are not buffered...
   */
 
+  setbuf(stdout, NULL);
   setbuf(stderr, NULL);
 
  /*
@@ -263,5 +264,5 @@ compare_names(const void *p1,	/* I - First name */
 
 
 /*
- * End of "$Id: hpgl-main.c,v 1.25 2002/12/17 18:59:25 swdev Exp $".
+ * End of "$Id: hpgl-main.c,v 1.26 2003/03/21 02:44:26 mike Exp $".
  */
