@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.34.2.20 2004/04/20 13:40:30 mike Exp $"
+ * "$Id: classes.c,v 1.34.2.21 2004/04/28 19:20:16 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -32,6 +32,8 @@
  *   FindClass()                - Find the named class.
  *   LoadAllClasses()           - Load classes from the classes.conf file.
  *   SaveAllClasses()           - Save classes to the classes.conf file.
+ *   UpdateImplicitClasses()    - Update the accepting state of implicit
+ *                                classes.
  */
 
 /*
@@ -676,5 +678,34 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.34.2.20 2004/04/20 13:40:30 mike Exp $".
+ * 'UpdateImplicitClasses()' - Update the accepting state of implicit classes.
+ */
+
+void
+UpdateImplicitClasses(void)
+{
+  int		i;			/* Looping var */
+  printer_t	*pclass;		/* Current class */
+  int		accepting;		/* printer-is-accepting-jobs value */
+
+
+  for (pclass = Printers; pclass; pclass = pclass->next)
+    if (pclass->type & CUPS_PRINTER_IMPLICIT)
+    {
+     /*
+      * Implicit class, loop through the printers to come up with a
+      * composite state...
+      */
+
+      for (i = 0, accepting = 0; i < pclass->num_printers; i ++)
+        if ((accepting |= pclass->printers[i]->accepting) != 0)
+	  break;
+
+      pclass->accepting = accepting;
+    }
+}
+
+
+/*
+ * End of "$Id: classes.c,v 1.34.2.21 2004/04/28 19:20:16 mike Exp $".
  */
