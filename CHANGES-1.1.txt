@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The USB backend didn't sort the devices entries, so it
+	  could associate the wrong serial number with a
+	  printer.
 	- The pstops filter didn't handle page ranges properly
 	  when a page contained an embedded document.
 	- Added a partial translation of the web interface to
