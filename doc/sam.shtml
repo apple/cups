@@ -2432,6 +2432,35 @@ provided then it is assumed to be relative to the
 <A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
 default request directory is <VAR>/var/spool/cups</VAR>.
 
+<!-- NEED 4in -->
+<H3><A NAME="Require">Require</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+Require group foo bar
+Require user john mary
+Require valid-user
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>Require</CODE> directive specifies that
+authentication is required for the resource. The
+<CODE>group</CODE> keyword specifies that the authenticated user
+must be a member of one or more of the named groups that follow.
+
+<P>The <CODE>user</CODE> keyboard specifies that the
+authenticated user must be one of the named users that follow.
+
+<P>The <CODE>valid-user</CODE> keyword specifies that any
+authenticated user may access the resource.
+
+<P>The default is to do no authentication. This directive must
+appear inside a <A HREF="#Location"><CODE>Location</CODE></A>
+directive.
+
 <!-- NEED 3in -->
 <H3><A NAME="RIPCache">RIPCache</A></H3>
 <HR>
@@ -2477,6 +2506,33 @@ automatically use a non-priviledged mode that is not 100%
 compliant with RFC 1179. The <CODE>parallel</CODE>,
 <CODE>serial</CODE>, and <CODE>usb</CODE> backends will need
 write access to the corresponding device files.
+
+<!-- NEED 3in -->
+<H3><A NAME="Satisfy">Satisfy</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+Satisfy all
+Satisfy any
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>Satisfy</CODE> directive specifies whether all
+conditions must be satisfied to allow access to the resource. If
+set to <CODE>all</CODE>, then all authentication and access
+control conditions must be satified to allow access.
+
+<P>Setting <CODE>Satisfy</CODE> to <CODE>any</CODE> allows a user to
+gain access if the authentication or access control requirements are
+satisfied. For example, you might require authentication for remote
+access, but allow local access without authentication.
+
+<P>The default is <CODE>all</CODE>. This directive must appear
+inside a <A HREF="#Location"><CODE>Location</CODE></A>
+directive.
 
 <!-- NEED 3in -->
 <H3><A NAME="ServerAdmin">ServerAdmin</A></H3>

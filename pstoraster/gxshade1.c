@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gxshade1.c,v 1.1 2000/03/08 23:15:05 mike Exp $ */
+/*$Id: gxshade1.c,v 1.2 2002/01/14 19:45:17 mike Exp $ */
 /* Rendering for non-mesh shadings */
 #include "math_.h"
 #include "gx.h"
@@ -218,7 +218,7 @@ recur:
 	    if (code < 0)
 		return code;
 	    v[1] = y1;
-	    code = gs_function_evaluate(pfn, v, mid[2].paint.values);
+	    code = gs_function_evaluate(pfn, v, mid[1].paint.values);
 	    if (code < 0)
 		return code;
 	    rcc[0].paint = cc[0].paint;

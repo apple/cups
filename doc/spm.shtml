@@ -2536,8 +2536,9 @@ API.
 
 <H3>Raster Page Header</H3>
 
-<P>The raster page header consists of the PostScript page device dictionary
-for the page:
+<P>The raster page header (<A
+NAME="cups_raster_header_t"><CODE>cups_raster_header_t</CODE></A>) consists
+of the PostScript page device dictionary for the page:
 
 <CENTER><TABLE WIDTH="90%" BORDER="1">
 <TR>
@@ -3322,7 +3323,7 @@ password = cupsGetPassword("Please enter a password:");
 <A HREF="#cupsSetPasswordCB">cupsSetPasswordCB()</A>,
 <A HREF="#cupsSetServer">cupsSetServer()</A>,
 <A HREF="#cupsSetUser">cupsSetUser()</A>,
-<A HREF="#cupsUser()">cupsUser()</A>
+<A HREF="#cupsUser">cupsUser()</A>
 
 <!-- NEW PAGE --><H2><A NAME="cupsGetPPD">cupsGetPPD()</A></H2>
 
@@ -4554,7 +4555,7 @@ password = cupsGetPassword("Please enter a password:");
 <A HREF="#cupsServer">cupsServer()</A>,
 <A HREF="#cupsSetServer">cupsSetServer()</A>,
 <A HREF="#cupsSetUser">cupsSetUser()</A>,
-<A HREF="#cupsUser()">cupsUser()</A>
+<A HREF="#cupsUser">cupsUser()</A>
 
 <!-- NEW PAGE --><H2><A NAME="cupsSetServer">cupsSetServer()</A></H2>
 
@@ -4598,7 +4599,7 @@ cupsSetServer("foo.bar.com");
 <A HREF="#cupsServer">cupsServer()</A>,
 <A HREF="#cupsSetPasswordCB">cupsSetPasswordCB()</A>,
 <A HREF="#cupsSetUser">cupsSetUser()</A>,
-<A HREF="#cupsUser()">cupsUser()</A>
+<A HREF="#cupsUser">cupsUser()</A>
 
 <!-- NEW PAGE --><H2><A NAME="cupsSetUser">cupsSetUser()</A></H2>
 
@@ -4644,7 +4645,7 @@ cupsSetUser("root");
 <A HREF="#cupsServer">cupsServer()</A>,
 <A HREF="#cupsSetPasswordCB">cupsSetPasswordCB()</A>,
 <A HREF="#cupsSetServer">cupsSetServer()</A>,
-<A HREF="#cupsUser()">cupsUser()</A>
+<A HREF="#cupsUser">cupsUser()</A>
 
 <!-- NEW PAGE --><H2><A NAME="cupsTempFile">cupsTempFile()</A></H2>
 

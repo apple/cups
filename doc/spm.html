@@ -3702,7 +3702,8 @@ cupsRasterOpen()</CODE></A> function to specify a stream for reading or
  CUPS API.</P>
 <H2><A NAME="9_1">Raster Structures</A></H2>
 <H3><A NAME="9_1_1">Raster Page Header</A></H3>
-<P>The raster page header consists of the PostScript page device
+<P>The raster page header (<A NAME="cups_raster_header_t"><CODE>
+cups_raster_header_t</CODE></A>) consists of the PostScript page device
  dictionary for the page:
 <CENTER>
 <TABLE BORDER="1" WIDTH="90%">
@@ -4189,7 +4190,7 @@ password = cupsGetPassword(&quot;Please enter a password:&quot;);
 <H3><A NAME="10_9_6">See Also</A></H3>
 <P><A HREF="#cupsServer"> cupsServer()</A>,<A HREF="#cupsSetPasswordCB">
  cupsSetPasswordCB()</A>,<A HREF="#cupsSetServer"> cupsSetServer()</A>,<A
-HREF="#cupsSetUser"> cupsSetUser()</A>,<A HREF="#cupsUser()"> cupsUser()</A>
+HREF="#cupsSetUser"> cupsSetUser()</A>,<A HREF="#cupsUser"> cupsUser()</A>
 <!-- NEW PAGE -->
 
 </P>
@@ -5038,7 +5039,7 @@ password = cupsGetPassword(&quot;Please enter a password:&quot;);
 </PRE>
 <H3><A NAME="10_30_5">See Also</A></H3>
 <P><A HREF="#cupsServer"> cupsServer()</A>,<A HREF="#cupsSetServer">
- cupsSetServer()</A>,<A HREF="#cupsSetUser"> cupsSetUser()</A>,<A HREF="#cupsUser()">
+ cupsSetServer()</A>,<A HREF="#cupsSetUser"> cupsSetUser()</A>,<A HREF="#cupsUser">
  cupsUser()</A>
 <!-- NEW PAGE -->
 </P>
@@ -5067,7 +5068,7 @@ cupsSetServer(&quot;foo.bar.com&quot;);
 </PRE>
 <H3><A NAME="10_31_5">See Also</A></H3>
 <P><A HREF="#cupsServer"> cupsServer()</A>,<A HREF="#cupsSetPasswordCB">
- cupsSetPasswordCB()</A>,<A HREF="#cupsSetUser"> cupsSetUser()</A>,<A HREF="#cupsUser()">
+ cupsSetPasswordCB()</A>,<A HREF="#cupsSetUser"> cupsSetUser()</A>,<A HREF="#cupsUser">
  cupsUser()</A>
 <!-- NEW PAGE -->
 </P>
@@ -5099,7 +5100,7 @@ cupsSetUser(&quot;root&quot;);
 <H3><A NAME="10_32_5">See Also</A></H3>
 <P><A HREF="#cupsServer"> cupsServer()</A>,<A HREF="#cupsSetPasswordCB">
  cupsSetPasswordCB()</A>,<A HREF="#cupsSetServer"> cupsSetServer()</A>,<A
-HREF="#cupsUser()"> cupsUser()</A>
+HREF="#cupsUser"> cupsUser()</A>
 <!-- NEW PAGE -->
 </P>
 <H2><A NAME="cupsTempFile">cupsTempFile()</A></H2>

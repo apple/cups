@@ -1,8 +1,10 @@
-CHANGES.txt - 01/04/2002
+CHANGES.txt - 01/14/2002
 ------------------------
 
 CHANGES IN CUPS V1.1.13
 
+	- The pstoraster filter accessed the third element of a
+	  2 element array.
 	- The scheduler did not setup a status pipe for polling
 	  processes, so error messages went to whatever file
 	  descriptor 2 was pointing to when they were started.
