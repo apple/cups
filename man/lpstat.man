@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpstat.man,v 1.1 2000/02/23 03:17:05 mike Exp $"
+.\" "$Id: lpstat.man,v 1.2 2000/05/01 21:02:05 mike Exp $"
 .\"
 .\"   lpstat man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpstat 1 "Common UNIX Printing System" "22 September 1999" "Easy Software Products"
+.TH lpstat 1 "Common UNIX Printing System" "1 May 2000" "Easy Software Products"
 .SH NAME
 lpstat \- print cups status information
 .SH SYNOPSIS
@@ -30,13 +30,13 @@ lpstat \- print cups status information
 .I destination(s)
 ] ] [ -c [
 .I class(es)
-] ] [ -d ] [ -h
+] [ -d ] [ -h
 .I server
-] [ -o [
+] [ -l ] [ -o [
 .I destination(s)
 ] ] [ -p [
 .I printer(s)
-] ] [ -r ] [ -s ] [ -t ] [ -u [
+] ] [ -r ] [ -R ] [ -s ] [ -t ] [ -u [
 .I user(s)
 ] ] [ -v [
 .I printer(s)
@@ -64,6 +64,10 @@ Shows the current default destination.
 .br
 Specifies the CUPS server to communicate with.
 .TP 5
+\-l
+.br
+Shows a long listing of printers, classes, or jobs.
+.TP 5
 \-o [\fIdestination(s)\fR]
 .br
 Shows the jobs queue on the specified destinations. If no destinations are
@@ -77,6 +81,10 @@ no printers are specified then all printers are listed.
 \-r
 .br
 Shows whether or not the CUPS server is running.
+.TP 5
+\-R
+.br
+Shows the ranking of print jobs.
 .TP 5
 \-s
 .br
@@ -105,11 +113,13 @@ any printable character except SPACE and TAB. Also, printer and class names are
 \fBnot\fR case-sensitive.
 .LP
 The "-h" option is not a standard System V option.
+.LP
+The Solaris "-f", "-P", and "-S" options are silently ignored.
 .SH SEE ALSO
 cancel(1), lp(1),
 CUPS Software Users Manual
 .SH COPYRIGHT
 Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpstat.man,v 1.1 2000/02/23 03:17:05 mike Exp $".
+.\" End of "$Id: lpstat.man,v 1.2 2000/05/01 21:02:05 mike Exp $".
 .\"

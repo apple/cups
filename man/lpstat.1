@@ -8,10 +8,10 @@ NNAAMMEE
        lpstat - print cups status information
 
 SSYYNNOOPPSSIISS
-       llppssttaatt [ -a [ _d_e_s_t_i_n_a_t_i_o_n_(_s_) ] ] [ -c [ _c_l_a_s_s_(_e_s_) ] ] [ -d
-       ] [ -h _s_e_r_v_e_r  ]  [  -o  [  _d_e_s_t_i_n_a_t_i_o_n_(_s_)  ]  ]  [  -p  [
-       _p_r_i_n_t_e_r_(_s_)  ]  ] [ -r ] [ -s ] [ -t ] [ -u [ _u_s_e_r_(_s_) ] ] [
-       -v [ _p_r_i_n_t_e_r_(_s_) ] ]
+       llppssttaatt [ -a [ _d_e_s_t_i_n_a_t_i_o_n_(_s_) ] ] [ -c [ _c_l_a_s_s_(_e_s_) ] [ -d ]
+       [ -h _s_e_r_v_e_r ] [ -l ] [ -o [ _d_e_s_t_i_n_a_t_i_o_n_(_s_)  ]  ]  [  -p  [
+       _p_r_i_n_t_e_r_(_s_)  ] ] [ -r ] [ -R ] [ -s ] [ -t ] [ -u [ _u_s_e_r_(_s_)
+       ] ] [ -v [ _p_r_i_n_t_e_r_(_s_) ] ]
 
 DDEESSCCRRIIPPTTIIOONN
        llppssttaatt  displays  status  information  about  the  current
@@ -34,6 +34,9 @@ DDEESSCCRRIIPPTTIIOONN
        -h _s_e_r_v_e_r
             Specifies the CUPS server to communicate with.
 
+       -l
+            Shows a long listing of printers, classes, or jobs.
+
        -o [_d_e_s_t_i_n_a_t_i_o_n_(_s_)]
             Shows  the  jobs queue on the specified destinations.
             If no destinations are specified all jobs are  shown.
@@ -46,6 +49,9 @@ DDEESSCCRRIIPPTTIIOONN
        -r
             Shows whether or not the CUPS server is running.
 
+       -R
+            Shows the ranking of print jobs.
+
        -s
             Shows  a status summary, including the system default
             destination, a  list  of  classes  and  their  member
@@ -53,15 +59,9 @@ DDEESSCCRRIIPPTTIIOONN
             devices. This is equivalent to using the "-d",  "-c",
             and "-p" options.
 
-       -t
-            Shows  all  status information. This is equivalent to
-            using the "-r", "-d", "-c", "-d", "-v",  "-a",  "-p",
-            and "-o" options.
 
 
-
-
-22 September 1999  Common UNIX Printing System                  1
+1 May 2000         Common UNIX Printing System                  1
 
 
 
@@ -69,6 +69,11 @@ DDEESSCCRRIIPPTTIIOONN
 
 lpstat(1)             Easy Software Products            lpstat(1)
 
+
+       -t
+            Shows  all  status information. This is equivalent to
+            using the "-r", "-d", "-c", "-d", "-v",  "-a",  "-p",
+            and "-o" options.
 
        -u [_u_s_e_r_(_s_)]
             Shows  a  list  of print jobs queued by the specified
@@ -87,11 +92,14 @@ CCOOMMPPAATTIIBBIILLIITTYY
 
        The "-h" option is not a standard System V option.
 
+       The Solaris "-f", "-P",  and  "-S"  options  are  silently
+       ignored.
+
 SSEEEE AALLSSOO
        cancel(1), lp(1), CUPS Software Users Manual
 
 CCOOPPYYRRIIGGHHTT
-       Copyright 1993-2000 by Easy Software Products, All  Rights
+       Copyright  1993-2000 by Easy Software Products, All Rights
        Reserved.
 
 
@@ -119,14 +127,6 @@ CCOOPPYYRRIIGGHHTT
 
 
 
-
-
-
-
-
-
-
-
-22 September 1999  Common UNIX Printing System                  2
+1 May 2000         Common UNIX Printing System                  2
 
 
