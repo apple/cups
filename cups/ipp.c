@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.78 2002/12/17 18:56:42 swdev Exp $"
+ * "$Id: ipp.c,v 1.79 2003/01/14 21:46:46 mike Exp $"
  *
  *   Internet Printing Protocol object functions for the Common UNIX
  *   Printing System (CUPS).
@@ -2000,10 +2000,12 @@ ipp_read(http_t        *http,	/* I - Client connection */
          unsigned char *buffer,	/* O - Buffer for data */
 	 int           length)	/* I - Total length */
 {
-  int	tbytes,			/* Total bytes read */
-	bytes;			/* Bytes read this pass */
-  char	len[32];		/* Length string */
-  
+  int		tbytes,		/* Total bytes read */
+		bytes;		/* Bytes read this pass */
+  char		len[32];	/* Length string */
+  fd_set	input;		/* Input set for select() */
+  struct timeval timeout;	/* Timeout */
+
 
  /*
   * Loop until all bytes are read...
@@ -2047,8 +2049,31 @@ ipp_read(http_t        *http,	/* I - Client connection */
 	}
       }
     }
-    else if ((bytes = httpRead(http, (char *)buffer, length - tbytes)) < 0)
-      break;
+    else
+    {
+     /*
+      * Try doing a select() to poll the socket for data, waiting a
+      * maximum of 1 second...
+      */
+
+      FD_ZERO(&input);
+      FD_SET(http->fd, &input);
+
+      timeout.tv_sec  = 1;
+      timeout.tv_usec = 0;
+
+      if (select(http->fd + 1, &input, NULL, NULL, &timeout) < 1)
+      {
+       /*
+        * Signal no data...
+	*/
+
+        bytes = -1;
+	break;
+      }
+      else if ((bytes = httpRead(http, (char *)buffer, length - tbytes)) < 0)
+        break;
+    }
   }
 
  /*
@@ -2063,5 +2088,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.78 2002/12/17 18:56:42 swdev Exp $".
+ * End of "$Id: ipp.c,v 1.79 2003/01/14 21:46:46 mike Exp $".
  */
