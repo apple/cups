@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.140 2001/06/27 14:57:50 mike Exp $"
+ * "$Id: ipp.c,v 1.141 2001/07/19 14:54:17 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2672,10 +2672,14 @@ delete_printer(client_t        *con,	/* I - Client connection */
     printer = FindPrinter(dest);
 
  /*
-  * Remove any old PPD or script files...
+  * Remove old jobs...
   */
 
   CancelJobs(dest);
+
+ /*
+  * Remove any old PPD or script files...
+  */
 
   snprintf(filename, sizeof(filename), "%s/interfaces/%s", ServerRoot, dest);
   unlink(filename);
@@ -5489,5 +5493,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.140 2001/06/27 14:57:50 mike Exp $".
+ * End of "$Id: ipp.c,v 1.141 2001/07/19 14:54:17 mike Exp $".
  */
