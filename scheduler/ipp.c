@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.13 1999/05/19 18:00:59 mike Exp $"
+ * "$Id: ipp.c,v 1.14 1999/05/19 19:46:41 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -354,6 +354,9 @@ accept_jobs(client_t        *con,	/* I - Client connection */
   printer->accepting        = 1;
   printer->state_message[0] = '\0';
 
+  LogMessage(LOG_INFO, "Printer \'%s\' now accepting jobs (\'%s\').", name,
+             con->username);
+
  /*
   * Everything was ok, so return OK status...
   */
@@ -499,6 +502,10 @@ add_class(client_t        *con,		/* I - Client connection */
   */
 
   SetPrinterAttrs(pclass);
+  SaveAllClasses();
+
+  LogMessage(LOG_INFO, "New class \'%s\' added by \'%s\'.", pclass->name,
+             con->username);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -659,6 +666,10 @@ add_printer(client_t        *con,	/* I - Client connection */
   */
 
   SetPrinterAttrs(printer);
+  SaveAllPrinters();
+
+  LogMessage(LOG_INFO, "New printer \'%s\' added by \'%s\'.", printer->name,
+             con->username);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -734,6 +745,8 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
   */
 
   CancelJobs(dest);
+  LogMessage(LOG_INFO, "All jobs on \'%s\' were cancelled by \'%s\'.", dest,
+             con->username);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -825,6 +838,9 @@ cancel_job(client_t        *con,	/* I - Client connection */
 
   CancelJob(jobid);
   CheckJobs();
+
+  LogMessage(LOG_INFO, "Job %d was cancelled by \'%s\'.", jobid,
+             con->username);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -1031,6 +1047,15 @@ delete_printer(client_t        *con,	/* I - Client connection */
 
   sprintf(filename, "%s/ppd/%s.ppd", ServerRoot, dest);
   unlink(filename);
+
+  SaveAllPrinters();
+
+  if (dtype == CUPS_PRINTER_CLASS)
+    LogMessage(LOG_INFO, "Class \'%s\' deleted by \'%s\'.", dest,
+               con->username);
+  else
+    LogMessage(LOG_INFO, "Printer \'%s\' deleted by \'%s\'.", dest,
+               con->username);
 
  /*
   * Return with no errors...
@@ -1650,7 +1675,7 @@ print_job(client_t        *con,		/* I - Client connection */
   else
     title = "Untitled";
 
-  if ((job = AddJob(priority, dest)) == NULL)
+  if ((job = AddJob(priority, printer->name)) == NULL)
   {
     send_ipp_error(con, IPP_INTERNAL_ERROR);
     return;
@@ -1687,6 +1712,9 @@ print_job(client_t        *con,		/* I - Client connection */
   */
 
   CheckJobs();
+
+  LogMessage(LOG_INFO, "Job %d queued on \'%s\' by \'%s\'.", job->id,
+             job->dest, con->username);
 
  /*
   * Fill in the response info...
@@ -1776,6 +1804,13 @@ reject_jobs(client_t        *con,	/* I - Client connection */
     strcpy(printer->state_message, "Rejecting Jobs");
   else
     strcpy(printer->state_message, attr->values[0].string.text);
+
+  if (dtype == CUPS_PRINTER_CLASS)
+    LogMessage(LOG_INFO, "Class \'%s\' rejecting jobs (\'%s\').", name,
+               con->username);
+  else
+    LogMessage(LOG_INFO, "Printer \'%s\' rejecting jobs (\'%s\').", name,
+               con->username);
 
  /*
   * Everything was ok, so return OK status...
@@ -1868,6 +1903,12 @@ set_default(client_t        *con,	/* I - Client connection */
   else
     DefaultPrinter = FindPrinter(name);
 
+  SaveAllPrinters();
+  SaveAllClasses();
+
+  LogMessage(LOG_INFO, "Default destination set to \'%s\' by \'%s\'.", name,
+             con->username);
+
  /*
   * Everything was ok, so return OK status...
   */
@@ -1938,6 +1979,18 @@ start_printer(client_t        *con,	/* I - Client connection */
     printer = FindPrinter(name);
 
   StartPrinter(printer);
+
+  if (dtype == CUPS_PRINTER_CLASS)
+    SaveAllClasses();
+  else
+    SaveAllPrinters();
+
+  if (dtype == CUPS_PRINTER_CLASS)
+    LogMessage(LOG_INFO, "Class \'%s\' started by \'%s\'.", name,
+               con->username);
+  else
+    LogMessage(LOG_INFO, "Printer \'%s\' started by \'%s\'.", name,
+               con->username);
 
   printer->state_message[0] = '\0';
 
@@ -2013,11 +2066,23 @@ stop_printer(client_t        *con,	/* I - Client connection */
 
   StopPrinter(printer);
 
+  if (dtype == CUPS_PRINTER_CLASS)
+    SaveAllClasses();
+  else
+    SaveAllPrinters();
+
   if ((attr = ippFindAttribute(con->request, "printer-state-message",
                                IPP_TAG_TEXT)) == NULL)
     strcpy(printer->state_message, "Paused");
   else
     strcpy(printer->state_message, attr->values[0].string.text);
+
+  if (dtype == CUPS_PRINTER_CLASS)
+    LogMessage(LOG_INFO, "Class \'%s\' stopped by \'%s\'.", name,
+               con->username);
+  else
+    LogMessage(LOG_INFO, "Printer \'%s\' stopped by \'%s\'.", name,
+               con->username);
 
  /*
   * Everything was ok, so return OK status...
@@ -2171,5 +2236,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.13 1999/05/19 18:00:59 mike Exp $".
+ * End of "$Id: ipp.c,v 1.14 1999/05/19 19:46:41 mike Exp $".
  */

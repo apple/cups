@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.17 1999/05/19 18:00:59 mike Exp $"
+ * "$Id: printers.c,v 1.18 1999/05/19 19:46:43 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -481,6 +481,78 @@ LoadAllPrinters(void)
 void
 SaveAllPrinters(void)
 {
+  FILE		*fp;			/* printers.conf file */
+  char		temp[1024];		/* Temporary string */
+  printer_t	*printer;		/* Current printer class */
+  int		i;			/* Looping var */
+  time_t	curtime;		/* Current time */
+  struct tm	*curdate;		/* Current date */
+
+
+ /*
+  * Create the printers.conf file...
+  */
+
+  sprintf(temp, "%s/conf/printers.conf", ServerRoot);
+  if ((fp = fopen(temp, "w")) == NULL)
+  {
+    LogMessage(LOG_ERROR, "Unable to save printers.conf - %s", strerror(errno));
+    return;
+  }
+  else
+    LogMessage(LOG_INFO, "Saving printers.conf...");
+
+ /*
+  * Write a small header to the file...
+  */
+
+  curtime = time(NULL);
+  curdate = gmtime(&curtime);
+  strftime(temp, sizeof(temp) - 1, "# Written by cupsd on %c\n", curdate);
+
+  fputs("# Class configuration file for " CUPS_SVERSION "\n", fp);
+  fputs(temp, fp);
+
+ /*
+  * Write each local printer known to the system...
+  */
+
+  for (printer = Printers; printer != NULL; printer = printer->next)
+  {
+   /*
+    * Skip remote destinations and printer classes...
+    */
+
+    if ((printer->type & CUPS_PRINTER_REMOTE) ||
+        (printer->type & CUPS_PRINTER_CLASS))
+      continue;
+
+   /*
+    * Write printers as needed...
+    */
+
+    if (printer == DefaultPrinter)
+      fprintf(fp, "<DefaultPrinter %s>\n", printer->name);
+    else
+      fprintf(fp, "<Printer %s>\n", printer->name);
+
+    if (printer->info[0])
+      fprintf(fp, "Info %s\n", printer->info);
+    if (printer->more_info[0])
+      fprintf(fp, "MoreInfo %s\n", printer->more_info);
+    if (printer->location[0])
+      fprintf(fp, "Location %s\n", printer->location);
+    if (printer->device_uri[0])
+      fprintf(fp, "DeviceURI %s\n", printer->device_uri);
+    if (printer->state == IPP_PRINTER_STOPPED)
+      fputs("State Stopped\n", fp);
+    else
+      fputs("State Idle\n", fp);
+
+    fputs("</Printer>\n", fp);
+  }
+
+  fclose(fp);
 }
 
 
@@ -861,5 +933,5 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 
 
 /*
- * End of "$Id: printers.c,v 1.17 1999/05/19 18:00:59 mike Exp $".
+ * End of "$Id: printers.c,v 1.18 1999/05/19 19:46:43 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.4 1999/05/13 20:41:10 mike Exp $"
+ * "$Id: classes.c,v 1.5 1999/05/19 19:46:40 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -303,7 +303,7 @@ LoadAllClasses(void)
 
 
  /*
-  * Open the printer.conf file...
+  * Open the classes.conf file...
   */
 
   sprintf(line, "%s/conf/classes.conf", ServerRoot);
@@ -311,7 +311,7 @@ LoadAllClasses(void)
     return;
 
  /*
-  * Read printer configurations until we hit EOF...
+  * Read class configurations until we hit EOF...
   */
 
   linenum = 0;
@@ -442,9 +442,82 @@ LoadAllClasses(void)
 void
 SaveAllClasses(void)
 {
+  FILE		*fp;			/* classes.conf file */
+  char		temp[1024];		/* Temporary string */
+  printer_t	*pclass;		/* Current printer class */
+  int		i;			/* Looping var */
+  time_t	curtime;		/* Current time */
+  struct tm	*curdate;		/* Current date */
+
+
+ /*
+  * Create the classes.conf file...
+  */
+
+  sprintf(temp, "%s/conf/classes.conf", ServerRoot);
+  if ((fp = fopen(temp, "w")) == NULL)
+  {
+    LogMessage(LOG_ERROR, "Unable to save classes.conf - %s", strerror(errno));
+    return;
+  }
+  else
+    LogMessage(LOG_INFO, "Saving classes.conf...");
+
+ /*
+  * Write a small header to the file...
+  */
+
+  curtime = time(NULL);
+  curdate = gmtime(&curtime);
+  strftime(temp, sizeof(temp) - 1, "# Written by cupsd on %c\n", curdate);
+
+  fputs("# Class configuration file for " CUPS_SVERSION "\n", fp);
+  fputs(temp, fp);
+
+ /*
+  * Write each local class known to the system...
+  */
+
+  for (pclass = Printers; pclass != NULL; pclass = pclass->next)
+  {
+   /*
+    * Skip remote destinations and regular printers...
+    */
+
+    if ((pclass->type & CUPS_PRINTER_REMOTE) ||
+        !(pclass->type & CUPS_PRINTER_CLASS))
+      continue;
+
+   /*
+    * Write printers as needed...
+    */
+
+    if (pclass == DefaultPrinter)
+      fprintf(fp, "<DefaultClass %s>\n", pclass->name);
+    else
+      fprintf(fp, "<Class %s>\n", pclass->name);
+
+    if (pclass->info[0])
+      fprintf(fp, "Info %s\n", pclass->info);
+    if (pclass->more_info[0])
+      fprintf(fp, "MoreInfo %s\n", pclass->more_info);
+    if (pclass->location[0])
+      fprintf(fp, "Location %s\n", pclass->location);
+    if (pclass->state == IPP_PRINTER_STOPPED)
+      fputs("State Stopped\n", fp);
+    else
+      fputs("State Idle\n", fp);
+
+    for (i = 0; i < pclass->num_printers; i ++)
+      fprintf(fp, "Printer %s\n", pclass->name);
+
+    fputs("</Class>\n", fp);
+  }
+
+  fclose(fp);
 }
 
 
 /*
- * End of "$Id: classes.c,v 1.4 1999/05/13 20:41:10 mike Exp $".
+ * End of "$Id: classes.c,v 1.5 1999/05/19 19:46:40 mike Exp $".
  */
