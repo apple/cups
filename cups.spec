@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.30.2.13 2004/05/27 15:37:47 mike Exp $"
+# "$Id$"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -53,22 +53,19 @@ Group: System Environment/Libraries
 Provides: libcups1
 
 %description
-The Common UNIX Printing System provides a portable printing
-layer for  UNIX® operating systems. It has been developed by
-Easy Software Products  to promote a standard printing solution
-for all UNIX vendors and users.  CUPS provides the System V and
-Berkeley command-line interfaces. 
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. It has been developed by Easy Software Products 
+to promote a standard printing solution for all UNIX vendors and users. 
+CUPS provides the System V and Berkeley command-line interfaces. 
 
 %description devel
-The Common UNIX Printing System provides a portable printing
-layer for  UNIX® operating systems. This is the development
-package for creating additional printer drivers and other CUPS
-services.
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This is the development package for creating
+additional printer drivers and other CUPS services.
 
 %description libs
-The Common UNIX Printing System provides a portable printing
-layer for  UNIX® operating systems. This package contains the
-CUPS shared libraries.
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package contains the CUPS shared libraries.
 
 %prep
 %setup
@@ -188,16 +185,16 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/cat8
 /usr/share/man/cat8/*
 %dir /usr/share/man/man1
-/usr/share/man/man1/backend.1
-/usr/share/man/man1/cupstestppd.1
-/usr/share/man/man1/filter.1
-/usr/share/man/man1/lp.1
-/usr/share/man/man1/lpoptions.1
-/usr/share/man/man1/lppasswd.1
-/usr/share/man/man1/lpq.1
-/usr/share/man/man1/lpr.1
-/usr/share/man/man1/lprm.1
-/usr/share/man/man1/lpstat.1
+/usr/share/man/man1/backend.1.gz
+/usr/share/man/man1/cupstestppd.1.gz
+/usr/share/man/man1/filter.1.gz
+/usr/share/man/man1/lp.1.gz
+/usr/share/man/man1/lpoptions.1.gz
+/usr/share/man/man1/lppasswd.1.gz
+/usr/share/man/man1/lpq.1.gz
+/usr/share/man/man1/lpr.1.gz
+/usr/share/man/man1/lprm.1.gz
+/usr/share/man/man1/lpstat.1.gz
 %dir /usr/share/man/man5
 /usr/share/man/man5/*
 %dir /usr/share/man/man8
@@ -240,12 +237,14 @@ rm -rf $RPM_BUILD_ROOT
 %files devel
 %dir /usr/share/man/cat1
 /usr/share/man/cat1/cups-config.1
-%dir /usr/share/man/fr/cat1
-/usr/share/man/fr/cat1/cups-config.1
 %dir /usr/share/man/man1
-/usr/share/man/man1/cups-config.1
-%dir /usr/share/man/fr/man1
-/usr/share/man/fr/man1/cups-config.1
+/usr/share/man/man1/cups-config.1.gz
+
+%dir /usr/share/man/es/cat1
+/usr/share/man/es/cat1/cups-config.1
+%dir /usr/share/man/es/man1
+/usr/share/man/es/man1/cups-config.1.gz
+
 /usr/bin/cups-config
 %dir /usr/include/cups
 /usr/include/cups/*
@@ -255,5 +254,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/*.so*
 
 #
-# End of "$Id: cups.spec,v 1.30.2.13 2004/05/27 15:37:47 mike Exp $".
+# End of "$Id$".
 #

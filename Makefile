@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.31.2.14 2004/06/29 20:16:29 mike Exp $"
+# "$Id$"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -78,6 +78,8 @@ install:	installhdrs
 	(cd data; $(MAKE) $(MFLAGS) install)
 	echo Installing in doc...
 	(cd doc; $(MAKE) $(MFLAGS) install)
+	echo Installing in fonts...
+	(cd fonts; $(MAKE) $(MFLAGS) install)
 	echo Installing in locale...
 	(cd locale; $(MAKE) $(MFLAGS) install)
 	echo Installing in ppd...
@@ -165,5 +167,5 @@ tardist:
 	epm $(EPMFLAGS) -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.31.2.14 2004/06/29 20:16:29 mike Exp $".
+# End of "$Id$".
 #

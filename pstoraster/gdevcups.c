@@ -1,10 +1,10 @@
 /*
- * "$Id: gdevcups.c,v 1.43.2.23 2004/06/29 13:15:10 mike Exp $"
+ * "$Id$"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 1993-2004 by Easy Software Products.
+ *   Copyright 1993-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -16,7 +16,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -404,7 +404,9 @@ static void	cups_print_planar(gx_device_printer *, unsigned char *,
 private int
 cups_close(gx_device *pdev)		/* I - Device info */
 {
+#ifdef DEBUG
   fprintf(stderr, "DEBUG2: cups_close(%p)\n", pdev);
+#endif /* DEBUG */
 
   if (cups->stream != NULL)
   {
@@ -555,7 +557,9 @@ private void
 cups_get_matrix(gx_device *pdev,	/* I - Device info */
                 gs_matrix *pmat)	/* O - Physical transform matrix */
 {
+#ifdef DEBUG
   fprintf(stderr, "DEBUG2: cups_get_matrix(%p, %p)\n", pdev, pmat);
+#endif /* DEBUG */
 
  /*
   * Set the raster width and height...
@@ -655,199 +659,265 @@ cups_get_params(gx_device     *pdev,	/* I - Device info */
   bool			b;		/* Temporary boolean value */
 
 
+#ifdef DEBUG
   fprintf(stderr, "DEBUG2: cups_get_params(%p, %p)\n", pdev, plist);
+#endif /* DEBUG */
 
  /*
   * First process the "standard" page device parameters...
   */
 
+#ifdef DEBUG
   fputs("DEBUG2: before gdev_prn_get_params()\n", stderr);
+#endif /* DEBUG */
 
   if ((code = gdev_prn_get_params(pdev, plist)) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: after gdev_prn_get_params()\n", stderr);
+#endif /* DEBUG */
 
  /*
   * Then write the CUPS parameters...
   */
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding MediaClass\n", stderr);
+#endif /* DEBUG */
 
   param_string_from_string(s, cups->header.MediaClass);
   if ((code = param_write_string(plist, "MediaClass", &s)) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding AdvanceDistance\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "AdvanceDistance",
                               (int *)&(cups->header.AdvanceDistance))) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding AdvanceDistance\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "AdvanceMedia",
                               (int *)&(cups->header.AdvanceMedia))) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding Collate\n", stderr);
+#endif /* DEBUG */
 
   b = cups->header.Collate;
   if ((code = param_write_bool(plist, "Collate", &b)) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding CutMedia\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "CutMedia",
                               (int *)&(cups->header.CutMedia))) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding InsertSheet\n", stderr);
+#endif /* DEBUG */
 
   b = cups->header.InsertSheet;
   if ((code = param_write_bool(plist, "InsertSheet", &b)) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding Jog\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "Jog",
                               (int *)&(cups->header.Jog))) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding LeadingEdge\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "LeadingEdge",
                               (int *)&(cups->header.LeadingEdge))) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding ManualFeed\n", stderr);
+#endif /* DEBUG */
 
   b = cups->header.ManualFeed;
   if ((code = param_write_bool(plist, "ManualFeed", &b)) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding MediaPosition\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "MediaPosition",
                               (int *)&(cups->header.MediaPosition))) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding MirrorPrint\n", stderr);
+#endif /* DEBUG */
 
   b = cups->header.MirrorPrint;
   if ((code = param_write_bool(plist, "MirrorPrint", &b)) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding NegativePrint\n", stderr);
+#endif /* DEBUG */
 
   b = cups->header.NegativePrint;
   if ((code = param_write_bool(plist, "NegativePrint", &b)) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding OutputFaceUp\n", stderr);
+#endif /* DEBUG */
 
   b = cups->header.OutputFaceUp;
   if ((code = param_write_bool(plist, "OutputFaceUp", &b)) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding Separations\n", stderr);
+#endif /* DEBUG */
 
   b = cups->header.Separations;
   if ((code = param_write_bool(plist, "Separations", &b)) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding TraySwitch\n", stderr);
+#endif /* DEBUG */
 
   b = cups->header.TraySwitch;
   if ((code = param_write_bool(plist, "TraySwitch", &b)) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding Tumble\n", stderr);
+#endif /* DEBUG */
 
   b = cups->header.Tumble;
   if ((code = param_write_bool(plist, "Tumble", &b)) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding cupsWidth\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "cupsWidth",
                               (int *)&(cups->header.cupsWidth))) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding cupsHeight\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "cupsHeight",
                               (int *)&(cups->header.cupsHeight))) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding cupsMediaType\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "cupsMediaType",
                               (int *)&(cups->header.cupsMediaType))) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding cupsBitsPerColor\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "cupsBitsPerColor",
                               (int *)&(cups->header.cupsBitsPerColor))) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding cupsBitsPerPixel\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "cupsBitsPerPixel",
                               (int *)&(cups->header.cupsBitsPerPixel))) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding cupsBytesPerLine\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "cupsBytesPerLine",
                               (int *)&(cups->header.cupsBytesPerLine))) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding cupsColorOrder\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "cupsColorOrder",
                               (int *)&(cups->header.cupsColorOrder))) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding cupsColorSpace\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "cupsColorSpace",
                               (int *)&(cups->header.cupsColorSpace))) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding cupsCompression\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "cupsCompression",
                               (int *)&(cups->header.cupsCompression))) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding cupsRowCount\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "cupsRowCount",
                               (int *)&(cups->header.cupsRowCount))) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding cupsRowFeed\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "cupsRowFeed",
                               (int *)&(cups->header.cupsRowFeed))) < 0)
     return (code);
 
+#ifdef DEBUG
   fputs("DEBUG2: Adding cupsRowStep\n", stderr);
+#endif /* DEBUG */
 
   if ((code = param_write_int(plist, "cupsRowStep",
                               (int *)&(cups->header.cupsRowStep))) < 0)
     return (code);
 
 #ifdef CUPS_RASTER_SYNCv1
+#  ifdef DEBUG
   fputs("DEBUG2: Adding cupsNumColors\n", stderr);
+#  endif /* DEBUG */
 
   if ((code = param_write_int(plist, "cupsNumColors",
                               (int *)&(cups->header.cupsNumColors))) < 0)
     return (code);
 
+#  ifdef DEBUG
   fputs("DEBUG2: Adding cupsInteger\n", stderr);
+#  endif /* DEBUG */
 
   for (i = 0; i < 16; i ++)
   {
@@ -857,7 +927,9 @@ cups_get_params(gx_device     *pdev,	/* I - Device info */
       return (code);
   }
 
+#  ifdef DEBUG
   fputs("DEBUG2: Adding cupsReal\n", stderr);
+#  endif /* DEBUG */
 
   for (i = 0; i < 16; i ++)
   {
@@ -867,7 +939,9 @@ cups_get_params(gx_device     *pdev,	/* I - Device info */
       return (code);
   }
 
+#  ifdef DEBUG
   fputs("DEBUG2: Adding cupsString\n", stderr);
+#  endif /* DEBUG */
 
   for (i = 0; i < 16; i ++)
   {
@@ -877,20 +951,26 @@ cups_get_params(gx_device     *pdev,	/* I - Device info */
       return (code);
   }
 
+#  ifdef DEBUG
   fputs("DEBUG2: Adding cupsMarkerType\n", stderr);
+#  endif /* DEBUG */
 
   param_string_from_string(s, cups->header.cupsMarkerType);
   if ((code = param_write_string(plist, "cupsMarkerType", &s)) < 0)
     return (code);
 
+#  ifdef DEBUG
   fputs("DEBUG2: Adding cupsRenderingIntent\n", stderr);
+#  endif /* DEBUG */
 
   param_string_from_string(s, cups->header.cupsRenderingIntent);
   if ((code = param_write_string(plist, "cupsRenderingIntent", &s)) < 0)
     return (code);
 #endif /* CUPS_RASTER_SYNCv1 */
 
+#ifdef DEBUG
   fputs("DEBUG2: Leaving cups_get_params()\n", stderr);
+#endif /* DEBUG */
 
   return (0);
 }
@@ -911,7 +991,9 @@ cups_get_space_params(const gx_device_printer *pdev,
 	cache_units[255];		/* Cache size units */
 
 
+#ifdef DEBUG
   fprintf(stderr, "DEBUG2: cups_get_space_params(%p, %p)\n", pdev, space_params);
+#endif /* DEBUG */
 
   if ((cache_env = getenv("RIP_MAX_CACHE")) != NULL)
   {
@@ -985,8 +1067,10 @@ cups_map_cmyk(gx_device *pdev,		/* I - Device info */
 	ciel, ciea, cieb;		/* CIE Lab colors */
 
 
+#ifdef DEBUG
   fprintf(stderr, "DEBUG2: cups_map_cmyk(%p, %d, %d, %d, %d, %p)\n",
           pdev, c, m, y, k, out);
+#endif /* DEBUG */
 
  /*
   * Convert the CMYK color to the destination colorspace...
@@ -1346,17 +1430,23 @@ cups_map_cmyk(gx_device *pdev,		/* I - Device info */
   {
     default :
     case 1 :
+#ifdef DEBUG
         fprintf(stderr, "DEBUG2:   \\=== COLOR %d\n", out[0]);
+#endif /* DEBUG */
 	break;
 
     case 3 :
+#ifdef DEBUG
         fprintf(stderr, "DEBUG2:   \\=== COLOR %d, %d, %d\n",
 	        out[0], out[1], out[2]);
+#endif /* DEBUG */
 	break;
 
     case 4 :
+#ifdef DEBUG
         fprintf(stderr, "DEBUG2:   \\=== COLOR %d, %d, %d, %d\n",
 	        out[0], out[1], out[2], out[3]);
+#endif /* DEBUG */
 	break;
   }
 }
@@ -1371,8 +1461,10 @@ cups_map_gray(gx_device *pdev,		/* I - Device info */
               frac      g,		/* I - Grayscale value */
 	      frac      *out)		/* O - Device colors */
 {
+#ifdef DEBUG
   fprintf(stderr, "DEBUG2: cups_map_gray(%p, %d, %p)\n",
           pdev, g, out);
+#endif /* DEBUG */
 
  /*
   * Just use the CMYK mapper...
@@ -1400,8 +1492,10 @@ cups_map_rgb(gx_device             *pdev,
   int		tc, tm, ty;		/* Temporary color values */
 
 
+#ifdef DEBUG
   fprintf(stderr, "DEBUG2: cups_map_rgb(%p, %p, %d, %d, %d, %p)\n",
           pdev, pis, r, g, b, out);
+#endif /* DEBUG */
 
  /*
   * Compute CMYK values...
@@ -1488,8 +1582,10 @@ cups_map_cmyk_color(gx_device      *pdev,
   gx_color_value	ic, im, iy, ik;	/* Integral CMYK values */
 
 
+#  ifdef DEBUG
   fprintf(stderr, "DEBUG2: cups_map_cmyk_color(%p, %d, %d, %d, %d)\n", pdev,
           c, m, y, k);
+#  endif /* DEBUG */
 
  /*
   * Setup the color info data as needed...
@@ -1601,8 +1697,10 @@ cups_map_cmyk_color(gx_device      *pdev,
         break;
   }
 
+#  ifdef DEBUG
   fprintf(stderr, "DEBUG2: CMYK (%d,%d,%d,%d) -> CMYK %08x (%d,%d,%d,%d)\n",
           c, m, y, k, (unsigned)i, ic, im, iy, ik);
+#  endif /* DEBUG */
 
  /*
   * Make sure we don't get a CMYK color of 255, 255, 255, 255...
@@ -1629,8 +1727,10 @@ cups_map_color_rgb(gx_device      *pdev,/* I - Device info */
   gx_color_value	k, divk;	/* Black & divisor */
 
 
+#  ifdef DEBUG
   fprintf(stderr, "DEBUG2: cups_map_color_rgb(%p, %d, %p)\n", pdev,
           (unsigned)color, prgb);
+#  endif /* DEBUG */
 
  /*
   * Setup the color info data as needed...
@@ -1639,7 +1739,9 @@ cups_map_color_rgb(gx_device      *pdev,/* I - Device info */
   if (pdev->color_info.num_components == 0)
     cups_set_color_info(pdev);
 
+#  ifdef DEBUG
   fprintf(stderr, "DEBUG2: COLOR %08x = ", (unsigned)color);
+#  endif /* DEBUG */
 
  /*
   * Extract the color components from the color index...
@@ -1815,7 +1917,9 @@ cups_map_color_rgb(gx_device      *pdev,/* I - Device info */
 #  endif /* CUPS_RASTER_HAVE_COLORIMETRIC */
   }
 
+#  ifdef DEBUG
   fprintf(stderr, "%d,%d,%d\n", prgb[0], prgb[1], prgb[2]);
+#  endif /* DEBUG */
 
   return (0);
 }
@@ -1845,7 +1949,9 @@ cups_map_rgb_color(gx_device      *pdev,/* I - Device info */
 					/* CIE Lab colors */
 
 
+#  ifdef DEBUG
   fprintf(stderr, "DEBUG2: cups_map_rgb_color(%p, %d, %d, %d)\n", pdev, r, g, b);
+#  endif /* DEBUG */
 
  /*
   * Setup the color info data as needed...
@@ -2052,8 +2158,10 @@ cups_map_rgb_color(gx_device      *pdev,/* I - Device info */
               break;
         }
 
+#  ifdef DEBUG
 	fprintf(stderr, "DEBUG2: CMY (%d,%d,%d) -> CMYK %08x (%d,%d,%d,%d)\n",
 	        r, g, b, (unsigned)i, ic, im, iy, ik);
+#  endif /* DEBUG */
         break;
 
     case CUPS_CSPACE_YMCK :
@@ -2294,7 +2402,9 @@ cups_map_rgb_color(gx_device      *pdev,/* I - Device info */
 #  endif /* CUPS_RASTER_HAVE_COLORIMETRIC */
   }
 
+#  ifdef DEBUG
   fprintf(stderr, "DEBUG2: RGB %d,%d,%d = %08x\n", r, g, b, (unsigned)i);
+#  endif /* DEBUG */
 
   return (i);
 }
@@ -2311,7 +2421,9 @@ cups_open(gx_device *pdev)		/* I - Device info */
   int	code;				/* Return status */
 
 
+#ifdef DEBUG
   fprintf(stderr, "DEBUG2: cups_open(%p)\n", pdev);
+#endif /* DEBUG */
 
   cups->printer_procs.get_space_params = cups_get_space_params;
 
@@ -2352,8 +2464,10 @@ cups_print_pages(gx_device_printer *pdev,
 
   (void)fp; /* reference unused file pointer to prevent compiler warning */
 
+#ifdef DEBUG
   fprintf(stderr, "DEBUG2: cups_print_pages(%p, %p, %d)\n", pdev, fp,
           num_copies);
+#endif /* DEBUG */
 
  /*
   * Figure out the number of bytes per line...
@@ -2389,9 +2503,11 @@ cups_print_pages(gx_device_printer *pdev,
 
   srcbytes = gdev_prn_raster(pdev);
 
+#ifdef DEBUG
   fprintf(stderr, "DEBUG2: cupsBitsPerPixel = %d, cupsWidth = %d, cupsBytesPerLine = %d, srcbytes = %d\n",
           cups->header.cupsBitsPerPixel, cups->header.cupsWidth,
 	  cups->header.cupsBytesPerLine, srcbytes);
+#endif /* DEBUG */
 
   src = (unsigned char *)gs_malloc(srcbytes, 1, "cups_print_pages");
 
@@ -2435,9 +2551,11 @@ cups_print_pages(gx_device_printer *pdev,
     num_copies = 1;
   }
 
+#ifdef DEBUG
   fprintf(stderr, "DEBUG2: cupsWidth = %d, cupsHeight = %d, cupsBytesPerLine = %d\n",
           cups->header.cupsWidth, cups->header.cupsHeight,
 	  cups->header.cupsBytesPerLine);
+#endif /* DEBUG */
 
   for (copy = num_copies; copy > 0; copy --)
   {
@@ -2501,7 +2619,9 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
 			height;		/* New height of page */
 
 
+#ifdef DEBUG
   fprintf(stderr, "DEBUG2: cups_put_params(%p, %p)\n", pdev, plist);
+#endif /* DEBUG */
 
  /*
   * Process other options for CUPS...
@@ -2833,6 +2953,7 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
     }
   }
 
+#ifdef DEBUG
   fprintf(stderr, "DEBUG2: ppd = %p\n", cupsPPD);
   fprintf(stderr, "DEBUG2: PageSize = [ %.3f %.3f ]\n",
           pdev->MediaSize[0], pdev->MediaSize[1]);
@@ -2845,6 +2966,7 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   fprintf(stderr, "DEBUG2: HWMargins = [ %.3f %.3f %.3f %.3f ]\n",
           pdev->HWMargins[0], pdev->HWMargins[1],
 	  pdev->HWMargins[2], pdev->HWMargins[3]);
+#endif /* DEBUG */
 
   return (0);
 }
@@ -2866,7 +2988,9 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
   ppd_profile_t	*profile;		/* Color profile information */
 
 
+#ifdef DEBUG
   fprintf(stderr, "DEBUG2: cups_set_color_info(%p)\n", pdev);
+#endif /* DEBUG */
 
   switch (cups->header.cupsColorSpace)
   {
@@ -3087,8 +3211,10 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
     cupsEncodeLUT[i] = (max_lut * i + gx_max_color_value / 2) /
                        gx_max_color_value;
 
+#ifdef DEBUG
     if (i == 0 || cupsEncodeLUT[i] != cupsEncodeLUT[i - 1])
       fprintf(stderr, "DEBUG2: cupsEncodeLUT[%d] = %d\n", i, cupsEncodeLUT[i]);
+#endif /* DEBUG */
   }
 
   for (i = 0; i < cups->color_info.dither_grays; i ++)
@@ -3191,9 +3317,11 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
 	{
           cupsMatrix[i][j][k] = (int)((float)k * m[i][j] + 0.5);
 
+#ifdef DEBUG
           if ((k & 4095) == 0)
             fprintf(stderr, "DEBUG2: cupsMatrix[%d][%d][%d] = %d\n",
 	            i, j, k, cupsMatrix[i][j][k]);
+#endif /* DEBUG */
         }
 
 
@@ -3203,8 +3331,10 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
 	                     pow((float)k / (float)CUPS_MAX_VALUE, g) +
 			     0.5);
 
+#ifdef DEBUG
       if ((k & 4095) == 0)
         fprintf(stderr, "DEBUG2: cupsDensity[%d] = %d\n", k, cupsDensity[k]);
+#endif /* DEBUG */
     }
   }
   else
@@ -4330,5 +4460,5 @@ cups_print_planar(gx_device_printer *pdev,
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.43.2.23 2004/06/29 13:15:10 mike Exp $".
+ * End of "$Id$".
  */

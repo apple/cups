@@ -1,9 +1,9 @@
 .\"
-.\" "$Id: cups-config.man,v 1.1.2.6 2004/06/29 13:15:10 mike Exp $"
+.\" "$Id$"
 .\"
 .\"   cups-config man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2004 by Easy Software Products.
+.\"   Copyright 1997-2005 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -15,13 +15,13 @@
 .\"       Attn: CUPS Licensing Information
 .\"       Easy Software Products
 .\"       44141 Airport View Drive, Suite 204
-.\"       Hollywood, Maryland 20636-3142 USA
+.\"       Hollywood, Maryland 20636 USA
 .\"
 .\"       Voice: (301) 373-9600
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cups-config 1 "Common UNIX Printing System" "25 October 2001" "Easy Software Products"
+.TH cups-config 1 "Common UNIX Printing System" "27 May 2004" "Easy Software Products"
 .SH NAME
 cups-config \- get cups api, compiler, directory, and link information.
 .SH SYNOPSIS
@@ -89,7 +89,7 @@ CUPS installation (major.minor.patch).
 CUPS Software Programmers Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2004 by Easy Software Products, All Rights Reserved.
+Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cups-config.man,v 1.1.2.6 2004/06/29 13:15:10 mike Exp $".
+.\" End of "$Id$".
 .\"

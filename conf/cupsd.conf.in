@@ -1,5 +1,5 @@
 #
-# "$Id: cupsd.conf.in,v 1.2.2.16 2004/08/19 12:46:28 mike Exp $"
+# "$Id$"
 #
 #   Sample configuration file for the Common UNIX Printing System (CUPS)
 #   scheduler.
@@ -217,6 +217,28 @@ LogLevel info
 #
 
 #MaxJobs 500
+
+#
+# MaxJobsPerPrinter: maximum number of active jobs per printer. The default
+# is 0 for no limit.
+#
+
+#MaxJobsPerPrinter 0
+
+#
+# MaxJobsPerUser: maximum number of active jobs per user. The default
+# is 0 for no limit.
+#
+
+#MaxJobsPerUser 0
+
+#
+# MaxPrinterHistory: controls the maximum number of history collections
+# in the printer-state-history attribute.  Set to 0 to disable history
+# data.
+#
+
+#MaxPrinterHistory 10
 
 #
 # Printcap: the name of the printcap file.  Default is /etc/printcap.
@@ -824,5 +846,5 @@ Allow From 127.0.0.1
 </Location>
 
 #
-# End of "$Id: cupsd.conf.in,v 1.2.2.16 2004/08/19 12:46:28 mike Exp $".
+# End of "$Id$".
 #

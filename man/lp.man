@@ -1,9 +1,9 @@
 .\"
-.\" "$Id: lp.man,v 1.6.2.6 2004/06/29 13:15:10 mike Exp $"
+.\" "$Id$"
 .\"
 .\"   lp/cancel man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2004 by Easy Software Products.
+.\"   Copyright 1997-2005 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -15,7 +15,7 @@
 .\"       Attn: CUPS Licensing Information
 .\"       Easy Software Products
 .\"       44141 Airport View Drive, Suite 204
-.\"       Hollywood, Maryland 20636-3142 USA
+.\"       Hollywood, Maryland 20636 USA
 .\"
 .\"       Voice: (301) 373-9600
 .\"       EMail: cups-info@cups.org
@@ -70,6 +70,8 @@ cancel \- cancel jobs
 .B cancel
 [ \-a ] [ -h
 .I server
+] [ -u 
+.I username
 ] [
 .I id
 ] [
@@ -136,6 +138,10 @@ Do not report the resulting job IDs (silent mode.)
 .br
 Sets the job name.
 .TP 5
+\-u \fIusername\fR
+.br
+Cancels jobs owned by \fIusername\fR.
+.TP 5
 \-H \fIhandling\fR
 .br
 Specifies when the job should be printed. A value of
@@ -143,6 +149,8 @@ Specifies when the job should be printed. A value of
 \fIhold\fR will hold the job indefinitely, and a time value
 (HH:MM) will hold the job until the specified time. Use a value
 of \fIresume\fR with the \fI-i\fR option to resume a held job.
+Use a value of \fIrestart\fR with the \fI-i\fR option to restart
+a completed job.
 .TP 5
 \-P \fIpage-list\fR
 .br
@@ -158,12 +166,16 @@ The "m" option is not functional in CUPS 1.1.
 The "q" option accepts a different range of values than the
 Solaris lp command, matching the IPP job priority values (1-100)
 instead of the Solaris values (0-39).
+.SH NOTES
+Administrators wishing to prevent unauthorized cancellation of
+jobs via the \fI-u\fR option should password-protect the /jobs
+location in \fIcupsd.conf(5)\fR.
 .SH SEE ALSO
 lpstat(1),
 CUPS Software Users Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2004 by Easy Software Products, All Rights Reserved.
+Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lp.man,v 1.6.2.6 2004/06/29 13:15:10 mike Exp $".
+.\" End of "$Id$".
 .\"

@@ -1,10 +1,10 @@
 /*
- * "$Id: rastertohp.c,v 1.15.2.8 2004/06/29 13:15:09 mike Exp $"
+ * "$Id$"
  *
  *   Hewlett-Packard Page Control Language filter for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 1993-2004 by Easy Software Products.
+ *   Copyright 1993-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -16,7 +16,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -125,16 +125,80 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 #endif /* HAVE_SIGSET */
 
  /*
+  * Show page device dictionary...
+  */
+
+  fprintf(stderr, "DEBUG: StartPage...\n");
+  fprintf(stderr, "DEBUG: MediaClass = \"%s\"\n", header->MediaClass);
+  fprintf(stderr, "DEBUG: MediaColor = \"%s\"\n", header->MediaColor);
+  fprintf(stderr, "DEBUG: MediaType = \"%s\"\n", header->MediaType);
+  fprintf(stderr, "DEBUG: OutputType = \"%s\"\n", header->OutputType);
+
+  fprintf(stderr, "DEBUG: AdvanceDistance = %d\n", header->AdvanceDistance);
+  fprintf(stderr, "DEBUG: AdvanceMedia = %d\n", header->AdvanceMedia);
+  fprintf(stderr, "DEBUG: Collate = %d\n", header->Collate);
+  fprintf(stderr, "DEBUG: CutMedia = %d\n", header->CutMedia);
+  fprintf(stderr, "DEBUG: Duplex = %d\n", header->Duplex);
+  fprintf(stderr, "DEBUG: HWResolution = [ %d %d ]\n", header->HWResolution[0],
+          header->HWResolution[1]);
+  fprintf(stderr, "DEBUG: ImagingBoundingBox = [ %d %d %d %d ]\n",
+          header->ImagingBoundingBox[0], header->ImagingBoundingBox[1],
+          header->ImagingBoundingBox[2], header->ImagingBoundingBox[3]);
+  fprintf(stderr, "DEBUG: InsertSheet = %d\n", header->InsertSheet);
+  fprintf(stderr, "DEBUG: Jog = %d\n", header->Jog);
+  fprintf(stderr, "DEBUG: LeadingEdge = %d\n", header->LeadingEdge);
+  fprintf(stderr, "DEBUG: Margins = [ %d %d ]\n", header->Margins[0],
+          header->Margins[1]);
+  fprintf(stderr, "DEBUG: ManualFeed = %d\n", header->ManualFeed);
+  fprintf(stderr, "DEBUG: MediaPosition = %d\n", header->MediaPosition);
+  fprintf(stderr, "DEBUG: MediaWeight = %d\n", header->MediaWeight);
+  fprintf(stderr, "DEBUG: MirrorPrint = %d\n", header->MirrorPrint);
+  fprintf(stderr, "DEBUG: NegativePrint = %d\n", header->NegativePrint);
+  fprintf(stderr, "DEBUG: NumCopies = %d\n", header->NumCopies);
+  fprintf(stderr, "DEBUG: Orientation = %d\n", header->Orientation);
+  fprintf(stderr, "DEBUG: OutputFaceUp = %d\n", header->OutputFaceUp);
+  fprintf(stderr, "DEBUG: PageSize = [ %d %d ]\n", header->PageSize[0],
+          header->PageSize[1]);
+  fprintf(stderr, "DEBUG: Separations = %d\n", header->Separations);
+  fprintf(stderr, "DEBUG: TraySwitch = %d\n", header->TraySwitch);
+  fprintf(stderr, "DEBUG: Tumble = %d\n", header->Tumble);
+  fprintf(stderr, "DEBUG: cupsWidth = %d\n", header->cupsWidth);
+  fprintf(stderr, "DEBUG: cupsHeight = %d\n", header->cupsHeight);
+  fprintf(stderr, "DEBUG: cupsMediaType = %d\n", header->cupsMediaType);
+  fprintf(stderr, "DEBUG: cupsBitsPerColor = %d\n", header->cupsBitsPerColor);
+  fprintf(stderr, "DEBUG: cupsBitsPerPixel = %d\n", header->cupsBitsPerPixel);
+  fprintf(stderr, "DEBUG: cupsBytesPerLine = %d\n", header->cupsBytesPerLine);
+  fprintf(stderr, "DEBUG: cupsColorOrder = %d\n", header->cupsColorOrder);
+  fprintf(stderr, "DEBUG: cupsColorSpace = %d\n", header->cupsColorSpace);
+  fprintf(stderr, "DEBUG: cupsCompression = %d\n", header->cupsCompression);
+
+ /*
   * Setup printer/job attributes...
   */
 
   Duplex    = header->Duplex;
   ColorBits = header->cupsBitsPerColor;
 
-  if (!Duplex || (Page & 1))
+  if ((!Duplex || (Page & 1)) && header->MediaPosition)
+    printf("\033&l%dH",				/* Set media position */
+           header->MediaPosition);
+
+  if (Duplex && ppd && ppd->model_number == 2)
   {
    /*
-    * Set the media type, position, and size...
+    * Handle duplexing on new DeskJet printers...
+    */
+
+    printf("\033&l-2H");			/* Load media */
+
+    if (Page & 1)
+      printf("\033&l2S");			/* Set duplex mode */
+  }
+
+  if (!Duplex || (Page & 1) || (ppd && ppd->model_number == 2))
+  {
+   /*
+    * Set the media size...
     */
 
     printf("\033&l6D\033&k12H");		/* Set 6 LPI, 10 CPI */
@@ -190,34 +254,36 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
     printf("\033&l%dP",				/* Set page length */
            header->PageSize[1] / 12);
     printf("\033&l0E");				/* Set top margin to 0 */
+  }
+
+  if (!Duplex || (Page & 1))
+  {
+   /*
+    * Set other job options...
+    */
 
     printf("\033&l%dX", header->NumCopies);	/* Set number copies */
 
-    if (header->MediaPosition)
-      printf("\033&l%dH",			/* Set media position */
-             header->MediaPosition);
-
-    if (header->cupsMediaType)
+    if (header->cupsMediaType &&
+        (!ppd || ppd->model_number != 2 || header->HWResolution[0] == 600))
       printf("\033&l%dM",			/* Set media type */
              header->cupsMediaType);
 
-    if (header->Duplex)
-      printf("\033&l%dS",			/* Set duplex mode */
-             header->Duplex + header->Tumble);
+    if (!ppd || ppd->model_number != 2)
+    {
+      if (header->Duplex)
+	printf("\033&l%dS",			/* Set duplex mode */
+               header->Duplex + header->Tumble);
 
-    printf("\033&l0L");				/* Turn off perforation skip */
-
-    if (ppd && ppd->model_number == 2)
-      printf("\033&l-2H");			/* Load media */
+      printf("\033&l0L");			/* Turn off perforation skip */
+    }
   }
-  else
+  else if (!ppd || ppd->model_number != 2)
     printf("\033&a2G");				/* Set back side */
 
  /*
   * Set graphics mode...
   */
-
-  printf("\033*t%dR", header->HWResolution[0]);	/* Set resolution */
 
   if (ppd->model_number == 2)
   {
@@ -229,6 +295,15 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
       NumPlanes = 4;
     else
       NumPlanes = 1;
+
+   /*
+    * Set the resolution and top-of-form...
+    */
+
+    printf("\033&u%dD", header->HWResolution[0]);
+						/* Resolution */
+    printf("\033&l0e0L");			/* Reset top and don't skip */
+    printf("\033*p0Y\033*p0X");			/* Set top of form */
 
    /*
     * Send 26-byte configure image data command with horizontal and
@@ -266,9 +341,14 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
     putchar(header->HWResolution[1]);
     putchar(0);
     putchar(1 << ColorBits);			/* # of yellow levels */
+
+    printf("\033&l0H");				/* Set media position */
   }
   else
   {
+    printf("\033*t%dR", header->HWResolution[0]);
+						/* Set resolution */
+
     if (header->cupsColorSpace == CUPS_CSPACE_KCMY)
     {
       NumPlanes = 4;
@@ -281,22 +361,22 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
     }
     else
       NumPlanes = 1;				/* Black&white graphics */
+
+   /*
+    * Set size and position of graphics...
+    */
+
+    printf("\033*r%dS", header->cupsWidth);	/* Set width */
+    printf("\033*r%dT", header->cupsHeight);	/* Set height */
+
+    printf("\033&a0H");				/* Set horizontal position */
+
+    if (ppd)
+      printf("\033&a%.0fV", 			/* Set vertical position */
+             10.0 * (ppd->sizes[0].length - ppd->sizes[0].top));
+    else
+      printf("\033&a0V");			/* Set top-of-page */
   }
-
- /*
-  * Set size and position of graphics...
-  */
-
-  printf("\033*r%dS", header->cupsWidth);	/* Set width */
-  printf("\033*r%dT", header->cupsHeight);	/* Set height */
-
-  printf("\033&a0H");				/* Set horizontal position */
-
-  if (ppd)
-    printf("\033&a%.0fV", 			/* Set vertical position */
-           10.0 * (ppd->sizes[0].length - ppd->sizes[0].top));
-  else
-    printf("\033&a0V");				/* Set top-of-page */
 
   printf("\033*r1A");				/* Start graphics */
 
@@ -658,7 +738,7 @@ int			/* O - Exit status */
 main(int  argc,		/* I - Number of command-line arguments */
      char *argv[])	/* I - Command-line arguments */
 {
-  int			fd;	/* Raster data file */
+  int			fd;	/* File descriptor */
   cups_raster_t		*ras;	/* Raster stream for printing */
   cups_page_header_t	header;	/* Page header from file */
   int			y;	/* Current line */
@@ -692,7 +772,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (argc == 7)
   {
-    if ((fd = open(argv[6], O_RDONLY)) < 0)
+    if ((fd = open(argv[6], O_RDONLY)) == -1)
     {
       perror("ERROR: Unable to open raster file - ");
       sleep(1);
@@ -787,7 +867,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   */
 
   cupsRasterClose(ras);
-  if (fd)
+  if (fd != 0)
     close(fd);
 
  /*
@@ -804,5 +884,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertohp.c,v 1.15.2.8 2004/06/29 13:15:09 mike Exp $".
+ * End of "$Id$".
  */

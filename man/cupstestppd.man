@@ -1,9 +1,9 @@
 .\"
-.\" "$Id: cupstestppd.man,v 1.1.2.5 2004/06/29 13:15:10 mike Exp $"
+.\" "$Id$"
 .\"
 .\"   cupstestppd man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2004 by Easy Software Products.
+.\"   Copyright 1997-2005 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -15,21 +15,21 @@
 .\"       Attn: CUPS Licensing Information
 .\"       Easy Software Products
 .\"       44141 Airport View Drive, Suite 204
-.\"       Hollywood, Maryland 20636-3142 USA
+.\"       Hollywood, Maryland 20636 USA
 .\"
 .\"       Voice: (301) 373-9600
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupstestppd 1 "Common UNIX Printing System" "14 February 2003" "Easy Software Products"
+.TH cupstestppd 1 "Common UNIX Printing System" "1 August 2003" "Easy Software Products"
 .SH NAME
 cupstestppd \- test conformance of ppd files
 .SH SYNOPSIS
 .B cupstestppd
-[ -q ] [ -v[v] ] filename.ppd[.gz] [ ... filenameN.ppd[.gz] ]
+[ -q ] [-r] [ -v[v] ] filename.ppd[.gz] [ ... filenameN.ppd[.gz] ]
 .br
 .B cupstestppd
-[ -q ] [ -v[v] ] -
+[ -q ] [-r] [ -v[v] ] -
 .SH DESCRIPTION
 \fIcupstestppd\fR tests the conformance of PPD files to the
 Adobe PostScript Printer Description file format specification
@@ -42,6 +42,10 @@ on the command-line. The second form tests the PPD file provided
 on the standard input.
 .LP
 The \fI-q\fR option specifies that no information should be displayed.
+.LP
+The \fI-r\fR option relaxes the PPD conformance requirements so
+that common whitespace, control character, and formatting
+problems are not treated as hard errors.
 .LP
 The \fI-v\fR option specifies that detailed conformance testing
 results should be displayed rather than the concise PASS/FAIL/ERROR
@@ -95,7 +99,7 @@ CUPS Software Programmers Manual,
 http://localhost:631/documentation.html,
 Adobe PostScript Printer Description File Format Specification, Version 4.3.
 .SH COPYRIGHT
-Copyright 1993-2004 by Easy Software Products, All Rights Reserved.
+Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupstestppd.man,v 1.1.2.5 2004/06/29 13:15:10 mike Exp $".
+.\" End of "$Id$".
 .\"

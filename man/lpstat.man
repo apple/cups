@@ -1,9 +1,9 @@
 .\"
-.\" "$Id: lpstat.man,v 1.5.2.4 2004/06/29 13:15:10 mike Exp $"
+.\" "$Id$"
 .\"
 .\"   lpstat man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2004 by Easy Software Products.
+.\"   Copyright 1997-2005 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -15,24 +15,26 @@
 .\"       Attn: CUPS Licensing Information
 .\"       Easy Software Products
 .\"       44141 Airport View Drive, Suite 204
-.\"       Hollywood, Maryland 20636-3142 USA
+.\"       Hollywood, Maryland 20636 USA
 .\"
 .\"       Voice: (301) 373-9600
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpstat 1 "Common UNIX Printing System" "23 January 2001" "Easy Software Products"
+.TH lpstat 1 "Common UNIX Printing System" "3 January 2005" "Easy Software Products"
 .SH NAME
 lpstat \- print cups status information
 .SH SYNOPSIS
 .B lpstat
-[ -E ] [ -a [
+[ -E ] [ -h
+.I server
+] [ -l ] [ -W
+.I which-jobs
+] [ -a [
 .I destination(s)
 ] ] [ -c [
 .I class(es)
-] [ -d ] [ -h
-.I server
-] [ -l ] [ -o [
+] [ -d ] [ -o [
 .I destination(s)
 ] ] [ -p [
 .I printer(s)
@@ -95,12 +97,12 @@ Shows the ranking of print jobs.
 Shows a status summary, including the default destination, a
 list of classes and their member printers, and a list of printers and
 their associated devices. This is equivalent to using the "-d", "-c",
-and "-p" options.
+and "-v" options.
 .TP 5
 \-t
 .br
 Shows all status information. This is equivalent to using the "-r",
-"-d", "-c", "-d", "-v", "-a", "-p", and "-o" options.
+"-d", "-c", "-v", "-a", "-p", and "-o" options.
 .TP 5
 \-u [\fIuser(s)\fR]
 .br
@@ -111,12 +113,20 @@ are specified, lists the jobs queued by the current user.
 .br
 Shows the printers and what device they are attached to. If no printers
 are specified then all printers are listed.
+.TP 5
+\-W [\fIwhich-jobs\fR]
+.br
+Specifies which jobs to show, \fIcompleted\fR or
+\fInot-completed\fR (the default). This option \fBmust\fR appear
+before the \fI-o\fR option and/or any printer names, otherwise
+the default (not-completed) value will be used in the request to
+the scheduler.
 .SH COMPATIBILITY
-Unlike the System V printing system, CUPS allows printer names to contain
-any printable character except SPACE and TAB. Also, printer and class names are
-\fBnot\fR case-sensitive.
+Unlike the System V printing system, CUPS allows printer names
+to contain any printable character except SPACE and TAB. Also,
+printer and class names are \fBnot\fR case-sensitive.
 .LP
-The "-h" option is not a standard System V option.
+The "-h" and "-W" options are unique to CUPS.
 .LP
 The Solaris "-f", "-P", and "-S" options are silently ignored.
 .SH SEE ALSO
@@ -124,7 +134,7 @@ cancel(1), lp(1),
 CUPS Software Users Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2004 by Easy Software Products, All Rights Reserved.
+Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpstat.man,v 1.5.2.4 2004/06/29 13:15:10 mike Exp $".
+.\" End of "$Id$".
 .\"

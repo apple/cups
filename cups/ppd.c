@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.65 2004/06/29 13:15:08 mike Exp $"
+ * "$Id$"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -2787,6 +2787,7 @@ ppd_read(FILE *fp,			/* I - File to read from */
             * Line is too long...
 	    */
 
+            ppd_line   = startline;
             ppd_status = PPD_LINE_TOO_LONG;
 
             return (0);
@@ -3025,5 +3026,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.65 2004/06/29 13:15:08 mike Exp $".
+ * End of "$Id$".
  */

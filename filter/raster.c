@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.c,v 1.2.2.12 2004/12/23 05:37:35 mike Exp $"
+ * "$Id$"
  *
  *   Raster file routines for the Common UNIX Printing System (CUPS).
  *
@@ -25,8 +25,8 @@
  *
  *   This code and any derivative of it may be used and distributed
  *   freely under the terms of the GNU General Public License when
- *   used with GNU Ghostscript or its derivatives.  Use of the code
- *   (or any derivative of it) with software other than GNU
+ *   used with GNU/GPL Ghostscript or its derivatives.  Use of the
+ *   code (or any derivative of it) with software other than GNU/GPL
  *   GhostScript (or its derivatives) is governed by the CUPS license
  *   agreement.
  *
@@ -875,5 +875,5 @@ cups_write(int        fd,			/* I - File descriptor */
 
 
 /*
- * End of "$Id: raster.c,v 1.2.2.12 2004/12/23 05:37:35 mike Exp $".
+ * End of "$Id$".
  */

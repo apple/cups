@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.41.2.29 2004/10/11 19:31:19 mike Exp $"
+ * "$Id$"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -956,7 +956,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 		};
 
 
-  LogMessage(L_DEBUG2, "IsAuthorized: URI = %s", con->uri);
+  LogMessage(L_DEBUG2, "IsAuthorized: con->uri = \"%s\"", con->uri);
 
  /*
   * Find a matching location; if there is no match then access is
@@ -1099,16 +1099,6 @@ IsAuthorized(client_t *con)	/* I - Connection */
  /*
   * Check the user's password...
   */
-
-  pw = getpwnam(con->username);		/* Get the current password */
-  endpwent();				/* Close the password file */
-
-  if (pw == NULL)			/* No such user... */
-  {
-    LogMessage(L_WARN, "IsAuthorized: Unknown username \"%s\"; access denied.",
-               con->username);
-    return (HTTP_UNAUTHORIZED);
-  }
 
   LogMessage(L_DEBUG2, "IsAuthorized: Checking \"%s\", address = %x:%x:%x:%x, hostname = \"%s\"",
 	     con->username, address[0], address[1], address[2],
@@ -1271,6 +1261,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 	  }
 #endif /* HAVE_LIBPAM */
           break;
+
       case AUTH_DIGEST :
 	 /*
 	  * Do Digest authentication...
@@ -1346,7 +1337,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
 	  if (!md5[0])
 	  {
-            LogMessage(L_ERROR, "IsAuthorized: No matching user:group for \"%s\" in passwd.md5!",
+            LogMessage(L_DEBUG2, "IsAuthorized: No matching user:group for \"%s\" in passwd.md5!",
 	               con->username);
             return (HTTP_UNAUTHORIZED);
 	  }
@@ -1779,5 +1770,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.41.2.29 2004/10/11 19:31:19 mike Exp $".
+ * End of "$Id$".
  */

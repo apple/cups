@@ -1,5 +1,5 @@
 /*
- * "$Id: lpinfo.c,v 1.3.2.8 2004/06/29 13:15:11 mike Exp $"
+ * "$Id$"
  *
  *   "lpinfo" command for the Common UNIX Printing System (CUPS).
  *
@@ -45,8 +45,8 @@
  * Local functions...
  */
 
-static void	show_devices(http_t *, int);
-static void	show_models(http_t *, int);
+static int	show_devices(http_t *, int);
+static int	show_models(http_t *, int);
 
 
 /*
@@ -98,7 +98,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      }
             }
 
-            show_models(http, long_status);
+            if (show_models(http, long_status))
+	      return (1);
 	    break;
 	    
         case 'v' : /* Show available devices */
@@ -114,7 +115,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      }
             }
 
-            show_devices(http, long_status);
+            if (show_devices(http, long_status))
+	      return (1);
 	    break;
 
         case 'h' : /* Connect to host */
@@ -158,7 +160,7 @@ main(int  argc,			/* I - Number of command-line arguments */
  * 'show_devices()' - Show available devices.
  */
 
-static void
+static int			/* O - 0 on success, 1 on failure */
 show_devices(http_t *http,	/* I - HTTP connection to server */
              int    long_status)/* I - Long status report? */
 {
@@ -173,7 +175,7 @@ show_devices(http_t *http,	/* I - HTTP connection to server */
 
 
   if (http == NULL)
-    return;
+    return (1);
 
  /*
   * Build a CUPS_GET_DEVICES request, which requires the following
@@ -215,7 +217,7 @@ show_devices(http_t *http,	/* I - HTTP connection to server */
       fprintf(stderr, "lpinfo: cups-get-devices failed: %s\n",
               ippErrorString(response->request.status.status_code));
       ippDelete(response);
-      return;
+      return (1);
     }
 
     for (attr = response->attrs; attr != NULL; attr = attr->next)
@@ -294,8 +296,13 @@ show_devices(http_t *http,	/* I - HTTP connection to server */
     ippDelete(response);
   }
   else
+  {
     fprintf(stderr, "lpinfo: cups-get-devices failed: %s\n",
             ippErrorString(cupsLastError()));
+    return (1);
+  }
+
+  return (0);
 }
 
 
@@ -303,7 +310,7 @@ show_devices(http_t *http,	/* I - HTTP connection to server */
  * 'show_models()' - Show available PPDs.
  */
 
-static void
+static int			/* O - 0 on success, 1 on failure */
 show_models(http_t *http,	/* I - HTTP connection to server */
             int    long_status)	/* I - Long status report? */
 {
@@ -317,7 +324,7 @@ show_models(http_t *http,	/* I - HTTP connection to server */
 
 
   if (http == NULL)
-    return;
+    return (1);
 
  /*
   * Build a CUPS_GET_PPDS request, which requires the following
@@ -359,7 +366,7 @@ show_models(http_t *http,	/* I - HTTP connection to server */
       fprintf(stderr, "lpinfo: cups-get-ppds failed: %s\n",
               ippErrorString(response->request.status.status_code));
       ippDelete(response);
-      return;
+      return (1);
     }
 
     for (attr = response->attrs; attr != NULL; attr = attr->next)
@@ -431,11 +438,17 @@ show_models(http_t *http,	/* I - HTTP connection to server */
     ippDelete(response);
   }
   else
+  {
     fprintf(stderr, "lpinfo: cups-get-ppds failed: %s\n",
             ippErrorString(cupsLastError()));
+
+    return (1);
+  }
+
+  return (0);
 }
 
 
 /*
- * End of "$Id: lpinfo.c,v 1.3.2.8 2004/06/29 13:15:11 mike Exp $".
+ * End of "$Id$".
  */

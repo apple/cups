@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.70 2004/12/06 19:43:17 mike Exp $"
+ * "$Id$"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -62,6 +62,7 @@
  */
 
 #ifdef __sgi
+static void	write_irix_config(printer_t *p);
 static void	write_irix_state(printer_t *p);
 #endif /* __sgi */
 
@@ -201,8 +202,8 @@ AddPrinterFilter(printer_t  *p,		/* I - Printer to add to */
        i > 0;
        i --, temptype ++)
     if (((super[0] == '*' && strcasecmp((*temptype)->super, "printer") != 0) ||
-         strcasecmp((*temptype)->super, super) == 0) &&
-        (type[0] == '*' || strcasecmp((*temptype)->type, type) == 0))
+         !strcasecmp((*temptype)->super, super)) &&
+        (type[0] == '*' || !strcasecmp((*temptype)->type, type)))
     {
       LogMessage(L_DEBUG2, "Adding filter %s/%s %s/%s %d %s",
                  (*temptype)->super, (*temptype)->type,
@@ -918,7 +919,7 @@ LoadAllPrinters(void)
         * Set the default printer as needed...
 	*/
 
-        if (strcasecmp(name, "<DefaultPrinter") == 0)
+        if (!strcasecmp(name, "<DefaultPrinter"))
 	  DefaultPrinter = p;
       }
       else
@@ -1637,7 +1638,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	  AddPrinterFilter(p, filename);
 	}
 	else if (p->device_uri &&
-	         strncmp(p->device_uri, "ipp://", 6) == 0 &&
+	         !strncmp(p->device_uri, "ipp://", 6) &&
 	         (strstr(p->device_uri, "/printers/") != NULL ||
 		  strstr(p->device_uri, "/classes/") != NULL))
         {
@@ -2003,7 +2004,7 @@ ValidateDest(const char   *hostname,	/* I - Host name */
   * See if the resource is a class or printer...
   */
 
-  if (strncmp(resource, "/classes/", 9) == 0)
+  if (!strncmp(resource, "/classes/", 9))
   {
    /*
     * Class...
@@ -2011,7 +2012,7 @@ ValidateDest(const char   *hostname,	/* I - Host name */
 
     resource += 9;
   }
-  else if (strncmp(resource, "/printers/", 10) == 0)
+  else if (!strncmp(resource, "/printers/", 10))
   {
    /*
     * Printer...
@@ -2051,12 +2052,12 @@ ValidateDest(const char   *hostname,	/* I - Host name */
   * Change localhost to the server name...
   */
 
-  if (strcasecmp(hostname, "localhost") == 0)
+  if (!strcasecmp(hostname, "localhost"))
     hostname = ServerName;
 
   strlcpy(localname, hostname, sizeof(localname));
 
-  if (strcasecmp(hostname, ServerName) != 0)
+  if (!strcasecmp(hostname, ServerName))
   {
    /*
     * Localize the hostname...
@@ -2073,7 +2074,7 @@ ValidateDest(const char   *hostname,	/* I - Host name */
 
       while (lptr != NULL)
       {
-	if (strcasecmp(lptr, sptr) == 0)
+	if (!strcasecmp(lptr, sptr))
 	{
           *lptr = '\0';
 	  break;
@@ -2091,8 +2092,8 @@ ValidateDest(const char   *hostname,	/* I - Host name */
   */
 
   for (p = Printers; p != NULL; p = p->next)
-    if (strcasecmp(p->hostname, localname) == 0 &&
-        strcasecmp(p->name, resource) == 0)
+    if (!strcasecmp(p->hostname, localname) &&
+        !strcasecmp(p->name, resource))
     {
       if (printer)
         *printer = p;
@@ -2415,6 +2416,7 @@ write_irix_config(printer_t *p)		/* I - Printer to update */
     chmod(filename, 0664);
     chown(filename, User, Group);
   }
+}
 
 
 /*
@@ -2547,5 +2549,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.70 2004/12/06 19:43:17 mike Exp $".
+ * End of "$Id$".
  */

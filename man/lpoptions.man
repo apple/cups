@@ -1,9 +1,9 @@
 .\"
-.\" "$Id: lpoptions.man,v 1.6.2.5 2004/06/29 13:15:10 mike Exp $"
+.\" "$Id$"
 .\"
 .\"   lpoptions man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2004 by Easy Software Products.
+.\"   Copyright 1997-2005 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -15,13 +15,13 @@
 .\"       Attn: CUPS Licensing Information
 .\"       Easy Software Products
 .\"       44141 Airport View Drive, Suite 204
-.\"       Hollywood, Maryland 20636-3142 USA
+.\"       Hollywood, Maryland 20636 USA
 .\"
 .\"       Voice: (301) 373-9600
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpoptions 1 "Common UNIX Printing System" "5 September 2000" "Easy Software Products"
+.TH lpoptions 1 "Common UNIX Printing System" "21 October 2002" "Easy Software Products"
 .SH NAME
 lpoptions \- display or set printer options and defaults
 .SH SYNOPSIS
@@ -39,14 +39,14 @@ lpoptions \- display or set printer options and defaults
 .B lpoptions
 [ -h
 .I server
-] [ -p
+] [ -E ] [ -p
 .I dest[/instance]
 ] -l
 .br
 .B lpoptions
 [ -h
 .I server
-] [ -o
+] [ -E ] [ -o
 .I option=value
 ] ... [ -o
 .I option=value
@@ -58,12 +58,16 @@ lpoptions \- display or set printer options and defaults
 .B lpoptions
 [ -h
 .I server
-] -x
+] [ -E ] -x
 .I dest[/instance]
 .SH DESCRIPTION
 \fBlpoptions\fR displays or sets printer options and defaults.
 \fBlpoptions\fR shows the default printer options when run with no
 arguments. Other options include:
+.TP 5
+\-E
+.br
+Enables encryption when communicating with the CUPS server.
 .TP 5
 \-d \fIdest[/instance]\fR
 .br
@@ -102,14 +106,23 @@ options for the named printer are reported on the standard output.
 .LP
 Options set with the \fBlpoptions\fR command are used by the \fBlp(1)\fR
 and \fBlpr(1)\fR commands when submitting jobs.
+.SH ROOT ACCOUNT OPTIONS
+When run by the root user, \fBlpoptions\fR gets and sets default
+options and instances for \fIall users\fR in the
+/etc/cups/lpoptions file.
 .SH COMPATIBILITY
 The \fBlpoptions\fR command is unique to CUPS.
+.SH FILES
+~/.lpoptions - user defaults and instances created by non-root users.
+.br
+/etc/cups/lpoptions - system-wide defaults and instances created by the root
+user.
 .SH SEE ALSO
 cancel(1), lp(1),
 CUPS Software Users Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2004 by Easy Software Products, All Rights Reserved.
+Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpoptions.man,v 1.6.2.5 2004/06/29 13:15:10 mike Exp $".
+.\" End of "$Id$".
 .\"

@@ -1,9 +1,9 @@
 .\"
-.\" "$Id: cupsaddsmb.man,v 1.2.2.7 2004/08/19 21:02:55 mike Exp $"
+.\" "$Id$"
 .\"
 .\"   cupsaddsmb man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2004 by Easy Software Products.
+.\"   Copyright 1997-2005 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -179,7 +179,7 @@ and copy the files exactly as named below:
 CUPS Software Administrators Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2004 by Easy Software Products, All Rights Reserved.
+Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupsaddsmb.man,v 1.2.2.7 2004/08/19 21:02:55 mike Exp $".
+.\" End of "$Id$".
 .\"

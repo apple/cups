@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.24.2.21 2004/06/29 13:15:09 mike Exp $"
+ * "$Id$"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -350,6 +350,8 @@ typedef struct ppd_file_str	/**** Files ****/
   int		num_attrs;	/* Number of attributes */
   int		cur_attr;	/* Current attribute */
   ppd_attr_t	**attrs;	/* Attributes */
+
+  /**** New in CUPS 1.2 ****/
   int		num_extended;	/* Number of extended options */
   ppd_ext_option_t **extended;	/* Extended options */
 } ppd_file_t;
@@ -391,6 +393,11 @@ extern ppd_attr_t	*ppdFindAttr(ppd_file_t *ppd, const char *name,
 extern ppd_attr_t	*ppdFindNextAttr(ppd_file_t *ppd, const char *name,
 			                 const char *spec);
 extern ppd_status_t	ppdLastError(int *line);
+
+/**** New in CUPS 1.1.20 ****/
+extern void		ppdSetConformance(ppd_conform_t c);
+
+/**** New in CUPS 1.2 ****/
 extern ppd_ext_option_t	*ppdFindExtOption(ppd_file_t *ppd, const char *keyword);
 extern ppd_ext_param_t	*ppdFindExtParam(ppd_ext_option_t *opt, const char *param);
 extern int		ppdMarkCurve(ppd_file_t *ppd, const char *keyword,
@@ -413,11 +420,6 @@ extern int		ppdMarkText(ppd_file_t *ppd, const char *keyword,
 extern int		ppdMarkXYArray(ppd_file_t *ppd, const char *keyword,
 			               const char *param, int num_values,
 				       const float *values);
-
-/**** New in CUPS 1.1.20 ****/
-extern void		ppdSetConformance(ppd_conform_t c);
-
-/**** New in CUPS 1.2 ****/
 extern int		ppdSave(ppd_file_t *ppd, FILE *fp);
 extern int		ppdSaveFd(ppd_file_t *ppd, int fd);
 extern int		ppdSaveFile(ppd_file_t *ppd, const char *filename);
@@ -433,5 +435,5 @@ extern int		ppdSaveFile(ppd_file_t *ppd, const char *filename);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.24.2.21 2004/06/29 13:15:09 mike Exp $".
+ * End of "$Id$".
  */

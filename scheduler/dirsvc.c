@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.60 2004/10/04 19:48:56 mike Exp $"
+ * "$Id$"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1613,6 +1613,11 @@ UpdatePolling(void)
 #  define SLP_CUPS_SRVTYPE	"service:printer"
 #  define SLP_CUPS_SRVLEN	15
 
+
+/* 
+ * Printer service URL structure
+ */
+
 typedef struct _slpsrvurl
 {
   struct _slpsrvurl	*next;
@@ -2114,5 +2119,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.60 2004/10/04 19:48:56 mike Exp $".
+ * End of "$Id$".
  */

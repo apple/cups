@@ -1,9 +1,9 @@
 .\"
-.\" "$Id: cupsd.conf.man,v 1.5.2.6 2004/08/19 12:46:28 mike Exp $"
+.\" "$Id$"
 .\"
 .\"   cupsd.conf man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2004 by Easy Software Products.
+.\"   Copyright 1997-2005 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -15,7 +15,7 @@
 .\"       Attn: CUPS Licensing Information
 .\"       Easy Software Products
 .\"       44141 Airport View Drive, Suite 204
-.\"       Hollywood, Maryland 20636-3142 USA
+.\"       Hollywood, Maryland 20636 USA
 .\"
 .\"       Voice: (301) 373-9600
 .\"       EMail: cups-info@cups.org
@@ -47,6 +47,10 @@ Allows access from the named hosts or addresses.
 AuthClass
 .br
 Specifies the authentication class (User, Group, System)
+.TP 5
+AuthGroupName
+.br
+Specifies the authentication group.
 .TP 5
 AuthType
 .br
@@ -152,6 +156,19 @@ ErrorLog
 .br
 Specifies the error log filename.
 .TP 5
+FaxRetryInterval
+.br
+Specifies the interval between retries of fax jobs in seconds.
+.TP 5
+FaxRetryLimit
+.br
+Specifies the number of retries that are done for fax jobs.
+.TP 5
+FileDevice
+.br
+Specifies whether the file pseudo-device can be used for new
+printer queues.
+.TP 5
 FilterLimit
 .br
 Specifies the maximum cost of filters that are run concurrently.
@@ -189,6 +206,10 @@ ImplicitClasses
 Specifies whether or not to create implicit classes from identical
 remote printers.
 .TP 5
+Include
+.br
+Includes the named file.
+.TP 5
 KeepAlive
 .br
 Specifies whether or not to support HTTP Keep-Alive.
@@ -207,6 +228,10 @@ LimitRequestBody
 .br
 Specifies the maximum size of any print job request.
 .TP 5
+Listen
+.br
+Listens to the specified address and port.
+.TP 5
 <Location /path> ... </Location>
 .br
 Specifies access control for the named location.
@@ -222,6 +247,11 @@ Specifies the logging level (none, warn, error, info, debug, or debug2)
 MaxClients
 .br
 Specifies the maximum number of simultaneous clients to support.
+.TP 5
+MaxClientsPerHost
+.br
+Specifies the maximum number of simultaneous clients to support from a
+single address.
 .TP 5
 MaxCopies
 .br
@@ -273,6 +303,10 @@ Printcap
 .br
 Specifies the filename for a printcap file that is updated automatically
 with a list of available printers (needed for legacy applications)
+.TP 5
+PrintcapFormat
+.br
+Specifies the format of the printcap file.
 .TP 5
 PrintcapGUI
 .br
@@ -343,6 +377,14 @@ ServerTokens
 Specifies what information is included in the Server header of HTTP
 responses.
 .TP 5
+SSLListen
+.br
+Listens on the specified address and port for encrypted connections.
+.TP 5
+SSLPort
+.br
+Listens on the specified port for encrypted connections.
+.TP 5
 SystemGroup
 .br
 Specifies the group to use for System class authentication.
@@ -363,7 +405,7 @@ classes.conf(5), cupsd(8), mime.convs(5), mime.types(5), printers.conf(5),
 CUPS Software Administrators Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2004 by Easy Software Products, All Rights Reserved.
+Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupsd.conf.man,v 1.5.2.6 2004/08/19 12:46:28 mike Exp $".
+.\" End of "$Id$".
 .\"

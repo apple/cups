@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.61 2004/08/23 18:01:56 mike Exp $"
+ * "$Id$"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -186,7 +186,7 @@ static ipp_op_t	get_operation(const char *name);
 
 
 /*
- * 'ReadConfiguration:' - Read the cupsd.conf file.
+ * 'ReadConfiguration()' - Read the cupsd.conf file.
  */
 
 int					/* O - 1 on success, 0 otherwise */
@@ -255,12 +255,12 @@ ReadConfiguration(void)
   if (NumListeners > 0)
   {
 #ifdef HAVE_DOMAINSOCKETS
-  int i;			/* Looping var */
-  listener_t	*lis;		/* Current listening socket */
+    int i;				/* Looping var */
+    listener_t	*lis;			/* Current listening socket */
 
-  for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
-    if (lis->address.sin_family == AF_LOCAL)
-      ClearString((char **)&lis->address.sin_addr);
+    for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+      if (lis->address.sin_family == AF_LOCAL)
+	ClearString((char **)&lis->address.sin_addr);
 #endif /* HAVE_DOMAINSOCKETS */
 
     free(Listeners);
@@ -407,10 +407,10 @@ ReadConfiguration(void)
   JobHistory          = DEFAULT_HISTORY;
   JobFiles            = DEFAULT_FILES;
   JobAutoPurge        = 0;
-  MaxJobs             = 0;
+  MaxJobs             = 500;
   MaxActiveJobs       = 0;
-  MaxJobsPerPrinter   = 0;
   MaxJobsPerUser      = 0;
+  MaxJobsPerPrinter   = 0;
   MaxCopies           = 100;
 
   ClearString(&DefaultPolicy);
@@ -597,7 +597,7 @@ ReadConfiguration(void)
 
   if ((Clients = calloc(sizeof(client_t), MaxClients)) == NULL)
   {
-    LogMessage(L_ERROR, "Unable to allocate memory for %d clients: %s",
+    LogMessage(L_ERROR, "ReadConfiguration: Unable to allocate memory for %d clients: %s",
                MaxClients, strerror(errno));
     exit(1);
   }
@@ -2131,7 +2131,9 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
       *     Require user names
       */
 
-      for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+      for (valptr = value;
+	   !isspace(*valptr & 255) && *valptr != '>' && *valptr;
+	   valptr ++);
 
       if (*valptr)
 	*valptr++ = '\0';
@@ -2912,5 +2914,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.61 2004/08/23 18:01:56 mike Exp $".
+ * End of "$Id$".
  */

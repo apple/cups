@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.13.2.6 2004/06/29 13:15:08 mike Exp $"
+# "$Id$"
 #
 #   Berkeley commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -103,10 +103,10 @@ lprm:	lprm.o ../cups/$(LIBCUPS)
 #
 # Dependencies...
 #
-  
+
 include Dependencies
 
-  
+
 #
-# End of "$Id: Makefile,v 1.13.2.6 2004/06/29 13:15:08 mike Exp $".
+# End of "$Id$".
 #

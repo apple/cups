@@ -1,9 +1,9 @@
 /*
- * "$Id: string.c,v 1.5.2.11 2004/06/29 13:15:09 mike Exp $"
+ * "$Id$"
  *
  *   String functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2004 by Easy Software Products.
+ *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -59,8 +59,8 @@ cups_strcpy(char       *dst,		/* I - Destination string */
  * 'cups_strdup()' - Duplicate a string.
  */
 
-#  ifndef HAVE_STRDUP
-char *				/* O - New string pointer */
+#ifndef HAVE_STRDUP
+char 	*			/* O - New string pointer */
 cups_strdup(const char *s)	/* I - String to duplicate */
 {
   char	*t;			/* New string pointer */
@@ -74,17 +74,17 @@ cups_strdup(const char *s)	/* I - String to duplicate */
 
   return (strcpy(t, s));
 }
-#  endif /* !HAVE_STRDUP */
+#endif /* !HAVE_STRDUP */
 
 
 /*
  * 'cups_strcasecmp()' - Do a case-insensitive comparison.
  */
 
-#  ifndef HAVE_STRCASECMP
+#ifndef HAVE_STRCASECMP
 int				/* O - Result of comparison (-1, 0, or 1) */
 cups_strcasecmp(const char *s,	/* I - First string */
-               const char *t)	/* I - Second string */
+                const char *t)	/* I - Second string */
 {
   while (*s != '\0' && *t != '\0')
   {
@@ -104,17 +104,17 @@ cups_strcasecmp(const char *s,	/* I - First string */
   else
     return (-1);
 }
-#  endif /* !HAVE_STRCASECMP */
+#endif /* !HAVE_STRCASECMP */
 
 /*
  * 'cups_strncasecmp()' - Do a case-insensitive comparison on up to N chars.
  */
 
-#  ifndef HAVE_STRNCASECMP
+#ifndef HAVE_STRNCASECMP
 int				/* O - Result of comparison (-1, 0, or 1) */
 cups_strncasecmp(const char *s,	/* I - First string */
-                const char *t,	/* I - Second string */
-	        size_t     n)	/* I - Maximum number of characters to compare */
+                 const char *t,	/* I - Second string */
+		 size_t     n)	/* I - Maximum number of characters to compare */
 {
   while (*s != '\0' && *t != '\0' && n > 0)
   {
@@ -222,5 +222,5 @@ cups_strlcpy(char       *dst,	/* O - Destination string */
 
 
 /*
- * End of "$Id: string.c,v 1.5.2.11 2004/06/29 13:15:09 mike Exp $".
+ * End of "$Id$".
  */

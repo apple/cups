@@ -1,11 +1,11 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: zebra.ppd,v 1.1.2.2 2004/05/12 19:32:07 mike Exp $"
+*% "$Id$"
 *%
 *%   Sample Zebra label printer driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
 *%
-*%   Copyright 2001-2003 by Easy Software Products.
+*%   Copyright 2001-2005 by Easy Software Products.
 *%
 *%   These coded instructions, statements, and computer programs are the
 *%   property of Easy Software Products and are protected by Federal
@@ -17,9 +17,9 @@
 *%       Attn: CUPS Licensing Information
 *%       Easy Software Products
 *%       44141 Airport View Drive, Suite 204
-*%       Hollywood, Maryland 20636-3111 USA
+*%       Hollywood, Maryland 20636 USA
 *%
-*%       Voice: (301) 373-9603
+*%       Voice: (301) 373-9600
 *%       EMail: cups-info@cups.org
 *%         WWW: http://www.cups.org
 *%
@@ -143,5 +143,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: zebra.ppd,v 1.1.2.2 2004/05/12 19:32:07 mike Exp $".
+*% End of "$Id$".
 *%

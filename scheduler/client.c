@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.97 2005/01/03 18:48:04 mike Exp $"
+ * "$Id$"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -165,7 +165,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 
     return;
   }
-  
+
  /*
   * Get the hostname or format the IP address as needed...
   */
@@ -297,13 +297,11 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   val = 1;
   setsockopt(con->http.fd, IPPROTO_TCP, TCP_NODELAY, &val, sizeof(val)); 
 
-#ifdef FD_CLOEXEC
  /*
   * Close this file on all execs...
   */
 
-  fcntl(con->http.fd, F_SETFD, FD_CLOEXEC);
-#endif /* FD_CLOEXEC */
+  fcntl(con->http.fd, F_SETFD, fcntl(con->http.fd, F_GETFD) | FD_CLOEXEC);
 
  /*
   * Add the socket to the select() input mask.
@@ -1233,15 +1231,13 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	httpPrintf(HTTP(con), "\r\n");
 
         EncryptClient(con);
-
-	status = IsAuthorized(con);
 #else
 	if (!SendError(con, HTTP_NOT_IMPLEMENTED))
 	  return (CloseClient(con));
 #endif /* HAVE_SSL */
       }
 
-      if (status != HTTP_OK)
+      if ((status = IsAuthorized(con)) != HTTP_OK)
       {
         LogMessage(L_DEBUG2, "ReadClient: Unauthorized request for %s...\n",
 	           con->uri);
@@ -1570,14 +1566,6 @@ ReadClient(client_t *con)		/* I - Client to read from */
             SetStringf(&con->filename, "%s/%08x", RequestRoot, request_id ++);
 	    con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
 
-#ifdef FD_CLOEXEC
-	   /*
-	    * Close this file when starting other processes...
-            */
-
-            fcntl(con->file, F_SETFD, FD_CLOEXEC);
-#endif /* FD_CLOEXEC */
-
             LogMessage(L_DEBUG2, "ReadClient: %d REQUEST %s=%d", con->http.fd,
 	               con->filename, con->file);
 
@@ -1822,14 +1810,6 @@ ReadClient(client_t *con)		/* I - Client to read from */
 
           SetStringf(&con->filename, "%s/%08x", RequestRoot, request_id ++);
 	  con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
-
-#ifdef FD_CLOEXEC
-	   /*
-	    * Close this file when starting other processes...
-            */
-
-            fcntl(con->file, F_SETFD, FD_CLOEXEC);
-#endif /* FD_CLOEXEC */
 
           LogMessage(L_DEBUG2, "ReadClient: %d REQUEST %s=%d", con->http.fd,
 	             con->filename, con->file);
@@ -2113,13 +2093,7 @@ SendFile(client_t    *con,
   if (con->file < 0)
     return (0);
 
-#ifdef FD_CLOEXEC
- /*
-  * Close this file when starting other processes...
-  */
-
-  fcntl(con->file, F_SETFD, FD_CLOEXEC);
-#endif /* FD_CLOEXEC */
+  fcntl(con->file, F_SETFD, fcntl(con->file, F_GETFD) | FD_CLOEXEC);
 
   con->pipe_pid = 0;
 
@@ -2372,11 +2346,11 @@ WriteClient(client_t *con)		/* I - Client connection */
                    con->file);
 	FD_CLR(con->file, InputSet);
       }
-  
+
       if (con->pipe_pid)
 	kill(con->pipe_pid, SIGTERM);
 
-      LogMessage(L_DEBUG2, "WriteClient() %d Closing data file %d.",
+      LogMessage(L_DEBUG2, "WriteClient: %d Closing data file %d.",
                  con->http.fd, con->file);
 
       close(con->file);
@@ -2386,7 +2360,7 @@ WriteClient(client_t *con)		/* I - Client connection */
 
     if (con->filename)
     {
-      LogMessage(L_DEBUG2, "WriteClient() %d Removing temp file %s",
+      LogMessage(L_DEBUG2, "WriteClient: %d Removing temp file %s",
                  con->http.fd, con->filename);
       unlink(con->filename);
       ClearString(&con->filename);
@@ -2547,19 +2521,23 @@ decode_auth(client_t *con)		/* I - Client to decode to */
     * Get the username and password from the Digest attributes...
     */
 
-    if (httpGetSubField(&(con->http), HTTP_FIELD_WWW_AUTHENTICATE, "username",
+    if (httpGetSubField(&(con->http), HTTP_FIELD_AUTHORIZATION, "username",
                         value))
       strlcpy(con->username, value, sizeof(con->username));
 
-    if (httpGetSubField(&(con->http), HTTP_FIELD_WWW_AUTHENTICATE, "response",
+    if (httpGetSubField(&(con->http), HTTP_FIELD_AUTHORIZATION, "response",
                         value))
-      strlcpy(con->password, value, sizeof(con->password) - 1);
+      strlcpy(con->password, value, sizeof(con->password));
   }
 
   LogMessage(L_DEBUG2, "decode_auth: %d username=\"%s\"",
              con->http.fd, con->username);
 }
 
+
+/*
+ * 'get_file()' - Get a filename and state info.
+ */
 
 static char *				/* O  - Real filename */
 get_file(client_t    *con,		/* I  - Client connection */
@@ -3074,7 +3052,7 @@ pipe_command(client_t *con,		/* I - Client connection */
              locale_encodings[con->language->encoding]);
   else
     strcpy(lang, "LANG=C");
-  
+
   sprintf(ipp_port, "IPP_PORT=%d", LocalPort);
 #ifdef AF_INET6
   if (con->http.hostaddr.addr.sa_family == AF_INET6)
@@ -3295,7 +3273,7 @@ pipe_command(client_t *con,		/* I - Client connection */
     * Update stdin/stdout/stderr...
     */
 
-    if (infile > 0)
+    if (infile)
     {
       close(0);
       if (dup(infile) < 0)
@@ -3428,5 +3406,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.97 2005/01/03 18:48:04 mike Exp $".
+ * End of "$Id$".
  */

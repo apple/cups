@@ -1,9 +1,9 @@
 /*
- * "$Id: emit.c,v 1.23.2.16 2004/09/08 20:31:30 mike Exp $"
+ * "$Id$"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2004 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -564,8 +564,16 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
   char		temp[81];		/* Local title string */
 
 
+ /*
+  * Range check the input...
+  */
+
   if (ppd == NULL || ppd->jcl_begin == NULL || ppd->jcl_ps == NULL)
     return (0);
+
+ /*
+  * See if the printer supports HP PJL...
+  */
 
   if (strncmp(ppd->jcl_begin, "\033%-12345X@", 10) == 0)
   {
@@ -609,6 +617,13 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
 	if (*ptr)
 	  ptr ++;
       }
+
+   /*
+    * Eliminate any path info from the job title...
+    */
+
+    if ((ptr = strrchr(title, '/')) != NULL)
+      title = ptr + 1;
 
    /*
     * Replace double quotes with single quotes so that the title
@@ -737,5 +752,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c,v 1.23.2.16 2004/09/08 20:31:30 mike Exp $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.23.2.10 2004/10/20 19:55:50 mike Exp $"
+# "$Id$"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -69,7 +69,7 @@ install:	all
 	$(INSTALL_BIN) lpmove $(SBINDIR)
 	$(INSTALL_DIR) $(BINDIR)
 	$(INSTALL_BIN) cancel $(BINDIR)
-	$(INSTALL_BIN) cupstestppd $(SBINDIR)
+	$(INSTALL_BIN) cupstestppd $(BINDIR)
 	$(RM) $(SBINDIR)/disable
 	$(LN) accept $(SBINDIR)/disable
 	$(RM) $(SBINDIR)/enable
@@ -77,7 +77,7 @@ install:	all
 	$(INSTALL_BIN) lp $(BINDIR)
 	$(INSTALL_BIN) lpoptions $(BINDIR)
 	$(INSTALL_BIN) lpstat $(BINDIR)
-	$(INSTALL_BIN) -m 4755 -o $(CUPS_USER) -g $(CUPS_GROUP) lppasswd $(BINDIR)
+	-$(INSTALL_BIN) -m 4755 -o $(CUPS_USER) -g $(CUPS_GROUP) lppasswd $(BINDIR)
 	if test ! -x $(BINDIR)/lppasswd; then \
 		chmod 755 $(BINDIR)/lppasswd; \
 	fi
@@ -194,5 +194,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.23.2.10 2004/10/20 19:55:50 mike Exp $".
+# End of "$Id$".
 #

@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.15.2.7 2004/06/29 13:15:08 mike Exp $"
+# "$Id$"
 #
 #   CGI makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2004 by Easy Software Products.
+#   Copyright 1997-2005 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -15,7 +15,7 @@
 #       Attn: CUPS Licensing Information
 #       Easy Software Products
 #       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636-3142 USA
+#       Hollywood, Maryland 20636 USA
 #
 #       Voice: (301) 373-9600
 #       EMail: cups-info@cups.org
@@ -79,7 +79,7 @@ libcgi.a:	$(LIBOBJS)
 # admin.cgi
 #
 
-admin.cgi:	admin.o ../cups/$(LIBCUPS) libcgi.a
+admin.cgi:	admin.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ admin.o libcgi.a $(LIBS)
 
@@ -88,7 +88,7 @@ admin.cgi:	admin.o ../cups/$(LIBCUPS) libcgi.a
 # classes.cgi
 #
 
-classes.cgi:	classes.o ../cups/$(LIBCUPS) libcgi.a
+classes.cgi:	classes.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ classes.o libcgi.a $(LIBS)
 
@@ -97,7 +97,7 @@ classes.cgi:	classes.o ../cups/$(LIBCUPS) libcgi.a
 # jobs.cgi
 #
 
-jobs.cgi:	jobs.o ../cups/$(LIBCUPS) libcgi.a
+jobs.cgi:	jobs.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ jobs.o libcgi.a $(LIBS)
 
@@ -106,7 +106,7 @@ jobs.cgi:	jobs.o ../cups/$(LIBCUPS) libcgi.a
 # printers.cgi
 #
 
-printers.cgi:	printers.o ../cups/$(LIBCUPS) libcgi.a
+printers.cgi:	printers.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ printers.o libcgi.a $(LIBS)
 
@@ -114,10 +114,10 @@ printers.cgi:	printers.o ../cups/$(LIBCUPS) libcgi.a
 #
 # Dependencies...
 #
-  
+
 include Dependencies
 
-  
+
 #
-# End of "$Id: Makefile,v 1.15.2.7 2004/06/29 13:15:08 mike Exp $".
+# End of "$Id$".
 #

@@ -1,10 +1,10 @@
-README - CUPS v1.2.0a1 - 01/07/2003
+README - CUPS v1.2.0b1 - 02/17/2005
 -----------------------------------
 
 *****************************************************************
 *****************************************************************
 ****                                                         ****
-**** WARNING: THIS IS ALPHA RELEASE SOFTWARE AND MAY BE      ****
+**** WARNING: THIS IS BETA RELEASE SOFTWARE AND MAY BE       ****
 ****          TOTALLY UNSTABLE.  DO NOT USE IN ENVIRONMENTS  ****
 ****          WHERE RELIABLE SOFTWARE IS REQUIRED!           ****
 ****                                                         ****
@@ -71,11 +71,10 @@ The following operating system software is required to install
 one of the binary distributions from Easy Software Products:
 
     - AIX 4.3 or higher
-    - Compaq Tru64 UNIX (aka OSF1 aka Digital UNIX) 4.0 or higher
-    - HP-UX 10.20 or higher
-    - IRIX 5.3 or higher
-    - Linux 2.0 with glibc2 or higher
-    - Solaris 2.5 or higher (SPARC or Intel)
+    - HP-UX 11.00 or higher
+    - IRIX 6.5 or higher
+    - Linux 2.4 with glibc 2.2 or higher
+    - Solaris 7 or higher (SPARC or Intel)
 
 
 INSTALLING "PORTABLE" CUPS DISTRIBUTIONS
@@ -179,10 +178,6 @@ and HP printer drivers.  To add the sample DeskJet driver to the
 system for a printer connected to the parallel port, use one of
 the following commands:
 
-    Digital UNIX:
-
-        /usr/lib/lpadmin -p DeskJet -m deskjet.ppd -v parallel:/dev/lp0 -E
-
     HP-UX:
 
         /usr/lib/lpadmin -p DeskJet -m deskjet.ppd -v parallel:/dev/c2t0d0_lp -E
@@ -258,14 +253,14 @@ file.
 
 LEGAL STUFF
 
-CUPS is Copyright 1993-2003 by Easy Software Products.  CUPS,
+CUPS is Copyright 1993-2005 by Easy Software Products.  CUPS,
 the CUPS logo, and the Common UNIX Printing System are the
 trademark property of Easy Software Products.
 
 The MD5 Digest code is Copyright 1999 Aladdin Enterprises.
 
 The PDF filter (pdftops) is based on the Xpdf software,
-Copyright 1996-2002 by Derek B. Noonburg.
+Copyright 1996-2005 by Derek B. Noonburg.
 
 This software is based in part on the work of the Independent
 JPEG Group.
@@ -282,13 +277,12 @@ For commercial licensing information, please contact:
     Attn: CUPS Licensing Information
     Easy Software Products
     44141 Airport View Drive, Suite 204
-    Hollywood, Maryland 20636-3111 USA
+    Hollywood, Maryland 20636 USA
 
     Voice: +1.301.373.9600
     Email: cups-info@cups.org
     WWW: http://www.cups.org
 
 Note that commercial licensors may also require a license from
-Artifex Software Inc. which handles commercial licensing of the
-Ghostscript software, and from Derek B. Noonburg who developed
-the Xpdf software used to print PDF files.
+Derek B. Noonburg who developed the Xpdf software used to print
+PDF files.

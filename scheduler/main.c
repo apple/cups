@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.71 2005/02/07 00:14:32 mike Exp $"
+ * "$Id$"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -1100,12 +1100,12 @@ process_children(void)
 
     if (status)
     {
-      if (WIFEXITED(status))
+      if (WIFSTOPPED(status))
+	LogMessage(L_ERROR, "PID %d crashed on signal %d!", pid,
+	           WSTOPSIG(status));
+      else
 	LogMessage(L_ERROR, "PID %d stopped with status %d!", pid,
 	           WEXITSTATUS(status));
-      else
-	LogMessage(L_ERROR, "PID %d crashed on signal %d!", pid,
-	           WTERMSIG(status));
 
       if (LogLevel < L_DEBUG)
         LogMessage(L_INFO, "Hint: Try setting the LogLevel to \"debug\" to find out more.");
@@ -1412,5 +1412,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.71 2005/02/07 00:14:32 mike Exp $".
+ * End of "$Id$".
  */

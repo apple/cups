@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.93 2004/10/04 20:24:16 mike Exp $"
+ * "$Id$"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -168,9 +168,8 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
   ipp_attribute_t	*username;	/* requesting-user-name attr */
 
 
-  DEBUG_printf(("ProcessIPPRequest(%08x)\n", con));
-  DEBUG_printf(("ProcessIPPRequest: operation_id = %04x\n",
-                con->request->request.op.operation_id));
+  LogMessage(L_DEBUG2, "ProcessIPPRequest(%p[%d]): operation_id = %04x",
+             con, con->http.fd, con->request->request.op.operation_id);
 
  /*
   * First build an empty response message for this request...
@@ -295,6 +294,15 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 
         if (uri == NULL)
 	  LogMessage(L_ERROR, "ProcessIPPRequest: missing printer-uri or job-uri attribute!");
+
+	LogMessage(L_DEBUG, "Request attributes follow...");
+
+	for (attr = con->request->attrs; attr != NULL; attr = attr->next)
+	  LogMessage(L_DEBUG, "attr \"%s\": group_tag = %x, value_tag = %x",
+	             attr->name ? attr->name : "(null)", attr->group_tag,
+		     attr->value_tag);
+
+	LogMessage(L_DEBUG, "End of attributes...");
 
 	send_ipp_error(con, IPP_BAD_REQUEST);
       }
@@ -518,7 +526,7 @@ accept_jobs(client_t        *con,	/* I - Client connection */
   printer_t		*printer;	/* Printer data */
 
 
-  LogMessage(L_DEBUG2, "accept_jobs(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "accept_jobs(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -612,7 +620,7 @@ add_class(client_t        *con,		/* I - Client connection */
   int			modify;		/* Non-zero if we just modified */
 
 
-  LogMessage(L_DEBUG2, "add_class(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "add_class(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -626,8 +634,6 @@ add_class(client_t        *con,		/* I - Client connection */
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
-
-  DEBUG_printf(("add_class(%08x, %08x)\n", con, uri));
 
  /*
   * Do we have a valid URI?
@@ -1079,7 +1085,7 @@ add_printer(client_t        *con,	/* I - Client connection */
   int			modify;		/* Non-zero if we are modifying */
 
 
-  LogMessage(L_DEBUG2, "add_printer(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "add_printer(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -1595,8 +1601,8 @@ static void
 add_printer_state_reasons(client_t  *con,	/* I - Client connection */
                           printer_t *p)		/* I - Printer info */
 {
-  LogMessage(L_DEBUG2, "add_printer_state_reasons(%d, %s)\n", con->http.fd,
-             p->name);
+  LogMessage(L_DEBUG2, "add_printer_state_reasons(%p[%d], %p[%s])\n",
+             con, con->http.fd, p, p->name);
 
   if (p->num_reasons == 0)
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
@@ -1621,8 +1627,8 @@ add_queued_job_count(client_t  *con,	/* I - Client connection */
   int		count;			/* Number of jobs on destination */
 
 
-  LogMessage(L_DEBUG2, "add_queued_job_count(%d, %s)\n", con->http.fd,
-             p->name);
+  LogMessage(L_DEBUG2, "add_queued_job_count(%p[%d], %p[%s])\n",
+             con, con->http.fd, p, p->name);
 
   count = GetPrinterJobCount(p->name);
 
@@ -1656,7 +1662,7 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
   printer_t		*printer;	/* Printer */
 
 
-  LogMessage(L_DEBUG2, "cancel_all_jobs(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "cancel_all_jobs(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -1666,7 +1672,7 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
   if (strncmp(con->uri, "/admin/", 7) &&
       strncmp(con->uri, "/jobs/", 7))
   {
-    LogMessage(L_ERROR, "cancel_all_jobs: request on bad resource \'%s\'!",
+    LogMessage(L_ERROR, "cancel_all_jobs: admin request on bad resource \'%s\'!",
                con->uri);
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
@@ -1815,7 +1821,7 @@ cancel_job(client_t        *con,	/* I - Client connection */
   printer_t		*printer;	/* Printer data */
 
 
-  LogMessage(L_DEBUG2, "cancel_job(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "cancel_job(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -1991,7 +1997,8 @@ check_quotas(client_t  *con,	/* I - Client connection */
   struct group	*grp;		/* Group data */
 
 
-  LogMessage(L_DEBUG2, "check_quotas(%d, %s)\n", con->http.fd, p->name);
+  LogMessage(L_DEBUG2, "check_quotas(%p[%d], %p[%s])\n",
+             con, con->http.fd, p, p->name);
 
  /*
   * Check input...
@@ -2145,8 +2152,9 @@ copy_attribute(ipp_t           *to,	/* O - Destination request/response */
   ipp_attribute_t	*toattr;	/* Destination attribute */
 
 
-  LogMessage(L_DEBUG2, "copy_attribute(%p, %s)\n", to,
-             attr->name ? attr->name : "(null)");
+  LogMessage(L_DEBUG2, "copy_attribute(%p, %p[%s,%x,%x])\n", to, attr,
+             attr->name ? attr->name : "(null)", attr->group_tag,
+	     attr->value_tag);
 
   switch (attr->value_tag & ~IPP_TAG_COPY)
   {
@@ -2362,15 +2370,12 @@ copy_banner(client_t   *con,	/* I - Client connection */
   ipp_attribute_t *attr;	/* Attribute */
 
 
-  LogMessage(L_DEBUG2, "copy_banner(%d, %d, %s)\n", con->http.fd, job->id,
-             name);
+  LogMessage(L_DEBUG2, "copy_banner(%p[%d], %p[%d], %s)",
+             con, con->http.fd, job, job->id, name ? name : "(null)");
 
  /*
   * Find the banner; return if not found or "none"...
   */
-
-  LogMessage(L_DEBUG, "copy_banner(%p, %d, \"%s\")", con, job->id,
-             name ? name : "(null)");
 
   if (name == NULL ||
       strcmp(name, "none") == 0 ||
@@ -2891,7 +2896,7 @@ create_job(client_t        *con,	/* I - Client connection */
   int			lowerpagerange;	/* Page range bound */
 
 
-  LogMessage(L_DEBUG2, "create_job(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "create_job(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -3357,7 +3362,7 @@ delete_printer(client_t        *con,	/* I - Client connection */
   char			filename[1024];	/* Script/PPD filename */
 
 
-  LogMessage(L_DEBUG2, "delete_printer(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "delete_printer(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -3371,8 +3376,6 @@ delete_printer(client_t        *con,	/* I - Client connection */
     send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
-
-  DEBUG_printf(("delete_printer(%08x, %08x)\n", con, uri));
 
  /*
   * Do we have a valid URI?
@@ -3516,7 +3519,7 @@ get_default(client_t *con)		/* I - Client connection */
 static void
 get_devices(client_t *con)		/* I - Client connection */
 {
-  LogMessage(L_DEBUG2, "get_devices(%d)\n", con->http.fd);
+  LogMessage(L_DEBUG2, "get_devices(%p[%d])\n", con, con->http.fd);
 
  /*
   * Check policy...
@@ -3573,7 +3576,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
   printer_t		*printer;	/* Printer */
 
 
-  LogMessage(L_DEBUG2, "get_jobs(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "get_jobs(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -3686,7 +3689,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
     * Filter out jobs that don't match...
     */
 
-    DEBUG_printf(("get_jobs: job->id = %d\n", job->id));
+    LogMessage(L_DEBUG2, "get_jobs: job->id = %d", job->id);
 
     if ((dest != NULL && strcmp(job->dest, dest) != 0) &&
         (job->printer == NULL || dest == NULL ||
@@ -3705,7 +3708,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
 
     count ++;
 
-    DEBUG_printf(("get_jobs: count = %d\n", count));
+    LogMessage(L_DEBUG2, "get_jobs: count = %d", count);
 
    /*
     * Send the requested attributes for each job...
@@ -3767,7 +3770,7 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
 					/* Job URI... */
 
 
-  LogMessage(L_DEBUG2, "get_job_attrs(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "get_job_attrs(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -3882,7 +3885,7 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
 static void
 get_ppds(client_t *con)			/* I - Client connection */
 {
-  LogMessage(L_DEBUG2, "get_ppds(%d)\n", con->http.fd);
+  LogMessage(L_DEBUG2, "get_ppds(%p[%d])\n", con, con->http.fd);
 
  /*
   * Check policy...
@@ -3935,7 +3938,7 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
   int			need_history;	/* Need to send history collection? */
 
 
-  LogMessage(L_DEBUG2, "get_printer_attrs(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "get_printer_attrs(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -4058,7 +4061,7 @@ get_printers(client_t *con,		/* I - Client connection */
   printer_t		*iclass;	/* Implicit class */
 
 
-  LogMessage(L_DEBUG2, "get_printers(%d, %x)\n", con->http.fd, type);
+  LogMessage(L_DEBUG2, "get_printers(%p[%d], %x)\n", con, con->http.fd, type);
 
  /*
   * Check policy...
@@ -4248,7 +4251,7 @@ hold_job(client_t        *con,	/* I - Client connection */
   job_t			*job;		/* Job information */
 
 
-  LogMessage(L_DEBUG2, "hold_job(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "hold_job(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -4403,7 +4406,7 @@ move_job(client_t        *con,		/* I - Client connection */
   printer_t		*printer;	/* Printer */
 
 
-  LogMessage(L_DEBUG2, "move_job(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "move_job(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -4710,7 +4713,7 @@ print_job(client_t        *con,		/* I - Client connection */
   int			compression;	/* Document compression */
 
 
-  LogMessage(L_DEBUG2, "print_job(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "print_job(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -5534,7 +5537,7 @@ reject_jobs(client_t        *con,	/* I - Client connection */
   ipp_attribute_t	*attr;		/* printer-state-message text */
 
 
-  LogMessage(L_DEBUG2, "reject_jobs(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "reject_jobs(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -5637,7 +5640,7 @@ release_job(client_t        *con,	/* I - Client connection */
   job_t			*job;		/* Job information */
 
 
-  LogMessage(L_DEBUG2, "release_job(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "release_job(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -5786,7 +5789,7 @@ restart_job(client_t        *con,	/* I - Client connection */
   job_t			*job;		/* Job information */
 
 
-  LogMessage(L_DEBUG2, "restart_job(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "restart_job(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -5951,7 +5954,7 @@ send_document(client_t        *con,	/* I - Client connection */
   int			compression;	/* Type of compression */
 
 
-  LogMessage(L_DEBUG2, "send_document(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "send_document(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -6281,7 +6284,8 @@ static void
 send_ipp_error(client_t     *con,	/* I - Client connection */
                ipp_status_t status)	/* I - IPP status code */
 {
-  LogMessage(L_DEBUG2, "send_ipp_error(%d, %x)\n", con->http.fd, status);
+  LogMessage(L_DEBUG2, "send_ipp_error(%p[%d], %x)\n", con, con->http.fd,
+             status);
 
   LogMessage(L_DEBUG, "Sending error: %s", ippErrorString(status));
 
@@ -6320,7 +6324,7 @@ set_default(client_t        *con,	/* I - Client connection */
   printer_t		*printer;	/* Printer */
 
 
-  LogMessage(L_DEBUG2, "set_default(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "set_default(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -6407,7 +6411,7 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
   int			port;		/* Port portion of URI */
 
 
-  LogMessage(L_DEBUG2, "set_job_attrs(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "set_job_attrs(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -6745,7 +6749,7 @@ start_printer(client_t        *con,	/* I - Client connection */
   printer_t		*printer;	/* Printer data */
 
 
-  LogMessage(L_DEBUG2, "start_printer(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "start_printer(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -6835,7 +6839,7 @@ stop_printer(client_t        *con,	/* I - Client connection */
   ipp_attribute_t	*attr;		/* printer-state-message attribute */
 
 
-  LogMessage(L_DEBUG2, "stop_printer(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "stop_printer(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -6935,7 +6939,7 @@ validate_job(client_t        *con,	/* I - Client connection */
   printer_t		*printer;	/* Printer */
 
 
-  LogMessage(L_DEBUG2, "validate_job(%d, %s)\n", con->http.fd,
+  LogMessage(L_DEBUG2, "validate_job(%p[%d], %s)\n", con, con->http.fd,
              uri->values[0].string.text);
 
  /*
@@ -7085,5 +7089,5 @@ validate_user(job_t      *job,		/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.93 2004/10/04 20:24:16 mike Exp $".
+ * End of "$Id$".
  */

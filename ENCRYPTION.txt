@@ -1,5 +1,5 @@
-ENCRYPTION - CUPS v1.1.7 - 02/21/2001
--------------------------------------
+ENCRYPTION - CUPS v1.1.20 - 11/24/2003
+--------------------------------------
 
 This file describes the encryption support provided by CUPS.
 
@@ -17,15 +17,16 @@ LEGAL STUFF
 
 BEFORE USING THE ENCRYPTION SUPPORT, PLEASE VERIFY THAT IT IS
 LEGAL TO DO SO IN YOUR COUNTRY.  CUPS by itself doesn't include
-any encryption code, but it can link against the OpenSSL library
-which does.
+any encryption code, but it can link against the OpenSSL, GNU
+TLS, or CDSA libraries which do.
 
 
 OVERVIEW OF ENCRYPTION SUPPORT IN CUPS
 
 CUPS supports SSL/2.0, SSL/3.0, and TLS/1.0 encryption using
 keys as large as 128-bits.  Encryption support is provided via
-the OpenSSL library and some new hooks in the CUPS code.
+the OpenSSL, GNU TLS, or CDSA libraries and some new hooks in
+the CUPS code.
 
 CUPS provides support for dedicated (https) and "upgrade" (TLS)
 encryption of sessions.  The "HTTP Upgrade" method is described
@@ -79,19 +80,22 @@ to /etc/cups/cupsd.conf.
 
 BEFORE YOU BEGIN
 
-You'll need the OpenSSL library from:
+You'll need the OpenSSL, GNU TLS, or CDSA libraries from:
 
-    http://www.openssl.org
+    http://www.openssl.org/
+    http://www.gnutls.org/
+    http://www.intel.com/labs/archive/cdsa.htm
 
 
 CONFIGURING WITH ENCRYPTION SUPPORT
 
-Once you have the OpenSSL library installed, you'll need to
-configure CUPS to use it with the "--enable-ssl" option:
+Once you have the OpenSSL, GNU TLS, or CDSA libraries installed,
+you'll need to configure CUPS to use it with the "--enable-ssl"
+option:
 
     ./configure --enable-ssl
 
-If the OpenSSL stuff is not in a standard location, make sure to
+If the library stuff is not in a standard location, make sure to
 define the CFLAGS, CXXFLAGS, and LDFLAGS environment variables
 with the appropriate compiler and linker options first.
 

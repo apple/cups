@@ -1,9 +1,9 @@
 .\"
-.\" "$Id: backend.man,v 1.6.2.6 2004/06/29 13:15:10 mike Exp $"
+.\" "$Id$"
 .\"
 .\"   backend man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2004 by Easy Software Products.
+.\"   Copyright 1997-2005 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -15,13 +15,13 @@
 .\"       Attn: CUPS Licensing Information
 .\"       Easy Software Products
 .\"       44141 Airport View Drive, Suite 204
-.\"       Hollywood, Maryland 20636-3142 USA
+.\"       Hollywood, Maryland 20636 USA
 .\"
 .\"       Voice: (301) 373-9600
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH backend 1 "Common UNIX Printing System" "22 June 2000" "Easy Software Products"
+.TH backend 1 "Common UNIX Printing System" "8 October 2004" "Easy Software Products"
 .SH NAME
 backend \- cups backend transmission interfaces
 .SH SYNOPSIS
@@ -37,7 +37,11 @@ Backends must be capable of reading from a filename on the command-line
 or from the standard input, copying the standard input to a temporary file
 if required by the physical interface.
 .LP
-The command name (argv[0]) is set to the device URI of the destination printer.
+The command name (argv[0]) is set to the device URI of the
+destination printer. Starting with CUPS 1.1.22, any
+authentication information in argv[0] will be removed, so
+backend developers are urged to use the DEVICE_URI environment
+variable whenever authentication information is required.
 .SH ENVIRONMENT VARIABLES
 The following environment variables are defined by the CUPS server when
 executing the backend:
@@ -66,8 +70,10 @@ The root directory of the server.
 .TP 5
 DEVICE_URI
 .br
-The device-uri associated with the printer; this is provided for shell
-scripts which may not be able to get the passed argv[0] string.
+The device-uri associated with the printer; this is provided for
+shell scripts which may not be able to get the passed argv[0]
+string and for backends that require any authentication
+information which is not included in argv[0].
 .TP 5
 LANG
 .br
@@ -110,7 +116,7 @@ CUPS Software Administrators Manual,
 CUPS Software Programmers Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2004 by Easy Software Products, All Rights Reserved.
+Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: backend.man,v 1.6.2.6 2004/06/29 13:15:10 mike Exp $".
+.\" End of "$Id$".
 .\"

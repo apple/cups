@@ -1,9 +1,9 @@
 /*
- * "$Id: socket.c,v 1.17.2.18 2004/06/29 13:15:08 mike Exp $"
+ * "$Id$"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2004 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -53,6 +53,13 @@
 #  include <arpa/inet.h>
 #  include <netdb.h>
 #endif /* WIN32 */
+
+
+/*
+ * Local functions...
+ */
+
+void	print_backchannel(const unsigned char *buffer, int nbytes);
 
 
 /*
@@ -221,20 +228,24 @@ main(int  argc,			/* I - Number of command-line arguments (6 or 7) */
    /*
     * Now that we are "connected" to the port, ignore SIGTERM so that we
     * can finish out any page data the driver sends (e.g. to eject the
-    * current page...
+    * current page...  Only ignore SIGTERM if we are printing data from
+    * stdin (otherwise you can't cancel raw jobs...)
     */
 
+    if (argc < 7)
+    {
 #ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-    sigset(SIGTERM, SIG_IGN);
+      sigset(SIGTERM, SIG_IGN);
 #elif defined(HAVE_SIGACTION)
-    memset(&action, 0, sizeof(action));
+      memset(&action, 0, sizeof(action));
 
-    sigemptyset(&action.sa_mask);
-    action.sa_handler = SIG_IGN;
-    sigaction(SIGTERM, &action, NULL);
+      sigemptyset(&action.sa_mask);
+      action.sa_handler = SIG_IGN;
+      sigaction(SIGTERM, &action, NULL);
 #else
-    signal(SIGTERM, SIG_IGN);
+      signal(SIGTERM, SIG_IGN);
 #endif /* HAVE_SIGSET */
+    }
 
    /*
     * Finally, send the print file...
@@ -291,8 +302,11 @@ main(int  argc,			/* I - Number of command-line arguments (6 or 7) */
 	*/
 
 	if ((nbytes = recv(fd, buffer, sizeof(buffer), 0)) > 0)
+	{
 	  fprintf(stderr, "INFO: Received %d bytes of back-channel data!\n",
 	          nbytes);
+          print_backchannel((unsigned char *)buffer, nbytes);
+        }
       }
       else if (argc > 6)
 	fprintf(stderr, "INFO: Sending print file, %lu bytes...\n",
@@ -331,9 +345,12 @@ main(int  argc,			/* I - Number of command-line arguments (6 or 7) */
 	*/
 
 	if ((nbytes = recv(fd, buffer, sizeof(buffer), 0)) > 0)
+	{
 	  fprintf(stderr, "INFO: Received %d bytes of back-channel data!\n",
 	          nbytes);
-        else
+          print_backchannel((unsigned char *)buffer, nbytes);
+        }
+	else
 	  break;
       }
       else
@@ -359,5 +376,43 @@ main(int  argc,			/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.17.2.18 2004/06/29 13:15:08 mike Exp $".
+ * 'print_backchannel()' - Print the contents of a back-channel buffer.
+ */
+
+void
+print_backchannel(const unsigned char *buffer,	/* I - Data buffer */
+                  int                 nbytes)	/* I - Number of bytes */
+{
+  char	line[255],				/* Formatted line */
+	*lineptr;				/* Pointer into line */
+
+
+  for (lineptr = line; nbytes > 0; buffer ++, nbytes --)
+  {
+    if (*buffer < 0x20 || *buffer >= 0x7f)
+    {
+      snprintf(lineptr, sizeof(line) - (lineptr - line), "<%02X>", *buffer);
+      lineptr += strlen(lineptr);
+    }
+    else
+      *lineptr++ = *buffer;
+
+    if ((lineptr - line) > 72)
+    {
+      *lineptr = '\0';
+      fprintf(stderr, "DEBUG: DATA: %s\n", line);
+      lineptr = line;
+    }
+  }
+
+  if (lineptr > line)
+  {
+    *lineptr = '\0';
+    fprintf(stderr, "DEBUG: DATA: %s\n", line);
+  }
+}
+
+
+/*
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.33.2.25 2004/08/18 17:49:19 mike Exp $"
+ * "$Id$"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -25,8 +25,8 @@
  *   This file is subject to the Apple OS-Developed Software exception.
  */
 
-#ifndef _IPP_HTTP_H_
-#  define _IPP_HTTP_H_
+#ifndef _CUPS_HTTP_H_
+#  define _CUPS_HTTP_H_
 
 /*
  * Include necessary headers...
@@ -429,8 +429,8 @@ extern char		*httpAddrString(const http_addr_t *addr,
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */
-#endif /* !_IPP_HTTP_H_ */
+#endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.33.2.25 2004/08/18 17:49:19 mike Exp $".
+ * End of "$Id$".
  */

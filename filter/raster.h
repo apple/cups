@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.h,v 1.2.2.12 2004/12/23 05:37:35 mike Exp $"
+ * "$Id$"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -25,8 +25,8 @@
  *
  *   This code and any derivative of it may be used and distributed
  *   freely under the terms of the GNU General Public License when
- *   used with GNU Ghostscript or its derivatives.  Use of the code
- *   (or any derivative of it) with software other than GNU
+ *   used with GNU/GPL Ghostscript or its derivatives.  Use of the
+ *   code (or any derivative of it) with software other than GNU/GPL
  *   GhostScript (or its derivatives) is governed by the CUPS license
  *   agreement.
  *
@@ -49,7 +49,7 @@ extern "C" {
 /*
  * Every non-PostScript printer driver that supports raster images
  * should use the application/vnd.cups-raster image file format.
- * Since both the PostScript RIP (pstoraster, based on GNU
+ * Since both the PostScript RIP (pstoraster, based on GNU/GPL
  * Ghostscript) and Image RIP (imagetoraster, located in the filter
  * directory) use it, using this format saves you a lot of work.
  * Also, the PostScript RIP passes any printer options that are in
@@ -345,5 +345,5 @@ extern unsigned		cupsRasterWritePixels(cups_raster_t *r,
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h,v 1.2.2.12 2004/12/23 05:37:35 mike Exp $".
+ * End of "$Id$".
  */

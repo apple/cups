@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.34.2.27 2004/10/04 19:48:56 mike Exp $"
+ * "$Id$"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -81,8 +81,17 @@ void
 AddPrinterToClass(printer_t *c,	/* I - Class to add to */
                   printer_t *p)	/* I - Printer to add */
 {
+  int		i;		/* Looping var */
   printer_t	**temp;		/* Pointer to printer array */
 
+
+ /*
+  * See if this printer is already a member of the class...
+  */
+
+  for (i = 0; i < c->num_printers; i ++)
+    if (c->printers[i] == p)
+      return;
 
  /*
   * Allocate memory as needed...
@@ -480,9 +489,9 @@ LoadAllClasses(void)
       * Set the initial queue state...
       */
 
-      if (strcasecmp(value, "idle"))
+      if (!strcasecmp(value, "idle"))
         p->state = IPP_PRINTER_IDLE;
-      else if (strcasecmp(value, "stopped"))
+      else if (!strcasecmp(value, "stopped"))
         p->state = IPP_PRINTER_STOPPED;
     }
     else if (!strcasecmp(name, "StateMessage"))
@@ -502,7 +511,7 @@ LoadAllClasses(void)
       * Set the initial accepting state...
       */
 
-      if (strcasecmp(value, "yes") ||
+      if (!strcasecmp(value, "yes") ||
           !strcasecmp(value, "on") ||
           !strcasecmp(value, "true"))
         p->accepting = 1;
@@ -579,6 +588,7 @@ SaveAllClasses(void)
 {
   cups_file_t	*fp;			/* classes.conf file */
   char		temp[1024];		/* Temporary string */
+  char		backup[1024];		/* classes.conf.O file */
   printer_t	*pclass;		/* Current printer class */
   int		i;			/* Looping var */
   time_t	curtime;		/* Current time */
@@ -590,9 +600,17 @@ SaveAllClasses(void)
   */
 
   snprintf(temp, sizeof(temp), "%s/classes.conf", ServerRoot);
+  snprintf(backup, sizeof(backup), "%s/classes.conf.O", ServerRoot);
+
+  if (rename(temp, backup))
+    LogMessage(L_ERROR, "Unable to backup classes.conf - %s", strerror(errno));
+
   if ((fp = cupsFileOpen(temp, "w")) == NULL)
   {
     LogMessage(L_ERROR, "Unable to save classes.conf - %s", strerror(errno));
+
+    if (rename(backup, temp))
+      LogMessage(L_ERROR, "Unable to restore classes.conf - %s", strerror(errno));
     return;
   }
   else
@@ -659,6 +677,9 @@ SaveAllClasses(void)
     else
       cupsFilePuts(fp, "Accepting No\n");
 
+    cupsFilePrintf(fp, "JobSheets %s %s\n", pclass->job_sheets[0],
+                   pclass->job_sheets[1]);
+
     for (i = 0; i < pclass->num_printers; i ++)
       cupsFilePrintf(fp, "Printer %s\n", pclass->printers[i]->name);
 
@@ -710,5 +731,5 @@ UpdateImplicitClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.34.2.27 2004/10/04 19:48:56 mike Exp $".
+ * End of "$Id$".
  */

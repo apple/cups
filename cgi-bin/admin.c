@@ -1,9 +1,9 @@
 /*
- * "$Id: admin.c,v 1.22.2.27 2004/06/29 13:15:08 mike Exp $"
+ * "$Id$"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2004 by Easy Software Products.
+ *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -119,6 +119,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       do_printer_op(http, language, CUPS_REJECT_JOBS);
     else if (strcmp(op, "purge-jobs") == 0)
       do_printer_op(http, language, IPP_PURGE_JOBS);
+    else if (strcmp(op, "set-as-default") == 0)
+      do_printer_op(http, language, CUPS_SET_DEFAULT);
     else if (strcmp(op, "add-class") == 0)
       do_am_class(http, language, 0);
     else if (strcmp(op, "add-printer") == 0)
@@ -263,7 +265,7 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
   if (*ptr || ptr == name || strlen(name) > 127)
   {
     cgiSetVariable("ERROR", "The class name may only contain up to 127 printable "
-                            "characters.");
+                            "characters and may not contain spaces.");
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     return;
   }
@@ -574,7 +576,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
   if (*ptr || ptr == name || strlen(name) > 127)
   {
     cgiSetVariable("ERROR", "The printer name may only contain up to 127 printable "
-                            "characters.");
+                            "characters and may not contain spaces.");
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     return;
   }
@@ -1029,7 +1031,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 	 i > 0;
 	 i --, group ++)
     {
-      if (strcmp(group->name, "InstallableOptions") == 0)
+      if (strcmp(group->text, "InstallableOptions") == 0)
 	cgiSetVariable("GROUP",
 	               cupsLangString(language, CUPS_MSG_OPTIONS_INSTALLED));
       else
@@ -1545,6 +1547,8 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
     cgiCopyTemplateLang(stdout, TEMPLATES, "printer-reject.tmpl", getenv("LANG"));
   else if (op == IPP_PURGE_JOBS)
     cgiCopyTemplateLang(stdout, TEMPLATES, "printer-purge.tmpl", getenv("LANG"));
+  else if (op == CUPS_SET_DEFAULT)
+    cgiCopyTemplateLang(stdout, TEMPLATES, "printer-default.tmpl", getenv("LANG"));
 }
 
 
@@ -1597,5 +1601,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.22.2.27 2004/06/29 13:15:08 mike Exp $".
+ * End of "$Id$".
  */

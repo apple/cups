@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-# "$Id$"
+# "$Id: pstopxl 4076 2004-02-24 21:59:13Z mike $"
 #
-# CUPS raster filter script for Ghostscript.
+# CUPS PCL XL/PCL 6 filter script for Ghostscript.
 #
-# Copyright 2001-2005 by Easy Software Products.
+# Copyright 2001-2003 by Easy Software Products.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,27 +22,32 @@
 #
 
 # Installation directories...
-prefix=@prefix@
-exec_prefix=@exec_prefix@
-bindir=@bindir@
+prefix=/usr/local
+exec_prefix=${prefix}
+bindir=/usr/lib/cups/filter
 
 # Set the library/font path...
 GS_LIB="${CUPS_FONTPATH:=/usr/share/cups/fonts}"
 export GS_LIB
 
-# Options we use with Ghostscript...
-gsopts="-dQUIET -dDEBUG -dPARANOIDSAFER -dNOPAUSE -dBATCH"
-gsopts="$gsopts -dNOMEDIAATTRS -sDEVICE=cups -sstdout=%stderr"
-
-# See if we have a profile=n,n,n,n,n,n,n,n,n,n,n option...
-profile=""
-for option in $5; do
-    case $option in
-        profile=*)
-	    profile="<</cupsProfile(`echo $option | awk -F= '{print $2}'`)>>setpagedevice"
+# Determine the PCL XL/PCL 6 driver to use...
+if test "x$PPD" != x; then
+    colordevice=`grep '^*ColorDevice:' "$PPD" | awk -F: '{print $2}'`
+    case "$colordevice" in
+	*True* | *true*)
+	    device="pxlcolor"
+	    ;;
+	*)
+	    device="pxlmono"
 	    ;;
     esac
-done
+else
+    device="pxlmono"
+fi
+
+# Options we use with Ghostscript...
+gsopts="-dQUIET -dDEBUG -dPARANOIDSAFER -dNOPAUSE -dBATCH"
+gsopts="$gsopts -dNOMEDIAATTRS -sDEVICE=$device -sstdout=%stderr"
 
 # See if we have a filename on the command-line...
 if test -z "$6"; then
@@ -52,11 +57,11 @@ else
 fi
 
 echo INFO: Starting ESP Ghostscript 7.07.1... 1>&2
-echo DEBUG: Running $bindir/@GS@ $gsopts -sOUTPUTFILE="%stdout" -c"$profile" "$ifile" 1>&2
+echo DEBUG: Running $bindir/gsrip $gsopts -sOUTPUTFILE="%stdout" "$ifile" 1>&2
 
 # Now run Ghostscript...
-$bindir/@GS@ $gsopts -sOUTPUTFILE="%stdout" -c"$profile" "$ifile"
+$bindir/gsrip $gsopts -sOUTPUTFILE="%stdout" "$ifile"
 
 #
-# End of "$Id$".
+# End of "$Id: pstopxl 4076 2004-02-24 21:59:13Z mike $".
 #

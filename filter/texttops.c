@@ -1,9 +1,9 @@
 /*
- * "$Id: texttops.c,v 1.34.2.14 2004/06/29 13:15:09 mike Exp $"
+ * "$Id$"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2004 by Easy Software Products.
+ *   Copyright 1993-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -699,7 +699,9 @@ WriteProlog(const char *title,		/* I - Title of job */
     else
       j = 0;
 
-    if (ppd != NULL && j >= ppd->num_fonts)
+    if ((ppd != NULL && j >= ppd->num_fonts) ||
+        strncmp(fonts[i], "Courier", 7) == 0 ||
+	strcmp(fonts[i], "Symbol") == 0)
     {
      /*
       * Need to embed this font...
@@ -728,7 +730,9 @@ WriteProlog(const char *title,		/* I - Title of job */
     else
       j = 0;
 
-    if (ppd != NULL && j >= ppd->num_fonts)
+    if ((ppd != NULL && j >= ppd->num_fonts) ||
+        strncmp(fonts[i], "Courier", 7) == 0 ||
+	strcmp(fonts[i], "Symbol") == 0)
     {
      /*
       * Need to embed this font...
@@ -736,6 +740,8 @@ WriteProlog(const char *title,		/* I - Title of job */
 
       printf("%%%%BeginResource: font %s\n", fonts[i]);
 
+      /**** MRS: Need to use CUPS_FONTPATH env var! ****/
+      /**** Also look for Fontmap file or name.pfa, name.pfb... ****/
       snprintf(filename, sizeof(filename), "%s/fonts/%s", datadir, fonts[i]);
       if ((fp = fopen(filename, "rb")) != NULL)
       {
@@ -763,6 +769,8 @@ WriteProlog(const char *title,		/* I - Title of job */
     {
       if (Glyphs[Codes[i * 256 + ch]])
 	printf("/%s", Glyphs[Codes[i * 256 + ch]]);
+      else if (Codes[i * 256 + ch] > 255)
+        printf("/uni%04X", Codes[i * 256 + ch]);
       else
 	printf("/.notdef");
 
@@ -1299,5 +1307,5 @@ write_text(const char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c,v 1.34.2.14 2004/06/29 13:15:09 mike Exp $".
+ * End of "$Id$".
  */

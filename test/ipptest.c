@@ -1,9 +1,9 @@
 /*
- * "$Id: ipptest.c,v 1.8.2.9 2004/10/27 14:16:50 mike Exp $"
+ * "$Id$"
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2004 by Easy Software Products.
+ *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -111,6 +111,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
          const char *testfile)		/* I - Test file to use */
 {
   int		i;			/* Looping var */
+  int		version;		/* IPP version number to use */
   http_t	*http;			/* HTTP connection to server */
   char		method[HTTP_MAX_URI],	/* URI method */
 		userpass[HTTP_MAX_URI],	/* username:password */
@@ -166,8 +167,9 @@ do_tests(const char *uri,		/* I - URI to connect on */
   */
 
   printf("\"%s\":\n", testfile);
-  pass   = 1;
-  job_id = 0;
+  pass    = 1;
+  job_id  = 0;
+  version = 1;
 
   while (get_token(fp, token, sizeof(token)) != NULL)
   {
@@ -215,6 +217,15 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	*/
 
 	get_token(fp, name, sizeof(name));
+      }
+      else if (strcasecmp(token, "VERSION") == 0)
+      {
+       /*
+        * IPP version number for test...
+	*/
+
+	get_token(fp, temp, sizeof(temp));
+	sscanf(temp, "%*d.%d", &version);
       }
       else if (strcasecmp(token, "RESOURCE") == 0)
       {
@@ -387,6 +398,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
     * Submit the IPP request...
     */
 
+    request->request.op.version[1]   = version;
     request->request.op.operation_id = op;
     request->request.op.request_id   = 1;
 
@@ -534,6 +546,9 @@ get_operation(const char *name)
   for (i = 0; i < (sizeof(ipp_ops) / sizeof(ipp_ops[0])); i ++)
     if (strcasecmp(name, ipp_ops[i]) == 0)
       return ((ipp_op_t)i);
+
+  if (strcasecmp(name, "windows-ext") == 0)
+    return (IPP_PRIVATE);
 
   for (i = 0; i < (sizeof(cups_ops) / sizeof(cups_ops[0])); i ++)
     if (strcasecmp(name, cups_ops[i]) == 0)
@@ -807,5 +822,5 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 
 
 /*
- * End of "$Id: ipptest.c,v 1.8.2.9 2004/10/27 14:16:50 mike Exp $".
+ * End of "$Id$".
  */
