@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.23 1999/06/23 15:26:52 mike Exp $"
+ * "$Id: dirsvc.c,v 1.24 1999/06/23 15:33:14 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -148,7 +148,8 @@ void
 UpdateBrowseList(void)
 {
   int		i;			/* Looping var */
-  int		len;			/* Length of name string */
+  int		len,			/* Length of name string */
+		offset;			/* Offset in name string */
   int		bytes;			/* Number of bytes left */
   char		packet[1540];		/* Broadcast packet */
   cups_ptype_t	type;			/* Printer type */
@@ -224,6 +225,7 @@ UpdateBrowseList(void)
 
     if ((p = FindClass(name)) == NULL)
       if ((p = FindClass(resource + 9)) != NULL)
+      {
         if (strcasecmp(p->hostname, host) != 0)
 	{
 	 /*
@@ -240,6 +242,9 @@ UpdateBrowseList(void)
 
           p = NULL;
 	}
+      }
+      else
+        strcpy(name, resource + 9);
 
     if (p == NULL)
     {
@@ -273,6 +278,7 @@ UpdateBrowseList(void)
 
     if ((p = FindPrinter(name)) == NULL)
       if ((p = FindPrinter(resource + 10)) != NULL)
+      {
         if (strcasecmp(p->hostname, host) != 0)
 	{
 	 /*
@@ -289,6 +295,9 @@ UpdateBrowseList(void)
 
           p = NULL;
 	}
+      }
+      else
+        strcpy(name, resource + 10);
 
     if (p == NULL)
     {
@@ -329,7 +338,7 @@ UpdateBrowseList(void)
     * Loop through all available printers and create classes as needed...
     */
 
-    for (p = Printers, len = 0; p != NULL; p = p->next)
+    for (p = Printers, len = 0, offset = 0; p != NULL; p = p->next)
     {
      /*
       * Skip classes...
@@ -347,7 +356,7 @@ UpdateBrowseList(void)
       */
 
       if (len > 0 &&
-	  strncasecmp(p->name, name + 3, len) == 0 &&
+	  strncasecmp(p->name, name + offset, len) == 0 &&
 	  (p->name[len] == '\0' || p->name[len] == '@'))
       {
        /*
@@ -391,6 +400,7 @@ UpdateBrowseList(void)
 
         strncpy(name, p->name, len);
 	name[len] = '\0';
+	offset    = 0;
 
 	if (FindPrinter(name) != NULL)
 	{
@@ -402,6 +412,7 @@ UpdateBrowseList(void)
           strcpy(name, "Any");
           strncpy(name + 3, p->name, len);
 	  name[len + 3] = '\0';
+	  offset        = 3;
 	}
 
 	first = p;
@@ -479,5 +490,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.23 1999/06/23 15:26:52 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.24 1999/06/23 15:33:14 mike Exp $".
  */
