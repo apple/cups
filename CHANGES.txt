@@ -24,11 +24,30 @@ CHANGES IN CUPS V1.1.9
 	  PPD files should start much faster now.
 	- The lpinfo command did not return a non-zero status
 	  code if an error occurred.
-	- Fixed a bug in the scheduler's job status handling
-	  code that has been in there since 1.0; basically, all
-	  jobs shared the same status buffer, and the "buffer
-	  start" pointer could point to 1 byte before the
-	  beginning of the buffer.
+	- Fixed a bug in the scheduler's UpdateJob() function.
+	  Basically, all jobs shared the same status buffer, and
+	  the "buffer start" pointer could point to 1 byte
+	  before the beginning of the buffer.  The new
+	  implementation uses a separate buffer for each job and
+	  eliminates the buffer start bug.
+	- The IPP backend would send N copies of a document if
+	  the receiving device didn't support the copies
+	  attribute, even if the upstream driver already added
+	  the necessary commands to generate the copies.  This
+	  was most noticeable with HP printers where N * N
+	  copies would come out instead of N.
+	- The PostScript filter (pstops) did not properly handle
+	  duplex printing on inkjet printers that provide this
+	  option.  Copies would be put on the front and back
+	  sides of the duplexed page, and the filter did not
+	  output an even number of pages.
+	- The backends always caught SIGTERM after they
+	  connected to the printer.  This prevented raw jobs
+	  from being cancelled early.
+	- The cupsSetDests() function now removes any printers,
+	  instances, and options that are not defined by the
+	  user or server.  This should prevent old system-wide
+	  options from being used in individual user accounts.
 
 
 CHANGES IN CUPS V1.1.8

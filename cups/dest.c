@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.19 2001/06/06 17:54:32 mike Exp $"
+ * "$Id: dest.c,v 1.20 2001/06/06 18:39:19 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -318,16 +318,17 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
     strcpy(filename, CUPS_SERVERROOT "/lpoptions");
 
 #ifndef WIN32
-  if (getuid() == 0)
+  if (getuid())
   {
-    if ((home = getenv("CUPS_SERVERROOT")) == NULL)
-      home = CUPS_SERVERROOT;
+   /*
+    * Merge in server defaults...
+    */
 
-    snprintf(filename, sizeof(filename), "%s/lpoptions", home);
-  }
-  else
-  {
     num_temps = cups_get_dests(filename, num_temps, &temps);
+
+   /*
+    * Point to user defaults...
+    */
 
     if ((home = getenv("HOME")) != NULL)
       snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
@@ -339,7 +340,10 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
   */
 
   if ((fp = fopen(filename, "w")) == NULL)
+  {
+    cupsFreeDests(num_temps, temps);
     return;
+  }
 
  /*
   * Write each printer; each line looks like:
@@ -718,5 +722,5 @@ cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
 
 
 /*
- * End of "$Id: dest.c,v 1.19 2001/06/06 17:54:32 mike Exp $".
+ * End of "$Id: dest.c,v 1.20 2001/06/06 18:39:19 mike Exp $".
  */
