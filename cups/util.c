@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.89 2002/01/02 17:58:41 mike Exp $"
+ * "$Id: util.c,v 1.90 2002/01/25 22:24:38 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -1027,7 +1027,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
 
-  snprintf(buffer, sizeof(buffer), "ipp://localhost/printers/%s", name);
+  snprintf(buffer, sizeof(buffer), "ipp://localhost/printers/%s", printer);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, buffer);
 
@@ -1737,5 +1737,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.89 2002/01/02 17:58:41 mike Exp $".
+ * End of "$Id: util.c,v 1.90 2002/01/25 22:24:38 mike Exp $".
  */
