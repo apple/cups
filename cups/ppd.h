@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.9 1999/03/31 18:08:02 mike Exp $"
+ * "$Id: ppd.h,v 1.10 1999/03/31 18:10:22 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -213,8 +213,7 @@ extern void		ppdMarkDefaults(ppd_file_t *ppd);
 extern int		ppdMarkOption(ppd_file_t *ppd, char *keyword,
 			              char *option);
 extern ppd_choice_t	*ppdFindChoice(ppd_option_t *o, char *option);
-extern ppd_choice_t	*ppdFindMarkedChoice(ppd_file_t *ppd, char *keyword,
-			                     char *option);
+extern ppd_choice_t	*ppdFindMarkedChoice(ppd_file_t *ppd, char *keyword);
 extern ppd_option_t	*ppdFindOption(ppd_file_t *ppd, char *keyword);
 extern ppd_file_t	*ppdOpen(FILE *fp);
 extern ppd_file_t	*ppdOpenFd(int fd);
@@ -233,5 +232,5 @@ extern float		ppdPageWidth(ppd_file_t *ppd, char *name);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.9 1999/03/31 18:08:02 mike Exp $".
+ * End of "$Id: ppd.h,v 1.10 1999/03/31 18:10:22 mike Exp $".
  */
