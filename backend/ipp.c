@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.21 2000/02/10 00:57:52 mike Exp $"
+ * "$Id: ipp.c,v 1.22 2000/02/24 21:40:29 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -81,6 +81,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 		tbytes;		/* Total bytes written */
   char		buffer[8192];	/* Output buffer */
   int		copies;		/* Number of copies remaining */
+  const char	*content_type;	/* CONTENT_TYPE environment variable */
 
 
   if (argc == 1)
@@ -392,7 +393,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     options     = NULL;
     num_options = cupsParseOptions(argv[5], 0, &options);
 
-    if (cupsGetOption("raw", num_options, options))
+    if (cupsGetOption("raw", num_options, options) ||
+        ((content_type = getenv("CONTENT_TYPE")) != NULL &&
+         strcasecmp(content_type, "application/vnd.cups-raw") == 0))
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
         	   NULL, "application/vnd.cups-raw");
     else
@@ -661,5 +664,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.21 2000/02/10 00:57:52 mike Exp $".
+ * End of "$Id: ipp.c,v 1.22 2000/02/24 21:40:29 mike Exp $".
  */
