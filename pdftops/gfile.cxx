@@ -450,23 +450,7 @@ time_t getModTime(const char *fileName) {
 }
 
 GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) {
-#ifdef HAVE_LIBCUPS
-  char	filename[1024];	// Name of temporary file...
-  int	fd;		// File descriptor...
-
-
-  (void)ext;
-
-  // Use the CUPS temporary file function on all platforms...
-  if ((fd = cupsTempFd(filename, sizeof(filename))) < 0)
-    return (gFalse);
-
-  // Make the file descriptor a FILE *, and copy the temp filename...
-  *f    = fdopen(fd, mode);
-  *name = new GString(filename);
-
-  return (gTrue);
-#elif defined(VMS) || defined(__EMX__) || defined(WIN32) || defined(ACORN) || defined(MACOS)
+#if defined(VMS) || defined(__EMX__) || defined(WIN32) || defined(ACORN) || defined(MACOS)
   //---------- non-Unix ----------
   char *s;
 

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.94 2001/06/01 21:01:11 mike Exp $"
+dnl "$Id: configure.in,v 1.95 2001/06/22 19:21:47 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -338,6 +338,9 @@ case "$uname" in
 		AC_DEFINE(CUPS_STRFTIME_FORMAT, "%c")
 		;;
 esac
+
+dnl Checks for mkstemp function.
+AC_CHECK_FUNCS(mkstemp)
 
 dnl Checks for vsyslog function.
 AC_CHECK_FUNCS(vsyslog)
@@ -724,5 +727,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.94 2001/06/01 21:01:11 mike Exp $".
+dnl End of "$Id: configure.in,v 1.95 2001/06/22 19:21:47 mike Exp $".
 dnl
