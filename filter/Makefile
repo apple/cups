@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.41.2.10 2002/03/08 20:23:03 mike Exp $"
+# "$Id: Makefile,v 1.41.2.11 2002/03/12 20:39:22 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -69,7 +69,7 @@ depend:
 # Install all targets...
 #
 
-install:	all
+install:	all installhdrs
 	$(INSTALL_DIR) $(SERVERBIN)/filter
 	for file in $(TARGETS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/filter; \
@@ -81,6 +81,7 @@ install:	all
 		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .3`; \
 	fi
 	-if test $(LIBCUPSIMAGE) = "libcupsimage.3.dylib"; then \
+		$(STRIP) -x $(LIBDIR)/$(LIBCUPSIMAGE); \
 		$(RM) $(LIBDIR)/libcupsimage.dylib; \
 		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/libcupsimage.dylib; \
 	fi
@@ -253,5 +254,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.41.2.10 2002/03/08 20:23:03 mike Exp $".
+# End of "$Id: Makefile,v 1.41.2.11 2002/03/12 20:39:22 mike Exp $".
 #
