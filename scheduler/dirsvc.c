@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.48 2000/02/11 05:04:14 mike Exp $"
+ * "$Id: dirsvc.c,v 1.49 2000/03/10 16:56:01 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -27,6 +27,8 @@
  *   StopBrowsing()     - Stop sending and receiving broadcast information.
  *   UpdateBrowseList() - Update the browse lists for any new browse data.
  *   SendBrowseList()   - Send new browsing information.
+ *   StartPolling()     - Start polling servers as needed.
+ *   StopPolling()      - Stop polling servers as needed.
  */
 
 /*
@@ -474,7 +476,7 @@ SendBrowseList(void)
 				/* Browse data packet */
 
 
-  if (!Browsing)
+  if (!Browsing || BrowseInterval == 0)
     return;
 
  /*
@@ -542,5 +544,25 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.48 2000/02/11 05:04:14 mike Exp $".
+ * 'StartPolling()' - Start polling servers as needed.
+ */
+
+void
+StartPolling(void)
+{
+}
+
+
+/*
+ * 'StopPolling()' - Stop polling servers as needed.
+ */
+
+void
+StopPolling(void)
+{
+}
+
+
+/*
+ * End of "$Id: dirsvc.c,v 1.49 2000/03/10 16:56:01 mike Exp $".
  */

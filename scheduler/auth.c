@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.27 2000/03/09 15:42:29 mike Exp $"
+ * "$Id: auth.c,v 1.28 2000/03/10 16:56:00 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -290,7 +290,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
   for (i = NumLocations, loc = Locations; i > 0; i --, loc ++)
     if (loc->length > bestlen &&
-        strncmp(con->uri, loc->location, loc->length) == 0)
+        strncmp(con->uri, loc->location, loc->length) == 0 &&
+	loc->location[0] == '/')
     {
       best    = loc;
       bestlen = loc->length;
@@ -734,5 +735,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.27 2000/03/09 15:42:29 mike Exp $".
+ * End of "$Id: auth.c,v 1.28 2000/03/10 16:56:00 mike Exp $".
  */

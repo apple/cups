@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.h,v 1.8 2000/01/04 13:46:09 mike Exp $"
+ * "$Id: dirsvc.h,v 1.9 2000/03/10 16:56:01 mike Exp $"
  *
  *   Directory services definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -24,6 +24,29 @@
  */
 
 /*
+ * Relay structure...
+ */
+
+typedef struct
+{
+  ipmask_t		from;		/* Source address mask */
+  struct sockaddr_in	to;		/* Destination address */
+} dirsvc_relay_t;
+
+
+/*
+ * Polling structure...
+ */
+
+typedef struct
+{
+  char			hostname[1024];	/* Hostname */
+  int			port;		/* Port number */
+  int			pid;		/* Current poll server PID */
+} dirsvc_poll_t;
+
+
+/*
  * Globals...
  */
 
@@ -41,6 +64,16 @@ VAR int			Browsing	VALUE(TRUE),
 					/* Number of broadcast addresses */
 VAR struct sockaddr_in	Browsers[MAX_BROWSERS];
 					/* Broadcast addresses */
+VAR location_t		*BrowseACL	VALUE(NULL);
+					/* Browser access control list */
+VAR int			NumRelays	VALUE(0);
+					/* Number of broadcast relays */
+VAR dirsvc_relay_t	Relays[MAX_BROWSERS];
+					/* Broadcast relays */
+VAR int			NumPolled	VALUE(0);
+					/* Number of polled servers */
+VAR dirsvc_poll_t	Polled[MAX_BROWSERS];
+					/* Polled servers */
 
 
 /*
@@ -52,7 +85,10 @@ extern void	StopBrowsing(void);
 extern void	UpdateBrowseList(void);
 extern void	SendBrowseList(void);
 
+extern void	StartPolling(void);
+extern void	StopPolling(void);
+
 
 /*
- * End of "$Id: dirsvc.h,v 1.8 2000/01/04 13:46:09 mike Exp $".
+ * End of "$Id: dirsvc.h,v 1.9 2000/03/10 16:56:01 mike Exp $".
  */

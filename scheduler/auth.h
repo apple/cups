@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.h,v 1.8 2000/02/06 22:09:06 mike Exp $"
+ * "$Id: auth.h,v 1.9 2000/03/10 16:56:00 mike Exp $"
  *
  *   Authorization definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -43,7 +43,7 @@
 
 
 /*
- * HTTP authorization structures...
+ * HTTP access control structures...
  */
 
 typedef struct
@@ -109,5 +109,5 @@ extern http_status_t	IsAuthorized(client_t *con);
 
 
 /*
- * End of "$Id: auth.h,v 1.8 2000/02/06 22:09:06 mike Exp $".
+ * End of "$Id: auth.h,v 1.9 2000/03/10 16:56:00 mike Exp $".
  */

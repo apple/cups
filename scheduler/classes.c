@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.17 2000/03/09 19:47:32 mike Exp $"
+ * "$Id: classes.c,v 1.18 2000/03/10 16:56:01 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -286,7 +286,7 @@ LoadAllClasses(void)
   FILE		*fp;			/* classes.conf file */
   int		linenum;		/* Current line number */
   int		len;			/* Length of line */
-  char		line[HTTP_MAX_BUFFER],	/* Line from file */
+  char		line[1024],		/* Line from file */
 		name[256],		/* Parameter name */
 		*nameptr,		/* Pointer into name */
 		*value;			/* Pointer to value */
@@ -423,6 +423,17 @@ LoadAllClasses(void)
       else if (strcasecmp(value, "stopped") == 0)
         p->state = IPP_PRINTER_STOPPED;
     }
+    else if (strcmp(name, "StateMessage") == 0)
+    {
+     /*
+      * Set the initial queue state message...
+      */
+
+      while (isspace(*value))
+        value ++;
+
+      strcpy(p->state_message, value);
+    }
     else if (strcmp(name, "Accepting") == 0)
     {
      /*
@@ -519,7 +530,10 @@ SaveAllClasses(void)
     if (pclass->location[0])
       fprintf(fp, "Location %s\n", pclass->location);
     if (pclass->state == IPP_PRINTER_STOPPED)
+    {
       fputs("State Stopped\n", fp);
+      fprintf(fp, "StateMessage %s\n", pclass->state_message);
+    }
     else
       fputs("State Idle\n", fp);
     if (pclass->accepting)
@@ -538,5 +552,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.17 2000/03/09 19:47:32 mike Exp $".
+ * End of "$Id: classes.c,v 1.18 2000/03/10 16:56:01 mike Exp $".
  */

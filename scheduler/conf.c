@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.44 2000/02/25 12:41:39 mike Exp $"
+ * "$Id: conf.c,v 1.45 2000/03/10 16:56:01 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -38,6 +38,10 @@
 #include <pwd.h>
 #include <grp.h>
 #include <sys/resource.h>
+
+#ifdef HAVE_VSYSLOG
+#  include <syslog.h>
+#endif /* HAVE_VSYSLOG */
 
 
 /*
@@ -86,6 +90,7 @@ static var_t	variables[] =
   { "DefaultLanguage",	DefaultLanguage,	VAR_STRING,	sizeof(DefaultLanguage) },
   { "RIPCache",		RIPCache,		VAR_STRING,	sizeof(RIPCache) },
   { "TempDir",		TempDir,		VAR_STRING,	sizeof(TempDir) },
+  { "Printcap",		Printcap,		VAR_STRING,	sizeof(Printcap) },
   { "HostNameLookups",	&HostNameLookups,	VAR_BOOLEAN,	0 },
   { "Timeout",		&Timeout,		VAR_INTEGER,	0 },
   { "KeepAlive",	&KeepAlive,		VAR_BOOLEAN,	0 },
@@ -136,6 +141,7 @@ ReadConfiguration(void)
 
   CloseAllClients();
   StopListening();
+  StopPolling();
   StopBrowsing();
 
   if (Clients != NULL)
@@ -189,6 +195,7 @@ ReadConfiguration(void)
   strcpy(AccessLog, CUPS_LOGDIR "/access_log");
   strcpy(ErrorLog, CUPS_LOGDIR "/error_log");
   strcpy(PageLog, CUPS_LOGDIR "/page_log");
+  strcpy(Printcap, "/etc/printcap");
 
   if ((language = DEFAULT_LANGUAGE) == NULL)
     language = "en";
@@ -287,7 +294,10 @@ ReadConfiguration(void)
   BrowsePort       = ippPort();
   BrowseInterval   = DEFAULT_INTERVAL;
   BrowseTimeout    = DEFAULT_TIMEOUT;
+  BrowseACL        = NULL;
   NumBrowsers      = 0;
+  NumRelays        = 0;
+  NumPolled        = 0;
 
   NumListeners     = 0;
 
@@ -298,8 +308,8 @@ ReadConfiguration(void)
   if (MimeDatabase != NULL)
     mimeDelete(MimeDatabase);
 
-  JobHistory       = DEFAULT_HISTORY;
-  JobFiles         = DEFAULT_FILES;
+  JobHistory = DEFAULT_HISTORY;
+  JobFiles   = DEFAULT_FILES;
 
   if ((fp = fopen(ConfigurationFile, "r")) == NULL)
     return (0);
@@ -328,6 +338,13 @@ ReadConfiguration(void)
     snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, ServerBin);
     strcpy(ServerBin, directory);
   }
+
+#ifdef HAVE_VSYSLOG
+  if (strcmp(AccessLog, "syslog") == 0 ||
+      strcmp(ErrorLog, "syslog") == 0 ||
+      strcmp(PageLog, "syslog") == 0)
+    openlog("cupsd", LOG_PID | LOG_NOWAIT | LOG_NDELAY, LOG_LPR);
+#endif /* HAVE_VSYSLOG */
 
   LogMessage(L_DEBUG, "ReadConfiguration() ConfigurationFile=\"%s\"",
              ConfigurationFile);
@@ -395,6 +412,7 @@ ReadConfiguration(void)
 
   StartListening();
   StartBrowsing();
+  StartPolling();
 
  /*
   * Check for queued jobs...
@@ -410,17 +428,29 @@ ReadConfiguration(void)
  * 'read_configuration()' - Read a configuration file.
  */
 
-static int			/* O - 1 on success, 0 on failure */
-read_configuration(FILE *fp)	/* I - File to read from */
+static int				/* O - 1 on success, 0 on failure */
+read_configuration(FILE *fp)		/* I - File to read from */
 {
-  int	i;			/* Looping var */
-  int	linenum;		/* Current line number */
-  int	len;			/* Length of line */
-  char	line[HTTP_MAX_BUFFER],	/* Line from file */
-	name[256],		/* Parameter name */
-	*nameptr,		/* Pointer into name */
-	*value;			/* Pointer to value */
-  var_t	*var;			/* Current variable */
+  int		i;			/* Looping var */
+  int		linenum;		/* Current line number */
+  int		len;			/* Length of line */
+  char		line[HTTP_MAX_BUFFER],	/* Line from file */
+		name[256],		/* Parameter name */
+		*nameptr,		/* Pointer into name */
+		*value;			/* Pointer to value */
+  var_t		*var;			/* Current variable */
+  unsigned	address,		/* Address value */
+		netmask;		/* Netmask value */
+  int		ip[4],			/* IP address components */
+		ipcount,		/* Number of components provided */
+ 		mask[4];		/* IP netmask components */
+  static unsigned netmasks[4] =		/* Standard netmasks... */
+  {
+    0xff000000,
+    0xffff0000,
+    0xffffff00,
+    0xffffffff
+  };
 
 
  /*
@@ -541,6 +571,157 @@ read_configuration(FILE *fp)	/* I - File to read from */
         LogMessage(L_WARN, "Too many BrowseAddress directives at line %d.",
 	           linenum);
     }
+    else if (strcmp(name, "BrowseOrder") == 0)
+    {
+     /*
+      * "BrowseOrder Deny,Allow" or "BrowseOrder Allow,Deny"...
+      */
+
+      if (BrowseACL == NULL)
+        BrowseACL = AddLocation("CUPS_INTERNAL_BROWSE_ACL");
+
+      if (BrowseACL == NULL)
+        LogMessage(L_ERROR, "Unable to initialize browse access control list!");
+      else if (strncasecmp(value, "deny", 4) == 0)
+        BrowseACL->order_type = AUTH_ALLOW;
+      else if (strncasecmp(value, "allow", 5) == 0)
+        BrowseACL->order_type = AUTH_DENY;
+      else
+        LogMessage(L_ERROR, "Unknown BrowseOrder value %s on line %d.",
+	           value, linenum);
+    }
+    else if (strcmp(name, "BrowseAllow") == 0 ||
+             strcmp(name, "BrowseDeny") == 0)
+    {
+     /*
+      * BrowseAllow [From] host/ip...
+      * BrowseDeny [From] host/ip...
+      */
+
+      if (BrowseACL == NULL)
+        BrowseACL = AddLocation("CUPS_INTERNAL_BROWSE_ACL");
+
+      if (BrowseACL == NULL)
+        LogMessage(L_ERROR, "Unable to initialize browse access control list!");
+      else
+      {
+	if (strncasecmp(value, "from", 4) == 0)
+	{
+	 /*
+          * Strip leading "from"...
+	  */
+
+	  value += 4;
+
+	  while (isspace(*value))
+	    value ++;
+	}
+
+       /*
+	* Figure out what form the allow/deny address takes:
+	*
+	*    All
+	*    None
+	*    *.domain.com
+	*    .domain.com
+	*    host.domain.com
+	*    nnn.*
+	*    nnn.nnn.*
+	*    nnn.nnn.nnn.*
+	*    nnn.nnn.nnn.nnn
+	*    nnn.nnn.nnn.nnn/mm
+	*    nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
+	*/
+
+	if (strcasecmp(value, "all") == 0)
+	{
+	 /*
+          * All hosts...
+	  */
+
+          if (strcmp(name, "BrowseAllow") == 0)
+	    AllowIP(BrowseACL, 0, 0);
+	  else
+	    DenyIP(BrowseACL, 0, 0);
+	}
+	else  if (strcasecmp(value, "none") == 0)
+	{
+	 /*
+          * No hosts...
+	  */
+
+          if (strcmp(name, "BrowseAllow") == 0)
+	    AllowIP(BrowseACL, ~0, 0);
+	  else
+	    DenyIP(BrowseACL, ~0, 0);
+	}
+	else if (value[0] == '*' || value[0] == '.' || !isdigit(value[0]))
+	{
+	 /*
+          * Host or domain name...
+	  */
+
+	  if (value[0] == '*')
+	    value ++;
+
+          if (strcmp(name, "BrowseAllow") == 0)
+	    AllowHost(BrowseACL, value);
+	  else
+	    DenyHost(BrowseACL, value);
+	}
+	else
+	{
+	 /*
+          * One of many IP address forms...
+	  */
+
+          memset(ip, 0, sizeof(ip));
+          ipcount = sscanf(value, "%d.%d.%d.%d", ip + 0, ip + 1, ip + 2, ip + 3);
+	  address = (((((ip[0] << 8) | ip[1]) << 8) | ip[2]) << 8) | ip[3];
+
+          if ((value = strchr(value, '/')) != NULL)
+	  {
+	    value ++;
+	    memset(mask, 0, sizeof(mask));
+            switch (sscanf(value, "%d.%d.%d.%d", mask + 0, mask + 1,
+	                   mask + 2, mask + 3))
+	    {
+	      case 1 :
+	          netmask = (0xffffffff << (32 - mask[0])) & 0xffffffff;
+	          break;
+	      case 4 :
+	          netmask = (((((mask[0] << 8) | mask[1]) << 8) |
+		              mask[2]) << 8) | mask[3];
+                  break;
+	      default :
+        	  LogMessage(L_ERROR, "Bad netmask value %s on line %d.",
+	        	     value, linenum);
+		  netmask = 0xffffffff;
+		  break;
+	    }
+	  }
+	  else
+	    netmask = netmasks[ipcount - 1];
+
+          if (strcmp(name, "BrowseAllow") == 0)
+	    AllowIP(BrowseACL, address, netmask);
+	  else
+	    DenyIP(BrowseACL, address, netmask);
+	}
+      }
+    }
+    else if (strcmp(name, "BrowseRelay") == 0)
+    {
+     /*
+      * BrowseRelay source destination
+      */
+    }
+    else if (strcmp(name, "BrowsePoll") == 0)
+    {
+     /*
+      * BrowsePoll address[:port]
+      */
+    }
     else if (strcmp(name, "User") == 0)
     {
      /*
@@ -633,11 +814,13 @@ read_configuration(FILE *fp)	/* I - File to read from */
 	    if (strcasecmp(value, "true") == 0 ||
 	        strcasecmp(value, "on") == 0 ||
 		strcasecmp(value, "enabled") == 0 ||
+		strcasecmp(value, "yes") == 0 ||
 		atoi(value) != 0)
               *((int *)var->ptr) = TRUE;
 	    else if (strcasecmp(value, "false") == 0 ||
 	             strcasecmp(value, "off") == 0 ||
 		     strcasecmp(value, "disabled") == 0 ||
+		     strcasecmp(value, "no") == 0 ||
 		     strcasecmp(value, "0") == 0)
               *((int *)var->ptr) = FALSE;
 	    else
@@ -1019,5 +1202,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.44 2000/02/25 12:41:39 mike Exp $".
+ * End of "$Id: conf.c,v 1.45 2000/03/10 16:56:01 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.56 2000/03/09 19:47:33 mike Exp $"
+ * "$Id: printers.c,v 1.57 2000/03/10 16:56:01 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -34,6 +34,8 @@
  *   SortPrinters()      - Sort the printer list when a printer name is
  *                         changed.
  *   StopPrinter()       - Stop a printer from printing any jobs...
+ *   write_printcap()    - Write a pseudo-printcap file for older applications
+ *                         that need it...
  */
 
 /*
@@ -364,7 +366,7 @@ LoadAllPrinters(void)
   FILE		*fp;			/* printers.conf file */
   int		linenum;		/* Current line number */
   int		len;			/* Length of line */
-  char		line[HTTP_MAX_BUFFER],	/* Line from file */
+  char		line[1024],		/* Line from file */
 		name[256],		/* Parameter name */
 		*nameptr,		/* Pointer into name */
 		*value;			/* Pointer to value */
@@ -502,6 +504,17 @@ LoadAllPrinters(void)
       else if (strcasecmp(value, "stopped") == 0)
         p->state = IPP_PRINTER_STOPPED;
     }
+    else if (strcmp(name, "StateMessage") == 0)
+    {
+     /*
+      * Set the initial queue state message...
+      */
+
+      while (isspace(*value))
+        value ++;
+
+      strcpy(p->state_message, value);
+    }
     else if (strcmp(name, "Accepting") == 0)
     {
      /*
@@ -599,7 +612,10 @@ SaveAllPrinters(void)
     if (printer->device_uri[0])
       fprintf(fp, "DeviceURI %s\n", printer->device_uri);
     if (printer->state == IPP_PRINTER_STOPPED)
+    {
       fputs("State Stopped\n", fp);
+      fprintf(fp, "StateMessage %s\n", printer->state_message);
+    }
     else
       fputs("State Idle\n", fp);
     if (printer->accepting)
@@ -1268,8 +1284,8 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 
 
 /*
- * 'write_printcap()' - Write a pseudo-printcap file to /etc/printcap for
- *                      older applications that need it...
+ * 'write_printcap()' - Write a pseudo-printcap file for older applications
+ *                      that need it...
  */
 
 static void
@@ -1283,11 +1299,11 @@ write_printcap(void)
   * See if we have a printcap file; if not, don't bother writing it.
   */
 
-  if (access("/etc/printcap", 0))
+  if (!Printcap[0])
     return;
 
  /*
-  * Write a new /etc/printcap with the current list of printers. Each printer
+  * Write a new printcap with the current list of printers. Each printer
   * is put in the file as:
   *
   *    Printer1:
@@ -1297,7 +1313,7 @@ write_printcap(void)
   *    PrinterN:
   */
 
-  if ((fp = fopen("/etc/printcap", "w")) == NULL)
+  if ((fp = fopen(Printcap, "w")) == NULL)
     return;
 
   for (p = Printers; p != NULL; p = p->next)
@@ -1312,5 +1328,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.56 2000/03/09 19:47:33 mike Exp $".
+ * End of "$Id: printers.c,v 1.57 2000/03/10 16:56:01 mike Exp $".
  */
