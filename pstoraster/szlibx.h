@@ -1,4 +1,6 @@
-/* Copyright (C) 1995, 1996, 1997, 1998 Aladdin Enterprises.  All rights reserved.
+/*
+  Copyright 2001 by Easy Software Products.
+  Copyright 1995, 1996, 1997, 1998 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
   
@@ -22,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: szlibx.h,v 1.2 2000/03/08 23:15:30 mike Exp $ */
+/*$Id: szlibx.h,v 1.3 2001/05/14 14:11:58 mike Exp $ */
 /* zlib filter state definition */
 
 #ifndef szlibx_INCLUDED
@@ -49,14 +51,22 @@ typedef struct stream_zlib_state_s {
 /*
  * The state descriptor is public only to allow us to split up
  * the encoding and decoding filters.
+ *
+ * MRS - Had to split this up and move to source files to get it to
+ *       compile with AIX C 5.0...
  */
+#if 0
 extern_st(st_zlib_state);
 #define public_st_zlib_state()	/* in szlibc.c */\
   gs_public_st_ptrs1(st_zlib_state, stream_zlib_state,\
     "zlibEncode/Decode state", zlib_state_enum_ptrs, zlib_state_reloc_ptrs,\
     dynamic)
-extern const stream_template s_zlibD_template;
-extern const stream_template s_zlibE_template;
+#else
+extern gs_memory_struct_type_t st_zlib_state;
+#endif /* 0 */
+
+extern stream_template s_zlibD_template;
+extern stream_template s_zlibE_template;
 
 /* Shared procedures */
 stream_proc_set_defaults(s_zlib_set_defaults);

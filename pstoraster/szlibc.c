@@ -26,7 +26,7 @@
 #include <config.h>
 #ifdef HAVE_LIBZ
 
-/*$Id: szlibc.c,v 1.6 2001/01/22 15:03:56 mike Exp $ */
+/*$Id: szlibc.c,v 1.7 2001/05/14 14:11:58 mike Exp $ */
 /* Code common to zlib encoding and decoding streams */
 #include "std.h"
 #include "gserror.h"
@@ -41,7 +41,18 @@
 
 private_st_zlib_block();
 private_st_zlib_dynamic_state();
-public_st_zlib_state();
+/*public_st_zlib_state();*/
+
+private const gc_ptr_element_t zlib_state_enum_ptrs[] = {
+  GC_OBJ_ELT(stream_zlib_state, dynamic)
+};
+private const gc_struct_data_t zlib_state_reloc_ptrs = {
+  countof(zlib_state_enum_ptrs), 0, 0, zlib_state_enum_ptrs
+};
+gs_memory_struct_type_t st_zlib_state = {
+  sizeof(stream_zlib_state), "zlibEncode/Decode state", 0, 0,
+  basic_enum_ptrs, basic_reloc_ptrs, 0, &zlib_state_reloc_ptrs
+};
 
 /* Set defaults for stream parameters. */
 void
