@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.36 2002/09/25 18:07:19 mike Exp $"
+ * "$Id: usb.c,v 1.37 2002/09/25 18:09:18 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -83,9 +83,6 @@ int			/* O - Exit status */
 main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
      char *argv[])	/* I - Command-line arguments */
 {
-  char		uri[HTTP_MAX_URI],
-				/* Copy of device URI */
-		*options;	/* Pointer to options in URI */
   int		fp;		/* Print file */
   int		copies;		/* Number of copies to print */
   int		fd;		/* Parallel device */
@@ -150,18 +147,12 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   }
 
  /*
-  * Copy the device URI and remove any options...
-  */
-
-  strlcpy(uri, argv[0], sizeof(uri));
-
- /*
   * Open the USB port device...
   */
 
   do
   {
-    if ((fd = open_device(uri)) == -1)
+    if ((fd = open_device(argv[0])) == -1)
     {
       if (errno == EBUSY)
       {
@@ -176,7 +167,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       else
       {
 	fprintf(stderr, "ERROR: Unable to open USB device \"%s\": %s\n",
-	        uri, strerror(errno));
+	        argv[0], strerror(errno));
 	return (1);
       }
     }
@@ -635,5 +626,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb.c,v 1.36 2002/09/25 18:07:19 mike Exp $".
+ * End of "$Id: usb.c,v 1.37 2002/09/25 18:09:18 mike Exp $".
  */
