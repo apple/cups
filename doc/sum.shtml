@@ -287,16 +287,6 @@ when printing with the <CODE>lp</CODE> and <CODE>lpr</CODE> commands.
 
 <P>The following options apply when printing all types of files.
 
-<H3>Setting the Orientation</H3>
-
-<P>The <CODE>-o landscape</CODE> option will rotate the page 90 degrees
-to print in landscape orientation:
-
-<UL><PRE>
-<B>lp -o landscape filename ENTER</B>
-<B>lpr -o landscape filename ENTER</B>
-</PRE></UL>
-
 <!-- NEED 2in -->
 <H3>Selecting the Media Size, Type, and Source</H3>
 
@@ -342,15 +332,6 @@ most support the following options (case is not significant):
 <P>The actual options supported are defined in the printer's PPD file
 in the <CODE>PageSize</CODE>, <CODE>InputSlot</CODE>, and
 <CODE>MediaType</CODE> options.
-
-<H3>Viewing Options for a Specific Printer</H3>
-
-<P>You can display the supported options using the <CODE>lpoptions</CODE>
-command with the <CODE>-l</CODE> option, as follows:
-
-<UL><PRE>
-<B>lpoptions -p laserjet -l ENTER</B>
-</UL></PRE>
 
 <H3>Printing On Both Sides of the Paper</H3>
 
@@ -836,6 +817,25 @@ options by not specifying any new options on the command-line:
 media=A4 sides=two-sided-long-edge
 <B>lpoptions -p deskjet ENTER</B>
 media=Legal scaling=100
+</PRE></UL>
+
+<H2>Viewing Options for a Specific Printer</H2>
+
+<P>You can display the supported options using the <CODE>lpoptions</CODE>
+command with the <CODE>-l</CODE> option, as follows:
+
+<UL><PRE>
+<B>lpoptions -p laserjet -l ENTER</B>
+</UL></PRE>
+
+<H3>Setting the Orientation</H3>
+
+<P>The <CODE>-o landscape</CODE> option will rotate the page 90 degrees
+to print in landscape orientation:
+
+<UL><PRE>
+<B>lp -o landscape filename ENTER</B>
+<B>lpr -o landscape filename ENTER</B>
 </PRE></UL>
 
 <H2>Setting the Default Printer</H2>
