@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.18
 
+	- SECURITY FIX: The scheduler now provides a FileDevice
+	  directive to control whether new printers can be added
+	  using device URIs of the form "file:/filename".  The
+	  default is to not allow printers with these device
+	  URIs.
 	- The scheduler did not compute the cost of filters
 	  properly, nor did it choose a multi-filter solution
 	  with a lower cost than a single filter solution.

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.36.2.9 2002/12/13 16:33:20 mike Exp $"
+ * "$Id: conf.h,v 1.36.2.10 2002/12/17 22:09:25 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -132,6 +132,8 @@ VAR int			ClassifyOverride	VALUE(0),
 					/* Create AnyPrinter classes? */
 			HideImplicitMembers	VALUE(TRUE),
 					/* Hide implicit class members? */
+			FileDevice		VALUE(FALSE),
+					/* Allow file: devices? */
 			FilterLimit		VALUE(0),
 					/* Max filter cost at any time */
 			FilterLevel		VALUE(0),
@@ -181,5 +183,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.36.2.9 2002/12/13 16:33:20 mike Exp $".
+ * End of "$Id: conf.h,v 1.36.2.10 2002/12/17 22:09:25 mike Exp $".
  */

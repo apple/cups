@@ -1,5 +1,5 @@
 #
-# "$Id: cupsd.conf.in,v 1.2.2.7 2002/12/13 16:33:17 mike Exp $"
+# "$Id: cupsd.conf.in,v 1.2.2.8 2002/12/17 22:09:23 mike Exp $"
 #
 #   Sample configuration file for the Common UNIX Printing System (CUPS)
 #   scheduler.
@@ -133,6 +133,16 @@
 #
 
 #ErrorLog @CUPS_LOGDIR@/error_log
+
+#
+# FileDevice: determines whether the scheduler will allow new printers
+# to be added using device URIs of the form "file:/foo/bar". The default
+# is not to allow file devices due to the potential security vulnerability
+# and due to the fact that file devices do not support raw printing.
+#
+
+#FileDevice No
+
 
 #
 # FontPath: the path to locate all font files (currently only for pstoraster)
@@ -770,5 +780,5 @@ Allow From 127.0.0.1
 </Location>
 
 #
-# End of "$Id: cupsd.conf.in,v 1.2.2.7 2002/12/13 16:33:17 mike Exp $".
+# End of "$Id: cupsd.conf.in,v 1.2.2.8 2002/12/17 22:09:23 mike Exp $".
 #
