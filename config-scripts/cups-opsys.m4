@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-opsys.m4,v 1.5.2.8 2004/06/29 03:46:29 mike Exp $"
+dnl "$Id: cups-opsys.m4,v 1.5.2.9 2004/08/11 14:41:00 mike Exp $"
 dnl
 dnl   Operating system stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -25,9 +25,17 @@ dnl
 dnl Get the operating system and version number...
 uname=`uname`
 uversion=`uname -r | sed -e '1,$s/[[^0-9]]//g'`
-if test x$uname = xIRIX64; then
-	uname="IRIX"
-fi
+case "$uname" in
+	GNU* | GNU/*)
+		uname="GNU"
+		;;
+	IRIX*)
+		uname="IRIX"
+		;;
+	Linux*)
+		uname="Linux"
+		;;
+esac
 
 dnl Determine the correct username and group for this OS...
 AC_ARG_WITH(cups-user, [  --with-cups-user        set default user for CUPS],
@@ -87,5 +95,5 @@ AC_DEFINE_UNQUOTED(CUPS_DEFAULT_USER, "$CUPS_USER")
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_GROUP, "$CUPS_GROUP")
 
 dnl
-dnl "$Id: cups-opsys.m4,v 1.5.2.8 2004/06/29 03:46:29 mike Exp $"
+dnl "$Id: cups-opsys.m4,v 1.5.2.9 2004/08/11 14:41:00 mike Exp $"
 dnl

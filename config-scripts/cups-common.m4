@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.12.2.22 2004/07/02 04:51:45 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.12.2.23 2004/08/11 14:41:00 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -138,7 +138,7 @@ dnl Check OS version and use appropriate format string for strftime...
 AC_MSG_CHECKING(for correct format string to use with strftime)
 
 case "$uname" in
-	IRIX* | SunOS*)
+	IRIX | SunOS*)
 		# IRIX and SunOS
 		AC_MSG_RESULT(NULL)
 		AC_DEFINE(CUPS_STRFTIME_FORMAT, NULL)
@@ -160,9 +160,15 @@ dnl Check for vsyslog function.
 AC_CHECK_FUNCS(vsyslog)
 
 dnl Checks for signal functions.
-if test "$uname" != "Linux"; then
-	AC_CHECK_FUNCS(sigset)
-fi
+case "$uname" in
+	Linux | GNU)
+		# Do not use sigset on Linux or GNU HURD
+		;;
+	*)
+		# Use sigset on other platforms, if available
+		AC_CHECK_FUNCS(sigset)
+		;;
+esac
 
 AC_CHECK_FUNCS(sigaction)
 
@@ -214,5 +220,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.12.2.22 2004/07/02 04:51:45 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.12.2.23 2004/08/11 14:41:00 mike Exp $".
 dnl

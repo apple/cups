@@ -3,6 +3,7 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- Configure script changes for GNU/Hurd (STR #838)
 	- The lppasswd program was not installed properly by GNU
 	  install when the installer was not root (STR #836)
 	- Updated the cups-lpd man page (STR #843)

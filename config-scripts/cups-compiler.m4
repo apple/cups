@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4,v 1.9.2.18 2004/06/29 03:46:29 mike Exp $"
+dnl "$Id: cups-compiler.m4,v 1.9.2.19 2004/08/11 14:41:00 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -119,7 +119,7 @@ else
 				OPTIM="+z $OPTIM"
 			fi
 			;;
-        	IRIX*)
+        	IRIX)
 			if test -z "$OPTIM"; then
 				if test "x$with_optim" = x; then
 					OPTIM="-O2"
@@ -202,5 +202,5 @@ if test $uname = HP-UX; then
 fi
 
 dnl
-dnl End of "$Id: cups-compiler.m4,v 1.9.2.18 2004/06/29 03:46:29 mike Exp $".
+dnl End of "$Id: cups-compiler.m4,v 1.9.2.19 2004/08/11 14:41:00 mike Exp $".
 dnl

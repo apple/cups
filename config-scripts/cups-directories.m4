@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-directories.m4,v 1.5.2.8 2004/06/29 03:46:29 mike Exp $"
+dnl "$Id: cups-directories.m4,v 1.5.2.9 2004/08/11 14:41:00 mike Exp $"
 dnl
 dnl   Directory stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -115,8 +115,8 @@ if test x$rcdir = x; then
 			INITDDIR="/System/Library/StartupItems/PrintingServices"
 			;;
 
-		Linux*)
-			# Linux seems to choose an init.d directory at random...
+		Linux | GNU)
+			# Linux/HURD seems to choose an init.d directory at random...
 			if test -d /sbin/init.d; then
 				# SuSE
 				INITDIR="/sbin/init.d"
@@ -197,7 +197,7 @@ AC_SUBST(CUPS_REQUESTS)
 
 dnl Set the CUPS_LOCALE directory...
 case "$uname" in
-	Linux* | *BSD* | Darwin*)
+	Linux | GNU | *BSD* | Darwin*)
 		CUPS_LOCALEDIR="$datadir/locale"
 		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$datadir/locale")
 		;;
@@ -238,5 +238,5 @@ AC_SUBST(CUPS_FONTPATH)
 AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 
 dnl
-dnl End of "$Id: cups-directories.m4,v 1.5.2.8 2004/06/29 03:46:29 mike Exp $".
+dnl End of "$Id: cups-directories.m4,v 1.5.2.9 2004/08/11 14:41:00 mike Exp $".
 dnl
