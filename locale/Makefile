@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.2 1999/06/15 20:41:48 mike Exp $"
+# "$Id: Makefile,v 1.3 1999/06/21 18:47:44 mike Exp $"
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -63,10 +63,11 @@ install:
 #
 
 translate:	translate.o ../cups/libcups.a
+	echo Linking $<...
 	$(CC) $(LDFLAGS) -o translate translate.o $(LIBS)
 
 translate.o:	../cups/http.h
 
 #
-# End of "$Id: Makefile,v 1.2 1999/06/15 20:41:48 mike Exp $".
+# End of "$Id: Makefile,v 1.3 1999/06/21 18:47:44 mike Exp $".
 #
