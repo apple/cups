@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.16 2000/09/26 20:53:42 mike Exp $"
+ * "$Id: admin.c,v 1.17 2000/09/27 15:04:38 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -645,7 +645,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
   else if (strchr(var, '/') == NULL)
   {
     if (oldinfo &&
-        (attr = ippFindAttribute(response, "device-uri", IPP_TAG_URI)) != NULL)
+        (attr = ippFindAttribute(oldinfo, "device-uri", IPP_TAG_URI)) != NULL)
     {
      /*
       * Set the current device URI for the form to the old one...
@@ -1578,5 +1578,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.16 2000/09/26 20:53:42 mike Exp $".
+ * End of "$Id: admin.c,v 1.17 2000/09/27 15:04:38 mike Exp $".
  */
