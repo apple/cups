@@ -36,6 +36,103 @@ information for the Common UNIX Printing System<SUP>TM</SUP>
 	<LI><A HREF="#FAQ">E - Troubleshooting Common Problems</A>
 </UL>
 
+<H2>Notation Conventions</H2>
+
+Various font and syntax conventions are used in this guide. Examples and
+their meanings and uses are explained below:
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Example</TH>
+	<TD>&nbsp;&nbsp;&nbsp;</TD>
+	<TH>Description</TH>
+</TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR VALIGN="TOP">
+	<TD><CODE>lpstat</CODE><BR>
+	<CODE>lpstat(1)</CODE></TD>
+
+	<TD>&nbsp;&nbsp;&nbsp;</TD>
+
+	<TD>The names of commands; the first mention of a command or
+	function in a chapter is followed by a manual page section
+	number.</TD>
+</TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR VALIGN="TOP">
+	<TD><VAR>/var</VAR><BR>
+	<VAR>/usr/share/cups/data/testprint.ps</VAR></TD>
+
+	<TD>&nbsp;&nbsp;&nbsp;</TD>
+
+	<TD>File and directory names.</TD>
+</TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR VALIGN="TOP">
+	<TD NOWRAP><TT>Request ID is Printer-123</TT></TD>
+
+	<TD>&nbsp;&nbsp;&nbsp;</TD>
+
+	<TD>Screen output.</TD>
+</TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR VALIGN="TOP">
+	<TD NOWRAP><KBD>lp -d printer filename ENTER</KBD></TD>
+
+	<TD>&nbsp;&nbsp;&nbsp;</TD>
+
+	<TD>Literal user input; special keys like <KBD>ENTER</B></KBD> are
+	in ALL CAPS.</TD>
+</TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR VALIGN="TOP">
+	<TD>12.3</TD>
+
+	<TD>&nbsp;&nbsp;&nbsp;</TD>
+
+	<TD>Numbers in the text are written using the period (.) to indicate
+	the decimal point.</TD>
+</TR>
+</TABLE></CENTER>
+
+<!-- NEED 3in -->
+<H2>Abbreviations</H2>
+
+The following abbreviations are used throughout this manual:
+
+<UL>
+<DL>
+
+	<DT>kb
+	<DD>Kilobytes, or 1024 bytes<BR>&nbsp;
+
+	<DT>Mb
+	<DD>Megabytes, or 1048576 bytes<BR>&nbsp;
+
+	<DT>Gb
+	<DD>Gigabytes, or 1073741824 bytes<BR>&nbsp;
+
+</DL>
+</UL>
+
+<H2>Other References</H2>
+
+<UL>
+<DL>
+
+	<DT>CUPS Software Programmers Manual
+
+	<DD>A programmer guide for interfacing with and/or extending the CUPS
+	software.<BR>&nbsp;
+
+	<DT>CUPS Software Users Manual
+
+	<DD>An end-user guide for using the CUPS software.<BR>&nbsp;
+
+</DL>
+</UL>
+
+
 <EMBED SRC="printing-overview.shtml">
 
 <H1 ALIGN="RIGHT"><A NAME="BUILDING_INSTALLING">2 - Building and Installing CUPS</A></H1>
@@ -3485,6 +3582,17 @@ For more information please contact us at:
 	<LI>Telephone (M-F, 9-5 EST): +1.301.373.9603
 
 </UL>
+
+<H2>My Applications Don't See the Available Printers</H1>
+
+<P>Many applications read the <VAR>/etc/printcap</VAR> file to
+get a list of available printers.
+
+<P>The default CUPS configuration does not create the
+<VAR>/etc/printcap</VAR> file automatically. To enable automatic
+creation and updating of this file, use the
+<A HREF="#Printcap"><CODE>Printcap</CODE></A> directive described in
+<A HREF="#PRINTING_MANAGEMENT">Chapter 6, "Printing System Management"</A>.
 
 <H2>CUPS Doesn't Recognize My Username or Password!</H2>
 
