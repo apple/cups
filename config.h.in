@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.34 2000/12/21 13:45:21 mike Exp $"
+ * "$Id: config.h.in,v 1.35 2001/01/03 16:10:27 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -136,7 +136,12 @@
 
 #undef HAVE_LIBSSL
 
+/*
+ * Do we have <sys/ioctl.h>?
+ */
+
+#undef HAVE_SYS_IOCTL_H
 
 /*
- * End of "$Id: config.h.in,v 1.34 2000/12/21 13:45:21 mike Exp $".
+ * End of "$Id: config.h.in,v 1.35 2001/01/03 16:10:27 mike Exp $".
  */

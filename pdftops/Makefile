@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.4 2000/10/13 02:05:10 mike Exp $"
+# "$Id: Makefile,v 1.5 2001/01/03 16:10:29 mike Exp $"
 #
 #   pdftops filter Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -18,8 +18,7 @@ LIBOBJS	=	Decrypt.o GString.o gfile.o gmempp.o gmem.o parseargs.o \
 		Array.o Catalog.o Dict.o Error.o FontEncoding.o \
 		FontFile.o FormWidget.o Gfx.o GfxFont.o GfxState.o \
 		Lexer.o Link.o Object.o OutputDev.o Page.o Params.o \
-		Parser.o PDFDoc.o PSOutputDev.o SFont.o Stream.o \
-		T1Font.o TTFont.o XRef.o
+		Parser.o PDFDoc.o PSOutputDev.o Stream.o XRef.o
 OBJS	=	pdftops.o $(LIBOBJS)
 
 #
@@ -131,5 +130,5 @@ XRef.o:		gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h \
 $(OBJS):	../config.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.4 2000/10/13 02:05:10 mike Exp $".
+# End of "$Id: Makefile,v 1.5 2001/01/03 16:10:29 mike Exp $".
 #

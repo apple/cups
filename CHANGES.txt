@@ -1,5 +1,17 @@
-CHANGES.txt - 12/20/2000
+CHANGES.txt - 01/03/2000
 ------------------------
+
+CHANGES IN CUPS V1.1.5-2
+
+	- More configure script changes for *BSD.
+	- Added configure check for <sys/ioctl.h>, and use this
+	  check in backend/serial.c.
+	- The pdftops filter didn't need some X-specific files.
+
+
+CHANGES IN CUPS V1.1.5-1
+
+	- 
 
 CHANGES IN CUPS V1.1.5
 

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.63 2000/12/21 13:45:21 mike Exp $"
+dnl "$Id: configure.in,v 1.64 2001/01/03 16:10:27 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -256,6 +256,7 @@ AC_CHECK_HEADER(malloc.h,AC_DEFINE(HAVE_MALLOC_H))
 AC_CHECK_HEADER(shadow.h,AC_DEFINE(HAVE_SHADOW_H))
 AC_CHECK_HEADER(stddef.h,AC_DEFINE(HAVE_STDDEF_H))
 AC_CHECK_HEADER(stdlib.h,AC_DEFINE(HAVE_STDLIB_H))
+AC_CHECK_HEADER(sys/ioctl.h,AC_DEFINE(HAVE_SYS_IOCTL_H))
 
 dnl Checks for string functions.
 AC_CHECK_FUNCS(strdup)
@@ -428,11 +429,20 @@ fi
 
 dnl Fix "mandir" variable...
 if test "$mandir" = "\${prefix}/man" -a "$prefix" = "/"; then
-	if test "$uname" = "IRIX"; then
-		mandir="/usr/share/catman"
-	else
-		mandir="/usr/man"
-	fi
+	case "$uname" in
+        	FreeBSD* | NetBSD* | OpenBSD*)
+        		# *BSD
+        		mandir="/usr/share/man"
+        		;;
+        	IRIX*)
+        		# SGI IRIX
+        		mandir="/usr/share/catman"
+        		;;
+        	*)
+        		# All others
+        		mandir="/usr/man"
+        		;;
+	esac
 fi
 
 dnl Fix "fontpath" variable...
@@ -576,5 +586,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.63 2000/12/21 13:45:21 mike Exp $".
+dnl End of "$Id: configure.in,v 1.64 2001/01/03 16:10:27 mike Exp $".
 dnl

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.38 2000/09/29 17:42:54 mike Exp $"
+# "$Id: Makefile,v 1.39 2001/01/03 16:10:28 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -59,6 +59,13 @@ clean:
 #
 
 install:
+	-$(MKDIR) $(LIBDIR)
+	$(CHMOD) ugo+rx $(LIBDIR)
+	$(INSTALL_LIB) $(LIBCUPSIMAGE) $(LIBDIR)
+	-if test $(LIBCUPSIMAGE) != "libcupsimage.a" -a $(LIBCUPSIMAGE) != "libcupsimage.la"; then \
+		$(RM) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .2`; \
+		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .2`; \
+	fi
 	-$(MKDIR) $(SERVERBIN)/filter
 	$(CHMOD) ugo+rx $(SERVERBIN)
 	$(CHMOD) ugo+rx $(SERVERBIN)/filter
@@ -67,13 +74,6 @@ install:
 	$(CHMOD) ugo+rx $(INCLUDEDIR)
 	$(CHMOD) ugo+rx $(INCLUDEDIR)/cups
 	$(INSTALL_DATA) raster.h $(INCLUDEDIR)/cups
-	-$(MKDIR) $(LIBDIR)
-	$(CHMOD) ugo+rx $(LIBDIR)
-	$(INSTALL_LIB) $(LIBCUPSIMAGE) $(LIBDIR)
-	-if test $(LIBCUPSIMAGE) != "libcupsimage.a" -a $(LIBCUPSIMAGE) != "libcupsimage.la"; then \
-		$(RM) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .2`; \
-		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .2`; \
-	fi
 
 
 #
@@ -203,5 +203,5 @@ $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 
 #
-# End of "$Id: Makefile,v 1.38 2000/09/29 17:42:54 mike Exp $".
+# End of "$Id: Makefile,v 1.39 2001/01/03 16:10:28 mike Exp $".
 #
