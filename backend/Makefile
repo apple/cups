@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.23 2001/01/22 15:03:19 mike Exp $"
+# "$Id: Makefile,v 1.24 2001/01/24 17:10:15 mike Exp $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -23,6 +23,8 @@
 #
 
 include ../Makedefs
+
+OPTIM	=	-fullwarn -woff 1209,1506,1692 -g -n32 -mips3 -I../tiff -I../jpeg -I../png -I../zlib
 
 BACKENDS =	ipp lpd parallel serial socket usb
 TARGETS	=	betest $(BACKENDS)
@@ -137,5 +139,5 @@ usb.o:	../cups/cups.h ../Makedefs
 
 
 #
-# End of "$Id: Makefile,v 1.23 2001/01/22 15:03:19 mike Exp $".
+# End of "$Id: Makefile,v 1.24 2001/01/24 17:10:15 mike Exp $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.34 2001/01/22 15:03:19 mike Exp $"
+ * "$Id: ipp.c,v 1.35 2001/01/24 17:10:16 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -69,7 +69,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   FILE		*fp;		/* File to print */
   http_t	*http;		/* HTTP connection */
   ipp_t		*request,	/* IPP request */
-		*response;	/* IPP response */
+		*response,	/* IPP response */
+		*supported;	/* get-printer-attributes response */
   ipp_attribute_t *job_id;	/* job-id attribute */
   ipp_attribute_t *copies_sup;	/* copies-supported attribute */
   ipp_attribute_t *charset_sup;	/* charset-supported attribute */
@@ -87,6 +88,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
   int		version;	/* IPP version */
 
+  setbuf(stderr, NULL);
 
   if (argc == 1)
   {
@@ -207,7 +209,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   language    = cupsLangDefault();
   charset_sup = NULL;
   copies_sup  = NULL;
+  format_sup  = NULL;
   version     = 1;
+  supported   = NULL;
 
   do
   {
@@ -286,12 +290,15 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
       while ((status = httpUpdate(http)) == HTTP_CONTINUE);
 
+      if (supported)
+	ippDelete(supported);
+
       if (status == HTTP_OK)
       {
-	response = ippNew();
-	ippRead(http, response);
+	supported = ippNew();
+	ippRead(http, supported);
 
-	ipp_status = response->request.status.status_code;
+	ipp_status = supported->request.status.status_code;
 
 	if (ipp_status > IPP_OK_CONFLICT)
 	{
@@ -318,7 +325,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
             status = HTTP_ERROR;
 	  }
 	}
-	else if ((copies_sup = ippFindAttribute(response, "copies-supported",
+	else if ((copies_sup = ippFindAttribute(supported, "copies-supported",
 	                                        IPP_TAG_RANGE)) != NULL)
         {
 	 /*
@@ -330,18 +337,27 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	    copies_sup = NULL; /* No */
         }
 
-        charset_sup = ippFindAttribute(response, "charset-supported",
+        charset_sup = ippFindAttribute(supported, "charset-supported",
 	                               IPP_TAG_CHARSET);
-        format_sup  = ippFindAttribute(response, "document-format-supported",
+        format_sup  = ippFindAttribute(supported, "document-format-supported",
 	                               IPP_TAG_MIMETYPE);
+
+        if (format_sup)
+	{
+	  fprintf(stderr, "DEBUG: document-format-supported (%d values)\n",
+	          format_sup->num_values);
+	  for (i = 0; i < format_sup->num_values; i ++)
+	    fprintf(stderr, "DEBUG: [%d] = \"%s\"\n", i,
+	            format_sup->values[i].string.text);
+	}
       }
       else
       {
-        response = NULL;
+        supported = NULL;
 
 	if (status == HTTP_ERROR)
 	{
-          fprintf(stderr, "WARNING: Did not receive the IPP response (%d)\n",
+          fprintf(stderr, "WARNING: Did not receive the IPP supported (%d)\n",
 	          errno);
 	  status     = HTTP_OK;
 	  ipp_status = IPP_PRINTER_BUSY;
@@ -436,9 +452,6 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
         charset = "utf-8";
     }
   }
-
-  if (response)
-    ippDelete(response);
 
  /*
   * Then issue the print-job request...
@@ -647,6 +660,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
   httpClose(http);
 
+  if (supported)
+    ippDelete(supported);
+
  /*
   * Close and remove the temporary file if necessary...
   */
@@ -665,5 +681,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.34 2001/01/22 15:03:19 mike Exp $".
+ * End of "$Id: ipp.c,v 1.35 2001/01/24 17:10:16 mike Exp $".
  */
