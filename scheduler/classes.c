@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.45 2003/01/24 17:55:05 mike Exp $"
+ * "$Id: classes.c,v 1.46 2003/01/29 19:54:49 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -62,8 +62,8 @@ AddClass(const char *name)	/* I - Name of class */
     */
 
     c->type = CUPS_PRINTER_CLASS;
-    snprintf(c->uri, sizeof(c->uri), "ipp://%s:%d/classes/%s", ServerName,
-             ntohs(Listeners[0].address.sin_port), name);
+    SetStringf(&c->uri, "ipp://%s:%d/classes/%s", ServerName,
+               ntohs(Listeners[0].address.sin_port), name);
   }
 
   return (c);
@@ -446,9 +446,9 @@ LoadAllClasses(void)
     }
     
     else if (strcmp(name, "Info") == 0)
-      strlcpy(p->info, value, sizeof(p->info));
+      SetString(&p->info, value);
     else if (strcmp(name, "Location") == 0)
-      strlcpy(p->location, value, sizeof(p->location));
+      SetString(&p->location, value);
     else if (strcmp(name, "Printer") == 0)
     {
       if ((temp = FindPrinter(value)) == NULL)
@@ -467,8 +467,8 @@ LoadAllClasses(void)
 	temp->type        |= CUPS_PRINTER_REMOTE;
 	temp->browse_time = 2147483647;
 
-	strcpy(temp->location, "Location Unknown");
-	strcpy(temp->info, "No Information Available");
+	SetString(&temp->location, "Location Unknown");
+	SetString(&temp->info, "No Information Available");
 	temp->hostname[0] = '\0';
 
 	SetPrinterAttrs(temp);
@@ -521,7 +521,7 @@ LoadAllClasses(void)
       if (*valueptr)
         *valueptr++ = '\0';
 
-      strlcpy(p->job_sheets[0], value, sizeof(p->job_sheets[0]));
+      SetString(&p->job_sheets[0], value);
 
       while (isspace(*valueptr))
         valueptr ++;
@@ -533,7 +533,7 @@ LoadAllClasses(void)
 	if (*valueptr)
           *valueptr++ = '\0';
 
-	strlcpy(p->job_sheets[1], value, sizeof(p->job_sheets[1]));
+	SetString(&p->job_sheets[1], value);
       }
     }
     else if (strcmp(name, "AllowUser") == 0)
@@ -646,10 +646,10 @@ SaveAllClasses(void)
     else
       fprintf(fp, "<Class %s>\n", pclass->name);
 
-    if (pclass->info[0])
+    if (pclass->info)
       fprintf(fp, "Info %s\n", pclass->info);
 
-    if (pclass->location[0])
+    if (pclass->location)
       fprintf(fp, "Location %s\n", pclass->location);
 
     if (pclass->state == IPP_PRINTER_STOPPED)
@@ -687,5 +687,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.45 2003/01/24 17:55:05 mike Exp $".
+ * End of "$Id: classes.c,v 1.46 2003/01/29 19:54:49 mike Exp $".
  */

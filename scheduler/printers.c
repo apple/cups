@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.135 2003/01/24 17:55:06 mike Exp $"
+ * "$Id: printers.c,v 1.136 2003/01/29 19:54:52 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -92,18 +92,18 @@ AddPrinter(const char *name)	/* I - Name of printer */
   if ((p = calloc(1, sizeof(printer_t))) == NULL)
     return (NULL);
 
-  strlcpy(p->name, name, sizeof(p->name));
-  strlcpy(p->info, name, sizeof(p->info));
-  strlcpy(p->hostname, ServerName, sizeof(p->hostname));
-  snprintf(p->uri, sizeof(p->uri), "ipp://%s:%d/printers/%s", ServerName,
-           ntohs(Listeners[0].address.sin_port), name);
+  SetString(&p->name, name);
+  SetString(&p->info, name);
+  SetString(&p->hostname, ServerName);
+  SetStringf(&p->uri, "ipp://%s:%d/printers/%s", ServerName,
+             ntohs(Listeners[0].address.sin_port), name);
 
   p->state     = IPP_PRINTER_STOPPED;
   p->accepting = 0;
   p->filetype  = mimeAddType(MimeDatabase, "printer", name);
 
-  strcpy(p->job_sheets[0], "none");
-  strcpy(p->job_sheets[1], "none");
+  SetString(&p->job_sheets[0], "none");
+  SetString(&p->job_sheets[1], "none");
 
  /*
   * Insert the printer in the printer list alphabetically...
@@ -350,6 +350,17 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
 
   FreePrinterUsers(p);
   FreeQuotas(p);
+
+  ClearString(&p->uri);
+  ClearString(&p->hostname);
+  ClearString(&p->name);
+  ClearString(&p->location);
+  ClearString(&p->make_model);
+  ClearString(&p->info);
+  ClearString(&p->job_sheets[0]);
+  ClearString(&p->job_sheets[1]);
+  ClearString(&p->device_uri);
+  ClearString(&p->backend);
 
   free(p);
 
@@ -606,11 +617,11 @@ LoadAllPrinters(void)
       return;
     }
     else if (strcmp(name, "Info") == 0)
-      strlcpy(p->info, value, sizeof(p->info));
+      SetString(&p->info, value);
     else if (strcmp(name, "Location") == 0)
-      strlcpy(p->location, value, sizeof(p->location));
+      SetString(&p->location, value);
     else if (strcmp(name, "DeviceURI") == 0)
-      strlcpy(p->device_uri, value, sizeof(p->device_uri));
+      SetString(&p->device_uri, value);
     else if (strcmp(name, "State") == 0)
     {
      /*
@@ -655,7 +666,7 @@ LoadAllPrinters(void)
       if (*valueptr)
         *valueptr++ = '\0';
 
-      strlcpy(p->job_sheets[0], value, sizeof(p->job_sheets[0]));
+      SetString(&p->job_sheets[0], value);
 
       while (isspace(*valueptr))
         valueptr ++;
@@ -667,7 +678,7 @@ LoadAllPrinters(void)
 	if (*valueptr)
           *valueptr++ = '\0';
 
-	strlcpy(p->job_sheets[1], value, sizeof(p->job_sheets[1]));
+	SetString(&p->job_sheets[1], value);
       }
     }
     else if (strcmp(name, "AllowUser") == 0)
@@ -781,13 +792,13 @@ SaveAllPrinters(void)
     else
       fprintf(fp, "<Printer %s>\n", printer->name);
 
-    if (printer->info[0])
+    if (printer->info)
       fprintf(fp, "Info %s\n", printer->info);
 
-    if (printer->location[0])
+    if (printer->location)
       fprintf(fp, "Location %s\n", printer->location);
 
-    if (printer->device_uri[0])
+    if (printer->device_uri)
       fprintf(fp, "DeviceURI %s\n", printer->device_uri);
 
     if (printer->state == IPP_PRINTER_STOPPED)
@@ -996,9 +1007,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME, "printer-name", NULL,
                p->name);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-location",
-               NULL, p->location);
+               NULL, p->location ? p->location : "");
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-info",
-               NULL, p->info);
+               NULL, p->info ? p->info : "");
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-more-info",
                NULL, p->uri);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
@@ -1073,7 +1084,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
     * Setup the job-sheets-supported and job-sheets-default attributes...
     */
 
-    if (Classification[0] && !ClassifyOverride)
+    if (Classification && !ClassifyOverride)
       attr = ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
                 	  "job-sheets-supported", NULL, Classification);
     else
@@ -1084,7 +1095,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
       LogMessage(L_EMERG, "SetPrinterAttrs: Unable to allocate memory for "
                           "job-sheets-supported attribute: %s!",
 	         strerror(errno));
-    else if (!Classification[0] || ClassifyOverride)
+    else if (!Classification || ClassifyOverride)
     {
       attr->values[0].string.text = strdup("none");
 
@@ -1099,9 +1110,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
       if (attr != NULL)
       {
-	attr->values[0].string.text = strdup(Classification[0] ?
+	attr->values[0].string.text = strdup(Classification ?
 	                                     Classification : p->job_sheets[0]);
-	attr->values[1].string.text = strdup(Classification[0] ?
+	attr->values[1].string.text = strdup(Classification ?
 	                                     Classification : p->job_sheets[1]);
       }
     }
@@ -1179,7 +1190,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
       * URI so it doesn't have a username or password in it...
       */
 
-      if (strstr(p->device_uri, "://") != NULL)
+      if (!p->device_uri)
+        strcpy(uri, "file:/dev/null");
+      else if (strstr(p->device_uri, "://") != NULL)
       {
        /*
         * http://..., ipp://..., etc.
@@ -1198,7 +1211,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
         * file:..., serial:..., etc.
 	*/
 
-        strcpy(uri, p->device_uri);
+        strlcpy(uri, p->device_uri, sizeof(uri));
       }
 
       ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "device-uri", NULL,
@@ -1235,11 +1248,11 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	                "pages-per-minute", ppd->throughput);
 
         if (ppd->nickname)
-          strlcpy(p->make_model, ppd->nickname, sizeof(p->make_model));
+          SetString(&p->make_model, ppd->nickname);
 	else if (ppd->modelname)
-          strlcpy(p->make_model, ppd->modelname, sizeof(p->make_model));
+          SetString(&p->make_model, ppd->modelname);
 	else
-	  strcpy(p->make_model, "Bad PPD File");
+	  SetString(&p->make_model, "Bad PPD File");
 
 	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
                      "printer-make-and-model", NULL, p->make_model);
@@ -1412,7 +1425,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	           ServerRoot, p->name);
 	  AddPrinterFilter(p, filename);
 	}
-	else if (strncmp(p->device_uri, "ipp://", 6) == 0 &&
+	else if (p->device_uri &&
+	         strncmp(p->device_uri, "ipp://", 6) == 0 &&
 	         (strstr(p->device_uri, "/printers/") != NULL ||
 		  strstr(p->device_uri, "/classes/") != NULL))
         {
@@ -1851,7 +1865,7 @@ WritePrintcap(void)
 	  fprintf(fp, "%s:\\\n"
 	              "\t:bsdaddr=%s,%s:\\\n"
 		      "\t:description=%s:\n",
-		  p->name, ServerName, p->name, p->info);
+		  p->name, ServerName, p->name, p->info ? p->info : "");
         break;
   }
 
@@ -1973,10 +1987,10 @@ write_irix_config(printer_t *p)	/* I - Printer to update */
   {
     fprintf(fp, "Printer Class      | %s\n",
             (p->type & CUPS_PRINTER_COLOR) ? "ColorPostScript" : "MonoPostScript");
-    fprintf(fp, "Printer Model      | %s\n", p->make_model);
-    fprintf(fp, "Location Code      | %s\n", p->location);
-    fprintf(fp, "Physical Location  | %s\n", p->info);
-    fprintf(fp, "Port Path          | %s\n", p->device_uri);
+    fprintf(fp, "Printer Model      | %s\n", p->make_model ? p->make_model : "");
+    fprintf(fp, "Location Code      | %s\n", p->location ? p->location : "");
+    fprintf(fp, "Physical Location  | %s\n", p->info ? p->info : "");
+    fprintf(fp, "Port Path          | %s\n", p->device_uri ? p->device_uri : "");
     fprintf(fp, "Config Path        | /var/spool/lp/pod/%s.config\n", p->name);
     fprintf(fp, "Active Status Path | /var/spool/lp/pod/%s.status\n", p->name);
     fputs("Status Update Wait | 10 seconds\n", fp);
@@ -2020,7 +2034,8 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
               (p->state == IPP_PRINTER_PROCESSING) ? "Busy" :
                                                      "Faulted");
       fprintf(fp, "Information        | 01 00 00 | %s\n", CUPS_SVERSION);
-      fprintf(fp, "Information        | 02 00 00 | Device URI: %s\n", p->device_uri);
+      fprintf(fp, "Information        | 02 00 00 | Device URI: %s\n",
+              p->device_uri ? p->device_uri : "");
       fprintf(fp, "Information        | 03 00 00 | %s jobs\n",
               p->accepting ? "Accepting" : "Not accepting");
       fprintf(fp, "Information        | 04 00 00 | %s\n", p->state_message);
@@ -2118,5 +2133,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.135 2003/01/24 17:55:06 mike Exp $".
+ * End of "$Id: printers.c,v 1.136 2003/01/29 19:54:52 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.181 2003/01/24 21:11:51 mike Exp $"
+ * "$Id: job.c,v 1.182 2003/01/29 19:54:51 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -95,7 +95,7 @@ AddJob(int        priority,	/* I - Job priority */
 
   job->id       = NextJobId ++;
   job->priority = priority;
-  strlcpy(job->dest, dest, sizeof(job->dest));
+  SetString(&job->dest, dest);
 
   NumJobs ++;
 
@@ -596,20 +596,20 @@ LoadAllJobs(void)
 	if (strncmp(resource, "/classes/", 9) == 0)
 	{
 	  p = AddClass(resource + 9);
-	  strcpy(p->make_model, "Remote Class on unknown");
+	  SetString(&p->make_model, "Remote Class on unknown");
 	}
 	else
 	{
 	  p = AddPrinter(resource + 10);
-	  strcpy(p->make_model, "Remote Printer on unknown");
+	  SetString(&p->make_model, "Remote Printer on unknown");
 	}
 
         p->state       = IPP_PRINTER_STOPPED;
 	p->type        |= CUPS_PRINTER_REMOTE;
 	p->browse_time = 2147483647;
 
-	strcpy(p->location, "Location Unknown");
-	strcpy(p->info, "No Information Available");
+	SetString(&p->location, "Location Unknown");
+	SetString(&p->info, "No Information Available");
 	p->hostname[0] = '\0';
 
 	SetPrinterAttrs(p);
@@ -626,7 +626,7 @@ LoadAllJobs(void)
 	continue;
       }
 
-      strlcpy(job->dest, dest, sizeof(job->dest));
+      SetString(&job->dest, dest);
 
       job->sheets     = ippFindAttribute(job->attrs, "job-media-sheets-completed",
                                          IPP_TAG_INTEGER);
@@ -636,12 +636,10 @@ LoadAllJobs(void)
       job->priority = attr->values[0].integer;
 
       attr = ippFindAttribute(job->attrs, "job-name", IPP_TAG_NAME);
-      strlcpy(job->title, attr->values[0].string.text,
-              sizeof(job->title));
+      SetString(&job->title, attr->values[0].string.text);
 
       attr = ippFindAttribute(job->attrs, "job-originating-user-name", IPP_TAG_NAME);
-      strlcpy(job->username, attr->values[0].string.text,
-              sizeof(job->username));
+      SetString(&job->username, attr->values[0].string.text);
 
      /*
       * Insert the job into the array, sorting by job priority and ID...
@@ -776,7 +774,7 @@ MoveJob(int        id,		/* I - Job ID */
       if (current->state->values[0].integer >= IPP_JOB_PROCESSING)
         break;
 
-      strlcpy(current->dest, dest, sizeof(current->dest));
+      SetString(&current->dest, dest);
       current->dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_REMOTE |
                                   CUPS_PRINTER_IMPLICIT);
 
@@ -1574,7 +1572,7 @@ StartJob(int       id,		/* I - Job ID */
   else
     class_name[0] = '\0';
 
-  if (Classification[0] && !banner_page)
+  if (Classification && !banner_page)
   {
     if ((attr = ippFindAttribute(current->attrs, "job-sheets",
                                  IPP_TAG_NAME)) == NULL)
@@ -3376,5 +3374,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.181 2003/01/24 21:11:51 mike Exp $".
+ * End of "$Id: job.c,v 1.182 2003/01/29 19:54:51 mike Exp $".
  */
