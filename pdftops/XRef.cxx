@@ -527,6 +527,9 @@ GBool XRef::checkEncrypted(GString *ownerPassword, GString *userPassword) {
 	} else {
 	  keyLength = 5;
 	}
+	if (keyLength > 16) {
+	  keyLength = 16;
+	}
 	permFlags = permissions.getInt();
 	if (encVersion >= 1 && encVersion <= 2 &&
 	    encRevision >= 2 && encRevision <= 3) {
