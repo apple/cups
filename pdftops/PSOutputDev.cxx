@@ -678,7 +678,9 @@ void PSOutputDev::setupFont(GfxFont *font) {
       writePS((i == 0) ? "[ " : "  ");
       for (j = 0; j < 8; ++j) {
 	charName = font->getCharName(i+j);
-	writePS("/%s", charName ? charName : (i + j) == 32 ? "space" : ".notdef");
+	if ((!charName || strcmp(charName, ".notdef") == 0) && (i + j) == 32)
+	  charName = "space";
+	writePS("/%s", charName ? charName : ".notdef");
       }
       writePS((i == 256-8) ? "]\n" : "\n");
     }

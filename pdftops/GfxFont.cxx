@@ -106,7 +106,7 @@ GfxFont::GfxFont(const char *tag1, Ref id1, Dict *fontDict) {
   // without embedding them, so munge the names into the equivalent
   // PostScript names.  This is a kludge -- it would be nice if Adobe
   // followed their own spec.
-  if (type == fontTrueType) {
+  if (type == fontTrueType && name) {
     p = name->getCString();
     name2 = NULL;
     if (!strncmp(p, "Arial", 5)) {
@@ -433,7 +433,7 @@ void GfxFont::getEncAndWidths(Dict *fontDict, BuiltinFont *builtinFont,
   obj1.free();
 
   // check embedded or external font file for base encoding
-  if ((type == fontType1 || type == fontType1C) &&
+  if ((type == fontType1 || type == fontType1C || type == fontTrueType) &&
       (extFontFile || embFontID.num >= 0)) {
     if (extFontFile)
       buf = readExtFontFile(&len);
@@ -442,8 +442,10 @@ void GfxFont::getEncAndWidths(Dict *fontDict, BuiltinFont *builtinFont,
     if (buf) {
       if (type == fontType1)
 	fontFile = new Type1FontFile(buf, len);
-      else
+      else if (type == fontType1C)
 	fontFile = new Type1CFontFile(buf, len);
+      else
+	fontFile = new TrueTypeFontFile(buf, len);
       if (fontFile->getName()) {
 	if (embFontName)
 	  delete embFontName;
@@ -601,6 +603,8 @@ void GfxFont::makeWidths(Dict *fontDict, FontEncoding *builtinEncoding,
       if ((charName = encoding->getCharName(code)) &&
 	  (code2 = builtinEncoding->getCharCode(charName)) >= 0)
 	widths[code] = builtinWidths[code2] * 0.001;
+      else
+	widths[code] = builtinWidths[' '] * 0.001;
     }
 
   // get widths from font dict
