@@ -20,6 +20,8 @@
   the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
   does not depend on any other GNU software.
 */
+#include <config.h>
+#ifdef HAVE_LIBJPEG
 
 /* sdctc.c */
 /* Code common to DCT encoding and decoding streams */
@@ -36,3 +38,4 @@ ENUM_PTRS_END
 private RELOC_PTRS_BEGIN(dct_reloc_ptrs) {
 	RELOC_CONST_STRING_PTR(stream_DCT_state, Markers);
 } RELOC_PTRS_END
+#endif /* HAVE_LIBJPEG */

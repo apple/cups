@@ -20,7 +20,8 @@
   the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
   does not depend on any other GNU software.
 */
-
+#include <config.h>
+#ifdef HAVE_LIBJPEG
 /* sjpegerr.c */
 /* IJG error message table for Ghostscript. */
 #include "stdio_.h"
@@ -83,3 +84,4 @@ const char * const *
 gs_jpeg_message_table (void)
 {	return jpeg_std_message_table;
 }
+#endif

@@ -20,7 +20,8 @@
   the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
   does not depend on any other GNU software.
 */
-
+#include <config.h>
+#ifdef HAVE_LIBJPEG
 /* sjpegd.c */
 /* Interface routines for IJG decoding code. */
 #include "stdio_.h"
@@ -87,3 +88,4 @@ gs_jpeg_finish_decompress (stream_DCT_state *st)
 		return_error(gs_jpeg_log_error(st));
 	return (int) jpeg_finish_decompress(&st->data.decompress->dinfo);
 }
+#endif

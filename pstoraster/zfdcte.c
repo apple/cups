@@ -20,6 +20,8 @@
   the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
   does not depend on any other GNU software.
 */
+#include <config.h>
+#ifdef HAVE_LIBJPEG
 
 /* zfdcte.c */
 /* DCTEncode filter creation */
@@ -265,3 +267,4 @@ BEGIN_OP_DEFS(zfdcte_op_defs) {
 		op_def_begin_filter(),
 	{"2DCTEncode", zDCTE},
 END_OP_DEFS(0) }
+#endif /* HAVE_LIBJPEG */

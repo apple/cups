@@ -20,6 +20,8 @@
   the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
   does not depend on any other GNU software.
 */
+#include <config.h>
+#ifdef HAVE_LIBJPEG
 
 /* zfdctc.c */
 /* Common code for DCT filter creation */
@@ -367,3 +369,4 @@ zfdct_byte_params(const ref *op, int start, int count, UINT8 *pvals)
 	}
 	return 0;
 }
+#endif /* HAVE_LIBJPEG */

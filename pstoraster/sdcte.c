@@ -20,6 +20,8 @@
   the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
   does not depend on any other GNU software.
 */
+#include <config.h>
+#ifdef HAVE_LIBJPEG
 
 /* sdcte.c */
 /* DCT encoding filter stream */
@@ -168,3 +170,4 @@ const stream_template s_DCTE_template =
 };
 
 #undef ss
+#endif /* HAVE_LIBJPEG */
