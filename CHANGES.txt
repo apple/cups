@@ -44,6 +44,9 @@ CHANGES IN CUPS V1.1.13
 	- The cupsaddsmb utility now uses the -c option with
 	  smbclient and rpcclient to avoid the read length limit
 	  for commands on the standard input.
+	- Added an include file to the CRD handling code in
+	  pstoraster so that it would compile properly on 64-bit
+	  pointer platforms...
 
 
 CHANGES IN CUPS V1.1.12
