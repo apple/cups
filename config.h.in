@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.39.2.4 2001/12/29 22:17:48 mike Exp $"
+ * "$Id: config.h.in,v 1.39.2.5 2001/12/31 13:04:16 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -68,13 +68,6 @@
 #undef HAVE_LIBZ
 #undef HAVE_LIBJPEG
 #undef HAVE_LIBTIFF
-
-
-/*
- * Does this machine store words in big-endian (MSB-first) order?
- */
-
-#undef WORDS_BIGENDIAN
 
 
 /*
@@ -203,5 +196,5 @@
 
 
 /*
- * End of "$Id: config.h.in,v 1.39.2.4 2001/12/29 22:17:48 mike Exp $".
+ * End of "$Id: config.h.in,v 1.39.2.5 2001/12/31 13:04:16 mike Exp $".
  */
