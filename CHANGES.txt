@@ -1,10 +1,13 @@
-CHANGES.txt - 05/29/2002
+CHANGES.txt - 05/31/2002
 ------------------------
 
 CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  and OpenSSL license exceptions.
+	- ppdOpen() and friends now add an "Auto" InputSlot
+	  option if none is provided to automatically select the
+	  correct tray.
 	- Updated the ppdEmit() and ppdEmitFd() functions to
 	  (re)mark the correct PageSize or PageRegion option
 	  depending on the selected ManualFeed or InputSlot
