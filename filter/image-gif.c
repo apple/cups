@@ -1,5 +1,5 @@
 /*
- * "$Id: image-gif.c,v 1.8.2.5 2002/11/27 04:44:52 mike Exp $"
+ * "$Id: image-gif.c,v 1.8.2.6 2002/12/12 21:33:13 mike Exp $"
  *
  *   GIF image routines for the Common UNIX Printing System (CUPS).
  *
@@ -232,6 +232,14 @@ ImageReadGIF(image_t    *img,		/* IO - Image */
 
           img->xsize = (buf[5] << 8) | buf[4];
           img->ysize = (buf[7] << 8) | buf[6];
+
+          if (img->xsize <= 0 || img->ysize <= 0)
+	  {
+	    fprintf(stderr, "ERROR: Bad GIF image dimensions: %dx%d\n",
+	            img->xsize, img->ysize);
+	    fclose(fp);
+	    return (1);
+	  }
 
 	  i = gif_read_image(fp, img, cmap, buf[8] & GIF_INTERLACE);
           fclose(fp);
@@ -658,5 +666,5 @@ gif_read_image(FILE       *fp,		/* I - Input file */
 
 
 /*
- * End of "$Id: image-gif.c,v 1.8.2.5 2002/11/27 04:44:52 mike Exp $".
+ * End of "$Id: image-gif.c,v 1.8.2.6 2002/12/12 21:33:13 mike Exp $".
  */

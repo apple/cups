@@ -1,5 +1,5 @@
 /*
- * "$Id: var.c,v 1.20.2.1 2002/01/02 18:04:21 mike Exp $"
+ * "$Id: var.c,v 1.20.2.2 2002/12/12 21:33:11 mike Exp $"
  *
  *   CGI form variable and array functions.
  *
@@ -242,7 +242,7 @@ cgiSetArray(const char *name,	/* I - Name of variable */
   var_t	*var;	/* Returned variable */
 
 
-  if (name == NULL || value == NULL || element < 0)
+  if (name == NULL || value == NULL || element < 0 || element > 100000)
     return;
 
   if ((var = cgi_find_variable(name)) == NULL)
@@ -286,7 +286,7 @@ cgiSetSize(const char *name,	/* I - Name of variable */
   var_t	*var;	/* Returned variable */
 
 
-  if (name == NULL || size < 0)
+  if (name == NULL || size < 0 || size > 100000)
     return;
 
   if ((var = cgi_find_variable(name)) == NULL)
@@ -361,7 +361,7 @@ cgi_add_variable(const char *name,	/* I - Variable name */
   var_t	*var;				/* New variable */
 
 
-  if (name == NULL || value == NULL)
+  if (name == NULL || value == NULL || element < 0 || element > 100000)
     return;
 
 #ifdef DEBUG
@@ -668,5 +668,5 @@ cgi_sort_variables(void)
 
 
 /*
- * End of "$Id: var.c,v 1.20.2.1 2002/01/02 18:04:21 mike Exp $".
+ * End of "$Id: var.c,v 1.20.2.2 2002/12/12 21:33:11 mike Exp $".
  */

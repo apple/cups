@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.18 2002/09/26 15:19:51 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.19 2002/12/12 21:33:15 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -87,6 +87,31 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 
   httpSeparate(uri, method, username, host, &port, resource);
 
+ /*
+  * Determine if the URI contains any illegal characters in it...
+  */
+
+  if (strncmp(uri, "ipp://", 6) != 0 ||
+      !host[0] ||
+      (strncmp(resource, "/printers/", 10) != 0 &&
+       strncmp(resource, "/classes/", 9) != 0))
+  {
+    LogMessage(L_ERROR, "ProcessBrowseData: Bad printer URI in browse data: %s",
+               uri);
+    return;
+  }
+
+  if (strchr(resource, '?') != NULL ||
+      (strncmp(resource, "/printers/", 10) == 0 &&
+       strchr(resource + 10, '/') != NULL) ||
+      (strncmp(resource, "/classes/", 9) == 0 &&
+       strchr(resource + 9, '/') != NULL))
+  {
+    LogMessage(L_ERROR, "ProcessBrowseData: Bad resource in browse data: %s",
+               resource);
+    return;
+  }
+    
  /*
   * OK, this isn't a local printer; see if we already have it listed in
   * the Printers list, and add it if not...
@@ -1857,5 +1882,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.18 2002/09/26 15:19:51 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.19 2002/12/12 21:33:15 mike Exp $".
  */

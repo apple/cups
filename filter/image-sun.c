@@ -1,5 +1,5 @@
 /*
- * "$Id: image-sun.c,v 1.8.2.4 2002/10/22 18:44:09 mike Exp $"
+ * "$Id: image-sun.c,v 1.8.2.5 2002/12/12 21:33:14 mike Exp $"
  *
  *   Sun Raster image file routines for the Common UNIX Printing System (CUPS).
  *
@@ -120,6 +120,12 @@ ImageReadSunRaster(image_t    *img,	/* IO - Image */
 
   fprintf(stderr, "DEBUG: ras_width=%d, ras_height=%d, ras_depth=%d, ras_type=%d, ras_maplength=%d\n",
           img->xsize, img->ysize, ras_depth, ras_type, ras_maplength);
+
+  if (ras_maplength > 768 || img->xsize > 0x40000000 || ras_depth > 32)
+  {
+    fputs("ERROR: Raster data invalid!\n", stderr);
+    return (1);
+  }
 
   if (ras_maplength > 0)
   {
@@ -386,5 +392,5 @@ read_unsigned(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: image-sun.c,v 1.8.2.4 2002/10/22 18:44:09 mike Exp $".
+ * End of "$Id: image-sun.c,v 1.8.2.5 2002/12/12 21:33:14 mike Exp $".
  */

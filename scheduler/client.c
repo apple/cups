@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.27 2002/11/21 21:46:57 mike Exp $"
+ * "$Id: client.c,v 1.91.2.28 2002/12/12 21:33:14 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -497,6 +497,12 @@ ReadClient(client_t *con)	/* I - Client to read from */
   LogMessage(L_DEBUG2, "ReadClient() %d, used=%d", con->http.fd,
              con->http.used);
 
+  if (con->http.error)
+  {
+    CloseClient(con);
+    return (0);
+  }
+
   switch (con->http.state)
   {
     case HTTP_WAITING :
@@ -951,6 +957,20 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
 	      break;
             }
+	    else if (atoi(con->http.fields[HTTP_FIELD_CONTENT_LENGTH]) < 0)
+	    {
+	     /*
+	      * Negative content lengths are invalid!
+	      */
+
+              if (!SendError(con, HTTP_BAD_REQUEST))
+	      {
+		CloseClient(con);
+		return (0);
+	      }
+
+	      break;
+	    }
 
            /*
 	    * See what kind of POST request this is; for IPP requests the
@@ -2638,5 +2658,5 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.27 2002/11/21 21:46:57 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.28 2002/12/12 21:33:14 mike Exp $".
  */
