@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.39.2.19 2003/03/14 18:10:40 mike Exp $"
+ * "$Id: config.h.in,v 1.39.2.20 2003/04/10 16:12:46 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -196,6 +196,13 @@
 
 
 /*
+ * Do we have libpaper?
+ */
+
+#undef HAVE_LIBPAPER
+
+
+/*
  * Do we have <sys/ioctl.h>?
  */
 
@@ -267,5 +274,5 @@
 
 
 /*
- * End of "$Id: config.h.in,v 1.39.2.19 2003/03/14 18:10:40 mike Exp $".
+ * End of "$Id: config.h.in,v 1.39.2.20 2003/04/10 16:12:46 mike Exp $".
  */

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.12.2.12 2003/03/12 20:40:09 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.12.2.13 2003/04/10 16:12:47 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -87,6 +87,19 @@ if test x$enable_mallinfo = xyes; then
 fi
 
 AC_SUBST(LIBMALLOC)
+
+dnl Check for libpaper support...
+AC_ARG_ENABLE(libpaper, [  --enable-libpaper       turn on libpaper support, default=no])
+
+if test x$enable_libpaper = xyes; then
+	AC_CHECK_LIB(paper,systempapername,
+		AC_DEFINE(HAVE_LIBPAPER)
+		LIBPAPER="-lpaper",
+		LIBPAPER="")
+else
+	LIBPAPER=""
+fi
+AC_SUBST(LIBPAPER)
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -185,5 +198,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.12.2.12 2003/03/12 20:40:09 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.12.2.13 2003/04/10 16:12:47 mike Exp $".
 dnl

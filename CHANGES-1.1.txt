@@ -3,6 +3,7 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- Added libpaper support (patch from Jeff Licquia)
 	- Added a new istring() rule for MIME types files that
 	  does a case-insensitive comparison of strings.
 	- The cups-lpd mini-daemon now sends jobs to the default

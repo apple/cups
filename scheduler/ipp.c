@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.59 2003/04/10 14:13:54 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.60 2003/04/10 16:12:48 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -81,6 +81,10 @@
 #include "cupsd.h"
 #include <pwd.h>
 #include <grp.h>
+
+#ifdef HAVE_LIBPAPER
+#  include <paper.h>
+#endif /* HAVE_LIBPAPER */
 
 
 /*
@@ -2543,6 +2547,10 @@ copy_model(const char *from,		/* I - Source file */
 		choice[PPD_MAX_NAME];	/* Choice name */
   int		num_defaults;		/* Number of default options */
   ppd_default_t	*defaults;		/* Default options */
+#ifdef HAVE_LIBPAPER
+  char		*paper_result;		/* Paper size name from libpaper */
+  char		system_paper[64];	/* Paper size name buffer */
+#endif /* HAVE_LIBPAPER */
 
 
   LogMessage(L_DEBUG2, "copy_model(\"%s\", \"%s\")\n", from, to);
@@ -2575,6 +2583,26 @@ copy_model(const char *from,		/* I - Source file */
 
     cupsFileClose(dst);
   }
+#ifdef HAVE_LIBPAPER
+  else if ((paper_result = systempapername()) != NULL)
+  {
+   /*
+    * Set the default media sizes from the systemwide default...
+    */
+
+    strlcpy(system_paper, paper_result, sizeof(system_paper));
+    system_paper[0] = toupper(system_paper[0]);
+
+    num_defaults = ppd_add_default("PageSize", system_paper, 
+				   num_defaults, &defaults);
+    num_defaults = ppd_add_default("PageRegion", system_paper, 
+				   num_defaults, &defaults);
+    num_defaults = ppd_add_default("PaperDimension", system_paper, 
+				   num_defaults, &defaults);
+    num_defaults = ppd_add_default("ImageableArea", system_paper, 
+				   num_defaults, &defaults);
+  }
+#endif /* HAVE_LIBPAPER */
   else
   {
    /*
@@ -6592,5 +6620,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.59 2003/04/10 14:13:54 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.60 2003/04/10 16:12:48 mike Exp $".
  */
