@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.25 2003/02/05 21:14:50 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.26 2003/03/12 18:50:24 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -498,7 +498,7 @@ SendBrowseList(void)
 			to;	/* Timeout time */
 
 
-  if (!Browsing || !(BrowseProtocols & BROWSE_CUPS))
+  if (!Browsing || !BrowseProtocols)
     return;
 
  /*
@@ -726,7 +726,7 @@ StartBrowsing(void)
   struct sockaddr_in	addr;	/* Broadcast address */
 
 
-  if (!Browsing)
+  if (!Browsing || !BrowseProtocols)
     return;
 
   if (BrowseProtocols & BROWSE_CUPS)
@@ -739,7 +739,7 @@ StartBrowsing(void)
     {
       LogMessage(L_ERROR, "StartBrowsing: Unable to create broadcast socket - %s.",
         	 strerror(errno));
-      Browsing = 0;
+      BrowseProtocols &= ~BROWSE_CUPS;
       return;
     }
 
@@ -759,8 +759,8 @@ StartBrowsing(void)
       close(BrowseSocket);
 #endif /* WIN32 */
 
-      BrowseSocket = -1;
-      Browsing     = 0;
+      BrowseSocket    = -1;
+      BrowseProtocols &= ~BROWSE_CUPS;
       return;
     }
 
@@ -784,8 +784,8 @@ StartBrowsing(void)
       close(BrowseSocket);
 #endif /* WIN32 */
 
-      BrowseSocket = -1;
-      Browsing     = 0;
+      BrowseSocket    = -1;
+      BrowseProtocols &= ~BROWSE_CUPS;
       return;
     }
 
@@ -833,6 +833,9 @@ StartPolling(void)
   char		interval[10];	/* Poll interval */
   int		statusfds[2];	/* Status pipe */
   int		fd;		/* Current file descriptor */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;	/* POSIX signal handler */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
  /*
@@ -879,6 +882,12 @@ StartPolling(void)
   {
     sprintf(sport, "%d", poll->port);
 
+   /*
+    * Block signals before forking...
+    */
+
+    HoldSignals();
+
     if ((pid = fork()) == 0)
     {
      /*
@@ -922,6 +931,28 @@ StartPolling(void)
 	close(fd);
 
      /*
+      * Unblock signals before doing the exec...
+      */
+
+#ifdef HAVE_SIGSET
+      sigset(SIGTERM, SIG_DFL);
+      sigset(SIGCHLD, SIG_DFL);
+#elif defined(HAVE_SIGACTION)
+      memset(&action, 0, sizeof(action));
+
+      sigemptyset(&action.sa_mask);
+      action.sa_handler = SIG_DFL;
+
+      sigaction(SIGTERM, &action, NULL);
+      sigaction(SIGCHLD, &action, NULL);
+#else
+      signal(SIGTERM, SIG_DFL);
+      signal(SIGCHLD, SIG_DFL);
+#endif /* HAVE_SIGSET */
+
+      ReleaseSignals();
+
+     /*
       * Execute the polling daemon...
       */
 
@@ -942,6 +973,8 @@ StartPolling(void)
       LogMessage(L_DEBUG, "StartPolling: Started polling daemon for %s:%d, pid = %d",
                  poll->hostname, poll->port, pid);
     }
+
+    ReleaseSignals();
   }
 
   close(statusfds[1]);
@@ -964,7 +997,7 @@ StartPolling(void)
 void
 StopBrowsing(void)
 {
-  if (!Browsing)
+  if (!Browsing || !BrowseProtocols)
     return;
 
   if (BrowseProtocols & BROWSE_CUPS)
@@ -1880,5 +1913,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.25 2003/02/05 21:14:50 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.26 2003/03/12 18:50:24 mike Exp $".
  */
