@@ -1189,6 +1189,8 @@ Allow from nnn.nnn.nnn.*
 Allow from nnn.nnn.nnn.nnn
 Allow from nnn.nnn.nnn.nnn/mm
 Allow from nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
+Allow from @LOCAL
+Allow from @IF(name)
 </PRE></UL>
 
 <H4>Description</H4>
@@ -1231,6 +1233,10 @@ can be used to allow access for multiple hosts or networks.  The
 	<TD ALIGN="CENTER">255.255.255.255</TD>
 </TR>
 </TABLE></CENTER>
+
+<P>The <CODE>@LOCAL</CODE> name will allow access from all local
+interfaces. The <CODE>@IF(name)</CODE> name will allow access
+from the named interface.
 
 <P>The <CODE>Allow</CODE> directive must appear inside a
 <A HREF="#Location"><CODE>Location</CODE></A> directive.
@@ -1362,6 +1368,8 @@ no effect if quotas are not enabled. The default setting is <CODE>No</CODE>.
 BrowseAddress 255.255.255.255:631
 BrowseAddress 192.0.2.255:631
 BrowseAddress host.domain.com:631
+BrowseAddress @LOCAL
+BrowseAddress @IF(name)
 </PRE></UL>
 
 <H4>Description</H4>
@@ -1370,6 +1378,10 @@ BrowseAddress host.domain.com:631
 send browsing information to. Multiple <CODE>BrowseAddress</CODE>
 directives can be specified to send browsing information to different
 networks or systems.
+
+<P>The <CODE>@LOCAL</CODE> name will broadcast printer
+information to all local interfaces. The <CODE>@IF(name)</CODE>
+name will broadcast to the named interface.
 
 <P>No browse addresses are set by default.</P>
 
@@ -1399,6 +1411,8 @@ BrowseAllow from 192.0.2
 BrowseAllow from 192.0.2.0/24
 BrowseAllow from 192.0.2.0/255.255.255.0
 BrowseAllow from *.domain.com
+BrowseAllow from @LOCAL
+BrowseAllow from @IF(name)
 </PRE></UL>
 
 <H4>Description</H4>
@@ -1414,6 +1428,11 @@ from all hosts.
 match networks using netmasks of 255.0.0.0, 255.255.0.0, and 255.255.255.0,
 or network addresses using the specified netmask or bit count.
 
+<P>The <CODE>@LOCAL</CODE> name will allow browse data from all
+local interfaces. The <CODE>@IF(name)</CODE> name will allow
+browse data from the named interface.
+
+
 <!-- NEED 4in -->
 <H3><A NAME="BrowseDeny">BrowseDeny</A></H3>
 <HR>
@@ -1427,6 +1446,8 @@ BrowseDeny from 192.0.2
 BrowseDeny from 192.0.2.0/24
 BrowseDeny from 192.0.2.0/255.255.255.0
 BrowseDeny from *.domain.com
+BrowseDeny from @LOCAL
+BrowseDeny from @IF(name)
 </PRE></UL>
 
 <H4>Description</H4>
@@ -1441,6 +1462,11 @@ from no hosts.
 <P>IP address matching supports exact matches, partial addresses that
 match networks using netmasks of 255.0.0.0, 255.255.0.0, and 255.255.255.0,
 or network addresses using the specified netmask or bit count.
+
+<P>The <CODE>@LOCAL</CODE> name will block browse data from all
+local interfaces. The <CODE>@IF(name)</CODE> name will block
+browse data from the named interface.
+
 
 <!-- NEED 3in -->
 <H3><A NAME="BrowseOrder">BrowseOrder</A></H3>
@@ -1794,6 +1820,8 @@ Deny from nnn.nnn.nnn.*
 Deny from nnn.nnn.nnn.nnn
 Deny from nnn.nnn.nnn.nnn/mm
 Deny from nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
+Deny from @LOCAL
+Deny from @IF(name)
 </PRE></UL>
 
 <H4>Description</H4>
@@ -1836,6 +1864,10 @@ can be used to allow access for multiple hosts or networks. The
 	<TD ALIGN="CENTER">255.255.255.255</TD>
 </TR>
 </TABLE></CENTER>
+
+<P>The <CODE>@LOCAL</CODE> name will deny access from all local
+interfaces. The <CODE>@IF(name)</CODE> name will deny access
+from the named interface.
 
 <P>The <CODE>Deny</CODE> directive must appear inside a
 <A HREF="#Location"><CODE>Location</CODE></A> directive.
