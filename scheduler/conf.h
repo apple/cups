@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.36.2.21 2003/10/09 19:13:52 mike Exp $"
+ * "$Id: conf.h,v 1.36.2.22 2004/04/20 13:40:30 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -150,6 +150,7 @@ VAR int			ClassifyOverride	VALUE(0),
 					/* Root certificate update interval */
 			RunAsUser		VALUE(FALSE),
 					/* Run as unpriviledged user? */
+			RunUser,	/* User to run as, used for files */
 			PrintcapFormat		VALUE(PRINTCAP_BSD);
 					/* Format of printcap file? */
 VAR cups_file_t		*AccessFile		VALUE(NULL),
@@ -194,5 +195,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.36.2.21 2003/10/09 19:13:52 mike Exp $".
+ * End of "$Id: conf.h,v 1.36.2.22 2004/04/20 13:40:30 mike Exp $".
  */

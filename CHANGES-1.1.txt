@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- When using RunAsUser, the scheduler did not correctly
+	  set the ownership of the log files, preventing log
+	  file rotation (STR #686)
 	- The image filters did not correctly load 1-bit PNG
 	  files (STR #687)
 	- The pdftops filter did not show all annotation objects

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.49 2004/02/25 20:01:37 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.50 2004/04/20 13:40:30 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -190,7 +190,6 @@ ReadConfiguration(void)
   char		*language;		/* Language string */
   struct passwd	*user;			/* Default user */
   struct group	*group;			/* Default group */
-  int		run_user;		/* User that will be running cupsd */
   char		*old_serverroot,	/* Old ServerRoot */
 		*old_requestroot;	/* Old RequestRoot */
 
@@ -403,9 +402,9 @@ ReadConfiguration(void)
     return (0);
 
   if (RunAsUser)
-    run_user = User;
+    RunUser = User;
   else
-    run_user = getuid();
+    RunUser = getuid();
 
  /*
   * Use the default system group if none was supplied in cupsd.conf...
@@ -481,13 +480,13 @@ ReadConfiguration(void)
     SetStringf(&ServerCertificate, "%s/%s", ServerRoot, ServerCertificate);
 
 #  if defined(HAVE_LIBSSL) || defined(HAVE_GNUTLS)
-  chown(ServerCertificate, run_user, Group);
+  chown(ServerCertificate, RunUser, Group);
   chmod(ServerCertificate, ConfigFilePerm);
 
   if (ServerKey[0] != '/')
     SetStringf(&ServerKey, "%s/%s", ServerRoot, ServerKey);
 
-  chown(ServerKey, run_user, Group);
+  chown(ServerKey, RunUser, Group);
   chmod(ServerKey, ConfigFilePerm);
 #  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
 #endif /* HAVE_SSL */
@@ -497,27 +496,27 @@ ReadConfiguration(void)
   * writable by the user and group in the cupsd.conf file...
   */
 
-  chown(ServerRoot, run_user, Group);
+  chown(ServerRoot, RunUser, Group);
   chmod(ServerRoot, 0775);
 
   snprintf(temp, sizeof(temp), "%s/certs", ServerRoot);
-  chown(temp, run_user, Group);
+  chown(temp, RunUser, Group);
   chmod(temp, 0711);
 
   snprintf(temp, sizeof(temp), "%s/ppd", ServerRoot);
-  chown(temp, run_user, Group);
+  chown(temp, RunUser, Group);
   chmod(temp, 0755);
 
   snprintf(temp, sizeof(temp), "%s/ssl", ServerRoot);
-  chown(temp, run_user, Group);
+  chown(temp, RunUser, Group);
   chmod(temp, 0700);
 
   snprintf(temp, sizeof(temp), "%s/cupsd.conf", ServerRoot);
-  chown(temp, run_user, Group);
+  chown(temp, RunUser, Group);
   chmod(temp, ConfigFilePerm);
 
   snprintf(temp, sizeof(temp), "%s/classes.conf", ServerRoot);
-  chown(temp, run_user, Group);
+  chown(temp, RunUser, Group);
 #ifdef __APPLE__
   chmod(temp, 0600);
 #else
@@ -525,7 +524,7 @@ ReadConfiguration(void)
 #endif /* __APPLE__ */
 
   snprintf(temp, sizeof(temp), "%s/printers.conf", ServerRoot);
-  chown(temp, run_user, Group);
+  chown(temp, RunUser, Group);
 #ifdef __APPLE__
   chmod(temp, 0600);
 #else
@@ -541,7 +540,7 @@ ReadConfiguration(void)
   * permissions...
   */
 
-  chown(RequestRoot, run_user, Group);
+  chown(RequestRoot, RunUser, Group);
   chmod(RequestRoot, 0710);
 
   if (strncmp(TempDir, RequestRoot, strlen(RequestRoot)) == 0)
@@ -551,7 +550,7 @@ ReadConfiguration(void)
     * is under the spool directory...
     */
 
-    chown(TempDir, run_user, Group);
+    chown(TempDir, RunUser, Group);
     chmod(TempDir, 01770);
   }
 
@@ -2306,5 +2305,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.49 2004/02/25 20:01:37 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.50 2004/04/20 13:40:30 mike Exp $".
  */
