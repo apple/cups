@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.48 2002/10/15 16:09:19 mike Exp $"
+ * "$Id: lpstat.c,v 1.49 2002/10/17 17:05:39 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -79,6 +79,10 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		ranking;	/* Show job ranking? */
   const char	*which;		/* Which jobs to show? */
 
+
+#ifdef LC_TIME
+  setlocale(LC_TIME, "");
+#endif /* LC_TIME */
 
   http        = NULL;
   num_dests   = 0;
@@ -2110,5 +2114,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.48 2002/10/15 16:09:19 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.49 2002/10/17 17:05:39 mike Exp $".
  */

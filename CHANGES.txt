@@ -1,8 +1,10 @@
-CHANGES.txt - 10/16/2002
+CHANGES.txt - 10/17/2002
 ------------------------
 
 CHANGES IN CUPS V1.1.17
 
+	- Now set the LC_TIME locale category to get the
+	  properly localized time string.
 	- Fixed a problem in the scheduler that would cause the
 	  web interface problems when adding, modifying, or
 	  configuring a printer or class.
