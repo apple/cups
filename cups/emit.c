@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.33 2003/06/02 19:43:12 mike Exp $"
+ * "$Id: emit.c,v 1.34 2003/06/02 20:08:38 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -539,6 +539,7 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
 	   const char *title)		/* I - Title */
 {
   const char	*ptr;			/* Pointer into JCL string */
+  char		temp[81];		/* Local title string */
 
 
  /*
@@ -557,9 +558,13 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
    /*
     * This printer uses HP PJL commands for output; filter the output
     * so that we only have a single "@PJL JOB" command in the header...
+    *
+    * To avoid bugs in the PJL implementation of certain vendors' products
+    * (Xerox in particular), we add a dummy "@PJL" command at the beginning
+    * of the PJL commands to initialize PJL processing.
     */
 
-    fputs("\033%-12345X", fp);
+    fputs("\033%-12345X@PJL\n", fp);
     for (ptr = ppd->jcl_begin + 9; *ptr;)
       if (strncmp(ptr, "@PJL JOB", 8) == 0)
       {
@@ -599,11 +604,22 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
       title = ptr + 1;
 
    /*
+    * Replace double quotes with single quotes so that the title
+    * does not cause a PJL syntax error.
+    */
+
+    strlcpy(temp, title, sizeof(temp));
+
+    for (ptr = temp; *ptr; ptr ++)
+      if (*ptr == '\"')
+        *ptr = '\'';
+
+   /*
     * Send PJL JOB command before we enter PostScript mode...
     */
 
-    fprintf(fp, "@PJL JOB NAME = \"%s\" DISPLAY = \"%d %s %s\"\n", title,
-            job_id, user, title);
+    fprintf(fp, "@PJL JOB NAME = \"%s\" DISPLAY = \"%d %s %s\"\n", temp,
+            job_id, user, temp);
   }
   else
     fputs(ppd->jcl_begin, stdout);
@@ -708,5 +724,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c,v 1.33 2003/06/02 19:43:12 mike Exp $".
+ * End of "$Id: emit.c,v 1.34 2003/06/02 20:08:38 mike Exp $".
  */
