@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.5 1999/03/03 21:17:56 mike Exp $"
+ * "$Id: auth.c,v 1.6 1999/04/21 14:14:55 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -339,10 +339,18 @@ IsAuthorized(client_t *con)	/* I - Connection */
   endpwent();				/* Close the password file */
 
   if (pw == NULL)			/* No such user... */
+  {
+    LogMessage(LOG_INFO, "IsAuthorized: Unknown username \"%s\".",
+               con->username);
     return (HTTP_UNAUTHORIZED);
+  }
 
   if (pw->pw_passwd[0] == '\0')		/* Don't allow blank passwords! */
+  {
+    LogMessage(LOG_WARN, "IsAuthorized: Username \"%s\" has no password; access denied.",
+               con->username);
     return (HTTP_UNAUTHORIZED);
+  }
 
 #ifdef HAVE_SHADOW_H
   spw = getspnam(con->username);
@@ -352,7 +360,11 @@ IsAuthorized(client_t *con)	/* I - Connection */
     return (HTTP_UNAUTHORIZED);
 
   if (spw->sp_pwdp[0] == '\0')		/* Don't allow blank passwords! */
+  {
+    LogMessage(LOG_WARN, "IsAuthorized: Username \"%s\" has no password; access denied.",
+               con->username);
     return (HTTP_UNAUTHORIZED);
+  }
 #endif /* HAVE_SHADOW_H */
 
  /*
@@ -365,7 +377,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
     if (spw != NULL)
     {
       if (strcmp(spw->sp_pwdp, crypt(con->password, spw->sp_pwdp)) != 0)
-        return (HTTP_UNAUTHORIZED);
+	return (HTTP_UNAUTHORIZED);
     }
     else
 #endif /* HAVE_SHADOW_H */
@@ -388,7 +400,11 @@ IsAuthorized(client_t *con)	/* I - Connection */
   endgrent();
 
   if (grp == NULL)			/* No group by that name??? */
+  {
+    LogMessage(LOG_WARN, "IsAuthorized: group name \"%s\" does not exist!",
+               best->group_name);
     return (HTTP_UNAUTHORIZED);
+  }
 
   for (i = 0; grp->gr_mem[i] != NULL; i ++)
     if (strcmp(con->username, grp->gr_mem[i]) == 0)
@@ -539,5 +555,5 @@ check_auth(unsigned ip,		/* I - Client address */
 
 
 /*
- * End of "$Id: auth.c,v 1.5 1999/03/03 21:17:56 mike Exp $".
+ * End of "$Id: auth.c,v 1.6 1999/04/21 14:14:55 mike Exp $".
  */

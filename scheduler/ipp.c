@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.7 1999/04/19 21:17:09 mike Exp $"
+ * "$Id: ipp.c,v 1.8 1999/04/21 14:14:56 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -23,23 +23,6 @@
  *
  * Contents:
  *
- *   ProcessIPPRequest() - Process an incoming IPP request...
- *   add_class()         - Add a class to the system.
- *   add_printer()       - Add a printer to the system.
- *   cancel_job()        - Cancel a print job.
- *   copy_attrs()        - Copy attributes from one request to another.
- *   delete_class()      - Remove a class from the system.
- *   delete_printer()    - Remove a printer from the system.
- *   get_classes()       - Get a list of classes.
- *   get_default()       - Get the default destination.
- *   get_jobs()          - Get a list of jobs for the specified printer.
- *   get_job_attrs()     - Get job attributes.
- *   get_printers()      - Get a list of printers.
- *   get_printer_attrs() - Get printer attributes.
- *   print_job()         - Print a file to a printer or class.
- *   send_ipp_error()    - Send an error status back to the IPP client.
- *   validate_dest()     - Validate a printer class destination.
- *   validate_job()      - Validate printer options and destination.
  */
 
 /*
@@ -53,8 +36,10 @@
  * Local functions...
  */
 
+static void	accept_jobs(client_t *con, ipp_attribute_t *uri);
 static void	add_class(client_t *con);
 static void	add_printer(client_t *con);
+static void	cancel_all_jobs(client_t *con, ipp_attribute_t *uri);
 static void	cancel_job(client_t *con, ipp_attribute_t *uri);
 static void	copy_attrs(ipp_t *to, ipp_t *from);
 static void	delete_class(client_t *con);
@@ -66,7 +51,10 @@ static void	get_job_attrs(client_t *con, ipp_attribute_t *uri);
 static void	get_printers(client_t *con);
 static void	get_printer_attrs(client_t *con, ipp_attribute_t *uri);
 static void	print_job(client_t *con, ipp_attribute_t *uri);
+static void	reject_jobs(client_t *con, ipp_attribute_t *uri);
 static void	send_ipp_error(client_t *con, ipp_status_t status);
+static void	start_printer(client_t *con, ipp_attribute_t *uri);
+static void	stop_printer(client_t *con, ipp_attribute_t *uri);
 static char	*validate_dest(char *resource, cups_ptype_t *dtype);
 static void	validate_job(client_t *con, ipp_attribute_t *uri);
 
@@ -220,6 +208,18 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
         get_printer_attrs(con, uri);
         break;
 
+    case IPP_PAUSE_PRINTER :
+        stop_printer(con, uri);
+	break;
+
+    case IPP_RESUME_PRINTER :
+        start_printer(con, uri);
+	break;
+
+    case IPP_PURGE_JOBS :
+        cancel_all_jobs(con, uri);
+        break;
+
     case CUPS_GET_DEFAULT :
         get_default(con);
         break;
@@ -250,6 +250,14 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
         break;
 #endif /* 0 */
 
+    case CUPS_ACCEPT_JOBS :
+        accept_jobs(con, uri);
+        break;
+
+    case CUPS_REJECT_JOBS :
+        reject_jobs(con, uri);
+        break;
+
     default :
         send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
 	return;
@@ -263,12 +271,90 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 
 
 /*
+ * 'accept_jobs()' - Accept print jobs to a printer.
+ */
+
+static void
+accept_jobs(client_t        *con,	/* I - Client connection */
+            ipp_attribute_t *uri)	/* I - Printer or class URI */
+{
+  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  char			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			username[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+  char			*name;		/* Printer name */
+  printer_t		*printer;	/* Printer data */
+
+
+  DEBUG_printf(("accept_jobs(%08x, %08x)\n", con, uri));
+
+ /*
+  * Was this operation called from the correct URI?
+  */
+
+  if (strncmp(con->uri, "/admin/", 7) != 0)
+  {
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * Is the destination valid?
+  */
+
+  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+
+  if ((name = validate_dest(resource, &dtype)) == NULL)
+  {
+   /*
+    * Bad URI...
+    */
+
+    DEBUG_printf(("accept_jobs: resource name \'%s\' no good!\n",
+	          resource));
+    send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * Accept jobs sent to the printer...
+  */
+
+  printer = FindPrinter(name);
+  printer->accepting        = 1;
+  printer->state_message[0] = '\0';
+
+ /*
+  * Everything was ok, so return OK status...
+  */
+
+  con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
  * 'add_class()' - Add a class to the system.
  */
 
 static void
 add_class(client_t *con)		/* I - Client connection */
 {
+ /*
+  * Was this operation called from the correct URI?
+  */
+
+  if (strncmp(con->uri, "/admin/", 7) != 0)
+  {
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
   send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
 }
 
@@ -280,7 +366,92 @@ add_class(client_t *con)		/* I - Client connection */
 static void
 add_printer(client_t *con)		/* I - Client connection */
 {
+ /*
+  * Was this operation called from the correct URI?
+  */
+
+  if (strncmp(con->uri, "/admin/", 7) != 0)
+  {
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
   send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
+}
+
+
+/*
+ * 'cancel_all_jobs()' - Cancel all print jobs.
+ */
+
+static void
+cancel_all_jobs(client_t        *con,	/* I - Client connection */
+	        ipp_attribute_t *uri)	/* I - Job or Printer URI */
+{
+  ipp_attribute_t	*attr;		/* Current attribute */
+  char			*dest;		/* Destination */
+  cups_ptype_t		dtype;		/* Destination type */
+  char			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			username[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+
+
+  DEBUG_printf(("cancel_all_jobs(%08x, %08x)\n", con, uri));
+
+ /*
+  * Was this operation called from the correct URI?
+  */
+
+  if (strncmp(con->uri, "/admin/", 7) != 0)
+  {
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * See if we have a printer URI...
+  */
+
+  if (strcmp(uri->name, "printer-uri") != 0)
+  {
+    DEBUG_printf(("cancel_all_jobs: bad %s attribute \'%s\'!\n",
+                  uri->name, uri->values[0].string.text));
+    send_ipp_error(con, IPP_BAD_REQUEST);
+    return;
+  }
+
+ /*
+  * And if the destination is valid...
+  */
+
+  httpSeparate(uri->values[0].string.text, method, username, host, &port,
+               resource);
+
+  if ((dest = validate_dest(resource, &dtype)) == NULL)
+  {
+   /*
+    * Bad URI...
+    */
+
+    DEBUG_printf(("cancel_all_jobs: resource name \'%s\' no good!\n",
+	          resource));
+    send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * Cancel all of the jobs and return...
+  */
+
+  CancelJobs(dest);
+
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -492,6 +663,16 @@ copy_attrs(ipp_t *to,		/* I - Destination request */
 static void
 delete_class(client_t *con)		/* I - Client connection */
 {
+ /*
+  * Was this operation called from the correct URI?
+  */
+
+  if (strncmp(con->uri, "/admin/", 7) != 0)
+  {
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
   send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
 }
 
@@ -503,6 +684,16 @@ delete_class(client_t *con)		/* I - Client connection */
 static void
 delete_printer(client_t *con)		/* I - Client connection */
 {
+ /*
+  * Was this operation called from the correct URI?
+  */
+
+  if (strncmp(con->uri, "/admin/", 7) != 0)
+  {
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
   send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
 }
 
@@ -835,6 +1026,7 @@ get_printers(client_t *con)		/* I - Client connection */
   int			limit;		/* Maximum number of printers to return */
   int			count;		/* Number of printers that match */
   printer_t		*printer;	/* Current printer pointer */
+  time_t		curtime;	/* Current time */
 
 
   DEBUG_printf(("get_printers(%08x)\n", con));
@@ -852,6 +1044,8 @@ get_printers(client_t *con)		/* I - Client connection */
  /*
   * OK, build a list of printers for this printer...
   */
+
+  curtime = time(NULL);
 
   for (count = 0, printer = Printers;
        count < limit && printer != NULL;
@@ -874,10 +1068,16 @@ get_printers(client_t *con)		/* I - Client connection */
       ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
                    "printer-state-message", NULL, printer->state_message);
 
-    ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs", 1);
+    ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs",
+                  printer->accepting);
 
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_URI,
                  "printer-device-uri", NULL, printer->device_uri);
+
+    ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                  "printer-up-time", curtime - StartTime);
+    ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
+               ippTimeToDate(curtime));
 
     copy_attrs(con->response, printer->attrs);
 
@@ -912,6 +1112,7 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
   int			port;		/* Port portion of URI */
   printer_t		*printer;	/* Printer */
   class_t		*pclass;	/* Printer class */
+  time_t		curtime;	/* Current time */
 
 
   DEBUG_printf(("get_printer_attrs(%08x, %08x)\n", con, uri));
@@ -952,6 +1153,8 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
   else
     printer = FindPrinter(dest);
 
+  curtime = time(NULL);
+
   copy_attrs(con->response, printer->attrs);
 
   ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state",
@@ -960,6 +1163,14 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
   if (printer->state_message[0])
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
                  "printer-state-message", NULL, printer->state_message);
+
+  ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs",
+                printer->accepting);
+
+  ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                "printer-up-time", curtime - StartTime);
+  ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
+             ippTimeToDate(curtime));
 
   if (ippFindAttribute(con->request, "requested-attributes", IPP_TAG_KEYWORD) != NULL)
     con->response->request.status.status_code = IPP_OK_SUBST;
@@ -998,6 +1209,7 @@ print_job(client_t        *con,		/* I - Client connection */
 					/* Supertype of file */
 			type[MIME_MAX_TYPE];
 					/* Subtype of file */
+  printer_t		*printer;	/* Printer data */
 
 
   DEBUG_printf(("print_job(%08x, %08x)\n", con, uri));
@@ -1087,6 +1299,24 @@ print_job(client_t        *con,		/* I - Client connection */
   }
 
  /*
+  * See if the printer is accepting jobs...
+  */
+
+  if (dtype == CUPS_PRINTER_CLASS)
+  {
+  }
+  else
+  {
+    printer = FindPrinter(dest);
+
+    if (!printer->accepting)
+    {
+      send_ipp_error(con, IPP_NOT_ACCEPTING);
+      return;
+    }
+  }
+
+ /*
   * Create the job and set things up...
   */
 
@@ -1152,6 +1382,80 @@ print_job(client_t        *con,		/* I - Client connection */
 
 
 /*
+ * 'reject_jobs()' - Reject print jobs to a printer.
+ */
+
+static void
+reject_jobs(client_t        *con,	/* I - Client connection */
+            ipp_attribute_t *uri)	/* I - Printer or class URI */
+{
+  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  char			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			username[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+  char			*name;		/* Printer name */
+  printer_t		*printer;	/* Printer data */
+  ipp_attribute_t	*attr;		/* printer-state-message text */
+
+
+  DEBUG_printf(("reject_jobs(%08x, %08x)\n", con, uri));
+
+ /*
+  * Was this operation called from the correct URI?
+  */
+
+  if (strncmp(con->uri, "/admin/", 7) != 0)
+  {
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * Is the destination valid?
+  */
+
+  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+
+  if ((name = validate_dest(resource, &dtype)) == NULL)
+  {
+   /*
+    * Bad URI...
+    */
+
+    DEBUG_printf(("reject_jobs: resource name \'%s\' no good!\n",
+	          resource));
+    send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * Reject jobs sent to the printer...
+  */
+
+  printer = FindPrinter(name);
+  printer->accepting = 0;
+
+  if ((attr = ippFindAttribute(con->request, "printer-state-message",
+                               IPP_TAG_TEXT)) == NULL)
+    strcpy(printer->state_message, "Rejecting Jobs");
+  else
+    strcpy(printer->state_message, attr->values[0].string.text);
+
+ /*
+  * Everything was ok, so return OK status...
+  */
+
+  con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
  * 'send_ipp_error()' - Send an error status back to the IPP client.
  */
 
@@ -1159,9 +1463,6 @@ static void
 send_ipp_error(client_t     *con,	/* I - Client connection */
                ipp_status_t status)	/* I - IPP status code */
 {
-  ipp_attribute_t	*attr;		/* Current attribute */
-
-
   DEBUG_printf(("send_ipp_error(%08x, %04x)\n", con, status));
 
   if (con->filename[0])
@@ -1169,16 +1470,160 @@ send_ipp_error(client_t     *con,	/* I - Client connection */
 
   con->response->request.status.status_code = status;
 
-  attr = ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                      "attributes-charset", NULL, DefaultCharset);
+  ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, DefaultCharset);
 
-  attr = ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                      "attributes-natural-language", NULL, DefaultLanguage);
+  ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, DefaultLanguage);
 
   SendHeader(con, HTTP_OK, "application/ipp");
   httpPrintf(HTTP(con), "Content-Length: %d\r\n\r\n", ippLength(con->response));
 
   FD_SET(con->http.fd, &OutputSet);
+}
+
+
+/*
+ * 'start_printer()' - Start a printer.
+ */
+
+static void
+start_printer(client_t        *con,	/* I - Client connection */
+              ipp_attribute_t *uri)	/* I - Printer URI */
+{
+  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  char			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			username[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+  char			*name;		/* Printer name */
+  printer_t		*printer;	/* Printer data */
+
+  DEBUG_printf(("start_printer(%08x, %08x)\n", con, uri));
+
+ /*
+  * Was this operation called from the correct URI?
+  */
+
+  if (strncmp(con->uri, "/admin/", 7) != 0)
+  {
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * Is the destination valid?
+  */
+
+  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+
+  if ((name = validate_dest(resource, &dtype)) == NULL)
+  {
+   /*
+    * Bad URI...
+    */
+
+    DEBUG_printf(("start_printer: resource name \'%s\' no good!\n",
+	          resource));
+    send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * Start the printer...
+  */
+
+  printer = FindPrinter(name);
+
+  StartPrinter(printer);
+
+  printer->state_message[0] = '\0';
+
+ /*
+  * Everything was ok, so return OK status...
+  */
+
+  con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
+ * 'stop_printer()' - Stop a printer.
+ */
+
+static void
+stop_printer(client_t        *con,	/* I - Client connection */
+             ipp_attribute_t *uri)	/* I - Printer URI */
+{
+  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  char			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			username[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+  char			*name;		/* Printer name */
+  printer_t		*printer;	/* Printer data */
+  ipp_attribute_t	*attr;		/* printer-state-message attribute */
+
+
+  DEBUG_printf(("stop_printer(%08x, %08x)\n", con, uri));
+
+ /*
+  * Was this operation called from the correct URI?
+  */
+
+  if (strncmp(con->uri, "/admin/", 7) != 0)
+  {
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * Is the destination valid?
+  */
+
+  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+
+  if ((name = validate_dest(resource, &dtype)) == NULL)
+  {
+   /*
+    * Bad URI...
+    */
+
+    DEBUG_printf(("stop_printer: resource name \'%s\' no good!\n",
+	          resource));
+    send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * Stop the printer...
+  */
+
+  printer = FindPrinter(name);
+
+  StopPrinter(printer);
+
+  if ((attr = ippFindAttribute(con->request, "printer-state-message",
+                               IPP_TAG_TEXT)) == NULL)
+    strcpy(printer->state_message, "Paused");
+  else
+    strcpy(printer->state_message, attr->values[0].string.text);
+
+ /*
+  * Everything was ok, so return OK status...
+  */
+
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -1326,5 +1771,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.7 1999/04/19 21:17:09 mike Exp $".
+ * End of "$Id: ipp.c,v 1.8 1999/04/21 14:14:56 mike Exp $".
  */

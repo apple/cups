@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.10 1999/04/19 21:17:09 mike Exp $"
+ * "$Id: client.c,v 1.11 1999/04/21 14:14:56 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -442,6 +442,17 @@ ReadClient(client_t *con)	/* I - Client to read from */
     else switch (con->http.state)
     {
       case HTTP_GET_SEND :
+          if (strncmp(con->uri, "/printers", 9) == 0 &&
+	      strcmp(con->uri + strlen(con->uri) - 4, ".ppd") == 0)
+	  {
+	   /*
+	    * Send PPD file...
+	    */
+
+            sprintf(command, "/ppd/%s", con->uri + 10);
+	    strcpy(con->uri, command);
+	  }
+
 	  if (strncmp(con->uri, "/printers", 9) == 0 ||
 	      strncmp(con->uri, "/classes", 8) == 0 ||
 	      strncmp(con->uri, "/jobs", 5) == 0)
@@ -528,11 +539,9 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  * content-type field will be "application/ipp"...
 	  */
 
-          httpGetLength(&(con->http));
-
 	  if (strcmp(con->http.fields[HTTP_FIELD_CONTENT_TYPE], "application/ipp") == 0)
             con->request = ippNew();
-	  else if (strcmp(con->http.fields[HTTP_FIELD_CONTENT_TYPE], "application/ipp") == 0 &&
+	  else if (strcmp(con->http.fields[HTTP_FIELD_CONTENT_TYPE], "application/x-www-form-urlencoded") == 0 &&
 	           (strncmp(con->uri, "/printers", 9) == 0 ||
 	            strncmp(con->uri, "/classes", 8) == 0 ||
 	            strncmp(con->uri, "/jobs", 5) == 0))
@@ -591,6 +600,17 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  return (0);
 
       case HTTP_HEAD :
+          if (strncmp(con->uri, "/printers", 9) == 0 &&
+	      strcmp(con->uri + strlen(con->uri) - 4, ".ppd") == 0)
+	  {
+	   /*
+	    * Send PPD file...
+	    */
+
+            sprintf(command, "/ppd/%s", con->uri + 10);
+	    strcpy(con->uri, command);
+	  }
+
 	  if (strncmp(con->uri, "/printers/", 10) == 0 ||
 	      strncmp(con->uri, "/classes/", 9) == 0 ||
 	      strncmp(con->uri, "/jobs/", 6) == 0)
@@ -875,7 +895,7 @@ SendError(client_t      *con,	/* I - Connection */
     sprintf(message, "<HTML><HEAD><TITLE>%d %s</TITLE></HEAD>"
                      "<BODY><H1>%s</H1>%s</BODY></HTML>\n",
             code, httpStatus(code), httpStatus(code),
-	    con->language ? (char *)con->language->messages[code] : httpStatus(code));
+	    con->language ? con->language->messages[code] : httpStatus(code));
 
     if (httpPrintf(HTTP(con), "Content-Type: text/html\r\n") < 0)
       return (0);
@@ -1251,14 +1271,23 @@ check_if_modified(client_t    *con,		/* I - Client connection */
 static void
 decode_basic_auth(client_t *con)	/* I - Client to decode to */
 {
-  char	value[1024];			/* Value string */
+  char	*s,				/* Authorization string */
+	value[1024];			/* Value string */
 
 
  /*
   * Decode the string and pull the username and password out...
   */
 
-  httpDecode64(value, con->http.fields[HTTP_FIELD_AUTHORIZATION]);
+  s = con->http.fields[HTTP_FIELD_AUTHORIZATION];
+  if (strncmp(s, "Basic", 5) != 0)
+    return;
+
+  s += 5;
+  while (isspace(*s))
+    s ++;
+
+  httpDecode64(value, s);
 
   LogMessage(LOG_DEBUG, "decode_basic_auth() %d Authorization=\"%s\"",
              con->http.fd, value);
@@ -1284,7 +1313,9 @@ get_file(client_t    *con,	/* I - Client connection */
   * Need to add DocumentRoot global...
   */
 
-  if (con->language != NULL)
+  if (strncmp(con->uri, "/ppd/", 5) == 0)
+    sprintf(filename, "%s%s", ServerRoot, con->uri);
+  else if (con->language != NULL)
     sprintf(filename, "%s/%s%s", DocumentRoot, con->language->language,
             con->uri);
   else
@@ -1304,9 +1335,12 @@ get_file(client_t    *con,	/* I - Client connection */
     * Drop the language prefix and try the current directory...
     */
 
-    sprintf(filename, "%s%s", DocumentRoot, con->uri);
+    if (strncmp(con->uri, "/ppd/", 5) != 0)
+    {
+      sprintf(filename, "%s%s", DocumentRoot, con->uri);
 
-    status = stat(filename, filestats);
+      status = stat(filename, filestats);
+    }
   }
 
  /*
@@ -1516,5 +1550,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.10 1999/04/19 21:17:09 mike Exp $".
+ * End of "$Id: client.c,v 1.11 1999/04/21 14:14:56 mike Exp $".
  */
