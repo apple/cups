@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.50 2000/03/11 15:31:28 mike Exp $"
+ * "$Id: dirsvc.c,v 1.51 2000/03/21 04:03:34 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -246,9 +246,15 @@ UpdateBrowseList(void)
       * Do authorization checks on the domain/address...
       */
 
-      switch (auth)
+      switch (BrowseACL->order_type)
       {
+        default :
+	    auth = AUTH_DENY;	/* anti-compiler-warning-code */
+	    break;
+
 	case AUTH_ALLOW : /* Order Deny,Allow */
+            auth = AUTH_ALLOW;
+
             if (CheckAuth(address, srcname, len,
 	        	  BrowseACL->num_deny, BrowseACL->deny))
 	      auth = AUTH_DENY;
@@ -259,6 +265,8 @@ UpdateBrowseList(void)
 	    break;
 
 	case AUTH_DENY : /* Order Allow,Deny */
+            auth = AUTH_DENY;
+
             if (CheckAuth(address, srcname, len,
 	        	  BrowseACL->num_allow, BrowseACL->allow))
 	      auth = AUTH_ALLOW;
@@ -293,7 +301,8 @@ UpdateBrowseList(void)
 
   if (sscanf(packet,
              "%x%x%1023s%*[^\"]\"%127[^\"]%*[^\"]\"%127[^\"]%*[^\"]\"%127[^\"]",
-             &type, &state, uri, location, info, make_model) < 3)
+             (unsigned *)&type, (unsigned *)&state, uri, location, info,
+	     make_model) < 3)
   {
     LogMessage(L_WARN, "UpdateBrowseList: Garbled browse packet - %s",
                packet);
@@ -449,7 +458,9 @@ UpdateBrowseList(void)
     * Loop through all available printers and create classes as needed...
     */
 
-    for (p = Printers, len = 0, offset = 0; p != NULL; p = p->next)
+    for (p = Printers, len = 0, offset = 0, first = NULL;
+         p != NULL;
+	 p = p->next)
     {
      /*
       * Skip classes...
@@ -702,5 +713,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.50 2000/03/11 15:31:28 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.51 2000/03/21 04:03:34 mike Exp $".
  */

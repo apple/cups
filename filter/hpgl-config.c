@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.23 2000/01/25 15:41:27 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.24 2000/03/21 04:03:26 mike Exp $"
  *
  *   HP-GL/2 configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -87,7 +87,7 @@ update_transform(void)
 
   switch (ScalingType)
   {
-    case -1 : /* No user scaling */
+    default : /* No user scaling */
         left   = P1[0];
 	bottom = P1[1];
 	right  = P2[0];
@@ -634,5 +634,5 @@ SC_scale(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.23 2000/01/25 15:41:27 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.24 2000/03/21 04:03:26 mike Exp $".
  */

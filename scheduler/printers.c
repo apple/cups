@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.58 2000/03/11 18:30:14 mike Exp $"
+ * "$Id: printers.c,v 1.59 2000/03/21 04:03:35 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -858,6 +858,26 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                 "orientation-requested-default", IPP_PORTRAIT);
 
+  if (NumBanners > 0)
+  {
+   /*
+    * Setup the banner-start-supported and banner-end-supported
+    * attributes...
+    */
+
+    attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                	 "banner-start-supported", NumBanners + 1, NULL, NULL);
+    attr->values[0].string.text = strdup("none");
+    for (i = 0; i < NumBanners; i ++)
+      attr->values[i + 1].string.text = strdup(Banners[i].name);
+
+    attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                	 "banner-end-supported", NumBanners + 1, NULL, NULL);
+    attr->values[0].string.text = strdup("none");
+    for (i = 0; i < NumBanners; i ++)
+      attr->values[i + 1].string.text = strdup(Banners[i].name);
+  }
+
   if (p->type & CUPS_PRINTER_REMOTE)
   {
    /*
@@ -1329,5 +1349,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.58 2000/03/11 18:30:14 mike Exp $".
+ * End of "$Id: printers.c,v 1.59 2000/03/21 04:03:35 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.56 2000/03/11 18:30:13 mike Exp $"
+ * "$Id: job.c,v 1.57 2000/03/21 04:03:35 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -53,26 +53,6 @@
  */
 
 #include "cupsd.h"
-
-#if defined(WIN32) || defined(__EMX__)
-#  include <windows.h>
-#elif HAVE_DIRENT_H
-#  include <dirent.h>
-typedef struct dirent DIRENT;
-#  define NAMLEN(dirent) strlen((dirent)->d_name)
-#else
-#  if HAVE_SYS_NDIR_H
-#    include <sys/ndir.h>
-#  endif
-#  if HAVE_SYS_DIR_H
-#    include <sys/dir.h>
-#  endif
-#  if HAVE_NDIR_H
-#    include <ndir.h>
-#  endif
-typedef struct direct DIRENT;
-#  define NAMLEN(dirent) (dirent)->d_namlen
-#endif
 
 
 /*
@@ -918,6 +898,9 @@ StartJob(int       id,		/* I - Job ID */
 	      else
 		strcat(optptr, attr->values[i].string.text);
 	      break;
+
+          default :
+	      break; /* anti-compiler-warning-code */
 	}
       }
 
@@ -1478,6 +1461,9 @@ ipp_read_file(const char *filename,	/* I - File to read from */
 
   switch (ipp->state)
   {
+    default :
+	break; /* anti-compiler-warning-code */
+
     case IPP_IDLE :
         ipp->state ++; /* Avoid common problem... */
 
@@ -1810,6 +1796,9 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 
   switch (ipp->state)
   {
+    default :
+	break; /* anti-compiler-warning-code */
+
     case IPP_IDLE :
         ipp->state ++; /* Avoid common problem... */
 
@@ -2303,5 +2292,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.56 2000/03/11 18:30:13 mike Exp $".
+ * End of "$Id: job.c,v 1.57 2000/03/21 04:03:35 mike Exp $".
  */

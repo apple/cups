@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertohp.c,v 1.4 2000/01/20 22:33:11 mike Exp $"
+ * "$Id: rastertohp.c,v 1.5 2000/03/21 04:03:28 mike Exp $"
  *
  *   Hewlett-Packard Page Control Language filter for the Common UNIX
  *   Printing System (CUPS).
@@ -213,7 +213,7 @@ CompressData(unsigned char *line,	/* I - Data to compress */
 
   switch (type)
   {
-    case 0 :
+    default :
        /*
 	* Do no compression...
 	*/
@@ -499,5 +499,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertohp.c,v 1.4 2000/01/20 22:33:11 mike Exp $".
+ * End of "$Id: rastertohp.c,v 1.5 2000/03/21 04:03:28 mike Exp $".
  */

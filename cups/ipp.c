@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.34 2000/03/09 20:13:28 mike Exp $"
+ * "$Id: ipp.c,v 1.35 2000/03/21 04:03:25 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -558,6 +558,9 @@ ippDelete(ipp_t *ipp)		/* I - IPP request */
 	    free(attr->values[i].string.text);
 	  }
 	  break;
+
+      default :
+          break; /* anti-compiler-warning-code */
     }
 
     next = attr->next;
@@ -643,9 +646,11 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
 
     case IPP_NOT_ACCEPTING :
         return (cupsLangString(language, CUPS_MSG_NOT_ACCEPTING_JOBS));
+
+    default :
+        return ("ERROR");
   }
 
-  return ("ERROR");
 }
 
 
@@ -1104,6 +1109,9 @@ ippRead(http_t *http,		/* I - HTTP data */
 
     case IPP_DATA :
         break;
+
+    default :
+        break; /* anti-compiler-warning-code */
   }
 
   return (ipp->state);
@@ -1564,6 +1572,9 @@ ippWrite(http_t *http,		/* I - HTTP data */
 
     case IPP_DATA :
         break;
+
+    default :
+        break; /* anti-compiler-warning-code */
   }
 
   return (ipp->state);
@@ -1655,5 +1666,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.34 2000/03/09 20:13:28 mike Exp $".
+ * End of "$Id: ipp.c,v 1.35 2000/03/21 04:03:25 mike Exp $".
  */

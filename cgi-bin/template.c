@@ -1,5 +1,5 @@
 /*
- * "$Id: template.c,v 1.13 2000/02/10 00:57:53 mike Exp $"
+ * "$Id: template.c,v 1.14 2000/03/21 04:03:24 mike Exp $"
  *
  *   CGI template function.
  *
@@ -301,6 +301,9 @@ cgi_copy(FILE *out,		/* I - Output file */
 	  case '!' :
 	      result = strcasecmp(outval, compare) != 0;
 	      break;
+	  default :
+	      result = 1;
+	      break;
 	}
       }
 
@@ -360,5 +363,5 @@ cgi_puts(const char *s,
 
 
 /*
- * End of "$Id: template.c,v 1.13 2000/02/10 00:57:53 mike Exp $".
+ * End of "$Id: template.c,v 1.14 2000/03/21 04:03:24 mike Exp $".
  */

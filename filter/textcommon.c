@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.c,v 1.11 2000/01/04 13:45:49 mike Exp $"
+ * "$Id: textcommon.c,v 1.12 2000/03/21 04:03:29 mike Exp $"
  *
  *   Common text filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -229,6 +229,7 @@ TextMain(char *name,		/* I - Name of filter */
   * Read text from the specified source and print it...
   */
 
+  lastch       = 0;
   column       = 0;
   line         = 0;
   page_column  = 0;
@@ -591,7 +592,7 @@ TextMain(char *name,		/* I - Name of filter */
 	      * Highlight curley braces...
 	      */
 
-	      Page[line][i].attr |= ATTR_BOLD;
+	      Page[line][column].attr |= ATTR_BOLD;
 	    }
 	    else if ((ch == '/' || ch == '*') && lastch == '/' &&
 	             column < ColumnWidth)
@@ -600,7 +601,7 @@ TextMain(char *name,		/* I - Name of filter */
 	      * Highlight first comment character...
 	      */
 
-	      Page[line][i - 1].attr = attr;
+	      Page[line][column - 1].attr = attr;
 	    }
 	    else if (ch == '\"' && lastch != '\\' && !ccomment && cstring > 0)
 	    {
@@ -741,5 +742,5 @@ getutf8(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: textcommon.c,v 1.11 2000/01/04 13:45:49 mike Exp $".
+ * End of "$Id: textcommon.c,v 1.12 2000/03/21 04:03:29 mike Exp $".
  */

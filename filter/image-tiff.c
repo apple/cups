@@ -1,5 +1,5 @@
 /*
- * "$Id: image-tiff.c,v 1.12 2000/03/09 19:47:26 mike Exp $"
+ * "$Id: image-tiff.c,v 1.13 2000/03/21 04:03:27 mike Exp $"
  *
  *   TIFF file routines for the Common UNIX Printing System (CUPS).
  *
@@ -1011,19 +1011,19 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
                    ycount --, p += pstep)
               {
         	if (*scanptr & bit & 0x88)
-                  p[0] = one;
+                  p[0] = 255;
                 else
-                  p[0] = zero;
+                  p[0] = 0;
 
         	if (*scanptr & bit & 0x44)
-                  p[1] = one;
+                  p[1] = 255;
                 else
-                  p[1] = zero;
+                  p[1] = 0;
 
         	if (*scanptr & bit & 0x22)
-                  p[2] = one;
+                  p[2] = 255;
                 else
-                  p[2] = zero;
+                  p[2] = 0;
 
         	if (bit == 0xf0)
                   bit = 0x0f;
@@ -1617,5 +1617,5 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-tiff.c,v 1.12 2000/03/09 19:47:26 mike Exp $".
+ * End of "$Id: image-tiff.c,v 1.13 2000/03/21 04:03:27 mike Exp $".
  */

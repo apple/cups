@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.53 2000/03/10 14:08:53 mike Exp $"
+ * "$Id: client.c,v 1.54 2000/03/21 04:03:33 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -388,6 +388,9 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  return (0);
 	}
 	break;
+
+    default :
+        break; /* Anti-compiler-warning-code */
   }
 
  /*
@@ -752,6 +755,9 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
           con->http.state = HTTP_WAITING;
           break;
+
+      default :
+          break; /* Anti-compiler-warning-code */
     }
   }
 
@@ -899,6 +905,9 @@ ReadClient(client_t *con)	/* I - Client to read from */
             ProcessIPPRequest(con);
 	}
         break;
+
+    default :
+        break; /* Anti-compiler-warning-code */
   }
 
   if (!con->http.keep_alive && con->http.state == HTTP_WAITING)
@@ -1684,5 +1693,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.53 2000/03/10 14:08:53 mike Exp $".
+ * End of "$Id: client.c,v 1.54 2000/03/21 04:03:33 mike Exp $".
  */

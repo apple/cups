@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.21 2000/02/18 17:48:07 mike Exp $"
+ * "$Id: cupsd.h,v 1.22 2000/03/21 04:03:34 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -119,6 +119,30 @@
 #include "classes.h"
 #include "job.h"
 #include "conf.h"
+#include "banners.h"
+
+
+/*
+ * Directory handling functions...
+ */
+
+#if HAVE_DIRENT_H
+#  include <dirent.h>
+typedef struct dirent DIRENT;
+#  define NAMLEN(dirent) strlen((dirent)->d_name)
+#else
+#  if HAVE_SYS_NDIR_H
+#    include <sys/ndir.h>
+#  endif
+#  if HAVE_SYS_DIR_H
+#    include <sys/dir.h>
+#  endif
+#  if HAVE_NDIR_H
+#    include <ndir.h>
+#  endif
+typedef struct direct DIRENT;
+#  define NAMLEN(dirent) (dirent)->d_namlen
+#endif
 
 
 /*
@@ -148,5 +172,5 @@ extern void	LoadDevices(const char *d);
 extern void	LoadPPDs(const char *d);
 
 /*
- * End of "$Id: cupsd.h,v 1.21 2000/02/18 17:48:07 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.22 2000/03/21 04:03:34 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.47 2000/03/11 15:48:41 mike Exp $"
+ * "$Id: conf.c,v 1.48 2000/03/21 04:03:34 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -379,6 +379,12 @@ ReadConfiguration(void)
 
   MimeDatabase = mimeNew();
   mimeMerge(MimeDatabase, ServerRoot);
+
+ /*
+  * Load banners...
+  */
+
+  LoadBanners(CUPS_DATADIR "/banners");
 
  /*
   * Load printers and classes...
@@ -1381,5 +1387,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.47 2000/03/11 15:48:41 mike Exp $".
+ * End of "$Id: conf.c,v 1.48 2000/03/21 04:03:34 mike Exp $".
  */

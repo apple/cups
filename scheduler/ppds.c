@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.6 2000/03/14 21:06:35 mike Exp $"
+ * "$Id: ppds.c,v 1.7 2000/03/21 04:03:35 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -37,24 +37,6 @@
 #ifdef HAVE_LIBZ
 #  include <zlib.h>
 #endif /* HAVE_LIBZ */
-
-#if HAVE_DIRENT_H
-#  include <dirent.h>
-typedef struct dirent DIRENT;
-#  define NAMLEN(dirent) strlen((dirent)->d_name)
-#else
-#  if HAVE_SYS_NDIR_H
-#    include <sys/ndir.h>
-#  endif
-#  if HAVE_SYS_DIR_H
-#    include <sys/dir.h>
-#  endif
-#  if HAVE_NDIR_H
-#    include <ndir.h>
-#  endif
-typedef struct direct DIRENT;
-#  define NAMLEN(dirent) (dirent)->d_namlen
-#endif
 
 
 /*
@@ -655,5 +637,5 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * End of "$Id: ppds.c,v 1.6 2000/03/14 21:06:35 mike Exp $".
+ * End of "$Id: ppds.c,v 1.7 2000/03/21 04:03:35 mike Exp $".
  */

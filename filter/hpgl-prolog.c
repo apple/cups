@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.24 2000/02/26 22:56:50 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.25 2000/03/21 04:03:26 mike Exp $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
@@ -258,6 +258,8 @@ Outputf(const char *format,	/* I - Printf-style string */
 	puts("%%EndSetup");
       }
     }
+    else
+      landscape = 0;
 
     printf("%%%%Page: %d %d\n", PageCount, PageCount);
 
@@ -369,5 +371,5 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.24 2000/02/26 22:56:50 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.25 2000/03/21 04:03:26 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: image-photocd.c,v 1.8 2000/01/04 13:45:45 mike Exp $"
+ * "$Id: image-photocd.c,v 1.9 2000/03/21 04:03:26 mike Exp $"
  *
  *   PhotoCD routines for the Common UNIX Printing System (CUPS).
  *
@@ -112,6 +112,8 @@ ImageReadPhotoCD(image_t    *img,	/* IO - Image */
 
   if (bpp > 1)
     rgb = malloc(768 * 3);
+  else
+    rgb = NULL;
 
   if (rotation)
   {
@@ -211,6 +213,8 @@ ImageReadPhotoCD(image_t    *img,	/* IO - Image */
         * Convert YCbCr to RGB...  While every pixel gets a luminance
 	* value, adjacent pixels share chroma information.
 	*/
+
+        cb = cr = 0.0f;
 
         for (x = 0, rgbptr = rgb + xstart, icb = in + 1536, icr = in + 1920;
 	     x < 768;
@@ -315,5 +319,5 @@ ImageReadPhotoCD(image_t    *img,	/* IO - Image */
 
 
 /*
- * End of "$Id: image-photocd.c,v 1.8 2000/01/04 13:45:45 mike Exp $".
+ * End of "$Id: image-photocd.c,v 1.9 2000/03/21 04:03:26 mike Exp $".
  */

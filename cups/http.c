@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.62 2000/03/20 13:51:48 mike Exp $"
+ * "$Id: http.c,v 1.63 2000/03/21 04:03:25 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1206,7 +1206,7 @@ httpUpdate(http_t *http)		/* I - HTTP data */
       * Got the beginning of a response...
       */
 
-      if (sscanf(line, "HTTP/%d.%d%d", &major, &minor, &status) != 3)
+      if (sscanf(line, "HTTP/%d.%d%d", &major, &minor, (int *)&status) != 3)
         return (HTTP_ERROR);
 
       http->version = (http_version_t)(major * 100 + minor);
@@ -1542,5 +1542,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.62 2000/03/20 13:51:48 mike Exp $".
+ * End of "$Id: http.c,v 1.63 2000/03/21 04:03:25 mike Exp $".
  */

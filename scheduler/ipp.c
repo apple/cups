@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.58 2000/03/11 18:30:13 mike Exp $"
+ * "$Id: ipp.c,v 1.59 2000/03/21 04:03:34 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1261,9 +1261,13 @@ cancel_job(client_t        *con,	/* I - Client connection */
     endgrent();
 
     if (group != NULL)
+    {
       for (i = 0; group->gr_mem[i]; i ++)
         if (strcmp(username, group->gr_mem[i]) == 0)
 	  break;
+    }
+    else
+      i = 0;
 
     if (user == NULL || group == NULL ||
         (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
@@ -1426,6 +1430,9 @@ copy_attrs(ipp_t           *to,		/* I - Destination request */
 	        strdup(fromattr->values[i].string.text);
           }
           break;
+
+       default :
+          break; /* anti-compiler-warning-code */
     }
   }
 }
@@ -2450,9 +2457,13 @@ hold_job(client_t        *con,	/* I - Client connection */
     endgrent();
 
     if (group != NULL)
+    {
       for (i = 0; group->gr_mem[i]; i ++)
         if (strcmp(username, group->gr_mem[i]) == 0)
 	  break;
+    }
+    else
+      i = 0;
 
     if (user == NULL || group == NULL ||
         (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
@@ -3036,9 +3047,13 @@ release_job(client_t        *con,	/* I - Client connection */
     endgrent();
 
     if (group != NULL)
+    {
       for (i = 0; group->gr_mem[i]; i ++)
         if (strcmp(username, group->gr_mem[i]) == 0)
 	  break;
+    }
+    else
+      i = 0;
 
     if (user == NULL || group == NULL ||
         (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
@@ -3224,9 +3239,13 @@ restart_job(client_t        *con,	/* I - Client connection */
     endgrent();
 
     if (group != NULL)
+    {
       for (i = 0; group->gr_mem[i]; i ++)
         if (strcmp(username, group->gr_mem[i]) == 0)
 	  break;
+    }
+    else
+      i = 0;
 
     if (user == NULL || group == NULL ||
         (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
@@ -3394,9 +3413,13 @@ send_document(client_t        *con,	/* I - Client connection */
     endgrent();
 
     if (group != NULL)
+    {
       for (i = 0; group->gr_mem[i]; i ++)
         if (strcmp(username, group->gr_mem[i]) == 0)
 	  break;
+    }
+    else
+      i = 0;
 
     if (user == NULL || group == NULL ||
         (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
@@ -3796,9 +3819,13 @@ set_job_attrs(client_t        *con,		/* I - Client connection */
     endgrent();
 
     if (group != NULL)
+    {
       for (i = 0; group->gr_mem[i]; i ++)
         if (strcmp(username, group->gr_mem[i]) == 0)
 	  break;
+    }
+    else
+      i = 0;
 
     if (user == NULL || group == NULL ||
         (group->gr_mem[i] == NULL && group->gr_gid != user->pw_gid))
@@ -4174,5 +4201,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.58 2000/03/11 18:30:13 mike Exp $".
+ * End of "$Id: ipp.c,v 1.59 2000/03/21 04:03:34 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: image-sgi.c,v 1.6 2000/01/04 13:45:45 mike Exp $"
+ * "$Id: image-sgi.c,v 1.7 2000/03/21 04:03:26 mike Exp $"
  *
  *   SGI image file routines for the Common UNIX Printing System (CUPS).
  *
@@ -167,7 +167,7 @@ ImageReadSGI(image_t    *img,		/* IO - Image */
             }
           else
 	    for (i = img->xsize - 1, red = rows[0], green = rows[1],
-	             blue = rows[2], inptr = in;
+	             blue = rows[2], alpha = rows[3], inptr = in;
 		 i >= 0;
 		 i --)
             {
@@ -263,5 +263,5 @@ ImageReadSGI(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-sgi.c,v 1.6 2000/01/04 13:45:45 mike Exp $".
+ * End of "$Id: image-sgi.c,v 1.7 2000/03/21 04:03:26 mike Exp $".
  */

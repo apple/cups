@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.29 2000/03/11 15:31:27 mike Exp $"
+ * "$Id: auth.c,v 1.30 2000/03/21 04:03:33 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -320,14 +320,15 @@ IsAuthorized(client_t *con)	/* I - Connection */
 		hostlen;	/* Length of hostname */
   struct passwd	*pw;		/* User password data */
   struct group	*grp;		/* Group data */
-  char		*pass;		/* Encrypted password */
-#ifdef HAVE_SHADOW_H
-  struct spwd	*spw;		/* Shadow password data */
-#endif /* HAVE_SHADOW_H */
 #if HAVE_LIBPAM
   pam_handle_t	*pamh;		/* PAM authentication handle */
   int		pamerr;		/* PAM error code */
   struct pam_conv pamdata;	/* PAM conversation data */
+#else
+  char		*pass;		/* Encrypted password */
+#  ifdef HAVE_SHADOW_H
+  struct spwd	*spw;		/* Shadow password data */
+#  endif /* HAVE_SHADOW_H */
 #endif /* HAVE_LIBPAM */
 
 
@@ -358,7 +359,6 @@ IsAuthorized(client_t *con)	/* I - Connection */
   * Check host/ip-based accesses...
   */
 
-  auth    = best->order_type;
   address = ntohl(con->http.hostaddr.sin_addr.s_addr);
   hostlen = strlen(con->http.hostname);
 
@@ -376,9 +376,15 @@ IsAuthorized(client_t *con)	/* I - Connection */
     * Do authorization checks on the domain/address...
     */
 
-    switch (auth)
+    switch (best->order_type)
     {
+      default :
+	  auth = AUTH_DENY;	/* anti-compiler-warning-code */
+	  break;
+
       case AUTH_ALLOW : /* Order Deny,Allow */
+          auth = AUTH_ALLOW;
+
           if (CheckAuth(address, con->http.hostname, hostlen,
 	          	best->num_deny, best->deny))
 	    auth = AUTH_DENY;
@@ -389,6 +395,8 @@ IsAuthorized(client_t *con)	/* I - Connection */
 	  break;
 
       case AUTH_DENY : /* Order Allow,Deny */
+          auth = AUTH_DENY;
+
           if (CheckAuth(address, con->http.hostname, hostlen,
 	        	best->num_allow, best->allow))
 	    auth = AUTH_ALLOW;
@@ -733,5 +741,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.29 2000/03/11 15:31:27 mike Exp $".
+ * End of "$Id: auth.c,v 1.30 2000/03/21 04:03:33 mike Exp $".
  */

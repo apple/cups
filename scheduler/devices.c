@@ -1,5 +1,5 @@
 /*
- * "$Id: devices.c,v 1.3 2000/02/11 05:04:14 mike Exp $"
+ * "$Id: devices.c,v 1.4 2000/03/21 04:03:34 mike Exp $"
  *
  *   Device scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -31,24 +31,6 @@
  */
 
 #include "cupsd.h"
-
-#if HAVE_DIRENT_H
-#  include <dirent.h>
-typedef struct dirent DIRENT;
-#  define NAMLEN(dirent) strlen((dirent)->d_name)
-#else
-#  if HAVE_SYS_NDIR_H
-#    include <sys/ndir.h>
-#  endif
-#  if HAVE_SYS_DIR_H
-#    include <sys/dir.h>
-#  endif
-#  if HAVE_NDIR_H
-#    include <ndir.h>
-#  endif
-typedef struct direct DIRENT;
-#  define NAMLEN(dirent) (dirent)->d_namlen
-#endif
 
 
 /*
@@ -386,5 +368,5 @@ compare_devs(const dev_info_t *d0,	/* I - First PPD file */
 
 
 /*
- * End of "$Id: devices.c,v 1.3 2000/02/11 05:04:14 mike Exp $".
+ * End of "$Id: devices.c,v 1.4 2000/03/21 04:03:34 mike Exp $".
  */

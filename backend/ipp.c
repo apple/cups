@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.22 2000/02/24 21:40:29 mike Exp $"
+ * "$Id: ipp.c,v 1.23 2000/03/21 04:03:23 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -168,6 +168,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     fprintf(stderr, "INFO: Connecting to %s...\n", hostname);
 
     if ((http = httpConnect(hostname, port)) == NULL)
+    {
       if (errno == ECONNREFUSED)
       {
 	fprintf(stderr, "INFO: Network host \'%s\' is busy; will retry in 30 seconds...",
@@ -179,6 +180,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	perror("ERROR: Unable to connect to IPP host");
 	sleep(30);
       }
+    }
   }
   while (http == NULL);
 
@@ -281,7 +283,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	ippRead(http, response);
 
 	ipp_status = response->request.status.status_code;
-       
+
 	if (ipp_status > IPP_OK_CONFLICT)
 	{
 	  if (ipp_status == IPP_PRINTER_BUSY ||
@@ -313,6 +315,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       }
       else
       {
+        response = NULL;
+
 	if (status == HTTP_ERROR)
 	{
           fprintf(stderr, "WARNING: Did not receive the IPP response (%d)\n",
@@ -321,7 +325,10 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	  ipp_status = IPP_PRINTER_BUSY;
 	}
 	else
+	{
           fprintf(stderr, "ERROR: Validate request was not accepted (%d)!\n", status);
+	  ipp_status = IPP_FORBIDDEN;
+	}
       }
 
       httpFlush(http);
@@ -664,5 +671,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.22 2000/02/24 21:40:29 mike Exp $".
+ * End of "$Id: ipp.c,v 1.23 2000/03/21 04:03:23 mike Exp $".
  */

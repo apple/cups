@@ -1,5 +1,5 @@
 /*
- * "$Id: image-sun.c,v 1.6 2000/01/04 13:45:45 mike Exp $"
+ * "$Id: image-sun.c,v 1.7 2000/03/21 04:03:26 mike Exp $"
  *
  *   Sun Raster image file routines for the Common UNIX Printing System (CUPS).
  *
@@ -144,6 +144,7 @@ ImageReadSunRaster(image_t    *img,	/* IO - Image */
   out       = malloc(img->xsize * bpp);
   scanline  = malloc(scanwidth);
   run_count = 0;
+  run_value = 0;
 
   for (y = 0; y < img->ysize; y ++)
   {
@@ -372,5 +373,5 @@ read_unsigned(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: image-sun.c,v 1.6 2000/01/04 13:45:45 mike Exp $".
+ * End of "$Id: image-sun.c,v 1.7 2000/03/21 04:03:26 mike Exp $".
  */

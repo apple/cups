@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.35 2000/03/20 22:06:14 mike Exp $"
+dnl "$Id: configure.in,v 1.36 2000/03/21 04:03:22 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -203,7 +203,10 @@ dnl Checks for vsyslog function.
 AC_CHECK_FUNCS(vsyslog)
 
 dnl Checks for signal functions.
-AC_CHECK_FUNCS(sigset)
+if test "$uname" != "Linux"; then
+	AC_CHECK_FUNCS(sigset)
+fi
+
 AC_CHECK_FUNCS(sigaction)
 
 dnl Checks for wait functions.
@@ -359,5 +362,5 @@ AC_SUBST(CUPS_DOCDIR)
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.35 2000/03/20 22:06:14 mike Exp $".
+dnl End of "$Id: configure.in,v 1.36 2000/03/21 04:03:22 mike Exp $".
 dnl

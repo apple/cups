@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.21 2000/03/09 19:47:26 mike Exp $"
+ * "$Id: image.c,v 1.22 2000/03/21 04:03:27 mike Exp $"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
@@ -198,9 +198,9 @@ ImageClose(image_t *img)	/* I - Image to close */
 
   fputs("DEBUG: Freeing memory...\n", stderr);
 
-  for (current = img->first; current != NULL; current = next)
+  for (current = img->first, next = NULL; current != NULL; current = next)
   {
-    fprintf(stderr, "DEBUG: Freeing cache (%08lx, next = %08lx)...\n",
+    fprintf(stderr, "DEBUG: Freeing cache (%p, next = %p)...\n",
             current, next);
 
     next = current->next;
@@ -213,11 +213,11 @@ ImageClose(image_t *img)	/* I - Image to close */
 
   if (img->tiles != NULL)
   {
-    fprintf(stderr, "DEBUG: Freeing tiles (%08lx)...\n", img->tiles[0]);
+    fprintf(stderr, "DEBUG: Freeing tiles (%p)...\n", img->tiles[0]);
 
     free(img->tiles[0]);
 
-    fprintf(stderr, "DEBUG: Freeing tile pointers (%08lx)...\n", img->tiles);
+    fprintf(stderr, "DEBUG: Freeing tile pointers (%p)...\n", img->tiles);
 
     free(img->tiles);
   }
@@ -630,12 +630,12 @@ get_tile(image_t *img,	/* I - Image */
 
       img->num_ics ++;
 
-      fprintf(stderr, "DEBUG: Allocated cache tile %d (%08lx)...\n",
+      fprintf(stderr, "DEBUG: Allocated cache tile %d (%p)...\n",
               img->num_ics, ic);
     }
     else
     {
-      fprintf(stderr, "DEBUG: Flushing old cache tile (%08lx)...\n",
+      fprintf(stderr, "DEBUG: Flushing old cache tile (%p)...\n",
               img->first);
 
       flush_tile(img);
@@ -647,7 +647,7 @@ get_tile(image_t *img,	/* I - Image */
 
     if (tile->pos >= 0)
     {
-      fprintf(stderr, "DEBUG: Loading cache tile from file position %d...\n",
+      fprintf(stderr, "DEBUG: Loading cache tile from file position %ld...\n",
               tile->pos);
 
       if (ftell(img->cachefile) != tile->pos)
@@ -768,7 +768,7 @@ flush_tile(image_t *img)	/* I - Image */
   if (fwrite(tile->ic->pixels, bpp, TILE_SIZE * TILE_SIZE, img->cachefile) < 1)
     perror("ERROR: Unable to write tile to swap file");
   else
-    fprintf(stderr, "DEBUG: Wrote tile at position %d...\n", tile->pos);
+    fprintf(stderr, "DEBUG: Wrote tile at position %ld...\n", tile->pos);
 
   tile->ic    = NULL;
   tile->dirty = 0;
@@ -776,5 +776,5 @@ flush_tile(image_t *img)	/* I - Image */
 
 
 /*
- * End of "$Id: image.c,v 1.21 2000/03/09 19:47:26 mike Exp $".
+ * End of "$Id: image.c,v 1.22 2000/03/21 04:03:27 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: testhttp.c,v 1.8 2000/01/04 13:45:37 mike Exp $"
+ * "$Id: testhttp.c,v 1.9 2000/03/21 04:03:25 mike Exp $"
  *
  *   HTTP test program for the Common UNIX Printing System (CUPS).
  *
@@ -46,7 +46,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   http_t	*http;		/* HTTP connection */
   http_status_t	status;		/* Status of GET command */
   char		buffer[1024];	/* Input buffer */
-  int		bytes;		/* Number of bytes read */
+  long		bytes;		/* Number of bytes read */
   FILE		*out;		/* Output file */
 
 #define HOST "dns.easysw.com"
@@ -90,7 +90,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     {
       fwrite(buffer, bytes, 1, out);
       if (out != stdout)
-        printf("Read %d bytes, %d total...\n", bytes, ftell(out));
+        printf("Read %ld bytes, %ld total...\n", bytes, ftell(out));
     }
   }
 
@@ -105,5 +105,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testhttp.c,v 1.8 2000/01/04 13:45:37 mike Exp $".
+ * End of "$Id: testhttp.c,v 1.9 2000/03/21 04:03:25 mike Exp $".
  */

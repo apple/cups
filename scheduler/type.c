@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.1 2000/01/25 03:50:49 mike Exp $"
+ * "$Id: type.c,v 1.2 2000/03/21 04:03:36 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -647,6 +647,7 @@ checkrules(const char   *filename,	/* I - Filename */
     logic = rules->parent->op;
 
   bufoffset = -1;
+  buflength = 0;
 
   while (rules != NULL)
   {
@@ -1010,5 +1011,5 @@ patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.1 2000/01/25 03:50:49 mike Exp $".
+ * End of "$Id: type.c,v 1.2 2000/03/21 04:03:36 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.17 2000/02/10 00:57:52 mike Exp $"
+ * "$Id: lpd.c,v 1.18 2000/03/21 04:03:23 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -195,7 +195,7 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
   bytes = vsnprintf(buf, sizeof(buf), format, ap);
   va_end(ap);
 
-  fprintf(stderr, "DEBUG: lpd_command %02.2x %s", buf[0], buf + 1);
+  fprintf(stderr, "DEBUG: lpd_command %2.2x %s", buf[0], buf + 1);
 
  /*
   * Send the command...
@@ -332,14 +332,14 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
   while (copies > 0)
   {
     
-    snprintf(cptr, sizeof(control) - (cptr - control), "ldfA%03.3d%s\n",
+    snprintf(cptr, sizeof(control) - (cptr - control), "ldfA%03d%s\n",
              getpid() % 1000, localhost);
     cptr   += strlen(cptr);
     copies --;
   }
 
   snprintf(cptr, sizeof(control) - (cptr - control),
-           "UdfA%03.3d%s\nNdfA%03.3d%s\n",
+           "UdfA%03d%s\nNdfA%03d%s\n",
            getpid() % 1000, localhost,
            getpid() % 1000, localhost);
 
@@ -410,5 +410,5 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
 
 /*
- * End of "$Id: lpd.c,v 1.17 2000/02/10 00:57:52 mike Exp $".
+ * End of "$Id: lpd.c,v 1.18 2000/03/21 04:03:23 mike Exp $".
  */

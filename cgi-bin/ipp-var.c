@@ -1,9 +1,9 @@
 /*
- * "$Id: ipp-var.c,v 1.3 2000/02/08 20:38:44 mike Exp $"
+ * "$Id: ipp-var.c,v 1.4 2000/03/21 04:03:24 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-1999 by Easy Software Products.
+ *   Copyright 1997-2000 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -68,8 +68,6 @@ ippSetCGIVars(ipp_t *response)		/* I - Response data to be copied... */
     * Copy attributes to a separator...
     */
 
-/*    puts("<HR>");*/
-
     for (; attr != NULL && attr->group_tag != IPP_TAG_ZERO; attr = attr->next)
     {
      /*
@@ -78,8 +76,6 @@ ippSetCGIVars(ipp_t *response)		/* I - Response data to be copied... */
 
       if (attr->name == NULL)
         continue;
-
-/*      printf("<P>%s\n", attr->name);*/
 
       for (i = 0; attr->name[i]; i ++)
         if (attr->name[i] == '-')
@@ -154,6 +150,9 @@ ippSetCGIVars(ipp_t *response)		/* I - Response data to be copied... */
 	  case IPP_TAG_LANGUAGE :
 	      strcat(valptr, attr->values[i].string.text);
 	      break;
+
+          default :
+	      break; /* anti-compiler-warning-code */
 	}
       }
 
@@ -171,5 +170,5 @@ ippSetCGIVars(ipp_t *response)		/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.3 2000/02/08 20:38:44 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.4 2000/03/21 04:03:24 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: filter.c,v 1.1 2000/01/25 03:50:48 mike Exp $"
+ * "$Id: filter.c,v 1.2 2000/03/21 04:03:34 mike Exp $"
  *
  *   File type conversion routines for the Common UNIX Printing System (CUPS).
  *
@@ -186,8 +186,10 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
   * OK, now look for filters from the source type to any other type...
   */
 
-  mincost = 9999999;
-  mintemp = NULL;
+  mincost     = 9999999;
+  mintemp     = NULL;
+  num_mintemp = 0;
+  mincurrent  = NULL;
 
   for (i = mime->num_filters, current = mime->filters; i > 0; i --, current ++)
     if (current->src == src)
@@ -295,5 +297,5 @@ lookup(mime_t      *mime,	/* I - MIME database */
 
 
 /*
- * End of "$Id: filter.c,v 1.1 2000/01/25 03:50:48 mike Exp $".
+ * End of "$Id: filter.c,v 1.2 2000/03/21 04:03:34 mike Exp $".
  */
