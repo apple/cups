@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.170 2002/08/27 19:19:22 mike Exp $"
+ * "$Id: ipp.c,v 1.171 2002/10/02 16:38:46 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3000,8 +3000,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
     dmask = CUPS_PRINTER_CLASS;
 
  /*
-  * See if the "which-jobs" attribute have been specified; if so, return
-  * right away if they specify "completed" - we don't keep old job records...
+  * See if the "which-jobs" attribute have been specified...
   */
 
   if ((attr = ippFindAttribute(con->request, "which-jobs", IPP_TAG_KEYWORD)) != NULL &&
@@ -5979,5 +5978,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.170 2002/08/27 19:19:22 mike Exp $".
+ * End of "$Id: ipp.c,v 1.171 2002/10/02 16:38:46 mike Exp $".
  */
