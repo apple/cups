@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.11 1999/04/02 18:13:37 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.12 1999/04/05 13:20:14 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -505,15 +505,15 @@ main(int  argc,		/* I - Number of command-line arguments */
   {
     header.cupsWidth   = xprint * header.HWResolution[0];
     header.cupsHeight  = yprint * header.HWResolution[1];
-    header.PageSize[0] = header.cupsWidth;
-    header.PageSize[1] = header.cupsHeight;
+    header.PageSize[0] = xprint * 72.0;
+    header.PageSize[1] = yprint * 72.0;
   }
   else
   {
     header.cupsWidth   = (PageRight - PageLeft) * header.HWResolution[0] / 72.0;
     header.cupsHeight  = (PageTop - PageBottom) * header.HWResolution[1] / 72.0;
-    header.PageSize[0] = PageWidth * header.HWResolution[0] / 72.0;
-    header.PageSize[1] = PageLength * header.HWResolution[1] / 72.0;
+    header.PageSize[0] = PageWidth;
+    header.PageSize[1] = PageLength;
   }
 
   switch (header.cupsColorOrder)
@@ -3600,5 +3600,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.11 1999/04/02 18:13:37 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.12 1999/04/05 13:20:14 mike Exp $".
  */
