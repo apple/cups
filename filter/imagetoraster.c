@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.20 1999/05/07 14:37:30 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.21 1999/05/26 19:37:51 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -114,7 +114,7 @@ int	Floyd4x4[4][4] =
 ib_t	OnPixels[256],	/* On-pixel LUT */
 	OffPixels[256];	/* Off-pixel LUT */
 int	Planes[] =	/* Number of planes for each colorspace */
-	{ 1, 3, 4, 1, 3, 3, 4, 4, 4, 6 };
+	{ 1, 3, 4, 1, 3, 3, 4, 4, 4, 6, 4, 4, 1, 1, 1 };
 
 
 /*
@@ -325,6 +325,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 	break;
 
     case CUPS_CSPACE_K :
+    case CUPS_CSPACE_WHITE :
+    case CUPS_CSPACE_GOLD :
+    case CUPS_CSPACE_SILVER :
         primary   = IMAGE_BLACK;
 	secondary = IMAGE_BLACK;
         header.cupsBitsPerPixel = header.cupsBitsPerColor;
@@ -713,6 +716,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 		              yerr0, yerr1, r0, r1);
 		  break;
 	      case CUPS_CSPACE_K :
+	      case CUPS_CSPACE_WHITE :
+	      case CUPS_CSPACE_GOLD :
+	      case CUPS_CSPACE_SILVER :
 	          format_K(&header, row, y, plane, z->xsize, z->ysize,
 		           yerr0, yerr1, r0, r1);
 		  break;
@@ -729,6 +735,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 		              yerr0, yerr1, r0, r1);
 		  break;
 	      case CUPS_CSPACE_YMCK :
+	      case CUPS_CSPACE_GMCK :
+	      case CUPS_CSPACE_GMCS :
 	          format_YMCK(&header, row, y, plane, z->xsize, z->ysize,
 		              yerr0, yerr1, r0, r1);
 		  break;
@@ -3831,5 +3839,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.20 1999/05/07 14:37:30 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.21 1999/05/26 19:37:51 mike Exp $".
  */
