@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: cups.sh,v 1.5 1999/07/21 19:04:33 mike Exp $"
+# "$Id: cups.sh,v 1.6 1999/10/25 17:13:11 mike Exp $"
 #
 #   Startup/shutdown script for the Common UNIX Printing System (CUPS).
 #
@@ -64,6 +64,11 @@ case "`uname`" in
 		;;
 esac
 
+# Change to the root directory first, in case we are being run from a
+# CD-ROM installation script...
+
+cd /
+
 # Start or stop the CUPS server based upon the first argument to the script.
 case $1 in
 	start | restart | reload)
@@ -108,5 +113,5 @@ exit 0
 
 
 #
-# End of "$Id: cups.sh,v 1.5 1999/07/21 19:04:33 mike Exp $".
+# End of "$Id: cups.sh,v 1.6 1999/10/25 17:13:11 mike Exp $".
 #
