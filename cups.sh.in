@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: cups.sh.in,v 1.9.2.5 2002/06/04 20:32:54 mike Exp $"
+# "$Id: cups.sh.in,v 1.9.2.6 2002/06/12 17:06:54 mike Exp $"
 #
 #   Startup/shutdown script for the Common UNIX Printing System (CUPS).
 #
@@ -64,17 +64,6 @@ case "`uname`" in
 		;;
 
 	Linux*)
-		# Set the timezone, if possible...
-		if test -f /etc/TIMEZONE; then
-                        . /etc/TIMEZONE
-                else
-			if test -f /etc/sysconfig/clock; then
-	                        . /etc/sysconfig/clock
-        	                TZ="$ZONE"
-                	        export TZ
-			fi
-                fi
-
 		IS_ON=/bin/true
 		;;
 
@@ -84,6 +73,40 @@ case "`uname`" in
 esac
 
 #### OS-Independent Stuff
+
+if test ! -f /etc/localtime; then
+	#
+	# Set the timezone, if possible...  This allows the
+	# scheduler and all child processes to know the local
+	# timezone when reporting dates and times to the user. 
+	# If no timezone information is found, then Greenwich
+	# Mean Time (GMT) is assumed.
+	#
+	# We only set the timezone when there is no
+	# /etc/localtime file, which is normally used instead of
+	# an environment variable under *BSD...
+	#
+
+	for file in /etc/TIMEZONE /etc/rc.config /etc/sysconfig/clock; do
+		if test -f $file; then
+	        	. /etc/TIMEZONE
+		fi
+	done
+
+	if test "x$ZONE" != x; then
+		TZ="$ZONE"
+	fi
+
+	if test "x$TIMEZONE" != x; then
+		TZ="$TIMEZONE"
+	fi
+
+	if test "x$TZ" = x; then
+		TZ=GMT
+	fi
+
+	export TZ
+fi
 
 #
 # The verbose flag controls the printing of the names of
@@ -106,10 +129,10 @@ fi
 #
 
 case "`uname`" in
-	IRIX* | HP-UX* | AIX* | SINIX*)
+	HP-UX* | AIX* | SINIX*)
 		pid=`ps -e | awk '{if (match($4, ".*/cupsd$") || $4 == "cupsd") print $1}'`
 		;;
-	SunOS*)
+	IRIX* | SunOS*)
 		pid=`ps -e | nawk '{if (match($4, ".*/cupsd$") || $4 == "cupsd") print $1}'`
 		;;
 	UnixWare*)
@@ -176,5 +199,5 @@ exit 0
 
 
 #
-# End of "$Id: cups.sh.in,v 1.9.2.5 2002/06/04 20:32:54 mike Exp $".
+# End of "$Id: cups.sh.in,v 1.9.2.6 2002/06/12 17:06:54 mike Exp $".
 #
