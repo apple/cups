@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.57 2000/05/17 14:32:48 mike Exp $"
+ * "$Id: client.c,v 1.58 2000/05/17 17:16:48 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -346,8 +346,6 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  con->http.state = HTTP_DELETE;
         else if (strcmp(operation, "TRACE") == 0)
 	  con->http.state = HTTP_TRACE;
-        else if (strcmp(operation, "CLOSE") == 0)
-	  con->http.state = HTTP_CLOSE;
         else if (strcmp(operation, "OPTIONS") == 0)
 	  con->http.state = HTTP_OPTIONS;
         else if (strcmp(operation, "HEAD") == 0)
@@ -369,7 +367,6 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	con->http.status = HTTP_OK;
 
     case HTTP_OPTIONS :
-    case HTTP_CLOSE :
     case HTTP_DELETE :
     case HTTP_GET :
     case HTTP_HEAD :
@@ -444,7 +441,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	}
       }
 
-      httpPrintf(HTTP(con), "Allow: CLOSE, OPTIONS, GET, HEAD, POST\r\n");
+      httpPrintf(HTTP(con), "Allow: GET, HEAD, OPTIONS, POST\r\n");
       httpPrintf(HTTP(con), "\r\n");
     }
     else if (strstr(con->uri, "..") != NULL)
@@ -681,8 +678,6 @@ ReadClient(client_t *con)	/* I - Client to read from */
       case HTTP_DELETE :
       case HTTP_TRACE :
           SendError(con, HTTP_NOT_IMPLEMENTED);
-
-      case HTTP_CLOSE :
           CloseClient(con);
 	  return (0);
 
@@ -1138,7 +1133,7 @@ SendHeader(client_t    *con,	/* I - Client to send to */
       return (0);
   }
   if (code == HTTP_METHOD_NOT_ALLOWED)
-    if (httpPrintf(HTTP(con), "Allow: CLOSE, OPTIONS, GET, HEAD, POST\r\n") < 0)
+    if (httpPrintf(HTTP(con), "Allow: GET, HEAD, OPTIONS, POST\r\n") < 0)
       return (0);
 
   if (code == HTTP_UNAUTHORIZED)
@@ -1757,5 +1752,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.57 2000/05/17 14:32:48 mike Exp $".
+ * End of "$Id: client.c,v 1.58 2000/05/17 17:16:48 mike Exp $".
  */
