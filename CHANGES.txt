@@ -1,13 +1,16 @@
 CHANGES.txt - 11/13/2001
 ------------------------
 
-CHANGES IN CUPS V1.1.11-1
+CHANGES IN CUPS V1.1.12
 
 	- Added "Polish" to the list of known languages for PPD
 	  files.
 	- Added missing directory definition to cups-config.
 	- The CUPS-Move-Job operation did not set the
 	  destination type for the new destination.
+	- The CUPS-Add-Printer operation did not support the
+	  allow=all or deny=none values to clear the per-user
+	  printer ACLs.
 
 
 CHANGES IN CUPS V1.1.11
