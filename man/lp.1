@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lp.1,v 1.4 1999/07/07 14:03:47 mike Exp $"
+.\" "$Id: lp.1,v 1.5 1999/09/09 14:58:01 mike Exp $"
 .\"
 .\"   lp/cancel man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lp 1 "Common UNIX Printing System" "14 May 1999" "Easy Software Products"
+.TH lp 1 "Common UNIX Printing System" "9 September 1999" "Easy Software Products"
 .SH NAME
 lp \- print files
 .br
@@ -30,6 +30,8 @@ cancel \- cancel jobs
 .B lp
 [ \-c ] [ \-d
 .I destination
+] [ -h
+.I server
 ] [ \-m ] [ \-n
 .I num-copies
 [ \-o
@@ -57,15 +59,53 @@ cancel \- cancel jobs
 .LP
 \fBcancel\fR cancels existing print jobs. The \fI-a\fR option will remove
 all jobs from the specified destination.
+.SH OPTIONS
+The following options are recognized by \fBlpr\fR:
+.TP 5
+\-d \fIdestination\fR
+.br
+Prints files to the named printer.
+.TP 5
+\-h \fIhostname\fR
+.br
+Specifies the print server hostname. The default is "localhost" or the value
+of the CUPS_SERVER environment variable.
+.TP 5
+\-m
+.br
+Send email when the job is completed (ignored in CUPS 1.0.)
+.TP 5
+\-n \fIcopies\fR
+.br
+Sets the number of copies to print from 1 to 100.
+.TP 5
+\-o \fIoption\fR
+.br
+Sets a job option.
+.TP 5
+\-p/q \fIpriority\fR
+.br
+Sets the job priority from 1 (lowest) to 100 (highest). The default priority
+is 50.
+.TP 5
+\-s
+.br
+Do not report the resulting job IDs (silent mode.)
+.TP 5
+\-t \fIname\fR
+.br
+Sets the job name.
 .SH COMPATIBILITY
 Unlike the System V printing system, CUPS allows printer names to contain
 any printable character except SPACE and TAB. Also, printer and class names are
 \fBnot\fR case-sensitive. 
+.LP
+The "m" option is not functional in CUPS 1.0.
 .SH SEE ALSO
 lpstat(1),
-CUPS Software User's Manual
+CUPS Software Users Manual
 .SH COPYRIGHT
 Copyright 1993-1999 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lp.1,v 1.4 1999/07/07 14:03:47 mike Exp $".
+.\" End of "$Id: lp.1,v 1.5 1999/09/09 14:58:01 mike Exp $".
 .\"
