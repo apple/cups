@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.28 2002/03/25 17:13:55 mike Exp $"
+ * "$Id: usb.c,v 1.29 2002/03/25 18:10:08 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -167,7 +167,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
         fputs("INFO: USB port busy; will retry in 30 seconds...\n", stderr);
 	sleep(30);
       }
-      else if (errno == ENXIO || errno == EIO)
+      else if (errno == ENXIO || errno == EIO || errno == ENOENT)
       {
         fputs("INFO: Printer not connected; will retry in 30 seconds...\n", stderr);
 	sleep(30);
@@ -460,5 +460,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: usb.c,v 1.28 2002/03/25 17:13:55 mike Exp $".
+ * End of "$Id: usb.c,v 1.29 2002/03/25 18:10:08 mike Exp $".
  */
