@@ -1,6 +1,6 @@
 #define DEBUG
 /*
- * "$Id: ipp.c,v 1.43 2000/01/21 03:45:11 mike Exp $"
+ * "$Id: ipp.c,v 1.44 2000/01/21 03:58:45 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -64,9 +64,10 @@ static void	add_class(client_t *con, ipp_attribute_t *uri);
 static void	add_printer(client_t *con, ipp_attribute_t *uri);
 static void	cancel_all_jobs(client_t *con, ipp_attribute_t *uri);
 static void	cancel_job(client_t *con, ipp_attribute_t *uri);
-static void	copy_attrs(ipp_t *to, ipp_t *from, ipp_attribute_t *req);
-static void	create_job(client_t *con, ipp_attribute_t *uri);
+static void	copy_attrs(ipp_t *to, ipp_t *from, ipp_attribute_t *req,
+		           ipp_tag_t group);
 static int	copy_file(const char *from, const char *to);
+static void	create_job(client_t *con, ipp_attribute_t *uri);
 static void	delete_printer(client_t *con, ipp_attribute_t *uri);
 static void	get_default(client_t *con);
 static void	get_devices(client_t *con);
@@ -1174,7 +1175,8 @@ cancel_job(client_t        *con,	/* I - Client connection */
 static void
 copy_attrs(ipp_t           *to,		/* I - Destination request */
            ipp_t           *from,	/* I - Source request */
-           ipp_attribute_t *req)	/* I - Requested attributes */
+           ipp_attribute_t *req,	/* I - Requested attributes */
+	   ipp_tag_t       group)	/* I - Group to copy */
 {
   int			i;		/* Looping var */
   ipp_attribute_t	*toattr,	/* Destination attribute */
@@ -1204,6 +1206,9 @@ copy_attrs(ipp_t           *to,		/* I - Destination request */
       if (i == req->num_values)
         continue;
     }
+
+    if (group != IPP_TAG_ZERO && fromattr->group_tag != group)
+      continue;
 
     DEBUG_printf(("copy_attrs: copying attribute \'%s\'...\n", fromattr->name));
 
@@ -1431,9 +1436,12 @@ create_job(client_t        *con,	/* I - Client connection */
                  NULL, job->username);
   else
   {
+    attr->group_tag = IPP_TAG_JOB;
     free(attr->name);
     attr->name = strdup("job-originating-user-name");
   }
+
+  SaveJob(job->id);
 
   LogMessage(LOG_INFO, "Job %d created on \'%s\' by \'%s\'.", job->id,
              job->dest, job->username);
@@ -1608,7 +1616,7 @@ get_default(client_t *con)		/* I - Client connection */
   {
     copy_attrs(con->response, DefaultPrinter->attrs,
                ippFindAttribute(con->request, "requested-attributes",
-	                	IPP_TAG_KEYWORD));
+	                	IPP_TAG_KEYWORD), IPP_TAG_ZERO);
 
     con->response->request.status.status_code = IPP_OK;
   }
@@ -1631,7 +1639,7 @@ get_devices(client_t *con)		/* I - Client connection */
 
   copy_attrs(con->response, Devices,
              ippFindAttribute(con->request, "requested-attributes",
-	                      IPP_TAG_KEYWORD));
+	                      IPP_TAG_KEYWORD), IPP_TAG_ZERO);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -1816,7 +1824,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
 
     copy_attrs(con->response, job->attrs,
                ippFindAttribute(con->request, "requested-attributes",
-	                	IPP_TAG_KEYWORD));
+	                	IPP_TAG_KEYWORD), IPP_TAG_JOB);
 
     ippAddSeparator(con->response);
   }
@@ -1949,7 +1957,7 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
 
   copy_attrs(con->response, job->attrs,
              ippFindAttribute(con->request, "requested-attributes",
-	                      IPP_TAG_KEYWORD));
+	                      IPP_TAG_KEYWORD), IPP_TAG_JOB);
 
   if (ippFindAttribute(con->request, "requested-attributes", IPP_TAG_KEYWORD) != NULL)
     con->response->request.status.status_code = IPP_OK_SUBST;
@@ -1972,7 +1980,7 @@ get_ppds(client_t *con)			/* I - Client connection */
 
   copy_attrs(con->response, PPDs,
              ippFindAttribute(con->request, "requested-attributes",
-	                      IPP_TAG_KEYWORD));
+	                      IPP_TAG_KEYWORD), IPP_TAG_ZERO);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -2042,7 +2050,7 @@ get_printers(client_t *con,		/* I - Client connection */
 
       copy_attrs(con->response, printer->attrs,
         	 ippFindAttribute(con->request, "requested-attributes",
-	                	  IPP_TAG_KEYWORD));
+	                	  IPP_TAG_KEYWORD), IPP_TAG_ZERO);
 
       ippAddSeparator(con->response);
     }
@@ -2107,7 +2115,7 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
 
   copy_attrs(con->response, printer->attrs,
              ippFindAttribute(con->request, "requested-attributes",
-	                      IPP_TAG_KEYWORD));
+	                      IPP_TAG_KEYWORD), IPP_TAG_ZERO);
 
   ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state",
                 printer->state);
@@ -2545,6 +2553,7 @@ print_job(client_t        *con,		/* I - Client connection */
                  NULL, job->username);
   else
   {
+    attr->group_tag = IPP_TAG_JOB;
     free(attr->name);
     attr->name = strdup("job-originating-user-name");
   }
@@ -2561,6 +2570,8 @@ print_job(client_t        *con,		/* I - Client connection */
                              "job-state", IPP_JOB_PENDING);
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
                printer_uri);
+
+  SaveJob(job->id);
 
  /*
   * Start the job if possible...
@@ -3540,5 +3551,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.43 2000/01/21 03:45:11 mike Exp $".
+ * End of "$Id: ipp.c,v 1.44 2000/01/21 03:58:45 mike Exp $".
  */

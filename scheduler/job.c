@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.49 2000/01/21 02:23:29 mike Exp $"
+ * "$Id: job.c,v 1.50 2000/01/21 03:58:45 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -143,10 +143,9 @@ CancelJob(int id)		/* I - Job to cancel */
       DEBUG_puts("CancelJob: found job in list.");
 
       if (current->state->values[0].integer == IPP_JOB_PROCESSING)
-      {
 	StopJob(current->id);
-	current->state->values[0].integer = IPP_JOB_CANCELLED;
-      }
+
+      current->state->values[0].integer = IPP_JOB_CANCELLED;
 
      /*
       * Remove the print file for good if we aren't preserving jobs or
@@ -2103,5 +2102,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.49 2000/01/21 02:23:29 mike Exp $".
+ * End of "$Id: job.c,v 1.50 2000/01/21 03:58:45 mike Exp $".
  */
