@@ -1633,6 +1633,12 @@ resolution is enabled.  The localhost address (127.0.0.1) is
 printing text files. Only the values 6 and 8 are currently supported.
 The default value is 6.
 
+<H3>mirror (boolean)</H3>
+
+<P>The mirror attribute specifies whether pages are mirrored on
+their X axis, which is useful for printing transfer images on
+special media. The default value is false.
+
 <H3>natural-scaling (integer(1:1000))</H3>
 
 <P><I>(CUPS 1.1.9 and higher)</I>
