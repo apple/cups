@@ -3,6 +3,10 @@ CHANGES.txt - 03/14/2001
 
 CHANGES IN CUPS V1.1.7
 
+	- Configuration script changes, including new
+	  "--with-docdir=/dir" option to relocate CUPS
+	  documentation and web content according to your
+	  favorite version of the FHS.
 	- Documentation updates for encryption, SLP, etc.
 	- New Software Test Plan and automated test script to
 	  test CUPS prior to installation.

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.81 2001/03/04 02:30:59 mike Exp $"
+dnl "$Id: configure.in,v 1.82 2001/03/19 16:46:08 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -127,6 +127,8 @@ fi
 AC_ARG_ENABLE(pam, [  --enable-pam        turn on PAM support [default=yes]])
 
 AC_ARG_WITH(fontpath, [  --with-fontpath     set font path for pstoraster],fontpath="$withval",fontpath="")
+
+AC_ARG_WITH(docdir, [  --with-docdir       set path for documentation],docdir="$withval",docdir="")
 
 dnl Checks for programs...
 AC_PROG_AWK
@@ -660,8 +662,14 @@ AC_DEFINE_UNQUOTED(CUPS_DATADIR, "$datadir/cups")
 AC_SUBST(CUPS_DATADIR)
 
 dnl Set the CUPS_DOCROOT directory...
-CUPS_DOCROOT='${datadir}/doc/cups'
-AC_DEFINE_UNQUOTED(CUPS_DOCROOT, "$datadir/doc/cups")
+if test x$docdir = x; then
+	CUPS_DOCROOT='${datadir}/doc/cups'
+	docdir='$datadir/doc/cups'
+else
+	CUPS_DOCROOT="$docdir"
+fi
+
+AC_DEFINE_UNQUOTED(CUPS_DOCROOT, "$docdir")
 AC_SUBST(CUPS_DOCROOT)
 
 dnl Set the CUPS_FONTPATH directory...
@@ -670,5 +678,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.81 2001/03/04 02:30:59 mike Exp $".
+dnl End of "$Id: configure.in,v 1.82 2001/03/19 16:46:08 mike Exp $".
 dnl
