@@ -1,5 +1,5 @@
 /*
- * "$Id: var.c,v 1.3 1997/05/13 14:56:37 mike Exp $"
+ * "$Id: var.c,v 1.4 1997/05/13 15:16:30 mike Exp $"
  *
  *   CGI form variable functions.
  *
@@ -21,7 +21,10 @@
  * Revision History:
  *
  *   $Log: var.c,v $
- *   Revision 1.3  1997/05/13 14:56:37  mike
+ *   Revision 1.4  1997/05/13 15:16:30  mike
+ *   Updated cgiCheckVariables() to see if the variable is blank.
+ *
+ *   Revision 1.3  1997/05/13  14:56:37  mike
  *   Added cgiCheckVariables() function to check for required variables.
  *
  *   Revision 1.2  1997/05/08  20:14:19  mike
@@ -101,7 +104,8 @@ int
 cgiCheckVariables(char *names)	/* I - Variables to look for */
 {
   char	name[255],	/* Current variable name */
-	*s;		/* Pointer in string */
+	*s,		/* Pointer in string */
+	*val;		/* Value of variable */
 
 
   if (names == NULL)
@@ -119,8 +123,11 @@ cgiCheckVariables(char *names)	/* I - Variables to look for */
     if (name[0] == '\0')
       break;
 
-    if (cgiGetVariable(name) == NULL)
+    if ((val = cgiGetVariable(name)) == NULL)
       return (0);
+
+    if (*val == '\0')
+      return (0);	/* Can't be blank, either! */
   };
 
   return (1);
@@ -419,5 +426,5 @@ cgi_initialize_post(int need_content)	/* I - True if input is required */
 
 
 /*
- * End of "$Id: var.c,v 1.3 1997/05/13 14:56:37 mike Exp $".
+ * End of "$Id: var.c,v 1.4 1997/05/13 15:16:30 mike Exp $".
  */
