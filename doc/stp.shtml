@@ -12,14 +12,14 @@
 
 <H2>Identification</H2>
 
-This software test plan provides detailed tests that are used to evaluate
+<P>This software test plan provides detailed tests that are used to evaluate
 the stability of the Common UNIX Printing System ("CUPS") Version 1.1.
 
 <EMBED SRC="system-overview.shtml">
 
 <H2>Document Overview</H2>
 
-This software test plan is organized into the following sections:
+<P>This software test plan is organized into the following sections:
 
 <UL>
 	<LI>1 - Scope</LI>

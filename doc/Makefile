@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.26 2000/07/07 17:02:39 mike Exp $"
+# "$Id: Makefile,v 1.27 2000/07/10 17:44:20 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -214,6 +214,11 @@ sum-7x8.ps:		sum.shtml
 	htmldoc --titleimage images/cups-large.gif --duplex --jpeg \
 		--size 7x8.5in --left 0.5in --right 0.25in \
 		--top 0.25in --bottom 0.25in --fontsize 10 --headfootsize 10 -f $@ sum.shtml
+
+$(DOCUMENTS):	glossary.shtml printing-overview.shtml \
+		references.shtml system-overview.shtml \
+		../LICENSE.html
+
 
 #
 # End of Makefile.

@@ -41,7 +41,7 @@
 	<DD>Hewlett-Packard Graphics Language
 
 	<DT>HP-PCL
-	<DD>Hewlett-Packard Printer Control Language
+	<DD>Hewlett-Packard Page Control Language
 
 	<DT>HP-PJL
 	<DD>Hewlett-Packard Printer Job Language
@@ -60,9 +60,6 @@
 
 	<DT>MIME
 	<DD>Multimedia Internet Mail Exchange
-
-	<DT>PCL
-	<DD>Page Control Language
 
 	<DT>PPD
 	<DD>PostScript Printer Description

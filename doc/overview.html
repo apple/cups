@@ -12,7 +12,7 @@
 	Common UNIX Printing System,<BR>
 	Version 1.1</H1>
 
-	<P ALIGN="RIGHT">July 7, 2000<BR>
+	<P ALIGN="RIGHT">July 10, 2000<BR>
 	Michael Sweet, Easy Software Products<BR>
 	Copyright 1998-2000, All Rights Reserved.</P>
 	</TD>
@@ -44,20 +44,23 @@ capabilities of these systems.
 
 <P>Over the last few years several attempts at developing a standard
 printing interface have been made, including the draft POSIX Printing
-standard [IEEE-1387.4, last updated in 1994] and Internet Printing
-Protocol [IETF-IPP]. The POSIX printing standard defines a common set
-of command-line tools as well as a C interface for printer
-administration and print jobs, but has been shelved by the IEEE.
+standard developed by the Institute of Electrical and Electronics
+Engineers, Inc. ("IEEE") [IEEE-1387.4] and Internet Printing Protocol
+("IPP") developed by the Internet Engineering Task Force ("IETF")
+through the Printer Working Group ("PWG") [IETF-IPP]. The POSIX
+printing standard defines a common set of command-line tools as well as
+a C interface for printer administration and print jobs, but has been
+shelved by the IEEE.
 
 <P>The Internet Printing Protocol defines extensions to the HyperText
 Transport Protocol 1.1 [RFC2616] to provide support for remote printing
-services. IPP/1.0 was accepted by the IETF as an experimental
-RFC in October of 1999. Since then the Printer Working Group
-has developed an updated set of specifications for IPP/1.1 which have
-been accepted by the IETF and are awaiting publication as proposed
-standards. Unlike POSIX Printing, IPP enjoys widespread industry
-support and is poised to become the standard network printing solution
-for all operating systems.
+services. IPP/1.0 was accepted by the IETF as an experimental Request
+For Comments [RFC] document in October of 1999. Since then the Printer
+Working Group has developed an updated set of specifications for
+IPP/1.1 which have been accepted by the IETF and are awaiting
+publication as proposed standards. Unlike POSIX Printing, IPP enjoys
+widespread industry support and is poised to become the standard
+network printing solution for all operating systems.
 
 <P>CUPS uses IPP/1.1 to provide a complete, modern printing system for
 UNIX that can be extended to support new printers, devices, and
@@ -74,9 +77,9 @@ and bugs found, but no new functionality was added to improve the
 stability of the CUPS code.
 
 <P>CUPS 1.1 is based on IPP/1.1 and adds many of the functional
-enhancements that have been requests by our users. As with 1.0, CUPS
+enhancements that have been requested by our users. As with 1.0, CUPS
 1.1 will be followed by patch releases that address any problems found
-with the software but will add no new features.
+with the software but add no new features.
 
 <H2>Design Overview</H2>
 
@@ -86,8 +89,8 @@ commands, provides printer status information to local and remote
 programs, and informs users as needed. Figure 1 shows the basic
 organization of CUPS.
 
-<P ALIGN=CENTER><IMG SRC="images/cups-block-diagram.gif" WIDTH="470" HEIGHT="170">
-<BR>Figure 1 - CUPS Block Diagram
+<CENTER><IMG SRC="images/cups-block-diagram.gif" WIDTH="470" HEIGHT="170"></CENTER>
+<P ALIGN="CENTER">Figure 1 - CUPS Block Diagram</P>
 
 <H3>Scheduler</H3>
 

@@ -33,20 +33,33 @@ sections:</P>
 
 <H1>Additions</H1>
 
-CUPS 1.1 includes many new features from the 1.0.x releases.
+<P>CUPS 1.1 includes many new features from the 1.0.x releases.
 
 <H2>Filters</H2>
 
 <H3><CODE>imagetoraster</CODE>, <CODE>imagetops</CODE></H3>
 
-The image file filters have been upgraded to support conversion of Microsoft
-Bitmap ("BMP") files.
+<P>The image file filters have been upgraded to support conversion of
+Microsoft Bitmap ("BMP") and Alias PIX files.
+
+<H3>pdftops</H3>
+
+<P>A new pdftops filter has been developed that is based on the
+excellent Xpdf 0.90 software from Derek B. Noonburg. The new filter is
+faster, smaller, and considerably more reliable than the
+Ghostscript-based filter in CUPS 1.0.
 
 <H3>pstoraster</H3>
 
-<P>The <CODE>pstoraster</CODE> filter has been integrated with GNU GhostScript 5.50. The
-new RIP supports most Level 3 PostScript language features and much better
-color management for the sample printer drivers.
+<P>The <CODE>pstoraster</CODE> filter has been integrated with GNU
+GhostScript 5.50. The new RIP supports most Level 3 PostScript language
+features.
+
+<H3>rastertoepson</H3>
+
+<P>The new <CODE>rastertoepson</CODE> filter supports EPSON printers
+using the ESC/P or ESC/P2 command sets. PPDs are supplied for 9-pin,
+24-pin, Stylus Color, and Stylus Photo printers.
 
 <H2>User-Defined Printers and Options</H2>
 
@@ -58,20 +71,61 @@ each with unique options.
 have been upgraded to use this option and printer instance information
 automatically.
 
+<H2>Daemons</H2>
+
+<P>CUPS 1.1 includes two new daemons that provide enhanced network printing
+support.
+
+<H3>cups-lpd</H3>
+
+<P>The <CODE>cups-lpd</CODE> daemon provides support for clients using the
+Line Printer Daemon protocol.
+
+<H3>cups-polld</H3>
+
+<P>The <CODE>cups-polld</CODE> daemon provides remote polling services for
+the scheduler.
+
+<H2>Commands</H2>
+
+<P>CUPS 1.1 includes several new printing commands.
+
+<H3>lpoptions</H3>
+
+<P>The <CODE>lpoptions</CODE> command provides user-defined printers and
+options.
+
+<H3>lpmove</H3>
+
+<P>The <CODE>lpmove</CODE> command moves a print job to a new destination.
+
+<H3>lpinfo</H3>
+
+<P>The <CODE>lpinfo</CODE> command lists the available PPD files or devices.
+
+<H2>IPP Implementation</H2>
+
+<P>CUPS 1.1 adds support for the <CODE>set-job-attributes</CODE>
+extension operation as well as two new CUPS-specific extension
+operations to determine which devices and printer drivers are available
+on the system.
+
+<P>Further information on the CUPS implementation of IPP can be found
+in CUPS-IPP-1.1.
 
 
 <H1>Changes</H1>
 
-CUPS 1.1 includes many changes from the 1.0.x releases.
+<P>CUPS 1.1 includes many changes from the 1.0.x releases.
 
 <H2>Directory Structure</H2>
 
-The directory structure in CUPS 1.1 has been modified to conform to the
+<P>The directory structure in CUPS 1.1 has been modified to conform to the
 Filesystem Hierarchy Standard, 2.0. The following table describes the
 new file locations.
 
 <CENTER><TABLE WIDTH="80%" BORDER>
-<CAPTION>Table N: Directory structure changes from CUPS 1.0.x to 1.1.x.</CAPTION>
+<CAPTION>Table 1: Directory structure changes from CUPS 1.0.x to 1.1.x.</CAPTION>
 <TR>
 	<TH>Description</TH>
 	<TH>CUPS 1.0.x</TH>
@@ -131,11 +185,13 @@ new file locations.
 
 <H2>IPP Implementation</H2>
 
-<P>CUPS 1.1 is based on version 1.1 of the Internet Printing Protocol,
-and implements the <CODE>set-job-attributes</CODE> extension operation.
+<P>CUPS 1.1 is based on version 1.1 of the Internet Printing Protocol.
 
-<P>Two new CUPS-specific extension operations are provided to determine
-which devices and printer drivers are available on the system.
+<P>The new scheduler supports the <CODE>create-job</CODE> and
+<CODE>send-document</CODE> operations. In addition, the
+<CODE>job-sheets</CODE>, <CODE>job-sheets-default</CODE>, and
+<CODE>job-sheets-supported</CODE> attributes are now supported for
+banner pages.
 
 <P>The <CODE>CUPS-get-printers</CODE> and <CODE>CUPS-get-classes</CODE>
 operations have been upgraded to support limited filtering based upon
@@ -144,8 +200,8 @@ the <CODE>printer-type</CODE>, <CODE>printer-location</CODE>,
 attributes.
 
 <P>The <CODE>CUPS-add-printer</CODE> operation now supports the
-<CODE>ppd-name</CODE> attribute to specify a locally-available PPD
-file rather than sending the PPD file from the client with the request.
+<CODE>ppd-name</CODE> attribute to specify a locally-available PPD file
+rather than sending the PPD file from the client with the request.
 
 <P>Further information on the CUPS implementation of IPP can be found
 in CUPS-IPP-1.1.

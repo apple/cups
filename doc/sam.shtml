@@ -148,7 +148,7 @@ from the source code.
 
 <H3><A NAME="REQUIREMENTS">Requirements</A></H3>
 
-<P>You'll need an ANSI-compliant C compiler to build CUPS on your
+<P>You'll need ANSI-compliant C and C++ compilers to build CUPS on your
 system. As its name implies, CUPS is designed to run on the UNIX
 operating system, however the CUPS interface library and most of the
 filters and backends supplied with CUPS should also compile and run
@@ -199,12 +199,23 @@ software in another location:
 
 <P>If the PNG, JPEG, TIFF, and ZLIB libraries are not installed in a
 system default location (typically <VAR>/usr/include</VAR> and
-<VAR>/usr/lib</VAR>) you'll need to set the <CODE>CFLAGS</CODE> and
-<CODE>LDFLAGS</CODE> environment variables prior to running configure:
+<VAR>/usr/lib</VAR>) you'll need to set the <CODE>CFLAGS</CODE>,
+<CODE>CXXFLAGS</CODE>, and <CODE>LDFLAGS</CODE> environment variables
+prior to running configure:
 
 <UL><PRE>
-<B>setenv CFLAGS "-I/some/directory"</B>
-<B>setenv LDFLAGS "-L/some/directory"</B>
+<B>setenv CFLAGS "-I/some/directory" ENTER</B>
+<B>setenv CXXFLAGS "-I/some/directory" ENTER</B>
+<B>setenv LDFLAGS "-L/some/directory" ENTER</B>
+<B>./configure ... ENTER</B>
+</PRE></UL>
+
+<P>or:
+
+<UL><PRE>
+<B>CFLAGS="-I/some/directory"; export CFLAGS ENTER</B>
+<B>CXXFLAGS="-I/some/directory"; export CXXFLAGS ENTER</B>
+<B>LDFLAGS="-L/some/directory"; export LDFLAGS ENTER</B>
 <B>./configure ... ENTER</B>
 </PRE></UL>
 
@@ -233,7 +244,7 @@ system default location (typically <VAR>/usr/include</VAR> and
 	<P>Installing CUPS will overwrite your existing printing
 	system. If you experience difficulties with the CUPS software
 	and need to go back to your old printing system, you will need
-	to reinstall the printing system from your operating system CDs.
+	to reinstall the old printing system from your operating system CDs.
 	</TD>
 </TR>
 </TABLE></CENTER>
@@ -266,7 +277,7 @@ only available for Linux.
 	system. If you experience difficulties with the CUPS software
 	and need to go back to your old printing system, you will need
 	to remove the CUPS software with the provided script and/or
-	reinstall the printing system from your operating system CDs.
+	reinstall the old printing system from your operating system CDs.
 	</TD>
 </TR>
 </TABLE></CENTER>
@@ -285,6 +296,7 @@ Once you are the root user, run the installation script with:
 <P>After asking you a few yes/no questions the CUPS software will be
 installed and the scheduler will be started automatically.
 
+<!-- NEED 2in -->
 <H3><A NAME="RPM-BINARY">Installing an RPM Distribution</A></H3>
 
 <P>To install the CUPS software from an RPM distribution you will need
@@ -334,7 +346,7 @@ example, the first parallel port in Linux usually uses a device URI of
 
 <!-- NEED 2.5in -->
 <P>You can see a complete list of supported devices by running the
-<CODE>lpinfo(1m)</CODE> command:
+<CODE>lpinfo(8)</CODE> command:
 
 <UL><PRE>
 <B>lpinfo -v ENTER</B>
@@ -346,7 +358,7 @@ network lpd
 direct parallel:/dev/lp1
 serial serial:/dev/ttyS1?baud=115200
 serial serial:/dev/ttyS2?baud=115200
-direct usb:/dev/usb/usblp0
+direct usb:/dev/usb/lp0
 network smb
 </PRE></UL>
 
@@ -367,7 +379,7 @@ DeskJet, EPSON 9-pin, EPSON 24-pin, and EPSON Stylus printers.
 <H2>Adding Your First Printer</H2>
 
 <P>CUPS provides two methods for adding printers: a command-line
-program called <CODE>lpadmin(1m)</CODE> and a Web interface. The
+program called <CODE>lpadmin(8)</CODE> and a Web interface. The
 <CODE>lpadmin</CODE> command allows you to perform most printer
 administration tasks from the command-line and is located in
 <VAR>/usr/sbin</VAR>. The Web interface is located at:
@@ -481,7 +493,7 @@ to add or modify a printer:
 
 	<DD>Enables the printer and accepts job. This option is
 	equivalent to running the <CODE>enable(1)</CODE> and
-	<CODE>accept(1m)</CODE> commands on the printer.
+	<CODE>accept(8)</CODE> commands on the printer.
 
 	<DT>-L <I>location</I>
 
@@ -670,7 +682,7 @@ jobs to a single server. However, if that server goes down then all
 printing will be disabled. Use this configuration only as absolutely needed.
 
 <P>The default server is normally "localhost". To override the default
-server create a file named <VAR>/etc/cups/conf/client.conf</VAR> and add
+server create a file named <VAR>/etc/cups/client.conf</VAR> and add
 a line reading:
 
 <UL><PRE>
@@ -688,8 +700,8 @@ reading:
 ServerName <I>server</I>
 </PRE></UL>
 
-<P>to the file. As before the <VAR>server</VAR> name can be the
-hostname or IP address of the default server.
+<P>to the file. The <VAR>server</VAR> name can be the hostname or IP
+address of the default server.
 
 <H3><A NAME="CLIENT_AUTO">Automatic Configuration of Print Queues</A></H3>
 
@@ -772,6 +784,8 @@ configuration files are located in the <VAR>/etc/cups</VAR> directory:
 </DL>
 </UL>
 
+<H2><A NAME="RESTARTING">Restarting the CUPS Server</A></H2>
+
 <P>Once you have made a change to a configuration file you need to
 restart the CUPS server by sending it a <CODE>HUP</CODE> signal or using the
 supplied initialization script. The CUPS distributions install the
@@ -789,11 +803,9 @@ script in the <VAR>init.d</VAR> directory with the name
 <P>The <VAR>/etc/cups/cupsd.conf</VAR> file contains configuration
 <I>directives</I> that control how the server functions. Each directive
 is listed on a line by itself followed by its value. Comments are
-introduced using the number sign ("#") character at the beginning of
-a line.
-
-<P>Since the server configuration file consists of plain text, you can
-use your favorite text editor to make changes to it.
+introduced using the number sign ("#") character at the beginning of a
+line. Since the server configuration file consists of plain text, you
+can use your favorite text editor to make changes to it.
 
 <!-- NEED 4in -->
 <H2>Server Directives</H2>
@@ -896,15 +908,15 @@ to the <A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
 access log file is stored in "common log format" and can be used by any
 web access reporting tool to generate a report on CUPS server activity.
 
-<P>The special name "syslog" can be used to send the access information
-to the system log instead of a plain file.
-
 <P>The server name can be included in the filename by using
 <CODE>%s</CODE> in the name.
 
+<P>The special name "syslog" can be used to send the access information
+to the system log instead of a plain file.
+
 <P>The default access log file is <VAR>/var/log/cups/access_log</VAR>.
 
-<!-- NEED 5in -->
+<!-- NEED 6in -->
 <H3><A NAME="Allow">Allow</A></H3>
 <HR>
 
@@ -1326,7 +1338,7 @@ destinations.
 <A HREF="#BrowseInterval"><CODE>BrowseInterval</CODE></A> value. Otherwise
 printers and classes will disappear from client systems between updates.
 
-<!-- NEED 3in -->
+<!-- NEED 4in -->
 <H3><A NAME="Browsing">Browsing</A></H3>
 <HR>
 
@@ -1500,7 +1512,7 @@ and then directly under the <CODE>DocumentRoot</CODE> directory
 the web content by providing subdirectories for each language needed.
 
 <!-- NEED 3in -->
-<H3><A NAME="Access">ErrorLog</A></H3>
+<H3><A NAME="ErrorLog">ErrorLog</A></H3>
 <HR>
 
 <H4>Examples</H4>
@@ -1518,11 +1530,11 @@ file. If the filename is not absolute then it is assumed to be relative
 to the <A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
 default error log file is <VAR>/var/log/cups/error_log</VAR>.
 
-<P>The special name "syslog" can be used to send the error information
-to the system log instead of a plain file.
-
 <P>The server name can be included in the filename by using
 <CODE>%s</CODE> in the name.
+
+<P>The special name "syslog" can be used to send the error information
+to the system log instead of a plain file.
 
 <!-- NEED 3in -->
 <H3><A NAME="Group">Group</A></H3>
@@ -1821,11 +1833,11 @@ file. If the filename is not absolute then it is assumed to be relative
 to the <A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
 default page log file is <VAR>/var/log/cups/page_log</VAR>.
 
-<P>The special name "syslog" can be used to send the page information
-to the system log instead of a plain file.
-
 <P>The server name can be included in the filename by using
 <CODE>%s</CODE> in the name.
+
+<P>The special name "syslog" can be used to send the page information
+to the system log instead of a plain file.
 
 <!-- NEED 3in -->
 <H3><A NAME="Port">Port</A></H3>
@@ -2114,11 +2126,10 @@ filter and CGI programs run as. The default user is <CODE>lp</CODE>.
 <!-- NEW PAGE -->
 <H2><A NAME="PRINTING_SECURITY">Printing System Security</A></H2>
 
-<P>CUPS provides support for address, certificate, and password (Basic and
-Digest) based authentication and access control.
-
-<P>Certificate and password authentication provide ways to limit access to
-individual people or groups.
+<P>CUPS provides support for address, certificate, and password (Basic
+and Digest) based authentication and access control. Certificate and
+password authentication provide ways to limit access to individual
+people or groups.
 
 <P>Address based access control allows you to limit access to specific
 systems, networks, or domains. While this does not provide authentication,
@@ -2265,6 +2276,7 @@ additional group membership requirements are checked.
 AuthType Basic
 </PRE></UL>
 
+<!-- NEED 7in -->
 <H3>Using Digest Authentication</H3>
 
 <P>Digest authentication uses users and passwords defined in the
@@ -2417,12 +2429,15 @@ directive in the <VAR>cupsd.conf</VAR> file.
 If no username and password is supplied for the request then this field
 contains "-".
 
-<P>The <I>date-time</I> field is the date and time of the request in Greenwich
-Mean Time (a.k.a. ZULU) and is in the format:
+<P>The <I>date-time</I> field is the date and time of the request in local time
+and is in the format:
 
 <UL><PRE>
-[DD/MON/YYYY:HH:MM:SS +0000]
+[DD/MON/YYYY:HH:MM:SS +ZZZZ]
 </PRE></UL>
+
+<P>where <I>ZZZZ</I> is the timezone offset in hours and minutes from Greenwich
+Mean Time (a.k.a. GMT a.k.a. ZULU.)
 
 <P>The <I>method</I> field is the HTTP method used ("GET", "PUT", "POST", etc.)
 
@@ -2438,7 +2453,7 @@ above.
 
 <P>The <I>bytes</I> field contains the number of bytes in the request.
 For POST requests the <I>bytes</I> field contains the number of bytes
-of non-IPP data that is received from the client.
+that was received from the client.
 
 <H3>The error_log File</H3>
 
@@ -2695,8 +2710,7 @@ different file types and filters.
 <P>Once you choose the names for these files, create them using your
 favorite text editor as described earlier in this chapter.  Once you
 have created the files, restart the <CODE>cupsd</CODE> process as
-described in <A HREF="#PRINTING_MANAGEMENT">Chapter N, "Printing System
-Configuration"</A>.
+described earlier in <A HREF="#RESTARTING">"Restarting the CUPS Server"</A>.
 
 <H3>Printer Drivers and PPD Files</H3>
 
@@ -2741,7 +2755,7 @@ the automatic client configuration and printer options are not supported by
 the LPD protocol, so you must manually configure each client for the printers
 it needs to access.
 
-<P>The <CODE>cups-lpd(1m)</CODE> program provides support for LPD clients.
+<P>The <CODE>cups-lpd(8)</CODE> program provides support for LPD clients.
 To enable LPD support on your server, edit the <VAR>/etc/inetd.conf</VAR>
 file and add a line reading:
 
@@ -2752,13 +2766,13 @@ printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd
 <P>The path to the <CODE>cups-lpd</CODE> may vary depending on your
 installation.
 
-<P>Once you have added this line, send the <CODE>inetd(1m)</CODE> process
+<P>Once you have added this line, send the <CODE>inetd(8)</CODE> process
 a <CODE>HUP</CODE> signal or reboot the system:
 
 <UL><PRE>
 <B>killall -HUP inetd ENTER</B> [IRIX and some versions of Linux]
-<B>kill -HUP <I>pid</I> ENTER</B>
-<B>reboot ENTER</B>
+<B>kill -HUP <I>pid</I> ENTER [Others]</B>
+<B>reboot ENTER [For all systems if the HUP signal fails]</B>
 </PRE></UL>
 
 <H2>Printing to LPD Servers</H2>
@@ -2782,7 +2796,7 @@ free and commercial software packages that do.
 
 <H3>Columbia Appletalk Package (CAP)</H3>
 
-<P>Because the CAP LaserWriter server (<CODE>lwsrv(1m)</CODE>) does
+<P>Because the CAP LaserWriter server (<CODE>lwsrv(8)</CODE>) does
 not support specification of PPD files, we do not recommend that you
 use CAP with CUPS. However, you can run the <CODE>lpsrv</CODE> program
 for limited printing with the command:
@@ -2798,7 +2812,7 @@ printer, and <CODE>printer</CODE> is the name of the CUPS print queue.
 <H3>XINET KA/Spool</H3>
 
 <P>To use your system as a print server for Mac OS clients,
-configure each printer using a <CODE>papserver(1m)</CODE> in the
+configure each printer using a <CODE>papserver(8)</CODE> in the
 <VAR>/usr/adm/appletalk/services</VAR> file, specifying the
 corresponding PPD file in the <VAR>/etc/cups/ppd</VAR> directory for
 each printer.  For a printer named <CODE>MyPrinter</CODE> the entry
@@ -2995,7 +3009,7 @@ test page or bottom of the print server.
 <H3>Configuring the IP Address Using ARP</H3>
 
 <P>The easiest way to set the IP address of a network device is to use
-the <CODE>arp(1m)</CODE> command.  The <CODE>arp</CODE> sends an Address
+the <CODE>arp(8)</CODE> command.  The <CODE>arp</CODE> sends an Address
 Resolution Protocol ("ARP") packet to the specified Ethernet MAC address,
 setting the network device's IP address:
 
@@ -3019,7 +3033,7 @@ IP address after a power cycle. If you just have a single printer or
 print server, the <CODE>arp</CODE> command is the way to go.
 
 <P>Some UNIX operating systems use a program called
-<CODE>rarpd(1m)</CODE> to manage RARP. Others, like Linux, support this
+<CODE>rarpd(8)</CODE> to manage RARP. Others, like Linux, support this
 protocol in the kernel. For systems that provide the <CODE>rarpd</CODE>
 program you will need to start it before RARP lookups will work:
 
@@ -3051,7 +3065,7 @@ server to set its address.
 
 <P>The BOOTP protocol is used when you need to provide additional information
 such as the location of a configuration file to the network interface. Using
-the standard <CODE>bootpd(1m)</CODE> program supplied with UNIX you simply need to
+the standard <CODE>bootpd(8)</CODE> program supplied with UNIX you simply need to
 add a line to the <VAR>/etc/bootptab</VAR> file; for IRIX:
 
 <UL><PRE>
@@ -3156,7 +3170,7 @@ CUPS:
 	lpd://<I>address</I>/pr3</TD>
 </TR>
 <TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>EFI&reg; Fiery RIP</TD>
+	<TD>EFI&reg; Fiery&reg; RIP</TD>
 	<TD>lpd://<I>address</I>/print</TD>
 </TR>
 <TR ALIGN="LEFT" VALIGN="TOP">
@@ -3198,7 +3212,8 @@ CUPS:
 </TR>
 <!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP">
-	<TD>Linksys EtherFast&reg;</TD>
+	<TD>Linksys EtherFast&reg;<BR>
+	<A HREF="#LINKSYS">(see directions)</A></TD>
 	<TD>socket://<I>address</I>:4010<BR>
 	socket://<I>address</I>:4020<BR>
 	socket://<I>address</I>:4030</TD>
@@ -3329,6 +3344,76 @@ ftp> <B>quit ENTER</B>
 
 <P>Your Axis print server is now ready for use!
 
+<H2><A NAME="LINKSYS">Configuring Linksys Print Servers</A></H2>
+
+<P>The Linksys print servers can be configured using ARP, RARP, or
+BOOTP. Like older Axis print servers, an additional step must be
+performed to configure the TCP/IP portion of the print server for use
+with CUPS.
+
+<!-- NEED 3in -->
+<P>Each print server contains a configuration file named
+<VAR>CONFIG</VAR> that contains a list of network parameters used by
+the server. To modify this file you must first download it from the
+print server using the <CODE>ftp(1)</CODE> program:
+
+<UL><PRE>
+<B>ftp -n ip-address ENTER</B>
+Connected to ip-address.
+220 Print Server Ready.
+Remote system type is Print.
+ftp> <B>get CONFIG ENTER</B>
+local: CONFIG remote: CONFIG
+200 Command OK.
+150 Open ASCII Mode Connection.
+WARNING! 68 bare linefeeds received in ASCII mode
+File may not have transferred correctly.
+226 Transfer complete.
+##### bytes received in #.## seconds (##### Kbytes/s)
+ftp> <B>quit ENTER</B>
+221 Goodbye.
+</PRE></UL>
+
+<!-- NEED 2in -->
+<P>Next, edit the file with your favorite text editor and locate the
+lines beginning with:
+
+<UL><PRE>
+0100 L1_PROUT:P1
+0120 L2_PROUT:P1
+0140 L3_PROUT:P1
+</PRE></UL>
+
+<P>Change the port number for
+each parallel and serial port on the server as follows:
+
+<UL><PRE>
+0100 L1_PROUT:<B>P1</B>
+0120 L2_PROUT:<B>P2</B>
+0140 L3_PROUT:<B>P3</B>
+</PRE></UL>
+
+<!-- NEED 4in -->
+<P>This maps each virtual printer with a physical port. Save the file and then upload the
+new <VAR>CONFIG</VAR> file using the <CODE>ftp</CODE> command:
+
+<UL><PRE>
+<B>ftp -n ip-address ENTER</B>
+Connected to ip-address.
+220 Print Server Ready.
+Remote system type is Print.
+ftp> <B>put CONFIG ENTER</B>
+local: CONFIG remote: CONFIG
+200 Command OK.
+150 Open ASCII Mode Connection.
+226 Transfer complete.
+##### bytes received in #.## seconds (##### Kbytes/s)
+ftp> <B>quit ENTER</B>
+221 Goodbye.
+</PRE></UL>
+
+<P>Your Linksys print server is now ready for use!
+
 
 <H1 ALIGN="RIGHT"><A NAME="PRINTER_DRIVERS">C - Printer Drivers</A></H1>
 
@@ -3414,7 +3499,11 @@ the Common UNIX Printing System.
 	<TH>Pathname</TH>
 	<TH>Description</TH>
 </TR>
-
+<TR VALIGN="TOP">
+	<TD>/etc/cups/certs/</TD>
+	<TD>The location of authentication certificate files for local
+	HTTP clients.</TD>
+</TR>
 <TR VALIGN="TOP">
 	<TD>/etc/cups/classes.conf</TD>
 	<TD>The printer classes configuration file for the scheduler.</TD>
@@ -3422,6 +3511,10 @@ the Common UNIX Printing System.
 <TR VALIGN="TOP">
 	<TD>/etc/cups/cupsd.conf</TD>
 	<TD>The scheduler configuration file.</TD>
+</TR>
+<TR VALIGN="TOP">
+	<TD>/etc/cups/interfaces/</TD>
+	<TD>The location of System V interface scripts for printers.</TD>
 </TR>
 <TR VALIGN="TOP">
 	<TD>/etc/cups/mime.convs</TD>
@@ -3432,17 +3525,13 @@ the Common UNIX Printing System.
 	<TD>The list of recognized file types for ESP Print Pro.</TD>
 </TR>
 <TR VALIGN="TOP">
-	<TD>/etc/cups/printers.conf</TD>
-	<TD>The printer configuration file for the scheduler.</TD>
-</TR>
-<TR VALIGN="TOP">
-	<TD>/etc/cups/interfaces/</TD>
-	<TD>The location of System V interface scripts for printers.</TD>
-</TR>
-<TR VALIGN="TOP">
 	<TD>/etc/cups/ppd/</TD>
 	<TD>The location of PostScript Printer Description ("PPD") files for
 	printers.</TD>
+</TR>
+<TR VALIGN="TOP">
+	<TD>/etc/cups/printers.conf</TD>
+	<TD>The printer configuration file for the scheduler.</TD>
 </TR>
 <TR VALIGN="TOP">
 	<TD>/usr/bin/cancel</TD>
@@ -3573,6 +3662,10 @@ the Common UNIX Printing System.
 	<TD>/usr/share/catman/a_man/<BR>
 	/usr/share/catman/u_man/</TD>
 	<TD>Man pages (IRIX)</TD>
+</TR>
+<TR VALIGN="TOP">
+	<TD>/usr/share/man/</TD>
+	<TD>Man pages (Compaq Tru64 UNIX, HP-UX, Solaris)</TD>
 </TR>
 <TR VALIGN="TOP">
 	<TD>/usr/man/</TD>
@@ -3730,7 +3823,7 @@ Management"</A>.
 	root account.
 
 	<LI>accessing the CUPS server using the hostname or IP
-	address of the server but haven't enabled remote access for
+	address of the server without enabling remote access for
 	administration functions. This can be corrected by following
 	the instructions in the <A HREF="#ALLOW_REMOTE">"I Can't Do
 	Administration Tasks from Another Machine!"</A> section earlier

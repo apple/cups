@@ -11,7 +11,7 @@
 
 <H2>Identification</H2>
 
-This software security report provides an analysis of possible security
+<P>This software security report provides an analysis of possible security
 concerns for the Common UNIX Printing System ("CUPS") Version 1.1.</P>
 
 <EMBED SRC="system-overview.shtml">
@@ -39,7 +39,7 @@ system.
 
 <H2>Security Breaches</H2>
 
-<P>There is one known security vulnerabilities with local access:
+<P>There is one known security vulnerability with local access:
 
 <OL>
 
@@ -77,7 +77,7 @@ service attacks, including:
 	<P>This cannot be protected against by the current software. It
 	is possible that future versions of the CUPS software could be
 	configured to limit the number of connections allowed from a
-	single host, however that still would not prevent a determined
+	single host, however that still would not prevent a distributed
 	attack.
 
 	<LI>Repeatedly opening and closing connections to the server as fast
@@ -153,11 +153,13 @@ authentication:
 </OL>
 
 <P>The default CUPS configuration disables remote administration. We do
-not recommend that remote administration be enabled for all hosts,
-however if you have a trusted network or subnet access can be
-restricted accordingly.  Also, we highly recommend using Digest
-authentication when possible; unfortunately, most web browsers do not
-support Digest authentication at this time.
+not recommend that remote administration be enabled for all hosts.
+However, if you have a trusted network or subnet, access can be
+restricted accordingly.
+
+Also, we highly recommend using Digest authentication when possible.
+Unfortunately, most web browsers do not support Digest authentication
+at this time.
 
 <EMBED SRC="glossary.shtml">
 

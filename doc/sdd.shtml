@@ -11,7 +11,7 @@
 
 <H2>Identification</H2>
 
-This software design description document provides detailed information 
+This software design description document provides general information 
 on the architecture and coding of the Common UNIX Printing System 
 (&quot;CUPS&quot;) Version 1.1.
 
@@ -38,7 +38,7 @@ following sections:
 
 <H1>Design Overview</H1>
 
-CUPS is composed of 7 software sub-systems that operate together to 
+CUPS is composed of 9 software sub-systems that operate together to 
 perform common printing tasks:
 
 <UL>
@@ -49,7 +49,11 @@ perform common printing tasks:
 
 	<LI>CGI
 
-	<LI>CUPS Interface Library
+	<LI>CUPS Application Programmers Interface
+
+	<LI>CUPS Imaging Library
+
+	<LI>Daemons
 
 	<LI>Filters
 
@@ -87,18 +91,18 @@ All backends are called with a common set of arguments:
 
 </UL>
 
-Backends are named using the method of the URI, so a URI of
+<P>Backends are named using the scheme of the URI, so a URI of
 "ipp://hostname/resource" would be processed by the "ipp" backend.
 
 <H3>ipp</H3>
 
-The ipp backend sends the specified job to a network printer or host using
+<P>The ipp backend sends the specified job to a network printer or host using
 the Internet Printing Protocol.  The URI is as specified by the
 <CODE>printer-uri-supported</CODE> attribute from the printer or host.
 
 <H3>lpd</H3>
 
-The lpd backend sends the specified job to a network printer or host using
+<P>The lpd backend sends the specified job to a network printer or host using
 the Line Printer Daemon protocol.  The URI is of the form:
 
 <UL><PRE>lpd://hostname/queue
@@ -106,7 +110,7 @@ the Line Printer Daemon protocol.  The URI is of the form:
 
 <H3>parallel</H3>
 
-The parallel backend sends the specified job to a local printer connected
+<P>The parallel backend sends the specified job to a local printer connected
 via the specified parallel port device.  The URI is of the form:
 
 <UL><PRE>parallel:/dev/file
@@ -114,7 +118,7 @@ via the specified parallel port device.  The URI is of the form:
 
 <H3>serial</H3>
 
-The serial backend sends the specified job to a local printer connected
+<P>The serial backend sends the specified job to a local printer connected
 via the specified serial port device.  The URI is of the form:
 
 <UL><PRE>serial:/dev/file?option[+option+...]
@@ -138,7 +142,7 @@ The options can be any combination of the following:
 
 <H3>socket</H3>
 
-The socket backend sends the specified job to a network host using the
+<P>The socket backend sends the specified job to a network host using the
 AppSocket protocol commonly used by Hewlett-Packard and Tektronix
 printers.  The URI is of the form:
 
@@ -147,11 +151,19 @@ printers.  The URI is of the form:
 
 The default port number is 9100.
 
+<H3>usb</H3>
+
+<P>The usb backend sends the specified job to a local printer connected
+via the specified usb port device.  The URI is of the form:
+
+<UL><PRE>usb:/dev/file
+</PRE></UL>
+
 <H2>Berkeley Commands</H2>
 
-The Berkeley commands provide a simple command-line interface to CUPS
+<P>The Berkeley commands provide a simple command-line interface to CUPS
 to submit and control print jobs. It is provided for compatibility with
-existing software that is hard coded to use the Berkeley commands.
+existing software that is hardcoded to use the Berkeley commands.
 
 <H3>lpc</H3>
 
@@ -167,85 +179,143 @@ commands:
 
 </UL>
 
+<H3>lpq</H3>
+
+<P>The lpq command shows the current queue status.
+
 <H3>lpr</H3>
 
-The lpr command submits a job for printing.  The CUPS version of lpr silently
+<P>The lpr command submits a job for printing.  The CUPS version of lpr silently
 ignores the "i", "t", "m", "h", and "s" options.
 
 <H3>lprm</H3>
 
-The lprm removes one or more print jobs.
+<P>The lprm removes one or more print jobs.
 
 <H2>CGI</H2>
 
-The Common Gateway Interface (CGI) programs provide a web-based status interface
-to monitor the status of printers, classes, and jobs.
+<P>The Common Gateway Interface (CGI) programs provide a web-based
+status interface to monitor the status of printers, classes, and jobs.
+Each of the CGIs utilize HTML template files that can be customized to
+provide alternate appearances.
+
+<H3>admin.cgi</H3>
+
+<P>The admin CGI provides administration interfaces for printers and
+classes. The user can add, modify, delete, start, stop, and configure
+printers and classes using "wizard" interfaces.
 
 <H3>classes.cgi</H3>
 
-The classes CGI lists the available printer classes and any pending jobs for
-the class.  The user can click on individual classes to limit the display and
-click on jobs to see the job status.
+<P>The classes CGI lists the available printer classes and any pending
+jobs for the class.  The user can click on individual classes to limit
+the display and click on jobs to see the job status.
 
 <H3>jobs.cgi</H3>
 
-The jobs CGI lists the queued print jobs in order of priority.  The list can
-be limited by printer or job.  When the user displays the status of an
-individual print job all job options are displayed.
+<P>The jobs CGI lists the queued print jobs in order of priority.  The
+list can be limited by printer or job.
 
 <H3>printers.cgi</H3>
 
-The printers CGI lists the available printer queues and any pending jobs for
-the printer.  The user can click on individual printers to limit the display and
-click on jobs to see the job status.
+<P>The printers CGI lists the available printer queues and any pending
+jobs for the printer.  The user can click on individual printers to
+limit the display and click on jobs to see the job status.
 
-<H2>CUPS Interface Library</H2>
+<H2>CUPS Application Programmers Interface</H2>
 
-The CUPS interface library provides common convenience, HTTP, IPP,
-language, MIME, PPD, and raster functions used by the CUPS software.
+<P>The CUPS Application Programmers Interface ("API") provides common
+convenience, HTTP, IPP, language, and PPD functions used by the CUPS
+software.
 
 <H3>Convenience Functions</H3>
 
-Convenience functions are provided to submit an IPP request, send a print file,
-cancel a job, get a list of available printers, get a list of available
-classes, get the default printer or class, get the default server name, get
-the local username, and get a password string.
+<P>Convenience functions are provided to submit an IPP request, send a
+print file, cancel a job, get a list of available printers, get a list
+of available classes, get the default printer or class, get the default
+server name, get the local username, and get a password string.
 
 <H3>HTTP Functions</H3>
 
-The HTTP functions provide functions to connect to HTTP servers, issue requests,
-read data from a server, and write data to a server.
+<P>The HTTP functions provide functions to connect to HTTP servers,
+issue requests, read data from a server, and write data to a server.
 
 <H3>IPP Functions</H3>
 
-The IPP function provide functions to manage IPP request data and attributes,
-read IPP responses from a server, and write IPP requests to a server.
+<P>The IPP function provide functions to manage IPP request data and
+attributes, read IPP responses from a server, and write IPP requests to
+a server.
 
 <H3>Language Functions</H3>
 
-The language functions provide a standard interface for retrieving common
-textual messages for a particular locale and determining the correct encoding
-(e.g. US ASCII, ISO-8859-1, etc.)
-
-<H3>MIME Functions</H3>
-
-The Multimedia Internet Mail Exchange functions manage a MIME type and
-conversion database that supports file typing by extension and content, and
-least-cost file filtering from a source to a destination file type.
+<P>The language functions provide a standard interface for retrieving
+common textual messages for a particular locale and determining the
+correct encoding (e.g. US ASCII, UTF-8, ISO-8859-1, etc.)
 
 <H3>PPD Functions</H3>
 
-The PostScript Printer Description functions manage PPD files, select options,
-check for option conflicts, and emit selected options in the correct order.
+<P>The PostScript Printer Description functions manage PPD files,
+select options, check for option conflicts, and emit selected options
+in the correct order.
+
+<H2>CUPS Imaging Library</H2>
+
+<P>The CUPS imaging library provides colorspace conversion, color
+management, image management, scaling, image file, and raster functions
+used by the CUPS raster filters.
+
+<H3>Colorspace Conversion Functions</H3>
+
+<P>The colorspace conversion functions handle conversion of grayscale
+and RGB colors to grayscale, RGB, K, CMY, CMYK, and CMYKcm colorspaces.
+
+<H3>Color Management Functions</H3>
+
+<P>The color management functions handle gamut mapping and density
+correction. These are integrated with the colorspace conversion
+functions so that colorspace conversion and color management are
+processed in a single step.
+
+<H3>Image Management Functions</H3>
+
+<P>The image management functions manage a tiled image database that is
+swapped to/from disk as needed.
+
+<H3>Scaling Functions</H3>
+
+<P>The scaling functions provide image scaling services using
+nearest-neighbor sampling and bilinear interpolation as appropriate.
+
+<H3>Image File Functions</H3>
+
+<P>The image file functions handle loading of all image file formats.
 
 <H3>Raster Functions</H3>
 
-The raster functions manage streams of CUPS raster data (described in the
-Interface Design Document) used by non-PostScript printer drivers.
+<P>The raster functions manage streams of CUPS raster data (described
+in the Interface Design Document) used by non-PostScript printer
+drivers and raster filters.
+
+<H2>Daemons</H2>
+
+<P>The daemons provide additional network functions for the scheduler.
+Currently only two daemons are provided with CUPS.
+
+<H3>Line Printer Daemon</H3>
+
+<P>The line printer daemon provides remote LPD client support and is
+run by the <CODE>inetd(8)</CODE> daemon as needed.
+
+<H3>Polling Daemon</H3>
+
+<P>The polling daemon is used to poll a remote server for a list of
+available printers and provide it to the scheduler for addition. A
+separate polling daemon is run by the scheduler for every remote
+system listed for polling in the scheduler configuration file.
 
 <H2>Filters</H2>
 
-The filters implement file conversion services for CUPS. All filters
+<P>The filters implement file conversion services for CUPS. All filters
 are called with a common set of arguments:
 
 <UL>
@@ -269,80 +339,100 @@ are called with a common set of arguments:
 
 </UL>
 
-Filters are added to the MIME conversion data file and implement all necessary
-conversions from one file type to another.
+<P>Filters are added to the MIME conversion data file and implement all
+necessary conversions from one file type to another.
 
 <H3>hpgltops</H3>
 
-The hpgltops filter converts HP-GL/2 files into PostScript.
+<P>The hpgltops filter converts HP-GL/2 files into PostScript.
 
 <H3>imagetops</H3>
 
-The imagetops filter converts image files into PostScript.
+<P>The imagetops filter converts image files into PostScript.
 
 <H3>imagetoraster</H3>
 
-The imagetoraster filter converts image files into CUPS raster data.
+<P>The imagetoraster filter converts image files into CUPS raster data.
+
+<H3>pdftops</H3>
+
+<P>The pdftops filter converts PDF files into PostScript.
 
 <H3>pstops</H3>
 
-The pstops filter inserts printer-specific commands from PPD files and
+<P>The pstops filter inserts printer-specific commands from PPD files and
 performs page filtering as requested by the user.
 
 <H3>pstoraster</H3>
 
-The pstoraster filter converts PostScript program data into CUPS raster data.
+<P>The pstoraster filter converts PostScript program data into CUPS
+raster data.
+
+<H3>rastertoepson</H3>
+
+<P>The rastertoepson filter handles converting CUPS raster data to
+ESC/P and supports both color and black-and-white printers.
 
 <H3>rastertohp</H3>
 
-The rastertohp filter handles converting CUPS raster data to HP PCL and
-supports both color and black-and-white printers.
+<P>The rastertohp filter handles converting CUPS raster data to HP-PCL
+and supports both color and black-and-white printers.
 
 <H3>texttops</H3>
 
-The texttops filter converts text files into PostScript.
+<P>The texttops filter converts text files into PostScript.
 
 <H2>Scheduler</H2>
 
-The scheduler is a fully-functional HTTP/1.1 and IPP/1.1 server that
+<P>The scheduler is a fully-functional HTTP/1.1 and IPP/1.1 server that
 manages the printers, classes, and jobs in the system.  It also handles
 a simple broadcast-based directory service so that remote print queues
 and classes can be accessed transparently from the local system.
 
 <H3>Authorization</H3>
 
-The authorization module is responsible for performing access control and
-authentication for all HTTP and IPP requests entering the system.
+<P>The authorization module is responsible for performing access
+control and authentication for all HTTP and IPP requests entering the
+system.
 
 <H3>Classes</H3>
 
-The classes module is responsible for managing printer classes in the system.
-Each class is a collection of local and/or remote printers.  The classes module
-also reads and writes the classes configuration file.
+<P>The classes module is responsible for managing printer classes in
+the system. Each class is a collection of local and/or remote
+printers.  The classes module also reads and writes the classes
+configuration file.
 
 <H3>Client</H3>
 
-The client module is responsible for all HTTP client communications.  It handles
-listening on selected interfaces, accepting connections from prospective
-clients, processing incoming HTTP requests, and sending HTTP responses to
-those requests.  The client module also is responsible for executing the
-external CGI programs as needed to support web-based printer, class, and job
-status monitoring.
+<P>The client module is responsible for all HTTP client
+communications.  It handles listening on selected interfaces, accepting
+connections from prospective clients, processing incoming HTTP
+requests, and sending HTTP responses to those requests.  The client
+module also is responsible for executing the external CGI programs as
+needed to support web-based printer, class, and job status monitoring
+and administration.
 
 <P>Once authorized, all IPP requests are sent to the IPP module.
 
 <H3>Configuration</H3>
 
-The configuration module is responsible for reading the CUPS configuration file
-and initializing the appropriate data structures and values.  The configuration
-module also stops CUPS services before reading the configuration file and
-restarts them after the configuration file has been read.
+<P>The configuration module is responsible for reading the CUPS
+configuration file and initializing the appropriate data structures and
+values.  The configuration module also stops CUPS services before
+reading the configuration file and restarts them after the
+configuration file has been read.
+
+<H3>Devices</H3>
+
+<P>The devices module is responsible for managing the list of available
+devices for the CUPS-Get-Devices operation.
 
 <H3>Directory Services</H3>
 
-The directory services module sends and recieves printer state information over
-a broadcast socket.  Remote printers and classes are automatically added to or
-removed from the local printer and class lists as needed.
+<P>The directory services module sends and recieves printer state
+information over a broadcast socket.  Remote printers and classes are
+automatically added to or removed from the local printer and class
+lists as needed.
 
 <P>The directory services module can only recieve printer state information
 over a single UDP port, however it can broadcast to multiple addresses and
@@ -350,83 +440,108 @@ ports as needed.
 
 <H3>IPP</H3>
 
-The IPP module handles IPP requests and acts accordingly.  URI
+<P>The IPP module handles IPP requests and acts accordingly.  URI
 validation is also performed here, as a client can post IPP data to any
 URI on the server which might sidestep the access control or
 authentication of the HTTP server.
 
 <H3>Jobs</H3>
 
-The jobs module manages print jobs, starts filter and backend processes
-for jobs to be printed, and monitors status messages from those filters
-and backends.
+<P>The jobs module manages print jobs, starts filter and backend
+processes for jobs to be printed, and monitors status messages from
+those filters and backends.
 
 <H3>Logging</H3>
 
-The logging module manages the access, error, and page log files that are
-generated by the scheduler.
+<P>The logging module manages the access, error, and page log files
+that are generated by the scheduler.
 
 <H3>Main</H3>
 
-The main module is responsible for timing out and dispatching input and output
-for client connections.  It also watches for incoming <CODE>SIGHUP</CODE>
-and <CODE>SIGCHLD</CODE> signals, reloads the server configuration files as
-needed, and handles child process errors and exits.
+<P>The main module is responsible for timing out and dispatching input
+and output for client connections.  It also watches for incoming
+<CODE>SIGHUP</CODE> and <CODE>SIGCHLD</CODE> signals, reloads the
+server configuration files as needed, and handles child process errors
+and exits.
+
+<H3>MIME</H3>
+
+<P>The Multimedia Internet Mail Exchange module manages a MIME type and
+conversion database that supports file typing by extension and content
+and least-cost file filtering from a source to a destination file type.
+
+<H3>PPDs</H3>
+
+<P>The PPDs module is responsible for managing the list of available
+PPD files for the CUPS-Get-PPDs operation.
 
 <H3>Printers</H3>
 
-The printers module is responsible for managing printers and PPD files
-in the system. The printers module also reads and writes the printers
-configuration file.
+<P>The printers module is responsible for managing printers and PPD
+files in the system. The printers module also reads and writes the
+printers configuration file.
 
 <H2>System V Commands</H2>
 
-The System V commands provide a robust command-line interface to CUPS
-to submit and control printers and jobs.
+<P>The System V commands provide a robust command-line interface to
+CUPS to submit and control printers and jobs.
 
 <H3>accept</H3>
 
-The accept command tells the scheduler to accept new jobs for specific
+<P>The accept command tells the scheduler to accept new jobs for specific
 printers.
 
 <H3>cancel</H3>
 
-The cancel command tells the scheduler to cancel one or more jobs that are
+<P>The cancel command tells the scheduler to cancel one or more jobs that are
 queued for printing.
 
 <H3>disable</H3>
 
-The disable command tells the scheduler to stop printing jobs on the
+<P>The disable command tells the scheduler to stop printing jobs on the
 specified printers.
 
 <H3>enable</H3>
 
-The enable command tells the scheduler to start printing jobs on the
+<P>The enable command tells the scheduler to start printing jobs on the
 specified printers.
 
 <H3>lp</H3>
 
-The lp command submits submits files for printing.  Unlike the standard
+<P>The lp command submits submits files for printing.  Unlike the standard
 System V lp command, a single CUPS lp command will generate a separate
 job ID for each file that is printed. Also, the Solaris "f", "H", "P", "S",
 and "y" options are silently ignored.
 
 <H3>lpadmin</H3>
 
-The lpadmin command manages printer queues and classes.  The Solaris
+<P>The lpadmin command manages printer queues and classes.  The Solaris
 "A", "F", "I", "M", "P", "Q", "S", "T", "U", "W", "f", "l", "m", "o",
 "s", "t", and "u" options are not supported, and new options "P" (PPD
-file), "F" (filter), and "E" (enable and accept) are provided to configure
-CUPS-specific features such as PPD file and conversion filters.
+file) and "E" (enable and accept) are provided to configure
+CUPS-specific features.
+
+<H3>lpinfo</H3>
+
+<P>The lpinfo command lists the available PPD files or devices as selected
+by the user.
+
+<H3>lpmove</H3>
+
+<P>The lpmove command moves a print job to a new destination.
+
+<H3>lpoptions</H3>
+
+<P>The lpoptions command manages user-defined printers and options.
 
 <H3>lpstat</H3>
 
-The lpstat command lists printers, classes, and jobs as requested by the
+<P>The lpstat command lists printers, classes, and jobs as requested by the
 user.
 
 <H3>reject</H3>
 
-The reject command tells the scheduler not to accept new jobs for specific
+<P>The reject command tells the scheduler not to accept new jobs for specific
 printers.
 
 <EMBED SRC="glossary.shtml">
