@@ -1,8 +1,15 @@
-CHANGES.txt - 11/29/2003
+CHANGES.txt - 06/29/2004
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Added BrowseLocalOptions directive to allow the
+	  administrator to add printer URI options to the browse
+	  URI, e.g. "encryption=required" (STR #732)
+	- Added BrowseRemoteOptions directive to allow the
+	  administrator to add standard URI options to the
+	  remote printer URI, e.g. "encryption=required" (STR
+	  #732)
 	- Now put "-I.." compiler option in front of all others
 	  to ensure that local CUPS headers are used before
 	  installed headers (STR #437)

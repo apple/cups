@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.51 2004/06/29 13:15:10 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.52 2004/06/29 17:48:52 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -63,7 +63,8 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 {
   int		i;			/* Looping var */
   int		update;			/* Update printer attributes? */
-  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+  char		finaluri[HTTP_MAX_URI],	/* Final URI for printer */
+		method[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
 		host[HTTP_MAX_URI],	/* Host portion of URI */
 		resource[HTTP_MAX_URI];	/* Resource portion of URI */
@@ -111,10 +112,54 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
                resource);
     return;
   }
-    
+
  /*
-  * OK, this isn't a local printer; see if we already have it listed in
-  * the Printers list, and add it if not...
+  * OK, this isn't a local printer; add any remote options...
+  */
+
+  if (BrowseRemoteOptions)
+  {
+    if (BrowseRemoteOptions[0] == '?')
+    {
+     /*
+      * Override server-supplied URI...
+      */
+
+      char	tempuri[HTTP_MAX_URI];	/* Temporary URI */
+
+
+      if (strchr(uri, '?'))
+      {
+       /*
+        * Drop everything after ?...
+	*/
+
+        strlcpy(tempuri, uri, sizeof(tempuri));
+	*strchr(tempuri, '?') = '\0';
+
+        uri = tempuri;
+      }
+
+     /*
+      * Combine stripped URI and remote options...
+      */
+
+      snprintf(finaluri, sizeof(finaluri), "%s%s", uri, BrowseRemoteOptions);
+    }
+    else if (strchr(uri, '?'))
+      snprintf(finaluri, sizeof(finaluri), "%s+%s", uri, BrowseRemoteOptions);
+    else
+      snprintf(finaluri, sizeof(finaluri), "%s?%s", uri, BrowseRemoteOptions);
+
+   /*
+    * Use the new URI instead of the old one...
+    */
+
+    uri = finaluri;
+  }
+
+ /*
+  * See if we already have it listed in the Printers list, and add it if not...
   */
 
   type   |= CUPS_PRINTER_REMOTE;
@@ -633,6 +678,7 @@ SendCUPSBrowse(printer_t *p)		/* I - Printer to send */
   dirsvc_addr_t		*b;		/* Browse address */
   int			bytes;		/* Length of packet */
   char			packet[1453];	/* Browse data packet */
+  char			options[1024];	/* Browse local options */
   cups_netif_t		*iface;		/* Network interface */
 
 
@@ -644,6 +690,20 @@ SendCUPSBrowse(printer_t *p)		/* I - Printer to send */
 
   if (!p->accepting)
     type |= CUPS_PRINTER_REJECTING;
+
+ /*
+  * Initialize the browse options...
+  */
+
+  if (BrowseLocalOptions)
+  {
+    if (BrowseLocalOptions[0] == '?')
+      strlcpy(options, BrowseLocalOptions, sizeof(options));
+    else
+      snprintf(options, sizeof(options), "?%s", BrowseLocalOptions);
+  }
+  else
+    options[0] = '\0';
 
  /*
   * Send a packet to each browse address...
@@ -673,10 +733,10 @@ SendCUPSBrowse(printer_t *p)		/* I - Printer to send */
 	  if (!iface->is_local)
 	    continue;
 
-	  snprintf(packet, sizeof(packet), "%x %x ipp://%s/%s/%s \"%s\" \"%s\" \"%s\"\n",
+	  snprintf(packet, sizeof(packet), "%x %x ipp://%s/%s/%s%s \"%s\" \"%s\" \"%s\"\n",
         	   type, p->state, iface->hostname,
 		   (p->type & CUPS_PRINTER_CLASS) ? "classes" : "printers",
-		   p->name, p->location ? p->location : "",
+		   p->name, options, p->location ? p->location : "",
 		   p->info ? p->info : "",
 		   p->make_model ? p->make_model : "Unknown");
 
@@ -711,10 +771,10 @@ SendCUPSBrowse(printer_t *p)		/* I - Printer to send */
         * Send to the named interface...
 	*/
 
-	snprintf(packet, sizeof(packet), "%x %x ipp://%s/%s/%s \"%s\" \"%s\" \"%s\"\n",
+	snprintf(packet, sizeof(packet), "%x %x ipp://%s/%s/%s%s \"%s\" \"%s\" \"%s\"\n",
         	 type, p->state, iface->hostname,
 		 (p->type & CUPS_PRINTER_CLASS) ? "classes" : "printers",
-		 p->name, p->location ? p->location : "",
+		 p->name, options, p->location ? p->location : "",
 		 p->info ? p->info : "",
 		 p->make_model ? p->make_model : "Unknown");
 
@@ -750,8 +810,8 @@ SendCUPSBrowse(printer_t *p)		/* I - Printer to send */
       * the default server name...
       */
 
-      snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"\n",
-       	       type, p->state, p->uri,
+      snprintf(packet, sizeof(packet), "%x %x %s%s \"%s\" \"%s\" \"%s\"\n",
+       	       type, p->state, p->uri, options,
 	       p->location ? p->location : "",
 	       p->info ? p->info : "",
 	       p->make_model ? p->make_model : "Unknown");
@@ -2000,5 +2060,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.51 2004/06/29 13:15:10 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.52 2004/06/29 17:48:52 mike Exp $".
  */

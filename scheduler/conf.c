@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.53 2004/06/29 13:15:10 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.54 2004/06/29 17:48:52 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -85,7 +85,9 @@ static var_t	variables[] =
   { "AccessLog",		&AccessLog,		VAR_STRING },
   { "AutoPurgeJobs", 		&JobAutoPurge,		VAR_BOOLEAN },
   { "BrowseInterval",		&BrowseInterval,	VAR_INTEGER },
+  { "BrowseLocalOptions",	&BrowseLocalOptions,	VAR_STRING },
   { "BrowsePort",		&BrowsePort,		VAR_INTEGER },
+  { "BrowseRemoteOptions",	&BrowseRemoteOptions,	VAR_STRING },
   { "BrowseShortNames",		&BrowseShortNames,	VAR_BOOLEAN },
   { "BrowseTimeout",		&BrowseTimeout,		VAR_INTEGER },
   { "Browsing",			&Browsing,		VAR_BOOLEAN },
@@ -377,6 +379,9 @@ ReadConfiguration(void)
   BrowseShortNames    = TRUE;
   BrowseTimeout       = DEFAULT_TIMEOUT;
   Browsing            = TRUE;
+
+  ClearString(&BrowseLocalOptions);
+  ClearString(&BrowseRemoteOptions);
 
   JobHistory          = DEFAULT_HISTORY;
   JobFiles            = DEFAULT_FILES;
@@ -2329,5 +2334,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.53 2004/06/29 13:15:10 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.54 2004/06/29 17:48:52 mike Exp $".
  */

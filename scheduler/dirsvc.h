@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.h,v 1.12.2.9 2004/06/29 13:15:10 mike Exp $"
+ * "$Id: dirsvc.h,v 1.12.2.10 2004/06/29 17:48:52 mike Exp $"
  *
  *   Directory services definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -96,6 +96,12 @@ VAR int			Browsing	VALUE(TRUE),
 					/* Time out for printers in seconds */
 			NumBrowsers	VALUE(0);
 					/* Number of broadcast addresses */
+VAR char		*BrowseLocalOptions
+					VALUE(NULL),
+					/* Options to add to local printer URIs */
+			*BrowseRemoteOptions
+					VALUE(NULL);
+					/* Options to add to remote printer URIs */
 VAR dirsvc_addr_t	*Browsers	VALUE(NULL);
 					/* Broadcast addresses */
 VAR location_t		*BrowseACL	VALUE(NULL);
@@ -141,5 +147,5 @@ extern void	UpdateSLPBrowse(void);
 
 
 /*
- * End of "$Id: dirsvc.h,v 1.12.2.9 2004/06/29 13:15:10 mike Exp $".
+ * End of "$Id: dirsvc.h,v 1.12.2.10 2004/06/29 17:48:52 mike Exp $".
  */
