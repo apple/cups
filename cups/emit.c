@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.23.2.7 2003/02/28 21:07:32 mike Exp $"
+ * "$Id: emit.c,v 1.23.2.8 2003/05/25 14:43:34 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -196,26 +196,52 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
       * Send DSC comments with option...
       */
 
-      if (fprintf(fp, "%%%%BeginFeature: *%s %s\n",
-                  ((ppd_option_t *)choices[i]->option)->keyword,
-		  choices[i]->choice) < 0)
-      {
-        free(choices);
-        return (-1);
-      }
-
       if ((strcasecmp(((ppd_option_t *)choices[i]->option)->keyword, "PageSize") == 0 ||
            strcasecmp(((ppd_option_t *)choices[i]->option)->keyword, "PageRegion") == 0) &&
           strcasecmp(choices[i]->choice, "Custom") == 0)
       {
        /*
-        * Variable size; write out standard size options (this should
-	* eventually be changed to use the parameter positions defined
-	* in the PPD file...)
+        * Variable size; write out standard size options, using the
+	* parameter positions defined in the PPD file...
 	*/
 
+        ppd_attr_t	*attr;		/* PPD attribute */
+	int		pos,		/* Position of custom value */
+			values[5];	/* Values for custom command */
+
+
+        fputs("%%BeginFeature: *CustomPageSize True\n", fp);
+
         size = ppdPageSize(ppd, "Custom");
-        fprintf(fp, "%.0f %.0f 0 0 0\n", size->width, size->length);
+
+        memset(values, 0, sizeof(values));
+
+	if ((attr = ppdFindAttr(ppd, "ParamCustomPageSize", "Width")) != NULL)
+	{
+	  pos = atoi(attr->value) - 1;
+
+          if (pos < 0 || pos > 4)
+	    pos = 0;
+	}
+	else
+	  pos = 0;
+
+	values[pos] = (int)size->width;
+
+	if ((attr = ppdFindAttr(ppd, "ParamCustomPageSize", "Height")) != NULL)
+	{
+	  pos = atoi(attr->value) - 1;
+
+          if (pos < 0 || pos > 4)
+	    pos = 1;
+	}
+	else
+	  pos = 1;
+
+	values[pos] = (int)size->length;
+
+        fprintf(fp, "%d %d %d %d %d\n", values[0], values[1],
+	        values[2], values[3], values[4]);
 
 	if (choices[i]->code == NULL)
 	{
@@ -227,6 +253,13 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
 
 	  fputs(ppd_custom_code, fp);
 	}
+      }
+      else if (fprintf(fp, "%%%%BeginFeature: *%s %s\n",
+                       ((ppd_option_t *)choices[i]->option)->keyword,
+		       choices[i]->choice) < 0)
+      {
+        free(choices);
+        return (-1);
       }
 
       if (choices[i]->code != NULL && choices[i]->code[0] != '\0')
@@ -274,7 +307,8 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
           ppd_section_t section)	/* I - Section to write */
 {
   int		i,			/* Looping var */
-		count;			/* Number of choices */
+		count,			/* Number of choices */
+		custom_size;		/* Non-zero if this option is a custom size */
   ppd_choice_t	**choices;		/* Choices */
   ppd_size_t	*size;			/* Custom page size */
   char		buf[1024];		/* Output buffer for feature */
@@ -311,9 +345,22 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
       * Send DSC comments with option...
       */
 
-      snprintf(buf, sizeof(buf), "%%%%BeginFeature: *%s %s\n",
-               ((ppd_option_t *)choices[i]->option)->keyword,
-	       choices[i]->choice);
+      if ((strcasecmp(((ppd_option_t *)choices[i]->option)->keyword, "PageSize") == 0 ||
+           strcasecmp(((ppd_option_t *)choices[i]->option)->keyword, "PageRegion") == 0) &&
+          strcasecmp(choices[i]->choice, "Custom") == 0)
+      {
+        custom_size = 1;
+
+	strcpy(buf, "%%BeginFeature: *CustomPageSize True\n");
+      }
+      else
+      {
+        custom_size = 0;
+
+	snprintf(buf, sizeof(buf), "%%%%BeginFeature: *%s %s\n",
+        	 ((ppd_option_t *)choices[i]->option)->keyword,
+		 choices[i]->choice);
+      }
 
       if (write(fd, buf, strlen(buf)) < 1)
       {
@@ -321,19 +368,48 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
         return (-1);
       }
 
-      if ((strcasecmp(((ppd_option_t *)choices[i]->option)->keyword, "PageSize") == 0 ||
-           strcasecmp(((ppd_option_t *)choices[i]->option)->keyword, "PageRegion") == 0) &&
-          strcasecmp(choices[i]->choice, "Custom") == 0)
+      if (custom_size)
       {
        /*
-        * Variable size; write out standard size options (this should
-	* eventually be changed to use the parameter positions defined
-	* in the PPD file...)
+        * Variable size; write out standard size options, using the
+	* parameter positions defined in the PPD file...
 	*/
 
+        ppd_attr_t	*attr;		/* PPD attribute */
+	int		pos,		/* Position of custom value */
+			values[5];	/* Values for custom command */
+
+
         size = ppdPageSize(ppd, "Custom");
-        snprintf(buf, sizeof(buf), "%.0f %.0f 0 0 0\n", size->width,
-	         size->length);
+
+        memset(values, 0, sizeof(values));
+
+	if ((attr = ppdFindAttr(ppd, "ParamCustomPageSize", "Width")) != NULL)
+	{
+	  pos = atoi(attr->value) - 1;
+
+          if (pos < 0 || pos > 4)
+	    pos = 0;
+	}
+	else
+	  pos = 0;
+
+	values[pos] = (int)size->width;
+
+	if ((attr = ppdFindAttr(ppd, "ParamCustomPageSize", "Height")) != NULL)
+	{
+	  pos = atoi(attr->value) - 1;
+
+          if (pos < 0 || pos > 4)
+	    pos = 1;
+	}
+	else
+	  pos = 1;
+
+	values[pos] = (int)size->length;
+
+        snprintf(buf, sizeof(buf), "%d %d %d %d %d\n", values[0], values[1],
+	         values[2], values[3], values[4]);
 
 	if (write(fd, buf, strlen(buf)) < 1)
 	{
@@ -555,5 +631,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c,v 1.23.2.7 2003/02/28 21:07:32 mike Exp $".
+ * End of "$Id: emit.c,v 1.23.2.8 2003/05/25 14:43:34 mike Exp $".
  */

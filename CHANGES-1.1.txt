@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The ppdEmit() functions output "PageSize Custom"
+	  instead of "CustomPageSize True" in the DSC comments.
+	  Also, the custom page size code did not use the
+	  ParamCustomPageSize attributes (STR #127)
 	- The cupstestppd command did not list the conflicting
 	  options (STR #123)
 	- The lpq command did not ensure that there was
