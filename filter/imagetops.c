@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.2 1998/03/31 18:26:41 mike Exp $"
+ * "$Id: imagetops.c,v 1.3 1998/04/23 15:52:20 mike Exp $"
  *
  *   Image file to PostScript conversion program for espPrint, a collection
  *   of printer drivers.
@@ -17,7 +17,13 @@
  * Revision History:
  *
  *   $Log: imagetops.c,v $
- *   Revision 1.2  1998/03/31 18:26:41  mike
+ *   Revision 1.3  1998/04/23 15:52:20  mike
+ *   Removed whitespace from the ASCII85 image data.
+ *   Now use an image dictionary for Level 2 printers.
+ *   Now enable interpolation for Level 2 printers.
+ *   Added whitespace to ASCII HEX image data.
+ *
+ *   Revision 1.2  1998/03/31  18:26:41  mike
  *   Added setcolorspace command for Level 2 output.
  *
  *   Revision 1.1  1998/02/19  20:43:33  mike
@@ -590,33 +596,28 @@ main(int  argc,		/* I - Number of command-line arguments */
       };
 
       if (level == 1)
+      {
 	fprintf(out, "\t/picture %d string def\n", (x1 - x0 + 1) * abs(colorspace));
-      else if (colorspace == IMAGE_WHITE)
-        fputs("/DeviceGray setcolorspace\n", out);
-      else
-        fputs("/DeviceRGB setcolorspace\n", out);
 
-      if (rotation == 0)
-      {
-        if (flip)
-	  fprintf(out, "\t%d %d 8 [-1 0 0 -1 1 1] ",
-	 	  (x1 - x0 + 1), (y1 - y0 + 1));
-        else
-	  fprintf(out, "\t%d %d 8 [1 0 0 -1 0 1] ",
-	 	  (x1 - x0 + 1), (y1 - y0 + 1));
-      }
-      else
-      {
-        if (flip)
-	  fprintf(out, "\t%d %d 8 [0 -1 1 0 0 0] ",
-	 	  (x1 - x0 + 1), (y1 - y0 + 1));
-        else
-	  fprintf(out, "\t%d %d 8 [0 1 1 0 0 0] ",
-	 	  (x1 - x0 + 1), (y1 - y0 + 1));
-      };
+	if (rotation == 0)
+	{
+          if (flip)
+	    fprintf(out, "\t%d %d 8 [-1 0 0 -1 1 1] ",
+	 	    (x1 - x0 + 1), (y1 - y0 + 1));
+          else
+	    fprintf(out, "\t%d %d 8 [1 0 0 -1 0 1] ",
+	 	    (x1 - x0 + 1), (y1 - y0 + 1));
+	}
+	else
+	{
+          if (flip)
+	    fprintf(out, "\t%d %d 8 [0 -1 1 0 0 0] ",
+	 	    (x1 - x0 + 1), (y1 - y0 + 1));
+          else
+	    fprintf(out, "\t%d %d 8 [0 1 1 0 0 0] ",
+	 	    (x1 - x0 + 1), (y1 - y0 + 1));
+	};
 
-      if (level == 1)
-      {
         if (colorspace == IMAGE_WHITE)
           fputs(" {currentfile picture readhex pop} image\n", out);
         else
@@ -630,8 +631,43 @@ main(int  argc,		/* I - Number of command-line arguments */
       }
       else
       {
-        fprintf(out, " currentfile /ASCII85Decode filter false %d colorimage\n",
-                abs(colorspace));
+        if (colorspace == IMAGE_WHITE)
+          fputs("/DeviceGray setcolorspace\n", out);
+        else
+          fputs("/DeviceRGB setcolorspace\n", out);
+
+        fputs("<<\n", out);
+        fputs("\t/ImageType 1\n", out);
+
+	fprintf(out, "\t/Width %d\n", x1 - x0 + 1);
+	fprintf(out, "\t/Height %d\n", y1 - y0 + 1);
+	fputs("\t/BitsPerComponent 8\n", out);
+
+        if (colorspace == IMAGE_WHITE)
+          fputs("\t/Decode [ 0 1 ]\n", out);
+        else
+          fputs("\t/Decode [ 0 1 0 1 0 1 ]\n", out);
+
+        fputs("\t/DataSource currentfile /ASCII85Decode filter\n", out);
+        fputs("\t/Interpolate true\n", out);
+
+	if (rotation == 0)
+	{
+          if (flip)
+	    fputs("\t/ImageMatrix [ -1 0 0 -1 1 1 ]\n", out);
+          else
+	    fputs("\t/ImageMatrix [ 1 0 0 -1 0 1 ]\n", out);
+	}
+	else
+	{
+          if (flip)
+	    fputs("\t/ImageMatrix [ 0 -1 1 0 0 0 ]\n", out);
+          else
+	    fputs("\t/ImageMatrix [ 0 1 1 0 0 0 ]\n", out);
+	};
+
+        fputs(">>\n", out);
+        fputs("image\n", out);
 
         for (y = y0, out_offset = 0; y <= y1; y ++)
         {
@@ -672,8 +708,11 @@ ps_hex(FILE *prn,	/* I - File to print to */
        ib_t *data,	/* I - Data to print */
        int  length)	/* I - Number of bytes to print */
 {
+  int		col;
   static char	*hex = "0123456789ABCDEF";
 
+
+  col = 0;
 
   while (length > 0)
   {
@@ -687,6 +726,10 @@ ps_hex(FILE *prn,	/* I - File to print to */
 
     data ++;
     length --;
+
+    col = (col + 1) & 31;
+    if (col == 0 && length > 0)
+      putc('\n', prn);
   };
 
   putc('\n', prn);
@@ -705,10 +748,8 @@ ps_ascii85(FILE *prn,		/* I - File to print to */
 {
   unsigned	b;		/* Binary data word */
   unsigned char	c[5];		/* ASCII85 encoded chars */
-  int		col;		/* Current column */
 
 
-  col = 0;
   while (length > 3)
   {
     b = (((((data[0] << 8) | data[1]) << 8) | data[2]) << 8) | data[3];
@@ -732,10 +773,6 @@ ps_ascii85(FILE *prn,		/* I - File to print to */
 
     data += 4;
     length -= 4;
-
-    col = (col + 1) & 15;
-    if (col == 0 && length > 0)
-      putc('\n', prn);
   };
 
   if (last_line)
@@ -758,9 +795,7 @@ ps_ascii85(FILE *prn,		/* I - File to print to */
     };
 
     fputs("~>\n", prn);
-  }
-  else
-    putc('\n', prn);
+  };
 }
 
 
@@ -891,5 +926,5 @@ print_prolog(FILE  *out,
 
 
 /*
- * End of "$Id: imagetops.c,v 1.2 1998/03/31 18:26:41 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.3 1998/04/23 15:52:20 mike Exp $".
  */
