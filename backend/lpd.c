@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.24 2001/02/06 23:40:05 mike Exp $"
+ * "$Id: lpd.c,v 1.25 2001/02/21 20:22:26 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -51,7 +51,12 @@
 #  include <netdb.h>
 #endif /* WIN32 || __EMX__ */
 
-extern int	rresvport(int *port);	/* Hello?  No prototype for this... */
+
+/*
+ * It appears that rresvport() is never declared on most systems...
+ */
+
+extern int	rresvport(int *port);
 
 
 /*
@@ -372,11 +377,31 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
   for (port = 732;;)
   {
-    if ((fd = rresvport(&port)) < 0)
+    if (getuid())
     {
-      perror("ERROR: Unable to reserve port");
-      sleep(30);
-      continue;
+     /*
+      * We're running as a normal user, so just create a regular socket...
+      */
+
+      if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+      {
+        perror("ERROR: Unable to create socket");
+        return (1);
+      }
+    }
+    else
+    {
+     /*
+      * We're running as root, so comply with RFC 1179 and reserve a
+      * priviledged port between 721 and 732...
+      */
+
+      if ((fd = rresvport(&port)) < 0)
+      {
+	perror("ERROR: Unable to reserve port");
+	sleep(30);
+	continue;
+      }
     }
 
     if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
@@ -407,7 +432,7 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
       break;
   }
 
-  fprintf(stderr, "INFO: Connected on port %d...\n", port);
+  fprintf(stderr, "INFO: Connected from port %d...\n", port);
 
  /*
   * Now that we are "connected" to the port, ignore SIGTERM so that we
@@ -542,5 +567,5 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
 
 /*
- * End of "$Id: lpd.c,v 1.24 2001/02/06 23:40:05 mike Exp $".
+ * End of "$Id: lpd.c,v 1.25 2001/02/21 20:22:26 mike Exp $".
  */
