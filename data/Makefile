@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.19 2002/01/31 14:53:42 mike Exp $"
+# "$Id: Makefile,v 1.20 2002/08/30 20:56:44 mike Exp $"
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
@@ -97,16 +97,8 @@ install:
 	for file in $(DATAFILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/data; \
 	done
-	-if test x$(PAMDIR) != x$(BUILDROOT); then \
-		$(INSTALL_DIR) $(PAMDIR); \
-		if test -f /lib/security/pam_unix.so; then \
-			$(INSTALL_DATA) cups.suse $(PAMDIR)/cups; \
-		else \
-			$(INSTALL_DATA) cups.pam $(PAMDIR)/cups; \
-		fi \
-	fi
 
 
 #
-# End of "$Id: Makefile,v 1.19 2002/01/31 14:53:42 mike Exp $".
+# End of "$Id: Makefile,v 1.20 2002/08/30 20:56:44 mike Exp $".
 #
