@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.45 2003/05/02 15:54:50 mike Exp $"
+ * "$Id: main.c,v 1.57.2.46 2003/05/09 15:11:57 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -30,10 +30,10 @@
  *   ReleaseSignals()     - Release signals for delivery.
  *   SetString()          - Set a string value.
  *   SetStringf()         - Set a formatted string value.
+ *   parent_handler()     - Catch USR1/CHLD signals...
  *   sigchld_handler()    - Handle 'child' signals from old processes.
  *   sighup_handler()     - Handle 'hangup' signals to reconfigure the scheduler.
  *   sigterm_handler()    - Handle 'terminate' signals that stop the scheduler.
- *   sigusr1_handler()    - Catch USR1 signals...
  *   usage()              - Show scheduler usage.
  */
 
@@ -56,10 +56,10 @@
  * Local functions...
  */
 
+static void	parent_handler(int sig);
 static void	sigchld_handler(int sig);
 static void	sighup_handler(int sig);
 static void	sigterm_handler(int sig);
-static void	sigusr1_handler(int sig);
 static void	usage(void);
 
 
@@ -67,6 +67,7 @@ static void	usage(void);
  * Local globals...
  */
 
+static int	parent_signal = 0;	/* Set to signal number from child */
 static int	holdcount = 0;		/* Number of time "hold" was called */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
 static sigset_t	holdmask;		/* Old POSIX signal mask */
@@ -176,21 +177,24 @@ main(int  argc,				/* I - Number of command-line arguments */
     */
 
 #ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-    sigset(SIGUSR1, sigusr1_handler);
+    sigset(SIGUSR1, parent_handler);
+    sigset(SIGCHLD, parent_handler);
 
     sigset(SIGHUP, SIG_IGN);
 #elif defined(HAVE_SIGACTION)
     memset(&action, 0, sizeof(action));
     sigemptyset(&action.sa_mask);
     sigaddset(&action.sa_mask, SIGUSR1);
-    action.sa_handler = sigusr1_handler;
+    action.sa_handler = parent_handler;
     sigaction(SIGUSR1, &action, NULL);
+    sigaction(SIGCHLD, &action, NULL);
 
     sigemptyset(&action.sa_mask);
     action.sa_handler = SIG_IGN;
     sigaction(SIGHUP, &action, NULL);
 #else
-    signal(SIGUSR1, sigusr1_handler);
+    signal(SIGUSR1, parent_handler);
+    signal(SIGCLD, parent_handler);
 
     signal(SIGHUP, SIG_IGN);
 #endif /* HAVE_SIGSET */
@@ -198,18 +202,23 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (fork() > 0)
     {
      /*
-      * OK, wait for the child to startup and send us SIGUSR1...  We
-      * also need to ignore SIGHUP which might be sent by the init
-      * script to restart the scheduler...
+      * OK, wait for the child to startup and send us SIGUSR1 or to crash
+      * and the OS send us SIGCHLD...  We also need to ignore SIGHUP which
+      * might be sent by the init script to restart the scheduler...
       */
 
-      if (wait(&i) < 0)
-        i = 0;
+      for (; parent_signal == 0;)
+        sleep(1);
 
-      if (i == 0)
+      if (parent_signal == SIGUSR1)
         return (0);
 
-      if (i >= 256)
+      if (wait(&i) < 0)
+      {
+        perror("cupsd");
+	i = 1;
+      }
+      else if (i >= 256)
         fprintf(stderr, "cupsd: Child exited with status %d!\n", i / 256);
       else
         fprintf(stderr, "cupsd: Child exited on signal %d!\n", i);
@@ -871,6 +880,21 @@ SetStringf(char       **s,		/* O - New string */
 
 
 /*
+ * 'parent_handler()' - Catch USR1/CHLD signals...
+ */
+
+static void
+parent_handler(int sig)		/* I - Signal */
+{
+ /*
+  * Store the signal we got from the OS and return...
+  */
+
+  parent_signal = sig;
+}
+
+
+/*
  * 'sigchld_handler()' - Handle 'child' signals from old processes.
  */
 
@@ -1052,17 +1076,6 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * 'sigusr1_handler()' - Catch USR1 signals...
- */
-
-static void
-sigusr1_handler(int sig)		/* I - Signal */
-{
-  (void)sig;	/* remove compiler warnings... */
-}
-
-
-/*
  * 'usage()' - Show scheduler usage.
  */
 
@@ -1075,5 +1088,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.45 2003/05/02 15:54:50 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.46 2003/05/09 15:11:57 mike Exp $".
  */

@@ -1,8 +1,11 @@
 CHANGES-1.1.txt
 ---------------
 
-CHANGES IN CUPS V1.1.19
+CHANGES IN CUPS V1.1.19rc5
 
+	- The scheduler dropped the first non-alpha character
+	  after an open brace when doing attribute substitutions
+	  in banner pages (STR #77)
 	- The scheduler child might send SIGUSR1 to the parent
 	  before the signal handler was installed; this didn't
 	  prevent the scheduler from starting but produced an
