@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.17 2002/05/31 19:08:22 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.18 2002/08/01 01:33:01 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -45,7 +45,6 @@
  *   compare_strings() - Compare two strings.
  *   compare_groups()  - Compare two groups.
  *   compare_options() - Compare two options.
- *   compare_choices() - Compare two choices.
  */
 
 /*
@@ -87,7 +86,6 @@
 static int		compare_strings(char *s, char *t);
 static int		compare_groups(ppd_group_t *g0, ppd_group_t *g1);
 static int		compare_options(ppd_option_t *o0, ppd_option_t *o1);
-static int		compare_choices(ppd_choice_t *c0, ppd_choice_t *c1);
 static int		ppd_read(FILE *fp, char *keyword, char *option,
 			         char *text, char **string);
 static void		ppd_decode(char *string);
@@ -1522,9 +1520,6 @@ ppdOpen(FILE *fp)		/* I - File to read from */
          j > 0;
 	 j --, option ++)
     {
-      qsort(option->choices, option->num_choices, sizeof(ppd_choice_t),
-            (int (*)(const void *, const void *))compare_choices);
-
       for (k = 0; k < option->num_choices; k ++)
         option->choices[k].option = (void *)option;
     }
@@ -1543,9 +1538,6 @@ ppdOpen(FILE *fp)		/* I - File to read from */
            k > 0;
 	   k --, option ++)
       {
-	qsort(option->choices, option->num_choices, sizeof(ppd_choice_t),
-              (int (*)(const void *, const void *))compare_choices);
-
         for (m = 0; m < option->num_choices; m ++)
           option->choices[m].option = (void *)option;
       }
@@ -1766,18 +1758,6 @@ compare_options(ppd_option_t *o0,/* I - First option */
                 ppd_option_t *o1)/* I - Second option */
 {
   return (compare_strings(o0->text, o1->text));
-}
-
-
-/*
- * 'compare_choices()' - Compare two choices.
- */
-
-static int			/* O - Result of comparison */
-compare_choices(ppd_choice_t *c0,/* I - First choice */
-                ppd_choice_t *c1)/* I - Second choice */
-{
-  return (compare_strings(c0->text, c1->text));
 }
 
 
@@ -2173,5 +2153,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.17 2002/05/31 19:08:22 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.18 2002/08/01 01:33:01 mike Exp $".
  */

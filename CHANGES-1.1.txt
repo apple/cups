@@ -3,6 +3,7 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- ppdOpen*() no longer sorts choices for an option.
 	- The web interface now enforces constraints in PPD
 	  files when configuring a printer.
 	- When stopping a printer, the scheduler didn't set the
