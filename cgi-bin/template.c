@@ -1,27 +1,37 @@
 /*
- * "$Id: template.c,v 1.1 1997/05/08 19:55:53 mike Exp $"
+ * "$Id: template.c,v 1.2 1997/05/08 20:14:19 mike Exp $"
  *
  *   CGI template function.
+ *
+ *   Copyright 1997 by Easy Software Products, All Rights Reserved.
+ *
+ * Contents:
+ *
+ *   cgiCopyTemplateFile() - Copy a template file and replace all the
+ *                           '{variable}' strings with the variable value.
  *
  * Revision History:
  *
  *   $Log: template.c,v $
- *   Revision 1.1  1997/05/08 19:55:53  mike
- *   Initial revision
+ *   Revision 1.2  1997/05/08 20:14:19  mike
+ *   Renamed CGI_Name functions to cgiName functions.
+ *   Updated documentation.
  *
+ *   Revision 1.1  1997/05/08  19:55:53  mike
+ *   Initial revision
  */
 
 #include "cgi.h"
 
 
 /*
- * 'CGI_CopyTemplateFile()' - Copy a template file and replace all the
- *                            '{variable}' strings with the variable value.
+ * 'cgiCopyTemplateFile()' - Copy a template file and replace all the
+ *                           '{variable}' strings with the variable value.
  */
 
 void
-CGI_CopyTemplateFile(FILE *out,		/* I - Output file */
-                     char *template)	/* I - Template file to read */
+cgiCopyTemplateFile(FILE *out,		/* I - Output file */
+                    char *template)	/* I - Template file to read */
 {
   FILE	*in;		/* Input file */
   int	ch;		/* Character from file */
@@ -60,7 +70,7 @@ CGI_CopyTemplateFile(FILE *out,		/* I - Output file */
       * See if it has a value...
       */
 
-      value = CGI_GetVariable(name);
+      value = cgiGetVariable(name);
       if (value == NULL)
         fprintf(out, "{%s}", name);
       else
@@ -80,5 +90,5 @@ CGI_CopyTemplateFile(FILE *out,		/* I - Output file */
 
 
 /*
- * End of "$Id: template.c,v 1.1 1997/05/08 19:55:53 mike Exp $".
+ * End of "$Id: template.c,v 1.2 1997/05/08 20:14:19 mike Exp $".
  */

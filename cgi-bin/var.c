@@ -1,14 +1,31 @@
 /*
- * "$Id: var.c,v 1.1 1997/05/08 19:55:53 mike Exp $"
+ * "$Id: var.c,v 1.2 1997/05/08 20:14:19 mike Exp $"
  *
  *   CGI form variable functions.
+ *
+ *   Copyright 1997 by Easy Software Products, All Rights Reserved.
+ *
+ * Contents:
+ *
+ *   cgiInitialize()         - Initialize the CGI variable "database"...
+ *   cgiGetVariable()        - Get a CGI variable from the database...
+ *   cgiSetVariable()        - Set a CGI variable in the database...
+ *   cgi_sort_variables()    - Sort all form variables for faster lookup.
+ *   cgi_compare_variables() - Compare two variables.
+ *   cgi_add_variable()      - Add a form variable.
+ *   cgi_initialize_string() - Initialize form variables from a string.
+ *   cgi_initialize_get()    - Initialize form variables using the GET method.
+ *   cgi_initialize_post()   - Initialize variables using the POST method.
  *
  * Revision History:
  *
  *   $Log: var.c,v $
- *   Revision 1.1  1997/05/08 19:55:53  mike
- *   Initial revision
+ *   Revision 1.2  1997/05/08 20:14:19  mike
+ *   Renamed CGI_Name functions to cgiName functions.
+ *   Updated documentation.
  *
+ *   Revision 1.1  1997/05/08  19:55:53  mike
+ *   Initial revision
  */
 
 #include "cgi.h"
@@ -46,13 +63,13 @@ static int	cgi_initialize_post(int need_content);
 
 
 /*
- * 'CGI_Initialize()' - Initialize the CGI variable "database"...
+ * 'cgiInitialize()' - Initialize the CGI variable "database"...
  */
 
 int
-CGI_Initialize(int need_content)	/* I - True if input is required */
+cgiInitialize(int need_content)	/* I - True if input is required */
 {
-  char	*method;			/* Form posting method */
+  char	*method;		/* Form posting method */
  
 
   method = getenv("REQUEST_METHOD");
@@ -69,6 +86,70 @@ CGI_Initialize(int need_content)	/* I - True if input is required */
 }
 
 
+/*
+ * 'cgiGetVariable()' - Get a CGI variable from the database...
+ *
+ * Returns NULL if the variable doesn't exist...
+ */
+
+char *
+cgiGetVariable(char *name)	/* I - Name of variable */
+{
+  var_t	key,	/* Search key */
+	*var;	/* Returned variable */
+
+
+  if (form_count < 1)
+    return (NULL);
+
+  key.name = name;
+
+  var = bsearch(&key, form_vars, form_count, sizeof(var_t),
+                (int (*)(const void *, const void *))cgi_compare_variables);
+
+  return ((var == NULL) ? NULL : var->value);
+}
+
+
+/*
+ * 'cgiSetVariable()' - Set a CGI variable in the database...
+ */
+
+void
+cgiSetVariable(char *name,	/* I - Name of variable */
+               char *value)	/* I - Value of variable */
+{
+  var_t	key,	/* Search key */
+	*var;	/* Returned variable */
+
+
+  if (form_count > 0)
+  {
+    key.name = name;
+
+    var = bsearch(&key, form_vars, form_count, sizeof(var_t),
+                  (int (*)(const void *, const void *))cgi_compare_variables);
+  }
+  else
+    var = NULL;
+
+  if (var == NULL)
+  {
+    cgi_add_variable(name, value);
+    cgi_sort_variables();
+  }
+  else
+  {
+    free(var->value);
+    var->value = strdup(value);
+  };
+}
+
+
+/*
+ * 'cgi_sort_variables()' - Sort all form variables for faster lookup.
+ */
+
 static void
 cgi_sort_variables(void)
 {
@@ -80,6 +161,10 @@ cgi_sort_variables(void)
 }
 
 
+/*
+ * 'cgi_compare_variables()' - Compare two variables.
+ */
+
 static int
 cgi_compare_variables(var_t *v1,	/* I - First variable */
                       var_t *v2)	/* I - Second variable */
@@ -87,6 +172,10 @@ cgi_compare_variables(var_t *v1,	/* I - First variable */
   return (strcasecmp(v1->name, v2->name));
 }
 
+
+/*
+ * 'cgi_add_variable()' - Add a form variable.
+ */
 
 static void
 cgi_add_variable(char *name,		/* I - Variable name */
@@ -230,6 +319,10 @@ cgi_initialize_get(int need_content)	/* I - True if input is required */
 }
 
 
+/*
+ * 'cgi_initialize_post()' - Initialize variables using the POST method.
+ */
+
 static int
 cgi_initialize_post(int need_content)	/* I - True if input is required */
 {
@@ -285,65 +378,5 @@ cgi_initialize_post(int need_content)	/* I - True if input is required */
 
 
 /*
- * 'CGI_GetVariable()' - Get a CGI variable from the database...
- *
- * Returns NULL if the variable doesn't exist...
- */
-
-char *
-CGI_GetVariable(char *name)	/* I - Name of variable */
-{
-  var_t	key,	/* Search key */
-	*var;	/* Returned variable */
-
-
-  if (form_count < 1)
-    return (NULL);
-
-  key.name = name;
-
-  var = bsearch(&key, form_vars, form_count, sizeof(var_t),
-                (int (*)(const void *, const void *))cgi_compare_variables);
-
-  return ((var == NULL) ? NULL : var->value);
-}
-
-
-/*
- * 'CGI_SetVariable()' - Set a CGI variable in the database...
- */
-
-void
-CGI_SetVariable(char *name,	/* I - Name of variable */
-                char *value)	/* I - Value of variable */
-{
-  var_t	key,	/* Search key */
-	*var;	/* Returned variable */
-
-
-  if (form_count > 0)
-  {
-    key.name = name;
-
-    var = bsearch(&key, form_vars, form_count, sizeof(var_t),
-                  (int (*)(const void *, const void *))cgi_compare_variables);
-  }
-  else
-    var = NULL;
-
-  if (var == NULL)
-  {
-    cgi_add_variable(name, value);
-    cgi_sort_variables();
-  }
-  else
-  {
-    free(var->value);
-    var->value = strdup(value);
-  };
-}
-
-
-/*
- * End of "$Id: var.c,v 1.1 1997/05/08 19:55:53 mike Exp $".
+ * End of "$Id: var.c,v 1.2 1997/05/08 20:14:19 mike Exp $".
  */
