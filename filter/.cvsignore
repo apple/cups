@@ -1,3 +1,4 @@
+gziptoany
 hpgltops
 imagetops
 imagetoraster
@@ -10,4 +11,6 @@ pstops
 rastertodymo
 rastertoepson
 rastertohp
+rastertortl
+testraster
 texttops
