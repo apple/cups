@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4,v 1.9.2.6 2002/03/13 15:54:26 mike Exp $"
+dnl "$Id: cups-compiler.m4,v 1.9.2.7 2002/06/04 20:32:54 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -35,6 +35,9 @@ AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging [default=no]],
 AC_ARG_WITH(optim, [  --with-optim=\"flags\"    set optimization flags ])
 
 dnl Update compiler options...
+CXXLIBS=""
+AC_SUBST(CXXLIBS)
+
 if test -n "$GCC"; then
 	# Starting with GCC 3.0, you must link C++ programs against either
 	# libstdc++ (shared by default), or libsupc++ (always static).  If
@@ -54,7 +57,7 @@ if test -n "$GCC"; then
  	SUPC="`$CXX -print-file-name=libsupc++.a 2>/dev/null`"
  	if test -n "$SUPC" -a "$SUPC" != "libsupc++.a"; then
  		# This is gcc 3.x, and it knows of libsupc++, so we need it
- 		LIBS="$LIBS -lsupc++"
+ 		CXXLIBS="-lsupc++"
 		AC_MSG_RESULT(yes)
 	else
 		AC_MSG_RESULT(no)
@@ -183,5 +186,5 @@ case $uname in
 esac
 
 dnl
-dnl End of "$Id: cups-compiler.m4,v 1.9.2.6 2002/03/13 15:54:26 mike Exp $".
+dnl End of "$Id: cups-compiler.m4,v 1.9.2.7 2002/06/04 20:32:54 mike Exp $".
 dnl
