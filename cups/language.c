@@ -1,0 +1,304 @@
+/*
+ * "$Id: language.c,v 1.1 1999/02/05 20:38:42 mike Exp $"
+ *
+ *   for the Common UNIX Printing System (CUPS).
+ *
+ *   Copyright 1997-1999 by Easy Software Products.
+ *
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44145 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
+ *
+ * Contents:
+ *
+ */
+
+/*
+ * Include necessary headers...
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include "string.h"
+#include "language.h"
+
+
+/*
+ * Local globals...
+ */
+
+static cups_lang_t	*lang_cache = NULL;	/* Language string cache */
+static char		*lang_encodings[] =	/* Encoding strings */
+			{
+			  "us-ascii",
+			  "iso8859-1",
+			  "iso8859-2",
+			  "iso8859-3",
+			  "iso8859-4",
+			  "iso8859-5",
+			  "iso8859-6",
+			  "iso8859-7",
+			  "iso8859-8",
+			  "iso8859-9",
+			  "iso8859-10",
+			  "utf8"
+			};
+
+
+/*
+ * 'cupsLangEncoding()' - Return the character encoding (us-ascii, etc.)
+ *                        for the given language.
+ */
+
+char *					/* O - Character encoding */
+cupsLangEncoding(cups_lang_t *lang)	/* I - Language data */
+{
+  if (lang == NULL)
+    return (NULL);
+  else
+    return (lang_encodings[lang->encoding]);
+}
+
+
+/*
+ * 'cupsLangFlush()' - Flush all language data out of the cache.
+ */
+
+void
+cupsLangFlush(void)
+{
+  int		i;	/* Looping var */
+  cups_lang_t	*lang,	/* Current language */
+		*next;	/* Next language */
+
+
+  for (lang = lang_cache; lang != NULL; lang = next)
+  {
+    for (i = 0; i < CUPS_MSG_MAX; i ++)
+      if (lang->messages[i] != NULL)
+        free(lang->messages[i]);
+
+    next = lang->next;
+    free(lang);
+  }
+}
+
+
+/*
+ * 'cupsLangFree()' - Free language data.
+ *
+ * This does not actually free anything; use cupsLangFlush() for that.
+ */
+
+void
+cupsLangFree(cups_lang_t *lang)	/* I - Language to free */
+{
+  if (lang != NULL && lang->used > 0)
+    lang->used --;
+}
+
+
+/*
+ * 'cupsLangGet()' - Get a language.
+ */
+
+cups_lang_t *			/* O - Language data */
+cupsLangGet(char *language)	/* I - Language or locale */
+{
+  int		i;		/* Looping var */
+  char		real[16],	/* Real language name */
+		filename[1024];	/* Filename for language locale file */
+  FILE		*fp;		/* Language locale file pointer */
+  char		line[1024];	/* Line from file */
+  cups_msg_t	msg;		/* Message number */
+  char		*text;		/* Message text */
+  cups_lang_t	*lang;		/* Current language... */
+
+
+ /*
+  * First see if we already have this language loaded...
+  */
+
+  if (language == NULL)
+    language = "C";
+
+  for (lang = lang_cache; lang != NULL; lang = lang->next)
+    if (strcmp(lang->language, language) == 0)
+    {
+      lang->used ++;
+      return (lang);
+    }
+
+ /*
+  * Then convert the language string passed in to a locale string.
+  * "C" is the standard POSIX locale and is copied unchanged.  Otherwise
+  * the language string is converted from ll-cc (language-country) to
+  * ll_CC to match the file naming convention used by all POSIX-compliant
+  * operating systems.
+  */
+
+  if (strlen(language) < 2)
+    strcpy(real, "C");
+  else
+  {
+    real[0] = tolower(language[0]);
+    real[1] = tolower(language[1]);
+
+    if (strlen(language) > 3)
+    {
+      real[2] = '_';
+      real[3] = toupper(language[3]);
+      real[4] = toupper(language[4]);
+      real[5] = '\0';
+    }
+    else
+      real[2] = '\0';
+  }
+
+ /*
+  * Next try to open a locale file; we will try the country-localized file
+  * first, and then look for generic language file.  If all else fails we
+  * will use the POSIX locale.
+  */
+
+  sprintf(filename, "/usr/lib/locale/%s/cups_%s", real, real);
+  if ((fp = fopen(filename, "r")) == NULL)
+    if (strlen(real) > 2)
+    {
+     /*
+      * Nope, see if we can open a generic language file...
+      */
+
+      real[2] = '\0';
+      sprintf(filename, "/usr/lib/locale/%s/cups_%s", real, real);
+      fp = fopen(filename, "r");
+    }
+
+ /*
+  * No language-specific file; try POSIX locale...
+  */
+
+  if (fp == NULL)
+    fp = fopen("/usr/lib/locale/C/cups_C", "r");
+
+ /*
+  * If we can't load anything, return NULL to signal an error!
+  */
+
+  if (fp == NULL)
+    return (NULL);
+
+ /*
+  * OK, we have an open messages file; the first line will contain the
+  * language encoding (us-ascii, iso-8859-1, etc.), and the rest will
+  * be messages consisting of:
+  *
+  *    #### SP message text
+  */
+
+  if (fgets(line, sizeof(line), fp) == NULL)
+  {
+   /*
+    * Can't read encoding!
+    */
+
+    fclose(fp);
+    return (NULL);
+  }
+
+  line[strlen(line) - 1] = '\0';	/* Strip LF */
+
+ /*
+  * See if there is a free language available; if so, use that
+  * record...
+  */
+
+  for (lang = lang_cache; lang != NULL; lang = lang->next)
+    if (lang->used == 0)
+      break;
+
+  if (lang == NULL)
+  {
+   /*
+    * Allocate memory for the language and add it to the cache.
+    */
+
+    if ((lang = calloc(sizeof(cups_lang_t), 1)) == NULL)
+    {
+      fclose(fp);
+      return (NULL);
+    }
+
+    lang->next = lang_cache;
+    lang_cache = lang;
+  }
+
+  lang->used ++;
+  strcpy(lang->language, language);
+
+  for (i = 0; i < (sizeof(lang_encodings) / sizeof(lang_encodings[0])); i ++)
+    if (strcmp(lang_encodings[i], line) == 0)
+    {
+      lang->encoding = (cups_encoding_t)i;
+      break;
+    }
+
+ /*
+  * Read the strings from the file...
+  */
+
+  while (fgets(line, sizeof(line), fp) != NULL)
+  {
+   /*
+    * Ignore lines not starting with a digit...
+    */
+
+    line[strlen(line) - 1] = '\0';	/* Strip LF */
+
+    if (!isdigit(line[0]))
+      continue;
+
+   /*
+    * Grab the message number and text...
+    */
+
+    msg = (cups_msg_t)atoi(line);
+
+    if (msg < 0 || msg >= CUPS_MSG_MAX)
+      continue;
+
+    text = line;
+    while (!isspace(*text) && *text != '\0')
+      text ++;
+    while (isspace(*text))
+      text ++;
+    
+    lang->messages[msg] = (unsigned char *)strdup(text);
+  }
+
+ /*
+  * Close the file and return...
+  */
+
+  fclose(fp);
+
+  return (lang);
+}
+
+
+/*
+ * End of "$Id: language.c,v 1.1 1999/02/05 20:38:42 mike Exp $".
+ */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.3 1999/02/05 17:40:50 mike Exp $"
+# "$Id: Makefile,v 1.4 1999/02/05 20:38:40 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,14 +28,14 @@ include ../Makedefs
 # libcups.a object files...
 #
 
-OBJS	=	emit.o filter.o http.o ipp.o mark.o mime.o options.o page.o \
-		ppd.o type.o util.o
+OBJS	=	emit.o filter.o http.o ipp.o language.o mark.o mime.o \
+		options.o page.o ppd.o type.o util.o
 
 #
 # Header files to install...
 #
 
-HEADERS	=	cups.h http.h ipp.h mime.h ppd.h
+HEADERS	=	cups.h http.h ipp.h language.h mime.h ppd.h
 
 #
 # Targets in this directory...
@@ -79,6 +79,7 @@ emit.o:		ppd.h ../config.h ../Makedefs
 filter.o:	mime.h ../config.h ../Makedefs
 http.o:		http.h string.h ../config.h ../Makedefs
 ipp.o:		http.h ipp.h ../config.h ../Makedefs
+language.o:	language.h string.h ../config.h ../Makedefs
 mark.o:		ppd.h ../config.h ../Makedefs
 mime.o:		mime.h ../config.h ../Makedefs
 options.o:	cups.h ../config.h ../Makedefs
@@ -117,5 +118,5 @@ testppd:	testppd.o libcups.a
 testppd.o:	ppd.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.3 1999/02/05 17:40:50 mike Exp $".
+# End of "$Id: Makefile,v 1.4 1999/02/05 20:38:40 mike Exp $".
 #
