@@ -333,6 +333,16 @@ most support the following options (case is not significant):
 in the <CODE>PageSize</CODE>, <CODE>InputSlot</CODE>, and
 <CODE>MediaType</CODE> options.
 
+<H3>Setting the Orientation</H3>
+
+<P>The <CODE>-o landscape</CODE> option will rotate the page 90 degrees
+to print in landscape orientation:
+
+<UL><PRE>
+<B>lp -o landscape filename ENTER</B>
+<B>lpr -o landscape filename ENTER</B>
+</PRE></UL>
+
 <H3>Printing On Both Sides of the Paper</H3>
 
 <P>The <CODE>-o sides=two-sided-short-edge</CODE> and <CODE>-o
@@ -827,16 +837,6 @@ command with the <CODE>-l</CODE> option, as follows:
 <UL><PRE>
 <B>lpoptions -p laserjet -l ENTER</B>
 </UL></PRE>
-
-<H3>Setting the Orientation</H3>
-
-<P>The <CODE>-o landscape</CODE> option will rotate the page 90 degrees
-to print in landscape orientation:
-
-<UL><PRE>
-<B>lp -o landscape filename ENTER</B>
-<B>lpr -o landscape filename ENTER</B>
-</PRE></UL>
 
 <H2>Setting the Default Printer</H2>
 
