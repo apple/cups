@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.21 2002/12/17 18:56:46 swdev Exp $"
+# "$Id: Makefile,v 1.22 2003/01/15 20:41:37 mike Exp $"
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
@@ -35,19 +35,7 @@ BANNERS	=	classified \
 		topsecret \
 		unclassified
 
-CHARSETS =	windows-874 \
-		windows-1250 \
-		windows-1251 \
-		windows-1252 \
-		windows-1253 \
-		windows-1254 \
-		windows-1255 \
-		windows-1256 \
-		windows-1257 \
-		windows-1258 \
-		koi8-r \
-		koi8-u \
-		iso-8859-1 \
+CHARSETS =	iso-8859-1 \
 		iso-8859-2 \
 		iso-8859-3 \
 		iso-8859-4 \
@@ -62,7 +50,18 @@ CHARSETS =	windows-874 \
 		iso-8859-15 \
 		koi8-r \
 		koi8-u \
-		utf-8
+		utf-8 \
+		windows-874 \
+		windows-1250 \
+		windows-1251 \
+		windows-1252 \
+		windows-1253 \
+		windows-1254 \
+		windows-1255 \
+		windows-1256 \
+		windows-1257 \
+		windows-1258
+
 DATAFILES =	HPGLprolog psglyphs testprint.ps
 
 
@@ -100,5 +99,5 @@ install:
 
 
 #
-# End of "$Id: Makefile,v 1.21 2002/12/17 18:56:46 swdev Exp $".
+# End of "$Id: Makefile,v 1.22 2003/01/15 20:41:37 mike Exp $".
 #
