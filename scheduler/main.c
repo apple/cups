@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.39 2000/05/11 15:47:13 mike Exp $"
+ * "$Id: main.c,v 1.40 2000/05/22 18:26:52 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -405,7 +405,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     * Update any pending multi-file documents...
     */
 
-    if ((time(NULL) - senddoc_time) >= 60)
+    if ((time(NULL) - senddoc_time) >= 10)
     {
       CheckJobs();
       senddoc_time = time(NULL);
@@ -613,5 +613,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.39 2000/05/11 15:47:13 mike Exp $".
+ * End of "$Id: main.c,v 1.40 2000/05/22 18:26:52 mike Exp $".
  */
