@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.61 2002/01/02 17:59:00 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.62 2002/02/20 18:59:39 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -683,7 +683,7 @@ main(int  argc,		/* I - Number of command-line arguments */
       yinches = yinches * atoi(val) / 100;
     }
 
-    if (cupsGetOption("orientation", num_options, options) == NULL &&
+    if (cupsGetOption("orientation-requested", num_options, options) == NULL &&
         cupsGetOption("landscape", num_options, options) == NULL)
     {
      /*
@@ -738,7 +738,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     fprintf(stderr, "DEBUG: xsize = %.0f, ysize = %.0f\n", xsize, ysize);
     fprintf(stderr, "DEBUG: xsize2 = %.0f, ysize2 = %.0f\n", xsize2, ysize2);
 
-    if (cupsGetOption("orientation", num_options, options) == NULL &&
+    if (cupsGetOption("orientation-requested", num_options, options) == NULL &&
         cupsGetOption("landscape", num_options, options) == NULL)
     {
      /*
@@ -4448,5 +4448,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.61 2002/01/02 17:59:00 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.62 2002/02/20 18:59:39 mike Exp $".
  */
