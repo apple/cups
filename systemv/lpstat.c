@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.16 2000/01/04 13:46:11 mike Exp $"
+ * "$Id: lpstat.c,v 1.17 2000/01/21 20:28:00 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -70,13 +70,24 @@ main(int  argc,		/* I - Number of command-line arguments */
   http_t	*http;	/* Connection to server */
 
 
-  http = httpConnect(cupsServer(), ippPort());
+  http = NULL;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
       switch (argv[i][1])
       {
         case 'a' : /* Show acceptance status */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpstat: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    if (argv[i][2] != '\0')
 	      show_accepting(http, argv[i] + 2);
 	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
@@ -89,6 +100,17 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
         case 'c' : /* Show classes and members */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpstat: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    if (argv[i][2] != '\0')
 	      show_classes(http, argv[i] + 2);
 	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
@@ -101,11 +123,23 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
         case 'd' : /* Show default destination */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpstat: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    show_default(http);
 	    break;
 
         case 'h' : /* Connect to host */
-	    httpClose(http);
+	    if (http)
+	      httpClose(http);
 
 	    if (argv[i][2] != '\0')
 	      http = httpConnect(argv[i] + 2, ippPort());
@@ -130,6 +164,17 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
         case 'o' : /* Show jobs by destination */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpstat: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    if (argv[i][2] != '\0')
 	      show_jobs(http, argv[i] + 2, NULL);
 	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
@@ -142,6 +187,17 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
         case 'p' : /* Show printers */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpstat: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    if (argv[i][2] != '\0')
 	      show_printers(http, argv[i] + 2);
 	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
@@ -154,16 +210,49 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
         case 'r' : /* Show scheduler status */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpstat: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    show_scheduler(http);
 	    break;
 
         case 's' : /* Show summary */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpstat: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    show_default(http);
 	    show_classes(http, NULL);
 	    show_devices(http, NULL);
 	    break;
 
         case 't' : /* Show all info */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpstat: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    show_scheduler(http);
 	    show_default(http);
 	    show_classes(http, NULL);
@@ -174,6 +263,17 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
         case 'u' : /* Show jobs by user */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpstat: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    if (argv[i][2] != '\0')
 	      show_jobs(http, NULL, argv[i] + 2);
 	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
@@ -186,6 +286,17 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
         case 'v' : /* Show printer devices */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpstat: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    if (argv[i][2] != '\0')
 	      show_devices(http, argv[i] + 2);
 	    else if ((i + 1) < argc && argv[i + 1][0] != '-')
@@ -209,7 +320,20 @@ main(int  argc,		/* I - Number of command-line arguments */
     }
 
   if (argc == 1)
+  {
+    if (!http)
+    {
+      http = httpConnect(cupsServer(), ippPort());
+
+      if (http == NULL)
+      {
+	perror("lpstat: Unable to connect to server");
+	return (1);
+      }
+    }
+
     show_jobs(http, NULL, cupsUser());
+  }
 
   return (0);
 }
@@ -265,9 +389,17 @@ show_accepting(http_t     *http,	/* I - HTTP connection to server */
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, "/printers/")) != NULL)
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
     DEBUG_puts("show_accepting: request succeeded...");
+
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    {
+      fprintf(stderr, "lpstat: get-printers failed: %s\n",
+              ippErrorString(response->request.status.status_code));
+      ippDelete(response);
+      return;
+    }
 
    /*
     * Loop through the printers returned in the list and display
@@ -390,6 +522,9 @@ show_accepting(http_t     *http,	/* I - HTTP connection to server */
 
     ippDelete(response);
   }
+  else
+    fprintf(stderr, "lpstat: get-printers failed: %s\n",
+            ippErrorString(cupsLastError()));
 }
 
 
@@ -443,9 +578,17 @@ show_classes(http_t     *http,	/* I - HTTP connection to server */
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, "/classes/")) != NULL)
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
     DEBUG_puts("show_devices: request succeeded...");
+
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    {
+      fprintf(stderr, "lpstat: get-classes failed: %s\n",
+              ippErrorString(response->request.status.status_code));
+      ippDelete(response);
+      return;
+    }
 
    /*
     * Loop through the printers returned in the list and display
@@ -561,6 +704,9 @@ show_classes(http_t     *http,	/* I - HTTP connection to server */
 
     ippDelete(response);
   }
+  else
+    fprintf(stderr, "lpstat: get-classes failed: %s\n",
+            ippErrorString(cupsLastError()));
 }
 
 
@@ -607,8 +753,16 @@ show_default(http_t *http)	/* I - HTTP connection to server */
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, "/printers/")) != NULL)
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    {
+      fprintf(stderr, "lpstat: get-default failed: %s\n",
+              ippErrorString(response->request.status.status_code));
+      ippDelete(response);
+      return;
+    }
+
     if ((attr = ippFindAttribute(response, "printer-name", IPP_TAG_NAME)) != NULL)
       printf("system default destination: %s\n", attr->values[0].string.text);
     else
@@ -617,7 +771,11 @@ show_default(http_t *http)	/* I - HTTP connection to server */
     ippDelete(response);
   }
   else
+  {
+    fprintf(stderr, "lpstat: get-default failed: %s\n",
+            ippErrorString(cupsLastError()));
     puts("no system default destination");
+  }
 }
 
 
@@ -670,9 +828,17 @@ show_devices(http_t     *http,	/* I - HTTP connection to server */
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, "/printers/")) != NULL)
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
     DEBUG_puts("show_devices: request succeeded...");
+
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    {
+      fprintf(stderr, "lpstat: get-printers failed: %s\n",
+              ippErrorString(response->request.status.status_code));
+      ippDelete(response);
+      return;
+    }
 
    /*
     * Loop through the printers returned in the list and display
@@ -789,6 +955,9 @@ show_devices(http_t     *http,	/* I - HTTP connection to server */
 
     ippDelete(response);
   }
+  else
+    fprintf(stderr, "lpstat: get-printers failed: %s\n",
+            ippErrorString(cupsLastError()));
 }
 
 
@@ -848,11 +1017,19 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, "/jobs/")) != NULL)
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
    /*
     * Loop through the job list and display them...
     */
+
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    {
+      fprintf(stderr, "lpstat: get-jobs failed: %s\n",
+              ippErrorString(response->request.status.status_code));
+      ippDelete(response);
+      return;
+    }
 
     for (attr = response->attrs; attr != NULL; attr = attr->next)
     {
@@ -1013,6 +1190,9 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 
     ippDelete(response);
   }
+  else
+    fprintf(stderr, "lpstat: get-jobs failed: %s\n",
+            ippErrorString(cupsLastError()));
 }
 
 
@@ -1070,9 +1250,17 @@ show_printers(http_t     *http,	/* I - HTTP connection to server */
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, "/printers/")) != NULL)
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
     DEBUG_puts("show_printers: request succeeded...");
+
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    {
+      fprintf(stderr, "lpstat: get-printers failed: %s\n",
+              ippErrorString(response->request.status.status_code));
+      ippDelete(response);
+      return;
+    }
 
    /*
     * Loop through the printers returned in the list and display
@@ -1256,6 +1444,9 @@ show_printers(http_t     *http,	/* I - HTTP connection to server */
 
     ippDelete(response);
   }
+  else
+    fprintf(stderr, "lpstat: get-printers failed: %s\n",
+            ippErrorString(cupsLastError()));
 }
 
 
@@ -1271,5 +1462,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.16 2000/01/04 13:46:11 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.17 2000/01/21 20:28:00 mike Exp $".
  */

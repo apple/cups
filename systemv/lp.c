@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.15 2000/01/04 13:46:11 mike Exp $"
+ * "$Id: lp.c,v 1.16 2000/01/21 20:28:00 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -220,8 +220,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
       if (job_id < 1)
       {
-	fprintf(stderr, "lp: unable to print file \'%s\' - error code %x.\n",
-	        argv[i], cupsLastError());
+	fprintf(stderr, "lp: unable to print file \'%s\': %s\n",
+	        argv[i], ippErrorString(cupsLastError()));
 	return (1);
       }
       else if (!silent)
@@ -291,8 +291,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
     if (job_id < 1)
     {
-      fprintf(stderr, "lp: unable to print stdin - error code %x.\n",
-              cupsLastError());
+      fprintf(stderr, "lp: unable to print stdin: %s\n",
+	      ippErrorString(cupsLastError()));
       return (1);
     }
     else if (!silent)
@@ -327,5 +327,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.15 2000/01/04 13:46:11 mike Exp $".
+ * End of "$Id: lp.c,v 1.16 2000/01/21 20:28:00 mike Exp $".
  */

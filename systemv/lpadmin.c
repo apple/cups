@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.11 2000/01/04 13:46:11 mike Exp $"
+ * "$Id: lpadmin.c,v 1.12 2000/01/21 20:28:00 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -81,12 +81,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	filename[1024];	/* Model filename */
 
 
-  if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
-  {
-    fputs("lpadmin: Unable to contact server!\n", stderr);
-    return (1);
-  }
-
+  http    = NULL;
   printer = NULL;
 
   for (i = 1; i < argc; i ++)
@@ -94,6 +89,17 @@ main(int  argc,		/* I - Number of command-line arguments */
       switch (argv[i][1])
       {
         case 'c' : /* Add printer to class */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpadmin: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    if (printer == NULL)
 	    {
 	      fputs("lpadmin: Unable to add a printer to the class:\n", stderr);
@@ -111,6 +117,17 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
         case 'd' : /* Set as default destination */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpadmin: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    if (argv[i][2])
 	      printer = argv[i] + 2;
 	    else
@@ -124,7 +141,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
         case 'h' : /* Connect to host */
-	    httpClose(http);
+	    if (http)
+	      httpClose(http);
 
 	    if (argv[i][2] != '\0')
 	      http = httpConnect(argv[i] + 2, ippPort());
@@ -149,6 +167,17 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
         case 'i' : /* Use the specified interface script */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpadmin: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    if (printer == NULL)
 	    {
 	      fputs("lpadmin: Unable to set the interface script:\n", stderr);
@@ -166,6 +195,17 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
         case 'E' : /* Enable the printer */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpadmin: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    if (printer == NULL)
 	    {
 	      fputs("lpadmin: Unable to enable the printer:\n", stderr);
@@ -177,6 +217,17 @@ main(int  argc,		/* I - Number of command-line arguments */
             break;
 
         case 'm' : /* Use the specified standard script/PPD file */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpadmin: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    if (printer == NULL)
 	    {
 	      fputs("lpadmin: Unable to set the interface script or PPD file:\n", stderr);
@@ -196,6 +247,17 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
         case 'p' : /* Add/modify a printer */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpadmin: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    if (argv[i][2])
 	      printer = argv[i] + 2;
 	    else
@@ -222,6 +284,17 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
         case 'r' : /* Remove printer from class */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpadmin: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    if (printer == NULL)
 	    {
 	      fputs("lpadmin: Unable to remove a printer from the class:\n", stderr);
@@ -239,6 +312,17 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
         case 'v' : /* Set the device-uri attribute */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpadmin: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    if (printer == NULL)
 	    {
 	      fputs("lpadmin: Unable to set the device URI:\n", stderr);
@@ -256,6 +340,17 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
         case 'x' : /* Delete a printer */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpadmin: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    if (argv[i][2])
 	      printer = argv[i] + 2;
 	    else
@@ -285,6 +380,17 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
         case 'D' : /* Set the printer-info attribute */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpadmin: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    if (printer == NULL)
 	    {
 	      fputs("lpadmin: Unable to set the printer description:\n", stderr);
@@ -302,6 +408,17 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
         case 'L' : /* Set the printer-location attribute */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpadmin: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    if (printer == NULL)
 	    {
 	      fputs("lpadmin: Unable to set the printer location:\n", stderr);
@@ -319,6 +436,17 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
         case 'P' : /* Use the specified PPD file */
+	    if (!http)
+	    {
+              http = httpConnect(cupsServer(), ippPort());
+
+	      if (http == NULL)
+	      {
+		perror("lpadmin: Unable to connect to server");
+		return (1);
+	      }
+            }
+
 	    if (printer == NULL)
 	    {
 	      fputs("lpadmin: Unable to set the PPD file:\n", stderr);
@@ -357,7 +485,8 @@ main(int  argc,		/* I - Number of command-line arguments */
     puts("");
   }
 
-  httpClose(http);
+  if (http)
+    httpClose(http);
 
   return (0);
 }
@@ -415,7 +544,7 @@ add_printer_to_class(http_t *http,	/* I - Server connection */
   * Do the request and get back a response...
   */
 
-  response = cupsDoRequest(http, request, "/classes/");
+  response = cupsDoRequest(http, request, "/");
 
  /*
   * Build a CUPS_ADD_CLASS request, which requires the following
@@ -489,9 +618,16 @@ add_printer_to_class(http_t *http,	/* I - Server connection */
   ippDelete(response);
 
   if ((response = cupsDoRequest(http, request, "/admin/")) == NULL)
-    fputs("lpadmin: Unable to add printer to class!\n", stderr);
+    fprintf(stderr, "lpadmin: add-class failed: %s\n",
+            ippErrorString(cupsLastError()));
   else
+  {
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+      fprintf(stderr, "lpadmin: add-class failed: %s\n",
+              ippErrorString(response->request.status.status_code));
+
     ippDelete(response);
+  }
 }
 
 
@@ -543,11 +679,13 @@ default_printer(http_t *http,		/* I - Server connection */
   */
 
   if ((response = cupsDoRequest(http, request, "/admin/")) == NULL)
-    fputs("lpadmin: Unable to set default destination!\n", stderr);
+    fprintf(stderr, "lpadmin: set-default failed: %s\n",
+            ippErrorString(cupsLastError()));
   else
   {
-    if (response->request.status.status_code == IPP_NOT_FOUND)
-      fprintf(stderr, "lpadmin: Destination %s does not exist!\n", printer);
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+      fprintf(stderr, "lpadmin: set-default failed: %s\n",
+              ippErrorString(response->request.status.status_code));
 
     ippDelete(response);
   }
@@ -602,11 +740,13 @@ delete_printer(http_t *http,		/* I - Server connection */
   */
 
   if ((response = cupsDoRequest(http, request, "/admin/")) == NULL)
-    fputs("lpadmin: Unable to delete printer!\n", stderr);
+    fprintf(stderr, "lpadmin: delete-printer failed: %s\n",
+            ippErrorString(cupsLastError()));
   else
   {
-    if (response->request.status.status_code == IPP_NOT_FOUND)
-      fprintf(stderr, "lpadmin: Destination %s does not exist!\n", printer);
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+      fprintf(stderr, "lpadmin: delete-printer failed: %s\n",
+              ippErrorString(response->request.status.status_code));
 
     ippDelete(response);
   }
@@ -771,9 +911,16 @@ delete_printer_from_class(http_t *http,		/* I - Server connection */
   ippDelete(response);
 
   if ((response = cupsDoRequest(http, request, "/admin/")) == NULL)
-    fputs("lpadmin: Unable to remove printer from class!\n", stderr);
+    fprintf(stderr, "lpadmin: add/delete-class failed: %s\n",
+            ippErrorString(cupsLastError()));
   else
+  {
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+      fprintf(stderr, "lpadmin: add/delete-class failed: %s\n",
+              ippErrorString(response->request.status.status_code));
+
     ippDelete(response);
+  }
 }
 
 
@@ -832,11 +979,13 @@ enable_printer(http_t *http,		/* I - Server connection */
   */
 
   if ((response = cupsDoRequest(http, request, "/admin/")) == NULL)
-    fputs("lpadmin: Unable to delete printer!\n", stderr);
+    fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+            ippErrorString(cupsLastError()));
   else
   {
-    if (response->request.status.status_code == IPP_NOT_FOUND)
-      fprintf(stderr, "lpadmin: Destination %s does not exist!\n", printer);
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+      fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+              ippErrorString(response->request.status.status_code));
 
     ippDelete(response);
   }
@@ -911,9 +1060,16 @@ set_printer_device(http_t *http,	/* I - Server connection */
   */
 
   if ((response = cupsDoRequest(http, request, "/admin/")) == NULL)
-    fputs("lpadmin: Unable to set device-uri attribute!\n", stderr);
+    fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+            ippErrorString(cupsLastError()));
   else
+  {
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+      fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+              ippErrorString(response->request.status.status_code));
+
     ippDelete(response);
+  }
 }
 
 
@@ -1007,10 +1163,17 @@ set_printer_file(http_t *http,		/* I - Server connection */
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoFileRequest(http, request, "/admin/", file)) == NULL)
-    fputs("lpadmin: Unable to set interface script or PPD file!\n", stderr);
+  if ((response = cupsDoRequest(http, request, "/admin/")) == NULL)
+    fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+            ippErrorString(cupsLastError()));
   else
+  {
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+      fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+              ippErrorString(response->request.status.status_code));
+
     ippDelete(response);
+  }
 
 #ifdef HAVE_LIBZ
  /*
@@ -1080,9 +1243,16 @@ set_printer_info(http_t *http,		/* I - Server connection */
   */
 
   if ((response = cupsDoRequest(http, request, "/admin/")) == NULL)
-    fputs("lpadmin: Unable to set printer-info attribute!\n", stderr);
+    fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+            ippErrorString(cupsLastError()));
   else
+  {
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+      fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+              ippErrorString(response->request.status.status_code));
+
     ippDelete(response);
+  }
 }
 
 
@@ -1143,12 +1313,19 @@ set_printer_location(http_t *http,	/* I - Server connection */
   */
 
   if ((response = cupsDoRequest(http, request, "/admin/")) == NULL)
-    fputs("lpadmin: Unable to set printer-location attribute!\n", stderr);
+    fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+            ippErrorString(cupsLastError()));
   else
+  {
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+      fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+              ippErrorString(response->request.status.status_code));
+
     ippDelete(response);
+  }
 }
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.11 2000/01/04 13:46:11 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.12 2000/01/21 20:28:00 mike Exp $".
  */

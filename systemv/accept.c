@@ -1,5 +1,5 @@
 /*
- * "$Id: accept.c,v 1.7 2000/01/04 13:46:11 mike Exp $"
+ * "$Id: accept.c,v 1.8 2000/01/21 20:28:00 mike Exp $"
  *
  *   "accept", "disable", "enable", and "reject" commands for the Common
  *   UNIX Printing System (CUPS).
@@ -164,8 +164,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       if (http == NULL)
       {
-        fprintf(stderr, "%s: Unable to contact server at %s!\n", command,
-	        hostname);
+	fputs(argv[0], stderr);
+	perror(": Unable to connect to server");
 	return (1);
       }
 
@@ -205,10 +205,20 @@ main(int  argc,			/* I - Number of command-line arguments */
       */
 
       if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
+      {
+        if (response->request.status.status_code > IPP_OK_CONFLICT)
+	{
+          fprintf(stderr, "%s: Operation failed: %s\n", command,
+	          ippErrorString(cupsLastError()));
+	  return (1);
+	}
+	
         ippDelete(response);
+      }
       else
       {
-        fprintf(stderr, "%s: Operation failed!\n", command);
+        fprintf(stderr, "%s: Operation failed: %s\n", command,
+	        ippErrorString(cupsLastError()));
 	return (1);
       }
 
@@ -245,7 +255,22 @@ main(int  argc,			/* I - Number of command-line arguments */
                      "printer-uri", NULL, uri);
 
 	if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
+	{
+          if (response->request.status.status_code > IPP_OK_CONFLICT)
+	  {
+            fprintf(stderr, "%s: Operation failed: %s\n", command,
+	            ippErrorString(cupsLastError()));
+	    return (1);
+	  }
+
           ippDelete(response);
+	}
+	else
+	{
+          fprintf(stderr, "%s: Operation failed: %s\n", command,
+	          ippErrorString(cupsLastError()));
+	  return (1);
+	}
       }
     }
 
@@ -257,5 +282,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: accept.c,v 1.7 2000/01/04 13:46:11 mike Exp $".
+ * End of "$Id: accept.c,v 1.8 2000/01/21 20:28:00 mike Exp $".
  */

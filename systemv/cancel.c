@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.14 2000/01/04 13:46:11 mike Exp $"
+ * "$Id: cancel.c,v 1.15 2000/01/21 20:28:00 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -210,32 +210,21 @@ main(int  argc,			/* I - Number of command-line arguments */
       else
         response = cupsDoRequest(http, request, "/jobs/");
 
-      if (response != NULL)
+      if (response == NULL ||
+          response->request.status.status_code > IPP_OK_CONFLICT)
       {
-        switch (response->request.status.status_code)
-	{
-	  case IPP_NOT_FOUND :
-              fputs("cancel: Job or printer not found!\n", stderr);
-	      break;
-	  case IPP_NOT_AUTHORIZED :
-              fputs("cancel: Not authorized to cancel job(s)!\n", stderr);
-	      break;
-	  case IPP_FORBIDDEN :
-              fprintf(stderr, "cancel: You don't own job ID %d!\n", job_id);
-	      break;
-	  default :
-              if (response->request.status.status_code > IPP_OK_CONFLICT)
-                fputs("cancel: Unable to cancel job(s)!\n", stderr);
-	      break;
-	}
+	fprintf(stderr, "cancel: %s failed: %s\n",
+	        op == IPP_PURGE_JOBS ? "purge-jobs" : "cancel-job",
+        	response ? ippErrorString(response->request.status.status_code) :
+		           ippErrorString(cupsLastError()));
 
-        ippDelete(response);
-      }
-      else
-      {
-        fputs("cancel: Unable to cancel job(s)!\n", stderr);
+	if (response)
+	  ippDelete(response);
+
 	return (1);
       }
+
+      ippDelete(response);
     }
 
   return (0);
@@ -243,5 +232,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c,v 1.14 2000/01/04 13:46:11 mike Exp $".
+ * End of "$Id: cancel.c,v 1.15 2000/01/21 20:28:00 mike Exp $".
  */
