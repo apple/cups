@@ -1,8 +1,12 @@
-CHANGES.txt - 03/20/2002
+CHANGES.txt - 04/14/2002
 ------------------------
 
 CHANGES IN CUPS V1.2.0a1
 
+	- Updated the printer test page with a better color
+	  wheel and a separate grayscale ramp.
+	- The IPP and HTTP functions are now provided in a
+	  separate library (libipp).
 	- A single backend process is now run to send all print
 	  data for a job.
 	- Backends and filters can now send and receive
