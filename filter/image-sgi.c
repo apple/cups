@@ -1,5 +1,5 @@
 /*
- * "$Id: image-sgi.c,v 1.1 1998/02/19 20:43:33 mike Exp $"
+ * "$Id: image-sgi.c,v 1.2 1999/03/06 18:11:35 mike Exp $"
  *
  *   SGI image file routines for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,13 @@
  * Revision History:
  *
  *   $Log: image-sgi.c,v $
- *   Revision 1.1  1998/02/19 20:43:33  mike
+ *   Revision 1.2  1999/03/06 18:11:35  mike
+ *   Checkin for CVS.
+ *
+ *   Revision 1.1  1998/02/19  20:43:33  mike
+ *   Initial revision
+ *
+ *   Revision 1.1  1998/02/19  20:43:33  mike
  *   Initial revision
  *
  */
@@ -239,5 +245,5 @@ ImageReadSGI(image_t *img,
 
 
 /*
- * End of "$Id: image-sgi.c,v 1.1 1998/02/19 20:43:33 mike Exp $".
+ * End of "$Id: image-sgi.c,v 1.2 1999/03/06 18:11:35 mike Exp $".
  */

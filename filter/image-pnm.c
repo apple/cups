@@ -1,5 +1,5 @@
 /*
- * "$Id: image-pnm.c,v 1.1 1998/02/19 20:43:33 mike Exp $"
+ * "$Id: image-pnm.c,v 1.2 1999/03/06 18:11:35 mike Exp $"
  *
  *   Portable Any Map file routines for espPrint, a collection of printer
  *   drivers.
@@ -17,7 +17,13 @@
  * Revision History:
  *
  *   $Log: image-pnm.c,v $
- *   Revision 1.1  1998/02/19 20:43:33  mike
+ *   Revision 1.2  1999/03/06 18:11:35  mike
+ *   Checkin for CVS.
+ *
+ *   Revision 1.1  1998/02/19  20:43:33  mike
+ *   Initial revision
+ *
+ *   Revision 1.1  1998/02/19  20:43:33  mike
  *   Initial revision
  *
  */
@@ -258,5 +264,5 @@ ImageReadPNM(image_t *img,
 
 
 /*
- * End of "$Id: image-pnm.c,v 1.1 1998/02/19 20:43:33 mike Exp $".
+ * End of "$Id: image-pnm.c,v 1.2 1999/03/06 18:11:35 mike Exp $".
  */

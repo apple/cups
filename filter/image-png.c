@@ -1,5 +1,5 @@
 /*
- * "$Id: image-png.c,v 1.3 1998/07/28 18:48:34 mike Exp $"
+ * "$Id: image-png.c,v 1.4 1999/03/06 18:11:35 mike Exp $"
  *
  *   PNG image routines for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,13 @@
  * Revision History:
  *
  *   $Log: image-png.c,v $
- *   Revision 1.3  1998/07/28 18:48:34  mike
+ *   Revision 1.4  1999/03/06 18:11:35  mike
+ *   Checkin for CVS.
+ *
+ *   Revision 1.3  1998/07/28  18:48:34  mike
+ *   Fixed possible bug in printing of grayscale images < 8bpp.
+ *
+ *   Revision 1.3  1998/07/28  18:48:34  mike
  *   Fixed possible bug in printing of grayscale images < 8bpp.
  *
  *   Revision 1.2  1998/03/19  16:57:12  mike
@@ -188,5 +194,5 @@ ImageReadPNG(image_t *img,
 
 
 /*
- * End of "$Id: image-png.c,v 1.3 1998/07/28 18:48:34 mike Exp $".
+ * End of "$Id: image-png.c,v 1.4 1999/03/06 18:11:35 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: image-jpeg.c,v 1.4 1998/04/01 21:47:31 mike Exp $"
+ * "$Id: image-jpeg.c,v 1.5 1999/03/06 18:11:35 mike Exp $"
  *
  *   JPEG image routines for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,13 @@
  * Revision History:
  *
  *   $Log: image-jpeg.c,v $
- *   Revision 1.4  1998/04/01 21:47:31  mike
+ *   Revision 1.5  1999/03/06 18:11:35  mike
+ *   Checkin for CVS.
+ *
+ *   Revision 1.4  1998/04/01  21:47:31  mike
+ *   Fixed problem with outputting B&W from color JPEG images...
+ *
+ *   Revision 1.4  1998/04/01  21:47:31  mike
  *   Fixed problem with outputting B&W from color JPEG images...
  *
  *   Revision 1.3  1998/03/19  16:58:45  mike
@@ -168,5 +174,5 @@ ImageReadJPEG(image_t *img,
 
 
 /*
- * End of "$Id: image-jpeg.c,v 1.4 1998/04/01 21:47:31 mike Exp $".
+ * End of "$Id: image-jpeg.c,v 1.5 1999/03/06 18:11:35 mike Exp $".
  */
