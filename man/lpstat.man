@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpstat.man,v 1.13 2004/10/29 13:44:10 mike Exp $"
+.\" "$Id: lpstat.man,v 1.14 2005/01/03 18:47:49 mike Exp $"
 .\"
 .\"   lpstat man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpstat 1 "Common UNIX Printing System" "29 October 2004" "Easy Software Products"
+.TH lpstat 1 "Common UNIX Printing System" "3 January 2005" "Easy Software Products"
 .SH NAME
 lpstat \- print cups status information
 .SH SYNOPSIS
@@ -102,7 +102,7 @@ and "-v" options.
 \-t
 .br
 Shows all status information. This is equivalent to using the "-r",
-"-d", "-c", "-d", "-v", "-a", "-p", and "-o" options.
+"-d", "-c", "-v", "-a", "-p", and "-o" options.
 .TP 5
 \-u [\fIuser(s)\fR]
 .br
@@ -136,5 +136,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2004 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpstat.man,v 1.13 2004/10/29 13:44:10 mike Exp $".
+.\" End of "$Id: lpstat.man,v 1.14 2005/01/03 18:47:49 mike Exp $".
 .\"

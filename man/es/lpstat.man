@@ -1,5 +1,5 @@
 .\" 
-.\" "$Id: lpstat.man,v 1.1 2004/10/20 18:00:54 mike Exp $"
+.\" "$Id: lpstat.man,v 1.2 2005/01/03 18:47:49 mike Exp $"
 .\" 
 .\" lpstat man page for the Common UNIX Printing System (CUPS).
 .\" 
@@ -21,7 +21,7 @@
 .\" EMail: cups-info@cups.org
 .\" WWW: http://www.cups.org
 .\" 
-.TH "lpstat" "1" "Common UNIX Printing System" "3 de Enero de 2003" "Easy Software Products"
+.TH "lpstat" "1" "Common UNIX Printing System" "29 de Octubre de 2004" "Easy Software Products"
 .SH "NOMBRE"
 lpstat \- imprime la información de estado de cups
 .SH "SINOPSIS"
@@ -56,7 +56,7 @@ Muestra el estado de aceptación de las colas de las impresoras. Si no se especif
 .TP 5
 \-c [\fIclase(s)\fR]
 .br 
-Muestra las clases de impresoras y las impresoras que pertenecen a ella. Si no se especifican clases, se listan todas.
+Muestra las clases de impresoras y las impresoras que pertenecen a ellas. Si no se especifican clases, se listan todas.
 .TP 5
 \-d
 .br 
@@ -89,12 +89,12 @@ Muestra la clasificación de los trabajos de impresión.
 \-s
 .br 
 Muestra un resúmen de estado, incluyendo el destino predeterminado, una lista de clases y las impresoras miembros que las forman, y una lista de impresoras y sus dispositivos asociados. Esto es equivalente a usar las opciones "\-d", "\-c",
-y "\-p".
+y "\-v".
 .TP 5
 \-t
 .br 
 Muestra toda la información de estado. Es equivalente a usar las opciones "\-r",
-"\-d", "\-c", "\-d", "\-v", "\-a", "\-p", y "\-o".
+"\-d", "\-c", "\-v", "\-a", "\-p", y "\-o".
 .TP 5
 \-u [\fIusuario(s)\fR]
 .br 
@@ -122,5 +122,5 @@ Los derechos de copia 1993\-2004 son de Easy Software Products. Todos los derech
 .SH "TRADUCCIÓN"
 Juan Pablo González Riopedre <riopedre@tiscali.es>
 .\"
-.\" End of "$Id: lpstat.man,v 1.1 2004/10/20 18:00:54 mike Exp $".
+.\" End of "$Id: lpstat.man,v 1.2 2005/01/03 18:47:49 mike Exp $".
 .\"

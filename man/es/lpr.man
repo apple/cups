@@ -1,5 +1,5 @@
 .\" 
-.\" "$Id: lpr.man,v 1.1 2004/10/20 18:00:54 mike Exp $"
+.\" "$Id: lpr.man,v 1.2 2005/01/03 18:47:49 mike Exp $"
 .\" 
 .\" lpr man page for the Common UNIX Printing System (CUPS).
 .\" 
@@ -21,13 +21,15 @@
 .\" EMail: cups-info@cups.org
 .\" WWW: http://www.cups.org
 .\" 
-.TH "lpr" "1" "Common UNIX Printing System" "23 de Enero de 2001" "Easy Software Products"
+.TH "lpr" "1" "Common UNIX Printing System" "16 de Diciembre de 2004" "Easy Software Products"
 .SH "NOMBRE"
 lpr \- imprime archivos
 .SH "SINOPSIS"
 .B lpr
 [ \-E ] [ \-P
 .I destino
+] [ \-U
+.I usuario
 ] [ \-#
 .I num\-copias
 [ \-l ] [ \-o
@@ -66,6 +68,10 @@ Establece el nombre del trabajo.
 .br 
 Establece el nombre del trabajo.
 .TP 5
+\-U \fIusuario\fR
+.br 
+Establece el nombre del usuario.
+.TP 5
 \-l
 .br 
 Especifica que el archivo a imprimir ya tiene el formato adecuado para el destino y debe ser enviado sin aplicar ningún filtro. Esta opción es equivalente a "\-oraw".
@@ -92,5 +98,5 @@ Los derechos de copia 1993\-2004 son de Easy Software Products. Todos los derech
 .SH "TRADUCCIÓN"
 Juan Pablo González Riopedre <riopedre@tiscali.es>
 .\"
-.\" End of "$Id: lpr.man,v 1.1 2004/10/20 18:00:54 mike Exp $".
+.\" End of "$Id: lpr.man,v 1.2 2005/01/03 18:47:49 mike Exp $".
 .\"

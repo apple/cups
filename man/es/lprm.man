@@ -1,5 +1,5 @@
 .\" 
-.\" "$Id: lprm.man,v 1.1 2004/10/20 18:00:54 mike Exp $"
+.\" "$Id: lprm.man,v 1.2 2005/01/03 18:47:49 mike Exp $"
 .\" 
 .\" lprm man page for the Common UNIX Printing System (CUPS).
 .\" 
@@ -21,14 +21,14 @@
 .\" EMail: cups-info@cups.org
 .\" WWW: http://www.cups.org
 .\" 
-.TH "lprm" "1" "Common UNIX Printing System" "23 de Enero de 2001" "Easy Software Products"
+.TH "lprm" "1" "Common UNIX Printing System" "16 de Diciembre de 2004" "Easy Software Products"
 .SH "NOMBRE"
 lprm \- cancela trabajos de impresión
 .SH "SINOPSIS"
 .B lprm
-[ \-E ] [ \- ] [ \-P
+[ \-E ] [ \-P
 .I destino
-] [
+] [ \- ] [
 .I ID trabajo(s)
 ]
 .SH "DESCRIPCIÓN"
@@ -48,5 +48,5 @@ Los derechos de copia 1993\-2004 son de Easy Software Products. Todos los derech
 .SH "TRADUCCIÓN"
 Juan Pablo González Riopedre <riopedre@tiscali.es>
 .\"
-.\" End of "$Id: lprm.man,v 1.1 2004/10/20 18:00:54 mike Exp $".
+.\" End of "$Id: lprm.man,v 1.2 2005/01/03 18:47:49 mike Exp $".
 .\"
