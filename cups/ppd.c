@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.18 1999/06/03 13:20:43 mike Exp $"
+ * "$Id: ppd.c,v 1.19 1999/06/03 13:47:27 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -1086,13 +1086,17 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 
 	    if (constraint->choice1[0] == '*')
 	    {
+	      strcpy(constraint->choice2, constraint->option2);
 	      strcpy(constraint->option2, constraint->choice1 + 1);
               constraint->choice1[0] = '\0';
 	    }
-	    else if (constraint->option2[0] == '*')
-  	      strcpy(constraint->option2, constraint->option2 + 1);
+	    else
+	    {
+	      if (constraint->option2[0] == '*')
+  	        strcpy(constraint->option2, constraint->option2 + 1);
 
-            constraint->choice2[0] = '\0';
+              constraint->choice2[0] = '\0';
+	    }
 	    break;
 	    
 	case 4 : /* Two options, two choices... */
@@ -1291,7 +1295,7 @@ static int			/* O - Result of comparison */
 compare_groups(ppd_group_t *g0,	/* I - First group */
                ppd_group_t *g1)	/* I - Second group */
 {
-  return (strcmp(g0->text, g1->text));
+  return (strcasecmp(g0->text, g1->text));
 }
 
 
@@ -1303,7 +1307,7 @@ static int			/* O - Result of comparison */
 compare_options(ppd_option_t *o0,/* I - First option */
                 ppd_option_t *o1)/* I - Second option */
 {
-  return (strcmp(o0->text, o1->text));
+  return (strcasecmp(o0->text, o1->text));
 }
 
 
@@ -1315,7 +1319,7 @@ static int			/* O - Result of comparison */
 compare_choices(ppd_choice_t *c0,/* I - First choice */
                 ppd_choice_t *c1)/* I - Second choice */
 {
-  return (strcmp(c0->text, c1->text));
+  return (strcasecmp(c0->text, c1->text));
 }
 
 
@@ -1572,5 +1576,5 @@ ppd_decode(char *string)	/* I - String to decode */
 
 
 /*
- * End of "$Id: ppd.c,v 1.18 1999/06/03 13:20:43 mike Exp $".
+ * End of "$Id: ppd.c,v 1.19 1999/06/03 13:47:27 mike Exp $".
  */
