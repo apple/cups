@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.24 2002/07/19 14:34:11 mike Exp $"
+ * "$Id: job.c,v 1.124.2.25 2002/07/19 14:40:31 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -656,19 +656,6 @@ LoadAllJobs(void)
       strlcpy(job->username, attr->values[0].string.text,
               sizeof(job->username));
 
-      if (job->state->values[0].integer == IPP_JOB_HELD)
-      {
-	if ((attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_KEYWORD)) == NULL)
-          attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
-
-        if (attr == NULL)
-          job->state->values[0].integer = IPP_JOB_PENDING;
-	else
-          SetJobHoldUntil(job->id, attr->values[0].string.text);
-      }
-      else if (job->state->values[0].integer == IPP_JOB_PROCESSING)
-        job->state->values[0].integer = IPP_JOB_PENDING;
-
      /*
       * Insert the job into the array, sorting by job priority and ID...
       */
@@ -688,6 +675,23 @@ LoadAllJobs(void)
 	Jobs = job;
 
       NumJobs ++;
+
+     /*
+      * Set the job hold-until time and state...
+      */
+
+      if (job->state->values[0].integer == IPP_JOB_HELD)
+      {
+	if ((attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_KEYWORD)) == NULL)
+          attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
+
+        if (attr == NULL)
+          job->state->values[0].integer = IPP_JOB_PENDING;
+	else
+          SetJobHoldUntil(job->id, attr->values[0].string.text);
+      }
+      else if (job->state->values[0].integer == IPP_JOB_PROCESSING)
+        job->state->values[0].integer = IPP_JOB_PENDING;
     }
 
  /*
@@ -2353,5 +2357,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.24 2002/07/19 14:34:11 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.25 2002/07/19 14:40:31 mike Exp $".
  */
