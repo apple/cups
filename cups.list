@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.15 1999/08/06 16:03:26 mike Exp $"
+# "$Id: cups.list,v 1.16 1999/08/09 17:11:19 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -315,17 +315,14 @@ f 0555 root sys /etc/init.d/cups cups.sh
 l 0555 root sys /etc/rc0.d/K25cups ../init.d/cups
 l 0555 root sys /etc/rc2.d/S60cups ../init.d/cups
 %system linux
+%install /sbin/chkconfig --add cups
+%install /sbin/chkconfig cups on
 %install /etc/rc.d/init.d/cups start
 %remove /etc/rc.d/init.d/cups stop
+%remove /sbin/chkconfig cups off
+%remove /sbin/chkconfig --remove cups
 %patch /etc/rc.d/init.d/cups stop
 f 0555 root sys /etc/rc.d/init.d/cups cups.sh
-l 0555 root sys /etc/rc.d/rc2.d/S60cups ../init.d/cups
-l 0555 root sys /etc/rc.d/rc3.d/S60cups ../init.d/cups
-l 0555 root sys /etc/rc.d/rc4.d/S60cups ../init.d/cups
-l 0555 root sys /etc/rc.d/rc5.d/S60cups ../init.d/cups
-l 0555 root sys /etc/rc.d/rc0.d/K60cups ../init.d/cups
-l 0555 root sys /etc/rc.d/rc1.d/K60cups ../init.d/cups
-l 0555 root sys /etc/rc.d/rc6.d/K60cups ../init.d/cups
 %system dunix
 %install /sbin/init.d/cups start
 %remove /sbin/init.d/cups stop
@@ -343,5 +340,5 @@ l 0555 root sys /etc/rc0.d/K20cups ../init.d/cups
 l 0555 root sys /etc/rc2.d/S80cups ../init.d/cups
 
 #
-# End of "$Id: cups.list,v 1.15 1999/08/06 16:03:26 mike Exp $".
+# End of "$Id: cups.list,v 1.16 1999/08/09 17:11:19 mike Exp $".
 #
