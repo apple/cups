@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.30 2003/03/14 22:14:32 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.31 2003/03/20 02:45:48 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -985,7 +985,7 @@ ippReadIO(void       *src,			/* I - Data source */
 
           DEBUG_printf(("ippReadIO: name length = %d\n", n));
 
-          if (n == 0)
+          if (n == 0 && tag != IPP_TAG_MEMBERNAME)
 	  {
 	   /*
 	    * More values for current attribute...
@@ -1001,9 +1001,13 @@ ippReadIO(void       *src,			/* I - Data source */
 	    * type...
 	    */
 
-	    if (attr->value_tag == IPP_TAG_STRING ||
-    		(attr->value_tag >= IPP_TAG_TEXTLANG &&
-		 attr->value_tag <= IPP_TAG_MIMETYPE))
+	    if (attr->value_tag == IPP_TAG_ZERO)
+	    {
+	      attr->value_tag = tag;
+	    }
+	    else if (attr->value_tag == IPP_TAG_STRING ||
+    		     (attr->value_tag >= IPP_TAG_TEXTLANG &&
+		      attr->value_tag <= IPP_TAG_MIMETYPE))
             {
 	     /*
 	      * String values can sometimes come across in different
@@ -1015,7 +1019,6 @@ ippReadIO(void       *src,			/* I - Data source */
 	        return (IPP_ERROR);
             }
 	    else if (attr->value_tag != tag &&
-	             attr->value_tag != IPP_TAG_MEMBERNAME &&
 		     tag != IPP_TAG_END_COLLECTION)
 	      return (IPP_ERROR);
 
@@ -1023,7 +1026,8 @@ ippReadIO(void       *src,			/* I - Data source */
 	    * Finally, reallocate the attribute array as needed...
 	    */
 
-	    if ((attr->num_values % IPP_MAX_VALUES) == 0)
+	    if ((attr->num_values % IPP_MAX_VALUES) == 0 &&
+	        attr->num_values > 0)
 	    {
 	      ipp_attribute_t	*temp,	/* Pointer to new buffer */
 				*ptr;	/* Pointer in attribute list */
@@ -1051,6 +1055,24 @@ ippReadIO(void       *src,			/* I - Data source */
 
               attr = ipp->current = ipp->last = temp;
 	    }
+	  }
+	  else if (tag == IPP_TAG_MEMBERNAME)
+	  {
+	   /*
+	    * Name must be length 0!
+	    */
+
+	    if (n)
+	    {
+	      DEBUG_puts("ippReadIO: member name not empty!");
+	      return (IPP_ERROR);
+	    }
+
+	    attr = ipp->current = _ipp_add_attr(ipp, IPP_MAX_VALUES);
+
+	    attr->group_tag  = ipp->curtag;
+	    attr->value_tag  = IPP_TAG_ZERO;
+	    attr->num_values = 0;
 	  }
 	  else
 	  {
@@ -1206,8 +1228,7 @@ ippReadIO(void       *src,			/* I - Data source */
                 if (n > 0)
 		  return (IPP_ERROR);
 
-	        ipp->state = IPP_DATA;
-	        break;
+		return (ipp->state = IPP_DATA);
 
             case IPP_TAG_MEMBERNAME :
 	       /*
@@ -1215,9 +1236,7 @@ ippReadIO(void       *src,			/* I - Data source */
 		* we need to carry over...
 		*/
 
-		free(attr->name);
-		attr->name       = calloc(n + 1, 1);
-		attr->num_values --;
+		attr->name = calloc(n + 1, 1);
 
 	        if ((*cb)(src, (ipp_uchar_t *)attr->name, n) < n)
 		  return (IPP_ERROR);
@@ -1500,6 +1519,8 @@ ippWriteIO(void       *dst,			/* I - Destination */
             DEBUG_puts("ippWrite: writing name = 0, \'\'\n");
 
             *bufptr++ = IPP_TAG_MEMBERNAME;
+	    *bufptr++ = 0;
+	    *bufptr++ = 0;
 	    *bufptr++ = n >> 8;
 	    *bufptr++ = n;
 	    memcpy(bufptr, attr->name, n);
@@ -2475,5 +2496,5 @@ ipp_write_file(int         *fd,			/* I - File descriptor */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.30 2003/03/14 22:14:32 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.31 2003/03/20 02:45:48 mike Exp $".
  */
