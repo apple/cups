@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in,v 1.13.2.2 2001/12/29 21:44:30 mike Exp $"
+# "$Id: cups.list.in,v 1.13.2.3 2001/12/29 22:17:48 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -29,7 +29,7 @@
 %vendor Easy Software Products
 %license LICENSE.txt
 %readme README.txt
-%version 1.3.0a1
+%version @CUPS_VERSION@
 %description The Common UNIX Printing System provides a portable printing
 %description layer for UNIX® operating systems.  It has been developed by
 %description Easy Software Products to promote a standard printing solution
@@ -366,5 +366,5 @@ f 0444 root sys $AMANDIR/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list.in,v 1.13.2.2 2001/12/29 21:44:30 mike Exp $".
+# End of "$Id: cups.list.in,v 1.13.2.3 2001/12/29 22:17:48 mike Exp $".
 #
