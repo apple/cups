@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.98 2001/06/22 19:47:18 mike Exp $"
+ * "$Id: client.c,v 1.99 2001/07/12 18:10:13 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1213,7 +1213,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	    }
 	  }
 	}
-	else
+
+        if (con->http.state == HTTP_WAITING)
 	{
 	 /*
 	  * End of file, see how big it is...
@@ -1497,7 +1498,7 @@ SendError(client_t      *con,	/* I - Connection */
   if (con->operation > HTTP_WAITING)
     LogRequest(con, code);
 
-  LogMessage(L_DEBUG2, "SendError() %d code=%d", con->http.fd, code);
+  LogMessage(L_DEBUG, "SendError() %d code=%d", con->http.fd, code);
 
  /*
   * To work around bugs in some proxies, don't use Keep-Alive for some
@@ -2067,23 +2068,23 @@ install_conf_file(client_t *con)	/* I - Connection */
   * First construct the filenames...
   */
 
-  snprintf(conffile, sizeof(conffile), "%s%s", ServerRoot, con->uri + 9);
-  snprintf(newfile, sizeof(newfile), "%s%s.N", ServerRoot, con->uri + 9);
-  snprintf(oldfile, sizeof(oldfile), "%s%s.O", ServerRoot, con->uri + 9);
+  snprintf(conffile, sizeof(conffile), "%s%s", ServerRoot, con->uri + 11);
+  snprintf(newfile, sizeof(newfile), "%s%s.N", ServerRoot, con->uri + 11);
+  snprintf(oldfile, sizeof(oldfile), "%s%s.O", ServerRoot, con->uri + 11);
 
   LogMessage(L_INFO, "Installing config file \"%s\"...", conffile);
 
  /*
   * Get the owner, group, and permissions of the configuration file.
   * If it doesn't exist, assign it to the User and Group in the
-  * cupsd.conf file with mode 0600 permissions.
+  * cupsd.conf file with mode 0640 permissions.
   */
 
   if (stat(conffile, &confinfo))
   {
     confinfo.st_uid  = User;
     confinfo.st_gid  = Group;
-    confinfo.st_mode = 0600;
+    confinfo.st_mode = 0640;
   }
 
  /*
@@ -2146,24 +2147,26 @@ install_conf_file(client_t *con)	/* I - Connection */
   */
 
   if (unlink(oldfile))
-  {
-    LogMessage(L_ERROR, "Unable to remove backup config file \"%s\" - %s",
-               oldfile, strerror(errno));
+    if (errno != ENOENT)
+    {
+      LogMessage(L_ERROR, "Unable to remove backup config file \"%s\" - %s",
+        	 oldfile, strerror(errno));
 
-    unlink(newfile);
+      unlink(newfile);
 
-    return (HTTP_SERVER_ERROR);
-  }
+      return (HTTP_SERVER_ERROR);
+    }
 
   if (rename(conffile, oldfile))
-  {
-    LogMessage(L_ERROR, "Unable to rename old config file \"%s\" - %s",
-               conffile, strerror(errno));
+    if (errno != ENOENT)
+    {
+      LogMessage(L_ERROR, "Unable to rename old config file \"%s\" - %s",
+        	 conffile, strerror(errno));
 
-    unlink(newfile);
+      unlink(newfile);
 
-    return (HTTP_SERVER_ERROR);
-  }
+      return (HTTP_SERVER_ERROR);
+    }
 
   if (rename(newfile, conffile))
   {
@@ -2461,5 +2464,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.98 2001/06/22 19:47:18 mike Exp $".
+ * End of "$Id: client.c,v 1.99 2001/07/12 18:10:13 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.99 2001/06/21 21:22:21 mike Exp $"
+ * "$Id: printers.c,v 1.100 2001/07/12 18:10:14 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -497,12 +497,12 @@ LoadAllPrinters(void)
       continue;
 
    /*
-    * Strip trailing newline, if any...
+    * Strip trailing whitespace, if any...
     */
 
     len = strlen(line);
 
-    if (line[len - 1] == '\n')
+    while (len > 0 && isspace(line[len - 1]))
     {
       len --;
       line[len] = '\0';
@@ -1803,5 +1803,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.99 2001/06/21 21:22:21 mike Exp $".
+ * End of "$Id: printers.c,v 1.100 2001/07/12 18:10:14 mike Exp $".
  */

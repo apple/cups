@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.36 2001/06/07 15:54:04 mike Exp $"
+ * "$Id: classes.c,v 1.37 2001/07/12 18:10:13 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -378,12 +378,12 @@ LoadAllClasses(void)
       continue;
 
    /*
-    * Strip trailing newline, if any...
+    * Strip trailing whitespace, if any...
     */
 
     len = strlen(line);
 
-    if (line[len - 1] == '\n')
+    while (len > 0 && isspace(line[len - 1]))
     {
       len --;
       line[len] = '\0';
@@ -704,5 +704,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.36 2001/06/07 15:54:04 mike Exp $".
+ * End of "$Id: classes.c,v 1.37 2001/07/12 18:10:13 mike Exp $".
  */

@@ -1,6 +1,18 @@
 CHANGES.txt - 07/12/2001
 ------------------------
 
+CHANGES IN CUPS V1.1.10
+
+	- The scheduler did not properly process PUT requests,
+	  so configuration files could not be uploaded to the
+	  server.
+	- The scheduler did not strip trailing whitespace on
+	  lines in the configuration files.
+	- The httpWrite() function did not transition the PUT
+	  request to the HTTP_STATUS state to get the status
+	  from the server.
+
+
 CHANGES IN CUPS V1.1.9-1
 
 	- The configure script did not substitute the

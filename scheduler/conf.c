@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.86 2001/06/27 21:53:18 mike Exp $"
+ * "$Id: conf.c,v 1.87 2001/07/12 18:10:13 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -575,12 +575,12 @@ read_configuration(FILE *fp)		/* I - File to read from */
       continue;
 
    /*
-    * Strip trailing newline, if any...
+    * Strip trailing whitespace, if any...
     */
 
     len = strlen(line);
 
-    if (line[len - 1] == '\n')
+    while (len > 0 && isspace(line[len - 1]))
     {
       len --;
       line[len] = '\0';
@@ -1204,7 +1204,31 @@ read_configuration(FILE *fp)		/* I - File to read from */
       switch (var->type)
       {
         case VAR_INTEGER :
-	    *((int *)var->ptr) = atoi(value);
+	    {
+	      float	n;		/* Number */
+	      char	units[255];	/* Units */
+
+
+	      switch (sscanf(value, "%f%254s", &n, units))
+	      {
+		case 0 :
+        	    n = 0.0;
+		case 1 :
+		    break;
+		case 2 :
+        	    if (tolower(units[0]) == 'g')
+		      n *= 1024.0 * 1024.0 * 1024.0;
+        	    else if (tolower(units[0]) == 'm')
+		      n *= 1024.0 * 1024.0;
+		    else if (tolower(units[0]) == 'k')
+		      n *= 1024.0;
+		    else if (tolower(units[0]) == 't')
+		      n *= 262144.0;
+		    break;
+	      }
+
+	      *((int *)var->ptr) = (int)n;
+	    }
 	    break;
 
 	case VAR_BOOLEAN :
@@ -1287,12 +1311,12 @@ read_location(FILE *fp,		/* I - Configuration file */
       continue;
 
    /*
-    * Strip trailing newline, if any...
+    * Strip trailing whitespace, if any...
     */
 
     len = strlen(line);
 
-    if (line[len - 1] == '\n')
+    while (len > 0 && isspace(line[len - 1]))
     {
       len --;
       line[len] = '\0';
@@ -1617,7 +1641,7 @@ read_location(FILE *fp,		/* I - Configuration file */
     {
       if (strcasecmp(value, "all") == 0)
         loc->satisfy = AUTH_SATISFY_ALL;
-      if (strcasecmp(value, "any") == 0)
+      else if (strcasecmp(value, "any") == 0)
         loc->satisfy = AUTH_SATISFY_ANY;
       else
         LogMessage(L_WARN, "Unknown Satisfy value %s on line %d.", value,
@@ -1688,7 +1712,7 @@ get_address(char               *value,		/* I - Value string */
   * Decode the hostname and port number as needed...
   */
 
-  if (hostname[0] != '\0')
+  if (hostname[0] && strcmp(hostname, "*") != 0)
   {
     if ((host = gethostbyname(hostname)) == NULL)
     {
@@ -1723,5 +1747,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.86 2001/06/27 21:53:18 mike Exp $".
+ * End of "$Id: conf.c,v 1.87 2001/07/12 18:10:13 mike Exp $".
  */

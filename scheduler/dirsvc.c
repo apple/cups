@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.77 2001/06/22 15:50:53 mike Exp $"
+ * "$Id: dirsvc.c,v 1.78 2001/07/12 18:10:13 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -252,7 +252,7 @@ UpdateBrowseList(void)
   * Do ACL stuff...
   */
 
-  if (BrowseACL)
+  if (BrowseACL && (BrowseACL->num_allow || BrowseACL->num_deny))
   {
     if (address == 0x7f000001 || strcasecmp(srcname, "localhost") == 0)
     {
@@ -982,5 +982,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.77 2001/06/22 15:50:53 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.78 2001/07/12 18:10:13 mike Exp $".
  */

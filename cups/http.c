@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.85 2001/06/07 15:54:03 mike Exp $"
+ * "$Id: http.c,v 1.86 2001/07/12 18:10:12 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1181,6 +1181,8 @@ httpWrite(http_t     *http,		/* I - HTTP data */
 
       if (http->state == HTTP_POST_RECV)
 	http->state ++;
+      else if (http->state == HTTP_PUT_RECV)
+        http->state = HTTP_STATUS;
       else
 	http->state = HTTP_WAITING;
 
@@ -2072,5 +2074,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.85 2001/06/07 15:54:03 mike Exp $".
+ * End of "$Id: http.c,v 1.86 2001/07/12 18:10:12 mike Exp $".
  */
