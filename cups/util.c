@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.106 2003/04/08 03:45:16 mike Exp $"
+ * "$Id: util.c,v 1.107 2003/08/20 17:21:18 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -1197,7 +1197,17 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 
     while ((status = httpUpdate(cups_server)) == HTTP_CONTINUE);
 
-    if (status == HTTP_UNAUTHORIZED)
+    if (status == HTTP_ERROR && httpError(cups_server) == EPIPE)
+    {
+      if (httpReconnect(cups_server))
+	break;
+      else
+      {
+        status = HTTP_UNAUTHORIZED;
+        continue;
+      }
+    }
+    else if (status == HTTP_UNAUTHORIZED)
     {
       DEBUG_puts("cupsGetPPD: unauthorized...");
 
@@ -1803,5 +1813,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.106 2003/04/08 03:45:16 mike Exp $".
+ * End of "$Id: util.c,v 1.107 2003/08/20 17:21:18 mike Exp $".
  */
