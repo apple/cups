@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.17 2003/01/16 20:04:17 mike Exp $"
+# "$Id: Makefile,v 1.1 2003/01/16 20:04:18 mike Exp $"
 #
 #   Template makefile for the Common UNIX Printing System (CUPS).
 #
@@ -22,7 +22,7 @@
 #         WWW: http://www.cups.org
 #
 
-include ../Makedefs
+include ../../Makedefs
 
 #
 # Template files...
@@ -56,7 +56,6 @@ FILES	=	add-class.tmpl \
 		modify-class.tmpl \
 		modify-printer.tmpl \
 		option-boolean.tmpl \
-		option-conflict.tmpl \
 		option-header.tmpl \
 		option-pickmany.tmpl \
 		option-pickone.tmpl \
@@ -95,14 +94,12 @@ clean:
 #
 
 install:
-	$(INSTALL_DIR) $(DATADIR)/templates
+	$(INSTALL_DIR) $(DATADIR)/templates/de
 	for file in $(FILES); do \
-		$(INSTALL_DATA) $$file $(DATADIR)/templates; \
+		$(INSTALL_DATA) $$file $(DATADIR)/templates/de; \
 	done
-	cd de; $(MAKE) $(MFLAGS) install
-	cd fr; $(MAKE) $(MFLAGS) install
 
 
 #
-# End of "$Id: Makefile,v 1.17 2003/01/16 20:04:17 mike Exp $".
+# End of "$Id: Makefile,v 1.1 2003/01/16 20:04:18 mike Exp $".
 #
