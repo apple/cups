@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.33 2002/03/22 14:21:42 mike Exp $"
+# "$Id: Makefile,v 1.34 2002/05/19 23:10:17 mike Exp $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -89,6 +89,19 @@ ieee1394-linux.o:	ieee1394.h
 
 
 #
+# lp1394.o
+#
+
+KERNEL_INCLUDES	=	-I/usr/src/linux-2.4/include \
+			-I/usr/src/linux-2.4/drivers/ieee1394
+
+lp1394.o:	lp1394.c
+	echo Compiling lp1394.o...
+	echo kgcc $(KERNEL_INCLUDES) -c lp1394.c
+	kgcc $(KERNEL_INCLUDES) -c lp1394.c
+
+
+#
 # ipp
 #
 
@@ -152,5 +165,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.33 2002/03/22 14:21:42 mike Exp $".
+# End of "$Id: Makefile,v 1.34 2002/05/19 23:10:17 mike Exp $".
 #
