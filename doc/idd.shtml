@@ -1,0 +1,381 @@
+<HTML>
+<HEAD>
+   <META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
+   <META NAME="DOCNUMBER" CONTENT="CUPS-IDD-1.0">
+   <META NAME="Author" CONTENT="Easy Software Products">
+   <TITLE>CUPS Interface Design Description</TITLE>
+</HEAD>
+<BODY>
+
+<H1>Scope</H1>
+
+<H2>Identification</H2>
+
+This interface design description document provides detailed file
+formats, message formats, and program conventions for the Common UNIX
+Printing System ("CUPS") Version 1.0.
+
+<H2>System Overview</H2>
+
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX&reg; operating systems. It has been developed by Easy Software 
+Products to promote a standard printing solution for all UNIX vendors 
+and users. CUPS provides the System V and Berkeley command-line interfaces.
+
+<P>CUPS uses the Internet Printing Protocol (IETF-IPP) as the basis
+for managing print jobs and queues. The Line Printer Daemon (LPD,
+RFC1179), Server Message Block (SMB), and AppSocket protocols are also
+supported with reduced functionality.
+
+<P>CUPS adds network printer browsing and PostScript Printer
+Description (&quot;PPD&quot;)-based printing options to support real
+world applications under UNIX.
+
+<H2>Document Overview</H2>
+
+This interface design description document is organized into the following
+sections:
+
+<UL>
+	<LI>1 - Scope
+	<LI>2 - References
+	<LI>3 - Internal Interfaces
+	<LI>4 - External Interfaces
+	<LI>5 - Command-Line Interfaces
+	<LI>A - Glossary
+</UL>
+
+<H1>References</H1>
+
+<H2>CUPS Documentation</H2>
+
+The following CUPS documentation is referenced by this document:
+
+<UL>
+	<LI>CUPS-CMP-1.0: CUPS Configuration Management Plan 
+	<LI>CUPS-IDD-1.0: CUPS System Interface Design Description 
+	<LI>CUPS-SAM-1.0.x: CUPS Software Administrators Manual 
+	<LI>CUPS-SDD-1.0: CUPS Software Design Description 
+	<LI>CUPS-SPM-1.0: CUPS Software Programming Manual
+	<LI>CUPS-SSR-1.0: CUPS Software Security Report 
+	<LI>CUPS-STP-1.0: CUPS Software Test Plan 
+	<LI>CUPS-SUM-1.0.x: CUPS Software Users Manual 
+	<LI>CUPS-SVD-1.0.x: CUPS Software Version Description 
+</UL>
+
+<H2>Other Documents</H2>
+
+The following non-CUPS documents are referenced by this document:
+
+<UL>
+	<LI>IEEE 1387.4, System Administration: Printing (draft) 
+	<LI>IPP/1.0: Additional Optional Operations - Set 1
+	<LI>IPP/1.0: Encoding and Transport 
+	<LI>IPP/1.0: Implementers Guide
+	<LI>IPP/1.0: Model and Semantics
+	<LI>RFC 1179, Line Printer Daemon Protocol 
+</UL>
+
+<H1>Internal Interfaces</H1>
+
+<H2>Character Set Files</H2>
+
+<H2>Language Files</H2>
+
+<H2>MIME Files</H2>
+
+<H3>mime.types</H3>
+
+<H3>mime.convs</H3>
+
+<H2>PPD Files</H2>
+
+<H2>Scheduler Configuration Files</H2>
+
+<H3>cupsd.conf</H3>
+
+<H3>printers.conf</H3>
+
+<H3>classes.conf</H3>
+
+<H1>External Interfaces</H1>
+
+<H2>Application Socket Protocol</H2>
+
+<H2>CUPS Browsing Protocol</H2>
+
+<H2>CUPS PostScript File</H2>
+
+CUPS PostScript files are device-dependent Adobe PostScript program files.
+The PostScript language is described in the PostScript Language Reference
+Manual, Third Edition.
+
+<H2>CUPS Raster File</H2>
+
+CUPS raster files are device-dependent raster image files that contain a
+PostScript page device dictionary and device-dependent raster imagery for
+each page in the document.  These files are used to transfer raster data
+from the PostScript and image file RIPs to device-dependent filters that
+convert the raster data to a printable format.
+
+<P>A raster file begins with a four byte synchronization word: 0x52615374
+("RaSt") for big-endian architectures and 0x74536152 ("tSaR") for little-endian
+architectures.  The writer of the raster file will use the native word order,
+and the reader is responsible for detecting a reversed word order file and
+swapping bytes as needed. The CUPS Interface Library raster functions perform
+this function automatically.
+
+<P>Following the synchronization word are a series of raster pages.  Each page
+starts with a page device dictionary header and is followed immediately by the
+raster data for that page.
+
+<CENTER><TABLE WIDTH="80%" BORDER="1">
+<TR>
+	<TH>Bytes</TH>
+	<TH>Description</TH>
+	<TH>Values</TH>
+</TR>
+<TR>
+	<TD>0-63</TD>
+	<TD>MediaClass</TD>
+	<TD>Nul-terminated ASCII string</TD>
+</TR>
+<TR>
+	<TD>64-127</TD>
+	<TD>MediaColor</TD>
+	<TD>Nul-terminated ASCII string</TD>
+</TR>
+<TR>
+	<TD>128-191</TD>
+	<TD>MediaType</TD>
+	<TD>Nul-terminated ASCII string</TD>
+</TR>
+<TR>
+	<TD>192-255</TD>
+	<TD>OutputType</TD>
+	<TD>Nul-terminated ASCII string</TD>
+</TR>
+<TR>
+	<TD>256-259</TD>
+	<TD>AdvanceDistance</TD>
+	<TD>0 to 2<SUP>32</SUP> - 1 pixels</TD>
+</TR>
+<TR>
+	<TD>260-263</TD>
+	<TD>AdvanceMedia</TD>
+	<TD>0 = Never advance roll<BR>
+	1 = Advance roll after file<BR>
+	2 = Advance roll after job<BR>
+	3 = Advance roll after set<BR>
+	4 = Advance roll after page</TD>
+</TR>
+<TR>
+	<TD>264-267</TD>
+	<TD>Collate</TD>
+	<TD>0 = do not collate copies<BR>
+	1 = collate copies</TD>
+</TR>
+<TR>
+	<TD>268-271</TD>
+	<TD>CutMedia</TD>
+	<TD>0 = Never cut media<BR>
+	1 = Cut roll after file<BR>
+	2 = Cut roll after job<BR>
+	3 = Cut roll after set<BR>
+	4 = Cut roll after page</TD>
+</TR>
+<TR>
+	<TD>272-275</TD>
+	<TD>Duplex</TD>
+	<TD>0 = Print single-sided<BR>
+	1 = Print double-sided</TD>
+</TR>
+<TR>
+	<TD>276-283</TD>
+	<TD>HWResolution</TD>
+	<TD>Horizontal and vertical resolution in dots-per-inch.</TD>
+</TR>
+<TR>
+	<TD>284-299</TD>
+	<TD>ImagingBoundingBox</TD>
+	<TD>Four integers giving the left, bottom, right, and top positions
+	of the page bounding box in pixels</TD>
+</TR>
+<TR>
+	<TD>300-303</TD>
+	<TD>InsertSheet</TD>
+	<TD>0 = Do not insert separator sheets<BR>
+	1 = Insert separator sheets</TD>
+</TR>
+<TR>
+	<TD>304-307</TD>
+	<TD>Jog</TD>
+	<TD>0 = Do no jog pages<BR>
+	1 = Jog pages after file<BR>
+	2 = Jog pages after job<BR>
+	3 = Jog pages after set</TD>
+</TR>
+<TR>
+	<TD>308-311</TD>
+	<TD>LeadingEdge</TD>
+	<TD>0 = Top edge is first<BR>
+	1 = Right edge is first<BR>
+	2 = Bottom edge is first<BR>
+	3 = Left edge is first</TD>
+</TR>
+<TR>
+	<TD>312-319</TD>
+	<TD>Margins</TD>
+	<TD>Left and bottom origin of image in pixels</TD>
+</TR>
+<TR>
+	<TD>320-323</TD>
+	<TD>ManualFeed</TD>
+	<TD>0 = Do not manually feed media<BR>
+	1 = Manually feed media</TD>
+</TR>
+<TR>
+	<TD>324-327</TD>
+	<TD>MediaPosition</TD>
+	<TD>Input slot position from 0 to N</TD>
+</TR>
+<TR>
+	<TD>328-331</TD>
+	<TD>MediaWeight</TD>
+	<TD>Media weight in grams per meter squared</TD>
+</TR>
+<TR>
+	<TD>332-335</TD>
+	<TD>MirrorPrint</TD>
+	<TD>0 = Do not mirror prints<BR>
+	1 = Mirror prints</TD>
+</TR>
+<TR>
+	<TD>336-339</TD>
+	<TD>NegativePrint</TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H2>Internet Printing Protocol</H2>
+
+<H2>Line Printer Daemon Protocol</H2>
+
+<H2>Parallel Device</H2>
+
+<H2>Serial Device</H2>
+
+<H2>Server Message Block Protocol</H2>
+
+<H2>Trivial File Transfer Protocol</H2>
+
+<H1>Command-Line Interfaces</H1>
+
+<H2>Backend Interfaces</H2>
+
+<H2>Filter Interfaces</H2>
+
+<H1 TYPE=A VALUE=0>Glossary</H1>
+
+<H2>Terms</H2>
+
+<DL>
+
+	<DT>C
+	<DD>A computer language.
+
+	<DT>parallel
+	<DD>Sending or receiving data more than 1 bit at a time.
+
+	<DT>pipe
+	<DD>A one-way communications channel between two programs.
+
+	<DT>serial
+	<DD>Sending or receiving data 1 bit at a time.
+
+	<DT>socket
+	<DD>A two-way network communications channel.
+
+</DL>
+
+<H2>Acronyms</H2>
+
+<DL>
+
+	<DT>ASCII
+	<DD>American Standard Code for Information Interchange
+
+	<DT>CUPS
+	<DD>Common UNIX Printing System
+
+	<DT>ESC/P
+	<DD>EPSON Standard Code for Printers
+
+	<DT>FTP
+	<DD>File Transfer Protocol
+
+	<DT>HP-GL
+	<DD>Hewlett-Packard Graphics Language
+
+	<DT>HP-PCL
+	<DD>Hewlett-Packard Printer Control Language
+
+	<DT>HP-PJL
+	<DD>Hewlett-Packard Printer Job Language
+
+	<DT>IETF
+	<DD>Internet Engineering Task Force
+
+	<DT>IPP
+	<DD>Internet Printing Protocol
+
+	<DT>ISO
+	<DD>International Standards Organization
+
+	<DT>LPD
+	<DD>Line Printer Daemon
+
+	<DT>MIME
+	<DD>Multimedia Internet Mail Exchange
+
+	<DT>PCL
+	<DD>Page Control Language
+
+	<DT>PPD
+	<DD>PostScript Printer Description
+
+	<DT>SMB
+	<DD>Server Message Block
+
+	<DT>TFTP
+	<DD>Trivial File Transfer Protocol
+
+</DL>
+
+</BODY>
+</HTML>

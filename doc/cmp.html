@@ -1,162 +1,250 @@
 <HTML>
 <HEAD>
-   <META NAME="DOCNUMBER" CONTENT="CUPS-CMP-1.0B5">
-   <META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
-   <META NAME="Author" CONTENT="Easy Software Products">
-   <TITLE>CUPS Configuration Management Plan</TITLE>
+<TITLE>CUPS Configuration Management Plan</TITLE>
+<META NAME="AUTHOR" CONTENT="Easy Software Products">
+<META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
+<META NAME="DOCNUMBER" CONTENT="CUPS-CMP-1.0">
 </HEAD>
-<BODY BACKGROUND="draft.gif">
-
-<H1>Scope</H1>
-
-<H2>Identification</H2>
-
-This configuration management plan document provides the guidelines for
-development and maintainance of the Common UNIX Printing System ("CUPS")
-Version 1.0 software.
-
-<EMBED SRC="system.html">
-
-<H2>Document Overview</H2>
-
-This configuration management document is organized into the following
-sections:
-
+<BODY>
+<CENTER><A HREF=#contents><IMG SRC="images/cups-large.gif" BORDER=0><BR>
+<H1>CUPS Configuration Management Plan</H1></A><BR>
+CUPS-CMP-1.0<BR>
+Easy Software Products<BR>
+Copyright 1997-1999, All Rights Reserved<BR>
+</CENTER>
+<HR>
+<H1 ALIGN=CENTER><A NAME=CONTENTS>Table of Contents</A></H1>
+<BR>
+<BR><B><A HREF=#1>1 Scope</A></B>
 <UL>
-	<LI>1 - Scope</LI>
-	<LI>2 - References</LI>
-	<LI>3 - File Management</LI>
-	<LI>4 - Trouble Report Processing</LI>
-	<LI>5 - Software Releases</LI>
-	<LI>A - Glossary</LI>
-	<LI>B - Coding Requirements</LI>
+<LI><A HREF=#1_1>1.1 Identification</A></LI>
+<LI><A HREF=#1_2>1.2 System Overview</A></LI>
+<LI><A HREF=#1_3>1.3 Document Overview</A></LI>
 </UL>
-
-<EMBED SRC="references.html">
-
-<H1>File Management</H1>
-
-<H2>Directory Structure</H2>
-
-Each source file shall be placed a sub-directory corresponding to the software
-sub-system it belongs to ("scheduler", "libcups", etc.) To remain compatible
-with older UNIX filesystems, directory names shall not exceed 16 characters
-in length.
-
-<H2>Source Files</H2>
-
-Source files shall be documented and formatted as described in Appendix
-B, Coding Requirements.
-
-<H2>Configuration Management</H2>
-
-Source files shall be placed under the control of the Concurrent Versions
-System ("CVS") software. Source files shall be "checked in" with each change
-so that modifications can be tracked.
-
-<P>Documentation on the CVS software is included with the whitepaper, "CVS
-II: Parallelizing Software Development".
-
-<H1>Trouble Report Processing</H1>
-
-A Software Trouble Report ("STR") shall be submitted every time a user
-or vendor experiences a problem with the CUPS software. Trouble reports
-are maintained in a database with one of the following states:
-
+<B><A HREF=#2>2 References</A></B>
+<UL>
+<LI><A HREF=#2_1>2.1 CUPS Documentation</A></LI>
+<LI><A HREF=#2_2>2.2 Other Documents</A></LI>
+</UL>
+<B><A HREF=#3>3 File Management</A></B>
+<UL>
+<LI><A HREF=#3_1>3.1 Directory Structure</A></LI>
+<LI><A HREF=#3_2>3.2 Source Files</A></LI>
+<LI><A HREF=#3_3>3.3 Configuration Management</A></LI>
+</UL>
+<B><A HREF=#4>4 Trouble Report Processing</A></B>
+<UL>
+<LI><A HREF=#4_1>4.1 Classification</A></LI>
+<LI><A HREF=#4_2>4.2 Identification</A></LI>
+<LI><A HREF=#4_3>4.3 Correction</A></LI>
+<LI><A HREF=#4_4>4.4 Notification</A></LI>
+</UL>
+<B><A HREF=#5>5 Software Releases</A></B>
+<UL>
+<LI><A HREF=#5_1>5.1 Version Numbering</A></LI>
+<LI><A HREF=#5_2>5.2 Generation</A></LI>
+<LI><A HREF=#5_3>5.3 Testing</A></LI>
+<LI><A HREF=#5_4>5.4 Release</A></LI>
+</UL>
+<B><A HREF=#6>@ Glossary</A></B>
+<UL>
+<LI><A HREF=#6_1>@.1 Terms</A></LI>
+<LI><A HREF=#6_2>@.2 Acronyms</A></LI>
+</UL>
+<B><A HREF=#7>A Coding Requirements</A></B>
+<UL>
+<LI><A HREF=#7_1>A.1 Source Files</A></LI>
+<UL>
+<LI><A HREF=#7_1_1>A.1.1 Naming</A></LI>
+<LI><A HREF=#7_1_2>A.1.2 Documentation</A></LI>
+</UL>
+<LI><A HREF=#7_2>A.2 Functions</A></LI>
+<UL>
+<LI><A HREF=#7_2_1>A.2.1 Naming</A></LI>
+<LI><A HREF=#7_2_2>A.2.2 Documentation</A></LI>
+</UL>
+<LI><A HREF=#7_3>A.3 Methods</A></LI>
+<UL>
+<LI><A HREF=#7_3_1>A.3.1 Naming</A></LI>
+<LI><A HREF=#7_3_2>A.3.2 Documentation</A></LI>
+</UL>
+<LI><A HREF=#7_4>A.4 Variables</A></LI>
+<UL>
+<LI><A HREF=#7_4_1>A.4.1 Naming</A></LI>
+<LI><A HREF=#7_4_2>A.4.2 Documentation</A></LI>
+</UL>
+<LI><A HREF=#7_5>A.5 Types</A></LI>
+<UL>
+<LI><A HREF=#7_5_1>A.5.1 Naming</A></LI>
+<LI><A HREF=#7_5_2>A.5.2 Documentation</A></LI>
+</UL>
+<LI><A HREF=#7_6>A.6 Structures</A></LI>
+<UL>
+<LI><A HREF=#7_6_1>A.6.1 Naming</A></LI>
+<LI><A HREF=#7_6_2>A.6.2 Documentation</A></LI>
+</UL>
+<LI><A HREF=#7_7>A.7 Classes</A></LI>
+<UL>
+<LI><A HREF=#7_7_1>A.7.1 Naming</A></LI>
+<LI><A HREF=#7_7_2>A.7.2 Documentation</A></LI>
+</UL>
+<LI><A HREF=#7_8>A.8 Constants</A></LI>
+<UL>
+<LI><A HREF=#7_8_1>A.8.1 Naming</A></LI>
+<LI><A HREF=#7_8_2>A.8.2 Documentation</A></LI>
+</UL>
+<LI><A HREF=#7_9>A.9 Code</A></LI>
+<UL>
+<LI><A HREF=#7_9_1>A.9.1 Documentation</A></LI>
+<LI><A HREF=#7_9_2>A.9.2 Style</A></LI>
+</UL>
+</UL>
+<B><A HREF=#8>B Software Trouble Report Form</A></B><HR>
+<H1><A NAME=1>1 Scope</A></H1>
+<H2><A NAME=1_1>1.1 Identification</A></H2>
+ This configuration management plan document provides the guidelines 
+for development and maintainance of the Common UNIX Printing System 
+(&quot;CUPS&quot;) Version 1.0 software. 
+<H2><A NAME=1_2>1.2 System Overview</A></H2>
+ The Common UNIX Printing System provides a portable printing layer for 
+ UNIX&reg; operating systems. It has been developed by Easy Software 
+ Products to promote a standard printing solution for all UNIX vendors 
+ and users. CUPS provides the System V and Berkeley command-line 
+interfaces. 
+<P>CUPS uses the Internet Printing Protocol (IETF-IPP) as the basis for 
+managing print jobs and queues. The Line Printer Daemon (LPD, RFC1179), 
+Server Message Block (SMB), and AppSocket protocols are also supported 
+with reduced functionality. </P>
+<P>CUPS adds network printer browsing and PostScript Printer 
+Description (&quot;PPD&quot;)-based printing options to support real world 
+applications under UNIX. </P>
+<H2><A NAME=1_3>1.3 Document Overview</A></H2>
+ This configuration management document is organized into the following 
+sections: 
+<UL>
+<LI>1 - Scope</LI>
+<LI>2 - References</LI>
+<LI>3 - File Management</LI>
+<LI>4 - Trouble Report Processing</LI>
+<LI>5 - Software Releases</LI>
+<LI>A - Glossary</LI>
+<LI>B - Coding Requirements</LI>
+</UL>
+<H1><A NAME=2>2 References</A></H1>
+<H2><A NAME=2_1>2.1 CUPS Documentation</A></H2>
+ The following CUPS documentation is referenced by this document: 
+<UL>
+<LI>CUPS-CMP-1.0: CUPS Configuration Management Plan </LI>
+<LI>CUPS-IDD-1.0: CUPS System Interface Design Description </LI>
+<LI>CUPS-SAM-1.0.x: CUPS Software Administrators Manual </LI>
+<LI>CUPS-SDD-1.0: CUPS Software Design Description </LI>
+<LI>CUPS-SPM-1.0: CUPS Software Programming Manual </LI>
+<LI>CUPS-SSR-1.0: CUPS Software Security Report </LI>
+<LI>CUPS-STP-1.0: CUPS Software Test Plan </LI>
+<LI>CUPS-SUM-1.0.x: CUPS Software Users Manual </LI>
+<LI>CUPS-SVD-1.0.x: CUPS Software Version Description </LI>
+</UL>
+<H2><A NAME=2_2>2.2 Other Documents</A></H2>
+ The following non-CUPS documents are referenced by this document: 
+<UL>
+<LI>IEEE 1387.4, System Administration: Printing (draft) </LI>
+<LI>IPP/1.0: Additional Optional Operations - Set 1 </LI>
+<LI>IPP/1.0: Encoding and Transport </LI>
+<LI>IPP/1.0: Implementers Guide </LI>
+<LI>IPP/1.0: Model and Semantics </LI>
+<LI>RFC 1179, Line Printer Daemon Protocol </LI>
+</UL>
+<H1><A NAME=3>3 File Management</A></H1>
+<H2><A NAME=3_1>3.1 Directory Structure</A></H2>
+ Each source file shall be placed a sub-directory corresponding to the 
+software sub-system it belongs to (&quot;scheduler&quot;, &quot;libcups&quot;, etc.) To 
+remain compatible with older UNIX filesystems, directory names shall 
+not exceed 16 characters in length. 
+<H2><A NAME=3_2>3.2 Source Files</A></H2>
+ Source files shall be documented and formatted as described in 
+Appendix B, Coding Requirements. 
+<H2><A NAME=3_3>3.3 Configuration Management</A></H2>
+ Source files shall be placed under the control of the Concurrent 
+Versions System (&quot;CVS&quot;) software. Source files shall be &quot;checked in&quot; 
+with each change so that modifications can be tracked. 
+<P>Documentation on the CVS software is included with the whitepaper, 
+&quot;CVS II: Parallelizing Software Development&quot;. </P>
+<H1><A NAME=4>4 Trouble Report Processing</A></H1>
+ A Software Trouble Report (&quot;STR&quot;) shall be submitted every time a user 
+or vendor experiences a problem with the CUPS software. Trouble reports 
+are maintained in a database with one of the following states: 
 <OL>
-	<LI>STR is closed with complete resolution</LI>
-	<LI>STR is closed without resolution</LI>
-	<LI>STR is active</LI>
-	<LI>STR is pending (new STR or additional information available)</LI>
+<LI>STR is closed with complete resolution</LI>
+<LI>STR is closed without resolution</LI>
+<LI>STR is active</LI>
+<LI>STR is pending (new STR or additional information available)</LI>
 </OL>
-
-Trouble reports shall be processed using the following steps.
-
-<H2>Classification</H2>
-
-When a trouble report is received it must be classified at one of the following
-levels:
-
+ Trouble reports shall be processed using the following steps. 
+<H2><A NAME=4_1>4.1 Classification</A></H2>
+ When a trouble report is received it must be classified at one of the 
+following levels: 
 <OL>
-	<LI>Request for enhancement</LI>
-	<LI>Documentation error</LI>
-	<LI>Unable to print a file</LI>
-	<LI>Unable to print to a printer</LI>
-	<LI>Unable to print at all</LI>
+<LI>Request for enhancement</LI>
+<LI>Documentation error</LI>
+<LI>Unable to print a file</LI>
+<LI>Unable to print to a printer</LI>
+<LI>Unable to print at all</LI>
 </OL>
-
-The scope of the problem should also be determined as:
-
+ The scope of the problem should also be determined as: 
 <OL>
-	<LI>Specific to a machine</LI>
-	<LI>Specific to an operating system</LI>
-	<LI>Applies to all machines and operating systems</LI>
+<LI>Specific to a machine</LI>
+<LI>Specific to an operating system</LI>
+<LI>Applies to all machines and operating systems</LI>
 </OL>
-
-<H2>Identification</H2>
-
-Once the level and scope of the trouble report is determined the software
-sub-system(s) involved with the problem are determined. This may involve
-additional communication with the user or vendor to isolate the problem
-to a specific cause.
-
-<P>When the sub-system(s) involved have been identified, an engineer will
-then determine the change(s) needed and estimate the time required for
-the change(s).
-
-<H2>Correction</H2>
-
-Corrections are scheduled based upon the severity and complexity of the
-problem. Once all changes have been made, documented, and tested successfully
-a new software release snapshot is generated. Additional tests are added
-as necessary for proper testing of the changes.
-
-<H2>Notification</H2>
-
-The user or vendor is notified when the fix is available or if the problem
-was caused by user error.
-
-<H1>Software Releases</H1>
-
-<H2>Version Numbering</H2>
-
-CUPS uses a three-part version number separated by periods to represent
-the major, minor, and patch release numbers:
-
+<H2><A NAME=4_2>4.2 Identification</A></H2>
+ Once the level and scope of the trouble report is determined the 
+software sub-system(s) involved with the problem are determined. This 
+may involve additional communication with the user or vendor to isolate 
+the problem to a specific cause. 
+<P>When the sub-system(s) involved have been identified, an engineer 
+will then determine the change(s) needed and estimate the time required 
+for the change(s). </P>
+<H2><A NAME=4_3>4.3 Correction</A></H2>
+ Corrections are scheduled based upon the severity and complexity of 
+the problem. Once all changes have been made, documented, and tested 
+successfully a new software release snapshot is generated. Additional 
+tests are added as necessary for proper testing of the changes. 
+<H2><A NAME=4_4>4.4 Notification</A></H2>
+ The user or vendor is notified when the fix is available or if the 
+problem was caused by user error. 
+<H1><A NAME=5>5 Software Releases</A></H1>
+<H2><A NAME=5_1>5.1 Version Numbering</A></H2>
+ CUPS uses a three-part version number separated by periods to 
+represent the major, minor, and patch release numbers: 
 <UL>
 <PRE>
 major.minor.patch
 1.0.0
 </PRE>
 </UL>
-
-Beta-test releases are indentified by appending the letter B followed by
-the build number:
-
+ Beta-test releases are indentified by appending the letter B followed 
+by the build number: 
 <UL>
 <PRE>
 major.minor.patchbbuild
 1.0.0b1
 </PRE>
 </UL>
-
-A CVS snapshot is generated for every beta and final release and uses
-the version number preceded by the letter "v" and with the decimal
-points replaced by underscores:
-
+ A CVS snapshot is generated for every beta and final release and uses 
+the version number preceded by the letter &quot;v&quot; and with the decimal 
+points replaced by underscores: 
 <UL>
 <PRE>
 v1_0_0b1
 v1_0_0
 </PRE>
 </UL>
-
-Each change that corrects a fault in a software sub-system increments the
-patch release number. If a change affects the software design of CUPS then
-the minor release number will be incremented and the patch release number
-reset to 0. If CUPS is completely redesigned the major release number will
-be incremented and the minor and patch release numbers reset to 0:
-
+ Each change that corrects a fault in a software sub-system increments 
+the patch release number. If a change affects the software design of 
+CUPS then the minor release number will be incremented and the patch 
+release number reset to 0. If CUPS is completely redesigned the major 
+release number will be incremented and the minor and patch release 
+numbers reset to 0: 
 <UL>
 <PRE>
 1.0.0b1    First beta release
@@ -170,54 +258,89 @@ be incremented and the minor and patch release numbers reset to 0:
 2.0.0      Production release of 2.0.0
 </PRE>
 </UL>
-
-<H2>Generation</H2>
-
-Software releases shall be generated for each successfully completed software
-trouble report. All object and executable files shall be deleted prior
-to performing a full build to ensure that source files are recompiled.
-
-<H2>Testing</H2>
-
-Software testing shall be conducted according to the CUPS Software Test
-Plan, CUPS-STP-1.0. Failed tests cause STRs to be generated to correct
-the problems found.
-
-<H2>Release</H2>
-
-When testing has been completed successfully a new distribution image is
-created from the current CVS code "snapshot". No production release shall
-contain software that has not passed the appropriate software tests.
-
-<EMBED SRC="glossary.html">
-
-<H1>Coding Requirements</H1>
-
-These coding requirements provide detailed information on source file
-formatting and documentation content. These guidelines shall be applied
-to all C and C++ source files provided with CUPS.
-
-<H2>Source Files</H2>
-
-<H3>Naming</H3>
-
-All source files names shall be 16 characters or less in length to
-ensure compatibility with older UNIX filesystems. Source files
-containing functions shall have an extension of ".c" for ANSI C and
-".cpp" for C++ source files. All other "include" files shall have an
-extension of ".h".
-
-<H3>Documentation</H3>
-
-The top of each source file shall contain a header giving the name of the
-file, the purpose or nature of the source file, the copyright and licensing
-notice, and the functions contained in the file.  The file name and revision
-information is provided by the CVS "$Id$" tag:
-
+<H2><A NAME=5_2>5.2 Generation</A></H2>
+ Software releases shall be generated for each successfully completed 
+software trouble report. All object and executable files shall be 
+deleted prior to performing a full build to ensure that source files 
+are recompiled. 
+<H2><A NAME=5_3>5.3 Testing</A></H2>
+ Software testing shall be conducted according to the CUPS Software 
+Test Plan, CUPS-STP-1.0. Failed tests cause STRs to be generated to 
+correct the problems found. 
+<H2><A NAME=5_4>5.4 Release</A></H2>
+ When testing has been completed successfully a new distribution image 
+is created from the current CVS code &quot;snapshot&quot;. No production release 
+shall contain software that has not passed the appropriate software 
+tests. 
+<H1 TYPE=A VALUE=0><A NAME=6>@ Glossary</A></H1>
+<H2><A NAME=6_1>@.1 Terms</A></H2>
+<DL>
+<DT>C </DT>
+<DD>A computer language. </DD>
+<DT>parallel </DT>
+<DD>Sending or receiving data more than 1 bit at a time. </DD>
+<DT>pipe </DT>
+<DD>A one-way communications channel between two programs. </DD>
+<DT>serial </DT>
+<DD>Sending or receiving data 1 bit at a time. </DD>
+<DT>socket </DT>
+<DD>A two-way network communications channel. </DD>
+</DL>
+<H2><A NAME=6_2>@.2 Acronyms</A></H2>
+<DL>
+<DT>ASCII </DT>
+<DD>American Standard Code for Information Interchange </DD>
+<DT>CUPS </DT>
+<DD>Common UNIX Printing System </DD>
+<DT>ESC/P </DT>
+<DD>EPSON Standard Code for Printers </DD>
+<DT>FTP </DT>
+<DD>File Transfer Protocol </DD>
+<DT>HP-GL </DT>
+<DD>Hewlett-Packard Graphics Language </DD>
+<DT>HP-PCL </DT>
+<DD>Hewlett-Packard Printer Control Language </DD>
+<DT>HP-PJL </DT>
+<DD>Hewlett-Packard Printer Job Language </DD>
+<DT>IETF </DT>
+<DD>Internet Engineering Task Force </DD>
+<DT>IPP </DT>
+<DD>Internet Printing Protocol </DD>
+<DT>ISO </DT>
+<DD>International Standards Organization </DD>
+<DT>LPD </DT>
+<DD>Line Printer Daemon </DD>
+<DT>MIME </DT>
+<DD>Multimedia Internet Mail Exchange </DD>
+<DT>PCL </DT>
+<DD>Page Control Language </DD>
+<DT>PPD </DT>
+<DD>PostScript Printer Description </DD>
+<DT>SMB </DT>
+<DD>Server Message Block </DD>
+<DT>TFTP </DT>
+<DD>Trivial File Transfer Protocol </DD>
+</DL>
+<H1><A NAME=7>A Coding Requirements</A></H1>
+ These coding requirements provide detailed information on source file 
+formatting and documentation content. These guidelines shall be applied 
+to all C and C++ source files provided with CUPS. 
+<H2><A NAME=7_1>A.1 Source Files</A></H2>
+<H3><A NAME=7_1_1>A.1.1 Naming</A></H3>
+ All source files names shall be 16 characters or less in length to 
+ensure compatibility with older UNIX filesystems. Source files 
+containing functions shall have an extension of &quot;.c&quot; for ANSI C and 
+&quot;.cpp&quot; for C++ source files. All other &quot;include&quot; files shall have an 
+extension of &quot;.h&quot;. 
+<H3><A NAME=7_1_2>A.1.2 Documentation</A></H3>
+ The top of each source file shall contain a header giving the name of 
+the file, the purpose or nature of the source file, the copyright and 
+licensing notice, and the functions contained in the file.  The file 
+name and revision information is provided by the CVS &quot;$Id$&quot; tag: 
 <UL>
 <PRE>
 /*
- * "$Id$"
+ * &quot;$Id$&quot;
  *
  *   Description of file contents.
  *
@@ -227,7 +350,7 @@ information is provided by the CVS "$Id$" tag:
  *   These coded instructions, statements, and computer programs are
  *   the property of Easy Software Products and are protected by
  *   Federal copyright law.  Distribution and use rights are outlined
- *   in the file "LICENSE.txt" which should have been included with
+ *   in the file &quot;LICENSE.txt&quot; which should have been included with
  *   this file.  If this file is missing or damaged please contact
  *   Easy Software Products at:
  *
@@ -248,39 +371,30 @@ information is provided by the CVS "$Id$" tag:
  */
 </PRE>
 </UL>
-
-The bottom of each source file shall contain a trailer giving the name
-of the file using the CVS "$Id$" tag. The primary purpose of this is to
-mark the end of a source file; if the trailer is missing it is possible
-that code has been lost near the end of the file:
-
+ The bottom of each source file shall contain a trailer giving the name 
+of the file using the CVS &quot;$Id$&quot; tag. The primary purpose of this is to 
+mark the end of a source file; if the trailer is missing it is possible 
+that code has been lost near the end of the file: 
 <UL>
 <PRE>
 /*
- * End of "$Id$".
+ * End of &quot;$Id$&quot;.
  */
 </PRE>
 </UL>
-
-<H2>Functions</H2>
-
-<H3>Naming</H3>
-
-Functions with a global scope shall be capitalized ("DoThis", "DoThat",
-"DoSomethingElse", etc.) The only exception to this rule shall be the
-CUPS interface library functions which may begin with a prefix word in
-lowercase ("cupsDoThis", "cupsDoThat", etc.)
-
-<P>Functions with a local scope shall be declared "static" and be lowercase
-with underscores between words ("do_this", "do_that", "do_something_else",
-etc.)
-
-<H3>Documentation</H3>
-
-Each function shall begin with a comment header describing what the function
-does, the possible input limits (if any), and the possible output values
-(if any), and any special information needed:
-
+<H2><A NAME=7_2>A.2 Functions</A></H2>
+<H3><A NAME=7_2_1>A.2.1 Naming</A></H3>
+ Functions with a global scope shall be capitalized (&quot;DoThis&quot;, 
+&quot;DoThat&quot;, &quot;DoSomethingElse&quot;, etc.) The only exception to this rule 
+shall be the CUPS interface library functions which may begin with a 
+prefix word in lowercase (&quot;cupsDoThis&quot;, &quot;cupsDoThat&quot;, etc.) 
+<P>Functions with a local scope shall be declared &quot;static&quot; and be 
+lowercase with underscores between words (&quot;do_this&quot;, &quot;do_that&quot;, 
+&quot;do_something_else&quot;, etc.) </P>
+<H3><A NAME=7_2_2>A.2.2 Documentation</A></H3>
+ Each function shall begin with a comment header describing what the 
+function does, the possible input limits (if any), and the possible 
+output values (if any), and any special information needed: 
 <UL>
 <PRE>
 /*
@@ -297,20 +411,14 @@ do_this(float x) /* I - Power value (0.0 &lt;= x &lt;= 1.0) */
 }
 </PRE>
 </UL>
-
-<H2>Methods</H2>
-
-<H3>Naming</H3>
-
-Methods shall be in lowercase with underscores between words ("do_this",
-"do_that", "do_something_else", etc.)
-
-<H3>Documentation</H3>
-
-Each method shall begin with a comment header describing what the method
-does, the possible input limits (if any), and the possible output values
-(if any), and any special information needed:
-
+<H2><A NAME=7_3>A.3 Methods</A></H2>
+<H3><A NAME=7_3_1>A.3.1 Naming</A></H3>
+ Methods shall be in lowercase with underscores between words 
+(&quot;do_this&quot;, &quot;do_that&quot;, &quot;do_something_else&quot;, etc.) 
+<H3><A NAME=7_3_2>A.3.2 Documentation</A></H3>
+ Each method shall begin with a comment header describing what the 
+method does, the possible input limits (if any), and the possible 
+output values (if any), and any special information needed: 
 <UL>
 <PRE>
 /*
@@ -327,44 +435,34 @@ class::do_this(float x) /* I - Power value (0.0 &lt;= x &lt;= 1.0) */
 }
 </PRE>
 </UL>
-
-<H2>Variables</H2>
-
-<H3>Naming</H3>
-
-Variables with a global scope shall be capitalized ("ThisVariable",
-"ThatVariable", "ThisStateVariable", etc.) The only exception to this
-rule shall be the CUPS interface library global variables which must
-begin with the prefix "cups" ("cupsThisVariable", "cupsThatVariable",
-etc.) Global variables shall be replaced by function arguments whenever
-possible.
-
-<P>Variables with a local scope shall be lowercase with underscores between
-words ("this_variable", "that_variable", etc.) Any local variables shared
-by functions within a source file shall be declared "static".
-
-<H3>Documentation</H3>
-
-Each variable shall be declared on a separate line and shall be immediately
-followed by a comment block describing the variable:
-
-<UL><PRE>
+<H2><A NAME=7_4>A.4 Variables</A></H2>
+<H3><A NAME=7_4_1>A.4.1 Naming</A></H3>
+ Variables with a global scope shall be capitalized (&quot;ThisVariable&quot;, 
+&quot;ThatVariable&quot;, &quot;ThisStateVariable&quot;, etc.) The only exception to this 
+rule shall be the CUPS interface library global variables which must 
+begin with the prefix &quot;cups&quot; (&quot;cupsThisVariable&quot;, &quot;cupsThatVariable&quot;, 
+etc.) Global variables shall be replaced by function arguments whenever 
+possible. 
+<P>Variables with a local scope shall be lowercase with underscores 
+between words (&quot;this_variable&quot;, &quot;that_variable&quot;, etc.) Any local 
+variables shared by functions within a source file shall be declared 
+&quot;static&quot;. </P>
+<H3><A NAME=7_4_2>A.4.2 Documentation</A></H3>
+ Each variable shall be declared on a separate line and shall be 
+immediately followed by a comment block describing the variable: 
+<UL>
+<PRE>
 int this_variable;   /* The current state of this */
 int that_variable;   /* The current state of that */
-</PRE></UL>
-
-<H2>Types</H2>
-
-<H3>Naming</H3>
-
-All type names shall be lowercase with underscores between words and
-"_t" appended to the end of the name ("this_type_t", "that_type_t",
-etc.)
-
-<H3>Documentation</H3>
-
-Each type shall have a comment block immediately before the typedef:
-
+</PRE>
+</UL>
+<H2><A NAME=7_5>A.5 Types</A></H2>
+<H3><A NAME=7_5_1>A.5.1 Naming</A></H3>
+ All type names shall be lowercase with underscores between words and 
+&quot;_t&quot; appended to the end of the name (&quot;this_type_t&quot;, &quot;that_type_t&quot;, 
+etc.) 
+<H3><A NAME=7_5_2>A.5.2 Documentation</A></H3>
+ Each type shall have a comment block immediately before the typedef: 
 <UL>
 <PRE>
 /*
@@ -373,21 +471,15 @@ Each type shall have a comment block immediately before the typedef:
 typedef int cups_this_type_t;
 </PRE>
 </UL>
-
-<H2>Structures</H2>
-
-<H3>Naming</H3>
-
-All structure names shall be lowercase with underscores between words and
-"_str" appended to the end of the name ("this_struct_str", "that_struct_str",
-etc.)
-
-<H3>Documentation</H3>
-
-Each structure shall have a comment block immediately before the struct
-and each member shall be documented in accordance with the variable naming
-policy above:
-
+<H2><A NAME=7_6>A.6 Structures</A></H2>
+<H3><A NAME=7_6_1>A.6.1 Naming</A></H3>
+ All structure names shall be lowercase with underscores between words 
+and &quot;_str&quot; appended to the end of the name (&quot;this_struct_str&quot;, 
+&quot;that_struct_str&quot;, etc.) 
+<H3><A NAME=7_6_2>A.6.2 Documentation</A></H3>
+ Each structure shall have a comment block immediately before the 
+struct and each member shall be documented in accordance with the 
+variable naming policy above: 
 <UL>
 <PRE>
 /*
@@ -400,20 +492,14 @@ struct cups_this_struct_str
 };
 </PRE>
 </UL>
-
-<H2>Classes</H2>
-
-<H3>Naming</H3>
-
-All class names shall be lowercase with underscores between words
-("this_class", "that_class", etc.)
-
-<H3>Documentation</H3>
-
-Each class shall have a comment block immediately before the class
-and each member shall be documented in accordance with the variable naming
-policy above:
-
+<H2><A NAME=7_7>A.7 Classes</A></H2>
+<H3><A NAME=7_7_1>A.7.1 Naming</A></H3>
+ All class names shall be lowercase with underscores between words 
+(&quot;this_class&quot;, &quot;that_class&quot;, etc.) 
+<H3><A NAME=7_7_2>A.7.2 Documentation</A></H3>
+ Each class shall have a comment block immediately before the class and 
+each member shall be documented in accordance with the variable naming 
+policy above: 
 <UL>
 <PRE>
 /*
@@ -426,23 +512,16 @@ class cups_this_class
 };
 </PRE>
 </UL>
-
-<H2>Constants</H2>
-
-<H3>Naming</H3>
-
-All constant names shall be uppercase with underscored between words
-("THIS_CONSTANT", "THAT_CONSTANT", etc.) Constants defined for the CUPS
-interface library must begin with an uppercase prefix
-("CUPS_THIS_CONSTANT", "CUPS_THAT_CONSTANT", etc.)
-
-<P>Typed enumerations shall be used whenever possible to allow for type
-checking by the compiler.
-
-<H3>Documentation</H3>
-
-Comment blocks shall immediately follow each constant:
-
+<H2><A NAME=7_8>A.8 Constants</A></H2>
+<H3><A NAME=7_8_1>A.8.1 Naming</A></H3>
+ All constant names shall be uppercase with underscored between words 
+(&quot;THIS_CONSTANT&quot;, &quot;THAT_CONSTANT&quot;, etc.) Constants defined for the CUPS 
+interface library must begin with an uppercase prefix 
+(&quot;CUPS_THIS_CONSTANT&quot;, &quot;CUPS_THAT_CONSTANT&quot;, etc.) 
+<P>Typed enumerations shall be used whenever possible to allow for type 
+checking by the compiler. </P>
+<H3><A NAME=7_8_2>A.8.2 Documentation</A></H3>
+ Comment blocks shall immediately follow each constant: 
 <UL>
 <PRE>
 enum
@@ -452,14 +531,10 @@ enum
 };
 </PRE>
 </UL>
-
-<H2>Code</H2>
-
-<H3>Documentation</H3>
-
-All source code shall utilize block comments within functions to describe
-the operations being performed by a group of statements:
-
+<H2><A NAME=7_9>A.9 Code</A></H2>
+<H3><A NAME=7_9_1>A.9.1 Documentation</A></H3>
+ All source code shall utilize block comments within functions to 
+describe the operations being performed by a group of statements: 
 <UL>
 <PRE>
 /*
@@ -484,16 +559,12 @@ do
 } while (i == (sizeof(array) / sizeof(array[0])));
 </PRE>
 </UL>
-
-<H3>Style</H3>
-
-<H4 TYPE="a">Indentation</H4>
-
-All code blocks enclosed by brackets shall begin with the opening brace
-on a new line. The code then follows starting on a new line after the brace
-and is indented 2 spaces. The closing brace is then placed on a new line
-following the code at the original indentation:
-
+<H3><A NAME=7_9_2>A.9.2 Style</A></H3>
+<H4 TYPE=a>A.9.2.a Indentation</H4>
+ All code blocks enclosed by brackets shall begin with the opening 
+brace on a new line. The code then follows starting on a new line after 
+the brace and is indented 2 spaces. The closing brace is then placed on 
+a new line following the code at the original indentation: 
 <UL>
 <PRE>
 {
@@ -511,11 +582,10 @@ following the code at the original indentation:
 }
 </PRE>
 </UL>
-
-Single-line statements following "do", "else", "for", "if", and "while"
-shall be indented 2 spaces as well. Blocks of code in a "switch" block
-shall be indented 4 spaces after each "case" and "default" case:
-
+ Single-line statements following &quot;do&quot;, &quot;else&quot;, &quot;for&quot;, &quot;if&quot;, and 
+&quot;while&quot; shall be indented 2 spaces as well. Blocks of code in a 
+&quot;switch&quot; block shall be indented 4 spaces after each &quot;case&quot; and 
+&quot;default&quot; case: 
 <UL>
 <PRE>
 switch (array[i])
@@ -530,66 +600,47 @@ switch (array[i])
 }
 </PRE>
 </UL>
-
-<H4>Spacing</H4>
-
-A space shall follow each reserved word ("if", "while", etc.) Spaces shall
-not be inserted between a function name and the arguments in parenthesis.
-
-<H4>Return Values</H4>
-
-Parenthesis shall surround values returned from a function using "return":
-
+<H4>A.9.2.b Spacing</H4>
+ A space shall follow each reserved word (&quot;if&quot;, &quot;while&quot;, etc.) Spaces 
+shall not be inserted between a function name and the arguments in 
+parenthesis. 
+<H4>A.9.2.c Return Values</H4>
+ Parenthesis shall surround values returned from a function using 
+&quot;return&quot;: 
 <UL>
 <PRE>
 return (STATE_IDLE);
 </PRE>
 </UL>
-
-<H4>Loops</H4>
-
-Whenever convenient loops should count downward to zero to improve program
-performance:
-
+<H4>A.9.2.d Loops</H4>
+ Whenever convenient loops should count downward to zero to improve 
+program performance: 
 <UL>
 <PRE>
-for (i = sizeof(array) / sizeof(array[0]) - 1; i >= 0; i --)
+for (i = sizeof(array) / sizeof(array[0]) - 1; i &gt;= 0; i --)
   array[i] = STATE_IDLE;
 </PRE>
 </UL>
-
-<H1 ALIGN=RIGHT>Software Trouble Report Form</H1>
-
-<CENTER><TABLE WIDTH="80%">
-<TR>
-	<TH ALIGN=RIGHT>Summary of Problem:</TH>
-	<TD ALIGN=LEFT>________________________________________</TD>
-</TR>
-
-<TR>
-	<TH ALIGN=RIGHT>Problem Severity:</TH>
-	<TD ALIGN=LEFT>__1=RFE
-	<BR>__2=Documentation-Error
-	<BR>__3=Unable-to-Print-a-File
-	<BR>__4=Unable-to-Print-to-a-Printer
-	<BR>__5=Unable-to-Print-at-All</TD>
-</TR>
-
-<TR>
-	<TH ALIGN=RIGHT>Problem Scope:</TH>
-	<TD ALIGN=LEFT>__1=Machine __2=Operating-System __3=All</TD>
-</TR>
-
-<TR>
-	<TH ALIGN=RIGHT VALIGN=TOP>Detailed Description of Problem:</TH>
-	<TD ALIGN=LEFT>________________________________________ 
-	<BR>________________________________________ 
-	<BR>________________________________________ 
-	<BR>________________________________________ 
-	<BR>________________________________________ 
-	<BR>________________________________________</TD>
-</TR>
-</TABLE></CENTER>
-
+<H1 ALIGN=RIGHT><A NAME=8>B Software Trouble Report Form</A></H1>
+<CENTER>
+<TABLE WIDTH=80%>
+<TR><TH ALIGN=RIGHT>Summary of Problem:</TH><TD ALIGN=LEFT>
+________________________________________</TD></TR>
+<TR><TH ALIGN=RIGHT>Problem Severity:</TH><TD ALIGN=LEFT>__1=RFE 
+<BR>__2=Documentation-Error 
+<BR>__3=Unable-to-Print-a-File 
+<BR>__4=Unable-to-Print-to-a-Printer 
+<BR>__5=Unable-to-Print-at-All</TD></TR>
+<TR><TH ALIGN=RIGHT>Problem Scope:</TH><TD ALIGN=LEFT>__1=Machine 
+__2=Operating-System __3=All</TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Detailed Description of Problem:</TH><TD ALIGN=LEFT>
+________________________________________ 
+<BR>________________________________________ 
+<BR>________________________________________ 
+<BR>________________________________________ 
+<BR>________________________________________ 
+<BR>________________________________________</TD></TR>
+</TABLE>
+</CENTER>
 </BODY>
 </HTML>

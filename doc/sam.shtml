@@ -1,0 +1,56 @@
+<HTML>
+<HEAD>
+	<META NAME="Description" CONTENT="Common UNIX Printing System Software Administrators Manual">
+	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.0.0b1">
+	<META NAME="Author" CONTENT="Easy Software Products">
+	<TITLE>CUPS Software Administrators Manual</TITLE>
+</HEAD>
+<BODY>
+
+<H1>Scope</H1>
+
+<H2>Identification</H2>
+
+This softwae administrators manual provides printer administration
+information for the Common UNIX Printing System ("CUPS") Version 1.0.0.
+
+<H2>Document Overview</H2>
+
+<P>This software administrators manual is organized into the following sections:</P>
+
+<UL>
+	<LI>1 - Scope</LI>
+	<LI>2 - References</LI>
+	<LI>3 - Printing System Overview</LI>
+	<LI>4 - Printer Queue Management</LI>
+	<LI>5 - Printing System Management</LI>
+	<LI>A - Glossary</LI>
+</UL>
+
+<H1>Printing System Overview</H1>
+
+<H1>Printer Queue Management</H1>
+
+<H2>Adding Printers</H2>
+
+<H2>Removing Printers</H2>
+
+<H2>Reconfiguring Printers</H2>
+
+<H2>Printer Options</H2>
+
+<H2>Printer Security</H2>
+
+<H2>Printer Accounting</H2>
+
+<H1>Printing System Management</H1>
+
+<H2>Log Files</H2>
+
+<H2>Network Configuration</H2>
+
+<H2>Adding File Types</H2>
+
+</BODY>
+</HTML>

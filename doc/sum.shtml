@@ -1,0 +1,45 @@
+<HTML>
+<HEAD>
+	<META NAME="Description" CONTENT="Common UNIX Printing System Software Users Manual">
+	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SUM-1.0.0b1">
+	<META NAME="Author" CONTENT="Easy Software Products">
+	<TITLE>CUPS Software Users Manual</TITLE>
+</HEAD>
+<BODY>
+
+<H1>Scope</H1>
+
+<H2>Identification</H2>
+
+This software users manual describes how to use the Common UNIX Printing
+System ("CUPS") Version 1.0.0.
+
+<H2>Document Overview</H2>
+
+<P>This software users manual is organized into the following sections:</P>
+
+<UL>
+	<LI>1 - Scope</LI>
+	<LI>2 - References</LI>
+	<LI>3 - Printing System Overview</LI>
+	<LI>4 - Using the Printing System</LI>
+	<LI>A - Glossary</LI>
+</UL>
+
+<H1>Printing System Overview</H1>
+
+<P></P>
+
+<H1>Using the Printing System</H1>
+
+<H2>Choosing a Printer</H2>
+
+<H2>Setting Printer Options</H2>
+
+<H2>Submitting Files for Printing</H2>
+
+<H2>Checking the Printer Status</H2>
+
+</BODY>
+</HTML>

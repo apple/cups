@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.4 1999/05/11 21:00:09 mike Exp $"
+# "$Id: Makefile,v 1.5 1999/05/12 20:41:45 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,17 +28,19 @@ include ../Makedefs
 # HTMLDOC generation rules...
 #
 
-.SUFFIXES:	.html .pdf
-.html.pdf:
+.SUFFIXES:	.html .pdf .shtml
+.shtml.html:
+	htmldoc --title images/cups-large.gif --numbered -f $@ $<
+.shtml.pdf:
 	htmldoc --title images/cups-large.gif --duplex --compression=9 \
-		--jpeg -f $@ $<
+		--numbered --jpeg -f $@ $<
 
 #
 # Document files...
 #
 
-DOCUMENTS	=	cmp.html idd.html overview.html \
-			sam.html sdd.html ssr.html stp.html sum.html svd.html
+DOCUMENTS	=	cmp.shtml idd.shtml sam.shtml sdd.shtml ssr.shtml \
+			sum.shtml svd.shtml
 DOCIMAGES	=	images/navbar.gif
 WEBPAGES	=	cups.css cupsdoc.css index.html documentation.html
 WEBIMAGES	=	images/navbar.gif images/printer-idle.gif \
@@ -50,14 +52,16 @@ WEBIMAGES	=	images/navbar.gif images/printer-idle.gif \
 # Make all documents...
 #
 
-all:	$(DOCUMENTS:.html=.pdf)
+all:	$(DOCUMENTS:.shtml=.pdf) $(DOCUMENTS:.shtml=.html) overview.pdf
 
 #
 # Remove all generated files...
 #
 
 clean:
-	$(RM) $(DOCUMENTS:.html=.pdf)
+	$(RM) $(DOCUMENTS:.shtml=.pdf)
+	$(RM) $(DOCUMENTS:.shtml=.html)
+	$(RM) overview.pdf
 
 #
 # Install all documentation files...
@@ -66,18 +70,19 @@ clean:
 install:
 	-$(MKDIR) $(SERVERROOT)/doc
 	$(CP) $(WEBPAGES) $(SERVERROOT)/doc
-	$(CP) $(DOCUMENTS) $(SERVERROOT)/doc
-	$(CP) $(DOCUMENTS:.html=.pdf) $(SERVERROOT)/doc
+	$(CP) overview.html overview.pdf $(SERVERROOT)/doc
+	$(CP) $(DOCUMENTS:.shtml=.html) $(SERVERROOT)/doc
+	$(CP) $(DOCUMENTS:.shtml=.pdf) $(SERVERROOT)/doc
 	-$(MKDIR) $(SERVERROOT)/doc/images
 	$(CP) $(WEBIMAGES) $(SERVERROOT)/doc/images
 	$(CP) $(DOCIMAGES) $(SERVERROOT)/doc/images
 
 #
-# Make the overview whitepaper (special format).
+# The overview PDF file gets special attention...
 #
 
 overview.pdf:	overview.html
-	htmldoc --duplex --compression=9 -jpeg --webpage -f $@ $<
+	htmldoc --duplex --compression=9 --jpeg --webpage -f $@ $<
 
 #
 # End of Makefile.
