@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.11 1999/06/23 16:03:28 mike Exp $"
+ * "$Id: lpstat.c,v 1.12 1999/07/09 13:06:52 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -697,7 +697,7 @@ show_devices(http_t *http,	/* I - HTTP connection to server */
 	    attr->value_tag == IPP_TAG_NAME)
 	  printer = attr->values[0].string.text;
 
-        if (strcmp(attr->name, "printer-device-uri") == 0 &&
+        if (strcmp(attr->name, "device-uri") == 0 &&
 	    attr->value_tag == IPP_TAG_URI)
 	  device = attr->values[0].string.text;
 
@@ -1264,5 +1264,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.11 1999/06/23 16:03:28 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.12 1999/07/09 13:06:52 mike Exp $".
  */
