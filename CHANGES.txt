@@ -132,6 +132,9 @@ CHANGES IN CUPS v1.1.3
 	  the job attributes; this preserves the information
 	  after a job is completed when job file history is
 	  turned off.
+	- Dropped option sub-group parsing code for the moment,
+	  since many Xerox PPD files abuse this feature in PPD
+	  files and don't follow the hierarchy rules.
 
 
 CHANGES IN CUPS v1.1.2

@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.45 2000/07/18 16:56:11 mike Exp $"
+ * "$Id: ppd.c,v 1.46 2000/09/18 00:34:45 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -1028,45 +1028,6 @@ ppdOpen(FILE *fp)		/* I - File to read from */
     }
     else if (strcmp(keyword, "CloseGroup") == 0)
       group = NULL;
-    else if (strcmp(keyword, "OpenSubGroup") == 0)
-    {
-     /*
-      * Open a new sub-group...
-      */
-
-      DEBUG_printf(("group = %p, subgroup = %p\n", group, subgroup));
-
-      if (group == NULL || subgroup != NULL)
-      {
-        ppdClose(ppd);
-	safe_free(string);
-	return (NULL);
-      }
-
-      if (group->num_subgroups == 0)
-	subgroup = malloc(sizeof(ppd_group_t));
-      else
-	subgroup = realloc(group->subgroups,
-	                   (group->num_subgroups + 1) * sizeof(ppd_group_t));
-
-      if (subgroup == NULL)
-      {
-	ppdClose(ppd);
-	safe_free(string);
-	return (NULL);
-      }
-
-      group->subgroups = subgroup;
-      subgroup += group->num_subgroups;
-      group->num_subgroups ++;
-
-      memset(subgroup, 0, sizeof(ppd_group_t));
-      ppd_decode(string);
-      ppd_fix(string);
-      strncpy(subgroup->text, string, sizeof(subgroup->text) - 1);
-    }
-    else if (strcmp(keyword, "CloseSubGroup") == 0)
-      subgroup = NULL;
     else if (strcmp(keyword, "OrderDependency") == 0 ||
              strcmp(keyword, "NonUIOrderDependency") == 0)
     {
@@ -1900,5 +1861,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.45 2000/07/18 16:56:11 mike Exp $".
+ * End of "$Id: ppd.c,v 1.46 2000/09/18 00:34:45 mike Exp $".
  */
