@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20
 
+	- The ppdOpen() functions did not issue an error when a
+	  translation string exceeded the maximum allowed by the
+	  Adobe PPD specification (STR #399)
+	- The default landscape orientation was not the same as
+	  that defined in the PPD file (STR #397)
 	- Updated the pstoraster patch files and CUPS driver to
 	  work with Ghostscript 8 (STR #402)
 	- The hpgltops filter did not skip PJL commands (STR
