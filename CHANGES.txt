@@ -1,6 +1,14 @@
 CHANGES.txt - 05/22/2001
 ------------------------
 
+CHANGES IN CUPS V1.1.9
+
+	- Updated pstops filter to use strict handling of EPS
+	  files embedded in a PostScript document.  The %%EOF
+	  handling in 1.1.8 caused some dvips files not to
+	  print.
+
+
 CHANGES IN CUPS V1.1.8
 
 	- Updated configure script to check for /etc/pam.d and
