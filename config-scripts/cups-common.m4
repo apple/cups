@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.12.2.17 2003/04/18 12:33:56 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.12.2.18 2003/11/19 17:32:31 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -55,9 +55,9 @@ AC_PATH_PROG(HTMLDOC,htmldoc)
 AC_PATH_PROG(LN,ln)
 AC_PATH_PROG(MV,mv)
 AC_PATH_PROG(NROFF,nroff)
-if test "$NROFF" = ""; then
+if test "x$NROFF" = x; then
 	AC_PATH_PROG(GROFF,groff)
-	if test "$GROFF" = ""; then
+	if test "x$GROFF" = x; then
         	NROFF="echo"
 	else
         	NROFF="$GROFF -T ascii"
@@ -210,5 +210,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.12.2.17 2003/04/18 12:33:56 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.12.2.18 2003/11/19 17:32:31 mike Exp $".
 dnl
