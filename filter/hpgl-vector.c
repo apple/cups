@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-vector.c,v 1.6 1999/03/21 02:10:13 mike Exp $"
+ * "$Id: hpgl-vector.c,v 1.7 1999/03/21 21:12:18 mike Exp $"
  *
  *   HP-GL/2 vector routines for the Common UNIX Printing System (CUPS).
  *
@@ -32,11 +32,28 @@
 #include "hpgltops.h"
 
 
+/*
+ * Local functions...
+ */
+
+static double	decode_number(char **, int, double);
+static void	plot_points(int, param_t *);
+
+
+/*
+ * 'AA_arc_absolute()' - Draw an arc.
+ */
+
 void
-AA_arc_absolute(int num_params, param_t *params)
+AA_arc_absolute(int     num_params,	/* I - Number of parameters */
+                param_t *params)	/* I - Parameters */
 {
-  float x, y, dx, dy;
-  float start, end, theta, dt, radius;
+  float x, y,				/* Transformed coordinates */
+	dx, dy;				/* Distance from current pen */
+  float start, end,			/* Start and end angles */
+	theta,				/* Current angle */
+	dt,				/* Step between points */
+	radius;				/* Radius of arc */
 
 
   if (num_params < 3)
@@ -52,71 +69,71 @@ AA_arc_absolute(int num_params, param_t *params)
   dx = PenPosition[0] - x;
   dy = PenPosition[1] - y;
 
-  start = 180.0 * atan2(dy, dx) / M_PI;
+  start = (float)(180.0 * atan2(dy, dx) / M_PI);
   if (start < 0.0)
-    start += 360.0;
+    start += 360.0f;
 
   end    = start + params[2].value.number;
-  radius = hypot(dx, dy);
-
-#ifdef DEBUG
-  fprintf(OutputFile, "%%AA %.3f, %.3f, %.3f, %.1f\n",
-          params[0].value.number, params[1].value.number,
-	  params[2].value.number, num_params > 3 ? params[3].value.number : 5.0);
-  fprintf(OutputFile, "%% %.3f %.3f %.3f %.1f %.1f arc\n",
-          x, y, radius, start, end);
-#endif /* DEBUG */
+  radius = (float)hypot(dx, dy);
 
   if (PenDown)
   {
     if (num_params > 3 && params[3].value.number > 0.0)
-      dt = fabs(params[3].value.number);
+      dt = (float)fabs(params[3].value.number);
     else
       dt = 5.0;
 
     if (!PolygonMode)
-      fputs("MP\n", OutputFile);
+      Outputf("MP\n");
 
-    fprintf(OutputFile, "%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+    Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
 
     if (start < end)
       for (theta = start + dt; theta < end; theta += dt)
       {
-	PenPosition[0] = x + radius * cos(M_PI * theta / 180.0);
-	PenPosition[1] = y + radius * sin(M_PI * theta / 180.0);
+	PenPosition[0] = (float)(x + radius * cos(M_PI * theta / 180.0));
+	PenPosition[1] = (float)(y + radius * sin(M_PI * theta / 180.0));
 
-	fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
+	Outputf("%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
       }
     else
       for (theta = start - dt; theta > end; theta -= dt)
       {
-	PenPosition[0] = x + radius * cos(M_PI * theta / 180.0);
-	PenPosition[1] = y + radius * sin(M_PI * theta / 180.0);
+	PenPosition[0] = (float)(x + radius * cos(M_PI * theta / 180.0));
+	PenPosition[1] = (float)(y + radius * sin(M_PI * theta / 180.0));
 
-	fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
-      };
-  };
+	Outputf("%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
+      }
+  }
 
-  PenPosition[0] = x + radius * cos(M_PI * end / 180.0);
-  PenPosition[1] = y + radius * sin(M_PI * end / 180.0);
+  PenPosition[0] = (float)(x + radius * cos(M_PI * end / 180.0));
+  PenPosition[1] = (float)(y + radius * sin(M_PI * end / 180.0));
 
   if (PenDown)
   {
-    fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
+    Outputf("%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
 
     if (!PolygonMode)
-      fputs("ST\n", OutputFile);
-
-    PageDirty = 1;
-  };
+      Outputf("ST\n");
+  }
 }
 
 
+/*
+ * 'AR_arc_relative()' - Draw an arc relative to the current pen
+ *                       position.
+ */
+
 void
-AR_arc_relative(int num_params, param_t *params)
+AR_arc_relative(int     num_params,	/* I - Number of parameters */
+                param_t *params)	/* I - Parameters */
 {
-  float x, y, dx, dy;
-  float start, end, theta, dt, radius;
+  float x, y,				/* Transformed coordinates */
+	dx, dy;				/* Distance from current pen */
+  float start, end,			/* Start and end angles */
+	theta,				/* Current angle */
+	dt,				/* Step between points */
+	radius;				/* Radius of arc */
 
 
   if (num_params < 3)
@@ -132,68 +149,68 @@ AR_arc_relative(int num_params, param_t *params)
   dx = PenPosition[0] - x;
   dy = PenPosition[1] - y;
 
-  start = 180.0 * atan2(dy, dx) / M_PI;
+  start = (float)(180.0 * atan2(dy, dx) / M_PI);
   if (start < 0.0)
-    start += 360.0;
+    start += 360.0f;
 
   end    = start + params[2].value.number;
-  radius = hypot(dx, dy);
-
-#ifdef DEBUG
-  fprintf(OutputFile, "%%AA %.3f, %.3f, %.3f, %.1f\n",
-          params[0].value.number, params[1].value.number,
-	  params[2].value.number, num_params > 3 ? params[3].value.number : 5.0);
-  fprintf(OutputFile, "%% %.3f %.3f %.3f %.1f %.1f arc\n",
-          x, y, radius, start, end);
-#endif /* DEBUG */
+  radius = (float)hypot(dx, dy);
 
   if (PenDown)
   {
     if (num_params > 3 && params[3].value.number > 0.0)
-      dt = fabs(params[3].value.number);
+      dt = (float)fabs(params[3].value.number);
     else
       dt = 5.0;
 
     if (!PolygonMode)
-      fputs("MP\n", OutputFile);
+      Outputf("MP\n");
 
-    fprintf(OutputFile, "%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+    Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
 
     if (start < end)
       for (theta = start + dt; theta < end; theta += dt)
       {
-	PenPosition[0] = x + radius * cos(M_PI * theta / 180.0);
-	PenPosition[1] = y + radius * sin(M_PI * theta / 180.0);
+	PenPosition[0] = (float)(x + radius * cos(M_PI * theta / 180.0));
+	PenPosition[1] = (float)(y + radius * sin(M_PI * theta / 180.0));
 
-	fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
+	Outputf("%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
       }
     else
       for (theta = start - dt; theta > end; theta -= dt)
       {
-	PenPosition[0] = x + radius * cos(M_PI * theta / 180.0);
-	PenPosition[1] = y + radius * sin(M_PI * theta / 180.0);
+	PenPosition[0] = (float)(x + radius * cos(M_PI * theta / 180.0));
+	PenPosition[1] = (float)(y + radius * sin(M_PI * theta / 180.0));
 
-	fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
-      };
-  };
+	Outputf("%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
+      }
+  }
 
-  PenPosition[0] = x + radius * cos(M_PI * end / 180.0);
-  PenPosition[1] = y + radius * sin(M_PI * end / 180.0);
+  PenPosition[0] = (float)(x + radius * cos(M_PI * end / 180.0));
+  PenPosition[1] = (float)(y + radius * sin(M_PI * end / 180.0));
 
   if (PenDown)
   {
-    fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
+    Outputf("%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
 
     if (!PolygonMode)
-      fputs("ST\n", OutputFile);
-
-    PageDirty = 1;
-  };
+      Outputf("ST\n");
+  }
 }
 
 
+/*
+ * 'AT_arc_absolute3()' - Draw an arc using 3 points.
+ *
+ * Note:
+ *
+ *   Currently this only draws two line segments through the
+ *   specified points.
+ */
+
 void
-AT_arc_absolute3(int num_params, param_t *params)
+AT_arc_absolute3(int     num_params,	/* I - Number of parameters */
+                 param_t *params)	/* I - Parameters */
 {
   if (num_params < 4)
     return;
@@ -201,9 +218,9 @@ AT_arc_absolute3(int num_params, param_t *params)
   if (PenDown)
   {
     if (!PolygonMode)
-      fputs("MP\n", OutputFile);
+      Outputf("MP\n");
 
-    fprintf(OutputFile, "%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+    Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
 
     PenPosition[0] = Transform[0][0] * params[0].value.number +
                      Transform[0][1] * params[1].value.number +
@@ -212,8 +229,8 @@ AT_arc_absolute3(int num_params, param_t *params)
                      Transform[1][1] * params[1].value.number +
                      Transform[1][2];
 
-    fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
-  };
+    Outputf("%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
+  }
 
   PenPosition[0] = Transform[0][0] * params[2].value.number +
                    Transform[0][1] * params[3].value.number +
@@ -224,21 +241,26 @@ AT_arc_absolute3(int num_params, param_t *params)
 
   if (PenDown)
   {
-    fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
+    Outputf("%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
 
     if (!PolygonMode)
-      fputs("ST\n", OutputFile);
-
-    PageDirty = 1;
-  };
+      Outputf("ST\n");
+  }
 }
 
 
+/*
+ * 'CI_circle()' - Draw a circle.
+ */
+
 void
-CI_circle(int num_params, param_t *params)
+CI_circle(int     num_params,	/* I - Number of parameters */
+          param_t *params)	/* I - Parameters */
 {
-  float x, y;
-  float theta, dt, radius;
+  float x, y;			/* Transformed coordinates */
+  float theta,			/* Current angle */
+	dt,			/* Step between points */
+	radius;			/* Radius of circle */
 
 
   if (num_params < 1)
@@ -250,87 +272,38 @@ CI_circle(int num_params, param_t *params)
   radius = params[0].value.number;
 
   if (num_params > 1)
-    dt = fabs(params[1].value.number);
+    dt = (float)fabs(params[1].value.number);
   else
     dt = 5.0;
 
   if (!PolygonMode)
-    fputs("MP\n", OutputFile);
+    Outputf("MP\n");
 
   for (theta = 0.0; theta < 360.0; theta += dt)
   {
-    x = PenPosition[0] +
-        radius * cos(M_PI * theta / 180.0) * Transform[0][0] +
-        radius * sin(M_PI * theta / 180.0) * Transform[0][1];
-    y = PenPosition[1] +
-        radius * cos(M_PI * theta / 180.0) * Transform[1][0] +
-        radius * sin(M_PI * theta / 180.0) * Transform[1][1];
+    x = (float)(PenPosition[0] +
+                radius * cos(M_PI * theta / 180.0) * Transform[0][0] +
+                radius * sin(M_PI * theta / 180.0) * Transform[0][1]);
+    y = (float)(PenPosition[1] +
+                radius * cos(M_PI * theta / 180.0) * Transform[1][0] +
+                radius * sin(M_PI * theta / 180.0) * Transform[1][1]);
 
-    fprintf(OutputFile, "%.3f %.3f %s\n", x, y, theta == 0.0 ? "MO" : "LI");
-  };
+    Outputf("%.3f %.3f %s\n", x, y, theta == 0.0 ? "MO" : "LI");
+  }
 
-  fputs("CP\n", OutputFile);
+  Outputf("CP\n");
   if (!PolygonMode)
-    fputs("ST\n", OutputFile);
-
-  PageDirty = 1;
+    Outputf("ST\n");
 }
 
 
-static void
-plot_points(int num_params, param_t *params)
-{
-  int i;
-  float x, y;
-
-
-  if (PenDown)
-  {
-    if (!PolygonMode)
-      fputs("MP\n", OutputFile);
-    fprintf(OutputFile, "%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
-  };
-
-  for (i = 0; i < num_params; i += 2)
-  {
-    if (PenMotion == 0)
-    {
-      x = Transform[0][0] * params[i + 0].value.number +
-          Transform[0][1] * params[i + 1].value.number +
-          Transform[0][2];
-      y = Transform[1][0] * params[i + 0].value.number +
-          Transform[1][1] * params[i + 1].value.number +
-          Transform[1][2];
-    }
-    else
-    {
-      x = Transform[0][0] * params[i + 0].value.number +
-          Transform[0][1] * params[i + 1].value.number +
-          PenPosition[0];
-      y = Transform[1][0] * params[i + 0].value.number +
-          Transform[1][1] * params[i + 1].value.number +
-          PenPosition[1];
-    };
-
-    if (PenDown)
-      fprintf(OutputFile, "%.3f %.3f LI\n", x, y);
-
-    PenPosition[0] = x;
-    PenPosition[1] = y;
-  };
-
-  if (PenDown)
-  {
-    if (!PolygonMode)
-      fputs("ST\n", OutputFile);
-
-    PageDirty = 1;
-  };
-}
-
+/*
+ * 'PA_plot_absolute()' - Plot a line using absolute coordinates.
+ */
 
 void
-PA_plot_absolute(int num_params, param_t *params)
+PA_plot_absolute(int     num_params,	/* I - Number of parameters */
+                 param_t *params)	/* I - Parameters */
 {
   PenMotion = 0;
 
@@ -339,8 +312,13 @@ PA_plot_absolute(int num_params, param_t *params)
 }
 
 
+/*
+ * 'PD_pen_down()' - Start drawing.
+ */
+
 void
-PD_pen_down(int num_params, param_t *params)
+PD_pen_down(int     num_params,		/* I - Number of parameters */
+            param_t *params)		/* I - Parameters */
 {
   PenDown = 1;
 
@@ -349,133 +327,22 @@ PD_pen_down(int num_params, param_t *params)
 }
 
 
-static double
-decode_number(char **s, int base_bits, float frac_bits)
-{
-  double	temp,
-		shift;
-  int		sign;
-
-
-  sign = 0;
-
-  if (Verbosity > 2)
-    fprintf(stderr, "hpgl2ps: decode_number 0");
-
-  if (base_bits == 5)
-  {
-    for (temp = 0.0, shift = frac_bits * 0.5; **s != '\0'; (*s) ++)
-      if (**s >= 95 && **s < 127)
-      {
-        if (sign == 0)
-        {
-          if ((**s - 95) & 1)
-            sign = -1;
-          else
-            sign = 1;
-
-          temp += ((**s - 95) & ~1) * shift;
-        }
-        else
-          temp += (**s - 95) * shift;
-
-	if (Verbosity > 2)
-	  fprintf(stderr, " + %d(%c,%.1f) = %.2f\n", **s - 95, **s, shift, temp);
-        break;
-      }
-      else if (**s < 63)
-      {
-        if (**s != '\r' && **s != '\n')
-          fprintf(stderr, "hpgl2ps: Bad PE character \'%c\'!\n", **s);
-
-        continue;
-      }
-      else
-      {
-        if (sign == 0)
-        {
-          if ((**s - 63) & 1)
-            sign = -1;
-          else
-            sign = 1;
-
-          temp += ((**s - 63) & ~1) * shift;
-        }
-        else
-          temp += (**s - 63) * shift;
-
-	if (Verbosity > 2)
-	  fprintf(stderr, " + %d(%c,%.1f)", **s - 63, **s, shift);
-
-	shift *= 32.0;
-      };
-  }
-  else
-  {
-    for (temp = 0.0, shift = frac_bits * 0.5; **s != '\0'; (*s) ++)
-      if (**s >= 191 && **s < 255)
-      {
-        if (sign == 0)
-        {
-          if ((**s - 191) & 1)
-            sign = -1;
-          else
-            sign = 1;
-
-          temp += ((**s - 191) & ~1) * shift;
-        }
-        else
-          temp += (**s - 191) * shift;
-
-	if (Verbosity > 2)
-	  fprintf(stderr, " + %d(%c) = %.2f\n", **s - 191, **s, temp);
-        break;
-      }
-      else if (**s < 63)
-      {
-        if (**s != '\r' && **s != '\n')
-          fprintf(stderr, "hpgl2ps: Bad PE character \'%c\'!\n", **s);
-
-        continue;
-      }
-      else
-      {
-        if (sign == 0)
-        {
-          if ((**s - 63) & 1)
-            sign = -1;
-          else
-            sign = 1;
-
-          temp += ((**s - 63) & ~1) * shift;
-        }
-        else
-          temp += (**s - 63) * shift;
-
-	if (Verbosity > 2)
-	  fprintf(stderr, " + %d(%c) = %.2f\n", **s - 63, **s, temp);
-
-        shift *= 64.0;
-      };
-  };
-
-  (*s) ++;
-
-  return (temp * sign);
-}
-
+/*
+ * 'PE_polygon_encoded()' - Draw an encoded polyline.
+ */
 
 void
-PE_polyline_encoded(int num_params, param_t *params)
+PE_polyline_encoded(int     num_params,	/* I - Number of parameters */
+                    param_t *params)	/* I - Parameters */
 {
-  char		*s;
-  int		temp,
-		base_bits,
-		draw,
-		abscoords;
-  double	x, y,
-		tx, ty,
-		frac_bits;
+  char		*s;			/* Pointer into string */
+  int		temp,			/* Temporary value */
+		base_bits,		/* Data bits per byte */
+		draw,			/* Draw or move */
+		abscoords;		/* Use absolute coordinates */
+  double	tx, ty,			/* Transformed coordinates */
+		x, y,			/* Raw coordinates */
+		frac_bits;		/* Multiplier for encoded number */
 
 
   base_bits = 6;
@@ -488,12 +355,9 @@ PE_polyline_encoded(int num_params, param_t *params)
 
   if (!PolygonMode)
   {
-    fputs("MP\n", OutputFile);
-    fprintf(OutputFile, "%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
-  };
-
-  if (Verbosity > 1)
-    fprintf(stderr, "PE pm=%d\n", PolygonMode);
+    Outputf("MP\n");
+    Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+  }
 
   for (s = params[0].value.string; *s != '\0';)
     switch (*s)
@@ -504,21 +368,17 @@ PE_polyline_encoded(int num_params, param_t *params)
           break;
       case ':' :	/* Select pen */
           s ++;
-          temp = decode_number(&s, base_bits, 1.0);
-          fprintf(OutputFile, "P%d W%d\n", temp, temp);
+          temp = (int)decode_number(&s, base_bits, 1.0);
+          Outputf("P%d W%d\n", temp, temp);
           break;
       case '<' :	/* Next coords are a move-to */
           draw = 0;
           s ++;
-	  if (Verbosity > 1)
-	    fprintf(stderr, "    UP\n");
           break;
       case '>' :	/* Set fractional bits */
           s ++;
-          temp      = decode_number(&s, base_bits, 1.0);
+          temp      = (int)decode_number(&s, base_bits, 1.0);
           frac_bits = 1.0 / (1 << temp);
-          if (frac_bits != 1.0)
-            fprintf(stderr, "hpgl2ps: fracbits = %f\n", frac_bits);
           break;
       case '=' :	/* Next coords are absolute */
           s ++;
@@ -540,9 +400,6 @@ PE_polyline_encoded(int num_params, param_t *params)
         	   Transform[0][2];
 	      ty = Transform[1][0] * x + Transform[1][1] * y +
         	   Transform[1][2];
-
-	      if (Verbosity > 1)
-	        fprintf(stderr, "    A%.2f,%.2f -> %.2f,%.2f\n", x, y, tx, ty);
 	    }
 	    else if (x == 0.0 && y == 0.0)
 	    {
@@ -555,25 +412,15 @@ PE_polyline_encoded(int num_params, param_t *params)
         	   PenPosition[0];
 	      ty = Transform[1][0] * x + Transform[1][1] * y +
         	   PenPosition[1];
-
-	      if (Verbosity > 1)
-		fprintf(stderr, "    R%.2f,%.2f -> %.2f,%.2f\n", x, y, tx, ty);
-	    };
-
-#if 0
-            if (tx < 0.0 || ty < 0.0 || tx > PageWidth || ty > PageHeight)
-              fprintf(stderr, "hpgl2ps: Coordinate out of range - %.2f, %.2f!\n",
-                      tx, ty);
-            else
-#endif /* 0 */
+	    }
 
             if (draw)
-              fprintf(OutputFile, "%.3f %.3f LI\n", tx, ty);
+              Outputf("%.3f %.3f LI\n", tx, ty);
             else
-              fprintf(OutputFile, "%.3f %.3f MO\n", tx, ty);
+              Outputf("%.3f %.3f MO\n", tx, ty);
 
-	    PenPosition[0] = tx;
-	    PenPosition[1] = ty;
+	    PenPosition[0] = (float)tx;
+	    PenPosition[1] = (float)ty;
 
 	    draw           = 1;
 	    abscoords      = 0;
@@ -585,21 +432,24 @@ PE_polyline_encoded(int num_params, param_t *params)
             */
 
             if (*s != '\n' && *s != '\r')
-              fprintf(stderr, "hpgl2ps: ignoring illegal PE char \'%c\'...\n", *s);
+              fprintf(stderr, "WARNING: ignoring illegal PE char \'%c\'...\n", *s);
             s ++;
-          };
+          }
           break;
-    };
+    }
 
   if (!PolygonMode)
-    fputs("ST\n", OutputFile);
-
-  PageDirty = 1;
+    Outputf("ST\n");
 }
 
 
+/*
+ * 'PR_plot_relative()' - Plot a line using relative coordinates.
+ */
+
 void
-PR_plot_relative(int num_params, param_t *params)
+PR_plot_relative(int     num_params,	/* I - Number of parameters */
+                 param_t *params)	/* I - Parameters */
 {
   PenMotion = 1;
 
@@ -608,8 +458,13 @@ PR_plot_relative(int num_params, param_t *params)
 }
 
 
+/*
+ * 'PU_pen_up()' - Stop drawing.
+ */
+
 void
-PU_pen_up(int num_params, param_t *params)
+PU_pen_up(int     num_params,	/* I - Number of parameters */
+          param_t *params)	/* I - Parameters */
 {
   PenDown = 0;
 
@@ -618,8 +473,19 @@ PU_pen_up(int num_params, param_t *params)
 }
 
 
+/*
+ * 'RT_arc_relative3()' - Draw an arc through 3 points relative to the
+ *                        current pen position.
+ *
+ * Note:
+ *
+ *   This currently only draws two line segments through the specified
+ *   points.
+ */
+
 void
-RT_arc_relative3(int num_params, param_t *params)
+RT_arc_relative3(int     num_params,	/* I - Number of parameters */
+                 param_t *params)	/* I - Parameters */
 {
   if (num_params < 4)
     return;
@@ -627,9 +493,9 @@ RT_arc_relative3(int num_params, param_t *params)
   if (PenDown)
   {
     if (!PolygonMode)
-      fputs("MP\n", OutputFile);
+      Outputf("MP\n");
 
-    fprintf(OutputFile, "%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+    Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
 
     PenPosition[0] = Transform[0][0] * params[0].value.number +
                      Transform[0][1] * params[1].value.number +
@@ -638,8 +504,8 @@ RT_arc_relative3(int num_params, param_t *params)
                      Transform[1][1] * params[1].value.number +
                      PenPosition[1];
 
-    fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
-  };
+    Outputf("%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
+  }
 
   PenPosition[0] = Transform[0][0] * params[2].value.number +
                    Transform[0][1] * params[3].value.number +
@@ -650,16 +516,177 @@ RT_arc_relative3(int num_params, param_t *params)
 
   if (PenDown)
   {
-    fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
+    Outputf("%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
 
     if (!PolygonMode)
-      fputs("ST\n", OutputFile);
-
-    PageDirty = 1;
-  };
+      Outputf("ST\n");
+  }
 }
 
 
 /*
- * End of "$Id: hpgl-vector.c,v 1.6 1999/03/21 02:10:13 mike Exp $".
+ * 'decode_number()' - Decode an encoded number.
+ */
+
+static double			/* O - Value */
+decode_number(char   **s,	/* IO - String to decode */
+              int    base_bits,	/* I - Number of data bits per byte */
+	      double frac_bits)	/* I - Multiplier for fractional data */
+{
+  double	temp,		/* Current value */
+		shift;		/* Multiplier */
+  int		sign;		/* Sign of result */
+
+
+  sign = 0;
+
+  if (base_bits == 5)
+  {
+    for (temp = 0.0, shift = frac_bits * 0.5; **s != '\0'; (*s) ++)
+      if (**s >= 95 && **s < 127)
+      {
+        if (sign == 0)
+        {
+          if ((**s - 95) & 1)
+            sign = -1;
+          else
+            sign = 1;
+
+          temp += ((**s - 95) & ~1) * shift;
+        }
+        else
+          temp += (**s - 95) * shift;
+        break;
+      }
+      else if (**s < 63)
+      {
+        if (**s != '\r' && **s != '\n')
+          fprintf(stderr, "hpgl2ps: Bad PE character \'%c\'!\n", **s);
+
+        continue;
+      }
+      else
+      {
+        if (sign == 0)
+        {
+          if ((**s - 63) & 1)
+            sign = -1;
+          else
+            sign = 1;
+
+          temp += ((**s - 63) & ~1) * shift;
+        }
+        else
+          temp += (**s - 63) * shift;
+
+	shift *= 32.0;
+      }
+  }
+  else
+  {
+    for (temp = 0.0, shift = frac_bits * 0.5; **s != '\0'; (*s) ++)
+      if (**s >= 191 && **s < 255)
+      {
+        if (sign == 0)
+        {
+          if ((**s - 191) & 1)
+            sign = -1;
+          else
+            sign = 1;
+
+          temp += ((**s - 191) & ~1) * shift;
+        }
+        else
+          temp += (**s - 191) * shift;
+        break;
+      }
+      else if (**s < 63)
+      {
+        if (**s != '\r' && **s != '\n')
+          fprintf(stderr, "hpgl2ps: Bad PE character \'%c\'!\n", **s);
+
+        continue;
+      }
+      else
+      {
+        if (sign == 0)
+        {
+          if ((**s - 63) & 1)
+            sign = -1;
+          else
+            sign = 1;
+
+          temp += ((**s - 63) & ~1) * shift;
+        }
+        else
+          temp += (**s - 63) * shift;
+
+        shift *= 64.0;
+      }
+  }
+
+  (*s) ++;
+
+  return (temp * sign);
+}
+
+
+/*
+ * 'plot_points()' - Plot the specified points.
+ */
+
+static void
+plot_points(int     num_params,	/* I - Number of parameters */
+            param_t *params)	/* I - Parameters */
+{
+  int	i;			/* Looping var */
+  float	x, y;			/* Transformed coordinates */
+
+
+  if (PenDown)
+  {
+    if (!PolygonMode)
+      Outputf("MP\n");
+
+    Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+  }
+
+  for (i = 0; i < num_params; i += 2)
+  {
+    if (PenMotion == 0)
+    {
+      x = Transform[0][0] * params[i + 0].value.number +
+          Transform[0][1] * params[i + 1].value.number +
+          Transform[0][2];
+      y = Transform[1][0] * params[i + 0].value.number +
+          Transform[1][1] * params[i + 1].value.number +
+          Transform[1][2];
+    }
+    else
+    {
+      x = Transform[0][0] * params[i + 0].value.number +
+          Transform[0][1] * params[i + 1].value.number +
+          PenPosition[0];
+      y = Transform[1][0] * params[i + 0].value.number +
+          Transform[1][1] * params[i + 1].value.number +
+          PenPosition[1];
+    }
+
+    if (PenDown)
+      Outputf("%.3f %.3f LI\n", x, y);
+
+    PenPosition[0] = x;
+    PenPosition[1] = y;
+  }
+
+  if (PenDown)
+  {
+    if (!PolygonMode)
+      Outputf("ST\n");
+  }
+}
+
+
+/*
+ * End of "$Id: hpgl-vector.c,v 1.7 1999/03/21 21:12:18 mike Exp $".
  */

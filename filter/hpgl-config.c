@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.11 1999/03/21 16:26:58 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.12 1999/03/21 21:12:14 mike Exp $"
  *
  *   HP-GL/2 configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -43,8 +43,7 @@ update_transform(void)
 	height;		/* Plot height */
   float	page_width,	/* Actual page width in points */
 	page_length;	/* Actual page length in points */
-  float	scaling,	/* Scaling factor */
-	pen_scaling;	/* Pen width scaling factor */
+  float	scaling;	/* Scaling factor */
 
 
  /*
@@ -85,7 +84,7 @@ update_transform(void)
     }
   }
   else
-    scaling = 72.0 / 1016.0;
+    scaling = 72.0f / 1016.0f;
 
  /*
   * Generate a new transformation matrix...
@@ -135,7 +134,7 @@ update_transform(void)
     PenScaling = Transform[0][0] + Transform[0][1];
 
     if (PenScaling < 0.0)
-      PenScaling = -pen_scaling;
+      PenScaling = -PenScaling;
   }
   else
     PenScaling = 1.0;
@@ -228,8 +227,8 @@ IP_input_absolute(int     num_params,	/* I - Number of parameters */
   {
     P1[0] = 0.0;
     P1[1] = 0.0;
-    P2[0] = PlotSize[0] / 72.0 * 1016.0;
-    P2[1] = PlotSize[1] / 72.0 * 1016.0;
+    P2[0] = PlotSize[0] / 72.0f * 1016.0f;
+    P2[1] = PlotSize[1] / 72.0f * 1016.0f;
   }
   else if (num_params == 2)
   {
@@ -267,26 +266,26 @@ IR_input_relative(int     num_params,	/* I - Number of parameters */
 {
   if (num_params == 0)
   {
-    P1[0] = PageLeft / 72.0 * 1016.0;
-    P1[1] = PageBottom / 72.0 * 1016.0;
-    P2[0] = PageRight / 72.0 * 1016.0;
-    P2[1] = PageTop / 72.0 * 1016.0;
+    P1[0] = PageLeft / 72.0f * 1016.0f;
+    P1[1] = PageBottom / 72.0f * 1016.0f;
+    P2[0] = PageRight / 72.0f * 1016.0f;
+    P2[1] = PageTop / 72.0f * 1016.0f;
   }
   else if (num_params == 2)
   {
     P2[0] -= P1[0];
     P2[1] -= P1[1];
-    P1[0] = params[0].value.number * (PageRight - PageLeft) / 72.0 * 1016.0 / 100.0;
-    P1[1] = params[1].value.number * (PageTop - PageBottom) / 72.0 * 1016.0 / 100.0;
+    P1[0] = params[0].value.number * (PageRight - PageLeft) / 72.0f * 1016.0f / 100.0f;
+    P1[1] = params[1].value.number * (PageTop - PageBottom) / 72.0f * 1016.0f / 100.0f;
     P2[0] += P1[0];
     P2[1] += P1[1];
   }
   else if (num_params == 4)
   {
-    P1[0] = params[0].value.number * (PageRight - PageLeft) / 72.0 * 1016.0 / 100.0;
-    P1[1] = params[1].value.number * (PageTop - PageBottom) / 72.0 * 1016.0 / 100.0;
-    P2[0] = params[2].value.number * (PageRight - PageLeft) / 72.0 * 1016.0 / 100.0;
-    P2[1] = params[3].value.number * (PageTop - PageBottom) / 72.0 * 1016.0 / 100.0;
+    P1[0] = params[0].value.number * (PageRight - PageLeft) / 72.0f * 1016.0f / 100.0f;
+    P1[1] = params[1].value.number * (PageTop - PageBottom) / 72.0f * 1016.0f / 100.0f;
+    P2[0] = params[2].value.number * (PageRight - PageLeft) / 72.0f * 1016.0f / 100.0f;
+    P2[1] = params[3].value.number * (PageTop - PageBottom) / 72.0f * 1016.0f / 100.0f;
   }
 
   IW1[0] = P1[0];
@@ -359,31 +358,31 @@ PS_plot_size(int     num_params,	/* I - Number of parameters */
         * This is a hack for programs that assume a DesignJet's hard limits...
         */
 
-        PlotSize[0] = 72.0 * 36.0;
-        PlotSize[1] = 72.0 * 48.0;
+        PlotSize[0] = 72.0f * 36.0f;
+        PlotSize[1] = 72.0f * 48.0f;
         break;
     case 1 :
         if (Rotation == 0 || Rotation == 180)
         {
-          PlotSize[1] = 72.0 * params[0].value.number / 1016.0;
-          PlotSize[0] = 0.75 * PlotSize[1];
+          PlotSize[1] = 72.0f * params[0].value.number / 1016.0f;
+          PlotSize[0] = 0.75f * PlotSize[1];
         }
         else
         {
-          PlotSize[0] = 72.0 * params[0].value.number / 1016.0;
-          PlotSize[1] = 0.75 * PlotSize[0];
+          PlotSize[0] = 72.0f * params[0].value.number / 1016.0f;
+          PlotSize[1] = 0.75f * PlotSize[0];
         }
         break;
     case 2 :
         if (Rotation == 0 || Rotation == 180)
         {
-          PlotSize[0] = 72.0 * params[1].value.number / 1016.0;
-          PlotSize[1] = 72.0 * params[0].value.number / 1016.0;
+          PlotSize[0] = 72.0f * params[1].value.number / 1016.0f;
+          PlotSize[1] = 72.0f * params[0].value.number / 1016.0f;
         }
         else
         {
-          PlotSize[0] = 72.0 * params[0].value.number / 1016.0;
-          PlotSize[1] = 72.0 * params[1].value.number / 1016.0;
+          PlotSize[0] = 72.0f * params[0].value.number / 1016.0f;
+          PlotSize[1] = 72.0f * params[1].value.number / 1016.0f;
         }
         break;
   }
@@ -407,7 +406,7 @@ RO_rotate(int     num_params,	/* I - Number of parameters */
   if (num_params == 0)
     Rotation = 0;
   else
-    Rotation = params[0].value.number;
+    Rotation = (int)params[0].value.number;
 
   update_transform();
 }
@@ -444,7 +443,7 @@ SC_scale(int     num_params,	/* I - Number of parameters */
     Scaling2[1] = params[3].value.number;
 
     if (num_params > 4)
-      ScalingType = params[4].value.number;
+      ScalingType = (int)params[4].value.number;
     else
       ScalingType = 0;
   }
@@ -454,5 +453,5 @@ SC_scale(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.11 1999/03/21 16:26:58 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.12 1999/03/21 21:12:14 mike Exp $".
  */

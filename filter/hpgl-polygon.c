@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-polygon.c,v 1.5 1999/03/21 02:10:13 mike Exp $"
+ * "$Id: hpgl-polygon.c,v 1.6 1999/03/21 21:12:18 mike Exp $"
  *
  *   HP-GL/2 polygon routines for the Common UNIX Printing System (CUPS).
  *
@@ -32,10 +32,15 @@
 #include "hpgltops.h"
 
 
+/*
+ * 'EA_edge_rect_absolute()' - Draw a rectangle.
+ */
+
 void
-EA_edge_rect_absolute(int num_params, param_t *params)
+EA_edge_rect_absolute(int     num_params,	/* I - Number of parameters */
+                      param_t *params)		/* I - Parameters */
 {
-  float x, y;
+  float	x, y;		/* Transformed coordinates */
 
 
   if (num_params < 2)
@@ -49,34 +54,44 @@ EA_edge_rect_absolute(int num_params, param_t *params)
       Transform[1][2];
 
   if (!PolygonMode)
-    fputs("MP\n", OutputFile);
+    Outputf("MP\n");
 
-  fprintf(OutputFile, "%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
-  fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], y);
-  fprintf(OutputFile, "%.3f %.3f LI\n", x, y);
-  fprintf(OutputFile, "%.3f %.3f LI\n", x, PenPosition[1]);
+  Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+  Outputf("%.3f %.3f LI\n", PenPosition[0], y);
+  Outputf("%.3f %.3f LI\n", x, y);
+  Outputf("%.3f %.3f LI\n", x, PenPosition[1]);
 
-  fputs("CP\n", OutputFile);
+  Outputf("CP\n");
   if (!PolygonMode)
-    fputs("ST\n", OutputFile);
-
-  PageDirty = 1;
+    Outputf("ST\n");
 }
 
 
-void
-EP_edge_polygon(int num_params, param_t *params)
-{
-  fputs("ST\n", OutputFile);
+/*
+ * 'EP_edge_polygon()' - Stroke the edges of a polygon.
+ */
 
-  PageDirty = 1;
+void
+EP_edge_polygon(int     num_params,	/* I - Number of parameters */
+                param_t *params)	/* I - Parameters */
+{
+  (void)num_params;
+  (void)params;
+
+  Outputf("ST\n");
 }
 
 
+/*
+ * 'ER_edge_rect_relative()' - Draw a rectangle relative to the current
+ *                             pen position.
+ */
+
 void
-ER_edge_rect_relative(int num_params, param_t *params)
+ER_edge_rect_relative(int     num_params,	/* I - Number of parameters */
+                      param_t *params)		/* I - Parameters */
 {
-  float x, y;
+  float x, y;		/* Transformed coordinates */
 
 
   if (num_params < 2)
@@ -90,26 +105,32 @@ ER_edge_rect_relative(int num_params, param_t *params)
       PenPosition[1];
 
   if (!PolygonMode)
-    fputs("MP\n", OutputFile);
+    Outputf("MP\n");
 
-  fprintf(OutputFile, "%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
-  fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], y);
-  fprintf(OutputFile, "%.3f %.3f LI\n", x, y);
-  fprintf(OutputFile, "%.3f %.3f LI\n", x, PenPosition[1]);
+  Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+  Outputf("%.3f %.3f LI\n", PenPosition[0], y);
+  Outputf("%.3f %.3f LI\n", x, y);
+  Outputf("%.3f %.3f LI\n", x, PenPosition[1]);
 
-  fputs("CP\n", OutputFile);
+  Outputf("CP\n");
   if (!PolygonMode)
-    fputs("ST\n", OutputFile);
-
-  PageDirty = 1;
+    Outputf("ST\n");
 }
 
 
+/*
+ * 'EW_edge_wedge()' - Draw a pie wedge.
+ */
+
 void
-EW_edge_wedge(int num_params, param_t *params)
+EW_edge_wedge(int     num_params,	/* I - Number of parameters */
+              param_t *params)		/* I - Parameters */
 {
-  float x, y;
-  float start, end, theta, dt, radius;
+  float x, y;				/* Transformed coordinates */
+  float start, end,			/* Start and end of arc */
+	theta,				/* Current angle */
+	dt,				/* Step between points */
+	radius;				/* Radius of arc */
 
 
   if (num_params < 3)
@@ -120,73 +141,82 @@ EW_edge_wedge(int num_params, param_t *params)
   end    = start + params[2].value.number;
 
   if (num_params > 3)
-    dt = fabs(params[3].value.number);
+    dt = (float)fabs(params[3].value.number);
   else
-    dt = 5.0;
+    dt = 5.0f;
 
   if (!PolygonMode)
-    fputs("MP\n", OutputFile);
+    Outputf("MP\n");
 
-  fprintf(OutputFile, "%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+  Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
 
   if (start < end)
     for (theta = start + dt; theta < end; theta += dt)
     {
-      x = PenPosition[0] +
-          radius * cos(M_PI * theta / 180.0) * Transform[0][0] +
-          radius * sin(M_PI * theta / 180.0) * Transform[0][1];
-      y = PenPosition[1] +
-          radius * cos(M_PI * theta / 180.0) * Transform[1][0] +
-          radius * sin(M_PI * theta / 180.0) * Transform[1][1];
+      x = (float)(PenPosition[0] +
+                  radius * cos(M_PI * theta / 180.0) * Transform[0][0] +
+                  radius * sin(M_PI * theta / 180.0) * Transform[0][1]);
+      y = (float)(PenPosition[1] +
+                  radius * cos(M_PI * theta / 180.0) * Transform[1][0] +
+                  radius * sin(M_PI * theta / 180.0) * Transform[1][1]);
 
-      fprintf(OutputFile, "%.3f %.3f LI\n", x, y);
+      Outputf("%.3f %.3f LI\n", x, y);
     }
   else
     for (theta = start - dt; theta > end; theta -= dt)
     {
-      x = PenPosition[0] +
-          radius * cos(M_PI * theta / 180.0) * Transform[0][0] +
-          radius * sin(M_PI * theta / 180.0) * Transform[0][1];
-      y = PenPosition[1] +
-          radius * cos(M_PI * theta / 180.0) * Transform[1][0] +
-          radius * sin(M_PI * theta / 180.0) * Transform[1][1];
+      x = (float)(PenPosition[0] +
+                  radius * cos(M_PI * theta / 180.0) * Transform[0][0] +
+                  radius * sin(M_PI * theta / 180.0) * Transform[0][1]);
+      y = (float)(PenPosition[1] +
+                  radius * cos(M_PI * theta / 180.0) * Transform[1][0] +
+                  radius * sin(M_PI * theta / 180.0) * Transform[1][1]);
 
-      fprintf(OutputFile, "%.3f %.3f LI\n", x, y);
-    };
+      Outputf("%.3f %.3f LI\n", x, y);
+    }
 
-  x = PenPosition[0] +
-      radius * cos(M_PI * end / 180.0) * Transform[0][0] +
-      radius * sin(M_PI * end / 180.0) * Transform[0][1];
-  y = PenPosition[1] +
-      radius * cos(M_PI * end / 180.0) * Transform[1][0] +
-      radius * sin(M_PI * end / 180.0) * Transform[1][1];
-  fprintf(OutputFile, "%.3f %.3f LI\n", x, y);
+  x = (float)(PenPosition[0] +
+              radius * cos(M_PI * end / 180.0) * Transform[0][0] +
+              radius * sin(M_PI * end / 180.0) * Transform[0][1]);
+  y = (float)(PenPosition[1] +
+              radius * cos(M_PI * end / 180.0) * Transform[1][0] +
+              radius * sin(M_PI * end / 180.0) * Transform[1][1]);
+  Outputf("%.3f %.3f LI\n", x, y);
 
-  fputs("CP\n", OutputFile);
+  Outputf("CP\n");
   if (!PolygonMode)
-    fputs("ST\n", OutputFile);
-
-  PageDirty = 1;
+    Outputf("ST\n");
 }
 
 
+/*
+ * 'FP_fill_polygon()' - Fill a polygon.
+ */
+
 void
-FP_fill_polygon(int num_params, param_t *params)
+FP_fill_polygon(int     num_params,	/* I - Number of parameters */
+                param_t *params)	/* I - Parameters */
 {
-  fputs("FI\n", OutputFile);
+  (void)num_params;
+  (void)params;
 
-  PageDirty = 1;
+  Outputf("FI\n");
 }
 
 
+/*
+ * 'PM_polygon_mode()' - Set the polygon drawing mode.
+ */
+
 void
-PM_polygon_mode(int num_params, param_t *params)
+PM_polygon_mode(int     num_params,	/* I - Number of parameters */
+                param_t *params)	/* I - Parameters */
 {
   if (num_params == 0 ||
       params[0].value.number == 0)
   {
-    fputs("MP\n", OutputFile);
-    fprintf(OutputFile, "%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+    Outputf("MP\n");
+    Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
     PolygonMode = 1;
   }
   else if (params[0].value.number == 2)
@@ -194,10 +224,15 @@ PM_polygon_mode(int num_params, param_t *params)
 }
 
 
+/*
+ * 'RA_fill_rect_absolute()' - Fill a rectangle.
+ */
+
 void
-RA_fill_rect_absolute(int num_params, param_t *params)
+RA_fill_rect_absolute(int     num_params,	/* I - Number of parameters */
+                      param_t *params)		/* I - Parameters */
 {
-  float x, y;
+  float x, y;			/* Transformed coordinates */
 
 
   if (num_params < 2)
@@ -211,25 +246,29 @@ RA_fill_rect_absolute(int num_params, param_t *params)
       Transform[1][2];
 
   if (!PolygonMode)
-    fputs("MP\n", OutputFile);
+    Outputf("MP\n");
 
-  fprintf(OutputFile, "%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
-  fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], y);
-  fprintf(OutputFile, "%.3f %.3f LI\n", x, y);
-  fprintf(OutputFile, "%.3f %.3f LI\n", x, PenPosition[1]);
+  Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+  Outputf("%.3f %.3f LI\n", PenPosition[0], y);
+  Outputf("%.3f %.3f LI\n", x, y);
+  Outputf("%.3f %.3f LI\n", x, PenPosition[1]);
 
-  fputs("CP\n", OutputFile);
+  Outputf("CP\n");
   if (!PolygonMode)
-    fputs("FI\n", OutputFile);
-
-  PageDirty = 1;
+    Outputf("FI\n");
 }
 
 
+/*
+ * 'RR_fill_rect_relative()' - Fill a rectangle relative to the current
+ *                             pen position.
+ */
+
 void
-RR_fill_rect_relative(int num_params, param_t *params)
+RR_fill_rect_relative(int     num_params,	/* I - Number of parameters */
+                      param_t *params)		/* I - Parameters */
 {
-  float x, y;
+  float x, y;			/* Transformed coordinates */
 
 
   if (num_params < 2)
@@ -243,26 +282,32 @@ RR_fill_rect_relative(int num_params, param_t *params)
       PenPosition[1];
 
   if (!PolygonMode)
-    fputs("MP\n", OutputFile);
+    Outputf("MP\n");
 
-  fprintf(OutputFile, "%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
-  fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], y);
-  fprintf(OutputFile, "%.3f %.3f LI\n", x, y);
-  fprintf(OutputFile, "%.3f %.3f LI\n", x, PenPosition[1]);
+  Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+  Outputf("%.3f %.3f LI\n", PenPosition[0], y);
+  Outputf("%.3f %.3f LI\n", x, y);
+  Outputf("%.3f %.3f LI\n", x, PenPosition[1]);
 
-  fputs("CP\n", OutputFile);
+  Outputf("CP\n");
   if (!PolygonMode)
-    fputs("FI\n", OutputFile);
-
-  PageDirty = 1;
+    Outputf("FI\n");
 }
 
 
+/*
+ * 'WG_fill_wedge()' - Fill a pie wedge.
+ */
+
 void
-WG_fill_wedge(int num_params, param_t *params)
+WG_fill_wedge(int     num_params,	/* I - Number of parameters */
+              param_t *params)		/* I - Parameters */
 {
-  float x, y;
-  float start, end, theta, dt, radius;
+  float x, y;				/* Transformed coordinates */
+  float start, end,			/* Start and end angles */
+	theta,				/* Current angle */
+	dt,				/* Step between points */
+	radius;				/* Radius of arc */
 
 
   if (num_params < 3)
@@ -273,56 +318,54 @@ WG_fill_wedge(int num_params, param_t *params)
   end    = start + params[2].value.number;
 
   if (num_params > 3)
-    dt = fabs(params[3].value.number);
+    dt = (float)fabs(params[3].value.number);
   else
     dt = 5.0;
 
   if (!PolygonMode)
-    fputs("MP\n", OutputFile);
+    Outputf("MP\n");
 
-  fprintf(OutputFile, "%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+  Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
 
   if (start < end)
     for (theta = start + dt; theta < end; theta += dt)
     {
-      x = PenPosition[0] +
-          radius * cos(M_PI * theta / 180.0) * Transform[0][0] +
-          radius * sin(M_PI * theta / 180.0) * Transform[0][1];
-      y = PenPosition[1] +
-          radius * cos(M_PI * theta / 180.0) * Transform[1][0] +
-          radius * sin(M_PI * theta / 180.0) * Transform[1][1];
+      x = (float)(PenPosition[0] +
+                  radius * cos(M_PI * theta / 180.0) * Transform[0][0] +
+                  radius * sin(M_PI * theta / 180.0) * Transform[0][1]);
+      y = (float)(PenPosition[1] +
+                  radius * cos(M_PI * theta / 180.0) * Transform[1][0] +
+                  radius * sin(M_PI * theta / 180.0) * Transform[1][1]);
 
-      fprintf(OutputFile, "%.3f %.3f LI\n", x, y);
+      Outputf("%.3f %.3f LI\n", x, y);
     }
   else
     for (theta = start - dt; theta > end; theta -= dt)
     {
-      x = PenPosition[0] +
-          radius * cos(M_PI * theta / 180.0) * Transform[0][0] +
-          radius * sin(M_PI * theta / 180.0) * Transform[0][1];
-      y = PenPosition[1] +
-          radius * cos(M_PI * theta / 180.0) * Transform[1][0] +
-          radius * sin(M_PI * theta / 180.0) * Transform[1][1];
+      x = (float)(PenPosition[0] +
+                  radius * cos(M_PI * theta / 180.0) * Transform[0][0] +
+                  radius * sin(M_PI * theta / 180.0) * Transform[0][1]);
+      y = (float)(PenPosition[1] +
+                  radius * cos(M_PI * theta / 180.0) * Transform[1][0] +
+                  radius * sin(M_PI * theta / 180.0) * Transform[1][1]);
 
-      fprintf(OutputFile, "%.3f %.3f LI\n", x, y);
-    };
+      Outputf("%.3f %.3f LI\n", x, y);
+    }
 
-  x = PenPosition[0] +
-      radius * cos(M_PI * end / 180.0) * Transform[0][0] +
-      radius * sin(M_PI * end / 180.0) * Transform[0][1];
-  y = PenPosition[1] +
-      radius * cos(M_PI * end / 180.0) * Transform[1][0] +
-      radius * sin(M_PI * end / 180.0) * Transform[1][1];
-  fprintf(OutputFile, "%.3f %.3f LI\n", x, y);
+  x = (float)(PenPosition[0] +
+              radius * cos(M_PI * end / 180.0) * Transform[0][0] +
+              radius * sin(M_PI * end / 180.0) * Transform[0][1]);
+  y = (float)(PenPosition[1] +
+              radius * cos(M_PI * end / 180.0) * Transform[1][0] +
+              radius * sin(M_PI * end / 180.0) * Transform[1][1]);
+  Outputf("%.3f %.3f LI\n", x, y);
 
-  fputs("CP\n", OutputFile);
+  Outputf("CP\n");
   if (!PolygonMode)
-    fputs("FI\n", OutputFile);
-
-  PageDirty = 1;
+    Outputf("FI\n");
 }
 
 
 /*
- * End of "$Id: hpgl-polygon.c,v 1.5 1999/03/21 02:10:13 mike Exp $".
+ * End of "$Id: hpgl-polygon.c,v 1.6 1999/03/21 21:12:18 mike Exp $".
  */

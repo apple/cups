@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-input.c,v 1.5 1999/03/21 02:10:11 mike Exp $"
+ * "$Id: hpgl-input.c,v 1.6 1999/03/21 21:12:17 mike Exp $"
  *
  *   HP-GL/2 input processing for the Common UNIX Printing System (CUPS).
  *
@@ -40,20 +40,20 @@
 /*
  * 'ParseCommand()' - Parse an HPGL/2 command.
  *
- * Returns the number of parameters seen.
+ * Returns the number of parameters seen or -1 on EOF.
  */
 
-int
-ParseCommand(char    *name,	/* O - Name of command */
+int				/* O - -1 on EOF, # params otherwise */
+ParseCommand(FILE    *fp,	/* I - File to read from */
+             char    *name,	/* O - Name of command */
              param_t **params)	/* O - Parameter list */
 {
-  int	num_params,	/* Number of parameters seen */
-	ch,		/* Current char */
-	done;		/* Non-zero when the current command is read */
-  int	i;		/* Looping var */
-  char	buf[262144];	/* String buffer */
-  static param_t	p[MAX_PARAMS];
-  			/* Parameter buffer */
+  int		num_params,	/* Number of parameters seen */
+		ch,		/* Current char */
+		done,		/* Non-zero when the current command is read */
+		i;		/* Looping var */
+  char		buf[262144];	/* String buffer */
+  static param_t p[MAX_PARAMS];	/* Parameter buffer */
 
 
   num_params = 0;
@@ -61,7 +61,7 @@ ParseCommand(char    *name,	/* O - Name of command */
 
   do
   {
-    while ((ch = getc(InputFile)) != EOF)
+    while ((ch = getc(fp)) != EOF)
       if (strchr(" \t\r\n,;", ch) == NULL)
         break;
 
@@ -69,88 +69,89 @@ ParseCommand(char    *name,	/* O - Name of command */
       return (-1);
 
     if (ch == 0x1b)
-      switch (getc(InputFile))
+      switch (getc(fp))
       {
-        case '.' : /* HPGL/2 job control */
-            i = getc(InputFile);
+        case '.' : /* HP-GL/2 job control */
+            i = getc(fp);
+
             if (strchr(")Z", i) != NULL)
             {
              /*
               * 'Printer Off' command - look for next 'Printer On' command...
               */
+
               while (1)
               {
-                while ((i = getc(InputFile)) != EOF &&
-                       i != 0x1b);
+                while ((i = getc(fp)) != EOF && i != 0x1b);
+
                 if (i == EOF)
                   return (-1);
 
-                if (getc(InputFile) != '.')
+                if (getc(fp) != '.')
                   continue;
-                if ((i = getc(InputFile)) == '(' ||
+
+                if ((i = getc(fp)) == '(' ||
                     i == 'Y')
                   break;
-              };
+              }
             }
             else if (strchr("@HIMNTI\003", i) != NULL)
             {
-              while ((i = getc(InputFile)) != EOF &&
-                     i != ':');
-            };
+              while ((i = getc(fp)) != EOF && i != ':');
+            }
             break;
 
         default : /* HP RTL/PCL control */
-            while ((i = getc(InputFile)) != EOF &&
-                   !isupper(i));
+            while ((i = getc(fp)) != EOF && !isupper(i));
             break;
-      };
+      }
   } while (ch == 0x1b);
 
   name[0] = ch;
-  name[1] = getc(InputFile);
+  name[1] = getc(fp);
   name[2] = '\0';
 
   if (strcasecmp(name, "LB") == 0)
   {
-    for (i = 0; (ch = getc(InputFile)) != StringTerminator; i ++)
+    for (i = 0; (ch = getc(fp)) != StringTerminator; i ++)
       buf[i] = ch;
     buf[i] = '\0';
-    p[num_params].type = PARAM_STRING;
+    p[num_params].type         = PARAM_STRING;
     p[num_params].value.string = strdup(buf);
     num_params ++;
   }
   else if (strcasecmp(name, "SM") == 0)
   {
-    buf[0] = getc(InputFile);
+    buf[0] = getc(fp);
     buf[1] = '\0';
-    p[num_params].type = PARAM_STRING;
+    p[num_params].type         = PARAM_STRING;
     p[num_params].value.string = strdup(buf);
     num_params ++;
   }
   else if (strcasecmp(name, "DT") == 0)
   {
-    if ((buf[0] = getc(InputFile)) != ';')
+    if ((buf[0] = getc(fp)) != ';')
     {
       buf[1] = '\0';
-      p[num_params].type = PARAM_STRING;
+      p[num_params].type         = PARAM_STRING;
       p[num_params].value.string = strdup(buf);
       num_params ++;
-    };
+    }
   }
   else if (strcasecmp(name, "PE") == 0)
   {
     for (i = 0; i < (sizeof(buf) - 1); i ++)
-      if ((buf[i] = getc(InputFile)) == ';')
+      if ((buf[i] = getc(fp)) == ';')
         break;
 
     buf[i] = '\0';
-    p[num_params].type = PARAM_STRING;
+    p[num_params].type         = PARAM_STRING;
     p[num_params].value.string = strdup(buf);
     num_params ++;
-  };
+  }
 
   while (!done)
-    switch (ch = getc(InputFile))
+    switch (ch = getc(fp))
     {
       case ',' :
       case ' ' :
@@ -160,10 +161,10 @@ ParseCommand(char    *name,	/* O - Name of command */
           break;
 
       case '\"' :
-          fscanf(InputFile, "%[^\"]\"", buf);
+          fscanf(fp, "%[^\"]\"", buf);
           if (num_params < MAX_PARAMS)
           {
-            p[num_params].type = PARAM_STRING;
+            p[num_params].type         = PARAM_STRING;
             p[num_params].value.string = strdup(buf);
             num_params ++;
           };
@@ -171,13 +172,13 @@ ParseCommand(char    *name,	/* O - Name of command */
 
       case '-' :
       case '+' :
-          ungetc(ch, InputFile);
-          fscanf(InputFile, "%f", &(p[num_params].value.number));
+          ungetc(ch, fp);
+          fscanf(fp, "%f", &(p[num_params].value.number));
           if (num_params < MAX_PARAMS)
           {
             p[num_params].type = PARAM_RELATIVE;
             num_params ++;
-          };
+          }
           break;
       case '0' :
       case '1' :
@@ -190,19 +191,19 @@ ParseCommand(char    *name,	/* O - Name of command */
       case '8' :
       case '9' :
       case '.' :
-          ungetc(ch, InputFile);
-          fscanf(InputFile, "%f", &(p[num_params].value.number));
+          ungetc(ch, fp);
+          fscanf(fp, "%f", &(p[num_params].value.number));
           if (num_params < MAX_PARAMS)
           {
             p[num_params].type = PARAM_ABSOLUTE;
             num_params ++;
-          };
+          }
           break;
       default :
-          ungetc(ch, InputFile);
+          ungetc(ch, fp);
           done = 1;
           break;
-    };
+    }
 
   *params = p;
   return (num_params);
@@ -214,10 +215,10 @@ ParseCommand(char    *name,	/* O - Name of command */
  */
 
 void
-FreeParameters(int     num_params, /* I - Number of parameters */
-               param_t *params)    /* I - Parameter values */
+FreeParameters(int     num_params,	/* I - Number of parameters */
+               param_t *params)		/* I - Parameter values */
 {
-  int i;	/* Looping var */
+  int	i;				/* Looping var */
 
 
   for (i = 0; i < num_params; i ++)
@@ -227,5 +228,5 @@ FreeParameters(int     num_params, /* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-input.c,v 1.5 1999/03/21 02:10:11 mike Exp $".
+ * End of "$Id: hpgl-input.c,v 1.6 1999/03/21 21:12:17 mike Exp $".
  */

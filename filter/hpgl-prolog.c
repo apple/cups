@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.8 1999/03/21 02:10:13 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.9 1999/03/21 21:12:18 mike Exp $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
@@ -58,9 +58,10 @@ OutputProlog(char  *title,	/* I - Job title */
   curtm   = localtime(&curtime);
 
   puts("%!PS-Adobe-3.0");
-  puts("%%Creator: hpgltops/CUPS-" CUPS_VERSION "");
-  strftime(line, sizeof(line), "%%%%CreationDate: %c\n", curtm);
-  puts(line, OutputFile);
+  puts("%%Creator: hpgltops/CUPS-" CUPS_SVERSION);
+  printf("%%%%Title: %s\n", title);
+  strftime(line, sizeof(line), "%%%%CreationDate: %c", curtm);
+  puts(line);
   printf("%%LanguageLevel: %d\n", LanguageLevel);
   puts("%%Pages: (atend)");
   printf("%%%%BoundingBox: %.0f %.0f %.0f %.0f\n",
@@ -69,16 +70,10 @@ OutputProlog(char  *title,	/* I - Job title */
   puts("%%EndComments");
   puts("%%BeginProlog");
   printf("/DefaultPenWidth %.2f def\n", penwidth * 72.0 / 25.4);
-  switch (shading)
-  {
-    case -1 : /* Black only */
-        puts("/setrgbcolor { pop pop pop } bind def");
-        break;
-    case 0 : /* Greyscale */
-        puts("/setrgbcolor { 0.08 mul exch 0.61 mul add exch 0.31 mul add setgray } bind def\n",
-              OutputFile);
-        break;
-  };
+  if (!shading)			/* Black only */
+    puts("/setrgbcolor { pop pop pop } bind def");
+  else if (!ColorDevice)	/* Greyscale */
+    puts("/setrgbcolor { 0.08 mul exch 0.61 mul add exch 0.31 mul add setgray } bind def\n");
 
   if ((server_root = getenv("SERVER_ROOT")) != NULL)
     sprintf(filename, "%s/filter/HPGLprolog.dat", server_root);
@@ -89,11 +84,11 @@ OutputProlog(char  *title,	/* I - Job title */
   {
     fprintf(stderr, "ERROR: Unable to open HPGL prolog \"%s\" for reading!\n",
             filename);
-    return (1);
+    exit(1);
   }
 
   while (fgets(line, sizeof(line), prolog) != NULL)
-    puts(line, OutputFile);
+    fputs(line, stdout);
 
   fclose(prolog);
 
@@ -178,5 +173,5 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.8 1999/03/21 02:10:13 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.9 1999/03/21 21:12:18 mike Exp $".
  */

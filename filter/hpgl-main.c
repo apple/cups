@@ -1,7 +1,7 @@
 /*
- * "$Id: hpgl-main.c,v 1.7 1999/03/21 02:10:12 mike Exp $"
+ * "$Id: hpgl-main.c,v 1.8 1999/03/21 21:12:17 mike Exp $"
  *
- *   Main entry for HP-GL/2 filter for the Common UNIX Printing System (CUPS).
+ *   HP-GL/2 filter main entry for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1993-1999 by Easy Software Products.
  *
@@ -23,6 +23,8 @@
  *
  * Contents:
  *
+ *   main()          - Main entry for HP-GL/2 filter.
+ *   compare_names() - Compare two command names.
  */
 
 /*
@@ -34,10 +36,14 @@
 #include "hpgltops.h"
 
 
+/*
+ * HP-GL/2 command table...
+ */
+
 typedef struct
 {
-  char name[4];
-  void (*func)(int, param_t *);
+  char	name[4];			/* Name of command */
+  void	(*func)(int, param_t *);	/* Function to call */
 } name_t;
 
 static name_t commands[] =
@@ -106,228 +112,124 @@ static name_t commands[] =
 #define NUM_COMMANDS (sizeof(commands) / sizeof(name_t))
 
 
-static int
-compare_names(void *p1, void *p2)
+/*
+ * Local functions...
+ */
+
+static int	compare_names(void *p1, void *p2);
+
+
+/*
+ * 'main()' - Main entry for HP-GL/2 filter.
+ */
+
+int			/* O - Exit status */
+main(int  argc,		/* I - Number of command-line arguments */
+     char *argv[])	/* I - Command-line arguments */
 {
-  return (strcasecmp(((name_t *)p1)->name, ((name_t *)p2)->name));
-}
+  FILE		*fp;		/* Input file */
+  int		num_params;	/* Number of parameters */
+  param_t	*params;	/* Command parameters */
+  name_t	*command,	/* Command */
+		name;		/* Name of command */
+  ppd_file_t	*ppd;		/* PPD file */
+  ppd_size_t	*pagesize;	/* Page size */
+  int		num_options;	/* Number of print options */
+  cups_option_t	*options;	/* Print options */
+  char		*val;		/* Option value */
+  int		shading;	/* -1 = black, 0 = grey, 1 = color */
+  float		penwidth;	/* Default pen width */
 
 
-void
-Usage(void)
-{
-  fputs("Usage: hpgl2ps [-P printer] [filename]\n", stderr);
-  exit(ERR_BAD_ARG);
-}
-
-
-int
-main(int  argc,
-     char *argv[])
-{
-  int			i;		/* Looping var */
-  char			*opt;		/* Current option character */
-  char			*filename,	/* Input filename, if specified (NULL otherwise). */
-			*outfile;
-  PDInfoStruct		*info;
-  PDSizeTableStruct	*size;
-  time_t		modtime;
-  param_t		*params;
-  int			num_params;
-  name_t		*command,
-			name;
-  int			shading;	/* -1 = black, 0 = grey, 1 = color */
-  float			penwidth,
-			temp;
-
+  if (argc < 6 || argc > 7)
+  {
+    fprintf(stderr, "Usage: %s job-id user title copies options [file]\n",
+            argv[0]);
+    return (1);
+  }
 
  /*
-  * Process any command-line args...
+  * If we have 7 arguments, print the file named on the command-line.
+  * Otherwise, send stdin instead...
   */
 
-  filename = NULL;
-  outfile  = NULL;
+  if (argc == 6)
+    fp = stdin;
+  else
+  {
+   /*
+    * Try to open the print file...
+    */
+
+    if ((fp = fopen(argv[6], "rb")) == NULL)
+    {
+      perror("ERROR: unable to open print file - ");
+      return (1);
+    }
+  }
+
+ /*
+  * Process command-line options and write the prolog...
+  */
+
+  ppd = ppdOpenFile(getenv("PPD"));
+
+  options     = NULL;
+  num_options = cupsParseOptions(argv[5], 0, &options);
+
+  ppdMarkDefaults(ppd);
+  cupsMarkOptions(ppd, num_options, options);
+
+  if ((pagesize = ppdPageSize(ppd, NULL)) != NULL)
+  {
+    PageWidth  = pagesize->width;
+    PageLength = pagesize->length;
+    PageTop    = pagesize->top;
+    PageBottom = pagesize->bottom;
+    PageLeft   = pagesize->left;
+    PageRight  = pagesize->right;
+  }
+
+  LanguageLevel = ppd->language_level;
+  ColorDevice   = ppd->color_device;
+
+  ppdClose(ppd);
+
   shading  = 1;
   penwidth = 1.0;
 
-  for (i = 1; i < argc; i ++)
-    if (argv[i][0] == '-')
-      for (opt = argv[i] + 1; *opt != '\0'; opt ++)
-        switch (*opt)
-        {
-          case 'P' : /* Specify the printer name */
-              i ++;
-              if (i >= argc)
-                Usage();
+  if ((val = cupsGetOption("blackplot", num_options, options)) != NULL)
+    shading = 0;
 
-	     /*
-	      * Open the POD database files and get the printer definition record.
-	      */
+  if ((val = cupsGetOption("fitplot", num_options, options)) != NULL)
+    FitPlot = 1;
 
-	      if (PDLocalReadInfo(argv[i], &info, &modtime) < 0)
-	      {
-		fprintf(stderr, "hpgl2ps: Could not open required POD database files for printer \'%s\'.\n", 
-        		argv[i]);
-		fprintf(stderr, "          Are you sure all required POD files are properly installed?\n");
+  if ((val = cupsGetOption("penwidth", num_options, options)) != NULL)
+    penwidth = (float)atof(val);
 
-		PDPerror("hpgl2ps");
-		exit(1);
-	      };
-	     
-	      size = PDFindPageSize(info, PD_SIZE_CURRENT);
+ /*
+  * Write the PostScript prolog and initialize the plotting "engine"...
+  */
 
-              if (strncasecmp(info->printer_class, "Color", 5) != 0)
-                shading = 0;
-
-	     /*
-	      * Grab the margin and printable area info from the database...
-	      */
-
-	      PageWidth      = 72.0 * size->horizontal_addr / info->horizontal_resolution;
-	      PageHeight     = 72.0 * size->vertical_addr / info->vertical_resolution;
-	      PageTop        = 72.0 * size->top_margin;
-	      PageBottom     = 72.0 * size->length - PageTop - PageHeight;
-	      PageLeft       = 72.0 * size->left_margin;
-	      PageRight      = 72.0 * size->width - PageLeft - PageWidth;
-              break;
-
-          case 'W' :
-	      i ++;
-	      if (i < argc)
-	        PageWidth = atoi(argv[i]);
-	      break;
-
-          case 'H' :
-	      i ++;
-	      if (i < argc)
-	        PageHeight = atoi(argv[i]);
-	      break;
-
-          case 'U' :
-	      i ++;
-	      if (i < argc)
-	        PageLeft = PageRight = atoi(argv[i]);
-	      break;
-
-          case 'V' :
-	      i ++;
-	      if (i < argc)
-	        PageTop = PageBottom = atoi(argv[i]);
-	      break;
-
-          case 'r' : /* Rotate */
-              i ++;
-              if (i >= argc)
-                Usage();
-
-              PageRotation = atoi(argv[i]);
-              break;
-
-          case 'z' : /* Page zoom */
-              i ++;
-              if (i >= argc)
-                Usage();
-
-              FitPlot = 1;
-              break;
-
-          case 'L' : /* Log file */
-              i ++;
-              if (i >= argc)
-                Usage();
-
-              freopen(argv[i], "w", stderr);
-              break;
-
-          case 'O' : /* Output file */
-              i ++;
-              if (i >= argc)
-                Usage();
-
-              outfile = argv[i];
-              break;
-
-          case 'D' : /* Produce debugging messages */
-              Verbosity ++;
-              break;
-
-          case 'b' : /* Produce black plot */
-              shading = -1;
-              break;
-
-          case 'w' : /* Set default pen width */
-              i ++;
-              if (i >= argc)
-                Usage();
-
-              penwidth = atof(argv[i]);
-              break;
-
-          default :
-              Usage();
-              break;
-        }
-    else if (filename != NULL)
-      Usage();
-    else
-      filename = argv[i];
-
-#if 0
-  if (PageRotation == 90 || PageRotation == 270)
-  {
-    temp       = PageWidth;
-    PageWidth  = PageHeight;
-    PageHeight = temp;
-
-    temp       = PageTop;
-    PageTop    = PageBottom;
-    PageBottom = temp;
-
-    temp       = PageLeft;
-    PageLeft   = PageRight;
-    PageRight  = temp;
-  };
-#endif /* 0 */
-
-  if (Verbosity)
-  {
-    fputs("hpgl2ps: Command-line args are:", stderr);
-    for (i = 1; i < argc; i ++)
-      fprintf(stderr, " %s", argv[i]);
-    fputs("\n", stderr);
-  };
-
-  if (filename == NULL)
-    InputFile = stdin;
-  else if ((InputFile = fopen(filename, "r")) == NULL)
-  {
-    fprintf(stderr, "hpgl2ps: Could not open \'%s\' for reading.\n", filename);
-
-    PDPerror("hpgl2ps");
-    exit(ERR_FILE_CONVERT);
-  };
-
-  if (outfile == NULL)
-    OutputFile = stdout;
-  else if ((OutputFile = fopen(outfile, "w")) == NULL)
-  {
-    fprintf(stderr, "hpgl2ps: Could not create \'%s\' for writing.\n", outfile);
-
-    PDPerror("hpgl2ps");
-    exit(ERR_FILE_CONVERT);
-  };
-
-  OutputProlog(shading, penwidth);
+  OutputProlog(argv[3], shading, penwidth);
 
   IP_input_absolute(0, NULL);
+
+ /*
+  * Sort the command array...
+  */
 
   qsort(commands, NUM_COMMANDS, sizeof(name_t),
         (int (*)(const void *, const void *))compare_names);
 
-  while ((num_params = ParseCommand(name.name, &params)) >= 0)
+ /*
+  * Read commands until we reach the end of file.
+  */
+
+  while ((num_params = ParseCommand(fp, name.name, &params)) >= 0)
   {
 #ifdef DEBUG
-    fprintf(stderr, "%s(%d)", name.name, num_params);
+    fprintf(stderr, "DEBUG: %s(%d)", name.name, num_params);
     for (i = 0; i < num_params; i ++)
       if (params[i].type == PARAM_STRING)
         fprintf(stderr, " \'%s\'", params[i].value.string);
@@ -341,14 +243,29 @@ main(int  argc,
       (*command->func)(num_params, params);
 
     FreeParameters(num_params, params);
-  };
+  }
 
   OutputTrailer();
 
-  return (NO_ERROR);
+  if (fp != stdin)
+    fclose(fp);
+
+  return (0);
 }
 
 
 /*
- * End of "$Id: hpgl-main.c,v 1.7 1999/03/21 02:10:12 mike Exp $".
+ * 'compare_names()' - Compare two command names.
+ */
+
+static int			/* O - Result of strcasecmp() on names */
+compare_names(const void *p1,	/* I - First name */
+              const void *p2)	/* I - Second name */
+{
+  return (strcasecmp(((name_t *)p1)->name, ((name_t *)p2)->name));
+}
+
+
+/*
+ * End of "$Id: hpgl-main.c,v 1.8 1999/03/21 21:12:17 mike Exp $".
  */

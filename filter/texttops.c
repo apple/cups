@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.8 1999/03/21 02:10:15 mike Exp $"
+ * "$Id: texttops.c,v 1.9 1999/03/21 21:12:19 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -376,7 +376,7 @@ write_prolog(ppd_file_t *ppd,		/* I - PPD file */
     printf("%%%%LanguageLevel: %d\n", ppd->language_level);
   else
     puts("%%LanguageLevel: 1");
-  puts("%%Creator: texttops/CUPS-" CUPS_VERSION);
+  puts("%%Creator: texttops/CUPS-" CUPS_SVERSION);
   printf("%%%%Title: %s\n", title);
   puts("%%DocumentFonts: Courier Courier-Bold");
   puts("%%Pages: (atend)");
@@ -931,5 +931,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: texttops.c,v 1.8 1999/03/21 02:10:15 mike Exp $".
+ * End of "$Id: texttops.c,v 1.9 1999/03/21 21:12:19 mike Exp $".
  */

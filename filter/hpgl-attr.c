@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-attr.c,v 1.8 1999/03/21 16:26:58 mike Exp $"
+ * "$Id: hpgl-attr.c,v 1.9 1999/03/21 21:12:13 mike Exp $"
  *
  *   HP-GL/2 attribute processing for the Common UNIX Printing System (CUPS).
  *
@@ -185,7 +185,7 @@ NP_number_pens(int     num_params,	/* I - Number of parameters */
   if (num_params == 0)
     PenCount = 8;
   else if (num_params == 1)
-    PenCount = params[0].value.number;
+    PenCount = (int)params[0].value.number;
   else
     fprintf(stderr, "WARNING: HP-GL/2 \'NP\' command with invalid number of parameters (%d)!\n",
             num_params);
@@ -193,7 +193,7 @@ NP_number_pens(int     num_params,	/* I - Number of parameters */
   PC_pen_color(0, NULL);
 
   for (i = 0; i <= PenCount; i ++)
-    Outputf(OutputFile, "/W%d { DefaultPenWidth PenScaling mul setlinewidth } bind def\n", i);
+    Outputf("/W%d { DefaultPenWidth PenScaling mul setlinewidth } bind def\n", i);
 }
 
 
@@ -230,7 +230,7 @@ PC_pen_color(int     num_params,	/* I - Number of parameters */
   }
   else if (num_params == 1)
   {
-    i = params[0].value.number;
+    i = (int)params[0].value.number;
 
     Outputf("/P%d { %.3f %.3f %.3f setrgbcolor } bind def\n",
             i, standard_colors[i & 7][0], standard_colors[i & 7][1],
@@ -267,9 +267,9 @@ PW_pen_width(int     num_params,	/* I - Number of parameters */
     */
 
     if (num_params == 0)
-      w = 0.35 / 25.4 * 72.0;
+      w = 0.35f / 25.4f * 72.0f;
     else
-      w = params[0].value.number / 25.4 * 72.0;
+      w = params[0].value.number / 25.4f * 72.0f;
   }
   else
   {
@@ -277,10 +277,10 @@ PW_pen_width(int     num_params,	/* I - Number of parameters */
     * Relative...
     */
 
-    w = hypot(PlotSize[0], PlotSize[1]) / 1016.0 * 72.0;
+    w = (float)hypot(PlotSize[0], PlotSize[1]) / 1016.0f * 72.0f;
 
     if (num_params == 0)
-      w *= 0.01;
+      w *= 0.01f;
     else
       w *= params[0].value.number;
   }
@@ -347,7 +347,7 @@ SP_select_pen(int     num_params,	/* I - Number of parameters */
   if (num_params == 0)
     PenNumber = 1;
   else if (params[0].value.number <= PenCount)
-    PenNumber = params[0].value.number;
+    PenNumber = (int)params[0].value.number;
   else
     fprintf(stderr, "WARNING: HP-GL/2 \'SP\' command with invalid number or value of parameters (%d, %d)!\n",
             num_params, (int)params[0].value.number);
@@ -380,7 +380,7 @@ WU_width_units(int     num_params,	/* I - Number of parameters */
   if (num_params == 0)
     WidthUnits = 0;
   else if (num_params == 1)
-    WidthUnits = params[0].value.number;
+    WidthUnits = (int)params[0].value.number;
   else
     fprintf(stderr, "WARNING: HP-GL/2 \'WU\' command with invalid number of parameters (%d)!\n",
             num_params);
@@ -388,5 +388,5 @@ WU_width_units(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-attr.c,v 1.8 1999/03/21 16:26:58 mike Exp $".
+ * End of "$Id: hpgl-attr.c,v 1.9 1999/03/21 21:12:13 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-char.c,v 1.5 1999/03/21 16:26:58 mike Exp $"
+ * "$Id: hpgl-char.c,v 1.6 1999/03/21 21:12:14 mike Exp $"
  *
  *   HP-GL/2 character processing for the Common UNIX Printing System (CUPS).
  *
@@ -67,13 +67,13 @@ AD_define_alternate(int     num_params,	/* I - Number of parameters */
           height = params[i + 1].value.number;
           break;
       case 5 :
-          posture = params[i + 1].value.number;
+          posture = (int)params[i + 1].value.number;
           break;
       case 6 :
-          weight = params[i + 1].value.number;
+          weight = (int)params[i + 1].value.number;
           break;
       case 7 :
-          typeface = params[i + 1].value.number;
+          typeface = (int)params[i + 1].value.number;
           break;
     }
 
@@ -103,10 +103,10 @@ CF_character_fill(int     num_params,	/* I - Number of parameters */
   if (num_params == 0)
     CharFillMode = 0;
   else
-    CharFillMode = params[0].value.number;
+    CharFillMode = (int)params[0].value.number;
 
   if (num_params == 2)
-    CharPen = params[1].value.number;
+    CharPen = (int)params[1].value.number;
 }
 
 
@@ -125,19 +125,19 @@ CP_character_plot(int     num_params,
   switch (Rotation)
   {
     case 0:
-	PenPosition[0] += params[0].value.number * 1.2 / CharHeight[CharFont];
+	PenPosition[0] += params[0].value.number * 1.2f / CharHeight[CharFont];
 	PenPosition[1] += params[1].value.number * CharHeight[CharFont];
 	break;
     case 90:
-	PenPosition[0] -= params[1].value.number * 1.2 / CharHeight[CharFont];
+	PenPosition[0] -= params[1].value.number * 1.2f / CharHeight[CharFont];
 	PenPosition[1] += params[0].value.number * CharHeight[CharFont];
 	break;
     case 180:
-	PenPosition[0] -= params[0].value.number * 1.2 / CharHeight[CharFont];
+	PenPosition[0] -= params[0].value.number * 1.2f / CharHeight[CharFont];
 	PenPosition[1] -= params[1].value.number * CharHeight[CharFont];
 	break;
     case 270:
-	PenPosition[0] += params[1].value.number * 1.2 / CharHeight[CharFont];
+	PenPosition[0] += params[1].value.number * 1.2f / CharHeight[CharFont];
 	PenPosition[1] -= params[0].value.number * CharHeight[CharFont];
 	break;
   }
@@ -239,7 +239,7 @@ LB_label(int     num_params,		/* I - Number of parameters */
     if (strchr("()\\", *s) != NULL)
       Outputf("\\%c", *s);
     else
-      putc(*s, OutputFile);
+      Outputf("%c", *s);
   Outputf(") true charpath\n");
 
   if (CharFillMode != 1)
@@ -313,13 +313,13 @@ SD_define_standard(int     num_params,	/* I - Number of parameters */
           height = params[i + 1].value.number;
           break;
       case 5 :
-          posture = params[i + 1].value.number;
+          posture = (int)params[i + 1].value.number;
           break;
       case 6 :
-          weight = params[i + 1].value.number;
+          weight = (int)params[i + 1].value.number;
           break;
       case 7 :
-          typeface = params[i + 1].value.number;
+          typeface = (int)params[i + 1].value.number;
           break;
     }
 
@@ -404,5 +404,5 @@ TD_transparent_data(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-char.c,v 1.5 1999/03/21 16:26:58 mike Exp $".
+ * End of "$Id: hpgl-char.c,v 1.6 1999/03/21 21:12:14 mike Exp $".
  */

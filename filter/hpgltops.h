@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgltops.h,v 1.6 1999/03/21 02:10:14 mike Exp $"
+ * "$Id: hpgltops.h,v 1.7 1999/03/21 21:12:19 mike Exp $"
  *
  *   HP-GL/2 to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -28,12 +28,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <math.h>
 #include <time.h>
 
 #include <cups/cups.h>
+#include <cups/string.h>
 
+#ifndef M_PI
+#  define M_PI	3.14159265358979323846
+#endif /* M_PI */
 
 /*
  * Parameter value structure...
@@ -71,7 +74,7 @@ typedef struct
 VAR int		ColorDevice	VALUE(1),	/* Color printer? */
 		LanguageLevel	VALUE(2);	/* PostScript level? */
 
-VAR int		P1[2],				/* Lower-lefthand physical limit */
+VAR float	P1[2],				/* Lower-lefthand physical limit */
 		P2[2],				/* Upper-righthand physical limit */
 		IW1[2],				/* Window lower-lefthand limit */
 		IW2[2];				/* Window upper-righthand limit */
@@ -123,7 +126,7 @@ VAR float	ColorRange[3][2]		/* Range of color values */
  */
 
 /* hpgl-input.c */
-extern int	ParseCommand(char *name, param_t **params);
+extern int	ParseCommand(FILE *fp, char *name, param_t **params);
 extern void	FreeParameters(int num_params, param_t *params);
 
 /* hpgl-config.c */
@@ -198,10 +201,10 @@ extern void	UL_user_line_type(int num_params, param_t *params);
 extern void	WU_width_units(int num_params, param_t *params);
 
 /* hpgl-prolog.c */
-extern int	OutputProlog(int shading, float penwidth);
-extern int	OutputTrailer(void);
+extern void	OutputProlog(char *title, int shading, float penwidth);
+extern void	OutputTrailer(void);
 extern int	Outputf(const char *format, ...);
 
 /*
- * End of "$Id: hpgltops.h,v 1.6 1999/03/21 02:10:14 mike Exp $".
+ * End of "$Id: hpgltops.h,v 1.7 1999/03/21 21:12:19 mike Exp $".
  */
