@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.18 2002/01/29 20:25:50 mike Exp $"
+# "$Id: Makefile,v 1.19 2002/01/31 14:53:42 mike Exp $"
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
@@ -60,6 +60,8 @@ CHARSETS =	windows-874 \
 		iso-8859-13 \
 		iso-8859-14 \
 		iso-8859-15 \
+		koi8-r \
+		koi8-u \
 		utf-8
 DATAFILES =	HPGLprolog psglyphs testprint.ps
 
@@ -106,5 +108,5 @@ install:
 
 
 #
-# End of "$Id: Makefile,v 1.18 2002/01/29 20:25:50 mike Exp $".
+# End of "$Id: Makefile,v 1.19 2002/01/31 14:53:42 mike Exp $".
 #
