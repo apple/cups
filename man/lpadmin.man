@@ -1,0 +1,124 @@
+.\"
+.\" "$Id: lpadmin.man,v 1.1 2000/02/23 03:17:05 mike Exp $"
+.\"
+.\"   lpadmin man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2000 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH lpadmin 8 "Common UNIX Printing System" "22 September 1999" "Easy Software Products"
+.SH NAME
+lpadmin \- configure cups printers and classes
+.SH SYNOPSIS
+.B lpadmin
+[ -h
+.I server
+] \-d
+.I destination
+.br
+.B lpadmin
+[ -h
+.I server
+] \-p
+.I printer
+.I option(s)
+.br
+.B lpadmin
+[ -h
+.I server
+] \-x
+.I destination
+.SH DESCRIPTION
+\fIlpadmin\fR configures printer and class queues provided by CUPS. It can also
+be used to set the system default printer or class.
+.LP
+The first form of the command sets the default printer or class to
+\fIdestination\fR.  Subsequent print jobs submitted via the \fIlp(1)\fR or
+\fIlpr(1)\fR commands will use this destination unless the user specifies
+otherwise.
+.LP
+The second form of the command configures the named printer.  The additional
+options are described below.
+.LP
+The third form of the command deletes the printer or class \fIdestination\fR.
+Any jobs that are pending for the destination will be removed and any job that
+is currently printed will be aborted.
+.SH CONFIGURATION OPTIONS
+The following options are recognized when configuring a printer queue:
+.TP 5
+\-c \fIclass\fR
+.br
+Adds the named \fIprinter\fR to \fIclass\fR.  If \fIclass\fR does not
+exist it is created automatically.
+.TP 5
+\-i \fIinterface\fR
+.br
+Sets a System V style interface script for the printer.  This option cannot
+be specified with the \fI\-P\fR option (PPD file) and is intended for
+providing support for legacy printer drivers.
+.TP 5
+\-m \fImodel\fR
+.br
+Sets a standard System V interface script or PPD file from the model
+directory.
+.TP 5
+\-r \fIclass\fR
+.br
+Removes the named \fIprinter\fR from \fIclass\fR.  If the resulting class
+becomes empty it is removed.
+.TP 5
+\-v \fIdevice-uri\fR
+.br
+Sets the \fIdevice-uri\fR attribute of the printer queue.  If \fIdevice-uri\fR
+is a filename it is automatically converted to the form \fBfile:/file/name\fR.
+.TP 5
+\-D \fIinfo\fR
+.br
+Provides a textual description of the printer.
+.TP 5
+\-E
+.br
+Enables the printer and accepts jobs; this is the same as running the
+\fIaccept(8)\fR and \fIenable(8)\fR programs on the printer.
+.TP 5
+\-L \fIlocation\fR
+.br
+Provides a textual location of the printer.
+.TP 5
+\-P \fIppd-file\fR
+.br
+Specifies a PostScript Printer Description file to use with the printer. If
+specified, this option overrides the \fI-i\fR option (interface script).
+.SH COMPATIBILITY
+Unlike the System V printing system, CUPS allows printer names to contain
+any printable character except SPACE and TAB. Also, printer and class names are
+\fBnot\fR case-sensitive. Finally, the CUPS version of \fIlpadmin\fR may ask the
+user for an access password depending on the printing system configuration.
+This differs from the System V version which requires the root user to execute
+this command.
+.SH LIMITATIONS
+The CUPS version of \fIlpadmin\fR does not support all of the System V or
+Solaris printing system configuration options.
+.SH SEE ALSO
+accept(8), cancel(1), disable(8), enable(8), lp(1), lpstat(1), reject(8),
+CUPS Software Administrators Manual
+.SH COPYRIGHT
+Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
+.\"
+.\" End of "$Id: lpadmin.man,v 1.1 2000/02/23 03:17:05 mike Exp $".
+.\"

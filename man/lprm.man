@@ -1,0 +1,51 @@
+.\"
+.\" "$Id: lprm.man,v 1.1 2000/02/23 03:17:05 mike Exp $"
+.\"
+.\"   lprm man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2000 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH lprm 1 "Common UNIX Printing System" "22 September 1999" "Easy Software Products"
+.SH NAME
+lprm \- cancel print jobs
+.SH SYNOPSIS
+.B lprm
+[ - ] [ -P
+.I destination
+] [
+.I job ID(s)
+]
+.SH DESCRIPTION
+\fBlprm\fR cancels print jobs that have been queued for printing. The \fI-P\fR
+option specifies the destination printer or class.
+.LP
+If no arguments are supplied, the current job on the default destination is
+cancelled. You can specify one or more job ID numbers to cancel those jobs,
+or use the \fI\-\fR option to cancel all jobs.
+.SH COMPATIBILITY
+The CUPS version of \fIlprm\fR is compatible with the standard Berkeley
+\fIlprm\fR command.
+.SH SEE ALSO
+cancel(1), lp(1), lpstat(1), lpr(1),
+CUPS Software Users Manual
+.SH COPYRIGHT
+Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
+.\"
+.\" End of "$Id: lprm.man,v 1.1 2000/02/23 03:17:05 mike Exp $".
+.\"

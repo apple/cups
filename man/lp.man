@@ -1,0 +1,111 @@
+.\"
+.\" "$Id: lp.man,v 1.1 2000/02/23 03:17:05 mike Exp $"
+.\"
+.\"   lp/cancel man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2000 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH lp 1 "Common UNIX Printing System" "9 September 1999" "Easy Software Products"
+.SH NAME
+lp \- print files
+.br
+cancel \- cancel jobs
+.SH SYNOPSIS
+.B lp
+[ \-c ] [ \-d
+.I destination
+] [ -h
+.I server
+] [ \-m ] [ \-n
+.I num-copies
+[ \-o
+.I option
+] [ \-p/q
+.I priority
+] [ \-s ] [ \-t
+.I title
+] [
+.I file(s)
+] 
+.br
+.B cancel
+[ \-a ] [ -h
+.I server
+] [
+.I id
+] [
+.I destination
+] [
+.I destination-id
+]
+.SH DESCRIPTION
+\fBlp\fR submits files for printing.
+.LP
+\fBcancel\fR cancels existing print jobs. The \fI-a\fR option will remove
+all jobs from the specified destination.
+.SH OPTIONS
+The following options are recognized by \fBlp\fR:
+.TP 5
+\-d \fIdestination\fR
+.br
+Prints files to the named printer.
+.TP 5
+\-h \fIhostname\fR
+.br
+Specifies the print server hostname. The default is "localhost" or the value
+of the CUPS_SERVER environment variable.
+.TP 5
+\-m
+.br
+Send email when the job is completed (ignored in CUPS 1.0.)
+.TP 5
+\-n \fIcopies\fR
+.br
+Sets the number of copies to print from 1 to 100.
+.TP 5
+\-o \fIoption\fR
+.br
+Sets a job option.
+.TP 5
+\-p/q \fIpriority\fR
+.br
+Sets the job priority from 1 (lowest) to 100 (highest). The default priority
+is 50.
+.TP 5
+\-s
+.br
+Do not report the resulting job IDs (silent mode.)
+.TP 5
+\-t \fIname\fR
+.br
+Sets the job name.
+.SH COMPATIBILITY
+Unlike the System V printing system, CUPS allows printer names to contain
+any printable character except SPACE and TAB. Also, printer and class names are
+\fBnot\fR case-sensitive. 
+.LP
+The "m" option is not functional in CUPS 1.0.
+.SH SEE ALSO
+lpstat(1),
+CUPS Software Users Manual
+.SH COPYRIGHT
+Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
+.\"
+.\" End of "$Id: lp.man,v 1.1 2000/02/23 03:17:05 mike Exp $".
+.\"
