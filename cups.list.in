@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in,v 1.13.2.10 2003/01/07 18:26:13 mike Exp $"
+# "$Id: cups.list.in,v 1.13.2.11 2003/01/08 17:44:03 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -35,11 +35,13 @@
 %description Easy Software Products to promote a standard printing solution
 %description for all UNIX vendors and users.  CUPS provides the System V and
 %description Berkeley command-line interfaces. 
-%provides cupsys
 %provides cups-devel
+%provides cups-libs
+%provides cupsys
 %provides cupsys-devel
-%provides cups-pstoraster
 %provides libcups1
+%provides libcups.so.2
+%provides libcupsimage.so.2
 
 #
 # GNU variables...
@@ -381,5 +383,5 @@ f 0444 root sys $AMANDIR/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list.in,v 1.13.2.10 2003/01/07 18:26:13 mike Exp $".
+# End of "$Id: cups.list.in,v 1.13.2.11 2003/01/08 17:44:03 mike Exp $".
 #

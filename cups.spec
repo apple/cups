@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.30.2.9 2002/05/21 20:05:48 mike Exp $"
+# "$Id: cups.spec,v 1.30.2.10 2003/01/08 17:44:04 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -38,21 +38,37 @@ Vendor: Easy Software Products
 # Use buildroot so as not to disturb the version already installed
 BuildRoot: /var/tmp/%{name}-root
 
+# Dependencies...
+Conflicts: lpr, LPRng
+Provides: libcups.so.2
+Provides: libcupsimage.so.2
+
 %package devel
 Summary: Common Unix Printing System - development environment
 Group: Development/Libraries
+
+%package libs
+Summary: Common Unix Printing System - shared libraries
+Group: System Environment/Libraries
 Provides: libcups1
 
 %description
-The Common UNIX Printing System provides a portable printing layer for
-UNIX® operating systems.  It has been developed by Easy Software Products
-to promote a standard printing solution for all UNIX vendors and users.
-CUPS provides the System V and Berkeley command-line interfaces.
+The Common UNIX Printing System provides a portable printing
+layer for  UNIX® operating systems. It has been developed by
+Easy Software Products  to promote a standard printing solution
+for all UNIX vendors and users.  CUPS provides the System V and
+Berkeley command-line interfaces. 
 
 %description devel
-The Common UNIX Printing System provides a portable printing layer for 
-UNIX® operating systems.  This is the development package for creating
-additional printer drivers and other CUPS services.
+The Common UNIX Printing System provides a portable printing
+layer for  UNIX® operating systems. This is the development
+package for creating additional printer drivers and other CUPS
+services.
+
+%description libs
+The Common UNIX Printing System provides a portable printing
+layer for  UNIX® operating systems. This package contains the
+CUPS shared libraries.
 
 %prep
 %setup
@@ -122,15 +138,16 @@ rm -rf $RPM_BUILD_ROOT
 # RC dirs are a pain under Linux...  Uncomment the appropriate ones if you
 # don't use Red Hat or Mandrake...
 
-/etc/rc.d/init.d/*
-/etc/rc.d/rc0.d/*
-/etc/rc.d/rc3.d/*
-/etc/rc.d/rc5.d/*
+/etc/init.d/*
+/etc/rc0.d/*
+/etc/rc3.d/*
+/etc/rc5.d/*
 
-#/etc/init.d/*
-#/etc/rc0.d/*
-#/etc/rc3.d/*
-#/etc/rc5.d/*
+# OLD RedHat/Mandrake
+#/etc/rc.d/init.d/*
+#/etc/rc.d/rc0.d/*
+#/etc/rc.d/rc3.d/*
+#/etc/rc.d/rc5.d/*
 
 #/sbin/rc.d/*
 #/sbin/rc.d/rc0.d/*
@@ -141,7 +158,6 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/disable
 /usr/bin/enable
 /usr/bin/lp*
-/usr/lib/*.so*
 %dir /usr/lib/cups
 /usr/lib/cups/*
 /usr/sbin/*
@@ -197,6 +213,9 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/fr/man3
 /usr/share/man/fr/man3/*
 
+%files libs
+/usr/lib/*.so*
+
 #
-# End of "$Id: cups.spec,v 1.30.2.9 2002/05/21 20:05:48 mike Exp $".
+# End of "$Id: cups.spec,v 1.30.2.10 2003/01/08 17:44:04 mike Exp $".
 #
