@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.197 2003/03/24 21:29:50 mike Exp $"
+ * "$Id: job.c,v 1.198 2003/03/30 21:43:02 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -61,6 +61,19 @@
 
 #include "cupsd.h"
 #include <grp.h>
+
+
+/*
+ * Local globals...
+ */
+
+static mime_filter_t	gziptoany_filter =
+			{
+			  NULL,		/* Source type */
+			  NULL,		/* Destination type */
+			  0,		/* Cost */
+			  "gziptoany"	/* Filter program to run */
+			};
 
 
 /*
@@ -193,7 +206,11 @@ CancelJob(int id,		/* I - Job to cancel */
         if (current->attrs != NULL)
           ippDelete(current->attrs);
 
-        free(current->filetypes);
+        if (current->num_files > 0)
+	{
+          free(current->compressions);
+          free(current->filetypes);
+	}
 
         ClearString(&current->username);
         ClearString(&current->dest);
@@ -378,7 +395,13 @@ FreeAllJobs(void)
     next = job->next;
 
     ippDelete(job->attrs);
-    free(job->filetypes);
+
+    if (job->num_files > 0)
+    {
+      free(job->compressions);
+      free(job->filetypes);
+    }
+
     free(job);
   }
 
@@ -503,6 +526,7 @@ LoadAllJobs(void)
   printer_t	*p;		/* Printer or class */
   const char	*dest;		/* Destination */
   mime_type_t	**filetypes;	/* New filetypes array */
+  int		*compressions;	/* New compressions array */
 
 
  /*
@@ -726,22 +750,31 @@ LoadAllJobs(void)
       if (fileid > job->num_files)
       {
         if (job->num_files == 0)
-	  filetypes = (mime_type_t **)calloc(sizeof(mime_type_t *), fileid);
+	{
+	  compressions = (int *)calloc(fileid, sizeof(int));
+	  filetypes    = (mime_type_t **)calloc(fileid, sizeof(mime_type_t *));
+	}
 	else
-	  filetypes = (mime_type_t **)realloc(job->filetypes,
-	                                    sizeof(mime_type_t *) * fileid);
+	{
+	  compressions = (int *)realloc(job->compressions,
+	                                sizeof(int) * fileid);
+	  filetypes    = (mime_type_t **)realloc(job->filetypes,
+	                                         sizeof(mime_type_t *) * fileid);
+        }
 
-        if (filetypes == NULL)
+        if (compressions == NULL || filetypes == NULL)
 	{
           LogMessage(L_ERROR, "LoadAllJobs: Ran out of memory for job file types!");
 	  continue;
 	}
 
-        job->filetypes = filetypes;
-	job->num_files = fileid;
+        job->compressions = compressions;
+        job->filetypes    = filetypes;
+	job->num_files    = fileid;
       }
 
-      job->filetypes[fileid - 1] = mimeFileType(MimeDatabase, filename);
+      job->filetypes[fileid - 1] = mimeFileType(MimeDatabase, filename,
+                                                job->compressions + fileid - 1);
 
       if (job->filetypes[fileid - 1] == NULL)
         job->filetypes[fileid - 1] = mimeType(MimeDatabase, "application",
@@ -1276,6 +1309,44 @@ StartJob(int       id,		/* I - Job ID */
   }
 
   FilterLevel += current->cost;
+
+ /*
+  * Add decompression filters, if any...
+  */
+
+  if (current->compressions[current->current_file])
+  {
+   /*
+    * Add gziptoany filter to the front of the list...
+    */
+
+    mime_filter_t	*temp_filters;
+
+    if (num_filters == 0)
+      temp_filters = malloc(sizeof(mime_filter_t));
+    else
+      temp_filters = realloc(filters,
+                             sizeof(mime_filter_t) * (num_filters + 1));
+
+    if (temp_filters == NULL)
+    {
+      LogMessage(L_ERROR, "Unable to add decompression filter - %s",
+                 strerror(errno));
+
+      free(filters);
+
+      current->current_file ++;
+
+      if (current->current_file == current->num_files)
+        CancelJob(current->id, 0);
+
+      return;
+    }
+
+    filters              = temp_filters;
+    filters[num_filters] = gziptoany_filter;
+    num_filters ++;
+  }
 
  /*
   * Update the printer and job state to "processing"...
@@ -2512,5 +2583,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.197 2003/03/24 21:29:50 mike Exp $".
+ * End of "$Id: job.c,v 1.198 2003/03/30 21:43:02 mike Exp $".
  */

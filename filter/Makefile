@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.69 2002/12/17 18:59:24 swdev Exp $"
+# "$Id: Makefile,v 1.70 2003/03/30 21:43:00 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -26,7 +26,7 @@
 
 include ../Makedefs
 
-TARGETS	=	hpgltops texttops pstops imagetops imagetoraster \
+TARGETS	=	gziptoany hpgltops texttops pstops imagetops imagetoraster \
 		rastertodymo rastertoepson rastertohp
 
 HPGLOBJS =	hpgl-attr.o hpgl-config.o hpgl-main.o hpgl-prolog.o \
@@ -37,9 +37,9 @@ IMAGEOBJS =	image-bmp.o image-colorspace.o image-gif.o image-jpeg.o \
 		image-zoom.o image.o raster.o
 FORMOBJS =	form-attr.o form-main.o form-ps.o form-text.o form-tree.o
 OBJS	=	$(HPGLOBJS) $(IMAGEOBJS) $(FORMOBJS) \
-		imagetops.o imagetoraster.o common.o pstops.o raster.o \
-		rastertodymo.o rastertoepson.o rastertohp.o texttops.o \
-		textcommon.o 
+		gziptoany.o imagetops.o imagetoraster.o common.o pstops.o \
+		rastertodymo.o rastertoepson.o rastertohp.o \
+		texttops.o textcommon.o 
 
 #
 # Make all targets...
@@ -103,6 +103,15 @@ installhdrs:
 formtops:	$(FORMOBJS) common.o ../Makedefs ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ $(FORMOBJS) common.o $(LIBS) -lm
+
+
+#
+# gziptoany
+#
+
+gziptoany:	gziptoany.o ../Makedefs
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ gziptoany.o $(LIBZ)
 
 
 #
@@ -259,5 +268,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.69 2002/12/17 18:59:24 swdev Exp $".
+# End of "$Id: Makefile,v 1.70 2003/03/30 21:43:00 mike Exp $".
 #
