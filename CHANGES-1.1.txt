@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The lpadmin command now allows printer access control
+	  by group name as well as user name.
 	- "lpoptions -l" got in an infinite loop if no default
 	  printer was available.
 	- The scheduler now logs the job-originating-host-name

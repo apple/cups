@@ -664,6 +664,18 @@ printer, but all other users cannot print. The command:</P>
 <P>has the opposite effect. All users except peter, paul, and mary will
 be able to print to the named printer.</P>
 
+<P>You can control access by UNIX groups as well by placing an
+"@" character before each group name. The command:</P>
+
+<UL>
+<PRE>
+<B>/usr/sbin/lpadmin -p <I>printer</I> -u allow:peter,paul,mary,@printgods <I>ENTER</I></B>
+</PRE>
+</UL>
+
+<P>allows the users peter, paul, and mary to print, as well as
+any user in the printgods group to print.
+
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
 <TR>

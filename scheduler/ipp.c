@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.44 2003/02/26 19:51:46 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.45 2003/03/04 21:42:18 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1761,10 +1761,12 @@ static int			/* O - 1 if OK, 0 if not */
 check_quotas(client_t  *con,	/* I - Client connection */
              printer_t *p)	/* I - Printer or class */
 {
-  int		i;		/* Looping var */
+  int		i, j;		/* Looping vars */
   ipp_attribute_t *attr;	/* Current attribute */
   char		username[33];	/* Username */
   quota_t	*q;		/* Quota data */
+  struct passwd	*pw;		/* User password data */
+  struct group	*grp;		/* Group data */
 
 
   LogMessage(L_DEBUG2, "check_quotas(%d, %s)\n", con->http.fd, p->name);
@@ -1833,8 +1835,41 @@ check_quotas(client_t  *con,	/* I - Client connection */
 
   if (p->num_users)
   {
+    pw = getpwnam(username);
+    endpwent();
+
     for (i = 0; i < p->num_users; i ++)
-      if (strcasecmp(username, p->users[i]) == 0)
+      if (p->users[i][0] == '@')
+      {
+       /*
+        * Check group membership...
+	*/
+
+        grp = getgrnam(p->users[i] + 1);
+	endgrent();
+
+        if (grp)
+	{
+	 /*
+	  * Check primary group...
+	  */
+
+	  if (pw && grp->gr_gid == pw->pw_gid)
+	    break;
+
+         /*
+	  * Check usernames in group...
+	  */
+
+          for (j = 0; grp->gr_mem[j]; j ++)
+	    if (!strcmp(username, grp->gr_mem[j]))
+	      break;
+
+          if (grp->gr_mem[j])
+	    break;
+	}
+      }
+      else if (!strcasecmp(username, p->users[i]))
 	break;
 
     if ((i < p->num_users) == p->deny_users)
@@ -6114,5 +6149,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.44 2003/02/26 19:51:46 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.45 2003/03/04 21:42:18 mike Exp $".
  */
