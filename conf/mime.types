@@ -1,5 +1,5 @@
 #
-# "$Id: mime.types,v 1.10 2000/06/22 18:25:29 mike Exp $"
+# "$Id: mime.types,v 1.11 2000/08/03 18:05:22 mike Exp $"
 #
 #   MIME types file for the Common UNIX Printing System (CUPS).
 #
@@ -122,6 +122,17 @@ application/vnd.cups-postscript	string(0,<1B>%-12345X)
 application/vnd.cups-raster	string(0,"RaSt") string(0,"tSaR")
 application/vnd.cups-raw
 
+########################################################################
 #
-# End of "$Id: mime.types,v 1.10 2000/06/22 18:25:29 mike Exp $".
+# Raw print file support...
+#
+# Uncomment the following type and the application/octet-stream
+# filter line in mime.convs to allow raw file printing without the
+# -oraw option.
+#
+
+#application/octet-stream
+
+#
+# End of "$Id: mime.types,v 1.11 2000/08/03 18:05:22 mike Exp $".
 #
