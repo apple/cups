@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-main.c,v 1.19 2000/01/04 13:45:44 mike Exp $"
+ * "$Id: hpgl-main.c,v 1.20 2000/05/02 19:32:40 mike Exp $"
  *
  *   HP-GL/2 filter main entry for the Common UNIX Printing System (CUPS).
  *
@@ -186,7 +186,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     FitPlot = 1;
 
   if ((val = cupsGetOption("penwidth", num_options, options)) != NULL)
-    PenWidth = (float)atof(val);
+    PenWidth = (float)atoi(val) * 0.001f;
 
  /*
   * Write the PostScript prolog and initialize the plotting "engine"...
@@ -251,5 +251,5 @@ compare_names(const void *p1,	/* I - First name */
 
 
 /*
- * End of "$Id: hpgl-main.c,v 1.19 2000/01/04 13:45:44 mike Exp $".
+ * End of "$Id: hpgl-main.c,v 1.20 2000/05/02 19:32:40 mike Exp $".
  */
