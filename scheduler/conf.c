@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.148 2004/07/02 04:44:20 mike Exp $"
+ * "$Id: conf.c,v 1.149 2004/07/06 00:34:56 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,7 +23,7 @@
  *
  * Contents:
  *
- *    - Read the cupsd.conf file.
+ *   ReadConfiguration()  - Read the cupsd.conf file.
  *   read_configuration() - Read a configuration file.
  *   read_location()      - Read a <Location path> definition.
  *   get_address()        - Get an address + port number from a line.
@@ -2226,5 +2226,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.148 2004/07/02 04:44:20 mike Exp $".
+ * End of "$Id: conf.c,v 1.149 2004/07/06 00:34:56 mike Exp $".
  */
