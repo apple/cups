@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.47 2002/12/17 18:56:25 swdev Exp $"
+# "$Id: Makefile,v 1.48 2003/03/06 16:36:00 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -105,7 +105,7 @@ install:	installhdrs
 	if test "x$(INITDIR)" = "x" -a "x$(INITDDIR)" != "x"; then \
 		$(INSTALL_DIR) $(BUILDROOT)$(INITDDIR); \
 		if test "$(INITDDIR)" = "/System/Library/StartupItems/PrintingServices"; then \
-			$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDDIR)/PrintingServices; \
+			$(INSTALL_SCRIPT) cups.osx $(BUILDROOT)$(INITDDIR)/PrintingServices; \
 			$(INSTALL_DATA) cups.plist $(BUILDROOT)$(INITDDIR)/StartupParameters.plist; \
 			$(INSTALL_DIR) $(BUILDROOT)$(INITDDIR)/Resources/English.lproj; \
 			$(INSTALL_DATA) cups.strings $(BUILDROOT)$(INITDDIR)/Resources/English.lproj/Localizable.strings; \
@@ -166,5 +166,5 @@ tardist:
 	epm $(EPMFLAGS) -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.47 2002/12/17 18:56:25 swdev Exp $".
+# End of "$Id: Makefile,v 1.48 2003/03/06 16:36:00 mike Exp $".
 #
