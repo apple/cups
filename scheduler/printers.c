@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.26 2002/08/22 17:07:56 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.27 2002/09/19 12:00:31 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -191,9 +191,9 @@ AddPrinterFilter(printer_t  *p,		/* I - Printer to add to */
   for (temptype = MimeDatabase->types, i = MimeDatabase->num_types;
        i > 0;
        i --, temptype ++)
-    if (((super[0] == '*' && strcmp((*temptype)->super, "printer") != 0) ||
-         strcmp((*temptype)->super, super) == 0) &&
-        (type[0] == '*' || strcmp((*temptype)->type, type) == 0))
+    if (((super[0] == '*' && strcasecmp((*temptype)->super, "printer") != 0) ||
+         strcasecmp((*temptype)->super, super) == 0) &&
+        (type[0] == '*' || strcasecmp((*temptype)->type, type) == 0))
     {
       LogMessage(L_DEBUG2, "Adding filter %s/%s %s/%s %d %s",
                  (*temptype)->super, (*temptype)->type,
@@ -2086,5 +2086,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.26 2002/08/22 17:07:56 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.27 2002/09/19 12:00:31 mike Exp $".
  */
