@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-network.m4,v 1.1.2.5 2002/03/28 21:49:28 mike Exp $"
+dnl "$Id: cups-network.m4,v 1.1.2.6 2002/03/28 22:13:53 mike Exp $"
 dnl
 dnl   Networking stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -32,10 +32,10 @@ fi
 AC_CHECK_FUNCS(rresvport getifaddrs)
 
 AC_CHECK_MEMBER(struct sockaddr.sa_len,,,[#include <sys/socket.h>])
-AC_CHECK_HEADER(sys/sockio.h)
+AC_CHECK_HEADER(sys/sockio.h,AC_DEFINE(HAVE_SYS_SOCKIO_H))
 
 AC_SUBST(NETLIBS)
 
 dnl
-dnl End of "$Id: cups-network.m4,v 1.1.2.5 2002/03/28 21:49:28 mike Exp $".
+dnl End of "$Id: cups-network.m4,v 1.1.2.6 2002/03/28 22:13:53 mike Exp $".
 dnl
