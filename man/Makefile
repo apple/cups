@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.3 1999/06/21 15:27:44 mike Exp $"
+# "$Id: Makefile,v 1.4 1999/12/08 12:45:58 mike Exp $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,7 +28,7 @@ include ../Makedefs
 # Man pages...
 #
 
-MAN1	=	backend.1 filter.1 lprm.1 lpr.1 lpstat.1 lp.1
+MAN1	=	backend.1 filter.1 lp.1 lpq.1 lprm.1 lpr.1 lpstat.1
 MAN5	=	classes.conf.5 cupsd.conf.5 mime.convs.5 mime.types.5 \
 		printers.conf.5
 MAN8	=	accept.8 cupsd.8 enable.8 lpadmin.8 lpc.8
@@ -74,5 +74,5 @@ install:
 	$(LN) enable.$(CAT) $(MANDIR)/cat8/disable.$(CAT)
 
 #
-# End of "$Id: Makefile,v 1.3 1999/06/21 15:27:44 mike Exp $".
+# End of "$Id: Makefile,v 1.4 1999/12/08 12:45:58 mike Exp $".
 #
