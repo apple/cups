@@ -1,5 +1,5 @@
 #
-# "$Id: mime.convs,v 1.9 2000/08/03 18:05:22 mike Exp $"
+# "$Id: mime.convs,v 1.10 2000/08/18 14:30:48 mike Exp $"
 #
 #   MIME converts file for the Common UNIX Printing System (CUPS).
 #
@@ -41,23 +41,23 @@
 # PostScript filters
 #
 
-#application/msword	application/postscript	50	mswordtops
-application/pdf		application/postscript	50	pdftops
-application/postscript	application/vnd.cups-postscript	50	pstops
-application/vnd.hp-HPGL	application/postscript	50	hpgltops
-image/*			application/vnd.cups-postscript	50	imagetops
-#text/html		application/postscript	50	htmltops
-text/html		application/postscript	50	texttops
-text/plain		application/postscript	50	texttops
-application/vnd.cups-form application/vnd.cups-postscript 50 formtops
+#application/msword	application/postscript	33	mswordtops
+application/pdf		application/postscript	33	pdftops
+application/postscript	application/vnd.cups-postscript	66	pstops
+application/vnd.hp-HPGL	application/postscript	66	hpgltops
+image/*			application/vnd.cups-postscript	66	imagetops
+#text/html		application/postscript	33	htmltops
+text/html		application/postscript	33	texttops
+text/plain		application/postscript	33	texttops
+application/vnd.cups-form application/vnd.cups-postscript 33 formtops
 
 ########################################################################
 #
 # Raster filters...
 #
 
-image/*			application/vnd.cups-raster	50	imagetoraster
-application/vnd.cups-postscript	application/vnd.cups-raster	50	pstoraster
+image/*			application/vnd.cups-raster	100	imagetoraster
+application/vnd.cups-postscript	application/vnd.cups-raster	100	pstoraster
 
 ########################################################################
 #
@@ -71,5 +71,5 @@ application/vnd.cups-postscript	application/vnd.cups-raster	50	pstoraster
 #*/*			application/vnd.cups-raw	0	-
 
 #
-# End of "$Id: mime.convs,v 1.9 2000/08/03 18:05:22 mike Exp $".
+# End of "$Id: mime.convs,v 1.10 2000/08/18 14:30:48 mike Exp $".
 #
