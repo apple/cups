@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.17 2000/06/27 20:15:54 mike Exp $"
+ * "$Id: serial.c,v 1.18 2000/09/12 14:12:48 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -396,7 +396,7 @@ list_devices(void)
   char	device[255];	/* Device filename */
 
 
-  for (i = 0; i < 4; i ++)
+  for (i = 0; i < 100; i ++)
   {
     sprintf(device, "/dev/ttyS%d", i);
     if ((fd = open(device, O_WRONLY | O_NOCTTY | O_NDELAY)) >= 0)
@@ -701,5 +701,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.17 2000/06/27 20:15:54 mike Exp $".
+ * End of "$Id: serial.c,v 1.18 2000/09/12 14:12:48 mike Exp $".
  */
