@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.65 2000/05/02 19:29:22 mike Exp $"
+ * "$Id: job.c,v 1.66 2000/05/11 15:47:12 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -248,6 +248,15 @@ CheckJobs(void)
                   current->state->values[0].integer));
 
    /*
+    * Start held jobs if they are ready...
+    */
+
+    if (current->state->values[0].integer == IPP_JOB_HELD &&
+        current->hold_until &&
+	current->hold_until < time(NULL))
+      current->state->values[0].integer = IPP_JOB_PENDING;
+
+   /*
     * Start pending jobs if the destination is available...
     */
 
@@ -474,6 +483,11 @@ LoadAllJobs(void)
       attr = ippFindAttribute(job->attrs, "job-originating-user-name", IPP_TAG_NAME);
       strncpy(job->username, attr->values[0].string.text,
               sizeof(job->username) - 1);
+
+      if (job->state->values[0].integer == IPP_JOB_HELD &&
+          ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_KEYWORD) == NULL &&
+	  ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME) == NULL)
+        job->state->values[0].integer = IPP_JOB_PENDING;
 
      /*
       * Insert the job into the array, sorting by job priority and ID...
@@ -2329,5 +2343,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.65 2000/05/02 19:29:22 mike Exp $".
+ * End of "$Id: job.c,v 1.66 2000/05/11 15:47:12 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.38 2000/03/30 05:19:29 mike Exp $"
+ * "$Id: main.c,v 1.39 2000/05/11 15:47:13 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -68,6 +68,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 			*next;		/* Next job */
   listener_t		*lis;		/* Current listener */
   time_t		activity;	/* Activity timer */
+  time_t		senddoc_time;	/* Send-Document time */
   struct timeval	timeout;	/* select() timeout */
   struct rlimit		limit;		/* Runtime limit */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
@@ -237,6 +238,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Loop forever...
   */
 
+  senddoc_time = time(NULL);
+
   for (;;)
   {
    /*
@@ -396,6 +399,16 @@ main(int  argc,			/* I - Number of command-line arguments */
         UpdateBrowseList();
 
       SendBrowseList();
+    }
+
+   /*
+    * Update any pending multi-file documents...
+    */
+
+    if ((time(NULL) - senddoc_time) >= 60)
+    {
+      CheckJobs();
+      senddoc_time = time(NULL);
     }
 
    /*
@@ -600,5 +613,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.38 2000/03/30 05:19:29 mike Exp $".
+ * End of "$Id: main.c,v 1.39 2000/05/11 15:47:13 mike Exp $".
  */

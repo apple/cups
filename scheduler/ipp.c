@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.64 2000/05/02 19:29:22 mike Exp $"
+ * "$Id: ipp.c,v 1.65 2000/05/11 15:47:12 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -744,8 +744,13 @@ add_job_state_reasons(client_t *con,	/* I - Client connection */
         break;
 
     case IPP_JOB_HELD :
-        ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-	             "job-state-reasons", NULL, "job-hold-until-specified");
+        if (ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_KEYWORD) != NULL ||
+	    ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME) != NULL)
+          ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+	               "job-state-reasons", NULL, "job-hold-until-specified");
+        else
+          ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+	               "job-state-reasons", NULL, "job-incoming");
         break;
 
     case IPP_JOB_PROCESSING :
@@ -1625,9 +1630,10 @@ create_job(client_t        *con,	/* I - Client connection */
     return;
   }
 
-  job->dtype   = dtype;
-  job->attrs   = con->request;
-  con->request = NULL;
+  job->hold_until = time(NULL) + 60;
+  job->dtype      = dtype;
+  job->attrs      = con->request;
+  con->request    = NULL;
 
   strncpy(job->title, title, sizeof(job->title) - 1);
 
@@ -4095,6 +4101,9 @@ send_document(client_t        *con,	/* I - Client connection */
     job->state->values[0].integer = IPP_JOB_PENDING;
     CheckJobs();
   }
+  else
+    job->hold_until = time(NULL) + 60;
+
 
  /*
   * Fill in the response info...
@@ -4768,5 +4777,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.64 2000/05/02 19:29:22 mike Exp $".
+ * End of "$Id: ipp.c,v 1.65 2000/05/11 15:47:12 mike Exp $".
  */
