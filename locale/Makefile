@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.8.2.1 2001/12/26 16:52:40 mike Exp $"
+# "$Id: Makefile,v 1.8.2.2 2002/01/26 21:46:10 mike Exp $"
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1993-1999 by Easy Software Products.
+#   Copyright 1993-2002 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -28,7 +28,7 @@ include ../Makedefs
 # Locales...
 #
 
-LOCALES	=	C cs de en es fr it
+LOCALES	=	C cs de en es fr it zh_CN
 
 
 #
@@ -72,5 +72,5 @@ translate.o:	../cups/http.h
 
 
 #
-# End of "$Id: Makefile,v 1.8.2.1 2001/12/26 16:52:40 mike Exp $".
+# End of "$Id: Makefile,v 1.8.2.2 2002/01/26 21:46:10 mike Exp $".
 #
