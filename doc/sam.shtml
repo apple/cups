@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.0.2">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.0.3">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Administrators Manual</TITLE>
 </HEAD>
@@ -10,7 +10,7 @@
 <H1 ALIGN=RIGHT>Preface</H1>
 
 This software administrators manual provides printer administration
-information for the Common UNIX Printing System ("CUPS") Version 1.0.2.
+information for the Common UNIX Printing System ("CUPS") Version 1.0.3.
 
 <H2>System Overview</H2>
 
@@ -344,6 +344,7 @@ CUPS:
 	</UL>
 
 	<DT>smb://[username:password@]hostname/queue
+	<DT>smb://[username:password@]workgroup/hostname/queue
 	<DD>Sends all output to the specified SMB (Windows) printer queue
 	using the SAMBA software.
 

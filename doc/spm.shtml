@@ -498,8 +498,6 @@ cupsCancelJob("LaserJet", 1);
 <H3>See Also</H3>
 
 <P>
-<A HREF="#cupsGetClasses"><CODE>cupsGetClasses()</CODE></A>,
-<A HREF="#cupsGetPrinters"><CODE>cupsGetPrinters()</CODE></A>,
 <A HREF="#cupsLastError"><CODE>cupsLastError()</CODE></A>,
 <A HREF="#cupsPrintFile"><CODE>cupsPrintFile()</CODE></A>
 
@@ -692,10 +690,15 @@ response = cupsDoRequest(http, request, "/resource");
 <A HREF="#ippAddString"><CODE>ippAddString()</CODE></A>,
 <A HREF="#ippNew"><CODE>ippNew()</CODE></A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsFreeOptions()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsFreeOptions">cupsFreeOptions()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+void
+cupsFreeOptions(int num_options,
+                cups_option_t *options);
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -704,23 +707,49 @@ response = cupsDoRequest(http, request, "/resource");
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>num_options</TD>
+	<TD>Number of options in array.</TD>
 </TR>
+<TR>
+	<TD>options</TD>
+	<TD>Pointer to options array.</TD>
+</TR>
 </TABLE></CENTER>
-
-<H3>Returns</H3>
 
 <H3>Description</H3>
 
+<P><CODE>cupsFreeOptions()</CODE> frees all memory associated with the
+option array specified.
+
 <H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+int           num_options;
+cups_option_t *options;
+
+...
 
+cupsFreeOptions(num_options, options);
+</PRE>
+
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsAddOption">cupsAddOption()</A>,
+<A HREF="#cupsGetOption">cupsGetOption()</A>,
+<A HREF="#cupsMarkOptions">cupsMarkOptions()</A>,
+<A HREF="#cupsParseOptions">cupsParseOptions()</A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsGetClasses()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsGetClasses">cupsGetClasses()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+int
+cupsGetClasses(char ***classes);
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -730,50 +759,95 @@ response = cupsDoRequest(http, request, "/resource");
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>classes</TD>
+	<TD>Pointer to character pointer array.</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>The number of printer classes available.
+
 <H3>Description</H3>
+
+<P><CODE>cupsGetClasses()</CODE> gets a list of the available printer classes.
+The returned array should be freed using the <CODE>free()</CODE> when it is
+no longer needed.
 
 <H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+int  i;
+int  num_classes;
+char **classes;
+
+...
+
+num_classes = cupsGetClasses(&classes);
+
+...
+
+if (num_classes > 0)
+{
+  for (i = 0; i < num_classes; i ++)
+    free(classes[i]);
 
+  free(classes);
+}
+</PRE>
+
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsGetDefault">cupsGetDefault()</CODE>,
+<A HREF="#cupsGetPrinters">cupsGetPrinters()</CODE>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsGetDefault()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsGetDefault">cupsGetDefault()</A></H2>
 
 <H3>Usage</H3>
-
-<H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%" BORDER>
-<TR>
-	<TH>Argument</TH>
-	<TH>Description</TH>
-</TR>
-<TR>
-	<TD></TD>
-	<TD></TD>
-</TR>
-</TABLE></CENTER>
+<PRE>
+const char *
+cupsGetDefault(void);
+</PRE>
 
 <H3>Returns</H3>
 
+<P>A pointer to the default destination.
+
 <H3>Description</H3>
+
+<P><CODE>cupsGetDefault()</CODE> gets the default destination printer or class.
+The default destination is stored in a static string and will be overwritten
+(usually with the same value) after each call.
 
 <H3>Example</H3>
 
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+printf("The default destination is %s\n", cupsGetDefault());
+</PRE>
+
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsGetClasses">cupsGetClasses()</CODE>,
+<A HREF="#cupsGetPrinters">cupsGetPrinters()</CODE>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsGetOption()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsGetOption">cupsGetOption()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+const char *
+cupsGetOption(const char *name,
+              int num_options,
+              cups_option_t *options);
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -782,23 +856,58 @@ response = cupsDoRequest(http, request, "/resource");
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>name</TD>
+	<TD>The name of the option.</TD>
+</TR>
+<TR>
+	<TD>num_options</TD>
+	<TD>The number of options in the array.</TD>
+</TR>
+<TR>
+	<TD>options</TD>
+	<TD>The options array.</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
+
+<P>A pointer to the option values or <CODE>NULL</CODE> if the option is
+not defined.
 
 <H3>Description</H3>
 
-<H3>Example</H3>
+<P><CODE>cupsGetOption()</CODE> returns the first occurrence of the
+named option. If the option is not included in the options array then a
+<CODE>NULL</CODE> pointer is returned.
+
+<PRE>
+#include &lt;cups/cups.h&gt;
 
+int           num_options;
+cups_option_t *options;
+const char    *media;
+
+...
+
+media = cupsGetOption("media", num_options, options);
+</PRE>
+
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsAddOption">cupsAddOption()</A>,
+<A HREF="#cupsFreeOptions">cupsFreeOptions()</A>,
+<A HREF="#cupsMarkOptions">cupsMarkOptions()</A>,
+<A HREF="#cupsParseOptions">cupsParseOptions()</A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsGetPassword()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsGetPassword">cupsGetPassword()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+const char *
+cupsGetPassword(const char *prompt);
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -808,24 +917,48 @@ response = cupsDoRequest(http, request, "/resource");
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>prompt</TD>
+	<TD>The prompt to display to the user.</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the password that was entered or <CODE>NULL</CODE> if no
+password was entered.
+
 <H3>Description</H3>
+
+<P><CODE>cupsGetPassword()</CODE> displays the prompt string and asks the user
+for a password. The password text is not echoed to the user.
 
 <H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+char *password;
+
+...
+
+password = cupsGetPassword("Please enter a password:");
+</PRE>
 
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsServer">cupsServer()</A>,
+<A HREF="#cupsUser()">cupsUser()</A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsGetPPD()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsGetPPD">cupsGetPPD()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+const char *
+cupsGetPPD(const char *printer);
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -834,24 +967,50 @@ response = cupsDoRequest(http, request, "/resource");
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>printer</TD>
+	<TD>The name of the printer.</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>The name of a temporary file containing the PPD file or <CODE>NULL</CODE>
+if the printer cannot be located or does not have a PPD file.
+
 <H3>Description</H3>
+
+<P><CODE>cupsGetPPD()</CODE> gets a copy of the PPD file for the named printer.
+The printer name can be of the form "printer" or "printer@hostname".
 
+<P>You should remove (unlink) the PPD file after you are done using it. The
+filename is stored in a static buffer and will be overwritten with each call
+to <CODE>cupsGetPPD()</CODE>.
+
 <H3>Example</H3>
 
-<H3>See Also</H3>
+<PRE>
+#include &lt;cups/cups.h&gt;
 
+char *ppd;
 
-<!-- NEW PAGE --><H2><A NAME="">cupsGetPrinters()</A></H2>
+...
 
+ppd = cupsGetPPD("printer@hostname");
+
+...
+
+unlink(ppd);
+</PRE>
+
+<!-- NEW PAGE --><H2><A NAME="cupsGetPrinters">cupsGetPrinters()</A></H2>
+
 <H3>Usage</H3>
 
+<PRE>
+int
+cupsGetPrinters(char ***printers);
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -860,50 +1019,107 @@ response = cupsDoRequest(http, request, "/resource");
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>printers</TD>
+	<TD>Pointer to character pointer array.</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
+
+<P>The number of printer printers available.
 
 <H3>Description</H3>
 
+<P><CODE>cupsGetPrinters()</CODE> gets a list of the available printers.
+The returned array should be freed using the <CODE>free()</CODE> when it is
+no longer needed.
+
 <H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+int  i;
+int  num_printers;
+char **printers;
+
+...
+
+num_printers = cupsGetPrinters(&printers);
+
+...
+
+if (num_printers > 0)
+{
+  for (i = 0; i < num_printers; i ++)
+    free(printers[i]);
+
+  free(printers);
+}
+</PRE>
 
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsGetClasses">cupsGetClasses()</CODE>,
+<A HREF="#cupsGetDefault">cupsGetDefault()</CODE>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsLangDefault()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsLangDefault">cupsLangDefault()</A></H2>
 
 <H3>Usage</H3>
 
-<H3>Arguments</H3>
-
-<CENTER><TABLE WIDTH="80%" BORDER>
-<TR>
-	<TH>Argument</TH>
-	<TH>Description</TH>
-</TR>
-<TR>
-	<TD></TD>
-	<TD></TD>
-</TR>
-</TABLE></CENTER>
+<PRE>
+const char *
+cupsLangDefault(void);
+</PRE>
 
 <H3>Returns</H3>
 
+<P>A pointer to the default language structure.
+
 <H3>Description</H3>
+
+<P><CODE>cupsLangDefault()</CODE> returns a language structure for the default
+language. The default language is defined by the <CODE>LANG</CODE> environment
+variable. If the specified language cannot be located then the POSIX (English)
+locale is used.
 
+<P>Call <CODE>cupsLangFree()</CODE> to free any memory associated with the
+language structure when you are done.
+
 <H3>Example</H3>
+
+<PRE>
+#include &lt;cups/language.h&gt;
 
+cups_lang_t *language;
+...
+
+language = cupsLangDefault();
+
+...
+
+cupsLangFree(language);
+</PRE>
+
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsLangEncoding">cupsLangEncoding()</A>,
+<A HREF="#cupsLangFlush">cupsLangFlush()</A>,
+<A HREF="#cupsLangFree">cupsLangFree()</A>,
+<A HREF="#cupsLangGet">cupsLangGet()</A>,
+<A HREF="#cupsLangString">cupsLangString()</A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsLangEncoding()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsLangEncoding">cupsLangEncoding()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+char *
+cupsLangEncoding(cups_lang_t *language);
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -912,50 +1128,87 @@ response = cupsDoRequest(http, request, "/resource");
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>language</TD>
+	<TD>The language structure.</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
+
+<P>A pointer to the encoding string.
 
 <H3>Description</H3>
 
+<P><CODE>cupsLangEncoding()</CODE> returns the language encoding used for the
+specified language, e.g. "iso-8859-1", "utf-8", etc.
+
 <H3>Example</H3>
 
-<H3>See Also</H3>
+<PRE>
+#include &lt;cups/language.h&gt;
 
+cups_lang_t *language;
+char        *encoding;
+...
 
-<!-- NEW PAGE --><H2><A NAME="">cupsLangFlush()</A></H2>
+language = cupsLangDefault();
+encoding = cupsLangEncoding(language);
+...
 
-<H3>Usage</H3>
+cupsLangFree(language);
+</PRE>
 
-<H3>Arguments</H3>
+<H3>See Also</H3>
 
-<CENTER><TABLE WIDTH="80%" BORDER>
-<TR>
-	<TH>Argument</TH>
-	<TH>Description</TH>
-</TR>
-<TR>
-	<TD></TD>
-	<TD></TD>
-</TR>
-</TABLE></CENTER>
+<P>
+<A HREF="#cupsLangDefault">cupsLangDefault()</A>,
+<A HREF="#cupsLangFlush">cupsLangFlush()</A>,
+<A HREF="#cupsLangFree">cupsLangFree()</A>,
+<A HREF="#cupsLangGet">cupsLangGet()</A>,
+<A HREF="#cupsLangString">cupsLangString()</A>
 
-<H3>Returns</H3>
+<!-- NEW PAGE --><H2><A NAME="cupsLangFlush">cupsLangFlush()</A></H2>
 
+<H3>Usage</H3>
+
+<PRE>
+void
+cupsLangFlush(void);
+</PRE>
+
 <H3>Description</H3>
 
+<P><CODE>cupsLangFlush()</CODE> frees all language structures that have been
+allocated.
+
 <H3>Example</H3>
+
+<PRE>
+#include &lt;cups/language.h&gt;
+
+...
+
+cupsLangFlush();
+</PRE>
 
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsLangDefault">cupsLangDefault()</A>,
+<A HREF="#cupsLangEncoding">cupsLangEncoding()</A>,
+<A HREF="#cupsLangFree">cupsLangFree()</A>,
+<A HREF="#cupsLangGet">cupsLangGet()</A>,
+<A HREF="#cupsLangString">cupsLangString()</A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsLangFree()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsLangFree">cupsLangFree()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+void
+cupsLangFree(cups_lang_t *language);
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -964,23 +1217,43 @@ response = cupsDoRequest(http, request, "/resource");
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>language</TD>
+	<TD>The language structure to free.</TD>
 </TR>
 </TABLE></CENTER>
-
-<H3>Returns</H3>
 
 <H3>Description</H3>
+
+<P><CODE>cupsLangFree()</CODE> frees the specified language structure.
 
 <H3>Example</H3>
+
+<PRE>
+#include &lt;cups/language.h&gt;
+
+cups_lang_t *language;
+...
 
+cupsLangFree(language);
+</PRE>
+
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsLangDefault">cupsLangDefault()</A>,
+<A HREF="#cupsLangEncoding">cupsLangEncoding()</A>,
+<A HREF="#cupsLangFlush">cupsLangFlush()</A>,
+<A HREF="#cupsLangGet">cupsLangGet()</A>,
+<A HREF="#cupsLangString">cupsLangString()</A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsLangGet()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsLangGet">cupsLangGet()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+cups_lang_t *
+cupsLangGet(const char *name);
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -990,24 +1263,56 @@ response = cupsDoRequest(http, request, "/resource");
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>name</TD>
+	<TD>The name of the locale.</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to a language structure.
+
 <H3>Description</H3>
+
+<P><CODE>cupsLangGet()</CODE> returns a language structure for the specified
+locale. If the locale is not defined then the POSIX (English) locale is
+substituted.
 
 <H3>Example</H3>
+
+<PRE>
+#include &lt;cups/language.h&gt;
+
+cups_lang_t *language;
 
+...
+
+language = cupsLangGet("fr");
+
+...
+
+cupsLangFree(language);
+</PRE>
+
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsLangDefault">cupsLangDefault()</A>,
+<A HREF="#cupsLangEncoding">cupsLangEncoding()</A>,
+<A HREF="#cupsLangFlush">cupsLangFlush()</A>,
+<A HREF="#cupsLangFree">cupsLangFree()</A>,
+<A HREF="#cupsLangString">cupsLangString()</A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsLangString()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsLangString">cupsLangString()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+char *
+cupsLangString(cups_lang_t *language,
+               int         message);
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -1016,50 +1321,100 @@ response = cupsDoRequest(http, request, "/resource");
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>language</TD>
+	<TD>The language to query.</TD>
+</TR>
+<TR>
+	<TD>message</TD>
+	<TD>The message number.</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to the message string or <CODE>NULL</CODE> if the message is
+not defined.
+
 <H3>Description</H3>
+
+<P><CODE>cupsLangString()</CODE> returns a pointer to the specified message
+string in the specified language.
 
 <H3>Example</H3>
+
+<PRE>
+#include &lt;cups/language.h&gt;
+
+cups_lang_t *language;
+char        *s;
+...
+
+language = cupsLangGet("fr");
+
+s = cupsLangString(language, CUPS_MSG_YES);
 
+...
+
+cupsLangFree(language);
+</PRE>
+
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsLangDefault">cupsLangDefault()</A>,
+<A HREF="#cupsLangEncoding">cupsLangEncoding()</A>,
+<A HREF="#cupsLangFlush">cupsLangFlush()</A>,
+<A HREF="#cupsLangFree">cupsLangFree()</A>,
+<A HREF="#cupsLangGet">cupsLangGet()</A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsLastError()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsLastError">cupsLastError()</A></H2>
 
 <H3>Usage</H3>
-
-<H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%" BORDER>
-<TR>
-	<TH>Argument</TH>
-	<TH>Description</TH>
-</TR>
-<TR>
-	<TD></TD>
-	<TD></TD>
-</TR>
-</TABLE></CENTER>
+<PRE>
+ipp_status_t
+cupsLastError(void);
+</PRE>
 
 <H3>Returns</H3>
 
+<P>An enumeration containing the last IPP error.
+
 <H3>Description</H3>
+
+<P><CODE>cupsLastError()</CODE> returns the last IPP error that occurred.
+If no error occurred then it will return <CODE>IPP_OK</CODE> or
+<CODE>IPP_OK_CONFLICT</CODE>.
 
 <H3>Example</H3>
 
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+ipp_status_t status;
+
+...
+
+status = cupsLastError();
+</PRE>
+
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsCancelJob">cupsCancelJob()</A>,
+<A HREF="#cupsPrintFile">cupsPrintFile()</A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsMarkOptions()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsMarkOptions">cupsMarkOptions()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+int
+cupsMarkOptions(ppd_file_t *ppd,
+                int num_options,
+                cups_option_t *options);
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -1068,24 +1423,61 @@ response = cupsDoRequest(http, request, "/resource");
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ppd</TD>
+	<TD>The PPD file to mark.</TD>
+</TR>
+<TR>
+	<TD>num_options</TD>
+	<TD>The number of options in the options array.</TD>
+</TR>
+<TR>
+	<TD>options</TD>
+	<TD>A pointer to the options array.</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>The number of conflicts found.
+
 <H3>Description</H3>
+
+<P><CODE>cupsMarkOptions()</CODE> marks options in the PPD file. It also
+handles mapping of IPP option names and values to PPD option names.
 
 <H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+int           num_options;
+cups_option_t *options;
+ppd_file_t    *ppd;
 
+...
+
+cupsMarkOptions(ppd, num_options, options);
+</PRE>
+
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsAddOption">cupsAddOption()</A>,
+<A HREF="#cupsFreeOptions">cupsFreeOptions()</A>,
+<A HREF="#cupsGetOption">cupsGetOption()</A>,
+<A HREF="#cupsParseOptions">cupsParseOptions()</A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsParseOptions()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsParseOptions">cupsParseOptions()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+int
+cupsParseOptions(const char *arg,
+                 int num_options,
+                 cups_option_t **options);
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -1094,23 +1486,64 @@ response = cupsDoRequest(http, request, "/resource");
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>arg</TD>
+	<TD>The string containing one or more options.</TD>
+</TR>
+<TR>
+	<TD>num_options</TD>
+	<TD>The number of options in the options array.</TD>
+</TR>
+<TR>
+	<TD>options</TD>
+	<TD>A pointer to the options array pointer.</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
+
+<P>The new number of options in the array.
 
 <H3>Description</H3>
 
+<P><CODE>cupsParseOptions()</CODE> parses the specifies string for one
+or more options of the form "name=value", "name", or "noname". It can
+be called multiple times to combine the options from several strings.
+
 <H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
 
+int           num_options;
+cups_option_t *options;
+
+...
+
+num_options = 0;
+options     = (cups_option_t *)0;
+num_options = cupsParseOptions(argv[5], num_options, &amp;options);
+</PRE>
+
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsAddOption">cupsAddOption()</A>,
+<A HREF="#cupsFreeOptions">cupsFreeOptions()</A>,
+<A HREF="#cupsGetOption">cupsGetOption()</A>,
+<A HREF="#cupsMarkOptions">cupsMarkOptions()</A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsPrintFile()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsPrintFile">cupsPrintFile()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+int
+cupsPrintFile(const char *printer,
+              const char *filename,
+              const char *title,
+	      int num_options,
+	      cups_option_t *options);
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -1120,24 +1553,66 @@ response = cupsDoRequest(http, request, "/resource");
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>printer</TD>
+	<TD>The printer or class to print to.</TD>
+</TR>
+<TR>
+	<TD>filename</TD>
+	<TD>The file to print.</TD>
+</TR>
+<TR>
+	<TD>title</TD>
+	<TD>The job title.</TD>
+</TR>
+<TR>
+	<TD>num_options</TD>
+	<TD>The number of options in the options array.</TD>
 </TR>
+<TR>
+	<TD>options</TD>
+	<TD>A pointer to the options array.</TD>
+</TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>The new job ID number or 0 on error.
+
 <H3>Description</H3>
+
+<P><CODE>cupsPrintFile()</CODE> sends a file to the specified printer or
+class for printing. If the job cannot be printed the error code can be
+found by calling <CODE>cupsLastError()</CODE>.
 
 <H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+int           num_options;
+cups_option_t *options;
+
+...
+
+cupsPrintFile("printer@hostname", "filename.ps", "Job Title", num_options,
+              options);
+</PRE>
 
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsCancelJob">cupsCancelJob()</A>,
+<A HREF="#cupsLastError">cupsLastError()</A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsRasterClose()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsRasterClose">cupsRasterClose()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+void
+cupsRasterClose(cups_raster_t *ras);
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -1146,23 +1621,46 @@ response = cupsDoRequest(http, request, "/resource");
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ras</TD>
+	<TD>The raster stream to close.</TD>
 </TR>
 </TABLE></CENTER>
-
-<H3>Returns</H3>
 
 <H3>Description</H3>
+
+<P><CODE>cupsRasterClose()</CODE> closes the specified raster stream.
 
 <H3>Example</H3>
+
+<PRE>
+#include &lt;cups/raster.h&gt;
+
+cups_raster_t *ras;
 
+...
+
+cupsRasterClose(ras);
+</PRE>
+
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsRasterOpen">cupsRasterOpen()</A>,
+<A HREF="#cupsRasterReadHeader">cupsRasterReadHeader()</A>,
+<A HREF="#cupsRasterReadPixels">cupsRasterReadPixels()</A>,
+<A HREF="#cupsRasterWriteHeader">cupsRasterWriteHeader()</A>,
+<A HREF="#cupsRasterWritePixels">cupsRasterWritePixels()</A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsRasterOpen()</A></H2>
 
+<!-- NEW PAGE --><H2><A NAME="cupsRasterOpen">cupsRasterOpen()</A></H2>
+
 <H3>Usage</H3>
+
+<PRE>
+cups_raster_t *
+cupsRasterOpen(int fd,
+               cups_mode_t mode);
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -1172,24 +1670,55 @@ response = cupsDoRequest(http, request, "/resource");
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>fd</TD>
+	<TD>The file descriptor to use.</TD>
+</TR>
+<TR>
+	<TD>mode</TD>
+	<TD>The mode to use; <CODE>CUPS_RASTER_READ</CODE> or
+	<CODE>CUPS_RASTER_WRITE</CODE>.</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>A pointer to a raster stream or <CODE>NULL</CODE> if there was an error.
+
 <H3>Description</H3>
+
+<P><CODE>cupsRasterOpen()</CODE> opens a raster stream for reading or writing.
 
 <H3>Example</H3>
+
+<PRE>
+#include &lt;cups/raster.h&gt;
+
+cups_raster_t *ras;
 
+...
+
+ras = cupsRasterOpen(0, CUPS_RASTER_READ);
+</PRE>
+
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsRasterClose">cupsRasterClose()</A>,
+<A HREF="#cupsRasterReadHeader">cupsRasterReadHeader()</A>,
+<A HREF="#cupsRasterReadPixels">cupsRasterReadPixels()</A>,
+<A HREF="#cupsRasterWriteHeader">cupsRasterWriteHeader()</A>,
+<A HREF="#cupsRasterWritePixels">cupsRasterWritePixels()</A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsRasterReadHeader()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsRasterReadHeader">cupsRasterReadHeader()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+unsigned
+cupsRasterReadHeader(cups_raster_t *ras,
+                     cups_page_header_t *header);
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -1198,23 +1727,67 @@ response = cupsDoRequest(http, request, "/resource");
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ras</TD>
+	<TD>The raster stream to read from.</TD>
+</TR>
+<TR>
+	<TD>header</TD>
+	<TD>A pointer to a page header structure to read into.</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>1 on success, 0 on EOF or error.
+
 <H3>Description</H3>
+
+<P><CODE>cupsRasterReadHeader()</CODE> reads a page header from the specified
+raster stream.
 
 <H3>Example</H3>
+
+<PRE>
+#include &lt;cups/raster.h&gt;
+
+int                  line;
+cups_raster_t        *ras;
+cups_raster_header_t header;
+unsigned char        pixels[8192];
+...
 
+while (cupsRasterReadHeader(ras, &amp;header))
+{
+  ...
+
+  for (line = 0; line &lt; header.cupsHeight; line ++)
+  {
+    cupsRasterReadPixels(ras, pixels, header.cupsBytesPerLine);
+
+    ...
+  }
+}
+</PRE>
+
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsRasterClose">cupsRasterClose()</A>,
+<A HREF="#cupsRasterOpen">cupsRasterOpen()</A>,
+<A HREF="#cupsRasterReadPixels">cupsRasterReadPixels()</A>,
+<A HREF="#cupsRasterWriteHeader">cupsRasterWriteHeader()</A>,
+<A HREF="#cupsRasterWritePixels">cupsRasterWritePixels()</A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsRasterReadPixels()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsRasterReadPixels">cupsRasterReadPixels()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+unsigned
+cupsRasterReadPixels(cups_raster_t *ras,
+                     unsigned char *pixels,
+		     unsigned length);
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -1224,23 +1797,70 @@ response = cupsDoRequest(http, request, "/resource");
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ras</TD>
+	<TD>The raster stream to read from.</TD>
+</TR>
+<TR>
+	<TD>pixels</TD>
+	<TD>The pointer to a pixel buffer.</TD>
 </TR>
+<TR>
+	<TD>length</TD>
+	<TD>The number of bytes of pixel data to read.</TD>
+</TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>The number of bytes read or 0 on EOF or error.
+
 <H3>Description</H3>
+
+<P><CODE>cupsRasterReadPixels()</CODE> reads pixel data from the specified
+raster stream.
 
 <H3>Example</H3>
+
+<PRE>
+#include &lt;cups/raster.h&gt;
+
+int                  line;
+cups_raster_t        *ras;
+cups_raster_header_t header;
+unsigned char        pixels[8192];
+...
+
+while (cupsRasterReadHeader(ras, &amp;header))
+{
+  ...
+
+  for (line = 0; line &lt; header.cupsHeight; line ++)
+  {
+    cupsRasterReadPixels(ras, pixels, header.cupsBytesPerLine);
 
+    ...
+  }
+}
+</PRE>
+
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsRasterClose">cupsRasterClose()</A>,
+<A HREF="#cupsRasterOpen">cupsRasterOpen()</A>,
+<A HREF="#cupsRasterReadHeader">cupsRasterReadHeader()</A>,
+<A HREF="#cupsRasterWriteHeader">cupsRasterWriteHeader()</A>,
+<A HREF="#cupsRasterWritePixels">cupsRasterWritePixels()</A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsRasterWriteHeader()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsRasterWriteHeader">cupsRasterWriteHeader()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+unsigned
+cupsRasterWriteHeader(cups_raster_t *ras,
+                      cups_page_header_t *header);
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -1250,24 +1870,65 @@ response = cupsDoRequest(http, request, "/resource");
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ras</TD>
+	<TD>The raster stream to write to.</TD>
 </TR>
+<TR>
+	<TD>header</TD>
+	<TD>A pointer to the page header to write.</TD>
+</TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>1 on success, 0 on error.
+
 <H3>Description</H3>
+
+<P><CODE>cupsRasterWriteHeader()</CODE> writes the specified page header to
+a raster stream.
 
 <H3>Example</H3>
 
+<PRE>
+#include &lt;cups/raster.h&gt;
+
+int                  line;
+cups_raster_t        *ras;
+cups_raster_header_t header;
+unsigned char        pixels[8192];
+...
+
+cupsRasterWriteHeader(ras, &amp;header);
+
+for (line = 0; line &lt; header.cupsHeight; line ++)
+{
+  ...
+
+  cupsRasterWritePixels(ras, pixels, header.cupsBytesPerLine);
+}
+</PRE>
+
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsRasterClose">cupsRasterClose()</A>,
+<A HREF="#cupsRasterOpen">cupsRasterOpen()</A>,
+<A HREF="#cupsRasterReadHeader">cupsRasterReadHeader()</A>,
+<A HREF="#cupsRasterReadPixels">cupsRasterReadPixels()</A>,
+<A HREF="#cupsRasterWritePixels">cupsRasterWritePixels()</A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsRasterWritePixels()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsRasterWritePixels">cupsRasterWritePixels()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+unsigned
+cupsRasterWritePixels(cups_raster_t *ras,
+                      unsigned char *pixels,
+		      unsigned length);
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -1276,50 +1937,116 @@ response = cupsDoRequest(http, request, "/resource");
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>ras</TD>
+	<TD>The raster stream to write to.</TD>
+</TR>
+<TR>
+	<TD>pixels</TD>
+	<TD>The pixel data to write.</TD>
+</TR>
+<TR>
+	<TD>length</TD>
+	<TD>The number of bytes to write.</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
+
+<P>The number of bytes written.
 
 <H3>Description</H3>
 
+<P><CODE>cupsRasterWritePixels()</CODE> writes the specified pixel data to a
+raster stream.
+
 <H3>Example</H3>
+
+<PRE>
+#include &lt;cups/raster.h&gt;
 
+int                  line;
+cups_raster_t        *ras;
+cups_raster_header_t header;
+unsigned char        pixels[8192];
+...
+
+cupsRasterWriteHeader(ras, &amp;header);
+
+for (line = 0; line &lt; header.cupsHeight; line ++)
+{
+  ...
+
+  cupsRasterWritePixels(ras, pixels, header.cupsBytesPerLine);
+}
+</PRE>
+
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsRasterClose">cupsRasterClose()</A>,
+<A HREF="#cupsRasterOpen">cupsRasterOpen()</A>,
+<A HREF="#cupsRasterReadHeader">cupsRasterReadHeader()</A>,
+<A HREF="#cupsRasterReadPixels">cupsRasterReadPixels()</A>,
+<A HREF="#cupsRasterWriteHeader">cupsRasterWriteHeader()</A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsServer()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsServer">cupsServer()</A></H2>
 
 <H3>Usage</H3>
 
-<H3>Arguments</H3>
-
-<CENTER><TABLE WIDTH="80%" BORDER>
-<TR>
-	<TH>Argument</TH>
-	<TH>Description</TH>
-</TR>
-<TR>
-	<TD></TD>
-	<TD></TD>
-</TR>
-</TABLE></CENTER>
+<PRE>
+const char *
+cupsServer(void);
+</PRE>
 
 <H3>Returns</H3>
 
+<P>A pointer to the default server name.
+
 <H3>Description</H3>
+
+<P><CODE>cupsServer()</CODE> returns a pointer to the default server name.
+The server name is stored in a static location and will be overwritten with
+every call to <CODE>cupsServer()</CODE>
+
+<P>The default server is determined from the following locations:
+
+<OL>
+
+	<LI>The <CODE>CUPS_SERVER</CODE> environment variable,
+
+	<LI>The <CODE>ServerName</CODE> directive in the
+	<VAR>cupsd.conf</VAR> file,
+
+	<LI>The default host, "localhost".
 
+</OL>
+
 <H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+const char *server;
+
+server = cupsServer();
+</PRE>
 
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsGetPassword">cupsGetPassword()</A>,
+<A HREF="#cupsUser">cupsUser()</A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsTempFile()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsTempFile">cupsTempFile()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+char *
+cupsTempFile(char *filename,
+             int length);
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -1328,50 +2055,77 @@ response = cupsDoRequest(http, request, "/resource");
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>filename</TD>
+	<TD>The character string to hold the temporary filename.</TD>
+</TR>
+<TR>
+	<TD>length</TD>
+	<TD>The size of the filename string in bytes.</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
+
+<P>A pointer to <CODE>filename</CODE>.
 
 <H3>Description</H3>
 
+<P><CODE>cupsTempFile()</CODE> generates a temporary filename for the
+<VAR>/var/tmp</VAR> directory or the directory specified by the
+<CODE>TMPDIR</CODE> environment variable.
+
 <H3>Example</H3>
 
-<H3>See Also</H3>
+<PRE>
+#include &lt;cups/cups.h&gt;
 
+char filename[256];
 
-<!-- NEW PAGE --><H2><A NAME="">cupsUser()</A></H2>
+cupsTempFile(filename, sizeof(filename));
+</PRE>
 
-<H3>Usage</H3>
+<!-- NEW PAGE --><H2><A NAME="cupsUser">cupsUser()</A></H2>
 
-<H3>Arguments</H3>
+<H3>Usage</H3>
 
-<CENTER><TABLE WIDTH="80%" BORDER>
-<TR>
-	<TH>Argument</TH>
-	<TH>Description</TH>
-</TR>
-<TR>
-	<TD></TD>
-	<TD></TD>
-</TR>
-</TABLE></CENTER>
+<PRE>
+const char *
+cupsUser(void);
+</PRE>
 
 <H3>Returns</H3>
+
+<P>A pointer to the current username or <CODE>NULL</CODE> if the user ID is
+undefined.
 
 <H3>Description</H3>
 
+<P><CODE>cupsUser()</CODE> returns the name associated with the current
+user ID as reported by the <CODE>getuid()</CODE> system call.
+
 <H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
 
+const char *user;
+
+user = cupsUser();
+</PRE>
+
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsGetPassword">cupsGetPassword()</A>,
+<A HREF="#cupsServer">cupsServer()</A>
 
-<!-- NEW PAGE --><H2><A NAME="">httpBlocking()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpBlocking">httpBlocking()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -1390,14 +2144,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpCheck()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpCheck">httpCheck()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -1416,14 +2176,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpClearFields()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpClearFields">httpClearFields()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -1442,14 +2208,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpClose()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpClose">httpClose()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -1468,14 +2240,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpConnect()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpConnect">httpConnect()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -1494,14 +2272,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpDecode64()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpDecode64">httpDecode64()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -1520,14 +2304,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpDelete()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpDelete">httpDelete()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -1546,14 +2336,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpEncode64()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpEncode64">httpEncode64()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -1572,14 +2368,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpError()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpError">httpError()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -1598,14 +2400,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpFlush()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpFlush">httpFlush()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -1624,14 +2432,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpGet()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpGet">httpGet()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -1650,14 +2464,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpGets()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpGets">httpGets()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -1676,14 +2496,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpGetDateString()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpGetDateString">httpGetDateString()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -1702,14 +2528,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpGetDateTime()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpGetDateTime">httpGetDateTime()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -1729,12 +2561,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpGetField()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpGetField">httpGetField()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -1755,12 +2593,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpGetLength()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpGetLength">httpGetLength()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -1781,12 +2625,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpHead()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpHead">httpHead()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -1807,12 +2657,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpInitialize()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpInitialize">httpInitialize()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -1833,12 +2689,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpOptions()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpOptions">httpOptions()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -1859,12 +2721,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpPost()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpPost">httpPost()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -1885,12 +2753,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpPrintf()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpPrintf">httpPrintf()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -1911,12 +2785,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpPut()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpPut">httpPut()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -1937,12 +2817,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpRead()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpRead">httpRead()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -1963,12 +2849,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpReconnect()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpReconnect">httpReconnect()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -1989,12 +2881,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpSeparate()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpSeparate">httpSeparate()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -2015,12 +2913,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpSetField()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpSetField">httpSetField()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -2041,12 +2945,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpTrace()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpTrace">httpTrace()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -2067,12 +2977,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpUpdate()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpUpdate">httpUpdate()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -2093,12 +3009,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">httpWrite()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="httpWrite">httpWrite()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -2119,12 +3041,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ippAddBoolean()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ippAddBoolean">ippAddBoolean()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -2145,12 +3073,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ippAddBooleans()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ippAddBooleans">ippAddBooleans()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -2171,12 +3105,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ippAddDate()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ippAddDate">ippAddDate()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -2197,12 +3137,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ippAddInteger()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ippAddInteger">ippAddInteger()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -2223,12 +3169,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ippAddIntegers()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ippAddIntegers">ippAddIntegers()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -2249,12 +3201,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ippAddRange()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ippAddRange">ippAddRange()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -2275,12 +3233,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ippAddRanges()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ippAddRanges">ippAddRanges()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -2301,12 +3265,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ippAddResolution()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ippAddResolution">ippAddResolution()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -2327,12 +3297,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ippAddResolutions()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ippAddResolutions">ippAddResolutions()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -2353,12 +3329,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ippAddSeparator()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ippAddSeparator">ippAddSeparator()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -2379,12 +3361,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ippAddString()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ippAddString">ippAddString()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -2405,12 +3393,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ippAddStrings()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ippAddStrings">ippAddStrings()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -2431,12 +3425,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ippDateToTime()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ippDateToTime">ippDateToTime()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -2457,12 +3457,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ippDelete()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ippDelete">ippDelete()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -2483,12 +3489,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ippFindAttribute()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ippFindAttribute">ippFindAttribute()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -2509,12 +3521,18 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ippLength()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ippLength">ippLength()</A></H2>
 
 <H3>Usage</H3>
+
+<PRE>
+</PRE>
 
 <H3>Arguments</H3>
 
@@ -2535,13 +3553,19 @@ response = cupsDoRequest(http, request, "/resource");
 
 <H3>Example</H3>
 
+<PRE>
+</PRE>
+
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ippNew()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ippNew">ippNew()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -2560,14 +3584,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ippPort()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ippPort">ippPort()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -2586,14 +3616,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ippRead()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ippRead">ippRead()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -2612,14 +3648,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ippTimeToDate()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ippTimeToDate">ippTimeToDate()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -2638,14 +3680,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ippWrite()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ippWrite">ippWrite()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -2664,14 +3712,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">mimeAddFilter()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="mimeAddFilter">mimeAddFilter()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -2690,14 +3744,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">mimeAddType()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="mimeAddType">mimeAddType()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -2716,14 +3776,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">mimeAddTypeRule()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="mimeAddTypeRule">mimeAddTypeRule()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -2742,14 +3808,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">mimeDelete()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="mimeDelete">mimeDelete()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -2768,14 +3840,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">mimeFileType()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="mimeFileType">mimeFileType()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -2794,14 +3872,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">mimeFilter()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="mimeFilter">mimeFilter()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -2820,14 +3904,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">mimeLoad()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="mimeLoad">mimeLoad()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -2846,14 +3936,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">mimeMerge()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="mimeMerge">mimeMerge()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -2872,14 +3968,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">mimeNew()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="mimeNew">mimeNew()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -2898,14 +4000,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">mimeType()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="mimeType">mimeType()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -2924,14 +4032,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ppdClose()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ppdClose">ppdClose()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -2950,14 +4064,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ppdConflicts()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ppdConflicts">ppdConflicts()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -2976,14 +4096,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">pddEmitFd()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="pddEmitFd">pddEmitFd()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -3002,14 +4128,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ppdEmit()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ppdEmit">ppdEmit()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -3028,14 +4160,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ppdFindChoice()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ppdFindChoice">ppdFindChoice()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -3054,14 +4192,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ppdFindMarkedChoice()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ppdFindMarkedChoice">ppdFindMarkedChoice()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -3080,14 +4224,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ppdFindOption()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ppdFindOption">ppdFindOption()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -3106,14 +4256,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ppdIsMarked()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ppdIsMarked">ppdIsMarked()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -3132,14 +4288,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ppdMarkDefaults()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ppdMarkDefaults">ppdMarkDefaults()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -3158,14 +4320,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ppdMarkOption()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ppdMarkOption">ppdMarkOption()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -3184,14 +4352,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ppdOpenFd()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ppdOpenFd">ppdOpenFd()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -3210,14 +4384,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ppdOpenFile()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ppdOpenFile">ppdOpenFile()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -3236,14 +4416,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ppdOpen()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ppdOpen">ppdOpen()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -3262,14 +4448,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ppdPageLength()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ppdPageLength">ppdPageLength()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -3288,14 +4480,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ppdPageSize()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ppdPageSize">ppdPageSize()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -3314,14 +4512,20 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
 
-<!-- NEW PAGE --><H2><A NAME="">ppdPageWidth()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="ppdPageWidth">ppdPageWidth()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+</PRE>
+
 <H3>Arguments</H3>
 
 <CENTER><TABLE WIDTH="80%" BORDER>
@@ -3340,6 +4544,9 @@ response = cupsDoRequest(http, request, "/resource");
 <H3>Description</H3>
 
 <H3>Example</H3>
+
+<PRE>
+</PRE>
 
 <H3>See Also</H3>
 
