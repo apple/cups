@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.4.2.7 2002/05/14 01:25:45 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.4.2.8 2002/06/07 21:04:44 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -135,9 +135,9 @@ cp $root/conf/mime.convs /tmp/$user/mime.convs
 #
 
 if test "x$LD_LIBRARY_PATH" = x; then
-	LD_LIBRARY_PATH="$root/cups:$root/filter:$root/ipp"
+	LD_LIBRARY_PATH="$root/cups:$root/filter"
 else
-	LD_LIBRARY_PATH="$root/cups:$root/filter:$root/ipp:$LD_LIBRARY_PATH"
+	LD_LIBRARY_PATH="$root/cups:$root/filter:$LD_LIBRARY_PATH"
 fi
 
 export LD_LIBRARY_PATH
@@ -146,12 +146,20 @@ LD_PRELOAD="$root/cups/libcups.so:$root/filter/libcupsimage.so"
 export LD_PRELOAD
 
 if test "x$DYLD_LIBRARY_PATH" = x; then
-	DYLD_LIBRARY_PATH="$root/cups:$root/filter:$root/ipp"
+	DYLD_LIBRARY_PATH="$root/cups:$root/filter"
 else
-	DYLD_LIBRARY_PATH="$root/cups:$root/filter:$root/ipp:$DYLD_LIBRARY_PATH"
+	DYLD_LIBRARY_PATH="$root/cups:$root/filter:$DYLD_LIBRARY_PATH"
 fi
 
-export DYLD_LIBRARY_PATH
+export SHLIB_PATH
+
+if test "x$SHLIB_PATH" = x; then
+	SHLIB_PATH="$root/cups:$root/filter"
+else
+	SHLIB_PATH="$root/cups:$root/filter:$SHLIB_PATH"
+fi
+
+export SHLIB_PATH
 
 CUPS_SERVERROOT=/tmp/$user; export CUPS_SERVERROOT
 CUPS_DATADIR=/tmp/$user/share; export CUPS_DATADIR
@@ -339,5 +347,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.4.2.7 2002/05/14 01:25:45 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.4.2.8 2002/06/07 21:04:44 mike Exp $"
 #
