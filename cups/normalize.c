@@ -1,7 +1,7 @@
 /*
- * "$Id: normalize.c,v 1.1.2.2 2002/08/20 12:41:52 mike Exp $"
+ * "$Id: normalize.c,v 1.1.2.3 2002/09/26 16:58:46 mike Exp $"
  *
- *   Transcoding support for the Common UNIX Printing System (CUPS).
+ *   Unicode normalization for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-2002 by Easy Software Products.
  *
@@ -12,44 +12,45 @@
  *   If this file is missing or damaged please contact Easy Software
  *   Products at:
  *
- *	 Attn: CUPS Licensing Information
- *	 Easy Software Products
- *	 44141 Airport View Drive, Suite 204
- *	 Hollywood, Maryland 20636-3111 USA
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
  *
- *	 Voice: (301) 373-9603
- *	 EMail: cups-info@cups.org
- *	   WWW: http://www.cups.org
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
  *
- *   cupsNormalizeMapsGet()	  - Get all normalization maps into cache.
- *   cupsNormalizeMapsFree()	  - Free all normalization maps in cache.
- *   cupsNormalizeMapsFlush()	  - Flush all normalization maps in cache.
- *   cupsUTF8Normalize()	  - Normalize UTF-8 string.
- *   cupsUTF32Normalize()	  - Normalize UTF-32 string.
- *   cupsUTF8CaseFold()		  - Case fold UTF-8 string.
- *   cupsUTF32CaseFold()	  - Case fold UTF-32 string.
- *   cupsUTF8CompareCaseless()	  - Compare case folded UTF-8 strings.
- *   cupsUTF32CompareCaseless()	  - Compare case folded UTF-32 strings.
+ *   cupsNormalizeMapsGet()       - Get all norm maps to cache.
+ *   cupsNormalizeMapsFree()      - Free all norm maps in cache.
+ *   cupsNormalizeMapsFlush()     - Flush all norm maps in cache.
+ *   cupsUTF8Normalize()          - Normalize UTF-8 string.
+ *   cupsUTF32Normalize()         - Normalize UTF-32 string.
+ *   cupsUTF8CaseFold()           - Case fold UTF-8 string.
+ *   cupsUTF32CaseFold()          - Case fold UTF-32 string.
+ *   cupsUTF8CompareCaseless()    - Compare case folded UTF-8 strings.
+ *   cupsUTF32CompareCaseless()   - Compare case folded UTF-32 strings.
  *   cupsUTF8CompareIdentifier()  - Compare folded NFKC UTF-8 strings.
  *   cupsUTF32CompareIdentifier() - Compare folded NFKC UTF-32 strings.
- *   get_general_category()	  - Get UTF-32 Character General Category.
- *   get_bidi_category()	  - Get UTF-32 Character Bidi Category.
- *   get_combining_class()	  - Get UTF-32 Character Combining Class.
- *   get_break_class()		  - Get UTF-32 Character Line Break Class.
- *   get_map_count()		  - Count lines in a map file.
- *   get_normmap()		  - Get Unicode normalization map into cache.
- *   get_foldmap()		  - Get Unicode case folding map into cache.
- *   get_propmap()		  - Get Unicode character property map into cache.
- *   get_combmap()		  - Get Unicode combining class map into cache.
- *   get_breakmap()		  - Get Unicode line break class map into cache.
- *   compare_compose()		  - Compare key for compose match.
- *   compare_decompose()	  - Compare key for decompose match.
- *   compare_foldchar()		  - Compare key for case fold match.
- *   compare_combchar()		  - Compare key for combining char match.
- *   compare_breakchar()	  - Compare key for line break char match.
- *   compare_propchar()		  - Compare key for property char match.
+ *   cupsUTF32CharacterProperty() - Get UTF-32 character property.
+ *   get_general_category()       - Get UTF-32 Char General Category.
+ *   get_bidi_category()          - Get UTF-32 Char Bidi Category.
+ *   get_combining_class()        - Get UTF-32 Char Combining Class.
+ *   get_break_class()            - Get UTF-32 Char Line Break Class.
+ *   get_map_count()              - Count lines in a map file.
+ *   get_normmap()                - Get Unicode norm map to cache.
+ *   get_foldmap()                - Get Unicode casefold map to cache.
+ *   get_propmap()                - Get Unicode property map to cache.
+ *   get_combmap()                - Get Unicode combining map to cache.
+ *   get_breakmap()               - Get Unicode break map to cache.
+ *   compare_compose()            - Compare key for compose match.
+ *   compare_decompose()          - Compare key for decompose match.
+ *   compare_foldchar()           - Compare key for case fold match.
+ *   compare_combchar()           - Compare key for combining match.
+ *   compare_breakchar()          - Compare key for line break match.
+ *   compare_propchar()           - Compare key for property char match.
  */
 
 /*
@@ -69,13 +70,6 @@
 #include "normalize.h"
 
 /*
- * Globals...
- */
-
-int	_cupsSupportUcs2 = 1;  /* Support UCS-2 (16-bit) mapping */
-int	_cupsSupportUcs4 = 0;  /* Support UCS-4 (32-bit) mapping */
-
-/*
  * Local Globals...
  */
 
@@ -85,53 +79,53 @@ static cups_propmap_t *propmap_cache = NULL;/* Char Prop Map Cache */
 static cups_combmap_t *combmap_cache = NULL;/* Comb Class Map Cache */
 static cups_breakmap_t *breakmap_cache = NULL;/* Line Break Map Cache */
 
-typedef struct			/**** General Category Index Struct****/
+typedef struct                  /**** General Category Index Struct****/
 {
-  cups_gencat_t		gencat;		/* General Category Value */
-  const char		*str;		/* General Category String */
+  cups_gencat_t         gencat;         /* General Category Value */
+  const char            *str;           /* General Category String */
 } gencat_t;
 
-static gencat_t gencat_index[] =	/* General Category Index */
+static gencat_t gencat_index[] =        /* General Category Index */
 {
-  { CUPS_GENCAT_LU, "Lu" },	/* Letter, Uppercase */
-  { CUPS_GENCAT_LL, "Ll" },	/* Letter, Lowercase */
-  { CUPS_GENCAT_LT, "Lt" },	/* Letter, Titlecase */
-  { CUPS_GENCAT_LM, "Lm" },	/* Letter, Modifier */
-  { CUPS_GENCAT_LO, "Lo" },	/* Letter, Other */
-  { CUPS_GENCAT_MN, "Mn" },	/* Mark, Non-Spacing */
-  { CUPS_GENCAT_MC, "Mc" },	/* Mark, Spacing Combining */
-  { CUPS_GENCAT_ME, "Me" },	/* Mark, Enclosing */
-  { CUPS_GENCAT_ND, "Nd" },	/* Number, Decimal Digit */
-  { CUPS_GENCAT_NL, "Nl" },	/* Number, Letter */
-  { CUPS_GENCAT_NO, "No" },	/* Number, Other */
-  { CUPS_GENCAT_PC, "Pc" },	/* Punctuation, Connector */
-  { CUPS_GENCAT_PD, "Pd" },	/* Punctuation, Dash */
-  { CUPS_GENCAT_PS, "Ps" },	/* Punctuation, Open (start) */
-  { CUPS_GENCAT_PE, "Pe" },	/* Punctuation, Close (end) */
-  { CUPS_GENCAT_PI, "Pi" },	/* Punctuation, Initial Quote */
-  { CUPS_GENCAT_PF, "Pf" },	/* Punctuation, Final Quote */
-  { CUPS_GENCAT_PO, "Po" },	/* Punctuation, Other */
-  { CUPS_GENCAT_SM, "Sm" },	/* Symbol, Math */
-  { CUPS_GENCAT_SC, "Sc" },	/* Symbol, Currency */
-  { CUPS_GENCAT_SK, "Sk" },	/* Symbol, Modifier */
-  { CUPS_GENCAT_SO, "So" },	/* Symbol, Other */
-  { CUPS_GENCAT_ZS, "Zs" },	/* Separator, Space */
-  { CUPS_GENCAT_ZL, "Zl" },	/* Separator, Line */
-  { CUPS_GENCAT_ZP, "Zp" },	/* Separator, Paragraph */
-  { CUPS_GENCAT_CC, "Cc" },	/* Other, Control */
-  { CUPS_GENCAT_CF, "Cf" },	/* Other, Format */
-  { CUPS_GENCAT_CS, "Cs" },	/* Other, Surrogate */
-  { CUPS_GENCAT_CO, "Co" },	/* Other, Private Use */
-  { CUPS_GENCAT_CN, "Cn" },	/* Other, Not Assigned */
+  { CUPS_GENCAT_LU, "Lu" },     /* Letter, Uppercase */
+  { CUPS_GENCAT_LL, "Ll" },     /* Letter, Lowercase */
+  { CUPS_GENCAT_LT, "Lt" },     /* Letter, Titlecase */
+  { CUPS_GENCAT_LM, "Lm" },     /* Letter, Modifier */
+  { CUPS_GENCAT_LO, "Lo" },     /* Letter, Other */
+  { CUPS_GENCAT_MN, "Mn" },     /* Mark, Non-Spacing */
+  { CUPS_GENCAT_MC, "Mc" },     /* Mark, Spacing Combining */
+  { CUPS_GENCAT_ME, "Me" },     /* Mark, Enclosing */
+  { CUPS_GENCAT_ND, "Nd" },     /* Number, Decimal Digit */
+  { CUPS_GENCAT_NL, "Nl" },     /* Number, Letter */
+  { CUPS_GENCAT_NO, "No" },     /* Number, Other */
+  { CUPS_GENCAT_PC, "Pc" },     /* Punctuation, Connector */
+  { CUPS_GENCAT_PD, "Pd" },     /* Punctuation, Dash */
+  { CUPS_GENCAT_PS, "Ps" },     /* Punctuation, Open (start) */
+  { CUPS_GENCAT_PE, "Pe" },     /* Punctuation, Close (end) */
+  { CUPS_GENCAT_PI, "Pi" },     /* Punctuation, Initial Quote */
+  { CUPS_GENCAT_PF, "Pf" },     /* Punctuation, Final Quote */
+  { CUPS_GENCAT_PO, "Po" },     /* Punctuation, Other */
+  { CUPS_GENCAT_SM, "Sm" },     /* Symbol, Math */
+  { CUPS_GENCAT_SC, "Sc" },     /* Symbol, Currency */
+  { CUPS_GENCAT_SK, "Sk" },     /* Symbol, Modifier */
+  { CUPS_GENCAT_SO, "So" },     /* Symbol, Other */
+  { CUPS_GENCAT_ZS, "Zs" },     /* Separator, Space */
+  { CUPS_GENCAT_ZL, "Zl" },     /* Separator, Line */
+  { CUPS_GENCAT_ZP, "Zp" },     /* Separator, Paragraph */
+  { CUPS_GENCAT_CC, "Cc" },     /* Other, Control */
+  { CUPS_GENCAT_CF, "Cf" },     /* Other, Format */
+  { CUPS_GENCAT_CS, "Cs" },     /* Other, Surrogate */
+  { CUPS_GENCAT_CO, "Co" },     /* Other, Private Use */
+  { CUPS_GENCAT_CN, "Cn" },     /* Other, Not Assigned */
   { 0, NULL }
 };
 
-static const char *bidicat_index[] =	      /* Bidi Category Index */
+static const char *bidicat_index[] =          /* Bidi Category Index */
 {
-  "L",	/* Left-to-Right (Alpha, Syllabic, Ideographic) */
+  "L",  /* Left-to-Right (Alpha, Syllabic, Ideographic) */
   "LRE",/* Left-to-Right Embedding (explicit) */
   "LRO",/* Left-to-Right Override (explicit) */
-  "R",	/* Right-to-Left (Hebrew alphabet and most punct) */
+  "R",  /* Right-to-Left (Hebrew alphabet and most punct) */
   "AL", /* Right-to-Left Arabic (Arabic, Thaana, Syriac) */
   "RLE",/* Right-to-Left Embedding (explicit) */
   "RLO",/* Right-to-Left Override (explicit) */
@@ -143,60 +137,64 @@ static const char *bidicat_index[] =	      /* Bidi Category Index */
   "CS", /* Common Number Separator (Colon, Comma, Dot, etc) */
   "NSM",/* Non-Spacing Mark (category Mn / Me in UCD) */
   "BN", /* Boundary Neutral (Formatting / Control chars) */
-  "B",	/* Paragraph Separator */
-  "S",	/* Segment Separator (Tab) */
+  "B",  /* Paragraph Separator */
+  "S",  /* Segment Separator (Tab) */
   "WS", /* Whitespace Space (Space, Line Separator, etc) */
   "ON", /* Other Neutrals */
   NULL
 };
 
-typedef struct			/**** Line Break Class Index Struct****/
+typedef struct                  /**** Line Break Class Index Struct****/
 {
-  cups_breakclass_t	breakclass;	/* Line Break Class Value */
-  const char		*str;		/* Line Break Class String */
+  cups_breakclass_t     breakclass;     /* Line Break Class Value */
+  const char            *str;           /* Line Break Class String */
 } break_t;
 
-static break_t break_index[] =		/* Line Break Class Index */
+static break_t break_index[] =          /* Line Break Class Index */
 {
   { CUPS_BREAK_AI, "AI" },  /* Ambiguous (Alphabetic or Ideograph) */
-  { CUPS_BREAK_AL, "AL" },  /* Ordinary Alphabetic / Symbol Chars (XP) */
+  { CUPS_BREAK_AL, "AL" },  /* Ordinary Alpha/Symbol Chars (XP) */
   { CUPS_BREAK_BA, "BA" },  /* Break Opportunity After Chars (A) */
   { CUPS_BREAK_BB, "BB" },  /* Break Opportunities Before Chars (B) */
-  { CUPS_BREAK_B2, "B2" },  /* Break Opportunity Before / After (B/A/XP) */
-  { CUPS_BREAK_BK, "BK" },  /* Mandatory Break (A) (normative) */
-  { CUPS_BREAK_CB, "CB" },  /* Contingent Break (B/A) (normative) */
+  { CUPS_BREAK_B2, "B2" },  /* Break Opportunity Either (B/A/XP) */
+  { CUPS_BREAK_BK, "BK" },  /* Mandatory Break (A) (norm) */
+  { CUPS_BREAK_CB, "CB" },  /* Contingent Break (B/A) (norm) */
   { CUPS_BREAK_CL, "CL" },  /* Closing Punctuation (XB) */
-  { CUPS_BREAK_CM, "CM" },  /* Attached Chars/Combining (XB) (normative) */
-  { CUPS_BREAK_CR, "CR" },  /* Carriage Return (A) (normative) */
+  { CUPS_BREAK_CM, "CM" },  /* Attached/Combining (XB) (norm) */
+  { CUPS_BREAK_CR, "CR" },  /* Carriage Return (A) (norm) */
   { CUPS_BREAK_EX, "EX" },  /* Exclamation / Interrogation (XB) */
-  { CUPS_BREAK_GL, "GL" },  /* Non-breaking ("Glue") (XB/XA) (normative) */
+  { CUPS_BREAK_GL, "GL" },  /* Non-breaking ("Glue") (XB/XA) (norm) */
   { CUPS_BREAK_HY, "HY" },  /* Hyphen (XA) */
   { CUPS_BREAK_ID, "ID" },  /* Ideographic (B/A) */
   { CUPS_BREAK_IN, "IN" },  /* Inseparable chars (XP) */
   { CUPS_BREAK_IS, "IS" },  /* Numeric Separator (Infix) (XB) */
-  { CUPS_BREAK_LF, "LF" },  /* Line Feed (A) (normative) */
+  { CUPS_BREAK_LF, "LF" },  /* Line Feed (A) (norm) */
   { CUPS_BREAK_NS, "NS" },  /* Non-starters (XB) */
   { CUPS_BREAK_NU, "NU" },  /* Numeric (XP) */
   { CUPS_BREAK_OP, "OP" },  /* Opening Punctuation (XA) */
   { CUPS_BREAK_PO, "PO" },  /* Postfix (Numeric) (XB) */
   { CUPS_BREAK_PR, "PR" },  /* Prefix (Numeric) (XA) */
   { CUPS_BREAK_QU, "QU" },  /* Ambiguous Quotation (XB/XA) */
-  { CUPS_BREAK_SA, "SA" },  /* Context Dependent (South East Asian) (P) */
-  { CUPS_BREAK_SG, "SG" },  /* Surrogates (XP) (normative) */
-  { CUPS_BREAK_SP, "SP" },  /* Space (A) (normative) */
+  { CUPS_BREAK_SA, "SA" },  /* Context Dependent (SE Asian) (P) */
+  { CUPS_BREAK_SG, "SG" },  /* Surrogates (XP) (norm) */
+  { CUPS_BREAK_SP, "SP" },  /* Space (A) (norm) */
   { CUPS_BREAK_SY, "SY" },  /* Symbols Allowing Break After (A) */
   { CUPS_BREAK_XX, "XX" },  /* Unknown (XP) */
-  { CUPS_BREAK_ZW, "ZW" },  /* Zero Width Space (A) (normative) */
+  { CUPS_BREAK_ZW, "ZW" },  /* Zero Width Space (A) (norm) */
   { 0, NULL }
 };
+
+/*
+ * Prototypes...
+ */
 
 static int get_bidi_category(const cups_utf32_t ch);
 static int get_combining_class(const cups_utf32_t ch);
 static int get_break_class(const cups_utf32_t ch);
 static int get_general_category(const cups_utf32_t ch);
-static int get_map_count(char *filename);
-static int get_normmap(cups_normalize_t normalize);
-static int get_foldmap(cups_folding_t fold);
+static int get_map_count(const char *filename);
+static int get_normmap(const cups_normalize_t normalize);
+static int get_foldmap(const cups_folding_t fold);
 static int get_propmap(void);
 static int get_combmap(void);
 static int get_breakmap(void);
@@ -208,13 +206,13 @@ static int compare_propchar(const void *k1, const void *k2);
 static int compare_breakchar(const void *k1, const void *k2);
 
 /*
- * 'cupsNormalizeMapsGet()' - Get all normalization maps into cache.
+ * 'cupsNormalizeMapsGet()' - Get all normalization maps to cache.
  */
-int				/* O - Zero or -1 on error */
+int                                     /* O - Zero or -1 on error */
 cupsNormalizeMapsGet(void)
 {
-  cups_normmap_t    *nmap;	/* Unicode Normalization Map */
-  cups_foldmap_t    *fmap;	/* Unicode Case Folding Map */
+  cups_normmap_t    *nmap;      /* Unicode Normalization Map */
+  cups_foldmap_t    *fmap;      /* Unicode Case Folding Map */
 
  /*
   * See if we already have normalization maps loaded...
@@ -265,11 +263,11 @@ cupsNormalizeMapsGet(void)
  *
  * This does not actually free; use 'cupsNormalizeMapsFlush()' for that.
  */
-int				/* O - Zero or -1 on error */
+int                                     /* O - Zero or -1 on error */
 cupsNormalizeMapsFree(void)
 {
-  cups_normmap_t    *nmap;	/* Unicode Normalization Map */
-  cups_foldmap_t    *fmap;	/* Unicode Case Folding Map */
+  cups_normmap_t    *nmap;      /* Unicode Normalization Map */
+  cups_foldmap_t    *fmap;      /* Unicode Case Folding Map */
 
  /*
   * See if we already have normalization maps loaded...
@@ -297,10 +295,10 @@ cupsNormalizeMapsFree(void)
 void
 cupsNormalizeMapsFlush(void)
 {
-  cups_normmap_t    *nmap;	/* Unicode Normalization Map */
-  cups_normmap_t    *nextnorm;	/* Next Unicode Normalization Map */
-  cups_foldmap_t    *fmap;	/* Unicode Case Folding Map */
-  cups_foldmap_t    *nextfold;	/* Next Unicode Case Folding Map */
+  cups_normmap_t    *nmap;      /* Unicode Normalization Map */
+  cups_normmap_t    *nextnorm;  /* Next Unicode Normalization Map */
+  cups_foldmap_t    *fmap;      /* Unicode Case Folding Map */
+  cups_foldmap_t    *nextfold;  /* Next Unicode Case Folding Map */
 
  /*
   * Flush all normalization maps...
@@ -347,17 +345,17 @@ cupsNormalizeMapsFlush(void)
  * Note - Compatibility Normalization Forms (NFKD/NFKC) are
  * unsafe for subsequent transcoding to legacy charsets
  */
-int					/* O - Count or -1 on error */
-cupsUTF8Normalize(cups_utf8_t *dest,	     /* O - Target string */
-    const cups_utf8_t *src,		     /* I - Source string */
-    const int maxout,			/* I - Max output */
-    const cups_normalize_t normalize)	/* I - Normalization */
+int                                     /* O - Count or -1 on error */
+cupsUTF8Normalize(cups_utf8_t *dest,    /* O - Target string */
+    const cups_utf8_t *src,             /* I - Source string */
+    const int maxout,                   /* I - Max output */
+    const cups_normalize_t normalize)   /* I - Normalization */
 {
-  int		len;		/* String length */
-  cups_utf32_t	     work1[CUPS_MAX_USTRING];
-				/* First internal UCS-4 string */
-  cups_utf32_t	     work2[CUPS_MAX_USTRING];
-				/* Second internal UCS-4 string */
+  int           len;            /* String length */
+  cups_utf32_t       work1[CUPS_MAX_USTRING];
+                                /* First internal UCS-4 string */
+  cups_utf32_t       work2[CUPS_MAX_USTRING];
+                                /* Second internal UCS-4 string */
 
  /*
   * Check for valid arguments and clear output...
@@ -397,29 +395,30 @@ cupsUTF8Normalize(cups_utf8_t *dest,	     /* O - Target string */
  * Note - Compatibility Normalization Forms (NFKD/NFKC) are
  * unsafe for subsequent transcoding to legacy charsets
  */
-int					/* O - Count or -1 on error */
-cupsUTF32Normalize(cups_utf32_t *dest,	     /* O - Target string */
-    const cups_utf32_t *src,		     /* I - Source string */
-    const int maxout,			/* I - Max output */
-    const cups_normalize_t normalize)	/* I - Normalization */
+int                                     /* O - Count or -1 on error */
+cupsUTF32Normalize(cups_utf32_t *dest,  /* O - Target string */
+    const cups_utf32_t *src,            /* I - Source string */
+    const int maxout,                   /* I - Max output */
+    const cups_normalize_t normalize)   /* I - Normalization */
 {
-  int		i;		/* Looping variable */
-  int		result;		/* Result Value */
-  cups_ucs2_t	     *mp;	     /* Map char pointer */
-  int		hit;		/* Hit count from binary search */
-  cups_utf32_t	     unichar1;	     /* Unicode character value */
-  cups_utf32_t	     unichar2;	     /* Unicode character value */
-  cups_combclass_t  class1;	/* First Combining Class */
-  cups_combclass_t  class2;	/* Second Combining Class */
-  int		len;		/* String length */
-  cups_utf32_t	     work1[CUPS_MAX_USTRING];
-				/* First internal UCS-4 string */
-  cups_utf32_t	     work2[CUPS_MAX_USTRING];
-				/* Second internal UCS-4 string */
-  cups_utf32_t	     *p1;	     /* First UCS-4 string pointer */
-  cups_utf32_t	     *p2;	     /* Second UCS-4 string pointer */
-  cups_normmap_t    *nmap;	/* Unicode Normalization Map */
-  cups_normalize_t  decompose;	/* Decomposition Type */
+  int           i;              /* Looping variable */
+  int           result;         /* Result Value */
+  cups_ucs2_t   *mp;            /* Map char pointer */
+  int           pass;           /* Pass count for each transform */
+  int           hit;            /* Hit count from binary search */
+  cups_utf32_t  unichar1;       /* Unicode character value */
+  cups_utf32_t  unichar2;       /* Unicode character value */
+  cups_combclass_t  class1;     /* First Combining Class */
+  cups_combclass_t  class2;     /* Second Combining Class */
+  int           len;            /* String length */
+  cups_utf32_t  work1[CUPS_MAX_USTRING];
+                                /* First internal UCS-4 string */
+  cups_utf32_t  work2[CUPS_MAX_USTRING];
+                                /* Second internal UCS-4 string */
+  cups_utf32_t  *p1;            /* First UCS-4 string pointer */
+  cups_utf32_t  *p2;            /* Second UCS-4 string pointer */
+  cups_normmap_t    *nmap;      /* Unicode Normalization Map */
+  cups_normalize_t  decompose;  /* Decomposition Type */
 
  /*
   * Check for valid arguments and clear output...
@@ -472,7 +471,7 @@ cupsUTF32Normalize(cups_utf32_t *dest,	     /* O - Target string */
  /*
   * Decompose until no further decomposition...
   */
-  for (;;)
+  for (pass = 0; pass < 20; pass ++)
   {
     p1 = &work1[0];
     p2 = &work2[0];
@@ -482,14 +481,14 @@ cupsUTF32Normalize(cups_utf32_t *dest,	     /* O - Target string */
       * Check for decomposition defined...
       */
       mp = (cups_ucs2_t *) bsearch(p1,
-			      nmap->uni2norm,
-			      nmap->normcount,
-			      (sizeof(cups_ucs2_t) * 3),
-			      compare_decompose);
+                                   nmap->uni2norm,
+                                   nmap->normcount,
+                                   (sizeof(cups_ucs2_t) * 3),
+                                   compare_decompose);
       if (mp == NULL)
       {
-	*p2 ++ = *p1;
-	continue;
+        *p2 ++ = *p1;
+        continue;
       }
 
      /*
@@ -499,7 +498,7 @@ cupsUTF32Normalize(cups_utf32_t *dest,	     /* O - Target string */
       mp ++;
       *p2 ++ = (cups_utf32_t) *mp ++;
       if (*mp != 0)
-	*p2 ++ = (cups_utf32_t) *mp;
+        *p2 ++ = (cups_utf32_t) *mp;
     }
     *p2 = 0;
     len = (int) (p2 - &work2[0]);
@@ -515,7 +514,7 @@ cupsUTF32Normalize(cups_utf32_t *dest,	     /* O - Target string */
  /*
   * Canonical reorder until no further reordering...
   */
-  for (;;)
+  for (pass = 0; pass < 20; pass ++)
   {
     p1 = &work1[0];
     for (hit = 0; *p1 != 0; p1 ++)
@@ -526,23 +525,24 @@ cupsUTF32Normalize(cups_utf32_t *dest,	     /* O - Target string */
       unichar1 = *p1;
       unichar2 = *(p1 + 1);
       if (unichar2 == 0)
-	break;
+        break;
       class1 = get_combining_class(unichar1);
       class2 = get_combining_class(unichar2);
       if ((class1 < 0) || (class2 < 0))
-	return (-1);
+        return (-1);
       if ((class1 == 0) || (class2 == 0))
-	continue;
-      if (class1 < class2)
-	continue;
+        continue;
+      if (class1 <= class2)
+        continue;
 
      /*
       * Swap two combining characters...
       */
       {
-	*p1 = unichar2;
-	*(p1 + 1) = unichar1;
-	hit ++;
+        *p1 = unichar2;
+        p1 ++;
+        *p1 = unichar1;
+        hit ++;
       }
     }
     if (hit == 0)
@@ -570,7 +570,7 @@ cupsUTF32Normalize(cups_utf32_t *dest,	     /* O - Target string */
  /*
   * Compose until no further composition...
   */
-  for (;;)
+  for (pass = 0; pass < 20; pass ++)
   {
     p1 = &work1[0];
     p2 = &work2[0];
@@ -583,18 +583,18 @@ cupsUTF32Normalize(cups_utf32_t *dest,	     /* O - Target string */
       unichar2 = *(p1 + 1);
       if (unichar2 == 0)
       {
-	*p2 ++ = unichar1;
-	break;
+        *p2 ++ = unichar1;
+        break;
       }
       mp = (cups_ucs2_t *) bsearch(p1,
-			      nmap->uni2norm,
-			      nmap->normcount,
-			      (sizeof(cups_ucs2_t) * 3),
-			      compare_compose);
+                                   nmap->uni2norm,
+                                   nmap->normcount,
+                                   (sizeof(cups_ucs2_t) * 3),
+                                   compare_compose);
       if (mp == NULL)
       {
-	*p2 ++ = *p1;
-	continue;
+        *p2 ++ = *p1;
+        continue;
       }
 
      /*
@@ -627,17 +627,17 @@ cupsUTF32Normalize(cups_utf32_t *dest,	     /* O - Target string */
  * Note - Case folding output is
  * unsafe for subsequent transcoding to legacy charsets
  */
-int					/* O - Count or -1 on error */
-cupsUTF8CaseFold(cups_utf8_t *dest,	     /* O - Target string */
-    const cups_utf8_t *src,		     /* I - Source string */
-    const int maxout,			/* I - Max output */
-    const cups_folding_t fold)		/* I - Fold Mode */
+int                                     /* O - Count or -1 on error */
+cupsUTF8CaseFold(cups_utf8_t *dest,     /* O - Target string */
+    const cups_utf8_t *src,             /* I - Source string */
+    const int maxout,                   /* I - Max output */
+    const cups_folding_t fold)          /* I - Fold Mode */
 {
-  int		len;		/* String length */
-  cups_utf32_t	     work1[CUPS_MAX_USTRING];
-				/* First internal UCS-4 string */
-  cups_utf32_t	     work2[CUPS_MAX_USTRING];
-				/* Second internal UCS-4 string */
+  int           len;            /* String length */
+  cups_utf32_t  work1[CUPS_MAX_USTRING];
+                                /* First internal UCS-4 string */
+  cups_utf32_t  work2[CUPS_MAX_USTRING];
+                                /* Second internal UCS-4 string */
 
  /*
   * Check for valid arguments and clear output...
@@ -679,17 +679,17 @@ cupsUTF8CaseFold(cups_utf8_t *dest,	     /* O - Target string */
  * Note - Case folding output is
  * unsafe for subsequent transcoding to legacy charsets
  */
-int					/* O - Count or -1 on error */
-cupsUTF32CaseFold(cups_utf32_t *dest,	     /* O - Target string */
-    const cups_utf32_t *src,		     /* I - Source string */
-    const int maxout,			/* I - Max output */
-    const cups_folding_t fold)		/* I - Fold Mode */
+int                                     /* O - Count or -1 on error */
+cupsUTF32CaseFold(cups_utf32_t *dest,   /* O - Target string */
+    const cups_utf32_t *src,            /* I - Source string */
+    const int maxout,                   /* I - Max output */
+    const cups_folding_t fold)          /* I - Fold Mode */
 {
-  cups_utf32_t	     *start = dest;  /* Start of destination string */
-  int		i;		/* Looping variable */
-  int		result;		/* Result Value */
-  cups_ucs2_t	     *mp;	     /* Map char pointer */
-  cups_foldmap_t    *fmap;	/* Unicode Case Folding Map */
+  cups_utf32_t  *start = dest;  /* Start of destination string */
+  int           i;              /* Looping variable */
+  int           result;         /* Result Value */
+  cups_ucs2_t   *mp;            /* Map char pointer */
+  cups_foldmap_t    *fmap;      /* Unicode Case Folding Map */
 
  /*
   * Check for valid arguments and clear output...
@@ -724,10 +724,10 @@ cupsUTF32CaseFold(cups_utf32_t *dest,	     /* O - Target string */
     * Check for case folding defined...
     */
     mp = (cups_ucs2_t *) bsearch(src,
-			    fmap->uni2fold,
-			    fmap->foldcount,
-			    (sizeof(cups_ucs2_t) * 4),
-			    compare_foldchar);
+                                 fmap->uni2fold,
+                                 fmap->foldcount,
+                                 (sizeof(cups_ucs2_t) * 4),
+                                 compare_foldchar);
     if (mp == NULL)
     {
       *dest ++ = *src;
@@ -743,7 +743,7 @@ cupsUTF32CaseFold(cups_utf32_t *dest,	     /* O - Target string */
     {
       i ++;
       if (i >= (maxout -1))
-	break;
+        break;
       *dest ++ = (cups_utf32_t) *mp;
     }
   }
@@ -755,17 +755,17 @@ cupsUTF32CaseFold(cups_utf32_t *dest,	     /* O - Target string */
 /*
  * 'cupsUTF8CompareCaseless()' - Compare case folded UTF-8 strings.
  */
-int					/* O - Difference of strings */
+int                                     /* O - Difference of strings */
 cupsUTF8CompareCaseless(const cups_utf8_t *s1,
-					/* I - String1 */
-    const cups_utf8_t *s2)		     /* I - String2 */
+                                        /* I - String1 */
+    const cups_utf8_t *s2)              /* I - String2 */
 {
-  int		difference;	/* Difference of two strings */
-  int		len;		/* String length */
-  cups_utf32_t	     work1[CUPS_MAX_USTRING];
-				/* First internal UCS-4 string */
-  cups_utf32_t	     work2[CUPS_MAX_USTRING];
-				/* Second internal UCS-4 string */
+  int           difference;     /* Difference of two strings */
+  int           len;            /* String length */
+  cups_utf32_t  work1[CUPS_MAX_USTRING];
+                                /* First internal UCS-4 string */
+  cups_utf32_t  work2[CUPS_MAX_USTRING];
+                                /* Second internal UCS-4 string */
 
  /*
   * Check for valid arguments...
@@ -794,21 +794,21 @@ cupsUTF8CompareCaseless(const cups_utf8_t *s1,
 /*
  * 'cupsUTF32CompareCaseless()' - Compare case folded UTF-32 strings.
  */
-int					/* O - Difference of strings */
+int                                     /* O - Difference of strings */
 cupsUTF32CompareCaseless(const cups_utf32_t *s1,
-					/* I - String1 */
-    const cups_utf32_t *s2)		     /* I - String2 */
+                                        /* I - String1 */
+    const cups_utf32_t *s2)             /* I - String2 */
 {
-  int		difference;	/* Difference of two strings */
-  int		len;		/* String length */
+  int           difference;     /* Difference of two strings */
+  int           len;            /* String length */
   cups_folding_t fold = CUPS_FOLD_FULL;
-				/* Case folding mode */
-  cups_utf32_t	     fold1[CUPS_MAX_USTRING];
-				/* First UCS-4 folded string */
-  cups_utf32_t	     fold2[CUPS_MAX_USTRING];
-				/* Second UCS-4 folded string */
-  cups_utf32_t	     *p1;	     /* First UCS-4 string pointer */
-  cups_utf32_t	     *p2;	     /* Second UCS-4 string pointer */
+                                /* Case folding mode */
+  cups_utf32_t  fold1[CUPS_MAX_USTRING];
+                                /* First UCS-4 folded string */
+  cups_utf32_t  fold2[CUPS_MAX_USTRING];
+                                /* Second UCS-4 folded string */
+  cups_utf32_t  *p1;            /* First UCS-4 string pointer */
+  cups_utf32_t  *p2;            /* Second UCS-4 string pointer */
 
  /*
   * Check for valid arguments...
@@ -848,15 +848,15 @@ cupsUTF32CompareCaseless(const cups_utf32_t *s1,
  */
 int
 cupsUTF8CompareIdentifier(const cups_utf8_t *s1,
-					/* I - String1 */
-    const cups_utf8_t *s2)		     /* I - String2 */
+                                        /* I - String1 */
+    const cups_utf8_t *s2)              /* I - String2 */
 {
-  int		difference;	/* Difference of two strings */
-  int		len;		/* String length */
-  cups_utf32_t	     work1[CUPS_MAX_USTRING];
-				/* First internal UCS-4 string */
-  cups_utf32_t	     work2[CUPS_MAX_USTRING];
-				/* Second internal UCS-4 string */
+  int           difference;     /* Difference of two strings */
+  int           len;            /* String length */
+  cups_utf32_t  work1[CUPS_MAX_USTRING];
+                                /* First internal UCS-4 string */
+  cups_utf32_t  work2[CUPS_MAX_USTRING];
+                                /* Second internal UCS-4 string */
 
  /*
   * Check for valid arguments...
@@ -887,25 +887,25 @@ cupsUTF8CompareIdentifier(const cups_utf8_t *s1,
  */
 int
 cupsUTF32CompareIdentifier(const cups_utf32_t *s1,
-					/* I - String1 */
-    const cups_utf32_t *s2)		     /* I - String2 */
+                                        /* I - String1 */
+    const cups_utf32_t *s2)             /* I - String2 */
 {
-  int		difference;	/* Difference of two strings */
-  int		len;		/* String length */
+  int           difference;     /* Difference of two strings */
+  int           len;            /* String length */
   cups_folding_t fold = CUPS_FOLD_FULL;
-				/* Case folding mode */
-  cups_utf32_t	     fold1[CUPS_MAX_USTRING];
-				/* First UCS-4 folded string */
-  cups_utf32_t	     fold2[CUPS_MAX_USTRING];
-				/* Second UCS-4 folded string */
+                                /* Case folding mode */
+  cups_utf32_t  fold1[CUPS_MAX_USTRING];
+                                /* First UCS-4 folded string */
+  cups_utf32_t  fold2[CUPS_MAX_USTRING];
+                                /* Second UCS-4 folded string */
   cups_normalize_t normalize = CUPS_NORM_NFKC;
-				/* Normalization form */
-  cups_utf32_t	     norm1[CUPS_MAX_USTRING];
-				/* First UCS-4 normalized string */
-  cups_utf32_t	     norm2[CUPS_MAX_USTRING];
-				/* Second UCS-4 normalized string */
-  cups_utf32_t	     *p1;	     /* First UCS-4 string pointer */
-  cups_utf32_t	     *p2;	     /* Second UCS-4 string pointer */
+                                /* Normalization form */
+  cups_utf32_t  norm1[CUPS_MAX_USTRING];
+                                /* First UCS-4 normalized string */
+  cups_utf32_t  norm2[CUPS_MAX_USTRING];
+                                /* Second UCS-4 normalized string */
+  cups_utf32_t  *p1;            /* First UCS-4 string pointer */
+  cups_utf32_t  *p2;            /* Second UCS-4 string pointer */
 
  /*
   * Check for valid arguments...
@@ -951,14 +951,14 @@ cupsUTF32CompareIdentifier(const cups_utf32_t *s1,
 }
 
 /*
- *   cupsUTF32CharacterProperty() - Get UTF-32 character property.
+ * 'cupsUTF32CharacterProperty()' - Get UTF-32 character property.
  */
 int
 cupsUTF32CharacterProperty(const cups_utf32_t ch,
-					/* I - Source char */
-    const cups_property_t property)	/* I - Char Property */
+                                        /* I - Source char */
+    const cups_property_t prop)         /* I - Char Property */
 {
-  int		    result;	/* Result Value */
+  int               result;     /* Result Value */
 
  /*
   * Check for valid arguments...
@@ -969,7 +969,7 @@ cupsUTF32CharacterProperty(const cups_utf32_t ch,
  /*
   * Find character property...
   */
-  switch (property)
+  switch (prop)
   {
     case CUPS_PROP_GENERAL_CATEGORY:
       result = (get_general_category(ch));
@@ -992,13 +992,14 @@ cupsUTF32CharacterProperty(const cups_utf32_t ch,
 /*
  * 'get_general_category()' - Get UTF-32 Character General Category.
  */
-static int				/* O - Class or -1 on error */
-get_general_category(const cups_utf32_t ch)  /* I - Source char */
+static int                              /* O - Class or -1 on error */
+get_general_category(const cups_utf32_t ch)
+                                        /* I - Source char */
 {
-  int		    result;	/* Result Value */
-  cups_gencat_t	    gencat;	/* General Category Value */
-  cups_propmap_t    *pmap;	/* Unicode Property Map */
-  cups_prop_t	    *uni2prop;	/* Unicode Char -> Properties */
+  int               result;     /* Result Value */
+  cups_gencat_t     gencat;     /* General Category Value */
+  cups_propmap_t    *pmap;      /* Unicode Property Map */
+  cups_prop_t       *uni2prop;  /* Unicode Char -> Properties */
 
  /*
   * Check for valid argument...
@@ -1020,13 +1021,13 @@ get_general_category(const cups_utf32_t ch)  /* I - Source char */
   * Find character in map...
   */
   uni2prop = (cups_prop_t *) bsearch(&ch,
-				     pmap->uni2prop,
-				     pmap->propcount,
-				     (sizeof(cups_prop_t)),
-				     compare_propchar);
+                                     pmap->uni2prop,
+                                     pmap->propcount,
+                                     (sizeof(cups_prop_t)),
+                                     compare_propchar);
   cupsNormalizeMapsFree();
   if (uni2prop == NULL)
-    gencat = CUPS_GENCAT_CN;		/* Other, Not Assigned */
+    gencat = CUPS_GENCAT_CN;            /* Other, Not Assigned */
   else
     gencat = (cups_gencat_t) uni2prop->gencat;
   result = (int) gencat;
@@ -1036,13 +1037,14 @@ get_general_category(const cups_utf32_t ch)  /* I - Source char */
 /*
  * 'get_bidi_category()' - Get UTF-32 Character Bidi Category.
  */
-static int				/* O - Class or -1 on error */
-get_bidi_category(const cups_utf32_t ch)     /* I - Source char */
+static int                              /* O - Class or -1 on error */
+get_bidi_category(const cups_utf32_t ch)
+                                        /* I - Source char */
 {
-  int		    result;	/* Result Value */
-  cups_bidicat_t    bidicat;	/* Bidi Category Value */
-  cups_propmap_t    *pmap;	/* Unicode Property Map */
-  cups_prop_t	    *uni2prop;	/* Unicode Char -> Properties */
+  int               result;     /* Result Value */
+  cups_bidicat_t    bidicat;    /* Bidi Category Value */
+  cups_propmap_t    *pmap;      /* Unicode Property Map */
+  cups_prop_t       *uni2prop;  /* Unicode Char -> Properties */
 
  /*
   * Check for valid argument...
@@ -1064,13 +1066,13 @@ get_bidi_category(const cups_utf32_t ch)     /* I - Source char */
   * Find character in map...
   */
   uni2prop = (cups_prop_t *) bsearch(&ch,
-				     pmap->uni2prop,
-				     pmap->propcount,
-				     (sizeof(cups_prop_t)),
-				     compare_propchar);
+                                     pmap->uni2prop,
+                                     pmap->propcount,
+                                     (sizeof(cups_prop_t)),
+                                     compare_propchar);
   cupsNormalizeMapsFree();
   if (uni2prop == NULL)
-    bidicat = CUPS_BIDI_ON;		/* Other Neutral */
+    bidicat = CUPS_BIDI_ON;             /* Other Neutral */
   else
     bidicat = (cups_bidicat_t) uni2prop->bidicat;
   result = (int) bidicat;
@@ -1082,13 +1084,14 @@ get_bidi_category(const cups_utf32_t ch)     /* I - Source char */
  *
  * Note - Zero is non-combining (base character)
  */
-static int				/* O - Class or -1 on error */
-get_combining_class(const cups_utf32_t ch)   /* I - Source char */
+static int                              /* O - Class or -1 on error */
+get_combining_class(const cups_utf32_t ch)
+                                        /* I - Source char */
 {
-  int		    result;	/* Result Value */
-  cups_combmap_t    *cmap;	/* Unicode Combining Class Map */
-  cups_combclass_t  combclass;	/* Unicode Combining Class */
-  cups_comb_t	    *uni2comb;	/* Unicode Char -> Combining Class */
+  int               result;     /* Result Value */
+  cups_combmap_t    *cmap;      /* Unicode Combining Class Map */
+  cups_combclass_t  combclass;  /* Unicode Combining Class */
+  cups_comb_t       *uni2comb;  /* Unicode Char -> Combining Class */
 
  /*
   * Check for valid argument...
@@ -1110,10 +1113,10 @@ get_combining_class(const cups_utf32_t ch)   /* I - Source char */
   * Find combining character in map...
   */
   uni2comb = (cups_comb_t *) bsearch(&ch,
-				     cmap->uni2comb,
-				     cmap->combcount,
-				     (sizeof(cups_comb_t)),
-				     compare_combchar);
+                                     cmap->uni2comb,
+                                     cmap->combcount,
+                                     (sizeof(cups_comb_t)),
+                                     compare_combchar);
   cupsNormalizeMapsFree();
   if (uni2comb == NULL)
     combclass = 0;
@@ -1126,13 +1129,13 @@ get_combining_class(const cups_utf32_t ch)   /* I - Source char */
 /*
  * 'get_break_class()' - Get UTF-32 Character Line Break Class.
  */
-static int				/* O - Class or -1 on error */
-get_break_class(const cups_utf32_t ch)	     /* I - Source char */
+static int                              /* O - Class or -1 on error */
+get_break_class(const cups_utf32_t ch)  /* I - Source char */
 {
-  int		    result;	/* Result Value */
-  cups_breakmap_t   *bmap;	/* Unicode Line Break Class Map */
+  int               result;     /* Result Value */
+  cups_breakmap_t   *bmap;      /* Unicode Line Break Class Map */
   cups_breakclass_t breakclass; /* Unicode Line Break Class */
-  cups_ucs2_t		 *uni2break; /* Unicode Char -> Line Break Class */
+  cups_ucs2_t       *uni2break; /* Unicode -> Line Break Class */
 
  /*
   * Check for valid argument...
@@ -1154,10 +1157,10 @@ get_break_class(const cups_utf32_t ch)	     /* I - Source char */
   * Find line break character in map...
   */
   uni2break = (cups_ucs2_t *) bsearch(&ch,
-				 bmap->uni2break,
-				 bmap->breakcount,
-				 (sizeof(cups_ucs2_t) * 3),
-				 compare_breakchar);
+                                      bmap->uni2break,
+                                      bmap->breakcount,
+                                      (sizeof(cups_ucs2_t) * 3),
+                                      compare_breakchar);
   cupsNormalizeMapsFree();
   if (uni2break == NULL)
     breakclass = CUPS_BREAK_AI;
@@ -1170,14 +1173,14 @@ get_break_class(const cups_utf32_t ch)	     /* I - Source char */
 /*
  * 'get_map_count()' - Count lines in a map file.
  */
-static int				/* O - Count or -1 on error */
-get_map_count(char *filename)		/* I - Map Filename */
+static int                              /* O - Count or -1 on error */
+get_map_count(const char *filename)     /* I - Map Filename */
 {
-  int		i;		/* Looping variable */
-  FILE		*fp;		/* Map input file pointer */
-  char		*s;		/* Line parsing pointer */
-  char		line[256];	/* Line from input map file */
-  cups_utf32_t	     unichar;	     /* Unicode character value */
+  int           i;              /* Looping variable */
+  FILE          *fp;            /* Map input file pointer */
+  char          *s;             /* Line parsing pointer */
+  char          line[256];      /* Line from input map file */
+  cups_utf32_t  unichar;        /* Unicode character value */
 
  /*
   * Open map input file...
@@ -1217,24 +1220,25 @@ get_map_count(char *filename)		/* I - Map Filename */
 }
 
 /*
- * 'get_normmap()' - Get Unicode normalization map into cache.
+ * 'get_normmap()' - Get Unicode normalization map to cache.
  */
-static int				/* O - Zero or -1 on error */
-get_normmap(cups_normalize_t normalize) /* I - Normalization Form */
+static int                              /* O - Zero or -1 on error */
+get_normmap(const cups_normalize_t normalize)
+                                        /* I - Normalization Form */
 {
-  int		i;		/* Looping variable */
-  cups_utf32_t	     unichar1;	     /* Unicode character value */
-  cups_utf32_t	     unichar2;	     /* Unicode character value */
-  cups_utf32_t	     unichar3;	     /* Unicode character value */
-  cups_normmap_t    *nmap;	/* Unicode Normalization Map */
-  int		normcount;	/* Count of Unicode Source Chars */
-  cups_ucs2_t	     *uni2norm;	     /* Unicode Char -> Normalization */
-  char		*datadir;	/* CUPS_DATADIR environment variable */
-  char		*mapname;	/* Normalization map name */
-  char		filename[256];	/* Filename for charset map file */
-  FILE		*fp;		/* Normalization map file pointer */
-  char		*s;		/* Line parsing pointer */
-  char		line[256];	/* Line from input map file */
+  int           i;              /* Looping variable */
+  cups_utf32_t  unichar1;       /* Unicode character value */
+  cups_utf32_t  unichar2;       /* Unicode character value */
+  cups_utf32_t  unichar3;       /* Unicode character value */
+  cups_normmap_t    *nmap;      /* Unicode Normalization Map */
+  int           normcount;      /* Count of Unicode Source Chars */
+  cups_ucs2_t   *uni2norm;      /* Unicode Char -> Normalization */
+  char          *datadir;       /* CUPS_DATADIR environment variable */
+  char          *mapname;       /* Normalization map name */
+  char          filename[256];  /* Filename for charset map file */
+  FILE          *fp;            /* Normalization map file pointer */
+  char          *s;             /* Line parsing pointer */
+  char          line[256];      /* Line from input map file */
 
  /*
   * See if we already have this normalization map loaded...
@@ -1250,16 +1254,16 @@ get_normmap(cups_normalize_t normalize) /* I - Normalization Form */
     datadir = CUPS_DATADIR;
   switch (normalize)
   {
-    case CUPS_NORM_NFD:		/* Canonical Decomposition */
+    case CUPS_NORM_NFD:         /* Canonical Decomposition */
       mapname = "uni-nfd.txt";
       break;
-    case CUPS_NORM_NFKD:	/* Compatibility Decomposition */
+    case CUPS_NORM_NFKD:        /* Compatibility Decomposition */
       mapname = "uni-nfkd.txt";
       break;
-    case CUPS_NORM_NFC:		/* Canonical Composition */
+    case CUPS_NORM_NFC:         /* Canonical Composition */
       mapname = "uni-nfc.txt";
       break;
-    case CUPS_NORM_NFKC:	/* no such map file... */
+    case CUPS_NORM_NFKC:        /* no such map file... */
     default:
       return (-1);
   }
@@ -1267,7 +1271,8 @@ get_normmap(cups_normalize_t normalize) /* I - Normalization Form */
  /*
   * Open normalization map input file...
   */
-  snprintf(filename, sizeof(filename), "%s/charmaps/%s", datadir, mapname);
+  snprintf(filename, sizeof(filename), "%s/charmaps/%s",
+           datadir, mapname);
   if ((normcount = get_map_count(filename)) <= 0)
     return (-1);
   fp = fopen(filename, "r");
@@ -1326,25 +1331,25 @@ get_normmap(cups_normalize_t normalize) /* I - Normalization Form */
 }
 
 /*
- * 'get_foldmap()' - Get Unicode case folding map into cache.
+ * 'get_foldmap()' - Get Unicode case folding map to cache.
  */
-static int				/* O - Zero or -1 on error */
-get_foldmap(cups_folding_t fold)	/* I - Case folding type */
+static int                              /* O - Zero or -1 on error */
+get_foldmap(const cups_folding_t fold)  /* I - Case folding type */
 {
-  int		i;		/* Looping variable */
-  cups_utf32_t	     unichar1;	     /* Unicode character value */
-  cups_utf32_t	     unichar2;	     /* Unicode character value */
-  cups_utf32_t	     unichar3;	     /* Unicode character value */
-  cups_utf32_t	     unichar4;	     /* Unicode character value */
-  cups_foldmap_t    *fmap;	/* Unicode Case Folding Map */
-  int		foldcount;	/* Count of Unicode Source Chars */
-  cups_ucs2_t	     *uni2fold;	     /* Unicode Char -> Folded Char(s) */
-  char		*datadir;	/* CUPS_DATADIR environment variable */
-  char		*mapname;	/* Case Folding map name */
-  char		filename[256];	/* Filename for charset map file */
-  FILE		*fp;		/* Case Folding map file pointer */
-  char		*s;		/* Line parsing pointer */
-  char		line[256];	/* Line from input map file */
+  int           i;              /* Looping variable */
+  cups_utf32_t  unichar1;       /* Unicode character value */
+  cups_utf32_t  unichar2;       /* Unicode character value */
+  cups_utf32_t  unichar3;       /* Unicode character value */
+  cups_utf32_t  unichar4;       /* Unicode character value */
+  cups_foldmap_t    *fmap;      /* Unicode Case Folding Map */
+  int           foldcount;      /* Count of Unicode Source Chars */
+  cups_ucs2_t   *uni2fold;      /* Unicode -> Folded Char(s) */
+  char          *datadir;       /* CUPS_DATADIR env variable */
+  char          *mapname;       /* Case Folding map name */
+  char          filename[256];  /* Filename for charset map file */
+  FILE          *fp;            /* Case Folding map file pointer */
+  char          *s;             /* Line parsing pointer */
+  char          line[256];      /* Line from input map file */
 
  /*
   * See if we already have this case folding map loaded...
@@ -1360,10 +1365,10 @@ get_foldmap(cups_folding_t fold)	/* I - Case folding type */
     datadir = CUPS_DATADIR;
   switch (fold)
   {
-    case CUPS_FOLD_SIMPLE:	/* Simple case folding */
+    case CUPS_FOLD_SIMPLE:      /* Simple case folding */
       mapname = "uni-fold.txt";
       break;
-    case CUPS_FOLD_FULL:	/* Full case folding */
+    case CUPS_FOLD_FULL:        /* Full case folding */
       mapname = "uni-full.txt";
       break;
     default:
@@ -1373,7 +1378,8 @@ get_foldmap(cups_folding_t fold)	/* I - Case folding type */
  /*
   * Open case folding map input file...
   */
-  snprintf(filename, sizeof(filename), "%s/charmaps/%s", datadir, mapname);
+  snprintf(filename, sizeof(filename), "%s/charmaps/%s",
+           datadir, mapname);
   if ((foldcount = get_map_count(filename)) <= 0)
     return (-1);
   fp = fopen(filename, "r");
@@ -1420,7 +1426,7 @@ get_foldmap(cups_folding_t fold)	/* I - Case folding type */
       break;
     if ((fold == CUPS_FOLD_FULL)
     && (sscanf(s, "%lx %lx %lx %lx",
-	       &unichar1, &unichar2, &unichar3, &unichar4) != 4))
+               &unichar1, &unichar2, &unichar3, &unichar4) != 4))
       break;
     if ((unichar1 > 0xffff)
     || (unichar2 > 0xffff)
@@ -1440,25 +1446,25 @@ get_foldmap(cups_folding_t fold)	/* I - Case folding type */
 }
 
 /*
- * 'get_propmap()' - Get Unicode character property map into cache.
+ * 'get_propmap()' - Get Unicode character property map to cache.
  */
-static int				/* O - Zero or -1 on error */
+static int                              /* O - Zero or -1 on error */
 get_propmap(void)
 {
-  int		i, j;		/* Looping variables */
-  int		len;		/* String length */
-  cups_utf32_t	     unichar;	     /* Unicode character value */
-  cups_gencat_t	    gencat;	/* General Category Value */
-  cups_bidicat_t    bidicat;	/* Bidi Category Value */
-  cups_propmap_t    *pmap;	/* Unicode Char Property Map */
-  int		propcount;	/* Count of Unicode Source Chars */
-  cups_prop_t	*uni2prop;	/* Unicode Char -> Properties */
-  char		*datadir;	/* CUPS_DATADIR environment variable */
-  char		*mapname;	/* Char Property map name */
-  char		filename[256];	/* Filename for charset map file */
-  FILE		*fp;		/* Char Property map file pointer */
-  char		*s;		/* Line parsing pointer */
-  char		line[256];	/* Line from input map file */
+  int           i, j;           /* Looping variables */
+  int           len;            /* String length */
+  cups_utf32_t  unichar;        /* Unicode character value */
+  cups_gencat_t     gencat;     /* General Category Value */
+  cups_bidicat_t    bidicat;    /* Bidi Category Value */
+  cups_propmap_t    *pmap;      /* Unicode Char Property Map */
+  int           propcount;      /* Count of Unicode Source Chars */
+  cups_prop_t   *uni2prop;      /* Unicode Char -> Properties */
+  char          *datadir;       /* CUPS_DATADIR environment variable */
+  char          *mapname;       /* Char Property map name */
+  char          filename[256];  /* Filename for charset map file */
+  FILE          *fp;            /* Char Property map file pointer */
+  char          *s;             /* Line parsing pointer */
+  char          line[256];      /* Line from input map file */
 
  /*
   * See if we already have this char properties map loaded...
@@ -1476,7 +1482,8 @@ get_propmap(void)
  /*
   * Open char properties map input file...
   */
-  snprintf(filename, sizeof(filename), "%s/charmaps/%s", datadir, mapname);
+  snprintf(filename, sizeof(filename), "%s/charmaps/%s",
+           datadir, mapname);
   if ((propcount = get_map_count(filename)) <= 0)
     return (-1);
   fp = fopen(filename, "r");
@@ -1515,7 +1522,7 @@ get_propmap(void)
       break;
     if (strlen(s) > 0)
       *(s + strlen(s) - 1) = '\0';
-    if ((*s == '#') || (*s == '\0'))
+    if ((*s == '#') || (*s == '\n') || (*s == '\0'))
       continue;
     if (sscanf(s, "%lx", &unichar) != 1)
        break;
@@ -1530,7 +1537,7 @@ get_propmap(void)
     {
       len = strlen(gencat_index[j].str);
       if (strncmp (s, gencat_index[j].str, len) == 0)
-	break;
+        break;
     }
     if (gencat_index[j].str == NULL)
       return (-1);
@@ -1544,7 +1551,7 @@ get_propmap(void)
     {
       len = strlen(bidicat_index[j]);
       if (strncmp (s, bidicat_index[j], len) == 0)
-	break;
+        break;
     }
     if (bidicat_index[j] == NULL)
       return (-1);
@@ -1562,23 +1569,23 @@ get_propmap(void)
 }
 
 /*
- * 'get_combmap()' - Get Unicode combining class map into cache.
+ * 'get_combmap()' - Get Unicode combining class map to cache.
  */
-static int				/* O - Zero or -1 on error */
+static int                              /* O - Zero or -1 on error */
 get_combmap(void)
 {
-  int		i;		/* Looping variable */
-  cups_utf32_t	     unichar;	     /* Unicode character value */
-  int		combclass;	/* Unicode char combining class */
-  cups_combmap_t    *cmap;	/* Unicode Comb Class Map */
-  int		combcount;	/* Count of Unicode Source Chars */
-  cups_comb_t	*uni2comb;	/* Unicode Char -> Combining Class */
-  char		*datadir;	/* CUPS_DATADIR environment variable */
-  char		*mapname;	/* Comb Class map name */
-  char		filename[256];	/* Filename for charset map file */
-  FILE		*fp;		/* Comb Class map file pointer */
-  char		*s;		/* Line parsing pointer */
-  char		line[256];	/* Line from input map file */
+  int           i;              /* Looping variable */
+  cups_utf32_t  unichar;        /* Unicode character value */
+  int           combclass;      /* Unicode char combining class */
+  cups_combmap_t    *cmap;      /* Unicode Comb Class Map */
+  int           combcount;      /* Count of Unicode Source Chars */
+  cups_comb_t   *uni2comb;      /* Unicode Char -> Combining Class */
+  char          *datadir;       /* CUPS_DATADIR environment variable */
+  char          *mapname;       /* Comb Class map name */
+  char          filename[256];  /* Filename for charset map file */
+  FILE          *fp;            /* Comb Class map file pointer */
+  char          *s;             /* Line parsing pointer */
+  char          line[256];      /* Line from input map file */
 
  /*
   * See if we already have this combining class map loaded...
@@ -1596,7 +1603,8 @@ get_combmap(void)
  /*
   * Open combining class map input file...
   */
-  snprintf(filename, sizeof(filename), "%s/charmaps/%s", datadir, mapname);
+  snprintf(filename, sizeof(filename), "%s/charmaps/%s",
+           datadir, mapname);
   if ((combcount = get_map_count(filename)) <= 0)
     return (-1);
   fp = fopen(filename, "r");
@@ -1658,25 +1666,25 @@ get_combmap(void)
 }
 
 /*
- * 'get_breakmap()' - Get Unicode line break class map into cache.
+ * 'get_breakmap()' - Get Unicode line break class map to cache.
  */
-static int				/* O - Zero or -1 on error */
+static int                              /* O - Zero or -1 on error */
 get_breakmap(void)
 {
-  int		i, j;		/* Looping variables */
-  int		len;		/* String length */
-  cups_utf32_t	     unichar1;	     /* Unicode character value */
-  cups_utf32_t	     unichar2;	     /* Unicode character value */
+  int           i, j;           /* Looping variables */
+  int           len;            /* String length */
+  cups_utf32_t  unichar1;       /* Unicode character value */
+  cups_utf32_t  unichar2;       /* Unicode character value */
   cups_breakclass_t breakclass; /* Unicode char line break class */
-  cups_breakmap_t   *bmap;	/* Unicode Line Break Class Map */
-  int		breakcount;	/* Count of Unicode Source Chars */
-  cups_ucs2_t	     *uni2break;     /* Unicode Char -> Line Break Class */
-  char		*datadir;	/* CUPS_DATADIR environment variable */
-  char		*mapname;	/* Comb Class map name */
-  char		filename[256];	/* Filename for charset map file */
-  FILE		*fp;		/* Comb Class map file pointer */
-  char		*s;		/* Line parsing pointer */
-  char		line[256];	/* Line from input map file */
+  cups_breakmap_t   *bmap;      /* Unicode Line Break Class Map */
+  int           breakcount;     /* Count of Unicode Source Chars */
+  cups_ucs2_t   *uni2break;     /* Unicode -> Line Break Class */
+  char          *datadir;       /* CUPS_DATADIR environment variable */
+  char          *mapname;       /* Comb Class map name */
+  char          filename[256];  /* Filename for charset map file */
+  FILE          *fp;            /* Comb Class map file pointer */
+  char          *s;             /* Line parsing pointer */
+  char          line[256];      /* Line from input map file */
 
  /*
   * See if we already have this line break class map loaded...
@@ -1694,7 +1702,8 @@ get_breakmap(void)
  /*
   * Open line break class map input file...
   */
-  snprintf(filename, sizeof(filename), "%s/charmaps/%s", datadir, mapname);
+  snprintf(filename, sizeof(filename), "%s/charmaps/%s",
+           datadir, mapname);
   if ((breakcount = get_map_count(filename)) <= 0)
     return (-1);
   fp = fopen(filename, "r");
@@ -1733,7 +1742,7 @@ get_breakmap(void)
       break;
     if (strlen(s) > 0)
       *(s + strlen(s) - 1) = '\0';
-    if ((*s == '#') || (*s == '\0'))
+    if ((*s == '#') || (*s == '\n') || (*s == '\0'))
       continue;
     if (sscanf(s, "%lx %lx", &unichar1, &unichar2) != 2)
        break;
@@ -1749,7 +1758,7 @@ get_breakmap(void)
     {
       len = strlen (break_index[j].str);
       if (strncmp (s, break_index[j].str, len) == 0)
-	break;
+        break;
     }
     if (break_index[j].str == NULL)
       return (-1);
@@ -1771,14 +1780,16 @@ get_breakmap(void)
  * Note - This function cannot be easily modified for 32-bit Unicode.
  */
 static int
-compare_compose(const void *k1,		/* I - Key char */
-    const void *k2)			/* I - Map char */
+compare_compose(const void *k1,         /* I - Key char */
+    const void *k2)                     /* I - Map char */
 {
-  cups_utf32_t	     *kp = (cups_utf32_t *) k1;	  /* Key char pointer */
-  cups_ucs2_t	     *mp = (cups_ucs2_t *) k2;	  /* Map char pointer */
-  unsigned long key;			/* Pair of key characters */
-  unsigned long map;			/* Pair of map characters */
-  int		result;			/* Result Value */
+  cups_utf32_t  *kp = (cups_utf32_t *) k1;
+                                /* Key char pointer */
+  cups_ucs2_t   *mp = (cups_ucs2_t *) k2;
+                                /* Map char pointer */
+  unsigned long key;            /* Pair of key characters */
+  unsigned long map;            /* Pair of map characters */
+  int           result;         /* Result Value */
 
   key = (*kp << 16);
   key |= *(kp + 1);
@@ -1795,13 +1806,15 @@ compare_compose(const void *k1,		/* I - Key char */
  * 'compare_decompose()' - Compare key for decompose match.
  */
 static int
-compare_decompose(const void *k1,	/* I - Key char */
-    const void *k2)			/* I - Map char */
+compare_decompose(const void *k1,       /* I - Key char */
+    const void *k2)                     /* I - Map char */
 {
-  cups_utf32_t	     *kp = (cups_utf32_t *) k1;	  /* Key char pointer */
-  cups_ucs2_t	     *mp = (cups_ucs2_t *) k2;	  /* Map char pointer */
-  cups_ucs2_t	     ch;		     /* Key char as UCS-2 */
-  int		result;			/* Result Value */
+  cups_utf32_t  *kp = (cups_utf32_t *) k1;
+                                /* Key char pointer */
+  cups_ucs2_t   *mp = (cups_ucs2_t *) k2;
+                                /* Map char pointer */
+  cups_ucs2_t   ch;             /* Key char as UCS-2 */
+  int           result;         /* Result Value */
 
   ch = (cups_ucs2_t) *kp;
   if (ch >= *mp)
@@ -1815,13 +1828,15 @@ compare_decompose(const void *k1,	/* I - Key char */
  * 'compare_foldchar()' - Compare key for case fold match.
  */
 static int
-compare_foldchar(const void *k1,	/* I - Key char */
-    const void *k2)			/* I - Map char */
+compare_foldchar(const void *k1,        /* I - Key char */
+    const void *k2)                     /* I - Map char */
 {
-  cups_utf32_t	     *kp = (cups_utf32_t *) k1;	  /* Key char pointer */
-  cups_ucs2_t	     *mp = (cups_ucs2_t *) k2;	  /* Map char pointer */
-  cups_ucs2_t	     ch;		     /* Key char as UCS-2 */
-  int		result;			/* Result Value */
+  cups_utf32_t  *kp = (cups_utf32_t *) k1;
+                                /* Key char pointer */
+  cups_ucs2_t   *mp = (cups_ucs2_t *) k2;
+                                /* Map char pointer */
+  cups_ucs2_t   ch;             /* Key char as UCS-2 */
+  int           result;         /* Result Value */
 
   ch = (cups_ucs2_t) *kp;
   if (ch >= *mp)
@@ -1835,14 +1850,15 @@ compare_foldchar(const void *k1,	/* I - Key char */
  * 'compare_combchar()' - Compare key for combining char match.
  */
 static int
-compare_combchar(const void *k1,	/* I - Key char */
-    const void *k2)			/* I - Map char */
+compare_combchar(const void *k1,        /* I - Key char */
+    const void *k2)                     /* I - Map char */
 {
-  cups_utf32_t	     *kp = (cups_utf32_t *) k1;	  /* Key char pointer */
-  cups_comb_t	*cp = (cups_comb_t *) k2;
-					/* Combining map row pointer */
-  cups_ucs2_t	     ch;		     /* Key char as UCS-2 */
-  int		result;			/* Result Value */
+  cups_utf32_t  *kp = (cups_utf32_t *) k1;
+                                /* Key char pointer */
+  cups_comb_t   *cp = (cups_comb_t *) k2;
+                                /* Combining map row pointer */
+  cups_ucs2_t   ch;             /* Key char as UCS-2 */
+  int           result;         /* Result Value */
 
   ch = (cups_ucs2_t) *kp;
   if (ch >= cp->ch)
@@ -1856,13 +1872,15 @@ compare_combchar(const void *k1,	/* I - Key char */
  * 'compare_breakchar()' - Compare key for line break char match.
  */
 static int
-compare_breakchar(const void *k1,	/* I - Key char */
-    const void *k2)			/* I - Map char */
+compare_breakchar(const void *k1,       /* I - Key char */
+    const void *k2)                     /* I - Map char */
 {
-  cups_utf32_t	     *kp = (cups_utf32_t *) k1;	  /* Key char pointer */
-  cups_ucs2_t	     *mp = (cups_ucs2_t *) k2;	  /* Map char pointer */
-  cups_ucs2_t	     ch;		     /* Key char as UCS-2 */
-  int		result;			/* Result Value */
+  cups_utf32_t  *kp = (cups_utf32_t *) k1;
+                                /* Key char pointer */
+  cups_ucs2_t   *mp = (cups_ucs2_t *) k2;
+                                /* Map char pointer */
+  cups_ucs2_t   ch;             /* Key char as UCS-2 */
+  int           result;         /* Result Value */
 
   ch = (cups_ucs2_t) *kp;
   if (ch < *mp)
@@ -1878,14 +1896,15 @@ compare_breakchar(const void *k1,	/* I - Key char */
  * 'compare_propchar()' - Compare key for property char match.
  */
 static int
-compare_propchar(const void *k1,	/* I - Key char */
-    const void *k2)			/* I - Map char */
+compare_propchar(const void *k1,        /* I - Key char */
+    const void *k2)                     /* I - Map char */
 {
-  cups_utf32_t	     *kp = (cups_utf32_t *) k1;	  /* Key char pointer */
-  cups_prop_t	*pp = (cups_prop_t *) k2;
-					/* Property map row pointer */
-  cups_ucs2_t	     ch;		     /* Key char as UCS-2 */
-  int		result;			/* Result Value */
+  cups_utf32_t  *kp = (cups_utf32_t *) k1;
+                                /* Key char pointer */
+  cups_prop_t   *pp = (cups_prop_t *) k2;
+                                /* Property map row pointer */
+  cups_ucs2_t   ch;             /* Key char as UCS-2 */
+  int           result;         /* Result Value */
 
   ch = (cups_ucs2_t) *kp;
   if (ch >= pp->ch)
@@ -1896,5 +1915,5 @@ compare_propchar(const void *k1,	/* I - Key char */
 }
 
 /*
- * End of "$Id: normalize.c,v 1.1.2.2 2002/08/20 12:41:52 mike Exp $"
+ * End of "$Id: normalize.c,v 1.1.2.3 2002/09/26 16:58:46 mike Exp $"
  */

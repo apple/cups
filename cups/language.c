@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.20.2.9 2002/08/20 12:41:52 mike Exp $"
+ * "$Id: language.c,v 1.20.2.10 2002/09/26 16:58:45 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -53,33 +53,72 @@ static cups_lang_t	*lang_cache = NULL;	/* Language string cache */
 static const char	*lang_blank = "";	/* Blank constant string */
 static const char	*lang_encodings[] =	/* Encoding strings */
 			{
-			  "us-ascii",
-			  "iso-8859-1",
-			  "iso-8859-2",
-			  "iso-8859-3",
-			  "iso-8859-4",
-			  "iso-8859-5",
-			  "iso-8859-6",
-			  "iso-8859-7",
-			  "iso-8859-8",
-			  "iso-8859-9",
-			  "iso-8859-10",
-			  "utf-8",
-			  "iso-8859-13",
-			  "iso-8859-14",
-			  "iso-8859-15",
-			  "windows-874",
-			  "windows-1250",
-			  "windows-1251",
-			  "windows-1252",
-			  "windows-1253",
-			  "windows-1254",
-			  "windows-1255",
-			  "windows-1256",
-			  "windows-1257",
-			  "windows-1258",
-			  "koi8-r",
-			  "koi8-u"
+			  "us-ascii",		"iso-8859-1",
+			  "iso-8859-2",		"iso-8859-3",
+			  "iso-8859-4",		"iso-8859-5",
+			  "iso-8859-6",		"iso-8859-7",
+			  "iso-8859-8",		"iso-8859-9",
+			  "iso-8859-10",	"utf-8",
+			  "iso-8859-13",	"iso-8859-14",
+			  "iso-8859-15",	"windows-874",
+			  "windows-1250",	"windows-1251",
+			  "windows-1252",	"windows-1253",
+			  "windows-1254",	"windows-1255",
+			  "windows-1256",	"windows-1257",
+			  "windows-1258",	"koi8-r",
+			  "koi8-u",		"iso-8859-11",
+			  "iso-8859-16",	"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "windows-932",	"windows-936",
+			  "windows-949",	"windows-950",
+			  "windows-1361",	"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "euc-cn",		"euc-jp",
+			  "euc-kr",		"euc-tw"
 			};
 static const char	*lang_default[] =	/* Default POSIX locale */
 			{
@@ -441,5 +480,5 @@ cupsLangGet(const char *language) /* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.20.2.9 2002/08/20 12:41:52 mike Exp $".
+ * End of "$Id: language.c,v 1.20.2.10 2002/09/26 16:58:45 mike Exp $".
  */

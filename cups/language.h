@@ -1,5 +1,5 @@
 /*
- * "$Id: language.h,v 1.18.2.12 2002/08/19 01:15:20 mike Exp $"
+ * "$Id: language.h,v 1.18.2.13 2002/09/26 16:58:45 mike Exp $"
  *
  *   Multi-language support for the Common UNIX Printing System (CUPS).
  *
@@ -237,7 +237,23 @@ typedef enum			/**** Language Encodings ****/
   CUPS_WINDOWS_1257,
   CUPS_WINDOWS_1258,
   CUPS_KOI8_R,
-  CUPS_KOI8_U
+  CUPS_KOI8_U,
+  CUPS_ISO8859_11,
+  CUPS_ISO8859_16,
+  CUPS_ENCODING_SBCS_END = 63,
+
+  CUPS_WINDOWS_932,		/* Japanese JIS X0208-1990 */
+  CUPS_WINDOWS_936,		/* Simplified Chinese GB 2312-80 */
+  CUPS_WINDOWS_949,		/* Korean KS C5601-1992 */
+  CUPS_WINDOWS_950,		/* Traditional Chinese Big Five */
+  CUPS_WINDOWS_1361,		/* Korean Johab */
+  CUPS_ENCODING_DBCS_END = 127,
+
+  CUPS_EUC_CN,			/* EUC Simplified Chinese */
+  CUPS_EUC_JP,			/* EUC Japanese */
+  CUPS_EUC_KR,			/* EUC Korean */
+  CUPS_EUC_TW,			/* EUC Traditional Chinese */
+  CUPS_ENCODING_VBCS_END = 191
 } cups_encoding_t;
 
 typedef struct cups_lang_str	/**** Language Cache Structure ****/
@@ -279,5 +295,5 @@ extern int		cupsLangPuts(FILE *fp, cups_lang_t *lang,
 #endif /* !_CUPS_LANGUAGE_H_ */
 
 /*
- * End of "$Id: language.h,v 1.18.2.12 2002/08/19 01:15:20 mike Exp $".
+ * End of "$Id: language.h,v 1.18.2.13 2002/09/26 16:58:45 mike Exp $".
  */

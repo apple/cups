@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.12.2.5 2002/08/30 20:58:22 mike Exp $"
+# "$Id: Makefile,v 1.12.2.6 2002/09/26 16:58:49 mike Exp $"
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,23 +28,26 @@ include ../Makedefs
 # Data files...
 #
 
-BANNERS	=	classified \
+BANNERS	=	\
+		classified \
 		confidential \
 		secret \
 		standard \
 		topsecret \
 		unclassified
-CHARMAPS =	windows-874.txt \
-		windows-1250.txt \
-		windows-1251.txt \
-		windows-1252.txt \
-		windows-1253.txt \
-		windows-1254.txt \
-		windows-1255.txt \
-		windows-1256.txt \
-		windows-1257.txt \
-		windows-1258.txt \
-		koi8-r.txt \
+
+CHARMAPS =	\
+		euc-cn.txt \
+		euc-jp.txt \
+		euc-kr.txt \
+		euc-tw.txt \
+		i18n_sdd.txt \
+		iso-8859-10.txt \
+		iso-8859-11.txt \
+		iso-8859-13.txt \
+		iso-8859-14.txt \
+		iso-8859-15.txt \
+		iso-8859-16.txt \
 		iso-8859-1.txt \
 		iso-8859-2.txt \
 		iso-8859-3.txt \
@@ -54,10 +57,8 @@ CHARMAPS =	windows-874.txt \
 		iso-8859-7.txt \
 		iso-8859-8.txt \
 		iso-8859-9.txt \
-		iso-8859-10.txt \
-		iso-8859-13.txt \
-		iso-8859-14.txt \
-		iso-8859-15.txt \
+		koi8-r.txt \
+		koi8-u.txt \
 		unibreak.txt \
 		uni-comb.txt \
 		uni-fold.txt \
@@ -66,8 +67,25 @@ CHARMAPS =	windows-874.txt \
 		uni-nfc.txt \
 		uni-nfd.txt \
 		uni-nfkd.txt \
-		uni-prop.txt
-CHARSETS =	windows-874 \
+		uni-prop.txt \
+		windows-1250.txt \
+		windows-1251.txt \
+		windows-1252.txt \
+		windows-1253.txt \
+		windows-1254.txt \
+		windows-1255.txt \
+		windows-1256.txt \
+		windows-1257.txt \
+		windows-1258.txt \
+		windows-1361.txt \
+		windows-874.txt \
+		windows-932.txt \
+		windows-936.txt \
+		windows-949.txt \
+		windows-950.txt
+
+CHARSETS =	\
+		windows-874 \
 		windows-1250 \
 		windows-1251 \
 		windows-1252 \
@@ -93,7 +111,11 @@ CHARSETS =	windows-874 \
 		iso-8859-14 \
 		iso-8859-15 \
 		utf-8
-DATAFILES =	HPGLprolog psglyphs testprint.ps
+
+DATAFILES =	\
+		HPGLprolog \
+		psglyphs \
+		testprint.ps
 
 
 #
@@ -134,5 +156,5 @@ install:
 
 
 #
-# End of "$Id: Makefile,v 1.12.2.5 2002/08/30 20:58:22 mike Exp $".
+# End of "$Id: Makefile,v 1.12.2.6 2002/09/26 16:58:49 mike Exp $".
 #
