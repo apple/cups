@@ -1,41 +1,27 @@
 /*
- * "$Id: image-colorspace.c,v 1.7 1998/08/14 19:12:51 mike Exp $"
+ * "$Id: image-colorspace.c,v 1.8 1999/03/24 18:01:42 mike Exp $"
  *
- *   Colorspace conversions for espPrint, a collection of printer drivers.
+ *   Colorspace conversions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1998 by Easy Software Products
+ *   Copyright 1993-1999 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs contain
- *   unpublished proprietary information of Easy Software Products, and
- *   are protected by Federal copyright law.  They may not be disclosed
- *   to third parties or copied or duplicated in any form, in whole or
- *   in part, without the prior written consent of Easy Software Products.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
- *
- * Revision History:
- *
- *   $Log: image-colorspace.c,v $
- *   Revision 1.7  1998/08/14 19:12:51  mike
- *   Updated black generation to use diff*diff
- *
- *   Revision 1.6  1998/07/28  20:48:30  mike
- *   Even better CMYK generation code...
- *
- *   Revision 1.5  1998/07/23  20:42:04  mike
- *   Updated with new CMYK generation code.
- *
- *   Revision 1.4  1998/03/05  16:58:38  mike
- *   Removed RGB adjustments, as it was causing color shifts to occur.
- *
- *   Revision 1.3  1998/02/24  21:45:43  mike
- *   Fixed CMY conversion - don't adjust black...
- *
- *   Revision 1.2  1998/02/24  21:05:22  mike
- *   Added color adjustments for CMY.
- *
- *   Revision 1.1  1998/02/19  15:35:50  mike
- *   Initial revision
  *
  */
 
@@ -593,5 +579,5 @@ huerotatemat(float mat[3][3],
 
 
 /*
- * End of "$Id: image-colorspace.c,v 1.7 1998/08/14 19:12:51 mike Exp $".
+ * End of "$Id: image-colorspace.c,v 1.8 1999/03/24 18:01:42 mike Exp $".
  */

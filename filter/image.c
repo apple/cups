@@ -1,47 +1,34 @@
 /*
- * "$Id: image.c,v 1.5 1998/07/28 20:48:30 mike Exp $"
+ * "$Id: image.c,v 1.6 1999/03/24 18:01:46 mike Exp $"
  *
- *   Base image support for espPrint, a collection of printer drivers.
+ *   Base image support for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1998 by Easy Software Products
+ *   Copyright 1993-1999 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs contain
- *   unpublished proprietary information of Easy Software Products, and
- *   are protected by Federal copyright law.  They may not be disclosed
- *   to third parties or copied or duplicated in any form, in whole or
- *   in part, without the prior written consent of Easy Software Products.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
  *
- * Revision History:
- *
- *   $Log: image.c,v $
- *   Revision 1.5  1998/07/28 20:48:30  mike
- *   Changed IMAGE_MAX_CACHE to RIP_MAX_CACHE.
- *   Now compute minimum required tiles to avoid cache thrashing.
- *   Fixed bug in flush_tile() - wasn't clearing cache pointer if tile wasn't
- *   dirty.
- *
- *   Revision 1.4  1998/07/07 13:04:52  mike
- *   OK, updated ImageSetMaxTiles() again, but this time we look at the
- *   IMAGE_MAX_CACHE environment variable and compute things that way.
- *
- *   Revision 1.3  1998/07/07 12:56:23  mike
- *   Updated ImageSetMaxTiles() to ignore the image depth so that images < 64MB
- *   won't be cached...
- *
- *   Revision 1.2  1998/03/19  16:15:15  mike
- *   Changed rewind() to fseek() to fix bug in HP-UX version of image library.
- *
- *   Revision 1.1  1998/02/19  20:43:33  mike
- *   Initial revision
  */
 
 /*
  * Include necessary headers...
  */
 
-/*#define DEBUG*/
 #include "image.h"
 #include <unistd.h>
 #include <ctype.h>
@@ -87,7 +74,7 @@ ImageOpen(char *filename,
   {
     fclose(fp);
     return (NULL);
-  };
+  }
 
   fseek(fp, 0, SEEK_SET);
 
@@ -101,7 +88,7 @@ ImageOpen(char *filename,
   {
     fclose(fp);
     return (NULL);
-  };
+  }
 
  /*
   * Load the image as appropriate...
@@ -111,11 +98,7 @@ ImageOpen(char *filename,
   img->xppi    = 128;
   img->yppi    = 128;
 
-  if (memcmp(header, "\211PNG", 4) == 0)
-    status = ImageReadPNG(img, fp, primary, secondary, saturation, hue);
-  else if (memcmp(header + 6, "JFIF", 4) == 0)
-    status = ImageReadJPEG(img, fp, primary, secondary, saturation, hue);
-  else if (memcmp(header, "GIF87a", 6) == 0 ||
+  if (memcmp(header, "GIF87a", 6) == 0 ||
            memcmp(header, "GIF89a", 6) == 0)
     status = ImageReadGIF(img, fp, primary, secondary, saturation, hue);
   else if (header[0] == 0x01 && header[1] == 0xda)
@@ -123,18 +106,30 @@ ImageOpen(char *filename,
   else if (header[0] == 0x59 && header[1] == 0xa6 &&
            header[2] == 0x6a && header[3] == 0x95)
     status = ImageReadSunRaster(img, fp, primary, secondary, saturation, hue);
+  else if (header[0] == 'P' && header[1] >= '1' && header[1] <= '6')
+    status = ImageReadPNM(img, fp, primary, secondary, saturation, hue);
+#if defined(HAVE_LIBPNG) && defined(HAVE_LIBZ)
+  else if (memcmp(header, "\211PNG", 4) == 0)
+    status = ImageReadPNG(img, fp, primary, secondary, saturation, hue);
+#endif /* HAVE_LIBPNG && HAVE_LIBZ */
+#ifdef HAVE_LIBJPEG
+  else if (memcmp(header + 6, "JFIF", 4) == 0)
+    status = ImageReadJPEG(img, fp, primary, secondary, saturation, hue);
+#endif /* HAVE_LIBJPEG */
+#ifdef HAVE_LIBTIFF
   else if (memcmp(header, "MM", 2) == 0 ||
            memcmp(header, "II", 2) == 0)
     status = ImageReadTIFF(img, fp, primary, secondary, saturation, hue);
+#endif /* HAVE_LIBTIFF */
+#ifdef HAVE_LIBPCD
   else if (memcmp(header, "\377\377\377\377", 4) == 0)
     status = ImageReadPhotoCD(img, fp, primary, secondary, saturation, hue);
-  else if (header[0] == 'P' && header[1] >= '1' && header[1] <= '6')
-    status = ImageReadPNM(img, fp, primary, secondary, saturation, hue);
+#endif /* HAVE_LIBPCD */
   else
   {
     fclose(fp);
     status = -1;
-  };
+  }
 
   if (status)
   {
@@ -161,7 +156,7 @@ ImageClose(image_t *img)
   {
     next = current->next;
     free(current);
-  };
+  }
 
  /*
   * Wipe the tile cache file (if any)...
@@ -171,7 +166,7 @@ ImageClose(image_t *img)
   {
     fclose(img->cachefile);
     unlink(img->cachename);
-  };
+  }
 
  /*
   * Free the rest of memory...
@@ -181,7 +176,7 @@ ImageClose(image_t *img)
   {
     free(img->tiles[0]);
     free(img->tiles);
-  };
+  }
 
   free(img);
 }
@@ -235,7 +230,7 @@ ImageSetMaxTiles(image_t *img,		/* I - Image to set */
 	  else if (tolower(cache_units[0]) == 't')
 	    max_size *= 4 * TILE_SIZE * TILE_SIZE;
 	  break;
-    };
+    }
   }
   else
     max_size = 32 * 1024 * 1024;
@@ -278,7 +273,7 @@ ImageGetCol(image_t *img,
   {
     height += y;
     y = 0;
-  };
+  }
 
   if ((y + height) > img->ysize)
     height = img->ysize - y;
@@ -314,8 +309,8 @@ ImageGetCol(image_t *img,
         case 1 :
             *pixels++ = *ib++;
             break;
-      };
-  };
+      }
+  }
 
   return (0);
 }
@@ -340,7 +335,7 @@ ImageGetRow(image_t *img,
   {
     width += x;
     x = 0;
-  };
+  }
 
   if ((x + width) > img->xsize)
     width = img->xsize - x;
@@ -364,7 +359,7 @@ ImageGetRow(image_t *img,
     pixels += count * bpp;
     x      += count;
     width  -= count;
-  };
+  }
 
   return (0);
 }
@@ -392,7 +387,7 @@ ImagePutCol(image_t *img,
   {
     height += y;
     y = 0;
-  };
+  }
 
   if ((y + height) > img->ysize)
     height = img->ysize - y;
@@ -433,8 +428,8 @@ ImagePutCol(image_t *img,
         case 1 :
             *ib++ = *pixels++;
             break;
-      };
-  };
+      }
+  }
 
   return (0);
 }
@@ -461,7 +456,7 @@ ImagePutRow(image_t *img,
   {
     width += x;
     x = 0;
-  };
+  }
 
   if ((x + width) > img->xsize)
     width = img->xsize - x;
@@ -490,7 +485,7 @@ ImagePutRow(image_t *img,
     x      += count;
     width  -= count;
     tilex  ++;
-  };
+  }
 
   return (0);
 }
@@ -527,8 +522,8 @@ get_tile(image_t *img,
       img->tiles[tiley] = tile;
       for (tilex = xtiles; tilex > 0; tilex --, tile ++)
         tile->pos = -1;
-    };
-  };
+    }
+  }
 
   bpp   = ImageGetDepth(img);
   tilex = x / TILE_SIZE;
@@ -559,7 +554,7 @@ get_tile(image_t *img,
 
       flush_tile(img);
       ic = img->first;
-    };
+    }
 
     ic->tile = tile;
     tile->ic = ic;
@@ -584,8 +579,8 @@ get_tile(image_t *img,
 #endif /* DEBUG */
 
       memset(ic->pixels, 0, bpp * TILE_SIZE * TILE_SIZE);
-    };
-  };
+    }
+  }
 
   if (ic == img->first)
     img->first = ic->next;
@@ -599,7 +594,7 @@ get_tile(image_t *img,
 
     ic->prev  = img->last;
     img->last = ic;
-  };
+  }
 
   ic->next = NULL;
 
@@ -626,7 +621,7 @@ flush_tile(image_t *img)
   {
     tile->ic = NULL;
     return;
-  };
+  }
 
   if (img->cachefile == NULL)
   {
@@ -641,8 +636,8 @@ flush_tile(image_t *img)
       fprintf(stderr, "flush_tile: Unable to create swap file - %s\n",
               strerror(errno));
       return;
-    };
-  };
+    }
+  }
 
   if (tile->pos >= 0)
   {
@@ -656,7 +651,7 @@ flush_tile(image_t *img)
       perror("flush_tile:");
 
     tile->pos = ftell(img->cachefile);
-  };
+  }
 
 #ifdef DEBUG
   fprintf(stderr, "flush_tile: Wrote tile cache at position %d...\n",
@@ -670,5 +665,5 @@ flush_tile(image_t *img)
 
 
 /*
- * End of "$Id: image.c,v 1.5 1998/07/28 20:48:30 mike Exp $".
+ * End of "$Id: image.c,v 1.6 1999/03/24 18:01:46 mike Exp $".
  */

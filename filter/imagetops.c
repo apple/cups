@@ -1,472 +1,195 @@
 /*
- * "$Id: imagetops.c,v 1.7 1999/02/01 17:26:58 mike Exp $"
+ * "$Id: imagetops.c,v 1.8 1999/03/24 18:01:47 mike Exp $"
  *
- *   Image file to PostScript conversion program for espPrint, a collection
- *   of printer drivers.
+ *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1998 by Easy Software Products
+ *   Copyright 1993-1999 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs contain
- *   unpublished proprietary information of Easy Software Products, and
- *   are protected by Federal copyright law.  They may not be disclosed
- *   to third parties or copied or duplicated in any form, in whole or
- *   in part, without the prior written consent of Easy Software Products.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
  *
- * Revision History:
- *
- *   $Log: imagetops.c,v $
- *   Revision 1.7  1999/02/01 17:26:58  mike
- *   Updated to accept color profile option.
- *
- *   Revision 1.6  1998/08/10  16:20:08  mike
- *   Removed extra debug statements.
- *
- *   Revision 1.5  1998/08/10  15:51:04  mike
- *   Fixed scaling problems.
- *   FIxed offset problems.
- *
- *   Revision 1.4  1998/07/28  20:48:30  mike
- *   Updated size/page computation code to work properly.
- *
- *   Revision 1.3  1998/04/23  15:52:20  mike
- *   Removed whitespace from the ASCII85 image data.
- *   Now use an image dictionary for Level 2 printers.
- *   Now enable interpolation for Level 2 printers.
- *   Added whitespace to ASCII HEX image data.
- *
- *   Revision 1.2  1998/03/31  18:26:41  mike
- *   Added setcolorspace command for Level 2 output.
- *
- *   Revision 1.1  1998/02/19  20:43:33  mike
- *   Initial revision
- *
+ *   main()       - Main entry...
+ *   ps_hex()     - Print binary data as a series of hexadecimal numbers.
+ *   ps_ascii85() - Print binary data as a series of base-85 numbers.
  */
 
 /*
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <math.h>
-#include <time.h>
-#include <unistd.h>
-#include <fcntl.h>
-
-#include <pod.h>
-#include <ppd.h>
-#include <printutil.h>
-#include <errorcodes.h>
-
+#include "common.h"
 #include "image.h"
-
-
-/*
- * Constants...
- */
-
-#ifndef FALSE				/* Boolean stuff */
-#  define FALSE 0
-#  define TRUE  (!FALSE)
-#endif /* !FALSE */
+#include <math.h>
 
 
 /*
  * Globals...
  */
 
-int	Verbosity = 0;
+int	Flip = 0,		/* Flip/mirror pages */
+	Collate = 0,		/* Collate copies? */
+	Copies = 1;		/* Number of copies */
 
 
 /*
  * Local functions...
  */
 
-static void	usage(void);
-static void	ps_hex(FILE *, ib_t *, int);
-static void	ps_ascii85(FILE *, ib_t *, int, int);
-static void	make_transfer_function(char *, float, float, float, float);
-static void	print_prolog(FILE *, int, float *, int *, float *);
+static void	ps_hex(ib_t *, int);
+static void	ps_ascii85(ib_t *, int, int);
 
 
 /*
  * 'main()' - Main entry...
  */
 
-int
+int			/* O - Exit status */
 main(int  argc,		/* I - Number of command-line arguments */
      char *argv[])	/* I - Command-line arguments */
 {
-  int			i;		/* Looping var */
-  FILE			*out;		/* Output file */
-  gzFile		ppdfile;	/* PPD file */
-  char			*pslevel,	/* Level of PostScript supported */
-			*opt,		/* Current option character */
-			*infile,	/* Input filename */
-			*outfile,	/* Output filename */
-			*printer;	/* Printer */
-  PDInfoStruct		*info;		/* POD info */
-  PDStatusStruct	*status;	/* POD status */
-  time_t		mod_time;	/* Modification time */
-  PDSizeTableStruct	*size;		/* Page size */
-  image_t		*img;		/* Image to print */
-  float			xzoom,		/* X zoom facter */
-			yzoom,		/* Y zoom facter */
-			xprint,
-			yprint,
-			xinches,
-			yinches;
-  float			xsize,
-			ysize,
-			xtemp,
-			ytemp;
-  int			xpages,		/* X pages */
-			ypages,		/* Y pages */
-			xpage,		/* Current x page */
-			ypage;		/* Current y page */
-  int			level,		/* PostScript "level" */
-			flip,		/* Flip */
-			rotation,	/* Rotation */
-			landscape,	/* Landscape orientation? */
-			xppi, yppi;	/* Pixels-per-inch */
-  float			gammaval[4];
-  int			brightness[4];
-  float			profile[6];
-  int			x0, y0,		/* Corners of the page in image coords */
-			x1, y1;
-  ib_t			*row;
-  int			y;
-  int			colorspace;
-  int			hue, sat;
-  int			out_offset,
-			out_length;
-  float			left, bottom;
+  image_t	*img;		/* Image to print */
+  float		xprint,		/* Printable area */
+		yprint,
+		xinches,	/* Total size in inches */
+		yinches;
+  float		xsize,		/* Total size in points */
+		ysize;
+  int		xpages,		/* # x pages */
+		ypages,		/* # y pages */
+		xpage,		/* Current x page */
+		ypage,		/* Current y page */
+		page;		/* Current page number */
+  int		x0, y0,		/* Corners of the page in image coords */
+		x1, y1;
+  ib_t		*row;		/* Current row */
+  int		y;		/* Current Y coordinate in image */
+  int		colorspace;	/* Output colorspace */
+  int		out_offset,	/* Offset into output buffer */
+		out_length;	/* Length of output buffer */
+  ppd_file_t	*ppd;		/* PPD file */
+  int		num_options;	/* Number of print options */
+  cups_option_t	*options;	/* Print options */
+  char		*val;		/* Option value */
+  int		slowcollate;	/* Collate copies the slow way */
+  float		g;		/* Gamma correction value */
+  float		b;		/* Brightness factor */
+  float		zoom;		/* Zoom facter */
+  int		ppi;		/* Pixels-per-inch */
+  int		hue, sat;	/* Hue and saturation adjustment */
 
 
- /*
-  * Process any command-line args...
-  */
-
-  infile        = NULL;
-  outfile       = NULL;
-  printer       = NULL;
-  level         = 0;
-  rotation      = -1;
-  xzoom = yzoom = 0.0;
-  flip          = 0;
-  xppi          = 0;
-  yppi          = 0;
-  hue           = 0;
-  sat           = 100;
-  landscape     = 0;
-  gammaval[0]   = 0.0;
-  gammaval[1]   = 0.0;
-  gammaval[2]   = 0.0;
-  gammaval[3]   = 0.0;
-  brightness[0] = 100;
-  brightness[1] = 100;
-  brightness[2] = 100;
-  brightness[3] = 100;
-  profile[0]    = 1.0;
-  profile[1]    = 1.0;
-  profile[2]    = 1.0;
-  profile[3]    = 1.0;
-  profile[4]    = 1.0;
-  profile[5]    = 1.0;
-
-  for (i = 1; i < argc; i ++)
-    if (argv[i][0] == '-')
-      for (opt = argv[i] + 1; *opt != '\0'; opt ++)
-        switch (*opt)
-        {
-          case 'P' : /* Specify the printer name */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              printer = argv[i];
-
-	     /*
-	      * Open the POD database files and get the printer definition record.
-	      */
-
-	      if (PDLocalReadInfo(printer, &info, &mod_time) < 0)
-	      {
-		fprintf(stderr, "img2ps: Could not open required POD database files for printer \'%s\'.\n", 
-        		printer);
-		fprintf(stderr, "        Are you sure all required POD files are properly installed?\n");
-
-		PDPerror("img2ps");
-		exit(ERR_BAD_ARG);
-	      };
-
-	      status = info->active_status;
-	      size   = PDFindPageSize(info, PD_SIZE_CURRENT);
-
-             /*
-	      * Copy the color profile over...
-	      */
-
-              memcpy(profile, status->color_profile, sizeof(profile));
-              break;
-
-          case 'L' : /* Log file */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              freopen(argv[i], "w", stderr);
-              break;
-
-          case 'O' : /* Output file */
-              i ++;
-              if (i >= argc || outfile != NULL)
-                usage();
-
-              outfile = argv[i];
-              break;
-
-          case 'B' : /* Bits per pixel */
-          case 'C' : /* Colorspace */
-          case 'F' : /* Format */
-          case 'H' : /* Pixel height */
-          case 'R' : /* Resolution */
-          case 'W' : /* Pixel width */
-          case 'X' : /* Horizontal resolution */
-          case 'Y' : /* Vertical resolution */
-              i ++;
-              if (i >= argc)
-                usage();
-              break;
-
-          case 'M' : /* Model (PostScript Level) */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              level = atoi(argv[i]);
-              break;
-
-          case 'l' : /* Landscape */
-              landscape = 1;
-              break;
-
-          case 'f' : /* Flip the image */
-              flip = 1;
-              break;
-
-          case 'r' : /* Rotate */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              rotation = (atoi(argv[i]) % 180) / 90;
-              break;
-
-          case 'z' : /* Page zoom */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              if (sscanf(argv[i], "%f,%f", &xzoom, &yzoom) == 1)
-                yzoom = xzoom;
-
-              if (strchr(argv[i], '.') == NULL)
-              {
-                xzoom *= 0.01;
-                yzoom *= 0.01;
-              };
-              break;
-
-          case 'p' : /* Scale to pixels/inch */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              if (sscanf(argv[i], "%d,%d", &xppi, &yppi) == 1)
-                yppi = xppi;
-              break;
-
-          case 'n' : /* Number of copies */
-              i ++;
-              if (i >= argc)
-                usage();
-              break;
-
-          case 'D' : /* Produce debugging messages */
-              Verbosity ++;
-              break;
-
-          case 'h' : /* Color Hue */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              hue = atoi(argv[i]);
-              break;
-
-          case 's' : /* Color Saturation */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              sat = atoi(argv[i]);
-              break;
-
-          case 'g' :	/* Gamma correction */
-	      i ++;
-	      if (i < argc)
-	        switch (sscanf(argv[i], "%f,%f,%f,%f", gammaval + 0,
-	                       gammaval + 1, gammaval + 2, gammaval + 3))
-	        {
-	          case 1 :
-	              gammaval[1] = gammaval[0];
-	          case 2 :
-	              gammaval[2] = gammaval[1];
-	              gammaval[3] = gammaval[1];
-	              break;
-	        };
-	      break;
-
-          case 'b' :	/* Brightness */
-	      i ++;
-	      if (i < argc)
-	        switch (sscanf(argv[i], "%d,%d,%d,%d", brightness + 0,
-	                brightness + 1, brightness + 2, brightness + 3))
-	        {
-	          case 1 :
-	              brightness[1] = brightness[0];
-	          case 2 :
-	              brightness[2] = brightness[1];
-	              brightness[3] = brightness[1];
-	              break;
-	        };
-	      break;
-
-          case 'c' : /* Color profile */
-              i ++;
-              if (i < argc)
-                sscanf(argv[i], "%f,%f,%f,%f,%f,%f",
-                       profile + 0,
-                       profile + 1,
-                       profile + 2,
-                       profile + 3,
-                       profile + 4,
-                       profile + 5);
-              break;
-
-          default :
-              usage();
-              break;
-        }
-    else if (infile != NULL)
-      usage();
-    else
-      infile = argv[i];
-
-  if (Verbosity)
+  if (argc != 7)
   {
-    fputs("img2ps: Command-line args are:", stderr);
-    for (i = 1; i < argc; i ++)
-      fprintf(stderr, " %s", argv[i]);
-    fputs("\n", stderr);
-  };
+    fputs("ERROR: imagetops job-id user title copies options file\n", stderr);
+    return (1);
+  }
 
  /*
-  * Check for necessary args...
+  * Process command-line options and write the prolog...
   */
 
-  if (printer == NULL ||
-      infile == NULL)
-    usage();
+  zoom = 0.0;
+  ppi  = 0;
+  hue  = 0;
+  sat  = 100;
+  g    = 1.0;
+  b    = 1.0;
 
- /*
-  * Figure out what we need to generate...
-  */
+  options     = NULL;
+  num_options = cupsParseOptions(argv[5], 0, &options);
 
-  if (strncasecmp(info->printer_class, "Color", 5) == 0)
-    colorspace = IMAGE_RGB;
-  else
-    colorspace = IMAGE_WHITE;
+  ppd = SetCommonOptions(num_options, options);
 
- /*
-  * See if we have a level 1 or 2 printer...
-  */
+  ppdMarkDefaults(ppd);
+  cupsMarkOptions(ppd, num_options, options);
 
-  if (level == 0 && info->ppd_path[0] != '\0')
-    if ((ppdfile = gzopen(info->ppd_path, "r")) != NULL)
-    {
-      if ((pslevel = PPDGetCap(ppdfile, "LanguageLevel")) != NULL)
-        level = atoi(pslevel);
-      gzclose(ppdfile);
-    };
+  if ((val = cupsGetOption("copies", num_options, options)) != NULL)
+    Copies = atoi(val);
 
-  if (strstr(info->printer_class, "Raster") != NULL)
-    level = 2;
+  if ((val = cupsGetOption("multiple-document-handling", num_options, options)) != NULL)
+  {
+   /*
+    * This IPP attribute is unnecessarily complicated...
+    *
+    *   single-document, separate-documents-collated-copies, and
+    *   single-document-new-sheet all require collated copies.
+    *
+    *   separate-documents-collated-copies allows for uncollated copies.
+    */
+
+    Collate = strcmp(val, "separate-documents-collated-copies") != 0;
+  }
+
+  if ((val = cupsGetOption("Collate", num_options, options)) != NULL &&
+      strcmp(val, "True") == 0)
+    Collate = 1;
+
+  if ((val = cupsGetOption("gamma", num_options, options)) != NULL)
+    g = atoi(val) * 0.001f;
+
+  if ((val = cupsGetOption("brightness", num_options, options)) != NULL)
+    b = atoi(val) * 0.01f;
+
+  if ((val = cupsGetOption("scaling", num_options, options)) != NULL)
+    zoom = atoi(val) * 0.01;
+
+  if ((val = cupsGetOption("ppi", num_options, options)) != NULL)
+    ppi = atoi(val);
+
+  if ((val = cupsGetOption("saturation", num_options, options)) != NULL)
+    sat = atoi(val);
+
+  if ((val = cupsGetOption("hue", num_options, options)) != NULL)
+    hue = atoi(val);
 
  /*
   * Open the input image to print...
   */
 
-  if ((img = ImageOpen(infile, colorspace, IMAGE_WHITE, sat, hue)) == NULL)
-    exit (ERR_FILE_CONVERT);
+  colorspace = ColorDevice ? IMAGE_RGB : IMAGE_WHITE;
+
+  if ((img = ImageOpen(argv[6], colorspace, IMAGE_WHITE, sat, hue)) == NULL)
+  {
+    fputs("ERROR: Unable to open image file for printing!\n", stderr);
+    ppdClose(ppd);
+    return (1);
+  }
 
   colorspace = img->colorspace;
-
-  if (Verbosity)
-    fprintf(stderr, "img2ps: Original image is %dx%d pixels...\n",
-            img->xsize, img->ysize);
 
  /*
   * Scale as necessary...
   */
 
-  xprint = (float)size->horizontal_addr / (float)info->horizontal_resolution;
-  yprint = (float)size->vertical_addr / (float)info->vertical_resolution;
+  xprint = (PageRight - PageLeft) / 72.0;
+  yprint = (PageTop - PageBottom) / 72.0;
 
-  if (rotation >= 0 && landscape)
-    rotation = 1 - (rotation & 1);
+  if (zoom == 0.0 && ppi == 0)
+    ppi = img->xppi;
 
-  if (xzoom == 0.0 && xppi == 0)
-  {
-    xppi = img->xppi;
-    yppi = img->yppi;
-  };
-
-  if (xppi > 0)
+  if (ppi > 0)
   {
    /*
     * Scale the image as neccesary to match the desired pixels-per-inch.
     */
     
-
-    if (rotation == 0)
-    {
-      xinches = (float)img->xsize / (float)xppi;
-      yinches = (float)img->ysize / (float)yppi;
-    }
-    else if (rotation == 1)
-    {
-      xinches = (float)img->ysize / (float)yppi;
-      yinches = (float)img->xsize / (float)xppi;
-    }
-    else
-    {
-      xinches  = (float)img->xsize / (float)xppi;
-      yinches  = (float)img->ysize / (float)yppi;
-      rotation = 0;
-
-      if (xinches > xprint && xinches <= yprint)
-      {
-	xinches  = (float)img->ysize / (float)yppi;
-	yinches  = (float)img->xsize / (float)xppi;
-        rotation = 1;
-      };
-    };
+    xinches = (float)img->xsize / (float)ppi;
+    yinches = (float)img->ysize / (float)ppi;
   }
   else
   {
@@ -474,97 +197,67 @@ main(int  argc,		/* I - Number of command-line arguments */
     * Scale percentage of page size...
     */
 
-    if (rotation == 0)
-    {
-      xsize = xprint * xzoom;
-      ysize = xsize * img->ysize / img->xsize;
+    xsize = xprint * zoom;
+    ysize = xsize * img->ysize / img->xsize;
 
-      if (ysize > (yprint * yzoom))
-      {
-        ysize = yprint * yzoom;
-        xsize = ysize * img->xsize / img->ysize;
-      };
-    }
-    else if (rotation == 1)
+    if (ysize > (yprint * zoom))
     {
-      ysize = xprint * yzoom;
+      ysize = yprint * zoom;
       xsize = ysize * img->xsize / img->ysize;
-
-      if (xsize > (yprint * xzoom))
-      {
-        xsize = yprint * xzoom;
-        ysize = xsize * img->ysize / img->xsize;
-      };
     }
-    else
-    {
-      xsize = xprint * xzoom;
-      ysize = xsize * img->ysize / img->xsize;
 
-      if (ysize > (yprint * yzoom))
-      {
-        ysize = yprint * yzoom;
-        xsize = ysize * img->xsize / img->ysize;
-      };
-
-      ytemp = xprint * yzoom;
-      xtemp = ytemp * img->xsize / img->ysize;
-
-      if (xtemp > (yprint * xzoom))
-      {
-        xtemp = yprint * xzoom;
-        ytemp = xtemp * img->ysize / img->xsize;
-      };
-
-      if ((xsize * ysize) < (xtemp * ytemp))
-      {
-        xsize = xtemp;
-        ysize = ytemp;
-
-        rotation = 1;
-      }
-      else
-        rotation = 0;
-    };
-
-    if (rotation)
-    {
-      xinches = ysize;
-      yinches = xsize;
-    }
-    else
-    {
-      xinches = xsize;
-      yinches = ysize;
-    };
-  };
+    xinches = xsize;
+    yinches = ysize;
+  }
 
   xpages = ceil(xinches / xprint);
   ypages = ceil(yinches / yprint);
 
-  if (Verbosity)
-  {
-    fprintf(stderr, "img2ps: Page size is %.1fx%.1f inches\n", xprint, yprint);
-    fprintf(stderr, "img2ps: Output image is rotated %d degrees, %.1fx%.1f inches.\n",
-            rotation * 90, xinches, yinches);
-    fprintf(stderr, "img2ps: Output image to %dx%d pages...\n", xpages, ypages);
-  };
-
  /*
-  * Create the output stream...
+  * See if we need to collate, and if so how we need to do it...
   */
 
-  if (outfile == NULL)
-    out = stdout;
-  else
-    out = fopen(outfile, "w");
+  if (xpages == 1 && ypages == 1)
+    Collate = 0;
 
-  if (out == NULL)
+  slowcollate = Collate && ppdFindOption(ppd, "Collate") == NULL;
+
+ /*
+  * Write any "exit server" options that have been selected...
+  */
+
+  ppdEmit(ppd, stdout, PPD_ORDER_EXIT);
+
+ /*
+  * Write any JCL commands that are needed to print PostScript code...
+  */
+
+  ppdEmit(ppd, stdout, PPD_ORDER_JCL);
+
+  if (ppd != NULL && ppd->jcl_begin && ppd->jcl_ps)
   {
-    fprintf(stderr, "img2ps: Unable to create PostScript output to %s - %s\n",
-            outfile == NULL ? "(stdout)" : outfile, strerror(errno));
-    exit(ERR_TRANSMISSION);
-  };
+    fputs((char *)ppd->jcl_begin, stdout);
+    fputs((char *)ppd->jcl_ps, stdout);
+  }
+
+ /*
+  * Start sending the document with any commands needed...
+  */
+
+  puts("%!");
+
+  ppdEmit(ppd, stdout, PPD_ORDER_DOCUMENT);
+  ppdEmit(ppd, stdout, PPD_ORDER_ANY);
+  ppdEmit(ppd, stdout, PPD_ORDER_PROLOG);
+
+  if (g != 1.0 || b != 1.0)
+    printf("{ neg 1 add %.3f exp neg 1 add %.3f mul } bind settransfer\n", g, b);
+
+  if (Copies > 1 && !slowcollate)
+  {
+    printf("/#copies %d def\n", Copies);
+    Copies = 1;
+  }
 
  /*
   * Output the pages...
@@ -572,161 +265,121 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   xprint = xinches / xpages;
   yprint = yinches / ypages;
-  left   = 36.0 * (size->width - xprint);
-  bottom = 36.0 * (size->length - yprint);
+  row    = malloc(img->xsize * abs(colorspace) + 3);
 
-  fputs("%!PS-Adobe-3.0\n", out);
-  fprintf(out, "%%%%BoundingBox: %.1f %.1f %.1f %.1f\n", left, bottom,
-          left + 72.0 * xprint, bottom + 72.0 * yprint);
-  fprintf(out, "%%%%LanguageLevel: %d\n", level);
-  fputs("%%Creator: img2ps " SVERSION " Copyright 1993-1998 Easy Software Products\n", out);
-  fprintf(out, "%%Pages: %d\n", xpages * ypages);
-  fputs("%%EndComments\n\n", out);
-
-  print_prolog(out, colorspace, gammaval, brightness, profile);
-
-  row = malloc(img->xsize * abs(colorspace) + 3);
-
-  for (xpage = 0; xpage < xpages; xpage ++)
-    for (ypage = 0; ypage < ypages; ypage ++)
-    {
-      fprintf(out, "%%Page: %d %d\n", xpage * ypages + ypage + 1,
-              xpage * ypages + ypage + 1);
-      fputs("gsave\n", out);
-
-      if (rotation == 0)
+  for (page = 1; Copies > 0; Copies --)
+    for (xpage = 0; xpage < xpages; xpage ++)
+      for (ypage = 0; ypage < ypages; ypage ++, page ++)
       {
+        fprintf(stderr, "INFO: Printing page %d...\n", page);
+
+        ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
+
+	puts("gsave");
+
+	if (Flip)
+	  printf("%.0f 0 translate -1 1 scale\n", PageWidth);
+
+	switch (Orientation)
+	{
+	  case 1 : /* Landscape */
+              printf("%.0f 0 translate 90 rotate\n", PageLength);
+              break;
+	  case 2 : /* Reverse Portrait */
+              printf("%.0f %.0f translate 180 rotate\n", PageWidth, PageLength);
+              break;
+	  case 3 : /* Reverse Landscape */
+              printf("0 %.0f translate -90 rotate\n", PageWidth);
+              break;
+	}
+
 	x0 = img->xsize * xpage / xpages;
 	x1 = img->xsize * (xpage + 1) / xpages - 1;
 	y0 = img->ysize * ypage / ypages;
 	y1 = img->ysize * (ypage + 1) / ypages - 1;
-      }
-      else
-      {
-	x0 = img->xsize * ypage / ypages;
-	x1 = img->xsize * (ypage + 1) / ypages - 1;
-	y0 = img->ysize * xpage / xpages;
-	y1 = img->ysize * (xpage + 1) / xpages - 1;
-      };
 
-      if (rotation)
-      {
-        fprintf(out, "\t%.1f %.1f translate\n", left, bottom);
-	fprintf(out, "\t%.3f %.3f scale\n\n",
-		xprint * 72.0 / (y1 - y0 + 1),
-		yprint * 72.0 / (x1 - x0 + 1));
-      }
-      else
-      {
-        fprintf(out, "\t%.1f %.1f translate\n", left, bottom + 72.0 * yprint);
-	fprintf(out, "\t%.3f %.3f scale\n\n",
-		xprint * 72.0 / (x1 - x0 + 1),
-		yprint * 72.0 / (y1 - y0 + 1));
-      };
+        printf("%.1f %.1f translate\n", PageLeft, PageBottom + 72.0 * yprint);
+	printf("%.3f %.3f scale\n\n",
+	       xprint * 72.0 / (x1 - x0 + 1),
+	       yprint * 72.0 / (y1 - y0 + 1));
 
-      if (level == 1)
-      {
-	fprintf(out, "\t/picture %d string def\n", (x1 - x0 + 1) * abs(colorspace));
-
-	if (rotation == 0)
+	if (LanguageLevel == 1)
 	{
-          if (flip)
-	    fprintf(out, "\t%d %d 8 [-1 0 0 -1 1 1] ",
-	 	    (x1 - x0 + 1), (y1 - y0 + 1));
+	  printf("/picture %d string def\n", (x1 - x0 + 1) * abs(colorspace));
+	  printf("%d %d 8[1 0 0 -1 0 1]", (x1 - x0 + 1), (y1 - y0 + 1));
+
+          if (colorspace == IMAGE_WHITE)
+            puts("{currentfile picture readhexstring pop} image");
           else
-	    fprintf(out, "\t%d %d 8 [1 0 0 -1 0 1] ",
-	 	    (x1 - x0 + 1), (y1 - y0 + 1));
+            puts("{currentfile picture readhexstring pop} false 3 colorimage");
+
+          for (y = y0; y <= y1; y ++)
+          {
+            ImageGetRow(img, x0, y, x1 - x0 + 1, row);
+            ps_hex(row, (x1 - x0 + 1) * abs(colorspace));
+          }
 	}
 	else
 	{
-          if (flip)
-	    fprintf(out, "\t%d %d 8 [0 -1 1 0 0 0] ",
-	 	    (x1 - x0 + 1), (y1 - y0 + 1));
+          if (colorspace == IMAGE_WHITE)
+            puts("/DeviceGray setcolorspace");
           else
-	    fprintf(out, "\t%d %d 8 [0 1 1 0 0 0] ",
-	 	    (x1 - x0 + 1), (y1 - y0 + 1));
-	};
+            puts("/DeviceRGB setcolorspace");
 
-        if (colorspace == IMAGE_WHITE)
-          fputs(" {currentfile picture readhex pop} image\n", out);
-        else
-          fputs(" {currentfile picture readhex pop} false 3 colorimage\n", out);
+          printf("<<"
+                 "/ImageType 1"
+		 "/Width %d"
+		 "/Height %d"
+		 "/BitsPerComponent 8",
+		 x1 - x0 + 1, y1 - y0 + 1);
 
-        for (y = y0; y <= y1; y ++)
-        {
-          ImageGetRow(img, x0, y, x1 - x0 + 1, row);
-          ps_hex(out, row, (x1 - x0 + 1) * abs(colorspace));
-        };
-      }
-      else
-      {
-        if (colorspace == IMAGE_WHITE)
-          fputs("/DeviceGray setcolorspace\n", out);
-        else
-          fputs("/DeviceRGB setcolorspace\n", out);
-
-        fputs("<<\n", out);
-        fputs("\t/ImageType 1\n", out);
-
-	fprintf(out, "\t/Width %d\n", x1 - x0 + 1);
-	fprintf(out, "\t/Height %d\n", y1 - y0 + 1);
-	fputs("\t/BitsPerComponent 8\n", out);
-
-        if (colorspace == IMAGE_WHITE)
-          fputs("\t/Decode [ 0 1 ]\n", out);
-        else
-          fputs("\t/Decode [ 0 1 0 1 0 1 ]\n", out);
-
-        fputs("\t/DataSource currentfile /ASCII85Decode filter\n", out);
-
-        if (((x1 - x0 + 1) / xprint) < 100.0)
-          fputs("\t/Interpolate true\n", out);
-
-	if (rotation == 0)
-	{
-          if (flip)
-	    fputs("\t/ImageMatrix [ -1 0 0 -1 1 1 ]\n", out);
+          if (colorspace == IMAGE_WHITE)
+            fputs("/Decode[0 1]", stdout);
           else
-	    fputs("\t/ImageMatrix [ 1 0 0 -1 0 1 ]\n", out);
+            fputs("/Decode[0 1 0 1 0 1]", stdout);
+
+          fputs("/DataSource currentfile /ASCII85Decode filter", stdout);
+
+          if (((x1 - x0 + 1) / xprint) < 100.0)
+            fputs("/Interpolate true", stdout);
+
+          puts("/ImageMatrix[1 0 0 -1 0 1]>>image");
+
+          for (y = y0, out_offset = 0; y <= y1; y ++)
+          {
+            ImageGetRow(img, x0, y, x1 - x0 + 1, row + out_offset);
+
+            out_length = (x1 - x0 + 1) * abs(colorspace) + out_offset;
+            out_offset = out_length & 3;
+
+            ps_ascii85(row, out_length, y == y1);
+
+            if (out_offset > 0)
+              memcpy(row, row + out_length - out_offset, out_offset);
+          }
 	}
-	else
-	{
-          if (flip)
-	    fputs("\t/ImageMatrix [ 0 -1 1 0 0 0 ]\n", out);
-          else
-	    fputs("\t/ImageMatrix [ 0 1 1 0 0 0 ]\n", out);
-	};
 
-        fputs(">>\n", out);
-        fputs("image\n", out);
+	puts("grestore");
+	puts("showpage");
+      }
 
-        for (y = y0, out_offset = 0; y <= y1; y ++)
-        {
-          ImageGetRow(img, x0, y, x1 - x0 + 1, row + out_offset);
+ /*
+  * End the job with the appropriate JCL command or CTRL-D otherwise.
+  */
 
-          out_length = (x1 - x0 + 1) * abs(colorspace) + out_offset;
-          out_offset = out_length & 3;
+  if (ppd != NULL && ppd->jcl_end)
+    fputs((char *)ppd->jcl_end, stdout);
+  else
+    putchar(0x04);
 
-          ps_ascii85(out, row, out_length, y == y1);
-
-          if (out_offset > 0)
-            memcpy(row, row + out_length - out_offset, out_offset);
-        };
-      };
-
-      fputs("grestore\n", out);
-      fputs("showpage\n", out);
-      fprintf(out, "%%EndPage: %d\n", xpage * ypages + ypage + 1);
-    };
-
-  fputs("%%EOF\n", out);
+ /*
+  * Close files...
+  */
 
   ImageClose(img);
+  ppdClose(ppd);
 
-  if (out != stdout)
-    fclose(out);
-
-  return (NO_ERROR);
+  return (0);
 }
 
 
@@ -735,8 +388,7 @@ main(int  argc,		/* I - Number of command-line arguments */
  */
 
 static void
-ps_hex(FILE *prn,	/* I - File to print to */
-       ib_t *data,	/* I - Data to print */
+ps_hex(ib_t *data,	/* I - Data to print */
        int  length)	/* I - Number of bytes to print */
 {
   int		col;
@@ -748,22 +400,22 @@ ps_hex(FILE *prn,	/* I - File to print to */
   while (length > 0)
   {
    /*
-    * Put the hex chars out to the file; note that we don't use fprintf()
+    * Put the hex chars out to the file; note that we don't use printf()
     * for speed reasons...
     */
 
-    putc(hex[*data >> 4], prn);
-    putc(hex[*data & 15], prn);
+    putchar(hex[*data >> 4]);
+    putchar(hex[*data & 15]);
 
     data ++;
     length --;
 
     col = (col + 1) & 31;
     if (col == 0 && length > 0)
-      putc('\n', prn);
-  };
+      putchar('\n');
+  }
 
-  putc('\n', prn);
+  putchar('\n');
 }
 
 
@@ -772,8 +424,7 @@ ps_hex(FILE *prn,	/* I - File to print to */
  */
 
 static void
-ps_ascii85(FILE *prn,		/* I - File to print to */
-	   ib_t *data,		/* I - Data to print */
+ps_ascii85(ib_t *data,		/* I - Data to print */
 	   int  length,		/* I - Number of bytes to print */
 	   int  last_line)	/* I - Last line of raster data? */
 {
@@ -787,7 +438,7 @@ ps_ascii85(FILE *prn,		/* I - File to print to */
     b = (((((data[0] << 8) | data[1]) << 8) | data[2]) << 8) | data[3];
 
     if (b == 0)
-      putc('z', prn);
+      putchar('z');
     else
     {
       c[4] = (b % 85) + '!';
@@ -800,12 +451,12 @@ ps_ascii85(FILE *prn,		/* I - File to print to */
       b /= 85;
       c[0] = b + '!';
 
-      fwrite(c, 5, 1, prn);
-    };
+      fwrite(c, 5, 1, stdout);
+    }
 
     data += 4;
     length -= 4;
-  };
+  }
 
   if (last_line)
   {
@@ -823,140 +474,14 @@ ps_ascii85(FILE *prn,		/* I - File to print to */
       b /= 85;
       c[0] = b + '!';
 
-      fwrite(c, length + 1, 1, prn);
-    };
+      fwrite(c, length + 1, 1, stdout);
+    }
 
-    fputs("~>\n", prn);
-  };
-}
-
-
-/*
- * 'usage()' - Print usage message and exit.
- */
-
-static void
-usage(void)
-{    
-  fputs("usage: img2ps -P <printer-name> <filename> [-D] [-L <log-file>]\n", stderr);
-  fputs("              [-O <output-file>] [-b <brightness-val(s)>] [-f]\n", stderr);
-  fputs("              [-g <gamma-val(s)>] [-h <hue>] [-l] [-p <ppi>]\n", stderr);
-  fputs("              [-r <rotation>] [-s <saturation]\n", stderr);
-
-  exit(ERR_BAD_ARG);
-}
-
-
-/*
- * 'make_transfer_function()' - Make a transfer function given a gamma,
- *                              brightness, and color profile values.
- */
-
-static void
-make_transfer_function(char  *s,	/* O - Transfer function string */
-                       float ig,	/* I - Image gamma */
-                       float ib,	/* I - Image brightness */
-                       float pg,	/* I - Profile gamma */
-                       float pd)	/* I - Profile ink density */
-{
-  if (ig == 0.0)
-    ig = LutDefaultGamma();
-
-  if ((ig == 1.0 || ig == 0.0) &&
-      (ib == 1.0 || ib == 0.0) &&
-      (pg == 1.0 || pg == 0.0) &&
-      (pd == 1.0 || pd == 0.0))
-  {
-    s[0] = '\0';
-    return;
-  };
-
-  if (ig != 1.0 && ig != 0.0)
-    sprintf(s, "%.4f exp ", 1.0 / ig);
-  else
-    s[0] = '\0';
-
-  if (ib != 1.0 || ib != 0.0 ||
-      pg != 1.0 || pg != 0.0 ||
-      pd != 1.0 || pd != 0.0)
-  {
-    strcat(s, "neg 1 add ");
-
-    if (ib != 1.0 && ib != 0.0)
-      sprintf(s + strlen(s), "%.2f mul ", ib);
-
-    if (pg != 1.0 && pg != 0.0)
-      sprintf(s + strlen(s), "%.4f exp ", 1.0 / pg);
-
-    if (pd != 1.0 && pd != 0.0)
-      sprintf(s + strlen(s), "%.4f mul ", pd);
-
-    strcat(s, "neg 1 add");
-  };
-}
-
-
-/*
- * 'print_prolog()' - Print the output prolog...
- */
-
-static void
-print_prolog(FILE  *out,
-             int   colorspace,
-             float gammaval[4],
-             int   brightness[4],
-             float *color_profile)
-{
-  char	cyan[255],
-	magenta[255],
-	yellow[255],
-	black[255];
-
-
-  fputs("%%BeginProlog\n", out);
-
-  make_transfer_function(black, gammaval[0], 100.0 / brightness[0],
-                         color_profile[PD_PROFILE_KG],
-                         color_profile[PD_PROFILE_KD]);
-
-  if (colorspace == IMAGE_RGB)
-  {
-   /*
-    * Color output...
-    */
-
-    make_transfer_function(cyan, gammaval[1], 100.0 / brightness[1],
-                           color_profile[PD_PROFILE_BG],
-                           color_profile[PD_PROFILE_CD]);
-    make_transfer_function(magenta, gammaval[2], 100.0 / brightness[2],
-                           color_profile[PD_PROFILE_BG],
-                           color_profile[PD_PROFILE_MD]);
-    make_transfer_function(yellow, gammaval[3], 100.0 / brightness[3],
-                           color_profile[PD_PROFILE_BG],
-                           color_profile[PD_PROFILE_YD]);
-
-    fprintf(out, "{ %s } bind\n"
-        	 "{ %s } bind\n"
-        	 "{ %s } bind\n"
-        	 "{ %s } bind\n"
-        	 "setcolortransfer\n",
-           cyan, magenta, yellow, black);
+    puts("~>");
   }
-  else
-  {
-   /*
-    * B&W output...
-    */
-
-    fprintf(out, "{ %s } bind\n"
-                 "settransfer\n",
-            black);
-  };
-
-  fputs("%%EndProlog\n", out);
 }
 
 
 /*
- * End of "$Id: imagetops.c,v 1.7 1999/02/01 17:26:58 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.8 1999/03/24 18:01:47 mike Exp $".
  */

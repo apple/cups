@@ -1,29 +1,28 @@
 /*
- * "$Id: image-gif.c,v 1.3 1998/09/10 15:39:35 mike Exp $"
+ * "$Id: image-gif.c,v 1.4 1999/03/24 18:01:42 mike Exp $"
  *
- *   GIF image routines for espPrint, a collection of printer drivers.
+ *   GIF image routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1998 by Easy Software Products
+ *   Copyright 1993-1999 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs contain
- *   unpublished proprietary information of Easy Software Products, and
- *   are protected by Federal copyright law.  They may not be disclosed
- *   to third parties or copied or duplicated in any form, in whole or
- *   in part, without the prior written consent of Easy Software Products.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
  *
- * Revision History:
- *
- *   $Log: image-gif.c,v $
- *   Revision 1.3  1998/09/10 15:39:35  mike
- *   Fixed bug in interlaced GIF loading.
- *
- *   Revision 1.2  1998/07/28  20:48:30  mike
- *   Updated for HP-UX.
- *
- *   Revision 1.1  1998/02/19  20:43:33  mike
- *   Initial revision
  */
 
 /*
@@ -95,11 +94,11 @@ ImageReadGIF(image_t *img,
     {
       fclose(fp);
       return (-1);
-    };
+    }
 
   transparent = -1;
 
-  while (1)
+  for (;;)
   {
     switch (getc(fp))
     {
@@ -114,7 +113,7 @@ ImageReadGIF(image_t *img,
             gif_get_block(fp, buf);
             if (buf[0] & 1)	/* Get transparent color index */
               transparent = buf[3];
-          };
+          }
 
           while (gif_get_block(fp, buf) != 0);
           break;
@@ -131,8 +130,8 @@ ImageReadGIF(image_t *img,
 	    {
               fclose(fp);
 	      return (-1);
-	    };
-	  };
+	    }
+	  }
 
           if (transparent >= 0)
           {
@@ -143,7 +142,7 @@ ImageReadGIF(image_t *img,
             cmap[transparent][0] = 255;
             cmap[transparent][1] = 255;
             cmap[transparent][2] = 255;
-          };
+          }
 
 	  if (gray)
 	  {
@@ -167,7 +166,7 @@ ImageReadGIF(image_t *img,
         	  for (i = ncolors - 1; i >= 0; i --)
         	    ImageWhiteToRGB(cmap[i], cmap[i], 1);
         	  break;
-	    };
+	    }
 
             img->colorspace = secondary;
 	  }
@@ -197,10 +196,10 @@ ImageReadGIF(image_t *img,
         	  break;
               case IMAGE_RGB :
         	  break;
-	    };
+	    }
 
             img->colorspace = primary;
-	  };
+	  }
 
           img->xsize = (buf[5] << 8) | buf[4];
           img->ysize = (buf[7] << 8) | buf[6];
@@ -208,11 +207,8 @@ ImageReadGIF(image_t *img,
 	  i = gif_read_image(fp, img, cmap, buf[8] & GIF_INTERLACE);
           fclose(fp);
           return (i);
-    };
-  };
-
-  fclose(fp);
-  return (-1);
+    }
+  }
 }
 
 
@@ -249,7 +245,7 @@ gif_read_cmap(FILE       *fp,
   {
     *gray = 1;
     return (0);
-  };
+  }
 
  /*
   * If this needs to be a grayscale image, convert the RGB values to
@@ -333,7 +329,7 @@ gif_get_code(FILE *fp,		/* I - File to read from */
     done    = 0;
 
     return (0);
-  };
+  }
 
 
   if ((curbit + code_size) >= lastbit)
@@ -364,7 +360,7 @@ gif_get_code(FILE *fp,		/* I - File to read from */
 
       done = 1;
       return (-1);
-    };
+    }
 
    /*
     * Update buffer state...
@@ -373,7 +369,7 @@ gif_get_code(FILE *fp,		/* I - File to read from */
     last_byte = 2 + count;
     curbit    = (curbit - lastbit) + 16;
     lastbit   = last_byte * 8;
-  };
+  }
 
   ret = 0;
   for (ret = 0, i = curbit + code_size - 1, j = code_size;
@@ -442,7 +438,7 @@ gif_read_lzw(FILE *fp,			/* I - File to read from */
     {
       table[0][i] = 0;
       table[1][i] = i;
-    };
+    }
 
     for (; i < 4096; i ++)
       table[0][i] = table[1][0] = 0;
@@ -460,7 +456,7 @@ gif_read_lzw(FILE *fp,			/* I - File to read from */
     while (firstcode == clear_code);
 
     return (firstcode);
-  };
+  }
 
   if (sp > stack)
     return (*--sp);
@@ -473,7 +469,7 @@ gif_read_lzw(FILE *fp,			/* I - File to read from */
       {
 	table[0][i] = 0;
 	table[1][i] = i;
-      };
+      }
 
       for (; i < 4096; i ++)
 	table[0][i] = table[1][i] = 0;
@@ -497,7 +493,7 @@ gif_read_lzw(FILE *fp,			/* I - File to read from */
         while (gif_get_block(fp, buf) > 0);
 
       return (-2);
-    };
+    }
 
     incode = code;
 
@@ -505,7 +501,7 @@ gif_read_lzw(FILE *fp,			/* I - File to read from */
     {
       *sp++ = firstcode;
       code  = oldcode;
-    };
+    }
 
     while (code >= clear_code)
     {
@@ -514,7 +510,7 @@ gif_read_lzw(FILE *fp,			/* I - File to read from */
 	return (255);
 
       code = table[0][code];
-    };
+    }
 
     *sp++ = firstcode = table[1][code];
     code  = max_code;
@@ -529,14 +525,14 @@ gif_read_lzw(FILE *fp,			/* I - File to read from */
       {
 	max_code_size *= 2;
 	code_size ++;
-      };
-    };
+      }
+    }
 
     oldcode = incode;
 
     if (sp > stack)
       return (*--sp);
-  };
+  }
 
   return (code);
 }
@@ -587,7 +583,7 @@ gif_read_image(FILE       *fp,		/* I - Input file */
           temp[1] = cmap[pixel][1];
       default :
           temp[0] = cmap[pixel][0];
-    };
+    }
 
     xpos ++;
     temp += bpp;
@@ -607,15 +603,15 @@ gif_read_image(FILE       *fp,		/* I - Input file */
 	  pass ++;
 
           ypos = ypasses[pass];
-	};
+	}
       }
       else
 	ypos ++;
-    };
+    }
 
     if (ypos >= img->ysize)
       break;
-  };
+  }
 
   free(pixels);
 
@@ -624,5 +620,5 @@ gif_read_image(FILE       *fp,		/* I - Input file */
 
 
 /*
- * End of "$Id: image-gif.c,v 1.3 1998/09/10 15:39:35 mike Exp $".
+ * End of "$Id: image-gif.c,v 1.4 1999/03/24 18:01:42 mike Exp $".
  */

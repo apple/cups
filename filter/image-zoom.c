@@ -1,15 +1,25 @@
 /*
- * "$Id: image-zoom.c,v 1.3 1998/07/28 20:51:43 mike Exp $"
+ * "$Id: image-zoom.c,v 1.4 1999/03/24 18:01:46 mike Exp $"
  *
- *   Image zoom routines for espPrint, a collection of printer drivers.
+ *   Image zoom routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1998 by Easy Software Products
+ *   Copyright 1993-1999 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs contain
- *   unpublished proprietary information of Easy Software Products, and
- *   are protected by Federal copyright law.  They may not be disclosed
- *   to third parties or copied or duplicated in any form, in whole or
- *   in part, without the prior written consent of Easy Software Products.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
  *
@@ -19,19 +29,6 @@
  *   ImageZoomQFill() - Fill a zoom record quickly using nearest-neighbor
  *                      sampling.
  *   ImageZoomFree()  - Free a zoom record...
- *
- * Revision History:
- *
- *   $Log: image-zoom.c,v $
- *   Revision 1.3  1998/07/28 20:51:43  mike
- *   Fixed zoom alloc code - xsize and ysize were swapped when rotated output
- *   was selected.
- *
- *   Revision 1.2  1998/02/19  20:44:58  mike
- *   Fixed scaling problems...
- *
- *   Revision 1.1  1998/02/02  20:20:02  mike
- *   Initial revision
  */
 
 /*
@@ -119,20 +116,20 @@ ImageZoomAlloc(image_t *img,	/* I - Image to zoom */
       z->ymax = z->height;
     else
       z->ymax = z->height - 1;
-  };
+  }
 
   if ((z->rows[0] = (ib_t *)malloc(z->xsize * z->depth)) == NULL)
   {
     free(z);
     return (NULL);
-  };
+  }
 
   if ((z->rows[1] = (ib_t *)malloc(z->xsize * z->depth)) == NULL)
   {
     free(z->rows[0]);
     free(z);
     return (NULL);
-  };
+  }
 
   if ((z->in = (ib_t *)malloc(z->width * z->depth)) == NULL)
   {
@@ -140,7 +137,7 @@ ImageZoomAlloc(image_t *img,	/* I - Image to zoom */
     free(z->rows[1]);
     free(z);
     return (NULL);
-  };
+  }
 
   return (z);
 }
@@ -212,7 +209,7 @@ ImageZoomFill(izoom_t *z,	/* I - Zoom record to fill */
     {
       for (count = 0; count < z_depth; count ++)
         *r++ = inptr[count];
-    };
+    }
 
     ix    += z_xstep;
     inptr += z_instep;
@@ -225,8 +222,8 @@ ImageZoomFill(izoom_t *z,	/* I - Zoom record to fill */
       xerr1 -= z_xsize;
       ix    += z_xincr;
       inptr += z_inincr;
-    };
-  };
+    }
+  }
 }
 
 
@@ -250,7 +247,6 @@ ImageZoomQFill(izoom_t *z,	/* I - Zoom record to fill */
 	z_xincr,
 	z_instep,
 	z_inincr,
-	z_xmax,
 	z_xmod,
 	z_xsize;
 
@@ -262,7 +258,6 @@ ImageZoomQFill(izoom_t *z,	/* I - Zoom record to fill */
 
   z_depth  = z->depth;
   z_xsize  = z->xsize;
-  z_xmax   = z->xmax;
   z_xmod   = z->xmod;
   z_xstep  = z->xstep;
   z_xincr  = z->xincr;
@@ -297,8 +292,8 @@ ImageZoomQFill(izoom_t *z,	/* I - Zoom record to fill */
       xerr0 += z_xsize;
       ix    += z_xincr;
       inptr += z_inincr;
-    };
-  };
+    }
+  }
 }
 
 
@@ -317,5 +312,5 @@ ImageZoomFree(izoom_t *z)	/* I - Zoom record to free */
 
 
 /*
- * End of "$Id: image-zoom.c,v 1.3 1998/07/28 20:51:43 mike Exp $".
+ * End of "$Id: image-zoom.c,v 1.4 1999/03/24 18:01:46 mike Exp $".
  */

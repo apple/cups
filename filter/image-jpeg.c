@@ -1,39 +1,27 @@
 /*
- * "$Id: image-jpeg.c,v 1.5 1999/03/06 18:11:35 mike Exp $"
+ * "$Id: image-jpeg.c,v 1.6 1999/03/24 18:01:43 mike Exp $"
  *
- *   JPEG image routines for espPrint, a collection of printer drivers.
+ *   JPEG image routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1998 by Easy Software Products
+ *   Copyright 1993-1999 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs contain
- *   unpublished proprietary information of Easy Software Products, and
- *   are protected by Federal copyright law.  They may not be disclosed
- *   to third parties or copied or duplicated in any form, in whole or
- *   in part, without the prior written consent of Easy Software Products.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
- *
- * Revision History:
- *
- *   $Log: image-jpeg.c,v $
- *   Revision 1.5  1999/03/06 18:11:35  mike
- *   Checkin for CVS.
- *
- *   Revision 1.4  1998/04/01  21:47:31  mike
- *   Fixed problem with outputting B&W from color JPEG images...
- *
- *   Revision 1.4  1998/04/01  21:47:31  mike
- *   Fixed problem with outputting B&W from color JPEG images...
- *
- *   Revision 1.3  1998/03/19  16:58:45  mike
- *   Fixed PPI calculation - was dividing instead of multiplying...
- *
- *   Revision 1.2  1998/02/24  18:39:46  mike
- *   Fixed bug in colorspace conversion - now check the number of components
- *   in the image and adjust accordingly.
- *
- *   Revision 1.1  1998/02/19  20:43:33  mike
- *   Initial revision
  *
  */
 
@@ -42,7 +30,9 @@
  */
 
 #include "image.h"
-#include <jpeglib.h>	/* JPEG/JFIF image definitions */
+
+#ifdef HAVE_LIBJPEG
+#  include <jpeglib.h>	/* JPEG/JFIF image definitions */
 
 
 int
@@ -58,6 +48,8 @@ ImageReadJPEG(image_t *img,
   ib_t				*in,		/* Input pixels */
 				*out;		/* Output pixels */
 
+
+  (void)secondary;
 
   cinfo.err = jpeg_std_error(&jerr);
   jpeg_create_decompress(&cinfo);
@@ -77,7 +69,7 @@ ImageReadJPEG(image_t *img,
     cinfo.out_color_space      = JCS_RGB;
     cinfo.out_color_components = 3;
     cinfo.output_components    = 3;
-  };
+  }
 
   jpeg_calc_output_dimensions(&cinfo);
 
@@ -96,8 +88,8 @@ ImageReadJPEG(image_t *img,
     {
       img->xppi = (int)((float)cinfo.X_density * 2.54);
       img->yppi = (int)((float)cinfo.Y_density * 2.54);
-    };
-  };
+    }
+  }
 
   ImageSetMaxTiles(img, 0);
 
@@ -135,7 +127,7 @@ ImageReadJPEG(image_t *img,
         case IMAGE_CMYK :
             ImageWhiteToCMYK(in, out, img->xsize);
             break;
-      };
+      }
 
       ImagePutRow(img, 0, cinfo.output_scanline - 1, img->xsize, out);
     }
@@ -155,11 +147,11 @@ ImageReadJPEG(image_t *img,
         case IMAGE_CMYK :
             ImageRGBToCMYK(in, out, img->xsize);
             break;
-      };
+      }
 
       ImagePutRow(img, 0, cinfo.output_scanline - 1, img->xsize, out);
-    };
-  };
+    }
+  }
 
   free(in);
   free(out);
@@ -173,6 +165,9 @@ ImageReadJPEG(image_t *img,
 }
 
 
+#endif /* HAVE_LIBJPEG */
+
+
 /*
- * End of "$Id: image-jpeg.c,v 1.5 1999/03/06 18:11:35 mike Exp $".
+ * End of "$Id: image-jpeg.c,v 1.6 1999/03/24 18:01:43 mike Exp $".
  */

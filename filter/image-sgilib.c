@@ -1,23 +1,26 @@
 /*
- * "$Id: image-sgilib.c,v 1.1 1999/03/06 18:11:35 mike Exp $"
+ * "$Id: image-sgilib.c,v 1.2 1999/03/24 18:01:45 mike Exp $"
  *
- *   SGI image file format library routines.
+ *   SGI image file format library routines for the Common UNIX Printing
+ *   System (CUPS).
  *
- *   Copyright 1997-1998 Michael Sweet (mike@easysw.com)
+ *   Copyright 1993-1999 by Easy Software Products.
  *
- *   This program is free software; you can redistribute it and/or modify it
- *   under the terms of the GNU General Public License as published by the Free
- *   Software Foundation; either version 2 of the License, or (at your option)
- *   any later version.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
  *
- *   This program is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- *   for more details.
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
  *
- *   You should have received a copy of the GNU General Public License
- *   along with this program; if not, write to the Free Software
- *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
  *
@@ -34,31 +37,9 @@
  *   read_rle16()  - Read 16-bit RLE data.
  *   write_rle8()  - Write 8-bit RLE data.
  *   write_rle16() - Write 16-bit RLE data.
- *
- * Revision History:
- *
- *   $Log: image-sgilib.c,v $
- *   Revision 1.1  1999/03/06 18:11:35  mike
- *   Initial revision
- *
- *   Revision 1.4  1998/02/05  17:10:58  mike
- *   Added sgiOpenFile() function for opening an existing file pointer.
- *
- *   Revision 1.3  1997/07/02  16:40:16  mike
- *   sgiOpen() wasn't opening files with "rb" or "wb+".  This caused problems
- *   on PCs running Windows/DOS...
- *
- *   Revision 1.2  1997/06/18  00:55:28  mike
- *   Updated to hold length table when writing.
- *   Updated to hold current length when doing ARLE.
- *   Wasn't writing length table on close.
- *   Wasn't saving new line into arle_row when necessary.
- *
- *   Revision 1.1  1997/06/15  03:37:19  mike
- *   Initial revision
  */
 
-#include "sgi.h"
+#include "image-sgi.h"
 
 
 /*
@@ -108,19 +89,19 @@ sgiClose(sgi_t *sgip)	/* I - SGI image */
          i --, offset ++)
       if (putlong(offset[0], sgip->file) < 0)
         return (-1);
-  };
+  }
 
   if (sgip->table != NULL)
   {
     free(sgip->table[0]);
     free(sgip->table);
-  };
+  }
 
   if (sgip->length != NULL)
   {
     free(sgip->length[0]);
     free(sgip->length);
-  };
+  }
 
   if (sgip->comp == SGI_COMP_ARLE)
     free(sgip->arle_row);
@@ -173,7 +154,7 @@ sgiGetRow(sgi_t *sgip,	/* I - SGI image */
         {
           for (x = sgip->xsize; x > 0; x --, row ++)
             *row = getshort(sgip->file);
-        };
+        }
         break;
 
     case SGI_COMP_RLE :
@@ -185,8 +166,7 @@ sgiGetRow(sgi_t *sgip,	/* I - SGI image */
           return (read_rle8(sgip->file, row, sgip->xsize));
         else
           return (read_rle16(sgip->file, row, sgip->xsize));
-        break;
-  };
+  }
 
   return (0);
 }
@@ -258,7 +238,7 @@ sgiOpenFile(FILE *file,	/* I - File to open */
         {
           free(sgip);
           return (NULL);
-        };
+        }
 
         sgip->comp  = getc(sgip->file);
         sgip->bpp   = getc(sgip->file);
@@ -285,7 +265,7 @@ sgiOpenFile(FILE *file,	/* I - File to open */
           for (i = 0; i < sgip->zsize; i ++)
             for (j = 0; j < sgip->ysize; j ++)
               sgip->table[i][j] = getlong(sgip->file);
-        };
+        }
         break;
 
     case SGI_WRITE :
@@ -297,7 +277,7 @@ sgiOpenFile(FILE *file,	/* I - File to open */
         {
           free(sgip);
           return (NULL);
-        };
+        }
 
         sgip->mode = SGI_WRITE;
 
@@ -317,7 +297,7 @@ sgiOpenFile(FILE *file,	/* I - File to open */
         {
           putlong(-32768, sgip->file);	/* Minimum pixel */
           putlong(32767, sgip->file);	/* Maximum pixel */
-        };
+        }
         putlong(0, sgip->file);		/* Reserved */
 
         memset(name, 0, sizeof(name));
@@ -343,7 +323,7 @@ sgiOpenFile(FILE *file,	/* I - File to open */
               {
         	for (i = xsize * ysize * zsize; i > 0; i --)
         	  putshort(0, sgip->file);
-              };
+              }
               break;
 
           case SGI_COMP_ARLE : /* Aggressive RLE */
@@ -369,13 +349,13 @@ sgiOpenFile(FILE *file,	/* I - File to open */
               for (i = 1; i < sgip->zsize; i ++)
         	sgip->length[i] = sgip->length[0] + i * sgip->ysize;
               break;
-        };
+        }
         break;
 
     default :
         free(sgip);
         return (NULL);
-  };
+  }
 
   return (sgip);
 }
@@ -422,7 +402,7 @@ sgiPutRow(sgi_t *sgip,	/* I - SGI image */
         {
           for (x = sgip->xsize; x > 0; x --, row ++)
             putshort(*row, sgip->file);
-        };
+        }
         break;
 
     case SGI_COMP_ARLE :
@@ -444,8 +424,8 @@ sgiPutRow(sgi_t *sgip,	/* I - SGI image */
             sgip->table[z][y]  = sgip->arle_offset;
             sgip->length[z][y] = sgip->arle_length;
             return (0);
-          };
-        };
+          }
+        }
 
        /*
         * If that didn't match, search all the previous rows...
@@ -462,7 +442,7 @@ sgiPutRow(sgi_t *sgip,	/* I - SGI image */
             {
               x = 0;
               break;
-            };
+            }
 
             for (x = 0; x < sgip->xsize; x ++)
               if (row[x] != sgip->arle_row[x])
@@ -479,14 +459,14 @@ sgiPutRow(sgi_t *sgip,	/* I - SGI image */
             {
               x = 0;
               break;
-            };
+            }
 
             for (x = 0; x < sgip->xsize; x ++)
               if (row[x] != sgip->arle_row[x])
         	break;
           }
           while (x < sgip->xsize);
-        };
+        }
 
 	if (x == sgip->xsize)
 	{
@@ -516,13 +496,13 @@ sgiPutRow(sgi_t *sgip,	/* I - SGI image */
           sgip->arle_offset = offset;
           sgip->arle_length = x;
           memcpy(sgip->arle_row, row, sgip->xsize * sizeof(short));
-        };
+        }
 
         sgip->nextrow      = ftell(sgip->file);
         sgip->length[z][y] = x;
 
         return (x);
-  };
+  }
 
   return (0);
 }
@@ -634,8 +614,8 @@ read_rle8(FILE  *fp,	/* I - File to read from */
       length ++;
       for (i = 0; i < count; i ++, row ++, xsize --)
         *row = ch;
-    };
-  };
+    }
+  }
 
   return (xsize > 0 ? -1 : length);
 }
@@ -679,8 +659,8 @@ read_rle16(FILE  *fp,	/* I - File to read from */
       length ++;
       for (i = 0; i < count; i ++, row ++, xsize --)
         *row = ch;
-    };
-  };
+    }
+  }
 
   return (xsize > 0 ? -1 : length * 2);
 }
@@ -713,7 +693,7 @@ write_rle8(FILE  *fp,	/* I - File to write to */
     {
       row ++;
       x --;
-    };
+    }
 
     row -= 2;
     x   += 2;
@@ -735,8 +715,8 @@ write_rle8(FILE  *fp,	/* I - File to write to */
         start ++;
         i --;
         length ++;
-      };
-    };
+      }
+    }
 
     if (x <= 0)
       break;
@@ -751,7 +731,7 @@ write_rle8(FILE  *fp,	/* I - File to write to */
     {
       row ++;
       x --;
-    };
+    }
 
     count = row - start;
     while (count > 0)
@@ -766,8 +746,8 @@ write_rle8(FILE  *fp,	/* I - File to write to */
       if (putc(repeat, fp) == EOF)
         return (-1);
       length ++;
-    };
-  };
+    }
+  }
 
   length ++;
 
@@ -805,7 +785,7 @@ write_rle16(FILE  *fp,	/* I - File to write to */
     {
       row ++;
       x --;
-    };
+    }
 
     row -= 2;
     x   += 2;
@@ -827,8 +807,8 @@ write_rle16(FILE  *fp,	/* I - File to write to */
         start ++;
         i --;
         length ++;
-      };
-    };
+      }
+    }
 
     if (x <= 0)
       break;
@@ -843,7 +823,7 @@ write_rle16(FILE  *fp,	/* I - File to write to */
     {
       row ++;
       x --;
-    };
+    }
 
     count = row - start;
     while (count > 0)
@@ -858,8 +838,8 @@ write_rle16(FILE  *fp,	/* I - File to write to */
       if (putshort(repeat, fp) == EOF)
         return (-1);
       length ++;
-    };
-  };
+    }
+  }
 
   length ++;
 
@@ -871,5 +851,5 @@ write_rle16(FILE  *fp,	/* I - File to write to */
 
 
 /*
- * End of "$Id: image-sgilib.c,v 1.1 1999/03/06 18:11:35 mike Exp $".
+ * End of "$Id: image-sgilib.c,v 1.2 1999/03/24 18:01:45 mike Exp $".
  */

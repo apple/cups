@@ -1,46 +1,28 @@
 /*
- * "$Id: imagetoraster.c,v 1.8 1999/02/01 17:26:58 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.9 1999/03/24 18:01:47 mike Exp $"
  *
- *   Image file to STIFF conversion program for espPrint, a collection
- *   of printer drivers.
+ *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1998 by Easy Software Products
+ *   Copyright 1993-1999 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs contain
- *   unpublished proprietary information of Easy Software Products, and
- *   are protected by Federal copyright law.  They may not be disclosed
- *   to third parties or copied or duplicated in any form, in whole or
- *   in part, without the prior written consent of Easy Software Products.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
  *
- * Revision History:
- *
- *   $Log: imagetoraster.c,v $
- *   Revision 1.8  1999/02/01 17:26:58  mike
- *   Updated to accept color profile option.
- *
- *   Revision 1.7  1998/11/16 15:47:04  mike
- *   make_lut() didn't limit value to 1.0 (255)...
- *
- *   Revision 1.6  1998/08/10  16:20:08  mike
- *   Fixed scaling problems.
- *
- *   Revision 1.5  1998/07/28  20:48:30  mike
- *   Updated size/page computation code to work properly.
- *
- *   Revision 1.4  1998/07/28  18:49:15  mike
- *   Fixed bug in rotation code - was rotating variable size media as well...
- *
- *   Revision 1.3  1998/04/02  21:06:54  mike
- *   Fixed problem with dither array (off by one).
- *
- *   Revision 1.2  1998/02/24  21:06:28  mike
- *   Updated to handle variable media sizes and adjust the output size
- *   accordingly.
- *
- *   Revision 1.1  1998/02/19  20:18:34  mike
- *   Initial revision
  */
 
 /*
@@ -1161,5 +1143,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.8 1999/02/01 17:26:58 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.9 1999/03/24 18:01:47 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: common.c,v 1.2 1999/03/24 13:59:46 mike Exp $"
+ * "$Id: common.c,v 1.3 1999/03/24 18:01:41 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,7 @@
  *
  * Contents:
  *
+ *   SetCommonOptions() - Set common filter options for media size, etc.
  */
 
 /*
@@ -52,9 +53,9 @@ float	PageLeft = 18.0f,	/* Left margin */
  * 'SetCommonOptions()' - Set common filter options for media size, etc.
  */
 
-void
-SetCommonOptions(int           num_options,
-                 cups_option_t *options)
+ppd_file_t *					/* O - PPD file */
+SetCommonOptions(int           num_options,	/* I - Number of options */
+                 cups_option_t *options)	/* I - Options */
 {
   float		temp;		/* Swapping variable */
   ppd_file_t	*ppd;		/* PPD file */
@@ -82,8 +83,6 @@ SetCommonOptions(int           num_options,
     ColorDevice   = ppd->color_device;
     LanguageLevel = ppd->language_level;
   }
-
-  ppdClose(ppd);
 
   if ((val = cupsGetOption("landscape", num_options, options)) != NULL)
     Orientation = 1;
@@ -239,9 +238,11 @@ SetCommonOptions(int           num_options,
   if ((val = cupsGetOption("Duplex", num_options, options)) != NULL &&
       strcmp(val, "NoTumble") == 0)
     Duplex = 1;
+
+  return (ppd);
 }
 
 
 /*
- * End of "$Id: common.c,v 1.2 1999/03/24 13:59:46 mike Exp $".
+ * End of "$Id: common.c,v 1.3 1999/03/24 18:01:41 mike Exp $".
  */

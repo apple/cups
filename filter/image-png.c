@@ -1,35 +1,28 @@
 /*
- * "$Id: image-png.c,v 1.4 1999/03/06 18:11:35 mike Exp $"
+ * "$Id: image-png.c,v 1.5 1999/03/24 18:01:43 mike Exp $"
  *
- *   PNG image routines for espPrint, a collection of printer drivers.
+ *   PNG image routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1998 by Easy Software Products
+ *   Copyright 1993-1999 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs contain
- *   unpublished proprietary information of Easy Software Products, and
- *   are protected by Federal copyright law.  They may not be disclosed
- *   to third parties or copied or duplicated in any form, in whole or
- *   in part, without the prior written consent of Easy Software Products.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
  *
- * Revision History:
- *
- *   $Log: image-png.c,v $
- *   Revision 1.4  1999/03/06 18:11:35  mike
- *   Checkin for CVS.
- *
- *   Revision 1.3  1998/07/28  18:48:34  mike
- *   Fixed possible bug in printing of grayscale images < 8bpp.
- *
- *   Revision 1.3  1998/07/28  18:48:34  mike
- *   Fixed possible bug in printing of grayscale images < 8bpp.
- *
- *   Revision 1.2  1998/03/19  16:57:12  mike
- *   Fixed PPI calculation - was dividing instead of multiplying...
- *
- *   Revision 1.1  1998/02/19  20:43:33  mike
- *   Initial revision
  */
 
 /*
@@ -37,6 +30,8 @@
  */
 
 #include "image.h"
+
+#if defined(HAVE_LIBPNG) && defined(HAVE_LIBZ)
 #include <png.h>	/* Portable Network Graphics (PNG) definitions */
 
 
@@ -92,7 +87,7 @@ ImageReadPNG(image_t *img,
   {
     img->xppi = (int)((float)info->x_pixels_per_unit * 0.0254);
     img->yppi = (int)((float)info->y_pixels_per_unit * 0.0254);
-  };
+  }
 
   ImageSetMaxTiles(img, 0);
 
@@ -144,8 +139,8 @@ ImageReadPNG(image_t *img,
 	  case IMAGE_CMYK :
 	      ImageWhiteToCMYK(in, out, img->xsize);
 	      break;
-	};
-      };
+	}
+      }
     }
     else
     {
@@ -177,12 +172,12 @@ ImageReadPNG(image_t *img,
 	  case IMAGE_CMYK :
 	      ImageRGBToCMYK(in, out, img->xsize);
 	      break;
-	};
-      };
-    };
+	}
+      }
+    }
 
     ImagePutRow(img, 0, y, img->xsize, out);
-  };
+  }
 
   png_read_end(pp, info);
   png_read_destroy(pp, info, NULL);
@@ -193,6 +188,9 @@ ImageReadPNG(image_t *img,
 }
 
 
+#endif /* HAVE_LIBPNG && HAVE_LIBZ */
+
+
 /*
- * End of "$Id: image-png.c,v 1.4 1999/03/06 18:11:35 mike Exp $".
+ * End of "$Id: image-png.c,v 1.5 1999/03/24 18:01:43 mike Exp $".
  */

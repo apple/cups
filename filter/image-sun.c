@@ -1,27 +1,28 @@
 /*
- * "$Id: image-sun.c,v 1.2 1998/08/12 15:03:55 mike Exp $"
+ * "$Id: image-sun.c,v 1.3 1999/03/24 18:01:45 mike Exp $"
  *
- *   Sun Raster image file routines for espPrint, a collection of printer
- *   drivers.
+ *   Sun Raster image file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1998 by Easy Software Products
+ *   Copyright 1993-1999 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs contain
- *   unpublished proprietary information of Easy Software Products, and
- *   are protected by Federal copyright law.  They may not be disclosed
- *   to third parties or copied or duplicated in any form, in whole or
- *   in part, without the prior written consent of Easy Software Products.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
  *
- * Revision History:
- *
- *   $Log: image-sun.c,v $
- *   Revision 1.2  1998/08/12 15:03:55  mike
- *   Added support for colormapped images.
- *
- *   Revision 1.1  1998/02/19  20:44:58  mike
- *   Initial revision
  */
 
 /*
@@ -87,9 +88,7 @@ ImageReadSunRaster(image_t *img,
 		*p,
 		bit;
   unsigned	ras_depth,		/* depth (1, 8, or 24 bits) of pixel */
-		ras_length,		/* length (bytes) of image */
 		ras_type,		/* type of file; see RT_* below */
-		ras_maptype,		/* type of colormap; see RMT_* below */
 		ras_maplength;		/* length (bytes) of following map */
   unsigned char	cmap[3][256];		/* colormap */
 
@@ -103,9 +102,9 @@ ImageReadSunRaster(image_t *img,
   img->xsize    = read_unsigned(fp);
   img->ysize    = read_unsigned(fp);
   ras_depth     = read_unsigned(fp);
-  ras_length    = read_unsigned(fp);
+  /* ras_length */read_unsigned(fp);
   ras_type      = read_unsigned(fp);
-  ras_maptype   = read_unsigned(fp);
+  /* ras_maptype*/read_unsigned(fp);
   ras_maplength = read_unsigned(fp);
 
   if (ras_maplength > 0)
@@ -113,7 +112,7 @@ ImageReadSunRaster(image_t *img,
     fread(cmap[0], 1, ras_maplength / 3, fp);
     fread(cmap[1], 1, ras_maplength / 3, fp);
     fread(cmap[2], 1, ras_maplength / 3, fp);
-  };
+  }
 
  /*
   * Compute the width of each line and allocate memory as needed...
@@ -132,7 +131,7 @@ ImageReadSunRaster(image_t *img,
   {
     img->colorspace = primary;
     in = malloc(img->xsize * 3 + 1);
-  };
+  }
 
   bpp       = ImageGetDepth(img);
   out       = malloc(img->xsize * bpp);
@@ -171,9 +170,9 @@ ImageReadSunRaster(image_t *img,
           }
           else
             *p = run_value;
-        };
-      };
-    };
+        }
+      }
+    }
 
     if (ras_depth == 1 && ras_maplength == 0)
     {
@@ -197,7 +196,7 @@ ImageReadSunRaster(image_t *img,
 	}
 	else
           bit >>= 1;
-      };
+      }
     }
     else if (ras_depth == 1)
     {
@@ -220,7 +219,7 @@ ImageReadSunRaster(image_t *img,
           *p++ = cmap[0][0];
           *p++ = cmap[1][0];
           *p++ = cmap[2][0];
-	};
+	}
 
 	if (bit > 1)
 	{
@@ -229,7 +228,7 @@ ImageReadSunRaster(image_t *img,
 	}
 	else
           bit >>= 1;
-      };
+      }
     }
     else if (ras_depth == 8 && ras_maplength > 0)
     {
@@ -244,7 +243,7 @@ ImageReadSunRaster(image_t *img,
         *p++ = cmap[0][*scanptr];
         *p++ = cmap[1][*scanptr];
         *p++ = cmap[2][*scanptr++];
-      };
+      }
     }
     else if (ras_depth == 24 && ras_type != RT_FORMAT_RGB)
     {
@@ -259,8 +258,8 @@ ImageReadSunRaster(image_t *img,
         *p++ = scanptr[2];
         *p++ = scanptr[1];
         *p++ = scanptr[0];
-      };
-    };
+      }
+    }
 
     if (bpp == 1)
     {
@@ -282,10 +281,10 @@ ImageReadSunRaster(image_t *img,
 	  case IMAGE_CMYK :
 	      ImageWhiteToCMYK(in, out, img->xsize);
 	      break;
-	};
+	}
 
         ImagePutRow(img, 0, y, img->xsize, out);
-      };
+      }
     }
     else
     {
@@ -315,12 +314,12 @@ ImageReadSunRaster(image_t *img,
 	  case IMAGE_CMYK :
 	      ImageRGBToCMYK(in, out, img->xsize);
 	      break;
-	};
+	}
 
         ImagePutRow(img, 0, y, img->xsize, out);
-      };
-    };
-  };
+      }
+    }
+  }
 
   free(scanline);
   free(in);
@@ -348,5 +347,5 @@ read_unsigned(FILE *fp)
 
 
 /*
- * End of "$Id: image-sun.c,v 1.2 1998/08/12 15:03:55 mike Exp $".
+ * End of "$Id: image-sun.c,v 1.3 1999/03/24 18:01:45 mike Exp $".
  */

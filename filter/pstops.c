@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.11 1999/03/24 13:59:47 mike Exp $"
+ * "$Id: pstops.c,v 1.12 1999/03/24 18:01:48 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -23,27 +23,19 @@
  *
  * Contents:
  *
+ *   main()        - Main entry...
+ *   check_range() - Check to see if the current page is selected for
+ *   copy_bytes()  - Copy bytes from the input file to stdout...
+ *   end_nup()     - End processing for N-up printing...
+ *   psgets()      - Get a line from a file.
+ *   start_nup()   - Start processing for N-up printing...
  */
 
 /*
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <ctype.h>
-
-#if defined(WIN32) || defined(__EMX__)
-#  include <io.h>
-#else
-#  include <unistd.h>
-#endif /* WIN32 || __EMX__ */
-
-#include <cups/cups.h>
-#include <cups/language.h>
-#include <cups/string.h>
+#include "common.h"
 
 
 /*
@@ -65,15 +57,9 @@ char	*PageRanges = NULL;	/* Range of pages selected */
 char	*PageSet = NULL;	/* All, Even, Odd pages */
 int	Order = 0,		/* 0 = normal, 1 = reverse pages */
 	Flip = 0,		/* Flip/mirror pages */
-	Orientation = 0,	/* 0 = Portrait, 1 = Landscape, etc. */
 	NUp = 1,		/* Number of pages on each sheet (1, 2, 4) */
-	LanguageLevel = 1,	/* LanguageLevel of printer */
-	ColorDevice = 1,	/* Color printer? */
 	Collate = 0,		/* Collate copies? */
-	Copies = 1,		/* Number of copies */
-	Duplex = 0;		/* Duplexed output? */
-float	PageWidth = 612.0f,	/* Total page width */
-	PageLength = 792.0f;	/* Total page length */
+	Copies = 1;		/* Number of copies */
 
 
 /*
@@ -87,9 +73,6 @@ static char	*psgets(char *buf, size_t len, FILE *fp);
 static void	start_nup(int number);
 
 
-
-
-
 /*
  * 'main()' - Main entry...
  */
@@ -99,7 +82,6 @@ main(int  argc,			/* I - Number of command-line arguments */
      char *argv[])		/* I - Command-line arguments */
 {
   FILE		*fp;		/* Print file */
-  float		t;		/* Swap variable */
   ppd_file_t	*ppd;		/* PPD file */
   ppd_size_t	*pagesize;	/* Current page size */
   int		num_options;	/* Number of print options */
@@ -153,60 +135,16 @@ main(int  argc,			/* I - Number of command-line arguments */
   options     = NULL;
   num_options = cupsParseOptions(argv[5], 0, &options);
 
+  ppd = SetCommonOptions(num_options, options);
+
   ppdMarkDefaults(ppd);
   cupsMarkOptions(ppd, num_options, options);
-
-  if ((pagesize = ppdPageSize(ppd, NULL)) != NULL)
-  {
-    PageWidth  = pagesize->width;
-    PageLength = pagesize->length;
-  }
-
-  if (ppd != NULL)
-  {
-    ColorDevice   = ppd->color_device;
-    LanguageLevel = ppd->language_level;
-  }
 
   if ((val = cupsGetOption("page-ranges", num_options, options)) != NULL)
     PageRanges = val;
 
   if ((val = cupsGetOption("page-set", num_options, options)) != NULL)
     PageSet = val;
-
-  if ((val = cupsGetOption("landscape", num_options, options)) != NULL)
-    Orientation = 1;
-
-  if ((val = cupsGetOption("orientation-requested", num_options, options)) != NULL)
-  {
-   /*
-    * Map IPP orientation values to 0 to 3:
-    *
-    *   3 = 0 degrees   = 0
-    *   4 = 90 degrees  = 1
-    *   5 = -90 degrees = 3
-    *   6 = 180 degrees = 2
-    */
-
-    Orientation = atoi(val) - 3;
-    if (Orientation >= 2)
-      Orientation ^= 1;
-  }
-
-  if (Orientation & 1)
-  {
-    t          = PageWidth;
-    PageWidth  = PageLength;
-    PageLength = t;
-  }
-
-  if ((val = cupsGetOption("sides", num_options, options)) != NULL &&
-      strncmp(val, "two-", 4) == 0)
-    Duplex = 1;
-
-  if ((val = cupsGetOption("Duplex", num_options, options)) != NULL &&
-      strcmp(val, "NoTumble") == 0)
-    Duplex = 1;
 
   if ((val = cupsGetOption("copies", num_options, options)) != NULL)
     Copies = atoi(val);
@@ -766,5 +704,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.11 1999/03/24 13:59:47 mike Exp $".
+ * End of "$Id: pstops.c,v 1.12 1999/03/24 18:01:48 mike Exp $".
  */

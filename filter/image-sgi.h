@@ -1,39 +1,26 @@
 /*
- * "$Id: image-sgi.h,v 1.1 1999/03/06 18:11:35 mike Exp $"
+ * "$Id: image-sgi.h,v 1.2 1999/03/24 18:01:44 mike Exp $"
  *
- *   SGI image file format library definitions.
+ *   SGI image file format library definitions for the Common UNIX Printing
+ *   System (CUPS).
  *
- *   Copyright 1997-1998 Michael Sweet (mike@easysw.com)
+ *   Copyright 1993-1999 by Easy Software Products.
  *
- *   This program is free software; you can redistribute it and/or modify it
- *   under the terms of the GNU General Public License as published by the Free
- *   Software Foundation; either version 2 of the License, or (at your option)
- *   any later version.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
  *
- *   This program is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- *   for more details.
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
  *
- *   You should have received a copy of the GNU General Public License
- *   along with this program; if not, write to the Free Software
- *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * Revision History:
- *
- *   $Log: image-sgi.h,v $
- *   Revision 1.1  1999/03/06 18:11:35  mike
- *   Initial revision
- *
- *   Revision 1.3  1998/02/05  17:10:58  mike
- *   Added sgiOpenFile() function for opening an existing file pointer.
- *
- *   Revision 1.2  1997/06/18  00:55:28  mike
- *   Updated to hold length table when writing.
- *   Updated to hold current length when doing ARLE.
- *
- *   Revision 1.1  1997/06/15  03:37:19  mike
- *   Initial revision
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  */
 
 #ifndef _SGI_H_
@@ -103,5 +90,5 @@ extern int	sgiPutRow(sgi_t *sgip, short *row, int y, int z);
 #endif /* !_SGI_H_ */
 
 /*
- * End of "$Id: image-sgi.h,v 1.1 1999/03/06 18:11:35 mike Exp $".
+ * End of "$Id: image-sgi.h,v 1.2 1999/03/24 18:01:44 mike Exp $".
  */

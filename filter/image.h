@@ -1,25 +1,25 @@
 /*
- * "$Id: image.h,v 1.4 1998/07/28 20:48:30 mike Exp $"
+ * "$Id: image.h,v 1.5 1999/03/24 18:01:47 mike Exp $"
  *
- *   Image library definitions for espPrint, a collection of printer drivers.
+ *   Image library definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1998 by Easy Software Products
+ *   Copyright 1993-1999 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs contain
- *   unpublished proprietary information of Easy Software Products, and
- *   are protected by Federal copyright law.  They may not be disclosed
- *   to third parties or copied or duplicated in any form, in whole or
- *   in part, without the prior written consent of Easy Software Products.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
  *
- * Revision History:
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
  *
- *   $Log: image.h,v $
- *   Revision 1.4  1998/07/28 20:48:30  mike
- *   Moved min, max, and abs macros from colorspace.c to here...
- *
- *   Revision 1.3  1998/02/19  20:44:58  mike
- *   Image file definitions.
- *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  */
 
 #ifndef _IMAGE_H_
@@ -29,10 +29,11 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
+#  include <stdio.h>
+#  include <stdlib.h>
+#  include <string.h>
+#  include <errno.h>
+#  include <config.h>
 
 
 /*
@@ -91,8 +92,8 @@ typedef struct ic_str
 
 typedef struct
 {
-  int		dirty,		/* True if tile is dirty */
-		pos;		/* Position of tile on disk (-1 if not written) */
+  int		dirty;		/* True if tile is dirty */
+  long		pos;		/* Position of tile on disk (-1 if not written) */
   ic_t		*ic;		/* Pixel data */
 } itile_t;
 
@@ -102,8 +103,8 @@ typedef struct
 
 typedef struct
 {
-  int		colorspace,	/* Colorspace of image */
-		xsize,		/* Width of image in pixels */
+  int		colorspace;	/* Colorspace of image */
+  unsigned	xsize,		/* Width of image in pixels */
 		ysize,		/* Height of image in pixels */
 		xppi,		/* X resolution in pixels-per-inch */
 		yppi,		/* Y resolution in pixels-per-inch */
@@ -123,7 +124,7 @@ typedef struct
 typedef struct
 {
   image_t	*img;		/* Image to zoom */
-  int		xorig,
+  unsigned	xorig,
 		yorig,
 		width,		/* Width of input area */
 		height,		/* Height of input area */
@@ -134,8 +135,8 @@ typedef struct
 		xmax,		/* Maximum input image X position */
 		ymax,		/* Maximum input image Y position */
 		xmod,		/* Threshold for Bresenheim rounding */
-		ymod,		/* ... */
-		xstep,		/* Amount to step for each pixel along X */
+		ymod;		/* ... */
+  int		xstep,		/* Amount to step for each pixel along X */
 		xincr,
 		instep,		/* Amount to step pixel pointer along X */
 		inincr,
@@ -215,5 +216,5 @@ extern void	ImageZoomFree(izoom_t *z);
 #endif /* !_IMAGE_H_ */
 
 /*
- * End of "$Id: image.h,v 1.4 1998/07/28 20:48:30 mike Exp $".
+ * End of "$Id: image.h,v 1.5 1999/03/24 18:01:47 mike Exp $".
  */

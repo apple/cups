@@ -1,38 +1,28 @@
 /*
- * "$Id: image-tiff.c,v 1.5 1998/08/14 15:18:57 mike Exp $"
+ * "$Id: image-tiff.c,v 1.6 1999/03/24 18:01:45 mike Exp $"
  *
- *   TIFF file routines for espPrint, a collection of printer drivers.
+ *   TIFF file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1998 by Easy Software Products
+ *   Copyright 1993-1999 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs contain
- *   unpublished proprietary information of Easy Software Products, and
- *   are protected by Federal copyright law.  They may not be disclosed
- *   to third parties or copied or duplicated in any form, in whole or
- *   in part, without the prior written consent of Easy Software Products.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
  *
- * Revision History:
- *
- *   $Log: image-tiff.c,v $
- *   Revision 1.5  1998/08/14 15:18:57  mike
- *   Added alpha channel support.
- *
- *   Revision 1.4  1998/08/12  15:21:56  mike
- *   Added colormapped image support.
- *   Fixed bug in column-major color conversion code - was converting xsize
- *   pixels instead of ysize pixels...
- *
- *   Revision 1.3  1998/07/28  20:51:43  mike
- *   Fixed default orientation code.
- *
- *   Revision 1.2  1998/03/19  17:00:21  mike
- *   Added check for units in resolution (physical) chunk; if undefined
- *   assume meters instead of centimeters...
- *
- *   Revision 1.1  1998/02/19  20:44:58  mike
- *   Initial revision
  */
 
 /*
@@ -40,9 +30,10 @@
  */
 
 #include "image.h"
-#include <tiff.h>	/* TIFF image definitions */
-#include <tiffio.h>
-#include <tiffiop.h>
+
+#ifdef HAVE_LIBTIFF
+#  include <tiff.h>	/* TIFF image definitions */
+#  include <tiffio.h>
 
 
 int
@@ -54,11 +45,13 @@ ImageReadTIFF(image_t *img,
               int     hue)
 {
   TIFF		*tif;
-  TIFFDirectory	*td;
   uint32	width, height;
   uint16	photometric,
 		orientation,
-		resunit;
+		resunit,
+		samples,
+		bits,
+		inkset;
   float		xres,
 		yres;
   uint16	*redcmap,
@@ -74,8 +67,7 @@ ImageReadTIFF(image_t *img,
 		pstep,
 		scanwidth,
 		r, g, b, k,
-		alpha,
-		samples;
+		alpha;
   ib_t		*in,
 		*out,
 		*p,
@@ -87,7 +79,7 @@ ImageReadTIFF(image_t *img,
 		one;
 
 
-#ifdef hpux
+#ifdef __hpux
   lseek(fileno(fp), 0, SEEK_SET); /* Work around "feature" in HPUX stdio */
 #endif /* hpux */
 
@@ -95,15 +87,17 @@ ImageReadTIFF(image_t *img,
   {
     fclose(fp);
     return (-1);
-  };
+  }
 
   if (!TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &width) ||
       !TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &height) ||
-      !TIFFGetField(tif, TIFFTAG_PHOTOMETRIC, &photometric))
+      !TIFFGetField(tif, TIFFTAG_PHOTOMETRIC, &photometric) ||
+      !TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &samples) ||
+      !TIFFGetField(tif, TIFFTAG_BITSPERSAMPLE, &bits))
   {
     fclose(fp);
     return (-1);
-  };
+  }
 
   if (!TIFFGetField(tif, TIFFTAG_ORIENTATION, &orientation))
     orientation = 0;
@@ -126,12 +120,8 @@ ImageReadTIFF(image_t *img,
     {
       img->xppi = xres * 0.0254;
       img->yppi = yres * 0.0254;
-    };
-  };
-
-  td = &(tif->tif_dir);
-
-  samples = td->td_samplesperpixel;
+    }
+  }
 
   if (samples == 2 || (samples == 4 && photometric == PHOTOMETRIC_RGB))
     alpha = 1;
@@ -181,14 +171,14 @@ ImageReadTIFF(image_t *img,
         ystart = img->ysize - 1;
         ydir   = -1;
         break;
-  };
+  }
 
   scanwidth = TIFFScanlineSize(tif);
   scanline  = _TIFFmalloc(scanwidth);
 
   if (orientation < ORIENTATION_LEFTTOP)
   {
-    if (td->td_samplesperpixel > 1 || photometric == PHOTOMETRIC_PALETTE)
+    if (samples > 1 || photometric == PHOTOMETRIC_PALETTE)
       pstep = xdir * 3;
     else
       pstep = xdir;
@@ -198,14 +188,14 @@ ImageReadTIFF(image_t *img,
   }
   else
   {
-    if (td->td_samplesperpixel > 1 || photometric == PHOTOMETRIC_PALETTE)
+    if (samples > 1 || photometric == PHOTOMETRIC_PALETTE)
       pstep = ydir * 3;
     else
       pstep = ydir;
 
     in  = malloc(img->ysize * 3 + 3);
     out = malloc(img->ysize * bpp);
-  };
+  }
 
   switch (photometric)
   {
@@ -220,7 +210,7 @@ ImageReadTIFF(image_t *img,
         {
           zero = 255;
           one  = 0;
-        };
+        }
 
         if (orientation < ORIENTATION_LEFTTOP)
         {
@@ -232,7 +222,7 @@ ImageReadTIFF(image_t *img,
                ycount > 0;
                ycount --, y += ydir)
           {
-            if (td->td_bitspersample == 1)
+            if (bits == 1)
             {
               TIFFReadScanline(tif, scanline, y, 0);
               for (xcount = img->xsize, scanptr = scanline, p = in + xstart, bit = 128;
@@ -250,10 +240,10 @@ ImageReadTIFF(image_t *img,
         	{
                   bit = 128;
                   scanptr ++;
-        	};
-              };
+        	}
+              }
             }
-            else if (td->td_bitspersample == 2)
+            else if (bits == 2)
             {
               TIFFReadScanline(tif, scanline, y, 0);
               for (xcount = img->xsize, scanptr = scanline, p = in + xstart, bit = 0xc0;
@@ -271,10 +261,10 @@ ImageReadTIFF(image_t *img,
         	{
                   bit = 0xc0;
                   scanptr ++;
-        	};
-              };
+        	}
+              }
             }
-            else if (td->td_bitspersample == 4)
+            else if (bits == 4)
             {
               TIFFReadScanline(tif, scanline, y, 0);
               for (xcount = img->xsize, scanptr = scanline, p = in + xstart, bit = 0xf0;
@@ -291,8 +281,8 @@ ImageReadTIFF(image_t *img,
                   *p = (255 * (*scanptr & 0x0f) / 15) ^ zero;
                   bit = 0xf0;
                   scanptr ++;
-        	};
-              };
+        	}
+              }
             }
             else if (xdir < 0 || zero || alpha)
             {
@@ -315,7 +305,7 @@ ImageReadTIFF(image_t *img,
                        xcount --, p += pstep, scanptr += 2)
                     *p = (scanptr[1] * scanptr[0] +
 		          (255 - scanptr[1]) * 255) / 255;
-        	};
+        	}
 	      }
 	      else
 	      {
@@ -332,8 +322,8 @@ ImageReadTIFF(image_t *img,
                        xcount > 0;
                        xcount --, p += pstep, scanptr ++)
                     *p = *scanptr;
-        	};
-              };
+        	}
+              }
             }
             else
               TIFFReadScanline(tif, in, y, 0);
@@ -356,11 +346,11 @@ ImageReadTIFF(image_t *img,
 		case IMAGE_CMYK :
 		    ImageWhiteToCMYK(in, out, img->xsize);
 		    break;
-	      };
+	      }
 
               ImagePutRow(img, 0, y, img->xsize, out);
-	    };
-          };
+	    }
+          }
         }
         else
         {
@@ -372,7 +362,7 @@ ImageReadTIFF(image_t *img,
                xcount > 0;
                xcount --, x += xdir)
           {
-            if (td->td_bitspersample == 1)
+            if (bits == 1)
             {
               TIFFReadScanline(tif, scanline, x, 0);
               for (ycount = img->ysize, scanptr = scanline, p = in + ystart, bit = 128;
@@ -390,10 +380,10 @@ ImageReadTIFF(image_t *img,
         	{
                   bit = 128;
                   scanptr ++;
-        	};
-              };
+        	}
+              }
             }
-            else if (td->td_bitspersample == 2)
+            else if (bits == 2)
             {
               TIFFReadScanline(tif, scanline, x, 0);
               for (ycount = img->ysize, scanptr = scanline, p = in + ystart, bit = 0xc0;
@@ -412,10 +402,10 @@ ImageReadTIFF(image_t *img,
         	{
                   bit = 0xc0;
                   scanptr ++;
-        	};
-              };
+        	}
+              }
             }
-            else if (td->td_bitspersample == 4)
+            else if (bits == 4)
             {
               TIFFReadScanline(tif, scanline, x, 0);
               for (ycount = img->ysize, scanptr = scanline, p = in + ystart, bit = 0xf0;
@@ -432,8 +422,8 @@ ImageReadTIFF(image_t *img,
                   *p = (255 * (*scanptr & 0x0f) / 15) ^ zero;
                   bit = 0xf0;
                   scanptr ++;
-        	};
-              };
+        	}
+              }
             }
             else if (ydir < 0 || zero || alpha)
             {
@@ -456,7 +446,7 @@ ImageReadTIFF(image_t *img,
                        ycount --, p += ydir, scanptr += 2)
                     *p = (scanptr[1] * scanptr[0] +
 		          (255 - scanptr[1]) * 255) / 255;
-        	};
+        	}
               }
 	      else
 	      {
@@ -473,8 +463,8 @@ ImageReadTIFF(image_t *img,
                        ycount > 0;
                        ycount --, p += ydir, scanptr ++)
                     *p = *scanptr;
-        	};
-	      };
+        	}
+	      }
             }
             else
               TIFFReadScanline(tif, in, x, 0);
@@ -497,12 +487,12 @@ ImageReadTIFF(image_t *img,
 		case IMAGE_CMYK :
 		    ImageWhiteToCMYK(in, out, img->ysize);
 		    break;
-	      };
+	      }
 
               ImagePutCol(img, x, 0, img->ysize, out);
-	    };
-          };
-        };
+	    }
+          }
+        }
         break;
 
     case PHOTOMETRIC_PALETTE :
@@ -510,16 +500,16 @@ ImageReadTIFF(image_t *img,
 	{
 	  fclose(fp);
 	  return (-1);
-	};
+	}
 
-        num_colors = 1 << td->td_bitspersample;
+        num_colors = 1 << bits;
 
         for (c = 0; c < num_colors; c ++)
 	{
 	  redcmap[c]   >>= 8;
 	  greencmap[c] >>= 8;
 	  bluecmap[c]  >>= 8;
-	};
+	}
 
         if (orientation < ORIENTATION_LEFTTOP)
         {
@@ -531,7 +521,7 @@ ImageReadTIFF(image_t *img,
                ycount > 0;
                ycount --, y += ydir)
           {
-            if (td->td_bitspersample == 1)
+            if (bits == 1)
             {
               TIFFReadScanline(tif, scanline, y, 0);
               for (xcount = img->xsize, scanptr = scanline,
@@ -550,7 +540,7 @@ ImageReadTIFF(image_t *img,
                   p[0] = redcmap[0];
                   p[1] = greencmap[0];
                   p[2] = bluecmap[0];
-		};
+		}
 
         	if (bit > 1)
                   bit >>= 1;
@@ -558,10 +548,10 @@ ImageReadTIFF(image_t *img,
         	{
                   bit = 128;
                   scanptr ++;
-        	};
-              };
+        	}
+              }
             }
-            else if (td->td_bitspersample == 2)
+            else if (bits == 2)
             {
               TIFFReadScanline(tif, scanline, y, 0);
               for (xcount = img->xsize, scanptr = scanline,
@@ -583,10 +573,10 @@ ImageReadTIFF(image_t *img,
         	{
                   bit = 0xc0;
                   scanptr ++;
-        	};
-              };
+        	}
+              }
             }
-            else if (td->td_bitspersample == 4)
+            else if (bits == 4)
             {
               TIFFReadScanline(tif, scanline, y, 0);
               for (xcount = img->xsize, scanptr = scanline,
@@ -609,8 +599,8 @@ ImageReadTIFF(image_t *img,
                   p[1]  = greencmap[pixel];
                   p[2]  = bluecmap[pixel];
                   bit   = 0xf0;
-        	};
-              };
+        	}
+              }
             }
             else
             {
@@ -623,8 +613,8 @@ ImageReadTIFF(image_t *img,
 	        p[0] = redcmap[*scanptr];
 	        p[1] = greencmap[*scanptr];
 	        p[2] = bluecmap[*scanptr++];
-	      };
-            };
+	      }
+            }
 
             if (img->colorspace == IMAGE_RGB)
               ImagePutRow(img, 0, y, img->xsize, in);
@@ -644,11 +634,11 @@ ImageReadTIFF(image_t *img,
 		case IMAGE_CMYK :
 		    ImageRGBToCMYK(in, out, img->xsize);
 		    break;
-	      };
+	      }
 
               ImagePutRow(img, 0, y, img->xsize, out);
-	    };
-          };
+	    }
+          }
         }
         else
         {
@@ -660,7 +650,7 @@ ImageReadTIFF(image_t *img,
                xcount > 0;
                xcount --, x += xdir)
           {
-            if (td->td_bitspersample == 1)
+            if (bits == 1)
             {
               TIFFReadScanline(tif, scanline, x, 0);
               for (ycount = img->ysize, scanptr = scanline,
@@ -679,7 +669,7 @@ ImageReadTIFF(image_t *img,
                   p[0] = redcmap[0];
                   p[1] = greencmap[0];
                   p[2] = bluecmap[0];
-		};
+		}
 
         	if (bit > 1)
                   bit >>= 1;
@@ -687,10 +677,10 @@ ImageReadTIFF(image_t *img,
         	{
                   bit = 128;
                   scanptr ++;
-        	};
-              };
+        	}
+              }
             }
-            else if (td->td_bitspersample == 2)
+            else if (bits == 2)
             {
               TIFFReadScanline(tif, scanline, x, 0);
               for (ycount = img->ysize, scanptr = scanline,
@@ -712,10 +702,10 @@ ImageReadTIFF(image_t *img,
         	{
                   bit = 0xc0;
                   scanptr ++;
-        	};
-              };
+        	}
+              }
             }
-            else if (td->td_bitspersample == 4)
+            else if (bits == 4)
             {
               TIFFReadScanline(tif, scanline, x, 0);
               for (ycount = img->ysize, scanptr = scanline,
@@ -738,8 +728,8 @@ ImageReadTIFF(image_t *img,
                   p[1]  = greencmap[pixel];
                   p[2]  = bluecmap[pixel];
                   bit   = 0xf0;
-        	};
-              };
+        	}
+              }
             }
             else
             {
@@ -752,8 +742,8 @@ ImageReadTIFF(image_t *img,
 	        p[0] = redcmap[*scanptr];
 	        p[1] = greencmap[*scanptr];
 	        p[2] = bluecmap[*scanptr++];
-	      };
-            };
+	      }
+            }
 
             if (img->colorspace == IMAGE_RGB)
               ImagePutCol(img, x, 0, img->ysize, in);
@@ -773,12 +763,12 @@ ImageReadTIFF(image_t *img,
 		case IMAGE_CMYK :
 		    ImageRGBToCMYK(in, out, img->ysize);
 		    break;
-	      };
+	      }
 
               ImagePutCol(img, x, 0, img->ysize, out);
-	    };
-          };
-        };
+	    }
+          }
+        }
         break;
 
     case PHOTOMETRIC_RGB :
@@ -792,7 +782,7 @@ ImageReadTIFF(image_t *img,
                ycount > 0;
                ycount --, y += ydir)
           {
-            if (td->td_bitspersample == 1)
+            if (bits == 1)
             {
               TIFFReadScanline(tif, scanline, y, 0);
               for (xcount = img->xsize, scanptr = scanline, p = in + xstart * 3, bit = 0xf0;
@@ -820,10 +810,10 @@ ImageReadTIFF(image_t *img,
         	{
                   bit = 0xf0;
                   scanptr ++;
-        	};
-              };
+        	}
+              }
             }
-            else if (td->td_bitspersample == 2)
+            else if (bits == 2)
             {
               TIFFReadScanline(tif, scanline, y, 0);
               for (xcount = img->xsize, scanptr = scanline, p = in + xstart * 3;
@@ -836,9 +826,9 @@ ImageReadTIFF(image_t *img,
                 p[1] = 255 * (pixel & 3) / 3;
                 pixel >>= 2;
                 p[2] = 255 * (pixel & 3) / 3;
-              };
+              }
             }
-            else if (td->td_bitspersample == 4)
+            else if (bits == 4)
             {
               TIFFReadScanline(tif, scanline, y, 0);
               for (xcount = img->xsize, scanptr = scanline, p = in + xstart * 3;
@@ -859,8 +849,8 @@ ImageReadTIFF(image_t *img,
                   p[pstep + 2] = 255 * (pixel & 15) / 15;
                   pixel >>= 4;
                   p[pstep + 1] = 255 * (pixel & 15) / 15;
-                };
-              };
+                }
+              }
             }
             else if (xdir < 0 || alpha)
             {
@@ -875,7 +865,7 @@ ImageReadTIFF(image_t *img,
                   p[0] = (scanptr[0] * scanptr[3] + 255 * (255 - scanptr[3])) / 255;
                   p[1] = (scanptr[1] * scanptr[3] + 255 * (255 - scanptr[3])) / 255;
                   p[2] = (scanptr[2] * scanptr[3] + 255 * (255 - scanptr[3])) / 255;
-        	};
+        	}
               }
 	      else
               {
@@ -886,8 +876,8 @@ ImageReadTIFF(image_t *img,
                   p[0] = scanptr[0];
                   p[1] = scanptr[1];
                   p[2] = scanptr[2];
-        	};
-	      };
+        	}
+	      }
             }
             else
               TIFFReadScanline(tif, in, y, 0);
@@ -913,11 +903,11 @@ ImageReadTIFF(image_t *img,
 		case IMAGE_CMYK :
 		    ImageRGBToCMYK(in, out, img->xsize);
 		    break;
-	      };
+	      }
 
               ImagePutRow(img, 0, y, img->xsize, out);
-	    };
-          };
+	    }
+          }
         }
         else
         {
@@ -929,7 +919,7 @@ ImageReadTIFF(image_t *img,
                xcount > 0;
                xcount --, x += xdir)
           {
-            if (td->td_bitspersample == 1)
+            if (bits == 1)
             {
               TIFFReadScanline(tif, scanline, x, 0);
               for (ycount = img->ysize, scanptr = scanline, p = in + ystart * 3, bit = 0xf0;
@@ -957,10 +947,10 @@ ImageReadTIFF(image_t *img,
         	{
                   bit = 0xf0;
                   scanptr ++;
-        	};
-              };
+        	}
+              }
             }
-            else if (td->td_bitspersample == 2)
+            else if (bits == 2)
             {
               TIFFReadScanline(tif, scanline, x, 0);
               for (ycount = img->ysize, scanptr = scanline, p = in + ystart * 3;
@@ -973,9 +963,9 @@ ImageReadTIFF(image_t *img,
                 p[1] = 255 * (pixel & 3) / 3;
                 pixel >>= 2;
                 p[2] = 255 * (pixel & 3) / 3;
-              };
+              }
             }
-            else if (td->td_bitspersample == 4)
+            else if (bits == 4)
             {
               TIFFReadScanline(tif, scanline, x, 0);
               for (ycount = img->ysize, scanptr = scanline, p = in + ystart * 3;
@@ -996,8 +986,8 @@ ImageReadTIFF(image_t *img,
                   p[pstep + 2] = 255 * (pixel & 15) / 15;
                   pixel >>= 4;
                   p[pstep + 1] = 255 * (pixel & 15) / 15;
-                };
-              };
+                }
+              }
             }
             else if (ydir < 0 || alpha)
             {
@@ -1012,7 +1002,7 @@ ImageReadTIFF(image_t *img,
                   p[0] = (scanptr[0] * scanptr[3] + 255 * (255 - scanptr[3])) / 255;
                   p[1] = (scanptr[1] * scanptr[3] + 255 * (255 - scanptr[3])) / 255;
                   p[2] = (scanptr[2] * scanptr[3] + 255 * (255 - scanptr[3])) / 255;
-        	};
+        	}
               }
 	      else
 	      {
@@ -1023,8 +1013,8 @@ ImageReadTIFF(image_t *img,
                   p[0] = scanptr[0];
                   p[1] = scanptr[1];
                   p[2] = scanptr[2];
-        	};
-	      };
+        	}
+	      }
             }
             else
               TIFFReadScanline(tif, in, x, 0);
@@ -1050,16 +1040,18 @@ ImageReadTIFF(image_t *img,
 		case IMAGE_CMYK :
 		    ImageRGBToCMYK(in, out, img->ysize);
 		    break;
-	      };
+	      }
 
               ImagePutCol(img, x, 0, img->ysize, out);
-	    };
-          };
-        };
+	    }
+          }
+        }
         break;
 
     case PHOTOMETRIC_SEPARATED :
-	if (td->td_inkset == INKSET_CMYK)
+        TIFFGetField(tif, TIFFTAG_INKSET, &inkset);
+
+	if (inkset == INKSET_CMYK)
 	{
           if (orientation < ORIENTATION_LEFTTOP)
           {
@@ -1071,7 +1063,7 @@ ImageReadTIFF(image_t *img,
         	 ycount > 0;
         	 ycount --, y += ydir)
             {
-              if (td->td_bitspersample == 1)
+              if (bits == 1)
               {
         	TIFFReadScanline(tif, scanline, y, 0);
         	for (xcount = img->xsize, scanptr = scanline, p = in + xstart * 3, bit = 0xf0;
@@ -1100,7 +1092,7 @@ ImageReadTIFF(image_t *img,
                       p[2] = 0;
                     else
                       p[2] = 255;
-                  };
+                  }
 
         	  if (bit == 0xf0)
                     bit = 0x0f;
@@ -1108,10 +1100,10 @@ ImageReadTIFF(image_t *img,
         	  {
                     bit = 0xf0;
                     scanptr ++;
-        	  };
-        	};
+        	  }
+        	}
               }
-              else if (td->td_bitspersample == 2)
+              else if (bits == 2)
               {
         	TIFFReadScanline(tif, scanline, y, 0);
         	for (xcount = img->xsize, scanptr = scanline, p = in + xstart * 3;
@@ -1154,10 +1146,10 @@ ImageReadTIFF(image_t *img,
                       p[0] = r;
                     else
                       p[0] = 255;
-                  };
-        	};
+                  }
+        	}
               }
-              else if (td->td_bitspersample == 4)
+              else if (bits == 4)
               {
         	TIFFReadScanline(tif, scanline, y, 0);
         	for (xcount = img->xsize, scanptr = scanline, p = in + xstart * 3;
@@ -1200,8 +1192,8 @@ ImageReadTIFF(image_t *img,
                       p[0] = r;
                     else
                       p[0] = 255;
-                  };
-        	};
+                  }
+        	}
               }
               else
               {
@@ -1243,9 +1235,9 @@ ImageReadTIFF(image_t *img,
                       p[2] = b;
                     else
                       p[2] = 255;
-        	  };
-        	};
-              };
+        	  }
+        	}
+              }
 
               if ((saturation != 100 || hue != 0) && bpp > 1)
         	ImageRGBAdjust(in, img->xsize, saturation, hue);
@@ -1268,11 +1260,11 @@ ImageReadTIFF(image_t *img,
 		  case IMAGE_CMYK :
 		      ImageRGBToCMYK(in, out, img->xsize);
 		      break;
-		};
+		}
 
         	ImagePutRow(img, 0, y, img->xsize, out);
-	      };
-            };
+	      }
+            }
           }
           else
           {
@@ -1284,7 +1276,7 @@ ImageReadTIFF(image_t *img,
         	 xcount > 0;
         	 xcount --, x += xdir)
             {
-              if (td->td_bitspersample == 1)
+              if (bits == 1)
               {
         	TIFFReadScanline(tif, scanline, x, 0);
         	for (ycount = img->ysize, scanptr = scanline, p = in + xstart * 3, bit = 0xf0;
@@ -1313,7 +1305,7 @@ ImageReadTIFF(image_t *img,
                       p[2] = 0;
                     else
                       p[2] = 255;
-                  };
+                  }
 
         	  if (bit == 0xf0)
                     bit = 0x0f;
@@ -1321,10 +1313,10 @@ ImageReadTIFF(image_t *img,
         	  {
                     bit = 0xf0;
                     scanptr ++;
-        	  };
-        	};
+        	  }
+        	}
               }
-              else if (td->td_bitspersample == 2)
+              else if (bits == 2)
               {
         	TIFFReadScanline(tif, scanline, x, 0);
         	for (ycount = img->ysize, scanptr = scanline, p = in + xstart * 3;
@@ -1367,10 +1359,10 @@ ImageReadTIFF(image_t *img,
                       p[0] = r;
                     else
                       p[0] = 255;
-                  };
-        	};
+                  }
+        	}
               }
-              else if (td->td_bitspersample == 4)
+              else if (bits == 4)
               {
         	TIFFReadScanline(tif, scanline, x, 0);
         	for (ycount = img->ysize, scanptr = scanline, p = in + xstart * 3;
@@ -1413,8 +1405,8 @@ ImageReadTIFF(image_t *img,
                       p[0] = r;
                     else
                       p[0] = 255;
-                  };
-        	};
+                  }
+        	}
               }
               else
               {
@@ -1456,9 +1448,9 @@ ImageReadTIFF(image_t *img,
                       p[2] = b;
                     else
                       p[2] = 255;
-        	  };
-        	};
-              };
+        	  }
+        	}
+              }
 
               if ((saturation != 100 || hue != 0) && bpp > 1)
         	ImageRGBAdjust(in, img->ysize, saturation, hue);
@@ -1481,15 +1473,15 @@ ImageReadTIFF(image_t *img,
 		  case IMAGE_CMYK :
 		      ImageRGBToCMYK(in, out, img->ysize);
 		      break;
-		};
+		}
 
         	ImagePutCol(img, x, 0, img->ysize, out);
-	      };
-            };
-          };
+	      }
+            }
+          }
 
           break;
-	};
+	}
 
     default :
 	_TIFFfree(scanline);
@@ -1498,7 +1490,7 @@ ImageReadTIFF(image_t *img,
 
 	TIFFClose(tif);
 	return (-1);
-  };
+  }
 
   _TIFFfree(scanline);
   free(in);
@@ -1509,6 +1501,9 @@ ImageReadTIFF(image_t *img,
 }
 
 
+#endif /* HAVE_LIBTIFF */
+
+
 /*
- * End of "$Id: image-tiff.c,v 1.5 1998/08/14 15:18:57 mike Exp $".
+ * End of "$Id: image-tiff.c,v 1.6 1999/03/24 18:01:45 mike Exp $".
  */

@@ -1,30 +1,27 @@
 /*
- * "$Id: image-pnm.c,v 1.2 1999/03/06 18:11:35 mike Exp $"
+ * "$Id: image-pnm.c,v 1.3 1999/03/24 18:01:44 mike Exp $"
  *
- *   Portable Any Map file routines for espPrint, a collection of printer
- *   drivers.
+ *   Portable Any Map file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1998 by Easy Software Products
+ *   Copyright 1993-1999 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs contain
- *   unpublished proprietary information of Easy Software Products, and
- *   are protected by Federal copyright law.  They may not be disclosed
- *   to third parties or copied or duplicated in any form, in whole or
- *   in part, without the prior written consent of Easy Software Products.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
- *
- * Revision History:
- *
- *   $Log: image-pnm.c,v $
- *   Revision 1.2  1999/03/06 18:11:35  mike
- *   Checkin for CVS.
- *
- *   Revision 1.1  1998/02/19  20:43:33  mike
- *   Initial revision
- *
- *   Revision 1.1  1998/02/19  20:43:33  mike
- *   Initial revision
  *
  */
 
@@ -264,5 +261,5 @@ ImageReadPNM(image_t *img,
 
 
 /*
- * End of "$Id: image-pnm.c,v 1.2 1999/03/06 18:11:35 mike Exp $".
+ * End of "$Id: image-pnm.c,v 1.3 1999/03/24 18:01:44 mike Exp $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.6 1999/03/24 13:59:46 mike Exp $"
+# "$Id: Makefile,v 1.7 1999/03/24 18:01:40 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,12 +28,13 @@ include ../Makedefs
 #			image.a imagetops imagetoraster \
 #			pstops \
 #			texttoescp texttopcl texttops
-TARGETS	=	hpgltops texttops pstops
+TARGETS	=	hpgltops texttops pstops image.a imagetops
+
 HPGLOBJS =	hpgl-attr.o hpgl-config.o hpgl-main.o hpgl-prolog.o \
 		hpgl-char.o hpgl-input.o hpgl-polygon.o hpgl-vector.o
 IMAGEOBJS =	image-colorspace.o image-photocd.o image-sgilib.o \
 		image-tiff.o image-gif.o image-png.o image-sgi.o image-zoom.o \
-		image-jpeg.o image-pnm.o image-sun.o
+		image-jpeg.o image-pnm.o image-sun.o image.o
 OBJS	=	$(HPGLOBJS) $(IMAGEOBJS) imagetops.o imagetoraster.o \
 		common.o pstops.o texttops.o textcommon.o
 
@@ -79,7 +80,7 @@ $(IMAGEOBJS):	image.h
 #
 
 imagetops:	imagetops.o common.o image.a ../Makedefs ../cups/libcups.a
-	$(CC) $(LDFLAGS) -o $@ imagetops.o common.o image.a $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ imagetops.o common.o image.a $(IMGLIBS)
 imagetops:	common.h image.h
 
 #
@@ -87,15 +88,16 @@ imagetops:	common.h image.h
 #
 
 imagetoraster:	imagetoraster.o common.o image.a ../Makedefs ../cups/libcups.a
-	$(CC) $(LDFLAGS) -o $@ imagetoraster.o common.o image.a $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ imagetoraster.o common.o image.a $(IMGLIBS)
 imagetoraster:	common.h image.h
 
 #
 # pstops
 #
 
-pstops:	pstops.o ../Makedefs ../cups/libcups.a
-	$(CC) $(LDFLAGS) -o $@ pstops.o $(LIBS)
+pstops:	pstops.o common.o ../Makedefs ../cups/libcups.a
+	$(CC) $(LDFLAGS) -o $@ pstops.o common.o $(LIBS)
+pstops.o:	common.h
 
 #
 # texttops
@@ -110,5 +112,5 @@ textcommon.o:	textcommon.h common.h
 $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 #
-# End of "$Id: Makefile,v 1.6 1999/03/24 13:59:46 mike Exp $".
+# End of "$Id: Makefile,v 1.7 1999/03/24 18:01:40 mike Exp $".
 #
