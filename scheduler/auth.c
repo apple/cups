@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.15 1999/10/15 20:41:42 mike Exp $"
+ * "$Id: auth.c,v 1.16 1999/10/18 15:47:23 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -36,6 +36,7 @@
  *   IsAuthorized()       - Check to see if the user is authorized...
  *   add_allow()          - Add an allow mask to the location.
  *   add_deny()           - Add a deny mask to the location.
+ *   pam_func()           - PAM conversation function.
  */
 
 /*
@@ -389,26 +390,26 @@ IsAuthorized(client_t *con)	/* I - Connection */
   pamerr = pam_start("cups", con->username, &pamdata, &pamh);
   if (pamerr != PAM_SUCCESS)
   {
-    LogMessage(LOG_ERROR, "IsAuthorized: pam_start() returned %d (%s)!\n",
-               pamerr, pam_strerror(pamerr));
+    LogMessage(LOG_ERROR, "IsAuthorized: pam_start() returned %d!\n",
+               pamerr);
     pam_end(pamh, 0);
     return (HTTP_UNAUTHORIZED);
   }
 
-  pam_error = pam_authenticate(pamh, PAM_SILENT);
+  pamerr = pam_authenticate(pamh, PAM_SILENT);
   if (pamerr != PAM_SUCCESS)
   {
-    LogMessage(LOG_ERROR, "IsAuthorized: pam_authenticate() returned %d (%s)!\n",
-               pamerr, pam_strerror(pamerr));
+    LogMessage(LOG_ERROR, "IsAuthorized: pam_authenticate() returned %d!\n",
+               pamerr);
     pam_end(pamh, 0);
     return (HTTP_UNAUTHORIZED);
   }
 
-  pam_error = pam_acct_mgmt(pamh, PAM_SILENT);
+  pamerr = pam_acct_mgmt(pamh, PAM_SILENT);
   if (pamerr != PAM_SUCCESS)
   {
-    LogMessage(LOG_ERROR, "IsAuthorized: pam_acct_mgmt() returned %d (%s)!\n",
-               pamerr, pam_strerror(pamerr));
+    LogMessage(LOG_ERROR, "IsAuthorized: pam_acct_mgmt() returned %d!\n",
+               pamerr);
     pam_end(pamh, 0);
     return (HTTP_UNAUTHORIZED);
   }
@@ -648,7 +649,7 @@ check_auth(unsigned   ip,	/* I - Client address */
  */
 
 static int					/* O - Success or failure */
-PAM_conv(int                      num_msg,	/* I - Number of messages */
+pam_func(int                      num_msg,	/* I - Number of messages */
          const struct pam_message **msg,	/* I - Messages */
          struct pam_response      **resp,	/* O - Responses */
          void                     *appdata_ptr)	/* I - Pointer to connection */
@@ -707,5 +708,5 @@ PAM_conv(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.15 1999/10/15 20:41:42 mike Exp $".
+ * End of "$Id: auth.c,v 1.16 1999/10/18 15:47:23 mike Exp $".
  */
