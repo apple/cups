@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.2 1998/03/19 16:15:15 mike Exp $"
+ * "$Id: image.c,v 1.3 1998/07/07 12:56:23 mike Exp $"
  *
  *   Base image support for espPrint, a collection of printer drivers.
  *
@@ -16,12 +16,15 @@
  * Revision History:
  *
  *   $Log: image.c,v $
- *   Revision 1.2  1998/03/19 16:15:15  mike
- *   Added lseek() after rewind() to fix bug in HP-UX version of image library.
+ *   Revision 1.3  1998/07/07 12:56:23  mike
+ *   Updated ImageSetMaxTiles() to ignore the image depth so that images < 64MB
+ *   won't be cached...
+ *
+ *   Revision 1.2  1998/03/19  16:15:15  mike
+ *   Changed rewind() to fseek() to fix bug in HP-UX version of image library.
  *
  *   Revision 1.1  1998/02/19  20:43:33  mike
  *   Initial revision
- *
  */
 
 /*
@@ -74,10 +77,7 @@ ImageOpen(char *filename,
     return (NULL);
   };
 
-  rewind(fp);
-#ifdef hpux /* work around an optimization in the HP C library... */
-  lseek(fileno(fp), 0, SEEK_SET);
-#endif /* hpux */
+  fseek(fp, 0, SEEK_SET);
 
  /*
   * Allocate memory...
@@ -189,8 +189,7 @@ ImageSetMaxTiles(image_t *img,		/* I - Image to set */
   if (max_tiles == 0)
   {
     max_tiles = ((img->xsize + TILE_SIZE - 1) / TILE_SIZE) *
-                ((img->ysize + TILE_SIZE - 1) / TILE_SIZE) /
-                ImageGetDepth(img);
+                ((img->ysize + TILE_SIZE - 1) / TILE_SIZE);
 
     if (max_tiles < TILE_DEFAULT)
       max_tiles = TILE_DEFAULT;
@@ -573,5 +572,5 @@ flush_tile(image_t *img)
 
 
 /*
- * End of "$Id: image.c,v 1.2 1998/03/19 16:15:15 mike Exp $".
+ * End of "$Id: image.c,v 1.3 1998/07/07 12:56:23 mike Exp $".
  */
