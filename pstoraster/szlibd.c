@@ -26,7 +26,7 @@
 #include <config.h>
 #ifdef HAVE_LIBZ
 
-/*$Id: szlibd.c,v 1.5 2001/01/22 15:03:56 mike Exp $ */
+/*$Id: szlibd.c,v 1.6 2001/05/16 18:22:39 mike Exp $ */
 /* zlib decoding (decompression) filter stream */
 #include "std.h"
 #include "gsmemory.h"
@@ -108,7 +108,10 @@ s_zlibD_release(stream_state * st)
 }
 
 /* Stream template */
-const stream_template s_zlibD_template = {
+#ifdef _AIX
+const
+#endif /* _AIX */
+stream_template s_zlibD_template = {
     &st_zlib_state, s_zlibD_init, s_zlibD_process, 1, 1, s_zlibD_release,
     s_zlib_set_defaults, s_zlibD_reset
 };
