@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.4 1999/04/16 20:48:30 mike Exp $"
+ * "$Id: lpstat.c,v 1.5 1999/04/19 21:17:29 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -36,57 +36,6 @@
 #include <cups/cups.h>
 #include <cups/language.h>
 #include <cups/debug.h>
-
-
-/*
- * 'do_request()' - Do an IPP request...
- */
-
-static ipp_t *			/* O - Response data */
-do_request(http_t *http,	/* I - HTTP connection to server */
-           ipp_t  *request,	/* I - IPP request */
-	   char   *resource)	/* I - HTTP resource for POST */
-{
-  ipp_t		*response;	/* IPP response data */
-  char		length[255];	/* Content-Length field */
-  http_status_t	status;		/* HTTP status code for POST */
-
-
-  DEBUG_printf(("do_request(%08x, %08s, \'%s\')\n", http, request, resource));
-
-  sprintf(length, "%d", ippLength(request));
-  httpClearFields(http);
-  httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, length);
-  httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
-
-  if (httpPost(http, resource))
-  {
-    if (httpPost(http, resource))
-    {
-      ippDelete(request);
-      return (response);
-    }
-  }
-
-  if (ippWrite(http, request) != IPP_DATA)
-    response = NULL;
-  else if ((status = httpUpdate(http)) != HTTP_OK)
-    response = NULL;
-  else
-  {
-    response = ippNew();
-
-    if (ippRead(http, response) == IPP_ERROR)
-    {
-      ippDelete(response);
-      response = NULL;
-    }
-  }
-  
-  ippDelete(request);
-
-  return (response);
-}
 
 
 /*
@@ -139,7 +88,7 @@ show_accepting(http_t *http,	/* I - HTTP connection to server */
   * Do the request and get back a response...
   */
 
-  if ((response = do_request(http, request, "/printers/")) != NULL)
+  if ((response = cupsDoRequest(http, request, "/printers/")) != NULL)
   {
     DEBUG_puts("show_accepting: request succeeded...");
 
@@ -334,7 +283,7 @@ show_default(http_t *http)	/* I - HTTP connection to server */
   * Do the request and get back a response...
   */
 
-  if ((response = do_request(http, request, "/printers/")) != NULL)
+  if ((response = cupsDoRequest(http, request, "/printers/")) != NULL)
   {
     if ((attr = ippFindAttribute(response, "printer-name", IPP_TAG_NAME)) != NULL)
       printf("system default destination: %s\n", attr->values[0].string.text);
@@ -395,7 +344,7 @@ show_devices(http_t *http,	/* I - HTTP connection to server */
   * Do the request and get back a response...
   */
 
-  if ((response = do_request(http, request, "/printers/")) != NULL)
+  if ((response = cupsDoRequest(http, request, "/printers/")) != NULL)
   {
     DEBUG_puts("show_devices: request succeeded...");
 
@@ -573,7 +522,7 @@ show_jobs(http_t *http,		/* I - HTTP connection to server */
   * Do the request and get back a response...
   */
 
-  if ((response = do_request(http, request, "/jobs/")) != NULL)
+  if ((response = cupsDoRequest(http, request, "/jobs/")) != NULL)
   {
    /*
     * Loop through the job list and display them...
@@ -795,7 +744,7 @@ show_printers(http_t *http,	/* I - HTTP connection to server */
   * Do the request and get back a response...
   */
 
-  if ((response = do_request(http, request, "/printers/")) != NULL)
+  if ((response = cupsDoRequest(http, request, "/printers/")) != NULL)
   {
     DEBUG_puts("show_printers: request succeeded...");
 
@@ -916,7 +865,7 @@ show_printers(http_t *http,	/* I - HTTP connection to server */
         if (pstate == IPP_PRINTER_PROCESSING)
 	{
 	 /*
-	  * Build am IPP_GET_JOBS request, which requires the following
+	  * Build an IPP_GET_JOBS request, which requires the following
 	  * attributes:
 	  *
 	  *    attributes-charset
@@ -947,7 +896,7 @@ show_printers(http_t *http,	/* I - HTTP connection to server */
 	  attr = ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER,
 	                       "limit", 1);
 
-          if ((jobs = do_request(http, request, "/jobs/")) != NULL)
+          if ((jobs = cupsDoRequest(http, request, "/jobs/")) != NULL)
 	  {
 	    if ((attr = ippFindAttribute(jobs, "job-id", IPP_TAG_INTEGER)) != NULL)
               jobid = attr->values[0].integer;
@@ -1128,5 +1077,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.4 1999/04/16 20:48:30 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.5 1999/04/19 21:17:29 mike Exp $".
  */
