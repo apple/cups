@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: laserjet.ppd,v 1.8 2001/04/23 19:52:31 mike Exp $"
+*% "$Id: laserjet.ppd,v 1.9 2001/05/21 12:07:23 mike Exp $"
 *%
 *%   Sample HP LaserJet driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -156,7 +156,7 @@
 *DefaultOption1: False
 *Option1 True/Installed:	""
 *Option1 False/Not Installed:	""
-*CloseUI *Option1
+*CloseUI: *Option1
 *CloseGroup: InstallableOptions
 
 *DefaultFont: Courier
@@ -196,5 +196,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: laserjet.ppd,v 1.8 2001/04/23 19:52:31 mike Exp $".
+*% End of "$Id: laserjet.ppd,v 1.9 2001/05/21 12:07:23 mike Exp $".
 *%
