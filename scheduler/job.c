@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.73 2003/07/19 21:57:47 mike Exp $"
+ * "$Id: job.c,v 1.124.2.74 2003/07/19 22:13:54 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2709,12 +2709,14 @@ start_process(const char *command,	/* I - Full path to command */
       if (setuid(User))
         exit(errno);
     }
+    else
+    {
+     /*
+      * Reset group membership to just the main one we belong to.
+      */
 
-   /*
-    * Reset group membership to just the main one we belong to.
-    */
-
-    setgroups(0, NULL);
+      setgroups(0, NULL);
+    }
 
    /*
     * Change umask to restrict permissions on created files...
@@ -2773,5 +2775,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.73 2003/07/19 21:57:47 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.74 2003/07/19 22:13:54 mike Exp $".
  */
