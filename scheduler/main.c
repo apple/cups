@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.117 2004/05/21 23:00:04 mike Exp $"
+ * "$Id: main.c,v 1.118 2004/05/27 18:17:54 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -305,7 +305,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Allocate memory for the input and output sets...
   */
 
-  SetSize = (MaxFDs + 31) / 8;
+  SetSize = (MaxFDs + 31) / 8 + 4;
   if (SetSize < sizeof(fd_set))
     SetSize = sizeof(fd_set);
 
@@ -775,6 +775,15 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (!S_ISFIFO(statbuf.st_mode))
       unlink("/var/spool/lp/SCHEDLOCK");
 #endif /* __sgi */
+
+ /*
+  * Free memory used by FD sets and return...
+  */
+
+  free(InputSet);
+  free(OutputSet);
+  free(input);
+  free(output);
 
   return (!stop_scheduler);
 }
@@ -1307,5 +1316,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.117 2004/05/21 23:00:04 mike Exp $".
+ * End of "$Id: main.c,v 1.118 2004/05/27 18:17:54 mike Exp $".
  */
