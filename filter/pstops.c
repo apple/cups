@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.62 2001/06/06 14:54:59 mike Exp $"
+ * "$Id: pstops.c,v 1.63 2001/06/06 15:11:59 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -139,7 +139,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     if ((fp = fopen(argv[6], "rb")) == NULL)
     {
-      perror("ERROR: unable to open print file - ");
+      fprintf(stderr, "ERROR: unable to open print file \"%s\" - %s\n",
+              argv[6], strerror(errno));
       return (1);
     }
   }
@@ -520,11 +521,10 @@ main(int  argc,			/* I - Number of command-line arguments */
     if (slowcollate || sloworder)
     {
       Pages[NumPages] = ftell(temp);
-      page = 1;
 
       if (!sloworder)
       {
-        while (Copies > 0)
+        while (Copies > 1)
 	{
 	  rewind(temp);
 
@@ -576,31 +576,15 @@ main(int  argc,			/* I - Number of command-line arguments */
       {
         page_count = (NumPages + NUp - 1) / NUp;
 	copy       = 0;
-	page       = 1;
 
         do
 	{
 	  if (slowduplex && (page_count & 1))
 	  {
-	   /*
-            * Make sure we have an even number of pages...
-	    */
-
-	    if (ppd == NULL || ppd->num_filters == 0)
-	      fprintf(stderr, "PAGE: %d %d\n", page, slowcollate ? 1 : Copies);
-
-            printf("%%%%Page: %d %d\n", page, page);
-	    page ++;
-	    ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
-
-	    start_nup(NUp - 1);
-	    puts("showpage");
-            end_nup(NUp - 1);
-
-            basepage = page_count - 2;
+            basepage = page_count - 1;
 	  }
 	  else
-	    basepage = page_count - 1;
+	    basepage = page_count - 1 - slowduplex;
 
 	  for (; basepage >= 0; basepage -= 1 + slowduplex)
 	  {
@@ -631,31 +615,53 @@ main(int  argc,			/* I - Number of command-line arguments */
 
             if (slowduplex)
 	    {
-	      if (ppd == NULL || ppd->num_filters == 0)
-		fprintf(stderr, "PAGE: %d %d\n", page,
-	        	slowcollate ? 1 : Copies);
-
-              printf("%%%%Page: %d %d\n", page, page);
-	      page ++;
-
-	      ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
-
-	      for (subpage = 0, number = (basepage + 1) * NUp;
-	           subpage < NUp && number < NumPages;
-		   subpage ++, number ++)
+              if (number < NumPages)
 	      {
-		start_nup(number);
-		fseek(temp, Pages[number], SEEK_SET);
-		copy_bytes(temp, Pages[number + 1] - Pages[number]);
-		end_nup(number);
-	      }
+		if (ppd == NULL || ppd->num_filters == 0)
+		  fprintf(stderr, "PAGE: %d %d\n", page,
+	        	  slowcollate ? 1 : Copies);
 
-              if (number & (NUp - 1))
+        	printf("%%%%Page: %d %d\n", page, page);
+		page ++;
+
+		ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
+
+		for (subpage = 0, number = (basepage + 1) * NUp;
+	             subpage < NUp && number < NumPages;
+		     subpage ++, number ++)
+		{
+		  start_nup(number);
+		  fseek(temp, Pages[number], SEEK_SET);
+		  copy_bytes(temp, Pages[number + 1] - Pages[number]);
+		  end_nup(number);
+		}
+
+        	if (number & (NUp - 1))
+		{
+		  start_nup(NUp - 1);
+        	  end_nup(NUp - 1);
+		}
+              }
+	      else
 	      {
+	       /*
+        	* Make sure we have an even number of pages...
+		*/
+
+		if (ppd == NULL || ppd->num_filters == 0)
+		  fprintf(stderr, "PAGE: %d %d\n", page, slowcollate ? 1 : Copies);
+
+        	printf("%%%%Page: %d %d\n", page, page);
+		page ++;
+		ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
+
 		start_nup(NUp - 1);
+		puts("showpage");
         	end_nup(NUp - 1);
+
+        	basepage = page_count - 1;
 	      }
-            }
+	    }
 	  }
 
 	  copy ++;
@@ -1095,5 +1101,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.62 2001/06/06 14:54:59 mike Exp $".
+ * End of "$Id: pstops.c,v 1.63 2001/06/06 15:11:59 mike Exp $".
  */
