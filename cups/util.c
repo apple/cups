@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.44 2000/01/04 13:45:37 mike Exp $"
+ * "$Id: util.c,v 1.45 2000/01/21 20:33:16 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -93,7 +93,10 @@ cupsCancelJob(const char *name,	/* I - Name of printer or class */
   */
 
   if (!cups_connect(name, printer, hostname))
+  {
+    last_error = IPP_SERVICE_UNAVAILABLE;
     return (0);
+  }
 
  /*
   * Build an IPP_CANCEL_JOB request, which requires the following
@@ -186,6 +189,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
       */
 
       ippDelete(request);
+      last_error = IPP_NOT_FOUND;
       return (NULL);
     }
 
@@ -196,6 +200,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
       */
 
       ippDelete(request);
+      last_error = IPP_NOT_FOUND;
       return (NULL);
     }
   }
@@ -346,6 +351,8 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 	ippDelete(response);
 	response = NULL;
 
+        last_error = IPP_SERVICE_UNAVAILABLE;
+
        /*
 	* Flush any remaining data...
 	*/
@@ -368,6 +375,15 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
   */
   
   ippDelete(request);
+
+  if (response)
+    last_error = response->request.status.status_code;
+  else if (status == HTTP_NOT_FOUND)
+    last_error = IPP_NOT_FOUND;
+  else if (status == HTTP_UNAUTHORIZED)
+    last_error = IPP_NOT_AUTHORIZED;
+  else if (status != HTTP_OK)
+    last_error = IPP_SERVICE_UNAVAILABLE;
 
   return (response);
 }
@@ -393,7 +409,10 @@ cupsGetClasses(char ***classes)	/* O - Classes */
   */
 
   if (!cups_connect("default", NULL, NULL))
+  {
+    last_error = IPP_SERVICE_UNAVAILABLE;
     return (0);
+  }
 
  /*
   * Build a CUPS_GET_CLASSES request, which requires the following
@@ -479,25 +498,31 @@ cupsGetDefault(void)
 		*response;	/* IPP Response */
   ipp_attribute_t *attr;	/* Current attribute */
   cups_lang_t	*language;	/* Default language */
+  const char	*var;		/* Environment variable */
   static char	def_printer[64];/* Default printer */
 
 
  /*
   * First see if the LPDEST or PRINTER environment variables are
-  * set...
+  * set...  However, if PRINTER is set to "lp", ignore it to work
+  * around a "feature" in most Linux distributions - the default
+  * user login scripts set PRINTER to "lp"...
   */
 
-  if (getenv("LPDEST") != NULL)
-    return (getenv("LPDEST"));
-  else if (getenv("PRINTER") != NULL)
-    return (getenv("PRINTER"));
+  if ((var = getenv("LPDEST")) != NULL)
+    return (var);
+  else if ((var = getenv("PRINTER")) != NULL && strcmp(var, "lp") != 0)
+    return (var);
 
  /*
   * Try to connect to the server...
   */
 
   if (!cups_connect("default", NULL, NULL))
+  {
+    last_error = IPP_SERVICE_UNAVAILABLE;
     return (NULL);
+  }
 
  /*
   * Build a CUPS_GET_DEFAULT request, which requires the following
@@ -571,7 +596,10 @@ cupsGetPPD(const char *name)	/* I - Printer name */
   */
 
   if (!cups_connect(name, printer, hostname))
+  {
+    last_error = IPP_SERVICE_UNAVAILABLE;
     return (NULL);
+  }
 
  /*
   * Then check for the cache file...
@@ -697,7 +725,10 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
   */
 
   if (!cups_connect("default", NULL, NULL))
+  {
+    last_error = IPP_SERVICE_UNAVAILABLE;
     return (0);
+  }
 
  /*
   * Build a CUPS_GET_PRINTERS request, which requires the following
@@ -826,6 +857,7 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
   {
     DEBUG_printf(("cupsPrintFile: Unable to open connection - %s.\n",
                   strerror(errno)));
+    last_error = IPP_SERVICE_UNAVAILABLE;
     ippDelete(request);
     return (0);
   }
@@ -1194,5 +1226,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.44 2000/01/04 13:45:37 mike Exp $".
+ * End of "$Id: util.c,v 1.45 2000/01/21 20:33:16 mike Exp $".
  */

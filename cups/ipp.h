@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.22 2000/01/04 13:45:35 mike Exp $"
+ * "$Id: ipp.h,v 1.23 2000/01/21 20:33:16 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -177,7 +177,7 @@ typedef enum			/**** IPP operations... ****/
   IPP_GET_JOB_ATTRIBUTES,
   IPP_GET_JOBS,
   IPP_GET_PRINTER_ATTRIBUTES,
-  IPP_HOLD_JOB = 0x000c,
+  IPP_HOLD_JOB,
   IPP_RELEASE_JOB,
   IPP_RESTART_JOB,
   IPP_PAUSE_PRINTER = 0x0010,
@@ -194,7 +194,6 @@ typedef enum			/**** IPP operations... ****/
   CUPS_ACCEPT_JOBS,
   CUPS_REJECT_JOBS,
   CUPS_SET_DEFAULT,
-  CUPS_GET_BANNERS,
   CUPS_GET_DEVICES,
   CUPS_GET_PPDS
 } ipp_op_t;
@@ -310,7 +309,6 @@ typedef struct			/**** Request State ****/
  * Prototypes...
  */
 
-extern time_t		ippDateToTime(const ipp_uchar_t *date);
 extern ipp_attribute_t	*ippAddBoolean(ipp_t *ipp, ipp_tag_t group, const char *name, char value);
 extern ipp_attribute_t	*ippAddBooleans(ipp_t *ipp, ipp_tag_t group, const char *name, int num_values, const char *values);
 extern ipp_attribute_t	*ippAddDate(ipp_t *ipp, ipp_tag_t group, const char *name, const ipp_uchar_t *value);
@@ -323,7 +321,9 @@ extern ipp_attribute_t	*ippAddResolutions(ipp_t *ipp, ipp_tag_t group, const cha
 extern ipp_attribute_t	*ippAddSeparator(ipp_t *ipp);
 extern ipp_attribute_t	*ippAddString(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, const char *name, const char *charset, const char *value);
 extern ipp_attribute_t	*ippAddStrings(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, const char *name, int num_values, const char *charset, const char **values);
+extern time_t		ippDateToTime(const ipp_uchar_t *date);
 extern void		ippDelete(ipp_t *ipp);
+extern const char	*ippErrorString(ipp_status_t error);
 extern ipp_attribute_t	*ippFindAttribute(ipp_t *ipp, const char *name, ipp_tag_t type);
 extern size_t		ippLength(ipp_t *ipp);
 extern ipp_t		*ippNew(void);
@@ -345,5 +345,5 @@ extern ipp_attribute_t	*_ipp_add_attr(ipp_t *, int);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.22 2000/01/04 13:45:35 mike Exp $".
+ * End of "$Id: ipp.h,v 1.23 2000/01/21 20:33:16 mike Exp $".
  */

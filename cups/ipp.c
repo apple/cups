@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.30 2000/01/04 13:45:35 mike Exp $"
+ * "$Id: ipp.c,v 1.31 2000/01/21 20:33:16 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -38,6 +38,7 @@
  *   ippAddSeparator()   - Add a group separator to an IPP request.
  *   ippDateToTime()     - Convert from RFC 1903 Date/Time format to UNIX time
  *   ippDelete()         - Delete an IPP request.
+ *   ippErrorString()    - Return a textual message for the given error message.
  *   ippFindAttribute()  - Find a named attribute in a request...
  *   ippLength()         - Compute the length of an IPP request.
  *   ippPort()           - Return the default IPP port number.
@@ -55,6 +56,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "string.h"
+#include "language.h"
 
 #include "ipp.h"
 #include "debug.h"
@@ -567,6 +569,83 @@ ippDelete(ipp_t *ipp)		/* I - IPP request */
   }
 
   free(ipp);
+}
+
+
+/*
+ * 'ippErrorString()' - Return a textual message for the given error message.
+ */
+
+const char *				/* O - Text string */
+ippErrorString(ipp_status_t error)	/* I - Error status */
+{
+  static cups_lang_t	*language = 0;	/* Language info */
+
+
+ /*
+  * Load the localized message file as needed...
+  */
+
+  if (!language)
+    language = cupsLangDefault();
+
+ /*
+  * Return the appropriate message...
+  */
+
+  switch (error)
+  {
+    case IPP_OK :
+    case IPP_OK_SUBST :
+    case IPP_OK_CONFLICT :
+        return ("OK");
+
+    case IPP_BAD_REQUEST :
+        return (cupsLangString(language, HTTP_BAD_REQUEST));
+
+    case IPP_FORBIDDEN :
+        return (cupsLangString(language, HTTP_FORBIDDEN));
+
+    case IPP_NOT_AUTHENTICATED :
+    case IPP_NOT_AUTHORIZED :
+        return (cupsLangString(language, HTTP_UNAUTHORIZED));
+
+    case IPP_NOT_POSSIBLE :
+        return (cupsLangString(language, HTTP_METHOD_NOT_ALLOWED));
+
+    case IPP_TIMEOUT :
+        return (cupsLangString(language, HTTP_REQUEST_TIMEOUT));
+
+    case IPP_NOT_FOUND :
+        return (cupsLangString(language, HTTP_NOT_FOUND));
+
+    case IPP_GONE :
+        return (cupsLangString(language, HTTP_GONE));
+
+    case IPP_DOCUMENT_FORMAT :
+        return (cupsLangString(language, HTTP_UNSUPPORTED_MEDIATYPE));
+
+    case IPP_CONFLICT :
+        return (cupsLangString(language, HTTP_CONFLICT));
+
+    case IPP_INTERNAL_ERROR :
+        return (cupsLangString(language, HTTP_SERVER_ERROR));
+
+    case IPP_OPERATION_NOT_SUPPORTED :
+    case IPP_VERSION_NOT_SUPPORTED :
+        return (cupsLangString(language, HTTP_NOT_SUPPORTED));
+
+    case IPP_SERVICE_UNAVAILABLE :
+    case IPP_DEVICE_UNAVAILABLE :
+    case IPP_TEMPORARY_ERROR :
+    case IPP_PRINTER_BUSY :
+        return (cupsLangString(language, HTTP_SERVICE_UNAVAILABLE));
+
+    case IPP_NOT_ACCEPTING :
+        return (cupsLangString(language, CUPS_MSG_NOT_ACCEPTING_JOBS));
+  }
+
+  return ("ERROR");
 }
 
 
@@ -1487,5 +1566,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.30 2000/01/04 13:45:35 mike Exp $".
+ * End of "$Id: ipp.c,v 1.31 2000/01/21 20:33:16 mike Exp $".
  */
