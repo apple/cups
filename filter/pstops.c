@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.104 2003/07/25 20:38:29 mike Exp $"
+ * "$Id: pstops.c,v 1.105 2003/08/01 18:57:28 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -81,8 +81,6 @@
 
 int		NumPages = 0;		/* Number of pages in file */
 long		Pages[MAX_PAGES];	/* Offsets to each page */
-char		PageLabels[MAX_PAGES][64];
-					/* Page labels */
 const char	*PageRanges = NULL;	/* Range of pages selected */
 const char	*PageSet = NULL;	/* All, Even, Odd pages */
 int		Order = 0,		/* 0 = normal, 1 = reverse pages */
@@ -1886,5 +1884,5 @@ start_nup(int number,			/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.104 2003/07/25 20:38:29 mike Exp $".
+ * End of "$Id: pstops.c,v 1.105 2003/08/01 18:57:28 mike Exp $".
  */
