@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.32 2003/05/25 14:39:17 mike Exp $"
+ * "$Id: emit.c,v 1.33 2003/06/02 19:43:12 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -207,7 +207,8 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
 
         ppd_attr_t	*attr;		/* PPD attribute */
 	int		pos,		/* Position of custom value */
-			values[5];	/* Values for custom command */
+			values[5],	/* Values for custom command */
+			orientation;	/* Orientation to use */
 
 
         fputs("%%BeginFeature: *CustomPageSize True\n", fp);
@@ -239,6 +240,36 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
 	  pos = 1;
 
 	values[pos] = (int)size->length;
+
+        if (size->width < size->length)
+	  orientation = 1;
+	else
+	  orientation = 0;
+
+	if ((attr = ppdFindAttr(ppd, "ParamCustomPageSize",
+	                        "Orientation")) != NULL)
+	{
+	  int min_orient, max_orient;	/* Minimum and maximum orientations */
+
+
+          if (sscanf(attr->value, "%d%*s%d%d", &pos, &min_orient,
+	             &max_orient) != 3)
+	    pos = 4;
+	  else
+	  {
+            if (pos < 0 || pos > 4)
+	      pos = 4;
+
+            if (orientation > max_orient)
+	      orientation = max_orient;
+	    else if (orientation < min_orient)
+	      orientation = min_orient;
+	  }
+	}
+	else
+	  pos = 4;
+
+	values[pos] = orientation;
 
         fprintf(fp, "%d %d %d %d %d\n", values[0], values[1],
 	        values[2], values[3], values[4]);
@@ -377,7 +408,8 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
 
         ppd_attr_t	*attr;		/* PPD attribute */
 	int		pos,		/* Position of custom value */
-			values[5];	/* Values for custom command */
+			values[5],	/* Values for custom command */
+			orientation;	/* Orientation to use */
 
 
         size = ppdPageSize(ppd, "Custom");
@@ -407,6 +439,36 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
 	  pos = 1;
 
 	values[pos] = (int)size->length;
+
+        if (size->width < size->length)
+	  orientation = 1;
+	else
+	  orientation = 0;
+
+	if ((attr = ppdFindAttr(ppd, "ParamCustomPageSize",
+	                        "Orientation")) != NULL)
+	{
+	  int min_orient, max_orient;	/* Minimum and maximum orientations */
+
+
+          if (sscanf(attr->value, "%d%*s%d%d", &pos, &min_orient,
+	             &max_orient) != 3)
+	    pos = 4;
+	  else
+	  {
+            if (pos < 0 || pos > 4)
+	      pos = 4;
+
+            if (orientation > max_orient)
+	      orientation = max_orient;
+	    else if (orientation < min_orient)
+	      orientation = min_orient;
+	  }
+	}
+	else
+	  pos = 4;
+
+	values[pos] = orientation;
 
         snprintf(buf, sizeof(buf), "%d %d %d %d %d\n", values[0], values[1],
 	         values[2], values[3], values[4]);
@@ -646,5 +708,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c,v 1.32 2003/05/25 14:39:17 mike Exp $".
+ * End of "$Id: emit.c,v 1.33 2003/06/02 19:43:12 mike Exp $".
  */
