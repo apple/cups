@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.84 2001/02/20 22:02:11 mike Exp $"
+ * "$Id: client.c,v 1.85 2001/02/20 22:41:55 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -74,7 +74,6 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   client_t		*con;	/* New client pointer */
   unsigned		address;/* Address of client */
   struct hostent	*host;	/* Host entry for address */
-			*ip;	/* Host entry for name */
 
 
   LogMessage(L_DEBUG2, "AcceptClient(%08x) %d NumClients = %d",
@@ -168,19 +167,19 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
     * Do double lookups as needed...
     */
 
-    if ((ip = gethostbyname(con->http.hostname)) != NULL)
+    if ((host = gethostbyname(con->http.hostname)) != NULL)
     {
      /*
       * See if the hostname maps to the IP address...
       */
 
-      if (ip->h_length != 4 || ip->h_addrtype != AF_INET)
+      if (host->h_length != 4 || host->h_addrtype != AF_INET)
       {
        /*
         * Not an IPv4 address...
 	*/
 
-	ip = NULL;
+	host = NULL;
       }
       else
       {
@@ -188,16 +187,16 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
         * Compare all of the addresses against this one...
 	*/
 
-	for (i = 0; ip->h_addr_list[i]; i ++)
-          if (memcmp(&(con->http.hostaddr.sin_addr), ip->h_addr_list[i], 4) == 0)
+	for (i = 0; host->h_addr_list[i]; i ++)
+          if (memcmp(&(con->http.hostaddr.sin_addr), host->h_addr_list[i], 4) == 0)
 	    break;
 
-        if (!ip->h_addr_list[i])
-	  ip = NULL;
+        if (!host->h_addr_list[i])
+	  host = NULL;
       }
     }
 
-    if (ip == NULL)
+    if (host == NULL)
     {
      /*
       * Can't have a hostname that doesn't resolve to the same IP address
@@ -2079,5 +2078,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.84 2001/02/20 22:02:11 mike Exp $".
+ * End of "$Id: client.c,v 1.85 2001/02/20 22:41:55 mike Exp $".
  */

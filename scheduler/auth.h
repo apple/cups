@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.h,v 1.14 2001/01/22 15:03:58 mike Exp $"
+ * "$Id: auth.h,v 1.15 2001/02/20 22:41:55 mike Exp $"
  *
  *   Authorization definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -41,6 +41,18 @@
 #define AUTH_NAME		0	/* Authorize host by name */
 #define AUTH_IP			1	/* Authorize host by IP */
 
+#define AUTH_SATISFY_ANY	1	/* Satisfy either address or auth */
+#define AUTH_SATISFY_ALL	2	/* Satisfy both address and auth */
+
+#define AUTH_LIMIT_DELETE	1	/* Limit DELETE requests */
+#define AUTH_LIMIT_GET		2	/* Limit GET requests */
+#define AUTH_LIMIT_HEAD		4	/* Limit HEAD requests */
+#define AUTH_LIMIT_OPTIONS	8	/* Limit OPTIONS requests */
+#define AUTH_LIMIT_POST		16	/* Limit POST requests */
+#define AUTH_LIMIT_PUT		32	/* Limit PUT requests */
+#define AUTH_LIMIT_TRACE	64	/* Limit TRACE requests */
+#define AUTH_LIMIT_ALL		127	/* Limit all requests */
+
 
 /*
  * HTTP access control structures...
@@ -71,11 +83,14 @@ typedef struct
 typedef struct
 {
   char		location[HTTP_MAX_URI];	/* Location of resource */
-  int		length,			/* Length of location string */
+  int		limit,			/* Limit for these types of requests */
+		length,			/* Length of location string */
 		order_type,		/* Allow or Deny */
 		type,			/* Type of authentication */
-		level;			/* Access level required */
-  char		group_name[MAX_USERPASS];/* User group name */
+		level,			/* Access level required */
+		satisfy;		/* Satisfy any or all limits? */
+  int		num_names;		/* Number of names */
+  char		**names;		/* User or group names */
   int		num_allow;		/* Number of Allow lines */
   authmask_t	*allow;			/* Allow lines */
   int		num_deny;		/* Number of Deny lines */
@@ -99,6 +114,7 @@ VAR location_t		*Locations	VALUE(NULL);
  */
 
 extern location_t	*AddLocation(const char *location);
+extern void		AddName(location_t *loc, char *name);
 extern void		AllowHost(location_t *loc, char *name);
 extern void		AllowIP(location_t *loc, unsigned address,
 			        unsigned netmask);
@@ -114,5 +130,5 @@ extern http_status_t	IsAuthorized(client_t *con);
 
 
 /*
- * End of "$Id: auth.h,v 1.14 2001/01/22 15:03:58 mike Exp $".
+ * End of "$Id: auth.h,v 1.15 2001/02/20 22:41:55 mike Exp $".
  */

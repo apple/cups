@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.70 2001/02/20 22:02:11 mike Exp $"
+ * "$Id: conf.c,v 1.71 2001/02/20 22:41:55 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -116,6 +116,7 @@ static var_t	variables[] =
   { "MaxClients",	&MaxClients,		VAR_INTEGER,	0 },
   { "MaxLogSize",	&MaxLogSize,		VAR_INTEGER,	0 },
   { "MaxRequestSize",	&MaxRequestSize,	VAR_INTEGER,	0 },
+  { "LimitRequestBody",	&MaxRequestSize,	VAR_INTEGER,	0 },
   { "PreserveJobHistory", &JobHistory,		VAR_BOOLEAN,	0 },
   { "PreserveJobFiles",	&JobFiles,		VAR_BOOLEAN,	0 },
   { "MaxJobs",		&MaxJobs,		VAR_INTEGER,	0 },
@@ -307,7 +308,7 @@ ReadConfiguration(void)
 
   endpwent();
 
-  ListenBacklog    = SOMAXCONN;
+  ListenBackLog    = SOMAXCONN;
   LogLevel         = L_ERROR;
   HostNameLookups  = FALSE;
   Timeout          = DEFAULT_TIMEOUT;
@@ -1387,14 +1388,14 @@ read_location(FILE *fp,		/* I - Configuration file */
       else if (strcasecmp(value, "system") == 0)
       {
         loc->level = AUTH_GROUP;
-	strncpy(loc->group_name, SystemGroup, sizeof(loc->group_name) - 1);
+	AddName(loc, SystemGroup);
       }
       else
         LogMessage(L_WARN, "Unknown authorization class %s on line %d.",
 	           value, linenum);
     }
     else if (strcmp(name, "AuthGroupName") == 0)
-      strncpy(loc->group_name, value, sizeof(loc->group_name) - 1);
+      AddName(loc, value);
     else
       LogMessage(L_ERROR, "Unknown Location directive %s on line %d.",
 	         name, linenum);
@@ -1500,5 +1501,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.70 2001/02/20 22:02:11 mike Exp $".
+ * End of "$Id: conf.c,v 1.71 2001/02/20 22:41:55 mike Exp $".
  */

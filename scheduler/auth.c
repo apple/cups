@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.39 2001/01/22 15:03:57 mike Exp $"
+ * "$Id: auth.c,v 1.40 2001/02/20 22:41:54 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -120,6 +120,42 @@ AddLocation(const char *location)	/* I - Location path */
 
 
 /*
+ * 'AddName()' - Add a name to a location...
+ */
+
+void
+AddName(location_t *loc,	/* I - Location to add to */
+        char       *name)	/* I - Name to add */
+{
+  char	**temp;			/* Pointer to names array */
+
+
+  if (loc->num_names == 0)
+    temp = malloc(sizeof(char *));
+  else
+    temp = realloc(loc->names, (loc->num_names + 1) * sizeof(char *));
+
+  if (temp == NULL)
+  {
+    LogMessage(L_ERROR, "Unable to add name to location %s: %s", loc->location,
+               strerror(errno));
+    return;
+  }
+
+  loc->names = temp;
+
+  if ((temp[loc->num_names] = strdup(name)) == NULL)
+  {
+    LogMessage(L_ERROR, "Unable to duplicate name for location %s: %s",
+               loc->location, strerror(errno));
+    return;
+  }
+
+  loc->num_names ++;
+}
+
+
+/*
  * 'AllowHost()' - Add a host name that is allowed to access the location.
  */
 
@@ -236,6 +272,12 @@ DeleteAllLocations(void)
 
   for (i = NumLocations, loc = Locations; i > 0; i --, loc ++)
   {
+    for (j = loc->num_names - 1; j >= 0; j --)
+      free(loc->names[j]);
+
+    if (loc->num_names > 0)
+      free(loc->names);
+
     for (j = loc->num_allow, mask = loc->allow; j > 0; j --, mask ++)
       if (mask->type == AUTH_NAME)
         free(mask->mask.name.name);
@@ -321,19 +363,39 @@ FindBest(client_t *con)		/* I - Connection */
   location_t	*loc,		/* Current location */
 		*best;		/* Best match for location so far */
   int		bestlen;	/* Length of best match */
+  int		limit;		/* Limit field */
+  static int	limits[] =	/* Map http_status_t to AUTH_LIMIT_xyz */
+		{
+		  AUTH_LIMIT_ALL,
+		  AUTH_LIMIT_OPTIONS,
+		  AUTH_LIMIT_GET,
+		  AUTH_LIMIT_GET,
+		  AUTH_LIMIT_HEAD,
+		  AUTH_LIMIT_POST,
+		  AUTH_LIMIT_POST,
+		  AUTH_LIMIT_POST,
+		  AUTH_LIMIT_PUT,
+		  AUTH_LIMIT_PUT,
+		  AUTH_LIMIT_DELETE,
+		  AUTH_LIMIT_TRACE,
+		  AUTH_LIMIT_ALL,
+		  AUTH_LIMIT_ALL
+		};
 
 
  /*
   * Loop through the list of locations to find a match...
   */
 
+  limit   = limits[con->http.status];
   best    = NULL;
   bestlen = 0;
 
   for (i = NumLocations, loc = Locations; i > 0; i --, loc ++)
     if (loc->length > bestlen &&
         strncmp(con->uri, loc->location, loc->length) == 0 &&
-	loc->location[0] == '/')
+	loc->location[0] == '/' &&
+	(limit & loc->limit) != 0)
     {
       best    = loc;
       bestlen = loc->length;
@@ -376,7 +438,7 @@ FindLocation(const char *location)	/* I - Connection */
 http_status_t			/* O - HTTP_OK if authorized or error code */
 IsAuthorized(client_t *con)	/* I - Connection */
 {
-  int		i,		/* Looping var */
+  int		i, j,		/* Looping vars */
 		auth;		/* Authorization status */
   unsigned	address;	/* Authorization address */
   location_t	*best;		/* Best match for location so far */
@@ -476,7 +538,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
     }
   }
 
-  if (auth == AUTH_DENY)
+  if (auth == AUTH_DENY && best->satisfy == AUTH_SATISFY_ALL)
     return (HTTP_FORBIDDEN);
 
 #ifdef HAVE_LIBSSL
@@ -499,7 +561,12 @@ IsAuthorized(client_t *con)	/* I - Connection */
 		con->username, con->password));
 
   if (con->username[0] == '\0')
-    return (HTTP_UNAUTHORIZED);		/* Non-anonymous needs user/pass */
+  {
+    if (best->satisfy == AUTH_SATISFY_ALL || auth == AUTH_DENY)
+      return (HTTP_UNAUTHORIZED);	/* Non-anonymous needs user/pass */
+    else
+      return (HTTP_OK);			/* unless overridden with Satisfy */
+  }
 
  /*
   * Check the user's password...
@@ -653,10 +720,10 @@ IsAuthorized(client_t *con)	/* I - Connection */
         return (HTTP_UNAUTHORIZED);
       }
 
-      if (!get_md5_passwd(con->username, best->group_name, md5))
+      if (!get_md5_passwd(con->username, best->names[0], md5))
       {
-        LogMessage(L_ERROR, "IsAuthorized: No user:group of \"%s:%s\" in passwd.md5!",
-	           con->username, best->group_name);
+        LogMessage(L_ERROR, "IsAuthorized: No user:group for \"%s:%s\" in passwd.md5!",
+	           con->username, best->names[0]);
         return (HTTP_UNAUTHORIZED);
       }
 
@@ -676,33 +743,58 @@ IsAuthorized(client_t *con)	/* I - Connection */
   * access... (root always matches)
   */
 
-  if (best->level == AUTH_USER || strcmp(con->username, "root") == 0)
+  if (strcmp(con->username, "root") == 0)
     return (HTTP_OK);
 
- /*
-  * Check to see if this user is in the specified group...
-  */
-
-  grp = getgrnam(best->group_name);
-  endgrent();
-
-  if (grp == NULL)			/* No group by that name??? */
+  if (best->level == AUTH_USER)
   {
-    LogMessage(L_WARN, "IsAuthorized: group name \"%s\" does not exist!",
-               best->group_name);
-    return (HTTP_FORBIDDEN);
-  }
+   /*
+    * If there are no names associated with this location, then
+    * any valid user is OK...
+    */
 
-  for (i = 0; grp->gr_mem[i] != NULL; i ++)
-    if (strcmp(con->username, grp->gr_mem[i]) == 0)
+    if (best->num_names == 0)
       return (HTTP_OK);
 
+   /*
+    * Otherwise check the user list and return OK if this user is
+    * allowed...
+    */
+
+    for (i = 0; i < best->num_names; i ++)
+      if (strcmp(con->username, best->names[i]) == 0)
+        return (HTTP_OK);
+
+    return (HTTP_UNAUTHORIZED);
+  }
+
  /*
-  * Check to see if the default group ID matches for the user...
+  * Check to see if this user is in any of the named groups...
   */
 
-  if (grp->gr_gid == pw->pw_gid)
-    return (HTTP_OK);
+  for (i = 0; i < best->num_names; i ++)
+  {
+    grp = getgrnam(best->names[i]);
+    endgrent();
+
+    if (grp == NULL)			/* No group by that name??? */
+    {
+      LogMessage(L_WARN, "IsAuthorized: group name \"%s\" does not exist!",
+        	 best->names[i]);
+      return (HTTP_FORBIDDEN);
+    }
+
+    for (j = 0; grp->gr_mem[j] != NULL; j ++)
+      if (strcmp(con->username, grp->gr_mem[j]) == 0)
+	return (HTTP_OK);
+
+   /*
+    * Check to see if the default group ID matches for the user...
+    */
+
+    if (grp->gr_gid == pw->pw_gid)
+      return (HTTP_OK);
+  }
 
  /*
   * The user isn't part of the specified group, so deny access...
@@ -909,5 +1001,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.39 2001/01/22 15:03:57 mike Exp $".
+ * End of "$Id: auth.c,v 1.40 2001/02/20 22:41:54 mike Exp $".
  */
