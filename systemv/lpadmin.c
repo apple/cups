@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.21 2001/02/06 23:40:10 mike Exp $"
+ * "$Id: lpadmin.c,v 1.22 2001/02/07 00:33:55 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -1411,7 +1411,7 @@ set_printer_file(http_t *http,		/* I - Server connection */
     if ((gz = gzopen(file, "rb")) == NULL)
     {
       perror("lpadmin: Unable to open file");
-      fclose(fp);
+      close(fd);
       unlink(tempfile);
       return;
     }
@@ -1801,5 +1801,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.21 2001/02/06 23:40:10 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.22 2001/02/07 00:33:55 mike Exp $".
  */

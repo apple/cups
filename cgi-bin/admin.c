@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.20 2001/02/06 23:40:06 mike Exp $"
+ * "$Id: admin.c,v 1.21 2001/02/07 00:33:54 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -40,6 +40,7 @@
 
 #include "ipp-var.h"
 #include <ctype.h>
+#include <errno.h>
 
 
 /*
@@ -1589,5 +1590,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.20 2001/02/06 23:40:06 mike Exp $".
+ * End of "$Id: admin.c,v 1.21 2001/02/07 00:33:54 mike Exp $".
  */

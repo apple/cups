@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.22 2001/02/06 23:40:09 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.23 2001/02/07 00:33:54 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -549,7 +549,7 @@ recv_print_job(const char    *dest,	/* I - Destination */
     * Close the file and send an acknowledgement...
     */
 
-    fclose(fp);
+    close(fd);
 
     putchar(status);
 
@@ -1218,5 +1218,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.22 2001/02/06 23:40:09 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.23 2001/02/07 00:33:54 mike Exp $".
  */
