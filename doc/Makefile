@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.32 2001/01/22 15:03:34 mike Exp $"
+# "$Id: Makefile,v 1.33 2001/03/02 03:45:34 andy Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -17,7 +17,7 @@
 #       44141 Airport View Drive, Suite 204
 #       Hollywood, Maryland 20636-3111 USA
 #
-#       Voice: (301) 373-9603
+#       Voice: (301) 373-9600
 #       EMail: cups-info@cups.org
 #         WWW: http://www.cups.org
 #

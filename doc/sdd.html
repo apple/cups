@@ -2,11 +2,11 @@
 <HTML>
 <HEAD>
 <TITLE> CUPS Software Design Description</TITLE>
-<META NAME="AUTHOR" CONTENT="Easy Software Products">
-<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2001, All Rights Reserved">
-<META NAME="DOCNUMBER" CONTENT="CUPS-SDD-1.1">
-<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
-<STYLE>
+<META NAME="author" CONTENT="Easy Software Products">
+<META NAME="copyright" CONTENT="Copyright 1997-2001, All Rights Reserved">
+<META NAME="docnumber" CONTENT="CUPS-SDD-1.1">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+<STYLE TYPE="text/css"><!--
 BODY { font-family: serif; font-size: 11.0pt }
 H1 { font-family: sans-serif; font-size: 20.0pt }
 H2 { font-family: sans-serif; font-size: 17.0pt }
@@ -17,7 +17,7 @@ H6 { font-family: sans-serif; font-size: 8.0pt }
 SUB { font-size: 8.0pt }
 SUP { font-size: 8.0pt }
 PRE { font-size: 9.0pt }
-</STYLE>
+--></STYLE>
 </HEAD>
 <BODY>
 <CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="100%"><BR>
@@ -27,680 +27,570 @@ Easy Software Products<BR>
 Copyright 1997-2001, All Rights Reserved<BR>
 </CENTER>
 <HR>
-<H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</></A></H1>
-<BR></BR>
-<BR></BR><B><A HREF="#1">1 </>Scope</></A></B>
+<H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
+<BR>
+<BR><B><A HREF="#1">1 Scope</A></B>
 <UL>
-<LI><A HREF="#1_1">1.1 </>Identification</></A></LI>
-<LI><A HREF="#1_2">1.2 </>System </>Overview</></A></LI>
-<LI><A HREF="#1_3">1.3 </>Document </>Overview</></A></LI>
+<LI><A HREF="#1_1">1.1 Identification</A></LI>
+<LI><A HREF="#1_2">1.2 System Overview</A></LI>
+<LI><A HREF="#1_3">1.3 Document Overview</A></LI>
 </UL>
-<B><A HREF="#2">2 </>References</></A></B>
+<B><A HREF="#2">2 References</A></B>
 <UL>
-<LI><A HREF="#2_1">2.1 </>CUPS </>Documentation</></A></LI>
-<LI><A HREF="#2_2">2.2 </>Other </>Documents</></A></LI>
+<LI><A HREF="#2_1">2.1 CUPS Documentation</A></LI>
+<LI><A HREF="#2_2">2.2 Other Documents</A></LI>
 </UL>
-<B><A HREF="#3">3 </>Design </>Overview</></A></B>
+<B><A HREF="#3">3 Design Overview</A></B>
 <UL>
-<LI><A HREF="#3_1">3.1 </>Backends</></A></LI>
+<LI><A HREF="#3_1">3.1 Backends</A></LI>
 <UL>
-<LI><A HREF="#3_1_1">3.1.1 </>ipp</></A></LI>
-<LI><A HREF="#3_1_2">3.1.2 </>lpd</></A></LI>
-<LI><A HREF="#3_1_3">3.1.3 </>parallel</></A></LI>
-<LI><A HREF="#3_1_4">3.1.4 </>serial</></A></LI>
-<LI><A HREF="#3_1_5">3.1.5 </>socket</></A></LI>
-<LI><A HREF="#3_1_6">3.1.6 </>usb</></A></LI>
+<LI><A HREF="#3_1_1">3.1.1 ipp</A></LI>
+<LI><A HREF="#3_1_2">3.1.2 lpd</A></LI>
+<LI><A HREF="#3_1_3">3.1.3 parallel</A></LI>
+<LI><A HREF="#3_1_4">3.1.4 serial</A></LI>
+<LI><A HREF="#3_1_5">3.1.5 socket</A></LI>
+<LI><A HREF="#3_1_6">3.1.6 usb</A></LI>
 </UL>
-<LI><A HREF="#3_2">3.2 </>Berkeley </>Commands</></A></LI>
+<LI><A HREF="#3_2">3.2 Berkeley Commands</A></LI>
 <UL>
-<LI><A HREF="#3_2_1">3.2.1 </>lpc</></A></LI>
-<LI><A HREF="#3_2_2">3.2.2 </>lpq</></A></LI>
-<LI><A HREF="#3_2_3">3.2.3 </>lpr</></A></LI>
-<LI><A HREF="#3_2_4">3.2.4 </>lprm</></A></LI>
+<LI><A HREF="#3_2_1">3.2.1 lpc</A></LI>
+<LI><A HREF="#3_2_2">3.2.2 lpq</A></LI>
+<LI><A HREF="#3_2_3">3.2.3 lpr</A></LI>
+<LI><A HREF="#3_2_4">3.2.4 lprm</A></LI>
 </UL>
-<LI><A HREF="#3_3">3.3 </>CGI</></A></LI>
+<LI><A HREF="#3_3">3.3 CGI</A></LI>
 <UL>
-<LI><A HREF="#3_3_1">3.3.1 </>admin.cgi</></A></LI>
-<LI><A HREF="#3_3_2">3.3.2 </>classes.cgi</></A></LI>
-<LI><A HREF="#3_3_3">3.3.3 </>jobs.cgi</></A></LI>
-<LI><A HREF="#3_3_4">3.3.4 </>printers.cgi</></A></LI>
+<LI><A HREF="#3_3_1">3.3.1 admin.cgi</A></LI>
+<LI><A HREF="#3_3_2">3.3.2 classes.cgi</A></LI>
+<LI><A HREF="#3_3_3">3.3.3 jobs.cgi</A></LI>
+<LI><A HREF="#3_3_4">3.3.4 printers.cgi</A></LI>
 </UL>
-<LI><A HREF="#3_4">3.4 </>CUPS </>Application </>Programmers </>
-Interface</></A></LI>
+<LI><A HREF="#3_4">3.4 CUPS Application Programmers Interface</A></LI>
 <UL>
-<LI><A HREF="#3_4_1">3.4.1 </>Convenience </>Functions</></A></LI>
-<LI><A HREF="#3_4_2">3.4.2 </>HTTP </>Functions</></A></LI>
-<LI><A HREF="#3_4_3">3.4.3 </>IPP </>Functions</></A></LI>
-<LI><A HREF="#3_4_4">3.4.4 </>Language </>Functions</></A></LI>
-<LI><A HREF="#3_4_5">3.4.5 </>PPD </>Functions</></A></LI>
+<LI><A HREF="#3_4_1">3.4.1 Convenience Functions</A></LI>
+<LI><A HREF="#3_4_2">3.4.2 HTTP Functions</A></LI>
+<LI><A HREF="#3_4_3">3.4.3 IPP Functions</A></LI>
+<LI><A HREF="#3_4_4">3.4.4 Language Functions</A></LI>
+<LI><A HREF="#3_4_5">3.4.5 PPD Functions</A></LI>
 </UL>
-<LI><A HREF="#3_5">3.5 </>CUPS </>Imaging </>Library</></A></LI>
+<LI><A HREF="#3_5">3.5 CUPS Imaging Library</A></LI>
 <UL>
-<LI><A HREF="#3_5_1">3.5.1 </>Colorspace </>Conversion </>Functions</></A>
-</LI>
-<LI><A HREF="#3_5_2">3.5.2 </>Color </>Management </>Functions</></A></LI>
-<LI><A HREF="#3_5_3">3.5.3 </>Image </>Management </>Functions</></A></LI>
-<LI><A HREF="#3_5_4">3.5.4 </>Scaling </>Functions</></A></LI>
-<LI><A HREF="#3_5_5">3.5.5 </>Image </>File </>Functions</></A></LI>
-<LI><A HREF="#3_5_6">3.5.6 </>Raster </>Functions</></A></LI>
+<LI><A HREF="#3_5_1">3.5.1 Colorspace Conversion Functions</A></LI>
+<LI><A HREF="#3_5_2">3.5.2 Color Management Functions</A></LI>
+<LI><A HREF="#3_5_3">3.5.3 Image Management Functions</A></LI>
+<LI><A HREF="#3_5_4">3.5.4 Scaling Functions</A></LI>
+<LI><A HREF="#3_5_5">3.5.5 Image File Functions</A></LI>
+<LI><A HREF="#3_5_6">3.5.6 Raster Functions</A></LI>
 </UL>
-<LI><A HREF="#3_6">3.6 </>Daemons</></A></LI>
+<LI><A HREF="#3_6">3.6 Daemons</A></LI>
 <UL>
-<LI><A HREF="#3_6_1">3.6.1 </>Line </>Printer </>Daemon</></A></LI>
-<LI><A HREF="#3_6_2">3.6.2 </>Polling </>Daemon</></A></LI>
+<LI><A HREF="#3_6_1">3.6.1 Line Printer Daemon</A></LI>
+<LI><A HREF="#3_6_2">3.6.2 Polling Daemon</A></LI>
 </UL>
-<LI><A HREF="#3_7">3.7 </>Filters</></A></LI>
+<LI><A HREF="#3_7">3.7 Filters</A></LI>
 <UL>
-<LI><A HREF="#3_7_1">3.7.1 </>hpgltops</></A></LI>
-<LI><A HREF="#3_7_2">3.7.2 </>imagetops</></A></LI>
-<LI><A HREF="#3_7_3">3.7.3 </>imagetoraster</></A></LI>
-<LI><A HREF="#3_7_4">3.7.4 </>pdftops</></A></LI>
-<LI><A HREF="#3_7_5">3.7.5 </>pstops</></A></LI>
-<LI><A HREF="#3_7_6">3.7.6 </>pstoraster</></A></LI>
-<LI><A HREF="#3_7_7">3.7.7 </>rastertoepson</></A></LI>
-<LI><A HREF="#3_7_8">3.7.8 </>rastertohp</></A></LI>
-<LI><A HREF="#3_7_9">3.7.9 </>texttops</></A></LI>
+<LI><A HREF="#3_7_1">3.7.1 hpgltops</A></LI>
+<LI><A HREF="#3_7_2">3.7.2 imagetops</A></LI>
+<LI><A HREF="#3_7_3">3.7.3 imagetoraster</A></LI>
+<LI><A HREF="#3_7_4">3.7.4 pdftops</A></LI>
+<LI><A HREF="#3_7_5">3.7.5 pstops</A></LI>
+<LI><A HREF="#3_7_6">3.7.6 pstoraster</A></LI>
+<LI><A HREF="#3_7_7">3.7.7 rastertoepson</A></LI>
+<LI><A HREF="#3_7_8">3.7.8 rastertohp</A></LI>
+<LI><A HREF="#3_7_9">3.7.9 texttops</A></LI>
 </UL>
-<LI><A HREF="#3_8">3.8 </>Scheduler</></A></LI>
+<LI><A HREF="#3_8">3.8 Scheduler</A></LI>
 <UL>
-<LI><A HREF="#3_8_1">3.8.1 </>Authorization</></A></LI>
-<LI><A HREF="#3_8_2">3.8.2 </>Classes</></A></LI>
-<LI><A HREF="#3_8_3">3.8.3 </>Client</></A></LI>
-<LI><A HREF="#3_8_4">3.8.4 </>Configuration</></A></LI>
-<LI><A HREF="#3_8_5">3.8.5 </>Devices</></A></LI>
-<LI><A HREF="#3_8_6">3.8.6 </>Directory </>Services</></A></LI>
-<LI><A HREF="#3_8_7">3.8.7 </>IPP</></A></LI>
-<LI><A HREF="#3_8_8">3.8.8 </>Jobs</></A></LI>
-<LI><A HREF="#3_8_9">3.8.9 </>Logging</></A></LI>
-<LI><A HREF="#3_8_10">3.8.10 </>Main</></A></LI>
-<LI><A HREF="#3_8_11">3.8.11 </>MIME</></A></LI>
-<LI><A HREF="#3_8_12">3.8.12 </>PPDs</></A></LI>
-<LI><A HREF="#3_8_13">3.8.13 </>Printers</></A></LI>
+<LI><A HREF="#3_8_1">3.8.1 Authorization</A></LI>
+<LI><A HREF="#3_8_2">3.8.2 Classes</A></LI>
+<LI><A HREF="#3_8_3">3.8.3 Client</A></LI>
+<LI><A HREF="#3_8_4">3.8.4 Configuration</A></LI>
+<LI><A HREF="#3_8_5">3.8.5 Devices</A></LI>
+<LI><A HREF="#3_8_6">3.8.6 Directory Services</A></LI>
+<LI><A HREF="#3_8_7">3.8.7 IPP</A></LI>
+<LI><A HREF="#3_8_8">3.8.8 Jobs</A></LI>
+<LI><A HREF="#3_8_9">3.8.9 Logging</A></LI>
+<LI><A HREF="#3_8_10">3.8.10 Main</A></LI>
+<LI><A HREF="#3_8_11">3.8.11 MIME</A></LI>
+<LI><A HREF="#3_8_12">3.8.12 PPDs</A></LI>
+<LI><A HREF="#3_8_13">3.8.13 Printers</A></LI>
 </UL>
-<LI><A HREF="#3_9">3.9 </>System </>V </>Commands</></A></LI>
+<LI><A HREF="#3_9">3.9 System V Commands</A></LI>
 <UL>
-<LI><A HREF="#3_9_1">3.9.1 </>accept</></A></LI>
-<LI><A HREF="#3_9_2">3.9.2 </>cancel</></A></LI>
-<LI><A HREF="#3_9_3">3.9.3 </>disable</></A></LI>
-<LI><A HREF="#3_9_4">3.9.4 </>enable</></A></LI>
-<LI><A HREF="#3_9_5">3.9.5 </>lp</></A></LI>
-<LI><A HREF="#3_9_6">3.9.6 </>lpadmin</></A></LI>
-<LI><A HREF="#3_9_7">3.9.7 </>lpinfo</></A></LI>
-<LI><A HREF="#3_9_8">3.9.8 </>lpmove</></A></LI>
-<LI><A HREF="#3_9_9">3.9.9 </>lpoptions</></A></LI>
-<LI><A HREF="#3_9_10">3.9.10 </>lpstat</></A></LI>
-<LI><A HREF="#3_9_11">3.9.11 </>reject</></A></LI>
+<LI><A HREF="#3_9_1">3.9.1 accept</A></LI>
+<LI><A HREF="#3_9_2">3.9.2 cancel</A></LI>
+<LI><A HREF="#3_9_3">3.9.3 disable</A></LI>
+<LI><A HREF="#3_9_4">3.9.4 enable</A></LI>
+<LI><A HREF="#3_9_5">3.9.5 lp</A></LI>
+<LI><A HREF="#3_9_6">3.9.6 lpadmin</A></LI>
+<LI><A HREF="#3_9_7">3.9.7 lpinfo</A></LI>
+<LI><A HREF="#3_9_8">3.9.8 lpmove</A></LI>
+<LI><A HREF="#3_9_9">3.9.9 lpoptions</A></LI>
+<LI><A HREF="#3_9_10">3.9.10 lpstat</A></LI>
+<LI><A HREF="#3_9_11">3.9.11 reject</A></LI>
 </UL>
 </UL>
-<B><A HREF="#4">A </>Glossary</></A></B>
+<B><A HREF="#4">A Glossary</A></B>
 <UL>
-<LI><A HREF="#4_1">A.1 </>Terms</></A></LI>
-<LI><A HREF="#4_2">A.2 </>Acronyms</></A></LI>
+<LI><A HREF="#4_1">A.1 Terms</A></LI>
+<LI><A HREF="#4_2">A.2 Acronyms</A></LI>
 </UL>
 <HR>
-<H1><A NAME="1">1 </>Scope</></A></H1>
-<H2><A NAME="1_1">1.1 </>Identification</></A></H2>
- This </>software </>design </>description </>document </>provides </>
-general </>information </> on </>the </>architecture </>and </>coding </>
-of </>the </>Common </>UNIX </>Printing </>System </> (&quot;CUPS&quot;) </>
-Version </>1.1. </>
-<H2><A NAME="1_2">1.2 </>System </>Overview</></A></H2>
-<P>CUPS </>provides </>a </>portable </>printing </>layer </>for </>
-UNIX&reg;-based </>operating </>systems. </>It </>has </>been </>developed </>
-by </><A HREF="http://www.easysw.com">Easy </>Software </>Products</></A>
- to </>promote </>a </>standard </>printing </>solution </>for </>all </>
-UNIX </>vendors </>and </>users. </>CUPS </>provides </>the </>System </>
-V </>and </>Berkeley </>command-line </>interfaces. </></P>
-<P>CUPS </>uses </>the </>Internet </>Printing </>Protocol </>(&quot;IPP&quot;) </>
-as </>the </>basis </>for </>managing </>print </>jobs </>and </>
-queues. </>The </>Line </>Printer </>Daemon </>(&quot;LPD&quot;) </>Server </>
-Message </>Block </>(&quot;SMB&quot;), </>and </>AppSocket </>(a.k.a. </>
-JetDirect) </>protocols </>are </>also </>supported </>with </>reduced </>
-functionality. </>CUPS </>adds </>network </>printer </>browsing </>and </>
-PostScript </>Printer </>Description </>(&quot;PPD&quot;) </>based </>printing </>
-options </>to </>support </>real-world </>printing </>under </>UNIX. </></P>
-<P>CUPS </>also </>includes </>a </>customized </>version </>of </>GNU </>
-Ghostscript </>(currently </>based </>off </>GNU </>Ghostscript </>
-5.50) </>and </>an </>image </>file </>RIP </>that </>are </>used </>to </>
-support </>non-PostScript </>printers. </>Sample </>drivers </>for </>
-HP </>and </>EPSON </>printers </>are </>included </>that </>use </>
-these </>filters. </></P>
-<H2><A NAME="1_3">1.3 </>Document </>Overview</></A></H2>
- This </>software </>design </>description </>document </>is </>
-organized </>into </>the </> following </>sections: </>
+<H1><A NAME="1">1 Scope</A></H1>
+<H2><A NAME="1_1">1.1 Identification</A></H2>
+ This software design description document provides general information 
+ on the architecture and coding of the Common UNIX Printing System 
+ (&quot;CUPS&quot;) Version 1.1. 
+<H2><A NAME="1_2">1.2 System Overview</A></H2>
+<P>CUPS provides a portable printing layer for UNIX&reg;-based operating 
+systems. It has been developed by <A HREF="http://www.easysw.com">Easy 
+Software Products</A> to promote a standard printing solution for all 
+UNIX vendors and users. CUPS provides the System V and Berkeley 
+command-line interfaces. </P>
+<P>CUPS uses the Internet Printing Protocol (&quot;IPP&quot;) as the basis for 
+managing print jobs and queues. The Line Printer Daemon (&quot;LPD&quot;) Server 
+Message Block (&quot;SMB&quot;), and AppSocket (a.k.a. JetDirect) protocols are 
+also supported with reduced functionality. CUPS adds network printer 
+browsing and PostScript Printer Description (&quot;PPD&quot;) based printing 
+options to support real-world printing under UNIX. </P>
+<P>CUPS also includes a customized version of GNU Ghostscript 
+(currently based off GNU Ghostscript 5.50) and an image file RIP that 
+are used to support non-PostScript printers. Sample drivers for HP and 
+EPSON printers are included that use these filters. </P>
+<H2><A NAME="1_3">1.3 Document Overview</A></H2>
+ This software design description document is organized into the 
+ following sections: 
 <UL>
-<LI>1 </>- </>Scope </></LI>
-<LI>2 </>- </>References </></LI>
-<LI>3 </>- </>Design </>Overview </></LI>
-<LI>A </>- </>Glossary </></LI>
+<LI>1 - Scope </LI>
+<LI>2 - References </LI>
+<LI>3 - Design Overview </LI>
+<LI>A - Glossary </LI>
 </UL>
-<H1><A NAME="2">2 </>References</></A></H1>
-<H2><A NAME="2_1">2.1 </>CUPS </>Documentation</></A></H2>
-<P>The </>following </>CUPS </>documentation </>is </>referenced </>by </>
-this </>document: </></P>
+<H1><A NAME="2">2 References</A></H1>
+<H2><A NAME="2_1">2.1 CUPS Documentation</A></H2>
+<P>The following CUPS documentation is referenced by this document: </P>
 <UL>
-<LI>CUPS-CMP-1.1: </>CUPS </>Configuration </>Management </>Plan </></LI>
-<LI>CUPS-IDD-1.1: </>CUPS </>System </>Interface </>Design </>
-Description </></LI>
-<LI>CUPS-IPP-1.1: </>CUPS </>Implementation </>of </>IPP </></LI>
-<LI>CUPS-SAM-1.1.x: </>CUPS </>Software </>Administrators </>Manual </></LI>
-<LI>CUPS-SDD-1.1: </>CUPS </>Software </>Design </>Description </></LI>
-<LI>CUPS-SPM-1.1.x: </>CUPS </>Software </>Programming </>Manual </></LI>
-<LI>CUPS-SSR-1.1: </>CUPS </>Software </>Security </>Report </></LI>
-<LI>CUPS-STP-1.1: </>CUPS </>Software </>Test </>Plan </></LI>
-<LI>CUPS-SUM-1.1.x: </>CUPS </>Software </>Users </>Manual </></LI>
-<LI>CUPS-SVD-1.1: </>CUPS </>Software </>Version </>Description </></LI>
+<LI>CUPS-CMP-1.1: CUPS Configuration Management Plan </LI>
+<LI>CUPS-IDD-1.1: CUPS System Interface Design Description </LI>
+<LI>CUPS-IPP-1.1: CUPS Implementation of IPP </LI>
+<LI>CUPS-SAM-1.1.x: CUPS Software Administrators Manual </LI>
+<LI>CUPS-SDD-1.1: CUPS Software Design Description </LI>
+<LI>CUPS-SPM-1.1.x: CUPS Software Programming Manual </LI>
+<LI>CUPS-SSR-1.1: CUPS Software Security Report </LI>
+<LI>CUPS-STP-1.1: CUPS Software Test Plan </LI>
+<LI>CUPS-SUM-1.1.x: CUPS Software Users Manual </LI>
+<LI>CUPS-SVD-1.1: CUPS Software Version Description </LI>
 </UL>
-<H2><A NAME="2_2">2.2 </>Other </>Documents</></A></H2>
-<P>The </>following </>non-CUPS </>documents </>are </>referenced </>by </>
-this </>document: </></P>
+<H2><A NAME="2_2">2.2 Other Documents</A></H2>
+<P>The following non-CUPS documents are referenced by this document: </P>
 <UL>
 <LI><A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/5003.PPD_Spec_v4.3.pdf">
-Adobe </> PostScript </>Printer </>Description </>File </>Format </>
-Specification, </> Version </>4.3.</></A></LI>
+Adobe  PostScript Printer Description File Format Specification, 
+ Version 4.3.</A></LI>
 <LI><A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/PLRM.pdf">
-Adobe </> PostScript </>Language </>Reference, </>Third </>Edition.</></A>
-</LI>
-<LI>IPP: </>Job </>and </>Printer </>Set </>Operations </></LI>
-<LI>IPP/1.1: </>Encoding </>and </>Transport </></LI>
-<LI>IPP/1.1: </>Implementers </>Guide </></LI>
-<LI>IPP/1.1: </>Model </>and </>Semantics </></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc1179.txt">RFC </>1179, </>Line </>
-Printer </>Daemon </>Protocol</></A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2567.txt">RFC </>2567, </>
-Design </>Goals </>for </>an </>Internet </>Printing </>Protocol</></A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2568.txt">RFC </>2568, </>
-Rationale </>for </>the </>Structure </>of </>the </>Model </>and </>
-Protocol</></A> for </>the </>Internet </>Printing </>Protocol</></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2569.txt">RFC </>2569, </>
-Mapping </>between </>LPD </>and </>IPP </>Protocols</></A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2616.txt">RFC </>2616, </>
-Hypertext </>Transfer </>Protocol </>-- </>HTTP/1.1</></A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2617.txt">RFC </>2617, </>HTTP </>
-Authentication: </>Basic </>and </>Digest </>Access</></A>
- Authentication </></LI>
+Adobe  PostScript Language Reference, Third Edition.</A></LI>
+<LI>IPP: Job and Printer Set Operations </LI>
+<LI>IPP/1.1: Encoding and Transport </LI>
+<LI>IPP/1.1: Implementers Guide </LI>
+<LI>IPP/1.1: Model and Semantics </LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc1179.txt">RFC 1179, Line 
+Printer Daemon Protocol</A></LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc2567.txt">RFC 2567, Design 
+Goals for an Internet Printing Protocol</A></LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc2568.txt">RFC 2568, Rationale 
+for the Structure of the Model and Protocol</A> for the Internet 
+Printing Protocol</LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc2569.txt">RFC 2569, Mapping 
+between LPD and IPP Protocols</A></LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616, Hypertext 
+Transfer Protocol -- HTTP/1.1</A></LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617, HTTP 
+Authentication: Basic and Digest Access</A> Authentication </LI>
 </UL>
-<H1><A NAME="3">3 </>Design </>Overview</></A></H1>
- CUPS </>is </>composed </>of </>9 </>software </>sub-systems </>that </>
-operate </>together </>to </> perform </>common </>printing </>tasks: </>
+<H1><A NAME="3">3 Design Overview</A></H1>
+ CUPS is composed of 9 software sub-systems that operate together to 
+ perform common printing tasks: 
 <UL>
-<LI>Backends </></LI>
-<LI>Berkeley </>Commands </></LI>
-<LI>CGI </></LI>
-<LI>CUPS </>Application </>Programmers </>Interface </></LI>
-<LI>CUPS </>Imaging </>Library </></LI>
-<LI>Daemons </></LI>
-<LI>Filters </></LI>
-<LI>Scheduler </></LI>
-<LI>System </>V </>Commands </></LI>
+<LI>Backends </LI>
+<LI>Berkeley Commands </LI>
+<LI>CGI </LI>
+<LI>CUPS Application Programmers Interface </LI>
+<LI>CUPS Imaging Library </LI>
+<LI>Daemons </LI>
+<LI>Filters </LI>
+<LI>Scheduler </LI>
+<LI>System V Commands </LI>
 </UL>
-<H2><A NAME="3_1">3.1 </>Backends</></A></H2>
- The </>backends </>implement </>communications </>over </>a </>number </>
-of </>different </>interfaces. </>All </>backends </>are </>called </>
-with </>a </>common </>set </>of </>arguments: </>
+<H2><A NAME="3_1">3.1 Backends</A></H2>
+ The backends implement communications over a number of different 
+interfaces. All backends are called with a common set of arguments: 
 <UL>
-<LI>Device </>URI </>- </>the </>Uniform </>Resource </>Identifier </>
-for </>the </>output </>device </> (e.g. </><CODE>parallel:/dev/plp</></CODE>
-, </><CODE> ipp://hostname/resource</></CODE>). </></LI>
-<LI>Job </>Identifier </>- </>the </>job </>identifier </>for </>this </>
-job </>(integer). </></LI>
-<LI>User </>Name </>- </>the </>user </>associated </>with </>this </>
-job </>(name </>string). </></LI>
-<LI>Title </>- </>the </>title/job-name </>associated </>with </>this </>
-job </>(name </>string). </></LI>
-<LI>Copies </>- </>the </>number </>of </>copies </>required </>
-(integer). </></LI>
-<LI>Options </>- </>the </>options </>associated </>with </>this </>job </>
-(space </>separated </> option </>strings). </></LI>
-<LI>Filename </>(optional) </>- </>the </>file </>to </>print; </>if </>
-this </>option </>is </>not </> specified, </>the </>backend </>must </>
-read </>the </>print </>file </>from </>the </>standard </> input. </></LI>
+<LI>Device URI - the Uniform Resource Identifier for the output device 
+ (e.g. <CODE>parallel:/dev/plp</CODE>, <CODE> ipp://hostname/resource</CODE>
+). </LI>
+<LI>Job Identifier - the job identifier for this job (integer). </LI>
+<LI>User Name - the user associated with this job (name string). </LI>
+<LI>Title - the title/job-name associated with this job (name string). </LI>
+<LI>Copies - the number of copies required (integer). </LI>
+<LI>Options - the options associated with this job (space separated 
+ option strings). </LI>
+<LI>Filename (optional) - the file to print; if this option is not 
+ specified, the backend must read the print file from the standard 
+ input. </LI>
 </UL>
-<P>Backends </>are </>named </>using </>the </>scheme </>of </>the </>
-URI, </>so </>a </>URI </>of </>&quot;ipp://hostname/resource&quot; </>would </>
-be </>processed </>by </>the </>&quot;ipp&quot; </>backend. </></P>
-<H3><A NAME="3_1_1">3.1.1 </>ipp</></A></H3>
-<P>The </>ipp </>backend </>sends </>the </>specified </>job </>to </>a </>
-network </>printer </>or </>host </>using </>the </>Internet </>
-Printing </>Protocol. </> The </>URI </>is </>as </>specified </>by </>
-the </><CODE>printer-uri-supported</></CODE> attribute </>from </>the </>
-printer </>or </>host. </></P>
-<H3><A NAME="3_1_2">3.1.2 </>lpd</></A></H3>
-<P>The </>lpd </>backend </>sends </>the </>specified </>job </>to </>a </>
-network </>printer </>or </>host </>using </>the </>Line </>Printer </>
-Daemon </>protocol. </> The </>URI </>is </>of </>the </>form: </></P>
+<P>Backends are named using the scheme of the URI, so a URI of 
+&quot;ipp://hostname/resource&quot; would be processed by the &quot;ipp&quot; backend. </P>
+<H3><A NAME="3_1_1">3.1.1 ipp</A></H3>
+<P>The ipp backend sends the specified job to a network printer or host 
+using the Internet Printing Protocol.  The URI is as specified by the <CODE>
+printer-uri-supported</CODE> attribute from the printer or host. </P>
+<H3><A NAME="3_1_2">3.1.2 lpd</A></H3>
+<P>The lpd backend sends the specified job to a network printer or host 
+using the Line Printer Daemon protocol.  The URI is of the form: </P>
 <UL>
 <PRE>lpd://hostname/queue
-</></PRE>
+</PRE>
 </UL>
-<H3><A NAME="3_1_3">3.1.3 </>parallel</></A></H3>
-<P>The </>parallel </>backend </>sends </>the </>specified </>job </>to </>
-a </>local </>printer </>connected </>via </>the </>specified </>
-parallel </>port </>device. </> The </>URI </>is </>of </>the </>form: </>
-</P>
+<H3><A NAME="3_1_3">3.1.3 parallel</A></H3>
+<P>The parallel backend sends the specified job to a local printer 
+connected via the specified parallel port device.  The URI is of the 
+form: </P>
 <UL>
 <PRE>parallel:/dev/file
-</></PRE>
+</PRE>
 </UL>
-<H3><A NAME="3_1_4">3.1.4 </>serial</></A></H3>
-<P>The </>serial </>backend </>sends </>the </>specified </>job </>to </>
-a </>local </>printer </>connected </>via </>the </>specified </>serial </>
-port </>device. </> The </>URI </>is </>of </>the </>form: </></P>
+<H3><A NAME="3_1_4">3.1.4 serial</A></H3>
+<P>The serial backend sends the specified job to a local printer 
+connected via the specified serial port device.  The URI is of the 
+form: </P>
 <UL>
 <PRE>serial:/dev/file?option[+option+...]
-</></PRE>
+</PRE>
 </UL>
- The </>options </>can </>be </>any </>combination </>of </>the </>
-following: </>
+ The options can be any combination of the following: 
 <UL>
-<LI><CODE>baud=</><I>rate</></I></CODE> - </>Sets </>the </>baud </>
-rate </>for </>the </>device. </></LI>
-<LI><CODE>bits=</><I>7 </>or </>8</></I></CODE> - </>Sets </>the </>
-number </>of </>data </>bits. </></LI>
-<LI><CODE>parity=</><I>even</></I></CODE> - </>Sets </>even </>parity </>
-checking. </></LI>
-<LI><CODE>parity=</><I>odd</></I></CODE> - </>Sets </>odd </>parity </>
-checking. </></LI>
-<LI><CODE>parity=</><I>none</></I></CODE> - </>Turns </>parity </>
-checking </>off. </></LI>
-<LI><CODE>flow=dtrdsr</><I></I></CODE> - </>Turns </>DTR/DSR </>
-(hardware) </>flow </> control </>on. </></LI>
-<LI><CODE>flow=hard</><I></I></CODE> - </>Turns </>RTS/CTS </>
- (hardware) </>flow </>control </>on. </></LI>
-<LI><CODE>flow=none</><I></I></CODE> - </>Turns </>flow </>control </>
-off. </></LI>
-<LI><CODE>flow=rtscts</><I></I></CODE> - </>Turns </>RTS/CTS </>
- (hardware) </>flow </>control </>on. </></LI>
-<LI><CODE>flow=xonxoff</><I></I></CODE> - </>Turns </>XON/XOFF </>
- (software) </>flow </>control </>on. </></LI>
+<LI><CODE>baud=<I>rate</I></CODE> - Sets the baud rate for the device. </LI>
+<LI><CODE>bits=<I>7 or 8</I></CODE> - Sets the number of data bits. </LI>
+<LI><CODE>parity=<I>even</I></CODE> - Sets even parity checking. </LI>
+<LI><CODE>parity=<I>odd</I></CODE> - Sets odd parity checking. </LI>
+<LI><CODE>parity=<I>none</I></CODE> - Turns parity checking off. </LI>
+<LI><CODE>flow=dtrdsr<I></I></CODE> - Turns DTR/DSR (hardware) flow 
+ control on. </LI>
+<LI><CODE>flow=hard<I></I></CODE> - Turns RTS/CTS  (hardware) flow 
+control on. </LI>
+<LI><CODE>flow=none<I></I></CODE> - Turns flow control off. </LI>
+<LI><CODE>flow=rtscts<I></I></CODE> - Turns RTS/CTS  (hardware) flow 
+control on. </LI>
+<LI><CODE>flow=xonxoff<I></I></CODE> - Turns XON/XOFF  (software) flow 
+control on. </LI>
 </UL>
-<H3><A NAME="3_1_5">3.1.5 </>socket</></A></H3>
-<P>The </>socket </>backend </>sends </>the </>specified </>job </>to </>
-a </>network </>host </>using </>the </>AppSocket </>protocol </>
-commonly </>used </>by </>Hewlett-Packard </>and </>Tektronix </>
-printers. </> The </>URI </>is </>of </>the </>form: </></P>
+<H3><A NAME="3_1_5">3.1.5 socket</A></H3>
+<P>The socket backend sends the specified job to a network host using 
+the AppSocket protocol commonly used by Hewlett-Packard and Tektronix 
+printers.  The URI is of the form: </P>
 <UL>
 <PRE>socket://hostname[:port]
-</></PRE>
+</PRE>
 </UL>
- The </>default </>port </>number </>is </>9100. </>
-<H3><A NAME="3_1_6">3.1.6 </>usb</></A></H3>
-<P>The </>usb </>backend </>sends </>the </>specified </>job </>to </>a </>
-local </>printer </>connected </>via </>the </>specified </>usb </>port </>
-device. </> The </>URI </>is </>of </>the </>form: </></P>
+ The default port number is 9100. 
+<H3><A NAME="3_1_6">3.1.6 usb</A></H3>
+<P>The usb backend sends the specified job to a local printer connected 
+via the specified usb port device.  The URI is of the form: </P>
 <UL>
 <PRE>usb:/dev/file
-</></PRE>
+</PRE>
 </UL>
-<H2><A NAME="3_2">3.2 </>Berkeley </>Commands</></A></H2>
-<P>The </>Berkeley </>commands </>provide </>a </>simple </>
-command-line </>interface </>to </>CUPS </>to </>submit </>and </>
-control </>print </>jobs. </>It </>is </>provided </>for </>
-compatibility </>with </>existing </>software </>that </>is </>
-hardcoded </>to </>use </>the </>Berkeley </>commands. </></P>
-<H3><A NAME="3_2_1">3.2.1 </>lpc</></A></H3>
- The </>lpc </>command </>allows </>users </>and </>administrators </>
-to </>check </>the </>status </>and </>control </>print </>queues. </>
- The </>version </>provided </>with </>CUPS </>supports </>the </>
-following </>commands: </>
+<H2><A NAME="3_2">3.2 Berkeley Commands</A></H2>
+<P>The Berkeley commands provide a simple command-line interface to 
+CUPS to submit and control print jobs. It is provided for compatibility 
+with existing software that is hardcoded to use the Berkeley commands. </P>
+<H3><A NAME="3_2_1">3.2.1 lpc</A></H3>
+ The lpc command allows users and administrators to check the status 
+and control print queues.  The version provided with CUPS supports the 
+following commands: 
 <UL>
-<LI>quit </>- </>Quits </>the </>lpc </>command. </></LI>
-<LI>status </>- </>Shows </>the </>status </>of </>printers </>and </>
-jobs </>in </>the </>queue. </></LI>
+<LI>quit - Quits the lpc command. </LI>
+<LI>status - Shows the status of printers and jobs in the queue. </LI>
 </UL>
-<H3><A NAME="3_2_2">3.2.2 </>lpq</></A></H3>
-<P>The </>lpq </>command </>shows </>the </>current </>queue </>status. </>
-</P>
-<H3><A NAME="3_2_3">3.2.3 </>lpr</></A></H3>
-<P>The </>lpr </>command </>submits </>a </>job </>for </>printing. </>
- The </>CUPS </>version </>of </>lpr </>silently </>ignores </>the </>
-&quot;i&quot;, </>&quot;t&quot;, </>&quot;m&quot;, </>&quot;h&quot;, </>and </>&quot;s&quot; </>options. </></P>
-<H3><A NAME="3_2_4">3.2.4 </>lprm</></A></H3>
-<P>The </>lprm </>removes </>one </>or </>more </>print </>jobs. </></P>
-<H2><A NAME="3_3">3.3 </>CGI</></A></H2>
-<P>The </>Common </>Gateway </>Interface </>(CGI) </>programs </>
-provide </>a </>web-based </>status </>interface </>to </>monitor </>
-the </>status </>of </>printers, </>classes, </>and </>jobs. </>Each </>
-of </>the </>CGIs </>utilize </>HTML </>template </>files </>that </>
-can </>be </>customized </>to </>provide </>alternate </>appearances. </>
-</P>
-<H3><A NAME="3_3_1">3.3.1 </>admin.cgi</></A></H3>
-<P>The </>admin </>CGI </>provides </>administration </>interfaces </>
-for </>printers </>and </>classes. </>The </>user </>can </>add, </>
-modify, </>delete, </>start, </>stop, </>and </>configure </>printers </>
-and </>classes </>using </>&quot;wizard&quot; </>interfaces. </></P>
-<H3><A NAME="3_3_2">3.3.2 </>classes.cgi</></A></H3>
-<P>The </>classes </>CGI </>lists </>the </>available </>printer </>
-classes </>and </>any </>pending </>jobs </>for </>the </>class. </>
- The </>user </>can </>click </>on </>individual </>classes </>to </>
-limit </>the </>display </>and </>click </>on </>jobs </>to </>see </>
-the </>job </>status. </></P>
-<H3><A NAME="3_3_3">3.3.3 </>jobs.cgi</></A></H3>
-<P>The </>jobs </>CGI </>lists </>the </>queued </>print </>jobs </>in </>
-order </>of </>priority. </> The </>list </>can </>be </>limited </>by </>
-printer </>or </>job. </></P>
-<H3><A NAME="3_3_4">3.3.4 </>printers.cgi</></A></H3>
-<P>The </>printers </>CGI </>lists </>the </>available </>printer </>
-queues </>and </>any </>pending </>jobs </>for </>the </>printer. </>
- The </>user </>can </>click </>on </>individual </>printers </>to </>
-limit </>the </>display </>and </>click </>on </>jobs </>to </>see </>
-the </>job </>status. </></P>
-<H2><A NAME="3_4">3.4 </>CUPS </>Application </>Programmers </>Interface</>
-</A></H2>
-<P>The </>CUPS </>Application </>Programmers </>Interface </>(&quot;API&quot;) </>
-provides </>common </>convenience, </>HTTP, </>IPP, </>language, </>and </>
-PPD </>functions </>used </>by </>the </>CUPS </>software. </></P>
-<H3><A NAME="3_4_1">3.4.1 </>Convenience </>Functions</></A></H3>
-<P>Convenience </>functions </>are </>provided </>to </>submit </>an </>
-IPP </>request, </>send </>a </>print </>file, </>cancel </>a </>job, </>
-get </>a </>list </>of </>available </>printers, </>get </>a </>list </>
-of </>available </>classes, </>get </>the </>default </>printer </>or </>
-class, </>get </>the </>default </>server </>name, </>get </>the </>
-local </>username, </>and </>get </>a </>password </>string. </></P>
-<H3><A NAME="3_4_2">3.4.2 </>HTTP </>Functions</></A></H3>
-<P>The </>HTTP </>functions </>provide </>functions </>to </>connect </>
-to </>HTTP </>servers, </>issue </>requests, </>read </>data </>from </>
-a </>server, </>and </>write </>data </>to </>a </>server. </></P>
-<H3><A NAME="3_4_3">3.4.3 </>IPP </>Functions</></A></H3>
-<P>The </>IPP </>function </>provide </>functions </>to </>manage </>
-IPP </>request </>data </>and </>attributes, </>read </>IPP </>
-responses </>from </>a </>server, </>and </>write </>IPP </>requests </>
-to </>a </>server. </></P>
-<H3><A NAME="3_4_4">3.4.4 </>Language </>Functions</></A></H3>
-<P>The </>language </>functions </>provide </>a </>standard </>
-interface </>for </>retrieving </>common </>textual </>messages </>for </>
-a </>particular </>locale </>and </>determining </>the </>correct </>
-encoding </>(e.g. </>US </>ASCII, </>UTF-8, </>ISO-8859-1, </>etc.) </></P>
-<H3><A NAME="3_4_5">3.4.5 </>PPD </>Functions</></A></H3>
-<P>The </>PostScript </>Printer </>Description </>functions </>manage </>
-PPD </>files, </>select </>options, </>check </>for </>option </>
-conflicts, </>and </>emit </>selected </>options </>in </>the </>
-correct </>order. </></P>
-<H2><A NAME="3_5">3.5 </>CUPS </>Imaging </>Library</></A></H2>
-<P>The </>CUPS </>imaging </>library </>provides </>colorspace </>
-conversion, </>color </>management, </>image </>management, </>scaling, </>
-image </>file, </>and </>raster </>functions </>used </>by </>the </>
-CUPS </>raster </>filters. </></P>
-<H3><A NAME="3_5_1">3.5.1 </>Colorspace </>Conversion </>Functions</></A>
-</H3>
-<P>The </>colorspace </>conversion </>functions </>handle </>conversion </>
-of </>grayscale </>and </>RGB </>colors </>to </>grayscale, </>RGB, </>
-K, </>CMY, </>CMYK, </>and </>CMYKcm </>colorspaces. </></P>
-<H3><A NAME="3_5_2">3.5.2 </>Color </>Management </>Functions</></A></H3>
-<P>The </>color </>management </>functions </>handle </>gamut </>
-mapping </>and </>density </>correction. </>These </>are </>integrated </>
-with </>the </>colorspace </>conversion </>functions </>so </>that </>
-colorspace </>conversion </>and </>color </>management </>are </>
-processed </>in </>a </>single </>step. </></P>
-<H3><A NAME="3_5_3">3.5.3 </>Image </>Management </>Functions</></A></H3>
-<P>The </>image </>management </>functions </>manage </>a </>tiled </>
-image </>database </>that </>is </>swapped </>to/from </>disk </>as </>
-needed. </></P>
-<H3><A NAME="3_5_4">3.5.4 </>Scaling </>Functions</></A></H3>
-<P>The </>scaling </>functions </>provide </>image </>scaling </>
-services </>using </>nearest-neighbor </>sampling </>and </>bilinear </>
-interpolation </>as </>appropriate. </></P>
-<H3><A NAME="3_5_5">3.5.5 </>Image </>File </>Functions</></A></H3>
-<P>The </>image </>file </>functions </>handle </>loading </>of </>all </>
-image </>file </>formats. </></P>
-<H3><A NAME="3_5_6">3.5.6 </>Raster </>Functions</></A></H3>
-<P>The </>raster </>functions </>manage </>streams </>of </>CUPS </>
-raster </>data </>(described </>in </>the </>Interface </>Design </>
-Document) </>used </>by </>non-PostScript </>printer </>drivers </>and </>
-raster </>filters. </></P>
-<H2><A NAME="3_6">3.6 </>Daemons</></A></H2>
-<P>The </>daemons </>provide </>additional </>network </>functions </>
-for </>the </>scheduler. </>Currently </>only </>two </>daemons </>are </>
-provided </>with </>CUPS. </></P>
-<H3><A NAME="3_6_1">3.6.1 </>Line </>Printer </>Daemon</></A></H3>
-<P>The </>line </>printer </>daemon </>provides </>remote </>LPD </>
-client </>support </>and </>is </>run </>by </>the </><CODE>inetd(8)</></CODE>
- daemon </>as </>needed. </></P>
-<H3><A NAME="3_6_2">3.6.2 </>Polling </>Daemon</></A></H3>
-<P>The </>polling </>daemon </>is </>used </>to </>poll </>a </>remote </>
-server </>for </>a </>list </>of </>available </>printers </>and </>
-provide </>it </>to </>the </>scheduler </>for </>addition. </>A </>
-separate </>polling </>daemon </>is </>run </>by </>the </>scheduler </>
-for </>every </>remote </>system </>listed </>for </>polling </>in </>
-the </>scheduler </>configuration </>file. </></P>
-<H2><A NAME="3_7">3.7 </>Filters</></A></H2>
-<P>The </>filters </>implement </>file </>conversion </>services </>for </>
-CUPS. </>All </>filters </>are </>called </>with </>a </>common </>set </>
-of </>arguments: </></P>
+<H3><A NAME="3_2_2">3.2.2 lpq</A></H3>
+<P>The lpq command shows the current queue status. </P>
+<H3><A NAME="3_2_3">3.2.3 lpr</A></H3>
+<P>The lpr command submits a job for printing.  The CUPS version of lpr 
+silently ignores the &quot;i&quot;, &quot;t&quot;, &quot;m&quot;, &quot;h&quot;, and &quot;s&quot; options. </P>
+<H3><A NAME="3_2_4">3.2.4 lprm</A></H3>
+<P>The lprm removes one or more print jobs. </P>
+<H2><A NAME="3_3">3.3 CGI</A></H2>
+<P>The Common Gateway Interface (CGI) programs provide a web-based 
+status interface to monitor the status of printers, classes, and jobs. 
+Each of the CGIs utilize HTML template files that can be customized to 
+provide alternate appearances. </P>
+<H3><A NAME="3_3_1">3.3.1 admin.cgi</A></H3>
+<P>The admin CGI provides administration interfaces for printers and 
+classes. The user can add, modify, delete, start, stop, and configure 
+printers and classes using &quot;wizard&quot; interfaces. </P>
+<H3><A NAME="3_3_2">3.3.2 classes.cgi</A></H3>
+<P>The classes CGI lists the available printer classes and any pending 
+jobs for the class.  The user can click on individual classes to limit 
+the display and click on jobs to see the job status. </P>
+<H3><A NAME="3_3_3">3.3.3 jobs.cgi</A></H3>
+<P>The jobs CGI lists the queued print jobs in order of priority.  The 
+list can be limited by printer or job. </P>
+<H3><A NAME="3_3_4">3.3.4 printers.cgi</A></H3>
+<P>The printers CGI lists the available printer queues and any pending 
+jobs for the printer.  The user can click on individual printers to 
+limit the display and click on jobs to see the job status. </P>
+<H2><A NAME="3_4">3.4 CUPS Application Programmers Interface</A></H2>
+<P>The CUPS Application Programmers Interface (&quot;API&quot;) provides common 
+convenience, HTTP, IPP, language, and PPD functions used by the CUPS 
+software. </P>
+<H3><A NAME="3_4_1">3.4.1 Convenience Functions</A></H3>
+<P>Convenience functions are provided to submit an IPP request, send a 
+print file, cancel a job, get a list of available printers, get a list 
+of available classes, get the default printer or class, get the default 
+server name, get the local username, and get a password string. </P>
+<H3><A NAME="3_4_2">3.4.2 HTTP Functions</A></H3>
+<P>The HTTP functions provide functions to connect to HTTP servers, 
+issue requests, read data from a server, and write data to a server. </P>
+<H3><A NAME="3_4_3">3.4.3 IPP Functions</A></H3>
+<P>The IPP function provide functions to manage IPP request data and 
+attributes, read IPP responses from a server, and write IPP requests to 
+a server. </P>
+<H3><A NAME="3_4_4">3.4.4 Language Functions</A></H3>
+<P>The language functions provide a standard interface for retrieving 
+common textual messages for a particular locale and determining the 
+correct encoding (e.g. US ASCII, UTF-8, ISO-8859-1, etc.) </P>
+<H3><A NAME="3_4_5">3.4.5 PPD Functions</A></H3>
+<P>The PostScript Printer Description functions manage PPD files, 
+select options, check for option conflicts, and emit selected options 
+in the correct order. </P>
+<H2><A NAME="3_5">3.5 CUPS Imaging Library</A></H2>
+<P>The CUPS imaging library provides colorspace conversion, color 
+management, image management, scaling, image file, and raster functions 
+used by the CUPS raster filters. </P>
+<H3><A NAME="3_5_1">3.5.1 Colorspace Conversion Functions</A></H3>
+<P>The colorspace conversion functions handle conversion of grayscale 
+and RGB colors to grayscale, RGB, K, CMY, CMYK, and CMYKcm colorspaces. </P>
+<H3><A NAME="3_5_2">3.5.2 Color Management Functions</A></H3>
+<P>The color management functions handle gamut mapping and density 
+correction. These are integrated with the colorspace conversion 
+functions so that colorspace conversion and color management are 
+processed in a single step. </P>
+<H3><A NAME="3_5_3">3.5.3 Image Management Functions</A></H3>
+<P>The image management functions manage a tiled image database that is 
+swapped to/from disk as needed. </P>
+<H3><A NAME="3_5_4">3.5.4 Scaling Functions</A></H3>
+<P>The scaling functions provide image scaling services using 
+nearest-neighbor sampling and bilinear interpolation as appropriate. </P>
+<H3><A NAME="3_5_5">3.5.5 Image File Functions</A></H3>
+<P>The image file functions handle loading of all image file formats. </P>
+<H3><A NAME="3_5_6">3.5.6 Raster Functions</A></H3>
+<P>The raster functions manage streams of CUPS raster data (described 
+in the Interface Design Document) used by non-PostScript printer 
+drivers and raster filters. </P>
+<H2><A NAME="3_6">3.6 Daemons</A></H2>
+<P>The daemons provide additional network functions for the scheduler. 
+Currently only two daemons are provided with CUPS. </P>
+<H3><A NAME="3_6_1">3.6.1 Line Printer Daemon</A></H3>
+<P>The line printer daemon provides remote LPD client support and is 
+run by the <CODE>inetd(8)</CODE> daemon as needed. </P>
+<H3><A NAME="3_6_2">3.6.2 Polling Daemon</A></H3>
+<P>The polling daemon is used to poll a remote server for a list of 
+available printers and provide it to the scheduler for addition. A 
+separate polling daemon is run by the scheduler for every remote system 
+listed for polling in the scheduler configuration file. </P>
+<H2><A NAME="3_7">3.7 Filters</A></H2>
+<P>The filters implement file conversion services for CUPS. All filters 
+are called with a common set of arguments: </P>
 <UL>
-<LI>Printer </>name </>- </>the </>name </>of </>the </>destination </>
-printer </>(name </>string). </></LI>
-<LI>Job </>Identifier </>- </>the </>job </>identifier </>for </>this </>
-job </>(integer). </></LI>
-<LI>User </>Name </>- </>the </>user </>associated </>with </>this </>
-job </>(name </>string). </></LI>
-<LI>Title </>- </>the </>title/job-name </>associated </>with </>this </>
-job </>(name </>string). </></LI>
-<LI>Copies </>- </>the </>number </>of </>copies </>required </>
-(integer). </></LI>
-<LI>Options </>- </>the </>options </>associated </>with </>this </>job </>
-(space </>separated </> option </>strings). </></LI>
-<LI>Filename </>(optional) </>- </>the </>file </>to </>print; </>if </>
-this </>option </>is </>not </> specified, </>the </>filter </>must </>
-read </>the </>input </>file </>from </>the </>standard </> input. </></LI>
+<LI>Printer name - the name of the destination printer (name string). </LI>
+<LI>Job Identifier - the job identifier for this job (integer). </LI>
+<LI>User Name - the user associated with this job (name string). </LI>
+<LI>Title - the title/job-name associated with this job (name string). </LI>
+<LI>Copies - the number of copies required (integer). </LI>
+<LI>Options - the options associated with this job (space separated 
+ option strings). </LI>
+<LI>Filename (optional) - the file to print; if this option is not 
+ specified, the filter must read the input file from the standard 
+ input. </LI>
 </UL>
-<P>Filters </>are </>added </>to </>the </>MIME </>conversion </>data </>
-file </>and </>implement </>all </>necessary </>conversions </>from </>
-one </>file </>type </>to </>another. </></P>
-<H3><A NAME="3_7_1">3.7.1 </>hpgltops</></A></H3>
-<P>The </>hpgltops </>filter </>converts </>HP-GL/2 </>files </>into </>
-PostScript. </></P>
-<H3><A NAME="3_7_2">3.7.2 </>imagetops</></A></H3>
-<P>The </>imagetops </>filter </>converts </>image </>files </>into </>
-PostScript. </></P>
-<H3><A NAME="3_7_3">3.7.3 </>imagetoraster</></A></H3>
-<P>The </>imagetoraster </>filter </>converts </>image </>files </>into </>
-CUPS </>raster </>data. </></P>
-<H3><A NAME="3_7_4">3.7.4 </>pdftops</></A></H3>
-<P>The </>pdftops </>filter </>converts </>PDF </>files </>into </>
-PostScript. </></P>
-<H3><A NAME="3_7_5">3.7.5 </>pstops</></A></H3>
-<P>The </>pstops </>filter </>inserts </>printer-specific </>commands </>
-from </>PPD </>files </>and </>performs </>page </>filtering </>as </>
-requested </>by </>the </>user. </></P>
-<H3><A NAME="3_7_6">3.7.6 </>pstoraster</></A></H3>
-<P>The </>pstoraster </>filter </>converts </>PostScript </>program </>
-data </>into </>CUPS </>raster </>data. </></P>
-<H3><A NAME="3_7_7">3.7.7 </>rastertoepson</></A></H3>
-<P>The </>rastertoepson </>filter </>handles </>converting </>CUPS </>
-raster </>data </>to </>ESC/P </>and </>supports </>both </>color </>
-and </>black-and-white </>printers. </></P>
-<H3><A NAME="3_7_8">3.7.8 </>rastertohp</></A></H3>
-<P>The </>rastertohp </>filter </>handles </>converting </>CUPS </>
-raster </>data </>to </>HP-PCL </>and </>supports </>both </>color </>
-and </>black-and-white </>printers. </></P>
-<H3><A NAME="3_7_9">3.7.9 </>texttops</></A></H3>
-<P>The </>texttops </>filter </>converts </>text </>files </>into </>
-PostScript. </></P>
-<H2><A NAME="3_8">3.8 </>Scheduler</></A></H2>
-<P>The </>scheduler </>is </>a </>fully-functional </>HTTP/1.1 </>and </>
-IPP/1.1 </>server </>that </>manages </>the </>printers, </>classes, </>
-and </>jobs </>in </>the </>system. </> It </>also </>handles </>a </>
-simple </>broadcast-based </>directory </>service </>so </>that </>
-remote </>print </>queues </>and </>classes </>can </>be </>accessed </>
-transparently </>from </>the </>local </>system. </></P>
-<H3><A NAME="3_8_1">3.8.1 </>Authorization</></A></H3>
-<P>The </>authorization </>module </>is </>responsible </>for </>
-performing </>access </>control </>and </>authentication </>for </>all </>
-HTTP </>and </>IPP </>requests </>entering </>the </>system. </></P>
-<H3><A NAME="3_8_2">3.8.2 </>Classes</></A></H3>
-<P>The </>classes </>module </>is </>responsible </>for </>managing </>
-printer </>classes </>in </>the </>system. </>Each </>class </>is </>a </>
-collection </>of </>local </>and/or </>remote </>printers. </> The </>
-classes </>module </>also </>reads </>and </>writes </>the </>classes </>
-configuration </>file. </></P>
-<H3><A NAME="3_8_3">3.8.3 </>Client</></A></H3>
-<P>The </>client </>module </>is </>responsible </>for </>all </>HTTP </>
-client </>communications. </> It </>handles </>listening </>on </>
-selected </>interfaces, </>accepting </>connections </>from </>
-prospective </>clients, </>processing </>incoming </>HTTP </>requests, </>
-and </>sending </>HTTP </>responses </>to </>those </>requests. </> The </>
-client </>module </>also </>is </>responsible </>for </>executing </>
-the </>external </>CGI </>programs </>as </>needed </>to </>support </>
-web-based </>printer, </>class, </>and </>job </>status </>monitoring </>
-and </>administration. </></P>
-<P>Once </>authorized, </>all </>IPP </>requests </>are </>sent </>to </>
-the </>IPP </>module. </></P>
-<H3><A NAME="3_8_4">3.8.4 </>Configuration</></A></H3>
-<P>The </>configuration </>module </>is </>responsible </>for </>
-reading </>the </>CUPS </>configuration </>file </>and </>initializing </>
-the </>appropriate </>data </>structures </>and </>values. </> The </>
-configuration </>module </>also </>stops </>CUPS </>services </>before </>
-reading </>the </>configuration </>file </>and </>restarts </>them </>
-after </>the </>configuration </>file </>has </>been </>read. </></P>
-<H3><A NAME="3_8_5">3.8.5 </>Devices</></A></H3>
-<P>The </>devices </>module </>is </>responsible </>for </>managing </>
-the </>list </>of </>available </>devices </>for </>the </>
-CUPS-Get-Devices </>operation. </></P>
-<H3><A NAME="3_8_6">3.8.6 </>Directory </>Services</></A></H3>
-<P>The </>directory </>services </>module </>sends </>and </>recieves </>
-printer </>state </>information </>over </>a </>broadcast </>socket. </>
- Remote </>printers </>and </>classes </>are </>automatically </>added </>
-to </>or </>removed </>from </>the </>local </>printer </>and </>class </>
-lists </>as </>needed. </></P>
-<P>The </>directory </>services </>module </>can </>only </>recieve </>
-printer </>state </>information </>over </>a </>single </>UDP </>port, </>
-however </>it </>can </>broadcast </>to </>multiple </>addresses </>and </>
-ports </>as </>needed. </></P>
-<H3><A NAME="3_8_7">3.8.7 </>IPP</></A></H3>
-<P>The </>IPP </>module </>handles </>IPP </>requests </>and </>acts </>
-accordingly. </> URI </>validation </>is </>also </>performed </>here, </>
-as </>a </>client </>can </>post </>IPP </>data </>to </>any </>URI </>
-on </>the </>server </>which </>might </>sidestep </>the </>access </>
-control </>or </>authentication </>of </>the </>HTTP </>server. </></P>
-<H3><A NAME="3_8_8">3.8.8 </>Jobs</></A></H3>
-<P>The </>jobs </>module </>manages </>print </>jobs, </>starts </>
-filter </>and </>backend </>processes </>for </>jobs </>to </>be </>
-printed, </>and </>monitors </>status </>messages </>from </>those </>
-filters </>and </>backends. </></P>
-<H3><A NAME="3_8_9">3.8.9 </>Logging</></A></H3>
-<P>The </>logging </>module </>manages </>the </>access, </>error, </>
-and </>page </>log </>files </>that </>are </>generated </>by </>the </>
-scheduler. </></P>
-<H3><A NAME="3_8_10">3.8.10 </>Main</></A></H3>
-<P>The </>main </>module </>is </>responsible </>for </>timing </>out </>
-and </>dispatching </>input </>and </>output </>for </>client </>
-connections. </> It </>also </>watches </>for </>incoming </><CODE>
-SIGHUP</></CODE> and </><CODE>SIGCHLD</></CODE> signals, </>reloads </>
-the </>server </>configuration </>files </>as </>needed, </>and </>
-handles </>child </>process </>errors </>and </>exits. </></P>
-<H3><A NAME="3_8_11">3.8.11 </>MIME</></A></H3>
-<P>The </>Multimedia </>Internet </>Mail </>Exchange </>module </>
-manages </>a </>MIME </>type </>and </>conversion </>database </>that </>
-supports </>file </>typing </>by </>extension </>and </>content </>and </>
-least-cost </>file </>filtering </>from </>a </>source </>to </>a </>
-destination </>file </>type. </></P>
-<H3><A NAME="3_8_12">3.8.12 </>PPDs</></A></H3>
-<P>The </>PPDs </>module </>is </>responsible </>for </>managing </>the </>
-list </>of </>available </>PPD </>files </>for </>the </>CUPS-Get-PPDs </>
-operation. </></P>
-<H3><A NAME="3_8_13">3.8.13 </>Printers</></A></H3>
-<P>The </>printers </>module </>is </>responsible </>for </>managing </>
-printers </>and </>PPD </>files </>in </>the </>system. </>The </>
-printers </>module </>also </>reads </>and </>writes </>the </>printers </>
-configuration </>file. </></P>
-<H2><A NAME="3_9">3.9 </>System </>V </>Commands</></A></H2>
-<P>The </>System </>V </>commands </>provide </>a </>robust </>
-command-line </>interface </>to </>CUPS </>to </>submit </>and </>
-control </>printers </>and </>jobs. </></P>
-<H3><A NAME="3_9_1">3.9.1 </>accept</></A></H3>
-<P>The </>accept </>command </>tells </>the </>scheduler </>to </>
-accept </>new </>jobs </>for </>specific </>printers. </></P>
-<H3><A NAME="3_9_2">3.9.2 </>cancel</></A></H3>
-<P>The </>cancel </>command </>tells </>the </>scheduler </>to </>
-cancel </>one </>or </>more </>jobs </>that </>are </>queued </>for </>
-printing. </></P>
-<H3><A NAME="3_9_3">3.9.3 </>disable</></A></H3>
-<P>The </>disable </>command </>tells </>the </>scheduler </>to </>stop </>
-printing </>jobs </>on </>the </>specified </>printers. </></P>
-<H3><A NAME="3_9_4">3.9.4 </>enable</></A></H3>
-<P>The </>enable </>command </>tells </>the </>scheduler </>to </>start </>
-printing </>jobs </>on </>the </>specified </>printers. </></P>
-<H3><A NAME="3_9_5">3.9.5 </>lp</></A></H3>
-<P>The </>lp </>command </>submits </>submits </>files </>for </>
-printing. </> Unlike </>the </>standard </>System </>V </>lp </>
-command, </>a </>single </>CUPS </>lp </>command </>will </>generate </>
-a </>separate </>job </>ID </>for </>each </>file </>that </>is </>
-printed. </>Also, </>the </>Solaris </>&quot;f&quot;, </>&quot;H&quot;, </>&quot;P&quot;, </>&quot;S&quot;, </>
-and </>&quot;y&quot; </>options </>are </>silently </>ignored. </></P>
-<H3><A NAME="3_9_6">3.9.6 </>lpadmin</></A></H3>
-<P>The </>lpadmin </>command </>manages </>printer </>queues </>and </>
-classes. </> The </>Solaris </>&quot;A&quot;, </>&quot;F&quot;, </>&quot;I&quot;, </>&quot;M&quot;, </>&quot;P&quot;, </>
-&quot;Q&quot;, </>&quot;S&quot;, </>&quot;T&quot;, </>&quot;U&quot;, </>&quot;W&quot;, </>&quot;f&quot;, </>&quot;l&quot;, </>&quot;m&quot;, </>&quot;o&quot;, </>
-&quot;s&quot;, </>&quot;t&quot;, </>and </>&quot;u&quot; </>options </>are </>not </>supported, </>
-and </>new </>options </>&quot;P&quot; </>(PPD </>file) </>and </>&quot;E&quot; </>(enable </>
-and </>accept) </>are </>provided </>to </>configure </>CUPS-specific </>
-features. </></P>
-<H3><A NAME="3_9_7">3.9.7 </>lpinfo</></A></H3>
-<P>The </>lpinfo </>command </>lists </>the </>available </>PPD </>
-files </>or </>devices </>as </>selected </>by </>the </>user. </></P>
-<H3><A NAME="3_9_8">3.9.8 </>lpmove</></A></H3>
-<P>The </>lpmove </>command </>moves </>a </>print </>job </>to </>a </>
-new </>destination. </></P>
-<H3><A NAME="3_9_9">3.9.9 </>lpoptions</></A></H3>
-<P>The </>lpoptions </>command </>manages </>user-defined </>printers </>
-and </>options. </></P>
-<H3><A NAME="3_9_10">3.9.10 </>lpstat</></A></H3>
-<P>The </>lpstat </>command </>lists </>printers, </>classes, </>and </>
-jobs </>as </>requested </>by </>the </>user. </></P>
-<H3><A NAME="3_9_11">3.9.11 </>reject</></A></H3>
-<P>The </>reject </>command </>tells </>the </>scheduler </>not </>to </>
-accept </>new </>jobs </>for </>specific </>printers. </></P>
-<H1 TYPE="A" VALUE="1"><A NAME="4">A </>Glossary</></A></H1>
-<H2><A NAME="4_1">A.1 </>Terms</></A></H2>
+<P>Filters are added to the MIME conversion data file and implement all 
+necessary conversions from one file type to another. </P>
+<H3><A NAME="3_7_1">3.7.1 hpgltops</A></H3>
+<P>The hpgltops filter converts HP-GL/2 files into PostScript. </P>
+<H3><A NAME="3_7_2">3.7.2 imagetops</A></H3>
+<P>The imagetops filter converts image files into PostScript. </P>
+<H3><A NAME="3_7_3">3.7.3 imagetoraster</A></H3>
+<P>The imagetoraster filter converts image files into CUPS raster data. </P>
+<H3><A NAME="3_7_4">3.7.4 pdftops</A></H3>
+<P>The pdftops filter converts PDF files into PostScript. </P>
+<H3><A NAME="3_7_5">3.7.5 pstops</A></H3>
+<P>The pstops filter inserts printer-specific commands from PPD files 
+and performs page filtering as requested by the user. </P>
+<H3><A NAME="3_7_6">3.7.6 pstoraster</A></H3>
+<P>The pstoraster filter converts PostScript program data into CUPS 
+raster data. </P>
+<H3><A NAME="3_7_7">3.7.7 rastertoepson</A></H3>
+<P>The rastertoepson filter handles converting CUPS raster data to 
+ESC/P and supports both color and black-and-white printers. </P>
+<H3><A NAME="3_7_8">3.7.8 rastertohp</A></H3>
+<P>The rastertohp filter handles converting CUPS raster data to HP-PCL 
+and supports both color and black-and-white printers. </P>
+<H3><A NAME="3_7_9">3.7.9 texttops</A></H3>
+<P>The texttops filter converts text files into PostScript. </P>
+<H2><A NAME="3_8">3.8 Scheduler</A></H2>
+<P>The scheduler is a fully-functional HTTP/1.1 and IPP/1.1 server that 
+manages the printers, classes, and jobs in the system.  It also handles 
+a simple broadcast-based directory service so that remote print queues 
+and classes can be accessed transparently from the local system. </P>
+<H3><A NAME="3_8_1">3.8.1 Authorization</A></H3>
+<P>The authorization module is responsible for performing access 
+control and authentication for all HTTP and IPP requests entering the 
+system. </P>
+<H3><A NAME="3_8_2">3.8.2 Classes</A></H3>
+<P>The classes module is responsible for managing printer classes in 
+the system. Each class is a collection of local and/or remote printers. 
+ The classes module also reads and writes the classes configuration 
+file. </P>
+<H3><A NAME="3_8_3">3.8.3 Client</A></H3>
+<P>The client module is responsible for all HTTP client communications. 
+ It handles listening on selected interfaces, accepting connections 
+from prospective clients, processing incoming HTTP requests, and 
+sending HTTP responses to those requests.  The client module also is 
+responsible for executing the external CGI programs as needed to 
+support web-based printer, class, and job status monitoring and 
+administration. </P>
+<P>Once authorized, all IPP requests are sent to the IPP module. </P>
+<H3><A NAME="3_8_4">3.8.4 Configuration</A></H3>
+<P>The configuration module is responsible for reading the CUPS 
+configuration file and initializing the appropriate data structures and 
+values.  The configuration module also stops CUPS services before 
+reading the configuration file and restarts them after the 
+configuration file has been read. </P>
+<H3><A NAME="3_8_5">3.8.5 Devices</A></H3>
+<P>The devices module is responsible for managing the list of available 
+devices for the CUPS-Get-Devices operation. </P>
+<H3><A NAME="3_8_6">3.8.6 Directory Services</A></H3>
+<P>The directory services module sends and recieves printer state 
+information over a broadcast socket.  Remote printers and classes are 
+automatically added to or removed from the local printer and class 
+lists as needed. </P>
+<P>The directory services module can only recieve printer state 
+information over a single UDP port, however it can broadcast to 
+multiple addresses and ports as needed. </P>
+<H3><A NAME="3_8_7">3.8.7 IPP</A></H3>
+<P>The IPP module handles IPP requests and acts accordingly.  URI 
+validation is also performed here, as a client can post IPP data to any 
+URI on the server which might sidestep the access control or 
+authentication of the HTTP server. </P>
+<H3><A NAME="3_8_8">3.8.8 Jobs</A></H3>
+<P>The jobs module manages print jobs, starts filter and backend 
+processes for jobs to be printed, and monitors status messages from 
+those filters and backends. </P>
+<H3><A NAME="3_8_9">3.8.9 Logging</A></H3>
+<P>The logging module manages the access, error, and page log files 
+that are generated by the scheduler. </P>
+<H3><A NAME="3_8_10">3.8.10 Main</A></H3>
+<P>The main module is responsible for timing out and dispatching input 
+and output for client connections.  It also watches for incoming <CODE>
+SIGHUP</CODE> and <CODE>SIGCHLD</CODE> signals, reloads the server 
+configuration files as needed, and handles child process errors and 
+exits. </P>
+<H3><A NAME="3_8_11">3.8.11 MIME</A></H3>
+<P>The Multimedia Internet Mail Exchange module manages a MIME type and 
+conversion database that supports file typing by extension and content 
+and least-cost file filtering from a source to a destination file type. </P>
+<H3><A NAME="3_8_12">3.8.12 PPDs</A></H3>
+<P>The PPDs module is responsible for managing the list of available 
+PPD files for the CUPS-Get-PPDs operation. </P>
+<H3><A NAME="3_8_13">3.8.13 Printers</A></H3>
+<P>The printers module is responsible for managing printers and PPD 
+files in the system. The printers module also reads and writes the 
+printers configuration file. </P>
+<H2><A NAME="3_9">3.9 System V Commands</A></H2>
+<P>The System V commands provide a robust command-line interface to 
+CUPS to submit and control printers and jobs. </P>
+<H3><A NAME="3_9_1">3.9.1 accept</A></H3>
+<P>The accept command tells the scheduler to accept new jobs for 
+specific printers. </P>
+<H3><A NAME="3_9_2">3.9.2 cancel</A></H3>
+<P>The cancel command tells the scheduler to cancel one or more jobs 
+that are queued for printing. </P>
+<H3><A NAME="3_9_3">3.9.3 disable</A></H3>
+<P>The disable command tells the scheduler to stop printing jobs on the 
+specified printers. </P>
+<H3><A NAME="3_9_4">3.9.4 enable</A></H3>
+<P>The enable command tells the scheduler to start printing jobs on the 
+specified printers. </P>
+<H3><A NAME="3_9_5">3.9.5 lp</A></H3>
+<P>The lp command submits submits files for printing.  Unlike the 
+standard System V lp command, a single CUPS lp command will generate a 
+separate job ID for each file that is printed. Also, the Solaris &quot;f&quot;, 
+&quot;H&quot;, &quot;P&quot;, &quot;S&quot;, and &quot;y&quot; options are silently ignored. </P>
+<H3><A NAME="3_9_6">3.9.6 lpadmin</A></H3>
+<P>The lpadmin command manages printer queues and classes.  The Solaris 
+&quot;A&quot;, &quot;F&quot;, &quot;I&quot;, &quot;M&quot;, &quot;P&quot;, &quot;Q&quot;, &quot;S&quot;, &quot;T&quot;, &quot;U&quot;, &quot;W&quot;, &quot;f&quot;, &quot;l&quot;, &quot;m&quot;, &quot;o&quot;, 
+&quot;s&quot;, &quot;t&quot;, and &quot;u&quot; options are not supported, and new options &quot;P&quot; (PPD 
+file) and &quot;E&quot; (enable and accept) are provided to configure 
+CUPS-specific features. </P>
+<H3><A NAME="3_9_7">3.9.7 lpinfo</A></H3>
+<P>The lpinfo command lists the available PPD files or devices as 
+selected by the user. </P>
+<H3><A NAME="3_9_8">3.9.8 lpmove</A></H3>
+<P>The lpmove command moves a print job to a new destination. </P>
+<H3><A NAME="3_9_9">3.9.9 lpoptions</A></H3>
+<P>The lpoptions command manages user-defined printers and options. </P>
+<H3><A NAME="3_9_10">3.9.10 lpstat</A></H3>
+<P>The lpstat command lists printers, classes, and jobs as requested by 
+the user. </P>
+<H3><A NAME="3_9_11">3.9.11 reject</A></H3>
+<P>The reject command tells the scheduler not to accept new jobs for 
+specific printers. </P>
+<H1 TYPE="A" VALUE="1"><A NAME="4">A Glossary</A></H1>
+<H2><A NAME="4_1">A.1 Terms</A></H2>
 <DL>
-<DT>C </></DT>
-<DD>A </>computer </>language. </></DD>
-<DT>parallel </></DT>
-<DD>Sending </>or </>receiving </>data </>more </>than </>1 </>bit </>
-at </>a </>time. </></DD>
-<DT>pipe </></DT>
-<DD>A </>one-way </>communications </>channel </>between </>two </>
-programs. </></DD>
-<DT>serial </></DT>
-<DD>Sending </>or </>receiving </>data </>1 </>bit </>at </>a </>time. </>
-</DD>
-<DT>socket </></DT>
-<DD>A </>two-way </>network </>communications </>channel. </></DD>
+<DT>C </DT>
+<DD>A computer language. </DD>
+<DT>parallel </DT>
+<DD>Sending or receiving data more than 1 bit at a time. </DD>
+<DT>pipe </DT>
+<DD>A one-way communications channel between two programs. </DD>
+<DT>serial </DT>
+<DD>Sending or receiving data 1 bit at a time. </DD>
+<DT>socket </DT>
+<DD>A two-way network communications channel. </DD>
 </DL>
-<H2><A NAME="4_2">A.2 </>Acronyms</></A></H2>
+<H2><A NAME="4_2">A.2 Acronyms</A></H2>
 <DL>
-<DT>ASCII </></DT>
-<DD>American </>Standard </>Code </>for </>Information </>Interchange </>
-</DD>
-<DT>CUPS </></DT>
-<DD>Common </>UNIX </>Printing </>System </></DD>
-<DT>ESC/P </></DT>
-<DD>EPSON </>Standard </>Code </>for </>Printers </></DD>
-<DT>FTP </></DT>
-<DD>File </>Transfer </>Protocol </></DD>
-<DT>HP-GL </></DT>
-<DD>Hewlett-Packard </>Graphics </>Language </></DD>
-<DT>HP-PCL </></DT>
-<DD>Hewlett-Packard </>Page </>Control </>Language </></DD>
-<DT>HP-PJL </></DT>
-<DD>Hewlett-Packard </>Printer </>Job </>Language </></DD>
-<DT>IETF </></DT>
-<DD>Internet </>Engineering </>Task </>Force </></DD>
-<DT>IPP </></DT>
-<DD>Internet </>Printing </>Protocol </></DD>
-<DT>ISO </></DT>
-<DD>International </>Standards </>Organization </></DD>
-<DT>LPD </></DT>
-<DD>Line </>Printer </>Daemon </></DD>
-<DT>MIME </></DT>
-<DD>Multimedia </>Internet </>Mail </>Exchange </></DD>
-<DT>PPD </></DT>
-<DD>PostScript </>Printer </>Description </></DD>
-<DT>SMB </></DT>
-<DD>Server </>Message </>Block </></DD>
-<DT>TFTP </></DT>
-<DD>Trivial </>File </>Transfer </>Protocol </></DD>
+<DT>ASCII </DT>
+<DD>American Standard Code for Information Interchange </DD>
+<DT>CUPS </DT>
+<DD>Common UNIX Printing System </DD>
+<DT>ESC/P </DT>
+<DD>EPSON Standard Code for Printers </DD>
+<DT>FTP </DT>
+<DD>File Transfer Protocol </DD>
+<DT>HP-GL </DT>
+<DD>Hewlett-Packard Graphics Language </DD>
+<DT>HP-PCL </DT>
+<DD>Hewlett-Packard Page Control Language </DD>
+<DT>HP-PJL </DT>
+<DD>Hewlett-Packard Printer Job Language </DD>
+<DT>IETF </DT>
+<DD>Internet Engineering Task Force </DD>
+<DT>IPP </DT>
+<DD>Internet Printing Protocol </DD>
+<DT>ISO </DT>
+<DD>International Standards Organization </DD>
+<DT>LPD </DT>
+<DD>Line Printer Daemon </DD>
+<DT>MIME </DT>
+<DD>Multimedia Internet Mail Exchange </DD>
+<DT>PPD </DT>
+<DD>PostScript Printer Description </DD>
+<DT>SMB </DT>
+<DD>Server Message Block </DD>
+<DT>TFTP </DT>
+<DD>Trivial File Transfer Protocol </DD>
 </DL>
 </BODY>
 </HTML>

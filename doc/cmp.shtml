@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<META NAME="DOCNUMBER" CONTENT="CUPS-CMP-1.1">
-	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2000, All Rights Reserved">
+	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2001, All Rights Reserved">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Configuration Management Plan</TITLE>
 </HEAD>
@@ -221,7 +221,7 @@ information is provided by the CVS "&#36;Id$" tag:
  *
  *   Description of file contents.
  *
- *   Copyright 1997-2000 by Easy Software Products, all rights
+ *   Copyright 1997-2001 by Easy Software Products, all rights
  *   reserved.
  *
  *   These coded instructions, statements, and computer programs are
@@ -236,7 +236,7 @@ information is provided by the CVS "&#36;Id$" tag:
  *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
