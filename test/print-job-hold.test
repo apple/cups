@@ -1,0 +1,33 @@
+# Test print-job and job-hold-until attribute
+{
+	# The name of the test...
+	NAME "Print with print-job + job-hold-until"
+
+	# The resource to use for the POST
+	# RESOURCE /admin
+
+	# The operation to use
+	OPERATION print-job
+
+	# Attributes, starting in the operation group...
+	GROUP operation
+	ATTR charset attributes-charset us-ascii
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR mimetype document-format application/postscript
+	ATTR keyword job-hold-until indefinite
+
+	GROUP job
+	ATTR integer copies 1
+
+	FILE ../data/testprint.ps
+
+	# What statuses are OK?
+	STATUS ok
+	STATUS ok-subst
+
+	# What attributes do we expect?
+	EXPECT job-id
+	EXPECT job-uri
+}

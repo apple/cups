@@ -1,5 +1,5 @@
 /*
- * "$Id: ipptest.c,v 1.2 2000/05/22 18:41:20 mike Exp $"
+ * "$Id: ipptest.c,v 1.3 2000/06/02 14:11:24 mike Exp $"
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
@@ -383,6 +383,8 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	}
         else
 	  printf("\b\b\b\b\bPASS]\n");
+
+	printf("        (%d bytes in response)\n", ippLength(response));
       }
 
       ippDelete(response);
@@ -647,5 +649,5 @@ get_token(FILE *fp,		/* I - File to read from */
 
 
 /*
- * End of "$Id: ipptest.c,v 1.2 2000/05/22 18:41:20 mike Exp $".
+ * End of "$Id: ipptest.c,v 1.3 2000/06/02 14:11:24 mike Exp $".
  */
