@@ -1,5 +1,5 @@
 /*
- * "$Id: string.h,v 1.15 2002/12/17 18:56:43 swdev Exp $"
+ * "$Id: string.h,v 1.16 2003/07/20 12:42:32 mike Exp $"
  *
  *   String definitions for the Common UNIX Printing System (CUPS).
  *
@@ -73,6 +73,8 @@ extern "C" {
  * Prototypes...
  */
 
+extern void	cups_strcpy(char *dst, const char *src);
+
 #  ifndef HAVE_STRDUP
 extern char	*cups_strdup(const char *);
 #    define strdup cups_strdup
@@ -124,5 +126,5 @@ extern int	cups_vsnprintf(char *, size_t, const char *, va_list);
 #endif /* !_CUPS_STRING_H_ */
 
 /*
- * End of "$Id: string.h,v 1.15 2002/12/17 18:56:43 swdev Exp $".
+ * End of "$Id: string.h,v 1.16 2003/07/20 12:42:32 mike Exp $".
  */

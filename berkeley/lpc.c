@@ -1,5 +1,5 @@
 /*
- * "$Id: lpc.c,v 1.15 2002/12/17 18:56:35 swdev Exp $"
+ * "$Id: lpc.c,v 1.16 2003/07/20 12:42:31 mike Exp $"
  *
  *   "lpc" command for the Common UNIX Printing System (CUPS).
  *
@@ -100,7 +100,7 @@ main(int  argc,		/* I - Number of command-line arguments */
       */
 
       while (isspace(line[0]))
-        strcpy(line, line + 1);
+        cups_strcpy(line, line + 1);
 
       for (params = line; *params != '\0'; params ++)
         if (isspace(*params))
@@ -478,5 +478,5 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpc.c,v 1.15 2002/12/17 18:56:35 swdev Exp $".
+ * End of "$Id: lpc.c,v 1.16 2003/07/20 12:42:31 mike Exp $".
  */

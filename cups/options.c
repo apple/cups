@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c,v 1.30 2003/03/21 18:06:35 mike Exp $"
+ * "$Id: options.c,v 1.31 2003/07/20 12:42:32 mike Exp $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -244,7 +244,7 @@ cupsParseOptions(const char    *arg,		/* I - Argument to parse */
       while (*ptr != '\'' && *ptr != '\0')
       {
         if (*ptr == '\\')
-	  strcpy(ptr, ptr + 1);
+	  cups_strcpy(ptr, ptr + 1);
 
         ptr ++;
       }
@@ -264,7 +264,7 @@ cupsParseOptions(const char    *arg,		/* I - Argument to parse */
       while (*ptr != '\"' && *ptr != '\0')
       {
         if (*ptr == '\\')
-	  strcpy(ptr, ptr + 1);
+	  cups_strcpy(ptr, ptr + 1);
 
         ptr ++;
       }
@@ -297,7 +297,7 @@ cupsParseOptions(const char    *arg,		/* I - Argument to parse */
 	  }
         }
         else if (*ptr == '\\')
-	  strcpy(ptr, ptr + 1);
+	  cups_strcpy(ptr, ptr + 1);
 
       if (*ptr != '\0')
         *ptr++ = '\0';
@@ -313,7 +313,7 @@ cupsParseOptions(const char    *arg,		/* I - Argument to parse */
       while (!isspace(*ptr) && *ptr != '\0')
       {
         if (*ptr == '\\')
-	  strcpy(ptr, ptr + 1);
+	  cups_strcpy(ptr, ptr + 1);
 
         ptr ++;
       }
@@ -495,5 +495,5 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: options.c,v 1.30 2003/03/21 18:06:35 mike Exp $".
+ * End of "$Id: options.c,v 1.31 2003/07/20 12:42:32 mike Exp $".
  */

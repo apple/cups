@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.151 2003/04/26 17:09:56 mike Exp $"
+ * "$Id: printers.c,v 1.152 2003/07/20 12:42:35 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -495,7 +495,7 @@ DeletePrinterFilters(printer_t *p)	/* I - Printer to remove from */
       MimeDatabase->num_filters --;
 
       if (i > 1)
-        memcpy(filter, filter + 1, sizeof(mime_filter_t) * (i - 1));
+        memmove(filter, filter + 1, sizeof(mime_filter_t) * (i - 1));
 
       filter --;
     }
@@ -2380,5 +2380,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.151 2003/04/26 17:09:56 mike Exp $".
+ * End of "$Id: printers.c,v 1.152 2003/07/20 12:42:35 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.166 2003/07/20 03:06:27 mike Exp $"
+ * "$Id: client.c,v 1.167 2003/07/20 12:42:33 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -496,7 +496,7 @@ CloseClient(client_t *con)	/* I - Client to close */
   NumClients --;
 
   if (con < (Clients + NumClients))
-    memcpy(con, con + 1, (Clients + NumClients - con) * sizeof(client_t));
+    memmove(con, con + 1, (Clients + NumClients - con) * sizeof(client_t));
 }
 
 
@@ -1234,7 +1234,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      }
 
 	      if (con->options[0] == '/')
-		strcpy(con->options, con->options + 1);
+		cups_strcpy(con->options, con->options + 1);
 
               if (!SendCommand(con, con->command, con->options))
 	      {
@@ -1408,7 +1408,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      }
 
 	      if (con->options[0] == '/')
-		strcpy(con->options, con->options + 1);
+		cups_strcpy(con->options, con->options + 1);
 
               LogMessage(L_DEBUG2, "ReadClient() %d command=\"%s\", options = \"%s\"",
 	        	 con->http.fd, con->command, con->options);
@@ -2914,7 +2914,8 @@ pipe_command(client_t *con,		/* I - Client connection */
 		script_name[1024],	/* SCRIPT_NAME environment variable */
 		server_name[1024],	/* SERVER_NAME environment variable */
 		server_port[1024],	/* SERVER_PORT environment variable */
-		tmpdir[1024];		/* TMPDIR environment variable */
+		tmpdir[1024],		/* TMPDIR environment variable */
+		vg_args[1024];		/* VG_ARGS environment variable */
   unsigned	address;		/* Address of client */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* POSIX signal handler */
@@ -2962,7 +2963,7 @@ pipe_command(client_t *con,		/* I - Client connection */
       else
         *commptr |= tolower(commptr[2]) - 'a' + 10;
 
-      strcpy(commptr + 1, commptr + 3);
+      cups_strcpy(commptr + 1, commptr + 3);
     }
     else if (*commptr == '?')
       break;
@@ -3007,6 +3008,7 @@ pipe_command(client_t *con,		/* I - Client connection */
   else
     envp[envc ++] = "SERVER_PROTOCOL=HTTP/0.9";
   envp[envc ++] = "REDIRECT_STATUS=1";
+  envp[envc ++] = "CUPS_SERVER=localhost";
   envp[envc ++] = ipp_port;
   envp[envc ++] = server_name;
   envp[envc ++] = server_port;
@@ -3018,6 +3020,12 @@ pipe_command(client_t *con,		/* I - Client connection */
   envp[envc ++] = tmpdir;
   envp[envc ++] = cups_datadir;
   envp[envc ++] = cups_serverroot;
+
+  if (getenv("VG_ARGS") != NULL)
+  {
+    snprintf(vg_args, sizeof(vg_args), "VG_ARGS=%s", getenv("VG_ARGS"));
+    envp[envc ++] = vg_args;
+  }
 
   if (getenv("LD_LIBRARY_PATH") != NULL)
   {
@@ -3313,5 +3321,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.166 2003/07/20 03:06:27 mike Exp $".
+ * End of "$Id: client.c,v 1.167 2003/07/20 12:42:33 mike Exp $".
  */

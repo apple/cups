@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.116 2003/07/19 22:13:01 mike Exp $"
+ * "$Id: dirsvc.c,v 1.117 2003/07/20 12:42:34 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1367,7 +1367,7 @@ UpdatePolling(void)
     * Copy over the buffer data we've used up...
     */
 
-    strcpy(buffer, lineptr);
+    cups_strcpy(buffer, lineptr);
     bufused -= lineptr - buffer;
 
     if (bufused < 0)
@@ -1671,7 +1671,7 @@ GetSlpAttrVal(const char *attrlist,	/* I - Attribute list string */
 
 	for (ptr1 = valbuf; *ptr1; ptr1 ++)
 	  if (*ptr1 == '\\' && ptr1[1])
-	    strcpy(ptr1, ptr1 + 1);
+	    cups_strcpy(ptr1, ptr1 + 1);
 
         return (0);
       }
@@ -1905,5 +1905,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.116 2003/07/19 22:13:01 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.117 2003/07/20 12:42:34 mike Exp $".
  */

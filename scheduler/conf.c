@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.135 2003/07/20 02:51:54 mike Exp $"
+ * "$Id: conf.c,v 1.136 2003/07/20 12:42:33 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -866,6 +866,8 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
       Listeners = temp;
       temp      += NumListeners;
+
+      memset(temp, 0, sizeof(listener_t));
 
       if (get_address(value, INADDR_ANY, IPP_PORT, &(temp->address)))
       {
@@ -2156,5 +2158,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.135 2003/07/20 02:51:54 mike Exp $".
+ * End of "$Id: conf.c,v 1.136 2003/07/20 12:42:33 mike Exp $".
  */
