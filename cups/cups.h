@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h,v 1.10 1999/04/27 19:57:08 mike Exp $"
+ * "$Id: cups.h,v 1.11 1999/05/10 16:34:47 mike Exp $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -55,7 +55,8 @@ extern "C" {
  * Types and structures...
  */
 
-typedef enum				/**** Printer Type/Capability Bits ****/
+typedef unsigned cups_ptype_t;		/**** Printer Type/Capability Bits ****/
+enum					/* Not a typedef'd enum so we can OR */
 {
   CUPS_PRINTER_LOCAL = 0x0000,		/* Local printer or class */
   CUPS_PRINTER_CLASS = 0x0001,		/* Printer class */
@@ -74,7 +75,7 @@ typedef enum				/**** Printer Type/Capability Bits ****/
   CUPS_PRINTER_MEDIUM = 0x2000,		/* Can do Tabloid/B/C/A3/A2 */
   CUPS_PRINTER_LARGE = 0x4000,		/* Can do D/E/A1/A0 */
   CUPS_PRINTER_VARIABLE = 0x8000	/* Can do variable sizes */
-} cups_ptype_t;
+};
 
 
 /*
@@ -130,5 +131,5 @@ extern int		cupsMarkOptions(ppd_file_t *ppd, int num_options,
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.10 1999/04/27 19:57:08 mike Exp $".
+ * End of "$Id: cups.h,v 1.11 1999/05/10 16:34:47 mike Exp $".
  */
