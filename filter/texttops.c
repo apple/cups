@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.25 2000/04/09 23:09:06 mike Exp $"
+ * "$Id: texttops.c,v 1.26 2000/04/10 16:28:57 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -307,7 +307,7 @@ WriteProlog(char       *title,	/* I - Title of job */
 	  lineptr ++;
 
         if (!*lineptr)
-	  break;	// Must be font mapping
+	  break;	/* Must be a font mapping */
 
 	valptr = lineptr;
 
@@ -1199,5 +1199,5 @@ write_text(char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c,v 1.25 2000/04/09 23:09:06 mike Exp $".
+ * End of "$Id: texttops.c,v 1.26 2000/04/10 16:28:57 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.60 2000/03/30 05:19:28 mike Exp $"
+ * "$Id: ipp.c,v 1.61 2000/04/10 16:28:57 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2302,7 +2302,6 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
   int			port;		/* Port portion of URI */
   printer_t		*printer;	/* Printer/class */
   time_t		curtime;	/* Current time */
-  ipp_attribute_t	*attr;		/* Job-sheets attributes */
 
 
   DEBUG_printf(("get_printer_attrs(%08x, %08x)\n", con, uri));
@@ -2360,11 +2359,6 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
   copy_attrs(con->response, printer->attrs,
              ippFindAttribute(con->request, "requested-attributes",
 	                      IPP_TAG_KEYWORD), IPP_TAG_ZERO);
-
-  attr = ippAddStrings(con->response, IPP_TAG_JOB, IPP_TAG_NAME,
-                       "job-sheets-default", 2, NULL, NULL);
-  attr->values[0].string.text = strdup(printer->job_sheets[0]);
-  attr->values[1].string.text = strdup(printer->job_sheets[1]);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -2431,6 +2425,11 @@ get_printers(client_t *con,		/* I - Client connection */
         (printer->type & printer_mask) == printer_type &&
 	(location == NULL || strcasecmp(printer->location, location) == 0))
     {
+      if (count > 0)
+        ippAddSeparator(con->response);
+
+      count ++;
+
      /*
       * Send the following attributes for each printer:
       *
@@ -2462,13 +2461,6 @@ get_printers(client_t *con,		/* I - Client connection */
       copy_attrs(con->response, printer->attrs,
         	 ippFindAttribute(con->request, "requested-attributes",
 	                	  IPP_TAG_KEYWORD), IPP_TAG_ZERO);
-
-      attr = ippAddStrings(con->response, IPP_TAG_JOB, IPP_TAG_NAME,
-                           "job-sheets-default", 2, NULL, NULL);
-      attr->values[0].string.text = strdup(printer->job_sheets[0]);
-      attr->values[1].string.text = strdup(printer->job_sheets[1]);
-
-      ippAddSeparator(con->response);
     }
 
   con->response->request.status.status_code = IPP_OK;
@@ -4680,5 +4672,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.60 2000/03/30 05:19:28 mike Exp $".
+ * End of "$Id: ipp.c,v 1.61 2000/04/10 16:28:57 mike Exp $".
  */

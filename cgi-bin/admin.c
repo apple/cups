@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.7 2000/04/09 23:08:58 mike Exp $"
+ * "$Id: admin.c,v 1.8 2000/04/10 16:28:56 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -191,7 +191,6 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
 		*response;		/* IPP response */
   ipp_attribute_t *attr;		/* member-uris attribute */
   ipp_status_t	status;			/* Request status */
-  const char	*var;			/* CGI variable */
   char		uri[HTTP_MAX_URI];	/* Device or printer URI */
 
 
@@ -249,7 +248,7 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
       cgiCopyTemplateLang(stdout, TEMPLATES, "add-class.tmpl", getenv("LANG"));
     }
   }
-  else if ((var = cgiGetVariable("MEMBER_URIS")) == NULL)
+  else if (cgiGetVariable("MEMBER_URIS") == NULL)
   {
    /*
     * Build a CUPS_GET_PRINTERS request, which requires the
@@ -1354,5 +1353,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.7 2000/04/09 23:08:58 mike Exp $".
+ * End of "$Id: admin.c,v 1.8 2000/04/10 16:28:56 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.5 2000/04/09 23:08:58 mike Exp $"
+ * "$Id: ipp-var.c,v 1.6 2000/04/10 16:28:56 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -85,6 +85,8 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
     if (filter_name)
     {
+      printf("filtering on %s = \"%s\"\n", filter_name, filter_value);
+
       for (filter = attr;
            filter != NULL && filter->group_tag != IPP_TAG_ZERO;
            filter = filter->next)
@@ -205,5 +207,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.5 2000/04/09 23:08:58 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.6 2000/04/10 16:28:56 mike Exp $".
  */
