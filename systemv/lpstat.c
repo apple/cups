@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.12 1999/07/09 13:06:52 mike Exp $"
+ * "$Id: lpstat.c,v 1.13 1999/07/30 13:31:33 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -49,12 +49,12 @@
  * Local functions...
  */
 
-static void	show_accepting(http_t *, char *);
-static void	show_classes(http_t *, char *);
+static void	show_accepting(http_t *, const char *);
+static void	show_classes(http_t *, const char *);
 static void	show_default(http_t *);
-static void	show_devices(http_t *, char *);
-static void	show_jobs(http_t *, char *, char *);
-static void	show_printers(http_t *, char *);
+static void	show_devices(http_t *, const char *);
+static void	show_jobs(http_t *, const char *, const char *);
+static void	show_printers(http_t *, const char *);
 static void	show_scheduler(http_t *);
 
 
@@ -202,7 +202,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     }
 
   if (argc == 1)
-    show_jobs(http, NULL, cuserid(NULL));
+    show_jobs(http, NULL, cupsUser());
 
   return (0);
 }
@@ -213,17 +213,17 @@ main(int  argc,		/* I - Number of command-line arguments */
  */
 
 static void
-show_accepting(http_t *http,	/* I - HTTP connection to server */
-               char   *dests)	/* I - Destinations */
+show_accepting(http_t     *http,	/* I - HTTP connection to server */
+               const char *dests)	/* I - Destinations */
 {
   ipp_t		*request,	/* IPP Request */
 		*response;	/* IPP Response */
   ipp_attribute_t *attr;	/* Current attribute */
   cups_lang_t	*language;	/* Default language */
-  char		*printer,	/* Printer name */
+  const char	*printer,	/* Printer name */
 		*message;	/* Printer device URI */
   int		accepting;	/* Accepting requests? */
-  char		*dptr,		/* Pointer into destination list */
+  const char	*dptr,		/* Pointer into destination list */
 		*ptr;		/* Pointer into printer name */
   int		match;		/* Non-zero if this job matches */
 
@@ -391,17 +391,17 @@ show_accepting(http_t *http,	/* I - HTTP connection to server */
  */
 
 static void
-show_classes(http_t *http,	/* I - HTTP connection to server */
-             char   *dests)	/* I - Destinations */
+show_classes(http_t     *http,	/* I - HTTP connection to server */
+             const char *dests)	/* I - Destinations */
 {
   int		i;		/* Looping var */
   ipp_t		*request,	/* IPP Request */
 		*response;	/* IPP Response */
   ipp_attribute_t *attr;	/* Current attribute */
   cups_lang_t	*language;	/* Default language */
-  char		*printer;	/* Printer class name */
+  const char	*printer;	/* Printer class name */
   ipp_attribute_t *members;	/* Printer members */
-  char		*dptr,		/* Pointer into destination list */
+  const char	*dptr,		/* Pointer into destination list */
 		*ptr;		/* Pointer into printer name */
   int		match;		/* Non-zero if this job matches */
 
@@ -619,16 +619,16 @@ show_default(http_t *http)	/* I - HTTP connection to server */
  */
 
 static void
-show_devices(http_t *http,	/* I - HTTP connection to server */
-             char   *dests)	/* I - Destinations */
+show_devices(http_t     *http,	/* I - HTTP connection to server */
+             const char *dests)	/* I - Destinations */
 {
   ipp_t		*request,	/* IPP Request */
 		*response;	/* IPP Response */
   ipp_attribute_t *attr;	/* Current attribute */
   cups_lang_t	*language;	/* Default language */
-  char		*printer,	/* Printer name */
-		*device;	/* Printer device URI */
-  char		*dptr,		/* Pointer into destination list */
+  const char	*printer,	/* Printer name */
+		*device,	/* Printer device URI */
+		*dptr,		/* Pointer into destination list */
 		*ptr;		/* Pointer into printer name */
   int		match;		/* Non-zero if this job matches */
 
@@ -790,19 +790,19 @@ show_devices(http_t *http,	/* I - HTTP connection to server */
  */
 
 static void
-show_jobs(http_t *http,		/* I - HTTP connection to server */
-          char   *dests,	/* I - Destinations */
-          char   *users)	/* I - Users */
+show_jobs(http_t     *http,	/* I - HTTP connection to server */
+          const char *dests,	/* I - Destinations */
+          const char *users)	/* I - Users */
 {
   ipp_t		*request,	/* IPP Request */
 		*response;	/* IPP Response */
   ipp_attribute_t *attr;	/* Current attribute */
   cups_lang_t	*language;	/* Default language */
-  char		*dest,		/* Pointer into job-printer-uri */
+  const char	*dest,		/* Pointer into job-printer-uri */
 		*username;	/* Pointer to job-originating-user-name */
   int		jobid,		/* job-id */
 		size;		/* job-k-octets */
-  char		*dptr,		/* Pointer into destination list */
+  const char	*dptr,		/* Pointer into destination list */
 		*ptr;		/* Pointer into printer name */
   int		match;		/* Non-zero if this job matches */
 
@@ -1014,19 +1014,19 @@ show_jobs(http_t *http,		/* I - HTTP connection to server */
  */
 
 static void
-show_printers(http_t *http,	/* I - HTTP connection to server */
-              char   *dests)	/* I - Destinations */
+show_printers(http_t     *http,	/* I - HTTP connection to server */
+              const char *dests)/* I - Destinations */
 {
   ipp_t		*request,	/* IPP Request */
 		*response,	/* IPP Response */
 		*jobs;		/* IPP Get Jobs response */
   ipp_attribute_t *attr;	/* Current attribute */
   cups_lang_t	*language;	/* Default language */
-  char		*printer,	/* Printer name */
+  const char	*printer,	/* Printer name */
 		*message;	/* Printer state message */
   ipp_pstate_t	pstate;		/* Printer state */
   int		jobid;		/* Job ID of current job */
-  char		*dptr,		/* Pointer into destination list */
+  const char	*dptr,		/* Pointer into destination list */
 		*ptr;		/* Pointer into printer name */
   int		match;		/* Non-zero if this job matches */
   char		printer_uri[HTTP_MAX_URI];
@@ -1208,7 +1208,7 @@ show_printers(http_t *http,	/* I - HTTP connection to server */
                        "attributes-natural-language", NULL,
 		       language->language);
 
-          sprintf(printer_uri, "ipp://localhost/printers/%s", printer);
+          sprintf(printer_uri, "ipp://%s/printers/%s", http->hostname, printer);
 	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
 	               "printer-uri", NULL, printer_uri);
 
@@ -1264,5 +1264,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.12 1999/07/09 13:06:52 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.13 1999/07/30 13:31:33 mike Exp $".
  */
