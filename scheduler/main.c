@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.15 2002/06/14 19:48:56 mike Exp $"
+ * "$Id: main.c,v 1.57.2.16 2002/07/18 10:52:09 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -57,6 +57,7 @@
 static void	sigchld_handler(int sig);
 static void	sighup_handler(int sig);
 static void	sigterm_handler(int sig);
+static void	sigusr1_handler(int sig);
 static void	usage(void);
 
 
@@ -132,6 +133,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      fg = 1;
 	      break;
 
+          case 'F' : /* Run in foreground, but still disconnect from terminal... */
+	      fg = -1;
+	      break;
+
 	  default : /* Unknown option */
               fprintf(stderr, "cupsd: Unknown option \'%c\' - aborting!\n", *opt);
 	      usage();
@@ -150,8 +155,39 @@ main(int  argc,			/* I - Number of command-line arguments */
   if (!fg)
   {
     if (fork() > 0)
-      return (0);
+    {
+     /*
+      * OK, wait for the child to startup and send us SIGUSR1...
+      */
 
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+      sigset(SIGUSR1, sigusr1_handler);
+#elif defined(HAVE_SIGACTION)
+      sigemptyset(&action.sa_mask);
+      sigaddset(&action.sa_mask, SIGUSR1);
+      action.sa_handler = sigusr1_handler;
+      sigaction(SIGUSR1, &action, NULL);
+#else
+      signal(SIGUSR1, sigusr1_handler);
+#endif /* HAVE_SIGSET */
+
+      if (wait(&i) < 0)
+        i = 0;
+
+      if (i == 0)
+        return (0);
+
+      if (i >= 256)
+        fprintf(stderr, "cupsd: Child exited with status %d!\n", i / 256);
+      else
+        fprintf(stderr, "cupsd: Child exited on signal %d!\n", i);
+
+      return (i);
+    }
+  }
+
+  if (fg < 1)
+  {
    /*
     * Make sure we aren't tying up any filesystems...
     */
@@ -283,10 +319,12 @@ main(int  argc,			/* I - Number of command-line arguments */
   InitCerts();
 
  /*
-  * Load all the jobs...
+  * If we are running in the background, signal the parent process that
+  * we are up and running...
   */
 
-  LoadAllJobs();
+  if (!fg)
+    kill(getppid(), SIGUSR1);
 
  /*
   * Loop forever...
@@ -645,7 +683,7 @@ sigchld_handler(int sig)	/* I - Signal number */
   if ((pid = wait(&status)) > 0)
 #endif /* HAVE_WAITPID */
   {
-    DEBUG_printf(("sigcld_handler: pid = %d, status = %d\n", pid, status));
+    DEBUG_printf(("sigchld_handler: pid = %d, status = %d\n", pid, status));
 
    /*
     * Delete certificates for CGI processes...
@@ -741,7 +779,7 @@ sighup_handler(int sig)	/* I - Signal number */
  */
 
 static void
-sigterm_handler(int sig)
+sigterm_handler(int sig)		/* I - Signal */
 {
 #ifdef __sgi
   struct stat	statbuf;		/* Needed for checking lpsched FIFO */
@@ -768,7 +806,7 @@ sigterm_handler(int sig)
   if (Clients != NULL)
     free(Clients);
 
-  StopAllJobs();
+  FreeAllJobs();
 
   if (AccessFile != NULL)
     fclose(AccessFile);
@@ -811,6 +849,17 @@ sigterm_handler(int sig)
 
 
 /*
+ * 'sigusr1_handler()' - Catch USR1 signals...
+ */
+
+static void
+sigusr1_handler(int sig)		/* I - Signal */
+{
+  (void)sig;	/* remove compiler warnings... */
+}
+
+
+/*
  * 'usage()' - Show scheduler usage.
  */
 
@@ -823,5 +872,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.15 2002/06/14 19:48:56 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.16 2002/07/18 10:52:09 mike Exp $".
  */

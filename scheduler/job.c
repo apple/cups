@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.21 2002/07/15 23:47:28 mike Exp $"
+ * "$Id: job.c,v 1.124.2.22 2002/07/18 10:52:08 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -29,6 +29,7 @@
  *   CheckJobs()          - Check the pending jobs and start any if the
  *                          destination is available.
  *   CleanJobs()          - Clean out old jobs.
+ *   FreeAllJobs()        - Free all jobs from memory.
  *   FindJob()            - Find the specified job.
  *   GetPrinterJobCount() - Get the number of pending, processing,
  *                          or held jobs in a printer or class.
@@ -352,6 +353,30 @@ CleanJobs(void)
 
     if (job->state->values[0].integer >= IPP_JOB_CANCELLED)
       CancelJob(job->id, 1);
+  }
+}
+
+
+/*
+ * 'FreeAllJobs()' - Free all jobs from memory.
+ */
+
+void
+FreeAllJobs(void)
+{
+  job_t	*job,		/* Current job */
+	*next;		/* Next job */
+
+
+  StopAllJobs();
+
+  for (job = Jobs; job; job = next)
+  {
+    next = job->next;
+
+    ippDelete(job->attrs);
+    free(job->filetypes);
+    free(job);
   }
 }
 
@@ -2321,5 +2346,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.21 2002/07/15 23:47:28 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.22 2002/07/18 10:52:08 mike Exp $".
  */

@@ -3,6 +3,20 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- When starting the scheduler in daemon mode, the parent
+	  process now waits for the child to signal it is ready
+	  to accept connections.
+	- Added -F option to cupsd to run cupsd in the
+	  foreground but detach from the controlling terminal
+	  and current directory.
+	- The scheduler did not reload jobs when receiving a HUP
+	  signal; this would cause problems since the pointers
+	  into the file type database would no longer be valid
+	  for existing jobs.
+	- The scheduler did not save the network interface list
+	  update time, thus no caching of the network data was
+	  actually provided.
+	- Updated the SuSE PAM configuration file.
 	- The LPD backend now supports a "reserve" option and no
 	  longer reserves a priviledged port by default.
 	- The cupsaddsmb command now continues past printers

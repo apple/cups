@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.12 2002/06/14 19:48:54 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.13 2002/07/18 10:52:08 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -184,6 +184,7 @@ ReadConfiguration(void)
   * Free all memory...
   */
 
+  FreeAllJobs();
   DeleteAllClasses();
   DeleteAllLocations();
   DeleteAllPrinters();
@@ -593,6 +594,7 @@ ReadConfiguration(void)
   * Check for queued jobs...
   */
 
+  LoadAllJobs();
   CheckJobs();
 
   return (1);
@@ -2022,5 +2024,5 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.12 2002/06/14 19:48:54 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.13 2002/07/18 10:52:08 mike Exp $".
  */

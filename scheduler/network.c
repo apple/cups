@@ -1,5 +1,5 @@
 /*
- * "$Id: network.c,v 1.5.2.5 2002/05/16 14:00:15 mike Exp $"
+ * "$Id: network.c,v 1.5.2.6 2002/07/18 10:52:10 mike Exp $"
  *
  *   Network interface functions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -141,6 +141,8 @@ NetIFUpdate(void)
 
   if ((time(NULL) - NetIFTime) < 60)
     return;
+
+  NetIFTime = time(NULL);
 
  /*
   * Free the old interfaces...
@@ -477,5 +479,5 @@ freeifaddrs(struct ifaddrs *addrs)	/* I - Interface list to free */
 
 
 /*
- * End of "$Id: network.c,v 1.5.2.5 2002/05/16 14:00:15 mike Exp $".
+ * End of "$Id: network.c,v 1.5.2.6 2002/07/18 10:52:10 mike Exp $".
  */
