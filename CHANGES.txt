@@ -1,4 +1,4 @@
-CHANGES.txt - 03/14/2001
+CHANGES.txt - 03/21/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.7
@@ -109,6 +109,8 @@ CHANGES IN CUPS V1.1.7
 	  encryption.
 	- Fixed a recursion bug in the scheduler that could
 	  cause cupsd to crash when a printer was removed.
+	- The LPDEST and PRINTER environment variables didn't
+	  support instances.
 
 
 CHANGES IN CUPS V1.1.6-3

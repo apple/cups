@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.16 2001/01/22 15:03:24 mike Exp $"
+ * "$Id: dest.c,v 1.17 2001/03/21 17:58:11 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -210,6 +210,9 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
   cups_dest_t	*dest;			/* Destination pointer */
   const char	*home;			/* HOME environment variable */
   char		filename[1024];		/* Local ~/.lpoptions file */
+  const char	*defprinter;		/* Default printer */
+  char		name[1024],		/* Copy of printer name */
+		*instance;		/* Pointer to instance name */
 
 
  /*
@@ -253,8 +256,25 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
   * Grab the default destination...
   */
 
-  if ((dest = cupsGetDest(cupsGetDefault(), NULL, num_dests, *dests)) != NULL)
-    dest->is_default = 1;
+  if ((defprinter = cupsGetDefault()) != NULL)
+  {
+   /*
+    * Grab printer and instance name...
+    */
+
+    strncpy(name, defprinter, sizeof(name) - 1);
+    name[sizeof(name) - 1] = '\0';
+
+    if ((instance = strchr(name, '/')) != NULL)
+      *instance++ = '\0';
+
+   /*
+    * Lookup the printer and instance and make it the default...
+    */
+
+    if ((dest = cupsGetDest(name, instance, num_dests, *dests)) != NULL)
+      dest->is_default = 1;
+  }
 
  /*
   * Load the /etc/cups/lpoptions and ~/.lpoptions files...
@@ -517,5 +537,5 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
 
 
 /*
- * End of "$Id: dest.c,v 1.16 2001/01/22 15:03:24 mike Exp $".
+ * End of "$Id: dest.c,v 1.17 2001/03/21 17:58:11 mike Exp $".
  */
