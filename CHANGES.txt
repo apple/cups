@@ -1,6 +1,14 @@
 CHANGES.txt - 08/04/2000
 ------------------------
 
+CHANGES IN CUPS v1.1.3
+
+	- Enabled pstoraster debug messages for everything
+	  (only logged when LogLevel set to "debug")
+	- Changed the Input/OutputAttributes fix in
+	  pstoraster so that it works on all platforms.
+
+
 CHANGES IN CUPS v1.1.2
 
 	- Makefile/configure fixes
