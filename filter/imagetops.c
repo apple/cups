@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.10 1999/04/06 19:37:14 mike Exp $"
+ * "$Id: imagetops.c,v 1.11 1999/04/16 17:10:51 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -232,11 +232,10 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Write any JCL commands that are needed to print PostScript code...
   */
 
-  ppdEmit(ppd, stdout, PPD_ORDER_JCL);
-
   if (ppd != NULL && ppd->jcl_begin && ppd->jcl_ps)
   {
     fputs((char *)ppd->jcl_begin, stdout);
+    ppdEmit(ppd, stdout, PPD_ORDER_JCL);
     fputs((char *)ppd->jcl_ps, stdout);
   }
 
@@ -483,5 +482,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.10 1999/04/06 19:37:14 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.11 1999/04/16 17:10:51 mike Exp $".
  */
