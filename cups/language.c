@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.38 2003/05/15 15:52:49 mike Exp $"
+ * "$Id: language.c,v 1.39 2003/05/15 20:00:32 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -322,6 +322,16 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   }
 
  /*
+  * Restore the locale...
+  */
+
+#if defined(__APPLE__) || !defined(LC_CTYPE)
+  setlocale(LC_ALL, oldlocale);
+#else
+  setlocale(LC_CTYPE, oldlocale);
+#endif /* __APPLE__ || !LC_CTYPE */
+
+ /*
   * Figure out the desired encoding...
   */
 
@@ -376,16 +386,6 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     else
       strcpy(real, langname);
   }
-
- /*
-  * Restore the locale...
-  */
-
-#if defined(__APPLE__) || !defined(LC_CTYPE)
-  setlocale(LC_ALL, oldlocale);
-#else
-  setlocale(LC_CTYPE, oldlocale);
-#endif /* __APPLE__ || !LC_CTYPE */
 
  /*
   * Open the messages file; the first line contains the default
@@ -730,5 +730,5 @@ cups_cache_lookup(const char      *name,/* I - Name of locale */
 
 
 /*
- * End of "$Id: language.c,v 1.38 2003/05/15 15:52:49 mike Exp $".
+ * End of "$Id: language.c,v 1.39 2003/05/15 20:00:32 mike Exp $".
  */
