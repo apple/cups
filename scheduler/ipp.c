@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.77 2004/02/04 20:15:11 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.78 2004/02/17 21:32:58 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -944,10 +944,10 @@ add_job_state_reasons(client_t *con,	/* I - Client connection */
   printer_t	*dest;			/* Destination printer */
 
 
-  LogMessage(L_DEBUG2, "add_job_state_reasons(%d, %d)\n", con->http.fd,
-             job->id);
+  LogMessage(L_DEBUG2, "add_job_state_reasons(%p[%d], %d)\n", con, con->http.fd,
+             job ? job->id : 0);
 
-  switch (job->state->values[0].integer)
+  switch (job ? job->state->values[0].integer : IPP_JOB_CANCELLED)
   {
     case IPP_JOB_PENDING :
         if (job->dtype & CUPS_PRINTER_CLASS)
@@ -4479,6 +4479,7 @@ print_job(client_t        *con,		/* I - Client connection */
   int			priority;	/* Job priority */
   char			*title;		/* Job name/title */
   job_t			*job;		/* Current job */
+  int			jobid;		/* Job ID number */
   char			job_uri[HTTP_MAX_URI],
 					/* Job URI */
 			printer_uri[HTTP_MAX_URI],
@@ -5115,10 +5116,15 @@ print_job(client_t        *con,		/* I - Client connection */
   SaveJob(job->id);
 
  /*
-  * Start the job if possible...
+  * Start the job if possible...  Since CheckJobs() can cancel a job if it
+  * doesn't print, we need to re-find the job afterwards...
   */
 
+  jobid = job->id;
+
   CheckJobs();
+
+  job = FindJob(jobid);
 
  /*
   * Fill in the response info...
@@ -5127,18 +5133,18 @@ print_job(client_t        *con,		/* I - Client connection */
 #ifdef AF_INET6
   if (con->http.hostaddr.addr.sa_family == AF_INET6)
     snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	     ntohs(con->http.hostaddr.ipv6.sin6_port), job->id);
+	     ntohs(con->http.hostaddr.ipv6.sin6_port), jobid);
   else
 #endif /* AF_INET6 */
   snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	   ntohs(con->http.hostaddr.ipv4.sin_port), job->id);
+	   ntohs(con->http.hostaddr.ipv4.sin_port), jobid);
 
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL, job_uri);
 
-  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", jobid);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
-                job->state->values[0].integer);
+                job ? job->state->values[0].integer : IPP_JOB_CANCELLED);
   add_job_state_reasons(con, job);
 
   con->response->request.status.status_code = IPP_OK;
@@ -6036,7 +6042,17 @@ send_document(client_t        *con,	/* I - Client connection */
     }
 
     SaveJob(job->id);
+
+   /*
+    * Start the job if possible...  Since CheckJobs() can cancel a job if it
+    * doesn't print, we need to re-find the job afterwards...
+    */
+
+    jobid = job->id;
+
     CheckJobs();
+
+    job = FindJob(jobid);
   }
   else
   {
@@ -6058,19 +6074,19 @@ send_document(client_t        *con,	/* I - Client connection */
 #ifdef AF_INET6
   if (con->http.hostaddr.addr.sa_family == AF_INET6)
     snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	     ntohs(con->http.hostaddr.ipv6.sin6_port), job->id);
+	     ntohs(con->http.hostaddr.ipv6.sin6_port), jobid);
   else
 #endif /* AF_INET6 */
   snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	   ntohs(con->http.hostaddr.ipv4.sin_port), job->id);
+	   ntohs(con->http.hostaddr.ipv4.sin_port), jobid);
 
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL,
                job_uri);
 
-  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", jobid);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
-                job->state->values[0].integer);
+                job ? job->state->values[0].integer : IPP_JOB_CANCELLED);
   add_job_state_reasons(con, job);
 
   con->response->request.status.status_code = IPP_OK;
@@ -6898,5 +6914,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.77 2004/02/04 20:15:11 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.78 2004/02/17 21:32:58 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.24.2.14 2003/05/22 12:48:35 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.24.2.15 2004/02/17 21:32:58 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -310,7 +310,8 @@ print_file(const char    *name,		/* I - Printer or class name */
   if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
                                  cupsEncryption())) == NULL)
   {
-    syslog(LOG_ERR, "Unable to connect to server: %s", strerror(errno));
+    syslog(LOG_ERR, "Unable to connect to server %s: %s", cupsServer(),
+           strerror(errno));
     return (0);
   }
 
@@ -507,8 +508,9 @@ recv_print_job(const char    *dest,	/* I - Destination */
 
 	    if ((fd = open(control, O_WRONLY)) < 0)
 	    {
-	      syslog(LOG_ERR, "Unable to append to temporary control file - %s",
-        	     strerror(errno));
+	      syslog(LOG_ERR,
+	             "Unable to append to temporary control file \"%s\" - %s",
+        	     control, strerror(errno));
 	      putchar(1);
 	      status = 1;
 	      break;
@@ -520,8 +522,8 @@ recv_print_job(const char    *dest,	/* I - Destination */
 	  {
 	    if ((fd = cupsTempFd(control, sizeof(control))) < 0)
 	    {
-	      syslog(LOG_ERR, "Unable to open temporary control file - %s",
-        	     strerror(errno));
+	      syslog(LOG_ERR, "Unable to open temporary control file \"%s\" - %s",
+        	     control, strerror(errno));
 	      putchar(1);
 	      status = 1;
 	      break;
@@ -555,8 +557,8 @@ recv_print_job(const char    *dest,	/* I - Destination */
 
           if ((fd = cupsTempFd(temp[num_data], sizeof(temp[0]))) < 0)
 	  {
-	    syslog(LOG_ERR, "Unable to open temporary data file - %s",
-        	   strerror(errno));
+	    syslog(LOG_ERR, "Unable to open temporary data file \"%s\" - %s",
+        	   temp[num_data], strerror(errno));
 	    putchar(1);
 	    status = 1;
 	    break;
@@ -817,7 +819,8 @@ remove_jobs(const char *dest,		/* I - Destination */
   if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
                                  cupsEncryption())) == NULL)
   {
-    syslog(LOG_ERR, "Unable to connect to server: %s", strerror(errno));
+    syslog(LOG_ERR, "Unable to connect to server %s: %s", cupsServer(),
+           strerror(errno));
     return (1);
   }
 
@@ -973,8 +976,9 @@ send_state(const char *dest,		/* I - Destination */
   if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
                                  cupsEncryption())) == NULL)
   {
-    syslog(LOG_ERR, "Unable to connect to server: %s", strerror(errno));
-    printf("Unable to connect to server: %s", strerror(errno));
+    syslog(LOG_ERR, "Unable to connect to server %s: %s", cupsServer(),
+           strerror(errno));
+    printf("Unable to connect to server %s: %s", cupsServer(), strerror(errno));
     return (1);
   }
 
@@ -1296,5 +1300,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.24.2.14 2003/05/22 12:48:35 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.24.2.15 2004/02/17 21:32:58 mike Exp $".
  */

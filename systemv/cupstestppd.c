@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.26 2003/11/07 19:45:05 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.27 2004/02/17 21:32:58 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -75,6 +75,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   const char	*ptr;		/* Pointer into string */
   int		files;		/* Number of files */
   int		verbose;	/* Want verbose output? */
+  int		relaxed;	/* Want relaxed testing? */
   int		status;		/* Exit status */
   int		errors;		/* Number of conformance errors */
   int		ppdversion;	/* PPD spec version in PPD file */
@@ -100,6 +101,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   ppdSetConformance(PPD_CONFORM_STRICT);
 
   verbose = 0;
+  relaxed = 0;
   ppd     = NULL;
   files   = 0;
   status  = ERROR_NONE;
@@ -123,6 +125,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	  case 'r' :			/* Relaxed mode */
               ppdSetConformance(PPD_CONFORM_RELAXED);
+	      relaxed = 1;
 	      break;
 
 	  case 'v' :			/* Verbose mode */
@@ -281,6 +284,31 @@ main(int  argc,			/* I - Number of command-line arguments */
       if ((attr = ppdFindAttr(ppd, "FormatVersion", NULL)) != NULL &&
           attr->value)
         ppdversion = (int)(10 * atof(attr->value) + 0.5);
+
+      if (verbose > 0)
+      {
+       /*
+        * Look for default keywords with no matching option...
+	*/
+
+        for (i = 0; i < ppd->num_attrs; i ++)
+	{
+	  attr = ppd->attrs[i];
+
+          if (!strcmp(attr->name, "DefaultColorSpace") ||
+	      !strcmp(attr->name, "DefaultFont") ||
+	      !strcmp(attr->name, "DefaultImageableArea") ||
+	      !strcmp(attr->name, "DefaultOutputOrder") ||
+	      !strcmp(attr->name, "DefaultPaperDimension") ||
+	      !strcmp(attr->name, "DefaultTransfer"))
+	    continue;
+	      
+	  if (!strncmp(attr->name, "Default", 7) &&
+	      !ppdFindOption(ppd, attr->name + 7))
+            printf("        WARN    %s has no corresponding options!\n",
+	           attr->name);
+        }
+      }
 
       if (ppdFindAttr(ppd, "DefaultImageableArea", NULL) != NULL)
       {
@@ -1093,5 +1121,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.26 2003/11/07 19:45:05 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.27 2004/02/17 21:32:58 mike Exp $".
  */

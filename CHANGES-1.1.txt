@@ -3,6 +3,14 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The scheduler could crash if a print job could not be
+	  printed and the PreserveJobHistory option was turned
+	  off (STR #535)
+	- cups-lpd now logs the temporary filenames that could
+	  not be opened in order to make troubleshooting easier
+	  (STR #565)
+	- cupsGetJobs() now returns -1 on error (STR #569)
+	- Added localization for Belarusian (STR #575)
 	- The LPD backend used the full length of the hostname
 	  when creating the data and control filenames, which
 	  causes problems with older systems that can't handle

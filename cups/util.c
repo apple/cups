@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.81.2.30 2004/02/04 19:18:06 mike Exp $"
+ * "$Id: util.c,v 1.81.2.31 2004/02/17 21:32:58 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -728,7 +728,7 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
   if (jobs == NULL)
   {
     last_error = IPP_INTERNAL_ERROR;
-    return (0);
+    return (-1);
   }
 
  /*
@@ -739,7 +739,7 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
   {
     DEBUG_puts("Unable to connect to server!");
     last_error = IPP_SERVICE_UNAVAILABLE;
-    return (0);
+    return (-1);
   }
 
  /*
@@ -937,7 +937,10 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
   else
     last_error = IPP_BAD_REQUEST;
 
-  return (n);
+  if (n == 0 && last_error >= IPP_BAD_REQUEST)
+    return (-1);
+  else
+    return (n);
 }
 
 
@@ -1554,5 +1557,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.81.2.30 2004/02/04 19:18:06 mike Exp $".
+ * End of "$Id: util.c,v 1.81.2.31 2004/02/17 21:32:58 mike Exp $".
  */
