@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20
 
+	- The lpadmin command displayed an incorrect error
+	  message when the "-u" option was provided with no
+	  arguments (STR #313)
 	- The web admin interface did not display an error
 	  message if the PPD file could not be loaded (STR #308)
 	- The ppdEmit() functions did not use the correct

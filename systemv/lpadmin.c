@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.22.2.19 2003/01/31 20:09:55 mike Exp $"
+ * "$Id: lpadmin.c,v 1.22.2.20 2003/10/06 20:33:10 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -427,7 +427,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-		fputs("lpadmin: Expected name=value after \'-o\' option!\n", stderr);
+		fputs("lpadmin: Expected allow/deny:userlist after \'-u\' option!\n", stderr);
 		return (1);
 	      }
 
@@ -2049,5 +2049,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.22.2.19 2003/01/31 20:09:55 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.22.2.20 2003/10/06 20:33:10 mike Exp $".
  */
