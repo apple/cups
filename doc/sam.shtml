@@ -4823,7 +4823,7 @@ server.
 </TR>
 </TABLE></CENTER>
 
-<H2>Printing to LPD Servers</H2>
+<H2><A NAME="LPD">Printing to LPD Servers</A></H2>
 
 <P>CUPS provides the <CODE>lpd</CODE> backend for printing to
 LPD-based servers and printers. Use a device URI of

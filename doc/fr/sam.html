@@ -5,7 +5,7 @@
 <META NAME="author" CONTENT="Easy Software Products">
 <META NAME="copyright" CONTENT="Copyright 1997-2003, All Rights Reserved">
 <META NAME="docnumber" CONTENT="CUPS-SAM-1.1.14">
-<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
 <STYLE TYPE="text/css"><!--
 BODY { font-family: serif }
 H1 { font-family: sans-serif }
@@ -249,7 +249,13 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#9_1_4">Support</A></LI>
 </UL>
 <LI><A HREF="#9_2">GNU GENERAL PUBLIC LICENSE</A></LI>
+<UL>
+<LI><A HREF="#9_2_1">Preamble</A></LI>
+</UL>
 <LI><A HREF="#9_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A></LI>
+<UL>
+<LI><A HREF="#9_3_1">Preamble</A></LI>
+</UL>
 </UL>
 <B><A HREF="#COMMON_NETWORK">B - R&eacute;glages r&eacute;seau courants</A></B>
 <UL>
@@ -336,8 +342,8 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <HR color="#000000" size="1px" width="50%">
 <H2><A NAME="1_1">Aper&ccedil;u du syst&egrave;me</A></H2>
 <P>CUPS fournit une couche d'impression portable pour les syst&egrave;mes
- d'exploitation de type UNIX&reg;. Il a &eacute;t&eacute; d&eacute;velopp&eacute; par<A HREF="http://www.easysw.com">
- Easy Software Products</A> pour promouvoir une solution d'impression
+ d'exploitation de type UNIX&reg;. Il a &eacute;t&eacute; d&eacute;velopp&eacute; par <A HREF="http://www.easysw.com">
+Easy Software Products</A> pour promouvoir une solution d'impression
  standard pour tous les vendeurs et utilisateurs d'UNIX. CUPS fournit
  des interfaces en ligne de commande de type System V et Berkeley.</P>
 <P>CUPS utilise le protocol IPP (Internet Printing Protocol) comme base
@@ -812,7 +818,7 @@ m&eacute;thode://serveur/chemin</CODE>.</P>
 </UL>
 <P>et vous quide pas &agrave; pas au travers des &eacute;tapes de configuration
  d'imprimante. Si vous n'aimez pas les interfaces en ligne de commande,
- essayez plut&ocirc;t<A HREF="#ADD_WEB"> l'interface web</A>.</P>
+ essayez plut&ocirc;t <A HREF="#ADD_WEB">l'interface web</A>.</P>
 <H3><A NAME="4_2_1">Ajouter votre premi&egrave;re imprimante depuis la ligne de
  commande</A></H3>
 <P>Ex&eacute;cutez la commande <CODE>lpadmin</CODE> avec l'option <CODE>-p</CODE>
@@ -1054,9 +1060,9 @@ devez</U> faire pr&eacute;c&eacute;der son nom du chemin d'acc&egrave;s complet 
 <P>Comme indiqu&eacute; auparavant, les classes implicites sont automatiquement
  cr&eacute;&eacute;es &agrave; partir des imprimantes et des classes disponibles sur le
  r&eacute;seau. Pour d&eacute;sactiver cette fonctionnalit&eacute;, r&eacute;glez la valeur de la
- directive<A HREF="#ImplicitClasses"> <CODE>ImplicitClasses</CODE></A>
+ directive <A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>
  sur <CODE>Off</CODE> dans le fichier <CODE>cupsd.conf</CODE>. Vous
- trouverez plus d'information sur la mani&egrave;re de faire cela dans le<A HREF="#PRINTING_MANAGEMENT">
+ trouverez plus d'information sur la mani&egrave;re de faire cela dans le <A HREF="#PRINTING_MANAGEMENT">
  Chapitre 6, &quot;Administration du syst&egrave;me d'impression&quot;</A>.</P>
 <H1 ALIGN="RIGHT"><A NAME="CLIENT_SETUP">5 - Configuration c&ocirc;t&eacute; client</A>
 </H1>
@@ -1131,7 +1137,7 @@ ServerName <I>serveur</I>
  sont automatiquement mises &agrave; jour chaque fois que des imprimantes et
  des serveurs sont ajout&eacute;s ou retir&eacute;s.</P>
 <P>Si vous d&eacute;sirez &eacute;galement voir les imprimantes sur d'autres
- sous-r&eacute;seau, utilisez la directive<A HREF="#BrowsePoll"> <CODE>
+ sous-r&eacute;seau, utilisez la directive <A HREF="#BrowsePoll"><CODE>
 BrowsePoll</CODE></A> comme indiqu&eacute; ci-apr&egrave;s.</P>
 <H3><A NAME="CLIENT_POLL">Choix de plusieurs serveurs pour l'impression</A>
 </H3>
@@ -1141,10 +1147,10 @@ BrowsePoll</CODE></A> comme indiqu&eacute; ci-apr&egrave;s.</P>
  singuli&egrave;rement la configuration sur les clients, et plusieurs clients
  sur le m&ecirc;me sous-r&eacute;seau peuvent partager les m&ecirc;mes informations de
  configuration.</P>
-<P>La surveillance est activ&eacute;e en indiquant une ou plusieurs directives<A
-HREF="#BrowsePoll"> <CODE>BrowsePoll</CODE></A> dans le fichier<VAR>
+<P>La surveillance est activ&eacute;e en indiquant une ou plusieurs directives <A
+HREF="#BrowsePoll"><CODE>BrowsePoll</CODE></A> dans le fichier<VAR>
  /etc/cups/cupsd.conf</VAR>. Pour savoir comment faire ces changements,
- veuillez vous reporter au<A HREF="#PRINTING_MANAGEMENT"> Chapitre 6,
+ veuillez vous reporter au <A HREF="#PRINTING_MANAGEMENT"> Chapitre 6,
  &quot;Administration du syst&egrave;me d'impression&quot;</A>.</P>
 <H1 ALIGN="RIGHT"><A NAME="PRINTING_MANAGEMENT">6 - Administration du
  syst&egrave;me d'impression</A></H1>
@@ -1166,7 +1172,7 @@ lpadmin</CODE> ou l'interface &quot;web&quot;.
 </DD>
 <DT>client.conf</DT>
 <DD> Ce fichier fournit le nom du serveur implicite pour les machines
- clientes. Veuillez vous reporter au<A HREF="#CLIENT_SETUP"> Chapitre 5,
+ clientes. Veuillez vous reporter au <A HREF="#CLIENT_SETUP">Chapitre 5,
  &quot;Configuration c&ocirc;t&eacute; client&quot;</A> pour de plus amples informations.
 <BR> &nbsp;
 <!-- NEED 1in -->
@@ -1377,7 +1383,7 @@ Allow</CODE> se cumulent, ainsi plusieurs directives <CODE>Allow</CODE>
 </CENTER>
 </P>
 <P>La directive <CODE>Allow</CODE> doit appara&icirc;tre &agrave; l'int&eacute;rieur d'une
- directive<A HREF="#Location"> <CODE>Location</CODE></A>.
+ directive <A HREF="#Location"><CODE>Location</CODE></A>.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="AuthClass">AuthClass</A></H3>
@@ -1424,7 +1430,7 @@ AuthGroupName lp
 <P>La directive <CODE>AuthGroupName</CODE> d&eacute;finit le groupe &agrave; utiliser
  pour l'authentification de type <CODE>Group</CODE>.</P>
 <P>La directive <CODE>AuthGroupName</CODE> doit appara&icirc;tre &agrave; l'int&eacute;rieur
- d'une directive<A HREF="#Location"> <CODE>Location</CODE></A>.
+ d'une directive <A HREF="#Location"> <CODE>Location</CODE></A>.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="AuthType">AuthType</A></H3>
@@ -1453,10 +1459,10 @@ AuthType BasicDigest
 </UL>
 <P> Lorsque vous utilisez <CODE>Basic</CODE>, <CODE>Digest</CODE>, ou <CODE>
 BasicDigest</CODE>, les clients se connectant en utilisant l'adresse <CODE>
-localhost</CODE> peuvent &eacute;galement le faire en utilisant les<A HREF="#CERTIFICATES">
- certificats</A>.</P>
+localhost</CODE> peuvent &eacute;galement le faire en utilisant les <A HREF="#CERTIFICATES">
+certificats</A>.</P>
 <P>La directive <CODE>AuthType</CODE> doit appara&icirc;tre &agrave; l'int&eacute;rieur
- d'une directive<A HREF="#Location"> <CODE>Location</CODE></A>.
+ d'une directive <A HREF="#Location"> <CODE>Location</CODE></A>.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="AutoPurgeJobs">AutoPurgeJobs</A></H3>
@@ -1526,7 +1532,7 @@ BrowseAllow from *.domain.com
  implicite est d'accepter des paquets d'exploration de n'importe quel
  h&ocirc;te.</P>
 <P>Le contr&ocirc;le sur la base du nom d'h&ocirc;te et de domaine impose que vous
- activiez la directive<A HREF="#HostNameLookups"> <CODE>HostNameLookups</CODE>
+ activiez la directive <A HREF="#HostNameLookups"><CODE>HostNameLookups</CODE>
 </A>.</P>
 <P>Le contr&ocirc;le sur la base de l'adresse IP prend en charge les
  correspondances exactes, les adresses partielles qui correspondent &agrave;
@@ -1552,7 +1558,7 @@ BrowseDeny from *.domain.com
  refuse de recevoir des paquets d'exploration. Le comportement implicite
  est de ne refuser aucun paquet d'exploration d'aucun h&ocirc;te.</P>
 <P>Le contr&ocirc;le sur la base du nom d'h&ocirc;te et de domaine impose que vous
- activiez la directive<A HREF="#HostNameLookups"> <CODE>HostNameLookups</CODE>
+ activiez la directive <A HREF="#HostNameLookups"><CODE>HostNameLookups</CODE>
 </A>.</P>
 <P>Le contr&ocirc;le sur la base de l'adresse IP prend en charge les
  correspondances exactes, les adresses partielles qui correspondent &agrave;
@@ -1595,7 +1601,7 @@ BrowseInterval 30
  de 0 interdit de diffuser des mises &agrave; jour mais autorise n&eacute;anmoins un
  serveur &agrave; recevoir des mises &agrave; jour en provenance d'autres h&ocirc;tes.</P>
 <P>La valeur <CODE>BrowseInterval</CODE> devrait toujours &ecirc;tre
- inf&eacute;rieure &agrave; la valeur<A HREF="#BrowseTimeout"> <CODE>BrowseTimeout</CODE>
+ inf&eacute;rieure &agrave; la valeur <A HREF="#BrowseTimeout"><CODE>BrowseTimeout</CODE>
 </A>. Sinon des imprimantes et des classes pourraient dispara&icirc;tre des
  syst&egrave;me clients entre les mises &agrave; jour.
 <!-- NEED 3in -->
@@ -1611,8 +1617,8 @@ BrowsePoll host.domain.com:631
 </UL>
 <H4>Description</H4>
 <P>La directive <CODE>BrowsePoll</CODE> collecte la liste des
- imprimantes disponibles sur un serveur une fois toutes les<A HREF="#BrowseInterval">
- <CODE>BrowseInterval</CODE></A> secondes. Plusieurs directives <CODE>
+ imprimantes disponibles sur un serveur une fois toutes les <A HREF="#BrowseInterval">
+<CODE>BrowseInterval</CODE></A> secondes. Plusieurs directives <CODE>
 BrowsePoll</CODE> peuvent &ecirc;tre indiqu&eacute;es pour surveiller plusieurs
  serveurs.</P>
 <P>Si <CODE>BrowseInterval</CODE> est mis &agrave; 0 alors le serveur est
@@ -1740,7 +1746,7 @@ BrowseTimeout 60
  concernant une imprimante ou une classe d&eacute;passent ce d&eacute;lai, elles sont
  retir&eacute;es de la liste des destinations disponibles.</P>
 <P>La valeur <CODE>BrowseTimeout</CODE> devrait toujours &ecirc;tre sup&eacute;rieure
- &agrave; la valeur<A HREF="#BrowseInterval"> <CODE>BrowseInterval</CODE></A>.
+ &agrave; la valeur <A HREF="#BrowseInterval"> <CODE>BrowseInterval</CODE></A>.
  Sinon des imprimantes et des classes pourraient dispara&icirc;tres des
  syst&egrave;mes clients entre les mises &agrave; jour.
 <!-- NEED 4in -->
@@ -1905,7 +1911,7 @@ Deny</CODE> peuvent &ecirc;tre utilis&eacute;es pour interdire l'acc&egrave;s &a
 </CENTER>
 </P>
 <P>La directive <CODE>Deny</CODE> doit appara&icirc;tre &agrave; l'int&eacute;rieur d'une
- directive<A HREF="#Location"> <CODE>Location</CODE></A>.
+ directive <A HREF="#Location"> <CODE>Location</CODE></A>.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="DocumentRoot">DocumentRoot</A></H3>
@@ -1920,8 +1926,8 @@ DocumentRoot /foo/bar/doc/cups
 <H4>Description</H4>
 <P>La directive <CODE>DocumentRoot</CODE> indique l'emplacement du
  contenu que le serveur HTTP de CUPS doit publier. Si un chemin absolu
- n'est pas indiqu&eacute;, celui-ci est consid&eacute;r&eacute; comme relatif au r&eacute;pertoire<A HREF="#ServerRoot">
- <CODE>ServerRoot</CODE></A>. La valeur implicite est<VAR>
+ n'est pas indiqu&eacute;, celui-ci est consid&eacute;r&eacute; comme relatif au r&eacute;pertoire <A
+HREF="#ServerRoot"><CODE>ServerRoot</CODE></A>. La valeur implicite est<VAR>
  /usr/share/doc/cups</VAR>.</P>
 <P>Les documents sont d'abord recherch&eacute;s dans un sous-r&eacute;pertoire
  correspondant &agrave; la langue demand&eacute;e par le client (par exemple<VAR>
@@ -1945,7 +1951,7 @@ Encryption Always
 </UL>
 <H4>Description</H4>
 <P>La directive <CODE>Encryption</CODE> doit appara&icirc;tre &agrave; l'int&eacute;rieur
- d'une section<A HREF="#Location"> <CODE>Location</CODE></A> et d&eacute;finit
+ d'une section <A HREF="#Location"><CODE>Location</CODE></A> et d&eacute;finit
  les r&eacute;glages d'encryptage pour cet emplacement. Le r&eacute;glage implicite
  est <CODE>IfRequested</CODE> pour tous les emplacements.
 <!-- NEED 3in -->
@@ -1963,7 +1969,7 @@ ErrorLog syslog
 <H4>Description</H4>
 <P>La directive <CODE>ErrorLog</CODE> d&eacute;finit le nom du fichier de suivi
  d'erreurs (&quot;error log&quot;). Si le nom de fichier n'est pas un chemin
- absolu, il est consid&eacute;r&eacute; comme un chemin relatif au r&eacute;pertoire<A HREF="#ServerRoot">
+ absolu, il est consid&eacute;r&eacute; comme un chemin relatif au r&eacute;pertoire <A HREF="#ServerRoot">
  <CODE>ServerRoot</CODE></A>. Le fichier standard est<VAR>
  /var/log/cups/error_log</VAR>.</P>
 <P>Le nom du serveur peut &ecirc;tre inclus dans le nom du fichier en
@@ -2083,8 +2089,8 @@ ImplicitClasses Off
 <P>La directive <CODE>ImplicitClasses</CODE> contr&ocirc;le si les classes
  implicites sont cr&eacute;&eacute;es sur la base des imprimantes et classes
  disponibles sur le r&eacute;seau. La valeur implicite est <CODE>On</CODE> mais
- est automatiquement positionn&eacute;e sur <CODE>Off</CODE> si<A HREF="#Browsing">
- <CODE>Browsing</CODE></A> est &agrave; la valeur <CODE>Off</CODE>.
+ est automatiquement positionn&eacute;e sur <CODE>Off</CODE> si <A HREF="#Browsing">
+<CODE>Browsing</CODE></A> est &agrave; la valeur <CODE>Off</CODE>.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="ImplicitAnyClasses">ImplicitAnyClasses</A></H3>
@@ -2117,8 +2123,8 @@ Include /foo/bar/filename
 <H4>Description</H4>
 <P>La directive <CODE>Include</CODE> inclut le fichier indiqu&eacute; dans le
  corps du fichier <CODE>cupsd.conf</CODE>. Si aucun chemin n'est
- indiqu&eacute;, le fichier est consid&eacute;r&eacute; comme &eacute;tant relatif au r&eacute;pertoire<A HREF="#ServerRoot">
- <CODE>ServerRoot</CODE></A>.</P>
+ indiqu&eacute;, le fichier est consid&eacute;r&eacute; comme &eacute;tant relatif au r&eacute;pertoire <A HREF="#ServerRoot">
+<CODE>ServerRoot</CODE></A>.</P>
 
 <!-- NEED 3in -->
 <H3><A NAME="KeepAlive">KeepAlive</A></H3>
@@ -2172,7 +2178,7 @@ KeepAliveTimeout 30
 <H4>Description</H4>
 <P>La directive <CODE>Limit</CODE> groupe les directives de contr&ocirc;le
  d'acc&egrave;s pour certains types sp&eacute;cifiques de requ&ecirc;tes HTTP et doit
- appara&icirc;tre &agrave; l'int&eacute;rieur d'une section<A HREF="#Location"> <CODE>
+ appara&icirc;tre &agrave; l'int&eacute;rieur d'une section <A HREF="#Location"><CODE>
 Location</CODE></A>. L'acc&egrave;s peut &ecirc;tre limit&eacute; &agrave; des types individuels de
  requ&ecirc;tes (<CODE>DELETE</CODE>, <CODE>GET</CODE>, <CODE>HEAD</CODE> , <CODE>
 OPTIONS</CODE>, <CODE>POST</CODE>, <CODE>PUT</CODE>, et <CODE>TRACE</CODE>
@@ -2194,8 +2200,8 @@ OPTIONS</CODE>, <CODE>POST</CODE>, <CODE>PUT</CODE>, et <CODE>TRACE</CODE>
 <H4>Description</H4>
 <P>La directive <CODE>LimitExcept</CODE> groupe les directives de
  contr&ocirc;le d'acc&egrave;s pour certains types sp&eacute;cifiques de requ&ecirc;tes HTTP et
- doit appara&icirc;tre &agrave; l'int&eacute;rieur d'une section<A HREF="#Location"> <CODE>
-Location</CODE></A>. Contrairement &agrave; la directive<A HREF="#Limit"> <CODE>
+ doit appara&icirc;tre &agrave; l'int&eacute;rieur d'une section <A HREF="#Location"> <CODE>
+Location</CODE></A>. Contrairement &agrave; la directive <A HREF="#Limit"><CODE>
 Limit</CODE></A>, <CODE>LimitExcept</CODE> restreint l'acc&egrave;s pour toutes
  les requ&ecirc;tes<I> &agrave; l'exception</I> de celles list&eacute;es dans la ligne <CODE>
 LimitExcept</CODE>.
@@ -2216,8 +2222,8 @@ LimitRequestBody 0
  maximale des fichiers d'impression, des requ&ecirc;tes IPP, et des donn&eacute;es
  des formulaires HTML dans les requ&ecirc;tes HTTP POST. La limite implicite
  est de 0 ce qui d&eacute;sactive la v&eacute;rification de la limite.</P>
-<P>Reportez-vous &eacute;galement &agrave; la directive similaire<A HREF="#MaxRequestSize">
- <CODE>MaxRequestSize</CODE></A>.
+<P>Reportez-vous &eacute;galement &agrave; la directive similaire <A HREF="#MaxRequestSize">
+<CODE>MaxRequestSize</CODE></A>.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="Listen">Listen</A></H3>
@@ -2234,8 +2240,8 @@ Listen 192.0.2.1:631
  port sur lequel &eacute;couter en attente de connexions. Plusieurs directives <CODE>
 Listen</CODE> peuvent &ecirc;tre indiqu&eacute;es pour &eacute;couter sur de multiples
  adresses.</P>
-<P>La directive <CODE>Listen</CODE> est similaire &agrave; la directive<A HREF="#Port">
- <CODE>Port</CODE></A> mais vous permet de restreindre l'acc&egrave;s &agrave; des
+<P>La directive <CODE>Listen</CODE> est similaire &agrave; la directive <A HREF="#Port">
+<CODE>Port</CODE></A> mais vous permet de restreindre l'acc&egrave;s &agrave; des
  interfaces ou des r&eacute;seaux sp&eacute;cifiques.
 <!-- NEED 3in -->
 </P>
@@ -2261,7 +2267,7 @@ Listen</CODE> peuvent &ecirc;tre indiqu&eacute;es pour &eacute;couter sur de mul
 <P>La directive <CODE>Location</CODE> indique des options de contr&ocirc;le
  d'acc&egrave;s et d'authentification pour le chemin ou la ressource HTTP
  indiqu&eacute;e. Des informations suppl&eacute;mentaires sont disponibles plus loin
- dans le chapitre dans la section<A HREF="#PRINTING_SECURITY"> &quot;S&eacute;curit&eacute;
+ dans le chapitre dans la section <A HREF="#PRINTING_SECURITY">&quot;S&eacute;curit&eacute;
  du syst&egrave;me d'impression&quot;</A>.
 <!-- NEED 3in -->
 </P>
@@ -2284,7 +2290,7 @@ LogLevel debug2
 </UL>
 <H4>Description</H4>
 <P>La directive <CODE>LogLevel</CODE> indique la quantit&eacute; d'informations
- &agrave; consigner dans le fichier<A HREF="#ErrorLog"> <CODE>ErrorLog</CODE></A>
+ &agrave; consigner dans le fichier <A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A>
 . Les valeurs suivantes sont reconnues (chaque niveau inclut tout ce qui
  l'est dans les niveaux inf&eacute;rieurs):</P>
 <UL>
@@ -2427,8 +2433,8 @@ MaxRequestSize 0
  des fichiers d'impression, des requ&ecirc;tes IPP, et des donn&eacute;es des
  formulaires HTML contenus dans les requ&ecirc;tes HTTP POST. La valeur
  implicite est 0, ce qui d&eacute;sactive cette v&eacute;rification de limite.</P>
-<P>Reportez-vous &eacute;galement &agrave; la directive similaire<A HREF="#LimitRequestBody">
- <CODE>LimitRequestBody</CODE></A>.
+<P>Reportez-vous &eacute;galement &agrave; la directive similaire <A HREF="#LimitRequestBody">
+<CODE>LimitRequestBody</CODE></A>.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="Order">Order</A></H3>
@@ -2451,7 +2457,7 @@ Deny</CODE>.</LI>
  les h&ocirc;tes list&eacute;s dans une directive <CODE>Allow</CODE>.</LI>
 </UL>
 <P>La directive <CODE>Order</CODE> doit appara&icirc;tre &agrave; l'int&eacute;rieur d'une
- directive<A HREF="#Location"> <CODE>Location</CODE></A>.
+ directive <A HREF="#Location"> <CODE>Location</CODE></A>.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="PageLog">PageLog</A></H3>
@@ -2467,7 +2473,7 @@ PageLog syslog
 <H4>Description</H4>
 <P>La directive <CODE>PageLog</CODE> d&eacute;finit le nom du fichier &quot;page
  log&quot;. Si le nom du fichier n'est pas absolu, il est consid&eacute;r&eacute; comme
- &eacute;tant relatif au r&eacute;pertoire<A HREF="#ServerRoot"> <CODE>ServerRoot</CODE>
+ &eacute;tant relatif au r&eacute;pertoire <A HREF="#ServerRoot"><CODE>ServerRoot</CODE>
 </A>. Le fichier standard &quot;page log&quot; est<VAR> /var/log/cups/page_log</VAR>
 .</P>
 <P>Le nom du serveur peut &ecirc;tre inclus dans le nom de fichier en
@@ -2620,8 +2626,8 @@ RequestRoot /foo/bar/spool/cups
 <H4>Description</H4>
 <P>La directive <CODE>RequestRoot</CODE> d&eacute;finit le r&eacute;pertoire pour les
  requ&ecirc;tes entrantes IPP et les formulaires HTML. Si un chemin absolu
- n'est pas fourni alors il est consid&eacute;r&eacute; comme relatif au r&eacute;pertoire<A HREF="#ServerRoot">
- <CODE>ServerRoot</CODE></A>. Le r&eacute;pertoire implicite est<VAR>
+ n'est pas fourni alors il est consid&eacute;r&eacute; comme relatif au r&eacute;pertoire <A HREF="#ServerRoot">
+<CODE>ServerRoot</CODE></A>. Le r&eacute;pertoire implicite est<VAR>
  /var/spool/cups</VAR>.
 <!-- NEED 4in -->
 </P>
@@ -2646,7 +2652,7 @@ group</CODE> indique que l'utilisateur authentifi&eacute; doit &ecirc;tre membre
  authentifi&eacute; peut acc&eacute;der &agrave; la ressource.</P>
 <P>Le comportement implicite (&quot;par d&eacute;faut&quot;) est de ne faire aucune
  authentification. Cette directive doit appara&icirc;tre &agrave; l'int&eacute;rieur d'une
- directive<A HREF="#Location"> <CODE>Location</CODE></A>.
+ directive <A HREF="#Location"><CODE>Location</CODE></A>.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="RIPCache">RIPCache</A></H3>
@@ -2713,7 +2719,7 @@ Satisfy any
  l'authentifiation pour l'acc&egrave;s &agrave; distance mais autoriser l'acc&egrave;s local
  sans elle.</P>
 <P>La valeur implicite est <CODE>all</CODE>. Cette directive doit
- appara&icirc;tre &agrave; l'int&eacute;rieur d'une directive<A HREF="#Location"> <CODE>
+ appara&icirc;tre &agrave; l'int&eacute;rieur d'une directive <A HREF="#Location"> <CODE>
 Location</CODE></A>.
 <!-- NEED 3in -->
 </P>
@@ -2744,8 +2750,8 @@ ServerBin /foo/bar/lib/cups
 <H4>Description</H4>
 <P>La directive <CODE>ServerBin</CODE> d&eacute;finit le r&eacute;pertoire contenant
  les fichiers ex&eacute;cutables du serveur. Si un chemin absolu n'est pas
- indiqu&eacute;, il est consid&eacute;r&eacute; comme relatif au r&eacute;pertoire<A HREF="#ServerRoot">
- <CODE>ServerRoot</CODE></A> . Le r&eacute;pertoire implicite est<VAR>
+ indiqu&eacute;, il est consid&eacute;r&eacute; comme relatif au r&eacute;pertoire <A HREF="#ServerRoot">
+<CODE>ServerRoot</CODE></A> . Le r&eacute;pertoire implicite est<VAR>
  /usr/lib/cups</VAR>.
 <!-- NEED 3in -->
 </P>
@@ -2827,8 +2833,8 @@ SSLListen 192.0.2.1:443
  port sur lequel &eacute;couter les tentatives de connexion s&eacute;curis&eacute;es.
  Plusieurs directives <CODE>SSLListen</CODE> peuvent &ecirc;tre fournies pour
  indiquer plusieurs adresses sur lesquelles &eacute;couter.</P>
-<P>La directive <CODE>SSLListen</CODE> est similaire &agrave; la directive<A HREF="#SSLPort">
- <CODE>SSLPort</CODE></A> mais vous permet de restreindre l'acc&egrave;s &agrave;
+<P>La directive <CODE>SSLListen</CODE> est similaire &agrave; la directive <A HREF="#SSLPort">
+<CODE>SSLPort</CODE></A> mais vous permet de restreindre l'acc&egrave;s &agrave;
  certaines interfaces ou r&eacute;seaux.
 <!-- NEED 3in -->
 </P>
@@ -2860,7 +2866,7 @@ SystemGroup root
 <P>La directive <CODE>SystemGroup</CODE> indique le groupe syst&egrave;me
  d'aministration pour l'authentification de type <CODE>System</CODE>.
  Plus d'information peut &ecirc;tre trouv&eacute;e plus loin dans ce chapitre dans la
- section<A HREF="#PRINTING_SECURITY"> &quot;S&eacute;curit&eacute; du syst&egrave;me d'impression&quot;</A>
+ section <A HREF="#PRINTING_SECURITY">&quot;S&eacute;curit&eacute; du syst&egrave;me d'impression&quot;</A>
 .
 <!-- NEED 3in -->
 </P>
@@ -2932,8 +2938,8 @@ User guest
  efficacement le nombre potentiel d'utilisateurs de votre syst&egrave;me.</P>
 <P>CUPS maintient &agrave; jour une liste des emplacements dont
  l'authentification et/ou le contr&ocirc;le d'acc&egrave;s est/sont activ&eacute;(e)(s). Ces
- emplacements sont indiqu&eacute;s en utilisant la directive<A HREF="#Location">
- <CODE>Location</CODE></A>:</P>
+ emplacements sont indiqu&eacute;s en utilisant la directive <A HREF="#Location">
+<CODE>Location</CODE></A>:</P>
 <UL>
 <PRE>
 &lt;Location /ressource&gt;
@@ -2948,7 +2954,7 @@ User guest
 </PRE>
 </UL>
 <P>Les emplacements suivent g&eacute;n&eacute;ralement la structure arborescente du
- contenu du r&eacute;pertoire<A HREF="#DocumentRoot"> <CODE>DocumentRoot</CODE></A>
+ contenu du r&eacute;pertoire <A HREF="#DocumentRoot"><CODE>DocumentRoot</CODE></A>
 , cependant CUPS poss&egrave;de de nombreux emplacements virtuels pour
  l'administration, les classes, les travaux d'impression et les
  imprimantes:
@@ -2994,15 +3000,15 @@ Authorization: Local 0123456789ABCDEF0123456789ABCDEF
 <P>Les certificats sont automatiquement g&eacute;n&eacute;r&eacute;s par le serveur et
  stock&eacute;s dans le r&eacute;pertoire<VAR> /etc/cups/certs</VAR> en utilisant le
  n&deg; de processus du programme CGI (&quot;process ID&quot;) ex&eacute;cut&eacute; par le serveur.
- Les fichiers de certificats sont en lecture seule pour les utilisateurs<A
-HREF="#User"> <CODE>User</CODE></A> et groupes<A HREF="#Group"> <CODE>
+ Les fichiers de certificats sont en lecture seule pour les utilisateurs
+ <A HREF="#User"><CODE>User</CODE></A> et groupes <A HREF="#Group"><CODE>
 Group</CODE></A> d&eacute;finis dans le fichier<VAR> cupsd.conf</VAR>. Quand le
  programme CGI se termine, le certificat est retir&eacute; et rendu
  automatiquement invalide.</P>
 <P>Le fichier sp&eacute;cial<VAR> /etc/cups/certs/0</VAR> d&eacute;finit le<I>
  certificat de root</I> qui peut &ecirc;tre utilis&eacute; par tout client
  fonctionnant sous l'identit&eacute; du super-utilisateur et qui appartient au
- group d&eacute;fini par la directive<A HREF="#SystemGroup"> <CODE>SystemGroup</CODE>
+ group d&eacute;fini par la directive <A HREF="#SystemGroup"><CODE>SystemGroup</CODE>
 </A>. Le certificat de root est automatiquement r&eacute;g&eacute;n&eacute;r&eacute; toutes les 5
  minutes.</P>
 <H3><A NAME="7_5_2">Utilisation de l'authentification &quot;Basic&quot;</A></H3>
@@ -3138,7 +3144,7 @@ AuthType Digest
 </PRE>
 </UL>
 <H3><A NAME="7_5_4">Authentifications &quot;System&quot; et &quot;Group&quot;</A></H3>
-<P>La directive<A HREF="#AuthClass"> <CODE>AuthClass</CODE></A> contr&ocirc;le
+<P>La directive <A HREF="#AuthClass"><CODE>AuthClass</CODE></A> contr&ocirc;le
  le niveau d'authentification &agrave; effectuer. Les authentifications <CODE>
 System</CODE> et <CODE>Group</CODE> ajoutent &agrave; l'authentification
  normale bas&eacute;e sur l'utilisateur une contrainte d'appartenance &agrave; un
@@ -3146,7 +3152,7 @@ System</CODE> et <CODE>Group</CODE> ajoutent &agrave; l'authentification
  utilisateur doit &ecirc;tre membre du groupe <CODE>sys</CODE>, <CODE>system</CODE>
 , ou <CODE>root</CODE>; le groupe r&eacute;el d&eacute;pend du syst&egrave;me d'exploitation.</P>
 <P>Pour l'authentification <CODE>Group</CODE> l'utilisateur doit &ecirc;tre
- membre du group indiqu&eacute; par la directive<A HREF="#AuthGroupName"> <CODE>
+ membre du group indiqu&eacute; par la directive <A HREF="#AuthGroupName"><CODE>
 AuthGroupName</CODE></A>:</P>
 <UL>
 <PRE>
@@ -3191,7 +3197,7 @@ H&ocirc;te Groupe Utilisateur Date/heure \&quot;M&eacute;thode Ressource Version
 </PRE>
 </UL>
 <P>Le champ<I> h&ocirc;te</I> ne devrait normalement &ecirc;tre qu'une adresse IP &agrave;
- moins que vous n'activiez la directive<A HREF="#HostNameLookups"> <CODE>
+ moins que vous n'activiez la directive <A HREF="#HostNameLookups"><CODE>
 HostNameLookups</CODE></A> dans le fichier<VAR> cupsd.conf</VAR>.</P>
 <P>Le champ<I> groupe</I> contient toujours &quot;-&quot; dans CUPS.</P>
 <P>Le champ<I> utilisateur</I> est le nom de l'utilisateur authentifi&eacute;
@@ -3285,8 +3291,8 @@ job-billing</CODE> fourni dans les requ&ecirc;te IPP <CODE>create-job</CODE>
  fichier bas&eacute; sur MIME, afin de convertir les fichiers dans un format
  utilisable par chaque imprimante. Au d&eacute;marrage, le serveur CUPS lit les
  fichiers de la base de donn&eacute;es MIME contenus dans le r&eacute;pertoire<VAR>
- /etc/cups</VAR> (ou un r&eacute;pertoire indiqu&eacute; au moyen de la directive<A HREF="#ServerRoot">
- <CODE>ServerRoot</CODE></A>) afin de construire en m&eacute;moire une base de
+ /etc/cups</VAR> (ou un r&eacute;pertoire indiqu&eacute; au moyen de la directive <A HREF="#ServerRoot">
+<CODE>ServerRoot</CODE></A>) afin de construire en m&eacute;moire une base de
  donn&eacute;es de conversion et de types de fichiers. Ces fichiers de base de
  donn&eacute;es sont de simples fichiers texte ASCII et peuvent &ecirc;tre modifi&eacute;s
  au moyen de votre &eacute;diteur de texte pr&eacute;f&eacute;r&eacute;.</P>
@@ -3444,8 +3450,8 @@ acme.msword.convs
 <P>Une fois choisis les noms pour ces fichiers, cr&eacute;ez-les au moyen de
  votre &eacute;diteur de texte pr&eacute;f&eacute;r&eacute; comme d&eacute;crit pr&eacute;c&eacute;demment dans ce
  chapitre. Une fois ces fichiers cr&eacute;&eacute;s, red&eacute;marrez le processus <CODE>
-cupsd</CODE> comme indiqu&eacute; pr&eacute;c&eacute;demment dans<A HREF="#RESTARTING">
- &quot;Red&eacute;marrage du serveur CUPS&quot;</A> .</P>
+cupsd</CODE> comme indiqu&eacute; pr&eacute;c&eacute;demment dans <A HREF="#RESTARTING">
+&quot;Red&eacute;marrage du serveur CUPS&quot;</A> .</P>
 <H3><A NAME="7_7_4">Pilotes d'imprimantes et fichiers PPD</A></H3>
 <P>Plusieurs pilotes d'imprimante CUPS utilisent un ou plusieurs filtres
  sp&eacute;cifiques et un fichier PPD pour chaque mod&egrave;le d'imprimante. Les
@@ -3739,7 +3745,7 @@ smbpasswd(1)</CODE> sinon vous ne pourrez pas vous authentifier.</P>
  premi&egrave;re utilise le protocole LPD sur le syst&egrave;me CUPS et le service
  &quot;Serveur d'impression TCP/IP&quot; sur le syst&egrave;me Windows NT. Vous pouvez
  trouver plus d'information au sujet de la premi&egrave;re configuration dans
- la section pr&eacute;c&eacute;dente<A HREF="#LPD"> LPD</A> de ce chapitre.</P>
+ la section pr&eacute;c&eacute;dente <A HREF="#LPD">LPD</A> de ce chapitre.</P>
 <P>La seconde m&eacute;thode utilise le protocole SMB de Microsoft (&quot;Server
  Message Block&quot;). La prise en charge de ce protocole est fournie par le
  logiciel libre SAMBA. Vous pouvez t&eacute;l&eacute;charger SAMBA &agrave; l'adresse
@@ -3872,7 +3878,7 @@ copies of this license document, but changing it is not allowed.
 <PRE>
 
 </PRE>
-<H4>Preamble</H4>
+<H3><A NAME="9_2_1">Preamble</A></H3>
 <P>The licenses for most software are designed to take away your freedom
  to share and change it. By contrast, the GNU General Public License is
  intended to guarantee your freedom to share and change free
@@ -4126,7 +4132,7 @@ of this license document, but changing it is not allowed.
 [This is the first released version of the library GPL.  It is
  numbered 2 because it goes with version 2 of the ordinary GPL.]
 </PRE>
-<H4>Preamble</H4>
+<H3><A NAME="9_3_1">Preamble</A></H3>
 <P>The licenses for most software are designed to take away your freedom
  to share and change it. By contrast, the GNU General Public Licenses
  are intended to guarantee your freedom to share and change free
@@ -4652,8 +4658,8 @@ PING mon_imprimante (192.0.2.2): 56 data bytes
 
 <!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Axis w/o IPP
-<BR><A HREF="#AXIS"> (voir instructions)</A></TD><TD>socket://<I>address</I>
- :9100
+<BR> <A HREF="#AXIS"> (voir instructions)</A></TD><TD>socket://<I>
+address</I> :9100
 <BR> socket://<I>address</I>:9101
 <BR> socket://<I>address</I>:9102</TD></TR>
 
@@ -4708,7 +4714,7 @@ PING mon_imprimante (192.0.2.2): 56 data bytes
 
 <!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Linksys EtherFast&reg;
-<BR><A HREF="#LINKSYS"> (voir instructions)</A></TD><TD>socket://<I>
+<BR> <A HREF="#LINKSYS"> (voir instructions)</A></TD><TD>socket://<I>
 address</I> :4010
 <BR> socket://<I>address</I>:4020
 <BR> socket://<I>address</I>:4030</TD></TR>
@@ -5097,9 +5103,9 @@ ftp&gt; <B>quit ENTREE</B>
  /etc/printcap</VAR> pour obtenir la liste des imprimantes disponibles.</P>
 <P>La configuration standard de CUPS ne cr&eacute;e pas ce fichier<VAR>
  /etc/printcap</VAR> automatiquement. Pour activer la cr&eacute;ation et la
- mise &agrave; jour automatiques de ce fichier, utilisez la directive<A HREF="#Printcap">
- <CODE>Printcap</CODE></A>d&eacute;crite au<A HREF="#PRINTING_MANAGEMENT">
- Chapitre 6, &quot;Administration du syst&egrave;me d'impression&quot;</A>.</P>
+ mise &agrave; jour automatiques de ce fichier, utilisez la directive <A HREF="#Printcap">
+<CODE>Printcap</CODE></A>d&eacute;crite au <A HREF="#PRINTING_MANAGEMENT">
+Chapitre 6, &quot;Administration du syst&egrave;me d'impression&quot;</A>.</P>
 <H2><A NAME="13_2">CUPS ne reconna&icirc;t pas mon nom d'utilisateur et mon
  mot de passe!</A></H2>
 <P>CUPS vous demandera un nom d'utilisateur UNIX et un mot de passe
@@ -5124,7 +5130,7 @@ AuthClass System
 </PRE>
 </UL>
  pour l'emplacement<VAR> /admin</VAR>. Red&eacute;marrez alors le serveur CUPS
- comme indiqu&eacute; dans le<A HREF="#PRINTING_MANAGEMENT"> Chapitre 6,
+ comme indiqu&eacute; dans le <A HREF="#PRINTING_MANAGEMENT">Chapitre 6,
  &quot;Administration du serveur d'impression&quot;</A>.
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
@@ -5149,14 +5155,14 @@ Allow from 127.0.0.1
 </PRE>
 </UL>
  pour l'emplacement<VAR> /admin</VAR>. Red&eacute;marrez alors le serveur CUPS
- comme indiqu&eacute; dans le<A HREF="#PRINTING_MANAGEMENT"> Chapitre 6,
+ comme indiqu&eacute; dans le <A HREF="#PRINTING_MANAGEMENT">Chapitre 6,
  &quot;Administration du serveur d'impression&quot;</A>.
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
 <TR><TD><B> NOTE:</B>
 <P>Autoriser l'acc&egrave;s &agrave; l'administration pour tous les h&ocirc;tes pr&eacute;sente un
- risque potentiel de s&eacute;curit&eacute;. Veuillez vous reporter au<A HREF="#PRINTING_MANAGEMENT">
- Chapitre 6, &quot;Administration du serveur d'impression&quot;</A> pour une
+ risque potentiel de s&eacute;curit&eacute;. Veuillez vous reporter au <A HREF="#PRINTING_MANAGEMENT">
+Chapitre 6, &quot;Administration du serveur d'impression&quot;</A> pour une
  description de ces risques ainsi que des m&eacute;thodes pour les minimiser.</P>
 </TD></TR>
 </TABLE>
@@ -5171,7 +5177,7 @@ Allow from 127.0.0.1
 <LI>au fait d'acc&eacute;der au serveur CUPS en utilisant le nom d'h&ocirc;te ou
  l'adresse IP sans activer l'acc&egrave;s &agrave; distance pour les fonctions
  d'administration. Cela peut &ecirc;tre corrig&eacute; en suivant les instructions
- pr&eacute;sentes dans la section<A HREF="#ALLOW_REMOTE"> &quot;Je ne peux pas
+ pr&eacute;sentes dans la section <A HREF="#ALLOW_REMOTE"> &quot;Je ne peux pas
  effectuer de t&acirc;ches d'administration depuis un poste distant!&quot;</A>
  &eacute;tudi&eacute;e pr&eacute;c&eacute;demment dans cette annexe.</LI>
 <LI>au fait de ne pas avoir de mot de passe pour le compte root. Pour

@@ -2031,6 +2031,14 @@ information and the PPD file for the printer. The following bits are defined:
 	<TD VALIGN="TOP">0x00010000</TD>
 	<TD VALIGN="TOP">Is an implicit (server-generated) class.</TD>
 </TR>
+<TR>
+	<TD VALIGN="TOP">0x00020000</TD>
+	<TD VALIGN="TOP">Is a network default printer.</TD>
+</TR>
+<TR>
+	<TD VALIGN="TOP">0x00040000</TD>
+	<TD VALIGN="TOP">Is a facsimile device.</TD>
+</TR>
 </TABLE></CENTER>
 
 <H3>printer-type-mask (type2 enum)</H3>

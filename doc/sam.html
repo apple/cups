@@ -5,7 +5,7 @@
 <META NAME="author" CONTENT="Easy Software Products">
 <META NAME="copyright" CONTENT="Copyright 1997-2003, All Rights Reserved">
 <META NAME="docnumber" CONTENT="CUPS-SAM-1.1.19">
-<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
 <STYLE TYPE="text/css"><!--
 BODY { font-family: serif }
 H1 { font-family: sans-serif }
@@ -263,7 +263,7 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <UL>
 <LI><A HREF="#8_1">The Basics</A></LI>
 <LI><A HREF="#8_2">Printing from LPD Clients</A></LI>
-<LI><A HREF="#8_3">Printing to LPD Servers</A></LI>
+<LI><A HREF="#LPD">Printing to LPD Servers</A></LI>
 <LI><A HREF="#8_4">Printing from Mac OS 10.2 and Later Clients</A></LI>
 <LI><A HREF="#8_5">Printing from Mac OS 10.1 and Earlier Clients</A></LI>
 <UL>
@@ -290,7 +290,13 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#9_1_5">Support</A></LI>
 </UL>
 <LI><A HREF="#9_2">GNU GENERAL PUBLIC LICENSE</A></LI>
+<UL>
+<LI><A HREF="#9_2_1">Preamble</A></LI>
+</UL>
 <LI><A HREF="#9_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A></LI>
+<UL>
+<LI><A HREF="#9_3_1">Preamble</A></LI>
+</UL>
 </UL>
 <B><A HREF="#COMMON_NETWORK">B - Common Network Settings</A></B>
 <UL>
@@ -337,7 +343,7 @@ Copyright 1997-2003, All Rights Reserved<BR>
 TM</SUP>&quot;), version 1.1.19.</P>
 <H2><A NAME="1_1">System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating
- systems. It has been developed by<A HREF="http://www.easysw.com"> Easy
+ systems. It has been developed by <A HREF="http://www.easysw.com">Easy
  Software Products</A> to promote a standard printing solution for all
  UNIX vendors and users. CUPS provides the System V and Berkeley
  command-line interfaces.</P>
@@ -540,7 +546,7 @@ File and directory names.</TD></TR>
  Installing CUPS</A></H1>
 <P>This chapter shows how to build and install the Common UNIX Printing
  System. If you are installing a binary distribution from the CUPS web
- site, proceed to the section titled,<A HREF="#BINARY"> Installing a
+ site, proceed to the section titled, <A HREF="#BINARY">Installing a
  Binary Distribution</A>.</P>
 <H2><A NAME="3_1">Installing a Source Distribution</A></H2>
 <P>This section describes how to compile and install CUPS on your system
@@ -791,7 +797,7 @@ file:/directory/filename</CODE> while network devices use the more
 </PRE>
 </UL>
 <P>and steps you through printer configuration. If you don't like
- command-line interfaces, try the<A HREF="#ADD_WEB"> Web interface</A>
+ command-line interfaces, try the <A HREF="#ADD_WEB">Web interface</A>
  instead.</P>
 <H3><A NAME="4_2_1">Adding Your First Printer from the Command-Line</A></H3>
 <P>Run the <CODE>lpadmin</CODE> command with the <CODE>-p</CODE> option
@@ -818,7 +824,7 @@ file:/directory/filename</CODE> while network devices use the more
 <P>As you can see, <CODE>deskjet.ppd</CODE> and <CODE>laserjet.ppd</CODE>
  are the PPD files for the HP DeskJet and HP LaserJet drivers included
  with CUPS. You'll find a complete list of PPD files and the printers
- they will work with in<A HREF="#PRINTER_DRIVERS"> Appendix C, &quot;Printer
+ they will work with in <A HREF="#PRINTER_DRIVERS">Appendix C, &quot;Printer
  Drivers&quot;</A>.</P>
 <P>For a dot matrix printer connected to the serial port this would
  might look like:</P>
@@ -872,8 +878,8 @@ file:/directory/filename</CODE> while network devices use the more
  PPD's are usually stored under the<VAR> /usr/share/cups/model/</VAR>
  directory structure. A list of all available models can be displayed
  using the <CODE>lpinfo</CODE> command with the <CODE>-m</CODE> option.
- A list of printer drivers included with CUPS can be found in<A HREF="#PRINTER_DRIVERS">
- Appendix C, &quot;Printer Drivers&quot;</A>.</DD>
+ A list of printer drivers included with CUPS can be found in <A HREF="#PRINTER_DRIVERS">
+Appendix C, &quot;Printer Drivers&quot;</A>.</DD>
 <DT>-r<I> class</I></DT>
 <DD>Removes the named printer from printer class<VAR> class</VAR>. If
  the resulting class becomes empty then it is removed.</DD>
@@ -957,8 +963,10 @@ lpoptions(1)</CODE> command.</P>
  quotas:</P>
 <UL>
 <PRE>
-<B>/usr/sbin/lpadmin -p <I>printer</I> -o job-quota-period=604800 -o job-k-limit=1024 <I>ENTER</I></B>
-<B>/usr/sbin/lpadmin -p <I>printer</I> -o job-quota-period=604800 -o job-page-limit=100 <I>ENTER</I></B>
+<B>/usr/sbin/lpadmin -p <I>printer</I> -o job-quota-period=604800 \
+    -o job-k-limit=1024 <I>ENTER</I></B>
+<B>/usr/sbin/lpadmin -p <I>printer</I> -o job-quota-period=604800 \
+    -o job-page-limit=100 <I>ENTER</I></B>
 </PRE>
 </UL>
 <P>Or, you can combine all three options on the same line.</P>
@@ -1072,10 +1080,10 @@ lpoptions(1)</CODE> command.</P>
 <H2><A NAME="5_4">Implicit Classes</A></H2>
 <P>A noted earlier, implicit classes are created automatically from the
  available network printers and classes. To disable this functionality,
- set the<A HREF="#ImplicitClasses"> <CODE>ImplicitClasses</CODE></A>
+ set the <A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>
  directive to <CODE>Off</CODE> in the <CODE>cupsd.conf</CODE> file. You
- will find more information on doing this in<A HREF="#PRINTING_MANAGEMENT">
- Chapter 6, &quot;Printing System Management&quot;</A>.</P>
+ will find more information on doing this in <A HREF="#PRINTING_MANAGEMENT">
+Chapter 6, &quot;Printing System Management&quot;</A>.</P>
 <H1 ALIGN="RIGHT"><A NAME="CLIENT_SETUP">5 - Client Setup</A></H1>
 <P>This chapter discusses several ways to configure CUPS clients for
  printing.</P>
@@ -1146,8 +1154,8 @@ ServerName <I>server</I>
  Each client should see the available printers within 30 seconds
  automatically. The printer and class lists are updated automatically as
  printers and servers are added or removed.</P>
-<P>If you want to see printers on other subnets as well, use the<A HREF="#BrowsePoll">
- <CODE>BrowsePoll</CODE></A> directive as described next.</P>
+<P>If you want to see printers on other subnets as well, use the <A HREF="#BrowsePoll">
+<CODE>BrowsePoll</CODE></A> directive as described next.</P>
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
 <TR><TD><B> NOTE:</B>
@@ -1156,11 +1164,11 @@ ServerName <I>server</I>
  braodcasts printer information every 30 seconds. Although this printer
  information does not use much bandwidth, typically about 80 bytes per
  printer, it can add up with large numbers of servers and printers.</P>
-<P>Use the<A HREF="#BrowseInterval"> <CODE>BrowseInterval</CODE></A> and<A
-HREF="#BrowseTimeout"> <CODE>BrowseTimeout</CODE></A> directives to tune
- the amount of data that is added to your network load. In addition,
- subnets can be used to minimize the amount of traffic that is carried
- by the &quot;backbone&quot; of your large network.</P>
+<P>Use the <A HREF="#BrowseInterval"><CODE>BrowseInterval</CODE></A> and
+ <A HREF="#BrowseTimeout"><CODE>BrowseTimeout</CODE></A> directives to
+ tune the amount of data that is added to your network load. In
+ addition, subnets can be used to minimize the amount of traffic that is
+ carried by the &quot;backbone&quot; of your large network.</P>
 </TD></TR>
 </TABLE>
 </CENTER>
@@ -1170,18 +1178,18 @@ HREF="#BrowseTimeout"> <CODE>BrowseTimeout</CODE></A> directives to tune
  automatic configuration without significant configuration on the
  clients, and multiple clients on the same subnet can share the same
  configuration information.</P>
-<P>Polling is enabled by specifying one or more<A HREF="#BrowsePoll"> <CODE>
+<P>Polling is enabled by specifying one or more <A HREF="#BrowsePoll"><CODE>
 BrowsePoll</CODE></A> directives in the<VAR> /etc/cups/cupsd.conf</VAR>
- file. For information on making these changes, see<A HREF="#PRINTING_MANAGEMENT">
- Chapter 6, &quot;Printing System Management&quot;</A>.</P>
-<P>Multiple<A HREF="#BrowsePoll"> <CODE>BrowsePoll</CODE></A> lines can
+ file. For information on making these changes, see <A HREF="#PRINTING_MANAGEMENT">
+Chapter 6, &quot;Printing System Management&quot;</A>.</P>
+<P>Multiple <A HREF="#BrowsePoll"><CODE>BrowsePoll</CODE></A> lines can
  be used to poll multiple CUPS servers. To limit the amount of polling
  you do from client machines, you can have only one of the clients do
  the polling and relay that information to the others on the same subnet
  (described next).</P>
 <H3><A NAME="CLIENT_RELAY">Relaying Printers to Other Clients</A></H3>
 <P>When you have clients and servers spread across multiple subnets, the
- polling method is inefficient. CUPS provides a<A HREF="#BrowseRelay"> <CODE>
+ polling method is inefficient. CUPS provides a <A HREF="#BrowseRelay"><CODE>
 BrowseRelay</CODE></A> directive that enables a single client to relay
  (broadcast) the polled printer information to the local subnet.</P>
 <P>For example, Server A and Server B are on subnet 1 and subnet 2,
@@ -1201,7 +1209,7 @@ BrowsePoll ServerB ENTER
 BrowseRelay 127.0.0.1 192.168.3.255 ENTER
 </B></PRE>
 </UL>
-<P>The<A HREF="#BrowseRelay"> <CODE>BrowseRelay</CODE></A> line
+<P>The <A HREF="#BrowseRelay"><CODE>BrowseRelay</CODE></A> line
  specifies a source address and mask. Any browse packets coming from a
  matching address wil be sent to the given broadcast address. In this
  case, we want the packets from the local machine (127.0.0.1) relayed to
@@ -1209,11 +1217,11 @@ BrowseRelay 127.0.0.1 192.168.3.255 ENTER
 <P>As printers are found using polling, they are relayed from client C
  to the rest of the clients through a broadcast on subnet 3. The rest of
  the clients can use the standard<VAR> cupsd.conf</VAR> configuration.</P>
-<P>The<A HREF="#BrowseRelay"> <CODE>BrowseRelay</CODE></A> directive can
+<P>The <A HREF="#BrowseRelay"><CODE>BrowseRelay</CODE></A> directive can
  also be used to relay browsing packets from one network interface to
  another. For example, if client C in the previous example had network
- interfaces attaches to both subnet 1 and subnet 2, it could use the<A HREF="#BrowseRelay">
- <CODE>BrowseRelay</CODE></A> directive exclusively:</P>
+ interfaces attaches to both subnet 1 and subnet 2, it could use the <A HREF="#BrowseRelay">
+<CODE>BrowseRelay</CODE></A> directive exclusively:</P>
 <UL>
 <PRE>
 # Relay the printers from subnet 1 and 2 to subnet 3
@@ -1233,8 +1241,8 @@ BrowseRelay 192.168.2 192.168.3.255 ENTER
 <P>If you have two printers, LaserJet@ServerA and LaserJet@ServerB, a
  third implicit class called<I> LaserJet</I> will be created
  automatically on the client that refers to both printers. If the client
- also has a local printer with the name LaserJet and the<A HREF="#ImplicitAnyClasses">
- <CODE>ImplicitAnyClasses</CODE></A> directive is enabled, then an
+ also has a local printer with the name LaserJet and the <A HREF="#ImplicitAnyClasses">
+<CODE>ImplicitAnyClasses</CODE></A> directive is enabled, then an
  implicit class named<I> AnyLaserJet</I> will be created instead.
  Otherwise, the local printer will prevent the creation of an implicit
  class, since CUPS will assume that the local printer will always be
@@ -1269,9 +1277,8 @@ ImplicitClasses</CODE></A>) are enabled and implicit &quot;any&quot; classes (<A
 <!-- NEED 1in -->
 </DD>
 <DT>client.conf</DT>
-<DD>This file provides the default server name for client machines. See<A
-HREF="#CLIENT_SETUP"> Chapter 5, &quot;Client Setup&quot;</A> for more
- information.
+<DD>This file provides the default server name for client machines. See <A
+HREF="#CLIENT_SETUP">Chapter 5, &quot;Client Setup&quot;</A> for more information.
 <BR>&nbsp;
 <!-- NEED 1in -->
 </DD>
@@ -1433,7 +1440,7 @@ AccessLog syslog
 <H4>Description</H4>
 <P>The <CODE>AccessLog</CODE> directive sets the name of the access log
  file. If the filename is not absolute then it is assumed to be relative
- to the<A HREF="#ServerRoot"> <CODE>ServerRoot</CODE></A> directory. The
+ to the <A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
  access log file is stored in &quot;common log format&quot; and can be used by any
  web access reporting tool to generate a report on CUPS server activity.</P>
 <P>The server name can be included in the filename by using <CODE>%s</CODE>
@@ -1487,8 +1494,8 @@ mm</TH><TH WIDTH="20%">netmask</TH></TR>
 <P>The <CODE>@LOCAL</CODE> name will allow access from all local network
  interfaces, but not remote point-to-point interfaces. The <CODE>
 @IF(name)</CODE> name will allow access from the named interface.</P>
-<P>The <CODE>Allow</CODE> directive must appear inside a<A HREF="#Location">
- <CODE>Location</CODE></A> directive.
+<P>The <CODE>Allow</CODE> directive must appear inside a <A HREF="#Location">
+<CODE>Location</CODE></A> directive.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="AuthClass">AuthClass</A></H3>
@@ -1511,13 +1518,13 @@ AuthClass Group
 <LI><CODE>User</CODE> - A valid username and password is required.</LI>
 <LI><CODE>System</CODE> - A valid username and password is required, and
  the username must belong to the &quot;sys&quot; group; this can be changed using
- the<A HREF="#SystemGroup"> <CODE>SystemGroup</CODE></A> directive.</LI>
+ the <A HREF="#SystemGroup"><CODE>SystemGroup</CODE></A> directive.</LI>
 <LI><CODE>Group</CODE> - A valid username and password is required, and
  the username must belong to the group named by the <CODE>AuthGroupName</CODE>
  directive.</LI>
 </UL>
-<P>The <CODE>AuthClass</CODE> directive must appear inside a<A HREF="#Location">
- <CODE>Location</CODE></A> directive.
+<P>The <CODE>AuthClass</CODE> directive must appear inside a <A HREF="#Location">
+<CODE>Location</CODE></A> directive.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="AuthGroupName">AuthGroupName</A></H3>
@@ -1532,8 +1539,8 @@ AuthGroupName lp
 <H4>Description</H4>
 <P>The <CODE>AuthGroupName</CODE> directive sets the group to use for <CODE>
 Group</CODE> authentication.</P>
-<P>The <CODE>AuthGroupName</CODE> directive must appear inside a<A HREF="#Location">
- <CODE>Location</CODE></A> directive.
+<P>The <CODE>AuthGroupName</CODE> directive must appear inside a <A HREF="#Location">
+<CODE>Location</CODE></A> directive.
 <!-- NEED 4in -->
 </P>
 <H3><A NAME="AuthType">AuthType</A></H3>
@@ -1561,10 +1568,10 @@ AuthType BasicDigest
 </UL>
 <P>When using <CODE>Basic</CODE>, <CODE>Digest</CODE>, or <CODE>
 BasicDigest</CODE> authentication, clients connecting through the <CODE>
-localhost</CODE> interface can also authenticate using<A HREF="#CERTIFICATES">
- certificates</A>.</P>
-<P>The <CODE>AuthType</CODE> directive must appear inside a<A HREF="#Location">
- <CODE>Location</CODE></A> directive.
+localhost</CODE> interface can also authenticate using <A HREF="#CERTIFICATES">
+certificates</A>.</P>
+<P>The <CODE>AuthType</CODE> directive must appear inside a <A HREF="#Location">
+<CODE>Location</CODE></A> directive.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="AutoPurgeJobs">AutoPurgeJobs</A></H3>
@@ -1634,8 +1641,8 @@ BrowseAllow from @IF(name)
 <P>The <CODE>BrowseAllow</CODE> directive specifies a system or network
  to accept browse packets from. The default is to accept browse packets
  from all hosts.</P>
-<P>Host and domain name matching require that you enable the<A HREF="#HostNameLookups">
- <CODE>HostNameLookups</CODE></A> directive.</P>
+<P>Host and domain name matching require that you enable the <A HREF="#HostNameLookups">
+<CODE>HostNameLookups</CODE></A> directive.</P>
 <P>IP address matching supports exact matches, partial addresses that
  match networks using netmasks of 255.0.0.0, 255.255.0.0, and
  255.255.255.0, or network addresses using the specified netmask or bit
@@ -1664,8 +1671,8 @@ BrowseDeny from @IF(name)
 <P>The <CODE>BrowseDeny</CODE> directive specifies a system or network
  to reject browse packets from. The default is to deny browse packets
  from no hosts.</P>
-<P>Host and domain name matching require that you enable the<A HREF="#HostNameLookups">
- <CODE>HostNameLookups</CODE></A> directive.</P>
+<P>Host and domain name matching require that you enable the <A HREF="#HostNameLookups">
+<CODE>HostNameLookups</CODE></A> directive.</P>
 <P>IP address matching supports exact matches, partial addresses that
  match networks using netmasks of 255.0.0.0, 255.255.0.0, and
  255.255.255.0, or network addresses using the specified netmask or bit
@@ -1689,8 +1696,8 @@ BrowseInterval 30
  amount of time between browsing updates. Specifying a value of 0
  seconds disables outgoing browse updates but allows a server to receive
  printer information from other hosts.</P>
-<P>The <CODE>BrowseInterval</CODE> value should always be less than the<A
-HREF="#BrowseTimeout"> <CODE>BrowseTimeout</CODE></A> value. Otherwise
+<P>The <CODE>BrowseInterval</CODE> value should always be less than the <A
+HREF="#BrowseTimeout"><CODE>BrowseTimeout</CODE></A> value. Otherwise
  printers and classes will disappear from client systems between
  updates.
 <!-- NEED 3in -->
@@ -1726,7 +1733,7 @@ BrowsePoll host.domain.com:631
 </UL>
 <H4>Description</H4>
 <P>The <CODE>BrowsePoll</CODE> directive polls a server for available
- printers once every<A HREF="#BrowseInterval"> <CODE>BrowseInterval</CODE>
+ printers once every <A HREF="#BrowseInterval"><CODE>BrowseInterval</CODE>
 </A> seconds. Multiple <CODE>BrowsePoll</CODE> directives can be
  specified to poll multiple servers.</P>
 <P>If <CODE>BrowseInterval</CODE> is set to 0 then the server is polled
@@ -1845,7 +1852,7 @@ BrowseTimeout 60
  or class times out it is removed from the list of available
  destinations.</P>
 <P>The <CODE>BrowseTimeout</CODE> value should always be greater than
- the<A HREF="#BrowseInterval"> <CODE>BrowseInterval</CODE></A> value.
+ the <A HREF="#BrowseInterval"><CODE>BrowseInterval</CODE></A> value.
  Otherwise printers and classes will disappear from client systems
  between updates.
 <!-- NEED 4in -->
@@ -2021,8 +2028,8 @@ mm</TH><TH WIDTH="20%">netmask</TH></TR>
 <P>The <CODE>@LOCAL</CODE> name will deny access from all local network
  interfaces, but not remote point-to-point interfaces. The <CODE>
 @IF(name)</CODE> name will deny access from the named interface.</P>
-<P>The <CODE>Deny</CODE> directive must appear inside a<A HREF="#Location">
- <CODE>Location</CODE></A> directive.
+<P>The <CODE>Deny</CODE> directive must appear inside a <A HREF="#Location">
+<CODE>Location</CODE></A> directive.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="DocumentRoot">DocumentRoot</A></H3>
@@ -2037,8 +2044,8 @@ DocumentRoot /foo/bar/doc/cups
 <H4>Description</H4>
 <P>The <CODE>DocumentRoot</CODE> directive specifies the location of web
  content for the HTTP server in CUPS. If an absolute path is not
- specified then it is assumed to be relative to the<A HREF="#ServerRoot">
- <CODE>ServerRoot</CODE></A> directory. The default directory is<VAR>
+ specified then it is assumed to be relative to the <A HREF="#ServerRoot">
+<CODE>ServerRoot</CODE></A> directory. The default directory is<VAR>
  /usr/share/doc/cups</VAR>.</P>
 <P>Documents are first looked up in a sub-directory for the primary
  language requested by the client (e.g.<VAR> /usr/share/doc/cups/fr/...</VAR>
@@ -2058,8 +2065,8 @@ Encryption Required
 </PRE>
 </UL>
 <H4>Description</H4>
-<P>The <CODE>Encryption</CODE> directive must appear instead a<A HREF="#Location">
- <CODE>Location</CODE></A> section and specifies the encryption settings
+<P>The <CODE>Encryption</CODE> directive must appear instead a <A HREF="#Location">
+<CODE>Location</CODE></A> section and specifies the encryption settings
  for that location. The default setting is <CODE>IfRequested</CODE> for
  all locations.
 <!-- NEED 3in -->
@@ -2077,7 +2084,7 @@ ErrorLog syslog
 <H4>Description</H4>
 <P>The <CODE>ErrorLog</CODE> directive sets the name of the error log
  file. If the filename is not absolute then it is assumed to be relative
- to the<A HREF="#ServerRoot"> <CODE>ServerRoot</CODE></A> directory. The
+ to the <A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
  default error log file is<VAR> /var/log/cups/error_log</VAR>.</P>
 <P>The server name can be included in the filename by using <CODE>%s</CODE>
  in the name.</P>
@@ -2287,7 +2294,7 @@ ImplicitClasses Off
 <P>The <CODE>ImplicitClasses</CODE> directive controls whether implicit
  classes are created based upon the available network printers and
  classes. The default setting is <CODE>On</CODE> but is automatically
- turned <CODE>Off</CODE> if<A HREF="#Browsing"> <CODE>Browsing</CODE></A>
+ turned <CODE>Off</CODE> if <A HREF="#Browsing"><CODE>Browsing</CODE></A>
  is turned <CODE>Off</CODE>.
 <!-- NEED 3in -->
 </P>
@@ -2303,7 +2310,7 @@ Include /foo/bar/filename
 <H4>Description</H4>
 <P>The <CODE>Include</CODE> directive includes the named file in the <CODE>
 cupsd.conf</CODE> file. If no leading path is provided, the file is
- assumed to be relative to the<A HREF="#ServerRoot"> <CODE>ServerRoot</CODE>
+ assumed to be relative to the <A HREF="#ServerRoot"><CODE>ServerRoot</CODE>
 </A> directory.</P>
 
 <!-- NEED 3in -->
@@ -2356,8 +2363,8 @@ KeepAliveTimeout 30
 </UL>
 <H4>Description</H4>
 <P>The <CODE>Limit</CODE> directive groups access control directives for
- specific types of HTTP requests and must appear inside a<A HREF="#Location">
- <CODE>Location</CODE></A> section. Access can be limited for individual
+ specific types of HTTP requests and must appear inside a <A HREF="#Location">
+<CODE>Location</CODE></A> section. Access can be limited for individual
  request types (<CODE>DELETE</CODE>, <CODE>GET</CODE>, <CODE>HEAD</CODE>
 , <CODE>OPTIONS</CODE>, <CODE>POST</CODE>, <CODE>PUT</CODE>, and <CODE>
 TRACE</CODE>) or for all request types (<CODE>ALL</CODE>). The request
@@ -2376,9 +2383,9 @@ TRACE</CODE>) or for all request types (<CODE>ALL</CODE>). The request
 </UL>
 <H4>Description</H4>
 <P>The <CODE>LimitExcept</CODE> directive groups access control
- directives for specific types of HTTP requests and must appear inside a<A
-HREF="#Location"> <CODE>Location</CODE></A> section. Unlike the<A HREF="#Limit">
- <CODE>Limit</CODE></A> directive, <CODE>LimitExcept</CODE> restricts
+ directives for specific types of HTTP requests and must appear inside a
+ <A HREF="#Location"><CODE>Location</CODE></A> section. Unlike the <A HREF="#Limit">
+<CODE>Limit</CODE></A> directive, <CODE>LimitExcept</CODE> restricts
  access for all requests<I> except</I> those listed on the <CODE>
 LimitExcept</CODE> line.
 <!-- NEED 3in -->
@@ -2397,7 +2404,7 @@ LimitRequestBody 0
 <P>The <CODE>LimitRequestBody</CODE> directive controls the maximum size
  of print files, IPP requests, and HTML form data in HTTP POST requests.
  The default limit is 0 which disables the limit check.</P>
-<P>Also see the identical<A HREF="#MaxRequestSize"> <CODE>MaxRequestSize</CODE>
+<P>Also see the identical <A HREF="#MaxRequestSize"><CODE>MaxRequestSize</CODE>
 </A> directive.
 <!-- NEED 3in -->
 </P>
@@ -2414,7 +2421,7 @@ Listen 192.0.2.1:631
 <P>The <CODE>Listen</CODE> directive specifies a network address and
  port to listen for connections. Multiple <CODE>Listen</CODE> directives
  can be provided to listen on multiple addresses.</P>
-<P>The <CODE>Listen</CODE> directive is similar to the<A HREF="#Port"> <CODE>
+<P>The <CODE>Listen</CODE> directive is similar to the <A HREF="#Port"><CODE>
 Port</CODE></A> directive but allows you to restrict access to specific
  interfaces or networks.
 <!-- NEED 3in -->
@@ -2451,13 +2458,13 @@ Port</CODE></A> directive but allows you to restrict access to specific
 </UL>
 <H4>Description</H4>
 <P>The <CODE>Location</CODE> directive specifies access control and
- authentication options for the specified HTTP resource or path. The<A HREF="#Allow">
- <CODE>Allow</CODE></A>,<A HREF="#AuthClass"> <CODE>AuthClass</CODE></A>
-,<A HREF="#AuthGroupName"> <CODE>AuthGroupName</CODE></A>,<A HREF="#AuthType">
- <CODE>AuthType</CODE></A>,<A HREF="#Deny"> <CODE>Deny</CODE></A>,<A HREF="#Encryption">
- <CODE>Encryption</CODE></A>,<A HREF="#Limit"> <CODE>Limit</CODE></A>,<A HREF="#LimitExcept">
- <CODE>LimitExcept</CODE></A>,<A HREF="#Order"> <CODE>Order</CODE></A>,<A
-HREF="#Require"> <CODE>Require</CODE></A>, and<A HREF="#Satisfy"> <CODE>
+ authentication options for the specified HTTP resource or path. The <A HREF="#Allow">
+<CODE>Allow</CODE></A>, <A HREF="#AuthClass"><CODE>AuthClass</CODE></A>,
+ <A HREF="#AuthGroupName"><CODE>AuthGroupName</CODE></A>, <A HREF="#AuthType">
+<CODE>AuthType</CODE></A>, <A HREF="#Deny"><CODE>Deny</CODE></A>, <A HREF="#Encryption">
+<CODE>Encryption</CODE></A>, <A HREF="#Limit"><CODE>Limit</CODE></A>, <A HREF="#LimitExcept">
+<CODE>LimitExcept</CODE></A>, <A HREF="#Order"><CODE>Order</CODE></A>, <A
+HREF="#Require"><CODE>Require</CODE></A>, and <A HREF="#Satisfy"><CODE>
 Satisfy</CODE></A> directives may all appear inside a location.
 <CENTER>
 <TABLE BORDER="1"><CAPTION>Locations on the Server.</CAPTION>
@@ -2486,8 +2493,8 @@ name</CODE></TD></TR>
  the directives inside the <CODE>/printers/name</CODE> location will
  override ones from <CODE>/printers</CODE>. Directives inside <CODE>
 /printers</CODE> will override ones from <CODE>/</CODE>. &nbsp; None of the
- directives are inherited. More information can be found in section<A HREF="#PRINTING_SECURITY">
- &quot;Printing System Security&quot;</A>.
+ directives are inherited. More information can be found in section <A HREF="#PRINTING_SECURITY">
+&quot;Printing System Security&quot;</A>.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="LogFilePerm">LogFilePerm</A></H3>
@@ -2523,7 +2530,7 @@ LogLevel debug2
 </UL>
 <H4>Description</H4>
 <P>The <CODE>LogLevel</CODE> directive specifies the level of logging
- for the<A HREF="#ErrorLog"> <CODE>ErrorLog</CODE></A> file. The
+ for the <A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A> file. The
  following values are recognized (each level logs everything under the
  preceding levels):</P>
 <UL>
@@ -2698,7 +2705,7 @@ MaxRequestSize 0
 <P>The <CODE>MaxRequestSize</CODE> directive controls the maximum size
  of print files, IPP requests, and HTML form data in HTTP POST requests.
  The default limit is 0 which disables the limit check.</P>
-<P>Also see the identical<A HREF="#LimitRequestBody"> <CODE>
+<P>Also see the identical <A HREF="#LimitRequestBody"><CODE>
 LimitRequestBody</CODE></A> directive.
 <!-- NEED 3in -->
 </P>
@@ -2720,8 +2727,8 @@ Order Deny,Allow
 <LI><CODE>Deny,Allow</CODE> - Allow requests only from those listed in
  an <CODE>Allow</CODE> directive.</LI>
 </UL>
-<P>The <CODE>Order</CODE> directive must appear inside a<A HREF="#Location">
- <CODE>Location</CODE></A> directive.
+<P>The <CODE>Order</CODE> directive must appear inside a <A HREF="#Location">
+<CODE>Location</CODE></A> directive.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="PageLog">PageLog</A></H3>
@@ -2737,7 +2744,7 @@ PageLog syslog
 <H4>Description</H4>
 <P>The <CODE>PageLog</CODE> directive sets the name of the page log
  file. If the filename is not absolute then it is assumed to be relative
- to the<A HREF="#ServerRoot"> <CODE>ServerRoot</CODE></A> directory. The
+ to the <A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
  default page log file is<VAR> /var/log/cups/page_log</VAR>.</P>
 <P>The server name can be included in the filename by using <CODE>%s</CODE>
  in the name.</P>
@@ -2884,8 +2891,8 @@ RequestRoot /foo/bar/spool/cups
 <H4>Description</H4>
 <P>The <CODE>RequestRoot</CODE> directive sets the directory for
  incoming IPP requests and HTML forms. If an absolute path is not
- provided then it is assumed to be relative to the<A HREF="#ServerRoot">
- <CODE>ServerRoot</CODE></A> directory. The default request directory is<VAR>
+ provided then it is assumed to be relative to the <A HREF="#ServerRoot">
+<CODE>ServerRoot</CODE></A> directory. The default request directory is<VAR>
  /var/spool/cups</VAR>.
 <!-- NEED 4in -->
 </P>
@@ -2909,7 +2916,7 @@ Require valid-user
 <P>The <CODE>valid-user</CODE> keyword specifies that any authenticated
  user may access the resource.</P>
 <P>The default is to do no authentication. This directive must appear
- inside a<A HREF="#Location"> <CODE>Location</CODE></A> directive.
+ inside a <A HREF="#Location"><CODE>Location</CODE></A> directive.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="RIPCache">RIPCache</A></H3>
@@ -2987,8 +2994,8 @@ Satisfy any
  gain access if the authentication or access control requirements are
  satisfied. For example, you might require authentication for remote
  access, but allow local access without authentication.</P>
-<P>The default is <CODE>all</CODE>. This directive must appear inside a<A
-HREF="#Location"> <CODE>Location</CODE></A> directive.
+<P>The default is <CODE>all</CODE>. This directive must appear inside a <A
+HREF="#Location"><CODE>Location</CODE></A> directive.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="ServerAdmin">ServerAdmin</A></H3>
@@ -3019,7 +3026,7 @@ ServerBin /foo/bar/lib/cups
 <H4>Description</H4>
 <P>The <CODE>ServerBin</CODE> directive sets the directory for
  server-run executables. If an absolute path is not provided then it is
- assumed to be relative to the<A HREF="#ServerRoot"> <CODE>ServerRoot</CODE>
+ assumed to be relative to the <A HREF="#ServerRoot"><CODE>ServerRoot</CODE>
 </A> directory. The default executable directory is<VAR> /usr/lib/cups</VAR>
 .
 <!-- NEED 3in -->
@@ -3099,8 +3106,8 @@ SSLListen 192.0.2.1:443
 <P>The <CODE>SSLListen</CODE> directive specifies a network address and
  port to listen for secure connections. Multiple <CODE>SSLListen</CODE>
  directives can be provided to listen on multiple addresses.</P>
-<P>The <CODE>SSLListen</CODE> directive is similar to the<A HREF="#SSLPort">
- <CODE>SSLPort</CODE></A> directive but allows you to restrict access to
+<P>The <CODE>SSLListen</CODE> directive is similar to the <A HREF="#SSLPort">
+<CODE>SSLPort</CODE></A> directive but allows you to restrict access to
  specific interfaces or networks.
 <!-- NEED 3in -->
 </P>
@@ -3131,8 +3138,8 @@ SystemGroup root
 <H4>Description</H4>
 <P>The <CODE>SystemGroup</CODE> directive specifies the system
  administration group for <CODE>System</CODE> authentication. More
- information can be found later in this chapter in<A HREF="#PRINTING_SECURITY">
- &quot;Printing System Security&quot;</A>.
+ information can be found later in this chapter in <A HREF="#PRINTING_SECURITY">
+&quot;Printing System Security&quot;</A>.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="TempDir">TempDir</A></H3>
@@ -3296,8 +3303,8 @@ Accepting no
 <P>The <CODE>Accepting</CODE> directive defines the initial Boolean
  value for the<VAR> printer-is-accepting-job</VAR> attribute which can
  be set by the <CODE>accept</CODE> and <CODE>reject</CODE> commands.</P>
-<P>This directive must appear inside a<A HREF="#Printer"> <CODE>Printer</CODE>
-</A> or<A HREF="#DefaultPrinter"> <CODE>DefaultPrinter</CODE></A>
+<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE>
+</A> or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
  directive.
 <!-- NEED 3in -->
 </P>
@@ -3314,8 +3321,8 @@ AllowUser bar_user
 <P>The <CODE>AllowUser</CODE> directive adds a username to the<VAR>
  requesting-user-name-allowed</VAR> attribute which can be set by the <CODE>
 lpadmin -u</CODE> command.</P>
-<P>This directive must appear inside a<A HREF="#Printer"> <CODE>Printer</CODE>
-</A> or<A HREF="#DefaultPrinter"> <CODE>DefaultPrinter</CODE></A>
+<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE>
+</A> or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
  directive.
 <!-- NEED 3in -->
 </P>
@@ -3349,8 +3356,8 @@ DenyUser bar_user
 <P>The <CODE>DenyUser</CODE> directive adds a username to the<VAR>
  requesting-user-name-allowed</VAR> attribute which can be set by the <CODE>
 lpadmin -u</CODE> command.</P>
-<P>This directive must appear inside a<A HREF="#Printer"> <CODE>Printer</CODE>
-</A> or<A HREF="#DefaultPrinter"> <CODE>DefaultPrinter</CODE></A>
+<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE>
+</A> or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
  directive.</P>
 
 <!-- NEED 3in -->
@@ -3366,8 +3373,8 @@ DeviceURI socket://foo.bar.com:9100
 <P>The <CODE>DeviceURI</CODE> directive defines the value of the<VAR>
  device-uri-attribute</VAR> attribute which can be set by the <CODE>
 lpadmin -v</CODE> command.</P>
-<P>This directive must appear inside a<A HREF="#Printer"> <CODE>Printer</CODE>
-</A> or<A HREF="#DefaultPrinter"> <CODE>DefaultPrinter</CODE></A>
+<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE>
+</A> or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
  directive.
 <!-- NEED 3in -->
 </P>
@@ -3383,8 +3390,8 @@ Info My Printer
 <P>The <CODE>Info</CODE> directive defines the string for the<VAR>
  printer-info</VAR> attribute which can be set by the <CODE>lpadmin -D</CODE>
  command.</P>
-<P>This directive must appear inside a<A HREF="#Printer"> <CODE>Printer</CODE>
-</A> or<A HREF="#DefaultPrinter"> <CODE>DefaultPrinter</CODE></A>
+<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE>
+</A> or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
  directive.</P>
 
 <!-- NEED 6in -->
@@ -3425,8 +3432,8 @@ JobSheets none,standard
 <LI><CODE>unclassified</CODE> - A banner page with an &quot;unclassified&quot;
  label at the top and bottom.</LI>
 </UL>
-<P>This directive must appear inside a<A HREF="#Printer"> <CODE>Printer</CODE>
-</A> or<A HREF="#DefaultPrinter"> <CODE>DefaultPrinter</CODE></A>
+<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE>
+</A> or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
  directive.
 <!-- NEED 3in -->
 </P>
@@ -3442,8 +3449,8 @@ KLimit 1234
 <P>The <CODE>KLimit</CODE> directive defines the value of the<VAR>
  job-k-limit</VAR> attribute which can be set by the <CODE>lpadmin -o
  job-k-limit=</CODE> command.</P>
-<P>This directive must appear inside a<A HREF="#Printer"> <CODE>Printer</CODE>
-</A> or<A HREF="#DefaultPrinter"> <CODE>DefaultPrinter</CODE></A>
+<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE>
+</A> or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
  directive.</P>
 
 <!-- NEED 6in -->
@@ -3467,8 +3474,8 @@ Location Building 3321
 </TD></TR>
 </TABLE>
 </CENTER>
-<P>This directive must appear inside a<A HREF="#Printer"> <CODE>Printer</CODE>
-</A> or<A HREF="#DefaultPrinter"> <CODE>DefaultPrinter</CODE></A>
+<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE>
+</A> or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
  directive.</P>
 
 <!-- NEED 3in -->
@@ -3484,8 +3491,8 @@ PageLimit 1234
 <P>The <CODE>PageLimit</CODE> directive defines the value of the<VAR>
  job-page-limit</VAR> attribute which can be set by the <CODE>lpadmin -o
  job-page-limit=</CODE> command.</P>
-<P>This directive must appear inside a<A HREF="#Printer"> <CODE>Printer</CODE>
-</A> or<A HREF="#DefaultPrinter"> <CODE>DefaultPrinter</CODE></A>
+<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE>
+</A> or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
  directive.</P>
 
 <!-- NEED 3in -->
@@ -3516,8 +3523,8 @@ QuotaPeriod 604800
 <P>The <CODE>QuotaPeriod</CODE> directive defines the value of the<VAR>
  job-quota-period</VAR> attribute which can be set by the <CODE>lpadmin
  -o job-quota-period=</CODE> command.</P>
-<P>This directive must appear inside a<A HREF="#Printer"> <CODE>Printer</CODE>
-</A> or<A HREF="#DefaultPrinter"> <CODE>DefaultPrinter</CODE></A>
+<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE>
+</A> or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
  directive.</P>
 
 <!-- NEED 3in -->
@@ -3533,8 +3540,8 @@ State stopped
 <P>The <CODE>State</CODE> directive defines the initial value of the<VAR>
  printer-state</VAR> attribute. The strings<VAR> idle</VAR> and<VAR>
  stopped</VAR> correspond to the IPP enumeration values.</P>
-<P>This directive must appear inside a<A HREF="#Printer"> <CODE>Printer</CODE>
-</A> or<A HREF="#DefaultPrinter"> <CODE>DefaultPrinter</CODE></A>
+<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE>
+</A> or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
  directive.</P>
 
 <!-- NEED 6in -->
@@ -3562,8 +3569,8 @@ StateMessage Ready to print.
 <LI>Ready to print.</LI>
 <LI>Waiting for job to complete</LI>
 </UL>
-<P>This directive must appear inside a<A HREF="#Printer"> <CODE>Printer</CODE>
-</A> or<A HREF="#DefaultPrinter"> <CODE>DefaultPrinter</CODE></A>
+<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE>
+</A> or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
  directive.</P>
 
 <!-- NEW PAGE -->
@@ -3619,8 +3626,8 @@ Accepting no
 <P>The <CODE>Accepting</CODE> directive defines the initial Boolean
  value for the<VAR> printer-is-accepting-job</VAR> attribute which can
  be set by the <CODE>accept</CODE> and <CODE>reject</CODE> commands.</P>
-<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
-</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE>
+</A> or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="ClassAllowUser">AllowUser</A></H3>
@@ -3636,8 +3643,8 @@ AllowUser bar_user
 <P>The <CODE>AllowUser</CODE> directive adds a username to the<VAR>
  requesting-user-name-allowed</VAR> attribute which can be set by the <CODE>
 lpadmin -u</CODE> command.</P>
-<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
-</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE>
+</A> or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="Class">Class</A></H3>
@@ -3685,8 +3692,8 @@ DenyUser bar_user
 <P>The <CODE>DenyUser</CODE> directive adds a username to the<VAR>
  requesting-user-name-allowed</VAR> attribute which can be set by the <CODE>
 lpadmin -u</CODE> command.</P>
-<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
-</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE>
+</A> or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="ClassInfo">Info</A></H3>
@@ -3701,8 +3708,8 @@ Info My Printer
 <P>The <CODE>Info</CODE> directive defines the string for the<VAR>
  printer-info</VAR> attribute which can be set by the <CODE>lpadmin -D</CODE>
  command.</P>
-<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
-</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE>
+</A> or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
 <!-- NEED 6in -->
 </P>
 <H3><A NAME="ClassJobSheets">JobSheets</A></H3>
@@ -3742,8 +3749,8 @@ JobSheets none,standard
 <LI><CODE>unclassified</CODE> - A banner page with an &quot;unclassified&quot;
  label at the top and bottom.</LI>
 </UL>
-<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
-</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE>
+</A> or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="ClassKLimit">KLimit</A></H3>
@@ -3758,8 +3765,8 @@ KLimit 1234
 <P>The <CODE>KLimit</CODE> directive defines the value of the<VAR>
  job-k-limit</VAR> attribute which can be set by the <CODE>lpadmin -o
  job-k-limit=</CODE> command.</P>
-<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
-</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE>
+</A> or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
 <!-- NEED 6in -->
 </P>
 <H3><A NAME="ClassLocation">Location</A></H3>
@@ -3782,8 +3789,8 @@ Location Building 3321
 </TD></TR>
 </TABLE>
 </CENTER>
-<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
-</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE>
+</A> or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="ClassPageLimit">PageLimit</A></H3>
@@ -3798,8 +3805,8 @@ PageLimit 1234
 <P>The <CODE>PageLimit</CODE> directive defines the value of the<VAR>
  job-page-limit</VAR> attribute which can be set by the <CODE>lpadmin -o
  job-page-limit=</CODE> command.</P>
-<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
-</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE>
+</A> or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="ClassPrinter">Printer</A></H3>
@@ -3823,8 +3830,8 @@ Printer foo@bar
 </TD></TR>
 </TABLE>
 </CENTER>
-<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
-</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.</P>
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE>
+</A> or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.</P>
 
 <!-- NEED 3in -->
 <H3><A NAME="ClassQuotaPeriod">QuotaPeriod</A></H3>
@@ -3839,8 +3846,8 @@ QuotaPeriod 604800
 <P>The <CODE>QuotaPeriod</CODE> directive defines the value of the<VAR>
  job-quota-period</VAR> attribute which can be set by the <CODE>lpadmin
  -o job-quota-period=</CODE> command.</P>
-<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
-</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE>
+</A> or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="ClassState">State</A></H3>
@@ -3855,8 +3862,8 @@ State stopped
 <P>The <CODE>State</CODE> directive defines the initial value of the<VAR>
  printer-state</VAR> attribute. The strings<VAR> idle</VAR> and<VAR>
  stopped</VAR> correspond to the IPP enumeration values.</P>
-<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
-</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE>
+</A> or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
 <!-- NEED 6in -->
 </P>
 <H3><A NAME="ClassStateMessage">StateMessage</A></H3>
@@ -3883,8 +3890,8 @@ StateMessage Ready to print.
 <LI>Ready to print.</LI>
 <LI>Waiting for job to complete</LI>
 </UL>
-<P>This directive must appear inside a<A HREF="#Class"> <CODE>Class</CODE>
-</A> or<A HREF="#DefaultClass"> <CODE>DefaultClass</CODE></A> directive.</P>
+<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE>
+</A> or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.</P>
 
 <!-- NEW PAGE -->
 <H2><A NAME="PRINTING_SECURITY">Printing System Security</A></H2>
@@ -3897,8 +3904,8 @@ StateMessage Ready to print.
  authentication, it does allow you to limit the potential users of your
  system efficiently.</P>
 <P>CUPS maintains a list of locations that have access control and/or
- authentication enabled. Locations are specified using the<A HREF="#Location">
- <CODE>Location</CODE></A> directive:</P>
+ authentication enabled. Locations are specified using the <A HREF="#Location">
+<CODE>Location</CODE></A> directive:</P>
 <UL>
 <PRE>
 &lt;Location /resource&gt;
@@ -3912,8 +3919,8 @@ StateMessage Ready to print.
 &lt;/Location&gt;
 </PRE>
 </UL>
-<P>Locations generally follow the directory structure of the<A HREF="#DocumentRoot">
- <CODE>DocumentRoot</CODE></A> directory, however CUPS does have several
+<P>Locations generally follow the directory structure of the <A HREF="#DocumentRoot">
+<CODE>DocumentRoot</CODE></A> directory, however CUPS does have several
  virtual locations for administration, classes, jobs, and printers:
 <CENTER>
 <TABLE BORDER="1">
@@ -3952,13 +3959,13 @@ Authorization: Local 0123456789ABCDEF0123456789ABCDEF
 <P>Certificates are generated by the server automatically and stored in
  the<VAR> /etc/cups/certs</VAR> directory using the process ID of the
  CGI program started by the server. Certificate files are only readable
- by the<A HREF="#User"> <CODE>User</CODE></A> and<A HREF="#Group"> <CODE>
+ by the <A HREF="#User"><CODE>User</CODE></A> and <A HREF="#Group"><CODE>
 Group</CODE></A> defined in the<VAR> cupsd.conf</VAR> file. When the CGI
  program ends the certificate is removed and invalidated automatically.</P>
 <P>The special file<VAR> /etc/cups/certs/0</VAR> defines the<I> root
  certificate</I> which can be used by any client running as the
- super-user or another user that is part of the group defined by the<A HREF="#SystemGroup">
- <CODE>SystemGroup</CODE></A> directive. The root certificate is
+ super-user or another user that is part of the group defined by the <A HREF="#SystemGroup">
+<CODE>SystemGroup</CODE></A> directive. The root certificate is
  automatically regenerated every 5 minutes.</P>
 <H3><A NAME="7_11_2">Using Basic Authentication</A></H3>
 <P>Basic authentication uses UNIX users and passwords to authenticate
@@ -4078,7 +4085,7 @@ AuthType Digest
 </PRE>
 </UL>
 <H3><A NAME="7_11_4">System and Group Authentication</A></H3>
-<P>The<A HREF="#AuthClass"> <CODE>AuthClass</CODE></A> directive
+<P>The <A HREF="#AuthClass"><CODE>AuthClass</CODE></A> directive
  controls the level of authentication to perform. <CODE>System</CODE>
  and <CODE>Group</CODE> authentication extend the normal user-based
  authentication to require membership in a UNIX group. For <CODE>System</CODE>
@@ -4086,7 +4093,7 @@ AuthType Digest
 system</CODE>, or <CODE>root</CODE> group; the actual group depends on
  the operating system.</P>
 <P>For <CODE>Group</CODE> authentication each user must belong to the
- group named by the<A HREF="#AuthGroupName"> <CODE>AuthGroupName</CODE></A>
+ group named by the <A HREF="#AuthGroupName"><CODE>AuthGroupName</CODE></A>
  directive:</P>
 <UL>
 <PRE>
@@ -4129,7 +4136,7 @@ host group user date-time \&quot;method resource version\&quot; status bytes
 </PRE>
 </UL>
 <P>The<I> host</I> field will normally only be an IP address unless you
- have enabled the<A HREF="#HostNameLookups"> <CODE>HostNameLookups</CODE>
+ have enabled the <A HREF="#HostNameLookups"><CODE>HostNameLookups</CODE>
 </A> directive in the<VAR> cupsd.conf</VAR> file.</P>
 <P>The<I> group</I> field always contains &quot;-&quot; in CUPS.</P>
 <P>The<I> user</I> field is the authenticated username of the requesting
@@ -4218,7 +4225,7 @@ job-originating-host-name</CODE> attribute) that originated the print
 <P>CUPS provides a MIME-based file typing and filtering mechanism to
  convert files to a printable format for each printer. On startup the
  CUPS server reads MIME database files from the<VAR> /etc/cups</VAR>
- directory (or a directory specified by the<A HREF="#ServerRoot"> <CODE>
+ directory (or a directory specified by the <A HREF="#ServerRoot"><CODE>
 ServerRoot</CODE></A> directive) to build a file type and conversion
  database in memory. These database files are plain ASCII text and can
  be edited with your favorite text editor.</P>
@@ -4371,7 +4378,7 @@ acme-msword.convs
 <P>Once you choose the names for these files, create them using your
  favorite text editor as described earlier in this chapter. Once you
  have created the files, restart the <CODE>cupsd</CODE> process as
- described earlier in<A HREF="#RESTARTING"> &quot;Restarting the CUPS Server&quot;</A>
+ described earlier in <A HREF="#RESTARTING">&quot;Restarting the CUPS Server&quot;</A>
 .</P>
 <H3><A NAME="7_13_4">Printer Drivers and PPD Files</A></H3>
 <P>Most CUPS printer drivers utilize one or more printer-specific
@@ -4461,14 +4468,14 @@ server = /usr/lib/cups/daemon/cups-lpd
 </TABLE>
 </CENTER>
 </P>
-<H2><A NAME="8_3">Printing to LPD Servers</A></H2>
+<H2><A NAME="LPD">Printing to LPD Servers</A></H2>
 <P>CUPS provides the <CODE>lpd</CODE> backend for printing to LPD-based
  servers and printers. Use a device URI of <CODE>lpd://server/name</CODE>
  to print to a printer on an LPD server, where <CODE>server</CODE> is
  the hostname or IP address of the server and <CODE>name</CODE> is the
  queue name. Additional options can be specified after the remote queue
- name to control how the LPD requests are sent - consult<A HREF="#COMMON_NETWORK">
- Appendix B - Common Network Settings</A> for a complete description.</P>
+ name to control how the LPD requests are sent - consult <A HREF="#COMMON_NETWORK">
+Appendix B - Common Network Settings</A> for a complete description.</P>
 <P>Microsoft Windows NT provides an LPD service under the name &quot;TCP/IP
  Printing Services&quot;. To enable LPD printing on NT, open the &quot;Services&quot;
  control panel, select the &quot;TCP/IP Printing Services&quot; service, and click
@@ -4736,7 +4743,7 @@ smbpasswd(1)</CODE> command. Otherwise you will not be able to
 <P>CUPS can print to Windows servers in one of two ways. The first way
  uses the LPD protocol on the CUPS system and the &quot;TCP/IP Printing
  Services&quot; on the Windows system. You can find out more about this
- configuration in the<A HREF="#LPD"> LPD</A> section earlier in this
+ configuration in the <A HREF="#LPD">LPD</A> section earlier in this
  chapter.</P>
 <P>The second way is through the Microsoft Server Message Block (&quot;SMB&quot;)
  protocol. Support for this protocol is provided with the free SAMBA
@@ -4775,8 +4782,8 @@ smb://user:pass@server/sharename
 <BR> HOLLYWOOD, MARYLAND 20636-3111 USA
 <BR>
 <BR> Voice: +1.301.373.9600
-<BR> Email:<A HREF="mailto:cups-info@cups.org"> cups-info@cups.org</A>
-<BR> WWW:<A HREF="http://www.cups.org"> http://www.cups.org</A></P>
+<BR> Email: <A HREF="mailto:cups-info@cups.org">cups-info@cups.org</A>
+<BR> WWW: <A HREF="http://www.cups.org">http://www.cups.org</A></P>
 <H3><A NAME="9_1_1">Introduction</A></H3>
 <P>The Common UNIX Printing System<SUP>TM</SUP>, (&quot;CUPS<SUP>TM</SUP>&quot;),
  is provided under the GNU General Public License (&quot;GPL&quot;) and GNU
@@ -4866,9 +4873,9 @@ smb://user:pass@server/sharename
 <P>The Common UNIX Printing System provides a &quot;pdftops&quot; filter that is
  based on the Xpdf software. For binary distribution licensing of this
  software, please contact:<BLOCKQUOTE> Derek B. Noonburg
-<BR> Email:<A HREF="mailto:derekn@foolabs.com"> derekn@foolabs.com</A>
-<BR> WWW:<A HREF="http://www.foolabs.com/xpdf/">
- http://www.foolabs.com/xpdf/</A></BLOCKQUOTE></P>
+<BR> Email: <A HREF="mailto:derekn@foolabs.com">derekn@foolabs.com</A>
+<BR> WWW: <A HREF="http://www.foolabs.com/xpdf/">
+http://www.foolabs.com/xpdf/</A></BLOCKQUOTE></P>
 <H3><A NAME="9_1_5">Support</A></H3>
 <P>Easy Software Products sells software support for CUPS as well as a
  commercial printing product based on CUPS called ESP Print Pro. You can
@@ -4889,7 +4896,7 @@ Copyright 1989, 1991 Free Software Foundation, Inc.
 Everyone is permitted to copy and distribute verbatim
 copies of this license document, but changing it is not allowed.
 </PRE>
-<H4>Preamble</H4>
+<H3><A NAME="9_2_1">Preamble</A></H3>
 <P>The licenses for most software are designed to take away your freedom
  to share and change it. By contrast, the GNU General Public License is
  intended to guarantee your freedom to share and change free
@@ -5147,7 +5154,7 @@ of this license document, but changing it is not allowed.
 [This is the first released version of the library GPL.  It is
  numbered 2 because it goes with version 2 of the ordinary GPL.]
 </PRE>
-<H4>Preamble</H4>
+<H3><A NAME="9_3_1">Preamble</A></H3>
 <P>The licenses for most software are designed to take away your freedom
  to share and change it. By contrast, the GNU General Public Licenses
  are intended to guarantee your freedom to share and change free
@@ -5664,7 +5671,7 @@ address</I>/PASSTHRU</TD></TR>
 
 <!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Axis w/o IPP
-<BR><A HREF="#AXIS"> (see directions)</A></TD><TD>socket://<I>address</I>
+<BR> <A HREF="#AXIS">(see directions)</A></TD><TD>socket://<I>address</I>
 :9100
 <BR> socket://<I>address</I>:9101
 <BR> socket://<I>address</I>:9102</TD></TR>
@@ -5720,7 +5727,7 @@ lpd://<I>address</I>/ps</TD></TR>
 
 <!-- NEED 1in -->
 <TR ALIGN="LEFT" VALIGN="TOP"><TD>Linksys EtherFast&reg;
-<BR><A HREF="#LINKSYS"> (see directions)</A></TD><TD>socket://<I>address</I>
+<BR> <A HREF="#LINKSYS">(see directions)</A></TD><TD>socket://<I>address</I>
 :4010
 <BR> socket://<I>address</I>:4020
 <BR> socket://<I>address</I>:4030</TD></TR>
@@ -6164,9 +6171,9 @@ ftp&gt; <B>quit ENTER</B>
 <P>Commercial support for CUPS is available from Easy Software Products.
  For more information please contact us at:</P>
 <UL>
-<LI>WWW:<A HREF="http://www.easysw.com/cups/"> <CODE>
+<LI>WWW: <A HREF="http://www.easysw.com/cups/"> <CODE>
 http://www.easysw.com/cups/</CODE></A></LI>
-<LI>EMail:<A HREF="mailto:info@easysw.com"> info@easysw.com</A></LI>
+<LI>EMail: <A HREF="mailto:info@easysw.com">info@easysw.com</A></LI>
 <LI>Telephone (M-F, 9-5 EST): +1.301.373.9600</LI>
 </UL>
 <H2><A NAME="13_1">My Applications Don't See the Available Printers</A></H2>
@@ -6174,8 +6181,8 @@ http://www.easysw.com/cups/</CODE></A></LI>
  list of available printers.</P>
 <P>The default CUPS configuration creates the<VAR> /etc/printcap</VAR>
  file automatically. To enable or disable automatic creation and
- updating of this file, use the<A HREF="#Printcap"> <CODE>Printcap</CODE>
-</A> directive described in<A HREF="#PRINTING_MANAGEMENT"> Chapter 6,
+ updating of this file, use the <A HREF="#Printcap"><CODE>Printcap</CODE>
+</A> directive described in <A HREF="#PRINTING_MANAGEMENT">Chapter 6,
  &quot;Printing System Management&quot;</A>.</P>
 <H2><A NAME="13_2">CUPS Doesn't Recognize My Username or Password!</A></H2>
 <P>CUPS will ask you for a UNIX username and password when you perform
@@ -6197,7 +6204,7 @@ AuthClass System
 </PRE>
 </UL>
 <P>for the<VAR> /admin</VAR> location. Then restart the CUPS server as
- described in<A HREF="#PRINTING_MANAGEMENT"> Chapter 6, &quot;Printing System
+ described in <A HREF="#PRINTING_MANAGEMENT">Chapter 6, &quot;Printing System
  Management&quot;</A>.</P>
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
@@ -6221,13 +6228,13 @@ Allow from 127.0.0.1
 </PRE>
 </UL>
 <P>for the<VAR> /admin</VAR> location. Then restart the CUPS server as
- described in<A HREF="#PRINTING_MANAGEMENT"> Chapter 6, &quot;Printing System
+ described in <A HREF="#PRINTING_MANAGEMENT">Chapter 6, &quot;Printing System
  Management&quot;</A>.</P>
 <CENTER>
 <TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
 <TR><TD><B> NOTE:</B>
 <P>Allowing administration access from all hosts is a potential security
- risk. Please read<A HREF="#PRINTING_SECURITY"> Chapter 6, &quot;Printing
+ risk. Please read <A HREF="#PRINTING_SECURITY">Chapter 6, &quot;Printing
  System Management&quot;</A> for a description of these risks and ways to
  minimize them.</P>
 </TD></TR>
@@ -6242,8 +6249,8 @@ Allow from 127.0.0.1
 <LI>not specifying the correct password for the root account.</LI>
 <LI>accessing the CUPS server using the hostname or IP address of the
  server without enabling remote access for administration functions.
- This can be corrected by following the instructions in the<A HREF="#ALLOW_REMOTE">
- &quot;I Can't Do Administration Tasks from Another Machine!&quot;</A> section
+ This can be corrected by following the instructions in the <A HREF="#ALLOW_REMOTE">
+&quot;I Can't Do Administration Tasks from Another Machine!&quot;</A> section
  earlier in this appendix.</LI>
 <LI>not setting a password on the root account. CUPS will not
  authenticate a user account that does not have a password for security

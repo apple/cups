@@ -5,7 +5,7 @@
 <META NAME="author" CONTENT="Easy Software Products">
 <META NAME="copyright" CONTENT="Copyright 1997-2003 All Rights Reserved">
 <META NAME="docnumber" CONTENT="CUPS-IPP-1.1">
-<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
 <STYLE TYPE="text/css"><!--
 BODY { font-family: serif }
 H1 { font-family: sans-serif }
@@ -210,7 +210,7 @@ Copyright 1997-2003 All Rights Reserved<BR>
  (&quot;CUPS&quot;) version 1.1.</P>
 <H2><A NAME="1_2">1.2 System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating
- systems. It has been developed by<A HREF="http://www.easysw.com"> Easy
+ systems. It has been developed by <A HREF="http://www.easysw.com">Easy
  Software Products</A> to promote a standard printing solution for all
  UNIX vendors and users. CUPS provides the System V and Berkeley
  command-line interfaces.</P>
@@ -1479,6 +1479,10 @@ VALIGN="TOP">0x4006</TD><TD VALIGN="TOP">Add or modify a printer class.</TD>
  user-defined media sizes.</TD></TR>
 <TR><TD VALIGN="TOP">0x00010000</TD><TD VALIGN="TOP">Is an implicit
  (server-generated) class.</TD></TR>
+<TR><TD VALIGN="TOP">0x00020000</TD><TD VALIGN="TOP">Is a network
+ default printer.</TD></TR>
+<TR><TD VALIGN="TOP">0x00040000</TD><TD VALIGN="TOP">Is a facsimile
+ device.</TD></TR>
 </TABLE>
 </CENTER>
 </P>
