@@ -1147,6 +1147,7 @@ determine how the server operates:
 	<LI><A HREF="#ServerKey"><CODE>ServerKey</CODE></A>
 	<LI><A HREF="#ServerName"><CODE>ServerName</CODE></A>
 	<LI><A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A>
+	<LI><A HREF="#ServerTokens"><CODE>ServerTokens</CODE></A>
 	<LI><A HREF="#SSLListen"><CODE>SSLListen</CODE></A>
 	<LI><A HREF="#SSLPort"><CODE>SSLPort</CODE></A>
 	<LI><A HREF="#SystemGroup"><CODE>SystemGroup</CODE></A>
@@ -3048,6 +3049,28 @@ ServerRoot /foo/bar/cups
 the server configuration and state files. It is also used to resolve
 relative paths in the <VAR>cupsd.conf</VAR> file. The default server
 directory is <VAR>/etc/cups</VAR>.
+
+<!-- NEED 3in -->
+<H3><A NAME="ServerTokens">ServerTokens</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+ServerTokens None
+ServerTokens ProductOnly
+ServerTokens Major
+ServerTokens Minor
+ServerTokens Minimal
+ServerTokens OS
+ServerTokens Full
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>ServerTokens</CODE> directive specifies the information
+that is included in the Server header of HTTP responses. The default value
+is <tt>Minor</tt> which generates "CUPS/1.1".
 
 <!-- NEED 3in -->
 <H3><A NAME="SSLListen">SSLListen</A></H3>

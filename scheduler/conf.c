@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.58 2004/06/30 21:18:31 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.59 2004/07/02 04:51:45 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,7 +23,7 @@
  *
  * Contents:
  *
- *   ReadConfiguration:  - Read the cupsd.conf file.
+ *   ReadConfiguration()  - Read the cupsd.conf file.
  *   read_configuration() - Read a configuration file.
  *   read_location()      - Read a <Location path> definition.
  *   read_policy()        - Read a <Policy name> definition.
@@ -41,6 +41,7 @@
 #include <stdarg.h>
 #include <pwd.h>
 #include <grp.h>
+#include <sys/utsname.h>
 
 #ifdef HAVE_DOMAINSOCKETS
 #  include <sys/un.h>
@@ -284,6 +285,7 @@ ReadConfiguration(void)
   SetString(&PrintcapGUI, "/usr/bin/glpoptions");
   SetString(&FontPath, CUPS_FONTPATH);
   SetString(&RemoteRoot, "remroot");
+  SetString(&ServerHeader, "CUPS/1.1");
 
   strlcpy(temp, ConfigurationFile, sizeof(temp));
   if ((slash = strrchr(temp, '/')) != NULL)
@@ -593,7 +595,7 @@ ReadConfiguration(void)
 
   if ((Clients = calloc(sizeof(client_t), MaxClients)) == NULL)
   {
-    LogMessage(L_ERROR, "ReadConfiguration: Unable to allocate memory for %d clients: %s",
+    LogMessage(L_ERROR, "Unable to allocate memory for %d clients: %s",
                MaxClients, strerror(errno));
     exit(1);
   }
@@ -1003,7 +1005,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       }
       else
       {
-        LogMessage(L_ERROR, "ReadConfiguration: Syntax error on line %d.",
+        LogMessage(L_ERROR, "Syntax error on line %d.",
 	           linenum);
         return (0);
       }
@@ -1024,7 +1026,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       }
       else
       {
-        LogMessage(L_ERROR, "ReadConfiguration: Syntax error on line %d.",
+        LogMessage(L_ERROR, "Syntax error on line %d.",
 	           linenum);
         return (0);
       }
@@ -1560,7 +1562,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	if (p != NULL)
 	  User = p->pw_uid;
 	else
-	  LogMessage(L_WARN, "ReadConfiguration: Unknown username \"%s\"",
+	  LogMessage(L_WARN, "Unknown username \"%s\"",
 	             value);
       }
     }
@@ -1582,7 +1584,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	if (g != NULL)
 	  Group = g->gr_gid;
 	else
-	  LogMessage(L_WARN, "ReadConfiguration: Unknown groupname \"%s\"",
+	  LogMessage(L_WARN, "Unknown groupname \"%s\"",
 	             value);
       }
     }
@@ -1648,7 +1650,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       else if (strcasecmp(value, "double") == 0)
         HostNameLookups = 2;
       else
-	LogMessage(L_WARN, "ReadConfiguration: Unknown HostNameLookups %s on line %d.",
+	LogMessage(L_WARN, "Unknown HostNameLookups %s on line %d.",
 	           value, linenum);
     }
     else if (strcasecmp(name, "LogLevel") == 0)
@@ -1691,8 +1693,36 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       else if (strcasecmp(value, "solaris") == 0)
         PrintcapFormat = PRINTCAP_SOLARIS;
       else
-	LogMessage(L_WARN, "ReadConfiguration: Unknown PrintcapFormat %s on line %d.",
+	LogMessage(L_WARN, "Unknown PrintcapFormat %s on line %d.",
 	           value, linenum);
+    }
+    else if (!strcasecmp(name, "ServerTokens"))
+    {
+     /*
+      * Set the string used for the Server header...
+      */
+
+      struct utsname plat;	      /* Platform info */
+
+
+      uname(&plat);
+
+      if (!strcasecmp(value, "ProductOnly"))
+	SetString(&ServerHeader, "CUPS");
+      else if (!strcasecmp(value, "Major"))
+	SetString(&ServerHeader, "CUPS/1");
+      else if (!strcasecmp(value, "Minor"))
+	SetString(&ServerHeader, "CUPS/1.1");
+      else if (!strcasecmp(value, "Minimal"))
+	SetString(&ServerHeader, CUPS_MINIMAL);
+      else if (!strcasecmp(value, "OS"))
+	SetStringf(&ServerHeader, CUPS_MINIMAL " (%s)", plat.sysname);
+      else if (!strcasecmp(value, "Full"))
+	SetStringf(&ServerHeader, CUPS_MINIMAL " (%s) IPP/1.1", plat.sysname);
+      else if (!strcasecmp(value, "None"))
+	ClearString(&ServerHeader);
+      else
+	LogMessage(L_WARN, "Unknown ServerTokens %s on line %d.", value, linenum);
     }
     else
     {
@@ -2880,5 +2910,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.58 2004/06/30 21:18:31 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.59 2004/07/02 04:51:45 mike Exp $".
  */

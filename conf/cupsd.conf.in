@@ -1,5 +1,5 @@
 #
-# "$Id: cupsd.conf.in,v 1.2.2.14 2004/07/01 20:08:04 mike Exp $"
+# "$Id: cupsd.conf.in,v 1.2.2.15 2004/07/02 04:51:45 mike Exp $"
 #
 #   Sample configuration file for the Common UNIX Printing System (CUPS)
 #   scheduler.
@@ -272,6 +272,22 @@ LogLevel info
 #
 
 #ServerRoot @CUPS_SERVERROOT@
+
+
+#
+# ServerTokens: specifies what information in provided in the Server
+# header of HTTP responses. The default is Minor.
+#
+# ServerTokens None
+# ServerTokens ProductOnly       CUPS
+# ServerTokens Major             CUPS/1
+# ServerTokens Minor             CUPS/1.1
+# ServerTokens Minimal           CUPS/@CUPS_VERSION@
+# ServerTokens OS                CUPS/@CUPS_VERSION@ (uname)
+# ServerTokens Full              CUPS/@CUPS_VERSION@ (uname) IPP/1.1
+#
+
+#ServerTokens Minor
 
 
 ########
@@ -804,5 +820,5 @@ Allow From 127.0.0.1
 </Location>
 
 #
-# End of "$Id: cupsd.conf.in,v 1.2.2.14 2004/07/01 20:08:04 mike Exp $".
+# End of "$Id: cupsd.conf.in,v 1.2.2.15 2004/07/02 04:51:45 mike Exp $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.39.2.25 2004/06/29 20:33:11 mike Exp $"
+ * "$Id: config.h.in,v 1.39.2.26 2004/07/02 04:51:45 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -32,6 +32,7 @@
  */
 
 #define CUPS_SVERSION	""
+#define CUPS_MINIMAL	""
 
 
 /*
@@ -293,5 +294,5 @@
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in,v 1.39.2.25 2004/06/29 20:33:11 mike Exp $".
+ * End of "$Id: config.h.in,v 1.39.2.26 2004/07/02 04:51:45 mike Exp $".
  */

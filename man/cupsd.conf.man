@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsd.conf.man,v 1.5.2.4 2004/06/29 13:15:10 mike Exp $"
+.\" "$Id: cupsd.conf.man,v 1.5.2.5 2004/07/02 04:51:45 mike Exp $"
 .\"
 .\"   cupsd.conf man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsd.conf 5 "Common UNIX Printing System" "12 August 2002" "Easy Software Products"
+.TH cupsd.conf 5 "Common UNIX Printing System" "1 July 2004" "Easy Software Products"
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -333,6 +333,11 @@ ServerRoot
 .br
 Specifies the directory where the server configuration files can be found.
 .TP 5
+ServerTokens
+.br
+Specifies what information is included in the Server header of HTTP
+responses.
+.TP 5
 SystemGroup
 .br
 Specifies the group to use for System class authentication.
@@ -355,5 +360,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2004 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupsd.conf.man,v 1.5.2.4 2004/06/29 13:15:10 mike Exp $".
+.\" End of "$Id: cupsd.conf.man,v 1.5.2.5 2004/07/02 04:51:45 mike Exp $".
 .\"
