@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.97 2003/03/20 21:24:05 mike Exp $"
+ * "$Id: main.c,v 1.98 2003/03/21 15:09:34 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -66,9 +66,9 @@ static void	usage(void);
  * Local globals...
  */
 
+static int	holdcount = 0;		/* Number of time "hold" was called */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
 static sigset_t	holdmask;		/* Old POSIX signal mask */
-static int	holdcount = 0;		/* Number of time "hold" was called */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
@@ -1091,5 +1091,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.97 2003/03/20 21:24:05 mike Exp $".
+ * End of "$Id: main.c,v 1.98 2003/03/21 15:09:34 mike Exp $".
  */
