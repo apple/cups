@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.1 1999/09/22 17:14:26 mike Exp $"
+ * "$Id: log.c,v 1.2 1999/09/29 15:38:07 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -347,6 +347,8 @@ get_datetime(time_t t)		/* I - Time value */
   * offset from GMT in seconds so that we are reporting local time in the
   * log files.  If you want GMT, set the TZ environment variable accordingly
   * before starting the scheduler.
+  *
+  * (*BSD stores the timezone offset in the tm structure)
   */
 
   date = localtime(&t);
@@ -354,12 +356,16 @@ get_datetime(time_t t)		/* I - Time value */
   sprintf(s, "[%02d/%s/%04d:%02d:%02d:%02d %+02d%02d]",
 	  date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
 	  date->tm_hour, date->tm_min, date->tm_sec,
-	  timezone / 3600, (timezone / 60) % 60);
-
+#ifdef BSD
+          date->tm_gmtoff / 3600, (date->tm_gmtoff / 60) % 60);
+#else
+          timezone / 3600, (timezone / 60) % 60);
+#endif
+ 
   return (s);
 }
 
 
 /*
- * End of "$Id: log.c,v 1.1 1999/09/22 17:14:26 mike Exp $".
+ * End of "$Id: log.c,v 1.2 1999/09/29 15:38:07 mike Exp $".
  */
