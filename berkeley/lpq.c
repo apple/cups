@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.2 1999/06/09 20:16:57 mike Exp $"
+ * "$Id: lpq.c,v 1.3 1999/06/23 14:08:21 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -68,7 +68,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Connect to the scheduler...
   */
 
-  http = httpConnect("localhost", ippPort());
+  http = httpConnect(cupsServer(), ippPort());
 
  /*
   * Check for command-line options...
@@ -362,5 +362,5 @@ show_jobs(http_t *http,		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpq.c,v 1.2 1999/06/09 20:16:57 mike Exp $".
+ * End of "$Id: lpq.c,v 1.3 1999/06/23 14:08:21 mike Exp $".
  */

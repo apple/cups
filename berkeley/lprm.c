@@ -1,5 +1,5 @@
 /*
- * "$Id: lprm.c,v 1.3 1999/06/18 18:36:05 mike Exp $"
+ * "$Id: lprm.c,v 1.4 1999/06/23 14:08:21 mike Exp $"
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
@@ -70,7 +70,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Open a connection to the server...
   */
 
-  if ((http = httpConnect("localhost", ippPort())) == NULL)
+  if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
   {
     fputs("lprm: Unable to contact server!\n", stderr);
     return (1);
@@ -194,5 +194,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lprm.c,v 1.3 1999/06/18 18:36:05 mike Exp $".
+ * End of "$Id: lprm.c,v 1.4 1999/06/23 14:08:21 mike Exp $".
  */
