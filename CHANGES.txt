@@ -5,6 +5,9 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- The backends now read print data using the read()
+	  system call to ensure that the current page is printed
+	  while the next page is being processed.
 	- The pdftops filter did not support shading type 3
 	  (radial fill) for the "sh" operator.
 	- The cups-polld program now throttles the local
