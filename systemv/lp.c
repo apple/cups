@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.22 2000/08/03 17:57:42 mike Exp $"
+ * "$Id: lp.c,v 1.23 2000/11/10 21:25:51 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -47,6 +47,7 @@
 
 void	sighandler(int);
 #endif /* !WIN32 */
+int	set_job_attrs(int job_id, int num_options, cups_option_t *options);
 
 
 /*
@@ -67,8 +68,9 @@ main(int  argc,		/* I - Number of command-line arguments */
   int		i, j;		/* Looping vars */
   int		job_id;		/* Job ID */
   char		*printer,	/* Printer name */
-		*instance;	/* Instance name */ 
-  char		*title;		/* Job title */
+		*instance,	/* Instance name */ 
+		*val,		/* Option value */
+		*title;		/* Job title */
   int		priority;	/* Job priority (1-100) */
   int		num_copies;	/* Number of copies per file */
   int		num_files;	/* Number of files to print */
@@ -81,7 +83,6 @@ main(int  argc,		/* I - Number of command-line arguments */
   int		silent;		/* Silent or verbose output? */
   char		buffer[8192];	/* Copy buffer */
   FILE		*temp;		/* Temporary file pointer */
-  char		server[1024];	/* Server name */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;	/* Signal action */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET*/
@@ -95,6 +96,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   options     = NULL;
   num_files   = 0;
   title       = NULL;
+  job_id      = 0;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -109,6 +111,13 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    else
 	    {
 	      i ++;
+
+	      if (i >= argc)
+	      {
+	        fputs("lp: Expected destination after -d option!\n", stderr);
+		return (1);
+              }
+
 	      printer = argv[i];
 	    }
 
@@ -128,18 +137,76 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    }
 	    break;
 
+        case 'f' : /* Form */
+	    if (!argv[i][2])
+	    {
+	      i ++;
+
+	      if (i >= argc)
+	      {
+	        fputs("lp: Expected form after -f option!\n", stderr);
+		return (1);
+              }
+	    }
+
+	    fputs("lp: Warning - form option ignored!\n", stderr);
+	    break;
+
         case 'h' : /* Destination host */
 	    if (argv[i][2] != '\0')
-	      snprintf(server, sizeof(server), "CUPS_SERVER=%s", argv[i] + 2);
+	      cupsSetServer(argv[i] + 2);
 	    else
 	    {
 	      i ++;
-	      snprintf(server, sizeof(server), "CUPS_SERVER=%s", argv[i]);
+
+	      if (i >= argc)
+	      {
+	        fputs("lp: Expected hostname after -h option!\n", stderr);
+		return (1);
+              }
+
+	      cupsSetServer(argv[i]);
 	    }
-	    putenv(server);
+	    break;
+
+        case 'i' : /* Change job */
+	    if (argv[i][2])
+	      val = argv[i] + 2;
+	    else
+	    {
+	      i ++;
+
+	      if (i >= argc)
+	      {
+	        fputs("lp: Expected job ID after -i option!\n", stderr);
+		return (1);
+              }
+
+	      val = argv[i];
+	    }
+
+            if (num_files > 0)
+	    {
+	      fputs("lp: Error - cannot print files and alter jobs simultaneously!\n", stderr);
+	      return (1);
+	    }
+
+            if (strrchr(val, '-') != NULL)
+	      job_id = atoi(strrchr(val, '-') + 1);
+	    else
+	      job_id = atoi(val);
+
+            if (job_id < 0)
+	    {
+	      fputs("lp: Error - bad job ID!\n", stderr);
+	      break;
+	    }
 	    break;
 
 	case 'm' : /* Send email when job is done */
+#ifdef __sun
+	case 'p' : /* Notify on completion */
+#endif /* __sun */
 	case 'w' : /* Write to console or email */
 	    break;
 
@@ -149,6 +216,13 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    else
 	    {
 	      i ++;
+
+	      if (i >= argc)
+	      {
+	        fputs("lp: Expected copies after -n option!\n", stderr);
+		return (1);
+              }
+
 	      num_copies = atoi(argv[i]);
 	    }
 
@@ -168,19 +242,45 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    else
 	    {
 	      i ++;
+
+	      if (i >= argc)
+	      {
+	        fputs("lp: Expected option string after -o option!\n", stderr);
+		return (1);
+              }
+
 	      num_options = cupsParseOptions(argv[i], num_options, &options);
 	    }
 	    break;
 
+#ifndef __sun
 	case 'p' : /* Queue priority */
+#endif /* !__sun */
 	case 'q' : /* Queue priority */
 	    if (argv[i][2] != '\0')
 	      priority = atoi(argv[i] + 2);
 	    else
 	    {
 	      i ++;
+
+	      if (i >= argc)
+	      {
+	        fprintf(stderr, "lp: Expected priority after -%c option!\n",
+		        argv[i][1]);
+		return (1);
+              }
+
 	      priority = atoi(argv[i]);
 	    }
+
+           /*
+	    * For 100% Solaris compatibility, need to add:
+	    *
+	    *   priority = 99 * (39 - priority) / 39 + 1;
+	    *
+	    * However, to keep CUPS lp the same across all platforms
+	    * we will break compatibility this far...
+	    */
 
 	    if (priority < 1 || priority > 100)
 	    {
@@ -202,15 +302,117 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    else
 	    {
 	      i ++;
+
+	      if (i >= argc)
+	      {
+	        fputs("lp: Expected title after -t option!\n", stderr);
+		return (1);
+              }
+
 	      title = argv[i];
 	    }
+	    break;
+
+        case 'y' : /* mode-list */
+	    if (!argv[i][2])
+	    {
+	      i ++;
+
+	      if (i >= argc)
+	      {
+	        fputs("lp: Expected mode list after -y option!\n", stderr);
+		return (1);
+              }
+	    }
+
+	    fputs("lp: Warning - mode option ignored!\n", stderr);
+	    break;
+
+        case 'H' : /* Hold job */
+	    if (argv[i][2])
+	      val = argv[i] + 2;
+	    else
+	    {
+	      i ++;
+
+	      if (i >= argc)
+	      {
+	        fputs("lp: Expected hold name after -H option!\n", stderr);
+		return (1);
+              }
+
+	      val = argv[i];
+	    }
+
+	    if (strcmp(val, "hold") == 0)
+              num_options = cupsAddOption("job-hold-until", "indefinite",
+	                                  num_options, &options);
+	    if (strcmp(val, "resume") == 0)
+              num_options = cupsAddOption("job-hold-until", "none",
+	                                  num_options, &options);
+	    else if (strcmp(val, "immediate") == 0)
+              num_options = cupsAddOption("job-priority", "100",
+	                                  num_options, &options);
+	    else
+              num_options = cupsAddOption("job-hold-until", val,
+	                                  num_options, &options);
+	    break;
+
+        case 'P' : /* Page list */
+	    if (argv[i][2])
+	      val = argv[i] + 2;
+	    else
+	    {
+	      i ++;
+
+	      if (i >= argc)
+	      {
+	        fputs("lp: Expected page list after -P option!\n", stderr);
+		return (1);
+              }
+
+	      val = argv[i];
+	    }
+
+            num_options = cupsAddOption("page-ranges", val, num_options,
+	                                &options);
+            break;
+
+        case 'S' : /* character set */
+	    if (!argv[i][2])
+	    {
+	      i ++;
+
+	      if (i >= argc)
+	      {
+	        fputs("lp: Expected character set after -S option!\n", stderr);
+		return (1);
+              }
+	    }
+
+	    fputs("lp: Warning - character set option ignored!\n", stderr);
+	    break;
+
+        case 'T' : /* Content-Type */
+	    if (!argv[i][2])
+	    {
+	      i ++;
+
+	      if (i >= argc)
+	      {
+	        fputs("lp: Expected content type after -T option!\n", stderr);
+		return (1);
+              }
+	    }
+
+	    fputs("lp: Warning - content type option ignored!\n", stderr);
 	    break;
 
 	default :
 	    fprintf(stderr, "lp: Unknown option \'%c\'!\n", argv[i][1]);
 	    return (1);
       }
-    else if (num_files < 1000)
+    else if (num_files < 1000 && job_id == 0)
     {
      /*
       * Print a file...
@@ -229,6 +431,13 @@ main(int  argc,		/* I - Number of command-line arguments */
     }
     else
       fprintf(stderr, "lp: Too many files - \"%s\"\n", argv[i]);
+
+ /*
+  * See if we are altering an existing job...
+  */
+
+  if (job_id)
+    return (set_job_attrs(job_id, num_options, options));
 
  /*
   * See if we have any files to print; if not, print from stdin...
@@ -326,6 +535,27 @@ main(int  argc,		/* I - Number of command-line arguments */
 }
 
 
+/*
+ * 'set_job_attrs()' - Set job attributes.
+ */
+
+int					/* O - Exit status */
+set_job_attrs(int           job_id,	/* I - Job ID */
+              int           num_options,/* I - Number of options */
+	      cups_option_t *options)	/* I - Options */
+{
+  http_t	*http;			/* HTTP connection to server */
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  cups_lang_t	*language;		/* Language for request */
+  char		uri[HTTP_MAX_URI];	/* URI for job */
+
+
+  http = httpConnect(cupsServer(), ippPort());
+
+}
+
+
 #ifndef WIN32
 /*
  * 'sighandler()' - Signal catcher for when we print from stdin...
@@ -350,5 +580,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.22 2000/08/03 17:57:42 mike Exp $".
+ * End of "$Id: lp.c,v 1.23 2000/11/10 21:25:51 mike Exp $".
  */
