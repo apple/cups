@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.7 2000/05/31 14:13:29 mike Exp $"
+ * "$Id: usb.c,v 1.8 2000/06/02 20:58:59 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -299,7 +299,7 @@ list_devices(void)
         * We were processing a printer device; send the info out...
 	*/
 
-	printf("direct usb:/dev/usb/usblp%d \"%s %s\" \"USB Printer #%d\"\n",
+	printf("direct usb:/dev/usb/lp%d \"%s %s\" \"USB Printer #%d\"\n",
 	       i, make, model, i + 1);
 
 	i ++;
@@ -315,7 +315,7 @@ list_devices(void)
   {
     for (i = 0; i < 8; i ++)
     {
-      sprintf(device, "/dev/usb/usblp%d", i);
+      sprintf(device, "/dev/usb/lp%d", i);
       if ((fd = open(device, O_WRONLY)) >= 0)
       {
 	close(fd);
@@ -353,5 +353,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: usb.c,v 1.7 2000/05/31 14:13:29 mike Exp $".
+ * End of "$Id: usb.c,v 1.8 2000/06/02 20:58:59 mike Exp $".
  */
