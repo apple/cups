@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.23 1999/06/03 19:12:03 mike Exp $"
+ * "$Id: job.c,v 1.24 1999/06/04 21:07:23 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -332,6 +332,13 @@ StartJob(int       id,		/* I - Job ID */
       if (!(printer->type & CUPS_PRINTER_REMOTE))
         filters = mimeFilter(MimeDatabase, current->filetype,
                              printer->filetype, &num_filters);
+
+      if (num_filters == 0)
+      {
+        LogMessage(LOG_ERROR, "Unable to convert file to printable format for job %s-%d!",
+	           printer->name, current->id);
+        CancelJob(current->id);
+      }
 
      /*
       * Building the options string is harder than it needs to be, but
@@ -897,5 +904,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.23 1999/06/03 19:12:03 mike Exp $".
+ * End of "$Id: job.c,v 1.24 1999/06/04 21:07:23 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.18 1999/05/19 19:46:43 mike Exp $"
+ * "$Id: printers.c,v 1.19 1999/06/04 21:07:24 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -843,6 +843,12 @@ SetPrinterAttrs(printer_t *p)	/* I - Printer to setup */
 
       ppdClose(ppd);
     }
+    else if (access(filename, 0) == 0)
+    {
+      LogMessage(LOG_ERROR, "PPD file for %s cannot be loaded!", p->name);
+
+      AddPrinterFilter(p, "application/vnd.cups-postscript 0 -");
+    }
 
     ippAddIntegers(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                    "finishings-supported", num_finishings, (int *)finishings);
@@ -933,5 +939,5 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 
 
 /*
- * End of "$Id: printers.c,v 1.18 1999/05/19 19:46:43 mike Exp $".
+ * End of "$Id: printers.c,v 1.19 1999/06/04 21:07:24 mike Exp $".
  */
