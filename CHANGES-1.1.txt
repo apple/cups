@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc3
 
+	- The scheduler could get in an infinite loop cancelling
+	  jobs using "cancel -u user dest" (STR #48)
+	- The "cancel -u user" command did nothing (it should
+	  cancel all jobs on all printers owned by the named
+	  user - STR #48)
 	- The scheduler would write 0-length job control files
 	  (STR #46)
 	- Updated the French man pages (translation provided by

@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.19.2.12 2003/03/12 21:27:39 mike Exp $"
+ * "$Id: cancel.c,v 1.19.2.13 2003/04/28 19:33:42 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -297,10 +297,85 @@ main(int  argc,			/* I - Number of command-line arguments */
       ippDelete(response);
     }
 
+  if (num_dests == 0 && op == IPP_PURGE_JOBS)
+  {
+   /*
+    * Open a connection to the server...
+    */
+
+    if (http == NULL)
+      if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                             cupsEncryption())) == NULL)
+      {
+	fputs("cancel: Unable to contact server!\n", stderr);
+	return (1);
+      }
+
+   /*
+    * Build an IPP request, which requires the following
+    * attributes:
+    *
+    *    attributes-charset
+    *    attributes-natural-language
+    *    printer-uri + job-id *or* job-uri
+    *    [requesting-user-name]
+    */
+
+    request = ippNew();
+
+    request->request.op.operation_id = op;
+    request->request.op.request_id   = 1;
+
+    language = cupsLangDefault();
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+              	 "attributes-charset", NULL, cupsLangEncoding(language));
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                 "attributes-natural-language", NULL, language->language);
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
+	         "printer-uri", NULL, "ipp://localhost/printers/");
+
+    if (user)
+    {
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                   "requesting-user-name", NULL, user);
+      ippAddBoolean(request, IPP_TAG_OPERATION, "my-jobs", 1);
+    }
+    else
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                   "requesting-user-name", NULL, cupsUser());
+
+    ippAddBoolean(request, IPP_TAG_OPERATION, "purge-jobs", purge);
+
+   /*
+    * Do the request and get back a response...
+    */
+
+    response = cupsDoRequest(http, request, "/admin/");
+
+    if (response == NULL ||
+        response->request.status.status_code > IPP_OK_CONFLICT)
+    {
+      fprintf(stderr, "cancel: %s failed: %s\n",
+	      op == IPP_PURGE_JOBS ? "purge-jobs" : "cancel-job",
+              response ? ippErrorString(response->request.status.status_code) :
+		         ippErrorString(cupsLastError()));
+
+      if (response)
+	ippDelete(response);
+
+      return (1);
+    }
+
+    ippDelete(response);
+  }
+
   return (0);
 }
 
 
 /*
- * End of "$Id: cancel.c,v 1.19.2.12 2003/03/12 21:27:39 mike Exp $".
+ * End of "$Id: cancel.c,v 1.19.2.13 2003/04/28 19:33:42 mike Exp $".
  */
