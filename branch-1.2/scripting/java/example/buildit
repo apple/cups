@@ -1,4 +1,0 @@
-#!/bin/sh
-for x in `cat class.list`; do
-  javac $x
-done
