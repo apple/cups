@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.5 1998/08/31 20:35:49 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.6 1998/09/16 14:37:29 mike Exp $"
  *
  *   PostScript prolog routines for the HPGL2PS program for espPrint, a
  *   collection of printer drivers.
@@ -17,7 +17,11 @@
  * Revision History:
  *
  *   $Log: hpgl-prolog.c,v $
- *   Revision 1.5  1998/08/31 20:35:49  mike
+ *   Revision 1.6  1998/09/16 14:37:29  mike
+ *   Fixed landscape printing bug.
+ *   Fixed margins when page is rotated.
+ *
+ *   Revision 1.5  1998/08/31  20:35:49  mike
  *   Updated pen width code to automatically adjust scaling as needed.
  *   Updated PS code to adjust width/height by a factor of 0.75 for better
  *   scaling of plots.
@@ -100,7 +104,22 @@ OutputProlog(int   shading,
   fputs("%%EndProlog\n", OutputFile);
   fputs("%%Page: 1\n", OutputFile);
   fputs("gsave\n", OutputFile);
-  fprintf(OutputFile, "%.1f %.1f translate\n", PageLeft, PageBottom);
+
+  switch (PageRotation)
+  {
+    case 0 :
+        fprintf(OutputFile, "%.1f %.1f translate\n", PageLeft, PageBottom);
+	break;
+    case 90 :
+        fprintf(OutputFile, "%.1f %.1f translate\n", PageBottom, PageRight);
+	break;
+    case 180 :
+        fprintf(OutputFile, "%.1f %.1f translate\n", PageRight, PageTop);
+	break;
+    case 270 :
+        fprintf(OutputFile, "%.1f %.1f translate\n", PageTop, PageLeft);
+	break;
+  };
 
   IN_initialize(0, NULL);
 
@@ -129,5 +148,5 @@ OutputTrailer(void)
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.5 1998/08/31 20:35:49 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.6 1998/09/16 14:37:29 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.7 1998/08/31 20:35:49 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.8 1998/09/16 14:37:29 mike Exp $"
  *
  *   HPGL configuration routines for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,16 @@
  * Revision History:
  *
  *   $Log: hpgl-config.c,v $
- *   Revision 1.7  1998/08/31 20:35:49  mike
+ *   Revision 1.8  1998/09/16 14:37:29  mike
+ *   Fixed landscape printing bug.
+ *   Fixed margins when page is rotated.
+ *
+ *   Revision 1.7  1998/08/31  20:35:49  mike
+ *   Updated pen width code to automatically adjust scaling as needed.
+ *   Updated PS code to adjust width/height by a factor of 0.75 for better
+ *   scaling of plots.
+ *
+ *   Revision 1.7  1998/08/31  20:35:49  mike
  *   Updated pen width code to automatically adjust scaling as needed.
  *   Updated PS code to adjust width/height by a factor of 0.75 for better
  *   scaling of plots.
@@ -332,7 +341,23 @@ PG_advance_page(int num_params, param_t *params)
   PageDirty = 0;
   fprintf(OutputFile, "%%%%Page: %d\n", PageCount);
   fputs("gsave\n", OutputFile);
-  fprintf(OutputFile, "%.1f %.1f translate\n", PageLeft, PageBottom);
+
+  switch (PageRotation)
+  {
+    case 0 :
+        fprintf(OutputFile, "%.1f %.1f translate\n", PageLeft, PageBottom);
+	break;
+    case 90 :
+        fprintf(OutputFile, "%.1f %.1f translate\n", PageBottom, PageRight);
+	break;
+    case 180 :
+        fprintf(OutputFile, "%.1f %.1f translate\n", PageRight, PageTop);
+	break;
+    case 270 :
+        fprintf(OutputFile, "%.1f %.1f translate\n", PageTop, PageLeft);
+	break;
+  };
+
 }
 
 
@@ -431,5 +456,5 @@ SC_scale(int num_params, param_t *params)
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.7 1998/08/31 20:35:49 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.8 1998/09/16 14:37:29 mike Exp $".
  */

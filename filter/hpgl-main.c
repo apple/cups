@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-main.c,v 1.4 1998/08/31 20:35:49 mike Exp $"
+ * "$Id: hpgl-main.c,v 1.5 1998/09/16 14:37:29 mike Exp $"
  *
  *   Main entry for HPGL converter for espPrint, a collection of printer
  *   drivers.
@@ -17,7 +17,16 @@
  * Revision History:
  *
  *   $Log: hpgl-main.c,v $
- *   Revision 1.4  1998/08/31 20:35:49  mike
+ *   Revision 1.5  1998/09/16 14:37:29  mike
+ *   Fixed landscape printing bug.
+ *   Fixed margins when page is rotated.
+ *
+ *   Revision 1.4  1998/08/31  20:35:49  mike
+ *   Updated pen width code to automatically adjust scaling as needed.
+ *   Updated PS code to adjust width/height by a factor of 0.75 for better
+ *   scaling of plots.
+ *
+ *   Revision 1.4  1998/08/31  20:35:49  mike
  *   Updated pen width code to automatically adjust scaling as needed.
  *   Updated PS code to adjust width/height by a factor of 0.75 for better
  *   scaling of plots.
@@ -284,6 +293,7 @@ main(int  argc,
     else
       filename = argv[i];
 
+#if 0
   if (PageRotation == 90 || PageRotation == 270)
   {
     temp       = PageWidth;
@@ -298,6 +308,7 @@ main(int  argc,
     PageLeft   = PageRight;
     PageRight  = temp;
   };
+#endif /* 0 */
 
   if (Verbosity)
   {
@@ -360,5 +371,5 @@ main(int  argc,
 
 
 /*
- * End of "$Id: hpgl-main.c,v 1.4 1998/08/31 20:35:49 mike Exp $".
+ * End of "$Id: hpgl-main.c,v 1.5 1998/09/16 14:37:29 mike Exp $".
  */
