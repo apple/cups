@@ -33,7 +33,7 @@
 	<LI>IPP/1.1: Model and Semantics
 	<LI><A HREF="http://www.ietf.org/rfc/rfc1179.txt">RFC 1179, Line Printer Daemon Protocol</A>
 	<LI><A HREF="http://www.ietf.org/rfc/rfc2567.txt">RFC 2567, Design Goals for an Internet Printing Protocol</A>
-	<LI><A HREF="http://www.ietf.org/rfc/rfc2568.txt">RFC 2568, Rationale for the Structure of the Model and Protocol</A>
+	<LI><A HREF="http://www.ietf.org/rfc/rfc2568.txt">RFC 2568, Rationale for the Structure of the Model and Protocol
 	for the Internet Printing Protocol</A>
 	<LI><A HREF="http://www.ietf.org/rfc/rfc2569.txt">RFC 2569, Mapping between LPD and IPP Protocols</A>
 	<LI><A HREF="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616, Hypertext Transfer Protocol -- HTTP/1.1</A>

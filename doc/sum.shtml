@@ -73,7 +73,7 @@ their meanings and uses are explained below:
 
 	<TD>&nbsp;&nbsp;&nbsp;</TD>
 
-	<TD>Literal user input; special keys like <KBD>ENTER</B></KBD> are
+	<TD>Literal user input; special keys like <KBD>ENTER</KBD> are
 	in ALL CAPS.</TD>
 </TR>
 <TR><TD>&nbsp;</TD></TR>
@@ -873,7 +873,7 @@ command with the <CODE>-l</CODE> option, as follows:
 
 <UL><PRE>
 <B>lpoptions -p laserjet -l ENTER</B>
-</UL></PRE>
+</PRE></UL>
 
 <H2>Setting the Default Printer</H2>
 
@@ -900,7 +900,7 @@ the slash (<CODE>/</CODE>) character:
 <B>lpoptions -p laserjet/legal -o media=Legal ENTER</B>
 </PRE></UL>
 
-<P>The <CODE>lp</CODE> and </CODE>lpr</CODE> commands also understand
+<P>The <CODE>lp</CODE> and <CODE>lpr</CODE> commands also understand
 this notation:
 
 <UL><PRE>

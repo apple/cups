@@ -80,7 +80,7 @@ their meanings and uses are explained below:
 
 	<TD>&nbsp;&nbsp;&nbsp;</TD>
 
-	<TD>Literal user input; special keys like <KBD>ENTER</B></KBD> are
+	<TD>Literal user input; special keys like <KBD>ENTER</KBD> are
 	in ALL CAPS.</TD>
 </TR>
 <TR><TD>&nbsp;</TD></TR>
@@ -279,7 +279,7 @@ and <CODE>--with-openssl-libs</CODE> options:</P>
 </TR>
 </TABLE></CENTER>
 
-<H3><A NAME="RUNNING">Running the Software</A></A></H3>
+<H3><A NAME="RUNNING">Running the Software</A></H3>
 
 <P>Once you have installed the software you can start the CUPS server by
 typing:
@@ -516,7 +516,7 @@ to add or modify a printer:
 
 	<DT>-r <I>class</I>
 
-	<DD>Removes the named printer from printer class <VAR>class</CODE>.
+	<DD>Removes the named printer from printer class <VAR>class</VAR>.
 	If the resulting class becomes empty then it is removed.
 
 	<DT>-v <I>device-uri</I>
@@ -600,7 +600,7 @@ those that have been queued. This is useful for when you must perform
 maintenance on the printer and will not have it available to users for
 a long period of time.
 
-<H3>Setting Quotas on a Printer</A></H3>
+<H3>Setting Quotas on a Printer</H3>
 
 <P>CUPS supports page and size-based quotas for each printer.
 The quotas are tracked individually for each user, but a single set of
@@ -629,7 +629,7 @@ quotas:</P>
 
 <P>Or, you can combine all three options on the same line.</P>
 
-<H3>Restricting User Access to a Printer</A></H3>
+<H3>Restricting User Access to a Printer</H3>
 
 <P>The <CODE>-u</CODE> option of the <CODE>lpadmin</CODE> command controls which users can
 print to a printer. The default configuration allows all users to print
@@ -3615,7 +3615,7 @@ In addition, any file starting with the hexadecimal string
 character between and including <CODE>0xe0</CODE> and <CODE>0xef</CODE>
 (JPEG APPn markers) is also a JPEG file.
 
-<H3>mime.convs</A></H3>
+<H3>mime.convs</H3>
 
 <P>The <VAR>mime.convs</VAR> file defines all of the filter programs that
 are known to the system. Each line consists of:
@@ -4817,7 +4817,7 @@ For more information please contact us at:
 
 </UL>
 
-<H2>My Applications Don't See the Available Printers</H1>
+<H2>My Applications Don't See the Available Printers</H2>
 
 <P>Many applications read the <VAR>/etc/printcap</VAR> file to
 get a list of available printers.
@@ -4849,9 +4849,9 @@ lines reading:
 <UL><PRE>
 AuthType Basic
 AuthClass System
-</UL></PRE>
+</PRE></UL>
 
-for the <VAR>/admin</VAR> location. Then restart the CUPS server as
+<P>for the <VAR>/admin</VAR> location. Then restart the CUPS server as
 described in <A HREF="#PRINTING_MANAGEMENT">Chapter 6, "Printing System
 Management"</A>.</P>
 
@@ -4879,7 +4879,7 @@ Deny from all
 Allow from 127.0.0.1
 </PRE></UL>
 
-for the <VAR>/admin</VAR> location. Then restart the CUPS server as
+<P>for the <VAR>/admin</VAR> location. Then restart the CUPS server as
 described in <A HREF="#PRINTING_MANAGEMENT">Chapter 6, "Printing System
 Management"</A>.</P>
 
