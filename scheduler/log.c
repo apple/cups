@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.19.2.14 2003/07/25 16:00:23 mike Exp $"
+ * "$Id: log.c,v 1.19.2.15 2003/07/25 17:37:33 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -217,6 +217,24 @@ LogMessage(int        level,		/* I - Log level */
     * Not processing a signal so use the dynamic buffer...
     */
 
+    if (!linesize)
+    {
+      linesize = 8192;
+      line     = malloc(linesize);
+
+      if (!line)
+      {
+	cupsFilePrintf(ErrorFile,
+                       "ERROR: Unable to allocate memory for line - %s\n",
+                       strerror(errno));
+	cupsFileFlush(ErrorFile);
+
+	ReleaseSignals();
+
+	return (0);
+      }
+    }
+
     va_start(ap, message);
     len = vsnprintf(line, linesize, message, ap);
     va_end(ap);
@@ -230,10 +248,7 @@ LogMessage(int        level,		/* I - Log level */
       else if (len > 65536)
 	len = 65536;
 
-      if (!linesize)
-	line = malloc(len);
-      else
-	line = realloc(line, len);
+      line = realloc(line, len);
 
       if (line)
 	linesize = len;
@@ -548,5 +563,5 @@ check_log_file(cups_file_t **log,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c,v 1.19.2.14 2003/07/25 16:00:23 mike Exp $".
+ * End of "$Id: log.c,v 1.19.2.15 2003/07/25 17:37:33 mike Exp $".
  */
