@@ -1,5 +1,5 @@
 /*
- * "$Id: image-jpeg.c,v 1.2 1998/02/24 18:39:46 mike Exp $"
+ * "$Id: image-jpeg.c,v 1.3 1998/03/19 16:58:45 mike Exp $"
  *
  *   JPEG image routines for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,10 @@
  * Revision History:
  *
  *   $Log: image-jpeg.c,v $
- *   Revision 1.2  1998/02/24 18:39:46  mike
+ *   Revision 1.3  1998/03/19 16:58:45  mike
+ *   Fixed PPI calculation - was dividing instead of multiplying...
+ *
+ *   Revision 1.2  1998/02/24  18:39:46  mike
  *   Fixed bug in colorspace conversion - now check the number of components
  *   in the image and adjust accordingly.
  *
@@ -82,8 +85,8 @@ ImageReadJPEG(image_t *img,
     }
     else
     {
-      img->xppi = (int)((float)cinfo.X_density / 2.54);
-      img->yppi = (int)((float)cinfo.Y_density / 2.54);
+      img->xppi = (int)((float)cinfo.X_density * 2.54);
+      img->yppi = (int)((float)cinfo.Y_density * 2.54);
     };
   };
 
@@ -161,5 +164,5 @@ ImageReadJPEG(image_t *img,
 
 
 /*
- * End of "$Id: image-jpeg.c,v 1.2 1998/02/24 18:39:46 mike Exp $".
+ * End of "$Id: image-jpeg.c,v 1.3 1998/03/19 16:58:45 mike Exp $".
  */

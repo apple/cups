@@ -1,5 +1,5 @@
 /*
- * "$Id: image-png.c,v 1.1 1998/02/19 20:43:33 mike Exp $"
+ * "$Id: image-png.c,v 1.2 1998/03/19 16:57:12 mike Exp $"
  *
  *   PNG image routines for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,10 @@
  * Revision History:
  *
  *   $Log: image-png.c,v $
- *   Revision 1.1  1998/02/19 20:43:33  mike
+ *   Revision 1.2  1998/03/19 16:57:12  mike
+ *   Fixed PPI calculation - was dividing instead of multiplying...
+ *
+ *   Revision 1.1  1998/02/19  20:43:33  mike
  *   Initial revision
  *
  */
@@ -79,14 +82,8 @@ ImageReadPNG(image_t *img,
   if (info->valid & PNG_INFO_pHYs &&
       info->phys_unit_type == PNG_RESOLUTION_METER)
   {
-   /*
-    * Who the hell was the braniac that decided that an *integer*
-    * pixels-per-meter measurement was good or even useful (~40ppi
-    * per meter)!
-    */
-
-    img->xppi = (int)((float)info->x_pixels_per_unit / 0.0254);
-    img->yppi = (int)((float)info->y_pixels_per_unit / 0.0254);
+    img->xppi = (int)((float)info->x_pixels_per_unit * 0.0254);
+    img->yppi = (int)((float)info->y_pixels_per_unit * 0.0254);
   };
 
   ImageSetMaxTiles(img, 0);
@@ -190,5 +187,5 @@ ImageReadPNG(image_t *img,
 
 
 /*
- * End of "$Id: image-png.c,v 1.1 1998/02/19 20:43:33 mike Exp $".
+ * End of "$Id: image-png.c,v 1.2 1998/03/19 16:57:12 mike Exp $".
  */
