@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.8 2000/08/21 20:22:35 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.9 2000/08/29 17:01:46 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -70,7 +70,7 @@ int	print_file(const char *name, const char *file,
 	           const char *title, const char *docname,
 	           const char *user, int num_options,
 		   cups_option_t *options);
-int	recv_print_job(const char *dest);
+int	recv_print_job(const char *dest, int num_defaults, cups_option_t *defaults);
 int	send_state(const char *dest, const char *list, int longstatus);
 int	remove_jobs(const char *dest, const char *agent, const char *list);
 
@@ -79,16 +79,20 @@ int	remove_jobs(const char *dest, const char *agent, const char *list);
  * 'main()' - Process an incoming LPD request...
  */
 
-int			/* O - Exit status */
-main(int  argc,		/* I - Number of command-line arguments */
-     char *argv[])	/* I - Command-line arguments */
+int				/* O - Exit status */
+main(int  argc,			/* I - Number of command-line arguments */
+     char *argv[])		/* I - Command-line arguments */
 {
-  char	line[1024],	/* Command string */
-	command,	/* Command code */
-	*dest,		/* Pointer to destination */
-	*list,		/* Pointer to list */
-	*agent,		/* Pointer to user */
-	status;		/* Status for client */
+  int		i;		/* Looping var */
+  char		*opt;		/* Option character */
+  int		num_defaults;	/* Number of default options */
+  cups_option_t	*defaults;	/* Default options */
+  char		line[1024],	/* Command string */
+		command,	/* Command code */
+		*dest,		/* Pointer to destination */
+		*list,		/* Pointer to list */
+		*agent,		/* Pointer to user */
+		status;		/* Status for client */
 
 
  /*
@@ -102,6 +106,34 @@ main(int  argc,		/* I - Number of command-line arguments */
   */
 
   openlog("cups-lpd", LOG_PID, LOG_LPR);
+
+ /*
+  * Scan the command-line for options...
+  */
+
+  num_defaults = 0;
+  defaults     = NULL;
+
+  for (i = 1; i < argc; i ++)
+    if (argv[i][0] == '-')
+    {
+      for (opt = argv[i] + 1; *opt; opt ++)
+        switch (*opt)
+	{
+	  case 'o' : /* Option */
+	      i ++;
+	      if (i < argc)
+	        num_defaults = cupsParseOptions(argv[i], num_defaults, &defaults);
+              else
+                syslog(LOG_WARNING, "Expected option string after -o option!");
+	      break;
+	  default :
+	      syslog(LOG_WARNING, "Unknown option \"%c\" ignored!", *opt);
+	      break;
+	}
+    }
+    else
+      syslog(LOG_WARNING, "Unknown command-line option \"%s\" ignored!", argv[i]);
 
  /*
   * RFC1179 specifies that only 1 daemon command can be received for
@@ -155,7 +187,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     case 0x02 : /* Receive a printer job */
 	putchar(0);
 
-        status = recv_print_job(dest);
+        status = recv_print_job(dest, num_defaults, defaults);
 	break;
 
     case 0x03 : /* Send queue state (short) */
@@ -421,7 +453,9 @@ print_file(const char    *name,		/* I - Printer or class name */
  */
 
 int					/* O - Command status */
-recv_print_job(const char *dest)	/* I - Destination */
+recv_print_job(const char    *dest,	/* I - Destination */
+               int           num_defaults,/* I - Number of default options */
+	       cups_option_t *defaults)	/* I - Default options */
 {
   int		i;			/* Looping var */
   int		status;			/* Command status */
@@ -653,10 +687,16 @@ recv_print_job(const char *dest)	/* I - Destination */
 
               num_options = 0;
 	      options     = NULL;
+
+	      for (i = 0; i < num_defaults; i ++)
+	        num_options = cupsAddOption(defaults[i].name,
+		                            defaults[i].value,
+		                            num_options, &options);
 	      for (i = 0; i < destptr->num_options; i ++)
 	        num_options = cupsAddOption(destptr->options[i].name,
 		                            destptr->options[i].value,
 		                            num_options, &options);
+
              /*
 	      * Add additional options as needed...
 	      */
@@ -1057,6 +1097,8 @@ remove_jobs(const char *dest,		/* I - Destination */
   char		uri[HTTP_MAX_URI];	/* Job URI */
 
 
+  (void)dest;	/* Suppress compiler warnings... */
+
  /*
   * Try connecting to the local server...
   */
@@ -1143,5 +1185,5 @@ remove_jobs(const char *dest,		/* I - Destination */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.8 2000/08/21 20:22:35 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.9 2000/08/29 17:01:46 mike Exp $".
  */
