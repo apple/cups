@@ -1,5 +1,5 @@
 /*
- * "$Id: accept.c,v 1.13 2001/06/07 17:53:08 mike Exp $"
+ * "$Id: accept.c,v 1.14 2001/09/17 19:52:22 mike Exp $"
  *
  *   "accept", "disable", "enable", and "reject" commands for the Common
  *   UNIX Printing System (CUPS).
@@ -58,6 +58,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 				/* Name of printer or class */
 		uri[1024],	/* Printer URI */
 		*reason;	/* Reason for reject/disable */
+  const char	*server;	/* Server name */
   ipp_t		*request;	/* IPP request */
   ipp_t		*response;	/* IPP response */
   ipp_op_t	op;		/* Operation */
@@ -91,6 +92,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     return (1);
   }
 
+  server     = cupsServer();
   http       = NULL;
   reason     = NULL;
   encryption = cupsEncryption();
@@ -124,7 +126,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      httpClose(http);
 
 	    if (argv[i][2] != '\0')
-	      http = httpConnectEncrypt(argv[i] + 2, ippPort(), encryption);
+	      server = argv[i] + 2;
 	    else
 	    {
 	      i ++;
@@ -135,8 +137,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 	        return (1);
 	      }
 
-	      http = httpConnectEncrypt(argv[i], ippPort(), encryption);
+              server = argv[i];
 	    }
+
+            http = httpConnectEncrypt(server, ippPort(), encryption);
 
 	    if (http == NULL)
 	    {
@@ -174,7 +178,10 @@ main(int  argc,			/* I - Number of command-line arguments */
       */
 
       if (sscanf(argv[i], "%1023[^@]@%1023s", printer, hostname) == 1)
-	strcpy(hostname, "localhost");
+      {
+	strncpy(hostname, server, sizeof(hostname) - 1);
+	hostname[sizeof(hostname) - 1] = '\0';
+      }
 
       if (http != NULL && strcasecmp(http->hostname, hostname) != 0)
       {
@@ -305,5 +312,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: accept.c,v 1.13 2001/06/07 17:53:08 mike Exp $".
+ * End of "$Id: accept.c,v 1.14 2001/09/17 19:52:22 mike Exp $".
  */
