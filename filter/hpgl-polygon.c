@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-polygon.c,v 1.3 1998/09/10 20:00:01 mike Exp $"
+ * "$Id: hpgl-polygon.c,v 1.4 1999/03/06 18:02:26 mike Exp $"
  *
  *   HPGL polygon routines for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,13 @@
  * Revision History:
  *
  *   $Log: hpgl-polygon.c,v $
- *   Revision 1.3  1998/09/10 20:00:01  mike
+ *   Revision 1.4  1999/03/06 18:02:26  mike
+ *   Updated for CVS check-in.
+ *
+ *   Revision 1.3  1998/09/10  20:00:01  mike
+ *   Wasn't doing an initial "move" when starting a polygon.
+ *
+ *   Revision 1.3  1998/09/10  20:00:01  mike
  *   Wasn't doing an initial "move" when starting a polygon.
  *
  *   Revision 1.2  1996/10/14  16:50:14  mike
@@ -329,5 +335,5 @@ WG_fill_wedge(int num_params, param_t *params)
 
 
 /*
- * End of "$Id: hpgl-polygon.c,v 1.3 1998/09/10 20:00:01 mike Exp $".
+ * End of "$Id: hpgl-polygon.c,v 1.4 1999/03/06 18:02:26 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-main.c,v 1.5 1998/09/16 14:37:29 mike Exp $"
+ * "$Id: hpgl-main.c,v 1.6 1999/03/06 18:02:26 mike Exp $"
  *
  *   Main entry for HPGL converter for espPrint, a collection of printer
  *   drivers.
@@ -17,7 +17,14 @@
  * Revision History:
  *
  *   $Log: hpgl-main.c,v $
- *   Revision 1.5  1998/09/16 14:37:29  mike
+ *   Revision 1.6  1999/03/06 18:02:26  mike
+ *   Updated for CVS check-in.
+ *
+ *   Revision 1.5  1998/09/16  14:37:29  mike
+ *   Fixed landscape printing bug.
+ *   Fixed margins when page is rotated.
+ *
+ *   Revision 1.5  1998/09/16  14:37:29  mike
  *   Fixed landscape printing bug.
  *   Fixed margins when page is rotated.
  *
@@ -371,5 +378,5 @@ main(int  argc,
 
 
 /*
- * End of "$Id: hpgl-main.c,v 1.5 1998/09/16 14:37:29 mike Exp $".
+ * End of "$Id: hpgl-main.c,v 1.6 1999/03/06 18:02:26 mike Exp $".
  */

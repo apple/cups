@@ -1,6 +1,6 @@
 #!/usr/sbin/smake
 #
-# "$Id: Makefile,v 1.1 1996/08/24 19:41:24 mike Exp $"
+# "$Id: Makefile,v 1.2 1999/03/06 18:02:26 mike Exp $"
 #
 #    for espPrint, a collection of printer/image software.
 #
@@ -15,7 +15,10 @@
 # Revision History:
 #
 #   $Log: Makefile,v $
-#   Revision 1.1  1996/08/24 19:41:24  mike
+#   Revision 1.2  1999/03/06 18:02:26  mike
+#   Updated for CVS check-in.
+#
+#   Revision 1.1  1996/08/24  19:41:24  mike
 #   Initial revision
 #
 #
@@ -24,16 +27,16 @@
 # Standard definitions...
 #
 
-include ../Makedefs
+include ../Makedefs.$(HOSTTYPE)
 
 
-TARGETS	=	hpgl2ps
+TARGETS	=	$(HOSTTYPE)/hpgl2ps
 
 #
 # Make all targets...
 #
 
-all:	$(TARGETS)
+m_$(HOSTTYPE):	$(TARGETS)
 
 #
 # Clean all garbage...
@@ -45,14 +48,15 @@ clean:
 # hpgl2ps
 #
 
-OBJS	=	attr.$(OBJ)	char.$(OBJ)	config.$(OBJ) \
-		input.$(OBJ)	main.$(OBJ)	polygon.$(OBJ) \
-		prolog.$(OBJ)	vector.$(OBJ)
+OBJS	=	$(HOSTTYPE)/attr.o $(HOSTTYPE)/char.o $(HOSTTYPE)/config.o \
+		$(HOSTTYPE)/input.o $(HOSTTYPE)/main.o $(HOSTTYPE)/polygon.o \
+		$(HOSTTYPE)/prolog.o $(HOSTTYPE)/vector.o
 
-hpgl2ps:	$(OBJS)
-	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
+$(HOSTTYPE)/hpgl2ps:	$(OBJS)
+	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(DRVLIBS)
+	$(STRIP) $@
 $(OBJS):	hpgl2ps.h
 
 #
-# End of "$Id: Makefile,v 1.1 1996/08/24 19:41:24 mike Exp $".
+# End of "$Id: Makefile,v 1.2 1999/03/06 18:02:26 mike Exp $".
 #

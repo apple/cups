@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-vector.c,v 1.4 1998/09/10 20:00:01 mike Exp $"
+ * "$Id: hpgl-vector.c,v 1.5 1999/03/06 18:02:26 mike Exp $"
  *
  *   HPGL vector processing routines for espPrint, a collection of printer
  *   drivers.
@@ -17,7 +17,13 @@
  * Revision History:
  *
  *   $Log: hpgl-vector.c,v $
- *   Revision 1.4  1998/09/10 20:00:01  mike
+ *   Revision 1.5  1999/03/06 18:02:26  mike
+ *   Updated for CVS check-in.
+ *
+ *   Revision 1.4  1998/09/10  20:00:01  mike
+ *   Wasn't drawing arcs properly.
+ *
+ *   Revision 1.4  1998/09/10  20:00:01  mike
  *   Wasn't drawing arcs properly.
  *
  *   Revision 1.3  1998/03/10  16:52:25  mike
@@ -670,5 +676,5 @@ RT_arc_relative3(int num_params, param_t *params)
 
 
 /*
- * End of "$Id: hpgl-vector.c,v 1.4 1998/09/10 20:00:01 mike Exp $".
+ * End of "$Id: hpgl-vector.c,v 1.5 1999/03/06 18:02:26 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.6 1998/09/16 14:37:29 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.7 1999/03/06 18:02:26 mike Exp $"
  *
  *   PostScript prolog routines for the HPGL2PS program for espPrint, a
  *   collection of printer drivers.
@@ -17,7 +17,14 @@
  * Revision History:
  *
  *   $Log: hpgl-prolog.c,v $
- *   Revision 1.6  1998/09/16 14:37:29  mike
+ *   Revision 1.7  1999/03/06 18:02:26  mike
+ *   Updated for CVS check-in.
+ *
+ *   Revision 1.6  1998/09/16  14:37:29  mike
+ *   Fixed landscape printing bug.
+ *   Fixed margins when page is rotated.
+ *
+ *   Revision 1.6  1998/09/16  14:37:29  mike
  *   Fixed landscape printing bug.
  *   Fixed margins when page is rotated.
  *
@@ -148,5 +155,5 @@ OutputTrailer(void)
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.6 1998/09/16 14:37:29 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.7 1999/03/06 18:02:26 mike Exp $".
  */
