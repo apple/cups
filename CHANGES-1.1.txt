@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The scheduler did not report the addresses associated
+	  with certain network errors, making troubleshooting
+	  difficult (STR #648, #649)
 	- The cupstestppd program did not allow a default choice
 	  of "Unknown" as required by the PPD spec (STR #651)
 	- The select() buffers are now allocated to be at least

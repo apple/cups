@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.9.2.12 2004/02/24 21:36:59 mike Exp $"
+ * "$Id: listen.c,v 1.9.2.13 2004/03/24 21:28:56 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -102,6 +102,7 @@ void
 StartListening(void)
 {
   int		i,		/* Looping var */
+		p,		/* Port number */
 		val;		/* Parameter value */
   listener_t	*lis;		/* Current listening socket */
   struct hostent *host;		/* Host entry for server address */
@@ -146,12 +147,12 @@ StartListening(void)
 
 #ifdef AF_INET6
     if (lis->address.addr.sa_family == AF_INET6)
-      LogMessage(L_DEBUG, "StartListening: address=%s port=%d (IPv6)", s,
-		 ntohs(lis->address.ipv6.sin6_port));
+      p = ntohs(lis->address.ipv6.sin6_port);
     else
 #endif /* AF_INET6 */
-    LogMessage(L_DEBUG, "StartListening: address=%s port=%d", s,
-	       ntohs(lis->address.ipv4.sin_port));
+    p = ntohs(lis->address.ipv4.sin_port);
+
+    LogMessage(L_DEBUG, "StartListening: address=%s port=%d", s, p);
 
    /*
     * Save the first port that is bound to the local loopback or
@@ -161,14 +162,7 @@ StartListening(void)
     if (!LocalPort &&
         (httpAddrLocalhost(&(lis->address)) ||
          httpAddrAny(&(lis->address))))
-    {
-#ifdef AF_INET6
-      if (lis->address.addr.sa_family == AF_INET6)
-	LocalPort = ntohs(lis->address.ipv6.sin6_port);
-      else
-#endif /* AF_INET6 */
-      LocalPort = ntohs(lis->address.ipv4.sin_port);
-    }
+      LocalPort = p;
 
    /*
     * Create a socket for listening...
@@ -176,8 +170,8 @@ StartListening(void)
 
     if ((lis->fd = socket(lis->address.addr.sa_family, SOCK_STREAM, 0)) == -1)
     {
-      LogMessage(L_ERROR, "StartListening: Unable to open listen socket - %s.",
-                 strerror(errno));
+      LogMessage(L_ERROR, "StartListening: Unable to open listen socket for address %s:%d - %s.",
+                 s, p, strerror(errno));
       exit(errno);
     }
 
@@ -210,8 +204,8 @@ StartListening(void)
              sizeof(lis->address.ipv4)) < 0)
 #endif
     {
-      LogMessage(L_ERROR, "StartListening: Unable to bind socket - %s.",
-                 strerror(errno));
+      LogMessage(L_ERROR, "StartListening: Unable to bind socket for address %s:%d - %s.",
+                 s, p, strerror(errno));
       exit(errno);
     }
 
@@ -221,8 +215,8 @@ StartListening(void)
 
     if (listen(lis->fd, ListenBackLog) < 0)
     {
-      LogMessage(L_ERROR, "StartListening: Unable to listen for clients - %s.",
-                 strerror(errno));
+      LogMessage(L_ERROR, "StartListening: Unable to listen for clients on address %s:%d - %s.",
+                 s, p, strerror(errno));
       exit(errno);
     }
   }
@@ -271,5 +265,5 @@ StopListening(void)
 
 
 /*
- * End of "$Id: listen.c,v 1.9.2.12 2004/02/24 21:36:59 mike Exp $".
+ * End of "$Id: listen.c,v 1.9.2.13 2004/03/24 21:28:56 mike Exp $".
  */
