@@ -3,21 +3,36 @@ CHANGES.txt - 07/10/2000
 
 CHANGES IN CUPS v1.1.1
 
-	- The pstoraster Makefile still referenced one of the old
-	  PDF filter files.
-	- The administration CGI didn't work properly with network
-	  devices.
-	- The BrowseACL variable was not updated after the cupsd.conf
-	  file was loaded.
+	- The pstoraster Makefile still referenced one of the
+	  old PDF filter files.
+	- The filter Makefile used INSTALL_DATA instead of
+	  INSTALL_LIB to install the CUPS image library.
+	- The administration CGI didn't work properly with
+	  network devices.
+	- The BrowseACL variable was not updated after the
+	  cupsd.conf file was loaded.
 	- The lpd mini-daemon didn't support printer instances.
 	- Now use a default umask of 077 for child processes.
 	- Now put temp files in /var/spool/cups/tmp for child
 	  processes and the root user, unless TMPDIR or TempDir
 	  is defined otherwise.
 	- cupsGetPPD() no longer uses easy-to-guess filenames.
-	- The CUPS-Delete-Class and CUPS-Delete-Printer operations
-	  now save classes.conf file as needed.
-
+	- The CUPS-Delete-Class and CUPS-Delete-Printer
+	  operations now save classes.conf file as needed.
+	- The lppasswd command wouldn't add a user.
+	- The ppdOpen() function could cause a segfault if a
+	  0-length PPD file was read.
+	- The image filters were not handling images with
+	  different X and Y resolutions properly.
+	- The imagetoraster filter defaulted to RGB output
+	  instead of black output like pstoraster.
+	- The pstops filter didn't handle binary data properly.
+	- The pstops filter didn't handle copies properly for
+	  PS files lacking DSC comments.
+	- The pstops filter now appends %%EOF to the end of
+	  documents if they don't have it.
+	- The cupsGetPPD() function didn't work with remote
+	  printers lacking the @server in the name.
 
 CHANGES IN CUPS v1.1
 
