@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.103 2001/10/25 16:26:02 mike Exp $"
+ * "$Id: client.c,v 1.104 2001/10/29 13:30:08 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -438,7 +438,7 @@ EncryptClient(client_t *con)	/* I - Client to encrypt */
 int				/* O - 1 on success, 0 on error */
 ReadClient(client_t *con)	/* I - Client to read from */
 {
-  char		line[8192],	/* Line from client... */
+  char		line[32768],	/* Line from client... */
 		operation[64],	/* Operation code from socket */
 		version[64];	/* HTTP version number string */
   int		major, minor;	/* HTTP version numbers */
@@ -2499,5 +2499,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.103 2001/10/25 16:26:02 mike Exp $".
+ * End of "$Id: client.c,v 1.104 2001/10/29 13:30:08 mike Exp $".
  */
