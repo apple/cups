@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.3 2001/06/29 14:19:09 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.4 2001/07/11 19:56:08 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -35,6 +35,10 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_INSTALL
+if test $INSTALL = $ac_install_sh; then
+    # Use full path to install-sh script...
+    INSTALL=`pwd`/install-sh
+fi
 AC_PROG_RANLIB
 AC_PATH_PROG(AR,ar)
 AC_PATH_PROG(HTMLDOC,htmldoc)
@@ -128,5 +132,5 @@ AC_CHECK_FUNCS(waitpid)
 AC_CHECK_FUNCS(wait3)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.3 2001/06/29 14:19:09 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.4 2001/07/11 19:56:08 mike Exp $".
 dnl
