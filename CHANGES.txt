@@ -32,6 +32,9 @@ CHANGES IN CUPS V1.1.5
 	- The PPD read functions incorrectly included trailing
 	  characters (usually whitespace) after quoted string
 	  attributes.
+	- The multiple-document-handling attribute handling code
+	  did not check for the correct value for collated
+	  copies (separate-documents-uncollated-copies).
 
 
 CHANGES IN CUPS v1.1.4

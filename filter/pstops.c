@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.44 2000/10/04 14:47:19 mike Exp $"
+ * "$Id: pstops.c,v 1.45 2000/10/19 02:12:26 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -162,10 +162,10 @@ main(int  argc,			/* I - Number of command-line arguments */
     *   single-document, separate-documents-collated-copies, and
     *   single-document-new-sheet all require collated copies.
     *
-    *   separate-documents-collated-copies allows for uncollated copies.
+    *   separate-documents-uncollated-copies allows for uncollated copies.
     */
 
-    Collate = strcasecmp(val, "separate-documents-collated-copies") != 0;
+    Collate = strcasecmp(val, "separate-documents-uncollated-copies") != 0;
   }
 
   if ((val = cupsGetOption("Collate", num_options, options)) != NULL &&
@@ -906,5 +906,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.44 2000/10/04 14:47:19 mike Exp $".
+ * End of "$Id: pstops.c,v 1.45 2000/10/19 02:12:26 mike Exp $".
  */
