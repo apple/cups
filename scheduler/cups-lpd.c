@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.17 2000/12/12 14:58:02 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.18 2001/01/12 15:40:10 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -43,6 +43,11 @@
 #include <errno.h>
 #include <syslog.h>
 #include <ctype.h>
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
 
 
 /*
@@ -96,6 +101,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 		*list,		/* Pointer to list */
 		*agent,		/* Pointer to user */
 		status;		/* Status for client */
+  int		hostlen;	/* Size of client address */
+  unsigned	hostip;		/* (32-bit) IP address */
+  struct sockaddr_in hostaddr;	/* Address of client */
+  struct hostent *hostname;	/* Name of client */
 
 
  /*
@@ -109,6 +118,25 @@ main(int  argc,			/* I - Number of command-line arguments */
   */
 
   openlog("cups-lpd", LOG_PID, LOG_LPR);
+
+ /*
+  * Get the address of the client...
+  */
+
+  hostlen = sizeof(hostaddr);
+
+  if (getpeername(0, &hostaddr, &hostlen))
+    syslog(LOG_WARNING, "Unable to get client address - %s", strerror(errno));
+  else
+  {
+    hostip   = ntohl(hostaddr.sin_addr.s_addr);
+    hostname = gethostbyaddr(&hostaddr, hostlen, AF_INET);
+
+    syslog(LOG_INFO, "Connection from %s (%d.%d.%d.%d)",
+           hostname ? hostname->h_name : "unknown",
+           (hostip >> 24) & 255, (hostip >> 16) & 255,
+	   (hostip >> 8) & 255, hostip & 255);
+  }
 
  /*
   * Scan the command-line for options...
@@ -187,24 +215,28 @@ main(int  argc,			/* I - Number of command-line arguments */
 	break;
 
     case 0x01 : /* Print any waiting jobs */
+        syslog(LOG_INFO, "Print waiting jobs (no-op)");
 	putchar(0);
 
         status = 0;
 	break;
 
     case 0x02 : /* Receive a printer job */
+        syslog(LOG_INFO, "Receive print job for %s", dest);
 	putchar(0);
 
         status = recv_print_job(dest, num_defaults, defaults);
 	break;
 
     case 0x03 : /* Send queue state (short) */
+        syslog(LOG_INFO, "Send queue state (short) for %s %s", dest, list);
 	putchar(0);
 
         status = send_state(dest, list, 0);
 	break;
 
     case 0x04 : /* Send queue state (long) */
+        syslog(LOG_INFO, "Send queue state (long) for %s %s", dest, list);
 	putchar(0);
 
         status = send_state(dest, list, 1);
@@ -223,10 +255,13 @@ main(int  argc,			/* I - Number of command-line arguments */
 	while (isspace(*list))
 	  *list++ = '\0';
 
+        syslog(LOG_INFO, "Remove jobs %s on %s by %s", list, dest, agent);
+
         status = remove_jobs(dest, agent, list);
 	break;
   }
 
+  syslog(LOG_INFO, "Closing connection");
   closelog();
 
   return (status);
@@ -329,6 +364,9 @@ print_file(const char    *name,		/* I - Printer or class name */
 
   httpClose(http);
   cupsLangFree(language);
+
+  if (jobid)
+    syslog(LOG_INFO, "Print file - job ID = %d", jobid);
 
   return (jobid);
 }
@@ -758,19 +796,22 @@ remove_jobs(const char *dest,		/* I - Destination */
     {
       if (response->request.status.status_code > IPP_OK_CONFLICT)
       {
-	printf("cancel-job failed: %s\n",
+	syslog(LOG_WARNING, "Cancel of job ID %d failed: %s\n", id,
                ippErrorString(response->request.status.status_code));
 	ippDelete(response);
 	cupsLangFree(language);
 	httpClose(http);
 	return (1);
       }
+      else
+        syslog(LOG_INFO, "Job ID %d cancelled", id);
 
       ippDelete(response);
     }
     else
     {
-      printf("cancel-job failed: %s\n", ippErrorString(cupsLastError()));
+      syslog(LOG_WARNING, "Cancel of job ID %d failed: %s\n", id,
+             ippErrorString(cupsLastError()));
       cupsLangFree(language);
       httpClose(http);
       return (1);
@@ -893,7 +934,7 @@ send_state(const char *dest,		/* I - Destination */
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      printf("get-printer-attributes failed: %s\n",
+      syslog(LOG_WARNING, "Unable to get printer list: %s\n",
              ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return (1);
@@ -921,7 +962,8 @@ send_state(const char *dest,		/* I - Destination */
   }
   else
   {
-    printf("get-printer-attributes failed: %s\n", ippErrorString(cupsLastError()));
+    syslog(LOG_WARNING, "Unable to get printer list: %s\n",
+           ippErrorString(cupsLastError()));
     return (1);
   }
 
@@ -1172,5 +1214,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.17 2000/12/12 14:58:02 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.18 2001/01/12 15:40:10 mike Exp $".
  */

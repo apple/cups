@@ -19,6 +19,11 @@ CHANGES IN CUPS V1.1.6
 	  if a class only contained 1 printer.
 	- If LoadAllJobs() is unable to determine the file type
 	  of a print job, assume "application/vnd.cups-raw".
+	- The web interface now provides a job_printer_name
+	  value for any corresponding job_printer_uri value.
+	- The cups-lpd mini-daemon now logs the client address
+	  and hostname as well as all commands and errors in the
+	  syslog file.
 
 
 CHANGES IN CUPS V1.1.5-2

@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.24 2000/11/11 13:53:04 mike Exp $"
+ * "$Id: lp.c,v 1.25 2001/01/12 15:40:11 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -88,6 +88,24 @@ main(int  argc,		/* I - Number of command-line arguments */
   struct sigaction action;	/* Signal action */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET*/
 
+
+#ifdef __sun
+ /*
+  * Solaris does some rather strange things to re-queue remote print
+  * jobs.  On bootup, the "lp" command is run as "printd" to re-spool
+  * any remote jobs in /var/spool/print.  Since CUPS doesn't need this
+  * nonsense, we just need to add the necessary check here to prevent
+  * lp from causing boot problems...
+  */
+
+  if ((val = strrchr(argv[0], '/')) != NULL)
+    val ++;
+  else
+    val = argv[0];
+
+  if (strcmp(val, "printd") == 0)
+    return (0);
+#endif /* __sun */
 
   silent      = 0;
   printer     = NULL;
@@ -620,5 +638,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.24 2000/11/11 13:53:04 mike Exp $".
+ * End of "$Id: lp.c,v 1.25 2001/01/12 15:40:11 mike Exp $".
  */

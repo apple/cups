@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.15 2000/10/04 12:29:42 mike Exp $"
+ * "$Id: ipp-var.c,v 1.16 2001/01/12 15:40:09 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -156,6 +156,21 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
       name[i] = '\0';
 
      /*
+      * Add "job_printer_name" variable if we have a "job_printer_uri"
+      * attribute...
+      */
+
+      if (strcmp(name, "job_printer_uri") == 0)
+      {
+        if ((valptr = strrchr(attr->values[0].string.text, '/')) == NULL)
+	  valptr = "unknown";
+	else
+	  valptr ++;
+
+        cgiSetArray("job_printer_name", element, valptr);
+      }
+
+     /*
       * Copy values...
       */
 
@@ -259,5 +274,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.15 2000/10/04 12:29:42 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.16 2001/01/12 15:40:09 mike Exp $".
  */

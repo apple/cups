@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.105 2001/01/11 21:58:51 mike Exp $"
+ * "$Id: job.c,v 1.106 2001/01/12 15:40:10 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -233,7 +233,6 @@ void
 CheckJobs(void)
 {
   job_t		*current,	/* Current job in queue */
-		*prev,		/* Previous job in queue */
 		*next;		/* Next job in queue */
   printer_t	*printer,	/* Printer destination */
 		*pclass;	/* Printer class destination */
@@ -241,9 +240,7 @@ CheckJobs(void)
 
   DEBUG_puts("CheckJobs()");
 
-  for (current = Jobs, prev = NULL;
-       current != NULL;
-       prev = current, current = next)
+  for (current = Jobs; current != NULL; current = next)
   {
    /*
     * Save next pointer in case the job is cancelled en-route.
@@ -614,7 +611,8 @@ LoadAllJobs(void)
       job->filetypes[fileid - 1] = mimeFileType(MimeDatabase, filename);
 
       if (job->filetypes[fileid - 1] == NULL)
-        job->filetypes[fileid - 1] = mimeType("application", "vnd.cups-raw");
+        job->filetypes[fileid - 1] = mimeType(MimeDatabase, "application",
+	                                      "vnd.cups-raw");
     }
 
   closedir(dir);
@@ -2612,5 +2610,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.105 2001/01/11 21:58:51 mike Exp $".
+ * End of "$Id: job.c,v 1.106 2001/01/12 15:40:10 mike Exp $".
  */
