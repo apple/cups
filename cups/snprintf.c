@@ -1,5 +1,5 @@
 /*
- * "$Id: snprintf.c,v 1.11 2004/02/25 20:14:51 mike Exp $"
+ * "$Id: snprintf.c,v 1.12 2004/04/11 17:06:22 mike Exp $"
  *
  *   snprintf functions for the Common UNIX Printing System (CUPS).
  *
@@ -61,6 +61,7 @@ cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 		temp[1024];		/* Buffer for formatted numbers */
   char		*s;			/* Pointer to string */
   int		slen;			/* Length of string */
+  int		bytes;			/* Total number of bytes needed */
 
 
  /*
@@ -69,8 +70,9 @@ cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 
   bufptr = buffer;
   bufend = buffer + bufsize - 1;
+  bytes  = 0;
 
-  while (*format && bufptr < bufend)
+  while (*format)
   {
     if (*format == '%')
     {
@@ -88,7 +90,7 @@ cups_vsnprintf(char       *buffer,	/* O - Output buffer */
         sign = 0;
 
       width = 0;
-      while (isdigit(*format & 255))
+      while (isdigit(*format))
         width = width * 10 + *format++ - '0';
 
       if (*format == '.')
@@ -96,7 +98,7 @@ cups_vsnprintf(char       *buffer,	/* O - Output buffer */
         format ++;
 	prec = 0;
 
-	while (isdigit(*format & 255))
+	while (isdigit(*format))
           prec = prec * 10 + *format++ - '0';
       }
       else
@@ -131,16 +133,21 @@ cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 
 	    sprintf(temp, tformat, va_arg(ap, double));
 
-	    if ((bufptr + strlen(temp)) > bufend)
+            bytes += strlen(temp);
+
+            if (bufptr)
 	    {
-	      strncpy(bufptr, temp, bufend - bufptr);
-	      bufptr = bufend;
-	      break;
-	    }
-	    else
-	    {
-	      strcpy(bufptr, temp);
-	      bufptr += strlen(temp);
+	      if ((bufptr + strlen(temp)) > bufend)
+	      {
+		strncpy(bufptr, temp, bufend - bufptr);
+		bufptr = bufend;
+		break;
+	      }
+	      else
+	      {
+		strcpy(bufptr, temp);
+		bufptr += strlen(temp);
+	      }
 	    }
 	    break;
 
@@ -161,16 +168,21 @@ cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 
 	    sprintf(temp, tformat, va_arg(ap, int));
 
-	    if ((bufptr + strlen(temp)) > bufend)
+            bytes += strlen(temp);
+
+	    if (bufptr)
 	    {
-	      strncpy(bufptr, temp, bufend - bufptr);
-	      bufptr = bufend;
-	      break;
-	    }
-	    else
-	    {
-	      strcpy(bufptr, temp);
-	      bufptr += strlen(temp);
+	      if ((bufptr + strlen(temp)) > bufend)
+	      {
+		strncpy(bufptr, temp, bufend - bufptr);
+		bufptr = bufend;
+		break;
+	      }
+	      else
+	      {
+		strcpy(bufptr, temp);
+		bufptr += strlen(temp);
+	      }
 	    }
 	    break;
 	    
@@ -184,29 +196,39 @@ cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 
 	    sprintf(temp, tformat, va_arg(ap, void *));
 
-	    if ((bufptr + strlen(temp)) > bufend)
+            bytes += strlen(temp);
+
+	    if (bufptr)
 	    {
-	      strncpy(bufptr, temp, bufend - bufptr);
-	      bufptr = bufend;
-	      break;
-	    }
-	    else
-	    {
-	      strcpy(bufptr, temp);
-	      bufptr += strlen(temp);
+	      if ((bufptr + strlen(temp)) > bufend)
+	      {
+		strncpy(bufptr, temp, bufend - bufptr);
+		bufptr = bufend;
+		break;
+	      }
+	      else
+	      {
+		strcpy(bufptr, temp);
+		bufptr += strlen(temp);
+	      }
 	    }
 	    break;
 
         case 'c' : /* Character or character array */
-	    if (width <= 1)
-	      *bufptr++ = va_arg(ap, int);
-	    else
-	    {
-	      if ((bufptr + width) > bufend)
-	        width = bufend - bufptr;
+	    bytes += width;
 
-	      memcpy(bufptr, va_arg(ap, char *), width);
-	      bufptr += width;
+	    if (bufptr)
+	    {
+	      if (width <= 1)
+		*bufptr++ = va_arg(ap, int);
+	      else
+	      {
+		if ((bufptr + width) > bufend)
+	          width = bufend - bufptr;
+
+		memcpy(bufptr, va_arg(ap, char *), width);
+		bufptr += width;
+	      }
 	    }
 	    break;
 
@@ -218,24 +240,29 @@ cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 	    if (slen > width && prec != width)
 	      width = slen;
 
-	    if ((bufptr + width) > bufend)
-	      width = bufend - bufptr;
+            bytes += width;
 
-            if (slen > width)
-	      slen = width;
-
-	    if (sign == '-')
+	    if (bufptr)
 	    {
-	      strncpy(bufptr, s, slen);
-	      memset(bufptr + slen, ' ', width - slen);
-	    }
-	    else
-	    {
-	      memset(bufptr, ' ', width - slen);
-	      strncpy(bufptr + width - slen, s, slen);
-	    }
+	      if ((bufptr + width) > bufend)
+		width = bufend - bufptr;
 
-	    bufptr += width;
+              if (slen > width)
+		slen = width;
+
+	      if (sign == '-')
+	      {
+		strncpy(bufptr, s, slen);
+		memset(bufptr + slen, ' ', width - slen);
+	      }
+	      else
+	      {
+		memset(bufptr, ' ', width - slen);
+		strncpy(bufptr + width - slen, s, slen);
+	      }
+
+	      bufptr += width;
+	    }
 	    break;
 
 	case 'n' : /* Output number of chars so far */
@@ -248,30 +275,41 @@ cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 
 	    sprintf(temp, tformat, va_arg(ap, int));
 
-	    if ((bufptr + strlen(temp)) > bufend)
+            bytes += strlen(temp);
+
+	    if (bufptr)
 	    {
-	      strncpy(bufptr, temp, bufend - bufptr);
-	      bufptr = bufend;
-	      break;
-	    }
-	    else
-	    {
-	      strcpy(bufptr, temp);
-	      bufptr += strlen(temp);
+	      if ((bufptr + strlen(temp)) > bufend)
+	      {
+		strncpy(bufptr, temp, bufend - bufptr);
+		bufptr = bufend;
+		break;
+	      }
+	      else
+	      {
+		strcpy(bufptr, temp);
+		bufptr += strlen(temp);
+	      }
 	    }
 	    break;
       }
     }
     else
-      *bufptr++ = *format++;
+    {
+      bytes ++;
+
+      if (bufptr && bufptr < bufend)
+	*bufptr++ = *format++;
+    }
   }
 
  /*
-  * Nul-terminate the string and return the number of characters in it.
+  * Nul-terminate the string and return the number of characters needed.
   */
 
   *bufptr = '\0';
-  return (bufptr - buffer);
+
+  return (bytes);
 }
 #endif /* !HAVE_VSNPRINT */
 
@@ -301,6 +339,6 @@ cups_snprintf(char       *buffer,	/* O - Output buffer */
 
 
 /*
- * End of "$Id: snprintf.c,v 1.11 2004/02/25 20:14:51 mike Exp $".
+ * End of "$Id: snprintf.c,v 1.12 2004/04/11 17:06:22 mike Exp $".
  */
 
