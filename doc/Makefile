@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.51 2004/02/26 16:36:02 mike Exp $"
+# "$Id: Makefile,v 1.52 2004/06/29 03:14:19 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -97,6 +97,7 @@ WEBIMAGES	=	images/accept-jobs.gif \
 all:	$(DOCUMENTS:.shtml=.pdf) $(DOCUMENTS:.shtml=.html) overview.pdf
 	cd be; $(MAKE) $(MFLAGS) all
 	cd de; $(MAKE) $(MFLAGS) all
+	cd es; $(MAKE) $(MFLAGS) all
 	cd fr; $(MAKE) $(MFLAGS) all
 
 
@@ -141,7 +142,9 @@ install:
 	for file in $(WEBIMAGES) $(DOCIMAGES); do \
 		$(INSTALL_MAN) $$file $(DOCDIR)/images; \
 	done
+	cd be; $(MAKE) $(MFLAGS) install
 	cd de; $(MAKE) $(MFLAGS) install
+	cd es; $(MAKE) $(MFLAGS) install
 	cd fr; $(MAKE) $(MFLAGS) install
 
 

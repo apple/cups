@@ -3,6 +3,7 @@ CHANGES.txt - 06/28/2004
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- Added Spanish translation of web interface (STR #772)
 	- The LPD backend now uses geteuid() instead of getuid()
 	  when it is available (STR #752)
 	- The IPP backend did not report the printer state if
