@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.6 2002/01/02 18:04:24 mike Exp $"
+ * "$Id: http.c,v 1.82.2.7 2002/01/23 17:32:09 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -535,6 +535,16 @@ httpReconnect(http_t *http)	/* I - HTTP data */
   val = 1;
   setsockopt(http->fd, SOL_SOCKET, SO_REUSEPORT, &val, sizeof(val));
 #endif /* SO_REUSEPORT */
+
+ /*
+  * Using TCP_NODELAY improves responsiveness, especially on systems
+  * with a slow loopback interface...  Since we write large buffers
+  * when sending print files and requests, there shouldn't be any
+  * performance penalty for this...
+  */
+
+  val = 1;
+  setsockopt(http->fd, IPPROTO_TCP, TCP_NODELAY, &val, sizeof(val)); 
 
  /*
   * Connect to the server...
@@ -2194,5 +2204,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.6 2002/01/02 18:04:24 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.7 2002/01/23 17:32:09 mike Exp $".
  */

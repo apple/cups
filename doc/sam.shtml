@@ -930,6 +930,7 @@ determine how the server operates:
 	<LI><A HREF="#PreserveJobHistory"><CODE>PreserveJobHistory</CODE></A>
 	<LI><A HREF="#Printcap"><CODE>Printcap</CODE></A>
 	<LI><A HREF="#PrintcapFormat"><CODE>PrintcapFormat</CODE></A>
+	<LI><A HREF="#PrintcapGUI"><CODE>PrintcapGUI</CODE></A>
 	<LI><A HREF="#RemoteRoot"><CODE>RemoteRoot</CODE></A>
 	<LI><A HREF="#RequestRoot"><CODE>RequestRoot</CODE></A>
 	<LI><A HREF="#Require"><CODE>Require</CODE></A>
@@ -2379,7 +2380,7 @@ printcap file can then be used by applications that are hardcoded to
 look at the printcap file for the available printers.
 
 <!-- NEED 3in -->
-<H3><A NAME="Printcap">PrintcapFormat</A></H3>
+<H3><A NAME="PrintcapFormat">PrintcapFormat</A></H3>
 <HR>
 
 <H4>Examples</H4>
@@ -2394,6 +2395,29 @@ PrintcapFormat Solaris
 <P>The <CODE>PrintcapFormat</CODE> directive controls the output
 format of the printcap file. The default is to generate a BSD
 printcap file.
+
+<!-- NEED 3in -->
+<H3><A NAME="PrintcapGUI">PrintcapGUI</A></H3>
+<HR>
+
+<H4>Example</H4>
+
+<UL><PRE>
+PrintcapGUI /usr/bin/glpoptions
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>PrintcapGUI</CODE> directive sets the program to
+use when displaying an option panel from an IRIX application
+that uses the Impressario print API. The default program is the
+ESP Print Pro "glpoptions" GUI.
+
+<P>The program must accept the <CODE>-d</CODE> option to specify
+a printer and the <CODE>-o</CODE> option to specify one or more
+options. After allowing the user to select/change options, the
+program must then write the list of printing options without the
+<CODE>-o</CODE> to the standard output.
 
 <!-- NEED 3in -->
 <H3><A NAME="RemoteRoot">RemoteRoot</A></H3>
@@ -3515,10 +3539,74 @@ replace the existing printing commands and options with the line:
 
 <UL><PRE>
 printing = cups
+printcap name = cups
 </PRE></UL>
 
 <P>That's all there is to it!  Remote users will now be able to browse and
 print to printers on your system.
+
+<H3>Exporting Printer Drivers</H3>
+
+<P>You can optionally export printer drivers from your CUPS
+server using the <CODE>cupsaddsmb</CODE> command and the SAMBA
+2.2.0 or higher software.
+
+<P>Before you can export the printers you must download the
+current Adobe PostScript printer drivers from the Adobe web
+site (<A HREF="http://www.adobe.com/">http://www.adobe.com/</A>).
+Use the free <CODE>unzip</CODE> software to extract the files
+from the self-extracting ZIP file containing the drivers; you
+will need the following files:
+
+<UL><PRE>
+ADFONTS.MFM
+ADOBEPS4.DRV
+ADOBEPS4.HLP
+ADOBEPS5.DLL
+ADOBEPSU.DLL
+ADOBEPSU.HLP
+DEFPRTR2.PPD
+ICONLIB.DLL
+PSMON.DLL
+</PRE></UL>
+
+<P>Copy these files to the <VAR>/usr/share/cups/drivers</VAR>
+directory - you may need to rename some of the files so the
+filenames are all UPPERCASE.
+
+<P>Next, add a <CODE>print$</CODE> share for the printer
+drivers to your <VAR>smb.conf</VAR> file:
+
+<UL><PRE>
+[print$]
+    comment = Printer Drivers
+    path = /etc/samba/drivers
+    browseable = yes
+    guest ok = no
+    read only = yes
+    write list = root
+</PRE></UL>
+
+<P>The directory for your printer drivers can be anywhere on the
+system; just make sure it is writable by the users specified by
+the <CODE>write list</CODE> directive. Also, make sure that you
+have SAMBA passwords defined for each user in the <CODE>write
+list</CODE> using the <CODE>smbpasswd(1)</CODE> command.
+Otherwise you will not be able to authenticate 
+
+<P>Finally, run the <CODE>cupsaddsmb</CODE> command to export
+the printer drivers for one or more queues:
+
+<UL><PRE>
+<KBD>cupsaddsmb -U root printer1 ... printerN <I>ENTER</I></KBD>
+</PRE></UL>
+
+<P>Running <CODE>cupsaddsmb</CODE> with the <CODE>-a</CODE> option
+will export all printers:
+
+<UL><PRE>
+<KBD>cupsaddsmb -U root -a <I>ENTER</I></KBD>
+</PRE></UL>
 
 <H2>Printing to Windows Servers</H2>
 

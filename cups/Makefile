@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.53.2.3 2002/01/02 18:04:23 mike Exp $"
+# "$Id: Makefile,v 1.53.2.4 2002/01/23 17:32:08 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -106,7 +106,11 @@ libcups.so.3 libcups.sl.3:	$(LIBOBJS) ../Makedefs
 
 libcups.3.dylib:	$(LIBOBJS) ../Makedefs
 	echo Linking $@...
-	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS) $(SSLLIBS)
+	$(DSO) $(DSOFLAGS) -o $@ \
+		-dylib_install_name $(LIBDIR)/libcups.dylib \
+		-dylib_current_version 3.0.0 \
+		-dylib_compatibility_version 3.0.0 \
+		$(LIBOBJS) $(SSLLIBS)
 	$(RM) libcups.dylib
 	$(LN) $@ libcups.dylib
 
@@ -198,5 +202,5 @@ $(OBJS):	../Makedefs ../config.h
 
 
 #
-# End of "$Id: Makefile,v 1.53.2.3 2002/01/02 18:04:23 mike Exp $".
+# End of "$Id: Makefile,v 1.53.2.4 2002/01/23 17:32:08 mike Exp $".
 #

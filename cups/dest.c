@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.18.2.3 2002/01/02 18:04:23 mike Exp $"
+ * "$Id: dest.c,v 1.18.2.4 2002/01/23 17:32:09 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -207,6 +207,7 @@ cupsGetDest(const char  *name,		/* I - Name of destination */
 int					/* O - Number of destinations */
 cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
 {
+  int		i;			/* Looping var */
   int		num_dests;		/* Number of destinations */
   cups_dest_t	*dest;			/* Destination pointer */
   const char	*home;			/* HOME environment variable */
@@ -214,6 +215,8 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
   const char	*defprinter;		/* Default printer */
   char		name[1024],		/* Copy of printer name */
 		*instance;		/* Pointer to instance name */
+  int		num_reals;		/* Number of real queues */
+  cups_dest_t	*reals;			/* Real queues */
 
 
  /*
@@ -229,6 +232,26 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
 
   num_dests = cups_get_sdests(CUPS_GET_PRINTERS, num_dests, dests);
   num_dests = cups_get_sdests(CUPS_GET_CLASSES, num_dests, dests);
+
+ /*
+  * Make a copy of the "real" queues for a later sanity check...
+  */
+
+  if (num_dests > 0)
+  {
+    num_reals = num_dests;
+    reals     = calloc(num_reals, sizeof(cups_dest_t));
+
+    if (reals)
+      memcpy(reals, *dests, num_reals * sizeof(cups_dest_t));
+    else
+      num_reals = 0;
+  }
+  else
+  {
+    num_reals = 0;
+    reals     = NULL;
+  }
 
  /*
   * Grab the default destination...
@@ -282,18 +305,45 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
   }
 
  /*
-  * Reset the default destination if the LPDEST or PRINTER environment
-  * variables are set...
+  * Validate the current default destination - this prevents old
+  * Default lines in /etc/cups/lpoptions and ~/.lpoptions from
+  * pointing to a non-existent printer or class...
   */
 
-  if (getenv("LPDEST") != NULL || getenv("PRINTER") != NULL)
+  if (num_reals)
   {
    /*
-    * Lookup the printer and instance and make it the default...
+    * See if we have a default printer...
     */
 
-    if ((dest = cupsGetDest(name, instance, num_dests, *dests)) != NULL)
-      dest->is_default = 1;
+    if ((dest = cupsGetDest(NULL, NULL, num_dests, *dests)) != NULL)
+    {
+     /*
+      * Have a default; see if it is real...
+      */
+
+      dest = cupsGetDest(dest->name, NULL, num_reals, reals);
+    }
+
+   /*
+    * If dest is NULL, then no default (that exists) is set, so we
+    * need to set a default if one exists...
+    */
+
+    if (dest == NULL && defprinter != NULL)
+    {
+      for (i = 0; i < num_dests; i ++)
+        (*dests)[i].is_default = 0;
+
+      if ((dest = cupsGetDest(name, instance, num_dests, *dests)) != NULL)
+	dest->is_default = 1;
+    }
+
+   /*
+    * Free memory...
+    */
+
+    free(reals);
   }
 
  /*
@@ -747,5 +797,5 @@ cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
 
 
 /*
- * End of "$Id: dest.c,v 1.18.2.3 2002/01/02 18:04:23 mike Exp $".
+ * End of "$Id: dest.c,v 1.18.2.4 2002/01/23 17:32:09 mike Exp $".
  */

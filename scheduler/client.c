@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.5 2002/01/02 18:04:59 mike Exp $"
+ * "$Id: client.c,v 1.91.2.6 2002/01/23 17:32:12 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -224,6 +224,16 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 #endif /* AF_INET6 */
   LogMessage(L_DEBUG, "AcceptClient() %d from %s:%d.", con->http.fd,
              con->http.hostname, ntohs(con->http.hostaddr.ipv4.sin_port));
+
+ /*
+  * Using TCP_NODELAY improves responsiveness, especially on systems
+  * with a slow loopback interface...  Since we write large buffers
+  * when sending print files and requests, there shouldn't be any
+  * performance penalty for this...
+  */
+
+  val = 1;
+  setsockopt(con->http.fd, IPPROTO_TCP, TCP_NODELAY, &val, sizeof(val)); 
 
  /*
   * Add the socket to the select() input mask.
@@ -2496,5 +2506,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.5 2002/01/02 18:04:59 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.6 2002/01/23 17:32:12 mike Exp $".
  */

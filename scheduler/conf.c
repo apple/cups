@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.6 2002/01/02 18:04:59 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.7 2002/01/23 17:32:13 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -111,6 +111,7 @@ static var_t	variables[] =
   { "PreserveJobFiles",	&JobFiles,		VAR_BOOLEAN,	0 },
   { "PreserveJobHistory", &JobHistory,		VAR_BOOLEAN,	0 },
   { "Printcap",		Printcap,		VAR_STRING,	sizeof(Printcap) },
+  { "PrintcapGUI",	PrintcapGUI,		VAR_STRING,	sizeof(PrintcapGUI) },
   { "RemoteRoot",	RemoteRoot,		VAR_STRING,	sizeof(RemoteRoot) },
   { "RequestRoot",	RequestRoot,		VAR_STRING,	sizeof(RequestRoot) },
   { "RIPCache",		RIPCache,		VAR_STRING,	sizeof(RIPCache) },
@@ -235,6 +236,7 @@ ReadConfiguration(void)
   strcpy(ErrorLog, CUPS_LOGDIR "/error_log");
   strcpy(PageLog, CUPS_LOGDIR "/page_log");
   strcpy(Printcap, "/etc/printcap");
+  strcpy(PrintcapGUI, "/usr/bin/glpoptions");
   strcpy(FontPath, CUPS_FONTPATH);
   strcpy(RemoteRoot, "remroot");
 
@@ -2002,5 +2004,5 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.6 2002/01/02 18:04:59 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.7 2002/01/23 17:32:13 mike Exp $".
  */

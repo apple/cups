@@ -3,6 +3,18 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.13
 
+	- Now set the TCP "no delay" option on network
+	  connections to improve performance/response time.
+	- Improved the IRIX printing tools support with patches
+	  from Andrea Suatoni.
+	- Added a new PrintcapGUI directive to specify the GUI
+	  option panel program to use for the IRIX printing
+	  tools support.
+	- The cupsGetDests() function did not check to see if a
+	  user-defined default printer (set via lpoptions) still
+	  existed.
+	- The pstops filter no longer assumes that the default
+	  dictionary is writable when doing N-up processing.
 	- The pstops filter now supports printing N-up with the
 	  page-set option.
 	- The imagetoraster filter now supports direct printing

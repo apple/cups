@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.7 2002/01/22 00:30:49 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.8 2002/01/23 17:32:11 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -880,7 +880,7 @@ static void
 end_nup(int number)	/* I - Page number */
 {
   if (Flip || Orientation || NUp > 1)
-    puts("ESPsave restore");
+    puts("userdict /ESPsave get restore");
 
   switch (NUp)
   {
@@ -992,7 +992,7 @@ start_nup(int number)	/* I - Page number */
 
 
   if (Flip || Orientation || NUp > 1)
-    puts("/ESPsave save def");
+    puts("userdict /ESPsave save put");
 
   if (Flip)
     printf("%.1f 0.0 translate -1 1 scale\n", PageWidth);
@@ -1113,5 +1113,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.7 2002/01/22 00:30:49 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.8 2002/01/23 17:32:11 mike Exp $".
  */
