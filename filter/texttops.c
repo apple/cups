@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.29 2000/06/28 18:35:24 mike Exp $"
+ * "$Id: texttops.c,v 1.30 2000/09/06 14:20:58 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -637,7 +637,7 @@ WriteProlog(char       *title,	/* I - Title of job */
   */
 
   for (i = 0, num_fonts = 0; i < NumFonts; i ++)
-    for (j = 1 + PrettyPrint; j >= 0; j --)
+    for (j = PrettyPrint ? 2 : 1; j >= 0; j --)
     {
       for (k = 0; k < num_fonts; k ++)
         if (strcmp(Fonts[i][j], fonts[k]) == 0)
@@ -717,13 +717,13 @@ WriteProlog(char       *title,	/* I - Title of job */
       snprintf(filename, sizeof(filename), "%s/fonts/%s", datadir, fonts[i]);
       if ((fp = fopen(filename, "rb")) != NULL)
       {
-        while (fgets(line, sizeof(line), fp) != NULL)
-	  fputs(line, stdout);
+        while ((j = fread(line, 1, sizeof(line), fp)) > 0)
+	  fwrite(line, 1, j, stdout);
 
 	fclose(fp);
       }
 
-      puts("%%EndResource");
+      puts("\n%%EndResource");
     }
   }
 
@@ -763,7 +763,7 @@ WriteProlog(char       *title,	/* I - Title of job */
 
     puts("% Reencode fonts");
 
-    for (i = 1 + PrettyPrint; i >= 0; i --)
+    for (i = PrettyPrint ? 2 : 1; i >= 0; i --)
     {
       printf("/%s findfont\n", Fonts[0][i]);
       puts("dup length 1 add dict begin\n"
@@ -1270,5 +1270,5 @@ write_text(char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c,v 1.29 2000/06/28 18:35:24 mike Exp $".
+ * End of "$Id: texttops.c,v 1.30 2000/09/06 14:20:58 mike Exp $".
  */

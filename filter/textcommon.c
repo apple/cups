@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.c,v 1.13 2000/06/12 15:51:48 mike Exp $"
+ * "$Id: textcommon.c,v 1.14 2000/09/06 14:20:58 mike Exp $"
  *
  *   Common text filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -52,7 +52,15 @@ int	NumPages = 0;		/* Number of pages in document */
 int	CharsPerInch = 10;	/* Number of character columns per inch */
 int	LinesPerInch = 6;	/* Number of lines per inch */
 int	UTF8 = 0;		/* Use UTF-8 encoding? */
-char	*Keywords[] =		/* List of known keywords... */
+int	NumKeywords = 0;	/* Number of known keywords */
+char	**Keywords = NULL;	/* List of known keywords */
+
+
+/*
+ * Local globals...
+ */
+
+static char *code_keywords[] =	/* List of known C/C++ keywords... */
 	{
 	  "and",
 	  "and_eq",
@@ -120,6 +128,344 @@ char	*Keywords[] =		/* List of known keywords... */
 	  "while",
 	  "xor",
 	  "xor_eq"
+	},
+	*sh_keywords[] =	/* List of known Boure/Korn/zsh/bash keywords... */
+	{
+	  "alias",
+	  "bg",
+	  "break",
+	  "case",
+	  "cd",
+	  "command",
+	  "continue",
+	  "do",
+	  "done",
+	  "echo",
+	  "elif",
+	  "else",
+	  "esac",
+	  "eval",
+	  "exec",
+	  "exit",
+	  "export",
+	  "fc",
+	  "fg",
+	  "fi",
+	  "for",
+	  "function",
+	  "getopts",
+	  "if",
+	  "in",
+	  "jobs",
+	  "kill",
+	  "let",
+	  "limit",
+	  "newgrp",
+	  "print",
+	  "pwd",
+	  "read",
+	  "readonly",
+	  "return",
+	  "select",
+	  "set",
+	  "shift",
+	  "test",
+	  "then",
+	  "time",
+	  "times",
+	  "trap",
+	  "typeset",
+	  "ulimit",
+	  "umask",
+	  "unalias",
+	  "unlimit",
+	  "unset",
+	  "until",
+	  "wait",
+	  "whence"
+	  "while",
+	},
+	*csh_keywords[] =	/* List of known csh/tcsh keywords... */
+	{
+	  "alias",
+	  "aliases",
+	  "bg",
+	  "bindkey",
+	  "break",
+	  "breaksw",
+	  "builtins",
+	  "case",
+	  "cd",
+	  "chdir",
+	  "complete",
+	  "continue",
+	  "default",
+	  "dirs",
+	  "echo",
+	  "echotc",
+	  "else",
+	  "end",
+	  "endif",
+	  "eval",
+	  "exec",
+	  "exit",
+	  "fg",
+	  "foreach",
+	  "glob",
+	  "goto",
+	  "history",
+	  "if",
+	  "jobs",
+	  "kill",
+	  "limit",
+	  "login",
+	  "logout",
+	  "ls",
+	  "nice",
+	  "nohup",
+	  "notify",
+	  "onintr",
+	  "popd",
+	  "pushd",
+	  "pwd",
+	  "rehash",
+	  "repeat",
+	  "set",
+	  "setenv",
+	  "settc",
+	  "shift",
+	  "source",
+	  "stop",
+	  "suspend",
+	  "switch",
+	  "telltc",
+	  "then",
+	  "time",
+	  "umask",
+	  "unalias",
+	  "unbindkey",
+	  "unhash",
+	  "unlimit",
+	  "unset",
+	  "unsetenv",
+	  "wait",
+	  "where",
+	  "which",
+	  "while"
+	},
+	*perl_keywords[] =	/* List of known perl keywords... */
+	{
+	  "abs",
+	  "accept",
+	  "alarm",
+	  "and",
+	  "atan2",
+	  "bind",
+	  "binmode",
+	  "bless",
+	  "caller",
+	  "chdir",
+	  "chmod",
+	  "chomp",
+	  "chop",
+	  "chown",
+	  "chr",
+	  "chroot",
+	  "closdir",
+	  "close",
+	  "connect",
+	  "continue",
+	  "cos",
+	  "crypt",
+	  "dbmclose",
+	  "dbmopen",
+	  "defined",
+	  "delete",
+	  "die",
+	  "do",
+	  "dump",
+	  "each",
+	  "else",
+	  "elsif",
+	  "endgrent",
+	  "endhostent",
+	  "endnetent",
+	  "endprotoent",
+	  "endpwent",
+	  "endservent",
+	  "eof",
+	  "eval",
+	  "exec",
+	  "exists",
+	  "exit",
+	  "exp",
+	  "fcntl",
+	  "fileno",
+	  "flock",
+	  "for",
+	  "foreach",
+	  "fork",
+	  "format",
+	  "formline",
+	  "getc",
+	  "getgrent",
+	  "getgrgid",
+	  "getgrnam",
+	  "gethostbyaddr",
+	  "gethostbyname",
+	  "gethostent",
+	  "getlogin",
+	  "getnetbyaddr",
+	  "getnetbyname",
+	  "getnetent",
+	  "getpeername",
+	  "getpgrp",
+	  "getppid",
+	  "getpriority",
+	  "getprotobyname",
+	  "getprotobynumber",
+	  "getprotoent",
+	  "getpwent",
+	  "getpwnam",
+	  "getpwuid",
+	  "getservbyname",
+	  "getservbyport",
+	  "getservent",
+	  "getsockname",
+	  "getsockopt",
+	  "glob",
+	  "gmtime",
+	  "goto",
+	  "grep",
+	  "hex",
+	  "if",
+	  "import",
+	  "index",
+	  "int",
+	  "ioctl",
+	  "join",
+	  "keys",
+	  "kill",
+	  "last",
+	  "lc",
+	  "lcfirst",
+	  "length",
+	  "link",
+	  "listen",
+	  "local",
+	  "localtime",
+	  "log",
+	  "lstat",
+	  "map",
+	  "mkdir",
+	  "msgctl",
+	  "msgget",
+	  "msgrcv",
+	  "msgsend",
+	  "my",
+	  "next",
+	  "no",
+	  "not",
+	  "oct",
+	  "open",
+	  "opendir",
+	  "or",
+	  "ord",
+	  "pack",
+	  "package",
+	  "pipe",
+	  "pop",
+	  "pos",
+	  "print",
+	  "printf",
+	  "push",
+	  "quotemeta",
+	  "rand",
+	  "read",
+	  "readdir",
+	  "readlink",
+	  "recv",
+	  "redo",
+	  "ref",
+	  "rename",
+	  "require",
+	  "reset",
+	  "return",
+	  "reverse",
+	  "rewinddir",
+	  "rindex",
+	  "rmdir",
+	  "scalar",
+	  "seek",
+	  "seekdir",
+	  "select",
+	  "semctl",
+	  "semget",
+	  "semop",
+	  "send",
+	  "setgrent",
+	  "sethostent",
+	  "setnetent",
+	  "setpgrp",
+	  "setpriority",
+	  "setprotoent",
+	  "setpwent",
+	  "setservent",
+	  "setsockopt",
+	  "shift",
+	  "shmctl",
+	  "shmget",
+	  "shmread",
+	  "shmwrite",
+	  "shutdown",
+	  "sin",
+	  "sleep",
+	  "socket",
+	  "socketpair",
+	  "sort",
+	  "splice",
+	  "split",
+	  "sprintf",
+	  "sqrt",
+	  "srand",
+	  "stat",
+	  "study",
+	  "sub",
+	  "substr",
+	  "symlink",
+	  "syscall",
+	  "sysread",
+	  "sysseek",
+	  "system",
+	  "syswrite",
+	  "tell",
+	  "telldir",
+	  "tie",
+	  "tied",
+	  "time",
+	  "times"
+	  "times",
+	  "truncate",
+	  "uc",
+	  "ucfirst",
+	  "umask",
+	  "undef",
+	  "unless",
+	  "unlink",
+	  "unpack",
+	  "unshift",
+	  "untie",
+	  "until",
+	  "use",
+	  "utime",
+	  "values",
+	  "vec",
+	  "wait",
+	  "waitpid",
+	  "wantarray",
+	  "warn",
+	  "while",
+	  "write"
 	};
 
 
@@ -195,13 +541,43 @@ TextMain(char *name,		/* I - Name of filter */
 
   if ((val = cupsGetOption("prettyprint", num_options, options)) != NULL)
   {
-    PrettyPrint  = 1;
     PageLeft     = 72.0f;
     PageRight    = PageWidth - 36.0f;
     PageBottom   = PageBottom > 36.0f ? PageBottom : 36.0f;
     PageTop      = PageLength - 36.0f;
     CharsPerInch = 12;
     LinesPerInch = 8;
+
+    if ((val = getenv("CONTENT_TYPE")) == NULL)
+    {
+      PrettyPrint = PRETTY_CODE;
+      NumKeywords = sizeof(code_keywords) / sizeof(code_keywords[0]);
+      Keywords    = code_keywords;
+    }
+    else if (strcasecmp(val, "application/x-cshell") == 0)
+    {
+      PrettyPrint = PRETTY_SHELL;
+      NumKeywords = sizeof(csh_keywords) / sizeof(csh_keywords[0]);
+      Keywords    = csh_keywords;
+    }
+    else if (strcasecmp(val, "application/x-perl") == 0)
+    {
+      PrettyPrint = PRETTY_PERL;
+      NumKeywords = sizeof(perl_keywords) / sizeof(perl_keywords[0]);
+      Keywords    = perl_keywords;
+    }
+    else if (strcasecmp(val, "application/x-shell") == 0)
+    {
+      PrettyPrint = PRETTY_SHELL;
+      NumKeywords = sizeof(sh_keywords) / sizeof(sh_keywords[0]);
+      Keywords    = sh_keywords;
+    }
+    else
+    {
+      PrettyPrint = PRETTY_CODE;
+      NumKeywords = sizeof(code_keywords) / sizeof(code_keywords[0]);
+      Keywords    = code_keywords;
+    }
   }
 
   ppd = SetCommonOptions(num_options, options, 1);
@@ -270,8 +646,8 @@ TextMain(char *name,		/* I - Name of filter */
 	    *keyptr = '\0';
 	    keyptr  = keyword;
 
-	    if (bsearch(&keyptr, Keywords, sizeof(Keywords) / sizeof(Keywords[0]),
-	                sizeof(Keywords[0]), compare_keywords))
+	    if (bsearch(&keyptr, Keywords, NumKeywords, sizeof(char *),
+	                compare_keywords))
             {
 	     /*
 	      * Put keywords in boldface...
@@ -316,8 +692,8 @@ TextMain(char *name,		/* I - Name of filter */
 	    *keyptr = '\0';
 	    keyptr  = keyword;
 
-	    if (bsearch(&keyptr, Keywords, sizeof(Keywords) / sizeof(Keywords[0]),
-	                sizeof(Keywords[0]), compare_keywords))
+	    if (bsearch(&keyptr, Keywords, NumKeywords, sizeof(char *),
+	                compare_keywords))
             {
 	     /*
 	      * Put keywords in boldface...
@@ -370,8 +746,8 @@ TextMain(char *name,		/* I - Name of filter */
 	    *keyptr = '\0';
 	    keyptr  = keyword;
 
-	    if (bsearch(&keyptr, Keywords, sizeof(Keywords) / sizeof(Keywords[0]),
-	                sizeof(Keywords[0]), compare_keywords))
+	    if (bsearch(&keyptr, Keywords, NumKeywords, sizeof(char *),
+	                compare_keywords))
             {
 	     /*
 	      * Put keywords in boldface...
@@ -480,8 +856,8 @@ TextMain(char *name,		/* I - Name of filter */
 	      keyptr  = keyword;
 
 	      if (!(attr & ATTR_ITALIC) &&
-	          bsearch(&keyptr, Keywords, sizeof(Keywords) / sizeof(Keywords[0]),
-	                  sizeof(Keywords[0]), compare_keywords))
+	          bsearch(&keyptr, Keywords, NumKeywords, sizeof(char *),
+	                  compare_keywords))
               {
 	       /*
 	        * Put keywords in boldface...
@@ -517,7 +893,8 @@ TextMain(char *name,		/* I - Name of filter */
 	      cstring = -1;
               attr    |= ATTR_BLUE;
 	    }
-            else if (ch == '*' && lastch == '/' && !cstring)
+            else if (ch == '*' && lastch == '/' && !cstring &&
+	             PrettyPrint != PRETTY_SHELL)
 	    {
 	     /*
 	      * Start a C-style comment...
@@ -526,7 +903,8 @@ TextMain(char *name,		/* I - Name of filter */
 	      ccomment = 1;
 	      attr     |= ATTR_ITALIC | ATTR_GREEN;
 	    }
-	    else if (ch == '/' && lastch == '/' && !cstring)
+	    else if (ch == '/' && lastch == '/' && !cstring &&
+	             PrettyPrint == PRETTY_CODE)
 	    {
 	     /*
 	      * Start a C++-style comment...
@@ -534,7 +912,16 @@ TextMain(char *name,		/* I - Name of filter */
 
 	      attr |= ATTR_ITALIC | ATTR_GREEN;
 	    }
-	    else if (ch == '#' && column == 0 && !ccomment && !cstring)
+	    else if (ch == '#' && !cstring && PrettyPrint != PRETTY_CODE)
+	    {
+	     /*
+	      * Start a shell-style comment...
+	      */
+
+	      attr |= ATTR_ITALIC | ATTR_GREEN;
+	    }
+	    else if (ch == '#' && column == 0 && !ccomment && !cstring &&
+	             PrettyPrint == PRETTY_CODE)
 	    {
 	     /*
 	      * Start a preprocessor command...
@@ -594,7 +981,7 @@ TextMain(char *name,		/* I - Name of filter */
 	      Page[line][column].attr |= ATTR_BOLD;
 	    }
 	    else if ((ch == '/' || ch == '*') && lastch == '/' &&
-	             column < ColumnWidth)
+	             column < ColumnWidth && PrettyPrint != PRETTY_SHELL)
 	    {
 	     /*
 	      * Highlight first comment character...
@@ -744,5 +1131,5 @@ getutf8(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: textcommon.c,v 1.13 2000/06/12 15:51:48 mike Exp $".
+ * End of "$Id: textcommon.c,v 1.14 2000/09/06 14:20:58 mike Exp $".
  */

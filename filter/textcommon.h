@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.h,v 1.4 2000/02/26 22:56:50 mike Exp $"
+ * "$Id: textcommon.h,v 1.5 2000/09/06 14:20:58 mike Exp $"
  *
  *   Common text filter definitions for the Common UNIX Printing System (CUPS).
  *
@@ -46,6 +46,12 @@
 #define ATTR_GREEN	0x40
 #define ATTR_BLUE	0x80
 
+#define PRETTY_OFF	0
+#define PRETTY_CODE	1
+#define PRETTY_SHELL	2
+#define PRETTY_PERL	3
+#define PRETTY_HTML	4
+
 
 /*
  * Structures...
@@ -68,14 +74,15 @@ extern int	WrapLines,	/* Wrap text in lines */
 		PageColumns,	/* Number of columns on a page */
 		ColumnGutter,	/* Number of characters between text columns */
 		ColumnWidth,	/* Width of each column */
-		PrettyPrint,	/* Do pretty code formatting */
+		PrettyPrint,	/* Do pretty code formatting? */
 		Copies;		/* Number of copies to produce */
 extern lchar_t	**Page;		/* Page characters */
 extern int	NumPages;	/* Number of pages in document */
 extern int	CharsPerInch,	/* Number of character columns per inch */
 		LinesPerInch,	/* Number of lines per inch */
 		UTF8;		/* Use UTF-8 encoding? */
-extern char	*Keywords[];	/* List of known keywords... */
+extern int	NumKeywords;	/* Number of known keywords */
+extern char	**Keywords;	/* List of known keywords... */
 
 
 /*
@@ -89,5 +96,5 @@ extern void	WriteProlog(char *title, char *user, ppd_file_t *ppd);
 
 
 /*
- * End of "$Id: textcommon.h,v 1.4 2000/02/26 22:56:50 mike Exp $".
+ * End of "$Id: textcommon.h,v 1.5 2000/09/06 14:20:58 mike Exp $".
  */
