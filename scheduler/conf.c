@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.111 2002/12/17 22:08:26 mike Exp $"
+ * "$Id: conf.c,v 1.112 2003/01/09 12:17:36 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -747,7 +747,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
 	                &(Listeners[NumListeners].address)))
         {
           LogMessage(L_INFO, "Listening to %x:%d",
-                     ntohl(Listeners[NumListeners].address.sin_addr.s_addr),
+                     (unsigned)ntohl(Listeners[NumListeners].address.sin_addr.s_addr),
                      ntohs(Listeners[NumListeners].address.sin_port));
 	  NumListeners ++;
         }
@@ -773,7 +773,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
 	                &(Listeners[NumListeners].address)))
         {
           LogMessage(L_INFO, "Listening to %x:%d (SSL)",
-                     ntohl(Listeners[NumListeners].address.sin_addr.s_addr),
+                     (unsigned)ntohl(Listeners[NumListeners].address.sin_addr.s_addr),
                      ntohs(Listeners[NumListeners].address.sin_port));
           Listeners[NumListeners].encryption = HTTP_ENCRYPT_ALWAYS;
 	  NumListeners ++;
@@ -826,7 +826,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
 	                     &(Browsers[NumBrowsers].to)))
         {
           LogMessage(L_INFO, "Sending browsing info to %x:%d",
-                     ntohl(Browsers[NumBrowsers].to.sin_addr.s_addr),
+                     (unsigned)ntohl(Browsers[NumBrowsers].to.sin_addr.s_addr),
                      ntohs(Browsers[NumBrowsers].to.sin_port));
 
 	  NumBrowsers ++;
@@ -1149,12 +1149,12 @@ read_configuration(FILE *fp)		/* I - File to read from */
         if (relay->from.type == AUTH_NAME)
           LogMessage(L_INFO, "Relaying from %s to %x:%d",
 	             relay->from.mask.name.name,
-                     ntohl(relay->to.sin_addr.s_addr),
+                     (unsigned)ntohl(relay->to.sin_addr.s_addr),
                      ntohs(relay->to.sin_port));
         else
           LogMessage(L_INFO, "Relaying from %x/%x to %x:%d",
                      relay->from.mask.ip.address, relay->from.mask.ip.netmask,
-                     ntohl(relay->to.sin_addr.s_addr),
+                     (unsigned)ntohl(relay->to.sin_addr.s_addr),
                      ntohs(relay->to.sin_port));
 
 	NumRelays ++;
@@ -1186,7 +1186,8 @@ read_configuration(FILE *fp)		/* I - File to read from */
 
       if (get_address(value, INADDR_NONE, ippPort(), &polladdr))
       {
-        LogMessage(L_INFO, "Polling %x:%d", ntohl(polladdr.sin_addr.s_addr),
+        LogMessage(L_INFO, "Polling %x:%d",
+	           (unsigned)ntohl(polladdr.sin_addr.s_addr),
                    ntohs(polladdr.sin_port));
 
         poll = Polled + NumPolled;
@@ -1912,5 +1913,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.111 2002/12/17 22:08:26 mike Exp $".
+ * End of "$Id: conf.c,v 1.112 2003/01/09 12:17:36 mike Exp $".
  */
