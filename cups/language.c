@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.43 2003/07/20 12:42:32 mike Exp $"
+ * "$Id: language.c,v 1.44 2003/08/25 16:08:20 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -607,10 +607,26 @@ _cupsSaveLocale(int        category,	/* I - Category */
   DEBUG_printf(("_cupsSaveLocale(category=%d, locale=\"%s\")\n",
                 category, locale));
 
-  if ((oldlocale = setlocale(category, locale)) != NULL)
-    return (strdup(oldlocale));
-  else
-    return (NULL);
+ /*
+  * Get the old locale and copy it...
+  */
+
+  if ((oldlocale = setlocale(category, NULL)) != NULL)
+    oldlocale = strdup(oldlocale);
+
+  DEBUG_printf(("    oldlocale=\"%s\"\n", oldlocale ? oldlocale : "(null)"));
+
+ /*
+  * Set the new locale...
+  */
+
+  setlocale(category, locale);
+
+ /*
+  * Return a copy of the old locale...
+  */
+
+  return (oldlocale);
 }
 
 
@@ -798,5 +814,5 @@ cups_cache_lookup(const char      *name,/* I - Name of locale */
 
 
 /*
- * End of "$Id: language.c,v 1.43 2003/07/20 12:42:32 mike Exp $".
+ * End of "$Id: language.c,v 1.44 2003/08/25 16:08:20 mike Exp $".
  */
