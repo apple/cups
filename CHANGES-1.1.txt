@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20
 
+	- The HP-GL/2 filter did not support the SI command,
+	  some values for the AD and SD commands, and did not
+	  rotate labels properly via the DI command (STR #282)
 	- The fax support did not update/set the job-hold-until
 	  attribute when a fax job fails (STR #269)
 	- The cupsLangGet() function didn't support locales of

@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.31.2.5 2003/01/07 18:26:52 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.31.2.6 2003/09/12 20:20:06 mike Exp $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
@@ -76,7 +76,6 @@ OutputProlog(char  *title,	/* I - Job title */
   puts("%%EndComments");
   puts("%%BeginProlog");
   printf("/DefaultPenWidth %.2f def\n", PenWidth * 72.0 / 25.4);
-  puts("3.0 setmiterlimit");
   if (!shading)			/* Black only */
     puts("/setrgbcolor { pop pop pop } bind def");
   else if (!ColorDevice)	/* Greyscale */
@@ -296,38 +295,8 @@ Outputf(const char *format,	/* I - Printf-style string */
       }
     }
 
-    printf("/SA {\n"
-           "	/%s%s%s%s findfont\n"
-	   "	[ %f %f %f %f 0.0 0.0 ] makefont\n"
-	   "	setfont\n"
-	   "} bind def\n",
-           AlternateFont.typeface == 48 ? "Courier" : "Helvetica",
-           (AlternateFont.weight != 0 || AlternateFont.posture != 0) ? "-" : "",
-           AlternateFont.weight != 0 ? "Bold" : "",
-           AlternateFont.posture != 0 ? "Oblique" : "",
-           AlternateFont.x * AlternateFont.height,
-	   -AlternateFont.y * AlternateFont.height,
-	   AlternateFont.y * AlternateFont.height,
-	   AlternateFont.x * AlternateFont.height);
-
-    printf("/SS {\n"
-           "	/%s%s%s%s findfont\n"
-	   "	[ %f %f %f %f 0.0 0.0 ] makefont\n"
-	   "	setfont\n"
-	   "} bind def\n",
-           StandardFont.typeface == 48 ? "Courier" : "Helvetica",
-           (StandardFont.weight != 0 || StandardFont.posture != 0) ? "-" : "",
-           StandardFont.weight != 0 ? "Bold" : "",
-           StandardFont.posture != 0 ? "Oblique" : "",
-           StandardFont.x * StandardFont.height,
-	   -StandardFont.y * StandardFont.height,
-	   StandardFont.y * StandardFont.height,
-	   StandardFont.x * StandardFont.height);
-
-    if (CharFont)
-      puts("SA");
-    else
-      puts("SS");
+    define_font(0);
+    define_font(1);
 
     printf("%.1f setmiterlimit\n", MiterLimit);
     printf("%d setlinecap\n", LineCap);
@@ -404,5 +373,5 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.31.2.5 2003/01/07 18:26:52 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.31.2.6 2003/09/12 20:20:06 mike Exp $".
  */

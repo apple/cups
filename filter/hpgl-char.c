@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-char.c,v 1.13.2.3 2003/01/07 18:26:51 mike Exp $"
+ * "$Id: hpgl-char.c,v 1.13.2.4 2003/09/12 20:20:05 mike Exp $"
  *
  *   HP-GL/2 character processing for the Common UNIX Printing System (CUPS).
  *
@@ -44,6 +44,7 @@
  *   SR_relative_size()        - Set the relative size of text.
  *   SS_select_standard()      - Select the standard font for text.
  *   TD_transparent_data()     - Send transparent print data.
+ *   
  */
 
 /*
@@ -51,6 +52,89 @@
  */
 
 #include "hpgltops.h"
+
+
+/*
+ * 'define_font()' - Define the specified font...
+ */
+
+void
+define_font(int f)			/* I - Font number */
+{
+  font_t	*font;			/* Font */
+  const char	*fstring;		/* Font string - SA or SS */
+  float		xform[2][2];		/* Transform matrix */
+
+
+ /*
+  * Get the correct font data...
+  */
+
+  if (f)
+  {
+    font    = &AlternateFont;
+    fstring = "SA";
+  }
+  else
+  {
+    font    = &StandardFont;
+    fstring = "SS";
+  }
+
+ /*
+  * Compute the font matrix, accounting for any rotation...
+  */
+
+  switch (Rotation)
+  {
+    default :
+    case 0 :
+        xform[0][0] = font->xpitch * font->x * font->height;
+	xform[0][1] = font->xpitch * font->y * font->height;
+	xform[1][0] = -font->y * font->height;
+	xform[1][1] = font->x * font->height;
+        break;
+
+    case 90 :
+	xform[0][0] = -font->xpitch * font->y * font->height;
+        xform[0][1] = font->xpitch * font->x * font->height;
+	xform[1][0] = -font->x * font->height;
+	xform[1][1] = -font->y * font->height;
+        break;
+
+    case 180 :
+        xform[0][0] = -font->xpitch * font->x * font->height;
+	xform[0][1] = -font->xpitch * font->y * font->height;
+	xform[1][0] = font->y * font->height;
+	xform[1][1] = -font->x * font->height;
+        break;
+
+    case 270 :
+	xform[0][0] = font->xpitch * font->y * font->height;
+        xform[0][1] = -font->xpitch * font->x * font->height;
+	xform[1][0] = font->x * font->height;
+	xform[1][1] = font->y * font->height;
+        break;
+  }
+
+ /*
+  * Send the font definition...
+  */
+
+  printf("/%s {\n"
+         "	/%s%s%s%s findfont\n"
+	 "	[ %f %f %f %f 0.0 0.0 ] makefont\n"
+	 "	setfont\n"
+	 "} bind def\n",
+         fstring, font->spacing ? "Helvetica" : "Courier",
+         (font->weight > 0 || font->posture) ? "-" : "",
+         font->weight > 0 ? "Bold" : "",
+         font->posture ? "Oblique" : "",
+         xform[0][0], xform[0][1], xform[1][0], xform[1][1]);
+
+  if (f == CharFont)
+    printf("%s\n", fstring);
+}
 
 
 /*
@@ -68,10 +152,15 @@ AD_define_alternate(int     num_params,	/* I - Number of parameters */
   * Set default font attributes...
   */
 
-  AlternateFont.typeface = 48;
-  AlternateFont.posture  = 0;
-  AlternateFont.weight   = 0;
-  AlternateFont.height   = 11.5;
+  AlternateFont.symbol_set = 277;
+  AlternateFont.spacing    = 0;
+  AlternateFont.pitch      = 9;
+  AlternateFont.height     = 11.5;
+  AlternateFont.posture    = 0;
+  AlternateFont.weight     = 0;
+  AlternateFont.typeface   = 48;
+  AlternateFont.x          = 1.0;
+  AlternateFont.y          = 0.0;
 
  /*
   * Loop through parameter value pairs...
@@ -80,38 +169,62 @@ AD_define_alternate(int     num_params,	/* I - Number of parameters */
   for (i = 0; i < (num_params - 1); i += 2)
     switch ((int)params[i].value.number)
     {
-      case 4 :
+      case 1 : /* Symbol Set */
+          AlternateFont.symbol_set = (int)params[i + 1].value.number;
+          break;
+      case 2 : /* Font Spacing */
+          AlternateFont.spacing = (int)params[i + 1].value.number;
+          break;
+      case 3 : /* Pitch */
+          AlternateFont.pitch = params[i + 1].value.number;
+          break;
+      case 4 : /* Height */
           AlternateFont.height = params[i + 1].value.number;
           break;
-      case 5 :
+      case 5 : /* Posture */
           AlternateFont.posture = (int)params[i + 1].value.number;
           break;
-      case 6 :
+      case 6 : /* Stroke Weight */
           AlternateFont.weight = (int)params[i + 1].value.number;
           break;
-      case 7 :
+      case 7 : /* Typeface */
           AlternateFont.typeface = (int)params[i + 1].value.number;
           break;
     }
+
+  if (AlternateFont.spacing)
+  {
+   /*
+    * Set proportional spacing font...
+    */
+
+    AlternateFont.xpitch = 1.0f;
+  }
+  else
+  {
+   /*
+    * Set fixed-spaced font...
+    */
+
+    AlternateFont.xpitch = 0.6f * AlternateFont.height / AlternateFont.pitch;
+  }
 
  /*
   * Define the font...
   */
 
   if (PageDirty)
-    printf("/SA {\n"
-           "	/%s%s%s%s findfont\n"
-	   "	[ %f %f %f %f 0.0 0.0 ] makefont\n"
-	   "	setfont\n"
-	   "} bind def\n",
-           AlternateFont.typeface == 48 ? "Courier" : "Helvetica",
-           (AlternateFont.weight != 0 || AlternateFont.posture != 0) ? "-" : "",
-           AlternateFont.weight != 0 ? "Bold" : "",
-           AlternateFont.posture != 0 ? "Oblique" : "",
-           AlternateFont.x * AlternateFont.height,
-	   -AlternateFont.y * AlternateFont.height,
-	   AlternateFont.y * AlternateFont.height,
-	   AlternateFont.x * AlternateFont.height);
+  {
+    printf("%% AD");
+    for (i = 0; i < num_params; i ++)
+      if (i)
+        printf(",%g", params[i].value.number);
+      else
+        printf("%g", params[i].value.number);
+    puts(";");
+
+    define_font(1);
+  }
 
   CharHeight[1] = AlternateFont.height;
 }
@@ -177,57 +290,25 @@ void
 DI_absolute_direction(int     num_params,	/* I - Number of parameters */
                       param_t *params)		/* I - Parameters */
 {
+  if (num_params != 2)
+    return;
+
   if (CharFont)
   {
-    if (num_params == 2)
-    {
-      AlternateFont.x = params[0].value.number;
-      AlternateFont.y = params[1].value.number;
-    }
-
-    if (PageDirty)
-    {
-      printf("/SA {\n"
-             "	/%s%s%s%s findfont\n"
-	     "	[ %f %f %f %f 0.0 0.0 ] makefont\n"
-	     "	setfont\n"
-	     "} bind def\n",
-             AlternateFont.typeface == 48 ? "Courier" : "Helvetica",
-             (AlternateFont.weight != 0 || AlternateFont.posture != 0) ? "-" : "",
-             AlternateFont.weight != 0 ? "Bold" : "",
-             AlternateFont.posture != 0 ? "Oblique" : "",
-             AlternateFont.x * AlternateFont.height,
-	     -AlternateFont.y * AlternateFont.height,
-	     AlternateFont.y * AlternateFont.height,
-	     AlternateFont.x * AlternateFont.height);
-      puts("SA");
-    }
+    AlternateFont.x = params[0].value.number;
+    AlternateFont.y = params[1].value.number;
   }
   else
   {
-    if (num_params == 2)
-    {
-      StandardFont.x = params[0].value.number;
-      StandardFont.y = params[1].value.number;
-    }
+    StandardFont.x = params[0].value.number;
+    StandardFont.y = params[1].value.number;
+  }
 
-    if (PageDirty)
-    {
-      printf("/SS {\n"
-             "	/%s%s%s%s findfont\n"
-	     "	[ %f %f %f %f 0.0 0.0 ] makefont\n"
-	     "	setfont\n"
-	     "} bind def\n",
-             StandardFont.typeface == 48 ? "Courier" : "Helvetica",
-             (StandardFont.weight != 0 || StandardFont.posture != 0) ? "-" : "",
-             StandardFont.weight != 0 ? "Bold" : "",
-             StandardFont.posture != 0 ? "Oblique" : "",
-             StandardFont.x * StandardFont.height,
-	     -StandardFont.y * StandardFont.height,
-	     StandardFont.y * StandardFont.height,
-	     StandardFont.x * StandardFont.height);
-      puts("SS");
-    }
+  if (PageDirty)
+  {
+    printf("%% DI%g,%g\n", params[0].value.number, params[1].value.number);
+
+    define_font(CharFont);
   }
 }
 
@@ -301,7 +382,7 @@ LB_label(int     num_params,		/* I - Number of parameters */
     return;
 
   Outputf("gsave\n");
-  Outputf("currentmiterlimit 1.0 \n");
+  Outputf("currentmiterlimit 1.0 setmiterlimit\n");
   Outputf("MP\n");
   Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
 
@@ -376,12 +457,15 @@ SD_define_standard(int     num_params,	/* I - Number of parameters */
   * Set default font attributes...
   */
 
-  StandardFont.typeface = 48;
-  StandardFont.posture  = 0;
-  StandardFont.weight   = 0;
-  StandardFont.height   = 11.5;
-  StandardFont.x        = 1.0;
-  StandardFont.y        = 0.0;
+  StandardFont.symbol_set = 277;
+  StandardFont.spacing    = 0;
+  StandardFont.pitch      = 9;
+  StandardFont.height     = 11.5;
+  StandardFont.posture    = 0;
+  StandardFont.weight     = 0;
+  StandardFont.typeface   = 48;
+  StandardFont.x          = 1.0;
+  StandardFont.y          = 0.0;
 
  /*
   * Loop through parameter value pairs...
@@ -390,38 +474,62 @@ SD_define_standard(int     num_params,	/* I - Number of parameters */
   for (i = 0; i < (num_params - 1); i += 2)
     switch ((int)params[i].value.number)
     {
-      case 4 :
+      case 1 : /* Symbol Set */
+          StandardFont.symbol_set = (int)params[i + 1].value.number;
+          break;
+      case 2 : /* Font Spacing */
+          StandardFont.spacing = (int)params[i + 1].value.number;
+          break;
+      case 3 : /* Pitch */
+          StandardFont.pitch = params[i + 1].value.number;
+          break;
+      case 4 : /* Height */
           StandardFont.height = params[i + 1].value.number;
           break;
-      case 5 :
+      case 5 : /* Posture */
           StandardFont.posture = (int)params[i + 1].value.number;
           break;
-      case 6 :
+      case 6 : /* Stroke Weight */
           StandardFont.weight = (int)params[i + 1].value.number;
           break;
-      case 7 :
+      case 7 : /* Typeface */
           StandardFont.typeface = (int)params[i + 1].value.number;
           break;
     }
+
+  if (StandardFont.spacing || StandardFont.pitch <= 0.0)
+  {
+   /*
+    * Set proportional spacing font...
+    */
+
+    StandardFont.xpitch = 1.0f;
+  }
+  else
+  {
+   /*
+    * Set fixed-spaced font...
+    */
+
+    StandardFont.xpitch = 0.6f * StandardFont.height / StandardFont.pitch;
+  }
 
  /*
   * Define the font...
   */
 
   if (PageDirty)
-    printf("/SS {\n"
-           "	/%s%s%s%s findfont\n"
-	   "	[ %f %f %f %f 0.0 0.0 ] makefont\n"
-	   "	setfont\n"
-	   "} bind def\n",
-           StandardFont.typeface == 48 ? "Courier" : "Helvetica",
-           (StandardFont.weight != 0 || StandardFont.posture != 0) ? "-" : "",
-           StandardFont.weight != 0 ? "Bold" : "",
-           StandardFont.posture != 0 ? "Oblique" : "",
-           StandardFont.x * StandardFont.height,
-	   -StandardFont.y * StandardFont.height,
-	   StandardFont.y * StandardFont.height,
-	   StandardFont.x * StandardFont.height);
+  {
+    printf("%% SD");
+    for (i = 0; i < num_params; i ++)
+      if (i)
+        printf(",%g", params[i].value.number);
+      else
+        printf("%g", params[i].value.number);
+    puts(";");
+
+    define_font(0);
+  }
 
   CharHeight[0] = StandardFont.height;
 }
@@ -435,8 +543,37 @@ void
 SI_absolute_size(int     num_params,	/* I - Number of parameters */
                  param_t *params)	/* I - Parameters */
 {
-  (void)num_params;
-  (void)params;
+  float	xsize, ysize;			/* Font size... */
+
+
+  if (num_params != 2)
+    return;
+
+ /*
+  * The "SI" values are supposed to be cm, but they appear to be inches
+  * when tested on real HP devices...
+  */
+
+  xsize = params[0].value.number * 72.0f;
+  ysize = params[1].value.number * 72.0f * 0.6f;
+
+  if (CharFont)
+  {
+    AlternateFont.xpitch = xsize / ysize;
+    AlternateFont.height = ysize;
+  }
+  else
+  {
+    StandardFont.xpitch = xsize / ysize;
+    StandardFont.height = ysize;
+  }
+
+  if (PageDirty)
+  {
+    printf("%% SI%g,%g\n", params[0].value.number, params[1].value.number);
+
+    define_font(CharFont);
+  }
 }
 
 
@@ -498,5 +635,5 @@ TD_transparent_data(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-char.c,v 1.13.2.3 2003/01/07 18:26:51 mike Exp $".
+ * End of "$Id: hpgl-char.c,v 1.13.2.4 2003/09/12 20:20:05 mike Exp $".
  */
