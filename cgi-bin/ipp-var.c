@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.23.2.17 2004/02/02 22:41:43 mike Exp $"
+ * "$Id: ipp-var.c,v 1.23.2.18 2004/02/24 16:38:17 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -127,6 +127,9 @@ ippGetAttributes(ipp_t      *request,	/* I - IPP request */
 	}
 
       *nameptr = '\0';
+
+      if (!strncmp(name, "printer_state_history", 21))
+        strcpy(name, "printer_state_history");
 
      /*
       * Possibly add it to the list of attributes...
@@ -543,5 +546,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.23.2.17 2004/02/02 22:41:43 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.23.2.18 2004/02/24 16:38:17 mike Exp $".
  */

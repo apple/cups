@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The web interface did not show the printer state
+	  history information (STR #592)
 	- The rastertoepson filter would crash under certain
 	  cirsumstances (STR #583)
 	- The USB backend did not handle serial numbers using
