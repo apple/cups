@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.58 2000/09/07 20:34:41 mike Exp $"
+ * "$Id: dirsvc.c,v 1.59 2000/09/12 18:18:28 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -154,11 +154,13 @@ void
 UpdateBrowseList(void)
 {
   int		i;			/* Looping var */
+  int		update;			/* Update printer attributes? */
   int		auth;			/* Authorization status */
   int		len,			/* Length of name string */
 		offset;			/* Offset in name string */
   int		bytes;			/* Number of bytes left */
-  char		packet[1540];		/* Broadcast packet */
+  char		packet[1540],		/* Broadcast packet */
+		*pptr;			/* Pointer into packet */
   struct sockaddr_in srcaddr;		/* Source address */
   char		srcname[1024];		/* Source hostname */
   unsigned	address;		/* Source address (host order) */
@@ -298,20 +300,65 @@ UpdateBrowseList(void)
   * Parse packet...
   */
 
-  location[0]   = '\0';
-  info[0]       = '\0';
-  make_model[0] = '\0';
+  update = 0;
 
-  if (sscanf(packet,
-             "%x%x%1023s%*[^\"]\"%127[^\"]%*[^\"]\"%127[^\"]%*[^\"]\"%127[^\"]",
-             (unsigned *)&type, (unsigned *)&state, uri, location, info,
-	     make_model) < 3)
+  if (sscanf(packet, "%x%x%1023s", (unsigned *)&type, (unsigned *)&state,
+             uri) < 3)
   {
     LogMessage(L_WARN, "UpdateBrowseList: Garbled browse packet - %s",
                packet);
     return;
   }
 
+  strcpy(location, "Location Unknown");
+  strcpy(info, "No Information Available");
+  make_model[0] = '\0';
+
+  if ((pptr = strchr(packet, '\"')) != NULL)
+  {
+   /*
+    * Have extended information; can't use sscanf for it because not all
+    * sscanf's allow empty strings with %[^\"]...
+    */
+
+    for (i = 0, pptr ++;
+         i < (sizeof(location) - 1) && *pptr && *pptr != '\"';
+         i ++, pptr ++)
+      location[i] = *pptr;
+
+    if (i)
+      location[i] = '\0';
+
+    if (*pptr == '\"')
+      pptr ++;
+
+    while (*pptr && isspace(*pptr))
+      pptr ++;
+
+    for (i = 0, pptr ++;
+         i < (sizeof(info) - 1) && *pptr && *pptr != '\"';
+         i ++, pptr ++)
+      info[i] = *pptr;
+
+    if (i)
+      info[i] = '\0';
+
+    if (*pptr == '\"')
+      pptr ++;
+
+    while (*pptr && isspace(*pptr))
+      pptr ++;
+
+    for (i = 0, pptr ++;
+         i < (sizeof(make_model) - 1) && *pptr && *pptr != '\"';
+         i ++, pptr ++)
+      make_model[i] = *pptr;
+
+    if (i)
+      make_model[i] = '\0';
+  }
+
+  DEBUG_puts(packet);
   DEBUG_printf(("type=%x, state=%x, uri=\"%s\"\n"
                 "location=\"%s\", info=\"%s\", make_model=\"%s\"\n",
 	        type, state, uri, location, info, make_model));
@@ -427,12 +474,7 @@ UpdateBrowseList(void)
       strcpy(p->device_uri, uri);
       strcpy(p->hostname, host);
 
-      strcpy(p->location, "Location Unknown");
-      strcpy(p->info, "No Information Available");
-      snprintf(p->make_model, sizeof(p->make_model), "Remote Class on %s",
-               host);
-
-      SetPrinterAttrs(p);
+      update = 1;
     }
   }
   else
@@ -494,12 +536,7 @@ UpdateBrowseList(void)
       strcpy(p->device_uri, uri);
       strcpy(p->hostname, host);
 
-      strcpy(p->location, "Location Unknown");
-      strcpy(p->info, "No Information Available");
-      snprintf(p->make_model, sizeof(p->make_model), "Remote Printer on %s",
-               host);
-
-      SetPrinterAttrs(p);
+      update = 1;
     }
   }
 
@@ -507,17 +544,52 @@ UpdateBrowseList(void)
   * Update the state...
   */
 
-  p->type        = type;
   p->state       = state;
   p->accepting   = state != IPP_PRINTER_STOPPED;
   p->browse_time = time(NULL);
 
-  if (location[0])
+  if (p->type != type)
+  {
+    p->type = type;
+    update  = 1;
+  }
+
+  if (strcpy(p->location, location))
+  {
     strcpy(p->location, location);
-  if (info[0])
+    update = 1;
+  }
+
+  if (strcpy(p->info, info))
+  {
     strcpy(p->info, info);
-  if (make_model[0])
+    update = 1;
+  }
+
+  if (!make_model[0])
+  {
+    if (type & CUPS_PRINTER_CLASS)
+      snprintf(make_model, sizeof(p->make_model), "Remote Class on %s",
+               host);
+    else
+      snprintf(make_model, sizeof(p->make_model), "Remote Printer on %s",
+               host);
+  }
+  else
+  {
+    strncat(make_model, " on ", sizeof(make_model) - 1);
+    strncat(make_model, host, sizeof(make_model) - 1);
+    make_model[sizeof(make_model) - 1] = '\0';
+  }
+
+  if (strcmp(p->make_model, make_model))
+  {
     strcpy(p->make_model, make_model);
+    update = 1;
+  }
+
+  if (update)
+    SetPrinterAttrs(p);
 
  /*
   * If the remote printer is idle, check for local jobs that might need to
@@ -804,5 +876,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.58 2000/09/07 20:34:41 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.59 2000/09/12 18:18:28 mike Exp $".
  */
