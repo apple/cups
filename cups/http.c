@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.63 2000/03/21 04:03:25 mike Exp $"
+ * "$Id: http.c,v 1.64 2000/05/01 19:50:25 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -570,6 +570,119 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 
 
 /*
+ * 'httpGetSubField()' - Get a sub-field value.
+ */
+
+char *					/* O - Value or NULL */
+httpGetSubField(http_t       *http,	/* I - HTTP data */
+                http_field_t field,	/* I - Field index */
+                const char   *name,	/* I - Name of sub-field */
+		char         *value)	/* O - Value string */
+{
+  const char	*fptr;			/* Pointer into field */
+  char		temp[HTTP_MAX_VALUE],	/* Temporary buffer for name */
+		*ptr;			/* Pointer into string buffer */
+
+
+  if (http == NULL ||
+      field < HTTP_FIELD_ACCEPT_LANGUAGE ||
+      field > HTTP_FIELD_WWW_AUTHENTICATE ||
+      name == NULL || value == NULL)
+    return (NULL);
+
+  for (fptr = http->fields[field]; *fptr;)
+  {
+   /*
+    * Skip leading whitespace...
+    */
+
+    while (isspace(*fptr));
+      fptr ++;
+
+    if (*fptr == ',')
+    {
+      fptr ++;
+      continue;
+    }
+
+   /*
+    * Get the sub-field name...
+    */
+
+    for (ptr = temp;
+         *fptr && *fptr != '=' && !isspace(*fptr) && ptr < (temp + sizeof(temp) - 1);
+         *ptr++ = *fptr++);
+
+    *ptr = '\0';
+
+   /*
+    * Skip trailing chars up to the '='...
+    */
+
+    while (*fptr && *fptr != '=')
+      fptr ++;
+
+    if (!*fptr)
+      break;
+
+   /*
+    * Skip = and leading whitespace...
+    */
+
+    fptr ++;
+
+    while (isspace(*fptr));
+      fptr ++;
+
+    if (*fptr == '\"')
+    {
+     /*
+      * Read quoted string...
+      */
+
+      for (ptr = value, fptr ++;
+           *fptr && *fptr != '\"' && ptr < (value + HTTP_MAX_VALUE - 1);
+	   *ptr++ = *fptr++);
+
+      *ptr = '\0';
+
+      while (*fptr && *fptr != '\"')
+        fptr ++;
+
+      if (*fptr)
+        fptr ++;
+    }
+    else
+    {
+     /*
+      * Read unquoted string...
+      */
+
+      for (ptr = value;
+           *fptr && !isspace(*fptr) && *fptr != ',' && ptr < (value + HTTP_MAX_VALUE - 1);
+	   *ptr++ = *fptr++);
+
+      *ptr = '\0';
+
+      while (*fptr && !isspace(*fptr) && *fptr != ',')
+        fptr ++;
+    }
+
+   /*
+    * See if this is the one...
+    */
+
+    if (strcmp(name, temp) == 0)
+      return (value);
+  }
+
+  value[0] = '\0';
+
+  return (NULL);
+}
+
+
+/*
  * 'httpSetField()' - Set the value of an HTTP header.
  */
 
@@ -578,6 +691,12 @@ httpSetField(http_t       *http,	/* I - HTTP data */
              http_field_t field,	/* I - Field index */
 	     const char   *value)	/* I - Value */
 {
+  if (http == NULL ||
+      field < HTTP_FIELD_ACCEPT_LANGUAGE ||
+      field > HTTP_FIELD_WWW_AUTHENTICATE ||
+      value == NULL)
+    return;
+
   strncpy(http->fields[field], value, HTTP_MAX_VALUE - 1);
   http->fields[field][HTTP_MAX_VALUE - 1] = '\0';
 }
@@ -1542,5 +1661,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.63 2000/03/21 04:03:25 mike Exp $".
+ * End of "$Id: http.c,v 1.64 2000/05/01 19:50:25 mike Exp $".
  */

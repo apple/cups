@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.25 2000/02/18 17:48:05 mike Exp $"
+ * "$Id: http.h,v 1.26 2000/05/01 19:50:25 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -281,6 +281,8 @@ extern char		*httpGets(char *line, int length, http_t *http);
 extern const char	*httpGetDateString(time_t t);
 extern time_t		httpGetDateTime(const char *s);
 #  define		httpGetField(http,field)	(http)->fields[field]
+extern char		*httpGetSubField(http_t *http, http_field_t field,
+			                 const char *name, char *value);
 extern int		httpHead(http_t *http, const char *uri);
 extern void		httpInitialize(void);
 extern int		httpOptions(http_t *http, const char *uri);
@@ -289,9 +291,11 @@ extern int		httpPrintf(http_t *http, const char *format, ...);
 extern int		httpPut(http_t *http, const char *uri);
 extern int		httpRead(http_t *http, char *buffer, int length);
 extern int		httpReconnect(http_t *http);
-extern void		httpSeparate(const char *uri, char *method, char *username,
-			             char *host, int *port, char *resource);
-extern void		httpSetField(http_t *http, http_field_t field, const char *value);
+extern void		httpSeparate(const char *uri, char *method,
+			             char *username, char *host, int *port,
+				     char *resource);
+extern void		httpSetField(http_t *http, http_field_t field,
+			             const char *value);
 extern const char	*httpStatus(http_status_t status);
 extern int		httpTrace(http_t *http, const char *uri);
 extern http_status_t	httpUpdate(http_t *http);
@@ -299,6 +303,11 @@ extern int		httpWrite(http_t *http, const char *buffer, int length);
 extern char		*httpEncode64(char *out, const char *in);
 extern char		*httpDecode64(char *out, const char *in);
 extern int		httpGetLength(http_t *http);
+extern char		*httpMD5(const char *, const char *, const char *,
+			         char [33]);
+extern char		*httpMD5Final(const char *, const char *, const char *,
+			              char [33]);
+extern char		*httpMD5String(const md5_byte_t *, char [33]);
 
 
 /*
@@ -311,5 +320,5 @@ extern int		httpGetLength(http_t *http);
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.25 2000/02/18 17:48:05 mike Exp $".
+ * End of "$Id: http.h,v 1.26 2000/05/01 19:50:25 mike Exp $".
  */

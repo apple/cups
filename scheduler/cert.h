@@ -1,5 +1,5 @@
 /*
- * "$Id: cert.h,v 1.1 2000/01/20 03:51:33 mike Exp $"
+ * "$Id: cert.h,v 1.2 2000/05/01 19:50:26 mike Exp $"
  *
  *   Authentication certificate definitions for the Common UNIX
  *   Printing System (CUPS).
@@ -32,7 +32,7 @@ typedef struct cert_str
   struct cert_str *next;	/* Next certificate in list */
   int		pid;		/* Process ID (0 for root certificate) */
   char		certificate[33];/* 32 hex characters, or 128 bits */
-  char		username[16];	/* Authenticated username */
+  char		username[33];	/* Authenticated username */
 } cert_t;
 
 
@@ -56,5 +56,5 @@ extern void		InitCerts(void);
 
 
 /*
- * End of "$Id: cert.h,v 1.1 2000/01/20 03:51:33 mike Exp $".
+ * End of "$Id: cert.h,v 1.2 2000/05/01 19:50:26 mike Exp $".
  */

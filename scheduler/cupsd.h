@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.22 2000/03/21 04:03:34 mike Exp $"
+ * "$Id: cupsd.h,v 1.23 2000/05/01 19:50:26 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -70,7 +70,7 @@
 
 #define MAX_BROWSERS		10	/* Maximum number of browse addresses */
 #define MAX_LISTENERS		10	/* Maximum number of listener sockets */
-#define MAX_USERPASS		16	/* Maximum size of username/password */
+#define MAX_USERPASS		33	/* Maximum size of username/password */
 #define MAX_FILTERS		20	/* Maximum number of filters */
 
 
@@ -172,5 +172,5 @@ extern void	LoadDevices(const char *d);
 extern void	LoadPPDs(const char *d);
 
 /*
- * End of "$Id: cupsd.h,v 1.22 2000/03/21 04:03:34 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.23 2000/05/01 19:50:26 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lppasswd.c,v 1.3 2000/03/09 19:47:34 mike Exp $"
+ * "$Id: lppasswd.c,v 1.4 2000/05/01 19:50:27 mike Exp $"
  *
  *   MD5 password program for the Common UNIX Printing System (CUPS).
  *
@@ -23,9 +23,8 @@
  *
  * Contents:
  *
- *   main()       - Add, change, or delete passwords from the MD5 password file.
- *   md5_passwd() - Compute the MD5 sum of the username:group:password.
- *   usage()      - Show program usage.
+ *   main()  - Add, change, or delete passwords from the MD5 password file.
+ *   usage() - Show program usage.
  */
 
 /*
@@ -57,8 +56,6 @@
  * Local functions...
  */
 
-char	*md5_passwd(const char *username, const char *groupname,
-	            const char *passwd, char *md5);
 void	usage(FILE *fp);
 
 
@@ -258,7 +255,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	return (0);
       }
 
-      if (strcmp(md5_passwd(username, groupname, passwd, md5new), md5line) != 0)
+      if (strcmp(httpMD5(username, "CUPS", passwd, md5new), md5line) != 0)
       {
 	fputs("lppasswd: Sorry, password doesn't match!\n", stderr);
 
@@ -357,7 +354,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     }
 
     fprintf(outfile, "%s:%s:%s\n", username, groupname,
-            md5_passwd(username, groupname, passwd, md5new));
+            httpMD5(username, "CUPS", passwd, md5new));
   }
 
  /*
@@ -370,55 +367,6 @@ main(int  argc,			/* I - Number of command-line arguments */
   unlink(CUPS_SERVERROOT "/passwd.old");
 
   return (0);
-}
-
-
-/*
- * 'md5_passwd()' - Compute the MD5 sum of the username:group:password.
- */
-
-char *					/* O - MD5 sum */
-md5_passwd(const char *username,	/* I - User name */
-           const char *groupname,	/* I - Group name */
-           const char *passwd,		/* I - Password string */
-	   char       *md5)		/* O - MD5 string */
-{
-  int		i;			/* Looping var */
-  md5_state_t	state;			/* MD5 state info */
-  md5_byte_t	sum[16],		/* Sum data */
-		*sumptr;		/* Pointer into sum */
-  char		*md5ptr;		/* Pointer into MD5 string */
-  char		line[256];		/* Line to sum */
-  static char	*hex = "0123456789abcdef";
-					/* Hex digits */
-
-
- /*
-  * Compute the MD5 sum of the user name, group name, and password.
-  */
-
-  sprintf(line, "%s:%s:%s", username, groupname, passwd);
-  md5_init(&state);
-  md5_append(&state, (md5_byte_t *)line, strlen(line));
-  md5_finish(&state, sum);
-
- /*
-  * Convert the MD5 sum to hexadecimal...
-  */
-
-  for (i = 0, sumptr = sum, md5ptr = md5; i < 16; i ++, sumptr ++)
-  {
-    *md5ptr++ = hex[*sumptr >> 4];
-    *md5ptr++ = hex[*sumptr & 15];
-  }
-
-  *md5ptr = '\0';
-
- /*
-  * Return the sum...
-  */
-
-  return (md5);
 }
 
 
@@ -445,5 +393,5 @@ usage(FILE *fp)		/* I - File to send usage to */
 
 
 /*
- * End of "$Id: lppasswd.c,v 1.3 2000/03/09 19:47:34 mike Exp $".
+ * End of "$Id: lppasswd.c,v 1.4 2000/05/01 19:50:27 mike Exp $".
  */

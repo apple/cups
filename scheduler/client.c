@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.54 2000/03/21 04:03:33 mike Exp $"
+ * "$Id: client.c,v 1.55 2000/05/01 19:50:26 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -979,7 +979,7 @@ int				/* O - 1 if successful, 0 otherwise */
 SendError(client_t      *con,	/* I - Connection */
           http_status_t code)	/* I - Error code */
 {
-  char	message[1024];		/* Message for user */
+  char		message[1024];	/* Message for user */
 
 
  /*
@@ -1004,12 +1004,6 @@ SendError(client_t      *con,	/* I - Connection */
 
   if (!SendHeader(con, code, NULL))
     return (0);
-
-  if (code == HTTP_UNAUTHORIZED)
-  {
-    if (httpPrintf(HTTP(con), "WWW-Authenticate: Basic realm=\"CUPS\"\r\n") < 0)
-      return (0);
-  }
 
   if (con->http.version >= HTTP_1_1 && !con->http.keep_alive)
   {
@@ -1095,6 +1089,9 @@ SendHeader(client_t    *con,	/* I - Client to send to */
            http_status_t code,	/* I - HTTP status code */
 	   char        *type)	/* I - MIME type of document */
 {
+  location_t	*loc;		/* Authentication location */
+
+
   if (httpPrintf(HTTP(con), "HTTP/%d.%d %d %s\r\n", con->http.version / 100,
                 con->http.version % 100, code, httpStatus(code)) < 0)
     return (0);
@@ -1109,10 +1106,22 @@ SendHeader(client_t    *con,	/* I - Client to send to */
     if (httpPrintf(HTTP(con), "Keep-Alive: timeout=%d\r\n", KeepAliveTimeout) < 0)
       return (0);
   }
-  /**** MRS - Need to store which kind of authentication to perform in the
-              client structure! ****/
   if (code == HTTP_UNAUTHORIZED)
-    httpPrintf(HTTP(con), "WWW-Authenticate: Basic realm=\"CUPS\"\r\n");
+  {
+    loc = FindBest(con); /* This already succeeded in IsAuthorized */
+
+    if (loc->type == AUTH_BASIC)
+    {
+      if (httpPrintf(HTTP(con), "WWW-Authenticate: Basic realm=\"CUPS\"\r\n") < 0)
+	return (0);
+    }
+    else
+    {
+      if (httpPrintf(HTTP(con), "WWW-Authenticate: Digest realm=\"CUPS\" "
+                                "nonce=\"%s\"\r\n", con->http.hostname) < 0)
+	return (0);
+    }
+  }
   if (con->language != NULL)
   {
     if (httpPrintf(HTTP(con), "Content-Language: %s\r\n",
@@ -1395,6 +1404,26 @@ decode_auth(client_t *con)		/* I - Client to decode to */
 
     if ((username = FindCert(s)) != NULL)
       strcpy(con->username, username);
+  }
+  else if (strncmp(s, "Digest", 5) == 0)
+  {
+   /*
+    * Get the username and password from the Digest attributes...
+    */
+
+    if (httpGetSubField(&(con->http), HTTP_FIELD_WWW_AUTHENTICATE, "username",
+                        value))
+    {
+      strncpy(con->username, value, sizeof(con->username) - 1);
+      con->username[sizeof(con->username) - 1] = '\0';
+    }
+
+    if (httpGetSubField(&(con->http), HTTP_FIELD_WWW_AUTHENTICATE, "response",
+                        value))
+    {
+      strncpy(con->password, value, sizeof(con->password) - 1);
+      con->password[sizeof(con->password) - 1] = '\0';
+    }
   }
 
   LogMessage(L_DEBUG, "decode_auth() %d username=\"%s\"",
@@ -1693,5 +1722,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.54 2000/03/21 04:03:33 mike Exp $".
+ * End of "$Id: client.c,v 1.55 2000/05/01 19:50:26 mike Exp $".
  */

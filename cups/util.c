@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.47 2000/03/21 04:03:25 mike Exp $"
+ * "$Id: util.c,v 1.48 2000/05/01 19:50:25 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -61,7 +61,7 @@
 
 static http_t		*cups_server = NULL;	/* Current server connection */
 static ipp_status_t	last_error = IPP_OK;	/* Last IPP error */
-static char		authstring[255] = "";	/* Authorization string */
+static char		authstring[1024] = "";	/* Authorization string */
 
 
 /*
@@ -161,16 +161,18 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
                   const char *resource,	/* I - HTTP resource for POST */
 		  const char *filename)	/* I - File to send or NULL */
 {
-  ipp_t		*response;	/* IPP response data */
-  char		length[255];	/* Content-Length field */
-  http_status_t	status;		/* Status of HTTP request */
-  FILE		*file;		/* File to send */
-  struct stat	fileinfo;	/* File information */
-  int		bytes;		/* Number of bytes read/written */
-  char		buffer[8192];	/* Output buffer */
-  const char	*password;	/* Password string */
-  char		plain[255],	/* Plaintext username:password */
-		encode[255];	/* Encoded username:password */
+  ipp_t		*response;		/* IPP response data */
+  char		length[255];		/* Content-Length field */
+  http_status_t	status;			/* Status of HTTP request */
+  FILE		*file;			/* File to send */
+  struct stat	fileinfo;		/* File information */
+  int		bytes;			/* Number of bytes read/written */
+  char		buffer[8192];		/* Output buffer */
+  const char	*password;		/* Password string */
+  char		realm[HTTP_MAX_VALUE],	/* realm="xyz" string */
+		nonce[HTTP_MAX_VALUE],	/* nonce="xyz" string */
+		plain[255],		/* Plaintext username:password */
+		encode[255];		/* Encoded username:password */
 
 
   DEBUG_printf(("cupsDoFileRequest(%08x, %08s, \'%s\', \'%s\')\n",
@@ -304,10 +306,32 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 
         if (!password[0])
           break;
-	snprintf(plain, sizeof(plain), "%s:%s", cupsUser(), password);
-	httpEncode64(encode, plain);
-	snprintf(authstring, sizeof(authstring), "Basic %s", encode);
 
+        if (strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5) == 0)
+        {
+	 /*
+	  * Basic authentication...
+	  */
+
+	  snprintf(plain, sizeof(plain), "%s:%s", cupsUser(), password);
+	  httpEncode64(encode, plain);
+	  snprintf(authstring, sizeof(authstring), "Basic %s", encode);
+	}
+        else
+	{
+	 /*
+	  * Digest authentication...
+	  */
+
+          httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "realm", realm);
+          httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "nonce", nonce);
+
+	  httpMD5(cupsUser(), realm, password, encode);
+	  httpMD5Final(nonce, "POST", resource, encode);
+	  snprintf(authstring, sizeof(authstring),
+	           "Digest username=\"%s\", realm=\"%s\", nonce=\"%s\", "
+	           "response=\"%s\"", cupsUser(), realm, nonce, encode);
+	}
         continue;
       }
       else
@@ -617,8 +641,8 @@ cupsGetDefault(void)
  * 'cupsGetPPD()' - Get the PPD file for a printer.
  */
 
-const char *			/* O - Filename for PPD file */
-cupsGetPPD(const char *name)	/* I - Printer name */
+const char *				/* O - Filename for PPD file */
+cupsGetPPD(const char *name)		/* I - Printer name */
 {
   FILE		*fp;			/* PPD file */
   int		bytes;			/* Number of bytes read */
@@ -628,7 +652,9 @@ cupsGetPPD(const char *name)	/* I - Printer name */
 		resource[HTTP_MAX_URI];	/* Resource name */
   char		*tempdir;		/* Temporary file directory */
   const char	*password;		/* Password string */
-  char		plain[255],		/* Plaintext username:password */
+  char		realm[HTTP_MAX_VALUE],	/* realm="xyz" string */
+		nonce[HTTP_MAX_VALUE],	/* nonce="xyz" string */
+		plain[255],		/* Plaintext username:password */
 		encode[255];		/* Encoded username:password */
   http_status_t	status;			/* HTTP status from server */
   static char	filename[HTTP_MAX_URI];	/* Local filename */
@@ -711,10 +737,32 @@ cupsGetPPD(const char *name)	/* I - Printer name */
 
         if (!password[0])
           break;
-	snprintf(plain, sizeof(plain), "%s:%s", cupsUser(), password);
-	httpEncode64(encode, plain);
-	snprintf(authstring, sizeof(authstring), "Basic %s", encode);
 
+        if (strncmp(cups_server->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5) == 0)
+        {
+	 /*
+	  * Basic authentication...
+	  */
+
+	  snprintf(plain, sizeof(plain), "%s:%s", cupsUser(), password);
+	  httpEncode64(encode, plain);
+	  snprintf(authstring, sizeof(authstring), "Basic %s", encode);
+	}
+        else
+	{
+	 /*
+	  * Digest authentication...
+	  */
+
+          httpGetSubField(cups_server, HTTP_FIELD_WWW_AUTHENTICATE, "realm", realm);
+          httpGetSubField(cups_server, HTTP_FIELD_WWW_AUTHENTICATE, "nonce", nonce);
+
+	  httpMD5(cupsUser(), realm, password, encode);
+	  httpMD5Final(nonce, "GET", resource, encode);
+	  snprintf(authstring, sizeof(authstring),
+	           "Digest username=\"%s\", realm=\"%s\", nonce=\"%s\", "
+	           "response=\"%s\"", cupsUser(), realm, nonce, encode);
+	}
         continue;
       }
       else
@@ -1269,5 +1317,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.47 2000/03/21 04:03:25 mike Exp $".
+ * End of "$Id: util.c,v 1.48 2000/05/01 19:50:25 mike Exp $".
  */
