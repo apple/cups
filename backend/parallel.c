@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c,v 1.20 2000/04/27 21:31:38 mike Exp $"
+ * "$Id: parallel.c,v 1.21 2000/06/27 20:15:54 mike Exp $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -86,9 +86,11 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   FILE		*fp;		/* Print file */
   int		copies;		/* Number of copies to print */
   int		fd;		/* Parallel device */
-  size_t	nbytes,		/* Number of bytes written */
+  int		wbytes;		/* Number of bytes written */
+  size_t	nbytes,		/* Number of bytes read */
 		tbytes;		/* Total number of bytes written */
-  char		buffer[8192];	/* Output buffer */
+  char		buffer[8192],	/* Output buffer */
+		*bufptr;	/* Pointer into buffer */
   struct termios opts;		/* Parallel port options */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;	/* Actions for POSIX signals */
@@ -224,13 +226,24 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       * Write the print data to the printer...
       */
 
-      if (write(fd, buffer, nbytes) < nbytes)
+      tbytes += nbytes;
+      bufptr = buffer;
+
+      while (nbytes > 0)
       {
-	perror("ERROR: Unable to send print file to printer");
-	break;
+	if ((wbytes = write(fd, bufptr, nbytes)) < 0)
+	  if (errno == ENOTTY)
+	    wbytes = write(fd, bufptr, nbytes);
+
+	if (wbytes < 0)
+	{
+	  perror("ERROR: Unable to send print file to printer");
+	  break;
+	}
+
+	nbytes -= wbytes;
+	bufptr += wbytes;
       }
-      else
-	tbytes += nbytes;
 
       if (argc > 6)
 	fprintf(stderr, "INFO: Sending print file, %u bytes...\n", tbytes);
@@ -546,5 +559,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c,v 1.20 2000/04/27 21:31:38 mike Exp $".
+ * End of "$Id: parallel.c,v 1.21 2000/06/27 20:15:54 mike Exp $".
  */
