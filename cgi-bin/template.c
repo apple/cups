@@ -1,5 +1,5 @@
 /*
- * "$Id: template.c,v 1.5 1999/09/15 21:17:38 mike Exp $"
+ * "$Id: template.c,v 1.6 1999/09/27 18:40:16 mike Exp $"
  *
  *   CGI template function.
  *
@@ -93,9 +93,11 @@ cgi_copy(FILE *out,		/* I - Output file */
       */
 
       for (s = name; (ch = getc(in)) != EOF;)
-        if (strchr("}]<>=!?", ch))
+        if (strchr("}]<>=!", ch))
           break;
-        else
+        else if (s > name && ch == '?')
+	  break;
+	else
           *s++ = ch;
 
       *s = '\0';
@@ -272,5 +274,5 @@ cgi_copy(FILE *out,		/* I - Output file */
 
 
 /*
- * End of "$Id: template.c,v 1.5 1999/09/15 21:17:38 mike Exp $".
+ * End of "$Id: template.c,v 1.6 1999/09/27 18:40:16 mike Exp $".
  */
