@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.33 2003/05/09 18:35:37 mike Exp $"
+ * "$Id: http.c,v 1.82.2.34 2003/05/12 20:39:21 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -961,7 +961,12 @@ httpRead(http_t *http,			/* I - HTTP data */
   }
 #ifdef HAVE_SSL
   else if (http->tls)
+  {
+    if (!http->blocking && !httpWait(http, 1000))
+      return (0);
+
     bytes = http_read_ssl(http, buffer, length);
+  }
 #endif /* HAVE_SSL */
   else
   {
@@ -1087,6 +1092,24 @@ httpWait(http_t *http,			/* I - HTTP data */
 
   if (http->used)
     return (1);
+
+#ifdef HAVE_SSL
+  if (http->tls)
+  {
+#  ifdef HAVE_LIBSSL
+    if (SSL_pending((SSL *)(http->tls)))
+      return (1);
+#  elif defined(HAVE_GNUTLS)
+    if (gnutls_check_pending(((http_tls_t *)(http->tls))->session))
+      return (1);
+#  elif defined(HAVE_CDSASSL)
+    size_t bytes;			/* Bytes that are available */
+
+    if (!SSLGetBufferedReadSize((SSLContextRef)http->tls, &bytes) && bytes > 0)
+      return;
+#  endif /* HAVE_LIBSSL */
+  }
+#endif /* HAVE_SSL */
 
  /*
   * Then try doing a select() to poll the socket...
@@ -1322,14 +1345,14 @@ httpGets(char   *line,			/* I - Line to read into */
       * No newline; see if there is more data to be read...
       */
 
+      if (!http->blocking && !httpWait(http, 1000))
+        return (NULL);
+
 #ifdef HAVE_SSL
       if (http->tls)
 	bytes = http_read_ssl(http, bufend, HTTP_MAX_BUFFER - http->used);
       else
 #endif /* HAVE_SSL */
-      if (!http->blocking && !httpWait(http, 1000))
-        return (NULL);
-      else
         bytes = recv(http->fd, bufend, HTTP_MAX_BUFFER - http->used, 0);
 
       if (bytes < 0)
@@ -2404,5 +2427,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.33 2003/05/09 18:35:37 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.34 2003/05/12 20:39:21 mike Exp $".
  */
