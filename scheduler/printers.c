@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.53 2000/02/08 20:39:02 mike Exp $"
+ * "$Id: printers.c,v 1.54 2000/02/11 05:04:14 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -852,14 +852,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
     * Tell the client this is a remote printer of some type...
     */
 
-    if (p->type & CUPS_PRINTER_CLASS)
-      snprintf(filename, sizeof(filename), "Remote Printer Class on %s",
-               p->hostname);
-    else
-      snprintf(filename, sizeof(filename), "Remote Printer on %s", p->hostname);
-
     ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                 "printer-make-and-model", NULL, filename);
+                 "printer-make-and-model", NULL, p->make_model);
   }
   else
   {
@@ -870,14 +864,18 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
     p->type &= ~CUPS_PRINTER_OPTIONS;
 
-    if (p->type & CUPS_PRINTER_CLASS)
+    if (p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
     {
      /*
       * Add class-specific attributes...
       */
 
-      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                   "printer-make-and-model", NULL, "Local Printer Class");
+      if ((p->type & CUPS_PRINTER_IMPLICIT) && p->num_printers > 0)
+	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                     "printer-make-and-model", NULL, p->printers[0]->make_model);
+      else
+	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                     "printer-make-and-model", NULL, "Local Printer Class");
 
       if (p->num_printers > 0)
       {
@@ -964,6 +962,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	                "pages-per-minute", ppd->throughput);
 	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
                      "printer-make-and-model", NULL, ppd->nickname);
+
+        strncpy(p->make_model, ppd->nickname, sizeof(p->make_model) - 1);
 
        /*
 	* Add media options from the PPD file...
@@ -1318,5 +1318,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.53 2000/02/08 20:39:02 mike Exp $".
+ * End of "$Id: printers.c,v 1.54 2000/02/11 05:04:14 mike Exp $".
  */

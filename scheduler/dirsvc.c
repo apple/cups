@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.47 2000/02/08 20:38:59 mike Exp $"
+ * "$Id: dirsvc.c,v 1.48 2000/02/11 05:04:14 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -159,7 +159,10 @@ UpdateBrowseList(void)
 		method[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
 		host[HTTP_MAX_URI],	/* Host portion of URI */
-		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+		resource[HTTP_MAX_URI],	/* Resource portion of URI */
+		info[IPP_MAX_NAME],	/* Information string */
+		location[IPP_MAX_NAME],	/* Location string */
+		make_model[IPP_MAX_NAME];/* Make and model string */
   int		port;			/* Port portion of URI */
   char		name[IPP_MAX_NAME],	/* Name of printer */
 		*hptr,			/* Pointer into hostname */
@@ -208,14 +211,22 @@ UpdateBrowseList(void)
   packet[bytes] = '\0';
 #endif /* DEBUG */
 
-  if (sscanf(packet, "%x%x%1023s", &type, &state, uri) != 3)
+  location[0]   = '\0';
+  info[0]       = '\0';
+  make_model[0] = '\0';
+
+  if (sscanf(packet,
+             "%x%x%1023s%*[^\"]\"%127[^\"]%*[^\"]\"%127[^\"]%*[^\"]\"%127[^\"]",
+             &type, &state, uri, location, info, make_model) < 3)
   {
     LogMessage(L_WARN, "UpdateBrowseList: Garbled browse packet - %s",
                packet);
     return;
   }
 
-  DEBUG_printf(("type=%x, state=%x, uri=\"%s\"\n", type, state, uri));
+  DEBUG_printf(("type=%x, state=%x, uri=\"%s\"\n"
+                "location=\"%s\", info=\"%s\", make_model=\"%s\"\n",
+	        type, state, uri, location, info, make_model));
 
  /*
   * Pull the URI apart to see if this is a local or remote printer...
@@ -267,6 +278,12 @@ UpdateBrowseList(void)
       strcpy(p->uri, uri);
       strcpy(p->device_uri, uri);
       strcpy(p->hostname, host);
+
+      strcpy(p->location, "Location Unknown");
+      strcpy(p->info, "No Information Available");
+      snprintf(p->make_model, sizeof(p->make_model), "Remote Class on %s",
+               host);
+
       SetPrinterAttrs(p);
     }
   }
@@ -297,6 +314,12 @@ UpdateBrowseList(void)
       strcpy(p->uri, uri);
       strcpy(p->device_uri, uri);
       strcpy(p->hostname, host);
+
+      strcpy(p->location, "Location Unknown");
+      strcpy(p->info, "No Information Available");
+      snprintf(p->make_model, sizeof(p->make_model), "Remote Printer on %s",
+               host);
+
       SetPrinterAttrs(p);
     }
   }
@@ -309,6 +332,13 @@ UpdateBrowseList(void)
   p->state       = state;
   p->accepting   = state != IPP_PRINTER_STOPPED;
   p->browse_time = time(NULL);
+
+  if (location[0])
+    strcpy(p->location, location);
+  if (info[0])
+    strcpy(p->info, info);
+  if (make_model[0])
+    strcpy(p->make_model, make_model);
 
  /*
   * See if we have a default printer...  If not, make the first printer the
@@ -354,13 +384,13 @@ UpdateBrowseList(void)
 	* we have a class, and if this printer is a member...
 	*/
 
-        if ((pclass = FindClass(name)) == NULL)
+        if ((pclass = FindPrinter(name)) == NULL)
 	{
 	 /*
 	  * Need to add the class...
 	  */
 
-	  pclass = AddClass(name);
+	  pclass = AddPrinter(name);
 	  pclass->type      |= CUPS_PRINTER_IMPLICIT;
 	  pclass->accepting = 1;
 	  pclass->state     = IPP_PRINTER_IDLE;
@@ -406,7 +436,8 @@ UpdateBrowseList(void)
 	name[len] = '\0';
 	offset    = 0;
 
-	if (FindPrinter(name) != NULL)
+	if ((pclass = FindPrinter(name)) != NULL &&
+	    !(pclass->type & CUPS_PRINTER_IMPLICIT))
 	{
 	 /*
 	  * Can't use same name as printer; add "Any" to the front of the
@@ -439,7 +470,7 @@ SendBrowseList(void)
   time_t		ut,	/* Minimum update time */
 			to;	/* Timeout time */
   int			bytes;	/* Length of packet */
-  char			packet[1540];
+  char			packet[1453];
 				/* Browse data packet */
 
 
@@ -482,8 +513,10 @@ SendBrowseList(void)
 
       p->browse_time = time(NULL);
 
-      sprintf(packet, "%x %x %s\n", p->type | CUPS_PRINTER_REMOTE, p->state,
-              p->uri);
+      snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"\n",
+               p->type | CUPS_PRINTER_REMOTE, p->state, p->uri,
+	       p->location, p->info, p->make_model);
+
       bytes = strlen(packet);
       DEBUG_printf(("SendBrowseList: (%d bytes) %s", bytes, packet));
 
@@ -509,5 +542,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.47 2000/02/08 20:38:59 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.48 2000/02/11 05:04:14 mike Exp $".
  */

@@ -1,7 +1,7 @@
 /*
- * "$Id: parallel.c,v 1.14 2000/02/11 05:04:12 mike Exp $"
+ * "$Id: usb.c,v 1.1 2000/02/11 05:04:12 mike Exp $"
  *
- *   Parallel port backend for the Common UNIX Printing System (CUPS).
+ *   USB port backend for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-2000 by Easy Software Products, all rights reserved.
  *
@@ -23,8 +23,8 @@
  *
  * Contents:
  *
- *   main()         - Send a file to the specified parallel port.
- *   list_devices() - List all parallel devices.
+ *   main()         - Send a file to the specified USB port.
+ *   list_devices() - List all USB devices.
  */
 
 /*
@@ -53,7 +53,7 @@ void	list_devices(void);
 
 
 /*
- * 'main()' - Send a file to the specified parallel port.
+ * 'main()' - Send a file to the specified USB port.
  *
  * Usage:
  *
@@ -87,7 +87,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   }
   else if (argc < 6 || argc > 7)
   {
-    fputs("Usage: parallel job-id user title copies options [file]\n", stderr);
+    fputs("Usage: USB job-id user title copies options [file]\n", stderr);
     return (1);
   }
 
@@ -137,12 +137,12 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   }
 
  /*
-  * Open the parallel port device...
+  * Open the USB port device...
   */
 
   if ((fd = open(resource, O_WRONLY)) == -1)
   {
-    perror("ERROR: Unable to open parallel port device file");
+    perror("ERROR: Unable to open USB port device file");
     return (1);
   }
 
@@ -205,7 +205,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * 'list_devices()' - List all parallel devices.
+ * 'list_devices()' - List all USB devices.
  */
 
 void
@@ -213,6 +213,7 @@ list_devices(void)
 {
 #ifdef __linux
   int	i;			/* Looping var */
+  int	is_printer;		/* Printer device? */
   int	fd;			/* File descriptor */
   char	device[255];		/* Device filename */
   FILE	*probe;			/* /proc/parport/n/autoprobe file */
@@ -222,63 +223,90 @@ list_devices(void)
 	model[IPP_MAX_NAME];	/* Model from file */
 
 
-  for (i = 0; i < 4; i ++)
+  if ((probe = fopen("/proc/bus/usb/devices", "r")) != NULL)
   {
-    sprintf(device, "/proc/parport/%d/autoprobe", i);
-    if ((probe = fopen(device, "r")) != NULL)
-    {
-      memset(make, 0, sizeof(make));
-      memset(model, 0, sizeof(model));
-      strcpy(model, "Unknown");
+    i          = 0;
+    is_printer = 0;
 
-      while (fgets(line, sizeof(line), probe) != NULL)
+    memset(make, 0, sizeof(make));
+    memset(model, 0, sizeof(model));
+
+    while (fgets(line, sizeof(line), probe) != NULL)
+    {
+     /*
+      * Strip trailing newline.
+      */
+
+      if ((delim = strrchr(line, '\n')) != NULL)
+	*delim = '\0';
+
+     /*
+      * See if it is a printer device ("P: ...")
+      */
+
+      if (strncmp(line, "S:", 2) == 0 && is_printer)
       {
        /*
-        * Strip trailing ; and/or newline.
+        * String attribute...
 	*/
 
-        if ((delim = strrchr(line, ';')) != NULL)
-	  *delim = '\0';
-	else if ((delim = strrchr(line, '\n')) != NULL)
-	  *delim = '\0';
-
-       /*
-        * Look for MODEL and MANUFACTURER lines...
-	*/
-
-        if (strncmp(line, "MODEL:", 6) == 0 &&
-	    strncmp(line, "MODEL:Unknown", 13) != 0)
-	  strncpy(model, line + 6, sizeof(model) - 1);
-	else if (strncmp(line, "MANUFACTURER:", 13) == 0 &&
-	         strncmp(line, "MANUFACTURER:Unknown", 20) != 0)
-	  strncpy(make, line + 13, sizeof(make) - 1);
+        if (strncmp(line, "S:  Manufacturer=", 17) == 0)
+	  strncpy(make, line + 17, sizeof(make) - 1);
+        else if (strncmp(line, "S:  Product=", 12) == 0)
+	  strncpy(model, line + 12, sizeof(model) - 1);
       }
+      else if (is_printer)
+      {
+       /*
+        * We were processing a printer device; send the info out...
+	*/
 
-      fclose(probe);
+	if (make[0])
+	  printf("direct usb:/dev/usblp%d \"%s %s\" \"USB Printer #%d\"\n",
+		 i, make, model, i + 1);
+	else if (model[0])
+	  printf("direct usb:/dev/usblp%d \"%s\" \"USB Printer #%d\"\n",
+		 i, model, i + 1);
+	else
+	  printf("direct usb:/dev/usblp%d \"Unknown\" \"USB Printer #%d\"\n",
+		 i, i + 1);
+
+        is_printer = strncmp(line, "P:", 2) == 0;
+	i ++;
+
+	memset(make, 0, sizeof(make));
+	memset(model, 0, sizeof(model));
+      }
+    }
+
+    if (is_printer)
+    {
+     /*
+      * We were processing a printer device; send the info out...
+      */
 
       if (make[0])
-	printf("direct parallel:/dev/lp%d \"%s %s\" \"Parallel Port #%d\"\n",
+	printf("direct usb:/dev/usblp%d \"%s %s\" \"USB Printer #%d\"\n",
 	       i, make, model, i + 1);
-      else
-	printf("direct parallel:/dev/lp%d \"%s\" \"Parallel Port #%d\"\n",
+      else if (model[0])
+	printf("direct usb:/dev/usblp%d \"%s\" \"USB Printer #%d\"\n",
 	       i, model, i + 1);
+      else
+	printf("direct usb:/dev/usblp%d \"Unknown\" \"USB Printer #%d\"\n",
+	       i, i + 1);
     }
-    else
+
+    fclose(probe);
+  }
+  else
+  {
+    for (i = 0; i < 8; i ++)
     {
-      sprintf(device, "/dev/lp%d", i);
+      sprintf(device, "/dev/usblp%d", i);
       if ((fd = open(device, O_WRONLY)) >= 0)
       {
 	close(fd);
-	printf("direct parallel:%s \"Unknown\" \"Parallel Port #%d\"\n", device, i + 1);
-      }
-      else
-      {
-	sprintf(device, "/dev/par%d", i);
-	if ((fd = open(device, O_WRONLY)) >= 0)
-	{
-	  close(fd);
-	  printf("direct parallel:%s \"Unknown\" \"Parallel Port #%d\"\n", device, i + 1);
-	}
+	printf("direct usb:%s \"Unknown\" \"USB Printer #%d\"\n", device, i + 1);
       }
     }
   }
@@ -292,5 +320,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c,v 1.14 2000/02/11 05:04:12 mike Exp $".
+ * End of "$Id: usb.c,v 1.1 2000/02/11 05:04:12 mike Exp $".
  */

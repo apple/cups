@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h,v 1.14 2000/01/04 13:46:10 mike Exp $"
+ * "$Id: printers.h,v 1.15 2000/02/11 05:04:14 mike Exp $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -33,6 +33,7 @@ typedef struct printer_str
 		hostname[HTTP_MAX_HOST],/* Host printer resides on */
 		name[IPP_MAX_NAME],	/* Printer name */
 		location[IPP_MAX_NAME],	/* Location code */
+		make_model[IPP_MAX_NAME],/* Make and model */
 		info[IPP_MAX_NAME],	/* Description */
 		more_info[HTTP_MAX_URI];/* URL for site-specific info */
   int		accepting;		/* Accepting jobs? */
@@ -77,5 +78,5 @@ extern void		StopPrinter(printer_t *p);
 
 
 /*
- * End of "$Id: printers.h,v 1.14 2000/01/04 13:46:10 mike Exp $".
+ * End of "$Id: printers.h,v 1.15 2000/02/11 05:04:14 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.3 2000/02/10 00:57:54 mike Exp $"
+ * "$Id: ppds.c,v 1.4 2000/02/11 05:04:14 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -58,9 +58,32 @@ typedef struct direct DIRENT;
 
 
 /*
+ * PPD information structure...
+ */
+
+typedef struct
+{
+  char	ppd_make[128],			/* Manufacturer */
+	ppd_make_and_model[256],	/* Make and model */
+	ppd_name[256],			/* PPD filename */
+	ppd_natural_language[16];	/* Natural language */
+} ppd_info_t;
+
+
+/*
+ * Local globals...
+ */
+
+static int		num_ppds,	/* Number of PPD files */
+			alloc_ppds;	/* Number of allocated entries */
+static ppd_info_t	*ppds;		/* PPD file info */
+
+
+/*
  * Local functions...
  */
 
+static int	compare_ppds(const ppd_info_t *p0, const ppd_info_t *p1);
 static void	load_ppds(const char *d, const char *p);
 
 
@@ -71,9 +94,182 @@ static void	load_ppds(const char *d, const char *p);
 void
 LoadPPDs(const char *d)		/* I - Directory to scan... */
 {
-  PPDs = ippNew();
+  int		i;		/* Looping var */
+  ppd_info_t	*ppd;		/* Current PPD file */
+
+
+ /*
+  * Load all PPDs in the specified directory and below...
+  */
+
+  num_ppds   = 0;
+  alloc_ppds = 0;
+  ppds       = (ppd_info_t *)0;
 
   load_ppds(d, "");
+
+ /*
+  * Sort the PPDs...
+  */
+
+  if (num_ppds > 1)
+    qsort(ppds, num_ppds, sizeof(ppd_info_t),
+          (int (*)(const void *, const void *))compare_ppds);
+
+ /*
+  * Create the list of PPDs...
+  */
+
+  PPDs = ippNew();
+
+  for (i = num_ppds, ppd = ppds; i > 0; i --, ppd ++)
+  {
+    if (i)
+      ippAddSeparator(PPDs);
+
+    ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                 "ppd-name", NULL, ppd->ppd_name);
+    ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                 "ppd-make", NULL, ppd->ppd_make);
+    ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                 "ppd-make-and-model", NULL, ppd->ppd_make_and_model);
+    ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
+                 "ppd-natural-language", NULL, ppd->ppd_natural_language);
+  }
+
+ /*
+  * Free the memory used...
+  */
+
+  if (alloc_ppds)
+    free(ppds);
+}
+
+
+/*
+ * 'compare_ppds()' - Compare PPD file make and model names for sorting.
+ */
+
+static int				/* O - Result of comparison */
+compare_ppds(const ppd_info_t *p0,	/* I - First PPD file */
+             const ppd_info_t *p1)	/* I - Second PPD file */
+{
+  const char	*s,			/* First name */
+		*t;			/* Second name */
+  int		diff,			/* Difference between digits */
+		digits;			/* Number of digits */
+
+
+ /*
+  * First compare manufacturers...
+  */
+
+  if ((diff = strcasecmp(p0->ppd_make, p1->ppd_make)) != 0)
+    return (diff);
+
+ /* 
+  * Then compare names...
+  */
+
+  s = p0->ppd_make_and_model;
+  t = p1->ppd_make_and_model;
+
+ /*
+  * Loop through both nicknames, returning only when a difference is
+  * seen.  Also, compare whole numbers rather than just characters, too!
+  */
+
+  while (*s && *t)
+  {
+    if (isdigit(*s) && isdigit(*t))
+    {
+     /*
+      * Got a number; start by skipping leading 0's...
+      */
+
+      while (*s == '0')
+        s ++;
+      while (*t == '0')
+        t ++;
+
+     /*
+      * Skip equal digits...
+      */
+
+      while (isdigit(*s) && *s == *t)
+      {
+        s ++;
+	t ++;
+      }
+
+     /*
+      * Bounce out if *s and *t aren't both digits...
+      */
+
+      if (isdigit(*s) && !isdigit(*t))
+        return (1);
+      else if (!isdigit(*s) && isdigit(*t))
+        return (-1);
+      else if (!isdigit(*s) || !isdigit(*t))
+        continue;     
+
+      if (*s < *t)
+        diff = -1;
+      else
+        diff = 1;
+
+     /*
+      * Figure out how many more digits there are...
+      */
+
+      digits = 0;
+      s ++;
+      t ++;
+
+      while (isdigit(*s))
+      {
+        digits ++;
+	s ++;
+      }
+
+      while (isdigit(*t))
+      {
+        digits --;
+	t ++;
+      }
+
+     /*
+      * Return if the number or value of the digits is different...
+      */
+
+      if (digits < 0)
+        return (-1);
+      else if (digits > 0)
+        return (1);
+      else if (diff)
+        return (diff);
+    }
+    else if (tolower(*s) < tolower(*t))
+      return (-1);
+    else if (tolower(*s) > tolower(*t))
+      return (1);
+    else
+    {
+      s ++;
+      t ++;
+    }
+  }
+
+ /*
+  * Return the results of the final comparison...
+  */
+
+  if (*s)
+    return (1);
+  else if (*t)
+    return (-1);
+  else
+    return (strcasecmp(p0->ppd_natural_language, p1->ppd_natural_language));
 }
 
 
@@ -100,6 +296,7 @@ load_ppds(const char *d,		/* I - Actual directory */
 		language[64],		/* Device class */
 		manufacturer[1024],	/* Manufacturer */
 		make_model[256];	/* Make and model */
+  ppd_info_t	*ppd;			/* New PPD file */
 
 
   if ((dir = opendir(d)) == NULL)
@@ -298,19 +495,41 @@ load_ppds(const char *d,		/* I - Actual directory */
     * Add the PPD file...
     */
 
-    if (PPDs->attrs)
-      ippAddSeparator(PPDs);
+    if (num_ppds >= alloc_ppds)
+    {
+     /*
+      * Allocate (more) memory for the PPD files...
+      */
 
-    ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                 "ppd-name", NULL, name);
-    ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                 "ppd-make", NULL, manufacturer);
-    ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                 "ppd-make-and-model", NULL, make_model);
-    ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
-                 "ppd-natural-language", NULL, language);
+      if (alloc_ppds == 0)
+        ppd = malloc(sizeof(ppd_info_t) * 32);
+      else
+        ppd = realloc(ppds, sizeof(ppd_info_t) * (alloc_ppds + 32));
 
-    LogMessage(L_DEBUG, "LoadPPDs: Adding ppd \"%s\"...", name);
+      if (ppd == NULL)
+      {
+        LogMessage(L_ERROR, "load_ppds: Ran out of memory for %d PPD files!",
+	           alloc_ppds + 32);
+        closedir(dir);
+	return;
+      }
+
+      ppds = ppd;
+      alloc_ppds += 32;
+    }
+
+    ppd = ppds + num_ppds;
+    num_ppds ++;
+
+    memset(ppd, 0, sizeof(ppd_info_t));
+    strncpy(ppd->ppd_name, name, sizeof(ppd->ppd_name) - 1);
+    strncpy(ppd->ppd_make, manufacturer, sizeof(ppd->ppd_make) - 1);
+    strncpy(ppd->ppd_make_and_model, make_model,
+            sizeof(ppd->ppd_make_and_model) - 1);
+    strncpy(ppd->ppd_natural_language, language,
+            sizeof(ppd->ppd_natural_language) - 1);
+
+    LogMessage(L_DEBUG, "LoadPPDs: Added ppd \"%s\"...", name);
   }
 
   closedir(dir);
@@ -318,5 +537,5 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * End of "$Id: ppds.c,v 1.3 2000/02/10 00:57:54 mike Exp $".
+ * End of "$Id: ppds.c,v 1.4 2000/02/11 05:04:14 mike Exp $".
  */

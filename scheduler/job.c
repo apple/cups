@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.53 2000/02/08 20:39:00 mike Exp $"
+ * "$Id: job.c,v 1.54 2000/02/11 05:04:14 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -252,7 +252,8 @@ CheckJobs(void)
 {
   job_t		*current,	/* Current job in queue */
 		*prev;		/* Previous job in queue */
-  printer_t	*printer;	/* Printer/class destination */
+  printer_t	*printer,	/* Printer destination */
+		*pclass;	/* Printer class destination */
 
 
   DEBUG_puts("CheckJobs()");
@@ -270,12 +271,22 @@ CheckJobs(void)
     {
       DEBUG_printf(("CheckJobs: current->dest = \'%s\'\n", current->dest));
 
-      if (FindClass(current->dest) != NULL)
+      if ((pclass = FindClass(current->dest)) != NULL)
         printer = FindAvailablePrinter(current->dest);
       else
         printer = FindPrinter(current->dest);
 
-      if (printer == NULL && FindClass(current->dest) == NULL)
+      if (printer != NULL && (printer->type & CUPS_PRINTER_IMPLICIT))
+      {
+       /*
+        * Handle implicit classes...
+	*/
+
+        pclass  = printer;
+        printer = FindAvailablePrinter(current->dest);
+      }
+
+      if (printer == NULL && pclass == NULL)
       {
        /*
         * Whoa, the printer and/or class for this destination went away;
@@ -2164,5 +2175,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.53 2000/02/08 20:39:00 mike Exp $".
+ * End of "$Id: job.c,v 1.54 2000/02/11 05:04:14 mike Exp $".
  */

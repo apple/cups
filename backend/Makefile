@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.15 2000/02/08 20:38:41 mike Exp $"
+# "$Id: Makefile,v 1.16 2000/02/11 05:04:12 mike Exp $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -24,8 +24,9 @@
 
 include ../Makedefs
 
-TARGETS	=	betest ipp lpd parallel serial socket
-OBJS	=	betest.o ipp.o lpd.o parallel.o serial.o socket.o
+TARGETS	=	betest ipp lpd parallel serial socket usb
+OBJS	=	betest.o ipp.o lpd.o parallel.o serial.o socket.o usb.o
+
 
 #
 # Make all targets...
@@ -33,12 +34,14 @@ OBJS	=	betest.o ipp.o lpd.o parallel.o serial.o socket.o
 
 all:	$(TARGETS)
 
+
 #
 # Clean all object files...
 #
 
 clean:
 	rm -f $(OBJS) $(TARGETS)
+
 
 #
 # Install all targets...
@@ -49,6 +52,7 @@ install:
 	$(CP) $(TARGETS) $(SERVERBIN)/backend
 	-$(LN) ipp $(SERVERBIN)/backend/http
 
+
 #
 # betest
 #
@@ -58,6 +62,7 @@ betest:	betest.o ../cups/$(LIBCUPS)
 	$(CC) $(LDFLAGS) -o betest betest.o $(LIBS)
 
 betest.o:	../cups/string.h ../Makedefs
+
 
 #
 # ipp
@@ -70,6 +75,7 @@ ipp:	ipp.o ../cups/$(LIBCUPS)
 
 ipp.o:	../cups/cups.h ../Makedefs
 
+
 #
 # lpd
 #
@@ -79,6 +85,7 @@ lpd:	lpd.o ../cups/$(LIBCUPS)
 	$(CC) $(LDFLAGS) -o lpd lpd.o $(LIBS)
 
 lpd.o:	../cups/cups.h ../Makedefs
+
 
 #
 # parallel
@@ -90,6 +97,7 @@ parallel:	parallel.o ../cups/$(LIBCUPS)
 
 parallel.o:	../cups/cups.h ../Makedefs
 
+
 #
 # serial
 #
@@ -99,6 +107,7 @@ serial:	serial.o ../cups/$(LIBCUPS)
 	$(CC) $(LDFLAGS) -o serial serial.o $(LIBS)
 
 serial.o:	../cups/cups.h ../Makedefs
+
 
 #
 # socket
@@ -110,6 +119,18 @@ socket:	socket.o ../cups/$(LIBCUPS)
 
 socket.o:	../cups/cups.h ../Makedefs
 
+
 #
-# End of "$Id: Makefile,v 1.15 2000/02/08 20:38:41 mike Exp $".
+# usb
+#
+
+usb:	usb.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o usb usb.o $(LIBS)
+
+usb.o:	../cups/cups.h ../Makedefs
+
+
+#
+# End of "$Id: Makefile,v 1.16 2000/02/11 05:04:12 mike Exp $".
 #
