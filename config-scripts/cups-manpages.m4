@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-manpages.m4,v 1.1 2001/06/27 19:06:45 mike Exp $"
+dnl "$Id: cups-manpages.m4,v 1.2 2001/06/29 19:14:56 mike Exp $"
 dnl
 dnl   Manpage stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -55,6 +55,7 @@ case "$uname" in
 		CAT5EXT=0
 		CAT8EXT=0
 		MAN8EXT=8
+		MAN8DIR=8
 		;;
 	IRIX*)
 		# SGI IRIX
@@ -62,6 +63,7 @@ case "$uname" in
 		CAT5EXT=z
 		CAT8EXT=z
 		MAN8EXT=1m
+		MAN8DIR=1
 		;;
 	SunOS* | HP-UX*)
 		# Solaris and HP-UX
@@ -69,6 +71,7 @@ case "$uname" in
 		CAT5EXT=5
 		CAT8EXT=1m
 		MAN8EXT=1m
+		MAN8DIR=1m
 		;;
 	*)
 		# All others
@@ -76,6 +79,7 @@ case "$uname" in
 		CAT5EXT=5
 		CAT8EXT=8
 		MAN8EXT=8
+		MAN8DIR=8
 		;;
 esac
 
@@ -83,7 +87,8 @@ AC_SUBST(CAT1EXT)
 AC_SUBST(CAT5EXT)
 AC_SUBST(CAT8EXT)
 AC_SUBST(MAN8EXT)
+AC_SUBST(MAN8DIR)
 
 dnl
-dnl End of "$Id: cups-manpages.m4,v 1.1 2001/06/27 19:06:45 mike Exp $".
+dnl End of "$Id: cups-manpages.m4,v 1.2 2001/06/29 19:14:56 mike Exp $".
 dnl

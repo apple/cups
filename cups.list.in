@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in,v 1.1 2001/06/28 16:20:09 mike Exp $"
+# "$Id: cups.list.in,v 1.2 2001/06/29 19:14:55 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -63,20 +63,29 @@ $top_srcdir=@top_srcdir@
 #
 
 $AMANDIR=@AMANDIR@
-$BINDIR=@BINDIR@
-$DATADIR=@DATADIR@
-$DOCDIR=@DOCDIR@
-$INCLUDEDIR=@INCLUDEDIR@
-$LIBDIR=@LIBDIR@
-$LOCALEDIR=@LOCALEDIR@
-$LOGDIR=@LOGDIR@
-$MANDIR=@MANDIR@
+$BINDIR=@bindir@
+$DATADIR=@CUPS_DATADIR@
+$DOCDIR=@CUPS_DOCROOT@
+$INCLUDEDIR=$(includedir)
+$INITDIR=@INITDIR@
+$INITDDIR=@INITDDIR@
+$LIBDIR=$(libdir)
+$LOCALEDIR=@CUPS_LOCALEDIR@
+$LOGDIR=@CUPS_LOGDIR@
+$MANDIR=@mandir@
 $PAMDIR=@PAMDIR@
-$REQUESTS=@REQUESTS@
-$SBINDIR=@SBINDIR@
-$SERVERBIN=@SERVERBIN@
-$SERVERROOT=@SERVERROOT@
+$REQUESTS=@CUPS_REQUESTS@
+$SBINDIR=@sbindir@
+$SERVERBIN=@CUPS_SERVERBIN@
+$SERVERROOT=@CUPS_SERVERROOT@
+
 $CUPS_USER=@CUPS_USER@
+
+$CAT1EXT=@CAT1EXT@
+$CAT5EXT=@CAT5EXT@
+$CAT8EXT=@CAT8EXT@
+$MAN8EXT=@MAN8EXT@
+$MAN8DIR=@MAN8DIR@
 
 # Make sure the MD5 password file is now owned by CUPS_USER...
 %postinstall if test -f $SERVERROOT/passwd.md5; then
@@ -270,108 +279,77 @@ d 0555 root sys $DOCDIR/images -
 f 0444 root sys $DOCDIR/images doc/images/*.gif
 
 # Man pages
-%system irix
 d 0555 root sys $AMANDIR -
-d 0555 root sys $AMANDIR/cat1 -
+d 0555 root sys $AMANDIR/cat$MAN8DIR -
+d 0555 root sys $AMANDIR/man$MAN8DIR -
 d 0555 root sys $MANDIR -
 d 0555 root sys $MANDIR/cat1 -
 d 0555 root sys $MANDIR/cat5 -
-
-f 0444 root sys $AMANDIR/cat1/accept.z man/accept.z
-l 0444 root sys $AMANDIR/cat1/reject.z accept.z
-f 0444 root sys $MANDIR/cat1/backend.z man/backend.z
-f 0444 root sys $MANDIR/cat5/classes.conf.z man/classes.conf.z
-f 0444 root sys $AMANDIR/cat1/cups-lpd.z man/cups-lpd.z
-f 0444 root sys $AMANDIR/cat1/cups-polld.z man/cups-polld.z
-f 0444 root sys $MANDIR/cat5/cupsd.conf.z man/cupsd.conf.z
-f 0444 root sys $AMANDIR/cat1/cupsd.z man/cupsd.z
-f 0444 root sys $AMANDIR/cat1/enable.z man/enable.z
-l 0444 root sys $AMANDIR/cat1/disable.z enable.z
-f 0444 root sys $MANDIR/cat1/filter.z man/filter.z
-f 0444 root sys $AMANDIR/cat1/lpadmin.z man/lpadmin.z
-f 0444 root sys $AMANDIR/cat1/lpc.z man/lpc.z
-f 0444 root sys $AMANDIR/cat1/lpinfo.z man/lpinfo.z
-f 0444 root sys $AMANDIR/cat1/lpmove.z man/lpmove.z
-f 0444 root sys $MANDIR/cat1/lpoptions.z man/lpoptions.z
-f 0444 root sys $MANDIR/cat1/lppasswd.z man/lppasswd.z
-f 0444 root sys $MANDIR/cat1/lpq.z man/lpq.z
-f 0444 root sys $MANDIR/cat1/lprm.z man/lprm.z
-f 0444 root sys $MANDIR/cat1/lpr.z man/lpr.z
-f 0444 root sys $MANDIR/cat1/lpstat.z man/lpstat.z
-f 0444 root sys $MANDIR/cat1/lp.z man/lp.z
-l 0444 root sys $MANDIR/cat1/cancel.z lp.z
-f 0444 root sys $MANDIR/cat5/mime.convs.z man/mime.convs.z
-f 0444 root sys $MANDIR/cat5/mime.types.z man/mime.types.z
-f 0444 root sys $MANDIR/cat5/printers.conf.z man/printers.conf.z
-
-%system solaris hpux
 d 0555 root sys $MANDIR/man1 -
 d 0555 root sys $MANDIR/man5 -
-d 0555 root sys $MANDIR/man1m -
 
-f 0444 root sys $MANDIR/man1m/accept.1m man/accept.man
-l 0444 root sys $MANDIR/man1m/reject.1m accept.1m
-f 0444 root sys $MANDIR/man1/backend.1 man/backend.man
-f 0444 root sys $MANDIR/man1/classes.conf.5 man/classes.conf.man
-f 0444 root sys $MANDIR/man1m/cups-lpd.1m man/cups-lpd.man
-f 0444 root sys $MANDIR/man1m/cups-polld.1m man/cups-polld.man
-f 0444 root sys $MANDIR/man1m/cupsd.1m man/cupsd.man
-f 0444 root sys $MANDIR/man5/cupsd.conf.5 man/cupsd.conf.man
-f 0444 root sys $MANDIR/man1m/enable.1m man/enable.man
-l 0444 root sys $MANDIR/man1m/disable.1m enable.1m
-f 0444 root sys $MANDIR/man1/filter.1 man/filter.man
-f 0444 root sys $MANDIR/man1m/lpadmin.1m man/lpadmin.man
-f 0444 root sys $MANDIR/man1m/lpc.1m man/lpc.man
-f 0444 root sys $MANDIR/man1m/lpinfo.1m man/lpinfo.man
-f 0444 root sys $MANDIR/man1m/lpmove.1m man/lpmove.man
-f 0444 root sys $MANDIR/man1/lpoptions.1 man/lpoptions.man
-f 0444 root sys $MANDIR/man1/lpq.1 man/lpq.man
-f 0444 root sys $MANDIR/man1/lppasswd.1 man/lppasswd.man
-f 0444 root sys $MANDIR/man1/lprm.1 man/lprm.man
-f 0444 root sys $MANDIR/man1/lpr.1 man/lpr.man
-f 0444 root sys $MANDIR/man1/lpstat.1 man/lpstat.man
-f 0444 root sys $MANDIR/man1/lp.1 man/lp.man
-l 0444 root sys $MANDIR/man1/cancel.1 lp.1
-f 0444 root sys $MANDIR/man5/mime.convs.5 man/mime.convs.man
-f 0444 root sys $MANDIR/man5/mime.types.5 man/mime.types.man
-f 0444 root sys $MANDIR/man5/printers.conf.5 man/printers.conf.man
+f 0444 root sys $MANDIR/cat1/backend.$CAT1EXT man/backend.$CAT1EXT
+f 0444 root sys $MANDIR/cat1/filter.$CAT1EXT man/filter.$CAT1EXT
+f 0444 root sys $MANDIR/cat1/lpoptions.$CAT1EXT man/lpoptions.$CAT1EXT
+f 0444 root sys $MANDIR/cat1/lppasswd.$CAT1EXT man/lppasswd.$CAT1EXT
+f 0444 root sys $MANDIR/cat1/lpq.$CAT1EXT man/lpq.$CAT1EXT
+f 0444 root sys $MANDIR/cat1/lprm.$CAT1EXT man/lprm.$CAT1EXT
+f 0444 root sys $MANDIR/cat1/lpr.$CAT1EXT man/lpr.$CAT1EXT
+f 0444 root sys $MANDIR/cat1/lpstat.$CAT1EXT man/lpstat.$CAT1EXT
+f 0444 root sys $MANDIR/cat1/lp.$CAT1EXT man/lp.$CAT1EXT
+l 0444 root sys $MANDIR/cat1/cancel.$CAT1EXT lp.$CAT1EXT
 
-%system !irix !solaris !hpux
-d 0555 root sys $MANDIR/man1 -
-d 0555 root sys $MANDIR/man5 -
-d 0555 root sys $MANDIR/man8 -
+f 0444 root sys $MANDIR/cat5/classes.conf.$CAT5EXT man/classes.conf.$CAT5EXT
+f 0444 root sys $MANDIR/cat5/cupsd.conf.$CAT5EXT man/cupsd.conf.$CAT5EXT
+f 0444 root sys $MANDIR/cat5/mime.convs.$CAT5EXT man/mime.convs.$CAT5EXT
+f 0444 root sys $MANDIR/cat5/mime.types.$CAT5EXT man/mime.types.$CAT5EXT
+f 0444 root sys $MANDIR/cat5/printers.conf.$CAT5EXT man/printers.conf.$CAT5EXT
 
-f 0444 root sys $MANDIR/man8/accept.8 man/accept.man
-l 0444 root sys $MANDIR/man8/reject.8 accept.8
-f 0444 root sys $MANDIR/man1/backend.1 man/backend.man
-f 0444 root sys $MANDIR/man1/classes.conf.5 man/classes.conf.man
-f 0444 root sys $MANDIR/man8/cups-lpd.8 man/cups-lpd.man
-f 0444 root sys $MANDIR/man8/cups-polld.8 man/cups-polld.man
-f 0444 root sys $MANDIR/man8/cupsd.8 man/cupsd.man
-f 0444 root sys $MANDIR/man5/cupsd.conf.5 man/cupsd.conf.man
-f 0444 root sys $MANDIR/man8/enable.8 man/enable.man
-l 0444 root sys $MANDIR/man8/disable.8 enable.8
-f 0444 root sys $MANDIR/man1/filter.1 man/filter.man
-f 0444 root sys $MANDIR/man8/lpadmin.8 man/lpadmin.man
-f 0444 root sys $MANDIR/man8/lpc.8 man/lpc.man
-f 0444 root sys $MANDIR/man8/lpinfo.8 man/lpinfo.man
-f 0444 root sys $MANDIR/man8/lpmove.8 man/lpmove.man
-f 0444 root sys $MANDIR/man1/lpoptions.1 man/lpoptions.man
-f 0444 root sys $MANDIR/man1/lppasswd.1 man/lppasswd.man
-f 0444 root sys $MANDIR/man1/lpq.1 man/lpq.man
-f 0444 root sys $MANDIR/man1/lprm.1 man/lprm.man
-f 0444 root sys $MANDIR/man1/lpr.1 man/lpr.man
-f 0444 root sys $MANDIR/man1/lpstat.1 man/lpstat.man
-f 0444 root sys $MANDIR/man1/lp.1 man/lp.man
-l 0444 root sys $MANDIR/man1/cancel.1 lp.1
-f 0444 root sys $MANDIR/man5/mime.convs.5 man/mime.convs.man
-f 0444 root sys $MANDIR/man5/mime.types.5 man/mime.types.man
-f 0444 root sys $MANDIR/man5/printers.conf.5 man/printers.conf.man
+f 0444 root sys $AMANDIR/cat$MAN8DIR/accept.$CAT8EXT man/accept.$CAT8EXT
+l 0444 root sys $AMANDIR/cat$MAN8DIR/reject.$CAT8EXT accept.$CAT8EXT
+f 0444 root sys $AMANDIR/cat$MAN8DIR/cups-lpd.$CAT8EXT man/cups-lpd.$CAT8EXT
+f 0444 root sys $AMANDIR/cat$MAN8DIR/cups-polld.$CAT8EXT man/cups-polld.$CAT8EXT
+f 0444 root sys $AMANDIR/cat$MAN8DIR/cupsd.$CAT8EXT man/cupsd.$CAT8EXT
+f 0444 root sys $AMANDIR/cat$MAN8DIR/enable.$CAT8EXT man/enable.$CAT8EXT
+l 0444 root sys $AMANDIR/cat$MAN8DIR/disable.$CAT8EXT enable.$CAT8EXT
+f 0444 root sys $AMANDIR/cat$MAN8DIR/lpadmin.$CAT8EXT man/lpadmin.$CAT8EXT
+f 0444 root sys $AMANDIR/cat$MAN8DIR/lpc.$CAT8EXT man/lpc.$CAT8EXT
+f 0444 root sys $AMANDIR/cat$MAN8DIR/lpinfo.$CAT8EXT man/lpinfo.$CAT8EXT
+f 0444 root sys $AMANDIR/cat$MAN8DIR/lpmove.$CAT8EXT man/lpmove.$CAT8EXT
+
+f 0444 root sys $MANDIR/man1/backend.$MAN1EXT man/backend.man
+f 0444 root sys $MANDIR/man1/filter.$MAN1EXT man/filter.man
+f 0444 root sys $MANDIR/man1/lpoptions.$MAN1EXT man/lpoptions.man
+f 0444 root sys $MANDIR/man1/lppasswd.$MAN1EXT man/lppasswd.man
+f 0444 root sys $MANDIR/man1/lpq.$MAN1EXT man/lpq.man
+f 0444 root sys $MANDIR/man1/lprm.$MAN1EXT man/lprm.man
+f 0444 root sys $MANDIR/man1/lpr.$MAN1EXT man/lpr.man
+f 0444 root sys $MANDIR/man1/lpstat.$MAN1EXT man/lpstat.man
+f 0444 root sys $MANDIR/man1/lp.$MAN1EXT man/lp.man
+l 0444 root sys $MANDIR/man1/cancel.$MAN1EXT lp.man
+
+f 0444 root sys $MANDIR/man5/classes.conf.$MAN5EXT man/classes.conf.man
+f 0444 root sys $MANDIR/man5/cupsd.conf.$MAN5EXT man/cupsd.conf.man
+f 0444 root sys $MANDIR/man5/mime.convs.$MAN5EXT man/mime.convs.man
+f 0444 root sys $MANDIR/man5/mime.types.$MAN5EXT man/mime.types.man
+f 0444 root sys $MANDIR/man5/printers.conf.$MAN5EXT man/printers.conf.man
+
+f 0444 root sys $AMANDIR/man$MAN8DIR/accept.$MAN8EXT man/accept.man
+l 0444 root sys $AMANDIR/man$MAN8DIR/reject.$MAN8EXT accept.man
+f 0444 root sys $AMANDIR/man$MAN8DIR/cups-lpd.$MAN8EXT man/cups-lpd.man
+f 0444 root sys $AMANDIR/man$MAN8DIR/cups-polld.$MAN8EXT man/cups-polld.man
+f 0444 root sys $AMANDIR/man$MAN8DIR/cupsd.$MAN8EXT man/cupsd.man
+f 0444 root sys $AMANDIR/man$MAN8DIR/enable.$MAN8EXT man/enable.man
+l 0444 root sys $AMANDIR/man$MAN8DIR/disable.$MAN8EXT enable.man
+f 0444 root sys $AMANDIR/man$MAN8DIR/lpadmin.$MAN8EXT man/lpadmin.man
+f 0444 root sys $AMANDIR/man$MAN8DIR/lpc.$MAN8EXT man/lpc.man
+f 0444 root sys $AMANDIR/man$MAN8DIR/lpinfo.$MAN8EXT man/lpinfo.man
+f 0444 root sys $AMANDIR/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.man
 
 # Startup script
 %system all
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list.in,v 1.1 2001/06/28 16:20:09 mike Exp $".
+# End of "$Id: cups.list.in,v 1.2 2001/06/29 19:14:55 mike Exp $".
 #
