@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.22 2000/06/26 15:12:53 mike Exp $"
+ * "$Id: lpstat.c,v 1.23 2000/06/28 16:49:30 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -1302,12 +1302,16 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
   int		match;		/* Non-zero if this job matches */
   char		printer_uri[HTTP_MAX_URI];
 				/* Printer URI */
+  const char	*root;		/* Server root directory... */
 
 
   DEBUG_printf(("show_printers(%08x, %08x)\n", http, dests));
 
   if (http == NULL)
     return;
+
+  if ((root = getenv("CUPS_SERVERROOT")) == NULL)
+    root = CUPS_SERVERROOT;
 
   if (strcmp(printers, "all") == 0)
     printers = NULL;
@@ -1551,7 +1555,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	  printf("\tConnection: %s\n",
 	         (ptype & CUPS_PRINTER_REMOTE) ? "remote" : "direct");
 	  if (!(ptype & CUPS_PRINTER_REMOTE))
-	    printf("\tInterface: " CUPS_SERVERROOT "/ppd/%s.ppd\n", printer);
+	    printf("\tInterface: %s/ppd/%s.ppd\n", root, printer);
 	  puts("\tOn fault: no alert");
 	  puts("\tAfter fault: continue");
 	  puts("\tUsers allowed:");
@@ -1597,7 +1601,8 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	    {
 	      printf("\tConnection: %s\n",
 	             (ptype & CUPS_PRINTER_REMOTE) ? "remote" : "direct");
-	      printf("\tInterface: " CUPS_SERVERROOT "/ppd/%s.ppd\n", printer);
+	      if (!(ptype & CUPS_PRINTER_REMOTE))
+		printf("\tInterface: %s/ppd/%s.ppd\n", root, printer);
 	      puts("\tOn fault: no alert");
 	      puts("\tAfter fault: continue");
 	      puts("\tUsers allowed:");
@@ -1638,5 +1643,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.22 2000/06/26 15:12:53 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.23 2000/06/28 16:49:30 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lppasswd.c,v 1.4 2000/05/01 19:50:27 mike Exp $"
+ * "$Id: lppasswd.c,v 1.5 2000/06/28 16:49:30 mike Exp $"
  *
  *   MD5 password program for the Common UNIX Printing System (CUPS).
  *
@@ -81,7 +81,25 @@ main(int  argc,			/* I - Number of command-line arguments */
 		groupline[17],	/* Group from line */
 		md5line[33],	/* MD5-sum from line */
 		md5new[33];	/* New MD5 sum */
+  const char	*root;		/* CUPS server root directory */
+  char		passwdmd5[1024],/* passwd.md5 file */
+		passwdold[1024];/* passwd.old file */
 
+
+ /*
+  * Find the server directory...
+  */
+
+  if ((root = getenv("CUPS_SERVERROOT")) != NULL)
+  {
+    snprintf(passwdmd5, sizeof(passwdmd5), "%s/passwd.md5", root);
+    snprintf(passwdold, sizeof(passwdold), "%s/passwd.old", root);
+  }
+  else
+  {
+    strcpy(passwdmd5, CUPS_SERVERROOT "/passwd.md5");
+    strcpy(passwdold, CUPS_SERVERROOT "/passwd.md5");
+  }
 
  /*
   * Find the default system group: "sys", "system", or "root"...
@@ -170,13 +188,13 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Try locking the password file...
   */
 
-  if (access(CUPS_SERVERROOT "/passwd.old", 0) == 0)
+  if (access(passwdold, 0) == 0)
   {
     fputs("lppasswd: Password file busy!\n", stderr);
     return (1);
   }
 
-  if (rename(CUPS_SERVERROOT "/passwd.md5", CUPS_SERVERROOT "/passwd.old"))
+  if (rename(passwdmd5, passwdold))
   {
     perror("lppasswd: Unable to rename password file");
     return (1);
@@ -186,17 +204,17 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Open the existing password file and create a new one...
   */
 
-  infile = fopen(CUPS_SERVERROOT "/passwd.old", "r");
+  infile = fopen(passwdold, "r");
   if (infile == NULL && op != ADD)
   {
     fputs("lppasswd: No password file to add to or delete from!\n", stderr);
     return (1);
   }
 
-  if ((outfile = fopen(CUPS_SERVERROOT "/passwd.md5", "w")) == NULL)
+  if ((outfile = fopen(passwdmd5, "w")) == NULL)
   {
     perror("lppasswd: Unable to create password file");
-    rename(CUPS_SERVERROOT "/passwd.old", CUPS_SERVERROOT "/passwd.md5");
+    rename(passwdold, passwdmd5);
     return (1);
   }
 
@@ -250,7 +268,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	fclose(infile);
 	fclose(outfile);
 
-	unlink(CUPS_SERVERROOT "/passwd.old");
+	unlink(passwdold);
 
 	return (0);
       }
@@ -266,7 +284,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	fclose(infile);
 	fclose(outfile);
 
-        rename(CUPS_SERVERROOT "/passwd.old", CUPS_SERVERROOT "/passwd.md5");
+        rename(passwdold, passwdmd5);
 
 	return (1);
       }
@@ -281,7 +299,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       fclose(infile);
       fclose(outfile);
 
-      rename(CUPS_SERVERROOT "/passwd.old", CUPS_SERVERROOT "/passwd.md5");
+      rename(passwdold, passwdmd5);
 
       return (0);
     }
@@ -297,7 +315,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       fclose(infile);
       fclose(outfile);
 
-      rename(CUPS_SERVERROOT "/passwd.old", CUPS_SERVERROOT "/passwd.md5");
+      rename(passwdold, passwdmd5);
 
       return (0);
     }
@@ -313,7 +331,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       fclose(infile);
       fclose(outfile);
 
-      rename(CUPS_SERVERROOT "/passwd.old", CUPS_SERVERROOT "/passwd.md5");
+      rename(passwdold, passwdmd5);
 
       return (1);
     }
@@ -348,7 +366,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       fclose(infile);
       fclose(outfile);
 
-      rename(CUPS_SERVERROOT "/passwd.old", CUPS_SERVERROOT "/passwd.md5");
+      rename(passwdold, passwdmd5);
 
       return (1);
     }
@@ -364,7 +382,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   fclose(infile);
   fclose(outfile);
 
-  unlink(CUPS_SERVERROOT "/passwd.old");
+  unlink(passwdold);
 
   return (0);
 }
@@ -393,5 +411,5 @@ usage(FILE *fp)		/* I - File to send usage to */
 
 
 /*
- * End of "$Id: lppasswd.c,v 1.4 2000/05/01 19:50:27 mike Exp $".
+ * End of "$Id: lppasswd.c,v 1.5 2000/06/28 16:49:30 mike Exp $".
  */
