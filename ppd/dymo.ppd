@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: dymo.ppd,v 1.3 2001/07/18 18:01:58 mike Exp $"
+*% "$Id: dymo.ppd,v 1.4 2001/07/18 18:18:30 mike Exp $"
 *%
 *%   Sample DYMO label printer driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -108,10 +108,10 @@
 *OpenUI *Darkness/Output Darkness: PickOne
 *OrderDependency: 20 AnySetup *Darkness
 *DefaultDarkness: Normal
-*Darkness Light: "<</cupsCompression 0>>setpagedevice>>"
-*Darkness Medium: "<</cupsCompression 1>>setpagedevice>>"
-*Darkness Normal: "<</cupsCompression 2>>setpagedevice>>"
-*Darkness Dark: "<</cupsCompression 3>>setpagedevice>>"
+*Darkness Light: "<</cupsCompression 0>>setpagedevice"
+*Darkness Medium: "<</cupsCompression 1>>setpagedevice"
+*Darkness Normal: "<</cupsCompression 2>>setpagedevice"
+*Darkness Dark: "<</cupsCompression 3>>setpagedevice"
 *CloseUI: *Darkness
 
 *DefaultFont: Courier
@@ -151,5 +151,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: dymo.ppd,v 1.3 2001/07/18 18:01:58 mike Exp $".
+*% End of "$Id: dymo.ppd,v 1.4 2001/07/18 18:18:30 mike Exp $".
 *%
