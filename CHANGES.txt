@@ -135,6 +135,8 @@ CHANGES IN CUPS v1.1.3
 	- Dropped option sub-group parsing code for the moment,
 	  since many Xerox PPD files abuse this feature in PPD
 	  files and don't follow the hierarchy rules.
+	- Added new wrapper code around options so that duplex
+	  options for some HP printers don't prevent prints.
 
 
 CHANGES IN CUPS v1.1.2

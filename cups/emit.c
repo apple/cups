@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.18 2000/08/03 13:22:35 mike Exp $"
+ * "$Id: emit.c,v 1.19 2000/09/18 16:16:09 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -157,6 +157,17 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
     if (section != PPD_ORDER_EXIT && section != PPD_ORDER_JCL)
     {
      /*
+      * Send wrapper commands to prevent printer errors for unsupported
+      * options...
+      */
+
+      if (fputs("[{\n", fp) < 0)
+      {
+        free(choices);
+        return (-1);
+      }
+
+     /*
       * Send DSC comments with option...
       */
 
@@ -210,6 +221,12 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
         free(choices);
         return (-1);
       }
+
+      if (fputs("} stopped cleartomark\n", fp) < 0)
+      {
+        free(choices);
+        return (-1);
+      }
     }
     else if (fputs(choices[i]->code, fp) < 0)
     {
@@ -244,6 +261,17 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
     if (section != PPD_ORDER_EXIT && section != PPD_ORDER_JCL)
     {
      /*
+      * Send wrapper commands to prevent printer errors for unsupported
+      * options...
+      */
+
+      if (write(fd, "[{\n", 3) < 1)
+      {
+        free(choices);
+        return (-1);
+      }
+
+     /*
       * Send DSC comments with option...
       */
 
@@ -263,6 +291,12 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
       }
 
       if (write(fd, "%%EndFeature\n", 13) < 1)
+      {
+        free(choices);
+        return (-1);
+      }
+
+      if (write(fd, "} stopped cleartomark\n", 22) < 1)
       {
         free(choices);
         return (-1);
@@ -297,5 +331,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c,v 1.18 2000/08/03 13:22:35 mike Exp $".
+ * End of "$Id: emit.c,v 1.19 2000/09/18 16:16:09 mike Exp $".
  */
