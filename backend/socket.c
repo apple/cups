@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.33 2003/01/23 16:26:37 mike Exp $"
+ * "$Id: socket.c,v 1.34 2003/01/29 14:44:46 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -52,6 +52,13 @@
 #  include <arpa/inet.h>
 #  include <netdb.h>
 #endif /* WIN32 */
+
+
+/*
+ * Local functions...
+ */
+
+void	print_backchannel(const unsigned char *buffer, size_t nbytes);
 
 
 /*
@@ -293,8 +300,11 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	*/
 
 	if ((nbytes = recv(fd, buffer, sizeof(buffer), 0)) > 0)
+	{
 	  fprintf(stderr, "INFO: Received %lu bytes of back-channel data!\n",
 	          (unsigned long)nbytes);
+          print_backchannel((unsigned char *)buffer, nbytes);
+        }
       }
       else if (argc > 6)
 	fprintf(stderr, "INFO: Sending print file, %lu bytes...\n",
@@ -333,9 +343,12 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	*/
 
 	if ((nbytes = recv(fd, buffer, sizeof(buffer), 0)) > 0)
+	{
 	  fprintf(stderr, "INFO: Received %lu bytes of back-channel data!\n",
 	          (unsigned long)nbytes);
-        else
+          print_backchannel((unsigned char *)buffer, nbytes);
+        }
+	else
 	  break;
       }
       else
@@ -363,5 +376,43 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.33 2003/01/23 16:26:37 mike Exp $".
+ * 'print_backchannel()' - Print the contents of a back-channel buffer.
+ */
+
+void
+print_backchannel(const unsigned char *buffer,	/* I - Data buffer */
+                  size_t              nbytes)	/* I - Number of bytes */
+{
+  char	line[255],				/* Formatted line */
+	*lineptr;				/* Pointer into line */
+
+
+  for (lineptr = line; nbytes > 0; buffer ++, nbytes --)
+  {
+    if (*buffer < 0x20 || *buffer >= 0x7f)
+    {
+      snprintf(lineptr, sizeof(line) - (lineptr - line), "<%02X>", *buffer);
+      lineptr += strlen(lineptr);
+    }
+    else
+      *lineptr++ = *buffer;
+
+    if ((lineptr - line) > 72)
+    {
+      *lineptr = '\0';
+      fprintf(stderr, "DEBUG: DATA: %s\n", line);
+      lineptr = line;
+    }
+  }
+
+  if (lineptr > line)
+  {
+    *lineptr = '\0';
+    fprintf(stderr, "DEBUG: DATA: %s\n", line);
+  }
+}
+
+
+/*
+ * End of "$Id: socket.c,v 1.34 2003/01/29 14:44:46 mike Exp $".
  */
