@@ -1,5 +1,5 @@
 /*
- * "$Id: image-tiff.c,v 1.14 2000/07/17 20:28:52 mike Exp $"
+ * "$Id: image-tiff.c,v 1.15 2000/07/18 19:45:52 mike Exp $"
  *
  *   TIFF file routines for the Common UNIX Printing System (CUPS).
  *
@@ -54,6 +54,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
   TIFF		*tif;			/* TIFF file */
   uint32	width, height;		/* Size of image */
   uint16	photometric,		/* Colorspace */
+		compression,		/* Type of compression */
 		orientation,		/* Orientation */
 		resunit,		/* Units for resolution */
 		samples,		/* Number of samples/pixel */
@@ -101,6 +102,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
   if (!TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &width) ||
       !TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &height) ||
       !TIFFGetField(tif, TIFFTAG_PHOTOMETRIC, &photometric) ||
+      !TIFFGetField(tif, TIFFTAG_COMPRESSION, &compression) ||
       !TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &samples) ||
       !TIFFGetField(tif, TIFFTAG_BITSPERSAMPLE, &bits))
   {
@@ -246,19 +248,22 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
   * each which must be handled separately...
   */
 
+  fprintf(stderr, "DEBUG: photometric = %d\n", photometric);
+  fprintf(stderr, "DEBUG: compression = %d\n", compression);
+
   switch (photometric)
   {
     case PHOTOMETRIC_MINISWHITE :
     case PHOTOMETRIC_MINISBLACK :
-        if (photometric == PHOTOMETRIC_MINISBLACK)
-        {
-          zero = 0;
-          one  = 255;
-        }
-        else
+        if (photometric == PHOTOMETRIC_MINISWHITE)
         {
           zero = 255;
           one  = 0;
+        }
+        else
+        {
+          zero = 0;
+          one  = 255;
         }
 
         if (orientation < ORIENTATION_LEFTTOP)
@@ -1622,5 +1627,5 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-tiff.c,v 1.14 2000/07/17 20:28:52 mike Exp $".
+ * End of "$Id: image-tiff.c,v 1.15 2000/07/18 19:45:52 mike Exp $".
  */

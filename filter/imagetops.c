@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.25 2000/06/27 19:01:58 mike Exp $"
+ * "$Id: imagetops.c,v 1.26 2000/07/18 19:45:52 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -73,6 +73,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 		ysize,
 		xsize2,
 		ysize2;
+  float		aspect;		/* Aspect ratio */
   int		xpages,		/* # x pages */
 		ypages,		/* # y pages */
 		xpage,		/* Current x page */
@@ -93,7 +94,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   float		g;		/* Gamma correction value */
   float		b;		/* Brightness factor */
   float		zoom;		/* Zoom facter */
-  int		ppi;		/* Pixels-per-inch */
+  int		xppi, yppi;	/* Pixels-per-inch */
   int		hue, sat;	/* Hue and saturation adjustment */
   int		realcopies;	/* Real copies being printed */
   float		left, top;	/* Left and top of image */
@@ -110,7 +111,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   */
 
   zoom = 0.0;
-  ppi  = 0;
+  xppi = 0;
+  yppi = 0;
   hue  = 0;
   sat  = 100;
   g    = 1.0;
@@ -151,7 +153,8 @@ main(int  argc,		/* I - Number of command-line arguments */
     zoom = atoi(val) * 0.01;
 
   if ((val = cupsGetOption("ppi", num_options, options)) != NULL)
-    ppi = atoi(val);
+    if (sscanf(val, "%dx%d", &xppi, &yppi) < 2)
+      yppi = xppi;
 
   if ((val = cupsGetOption("position", num_options, options)) != NULL)
   {
@@ -227,20 +230,26 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Scale as necessary...
   */
 
-  if (zoom == 0.0 && ppi == 0)
-    ppi = img->xppi;
-
   xprint = (PageRight - PageLeft) / 72.0;
   yprint = (PageTop - PageBottom) / 72.0;
 
-  if (ppi > 0)
+  if (zoom == 0.0 && xppi == 0)
+  {
+    xppi = img->xppi;
+    yppi = img->yppi;
+  }
+
+  if (yppi == 0)
+    yppi = xppi;
+
+  if (xppi > 0)
   {
    /*
     * Scale the image as neccesary to match the desired pixels-per-inch.
     */
     
-    xinches = (float)img->xsize / (float)ppi;
-    yinches = (float)img->ysize / (float)ppi;
+    xinches = (float)img->xsize / (float)xppi;
+    yinches = (float)img->ysize / (float)yppi;
 
    /*
     * Rotate the image if it will fit landscape but not portrait...
@@ -275,23 +284,31 @@ main(int  argc,		/* I - Number of command-line arguments */
     * Scale percentage of page size...
     */
 
+    aspect = (float)img->yppi / (float)img->xppi;
+
+    fprintf(stderr, "DEBUG: img->xppi = %d, img->yppi = %d, aspect = %f\n",
+            img->xppi, img->yppi, aspect);
+
     xsize = xprint * zoom;
-    ysize = xsize * img->ysize / img->xsize;
+    ysize = xsize * img->ysize / img->xsize / aspect;
 
     if (ysize > (yprint * zoom))
     {
       ysize = yprint * zoom;
-      xsize = ysize * img->xsize / img->ysize;
+      xsize = ysize * img->xsize * aspect / img->ysize;
     }
 
     xsize2 = yprint * zoom;
-    ysize2 = xsize2 * img->ysize / img->xsize;
+    ysize2 = xsize2 * img->ysize / img->xsize / aspect;
 
     if (ysize2 > (xprint * zoom))
     {
       ysize2 = xprint * zoom;
-      xsize2 = ysize2 * img->xsize / img->ysize;
+      xsize2 = ysize2 * img->xsize * aspect / img->ysize;
     }
+
+    fprintf(stderr, "DEBUG: xsize = %.0f, ysize = %.0f\n", xsize, ysize);
+    fprintf(stderr, "DEBUG: xsize2 = %.0f, ysize2 = %.0f\n", xsize2, ysize2);
 
    /*
     * Choose the rotation with the largest area, but prefer
@@ -639,5 +656,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.25 2000/06/27 19:01:58 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.26 2000/07/18 19:45:52 mike Exp $".
  */
