@@ -1,5 +1,5 @@
 /*
- * "$Id: policy.h,v 1.1.2.6 2004/06/29 13:15:11 mike Exp $"
+ * "$Id: policy.h,v 1.1.2.7 2004/06/30 05:15:52 mike Exp $"
  *
  *   Policy definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -28,16 +28,15 @@
  */
 
 #define IPP_ANY_OPERATION	(ipp_op_t)0
+#define IPP_BAD_OPERATION	(ipp_op_t)-1
 
 
 /*
  * Access levels...
  */
 
-#define POLICY_LEVEL_ANON	0	/* Anonymous access */
-#define POLICY_LEVEL_NONE	1	/* Do not support operation */
-#define POLICY_LEVEL_USER	2	/* Must have a valid username/password */
-#define POLICY_LEVEL_GROUP	3	/* Must also be in a named group */
+#define POLICY_ALLOW		0	/* Allow access */
+#define POLICY_DENY		1	/* Deny access */
 
 
 /*
@@ -46,18 +45,24 @@
 
 typedef struct
 {
+  int		allow_deny;		/* POLICY_ALLOW or POLICY_DENY */
+  char		*name;			/* Name to allow or deny */
+} policyname_t;
+
+typedef struct
+{
   ipp_op_t	op;			/* Operation */
-  int		level,			/* Authentication level required */
+  int		order_type,		/* Default allow/deny */
+		authenticate,		/* Authentication required? */
 		num_names;		/* Number of names */
-  char		**names;		/* Names */
+  policyname_t	*names;			/* Names */
 } policyop_t;
 
 typedef struct
 {
   char		*name;			/* Policy name */
-  int		default_result;		/* Default policy result */
   int		num_ops;		/* Number of operations */
-  policyop_t	*ops;			/* Operations */
+  policyop_t	**ops;			/* Operations */
 } policy_t;
 
 
@@ -67,7 +72,7 @@ typedef struct
 
 VAR int			NumPolicies	VALUE(0);
 					/* Number of policies */
-VAR policy_t		*Policies	VALUE(NULL);
+VAR policy_t		**Policies	VALUE(NULL);
 					/* Policies */
 
 
@@ -76,15 +81,17 @@ VAR policy_t		*Policies	VALUE(NULL);
  */
 
 extern policy_t		*AddPolicy(const char *policy);
-extern policyop_t	*AddPolicyOp(policy_t *p, ipp_op_t op);
-extern void		AddPolicyOpName(policyop_t *po, const char *name);
+extern policyop_t	*AddPolicyOp(policy_t *p, policyop_t *po, ipp_op_t op);
+extern void		AddPolicyOpName(policyop_t *po, int allow_deny,
+			                const char *name);
 extern int		CheckPolicy(policy_t *p, ipp_op_t op,
-			            const char *name, const char *owner);
+			            const char *name, int authenticated,
+				    const char *owner);
 extern void		DeleteAllPolicies(void);
 extern policy_t		*FindPolicy(const char *policy);
 extern policyop_t	*FindPolicyOp(policy_t *p, ipp_op_t op);
 
 
 /*
- * End of "$Id: policy.h,v 1.1.2.6 2004/06/29 13:15:11 mike Exp $".
+ * End of "$Id: policy.h,v 1.1.2.7 2004/06/30 05:15:52 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.55 2004/06/29 18:54:17 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.56 2004/06/30 05:15:51 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,9 +23,10 @@
  *
  * Contents:
  *
- *   ReadConfiguration()  - Read the cupsd.conf file.
+ *   ReadConfiguration:  - Read the cupsd.conf file.
  *   read_configuration() - Read a configuration file.
  *   read_location()      - Read a <Location path> definition.
+ *   read_policy()        - Read a <Policy name> definition.
  *   get_address()        - Get an address + port number from a line.
  *   get_addr_and_mask()  - Get an IP address and netmask.
  *   CDSAGetServerCerts() - Convert a keychain name into the CFArrayRef
@@ -173,14 +174,16 @@ static CFArrayRef CDSAGetServerCerts();
 
 static int	read_configuration(cups_file_t *fp);
 static int	read_location(cups_file_t *fp, char *name, int linenum);
+static int	read_policy(cups_file_t *fp, char *name, int linenum);
 static int	get_address(const char *value, unsigned defaddress, int defport,
 		            int deffamily, http_addr_t *address);
 static int	get_addr_and_mask(const char *value, unsigned *ip,
 		                  unsigned *mask);
+static ipp_op_t	get_operation(const char *name);
 
 
 /*
- * 'ReadConfiguration()' - Read the cupsd.conf file.
+ * 'ReadConfiguration:' - Read the cupsd.conf file.
  */
 
 int					/* O - 1 on success, 0 otherwise */
@@ -868,7 +871,28 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       }
       else
       {
-        LogMessage(L_ERROR, "ReadConfiguration() Syntax error on line %d.",
+        LogMessage(L_ERROR, "ReadConfiguration: Syntax error on line %d.",
+	           linenum);
+        return (0);
+      }
+    }
+    else if (!strcasecmp(name, "<Policy"))
+    {
+     /*
+      * <Policy name>
+      */
+
+      if (line[len - 1] == '>')
+      {
+        line[len - 1] = '\0';
+
+	linenum = read_policy(fp, value, linenum);
+	if (linenum == 0)
+	  return (0);
+      }
+      else
+      {
+        LogMessage(L_ERROR, "ReadConfiguration: Syntax error on line %d.",
 	           linenum);
         return (0);
       }
@@ -1404,7 +1428,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	if (p != NULL)
 	  User = p->pw_uid;
 	else
-	  LogMessage(L_WARN, "ReadConfiguration() Unknown username \"%s\"",
+	  LogMessage(L_WARN, "ReadConfiguration: Unknown username \"%s\"",
 	             value);
       }
     }
@@ -1426,7 +1450,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	if (g != NULL)
 	  Group = g->gr_gid;
 	else
-	  LogMessage(L_WARN, "ReadConfiguration() Unknown groupname \"%s\"",
+	  LogMessage(L_WARN, "ReadConfiguration: Unknown groupname \"%s\"",
 	             value);
       }
     }
@@ -1492,7 +1516,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       else if (strcasecmp(value, "double") == 0)
         HostNameLookups = 2;
       else
-	LogMessage(L_WARN, "ReadConfiguration() Unknown HostNameLookups %s on line %d.",
+	LogMessage(L_WARN, "ReadConfiguration: Unknown HostNameLookups %s on line %d.",
 	           value, linenum);
     }
     else if (strcasecmp(name, "LogLevel") == 0)
@@ -1535,7 +1559,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       else if (strcasecmp(value, "solaris") == 0)
         PrintcapFormat = PRINTCAP_SOLARIS;
       else
-	LogMessage(L_WARN, "ReadConfiguration() Unknown PrintcapFormat %s on line %d.",
+	LogMessage(L_WARN, "ReadConfiguration: Unknown PrintcapFormat %s on line %d.",
 	           value, linenum);
     }
     else
@@ -1943,9 +1967,7 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
       *     Require user names
       */
 
-      for (valptr = value;
-	   !isspace(*valptr & 255) && *valptr != '>' && *valptr;
-	   valptr ++);
+      for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
 
       if (*valptr)
 	*valptr++ = '\0';
@@ -1968,7 +1990,27 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 
       for (value = valptr; *value;)
       {
-        for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+        while (isspace(*value & 255))
+	  value ++;
+
+        if (*value == '\"' || *value == '\'')
+	{
+	 /*
+	  * Grab quoted name...
+	  */
+
+          for (valptr = value + 1; *valptr != *value && *valptr; valptr ++);
+
+	  value ++;
+	}
+	else
+	{
+	 /*
+	  * Grab literal name.
+	  */
+
+          for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+        }
 
 	if (*valptr)
 	  *valptr++ = '\0';
@@ -1992,6 +2034,252 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
       LogMessage(L_ERROR, "Unknown Location directive %s on line %d.",
 	         name, linenum);
   }
+
+  LogMessage(L_ERROR, "Unexpected end-of-file at line %d while reading location!",
+             linenum);
+
+  return (0);
+}
+
+
+/*
+ * 'read_policy()' - Read a <Policy name> definition.
+ */
+
+static int				/* O - New line number or 0 on error */
+read_policy(cups_file_t *fp,		/* I - Configuration file */
+            char        *policy,	/* I - Location name/path */
+	    int         linenum)	/* I - Current line number */
+{
+  int		i;			/* Looping var */
+  policy_t	*pol;			/* Policy */
+  policyop_t	*op;			/* Policy operation */
+  int		num_ops;		/* Number of IPP operations */
+  ipp_op_t	ops[100];		/* Operations */
+  int		len;			/* Length of line */
+  char		line[HTTP_MAX_BUFFER],	/* Line buffer */
+		name[256],		/* Configuration directive */
+		*nameptr,		/* Pointer into name */
+		*value,			/* Value for directive */
+		*valptr;		/* Pointer into value */
+
+
+ /*
+  * Create the policy...
+  */
+
+  if ((pol = AddPolicy(policy)) == NULL)
+    return (0);
+
+ /*
+  * Read from the file...
+  */
+
+  op      = NULL;
+  num_ops = 0;
+
+  while (cupsFileGets(fp, line, sizeof(line)) != NULL)
+  {
+    linenum ++;
+
+   /*
+    * Skip comment lines...
+    */
+
+    if (line[0] == '#')
+      continue;
+
+   /*
+    * Strip trailing whitespace, if any...
+    */
+
+    len = strlen(line);
+
+    while (len > 0 && isspace(line[len - 1] & 255))
+    {
+      len --;
+      line[len] = '\0';
+    }
+
+   /*
+    * Extract the name from the beginning of the line...
+    */
+
+    for (value = line; isspace(*value & 255); value ++);
+
+    for (nameptr = name; *value != '\0' && !isspace(*value & 255) &&
+                             nameptr < (name + sizeof(name) - 1);)
+      *nameptr++ = *value++;
+    *nameptr = '\0';
+
+    while (isspace(*value & 255))
+      value ++;
+
+    if (name[0] == '\0')
+      continue;
+
+   /*
+    * Decode the directive...
+    */
+
+    if (!strcasecmp(name, "</Policy>"))
+    {
+      if (op)
+        LogMessage(L_WARN, "Missing </Limit> before </Policy> on line %d!",
+	           linenum);
+
+      return (linenum);
+    }
+    else if (!strncasecmp(name, "<Limit ", 7) && !op)
+    {
+     /*
+      * Scan for IPP operation names...
+      */
+
+      num_ops = 0;
+
+      while (*value)
+      {
+        for (valptr = value;
+	     !isspace(*valptr & 255) && *valptr != '>' && *valptr;
+	     valptr ++);
+
+	if (*valptr)
+	  *valptr++ = '\0';
+
+        if (num_ops < (int)(sizeof(ops) / sizeof(ops[0])))
+	{
+	  if ((ops[num_ops] = get_operation(value)) == IPP_BAD_OPERATION)
+	    LogMessage(L_ERROR, "Bad IPP operation name \"%s\" on line %d!",
+	               value, linenum);
+          else
+	    num_ops ++;
+	}
+	else
+	  LogMessage(L_ERROR, "Too many operations listed on line %d!",
+	             linenum);
+
+        for (value = valptr; isspace(*value & 255) || *value == '>'; value ++);
+      }
+
+     /*
+      * If none are specified, apply the policy to all operations...
+      */
+
+      if (num_ops == 0)
+      {
+        ops[0]  = IPP_ANY_OPERATION;
+	num_ops = 1;
+      }
+
+     /*
+      * Add a new policy for the first operation...
+      */
+
+      op = AddPolicyOp(pol, NULL, ops[0]);
+    }
+    else if (!strcasecmp(name, "</Limit>") && op)
+    {
+     /*
+      * Finish the current operation limit...
+      */
+
+      if (num_ops > 1)
+      {
+       /*
+        * Copy the policy to the other operations...
+	*/
+
+        for (i = 1; i < num_ops; i ++)
+	  AddPolicyOp(pol, op, ops[i]);
+      }
+
+      op = NULL;
+    }
+    else if (!strcasecmp(name, "Authenticate") && op)
+    {
+     /*
+      * Authenticate boolean
+      */
+
+      if (!strcasecmp(value, "on") ||
+          !strcasecmp(value, "yes") ||
+          !strcasecmp(value, "true"))
+	op->authenticate = 1;
+      else if (!strcasecmp(value, "off") ||
+               !strcasecmp(value, "no") ||
+               !strcasecmp(value, "false"))
+	op->authenticate = 0;
+      else
+        LogMessage(L_ERROR, "Invalid Authenticate value \"%s\" on line %d!\n",
+	           value, linenum);
+    }
+    else if (!strcasecmp(name, "Order") && op)
+    {
+     /*
+      * "Order Deny,Allow" or "Order Allow,Deny"...
+      */
+
+      if (!strncasecmp(value, "deny", 4))
+        op->order_type = AUTH_ALLOW;
+      else if (!strncasecmp(value, "allow", 5))
+        op->order_type = AUTH_DENY;
+      else
+        LogMessage(L_ERROR, "Unknown Order value %s on line %d.",
+	           value, linenum);
+    }
+    else if ((!strcasecmp(name, "Allow") || !strcasecmp(name, "Deny")) && op)
+    {
+     /*
+      * Allow name, @group, @OWNER
+      * Deny name, @group, @OWNER
+      */
+
+      for (value = valptr; *value;)
+      {
+        while (isspace(*value & 255))
+	  value ++;
+
+        if (*value == '\"' || *value == '\'')
+	{
+	 /*
+	  * Grab quoted name...
+	  */
+
+          for (valptr = value + 1; *valptr != *value && *valptr; valptr ++);
+
+	  value ++;
+	}
+	else
+	{
+	 /*
+	  * Grab literal name.
+	  */
+
+          for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+        }
+
+	if (*valptr)
+	  *valptr++ = '\0';
+
+        if (!strcasecmp(name, "Allow"))
+          AddPolicyOpName(op, POLICY_ALLOW, value);
+	else
+          AddPolicyOpName(op, POLICY_DENY, value);
+
+        for (value = valptr; isspace(*value & 255); value ++);
+      }
+    }
+    else if (op)
+      LogMessage(L_ERROR, "Unknown Policy Limit directive %s on line %d.",
+	         name, linenum);
+    else
+      LogMessage(L_ERROR, "Unknown Policy directive %s on line %d.",
+	         name, linenum);
+  }
+
+  LogMessage(L_ERROR, "Unexpected end-of-file at line %d while reading policy \"%s\"!",
+             linenum, policy);
 
   return (0);
 }
@@ -2277,6 +2565,69 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 }
 
 
+/*
+ * 'get_operation()' - Get an IPP opcode from an operation name...
+ */
+
+static ipp_op_t				/* O - Operation code or -1 on error */
+get_operation(const char *name)		/* I - Operating name */
+{
+  int		i;			/* Looping var */
+  static const char * const ipp_ops[] =	/* List of standard operations */
+		{
+		  "all",
+		  "",
+		  "print-job",
+		  "print-uri",
+		  "validate-job",
+		  "create-job",
+		  "send-document",
+		  "send-uri",
+		  "cancel-job",
+		  "get-job-attributes",
+		  "get-jobs",
+		  "get-printer-attributes",
+		  "hold-job",
+		  "release-job",
+		  "restart-job",
+		  "",
+		  "pause-printer",
+		  "resume-printer",
+		  "purge-jobs",
+		  "set-printer-attributes",
+		  "set-job-attributes",
+		  "get-printer-supported-values"
+		},
+		*cups_ops[] =		/* List of CUPS operations */
+		{
+		  "cups-get-default",
+		  "cups-get-printers",
+		  "cups-add-printer",
+		  "cups-delete-printer",
+		  "cups-get-classes",
+		  "cups-add-class",
+		  "cups-delete-class",
+		  "cups-accept-jobs",
+		  "cups-reject-jobs",
+		  "cups-set-default",
+		  "cups-get-devices",
+		  "cups-get-ppds",
+		  "cups-move-job"
+		};
+
+
+  for (i = 0; i < (int)(sizeof(ipp_ops) / sizeof(ipp_ops[0])); i ++)
+    if (!strcasecmp(name, ipp_ops[i]))
+      return ((ipp_op_t)i);
+
+  for (i = 0; i < (int)(sizeof(cups_ops) / sizeof(cups_ops[0])); i ++)
+    if (!strcasecmp(name, cups_ops[i]))
+      return ((ipp_op_t)(i + 0x4001));
+
+  return ((ipp_op_t)-1);
+}
+
+
 #ifdef HAVE_CDSASSL
 /*
  * 'CDSAGetServerCerts()' - Convert a keychain name into the CFArrayRef
@@ -2367,5 +2718,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.55 2004/06/29 18:54:17 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.56 2004/06/30 05:15:51 mike Exp $".
  */
