@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.22.2.23 2003/04/10 21:02:07 mike Exp $"
+ * "$Id: admin.c,v 1.22.2.24 2003/04/11 02:13:41 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -917,7 +917,6 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
   ppd_group_t	*group;			/* Option group */
   ppd_option_t	*option;		/* Option */
   ppd_attr_t	*protocol;		/* cupsProtocol attribute */
-  ppd_attr_t	*protocols;		/* Protocols attribute */
 
 
  /*
@@ -1159,8 +1158,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     * Binary protocol support...
     */
 
-    if ((protocols = ppdFindAttr(ppd, "Protocols", NULL)) != NULL &&
-        protocols->value && strstr(protocols->value, "BCP"))
+    if (ppd->protocols && strstr(ppd->protocols, "BCP"))
     {
       protocol = ppdFindAttr(ppd, "cupsProtocol", NULL);
 
@@ -1173,7 +1171,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
       cgiSetArray("CHOICES", 0, "None");
       cgiSetArray("TEXT", 0, "None");
 
-      if (strstr(protocols->value, "TBCP"))
+      if (strstr(ppd->protocols, "TBCP"))
       {
 	cgiSetArray("CHOICES", 1, "TBCP");
 	cgiSetArray("TEXT", 1, "TBCP");
@@ -1594,5 +1592,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.22.2.23 2003/04/10 21:02:07 mike Exp $".
+ * End of "$Id: admin.c,v 1.22.2.24 2003/04/11 02:13:41 mike Exp $".
  */
