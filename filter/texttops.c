@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.23 2000/02/27 16:01:31 mike Exp $"
+ * "$Id: texttops.c,v 1.24 2000/03/09 19:47:27 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -926,7 +926,6 @@ write_string(int     col,	/* I - Start column */
              lchar_t *s)	/* I - String to print */
 {
   int		ch;		/* Current character */
-  int		font;		/* Font for character */
   float		x, y;		/* Position of text */
   unsigned	attr;		/* Character attributes */
 
@@ -1128,5 +1127,5 @@ write_text(char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c,v 1.23 2000/02/27 16:01:31 mike Exp $".
+ * End of "$Id: texttops.c,v 1.24 2000/03/09 19:47:27 mike Exp $".
  */

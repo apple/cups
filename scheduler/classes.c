@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.16 2000/01/27 03:38:34 mike Exp $"
+ * "$Id: classes.c,v 1.17 2000/03/09 19:47:32 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -284,14 +284,12 @@ void
 LoadAllClasses(void)
 {
   FILE		*fp;			/* classes.conf file */
-  int		i;			/* Looping var */
   int		linenum;		/* Current line number */
   int		len;			/* Length of line */
   char		line[HTTP_MAX_BUFFER],	/* Line from file */
 		name[256],		/* Parameter name */
 		*nameptr,		/* Pointer into name */
-		*value,			/* Pointer to value */
-		*lineptr;		/* Pointer in line */
+		*value;			/* Pointer to value */
   printer_t	*p,			/* Current printer class */
 		*temp;			/* Temporary pointer to printer */
 
@@ -540,5 +538,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.16 2000/01/27 03:38:34 mike Exp $".
+ * End of "$Id: classes.c,v 1.17 2000/03/09 19:47:32 mike Exp $".
  */

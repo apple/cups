@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.13 2000/02/24 21:01:38 mike Exp $"
+ * "$Id: serial.c,v 1.14 2000/03/09 19:47:20 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -86,7 +86,6 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   FILE		*fp;		/* Print file */
   int		copies;		/* Number of copies to print */
   int		fd;		/* Parallel device */
-  int		error;		/* Error code (if any) */
   size_t	nbytes,		/* Number of bytes written */
 		tbytes;		/* Total number of bytes written */
   char		buffer[8192];	/* Output buffer */
@@ -397,11 +396,11 @@ list_devices(void)
 	if (inv->inv_unit == 0)
           i = 1;
 	else
-          i = 41 + 4 * inv->inv_controller;
+          i = 41 + 4 * (int)inv->inv_controller;
 
-	for (n = 0; n < inv->inv_state; n ++)
+	for (n = 0; n < (int)inv->inv_state; n ++)
 	  printf("serial serial:/dev/ttyd%d?baud=19200 \"Unknown\" \"EPC Serial Port %d, Ebus slot %d\"\n",
-        	 n + i, n + 1, inv->inv_controller);
+        	 n + i, n + 1, (int)inv->inv_controller);
       }
       else if (inv->inv_state > 1)
       {
@@ -409,9 +408,9 @@ list_devices(void)
         * Standard serial port under IRIX 6.4 and earlier...
         */
 
-	for (n = 0; n < inv->inv_state; n ++)
+	for (n = 0; n < (int)inv->inv_state; n ++)
 	  printf("serial serial:/dev/ttyd%d?baud=19200 \"Unknown\" \"Onboard Serial Port %d\"\n",
-        	 n + inv->inv_unit + 1, n + inv->inv_unit + 1);
+        	 n + (int)inv->inv_unit + 1, n + (int)inv->inv_unit + 1);
       }
       else
       {
@@ -420,7 +419,7 @@ list_devices(void)
         */
 
 	printf("serial serial:/dev/ttyd%d?baud=115200 \"Unknown\" \"Onboard Serial Port %d\"\n",
-               inv->inv_controller, inv->inv_controller);
+               (int)inv->inv_controller, (int)inv->inv_controller);
       }
     }
   }
@@ -653,5 +652,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.13 2000/02/24 21:01:38 mike Exp $".
+ * End of "$Id: serial.c,v 1.14 2000/03/09 19:47:20 mike Exp $".
  */

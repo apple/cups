@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.6 2000/03/02 18:36:29 mike Exp $"
+ * "$Id: dest.c,v 1.7 2000/03/09 19:47:23 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -39,6 +39,7 @@
 #include "cups.h"
 #include "string.h"
 #include <stdlib.h>
+#include <ctype.h>
 
 
 /*
@@ -467,5 +468,5 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
 
 
 /*
- * End of "$Id: dest.c,v 1.6 2000/03/02 18:36:29 mike Exp $".
+ * End of "$Id: dest.c,v 1.7 2000/03/09 19:47:23 mike Exp $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.18 2000/02/29 14:47:27 mike Exp $"
+# "$Id: Makefile,v 1.19 2000/03/09 19:47:20 mike Exp $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -41,7 +41,7 @@ all:	$(TARGETS)
 #
 
 clean:
-	rm -f $(OBJS) $(TARGETS)
+	$(RM) $(OBJS) $(TARGETS)
 
 
 #
@@ -135,5 +135,5 @@ usb.o:	../cups/cups.h ../Makedefs
 
 
 #
-# End of "$Id: Makefile,v 1.18 2000/02/29 14:47:27 mike Exp $".
+# End of "$Id: Makefile,v 1.19 2000/03/09 19:47:20 mike Exp $".
 #

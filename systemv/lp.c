@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.19 2000/03/01 21:55:50 mike Exp $"
+ * "$Id: lp.c,v 1.20 2000/03/09 19:47:34 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -81,9 +81,9 @@ main(int  argc,		/* I - Number of command-line arguments */
   char		buffer[8192];	/* Copy buffer */
   FILE		*temp;		/* Temporary file pointer */
   char		server[1024];	/* Server name */
-#ifdef HAVE_SIGACTION
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;	/* Signal action */
-#endif /* HAVE_SIGACTION */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET*/
 
 
   silent      = 0;
@@ -377,5 +377,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.19 2000/03/01 21:55:50 mike Exp $".
+ * End of "$Id: lp.c,v 1.20 2000/03/09 19:47:34 mike Exp $".
  */

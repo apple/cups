@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.13 2000/02/08 20:38:40 mike Exp $"
+# "$Id: Makefile,v 1.14 2000/03/09 19:47:18 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -38,7 +38,7 @@ DIRS	=	cups backend berkeley cgi-bin filter man pstoraster \
 all:
 	for dir in $(DIRS); do\
 		echo Making all in $$dir... ;\
-		(cd $$dir; $(MAKE)) || break;\
+		(cd $$dir; $(MAKE) -$(MAKEFLAGS)) || break;\
 	done
 
 #
@@ -48,7 +48,7 @@ all:
 clean:
 	for dir in $(DIRS); do\
 		echo Cleaning in $$dir... ;\
-		(cd $$dir; $(MAKE) clean) || break;\
+		(cd $$dir; $(MAKE) -$(MAKEFLAGS) clean) || break;\
 	done
 
 #
@@ -58,20 +58,20 @@ clean:
 install:
 	for dir in $(DIRS); do\
 		echo Installing in $$dir... ;\
-		(cd $$dir; $(MAKE) install) || break;\
+		(cd $$dir; $(MAKE) -$(MAKEFLAGS) install) || break;\
 	done
 	echo Installing in conf...
-	(cd conf; $(MAKE) install)
+	(cd conf; $(MAKE) -$(MAKEFLAGS) install)
 	echo Installing in data...
-	(cd data; $(MAKE) install)
+	(cd data; $(MAKE) -$(MAKEFLAGS) install)
 	echo Installing in doc...
-	(cd doc; $(MAKE) install)
+	(cd doc; $(MAKE) -$(MAKEFLAGS) install)
 	echo Installing in fonts...
-	(cd fonts; $(MAKE) install)
+	(cd fonts; $(MAKE) -$(MAKEFLAGS) install)
 	echo Installing in ppd...
-	(cd ppd; $(MAKE) install)
+	(cd ppd; $(MAKE) -$(MAKEFLAGS) install)
 	echo Installing in templates...
-	(cd templates; $(MAKE) install)
+	(cd templates; $(MAKE) -$(MAKEFLAGS) install)
 
 #
 # Make a software distribution...
@@ -90,5 +90,5 @@ tardist:
 	epm -v -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.13 2000/02/08 20:38:40 mike Exp $".
+# End of "$Id: Makefile,v 1.14 2000/03/09 19:47:18 mike Exp $".
 #

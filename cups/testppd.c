@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c,v 1.14 2000/01/04 13:45:37 mike Exp $"
+ * "$Id: testppd.c,v 1.15 2000/03/09 19:47:23 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -44,7 +44,7 @@ int				/* O - Exit status */
 main(int  argc,			/* I - Number of command-line arguments */
      char *argv[])		/* I - Command-line arguments */
 {
-  int		i, j, k, m, n;	/* Looping vars */
+  int		i, j, k, m;	/* Looping vars */
   const char	*filename;	/* File to load */
   ppd_file_t	*ppd;		/* PPD file record */
   ppd_size_t	*size;		/* Size record */
@@ -179,5 +179,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c,v 1.14 2000/01/04 13:45:37 mike Exp $".
+ * End of "$Id: testppd.c,v 1.15 2000/03/09 19:47:23 mike Exp $".
  */

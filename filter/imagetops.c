@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.23 2000/01/21 20:34:46 mike Exp $"
+ * "$Id: imagetops.c,v 1.24 2000/03/09 19:47:26 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -505,7 +505,6 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 	   int  length,		/* I - Number of bytes to print */
 	   int  last_line)	/* I - Last line of raster data? */
 {
-  int		i;		/* Looping var */
   unsigned	b;		/* Binary data word */
   unsigned char	c[5];		/* ASCII85 encoded chars */
 
@@ -561,5 +560,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.23 2000/01/21 20:34:46 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.24 2000/03/09 19:47:26 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lppasswd.c,v 1.2 2000/02/22 20:09:30 mike Exp $"
+ * "$Id: lppasswd.c,v 1.3 2000/03/09 19:47:34 mike Exp $"
  *
  *   MD5 password program for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,9 @@
  *
  * Contents:
  *
+ *   main()       - Add, change, or delete passwords from the MD5 password file.
+ *   md5_passwd() - Compute the MD5 sum of the username:group:password.
+ *   usage()      - Show program usage.
  */
 
 /*
@@ -31,7 +34,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <grp.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include <cups/cups.h>
 #include <cups/md5.h>
 #include <cups/string.h>
@@ -438,5 +445,5 @@ usage(FILE *fp)		/* I - File to send usage to */
 
 
 /*
- * End of "$Id: lppasswd.c,v 1.2 2000/02/22 20:09:30 mike Exp $".
+ * End of "$Id: lppasswd.c,v 1.3 2000/03/09 19:47:34 mike Exp $".
  */

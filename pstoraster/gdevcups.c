@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.21 2000/01/21 02:23:28 mike Exp $"
+ * "$Id: gdevcups.c,v 1.22 2000/03/09 19:47:31 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -55,6 +55,7 @@
 #include "std.h"                /* to stop stdlib.h redefining types */
 #include "gdevprn.h"
 #include "gsparam.h"
+#include "gsexit.h"
 
 #include <stdlib.h>
 #include <filter/raster.h>
@@ -103,7 +104,6 @@ private dev_proc_close_device(cups_close);
 private dev_proc_get_initial_matrix(cups_get_matrix);
 private int cups_get_params(gx_device *, gs_param_list *);
 private dev_proc_map_color_rgb(cups_map_color_rgb);
-private dev_proc_map_cmyk_color(cups_map_cmyk_color);
 private dev_proc_map_rgb_color(cups_map_rgb_color);
 private dev_proc_open_device(cups_open);
 private int cups_print_pages(gx_device_printer *, FILE *, int);
@@ -586,8 +586,7 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 {
   gx_color_index	i;			/* Temporary index */
   gx_color_value	ic, im, iy, ik, mk;	/* Integral CMYK values */
-  float			diff;			/* Average color difference */
-  int			tc, tm, ty, tk;		/* Temporary color values */
+  int			tc, tm, ty;		/* Temporary color values */
 
 
 #ifdef DEBUG
@@ -931,7 +930,6 @@ cups_print_pages(gx_device_printer *pdev,	/* I - Device info */
 {
   int		copy;		/* Copy number */
   int		srcbytes;	/* Byte width of scanline */
-  int		x, y;		/* Current position in image */
   unsigned char	*src,		/* Scanline data */
 		*dst;		/* Bitmap data */
 
@@ -2349,5 +2347,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.21 2000/01/21 02:23:28 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.22 2000/03/09 19:47:31 mike Exp $".
  */

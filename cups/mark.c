@@ -1,5 +1,5 @@
 /*
- * "$Id: mark.c,v 1.20 2000/01/04 13:45:35 mike Exp $"
+ * "$Id: mark.c,v 1.21 2000/03/09 19:47:23 mike Exp $"
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
@@ -375,6 +375,26 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
             o->choices[i].marked = 0;
       }
     }
+    else if (strcasecmp(option, "InputSlot") == 0)
+    {
+     /*
+      * Unmark ManualFeed option...
+      */
+
+      if ((o = ppdFindOption(ppd, "ManualFeed")) != NULL)
+	for (i = 0; i < o->num_choices; i ++)
+          o->choices[i].marked = 0;
+    }
+    else if (strcasecmp(option, "ManualFeed") == 0)
+    {
+     /*
+      * Unmark InputSlot option...
+      */
+
+      if ((o = ppdFindOption(ppd, "InputSlot")) != NULL)
+	for (i = 0; i < o->num_choices; i ++)
+          o->choices[i].marked = 0;
+    }
   }
 
   return (ppdConflicts(ppd));
@@ -407,5 +427,5 @@ ppd_defaults(ppd_file_t  *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: mark.c,v 1.20 2000/01/04 13:45:35 mike Exp $".
+ * End of "$Id: mark.c,v 1.21 2000/03/09 19:47:23 mike Exp $".
  */

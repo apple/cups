@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.33 2000/03/01 21:55:48 mike Exp $"
+dnl "$Id: configure.in,v 1.34 2000/03/09 19:47:19 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -191,6 +191,9 @@ AC_CHECK_FUNCS(strncasecmp)
 AC_CHECK_FUNCS(snprintf)
 AC_CHECK_FUNCS(vsnprintf)
 
+dnl Checks for vsyslog function.
+AC_CHECK_FUNCS(vsyslog)
+
 dnl Checks for signal functions.
 AC_CHECK_FUNCS(sigset)
 AC_CHECK_FUNCS(sigaction)
@@ -207,6 +210,7 @@ if test -n "$GCC"; then
 	if test $PICFLAG = 1; then
     		OPTIM="-fPIC $OPTIM"
 	fi
+	OPTIM="-Wall $OPTIM"
 else
 	case $uname in
         	IRIX*)
@@ -216,6 +220,7 @@ else
 			if test $uversion -ge 62; then
 				OPTIM="$OPTIM -n32 -mips3"
 			fi
+			OPTIM="-fullwarn $OPTIM"
 			;;
 		HP-UX*)
 			if test -z "$OPTIM"; then
@@ -346,5 +351,5 @@ AC_SUBST(CUPS_DOCDIR)
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.33 2000/03/01 21:55:48 mike Exp $".
+dnl End of "$Id: configure.in,v 1.34 2000/03/09 19:47:19 mike Exp $".
 dnl

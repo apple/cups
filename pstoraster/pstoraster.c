@@ -1,5 +1,5 @@
 /*
- * "$Id: pstoraster.c,v 1.11 2000/01/04 13:46:07 mike Exp $"
+ * "$Id: pstoraster.c,v 1.12 2000/03/09 19:47:32 mike Exp $"
  *
  *   PostScript RIP filter main entry for the Common UNIX Printing System
  *   (CUPS).
@@ -58,7 +58,10 @@
 #include "ghost.h"
 #include "imain.h"
 #include "iminst.h"
+#include "istack.h"
+#include "interp.h"
 #include "ostack.h"
+#include "opextern.h"
 #include "gscdefs.h"
 #include "store.h"
 
@@ -88,7 +91,6 @@ main(int  argc,		/* I - Number of command-line arguments */
   FILE			*stdfiles[3];	/* Copies of stdin, stdout, and stderr */
   gs_main_instance	*minst;		/* Interpreter instance */
   ref			vtrue;		/* True value */
-  int			code;		/* Run status code */
   int			exit_code;	/* Exit code */
   ref			error_object;	/* Error object */
   char			*content_type;	/* CONTENT_TYPE environment variable */
@@ -163,8 +165,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   */
 
   gs_main_init2(minst);
-  code = gs_main_run_string(minst, ".runstdin", minst->user_errors,
-	                    &exit_code, &error_object);
+  gs_main_run_string(minst, ".runstdin", minst->user_errors, &exit_code,
+                     &error_object);
 
  /*
   * Make sure that the last page was printed...
@@ -223,5 +225,5 @@ define_string(char *name,	/* I - Variable to set */
 
 
 /*
- * End of "$Id: pstoraster.c,v 1.11 2000/01/04 13:46:07 mike Exp $".
+ * End of "$Id: pstoraster.c,v 1.12 2000/03/09 19:47:32 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.36 2000/02/08 20:39:01 mike Exp $"
+ * "$Id: main.c,v 1.37 2000/03/09 19:47:33 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -66,9 +66,9 @@ main(int  argc,			/* I - Number of command-line arguments */
   time_t		activity;	/* Activity timer */
   struct timeval	timeout;	/* select() timeout */
   struct rlimit		limit;		/* Runtime limit */
-#ifdef HAVE_SIGACTION
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction	action;		/* Actions for POSIX signals */
-#endif /* HAVE_SIGACTION */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
  /*
@@ -482,5 +482,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.36 2000/02/08 20:39:01 mike Exp $".
+ * End of "$Id: main.c,v 1.37 2000/03/09 19:47:33 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.8 2000/02/24 15:20:18 mike Exp $"
+ * "$Id: lpq.c,v 1.9 2000/03/09 19:47:21 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -166,7 +166,9 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
   ipp_jstate_t	jobstate;	/* job-state */
   int		jobid,		/* job-id */
 		jobsize,	/* job-k-octets */
+#ifdef __osf__
 		jobpriority,	/* job-priority */
+#endif /* __osf__ */
 		jobcount,	/* Number of jobs */
 		jobcopies,	/* Number of copies */
 		rank;		/* Rank of job */
@@ -281,7 +283,9 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 
       jobid       = 0;
       jobsize     = 0;
+#ifdef __osf__
       jobpriority = 50;
+#endif /* __osf__ */
       jobstate    = IPP_JOB_PENDING;
       jobname     = "untitled";
       jobuser     = NULL;
@@ -298,9 +302,11 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 	    attr->value_tag == IPP_TAG_INTEGER)
 	  jobsize = attr->values[0].integer * 1024;
 
+#ifdef __osf__
         if (strcmp(attr->name, "job-priority") == 0 &&
 	    attr->value_tag == IPP_TAG_INTEGER)
 	  jobpriority = attr->values[0].integer;
+#endif /* __osf__ */
 
         if (strcmp(attr->name, "job-state") == 0 &&
 	    attr->value_tag == IPP_TAG_ENUM)
@@ -338,6 +344,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
           continue;
       }
 
+      /**** TODO - support OSF/1 and Berkeley formats ****/
       if (!longstatus && jobcount == 0)
 	puts("Rank   Owner      Job          Files             Total Size");
 
@@ -402,8 +409,6 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
 		*response;	/* IPP Response */
   ipp_attribute_t *attr;	/* Current attribute */
   cups_lang_t	*language;	/* Default language */
-  const char	*printer,	/* Printer name */
-		*message;	/* Printer device URI */
   ipp_pstate_t	state;		/* Printer state */
   char		uri[HTTP_MAX_URI];
 				/* Printer URI */
@@ -479,5 +484,5 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpq.c,v 1.8 2000/02/24 15:20:18 mike Exp $".
+ * End of "$Id: lpq.c,v 1.9 2000/03/09 19:47:21 mike Exp $".
  */

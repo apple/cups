@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.4 2000/02/10 00:57:53 mike Exp $"
+ * "$Id: admin.c,v 1.5 2000/03/09 19:47:22 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -200,9 +200,6 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
   ipp_t		*request,		/* IPP request */
 		*response;		/* IPP response */
   ipp_status_t	status;			/* Request status */
-  ipp_attribute_t *attr;		/* Response attribute */
-  int		num_strings;		/* Number of strings */
-  char		**strings;		/* Strings */
   const char	*var;			/* CGI variable */
   char		uri[HTTP_MAX_URI],	/* Device or printer URI */
 		*uriptr;		/* Pointer into URI */
@@ -887,5 +884,5 @@ do_test_page(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: admin.c,v 1.4 2000/02/10 00:57:53 mike Exp $".
+ * End of "$Id: admin.c,v 1.5 2000/03/09 19:47:22 mike Exp $".
  */

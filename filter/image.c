@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.20 2000/01/04 13:45:45 mike Exp $"
+ * "$Id: image.c,v 1.21 2000/03/09 19:47:26 mike Exp $"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
@@ -43,6 +43,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <math.h>
+#include <cups/cups.h>
 
 
 /*
@@ -775,5 +776,5 @@ flush_tile(image_t *img)	/* I - Image */
 
 
 /*
- * End of "$Id: image.c,v 1.20 2000/01/04 13:45:45 mike Exp $".
+ * End of "$Id: image.c,v 1.21 2000/03/09 19:47:26 mike Exp $".
  */

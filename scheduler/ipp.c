@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.56 2000/03/02 22:12:37 mike Exp $"
+ * "$Id: ipp.c,v 1.57 2000/03/09 19:47:33 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1060,7 +1060,6 @@ static void
 cancel_all_jobs(client_t        *con,	/* I - Client connection */
 	        ipp_attribute_t *uri)	/* I - Job or Printer URI */
 {
-  ipp_attribute_t	*attr;		/* Current attribute */
   const char		*dest;		/* Destination */
   cups_ptype_t		dtype;		/* Destination type */
   char			method[HTTP_MAX_URI],
@@ -1834,10 +1833,8 @@ get_jobs(client_t        *con,		/* I - Client connection */
   int			limit;		/* Maximum number of jobs to return */
   int			count;		/* Number of jobs that match */
   job_t			*job;		/* Current job pointer */
-  char			job_uri[HTTP_MAX_URI],
+  char			job_uri[HTTP_MAX_URI];
 					/* Job URI... */
-			printer_uri[HTTP_MAX_URI];
-					/* Printer URI... */
   char			filename[1024];	/* Job filename */
   struct stat		filestats;	/* Print file information */
   size_t		jobsize;	/* Total job sizes */
@@ -2029,10 +2026,8 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
 			resource[HTTP_MAX_URI];
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
-  char			job_uri[HTTP_MAX_URI],
+  char			job_uri[HTTP_MAX_URI];
 					/* Job URI... */
-			printer_uri[HTTP_MAX_URI];
-					/* Printer URI... */
   char			filename[1024];	/* Job filename */
   struct stat		filestats;	/* Print file information */
   size_t		jobsize;	/* Total job sizes */
@@ -3287,7 +3282,6 @@ send_document(client_t        *con,	/* I - Client connection */
 					/* Subtype of file */
 			mimetype[MIME_MAX_SUPER + MIME_MAX_TYPE + 2];
 					/* Textual name of mime type */
-  printer_t		*printer;	/* Printer data */
   struct passwd		*user;		/* User info */
   struct group		*group;		/* System group info */
   char			filename[1024];	/* Job filename */
@@ -3960,5 +3954,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.56 2000/03/02 22:12:37 mike Exp $".
+ * End of "$Id: ipp.c,v 1.57 2000/03/09 19:47:33 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: image-tiff.c,v 1.11 2000/01/04 13:45:45 mike Exp $"
+ * "$Id: image-tiff.c,v 1.12 2000/03/09 19:47:26 mike Exp $"
  *
  *   TIFF file routines for the Common UNIX Printing System (CUPS).
  *
@@ -35,6 +35,7 @@
 #ifdef HAVE_LIBTIFF
 #  include <tiff.h>	/* TIFF image definitions */
 #  include <tiffio.h>
+#  include <unistd.h>
 
 
 /*
@@ -1616,5 +1617,5 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-tiff.c,v 1.11 2000/01/04 13:45:45 mike Exp $".
+ * End of "$Id: image-tiff.c,v 1.12 2000/03/09 19:47:26 mike Exp $".
  */

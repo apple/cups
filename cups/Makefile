@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.32 2000/02/29 14:47:28 mike Exp $"
+# "$Id: Makefile,v 1.33 2000/03/09 19:47:23 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -55,7 +55,7 @@ all:	$(TARGETS)
 #
 
 clean:
-	rm -f $(OBJS) $(TARGETS)
+	$(RM) $(OBJS) $(TARGETS)
 
 #
 # Install object and target files...
@@ -138,5 +138,5 @@ testppd.o:	ppd.h
 $(OBJS):	../Makedefs ../config.h
 
 #
-# End of "$Id: Makefile,v 1.32 2000/02/29 14:47:28 mike Exp $".
+# End of "$Id: Makefile,v 1.33 2000/03/09 19:47:23 mike Exp $".
 #

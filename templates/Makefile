@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.1 2000/02/08 20:39:03 mike Exp $"
+# "$Id: Makefile,v 1.2 2000/03/09 19:47:34 mike Exp $"
 #
 #   Template makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,17 +28,41 @@ include ../Makedefs
 # Template files...
 #
 
-FILES	=	add-class.tmpl add-printer.tmpl admin-op.tmpl \
-		admin.tmpl choose-device.tmpl choose-make.tmpl \
-		choose-model.tmpl choose-uri.tmpl classes.tmpl \
-		error.tmpl header.tmpl job-cancel.tmpl job-hold.tmpl \
-		job-release.tmpl jobs.tmpl modify-class.tmpl \
-		modify-printer.tmpl option-boolean.tmpl \
-		option-header.tmpl option-pickmany.tmpl \
-		option-pickone.tmpl option-trailer.tmpl \
-		printer-accept.tmpl printer-reject.tmpl \
-		printer-start.tmpl printer-stop.tmpl printers.tmpl \
-		test-page.tmpl trailer.tmpl
+FILES	=	add-class.tmpl \
+		add-printer.tmpl \
+		admin-op.tmpl \
+		admin.tmpl \
+		choose-device.tmpl \
+		choose-make.tmpl \
+		choose-model.tmpl \
+		choose-serial.tmpl \
+		choose-uri.tmpl \
+		classes.tmpl \
+		error.tmpl \
+		header.tmpl \
+		jobs.tmpl \
+		job-cancel.tmpl \
+		job-hold.tmpl \
+		job-release.tmpl \
+		modify-class.tmpl \
+		modify-printer.tmpl \
+		option-boolean.tmpl \
+		option-header.tmpl \
+		option-pickmany.tmpl \
+		option-pickone.tmpl \
+		option-trailer.tmpl \
+		printers.tmpl \
+		printer-accept.tmpl \
+		printer-added.tmpl \
+		printer-configured.tmpl \
+		printer-confirm.tmpl \
+		printer-deleted.tmpl \
+		printer-modified.tmpl \
+		printer-reject.tmpl \
+		printer-start.tmpl \
+		printer-stop.tmpl \
+		test-page.tmpl \
+		trailer.tmpl
 
 
 #
@@ -65,5 +89,5 @@ install:
 
 
 #
-# End of "$Id: Makefile,v 1.1 2000/02/08 20:39:03 mike Exp $".
+# End of "$Id: Makefile,v 1.2 2000/03/09 19:47:34 mike Exp $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.55 2000/02/22 20:45:14 mike Exp $"
+ * "$Id: printers.c,v 1.56 2000/03/09 19:47:33 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -208,7 +208,6 @@ DeleteAllPrinters(void)
 void
 DeletePrinter(printer_t *p)	/* I - Printer to delete */
 {
-  int		i;		/* Looping var */
   printer_t	*current,	/* Current printer in list */
 		*prev;		/* Previous printer in list */
 #ifdef __sgi
@@ -363,15 +362,12 @@ void
 LoadAllPrinters(void)
 {
   FILE		*fp;			/* printers.conf file */
-  int		i;			/* Looping var */
   int		linenum;		/* Current line number */
   int		len;			/* Length of line */
   char		line[HTTP_MAX_BUFFER],	/* Line from file */
 		name[256],		/* Parameter name */
 		*nameptr,		/* Pointer into name */
-		*value,			/* Pointer to value */
-		*lineptr,		/* Pointer in line */
-		*temp;			/* Temporary pointer */
+		*value;			/* Pointer to value */
   printer_t	*p;			/* Current printer */
 
 
@@ -543,7 +539,6 @@ SaveAllPrinters(void)
   FILE		*fp;			/* printers.conf file */
   char		temp[1024];		/* Temporary string */
   printer_t	*printer;		/* Current printer class */
-  int		i;			/* Looping var */
   time_t	curtime;		/* Current time */
   struct tm	*curdate;		/* Current date */
 
@@ -1216,7 +1211,6 @@ void
 SortPrinters(void)
 {
   printer_t	*current,	/* Current printer */
- 		*start,		/* Starting printer */
 		*prev,		/* Previous printer */
 		*next;		/* Next printer */
   int		did_swap;	/* Non-zero if we did a swap */
@@ -1318,5 +1312,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.55 2000/02/22 20:45:14 mike Exp $".
+ * End of "$Id: printers.c,v 1.56 2000/03/09 19:47:33 mike Exp $".
  */

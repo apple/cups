@@ -21,7 +21,7 @@
   ghost@aladdin.com
 
  */
-/*$Id: md5.c,v 1.1 2000/01/28 02:49:41 mike Exp $ */
+/*$Id: md5.c,v 1.2 2000/03/09 19:47:23 mike Exp $ */
 /*
   Independent implementation of MD5 (RFC 1321).
 
@@ -39,6 +39,7 @@
  */
 
 #include "md5.h"
+#include "string.h"
 
 #ifdef TEST
 /*
@@ -46,7 +47,6 @@
  * The test program should print out the same values as given in section
  * A.5 of RFC 1321, reproduced below.
  */
-#include <string.h>
 main()
 {
     static const char *const test[7] = {

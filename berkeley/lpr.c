@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.11 2000/02/24 15:20:18 mike Exp $"
+ * "$Id: lpr.c,v 1.12 2000/03/09 19:47:22 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -67,13 +67,11 @@ main(int  argc,		/* I - Number of command-line arguments */
   int		job_id;		/* Job ID */
   const char	*dest;		/* Destination printer */
   const char	*title;		/* Job title */
-  int		priority;	/* Job priority (1-100) */
   int		num_copies;	/* Number of copies per file */
   int		num_files;	/* Number of files printed */
   int		num_options;	/* Number of options */
   cups_option_t	*options;	/* Options */
-  int		silent,		/* Silent or verbose output? */
-		deletefile;	/* Delete file after print? */
+  int		deletefile;	/* Delete file after print? */
   char		buffer[8192];	/* Copy buffer */
   FILE		*temp;		/* Temporary file pointer */
 #ifdef HAVE_SIGACTION
@@ -81,7 +79,6 @@ main(int  argc,		/* I - Number of command-line arguments */
 #endif /* HAVE_SIGACTION */
 
 
-  silent      = 0;
   deletefile  = 0;
   dest        = cupsGetDefault();
   num_options = 0;
@@ -314,5 +311,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c,v 1.11 2000/02/24 15:20:18 mike Exp $".
+ * End of "$Id: lpr.c,v 1.12 2000/03/09 19:47:22 mike Exp $".
  */
