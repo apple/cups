@@ -1,4 +1,4 @@
-README - CUPS v1.1b2 - 03/13/2000
+README - CUPS v1.1b3 - 04/19/2000
 ---------------------------------
 
 ************************************************************************
@@ -124,9 +124,6 @@ You will be asked for the administration password (root or any other
 user in the sys/system/root group on your system) and then shown a
 menu of available functions.
 
-[note: adding, deleting, and modifying classes has not been implemented in
-       beta 2]
-
 
 SETTING UP PRINTER QUEUES FROM THE COMMAND-LINE
 
@@ -169,8 +166,8 @@ Similarly, for the other sample drivers you can use:
     HP LaserJet Series          laserjet.ppd
     EPSON Stylus Color Series   stcolor.ppd
     EPSON Stylus Photo Series   stphoto.ppd
-    EPSON 9-pin Series          epson9.ppd [not in beta 2]
-    EPSON 24-pin Series         epson24.ppd [not in beta 2]
+    EPSON 9-pin Series          epson9.ppd [not in beta 3]
+    EPSON 24-pin Series         epson24.ppd [not in beta 3]
 
 These sample drivers provide basic printing capabilities, but generally
 do not exercise the full potential of the printers or CUPS.  For
