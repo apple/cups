@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.174 2002/10/15 16:09:17 mike Exp $"
+ * "$Id: job.c,v 1.175 2002/10/22 16:58:01 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -504,6 +504,8 @@ LoadAllJobs(void)
   */
 
   LogMessage(L_DEBUG, "LoadAllJobs: Scanning %s...", RequestRoot);
+
+  NumJobs = 0;
 
   if ((dir = opendir(RequestRoot)) == NULL)
   {
@@ -3212,5 +3214,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.174 2002/10/15 16:09:17 mike Exp $".
+ * End of "$Id: job.c,v 1.175 2002/10/22 16:58:01 mike Exp $".
  */
