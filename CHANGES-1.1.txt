@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.15
 
+	- The image filters looked for the "orientation" option
+	  instead of the correctly named "orientation-requested"
+	  option.
 	- The cupsEncodeOptions() function now handles mixed
 	  integers and ranges.
 	- New translation guide for developers to provide native
