@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.22 2002/10/17 17:06:01 mike Exp $"
+ * "$Id: main.c,v 1.57.2.23 2002/10/22 15:54:36 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -685,6 +685,7 @@ IgnoreChildSignals(void)
 static void
 sigchld_handler(int sig)	/* I - Signal number */
 {
+  int		olderrno;	/* Old errno value */
   int		status;		/* Exit status of child */
   int		pid;		/* Process ID of child */
   job_t		*job;		/* Current job */
@@ -692,6 +693,12 @@ sigchld_handler(int sig)	/* I - Signal number */
 
 
   (void)sig;
+
+ /*
+  * Save the original error value (wait might overwrite it...)
+  */
+
+  olderrno = errno;
 
 #ifdef HAVE_WAITPID
   while ((pid = waitpid(-1, &status, WNOHANG)) > 0)
@@ -774,6 +781,12 @@ sigchld_handler(int sig)	/* I - Signal number */
 	}
       }
   }
+
+ /*
+  * Restore the original error value...
+  */
+
+  errno = olderrno;
 
 #ifdef HAVE_SIGSET
   sigset(SIGCHLD, sigchld_handler);
@@ -900,5 +913,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.22 2002/10/17 17:06:01 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.23 2002/10/22 15:54:36 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.17 2002/09/04 02:38:42 mike Exp $"
+ * "$Id: http.c,v 1.82.2.18 2002/10/22 15:54:34 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -1010,10 +1010,14 @@ httpRead(http_t *http,			/* I - HTTP data */
     {
 #ifdef WIN32
       http->error = WSAGetLastError();
-#else
-      http->error = errno;
-#endif /* WIN32 */
       return (-1);
+#else
+      if (errno != EINTR)
+      {
+        http->error = errno;
+        return (-1);
+      }
+#endif /* WIN32 */
     }
     else
       return (0);
@@ -1048,11 +1052,16 @@ httpRead(http_t *http,			/* I - HTTP data */
   if (bytes > 0)
     http->data_remaining -= bytes;
   else if (bytes < 0)
+  {
 #ifdef WIN32
     http->error = WSAGetLastError();
 #else
-    http->error = errno;
+    if (errno == EINTR)
+      bytes = 0;
+    else
+      http->error = errno;
 #endif /* WIN32 */
+  }
 
   if (http->data_remaining == 0)
   {
@@ -1163,6 +1172,22 @@ httpWrite(http_t     *http,		/* I - HTTP data */
 
     if (bytes < 0)
     {
+#ifdef WIN32
+      if (WSAGetLastError() != http->error)
+      {
+        http->error = WSAGetLastError();
+	continue;
+      }
+#else
+      if (errno == EINTR)
+        continue;
+      else if (errno != http->error)
+      {
+        http->error = errno;
+	continue;
+      }
+#endif /* WIN32 */
+
       DEBUG_puts("httpWrite: error writing data...\n");
 
       return (-1);
@@ -1298,7 +1323,9 @@ httpGets(char   *line,			/* I - Line to read into */
 
         DEBUG_printf(("httpGets(): recv() error %d!\n", WSAGetLastError()));
 #else
-        if (errno != http->error)
+        if (errno == EINTR)
+	  continue;
+	else if (errno != http->error)
 	{
 	  http->error = errno;
 	  continue;
@@ -1404,7 +1431,27 @@ httpPrintf(http_t     *http,		/* I - HTTP data */
     nbytes = send(http->fd, bufptr, bytes - tbytes, 0);
 
     if (nbytes < 0)
+    {
+      nbytes = 0;
+
+#ifdef WIN32
+      if (WSAGetLastError() != http->error)
+      {
+        http->error = WSAGetLastError();
+	continue;
+      }
+#else
+      if (errno == EINTR)
+	continue;
+      else if (errno != http->error)
+      {
+        http->error = errno;
+	continue;
+      }
+#endif /* WIN32 */
+
       return (-1);
+    }
   }
 
   return (bytes);
@@ -2063,5 +2110,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.17 2002/09/04 02:38:42 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.18 2002/10/22 15:54:34 mike Exp $".
  */

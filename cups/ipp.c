@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.18 2002/09/26 11:31:10 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.19 2002/10/22 15:54:34 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -2270,7 +2270,7 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
 	}
       }
     }
-    else if ((bytes = httpRead(http, (char *)buffer, length - tbytes)) <= 0)
+    else if ((bytes = httpRead(http, (char *)buffer, length - tbytes)) < 0)
       break;
   }
 
@@ -2366,5 +2366,5 @@ ipp_write_mem(ipp_mem_t   *m,		/* I - Memory buffer */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.18 2002/09/26 11:31:10 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.19 2002/10/22 15:54:34 mike Exp $".
  */

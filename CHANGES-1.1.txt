@@ -3,6 +3,14 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.17
 
+	- The HTTP and IPP read/write code didn't handle EINTR
+	  (interrupted system call) errors.
+	- When under high load, the scheduler could abort due to
+	  the wrong errno value after a select() call.  This was
+	  caused by the child signal handler.
+	- Added new load tests to the test target to verify that
+	  cupsd can handle hundreds of simultaneous jobs without
+	  error.
 	- The Solaris USB backend now supports the new device
 	  URI syntax.
 	- The ppdOpen*() functions now reset the numeric locale

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: 5.6-lpr.sh,v 1.1.2.1 2002/01/11 18:06:30 mike Exp $"
+# "$Id: 5.6-lpr.sh,v 1.1.2.2 2002/10/22 15:54:37 mike Exp $"
 #
 #   Test the lpr command.
 #
@@ -47,6 +47,25 @@ else
 fi
 echo ""
 
+echo "LPR Flood Test"
+echo ""
+echo "    lpr -P Test1 testfile.txt (100 times in parallel)"
+i=0
+while test $i -lt 100; do
+	echo "    flood copy $i..." 1>&2
+	../berkeley/lpr -P Test1 testfile.txt 2>&1 &
+	lprpid=$!
+	i=`expr $i + 1`
+done
+wait $lppid
+if test $? != 0; then
+	echo "    FAILED"
+	exit 1
+else
+	echo "    PASSED"
+fi
+echo ""
+
 #
-# End of "$Id: 5.6-lpr.sh,v 1.1.2.1 2002/01/11 18:06:30 mike Exp $".
+# End of "$Id: 5.6-lpr.sh,v 1.1.2.2 2002/10/22 15:54:37 mike Exp $".
 #
