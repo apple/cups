@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.17
 
+	- The "manual_copies" option did not work when the LPD
+	  backend had to retry a print job.
 	- The image filters did not convert GIF images properly.
 	- The RunAsUser option was incompatible with the new
 	  daemon-mode code in 1.1.16.
