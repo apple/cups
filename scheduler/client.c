@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.83 2004/06/29 02:45:24 mike Exp $"
+ * "$Id: client.c,v 1.91.2.84 2004/06/29 04:31:03 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2900,6 +2900,7 @@ pipe_command(client_t *con,		/* I - Client connection */
   int		i;			/* Looping var */
   int		pid;			/* Process ID */
   char		*commptr;		/* Command string pointer */
+  char		*query;			/* Query string pointer */
   char		*uriptr;		/* URI string pointer */
   int		fd;			/* Looping var */
   int		fds[2];			/* Pipe FDs */
@@ -2995,6 +2996,7 @@ pipe_command(client_t *con,		/* I - Client connection */
   */
 
   argv[0] = argbuf;
+  query   = NULL;
 
   for (commptr = argbuf, argc = 1; *commptr != '\0' && argc < 99; commptr ++)
     if (*commptr == ' ' || *commptr == '+')
@@ -3009,6 +3011,14 @@ pipe_command(client_t *con,		/* I - Client connection */
         argv[argc] = commptr;
 	argc ++;
       }
+
+
+     /*
+      * Copy query data, if any, from arguments...
+      */
+
+      if (argc == 2 && strchr(commptr, '=') && con->operation == HTTP_GET)
+	query = strdup(commptr);
 
       commptr --;
     }
@@ -3027,8 +3037,6 @@ pipe_command(client_t *con,		/* I - Client connection */
 
       cups_strcpy(commptr + 1, commptr + 3);
     }
-    else if (*commptr == '?')
-      break;
 
   argv[argc] = NULL;
 
@@ -3165,16 +3173,15 @@ pipe_command(client_t *con,		/* I - Client connection */
       LogMessage(L_DEBUG2, "argv[%d] = \"%s\"", i, argv[i]);
     envp[envc ++] = "REQUEST_METHOD=GET";
 
-    if (*commptr)
+    if (query)
     {
      /*
       * Add GET form variables after ?...
       */
 
-      *commptr++ = '\0';
-
-      snprintf(query_string, sizeof(query_string), "QUERY_STRING=%s", commptr);
+      snprintf(query_string, sizeof(query_string), "QUERY_STRING=%s", query);
       envp[envc ++] = query_string;
+      free(query);
     }
   }
   else
@@ -3405,5 +3412,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.83 2004/06/29 02:45:24 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.84 2004/06/29 04:31:03 mike Exp $".
  */
