@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.41 2003/03/30 20:01:48 mike Exp $"
+ * "$Id: main.c,v 1.57.2.42 2003/04/10 20:15:54 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -992,7 +992,7 @@ sighup_handler(int sig)	/* I - Signal number */
 {
   (void)sig;
 
-  NeedReload = TRUE;
+  NeedReload = RELOAD_ALL;
 
 #ifdef HAVE_SIGSET
   sigset(SIGHUP, sighup_handler);
@@ -1026,39 +1026,9 @@ sigterm_handler(int sig)		/* I - Signal */
   * Close all network clients and stop all jobs...
   */
 
-  CloseAllClients();
-  StopListening();
-  StopPolling();
-  StopBrowsing();
+  StopServer();
 
-  if (Clients != NULL)
-    free(Clients);
-
-  FreeAllJobs();
-
-  if (AccessFile != NULL)
-    cupsFileClose(AccessFile);
-
-  if (ErrorFile != NULL)
-    cupsFileClose(ErrorFile);
-
-  if (PageFile != NULL)
-    cupsFileClose(PageFile);
-
-  DeleteAllLocations();
-
-  DeleteAllClasses();
-
-  if (Devices)
-    ippDelete(Devices);
-
-  if (PPDs)
-    ippDelete(PPDs);
-
-  DeleteAllPrinters();
-
-  if (MimeDatabase != NULL)
-    mimeDelete(MimeDatabase);
+  StopAllJobs();
 
 #ifdef __sgi
  /*
@@ -1094,11 +1064,11 @@ sigusr1_handler(int sig)		/* I - Signal */
 static void
 usage(void)
 {
-  fputs("Usage: cupsd [-c config-file] [-f]\n", stderr);
+  fputs("Usage: cupsd [-c config-file] [-f] [-F]\n", stderr);
   exit(1);
 }
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.41 2003/03/30 20:01:48 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.42 2003/04/10 20:15:54 mike Exp $".
  */

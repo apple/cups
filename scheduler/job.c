@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.63 2003/04/08 03:48:13 mike Exp $"
+ * "$Id: job.c,v 1.124.2.64 2003/04/10 20:15:53 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -891,6 +891,7 @@ RestartJob(int id)		/* I - Job ID */
 
   if (job->state->values[0].integer == IPP_JOB_STOPPED || JobFiles)
   {
+    job->tries = 0;
     job->state->values[0].integer = IPP_JOB_PENDING;
     SaveJob(id);
     CheckJobs();
@@ -2377,11 +2378,31 @@ UpdateJob(job_t *job)		/* I - Job to check */
       else if (job->dtype & CUPS_PRINTER_FAX)
       {
        /*
-        * Hold the current job for 5 minutes...
+        * See how many times we've tried to send the job; if more than
+	* the limit, cancel the job.
 	*/
 
-        job->state->values[0].integer = IPP_JOB_HELD;
-	job->hold_until               = time(NULL) + 300;
+        job->tries ++;
+
+	if (job->tries >= FaxRetryLimit)
+	{
+	 /*
+	  * Too many tries...
+	  */
+
+	  LogMessage(L_ERROR, "Canceling fax job %d since it could not be sent after %d tries.",
+	             job->id, FaxRetryLimit);
+	  CancelJob(job->id, 0);
+	}
+	else
+	{
+	 /*
+	  * Try again in N seconds...
+	  */
+
+          job->state->values[0].integer = IPP_JOB_HELD;
+	  job->hold_until               = time(NULL) + FaxRetryInterval;
+	}
 
         CheckJobs();
       }
@@ -2729,5 +2750,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.63 2003/04/08 03:48:13 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.64 2003/04/10 20:15:53 mike Exp $".
  */

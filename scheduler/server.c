@@ -1,5 +1,5 @@
 /*
- * "$Id: server.c,v 1.2.2.11 2003/03/30 20:01:49 mike Exp $"
+ * "$Id: server.c,v 1.2.2.12 2003/04/10 20:15:55 mike Exp $"
  *
  *   Server start/stop routines for the Common UNIX Printing System (CUPS).
  *
@@ -77,6 +77,8 @@ StartServer(void)
   */
 
   gnutls_global_init();
+#elif defined(HAVE_CDSASSL)
+  ServerCertificatesArray = CDSAGetServerCerts();
 #endif /* HAVE_LIBSSL */
 
  /*
@@ -120,7 +122,17 @@ StopServer(void)
     Clients = NULL;
   }
 
-  StopAllJobs();
+#if defined(HAVE_SSL) && defined(HAVE_CDSASSL)
+ /*
+  * Free all of the certificates...
+  */
+
+  if (ServerCertificatesArray)
+  {
+    CFRelease(ServerCertificatesArray);
+    ServerCertificatesArray = NULL;
+  }
+#endif /* HAVE_SSL && HAVE_CDSASSL */
 
  /*
   * Close the pipe for CGI processes...
@@ -130,6 +142,11 @@ StopServer(void)
   {
     close(CGIPipes[0]);
     close(CGIPipes[1]);
+
+    LogMessage(L_DEBUG2, "StopServer: Removing fd %d from InputSet...",
+               CGIPipes[0]);
+
+    FD_CLR(CGIPipes[0], InputSet);
 
     CGIPipes[0] = -1;
     CGIPipes[1] = -1;
@@ -159,16 +176,9 @@ StopServer(void)
 
     PageFile = NULL;
   }
-
- /*
-  * Clear the input and output sets...
-  */
-
-  memset(InputSet, 0, SetSize);
-  memset(OutputSet, 0, SetSize);
 }
 
 
 /*
- * End of "$Id: server.c,v 1.2.2.11 2003/03/30 20:01:49 mike Exp $".
+ * End of "$Id: server.c,v 1.2.2.12 2003/04/10 20:15:55 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.h,v 1.25.2.10 2003/03/30 21:49:21 mike Exp $"
+ * "$Id: job.h,v 1.25.2.11 2003/04/10 20:15:54 mike Exp $"
  *
  *   Print job definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -60,6 +60,7 @@ typedef struct job_str
   printer_t	*printer;		/* Printer this job is assigned to */
   char		*buffer;		/* Status buffer */
   int		bufused;		/* Amount of buffer in use */
+  int		tries;			/* Number of tries for this job */
 } job_t;
 
 
@@ -78,6 +79,8 @@ VAR int		NumJobs		VALUE(0),	/* Number of jobs in queue */
 		ActiveJobs	VALUE(0);	/* Number of active jobs */
 VAR job_t	*Jobs		VALUE(NULL);	/* List of current jobs */
 VAR int		NextJobId	VALUE(1);	/* Next job ID to use */
+VAR int		FaxRetryLimit	VALUE(5),	/* Max number of tries */
+		FaxRetryInterval VALUE(300);	/* Seconds between retries */
 
 
 /*
@@ -109,5 +112,5 @@ extern void	UpdateJob(job_t *job);
 
 
 /*
- * End of "$Id: job.h,v 1.25.2.10 2003/03/30 21:49:21 mike Exp $".
+ * End of "$Id: job.h,v 1.25.2.11 2003/04/10 20:15:54 mike Exp $".
  */

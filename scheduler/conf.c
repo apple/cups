@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.37 2003/04/10 14:13:52 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.38 2003/04/10 20:15:51 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -128,6 +128,8 @@ static var_t	variables[] =
   { "DefaultLanguage",		&DefaultLanguage,	VAR_STRING },
   { "DocumentRoot",		&DocumentRoot,		VAR_STRING },
   { "ErrorLog",			&ErrorLog,		VAR_STRING },
+  { "FaxRetryLimit",		&FaxRetryLimit,		VAR_INTEGER },
+  { "FaxRetryInterval",		&FaxRetryInterval,	VAR_INTEGER },
   { "FileDevice",		&FileDevice,		VAR_BOOLEAN },
   { "FilterLimit",		&FilterLimit,		VAR_INTEGER },
   { "FilterNice",		&FilterNice,		VAR_INTEGER },
@@ -220,6 +222,8 @@ ReadConfiguration(void)
   struct passwd	*user;			/* Default user */
   struct group	*group;			/* Default group */
   int		run_user;		/* User that will be running cupsd */
+  char		*old_serverroot,	/* Old ServerRoot */
+		*old_requestroot;	/* Old RequestRoot */
 
 
  /*
@@ -229,38 +233,17 @@ ReadConfiguration(void)
   StopServer();
 
  /*
-  * Free all memory...
+  * Save the old root paths...
   */
 
-  FreeAllJobs();
-  DeleteAllClasses();
+  SetString(&old_serverroot, ServerRoot);
+  SetString(&old_requestroot, RequestRoot);
+
+ /*
+  * Reset the server configuration data...
+  */
+
   DeleteAllLocations();
-  DeleteAllPrinters();
-
-  DefaultPrinter = NULL;
-
-  if (Devices)
-  {
-    ippDelete(Devices);
-    Devices = NULL;
-  }
-
-  if (PPDs)
-  {
-    ippDelete(PPDs);
-    PPDs = NULL;
-  }
-
-  if (MimeDatabase != NULL)
-    mimeDelete(MimeDatabase);
-
-  if (NumMimeTypes)
-  {
-    for (i = 0; i < NumMimeTypes; i ++)
-      free((void *)MimeTypes[i]);
-
-    free(MimeTypes);
-  }
 
   if (NumBrowsers > 0)
   {
@@ -295,12 +278,6 @@ ReadConfiguration(void)
   }
 
  /*
-  * Reset the current configuration to the defaults...
-  */
-
-  NeedReload = FALSE;
-
- /*
   * String options...
   */
 
@@ -330,14 +307,7 @@ ReadConfiguration(void)
 
 #ifdef HAVE_SSL
 #  ifdef HAVE_CDSASSL
-  if (ServerCertificatesArray)
-  {
-    CFRelease(ServerCertificatesArray);
-    ServerCertificatesArray = NULL;
-  }
-
   SetString(&ServerCertificate, "/var/root/Library/Keychains/CUPS");
-
 #  else
   SetString(&ServerCertificate, "ssl/server.crt");
   SetString(&ServerKey, "ssl/server.key");
@@ -408,6 +378,8 @@ ReadConfiguration(void)
   ConfigFilePerm      = 0640;
   LogFilePerm         = 0644;
 
+  FaxRetryLimit       = 5;
+  FaxRetryInterval    = 300;
   FileDevice          = FALSE;
   FilterLevel         = 0;
   FilterLimit         = 0;
@@ -492,8 +464,7 @@ ReadConfiguration(void)
   * Log the configuration file that was used...
   */
 
-  LogMessage(L_DEBUG, "ReadConfiguration() ConfigurationFile=\"%s\"",
-             ConfigurationFile);
+  LogMessage(L_INFO, "Loaded configuration file \"%s\"", ConfigurationFile);
 
  /*
   * Update all relative filenames to include the full path from ServerRoot...
@@ -637,75 +608,129 @@ ReadConfiguration(void)
              MaxClientsPerHost);
 
  /*
-  * Read the MIME type and conversion database...
+  * If we are doing a full reload or the server root has changed, flush
+  * the jobs, printers, etc. and start from scratch...
   */
 
-  snprintf(temp, sizeof(temp), "%s/filter", ServerBin);
-
-  MimeDatabase = mimeNew();
-  mimeMerge(MimeDatabase, ServerRoot, temp);
-
- /*
-  * Create a list of MIME types for the document-format-supported
-  * attribute...
-  */
-
-  NumMimeTypes = MimeDatabase->num_types;
-  if (!mimeType(MimeDatabase, "application", "octet-stream"))
-    NumMimeTypes ++;
-
-  MimeTypes = calloc(NumMimeTypes, sizeof(const char *));
-
-  for (i = 0; i < MimeDatabase->num_types; i ++)
+  if (NeedReload == RELOAD_ALL ||
+      !old_serverroot || !ServerRoot || strcmp(old_serverroot, ServerRoot) ||
+      !old_requestroot || !RequestRoot || strcmp(old_requestroot, RequestRoot))
   {
-    snprintf(type, sizeof(type), "%s/%s", MimeDatabase->types[i]->super,
-             MimeDatabase->types[i]->type);
+    LogMessage(L_INFO, "Full reload is required.");
 
-    MimeTypes[i] = strdup(type);
+   /*
+    * Free all memory...
+    */
+
+    FreeAllJobs();
+    DeleteAllClasses();
+    DeleteAllPrinters();
+
+    DefaultPrinter = NULL;
+
+    if (Devices)
+    {
+      ippDelete(Devices);
+      Devices = NULL;
+    }
+
+    if (PPDs)
+    {
+      ippDelete(PPDs);
+      PPDs = NULL;
+    }
+
+    if (MimeDatabase != NULL)
+      mimeDelete(MimeDatabase);
+
+    if (NumMimeTypes)
+    {
+      for (i = 0; i < NumMimeTypes; i ++)
+	free((void *)MimeTypes[i]);
+
+      free(MimeTypes);
+    }
+
+   /*
+    * Read the MIME type and conversion database...
+    */
+
+    snprintf(temp, sizeof(temp), "%s/filter", ServerBin);
+
+    MimeDatabase = mimeNew();
+    mimeMerge(MimeDatabase, ServerRoot, temp);
+
+   /*
+    * Create a list of MIME types for the document-format-supported
+    * attribute...
+    */
+
+    NumMimeTypes = MimeDatabase->num_types;
+    if (!mimeType(MimeDatabase, "application", "octet-stream"))
+      NumMimeTypes ++;
+
+    MimeTypes = calloc(NumMimeTypes, sizeof(const char *));
+
+    for (i = 0; i < MimeDatabase->num_types; i ++)
+    {
+      snprintf(type, sizeof(type), "%s/%s", MimeDatabase->types[i]->super,
+               MimeDatabase->types[i]->type);
+
+      MimeTypes[i] = strdup(type);
+    }
+
+    if (i < NumMimeTypes)
+      MimeTypes[i] = strdup("application/octet-stream");
+
+   /*
+    * Load banners...
+    */
+
+    snprintf(temp, sizeof(temp), "%s/banners", DataDir);
+    LoadBanners(temp);
+
+   /*
+    * Load printers and classes...
+    */
+
+    LoadAllPrinters();
+    LoadAllClasses();
+
+   /*
+    * Load devices and PPDs...
+    */
+
+    snprintf(temp, sizeof(temp), "%s/model", DataDir);
+    LoadPPDs(temp);
+
+    snprintf(temp, sizeof(temp), "%s/backend", ServerBin);
+    LoadDevices(temp);
+
+   /*
+    * Load queued jobs...
+    */
+
+    LoadAllJobs();
+
+    LogMessage(L_INFO, "Full reload complete.");
   }
-
-  if (i < NumMimeTypes)
-    MimeTypes[i] = strdup("application/octet-stream");
+  else
+    LogMessage(L_INFO, "Partial reload complete.");
 
  /*
-  * Load banners...
+  * Reset the reload state...
   */
 
-  snprintf(temp, sizeof(temp), "%s/banners", DataDir);
-  LoadBanners(temp);
+  NeedReload = RELOAD_NONE;
+
+  ClearString(&old_serverroot);
+  ClearString(&old_requestroot);
 
  /*
-  * Load printers and classes...
-  */
-
-  LoadAllPrinters();
-  LoadAllClasses();
-
- /*
-  * Load devices and PPDs...
-  */
-
-  snprintf(temp, sizeof(temp), "%s/model", DataDir);
-  LoadPPDs(temp);
-
-  snprintf(temp, sizeof(temp), "%s/backend", ServerBin);
-  LoadDevices(temp);
-
-#ifdef HAVE_CDSASSL
-  ServerCertificatesArray = CDSAGetServerCerts();
-#endif /* HAVE_CDSASSL */
-
- /*
-  * Startup the server...
+  * Startup the server and return...
   */
 
   StartServer();
-
- /*
-  * Load queued jobs...
-  */
-
-  LoadAllJobs();
 
   return (1);
 }
@@ -2266,5 +2291,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.37 2003/04/10 14:13:52 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.38 2003/04/10 20:15:51 mike Exp $".
  */

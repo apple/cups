@@ -3,6 +3,12 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The scheduler now supports fast-reloads of the
+	  cupsd.conf file when it is updated via HTTP.
+	- The scheduler always changed the ownership of log
+	  files; it now only does so if they are not in the /dev
+	  directory (i.e. don't want to change the ownership and
+	  permissions of /dev/null...)
 	- Added libpaper support (patch from Jeff Licquia)
 	- Added a new istring() rule for MIME types files that
 	  does a case-insensitive comparison of strings.
@@ -11,8 +17,10 @@ CHANGES IN CUPS V1.1.19
 	  no "lp" queue) is sent.
 	- The scheduler now supports fax queues identified by a
 	  "*cupsFax: True" attribute in the PPD file. When a job
-	  can't be sent, it is held for 5 minutes while other
-	  jobs are attempted.
+	  can't be sent, it is held for 5 minutes by default
+	  while other jobs are attempted.  The FaxRetryLimit and
+	  FaxRetryInterval directives control the number of
+	  retries and the time between retries.
 	- The scheduler now preserves the default options of PPD
 	  files when modifying/upgrading an existing PPD file.
 	  When installing a new printer, the scheduler sets the

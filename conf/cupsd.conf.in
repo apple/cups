@@ -1,5 +1,5 @@
 #
-# "$Id: cupsd.conf.in,v 1.2.2.10 2003/04/05 03:39:28 mike Exp $"
+# "$Id: cupsd.conf.in,v 1.2.2.11 2003/04/10 20:15:48 mike Exp $"
 #
 #   Sample configuration file for the Common UNIX Printing System (CUPS)
 #   scheduler.
@@ -272,6 +272,25 @@ LogLevel info
 #
 
 #ServerRoot @CUPS_SERVERROOT@
+
+
+########
+######## Fax Support
+########
+
+#
+# FaxRetryLimit: the number of times a fax job is retried.
+# The default is 5 times.
+#
+
+#FaxRetryLimit 5
+
+#
+# FaxRetryInterval: the number of seconds between fax job retries.
+# The default is 300 seconds/5 minutes.
+#
+
+#FaxRetryInterval 300
 
 
 ########
@@ -780,5 +799,5 @@ Allow From 127.0.0.1
 </Location>
 
 #
-# End of "$Id: cupsd.conf.in,v 1.2.2.10 2003/04/05 03:39:28 mike Exp $".
+# End of "$Id: cupsd.conf.in,v 1.2.2.11 2003/04/10 20:15:48 mike Exp $".
 #
