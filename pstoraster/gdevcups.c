@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.48 2002/01/02 17:59:09 mike Exp $"
+ * "$Id: gdevcups.c,v 1.49 2002/01/16 16:54:24 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -1690,6 +1690,9 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   cups->header.HWResolution[0] = pdev->HWResolution[0];
   cups->header.HWResolution[1] = pdev->HWResolution[1];
 
+  cups->header.Margins[0] = 72.0 * margins[0];
+  cups->header.Margins[1] = 72.0 * margins[1];
+
   cups->header.PageSize[0] = pdev->PageSize[0];
   cups->header.PageSize[1] = pdev->PageSize[1];
 
@@ -3051,5 +3054,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.48 2002/01/02 17:59:09 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.49 2002/01/16 16:54:24 mike Exp $".
  */

@@ -1,8 +1,10 @@
-CHANGES.txt - 01/14/2002
+CHANGES.txt - 01/16/2002
 ------------------------
 
 CHANGES IN CUPS V1.1.13
 
+	- The Margins field in the CUPS raster header was not
+	  initialized by the pstoraster filter.
 	- Added --with-optim="flags" option to configure script.
 	- Updated the Italian message translations.
 	- Updated the cups.list file to install the correct
