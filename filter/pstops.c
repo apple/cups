@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.106 2003/08/07 14:55:39 mike Exp $"
+ * "$Id: pstops.c,v 1.107 2003/08/11 18:40:41 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -448,7 +448,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     */
 
     if (Duplex)
-      puts("%%Requirements: duplex\n");
+      puts("%%Requirements: duplex");
 
    /*
     * Apple uses RBI comments for various non-PPD options...
@@ -1890,5 +1890,5 @@ start_nup(int number,			/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.106 2003/08/07 14:55:39 mike Exp $".
+ * End of "$Id: pstops.c,v 1.107 2003/08/11 18:40:41 mike Exp $".
  */
