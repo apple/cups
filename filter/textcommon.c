@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.c,v 1.24 2002/07/02 12:46:22 mike Exp $"
+ * "$Id: textcommon.c,v 1.25 2002/07/08 18:26:05 mike Exp $"
  *
  *   Common text filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -720,10 +720,13 @@ TextMain(const char *name,	/* I - Name of filter */
 	  * MacOS/Darwin still need to treat CR as a line ending.
 	  */
 
-          if ((nextch = getc(fp)) != 0x0a)
-	    ungetc(nextch, fp);
-	  else
-	    ch = nextch;
+          {
+	    int nextch;
+            if ((nextch = getc(fp)) != 0x0a)
+	      ungetc(nextch, fp);
+	    else
+	      ch = nextch;
+	  }
 #endif /* !__APPLE__ */
 
       case 0x0a :		/* LF - output current line */
@@ -1176,5 +1179,5 @@ getutf8(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: textcommon.c,v 1.24 2002/07/02 12:46:22 mike Exp $".
+ * End of "$Id: textcommon.c,v 1.25 2002/07/08 18:26:05 mike Exp $".
  */
