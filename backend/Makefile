@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.7 1999/06/24 17:43:35 mike Exp $"
+# "$Id: Makefile,v 1.8 1999/07/08 14:20:23 mike Exp $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -54,7 +54,7 @@ install:
 # ipp
 #
 
-ipp:	ipp.o ../cups/libcups.a
+ipp:	ipp.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o ipp ipp.o $(LIBS)
 	$(LN) ipp http
@@ -65,7 +65,7 @@ ipp.o:	../cups/cups.h ../Makedefs
 # lpd
 #
 
-lpd:	lpd.o ../cups/libcups.a
+lpd:	lpd.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lpd lpd.o $(LIBS)
 
@@ -75,7 +75,7 @@ lpd.o:	../cups/cups.h ../Makedefs
 # parallel
 #
 
-parallel:	parallel.o ../cups/libcups.a
+parallel:	parallel.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o parallel parallel.o $(LIBS)
 
@@ -85,7 +85,7 @@ parallel.o:	../cups/cups.h ../Makedefs
 # serial
 #
 
-serial:	serial.o ../cups/libcups.a
+serial:	serial.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o serial serial.o $(LIBS)
 
@@ -108,12 +108,12 @@ smb:	smb.sh ../Makedefs
 # socket
 #
 
-socket:	socket.o ../cups/libcups.a
+socket:	socket.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o socket socket.o $(LIBS)
 
 socket.o:	../cups/cups.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.7 1999/06/24 17:43:35 mike Exp $".
+# End of "$Id: Makefile,v 1.8 1999/07/08 14:20:23 mike Exp $".
 #

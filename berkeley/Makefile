@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.5 1999/06/21 18:59:07 mike Exp $"
+# "$Id: Makefile,v 1.6 1999/07/08 14:20:32 mike Exp $"
 #
 #   Berkeley commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -54,7 +54,7 @@ install:
 # lpc
 #
 
-lpc:	lpc.o ../cups/libcups.a
+lpc:	lpc.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lpc lpc.o $(LIBS)
 
@@ -64,7 +64,7 @@ lpc.o:	../cups/cups.h ../Makedefs
 # lpq
 #
 
-lpq:	lpq.o ../cups/libcups.a
+lpq:	lpq.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lpq lpq.o $(LIBS)
 
@@ -74,7 +74,7 @@ lpq.o:	../cups/cups.h ../Makedefs
 # lpr
 #
 
-lpr:	lpr.o ../cups/libcups.a
+lpr:	lpr.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lpr lpr.o $(LIBS)
 
@@ -84,12 +84,12 @@ lpr.o:	../cups/cups.h ../Makedefs
 # lprm
 #
 
-lprm:	lprm.o ../cups/libcups.a
+lprm:	lprm.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lprm lprm.o $(LIBS)
 
 lprm.o:	../cups/cups.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.5 1999/06/21 18:59:07 mike Exp $".
+# End of "$Id: Makefile,v 1.6 1999/07/08 14:20:32 mike Exp $".
 #

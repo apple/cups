@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.5 1999/06/21 18:59:08 mike Exp $"
+# "$Id: Makefile,v 1.6 1999/07/08 14:20:38 mike Exp $"
 #
 #   CGI makefile for the Common UNIX Printing System (CUPS).
 #
@@ -52,7 +52,7 @@ install:
 # classes.cgi
 #
 
-classes.cgi:	classes.o ../Makedefs ../cups/libcups.a
+classes.cgi:	classes.o ../Makedefs ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ classes.o $(LIBS)
 
@@ -62,7 +62,7 @@ $(OBJS):	../Makedefs ../cups/cups.h ../cups/ipp.h ../cups/language.h
 # jobs.cgi
 #
 
-jobs.cgi:	jobs.o ../Makedefs ../cups/libcups.a
+jobs.cgi:	jobs.o ../Makedefs ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ jobs.o $(LIBS)
 
@@ -72,12 +72,12 @@ $(OBJS):	../Makedefs ../cups/cups.h ../cups/ipp.h ../cups/language.h
 # printers.cgi
 #
 
-printers.cgi:	printers.o ../Makedefs ../cups/libcups.a
+printers.cgi:	printers.o ../Makedefs ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ printers.o $(LIBS)
 
 $(OBJS):	../Makedefs ../cups/cups.h ../cups/ipp.h ../cups/language.h
 
 #
-# End of "$Id: Makefile,v 1.5 1999/06/21 18:59:08 mike Exp $".
+# End of "$Id: Makefile,v 1.6 1999/07/08 14:20:38 mike Exp $".
 #

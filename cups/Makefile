@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.16 1999/06/21 18:59:10 mike Exp $"
+# "$Id: Makefile,v 1.17 1999/07/08 14:20:43 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -42,7 +42,7 @@ HEADERS	=	cups.h http.h ipp.h language.h mime.h ppd.h raster.h
 # Targets in this directory...
 #
 
-TARGETS	=	libcups.a testmime testppd testhttp
+TARGETS	=	$(LIBCUPS) testmime testppd testhttp
 
 #
 # Make all targets...
@@ -62,10 +62,22 @@ clean:
 #
 
 install:	all
-	-$(MKDIR) $(LIBDIR)
-	$(CP) libcups.a $(LIBDIR)
 	-$(MKDIR) $(INCLUDEDIR)/cups
 	$(CP) $(HEADERS) $(INCLUDEDIR)/cups
+	-$(MKDIR) $(LIBDIR)
+	$(CP) $(LIBCUPS) $(LIBDIR)
+	if test $(LIBCUPS) != "libcups.a"; then \
+		$(LN) $(LIBCUPS) `basename $(LIBCUPS) .1` \
+	fi
+
+#
+# libcups.so.1, libcups.sl.1
+#
+
+libcups.so.1 libcups.sl.1:	$(OBJS) ../Makedefs
+	echo Linking $@...
+	$(DSO) $@ $(OBJS)
+	$(LN) $@ `basename $@ .1`
 
 #
 # libcups.a
@@ -103,35 +115,35 @@ usersys.o:	cups.h ../config.h ../Makedefs
 util.o:		cups.h http.h ipp.h ../config.h ../Makedefs
 
 #
-# testhttp
+# testhttp (dependency on static CUPS library is intentional)
 #
 
 testhttp:	testhttp.o libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testhttp.o $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ testhttp.o libcups.a
 
 testhttp.o:	http.h ../Makedefs
 
 #
-# testmime
+# testmime (dependency on static CUPS library is intentional)
 #
 
 testmime:	testmime.o libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testmime.o $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ testmime.o libcups.a
 
 testmime.o:	mime.h ../Makedefs
 
 #
-# testppd
+# testppd (dependency on static CUPS library is intentional)
 #
 
 testppd:	testppd.o libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testppd.o $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ testppd.o libcups.a
 
 testppd.o:	ppd.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.16 1999/06/21 18:59:10 mike Exp $".
+# End of "$Id: Makefile,v 1.17 1999/07/08 14:20:43 mike Exp $".
 #
