@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.32.2.9 2002/03/19 19:08:52 mike Exp $"
+ * "$Id: serial.c,v 1.32.2.10 2002/04/29 19:10:42 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -542,6 +542,17 @@ list_devices(void)
 #  endif // _ARCH_PPC || powerpc || __powerpc
     }
   }
+
+  for (i = 0; i < 16; i ++)
+  {
+    sprintf(device, "/dev/usb/ttyUSB%d", i);
+    if ((fd = open(device, O_WRONLY | O_NOCTTY | O_NDELAY)) >= 0)
+    {
+      close(fd);
+      printf("serial serial:%s?baud=230400 \"Unknown\" \"USB Serial Port #%d\"\n",
+             device, i + 1);
+    }
+  }
 #elif defined(__sgi)
   int		i, j, n;	/* Looping vars */
   char		device[255];	/* Device filename */
@@ -879,5 +890,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.32.2.9 2002/03/19 19:08:52 mike Exp $".
+ * End of "$Id: serial.c,v 1.32.2.10 2002/04/29 19:10:42 mike Exp $".
  */
