@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.56 2001/03/06 18:37:49 mike Exp $"
+ * "$Id: main.c,v 1.57 2001/03/14 22:02:18 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -205,20 +205,24 @@ main(int  argc,			/* I - Number of command-line arguments */
   */
 
 #ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-  if (!getuid())
+  if (RunAsUser)
+    sigset(SIGHUP, sigterm_handler);
+  else
     sigset(SIGHUP, sighup_handler);
   sigset(SIGPIPE, SIG_IGN);
   sigset(SIGTERM, sigterm_handler);
 #elif defined(HAVE_SIGACTION)
   memset(&action, 0, sizeof(action));
 
-  if (!getuid())
-  {
-    sigemptyset(&action.sa_mask);
-    sigaddset(&action.sa_mask, SIGHUP);
+  sigemptyset(&action.sa_mask);
+  sigaddset(&action.sa_mask, SIGHUP);
+
+  if (RunAsUser)
+    action.sa_handler = sigterm_handler;
+  else
     action.sa_handler = sighup_handler;
-    sigaction(SIGHUP, &action, NULL);
-  }
+
+  sigaction(SIGHUP, &action, NULL);
 
   sigemptyset(&action.sa_mask);
   action.sa_handler = SIG_IGN;
@@ -229,8 +233,11 @@ main(int  argc,			/* I - Number of command-line arguments */
   action.sa_handler = sigterm_handler;
   sigaction(SIGTERM, &action, NULL);
 #else
-  if (!getuid())
+  if (RunAsUser)
+    signal(SIGHUP, sigterm_handler);
+  else
     signal(SIGHUP, sighup_handler);
+
   signal(SIGPIPE, SIG_IGN);
   signal(SIGTERM, sigterm_handler);
 #endif /* HAVE_SIGSET */
@@ -720,5 +727,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.56 2001/03/06 18:37:49 mike Exp $".
+ * End of "$Id: main.c,v 1.57 2001/03/14 22:02:18 mike Exp $".
  */
