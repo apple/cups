@@ -30,6 +30,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "image"=.\filter\image.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "pstops"=.\filter\pstops.dsp - Package Owner=<4>
 
 Package=<5>
