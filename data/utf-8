@@ -26,14 +26,14 @@ charset utf8
 # printing.
 #
 
-0000 00FF ltor single Courier Courier-Bold Courier-Italic Courier-Bold-Italic
-0100 01FF ltor single Courier Courier-Bold Courier-Italic Courier-Bold-Italic
-0200 02FF ltor single Courier Courier-Bold Courier-Italic Courier-Bold-Italic
+0000 00FF ltor single Courier Courier-Bold Courier-Oblique Courier-BoldOblique
+0100 01FF ltor single Courier Courier-Bold Courier-Oblique Courier-BoldOblique
+0200 02FF ltor single Courier Courier-Bold Courier-Oblique Courier-BoldOblique
 0300 03FF ltor single Symbol
-0400 04FF ltor single Courier Courier-Bold Courier-Italic Courier-Bold-Italic
+0400 04FF ltor single Courier Courier-Bold Courier-Oblique Courier-BoldOblique
 0500 05FF rtol single Courier
-1E00 1EFF ltor single Courier Courier-Bold Courier-Italic Courier-Bold-Italic
-2000 20FF ltor single Courier Courier-Bold Courier-Italic Courier-Bold-Italic
-2100 21FF ltor single Courier Courier-Bold Courier-Italic Courier-Bold-Italic
+1E00 1EFF ltor single Courier Courier-Bold Courier-Oblique Courier-BoldOblique
+2000 20FF ltor single Courier Courier-Bold Courier-Oblique Courier-BoldOblique
+2100 21FF ltor single Courier Courier-Bold Courier-Oblique Courier-BoldOblique
 2200 22FF ltor single Symbol
 2300 23FF ltor single Symbol

@@ -22,7 +22,7 @@ charset 8bit
 # printing.
 #
 
-00 9f ltor single Courier Courier-Bold Courier-Italic Courier-BoldItalic
+00 9f ltor single Courier Courier-Bold Courier-Oblique Courier-BoldOblique
 a0 ff ltor single Symbol
 
 #
