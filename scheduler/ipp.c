@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.145 2001/10/05 18:41:39 mike Exp $"
+ * "$Id: ipp.c,v 1.146 2001/10/22 21:04:08 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1094,6 +1094,45 @@ add_printer(client_t        *con,	/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "device-uri", IPP_TAG_URI)) != NULL)
   {
+    ipp_attribute_t	*device;	/* Current device */
+    int			methodlen;	/* Length of method string */
+
+
+   /*
+    * Do we have a valid device URI?
+    */
+
+    httpSeparate(attr->values[0].string.text, method, username, host,
+                 &port, resource);
+    methodlen = strlen(method);
+
+    if (strcmp(method, "file") != 0)
+    {
+     /*
+      * See if the backend is listed as a device...
+      */
+
+      for (device = ippFindAttribute(Devices, "device-uri", IPP_TAG_URI);
+           device != NULL;
+	   device = ippFindNextAttribute(Devices, "device-uri", IPP_TAG_URI))
+        if (strncmp(method, device->values[0].string.text, methodlen) == 0 &&
+	    (device->values[0].string.text[methodlen] == ':' ||
+	     device->values[0].string.text[methodlen] == '\0'))
+	  break;
+
+      if (device == NULL)
+      {
+       /*
+        * Could not find device in list!
+	*/
+
+	LogMessage(L_ERROR, "add_printer: bad device-uri attribute \'%s\'!",
+        	   attr->values[0].string.text);
+	send_ipp_error(con, IPP_NOT_POSSIBLE);
+	return;
+      }
+    }
+
     LogMessage(L_INFO, "Setting %s device-uri to \"%s\" (was \"%s\".)",
                printer->name, attr->values[0].string.text, printer->device_uri);
 
@@ -5542,5 +5581,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.145 2001/10/05 18:41:39 mike Exp $".
+ * End of "$Id: ipp.c,v 1.146 2001/10/22 21:04:08 mike Exp $".
  */
