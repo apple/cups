@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.8 2000/03/21 18:35:38 mike Exp $"
+ * "$Id: log.c,v 1.9 2000/05/02 19:29:23 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -189,7 +189,11 @@ LogPage(job_t       *job,	/* I - Job being printed */
 {
   char		filename[1024],	/* Name of error log file */
 		backname[1024];	/* Backup filename */
+  ipp_attribute_t *billing;	/* job-billing attribute */
 
+
+
+  billing = ippFindAttribute(job->attrs, "job-billing", IPP_TAG_TEXT);
 
 #ifdef HAVE_VSYSLOG
  /*
@@ -198,8 +202,8 @@ LogPage(job_t       *job,	/* I - Job being printed */
 
   if (strcmp(PageLog, "syslog") == 0)
   {
-    syslog(LOG_INFO, "PAGE %s %s %d %s", job->printer->name, job->username,
-           job->id, page);
+    syslog(LOG_INFO, "PAGE %s %s %d %s %s", job->printer->name, job->username,
+           job->id, page, billing ? billing->values[0].string.text : "");
 
     return (1);
   }
@@ -256,11 +260,12 @@ LogPage(job_t       *job,	/* I - Job being printed */
  /*
   * Print a page log entry of the form:
   *
-  *    printer job-id user [DD/MON/YYYY:HH:MM:SS +TTTT] page num-copies
+  *    printer job-id user [DD/MON/YYYY:HH:MM:SS +TTTT] page num-copies billing
   */
 
-  fprintf(PageFile, "%s %s %d %s %s\n", job->printer->name, job->username,
-          job->id, get_datetime(time(NULL)), page);
+  fprintf(PageFile, "%s %s %d %s %s %s\n", job->printer->name, job->username,
+          job->id, get_datetime(time(NULL)), page,
+	  billing ? billing->values[0].string.text : "");
   fflush(PageFile);
 
   return (1);
@@ -432,5 +437,5 @@ get_datetime(time_t t)		/* I - Time value */
 
 
 /*
- * End of "$Id: log.c,v 1.8 2000/03/21 18:35:38 mike Exp $".
+ * End of "$Id: log.c,v 1.9 2000/05/02 19:29:23 mike Exp $".
  */

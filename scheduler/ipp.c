@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.63 2000/04/29 12:35:57 mike Exp $"
+ * "$Id: ipp.c,v 1.64 2000/05/02 19:29:22 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1672,6 +1672,8 @@ create_job(client_t        *con,	/* I - Client connection */
   ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
   job->state = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_ENUM,
                              "job-state", IPP_JOB_STOPPED);
+  job->sheets = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
+                              "job-media-sheets-completed", 0);
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
                printer_uri);
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL,
@@ -1689,7 +1691,7 @@ create_job(client_t        *con,	/* I - Client connection */
 
     if (attr == NULL)
     {
-      attr = ippAddStrings(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job->sheets",
+      attr = ippAddStrings(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-sheets",
                            2, NULL, NULL);
       attr->values[0].string.text = strdup(printer->job_sheets[0]);
       attr->values[1].string.text = strdup(printer->job_sheets[1]);
@@ -3225,6 +3227,8 @@ print_job(client_t        *con,		/* I - Client connection */
   ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
   job->state = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_ENUM,
                              "job-state", IPP_JOB_PENDING);
+  job->sheets = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
+                              "job-media-sheets-completed", 0);
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
                printer_uri);
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL,
@@ -4764,5 +4768,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.63 2000/04/29 12:35:57 mike Exp $".
+ * End of "$Id: ipp.c,v 1.64 2000/05/02 19:29:22 mike Exp $".
  */

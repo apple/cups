@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.64 2000/04/27 12:24:58 mike Exp $"
+ * "$Id: job.c,v 1.65 2000/05/02 19:29:22 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1254,6 +1254,7 @@ void
 UpdateJob(job_t *job)		/* I - Job to check */
 {
   int		bytes;		/* Number of bytes read */
+  int		copies;		/* Number of copies printed */
   char		*lineptr,	/* Pointer to end of line in buffer */
 		*message;	/* Pointer to message text */
   int		loglevel;	/* Log level for message */
@@ -1330,8 +1331,14 @@ UpdateJob(job_t *job)		/* I - Job to check */
     if (loglevel == L_PAGE)
     {
      /*
-      * Page message; send the message to the page_log file...
+      * Page message; send the message to the page_log file and update the
+      * job sheet count...
       */
+
+      if (!sscanf(message, "%*d%d", &copies))
+        job->sheets->values[0].integer ++;
+      else
+        job->sheets->values[0].integer += copies;
 
       LogPage(job, message);
     }
@@ -2322,5 +2329,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.64 2000/04/27 12:24:58 mike Exp $".
+ * End of "$Id: job.c,v 1.65 2000/05/02 19:29:22 mike Exp $".
  */
