@@ -1,5 +1,5 @@
 /*
- * "$Id: network.h,v 1.1 2002/03/27 18:36:18 mike Exp $"
+ * "$Id: network.h,v 1.1.2.1 2002/03/27 19:10:16 mike Exp $"
  *
  *   Network interface definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -34,7 +34,7 @@ typedef struct cups_netif_str		/**** Network interface data ****/
 			hostname[HTTP_MAX_HOST];
 					/* Hostname associated with interface */
   int			is_local;	/* Local (not point-to-point) interface? */
-  struct sockaddr_in	address,	/* Network address */
+  http_addr_t		address,	/* Network address */
 			mask,		/* Network mask */
 			broadcast;	/* Broadcast address */
 } cups_netif_t;
@@ -59,5 +59,5 @@ extern void		NetIFUpdate(void);
 
 
 /*
- * End of "$Id: network.h,v 1.1 2002/03/27 18:36:18 mike Exp $".
+ * End of "$Id: network.h,v 1.1.2.1 2002/03/27 19:10:16 mike Exp $".
  */

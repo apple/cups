@@ -1,5 +1,5 @@
 /*
- * "$Id: network.c,v 1.5 2002/03/27 18:36:18 mike Exp $"
+ * "$Id: network.c,v 1.5.2.1 2002/03/27 19:10:16 mike Exp $"
  *
  *   Network interface functions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -157,15 +157,17 @@ NetIFUpdate(void)
   for (addr = addrs; addr != NULL; addr = addr->ifa_next)
   {
    /*
-    * See if this interface address is IPv4...
+    * See if this interface address is IPv4 or IPv6...
     */
 
-    if (addr->ifa_addr == NULL || addr->ifa_addr->sa_family != AF_INET ||
+    if (addr->ifa_addr == NULL ||
+        (addr->ifa_addr->sa_family != AF_INET &&
+	 addr->ifa_addr->sa_family != AF_INET6) ||
         addr->ifa_netmask == NULL || addr->ifa_name == NULL)
       continue;
 
    /*
-    * OK, we have an IPv4 address, so create a new list node...
+    * OK, we have an IPv4/6 address, so create a new list node...
     */
 
     if ((temp = calloc(1, sizeof(cups_netif_t))) == NULL)
@@ -179,11 +181,31 @@ NetIFUpdate(void)
     */
 
     strncpy(temp->name, addr->ifa_name, sizeof(temp->name) - 1);
-    memcpy(&(temp->address), addr->ifa_addr, sizeof(temp->address));
-    memcpy(&(temp->mask), addr->ifa_netmask, sizeof(temp->mask));
 
-    if (addr->ifa_dstaddr)
-      memcpy(&(temp->broadcast), addr->ifa_dstaddr, sizeof(temp->broadcast));
+    if (addr->ifa_addr->sa_family == AF_INET)
+    {
+     /*
+      * Copy IPv4 addresses...
+      */
+
+      memcpy(&(temp->address), addr->ifa_addr, sizeof(struct sockaddr_in));
+      memcpy(&(temp->mask), addr->ifa_netmask, sizeof(struct sockaddr_in));
+
+      if (addr->ifa_dstaddr)
+	memcpy(&(temp->broadcast), addr->ifa_dstaddr, sizeof(struct sockaddr_in));
+    }
+    else
+    {
+     /*
+      * Copy IPv6 addresses...
+      */
+
+      memcpy(&(temp->address), addr->ifa_addr, sizeof(struct sockaddr_in6));
+      memcpy(&(temp->mask), addr->ifa_netmask, sizeof(struct sockaddr_in6));
+
+      if (addr->ifa_dstaddr)
+	memcpy(&(temp->broadcast), addr->ifa_dstaddr, sizeof(struct sockaddr_in6));
+    }
 
     if (!(addr->ifa_flags & IFF_POINTOPOINT))
       temp->is_local = 1;
@@ -441,5 +463,5 @@ freeifaddrs(struct ifaddrs *addrs)	/* I - Interface list to free */
 
 
 /*
- * End of "$Id: network.c,v 1.5 2002/03/27 18:36:18 mike Exp $".
+ * End of "$Id: network.c,v 1.5.2.1 2002/03/27 19:10:16 mike Exp $".
  */

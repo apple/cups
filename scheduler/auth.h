@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.h,v 1.16.2.4 2002/01/02 18:04:58 mike Exp $"
+ * "$Id: auth.h,v 1.16.2.5 2002/03/27 19:10:16 mike Exp $"
  *
  *   Authorization definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -41,6 +41,7 @@
 
 #define AUTH_NAME		0	/* Authorize host by name */
 #define AUTH_IP			1	/* Authorize host by IP */
+#define AUTH_INTERFACE		2	/* Authorize host by interface */
 
 #define AUTH_SATISFY_ALL	0	/* Satisfy both address and auth */
 #define AUTH_SATISFY_ANY	1	/* Satisfy either address or auth */
@@ -132,5 +133,5 @@ extern http_status_t	IsAuthorized(client_t *con);
 
 
 /*
- * End of "$Id: auth.h,v 1.16.2.4 2002/01/02 18:04:58 mike Exp $".
+ * End of "$Id: auth.h,v 1.16.2.5 2002/03/27 19:10:16 mike Exp $".
  */
