@@ -1,0 +1,63 @@
+.\"
+.\" "$Id: lppasswd.man,v 1.2 2002/06/27 19:45:10 mike Exp $"
+.\"
+.\"   lpadmin man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2002 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH lppasswd 1 "Common UNIX Printing System" "7 Juin 2001" "Easy Software Products"
+.SH NOM
+lppasswd \- Ajoute, modifie ou supprime des mots de passe
+.SH SYNOPSIS
+.B lppasswd
+[ -a ] [ -g
+.I groupe
+] [ -x ] [
+.I utilisateur
+]
+.SH DESCRIPTION
+\fIlppasswd\fR ajoute, modifie ou supprime des mots de passe du fichier 
+\fIpasswd.md5\fR. Lorsque ce programme est lancé par un utlisateur non privilégié,
+il demande l'ancien et le nouveau mot de passe. Lorsque ce programme est lancé par
+un super-utilisateur, il peut créer de nouveaux comptes utilisateurs (\fI-a utilisateur\fR),
+modifier des comptes existants (\fIutilisateur\fR), ou supprimer des comptes
+(\fI-x utilisateur\fR). Les noms d'utilisateurs ne doivent pas forcément correspondre
+à des noms d'utilisateurs UNIX. Cependant, seuls les utilisateurs UNIX sont gérés
+par les programmes clients CUPS (\fIlp(1)\fR, \fIlpr(1)\fR, etc.)
+.LP
+L'option \fI-g\fR définit un groupe autre que le groupe système -\ «\ sys\ »,
+«\ system\ », «\ root\ », suivant le système d'exploitation.
+.SH PROBLÈMES DE SÉCURITÉ
+La commande \fIlppasswd\fR est installée avec le bit setuid activé. Toutes les précautions
+ont été prises pour empêcher les exploits permettant l'accès aux privilèges du
+super-utilisateur par un utilisateur non privilégié. Cependant, certains administrateurs
+systèmes (paranoïaques) peuvent vouloir désactiver ce programme ou en modifier le
+propriétaire par un utilisateur non privilégié.
+.SH VOIR AUSSI
+lp(1), lpr(1),
+CUPS Software Administrators Manual,
+CUPS Software Users Manual,
+http://localhost:631/documentation.html
+.SH COPYRIGHT
+Copyright 1993-2002 Easy Software Products, Tous droits réservés.
+.SH TRADUCTION
+Gilles QUERRET <gilles.querret@nerim.net>
+.\"
+.\" End of "$Id: lppasswd.man,v 1.2 2002/06/27 19:45:10 mike Exp $".
+.\"
