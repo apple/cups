@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.93 2003/02/19 14:46:10 mike Exp $"
+ * "$Id: ppd.c,v 1.94 2003/02/19 18:08:10 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -366,6 +366,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
   ppd_profile_t		*profile;	/* Pointer to color profile */
   char			**filter;	/* Pointer to filter */
   cups_lang_t		*language;	/* Default language */
+  int			ui_keyword;	/* Is this line a UI keyword? */
   static const char * const ui_keywords[] =
 			{
 			  /* Boolean keywords */
@@ -490,10 +491,11 @@ ppdOpen(FILE *fp)			/* I - File to read from */
   * Read lines from the PPD file and add them to the file record...
   */
 
-  group    = NULL;
-  subgroup = NULL;
-  option   = NULL;
-  choice   = NULL;
+  group      = NULL;
+  subgroup   = NULL;
+  option     = NULL;
+  choice     = NULL;
+  ui_keyword = 0;
 
   while ((mask = ppd_read(fp, keyword, name, text, &string)) != 0)
   {
@@ -551,6 +553,16 @@ ppdOpen(FILE *fp)			/* I - File to read from */
     * create the corresponding option, as needed...
     */
 
+    if (ui_keyword)
+    {
+     /*
+      * Previous line was a UI keyword...
+      */
+
+      option     = NULL;
+      ui_keyword = 0;
+    }
+
     if (option == NULL)
     {
       for (i = 0; i < (int)(sizeof(ui_keywords) / sizeof(ui_keywords[0])); i ++)
@@ -562,6 +574,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
        /*
         * Create the option in the appropriate group...
 	*/
+
+        ui_keyword = 1;
 
         if (!group)
 	{
@@ -2935,5 +2949,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.93 2003/02/19 14:46:10 mike Exp $".
+ * End of "$Id: ppd.c,v 1.94 2003/02/19 18:08:10 mike Exp $".
  */
