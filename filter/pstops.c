@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.24 2002/08/22 16:00:55 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.25 2002/08/23 20:59:42 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -60,8 +60,8 @@
 #define LAYOUT_RLBT	2	/* Right to left, bottom to top */
 #define LAYOUT_RLTB	3	/* Right to left, top to bottom */
 #define LAYOUT_BTLR	4	/* Bottom to top, left to right */
-#define LAYOUT_TBLR	5	/* Top to bottom, right to left */
-#define LAYOUT_BTRL	6	/* Bottom to top, left to right */
+#define LAYOUT_TBLR	5	/* Top to bottom, left to right */
+#define LAYOUT_BTRL	6	/* Bottom to top, right to left */
 #define LAYOUT_TBRL	7	/* Top to bottom, right to left */
 
 #define LAYOUT_NEGATEY	1
@@ -353,17 +353,37 @@ main(int  argc,			/* I - Number of command-line arguments */
   sent_setup  = 0;
 
   if (Copies != 1 && (!Collate || !slowcollate))
+  {
+   /*
+    * Tell the document processor the copy and duplex options
+    * that are required...
+    */
+
     printf("%%%%Requirements: numcopies(%d)%s%s\n", Copies,
            Collate ? " collate" : "",
 	   Duplex ? " duplex" : "");
-  else if (Duplex)
-    puts("%%%%Requirements: duplex\n");
 
- /*
-  * Apple uses RBI comments for various non-PPD options...
-  */
+   /*
+    * Apple uses RBI comments for various non-PPD options...
+    */
 
-  printf("%%RBINumCopies: %d\n", Copies);
+    printf("%%RBINumCopies: %d\n", Copies);
+  }
+  else
+  {
+   /*
+    * Tell the document processor the duplex option that is required...
+    */
+
+    if (Duplex)
+      puts("%%Requirements: duplex\n");
+
+   /*
+    * Apple uses RBI comments for various non-PPD options...
+    */
+
+    puts("%RBINumCopies: 1");
+  }
 
  /*
   * Figure out if we should use ESPshowpage or not...
@@ -1643,5 +1663,5 @@ start_nup(int number,		/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.24 2002/08/22 16:00:55 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.25 2002/08/23 20:59:42 mike Exp $".
  */

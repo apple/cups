@@ -1,5 +1,5 @@
 /*
- * "$Id: filter.c,v 1.3.2.3 2002/07/02 19:15:25 mike Exp $"
+ * "$Id: filter.c,v 1.3.2.4 2002/08/23 20:59:44 mike Exp $"
  *
  *   File type conversion routines for the Common UNIX Printing System (CUPS).
  *
@@ -140,7 +140,8 @@ mime_filter_t *				/* O - Array of filters to run */
 mimeFilter(mime_t      *mime,		/* I - MIME database */
            mime_type_t *src,		/* I - Source file type */
 	   mime_type_t *dst,		/* I - Destination file type */
-           int         *num_filters)	/* O - Number of filters to run */
+           int         *num_filters,	/* O - Number of filters to run */
+	   int         max_depth)       /* I - Maximum depth of search */
 {
   int		i, j,			/* Looping vars */
 		num_temp,		/* Number of temporary filters */
@@ -163,7 +164,8 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
 		dst, dst ? dst->super : "?", dst ? dst->type : "?",
 		num_filters, num_filters ? *num_filters : 0));
 
-  if (mime == NULL || src == NULL || dst == NULL || num_filters == NULL)
+  if (mime == NULL || src == NULL || dst == NULL || num_filters == NULL ||
+      max_depth <= 0)
     return (NULL);
 
   *num_filters = 0;
@@ -207,7 +209,8 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
       * of this filter to the final type...
       */
 
-      if ((temp = mimeFilter(mime, current->dst, dst, &num_temp)) == NULL)
+      if ((temp = mimeFilter(mime, current->dst, dst, &num_temp,
+                             max_depth - 1)) == NULL)
         continue;
 
      /*
@@ -313,5 +316,5 @@ lookup(mime_t      *mime,	/* I - MIME database */
 
 
 /*
- * End of "$Id: filter.c,v 1.3.2.3 2002/07/02 19:15:25 mike Exp $".
+ * End of "$Id: filter.c,v 1.3.2.4 2002/08/23 20:59:44 mike Exp $".
  */

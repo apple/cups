@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- Now limit the maximum number of recursion steps when
+	  searching for a filter for a job, in case a user
+	  defines a circular filter rule.
+	- The PostScript filter would embed an invalid
+	  requirements comment in some cases.
 	- Added support for embedded job tickets in PostScript
 	  files.
 	- The PostScript filter now detects EPS files and should

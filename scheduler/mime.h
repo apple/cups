@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.h,v 1.3.2.2 2002/05/14 01:25:43 mike Exp $"
+ * "$Id: mime.h,v 1.3.2.3 2002/08/23 20:59:45 mike Exp $"
  *
  *   MIME type/conversion database definitions for the Common UNIX Printing System (CUPS).
  *
@@ -131,7 +131,7 @@ extern mime_type_t	*mimeType(mime_t *mime, const char *super, const char *type);
 extern mime_filter_t	*mimeAddFilter(mime_t *mime, mime_type_t *src, mime_type_t *dst,
 			               int cost, const char *filter);
 extern mime_filter_t	*mimeFilter(mime_t *mime, mime_type_t *src, mime_type_t *dst,
-			            int *num_filters);
+			            int *num_filters, int max_depth);
 
 #  ifdef _cplusplus
 }
@@ -139,5 +139,5 @@ extern mime_filter_t	*mimeFilter(mime_t *mime, mime_type_t *src, mime_type_t *ds
 #endif /* !_MIME_H_ */
 
 /*
- * End of "$Id: mime.h,v 1.3.2.2 2002/05/14 01:25:43 mike Exp $".
+ * End of "$Id: mime.h,v 1.3.2.3 2002/08/23 20:59:45 mike Exp $".
  */

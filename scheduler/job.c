@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.29 2002/08/21 17:24:28 mike Exp $"
+ * "$Id: job.c,v 1.124.2.30 2002/08/23 20:59:44 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1195,7 +1195,7 @@ StartJob(int       id,		/* I - Job ID */
     */
 
     filters = mimeFilter(MimeDatabase, current->filetypes[current->current_file],
-                         printer->filetype, &num_filters);
+                         printer->filetype, &num_filters, MAX_FILTERS - 1);
 
     if (num_filters == 0)
     {
@@ -2405,5 +2405,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.29 2002/08/21 17:24:28 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.30 2002/08/23 20:59:44 mike Exp $".
  */
