@@ -1782,6 +1782,10 @@ printers and classes:
 
 	<LI><CODE>CUPS_WINDOWS_1258</CODE> - Windows code page 1258.
 
+	<LI><CODE>CUPS_KOI8_R</CODE> - Russian code page koi8-r.
+
+	<LI><CODE>CUPS_KOI8_U</CODE> - Ukrainian code page koi8-r.
+
 </UL>
 
 <H2>HTTP Constants</H2>

@@ -154,6 +154,8 @@ The currently recognized values are:
 	<LI>windows-1256
 	<LI>windows-1257
 	<LI>windows-1258
+	<LI>koi8-r
+	<LI>koi8-u
 </UL>
 
 <P>The second and succeeding lines define text messages. If the message text

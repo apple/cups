@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.17 2002/01/23 17:25:35 mike Exp $"
+# "$Id: Makefile,v 1.18 2002/01/29 20:25:50 mike Exp $"
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
@@ -45,6 +45,8 @@ CHARSETS =	windows-874 \
 		windows-1256 \
 		windows-1257 \
 		windows-1258 \
+		koi8-r \
+		koi8-u \
 		iso-8859-1 \
 		iso-8859-2 \
 		iso-8859-3 \
@@ -104,5 +106,5 @@ install:
 
 
 #
-# End of "$Id: Makefile,v 1.17 2002/01/23 17:25:35 mike Exp $".
+# End of "$Id: Makefile,v 1.18 2002/01/29 20:25:50 mike Exp $".
 #

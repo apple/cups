@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.112 2002/01/29 02:53:09 mike Exp $"
+ * "$Id: printers.c,v 1.113 2002/01/29 20:25:54 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -915,7 +915,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 		  "windows-1255",
 		  "windows-1256",
 		  "windows-1257",
-		  "windows-1258"
+		  "windows-1258",
+		  "koi8-r",
+		  "koi8-u",
 		};
   int		num_finishings;
   ipp_finish_t	finishings[5];
@@ -2004,5 +2006,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.112 2002/01/29 02:53:09 mike Exp $".
+ * End of "$Id: printers.c,v 1.113 2002/01/29 20:25:54 mike Exp $".
  */
