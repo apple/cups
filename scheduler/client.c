@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.72 2003/09/17 19:24:09 mike Exp $"
+ * "$Id: client.c,v 1.91.2.73 2003/09/29 14:51:59 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2076,7 +2076,8 @@ SendError(client_t      *con,	/* I - Connection */
   if (con->operation > HTTP_WAITING)
     LogRequest(con, code);
 
-  LogMessage(L_DEBUG, "SendError() %d code=%d", con->http.fd, code);
+  LogMessage(L_DEBUG, "SendError() %d code=%d (%s)", con->http.fd, code,
+             httpStatus(code));
 
  /*
   * To work around bugs in some proxies, don't use Keep-Alive for some
@@ -3495,5 +3496,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.72 2003/09/17 19:24:09 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.73 2003/09/29 14:51:59 mike Exp $".
  */
