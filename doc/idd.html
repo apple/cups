@@ -29,257 +29,258 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <HR>
 <H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
 <BR>
-<BR><B><A HREF="#1">1 Scope</A></B>
+<BR><B><A HREF="#1">1  Scope</A></B>
 <UL>
-<LI><A HREF="#1_1">1.1 Identification</A></LI>
-<LI><A HREF="#1_2">1.2 System Overview</A></LI>
-<LI><A HREF="#1_3">1.3 Document Overview</A></LI>
+<LI><A HREF="#1_1">1.1  Identification</A></LI>
+<LI><A HREF="#1_2">1.2  System Overview</A></LI>
+<LI><A HREF="#1_3">1.3  Document Overview</A></LI>
 </UL>
-<B><A HREF="#2">2 References</A></B>
+<B><A HREF="#2">2  References</A></B>
 <UL>
-<LI><A HREF="#2_1">2.1 CUPS Documentation</A></LI>
-<LI><A HREF="#2_2">2.2 Other Documents</A></LI>
+<LI><A HREF="#2_1">2.1  CUPS Documentation</A></LI>
+<LI><A HREF="#2_2">2.2  Other Documents</A></LI>
 </UL>
-<B><A HREF="#3">3 Internal Interfaces</A></B>
+<B><A HREF="#3">3  Internal Interfaces</A></B>
 <UL>
-<LI><A HREF="#3_1">3.1 Character Set Files</A></LI>
+<LI><A HREF="#3_1">3.1  Character Set Files</A></LI>
 <UL>
-<LI><A HREF="#3_1_1">3.1.1 8-Bit Character Set Files</A></LI>
-<LI><A HREF="#3_1_2">3.1.2 Unicode Character Set Files</A></LI>
+<LI><A HREF="#3_1_1">3.1.1  8-Bit Character Set Files</A></LI>
+<LI><A HREF="#3_1_2">3.1.2  Unicode Character Set Files</A></LI>
 </UL>
-<LI><A HREF="#3_2">3.2 Language Files</A></LI>
-<LI><A HREF="#3_3">3.3 MIME Files</A></LI>
+<LI><A HREF="#3_2">3.2  Language Files</A></LI>
+<LI><A HREF="#3_3">3.3  MIME Files</A></LI>
 <UL>
-<LI><A HREF="#3_3_1">3.3.1 mime.types</A></LI>
-<LI><A HREF="#3_3_2">3.3.2 mime.convs</A></LI>
+<LI><A HREF="#3_3_1">3.3.1  mime.types</A></LI>
+<LI><A HREF="#3_3_2">3.3.2  mime.convs</A></LI>
 </UL>
-<LI><A HREF="#3_4">3.4 Option Files</A></LI>
-<LI><A HREF="#3_5">3.5 PostScript Printer Description Files</A></LI>
+<LI><A HREF="#3_4">3.4  Option Files</A></LI>
+<LI><A HREF="#3_5">3.5  PostScript Printer Description Files</A></LI>
 <UL>
-<LI><A HREF="#3_5_1">3.5.1 PPD Specification</A></LI>
-<LI><A HREF="#3_5_2">3.5.2 CUPS Extensions to PPD Files</A></LI>
+<LI><A HREF="#3_5_1">3.5.1  PPD Specification</A></LI>
+<LI><A HREF="#3_5_2">3.5.2  CUPS Extensions to PPD Files</A></LI>
 </UL>
-<LI><A HREF="#3_6">3.6 Scheduler Configuration Files</A></LI>
+<LI><A HREF="#3_6">3.6  Scheduler Configuration Files</A></LI>
 <UL>
-<LI><A HREF="#3_6_1">3.6.1 classes.conf</A></LI>
-<LI><A HREF="#3_6_2">3.6.2 cupsd.conf</A></LI>
-<LI><A HREF="#3_6_3">3.6.3 printers.conf</A></LI>
+<LI><A HREF="#3_6_1">3.6.1  classes.conf</A></LI>
+<LI><A HREF="#3_6_2">3.6.2  cupsd.conf</A></LI>
+<LI><A HREF="#3_6_3">3.6.3  printers.conf</A></LI>
 </UL>
 </UL>
-<B><A HREF="#4">4 External Interfaces</A></B>
+<B><A HREF="#4">4  External Interfaces</A></B>
 <UL>
-<LI><A HREF="#4_1">4.1 AppSocket Protocol</A></LI>
-<LI><A HREF="#4_2">4.2 CUPS Browsing Protocol</A></LI>
-<LI><A HREF="#4_3">4.3 CUPS Form File</A></LI>
+<LI><A HREF="#4_1">4.1  AppSocket Protocol</A></LI>
+<LI><A HREF="#4_2">4.2  CUPS Browsing Protocol</A></LI>
+<LI><A HREF="#4_3">4.3  CUPS Form File</A></LI>
 <UL>
-<LI><A HREF="#4_3_1">4.3.1 CUPS Form DTD</A></LI>
+<LI><A HREF="#4_3_1">4.3.1  CUPS Form DTD</A></LI>
 </UL>
-<LI><A HREF="#4_4">4.4 CUPS PostScript File</A></LI>
-<LI><A HREF="#4_5">4.5 CUPS Raster File</A></LI>
-<LI><A HREF="#4_6">4.6 CUPS Raw Files</A></LI>
-<LI><A HREF="#4_7">4.7 Internet Printing Protocol</A></LI>
-<LI><A HREF="#4_8">4.8 Line Printer Daemon Protocol</A></LI>
-<LI><A HREF="#4_9">4.9 Server Message Block Protocol</A></LI>
+<LI><A HREF="#4_4">4.4  CUPS PostScript File</A></LI>
+<LI><A HREF="#4_5">4.5  CUPS Raster File</A></LI>
+<LI><A HREF="#4_6">4.6  CUPS Raw Files</A></LI>
+<LI><A HREF="#4_7">4.7  Internet Printing Protocol</A></LI>
+<LI><A HREF="#4_8">4.8  Line Printer Daemon Protocol</A></LI>
+<LI><A HREF="#4_9">4.9  Server Message Block Protocol</A></LI>
 </UL>
-<B><A HREF="#5">5 Directories</A></B>
+<B><A HREF="#5">5  Directories</A></B>
 <BR>
-<BR><B><A HREF="#6">A Glossary</A></B>
+<BR><B><A HREF="#6">A  Glossary</A></B>
 <UL>
-<LI><A HREF="#6_1">A.1 Terms</A></LI>
-<LI><A HREF="#6_2">A.2 Acronyms</A></LI>
+<LI><A HREF="#6_1">A.1  Terms</A></LI>
+<LI><A HREF="#6_2">A.2  Acronyms</A></LI>
 </UL>
 <HR>
-<H1><A NAME="1">1 Scope</A></H1>
-<H2><A NAME="1_1">1.1 Identification</A></H2>
-<P>This interface design description document provides detailed file 
+<H1><A NAME="1">1  Scope</A></H1>
+<H2><A NAME="1_1">1.1  Identification</A></H2>
+<P> This interface design description document provides detailed file 
 formats, message formats, and program conventions for the Common UNIX 
 Printing System (&quot;CUPS&quot;) Version 1.1. </P>
-<H2><A NAME="1_2">1.2 System Overview</A></H2>
-<P>CUPS provides a portable printing layer for UNIX&reg;-based operating 
+<H2><A NAME="1_2">1.2  System Overview</A></H2>
+<P> CUPS provides a portable printing layer for UNIX&reg;-based operating 
 systems. It has been developed by <A HREF="http://www.easysw.com">Easy 
 Software Products</A> to promote a standard printing solution for all 
 UNIX vendors and users. CUPS provides the System V and Berkeley 
 command-line interfaces. </P>
-<P>CUPS uses the Internet Printing Protocol (&quot;IPP&quot;) as the basis for 
+<P> CUPS uses the Internet Printing Protocol (&quot;IPP&quot;) as the basis for 
 managing print jobs and queues. The Line Printer Daemon (&quot;LPD&quot;) Server 
 Message Block (&quot;SMB&quot;), and AppSocket (a.k.a. JetDirect) protocols are 
 also supported with reduced functionality. CUPS adds network printer 
 browsing and PostScript Printer Description (&quot;PPD&quot;) based printing 
 options to support real-world printing under UNIX. </P>
-<P>CUPS also includes a customized version of GNU Ghostscript 
+<P> CUPS also includes a customized version of GNU Ghostscript 
 (currently based off GNU Ghostscript 5.50) and an image file RIP that 
 are used to support non-PostScript printers. Sample drivers for HP and 
 EPSON printers are included that use these filters. </P>
-<H2><A NAME="1_3">1.3 Document Overview</A></H2>
-<P>This interface design description document is organized into the 
+<H2><A NAME="1_3">1.3  Document Overview</A></H2>
+<P> This interface design description document is organized into the 
 following sections: </P>
 <UL>
-<LI>1 - Scope </LI>
-<LI>2 - References </LI>
-<LI>3 - Internal Interfaces </LI>
-<LI>4 - External Interfaces </LI>
-<LI>5 - Directories </LI>
-<LI>A - Glossary </LI>
+<LI> 1 - Scope </LI>
+<LI> 2 - References </LI>
+<LI> 3 - Internal Interfaces </LI>
+<LI> 4 - External Interfaces </LI>
+<LI> 5 - Directories </LI>
+<LI> A - Glossary </LI>
 </UL>
-<H1><A NAME="2">2 References</A></H1>
-<H2><A NAME="2_1">2.1 CUPS Documentation</A></H2>
-<P>The following CUPS documentation is referenced by this document: </P>
+<H1><A NAME="2">2  References</A></H1>
+<H2><A NAME="2_1">2.1  CUPS Documentation</A></H2>
+<P> The following CUPS documentation is referenced by this document: </P>
 <UL>
-<LI>CUPS-CMP-1.1: CUPS Configuration Management Plan </LI>
-<LI>CUPS-IDD-1.1: CUPS System Interface Design Description </LI>
-<LI>CUPS-IPP-1.1: CUPS Implmentation of IPP </LI>
-<LI>CUPS-SAM-1.1.x: CUPS Software Administrators Manual </LI>
-<LI>CUPS-SDD-1.1: CUPS Software Design Description </LI>
-<LI>CUPS-SPM-1.1.x: CUPS Software Programming Manual </LI>
-<LI>CUPS-SSR-1.1: CUPS Software Security Report </LI>
-<LI>CUPS-STP-1.1: CUPS Software Test Plan </LI>
-<LI>CUPS-SUM-1.1.x: CUPS Software Users Manual </LI>
-<LI>CUPS-SVD-1.1.x: CUPS Software Version Description </LI>
+<LI> CUPS-CMP-1.1: CUPS Configuration Management Plan </LI>
+<LI> CUPS-IDD-1.1: CUPS System Interface Design Description </LI>
+<LI> CUPS-IPP-1.1: CUPS Implmentation of IPP </LI>
+<LI> CUPS-SAM-1.1.x: CUPS Software Administrators Manual </LI>
+<LI> CUPS-SDD-1.1: CUPS Software Design Description </LI>
+<LI> CUPS-SPM-1.1.x: CUPS Software Programming Manual </LI>
+<LI> CUPS-SSR-1.1: CUPS Software Security Report </LI>
+<LI> CUPS-STP-1.1: CUPS Software Test Plan </LI>
+<LI> CUPS-SUM-1.1.x: CUPS Software Users Manual </LI>
+<LI> CUPS-SVD-1.1.x: CUPS Software Version Description </LI>
 </UL>
-<H2><A NAME="2_2">2.2 Other Documents</A></H2>
-<P>The following non-CUPS documents are referenced by this document: </P>
+<H2><A NAME="2_2">2.2  Other Documents</A></H2>
+<P> The following non-CUPS documents are referenced by this document: </P>
 <UL>
 <LI><A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/5003.PPD_Spec_v4.3.pdf">
-Adobe  PostScript Printer Description File Format Specification, 
+ Adobe  PostScript Printer Description File Format Specification, 
  Version 4.3.</A></LI>
 <LI><A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/PLRM.pdf">
-Adobe  PostScript Language Reference, Third Edition.</A></LI>
-<LI>IPP: Job and Printer Set Operations </LI>
-<LI>IPP/1.1: Encoding and Transport </LI>
-<LI>IPP/1.1: Implementers Guide </LI>
-<LI>IPP/1.1: Model and Semantics </LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc1179.txt">RFC 1179, Line 
+ Adobe  PostScript Language Reference, Third Edition.</A></LI>
+<LI> IPP: Job and Printer Set Operations </LI>
+<LI> IPP/1.1: Encoding and Transport </LI>
+<LI> IPP/1.1: Implementers Guide </LI>
+<LI> IPP/1.1: Model and Semantics </LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc1179.txt"> RFC 1179, Line 
 Printer Daemon Protocol</A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2567.txt">RFC 2567, Design 
+<LI><A HREF="http://www.ietf.org/rfc/rfc2567.txt"> RFC 2567, Design 
 Goals for an Internet Printing Protocol</A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2568.txt">RFC 2568, Rationale 
+<LI><A HREF="http://www.ietf.org/rfc/rfc2568.txt"> RFC 2568, Rationale 
 for the Structure of the Model and Protocol</A> for the Internet 
 Printing Protocol</LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2569.txt">RFC 2569, Mapping 
+<LI><A HREF="http://www.ietf.org/rfc/rfc2569.txt"> RFC 2569, Mapping 
 between LPD and IPP Protocols</A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616, Hypertext 
+<LI><A HREF="http://www.ietf.org/rfc/rfc2616.txt"> RFC 2616, Hypertext 
 Transfer Protocol -- HTTP/1.1</A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617, HTTP 
+<LI><A HREF="http://www.ietf.org/rfc/rfc2617.txt"> RFC 2617, HTTP 
 Authentication: Basic and Digest Access</A> Authentication </LI>
 </UL>
-<H1><A NAME="3">3 Internal Interfaces</A></H1>
-<H2><A NAME="3_1">3.1 Character Set Files</A></H2>
-<P>The character set files define a mapping between 8-bit characters 
+<H1><A NAME="3">3  Internal Interfaces</A></H1>
+<H2><A NAME="3_1">3.1  Character Set Files</A></H2>
+<P> The character set files define a mapping between 8-bit characters 
 and the Unicode character set, or between Unicode and printer fonts. 
 They are named using the IETF charset names defined in RFCnnnn.  These 
 files are ASCII text, the content of which is described below. Comments 
 can be included by using the <TT>#</TT> character in the first column 
 of a line. </P>
-<H3><A NAME="3_1_1">3.1.1 8-Bit Character Set Files</A></H3>
-<P>8-bit character set files start with a line reading: </P>
+<H3><A NAME="3_1_1">3.1.1  8-Bit Character Set Files</A></H3>
+<P> 8-bit character set files start with a line reading: </P>
 <UL>
 <PRE>
 charset 8bit
 </PRE>
 </UL>
-<P>Following this are lines that define the font information: </P>
+<P> Following this are lines that define the font information: </P>
 <UL>
 <PRE>
 first last direction width normal bold italic bold-italic
 </PRE>
 </UL>
-<P><VAR>First</VAR> and <VAR>last</VAR> are the first and last glyphs 
+<P><VAR> First</VAR> and <VAR>last</VAR> are the first and last glyphs 
 in the font mapping that correspond to that font; a maximum of 256 
 characters can be mapped within each group, with a maximum of 256 
 mappings (this is a PostScript limitation.) The glyph values are 
 hexadecimal. </P>
-<P><VAR>Direction</VAR> is the string &quot;ltor&quot;, &quot;rtol&quot;, or &quot;rtola&quot; 
+<P><VAR> Direction</VAR> is the string &quot;ltor&quot;, &quot;rtol&quot;, or &quot;rtola&quot; 
 indicating left-to-right, right-to-left, or right-to-left Arabic text. </P>
-<P><VAR>Width</VAR> is the string &quot;single&quot; or &quot;double&quot;; double means 
+<P><VAR> Width</VAR> is the string &quot;single&quot; or &quot;double&quot;; double means 
 that the glyphs are twice as wide as ASCII characters in the Courier 
 typeface. </P>
-<P><VAR>Normal, bold, italic</VAR>, and <VAR>bold-italic</VAR> are the 
+<P><VAR> Normal, bold, italic</VAR>, and <VAR>bold-italic</VAR> are the 
 typefaces to use for each presentation.  If characters are only 
 available in a single style then only one typeface should be listed 
 (e.g. &quot;Symbol&quot;.) Each font that is listed will be used (and downloaded 
 if needed) when printing. </P>
-<P>The remaining lines define a character to Unicode glyph mapping for 
+<P> The remaining lines define a character to Unicode glyph mapping for 
 the character set. The character and glyph values are hexadecimal: </P>
 <UL>
 <PRE>
 xx yyyy
 </PRE>
 </UL>
-<H3><A NAME="3_1_2">3.1.2 Unicode Character Set Files</A></H3>
-<P>Unicode character set files start with a line reading: </P>
+<H3><A NAME="3_1_2">3.1.2  Unicode Character Set Files</A></H3>
+<P> Unicode character set files start with a line reading: </P>
 <UL>
 <PRE>
 charset encoding
 </PRE>
 </UL>
-<P><VAR>Encoding</VAR> is the encoding to use for the text; currently 
+<P><VAR> Encoding</VAR> is the encoding to use for the text; currently 
 only the string &quot;utf8&quot; is supported. </P>
-<P>Following this are lines defining the font information: </P>
+<P> Following this are lines defining the font information: </P>
 <UL>
 <PRE>
 first last direction width normal bold italic bold-italic
 </PRE>
 </UL>
-<P><VAR>First</VAR> and <VAR>last</VAR> are the first and last glyphs 
+<P><VAR> First</VAR> and <VAR>last</VAR> are the first and last glyphs 
 in the font mapping that correspond to that font; a maximum of 256 
 characters can be mapped within each group, with a maximum of 256 
 mappings (this is a PostScript limitation.) The glyph values are 
 hexadecimal. </P>
-<P><VAR>Direction</VAR> is the string &quot;ltor&quot;, &quot;rtol&quot;, or &quot;rtola&quot; 
+<P><VAR> Direction</VAR> is the string &quot;ltor&quot;, &quot;rtol&quot;, or &quot;rtola&quot; 
 indicating left-to-right, right-to-left, or right-to-left Arabic text. </P>
-<P><VAR>Width</VAR> is the string &quot;single&quot; or &quot;double&quot;; double means 
+<P><VAR> Width</VAR> is the string &quot;single&quot; or &quot;double&quot;; double means 
 that the glyphs are twice as wide as ASCII characters in the Courier 
 typeface. </P>
-<P><VAR>Normal, bold, italic</VAR>, and <VAR>bold-italic</VAR> are the 
+<P><VAR> Normal, bold, italic</VAR>, and <VAR>bold-italic</VAR> are the 
 typefaces to use for each presentation.  If characters are only 
 available in a single style then only one typeface should be listed 
 (e.g. &quot;Symbol&quot;.) Each font that is listed will be used (and downloaded 
 if needed) when printing. </P>
-<H2><A NAME="3_2">3.2 Language Files</A></H2>
-<P>The language files define the default character set and a collection 
-of text messages in that language. They are named by prefixing the 
-string &quot;cups_&quot; to the front of the language specifier (e.g. &quot;cups_en&quot;, 
-&quot;cups_fr&quot;, etc.) Each file consists of two or more lines of ASCII text. </P>
-<P>The first line identifies the character set to be used for the 
+<H2><A NAME="3_2">3.2  Language Files</A></H2>
+<P> The language files define the default character set and a 
+collection of text messages in that language. They are named by 
+prefixing the string &quot;cups_&quot; to the front of the language specifier 
+(e.g. &quot;cups_en&quot;, &quot;cups_fr&quot;, etc.) Each file consists of two or more 
+lines of ASCII text. </P>
+<P> The first line identifies the character set to be used for the 
 messages. The currently recognized values are: </P>
 <UL>
-<LI>iso-8859-1 </LI>
-<LI>iso-8859-2 </LI>
-<LI>iso-8859-3 </LI>
-<LI>iso-8859-4 </LI>
-<LI>iso-8859-5 </LI>
-<LI>iso-8859-6 </LI>
-<LI>iso-8859-7 </LI>
-<LI>iso-8859-8 </LI>
-<LI>iso-8859-9 </LI>
-<LI>iso-8859-10 </LI>
-<LI>iso-8859-13 </LI>
-<LI>iso-8859-14 </LI>
-<LI>iso-8859-15 </LI>
-<LI>us-ascii </LI>
-<LI>utf-8 </LI>
-<LI>windows-874 </LI>
-<LI>windows-1250 </LI>
-<LI>windows-1251 </LI>
-<LI>windows-1252 </LI>
-<LI>windows-1253 </LI>
-<LI>windows-1254 </LI>
-<LI>windows-1255 </LI>
-<LI>windows-1256 </LI>
-<LI>windows-1257 </LI>
-<LI>windows-1258 </LI>
+<LI> iso-8859-1 </LI>
+<LI> iso-8859-2 </LI>
+<LI> iso-8859-3 </LI>
+<LI> iso-8859-4 </LI>
+<LI> iso-8859-5 </LI>
+<LI> iso-8859-6 </LI>
+<LI> iso-8859-7 </LI>
+<LI> iso-8859-8 </LI>
+<LI> iso-8859-9 </LI>
+<LI> iso-8859-10 </LI>
+<LI> iso-8859-13 </LI>
+<LI> iso-8859-14 </LI>
+<LI> iso-8859-15 </LI>
+<LI> us-ascii </LI>
+<LI> utf-8 </LI>
+<LI> windows-874 </LI>
+<LI> windows-1250 </LI>
+<LI> windows-1251 </LI>
+<LI> windows-1252 </LI>
+<LI> windows-1253 </LI>
+<LI> windows-1254 </LI>
+<LI> windows-1255 </LI>
+<LI> windows-1256 </LI>
+<LI> windows-1257 </LI>
+<LI> windows-1258 </LI>
 </UL>
-<P>The second and succeeding lines define text messages. If the message 
-text is preceded by a number, then the current message number is 
-updated and the text after the number is used. </P>
-<H2><A NAME="3_3">3.3 MIME Files</A></H2>
-<P>CUPS uses two MIME files in its standard configuration. </P>
-<H3><A NAME="3_3_1">3.3.1 mime.types</A></H3>
-<P>The mime.types file defines the recognized file types and consists 
+<P> The second and succeeding lines define text messages. If the 
+message text is preceded by a number, then the current message number 
+is updated and the text after the number is used. </P>
+<H2><A NAME="3_3">3.3  MIME Files</A></H2>
+<P> CUPS uses two MIME files in its standard configuration. </P>
+<H3><A NAME="3_3_1">3.3.1  mime.types</A></H3>
+<P> The mime.types file defines the recognized file types and consists 
 of 1 or more lines of ASCII text. Comment lines start with the pound 
 (&quot;#&quot;) character. The backslash (&quot;\&quot;) character can be used at the end 
 of a line to continue that line to the next. </P>
-<P>Each non-blank line starts with a MIME type identifier 
+<P> Each non-blank line starts with a MIME type identifier 
 (&quot;super/type&quot;) as registered with the IANA. All text following the MIME 
 type is treated as a series of type recognition rules: </P>
 <UL>
@@ -303,14 +304,14 @@ operator := &quot;+&quot; |	[ logical AND ]
 	    &quot;!&quot;         [ unary NOT ]
 </PRE>
 </UL>
-<P>The <CODE>int</CODE> and <CODE>short</CODE> rules match look for 
+<P> The <CODE>int</CODE> and <CODE>short</CODE> rules match look for 
 integers in network byte order (a.k.a. big-endian) with the 
 most-significant byte first. </P>
-<H3><A NAME="3_3_2">3.3.2 mime.convs</A></H3>
-<P>The mime.types file defines the recognized file filters and consists 
-of 1 or more lines of ASCII text. Comment lines start with the pound 
-(&quot;#&quot;) character. </P>
-<P>Each non-blank line starts with two MIME type identifiers 
+<H3><A NAME="3_3_2">3.3.2  mime.convs</A></H3>
+<P> The mime.types file defines the recognized file filters and 
+consists of 1 or more lines of ASCII text. Comment lines start with the 
+pound (&quot;#&quot;) character. </P>
+<P> Each non-blank line starts with two MIME type identifiers 
 (&quot;super/type&quot;) representing the source and destination types. Following 
 the MIME types are a cost value (0 to 100) and the filter program to 
 use. If the filter program is not specified using the full path then it 
@@ -320,8 +321,8 @@ must reside in the CUPS filter directory: </P>
 super/type SP super/type2 SP cost SP program
 </PRE>
 </UL>
-<H2><A NAME="3_4">3.4 Option Files</A></H2>
-<P>CUPS maintains user-defined printer and option files for each 
+<H2><A NAME="3_4">3.4  Option Files</A></H2>
+<P> CUPS maintains user-defined printer and option files for each 
 printer and user on the system. The printers and options defined in the 
 system option file (<CODE>/etc/cups/lpoptions</CODE>) are loaded first, 
 followed by the user option file (<CODE>$HOME/.lpoptions</CODE>). 
@@ -336,286 +337,287 @@ Default name option=value option=value ... option=value
 Default name/instance option=value option=value ... option=value
 </PRE>
 </UL>
-<P>The line beginning with &quot;Default&quot; indicates the default destination 
+<P> The line beginning with &quot;Default&quot; indicates the default destination 
 for print jobs; a default line in the user option file overrides the 
 default defined in the system option file. </P>
-<P><VAR>Name</VAR> is the name of a printer known to the local server. </P>
-<P><VAR>Instance</VAR> can be any string of letters, numbers, and the 
+<P><VAR> Name</VAR> is the name of a printer known to the local server. </P>
+<P><VAR> Instance</VAR> can be any string of letters, numbers, and the 
 underscore up to 127 characters in length. </P>
-<P>The remainder of the line contains a list of space-separated options 
-and their values. </P>
-<H2><A NAME="3_5">3.5 PostScript Printer Description Files</A></H2>
-<P>PostScript Printer Description (&quot;PPD&quot;) files describe the 
+<P> The remainder of the line contains a list of space-separated 
+options and their values. </P>
+<H2><A NAME="3_5">3.5  PostScript Printer Description Files</A></H2>
+<P> PostScript Printer Description (&quot;PPD&quot;) files describe the 
 capabilities of each printer and are used by CUPS to support 
 printer-specific features and intelligent filtering. </P>
-<H3><A NAME="3_5_1">3.5.1 PPD Specification</A></H3>
-<P>The PPD file format is described in <A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/5003.PPD_Spec_v4.3.pdf">
+<H3><A NAME="3_5_1">3.5.1  PPD Specification</A></H3>
+<P> The PPD file format is described in <A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/5003.PPD_Spec_v4.3.pdf">
  Adobe TechNote #5003: PostScript Printer Description File Format 
 Specification Version 4.3</A>. </P>
-<H3><A NAME="3_5_2">3.5.2 CUPS Extensions to PPD Files</A></H3>
-<P>CUPS adds several new attributes that are described below. </P>
-<H4>3.5.2.1 cupsFilter</H4>
-<P>This string attribute provides a conversion rule of the form: </P>
+<H3><A NAME="3_5_2">3.5.2  CUPS Extensions to PPD Files</A></H3>
+<P> CUPS adds several new attributes that are described below. </P>
+<H4>3.5.2.1  cupsFilter</H4>
+<P> This string attribute provides a conversion rule of the form: </P>
 <UL>
 <PRE>
 source/type cost program
 </PRE>
 </UL>
-<P>The destination type is assumed to the printer's type. If a printer 
+<P> The destination type is assumed to the printer's type. If a printer 
 supports the source type directly the special filter program &quot;-&quot; may be 
 specified. </P>
-<H4>3.5.2.2 cupsManualCopies</H4>
-<P>This boolean attribute notifies the RIP filters that the destination 
-printer does not support copy generation in hardware. The default value 
-is false. </P>
-<H4>3.5.2.3 cupsModelNumber</H4>
-<P>This integer attribute specifies a printer-specific model number. 
+<H4>3.5.2.2  cupsManualCopies</H4>
+<P> This boolean attribute notifies the RIP filters that the 
+destination printer does not support copy generation in hardware. The 
+default value is false. </P>
+<H4>3.5.2.3  cupsModelNumber</H4>
+<P> This integer attribute specifies a printer-specific model number. 
 This number can be used by a filter program to adjust the output for a 
 specific model of printer. </P>
-<H4>3.5.2.4 cupsProfile</H4>
-<P>This string attribute specifies a color profile of the form: </P>
+<H4>3.5.2.4  cupsProfile</H4>
+<P> This string attribute specifies a color profile of the form: </P>
 <UL>
 <PRE>
 resolution/type density gamma m00 m01 m02 m10 m11 m12 m20 m21 m22
 </PRE>
 </UL>
-<P>The <I>resolution</I> and <I>type</I> values may be &quot;-&quot; to act as a 
+<P> The <I>resolution</I> and <I>type</I> values may be &quot;-&quot; to act as a 
 wildcard. Otherwise they must match one of the <CODE>Resolution</CODE>
  or <CODE>MediaType</CODE> attributes defined in the PPD file. </P>
-<P>The <I>density</I> and <I>gamma</I> values define gamma and density 
+<P> The <I>density</I> and <I>gamma</I> values define gamma and density 
 adjustment function such that: </P>
 <UL>
 <PRE>
 f(x) = density * x<SUP>gamma</SUP>
 </PRE>
 </UL>
-<P>The <I>m00</I> through <I>m22</I> values define a 3x3 transformation 
-matrix for the CMY color values. The density function is applied <I>
-after</I> the CMY transformation. </P>
-<H4>3.5.2.5 cupsVersion</H4>
-<P>This required attribute describes which version of the CUPS IDD was 
+<P> The <I>m00</I> through <I>m22</I> values define a 3x3 
+transformation matrix for the CMY color values. The density function is 
+applied <I>after</I> the CMY transformation. </P>
+<H4>3.5.2.5  cupsVersion</H4>
+<P> This required attribute describes which version of the CUPS IDD was 
 used for the PPD file extensions. Currently it must be the string &quot;1.0&quot; 
 or &quot;1.1&quot;. </P>
-<H2><A NAME="3_6">3.6 Scheduler Configuration Files</A></H2>
-<P>The scheduler reads three configuration files that define the 
+<H2><A NAME="3_6">3.6  Scheduler Configuration Files</A></H2>
+<P> The scheduler reads three configuration files that define the 
 available printers, classes, and services: </P>
 <DL>
-<DT>classes.conf </DT>
-<DD>This file defines all of the printer classes known to the  system. </DD>
-<DT>cupsd.conf </DT>
-<DD>This file defines the files, directories, passwords, etc.  used by 
+<DT> classes.conf </DT>
+<DD> This file defines all of the printer classes known to the  system. </DD>
+<DT> cupsd.conf </DT>
+<DD> This file defines the files, directories, passwords, etc.  used by 
 the scheduler. </DD>
-<DT>printers.conf </DT>
-<DD>This file defines all of the printers known to the system. </DD>
+<DT> printers.conf </DT>
+<DD> This file defines all of the printers known to the system. </DD>
 </DL>
-<H3><A NAME="3_6_1">3.6.1 classes.conf</A></H3>
-<P>The classes.conf file consists of 1 or more lines of ASCII text. 
+<H3><A NAME="3_6_1">3.6.1  classes.conf</A></H3>
+<P> The classes.conf file consists of 1 or more lines of ASCII text. 
  Comment lines start with the pound (&quot;#&quot;) character. </P>
-<P>Each non-blank line starts with the name of a configuration 
+<P> Each non-blank line starts with the name of a configuration 
 directive followed by its value. The following directives are 
 understood: 
 <CENTER>
 <TABLE BORDER="1" WIDTH="90%">
-<TR><TH WIDTH="25%">Directive</TH><TH>Description</TH></TR>
-<TR><TD>&lt;Class name&gt;
-<BR> &lt;/Class&gt;</TD><TD>Surrounds a class definition.</TD></TR>
-<TR><TD>&lt;DefaultClass name&gt;
-<BR> &lt;/Class&gt;</TD><TD>Surrounds a class definition for the default 
+<TR><TH WIDTH="25%"> Directive</TH><TH> Description</TH></TR>
+<TR><TD> &lt;Class name&gt;
+<BR> &lt;/Class&gt;</TD><TD> Surrounds a class definition.</TD></TR>
+<TR><TD> &lt;DefaultClass name&gt;
+<BR> &lt;/Class&gt;</TD><TD> Surrounds a class definition for the default 
 destination.</TD></TR>
-<TR><TD>Accepting</TD><TD>Specifies whether the class is accepting new 
-jobs. May be  the names &quot;Yes&quot; or &quot;No&quot;.</TD></TR>
-<TR><TD>AllowUsers</TD><TD>Specifies a list of users that are allowed 
+<TR><TD> Accepting</TD><TD> Specifies whether the class is accepting 
+new jobs. May be  the names &quot;Yes&quot; or &quot;No&quot;.</TD></TR>
+<TR><TD> AllowUsers</TD><TD> Specifies a list of users that are allowed 
 to access the class.</TD></TR>
-<TR><TD>BannerStart</TD><TD>Specifies the banner that is printed before 
+<TR><TD> BannerStart</TD><TD> Specifies the banner that is printed 
+before other files in a  job.</TD></TR>
+<TR><TD> BannerEnd</TD><TD> Specifies the banner that is printed after 
 other files in a  job.</TD></TR>
-<TR><TD>BannerEnd</TD><TD>Specifies the banner that is printed after 
-other files in a  job.</TD></TR>
-<TR><TD>DenyUsers</TD><TD>Specifies a list of users that are not 
+<TR><TD> DenyUsers</TD><TD> Specifies a list of users that are not 
 allowed to access the  class.</TD></TR>
-<TR><TD>Info</TD><TD>A textual description of the class.</TD></TR>
-<TR><TD>Location</TD><TD>A textual location of the class.</TD></TR>
-<TR><TD>Printer</TD><TD>Specifies a printer that is a member of the 
+<TR><TD> Info</TD><TD> A textual description of the class.</TD></TR>
+<TR><TD> Location</TD><TD> A textual location of the class.</TD></TR>
+<TR><TD> Printer</TD><TD> Specifies a printer that is a member of the 
 class.</TD></TR>
-<TR><TD>State</TD><TD>Specifies the initial state of the class; can be 
-&quot;Idle&quot; or  &quot;Stopped&quot;.</TD></TR>
-<TR><TD>StateMessage</TD><TD>Specifies a textual message for the 
+<TR><TD> State</TD><TD> Specifies the initial state of the class; can 
+be &quot;Idle&quot; or  &quot;Stopped&quot;.</TD></TR>
+<TR><TD> StateMessage</TD><TD> Specifies a textual message for the 
 current class state.</TD></TR>
 </TABLE>
 </CENTER>
 </P>
-<H3><A NAME="3_6_2">3.6.2 cupsd.conf</A></H3>
-<P>The cupsd.conf file consists of 1 or more lines of ASCII text. 
+<H3><A NAME="3_6_2">3.6.2  cupsd.conf</A></H3>
+<P> The cupsd.conf file consists of 1 or more lines of ASCII text. 
  Comment lines start with the pound (&quot;#&quot;) character. </P>
-<P>Each non-blank line starts with the name of a configuration 
+<P> Each non-blank line starts with the name of a configuration 
 directive followed by its value. The following directives are 
 understood: 
 <CENTER>
 <TABLE BORDER="1" WIDTH="90%">
-<TR><TH WIDTH="25%">Directive</TH><TH>Default</TH><TH>Description</TH></TR>
-<TR><TD>AccessLog</TD><TD>access_log</TD><TD>Specifies the location of 
-the access log file. The special name  &quot;syslog&quot; can be used to send 
+<TR><TH WIDTH="25%"> Directive</TH><TH> Default</TH><TH> Description</TH>
+</TR>
+<TR><TD> AccessLog</TD><TD> access_log</TD><TD> Specifies the location 
+of the access log file. The special name  &quot;syslog&quot; can be used to send 
 access log information to the system  log.</TD></TR>
-<TR><TD>Allow</TD><TD>-</TD><TD>Allows connections from the specified 
-host, network, or  domain.</TD></TR>
-<TR><TD>AuthClass</TD><TD>-</TD><TD>Specifies what level of 
+<TR><TD> Allow</TD><TD> -</TD><TD> Allows connections from the 
+specified host, network, or  domain.</TD></TR>
+<TR><TD> AuthClass</TD><TD> -</TD><TD> Specifies what level of 
 authentication is required; may be  &quot;User&quot;, &quot;System&quot;, or &quot;Group&quot;.</TD></TR>
-<TR><TD>AuthType</TD><TD>None</TD><TD>Specifies the type of 
+<TR><TD> AuthType</TD><TD> None</TD><TD> Specifies the type of 
 authentication to perform; may be  &quot;None&quot;, &quot;Basic&quot;, or &quot;Digest&quot;.</TD></TR>
-<TR><TD>BrowseAddress</TD><TD>255.255.255.255</TD><TD>Specifies a 
+<TR><TD> BrowseAddress</TD><TD> 255.255.255.255</TD><TD> Specifies a 
 broadcast address to send CUPS browsing packets to.</TD></TR>
-<TR><TD>BrowseAllow</TD><TD>-</TD><TD>Specifies hosts or addresses from 
-which browsing information  should be used.</TD></TR>
-<TR><TD>BrowseDeny</TD><TD>-</TD><TD>Specifies hosts or addresses from 
-which browsing information  should not be used.</TD></TR>
-<TR><TD>BrowseInterval</TD><TD>30</TD><TD>Specifies the number of 
+<TR><TD> BrowseAllow</TD><TD> -</TD><TD> Specifies hosts or addresses 
+from which browsing information  should be used.</TD></TR>
+<TR><TD> BrowseDeny</TD><TD> -</TD><TD> Specifies hosts or addresses 
+from which browsing information  should not be used.</TD></TR>
+<TR><TD> BrowseInterval</TD><TD> 30</TD><TD> Specifies the number of 
 seconds between browsing updates. A  browse interval of 0 seconds 
 disables outgoing packets.</TD></TR>
-<TR><TD>BrowseOrder</TD><TD>Allow,Deny</TD><TD>Specifies the order of 
-BrowseAllow and BrowseDeny directive  processing; can be &quot;Deny,Allow&quot; 
-to implicitly deny hosts unless  they are allowed by a BrowseAllow 
-line, or &quot;Allow,Deny&quot; to  implicitly allow hosts unless they are denied 
-by a BrowseDeny  line.</TD></TR>
-<TR><TD>BrowsePoll</TD><TD>-</TD><TD>Specifies a server to poll for 
+<TR><TD> BrowseOrder</TD><TD> Allow,Deny</TD><TD> Specifies the order 
+of BrowseAllow and BrowseDeny directive  processing; can be 
+&quot;Deny,Allow&quot; to implicitly deny hosts unless  they are allowed by a 
+BrowseAllow line, or &quot;Allow,Deny&quot; to  implicitly allow hosts unless 
+they are denied by a BrowseDeny  line.</TD></TR>
+<TR><TD> BrowsePoll</TD><TD> -</TD><TD> Specifies a server to poll for 
 available printers and classes.</TD></TR>
-<TR><TD>BrowsePort</TD><TD>631</TD><TD>Specifies the UDP port number to 
-use for browse packets.</TD></TR>
-<TR><TD>BrowseRelay</TD><TD>-</TD><TD>Specifies a source and 
+<TR><TD> BrowsePort</TD><TD> 631</TD><TD> Specifies the UDP port number 
+to use for browse packets.</TD></TR>
+<TR><TD> BrowseRelay</TD><TD> -</TD><TD> Specifies a source and 
 destination address for relaying browser  information from one subnet 
 to another.</TD></TR>
-<TR><TD>BrowseShortNames</TD><TD>yes</TD><TD>Specifies whether or not 
-to provide short names (without the  &quot;@server&quot; part) for remote 
+<TR><TD> BrowseShortNames</TD><TD> yes</TD><TD> Specifies whether or 
+not to provide short names (without the  &quot;@server&quot; part) for remote 
 printers.</TD></TR>
-<TR><TD>BrowseTimeout</TD><TD>300</TD><TD>Specifies the number of 
+<TR><TD> BrowseTimeout</TD><TD> 300</TD><TD> Specifies the number of 
 seconds to wait until remote destinations  are removed from the local 
 destination list.</TD></TR>
-<TR><TD>Browsing</TD><TD>On</TD><TD>Specifies whether or not printer 
+<TR><TD> Browsing</TD><TD> On</TD><TD> Specifies whether or not printer 
 and class browsing is enabled; can  be &quot;On&quot; or &quot;Off&quot;.</TD></TR>
-<TR><TD>DataDir</TD><TD>/usr/share/cups</TD><TD>Specifies the directory 
-where CUPS data files are stored.</TD></TR>
-<TR><TD>DefaultCharset</TD><TD>iso-8859-1</TD><TD>Specifies the default 
-character set.</TD></TR>
-<TR><TD>DefaultLanguage</TD><TD>current locale</TD><TD>Specifies the 
+<TR><TD> DataDir</TD><TD> /usr/share/cups</TD><TD> Specifies the 
+directory where CUPS data files are stored.</TD></TR>
+<TR><TD> DefaultCharset</TD><TD> iso-8859-1</TD><TD> Specifies the 
+default character set.</TD></TR>
+<TR><TD> DefaultLanguage</TD><TD> current locale</TD><TD> Specifies the 
 default language.</TD></TR>
-<TR><TD>Deny</TD><TD>-</TD><TD>Refuses connections from the specified 
-host, network, or  domain.</TD></TR>
-<TR><TD>DocumentRoot</TD><TD>/usr/share/doc/cups</TD><TD>Specifies the 
-document data root directory.</TD></TR>
-<TR><TD>ErrorLog</TD><TD>error_log</TD><TD>Specifies the error log file 
-location. The special name  &quot;syslog&quot; can be used to send error log 
+<TR><TD> Deny</TD><TD> -</TD><TD> Refuses connections from the 
+specified host, network, or  domain.</TD></TR>
+<TR><TD> DocumentRoot</TD><TD> /usr/share/doc/cups</TD><TD> Specifies 
+the document data root directory.</TD></TR>
+<TR><TD> ErrorLog</TD><TD> error_log</TD><TD> Specifies the error log 
+file location. The special name  &quot;syslog&quot; can be used to send error log 
 information to the system  log.</TD></TR>
-<TR><TD>Group</TD><TD>root, sys, system</TD><TD>Specifies the group 
+<TR><TD> Group</TD><TD> root, sys, system</TD><TD> Specifies the group 
 name or ID that is used when running  external programs.</TD></TR>
-<TR><TD>HostNameLookups</TD><TD>Off</TD><TD>Specifies whether or not to 
-perform reverse IP address lookups to  get the actual hostname; may be 
-&quot;On&quot; or &quot;Off&quot;. Hostname lookups can  significantly degrade the 
+<TR><TD> HostNameLookups</TD><TD> Off</TD><TD> Specifies whether or not 
+to perform reverse IP address lookups to  get the actual hostname; may 
+be &quot;On&quot; or &quot;Off&quot;. Hostname lookups can  significantly degrade the 
 performance of the CUPS server if one or  more DNS servers is not 
 functioning properly.</TD></TR>
-<TR><TD>ImplicitClasses</TD><TD>On</TD><TD>Specifies whether or not to 
-automatically create printer classes  when more than one printer or 
+<TR><TD> ImplicitClasses</TD><TD> On</TD><TD> Specifies whether or not 
+to automatically create printer classes  when more than one printer or 
 class of the same name is detected on  the network; may be &quot;On&quot; or 
 &quot;Off&quot;.</TD></TR>
-<TR><TD>KeepAlive</TD><TD>On</TD><TD>Specifies whether or not to use 
+<TR><TD> KeepAlive</TD><TD> On</TD><TD> Specifies whether or not to use 
 the HTTP Keep-Alive feature; may  be &quot;On&quot; or &quot;Off&quot;.</TD></TR>
-<TR><TD>KeepAliveTimeout</TD><TD>30</TD><TD>Specifies the amount of 
+<TR><TD> KeepAliveTimeout</TD><TD> 30</TD><TD> Specifies the amount of 
 time to keep the HTTP connection alive  before closing it.</TD></TR>
-<TR><TD>&lt;Location path&gt;
-<BR> &lt;/Location&gt;</TD><TD>-</TD><TD>Specifies a location to restrict 
+<TR><TD> &lt;Location path&gt;
+<BR> &lt;/Location&gt;</TD><TD> -</TD><TD> Specifies a location to restrict 
 access to.</TD></TR>
-<TR><TD>LogLevel</TD><TD>info</TD><TD>Controls the amount of 
+<TR><TD> LogLevel</TD><TD> info</TD><TD> Controls the amount of 
 information that is logged in the  error log file. Can be one of 
 &quot;debug&quot;, &quot;info&quot;, &quot;warn&quot;, &quot;error&quot;,  or &quot;none&quot;, in decreasing order or 
 verbosity.</TD></TR>
-<TR><TD>MaxClients</TD><TD>100</TD><TD>Specifies the maximum number of 
-simultaneous active clients.  This value is internally limited to 1/3 
-of the total number of  available file descriptors.</TD></TR>
-<TR><TD>MaxLogSize</TD><TD>0</TD><TD>Specifies the maximum size of the 
-access, error, and page  log files in bytes. If set to 0 then no 
+<TR><TD> MaxClients</TD><TD> 100</TD><TD> Specifies the maximum number 
+of simultaneous active clients.  This value is internally limited to 
+1/3 of the total number of  available file descriptors.</TD></TR>
+<TR><TD> MaxLogSize</TD><TD> 0</TD><TD> Specifies the maximum size of 
+the access, error, and page  log files in bytes. If set to 0 then no 
 maximum size is set.  Log files are rotated automatically when this 
 size is  exceeded.</TD></TR>
-<TR><TD>MaxRequestSize</TD><TD>0</TD><TD>Specifies the maximum size of 
-HTTP requests in bytes. If set to 0  then there is no maximum.</TD></TR>
-<TR><TD>Order</TD><TD>Allow,Deny</TD><TD>Specifies the order of Allow 
-and Deny directive processing; can  be &quot;Deny,Allow&quot; to implicitly deny 
-hosts unless they are allowed by  an Allow line, or &quot;Allow,Deny&quot; to 
-implicitly allow hosts unless they  are denied by a Deny line.</TD></TR>
-<TR><TD>PageLog</TD><TD>page_log</TD><TD>Specifies the location of the 
-page log file. The special name  &quot;syslog&quot; can be used to send page log 
-information to the system  log.</TD></TR>
-<TR><TD>Port</TD><TD>631</TD><TD>Specifies a port number to listen to 
-for HTTP connections.</TD></TR>
-<TR><TD>Printcap</TD><TD>/etc/printcap</TD><TD>Specifies the location 
-of a Berkeley printcap file to update  with a list of current printers 
-and classes. If no filename is  supplied then this automatic generation 
-is disabled.</TD></TR>
-<TR><TD>RequestRoot</TD><TD>/var/spool/cups</TD><TD>Specifies the 
+<TR><TD> MaxRequestSize</TD><TD> 0</TD><TD> Specifies the maximum size 
+of HTTP requests in bytes. If set to 0  then there is no maximum.</TD></TR>
+<TR><TD> Order</TD><TD> Allow,Deny</TD><TD> Specifies the order of 
+Allow and Deny directive processing; can  be &quot;Deny,Allow&quot; to implicitly 
+deny hosts unless they are allowed by  an Allow line, or &quot;Allow,Deny&quot; 
+to implicitly allow hosts unless they  are denied by a Deny line.</TD></TR>
+<TR><TD> PageLog</TD><TD> page_log</TD><TD> Specifies the location of 
+the page log file. The special name  &quot;syslog&quot; can be used to send page 
+log information to the system  log.</TD></TR>
+<TR><TD> Port</TD><TD> 631</TD><TD> Specifies a port number to listen 
+to for HTTP connections.</TD></TR>
+<TR><TD> Printcap</TD><TD> /etc/printcap</TD><TD> Specifies the 
+location of a Berkeley printcap file to update  with a list of current 
+printers and classes. If no filename is  supplied then this automatic 
+generation is disabled.</TD></TR>
+<TR><TD> RequestRoot</TD><TD> /var/spool/cups</TD><TD> Specifies the 
 location of request files.</TD></TR>
-<TR><TD>RIPCache</TD><TD>8m</TD><TD>Specifies the size of the memory 
+<TR><TD> RIPCache</TD><TD> 8m</TD><TD> Specifies the size of the memory 
 cache in bytes that is used by  RIP filters.</TD></TR>
-<TR><TD>ServerAdmin</TD><TD>root@ServerName</TD><TD>Specifies the 
+<TR><TD> ServerAdmin</TD><TD> root@ServerName</TD><TD> Specifies the 
 person to contact with problems.</TD></TR>
-<TR><TD>ServerName</TD><TD>hostname</TD><TD>Specifies the hostname that 
-is supplied to HTTP clients. This  is also used to determine the 
+<TR><TD> ServerName</TD><TD> hostname</TD><TD> Specifies the hostname 
+that is supplied to HTTP clients. This  is also used to determine the 
 default CUPS server for the CUPS IPP  client applications.</TD></TR>
-<TR><TD>ServerRoot</TD><TD>/etc/cups</TD><TD>Specifies the root 
+<TR><TD> ServerRoot</TD><TD> /etc/cups</TD><TD> Specifies the root 
 directory for server configuration files.</TD></TR>
-<TR><TD>SystemGroup</TD><TD>root, sys, system</TD><TD>Specifies the 
+<TR><TD> SystemGroup</TD><TD> root, sys, system</TD><TD> Specifies the 
 group name used for System class authentication.</TD></TR>
-<TR><TD>TempDir</TD><TD>/var/tmp</TD><TD>Specifies the temporary 
+<TR><TD> TempDir</TD><TD> /var/tmp</TD><TD> Specifies the temporary 
 directory to use.</TD></TR>
-<TR><TD>Timeout</TD><TD>300</TD><TD>The timeout in seconds before 
+<TR><TD> Timeout</TD><TD> 300</TD><TD> The timeout in seconds before 
 client connections are closed  in the middle of a request.</TD></TR>
-<TR><TD>User</TD><TD>lp</TD><TD>Specifies the user that is used when 
+<TR><TD> User</TD><TD> lp</TD><TD> Specifies the user that is used when 
 running external programs.</TD></TR>
 </TABLE>
 </CENTER>
 </P>
-<H3><A NAME="3_6_3">3.6.3 printers.conf</A></H3>
-<P>The printers.conf file consists of 1 or more lines of ASCII text. 
+<H3><A NAME="3_6_3">3.6.3  printers.conf</A></H3>
+<P> The printers.conf file consists of 1 or more lines of ASCII text. 
  Comment lines start with the pound (&quot;#&quot;) character. </P>
-<P>Each non-blank line starts with the name of a configuration 
+<P> Each non-blank line starts with the name of a configuration 
 directive followed by its value. The following directives are 
 understood: 
 <CENTER>
 <TABLE BORDER="1" WIDTH="90%">
-<TR><TH WIDTH="25%">Directive</TH><TH>Description</TH></TR>
-<TR><TD>Accepting</TD><TD>Specifies whether the printer is accepting 
+<TR><TH WIDTH="25%"> Directive</TH><TH> Description</TH></TR>
+<TR><TD> Accepting</TD><TD> Specifies whether the printer is accepting 
 new jobs. May be  the names &quot;Yes&quot; or &quot;No&quot;.</TD></TR>
-<TR><TD>&lt;DefaultPrinter name&gt;
-<BR> &lt;/Printer&gt;</TD><TD>Surrounds the printer definition for a default 
+<TR><TD> &lt;DefaultPrinter name&gt;
+<BR> &lt;/Printer&gt;</TD><TD> Surrounds the printer definition for a default 
 destination.</TD></TR>
-<TR><TD>AllowUsers</TD><TD>Specifies a list of users that are allowed 
+<TR><TD> AllowUsers</TD><TD> Specifies a list of users that are allowed 
 to access the printer.</TD></TR>
-<TR><TD>BannerStart</TD><TD>Specifies the banner that is printed before 
+<TR><TD> BannerStart</TD><TD> Specifies the banner that is printed 
+before other files in a  job.</TD></TR>
+<TR><TD> BannerEnd</TD><TD> Specifies the banner that is printed after 
 other files in a  job.</TD></TR>
-<TR><TD>BannerEnd</TD><TD>Specifies the banner that is printed after 
-other files in a  job.</TD></TR>
-<TR><TD>DenyUsers</TD><TD>Specifies a list of users that are not 
+<TR><TD> DenyUsers</TD><TD> Specifies a list of users that are not 
 allowed to access the  printer.</TD></TR>
-<TR><TD>DeviceURI</TD><TD>Specifies the device-uri attribute for the 
+<TR><TD> DeviceURI</TD><TD> Specifies the device-uri attribute for the 
 printer.</TD></TR>
-<TR><TD>Info</TD><TD>A textual description of the printer.</TD></TR>
-<TR><TD>Location</TD><TD>A textual location of the printer.</TD></TR>
-<TR><TD>&lt;Printer name&gt;
-<BR> &lt;/Printer&gt;</TD><TD>Surrounds the printer definition.</TD></TR>
-<TR><TD>State</TD><TD>Specifies the initial state of the printer; can 
+<TR><TD> Info</TD><TD> A textual description of the printer.</TD></TR>
+<TR><TD> Location</TD><TD> A textual location of the printer.</TD></TR>
+<TR><TD> &lt;Printer name&gt;
+<BR> &lt;/Printer&gt;</TD><TD> Surrounds the printer definition.</TD></TR>
+<TR><TD> State</TD><TD> Specifies the initial state of the printer; can 
 be &quot;Idle&quot; or  &quot;Stopped&quot;.</TD></TR>
-<TR><TD>StateMessage</TD><TD>Specifies a textual message for the 
+<TR><TD> StateMessage</TD><TD> Specifies a textual message for the 
 current printer state.</TD></TR>
 </TABLE>
 </CENTER>
 </P>
-<H1><A NAME="4">4 External Interfaces</A></H1>
-<H2><A NAME="4_1">4.1 AppSocket Protocol</A></H2>
-<P>The AppSocket protocol is an 8-bit clean TCP/IP socket connection. 
+<H1><A NAME="4">4  External Interfaces</A></H1>
+<H2><A NAME="4_1">4.1  AppSocket Protocol</A></H2>
+<P> The AppSocket protocol is an 8-bit clean TCP/IP socket connection. 
 The default IP service port is 9100. The URI method name is &quot;socket&quot;. </P>
-<P>The AppSocket protocol is used by the Hewlett Packard JetDirect 
+<P> The AppSocket protocol is used by the Hewlett Packard JetDirect 
 network interfaces and print servers, as well as many other vendors' 
 products. See the CUPS Software Administrators Manual for a list of 
 supported products. </P>
-<H2><A NAME="4_2">4.2 CUPS Browsing Protocol</A></H2>
-<P>The CUPS Browsing Protocol is a UDP/IP-based broadcast service. By 
+<H2><A NAME="4_2">4.2  CUPS Browsing Protocol</A></H2>
+<P> The CUPS Browsing Protocol is a UDP/IP-based broadcast service. By 
 default this service operates on IP service port 631. </P>
-<P>Each broadcast packet describes the state of a single printer or 
+<P> Each broadcast packet describes the state of a single printer or 
 class and is an ASCII text string of up to 1450 bytes ending with a 
 newline (0x0a). The string is formatted as follows: </P>
 <UL>
@@ -623,46 +625,46 @@ newline (0x0a). The string is formatted as follows: </P>
 type SP state SP uri SP &quot;location&quot; SP &quot;info&quot; SP &quot;make-and-model&quot; NL
 </PRE>
 </UL>
-<P><VAR>State, uri, location, info</VAR>, and <VAR>make-and-model</VAR>
+<P><VAR> State, uri, location, info</VAR>, and <VAR>make-and-model</VAR>
 , correspond to the IPP <CODE>printer-state</CODE>, <CODE>
 printer-uri-supported</CODE>, <CODE>printer-location</CODE>, <CODE>
 printer-info</CODE>, and <CODE>printer-make-and-model</CODE>
  attributes. </P>
-<P><VAR>Type</VAR> is a hexadecimal number string representing 
+<P><VAR> Type</VAR> is a hexadecimal number string representing 
 capability/type bits: 
 <CENTER>
 <TABLE BORDER="1" WIDTH="40%">
-<TR><TH WIDTH="8%">Bit</TH><TH>Description</TH></TR>
-<TR><TD>0</TD><TD>0 = printer
+<TR><TH WIDTH="8%"> Bit</TH><TH> Description</TH></TR>
+<TR><TD> 0</TD><TD> 0 = printer
 <BR> 1 = class</TD></TR>
-<TR><TD>1</TD><TD>0 = local
+<TR><TD> 1</TD><TD> 0 = local
 <BR> 1 = remote
 <BR> (always 1)</TD></TR>
-<TR><TD>2</TD><TD>1 = can print B</TD></TR>
-<TR><TD>3</TD><TD>1 = can print color</TD></TR>
-<TR><TD>4</TD><TD>1 = can duplex</TD></TR>
-<TR><TD>5</TD><TD>1 = can staple</TD></TR>
-<TR><TD>6</TD><TD>1 = can do fast copies</TD></TR>
-<TR><TD>7</TD><TD>1 = can do fast collating</TD></TR>
-<TR><TD>8</TD><TD>1 = can punch holes</TD></TR>
-<TR><TD>9</TD><TD>1 = can cover</TD></TR>
-<TR><TD>10</TD><TD>1 = can bind</TD></TR>
-<TR><TD>11</TD><TD>1 = can sort</TD></TR>
-<TR><TD>12</TD><TD>1 = can print up to 9x14 inches</TD></TR>
-<TR><TD>13</TD><TD>1 = can print up to 18x24 inches</TD></TR>
-<TR><TD>14</TD><TD>1 = can print up to 36x48 inches</TD></TR>
-<TR><TD>15</TD><TD>1 = can print variable sizes</TD></TR>
+<TR><TD> 2</TD><TD> 1 = can print B</TD></TR>
+<TR><TD> 3</TD><TD> 1 = can print color</TD></TR>
+<TR><TD> 4</TD><TD> 1 = can duplex</TD></TR>
+<TR><TD> 5</TD><TD> 1 = can staple</TD></TR>
+<TR><TD> 6</TD><TD> 1 = can do fast copies</TD></TR>
+<TR><TD> 7</TD><TD> 1 = can do fast collating</TD></TR>
+<TR><TD> 8</TD><TD> 1 = can punch holes</TD></TR>
+<TR><TD> 9</TD><TD> 1 = can cover</TD></TR>
+<TR><TD> 10</TD><TD> 1 = can bind</TD></TR>
+<TR><TD> 11</TD><TD> 1 = can sort</TD></TR>
+<TR><TD> 12</TD><TD> 1 = can print up to 9x14 inches</TD></TR>
+<TR><TD> 13</TD><TD> 1 = can print up to 18x24 inches</TD></TR>
+<TR><TD> 14</TD><TD> 1 = can print up to 36x48 inches</TD></TR>
+<TR><TD> 15</TD><TD> 1 = can print variable sizes</TD></TR>
 </TABLE>
 </CENTER>
 </P>
-<H2><A NAME="4_3">4.3 CUPS Form File</A></H2>
-<P>CUPS Form files are XML files used by the CUPS <CODE>formtops</CODE>
+<H2><A NAME="4_3">4.3  CUPS Form File</A></H2>
+<P> CUPS Form files are XML files used by the CUPS <CODE>formtops</CODE>
  filter to produce dynamic banner pages and support preprinted forms. </P>
-<P>The MIME type for CUPS Form files is <CODE>application/vnd.cups-form</CODE>
+<P> The MIME type for CUPS Form files is <CODE>application/vnd.cups-form</CODE>
 . </P>
-<H3><A NAME="4_3_1">4.3.1 CUPS Form DTD</A></H3>
-<P>The following DTD describes the available elements and attributes in 
-a CUPS Form file: 
+<H3><A NAME="4_3_1">4.3.1  CUPS Form DTD</A></H3>
+<P> The following DTD describes the available elements and attributes 
+in a CUPS Form file: 
 <CENTER>
 <TABLE BORDER>
 <TR><TD>
@@ -839,115 +841,119 @@ a CUPS Form file:
 </TABLE>
 </CENTER>
 </P>
-<H2><A NAME="4_4">4.4 CUPS PostScript File</A></H2>
-<P>CUPS PostScript files are device-dependent Adobe PostScript program 
+<H2><A NAME="4_4">4.4  CUPS PostScript File</A></H2>
+<P> CUPS PostScript files are device-dependent Adobe PostScript program 
 files. The PostScript language is described in the <A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/PLRM.pdf">
  Adobe PostScript Language Reference Manual, Third Edition</A>. </P>
-<P>The MIME type for CUPS PostScript files is <CODE>
+<P> The MIME type for CUPS PostScript files is <CODE>
 application/vnd.cups-postscript</CODE>. </P>
-<H2><A NAME="4_5">4.5 CUPS Raster File</A></H2>
-<P>CUPS raster files are device-dependent raster image files that 
+<H2><A NAME="4_5">4.5  CUPS Raster File</A></H2>
+<P> CUPS raster files are device-dependent raster image files that 
 contain a PostScript page device dictionary and device-dependent raster 
 imagery for each page in the document. These files are used to transfer 
 raster data from the PostScript and image file RIPs to device-dependent 
 filters that convert the raster data to a printable format. </P>
-<P>A raster file begins with a four byte synchronization word: 
+<P> A raster file begins with a four byte synchronization word: 
 0x52615374 (&quot;RaSt&quot;) for big-endian architectures and 0x74536152 
 (&quot;tSaR&quot;) for little-endian architectures.  The writer of the raster 
 file will use the native word order, and the reader is responsible for 
 detecting a reversed word order file and swapping bytes as needed. The 
 CUPS Image Library raster functions perform this function 
 automatically. </P>
-<P>Following the synchronization word are a series of raster pages. 
+<P> Following the synchronization word are a series of raster pages. 
  Each page starts with a page device dictionary header and is followed 
 immediately by the raster data for that page. 
 <CENTER>
 <TABLE BORDER="1" WIDTH="80%">
-<TR><TH WIDTH="10%">Bytes</TH><TH WIDTH="20%">Description</TH><TH>Values</TH>
+<TR><TH WIDTH="10%"> Bytes</TH><TH WIDTH="20%"> Description</TH><TH>
+ Values</TH></TR>
+<TR><TD> 0-63</TD><TD> MediaClass</TD><TD> Nul-terminated ASCII string</TD>
 </TR>
-<TR><TD>0-63</TD><TD>MediaClass</TD><TD>Nul-terminated ASCII string</TD></TR>
-<TR><TD>64-127</TD><TD>MediaColor</TD><TD>Nul-terminated ASCII string</TD>
+<TR><TD> 64-127</TD><TD> MediaColor</TD><TD> Nul-terminated ASCII string</TD>
 </TR>
-<TR><TD>128-191</TD><TD>MediaType</TD><TD>Nul-terminated ASCII string</TD>
+<TR><TD> 128-191</TD><TD> MediaType</TD><TD> Nul-terminated ASCII string</TD>
 </TR>
-<TR><TD>192-255</TD><TD>OutputType</TD><TD>Nul-terminated ASCII string</TD>
-</TR>
-<TR><TD>256-259</TD><TD>AdvanceDistance</TD><TD>0 to 2<SUP>32</SUP> - 1 
-points</TD></TR>
-<TR><TD>260-263</TD><TD>AdvanceMedia</TD><TD>0 = Never advance roll
+<TR><TD> 192-255</TD><TD> OutputType</TD><TD> Nul-terminated ASCII 
+string</TD></TR>
+<TR><TD> 256-259</TD><TD> AdvanceDistance</TD><TD> 0 to 2<SUP>32</SUP>
+ - 1 points</TD></TR>
+<TR><TD> 260-263</TD><TD> AdvanceMedia</TD><TD> 0 = Never advance roll
 <BR> 1 = Advance roll after file
 <BR> 2 = Advance roll after job
 <BR> 3 = Advance roll after set
 <BR> 4 = Advance roll after page</TD></TR>
-<TR><TD>264-267</TD><TD>Collate</TD><TD>0 = do not collate copies
+<TR><TD> 264-267</TD><TD> Collate</TD><TD> 0 = do not collate copies
 <BR> 1 = collate copies</TD></TR>
-<TR><TD>268-271</TD><TD>CutMedia</TD><TD>0 = Never cut media
+<TR><TD> 268-271</TD><TD> CutMedia</TD><TD> 0 = Never cut media
 <BR> 1 = Cut roll after file
 <BR> 2 = Cut roll after job
 <BR> 3 = Cut roll after set
 <BR> 4 = Cut roll after page</TD></TR>
-<TR><TD>272-275</TD><TD>Duplex</TD><TD>0 = Print single-sided
+<TR><TD> 272-275</TD><TD> Duplex</TD><TD> 0 = Print single-sided
 <BR> 1 = Print double-sided</TD></TR>
-<TR><TD>276-283</TD><TD>HWResolution</TD><TD>Horizontal and vertical 
+<TR><TD> 276-283</TD><TD> HWResolution</TD><TD> Horizontal and vertical 
 resolution in dots-per-inch.</TD></TR>
-<TR><TD>284-299</TD><TD>ImagingBoundingBox</TD><TD>Four integers giving 
-the left, bottom, right, and top positions  of the page bounding box in 
-points</TD></TR>
-<TR><TD>300-303</TD><TD>InsertSheet</TD><TD>0 = Do not insert separator 
-sheets
+<TR><TD> 284-299</TD><TD> ImagingBoundingBox</TD><TD> Four integers 
+giving the left, bottom, right, and top positions  of the page bounding 
+box in points</TD></TR>
+<TR><TD> 300-303</TD><TD> InsertSheet</TD><TD> 0 = Do not insert 
+separator sheets
 <BR> 1 = Insert separator sheets</TD></TR>
-<TR><TD>304-307</TD><TD>Jog</TD><TD>0 = Do no jog pages
+<TR><TD> 304-307</TD><TD> Jog</TD><TD> 0 = Do no jog pages
 <BR> 1 = Jog pages after file
 <BR> 2 = Jog pages after job
 <BR> 3 = Jog pages after set</TD></TR>
-<TR><TD>308-311</TD><TD>LeadingEdge</TD><TD>0 = Top edge is first
+<TR><TD> 308-311</TD><TD> LeadingEdge</TD><TD> 0 = Top edge is first
 <BR> 1 = Right edge is first
 <BR> 2 = Bottom edge is first
 <BR> 3 = Left edge is first</TD></TR>
-<TR><TD>312-319</TD><TD>Margins</TD><TD>Left and bottom origin of image 
-in points</TD></TR>
-<TR><TD>320-323</TD><TD>ManualFeed</TD><TD>0 = Do not manually feed 
+<TR><TD> 312-319</TD><TD> Margins</TD><TD> Left and bottom origin of 
+image in points</TD></TR>
+<TR><TD> 320-323</TD><TD> ManualFeed</TD><TD> 0 = Do not manually feed 
 media
 <BR> 1 = Manually feed media</TD></TR>
-<TR><TD>324-327</TD><TD>MediaPosition</TD><TD>Input slot position from 
-0 to N</TD></TR>
-<TR><TD>328-331</TD><TD>MediaWeight</TD><TD>Media weight in grams per 
-meter squared</TD></TR>
-<TR><TD>332-335</TD><TD>MirrorPrint</TD><TD>0 = Do not mirror prints
+<TR><TD> 324-327</TD><TD> MediaPosition</TD><TD> Input slot position 
+from 0 to N</TD></TR>
+<TR><TD> 328-331</TD><TD> MediaWeight</TD><TD> Media weight in grams 
+per meter squared</TD></TR>
+<TR><TD> 332-335</TD><TD> MirrorPrint</TD><TD> 0 = Do not mirror prints
 <BR> 1 = Mirror prints</TD></TR>
-<TR><TD>336-339</TD><TD>NegativePrint</TD><TD>0 = Do not invert prints
+<TR><TD> 336-339</TD><TD> NegativePrint</TD><TD> 0 = Do not invert 
+prints
 <BR> 1 = Invert prints</TD></TR>
-<TR><TD>340-343</TD><TD>NumCopies</TD><TD>1 to 2<SUP>32</SUP> - 1</TD></TR>
-<TR><TD>344-347</TD><TD>Orientation</TD><TD>0 = Do not rotate page
+<TR><TD> 340-343</TD><TD> NumCopies</TD><TD> 1 to 2<SUP>32</SUP> - 1</TD>
+</TR>
+<TR><TD> 344-347</TD><TD> Orientation</TD><TD> 0 = Do not rotate page
 <BR> 1 = Rotate page counter-clockwise
 <BR> 2 = Turn page upside down
 <BR> 3 = Rotate page clockwise</TD></TR>
-<TR><TD>348-351</TD><TD>OutputFaceUp</TD><TD>0 = Output face down
+<TR><TD> 348-351</TD><TD> OutputFaceUp</TD><TD> 0 = Output face down
 <BR> 1 = Output face up</TD></TR>
-<TR><TD>352-359</TD><TD>PageSize</TD><TD>Width and length in points</TD></TR>
-<TR><TD>360-363</TD><TD>Separations</TD><TD>0 = Print composite image
+<TR><TD> 352-359</TD><TD> PageSize</TD><TD> Width and length in points</TD>
+</TR>
+<TR><TD> 360-363</TD><TD> Separations</TD><TD> 0 = Print composite image
 <BR> 1 = Print color separations</TD></TR>
-<TR><TD>364-367</TD><TD>TraySwitch</TD><TD>0 = Do not change trays if 
-selected tray is empty
+<TR><TD> 364-367</TD><TD> TraySwitch</TD><TD> 0 = Do not change trays 
+if selected tray is empty
 <BR> 1 = Change trays if selected tray is empty</TD></TR>
-<TR><TD>368-371</TD><TD>Tumble</TD><TD>0 = Do not rotate even pages 
+<TR><TD> 368-371</TD><TD> Tumble</TD><TD> 0 = Do not rotate even pages 
 when duplexing
 <BR> 1 = Rotate even pages when duplexing</TD></TR>
-<TR><TD>372-375</TD><TD>cupsWidth</TD><TD>Width of page image in pixels</TD>
-</TR>
-<TR><TD>376-379</TD><TD>cupsHeight</TD><TD>Height of page image in 
+<TR><TD> 372-375</TD><TD> cupsWidth</TD><TD> Width of page image in 
 pixels</TD></TR>
-<TR><TD>380-383</TD><TD>cupsMediaType</TD><TD>Driver-specific 0 to 2<SUP>
+<TR><TD> 376-379</TD><TD> cupsHeight</TD><TD> Height of page image in 
+pixels</TD></TR>
+<TR><TD> 380-383</TD><TD> cupsMediaType</TD><TD> Driver-specific 0 to 2<SUP>
 32</SUP> - 1</TD></TR>
-<TR><TD>384-387</TD><TD>cupsBitsPerColor</TD><TD>1, 2, 4, 8 bits</TD></TR>
-<TR><TD>388-391</TD><TD>cupsBitsPerPixel</TD><TD>1 to 32 bits</TD></TR>
-<TR><TD>392-395</TD><TD>cupsBytesPerLine</TD><TD>1 to 2<SUP>32</SUP> - 
-1 bytes</TD></TR>
-<TR><TD>396-399</TD><TD>cupsColorOrder</TD><TD>0 = chunky pixels (CMYK 
-CMYK CMYK)
+<TR><TD> 384-387</TD><TD> cupsBitsPerColor</TD><TD> 1, 2, 4, 8 bits</TD></TR>
+<TR><TD> 388-391</TD><TD> cupsBitsPerPixel</TD><TD> 1 to 32 bits</TD></TR>
+<TR><TD> 392-395</TD><TD> cupsBytesPerLine</TD><TD> 1 to 2<SUP>32</SUP>
+ - 1 bytes</TD></TR>
+<TR><TD> 396-399</TD><TD> cupsColorOrder</TD><TD> 0 = chunky pixels 
+(CMYK CMYK CMYK)
 <BR> 1 = banded pixels (CCC MMM YYY KKK)
 <BR> 2 = planar pixels (CCC... MMM... YYY... KKK...)</TD></TR>
-<TR><TD>400-403</TD><TD>cupsColorSpace</TD><TD>0 = white
+<TR><TD> 400-403</TD><TD> cupsColorSpace</TD><TD> 0 = white
 <BR> 1 = RGB
 <BR> 2 = RGBA
 <BR> 3 = black
@@ -957,132 +963,132 @@ CMYK CMYK)
 <BR> 7 = YMCK
 <BR> 8 = KCMY
 <BR> 9 = KCMYcm</TD></TR>
-<TR><TD>404-407</TD><TD>cupsCompression</TD><TD>Driver-specific 0 to 2<SUP>
+<TR><TD> 404-407</TD><TD> cupsCompression</TD><TD> Driver-specific 0 to 
+2<SUP>32</SUP> - 1</TD></TR>
+<TR><TD> 408-411</TD><TD> cupsRowCount</TD><TD> Driver-specific 0 to 2<SUP>
 32</SUP> - 1</TD></TR>
-<TR><TD>408-411</TD><TD>cupsRowCount</TD><TD>Driver-specific 0 to 2<SUP>
+<TR><TD> 412-415</TD><TD> cupsRowFeed</TD><TD> Driver-specific 0 to 2<SUP>
 32</SUP> - 1</TD></TR>
-<TR><TD>412-415</TD><TD>cupsRowFeed</TD><TD>Driver-specific 0 to 2<SUP>
-32</SUP> - 1</TD></TR>
-<TR><TD>416-419</TD><TD>cupsRowStep</TD><TD>Driver-specific 0 to 2<SUP>
+<TR><TD> 416-419</TD><TD> cupsRowStep</TD><TD> Driver-specific 0 to 2<SUP>
 32</SUP> - 1</TD></TR>
 </TABLE>
 </CENTER>
 </P>
-<P>The MIME type for CUPS Raster files is <CODE>
+<P> The MIME type for CUPS Raster files is <CODE>
 application/vnd.cups-raster</CODE>. </P>
-<H2><A NAME="4_6">4.6 CUPS Raw Files</A></H2>
-<P>Raw files are printer-dependent print files that are in a format 
+<H2><A NAME="4_6">4.6  CUPS Raw Files</A></H2>
+<P> Raw files are printer-dependent print files that are in a format 
 suitable to the destination printer (e.g. HP-PCL, HP-RTL, etc.) The 
 MIME type for CUPS Raw files is <CODE>application/vnd.cups-raw</CODE>. </P>
-<H2><A NAME="4_7">4.7 Internet Printing Protocol</A></H2>
-<P>The Internet Printing Protocol and the CUPS extensions to it are 
+<H2><A NAME="4_7">4.7  Internet Printing Protocol</A></H2>
+<P> The Internet Printing Protocol and the CUPS extensions to it are 
 described in the CUPS Implementation of IPP document. </P>
-<H2><A NAME="4_8">4.8 Line Printer Daemon Protocol</A></H2>
-<P>The Line Printer Daemon (LPD) protocol is described by <A HREF="http://www.ietf.org/rfc/rfc1179.txt">
+<H2><A NAME="4_8">4.8  Line Printer Daemon Protocol</A></H2>
+<P> The Line Printer Daemon (LPD) protocol is described by <A HREF="http://www.ietf.org/rfc/rfc1179.txt">
 RFC 1179: Line Printer Daemon Protocol</A>. </P>
-<P>The URI method name for LPD is &quot;lpd&quot;. </P>
-<H2><A NAME="4_9">4.9 Server Message Block Protocol</A></H2>
-<P>The Server Message Block (SMB) and related Common Internet File 
+<P> The URI method name for LPD is &quot;lpd&quot;. </P>
+<H2><A NAME="4_9">4.9  Server Message Block Protocol</A></H2>
+<P> The Server Message Block (SMB) and related Common Internet File 
 System (CIFS) protocols are described at <A HREF="http://anu.samba.org/cifs">
 http://anu.samba.org/cifs</A>. </P>
-<P>The URI method name for SMB is &quot;smb&quot;. Support for this protocol is 
+<P> The URI method name for SMB is &quot;smb&quot;. Support for this protocol is 
 provided via the SAMBA <CODE>smbspool(1)</CODE> program provided with 
 SAMBA 2.0.6 and higher. </P>
-<H1><A NAME="5">5 Directories</A></H1>
+<H1><A NAME="5">5  Directories</A></H1>
 <DL>
-<DT>/etc/cups </DT>
-<DD>The scheduler configuration and MIME files reside here. </DD>
-<DT>/etc/cups/certs </DT>
-<DD>The authentication certificates reside here. </DD>
-<DT>/etc/cups/interfaces </DT>
-<DD>System V interface scripts reside here. </DD>
-<DT>/etc/cups/ppd </DT>
-<DD>This directory contains PPD files for each printer. </DD>
-<DT>/usr/bin </DT>
-<DD>The <CODE>cancel</CODE>, <CODE>lp</CODE>, <CODE>lpq</CODE>, <CODE>
+<DT> /etc/cups </DT>
+<DD> The scheduler configuration and MIME files reside here. </DD>
+<DT> /etc/cups/certs </DT>
+<DD> The authentication certificates reside here. </DD>
+<DT> /etc/cups/interfaces </DT>
+<DD> System V interface scripts reside here. </DD>
+<DT> /etc/cups/ppd </DT>
+<DD> This directory contains PPD files for each printer. </DD>
+<DT> /usr/bin </DT>
+<DD> The <CODE>cancel</CODE>, <CODE>lp</CODE>, <CODE>lpq</CODE>, <CODE>
  lpr</CODE>, <CODE>lprm</CODE>, and <CODE>lpstat</CODE> commands 
  reside here. </DD>
-<DT>/usr/lib, /usr/lib32 </DT>
-<DD>The shared libraries (DSOs) reside here. </DD>
-<DT>/usr/lib/cups/backend </DT>
-<DD>The backend filters reside here. </DD>
-<DT>/usr/lib/cups/cgi-bin </DT>
-<DD>The CGI programs reside here. </DD>
-<DT>/usr/lib/cups/daemon </DT>
-<DD>The polling and LPD daemons reside here. </DD>
-<DT>/usr/lib/cups/filter </DT>
-<DD>The file filters reside here. </DD>
-<DT>/usr/sbin </DT>
-<DD>The <CODE>accept</CODE>, <CODE>cupsd</CODE>, <CODE> lpadmin</CODE>, <CODE>
-lpc</CODE>, and <CODE>reject</CODE> commands reside here. </DD>
-<DT>/usr/share/cups </DT>
-<DD>This is the root directory of the CUPS static data. </DD>
-<DT>/usr/share/cups/charsets </DT>
-<DD>The character set files reside here. </DD>
-<DT>/usr/share/cups/data </DT>
-<DD>The filter data files reside here. </DD>
-<DT>/usr/share/cups/fonts </DT>
-<DD>The <CODE>pstoraster</CODE> font files reside here. </DD>
-<DT>/usr/share/cups/model </DT>
-<DD>The sample PPD files reside here. </DD>
-<DT>/usr/share/cups/pstoraster </DT>
-<DD>The <CODE>pstoraster</CODE> data files reside here. </DD>
-<DT>/usr/share/doc/cups </DT>
-<DD>The scheduler documentation files reside here. </DD>
-<DT>/var/log/cups </DT>
-<DD>The <CODE>access_log</CODE>, <CODE>error_log</CODE>, and <CODE>
+<DT> /usr/lib, /usr/lib32 </DT>
+<DD> The shared libraries (DSOs) reside here. </DD>
+<DT> /usr/lib/cups/backend </DT>
+<DD> The backend filters reside here. </DD>
+<DT> /usr/lib/cups/cgi-bin </DT>
+<DD> The CGI programs reside here. </DD>
+<DT> /usr/lib/cups/daemon </DT>
+<DD> The polling and LPD daemons reside here. </DD>
+<DT> /usr/lib/cups/filter </DT>
+<DD> The file filters reside here. </DD>
+<DT> /usr/sbin </DT>
+<DD> The <CODE>accept</CODE>, <CODE>cupsd</CODE>, <CODE> lpadmin</CODE>
+, <CODE>lpc</CODE>, and <CODE>reject</CODE> commands reside here. </DD>
+<DT> /usr/share/cups </DT>
+<DD> This is the root directory of the CUPS static data. </DD>
+<DT> /usr/share/cups/charsets </DT>
+<DD> The character set files reside here. </DD>
+<DT> /usr/share/cups/data </DT>
+<DD> The filter data files reside here. </DD>
+<DT> /usr/share/cups/fonts </DT>
+<DD> The <CODE>pstoraster</CODE> font files reside here. </DD>
+<DT> /usr/share/cups/model </DT>
+<DD> The sample PPD files reside here. </DD>
+<DT> /usr/share/cups/pstoraster </DT>
+<DD> The <CODE>pstoraster</CODE> data files reside here. </DD>
+<DT> /usr/share/doc/cups </DT>
+<DD> The scheduler documentation files reside here. </DD>
+<DT> /var/log/cups </DT>
+<DD> The <CODE>access_log</CODE>, <CODE>error_log</CODE>, and <CODE>
  page_log</CODE> files reside here. </DD>
-<DT>/var/spool/cups </DT>
-<DD>This directory contains print job files. </DD>
+<DT> /var/spool/cups </DT>
+<DD> This directory contains print job files. </DD>
 </DL>
-<H1 TYPE="A" VALUE="1"><A NAME="6">A Glossary</A></H1>
-<H2><A NAME="6_1">A.1 Terms</A></H2>
+<H1 TYPE="A" VALUE="1"><A NAME="6">A  Glossary</A></H1>
+<H2><A NAME="6_1">A.1  Terms</A></H2>
 <DL>
-<DT>C </DT>
-<DD>A computer language. </DD>
-<DT>parallel </DT>
-<DD>Sending or receiving data more than 1 bit at a time. </DD>
-<DT>pipe </DT>
-<DD>A one-way communications channel between two programs. </DD>
-<DT>serial </DT>
-<DD>Sending or receiving data 1 bit at a time. </DD>
-<DT>socket </DT>
-<DD>A two-way network communications channel. </DD>
+<DT> C </DT>
+<DD> A computer language. </DD>
+<DT> parallel </DT>
+<DD> Sending or receiving data more than 1 bit at a time. </DD>
+<DT> pipe </DT>
+<DD> A one-way communications channel between two programs. </DD>
+<DT> serial </DT>
+<DD> Sending or receiving data 1 bit at a time. </DD>
+<DT> socket </DT>
+<DD> A two-way network communications channel. </DD>
 </DL>
-<H2><A NAME="6_2">A.2 Acronyms</A></H2>
+<H2><A NAME="6_2">A.2  Acronyms</A></H2>
 <DL>
-<DT>ASCII </DT>
-<DD>American Standard Code for Information Interchange </DD>
-<DT>CUPS </DT>
-<DD>Common UNIX Printing System </DD>
-<DT>ESC/P </DT>
-<DD>EPSON Standard Code for Printers </DD>
-<DT>FTP </DT>
-<DD>File Transfer Protocol </DD>
-<DT>HP-GL </DT>
-<DD>Hewlett-Packard Graphics Language </DD>
-<DT>HP-PCL </DT>
-<DD>Hewlett-Packard Printer Control Language </DD>
-<DT>HP-PJL </DT>
-<DD>Hewlett-Packard Printer Job Language </DD>
-<DT>IETF </DT>
-<DD>Internet Engineering Task Force </DD>
-<DT>IPP </DT>
-<DD>Internet Printing Protocol </DD>
-<DT>ISO </DT>
-<DD>International Standards Organization </DD>
-<DT>LPD </DT>
-<DD>Line Printer Daemon </DD>
-<DT>MIME </DT>
-<DD>Multimedia Internet Mail Exchange </DD>
-<DT>PCL </DT>
-<DD>Page Control Language </DD>
-<DT>PPD </DT>
-<DD>PostScript Printer Description </DD>
-<DT>SMB </DT>
-<DD>Server Message Block </DD>
-<DT>TFTP </DT>
-<DD>Trivial File Transfer Protocol </DD>
+<DT> ASCII </DT>
+<DD> American Standard Code for Information Interchange </DD>
+<DT> CUPS </DT>
+<DD> Common UNIX Printing System </DD>
+<DT> ESC/P </DT>
+<DD> EPSON Standard Code for Printers </DD>
+<DT> FTP </DT>
+<DD> File Transfer Protocol </DD>
+<DT> HP-GL </DT>
+<DD> Hewlett-Packard Graphics Language </DD>
+<DT> HP-PCL </DT>
+<DD> Hewlett-Packard Printer Control Language </DD>
+<DT> HP-PJL </DT>
+<DD> Hewlett-Packard Printer Job Language </DD>
+<DT> IETF </DT>
+<DD> Internet Engineering Task Force </DD>
+<DT> IPP </DT>
+<DD> Internet Printing Protocol </DD>
+<DT> ISO </DT>
+<DD> International Standards Organization </DD>
+<DT> LPD </DT>
+<DD> Line Printer Daemon </DD>
+<DT> MIME </DT>
+<DD> Multimedia Internet Mail Exchange </DD>
+<DT> PCL </DT>
+<DD> Page Control Language </DD>
+<DT> PPD </DT>
+<DD> PostScript Printer Description </DD>
+<DT> SMB </DT>
+<DD> Server Message Block </DD>
+<DT> TFTP </DT>
+<DD> Trivial File Transfer Protocol </DD>
 </DL>
 </BODY>
 </HTML>
