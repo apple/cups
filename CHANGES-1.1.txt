@@ -5,6 +5,10 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- Updated the IPP backend to reconnect after downgrading
+	  from IPP/1.1 to 1.0, and when sending requests to HP
+	  JetDirect interfaces that don't support HTTP
+	  Keep-Alive like they should.
 	- Now pass NLSPATH and DYLD_LIBRARY_PATH environment
 	  variables, if defined, to CGI and job processes.
 	- Removed the pstoraster filter (based on GNU

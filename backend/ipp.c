@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.10 2002/03/25 17:14:12 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.11 2002/04/24 19:54:42 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -200,7 +200,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
   do
   {
-    fprintf(stderr, "INFO: Connecting to %s...\n", hostname);
+    fprintf(stderr, "INFO: Connecting to %s on port %d...\n", hostname, port);
 
     if ((http = httpConnect(hostname, port)) == NULL)
     {
@@ -219,6 +219,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     }
   }
   while (http == NULL);
+
+  fprintf(stderr, "INFO: Connected to %s...\n", hostname);
 
  /*
   * Build a URI for the printer and fill the standard IPP attributes for
@@ -266,6 +268,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     * Do the request...
     */
 
+    fputs("DEBUG: Getting supported attributes...\n", stderr);
+
     if ((supported = cupsDoRequest(http, request, resource)) == NULL)
       ipp_status = cupsLastError();
     else
@@ -289,6 +293,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 	fputs("INFO: Printer does not support IPP/1.1, trying IPP/1.0...\n", stderr);
 	version = 0;
+	httpReconnect(http);
       }
       else
 	fprintf(stderr, "ERROR: Unable to get printer status (%s)!\n",
@@ -480,6 +485,16 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     cupsFreeOptions(num_options, options);
 
    /*
+    * If copies aren't supported, then we are likely dealing with an HP
+    * JetDirect.  The HP IPP implementation seems to close the connection
+    * after every request (that is, it does *not* implement HTTP Keep-
+    * Alive, which is REQUIRED by HTTP/1.1...
+    */
+
+    if (!copies_sup)
+      httpReconnect(http);
+
+   /*
     * Do the request...
     */
 
@@ -570,6 +585,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       * Do the request...
       */
 
+      if (!copies_sup)
+	httpReconnect(http);
+
       if ((response = cupsDoRequest(http, request, resource)) == NULL)
 	ipp_status = cupsLastError();
       else
@@ -617,7 +635,6 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       if (response)
 	ippDelete(response);
 
-
      /*
       * Now check on the printer state...
       */
@@ -647,6 +664,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
      /*
       * Do the request...
       */
+
+      if (!copies_sup)
+	httpReconnect(http);
 
       if ((response = cupsDoRequest(http, request, resource)) != NULL)
       {
@@ -800,5 +820,5 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.10 2002/03/25 17:14:12 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.11 2002/04/24 19:54:42 mike Exp $".
  */
