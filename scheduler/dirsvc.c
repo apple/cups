@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.54 2000/05/09 14:10:15 mike Exp $"
+ * "$Id: dirsvc.c,v 1.55 2000/05/31 13:47:47 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -60,6 +60,7 @@ StartBrowsing(void)
   {
     LogMessage(L_ERROR, "StartBrowsing: Unable to create broadcast socket - %s.",
                strerror(errno));
+    Browsing = 0;
     return;
   }
 
@@ -80,6 +81,7 @@ StartBrowsing(void)
 #endif /* WIN32 || __EMX__ */
 
     BrowseSocket = -1;
+    Browsing     = 0;
     return;
   }
 
@@ -104,6 +106,7 @@ StartBrowsing(void)
 #endif /* WIN32 || __EMX__ */
 
     BrowseSocket = -1;
+    Browsing     = 0;
     return;
   }
 
@@ -727,5 +730,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.54 2000/05/09 14:10:15 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.55 2000/05/31 13:47:47 mike Exp $".
  */
