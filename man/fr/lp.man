@@ -1,7 +1,8 @@
 .\"
-.\" "$Id: lp.man,v 1.2 2002/12/17 19:00:01 swdev Exp $"
+.\" "$Id: lp.man,v 1.3 2003/03/12 20:41:42 mike Exp $"
 .\"
 .\"   lp/cancel man page for the Common UNIX Printing System (CUPS).
+.\"   Based on cvs revision 1.12
 .\"
 .\"   Copyright 1997-2003 by Easy Software Products.
 .\"
@@ -21,7 +22,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lp 1 "Common UNIX Printing System" "25 Septembre 2001" "Easy Software Products"
+.TH lp 1 "Common UNIX Printing System" "24 janvier 2003" "Easy Software Products"
 .SH NOM
 lp \- Imprime des fichiers
 .br
@@ -70,6 +71,8 @@ cancel \- Annule des travaux d'impression
 .B cancel
 [ \-a ] [ -h
 .I serveur
+] [ -u
+.I utilisateur
 ] [
 .I id
 ] [
@@ -89,6 +92,14 @@ Les options suivantes sont reconnues par \fBlp\fR\ :
 \-E
 .br
 Force le cryptage des données lors de la connexion au serveur.
+.TP 5
+\-c
+.br
+Cette option n'est fournie que pour des raisons de compatibilité avec les
+précédentes versions. Sur les systèmes le permettant, force la copie du fichier
+d'impression dans le répertoire spool avant impression. Avec CUPS, les fichiers
+d'impression sont envoyés à l'ordonnanceur via IPP. Le résultat est le même
+dans les deux cas.
 .TP 5
 \-d \fIdestination\fR
 .br
@@ -130,12 +141,17 @@ N'affiche pas le numéro du travail (mode silencieux).
 .br
 Définit le nom du travail.
 .TP 5
+\-u \fInom_utilisateur\fR
+.br
+Annule les travaux d'impression de l'utilisateur \fInom_utilisateur\fR.
+.TP5
 \-H \fIméthode\fR
 .br
 Définit quand l'impression doit être effectuée. La valeur \fIimmediate\fR effectue
 l'impression immédiatement, la valeur \fIhold\fR suspend l'impression indéfiniment,
 une valeur, une heure suspend l'impression jusqu'à l'heure donnée. Utilisez la valeur
-\fIresume\fR avec l'option \fI-i\fR pour reprendre un travail suspendu.
+\fIresume\fR avec l'option \fI-i\fR pour reprendre un travail suspendu. Utilisez la
+valeur \fIrestart\fR avec l'option \fI-i\fR pour relancer un travail terminé.
 .TP 5
 \-P \fIliste-de-pages\fR
 .br
@@ -150,14 +166,19 @@ L'option «\ m\ » n'est pas opérationnelle dans CUPS 1.1.
 .LP
 L'option «\ q\ » accepte des valeurs de 1 à 100, contrairement au lp de Solaris qui
 utilise des valeurs de 0 à 39.
+.SH NOTES
+Les administrateurs désirant empêcher les annulations de travaux d'impression
+d'autres utilisateurs via l'option \fI-u\fR doivent protéger par mot de passe
+l'endroit où sont stockés les travaux d'impression (voir la section
+<Location\ /jobs> dans le fichier \fIcupsd.conf(5)\fR.
 .SH VOIR AUSSI
 lpstat(1),
 CUPS Software Users Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2003 by Easy Software Products, Tous droits réservés.
+Copyright 1993-2003 Easy Software Products, Tous droits réservés.
 .SH TRADUCTION
 Gilles QUERRET <gilles.querret@nerim.net>
 .\"
-.\" End of "$Id: lp.man,v 1.2 2002/12/17 19:00:01 swdev Exp $".
+.\" End of "$Id: lp.man,v 1.3 2003/03/12 20:41:42 mike Exp $".
 .\"

@@ -1,7 +1,8 @@
 .\"
-.\" "$Id: cupsaddsmb.man,v 1.2 2002/12/17 19:00:00 swdev Exp $"
+.\" "$Id: cupsaddsmb.man,v 1.3 2003/03/12 20:41:41 mike Exp $"
 .\"
 .\"   cupsaddsmb man page for the Common UNIX Printing System (CUPS).
+.\"   Based on cvs revision 1.6
 .\"
 .\"   Copyright 1997-2003 by Easy Software Products.
 .\"
@@ -21,7 +22,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsaddsmb 8 "Common UNIX Printing System" "9 Novembre 2001" "Easy Software Products"
+.TH cupsaddsmb 8 "Common UNIX Printing System" "27 septembre 2002" "Easy Software Products"
 .SH NOM
 cupsaddsmb \- Export d'imprimante vers Samba pour les clients Windows
 .SH SYNOPSIS
@@ -39,7 +40,7 @@ cupsaddsmb \- Export d'imprimante vers Samba pour les clients Windows
 ou supérieure) pour l'utilisation par des clients Windows. Suivant
 la configuration de SAMBA, il est possible qu'un mot de passe soit
 demandé pour l'export. Ce programme requiert les fichiers du driver
-d'imprimante Adobe PostScript, comme indiqué plus bas.
+d'imprimante Adobe PostScript ou CUPS, comme indiqué plus bas.
 .LP
 L'option \fI-a\fR exporte toutes les imprimantes connues. Sinon,
 seules les imprimantes fournies dans la ligne de commande sont
@@ -86,32 +87,65 @@ fournir un driver à télécharger. Ceci est fait de la manière suivante\ :
 Cette configuration suppose une installation de SAMBA conforme au
 standard FHS. Modifiez les chemins dans [printers] et [print$] suivant
 votre installation.
-.SH LES DRIVERS ADOBE POSTSCRIPT POUR WINDOWS
-\fIcupsaddsmb\fR utilise les drivers Adobe PostScript pour Windows,
-disponible en téléchargement sur le site web d'Adobe (http://www.adobe.com).
+.SH PILOTES POSTSCRIPT CUPS POUR WINDOWS
+\fIcupsaddsmb\fR peut utiliser les pilotes d'impression CUPS PostScript pour
+Windows, disponibles sur le site Internet de CUPS.
+.LP
+Il est recommandé d'utiliser ces pilotes CUPS car ils permettent le comptage
+du nombre de pages, les pages de garde et les labels sur tous les types
+d'imprimantes. Ces pilotes ne sont cependant disponibles que pour les
+plateformes Windows NT, 2000 et XP. Pour des plateformes Windows 95, 98 et Me,
+il est nécessaire d'utiliser les pilotes Adobe.
+.LP
+Après décompression des fichiers, créer un répertoire «\ drivers\ » dans le
+répertoire de données de CUPS (habituellement /usr/share/cups) et copiez
+les fichiers CUPS en utilisant des noms de fichiers en MINUSCULES, comme
+ci-dessous\ :
+.nf
+    [Windows NT, 2000, and XP]
+    cups.hlp
+    cupsdrvr.dll
+    cupsui.dll
+.fi
+
+.SH LES PILOTES ADOBE POSTSCRIPT POUR WINDOWS
+\fIcupsaddsmb\fR peut utiliser les pilotes Adobe PostScript pour Windows,
+disponibles en téléchargement sur le site web d'Adobe (http://www.adobe.com).
+.LP
+Il est recommandé d'utiliser ces pilotes CUPS car ils permettent le comptage
+du nombre de pages, les pages de garde et les labels sur tous les types
+d'imprimantes. Ces pilotes ne sont cependant disponibles que pour les
+plateformes Windows NT, 2000 et XP. Pour des plateformes Windows 95, 98 et Me,
+il est nécessaire d'utiliser les pilotes Adobe.
+.LP
 Une fois les fichiers décompressés, créez un répertoire «\ drivers\ » dans
 le répertoire de données de CUPS (habituellement /usr/share/cups) et
 copiez les fichiers Adobe en utilisant des noms de fichiers en MAJUSCULES,
 comme ci-dessous\ :
 .nf
+
+    [Windows 95, 98, and Me]
     ADFONTS.MFM
     ADOBEPS4.DRV
     ADOBEPS4.HLP
-    ADOBEPS5.DLL
-    ADOBEPSU.DLL
-    ADOBEPSU.HLP
     DEFPRTR2.PPD
     ICONLIB.DLL
     PSMON.DLL
+    
+    [Windows NT, 2000, and XP]
+    cups.hlp
+    cupsdrvr.dll
+    cupsui.dll
 .fi
+.LP
+Les deux jeux de pilotes sont utilisables indépendemment.
 .SH VOIR AUSSI
 CUPS Software Administrators Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2003 by Easy Software Products, Tous droits réservés.
+Copyright 1993-2003 Easy Software Products, Tous droits réservés.
 .SH TRADUCTION
 Gilles QUERRET <gilles.querret@nerim.net>
 .\"
-.\" End of "$Id: cupsaddsmb.man,v 1.2 2002/12/17 19:00:00 swdev Exp $".
+.\" End of "$Id: cupsaddsmb.man,v 1.3 2003/03/12 20:41:41 mike Exp $".
 .\"
-

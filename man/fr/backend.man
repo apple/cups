@@ -1,7 +1,8 @@
 .\"
-.\" "$Id: backend.man,v 1.2 2002/12/17 18:59:59 swdev Exp $"
+.\" "$Id: backend.man,v 1.3 2003/03/12 20:41:41 mike Exp $"
 .\"
 .\"   backend man page for the Common UNIX Printing System (CUPS).
+.\"   Based on cvs revision 1.10
 .\"
 .\"   Copyright 1997-2003 by Easy Software Products.
 .\"
@@ -45,6 +46,10 @@ lors de l'exécution d'un programme de transmission\ :
 CHARSET
 .br
 Le jeu de caractères par défaut (généralement us-ascii ou iso-8859-1).
+.TP 5
+CLASS
+.br
+Contient le nom de la classe lorsqu'un travail d'impression est envoyé à une classe d'imprimante. Cette variable n'est pas définie si le travail d'impression n'est pas envoyé à une classe.
 .TP 5
 CONTENT_TYPE
 .br
@@ -96,7 +101,8 @@ Le fuseau horaire du serveur.
 .TP 5
 USER
 .br
-L'utilisateur exécutant le programme (généralement lp).
+L'utilisateur exécutant le programme (généralement lp). Vous pouvez
+trouver cette information dans le fichier cupsd.conf.
 .SH VOIR AUSSI
 cupsd(8), filter(1)
 CUPS Interface Design Description,
@@ -104,10 +110,9 @@ CUPS Software Administrators Manual,
 CUPS Software Programmers Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2003 by Easy Software Products, Tous droits réservés.
+Copyright 1993-2003 Easy Software Products, Tous droits réservés.
 .SH TRADUCTION
 Gilles QUERRET <gilles.querret@nerim.net>
 .\"
-.\" End of "$Id: backend.man,v 1.2 2002/12/17 18:59:59 swdev Exp $".
+.\" End of "$Id: backend.man,v 1.3 2003/03/12 20:41:41 mike Exp $".
 .\"
-

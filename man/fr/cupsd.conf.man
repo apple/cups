@@ -1,7 +1,8 @@
 .\"
-.\" "$Id: cupsd.conf.man,v 1.3 2002/12/17 19:00:00 swdev Exp $"
+.\" "$Id: cupsd.conf.man,v 1.4 2003/03/12 20:41:41 mike Exp $"
 .\"
 .\"   cupsd.conf man page for the Common UNIX Printing System (CUPS).
+.\"   Based on cvs revision 1.10
 .\"
 .\"   Copyright 1997-2003 by Easy Software Products.
 .\"
@@ -21,7 +22,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsd.conf 5 "Common UNIX Printing System" "22 Juin 2000" «Easy Software Products»
+.TH cupsd.conf 5 "Common UNIX Printing System" "12 août 2002" «Easy Software Products»
 .SH NOM
 cupsd.conf \- Fichier de configuration du serveur CUPS
 .SH DESCRIPTION
@@ -51,6 +52,10 @@ Définit la classe d'identification (User, Group, System)
 AuthType
 .br
 Définit le type d'identification (None, Basic, Digest)
+.TP 5
+AutoPurgeJobs
+.br
+Définit s'il faut purger automatiquement l'historique des travaux lorsque les données ne sont plus nécessaires pour l'application des quotas.
 .TP 5
 BrowseAddress
 .br
@@ -82,6 +87,10 @@ BrowsePort
 .br
 Définit le port utilisé pour les demandes d'informations sur les imprimantes.
 .TP 5
+BrowseProtocols
+.br
+Définit les protocoles réseaux à utiliser pour la recherche d'imprimantes.
+.TP 5
 BrowseRelay
 .br
 Les paquets de demande d'information peuvent être relayés depuis une machine ou
@@ -103,6 +112,18 @@ Browsing
 .br
 Définit si la récupération des informations des imprimantes distantes doit être activée.
 .TP 5
+Classification
+.br
+Définit le niveau de sécurité du serveur
+.TP 5
+ClassifyOverride
+.br
+Définit s'il faut autoriser les utilisateurs à modifier la classification de leurs travaux d'impression.
+.TP 5
+ConfigFilePerm
+.br
+Définit les permissions UNIX à utiliser pour les fichiers de configuration utilisés par l'ordonnanceur.
+.TP 5
 DataDir
 .br
 Définit le répertoire où se trouvent les fichiers de données.
@@ -123,19 +144,45 @@ DocumentRoot
 .br
 Définit le répertoire racine des documents du serveur web interne.
 .TP 5
+Encryption
+.br
+Définit le niveau de cryptage nécessaire pour un lieu.
+.TP 5
 ErrorLog
 .br
 Définit le nom du fichier traçant les erreurs.
+.TP 5
+FilterLimit
+.br
+Définit le coût maximum des filtres lancés simultanément.
+.TP 5
+FilterNice
+.br
+Définit la priorité (valeur «\ nice\ ») des filtres exécutés pour une impression.
+.TP 5
+FontPath
+.br
+Définit le chemin de recherche des polices.
 .TP 5
 Group
 .br
 Définit le nom du groupe ou l'ID qui sera utilisé lors de l'exécution de 
 programmes externes.
 .TP 5
+HideImplicitMembers
+.br
+Définit s'il faut cacher ou non les membres des classes implicites.
+.TP 5
 HostNameLookups
 .br
 Définit s'il faut effectuer ou non des recherches de noms à partir des adresses
 des clients.
+.TP 5
+ImplicitAnyClasses
+.br
+Définit s'il faut créer ou non des classes implicites pour les imprimantes
+locales et distantes (par exemple «\ UneImprimante\ » pour «\ Imprimante\ »,
+«\ Imprimante@serveur1\ » et «\ Imprimante@serveur2\ »).
 .TP 5
 ImplicitClasses
 .br
@@ -150,17 +197,47 @@ KeepAliveTimeout
 .br
 Définit le timeout pour HTTP-Keep-Alive.
 .TP 5
+<Limit methods> ... </Limit>
+.TP 5
+<LimitExcept methods> ... </LimitExcept>
+.br
+Définit les méthodes HTTP interdites pour un lieu donné.
+.TP 5
+LimitRequestBody
+.br
+Définit la taille maximale des demandes de travaux d'impression.
+.TP 5
 <Location /path> ... </Location>
 .br
 Définit les contrôles d'accès à une destination donnée.
 .TP 5
+LogFilePerm
+.br
+Définit les permissions UNIX des fichiers de trace écrits par l'ordonnanceur.
+.TP 5
 LogLevel
 .br
-Définit le niveau de trace (none, warn, error, info ou debug).
+Définit le niveau de trace (none, warn, error, info, debug ou debug2).
 .TP 5
 MaxClients
 .br
 Définit le nombre maximum de clients simultanés.
+.TP 5
+MaxCopies
+.br
+Définit le nombre maximum de copies qu'un utilisateur peut effectuer pour un travail d'impression.
+.TP 5
+MaxJobs
+.br
+Définit le nombre maximum de travaux simultanés.
+.TP 5
+MaxJobsPerPrinter
+.br
+Définit le nombre maximum de travaux simultanés par imprimante.
+.TP 5
+MaxJobsPerUser
+.br
+Définit le nombre maximum de travaux simultanés par utilisateur.
 .TP 5
 MaxLogSize
 .br
@@ -200,15 +277,34 @@ Définit l'emplacement du fichier printcap, contenant la liste des imprimantes,
 et qui est mis à jour automatiquement. Ce fichier est indispensable aux
 applications externes.
 .TP 5
+PrintcapGUI
+.br
+Définit s'il faut générer ou non les fichiers du panneau d'options sur certains systèmes d'exploitation.
+.TP 5
+RemoteRoot
+.br
+Définit le nom d'utilisateur associé aux accès root non identifié.
+.TP 5
+RequestRoot
+.br
+Définit le répertoire où sont stockées les fichiers de travail et les données des requêtes HTTP.
+.TP 5
+Require
+.br
+Définit qu'un identification par utilisateur ou par groupe est nécessaire.
+.TP 5
 RIPCache
 .br
 Définit la taille maximale de mémoire à utiliser lors de la conversion d'images
 ou de fichiers PostScript en fichier bitmap pour une imprimante.
 .TP 5
-RequestRoot
+RunAsUser
 .br
-Définit le répertoire où sont stockés les fichiers de travail et les données
-des requêtes HTTP.
+Définit si l'ordonnanceur doit être lancé en tant qu'utilisateur, dont le nom doit être défini par la directive «\ User\ ».
+.TP 5
+Satisfy
+.br
+Définit si tout ou partie des limites définies pour un lieu donné doivent être satisfaites pour permettre l'accès.
 .TP 5
 ServerAdmin
 .br
@@ -218,6 +314,14 @@ ServerBin
 .br
 Définit le répertoire où les applications frontales, les CGI, les démons et
 les filtres sont stockés.
+.TP 5
+ServerCertificate
+.br
+Définit le certificat de cryptage à utiliser.
+.TP 5
+ServerKey
+.br
+Définit la clé de cryptage à utiliser.
 .TP 5
 ServerName
 .br
@@ -247,9 +351,9 @@ classes.conf(5), cupsd(8), mime.convs(5), mime.types(5), printers.conf(5),
 CUPS Software Administrators Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2003 by Easy Software Products, Tous droits réservés.
+Copyright 1993-2003 Easy Software Products, Tous droits réservés.
 .SH TRADUCTION
 Gilles QUERRET <gilles.querret@nerim.net>
 .\"
-.\" End of "$Id: cupsd.conf.man,v 1.3 2002/12/17 19:00:00 swdev Exp $".
+.\" End of "$Id: cupsd.conf.man,v 1.4 2003/03/12 20:41:41 mike Exp $".
 .\"

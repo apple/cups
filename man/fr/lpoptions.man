@@ -1,7 +1,8 @@
 .\"
-.\" "$Id: lpoptions.man,v 1.3 2002/12/17 19:00:01 swdev Exp $"
+.\" "$Id: lpoptions.man,v 1.4 2003/03/12 20:41:42 mike Exp $"
 .\"
 .\"   lpoptions man page for the Common UNIX Printing System (CUPS).
+.\"   Based on cvs revision 1.11
 .\"
 .\"   Copyright 1997-2003 by Easy Software Products.
 .\"
@@ -21,7 +22,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpoptions 1 "Common UNIX Printing System" "5 Septembre 2000" "Easy Software Products"
+.TH lpoptions 1 "Common UNIX Printing System" "21 octobre 2002" "Easy Software Products"
 .SH NOM
 lpoptions \- Affiche et définit les options et paramètres par défaut d'une imprimante
 .SH SYNOPSIS
@@ -39,31 +40,34 @@ lpoptions \- Affiche et définit les options et paramètres par défaut d'une impri
 .B lpoptions
 [ -h
 .I serveur
-] [ -p
+] [ -E ] [ -p
 .I destination[/instance]
 ] -l
 .br
 .B lpoptions
 [ -h
 .I serveur
-] [ -o
+] [ -E ] [ -o
 .I option=valeur
 ] ... [ -o
 .I option=valeur
-] -p
+] [ -p
 .I dest[/instance]
 ] -r
 .I option
-]
 .br
 .B lpoptions
 [ -h
 .I serveur
-] -x
+] [ -E] -x
 .I destination[/instance]
 .SH DESCRIPTION
 Lorsqu'il est lancé sans arguments, \fBlpoptions\fR affiche les options
 par défaut. Les paramètres pouvant être fournis sont\ :
+.TP 5
+\-E
+.br
+Crypte les données lors de la communication avec le serveur CUPS.
 .TP 5
 \-d \fIdestination[/instance]\fR
 .br
@@ -102,16 +106,22 @@ de l'imprimante fournie en paramètre sont affichées sur la sortie standard.
 .LP
 Les options définies par la commande \fBlpoptions\fR sont utilisées par les
 commandes \fBlp(1)\fR et \fBlpr(1)\fR lors de l'envoi de travaux d'impression.
+.SH UTILISATION DU COMPTE ROOT
+Lorsque la commande \fBlpoptions\fR est lancée par l'utilisateur root, les options sont lues et sauvegardées pour \fItous les utilisateurs\fR dans le fichier
+/etc/cups/lpoptions.
 .SH COMPATIBILITÉ
 La commande \fBlpoptions\fR est spécifique à CUPS.
+.SH FICHIERS
+~/.lpoptions - fichier créé par utilisateur et contenant ses options.
+/etc/cups/lpoptions - fichier global de configuration créé par l'utilisateur root.
 .SH VOIR AUSSI
 cancel(1), lp(1),
 CUPS Software Users Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2003 by Easy Software Products, Tous droits réservés.
+Copyright 1993-2003 Easy Software Products, Tous droits réservés.
 .SH TRADUCTION
 Gilles QUERRET <gilles.querret@nerim.net>
 .\"
-.\" End of "$Id: lpoptions.man,v 1.3 2002/12/17 19:00:01 swdev Exp $".
+.\" End of "$Id: lpoptions.man,v 1.4 2003/03/12 20:41:42 mike Exp $".
 .\"
