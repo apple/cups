@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.70 2003/03/30 21:43:00 mike Exp $"
+# "$Id: Makefile,v 1.71 2003/04/17 23:09:42 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -27,7 +27,7 @@
 include ../Makedefs
 
 TARGETS	=	gziptoany hpgltops texttops pstops imagetops imagetoraster \
-		rastertodymo rastertoepson rastertohp
+		rastertodymo rastertoepson rastertohp libcupsimage.a
 
 HPGLOBJS =	hpgl-attr.o hpgl-config.o hpgl-main.o hpgl-prolog.o \
 		hpgl-char.o hpgl-input.o hpgl-polygon.o hpgl-vector.o
@@ -268,5 +268,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.70 2003/03/30 21:43:00 mike Exp $".
+# End of "$Id: Makefile,v 1.71 2003/04/17 23:09:42 mike Exp $".
 #
