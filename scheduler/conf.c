@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.44 2003/09/11 23:01:55 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.45 2003/10/09 19:13:51 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -58,37 +58,6 @@
 #ifndef INADDR_NONE
 #  define INADDR_NONE	0xffffffff
 #endif /* !INADDR_NONE */
-
-
-/*
- * Some OS's don't have hstrerror(), most notably Solaris...
- */
-
-#ifndef HAVE_HSTRERROR
-const char *					/* O - Error string */
-cups_hstrerror(int error)			/* I - Error number */
-{
-  static const char * const errors[] =
-		{
-		  "OK",
-		  "Host not found.",
-		  "Try again.",
-		  "Unrecoverable lookup error.",
-		  "No data associated with name."
-		};
-
-
-  if (error < 0 || error > 4)
-    return ("Unknown hostname lookup error.");
-  else
-    return (errors[error]);
-}
-#elif defined(_AIX)
-/*
- * AIX doesn't provide a prototype but does provide the function...
- */
-extern const char *hstrerror(int);
-#endif /* !HAVE_HSTRERROR */
 
 
 /*
@@ -224,8 +193,6 @@ ReadConfiguration(void)
   int		run_user;		/* User that will be running cupsd */
   char		*old_serverroot,	/* Old ServerRoot */
 		*old_requestroot;	/* Old RequestRoot */
-  time_t	temptime;		/* Temporary time info */
-  struct tm	*tempdate;		/* Temporary date/time info */
 
 
  /*
@@ -420,22 +387,6 @@ ReadConfiguration(void)
   MaxJobsPerPrinter   = 0;
   MaxJobsPerUser      = 0;
   MaxCopies           = 100;
-
- /*
-  * Set the time zone offset based on the output from localtime()...
-  * We do this so that GetDateTime() can use gmtime() and avoid the
-  * opportunity for a deadlock condition that Solaris offers if you
-  * call localtime() from a signal handler...
-  */
-
-  temptime = time(NULL);
-  tempdate = localtime(&temptime);
-
-#ifdef HAVE_TM_GMTOFF
-  TimeZoneOffset = tempdate->tm_gmtoff;
-#else
-  TimeZoneOffset = timezone;
-#endif /* HAVE_TM_GMTOFF */
 
  /*
   * Read the configuration file...
@@ -2319,5 +2270,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.44 2003/09/11 23:01:55 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.45 2003/10/09 19:13:51 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.19.2.17 2003/09/15 20:11:16 mike Exp $"
+ * "$Id: log.c,v 1.19.2.18 2003/10/09 19:13:52 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -57,6 +57,7 @@ char *				/* O - Date/time string */
 GetDateTime(time_t t)		/* I - Time value */
 {
   struct tm	*date;		/* Date/time value */
+  static time_t	last_time = -1;	/* Last time value */
   static char	s[1024];	/* Date/time string */
   static const char * const months[12] =
 		{		/* Months */
@@ -75,31 +76,36 @@ GetDateTime(time_t t)		/* I - Time value */
 		};
 
 
- /*
-  * Get the date and time from the UNIX time value, and then format it
-  * into a string.  Note that we *can't* use the strftime() function since
-  * it is localized and will seriously confuse automatic programs if the
-  * month names are in the wrong language!  Also, thanks to a marvelous
-  * deadlock condition present in most/all versions of Sun's C libraries
-  * we can't use localtime()...
-  *
-  * We use the "TimeZoneOffset" variable that contains the current
-  * timezone offset from UTC in seconds so that we are reporting local
-  * time in the log files.  If you want GMT, set the TZ environment
-  * variable accordingly before starting the scheduler.  Because of the
-  * static nature of the TimeZoneOffset variable, the time may not
-  * reflect daylight savings time accurately until you reconfigure or
-  * restart the scheduler...
-  */
+  if (t != last_time)
+  {
+    last_time = t;
 
-  t    += TimeZoneOffset;
-  date = gmtime(&t);
+   /*
+    * Get the date and time from the UNIX time value, and then format it
+    * into a string.  Note that we *can't* use the strftime() function since
+    * it is localized and will seriously confuse automatic programs if the
+    * month names are in the wrong language!
+    *
+    * Also, we use the "timezone" variable that contains the current timezone
+    * offset from GMT in seconds so that we are reporting local time in the
+    * log files.  If you want GMT, set the TZ environment variable accordingly
+    * before starting the scheduler.
+    *
+    * (*BSD and Darwin store the timezone offset in the tm structure)
+    */
 
-  snprintf(s, sizeof(s), "[%02d/%s/%04d:%02d:%02d:%02d %+03ld%02ld]",
-	   date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
-	   date->tm_hour, date->tm_min, date->tm_sec,
-	   TimeZoneOffset / 3600, (TimeZoneOffset / 60) % 60);
- 
+    date = localtime(&t);
+
+    snprintf(s, sizeof(s), "[%02d/%s/%04d:%02d:%02d:%02d %+03ld%02ld]",
+	     date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
+	     date->tm_hour, date->tm_min, date->tm_sec,
+#ifdef HAVE_TM_GMTOFF
+             date->tm_gmtoff / 3600, (date->tm_gmtoff / 60) % 60);
+#else
+             timezone / 3600, (timezone / 60) % 60);
+#endif /* HAVE_TM_GMTOFF */
+  }
+
   return (s);
 }
 
@@ -146,7 +152,6 @@ LogMessage(int        level,		/* I - Log level */
 #endif /* HAVE_VSYSLOG */
   static int	linesize = 0;		/* Size of line for output file */
   static char	*line = NULL;		/* Line for output file */
-  static char	sigbuf[1024];		/* Buffer for signal handlers */
 
 
  /*
@@ -155,8 +160,6 @@ LogMessage(int        level,		/* I - Log level */
 
   if (level > LogLevel)
     return (1);
-
-  HoldSignals();
 
 #ifdef HAVE_VSYSLOG
  /*
@@ -169,8 +172,6 @@ LogMessage(int        level,		/* I - Log level */
     vsyslog(syslevels[level], message, ap);
     va_end(ap);
 
-    ReleaseSignals();
-
     return (1);
   }
 #endif /* HAVE_VSYSLOG */
@@ -180,11 +181,7 @@ LogMessage(int        level,		/* I - Log level */
   */
 
   if (!check_log_file(&ErrorFile, ErrorLog))
-  {
-    ReleaseSignals();
-
     return (0);
-  }
 
  /*
   * Print the log level and date/time...
@@ -193,100 +190,88 @@ LogMessage(int        level,		/* I - Log level */
   cupsFilePrintf(ErrorFile, "%c %s ", levels[level], GetDateTime(time(NULL)));
 
  /*
-  * Then the log message...
+  * Allocate the line buffer as needed...
   */
 
-  if (SignalCount)
+  if (!linesize)
   {
-   /*
-    * Processing a signal so use the static buffer...
-    */
+    linesize = 8192;
+    line     = malloc(linesize);
 
-    va_start(ap, message);
-    len = vsnprintf(sigbuf, sizeof(sigbuf), message, ap);
-    va_end(ap);
-
-    ptr = sigbuf;
-
-    if (len >= sizeof(sigbuf))
-      len = sizeof(sigbuf) - 1;
-  }
-  else
-  {
-   /*
-    * Not processing a signal so use the dynamic buffer...
-    */
-
-    if (!linesize)
+    if (!line)
     {
-      linesize = 8192;
-      line     = malloc(linesize);
+      cupsFilePrintf(ErrorFile,
+                     "ERROR: Unable to allocate memory for line - %s\n",
+                     strerror(errno));
+      cupsFileFlush(ErrorFile);
 
-      if (!line)
-      {
-	cupsFilePrintf(ErrorFile,
-                       "ERROR: Unable to allocate memory for line - %s\n",
-                       strerror(errno));
-	cupsFileFlush(ErrorFile);
+      return (0);
+    }
+  }
 
-	ReleaseSignals();
+ /*
+  * Format the log message...
+  */
 
-	return (0);
-      }
+  va_start(ap, message);
+  len = vsnprintf(line, linesize, message, ap);
+  va_end(ap);
+
+ /*
+  * Resize the buffer as needed...
+  */
+
+  if (len >= linesize)
+  {
+    len ++;
+
+    if (len < 8192)
+      len = 8192;
+    else if (len > 65536)
+      len = 65536;
+
+    line = realloc(line, len);
+
+    if (line)
+      linesize = len;
+    else
+    {
+      cupsFilePrintf(ErrorFile,
+                     "ERROR: Unable to allocate memory for line - %s\n",
+                     strerror(errno));
+      cupsFileFlush(ErrorFile);
+
+      return (0);
     }
 
     va_start(ap, message);
     len = vsnprintf(line, linesize, message, ap);
     va_end(ap);
-
-    if (len >= linesize)
-    {
-      len ++;
-
-      if (len < 8192)
-	len = 8192;
-      else if (len > 65536)
-	len = 65536;
-
-      line = realloc(line, len);
-
-      if (line)
-	linesize = len;
-      else
-      {
-	cupsFilePrintf(ErrorFile,
-                       "ERROR: Unable to allocate memory for line - %s\n",
-                       strerror(errno));
-	cupsFileFlush(ErrorFile);
-
-	ReleaseSignals();
-
-	return (0);
-      }
-
-      va_start(ap, message);
-      len = vsnprintf(line, linesize, message, ap);
-      va_end(ap);
-    }
-
-    ptr = line;
-
-    if (len >= linesize)
-      len = linesize - 1;
   }
+
+  ptr = line;
+
+  if (len >= linesize)
+    len = linesize - 1;
+
+ /*
+  * Then the log message...
+  */
+
+  cupsFilePuts(ErrorFile, line);
 
  /*
   * Then a newline...
   */
 
-  cupsFilePuts(ErrorFile, line);
-
   if (len > 0 && line[len - 1] != '\n')
     cupsFilePutChar(ErrorFile, '\n');
 
-  cupsFileFlush(ErrorFile);
+ /*
+  * Flush the line to the file and return...
+  */
 
-  ReleaseSignals();
+  cupsFileFlush(ErrorFile);
 
   return (1);
 }
@@ -308,8 +293,6 @@ LogPage(job_t       *job,	/* I - Job being printed */
   hostname = ippFindAttribute(job->attrs, "job-originating-host-name",
                               IPP_TAG_ZERO);
 
-  HoldSignals();
-
 #ifdef HAVE_VSYSLOG
  /*
   * See if we are logging pages via syslog...
@@ -322,8 +305,6 @@ LogPage(job_t       *job,	/* I - Job being printed */
            job->id, page, billing ? billing->values[0].string.text : "-",
            hostname->values[0].string.text);
 
-    ReleaseSignals();
-
     return (1);
   }
 #endif /* HAVE_VSYSLOG */
@@ -333,11 +314,7 @@ LogPage(job_t       *job,	/* I - Job being printed */
   */
 
   if (!check_log_file(&PageFile, PageLog))
-  {
-    ReleaseSignals();
-
     return (0);
-  }
 
  /*
   * Print a page log entry of the form:
@@ -352,8 +329,6 @@ LogPage(job_t       *job,	/* I - Job being printed */
 		 billing ? billing->values[0].string.text : "-",
         	 hostname->values[0].string.text);
   cupsFileFlush(PageFile);
-
-  ReleaseSignals();
 
   return (1);
 }
@@ -386,8 +361,6 @@ LogRequest(client_t      *con,	/* I - Request to log */
 		};
 
 
-  HoldSignals();
-
 #ifdef HAVE_VSYSLOG
  /*
   * See if we are logging accesses via syslog...
@@ -401,8 +374,6 @@ LogRequest(client_t      *con,	/* I - Request to log */
 	   con->http.version / 100, con->http.version % 100,
 	   code, con->bytes);
 
-    ReleaseSignals();
-
     return (1);
   }
 #endif /* HAVE_VSYSLOG */
@@ -412,11 +383,7 @@ LogRequest(client_t      *con,	/* I - Request to log */
   */
 
   if (!check_log_file(&AccessFile, AccessLog))
-  {
-    ReleaseSignals();
-
     return (0);
-  }
 
  /*
   * Write a log of the request in "common log format"...
@@ -428,8 +395,6 @@ LogRequest(client_t      *con,	/* I - Request to log */
 		 con->http.version / 100, con->http.version % 100,
 		 code, con->bytes);
   cupsFileFlush(AccessFile);
-
-  ReleaseSignals();
 
   return (1);
 }
@@ -563,5 +528,5 @@ check_log_file(cups_file_t **log,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c,v 1.19.2.17 2003/09/15 20:11:16 mike Exp $".
+ * End of "$Id: log.c,v 1.19.2.18 2003/10/09 19:13:52 mike Exp $".
  */

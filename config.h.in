@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.39.2.20 2003/04/10 16:12:46 mike Exp $"
+ * "$Id: config.h.in,v 1.39.2.21 2003/10/09 19:13:47 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,9 @@
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  */
+
+#ifndef _CUPS_CONFIG_H_
+#define _CUPS_CONFIG_H_
 
 /*
  * Version of software...
@@ -273,6 +276,8 @@
 #define CUPS_PYTHON	"/usr/bin/python"
 
 
+#endif /* !_CUPS_CONFIG_H_ */
+
 /*
- * End of "$Id: config.h.in,v 1.39.2.20 2003/04/10 16:12:46 mike Exp $".
+ * End of "$Id: config.h.in,v 1.39.2.21 2003/10/09 19:13:47 mike Exp $".
  */

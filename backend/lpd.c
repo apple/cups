@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.28.2.24 2003/08/28 14:36:51 mike Exp $"
+ * "$Id: lpd.c,v 1.28.2.25 2003/10/09 19:13:48 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -43,6 +43,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <ctype.h>
+#include <cups/http-private.h>
 #include <cups/string.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -64,39 +65,6 @@
  */
 
 static char	tmpfilename[1024] = "";	/* Temporary spool file name */
-
-
-/*
- * Some OS's don't have hstrerror(), most notably Solaris...
- */
-
-#ifndef HAVE_HSTRERROR
-#  define hstrerror cups_hstrerror
-
-const char *					/* O - Error string */
-cups_hstrerror(int error)			/* I - Error number */
-{
-  static const char * const errors[] =
-		{
-		  "OK",
-		  "Host not found.",
-		  "Try again.",
-		  "Unrecoverable lookup error.",
-		  "No data associated with name."
-		};
-
-
-  if (error < 0 || error > 4)
-    return ("Unknown hostname lookup error.");
-  else
-    return (errors[error]);
-}
-#elif defined(_AIX)
-/*
- * AIX doesn't provide a prototype but does provide the function...
- */
-extern const char *hstrerror(int);
-#endif /* !HAVE_HSTRERROR */
 
 
 /*
@@ -1026,5 +994,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: lpd.c,v 1.28.2.24 2003/08/28 14:36:51 mike Exp $".
+ * End of "$Id: lpd.c,v 1.28.2.25 2003/10/09 19:13:48 mike Exp $".
  */

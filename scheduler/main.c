@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.52 2003/09/05 20:36:34 mike Exp $"
+ * "$Id: main.c,v 1.57.2.53 2003/10/09 19:13:53 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -31,6 +31,7 @@
  *   SetString()          - Set a string value.
  *   SetStringf()         - Set a formatted string value.
  *   parent_handler()     - Catch USR1/CHLD signals...
+ *   process_children()   - Process all dead children...
  *   sigchld_handler()    - Handle 'child' signals from old processes.
  *   sighup_handler()     - Handle 'hangup' signals to reconfigure the scheduler.
  *   sigterm_handler()    - Handle 'terminate' signals that stop the scheduler.
@@ -57,6 +58,7 @@
  */
 
 static void	parent_handler(int sig);
+static void	process_children(void);
 static void	sigchld_handler(int sig);
 static void	sighup_handler(int sig);
 static void	sigterm_handler(int sig);
@@ -72,6 +74,7 @@ static int	holdcount = 0;		/* Number of times "hold" was called */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
 static sigset_t	holdmask;		/* Old POSIX signal mask */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+static int	dead_children = 0;	/* Dead children? */
 
 
 /*
@@ -425,6 +428,13 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   for (;;)
   {
+   /*
+    * Check if there are dead children to handle...
+    */
+
+    if (dead_children)
+      process_children();
+
    /*
     * Check if we need to load the server configuration file...
     */
@@ -925,32 +935,27 @@ parent_handler(int sig)		/* I - Signal */
 
 
 /*
- * 'sigchld_handler()' - Handle 'child' signals from old processes.
+ * 'process_children()' - Process all dead children...
  */
 
 static void
-sigchld_handler(int sig)	/* I - Signal number */
+process_children(void)
 {
-  int		olderrno;	/* Old errno value */
   int		status;		/* Exit status of child */
   int		pid;		/* Process ID of child */
   job_t		*job;		/* Current job */
   int		i;		/* Looping var */
 
 
-  (void)sig;
-
  /*
-  * Bump the signal count...
+  * Reset the dead_children flag...
   */
 
-  SignalCount ++;
+  dead_children = 0;
 
  /*
-  * Save the original error value (wait might overwrite it...)
+  * Collect the exit status of some children...
   */
-
-  olderrno = errno;
 
 #ifdef HAVE_WAITPID
   while ((pid = waitpid(-1, &status, WNOHANG)) > 0)
@@ -960,7 +965,7 @@ sigchld_handler(int sig)	/* I - Signal number */
   if ((pid = wait(&status)) > 0)
 #endif /* HAVE_WAITPID */
   {
-    DEBUG_printf(("sigchld_handler: pid = %d, status = %d\n", pid, status));
+    DEBUG_printf(("process_children: pid = %d, status = %d\n", pid, status));
 
    /*
     * Ignore SIGTERM errors - that comes when a job is cancelled...
@@ -1033,24 +1038,33 @@ sigchld_handler(int sig)	/* I - Signal number */
 	}
       }
   }
+}
+
+
+/*
+ * 'sigchld_handler()' - Handle 'child' signals from old processes.
+ */
+
+static void
+sigchld_handler(int sig)	/* I - Signal number */
+{
+  (void)sig;
 
  /*
-  * Restore the original error value...
+  * Flag that we have dead children...
   */
 
-  errno = olderrno;
+  dead_children = 1;
+
+ /*
+  * Reset the signal handler as needed...
+  */
 
 #ifdef HAVE_SIGSET
   sigset(SIGCHLD, sigchld_handler);
 #elif !defined(HAVE_SIGACTION)
   signal(SIGCLD, sigchld_handler);
 #endif /* HAVE_SIGSET */
-
- /*
-  * Restore the signal count...
-  */
-
-  SignalCount --;
 }
 
 
@@ -1137,5 +1151,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.52 2003/09/05 20:36:34 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.53 2003/10/09 19:13:53 mike Exp $".
  */

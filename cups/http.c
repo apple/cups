@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.40 2003/09/05 20:36:32 mike Exp $"
+ * "$Id: http.c,v 1.82.2.41 2003/10/09 19:13:49 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -50,7 +50,6 @@
  *   httpWrite()          - Write data to a HTTP connection.
  *   httpGets()           - Get a line of text from a HTTP connection.
  *   httpPrintf()         - Print a formatted string to a HTTP connection.
- *   httpStatus()         - Return a short string describing a HTTP status code.
  *   httpGetDateString()  - Get a formatted date/time string from a time value.
  *   httpGetDateTime()    - Get a time value from a formatted date/time string.
  *   httpUpdate()         - Update the current HTTP state for incoming data.
@@ -1448,53 +1447,6 @@ httpPrintf(http_t     *http,		/* I - HTTP data */
 
 
 /*
- * 'httpStatus()' - Return a short string describing a HTTP status code.
- */
-
-const char *				/* O - String or NULL */
-httpStatus(http_status_t status)	/* I - HTTP status code */
-{
-  switch (status)
-  {
-    case HTTP_CONTINUE :
-        return ("Continue");
-    case HTTP_SWITCHING_PROTOCOLS :
-        return ("Switching Protocols");
-    case HTTP_OK :
-        return ("OK");
-    case HTTP_CREATED :
-        return ("Created");
-    case HTTP_ACCEPTED :
-        return ("Accepted");
-    case HTTP_NO_CONTENT :
-        return ("No Content");
-    case HTTP_NOT_MODIFIED :
-        return ("Not Modified");
-    case HTTP_BAD_REQUEST :
-        return ("Bad Request");
-    case HTTP_UNAUTHORIZED :
-        return ("Unauthorized");
-    case HTTP_FORBIDDEN :
-        return ("Forbidden");
-    case HTTP_NOT_FOUND :
-        return ("Not Found");
-    case HTTP_REQUEST_TOO_LARGE :
-        return ("Request Entity Too Large");
-    case HTTP_URI_TOO_LONG :
-        return ("URI Too Long");
-    case HTTP_UPGRADE_REQUIRED :
-        return ("Upgrade Required");
-    case HTTP_NOT_IMPLEMENTED :
-        return ("Not Implemented");
-    case HTTP_NOT_SUPPORTED :
-        return ("Not Supported");
-    default :
-        return ("Unknown");
-  }
-}
-
-
-/*
  * 'httpGetDateString()' - Get a formatted date/time string from a time value.
  */
 
@@ -2453,5 +2405,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.40 2003/09/05 20:36:32 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.41 2003/10/09 19:13:49 mike Exp $".
  */
