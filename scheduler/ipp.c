@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.68 2000/05/11 20:49:36 mike Exp $"
+ * "$Id: ipp.c,v 1.69 2000/05/22 18:22:54 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -156,8 +156,16 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
     * Return an error, since we only support IPP 1.x.
     */
 
+    LogMessage(L_ERROR, "ProcessIPPRequest: bad request version (%d.%d)!",
+               con->request->request.any.version[0],
+	       con->request->request.any.version[1]);
     send_ipp_error(con, IPP_VERSION_NOT_SUPPORTED);
   }  
+  else if (con->request->attrs == NULL)
+  {
+    LogMessage(L_ERROR, "ProcessIPPRequest: no attributes in request!");
+    send_ipp_error(con, IPP_BAD_REQUEST);
+  }
   else
   {
    /*
@@ -1626,10 +1634,9 @@ create_job(client_t        *con,	/* I - Client connection */
     return;
   }
 
-  job->hold_until = time(NULL) + 60;
-  job->dtype      = dtype;
-  job->attrs      = con->request;
-  con->request    = NULL;
+  job->dtype   = dtype;
+  job->attrs   = con->request;
+  con->request = NULL;
 
   strncpy(job->title, title, sizeof(job->title) - 1);
 
@@ -4112,11 +4119,15 @@ send_document(client_t        *con,	/* I - Client connection */
     }
 
     job->state->values[0].integer = IPP_JOB_PENDING;
+    SaveJob(job->id);
     CheckJobs();
   }
   else
+  {
+    job->state->values[0].integer = IPP_JOB_HELD;
     job->hold_until = time(NULL) + 60;
-
+    SaveJob(job->id);
+  }
 
  /*
   * Fill in the response info...
@@ -4790,5 +4801,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.68 2000/05/11 20:49:36 mike Exp $".
+ * End of "$Id: ipp.c,v 1.69 2000/05/22 18:22:54 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.67 2000/05/11 20:49:36 mike Exp $"
+ * "$Id: job.c,v 1.68 2000/05/22 18:22:55 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -622,7 +622,7 @@ RestartJob(int id)		/* I - Job ID */
   if ((job = FindJob(id)) == NULL)
     return;
 
-  if (job->state->values[0].integer > IPP_JOB_PROCESSING && JobFiles)
+  if (job->state->values[0].integer == IPP_JOB_STOPPED || JobFiles)
   {
     job->state->values[0].integer = IPP_JOB_PENDING;
     SaveJob(id);
@@ -2344,5 +2344,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.67 2000/05/11 20:49:36 mike Exp $".
+ * End of "$Id: job.c,v 1.68 2000/05/22 18:22:55 mike Exp $".
  */
