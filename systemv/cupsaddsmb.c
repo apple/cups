@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsaddsmb.c,v 1.3.2.6 2002/05/16 14:00:18 mike Exp $"
+ * "$Id: cupsaddsmb.c,v 1.3.2.7 2002/07/03 15:51:01 mike Exp $"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
@@ -232,8 +232,8 @@ export_dest(const char *dest)	/* I - Destination to export */
   /* Get the PPD file... */
   if ((ppdfile = cupsGetPPD(dest)) == NULL)
   {
-    fprintf(stderr, "Warning: No PPD file for printer \"%s\"!\n", dest);
-    return (1);
+    fprintf(stderr, "Warning: No PPD file for printer \"%s\" - skipping!\n", dest);
+    return (0);
   }
 
   /* Do the smbclient commands needed for the Windows drivers... */
@@ -336,5 +336,5 @@ usage()
 
 
 /*
- * End of "$Id: cupsaddsmb.c,v 1.3.2.6 2002/05/16 14:00:18 mike Exp $".
+ * End of "$Id: cupsaddsmb.c,v 1.3.2.7 2002/07/03 15:51:01 mike Exp $".
  */
