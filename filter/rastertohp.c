@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertohp.c,v 1.13 2001/01/22 15:03:41 mike Exp $"
+ * "$Id: rastertohp.c,v 1.14 2001/01/24 17:18:58 mike Exp $"
  *
  *   Hewlett-Packard Page Control Language filter for the Common UNIX
  *   Printing System (CUPS).
@@ -534,7 +534,13 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
  /*
-  * Check for valid arguments...
+  * Make sure status messages are not buffered...
+  */
+
+  setbuf(stderr, NULL);
+
+ /*
+  * Check command-line...
   */
 
   if (argc < 6 || argc > 7)
@@ -661,5 +667,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertohp.c,v 1.13 2001/01/22 15:03:41 mike Exp $".
+ * End of "$Id: rastertohp.c,v 1.14 2001/01/24 17:18:58 mike Exp $".
  */

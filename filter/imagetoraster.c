@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.53 2001/01/22 15:03:39 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.54 2001/01/24 17:18:56 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -202,7 +202,13 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
  /*
-  * Check arguments...
+  * Make sure status messages are not buffered...
+  */
+
+  setbuf(stderr, NULL);
+
+ /*
+  * Check command-line...
   */
 
   if (argc < 6 || argc > 7)
@@ -4312,5 +4318,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.53 2001/01/22 15:03:39 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.54 2001/01/24 17:18:56 mike Exp $".
  */

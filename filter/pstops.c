@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.46 2001/01/22 15:03:40 mike Exp $"
+ * "$Id: pstops.c,v 1.47 2001/01/24 17:18:57 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -104,8 +104,14 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		saweof;		/* Did we see a %%EOF tag? */
 
 
- /* 
-  * Check arguments...
+ /*
+  * Make sure status messages are not buffered...
+  */
+
+  setbuf(stderr, NULL);
+
+ /*
+  * Check command-line...
   */
 
   if (argc < 6 || argc > 7)
@@ -906,5 +912,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.46 2001/01/22 15:03:40 mike Exp $".
+ * End of "$Id: pstops.c,v 1.47 2001/01/24 17:18:57 mike Exp $".
  */

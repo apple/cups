@@ -1,5 +1,5 @@
 /*
- * "$Id: pstoraster.c,v 1.18 2001/01/22 15:03:56 mike Exp $"
+ * "$Id: pstoraster.c,v 1.19 2001/01/24 17:20:05 mike Exp $"
  *
  *   PostScript RIP filter main entry for the Common UNIX Printing System
  *   (CUPS).
@@ -119,6 +119,12 @@ main(int  argc,		/* I - Number of command-line arguments */
   gs_get_real_stdio(stdfiles);
 
  /*
+  * Make sure status messages are not buffered...
+  */
+
+  setbuf(stdfiles[2], NULL);
+
+ /*
   * Grab any job options...
   */
 
@@ -229,5 +235,5 @@ define_string(const char *name,	/* I - Variable to set */
 
 
 /*
- * End of "$Id: pstoraster.c,v 1.18 2001/01/22 15:03:56 mike Exp $".
+ * End of "$Id: pstoraster.c,v 1.19 2001/01/24 17:20:05 mike Exp $".
  */

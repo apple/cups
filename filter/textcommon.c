@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.c,v 1.15 2001/01/22 15:03:41 mike Exp $"
+ * "$Id: textcommon.c,v 1.16 2001/01/24 17:18:59 mike Exp $"
  *
  *   Common text filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -504,6 +504,16 @@ TextMain(char *name,		/* I - Name of filter */
   int		ccomment;	/* Inside a C-style comment? */
   int		cstring;	/* Inside a C string */
 
+
+ /*
+  * Make sure status messages are not buffered...
+  */
+
+  setbuf(stderr, NULL);
+
+ /*
+  * Check command-line...
+  */
 
   if (argc < 6 || argc > 7)
   {
@@ -1131,5 +1141,5 @@ getutf8(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: textcommon.c,v 1.15 2001/01/22 15:03:41 mike Exp $".
+ * End of "$Id: textcommon.c,v 1.16 2001/01/24 17:18:59 mike Exp $".
  */

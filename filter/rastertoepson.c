@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertoepson.c,v 1.8 2001/01/22 15:03:41 mike Exp $"
+ * "$Id: rastertoepson.c,v 1.9 2001/01/24 17:18:57 mike Exp $"
  *
  *   EPSON ESC/P and ESC/P2 filter for the Common UNIX Printing System
  *   (CUPS).
@@ -945,7 +945,13 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
  /*
-  * Check for valid arguments...
+  * Make sure status messages are not buffered...
+  */
+
+  setbuf(stderr, NULL);
+
+ /*
+  * Check command-line...
   */
 
   if (argc < 6 || argc > 7)
@@ -1072,5 +1078,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertoepson.c,v 1.8 2001/01/22 15:03:41 mike Exp $".
+ * End of "$Id: rastertoepson.c,v 1.9 2001/01/24 17:18:57 mike Exp $".
  */

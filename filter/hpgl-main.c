@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-main.c,v 1.21 2001/01/22 15:03:38 mike Exp $"
+ * "$Id: hpgl-main.c,v 1.22 2001/01/24 17:18:56 mike Exp $"
  *
  *   HP-GL/2 filter main entry for the Common UNIX Printing System (CUPS).
  *
@@ -138,6 +138,16 @@ main(int  argc,		/* I - Number of command-line arguments */
   int		shading;	/* -1 = black, 0 = grey, 1 = color */
 
 
+ /*
+  * Make sure status messages are not buffered...
+  */
+
+  setbuf(stderr, NULL);
+
+ /*
+  * Check command-line...
+  */
+
   if (argc < 6 || argc > 7)
   {
     fputs("ERROR: hpgltops job-id user title copies options [file]\n", stderr);
@@ -251,5 +261,5 @@ compare_names(const void *p1,	/* I - First name */
 
 
 /*
- * End of "$Id: hpgl-main.c,v 1.21 2001/01/22 15:03:38 mike Exp $".
+ * End of "$Id: hpgl-main.c,v 1.22 2001/01/24 17:18:56 mike Exp $".
  */
