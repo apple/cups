@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.77 2001/02/07 01:25:39 mike Exp $"
+ * "$Id: http.c,v 1.78 2001/02/07 18:27:16 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -328,6 +328,13 @@ httpConnect(const char *host,	/* I - Host to connect to */
     return (NULL);
 
  /*
+  * Verify that it is an IPv4 address (IPv6 support will come in CUPS 1.2...)
+  */
+
+  if (hostaddr->h_addrtype != AF_INET || hostaddr->h_length != 4)
+    return (NULL);
+
+ /*
   * Allocate memory for the structure...
   */
 
@@ -338,6 +345,7 @@ httpConnect(const char *host,	/* I - Host to connect to */
   http->version  = HTTP_1_1;
   http->blocking = 1;
   http->activity = time(NULL);
+  http->fd       = -1;
 
  /*
   * Copy the hostname and port and then "reconnect"...
@@ -433,7 +441,7 @@ httpReconnect(http_t *http)	/* I - HTTP data */
   * Close any previously open socket...
   */
 
-  if (http->fd)
+  if (http->fd >= 0)
 #ifdef WIN32
     closesocket(http->fd);
 #else
@@ -487,6 +495,8 @@ httpReconnect(http_t *http)	/* I - HTTP data */
 #else
     close(http->fd);
 #endif
+
+    http->fd = -1;
 
     return (-1);
   }
@@ -552,11 +562,26 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
   char		*ptr;				/* Pointer into string... */
   const char	*atsign,			/* @ sign */
 		*slash;				/* Separator */
+  char		safeuri[HTTP_MAX_URI];		/* "Safe" local copy of URI */
 
+
+ /*
+  * Range check input...
+  */
 
   if (uri == NULL || method == NULL || username == NULL || host == NULL ||
       port == NULL || resource == NULL)
     return;
+
+ /*
+  * Copy the URL to a local string to make sure we don't have a URL
+  * longer than HTTP_MAX_URI characters long...
+  */
+
+  strncpy(safeuri, url, sizeof(safeuri) - 1);
+  safeuri[sizeof(safeuri) - 1] = '\0';
+
+  uri = safeuri;
 
  /*
   * Grab the method portion of the URI...
@@ -660,7 +685,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
     */
 
     for (ptr = username;
-         uri < atsign && ptr < (username + sizeof(username) - 1);
+         uri < atsign && ptr < (username + HTTP_MAX_URI - 1);
 	 *ptr++ = *uri++);
 
     *ptr = '\0';
@@ -2000,5 +2025,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.77 2001/02/07 01:25:39 mike Exp $".
+ * End of "$Id: http.c,v 1.78 2001/02/07 18:27:16 mike Exp $".
  */
