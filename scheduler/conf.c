@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.11 1999/04/23 14:06:15 mike Exp $"
+ * "$Id: conf.c,v 1.12 1999/04/23 16:58:49 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -866,6 +866,7 @@ get_address(char               *value,		/* I - Value string */
   * Initialize the socket address to the defaults...
   */
 
+  memset(address, 0, sizeof(struct sockaddr_in));
   address->sin_family      = AF_INET;
   address->sin_addr.s_addr = htonl(defaddress);
   address->sin_port        = htons(defport);
@@ -932,5 +933,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.11 1999/04/23 14:06:15 mike Exp $".
+ * End of "$Id: conf.c,v 1.12 1999/04/23 16:58:49 mike Exp $".
  */
