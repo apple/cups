@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.63 2003/04/16 20:54:34 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.64 2003/04/25 14:42:39 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2985,6 +2985,8 @@ create_job(client_t        *con,	/* I - Client connection */
       attr->num_values            = 1;
       attr->values[0].string.text = strdup(con->http.hostname);
     }
+
+    attr->group_tag = IPP_TAG_JOB;
   }
   else
   {
@@ -4767,6 +4769,8 @@ print_job(client_t        *con,		/* I - Client connection */
       attr->num_values            = 1;
       attr->values[0].string.text = strdup(con->http.hostname);
     }
+
+    attr->group_tag = IPP_TAG_JOB;
   }
   else
   {
@@ -6617,5 +6621,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.63 2003/04/16 20:54:34 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.64 2003/04/25 14:42:39 mike Exp $".
  */

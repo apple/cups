@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc3
 
+	- The scheduler did not put the
+	  job-originating-host-name attribute in the job
+	  attributes group.
+	- The text filter did not default to wrapping text as
+	  defined by the IPP implementation document.
 	- Scan backends first, PPDs second (STR #37)
 	- Updated the Netatalk documentation in the SAM (STR #38
 	  and #39)
