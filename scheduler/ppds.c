@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.7 2000/03/21 04:03:35 mike Exp $"
+ * "$Id: ppds.c,v 1.8 2000/08/04 15:43:34 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -122,7 +122,7 @@ LoadPPDs(const char *d)		/* I - Directory to scan... */
     {
       fwrite(ppds, num_ppds, sizeof(ppd_info_t), fp);
       fclose(fp);
-      LogMessage(L_INFO, "LoadPPDs: Wrote %s...", filename);
+      LogMessage(L_INFO, "LoadPPDs: Wrote %s (%d PPDs)...", filename, num_ppds);
     }
     else
       LogMessage(L_ERROR, "LoadPPDs: Unable to write %s...", filename);
@@ -637,5 +637,5 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * End of "$Id: ppds.c,v 1.7 2000/03/21 04:03:35 mike Exp $".
+ * End of "$Id: ppds.c,v 1.8 2000/08/04 15:43:34 mike Exp $".
  */
