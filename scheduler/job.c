@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.33 2002/09/15 12:41:44 mike Exp $"
+ * "$Id: job.c,v 1.124.2.34 2002/09/15 22:55:16 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2286,8 +2286,9 @@ start_process(const char *command,	/* I - Full path to command */
 {
   int	fd;				/* Looping var */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  sigset_t	oldmask,		/* POSIX signal masks */
-		newmask;
+  sigset_t		oldmask,	/* POSIX signal masks */
+			newmask;
+  struct sigaction	action;		/* POSIX signal handler */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
@@ -2381,10 +2382,24 @@ start_process(const char *command,	/* I - Full path to command */
     */
 
 #ifdef HAVE_SIGSET
+    sigset(SIGTERM, SIG_DFL);
+    sigset(SIGCHLD, SIG_DFL);
+
     sigrelse(SIGTERM);
     sigrelse(SIGCHLD);
 #elif defined(HAVE_SIGACTION)
+    memset(&action, 0, sizeof(action));
+
+    sigemptyset(&action.sa_mask);
+    action.sa_handler = SIG_DFL;
+
+    sigaction(SIGTERM, &action, NULL);
+    sigaction(SIGCHLD, &action, NULL);
+
     sigprocmask(SIG_SETMASK, &oldmask, NULL);
+#else
+    signal(SIGTERM, SIG_DFL);
+    signal(SIGCHLD, SIG_DFL);
 #endif /* HAVE_SIGSET */
 
    /*
@@ -2421,5 +2436,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.33 2002/09/15 12:41:44 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.34 2002/09/15 22:55:16 mike Exp $".
  */
