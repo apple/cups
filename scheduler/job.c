@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.71 2000/06/02 13:51:49 mike Exp $"
+ * "$Id: job.c,v 1.72 2000/06/02 13:59:01 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -771,11 +771,11 @@ SetJobHoldUntil(int        id,		/* I - Job ID */
   else if (sscanf(when, "%d:%d:%d", &hour, &minute, &second) >= 2)
   {
    /*
-    * Hold to specified time...
+    * Hold to specified GMT time (HH:MM or HH:MM:SS)...
     */
 
     curtime = time(NULL);
-    curdate = localtime(&curtime);
+    curdate = gmtime(&curtime);
 
     job->hold_until = curtime +
                       ((hour - curdate->tm_hour) * 60 + minute -
@@ -2496,5 +2496,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.71 2000/06/02 13:51:49 mike Exp $".
+ * End of "$Id: job.c,v 1.72 2000/06/02 13:59:01 mike Exp $".
  */
