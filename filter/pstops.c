@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.3 1997/06/19 20:05:05 mike Exp $"
+ * "$Id: pstops.c,v 1.4 1998/01/15 15:35:22 mike Exp $"
  *
  *   PostScript filter for espPrint, a collection of printer drivers.
  *
@@ -17,7 +17,12 @@
  * Revision History:
  *
  *   $Log: pstops.c,v $
- *   Revision 1.3  1997/06/19 20:05:05  mike
+ *   Revision 1.4  1998/01/15 15:35:22  mike
+ *   Updated gamma/brightness code to support full CMYK.
+ *   Fixed to not disable settransfer and setcolortransfer.
+ *   Fixed to not redefine settransfer and setcolortransfer (damn Adobe!)
+ *
+ *   Revision 1.3  1997/06/19  20:05:05  mike
  *   Optimized code so that non-filtered output is just copied to stdout.
  *
  *   Revision 1.2  1996/10/23  20:06:28  mike
@@ -59,6 +64,8 @@ int	PrintEvenPages = 1,
 	PrintFlip = 0;
 char	*PrintRange = NULL;
 int	Verbosity = 0;
+float	ColorProfile[6] =			/* Color profile */
+        { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };
 
 
 /*
@@ -270,6 +277,48 @@ scan_file(FILE *fp)
 
 
 /*
+ * 'make_transfer_function()' - Make a transfer function given a gamma,
+ *                              brightness, and color profile values.
+ */
+
+void
+make_transfer_function(char  *s,	/* O - Transfer function string */
+                       float ig,	/* I - Image gamma */
+                       float ib,	/* I - Image brightness */
+                       float pg,	/* I - Profile gamma */
+                       float pd)	/* I - Profile ink density */
+{
+  if (ig == 0.0)
+    ig = LutDefaultGamma();
+
+  if (ig == 1.0 &&
+      ib == 1.0 &&
+      pg == 1.0 &&
+      pd == 1.0)
+  {
+    s[0] = '\0';
+    return;
+  };
+
+  strcpy(s, "neg 1 add");
+
+  if (ig != 1.0)
+    sprintf(s + strlen(s), " %.2f exp", ig);
+
+  if (ib != 1.0)
+    sprintf(s + strlen(s), " %.2f mul", ib);
+
+  if (pg != 1.0)
+    sprintf(s + strlen(s), " %.4f exp", 1.0 / pg);
+
+  if (pd != 1.0)
+    sprintf(s + strlen(s), " %.4f mul", pd);
+
+  strcat(s, " neg 1 add");
+}
+
+
+/*
  * 'print_header()' - Print the output header...
  */
 
@@ -277,43 +326,55 @@ void
 print_header(float gammaval[2],
              int   brightness[2])
 {
+  char	cyan[255],
+	magenta[255],
+	yellow[255],
+	black[255];
+
+
   puts("%!PS-Adobe-3.0");
 
- /*
-  * Gamma correct the output...
-  */
+  puts("userdict begin");
 
-  if (gammaval[0] == 0.0)
-    gammaval[0] = LutDefaultGamma();
+  make_transfer_function(black, gammaval[0], 100.0 / brightness[0],
+                         ColorProfile[PD_PROFILE_KG],
+                         ColorProfile[PD_PROFILE_KD]);
 
   if (PrintColor)
   {
-    if (gammaval[1] == 0.0)
-      gammaval[1] = LutDefaultGamma();
+   /*
+    * Color output...
+    */
 
-    if (gammaval[0] != 1.0 ||
-	gammaval[1] != 1.0 ||
-	brightness[0] != 100 ||
-	brightness[1] != 100)
-    {
-      printf("userdict begin\n"
-             "{ neg 1 add %f exp %f mul neg 1 add } bind dup dup "
-             "{ neg 1 add %f exp %f mul neg 1 add } bind\n"
-             "setcolortransfer\n"
-             "/setcolortransfer { pop pop pop pop } def\n"
-             "end\n",
-             gammaval[1], 100.0 / brightness[1],
-             gammaval[0], 100.0 / brightness[0]);
-    };
+    make_transfer_function(cyan, gammaval[1], 100.0 / brightness[1],
+                           ColorProfile[PD_PROFILE_BG],
+                           ColorProfile[PD_PROFILE_CD]);
+    make_transfer_function(magenta, gammaval[2], 100.0 / brightness[2],
+                           ColorProfile[PD_PROFILE_BG],
+                           ColorProfile[PD_PROFILE_MD]);
+    make_transfer_function(yellow, gammaval[3], 100.0 / brightness[3],
+                           ColorProfile[PD_PROFILE_BG],
+                           ColorProfile[PD_PROFILE_YD]);
+
+    printf("{ %s } bind\n"
+           "{ %s } bind\n"
+           "{ %s } bind\n"
+           "{ %s } bind\n"
+           "setcolortransfer\n",
+           cyan, magenta, yellow, black);
   }
-  else if (gammaval[0] != 1.0 ||
-	   brightness[0] != 100)
-    printf("userdict begin\n"
-           "{ neg 1 add %f exp %f mul neg 1 add } bind "
-           "settransfer\n"
-           "/settransfer { pop } def\n"
-           "end\n",
-           gammaval[0], 100.0 / brightness[0]);
+  else
+  {
+   /*
+    * B&W output...
+    */
+
+    printf("{ %s } bind\n"
+           "setcolortransfer\n",
+           black);
+  };
+
+  puts("end");
 }
 
 
@@ -323,8 +384,8 @@ print_header(float gammaval[2],
 
 void
 print_file(char  *filename,
-           float gammaval[2],
-           int   brightness[2],
+           float gammaval[4],
+           int   brightness[4],
            int   nup)
 {
   FILE	*fp;
@@ -520,8 +581,8 @@ main(int  argc,
   char			tempfile[255];
   FILE			*temp;
   char			buffer[8192];
-  float			gammaval[2];
-  int			brightness[2];
+  float			gammaval[4];
+  int			brightness[4];
   int			nup;
   PDInfoStruct		*info;
   PDSizeTableStruct	*size;
@@ -530,8 +591,12 @@ main(int  argc,
 
   gammaval[0]   = 0.0;
   gammaval[1]   = 0.0;
+  gammaval[2]   = 0.0;
+  gammaval[3]   = 0.0;
   brightness[0] = 100;
   brightness[1] = 100;
+  brightness[2] = 100;
+  brightness[3] = 100;
 
   nup = 1;
 
@@ -556,6 +621,9 @@ main(int  argc,
               PrintColor  = strncasecmp(info->printer_class, "Color", 5) == 0;
               PrintWidth  = 72.0 * size->width;
               PrintLength = 72.0 * size->length;
+
+	      memcpy(ColorProfile, info->active_status->color_profile,
+	             sizeof(ColorProfile));
               break;
 
           case '1' : /* 1-up printing... */
@@ -594,16 +662,45 @@ main(int  argc,
           case 'g' :	/* Gamma correction */
 	      i ++;
 	      if (i < argc)
-	        if (sscanf(argv[i], "%f,%f", gammaval + 0, gammaval + 1) == 1)
-	          gammaval[1] = gammaval[0];
+	        switch (sscanf(argv[i], "%f,%f,%f,%f", gammaval + 0,
+	                       gammaval + 1, gammaval + 2, gammaval + 3))
+	        {
+	          case 1 :
+	              gammaval[1] = gammaval[0];
+	          case 2 :
+	              gammaval[2] = gammaval[1];
+	              gammaval[3] = gammaval[1];
+	              break;
+	        };
 	      break;
 
           case 'b' :	/* Brightness */
 	      i ++;
 	      if (i < argc)
-	        if (sscanf(argv[i], "%d,%d", brightness + 0, brightness + 1) == 1)
-	          brightness[1] = brightness[0];
+	        switch (sscanf(argv[i], "%d,%d,%d,%d", brightness + 0,
+	                       brightness + 1, brightness + 2, brightness + 3))
+	        {
+	          case 1 :
+	              brightness[1] = brightness[0];
+	          case 2 :
+	              brightness[2] = brightness[1];
+	              brightness[3] = brightness[1];
+	              break;
+	        };
 	      break;
+
+          case 'c' : /* Color profile */
+              i ++;
+              if (i < argc)
+                sscanf(argv[i], "%f,%f,%f,%f,%f,%f",
+                       ColorProfile + 0,
+                       ColorProfile + 1,
+                       ColorProfile + 2,
+                       ColorProfile + 3,
+                       ColorProfile + 4,
+                       ColorProfile + 5);
+              break;
+
         }
     else
     {
@@ -672,5 +769,5 @@ main(int  argc,
 
 
 /*
- * End of "$Id: pstops.c,v 1.3 1997/06/19 20:05:05 mike Exp $".
+ * End of "$Id: pstops.c,v 1.4 1998/01/15 15:35:22 mike Exp $".
  */
