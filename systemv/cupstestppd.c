@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.18 2003/02/25 19:18:26 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.19 2003/02/26 01:19:49 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -170,7 +170,7 @@ main(int  argc,			/* I - Number of command-line arguments */
         if (verbose >= 0)
           printf("%s:", argv[i]);
 
-        snprintf(command, sizeof(command), "gunzip -c %s", argv[i]);
+        snprintf(command, sizeof(command), "gunzip -c \"%s\"", argv[i]);
 	gunzip = popen(command, "r");
 	ppd    = ppdOpen(gunzip);
 
@@ -868,5 +868,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.18 2003/02/25 19:18:26 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.19 2003/02/26 01:19:49 mike Exp $".
  */
