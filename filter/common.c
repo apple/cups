@@ -1,5 +1,5 @@
 /*
- * "$Id: common.c,v 1.15.2.9 2002/10/17 17:06:00 mike Exp $"
+ * "$Id: common.c,v 1.15.2.10 2002/10/28 17:33:30 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -328,6 +328,7 @@ WriteLabelProlog(const char *label,	/* I - Page label */
 		 float      width)	/* I - Width in points */
 {
   const char	*classification;	/* CLASSIFICATION environment variable */
+  const char	*ptr;			/* Temporary string pointer */
 
 
  /*
@@ -366,7 +367,20 @@ WriteLabelProlog(const char *label,	/* I - Page label */
   else if (strcmp(classification, "unclassified") == 0)
     printf("/ESPpl(UNCLASSIFIED");
   else
+  {
     printf("/ESPpl(");
+
+    for (ptr = classification; *ptr; ptr ++)
+      if (*ptr < 32 || *ptr > 126)
+        printf("\\%03o", *ptr);
+      else
+      {
+	if (*ptr == '(' || *ptr == ')' || *ptr == '\\')
+	  putchar('\\');
+
+	putchar(*ptr);
+      }
+  }
 
   if (label)
   {
@@ -377,20 +391,16 @@ WriteLabelProlog(const char *label,	/* I - Page label */
     * Quote the label string as needed...
     */
 
-    while (*label)
-    {
-      if (*label < 32 || *label > 126)
-        printf("\\%03o", *label);
+    for (ptr = label; *ptr; ptr ++)
+      if (*ptr < 32 || *ptr > 126)
+        printf("\\%03o", *ptr);
       else
       {
-	if (*label == '(' || *label == ')' || *label == '\\')
+	if (*ptr == '(' || *ptr == ')' || *ptr == '\\')
 	  putchar('\\');
 
-	putchar(*label);
+	putchar(*ptr);
       }
-
-      label ++;
-    }
   }
 
   puts(")put");
@@ -465,5 +475,5 @@ WriteLabels(int orient)	/* I - Orientation of the page */
 
 
 /*
- * End of "$Id: common.c,v 1.15.2.9 2002/10/17 17:06:00 mike Exp $".
+ * End of "$Id: common.c,v 1.15.2.10 2002/10/28 17:33:30 mike Exp $".
  */

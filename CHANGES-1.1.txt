@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.17
 
+	- User-defined classification strings are now printed
+	  verbatim - previously the classification box would be
+	  empty.
 	- Re-added Spanish to the list of PPD languages that
 	  CUPS supports.
 	- CUPS API library user and temp file updates for
