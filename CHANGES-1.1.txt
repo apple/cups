@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The web interface now enforces constraints in PPD
+	  files when configuring a printer.
 	- When stopping a printer, the scheduler didn't set the
 	  printer state before stopping the current job.
 	- The cupsaddsmb utility now lists all data files for

@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.22.2.11 2002/06/28 20:14:46 mike Exp $"
+ * "$Id: admin.c,v 1.22.2.12 2002/08/01 01:17:38 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -950,6 +950,8 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
   else
     have_options = 0;
 
+  ppdMarkDefaults(ppd);
+
   for (i = ppd->num_groups, group = ppd->groups;
        i > 0 && !have_options;
        i --, group ++)
@@ -959,10 +961,11 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
       if ((var = cgiGetVariable(option->keyword)) != NULL)
       {
         have_options = 1;
+	ppdMarkOption(ppd, option->keyword, var);
 	break;
       }
 
-  if (!have_options)
+  if (!have_options || ppdConflicts(ppd))
   {
    /*
     * Show the options to the user...
@@ -994,6 +997,11 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
         cgiSetVariable("KEYWORD", option->keyword);
         cgiSetVariable("KEYTEXT", option->text);
 	cgiSetVariable("DEFCHOICE", option->defchoice);
+
+	if (option->conflicted)
+	  cgiSetVariable("CONFLICTED", "1");
+	else
+	  cgiSetVariable("CONFLICTED", "0");
 
 	cgiSetSize("CHOICES", option->num_choices);
 	cgiSetSize("TEXT", option->num_choices);
@@ -1492,5 +1500,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.22.2.11 2002/06/28 20:14:46 mike Exp $".
+ * End of "$Id: admin.c,v 1.22.2.12 2002/08/01 01:17:38 mike Exp $".
  */
