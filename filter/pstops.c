@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.18 2002/05/16 15:22:37 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.19 2002/05/16 17:52:24 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -371,7 +371,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   val = cupsGetOption("page-label", num_options, options);
 
   if (val != NULL || getenv("CLASSIFICATION") != NULL || NUp > 1 ||
-      strstr(line, "EPS") != NULL)
+      Border || strstr(line, "EPS") != NULL)
   {
    /*
     * Yes, use ESPshowpage...
@@ -1585,34 +1585,67 @@ start_nup(int number,		/* I - Page number */
         break;
   }
 
- /*
-  * Draw borders as necessary...
-  */
-
-  if (Border && show_border)
+  if (NUp > 1)
   {
    /*
-    * Set the line width and color...
+    * Draw borders as necessary...
     */
 
-    puts("gsave");
-    printf("%.3f setlinewidth 0 setgray newpath\n",
-           (Border & BORDER_THICK) ? PageWidth / w : 0.0);
+    if (Border && show_border)
+    {
+     /*
+      * Set the line width and color...
+      */
 
-    printf("0 0 %.1f %.1f ESPrs\n", PageWidth, PageLength);
+      puts("gsave");
+      printf("%.3f setlinewidth 0 setgray newpath\n",
+             (Border & BORDER_THICK) ? PageWidth / w : 0.0);
 
-    if (Border & BORDER_DOUBLE)
-      printf("2 2 %.1f %.1f ESPrs\n", PageWidth - 4.0, PageLength - 4.0);
+      printf("0 0 %.1f %.1f ESPrs\n", PageWidth, PageLength);
+
+      if (Border & BORDER_DOUBLE)
+	printf("2 2 %.1f %.1f ESPrs\n", PageWidth - 4.0, PageLength - 4.0);
+
+      puts("grestore");
+    }
+
+   /*
+    * Clip the page that follows to the bounding box of the page...
+    */
+
+    printf("0 0 %.1f %.1f ESPrc\n", PageWidth, PageLength);
   }
+  else
+  {
+   /*
+    * Draw borders as necessary...
+    */
 
- /*
-  * Clip the page that follows to the bounding box of the page...
-  */
+    if (Border && show_border)
+    {
+     /*
+      * Set the line width and color...
+      */
 
-  printf("0 0 %.1f %.1f ESPrc\n", PageWidth, PageLength);
+      puts("gsave");
+      printf("%.3f setlinewidth 0 setgray newpath\n",
+             (Border & BORDER_THICK) ? PageWidth / w : 0.0);
+
+      printf("%.1f %.1f %.1f %.1f ESPrs\n",
+             PageLeft, PageBottom,
+	     PageRight - PageLeft, PageTop - PageBottom);
+
+      if (Border & BORDER_DOUBLE)
+	printf("%.1f %.1f %.1f %.1f ESPrs\n",
+               PageLeft + 2.0, PageBottom + 2.0,
+	       PageRight - PageLeft - 4.0, PageTop - PageBottom - 4.0);
+
+      puts("grestore");
+    }
+  }
 }
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.18 2002/05/16 15:22:37 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.19 2002/05/16 17:52:24 mike Exp $".
  */
