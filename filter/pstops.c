@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.25 2002/08/23 20:59:42 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.26 2002/08/27 16:20:16 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -269,6 +269,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if ((val = cupsGetOption("brightness", num_options, options)) != NULL)
     b = atoi(val) * 0.01f;
+
+  if ((val = cupsGetOption("mirror", num_options, options)) != NULL &&
+      strcasecmp(val, "True") == 0)
+    Flip = 1;
 
  /*
   * See if we have to filter the fast or slow way...
@@ -1663,5 +1667,5 @@ start_nup(int number,		/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.25 2002/08/23 20:59:42 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.26 2002/08/27 16:20:16 mike Exp $".
  */

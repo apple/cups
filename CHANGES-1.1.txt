@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The "mirror" option was not being handled by the
+	  PostScript or image filters.
 	- Updated the cupsaddsmb command to support the new CUPS
 	  driver for Windows NT/2k/XP.
 	- Filter status lines longer than 1023 characters could

@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.56.2.9 2002/05/16 14:00:02 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.56.2.10 2002/08/27 16:20:16 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -472,6 +472,10 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if ((val = cupsGetOption("hue", num_options, options)) != NULL)
     hue = atoi(val);
+
+  if ((val = cupsGetOption("mirror", num_options, options)) != NULL &&
+      strcasecmp(val, "True") == 0)
+    Flip = 1;
 
  /*
   * Set the needed options in the page header...
@@ -1212,7 +1216,12 @@ main(int  argc,		/* I - Number of command-line arguments */
 	  * Initialize the image "zoom" engine...
 	  */
 
-	  z = ImageZoomAlloc(img, x0, y0, x1, y1, xtemp, ytemp, Orientation & 1);
+          if (Flip)
+	    z = ImageZoomAlloc(img, x0, y0, x1, y1, -xtemp, ytemp,
+	                       Orientation & 1);
+          else
+	    z = ImageZoomAlloc(img, x0, y0, x1, y1, xtemp, ytemp,
+	                       Orientation & 1);
 
          /*
 	  * Write leading blank space as needed...
@@ -4503,5 +4512,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.56.2.9 2002/05/16 14:00:02 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.56.2.10 2002/08/27 16:20:16 mike Exp $".
  */

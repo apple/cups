@@ -1,5 +1,5 @@
 /*
- * "$Id: image-zoom.c,v 1.7.2.2 2002/03/01 19:55:19 mike Exp $"
+ * "$Id: image-zoom.c,v 1.7.2.3 2002/08/27 16:20:15 mike Exp $"
  *
  *   Image zoom routines for the Common UNIX Printing System (CUPS).
  *
@@ -55,6 +55,7 @@ ImageZoomAlloc(image_t *img,	/* I - Image to zoom */
                int     rotated)	/* I - Non-zero if image is rotated 90 degs */
 {
   izoom_t	*z;		/* New zoom record */
+  int		flip;		/* Flip on X axis? */
 
 
   if ((z = (izoom_t *)calloc(1, sizeof(izoom_t))) == NULL)
@@ -64,6 +65,16 @@ ImageZoomAlloc(image_t *img,	/* I - Image to zoom */
   z->row     = 0;
   z->depth   = ImageGetDepth(img);
   z->rotated = rotated;
+
+  if (xsize < 0)
+  {
+    flip  = 1;
+    xsize = -xsize;
+  }
+  else
+  {
+    flip  = 0;
+  }
 
   if (rotated)
   {
@@ -118,6 +129,12 @@ ImageZoomAlloc(image_t *img,	/* I - Image to zoom */
       z->ymax = z->height;
     else
       z->ymax = z->height - 1;
+  }
+
+  if (flip)
+  {
+    z->instep = -z->instep;
+    z->inincr = -z->inincr;
   }
 
   if ((z->rows[0] = (ib_t *)malloc(z->xsize * z->depth)) == NULL)
@@ -308,5 +325,5 @@ ImageZoomFree(izoom_t *z)	/* I - Zoom record to free */
 
 
 /*
- * End of "$Id: image-zoom.c,v 1.7.2.2 2002/03/01 19:55:19 mike Exp $".
+ * End of "$Id: image-zoom.c,v 1.7.2.3 2002/08/27 16:20:15 mike Exp $".
  */
