@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.84 2001/07/24 14:41:16 mike Exp $"
+ * "$Id: dirsvc.c,v 1.85 2001/09/14 16:52:08 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -161,7 +161,7 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
         name[sizeof(name) - 1] = '\0';
       }
     }
-    else if (!p->hostname[0])
+    else if (p != NULL && !p->hostname[0])
     {
       /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
       strncpy(p->hostname, host, sizeof(p->hostname) - 1);
@@ -242,7 +242,7 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
         name[sizeof(name) - 1] = '\0';
       }
     }
-    else if (!p->hostname[0])
+    else if (p != NULL && !p->hostname[0])
     {
       /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
       strncpy(p->hostname, host, sizeof(p->hostname) - 1);
@@ -1583,5 +1583,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.84 2001/07/24 14:41:16 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.85 2001/09/14 16:52:08 mike Exp $".
  */

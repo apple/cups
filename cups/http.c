@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.86 2001/07/12 18:10:12 mike Exp $"
+ * "$Id: http.c,v 1.87 2001/09/14 16:52:06 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1094,6 +1094,47 @@ httpRead(http_t *http,			/* I - HTTP data */
   else if (length > http->data_remaining)
     length = http->data_remaining;
 
+  if (http->used == 0 && length <= 256)
+  {
+   /*
+    * Buffer small reads for better performance...
+    */
+
+    if (http->data_remaining > sizeof(http->buffer))
+      bytes = sizeof(http->buffer);
+    else
+      bytes = http->data_remaining;
+
+#ifdef HAVE_LIBSSL
+    if (http->tls)
+      bytes = SSL_read((SSL *)(http->tls), http->buffer, bytes);
+    else
+#endif /* HAVE_LIBSSL */
+    {
+      DEBUG_printf(("httpRead: reading %d bytes from socket into buffer...\n",
+                    bytes));
+
+      bytes = recv(http->fd, http->buffer, bytes, 0);
+
+      DEBUG_printf(("httpRead: read %d bytes from socket into buffer...\n",
+                    bytes));
+    }
+
+    if (bytes > 0)
+      http->used = bytes;
+    else if (bytes < 0)
+    {
+#if defined(WIN32) || defined(__EMX__)
+      http->error = WSAGetLastError();
+#else
+      http->error = errno;
+#endif /* WIN32 || __EMX__ */
+      return (-1);
+    }
+    else
+      return (0);
+  }
+
   if (http->used > 0)
   {
     if (length > http->used)
@@ -2074,5 +2115,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.86 2001/07/12 18:10:12 mike Exp $".
+ * End of "$Id: http.c,v 1.87 2001/09/14 16:52:06 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.60 2001/07/23 19:45:35 mike Exp $"
+ * "$Id: ipp.c,v 1.61 2001/09/14 16:52:06 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -1099,7 +1099,9 @@ ippRead(http_t *http,		/* I - HTTP data */
                 buffer[n] = '\0';
 		DEBUG_printf(("ippRead: value = \'%s\'\n", buffer));
 
-                attr->values[attr->num_values].string.text = strdup((char *)buffer);
+                attr->values[attr->num_values].string.text = malloc(n + 1);
+		memcpy(attr->values[attr->num_values].string.text,
+		       buffer, n + 1);
 	        break;
 	    case IPP_TAG_DATE :
 	        if (ipp_read(http, buffer, 11) < 11)
@@ -1162,7 +1164,6 @@ ippRead(http_t *http,		/* I - HTTP data */
 
 		memcpy(attr->values[attr->num_values].string.text,
 		       bufptr + 2, n);
-
 	        break;
 
             default : /* Other unsupported values */
@@ -1894,15 +1895,54 @@ ipp_read(http_t        *http,	/* I - Client connection */
 {
   int	tbytes,			/* Total bytes read */
 	bytes;			/* Bytes read this pass */
-
+  char	len[32];		/* Length string */
+  
 
  /*
   * Loop until all bytes are read...
   */
 
   for (tbytes = 0, bytes = 0; tbytes < length; tbytes += bytes, buffer += bytes)
-    if ((bytes = httpRead(http, (char *)buffer, length - tbytes)) <= 0)
+  {
+    if (http->used > 0)
+    {
+     /*
+      * Do "fast read" from HTTP buffer directly...
+      */
+
+      if (http->used > (length - tbytes))
+        bytes = length - tbytes;
+      else
+        bytes = http->used;
+
+      if (bytes == 1)
+	buffer[0] = http->buffer[0];
+      else
+	memcpy(buffer, http->buffer, bytes);
+
+      http->used           -= bytes;
+      http->data_remaining -= bytes;
+
+      if (http->used > 0)
+	memcpy(http->buffer, http->buffer + bytes, http->used);
+
+      if (http->data_remaining == 0)
+      {
+	if (http->data_encoding == HTTP_ENCODE_CHUNKED)
+	  httpGets(len, sizeof(len), http);
+
+	if (http->data_encoding != HTTP_ENCODE_CHUNKED)
+	{
+	  if (http->state == HTTP_POST_RECV)
+	    http->state ++;
+	  else
+	    http->state = HTTP_WAITING;
+	}
+      }
+    }
+    else if ((bytes = httpRead(http, (char *)buffer, length - tbytes)) <= 0)
       break;
+  }
 
  /*
   * Return the number of bytes read...
@@ -1916,5 +1956,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.60 2001/07/23 19:45:35 mike Exp $".
+ * End of "$Id: ipp.c,v 1.61 2001/09/14 16:52:06 mike Exp $".
  */

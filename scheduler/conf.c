@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.90 2001/07/25 21:03:36 mike Exp $"
+ * "$Id: conf.c,v 1.91 2001/09/14 16:52:08 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -333,7 +333,7 @@ ReadConfiguration(void)
   JobHistory          = DEFAULT_HISTORY;
   JobFiles            = DEFAULT_FILES;
   JobAutoPurge        = 0;
-  MaxJobs             = 0;
+  MaxJobs             = 500;
   MaxJobsPerUser      = 0;
   MaxJobsPerPrinter   = 0;
 
@@ -441,7 +441,7 @@ ReadConfiguration(void)
 
   getrlimit(RLIMIT_NOFILE, &limit);
 
-  if (MaxClients > (limit.rlim_max / 3))
+  if (MaxClients > (limit.rlim_max / 3) || MaxClients <= 0)
     MaxClients = limit.rlim_max / 3;
 
   if ((Clients = calloc(sizeof(client_t), MaxClients)) == NULL)
@@ -1794,5 +1794,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.90 2001/07/25 21:03:36 mike Exp $".
+ * End of "$Id: conf.c,v 1.91 2001/09/14 16:52:08 mike Exp $".
  */

@@ -5,6 +5,14 @@ CHANGES IN CUPS V1.1.11
 
 	- Added support for embedded TrueType fonts in PDF
 	  files.
+	- The scheduler could crash when BrowseShortNames
+	  was set to "No".
+	- The scheduler did not prevent MaxClients from being
+	  set to 0, which could cause the scheduler to go in an
+	  infinite loop when accepting a request.
+	- Made some performance optimizations in the ippRead()
+	  functions to make IPP request/response processing
+	  faster.
 
 
 CHANGES IN CUPS V1.1.10-1
