@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.91 2003/02/18 22:43:06 mike Exp $"
+ * "$Id: ppd.c,v 1.92 2003/02/19 14:43:36 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -386,7 +386,6 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 			  "BindWhen",
 			  "BitsPerPixel",
 			  "ColorModel",
-			  "ColorRenderDict",
 			  "CutMedia",
 			  "Duplex",
 			  "FoldType",
@@ -404,9 +403,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 			  "PageRegion",
 			  "PageSize",
 			  "Resolution",
-			  "ScreenProc",
 			  "Separations",
-			  "SetResolution",
 			  "Signature",
 			  "Slipsheet",
 			  "Smoothing",
@@ -414,8 +411,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 			  "StapleOrientation",
 			  "StapleWhen",
 			  "StapleX",
-			  "StapleY",
-			  "Transfer"
+			  "StapleY"
 			};
 
 
@@ -2941,5 +2937,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.91 2003/02/18 22:43:06 mike Exp $".
+ * End of "$Id: ppd.c,v 1.92 2003/02/19 14:43:36 mike Exp $".
  */
