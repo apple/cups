@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gdevprn.c,v 1.7 2000/03/08 23:14:24 mike Exp $ */
+/*$Id: gdevprn.c,v 1.8 2000/06/02 20:05:31 mike Exp $ */
 /* Generic printer driver support */
 #include "ctype_.h"
 #include "gdevprn.h"
@@ -427,16 +427,8 @@ gdev_prn_get_params(gx_device * pdev, gs_param_list * plist)
 {
     gx_device_printer * const ppdev = (gx_device_printer *)pdev;
     int code = gx_default_get_params(pdev, plist);
-    gs_param_string ofns;
 
     if (code < 0 ||
-	(code = param_write_long(plist, "MaxBitmap", &ppdev->space_params.MaxBitmap)) < 0 ||
-	(code = param_write_long(plist, "BufferSpace", &ppdev->space_params.BufferSpace)) < 0 ||
-	(code = param_write_int(plist, "BandWidth", &ppdev->space_params.band.BandWidth)) < 0 ||
-	(code = param_write_int(plist, "BandHeight", &ppdev->space_params.band.BandHeight)) < 0 ||
-	(code = param_write_long(plist, "BandBufferSpace", &ppdev->space_params.band.BandBufferSpace)) < 0 ||
-	(code = param_write_bool(plist, "OpenOutputFile", &ppdev->OpenOutputFile)) < 0 ||
-	(code = param_write_bool(plist, "ReopenPerPage", &ppdev->ReopenPerPage)) < 0 ||
 	(ppdev->Duplex_set >= 0 &&
 	 (code = (ppdev->Duplex_set ?
 		  param_write_bool(plist, "Duplex", &ppdev->Duplex) :
@@ -444,61 +436,6 @@ gdev_prn_get_params(gx_device * pdev, gs_param_list * plist)
 	)
 	return code;
 
-    ofns.data = (const byte *)ppdev->fname,
-	ofns.size = strlen(ppdev->fname),
-	ofns.persistent = false;
-    return param_write_string(plist, "OutputFile", &ofns);
-}
-
-/* Validate an OutputFile name by checking any %-formats. */
-private int
-validate_output_file(const gs_param_string * ofs)
-{
-    const byte *data = ofs->data;
-    uint size = ofs->size;
-    bool have_format = false;
-    uint i;
-
-    if (size >= prn_fname_sizeof)
-	return_error(gs_error_limitcheck);
-    for (i = 0; i < size; ++i)
-	if (data[i] == '%') {
-	    if (i + 1 < size && data[i + 1] == '%')
-		continue;
-	    if (have_format)	/* more than one % */
-		return_error(gs_error_rangecheck);
-	    have_format = true;
-	  sw:if (++i == size)
-		return_error(gs_error_rangecheck);
-	    switch (data[i]) {
-		case ' ':
-		case '#':
-		case '+':
-		case '-':
-		case '.':
-		case '0':
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
-		case 'l':
-		    goto sw;
-		case 'd':
-		case 'i':
-		case 'u':
-		case 'o':
-		case 'x':
-		case 'X':
-		    continue;
-		default:
-		    return_error(gs_error_rangecheck);
-	    }
-	}
     return 0;
 }
 
@@ -518,7 +455,6 @@ gdev_prn_put_params(gx_device * pdev, gs_param_list * plist)
     int width = pdev->width;
     int height = pdev->height;
     gdev_prn_space_params sp, save_sp;
-    gs_param_string ofs;
     gs_param_dict mdict;
 
     sp = ppdev->space_params;
@@ -572,40 +508,6 @@ label:\
     case 1:\
 	break
 
-    switch (code = param_read_long(plist, (param_name = "MaxBitmap"), &sp.MaxBitmap)) {
-	CHECK_PARAM_CASES(MaxBitmap, sp.MaxBitmap < 10000, mbe);
-    }
-
-    switch (code = param_read_long(plist, (param_name = "BufferSpace"), &sp.BufferSpace)) {
-	CHECK_PARAM_CASES(BufferSpace, sp.BufferSpace < 10000, bse);
-    }
-
-    switch (code = param_read_int(plist, (param_name = "BandWidth"), &sp.band.BandWidth)) {
-	CHECK_PARAM_CASES(band.BandWidth, sp.band.BandWidth < 0, bwe);
-    }
-
-    switch (code = param_read_int(plist, (param_name = "BandHeight"), &sp.band.BandHeight)) {
-	CHECK_PARAM_CASES(band.BandHeight, sp.band.BandHeight < 0, bhe);
-    }
-
-    switch (code = param_read_long(plist, (param_name = "BandBufferSpace"), &sp.band.BandBufferSpace)) {
-	CHECK_PARAM_CASES(band.BandBufferSpace, sp.band.BandBufferSpace < 0, bbse);
-    }
-
-    switch (code = param_read_string(plist, (param_name = "OutputFile"), &ofs)) {
-	case 0:
-	    code = validate_output_file(&ofs);
-	    if (code >= 0)
-		break;
-	    /* falls through */
-	default:
-	    ecode = code;
-	    param_signal_error(plist, param_name, ecode);
-	case 1:
-	    ofs.data = 0;
-	    break;
-    }
-
     /* Read InputAttributes and OutputAttributes just for the type */
     /* check and to indicate that they aren't undefined. */
 #define read_media(pname)\
@@ -648,37 +550,49 @@ label:\
     if (code < 0)
 	return code;
 
-    /* If filename changed, close file. */
-    if (ofs.data != 0 &&
-	bytes_compare(ofs.data, ofs.size,
-		      (const byte *)ppdev->fname, strlen(ppdev->fname))
-	) {
-	/* Close the file if it's open. */
-	if (ppdev->file != NULL && ppdev->file != stdout)
-	    gp_close_printer(ppdev->file, ppdev->fname);
-	ppdev->file = NULL;
-	memcpy(ppdev->fname, ofs.data, ofs.size);
-	ppdev->fname[ofs.size] = 0;
-    }
-    /* If the device is open and OpenOutputFile is true, */
-    /* open the OutputFile now.  (If the device isn't open, */
-    /* this will happen when it is opened.) */
-    if (pdev->is_open && oof) {
-	code = gdev_prn_open_printer(pdev, 1);
-	if (code < 0)
-	    return code;
-    }
     return 0;
 }
 
 /* ------ Others ------ */
 
-/* Default routine to (not) override current space_params. */
+#define TILE_SIZE	256
+
+/* Default routine to override current space_params. */
 void
 gdev_prn_default_get_space_params(const gx_device_printer *printer_dev,
 				  gdev_prn_space_params *space_params)
 {
-    return;
+  int	cache_size;			/* Size of tile cache in bytes */
+  char	*cache_env,			/* Cache size environment variable */
+	cache_units[255];		/* Cache size units */
+
+
+  if ((cache_env = getenv("RIP_MAX_CACHE")) != NULL)
+  {
+    switch (sscanf(cache_env, "%d%254s", &cache_size, cache_units))
+    {
+      case 0 :
+          cache_size = 32 * 1024 * 1024;
+	  break;
+      case 1 :
+          cache_size *= 4 * TILE_SIZE * TILE_SIZE;
+	  break;
+      case 2 :
+          if (tolower(cache_units[0]) == 'g')
+	    cache_size *= 1024 * 1024 * 1024;
+          else if (tolower(cache_units[0]) == 'm')
+	    cache_size *= 1024 * 1024;
+	  else if (tolower(cache_units[0]) == 'k')
+	    cache_size *= 1024;
+	  else if (tolower(cache_units[0]) == 't')
+	    cache_size *= 4 * TILE_SIZE * TILE_SIZE;
+	  break;
+    }
+  }
+  else
+    cache_size = 32 * 1024 * 1024;
+
+  space_params->MaxBitmap = cache_size;
 }
 
 /* Generic routine to send the page to the printer. */

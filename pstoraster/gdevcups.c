@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.27 2000/04/21 12:47:46 mike Exp $"
+ * "$Id: gdevcups.c,v 1.28 2000/06/02 20:05:31 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -1081,12 +1081,7 @@ cups_print_pages(gx_device_printer *pdev,	/* I - Device info */
 
   if (cups->stream == NULL)
   {
-    if (fp == NULL)
-      cups->stream = cupsRasterOpen(1, CUPS_RASTER_WRITE);
-    else
-      cups->stream = cupsRasterOpen(fileno(fp), CUPS_RASTER_WRITE);
-
-    if (cups->stream == NULL)
+    if ((cups->stream = cupsRasterOpen(1, CUPS_RASTER_WRITE)) == NULL)
     {
       perror("ERROR: Unable to open raster stream - ");
       gs_exit(0);
@@ -1159,7 +1154,6 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   int			i;		/* Looping var */
   float			margins[4];	/* Physical margins of print */
   ppd_size_t		*size;		/* Page size */
-  int			olddepth;	/* Old depth value */
   int			code;		/* Error code */
   int			intval;		/* Integer value */
   bool			boolval;	/* Boolean value */
@@ -1278,6 +1272,41 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   intoption(cupsRowFeed, "cupsRowFeed", unsigned)
   intoption(cupsRowStep, "cupsRowStep", unsigned)
 
+  cups_set_color_info(pdev);
+
+ /*
+  * Compute the page margins...
+  */
+
+  if (cups->ppd != NULL)
+  {
+   /*
+    * Pull the margins from the first size entry; since the margins are not
+    * like the bounding box we have to adjust the top and right values
+    * accordingly.
+    */
+
+    size       = cups->ppd->sizes;
+    margins[0] = size->left / 72.0;
+    margins[1] = size->bottom / 72.0;
+    margins[2] = (size->width - size->right) / 72.0;
+    margins[3] = (size->length - size->top) / 72.0;
+  }
+  else
+  {
+   /*
+    * Set default margins of 0.0...
+    */
+
+    memset(margins, 0, sizeof(margins));
+  }
+
+ /*
+  * Set the margins to update the bitmap size...
+  */
+
+  gx_device_set_margins(pdev, margins, false);
+
  /*
   * Then process standard page device options...
   */
@@ -1290,68 +1319,6 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
 
   cups->header.PageSize[0] = pdev->MediaSize[0];
   cups->header.PageSize[1] = pdev->MediaSize[1];
-
- /*
-  * Check for a change in color depth...
-  */
-
-  olddepth = pdev->color_info.depth;
-  cups_set_color_info(pdev);
-
-  if (olddepth != pdev->color_info.depth && pdev->is_open)
-    gs_closedevice(pdev);
-
- /*
-  * Compute the page margins...
-  */
-
-  if (cups->ppd != NULL)
-  {
-   /*
-    * Set the margins from the PPD file...
-    */
-
-    for (i = cups->ppd->num_sizes, size = cups->ppd->sizes;
-         i > 0;
-	 i --, size ++)
-      if (size->width == cups->header.PageSize[0] &&
-          size->length == cups->header.PageSize[1])
-	break;
-
-    if (i == 0)
-    {
-     /*
-      * Pull margins from custom page size (0 or whatever is defined
-      * by the PPD file...
-      */
-
-      margins[0] = cups->ppd->custom_margins[0] / 72.0;
-      margins[1] = cups->ppd->custom_margins[1] / 72.0;
-      margins[2] = cups->ppd->custom_margins[2] / 72.0;
-      margins[3] = cups->ppd->custom_margins[3] / 72.0;
-    }
-    else
-    {
-     /*
-      * Pull the margins from the size entry; since the margins are not
-      * like the bounding box we have to adjust the top and right values
-      * accordingly.
-      */
-
-      margins[0] = size->left / 72.0;
-      margins[1] = size->bottom / 72.0;
-      margins[2] = (size->width - size->right) / 72.0;
-      margins[3] = (size->length - size->top) / 72.0;
-    }
-  }
-  else
-  {
-   /*
-    * Set default margins of 0.0...
-    */
-
-    memset(margins, 0, sizeof(margins));
-  }
 
 #ifdef DEBUG
   fprintf(stderr, "DEBUG: ppd = %08x\n", cups->ppd);
@@ -1367,15 +1334,6 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
           pdev->HWMargins[0], pdev->HWMargins[1],
 	  pdev->HWMargins[2], pdev->HWMargins[3]);
 #endif /* DEBUG */
-
- /*
-  * Set the margins and update the bitmap size...
-  */
-
-  gx_device_set_margins(pdev, margins, false);
-
-  if ((code = gdev_prn_put_params(pdev, plist)) < 0)
-    return (code);
 
   return (0);
 }
@@ -2424,5 +2382,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.27 2000/04/21 12:47:46 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.28 2000/06/02 20:05:31 mike Exp $".
  */
