@@ -75,6 +75,7 @@ public:
 
   Type1CFontFile(const char *fileA, int lenA);
   virtual ~Type1CFontFile();
+  GBool isOk() { return ok; }
 
   virtual const char *getName();
   virtual const char **getEncoding();
@@ -97,14 +98,14 @@ public:
 
 private:
 
-  void readNameAndEncoding();
+  void readEncoding();
   void readTopDict(Type1CTopDict *dict);
   void readPrivateDict(Type1CPrivateDict *privateDict,
 		       int offset, int size);
   Gushort *readCharset(int charset, int nGlyphs);
   void eexecWrite(const char *s);
-  void eexecCvtGlyph(const char *glyphName, Guchar *s, int n);
-  void cvtGlyph(Guchar *s, int n);
+  void eexecCvtGlyph(const char *glyphName, int pos, int n);
+  void cvtGlyph(int pos, int n, GBool top);
   void cvtGlyphWidth(GBool useOp);
   void eexecDumpNum(double x, GBool fpA);
   void eexecDumpOp1(int opA);
@@ -112,29 +113,33 @@ private:
   void eexecWriteCharstring(Guchar *s, int n);
   void getDeltaInt(char *buf, const char *key, double *opA, int n);
   void getDeltaReal(char *buf, const char *key, double *opA, int n);
-  int getIndexLen(Guchar *indexPtr);
-  Guchar *getIndexValPtr(Guchar *indexPtr, int i);
-  Guchar *getIndexEnd(Guchar *indexPtr);
-  Guint getWord(Guchar *ptr, int size);
-  double getNum(Guchar **ptr, GBool *fp);
+  int getIndexLen(int indexPos);
+  int getIndexValPos(int indexPos, int i, int *valLen);
+  int getIndexEnd(int indexPos);
+  Guint getWord(int pos, int size);
+  double getNum(int *pos, GBool *fp);
   char *getString(int sid, char *buf);
 
-  const char *file;
+  const Guchar *file;
   int len;
 
   GString *name;
   char **encoding;
 
-  int topOffSize;
-  Guchar *topDictIdxPtr;
-  Guchar *stringIdxPtr;
-  Guchar *gsubrIdxPtr;
+  int topDictIdxPos;
+  int stringIdxPos;
+  int gsubrIdxPos;
+  int subrIdxPos;
+  int gsubrBias;
+  int subrBias;
 
   FontFileOutputFunc outputFunc;
   void *outputStream;
   double op[48];		// operands
   GBool fp[48];			// true if operand is fixed point
   int nOps;			// number of operands
+  int nHints;			// number of hints for the current glyph
+  GBool firstOp;		// true if we haven't hit the first op yet
   double defaultWidthX;		// default glyph width
   double nominalWidthX;		// nominal glyph width
   GBool defaultWidthXFP;	// true if defaultWidthX is fixed point
@@ -142,6 +147,8 @@ private:
   Gushort r1;			// eexec encryption key
   GString *charBuf;		// charstring output buffer
   int line;			// number of eexec chars on current line
+
+  GBool ok;
 };
 
 //------------------------------------------------------------------------
@@ -171,6 +178,7 @@ public:
   void convertToType42(const char *name, const char **encodingA,
 		       CharCodeToUnicode *toUnicode,
 		       GBool pdfFontHasEncoding,
+		       GBool pdfFontIsSymbolic,
 		       FontFileOutputFunc outputFunc, void *outputStream);
 
   // Convert to a Type 2 CIDFont, suitable for embedding in a
@@ -217,7 +225,7 @@ private:
   void cvtEncoding(const char **encodingA, GBool pdfFontHasEncoding,
 		   FontFileOutputFunc outputFunc, void *outputStream);
   void cvtCharStrings(const char **encodingA, CharCodeToUnicode *toUnicode,
-		      GBool pdfFontHasEncoding,
+		      GBool pdfFontHasEncoding, GBool pdfFontIsSymbolic,
 		      FontFileOutputFunc outputFunc, void *outputStream);
   int getCmapEntry(int cmapFmt, int pos, int code);
   void cvtSfnts(FontFileOutputFunc outputFunc, void *outputStream,

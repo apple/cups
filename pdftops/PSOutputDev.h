@@ -217,6 +217,8 @@ private:
   PSFont16Enc *font16Enc;	// encodings for substitute 16-bit fonts
   int font16EncLen;		// number of entries in font16Enc array
   int font16EncSize;		// size of font16Enc array
+  GList *xobjStack;		// stack of XObject dicts currently being
+				//   processed
 
   double tx, ty;		// global translation
   double xScale, yScale;	// global scaling

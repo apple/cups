@@ -2,7 +2,7 @@
 //
 // XRef.cc
 //
-// Copyright 1996-2002 Glyph & Cog, LLC
+// Copyright 1996-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -324,6 +324,11 @@ GBool XRef::readXRef(Guint *pos) {
   obj.getDict()->lookupNF("Prev", &obj2);
   if (obj2.isInt()) {
     *pos = (Guint)obj2.getInt();
+    more = gTrue;
+  } else if (obj2.isRef()) {
+    // certain buggy PDF generators generate "/Prev NNN 0 R" instead
+    // of "/Prev NNN"
+    *pos = (Guint)obj2.getRefNum();
     more = gTrue;
   } else {
     more = gFalse;

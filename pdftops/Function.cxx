@@ -2,7 +2,7 @@
 //
 // Function.cc
 //
-// Copyright 2001-2002 Glyph & Cog, LLC
+// Copyright 2001-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -412,7 +412,6 @@ void SampledFunction::transform(double *in, double *out) {
 
 ExponentialFunction::ExponentialFunction(Object *funcObj, Dict *dict) {
   Object obj1, obj2;
-  GBool hasN;
   int i;
 
   ok = gFalse;
@@ -425,23 +424,14 @@ ExponentialFunction::ExponentialFunction(Object *funcObj, Dict *dict) {
     error(-1, "Exponential function with more than one input");
     goto err1;
   }
-  hasN = hasRange;
-
-  //----- default values
-  for (i = 0; i < funcMaxOutputs; ++i) {
-    c0[i] = 0;
-    c1[i] = 1;
-  }
 
   //----- C0
   if (dict->lookup("C0", &obj1)->isArray()) {
-    if (!hasN) {
-      n = obj1.arrayGetLength();
-      hasN = gTrue;
-    } else if (obj1.arrayGetLength() != n) {
+    if (hasRange && obj1.arrayGetLength() != n) {
       error(-1, "Function's C0 array is wrong length");
       goto err2;
     }
+    n = obj1.arrayGetLength();
     for (i = 0; i < n; ++i) {
       obj1.arrayGet(i, &obj2);
       if (!obj2.isNum()) {
@@ -451,15 +441,19 @@ ExponentialFunction::ExponentialFunction(Object *funcObj, Dict *dict) {
       c0[i] = obj2.getNum();
       obj2.free();
     }
+  } else {
+    if (hasRange && n != 1) {
+      error(-1, "Function's C0 array is wrong length");
+      goto err2;
+    }
+    n = 1;
+    c0[0] = 0;
   }
   obj1.free();
 
   //----- C1
   if (dict->lookup("C1", &obj1)->isArray()) {
-    if (!hasN) {
-      n = obj1.arrayGetLength();
-      hasN = gTrue;
-    } else if (obj1.arrayGetLength() != n) {
+    if (obj1.arrayGetLength() != n) {
       error(-1, "Function's C1 array is wrong length");
       goto err2;
     }
@@ -472,6 +466,12 @@ ExponentialFunction::ExponentialFunction(Object *funcObj, Dict *dict) {
       c1[i] = obj2.getNum();
       obj2.free();
     }
+  } else {
+    if (n != 1) {
+      error(-1, "Function's C1 array is wrong length");
+      goto err2;
+    }
+    c1[0] = 1;
   }
   obj1.free();
 
@@ -482,13 +482,6 @@ ExponentialFunction::ExponentialFunction(Object *funcObj, Dict *dict) {
   }
   e = obj1.getNum();
   obj1.free();
-
-  // this isn't supposed to happen, but I've run into (broken) PDF
-  // files where it does
-  if (!hasN) {
-    error(-1, "Exponential function does not define number of output values");
-    n = 1;
-  }
 
   ok = gTrue;
   return;

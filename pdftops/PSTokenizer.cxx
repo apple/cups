@@ -2,7 +2,7 @@
 //
 // PSTokenizer.cc
 //
-// Copyright 2002 Glyph & Cog, LLC
+// Copyright 2002-2003 Glyph & Cog, LLC
 //
 //========================================================================
 

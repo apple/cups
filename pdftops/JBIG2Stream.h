@@ -2,7 +2,7 @@
 //
 // JBIG2Stream.h
 //
-// Copyright 2002 Glyph & Cog, LLC
+// Copyright 2002-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -60,7 +60,7 @@ private:
 			      JBIG2Bitmap **syms,
 			      Guint defPixel, Guint combOp,
 			      Guint transposed, Guint refCorner,
-			      Guint sOffset,
+			      int sOffset,
 			      JBIG2HuffmanTable *huffFSTable,
 			      JBIG2HuffmanTable *huffDSTable,
 			      JBIG2HuffmanTable *huffDTTable,

@@ -72,7 +72,7 @@ public:
   //----- coordinate conversion
 
   // Convert between device and user coordinates.
-  virtual void cvtDevToUser(int dx, int dy, double *ux, double *uy);
+  virtual void cvtDevToUser(double dx, double dy, double *ux, double *uy);
   virtual void cvtUserToDev(double ux, double uy, int *dx, int *dy);
 
   //----- link borders

@@ -2,7 +2,7 @@
 //
 // JBIG2Stream.cc
 //
-// Copyright 2002 Glyph & Cog, LLC
+// Copyright 2002-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -655,25 +655,22 @@ GBool JBIG2HuffmanDecoder::decodeInt(int *x, JBIG2HuffmanTable *table) {
   len = 0;
   prefix = 0;
   while (table[i].rangeLen != jbig2HuffmanEOT) {
-    //~ if buildTable removes the entries with prefixLen=0, this is unneeded
-    if (table[i].prefixLen > 0) {
-      while (len < table[i].prefixLen) {
-	prefix = (prefix << 1) | readBit();
-	++len;
+    while (len < table[i].prefixLen) {
+      prefix = (prefix << 1) | readBit();
+      ++len;
+    }
+    if (prefix == table[i].prefix) {
+      if (table[i].rangeLen == jbig2HuffmanOOB) {
+	return gFalse;
       }
-      if (prefix == table[i].prefix) {
-	if (table[i].rangeLen == jbig2HuffmanOOB) {
-	  return gFalse;
-	}
-	if (table[i].rangeLen == jbig2HuffmanLOW) {
-	  *x = table[i].val - readBits(32);
-	} else if (table[i].rangeLen > 0) {
-	  *x = table[i].val + readBits(table[i].rangeLen);
-	} else {
-	  *x = table[i].val;
-	}
-	return gTrue;
+      if (table[i].rangeLen == jbig2HuffmanLOW) {
+	*x = table[i].val - readBits(32);
+      } else if (table[i].rangeLen > 0) {
+	*x = table[i].val + readBits(table[i].rangeLen);
+      } else {
+	*x = table[i].val;
       }
+      return gTrue;
     }
     ++i;
   }
@@ -713,22 +710,41 @@ Guint JBIG2HuffmanDecoder::readBit() {
   return (buf >> bufLen) & 1;
 }
 
-static int cmpHuffmanTabEntries(const void *p1, const void *p2) {
-  return ((JBIG2HuffmanTable *)p1)->prefixLen
-         - ((JBIG2HuffmanTable *)p2)->prefixLen;
-}
-
-//~ should remove entries with prefixLen = 0
 void JBIG2HuffmanDecoder::buildTable(JBIG2HuffmanTable *table, Guint len) {
-  Guint i, prefix;
+  Guint i, j, k, prefix;
+  JBIG2HuffmanTable tab;
 
-  qsort(table, len, sizeof(JBIG2HuffmanTable), &cmpHuffmanTabEntries);
-  for (i = 0; i < len && table[i].prefixLen == 0; ++i) {
-    table[i].prefix = 0;
+  // stable selection sort:
+  // - entries with prefixLen > 0, in ascending prefixLen order
+  // - entry with prefixLen = 0, rangeLen = EOT
+  // - all other entries with prefixLen = 0
+  // (on entry, table[len] has prefixLen = 0, rangeLen = EOT)
+  for (i = 0; i < len; ++i) {
+    for (j = i; j < len && table[j].prefixLen == 0; ++j) ;
+    if (j == len) {
+      break;
+    }
+    for (k = j + 1; k < len; ++k) {
+      if (table[k].prefixLen > 0 &&
+	  table[k].prefixLen < table[j].prefixLen) {
+	j = k;
+      }
+    }
+    if (j != i) {
+      tab = table[j];
+      for (k = j; k > i; --k) {
+	table[k] = table[k - 1];
+      }
+      table[i] = tab;
+    }
   }
+  table[i] = table[len];
+
+  // assign prefixes
+  i = 0;
   prefix = 0;
   table[i++].prefix = prefix++;
-  for (; i < len; ++i) {
+  for (; table[i].rangeLen != jbig2HuffmanEOT; ++i) {
     prefix <<= table[i].prefixLen - table[i-1].prefixLen;
     table[i].prefix = prefix++;
   }
@@ -810,7 +826,7 @@ int JBIG2MMRDecoder::getWhiteCode() {
     ++nBytesRead;
   }
   while (1) {
-    if (bufLen > 7 && ((buf >> (bufLen - 7)) & 0x7f) == 0) {
+    if (bufLen >= 7 && ((buf >> (bufLen - 7)) & 0x7f) == 0) {
       if (bufLen <= 12) {
 	code = buf << (12 - bufLen);
       } else {
@@ -825,7 +841,7 @@ int JBIG2MMRDecoder::getWhiteCode() {
       }
       p = &whiteTab2[code & 0x1ff];
     }
-    if (p->bits > 0 && p->bits < (int)bufLen) {
+    if (p->bits > 0 && p->bits <= (int)bufLen) {
       bufLen -= p->bits;
       return p->n;
     }
@@ -853,14 +869,14 @@ int JBIG2MMRDecoder::getBlackCode() {
     ++nBytesRead;
   }
   while (1) {
-    if (bufLen > 6 && ((buf >> (bufLen - 6)) & 0x3f) == 0) {
+    if (bufLen >= 6 && ((buf >> (bufLen - 6)) & 0x3f) == 0) {
       if (bufLen <= 13) {
 	code = buf << (13 - bufLen);
       } else {
 	code = buf >> (bufLen - 13);
       }
       p = &blackTab1[code & 0x7f];
-    } else if (bufLen > 4 && ((buf >> (bufLen - 4)) & 0x0f) == 0) {
+    } else if (bufLen >= 4 && ((buf >> (bufLen - 4)) & 0x0f) == 0) {
       if (bufLen <= 12) {
 	code = buf << (12 - bufLen);
       } else {
@@ -875,7 +891,7 @@ int JBIG2MMRDecoder::getBlackCode() {
       }
       p = &blackTab3[code & 0x3f];
     }
-    if (p->bits > 0 && p->bits < (int)bufLen) {
+    if (p->bits > 0 && p->bits <= (int)bufLen) {
       bufLen -= p->bits;
       return p->n;
     }
@@ -938,6 +954,12 @@ private:
 // JBIG2Bitmap
 //------------------------------------------------------------------------
 
+struct JBIG2BitmapPtr {
+  Guchar *p;
+  int shift;
+  int x;
+};
+
 class JBIG2Bitmap: public JBIG2Segment {
 public:
 
@@ -958,6 +980,8 @@ public:
     { data[y * line + (x >> 3)] |= 1 << (7 - (x & 7)); }
   void clearPixel(int x, int y)
     { data[y * line + (x >> 3)] &= 0x7f7f >> (x & 7); }
+  void getPixelPtr(int x, int y, JBIG2BitmapPtr *ptr);
+  int nextPixel(JBIG2BitmapPtr *ptr);
   void duplicateRow(int yDest, int ySrc);
   void combine(JBIG2Bitmap *bitmap, int x, int y, Guint combOp);
   Guchar *getDataPtr() { return data; }
@@ -1030,6 +1054,42 @@ void JBIG2Bitmap::clearToZero() {
 
 void JBIG2Bitmap::clearToOne() {
   memset(data, 0xff, h * line);
+}
+
+inline void JBIG2Bitmap::getPixelPtr(int x, int y, JBIG2BitmapPtr *ptr) {
+  if (y < 0 || y >= h || x >= w) {
+    ptr->p = NULL;
+  } else if (x < 0) {
+    ptr->p = &data[y * line];
+    ptr->shift = 7;
+    ptr->x = x;
+  } else {
+    ptr->p = &data[y * line + (x >> 3)];
+    ptr->shift = 7 - (x & 7);
+    ptr->x = x;
+  }
+}
+
+inline int JBIG2Bitmap::nextPixel(JBIG2BitmapPtr *ptr) {
+  int pix;
+
+  if (!ptr->p) {
+    pix = 0;
+  } else if (ptr->x < 0) {
+    ++ptr->x;
+    pix = 0;
+  } else {
+    pix = (*ptr->p >> ptr->shift) & 1;
+    if (++ptr->x == w) {
+      ptr->p = NULL;
+    } else if (ptr->shift == 0) {
+      ++ptr->p;
+      ptr->shift = 7;
+    } else {
+      --ptr->shift;
+    }
+  }
+  return pix;
 }
 
 void JBIG2Bitmap::duplicateRow(int yDest, int ySrc) {
@@ -1365,7 +1425,7 @@ JBIG2Stream::JBIG2Stream(Stream *strA, Object *globalsStream):
   huffDecoder = new JBIG2HuffmanDecoder();
   mmrDecoder = new JBIG2MMRDecoder();
 
-  segments = new GList();
+  segments = globalSegments = new GList();
   if (globalsStream->isStream()) {
     curStr = globalsStream->getStream();
     curStr->reset();
@@ -1374,7 +1434,6 @@ JBIG2Stream::JBIG2Stream(Stream *strA, Object *globalsStream):
     mmrDecoder->setStream(curStr);
     readSegments();
   }
-  globalSegments = segments;
 
   segments = NULL;
   curStr = NULL;
@@ -1768,18 +1827,21 @@ void JBIG2Stream::readSymbolDictSeg(Guint segNum, Guint length,
   } else {
     if (contextUsed && inputSymbolDict) {
       resetGenericStats(sdTemplate, inputSymbolDict->getGenericRegionStats());
-      if (refAgg) {
-	resetRefinementStats(sdrTemplate,
-			     inputSymbolDict->getRefinementRegionStats());
-      }
     } else {
       resetGenericStats(sdTemplate, NULL);
-      if (refAgg) {
-	resetRefinementStats(sdrTemplate, NULL);
-      }
     }
     resetIntStats(symCodeLen);
     arithDecoder->start();
+  }
+
+  // set up the arithmetic decoder for refinement/aggregation
+  if (refAgg) {
+    if (contextUsed && inputSymbolDict) {
+      resetRefinementStats(sdrTemplate,
+			   inputSymbolDict->getRefinementRegionStats());
+    } else {
+      resetRefinementStats(sdrTemplate, NULL);
+    }
   }
 
   // allocate symbol widths storage
@@ -1834,7 +1896,13 @@ void JBIG2Stream::readSymbolDictSeg(Guint segNum, Guint length,
 	    break;
 	  }
 	}
+#if 0 //~ This special case was added about a year before the final draft
+      //~ of the JBIG2 spec was released.  I have encountered some old
+      //~ JBIG2 images that predate it.
+	if (0) {
+#else
 	if (refAggNum == 1) {
+#endif
 	  if (huff) {
 	    symID = huffDecoder->readBits(symCodeLen);
 	    huffDecoder->decodeInt(&refDX, huffTableO);
@@ -1878,15 +1946,13 @@ void JBIG2Stream::readSymbolDictSeg(Guint segNum, Guint length,
     // read the collective bitmap
     if (huff && !refAgg) {
       huffDecoder->decodeInt(&bmSize, huffBMSizeTable);
-      if (huff) {
-	huffDecoder->reset();
-      }
+      huffDecoder->reset();
       if (bmSize == 0) {
 	collBitmap = new JBIG2Bitmap(0, totalWidth, symHeight);
 	bmSize = symHeight * ((totalWidth + 7) >> 3);
 	p = collBitmap->getDataPtr();
 	for (k = 0; k < (Guint)bmSize; ++k) {
-	  *p++ = str->getChar();
+	  *p++ = curStr->getChar();
 	}
       } else {
 	collBitmap = readGenericBitmap(gTrue, totalWidth, symHeight,
@@ -1924,7 +1990,7 @@ void JBIG2Stream::readSymbolDictSeg(Guint segNum, Guint length,
     }
     ex = !ex;
   }
-  
+
   for (i = 0; i < numNewSyms; ++i) {
     delete bitmaps[numInputSyms + i];
   }
@@ -1965,7 +2031,8 @@ void JBIG2Stream::readTextRegionSeg(Guint segNum, GBool imm,
   JBIG2Bitmap **syms;
   Guint w, h, x, y, segInfoFlags, extCombOp;
   Guint flags, huff, refine, logStrips, refCorner, transposed;
-  Guint combOp, defPixel, sOffset, templ;
+  Guint combOp, defPixel, templ;
+  int sOffset;
   Guint huffFlags, huffFS, huffDS, huffDT;
   Guint huffRDW, huffRDH, huffRDX, huffRDY, huffRSize;
   Guint numInstances, numSyms, symCodeLen;
@@ -1993,6 +2060,9 @@ void JBIG2Stream::readTextRegionSeg(Guint segNum, GBool imm,
   combOp = (flags >> 7) & 3;
   defPixel = (flags >> 9) & 1;
   sOffset = (flags >> 10) & 0x1f;
+  if (sOffset & 0x10) {
+    sOffset |= -1 - 0x0f;
+  }
   templ = (flags >> 15) & 1;
   huffFS = huffDS = huffDT = 0; // make gcc happy
   huffRDW = huffRDH = huffRDX = huffRDY = huffRSize = 0; // make gcc happy
@@ -2135,6 +2205,7 @@ void JBIG2Stream::readTextRegionSeg(Guint segNum, GBool imm,
     runLengthTab[34].val = 0x20b;
     runLengthTab[34].prefixLen = huffDecoder->readBits(4);
     runLengthTab[34].rangeLen = 7;
+    runLengthTab[35].prefixLen = 0;
     runLengthTab[35].rangeLen = jbig2HuffmanEOT;
     huffDecoder->buildTable(runLengthTab, 35);
     symCodeTab = (JBIG2HuffmanTable *)gmalloc((numSyms + 1) *
@@ -2158,8 +2229,8 @@ void JBIG2Stream::readTextRegionSeg(Guint segNum, GBool imm,
       } else {
 	symCodeTab[i++].prefixLen = j;
       }
-
     }
+    symCodeTab[numSyms].prefixLen = 0;
     symCodeTab[numSyms].rangeLen = jbig2HuffmanEOT;
     huffDecoder->buildTable(symCodeTab, numSyms);
     huffDecoder->reset();
@@ -2168,10 +2239,10 @@ void JBIG2Stream::readTextRegionSeg(Guint segNum, GBool imm,
   } else {
     symCodeTab = NULL;
     resetIntStats(symCodeLen);
-    if (refine) {
-      resetRefinementStats(templ, NULL);
-    }
     arithDecoder->start();
+  }
+  if (refine) {
+    resetRefinementStats(templ, NULL);
   }
 
   bitmap = readTextRegion(huff, refine, w, h, numInstances,
@@ -2219,7 +2290,7 @@ JBIG2Bitmap *JBIG2Stream::readTextRegion(GBool huff, GBool refine,
 					 JBIG2Bitmap **syms,
 					 Guint defPixel, Guint combOp,
 					 Guint transposed, Guint refCorner,
-					 Guint sOffset,
+					 int sOffset,
 					 JBIG2HuffmanTable *huffFSTable,
 					 JBIG2HuffmanTable *huffDSTable,
 					 JBIG2HuffmanTable *huffDTTable,
@@ -2686,6 +2757,8 @@ JBIG2Bitmap *JBIG2Stream::readGenericBitmap(GBool mmr, int w, int h,
   JBIG2Bitmap *bitmap;
   GBool ltp;
   Guint ltpCX, cx, cx0, cx1, cx2;
+  JBIG2BitmapPtr cxPtr0, cxPtr1;
+  JBIG2BitmapPtr atPtr0, atPtr1, atPtr2, atPtr3;
   int *refLine, *codingLine;
   int code1, code2, code3;
   int x, y, a0, pix, i, refI, codingI;
@@ -2880,99 +2953,151 @@ JBIG2Bitmap *JBIG2Stream::readGenericBitmap(GBool mmr, int w, int h,
 	}
       }
 
-      // set up the context
       switch (templ) {
       case 0:
-	cx0 = (bitmap->getPixel(0, y-2) << 1) |
-	      bitmap->getPixel(1, y-2);
-	cx1 = (bitmap->getPixel(0, y-1) << 2) |
-	      (bitmap->getPixel(1, y-1) << 1) |
-	      bitmap->getPixel(2, y-1);
-	cx2 = 0;
-	break;
-      case 1:
-	cx0 = (bitmap->getPixel(0, y-2) << 2) |
-	      (bitmap->getPixel(1, y-2) << 1) |
-	      bitmap->getPixel(2, y-2);
-	cx1 = (bitmap->getPixel(0, y-1) << 2) |
-	      (bitmap->getPixel(1, y-1) << 1) |
-	      bitmap->getPixel(2, y-1);
-	cx2 = 0;
-	break;
-      case 2:
-	cx0 = (bitmap->getPixel(0, y-2) << 1) |
-	      bitmap->getPixel(1, y-2);
-	cx1 = (bitmap->getPixel(0, y-1) << 1) |
-	      bitmap->getPixel(1, y-1);
-	cx2 = 0;
-	break;
-      case 3:
-	cx1 = (bitmap->getPixel(0, y-1) << 1) |
-	      bitmap->getPixel(1, y-1);
-	cx2 = 0;
-	break;
-      }
 
-      // decode the row
-      for (x = 0; x < w; ++x) {
+	// set up the context
+	bitmap->getPixelPtr(0, y-2, &cxPtr0);
+	cx0 = bitmap->nextPixel(&cxPtr0);
+	cx0 = (cx0 << 1) | bitmap->nextPixel(&cxPtr0);
+	bitmap->getPixelPtr(0, y-1, &cxPtr1);
+	cx1 = bitmap->nextPixel(&cxPtr1);
+	cx1 = (cx1 << 1) | bitmap->nextPixel(&cxPtr1);
+	cx1 = (cx1 << 1) | bitmap->nextPixel(&cxPtr1);
+	cx2 = 0;
+	bitmap->getPixelPtr(atx[0], y + aty[0], &atPtr0);
+	bitmap->getPixelPtr(atx[1], y + aty[1], &atPtr1);
+	bitmap->getPixelPtr(atx[2], y + aty[2], &atPtr2);
+	bitmap->getPixelPtr(atx[3], y + aty[3], &atPtr3);
 
-	// check for a skipped pixel
-	if (useSkip && skip->getPixel(x, y)) {
-	  pix = 0;
-
-	} else {
+	// decode the row
+	for (x = 0; x < w; ++x) {
 
 	  // build the context
-	  switch (templ) {
-	  case 0:
-	    cx = (cx0 << 13) | (cx1 << 8) | (cx2 << 4) |
-	         (bitmap->getPixel(x + atx[0], y + aty[0]) << 3) |
-	         (bitmap->getPixel(x + atx[1], y + aty[1]) << 2) |
-	         (bitmap->getPixel(x + atx[2], y + aty[2]) << 1) |
-	         bitmap->getPixel(x + atx[3], y + aty[3]);
-	    break;
-	  case 1:
-	    cx = (cx0 << 9) | (cx1 << 4) | (cx2 << 1) |
-	         bitmap->getPixel(x + atx[0], y + aty[0]);
-	    break;
-	  case 2:
-	    cx = (cx0 << 7) | (cx1 << 3) | (cx2 << 1) |
-	         bitmap->getPixel(x + atx[0], y + aty[0]);
-	    break;
-	  case 3:
-	    cx = (cx1 << 5) | (cx2 << 1) |
-	         bitmap->getPixel(x + atx[0], y + aty[0]);
-	    break;
-	  }
+	  cx = (cx0 << 13) | (cx1 << 8) | (cx2 << 4) |
+	       (bitmap->nextPixel(&atPtr0) << 3) |
+	       (bitmap->nextPixel(&atPtr1) << 2) |
+	       (bitmap->nextPixel(&atPtr2) << 1) |
+	       bitmap->nextPixel(&atPtr3);
+
+	  // check for a skipped pixel
+	  if (useSkip && skip->getPixel(x, y)) {
+	    pix = 0;
 
 	  // decode the pixel
-	  if ((pix = arithDecoder->decodeBit(cx, genericRegionStats))) {
+	  } else if ((pix = arithDecoder->decodeBit(cx, genericRegionStats))) {
 	    bitmap->setPixel(x, y);
 	  }
-	}
 
-	// update the context
-	switch (templ) {
-	  case 0:
-	    cx0 = ((cx0 << 1) | bitmap->getPixel(x+2, y-2)) & 0x07;
-	    cx1 = ((cx1 << 1) | bitmap->getPixel(x+3, y-1)) & 0x1f;
-	    cx2 = ((cx2 << 1) | pix) & 0x0f;
-	    break;
-	  case 1:
-	    cx0 = ((cx0 << 1) | bitmap->getPixel(x+3, y-2)) & 0x0f;
-	    cx1 = ((cx1 << 1) | bitmap->getPixel(x+3, y-1)) & 0x1f;
-	    cx2 = ((cx2 << 1) | pix) & 0x07;
-	    break;
-	  case 2:
-	    cx0 = ((cx0 << 1) | bitmap->getPixel(x+2, y-2)) & 0x07;
-	    cx1 = ((cx1 << 1) | bitmap->getPixel(x+2, y-1)) & 0x0f;
-	    cx2 = ((cx2 << 1) | pix) & 0x03;
-	    break;
-	  case 3:
-	    cx1 = ((cx1 << 1) | bitmap->getPixel(x+2, y-1)) & 0x1f;
-	    cx2 = ((cx2 << 1) | pix) & 0x0f;
-	    break;
+	  // update the context
+	  cx0 = ((cx0 << 1) | bitmap->nextPixel(&cxPtr0)) & 0x07;
+	  cx1 = ((cx1 << 1) | bitmap->nextPixel(&cxPtr1)) & 0x1f;
+	  cx2 = ((cx2 << 1) | pix) & 0x0f;
 	}
+	break;
+
+      case 1:
+
+	// set up the context
+	bitmap->getPixelPtr(0, y-2, &cxPtr0);
+	cx0 = bitmap->nextPixel(&cxPtr0);
+	cx0 = (cx0 << 1) | bitmap->nextPixel(&cxPtr0);
+	cx0 = (cx0 << 1) | bitmap->nextPixel(&cxPtr0);
+	bitmap->getPixelPtr(0, y-1, &cxPtr1);
+	cx1 = bitmap->nextPixel(&cxPtr1);
+	cx1 = (cx1 << 1) | bitmap->nextPixel(&cxPtr1);
+	cx1 = (cx1 << 1) | bitmap->nextPixel(&cxPtr1);
+	cx2 = 0;
+	bitmap->getPixelPtr(atx[0], y + aty[0], &atPtr0);
+
+	// decode the row
+	for (x = 0; x < w; ++x) {
+
+	  // build the context
+	  cx = (cx0 << 9) | (cx1 << 4) | (cx2 << 1) |
+	       bitmap->nextPixel(&atPtr0);
+
+	  // check for a skipped pixel
+	  if (useSkip && skip->getPixel(x, y)) {
+	    pix = 0;
+
+	  // decode the pixel
+	  } else if ((pix = arithDecoder->decodeBit(cx, genericRegionStats))) {
+	    bitmap->setPixel(x, y);
+	  }
+
+	  // update the context
+	  cx0 = ((cx0 << 1) | bitmap->nextPixel(&cxPtr0)) & 0x07;
+	  cx1 = ((cx1 << 1) | bitmap->nextPixel(&cxPtr1)) & 0x1f;
+	  cx2 = ((cx2 << 1) | pix) & 0x0f;
+	}
+	break;
+
+      case 2:
+
+	// set up the context
+	bitmap->getPixelPtr(0, y-2, &cxPtr0);
+	cx0 = bitmap->nextPixel(&cxPtr0);
+	cx0 = (cx0 << 1) | bitmap->nextPixel(&cxPtr0);
+	bitmap->getPixelPtr(0, y-1, &cxPtr1);
+	cx1 = bitmap->nextPixel(&cxPtr1);
+	cx1 = (cx1 << 1) | bitmap->nextPixel(&cxPtr1);
+	cx2 = 0;
+	bitmap->getPixelPtr(atx[0], y + aty[0], &atPtr0);
+
+	// decode the row
+	for (x = 0; x < w; ++x) {
+
+	  // build the context
+	  cx = (cx0 << 9) | (cx1 << 4) | (cx2 << 1) |
+	       bitmap->nextPixel(&atPtr0);
+
+	  // check for a skipped pixel
+	  if (useSkip && skip->getPixel(x, y)) {
+	    pix = 0;
+
+	  // decode the pixel
+	  } else if ((pix = arithDecoder->decodeBit(cx, genericRegionStats))) {
+	    bitmap->setPixel(x, y);
+	  }
+
+	  // update the context
+	  cx0 = ((cx0 << 1) | bitmap->nextPixel(&cxPtr0)) & 0x0f;
+	  cx1 = ((cx1 << 1) | bitmap->nextPixel(&cxPtr1)) & 0x1f;
+	  cx2 = ((cx2 << 1) | pix) & 0x07;
+	}
+	break;
+
+      case 3:
+
+	// set up the context
+	bitmap->getPixelPtr(0, y-1, &cxPtr1);
+	cx1 = bitmap->nextPixel(&cxPtr1);
+	cx1 = (cx1 << 1) | bitmap->nextPixel(&cxPtr1);
+	cx2 = 0;
+	bitmap->getPixelPtr(atx[0], y + aty[0], &atPtr0);
+
+	// decode the row
+	for (x = 0; x < w; ++x) {
+
+	  // build the context
+	  cx = (cx0 << 9) | (cx1 << 4) | (cx2 << 1) |
+	       bitmap->nextPixel(&atPtr0);
+
+	  // check for a skipped pixel
+	  if (useSkip && skip->getPixel(x, y)) {
+	    pix = 0;
+
+	  // decode the pixel
+	  } else if ((pix = arithDecoder->decodeBit(cx, genericRegionStats))) {
+	    bitmap->setPixel(x, y);
+	  }
+
+	  // update the context
+	  cx1 = ((cx1 << 1) | bitmap->nextPixel(&cxPtr1)) & 0x1f;
+	  cx2 = ((cx2 << 1) | pix) & 0x0f;
+	}
+	break;
       }
     }
   }
@@ -3076,6 +3201,8 @@ JBIG2Bitmap *JBIG2Stream::readGenericRefinementRegion(int w, int h,
   JBIG2Bitmap *bitmap;
   GBool ltp;
   Guint ltpCX, cx, cx0, cx2, cx3, cx4, tpgrCX0, tpgrCX1, tpgrCX2;
+  JBIG2BitmapPtr cxPtr0, cxPtr1, cxPtr2, cxPtr3, cxPtr4, cxPtr5, cxPtr6;
+  JBIG2BitmapPtr tpgrCXPtr0, tpgrCXPtr1, tpgrCXPtr2;
   int x, y, pix;
 
   bitmap = new JBIG2Bitmap(0, w, h);
@@ -3091,87 +3218,144 @@ JBIG2Bitmap *JBIG2Stream::readGenericRefinementRegion(int w, int h,
   ltp = 0;
   for (y = 0; y < h; ++y) {
 
-    // set up the context
     if (templ) {
-      cx0 = bitmap->getPixel(0, y-1);
-      cx2 = 0; // unused
-      cx3 = (refBitmap->getPixel(-1-refDX, y-refDY) << 1) |
-	    refBitmap->getPixel(-refDX, y-refDY);
-      cx4 = refBitmap->getPixel(-refDX, y+1-refDY);
-    } else {
-      cx0 = bitmap->getPixel(0, y-1);
-      cx2 = refBitmap->getPixel(-refDX, y-1-refDY);
-      cx3 = (refBitmap->getPixel(-1-refDX, y-refDY) << 1) |
-	    refBitmap->getPixel(-refDX, y-refDY);
-      cx4 = (refBitmap->getPixel(-1-refDX, y+1-refDY) << 1) |
-	    refBitmap->getPixel(-refDX, y+1-refDY);
-    }
 
-    // set up the typical prediction context
-    tpgrCX0 = tpgrCX1 = tpgrCX2 = 0; // make gcc happy
-    if (tpgrOn) {
-      tpgrCX0 = (refBitmap->getPixel(-1-refDX, y-1-refDY) << 2) |
-	        (refBitmap->getPixel(-refDX, y-1-refDY) << 1) |
-	        refBitmap->getPixel(1-refDX, y-1-refDY);
-      tpgrCX1 = (refBitmap->getPixel(-1-refDX, y-refDY) << 2) |
-	        (refBitmap->getPixel(-refDX, y-refDY) << 1) |
-	        refBitmap->getPixel(1-refDX, y-refDY);
-      tpgrCX2 = (refBitmap->getPixel(-1-refDX, y+1-refDY) << 2) |
-	        (refBitmap->getPixel(-refDX, y+1-refDY) << 1) |
-	        refBitmap->getPixel(1-refDX, y+1-refDY);
-    }
+      // set up the context
+      bitmap->getPixelPtr(0, y-1, &cxPtr0);
+      cx0 = bitmap->nextPixel(&cxPtr0);
+      bitmap->getPixelPtr(-1, y, &cxPtr1);
+      refBitmap->getPixelPtr(-refDX, y-1-refDY, &cxPtr2);
+      refBitmap->getPixelPtr(-1-refDX, y-refDY, &cxPtr3);
+      cx3 = refBitmap->nextPixel(&cxPtr3);
+      cx3 = (cx3 << 1) | refBitmap->nextPixel(&cxPtr3);
+      refBitmap->getPixelPtr(-refDX, y+1-refDY, &cxPtr4);
+      cx4 = refBitmap->nextPixel(&cxPtr4);
 
-    for (x = 0; x < w; ++x) {
-
-      // update the context
-      if (templ) {
-	cx0 = ((cx0 << 1) | bitmap->getPixel(x+1, y-1)) & 7;
-	cx3 = ((cx3 << 1) | refBitmap->getPixel(x+1-refDX, y-refDY)) & 7;
-	cx4 = ((cx4 << 1) | refBitmap->getPixel(x+1-refDX, y+1-refDY)) & 3;
-      } else {
-	cx0 = ((cx0 << 1) | bitmap->getPixel(x+1, y-1)) & 3;
-	cx2 = ((cx2 << 1) | refBitmap->getPixel(x+1-refDX, y-1-refDY)) & 3;
-	cx3 = ((cx3 << 1) | refBitmap->getPixel(x+1-refDX, y-refDY)) & 7;
-	cx4 = ((cx4 << 1) | refBitmap->getPixel(x+1-refDX, y+1-refDY)) & 7;
-      }
-
+      // set up the typical prediction context
+      tpgrCX0 = tpgrCX1 = tpgrCX2 = 0; // make gcc happy
       if (tpgrOn) {
-	// update the typical predictor context
-	tpgrCX0 = ((tpgrCX0 << 1) |
-		   refBitmap->getPixel(x+1-refDX, y-1-refDY)) & 7;
-	tpgrCX1 = ((tpgrCX1 << 1) |
-		   refBitmap->getPixel(x+1-refDX, y-refDY)) & 7;
-	tpgrCX2 = ((tpgrCX2 << 1) |
-		   refBitmap->getPixel(x+1-refDX, y+1-refDY)) & 7;
-
-	// check for a "typical" pixel
-	if (arithDecoder->decodeBit(ltpCX, refinementRegionStats)) {
-	  ltp = !ltp;
-	}
-	if (tpgrCX0 == 0 && tpgrCX1 == 0 && tpgrCX2 == 0) {
-	  bitmap->clearPixel(x, y);
-	  continue;
-	} else if (tpgrCX0 == 7 && tpgrCX1 == 7 && tpgrCX2 == 7) {
-	  bitmap->setPixel(x, y);
-	  continue;
-	}
+	refBitmap->getPixelPtr(-1-refDX, y-1-refDY, &tpgrCXPtr0);
+	tpgrCX0 = refBitmap->nextPixel(&tpgrCXPtr0);
+	tpgrCX0 = (tpgrCX0 << 1) | refBitmap->nextPixel(&tpgrCXPtr0);
+	tpgrCX0 = (tpgrCX0 << 1) | refBitmap->nextPixel(&tpgrCXPtr0);
+	refBitmap->getPixelPtr(-1-refDX, y-refDY, &tpgrCXPtr1);
+	tpgrCX1 = refBitmap->nextPixel(&tpgrCXPtr1);
+	tpgrCX1 = (tpgrCX1 << 1) | refBitmap->nextPixel(&tpgrCXPtr1);
+	tpgrCX1 = (tpgrCX1 << 1) | refBitmap->nextPixel(&tpgrCXPtr1);
+	refBitmap->getPixelPtr(-1-refDX, y+1-refDY, &tpgrCXPtr2);
+	tpgrCX2 = refBitmap->nextPixel(&tpgrCXPtr2);
+	tpgrCX2 = (tpgrCX2 << 1) | refBitmap->nextPixel(&tpgrCXPtr2);
+	tpgrCX2 = (tpgrCX2 << 1) | refBitmap->nextPixel(&tpgrCXPtr2);
       }
 
-      // build the context
-      if (templ) {
-	cx = (cx0 << 7) | (bitmap->getPixel(x-1, y) << 6) |
-	     (refBitmap->getPixel(x-refDX, y-1-refDY) << 5) |
+      for (x = 0; x < w; ++x) {
+
+	// update the context
+	cx0 = ((cx0 << 1) | bitmap->nextPixel(&cxPtr0)) & 7;
+	cx3 = ((cx3 << 1) | refBitmap->nextPixel(&cxPtr3)) & 7;
+	cx4 = ((cx4 << 1) | refBitmap->nextPixel(&cxPtr4)) & 3;
+
+	if (tpgrOn) {
+	  // update the typical predictor context
+	  tpgrCX0 = ((tpgrCX0 << 1) | refBitmap->nextPixel(&tpgrCXPtr0)) & 7;
+	  tpgrCX1 = ((tpgrCX1 << 1) | refBitmap->nextPixel(&tpgrCXPtr1)) & 7;
+	  tpgrCX2 = ((tpgrCX2 << 1) | refBitmap->nextPixel(&tpgrCXPtr2)) & 7;
+
+	  // check for a "typical" pixel
+	  if (arithDecoder->decodeBit(ltpCX, refinementRegionStats)) {
+	    ltp = !ltp;
+	  }
+	  if (tpgrCX0 == 0 && tpgrCX1 == 0 && tpgrCX2 == 0) {
+	    bitmap->clearPixel(x, y);
+	    continue;
+	  } else if (tpgrCX0 == 7 && tpgrCX1 == 7 && tpgrCX2 == 7) {
+	    bitmap->setPixel(x, y);
+	    continue;
+	  }
+	}
+
+	// build the context
+	cx = (cx0 << 7) | (bitmap->nextPixel(&cxPtr1) << 6) |
+	     (refBitmap->nextPixel(&cxPtr2) << 5) |
 	     (cx3 << 2) | cx4;
-      } else {
-	cx = (cx0 << 11) | (bitmap->getPixel(x-1, y) << 10) |
-	     (cx2 << 8) | (cx3 << 5) | (cx4 << 2) |
-	     (bitmap->getPixel(x+atx[0], y+aty[0]) << 1) |
-	     refBitmap->getPixel(x+atx[1]-refDX, y+aty[1]-refDY);
+
+	// decode the pixel
+	if ((pix = arithDecoder->decodeBit(cx, refinementRegionStats))) {
+	  bitmap->setPixel(x, y);
+	}
       }
 
-      // decode the pixel
-      if ((pix = arithDecoder->decodeBit(cx, refinementRegionStats))) {
-	bitmap->setPixel(x, y);
+    } else {
+
+      // set up the context
+      bitmap->getPixelPtr(0, y-1, &cxPtr0);
+      cx0 = bitmap->nextPixel(&cxPtr0);
+      bitmap->getPixelPtr(-1, y, &cxPtr1);
+      refBitmap->getPixelPtr(-refDX, y-1-refDY, &cxPtr2);
+      cx2 = refBitmap->nextPixel(&cxPtr2);
+      refBitmap->getPixelPtr(-1-refDX, y-refDY, &cxPtr3);
+      cx3 = refBitmap->nextPixel(&cxPtr3);
+      cx3 = (cx3 << 1) | refBitmap->nextPixel(&cxPtr3);
+      refBitmap->getPixelPtr(-1-refDX, y+1-refDY, &cxPtr4);
+      cx4 = refBitmap->nextPixel(&cxPtr4);
+      cx4 = (cx4 << 1) | refBitmap->nextPixel(&cxPtr4);
+      bitmap->getPixelPtr(atx[0], y+aty[0], &cxPtr5);
+      refBitmap->getPixelPtr(atx[1]-refDX, y+aty[1]-refDY, &cxPtr6);
+
+      // set up the typical prediction context
+      tpgrCX0 = tpgrCX1 = tpgrCX2 = 0; // make gcc happy
+      if (tpgrOn) {
+	refBitmap->getPixelPtr(-1-refDX, y-1-refDY, &tpgrCXPtr0);
+	tpgrCX0 = refBitmap->nextPixel(&tpgrCXPtr0);
+	tpgrCX0 = (tpgrCX0 << 1) | refBitmap->nextPixel(&tpgrCXPtr0);
+	tpgrCX0 = (tpgrCX0 << 1) | refBitmap->nextPixel(&tpgrCXPtr0);
+	refBitmap->getPixelPtr(-1-refDX, y-refDY, &tpgrCXPtr1);
+	tpgrCX1 = refBitmap->nextPixel(&tpgrCXPtr1);
+	tpgrCX1 = (tpgrCX1 << 1) | refBitmap->nextPixel(&tpgrCXPtr1);
+	tpgrCX1 = (tpgrCX1 << 1) | refBitmap->nextPixel(&tpgrCXPtr1);
+	refBitmap->getPixelPtr(-1-refDX, y+1-refDY, &tpgrCXPtr2);
+	tpgrCX2 = refBitmap->nextPixel(&tpgrCXPtr2);
+	tpgrCX2 = (tpgrCX2 << 1) | refBitmap->nextPixel(&tpgrCXPtr2);
+	tpgrCX2 = (tpgrCX2 << 1) | refBitmap->nextPixel(&tpgrCXPtr2);
+      }
+
+      for (x = 0; x < w; ++x) {
+
+	// update the context
+	cx0 = ((cx0 << 1) | bitmap->nextPixel(&cxPtr0)) & 3;
+	cx2 = ((cx2 << 1) | refBitmap->nextPixel(&cxPtr2)) & 3;
+	cx3 = ((cx3 << 1) | refBitmap->nextPixel(&cxPtr3)) & 7;
+	cx4 = ((cx4 << 1) | refBitmap->nextPixel(&cxPtr4)) & 7;
+
+	if (tpgrOn) {
+	  // update the typical predictor context
+	  tpgrCX0 = ((tpgrCX0 << 1) | refBitmap->nextPixel(&tpgrCXPtr0)) & 7;
+	  tpgrCX1 = ((tpgrCX1 << 1) | refBitmap->nextPixel(&tpgrCXPtr1)) & 7;
+	  tpgrCX2 = ((tpgrCX2 << 1) | refBitmap->nextPixel(&tpgrCXPtr2)) & 7;
+
+	  // check for a "typical" pixel
+	  if (arithDecoder->decodeBit(ltpCX, refinementRegionStats)) {
+	    ltp = !ltp;
+	  }
+	  if (tpgrCX0 == 0 && tpgrCX1 == 0 && tpgrCX2 == 0) {
+	    bitmap->clearPixel(x, y);
+	    continue;
+	  } else if (tpgrCX0 == 7 && tpgrCX1 == 7 && tpgrCX2 == 7) {
+	    bitmap->setPixel(x, y);
+	    continue;
+	  }
+	}
+
+	// build the context
+	cx = (cx0 << 11) | (bitmap->nextPixel(&cxPtr1) << 10) |
+	     (cx2 << 8) | (cx3 << 5) | (cx4 << 2) |
+	     (bitmap->nextPixel(&cxPtr5) << 1) |
+	     refBitmap->nextPixel(&cxPtr6);
+
+	// decode the pixel
+	if ((pix = arithDecoder->decodeBit(cx, refinementRegionStats))) {
+	  bitmap->setPixel(x, y);
+	}
       }
     }
   }
@@ -3239,8 +3423,8 @@ void JBIG2Stream::readCodeTableSeg(Guint segNum, Guint length) {
     goto eofError;
   }
   oob = flags & 1;
-  prefixBits = (flags >> 1) & 7;
-  rangeBits = (flags >> 4) & 7;
+  prefixBits = ((flags >> 1) & 7) + 1;
+  rangeBits = ((flags >> 4) & 7) + 1;
 
   huffDecoder->reset();
   huffTabSize = 8;
@@ -3282,7 +3466,6 @@ void JBIG2Stream::readCodeTableSeg(Guint segNum, Guint length) {
   huffTab[i].val = 0;
   huffTab[i].prefixLen = 0;
   huffTab[i].rangeLen = jbig2HuffmanEOT;
-  ++i;
   huffDecoder->buildTable(huffTab, i);
 
   // create and store the new table segment
@@ -3467,7 +3650,7 @@ GBool JBIG2Stream::readLong(int *x) {
   }
   *x = ((c0 << 24) | (c1 << 16) | (c2 << 8) | c3);
   if (c0 & 0x80) {
-    *x |= -1 - 0xffffffff;
+    *x |= -1 - (int)0xffffffff;
   }
   return gTrue;
 }

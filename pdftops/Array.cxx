@@ -2,7 +2,7 @@
 //
 // Array.cc
 //
-// Copyright 1996-2002 Glyph & Cog, LLC
+// Copyright 1996-2003 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -12,6 +12,7 @@
 #pragma implementation
 #endif
 
+#include <stdlib.h>
 #include <stddef.h>
 #include "gmem.h"
 #include "Object.h"
@@ -46,9 +47,23 @@ void Array::add(Object *elem) {
 }
 
 Object *Array::get(int i, Object *obj) {
+  if (i < 0 || i >= length) {
+#ifdef DEBUG_MEM
+    abort();
+#else
+    return obj->initNull();
+#endif
+  }
   return elems[i].fetch(xref, obj);
 }
 
 Object *Array::getNF(int i, Object *obj) {
+  if (i < 0 || i >= length) {
+#ifdef DEBUG_MEM
+    abort();
+#else
+    return obj->initNull();
+#endif
+  }
   return elems[i].copy(obj);
 }

@@ -157,7 +157,7 @@ public:
   GBool getPSASCIIHex();
   EndOfLineKind getTextEOL();
   GBool getTextKeepTinyChars();
-  GString *findFontFile(GString *fontName, const char *ext1, const char *ext2);
+  GString *findFontFile(GString *fontName, const char **exts);
   GString *getInitialZoom();
   FontRastControl getT1libControl();
   FontRastControl getFreeTypeControl();
