@@ -1,5 +1,5 @@
 /*
- * "$Id: pstoraster.c,v 1.3 1999/05/10 17:22:04 mike Exp $"
+ * "$Id: pstoraster.c,v 1.4 1999/05/10 21:34:54 mike Exp $"
  *
  *   PostScript RIP filter main entry for the Common UNIX Printing System
  *   (CUPS).
@@ -37,6 +37,7 @@
  * Include necessary headers...
  */
 
+#include <config.h>
 #include "ghost.h"
 #include "imain.h"
 #include "iminst.h"
@@ -106,6 +107,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   initial_enter_name("QUIET", &vtrue);
   initial_enter_name("NOPAUSE", &vtrue);
   define_string("OutputFile", "-");
+  define_string("FONTPATH", CUPS_DATADIR "/fonts");
 
  /*
   * Start the interpreter...
@@ -172,5 +174,5 @@ define_string(char *name,	/* I - Variable to set */
 
 
 /*
- * End of "$Id: pstoraster.c,v 1.3 1999/05/10 17:22:04 mike Exp $".
+ * End of "$Id: pstoraster.c,v 1.4 1999/05/10 21:34:54 mike Exp $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.6 1999/05/10 17:42:00 mike Exp $"
+# "$Id: Makefile,v 1.7 1999/05/10 21:34:46 mike Exp $"
 #
 #   GNU Ghostscript makefile for the Common UNIX Printing System (CUPS).
 #
@@ -120,9 +120,9 @@ clean:
 
 install:	$(TARGETS)
 	-$(MKDIR) $(SERVERROOT)/filter
-	cp pstoraster $(SERVERROOT)/filter
+	$(CP) pstoraster $(SERVERROOT)/filter
 	-$(MKDIR) $(DATADIR)/pstoraster
-	cp $(DFILES) $(DATADIR)/pstoraster
+	$(CP) $(DFILES) $(DATADIR)/pstoraster
 
 #
 # genarch - generate the architecture configuration file.
@@ -145,5 +145,5 @@ $(OBJS):	arch.h ../config.h ../Makedefs
 gconf.o iconf.o gscdef.o:	gconfig.h
 
 #
-# End of "$Id: Makefile,v 1.6 1999/05/10 17:42:00 mike Exp $".
+# End of "$Id: Makefile,v 1.7 1999/05/10 21:34:46 mike Exp $".
 #
