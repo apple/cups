@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertodymo.c,v 1.3 2001/07/18 18:01:58 mike Exp $"
+ * "$Id: rastertodymo.c,v 1.4 2001/07/18 20:45:51 mike Exp $"
  *
  *   DYMO label printer filter for the Common UNIX Printing System (CUPS).
  *
@@ -60,9 +60,8 @@ int		Page,			/* Current page */
  */
 
 void	Setup(void);
-void	StartPage(ppd_file_t *ppd, cups_page_header_t *header);
+void	StartPage(cups_page_header_t *header);
 void	EndPage(void);
-void	Shutdown(void);
 
 void	CancelJob(int sig);
 
@@ -76,11 +75,15 @@ void	CancelJob(int sig);
 void
 Setup(void)
 {
+  int	i;		/* Looping var */
+
+
  /*
-  * Send a reset sequence.
+  * Clear any remaining data...
   */
 
-  printf("\033@");
+  for (i = 0; i < 100; i ++)
+    putchar(0x1b);
 }
 
 
@@ -89,8 +92,7 @@ Setup(void)
  */
 
 void
-StartPage(ppd_file_t         *ppd,	/* I - PPD file */
-          cups_page_header_t *header)	/* I - Page header */
+StartPage(cups_page_header_t *header)	/* I - Page header */
 {
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
@@ -177,21 +179,6 @@ EndPage(void)
 
 
 /*
- * 'Shutdown()' - Shutdown the printer.
- */
-
-void
-Shutdown(void)
-{
- /*
-  * Send a reset sequence.
-  */
-
-  printf("\033@");
-}
-
-
-/*
  * 'CancelJob()' - Cancel the current job...
  */
 
@@ -215,7 +202,6 @@ CancelJob(int sig)			/* I - Signal */
   */
 
   EndPage();
-  Shutdown();
 
   exit(0);
 }
@@ -233,7 +219,6 @@ main(int  argc,		/* I - Number of command-line arguments */
   cups_raster_t		*ras;	/* Raster stream for printing */
   cups_page_header_t	header;	/* Page header from file */
   int			y;	/* Current line */
-  ppd_file_t		*ppd;	/* PPD file */
 
 
  /*
@@ -279,8 +264,6 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Initialize the print device...
   */
 
-  ppd = ppdOpenFile(getenv("PPD"));
-
   Setup();
 
  /*
@@ -303,7 +286,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     * Start the page...
     */
 
-    StartPage(ppd, &header);
+    StartPage(&header);
 
    /*
     * Loop for each line on the page...
@@ -353,15 +336,6 @@ main(int  argc,		/* I - Number of command-line arguments */
   }
 
  /*
-  * Shutdown the printer...
-  */
-
-  Shutdown();
-
-  if (ppd)
-    ppdClose(ppd);
-
- /*
   * Close the raster stream...
   */
 
@@ -383,5 +357,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertodymo.c,v 1.3 2001/07/18 18:01:58 mike Exp $".
+ * End of "$Id: rastertodymo.c,v 1.4 2001/07/18 20:45:51 mike Exp $".
  */
