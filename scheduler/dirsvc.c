@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.40 1999/07/30 13:31:52 mike Exp $"
+ * "$Id: dirsvc.c,v 1.41 1999/09/17 19:11:46 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -180,8 +180,12 @@ UpdateBrowseList(void)
   if ((bytes = recvfrom(BrowseSocket, packet, sizeof(packet), 0, 
                         (struct sockaddr *)&addr, &len)) <= 0)
   {
-    LogMessage(LOG_ERROR, "UpdateBrowseList: recv failed - %s.",
+    LogMessage(LOG_ERROR, "Browse recv failed - %s.",
                strerror(errno));
+    LogMessage(LOG_ERROR, "Browsing turned off.");
+
+    StopBrowsing();
+    Browsing = 0;
     return;
   }
 
@@ -191,8 +195,12 @@ UpdateBrowseList(void)
 #else
   if ((bytes = recv(BrowseSocket, packet, sizeof(packet), 0)) <= 0)
   {
-    LogMessage(LOG_ERROR, "UpdateBrowseList: recv failed - %s.",
+    LogMessage(LOG_ERROR, "Browse recv failed - %s.",
                strerror(errno));
+    LogMessage(LOG_ERROR, "Browsing turned off.");
+
+    StopBrowsing();
+    Browsing = 0;
     return;
   }
 
@@ -540,5 +548,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.40 1999/07/30 13:31:52 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.41 1999/09/17 19:11:46 mike Exp $".
  */
