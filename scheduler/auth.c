@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.25 2000/01/27 03:38:34 mike Exp $"
+ * "$Id: auth.c,v 1.26 2000/02/24 02:37:06 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -509,7 +509,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
   {
     LogMessage(L_WARN, "IsAuthorized: group name \"%s\" does not exist!",
                best->group_name);
-    return (HTTP_UNAUTHORIZED);
+    return (HTTP_FORBIDDEN);
   }
 
   for (i = 0; grp->gr_mem[i] != NULL; i ++)
@@ -529,7 +529,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
   DEBUG_puts("IsAuthorized: user not in group!");
 
-  return (HTTP_UNAUTHORIZED);
+  return (HTTP_FORBIDDEN);
 }
 
 
@@ -734,5 +734,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.25 2000/01/27 03:38:34 mike Exp $".
+ * End of "$Id: auth.c,v 1.26 2000/02/24 02:37:06 mike Exp $".
  */
