@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.205 2003/04/14 18:33:26 mike Exp $"
+ * "$Id: job.c,v 1.206 2003/04/14 20:04:16 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1753,6 +1753,7 @@ StartJob(int       id,			/* I - Job ID */
   }
 
 #ifdef __APPLE__
+  strlcpy(processPath, "<CFProcessPath>", sizeof(processPath));
   envp[envc ++] = processPath;
 #endif	/* __APPLE__ */
 
@@ -2629,5 +2630,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.205 2003/04/14 18:33:26 mike Exp $".
+ * End of "$Id: job.c,v 1.206 2003/04/14 20:04:16 mike Exp $".
  */
