@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.122 2003/08/04 18:45:51 swdev Exp $"
+ * "$Id: http.c,v 1.123 2003/08/28 15:16:07 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -2019,7 +2019,7 @@ http_wait(http_t *http,			/* I - HTTP data */
 
     getrlimit(RLIMIT_NOFILE, &limit);
 
-    http->input_set = calloc(1, (limit.rlim_cur + 7) / 8);
+    http->input_set = calloc(1, (limit.rlim_cur + 31) / 32);
 #endif /* WIN32 */
 
     if (!http->input_set)
@@ -2410,5 +2410,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.122 2003/08/04 18:45:51 swdev Exp $".
+ * End of "$Id: http.c,v 1.123 2003/08/28 15:16:07 mike Exp $".
  */
