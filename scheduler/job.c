@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.233 2004/10/08 20:18:02 mike Exp $"
+ * "$Id: job.c,v 1.234 2004/12/16 20:03:12 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1522,7 +1522,8 @@ StartJob(int       id,			/* I - Job ID */
 
       if ((strcmp(attr->name, "page-label") == 0 ||
            strcmp(attr->name, "page-border") == 0 ||
-           strncmp(attr->name, "number-up", 9) == 0) &&
+           strncmp(attr->name, "number-up", 9) == 0 ||
+	   strcmp(attr->name, "page-set") == 0) &&
 	  banner_page)
         continue;
 
@@ -2840,5 +2841,5 @@ set_hold_until(job_t *job, 		/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c,v 1.233 2004/10/08 20:18:02 mike Exp $".
+ * End of "$Id: job.c,v 1.234 2004/12/16 20:03:12 mike Exp $".
  */

@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lprm.man,v 1.7 2004/08/11 13:48:15 mike Exp $"
+.\" "$Id: lprm.man,v 1.8 2004/12/16 20:03:12 mike Exp $"
 .\"
 .\"   lprm man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -15,20 +15,20 @@
 .\"       Attn: CUPS Licensing Information
 .\"       Easy Software Products
 .\"       44141 Airport View Drive, Suite 204
-.\"       Hollywood, Maryland 20636-3142 USA
+.\"       Hollywood, Maryland 20636 USA
 .\"
 .\"       Voice: (301) 373-9600
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lprm 1 "Common UNIX Printing System" "23 January 2001" "Easy Software Products"
+.TH lprm 1 "Common UNIX Printing System" "16 December 2004" "Easy Software Products"
 .SH NAME
 lprm \- cancel print jobs
 .SH SYNOPSIS
 .B lprm
-[ -E ] [ - ] [ -P
+[ -E ] [ -P
 .I destination
-] [
+]  [ - ] [
 .I job ID(s)
 ]
 .SH DESCRIPTION
@@ -50,5 +50,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2004 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lprm.man,v 1.7 2004/08/11 13:48:15 mike Exp $".
+.\" End of "$Id: lprm.man,v 1.8 2004/12/16 20:03:12 mike Exp $".
 .\"
