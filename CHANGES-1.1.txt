@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The scheduler's built-in broadcast throttling was
+	  ineffective since incoming packets would cause the
+	  next group of outgoing packets to be sent immediately
+	  rather than waiting for the next time slot (STR #211)
 	- Added a new ppdSetConformance() function to set the
 	  conformance requirements for PPD files. Currently only
 	  two levels are defined, PPD_CONFORM_RELAXED and

@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.47 2003/07/19 21:57:49 mike Exp $"
+ * "$Id: main.c,v 1.57.2.48 2003/08/01 15:21:05 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -92,6 +92,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 			*next;		/* Next job */
   listener_t		*lis;		/* Current listener */
   time_t		activity;	/* Activity timer */
+  time_t		browse_time;	/* Next browse send time */
   time_t		senddoc_time;	/* Send-Document time */
 #ifdef HAVE_MALLINFO
   time_t		mallinfo_time;	/* Malloc information time */
@@ -415,6 +416,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Loop forever...
   */
 
+  browse_time  = time(NULL);
   senddoc_time = time(NULL);
 
 #ifdef HAVE_MALLINFO
@@ -641,7 +643,11 @@ main(int  argc,				/* I - Number of command-line arguments */
         UpdateSLPBrowse();
 #endif /* HAVE_LIBSLP */
 
-      SendBrowseList();
+      if (time(NULL) > browse_time)
+      {
+        SendBrowseList();
+	browse_time = time(NULL);
+      }
     }
 
    /*
@@ -1106,5 +1112,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.47 2003/07/19 21:57:49 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.48 2003/08/01 15:21:05 mike Exp $".
  */
