@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The httpUpdate() function could return HTTP_ERROR
+	  instead of the HTTP status if the server closed the
+	  connection before the client received the whole
+	  response (STR #611)
 	- The LPD mini-daemon did not allow the administrator to
 	  force banner pages on (STR #605)
 	- Added PAM support for Darwin/MacOS X (STR #550)
