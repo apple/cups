@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-sharedlibs.m4,v 1.1 2001/06/27 19:06:46 mike Exp $"
+dnl "$Id: cups-sharedlibs.m4,v 1.2 2001/06/27 19:40:51 mike Exp $"
 dnl
 dnl   Shared library support for the Common UNIX Printing System (CUPS).
 dnl
@@ -50,8 +50,8 @@ if test x$enable_shared != xno; then
 		AIX*)
 			LIBCUPS="libcups_s.a"
 			LIBCUPSIMAGE="libcupsimage_s.a"
-			DSO="ld"
-			DSOFLAGS="$DSOFLAGS -G -o \$@"
+			DSO="\$(CC)"
+			DSOFLAGS="$DSOFLAGS -Wl,-bexpall,-bM:SRE,-bnoentry"
 			;;
 		*)
 			echo "Warning: shared libraries may not be supported.  Trying -shared"
@@ -129,5 +129,5 @@ AC_SUBST(DSOLIBS)
 AC_SUBST(IMGLIBS)
 
 dnl
-dnl End of "$Id: cups-sharedlibs.m4,v 1.1 2001/06/27 19:06:46 mike Exp $".
+dnl End of "$Id: cups-sharedlibs.m4,v 1.2 2001/06/27 19:40:51 mike Exp $".
 dnl
