@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.115 2003/03/13 05:44:22 mike Exp $"
+ * "$Id: http.c,v 1.116 2003/04/08 03:45:15 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -832,7 +832,10 @@ httpFlush(http_t *http)	/* I - HTTP data */
   char	buffer[8192];	/* Junk buffer */
 
 
-  while (httpRead(http, buffer, sizeof(buffer)) > 0);
+  if (http->state != HTTP_WAITING)
+  {
+    while (httpRead(http, buffer, sizeof(buffer)) > 0);
+  }
 }
 
 
@@ -1604,6 +1607,7 @@ httpUpdate(http_t *http)		/* I - HTTP data */
 	case HTTP_POST_RECV :
 	case HTTP_PUT :
 	    http->state ++;
+	case HTTP_POST_SEND :
 	    break;
 
 	default :
@@ -1821,7 +1825,7 @@ httpEncode64(char       *out,	/* I - String to write to */
 int				/* O - Content length */
 httpGetLength(http_t *http)	/* I - HTTP data */
 {
-  DEBUG_printf(("httpGetLength(%p)\n", http));
+  DEBUG_printf(("httpGetLength(%p), state = %d\n", http, http->state));
 
   if (strcasecmp(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked") == 0)
   {
@@ -2347,5 +2351,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.115 2003/03/13 05:44:22 mike Exp $".
+ * End of "$Id: http.c,v 1.116 2003/04/08 03:45:15 mike Exp $".
  */

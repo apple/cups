@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.156 2003/03/30 21:43:01 mike Exp $"
+ * "$Id: client.c,v 1.157 2003/04/08 03:45:17 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2898,6 +2898,9 @@ pipe_command(client_t *con,		/* I - Client connection */
 		ipp_port[1024],		/* IPP_PORT environment variable */
 		lang[1024],		/* LANG environment variable */
 		ld_library_path[1024],	/* LD_LIBRARY_PATH environment variable */
+		ld_preload[1024],	/* LD_PRELOAD environment variable */
+		dyld_library_path[1024],/* DYLD_LIBRARY_PATH environment variable */
+		shlib_path[1024],	/* SHLIB_PATH environment variable */
 		nlspath[1024],		/* NLSPATH environment variable */
 		query_string[10240],	/* QUERY_STRING env variable */
 		remote_addr[1024],	/* REMOTE_ADDR environment variable */
@@ -3017,17 +3020,26 @@ pipe_command(client_t *con,		/* I - Client connection */
              getenv("LD_LIBRARY_PATH"));
     envp[envc ++] = ld_library_path;
   }
-  else if (getenv("DYLD_LIBRARY_PATH") != NULL)
+
+  if (getenv("LD_PRELOAD") != NULL)
   {
-    snprintf(ld_library_path, sizeof(ld_library_path), "DYLD_LIBRARY_PATH=%s",
-             getenv("DYLD_LIBRARY_PATH"));
-    envp[envc ++] = ld_library_path;
+    snprintf(ld_preload, sizeof(ld_preload), "LD_PRELOAD=%s",
+             getenv("LD_PRELOAD"));
+    envp[envc ++] = ld_preload;
   }
-  else if (getenv("SHLIB_PATH") != NULL)
+
+  if (getenv("DYLD_LIBRARY_PATH") != NULL)
   {
-    snprintf(ld_library_path, sizeof(ld_library_path), "SHLIB_PATH=%s",
+    snprintf(dyld_library_path, sizeof(dyld_library_path), "DYLD_LIBRARY_PATH=%s",
+             getenv("DYLD_LIBRARY_PATH"));
+    envp[envc ++] = dyld_library_path;
+  }
+
+  if (getenv("SHLIB_PATH") != NULL)
+  {
+    snprintf(shlib_path, sizeof(shlib_path), "SHLIB_PATH=%s",
              getenv("SHLIB_PATH"));
-    envp[envc ++] = ld_library_path;
+    envp[envc ++] = shlib_path;
   }
 
   if (getenv("NLSPATH") != NULL)
@@ -3291,5 +3303,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.156 2003/03/30 21:43:01 mike Exp $".
+ * End of "$Id: client.c,v 1.157 2003/04/08 03:45:17 mike Exp $".
  */
