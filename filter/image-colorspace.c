@@ -1,5 +1,5 @@
 /*
- * "$Id: image-colorspace.c,v 1.15 1999/10/01 14:35:33 mike Exp $"
+ * "$Id: image-colorspace.c,v 1.16 1999/12/10 21:47:56 mike Exp $"
  *
  *   Colorspace conversions for the Common UNIX Printing System (CUPS).
  *
@@ -322,8 +322,7 @@ ImageRGBToCMYK(const ib_t *in,	/* I - Input pixels */
 {
   int	c, m, y, k,		/* CMYK values */
 	km,			/* Maximum K value */
-	diff,			/* Color differences */
-	divk;			/* Color divisor */
+	diff;			/* Color differences */
   int	cc, cm, cy;		/* Calibrated CMY values */
 
 
@@ -338,24 +337,9 @@ ImageRGBToCMYK(const ib_t *in,	/* I - Input pixels */
       if ((km = max(c, max(m, y))) > k)
         k = k * k / km;
 
-      if (k == 255)
-        c = m = y = 0;
-      else if (k > 0)
-      {
-        divk = 255 - k;
-	c    = 255 * (c - k) / divk;
-	m    = 255 * (m - k) / divk;
-	y    = 255 * (y - k) / divk;
-
-	if (c > 255)
-	  c = 255;
-
-	if (m > 255)
-	  m = 255;
-
-	if (y > 255)
-	  y = 255;
-      }
+      c -= k;
+      m -= k;
+      y -= k;
 
       cc = (ImageMatrix[0][0][c] +
             ImageMatrix[0][1][m] +
@@ -400,24 +384,12 @@ ImageRGBToCMYK(const ib_t *in,	/* I - Input pixels */
       y = 255 - *in++;
       k = min(c, min(m, y));
 
-      if (k == 255)
-        c = m = y = 0;
-      else if (k > 0)
-      {
-        divk = 255 - k;
-	c    = 255 * (c - k) / divk;
-	m    = 255 * (m - k) / divk;
-	y    = 255 * (y - k) / divk;
+      if ((km = max(c, max(m, y))) > k)
+        k = k * k / km;
 
-	if (c > 255)
-	  c = 255;
-
-	if (m > 255)
-	  m = 255;
-
-	if (y > 255)
-	  y = 255;
-      }
+      c -= k;
+      m -= k;
+      y -= k;
 
       *out++ = c;
       *out++ = m;
@@ -907,5 +879,5 @@ zshear(float mat[3][3],	/* I - Matrix */
 
 
 /*
- * End of "$Id: image-colorspace.c,v 1.15 1999/10/01 14:35:33 mike Exp $".
+ * End of "$Id: image-colorspace.c,v 1.16 1999/12/10 21:47:56 mike Exp $".
  */

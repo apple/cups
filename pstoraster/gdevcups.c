@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.16 1999/12/10 17:13:14 mike Exp $"
+ * "$Id: gdevcups.c,v 1.17 1999/12/10 21:47:58 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -586,8 +586,7 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 {
   gx_color_index	i;			/* Temporary index */
   gx_color_value	ic, im, iy, ik, mk;	/* Integral CMYK values */
-  float			divk,			/* Black "divisor" */
-			diff;			/* Average color difference */
+  float			diff;			/* Average color difference */
   int			tc, tm, ty, tk;		/* Temporary color values */
 
 
@@ -756,44 +755,10 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
         if (mk > ik)
 	  ik = ik * ik / mk;
 
-        if (ik == gx_max_color_value)
-        {
-          ik = lut_rgb_color[ik];
-          ic = 0;
-          im = 0;
-          iy = 0;
-        }
-        else if (cups->header.cupsBitsPerColor == 1)
-        {
-          ic = lut_rgb_color[ic - ik];
-          im = lut_rgb_color[im - ik];
-          iy = lut_rgb_color[iy - ik];
-          ik = lut_rgb_color[ik];
-        }
-        else
-        {
-          divk = (float)gx_max_color_value / (float)(gx_max_color_value - ik);
-	  tc   = (float)(ic - ik) * divk;
-	  tm   = (float)(im - ik) * divk;
-	  ty   = (float)(iy - ik) * divk;
-
-          if (tc >= gx_max_color_value)
-	    ic = lut_rgb_color[gx_max_color_value];
-	  else
-	    ic = lut_rgb_color[tc];
-
-          if (tm >= gx_max_color_value)
-	    im = lut_rgb_color[gx_max_color_value];
-	  else
-	    im = lut_rgb_color[tm];
-
-          if (ty >= gx_max_color_value)
-	    iy = lut_rgb_color[gx_max_color_value];
-	  else
-	    iy = lut_rgb_color[ty];
-
-          ik = lut_rgb_color[ik];
-        }
+        ic = lut_rgb_color[ic - ik];
+        im = lut_rgb_color[im - ik];
+        iy = lut_rgb_color[iy - ik];
+        ik = lut_rgb_color[ik];
 
         switch (cups->header.cupsBitsPerColor)
         {
@@ -828,44 +793,10 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
         if (mk > ik)
 	  ik = ik * ik / mk;
 
-        if (ik == gx_max_color_value)
-        {
-          ik = lut_rgb_color[ik];
-          ic = 0;
-          im = 0;
-          iy = 0;
-        }
-        else if (cups->header.cupsBitsPerColor == 1)
-        {
-          ic = lut_rgb_color[ic - ik];
-          im = lut_rgb_color[im - ik];
-          iy = lut_rgb_color[iy - ik];
-          ik = lut_rgb_color[ik];
-        }
-        else
-        {
-          divk = (float)gx_max_color_value / (float)(gx_max_color_value - ik);
-	  tc   = (float)(ic - ik) * divk;
-	  tm   = (float)(im - ik) * divk;
-	  ty   = (float)(iy - ik) * divk;
-
-          if (tc >= gx_max_color_value)
-	    ic = lut_rgb_color[gx_max_color_value];
-	  else
-	    ic = lut_rgb_color[tc];
-
-          if (tm >= gx_max_color_value)
-	    im = lut_rgb_color[gx_max_color_value];
-	  else
-	    im = lut_rgb_color[tm];
-
-          if (ty >= gx_max_color_value)
-	    iy = lut_rgb_color[gx_max_color_value];
-	  else
-	    iy = lut_rgb_color[ty];
-
-          ik = lut_rgb_color[ik];
-        }
+        ic = lut_rgb_color[ic - ik];
+        im = lut_rgb_color[im - ik];
+        iy = lut_rgb_color[iy - ik];
+        ik = lut_rgb_color[ik];
 
         switch (cups->header.cupsBitsPerColor)
         {
@@ -925,44 +856,10 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
         if (mk > ik)
 	  ik = ik * ik / mk;
 
-        if (ik == gx_max_color_value)
-        {
-          ik = lut_rgb_color[ik];
-          ic = 0;
-          im = 0;
-          iy = 0;
-        }
-        else if (cups->header.cupsBitsPerColor == 1)
-        {
-          ic = lut_rgb_color[ic - ik];
-          im = lut_rgb_color[im - ik];
-          iy = lut_rgb_color[iy - ik];
-          ik = lut_rgb_color[ik];
-        }
-        else
-        {
-          divk = (float)gx_max_color_value / (float)(gx_max_color_value - ik);
-	  tc   = (float)(ic - ik) * divk;
-	  tm   = (float)(im - ik) * divk;
-	  ty   = (float)(iy - ik) * divk;
-
-          if (tc >= gx_max_color_value)
-	    ic = lut_rgb_color[gx_max_color_value];
-	  else
-	    ic = lut_rgb_color[tc];
-
-          if (tm >= gx_max_color_value)
-	    im = lut_rgb_color[gx_max_color_value];
-	  else
-	    im = lut_rgb_color[tm];
-
-          if (ty >= gx_max_color_value)
-	    iy = lut_rgb_color[gx_max_color_value];
-	  else
-	    iy = lut_rgb_color[ty];
-
-          ik = lut_rgb_color[ik];
-        }
+        ic = lut_rgb_color[ic - ik];
+        im = lut_rgb_color[im - ik];
+        iy = lut_rgb_color[iy - ik];
+        ik = lut_rgb_color[ik];
 
         switch (cups->header.cupsBitsPerColor)
         {
@@ -2447,5 +2344,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.16 1999/12/10 17:13:14 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.17 1999/12/10 21:47:58 mike Exp $".
  */

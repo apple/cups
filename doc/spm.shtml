@@ -394,7 +394,7 @@ cupsAddOption(const char *name,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -434,7 +434,7 @@ cupsAddOption(const char *name,
 
 /* Declare the options array */
 int           num_options;
-cups_option_t *options;
+<A HREF="#cups_option_t">cups_option_t</A> *options;
 
 /* Initialize the options array */
 num_options = 0;
@@ -457,20 +457,20 @@ num_options = cupsAddOption("resolution", "300dpi", num_options, &amp;options);
 
 <PRE>
 int
-cupsCancelJob(const char *printer,
+cupsCancelJob(const char *dest,
               int job);
 </PRE>
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD>printer</TD>
-	<TD>Printer name</TD>
+	<TD>dest</TD>
+	<TD>Printer or class name</TD>
 </TR>
 <TR>
 	<TD>job</TD>
@@ -480,66 +480,217 @@ cupsCancelJob(const char *printer,
 
 <H3>Returns</H3>
 
-<P>1 on success, 0 on failure.
+<P>1 on success, 0 on failure. On failure the error can be found by calling
+<A HREF="#cupsLastError"><CODE>cupsLastError()</CODE></A>.
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<P><CODE>cupsCancelJob()</CODE> cancels the specifies job.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups.h&gt;
+
+cupsCancelJob("LaserJet", 1);
+</PRE>
 
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsGetClasses"><CODE>cupsGetClasses()</CODE></A>,
+<A HREF="#cupsGetPrinters"><CODE>cupsGetPrinters()</CODE></A>,
+<A HREF="#cupsLastError"><CODE>cupsLastError()</CODE></A>,
+<A HREF="#cupsPrintFile"><CODE>cupsPrintFile()</CODE></A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsDoFileRequest()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsDoFileRequest">cupsDoFileRequest()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+ipp_t *
+cupsDoFileRequest(http_t *http,
+                  ipp_t *request,
+                  const char *resource,
+		  const char *filename);
+</PRE>
+
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>HTTP connection to server.</TD>
+</TR>
+<TR>
+	<TD>request</TD>
+	<TD>IPP request data.</TD>
+</TR>
+<TR>
+	<TD>resource</TD>
+	<TD>HTTP resource name for POST.</TD>
+</TR>
+<TR>
+	<TD>filename</TD>
+	<TD>File to send with POST request (<CODE>NULL</CODE> pointer if none.)</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>IPP response data or <CODE>NULL</CODE> if the request fails. On failure
+the error can be found by calling
+<A HREF="#cupsLastError"><CODE>cupsLastError()</CODE></A>.
+
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<P><CODE>cupsDoFileRequest()</CODE> does a HTTP POST request and provides the
+IPP request and optionally the contents of a file to the IPP server. It also
+handles resubmitting the request and performing password authentication as
+needed.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups.h&gt;
+
+<A HREF="#http_t">http_t</A>      *http;
+<A HREF="#cups_lang_t">cups_lang_t</A> *language;
+<A HREF="#ipp_t">ipp_t</A>       *request;
+ipp_t       *response;
+
+...
+
+/* Get the default language */
+language = <A HREF="#cupsLangDefault">cupsLangDefault()</A>;
+
+/* Create a new IPP request */
+request  = <A HREF="#ippNew">ippNew()</A>;
+
+request-&gt;request.op.operation_id = IPP_PRINT_FILE;
+request-&gt;request.op.request_id   = 1;
+
+/* Add required attributes */
+<A HREF="#ippAddString">ippAddString</A>(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+             "attributes-charset", NULL, <A HREF="#cupsLangEncoding">cupsLangEncoding</A>(language));
+
+ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+             "attributes-natural-language", NULL,
+             language != NULL ? language-&gt;language : "C");
+
+ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+             NULL, "ipp://hostname/resource");
+
+ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+             NULL, <A HREF="#cupsUser">cupsUser()</A>);
+
+/* Do the request... */
+response = cupsDoFileRequest(http, request, "/resource", "filename.txt");
+</PRE>
 
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsLangDefault"><CODE>cupsLangDefault()</CODE></A>,
+<A HREF="#cupsLangEncoding"><CODE>cupsLangEncoding()</CODE></A>,
+<A HREF="#cupsUser"><CODE>cupsUser()</CODE></A>,
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>,
+<A HREF="#ippAddString"><CODE>ippAddString()</CODE></A>,
+<A HREF="#ippNew"><CODE>ippNew()</CODE></A>
 
-<!-- NEW PAGE --><H2><A NAME="">cupsDoRequest()</A></H2>
+<!-- NEW PAGE --><H2><A NAME="cupsDoRequest">cupsDoRequest()</A></H2>
 
 <H3>Usage</H3>
 
+<PRE>
+ipp_t *
+cupsDoRequest(http_t *http,
+              ipp_t *request,
+              const char *resource);
+</PRE>
+
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
 </TR>
 <TR>
-	<TD></TD>
-	<TD></TD>
+	<TD>http</TD>
+	<TD>HTTP connection to server.</TD>
+</TR>
+<TR>
+	<TD>request</TD>
+	<TD>IPP request data.</TD>
+</TR>
+<TR>
+	<TD>resource</TD>
+	<TD>HTTP resource name for POST.</TD>
 </TR>
 </TABLE></CENTER>
 
 <H3>Returns</H3>
 
+<P>IPP response data or <CODE>NULL</CODE> if the request fails. On failure
+the error can be found by calling
+<A HREF="#cupsLastError"><CODE>cupsLastError()</CODE></A>.
+
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<P><CODE>cupsDoRequest()</CODE> does a HTTP POST request and provides
+the IPP request to the IPP server. It also handles resubmitting the
+request and performing password authentication as needed.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups.h&gt;
+
+<A HREF="#http_t">http_t</A>      *http;
+<A HREF="#cups_lang_t">cups_lang_t</A> *language;
+<A HREF="#ipp_t">ipp_t</A>       *request;
+ipp_t       *response;
+
+...
+
+/* Get the default language */
+language = <A HREF="#cupsLangDefault">cupsLangDefault()</A>;
+
+/* Create a new IPP request */
+request  = <A HREF="#ippNew">ippNew()</A>;
+
+request-&gt;request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+request-&gt;request.op.request_id   = 1;
+
+/* Add required attributes */
+<A HREF="#ippAddString">ippAddString</A>(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+             "attributes-charset", NULL, <A HREF="#cupsLangEncoding">cupsLangEncoding</A>(language));
+
+ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+             "attributes-natural-language", NULL,
+             language != NULL ? language-&gt;language : "C");
+
+ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+             NULL, "ipp://hostname/resource");
+
+/* Do the request... */
+response = cupsDoRequest(http, request, "/resource");
+</PRE>
 
 <H3>See Also</H3>
 
+<P>
+<A HREF="#cupsLangDefault"><CODE>cupsLangDefault()</CODE></A>,
+<A HREF="#cupsLangEncoding"><CODE>cupsLangEncoding()</CODE></A>,
+<A HREF="#cupsUser"><CODE>cupsUser()</CODE></A>,
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>,
+<A HREF="#ippAddString"><CODE>ippAddString()</CODE></A>,
+<A HREF="#ippNew"><CODE>ippNew()</CODE></A>
 
 <!-- NEW PAGE --><H2><A NAME="">cupsFreeOptions()</A></H2>
 
@@ -547,7 +698,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -562,7 +713,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -573,7 +724,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -588,7 +739,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -599,7 +750,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -614,7 +765,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -625,7 +776,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -640,7 +791,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -651,7 +802,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -666,7 +817,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -677,7 +828,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -692,7 +843,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -703,7 +854,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -718,7 +869,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -729,7 +880,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -744,7 +895,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -755,7 +906,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -770,7 +921,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -781,7 +932,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -796,7 +947,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -807,7 +958,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -822,7 +973,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -833,7 +984,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -848,7 +999,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -859,7 +1010,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -874,7 +1025,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -885,7 +1036,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -900,7 +1051,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -911,7 +1062,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -926,7 +1077,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -937,7 +1088,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -952,7 +1103,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -963,7 +1114,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -978,7 +1129,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -989,7 +1140,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1004,7 +1155,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1015,7 +1166,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1030,7 +1181,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1041,7 +1192,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1056,7 +1207,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1067,7 +1218,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1082,7 +1233,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1093,7 +1244,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1108,7 +1259,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1119,7 +1270,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1134,7 +1285,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1145,7 +1296,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1160,7 +1311,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1171,7 +1322,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1186,7 +1337,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1197,7 +1348,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1212,7 +1363,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1223,7 +1374,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1238,7 +1389,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1249,7 +1400,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1264,7 +1415,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1275,7 +1426,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1290,7 +1441,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1301,7 +1452,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1316,7 +1467,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1327,7 +1478,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1342,7 +1493,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1353,7 +1504,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1368,7 +1519,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1379,7 +1530,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1394,7 +1545,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1405,7 +1556,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1420,7 +1571,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1431,7 +1582,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1446,7 +1597,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1457,7 +1608,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1472,7 +1623,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1483,7 +1634,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1498,7 +1649,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1509,7 +1660,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1524,7 +1675,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1535,7 +1686,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1550,7 +1701,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1561,7 +1712,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1576,7 +1727,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1587,7 +1738,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1602,7 +1753,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1613,7 +1764,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1628,7 +1779,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1639,7 +1790,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1654,7 +1805,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1665,7 +1816,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1680,7 +1831,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1691,7 +1842,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1706,7 +1857,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1717,7 +1868,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1732,7 +1883,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1743,7 +1894,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1758,7 +1909,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1769,7 +1920,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1784,7 +1935,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1795,7 +1946,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1810,7 +1961,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1821,7 +1972,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1836,7 +1987,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1847,7 +1998,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1862,7 +2013,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1873,7 +2024,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1888,7 +2039,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1899,7 +2050,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1914,7 +2065,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1925,7 +2076,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1940,7 +2091,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1951,7 +2102,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1966,7 +2117,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -1977,7 +2128,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -1992,7 +2143,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2003,7 +2154,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2018,7 +2169,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2029,7 +2180,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2044,7 +2195,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2055,7 +2206,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2070,7 +2221,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2081,7 +2232,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2096,7 +2247,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2107,7 +2258,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2122,7 +2273,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2133,7 +2284,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2148,7 +2299,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2159,7 +2310,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2174,7 +2325,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2185,7 +2336,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2200,7 +2351,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2211,7 +2362,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2226,7 +2377,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2237,7 +2388,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2252,7 +2403,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2263,7 +2414,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2278,7 +2429,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2289,7 +2440,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2304,7 +2455,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2315,7 +2466,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2330,7 +2481,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2341,7 +2492,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2356,7 +2507,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2367,7 +2518,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2382,7 +2533,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2393,7 +2544,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2408,7 +2559,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2419,7 +2570,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2434,7 +2585,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2445,7 +2596,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2460,7 +2611,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2471,7 +2622,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2486,7 +2637,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2497,7 +2648,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2512,7 +2663,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2523,7 +2674,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2538,7 +2689,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2549,7 +2700,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2564,7 +2715,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2575,7 +2726,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2590,7 +2741,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2601,7 +2752,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2616,7 +2767,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2627,7 +2778,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2642,7 +2793,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2653,7 +2804,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2668,7 +2819,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2679,7 +2830,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2694,7 +2845,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2705,7 +2856,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2720,7 +2871,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2731,7 +2882,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2746,7 +2897,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2757,7 +2908,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2772,7 +2923,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2783,7 +2934,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2798,7 +2949,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2809,7 +2960,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2824,7 +2975,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2835,7 +2986,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2850,7 +3001,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2861,7 +3012,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2876,7 +3027,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2887,7 +3038,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2902,7 +3053,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2913,7 +3064,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2928,7 +3079,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2939,7 +3090,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2954,7 +3105,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2965,7 +3116,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -2980,7 +3131,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -2991,7 +3142,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -3006,7 +3157,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -3017,7 +3168,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -3032,7 +3183,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -3043,7 +3194,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -3058,7 +3209,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -3069,7 +3220,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -3084,7 +3235,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -3095,7 +3246,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -3110,7 +3261,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -3121,7 +3272,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -3136,7 +3287,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -3147,7 +3298,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -3162,7 +3313,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
@@ -3173,7 +3324,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Arguments</H3>
 
-<CENTER><TABLE WIDTH="80%">
+<CENTER><TABLE WIDTH="80%" BORDER>
 <TR>
 	<TH>Argument</TH>
 	<TH>Description</TH>
@@ -3188,7 +3339,7 @@ cupsCancelJob(const char *printer,
 
 <H3>Description</H3>
 
-<H3>Examples</H3>
+<H3>Example</H3>
 
 <H3>See Also</H3>
 
