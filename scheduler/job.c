@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.98 2000/11/17 19:57:14 mike Exp $"
+ * "$Id: job.c,v 1.99 2000/11/17 21:56:19 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1647,9 +1647,19 @@ UpdateJob(job_t *job)		/* I - Job to check */
       if (job->sheets != NULL)
       {
 	if (!sscanf(message, "%*d%d", &copies))
+	{
           job->sheets->values[0].integer ++;
+
+	  if (job->printer->page_limit)
+	    UpdateQuota(job->printer, job->username, 1, 0);
+        }
 	else
+	{
           job->sheets->values[0].integer += copies;
+
+	  if (job->printer->page_limit)
+	    UpdateQuota(job->printer, job->username, copies, 0);
+        }
       }
 
       LogPage(job, message);
@@ -2615,5 +2625,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.98 2000/11/17 19:57:14 mike Exp $".
+ * End of "$Id: job.c,v 1.99 2000/11/17 21:56:19 mike Exp $".
  */

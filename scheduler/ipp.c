@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.107 2000/11/17 19:57:13 mike Exp $"
+ * "$Id: ipp.c,v 1.108 2000/11/17 21:56:19 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -35,6 +35,7 @@
  *   add_queued_job_count()      - Add the "queued-job-count" attribute for
  *   cancel_all_jobs()           - Cancel all print jobs.
  *   cancel_job()                - Cancel a print job.
+ *   check_quotas()              - Check quotas for a printer and user.
  *   copy_attribute()            - Copy a single attribute.
  *   copy_attrs()                - Copy attributes from one request to another.
  *   create_job()                - Print a file to a printer or class.
@@ -92,10 +93,11 @@ static void	add_printer_state_reasons(client_t *con, printer_t *p);
 static void	add_queued_job_count(client_t *con, printer_t *p);
 static void	cancel_all_jobs(client_t *con, ipp_attribute_t *uri);
 static void	cancel_job(client_t *con, ipp_attribute_t *uri);
+static int	check_quotas(client_t *con, printer_t *p);
 static void	copy_attribute(ipp_t *to, ipp_attribute_t *attr);
 static void	copy_attrs(ipp_t *to, ipp_t *from, ipp_attribute_t *req,
 		           ipp_tag_t group);
-static void	copy_banner(client_t *con, job_t *job, const char *name);
+static int	copy_banner(client_t *con, job_t *job, const char *name);
 static int	copy_file(const char *from, const char *to);
 static void	create_job(client_t *con, ipp_attribute_t *uri);
 static void	delete_printer(client_t *con, ipp_attribute_t *uri);
@@ -762,7 +764,7 @@ add_class(client_t        *con,		/* I - Client connection */
  * 'add_file()' - Add a file to a job.
  */
 
-static int
+static int				/* O - 0 on success, -1 on error */
 add_file(client_t    *con,		/* I - Connection to client */
          job_t       *job,		/* I - Job to add to */
          mime_type_t *filetype)		/* I - Type of file */
@@ -1479,6 +1481,100 @@ cancel_job(client_t        *con,	/* I - Client connection */
 
 
 /*
+ * 'check_quotas()' - Check quotas for a printer and user.
+ */
+
+static int			/* O - 1 if OK, 0 if not */
+check_quotas(client_t  *con,	/* I - Client connection */
+             printer_t *p)	/* I - Printer or class */
+{
+  int		i;		/* Looping var */
+  ipp_attribute_t *attr;	/* Current attribute */
+  char		username[33];	/* Username */
+  quota_t	*q;		/* Quota data */
+
+
+ /*
+  * Check input...
+  */
+
+  if (con == NULL || p == NULL)
+    return (0);
+
+  if (p->num_users == 0 && p->k_limit == 0 && p->page_limit == 0)
+    return (1);
+
+ /*
+  * Figure out who is printing...
+  */
+
+  attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME);
+
+  if (con->username[0])
+  {
+    strncpy(username, con->username, sizeof(username) - 1);
+    username[sizeof(username) - 1] = '\0';
+  }
+  else if (attr != NULL)
+  {
+    LogMessage(L_DEBUG, "check_quotas: requesting-user-name = \'%s\'",
+               attr->values[0].string.text);
+
+    strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
+    username[sizeof(username) - 1] = '\0';
+  }
+  else
+    strcpy(username, "anonymous");
+
+ /*
+  * Check against users...
+  */
+
+  if (p->num_users)
+  {
+    for (i = 0; i < p->num_users; i ++)
+      if (strcmp(username, p->users[i]) == 0)
+	break;
+
+    if ((i < p->num_users) == p->deny_users)
+    {
+      LogMessage(L_INFO, "Denying user \"%s\" access to printer \"%s\"...",
+        	 username, p->name);
+      return (0);
+    }
+  }
+
+ /*
+  * Check quotas...
+  */
+
+  if (p->k_limit || p->page_limit)
+  {
+    if ((q = UpdateQuota(p, username, 0, 0)) == NULL)
+    {
+      LogMessage(L_ERROR, "Unable to allocate quota data for user \"%s\"!",
+                 username);
+      return (0);
+    }
+
+    if ((q->k_count >= p->k_limit && p->k_limit) ||
+        (q->page_count >= p->page_limit && p->page_limit))
+    {
+      LogMessage(L_INFO, "User \"%s\" is over the quota limit...",
+                 username);
+      return (0);
+    }
+  }
+
+ /*
+  * If we have gotten this far, we're done!
+  */
+
+  return (1);
+}
+
+
+/*
  * 'copy_attribute()' - Copy a single attribute.
  */
 
@@ -1652,7 +1748,6 @@ static void
 create_job(client_t        *con,	/* I - Client connection */
 	   ipp_attribute_t *uri)	/* I - Printer URI */
 {
-  int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Current attribute */
   const char		*dest;		/* Destination */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
@@ -1673,6 +1768,7 @@ create_job(client_t        *con,	/* I - Client connection */
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
   printer_t		*printer;	/* Printer data */
+  int			kbytes;		/* Size of print file */
 
 
   DEBUG_printf(("create_job(%08x, %08x)\n", con, uri));
@@ -1747,29 +1843,11 @@ create_job(client_t        *con,	/* I - Client connection */
     return;
   }
 
- /*
-  * Figure out who is printing...
-  */
-
-  attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME);
-
-  if (con->username[0])
+  if (!check_quotas(con, printer))
   {
-    strncpy(job->username, con->username, sizeof(job->username) - 1);
-    job->username[sizeof(job->username) - 1] = '\0';
+    send_ipp_error(con, IPP_NOT_POSSIBLE);
+    return;
   }
-  else if (attr != NULL)
-  {
-    LogMessage(L_DEBUG, "create_job: requesting-user-name = \'%s\'",
-               attr->values[0].string.text);
-
-    strncpy(job->username, attr->values[0].string.text,
-            sizeof(job->username) - 1);
-    job->username[sizeof(job->username) - 1] = '\0';
-  }
-  else
-    strcpy(job->username, "anonymous");
-
 
  /*
   * Create the job and set things up...
@@ -1897,7 +1975,9 @@ create_job(client_t        *con,	/* I - Client connection */
     * See if we need to add the starting sheet...
     */
 
-    copy_banner(con, job, attr->values[0].string.text);
+    kbytes = copy_banner(con, job, attr->values[0].string.text);
+
+    UpdateQuota(printer, job->username, 0, kbytes);
   }
 
  /*
@@ -1931,12 +2011,13 @@ create_job(client_t        *con,	/* I - Client connection */
  *                   specified job.
  */
 
-static void
+static int			/* O - Size of banner file in kbytes */
 copy_banner(client_t   *con,	/* I - Client connection */
             job_t      *job,	/* I - Job information */
             const char *name)	/* I - Name of banner */
 {
   int		i;		/* Looping var */
+  int		kbytes;		/* Size of banner file in kbytes */
   char		filename[1024];	/* Job filename */
   banner_t	*banner;	/* Pointer to banner */
   FILE		*in;		/* Input file */
@@ -1957,14 +2038,14 @@ copy_banner(client_t   *con,	/* I - Client connection */
   if (name == NULL ||
       strcmp(name, "none") == 0 ||
       (banner = FindBanner(name)) == NULL)
-    return;
+    return (0);
 
  /*
   * Open the banner and job files...
   */
 
   if (add_file(con, job, banner->filetype))
-    return;
+    return (0);
 
   snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot, job->id,
            job->num_files);
@@ -1973,7 +2054,7 @@ copy_banner(client_t   *con,	/* I - Client connection */
     LogMessage(L_ERROR, "copy_banner: Unable to create banner job file %s - %s",
                filename, strerror(errno));
     job->num_files --;
-    return;
+    return (0);
   }
 
   if ((in = fopen(banner->filename, "r")) == NULL)
@@ -1983,7 +2064,7 @@ copy_banner(client_t   *con,	/* I - Client connection */
     LogMessage(L_ERROR, "copy_banner: Unable to open banner template file %s - %s",
                filename, strerror(errno));
     job->num_files --;
-    return;
+    return (0);
   }
 
  /*
@@ -2111,10 +2192,14 @@ copy_banner(client_t   *con,	/* I - Client connection */
 
   fclose(in);
 
+  kbytes = (ftell(out) + 1023) / 1024;
+
   if ((attr = ippFindAttribute(job->attrs, "job-k-octets", IPP_TAG_INTEGER)) != NULL)
-    attr->values[0].integer += (ftell(out) + 1023) / 1024;
+    attr->values[0].integer += kbytes;
 
   fclose(out);
+
+  return (kbytes);
 }
 
 
@@ -3166,6 +3251,7 @@ print_job(client_t        *con,		/* I - Client connection */
 					/* Textual name of mime type */
   printer_t		*printer;	/* Printer data */
   struct stat		fileinfo;	/* File information */
+  int			kbytes;		/* Size of file */
 
 
   DEBUG_printf(("print_job(%08x, %08x)\n", con, uri));
@@ -3343,6 +3429,12 @@ print_job(client_t        *con,		/* I - Client connection */
     return;
   }
 
+  if (!check_quotas(con, printer))
+  {
+    send_ipp_error(con, IPP_NOT_POSSIBLE);
+    return;
+  }
+
  /*
   * Create the job and set things up...
   */
@@ -3425,8 +3517,13 @@ print_job(client_t        *con,		/* I - Client connection */
     attr = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
                          "job-k-octets", 0);
 
-  if (!stat(con->filename, &fileinfo))
-    attr->values[0].integer = (fileinfo.st_size + 1023) / 1024;
+  if (stat(con->filename, &fileinfo))
+    kbytes = 0;
+  else
+    kbytes = (fileinfo.st_size + 1023) / 1024;
+
+  UpdateQuota(printer, job->username, 0, kbytes);
+  attr->values[0].integer += kbytes;
 
   ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "time-at-creation",
                 time(NULL));
@@ -3471,7 +3568,9 @@ print_job(client_t        *con,		/* I - Client connection */
     * Add the starting sheet...
     */
 
-    copy_banner(con, job, attr->values[0].string.text);
+    kbytes = copy_banner(con, job, attr->values[0].string.text);
+
+    UpdateQuota(printer, job->username, 0, kbytes);
   }
    
  /*
@@ -3496,7 +3595,8 @@ print_job(client_t        *con,		/* I - Client connection */
     * Yes...
     */
 
-    copy_banner(con, job, attr->values[1].string.text);
+    kbytes = copy_banner(con, job, attr->values[1].string.text);
+    UpdateQuota(printer, job->username, 0, kbytes);
   }
 
  /*
@@ -3957,6 +4057,7 @@ send_document(client_t        *con,	/* I - Client connection */
   char			filename[1024];	/* Job filename */
   printer_t		*printer;	/* Current printer */
   struct stat		fileinfo;	/* File information */
+  int			kbytes;		/* Size of file */
 
 
   DEBUG_printf(("send_document(%08x, %08x)\n", con, uri));
@@ -4154,9 +4255,20 @@ send_document(client_t        *con,	/* I - Client connection */
   if (add_file(con, job, filetype))
     return;
 
-  if ((attr = ippFindAttribute(job->attrs, "job-k-octets", IPP_TAG_INTEGER)) != NULL &&
-      !stat(con->filename, &fileinfo))
-    attr->values[0].integer += (fileinfo.st_size + 1023) / 1024;
+  if (job->dtype & CUPS_PRINTER_CLASS)
+    printer = FindClass(job->dest);
+  else
+    printer = FindPrinter(job->dest);
+
+  if (stat(con->filename, &fileinfo))
+    kbytes = 0;
+  else
+    kbytes = (fileinfo.st_size + 1023) / 1024;
+
+  UpdateQuota(printer, job->username, 0, kbytes);
+
+  if ((attr = ippFindAttribute(job->attrs, "job-k-octets", IPP_TAG_INTEGER)) != NULL)
+    attr->values[0].integer += kbytes;
 
   snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot, job->id,
            job->num_files);
@@ -4178,11 +4290,6 @@ send_document(client_t        *con,	/* I - Client connection */
     * See if we need to add the ending sheet...
     */
 
-    if (job->dtype & CUPS_PRINTER_CLASS)
-      printer = FindClass(job->dest);
-    else
-      printer = FindPrinter(job->dest);
-
     if (printer != NULL && !(printer->type & CUPS_PRINTER_REMOTE) &&
         (attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) != NULL &&
         attr->num_values > 1)
@@ -4191,7 +4298,8 @@ send_document(client_t        *con,	/* I - Client connection */
       * Yes...
       */
 
-      copy_banner(con, job, attr->values[1].string.text);
+      kbytes = copy_banner(con, job, attr->values[1].string.text);
+      UpdateQuota(printer, job->username, 0, kbytes);
     }
 
     if (job->state->values[0].integer == IPP_JOB_STOPPED)
@@ -4926,5 +5034,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.107 2000/11/17 19:57:13 mike Exp $".
+ * End of "$Id: ipp.c,v 1.108 2000/11/17 21:56:19 mike Exp $".
  */
