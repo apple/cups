@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.21 1999/07/27 11:37:17 mike Exp $"
+# "$Id: Makefile,v 1.22 1999/07/30 13:34:46 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,9 +28,10 @@ include ../Makedefs
 # Object files...
 #
 
-OBJS	=	emit.o filter.o http.o ipp.o language.o mark.o mime.o \
+LIBOBJS	=	emit.o filter.o http.o ipp.o language.o mark.o mime.o \
 		options.o page.o ppd.o raster.o string.o type.o usersys.o \
 		util.o
+OBJS	=	$(LIBOBJS) testhttp.o testmime.o testppd.o
 
 #
 # Header files to install...
@@ -42,7 +43,7 @@ HEADERS	=	cups.h http.h ipp.h language.h mime.h ppd.h raster.h
 # Targets in this directory...
 #
 
-TARGETS	=	$(LIBCUPS) testmime testppd testhttp
+TARGETS	=	$(LIBCUPS) testhttp testmime testppd
 
 #
 # Make all targets...
@@ -67,26 +68,26 @@ install:	all
 	-$(MKDIR) $(LIBDIR)
 	$(CP) $(LIBCUPS) $(LIBDIR)
 	if test $(LIBCUPS) != "libcups.a"; then \
-		$(LN) $(LIBCUPS) `basename $(LIBCUPS) .1` \
+		$(LN) $(LIBCUPS) `basename $(LIBCUPS) .1`; \
 	fi
 
 #
 # libcups.so.1, libcups.sl.1
 #
 
-libcups.so.1 libcups.sl.1:	$(OBJS) ../Makedefs
+libcups.so.1 libcups.sl.1:	$(LIBOBJS) ../Makedefs
 	echo Linking $@...
-	$(DSO) $@ $(OBJS)
+	$(DSO) $@ $(LIBOBJS)
 	-$(LN) $@ `basename $@ .1`
 
 #
 # libcups.a
 #
 
-libcups.a:	$(OBJS)
+libcups.a:	$(LIBOBJS)
 	echo Archiving $@...
 	$(RM) $@
-	$(AR) $(ARFLAGS) $@ $(OBJS)
+	$(AR) $(ARFLAGS) $@ $(LIBOBJS)
 	$(RANLIB) $@
 
 #
@@ -145,5 +146,5 @@ testppd:	testppd.o libcups.a
 testppd.o:	ppd.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.21 1999/07/27 11:37:17 mike Exp $".
+# End of "$Id: Makefile,v 1.22 1999/07/30 13:34:46 mike Exp $".
 #
