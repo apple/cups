@@ -1,9 +1,10 @@
-CHANGES.txt - 07/31/2000
+CHANGES.txt - 08/04/2000
 ------------------------
 
 CHANGES IN CUPS v1.1.2
 
 	- Makefile/configure fixes
+	- RPM spec file and EPM list file fixes
 	- The cupsTempFile() function now uses a different
 	  algorithm for generating temp files and "reserves"
 	  them to avoid possible security exploitation.
@@ -25,6 +26,30 @@ CHANGES IN CUPS v1.1.2
 	- Added format and banner options to LPD backend.
 	- The send-document operation didn't start a job
 	  immediately when last-document was true.
+	- The set-job-attributes operation didn't correctly
+	  replace the current job-hold-until value.
+	- Removed the option wrapper code from ppdEmit() and
+	  friends since it caused problems with Ghostscript
+	  and many PS printers.
+	- Was setting TZ environment variable twice for job
+	  filters.
+	- Added syslog logging in cups-lpd to aide in
+	  debugging problems.
+	- The HP-UX parallel port backend did not list the
+	  available parallel ports on some systems (printf
+	  calling problem...)
+	- The lp and lpr commands overrode user options if
+	  -d/-P were specified after -o.
+	- The scheduler would crash with a */* filter.
+	- Added support for a "default" filter for unknown file
+	  types.  The example provided in the mime.types and
+	  mime.convs file prints unknown files as if "-oraw" was
+	  specified for the job.  This functionality is disabled
+	  by default.
+	- The "compatibility" mode fix for older backends did not
+	  work for smbspool.  Added a workaround for it.
+	- The HP-GL/2 filter didn't perform the right pen scaling
+	  with some files and the "fitplot" option.
 
 
 CHANGES IN CUPS v1.1.1
