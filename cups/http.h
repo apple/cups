@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.15 1999/02/26 15:10:23 mike Exp $"
+ * "$Id: http.h,v 1.16 1999/04/28 15:52:05 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -270,7 +270,7 @@ typedef struct
  * Prototypes...
  */
 
-extern void		httpBlocking(http_t *http, int blocking);
+#  define		httpBlocking(http,b)	(http)->blocking = (b)
 #  define		httpClearFields(http)	memset((http)->fields, 0, sizeof((http)->fields)),\
 						httpSetField((http), HTTP_FIELD_HOST, (http)->hostname)
 extern void		httpClose(http_t *http);
@@ -311,5 +311,5 @@ extern int		httpGetLength(http_t *http);
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.15 1999/02/26 15:10:23 mike Exp $".
+ * End of "$Id: http.h,v 1.16 1999/04/28 15:52:05 mike Exp $".
  */

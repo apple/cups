@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.27 1999/04/23 18:46:53 mike Exp $"
+ * "$Id: http.c,v 1.28 1999/04/28 15:52:04 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -343,39 +343,7 @@ httpReconnect(http_t *http)	/* I - HTTP data */
     return (-1);
   }
 
-  httpBlocking(http, http->blocking);
-
   return (0);
-}
-
-
-/*
- * 'httpBlocking()' - Make a HTTP connection blocking or non-blocking...
- */
-
-void
-httpBlocking(http_t *http,	/* I - HTTP data */
-             int    blocking)	/* I - 1 = block on reads, 0 = don't block */
-{
-#ifdef WIN32
-  u_long val;
-
-  if (http == NULL)
-    return;
-
-  val = !blocking;
-  ioctlsocket(http->fd, FIONBIO, &val);
-#else
-  if (http == NULL)
-    return;
-
-  if (blocking)
-    fcntl(http->fd, F_SETFL, fcntl(http->fd, F_GETFL) & ~FNONBLK);
-  else
-    fcntl(http->fd, F_SETFL, fcntl(http->fd, F_GETFL) | FNONBLK);
-#endif /* WIN32 */
-
-  http->blocking = blocking;
 }
 
 
@@ -1367,5 +1335,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.27 1999/04/23 18:46:53 mike Exp $".
+ * End of "$Id: http.c,v 1.28 1999/04/28 15:52:04 mike Exp $".
  */
