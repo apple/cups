@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The LPD backend now supports timeout and
+	  sanitize_title options (default to 300 and yes,
+	  respectively) and has some additional changes to
+	  reduce the chances of multiple copies being printed
+	  when only one copy was requested.
 	- Fixed a polygon drawing bug in the HP-GL/2 filter.
 	- Added a robots.txt file to the standard install to
 	  prevent search engines from indexing the CUPS server.

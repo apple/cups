@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.28.2.20 2003/01/29 15:38:43 mike Exp $"
+ * "$Id: lpd.c,v 1.28.2.21 2003/03/24 20:51:37 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -25,11 +25,13 @@
  *
  * Contents:
  *
- *   main()        - Send a file to the printer or server.
- *   lpd_command() - Send an LPR command sequence and wait for a reply.
- *   lpd_queue()   - Queue a file using the Line Printer Daemon protocol.
- *   lpd_timeout() - Handle timeout alarms...
- *   lpd_write()   - Write a buffer of data to an LPD server.
+ *   main()            - Send a file to the printer or server.
+ *   lpd_command()     - Send an LPR command sequence and wait for a reply.
+ *   lpd_queue()       - Queue a file using the Line Printer Daemon protocol.
+ *   lpd_timeout()     - Handle timeout alarms...
+ *   lpd_write()       - Write a buffer of data to an LPD server.
+ *   rresvport()       - A simple implementation of rresvport().
+ *   sigterm_handler() - Handle 'terminate' signals that stop the backend.
  */
 
 /*
@@ -55,6 +57,13 @@
 #  include <arpa/inet.h>
 #  include <netdb.h>
 #endif /* WIN32 */
+
+
+/*
+ * Globals...
+ */
+
+static char	tmpfilename[1024] = "";	/* Temporary spool file name */
 
 
 /*
@@ -104,13 +113,14 @@ extern int	rresvport(int *port);
  * Local functions...
  */
 
-static int	lpd_command(int lpd_fd, char *format, ...);
+static int	lpd_command(int lpd_fd, int timeout, char *format, ...);
 static int	lpd_queue(char *hostname, char *printer, char *filename,
-		          int fromstdin, char *user, char *title, int copies,
+		          char *user, char *title, int copies,
 			  int banner, int format, int order, int reserve,
-			  int manual_copies);
+			  int manual_copies, int timeout);
 static void	lpd_timeout(int sig);
 static int	lpd_write(int lpd_fd, char *buffer, int length);
+static void	sigterm_handler(int sig);
 
 
 /*
@@ -121,31 +131,32 @@ static int	lpd_write(int lpd_fd, char *buffer, int length);
  *    printer-uri job-id user title copies options [file]
  */
 
-int			/* O - Exit status */
-main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
-     char *argv[])	/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
+     char *argv[])			/* I - Command-line arguments */
 {
-  char	method[255],	/* Method in URI */
-	hostname[1024],	/* Hostname */
-	username[255],	/* Username info (not used) */
-	resource[1024],	/* Resource info (printer name) */
-	*options,	/* Pointer to options */
-	name[255],	/* Name of option */
-	value[255],	/* Value of option */
-	*ptr,		/* Pointer into name or value */
-	filename[1024],	/* File to print */
-	title[256];	/* Title string */
-  int	port;		/* Port number (not used) */
-  int	status;		/* Status of LPD job */
-  int	banner;		/* Print banner page? */
-  int	format;		/* Print format */
-  int	order;		/* Order of control/data files */
-  int	reserve;	/* Reserve priviledged port? */
-  int	manual_copies,	/* Do manual copies? */
-	copies;		/* Number of copies */
+  char			method[255],	/* Method in URI */
+			hostname[1024],	/* Hostname */
+			username[255],	/* Username info (not used) */
+			resource[1024],	/* Resource info (printer name) */
+			*options,	/* Pointer to options */
+			name[255],	/* Name of option */
+			value[255],	/* Value of option */
+			*ptr,		/* Pointer into name or value */
+			*filename,	/* File to print */
+			title[256];	/* Title string */
+  int			port;		/* Port number (not used) */
+  int			status;		/* Status of LPD job */
+  int			banner;		/* Print banner page? */
+  int			format;		/* Print format */
+  int			order;		/* Order of control/data files */
+  int			reserve;	/* Reserve priviledged port? */
+  int			sanitize_title;	/* Sanitize title string? */
+  int			manual_copies,	/* Do manual copies? */
+			timeout,	/* Timeout */
+			copies;		/* Number of copies */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;
-			/* Actions for POSIX signals */
+  struct sigaction	action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
@@ -156,17 +167,24 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   setbuf(stderr, NULL);
 
  /*
-  * Ignore SIGPIPE signals...
+  * Ignore SIGPIPE and catch SIGTERM signals...
   */
 
 #ifdef HAVE_SIGSET
   sigset(SIGPIPE, SIG_IGN);
+  sigset(SIGTERM, sigterm_handler);
 #elif defined(HAVE_SIGACTION)
   memset(&action, 0, sizeof(action));
   action.sa_handler = SIG_IGN;
   sigaction(SIGPIPE, &action, NULL);
+
+  sigemptyset(&action.sa_mask);
+  sigaddset(&action.sa_mask, SIGTERM);
+  action.sa_handler = sigterm_handler;
+  sigaction(SIGTERM, &action, NULL);
 #else
   signal(SIGPIPE, SIG_IGN);
+  signal(SIGTERM, sigterm_handler);
 #endif /* HAVE_SIGSET */
 
  /*
@@ -202,7 +220,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     int  bytes;		/* Number of bytes read */
 
 
-    if ((fd = cupsTempFd(filename, sizeof(filename))) < 0)
+    if ((fd = cupsTempFd(tmpfilename, sizeof(tmpfilename))) < 0)
     {
       perror("ERROR: unable to create temporary file");
       return (1);
@@ -213,14 +231,15 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       {
         perror("ERROR: unable to write to temporary file");
 	close(fd);
-	unlink(filename);
+	unlink(tmpfilename);
 	return (1);
       }
 
     close(fd);
+    filename = tmpfilename;
   }
   else
-    strlcpy(filename, argv[6], sizeof(filename));
+    filename = argv[6];
 
  /*
   * Extract the hostname and printer name from the URI...
@@ -232,11 +251,13 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * See if there are any options...
   */
 
-  banner        = 0;
-  format        = 'l';
-  order         = ORDER_CONTROL_DATA;
-  reserve       = 0;
-  manual_copies = 1;
+  banner         = 0;
+  format         = 'l';
+  order          = ORDER_CONTROL_DATA;
+  reserve        = 0;
+  manual_copies  = 1;
+  timeout        = 300;
+  sanitize_title = 1;
 
   if ((options = strchr(resource, '?')) != NULL)
   {
@@ -332,13 +353,33 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       else if (strcasecmp(name, "manual_copies") == 0)
       {
        /*
-        * Set port reservation mode...
+        * Set manual copies...
 	*/
 
         manual_copies = !value[0] ||
 	        	strcasecmp(value, "on") == 0 ||
 	 		strcasecmp(value, "yes") == 0 ||
 	 		strcasecmp(value, "true") == 0;
+      }
+      else if (strcasecmp(name, "sanitize_title") == 0)
+      {
+       /*
+        * Set sanitize title...
+	*/
+
+        sanitize_title = !value[0] ||
+	        	strcasecmp(value, "on") == 0 ||
+	 		strcasecmp(value, "yes") == 0 ||
+	 		strcasecmp(value, "true") == 0;
+      }
+      else if (strcasecmp(name, "timeout") == 0)
+      {
+       /*
+        * Set the timeout...
+	*/
+
+	if (atoi(value) > 0)
+	  timeout = atoi(value);
       }
     }
   }
@@ -349,9 +390,17 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
   strlcpy(title, argv[3], sizeof(title));
 
-  for (ptr = title; *ptr; ptr ++)
-    if (!isalnum(*ptr) && !isspace(*ptr))
-      *ptr = '_';
+  if (sanitize_title)
+  {
+   /*
+    * Sanitize the title string so that we don't cause problems on
+    * the remote end...
+    */
+
+    for (ptr = title; *ptr; ptr ++)
+      if (!isalnum(*ptr) && !isspace(*ptr))
+	*ptr = '_';
+  }
 
  /*
   * Queue the job...
@@ -370,24 +419,24 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       copies        = atoi(argv[4]);
     }
 
-    status = lpd_queue(hostname, resource + 1, filename, 0,
+    status = lpd_queue(hostname, resource + 1, filename,
                        argv[2] /* user */, title, copies,
-		       banner, format, order, reserve, manual_copies);
+		       banner, format, order, reserve, manual_copies, timeout);
 
     if (!status)
       fprintf(stderr, "PAGE: 1 %d\n", atoi(argv[4]));
   }
   else
-    status = lpd_queue(hostname, resource + 1, filename, 1,
+    status = lpd_queue(hostname, resource + 1, filename,
                        argv[2] /* user */, title, 1,
-		       banner, format, order, reserve, 1);
+		       banner, format, order, reserve, 1, timeout);
 
  /*
   * Remove the temporary file if necessary...
   */
 
-  if (argc < 7)
-    unlink(filename);
+  if (tmpfilename[0])
+    unlink(tmpfilename);
 
  /*
   * Return the queue status...
@@ -403,6 +452,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 static int			/* O - Status of command */
 lpd_command(int  fd,		/* I - Socket connection to LPD host */
+            int  timeout,	/* I - Seconds to wait for a response */
             char *format,	/* I - printf()-style format string */
             ...)		/* I - Additional args as necessary */
 {
@@ -428,10 +478,11 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
 
   fprintf(stderr, "DEBUG: Sending command string (%d bytes)...\n", bytes);
 
-  alarm(30);
-
   if (lpd_write(fd, buf, bytes) < bytes)
+  {
+    perror("ERROR: Unable to send LPD command");
     return (-1);
+  }
 
  /*
   * Read back the status from the command and return it...
@@ -439,10 +490,14 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
 
   fprintf(stderr, "DEBUG: Reading command status...\n");
 
-  alarm(30);
+  alarm(timeout);
 
   if (recv(fd, &status, 1, 0) < 1)
+  {
+    fprintf(stderr, "WARNING: Remote host did not respond with command "
+	            "status byte after %d seconds!\n", timeout);
     status = errno;
+  }
 
   alarm(0);
 
@@ -456,19 +511,19 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
  * 'lpd_queue()' - Queue a file using the Line Printer Daemon protocol.
  */
 
-static int			/* O - Zero on success, non-zero on failure */
-lpd_queue(char *hostname,	/* I - Host to connect to */
-          char *printer,	/* I - Printer/queue name */
-	  char *filename,	/* I - File to print */
-          int  fromstdin,	/* I - Printing from stdin? */
-          char *user,		/* I - Requesting user */
-	  char *title,		/* I - Job title */
-	  int  copies,		/* I - Number of copies */
-	  int  banner,		/* I - Print LPD banner? */
-          int  format,		/* I - Format specifier */
-          int  order,		/* I - Order of data/control files */
-	  int  reserve,		/* I - Reserve ports? */
-	  int  manual_copies)	/* I - Do copies by hand... */
+static int				/* O - Zero on success, non-zero on failure */
+lpd_queue(char *hostname,		/* I - Host to connect to */
+          char *printer,		/* I - Printer/queue name */
+	  char *filename,		/* I - File to print */
+          char *user,			/* I - Requesting user */
+	  char *title,			/* I - Job title */
+	  int  copies,			/* I - Number of copies */
+	  int  banner,			/* I - Print LPD banner? */
+          int  format,			/* I - Format specifier */
+          int  order,			/* I - Order of data/control files */
+	  int  reserve,			/* I - Reserve ports? */
+	  int  manual_copies,		/* I - Do copies by hand... */
+	  int  timeout)			/* I - Timeout... */
 {
   FILE			*fp;		/* Job file */
   char			localhost[255];	/* Local host name */
@@ -594,28 +649,6 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
     fprintf(stderr, "INFO: Connected from port %d...\n", port);
 
    /*
-    * Now that we are "connected" to the port, ignore SIGTERM so that we
-    * can finish out any page data the driver sends (e.g. to eject the
-    * current page...  Only ignore SIGTERM if we are printing data from
-    * stdin (otherwise you can't cancel raw jobs...)
-    */
-
-    if (fromstdin)
-    {
-#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-      sigset(SIGTERM, SIG_IGN);
-#elif defined(HAVE_SIGACTION)
-      memset(&action, 0, sizeof(action));
-
-      sigemptyset(&action.sa_mask);
-      action.sa_handler = SIG_IGN;
-      sigaction(SIGTERM, &action, NULL);
-#else
-      signal(SIGTERM, SIG_IGN);
-#endif /* HAVE_SIGSET */
-    }
-
-   /*
     * Next, open the print file and figure out its size...
     */
 
@@ -638,7 +671,9 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
     * literal output...
     */
 
-    lpd_command(fd, "\002%s\n", printer);	/* Receive print job(s) */
+    if (lpd_command(fd, timeout, "\002%s\n",
+                    printer))		/* Receive print job(s) */
+      return (1);
 
     gethostname(localhost, sizeof(localhost));
     localhost[31] = '\0'; /* RFC 1179, Section 7.2 - host name < 32 chars */
@@ -668,13 +703,12 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
     if (order == ORDER_CONTROL_DATA)
     {
-      lpd_command(fd, "\002%d cfA%03.3d%s\n", strlen(control), getpid() % 1000,
-        	  localhost);
+      if (lpd_command(fd, timeout, "\002%d cfA%03.3d%s\n", strlen(control),
+                      getpid() % 1000, localhost))
+        return (1);
 
       fprintf(stderr, "INFO: Sending control file (%lu bytes)\n",
               (unsigned long)strlen(control));
-
-      alarm(30);
 
       if (lpd_write(fd, control, strlen(control) + 1) < (strlen(control) + 1))
       {
@@ -683,10 +717,14 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
       }
       else
       {
-        alarm(30);
+        alarm(timeout);
 
         if (read(fd, &status, 1) < 1)
+	{
+	  fprintf(stderr, "WARNING: Remote host did not respond with control "
+	                  "status byte after %d seconds!\n", timeout);
 	  status = errno;
+	}
 
         alarm(0);
       }
@@ -706,8 +744,10 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
       * Send the print file...
       */
 
-      lpd_command(fd, "\003%u dfA%03.3d%s\n", (unsigned)filestats.st_size,
-                  getpid() % 1000, localhost);
+      if (lpd_command(fd, timeout, "\003%u dfA%03.3d%s\n",
+                      (unsigned)filestats.st_size, getpid() % 1000,
+		      localhost))
+        return (1);
 
       fprintf(stderr, "INFO: Sending data file (%u bytes)\n",
               (unsigned)filestats.st_size);
@@ -735,13 +775,27 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
       if (tbytes < filestats.st_size)
 	status = errno;
       else if (lpd_write(fd, "", 1) < 1)
+      {
+        perror("ERROR: Unable to send trailing nul to printer");
 	status = errno;
+      }
       else
       {
-        alarm(30);
+       /*
+        * Read the status byte from the printer; if we can't read the byte
+	* back now, we should set status to "errno", however at this point
+	* we know the printer got the whole file and we don't necessarily
+	* want to requeue it over and over...
+	*/
+
+	alarm(timeout);
 
         if (recv(fd, &status, 1, 0) < 1)
-	  status = errno;
+	{
+	  fprintf(stderr, "WARNING: Remote host did not respond with data "
+	                  "status byte after %d seconds!\n", timeout);
+	  status = 0;
+        }
 
 	alarm(0);
       }
@@ -755,13 +809,12 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
     if (status == 0 && order == ORDER_DATA_CONTROL)
     {
-      lpd_command(fd, "\002%d cfA%03.3d%s\n", strlen(control), getpid() % 1000,
-        	  localhost);
+      if (lpd_command(fd, timeout, "\002%d cfA%03.3d%s\n", strlen(control),
+                      getpid() % 1000, localhost))
+        return (1);
 
       fprintf(stderr, "INFO: Sending control file (%lu bytes)\n",
               (unsigned long)strlen(control));
-
-      alarm(30);
 
       if (lpd_write(fd, control, strlen(control) + 1) < (strlen(control) + 1))
       {
@@ -770,10 +823,14 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
       }
       else
       {
-        alarm(30);
+        alarm(timeout);
 
-	if (read(fd, &status, 1) < 1)
+        if (read(fd, &status, 1) < 1)
+	{
+	  fprintf(stderr, "WARNING: Remote host did not respond with control "
+	                  "status byte after %d seconds!\n", timeout);
 	  status = errno;
+	}
 
 	alarm(0);
       }
@@ -796,23 +853,8 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
       return (0);
 
    /*
-    * Restore the SIGTERM handler if we are waiting for a retry...
+    * Waiting for a retry...
     */
-
-    if (fromstdin)
-    {
-#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-      sigset(SIGTERM, SIG_DFL);
-#elif defined(HAVE_SIGACTION)
-      memset(&action, 0, sizeof(action));
-
-      sigemptyset(&action.sa_mask);
-      action.sa_handler = SIG_DFL;
-      sigaction(SIGTERM, &action, NULL);
-#else
-      signal(SIGTERM, SIG_DFL);
-#endif /* HAVE_SIGSET */
-    }
 
     sleep(30);
   }
@@ -824,7 +866,7 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
  */
 
 static void
-lpd_timeout(int sig)		/* I - Signal number */
+lpd_timeout(int sig)			/* I - Signal number */
 {
   (void)sig;
 
@@ -838,13 +880,13 @@ lpd_timeout(int sig)		/* I - Signal number */
  * 'lpd_write()' - Write a buffer of data to an LPD server.
  */
 
-static int			/* O - Number of bytes written or -1 on error */
-lpd_write(int  lpd_fd,		/* I - LPD socket */
-          char *buffer,		/* I - Buffer to write */
-	  int  length)		/* I - Number of bytes to write */
+static int				/* O - Number of bytes written or -1 on error */
+lpd_write(int  lpd_fd,			/* I - LPD socket */
+          char *buffer,			/* I - Buffer to write */
+	  int  length)			/* I - Number of bytes to write */
 {
-  int	bytes,			/* Number of bytes written */
-	total;			/* Total number of bytes written */
+  int	bytes,				/* Number of bytes written */
+	total;				/* Total number of bytes written */
 
 
   total = 0;
@@ -869,11 +911,11 @@ lpd_write(int  lpd_fd,		/* I - LPD socket */
  * 'rresvport()' - A simple implementation of rresvport().
  */
 
-int				/* O  - Socket or -1 on error */
-rresvport(int *port)		/* IO - Port number to bind to */
+int					/* O  - Socket or -1 on error */
+rresvport(int *port)			/* IO - Port number to bind to */
 {
-  struct sockaddr_in	addr;	/* Socket address */
-  int			fd;	/* Socket file descriptor */
+  struct sockaddr_in	addr;		/* Socket address */
+  int			fd;		/* Socket file descriptor */
 
 
  /*
@@ -951,6 +993,27 @@ rresvport(int *port)		/* IO - Port number to bind to */
 }
 #endif /* !HAVE_RRESVPORT */
 
+
 /*
- * End of "$Id: lpd.c,v 1.28.2.20 2003/01/29 15:38:43 mike Exp $".
+ * 'sigterm_handler()' - Handle 'terminate' signals that stop the backend.
+ */
+
+static void
+sigterm_handler(int sig)		/* I - Signal */
+{
+  (void)sig;	/* remove compiler warnings... */
+
+ /*
+  * Remove the temporary file if necessary...
+  */
+
+  if (tmpfilename[0])
+    unlink(tmpfilename);
+
+  exit(1);
+}
+
+
+/*
+ * End of "$Id: lpd.c,v 1.28.2.21 2003/03/24 20:51:37 mike Exp $".
  */
