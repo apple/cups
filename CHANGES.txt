@@ -144,6 +144,9 @@ CHANGES IN CUPS V1.1.9
 	- Added another fix to pstoraster for a bus error
 	  condition caused by a lack of parenthesis in the
 	  Ghostscript code.
+	- Added new "natural-scaling" option which scales the
+	  natural size of the image (percent of natural image
+	  size instead of percent of page size.)
 
 
 CHANGES IN CUPS V1.1.8

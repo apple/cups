@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.38 2001/05/09 14:59:05 mike Exp $"
+ * "$Id: imagetops.c,v 1.39 2001/06/27 15:34:18 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -304,6 +304,12 @@ main(int  argc,		/* I - Number of command-line arguments */
     
     xinches = (float)img->xsize / (float)xppi;
     yinches = (float)img->ysize / (float)yppi;
+
+    if ((val = cupsGetOption("natural-scaling")) != NULL)
+    {
+      xinches = xinches * atoi(val) / 100;
+      yinches = yinches * atoi(val) / 100;
+    }
 
     if (cupsGetOption("orientation", num_options, options) == NULL &&
         cupsGetOption("landscape", num_options, options) == NULL)
@@ -859,5 +865,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.38 2001/05/09 14:59:05 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.39 2001/06/27 15:34:18 mike Exp $".
  */
