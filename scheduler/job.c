@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.14 2002/04/21 12:47:05 mike Exp $"
+ * "$Id: job.c,v 1.124.2.15 2002/04/23 18:40:42 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1094,6 +1094,7 @@ StartJob(int       id,		/* I - Job ID */
 		cache[255],	/* RIP_MAX_CACHE environment variable */
 		tmpdir[1024],	/* TMPDIR environment variable */
 		ldpath[1024],	/* LD_LIBRARY_PATH environment variable */
+		nlspath[1024],	/* NLSPATH environment variable */
 		datadir[1024],	/* CUPS_DATADIR environment variable */
 		fontpath[1050];	/* CUPS_FONTPATH environment variable */
 
@@ -1504,6 +1505,7 @@ StartJob(int       id,		/* I - Job ID */
   snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
   snprintf(datadir, sizeof(datadir), "CUPS_DATADIR=%s", DataDir);
   snprintf(fontpath, sizeof(fontpath), "CUPS_FONTPATH=%s", FontPath);
+
   if (Classification[0] && !banner_page)
   {
     if ((attr = ippFindAttribute(current->attrs, "job-sheets",
@@ -1520,12 +1522,20 @@ StartJob(int       id,		/* I - Job ID */
   }
   else
     classification[0] = '\0';
+
   if (getenv("LD_LIBRARY_PATH") != NULL)
-    snprintf(ldpath, sizeof(ldpath), "LD_LIBRARY_PATH=%s", getenv("LD_LIBRARY_PATH"));
+    snprintf(ldpath, sizeof(ldpath), "LD_LIBRARY_PATH=%s",
+             getenv("LD_LIBRARY_PATH"));
   else if (getenv("DYLD_LIBRARY_PATH") != NULL)
-    snprintf(ldpath, sizeof(ldpath), "DYLD_LIBRARY_PATH=%s", getenv("DYLD_LIBRARY_PATH"));
+    snprintf(ldpath, sizeof(ldpath), "DYLD_LIBRARY_PATH=%s",
+             getenv("DYLD_LIBRARY_PATH"));
   else
     ldpath[0] = '\0';
+
+  if (getenv("NLSPATH") != NULL)
+    snprintf(nlspath, sizeof(nlspath), "NLSPATH=%s", getenv("NLSPATH"));
+  else
+    nlspath[0] = '\0';
 
   envp[0]  = path;
   envp[1]  = "SOFTWARE=CUPS/1.1";
@@ -1543,16 +1553,17 @@ StartJob(int       id,		/* I - Job ID */
   envp[13] = datadir;
   envp[14] = fontpath;
   envp[15] = ldpath;
-  envp[16] = classification;
-  envp[17] = NULL;
+  envp[16] = nlspath;
+  envp[17] = classification;
+  envp[18] = NULL;
 
   LogMessage(L_DEBUG, "StartJob: envp = \"%s\",\"%s\",\"%s\",\"%s\","
                       "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\","
-		      "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"",
+		      "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"",
 	     envp[0], envp[1], envp[2], envp[3], envp[4],
 	     envp[5], envp[6], envp[7], envp[8], envp[9],
 	     envp[10], envp[11], envp[12], envp[13], envp[14],
-	     envp[15], envp[16]);
+	     envp[15], envp[16], envp[17]);
 
   current->current_file ++;
 
@@ -2293,5 +2304,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.14 2002/04/21 12:47:05 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.15 2002/04/23 18:40:42 mike Exp $".
  */

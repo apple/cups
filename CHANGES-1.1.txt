@@ -5,6 +5,18 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- Now pass NLSPATH and DYLD_LIBRARY_PATH environment
+	  variables, if defined, to CGI and job processes.
+	- Removed the pstoraster filter (based on GNU
+	  Ghostscript 5.50) and now provide the raster "driver"
+	  and patch file necessary to use the current GNU
+	  Ghostscript 7.05 release.
+	- Removed unnecessary fonts and updated the Courier and
+	  Symbol fonts to the latest versions to better support
+	  non-ISOLatin1 text.
+	- The text filter now always embeds the Courier and
+	  Symbol fonts to ensure that they contain the full set
+	  of glyphs.
 	- The lp and lpr commands now only override the SIGINT
 	  handler if it is not being ignored (patch from Robert
 	  Ambrose for some interactive software that catches

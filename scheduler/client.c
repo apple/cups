@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.9 2002/04/21 12:47:03 mike Exp $"
+ * "$Id: client.c,v 1.91.2.10 2002/04/23 18:40:41 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2265,6 +2265,7 @@ pipe_command(client_t *con,	/* I - Client connection */
 	remote_user[1024],	/* REMOTE_USER env variable */
 	tmpdir[1024],		/* TMPDIR environment variable */
 	ldpath[1024],		/* LD_LIBRARY_PATH environment variable */
+	nlspath[1024],		/* NLSPATH environment variable */
 	datadir[1024],		/* CUPS_DATADIR environment variable */
 	root[1024],		/* CUPS_SERVERROOT environment variable */
 	query_string[10240];	/* QUERY_STRING env variable */
@@ -2351,9 +2352,18 @@ pipe_command(client_t *con,	/* I - Client connection */
   snprintf(root, sizeof(root), "CUPS_SERVERROOT=%s", ServerRoot);
 
   if (getenv("LD_LIBRARY_PATH") != NULL)
-    snprintf(ldpath, sizeof(ldpath), "LD_LIBRARY_PATH=%s", getenv("LD_LIBRARY_PATH"));
+    snprintf(ldpath, sizeof(ldpath), "LD_LIBRARY_PATH=%s",
+             getenv("LD_LIBRARY_PATH"));
+  else if (getenv("DYLD_LIBRARY_PATH") != NULL)
+    snprintf(ldpath, sizeof(ldpath), "DYLD_LIBRARY_PATH=%s",
+             getenv("DYLD_LIBRARY_PATH"));
   else
     ldpath[0] = '\0';
+
+  if (getenv("NLSPATH") != NULL)
+    snprintf(nlspath, sizeof(nlspath), "NLSPATH=%s", getenv("NLSPATH"));
+  else
+    nlspath[0] = '\0';
 
   envp[0]  = "PATH=/bin:/usr/bin";
   envp[1]  = "SERVER_SOFTWARE=CUPS/1.2";
@@ -2374,6 +2384,9 @@ pipe_command(client_t *con,	/* I - Client connection */
 
   if (ldpath[0])
     envp[envc ++] = ldpath;
+
+  if (nlspath[0])
+    envp[envc ++] = nlspath;
 
   if (con->operation == HTTP_GET)
   {
@@ -2522,5 +2535,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.9 2002/04/21 12:47:03 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.10 2002/04/23 18:40:41 mike Exp $".
  */
