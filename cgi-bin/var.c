@@ -1,5 +1,5 @@
 /*
- * "$Id: var.c,v 1.12 1999/10/26 22:39:49 mike Exp $"
+ * "$Id: var.c,v 1.13 1999/10/27 01:22:26 mike Exp $"
  *
  *   CGI form variable and array functions.
  *
@@ -253,7 +253,8 @@ cgiSetArray(const char *name,	/* I - Name of variable */
     if (element >= var->avalues)
     {
       var->avalues = element + 16;
-      var->values  = realloc(var->values, sizeof(char *) * var->avalues);
+      var->values  = (const char **)realloc((void *)(var->values),
+                                            sizeof(char *) * var->avalues);
     }
 
     if (element >= var->nvalues)
@@ -292,7 +293,8 @@ cgiSetSize(const char *name,	/* I - Name of variable */
   if (size >= var->avalues)
   {
     var->avalues = size + 16;
-    var->values  = realloc(var->values, sizeof(char *) * var->avalues);
+    var->values  = (const char **)realloc((void *)(var->values),
+                                          sizeof(char *) * var->avalues);
   }
 
   if (size > var->nvalues)
@@ -304,7 +306,7 @@ cgiSetSize(const char *name,	/* I - Name of variable */
   {
     for (i = size; i < var->nvalues; i ++)
       if (var->values[i])
-        free(var->values[i]);
+        free((void *)(var->values[i]));
   }
 
   var->nvalues = size;
@@ -648,5 +650,5 @@ cgi_sort_variables(void)
 
 
 /*
- * End of "$Id: var.c,v 1.12 1999/10/26 22:39:49 mike Exp $".
+ * End of "$Id: var.c,v 1.13 1999/10/27 01:22:26 mike Exp $".
  */

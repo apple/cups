@@ -1,5 +1,5 @@
 /*
- * "$Id: cgi.h,v 1.7 1999/10/26 22:39:48 mike Exp $"
+ * "$Id: cgi.h,v 1.8 1999/10/27 01:22:26 mike Exp $"
  *
  *   CGI support library definitions.
  *
@@ -26,6 +26,18 @@
 #  include <stdio.h>
 #  include <stdlib.h>
 #  include <string.h>
+#  include <ctype.h>
+
+#  ifdef WIN32
+#    include <direct.h>
+#    include <io.h>
+#    include <malloc.h>
+#    define strcasecmp(s,t)	stricmp((s),(t))
+#    define strncasecmp(s,t,n)	strnicmp((s),(t),(n))
+#  else
+#    include <unistd.h>
+#  endif /* WIN32 */
+
 
 /*
  * Prototypes...
@@ -65,5 +77,5 @@ extern void		cgiEMailClose(FILE *mail);
 #endif /* !_CGI_H_ */
 
 /*
- * End of "$Id: cgi.h,v 1.7 1999/10/26 22:39:48 mike Exp $".
+ * End of "$Id: cgi.h,v 1.8 1999/10/27 01:22:26 mike Exp $".
  */
