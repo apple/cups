@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.25 2003/04/17 14:20:49 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.26 2003/04/18 12:33:29 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -66,6 +66,16 @@ fi
 AC_PATH_PROG(RM,rm)
 AC_PATH_PROG(SED,sed)
 AC_PATH_PROG(STRIP,strip)
+
+if test "x$AR" = x; then
+	AC_MSG_ERROR([Unable to find required library archive command.])
+fi
+if test "x$CC" = x; then
+	AC_MSG_ERROR([Unable to find required C compiler command.])
+fi
+if test "x$CXX" = x; then
+	AC_MSG_ERROR([Unable to find required C++ compiler command.])
+fi
 
 dnl Architecture checks...
 AC_C_BIGENDIAN
@@ -192,5 +202,5 @@ AC_SUBST(BACKLIBS)
 AC_SUBST(COMMONLIBS)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.25 2003/04/17 14:20:49 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.26 2003/04/18 12:33:29 mike Exp $".
 dnl
