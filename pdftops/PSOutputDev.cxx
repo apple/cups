@@ -595,10 +595,8 @@ PSOutputDev::~PSOutputDev() {
     } else  {
       writePS("%%%%Trailer\n");
       writePS("end\n");
-      if (mode == psModeEPS) {
-	writePS("%%%%DocumentSuppliedResources:\n");
-	writePS("%s", embFontList->getCString());
-      }
+      writePS("%%%%DocumentSuppliedResources:\n");
+      writePS("%s", embFontList->getCString());
       if (level == psLevel1Sep || level == psLevel2Sep) {
          writePS("%%%%DocumentProcessColors:");
          if (processColors & psProcessCyan) {
@@ -893,12 +891,10 @@ void PSOutputDev::setupEmbeddedType1Font(Ref *id, char *psName) {
   obj2.free();
 
   // beginning comment
-  if (mode == psModeEPS) {
-    writePS("%%%%BeginResource: font %s\n", psName);
-    embFontList->append("%%+ font ");
-    embFontList->append(psName);
-    embFontList->append("\n");
-  }
+  writePS("%%%%BeginResource: font %s\n", psName);
+  embFontList->append("%%+ font ");
+  embFontList->append(psName);
+  embFontList->append("\n");
 
   // copy ASCII portion of font
   strObj.streamReset();
@@ -954,9 +950,7 @@ void PSOutputDev::setupEmbeddedType1Font(Ref *id, char *psName) {
   writePS("cleartomark\n");
 
   // ending comment
-  if (mode == psModeEPS) {
-    writePS("%%%%EndResource\n");
-  }
+  writePS("%%%%EndResource\n");
 
  err1:
   strObj.streamClose();
@@ -986,12 +980,10 @@ void PSOutputDev::setupEmbeddedType1Font(GString *fileName, char *psName) {
   fontFileNames[fontFileNameLen++] = fileName->copy();
 
   // beginning comment
-  if (mode == psModeEPS) {
-    writePS("%%%%BeginResource: font %s\n", psName);
-    embFontList->append("%%+ font ");
-    embFontList->append(psName);
-    embFontList->append("\n");
-  }
+  writePS("%%%%BeginResource: font %s\n", psName);
+  embFontList->append("%%+ font ");
+  embFontList->append(psName);
+  embFontList->append("\n");
 
   // copy the font file
   if (!(fontFile = fopen(fileName->getCString(), "rb"))) {
@@ -1003,9 +995,7 @@ void PSOutputDev::setupEmbeddedType1Font(GString *fileName, char *psName) {
   fclose(fontFile);
 
   // ending comment
-  if (mode == psModeEPS) {
-    writePS("%%%%EndResource\n");
-  }
+  writePS("%%%%EndResource\n");
 }
 
 void PSOutputDev::setupEmbeddedType1CFont(GfxFont *font, Ref *id,
@@ -1030,12 +1020,10 @@ void PSOutputDev::setupEmbeddedType1CFont(GfxFont *font, Ref *id,
   fontFileIDs[fontFileIDLen++] = *id;
 
   // beginning comment
-  if (mode == psModeEPS) {
-    writePS("%%%%BeginResource: font %s\n", psName);
-    embFontList->append("%%+ font ");
-    embFontList->append(psName);
-    embFontList->append("\n");
-  }
+  writePS("%%%%BeginResource: font %s\n", psName);
+  embFontList->append("%%+ font ");
+  embFontList->append(psName);
+  embFontList->append("\n");
 
   // convert it to a Type 1 font
   fontBuf = font->readEmbFontFile(xref, &fontLen);
@@ -1045,9 +1033,7 @@ void PSOutputDev::setupEmbeddedType1CFont(GfxFont *font, Ref *id,
   gfree(fontBuf);
 
   // ending comment
-  if (mode == psModeEPS) {
-    writePS("%%%%EndResource\n");
-  }
+  writePS("%%%%EndResource\n");
 }
 
 void PSOutputDev::setupEmbeddedTrueTypeFont(GfxFont *font, Ref *id,
@@ -1072,12 +1058,10 @@ void PSOutputDev::setupEmbeddedTrueTypeFont(GfxFont *font, Ref *id,
   fontFileIDs[fontFileIDLen++] = *id;
 
   // beginning comment
-  if (mode == psModeEPS) {
-    writePS("%%%%BeginResource: font %s\n", psName);
-    embFontList->append("%%+ font ");
-    embFontList->append(psName);
-    embFontList->append("\n");
-  }
+  writePS("%%%%BeginResource: font %s\n", psName);
+  embFontList->append("%%+ font ");
+  embFontList->append(psName);
+  embFontList->append("\n");
 
   // convert it to a Type 42 font
   fontBuf = font->readEmbFontFile(xref, &fontLen);
@@ -1087,9 +1071,7 @@ void PSOutputDev::setupEmbeddedTrueTypeFont(GfxFont *font, Ref *id,
   gfree(fontBuf);
 
   // ending comment
-  if (mode == psModeEPS) {
-    writePS("%%%%EndResource\n");
-  }
+  writePS("%%%%EndResource\n");
 }
 
 void PSOutputDev::setupImages(Dict *resDict) {

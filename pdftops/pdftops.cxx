@@ -78,9 +78,6 @@ int main(int argc, char *argv[]) {
     tempfile[0] = '\0';
   }
 
-  // Support "printCommands" debug option...
-//  if (getenv("DEBUG") != NULL) printCommands = 1;
-
   // Default to "Universal" size - min of A4 and Letter...
   width  = 595;
   length = 792;
@@ -121,7 +118,7 @@ int main(int argc, char *argv[]) {
   initParams("", tempfile);
 
   // open PDF file
-  doc = new PDFDoc(fileName, NULL, NULL);
+  doc = new PDFDoc(fileName, NULL, NULL, getenv("DEBUG") != NULL);
 
   // check for print permission
   if (doc->isOk() && doc->okToPrint())
