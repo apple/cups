@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertohp.c,v 1.8 2000/06/20 21:51:11 mike Exp $"
+ * "$Id: rastertohp.c,v 1.9 2000/07/21 15:25:45 mike Exp $"
  *
  *   Hewlett-Packard Page Control Language filter for the Common UNIX
  *   Printing System (CUPS).
@@ -148,7 +148,7 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
   }
 
   printf("\033&l%dP", header->PageSize[1] / 12);/* Set page length */
-  printf("\033&l3E");				/* Set top margin to 1/2 inch */
+  printf("\033&l0E");				/* Set top margin to 0 */
 
   printf("\033&l%dX", header->NumCopies);	/* Set number copies */
 
@@ -169,6 +169,10 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
   * Set graphics mode...
   */
 
+  printf("\033*t%dR", header->HWResolution[0]);	/* Set resolution */
+  printf("\033*r%dS", header->cupsWidth);	/* Set width */
+  printf("\033*r%dT", header->cupsHeight);	/* Set height */
+
   if (header->cupsColorSpace == CUPS_CSPACE_KCMY)
   {
     NumPlanes = 4;
@@ -182,10 +186,7 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
   else
     NumPlanes = 1;				/* Black&white graphics */
 
-  printf("\033*t%dR", header->HWResolution[0]);	/* Set resolution */
-  printf("\033*r%dS", header->cupsWidth);	/* Set width */
-  printf("\033*r%dT", header->cupsHeight);	/* Set height */
-  printf("\033&a0H\033&a0V");			/* Set top-of-page */
+  printf("\033&a0H\033&a300V");			/* Set top-of-page */
   printf("\033*r1A");				/* Start graphics */
 
   if (header->cupsCompression)
@@ -561,5 +562,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertohp.c,v 1.8 2000/06/20 21:51:11 mike Exp $".
+ * End of "$Id: rastertohp.c,v 1.9 2000/07/21 15:25:45 mike Exp $".
  */
