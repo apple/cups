@@ -1,10 +1,19 @@
 /*
- * "$Id: ppd.h,v 1.2 1998/06/12 20:33:20 mike Exp $"
+ * "$Id: ppd.h,v 1.3 1999/01/24 14:18:43 mike Exp $"
  *
- *   Header file for the PostScript Printer Description (PPD) file library.
+ *   PostScript Printer Description definitions for the Common UNIX Printing
+ *   System (CUPS).
  *
- *   Copyright 1997-1998 by Easy Software Products.
+ *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
  *
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44145 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
@@ -14,34 +23,10 @@
  *         WWW: http://www.cups.org
  *
  *   PostScript is a trademark of Adobe Systems, Inc.
- *
- *   This library is free software; you can redistribute it and/or modify it
- *   under the terms of the GNU Library General Public License as published
- *   by the Free Software Foundation; either version 2 of the License, or
- *   (at your option) any later version.
- *
- *   This library is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
- *
- *   You should have received a copy of the GNU Library General Public
- *   License along with this program; if not, write to the Free Software
- *   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
- *   USA.
- *
- * Revision History:
- *
- *   $Log: ppd.h,v $
- *   Revision 1.2  1998/06/12 20:33:20  mike
- *   First working version.
- *
- *   Revision 1.1  1998/06/11 18:35:02  mike
- *   Initial revision
  */
 
-#ifndef _PPD_H_
-#  define _PPD_H_
+#ifndef _CUPS_PPD_H_
+#  define _CUPS_PPD_H_
 
 /*
  * Include necessary headers...
@@ -62,10 +47,10 @@ extern "C" {
 
 
 /*
- * Library version...
+ * PPD version...
  */
 
-#  define PPD_VERSION	430	/* Kept in sync with Adobe version number */
+#  define PPD_VERSION	4.3	/* Kept in sync with Adobe version number */
 
 
 /*
@@ -100,9 +85,10 @@ typedef enum			/**** Colorspaces ****/
 typedef struct			/**** Option choices ****/
 {
   short		marked;		/* 0 if not selected, 1 otherwise */
-  char		option[41];	/* Computer-readable option name */
+  char		choice[41];	/* Computer-readable option name */
   unsigned char	text[81],	/* Human-readable option name */
 		*code;		/* Code to send for this option */
+  void		*option;	/* Pointer to parent option structure */
 } ppd_choice_t;
 
 typedef struct			/**** Options ****/
@@ -196,27 +182,28 @@ typedef struct			/**** File ****/
 
 
 /*
- * Functions...
+ * Prototypes...
  */
 
-extern ppd_file_t	*ppdOpen(FILE *fp);
-extern ppd_file_t	*ppdOpenFd(int fd);
-extern ppd_file_t	*ppdOpenFile(char *filename);
-
 extern void		ppdClose(ppd_file_t *ppd);
-
-extern void		ppdMarkDefaults(ppd_file_t *ppd);
-extern int		ppdMarkOption(ppd_file_t *ppd, char *keyword,
-			              char *option);
-
+extern int		ppdConflicts(ppd_file_t *ppd);
 extern int		ppdEmit(ppd_file_t *ppd, FILE *fp,
 			        ppd_section_t section);
 extern int		ppdEmitFd(ppd_file_t *ppd, int fd,
 			          ppd_section_t section);
-
+extern int		ppdIsMarked(ppd_file_t *ppd, char *keyword,
+			            char *option);
+extern void		ppdMarkDefaults(ppd_file_t *ppd);
+extern int		ppdMarkOption(ppd_file_t *ppd, char *keyword,
+			              char *option);
+extern ppd_file_t	*ppdOpen(FILE *fp);
+extern ppd_file_t	*ppdOpenFd(int fd);
+extern ppd_file_t	*ppdOpenFile(char *filename);
+extern ppd_file_t	*ppdOpenRead(char *(*readfunc)(char *,int,void*),
+			             void *data);
+extern float		ppdPageLength(ppd_file_t *ppd, char *name);
 extern ppd_size_t	*ppdPageSize(ppd_file_t *ppd, char *name);
 extern float		ppdPageWidth(ppd_file_t *ppd, char *name);
-extern float		ppdPageLength(ppd_file_t *ppd, char *name);
 
 /*
  * C++ magic...
@@ -225,8 +212,8 @@ extern float		ppdPageLength(ppd_file_t *ppd, char *name);
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */
-#endif /* !_PPD_H_ */
+#endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.2 1998/06/12 20:33:20 mike Exp $".
+ * End of "$Id: ppd.h,v 1.3 1999/01/24 14:18:43 mike Exp $".
  */

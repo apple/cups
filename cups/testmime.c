@@ -1,9 +1,9 @@
 /*
- * "$Id: testmime.c,v 1.2 1998/08/06 14:38:38 mike Exp $"
+ * "$Id: testmime.c,v 1.3 1999/01/24 14:18:43 mike Exp $"
  *
- *   MIME library test program for the Common UNIX Printing System (CUPS).
+ *   MIME test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-1998 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -24,21 +24,13 @@
  * Contents:
  *
  *   main() - Main entry for the test program.
- *
- * Revision History:
- *
- *   $Log: testmime.c,v $
- *   Revision 1.2  1998/08/06 14:38:38  mike
- *   Finished coding and testing for CUPS 1.0.
- *
- *   Revision 1.1  1998/08/06 12:46:57  mike
- *   Initial revision
  */
 
 /*
  * Include necessary headers...
  */
 
+#include <config.h>
 #include "mime.h"
 
 
@@ -53,7 +45,7 @@ static void print_rules(mime_magic_t *rules);
  * 'main()' - Main entry for the test program.
  */
 
-int					/* O - Exit code */
+int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
@@ -68,7 +60,7 @@ main(int  argc,				/* I - Number of command-line args */
   int		num_filters;		/* Number of filters for the file */
 
 
-  mime = mimeLoad(".");
+  mime = mimeLoad("../conf");
 
   puts("MIME database types:");
   for (i = 0, types = mime->types; i < mime->num_types; i ++, types ++)
@@ -203,5 +195,5 @@ print_rules(mime_magic_t *rules)	/* I - Rules to print */
 
 
 /*
- * End of "$Id: testmime.c,v 1.2 1998/08/06 14:38:38 mike Exp $".
+ * End of "$Id: testmime.c,v 1.3 1999/01/24 14:18:43 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: socket.c,v 1.1 1998/01/05 20:50:22 mike Exp $"
+ * "$Id: socket.c,v 1.2 1999/01/24 14:14:17 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-1998 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -27,7 +27,10 @@
  * Revision History:
  *
  *   $Log: socket.c,v $
- *   Revision 1.1  1998/01/05 20:50:22  mike
+ *   Revision 1.2  1999/01/24 14:14:17  mike
+ *   Check-in prior to CVS use.
+ *
+ *   Revision 1.1  1998/01/05  20:50:22  mike
  *   Initial revision
  *
  */
@@ -40,5 +43,5 @@
 
 
 /*
- * End of "$Id: socket.c,v 1.1 1998/01/05 20:50:22 mike Exp $".
+ * End of "$Id: socket.c,v 1.2 1999/01/24 14:14:17 mike Exp $".
  */

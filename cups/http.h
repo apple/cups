@@ -1,10 +1,10 @@
 /*
- * "$Id: http.h,v 1.4 1998/10/16 18:28:01 mike Exp $"
+ * "$Id: http.h,v 1.5 1999/01/24 14:18:43 mike Exp $"
  *
- *   Hyper-Text Transfer Protocol definitions for the Common UNIX Printing
- *   System (CUPS) scheduler.
+ *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
+ *   System (CUPS).
  *
- *   Copyright 1997-1998 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -23,138 +23,274 @@
  *         WWW: http://www.cups.org
  */
 
+#ifndef _CUPS_HTTP_H_
+#  define _CUPS_HTTP_H_
+
+/*
+ * Include necessary headers...
+ */
+
+#  include <time.h>
+
+
+/*
+ * C++ magic...
+ */
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
+
+
+/*
+ * Limits...
+ */
+
+#  define HTTP_MAX_URI		1024	/* Max length of URI string */
+#  define HTTP_MAX_HOST		256	/* Max length of hostname string */
+#  define HTTP_MAX_BUFFER	8192	/* Max length of data buffer */
+#  define HTTP_MAX_VALUE	256	/* Max header field value length */
+
+
 /*
  * HTTP state values...
  */
 
-#define HTTP_WAITING		0	/* Waiting for command */
-#define HTTP_OPTIONS		1	/* OPTIONS command, waiting for blank line */
-#define HTTP_GET		2	/* GET command, waiting for blank line */
-#define HTTP_GET_DATA		3	/* GET command, sending data */
-#define HTTP_HEAD		4	/* HEAD command, waiting for blank line */
-#define HTTP_POST		5	/* POST command, waiting for blank line */
-#define HTTP_POST_DATA		6	/* POST command, receiving data */
-#define HTTP_PUT		7	/* PUT command, waiting for blank line */
-#define HTTP_PUT_DATA		8	/* PUT command, receiving data */
-#define HTTP_DELETE		9	/* DELETE command, waiting for blank line */
-#define HTTP_TRACE		10	/* TRACE command, waiting for blank line */
-#define HTTP_CLOSE		11	/* CLOSE command, waiting for blank line */
+typedef enum			/* States are server-oriented */
+{
+  HTTP_WAITING,			/* Waiting for command */
+  HTTP_OPTIONS,			/* OPTIONS command, waiting for blank line */
+  HTTP_GET,			/* GET command, waiting for blank line */
+  HTTP_GET_SEND,		/* GET command, sending data */
+  HTTP_HEAD,			/* HEAD command, waiting for blank line */
+  HTTP_POST,			/* POST command, waiting for blank line */
+  HTTP_POST_RECV,		/* POST command, receiving data */
+  HTTP_POST_SEND,		/* POST command, sending data */
+  HTTP_PUT,			/* PUT command, waiting for blank line */
+  HTTP_PUT_RECV,		/* PUT command, receiving data */
+  HTTP_DELETE,			/* DELETE command, waiting for blank line */
+  HTTP_TRACE,			/* TRACE command, waiting for blank line */
+  HTTP_CLOSE			/* CLOSE command, waiting for blank line */
+} http_state_t;
 
 
 /*
  * HTTP version numbers...
  */
 
-#define HTTP_0_9		9	/* HTTP/0.9 */
-#define HTTP_1_0		100	/* HTTP/1.0 */
-#define HTTP_1_1		101	/* HTTP/1.1 */
+typedef enum
+{
+  HTTP_0_9 = 9,			/* HTTP/0.9 */
+  HTTP_1_0 = 100,		/* HTTP/1.0 */
+  HTTP_1_1 = 101		/* HTTP/1.1 */
+} http_version_t;
+
+
+/*
+ * HTTP keep-alive values...
+ */
+
+typedef enum
+{
+  HTTP_KEEPALIVE_OFF = 0,
+  HTTP_KEEPALIVE_ON
+} http_keepalive_t;
 
 
 /*
  * HTTP transfer encoding values...
  */
 
-#define HTTP_DATA_SINGLE	0	/* Data is sent in one stream */
-#define HTTP_DATA_CHUNKED	1	/* Data is chunked */
+typedef enum
+{
+  HTTP_ENCODE_LENGTH,		/* Data is sent with Content-Length */
+  HTTP_ENCODE_CHUNKED		/* Data is chunked */
+} http_encoding_t;
 
 
 /*
  * HTTP status codes...
  */
 
-#define HTTP_OK			200	/* OPTIONS/GET/HEAD/POST/TRACE command was successful */
-#define HTTP_CREATED		201	/* PUT command was successful */
-#define HTTP_ACCEPTED		202	/* DELETE command was successful */
-#define HTTP_NO_CONTENT		204	/* Successful command, no new data */
+typedef enum
+{
+  HTTP_ERROR = 0,		/* An error response from httpXxxx() */
+  HTTP_CONTINUE,		/* Everything OK, keep going... */
 
-#define HTTP_NOT_MODIFIED	304	/* File not modified */
+  HTTP_OK = 200,		/* OPTIONS/GET/HEAD/POST/TRACE command was successful */
+  HTTP_CREATED,			/* PUT command was successful */
+  HTTP_ACCEPTED,		/* DELETE command was successful */
+  HTTP_NOT_AUTHORITATIVE,	/* Information isn't authoritative */
+  HTTP_NO_CONTENT,		/* Successful command, no new data */
+  HTTP_RESET_CONTENT,		/* Content was reset/recreated */
+  HTTP_PARTIAL_CONTENT,		/* Only a partial file was recieved/sent */
 
-#define HTTP_BAD_REQUEST	400	/* Bad request */
-#define HTTP_UNAUTHORIZED	401	/* Unauthorized to access host */
-#define HTTP_FORBIDDEN		403	/* Forbidden to access this URI */
-#define HTTP_NOT_FOUND		404	/* URI was not found */
-#define HTTP_URI_TOO_LONG	414	/* URI too long */
+  HTTP_MULTIPLE_CHOICES = 300,	/* Multiple files match request */
+  HTTP_MOVED_PERMANENTLY,	/* Document has moved permanently */
+  HTTP_MOVED_TEMPORARILY,	/* Documnet has moved temporarily */
+  HTTP_SEE_OTHER,		/* See this other link... */
+  HTTP_NOT_MODIFIED,		/* File not modified */
+  HTTP_USE_PROXY,		/* Must use a proxy to access this URI */
 
-#define HTTP_NOT_IMPLEMENTED	501	/* Feature not implemented */
-#define HTTP_NOT_SUPPORTED	505	/* HTTP version not supported */
+  HTTP_BAD_REQUEST = 400,	/* Bad request */
+  HTTP_UNAUTHORIZED,		/* Unauthorized to access host */
+  HTTP_PAYMENT_REQUIRED,	/* Payment required */
+  HTTP_FORBIDDEN,		/* Forbidden to access this URI */
+  HTTP_NOT_FOUND,		/* URI was not found */
+  HTTP_METHOD_NOT_ALLOWED,	/* Method is not allowed */
+  HTTP_NOT_ACCEPTABLE,		/* Not Acceptable */
+  HTTP_PROXY_AUTHENTICATION,	/* Proxy Authentication is Required */
+  HTTP_REQUEST_TIMEOUT,		/* Request timed out */
+  HTTP_CONFLICT,		/* Request is self-conflicting */
+  HTTP_GONE,			/* Server has gone away */
+  HTTP_LENGTH_REQUIRED,		/* A content length or encoding is required */
+  HTTP_PRECONDITION,		/* Precondition failed */
+  HTTP_REQUEST_TOO_LARGE,	/* Request entity too large */
+  HTTP_URI_TOO_LONG,		/* URI too long */
+  HTTP_UNSUPPORTED_MEDIATYPE,	/* The requested media type is unsupported */
+
+  HTTP_SERVER_ERROR = 500,	/* Internal server error */
+  HTTP_NOT_IMPLEMENTED,		/* Feature not implemented */
+  HTTP_BAD_GATEWAY,		/* Bad gateway */
+  HTTP_SERVICE_UNAVAILABLE,	/* Service is unavailable */
+  HTTP_GATEWAY_TIMEOUT,		/* Gateway connection timed out */
+  HTTP_NOT_SUPPORTED		/* HTTP version not supported */
+} http_status_t;
 
 
 /*
- * HTTP client structure...
+ * HTTP field names...
  */
 
 typedef struct
 {
-  int			fd;		/* File descriptor for this client */
+  HTTP_FIELD_ACCEPT = 0,
+  HTTP_FIELD_ACCEPT_CHARSET,
+  HTTP_FIELD_ACCEPT_ENCODING,
+  HTTP_FIELD_ACCEPT_LANGUAGE,
+  HTTP_FIELD_AGE,
+  HTTP_FIELD_ALLOW,
+  HTTP_FIELD_AUTHORIZATION,
+  HTTP_FIELD_CACHE_CONTROL,
+  HTTP_FIELD_CONNECTION,
+  HTTP_FIELD_CONTENT_BASE,
+  HTTP_FIELD_CONTENT_ENCODING,
+  HTTP_FIELD_CONTENT_LANGUAGE,
+  HTTP_FIELD_CONTENT_LENGTH,
+  HTTP_FIELD_CONTENT_LOCATION,
+  HTTP_FIELD_CONTENT_MD5,
+  HTTP_FIELD_CONTENT_RANGE,
+  HTTP_FIELD_CONTENT_TYPE,
+  HTTP_FIELD_DATE,
+  HTTP_FIELD_ETAG,
+  HTTP_FIELD_EXPIRES,
+  HTTP_FIELD_FROM,
+  HTTP_FIELD_HOST,
+  HTTP_FIELD_IF_MATCH,
+  HTTP_FIELD_IF_MODIFIED_SINCE,
+  HTTP_FIELD_IF_NONE_MATCH,
+  HTTP_FIELD_IF_RANGE,
+  HTTP_FIELD_IF_UNMODIFIED_SINCE,
+  HTTP_FIELD_LAST_MODIFIED,
+  HTTP_FIELD_LOCATION,
+  HTTP_FIELD_MAX_FORWARDS,
+  HTTP_FIELD_PRAGMA,
+  HTTP_FIELD_PROXY_AUTHENTICATE,
+  HTTP_FIELD_PROXY_AUTHORIZATION,
+  HTTP_FIELD_PUBLIC,
+  HTTP_FIELD_RANGE,
+  HTTP_FIELD_REFERER,
+  HTTP_FIELD_RETRY_AFTER,
+  HTTP_FIELD_SERVER,
+  HTTP_FIELD_TRANSFER_ENCODING,
+  HTTP_FIELD_UPGRADE,
+  HTTP_FIELD_USER_AGENT,
+  HTTP_FIELD_VARY,
+  HTTP_FIELD_VIA,
+  HTTP_FIELD_WARNING,
+  HTTP_FIELD_WWW_AUTHENTICATE,
+  HTTP_FIELD_MAX
+} http_field_t;
+  
+
+/*
+ * HTTP connection structure...
+ */
+
+typedef struct
+{
+  int			fd;		/* File descriptor for this socket */
   time_t		activity;	/* Time since last read/write */
-  struct sockaddr_in	remote;		/* Address of remote interface */
-  char			remote_host[256];/* Remote host name */
-  int			remote_length;	/* Remote host name length */
-  int			state,		/* State of client */
-			version,	/* Protocol version */
-			keep_alive;	/* Keep-alive supported? */
-  char			host[256],	/* Host: line */
-			user_agent[128],/* User-Agent: line */
-			username[16],	/* Username from Authorization: line */
-			password[16],	/* Password from Authorization: line */
-			uri[1024],	/* Localized URL/URI for GET/PUT */
-			content_type[64],/* Content-Type: line */
-			language[16];	/* Accept-Language: line (first available) */
-  time_t		remote_time;	/* Remote file time */
-  int			remote_size;	/* Remote file size */
-  int			data_encoding,	/* Chunked or not */
-			data_length;	/* Content-Length: or chunk length line */
-  int			file;		/* Input/output file */
-  int			pipe_pid;	/* Pipe process ID (or 0 if not a pipe) */
-  int			bufused;	/* Number of bytes used in input buffer */
-  char			buf[MAX_BUFFER];/* Buffer for incoming messages */
-} client_t;
-
-
-/*
- * HTTP listener structure...
- */
-
-typedef struct
-{
-  int			fd;		/* File descriptor for this client */
-  struct sockaddr_in	address;	/* Bind address of socket */
-} listener_t;
-
-
-/*
- * Globals...
- */
-
-VAR int			NumListeners	VALUE(0);
-					/* Number of listening sockets */
-VAR listener_t		Listeners[MAX_LISTENERS];
-					/* Listening sockets */
-VAR int			NumClients	VALUE(0);
-					/* Number of HTTP clients */
-VAR client_t		Clients[MAX_CLIENTS];
-					/* HTTP clients */
-
+  http_state_t		state;		/* State of client */
+  http_status_t		status;		/* Status of last request */
+  http_version_t	version;	/* Protocol version */
+  http_keepalive_t	keep_alive;	/* Keep-alive supported? */
+  struct sockaddr_in	hostaddr;	/* Address of connected host */
+  int			hostlength;	/* Hostname length */
+  char			hostname[HTTP_MAX_HOST],
+  					/* Name of connected host */
+			uri[HTTP_MAX_URI],
+					/* Resource we're attached to */
+			fields[HTTP_FIELD_MAX][HTTP_MAX_VALUE];
+					/* Field values */
+  time_t		request_time;	/* Request file time */
+  int			request_size;	/* Request file size */
+  char			*data;		/* Pointer to data buffer */
+  http_encoding_t	data_encoding;	/* Chunked or not */
+  int			data_length,	/* Content-Length: or chunk length line */
+			data_remaining;	/* Number of bytes left */
+  int			used;		/* Number of bytes used in buffer */
+  char			buffer[HTTP_MAX_BUFFER];
+					/* Buffer for messages */
+} http_t;
 
 
 /*
  * Prototypes...
  */
 
-extern void	AcceptClient(listener_t *lis);
-extern void	CloseAllClients(void);
-extern void	CloseClient(client_t *con);
-extern int	ReadClient(client_t *con);
-extern int	SendCommand(client_t *con, int code, char *command, char *type);
-extern int	SendError(client_t *con, int code);
-extern int	SendFile(client_t *con, int code, char *filename,
-		         char *type, struct stat *filestats);
-extern int	SendHeader(client_t *con, int code, char *type);
-extern void	StartListening(void);
-extern void	StopListening(void);
-extern int	WriteClient(client_t *con);
+extern http_t	*httpAccept(int fd);
+extern void	httpClose(http_t *http);
+extern http_t	*httpConnect(char *host, int port);
+extern int	httpReconnect(http_t *http);
+extern void	httpSeparate(char *uri, char *method, char *host, int *port,
+		             char *resource);
+extern void	httpSetField(http_t *http, http_field_t field, char *value);
+#  define	httpGetField(http,field)	(http)->fields[field]
+
+extern int	httpDelete(http_t *http, char *uri);
+extern int	httpGet(http_t *http, char *uri);
+extern int	httpHead(http_t *http, char *uri);
+extern int	httpOptions(http_t *http, char *uri);
+extern int	httpPost(http_t *http, char *uri);
+extern int	httpPut(http_t *http, char *uri);
+extern int	httpTrace(http_t *http, char *uri);
+
+extern int	httpRead(http_t *http, char *buffer, int length);
+extern int	httpWrite(http_t *http, char *buffer, int length);
+
+extern char	*httpGets(char *buffer, int length, http_t *http);
+extern int	httpPrintf(http_t *http, const char *format, ...);
+extern int	httpChunkf(http_t *http, const char *format, ...);
+
+extern char	*httpStatus(http_status_t status);
+extern char	*httpLongStatus(http_status_t status);
+
+extern char	*httpGetDateString(time_t t);
+extern time_t	httpGetDateTime(char *s);
+
+extern int	httpUpdate(http_t *http);
 
 
 /*
- * End of "$Id: http.h,v 1.4 1998/10/16 18:28:01 mike Exp $".
+ * C++ magic...
+ */
+
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
+#endif /* !_CUPS_HTTP_H_ */
+
+/*
+ * End of "$Id: http.h,v 1.5 1999/01/24 14:18:43 mike Exp $".
  */
