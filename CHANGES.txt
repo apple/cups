@@ -147,6 +147,8 @@ CHANGES IN CUPS V1.1.7
 	  by the GIMP.
 	- The HTTP Upgrade code (upgrade to TLS encryption)
 	  bypassed the authentication checks.
+	- Fixed a bug in the EOF and Trailer detection code in
+	  the pstops filter.
 
 
 CHANGES IN CUPS V1.1.6-3

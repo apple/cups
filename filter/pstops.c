@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54 2001/03/29 15:14:47 mike Exp $"
+ * "$Id: pstops.c,v 1.55 2001/04/19 16:35:35 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -293,7 +293,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
           strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
         level ++;
-      else if (strcmp(line, "%%EndDocument") == 0 && level > 0)
+      else if (strncmp(line, "%%EndDocument", 13) == 0 && level > 0)
         level --;
       else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
         break;
@@ -329,10 +329,16 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
           strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
         level ++;
-      else if (strcmp(line, "%%EndDocument") == 0 && level > 0)
+      else if (strncmp(line, "%%EndDocument", 13) == 0 && level > 0)
         level --;
-      else if (strcmp(line, "%%EOF") == 0 && level == 0)
+      else if (strcmp(line, "\004") == 0)
+        continue;
+      else if (strncmp(line, "%%EOF", 5) == 0 && level == 0)
+      {
+        fputs("DEBUG: Saw EOF!\n", stderr);
         saweof = 1;
+	break;
+      }
       else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
       {
         if (sscanf(line, "%*s%*s%d", &number) == 1)
@@ -400,8 +406,11 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  tbytes -= nbytes;
 	}
       }
-      else if (strcmp(line, "%%Trailer") == 0 && level == 0)
+      else if (strncmp(line, "%%Trailer", 9) == 0 && level == 0)
+      {
+        fputs("DEBUG: Saw Trailer!\n", stderr);
         break;
+      }
       else
       {
         if (!sloworder)
@@ -511,8 +520,18 @@ main(int  argc,			/* I - Number of command-line arguments */
     * Copy the trailer, if any...
     */
 
-    while ((nbytes = fread(line, 1, sizeof(line), fp)) > 0)
-      fwrite(line, 1, nbytes, stdout);
+    while (psgets(line, sizeof(line), fp) != NULL)
+    {
+      if (strcmp(line, "\004") != 0)
+        fputs(line, stdout);
+
+      if (strncmp(line, "%%EOF", 5) == 0)
+      {
+        fputs("DEBUG: Saw EOF!\n", stderr);
+        saweof = 1;
+	break;
+      }
+    }
   }
   else
   {
@@ -921,5 +940,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54 2001/03/29 15:14:47 mike Exp $".
+ * End of "$Id: pstops.c,v 1.55 2001/04/19 16:35:35 mike Exp $".
  */

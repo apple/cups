@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.31 2001/03/01 20:40:14 mike Exp $"
+# "$Id: Makefile,v 1.32 2001/04/19 16:35:34 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -115,6 +115,7 @@ test:	all
 #
 
 EPMFLAGS	=	-v \
+			AMANDIR=$(AMANDIR) \
 			BINDIR=$(BINDIR) DATADIR=$(DATADIR) \
 			DOCDIR=$(DOCDIR) INCLUDEDIR=$(INCLUDEDIR) \
 			LIBDIR=$(LIBDIR) LOCALEDIR=$(LOCALEDIR) \
@@ -142,5 +143,5 @@ tardist:
 	epm $(EPMFLAGS) -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.31 2001/03/01 20:40:14 mike Exp $".
+# End of "$Id: Makefile,v 1.32 2001/04/19 16:35:34 mike Exp $".
 #
