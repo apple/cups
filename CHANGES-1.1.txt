@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The configure script didn't specify the static
+	  libraries properly when configuring with the
+	  --disable-shared option (STR #104)
 	- The cups.list file used file dependencies for package
 	  formats other than portable, RPM, and Debian (STR #98)
 	- cupsLangGet() didn't use its language cache (STR #97)
