@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.64 2000/07/17 12:31:59 mike Exp $"
+ * "$Id: client.c,v 1.65 2000/09/05 19:27:50 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -71,6 +71,13 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 
   DEBUG_printf(("AcceptClient(%08x) %d NumClients = %d\n",
                 lis, lis->fd, NumClients));
+
+ /*
+  * Make sure we don't have a full set of clients already...
+  */
+
+  if (NumClients == MaxClients)
+    return;
 
  /*
   * Get a pointer to the next available client...
@@ -1781,5 +1788,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.64 2000/07/17 12:31:59 mike Exp $".
+ * End of "$Id: client.c,v 1.65 2000/09/05 19:27:50 mike Exp $".
  */
