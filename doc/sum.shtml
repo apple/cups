@@ -2,7 +2,7 @@
 <HEAD>
 	<META NAME="Description" CONTENT="Common UNIX Printing System Software Users Manual">
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2001, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SUM-1.1.6">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SUM-1.1.7">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Users Manual</TITLE>
 </HEAD>
@@ -11,7 +11,7 @@
 <H1 ALIGN="RIGHT">Preface</H1>
 
 <P>This software users manual describes how to use the Common UNIX Printing
-System<SUP>TM</SUP> ("CUPS<SUP>TM</SUP>") Version 1.1.6.
+System<SUP>TM</SUP> ("CUPS<SUP>TM</SUP>") Version 1.1.7.
 
 <EMBED SRC="system-overview.shtml">
 
