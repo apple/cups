@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.5 1999/04/21 14:16:29 mike Exp $"
+ * "$Id: lp.c,v 1.6 1999/05/10 21:36:09 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -221,9 +221,9 @@ main(int  argc,		/* I - Number of command-line arguments */
     }
 
     if (title)
-      job_id = cupsPrintFile(dest, argv[i], title, num_options, options);
+      job_id = cupsPrintFile(dest, tempfile, title, num_options, options);
     else
-      job_id = cupsPrintFile(dest, argv[i], "(stdin)", num_options, options);
+      job_id = cupsPrintFile(dest, tempfile, "(stdin)", num_options, options);
 
     if (job_id < 1)
     {
@@ -239,5 +239,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lp.c,v 1.5 1999/04/21 14:16:29 mike Exp $".
+ * End of "$Id: lp.c,v 1.6 1999/05/10 21:36:09 mike Exp $".
  */
