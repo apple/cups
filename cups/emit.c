@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.37 2003/09/20 15:47:13 mike Exp $"
+ * "$Id: emit.c,v 1.38 2004/02/03 04:04:05 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -691,8 +691,14 @@ ppd_handle_media(ppd_file_t *ppd)
 
     ppdMarkOption(ppd, "PageRegion", size->name);
 
-    if ((rpr && rpr->value && !strcmp(rpr->value, "False")) ||
-        (!rpr && !ppd->num_filters))
+   /*
+    * RequiresPageRegion does not apply to manual feed so we need to
+    * check that we are not doing manual feed before unmarking PageRegion.
+    */
+
+    if (!(manual_feed && !strcasecmp(manual_feed->choice, "True")) &&
+        ((rpr && rpr->value && !strcmp(rpr->value, "False")) ||
+         (!rpr && !ppd->num_filters)))
     {
      /*
       * Either the PPD file specifies no PageRegion code or the PPD file
@@ -728,5 +734,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c,v 1.37 2003/09/20 15:47:13 mike Exp $".
+ * End of "$Id: emit.c,v 1.38 2004/02/03 04:04:05 mike Exp $".
  */

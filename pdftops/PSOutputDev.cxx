@@ -1933,8 +1933,8 @@ void PSOutputDev::startPage(int pageNum, GfxState *state) {
     x2 = (int)(state->getX2() + 0.5);
     y2 = (int)(state->getY2() + 0.5);
     writePSFmt("%%%%PageBoundingBox: %d %d %d %d\n",
-	       (int)floor(x1), (int)floor(y1),
-	       (int)ceil(x2), (int)ceil(y2));
+	       (int)floor((float)x1), (int)floor((float)y1),
+	       (int)ceil((float)x2), (int)ceil((float)y2));
     writePS("%%BeginPageSetup\n");
     width = x2 - x1;
     height = y2 - y1;

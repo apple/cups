@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.175 2003/09/29 14:51:20 mike Exp $"
+ * "$Id: client.c,v 1.176 2004/02/03 04:04:05 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -33,7 +33,6 @@
  *   SendError()           - Send an error message via HTTP.
  *   SendFile()            - Send a file via HTTP.
  *   SendHeader()          - Send an HTTP request.
- *   ShutdownClient()      - Shutdown the receiving end of a connection.
  *   UpdateCGI()           - Read status messages from CGI scripts and programs.
  *   WriteClient()         - Write data to a client as needed.
  *   check_if_modified()   - Decode an "If-Modified-Since" line.
@@ -903,8 +902,8 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	  case 1 :
 	      LogMessage(L_ERROR, "Bad request line \"%s\"!", line);
 	      SendError(con, HTTP_BAD_REQUEST);
-	      ShutdownClient(con);
-	      return (1);
+	      CloseClient(con);
+	      return (0);
 	  case 2 :
 	      con->http.version = HTTP_0_9;
 	      break;
@@ -913,8 +912,8 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      {
 		LogMessage(L_ERROR, "Bad request line \"%s\"!", line);
 		SendError(con, HTTP_BAD_REQUEST);
-		ShutdownClient(con);
-		return (1);
+		CloseClient(con);
+		return (0);
 	      }
 
 	      if (major < 2)
@@ -928,8 +927,8 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      else
 	      {
 	        SendError(con, HTTP_NOT_SUPPORTED);
-	        ShutdownClient(con);
-	        return (1);
+	        CloseClient(con);
+	        return (0);
 	      }
 	      break;
 	}
@@ -968,8 +967,8 @@ ReadClient(client_t *con)		/* I - Client to read from */
 
 	    LogMessage(L_ERROR, "Bad URI \"%s\" in request!", con->uri);
 	    SendError(con, HTTP_METHOD_NOT_ALLOWED);
-	    ShutdownClient(con);
-	    return (1);
+	    CloseClient(con);
+	    return (0);
 	  }
 
          /*
@@ -1002,8 +1001,8 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	{
 	  LogMessage(L_ERROR, "Bad operation \"%s\"!", operation);
 	  SendError(con, HTTP_BAD_REQUEST);
-	  ShutdownClient(con);
-	  return (1);
+	  CloseClient(con);
+	  return (0);
 	}
 
         con->start     = time(NULL);
@@ -1031,8 +1030,8 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	if (status != HTTP_OK && status != HTTP_CONTINUE)
 	{
 	  SendError(con, HTTP_BAD_REQUEST);
-	  ShutdownClient(con);
-	  return (1);
+	  CloseClient(con);
+	  return (0);
 	}
 	break;
 
@@ -1203,8 +1202,8 @@ ReadClient(client_t *con)		/* I - Client to read from */
         LogMessage(L_DEBUG2, "ReadClient: Unauthorized request for %s...\n",
 	           con->uri);
 	SendError(con, status);
-        ShutdownClient(con);
-	return (1);
+        CloseClient(con);
+	return (0);
       }
 
       switch (con->http.state)
@@ -1570,8 +1569,8 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	case HTTP_DELETE :
 	case HTTP_TRACE :
             SendError(con, HTTP_NOT_IMPLEMENTED);
-            ShutdownClient(con);
-	    return (1);
+            CloseClient(con);
+	    return (0);
 
 	case HTTP_HEAD :
             if (strncmp(con->uri, "/printers/", 10) == 0 &&
@@ -1826,8 +1825,8 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      return (0);
 	    }
 
-	    ShutdownClient(con);
-	    return (1);
+	    CloseClient(con);
+	    return (0);
 	  }
 	  else if (ipp_state != IPP_DATA)
 	    break;
@@ -2223,36 +2222,6 @@ SendHeader(client_t    *con,	/* I - Client to send to */
       return (0);
 
   return (1);
-}
-
-
-/*
- * 'ShutdownClient()' - Shutdown the receiving end of a connection.
- */
-
-void
-ShutdownClient(client_t *con)		/* I - Client connection */
-{
- /*
-  * Shutdown the receiving end of the socket, since the client
-  * still needs to read the error message...
-  */
-
-  shutdown(con->http.fd, 0);
-  con->http.used = 0;
-
- /*
-  * Update the activity time so that we timeout after 30 seconds rather
-  * then the current Timeout setting (300 by default).  This prevents
-  * some DoS situations...
-  */
-
-  con->http.activity = time(NULL) - Timeout + 30;
-
-  LogMessage(L_DEBUG2, "ShutdownClient: Removing fd %d from InputSet...",
-             con->http.fd);
-
-  FD_CLR(con->http.fd, InputSet);
 }
 
 
@@ -3456,5 +3425,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.175 2003/09/29 14:51:20 mike Exp $".
+ * End of "$Id: client.c,v 1.176 2004/02/03 04:04:05 mike Exp $".
  */
