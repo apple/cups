@@ -3,7 +3,7 @@
 <HEAD>
 <TITLE>CUPS Software Design Description</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
-<META NAME="copyright" CONTENT="Copyright 1997-2004, All Rights Reserved">
+<META NAME="copyright" CONTENT="Copyright 1997-2005, All Rights Reserved">
 <META NAME="docnumber" CONTENT="CUPS-SDD-1.1">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
 <STYLE TYPE="text/css"><!--
@@ -20,11 +20,11 @@ PRE { font-family: monospace }
 --></STYLE>
 </HEAD>
 <BODY BGCOLOR="white">
-<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
+<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511" ALT="CUPS Software Design Description"><BR>
 <H1>CUPS Software Design Description</H1></A><BR>
 CUPS-SDD-1.1<BR>
 Easy Software Products<BR>
-Copyright 1997-2004, All Rights Reserved<BR>
+Copyright 1997-2005, All Rights Reserved<BR>
 </CENTER>
 <HR NOSHADE>
 <H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
@@ -42,7 +42,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 </UL>
 <B><A HREF="#3">3 Design Overview</A></B>
 <UL>
-<LI><A HREF="#3_1">3.1 Backends</A></LI>
+<LI><A HREF="#3_1">3.1 Backends</A>
 <UL>
 <LI><A HREF="#3_1_1">3.1.1 ipp</A></LI>
 <LI><A HREF="#3_1_2">3.1.2 lpd</A></LI>
@@ -51,21 +51,24 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#3_1_5">3.1.5 socket</A></LI>
 <LI><A HREF="#3_1_6">3.1.6 usb</A></LI>
 </UL>
-<LI><A HREF="#3_2">3.2 Berkeley Commands</A></LI>
+</LI>
+<LI><A HREF="#3_2">3.2 Berkeley Commands</A>
 <UL>
 <LI><A HREF="#3_2_1">3.2.1 lpc</A></LI>
 <LI><A HREF="#3_2_2">3.2.2 lpq</A></LI>
 <LI><A HREF="#3_2_3">3.2.3 lpr</A></LI>
 <LI><A HREF="#3_2_4">3.2.4 lprm</A></LI>
 </UL>
-<LI><A HREF="#3_3">3.3 CGI</A></LI>
+</LI>
+<LI><A HREF="#3_3">3.3 CGI</A>
 <UL>
 <LI><A HREF="#3_3_1">3.3.1 admin.cgi</A></LI>
 <LI><A HREF="#3_3_2">3.3.2 classes.cgi</A></LI>
 <LI><A HREF="#3_3_3">3.3.3 jobs.cgi</A></LI>
 <LI><A HREF="#3_3_4">3.3.4 printers.cgi</A></LI>
 </UL>
-<LI><A HREF="#3_4">3.4 CUPS Application Programmers Interface</A></LI>
+</LI>
+<LI><A HREF="#3_4">3.4 CUPS Application Programmers Interface</A>
 <UL>
 <LI><A HREF="#3_4_1">3.4.1 Convenience Functions</A></LI>
 <LI><A HREF="#3_4_2">3.4.2 HTTP Functions</A></LI>
@@ -73,7 +76,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#3_4_4">3.4.4 Language Functions</A></LI>
 <LI><A HREF="#3_4_5">3.4.5 PPD Functions</A></LI>
 </UL>
-<LI><A HREF="#3_5">3.5 CUPS Imaging Library</A></LI>
+</LI>
+<LI><A HREF="#3_5">3.5 CUPS Imaging Library</A>
 <UL>
 <LI><A HREF="#3_5_1">3.5.1 Colorspace Conversion Functions</A></LI>
 <LI><A HREF="#3_5_2">3.5.2 Color Management Functions</A></LI>
@@ -82,12 +86,14 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#3_5_5">3.5.5 Image File Functions</A></LI>
 <LI><A HREF="#3_5_6">3.5.6 Raster Functions</A></LI>
 </UL>
-<LI><A HREF="#3_6">3.6 Daemons</A></LI>
+</LI>
+<LI><A HREF="#3_6">3.6 Daemons</A>
 <UL>
 <LI><A HREF="#3_6_1">3.6.1 Line Printer Daemon</A></LI>
 <LI><A HREF="#3_6_2">3.6.2 Polling Daemon</A></LI>
 </UL>
-<LI><A HREF="#3_7">3.7 Filters</A></LI>
+</LI>
+<LI><A HREF="#3_7">3.7 Filters</A>
 <UL>
 <LI><A HREF="#3_7_1">3.7.1 hpgltops</A></LI>
 <LI><A HREF="#3_7_2">3.7.2 imagetops</A></LI>
@@ -99,7 +105,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#3_7_8">3.7.8 rastertohp</A></LI>
 <LI><A HREF="#3_7_9">3.7.9 texttops</A></LI>
 </UL>
-<LI><A HREF="#3_8">3.8 Scheduler</A></LI>
+</LI>
+<LI><A HREF="#3_8">3.8 Scheduler</A>
 <UL>
 <LI><A HREF="#3_8_1">3.8.1 Authorization</A></LI>
 <LI><A HREF="#3_8_2">3.8.2 Classes</A></LI>
@@ -115,7 +122,8 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#3_8_12">3.8.12 PPDs</A></LI>
 <LI><A HREF="#3_8_13">3.8.13 Printers</A></LI>
 </UL>
-<LI><A HREF="#3_9">3.9 System V Commands</A></LI>
+</LI>
+<LI><A HREF="#3_9">3.9 System V Commands</A>
 <UL>
 <LI><A HREF="#3_9_1">3.9.1 accept</A></LI>
 <LI><A HREF="#3_9_2">3.9.2 cancel</A></LI>
@@ -129,6 +137,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#3_9_10">3.9.10 lpstat</A></LI>
 <LI><A HREF="#3_9_11">3.9.11 reject</A></LI>
 </UL>
+</LI>
 </UL>
 <B><A HREF="#4">A Glossary</A></B>
 <UL>

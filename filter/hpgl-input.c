@@ -1,9 +1,9 @@
 /*
- * "$Id: hpgl-input.c,v 1.18 2004/12/27 14:37:33 mike Exp $"
+ * "$Id: hpgl-input.c,v 1.19 2005/01/03 19:29:57 mike Exp $"
  *
  *   HP-GL/2 input processing for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2004 by Easy Software Products.
+ *   Copyright 1993-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -254,5 +254,5 @@ FreeParameters(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-input.c,v 1.18 2004/12/27 14:37:33 mike Exp $".
+ * End of "$Id: hpgl-input.c,v 1.19 2005/01/03 19:29:57 mike Exp $".
  */

@@ -20,7 +20,7 @@ PRE { font-family: monospace }
 --></STYLE>
 </HEAD>
 <BODY BGCOLOR="white">
-<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
+<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511" ALT="CUPS - Manuel de l'administrateur CUPS"><BR>
 <H1>CUPS - Manuel de l'administrateur CUPS</H1></A><BR>
 CUPS-SAM-1.1.14<BR>
 Easy Software Products<BR>
@@ -51,32 +51,34 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <B><A HREF="#BUILDING_INSTALLING">2 - Construire et installer CUPS</A></B>
 <UL>
 <LI><A HREF="#3_1">Installer &agrave; partir d'une distribution du code source</A>
-</LI>
 <UL>
 <LI><A HREF="#REQUIREMENTS">Conditions n&eacute;cessaires</A></LI>
 <LI><A HREF="#COMPILING">Compiler CUPS</A></LI>
 <LI><A HREF="#INSTALLING">Installer le logiciel</A></LI>
 <LI><A HREF="#RUNNING">Ex&eacute;cuter le logiciel</A></LI>
 </UL>
-<LI><A HREF="#BINARY">Installer une distribution binaire du logiciel</A></LI>
+</LI>
+<LI><A HREF="#BINARY">Installer une distribution binaire du logiciel</A>
 <UL>
 <LI><A HREF="#PORTABLE-BINARY">Installer une distribution portable</A></LI>
 <LI><A HREF="#RPM-BINARY">Installer une distribution de type RPM</A></LI>
 <LI><A HREF="#DPKG-BINARY">Installer une distribution de type DEBIAN</A></LI>
 </UL>
+</LI>
 </UL>
 <B><A HREF="#MANAGING_PRINTERS">3 - Administration les imprimantes</A></B>
 <UL>
 <LI><A HREF="#4_1">Les bases</A></LI>
-<LI><A HREF="#4_2">Ajouter votre premi&egrave;re imprimante</A></LI>
+<LI><A HREF="#4_2">Ajouter votre premi&egrave;re imprimante</A>
 <UL>
 <LI><A HREF="#4_2_1">Ajouter votre premi&egrave;re imprimante depuis la ligne
  de commande</A></LI>
 <LI><A HREF="#ADD_WEB">Ajouter votre premi&egrave;re imprimante depuis
  l'interface &quot;web&quot;</A></LI>
 </UL>
+</LI>
 <LI><A HREF="#4_3">Administrer les imprimantes depuis la ligne de
- commande</A></LI>
+ commande</A>
 <UL>
 <LI><A HREF="#4_3_1">Ajouter et modifier des imprimantes</A></LI>
 <LI><A HREF="#4_3_2">Supprimer des imprimantes</A></LI>
@@ -84,6 +86,7 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#4_3_4">D&eacute;marrer et arr&ecirc;ter des imprimantes</A></LI>
 <LI><A HREF="#4_3_5">Accepter et rejeter les travaux d'impression</A></LI>
 </UL>
+</LI>
 <LI><A HREF="#4_4">Administrer les imprimantes depuis l'interface &quot;web&quot;</A>
 </LI>
 </UL>
@@ -98,7 +101,7 @@ Copyright 1997-2003, All Rights Reserved<BR>
 </UL>
 <B><A HREF="#CLIENT_SETUP">5 - Configuration c&ocirc;t&eacute; client</A></B>
 <UL>
-<LI><A HREF="#6_1">Les bases</A></LI>
+<LI><A HREF="#6_1">Les bases</A>
 <UL>
 <LI><A HREF="#CLIENT_MANUAL">Configuration manuelle des files
  d'impression</A></LI>
@@ -109,6 +112,7 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#CLIENT_POLL">Choix de plusieurs serveurs pour l'impression</A>
 </LI>
 </UL>
+</LI>
 </UL>
 <B><A HREF="#PRINTING_MANAGEMENT">6 - Administration du syst&egrave;me
  d'impression</A></B>
@@ -116,7 +120,7 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#7_1">Les bases</A></LI>
 <LI><A HREF="#RESTARTING">Red&eacute;marrer le serveur CUPS</A></LI>
 <LI><A HREF="#7_3">Changer la configuration du serveur</A></LI>
-<LI><A HREF="#7_4">Directives de configuration du serveur</A></LI>
+<LI><A HREF="#7_4">Directives de configuration du serveur</A>
 <UL>
 <LI><A HREF="#AccessLog">AccessLog</A></LI>
 <LI><A HREF="#Allow">Allow</A></LI>
@@ -194,7 +198,8 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#Timeout">Timeout</A></LI>
 <LI><A HREF="#User">User</A></LI>
 </UL>
-<LI><A HREF="#PRINTING_SECURITY">S&eacute;curit&eacute; du syst&egrave;me d'impression</A></LI>
+</LI>
+<LI><A HREF="#PRINTING_SECURITY">S&eacute;curit&eacute; du syst&egrave;me d'impression</A>
 <UL>
 <LI><A HREF="#CERTIFICATES">Authentification bas&eacute;e sur les certificats</A>
 </LI>
@@ -202,15 +207,17 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#7_5_3">Utilisation de l'authentification &quot;Digest&quot;</A></LI>
 <LI><A HREF="#7_5_4">Authentifications &quot;System&quot; et &quot;Group&quot;</A></LI>
 </UL>
+</LI>
 <LI><A HREF="#PRINTER_ACCOUNTING">Suivi/facturation de travaux et
- d'imprimantes</A></LI>
+ d'imprimantes</A>
 <UL>
 <LI><A HREF="#7_6_1">Le fichier access_log</A></LI>
 <LI><A HREF="#7_6_2">Le fichier error_log</A></LI>
 <LI><A HREF="#7_6_3">Le fichier page_log</A></LI>
 </UL>
+</LI>
 <LI><A HREF="#FILE_TYPING_FILTERING">Filtrage et d&eacute;termination des types
- de fichiers</A></LI>
+ de fichiers</A>
 <UL>
 <LI><A HREF="#7_7_1">Le fichier mime.types</A></LI>
 <LI><A HREF="#7_7_2">Le fichier mime.convs</A></LI>
@@ -219,6 +226,7 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#7_7_5">Ecrire vos propres filtres ou pilotes d'imprimantes</A>
 </LI>
 </UL>
+</LI>
 </UL>
 <B><A HREF="#PRINTING_OTHER">7 - Imprimer depuis et vers d'autres
  syst&egrave;mes</A></B>
@@ -226,45 +234,51 @@ Copyright 1997-2003, All Rights Reserved<BR>
 <LI><A HREF="#8_1">Les bases</A></LI>
 <LI><A HREF="#8_2">Imprimer depuis des clients LPD</A></LI>
 <LI><A HREF="#8_3">Imprimer vers des serveurs LPD</A></LI>
-<LI><A HREF="#8_4">Imprimer depuis des client Mac OS</A></LI>
+<LI><A HREF="#8_4">Imprimer depuis des client Mac OS</A>
 <UL>
 <LI><A HREF="#8_4_1">Columbia Appletalk Package (CAP)</A></LI>
 <LI><A HREF="#8_4_2">XINET KA/Spool</A></LI>
 <LI><A HREF="#8_4_3">NetATalk</A></LI>
 </UL>
+</LI>
 <LI><A HREF="#8_5">Imprimer vers des serveurs d'impression Mac OS</A></LI>
-<LI><A HREF="#8_6">Imprimer depuis des clients Windows</A></LI>
+<LI><A HREF="#8_6">Imprimer depuis des clients Windows</A>
 <UL>
 <LI><A HREF="#8_6_1">Exporter les pilotes d'imprimantes</A></LI>
 </UL>
+</LI>
 <LI><A HREF="#8_7">Imprimer vers des serveurs d'impression Windows</A></LI>
 </UL>
 <B><A HREF="#LICENSE">A - Licence d'utilisation du logiciel</A></B>
 <UL>
-<LI><A HREF="#9_1">Common UNIX Printing System License Agreement</A></LI>
+<LI><A HREF="#9_1">Common UNIX Printing System License Agreement</A>
 <UL>
 <LI><A HREF="#9_1_1">Introduction</A></LI>
 <LI><A HREF="#9_1_2">Trademarks</A></LI>
 <LI><A HREF="#9_1_3">Binary Distribution Rights</A></LI>
 <LI><A HREF="#9_1_4">Support</A></LI>
 </UL>
-<LI><A HREF="#9_2">GNU GENERAL PUBLIC LICENSE</A></LI>
+</LI>
+<LI><A HREF="#9_2">GNU GENERAL PUBLIC LICENSE</A>
 <UL>
 <LI><A HREF="#9_2_1">Preamble</A></LI>
 </UL>
-<LI><A HREF="#9_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A></LI>
+</LI>
+<LI><A HREF="#9_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A>
 <UL>
 <LI><A HREF="#9_3_1">Preamble</A></LI>
 </UL>
+</LI>
 </UL>
 <B><A HREF="#COMMON_NETWORK">B - R&eacute;glages r&eacute;seau courants</A></B>
 <UL>
-<LI><A HREF="#10_1">Configurer une interface r&eacute;seau</A></LI>
+<LI><A HREF="#10_1">Configurer une interface r&eacute;seau</A>
 <UL>
 <LI><A HREF="#10_1_1">Configuration de l'adresse IP utilisant ARP</A></LI>
 <LI><A HREF="#10_1_2">Configuration de l'adresse IP utilisant RARP</A></LI>
 <LI><A HREF="#10_1_3">Configuration de l'adresse IP utilisant BOOTP</A></LI>
 </UL>
+</LI>
 <LI><A HREF="#10_2">V&eacute;rifier la connexion de l'imprimante</A></LI>
 <LI><A HREF="#10_3">R&eacute;glages d'interfaces r&eacute;seau et serveur d'impression
  courants</A></LI>

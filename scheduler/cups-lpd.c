@@ -1,9 +1,9 @@
 /*
- * "$Id: cups-lpd.c,v 1.48 2004/10/04 19:40:35 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.49 2005/01/03 19:29:59 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2004 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1423,5 +1423,5 @@ smart_gets(char *s,			/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.48 2004/10/04 19:40:35 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.49 2005/01/03 19:29:59 mike Exp $".
  */

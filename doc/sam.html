@@ -3,9 +3,9 @@
 <HEAD>
 <TITLE>CUPS Software Administrators Manual</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
-<META NAME="copyright" CONTENT="Copyright 1997-2004, All Rights Reserved">
-<META NAME="docnumber" CONTENT="CUPS-SAM-1.1.22">
-<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<META NAME="copyright" CONTENT="Copyright 1997-2005, All Rights Reserved">
+<META NAME="docnumber" CONTENT="CUPS-SAM-1.1.23">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
 <STYLE TYPE="text/css"><!--
 BODY { font-family: serif }
 H1 { font-family: sans-serif }
@@ -22,14 +22,14 @@ PRE { font-family: monospace }
 <BODY BGCOLOR="white">
 <CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511" ALT="CUPS Software Administrators Manual"><BR>
 <H1>CUPS Software Administrators Manual</H1></A><BR>
-CUPS-SAM-1.1.22<BR>
+CUPS-SAM-1.1.23<BR>
 Easy Software Products<BR>
-Copyright 1997-2004, All Rights Reserved<BR>
+Copyright 1997-2005, All Rights Reserved<BR>
 </CENTER>
 <HR NOSHADE>
 <H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
 <BR>
-<BR><B><A HREF="#1">Preface</A>
+<BR><B><A HREF="#1">Preface</A></B>
 <UL>
 <LI><A HREF="#1_1">System Overview</A></LI>
 <LI><A HREF="#1_2">Document Overview</A></LI>
@@ -37,7 +37,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#1_4">Abbreviations</A></LI>
 <LI><A HREF="#1_5">Other References</A></LI>
 </UL>
-</B><B><A HREF="#OVERVIEW">1 - Printing System Overview</A>
+<B><A HREF="#OVERVIEW">1 - Printing System Overview</A></B>
 <UL>
 <LI><A HREF="#2_1">The Printing Problem</A></LI>
 <LI><A HREF="#2_2">The Technology</A></LI>
@@ -48,7 +48,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#2_7">Printer Drivers</A></LI>
 <LI><A HREF="#2_8">Networking</A></LI>
 </UL>
-</B><B><A HREF="#BUILDING_INSTALLING">2 - Building and Installing CUPS</A>
+<B><A HREF="#BUILDING_INSTALLING">2 - Building and Installing CUPS</A></B>
 <UL>
 <LI><A HREF="#3_1">Installing a Source Distribution</A>
 <UL>
@@ -66,7 +66,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 </UL>
 </LI>
 </UL>
-</B><B><A HREF="#MANAGING_PRINTERS">3 - Managing Printers</A>
+<B><A HREF="#MANAGING_PRINTERS">3 - Managing Printers</A></B>
 <UL>
 <LI><A HREF="#4_1">The Basics</A></LI>
 <LI><A HREF="#4_2">Adding Your First Printer</A>
@@ -88,14 +88,14 @@ Copyright 1997-2004, All Rights Reserved<BR>
 </LI>
 <LI><A HREF="#4_4">Managing Printers from the Web</A></LI>
 </UL>
-</B><B><A HREF="#PRINTER_CLASSES">4 - Printer Classes</A>
+<B><A HREF="#PRINTER_CLASSES">4 - Printer Classes</A></B>
 <UL>
 <LI><A HREF="#5_1">The Basics</A></LI>
 <LI><A HREF="#5_2">Managing Printer Classes from the Command-Line</A></LI>
 <LI><A HREF="#5_3">Managing Printer Classes from the Web Interface</A></LI>
 <LI><A HREF="#5_4">Implicit Classes</A></LI>
 </UL>
-</B><B><A HREF="#CLIENT_SETUP">5 - Client Setup</A>
+<B><A HREF="#CLIENT_SETUP">5 - Client Setup</A></B>
 <UL>
 <LI><A HREF="#6_1">The Basics</A>
 <UL>
@@ -108,7 +108,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 </LI>
 <LI><A HREF="#6_2">Load Balancing and Failsafe Operation</A></LI>
 </UL>
-</B><B><A HREF="#PRINTING_MANAGEMENT">6 - Printing System Management</A>
+<B><A HREF="#PRINTING_MANAGEMENT">6 - Printing System Management</A></B>
 <UL>
 <LI><A HREF="#7_1">The Basics</A></LI>
 <LI><A HREF="#RESTARTING">Restarting the CUPS Server</A></LI>
@@ -273,7 +273,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 </UL>
 </LI>
 </UL>
-</B><B><A HREF="#PRINTING_OTHER">7 - Printing with Other Systems</A>
+<B><A HREF="#PRINTING_OTHER">7 - Printing with Other Systems</A></B>
 <UL>
 <LI><A HREF="#8_1">The Basics</A></LI>
 <LI><A HREF="#8_2">Printing from LPD Clients</A></LI>
@@ -295,7 +295,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 </LI>
 <LI><A HREF="#8_9">Printing to Windows Servers</A></LI>
 </UL>
-</B><B><A HREF="#LICENSE">A - Software License Agreement</A>
+<B><A HREF="#LICENSE">A - Software License Agreement</A></B>
 <UL>
 <LI><A HREF="#9_1">Common UNIX Printing System License Agreement</A>
 <UL>
@@ -317,7 +317,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 </UL>
 </LI>
 </UL>
-</B><B><A HREF="#COMMON_NETWORK">B - Common Network Settings</A>
+<B><A HREF="#COMMON_NETWORK">B - Common Network Settings</A></B>
 <UL>
 <LI><A HREF="#10_1">Configuring a Network Interface</A>
 <UL>
@@ -332,7 +332,7 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#LINKSYS">Configuring Linksys Print Servers</A></LI>
 <LI><A HREF="#LPD_OPTIONS">Configuring LPD Printing Options</A></LI>
 </UL>
-</B><B><A HREF="#PRINTER_DRIVERS">C - Printer Drivers</A>
+<B><A HREF="#PRINTER_DRIVERS">C - Printer Drivers</A></B>
 <UL>
 <LI><A HREF="#11_1">Printer Drivers</A></LI>
 <LI><A HREF="#DYMO">DYMO Label Printer</A></LI>
@@ -343,9 +343,9 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#DESKJET">HP DeskJet</A></LI>
 <LI><A HREF="#LASERJET">HP LaserJet</A></LI>
 </UL>
-</B><B><A HREF="#FILES">D - List of Files</A></B>
+<B><A HREF="#FILES">D - List of Files</A></B>
 <BR>
-<BR><B><A HREF="#FAQ">E - Troubleshooting Common Problems</A>
+<BR><B><A HREF="#FAQ">E - Troubleshooting Common Problems</A></B>
 <UL>
 <LI><A HREF="#13_1">My Applications Don't See the Available Printers</A></LI>
 <LI><A HREF="#13_2">CUPS Doesn't Recognize My Username or Password!</A></LI>
@@ -356,11 +356,11 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#13_5">Connection Refused Messages</A></LI>
 <LI><A HREF="#13_6">Write Error Messages</A></LI>
 </UL>
-</B><HR NOSHADE>
+<HR NOSHADE>
 <H1 ALIGN="RIGHT"><A NAME="1">Preface</A></H1>
 <P>This software administrators manual provides printer administration
  information for the Common UNIX Printing System<SUP>TM</SUP> (&quot;CUPS<SUP>
-TM</SUP>&quot;), version 1.1.22.</P>
+TM</SUP>&quot;), version 1.1.23.</P>
 <H2><A NAME="1_1">System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating
  systems. It has been developed by <A HREF="http://www.easysw.com">Easy
@@ -4834,9 +4834,9 @@ smb://user:pass@server/sharename
 <H1 ALIGN="RIGHT"><A NAME="LICENSE">A - Software License Agreement</A></H1>
 <H2 ALIGN="CENTER"><A NAME="9_1">Common UNIX Printing System License
  Agreement</A></H2>
-<P ALIGN="CENTER">Copyright 1997-2004 by Easy Software Products
+<P ALIGN="CENTER">Copyright 1997-2005 by Easy Software Products
 <BR> 44141 AIRPORT VIEW DR STE 204
-<BR> HOLLYWOOD, MARYLAND 20636-3142 USA
+<BR> HOLLYWOOD, MARYLAND 20636 USA
 <BR>
 <BR> Voice: +1.301.373.9600
 <BR> Email: <A HREF="mailto:cups-info@cups.org">cups-info@cups.org</A>
@@ -5198,6 +5198,61 @@ copies of this license document, but changing it is not allowed.
  DAMAGES.</LI>
 </OL>
 <H4>END OF TERMS AND CONDITIONS</H4>
+<H4>How to Apply These Terms to Your New Programs</H4>
+<P>If you develop a new program, and you want it to be of the greatest
+ possible use to the public, the best way to achieve this is to make it
+ free software which everyone can redistribute and change under these
+ terms.</P>
+<P>To do so, attach the following notices to the program. It is safest
+ to attach them to the start of each source file to most effectively
+ convey the exclusion of warranty; and each file should have at least
+ the &quot;copyright&quot; line and a pointer to where the full notice is found.</P>
+<PRE>
+<VAR>one line to give the program's name and an idea of what it does.</VAR>
+Copyright (C) <VAR>yyyy</VAR>  <VAR>name of author</VAR>
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+</PRE>
+<P>Also add information on how to contact you by electronic and paper
+ mail.</P>
+<P>If the program is interactive, make it output a short notice like
+ this when it starts in an interactive mode:</P>
+<PRE>
+Gnomovision version 69, Copyright (C) <VAR>year</VAR> <VAR>name of author</VAR>
+Gnomovision comes with ABSOLUTELY NO WARRANTY; for details
+type `show w'.  This is free software, and you are welcome
+to redistribute it under certain conditions; type `show c' 
+for details.
+</PRE>
+<P>The hypothetical commands <SAMP>`show w'</SAMP> and <SAMP>`show c'</SAMP>
+ should show the appropriate parts of the General Public License. Of
+ course, the commands you use may be called something other than <SAMP>
+`show w'</SAMP> and <SAMP>`show c'</SAMP>; they could even be
+ mouse-clicks or menu items--whatever suits your program.</P>
+<P>You should also get your employer (if you work as a programmer) or
+ your school, if any, to sign a &quot;copyright disclaimer&quot; for the program,
+ if necessary. Here is a sample; alter the names:</P>
+<PRE>
+Yoyodyne, Inc., hereby disclaims all copyright
+interest in the program `Gnomovision'
+(which makes passes at compilers) written 
+by James Hacker.
+
+<VAR>signature of Ty Coon</VAR>, 1 April 1989
+Ty Coon, President of Vice
+</PRE>
 
 <!-- NEW PAGE -->
 <H2><A NAME="9_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A></H2>
@@ -5587,6 +5642,49 @@ of this license document, but changing it is not allowed.
  SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
  DAMAGES.</P>
 <H4>END OF TERMS AND CONDITIONS</H4>
+<H4>How to Apply These Terms to Your New Libraries</H4>
+<P>If you develop a new library, and you want it to be of the greatest
+ possible use to the public, we recommend making it free software that
+ everyone can redistribute and change. You can do so by permitting
+ redistribution under these terms (or, alternatively, under the terms of
+ the ordinary General Public License).</P>
+<P>To apply these terms, attach the following notices to the library. It
+ is safest to attach them to the start of each source file to most
+ effectively convey the exclusion of warranty; and each file should have
+ at least the &quot;copyright&quot; line and a pointer to where the full notice is
+ found.</P>
+<PRE>
+<VAR>one line to give the library's name and an idea of what it does.</VAR>
+Copyright (C) <VAR>year</VAR>  <VAR>name of author</VAR>
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+</PRE>
+<P>Also add information on how to contact you by electronic and paper
+ mail.</P>
+<P>You should also get your employer (if you work as a programmer) or
+ your school, if any, to sign a &quot;copyright disclaimer&quot; for the library,
+ if necessary. Here is a sample; alter the names:</P>
+<PRE>
+Yoyodyne, Inc., hereby disclaims all copyright interest in
+the library `Frob' (a library for tweaking knobs) written
+by James Random Hacker.
+
+<VAR>signature of Ty Coon</VAR>, 1 April 1990
+Ty Coon, President of Vice
+</PRE>
+<P>That's all there is to it!</P>
 <H1 ALIGN="RIGHT"><A NAME="COMMON_NETWORK">B - Common Network Settings</A>
 </H1>
 <P>This appendix covers many of the popular TCP/IP network interfaces

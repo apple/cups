@@ -1,10 +1,10 @@
 .\"
-.\" "$Id: cupsd.man,v 1.4 2003/03/12 20:41:41 mike Exp $"
+.\" "$Id: cupsd.man,v 1.5 2005/01/03 19:29:58 mike Exp $"
 .\"
 .\"   cupsd man page for the Common UNIX Printing System (CUPS).
 .\"   Based on cvs revision 1.8
 .\"
-.\"   Copyright 1997-2003 by Easy Software Products.
+.\"   Copyright 1997-2005 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -16,9 +16,9 @@
 .\"       Attn: CUPS Licensing Information
 .\"       Easy Software Products
 .\"       44141 Airport View Drive, Suite 204
-.\"       Hollywood, Maryland 20636-3111 USA
+.\"       Hollywood, Maryland 20636 USA
 .\"
-.\"       Voice: (301) 373-9603
+.\"       Voice: (301) 373-9600
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
@@ -46,7 +46,7 @@ CUPS Interface Design Description,
 CUPS Software Administrators Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2003 Easy Software Products, All Rights Reserved.
+Copyright 1993-2005 Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupsd.man,v 1.4 2003/03/12 20:41:41 mike Exp $".
+.\" End of "$Id: cupsd.man,v 1.5 2005/01/03 19:29:58 mike Exp $".
 .\"

@@ -1,9 +1,9 @@
 /*
- * "$Id: var.c,v 1.25 2004/02/25 20:14:51 mike Exp $"
+ * "$Id: var.c,v 1.26 2005/01/03 19:29:45 mike Exp $"
  *
  *   CGI form variable and array functions.
  *
- *   Copyright 1997-2004 by Easy Software Products.
+ *   Copyright 1997-2005 by Easy Software Products.
  *
  *   This program is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU General Public License as published by the Free
@@ -668,5 +668,5 @@ cgi_sort_variables(void)
 
 
 /*
- * End of "$Id: var.c,v 1.25 2004/02/25 20:14:51 mike Exp $".
+ * End of "$Id: var.c,v 1.26 2005/01/03 19:29:45 mike Exp $".
  */

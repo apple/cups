@@ -1,10 +1,10 @@
 /*
- * "$Id: network.c,v 1.15 2004/10/04 19:40:35 mike Exp $"
+ * "$Id: network.c,v 1.16 2005/01/03 19:29:59 mike Exp $"
  *
  *   Network interface functions for the Common UNIX Printing System
  *   (CUPS) scheduler.
  *
- *   Copyright 1997-2004 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -487,5 +487,5 @@ freeifaddrs(struct ifaddrs *addrs)	/* I - Interface list to free */
 
 
 /*
- * End of "$Id: network.c,v 1.15 2004/10/04 19:40:35 mike Exp $".
+ * End of "$Id: network.c,v 1.16 2005/01/03 19:29:59 mike Exp $".
  */

@@ -3,7 +3,7 @@
 <HEAD>
 <TITLE>CUPS Configuration Management Plan</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
-<META NAME="copyright" CONTENT="Copyright 1997-2004, All Rights Reserved">
+<META NAME="copyright" CONTENT="Copyright 1997-2005, All Rights Reserved">
 <META NAME="docnumber" CONTENT="CUPS-CMP-1.1">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
 <STYLE TYPE="text/css"><!--
@@ -20,11 +20,11 @@ PRE { font-family: monospace }
 --></STYLE>
 </HEAD>
 <BODY BGCOLOR="white">
-<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
+<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511" ALT="CUPS Configuration Management Plan"><BR>
 <H1>CUPS Configuration Management Plan</H1></A><BR>
 CUPS-CMP-1.1<BR>
 Easy Software Products<BR>
-Copyright 1997-2004, All Rights Reserved<BR>
+Copyright 1997-2005, All Rights Reserved<BR>
 </CENTER>
 <HR NOSHADE>
 <H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
@@ -58,12 +58,13 @@ Copyright 1997-2004, All Rights Reserved<BR>
 <LI><A HREF="#5_1">5.1 Version Numbering</A></LI>
 <LI><A HREF="#5_2">5.2 Generation</A></LI>
 <LI><A HREF="#5_3">5.3 Testing</A></LI>
-<LI><A HREF="#5_4">5.4 Releases</A></LI>
+<LI><A HREF="#5_4">5.4 Releases</A>
 <UL>
 <LI><A HREF="#5_4_1">5.4.1 Beta Releases</A></LI>
 <LI><A HREF="#5_4_2">5.4.2 Release Candidates</A></LI>
 <LI><A HREF="#5_4_3">5.4.3 Production Releases</A></LI>
 </UL>
+</LI>
 </UL>
 <B><A HREF="#6">A Glossary</A></B>
 <UL>
@@ -72,51 +73,60 @@ Copyright 1997-2004, All Rights Reserved<BR>
 </UL>
 <B><A HREF="#7">B Coding Requirements</A></B>
 <UL>
-<LI><A HREF="#7_1">B.1 Source Files</A></LI>
+<LI><A HREF="#7_1">B.1 Source Files</A>
 <UL>
 <LI><A HREF="#7_1_1">B.1.1 Naming</A></LI>
 <LI><A HREF="#7_1_2">B.1.2 Documentation</A></LI>
 </UL>
-<LI><A HREF="#7_2">B.2 Functions</A></LI>
+</LI>
+<LI><A HREF="#7_2">B.2 Functions</A>
 <UL>
 <LI><A HREF="#7_2_1">B.2.1 Naming</A></LI>
 <LI><A HREF="#7_2_2">B.2.2 Documentation</A></LI>
 </UL>
-<LI><A HREF="#7_3">B.3 Methods</A></LI>
+</LI>
+<LI><A HREF="#7_3">B.3 Methods</A>
 <UL>
 <LI><A HREF="#7_3_1">B.3.1 Naming</A></LI>
 <LI><A HREF="#7_3_2">B.3.2 Documentation</A></LI>
 </UL>
-<LI><A HREF="#7_4">B.4 Variables</A></LI>
+</LI>
+<LI><A HREF="#7_4">B.4 Variables</A>
 <UL>
 <LI><A HREF="#7_4_1">B.4.1 Naming</A></LI>
 <LI><A HREF="#7_4_2">B.4.2 Documentation</A></LI>
 </UL>
-<LI><A HREF="#7_5">B.5 Types</A></LI>
+</LI>
+<LI><A HREF="#7_5">B.5 Types</A>
 <UL>
 <LI><A HREF="#7_5_1">B.5.1 Naming</A></LI>
 <LI><A HREF="#7_5_2">B.5.2 Documentation</A></LI>
 </UL>
-<LI><A HREF="#7_6">B.6 Structures</A></LI>
+</LI>
+<LI><A HREF="#7_6">B.6 Structures</A>
 <UL>
 <LI><A HREF="#7_6_1">B.6.1 Naming</A></LI>
 <LI><A HREF="#7_6_2">B.6.2 Documentation</A></LI>
 </UL>
-<LI><A HREF="#7_7">B.7 Classes</A></LI>
+</LI>
+<LI><A HREF="#7_7">B.7 Classes</A>
 <UL>
 <LI><A HREF="#7_7_1">B.7.1 Naming</A></LI>
 <LI><A HREF="#7_7_2">B.7.2 Documentation</A></LI>
 </UL>
-<LI><A HREF="#7_8">B.8 Constants</A></LI>
+</LI>
+<LI><A HREF="#7_8">B.8 Constants</A>
 <UL>
 <LI><A HREF="#7_8_1">B.8.1 Naming</A></LI>
 <LI><A HREF="#7_8_2">B.8.2 Documentation</A></LI>
 </UL>
-<LI><A HREF="#7_9">B.9 Code</A></LI>
+</LI>
+<LI><A HREF="#7_9">B.9 Code</A>
 <UL>
 <LI><A HREF="#7_9_1">B.9.1 Documentation</A></LI>
 <LI><A HREF="#7_9_2">B.9.2 Style</A></LI>
 </UL>
+</LI>
 </UL>
 <B><A HREF="#8">C Software Trouble Report Form</A></B><HR NOSHADE>
 <H1><A NAME="1">1 Scope</A></H1>
@@ -448,7 +458,7 @@ Adobe PostScript Language Reference, Third Edition.</A></LI>
      *
      *   Description of file contents.
      *
-     *   Copyright 1997-2004 by Easy Software Products, all rights
+     *   Copyright 1997-2005 by Easy Software Products, all rights
      *   reserved.
      *
      *   These coded instructions, statements, and computer programs are
@@ -461,7 +471,7 @@ Adobe PostScript Language Reference, Third Edition.</A></LI>
      *       Attn: CUPS Licensing Information
      *       Easy Software Products
      *       44141 Airport View Drive, Suite 204
-     *       Hollywood, Maryland 20636-3111 USA
+     *       Hollywood, Maryland 20636 USA
      *
      *       Voice: (301) 373-9600
      *       EMail: cups-info@cups.org

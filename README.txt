@@ -1,4 +1,4 @@
-README - CUPS v1.1.22 - 10/29/2004
+README - CUPS v1.1.23 - 01/03/2005
 ----------------------------------
 
 Looking for compile instructions?  Read the file "INSTALL.txt"
@@ -243,14 +243,14 @@ file.
 
 LEGAL STUFF
 
-CUPS is Copyright 1993-2004 by Easy Software Products.  CUPS,
+CUPS is Copyright 1993-2005 by Easy Software Products.  CUPS,
 the CUPS logo, and the Common UNIX Printing System are the
 trademark property of Easy Software Products.
 
 The MD5 Digest code is Copyright 1999 Aladdin Enterprises.
 
 The PDF filter (pdftops) is based on the Xpdf software,
-Copyright 1996-2002 by Derek B. Noonburg.
+Copyright 1996-2005 by Derek B. Noonburg.
 
 This software is based in part on the work of the Independent
 JPEG Group.
@@ -267,7 +267,7 @@ For commercial licensing information, please contact:
     Attn: CUPS Licensing Information
     Easy Software Products
     44141 Airport View Drive, Suite 204
-    Hollywood, Maryland 20636-3111 USA
+    Hollywood, Maryland 20636 USA
 
     Voice: +1.301.373.9600
     Email: cups-info@cups.org

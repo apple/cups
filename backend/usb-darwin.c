@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-darwin.c,v 1.3 2004/05/27 15:21:39 mike Exp $"
+ * "$Id: usb-darwin.c,v 1.4 2005/01/03 19:29:44 mike Exp $"
  *
  *   USB port on Darwin backend for the Common UNIX Printing System (CUPS).
  *
@@ -287,7 +287,7 @@ OSStatus    UsbGetPrinterAddress( USBPrinterInfo *thePrinter, USBPrinterAddress 
 /*******************************************************************************
     Contains:	Support IEEE-1284 DeviceID as a CFString.
 
-    Copyright 2000-2002 by Apple Computer, Inc., all rights reserved.
+    Copyright 2000-2005 by Apple Computer, Inc., all rights reserved.
 
     Description:
 	IEEE-1284 Device ID is referenced in USB and PPDT (1394.3). It allows
@@ -1895,5 +1895,5 @@ static CFStringRef CreateEncodedCFString(CFStringRef string)
 }
 
 /*
- * End of "$Id: usb-darwin.c,v 1.3 2004/05/27 15:21:39 mike Exp $".
+ * End of "$Id: usb-darwin.c,v 1.4 2005/01/03 19:29:44 mike Exp $".
  */

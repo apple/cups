@@ -3,7 +3,7 @@
 <HEAD>
 <TITLE>CUPS Implementation of IPP</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
-<META NAME="copyright" CONTENT="Copyright 1997-2004 All Rights Reserved">
+<META NAME="copyright" CONTENT="Copyright 1997-2005 All Rights Reserved">
 <META NAME="docnumber" CONTENT="CUPS-IPP-1.1">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
 <STYLE TYPE="text/css"><!--
@@ -20,11 +20,11 @@ PRE { font-family: monospace }
 --></STYLE>
 </HEAD>
 <BODY BGCOLOR="white">
-<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
+<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511" ALT="CUPS Implementation of IPP"><BR>
 <H1>CUPS Implementation of IPP</H1></A><BR>
 CUPS-IPP-1.1<BR>
 Easy Software Products<BR>
-Copyright 1997-2004 All Rights Reserved<BR>
+Copyright 1997-2005 All Rights Reserved<BR>
 </CENTER>
 <HR NOSHADE>
 <H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
@@ -47,97 +47,114 @@ Copyright 1997-2004 All Rights Reserved<BR>
 </UL>
 <B><A HREF="#4">4 Operations</A></B>
 <UL>
-<LI><A HREF="#4_1">4.1 Print-Job Operation</A></LI>
+<LI><A HREF="#4_1">4.1 Print-Job Operation</A>
 <UL>
 <LI><A HREF="#4_1_1">4.1.1 Print-Job Request</A></LI>
 <LI><A HREF="#4_1_2">4.1.2 Print-Job Response</A></LI>
 </UL>
-<LI><A HREF="#4_2">4.2 Create-Job Operation</A></LI>
+</LI>
+<LI><A HREF="#4_2">4.2 Create-Job Operation</A>
 <UL>
 <LI><A HREF="#4_2_1">4.2.1 Create-Job Request</A></LI>
 <LI><A HREF="#4_2_2">4.2.2 Create-Job Response</A></LI>
 </UL>
-<LI><A HREF="#4_3">4.3 Set-Job-Attributes Operation</A></LI>
+</LI>
+<LI><A HREF="#4_3">4.3 Set-Job-Attributes Operation</A>
 <UL>
 <LI><A HREF="#4_3_1">4.3.1 Set-Job-Attributes Request</A></LI>
 <LI><A HREF="#4_3_2">4.3.2 Set-Job-Attributes Response</A></LI>
 </UL>
-<LI><A HREF="#4_4">4.4 CUPS-Get-Default Operation</A></LI>
+</LI>
+<LI><A HREF="#4_4">4.4 CUPS-Get-Default Operation</A>
 <UL>
 <LI><A HREF="#4_4_1">4.4.1 CUPS-Get-Default Request</A></LI>
 <LI><A HREF="#4_4_2">4.4.2 CUPS-Get-Default Response</A></LI>
 </UL>
-<LI><A HREF="#4_5">4.5 CUPS-Get-Printers Operation</A></LI>
+</LI>
+<LI><A HREF="#4_5">4.5 CUPS-Get-Printers Operation</A>
 <UL>
 <LI><A HREF="#4_5_1">4.5.1 CUPS-Get-Printers Request</A></LI>
 <LI><A HREF="#4_5_2">4.5.2 CUPS-Get-Printers Response</A></LI>
 </UL>
-<LI><A HREF="#4_6">4.6 CUPS-Add-Modify-Printer Operation</A></LI>
+</LI>
+<LI><A HREF="#4_6">4.6 CUPS-Add-Modify-Printer Operation</A>
 <UL>
 <LI><A HREF="#4_6_1">4.6.1 CUPS-Add-Modify-Printer Request</A></LI>
 <LI><A HREF="#4_6_2">4.6.2 CUPS-Add-Modify-Printer Response</A></LI>
 </UL>
-<LI><A HREF="#4_7">4.7 CUPS-Delete-Printer Operation</A></LI>
+</LI>
+<LI><A HREF="#4_7">4.7 CUPS-Delete-Printer Operation</A>
 <UL>
 <LI><A HREF="#4_7_1">4.7.1 CUPS-Delete-Printer Request</A></LI>
 <LI><A HREF="#4_7_2">4.7.2 CUPS-Delete-Printer Response</A></LI>
 </UL>
-<LI><A HREF="#4_8">4.8 CUPS-Get-Classes Operation</A></LI>
+</LI>
+<LI><A HREF="#4_8">4.8 CUPS-Get-Classes Operation</A>
 <UL>
 <LI><A HREF="#4_8_1">4.8.1 CUPS-Get-Classes Request</A></LI>
 <LI><A HREF="#4_8_2">4.8.2 CUPS-Get-Classes Response</A></LI>
 </UL>
-<LI><A HREF="#4_9">4.9 CUPS-Add-Modify-Class Operation</A></LI>
+</LI>
+<LI><A HREF="#4_9">4.9 CUPS-Add-Modify-Class Operation</A>
 <UL>
 <LI><A HREF="#4_9_1">4.9.1 CUPS-Add-Modify-Class Request</A></LI>
 <LI><A HREF="#4_9_2">4.9.2 CUPS-Add-Modify-Class Response</A></LI>
 </UL>
-<LI><A HREF="#4_10">4.10 CUPS-Delete-Class Operation</A></LI>
+</LI>
+<LI><A HREF="#4_10">4.10 CUPS-Delete-Class Operation</A>
 <UL>
 <LI><A HREF="#4_10_1">4.10.1 CUPS-Delete-Class Request</A></LI>
 <LI><A HREF="#4_10_2">4.10.2 CUPS-Delete-Class Response</A></LI>
 </UL>
-<LI><A HREF="#4_11">4.11 CUPS-Accept-Jobs Operation</A></LI>
+</LI>
+<LI><A HREF="#4_11">4.11 CUPS-Accept-Jobs Operation</A>
 <UL>
 <LI><A HREF="#4_11_1">4.11.1 CUPS-Accept-Jobs Request</A></LI>
 <LI><A HREF="#4_11_2">4.11.2 CUPS-Accept-Jobs Response</A></LI>
 </UL>
-<LI><A HREF="#4_12">4.12 CUPS-Reject-Jobs Operation</A></LI>
+</LI>
+<LI><A HREF="#4_12">4.12 CUPS-Reject-Jobs Operation</A>
 <UL>
 <LI><A HREF="#4_12_1">4.12.1 CUPS-Reject-Jobs Request</A></LI>
 <LI><A HREF="#4_12_2">4.12.2 CUPS-Reject-Jobs Response</A></LI>
 </UL>
-<LI><A HREF="#4_13">4.13 CUPS-Set-Default Operation</A></LI>
+</LI>
+<LI><A HREF="#4_13">4.13 CUPS-Set-Default Operation</A>
 <UL>
 <LI><A HREF="#4_13_1">4.13.1 CUPS-Set-Default Request</A></LI>
 <LI><A HREF="#4_13_2">4.13.2 CUPS-Set-Default Response</A></LI>
 </UL>
-<LI><A HREF="#4_14">4.14 CUPS-Get-Devices Operation</A></LI>
+</LI>
+<LI><A HREF="#4_14">4.14 CUPS-Get-Devices Operation</A>
 <UL>
 <LI><A HREF="#4_14_1">4.14.1 CUPS-Get-Devices Request</A></LI>
 <LI><A HREF="#4_14_2">4.14.2 CUPS-Get-Devices Response</A></LI>
 </UL>
-<LI><A HREF="#4_15">4.15 CUPS-Get-PPDs Operation</A></LI>
+</LI>
+<LI><A HREF="#4_15">4.15 CUPS-Get-PPDs Operation</A>
 <UL>
 <LI><A HREF="#4_15_1">4.15.1 CUPS-Get-PPDs Request</A></LI>
 <LI><A HREF="#4_15_2">4.15.2 CUPS-Get-PPDs Response</A></LI>
 </UL>
-<LI><A HREF="#4_16">4.16 CUPS-Move-Job Operation</A></LI>
+</LI>
+<LI><A HREF="#4_16">4.16 CUPS-Move-Job Operation</A>
 <UL>
 <LI><A HREF="#4_16_1">4.16.1 CUPS-Move-Job Request</A></LI>
 <LI><A HREF="#4_16_2">4.16.2 CUPS-Move-Job Response</A></LI>
 </UL>
+</LI>
 </UL>
 <B><A HREF="#5">5 Attributes</A></B>
 <UL>
-<LI><A HREF="#5_1">5.1 Device Attributes</A></LI>
+<LI><A HREF="#5_1">5.1 Device Attributes</A>
 <UL>
 <LI><A HREF="#5_1_1">5.1.1 device-class (type2 keyword)</A></LI>
 <LI><A HREF="#5_1_2">5.1.2 device-info (text(127))</A></LI>
 <LI><A HREF="#5_1_3">5.1.3 device-make-and-model (text(127))</A></LI>
 <LI><A HREF="#5_1_4">5.1.4 device-uri (uri)</A></LI>
 </UL>
-<LI><A HREF="#5_2">5.2 Job Template Attributes</A></LI>
+</LI>
+<LI><A HREF="#5_2">5.2 Job Template Attributes</A>
 <UL>
 <LI><A HREF="#5_2_1">5.2.1 blackplot (boolean)</A></LI>
 <LI><A HREF="#5_2_2">5.2.2 brightness (integer(0:200))</A></LI>
@@ -170,14 +187,16 @@ Copyright 1997-2004 All Rights Reserved<BR>
 <LI><A HREF="#5_2_28">5.2.28 scaling (integer(1:1000))</A></LI>
 <LI><A HREF="#5_2_29">5.2.29 wrap (boolean)</A></LI>
 </UL>
-<LI><A HREF="#5_3">5.3 PPD Attributes</A></LI>
+</LI>
+<LI><A HREF="#5_3">5.3 PPD Attributes</A>
 <UL>
 <LI><A HREF="#5_3_1">5.3.1 ppd-natural-language (naturalLanguage)</A></LI>
 <LI><A HREF="#5_3_2">5.3.2 ppd-make (text(127))</A></LI>
 <LI><A HREF="#5_3_3">5.3.3 ppd-make-and-model (text(127))</A></LI>
 <LI><A HREF="#5_3_4">5.3.4 ppd-name (name(255))</A></LI>
 </UL>
-<LI><A HREF="#5_4">5.4 Printer Attributes</A></LI>
+</LI>
+<LI><A HREF="#5_4">5.4 Printer Attributes</A>
 <UL>
 <LI><A HREF="#5_4_1">5.4.1 job-k-limit (integer)</A></LI>
 <LI><A HREF="#5_4_2">5.4.2 job-page-limit (integer)</A></LI>
@@ -191,11 +210,13 @@ Copyright 1997-2004 All Rights Reserved<BR>
 <LI><A HREF="#5_4_8">5.4.8 requesting-user-name-denied (1setof
  name(127))</A></LI>
 </UL>
-<LI><A HREF="#5_5">5.5 Printer Class Attributes</A></LI>
+</LI>
+<LI><A HREF="#5_5">5.5 Printer Class Attributes</A>
 <UL>
 <LI><A HREF="#5_5_1">5.5.1 member-names (1setof name(127))</A></LI>
 <LI><A HREF="#5_5_2">5.5.2 member-uris (1setof uri)</A></LI>
 </UL>
+</LI>
 </UL>
 <B><A HREF="#6">A Glossary</A></B>
 <UL>

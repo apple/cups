@@ -1,9 +1,9 @@
 /*
- * "$Id: ipp-var.c,v 1.46 2004/03/24 21:05:21 mike Exp $"
+ * "$Id: ipp-var.c,v 1.47 2005/01/03 19:29:44 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2004 by Easy Software Products.
+ *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -571,5 +571,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.46 2004/03/24 21:05:21 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.47 2005/01/03 19:29:44 mike Exp $".
  */

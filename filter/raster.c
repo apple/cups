@@ -1,9 +1,9 @@
 /*
- * "$Id: raster.c,v 1.10 2004/12/23 05:37:21 mike Exp $"
+ * "$Id: raster.c,v 1.11 2005/01/03 19:29:58 mike Exp $"
  *
  *   Raster file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2004 by Easy Software Products.
+ *   Copyright 1997-2005 by Easy Software Products.
  *
  *   This file is part of the CUPS Imaging library.
  *
@@ -256,5 +256,5 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
 
 
 /*
- * End of "$Id: raster.c,v 1.10 2004/12/23 05:37:21 mike Exp $".
+ * End of "$Id: raster.c,v 1.11 2005/01/03 19:29:58 mike Exp $".
  */

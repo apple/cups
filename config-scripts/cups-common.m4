@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.53 2004/12/16 19:42:21 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.54 2005/01/03 19:29:45 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2004 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -15,7 +15,7 @@ dnl
 dnl       Attn: CUPS Licensing Information
 dnl       Easy Software Products
 dnl       44141 Airport View Drive, Suite 204
-dnl       Hollywood, Maryland 20636-3142 USA
+dnl       Hollywood, Maryland 20636 USA
 dnl
 dnl       Voice: (301) 373-9600
 dnl       EMail: cups-info@cups.org
@@ -29,7 +29,7 @@ dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
 
 dnl Version number information...
-CUPS_VERSION="1.1.23rc1"
+CUPS_VERSION="1.1.23"
 AC_SUBST(CUPS_VERSION)
 AC_DEFINE_UNQUOTED(CUPS_SVERSION, "CUPS v$CUPS_VERSION")
 AC_DEFINE_UNQUOTED(CUPS_MINIMAL, "CUPS/$CUPS_VERSION")
@@ -213,5 +213,5 @@ AC_SUBST(BACKLIBS)
 AC_SUBST(COMMONLIBS)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.53 2004/12/16 19:42:21 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.54 2005/01/03 19:29:45 mike Exp $".
 dnl

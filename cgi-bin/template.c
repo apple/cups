@@ -1,9 +1,9 @@
 /*
- * "$Id: template.c,v 1.31 2004/12/27 14:57:30 mike Exp $"
+ * "$Id: template.c,v 1.32 2005/01/03 19:29:45 mike Exp $"
  *
  *   CGI template function.
  *
- *   Copyright 1997-2004 by Easy Software Products.
+ *   Copyright 1997-2005 by Easy Software Products.
  *
  *   This program is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU General Public License as published by the Free
@@ -488,5 +488,5 @@ cgi_puts(const char *s,
 
 
 /*
- * End of "$Id: template.c,v 1.31 2004/12/27 14:57:30 mike Exp $".
+ * End of "$Id: template.c,v 1.32 2005/01/03 19:29:45 mike Exp $".
  */
