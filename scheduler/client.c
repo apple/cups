@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.105 2001/10/30 20:37:15 mike Exp $"
+ * "$Id: client.c,v 1.106 2001/12/13 20:45:30 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1646,7 +1646,7 @@ SendHeader(client_t    *con,	/* I - Client to send to */
 
     loc = FindBest(con->uri, con->http.state);
 
-    if (loc->type == AUTH_BASIC)
+    if (loc->type != AUTH_DIGEST)
     {
       if (httpPrintf(HTTP(con), "WWW-Authenticate: Basic realm=\"CUPS\"\r\n") < 0)
 	return (0);
@@ -2483,5 +2483,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.105 2001/10/30 20:37:15 mike Exp $".
+ * End of "$Id: client.c,v 1.106 2001/12/13 20:45:30 mike Exp $".
  */
