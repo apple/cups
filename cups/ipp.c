@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.54 2001/03/30 03:07:51 mike Exp $"
+ * "$Id: ipp.c,v 1.55 2001/03/30 19:21:30 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -638,8 +638,8 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
 
   if (error >= IPP_OK && error <= IPP_OK_BUT_CANCEL_SUBSCRIPTION)
     return (status_oks[error]);
-  else if (error == IPP_REDIRECTION_OTHER_SERVER)
-    return ("redirection-other-server");
+  else if (error == IPP_REDIRECTION_OTHER_SITE)
+    return ("redirection-other-site");
   else if (error >= IPP_BAD_REQUEST && error <= IPP_PRINT_SUPPORT_FILE_NOT_FOUND)
     return (status_400s[error - IPP_BAD_REQUEST]);
   else if (error >= IPP_INTERNAL_ERROR && error <= IPP_PRINTER_IS_DEACTIVATED)
@@ -1870,5 +1870,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.54 2001/03/30 03:07:51 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55 2001/03/30 19:21:30 mike Exp $".
  */
