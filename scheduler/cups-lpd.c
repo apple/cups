@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.26 2001/10/18 19:28:40 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.27 2001/10/24 00:13:26 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -223,28 +223,26 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     case 0x02 : /* Receive a printer job */
         syslog(LOG_INFO, "Receive print job for %s", dest);
-	putchar(0);
+        /* recv_print_job() sends initial status byte */
 
         status = recv_print_job(dest, num_defaults, defaults);
 	break;
 
     case 0x03 : /* Send queue state (short) */
         syslog(LOG_INFO, "Send queue state (short) for %s %s", dest, list);
-	putchar(0);
+	/* send_state() sends initial status byte */
 
         status = send_state(dest, list, 0);
 	break;
 
     case 0x04 : /* Send queue state (long) */
         syslog(LOG_INFO, "Send queue state (long) for %s %s", dest, list);
-	putchar(0);
+	/* send_state() sends initial status byte */
 
         status = send_state(dest, list, 1);
 	break;
 
     case 0x05 : /* Remove jobs */
-	putchar(0);
-
        /*
         * Grab the agent and skip to the list of users and/or jobs.
 	*/
@@ -258,6 +256,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         syslog(LOG_INFO, "Remove jobs %s on %s by %s", list, dest, agent);
 
         status = remove_jobs(dest, agent, list);
+
+	putchar(status);
 	break;
   }
 
@@ -433,8 +433,13 @@ recv_print_job(const char    *dest,	/* I - Destination */
       syslog(LOG_ERR, "Unknown destination %s!", queue);
 
     cupsFreeDests(num_dests, dests);
+
+    putchar(1);
+
     return (1);
   }
+  else
+    putchar(0);
 
   while (smart_gets(line, sizeof(line), stdin) != NULL)
   {
@@ -854,7 +859,7 @@ remove_jobs(const char *dest,		/* I - Destination */
 
 
 /*
- * 'send_short_state()' - Send the short queue state.
+ * 'send_state()' - Send the queue state.
  */
 
 int					/* O - Command status */
@@ -926,6 +931,7 @@ send_state(const char *dest,		/* I - Destination */
                                  cupsEncryption())) == NULL)
   {
     syslog(LOG_ERR, "Unable to connect to server: %s", strerror(errno));
+    putchar(1);
     return (1);
   }
 
@@ -969,8 +975,11 @@ send_state(const char *dest,		/* I - Destination */
       syslog(LOG_WARNING, "Unable to get printer list: %s\n",
              ippErrorString(response->request.status.status_code));
       ippDelete(response);
+      putchar(1);
       return (1);
     }
+    else
+      putchar(0);
 
     if ((attr = ippFindAttribute(response, "printer-state", IPP_TAG_ENUM)) != NULL)
       state = (ipp_pstate_t)attr->values[0].integer;
@@ -996,6 +1005,7 @@ send_state(const char *dest,		/* I - Destination */
   {
     syslog(LOG_WARNING, "Unable to get printer list: %s\n",
            ippErrorString(cupsLastError()));
+    putchar(1);
     return (1);
   }
 
@@ -1246,5 +1256,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.26 2001/10/18 19:28:40 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.27 2001/10/24 00:13:26 mike Exp $".
  */

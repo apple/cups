@@ -1,4 +1,4 @@
-CHANGES.txt - 10/22/2001
+CHANGES.txt - 10/23/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.11
@@ -82,6 +82,9 @@ CHANGES IN CUPS V1.1.11
 	- Added many warning and informational messages
 	  to cups-lpd where they were missing.
 	- Added Czech message file contributed by SuSE.
+	- The cups-lpd mini-daemon now returns a non-zero
+	  status if an invalid destination or job ID is
+	  provided.
 
 
 CHANGES IN CUPS V1.1.10-1
