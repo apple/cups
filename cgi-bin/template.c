@@ -1,5 +1,5 @@
 /*
- * "$Id: template.c,v 1.9 1999/10/29 15:51:22 mike Exp $"
+ * "$Id: template.c,v 1.10 1999/10/29 19:01:38 mike Exp $"
  *
  *   CGI template function.
  *
@@ -308,6 +308,10 @@ cgi_puts(const char *s,
   {
     if (s[0] == '<' && s[1] != '/' && !isalpha(s[1]))
       fputs("&lt;", out);
+    else if (*s == '\"')
+      fputs("&quot;", out);
+    else if (s[0] == '&' && isspace(s[1]))
+      fputs("&amp;", out);
     else
       putc(*s, out);
 
@@ -317,5 +321,5 @@ cgi_puts(const char *s,
 
 
 /*
- * End of "$Id: template.c,v 1.9 1999/10/29 15:51:22 mike Exp $".
+ * End of "$Id: template.c,v 1.10 1999/10/29 19:01:38 mike Exp $".
  */
