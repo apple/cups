@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.56 2001/07/02 19:50:26 mike Exp $"
+ * "$Id: ppd.c,v 1.57 2001/08/14 19:25:44 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -284,12 +284,16 @@ ppd_get_group(ppd_file_t *ppd,	/* I - PPD file */
   ppd_group_t	*group;		/* Group */
 
 
+  DEBUG_printf(("ppd_get_group(%p, \"%s\")\n", ppd, name));
+
   for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
     if (strcmp(group->text, name) == 0)
       break;
 
   if (i == 0)
   {
+    DEBUG_printf(("Adding group %s...\n", name));
+
     if (ppd->num_groups == 0)
       group = malloc(sizeof(ppd_group_t));
     else
@@ -926,7 +930,13 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       */
 
       if (name[0] == '*')
-        strcpy(name, name + 1);
+        strcpy(name, name + 1); /* Eliminate leading asterisk */
+
+      for (i = strlen(name) - 1; i > 0 && isspace(name[i]); i --)
+        name[i] = '\0'; /* Eliminate trailing spaces */
+
+      DEBUG_printf(("OpenUI of %s in group %s...\n", name,
+                    group ? group->text : "(null)"));
 
       if (subgroup != NULL)
         option = ppd_get_option(subgroup, name);
@@ -955,6 +965,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	  return (NULL);
 	}
 
+        DEBUG_printf(("Adding to group %s...\n", group->text));
         option = ppd_get_option(group, name);
 	group  = NULL;
       }
@@ -1764,7 +1775,7 @@ ppd_read(FILE *fp,		/* I - File to read from */
 
     *lineptr = '\0';
 
-    DEBUG_printf(("LINE = \"%s\"\n", line));
+/*    DEBUG_printf(("LINE = \"%s\"\n", line));*/
 
     if (ch == EOF && lineptr == line)
       return (0);
@@ -1807,7 +1818,7 @@ ppd_read(FILE *fp,		/* I - File to read from */
 
     mask |= PPD_KEYWORD;
 
-    DEBUG_printf(("keyword = \"%s\", lineptr = \"%s\"\n", keyword, lineptr));
+/*    DEBUG_printf(("keyword = \"%s\", lineptr = \"%s\"\n", keyword, lineptr));*/
 
     if (isspace(*lineptr))
     {
@@ -1827,7 +1838,7 @@ ppd_read(FILE *fp,		/* I - File to read from */
       *optptr = '\0';
       mask |= PPD_OPTION;
 
-      DEBUG_printf(("option = \"%s\", lineptr = \"%s\"\n", option, lineptr));
+/*      DEBUG_printf(("option = \"%s\", lineptr = \"%s\"\n", option, lineptr));*/
 
       if (*lineptr == '/')
       {
@@ -1849,7 +1860,7 @@ ppd_read(FILE *fp,		/* I - File to read from */
 	mask |= PPD_TEXT;
       }
 
-      DEBUG_printf(("text = \"%s\", lineptr = \"%s\"\n", text, lineptr));
+/*      DEBUG_printf(("text = \"%s\", lineptr = \"%s\"\n", text, lineptr));*/
     }
 
     if (*lineptr == ':')
@@ -1875,7 +1886,7 @@ ppd_read(FILE *fp,		/* I - File to read from */
 
       *strptr = '\0';
 
-      DEBUG_printf(("string = \"%s\", lineptr = \"%s\"\n", *string, lineptr));
+/*      DEBUG_printf(("string = \"%s\", lineptr = \"%s\"\n", *string, lineptr));*/
 
       mask |= PPD_STRING;
     }
@@ -1991,5 +2002,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.56 2001/07/02 19:50:26 mike Exp $".
+ * End of "$Id: ppd.c,v 1.57 2001/08/14 19:25:44 mike Exp $".
  */

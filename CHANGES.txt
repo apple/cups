@@ -1,4 +1,4 @@
-CHANGES.txt - 08/08/2001
+CHANGES.txt - 08/14/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.10
@@ -67,6 +67,10 @@ CHANGES IN CUPS V1.1.9-1
 	- Updated the pstoraster filter to use the MIPS_FIXADE
 	  system call under IRIX to fix bus error problems on
 	  R12000 processors (Ghostscript is not 64-bit clean...)
+	- Some Xerox PPD files (most notably the Phaser 790)
+	  have illegal whitespace in the option keyword in the
+	  OpenUI line.  This caused the PageRegion option to not
+	  be recognized properly for the Phaser 790.
 
 
 CHANGES IN CUPS V1.1.9
