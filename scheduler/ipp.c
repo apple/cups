@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.45 2000/01/21 04:32:25 mike Exp $"
+ * "$Id: ipp.c,v 1.46 2000/01/27 02:25:45 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -491,34 +491,8 @@ add_class(client_t        *con,		/* I - Client connection */
     }
 
    /*
-    * If we found a printer but didn't error out, then rename the printer to
-    * printer@host...
-    */
-
-    if (pclass != NULL)
-    {
-      strcat(pclass->name, "@");
-      strcat(pclass->name, pclass->hostname);
-      SetPrinterAttrs(pclass);
-      SortPrinters();
-    }
-
-   /*
     * No, add the pclass...
     */
-
-    pclass = AddClass(resource + 9);
-  }
-  else if (pclass->type & CUPS_PRINTER_REMOTE)
-  {
-   /*
-    * We found a remote class; rename it and then add the pclass.
-    */
-
-    strcat(pclass->name, "@");
-    strcat(pclass->name, pclass->hostname);
-    SetPrinterAttrs(pclass);
-    SortPrinters();
 
     pclass = AddClass(resource + 9);
   }
@@ -716,34 +690,8 @@ add_printer(client_t        *con,	/* I - Client connection */
     }
 
    /*
-    * If we found a class but didn't error out, then rename the class to
-    * class@host...
-    */
-
-    if (printer != NULL)
-    {
-      strcat(printer->name, "@");
-      strcat(printer->name, printer->hostname);
-      SetPrinterAttrs(printer);
-      SortPrinters();
-    }
-
-   /*
     * No, add the printer...
     */
-
-    printer = AddPrinter(resource + 10);
-  }
-  else if (printer->type & CUPS_PRINTER_REMOTE)
-  {
-   /*
-    * We found a remote printer; rename it and then add the printer.
-    */
-
-    strcat(printer->name, "@");
-    strcat(printer->name, printer->hostname);
-    SetPrinterAttrs(printer);
-    SortPrinters();
 
     printer = AddPrinter(resource + 10);
   }
@@ -3550,5 +3498,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.45 2000/01/21 04:32:25 mike Exp $".
+ * End of "$Id: ipp.c,v 1.46 2000/01/27 02:25:45 mike Exp $".
  */
