@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.31 2000/12/14 20:51:28 mike Exp $"
+ * "$Id: lpstat.c,v 1.32 2001/01/11 21:58:52 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -361,7 +361,20 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    return (1);
       }
     else
+    {
+      if (!http)
+      {
+	http = httpConnect(cupsServer(), ippPort());
+
+	if (http == NULL)
+	{
+	  perror("lpstat: Unable to connect to server");
+	  return (1);
+	}
+      }
+
       show_jobs(http, argv[i], NULL, long_status, ranking);
+    }
 
   if (argc == 1)
   {
@@ -1819,5 +1832,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.31 2000/12/14 20:51:28 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.32 2001/01/11 21:58:52 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.81 2000/11/18 19:16:33 mike Exp $"
+ * "$Id: printers.c,v 1.82 2001/01/11 21:58:51 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -685,6 +685,14 @@ SaveAllPrinters(void)
   }
   else
     LogMessage(L_INFO, "Saving printers.conf...");
+
+ /*
+  * Restrict access to the file...
+  */
+
+  fchown(fileno(fp), User);
+  fchgrp(fileno(fp), Group);
+  fchmod(fileno(fp), 0600);
 
  /*
   * Write a small header to the file...
@@ -1691,5 +1699,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.81 2000/11/18 19:16:33 mike Exp $".
+ * End of "$Id: printers.c,v 1.82 2001/01/11 21:58:51 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.104 2001/01/08 15:42:36 mike Exp $"
+ * "$Id: job.c,v 1.105 2001/01/11 21:58:51 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -233,15 +233,24 @@ void
 CheckJobs(void)
 {
   job_t		*current,	/* Current job in queue */
-		*prev;		/* Previous job in queue */
+		*prev,		/* Previous job in queue */
+		*next;		/* Next job in queue */
   printer_t	*printer,	/* Printer destination */
 		*pclass;	/* Printer class destination */
 
 
   DEBUG_puts("CheckJobs()");
 
-  for (current = Jobs, prev = NULL; current != NULL; prev = current)
+  for (current = Jobs, prev = NULL;
+       current != NULL;
+       prev = current, current = next)
   {
+   /*
+    * Save next pointer in case the job is cancelled en-route.
+    */
+
+    next = current->next;
+
    /*
     * Start held jobs if they are ready...
     */
@@ -282,11 +291,6 @@ CheckJobs(void)
         LogMessage(L_WARN, "Printer/class %s has gone away; cancelling job %d!",
 	           current->dest, current->id);
         CancelJob(current->id, 1);
-
-	if (prev == NULL)
-	  current = Jobs;
-	else
-	  current = prev->next;
       }
       else if (printer != NULL)
       {
@@ -299,14 +303,8 @@ CheckJobs(void)
 	    ((printer->type & CUPS_PRINTER_REMOTE) &&	/* Printer is remote */
 	     !printer->job))				/* and not printing a job */
 	  StartJob(current->id, printer);
-
-        current = current->next;
       }
-      else
-        current = current->next;
     }
-    else
-      current = current->next;
   }
 }
 
@@ -614,6 +612,9 @@ LoadAllJobs(void)
       }
 
       job->filetypes[fileid - 1] = mimeFileType(MimeDatabase, filename);
+
+      if (job->filetypes[fileid - 1] == NULL)
+        job->filetypes[fileid - 1] = mimeType("application", "vnd.cups-raw");
     }
 
   closedir(dir);
@@ -2611,5 +2612,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.104 2001/01/08 15:42:36 mike Exp $".
+ * End of "$Id: job.c,v 1.105 2001/01/11 21:58:51 mike Exp $".
  */

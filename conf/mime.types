@@ -1,5 +1,5 @@
 #
-# "$Id: mime.types,v 1.13 2000/11/06 16:39:17 mike Exp $"
+# "$Id: mime.types,v 1.14 2001/01/11 21:58:50 mike Exp $"
 #
 #   MIME types file for the Common UNIX Printing System (CUPS).
 #
@@ -60,7 +60,7 @@
 #   accepts 8-bit characters in the range 128-255.
 #
 #   String constants must be surrounded by "" if they contain whitespace.
-#   To instead binary data into a string, use the <hex> notation.
+#   To insert binary data into a string, use the <hex> notation.
 #
 
 ########################################################################
@@ -126,12 +126,14 @@ text/plain			txt printable(0,1024)
 
 application/vnd.cups-form	string(0,"<CUPSFORM>")
 application/vnd.cups-postscript	string(0,<1B>%-12345X) + \
-				contains(9,512,"LANGUAGE=POSTSCRIPT")
+				(contains(9,512,"LANGUAGE=POSTSCRIPT") \
+				 contains(9,512,"LANGUAGE = POSTSCRIPT"))
 application/vnd.cups-raster	string(0,"RaSt") string(0,"tSaR")
 application/vnd.cups-raw	string(0,<1B>E) \
 				string(0,<1B>@) \
 				(string(0,<1B>%-12345X) + \
-				 contains(9,512,"LANGUAGE=PCL"))
+				 (contains(9,512,"LANGUAGE=PCL")) \
+				  contains(9,512,"LANGUAGE = PCL")))
 
 ########################################################################
 #
@@ -145,5 +147,5 @@ application/vnd.cups-raw	string(0,<1B>E) \
 #application/octet-stream
 
 #
-# End of "$Id: mime.types,v 1.13 2000/11/06 16:39:17 mike Exp $".
+# End of "$Id: mime.types,v 1.14 2001/01/11 21:58:50 mike Exp $".
 #

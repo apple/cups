@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.66 2001/01/09 21:52:42 mike Exp $"
+dnl "$Id: configure.in,v 1.67 2001/01/11 21:58:50 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -534,7 +534,7 @@ AC_SUBST(INITDIR)
 AC_SUBST(INITDDIR)
 
 dnl Setup default locations...
-CUPS_SERVERROOT='${sysconfdif}/cups'
+CUPS_SERVERROOT='${sysconfdir}/cups'
 CUPS_LOGDIR='${localstatedir}/log/cups'
 CUPS_REQUESTS='${localstatedir}/spool/cups'
 
@@ -601,5 +601,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.66 2001/01/09 21:52:42 mike Exp $".
+dnl End of "$Id: configure.in,v 1.67 2001/01/11 21:58:50 mike Exp $".
 dnl

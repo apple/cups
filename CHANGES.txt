@@ -1,14 +1,24 @@
 CHANGES.txt - 01/03/2000
 ------------------------
 
-CHANGES IN CUPS V1.1.5-3
+CHANGES IN CUPS V1.1.6
 
 	- Fixed another possible DoS attack in httpGets()
+	- Added check for "LANGUAGE = PCL" and "LANGUAGE =
+	  POSTSCRIPT" in mime.types.
 	- Resolution options were not being passed into the
 	  filter programs properly.
 	- The default compiler options for GCC no longer includ
 	  "-g3", which apparently is deprecated in newer
 	  versions of GCC.
+	- CheckJobs() could cause cupsd to crash if a job is
+	  cancelled in StartJob().
+	- The printers.conf and classes.conf files are now
+	  written with restricted permissions.
+	- FindAvailablePrinter() would go into an infinite loop
+	  if a class only contained 1 printer.
+	- If LoadAllJobs() is unable to determine the file type
+	  of a print job, assume "application/vnd.cups-raw".
 
 
 CHANGES IN CUPS V1.1.5-2

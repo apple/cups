@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.23 2000/11/17 19:57:12 mike Exp $"
+ * "$Id: classes.c,v 1.24 2001/01/11 21:58:51 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -258,6 +258,9 @@ FindAvailablePrinter(const char *name)	/* I - Class to check */
       c->last_printer = i;
       return (c->printers[i]);
     }
+
+    if (c->num_numprinters == 1)
+      break;
   }
 
   return (NULL);
@@ -517,6 +520,14 @@ SaveAllClasses(void)
     LogMessage(L_INFO, "Saving classes.conf...");
 
  /*
+  * Restrict access to the file...
+  */
+
+  fchown(fileno(fp), User);
+  fchgrp(fileno(fp), Group);
+  fchmod(fileno(fp), 0600);
+
+ /*
   * Write a small header to the file...
   */
 
@@ -589,5 +600,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.23 2000/11/17 19:57:12 mike Exp $".
+ * End of "$Id: classes.c,v 1.24 2001/01/11 21:58:51 mike Exp $".
  */
