@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.19 2002/05/16 17:52:24 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.20 2002/05/28 19:06:45 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -60,8 +60,8 @@
 #define LAYOUT_RLBT	2	/* Right to left, bottom to top */
 #define LAYOUT_RLTB	3	/* Right to left, top to bottom */
 #define LAYOUT_BTLR	4	/* Bottom to top, left to right */
-#define LAYOUT_BTRL	5	/* Bottom to top, right to left */
-#define LAYOUT_TBLR	6	/* Top to bottom, left to right */
+#define LAYOUT_TBLR	5	/* Bottom to top, right to left */
+#define LAYOUT_BTRL	6	/* Top to bottom, left to right */
 #define LAYOUT_TBRL	7	/* Top to bottom, right to left */
 
 #define LAYOUT_NEGATEY	1
@@ -87,7 +87,7 @@ int		Order = 0,		/* 0 = normal, 1 = reverse pages */
 		UseESPsp = 0,		/* Use ESPshowpage? */
 		Border = BORDER_NONE,	/* Border around pages */
 		Layout = LAYOUT_LRTB,	/* Layout of N-up pages */
-		NormalLandscape = 1;	/* Normal rotation for landscape? */
+		NormalLandscape = 0;	/* Normal rotation for landscape? */
 
 
 /*
@@ -102,6 +102,7 @@ static void 	do_setup(ppd_file_t *ppd, int copies,  int collate,
 static void	end_nup(int number);
 #define		is_first_page(p)	(NUp == 1 || (((p)+1) % NUp) == 1)
 #define		is_last_page(p)		(NUp > 1 && (((p)+1) % NUp) == 0)
+#define 	is_not_last_page(p)	(NUp > 1 && ((p) % NUp) != 0)
 static char	*psgets(char *buf, size_t len, FILE *fp);
 static void	start_nup(int number, int show_border);
 
@@ -195,8 +196,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   ppd = SetCommonOptions(num_options, options, 1);
 
-  if (ppd && ppd->landscape < 0)
-    NormalLandscape = 0;
+  if (ppd && ppd->landscape > 0)
+    NormalLandscape = 1;
 
   if ((val = cupsGetOption("page-ranges", num_options, options)) != NULL)
     PageRanges = val;
@@ -229,7 +230,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   if ((val = cupsGetOption("number-up", num_options, options)) != NULL)
     NUp = atoi(val);
 
-  if ((val = cupsGetOption("number-up-border", num_options, options)) != NULL)
+  if ((val = cupsGetOption("page-border", num_options, options)) != NULL)
   {
     if (strcasecmp(val, "none") == 0)
       Border = BORDER_NONE;
@@ -680,7 +681,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     {
       end_nup(NumPages - 1);
 
-      if (!is_last_page(NumPages))
+      if (is_not_last_page(NumPages))
       {
 	start_nup(NUp - 1, 0);
         end_nup(NUp - 1);
@@ -732,7 +733,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    end_nup(number);
 	  }
 
-          if (!is_last_page(NumPages))
+          if (is_not_last_page(NumPages))
 	  {
 	    start_nup(NUp - 1, 0);
             end_nup(NUp - 1);
@@ -794,7 +795,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      end_nup(number);
 	    }
 
-            if (!is_last_page(number))
+            if (is_not_last_page(number))
 	    {
 	      start_nup(NUp - 1, 0);
               end_nup(NUp - 1);
@@ -823,7 +824,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 		  end_nup(number);
 		}
 
-        	if (!is_last_page(number))
+        	if (is_not_last_page(number))
 		{
 		  start_nup(NUp - 1, 0);
         	  end_nup(NUp - 1);
@@ -1473,8 +1474,8 @@ start_nup(int number,		/* I - Page number */
 	{
 	  if (Layout & LAYOUT_VERTICAL)
 	  {
-	    x = pos % 3;
-	    y = pos / 3;
+	    x = pos / 2;
+	    y = pos & 1;
 
             if (Layout & LAYOUT_NEGATEX)
 	      x = 2 - x;
@@ -1484,14 +1485,14 @@ start_nup(int number,		/* I - Page number */
 	  }
 	  else
 	  {
-	    x = pos / 3;
-	    y = pos % 3;
+	    x = pos % 3;
+	    y = pos / 3;
 
             if (Layout & LAYOUT_NEGATEX)
-	      x = 1 - x;
+	      x = 2 - x;
 
             if (Layout & LAYOUT_NEGATEY)
-	      y = 2 - y;
+	      y = 1 - y;
 	  }
 
           l = pw * 0.5;
@@ -1585,67 +1586,65 @@ start_nup(int number,		/* I - Page number */
         break;
   }
 
-  if (NUp > 1)
+ /*
+  * Draw borders as necessary...
+  */
+
+  if (Border && show_border)
   {
+    int		rects;		/* Number of border rectangles */
+    float	fscale,		/* Scaling value for points */
+		margin;		/* Current margin for borders */
+
+
+    rects  = (Border & BORDER_DOUBLE) ? 2 : 1;
+    fscale = PageWidth / w;
+    margin = 2.25 * fscale;
+
    /*
-    * Draw borders as necessary...
+    * Set the line width and color...
     */
 
-    if (Border && show_border)
-    {
-     /*
-      * Set the line width and color...
-      */
+    puts("gsave");
+    printf("%.3f setlinewidth 0 setgray newpath\n",
+           (Border & BORDER_THICK) ? 0.5 * fscale : 0.24 * fscale);
 
-      puts("gsave");
-      printf("%.3f setlinewidth 0 setgray newpath\n",
-             (Border & BORDER_THICK) ? PageWidth / w : 0.0);
+   /*
+    * Draw border boxes...
+    */
 
-      printf("0 0 %.1f %.1f ESPrs\n", PageWidth, PageLength);
+    for (; rects > 0; rects --, margin += 2 * fscale)
+      if (NUp > 1)
+	printf("%.1f %.1f %.1f %.1f ESPrs\n",
+	       margin,
+	       margin,
+	       PageWidth - 2 * margin,
+	       PageLength - 2 * margin);
+      else
+	printf("%.1f %.1f %.1f %.1f ESPrs\n",
+               PageLeft + margin,
+	       PageBottom + margin,
+	       PageRight - PageLeft - 2 * margin,
+	       PageTop - PageBottom - 2 * margin);
 
-      if (Border & BORDER_DOUBLE)
-	printf("2 2 %.1f %.1f ESPrs\n", PageWidth - 4.0, PageLength - 4.0);
+   /*
+    * Restore pen settings...
+    */
 
-      puts("grestore");
-    }
+    puts("grestore");
+  }
 
+  if (NUp > 1)
+  {
    /*
     * Clip the page that follows to the bounding box of the page...
     */
 
     printf("0 0 %.1f %.1f ESPrc\n", PageWidth, PageLength);
   }
-  else
-  {
-   /*
-    * Draw borders as necessary...
-    */
-
-    if (Border && show_border)
-    {
-     /*
-      * Set the line width and color...
-      */
-
-      puts("gsave");
-      printf("%.3f setlinewidth 0 setgray newpath\n",
-             (Border & BORDER_THICK) ? PageWidth / w : 0.0);
-
-      printf("%.1f %.1f %.1f %.1f ESPrs\n",
-             PageLeft, PageBottom,
-	     PageRight - PageLeft, PageTop - PageBottom);
-
-      if (Border & BORDER_DOUBLE)
-	printf("%.1f %.1f %.1f %.1f ESPrs\n",
-               PageLeft + 2.0, PageBottom + 2.0,
-	       PageRight - PageLeft - 4.0, PageTop - PageBottom - 4.0);
-
-      puts("grestore");
-    }
-  }
 }
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.19 2002/05/16 17:52:24 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.20 2002/05/28 19:06:45 mike Exp $".
  */
