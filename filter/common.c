@@ -1,5 +1,5 @@
 /*
- * "$Id: common.c,v 1.7 1999/07/15 14:28:11 mike Exp $"
+ * "$Id: common.c,v 1.8 1999/09/12 17:48:03 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -77,6 +77,9 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
     PageBottom = pagesize->bottom;
     PageLeft   = pagesize->left;
     PageRight  = pagesize->right;
+
+    fprintf(stderr, "DEBUG: Page = %.0fx%.0f; %.0f,%.0f to %.0f,%.0f\n",
+            PageWidth, PageLength, PageLeft, PageBottom, PageRight, PageTop);
   }
 
   if (ppd != NULL)
@@ -248,5 +251,5 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
 
 
 /*
- * End of "$Id: common.c,v 1.7 1999/07/15 14:28:11 mike Exp $".
+ * End of "$Id: common.c,v 1.8 1999/09/12 17:48:03 mike Exp $".
  */

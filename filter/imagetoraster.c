@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.29 1999/08/30 15:50:16 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.30 1999/09/12 17:48:05 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -491,8 +491,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   xprint = xinches / xpages;
   yprint = yinches / ypages;
 
-  if ((val = cupsGetOption("Page", num_options, options)) != NULL &&
-      strncmp(val, "Custom.", 7) == 0)
+  if ((choice = ppdFindMarkedChoice(ppd, "PageSize")) != NULL &&
+      strcmp(choice->choice, "Custom") == 0)
   {
     if (Orientation & 1)
     {
@@ -3848,5 +3848,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.29 1999/08/30 15:50:16 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.30 1999/09/12 17:48:05 mike Exp $".
  */
