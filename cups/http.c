@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.65 2000/10/13 03:29:17 mike Exp $"
+ * "$Id: http.c,v 1.66 2000/10/20 20:23:52 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -397,7 +397,9 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 	     int        *port,		/* O - Port number to use */
              char       *resource)	/* O - Resource/filename [1024] */
 {
-  char	*ptr;			/* Pointer into string... */
+  char		*ptr;				/* Pointer into string... */
+  const char	*atsign,			/* @ sign */
+		*slash;				/* Separator */
 
 
   if (uri == NULL || method == NULL || username == NULL || host == NULL ||
@@ -490,36 +492,41 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
   }
 
  /*
-  * Grab the hostname...
+  * Grab the usenname, if any...
   */
 
   while (*uri == '/')
     uri ++;
 
-  ptr = host;
-  while (!(*uri == ':' && isdigit(uri[1])) && *uri != '@' && *uri != '/' && *uri != '\0')
-    *ptr ++ = *uri ++;
+  if ((slash = strchr(uri, '/')) == NULL)
+    slash = uri + strlen(uri);
 
-  *ptr = '\0';
-
-  if (*uri == '@')
+  if ((atsign = strchr(uri, '@')) != NULL && atsign < slash)
   {
    /*
-    * Got a username...
+    * Got a username:password combo...
     */
 
-    strncpy(username, host, 31);
-    username[31] = '\0';
-    
-    ptr = host;
-    uri ++;
-    while (*uri != ':' && *uri != '/' && *uri != '\0')
-      *ptr ++ = *uri ++;
+    for (ptr = username;
+         uri < atsign && ptr < (username + sizeof(username) - 1);
+	 *ptr++ = *uri++);
 
     *ptr = '\0';
+
+    uri = atsign + 1;
   }
   else
     username[0] = '\0';
+
+ /*
+  * Grab the hostname...
+  */
+
+  ptr = host;
+  while (*uri != ':' && *uri != '/' && *uri != '\0')
+    *ptr ++ = *uri ++;
+
+  *ptr = '\0';
 
   if (*uri != ':')
   {
@@ -527,7 +534,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
       *port = 80;
     else if (strcasecmp(method, "https") == 0)
       *port = 443;
-    else if (strcasecmp(method, "ipp") == 0)	/* Not registered yet... */
+    else if (strcasecmp(method, "ipp") == 0)
       *port = ippPort();
     else if (strcasecmp(method, "socket") == 0)	/* Not registered yet... */
       *port = 9100;
@@ -1661,5 +1668,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.65 2000/10/13 03:29:17 mike Exp $".
+ * End of "$Id: http.c,v 1.66 2000/10/20 20:23:52 mike Exp $".
  */

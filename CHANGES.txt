@@ -47,6 +47,8 @@ CHANGES IN CUPS V1.1.5
 	  scale mode 2.
 	- Added PPD files for 9-pin and 24-pin OKIDATA printers.
 	- Updated pdftops filter to Xpdf 0.91.
+	- The httpSeparate() function didn't handle passwords
+	  that started with a number.
 
 
 CHANGES IN CUPS v1.1.4
