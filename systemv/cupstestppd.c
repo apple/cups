@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.3 2003/01/24 21:32:33 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.4 2003/01/29 01:40:39 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -444,7 +444,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       ppdClose(ppd);
     }
 
-  if (!ppd)
+  if (!ppd && verbose >= 0)
   {
     puts("Usage: cupstestppd [-q] [-v] filename1.ppd [... filenameN.ppd]");
     puts("       program | cupstestppd [-q] [-v] -");
@@ -457,5 +457,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.3 2003/01/24 21:32:33 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.4 2003/01/29 01:40:39 mike Exp $".
  */
