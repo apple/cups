@@ -1,5 +1,5 @@
 /*
- * "$Id: language.h,v 1.18.2.9 2002/05/31 19:08:22 mike Exp $"
+ * "$Id: language.h,v 1.18.2.10 2002/06/06 02:01:38 mike Exp $"
  *
  *   Multi-language support for the Common UNIX Printing System (CUPS).
  *
@@ -154,8 +154,58 @@ typedef enum			/**** Message Indices ****/
   CUPS_MSG_PRINT,
   CUPS_MSG_OPTIONS_INSTALLED,
   CUPS_MSG_AUTO,
+  /* Next message #111 */
+
   CUPS_MSG_HTTP_BASE = 200,
   CUPS_MSG_HTTP_END = 505,
+
+  CUPS_MSG_IPP_OK = 512,
+  CUPS_MSG_IPP_OK_SUBST,
+  CUPS_MSG_IPP_OK_CONFLICT,
+  CUPS_MSG_IPP_OK_IGNORED_SUBSCRIPTIONS,
+  CUPS_MSG_IPP_OK_IGNORED_NOTIFICATIONS,
+  CUPS_MSG_IPP_OK_TOO_MANY_EVENTS,
+  CUPS_MSG_IPP_OK_BUT_CANCEL_SUBSCRIPTION,
+
+  CUPS_MSG_IPP_REDIRECTION_OTHER_SITE,
+
+  CUPS_MSG_IPP_BAD_REQUEST = 528,
+  CUPS_MSG_IPP_FORBIDDEN,
+  CUPS_MSG_IPP_NOT_AUTHENTICATED,
+  CUPS_MSG_IPP_NOT_AUTHORIZED,
+  CUPS_MSG_IPP_NOT_POSSIBLE,
+  CUPS_MSG_IPP_TIMEOUT,
+  CUPS_MSG_IPP_NOT_FOUND,
+  CUPS_MSG_IPP_GONE,
+  CUPS_MSG_IPP_REQUEST_ENTITY,
+  CUPS_MSG_IPP_REQUEST_VALUE,
+  CUPS_MSG_IPP_DOCUMENT_FORMAT,
+  CUPS_MSG_IPP_ATTRIBUTES,
+  CUPS_MSG_IPP_URI_SCHEME,
+  CUPS_MSG_IPP_CHARSET,
+  CUPS_MSG_IPP_CONFLICT,
+  CUPS_MSG_IPP_COMPRESSION_NOT_SUPPORTED,
+  CUPS_MSG_IPP_COMPRESSION_ERROR,
+  CUPS_MSG_IPP_DOCUMENT_FORMAT_ERROR,
+  CUPS_MSG_IPP_DOCUMENT_ACCESS_ERROR,
+  CUPS_MSG_IPP_ATTRIBUTES_NOT_SETTABLE,
+  CUPS_MSG_IPP_IGNORED_ALL_SUBSCRIPTIONS,
+  CUPS_MSG_IPP_TOO_MANY_SUBSCRIPTIONS,
+  CUPS_MSG_IPP_IGNORED_ALL_NOTIFICATIONS,
+  CUPS_MSG_IPP_PRINT_SUPPORT_FILE_NOT_FOUND,
+
+  CUPS_MSG_IPP_INTERNAL_ERROR = 560,
+  CUPS_MSG_IPP_OPERATION_NOT_SUPPORTED,
+  CUPS_MSG_IPP_SERVICE_UNAVAILABLE,
+  CUPS_MSG_IPP_VERSION_NOT_SUPPORTED,
+  CUPS_MSG_IPP_DEVICE_ERROR,
+  CUPS_MSG_IPP_TEMPORARY_ERROR,
+  CUPS_MSG_IPP_NOT_ACCEPTING,
+  CUPS_MSG_IPP_PRINTER_BUSY,
+  CUPS_MSG_IPP_ERROR_JOB_CANCELLED,
+  CUPS_MSG_IPP_MULTIPLE_JOBS_NOT_SUPPORTED,
+  CUPS_MSG_IPP_PRINTER_IS_DEACTIVATED,
+
   CUPS_MSG_MAX
 } cups_msg_t;
 
@@ -215,6 +265,10 @@ extern char		*cupsLangEncoding(cups_lang_t *lang);
 extern void		cupsLangFlush(void);
 extern void		cupsLangFree(cups_lang_t *lang);
 extern cups_lang_t	*cupsLangGet(const char *language);
+extern int		cupsLangPrintf(FILE *fp, cups_lang_t *lang,
+			               cups_msg_t msg, ...);
+extern int		cupsLangPuts(FILE *fp, cups_lang_t *lang,
+			             cups_msg_t msg);
 #  define		cupsLangString(lang,msg) (lang)->messages[(msg)]
 
 #  ifdef __cplusplus
@@ -224,5 +278,5 @@ extern cups_lang_t	*cupsLangGet(const char *language);
 #endif /* !_CUPS_LANGUAGE_H_ */
 
 /*
- * End of "$Id: language.h,v 1.18.2.9 2002/05/31 19:08:22 mike Exp $".
+ * End of "$Id: language.h,v 1.18.2.10 2002/06/06 02:01:38 mike Exp $".
  */
