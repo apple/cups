@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.11 2002/03/08 19:18:50 mike Exp $"
+# "$Id: Makefile,v 1.12 2002/06/04 20:32:03 mike Exp $"
 #
 #   pdftops filter Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -61,7 +61,8 @@ install:	all
 
 pdftops:	libxpdf.a pdftops.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CXX) $(LDFLAGS) -o $@ pdftops.o libxpdf.a $(LIBS) -lm
+	echo $(CXX) $(LDFLAGS) -o $@ pdftops.o libxpdf.a $(LIBS) $(CXXLIBS) -lm
+	$(CXX) $(LDFLAGS) -o $@ pdftops.o libxpdf.a $(LIBS) $(CXXLIBS) -lm
 
 
 #
@@ -83,5 +84,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.11 2002/03/08 19:18:50 mike Exp $".
+# End of "$Id: Makefile,v 1.12 2002/06/04 20:32:03 mike Exp $".
 #
