@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The lpstat command didn't treat printer names as
+	  case-insensitive.
+	- The lpstat command now reports the printer location
+	  attribute with "lpstat -l -p".
 	- Fixed a bug in the vsnprintf() emulation function,
 	  which was used on old versions of HP-UX, IRIX, and
 	  Solaris.

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.37.2.6 2002/05/09 03:08:05 mike Exp $"
+ * "$Id: lpstat.c,v 1.37.2.7 2002/07/02 20:09:27 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -619,7 +619,7 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
 	  */
 
 	  for (ptr = printer;
-	       *ptr != '\0' && *dptr != '\0' && *ptr == *dptr;
+	       *ptr != '\0' && *dptr != '\0' && tolower(*ptr) == tolower(*dptr);
 	       ptr ++, dptr ++);
 
           if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' || isspace(*dptr)))
@@ -897,7 +897,7 @@ show_classes(http_t     *http,	/* I - HTTP connection to server */
 	  */
 
 	  for (ptr = printer;
-	       *ptr != '\0' && *dptr != '\0' && *ptr == *dptr;
+	       *ptr != '\0' && *dptr != '\0' && tolower(*ptr) == tolower(*dptr);
 	       ptr ++, dptr ++);
 
           if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' || isspace(*dptr)))
@@ -1138,7 +1138,7 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
 	  */
 
 	  for (ptr = printer;
-	       *ptr != '\0' && *dptr != '\0' && *ptr == *dptr;
+	       *ptr != '\0' && *dptr != '\0' && tolower(*ptr) == tolower(*dptr);
 	       ptr ++, dptr ++);
 
           if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' || isspace(*dptr)))
@@ -1419,7 +1419,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 	  */
 
 	  for (ptr = dest;
-	       *ptr != '\0' && *dptr != '\0' && *ptr == *dptr;
+	       *ptr != '\0' && *dptr != '\0' && tolower(*ptr) == tolower(*dptr);
 	       ptr ++, dptr ++);
 
           if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' || isspace(*dptr)))
@@ -1551,7 +1551,8 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
   cups_lang_t	*language;	/* Default language */
   const char	*printer,	/* Printer name */
 		*message,	/* Printer state message */
-		*description;	/* Description of printer */
+		*description,	/* Description of printer */
+		*location;	/* Location of printer */
   ipp_pstate_t	pstate;		/* Printer state */
   cups_ptype_t	ptype;		/* Printer type */
   int		jobid;		/* Job ID of current job */
@@ -1567,7 +1568,8 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 		  "printer-state",
 		  "printer-state-message",
 		  "printer-type",
-		  "printer-info"
+		  "printer-info",
+                   "printer-location"
 		};
   static const char *jattrs[] =	/* Attributes we need for jobs... */
 		{
@@ -1654,6 +1656,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
       pstate      = IPP_PRINTER_IDLE;
       message     = NULL;
       description = NULL;
+      location = NULL;
       jobid       = 0;
 
       while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
@@ -1677,6 +1680,10 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
         if (strcmp(attr->name, "printer-info") == 0 &&
 	    attr->value_tag == IPP_TAG_TEXT)
 	  description = attr->values[0].string.text;
+
+        if (strcmp(attr->name, "printer-location") == 0 &&
+	    attr->value_tag == IPP_TAG_TEXT)
+	  location = attr->values[0].string.text;
 
         attr = attr->next;
       }
@@ -1718,7 +1725,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	  */
 
 	  for (ptr = printer;
-	       *ptr != '\0' && *dptr != '\0' && *ptr == *dptr;
+	       *ptr != '\0' && *dptr != '\0' && tolower(*ptr) == tolower(*dptr);
 	       ptr ++, dptr ++);
 
           if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' || isspace(*dptr)))
@@ -1829,6 +1836,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	  printf("\tDescription: %s\n", description ? description : "");
         if (long_status > 1)
 	{
+	  printf("\tLocation: %s\n", location ? location : "");
 	  printf("\tConnection: %s\n",
 	         (ptype & CUPS_PRINTER_REMOTE) ? "remote" : "direct");
 	  if (!(ptype & CUPS_PRINTER_REMOTE))
@@ -1876,6 +1884,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	      printf("\tDescription: %s\n", description ? description : "");
             if (long_status > 1)
 	    {
+	      printf("\tLocation: %s\n", location ? location : "");
 	      printf("\tConnection: %s\n",
 	             (ptype & CUPS_PRINTER_REMOTE) ? "remote" : "direct");
 	      if (!(ptype & CUPS_PRINTER_REMOTE))
@@ -1920,5 +1929,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.37.2.6 2002/05/09 03:08:05 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.37.2.7 2002/07/02 20:09:27 mike Exp $".
  */
