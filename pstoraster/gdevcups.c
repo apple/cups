@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.15 1999/11/05 19:58:30 mike Exp $"
+ * "$Id: gdevcups.c,v 1.16 1999/12/10 17:13:14 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -1524,23 +1524,29 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
 
   if (cupsProfile && cups->header.cupsBitsPerColor == 8)
   {
-    cupsHaveProfile = 1;
-    sscanf(cupsProfile, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f", &d, &g,
-           m[0] + 0, m[0] + 1, m[0] + 2,
-           m[1] + 0, m[1] + 1, m[1] + 2,
-           m[2] + 0, m[2] + 1, m[2] + 2);
+    fprintf(stderr, "DEBUG: Using user-defined profile \"%s\"...\n", cupsProfile);
 
-    d       *= 0.001f;
-    g       *= 0.001f;
-    m[0][0] *= 0.001f;
-    m[0][1] *= 0.001f;
-    m[0][2] *= 0.001f;
-    m[1][0] *= 0.001f;
-    m[1][1] *= 0.001f;
-    m[1][2] *= 0.001f;
-    m[2][0] *= 0.001f;
-    m[2][1] *= 0.001f;
-    m[2][2] *= 0.001f;
+    if (sscanf(cupsProfile, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f", &d, &g,
+               m[0] + 0, m[0] + 1, m[0] + 2,
+               m[1] + 0, m[1] + 1, m[1] + 2,
+               m[2] + 0, m[2] + 1, m[2] + 2) != 11)
+      fputs("DEBUG: User-defined profile does not contain 11 integers!\n", stderr);
+    else
+    {
+      cupsHaveProfile = 1;
+
+      d       *= 0.001f;
+      g       *= 0.001f;
+      m[0][0] *= 0.001f;
+      m[0][1] *= 0.001f;
+      m[0][2] *= 0.001f;
+      m[1][0] *= 0.001f;
+      m[1][1] *= 0.001f;
+      m[1][2] *= 0.001f;
+      m[2][0] *= 0.001f;
+      m[2][1] *= 0.001f;
+      m[2][2] *= 0.001f;
+    }
   }
   else if (cups->ppd != NULL && cups->header.cupsBitsPerColor == 8)
   {
@@ -2441,5 +2447,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.15 1999/11/05 19:58:30 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.16 1999/12/10 17:13:14 mike Exp $".
  */
