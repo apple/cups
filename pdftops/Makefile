@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.6.2.5 2002/09/18 17:03:20 mike Exp $"
+# "$Id: Makefile,v 1.6.2.6 2002/10/09 23:25:21 mike Exp $"
 #
 #   pdftops filter Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -24,7 +24,6 @@ LIBOBJS	=	Annot.o \
 		Decrypt.o \
 		Dict.o \
 		Error.o \
-		FTFont.o \
 		FontEncoding.o \
 		FontEncodingTables.o \
 		FontFile.o \
@@ -47,10 +46,7 @@ LIBOBJS	=	Annot.o \
 		Page.o \
 		Params.o \
 		Parser.o \
-		SFont.o \
 		Stream.o \
-		T1Font.o \
-		TTFont.o \
 		UnicodeMap.o \
 		XRef.o \
 		gfile.o \
@@ -122,5 +118,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.6.2.5 2002/09/18 17:03:20 mike Exp $".
+# End of "$Id: Makefile,v 1.6.2.6 2002/10/09 23:25:21 mike Exp $".
 #
