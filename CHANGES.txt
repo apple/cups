@@ -1,4 +1,4 @@
-CHANGES.txt - 02/14/2001
+CHANGES.txt - 02/20/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.6-3
@@ -7,6 +7,9 @@ CHANGES IN CUPS V1.1.6-3
 	  TIFF library; this caused problems in some
 	  configurations since the TIFF library also supports
 	  JPEG compression of TIFF images.
+	- Updated the configure script and makefiles to handle
+	  admin man pages with the "1m" extension (HP-UX, IRIX,
+	  Solaris, Tru64) and in odd directories (IRIX)
 	- The updated cupsTempFile() function did not return
 	  the filename when called with a filename buffer of
 	  NULL (previously it used a static buffer.)

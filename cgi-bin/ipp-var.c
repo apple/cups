@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.21 2001/02/15 13:34:14 mike Exp $"
+ * "$Id: ipp-var.c,v 1.22 2001/02/20 17:32:59 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -182,7 +182,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
       for (i = 0; i < attr->num_values; i ++)
       {
 	if (i)
-	  strncat(valptr, ",", sizeof(value) - (valptr - value));
+	  strncat(valptr, ",", sizeof(value) - (valptr - value) - 1);
 
 	valptr += strlen(valptr);
 
@@ -207,7 +207,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 	      break;
 
 	  case IPP_TAG_NOVALUE :
-	      strncat(valptr, "novalue", sizeof(value) - (valptr - value));
+	      strncat(valptr, "novalue", sizeof(value) - (valptr - value) - 1);
 	      break;
 
 	  case IPP_TAG_RANGE :
@@ -254,7 +254,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 		    snprintf(uri, sizeof(uri), "http://%s:%d%s", hostname, port,
 		             resource);
 
-		  strncat(valptr, uri, sizeof(value) - (valptr - value));
+		  strncat(valptr, uri, sizeof(value) - (valptr - value) - 1);
         	  break;
         	}
               }
@@ -266,7 +266,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 	  case IPP_TAG_CHARSET :
 	  case IPP_TAG_LANGUAGE :
 	      strncat(valptr, attr->values[i].string.text,
-	              sizeof(value) - (valptr - value));
+	              sizeof(value) - (valptr - value) - 1);
 	      break;
 
           default :
@@ -288,5 +288,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.21 2001/02/15 13:34:14 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.22 2001/02/20 17:32:59 mike Exp $".
  */

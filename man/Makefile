@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.11 2000/08/18 17:24:43 mike Exp $"
+# "$Id: Makefile,v 1.12 2001/02/20 17:33:00 mike Exp $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -73,15 +73,15 @@ install:
 	for file in $(MAN5); do \
 		$(INSTALL_MAN) $$file $(MANDIR)/man5/`basename $$file man`5; \
 	done
-	-$(MKDIR) $(MANDIR)/man8
-	-$(CHMOD) ugo+rx $(MANDIR)/man8
+	-$(MKDIR) $(AMANDIR)/man$(MAN8EXT)
+	-$(CHMOD) ugo+rx $(AMANDIR)/man$(MAN8EXT)
 	for file in $(MAN8); do \
-		$(INSTALL_MAN) $$file $(MANDIR)/man8/`basename $$file man`8; \
+		$(INSTALL_MAN) $$file $(AMANDIR)/man$(MAN8EXT)/`basename $$file man`$(MAN8EXT); \
 	done
-	$(RM) $(MANDIR)/man8/reject.8
-	$(LN) accept.8 $(MANDIR)/man8/reject.8
-	$(RM) $(MANDIR)/man8/disable.8
-	$(LN) enable.8 $(MANDIR)/man8/disable.8
+	$(RM) $(AMANDIR)/man$(MAN8EXT)/reject.$(MAN8EXT)
+	$(LN) accept.$(MAN8EXT) $(AMANDIR)/man$(MAN8EXT)/reject.$(MAN8EXT)
+	$(RM) $(AMANDIR)/man$(MAN8EXT)/disable.$(MAN8EXT)
+	$(LN) enable.$(MAN8EXT) $(AMANDIR)/man$(MAN8EXT)/disable.$(MAN8EXT)
 	-$(MKDIR) $(MANDIR)/cat1
 	-$(CHMOD) ugo+rx $(MANDIR)/cat1
 	$(INSTALL_MAN) $(CAT1) $(MANDIR)/cat1
@@ -90,15 +90,15 @@ install:
 	-$(MKDIR) $(MANDIR)/cat5
 	-$(CHMOD) ugo+rx $(MANDIR)/cat5
 	$(INSTALL_MAN) $(CAT5) $(MANDIR)/cat5
-	-$(MKDIR) $(MANDIR)/cat8
-	-$(CHMOD) ugo+rx $(MANDIR)/cat8
-	$(INSTALL_MAN) $(CAT8) $(MANDIR)/cat8
-	$(RM) $(MANDIR)/cat8/reject.$(CAT1EXT)
-	$(LN) accept.$(CAT1EXT) $(MANDIR)/cat8/reject.$(CAT1EXT)
-	$(RM) $(MANDIR)/cat8/disable.$(CAT1EXT)
-	$(LN) enable.$(CAT1EXT) $(MANDIR)/cat8/disable.$(CAT1EXT)
+	-$(MKDIR) $(AMANDIR)/cat$(MAN8EXT)
+	-$(CHMOD) ugo+rx $(AMANDIR)/cat$(MAN8EXT)
+	$(INSTALL_MAN) $(CAT8) $(AMANDIR)/cat$(MAN8EXT)
+	$(RM) $(AMANDIR)/cat$(MAN8EXT)/reject.$(CAT8EXT)
+	$(LN) accept.$(CAT1EXT) $(AMANDIR)/cat$(MAN8EXT)/reject.$(CAT8EXT)
+	$(RM) $(AMANDIR)/cat$(MAN8EXT)/disable.$(CAT8EXT)
+	$(LN) enable.$(CAT1EXT) $(AMANDIR)/cat$(MAN8EXT)/disable.$(CAT8EXT)
 
 
 #
-# End of "$Id: Makefile,v 1.11 2000/08/18 17:24:43 mike Exp $".
+# End of "$Id: Makefile,v 1.12 2001/02/20 17:33:00 mike Exp $".
 #

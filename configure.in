@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.78 2001/02/14 15:48:48 mike Exp $"
+dnl "$Id: configure.in,v 1.79 2001/02/20 17:32:59 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -498,17 +498,22 @@ if test "$mandir" = "\${prefix}/man" -a "$prefix" = "/"; then
         	FreeBSD* | NetBSD* | OpenBSD*)
         		# *BSD
         		mandir="/usr/share/man"
+        		AMANDIR="/usr/share/man"
         		;;
         	IRIX*)
         		# SGI IRIX
-        		mandir="/usr/share/catman"
+        		mandir="/usr/share/catman/u_man"
+        		AMANDIR="/usr/share/catman/a_man"
         		;;
         	*)
         		# All others
         		mandir="/usr/man"
+        		AMANDIR="/usr/man"
         		;;
 	esac
 fi
+
+AC_SUBST(AMANDIR)
 
 dnl Fix "fontpath" variable...
 if test "x$fontpath" = "x"; then
@@ -522,24 +527,35 @@ case "$uname" in
 		CAT1EXT=0
 		CAT5EXT=0
 		CAT8EXT=0
+		MAN8EXT=8
 		;;
 	IRIX*)
 		# SGI IRIX
 		CAT1EXT=z
 		CAT5EXT=z
 		CAT8EXT=z
+		MAN8EXT=1m
+		;;
+	SunOS* | HP-UX*)
+		# Solaris and HP-UX
+		CAT1EXT=1
+		CAT5EXT=5
+		CAT8EXT=1m
+		MAN8EXT=1m
 		;;
 	*)
 		# All others
 		CAT1EXT=1
 		CAT5EXT=5
 		CAT8EXT=8
+		MAN8EXT=8
 		;;
 esac
 
 AC_SUBST(CAT1EXT)
 AC_SUBST(CAT5EXT)
 AC_SUBST(CAT8EXT)
+AC_SUBST(MAN8EXT)
 
 dnl Setup init.d locations...
 case "$uname" in
@@ -657,5 +673,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.78 2001/02/14 15:48:48 mike Exp $".
+dnl End of "$Id: configure.in,v 1.79 2001/02/20 17:32:59 mike Exp $".
 dnl
