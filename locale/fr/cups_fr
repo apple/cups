@@ -1,116 +1,114 @@
 iso-8859-1
-OK
-Cancel
-Aide
+CORRECT 
+Annulation 
+Aide 
 Quitté 
-Fin
+Étroit
 Oui
-Non
-Automatique 
+Aucun
 Sur
-Outre
-Enregistrent
-Jettent
-Défaut
-User-Defined
-Options
-More Info
-Black
-Couleur
-Cyan
-Magenta
-Yellow
-Copyright
-Tous droits réservés
-General
-Imprimante
-PostScript
-Image
-Text
-HPGL
-Advanced
-Page D'Accueil D'Impression
-Bavard Enregistrement
-La Copie Pagine
-Document
-Entire Document
-Page Range
-Reverse Order
-Page Format
- 1-Up
- 2-Up
- 4-Up
-Image Scaling
-Use Natural Image Size
-Zoom by Percent
-Zoom by PPI
-Mirror Image
-Rotate Image
-Best Fit
-Saturation De Couleur
-Tonalité De Couleur
-Nombre de Colonnes
-Margins
-Wrap Text
-Fit to Page
-Shading
-Default Pen Width
-Gamma Correction
-Brightness
-Couleur Profile
-Add Imprimante
-Delete Imprimante
-Modify Imprimante
-URI D'Imprimante
-Nom D'Imprimante
-Emplacement D'Imprimante
-L'Information D'Imprimante
-L'imprimante Font et Modèlent
-URI De Dispositif
-Page de formatage
-Imprimant la page
-Imprimante D'Initialisation
-Mode D'Imprimante
-Les Travaux De Recevoir
-Ne recevant pas Les Travaux
-Print Jobs
-Class
-Local
-Remote
-Duplexing
-Stapling
-Fast Copies
-Collated Copies
-Hole Punching
-Covering
-Binding
-Sorting
-Petit (up to 241x356mm)
-Moyenne (241x356mm to 330x483mm)
-Grand (330x483mm and larger)
-Faite sur Commande Taille
-Idle
-Processing
-Stopped
-400 Votre browser a envoyé une demande que ce serveur ne pourrait pas comprendre.
-Ce serveur ne pourrait pas vérifier que vous êtes autorisés à accéder à la ressource.
-You must pay to access this server.
-You don't have permission to access the resource on this server.
-La ressource demandée n'a pas été trouvée sur ce serveur.
-The requested method is not allowed with the resource.
-An appropriate representation for the resource was not found on this server.
-You don't have permission to use this server as a proxy host.
-The request has taken too long to complete and has been aborted.
-The requested resource has more than one value.
-The requested resource is gone and has not been replaced.
-The requested method requires a valid Content-Length.
-The precondition on the request evaluated to false.
-The request is too large for this server to process.
-The request URI is too large for this server to process.
-The request format is not understood by this server.
-500 The server has detected an unrecoverable error and cannot process your request.
-The requested method is not implemented by this server.
-The proxy server received an invalid response from an upstream server.
-The requested resource is currently unavailable on this server.
-The proxy server has taken too long to respond to this server.
-This server does not support the HTTP version required by your browser.
+Outre de
+Économiser
+Écart
+Défaut 
+Options 
+Plus D'Information 
+Noir 
+Couleur 
+Cyan 
+Magenta 
+Jaune 
+Copyright 1993-1999 par Easy Software Products, tous droits réservés. 
+Général 
+Imprimante 
+Options D'Image 
+HP-GL/2 Options 
+Frais supplémentaires 
+Document 
+Autre 
+Pages D'Impression: 
+Entier Document 
+Chaîne De Page 
+Commande D'Inversion: 
+Format De Page: 
+ 1-Up 
+ 2-Up 
+ 4-Up 
+Graduation D'Image: 
+Taille Normale D'Image D'Utilisation 
+Zoom par Percent 
+Zoom par PPI 
+Image De Miroir: 
+Saturation De Couleur: 
+Tonalité De Couleur: 
+Adaptez pour paginer: 
+Ombrageant: 
+Largeur De Crayon lecteur: 
+Gamma Correction: 
+Éclat: 
+Ajoutez 
+Effacement 
+Modifiez 
+URI D'Imprimante 
+Nom D'Imprimante 
+Emplacement D'Imprimante 
+Information D'Imprimante 
+L'imprimante font et modèlent 
+URI De Dispositif 
+Page De Formatage 
+Imprimant La Page 
+D' Initialisation Imprimante 
+État D'Imprimante 
+Recevant Les Travaux 
+Ne recevant pas Les Travaux 
+Tirages 
+Classe 
+Local 
+Périphérique 
+Duplexage 
+Agrafant 
+Rapides Copies 
+Assemblées Copies 
+Poinçon De Trou 
+Bâche 
+Liant 
+Triant 
+Petit (jusqu'à 9.5x1în) 
+Support (9.5x1în à 13x19in) 
+Grand (13x19in et plus grand) 
+Faite sur commande Taille 
+Ralenti 
+Traitant 
+Arrêté 
+Tout 
+Impair 
+Même Pages 
+Plus foncé    Un Allumeur 
+Taille De Medias 
+Type De Supports 
+Source De Medias 
+Orientation: 
+Verticale 
+Horizontal 
+400 Votre browser a envoyé une demande que ce serveur ne pourrait pas comprendre. 
+Ce serveur ne pourrait pas vérifier que vous êtes autorisés à accéder à la ressource. 
+Vous devez payer pour accéder à ce serveur. 
+Vous n'avez pas la permission d'accéder à la ressource sur ce serveur. 
+La ressource demandée n'a pas été trouvée sur ce serveur. 
+On ne permet pas la méthode demandée avec la ressource. 
+Une représentation appropriée pour la ressource n'a pas été trouvée sur ce serveur. 
+Vous n'avez pas la permission d'utiliser ce serveur comme centre serveur de procuration. 
+La demande a pris trop longtemps pour se terminer et a été interrompue. 
+La ressource demandée a plus d'une valeur. 
+La ressource demandée est allée et n'a pas été substituée. 
+La méthode demandée exige un Content-Length valide. 
+La condition préalable sur la demande a évalué à faux. 
+La demande est trop grande pour que ce serveur traite. 
+L'cUri de demande est trop grand pour que ce serveur traite. 
+Le format de demande n'est pas compris par ce serveur. 
+500 Le serveur a détecté une erreur irrémédiable et ne peut pas traiter votre demande. 
+La méthode demandée n'est pas appliquée par ce serveur. 
+Le proxy server a reçu une réponse incorrecte d'un serveur ascendant. 
+La ressource demandée est actuel indisponible sur ce serveur. 
+Le proxy server a pris trop longtemps pour répondre à ce serveur. 
+Ce serveur ne supporte pas la version de HTTP exigée par votre browser. 

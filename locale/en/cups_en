@@ -6,7 +6,7 @@ Quit
 Close
 Yes
 No
-Auto
+Automatic
 On
 Off
 Save
@@ -28,7 +28,7 @@ PostScript
 Image
 Text
 HPGL
-Advanced
+Extra
 Print Banner Page
 Verbose Logging
 Print Pages
@@ -92,6 +92,15 @@ Custom Size
 Idle
 Processing
 Stopped
+All
+Odd
+Even Pages
+Other
+Media Size
+Media Type
+Media Source
+Portrait
+Landscape
 400 Your browser sent a request that this server could not understand.
 This server could not verify that you are authorized to access the resource.
 You must pay to access this server.
