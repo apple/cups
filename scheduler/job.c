@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.35 1999/07/29 20:36:18 mike Exp $"
+ * "$Id: job.c,v 1.36 1999/09/03 16:07:04 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -936,8 +936,8 @@ start_process(char *command,	/* I - Full path to command */
     * Change user to something "safe"...
     */
 
-    setuid(User);
     setgid(Group);
+    setuid(User);
 
    /*
     * Execute the command; if for some reason this doesn't work,
@@ -967,5 +967,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.35 1999/07/29 20:36:18 mike Exp $".
+ * End of "$Id: job.c,v 1.36 1999/09/03 16:07:04 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.32 1999/08/27 16:33:39 mike Exp $"
+ * "$Id: client.c,v 1.33 1999/09/03 16:07:03 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1455,8 +1455,8 @@ pipe_command(client_t *con,	/* I - Client connection */
     * Child comes here...  Close stdin if necessary and dup the pipe to stdout.
     */
 
-    setuid(User);
     setgid(Group);
+    setuid(User);
 
     if (infile)
     {
@@ -1504,5 +1504,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.32 1999/08/27 16:33:39 mike Exp $".
+ * End of "$Id: client.c,v 1.33 1999/09/03 16:07:03 mike Exp $".
  */
