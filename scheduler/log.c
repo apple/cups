@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.23 2002/01/29 18:20:12 mike Exp $"
+ * "$Id: log.c,v 1.24 2002/01/29 22:04:00 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -215,7 +215,7 @@ LogPage(job_t       *job,	/* I - Job being printed */
 
 
 
-  billing = ippFindAttribute(job->attrs, "job-billing", IPP_TAG_TEXT);
+  billing = ippFindAttribute(job->attrs, "job-billing", IPP_TAG_ZERO);
 
 #ifdef HAVE_VSYSLOG
  /*
@@ -436,5 +436,5 @@ check_log_file(FILE       **log,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c,v 1.23 2002/01/29 18:20:12 mike Exp $".
+ * End of "$Id: log.c,v 1.24 2002/01/29 22:04:00 mike Exp $".
  */
