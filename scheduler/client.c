@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.83 2001/02/08 19:24:14 mike Exp $"
+ * "$Id: client.c,v 1.84 2001/02/20 22:02:11 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -69,14 +69,16 @@ static int	pipe_command(client_t *con, int infile, int *outfile, char *command, 
 void
 AcceptClient(listener_t *lis)	/* I - Listener socket */
 {
+  int			i;	/* Looping var */
   int			val;	/* Parameter value */
   client_t		*con;	/* New client pointer */
   unsigned		address;/* Address of client */
   struct hostent	*host;	/* Host entry for address */
+			*ip;	/* Host entry for name */
 
 
-  DEBUG_printf(("AcceptClient(%08x) %d NumClients = %d\n",
-                lis, lis->fd, NumClients));
+  LogMessage(L_DEBUG2, "AcceptClient(%08x) %d NumClients = %d",
+             lis, lis->fd, NumClients);
 
  /*
   * Make sure we don't have a full set of clients already...
@@ -103,7 +105,8 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   if ((con->http.fd = accept(lis->fd, (struct sockaddr *)&(con->http.hostaddr),
                              &val)) < 0)
   {
-    LogMessage(L_ERROR, "accept() failed - %s.", strerror(errno));
+    LogMessage(L_ERROR, "Unable to accept client connection - %s.",
+               strerror(errno));
     return;
   }
 
@@ -135,10 +138,83 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
     strncpy(con->http.hostname, ServerName, sizeof(con->http.hostname) - 1);
   }
   else if (host == NULL)
+  {
     sprintf(con->http.hostname, "%d.%d.%d.%d", (address >> 24) & 255,
             (address >> 16) & 255, (address >> 8) & 255, address & 255);
+
+    if (HostNameLookups == 2)
+    {
+     /*
+      * Can't have an unresolved IP address with double-lookups enabled...
+      */
+
+#ifdef WIN32
+      closesocket(con->http.fd);
+#else
+      close(con->http.fd);
+#endif /* WIN32 */
+
+      LogMessage(L_WARN, "Name lookup failed - connection from %s closed!",
+                 con->http.hostname);
+      return;
+    }
+  }
   else
     strncpy(con->http.hostname, host->h_name, sizeof(con->http.hostname) - 1);
+
+  if (HostNameLookups == 2)
+  {
+   /*
+    * Do double lookups as needed...
+    */
+
+    if ((ip = gethostbyname(con->http.hostname)) != NULL)
+    {
+     /*
+      * See if the hostname maps to the IP address...
+      */
+
+      if (ip->h_length != 4 || ip->h_addrtype != AF_INET)
+      {
+       /*
+        * Not an IPv4 address...
+	*/
+
+	ip = NULL;
+      }
+      else
+      {
+       /*
+        * Compare all of the addresses against this one...
+	*/
+
+	for (i = 0; ip->h_addr_list[i]; i ++)
+          if (memcmp(&(con->http.hostaddr.sin_addr), ip->h_addr_list[i], 4) == 0)
+	    break;
+
+        if (!ip->h_addr_list[i])
+	  ip = NULL;
+      }
+    }
+
+    if (ip == NULL)
+    {
+     /*
+      * Can't have a hostname that doesn't resolve to the same IP address
+      * with double-lookups enabled...
+      */
+
+#ifdef WIN32
+      closesocket(con->http.fd);
+#else
+      close(con->http.fd);
+#endif /* WIN32 */
+
+      LogMessage(L_WARN, "IP lookup failed - connection from %s closed!",
+                 con->http.hostname);
+      return;
+    }
+  }
 
   LogMessage(L_DEBUG, "AcceptClient() %d from %s:%d.", con->http.fd,
              con->http.hostname, ntohs(con->http.hostaddr.sin_port));
@@ -149,7 +225,8 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 
   fcntl(con->http.fd, F_SETFD, fcntl(con->http.fd, F_GETFD) | FD_CLOEXEC);
 
-  DEBUG_printf(("AcceptClient: Adding fd %d to InputSet...\n", con->http.fd));
+  LogMessage(L_DEBUG2, "AcceptClient() Adding fd %d to InputSet...",
+             con->http.fd);
   FD_SET(con->http.fd, &InputSet);
 
   NumClients ++;
@@ -230,7 +307,8 @@ CloseClient(client_t *con)	/* I - Client to close */
 
   if (con->http.fd > 0)
   {
-    DEBUG_printf(("CloseClient: Removing fd %d from InputSet...\n", con->http.fd));
+    LogMessage(L_DEBUG2, "CloseClient: Removing fd %d from InputSet...",
+               con->http.fd);
     close(con->http.fd);
     FD_CLR(con->http.fd, &InputSet);
     FD_CLR(con->http.fd, &OutputSet);
@@ -239,7 +317,8 @@ CloseClient(client_t *con)	/* I - Client to close */
 
   if (con->pipe_pid != 0)
   {
-    DEBUG_printf(("CloseClient: Removing fd %d from InputSet...\n", con->file));
+    LogMessage(L_DEBUG2, "CloseClient: Removing fd %d from InputSet...",
+               con->file);
     FD_CLR(con->file, &InputSet);
   }
 
@@ -1163,7 +1242,7 @@ SendCommand(client_t      *con,
 
   fcntl(con->file, F_SETFD, fcntl(con->file, F_GETFD) | FD_CLOEXEC);
 
-  DEBUG_printf(("SendCommand: Adding fd %d to InputSet...\n", con->file));
+  LogMessage(L_DEBUG2, "SendCommand: Adding fd %d to InputSet...", con->file);
   FD_SET(con->file, &InputSet);
   FD_SET(con->http.fd, &OutputSet);
 
@@ -1482,7 +1561,8 @@ WriteClient(client_t *con)		/* I - Client connection */
 
     if (con->file)
     {
-      DEBUG_printf(("WriteClient: Removing fd %d from InputSet...\n", con->file));
+      LogMessage(L_DEBUG2, "WriteClient() Removing fd %d from InputSet...",
+                 con->file);
       FD_CLR(con->file, &InputSet);
 
       if (con->pipe_pid)
@@ -1595,8 +1675,8 @@ decode_auth(client_t *con)		/* I - Client to decode to */
 
   s = con->http.fields[HTTP_FIELD_AUTHORIZATION];
 
-  DEBUG_printf(("decode_auth(%08x): Authorization string = \"%s\"\n",
-                con, s));
+  LogMessage(L_DEBUG2, "decode_auth(%08x): Authorization string = \"%s\"",
+             con, s);
 
   if (strncmp(s, "Basic", 5) == 0)
   {
@@ -1658,10 +1738,8 @@ decode_auth(client_t *con)		/* I - Client to decode to */
     }
   }
 
-  LogMessage(L_DEBUG, "decode_auth() %d username=\"%s\"",
+  LogMessage(L_DEBUG2, "decode_auth() %d username=\"%s\"",
              con->http.fd, con->username);
-  DEBUG_printf(("decode_auth() %d username=\"%s\" password=\"%s\"\n",
-                con->http.fd, con->username, con->password));
 }
 
 
@@ -2001,5 +2079,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.83 2001/02/08 19:24:14 mike Exp $".
+ * End of "$Id: client.c,v 1.84 2001/02/20 22:02:11 mike Exp $".
  */

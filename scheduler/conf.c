@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.69 2001/02/07 19:41:36 mike Exp $"
+ * "$Id: conf.c,v 1.70 2001/02/20 22:02:11 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -103,7 +103,6 @@ static var_t	variables[] =
   { "ServerCertificate",ServerCertificate,	VAR_STRING,	sizeof(ServerCertificate) },
   { "ServerKey",	ServerKey,		VAR_STRING,	sizeof(ServerKey) },
 #endif /* HAVE_LIBSSL */
-  { "HostNameLookups",	&HostNameLookups,	VAR_BOOLEAN,	0 },
   { "Timeout",		&Timeout,		VAR_INTEGER,	0 },
   { "KeepAlive",	&KeepAlive,		VAR_BOOLEAN,	0 },
   { "KeepAliveTimeout",	&KeepAliveTimeout,	VAR_INTEGER,	0 },
@@ -113,6 +112,7 @@ static var_t	variables[] =
   { "BrowsePort",	&BrowsePort,		VAR_INTEGER,	0 },
   { "BrowseInterval",	&BrowseInterval,	VAR_INTEGER,	0 },
   { "BrowseTimeout",	&BrowseTimeout,		VAR_INTEGER,	0 },
+  { "ListenBackLog",	&ListenBackLog,		VAR_INTEGER,	0 },
   { "MaxClients",	&MaxClients,		VAR_INTEGER,	0 },
   { "MaxLogSize",	&MaxLogSize,		VAR_INTEGER,	0 },
   { "MaxRequestSize",	&MaxRequestSize,	VAR_INTEGER,	0 },
@@ -307,6 +307,7 @@ ReadConfiguration(void)
 
   endpwent();
 
+  ListenBacklog    = SOMAXCONN;
   LogLevel         = L_ERROR;
   HostNameLookups  = FALSE;
   Timeout          = DEFAULT_TIMEOUT;
@@ -590,7 +591,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
     * Decode the directive...
     */
 
-    if (strcmp(name, "<Location") == 0)
+    if (strcasecmp(name, "<Location") == 0)
     {
      /*
       * <Location path>
@@ -611,8 +612,8 @@ read_configuration(FILE *fp)		/* I - File to read from */
         return (0);
       }
     }
-    else if (strcmp(name, "Port") == 0 ||
-             strcmp(name, "Listen") == 0)
+    else if (strcasecmp(name, "Port") == 0 ||
+             strcasecmp(name, "Listen") == 0)
     {
      /*
       * Add a listening address to the list...
@@ -636,7 +637,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
         LogMessage(L_WARN, "Too many %s directives at line %d.", name,
 	           linenum);
     }
-    else if (strcmp(name, "BrowseAddress") == 0)
+    else if (strcasecmp(name, "BrowseAddress") == 0)
     {
      /*
       * Add a browse address to the list...
@@ -659,7 +660,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
         LogMessage(L_WARN, "Too many BrowseAddress directives at line %d.",
 	           linenum);
     }
-    else if (strcmp(name, "BrowseOrder") == 0)
+    else if (strcasecmp(name, "BrowseOrder") == 0)
     {
      /*
       * "BrowseOrder Deny,Allow" or "BrowseOrder Allow,Deny"...
@@ -678,8 +679,8 @@ read_configuration(FILE *fp)		/* I - File to read from */
         LogMessage(L_ERROR, "Unknown BrowseOrder value %s on line %d.",
 	           value, linenum);
     }
-    else if (strcmp(name, "BrowseAllow") == 0 ||
-             strcmp(name, "BrowseDeny") == 0)
+    else if (strcasecmp(name, "BrowseAllow") == 0 ||
+             strcasecmp(name, "BrowseDeny") == 0)
     {
      /*
       * BrowseAllow [From] host/ip...
@@ -727,7 +728,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
           * All hosts...
 	  */
 
-          if (strcmp(name, "BrowseAllow") == 0)
+          if (strcasecmp(name, "BrowseAllow") == 0)
 	    AllowIP(location, 0, 0);
 	  else
 	    DenyIP(location, 0, 0);
@@ -738,7 +739,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
           * No hosts...
 	  */
 
-          if (strcmp(name, "BrowseAllow") == 0)
+          if (strcasecmp(name, "BrowseAllow") == 0)
 	    AllowIP(location, ~0, 0);
 	  else
 	    DenyIP(location, ~0, 0);
@@ -752,7 +753,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
 	  if (value[0] == '*')
 	    value ++;
 
-          if (strcmp(name, "BrowseAllow") == 0)
+          if (strcasecmp(name, "BrowseAllow") == 0)
 	    AllowHost(location, value);
 	  else
 	    DenyHost(location, value);
@@ -791,14 +792,14 @@ read_configuration(FILE *fp)		/* I - File to read from */
 	  else
 	    netmask = netmasks[ipcount - 1];
 
-          if (strcmp(name, "BrowseAllow") == 0)
+          if (strcasecmp(name, "BrowseAllow") == 0)
 	    AllowIP(location, address, netmask);
 	  else
 	    DenyIP(location, address, netmask);
 	}
       }
     }
-    else if (strcmp(name, "BrowseRelay") == 0)
+    else if (strcasecmp(name, "BrowseRelay") == 0)
     {
      /*
       * BrowseRelay [from] source [to] destination
@@ -946,7 +947,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
         LogMessage(L_ERROR, "Bad relay address %s at line %d.", value, linenum);
       }
     }
-    else if (strcmp(name, "BrowsePoll") == 0)
+    else if (strcasecmp(name, "BrowsePoll") == 0)
     {
      /*
       * BrowsePoll address[:port]
@@ -981,7 +982,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
       else
         LogMessage(L_ERROR, "Bad poll address %s at line %d.", value, linenum);
     }
-    else if (strcmp(name, "User") == 0)
+    else if (strcasecmp(name, "User") == 0)
     {
      /*
       * User ID to run as...
@@ -1003,7 +1004,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
 	             value);
       }
     }
-    else if (strcmp(name, "Group") == 0)
+    else if (strcasecmp(name, "Group") == 0)
     {
      /*
       * Group ID to run as...
@@ -1025,23 +1026,39 @@ read_configuration(FILE *fp)		/* I - File to read from */
 	             value);
       }
     }
-    else if (strcmp(name, "LogLevel") == 0)
+    else if (strcasecmp(name, "HostNameLookups") == 0)
+    {
+     /*
+      * Do hostname lookups?
+      */
+
+      if (strcasecmp(value, "off") == 0)
+        HostNameLookups = 0;
+      else if (strcasecmp(value, "on") == 0)
+        HostNameLookups = 1;
+      else if (strcasecmp(value, "double") == 0)
+        HostNameLookups = 2;
+      else
+	LogMessage(L_WARN, "ReadConfiguration() Unknown HostNameLookups value \"%s\"",
+	           value);
+    }
+    else if (strcasecmp(name, "LogLevel") == 0)
     {
      /*
       * Amount of logging to do...
       */
 
-      if (strcmp(value, "debug2") == 0)
+      if (strcasecmp(value, "debug2") == 0)
         LogLevel = L_DEBUG2;
-      else if (strcmp(value, "debug") == 0)
+      else if (strcasecmp(value, "debug") == 0)
         LogLevel = L_DEBUG;
-      else if (strcmp(value, "info") == 0)
+      else if (strcasecmp(value, "info") == 0)
         LogLevel = L_INFO;
-      else if (strcmp(value, "warn") == 0)
+      else if (strcasecmp(value, "warn") == 0)
         LogLevel = L_WARN;
-      else if (strcmp(value, "error") == 0)
+      else if (strcasecmp(value, "error") == 0)
         LogLevel = L_ERROR;
-      else if (strcmp(value, "none") == 0)
+      else if (strcasecmp(value, "none") == 0)
         LogLevel = L_NONE;
     }
     else
@@ -1051,7 +1068,7 @@ read_configuration(FILE *fp)		/* I - File to read from */
       */
 
       for (i = NUM_VARS, var = variables; i > 0; i --, var ++)
-        if (strcmp(name, var->name) == 0)
+        if (strcasecmp(name, var->name) == 0)
 	  break;
 
       if (i == 0)
@@ -1483,5 +1500,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.69 2001/02/07 19:41:36 mike Exp $".
+ * End of "$Id: conf.c,v 1.70 2001/02/20 22:02:11 mike Exp $".
  */

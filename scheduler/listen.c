@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.8 2001/01/22 15:04:00 mike Exp $"
+ * "$Id: listen.c,v 1.9 2001/02/20 22:02:11 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -171,7 +171,7 @@ StartListening(void)
     * Listen for new clients.
     */
 
-    if (listen(lis->fd, SOMAXCONN) < 0)
+    if (listen(lis->fd, ListenBackLog) < 0)
     {
       LogMessage(L_ERROR, "StartListening: Unable to listen for clients - %s.",
                  strerror(errno));
@@ -208,5 +208,5 @@ StopListening(void)
 
 
 /*
- * End of "$Id: listen.c,v 1.8 2001/01/22 15:04:00 mike Exp $".
+ * End of "$Id: listen.c,v 1.9 2001/02/20 22:02:11 mike Exp $".
  */
