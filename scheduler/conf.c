@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.28 2003/02/04 05:45:25 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.29 2003/02/04 19:02:45 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -488,11 +488,13 @@ ReadConfiguration(void)
   chown(ServerCertificate, run_user, Group);
   chmod(ServerCertificate, ConfigFilePerm);
 
+#  if defined(HAVE_LIBSSL) || defined(HAVE_GNUTLS)
   if (ServerKey[0] != '/')
     SetStringf(&ServerKey, "%s/%s", ServerRoot, ServerKey);
 
   chown(ServerKey, run_user, Group);
   chmod(ServerKey, ConfigFilePerm);
+#  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
 #endif /* HAVE_SSL */
 
  /*
@@ -2185,5 +2187,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.28 2003/02/04 05:45:25 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.29 2003/02/04 19:02:45 mike Exp $".
  */
