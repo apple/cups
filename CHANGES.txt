@@ -76,7 +76,9 @@ CHANGES IN CUPS V1.1.5
 	- Added new mime.types rules to allow automatic raw
 	  printing of PCL and ESC/P files; PJL headers are
 	  parsed to differentiate between PostScript and
-	  PCL job files.
+	  PCL job files.  This should eliminate a lot of
+	  the reports of SAMBA printing problems due to
+	  the missing "-oraw" or "-l" options.
 	- The mimeLoadType() function didn't handle the
           3-argument contains() function.
 	- The LoadPPDs() function in the scheduler didn't
