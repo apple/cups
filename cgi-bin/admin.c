@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.8 2000/04/10 16:28:56 mike Exp $"
+ * "$Id: admin.c,v 1.9 2000/05/22 18:18:53 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,15 @@
  *
  * Contents:
  *
+ *   main()              - Main entry for CGI.
+ *   do_am_class()       - Add or modify a class.
+ *   do_am_printer()     - Add or modify a printer.
+ *   do_config_printer() - Configure the default options for a printer.
+ *   do_delete_class()   - Delete a class...
+ *   do_delete_printer() - Delete a printer...
+ *   do_job_op()         - Do a job operation.
+ *   do_printer_op()     - Do a printer operation.
+ *   get_line()          - Get a line that is terminated by a LF, CR, or CR LF.
  */
 
 /*
@@ -1224,6 +1233,8 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
     cgiCopyTemplateLang(stdout, TEMPLATES, "job-hold.tmpl", getenv("LANG"));
   else if (op == IPP_RELEASE_JOB)
     cgiCopyTemplateLang(stdout, TEMPLATES, "job-release.tmpl", getenv("LANG"));
+  else if (op == IPP_RESTART_JOB)
+    cgiCopyTemplateLang(stdout, TEMPLATES, "job-restart.tmpl", getenv("LANG"));
 }
 
 
@@ -1353,5 +1364,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.8 2000/04/10 16:28:56 mike Exp $".
+ * End of "$Id: admin.c,v 1.9 2000/05/22 18:18:53 mike Exp $".
  */
