@@ -5,7 +5,7 @@
   OrderPreference = "None";
   Messages =
   {
-    start = "Starting CUPS";
-    stop  = "Stopping CUPS";
+    start = "Starting printing services";
+    stop  = "Stopping printing services";
   };
 }

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.67 2002/03/08 19:18:48 mike Exp $"
+# "$Id: Makefile,v 1.68 2002/03/08 19:48:58 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -78,10 +78,6 @@ depend:
 #
 
 install:	all
-	$(INSTALL_DIR) $(INCLUDEDIR)/cups
-	for file in $(HEADERS); do \
-		$(INSTALL_DATA) $$file $(INCLUDEDIR)/cups; \
-	done
 	$(INSTALL_DIR) $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPS) $(LIBDIR)
 	if test $(LIBCUPS) = "libcups.so.2" -o $(LIBCUPS) = "libcups.sl.2"; then \
@@ -97,6 +93,12 @@ install:	all
 	if test $(LIBCUPS) = "libcups_s.a"; then \
 		$(INSTALL_LIB) libcups.a $(LIBDIR); \
 	fi
+
+installhdrs:
+	$(INSTALL_DIR) $(INCLUDEDIR)/cups
+	for file in $(HEADERS); do \
+		$(INSTALL_DATA) $$file $(INCLUDEDIR)/cups; \
+	done
 
 
 #
@@ -117,9 +119,9 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS) ../Makedefs
 libcups.2.dylib:	$(LIBOBJS) ../Makedefs
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ \
-		-dylib_install_name $(LIBDIR)/libcups.dylib \
-		-dylib_current_version 2.0.4 \
-		-dylib_compatibility_version 2.0.0 \
+		-install_name $(libdir)/$@ \
+		-current_version 2.0.4 \
+		-compatibility_version 2.0.0 \
 		$(LIBOBJS) $(SSLLIBS)
 	$(RM) libcups.dylib
 	$(LN) $@ libcups.dylib
@@ -200,5 +202,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.67 2002/03/08 19:18:48 mike Exp $".
+# End of "$Id: Makefile,v 1.68 2002/03/08 19:48:58 mike Exp $".
 #

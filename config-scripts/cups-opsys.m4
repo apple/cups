@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-opsys.m4,v 1.7 2002/01/02 18:50:43 mike Exp $"
+dnl "$Id: cups-opsys.m4,v 1.8 2002/03/08 19:48:58 mike Exp $"
 dnl
 dnl   Operating system stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -56,7 +56,7 @@ AC_ARG_WITH(cups-group, [  --with-cups-group       set default group for CUPS],
 	CUPS_GROUP="$withval",
 	AC_MSG_CHECKING(for default print group)
 	if test x$uname = xDarwin; then
-		CUPS_GROUP="${GROUP:=admin}"
+		CUPS_GROUP="admin"
 		AC_MSG_RESULT(Darwin, using "$CUPS_GROUP")
 	else
 		if test -f /etc/group; then
@@ -86,5 +86,5 @@ AC_DEFINE_UNQUOTED(CUPS_DEFAULT_USER, "$CUPS_USER")
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_GROUP, "$CUPS_GROUP")
 
 dnl
-dnl "$Id: cups-opsys.m4,v 1.7 2002/01/02 18:50:43 mike Exp $"
+dnl "$Id: cups-opsys.m4,v 1.8 2002/03/08 19:48:58 mike Exp $"
 dnl

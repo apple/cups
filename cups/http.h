@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.38 2002/03/01 19:53:28 mike Exp $"
+ * "$Id: http.h,v 1.39 2002/03/08 19:48:58 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -46,7 +46,9 @@
 #    include <arpa/inet.h>
 #    include <netinet/in_systm.h>
 #    include <netinet/ip.h>
-#    include <netinet/tcp.h>
+#    if !defined(__APPLE__) || !defined(TCP_NODELAY)
+#      include <netinet/tcp.h>
+#    endif /* !__APPLE__ || !TCP_NODELAY */
 #  endif /* WIN32 */
 
 #  include "md5.h"
@@ -343,5 +345,5 @@ extern char		*httpMD5String(const md5_byte_t *, char [33]);
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.38 2002/03/01 19:53:28 mike Exp $".
+ * End of "$Id: http.h,v 1.39 2002/03/08 19:48:58 mike Exp $".
  */

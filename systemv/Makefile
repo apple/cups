@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.30 2002/03/08 19:18:52 mike Exp $"
+# "$Id: Makefile,v 1.31 2002/03/08 19:48:59 mike Exp $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -58,7 +58,7 @@ depend:
 #
 
 install:	all
-	$(INSTALL_DIR) $(BINDIR)
+	$(INSTALL_DIR) $(SBINDIR)
 	$(INSTALL_BIN) accept $(SBINDIR)
 	$(RM) $(SBINDIR)/reject
 	$(LN) accept $(SBINDIR)/reject
@@ -66,6 +66,7 @@ install:	all
 	$(INSTALL_BIN) lpadmin $(SBINDIR)
 	$(INSTALL_BIN) lpinfo $(SBINDIR)
 	$(INSTALL_BIN) lpmove $(SBINDIR)
+	$(INSTALL_DIR) $(BINDIR)
 	$(INSTALL_BIN) cancel $(BINDIR)
 	$(RM) $(BINDIR)/disable
 	$(LN) ../sbin/accept $(BINDIR)/disable
@@ -179,5 +180,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.30 2002/03/08 19:18:52 mike Exp $".
+# End of "$Id: Makefile,v 1.31 2002/03/08 19:48:59 mike Exp $".
 #
