@@ -1,5 +1,5 @@
 /*
- * "$Id: lpoptions.c,v 1.2 2000/02/28 20:38:15 mike Exp $"
+ * "$Id: lpoptions.c,v 1.3 2000/03/02 16:31:50 mike Exp $"
  *
  *   Printer option program for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,8 @@
  *
  * Contents:
  *
+ *   main()  - Main entry.
+ *   usage() - Show program usage and exit.
  */
 
 /*
@@ -169,7 +171,6 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      num_options = cupsParseOptions(argv[i], num_options, &options);
 	    }
-	    printf("num_options = %d\n", num_options);
 	    break;
 
         case 'x' : /* -x printer */
@@ -286,5 +287,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpoptions.c,v 1.2 2000/02/28 20:38:15 mike Exp $".
+ * End of "$Id: lpoptions.c,v 1.3 2000/03/02 16:31:50 mike Exp $".
  */
