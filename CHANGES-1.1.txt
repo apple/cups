@@ -5,6 +5,9 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- The PPD code now decodes all JCL options in the
+	  JCLSetup group, not just those options that start with
+	  the prefix "JCL".
 	- The backends now read print data using the read()
 	  system call to ensure that the current page is printed
 	  while the next page is being processed.
