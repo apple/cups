@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.209 2003/04/28 19:26:38 mike Exp $"
+ * "$Id: job.c,v 1.210 2003/05/01 17:58:27 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -795,12 +795,6 @@ LoadAllJobs(void)
   */
 
   CleanJobs();
-
- /*
-  * Check to see if we need to start any jobs...
-  */
-
-  CheckJobs();
 }
 
 
@@ -2643,5 +2637,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.209 2003/04/28 19:26:38 mike Exp $".
+ * End of "$Id: job.c,v 1.210 2003/05/01 17:58:27 mike Exp $".
  */
