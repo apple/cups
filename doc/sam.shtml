@@ -43,7 +43,7 @@ the section titled, <A HREF="#binary">Installing a Binary Distribution</A>.
 
 <H2>Installing a Source Distribution</H2>
 
-<H3>Requirements</H3>
+<H3><A NAME="">Requirements</A></H3>
 
 <P>You'll need an ANSI-compliant C compiler to build CUPS on your
 system. As its name implies, CUPS is designed to run on the UNIX
@@ -74,7 +74,7 @@ make changes you can get the HTMLDOC software from:
 <A HREF="http://www.easysw.com/htmldoc">http://www.easysw.com/htmldoc</A>
 </PRE></UL>
 
-<H3>Compiling CUPS</H3>
+<H3><A NAME="">Compiling CUPS</A></H3>
 
 <P>CUPS uses GNU autoconf to configure the makefiles and source code
 for your system. To configure CUPS for your system type:
@@ -84,7 +84,7 @@ for your system. To configure CUPS for your system type:
 </PRE></UL>
 
 <P>The default installation will put the CUPS software in the
-<CODE>/etc</CODE>, <CODE>/usr</CODE>, and <CODE>/var</CODE> directories
+<VAR>/etc</VAR>, <VAR>/usr</VAR>, and <VAR>/var</VAR> directories
 on your system, which will overwrite any existing printing commands on
 your system. To install the CUPS software in another location use the
 <CODE>--prefix</CODE> option:
@@ -94,8 +94,8 @@ your system. To install the CUPS software in another location use the
 </PRE></UL>
 
 <P>If the PNG, JPEG, TIFF, and ZLIB libraries are not installed in a
-system default location (typically <CODE>/usr/include</CODE> and
-<CODE>/usr/lib</CODE>) you'll need to set the <CODE>CFLAGS</CODE> and
+system default location (typically <VAR>/usr/include</VAR> and
+<VAR>/usr/lib</VAR>) you'll need to set the <CODE>CFLAGS</CODE> and
 <CODE>LDFLAGS</CODE> environment variables prior to running configure:
 
 <UL><PRE>
@@ -112,7 +112,7 @@ system default location (typically <CODE>/usr/include</CODE> and
 
 <P>to build the software.
 
-<H3>Installing the Software</H3>
+<H3><A NAME="">Installing the Software</A></H3>
 
 <P>To install the software type:
 
@@ -120,7 +120,7 @@ system default location (typically <CODE>/usr/include</CODE> and
 % make install ENTER
 </PRE></UL>
 
-<H3>Running the Software</A></H3>
+<H3><A NAME="">Running the Software</A></A></H3>
 
 Once you have installed the software you can start the CUPS daemon by
 typing:
@@ -172,8 +172,8 @@ on your system.
 <P>The <CODE>lpadmin</CODE> command allows you to perform most printer
 administration tasks from the command-line. Since <CODE>lpadmin</CODE>
 is also a System V printing system command, it is located in the
-<CODE>/usr/lib</CODE> directory instead of a more common one like
-<CODE>/usr/bin</CODE> or <CODE>/usr/sbin</CODE>.
+<VAR>/usr/lib</VAR> directory instead of a more common one like
+<VAR>/usr/bin</VAR> or <VAR>/usr/sbin</VAR>.
 
 <H2>Adding and Modifying Printers</H2>
 
@@ -244,10 +244,10 @@ CUPS:
 to use for this printer. Many options (such as media size, etc.) will not
 be available if you omit this part of the <CODE>lpadmin</CODE> command.
 
-<H3>Using Standard Printer Drivers</H2>
+<H3><A NAME="">Using Standard Printer Drivers</H2>
 
 <P>The <CODE>lpadmin</CODE> command allows you to use "standard" PPD files
-and interface scripts located in the <CODE>/usr/share/cups/model</CODE>
+and interface scripts located in the <VAR>/usr/share/cups/model</VAR>
 directory with the "-m" option:
 
 <UL><PRE>
@@ -345,7 +345,7 @@ a long period of time.
 <H2>Changing the Configuration Files</H2>
 
 <P>All of the server configuration files are located in the
-<CODE>/var/cups/conf</CODE> directory. Once you have made a change to a
+<VAR>/etc/cups</VAR> directory. Once you have made a change to a
 file you need to restart the CUPS server by sending it a HUP signal or
 using the supplied script "<CODE>cups.sh</CODE>":
 
@@ -359,9 +359,9 @@ using the supplied script "<CODE>cups.sh</CODE>":
 
 <H2>Temporary Files</H2>
 
-<P>Normally CUPS puts all of its temporary files in <CODE>/var/tmp</CODE>.
+<P>Normally CUPS puts all of its temporary files in <VAR>/var/tmp</VAR>.
 If you'd like to change this directory you'll need to edit the
-<CODE>/var/cups/conf/cupsd.conf</CODE> file.
+<VAR>/etc/cups/cupsd.conf</VAR> file.
 
 <P>Start by creating the new temporary directory and setting the appropriate
 permissions:
@@ -372,7 +372,7 @@ permissions:
 </PRE></UL>
 
 <P>Then change the line containing the <CODE>TempDir</CODE> directive in
-the <CODE>cupsd.conf</CODE> to the directory that you've created:
+the <VAR>cupsd.conf</VAR> to the directory that you've created:
 
 <UL><PRE>
 TempDir <I>/foo/bar/tmp</I>
@@ -389,16 +389,16 @@ functions are limited to local connections with the appropriate username and
 password.
 
 <P>If you'd like to limit access to your system you'll need to edit the
-<CODE>/var/cups/conf/cupsd.conf</CODE> file.
+<VAR>/etc/cups/cupsd.conf</VAR> file.
 
-<H3>Port</H3>
+<H3><A NAME="">Port</A></H3>
 
 <P>The <CODE>Port</CODE> directive specifies a port to listen on for
 all interfaces. Besides the standard IPP port (631) you can also setup
 your server to listen on the HTTP port (80) to use your CUPS server as
 a standard web server as well.
 
-<H3>Listen</H3>
+<H3><A NAME="">Listen</A></H3>
 
 <P>The <CODE>Listen</CODE> directive specifies a listening address and port,
 extending the functionality of the <CODE>Port</CODE> directive. If you want
@@ -413,7 +413,7 @@ Listen 127.0.0.1:631
 <P>If you want to limit access to a specific network/subnet, make sure you
 specify only the network address and not your system's network address!
 
-<H3>BrowsePort</H3>
+<H3><A NAME="">BrowsePort</A></H3>
 
 <P>The <CODE>BrowsePort</CODE> directive controls which port is monitored for
 remote printers. By default it is set to the IPP port (631), however you can
@@ -428,7 +428,7 @@ change it as needed.
 
 </UL>
 
-<H3>BrowseAddress</H3>
+<H3><A NAME="">BrowseAddress</A></H3>
 
 <P>The <CODE>BrowseAddress</CODE> directive specifies a broadcast address to
 use when sending printer status updates over the network. The default
@@ -451,7 +451,7 @@ information to all subnets.
 <P>CUPS provides IP and domain-name based access control and Basic
 authentication for authentication.
 
-<H3>Location</H3>
+<H3><A NAME="">Location</A></H3>
 
 <P>The <CODE>Location</CODE> directive defines access control for a
 specific HTTP directory. The following pseudo directories are provided
@@ -459,22 +459,22 @@ by the CUPS server:
 
 <UL>
 
-	<LI><CODE>/admin</CODE> - This is the URI that must be referenced to
+	<LI><VAR>/admin</VAR> - This is the URI that must be referenced to
 	do printer administation commands.
 
-	<LI><CODE>/classes</CODE> - This is the URI that must be referenced to
+	<LI><VAR>/classes</VAR> - This is the URI that must be referenced to
 	access printer classes.
 
-	<LI><CODE>/jobs</CODE> - This is the URI that must be referenced to
+	<LI><VAR>/jobs</VAR> - This is the URI that must be referenced to
 	access jobs.
 
-	<LI><CODE>/printers</CODE> - This is the URI that must be referenced to
+	<LI><VAR>/printers</VAR> - This is the URI that must be referenced to
 	access printers.
 
 </UL>
 
 <P>All other directories are taken from the
-<CODE>/usr/share/cups/doc</CODE> directory.
+<VAR>/usr/share/cups/doc</VAR> directory.
 
 <P>The <CODE>Location</CODE> directive surrounds the other access control
 directives described below. The default server configuration uses:
@@ -490,7 +490,7 @@ Allow From 127.0.0.1
 &lt;/Location&gt;
 </PRE></UL>
 
-<H3>Order</H3>
+<H3><A NAME="">Order</A></H3>
 
 <P>The <CODE>Order</CODE> directive defines the default access control.
 The following values are supported:
@@ -509,7 +509,7 @@ The following values are supported:
 <P>The <CODE>Order</CODE> directive must appear inside a
 <CODE>Location</CODE> directive.
 
-<H3>Allow</H3>
+<H3><A NAME="">Allow</A></H3>
 
 <P>The <CODE>Allow</CODE> directive specifies a hostname, IP address, or
 network that is allowed access to the server:
@@ -574,7 +574,7 @@ directives can be used to allow access for multiple hosts or networks.  The
 <P>The <CODE>Allow</CODE> directive must appear inside a
 <CODE>Location</CODE> directive.
 
-<H3>Deny</H3>
+<H3><A NAME="">Deny</A></H3>
 
 <P>The <CODE>Deny</CODE> directive specifies a hostname, IP address, or
 network that is allowed access to the server:
@@ -639,7 +639,7 @@ directives can be used to allow access for multiple hosts or networks.  The
 <P>The <CODE>Deny</CODE> directive must appear inside a
 <CODE>Location</CODE> directive.
 
-<H3>AuthType</H3>
+<H3><A NAME="">AuthType</A></H3>
 
 <P>The <CODE>AuthType</CODE> directive defines the type of authentication to
 perform:
@@ -652,12 +652,15 @@ perform:
 	<LI><CODE>Basic</CODE> - Basic authentication should be
 	performed using the UNIX password and group files.
 
+	<LI><CODE>Digest</CODE> - Digest authentication should be
+	performed using the <VAR>/etc/cups/passwd.md5</VAR> file.
+
 </UL>
 
 <P>The <CODE>AuthType</CODE> directive must appear inside a
 <CODE>Location</CODE> directive.
 
-<H3>AuthClass</H3>
+<H3><A NAME="">AuthClass</A></H3>
 
 <P>The <CODE>AuthClass</CODE> directive defines what level of <CODE>Basic</CODE>
 access is required:
@@ -683,7 +686,7 @@ access is required:
 <P>The <CODE>AuthClass</CODE> directive must appear inside a
 <CODE>Location</CODE> directive.
 
-<H3>AuthGroupName</H3>
+<H3><A NAME=""><A NAME="AuthGroupName">AuthGroupName</A></A></H3>
 
 <P>The <CODE>AuthGroupName</CODE> directive sets the group to use for
 <CODE>Group</CODE> authentication.
@@ -691,7 +694,7 @@ access is required:
 <P>The <CODE>AuthGroupName</CODE> directive must appear inside a
 <CODE>Location</CODE> directive.
 
-<H3>SystemGroup</H3>
+<H3><A NAME="">SystemGroup</A></H3>
 
 <P>The <CODE>SystemGroup</CODE> directive sets the administration group used
 when authenticating the <CODE>System</CODE> type. It defaults to the "sys"
@@ -704,7 +707,7 @@ convert files to a printable format for each printer. The
 <CODE>mime.types</CODE> and <CODE>mime.convs</CODE> files define the
 file type and filters that are available on the system.
 
-<H3>mime.types</H3>
+<H3><A NAME="">mime.types</A></H3>
 
 <P>The <CODE>mime.types</CODE> defines the known file types. Each line
 of the file starts with the MIME type and may be followed by one or
@@ -768,7 +771,7 @@ the file type based upon the contents of the file instead.
 
 </UL>
 
-<H3>mime.convs</H3>
+<H3><A NAME="">mime.convs</A></H3>
 
 <P>The <CODE>mime.convs</CODE> file defines all of the filter programs that
 are known to the system. Each line consists of:
@@ -815,13 +818,13 @@ This chapter describes the CUPS log files.
 
 <H2>Where to Find the Log Files</H2>
 
-<P>The log files are normally stored in the <CODE>/var/cups/logs</CODE>
+<P>The log files are normally stored in the <VAR>/var/log/cups</VAR>
 directory. You can change this by editing the
-<CODE>/var/cups/conf/cupsd.conf</CODE> configuration file.
+<VAR>/etc/cups/cupsd.conf</VAR> configuration file.
 
 <H2>The access_log File</H2>
 
-<P>The <CODE>access_log</CODE> file lists each HTTP resource that is accessed
+<P>The <VAR>access_log</VAR> file lists each HTTP resource that is accessed
 by a web browser or CUPS/IPP client. Each line is in the so-called "Common
 Log Format" used by many web servers and web reporting tools:
 
@@ -834,7 +837,7 @@ host group user date-time \"method resource version\" status bytes
 
 <P>The <I>host</I> field will normally only be an IP address unless you
 have changed the <CODE>HostnameLookups</CODE> directive on in the
-<CODE>cupsd.conf</CODE> file.
+<VAR>cupsd.conf</VAR> file.
 
 <P>The <I>group</I> field always contains "-".
 
@@ -867,7 +870,7 @@ of non-IPP data that is received from the client.
 
 <H2>The error_log File</H2>
 
-<P>The <CODE>error_log</CODE> file lists messages from the scheduler (errors,
+<P>The <VAR>error_log</VAR> file lists messages from the scheduler (errors,
 warnings, etc.):
 
 <UL><PRE>
@@ -894,19 +897,19 @@ I [20/May/1999:19:22:24 +0000] Job 2 was cancelled by 'mike'.
 
 <P>The <I>date-time</I> field contains the date and time of when the page
 started printing. The format of this field is identical to the <I>data-time</I>
-field in the <CODE>access_log</CODE> file.
+field in the <VAR>access_log</VAR> file.
 
 <P>The <I>message</I> fields contains a free-form textual message.
 
 <H2>The page_log File</H2>
 
-<P>The <CODE>page_log</CODE> file lists each page that is sent to a printer.
+<P>The <VAR>page_log</VAR> file lists each page that is sent to a printer.
 Each line contains the following information:
 
 <UL><PRE>
-printer user job-id date-time page-number num-copies
+printer user job-id date-time page-number num-copies job-billing
 
-DeskJet root 2 [20/May/1999:19:21:05 +0000] 1 0
+DeskJet root 2 [20/May/1999:19:21:05 +0000] 1 0 acme-123
 </PRE></UL>
 
 <P>The <I>printer</I> field contains the name of the printer that
@@ -923,12 +926,15 @@ on this number being unique!
 
 <P>The <I>date-time</I> field contains the date and time of when the page
 started printing. The format of this field is identical to the <I>data-time</I>
-field in the <CODE>access_log</CODE> file.
+field in the <VAR>access_log</VAR> file.
 
 <P>The <I>page-number</I> and <I>num-pages</I> fields contain the page number
 and number of copies being printed of that page. For printer that can not
 produce copies on their own, the <I>num-pages</I> field will always be 1.
 
+<P>The <I>job-billing</I> field contains a copy of the
+<CODE>job-billing</CODE> attribute provided with the IPP
+<CODE>create-job</CODE> or <CODE>print-job</CODE> requests.
 
 <H1 ALIGN="RIGHT">7 - Printing System Security</H1>
 
@@ -946,7 +952,7 @@ LPD, Windows, or MacOS printing protocols.
 
 <H2>Printing from Windows Clients</H2>
 
-<H3>What is SAMBA?</H3>
+<H3><A NAME="">What is SAMBA?</A></H3>
 
 <P>In case you haven't heard of SAMBA, it is basically a software package
 that allows you to configure your UNIX system as a Windows file and printer
@@ -958,7 +964,7 @@ You can download SAMBA from:
 
 <P ALIGN="CENTER"><A HREF="http://www.samba.org">http://www.samba.org</A></P>
 
-<H3>How Do I Configure SAMBA for CUPS?</H3>
+<H3><A NAME="">How Do I Configure SAMBA for CUPS?</A></H3>
 
 <P>To configure SAMBA for CUPS, edit the <CODE>smb.conf</CODE> file and
 replace the existing printing commands and options with the line:
@@ -970,12 +976,12 @@ printing = cups
 <P>That's all there is to it!  Remote users will now be able to browse and
 print to printers on your system.
 
-<H3>How Do I Configure CUPS for SAMBA?</H3>
+<H3><A NAME="">How Do I Configure CUPS for SAMBA?</A></H3>
 
 <P>To configure CUPS for SAMBA, run the following command:
 
 <UL><PRE>
-% ln -s `which smbspool` /var/cups/backend/smb ENTER
+% ln -s `which smbspool` /usr/lib/cups/backend/smb ENTER
 </PRE></UL>
 
 <P>The <CODE>smbspool</CODE> program is provided with SAMBA starting with
