@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.21 2000/05/01 21:02:06 mike Exp $"
+ * "$Id: lpstat.c,v 1.22 2000/06/26 15:12:53 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -413,6 +413,9 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
   if (http == NULL)
     return;
 
+  if (strcmp(printers, "all") == 0)
+    printers = NULL;
+
  /*
   * Build a CUPS_GET_PRINTERS request, which requires the following
   * attributes:
@@ -612,6 +615,9 @@ show_classes(http_t     *http,	/* I - HTTP connection to server */
 
   if (http == NULL)
     return;
+
+  if (strcmp(dests, "all") == 0)
+    dests = NULL;
 
  /*
   * Build a CUPS_GET_CLASSES request, which requires the following
@@ -825,6 +831,9 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
   if (http == NULL)
     return;
 
+  if (strcmp(printers, "all") == 0)
+    printers = NULL;
+
  /*
   * Build a CUPS_GET_PRINTERS request, which requires the following
   * attributes:
@@ -1029,6 +1038,12 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 
   if (http == NULL)
     return;
+
+  if (strcmp(dests, "all") == 0)
+    dests = NULL;
+
+  if (strcmp(users, "all") == 0)
+    users = NULL;
 
  /*
   * Build a IPP_GET_JOBS request, which requires the following
@@ -1293,6 +1308,9 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 
   if (http == NULL)
     return;
+
+  if (strcmp(printers, "all") == 0)
+    printers = NULL;
 
  /*
   * Build a CUPS_GET_PRINTERS request, which requires the following
@@ -1620,5 +1638,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.21 2000/05/01 21:02:06 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.22 2000/06/26 15:12:53 mike Exp $".
  */
