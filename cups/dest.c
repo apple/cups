@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.3 2000/02/28 19:18:57 mike Exp $"
+ * "$Id: dest.c,v 1.4 2000/02/28 20:38:14 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -155,7 +155,7 @@ cupsGetDest(const char  *name,		/* I - Name of destination */
 
   while (num_dests > 0)
   {
-    if ((comp = strcasecmp(name, dests->name)) > 0)
+    if ((comp = strcasecmp(name, dests->name)) < 0)
       return (NULL);
     else if (comp == 0)
     {
@@ -295,7 +295,7 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
   */
 
   for (i = num_dests, dest = dests; i > 0; i --, dest ++)
-    if (dest->instance != NULL || dest->num_options != 0)
+    if (dest->instance != NULL || dest->num_options != 0 || dest->is_default)
     {
       fprintf(fp, "%s %s", dest->is_default ? "Default" : "Dest",
               dest->name);
@@ -325,14 +325,13 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
                int         num_dests,	/* I - Number of destinations */
                cups_dest_t **dests)	/* IO - Destinations */
 {
+  int		i;			/* Looping var */
   cups_dest_t	*dest;			/* Current destination */
-  cups_option_t	*option;		/* Current option */
   FILE		*fp;			/* File pointer */
   char		line[8192],		/* Line from file */
 		*lineptr,		/* Pointer into line */
 		*name,			/* Name of destination/option */
-		*instance,		/* Instance of destination */
-		*value;			/* Pointer to value */
+		*instance;		/* Instance of destination */
 
 
  /*
@@ -340,7 +339,7 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
   */
 
   if ((fp = fopen(filename, "r")) == NULL)
-    return (0);
+    return (num_dests);
 
  /*
   * Read each printer; each line looks like:
@@ -357,7 +356,7 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
 
     if (strncasecmp(line, "dest", 4) == 0 && isspace(line[4]))
       lineptr = line + 4;
-    else if (strncasecmp(line, "default ", 7) == 0 && isspace(line[7]))
+    else if (strncasecmp(line, "default", 7) == 0 && isspace(line[7]))
       lineptr = line + 7;
     else
       continue;
@@ -418,55 +417,26 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
       */
 
       fclose(fp);
-      return (0);
+      return (num_dests);
     }
 
    /*
     * Add options until we hit the end of the line...
     */
 
-    while (*lineptr)
+    dest->num_options = cupsParseOptions(lineptr, dest->num_options,
+                                         &(dest->options));
+
+   /*
+    * Set this as default if needed...
+    */
+
+    if (strncasecmp(line, "default", 7) == 0)
     {
-     /*
-      * Skip leading whitespace...
-      */
+      for (i = 0; i < num_dests; i ++)
+        (*dests)[i].is_default = 0;
 
-      while (isspace(*lineptr))
-        lineptr ++;
-
-      if (!*lineptr)
-        break;
-
-     /*
-      * Grab the name...
-      */
-
-      name = lineptr;
-      while (!isspace(*lineptr) && *lineptr && *lineptr != '=')
-        lineptr ++;
-
-      if (*lineptr != '=')
-        break;
-
-      *lineptr++ = '\0';
-
-     /*
-      * Grab the value...
-      */
-
-      value = lineptr;
-      while (!isspace(*lineptr) && *lineptr)
-        lineptr ++;
-
-      if (*lineptr)
-        *lineptr++ = '\0';
-
-     /*
-      * Add the option...
-      */
-
-      dest->num_options = cupsAddOption(name, value, dest->num_options,
-                                        &(dest->options));
+      dest->is_default = 1;
     }
   }
 
@@ -481,5 +451,5 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
 
 
 /*
- * End of "$Id: dest.c,v 1.3 2000/02/28 19:18:57 mike Exp $".
+ * End of "$Id: dest.c,v 1.4 2000/02/28 20:38:14 mike Exp $".
  */

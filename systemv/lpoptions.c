@@ -1,5 +1,5 @@
 /*
- * "$Id: lpoptions.c,v 1.1 2000/02/28 19:17:46 mike Exp $"
+ * "$Id: lpoptions.c,v 1.2 2000/02/28 20:38:15 mike Exp $"
  *
  *   Printer option program for the Common UNIX Printing System (CUPS).
  *
@@ -92,6 +92,41 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 
         case 'd' : /* -d printer */
+	    if (argv[i][2])
+	      printer = argv[i] + 2;
+	    else
+	    {
+	      i ++;
+	      if (i >= argc)
+	        usage();
+
+	      printer = argv[i];
+	    }
+
+            if ((instance = strrchr(printer, '/')) != NULL)
+	      *instance++ = '\0';
+
+	    if (num_dests == 0)
+	      num_dests = cupsGetDests(&dests);
+
+            if ((dest = cupsGetDest(printer, instance, num_dests, dests)) == NULL)
+	    {
+	      fputs("lpoptions: Unknown printer or class!\n", stderr);
+	      return (1);
+	    }
+
+	   /*
+	    * Set the default destination...
+	    */
+
+	    for (j = 0; j < num_dests; j ++)
+	      dests[j].is_default = 0;
+
+	    dest->is_default = 1;
+
+	    cupsSetDests(num_dests, dests);
+	    break;
+
 	case 'p' : /* -p printer */
 	    if (argv[i][2])
 	      printer = argv[i] + 2;
@@ -121,20 +156,6 @@ main(int  argc,			/* I - Number of command-line arguments */
 		return (1);
 	      }
 	    }
-
-	    if (argv[i][1] == 'd')
-	    {
-	     /*
-	      * Set the default destination...
-	      */
-
-	      for (j = 0; j < num_dests; j ++)
-	        dests[j].is_default = 0;
-
-	      dest->is_default = 1;
-
-	      cupsSetDests(num_dests, dests);
-	    }
 	    break;
 
 	case 'o' : /* -o option[=value] */
@@ -148,6 +169,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      num_options = cupsParseOptions(argv[i], num_options, &options);
 	    }
+	    printf("num_options = %d\n", num_options);
 	    break;
 
         case 'x' : /* -x printer */
@@ -264,5 +286,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpoptions.c,v 1.1 2000/02/28 19:17:46 mike Exp $".
+ * End of "$Id: lpoptions.c,v 1.2 2000/02/28 20:38:15 mike Exp $".
  */

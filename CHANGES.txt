@@ -13,6 +13,17 @@ CHANGES IN CUPS v1.1b1
 	- NEW support for create-job and send-file operations.
 	- NEW certificate-based authentication for local
 	      administration.
+	- NEW USB backend.
+	- The lpr command now produces human-readable error messages.
+	- The lpq command now produces BSD standard format output
+	  instead of OSF/1 output.  This should resolve the SAMBA
+	  print queue problems that have been reported.
+	- The IPP backend did not always detect when the "raw" option
+	  was being used.
+	- The "lpstat -p" command would stop after the first active
+	  printer.
+	- The "lpstat -v" command would stop before the first remote
+	  printer.
 
 
 CHANGES IN CUPS v1.0.5
