@@ -3,6 +3,7 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc3
 
+	- Fixed a typo in the cups.list.in file.
 	- Updated all of the Western European locales to default
 	  to ISO-8859-15 (for Euro support)
 	- Updated the German message catalog.
