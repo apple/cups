@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.79 2001/02/20 17:32:59 mike Exp $"
+dnl "$Id: configure.in,v 1.80 2001/02/28 14:57:05 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -511,6 +511,8 @@ if test "$mandir" = "\${prefix}/man" -a "$prefix" = "/"; then
         		AMANDIR="/usr/man"
         		;;
 	esac
+else
+	AMANDIR="$mandir"
 fi
 
 AC_SUBST(AMANDIR)
@@ -673,5 +675,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.79 2001/02/20 17:32:59 mike Exp $".
+dnl End of "$Id: configure.in,v 1.80 2001/02/28 14:57:05 mike Exp $".
 dnl
