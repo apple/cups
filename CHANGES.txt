@@ -5,8 +5,8 @@ CHANGES IN CUPS V1.1.21rc1
 
 	- The lpd backend used a source port of 732 by default,
 	  which is outside of the range defined by RFC 1179;
-	  also added a "reserve=any" option for any priviledged
-	  port from 1 to 1023 (STR #474)
+	  also added a new (default) "reserve=any" option for
+	  any priviledged port from 1 to 1023 (STR #474)
 	- The scheduler did not check for a valid Listen/Port
 	  configuration (STR #499)
 	- The cupsPrintFiles() function did not always set the

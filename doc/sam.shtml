@@ -5677,18 +5677,28 @@ device URI, e.g.:
 	reserve=false</TD>
 	<TD VALIGN="TOP">Specifies that the backend should not
 	reserve a priviledged source port as required by RFC
-	1179. (Default)</TD>
+	1179.</TD>
 </TR>
 <TR>
 	<TD>reserve=on<BR>
 	reserve=yes<BR>
-	reserve=true</TD>
+	reserve=true<BR>
+	reserve=rfc1179</TD>
 	<TD VALIGN="TOP">Specifies that the backend should
 	reserve a priviledges source port from 721 to 731
 	inclusive as required by RFC 1179. This option may cause
 	reduced printing performance when more than 11 LPD
 	printers are defined on the server due to port
 	contention issues.</TD>
+</TR>
+<TR>
+	<TD>reserve=any</TD>
+	<TD VALIGN="TOP">Specifies that the backend should
+	reserve a priviledges source port from 1 to 1023
+	inclusive. This often works with LPD implementations
+	that require a priviledged source port but do not
+	limit it to the range defined by RFC 1179, allowing
+	for more printers to be active at the same time. (Default)</TD>
 </TR>
 <TR>
 	<TD>sanitize_title=off<BR>
