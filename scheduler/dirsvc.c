@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.69 2001/01/22 15:03:59 mike Exp $"
+ * "$Id: dirsvc.c,v 1.70 2001/01/23 15:08:13 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -776,7 +776,7 @@ SendBrowseList(void)
 				/* Browse data packet */
 
 
-  if (!Browsing || BrowseInterval == 0)
+  if (!Browsing)
     return;
 
  /*
@@ -807,7 +807,8 @@ SendBrowseList(void)
         DeletePrinter(p);
       }
     }
-    else if (p->browse_time < ut && !(p->type & CUPS_PRINTER_IMPLICIT))
+    else if (p->browse_time < ut && !(p->type & CUPS_PRINTER_IMPLICIT) &&
+             BrowseInterval > 0)
     {
      /*
       * Need to send an update...
@@ -917,5 +918,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.69 2001/01/22 15:03:59 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.70 2001/01/23 15:08:13 mike Exp $".
  */
