@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The job-quota-period, job-page-limit, and job-k-limit
+	  attributes were not flagged as integers, so setting
+	  quotas would not work.
 	- Added an additional response check in the scheduler to
 	  more quickly recover from denial-of-service attacks.
 	- The cupstestppd file was incorrectly installed in the

@@ -1,5 +1,5 @@
 /*
- * "$Id: encode.c,v 1.1.2.8 2002/11/05 20:43:14 mike Exp $"
+ * "$Id: encode.c,v 1.1.2.9 2003/01/03 22:03:13 mike Exp $"
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
@@ -59,7 +59,10 @@ static ipp_option_t	ipp_options[] =
 			  { "fitplot",			IPP_TAG_BOOLEAN },
 			  { "gamma",			IPP_TAG_INTEGER },
 			  { "hue",			IPP_TAG_INTEGER },
+			  { "job-k-limit",		IPP_TAG_INTEGER },
+			  { "job-page-limit",		IPP_TAG_INTEGER },
 			  { "job-priority",		IPP_TAG_INTEGER },
+			  { "job-quota-period",		IPP_TAG_INTEGER },
 			  { "landscape",		IPP_TAG_BOOLEAN },
 			  { "mirror",			IPP_TAG_BOOLEAN },
 			  { "natural-scaling",		IPP_TAG_INTEGER },
@@ -377,5 +380,5 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 
 
 /*
- * End of "$Id: encode.c,v 1.1.2.8 2002/11/05 20:43:14 mike Exp $".
+ * End of "$Id: encode.c,v 1.1.2.9 2003/01/03 22:03:13 mike Exp $".
  */

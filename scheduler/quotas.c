@@ -1,5 +1,5 @@
 /*
- * "$Id: quotas.c,v 1.4.2.3 2002/05/16 14:00:16 mike Exp $"
+ * "$Id: quotas.c,v 1.4.2.4 2003/01/03 22:03:16 mike Exp $"
  *
  *   Quota routines for the Common UNIX Printing System (CUPS).
  *
@@ -157,6 +157,9 @@ UpdateQuota(printer_t  *p,		/* I - Printer */
   if ((q = FindQuota(p, username)) == NULL)
     return (NULL);
 
+  LogMessage(L_DEBUG, "UpdateQuota: p=%s username=%s pages=%d k=%d",
+             p->name, username, pages, k);
+
   curtime = time(NULL);
 
   if (curtime < q->next_update)
@@ -231,5 +234,5 @@ compare(const quota_t *q1,		/* I - First quota record */
 
 
 /*
- * End of "$Id: quotas.c,v 1.4.2.3 2002/05/16 14:00:16 mike Exp $".
+ * End of "$Id: quotas.c,v 1.4.2.4 2003/01/03 22:03:16 mike Exp $".
  */
