@@ -1183,6 +1183,8 @@ NOCACHE { 0 setcachelimit } if
   >> sethalftone
 } bind def
 .setdefaultscreen
+% Set a null transfer function...
+{} bind settransfer
 initgraphics
 % The interpreter relies on there being at least 2 entries
 % on the graphics stack.  Establish the second one now.
