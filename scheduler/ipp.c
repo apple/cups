@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.149 2001/11/13 19:03:51 mike Exp $"
+ * "$Id: ipp.c,v 1.150 2001/12/18 03:13:22 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2342,6 +2342,8 @@ create_job(client_t        *con,	/* I - Client connection */
 
     UpdateQuota(printer, job->username, 0, kbytes);
   }
+  else if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) != NULL)
+    job->sheets = attr;
 
  /*
   * Save and log the job...
@@ -2487,35 +2489,60 @@ copy_banner(client_t   *con,	/* I - Client connection */
       */
 
       for (s = attrname; (ch = getc(in)) != EOF;)
-        if (ch == '}' || isspace(ch))
+        if (!isalpha(ch) && ch != '-' && ch != '?')
           break;
 	else if (s < (attrname + sizeof(attrname) - 1))
           *s++ = ch;
+	else
+	  break;
 
-      if (isspace(ch) && s == attrname)
+      *s = '\0';
+
+      if (ch != '}')
       {
        /*
-        * Ignore { followed by whitespace...
+        * Ignore { followed by stuff that is not an attribute name...
 	*/
 
         putc('{', out);
+	fputs(attrname, out);
 	putc(ch, out);
 	continue;
       }
-
-      *s = '\0';
 
      /*
       * See if it is defined...
       */
 
-      if (strcmp(attrname, "printer-name") == 0)
+      if (attrname[0] == '?')
+        s = attrname + 1;
+      else
+        s = attrname;
+
+      if (strcmp(s, "printer-name") == 0)
       {
         fputs(job->dest, out);
 	continue;
       }
-      else if ((attr = ippFindAttribute(job->attrs, attrname, IPP_TAG_ZERO)) == NULL)
-        continue; /* Nope */
+      else if ((attr = ippFindAttribute(job->attrs, s, IPP_TAG_ZERO)) == NULL)
+      {
+       /*
+        * See if we have a leading question mark...
+	*/
+
+	if (attrname[0] != '?')
+	{
+	 /*
+          * Nope, write to file as-is; probably a PostScript procedure...
+	  */
+
+	  putc('{', out);
+	  fputs(attrname, out);
+	  putc('}', out);
+        }
+
+        continue;
+      }
 
      /*
       * Output value(s)...
@@ -4092,6 +4119,8 @@ print_job(client_t        *con,		/* I - Client connection */
 
     UpdateQuota(printer, job->username, 0, kbytes);
   }
+  else if ((attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) != NULL)
+    job->sheets = attr;
    
  /*
   * Add the job file...
@@ -5591,5 +5620,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.149 2001/11/13 19:03:51 mike Exp $".
+ * End of "$Id: ipp.c,v 1.150 2001/12/18 03:13:22 mike Exp $".
  */

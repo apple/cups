@@ -1,4 +1,4 @@
-CHANGES.txt - 12/10/2001
+CHANGES.txt - 12/17/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.13
@@ -28,6 +28,17 @@ CHANGES IN CUPS V1.1.13
 	- Added new AuthType BasicDigest that does Basic
 	  authentication using the MD5 password file managed by
 	  the lppasswd command.
+	- The banner page attribute substitution code now
+	  retains {name} sequences in banner files when the
+	  named attribute is undefined.  Use {?name} to
+	  conditionally substitute an IPP attribute.
+	- The scheduler now ensures that the ServerRoot
+	  directory and configuration files are owned by and
+	  writable by the User and Group in cupsd.conf.
+	- The USB backend now lists all USB printer devices
+	  regardless of whether a printer is connected or not. 
+	  This allows new USB printers to be connected without
+	  restarting cupsd.
 
 
 CHANGES IN CUPS V1.1.12

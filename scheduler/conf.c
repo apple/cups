@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.94 2001/12/13 20:44:43 mike Exp $"
+ * "$Id: conf.c,v 1.95 2001/12/18 03:13:21 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -408,13 +408,55 @@ ReadConfiguration(void)
     ServerCertificate[sizeof(ServerCertificate) - 1] = '\0';
   }
 
+  chown(ServerCertificate, User, Group);
+  chmod(ServerCertificate, 0600);
+
   if (ServerKey[0] != '/')
   {
     snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, ServerKey);
     strncpy(ServerKey, directory, sizeof(ServerKey) - 1);
     ServerKey[sizeof(ServerKey) - 1] = '\0';
   }
+
+  chown(ServerKey, User, Group);
+  chmod(ServerKey, 0600);
 #endif /* HAVE_LIBSSL */
+
+ /*
+  * Make sure that ServerRoot and the config files are owned and
+  * writable by the user and group in the cupsd.conf file...
+  */
+
+  chown(ServerRoot, User, Group);
+  chmod(ServerRoot, 0755);
+
+  snprintf(directory, sizeof(directory), "%s/certs", ServerRoot);
+  chown(directory, User, Group);
+  chmod(directory, 0711);
+
+  snprintf(directory, sizeof(directory), "%s/ppd", ServerRoot);
+  chown(directory, User, Group);
+  chmod(directory, 0755);
+
+  snprintf(directory, sizeof(directory), "%s/ssl", ServerRoot);
+  chown(directory, User, Group);
+  chmod(directory, 0700);
+
+  snprintf(directory, sizeof(directory), "%s/cupsd.conf", ServerRoot);
+  chown(directory, User, Group);
+  chmod(directory, 0600);
+
+  snprintf(directory, sizeof(directory), "%s/classes.conf", ServerRoot);
+  chown(directory, User, Group);
+  chmod(directory, 0600);
+
+  snprintf(directory, sizeof(directory), "%s/printers.conf", ServerRoot);
+  chown(directory, User, Group);
+  chmod(directory, 0600);
+
+  snprintf(directory, sizeof(directory), "%s/passwd.md5", ServerRoot);
+  chown(directory, User, Group);
+  chmod(directory, 0600);
 
  /*
   * Make sure the request and temporary directories have the right
@@ -1806,5 +1848,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.94 2001/12/13 20:44:43 mike Exp $".
+ * End of "$Id: conf.c,v 1.95 2001/12/18 03:13:21 mike Exp $".
  */
