@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- ppdOpen() did not correctly check for "*PPD-Adobe-4."
+	  on the first line of a PPD file. This caused incorrect
+	  PASS results for some PPD files (STR #233)
 	- cupsEncodeOptions() did not allow boolean options to
 	  use "yes" and "on" for true values (STR #227)
 	- The pstops filter only sent the TBCP exit sequence if
