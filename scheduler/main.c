@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.116 2004/03/19 22:19:35 mike Exp $"
+ * "$Id: main.c,v 1.117 2004/05/21 23:00:04 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -225,14 +225,20 @@ main(int  argc,				/* I - Number of command-line arguments */
       if (wait(&i) < 0)
       {
         perror("cupsd");
-	i = 1;
+	return (1);
       }
-      else if (i >= 256)
-        fprintf(stderr, "cupsd: Child exited with status %d!\n", i / 256);
+      else if (WIFEXITED(i))
+      {
+        fprintf(stderr, "cupsd: Child exited with status %d!\n", WEXITSTATUS(i));
+	return (2);
+      }
       else
-        fprintf(stderr, "cupsd: Child exited on signal %d!\n", i);
+      {
+        fprintf(stderr, "cupsd: Child exited on signal %d!\n", WTERMSIG(i));
+	return (3);
+      }
 
-      return (i);
+      return (0);
     }
   }
 
@@ -1008,11 +1014,12 @@ process_children(void)
 
     if (status)
     {
-      if (status < 256)
-	LogMessage(L_ERROR, "PID %d crashed on signal %d!", pid, status);
+      if (WIFSTOPPED(status))
+	LogMessage(L_ERROR, "PID %d crashed on signal %d!", pid,
+	           WSTOPSIG(status));
       else
 	LogMessage(L_ERROR, "PID %d stopped with status %d!", pid,
-	           status / 256);
+	           WEXITSTATUS(status));
 
       if (LogLevel < L_DEBUG)
         LogMessage(L_INFO, "Hint: Try setting the LogLevel to \"debug\" to find out more.");
@@ -1300,5 +1307,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.116 2004/03/19 22:19:35 mike Exp $".
+ * End of "$Id: main.c,v 1.117 2004/05/21 23:00:04 mike Exp $".
  */
