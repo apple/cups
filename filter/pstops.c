@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.5 2002/01/03 16:19:53 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.6 2002/01/03 20:41:17 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -448,7 +448,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
       else if (strncmp(line, "%%BeginBinary:", 14) == 0 ||
                (strncmp(line, "%%BeginData:", 12) == 0 &&
-	        strstr(line, "Binary") != NULL))
+	        strstr(line, "ASCII") == NULL && strstr(line, "Hex") == NULL))
       {
        /*
         * Copy binary data...
@@ -1113,5 +1113,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.5 2002/01/03 16:19:53 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.6 2002/01/03 20:41:17 mike Exp $".
  */
