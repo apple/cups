@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.36 1999/09/22 18:08:43 mike Exp $"
+ * "$Id: printers.c,v 1.37 1999/09/22 21:13:12 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -44,6 +44,13 @@
 
 
 /*
+ * Local functions...
+ */
+
+static void	write_printcap(void);
+
+
+/*
  * 'AddPrinter()' - Add a printer to the system.
  */
 
@@ -53,6 +60,10 @@ AddPrinter(char *name)		/* I - Name of printer */
   printer_t	*p,		/* New printer */
 		*current,	/* Current printer in list */
 		*prev;		/* Previous printer in list */
+#ifdef __sgi
+  char		filename[1024];	/* Interface script filename */
+  FILE		*fp;		/* Interface script file */
+#endif /* __sgi */
 
 
  /*
@@ -104,6 +115,34 @@ AddPrinter(char *name)		/* I - Name of printer */
     prev->next = p;
 
   p->next = current;
+
+ /*
+  * Write a new /etc/printcap file, and add a dummy interface and GUI scripts
+  * to fool SGI's stupid printing tools.
+  */
+
+  write_printcap();
+
+#ifdef __sgi
+  sprintf(filename, "/var/spool/lp/interface/%s", p->name);
+  if ((fp = fopen(filename, "w")) != NULL)
+  {
+    fputs("#!/bin/sh\n", fp);
+    fprintf(fp, "NAME=\"%s\"\n", p->info);
+    fputs("TYPE=PostScript\n", fp);
+    fclose(fp);
+    chmod(filename, 0755);
+  }
+
+  sprintf(filename, "/var/spool/lp/gui_interface/ELF/%s.gui", p->name);
+  if ((fp = fopen(filename, "w")) != NULL)
+  {
+    fputs("#!/bin/sh\n", fp);
+    fprintf(fp, "/usr/bin/glpoptions -d %s -o \"$*\"\n", p->name);
+    fclose(fp);
+    chmod(filename, 0755);
+  }
+#endif /* __sgi */
 
   return (p);
 }
@@ -196,6 +235,9 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
   int		i;		/* Looping var */
   printer_t	*current,	/* Current printer in list */
 		*prev;		/* Previous printer in list */
+#ifdef __sgi
+  char		filename[1024];	/* Interface script filename */
+#endif /* __sgi */
 
 
   DEBUG_printf(("DeletePrinter(%08x): p->name = \"%s\"...\n", p, p->name));
@@ -247,6 +289,21 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
 
   if (p == DefaultPrinter)
     DefaultPrinter = Printers;
+
+ /*
+  * Write a new /etc/printcap file, and delete the dummy interface and GUI
+  * scripts to fool SGI's stupid printing tools.
+  */
+
+  write_printcap();
+
+#ifdef __sgi
+  sprintf(filename, "/var/spool/lp/interface/%s", p->name);
+  unlink(filename);
+
+  sprintf(filename, "/var/spool/lp/gui_interface/ELF/%s.gui", p->name);
+  unlink(filename);
+#endif /* __sgi */
 }
 
 
@@ -1064,5 +1121,49 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 
 
 /*
- * End of "$Id: printers.c,v 1.36 1999/09/22 18:08:43 mike Exp $".
+ * 'write_printcap()' - Write a pseudo-printcap file to /etc/printcap for
+ *                      older applications that need it...
+ */
+
+static void
+write_printcap(void)
+{
+  FILE		*fp;	/* printcap file */
+  printer_t	*p;	/* Current printer */
+
+
+ /*
+  * See if we have a printcap file; if not, don't bother writing it.
+  */
+
+  if (access("/etc/printcap", 0))
+    return;
+
+ /*
+  * Write a new /etc/printcap with the current list of printers. Each printer
+  * is put in the file as:
+  *
+  *    Printer1:
+  *    Printer2:
+  *    Printer3:
+  *    ...
+  *    PrinterN:
+  */
+
+  if ((fp = fopen("/etc/printcap", "w")) == NULL)
+    return;
+
+  for (p = Printers; p != NULL; p = p->next)
+    fprintf(fp, "%s:\n", p->name);
+
+ /*
+  * Close the file and return...
+  */
+
+  fclose(fp);
+}
+
+
+/*
+ * End of "$Id: printers.c,v 1.37 1999/09/22 21:13:12 mike Exp $".
  */
