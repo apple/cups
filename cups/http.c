@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.28 1999/04/28 15:52:04 mike Exp $"
+ * "$Id: http.c,v 1.29 1999/04/29 19:23:20 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -53,7 +53,6 @@
  *   http_field()        - Return the field index for a field name.
  *   http_send()         - Send a request with all fields and the trailing
  *                         blank line.
- *   http_sighandler()   - Handle SIGPIPE signals...
  */
 
 /*
@@ -195,7 +194,9 @@ httpInitialize(void)
 
   if (!initialized)
     WSAStartup(MAKEWORD(1,1), &winsockdata);
-#else
+#elif defined(HAVE_SIGSET)
+  sigset(SIGPIPE, SIG_IGN);
+#elif defined(HAVE_SIGACTION)
   struct sigaction	action;	/* POSIX sigaction data */
 
 
@@ -206,6 +207,8 @@ httpInitialize(void)
   memset(&action, 0, sizeof(action));
   action.sa_handler = SIG_IGN;
   sigaction(SIGPIPE, &action, NULL);
+#else
+  signal(SIGPIPE, SIG_IGN);
 #endif /* WIN32 || __EMX__ */
 }
 
@@ -1335,5 +1338,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.28 1999/04/28 15:52:04 mike Exp $".
+ * End of "$Id: http.c,v 1.29 1999/04/29 19:23:20 mike Exp $".
  */
