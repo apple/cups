@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.23 2001/02/07 00:33:54 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.24 2001/03/30 15:23:29 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -530,6 +530,8 @@ recv_print_job(const char    *dest,	/* I - Destination */
 
       if (bytes < 1)
       {
+	syslog(LOG_ERR, "Error while reading file - %s",
+               strerror(errno));
         status = 1;
 	break;
       }
@@ -541,8 +543,18 @@ recv_print_job(const char    *dest,	/* I - Destination */
 
     if (!status)
     {
-      fread(line, 1, 1, stdin);
-      status = line[0];
+      if (fread(line, 1, 1, stdin) < 1)
+      {
+        status = 1;
+	syslog(LOG_ERR, "Error while reading trailing nul - %s",
+               strerror(errno));
+      }
+      else if (line[0])
+      {
+        status = 1;
+	syslog(LOG_ERR, "Trailing character after file is not nul (%02X)!",
+	       line[0]);
+      }
     }
 
    /*
@@ -1218,5 +1230,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.23 2001/02/07 00:33:54 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.24 2001/03/30 15:23:29 mike Exp $".
  */
