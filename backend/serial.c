@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.33 2001/06/06 16:47:53 mike Exp $"
+ * "$Id: serial.c,v 1.34 2001/07/18 20:46:22 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -213,7 +213,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
   opts.c_lflag &= ~(ICANON | ECHO | ISIG);	/* Raw mode */
 
-  bufsize = 480;	/* 9600 baud / 10 bits/char / 2Hz */
+  bufsize = 96;		/* 9600 baud / 10 bits/char / 10Hz */
   dtrdsr  = 0;		/* No dtr/dsr flow control */
 
   if (options != NULL)
@@ -255,7 +255,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
         * Set the baud rate...
 	*/
 
-        bufsize = atoi(value) / 20;
+        bufsize = atoi(value) / 100;
 
 #if B19200 == 19200
         cfsetispeed(&opts, atoi(value));
@@ -480,7 +480,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   }
 
  /*
-  * Close the socket connection and input file and return...
+  * Close the serial port and input file and return...
   */
 
   close(fd);
@@ -856,5 +856,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.33 2001/06/06 16:47:53 mike Exp $".
+ * End of "$Id: serial.c,v 1.34 2001/07/18 20:46:22 mike Exp $".
  */
