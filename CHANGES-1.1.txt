@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20
 
+	- "lp -i jobid -H restart" would often return an error
+	  even though the job restarted successfully (STR #362)
 	- The scheduler did not check for invalid allow/deny
 	  addresses such as "11.22.33.44/24". It now masks off
 	  the extra address bits and logs a warning message in
