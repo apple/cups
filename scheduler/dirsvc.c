@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.67 2000/12/14 22:21:58 mike Exp $"
+ * "$Id: dirsvc.c,v 1.68 2000/12/19 19:19:56 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -666,7 +666,7 @@ UpdateBrowseList(void)
       * Skip classes...
       */
 
-      if (p->type & CUPS_PRINTER_CLASS)
+      if (p->type & (CUPS_PRINTER_IMPLICIT | CUPS_PRINTER_CLASS))
       {
         len = 0;
         continue;
@@ -917,5 +917,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.67 2000/12/14 22:21:58 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.68 2000/12/19 19:19:56 mike Exp $".
  */
