@@ -18,6 +18,8 @@ CHANGES IN CUPS V1.1.6-3
 	  implicit status of a class.
 	- DeletePrinterFromClasses() didn't remove printers
 	  from implicit classes.
+	- Caldera fix: lpr didn't recognize BSD lpr "-1", "-2",
+	  "-3", or "-4" options.
 	- SuSE fix: Exit from child if setgid() or setuid()
 	  fails.
 	- SuSE fix: Added setgroups() calls after setgid() and
