@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.94 2000/08/30 22:00:36 mike Exp $"
+ * "$Id: ipp.c,v 1.95 2000/09/06 18:31:30 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -284,7 +284,7 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 	    */
 
 	    free(username->values[0].string.text);
-	    username->values[0].string.text = strdup("root-remote");
+	    username->values[0].string.text = strdup(RemoteRoot);
 	  }
 	}
 
@@ -4833,5 +4833,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.94 2000/08/30 22:00:36 mike Exp $".
+ * End of "$Id: ipp.c,v 1.95 2000/09/06 18:31:30 mike Exp $".
  */

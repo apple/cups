@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.28 2000/08/29 21:23:12 mike Exp $"
+ * "$Id: conf.h,v 1.29 2000/09/06 18:31:30 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -73,8 +73,10 @@ VAR char		ConfigurationFile[256]	VALUE(CUPS_SERVERROOT "/cupsd.conf"),
 					/* Temporary directory */
 			Printcap[1024]		VALUE(""),
 					/* Printcap file */
-			FontPath[1024]		VALUE(CUPS_FONTPATH);
+			FontPath[1024]		VALUE(CUPS_FONTPATH),
 					/* Font search path */
+			RemoteRoot[32]		VALUE("remroot");
+					/* Remote root user */
 VAR int			User			VALUE(1),
 					/* User ID for server */
 			Group			VALUE(0),
@@ -123,5 +125,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.28 2000/08/29 21:23:12 mike Exp $".
+ * End of "$Id: conf.h,v 1.29 2000/09/06 18:31:30 mike Exp $".
  */

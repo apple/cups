@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.40 2000/05/22 18:26:52 mike Exp $"
+ * "$Id: main.c,v 1.41 2000/09/06 18:31:30 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -552,6 +552,8 @@ sighup_handler(int sig)	/* I - Signal number */
 static void
 sigterm_handler(int sig)
 {
+  (void)sig;	/* remove compiler warnings... */
+
  /*
   * Log an error...
   */
@@ -613,5 +615,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.40 2000/05/22 18:26:52 mike Exp $".
+ * End of "$Id: main.c,v 1.41 2000/09/06 18:31:30 mike Exp $".
  */

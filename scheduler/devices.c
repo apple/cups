@@ -1,5 +1,5 @@
 /*
- * "$Id: devices.c,v 1.8 2000/08/03 18:24:08 mike Exp $"
+ * "$Id: devices.c,v 1.9 2000/09/06 18:31:30 mike Exp $"
  *
  *   Device scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -463,10 +463,12 @@ compare_devs(const dev_info_t *d0,	/* I - First PPD file */
 static void
 sigalrm_handler(int sig)	/* I - Signal number */
 {
+  (void)sig;	/* remove compiler warnings... */
+
   LogMessage(L_WARN, "LoadDevices: Backend did not respond within 30 seconds!");
 }
 
 
 /*
- * End of "$Id: devices.c,v 1.8 2000/08/03 18:24:08 mike Exp $".
+ * End of "$Id: devices.c,v 1.9 2000/09/06 18:31:30 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.55 2000/08/29 21:23:12 mike Exp $"
+ * "$Id: conf.c,v 1.56 2000/09/06 18:31:30 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -93,6 +93,7 @@ static var_t	variables[] =
   { "TempDir",		TempDir,		VAR_STRING,	sizeof(TempDir) },
   { "Printcap",		Printcap,		VAR_STRING,	sizeof(Printcap) },
   { "FontPath",		FontPath,		VAR_STRING,	sizeof(FontPath) },
+  { "RemoteRoot",	RemoteRoot,		VAR_STRING,	sizeof(RemoteRoot) },
   { "HostNameLookups",	&HostNameLookups,	VAR_BOOLEAN,	0 },
   { "Timeout",		&Timeout,		VAR_INTEGER,	0 },
   { "KeepAlive",	&KeepAlive,		VAR_BOOLEAN,	0 },
@@ -192,7 +193,7 @@ ReadConfiguration(void)
   DeleteAllClasses();
 
   gethostname(ServerName, sizeof(ServerName));
-  sprintf(ServerAdmin, "root@%s", ServerName);
+  snprintf(ServerAdmin, sizeof(ServerAdmin), "root@%s", ServerName);
   strcpy(ServerRoot, CUPS_SERVERROOT);
   strcpy(ServerBin, CUPS_SERVERBIN);
   strcpy(RequestRoot, CUPS_REQUESTS);
@@ -203,6 +204,7 @@ ReadConfiguration(void)
   strcpy(PageLog, CUPS_LOGDIR "/page_log");
   strcpy(Printcap, "");
   strcpy(FontPath, CUPS_FONTPATH);
+  strcpy(RemoteRoot, "remroot");
 
   if ((language = DEFAULT_LANGUAGE) == NULL)
     language = "en";
@@ -423,7 +425,7 @@ ReadConfiguration(void)
   snprintf(directory, sizeof(directory), "%s/model", DataDir);
   LoadPPDs(directory);
 
-  sprintf(directory, "%s/backend", ServerBin);
+  snprintf(directory, sizeof(directory), "%s/backend", ServerBin);
   LoadDevices(directory);
 
  /*
@@ -1412,5 +1414,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.55 2000/08/29 21:23:12 mike Exp $".
+ * End of "$Id: conf.c,v 1.56 2000/09/06 18:31:30 mike Exp $".
  */
