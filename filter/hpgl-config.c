@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.27 2000/08/17 14:35:37 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.28 2000/10/19 19:19:50 mike Exp $"
  *
  *   HP-GL/2 configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -136,8 +136,8 @@ update_transform(void)
     case 2 :
         left   = Scaling1[0];
 	bottom = Scaling1[1];
-	right  = left + page_width * Scaling2[0];
-	top    = bottom + page_height * Scaling2[1];
+	right  = left + page_width * Scaling2[0] * 1016.0f / 72.0f;
+	top    = bottom + page_height * Scaling2[1] * 1016.0f / 72.0f;
         break;
   }
 
@@ -631,5 +631,5 @@ SC_scale(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.27 2000/08/17 14:35:37 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.28 2000/10/19 19:19:50 mike Exp $".
  */

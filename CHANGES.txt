@@ -41,6 +41,11 @@ CHANGES IN CUPS V1.1.5
 	- The multiple-document-handling attribute handling code
 	  did not check for the correct value for collated
 	  copies (separate-documents-uncollated-copies).
+	- The EPSON driver did not work with OKIDATA printers in
+	  EPSON emulation mode (needed change-emulation command)
+	- The HP-GL/2 filter did not scale the plot properly in
+	  scale mode 2.
+	- Added PPD files for 9-pin and 24-pin OKIDATA printers.
 
 
 CHANGES IN CUPS v1.1.4

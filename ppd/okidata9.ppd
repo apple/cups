@@ -1,0 +1,126 @@
+*PPD-Adobe: "4.3"
+*%
+*% "$Id: okidata9.ppd,v 1.1 2000/10/19 19:19:51 mike Exp $"
+*%
+*%   Sample OKIDATA 9-Pin driver PPD file for the Common UNIX Printing
+*%   System (CUPS).
+*%
+*%   Copyright 1997-2000 by Easy Software Products.
+*%
+*%   These coded instructions, statements, and computer programs are the
+*%   property of Easy Software Products and are protected by Federal
+*%   copyright law.  Distribution and use rights are outlined in the file
+*%   "LICENSE.txt" which should have been included with this file.  If this
+*%   file is missing or damaged please contact Easy Software Products
+*%   at:
+*%
+*%       Attn: CUPS Licensing Information
+*%       Easy Software Products
+*%       44141 Airport View Drive, Suite 204
+*%       Hollywood, Maryland 20636-3111 USA
+*%
+*%       Voice: (301) 373-9603
+*%       EMail: cups-info@cups.org
+*%         WWW: http://www.cups.org
+*%
+*FormatVersion:	"4.3"
+*FileVersion:	"1.1"
+*LanguageVersion: English 
+*LanguageEncoding: ISOLatin1
+*PCFileName:	"OKIDATA9.PPD"
+*Manufacturer:	"ESP"
+*Product:	"(CUPS v1.1)"
+*cupsVersion:	1.1
+*cupsManualCopies: True
+*cupsModelNumber:	0
+*cupsFilter:	"application/vnd.cups-raster 0 rastertoepson"
+*ModelName:     "OKIDATA 9-Pin Series"
+*ShortNickName: "OKIDATA 9-Pin Series"
+*NickName:      "OKIDATA 9-Pin Series CUPS v1.1"
+*PSVersion:	"(3010.000) 550"
+*LanguageLevel:	"3"
+*ColorDevice:	False
+*DefaultColorSpace: Gray
+*FileSystem:	False
+*Throughput:	"1"
+*LandscapeOrientation: Plus90
+*VariablePaperSize: False
+*TTRasterizer:	Type42
+
+*OpenUI *PageSize/Media Size: PickOne
+*OrderDependency: 10 AnySetup *PageSize
+*DefaultPageSize: Letter
+*PageSize Letter:	"<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*PageSize Legal:	"<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+*PageSize A4:		"<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+*PageSize FanFoldUS:	"<</PageSize[1071 792]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageSize
+
+*OpenUI *PageRegion: PickOne
+*OrderDependency: 10 AnySetup *PageRegion
+*DefaultPageRegion: Letter
+*PageRegion Letter:	"<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*PageRegion Legal:	"<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+*PageRegion A4:		"<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+*PageRegion FanFoldUS:	"<</PageSize[1071 792]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageRegion
+
+*DefaultImageableArea: Letter 
+*ImageableArea Letter:	"18.0 18.0 594.0 774.0"
+*ImageableArea Legal:	"18.0 18.0 594.0 990.0"
+*ImageableArea A4:	"18.0 18.0 577.0 824.0"
+*ImageableArea FanFoldUS: "18.0 18.0 1053.0 774.0"
+
+*DefaultPaperDimension: Letter
+*PaperDimension Letter:	"612 792"
+*PaperDimension Legal:	"612 1008"
+*PaperDimension A4:	"595 842"
+*PaperDimension FanFoldUS: "1071 792"
+
+*OpenUI *Resolution/Output Resolution: PickOne
+*OrderDependency: 20 AnySetup *Resolution
+*DefaultResolution: 120dpi
+*Resolution 60dpi/60x72 DPI: "<</HWResolution[60 72]/cupsRowCount 8>>setpagedevice"
+*Resolution 120dpi/120x72 DPI: "<</HWResolution[120 72]/cupsRowCount 8>>setpagedevice"
+*Resolution 240dpi/240x72 DPI: "<</HWResolution[240 72]/cupsRowCount 8>>setpagedevice"
+*CloseUI: *Resolution
+
+*DefaultFont: Courier
+*Font AvantGarde-Book: Standard "(001.006S)" Standard ROM
+*Font AvantGarde-BookOblique: Standard "(001.006S)" Standard ROM
+*Font AvantGarde-Demi: Standard "(001.007S)" Standard ROM
+*Font AvantGarde-DemiOblique: Standard "(001.007S)" Standard ROM
+*Font Bookman-Demi: Standard "(001.004S)" Standard ROM
+*Font Bookman-DemiItalic: Standard "(001.004S)" Standard ROM
+*Font Bookman-Light: Standard "(001.004S)" Standard ROM
+*Font Bookman-LightItalic: Standard "(001.004S)" Standard ROM
+*Font Courier: Standard "(002.004S)" Standard ROM
+*Font Courier-Bold: Standard "(002.004S)" Standard ROM
+*Font Courier-BoldOblique: Standard "(002.004S)" Standard ROM
+*Font Courier-Oblique: Standard "(002.004S)" Standard ROM
+*Font Helvetica: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Bold: Standard "(001.007S)" Standard ROM
+*Font Helvetica-BoldOblique: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Narrow-Bold: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow-BoldOblique: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow-Oblique: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Oblique: Standard "(001.006S)" Standard ROM
+*Font NewCenturySchlbk-Bold: Standard "(001.009S)" Standard ROM
+*Font NewCenturySchlbk-BoldItalic: Standard "(001.007S)" Standard ROM
+*Font NewCenturySchlbk-Italic: Standard "(001.006S)" Standard ROM
+*Font NewCenturySchlbk-Roman: Standard "(001.007S)" Standard ROM
+*Font Palatino-Bold: Standard "(001.005S)" Standard ROM
+*Font Palatino-BoldItalic: Standard "(001.005S)" Standard ROM
+*Font Palatino-Italic: Standard "(001.005S)" Standard ROM
+*Font Palatino-Roman: Standard "(001.005S)" Standard ROM
+*Font Symbol: Special "(001.007S)" Special ROM
+*Font Times-Bold: Standard "(001.007S)" Standard ROM
+*Font Times-BoldItalic: Standard "(001.009S)" Standard ROM
+*Font Times-Italic: Standard "(001.007S)" Standard ROM
+*Font Times-Roman: Standard "(001.007S)" Standard ROM
+*Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
+*Font ZapfDingbats: Special "(001.004S)" Standard ROM
+*%
+*% End of "$Id: okidata9.ppd,v 1.1 2000/10/19 19:19:51 mike Exp $".
+*%
