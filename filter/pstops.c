@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.21 1999/07/13 12:04:00 mike Exp $"
+ * "$Id: pstops.c,v 1.22 1999/07/21 15:05:50 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -97,6 +97,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		level;		/* Nesting level for embedded files */
   int		nbytes,		/* Number of bytes read */
 		tbytes;		/* Total bytes to read for binary data */
+  int		page;		/* Current page sequence number */
 
 
   if (argc < 6 || argc > 7)
@@ -276,7 +277,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
           strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
         level ++;
-      else if (strcmp(line, "%%EndDocument") == 0)
+      else if (strcmp(line, "%%EndDocument") == 0 && level > 0)
         level --;
       else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
         break;
@@ -303,12 +304,12 @@ main(int  argc,			/* I - Number of command-line arguments */
     * Then read all of the pages, filtering as needed...
     */
 
-    for (;;)
+    for (page = 1;;)
     {
       if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
           strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
         level ++;
-      else if (strcmp(line, "%%EndDocument") == 0)
+      else if (strcmp(line, "%%EndDocument") == 0 && level > 0)
         level --;
       else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
       {
@@ -320,7 +321,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
         	  strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
         	level ++;
-	      else if (strcmp(line, "%%EndDocument") == 0)
+	      else if (strcmp(line, "%%EndDocument") == 0 && level > 0)
         	level --;
 	      else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
 	        break;
@@ -334,16 +335,22 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  if (slowcollate || sloworder)
 	    Pages[NumPages] = ftell(temp);
 
-	  NumPages ++;
-
           if (!sloworder)
 	  {
-	    if (ppd == NULL || ppd->num_filters == 0)
-	      fprintf(stderr, "PAGE: %d %d\n", NumPages, Copies);
+	    if ((NumPages % NUp) == 0)
+	    {
+	      if (ppd == NULL || ppd->num_filters == 0)
+		fprintf(stderr, "PAGE: %d %d\n", page, Copies);
 
-	    ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
-	    start_nup(NumPages - 1);
+              printf("%%%%Page: %d %d\n", page, page);
+	      page ++;
+	      ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
+	    }
+
+	    start_nup(NumPages);
 	  }
+
+	  NumPages ++;
 	}
       }
       else if (strncmp(line, "%%BeginBinary:", 14) == 0 ||
@@ -390,19 +397,26 @@ main(int  argc,			/* I - Number of command-line arguments */
     if (slowcollate || sloworder)
     {
       Pages[NumPages] = ftell(temp);
+      page = 1;
 
       if (!sloworder)
       {
-        while (Copies > 1)
+        while (Copies > 0)
 	{
 	  rewind(temp);
 
 	  for (number = 0; number < NumPages; number ++)
 	  {
-	    if (ppd == NULL || ppd->num_filters == 0)
-	      fprintf(stderr, "PAGE: %d 1\n", number + 1);
+	    if ((number % NUp) == 0)
+	    {
+	      if (ppd == NULL || ppd->num_filters == 0)
+		fprintf(stderr, "PAGE: %d 1\n", page);
 
-	    ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
+              printf("%%%%Page: %d %d\n", page, page);
+	      page ++;
+	      ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
+	    }
+
 	    start_nup(number);
 	    copy_bytes(temp, Pages[number + 1] - Pages[number]);
 	    end_nup(number);
@@ -417,11 +431,17 @@ main(int  argc,			/* I - Number of command-line arguments */
 	{
 	  for (number = NumPages - 1; number >= 0; number --)
 	  {
-	    if (ppd == NULL || ppd->num_filters == 0)
-	      fprintf(stderr, "PAGE: %d %d\n", NumPages - number,
-	              slowcollate ? 1 : Copies);
+	    if ((number % NUp) == 0)
+	    {
+	      if (ppd == NULL || ppd->num_filters == 0)
+		fprintf(stderr, "PAGE: %d %d\n", page,
+	        	slowcollate ? 1 : Copies);
 
-	    ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
+              printf("%%%%Page: %d %d\n", page, page);
+	      page ++;
+	      ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
+	    }
+
 	    start_nup(NumPages - 1 - number);
 	    fseek(temp, Pages[number], SEEK_SET);
 	    copy_bytes(temp, Pages[number + 1] - Pages[number]);
@@ -596,7 +616,8 @@ copy_bytes(FILE   *fp,		/* I - File to read from */
 static void
 end_nup(int number)	/* I - Page number */
 {
-  puts("grestore");
+  if (Flip || Orientation || NUp > 1)
+    puts("grestoreall");
 
   switch (NUp)
   {
@@ -683,7 +704,8 @@ start_nup(int number)	/* I - Page number */
 	tx, ty;		/* Translation values for subpage */
 
 
-  puts("gsave");
+  if (Flip || Orientation || NUp > 1)
+    puts("gsave");
 
   if (Flip)
     printf("%.0f 0 translate -1 1 scale\n", PageWidth);
@@ -778,5 +800,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.21 1999/07/13 12:04:00 mike Exp $".
+ * End of "$Id: pstops.c,v 1.22 1999/07/21 15:05:50 mike Exp $".
  */
