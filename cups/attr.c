@@ -1,5 +1,5 @@
 /*
- * "$Id: attr.c,v 1.1.2.3 2003/01/31 20:09:51 mike Exp $"
+ * "$Id: attr.c,v 1.1.2.4 2003/02/28 21:07:32 mike Exp $"
  *
  *   PPD model-specific attribute routines for the Common UNIX Printing System
  *   (CUPS).
@@ -49,7 +49,7 @@ extern int	_ppd_attr_compare(ppd_attr_t **a, ppd_attr_t **b);
  * 'ppdFindAttr()' - Find the first matching attribute...
  */
 
-const char *			/* O - Value or NULL if not found */
+ppd_attr_t *			/* O - Attribute or NULL if not found */
 ppdFindAttr(ppd_file_t *ppd,	/* I - PPD file data */
             const char *name,	/* I - Attribute name */
             const char *spec)	/* I - Specifier string or NULL */
@@ -111,10 +111,7 @@ ppdFindAttr(ppd_file_t *ppd,	/* I - PPD file data */
 
   ppd->cur_attr = match - ppd->attrs;
 
-  if ((*match)->value)
-    return ((*match)->value);
-  else
-    return ("");
+  return (*match);
 }
 
 
@@ -122,7 +119,7 @@ ppdFindAttr(ppd_file_t *ppd,	/* I - PPD file data */
  * 'ppdFindNextAttr()' - Find the next matching attribute...
  */
 
-const char *				/* O - Value or NULL if not found */
+ppd_attr_t *				/* O - Attribute or NULL if not found */
 ppdFindNextAttr(ppd_file_t *ppd,	/* I - PPD file data */
                 const char *name,	/* I - Attribute name */
 		const char *spec)	/* I - Specifier string or NULL */
@@ -174,13 +171,10 @@ ppdFindNextAttr(ppd_file_t *ppd,	/* I - PPD file data */
   * Return the next attribute's value...
   */
 
-  if ((*match)->value)
-    return ((*match)->value);
-  else
-    return ("");
+  return (*match);
 }
 
 
 /*
- * End of "$Id: attr.c,v 1.1.2.3 2003/01/31 20:09:51 mike Exp $".
+ * End of "$Id: attr.c,v 1.1.2.4 2003/02/28 21:07:32 mike Exp $".
  */

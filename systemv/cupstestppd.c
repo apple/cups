@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.19 2003/02/26 01:19:49 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.20 2003/02/28 21:07:35 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -79,6 +79,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   ppd_status_t	error;		/* Status of ppdOpen*() */
   int		line;		/* Line number for error */
   ppd_file_t	*ppd;		/* PPD file record */
+  ppd_attr_t	*attr;		/* PPD attribute */
   ppd_size_t	*size;		/* Size record */
   ppd_group_t	*group;		/* UI group */
   ppd_option_t	*option;	/* Standard UI option */
@@ -271,8 +272,9 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (verbose > 0)
         puts("\n    DETAILED CONFORMANCE TEST RESULTS");
 
-      if ((ptr = ppdFindAttr(ppd, "FormatVersion", NULL)) != NULL)
-        ppdversion = (int)(10 * atof(ptr) + 0.5);
+      if ((attr = ppdFindAttr(ppd, "FormatVersion", NULL)) != NULL &&
+          attr->value)
+        ppdversion = (int)(10 * atof(attr->value) + 0.5);
 
       if (ppdFindAttr(ppd, "DefaultImageableArea", NULL) != NULL)
       {
@@ -580,13 +582,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 	errors ++;
       }
 
-      if ((ptr = ppdFindAttr(ppd, "PSVersion", NULL)) != NULL)
+      if ((attr = ppdFindAttr(ppd, "PSVersion", NULL)) != NULL &&
+          attr->value != NULL)
       {
         char	junkstr[255];			/* Temp string */
 	int	junkint;			/* Temp integer */
 
 
-        if (sscanf(ptr, "(%[^)])%d", junkstr, &junkint) != 2)
+        if (sscanf(attr->value, "(%[^)])%d", junkstr, &junkint) != 2)
 	{
 	  if (verbose >= 0)
 	  {
@@ -657,8 +660,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       {
         if (ppdversion < 43)
 	{
-          printf("        WARN    Obsolete PPD version %s!\n",
-	         ppdFindAttr(ppd, "FormatVersion", NULL));
+          printf("        WARN    Obsolete PPD version %.1f!\n",
+	         0.1f * ppdversion);
 	  puts("                REF: Page 42, section 5.2.");
 	}
 
@@ -868,5 +871,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.19 2003/02/26 01:19:49 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.20 2003/02/28 21:07:35 mike Exp $".
  */
