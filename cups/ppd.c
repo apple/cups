@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.71 2002/08/01 01:32:30 mike Exp $"
+ * "$Id: ppd.c,v 1.72 2002/08/23 02:27:41 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -83,13 +83,19 @@
  * Local functions...
  */
 
+#ifndef __APPLE__
 static int		compare_strings(char *s, char *t);
 static int		compare_groups(ppd_group_t *g0, ppd_group_t *g1);
 static int		compare_options(ppd_option_t *o0, ppd_option_t *o1);
+#endif /* !__APPLE__ */
 static int		ppd_read(FILE *fp, char *keyword, char *option,
 			         char *text, char **string);
 static void		ppd_decode(char *string);
+#ifdef __APPLE__
+#  define ppd_fix(s)
+#else
 static void		ppd_fix(char *string);
+#endif /* __APPLE__ */
 static void		ppd_free_group(ppd_group_t *group);
 static void		ppd_free_option(ppd_option_t *option);
 static ppd_group_t	*ppd_get_group(ppd_file_t *ppd, char *name);
@@ -1367,6 +1373,10 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 #endif /* DEBUG */
 
  /*
+ * For MacOS compatibility reasons we don't want to make a synthetic "Auto" choice.
+ */
+#ifndef __APPLE__
+ /*
   * Make sure that all PPD files with an InputSlot option have an
   * "auto" choice that maps to no specific tray or media type.
   */
@@ -1390,20 +1400,25 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       choice->code = NULL;
     }
   }
+#endif /* !__APPLE__ */
 
  /*
   * Set the option back-pointer for each choice...
   */
 
+#ifndef __APPLE__
   qsort(ppd->groups, ppd->num_groups, sizeof(ppd_group_t),
         (int (*)(const void *, const void *))compare_groups);
+#endif /* !__APPLE__ */
 
   for (i = ppd->num_groups, group = ppd->groups;
        i > 0;
        i --, group ++)
   {
+#ifndef __APPLE__
     qsort(group->options, group->num_options, sizeof(ppd_option_t),
           (int (*)(const void *, const void *))compare_options);
+#endif /* !__APPLE__ */
 
     for (j = group->num_options, option = group->options;
          j > 0;
@@ -1413,15 +1428,19 @@ ppdOpen(FILE *fp)		/* I - File to read from */
         option->choices[k].option = (void *)option;
     }
 
+#ifndef __APPLE__
     qsort(group->subgroups, group->num_subgroups, sizeof(ppd_group_t),
           (int (*)(const void *, const void *))compare_groups);
+#endif /* !__APPLE__ */
 
     for (j = group->num_subgroups, subgroup = group->subgroups;
          j > 0;
 	 j --, subgroup ++)
     {
+#ifndef __APPLE__
       qsort(subgroup->options, subgroup->num_options, sizeof(ppd_option_t),
             (int (*)(const void *, const void *))compare_options);
+#endif /* !__APPLE__ */
 
       for (k = group->num_options, option = group->options;
            k > 0;
@@ -1509,6 +1528,7 @@ ppdOpenFile(const char *filename) /* I - File to read from */
 }
 
 
+#ifndef __APPLE__
 /*
  * 'compare_strings()' - Compare two strings.
  */
@@ -1640,6 +1660,7 @@ compare_options(ppd_option_t *o0,/* I - First option */
 {
   return (compare_strings(o0->text, o1->text));
 }
+#endif /* !__APPLE__ */
 
 
 /*
@@ -1981,6 +2002,7 @@ ppd_decode(char *string)	/* I - String to decode */
 }
 
 
+#ifndef __APPLE__
 /*
  * 'ppd_fix()' - Fix WinANSI characters in the range 0x80 to 0x9f to be
  *               valid ISO-8859-1 characters...
@@ -2031,8 +2053,9 @@ ppd_fix(char *string)		/* IO - String to fix */
     if (*p >= 0x80 && *p < 0xa0)
       *p = lut[*p - 0x80];
 }
+#endif /* !__APPLE__ */
 
 
 /*
- * End of "$Id: ppd.c,v 1.71 2002/08/01 01:32:30 mike Exp $".
+ * End of "$Id: ppd.c,v 1.72 2002/08/23 02:27:41 mike Exp $".
  */

@@ -2,10 +2,6 @@
   Description     = "Printing Services";
   Provides        = ("Printing");
   Requires        = ("Resolver");
-  OrderPreference = "None";
-  Messages =
-  {
-    start = "Starting printing services";
-    stop  = "Stopping printing services";
-  };
+  Uses            = ("Network Time");
+  OrderPreference = "Late";
 }
