@@ -13,9 +13,9 @@ CHANGES IN CUPS V1.1.7
 	- All scheduler configuration files are now case
 	  insensitive to match Apache.
 	- Added support for Apache ListenBackLog, LogFormat,
-	  PassEnv, SetEnv, UnsetEnv, Require, UseCanonicalName,
-	  Satisfy, <Limit>, <LimitExcept>, LimitRequestSize, and
-	  Options directives.
+	  Require, UseCanonicalName, Satisfy, <Limit>,
+	  <LimitExcept>, LimitRequestSize, and Options
+	  directives.
 	- Added support for all Apache log levels...
 	- Added support for "double" HostNameLookups.
 	- Added new "RunAsUser" directive to support non-root
