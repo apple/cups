@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.65 2000/09/05 19:27:50 mike Exp $"
+ * "$Id: client.c,v 1.66 2000/09/05 19:45:08 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -191,24 +191,18 @@ CloseClient(client_t *con)	/* I - Client to close */
     con->http.fd = 0;
   }
 
-  for (i = 0; i < NumListeners; i ++)
-  {
-    DEBUG_printf(("CloseClient: Adding fd %d to InputSet...\n", Listeners[i].fd));
-    FD_SET(Listeners[i].fd, &InputSet);
-  }
-
   if (con->pipe_pid != 0)
   {
     DEBUG_printf(("CloseClient: Removing fd %d from InputSet...\n", con->file));
     FD_CLR(con->file, &InputSet);
   }
 
- /*
-  * If we have a data file open, close it...
-  */
-
   if (con->file)
   {
+   /*
+    * Close the open data file...
+    */
+
     if (con->pipe_pid)
     {
       kill(con->pipe_pid, SIGKILL);
@@ -218,6 +212,21 @@ CloseClient(client_t *con)	/* I - Client to close */
     FD_CLR(con->file, &InputSet);
     close(con->file);
     con->file = 0;
+  }
+
+ /*
+  * Re-enable new client connections if we are going back under the
+  * limit...
+  */
+
+  if (NumClients == MaxClients)
+  {
+
+    for (i = 0; i < NumListeners; i ++)
+    {
+      DEBUG_printf(("CloseClient: Adding fd %d to InputSet...\n", Listeners[i].fd));
+      FD_SET(Listeners[i].fd, &InputSet);
+    }
   }
 
  /*
@@ -1788,5 +1797,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.65 2000/09/05 19:27:50 mike Exp $".
+ * End of "$Id: client.c,v 1.66 2000/09/05 19:45:08 mike Exp $".
  */
