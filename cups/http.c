@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.88 2001/10/30 20:37:14 mike Exp $"
+ * "$Id: http.c,v 1.89 2001/10/30 20:58:56 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -393,7 +393,6 @@ httpConnectEncrypt(const char *host,	/* I - Host to connect to */
   */
 
   strncpy(http->hostname, host, sizeof(http->hostname) - 1);
-  memcpy((char *)&(http->hostaddr.sin_addr), hostaddr->h_addr, hostaddr->h_length);
   http->hostaddr.sin_family = hostaddr->h_addrtype;
 #ifdef WIN32
   http->hostaddr.sin_port   = htons((u_short)port);
@@ -411,13 +410,16 @@ httpConnectEncrypt(const char *host,	/* I - Host to connect to */
   * Loop through the addresses we have until one of them connects...
   */
 
+  strncpy(http->hostname, host, sizeof(http->hostname) - 1);
+
   for (i = 0; hostaddr->h_addr_list[i]; i ++)
   {
    /*
     * Load the address...
     */
 
-    httpAddrLoad(hostaddr, port, i, &(http->hostaddr));
+    memcpy((char *)&(http->hostaddr.sin_addr), hostaddr->h_addr_list[i],
+           hostaddr->h_length);
 
    /*
     * Connect to the remote system...
@@ -2196,5 +2198,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.88 2001/10/30 20:37:14 mike Exp $".
+ * End of "$Id: http.c,v 1.89 2001/10/30 20:58:56 mike Exp $".
  */
