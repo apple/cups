@@ -1,5 +1,5 @@
 /*
- * "$Id: pstoraster.c,v 1.14 2000/06/26 15:50:18 mike Exp $"
+ * "$Id: pstoraster.c,v 1.15 2000/06/28 18:42:49 mike Exp $"
  *
  *   PostScript RIP filter main entry for the Common UNIX Printing System
  *   (CUPS).
@@ -95,6 +95,9 @@ main(int  argc,		/* I - Number of command-line arguments */
   ref			error_object;	/* Error object */
   int			num_options;	/* Number of job options */
   cups_option_t		*options;	/* Job options */
+  char			gspath[2048];	/* Path to GS files... */
+  char			fontpath[2048];	/* Path to GS fonts... */
+  const char		*datadir;	/* CUPS_DATADIR env variable */
 
 
  /*
@@ -137,7 +140,12 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Tell the interpreter where to find its files...
   */
 
-  minst->lib_path.final = gs_lib_default_path;
+  if ((datadir = getenv("CUPS_DATADIR")) == NULL)
+    datadir = CUPS_DATADIR;
+
+  snprintf(gspath, sizeof(gspath), "%s/pstoraster:%s/fonts", datadir, datadir);
+
+  minst->lib_path.final = gspath;
   gs_main_set_lib_paths(minst);
 
  /*
@@ -151,7 +159,9 @@ main(int  argc,		/* I - Number of command-line arguments */
   initial_enter_name("BATCH", &vtrue);
 
   define_string("OutputFile", "-");
-  define_string("FONTPATH", CUPS_DATADIR "/fonts");
+
+  snprintf(fontpath, sizeof(fontpath), "%s/fonts", datadir);
+  define_string("FONTPATH", fontpath);
 
  /*
   * Start the interpreter...
@@ -218,5 +228,5 @@ define_string(char *name,	/* I - Variable to set */
 
 
 /*
- * End of "$Id: pstoraster.c,v 1.14 2000/06/26 15:50:18 mike Exp $".
+ * End of "$Id: pstoraster.c,v 1.15 2000/06/28 18:42:49 mike Exp $".
  */

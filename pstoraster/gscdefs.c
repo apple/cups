@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gscdefs.c,v 1.2 2000/03/13 19:05:24 mike Exp $ */
+/*$Id: gscdefs.c,v 1.3 2000/06/28 18:42:49 mike Exp $ */
 /* Configuration scalars */
 #include "stdpre.h"
 #include "gscdefs.h"		/* interface */
@@ -73,9 +73,6 @@ CONFIG_CONST long gs_serialnumber = GS_SERIALNUMBER;
 
 /* Here is where the library search path, the name of the */
 /* initialization file, and the doc directory are defined. */
-
-/* Define the default library search path. */
-const char *const gs_lib_default_path = CUPS_DATADIR "/pstoraster:" CUPS_DATADIR "/fonts";
 
 /* Define the interpreter initialization file. */
 const char *const gs_init_file = "gs_init.ps";
