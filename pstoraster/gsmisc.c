@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gsmisc.c,v 1.5 2000/05/23 12:19:48 mike Exp $ */
+/*$Id: gsmisc.c,v 1.6 2000/08/16 15:18:43 mike Exp $ */
 /* Miscellaneous utilities for Ghostscript library */
 #include "ctype_.h"
 #include "malloc_.h"
@@ -240,7 +240,7 @@ gs_realloc(void *old_ptr, size_t old_size, size_t new_size)
     new_size = (new_size + 7) & ~7;
 
     if (new_size) {
-	new_ptr = malloc(new_size);
+	new_ptr = calloc(1, new_size);
 	if (new_ptr == NULL)
 	    return NULL;
     } else

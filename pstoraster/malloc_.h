@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: malloc_.h,v 1.2 2000/03/08 23:15:18 mike Exp $ */
+/*$Id: malloc_.h,v 1.3 2000/08/16 15:18:43 mike Exp $ */
 /* Generic substitute for Unix malloc.h */
 
 #ifndef malloc__INCLUDED
@@ -52,12 +52,8 @@ extern void free();
 #endif /* !__TURBOC__ */
 
 /* (At least some versions of) Linux don't have a working realloc.... */
-#ifdef linux
-#  define malloc__need_realloc
+/* MRS - in order to make sure memory is initialized, always use gs_realloc() */
+#define malloc__need_realloc
 void *gs_realloc(P3(void *, size_t, size_t));
-
-#else
-#  define gs_realloc(ptr, old_size, new_size) realloc(ptr, new_size)
-#endif
 
 #endif /* malloc__INCLUDED */

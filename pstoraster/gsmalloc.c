@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gsmalloc.c,v 1.1 2000/03/08 23:14:44 mike Exp $ */
+/*$Id: gsmalloc.c,v 1.2 2000/08/16 15:18:43 mike Exp $ */
 /* C heap allocator */
 #include "malloc_.h"
 #include "gdebug.h"
@@ -114,7 +114,7 @@ private long heap_available(P0());
 gs_malloc_memory_t *
 gs_malloc_memory_init(void)
 {
-    gs_malloc_memory_t *mem = malloc(sizeof(gs_malloc_memory_t));
+    gs_malloc_memory_t *mem = calloc(1, sizeof(gs_malloc_memory_t));
 
     mem->procs = gs_malloc_memory_procs;
     mem->allocated = 0;
@@ -173,7 +173,7 @@ gs_heap_alloc_bytes(gs_memory_t * mem, uint size, client_name_t cname)
 
 	if (mmem->limit - added < mmem->used)
 	    set_msg("exceeded limit");
-	else if ((ptr = (byte *) malloc(added)) == 0)
+	else if ((ptr = (byte *) calloc(1, added)) == 0)
 	    set_msg("failed");
 	else {
 	    gs_malloc_block_t *bp = (gs_malloc_block_t *) ptr;
