@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.16 2002/06/14 12:31:15 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.17 2002/09/18 14:57:46 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -874,7 +874,8 @@ ippLength(ipp_t *ipp)		/* I - IPP request */
 	  for (i = 0, value = attr->values;
 	       i < attr->num_values;
 	       i ++, value ++)
-	    bytes += strlen(value->string.text);
+	    if (value->string.text != NULL)
+	      bytes += strlen(value->string.text);
 	  break;
 
       case IPP_TAG_DATE :
@@ -892,11 +893,17 @@ ippLength(ipp_t *ipp)		/* I - IPP request */
       case IPP_TAG_TEXTLANG :
       case IPP_TAG_NAMELANG :
           bytes += 4 * attr->num_values;/* Charset + text length */
+
 	  for (i = 0, value = attr->values;
 	       i < attr->num_values;
 	       i ++, value ++)
-	    bytes += strlen(value->string.charset) +
-	             strlen(value->string.text);
+	  {
+	    if (value->string.charset != NULL)
+	      bytes += strlen(value->string.charset);
+
+	    if (value->string.text != NULL)
+	      bytes += strlen(value->string.text);
+	  }
 	  break;
 
       default :
@@ -1686,7 +1693,10 @@ ippWriteIO(void       *dst,	/* I - Destination */
 		    *bufptr++ = 0;
 		  }
 
-                  n = strlen(value->string.text);
+                  if (value->string.text != NULL)
+                    n = strlen(value->string.text);
+		  else
+		    n = 0;
 
                   if (n > (sizeof(buffer) - 2))
 		    return (IPP_ERROR);
@@ -1717,8 +1727,12 @@ ippWriteIO(void       *dst,	/* I - Destination */
 
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
-		  memcpy(bufptr, value->string.text, n);
-		  bufptr += n;
+
+		  if (n > 0)
+		  {
+		    memcpy(bufptr, value->string.text, n);
+		    bufptr += n;
+		  }
 		}
 		break;
 
@@ -1904,8 +1918,13 @@ ippWriteIO(void       *dst,	/* I - Destination */
 		  * the trailing nul.
 		  */
 
-                  n = 2 + strlen(value->string.charset) +
-		      2 + strlen(value->string.text);
+                  n = 4;
+
+		  if (value->string.charset != NULL)
+                    n += strlen(value->string.charset);
+
+		  if (value->string.text != NULL)
+                    n += strlen(value->string.text);
 
                   if (n > (sizeof(buffer) - 2))
 		    return (IPP_ERROR);
@@ -1926,22 +1945,36 @@ ippWriteIO(void       *dst,	/* I - Destination */
 		  *bufptr++ = n;
 
                  /* Length of charset */
-                  n = strlen(value->string.charset);
+		  if (value->string.charset != NULL)
+		    n = strlen(value->string.charset);
+		  else
+		    n = 0;
+
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
 
                  /* Charset */
-		  memcpy(bufptr, value->string.charset, n);
-		  bufptr += n;
+		  if (n > 0)
+		  {
+		    memcpy(bufptr, value->string.charset, n);
+		    bufptr += n;
+		  }
 
                  /* Length of text */
-                  n = strlen(value->string.text);
+                  if (value->string.text != NULL)
+		    n = strlen(value->string.text);
+		  else
+		    n = 0;
+
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
 
                  /* Text */
-		  memcpy(bufptr, value->string.text, n);
-		  bufptr += n;
+		  if (n > 0)
+		  {
+		    memcpy(bufptr, value->string.text, n);
+		    bufptr += n;
+		  }
 		}
 		break;
 
@@ -2333,5 +2366,5 @@ ipp_write_mem(ipp_mem_t   *m,		/* I - Memory buffer */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.16 2002/06/14 12:31:15 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.17 2002/09/18 14:57:46 mike Exp $".
  */
