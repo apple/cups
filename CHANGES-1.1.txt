@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- The scheduler no longer keeps job history data for
+	  remote printers on the client (just on the server.)
 	- The parallel and USB backends now retry if the backend
 	  detects that the printer is not connected to the
 	  system (rather than stopping the queue...)
