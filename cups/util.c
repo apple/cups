@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.81.2.16 2002/08/30 20:43:24 mike Exp $"
+ * "$Id: util.c,v 1.81.2.17 2002/10/16 02:35:29 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -323,6 +323,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
       */
 
       httpFlush(http);
+      httpReconnect(http);
 
      /*
       * See if we can do local authentication...
@@ -1707,5 +1708,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.81.2.16 2002/08/30 20:43:24 mike Exp $".
+ * End of "$Id: util.c,v 1.81.2.17 2002/10/16 02:35:29 mike Exp $".
  */

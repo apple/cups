@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.20 2002/08/30 18:18:07 mike Exp $"
+ * "$Id: main.c,v 1.57.2.21 2002/10/16 02:35:33 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -700,13 +700,6 @@ sigchld_handler(int sig)	/* I - Signal number */
     DEBUG_printf(("sigchld_handler: pid = %d, status = %d\n", pid, status));
 
    /*
-    * Delete certificates for CGI processes...
-    */
-
-    if (pid)
-      DeleteCert(pid);
-
-   /*
     * Ignore SIGTERM errors - that comes when a job is cancelled...
     */
 
@@ -725,6 +718,19 @@ sigchld_handler(int sig)	/* I - Signal number */
       if (LogLevel < L_DEBUG)
         LogMessage(L_INFO, "Hint: Try setting the LogLevel to \"debug\" to find out more.");
     }
+    else
+      LogMessage(L_DEBUG2, "PID %d exited with no errors.", pid);
+
+   /*
+    * Delete certificates for CGI processes...
+    */
+
+    if (pid)
+      DeleteCert(pid);
+
+   /*
+    * Lookup the PID in the jobs list...
+    */
 
     for (job = Jobs; job != NULL; job = job->next)
       if (job->state != NULL &&
@@ -890,5 +896,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.20 2002/08/30 18:18:07 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.21 2002/10/16 02:35:33 mike Exp $".
  */

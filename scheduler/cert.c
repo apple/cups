@@ -1,5 +1,5 @@
 /*
- * "$Id: cert.c,v 1.7.2.5 2002/08/30 20:43:26 mike Exp $"
+ * "$Id: cert.c,v 1.7.2.6 2002/10/16 02:35:30 mike Exp $"
  *
  *   Authentication certificate routines for the Common UNIX
  *   Printing System (CUPS).
@@ -56,6 +56,8 @@ AddCert(int        pid,			/* I - Process ID */
   static const char *hex = "0123456789ABCDEF";
 					/* Hex constants... */
 
+
+  LogMessage(L_DEBUG2, "AddCert: adding certificate for pid %d", pid);
 
  /*
   * Allocate memory for the certificate...
@@ -114,6 +116,9 @@ AddCert(int        pid,			/* I - Process ID */
     fchown(fileno(fp), User, Group);
   }
 
+  DEBUG_printf(("ADD pid=%d, username=%s, cert=%s\n", pid, username,
+                cert->certificate));
+
   fputs(cert->certificate, fp);
   fclose(fp);
 
@@ -144,6 +149,11 @@ DeleteCert(int pid)			/* I - Process ID */
      /*
       * Remove this certificate from the list...
       */
+
+      LogMessage(L_DEBUG2, "DeleteCert: removing certificate for pid %d", pid);
+
+      DEBUG_printf(("DELETE pid=%d, username=%s, cert=%s\n", cert->pid,
+                    cert->username, cert->certificate));
 
       if (prev == NULL)
         Certs = cert->next;
@@ -211,9 +221,15 @@ FindCert(const char *certificate)	/* I - Certificate */
   cert_t	*cert;			/* Current certificate */
 
 
+  DEBUG_printf(("FindCert(certificate=%s)\n", certificate));
   for (cert = Certs; cert != NULL; cert = cert->next)
     if (strcasecmp(certificate, cert->certificate) == 0)
+    {
+      DEBUG_printf(("    returning %s...\n", cert->username));
       return (cert->username);
+    }
+
+  DEBUG_puts("    certificate not found!");
 
   return (NULL);
 }
@@ -272,5 +288,5 @@ InitCerts(void)
 
 
 /*
- * End of "$Id: cert.c,v 1.7.2.5 2002/08/30 20:43:26 mike Exp $".
+ * End of "$Id: cert.c,v 1.7.2.6 2002/10/16 02:35:30 mike Exp $".
  */
