@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.4 2002/01/14 19:15:05 mike Exp $"
+ * "$Id: main.c,v 1.57.2.5 2002/01/28 19:10:25 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -87,6 +87,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction	action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+#ifdef __sgi
+  FILE			*fp;		/* Fake lpsched lock file */
+#endif /* __sgi */
 
 
  /*
@@ -241,6 +244,28 @@ main(int  argc,			/* I - Number of command-line arguments */
   signal(SIGPIPE, SIG_IGN);
   signal(SIGTERM, sigterm_handler);
 #endif /* HAVE_SIGSET */
+
+#ifdef __sgi
+ /*
+  * Try to create a fake lpsched lock file if one is not already there.
+  * Some Adobe applications need it under IRIX in order to enable
+  * printing...
+  */
+
+  if ((fp = fopen("/var/spool/lp/SCHEDLOCK", "a")) == NULL)
+  {
+    syslog(LOG_LPR, "Unable to create fake lpsched lock file "
+                    "\"/var/spool/lp/SCHEDLOCK\"\' - %s!",
+           strerror(errno));
+  }
+  else
+  {
+    fclose(fp);
+
+    chmod("/var/spool/lp/SCHEDLOCK", 0644);
+    chown("/var/spool/lp/SCHEDLOCK", User, Group);
+  }
+#endif /* __sgi */
 
  /*
   * Read configuration...
@@ -685,6 +710,11 @@ sighup_handler(int sig)	/* I - Signal number */
 static void
 sigterm_handler(int sig)
 {
+#ifdef __sgi
+  struct stat	statbuf;		/* Needed for checking lpsched FIFO */
+#endif /* __sgi */
+
+
   (void)sig;	/* remove compiler warnings... */
 
  /*
@@ -731,6 +761,18 @@ sigterm_handler(int sig)
   if (MimeDatabase != NULL)
     mimeDelete(MimeDatabase);
 
+#ifdef __sgi
+ /*
+  * Remove the fake IRIX lpsched lock file, but only if the existing
+  * file is not a FIFO which indicates that the real IRIX lpsched is
+  * running...
+  */
+
+  if (!stat("/var/spool/lp/FIFO", &statbuf))
+    if (!S_ISFIFO(statbuf.st_mode))
+      unlink("/var/spool/lp/SCHEDLOCK");
+#endif /* __sgi */
+
   exit(1);
 }
 
@@ -748,5 +790,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.4 2002/01/14 19:15:05 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.5 2002/01/28 19:10:25 mike Exp $".
  */

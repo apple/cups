@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.37.2.3 2002/01/18 19:18:25 mike Exp $"
+ * "$Id: lpstat.c,v 1.37.2.4 2002/01/28 19:10:26 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -141,6 +141,43 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      show_accepting(http, NULL, num_dests, dests);
 	    break;
 
+#ifdef __sgi
+        case 'b' : /* Show both the local and remote status */
+	    if (!http)
+	    {
+              http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
+
+	      if (http == NULL)
+	      {
+		perror("lpstat: Unable to connect to server");
+		return (1);
+	      }
+            }
+
+	    if (argv[i][2] != '\0')
+	    {
+	     /*
+	      * The local and remote status are separated by a blank line;
+	      * since all CUPS jobs are networked, we only output the
+	      * second list for now...  In the future, we might further
+	      * emulate this by listing the remote server's queue, but
+	      * for now this is enough to make the SGI printstatus program
+	      * happy...
+	      */
+
+	      puts("");
+	      show_jobs(http, argv[i] + 2, NULL, 3, ranking);
+	    }
+	    else
+	    {
+	      fputs("lpstat: The -b option requires a destination argument.\n",
+	            stderr);
+
+	      return (1);
+	    }
+	    break;
+#endif /* __sgi */
+
         case 'c' : /* Show classes and members */
 	    if (!http)
 	    {
@@ -207,6 +244,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 
         case 'l' : /* Long status or long job status */
+#ifdef __sgi
 	    if (!http)
 	    {
               http = httpConnectEncrypt(cupsServer(), ippPort(), encryption);
@@ -221,6 +259,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    if (argv[i][2] != '\0')
 	      show_jobs(http, argv[i] + 2, NULL, 3, ranking);
 	    else
+#endif /* __sgi */
 	      long_status = 2;
 	    break;
 
@@ -1881,5 +1920,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.37.2.3 2002/01/18 19:18:25 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.37.2.4 2002/01/28 19:10:26 mike Exp $".
  */

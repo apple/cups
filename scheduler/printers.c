@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.9 2002/01/26 21:36:38 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.10 2002/01/28 19:10:25 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -323,6 +323,9 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
   unlink(filename);
 
   snprintf(filename, sizeof(filename), "/var/spool/lp/pod/%s.status", p->name);
+  unlink(filename);
+
+  snprintf(filename, sizeof(filename), "/var/spool/lp/member/%s", p->name);
   unlink(filename);
 #endif /* __sgi */
 
@@ -1462,7 +1465,10 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
     if (p->type & CUPS_PRINTER_COLOR)
       fputs("TYPE=ColorPostScript\n", fp);
     else
-      fputs("TYPE=PostScript\n", fp);
+      fputs("TYPE=MonoPostScript\n", fp);
+
+    fprintf(fp, "HOSTNAME=%s\n", ServerName);
+    fprintf(fp, "HOSTPRINTER=%s\n", p->name);
 
     fclose(fp);
 
@@ -1472,15 +1478,14 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
  /*
   * Then the member file that tells which device file the queue is connected
-  * to...  While it may be confusing to apps that look at the member file
-  * directly, we put the device URI in here so that the IRIX printstatus
-  * program doesn't try to run lpstat with the undocumented "-b" option...
+  * to...  Networked printers use "/dev/null" in this file, so that's what
+  * we use (the actual device URI can confuse some apps...)
   */
 
   snprintf(filename, sizeof(filename), "/var/spool/lp/member/%s", p->name);
   if ((fp = fopen(filename, "w")) != NULL)
   {
-    fprintf(fp, "%s\n", p->device_uri);
+    fputs("/dev/null\n", fp);
 
     fclose(fp);
 
@@ -1522,10 +1527,10 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   if ((fp = fopen(filename, "w")) != NULL)
   {
     fprintf(fp, "Printer Class      | %s\n",
-            (p->type & CUPS_PRINTER_COLOR) ? "ColorPostScript" : "PostScript");
+            (p->type & CUPS_PRINTER_COLOR) ? "ColorPostScript" : "MonoPostScript");
     fprintf(fp, "Printer Model      | %s\n", p->make_model);
-    fprintf(fp, "Location Code      | %s\n", p->uri);
-    fprintf(fp, "Physical Location  | %s\n", p->location);
+    fprintf(fp, "Location Code      | %s\n", p->location);
+    fprintf(fp, "Physical Location  | %s\n", p->info);
     fprintf(fp, "Port Path          | %s\n", p->device_uri);
     fprintf(fp, "Config Path        | /var/spool/lp/pod/%s.config\n", p->name);
     fprintf(fp, "Active Status Path | /var/spool/lp/pod/%s.status\n", p->name);
@@ -1911,9 +1916,10 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
             (p->state == IPP_PRINTER_PROCESSING) ? "Busy" :
                                                    "Faulted");
     fprintf(fp, "Information        | 01 00 00 | %s\n", CUPS_SVERSION);
-    fprintf(fp, "Information        | 02 00 00 | %s jobs\n",
+    fprintf(fp, "Information        | 02 00 00 | Device URI: %s\n", p->device_uri);
+    fprintf(fp, "Information        | 03 00 00 | %s jobs\n",
             p->accepting ? "Accepting" : "Not accepting");
-    fprintf(fp, "Information        | 03 00 00 | %s\n", p->state_message);
+    fprintf(fp, "Information        | 04 00 00 | %s\n", p->state_message);
 
     fclose(fp);
 
@@ -1959,7 +1965,7 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
     if (p->type & CUPS_PRINTER_COLOR)
       tag = 66240;
     else
-      tag = 66208;
+      tag = 66272;
 
     if (p->type & CUPS_PRINTER_REMOTE)
       tag |= 8;
@@ -2005,5 +2011,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.9 2002/01/26 21:36:38 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.10 2002/01/28 19:10:25 mike Exp $".
  */
