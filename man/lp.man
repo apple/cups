@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lp.man,v 1.5 2001/01/23 17:36:21 mike Exp $"
+.\" "$Id: lp.man,v 1.6 2001/03/09 14:26:54 mike Exp $"
 .\"
 .\"   lp/cancel man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -32,8 +32,6 @@ cancel \- cancel jobs
 .I destination
 ] [ \-h
 .I server
-] [ \-i
-.I job-id
 ] [ \-m ] [ \-n
 .I num-copies
 [ \-o
@@ -50,6 +48,25 @@ cancel \- cancel jobs
 .I file(s)
 ]
 .br
+.B lp
+[ -E ] [ \-c ] [ \-h
+.I server
+] [ \-i
+.I job-id
+] [ \-n
+.I num-copies
+[ \-o
+.I option
+] [ \-p/q
+.I priority
+] [ \-t
+.I title
+] [ \-H
+.I handling
+] [ \-P
+.I page-list
+]
+.br
 .B cancel
 [ \-a ] [ -h
 .I server
@@ -61,7 +78,7 @@ cancel \- cancel jobs
 .I destination-id
 ]
 .SH DESCRIPTION
-\fBlp\fR submits files for printing.
+\fBlp\fR submits files for printing or alters a pending job.
 .LP
 \fBcancel\fR cancels existing print jobs. The \fI-a\fR option will remove
 all jobs from the specified destination.
@@ -135,5 +152,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2001 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lp.man,v 1.5 2001/01/23 17:36:21 mike Exp $".
+.\" End of "$Id: lp.man,v 1.6 2001/03/09 14:26:54 mike Exp $".
 .\"

@@ -88,6 +88,8 @@ CHANGES IN CUPS V1.1.7
 	  could cause it to crash.
 	- The LPD backend now sanitizes the job title to avoid
 	  potential problems on remote LPD servers.
+	- The lp command did not send the requesting-user-name
+	  attribute when altering a job.
 
 
 CHANGES IN CUPS V1.1.6-3
