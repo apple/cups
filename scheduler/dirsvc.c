@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.130 2004/04/28 19:19:13 mike Exp $"
+ * "$Id: dirsvc.c,v 1.131 2004/05/27 18:04:32 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1099,8 +1099,8 @@ UpdateCUPSBrowse(void)
   char		srcname[1024];		/* Source hostname */
   unsigned	address;		/* Source address (host order) */
   struct hostent *srchost;		/* Host entry for source address */
-  cups_ptype_t	type;			/* Printer type */
-  ipp_pstate_t	state;			/* Printer state */
+  unsigned	type;			/* Printer type */
+  unsigned	state;			/* Printer state */
   char		uri[HTTP_MAX_URI],	/* Printer URI */
 		method[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
@@ -1235,8 +1235,7 @@ UpdateCUPSBrowse(void)
   * Parse packet...
   */
 
-  if (sscanf(packet, "%x%x%1023s", (unsigned *)&type, (unsigned *)&state,
-             uri) < 3)
+  if (sscanf(packet, "%x%x%1023s", &type, &state, uri) < 3)
   {
     LogMessage(L_WARN, "UpdateCUPSBrowse: Garbled browse packet - %s",
                packet);
@@ -1342,7 +1341,8 @@ UpdateCUPSBrowse(void)
   * Process the browse data...
   */
 
-  ProcessBrowseData(uri, type, state, location, info, make_model);
+  ProcessBrowseData(uri, (cups_ptype_t)type, (ipp_pstate_t)state, location,
+                    info, make_model);
 }
 
 
@@ -1935,5 +1935,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.130 2004/04/28 19:19:13 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.131 2004/05/27 18:04:32 mike Exp $".
  */
