@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h,v 1.32.2.4 2002/03/01 19:55:09 mike Exp $"
+ * "$Id: cups.h,v 1.32.2.5 2002/04/20 19:40:09 mike Exp $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -31,7 +31,7 @@
  * Include necessary headers...
  */
 
-#  include "ipp.h"
+#  include <ipp/ipp.h>
 #  include "ppd.h"
 
 
@@ -173,5 +173,5 @@ extern const char	*cupsUser(void);
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.32.2.4 2002/03/01 19:55:09 mike Exp $".
+ * End of "$Id: cups.h,v 1.32.2.5 2002/04/20 19:40:09 mike Exp $".
  */

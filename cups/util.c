@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.81.2.9 2002/03/22 15:47:22 mike Exp $"
+ * "$Id: util.c,v 1.81.2.10 2002/04/20 19:40:09 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -46,7 +46,6 @@
  */
 
 #include "cups.h"
-#include "ipp.h"
 #include "language.h"
 #include "string.h"
 #include "debug.h"
@@ -1686,5 +1685,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.81.2.9 2002/03/22 15:47:22 mike Exp $".
+ * End of "$Id: util.c,v 1.81.2.10 2002/04/20 19:40:09 mike Exp $".
  */

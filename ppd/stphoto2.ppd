@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: stphoto2.ppd,v 1.2 2002/01/02 17:59:09 mike Exp $"
+*% "$Id: stphoto2.ppd,v 1.2.2.1 2002/04/20 19:40:12 mike Exp $"
 *%
 *%   Sample EPSON Stylus Photo driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -128,5 +128,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: stphoto2.ppd,v 1.2 2002/01/02 17:59:09 mike Exp $".
+*% End of "$Id: stphoto2.ppd,v 1.2.2.1 2002/04/20 19:40:12 mike Exp $".
 *%

@@ -1,20 +1,20 @@
 # DO NOT DELETE
 
 html.o: cgi.h
-ipp-var.o: ipp-var.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h
-ipp-var.o: ../ipp/md5.h ../cups/ppd.h ../cups/debug.h ../cups/language.h
-ipp-var.o: ../cups/string.h ../ipp/string.h ../config.h cgi.h
+ipp-var.o: ipp-var.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h ../ipp/md5.h
+ipp-var.o: ../cups/ppd.h ../cups/debug.h ../cups/language.h ../cups/string.h
+ipp-var.o: ../ipp/string.h ../config.h cgi.h
 template.o: cgi.h
 var.o: cgi.h
-admin.o: ipp-var.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h
-admin.o: ../ipp/md5.h ../cups/ppd.h ../cups/debug.h ../cups/language.h
-admin.o: ../cups/string.h ../ipp/string.h ../config.h cgi.h
-classes.o: ipp-var.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h
-classes.o: ../ipp/md5.h ../cups/ppd.h ../cups/debug.h ../cups/language.h
-classes.o: ../cups/string.h ../ipp/string.h ../config.h cgi.h
-jobs.o: ipp-var.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h
-jobs.o: ../ipp/md5.h ../cups/ppd.h ../cups/debug.h ../cups/language.h
-jobs.o: ../cups/string.h ../ipp/string.h ../config.h cgi.h
-printers.o: ipp-var.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h
-printers.o: ../ipp/md5.h ../cups/ppd.h ../cups/debug.h ../cups/language.h
-printers.o: ../cups/string.h ../ipp/string.h ../config.h cgi.h
+admin.o: ipp-var.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h ../ipp/md5.h
+admin.o: ../cups/ppd.h ../cups/debug.h ../cups/language.h ../cups/string.h
+admin.o: ../ipp/string.h ../config.h cgi.h
+classes.o: ipp-var.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h ../ipp/md5.h
+classes.o: ../cups/ppd.h ../cups/debug.h ../cups/language.h ../cups/string.h
+classes.o: ../ipp/string.h ../config.h cgi.h
+jobs.o: ipp-var.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h ../ipp/md5.h
+jobs.o: ../cups/ppd.h ../cups/debug.h ../cups/language.h ../cups/string.h
+jobs.o: ../ipp/string.h ../config.h cgi.h
+printers.o: ipp-var.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h ../ipp/md5.h
+printers.o: ../cups/ppd.h ../cups/debug.h ../cups/language.h ../cups/string.h
+printers.o: ../ipp/string.h ../config.h cgi.h

@@ -1,5 +1,5 @@
 /*
- * "$Id: policy.h,v 1.1.2.1 2002/04/14 12:58:54 mike Exp $"
+ * "$Id: policy.h,v 1.1.2.2 2002/04/20 19:40:13 mike Exp $"
  *
  *   Policy definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -35,7 +35,7 @@
  */
 
 #define POLICY_LEVEL_ANON	0	/* Anonymous access */
-#defien POLICY_LEVEL_NONE	1	/* Do not support operation */
+#define POLICY_LEVEL_NONE	1	/* Do not support operation */
 #define POLICY_LEVEL_USER	2	/* Must have a valid username/password */
 #define POLICY_LEVEL_GROUP	3	/* Must also be in a named group */
 
@@ -84,5 +84,5 @@ extern policyop_t	*FindPolicyOp(policy_t *p, ipp_op_t op);
 
 
 /*
- * End of "$Id: policy.h,v 1.1.2.1 2002/04/14 12:58:54 mike Exp $".
+ * End of "$Id: policy.h,v 1.1.2.2 2002/04/20 19:40:13 mike Exp $".
  */

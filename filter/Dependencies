@@ -1,29 +1,29 @@
 # DO NOT DELETE
 
-hpgl-attr.o: hpgltops.h common.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h
-hpgl-attr.o: ../ipp/http.h ../ipp/md5.h ../cups/ppd.h ../cups/language.h
-hpgl-attr.o: ../cups/string.h ../ipp/string.h ../config.h
-hpgl-config.o: hpgltops.h common.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h
-hpgl-config.o: ../ipp/http.h ../ipp/md5.h ../cups/ppd.h ../cups/language.h
-hpgl-config.o: ../cups/string.h ../ipp/string.h ../config.h
-hpgl-main.o: hpgltops.h common.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h
-hpgl-main.o: ../ipp/http.h ../ipp/md5.h ../cups/ppd.h ../cups/language.h
-hpgl-main.o: ../cups/string.h ../ipp/string.h ../config.h
-hpgl-prolog.o: hpgltops.h common.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h
-hpgl-prolog.o: ../ipp/http.h ../ipp/md5.h ../cups/ppd.h ../cups/language.h
-hpgl-prolog.o: ../cups/string.h ../ipp/string.h ../config.h
-hpgl-char.o: hpgltops.h common.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h
-hpgl-char.o: ../ipp/http.h ../ipp/md5.h ../cups/ppd.h ../cups/language.h
-hpgl-char.o: ../cups/string.h ../ipp/string.h ../config.h
-hpgl-input.o: hpgltops.h common.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h
-hpgl-input.o: ../ipp/http.h ../ipp/md5.h ../cups/ppd.h ../cups/language.h
-hpgl-input.o: ../cups/string.h ../ipp/string.h ../config.h
-hpgl-polygon.o: hpgltops.h common.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h
-hpgl-polygon.o: ../ipp/http.h ../ipp/md5.h ../cups/ppd.h ../cups/language.h
+hpgl-attr.o: hpgltops.h common.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h
+hpgl-attr.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h ../cups/string.h
+hpgl-attr.o: ../ipp/string.h ../config.h
+hpgl-config.o: hpgltops.h common.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h
+hpgl-config.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h ../cups/string.h
+hpgl-config.o: ../ipp/string.h ../config.h
+hpgl-main.o: hpgltops.h common.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h
+hpgl-main.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h ../cups/string.h
+hpgl-main.o: ../ipp/string.h ../config.h
+hpgl-prolog.o: hpgltops.h common.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h
+hpgl-prolog.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h ../cups/string.h
+hpgl-prolog.o: ../ipp/string.h ../config.h
+hpgl-char.o: hpgltops.h common.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h
+hpgl-char.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h ../cups/string.h
+hpgl-char.o: ../ipp/string.h ../config.h
+hpgl-input.o: hpgltops.h common.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h
+hpgl-input.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h ../cups/string.h
+hpgl-input.o: ../ipp/string.h ../config.h
+hpgl-polygon.o: hpgltops.h common.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h
+hpgl-polygon.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h
 hpgl-polygon.o: ../cups/string.h ../ipp/string.h ../config.h
-hpgl-vector.o: hpgltops.h common.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h
-hpgl-vector.o: ../ipp/http.h ../ipp/md5.h ../cups/ppd.h ../cups/language.h
-hpgl-vector.o: ../cups/string.h ../ipp/string.h ../config.h
+hpgl-vector.o: hpgltops.h common.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h
+hpgl-vector.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h ../cups/string.h
+hpgl-vector.o: ../ipp/string.h ../config.h
 image-bmp.o: image.h ../config.h
 image-colorspace.o: image.h ../config.h
 image-gif.o: image.h ../config.h
@@ -37,45 +37,45 @@ image-sgilib.o: image-sgi.h
 image-sun.o: image.h ../config.h
 image-tiff.o: image.h ../config.h
 image-zoom.o: image.h ../config.h
-image.o: image.h ../config.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h
-image.o: ../ipp/http.h ../ipp/md5.h ../cups/ppd.h
+image.o: image.h ../config.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h
+image.o: ../ipp/md5.h ../cups/ppd.h
 raster.o: raster.h ../cups/string.h ../ipp/string.h ../config.h
-form-main.o: form.h common.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h
-form-main.o: ../ipp/http.h ../ipp/md5.h ../cups/ppd.h ../cups/language.h
-form-main.o: ../cups/string.h ../ipp/string.h ../config.h
-form-ps.o: form.h common.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h
-form-ps.o: ../ipp/http.h ../ipp/md5.h ../cups/ppd.h ../cups/language.h
-form-ps.o: ../cups/string.h ../ipp/string.h ../config.h
-form-tree.o: form.h common.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h
-form-tree.o: ../ipp/http.h ../ipp/md5.h ../cups/ppd.h ../cups/language.h
-form-tree.o: ../cups/string.h ../ipp/string.h ../config.h
-imagetops.o: common.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h
-imagetops.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h ../cups/string.h
+form-main.o: form.h common.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h
+form-main.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h ../cups/string.h
+form-main.o: ../ipp/string.h ../config.h
+form-ps.o: form.h common.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h
+form-ps.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h ../cups/string.h
+form-ps.o: ../ipp/string.h ../config.h
+form-tree.o: form.h common.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h
+form-tree.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h ../cups/string.h
+form-tree.o: ../ipp/string.h ../config.h
+imagetops.o: common.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h ../ipp/md5.h
+imagetops.o: ../cups/ppd.h ../cups/language.h ../cups/string.h
 imagetops.o: ../ipp/string.h ../config.h image.h
-imagetoraster.o: common.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h
-imagetoraster.o: ../ipp/http.h ../ipp/md5.h ../cups/ppd.h ../cups/language.h
+imagetoraster.o: common.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h
+imagetoraster.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h
 imagetoraster.o: ../cups/string.h ../ipp/string.h ../config.h image.h
 imagetoraster.o: raster.h
-common.o: common.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h
-common.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h ../cups/string.h
-common.o: ../ipp/string.h ../config.h
-pstops.o: common.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h
-pstops.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h ../cups/string.h
-pstops.o: ../ipp/string.h ../config.h
+common.o: common.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h ../ipp/md5.h
+common.o: ../cups/ppd.h ../cups/language.h ../cups/string.h ../ipp/string.h
+common.o: ../config.h
+pstops.o: common.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h ../ipp/md5.h
+pstops.o: ../cups/ppd.h ../cups/language.h ../cups/string.h ../ipp/string.h
+pstops.o: ../config.h
 raster.o: raster.h ../cups/string.h ../ipp/string.h ../config.h
-rastertodymo.o: ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h
-rastertodymo.o: ../ipp/md5.h ../cups/ppd.h ../cups/string.h ../ipp/string.h
-rastertodymo.o: ../config.h raster.h
-rastertoepson.o: ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h
-rastertoepson.o: ../ipp/md5.h ../cups/ppd.h ../cups/ppd.h ../cups/string.h
-rastertoepson.o: ../ipp/string.h ../config.h raster.h
-rastertohp.o: ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h ../ipp/http.h
-rastertohp.o: ../ipp/md5.h ../cups/ppd.h ../cups/string.h ../ipp/string.h
-rastertohp.o: ../config.h raster.h
-texttops.o: textcommon.h common.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h
-texttops.o: ../ipp/http.h ../ipp/md5.h ../cups/ppd.h ../cups/language.h
-texttops.o: ../cups/string.h ../ipp/string.h ../config.h
-textcommon.o: textcommon.h common.h ../cups/cups.h ../cups/ipp.h ../ipp/ipp.h
-textcommon.o: ../ipp/http.h ../ipp/md5.h ../cups/ppd.h ../cups/language.h
-textcommon.o: ../cups/string.h ../ipp/string.h ../config.h
+rastertodymo.o: ../cups/cups.h ../ipp/ipp.h ../ipp/http.h ../ipp/md5.h
+rastertodymo.o: ../cups/ppd.h ../cups/string.h ../ipp/string.h ../config.h
+rastertodymo.o: raster.h
+rastertoepson.o: ../cups/cups.h ../ipp/ipp.h ../ipp/http.h ../ipp/md5.h
+rastertoepson.o: ../cups/ppd.h ../cups/ppd.h ../cups/string.h ../ipp/string.h
+rastertoepson.o: ../config.h raster.h
+rastertohp.o: ../cups/cups.h ../ipp/ipp.h ../ipp/http.h ../ipp/md5.h
+rastertohp.o: ../cups/ppd.h ../cups/string.h ../ipp/string.h ../config.h
+rastertohp.o: raster.h
+texttops.o: textcommon.h common.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h
+texttops.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h ../cups/string.h
+texttops.o: ../ipp/string.h ../config.h
+textcommon.o: textcommon.h common.h ../cups/cups.h ../ipp/ipp.h ../ipp/http.h
+textcommon.o: ../ipp/md5.h ../cups/ppd.h ../cups/language.h ../cups/string.h
+textcommon.o: ../ipp/string.h ../config.h
 testraster.o: raster.h ../cups/string.h ../ipp/string.h ../config.h
