@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.c,v 1.7 1999/07/15 14:28:12 mike Exp $"
+ * "$Id: textcommon.c,v 1.8 1999/07/15 16:27:49 mike Exp $"
  *
  *   Common text filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -39,7 +39,7 @@
  * Globals...
  */
 
-int	WrapLines = 0,		/* Wrap text in lines */
+int	WrapLines = 1,		/* Wrap text in lines */
 	SizeLines = 60,		/* Number of lines on a page */
 	SizeColumns = 80,	/* Number of columns on a line */
 	PageColumns = 1,	/* Number of columns on a page */
@@ -195,25 +195,27 @@ TextMain(char *name,		/* I - Name of filter */
   if ((ppd = SetCommonOptions(num_options, options, 1)) != NULL)
     ppdClose(ppd);
 
-  WrapLines = cupsGetOption("wrap", num_options, options) != NULL;
+  WrapLines = cupsGetOption("nowrap", num_options, options) == NULL;
 
   if ((val = cupsGetOption("columns", num_options, options)) != NULL)
     PageColumns = atoi(val);
+
+  if ((val = cupsGetOption("prettyprint", num_options, options)) != NULL)
+  {
+    PrettyPrint  = 1;
+    PageLeft     = 72.0f;
+    PageRight    = PageWidth - 36.0f;
+    PageBottom   = PageBottom > 36.0f ? PageBottom : 36.0f;
+    PageTop      = PageLength - 36.0f - 216.0f / LinesPerInch;
+    CharsPerInch = 12;
+    LinesPerInch = 8;
+  }
 
   if ((val = cupsGetOption("cpi", num_options, options)) != NULL)
     CharsPerInch = atoi(val);
 
   if ((val = cupsGetOption("lpi", num_options, options)) != NULL)
     LinesPerInch = atoi(val);
-
-  if ((val = cupsGetOption("prettyprint", num_options, options)) != NULL)
-  {
-    PrettyPrint = 1;
-    PageLeft    = 72.0f;
-    PageRight   = PageWidth - 36.0f;
-    PageBottom  = PageBottom > 36.0f ? PageBottom : 36.0f;
-    PageTop     = PageLength - 36.0f - 216.0f / LinesPerInch;
-  }
 
   WriteProlog(argv[3], argv[2]);
 
@@ -733,5 +735,5 @@ getutf8(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: textcommon.c,v 1.7 1999/07/15 14:28:12 mike Exp $".
+ * End of "$Id: textcommon.c,v 1.8 1999/07/15 16:27:49 mike Exp $".
  */
