@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.60 2000/03/30 05:19:29 mike Exp $"
+ * "$Id: printers.c,v 1.61 2000/04/19 15:18:55 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -84,6 +84,7 @@ AddPrinter(const char *name)	/* I - Name of printer */
   strcpy(p->hostname, ServerName);
   sprintf(p->uri, "ipp://%s:%d/printers/%s", ServerName,
           ntohs(Listeners[0].address.sin_port), name);
+  strcpy(p->more_info, p->uri);
 
   p->state     = IPP_PRINTER_STOPPED;
   p->accepting = 0;
@@ -491,8 +492,6 @@ LoadAllPrinters(void)
     
     else if (strcmp(name, "Info") == 0)
       strncpy(p->info, value, sizeof(p->info) - 1);
-    else if (strcmp(name, "MoreInfo") == 0)
-      strncpy(p->more_info, value, sizeof(p->more_info) - 1);
     else if (strcmp(name, "Location") == 0)
       strncpy(p->location, value, sizeof(p->location) - 1);
     else if (strcmp(name, "DeviceURI") == 0)
@@ -636,8 +635,6 @@ SaveAllPrinters(void)
     if (printer->info[0])
       fprintf(fp, "Info %s\n", printer->info);
     if (printer->more_info[0])
-      fprintf(fp, "MoreInfo %s\n", printer->more_info);
-    if (printer->location[0])
       fprintf(fp, "Location %s\n", printer->location);
     if (printer->device_uri[0])
       fprintf(fp, "DeviceURI %s\n", printer->device_uri);
@@ -1379,5 +1376,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.60 2000/03/30 05:19:29 mike Exp $".
+ * End of "$Id: printers.c,v 1.61 2000/04/19 15:18:55 mike Exp $".
  */

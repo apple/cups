@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.18 2000/03/10 16:56:01 mike Exp $"
+ * "$Id: classes.c,v 1.19 2000/04/19 15:18:55 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -60,6 +60,7 @@ AddClass(const char *name)	/* I - Name of class */
     c->type = CUPS_PRINTER_CLASS;
     sprintf(c->uri, "ipp://%s:%d/classes/%s", ServerName,
             ntohs(Listeners[0].address.sin_port), name);
+    strcpy(c->more_info, c->uri);
     SetPrinterAttrs(c);
   }
 
@@ -400,8 +401,6 @@ LoadAllClasses(void)
     
     else if (strcmp(name, "Info") == 0)
       strncpy(p->info, value, sizeof(p->info) - 1);
-    else if (strcmp(name, "MoreInfo") == 0)
-      strncpy(p->more_info, value, sizeof(p->more_info) - 1);
     else if (strcmp(name, "Location") == 0)
       strncpy(p->location, value, sizeof(p->location) - 1);
     else if (strcmp(name, "Printer") == 0)
@@ -526,8 +525,6 @@ SaveAllClasses(void)
     if (pclass->info[0])
       fprintf(fp, "Info %s\n", pclass->info);
     if (pclass->more_info[0])
-      fprintf(fp, "MoreInfo %s\n", pclass->more_info);
-    if (pclass->location[0])
       fprintf(fp, "Location %s\n", pclass->location);
     if (pclass->state == IPP_PRINTER_STOPPED)
     {
@@ -552,5 +549,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.18 2000/03/10 16:56:01 mike Exp $".
+ * End of "$Id: classes.c,v 1.19 2000/04/19 15:18:55 mike Exp $".
  */
