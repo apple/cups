@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.27 1999/06/23 16:20:29 mike Exp $"
+ * "$Id: dirsvc.c,v 1.28 1999/06/23 17:18:45 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -475,7 +475,8 @@ SendBrowseList(void)
 
       p->browse_time = time(NULL);
 
-      sprintf(packet, "%x %x %s\n", p->type, p->state, p->uri);
+      sprintf(packet, "%x %x %s\n", p->type | CUPS_PRINTER_REMOTE, p->state,
+              p->uri);
       bytes = strlen(packet);
       DEBUG_printf(("SendBrowseList: (%d bytes) %s", bytes, packet));
 
@@ -494,5 +495,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.27 1999/06/23 16:20:29 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.28 1999/06/23 17:18:45 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.23 1999/06/23 16:20:30 mike Exp $"
+ * "$Id: printers.c,v 1.24 1999/06/23 17:18:45 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -31,6 +31,8 @@
  *   SaveAllPrinters()   - Save all printer definitions to the printers.conf
  *   SetPrinterAttrs()   - Set printer attributes based upon the PPD file.
  *   SetPrinterState()   - Update the current state of a printer.
+ *   SortPrinters()      - Sort the printer list when a printer name is
+ *                         changed.
  *   StopPrinter()       - Stop a printer from printing any jobs...
  */
 
@@ -989,5 +991,5 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 
 
 /*
- * End of "$Id: printers.c,v 1.23 1999/06/23 16:20:30 mike Exp $".
+ * End of "$Id: printers.c,v 1.24 1999/06/23 17:18:45 mike Exp $".
  */
