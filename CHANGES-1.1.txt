@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- "make install" didn't work on some platforms due to an
+	  error in the man page makefiles (STR #775)
 	- Changed some calls to snprintf() in the scheduler to
 	  SetStringf() (STR #740)
 

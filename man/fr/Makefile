@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.1.2.2 2002/06/06 12:32:40 mike Exp $"
+# "$Id: Makefile,v 1.1.2.3 2004/06/17 14:09:00 mike Exp $"
 #
 #   French man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -37,7 +37,7 @@ LANGUAGE =	fr
 # Make everything...
 #
 
-all:	$(CAT1) $(CAT3) $(CAT5) $(CAT8)
+all:	$(CAT1) $(CAT5) $(CAT8)
 
 
 #
@@ -45,7 +45,7 @@ all:	$(CAT1) $(CAT3) $(CAT5) $(CAT8)
 #
 
 clean:
-	$(RM) $(CAT1) $(CAT3) $(CAT5) $(CAT8)
+	$(RM) $(CAT1) $(CAT5) $(CAT8)
 
 
 #
@@ -66,10 +66,6 @@ install:	all
 	done
 	$(RM) $(MANDIR)/$(LANGUAGE)/man1/cancel.1
 	$(LN) lp.1 $(MANDIR)/$(LANGUAGE)/man1/cancel.1
-	$(INSTALL_DIR) $(PMANDIR)/fr/man3
-	for file in $(MAN3); do \
-		$(INSTALL_MAN) $$file $(PMANDIR)/fr/man3/`basename $$file man`3; \
-	done
 	$(INSTALL_DIR) $(MANDIR)/$(LANGUAGE)/man5
 	for file in $(MAN5); do \
 		$(INSTALL_MAN) $$file $(MANDIR)/$(LANGUAGE)/man5/`basename $$file man`5; \
@@ -88,10 +84,6 @@ install:	all
 	done
 	$(RM) $(MANDIR)/$(LANGUAGE)/cat1/cancel.$(CAT1EXT)
 	$(LN) lp.$(CAT1EXT) $(MANDIR)/$(LANGUAGE)/cat1/cancel.$(CAT1EXT)
-	$(INSTALL_DIR) $(PMANDIR)/fr/cat3
-	for file in $(CAT3); do \
-		$(INSTALL_MAN) $$file $(PMANDIR)/fr/cat3; \
-	done
 	$(INSTALL_DIR) $(MANDIR)/$(LANGUAGE)/cat5
 	for file in $(CAT5); do \
 		$(INSTALL_MAN) $$file $(MANDIR)/$(LANGUAGE)/cat5; \
@@ -107,5 +99,5 @@ install:	all
 
 
 #
-# End of "$Id: Makefile,v 1.1.2.2 2002/06/06 12:32:40 mike Exp $".
+# End of "$Id: Makefile,v 1.1.2.3 2004/06/17 14:09:00 mike Exp $".
 #
