@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.24.2.10 2003/01/28 15:29:42 mike Exp $"
+ * "$Id: ppd.h,v 1.24.2.11 2003/01/29 17:04:34 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -106,6 +106,20 @@ typedef enum			/**** Colorspaces ****/
   PPD_CS_RGBK,			/* RGBK (K = gray) colorspace */
   PPD_CS_N			/* DeviceN colorspace */
 } ppd_cs_t;
+
+typedef enum			/**** Status Codes ****/
+{
+  PPD_OK = 0,			/* OK */
+  PPD_FILE_OPEN_ERROR,		/* Unable to open PPD file */
+  PPD_NULL_FILE,		/* NULL PPD file pointer */
+  PPD_MISSING_PPDADOBE4,	/* Missing PPD-Adobe-4.x header */
+  PPD_ALLOC_ERROR,		/* Memory allocation error */
+  PPD_MISSING_VALUE,		/* Missing value string */
+  PPD_INTERNAL_ERROR,		/* Internal error */
+  PPD_NESTED_OPEN_GROUP,	/* OpenGroup without a CloseGroup first */
+  PPD_BAD_ORDER_DEPENDENCY,	/* Bad OrderDependency */
+  PPD_BAD_UI_CONSTRAINTS	/* Bad UIConstraints */
+} ppd_status_t;
 
 typedef struct			/**** PPD Attribute Structure ****/
 {
@@ -328,10 +342,12 @@ extern ppd_size_t	*ppdPageSize(ppd_file_t *ppd, const char *name);
 extern float		ppdPageWidth(ppd_file_t *ppd, const char *name);
 
 /**** New in CUPS 1.1.19 ****/
+extern const char	*ppdErrorString(ppd_status_t status);
 extern const char	*ppdFindAttr(ppd_file_t *ppd, const char *name,
 			             const char *spec);
 extern const char	*ppdFindNextAttr(ppd_file_t *ppd, const char *name,
 			                 const char *spec);
+extern ppd_status_t	ppdLastError(int *line);
 
 /**** New in CUPS 1.2 ****/
 extern ppd_ext_option_t	*ppdFindExtOption(ppd_file_t *ppd, const char *keyword);
@@ -364,5 +380,5 @@ extern int		ppdSaveFile(ppd_file_t *ppd, const char *filename);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.24.2.10 2003/01/28 15:29:42 mike Exp $".
+ * End of "$Id: ppd.h,v 1.24.2.11 2003/01/29 17:04:34 mike Exp $".
  */

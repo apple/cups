@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.4 2003/01/29 01:40:39 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.5 2003/01/29 17:04:34 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -59,9 +59,12 @@ main(int  argc,			/* I - Number of command-line arguments */
      char *argv[])		/* I - Command-line arguments */
 {
   int		i, j, k, m;	/* Looping vars */
+  int		files;		/* Number of files */
   int		verbose;	/* Want verbose output? */
   int		status;		/* Exit status */
   int		errors;		/* Number of conformance errors */
+  ppd_status_t	error;		/* Status of ppdOpen*() */
+  int		line;		/* Line number for error */
   ppd_file_t	*ppd;		/* PPD file record */
   ppd_size_t	*size;		/* Size record */
   ppd_group_t	*group;		/* UI group */
@@ -80,6 +83,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   verbose = 0;
   ppd     = NULL;
+  files   = 0;
   status  = ERROR_NONE;
 
   for (i = 1; i < argc; i ++)
@@ -116,6 +120,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       * Open the PPD file...
       */
 
+      files ++;
+
       if (argv[i][0] == '-')
       {
        /*
@@ -141,7 +147,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       if (ppd == NULL)
       {
-        if (errno)
+        error = ppdLastError(&line);
+
+	if (error <= PPD_NULL_FILE)
 	{
 	  status = ERROR_FILE_OPEN;
 
@@ -153,7 +161,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  status = ERROR_PPD_FORMAT;
 
           if (verbose >= 0)
-	    puts("    Unable to open PPD file using CUPS functions!\n");
+	    printf("    Unable to open PPD file - %s on line %d.\n",
+	           ppdErrorString(error), line);
         }
 
 	continue;
@@ -444,7 +453,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       ppdClose(ppd);
     }
 
-  if (!ppd && verbose >= 0)
+  if (!files && verbose >= 0)
   {
     puts("Usage: cupstestppd [-q] [-v] filename1.ppd [... filenameN.ppd]");
     puts("       program | cupstestppd [-q] [-v] -");
@@ -457,5 +466,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.4 2003/01/29 01:40:39 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.5 2003/01/29 17:04:34 mike Exp $".
  */
