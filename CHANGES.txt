@@ -19,6 +19,8 @@ CHANGES IN CUPS V1.1.13
 	  interrupt-driven devices under *BSD.
 	- The scheduler allowed the "always" encryption mode
 	  inside a Location, which is not valid.
+	- The CUPS startup script now checks for the timezone
+	  information under Linux.
 
 
 CHANGES IN CUPS V1.1.12

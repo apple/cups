@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: cups.sh.in,v 1.15 2001/11/02 20:43:10 mike Exp $"
+# "$Id: cups.sh.in,v 1.16 2001/12/06 20:59:50 mike Exp $"
 #
 #   Startup/shutdown script for the Common UNIX Printing System (CUPS).
 #
@@ -63,6 +63,21 @@ case "`uname`" in
         	IS_ON=:
 		;;
 
+	Linux*)
+		# Set the timezone, if possible...
+		if test -f /etc/TIMEZONE; then
+                        . /etc/TIMEZONE
+                else
+			if test -f /etc/sysconfig/clock; then
+	                        . /etc/sysconfig/clock
+        	                TZ="$ZONE"
+                	        export TZ
+			fi
+                fi
+
+		IS_ON=/bin/true
+		;;
+
 	*)
 		IS_ON=/bin/true
 		;;
@@ -104,7 +119,7 @@ case "`uname`" in
 	OSF1*)
 		pid=`ps -e | awk '{if (match($5, ".*/cupsd$") || $5 == "cupsd") print $1}'`
 		;;
-	Linux* | NetBSD* | Darwin*)
+	Linux* | *BSD* | Darwin*)
 		pid=`ps ax | awk '{if (match($5, ".*/cupsd$") || $5 == "cupsd") print $1}'`
 		;;
 	*)
@@ -161,5 +176,5 @@ exit 0
 
 
 #
-# End of "$Id: cups.sh.in,v 1.15 2001/11/02 20:43:10 mike Exp $".
+# End of "$Id: cups.sh.in,v 1.16 2001/12/06 20:59:50 mike Exp $".
 #
