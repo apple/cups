@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.9 1999/06/21 18:59:04 mike Exp $"
+# "$Id: Makedefs.in,v 1.10 1999/06/24 17:48:06 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -108,16 +108,16 @@ SERVERROOT	= 	@CUPS_SERVERROOT@
 # Rules...
 #
 
-.SUFFIXES:	.a .c .h .1 .2 .3 .4 .5 .6 .7 .8 .o .$(CAT)
+.SUFFIXES:	.a .c .gz .h .o .z .1 .5 .8
 .c.o:
 	echo Compiling $<...
 	$(CC) $(CFLAGS) -c $<
-.1.$(CAT) .2.$(CAT) .3.$(CAT) .4.$(CAT) .5.$(CAT) .6.$(CAT) .7.$(CAT) .8.$(CAT):
+.1.z .5.z .8.z .1.gz .5.gz .8.gz:
 	echo Formatting $<...
 	$(NROFF) -man $< >t
 	$(PACK) t
 	-mv t.$(CAT) $@
 
 #
-# End of "$Id: Makedefs.in,v 1.9 1999/06/21 18:59:04 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.10 1999/06/24 17:48:06 mike Exp $"
 #
