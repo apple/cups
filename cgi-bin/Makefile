@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.3 1999/06/18 18:36:06 mike Exp $"
+# "$Id: Makefile,v 1.4 1999/06/21 18:45:22 mike Exp $"
 #
 #   CGI makefile for the Common UNIX Printing System (CUPS).
 #
@@ -24,8 +24,7 @@
 
 include ../Makedefs
 
-#TARGETS	=	classes.cgi jobs.cgi printers.cgi
-TARGETS	=	printers.cgi
+TARGETS	=	classes.cgi jobs.cgi printers.cgi
 OBJS	=	classes.o jobs.o printers.o
 
 #
@@ -50,14 +49,35 @@ install:
 	$(CP) $(TARGETS) $(SERVERROOT)/cgi-bin
 
 #
+# classes.cgi
+#
+
+classes.cgi:	classes.o ../Makedefs ../cups/libcups.a
+	echo Linking $<...
+	$(CC) $(LDFLAGS) -o $@ classes.o $(LIBS)
+
+$(OBJS):	../Makedefs ../cups/cups.h ../cups/ipp.h ../cups/language.h
+
+#
+# jobs.cgi
+#
+
+jobs.cgi:	jobs.o ../Makedefs ../cups/libcups.a
+	echo Linking $<...
+	$(CC) $(LDFLAGS) -o $@ jobs.o $(LIBS)
+
+$(OBJS):	../Makedefs ../cups/cups.h ../cups/ipp.h ../cups/language.h
+
+#
 # printers.cgi
 #
 
 printers.cgi:	printers.o ../Makedefs ../cups/libcups.a
+	echo Linking $<...
 	$(CC) $(LDFLAGS) -o $@ printers.o $(LIBS)
 
 $(OBJS):	../Makedefs ../cups/cups.h ../cups/ipp.h ../cups/language.h
 
 #
-# End of "$Id: Makefile,v 1.3 1999/06/18 18:36:06 mike Exp $".
+# End of "$Id: Makefile,v 1.4 1999/06/21 18:45:22 mike Exp $".
 #

@@ -1,7 +1,7 @@
 /*
- * "$Id: printers.c,v 1.3 1999/06/21 18:45:24 mike Exp $"
+ * "$Id: classes.c,v 1.1 1999/06/21 18:45:23 mike Exp $"
  *
- *   Printer status CGI for the Common UNIX Printing System (CUPS).
+ *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-1999 by Easy Software Products.
  *
@@ -23,9 +23,9 @@
  *
  * Contents:
  *
- *   main()              - Main entry for CGI.
- *   show_printer_list() - Show a list of printers...
- *   show_printer_info() - Show printer information.
+ *   main()            - Main entry for CGI.
+ *   show_class_list() - Show a list of classes...
+ *   show_class_info() - Show class information.
  */
 
 /*
@@ -44,8 +44,8 @@
  * Local functions...
  */
 
-static void	show_printer_list(http_t *http, cups_lang_t *language);
-static void	show_printer_info(http_t *http, cups_lang_t *language,
+static void	show_class_list(http_t *http, cups_lang_t *language);
+static void	show_class_info(http_t *http, cups_lang_t *language,
 		                  char *name);
 
 
@@ -58,7 +58,7 @@ main(int  argc,			/* I - Number of command-line arguments */
      char *argv[])		/* I - Command-line arguments */
 {
   cups_lang_t	*language;	/* Language information */
-  char		*printer;	/* Printer name */
+  char		*name;		/* Class name */
   http_t	*http;		/* Connection to the server */
 
 
@@ -81,13 +81,13 @@ main(int  argc,			/* I - Number of command-line arguments */
   printf("Content-Type: text/html;charset=%s\n\n", cupsLangEncoding(language));
 
  /*
-  * See if we need to show a list of printers or the status of a
-  * single printer...
+  * See if we need to show a list of classes or the status of a
+  * single class...
   */
 
-  printer = argv[0];
-  if (strcmp(printer, "/") == 0 || strcmp(printer, "printers.cgi") == 0)
-    printer = NULL;
+  name = argv[0];
+  if (strcmp(name, "/") == 0 || strcmp(name, "classes.cgi") == 0)
+    name = NULL;
 
  /*
   * Print the standard header...
@@ -95,12 +95,12 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   puts("<HTML>");
   puts("<HEAD>");
-  if (printer)
+  if (name)
     puts("<META HTTP-EQUIV=\"Refresh\" CONTENT=\"10\">");
   else
     puts("<META HTTP-EQUIV=\"Refresh\" CONTENT=\"30\">");
   printf("<TITLE>%s on %s - Common UNIX Printing System</TITLE>\n",
-         printer == NULL ? "Printers" : printer, getenv("SERVER_NAME"));
+         name == NULL ? "Classes" : name, getenv("SERVER_NAME"));
   puts("<LINK REL=STYLESHEET TYPE=\"text/css\" HREF=\"/cups.css\">");
   puts("<MAP NAME=\"navbar\">");
   puts("<AREA SHAPE=\"RECT\" COORDS=\"10,10,100,35\" HREF=\"/printers\" ALT=\"Current Printer Status\">");
@@ -116,7 +116,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   puts("<IMG SRC=\"/images/logo.gif\" WIDTH=\"71\" HEIGHT=\"40\" BORDER=0 ALT=\"Easy Software Products Home Page\"></A>");
   puts("<IMG SRC=\"/images/navbar.gif\" WIDTH=\"540\" HEIGHT=\"40\" USEMAP=\"#navbar\" BORDER=0>");
 
-  printf("<H1>%s on %s</H1>\n", printer == NULL ? "Printers" : printer,
+  printf("<H1>%s on %s</H1>\n", name == NULL ? "Classes" : name,
          getenv("SERVER_NAME"));
   fflush(stdout);
 
@@ -132,10 +132,10 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Show the information...
   */
 
-  if (printer == NULL)
-    show_printer_list(http, language);
+  if (name == NULL)
+    show_class_list(http, language);
   else
-    show_printer_info(http, language, printer);
+    show_class_info(http, language, name);
 
  /*
   * Write a standard trailer...
@@ -170,11 +170,11 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * 'show_printer_list()' - Show a list of printers...
+ * 'show_class_list()' - Show a list of classes...
  */
 
 static void
-show_printer_list(http_t      *http,	/* I - HTTP connection */
+show_class_list(http_t      *http,	/* I - HTTP connection */
                   cups_lang_t *language)/* I - Client's language */
 {
   ipp_t		*request,	/* IPP request */
@@ -183,7 +183,7 @@ show_printer_list(http_t      *http,	/* I - HTTP connection */
 
 
  /*
-  * Build a CUPS_GET_PRINTERS request, which requires the following
+  * Build a CUPS_GET_CLASSES request, which requires the following
   * attributes:
   *
   *    attributes-charset
@@ -192,7 +192,7 @@ show_printer_list(http_t      *http,	/* I - HTTP connection */
 
   request = ippNew();
 
-  request->request.op.operation_id = CUPS_GET_PRINTERS;
+  request->request.op.operation_id = CUPS_GET_CLASSES;
   request->request.op.request_id   = 1;
 
 
@@ -206,10 +206,10 @@ show_printer_list(http_t      *http,	/* I - HTTP connection */
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, "/printers/")) != NULL)
+  if ((response = cupsDoRequest(http, request, "/classes/")) != NULL)
   {
    /*
-    * Loop through the printers returned in the list and display
+    * Loop through the classes returned in the list and display
     * their devices...
     */
 
@@ -226,14 +226,14 @@ show_printer_list(http_t      *http,	/* I - HTTP connection */
         break;
 
      /*
-      * Show the printer status for each printer...
+      * Show the class status for each class...
       */
 
       while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
       {
         if (strcmp(attr->name, "printer-name") == 0 &&
 	    attr->value_tag == IPP_TAG_NAME)
-	  show_printer_info(http, language, attr->values[0].string.text);
+	  show_class_info(http, language, attr->values[0].string.text);
 
         attr = attr->next;
       }
@@ -248,11 +248,11 @@ show_printer_list(http_t      *http,	/* I - HTTP connection */
 
 
 /*
- * 'show_printer_info()' - Show printer information.
+ * 'show_class_info()' - Show class information.
  */
 
 static void
-show_printer_info(http_t      *http,
+show_class_info(http_t      *http,
                   cups_lang_t *language,
                   char        *name)
 {
@@ -273,7 +273,7 @@ show_printer_info(http_t      *http,
   *
   *    attributes-charset
   *    attributes-natural-language
-  *    printer-uri
+  *    class-uri
   */
 
   request = ippNew();
@@ -287,9 +287,9 @@ show_printer_info(http_t      *http,
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
 
-  sprintf(uri, "ipp://localhost/printers/%s", name);
+  sprintf(uri, "ipp://localhost/classes/%s", name);
 
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "class-uri", NULL, uri);
 
  /*
   * Do the request and get back a response...
@@ -298,20 +298,20 @@ show_printer_info(http_t      *http,
   if ((response = cupsDoRequest(http, request, uri + 15)) != NULL)
   {
    /*
-    * Grab the needed printer attributes...
+    * Grab the needed class attributes...
     */
 
-    if ((attr = ippFindAttribute(response, "printer-state", IPP_TAG_ENUM)) != NULL)
+    if ((attr = ippFindAttribute(response, "class-state", IPP_TAG_ENUM)) != NULL)
       pstate = (ipp_pstate_t)attr->values[0].integer;
     else
       pstate = IPP_PRINTER_IDLE;
 
-    if ((attr = ippFindAttribute(response, "printer-state-message", IPP_TAG_TEXT)) != NULL)
+    if ((attr = ippFindAttribute(response, "class-state-message", IPP_TAG_TEXT)) != NULL)
       message = attr->values[0].string.text;
     else
       message = NULL;
 
-    if ((attr = ippFindAttribute(response, "printer-is-accepting-jobs",
+    if ((attr = ippFindAttribute(response, "class-is-accepting-jobs",
                                  IPP_TAG_BOOLEAN)) != NULL)
       accepting = attr->values[0].boolean;
     else
@@ -321,16 +321,14 @@ show_printer_info(http_t      *http,
       strcpy(uri, attr->values[0].string.text);
 
    /*
-    * Display the printer entry...
+    * Display the class entry...
     */
 
     puts("<TR>");
 
-    printf("<TD VALIGN=TOP><A HREF=\"/printers/%s\">%s</A></TD>\n", name, name);
+    printf("<TD VALIGN=TOP><A HREF=\"/classes/%s\">%s</A></TD>\n", name, name);
 
-    printf("<TD VALIGN=TOP><IMG SRC=\"/images/printer-%s.gif\" ALIGN=\"LEFT\">\n",
-           pstate == IPP_PRINTER_IDLE ? "idle" :
-	       pstate == IPP_PRINTER_PROCESSING ? "processing" : "stopped");
+    puts("<TD VALIGN=TOP><IMG SRC=\"/images/classes.gif\" ALIGN=\"LEFT\">");
 
     printf("%s: %s, %s<BR>\n",
            cupsLangString(language, CUPS_MSG_PRINTER_STATE),
@@ -359,7 +357,7 @@ show_printer_info(http_t      *http,
       *
       *    attributes-charset
       *    attributes-natural-language
-      *    printer-uri
+      *    class-uri
       */
 
       request = ippNew();
@@ -376,7 +374,7 @@ show_printer_info(http_t      *http,
 			  language->language);
 
       attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
-	                  "printer-uri", NULL, uri);
+	                  "class-uri", NULL, uri);
 
       jobs = cupsDoRequest(http, request, uri + 15);
     }
@@ -431,7 +429,7 @@ show_printer_info(http_t      *http,
 	}
 
        /*
-        * Display the job if it matches the current printer...
+        * Display the job if it matches the current class...
 	*/
 
         if (username != NULL)
@@ -459,5 +457,5 @@ show_printer_info(http_t      *http,
 
 
 /*
- * End of "$Id: printers.c,v 1.3 1999/06/21 18:45:24 mike Exp $".
+ * End of "$Id: classes.c,v 1.1 1999/06/21 18:45:23 mike Exp $".
  */
