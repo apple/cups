@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h,v 1.22.2.4 2002/06/27 15:10:43 mike Exp $"
+ * "$Id: printers.h,v 1.22.2.5 2002/10/28 15:59:27 mike Exp $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -64,6 +64,7 @@ typedef struct printer_str
   time_t	browse_time;		/* Last time update was sent/received */
   char		device_uri[HTTP_MAX_URI],/* Device URI */
 		backend[1024];		/* Backend to use */
+  int		raw;			/* Raw queue? */
   mime_type_t	*filetype;		/* Pseudo-filetype for printer */
   void		*job;			/* Current job in queue */
   ipp_t		*attrs;			/* Attributes supported by this printer */
@@ -120,5 +121,5 @@ extern void		WritePrintcap(void);
 
 
 /*
- * End of "$Id: printers.h,v 1.22.2.4 2002/06/27 15:10:43 mike Exp $".
+ * End of "$Id: printers.h,v 1.22.2.5 2002/10/28 15:59:27 mike Exp $".
  */

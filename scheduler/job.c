@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.37 2002/10/22 16:58:20 mike Exp $"
+ * "$Id: job.c,v 1.124.2.38 2002/10/28 15:59:25 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1182,10 +1182,10 @@ StartJob(int       id,		/* I - Job ID */
   num_filters   = 0;
   current->cost = 0;
 
-  if ((printer->type & CUPS_PRINTER_REMOTE) || printer->filetype == NULL)
+  if (printer->raw)
   {
    /*
-    * Remote jobs go directly to the remote printer, raw queues get no
+    * Remote jobs and raw queues go directly to the printer without
     * filtering...
     */
 
@@ -2438,5 +2438,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.37 2002/10/22 16:58:20 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.38 2002/10/28 15:59:25 mike Exp $".
  */
