@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.22.2.2 2001/12/26 16:52:57 mike Exp $"
+ * "$Id: lpadmin.c,v 1.22.2.3 2001/12/29 00:05:26 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -87,9 +87,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   char		*printer,	/* Destination printer */
 		*pclass,	/* Printer class name */
 		*host,		/* Pointer to hostname */
-		*val,		/* Pointer to allow/deny value */
-		filename[1024];	/* Model filename */
-  const char	*datadir;	/* CUPS_DATADIR env variable */
+		*val;		/* Pointer to allow/deny value */
   int		num_options;	/* Number of options */
   cups_option_t	*options;	/* Options */
   http_encryption_t encryption;	/* Encryption? */
@@ -1829,5 +1827,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.22.2.2 2001/12/26 16:52:57 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.22.2.3 2001/12/29 00:05:26 mike Exp $".
  */

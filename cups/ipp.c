@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.5 2001/12/27 00:04:50 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.6 2001/12/29 00:05:24 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -36,23 +36,33 @@
  *   ippAddResolution()     - Add a resolution value to an IPP request.
  *   ippAddResolutions()    - Add resolution values to an IPP request.
  *   ippAddSeparator()      - Add a group separator to an IPP request.
- *   ippDateToTime()        - Convert from RFC 1903 Date/Time format to UNIX
- *                            time in seconds.
+ *   ippDateToTime()        - Convert from RFC 1903 Date/Time format to
+ *                            UNIX time in seconds.
  *   ippDelete()            - Delete an IPP request.
- *   ippErrorString()       - Return a textual message for the given error
- *                            message.
+ *   ippErrorString()       - Return a textual string for the given error
+ *                            message code.
  *   ippFindAttribute()     - Find a named attribute in a request...
  *   ippFindNextAttribute() - Find the next named attribute in a request...
  *   ippLength()            - Compute the length of an IPP request.
  *   ippNew()               - Allocate a new IPP request.
- *   ippPort()              - Return the default IPP port number.
- *   ippRead()              - Read data for an IPP request.
- *   ippSetPort()           - Set the default port number.
+ *   ippRead()              - Read data for an IPP request from a HTTP
+ *                            connection.
+ *   ippReadFile()          - Read data for an IPP request from a file.
+ *   ippReadIO()            - Read data for an IPP request.
  *   ippTimeToDate()        - Convert from UNIX time to RFC 1903 format.
- *   ippWrite()             - Write data for an IPP request.
+ *   ippWrite()             - Write data for an IPP request to a HTTP
+ *                            connection.
+ *   ippWriteFile()         - Write data for an IPP request to a file.
+ *   ippWriteIO()           - Write data for an IPP request.
+ *   ippPort()              - Return the default IPP port number.
+ *   ippSetPort()           - Set the default port number.
  *   _ipp_add_attr()        - Add a new attribute to the request.
  *   _ipp_free_attr()       - Free an attribute.
- *   ipp_read()             - Semi-blocking read on a HTTP connection...
+ *   ipp_read_http()        - Semi-blocking read on a HTTP connection...
+ *   ipp_read_file()        - Read IPP data from a file.
+ *   ipp_read_mem()         - Read IPP data from memory.
+ *   ipp_write_file()       - Write IPP data to a file.
+ *   ipp_write_mem()        - Write IPP data to memory.
  */
 
 /*
@@ -70,6 +80,17 @@
 
 
 /*
+ * Memory read/write info...
+ */
+
+typedef struct
+{
+  ipp_uchar_t	*current,	/* Current byte in buffer */
+		*end;		/* Last byte in buffer */
+} ipp_mem_t;
+
+
+/*
  * Local globals...
  */
 
@@ -80,7 +101,11 @@ static int	ipp_port = 0;
  * Local functions...
  */
 
-static int	ipp_read(http_t *http, unsigned char *buffer, int length);
+static int	ipp_read_http(http_t *http, ipp_uchar_t *buffer, int length);
+static int	ipp_read_file(int *fd, ipp_uchar_t *buffer, int length);
+static int	ipp_read_mem(ipp_mem_t *m, ipp_uchar_t *buffer, int length);
+static int	ipp_write_file(int *fd, ipp_uchar_t *buffer, int length);
+static int	ipp_write_mem(ipp_mem_t *m, ipp_uchar_t *buffer, int length);
 
 
 /*
@@ -594,7 +619,7 @@ ippDelete(ipp_t *ipp)		/* I - IPP request */
 
 
 /*
- * 'ippErrorString()' - Return a textual message for the given error message.
+ * 'ippErrorString()' - Return a textual string for the given error message code.
  */
 
 const char *				/* O - Text string */
@@ -894,24 +919,59 @@ ippNew(void)
 
 
 /*
- * 'ippRead()' - Read data for an IPP request.
+ * 'ippRead()' - Read data for an IPP request from a HTTP connection.
  */
 
 ipp_state_t			/* O - Current state */
-ippRead(http_t *http,		/* I - HTTP data */
+ippRead(http_t *http,		/* I - HTTP connection */
         ipp_t  *ipp)		/* I - IPP data */
 {
+  DEBUG_printf(("ippRead(%p, %p)\n", http, ipp));
+
+  if (http == NULL)
+    return (IPP_ERROR);
+
+  return (ippReadIO(http, (ipp_iocb_t *)ipp_read_http,
+                    http->blocking || http->used != 0, NULL, ipp));
+}
+
+
+/*
+ * 'ippReadFile()' - Read data for an IPP request from a file.
+ */
+
+ipp_state_t			/* O - Current state */
+ippReadFile(int   fd,		/* I - HTTP data */
+            ipp_t *ipp)		/* I - IPP data */
+{
+  DEBUG_printf(("ippReadFile(%d, %p)\n", fd, ipp));
+
+  return (ippReadIO(&fd, (ipp_iocb_t *)ipp_read_file, 1, NULL, ipp));
+}
+
+
+/*
+ * 'ippReadIO()' - Read data for an IPP request.
+ */
+
+ipp_state_t			/* O - Current state */
+ippReadIO(void       *src,	/* I - Data source */
+          ipp_iocb_t *cb,	/* I - Read callback function */
+	  int        blocking,	/* I - Use blocking IO? */
+	  ipp_t      *parent,	/* I - Parent request, if any */
+          ipp_t      *ipp)	/* I - IPP data */
+{
   int			n;		/* Length of data */
-  unsigned char		buffer[8192],	/* Data buffer */
+  unsigned char		buffer[32768],	/* Data buffer */
 			*bufptr;	/* Pointer into buffer */
   ipp_attribute_t	*attr;		/* Current attribute */
   ipp_tag_t		tag;		/* Current tag */
   ipp_value_t		*value;		/* Current value */
 
 
-  DEBUG_printf(("ippRead(%p, %p)\n", http, ipp));
+  DEBUG_printf(("ippReadIO(%p, %p)\n", src, ipp));
 
-  if (http == NULL || ipp == NULL)
+  if (src == NULL || ipp == NULL)
     return (IPP_ERROR);
 
   switch (ipp->state)
@@ -924,9 +984,9 @@ ippRead(http_t *http,		/* I - HTTP data */
         * Get the request header...
 	*/
 
-        if ((n = ipp_read(http, buffer, 8)) < 8)
+        if ((n = (*cb)(src, buffer, 8)) < 8)
 	{
-	  DEBUG_printf(("ippRead: Unable to read header (%d bytes read)!\n", n));
+	  DEBUG_printf(("ippReadIO: Unable to read header (%d bytes read)!\n", n));
 	  return (n == 0 ? IPP_IDLE : IPP_ERROR);
 	}
 
@@ -936,7 +996,7 @@ ippRead(http_t *http,		/* I - HTTP data */
 
 	if (buffer[0] != 1)
 	{
-	  DEBUG_printf(("ippRead: version number (%d.%d) is bad.\n", buffer[0],
+	  DEBUG_printf(("ippReadIO: version number (%d.%d) is bad.\n", buffer[0],
 	                buffer[1]));
 	  return (IPP_ERROR);
 	}
@@ -955,19 +1015,19 @@ ippRead(http_t *http,		/* I - HTTP data */
 	ipp->current = NULL;
 	ipp->curtag  = IPP_TAG_ZERO;
 
-        DEBUG_printf(("ippRead: version=%d.%d\n", buffer[0], buffer[1]));
-	DEBUG_printf(("ippRead: op_status=%04x\n", ipp->request.any.op_status));
-	DEBUG_printf(("ippRead: request_id=%d\n", ipp->request.any.request_id));
+        DEBUG_printf(("ippReadIO: version=%d.%d\n", buffer[0], buffer[1]));
+	DEBUG_printf(("ippReadIO: op_status=%04x\n", ipp->request.any.op_status));
+	DEBUG_printf(("ippReadIO: request_id=%d\n", ipp->request.any.request_id));
 
        /*
         * If blocking is disabled, stop here...
 	*/
 
-        if (!http->blocking && http->used == 0)
+        if (!blocking)
 	  break;
 
     case IPP_ATTRIBUTE :
-        while (ipp_read(http, buffer, 1) > 0)
+        while ((*cb)(src, buffer, 1) > 0)
 	{
 	 /*
 	  * Read this attribute...
@@ -981,7 +1041,7 @@ ippRead(http_t *http,		/* I - HTTP data */
 	    * No more attributes left...
 	    */
 
-            DEBUG_puts("ippRead: IPP_TAG_END!");
+            DEBUG_puts("ippReadIO: IPP_TAG_END!");
 
 	    ipp->state = IPP_DATA;
 	    break;
@@ -997,25 +1057,25 @@ ippRead(http_t *http,		/* I - HTTP data */
 
 	    ipp->curtag  = tag;
 	    ipp->current = NULL;
-	    DEBUG_printf(("ippRead: group tag = %x\n", tag));
+	    DEBUG_printf(("ippReadIO: group tag = %x\n", tag));
 	    continue;
 	  }
 
-          DEBUG_printf(("ippRead: value tag = %x\n", tag));
+          DEBUG_printf(("ippReadIO: value tag = %x\n", tag));
 
          /*
 	  * Get the name...
 	  */
 
-          if (ipp_read(http, buffer, 2) < 2)
+          if ((*cb)(src, buffer, 2) < 2)
 	  {
-	    DEBUG_puts("ippRead: unable to read name length!");
+	    DEBUG_puts("ippReadIO: unable to read name length!");
 	    return (IPP_ERROR);
 	  }
 
           n = (buffer[0] << 8) | buffer[1];
 
-          DEBUG_printf(("ippRead: name length = %d\n", n));
+          DEBUG_printf(("ippReadIO: name length = %d\n", n));
 
           if (n == 0)
 	  {
@@ -1088,14 +1148,14 @@ ippRead(http_t *http,		/* I - HTTP data */
 	    * New attribute; read the name and add it...
 	    */
 
-	    if (ipp_read(http, buffer, n) < n)
+	    if ((*cb)(src, buffer, n) < n)
 	    {
-	      DEBUG_puts("ippRead: unable to read name!");
+	      DEBUG_puts("ippReadIO: unable to read name!");
 	      return (IPP_ERROR);
 	    }
 
 	    buffer[n] = '\0';
-	    DEBUG_printf(("ippRead: name = \'%s\'\n", buffer));
+	    DEBUG_printf(("ippReadIO: name = \'%s\'\n", buffer));
 
 	    attr = ipp->current = _ipp_add_attr(ipp, IPP_MAX_VALUES);
 
@@ -1107,20 +1167,20 @@ ippRead(http_t *http,		/* I - HTTP data */
 
           value = attr->values + attr->num_values;
 
-	  if (ipp_read(http, buffer, 2) < 2)
+	  if ((*cb)(src, buffer, 2) < 2)
 	  {
-	    DEBUG_puts("ippRead: unable to read value length!");
+	    DEBUG_puts("ippReadIO: unable to read value length!");
 	    return (IPP_ERROR);
 	  }
 
 	  n = (buffer[0] << 8) | buffer[1];
-          DEBUG_printf(("ippRead: value length = %d\n", n));
+          DEBUG_printf(("ippReadIO: value length = %d\n", n));
 
 	  switch (tag)
 	  {
 	    case IPP_TAG_INTEGER :
 	    case IPP_TAG_ENUM :
-	        if (ipp_read(http, buffer, 4) < 4)
+	        if ((*cb)(src, buffer, 4) < 4)
 		  return (IPP_ERROR);
 
 		n = (((((buffer[0] << 8) | buffer[1]) << 8) | buffer[2]) << 8) |
@@ -1129,7 +1189,7 @@ ippRead(http_t *http,		/* I - HTTP data */
                 value->integer = n;
 	        break;
 	    case IPP_TAG_BOOLEAN :
-	        if (ipp_read(http, buffer, 1) < 1)
+	        if ((*cb)(src, buffer, 1) < 1)
 		  return (IPP_ERROR);
 
                 value->boolean = buffer[0];
@@ -1145,18 +1205,18 @@ ippRead(http_t *http,		/* I - HTTP data */
 	    case IPP_TAG_MIMETYPE :
                 value->string.text = calloc(n + 1, 1);
 
-	        if (ipp_read(http, value->string.text, n) < n)
+	        if ((*cb)(src, value->string.text, n) < n)
 		  return (IPP_ERROR);
 
-		DEBUG_printf(("ippRead: value = \'%s\'\n",
+		DEBUG_printf(("ippReadIO: value = \'%s\'\n",
 		              value->string.text));
 	        break;
 	    case IPP_TAG_DATE :
-	        if (ipp_read(http, value->date, 11) < 11)
+	        if ((*cb)(src, value->date, 11) < 11)
 		  return (IPP_ERROR);
 	        break;
 	    case IPP_TAG_RESOLUTION :
-	        if (ipp_read(http, buffer, 9) < 9)
+	        if ((*cb)(src, buffer, 9) < 9)
 		  return (IPP_ERROR);
 
                 value->resolution.xres =
@@ -1169,7 +1229,7 @@ ippRead(http_t *http,		/* I - HTTP data */
 		    (ipp_res_t)buffer[8];
 	        break;
 	    case IPP_TAG_RANGE :
-	        if (ipp_read(http, buffer, 8) < 8)
+	        if ((*cb)(src, buffer, 8) < 8)
 		  return (IPP_ERROR);
 
                 value->range.lower =
@@ -1181,7 +1241,7 @@ ippRead(http_t *http,		/* I - HTTP data */
 	        break;
 	    case IPP_TAG_TEXTLANG :
 	    case IPP_TAG_NAMELANG :
-	        if (ipp_read(http, buffer, n) < n)
+	        if ((*cb)(src, buffer, n) < n)
 		  return (IPP_ERROR);
 
                 bufptr = buffer;
@@ -1217,7 +1277,7 @@ ippRead(http_t *http,		/* I - HTTP data */
 	        if (n > 0)
 		{
 		  value->unknown.data = malloc(n);
-	          if (ipp_read(http, value->unknown.data, n) < n)
+	          if ((*cb)(src, value->unknown.data, n) < n)
 		    return (IPP_ERROR);
 		}
 		else
@@ -1231,7 +1291,7 @@ ippRead(http_t *http,		/* I - HTTP data */
           * If blocking is disabled, stop here...
 	  */
 
-          if (!http->blocking && http->used == 0)
+          if (!blocking)
 	    break;
 	}
         break;
@@ -1295,22 +1355,57 @@ ippTimeToDate(time_t t)			/* I - UNIX time value */
 
 
 /*
- * 'ippWrite()' - Write data for an IPP request.
+ * 'ippWrite()' - Write data for an IPP request to a HTTP connection.
  */
 
 ipp_state_t			/* O - Current state */
-ippWrite(http_t *http,		/* I - HTTP data */
+ippWrite(http_t *http,		/* I - HTTP connection */
          ipp_t  *ipp)		/* I - IPP data */
+{
+  DEBUG_printf(("ippWrite(%p, %p)\n", http, ipp));
+
+  if (http == NULL)
+    return (IPP_ERROR);
+
+  return (ippWriteIO(http, (ipp_iocb_t *)httpWrite,
+                     http->blocking, NULL, ipp));
+}
+
+
+/*
+ * 'ippWriteFile()' - Write data for an IPP request to a file.
+ */
+
+ipp_state_t			/* O - Current state */
+ippWriteFile(int   fd,		/* I - HTTP data */
+             ipp_t *ipp)	/* I - IPP data */
+{
+  DEBUG_printf(("ippWriteFile(%d, %p)\n", fd, ipp));
+
+  return (ippWriteIO(&fd, (ipp_iocb_t *)ipp_write_file, 1, NULL, ipp));
+}
+
+
+/*
+ * 'ippWriteIO()' - Write data for an IPP request.
+ */
+
+ipp_state_t			/* O - Current state */
+ippWriteIO(void       *dst,	/* I - Destination */
+           ipp_iocb_t *cb,	/* I - Write callback function */
+	   int        blocking,	/* I - Use blocking IO? */
+	   ipp_t      *parent,	/* I - Parent IPP request */
+           ipp_t      *ipp)	/* I - IPP data */
 {
   int			i;		/* Looping var */
   int			n;		/* Length of data */
-  unsigned char		buffer[8192],	/* Data buffer */
+  unsigned char		buffer[32768],	/* Data buffer */
 			*bufptr;	/* Pointer into buffer */
   ipp_attribute_t	*attr;		/* Current attribute */
   ipp_value_t		*value;		/* Current value */
 
 
-  if (http == NULL || ipp == NULL)
+  if (dst == NULL || ipp == NULL)
     return (IPP_ERROR);
 
   switch (ipp->state)
@@ -1334,7 +1429,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
 	*bufptr++ = ipp->request.any.request_id >> 8;
 	*bufptr++ = ipp->request.any.request_id;
 
-        if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+        if ((*cb)(dst, buffer, bufptr - buffer) < 0)
 	{
 	  DEBUG_puts("ippWrite: Could not write IPP header...");
 	  return (IPP_ERROR);
@@ -1352,7 +1447,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
         * If blocking is disabled, stop here...
 	*/
 
-        if (!http->blocking)
+        if (!blocking)
 	  break;
 
     case IPP_ATTRIBUTE :
@@ -1404,7 +1499,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		{
                   if ((sizeof(buffer) - (bufptr - buffer)) < 9)
 		  {
-                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+                    if ((*cb)(dst, buffer, bufptr - buffer) < 0)
 	            {
 	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	              return (IPP_ERROR);
@@ -1441,7 +1536,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		{
                   if ((sizeof(buffer) - (bufptr - buffer)) < 6)
 		  {
-                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+                    if ((*cb)(dst, buffer, bufptr - buffer) < 0)
 	            {
 	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	              return (IPP_ERROR);
@@ -1494,7 +1589,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
 
                     if ((sizeof(buffer) - (bufptr - buffer)) < 3)
 		    {
-                      if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+                      if ((*cb)(dst, buffer, bufptr - buffer) < 0)
 	              {
 	        	DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	        	return (IPP_ERROR);
@@ -1518,7 +1613,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
 
                   if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
 		  {
-                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+                    if ((*cb)(dst, buffer, bufptr - buffer) < 0)
 	            {
 	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	              return (IPP_ERROR);
@@ -1541,7 +1636,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		{
                   if ((sizeof(buffer) - (bufptr - buffer)) < 16)
 		  {
-                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+                    if ((*cb)(dst, buffer, bufptr - buffer) < 0)
 	            {
 	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	              return (IPP_ERROR);
@@ -1576,7 +1671,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		{
                   if ((sizeof(buffer) - (bufptr - buffer)) < 14)
 		  {
-                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+                    if ((*cb)(dst, buffer, bufptr - buffer) < 0)
 	            {
 	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	              return (IPP_ERROR);
@@ -1618,7 +1713,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		{
                   if ((sizeof(buffer) - (bufptr - buffer)) < 13)
 		  {
-                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+                    if ((*cb)(dst, buffer, bufptr - buffer) < 0)
 	            {
 	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	              return (IPP_ERROR);
@@ -1667,7 +1762,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
 
                     if ((sizeof(buffer) - (bufptr - buffer)) < 3)
 		    {
-                      if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+                      if ((*cb)(dst, buffer, bufptr - buffer) < 0)
 	              {
 	        	DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	        	return (IPP_ERROR);
@@ -1690,7 +1785,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
 
                   if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
 		  {
-                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+                    if ((*cb)(dst, buffer, bufptr - buffer) < 0)
 	            {
 	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	              return (IPP_ERROR);
@@ -1737,7 +1832,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
 
                     if ((sizeof(buffer) - (bufptr - buffer)) < 3)
 		    {
-                      if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+                      if ((*cb)(dst, buffer, bufptr - buffer) < 0)
 	              {
 	        	DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	        	return (IPP_ERROR);
@@ -1758,7 +1853,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
 
                   if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
 		  {
-                    if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+                    if ((*cb)(dst, buffer, bufptr - buffer) < 0)
 	            {
 	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	              return (IPP_ERROR);
@@ -1785,7 +1880,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
 	  * Write the data out...
 	  */
 
-          if (httpWrite(http, (char *)buffer, bufptr - buffer) < 0)
+          if ((*cb)(dst, buffer, bufptr - buffer) < 0)
 	  {
 	    DEBUG_puts("ippWrite: Could not write IPP attribute...");
 	    return (IPP_ERROR);
@@ -1797,7 +1892,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
           * If blocking is disabled, stop here...
 	  */
 
-          if (!http->blocking)
+          if (!blocking)
 	    break;
 	}
 
@@ -1808,7 +1903,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
 	  */
 
           buffer[0] = IPP_TAG_END;
-	  if (httpWrite(http, (char *)buffer, 1) < 0)
+	  if ((*cb)(dst, buffer, 1) < 0)
 	  {
 	    DEBUG_puts("ippWrite: Could not write IPP end-tag...");
 	    return (IPP_ERROR);
@@ -1953,13 +2048,13 @@ _ipp_free_attr(ipp_attribute_t *attr)	/* I - Attribute to free */
 
 
 /*
- * 'ipp_read()' - Semi-blocking read on a HTTP connection...
+ * 'ipp_read_http()' - Semi-blocking read on a HTTP connection...
  */
 
-static int			/* O - Number of bytes read */
-ipp_read(http_t        *http,	/* I - Client connection */
-         unsigned char *buffer,	/* O - Buffer for data */
-	 int           length)	/* I - Total length */
+static int				/* O - Number of bytes read */
+ipp_read_http(http_t      *http,	/* I - Client connection */
+              ipp_uchar_t *buffer,	/* O - Buffer for data */
+	      int         length)	/* I - Total length */
 {
   int	tbytes,			/* Total bytes read */
 	bytes;			/* Bytes read this pass */
@@ -2024,5 +2119,85 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.5 2001/12/27 00:04:50 mike Exp $".
+ * 'ipp_read_file()' - Read IPP data from a file.
+ */
+
+static int				/* O - Number of bytes read */
+ipp_read_file(int         *fd,		/* I - File descriptor */
+              ipp_uchar_t *buffer,	/* O - Read buffer */
+	      int         length)	/* I - Number of bytes to read */
+{
+  return (read(*fd, buffer, length));
+}
+
+
+/*
+ * 'ipp_read_mem()' - Read IPP data from memory.
+ */
+
+static int				/* O - Number of bytes read */
+ipp_read_mem(ipp_mem_t   *m,		/* I - Memory buffer */
+             ipp_uchar_t *buffer,	/* O - Read buffer */
+	     int         length)	/* I - Number of bytes to read */
+{
+  int avail;				/* Number of bytes in buffer */
+
+
+  avail = m->end - m->current;
+
+  if (avail == 0)
+    return (-1);
+
+  if (length > avail)
+    length = avail;
+
+  memcpy(buffer, m->current, length);
+  m->current += length;
+
+  return (length);
+}
+
+
+/*
+ * 'ipp_write_file()' - Write IPP data to a file.
+ */
+
+static int				/* O - Number of bytes written */
+ipp_write_file(int         *fd,		/* I - File descriptor */
+               ipp_uchar_t *buffer,	/* I - Data to write */
+               int         length)	/* I - Number of bytes to write */
+{
+  return (write(*fd, buffer, length));
+}
+
+
+/*
+ * 'ipp_write_mem()' - Write IPP data to memory.
+ */
+
+static int				/* O - Number of bytes written */
+ipp_write_mem(ipp_mem_t   *m,		/* I - Memory buffer */
+              ipp_uchar_t *buffer,	/* I - Data to write */
+	      int         length)	/* I - Number of bytes to write */
+{
+  int avail;				/* Number of bytes in buffer */
+
+
+  avail = m->end - m->current;
+
+  if (avail == 0)
+    return (-1);
+
+  if (length > avail)
+    length = avail;
+
+  memcpy(m->current, buffer, length);
+  m->current += length;
+
+  return (length);
+}
+
+
+/*
+ * End of "$Id: ipp.c,v 1.55.2.6 2001/12/29 00:05:24 mike Exp $".
  */

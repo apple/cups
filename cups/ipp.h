@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.36.2.4 2001/12/27 00:04:50 mike Exp $"
+ * "$Id: ipp.h,v 1.36.2.5 2001/12/29 00:05:25 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -303,6 +303,9 @@ typedef enum			/**** IPP status codes... ****/
 
 typedef unsigned char ipp_uchar_t;/**** Unsigned 8-bit integer/character ****/
 
+typedef int	(*ipp_iocb_t)(void *, ipp_uchar_t *, int);
+				/**** IPP IO Callback Function ****/
+
 typedef union			/**** Request Header ****/
 {
   struct			/* Any Header */
@@ -409,8 +412,12 @@ extern ipp_attribute_t	*ippFindNextAttribute(ipp_t *ipp, const char *name,
 extern size_t		ippLength(ipp_t *ipp);
 extern ipp_t		*ippNew(void);
 extern ipp_state_t	ippRead(http_t *http, ipp_t *ipp);
+extern ipp_state_t	ippReadFile(int fd, ipp_t *ipp);
+extern ipp_state_t	ippReadIO(void *src, ipp_iocb_t *cb, int blocking, ipp_t *parent, ipp_t *ipp);
 extern const ipp_uchar_t *ippTimeToDate(time_t t);
 extern ipp_state_t	ippWrite(http_t *http, ipp_t *ipp);
+extern ipp_state_t	ippWriteFile(int fd, ipp_t *ipp);
+extern ipp_state_t	ippWriteIO(void *dst, ipp_iocb_t *cb, int blocking, ipp_t *parent, ipp_t *ipp);
 extern int		ippPort(void);
 extern void		ippSetPort(int p);
 
@@ -428,5 +435,5 @@ extern void		_ipp_free_attr(ipp_attribute_t *);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.36.2.4 2001/12/27 00:04:50 mike Exp $".
+ * End of "$Id: ipp.h,v 1.36.2.5 2001/12/29 00:05:25 mike Exp $".
  */

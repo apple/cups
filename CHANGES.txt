@@ -1,7 +1,10 @@
-CHANGES.txt - 12/26/2001
+CHANGES.txt - 12/28/2001
 ------------------------
 
 CHANGES IN CUPS V1.2.0a1
+
+	- New ippReadFile(), ippReadIO(), ippWriteFile(), and
+	  ippWriteIO() functions in CUPS API.
 
 
 CHANGES IN CUPS V1.1.13
