@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- Now timeout IPP attribute reads after 1 second inside
+	  an attribute definition.
 	- Now timeout connections that have been shutdown (due
 	  to errors) after 30 seconds instead of the Timeout
 	  setting (300 seconds by default).  This provides
