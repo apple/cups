@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The scheduler did not properly handle backslashes in
+	  banner files; it incorrectly assumed that "\c" should
+	  always be replaced by "c", instead of only looking for
+	  "\{" and replacing it by "{".
 	- The texttops filter didn't handle prettyprint=no.
 	- The text and HP-GL/2 filters didn't check for other
 	  common duplex option names like cupsMarkOptions() did.
