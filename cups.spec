@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.33 2001/05/30 16:01:30 mike Exp $"
+# "$Id: cups.spec,v 1.34 2001/07/05 15:34:37 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -39,7 +39,7 @@ BuildRoot: /var/tmp/%{name}-root
 Conflicts: lpr, LPRng
 Provides: libcups.so.2
 Provides: libcupsimage.so.2
-Provides: cupsd
+Provides: cups
 
 %package devel
 Summary: Common Unix Printing System - development environment
@@ -215,5 +215,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/pstoraster/*
 
 #
-# End of "$Id: cups.spec,v 1.33 2001/05/30 16:01:30 mike Exp $".
+# End of "$Id: cups.spec,v 1.34 2001/07/05 15:34:37 mike Exp $".
 #

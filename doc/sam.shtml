@@ -177,6 +177,11 @@ make changes you can get the HTMLDOC software from:
 <A HREF="http://www.easysw.com/htmldoc">http://www.easysw.com/htmldoc</A>
 </PRE></UL>
 
+<P>Finally, you'll need a <CODE>make</CODE> program that
+understands the <CODE>include</CODE> directive - FreeBSD,
+NetBSD, and OpenBSD developers should use the <CODE>gmake</CODE>
+program.
+
 <H3><A NAME="COMPILING">Compiling CUPS</A></H3>
 
 <P>CUPS uses GNU autoconf to configure the makefiles and source code
@@ -232,6 +237,16 @@ prior to running configure:
 
 <UL><PRE>
 <A HREF="http://www.openssl.org">http://www.openssl.org</A>
+</PRE></UL>
+
+<P>If the OpenSSL headers and libraries are not installed in the
+standard directories, use the <CODE>--with-openssl-includes</CODE>
+and <CODE>--with-openssl-libs</CODE> options:</P>
+
+<UL><PRE>
+./configure --enable-ssl \
+    --with-openssl-includes=/foo/bar/include \
+    --with-openssl-libs=/foo/bar/lib
 </PRE></UL>
 
 <P>Once you have configured things, just type:
@@ -857,6 +872,8 @@ determine how the server operates:
 	<LI><A HREF="#DefaultLanguage"><CODE>DefaultLanguage</CODE></A>
 	<LI><A HREF="#Deny"><CODE>Deny</CODE></A>
 	<LI><A HREF="#DocumentRoot"><CODE>DocumentRoot</CODE></A>
+	<LI><A HREF="#Encryption"><CODE>Encryption</CODE></A>
+	<LI><A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A>
 
 </TD>
 <TD VALIGN="TOP">
@@ -864,13 +881,14 @@ determine how the server operates:
 </TD>
 <TD VALIGN="TOP">
 
-	<LI><A HREF="#Encryption"><CODE>Encryption</CODE></A>
-	<LI><A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A>
 	<LI><A HREF="#FilterLimit"><CODE>FilterLimit</CODE></A>
 	<LI><A HREF="#FontPath"><CODE>FontPath</CODE></A>
 	<LI><A HREF="#Group"><CODE>Group</CODE></A>
+	<LI><A HREF="#HideImplicitMembers"><CODE>HideImplicitMembers</CODE></A>
 	<LI><A HREF="#HostNameLookups"><CODE>HostNameLookups</CODE></A>
 	<LI><A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>
+	<LI><A HREF="#ImplicitAnyClasses"><CODE>ImplicitAnyClasses</CODE></A>
+	<LI><A HREF="#Include"><CODE>Include</CODE></A>
 	<LI><A HREF="#KeepAliveTimeout"><CODE>KeepAliveTimeout</CODE></A>
 	<LI><A HREF="#KeepAlive"><CODE>KeepAlive</CODE></A>
 	<LI><A HREF="#Limit"><CODE>Limit</CODE></A>
@@ -886,7 +904,6 @@ determine how the server operates:
 	<LI><A HREF="#MaxLogSize"><CODE>MaxLogSize</CODE></A>
 	<LI><A HREF="#MaxRequestSize"><CODE>MaxRequestSize</CODE></A>
 	<LI><A HREF="#Order"><CODE>Order</CODE></A>
-	<LI><A HREF="#PageLog"><CODE>PageLog</CODE></A>
 
 </TD>
 <TD VALIGN="TOP">
@@ -894,6 +911,7 @@ determine how the server operates:
 </TD>
 <TD VALIGN="TOP">
 
+	<LI><A HREF="#PageLog"><CODE>PageLog</CODE></A>
 	<LI><A HREF="#Port"><CODE>Port</CODE></A>
 	<LI><A HREF="#PreserveJobFiles"><CODE>PreserveJobFiles</CODE></A>
 	<LI><A HREF="#PreserveJobHistory"><CODE>PreserveJobHistory</CODE></A>
@@ -1694,6 +1712,26 @@ filter and CGI programs run as. The default group is <CODE>sys</CODE>,
 system.
 
 <!-- NEED 3in -->
+<H3><A NAME="HideImplicitMembers">HideImplicitMembers</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+HideImplicitMembers Yes
+HideImplicitMembers No
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>HideImplicitMembers</CODE> directive controls
+whether the individual printers in an implicit class are shown
+to the user. The default is <CODE>No</CODE>.</P>
+
+<P><A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>
+must be enabled for this directive to have any effect.</P>
+
+<!-- NEED 3in -->
 <H3><A NAME="HostNameLookups">HostNameLookups</A></H3>
 <HR>
 
@@ -1738,6 +1776,45 @@ classes are created based upon the available network printers and classes.
 The default setting is <CODE>On</CODE> but is automatically turned
 <CODE>Off</CODE> if <A HREF="#Browsing"><CODE>Browsing</CODE></A> is
 turned <CODE>Off</CODE>.
+
+<!-- NEED 3in -->
+<H3><A NAME="ImplicitAnyClasses">ImplicitAnyClasses</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+ImplicitAnyClasses On
+ImplicitAnyClasses Off
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>ImplicitAnyClasses</CODE> directive controls
+whether implicit classes for local and remote printers are
+created with the name <CODE>AnyPrinter</CODE>. The default
+setting is <CODE>Off</CODE>.</P>
+
+<P><A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>
+must be enabled for this directive to have any effect.</P>
+
+<!-- NEED 3in -->
+<H3><A NAME="Include">Include</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+Include filename
+Include /foo/bar/filename
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>Include</CODE> directive includes the named file in
+the <CODE>cupsd.conf</CODE> file. If no leading path is
+provided, the file is assumed to be relative to the
+<A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory.</P>
 
 <!-- NEED 3in -->
 <H3><A NAME="KeepAlive">KeepAlive</A></H3>

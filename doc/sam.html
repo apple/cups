@@ -134,8 +134,11 @@ Copyright 1997-2001, All Rights Reserved<BR>
 <LI><A HREF="#FilterLimit">FilterLimit</A></LI>
 <LI><A HREF="#FontPath">FontPath</A></LI>
 <LI><A HREF="#Group">Group</A></LI>
+<LI><A HREF="#HideImplicitMembers">HideImplicitMembers</A></LI>
 <LI><A HREF="#HostNameLookups">HostNameLookups</A></LI>
 <LI><A HREF="#ImplicitClasses">ImplicitClasses</A></LI>
+<LI><A HREF="#ImplicitAnyClasses">ImplicitAnyClasses</A></LI>
+<LI><A HREF="#Include">Include</A></LI>
 <LI><A HREF="#KeepAlive">KeepAlive</A></LI>
 <LI><A HREF="#KeepAliveTimeout">KeepAliveTimeout</A></LI>
 <LI><A HREF="#Limit">Limit</A></LI>
@@ -493,6 +496,9 @@ File and directory names.</TD></TR>
 <A HREF="http://www.easysw.com/htmldoc">http://www.easysw.com/htmldoc</A>
 </PRE>
 </UL>
+<P>Finally, you'll need a <CODE>make</CODE> program that understands the
+ <CODE>include</CODE> directive - FreeBSD, NetBSD, and OpenBSD
+ developers should use the <CODE>gmake</CODE> program.</P>
 <H3><A NAME="COMPILING">Compiling CUPS</A></H3>
 <P>CUPS uses GNU autoconf to configure the makefiles and source code for
  your system. Type the following command to configure CUPS for your
@@ -546,6 +552,16 @@ CXXFLAGS</CODE>, and <CODE>LDFLAGS</CODE> environment variables prior to
 <UL>
 <PRE>
 <A HREF="http://www.openssl.org">http://www.openssl.org</A>
+</PRE>
+</UL>
+<P>If the OpenSSL headers and libraries are not installed in the
+ standard directories, use the <CODE>--with-openssl-includes</CODE> and <CODE>
+--with-openssl-libs</CODE> options:</P>
+<UL>
+<PRE>
+./configure --enable-ssl \
+    --with-openssl-includes=/foo/bar/include \
+    --with-openssl-libs=/foo/bar/lib
 </PRE>
 </UL>
 <P>Once you have configured things, just type:</P>
@@ -1068,14 +1084,17 @@ HREF="#CLIENT_SETUP"> Chapter 5, &quot;Client Setup&quot;</A> for more
 <LI><A HREF="#DefaultLanguage"><CODE>DefaultLanguage</CODE></A></LI>
 <LI><A HREF="#Deny"><CODE>Deny</CODE></A></LI>
 <LI><A HREF="#DocumentRoot"><CODE>DocumentRoot</CODE></A></LI>
-</TD><TD VALIGN="TOP"> &nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
 <LI><A HREF="#Encryption"><CODE>Encryption</CODE></A></LI>
 <LI><A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A></LI>
+</TD><TD VALIGN="TOP"> &nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
 <LI><A HREF="#FilterLimit"><CODE>FilterLimit</CODE></A></LI>
 <LI><A HREF="#FontPath"><CODE>FontPath</CODE></A></LI>
 <LI><A HREF="#Group"><CODE>Group</CODE></A></LI>
+<LI><A HREF="#HideImplicitMembers"><CODE>HideImplicitMembers</CODE></A></LI>
 <LI><A HREF="#HostNameLookups"><CODE>HostNameLookups</CODE></A></LI>
 <LI><A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A></LI>
+<LI><A HREF="#ImplicitAnyClasses"><CODE>ImplicitAnyClasses</CODE></A></LI>
+<LI><A HREF="#Include"><CODE>Include</CODE></A></LI>
 <LI><A HREF="#KeepAliveTimeout"><CODE>KeepAliveTimeout</CODE></A></LI>
 <LI><A HREF="#KeepAlive"><CODE>KeepAlive</CODE></A></LI>
 <LI><A HREF="#Limit"><CODE>Limit</CODE></A></LI>
@@ -1091,8 +1110,8 @@ HREF="#CLIENT_SETUP"> Chapter 5, &quot;Client Setup&quot;</A> for more
 <LI><A HREF="#MaxLogSize"><CODE>MaxLogSize</CODE></A></LI>
 <LI><A HREF="#MaxRequestSize"><CODE>MaxRequestSize</CODE></A></LI>
 <LI><A HREF="#Order"><CODE>Order</CODE></A></LI>
-<LI><A HREF="#PageLog"><CODE>PageLog</CODE></A></LI>
 </TD><TD VALIGN="TOP"> &nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
+<LI><A HREF="#PageLog"><CODE>PageLog</CODE></A></LI>
 <LI><A HREF="#Port"><CODE>Port</CODE></A></LI>
 <LI><A HREF="#PreserveJobFiles"><CODE>PreserveJobFiles</CODE></A></LI>
 <LI><A HREF="#PreserveJobHistory"><CODE>PreserveJobHistory</CODE></A></LI>
@@ -1753,6 +1772,23 @@ Group root
 system</CODE>, or <CODE>root</CODE> depending on the operating system.
 <!-- NEED 3in -->
 </P>
+<H3><A NAME="HideImplicitMembers">HideImplicitMembers</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+HideImplicitMembers Yes
+HideImplicitMembers No
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>HideImplicitMembers</CODE> directive controls whether the
+ individual printers in an implicit class are shown to the user. The
+ default is <CODE>No</CODE>.</P>
+<P><A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A> must be
+ enabled for this directive to have any effect.</P>
+
+<!-- NEED 3in -->
 <H3><A NAME="HostNameLookups">HostNameLookups</A></H3>
 <HR>
 <H4>Examples</H4>
@@ -1792,6 +1828,39 @@ ImplicitClasses Off
  is turned <CODE>Off</CODE>.
 <!-- NEED 3in -->
 </P>
+<H3><A NAME="ImplicitAnyClasses">ImplicitAnyClasses</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+ImplicitAnyClasses On
+ImplicitAnyClasses Off
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>ImplicitAnyClasses</CODE> directive controls whether
+ implicit classes for local and remote printers are created with the
+ name <CODE>AnyPrinter</CODE>. The default setting is <CODE>Off</CODE>.</P>
+<P><A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A> must be
+ enabled for this directive to have any effect.</P>
+
+<!-- NEED 3in -->
+<H3><A NAME="Include">Include</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+Include filename
+Include /foo/bar/filename
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>Include</CODE> directive includes the named file in the <CODE>
+cupsd.conf</CODE> file. If no leading path is provided, the file is
+ assumed to be relative to the<A HREF="#ServerRoot"> <CODE>ServerRoot</CODE>
+</A> directory.</P>
+
+<!-- NEED 3in -->
 <H3><A NAME="KeepAlive">KeepAlive</A></H3>
 <HR>
 <H4>Examples</H4>
@@ -3236,7 +3305,7 @@ smb://user:pass@server/sharename
  &quot;libcups.so&quot; files in the binary distributions.</P>
 <P>The GNU GPL applies to the remainder of the CUPS distribution,
  including the &quot;pstoraster&quot; filter which is based upon GNU Ghostscript
- 5.50 and the &quot;pdftops&quot; filter which is based upon Xpdf 0.90.</P>
+ 5.50 and the &quot;pdftops&quot; filter which is based upon Xpdf 0.92.</P>
 <P>For those not familiar with the GNU GPL, the license basically allows
  you to:</P>
 <UL>
@@ -3281,7 +3350,7 @@ smb://user:pass@server/sharename
 <BR> Fax: +1.415.492.9862
 <BR> EMail:<A HREF="mailto:info@arsoft.com"> info@arsoft.com</A></BLOCKQUOTE>
 </P>
-<P>The &quot;pdftops&quot; filter is based on the Xpdf 0.90 software. For binary
+<P>The &quot;pdftops&quot; filter is based on the Xpdf 0.92 software. For binary
  distribution licensing of this software, please contact:<BLOCKQUOTE>
  Derek B. Noonburg
 <BR> Email:<A HREF="mailto:derekn@foolabs.com"> derekn@foolabs.com</A>
