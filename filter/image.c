@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.18 1999/10/10 15:40:36 mike Exp $"
+ * "$Id: image.c,v 1.19 1999/12/01 20:25:03 mike Exp $"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
@@ -664,12 +664,32 @@ get_tile(image_t *img,	/* I - Image */
   }
 
   if (ic == img->first)
+  {
+    if (ic->next != NULL)
+      ic->next->prev = NULL;
+
     img->first = ic->next;
+    ic->next   = NULL;
+    ic->prev   = NULL;
+  }
   else if (img->first == NULL)
     img->first = ic;
 
   if (ic != img->last)
   {
+   /*
+    * Remove the cache entry from the list...
+    */
+
+    if (ic->prev != NULL)
+      ic->prev->next = ic->next;
+    if (ic->next != NULL)
+      ic->next->prev = ic->prev;
+
+   /*
+    * And add it to the end...
+    */
+
     if (img->last != NULL)
       img->last->next = ic;
 
@@ -755,5 +775,5 @@ flush_tile(image_t *img)	/* I - Image */
 
 
 /*
- * End of "$Id: image.c,v 1.18 1999/10/10 15:40:36 mike Exp $".
+ * End of "$Id: image.c,v 1.19 1999/12/01 20:25:03 mike Exp $".
  */

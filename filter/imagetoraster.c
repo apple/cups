@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.35 1999/11/01 16:53:43 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.36 1999/12/01 20:25:03 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -275,6 +275,12 @@ main(int  argc,		/* I - Number of command-line arguments */
   if ((choice = ppdFindMarkedChoice(ppd, "ColorModel")) != NULL)
     exec_choice(&header, choice);
 
+  if ((choice = ppdFindMarkedChoice(ppd, "CutMedia")) != NULL)
+    exec_choice(&header, choice);
+
+  if ((choice = ppdFindMarkedChoice(ppd, "ESPFinishing")) != NULL)
+    exec_choice(&header, choice);
+
   if ((choice = ppdFindMarkedChoice(ppd, "InputSlot")) != NULL)
     exec_choice(&header, choice);
 
@@ -543,6 +549,37 @@ main(int  argc,		/* I - Number of command-line arguments */
     header.cupsHeight  = (PageTop - PageBottom) * header.HWResolution[1] / 72.0;
     header.PageSize[0] = PageWidth;
     header.PageSize[1] = PageLength;
+  }
+
+  header.Margins[0] = PageLeft;
+  header.Margins[1] = PageBottom;
+
+  switch (Orientation)
+  {
+    case 0 :
+        header.ImagingBoundingBox[0] = PageLeft;
+	header.ImagingBoundingBox[1] = PageBottom;
+	header.ImagingBoundingBox[2] = PageLeft + xprint * 72;
+	header.ImagingBoundingBox[3] = PageBottom + yprint * 72;
+	break;
+    case 1 :
+        header.ImagingBoundingBox[0] = PageRight - yprint * 72;
+	header.ImagingBoundingBox[1] = PageBottom;
+	header.ImagingBoundingBox[2] = PageRight;
+	header.ImagingBoundingBox[3] = PageBottom + xprint * 72;
+	break;
+    case 2 :
+        header.ImagingBoundingBox[0] = PageRight - xprint * 72;
+	header.ImagingBoundingBox[1] = PageTop - yprint * 72;
+	header.ImagingBoundingBox[2] = PageRight;
+	header.ImagingBoundingBox[3] = PageTop;
+	break;
+    case 3 :
+        header.ImagingBoundingBox[0] = PageLeft;
+	header.ImagingBoundingBox[1] = PageTop - xprint * 72;
+	header.ImagingBoundingBox[2] = PageLeft + yprint * 72 + 0.5f;
+	header.ImagingBoundingBox[3] = PageTop;
+	break;
   }
 
   switch (header.cupsColorOrder)
@@ -973,6 +1010,8 @@ exec_choice(cups_page_header_t *header,	/* I - Page header */
       header->cupsRowFeed = atoi(value);
     else if (strcmp(name, "cupsRowStep") == 0)
       header->cupsRowStep = atoi(value);
+    else if (strcmp(name, "CutMedia") == 0)
+      header->CutMedia = (cups_cut_t)atoi(value);
     else if (strcmp(name, "HWResolution") == 0)
       sscanf(value, "%d%d", header->HWResolution + 0, header->HWResolution + 1);
     else if (strcmp(name, "cupsMediaPosition") == 0)
@@ -1018,7 +1057,7 @@ format_CMY(cups_page_header_t *header,	/* I - Page header */
     bitoffset = 0;
 
   ptr       = row + bitoffset / 8;
-  bandwidth = header->cupsBytesPerLine / 4;
+  bandwidth = header->cupsBytesPerLine / 3;
 
   switch (header->cupsColorOrder)
   {
@@ -3876,5 +3915,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.35 1999/11/01 16:53:43 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.36 1999/12/01 20:25:03 mike Exp $".
  */
