@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.44 1999/08/18 20:06:31 mike Exp $"
+ * "$Id: http.c,v 1.45 1999/08/21 18:45:25 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -838,6 +838,7 @@ httpGets(char   *line,			/* I - Line to read into */
   */
 
   lasterror = 0;
+  errno     = 0;
 
   do
   {
@@ -862,7 +863,8 @@ httpGets(char   *line,			/* I - Line to read into */
 	* Nope, can't get a line this time...
 	*/
 
-        if (errno != lasterror)
+        if (errno != lasterror && errno != ECONNRESET &&
+	    errno != ECONNABORTED && errno != ENETRESET)
 	{
 	  lasterror = errno;
 	  continue;
@@ -932,8 +934,11 @@ httpPrintf(http_t     *http,		/* I - HTTP data */
            const char *format,		/* I - printf-style format string */
 	   ...)				/* I - Additional args as needed */
 {
-  int		bytes;			/* Number of bytes to write */
-  char		buf[HTTP_MAX_BUFFER];	/* Buffer for formatted string */
+  int		bytes,			/* Number of bytes to write */
+		nbytes,			/* Number of bytes written */
+		tbytes;			/* Number of bytes all together */
+  char		buf[HTTP_MAX_BUFFER],	/* Buffer for formatted string */
+		*bufptr;		/* Pointer into buffer */
   va_list	ap;			/* Variable argument pointer */
 
 
@@ -943,7 +948,11 @@ httpPrintf(http_t     *http,		/* I - HTTP data */
 
   DEBUG_printf(("httpPrintf: %s", buf));
 
-  return (send(http->fd, buf, bytes, 0));
+  for (tbytes = 0, bufptr = buf; tbytes < bytes; tbytes += nbytes, bufptr += nbytes)
+    if ((nbytes = send(http->fd, bufptr, bytes - tbytes, 0)) < 0)
+      return (-1);
+
+  return (bytes);
 }
 
 
@@ -1433,5 +1442,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.44 1999/08/18 20:06:31 mike Exp $".
+ * End of "$Id: http.c,v 1.45 1999/08/21 18:45:25 mike Exp $".
  */
