@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- The printer-info attribute now defaults to the printer
+	  name if no value has been set.
 	- ppdOpen() and friends now add an "Auto" InputSlot
 	  option if none is provided to automatically select the
 	  correct tray.

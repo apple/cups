@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.20 2002/05/16 14:00:16 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.21 2002/06/03 19:30:51 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -93,6 +93,7 @@ AddPrinter(const char *name)	/* I - Name of printer */
     return (NULL);
 
   strlcpy(p->name, name, sizeof(p->name));
+  strlcpy(p->info, name, sizeof(p->info));
   strlcpy(p->hostname, ServerName, sizeof(p->hostname));
 
 #ifdef AF_INET6
@@ -2084,5 +2085,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.20 2002/05/16 14:00:16 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.21 2002/06/03 19:30:51 mike Exp $".
  */
