@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.23 2000/11/10 21:25:51 mike Exp $"
+ * "$Id: lp.c,v 1.24 2000/11/11 13:53:04 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <cups/cups.h>
 #include <cups/string.h>
+#include <cups/language.h>
 
 
 #ifndef WIN32
@@ -553,6 +554,45 @@ set_job_attrs(int           job_id,	/* I - Job ID */
 
   http = httpConnect(cupsServer(), ippPort());
 
+  language = cupsLangDefault();
+
+  request = ippNew();
+  request->request.op.operation_id = IPP_SET_JOB_ATTRIBUTES;
+  request->request.op.request_id   = 1;
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
+
+  sprintf(uri, "ipp://localhost/jobs/%d", job_id);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
+               "job-uri", NULL, uri);
+
+  cupsEncodeOptions(request, num_options, options);
+
+  if ((response = cupsDoRequest(http, request, "/jobs")) != NULL)
+  {
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    {
+      fprintf(stderr, "lp: set-job-attributes failed: %s\n",
+              ippErrorString(response->request.status.status_code));
+      ippDelete(response);
+      return (1);
+    }
+
+    ippDelete(response);
+  }
+  else
+  {
+    fprintf(stderr, "lp: set-job-attributes failed: %s\n",
+            ippErrorString(cupsLastError()));
+    return (1);
+  }
+
+  return (0);
 }
 
 
@@ -580,5 +620,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.23 2000/11/10 21:25:51 mike Exp $".
+ * End of "$Id: lp.c,v 1.24 2000/11/11 13:53:04 mike Exp $".
  */
