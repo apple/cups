@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.13
 
+	- The httpMD5Final() function didn't put a colon between
+	  the password and nonce strings.
 	- The pstops filter did not default to Binary data for
 	  "%%BeginData:".
 	- The pstops filter did not stop processing when a line
