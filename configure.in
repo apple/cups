@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.87 2001/04/24 14:46:40 mike Exp $"
+dnl "$Id: configure.in,v 1.88 2001/04/30 17:53:01 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -39,8 +39,6 @@ dnl for them...
 
 OPTIM=""
 AC_SUBST(OPTIM)
-GSOPTIM=""
-AC_SUBST(GSOPTIM)
 PICFLAG=1
 CFLAGS="${CFLAGS:=}"
 CXXFLAGS="${CXXFLAGS:=}"
@@ -49,7 +47,6 @@ AC_SUBST(DSOFLAGS)
 
 AC_ARG_ENABLE(debug, [  --enable-debug        turn on debugging [default=no]],[if eval "test x$enable_debug = xyes"; then
 	OPTIM="-g"
-	GSOPTIM="-g"
 fi])
 AC_ARG_ENABLE(shared, [  --enable-shared        turn on shared libraries [default=yes]])
 AC_ARG_ENABLE(ssl, [  --enable-ssl           turn on SSL/TLS support [default=no]])
@@ -334,52 +331,40 @@ if test -n "$GCC"; then
 
 	if test -z "$OPTIM"; then
 	       	OPTIM="-O2"
-		GSOPTIM="-O1"
 	fi
 	if test $PICFLAG = 1; then
     		OPTIM="-fPIC $OPTIM"
-    		GSOPTIM="-fPIC $GSOPTIM"
 	fi
 	OPTIM="-Wall $OPTIM"
-	GSOPTIM="-Wall $GSOPTIM"
 else
 	case $uname in
         	IRIX*)
 			if test -z "$OPTIM"; then
         			OPTIM="-O2"
-        			GSOPTIM="-O1"
 			fi
 			if test $uversion -ge 62; then
 				OPTIM="$OPTIM -n32 -mips3"
-				GSOPTIM="$GSOPTIM -n32 -mips3"
 			fi
 			OPTIM="-fullwarn $OPTIM"
-			GSOPTIM="-fullwarn $GSOPTIM"
 			;;
 		HP-UX*)
 			if test -z "$OPTIM"; then
 				OPTIM="+O2"
-				GSOPTIM="+O1"
 			fi
 			CFLAGS="-Ae $CFLAGS"
 			OPTIM="+DAportable $OPTIM"
-			GSOPTIM="+DAportable $GSOPTIM"
 			if test $PICFLAG = 1; then
 				OPTIM="+z $OPTIM"
-				GSOPTIM="+z $GSOPTIM"
 			fi
 			;;
 		SunOS*)
 			# Solaris
 			if test -z "$OPTIM"; then
 				OPTIM="-xO4"
-				GSOPTIM="-xO2"
 			fi
 			OPTIM="$OPTIM -xarch=generic"
-			GSOPTIM="$GSOPTIM -xarch=generic"
 			if test $PICFLAG = 1; then
 				OPTIM="-KPIC $OPTIM"
-				GSOPTIM="-KPIC $GSOPTIM"
 			fi
 			;;
 		*)
@@ -681,5 +666,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.87 2001/04/24 14:46:40 mike Exp $".
+dnl End of "$Id: configure.in,v 1.88 2001/04/30 17:53:01 mike Exp $".
 dnl
