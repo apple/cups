@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.18.2.28 2003/08/31 11:25:33 mike Exp $"
+ * "$Id: usb.c,v 1.18.2.29 2003/09/02 20:39:56 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -226,7 +226,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   signal(SIGTERM, SIG_IGN);
 #endif /* HAVE_SIGSET */
 
-#ifdef __linux
+#if defined(__linux) && defined(LP_POUTPA)
  /*
   * Show the printer status before we send the file; normally, we'd
   * do this while we write data to the printer, however at least some
@@ -249,7 +249,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     else if (!(status & LP_PSELECD))
       fputs("WARNING: Printer off-line.\n", stderr);
   }
-#endif /* __linux */
+#endif /* __linux && LP_POUTPA */
 
  /*
   * Finally, send the print file...
@@ -798,5 +798,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb.c,v 1.18.2.28 2003/08/31 11:25:33 mike Exp $".
+ * End of "$Id: usb.c,v 1.18.2.29 2003/09/02 20:39:56 mike Exp $".
  */

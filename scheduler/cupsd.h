@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.28.2.22 2003/08/04 19:01:44 mike Exp $"
+ * "$Id: cupsd.h,v 1.28.2.23 2003/09/02 20:39:59 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -176,6 +176,8 @@ VAR int			MaxFDs,		/* Maximum number of files */
 VAR fd_set		*InputSet,	/* Input files for select() */
 			*OutputSet;	/* Output files for select() */
 
+VAR time_t		ReloadTime	VALUE(0);
+					/* Time of reload request... */
 VAR int			NeedReload	VALUE(RELOAD_ALL),
 					/* Need to load configuration? */
 			SignalCount	VALUE(0);
@@ -208,5 +210,5 @@ extern void	StopServer(void);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.28.2.22 2003/08/04 19:01:44 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.28.2.23 2003/09/02 20:39:59 mike Exp $".
  */

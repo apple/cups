@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.50 2003/08/28 15:16:27 mike Exp $"
+ * "$Id: main.c,v 1.57.2.51 2003/09/02 20:40:02 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -431,6 +431,13 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     if (NeedReload)
     {
+      job_t	*job;			/* Current job */
+
+
+     /*
+      * Close any idle clients...
+      */
+
       if (NumClients > 0)
       {
         for (i = NumClients, con = Clients; i > 0; i --, con ++)
@@ -444,11 +451,28 @@ main(int  argc,				/* I - Number of command-line arguments */
 
         PauseListening();
       }
-      else if (!ReadConfiguration())
+
+     /*
+      * Check for any active jobs...
+      */
+
+      for (job = Jobs; job; job = job->next)
+        if (job->state->values[0].integer == IPP_JOB_PROCESSING)
+	  break;
+
+     /*
+      * Restart if all clients are closed and all jobs finished, or
+      * if 60 seconds has elapsed...
+      */
+
+      if ((NumClients == 0 && !job) || (time(NULL) - ReloadTime) >= 60)
       {
-        syslog(LOG_LPR, "Unable to read configuration file \'%s\' - exiting!",
-	       ConfigurationFile);
-        break;
+        if (!ReadConfiguration())
+        {
+          syslog(LOG_LPR, "Unable to read configuration file \'%s\' - exiting!",
+		 ConfigurationFile);
+          break;
+	}
       }
     }
 
@@ -1040,6 +1064,7 @@ sighup_handler(int sig)	/* I - Signal number */
   (void)sig;
 
   NeedReload = RELOAD_ALL;
+  ReloadTime = time(NULL);
 
 #ifdef HAVE_SIGSET
   sigset(SIGHUP, sighup_handler);
@@ -1112,5 +1137,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.50 2003/08/28 15:16:27 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.51 2003/09/02 20:40:02 mike Exp $".
  */

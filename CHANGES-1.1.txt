@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The scheduler now waits up to 60 seconds before
+	  restarting to allow active jobs to complete printing
+	  and pending requests to be processed (STR #226)
 	- The web interface did not work on systems where time_t
 	  is 64 bits (STR #262)
 	- Added backend tweeks and content-length check from Red
