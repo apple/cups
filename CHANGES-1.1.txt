@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.17
 
+	- The ppdOpen*() functions now reset the numeric locale
+	  settings while loading a PPD file.
 	- Fixed the libtool build rules.
 	- The manpage make rules didn't use $(MAKE) and
 	  $(MFLAGS) for the language subdirectories.
