@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.42 2003/08/01 18:57:54 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.43 2003/08/07 14:56:00 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -1058,8 +1058,14 @@ main(int  argc,			/* I - Number of command-line arguments */
   {
     if (ppd->jcl_end)
       fputs(ppd->jcl_end, stdout);
-    else if (ppd->num_filters == 0)
-      putchar(0x04);
+    else
+    {
+      if (ppd->num_filters == 0)
+        putchar(0x04);
+
+      if (Protocol == PROT_TBCP)
+        fputs("\033%-12345X", stdout);
+    }
   }
 
  /*
@@ -1884,5 +1890,5 @@ start_nup(int number,			/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.42 2003/08/01 18:57:54 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.43 2003/08/07 14:56:00 mike Exp $".
  */

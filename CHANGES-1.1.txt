@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The pstops filter only sent the TBCP exit sequence if
+	  it was defined in the JCLEnd attribute in the PPD file
+	  (STR #224)
 	- Support for more than 1024 files was broken on Solaris
 	  9 (STR #217)
 	- The setgroups() calls now pass in 1 group (the
