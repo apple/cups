@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.13 2000/06/26 15:08:55 mike Exp $"
+ * "$Id: lpr.c,v 1.14 2000/08/03 17:57:42 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -160,9 +160,10 @@ main(int  argc,		/* I - Number of command-line arguments */
             if ((dest = cupsGetDest(printer, instance, num_dests, dests)) != NULL)
 	    {
 	      for (j = 0; j < dest->num_options; j ++)
-	        num_options = cupsAddOption(dest->options[j].name,
-		                            dest->options[j].value,
-					    num_options, &options);
+	        if (cupsGetOption(dest->options[j].name, num_options, options) == NULL)
+	          num_options = cupsAddOption(dest->options[j].name,
+		                              dest->options[j].value,
+					      num_options, &options);
 	    }
 	    break;
 
@@ -235,9 +236,10 @@ main(int  argc,		/* I - Number of command-line arguments */
 	printer = dests[j].name;
 
 	for (j = 0; j < dest->num_options; j ++)
-	  num_options = cupsAddOption(dest->options[j].name,
-		                      dest->options[j].value,
-				      num_options, &options);
+	  if (cupsGetOption(dest->options[j].name, num_options, options) == NULL)
+	    num_options = cupsAddOption(dest->options[j].name,
+		                        dest->options[j].value,
+					num_options, &options);
         break;
       }
   }
@@ -348,5 +350,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c,v 1.13 2000/06/26 15:08:55 mike Exp $".
+ * End of "$Id: lpr.c,v 1.14 2000/08/03 17:57:42 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.21 2000/05/11 18:47:00 mike Exp $"
+ * "$Id: lp.c,v 1.22 2000/08/03 17:57:42 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -121,9 +121,10 @@ main(int  argc,		/* I - Number of command-line arguments */
             if ((dest = cupsGetDest(printer, instance, num_dests, dests)) != NULL)
 	    {
 	      for (j = 0; j < dest->num_options; j ++)
-	        num_options = cupsAddOption(dest->options[j].name,
-		                            dest->options[j].value,
-					    num_options, &options);
+	        if (cupsGetOption(dest->options[j].name, num_options, options) == NULL)
+	          num_options = cupsAddOption(dest->options[j].name,
+		                              dest->options[j].value,
+					      num_options, &options);
 	    }
 	    break;
 
@@ -244,9 +245,10 @@ main(int  argc,		/* I - Number of command-line arguments */
 	printer = dests[j].name;
 
 	for (j = 0; j < dest->num_options; j ++)
-	  num_options = cupsAddOption(dest->options[j].name,
-		                      dest->options[j].value,
-				      num_options, &options);
+	  if (cupsGetOption(dest->options[j].name, num_options, options) == NULL)
+	    num_options = cupsAddOption(dest->options[j].name,
+		                        dest->options[j].value,
+					num_options, &options);
         break;
       }
   }
@@ -348,5 +350,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.21 2000/05/11 18:47:00 mike Exp $".
+ * End of "$Id: lp.c,v 1.22 2000/08/03 17:57:42 mike Exp $".
  */
