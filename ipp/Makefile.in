@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile.in,v 1.1.2.3 2002/03/22 16:24:35 mike Exp $"
+# "$Id: Makefile.in,v 1.1.2.4 2002/03/22 17:55:05 mike Exp $"
 #
 #   IPP library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -190,7 +190,7 @@ srcdist:
 	cp configure $(SRCDIR)
 	cp Dependencies.dist $(SRCDIR)/Dependencies
 	cp *.c *.h *.in *.spec *.txt $(SRCDIR)
-	cp ../LICENSE.txt ../LICENSE.html $(SRCDIR)
+	cp ../LICENSE.txt ../LICENSE.html ../install-sh $(SRCDIR)
 	tar cvzf $(SRCDIST) $(SRCDIR)
 
 
@@ -233,5 +233,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile.in,v 1.1.2.3 2002/03/22 16:24:35 mike Exp $".
+# End of "$Id: Makefile.in,v 1.1.2.4 2002/03/22 17:55:05 mike Exp $".
 #
