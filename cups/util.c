@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.48 2000/05/01 19:50:25 mike Exp $"
+ * "$Id: util.c,v 1.49 2000/05/10 19:59:09 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -929,6 +929,7 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
 		uri[HTTP_MAX_URI];	/* Printer URI */
   cups_lang_t	*language;		/* Language to use */
   int		jobid;			/* New job ID */
+  cups_option_t	*option;		/* Pointer to current option */
 
 
   DEBUG_printf(("cupsPrintFile(\'%s\', \'%s\', %d, %08x)\n",
@@ -982,6 +983,9 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
   if (cupsGetOption("raw", num_options, options))
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
         	 NULL, "application/vnd.cups-raw");
+  else if ((option = cupsGetOption("document-format", num_options, options)) != NULL)
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
+        	 NULL, option->value);
   else
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
         	 NULL, "application/octet-stream");
@@ -1002,7 +1006,8 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
     * Skip the "raw" option - handled above...
     */
 
-    if (strcasecmp(options[i].name, "raw") == 0)
+    if (strcasecmp(options[i].name, "raw") == 0 ||
+        strcasecmp(options[i].name, "document-format") == 0)
       continue;
 
    /*
@@ -1317,5 +1322,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.48 2000/05/01 19:50:25 mike Exp $".
+ * End of "$Id: util.c,v 1.49 2000/05/10 19:59:09 mike Exp $".
  */

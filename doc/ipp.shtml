@@ -1417,6 +1417,16 @@ CUPS-Move-Job request:
 
 </UL>
 
+<P>Group 2: Job Template Attributes
+
+<UL>
+
+	<P>"job-printer-uri" (uri)
+
+	<P>The client MUST supply a URI for a printer on the same server.
+
+</UL>
+
 <H3>CUPS-Move-Job Response</H3>
 
 <P>The following groups of attributes are send as part of the
