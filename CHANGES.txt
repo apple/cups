@@ -3,6 +3,9 @@ CHANGES.txt - 08/18/2004
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- Added a ReloadTimeout directive to control how long
+	  the scheduler waits for jobs to complete before
+	  restarting the scheduler (STR #861)
 	- Added a note to the default cupsd.conf file which
 	  mentions that you must allow connections from
 	  localhost for the command-line and web interfaces to

@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsd.conf.man,v 1.13 2004/08/11 13:48:15 mike Exp $"
+.\" "$Id: cupsd.conf.man,v 1.14 2004/08/18 17:57:52 mike Exp $"
 .\"
 .\"   cupsd.conf man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsd.conf 5 "Common UNIX Printing System" "1 July 2004" "Easy Software Products"
+.TH cupsd.conf 5 "Common UNIX Printing System" "18 August 2004" "Easy Software Products"
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -313,6 +313,11 @@ PrintcapGUI
 Specifies whether to generate option panel definition files on some
 operating systems.
 .TP 5
+ReloadTimeout
+.br
+Specifies the amount of time to wait for job completion before
+restarting the scheduler.
+.TP 5
 RemoteRoot
 .br
 Specifies the username that is associated with unauthenticated root
@@ -402,5 +407,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2004 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupsd.conf.man,v 1.13 2004/08/11 13:48:15 mike Exp $".
+.\" End of "$Id: cupsd.conf.man,v 1.14 2004/08/18 17:57:52 mike Exp $".
 .\"

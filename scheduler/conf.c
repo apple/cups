@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.149 2004/07/06 00:34:56 mike Exp $"
+ * "$Id: conf.c,v 1.150 2004/08/18 17:57:53 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -125,6 +125,7 @@ static var_t	variables[] =
   { "PreserveJobHistory",	&JobHistory,		VAR_BOOLEAN },
   { "Printcap",			&Printcap,		VAR_STRING },
   { "PrintcapGUI",		&PrintcapGUI,		VAR_STRING },
+  { "ReloadTimeout",		&ReloadTimeout,		VAR_INTEGER },
   { "RemoteRoot",		&RemoteRoot,		VAR_STRING },
   { "RequestRoot",		&RequestRoot,		VAR_STRING },
   { "RIPCache",			&RIPCache,		VAR_STRING },
@@ -355,6 +356,7 @@ ReadConfiguration(void)
   MaxLogSize          = 1024 * 1024;
   MaxPrinterHistory   = 10;
   MaxRequestSize      = 0;
+  ReloadTimeout	      = 60;
   RootCertDuration    = 300;
   RunAsUser           = FALSE;
   Timeout             = DEFAULT_TIMEOUT;
@@ -2226,5 +2228,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.149 2004/07/06 00:34:56 mike Exp $".
+ * End of "$Id: conf.c,v 1.150 2004/08/18 17:57:53 mike Exp $".
  */
