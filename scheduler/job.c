@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.77 2000/06/28 14:00:49 mike Exp $"
+ * "$Id: job.c,v 1.78 2000/06/28 16:34:24 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -941,7 +941,7 @@ StartJob(int       id,		/* I - Job ID */
 		device_uri[1024],/* DEVICE_URI environment variable */
 		ppd[1024],	/* PPD environment variable */
 		printer_name[255],/* PRINTER environment variable */
-		root[1024],	/* SERVER_ROOT environment variable */
+		root[1024],	/* CUPS_SERVERROOT environment variable */
 		cache[255],	/* RIP_MAX_CACHE environment variable */
 		tmpdir[1024],	/* TMPDIR environment variable */
 		ldpath[1024],	/* LD_LIBRARY_PATH environment variable */
@@ -1196,7 +1196,7 @@ StartJob(int       id,		/* I - Job ID */
   snprintf(ppd, sizeof(ppd), "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
   sprintf(printer_name, "PRINTER=%s", printer->name);
   snprintf(cache, sizeof(cache), "RIP_MAX_CACHE=%s", RIPCache);
-  snprintf(root, sizeof(root), "SERVER_ROOT=%s", ServerRoot);
+  snprintf(root, sizeof(root), "CUPS_SERVERROOT=%s", ServerRoot);
   snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
   snprintf(datadir, sizeof(datadir), "CUPS_DATADIR=%s", DataDir);
 
@@ -2562,5 +2562,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.77 2000/06/28 14:00:49 mike Exp $".
+ * End of "$Id: job.c,v 1.78 2000/06/28 16:34:24 mike Exp $".
  */

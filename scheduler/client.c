@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.60 2000/06/27 21:10:53 mike Exp $"
+ * "$Id: client.c,v 1.61 2000/06/28 16:34:24 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1565,6 +1565,7 @@ pipe_command(client_t *con,	/* I - Client connection */
 	tmpdir[1024],		/* TMPDIR environment variable */
 	ldpath[1024],		/* LD_LIBRARY_PATH environment variable */
 	datadir[1024],		/* CUPS_DATADIR environment variable */
+	root[1024],		/* CUPS_SERVERROOT environment variable */
 	query_string[10240];	/* QUERY_STRING env variable */
 
 
@@ -1634,6 +1635,7 @@ pipe_command(client_t *con,	/* I - Client connection */
   snprintf(remote_user, sizeof(remote_user), "REMOTE_USER=%s", con->username);
   snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
   snprintf(datadir, sizeof(datadir), "CUPS_DATADIR=%s", DataDir);
+  snprintf(root, sizeof(root), "CUPS_SERVERROOT=%s", ServerRoot);
 
   if (getenv("LD_LIBRARY_PATH") != NULL)
     snprintf(ldpath, sizeof(ldpath), "LD_LIBRARY_PATH=%s", getenv("LD_LIBRARY_PATH"));
@@ -1653,8 +1655,9 @@ pipe_command(client_t *con,	/* I - Client connection */
   envp[10] = TZ;
   envp[11] = tmpdir;
   envp[12] = datadir;
+  envp[13] = root;
 
-  envc = 13;
+  envc = 14;
 
   if (ldpath[0])
     envp[envc ++] = ldpath;
@@ -1765,5 +1768,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.60 2000/06/27 21:10:53 mike Exp $".
+ * End of "$Id: client.c,v 1.61 2000/06/28 16:34:24 mike Exp $".
  */
