@@ -1,5 +1,12 @@
-CHANGES.txt - 04/28/2003
+CHANGES.txt - 04/29/2003
 ------------------------
+
+CHANGES IN CUPS V1.1.19
+
+	- The polling daemon allocated an extra localization
+	  buffer but did not free it, causing cups-polld to
+	  eventually use all available memory (STR #40)
+
 
 CHANGES IN CUPS V1.1.19rc3
 
