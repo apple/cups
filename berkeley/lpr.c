@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.17 2001/01/23 17:36:20 mike Exp $"
+ * "$Id: lpr.c,v 1.18 2001/02/06 23:40:05 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -80,7 +80,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   cups_option_t	*options;	/* Options */
   int		deletefile;	/* Delete file after print? */
   char		buffer[8192];	/* Copy buffer */
-  FILE		*temp;		/* Temporary file pointer */
+  int		temp;		/* Temporary file descriptor */
 #ifdef HAVE_SIGACTION
   struct sigaction action;	/* Signal action */
 #endif /* HAVE_SIGACTION */
@@ -301,19 +301,17 @@ main(int  argc,		/* I - Number of command-line arguments */
 #  endif
 #endif /* !WIN32 */
 
-    temp = fopen(cupsTempFile(tempfile, sizeof(tempfile)), "w");
-
-    if (temp == NULL)
+    if ((temp = cupsTempFd(tempfile, sizeof(tempfile))) < 0)
     {
       fputs("lpr: unable to create temporary file.\n", stderr);
       return (1);
     }
 
     while ((i = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
-      fwrite(buffer, 1, i, temp);
+      write(temp, buffer, i);
 
-    i = ftell(temp);
-    fclose(temp);
+    i = lseek(temp, 0, SEEK_CUR);
+    close(temp);
 
     if (i == 0)
     {
@@ -364,5 +362,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c,v 1.17 2001/01/23 17:36:20 mike Exp $".
+ * End of "$Id: lpr.c,v 1.18 2001/02/06 23:40:05 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.54 2001/01/24 17:18:56 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.55 2001/02/06 23:40:08 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -226,12 +226,12 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (argc == 6)
   {
-    FILE	*fp;		/* File to read from */
+    int		fd;		/* File to write to */
     char	buffer[8192];	/* Buffer to read into */
     int		bytes;		/* # of bytes to read */
 
 
-    if ((fp = fopen(cupsTempFile(filename, sizeof(filename)), "w")) == NULL)
+    if ((fd = cupsTempFd(filename, sizeof(filename))) < 0)
     {
       perror("ERROR: Unable to copy image file");
       return (1);
@@ -241,8 +241,9 @@ main(int  argc,		/* I - Number of command-line arguments */
             filename);
 
     while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
-      fwrite(buffer, 1, bytes, fp);
-    fclose(fp);
+      write(fd, buffer, bytes);
+
+    close(fd);
   }
   else
   {
@@ -4318,5 +4319,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.54 2001/01/24 17:18:56 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.55 2001/02/06 23:40:08 mike Exp $".
  */

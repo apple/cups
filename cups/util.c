@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.72 2001/01/22 15:03:32 mike Exp $"
+ * "$Id: util.c,v 1.73 2001/02/06 23:40:07 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -32,6 +32,7 @@
  *   cupsLastError()     - Return the last IPP error that occurred.
  *   cupsPrintFile()     - Print a file to a printer or class.
  *   cupsPrintFiles()    - Print one or more files to a printer or class.
+ *   cupsTempFd()        - Create a temporary file.
  *   cupsTempFile()      - Generate a temporary filename.
  *   cups_connect()      - Connect to the specified host...
  *   cups_local_auth()   - Get the local authorization certificate if
@@ -633,7 +634,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 		*response;		/* IPP response */
   ipp_attribute_t *attr;		/* Current attribute */
   cups_lang_t	*language;		/* Local language */
-  FILE		*fp;			/* PPD file */
+  int		fd;			/* PPD file */
   int		bytes;			/* Number of bytes read */
   char		buffer[8192];		/* Buffer for file */
   char		printer[HTTP_MAX_URI],	/* Printer name */
@@ -787,7 +788,17 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   * Get a temp file...
   */
 
-  cupsTempFile(filename, sizeof(filename));
+  if ((fd = cupsTempFd(filename, sizeof(filename))) < 0)
+  {
+   /*
+    * Can't open file; close the server connection and return NULL...
+    */
+
+    httpFlush(cups_server);
+    httpClose(cups_server);
+    cups_server = NULL;
+    return (NULL);
+  }
 
  /*
   * And send a request to the HTTP server...
@@ -876,25 +887,26 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   while (status == HTTP_UNAUTHORIZED);
 
  /*
-  * OK, we need to copy the file; open the file and copy it...
+  * See if we actually got the file or an error...
   */
 
-  if ((fp = fopen(filename, "w")) == NULL)
+  if (status != HTTP_OK)
   {
-   /*
-    * Can't open file; close the server connection and return NULL...
-    */
-
+    unlink(filename);
     httpFlush(cups_server);
     httpClose(cups_server);
     cups_server = NULL;
     return (NULL);
   }
 
-  while ((bytes = httpRead(cups_server, buffer, sizeof(buffer))) > 0)
-    fwrite(buffer, bytes, 1, fp);
+ /*
+  * OK, we need to copy the file...
+  */
 
-  fclose(fp);
+  while ((bytes = httpRead(cups_server, buffer, sizeof(buffer))) > 0)
+    write(fd, buffer, bytes);
+
+  close(fd);
 
   return (filename);
 }
@@ -1218,12 +1230,12 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
 
 
 /*
- * 'cupsTempFile()' - Generate a temporary filename.
+ * 'cupsTempFd()' - Create a temporary file.
  */
 
-char *					/* O - Filename */
-cupsTempFile(char *filename,		/* I - Pointer to buffer */
-             int  len)			/* I - Size of buffer */
+int					/* O - New file descriptor */
+cupsTempFd(char *filename,		/* I - Pointer to buffer */
+           int  len)			/* I - Size of buffer */
 {
   int		fd;			/* File descriptor for temp file */
 #ifdef WIN32
@@ -1309,8 +1321,42 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
 #else
     fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0600);
 #endif /* O_NOFOLLOW */
+
+    if (fd < 0 && errno == EPERM)
+      break; /* Stop immediately if permission denied! */
   }
   while (fd < 0);
+
+ /*
+  * Return the file descriptor...
+  */
+
+  return (fd);
+}
+
+
+/*
+ * 'cupsTempFile()' - Generate a temporary filename.
+ *
+ * Note: This function will be removed in the next minor release of
+ *       CUPS due to serious bugs in glibc - the fopen() function
+ *       in glibc does an unlink before creating the file, which
+ *       opens up a major symlink hole!
+ */
+
+char *					/* O - Filename */
+cupsTempFile(char *filename,		/* I - Pointer to buffer */
+             int  len)			/* I - Size of buffer */
+{
+  int		fd;			/* File descriptor for temp file */
+
+
+ /*
+  * Create the temporary file...
+  */
+
+  if ((fd = cupsTempFd(filename, len)) < 0)
+    return (NULL);
 
  /*
   * Close the temp file - it'll be reopened later as needed...
@@ -1335,10 +1381,9 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 	     char       *printer,	/* O - Printer name [HTTP_MAX_URI] */
              char       *hostname)	/* O - Hostname [HTTP_MAX_URI] */
 {
-  char		hostbuf[HTTP_MAX_URI];
-				/* Name of host */
+  char		hostbuf[HTTP_MAX_URI];	/* Name of host */
   static char	printerbuf[HTTP_MAX_URI];
-				/* Name of printer or class */
+					/* Name of printer or class */
 
 
   if (name == NULL)
@@ -1458,5 +1503,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.72 2001/01/22 15:03:32 mike Exp $".
+ * End of "$Id: util.c,v 1.73 2001/02/06 23:40:07 mike Exp $".
  */

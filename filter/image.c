@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.26 2001/01/22 15:03:39 mike Exp $"
+ * "$Id: image.c,v 1.27 2001/02/06 23:40:08 mike Exp $"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
@@ -731,9 +731,9 @@ get_tile(image_t *img,	/* I - Image */
 static void
 flush_tile(image_t *img)	/* I - Image */
 {
+  int		fd;		/* Cache file descriptor */
   int		bpp;		/* Bytes per pixel */
   itile_t	*tile;		/* Pointer to tile */
-
 
 
   bpp  = ImageGetDepth(img);
@@ -747,13 +747,21 @@ flush_tile(image_t *img)	/* I - Image */
 
   if (img->cachefile == NULL)
   {
-    cupsTempFile(img->cachename, sizeof(img->cachename));
-
-    fprintf(stderr, "DEBUG: Creating swap file \"%s\"...\n", img->cachename);
-
-    if ((img->cachefile = fopen(img->cachename, "wb+")) == NULL)
+    if ((fd = cupsTempFd(img->cachename, sizeof(img->cachename))) < 0)
     {
       perror("ERROR: Unable to create image swap file");
+      tile->ic    = NULL;
+      tile->dirty = 0;
+      return;
+    }
+
+    fprintf(stderr, "DEBUG: Created swap file \"%s\"...\n", img->cachename);
+
+    if ((img->cachefile = fdopen(fd, "wb+")) == NULL)
+    {
+      perror("ERROR: Unable to create image swap file");
+      close(fd);
+      unlink(img->cachefile);
       tile->ic    = NULL;
       tile->dirty = 0;
       return;
@@ -796,5 +804,5 @@ flush_tile(image_t *img)	/* I - Image */
 
 
 /*
- * End of "$Id: image.c,v 1.26 2001/01/22 15:03:39 mike Exp $".
+ * End of "$Id: image.c,v 1.27 2001/02/06 23:40:08 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.19 2001/01/22 15:03:21 mike Exp $"
+ * "$Id: admin.c,v 1.20 2001/02/06 23:40:06 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -692,7 +692,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
       * Get the PPD file...
       */
 
-      FILE		*fp;			/* PPD file */
+      int		fd;			/* PPD file */
       char		filename[1024];		/* PPD filename */
       ppd_file_t	*ppd;			/* PPD information */
       char		buffer[1024];		/* Buffer */
@@ -700,19 +700,18 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 
 
       snprintf(uri, sizeof(uri), "/printers/%s.ppd", name);
-      cupsTempFile(filename, sizeof(filename));
 
       if (httpGet(http, uri))
         httpGet(http, uri);
 
       while (httpUpdate(http) == HTTP_CONTINUE);
 
-      if ((fp = fopen(filename, "w")) != NULL)
+      if ((fd = cupsTempFd(filename, sizeof(filename))) >= 0)
       {
 	while ((bytes = httpRead(http, buffer, sizeof(buffer))) > 0)
-          fwrite(buffer, 1, bytes, fp);
+          write(fd, buffer, bytes);
 
-	fclose(fp);
+	close(fd);
 
         if ((ppd = ppdOpenFile(filename)) != NULL)
 	{
@@ -723,11 +722,11 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 
           ppdClose(ppd);
 	}
+
+        unlink(filename);
       }
       else
         httpFlush(http);
-
-      unlink(filename);
     }
 
    /*
@@ -921,6 +920,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
   char		tempfile[1024];		/* Temporary filename */
   FILE		*in,			/* Input file */
 		*out;			/* Output file */
+  int		outfd;			/* Output file descriptor */
   char		line[1024];		/* Line from PPD file */
   char		keyword[1024],		/* Keyword from Default line */
 		*keyptr;		/* Pointer into keyword... */
@@ -1113,10 +1113,17 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     * Set default options...
     */
 
-    cupsTempFile(tempfile, sizeof(tempfile));
+    outfd = cupsTempFd(tempfile, sizeof(tempfile));
+    in    = fopen(filename, "rb");
+    out   = fdopen(outfd, "wb");
 
-    in  = fopen(filename, "rb");
-    out = fopen(tempfile, "wb");
+    if (outfd < 0 || in == NULL || out == NULL)
+    {
+      cgiSetVariable("ERROR", strerror(errno));
+      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+      unlink(filename);
+      return;
+    }
 
     while (get_line(line, sizeof(line), in) != NULL)
     {
@@ -1151,6 +1158,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 
     fclose(in);
     fclose(out);
+    close(outfd);
 
    /*
     * Build a CUPS_ADD_PRINTER request, which requires the following
@@ -1581,5 +1589,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.19 2001/01/22 15:03:21 mike Exp $".
+ * End of "$Id: admin.c,v 1.20 2001/02/06 23:40:06 mike Exp $".
  */

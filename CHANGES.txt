@@ -1,4 +1,4 @@
-CHANGES.txt - 02/02/2001
+CHANGES.txt - 02/06/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.6-2
@@ -8,6 +8,14 @@ CHANGES IN CUPS V1.1.6-2
 	  (Ghostscript) to avoid compiler-induced errors
 	  from Ghostscript's twisted code.
 	- The mime.types file contained syntax errors.
+	- Updated the *BSD USB device filenames to use
+	  the /dev/unlptN files so that the USB device
+	  is not reset prior to printing (causes print
+	  corruption on many printers)
+	- Added new cupsTempFd() function to avoid serious
+	  security bug in glibc fopen() function.  The glibc
+	  fopen() function unlinks a file before creating it,
+	  which opens up possible symlink attacks.
 
 
 CHANGES IN CUPS V1.1.6-1

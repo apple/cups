@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.20 2001/01/23 17:36:23 mike Exp $"
+ * "$Id: lpadmin.c,v 1.21 2001/02/06 23:40:10 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -1382,7 +1382,7 @@ set_printer_file(http_t *http,		/* I - Server connection */
   char		uri[HTTP_MAX_URI];	/* URI for printer/class */
 #ifdef HAVE_LIBZ
   char		tempfile[1024];		/* Temporary filename */
-  FILE		*fp;			/* Temporary file */
+  int		fd;			/* Temporary file */
   gzFile	*gz;			/* GZIP'd file */
   char		buffer[8192];		/* Copy buffer */
   int		bytes;			/* Bytes in buffer */
@@ -1402,7 +1402,7 @@ set_printer_file(http_t *http,		/* I - Server connection */
     * Yes, the file is compressed; uncompress to a temp file...
     */
 
-    if ((fp = fopen(cupsTempFile(tempfile, sizeof(tempfile)), "wb")) == NULL)
+    if ((fd = cupsTempFd(tempfile, sizeof(tempfile))) < 0)
     {
       perror("lpadmin: Unable to create temporary file");
       return;
@@ -1417,9 +1417,9 @@ set_printer_file(http_t *http,		/* I - Server connection */
     }
 
     while ((bytes = gzread(gz, buffer, sizeof(buffer))) > 0)
-      fwrite(buffer, bytes, 1, fp);
+      write(fd, buffer, bytes);
 
-    fclose(fp);
+    close(fd);
     gzclose(gz);
 
     file = tempfile;
@@ -1642,6 +1642,7 @@ set_printer_options(http_t        *http,	/* I - Server connection */
 		tempfile[1024];		/* Temporary filename */
   FILE		*in,			/* PPD file */
 		*out;			/* Temporary file */
+  int		outfd;			/* Temporary file descriptor */
 
 
   DEBUG_printf(("set_printer_options(%p, \"%s\", %d, %p)\n", http, printer,
@@ -1687,10 +1688,10 @@ set_printer_options(http_t        *http,	/* I - Server connection */
     * Set default options in the PPD file...
     */
 
-    cupsTempFile(tempfile, sizeof(tempfile));
+    outfd = cupsTempFd(tempfile, sizeof(tempfile));
 
     in  = fopen(ppdfile, "rb");
-    out = fopen(tempfile, "wb");
+    out = fdopen(outfd, "wb");
 
     while (get_line(line, sizeof(line), in) != NULL)
     {
@@ -1725,6 +1726,7 @@ set_printer_options(http_t        *http,	/* I - Server connection */
 
     fclose(in);
     fclose(out);
+    close(outfd);
 
    /*
     * Do the request...
@@ -1799,5 +1801,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.20 2001/01/23 17:36:23 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.21 2001/02/06 23:40:10 mike Exp $".
  */

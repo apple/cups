@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.23 2001/01/24 17:14:01 mike Exp $"
+ * "$Id: lpd.c,v 1.24 2001/02/06 23:40:05 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -125,27 +125,27 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     * Copy stdin to a temporary file...
     */
 
-    FILE *fp;		/* Temporary file */
+    int  fd;		/* Temporary file */
     char buffer[8192];	/* Buffer for copying */
     int  bytes;		/* Number of bytes read */
 
 
-    if ((fp = fopen(cupsTempFile(filename, sizeof(filename)), "w")) == NULL)
+    if ((fd = cupsTempFd(filename, sizeof(filename))) < 0)
     {
       perror("ERROR: unable to create temporary file");
       return (1);
     }
 
     while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
-      if (fwrite(buffer, 1, bytes, fp) < bytes)
+      if (write(fd, buffer, bytes) < bytes)
       {
         perror("ERROR: unable to write to temporary file");
-	fclose(fp);
+	close(fd);
 	unlink(filename);
 	return (1);
       }
 
-    fclose(fp);
+    close(fd);
   }
   else
   {
@@ -542,5 +542,5 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
 
 /*
- * End of "$Id: lpd.c,v 1.23 2001/01/24 17:14:01 mike Exp $".
+ * End of "$Id: lpd.c,v 1.24 2001/02/06 23:40:05 mike Exp $".
  */

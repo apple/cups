@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.21 2001/01/22 15:03:59 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.22 2001/02/06 23:40:09 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -383,7 +383,8 @@ recv_print_job(const char    *dest,	/* I - Destination */
 {
   int		i;			/* Looping var */
   int		status;			/* Command status */
-  FILE		*fp;			/* Temporary file */
+  int		fd;			/* Temporary file */
+  FILE		*fp;			/* File pointer */
   char		filename[1024];		/* Temporary filename */
   int		bytes;			/* Bytes received */
   char		line[256],		/* Line from file/stdin */
@@ -458,7 +459,15 @@ recv_print_job(const char    *dest,	/* I - Destination */
 	    break;
 	  }
 
-          cupsTempFile(control, sizeof(control));
+          if ((fd = cupsTempFd(control, sizeof(control))) < 0)
+	  {
+	    syslog(LOG_ERR, "Unable to open temporary control file - %s",
+        	   strerror(errno));
+	    putchar(1);
+	    status = 1;
+	    break;
+	  }
+
 	  strcpy(filename, control);
 	  break;
       case 0x03 : /* Receive data file */
@@ -485,7 +494,15 @@ recv_print_job(const char    *dest,	/* I - Destination */
 	  strncpy(data[num_data], name, sizeof(data[0]) - 1);
 	  data[num_data][sizeof(data[0]) - 1] = '\0';
 
-          cupsTempFile(temp[num_data], sizeof(temp[0]));
+          if ((fd = cupsTempFd(temp[num_data], sizeof(temp[0]))) < 0)
+	  {
+	    syslog(LOG_ERR, "Unable to open temporary data file - %s",
+        	   strerror(errno));
+	    putchar(1);
+	    status = 1;
+	    break;
+	  }
+
 	  strcpy(filename, temp[num_data]);
 
           num_data ++;
@@ -496,19 +513,6 @@ recv_print_job(const char    *dest,	/* I - Destination */
 
     if (status)
       break;
-
-   /*
-    * Try opening the temp file...
-    */
-
-    if ((fp = fopen(filename, "wb")) == NULL)
-    {
-      syslog(LOG_ERR, "Unable to open temporary file \"%s\" - %s",
-             filename, strerror(errno));
-      putchar(1);
-      status = 1;
-      break;
-    }
 
    /*
     * Copy the data or control file from the client...
@@ -522,7 +526,7 @@ recv_print_job(const char    *dest,	/* I - Destination */
         bytes = i;
 
       if ((bytes = fread(line, 1, bytes, stdin)) > 0)
-        bytes = fwrite(line, 1, bytes, fp);
+        bytes = write(fd, line, bytes);
 
       if (bytes < 1)
       {
@@ -1214,5 +1218,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.21 2001/01/22 15:03:59 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.22 2001/02/06 23:40:09 mike Exp $".
  */

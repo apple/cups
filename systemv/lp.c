@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.27 2001/01/23 17:36:23 mike Exp $"
+ * "$Id: lp.c,v 1.28 2001/02/06 23:40:10 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -83,7 +83,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   cups_option_t	*options;	/* Options */
   int		silent;		/* Silent or verbose output? */
   char		buffer[8192];	/* Copy buffer */
-  FILE		*temp;		/* Temporary file pointer */
+  int		temp;		/* Temporary file descriptor */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;	/* Signal action */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET*/
@@ -521,19 +521,19 @@ main(int  argc,		/* I - Number of command-line arguments */
 #  endif
 #endif /* !WIN32 */
 
-    temp = fopen(cupsTempFile(tempfile, sizeof(tempfile)), "w");
+    temp = cupsTempFd(tempfile, sizeof(tempfile));
 
-    if (temp == NULL)
+    if (temp < 0)
     {
       fputs("lp: unable to create temporary file.\n", stderr);
       return (1);
     }
 
     while ((i = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
-      fwrite(buffer, 1, i, temp);
+      write(temp, buffer, i);
 
-    i = ftell(temp);
-    fclose(temp);
+    i = lseek(temp, 0, SEEK_CUR);
+    close(temp);
 
     if (i == 0)
     {
@@ -647,5 +647,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.27 2001/01/23 17:36:23 mike Exp $".
+ * End of "$Id: lp.c,v 1.28 2001/02/06 23:40:10 mike Exp $".
  */

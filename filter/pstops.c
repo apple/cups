@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.47 2001/01/24 17:18:57 mike Exp $"
+ * "$Id: pstops.c,v 1.48 2001/02/06 23:40:08 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -88,6 +88,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   const char	*val;		/* Option value */
   char		tempfile[255];	/* Temporary file name */
   FILE		*temp;		/* Temporary file */
+  int		tempfd;		/* Temporary file descriptor */
   int		number;		/* Page number */
   int		slowcollate;	/* 1 if we need to collate manually */
   int		sloworder;	/* 1 if we need to order manually */
@@ -214,7 +215,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if (sloworder || slowcollate)
   {
-    temp = fopen(cupsTempFile(tempfile, sizeof(tempfile)), "wb+");
+    tempfd = cupsTempFd(tempfile, sizeof(tempfile));
+    temp   = fdopen(tempfd, "wb+");
 
     if (temp == NULL)
       slowcollate = sloworder = 0;
@@ -585,6 +587,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   if (slowcollate || sloworder)
   {
     fclose(temp);
+    close(tempfd);
     unlink(tempfile);
   }
 
@@ -912,5 +915,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.47 2001/01/24 17:18:57 mike Exp $".
+ * End of "$Id: pstops.c,v 1.48 2001/02/06 23:40:08 mike Exp $".
  */
