@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.45 2001/06/01 15:09:17 mike Exp $"
+ * "$Id: auth.c,v 1.46 2001/06/05 15:42:35 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -744,16 +744,6 @@ IsAuthorized(client_t *con)	/* I - Connection */
   * Check the user's password...
   */
 
-  pw = getpwnam(con->username);		/* Get the current password */
-  endpwent();				/* Close the password file */
-
-  if (pw == NULL)			/* No such user... */
-  {
-    LogMessage(L_WARN, "IsAuthorized: Unknown username \"%s\"; access denied.",
-               con->username);
-    return (HTTP_UNAUTHORIZED);
-  }
-
   LogMessage(L_DEBUG2, "IsAuthorized: Checking \"%s\", address = %08x, hostname = \"%s\"",
              con->username, address, con->http.hostname);
 
@@ -767,6 +757,20 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
     if (!con->password[0])
       return (HTTP_UNAUTHORIZED);
+
+   /*
+    * Get the user info...
+    */
+
+    pw = getpwnam(con->username);	/* Get the current password */
+    endpwent();				/* Close the password file */
+
+    if (pw == NULL)			/* No such user... */
+    {
+      LogMessage(L_WARN, "IsAuthorized: Unknown username \"%s\"; access denied.",
+        	 con->username);
+      return (HTTP_UNAUTHORIZED);
+    }
 
    /*
     * See if we are doing Digest or Basic authentication...
@@ -846,7 +850,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
       {					/* Don't allow blank passwords! */
 	LogMessage(L_WARN, "IsAuthorized: Username \"%s\" has no shadow password; access denied.",
         	   con->username);
-	return (HTTP_UNAUTHORIZED);		/* No such user or bad shadow file */
+	return (HTTP_UNAUTHORIZED);	/* No such user or bad shadow file */
       }
 
 #    ifdef DEBUG
@@ -858,7 +862,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
       if (spw != NULL && spw->sp_pwdp[0] == '\0' && pw->pw_passwd[0] == '\0')
 #  else
-      if (pw->pw_passwd[0] == '\0')		/* Don't allow blank passwords! */
+      if (pw->pw_passwd[0] == '\0')
 #  endif /* HAVE_SHADOW_H */
       {					/* Don't allow blank passwords! */
 	LogMessage(L_WARN, "IsAuthorized: Username \"%s\" has no password; access denied.",
@@ -1244,5 +1248,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.45 2001/06/01 15:09:17 mike Exp $".
+ * End of "$Id: auth.c,v 1.46 2001/06/05 15:42:35 mike Exp $".
  */
