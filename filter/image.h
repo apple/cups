@@ -1,5 +1,5 @@
 /*
- * "$Id: image.h,v 1.1 1995/07/04 22:16:59 mike Exp $"
+ * "$Id: image.h,v 1.2 1995/10/10 01:20:26 mike Exp $"
  *
  *   Image file definitions for espPrint, a collection of printer/image
  *   software.
@@ -15,9 +15,17 @@
  * Revision History:
  *
  *   $Log: image.h,v $
- *   Revision 1.1  1995/07/04 22:16:59  mike
- *   Initial revision
+ *   Revision 1.2  1995/10/10 01:20:26  mike
+ *   Converted to C++, because everyone knows that C++ is better than ANSI C.
+ *   (read LOTS of sarcasm there)
  *
+ *   The C++ version doesn't require il_eoe.sw.c, which is not loaded by
+ *   default.
+ *
+ *   Fixed the image scaling for rotated images.
+ *
+ *   Revision 1.1  1995/07/04  22:16:59  mike
+ *   Initial revision
  */
 
 #ifndef _IMAGE_H_
@@ -30,7 +38,15 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
-# include <il/ilCdefs.h>
+# include <il/ilDefs.h>
+# include <il/ilGenericImgFile.h>
+# include <il/ilCoord.h>
+# include <il/ilColor.h>
+# include <il/ilImage.h>
+# include <il/ilRGBImg.h>
+# include <il/ilCMYKImg.h>
+# include <il/ilConfig.h>
+# include <il/ilConfigure.h>
 
 
 /*
@@ -44,7 +60,7 @@ typedef struct
 		pdepth,		/* Number of components per pixel */
 		ldepth,		/* Number of components per line */
 		idepth;		/* Number of components per image */
-  ilCoordSpace	type;		/* Colorspace of image */
+  ilColorModel	type;		/* Colorspace of image */
   unsigned char	*pixels;	/* Pixel data */
 } IMAGE;
 
@@ -82,12 +98,14 @@ extern IMAGE	*ImageLoad(char *filename, ilColorModel type, ilOrder order,
 		           int *channels);
 extern void	ImageFree(IMAGE *ip);
 
-extern ZOOM	*ZoomAlloc(IMAGE *ip, int xsize, int ysize, int rotated);
+extern ZOOM	*ZoomAlloc(IMAGE *ip, int x0, int y0, int x1, int y1,
+		           int xsize, int ysize, int rotated);
 extern void	ZoomFill(ZOOM *z, int row, int idepth);
+extern void	ZoomQFill(ZOOM *z, int row, int idepth);
 extern void	ZoomFree(ZOOM *z);
 
 #endif /* !_IMAGE_H_ */
 
 /*
- * End of "$Id: image.h,v 1.1 1995/07/04 22:16:59 mike Exp $".
+ * End of "$Id: image.h,v 1.2 1995/10/10 01:20:26 mike Exp $".
  */
