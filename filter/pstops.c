@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.4 1998/01/15 15:35:22 mike Exp $"
+ * "$Id: pstops.c,v 1.5 1998/12/16 16:35:25 mike Exp $"
  *
  *   PostScript filter for espPrint, a collection of printer drivers.
  *
@@ -17,7 +17,10 @@
  * Revision History:
  *
  *   $Log: pstops.c,v $
- *   Revision 1.4  1998/01/15 15:35:22  mike
+ *   Revision 1.5  1998/12/16 16:35:25  mike
+ *   Updated to support landscape 2-up and 4-up printing.
+ *
+ *   Revision 1.4  1998/01/15  15:35:22  mike
  *   Updated gamma/brightness code to support full CMYK.
  *   Fixed to not disable settransfer and setcolortransfer.
  *   Fixed to not redefine settransfer and setcolortransfer (damn Adobe!)
@@ -243,7 +246,7 @@ scan_file(FILE *fp)
       else if (strncmp(line, "%%Page:", 7) == 0 && doclevel < 0)
       {
 	if (Verbosity)
-	  fprintf(stderr, "psfilter: Page %d begins at offset %d\n",
+	  fprintf(stderr, "psfilter: Page %d begins at offset %u\n",
 	          PrintNumPages + 2, PrintPages[PrintNumPages]);
 
 	PrintNumPages ++;
@@ -291,30 +294,37 @@ make_transfer_function(char  *s,	/* O - Transfer function string */
   if (ig == 0.0)
     ig = LutDefaultGamma();
 
-  if (ig == 1.0 &&
-      ib == 1.0 &&
-      pg == 1.0 &&
-      pd == 1.0)
+  if ((ig == 1.0 || ig == 0.0) &&
+      (ib == 1.0 || ib == 0.0) &&
+      (pg == 1.0 || pg == 0.0) &&
+      (pd == 1.0 || pd == 0.0))
   {
     s[0] = '\0';
     return;
   };
 
-  strcpy(s, "neg 1 add");
+  if (ig != 1.0 && ig != 0.0)
+    sprintf(s, "%.4f exp ", 1.0 / ig);
+  else
+    s[0] = '\0';
 
-  if (ig != 1.0)
-    sprintf(s + strlen(s), " %.2f exp", ig);
+  if (ib != 1.0 || ib != 0.0 ||
+      pg != 1.0 || pg != 0.0 ||
+      pd != 1.0 || pd != 0.0)
+  {
+    strcat(s, "neg 1 add ");
 
-  if (ib != 1.0)
-    sprintf(s + strlen(s), " %.2f mul", ib);
+    if (ib != 1.0 && ib != 0.0)
+      sprintf(s + strlen(s), "%.2f mul ", ib);
 
-  if (pg != 1.0)
-    sprintf(s + strlen(s), " %.4f exp", 1.0 / pg);
+    if (pg != 1.0 && pg != 0.0)
+      sprintf(s + strlen(s), "%.4f exp ", 1.0 / pg);
 
-  if (pd != 1.0)
-    sprintf(s + strlen(s), " %.4f mul", pd);
+    if (pd != 1.0 && pd != 0.0)
+      sprintf(s + strlen(s), "%.4f mul ", pd);
 
-  strcat(s, " neg 1 add");
+    strcat(s, "neg 1 add");
+  };
 }
 
 
@@ -323,8 +333,8 @@ make_transfer_function(char  *s,	/* O - Transfer function string */
  */
 
 void
-print_header(float gammaval[2],
-             int   brightness[2])
+print_header(float gammaval[4],
+             int   brightness[4])
 {
   char	cyan[255],
 	magenta[255],
@@ -370,7 +380,7 @@ print_header(float gammaval[2],
     */
 
     printf("{ %s } bind\n"
-           "setcolortransfer\n",
+           "settransfer\n",
            black);
   };
 
@@ -386,7 +396,8 @@ void
 print_file(char  *filename,
            float gammaval[4],
            int   brightness[4],
-           int   nup)
+           int   nup,
+	   int   landscape)
 {
   FILE	*fp;
   int	number,
@@ -443,16 +454,32 @@ print_file(char  *filename,
         break;
 
     case 2 :
-        l = (float)PrintWidth;
-        w = l * (float)PrintWidth / (float)PrintLength;
-        if (w > ((float)PrintLength * 0.5))
-        {
-          w = (float)PrintLength * 0.5;
+        if (landscape)
+	{
+          w = (float)PrintLength;
           l = w * (float)PrintLength / (float)PrintWidth;
-        };
+          if (l > ((float)PrintWidth * 0.5))
+          {
+            l = (float)PrintWidth * 0.5;
+            w = l * (float)PrintWidth / (float)PrintLength;
+          };
 
-        tx = (float)PrintLength * 0.5 - w;
-        ty = ((float)PrintWidth - l) * 0.5;
+          tx = (float)PrintWidth * 0.5 - l;
+          ty = ((float)PrintLength - w) * 0.5;
+        }
+	else
+	{
+          l = (float)PrintWidth;
+          w = l * (float)PrintWidth / (float)PrintLength;
+          if (w > ((float)PrintLength * 0.5))
+          {
+            w = (float)PrintLength * 0.5;
+            l = w * (float)PrintLength / (float)PrintWidth;
+          };
+
+          tx = (float)PrintLength * 0.5 - w;
+          ty = ((float)PrintWidth - l) * 0.5;
+        }
 
         puts("userdict begin\n"
              "/ESPshowpage /showpage load def\n"
@@ -461,16 +488,22 @@ print_file(char  *filename,
 
         copy_bytes(fp, PrintPages[0]);
 
-        for (x = 0; number != endpage;)
+        for (x = landscape; number != endpage;)
         {
           puts("gsave");
           printf("%d 0.0 translate\n"
                  "90 rotate\n",
                  PrintWidth);
-          printf("%f %f translate\n"
-                 "%f %f scale\n",
-                 tx + w * x, ty,
-                 w / (float)PrintWidth, l / (float)PrintLength);
+          if (landscape)
+            printf("%f %f translate\n"
+                   "%f %f scale\n",
+                   ty, tx + l * x,
+                   w / (float)PrintWidth, l / (float)PrintLength);
+          else
+            printf("%f %f translate\n"
+                   "%f %f scale\n",
+                   tx + w * x, ty,
+                   w / (float)PrintWidth, l / (float)PrintLength);
           printf("newpath\n"
                  "0 0 moveto\n"
                  "%d 0 lineto\n"
@@ -491,11 +524,11 @@ print_file(char  *filename,
 
           puts("grestore");
 
-          if (x == 0)
+          if (x == landscape)
             puts("ESPshowpage");
         };
 
-        if (x)
+        if (x != landscape)
           puts("ESPshowpage");
         break;
 
@@ -572,7 +605,7 @@ usage(void)
  * 'main()' - Main entry...
  */
 
-void
+int
 main(int  argc,
      char *argv[])
 {
@@ -584,6 +617,7 @@ main(int  argc,
   float			gammaval[4];
   int			brightness[4];
   int			nup;
+  int			landscape;
   PDInfoStruct		*info;
   PDSizeTableStruct	*size;
   time_t		modtime;
@@ -598,7 +632,8 @@ main(int  argc,
   brightness[2] = 100;
   brightness[3] = 100;
 
-  nup = 1;
+  nup       = 1;
+  landscape = 0;
 
   for (i = 1, nfiles = 0; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -624,6 +659,10 @@ main(int  argc,
 
 	      memcpy(ColorProfile, info->active_status->color_profile,
 	             sizeof(ColorProfile));
+              break;
+
+          case 'l' : /* Landscape printing... */
+              landscape = 1;
               break;
 
           case '1' : /* 1-up printing... */
@@ -704,6 +743,13 @@ main(int  argc,
         }
     else
     {
+      if (landscape && nfiles == 0)
+      {
+	n           = PrintWidth;
+	PrintWidth  = PrintLength;
+	PrintLength = n;
+      };
+
       if (nup == 1 && PrintEvenPages && PrintOddPages && PrintRange == NULL &&
 	  !PrintReversed)
       {
@@ -727,7 +773,7 @@ main(int  argc,
         * Filter the file as necessary...
         */
 
-        print_file(argv[i], gammaval, brightness, nup);
+        print_file(argv[i], gammaval, brightness, nup, landscape);
       };
 
       nfiles ++;
@@ -735,6 +781,13 @@ main(int  argc,
 
   if (nfiles == 0)
   {
+    if (landscape)
+    {
+      n           = PrintWidth;
+      PrintWidth  = PrintLength;
+      PrintLength = n;
+    };
+
     if (nup == 1 && PrintEvenPages && PrintOddPages && PrintRange == NULL &&
 	!PrintReversed)
     {
@@ -760,14 +813,16 @@ main(int  argc,
 	fputs(buffer, temp);
       fclose(temp);
 
-      print_file(tempfile, gammaval, brightness, nup);
+      print_file(tempfile, gammaval, brightness, nup, landscape);
 
       unlink(tempfile);
     };
   };
+
+  return (NO_ERROR);
 }
 
 
 /*
- * End of "$Id: pstops.c,v 1.4 1998/01/15 15:35:22 mike Exp $".
+ * End of "$Id: pstops.c,v 1.5 1998/12/16 16:35:25 mike Exp $".
  */
