@@ -464,40 +464,25 @@ CUPS supports 1, 2, 4, 6, 9, and 16-Up formats; the default format is
 to draw around each page:
 
 <UL>
-
 	<LI><CODE>-o number-up-border=double</CODE>; draw two hairline borders around each page</LI>
-
 	<LI><CODE>-o number-up-border=double-thick</CODE>; draw two 1pt borders around each page</LI>
-
 	<LI><CODE>-o number-up-border=none</CODE>; do not draw a border (default)</LI>
-
 	<LI><CODE>-o number-up-border=single</CODE>; draw one hairline border around each page</LI>
-
 	<LI><CODE>-o number-up-border=single-thick</CODE>; draw one 1pt border around each page</LI>
-
 </UL>
 
 <P>The <CODE>-o number-up-layout=value</CODE> option chooses the layout
 of the pages on each output page:
 
 <UL>
-
 	<LI><CODE>-o number-up-layout=btlr</CODE>; Bottom to top, left to right</LI>
-
 	<LI><CODE>-o number-up-layout=btrl</CODE>; Bottom to top, right to left</LI>
-
 	<LI><CODE>-o number-up-layout=lrbt</CODE>; Left to right, bottom to top</LI>
-
 	<LI><CODE>-o number-up-layout=lrtb</CODE>; Left to right, top to bottom (default)</LI>
-
 	<LI><CODE>-o number-up-layout=rlbt</CODE>; Right to left, bottom to top</LI>
-
 	<LI><CODE>-o number-up-layout=rltb</CODE>; Right to left, top to bottom</LI>
-
 	<LI><CODE>-o number-up-layout=tblr</CODE>; Top to bottom, left to right</LI>
-
 	<LI><CODE>-o number-up-layout=tbrl</CODE>; Top to bottom, right to left</LI>
-
 </UL>
 
 <H3>Setting the Brightness</H3>
