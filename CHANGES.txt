@@ -113,6 +113,8 @@ CHANGES IN CUPS V1.1.9
 	- The lp command didn't send the right value for the
 	  job-hold-until attribute when "-H resume" was
 	  specified.
+	- The IPP backend now returns as soon as a job is
+	  completed or reported as "pending-held".
 
 
 CHANGES IN CUPS V1.1.8

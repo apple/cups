@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.46 2001/06/21 15:33:08 mike Exp $"
+ * "$Id: ipp.c,v 1.47 2001/06/22 11:35:51 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -579,10 +579,11 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       else if ((job_state = ippFindAttribute(response, "job-state", IPP_TAG_ENUM)) != NULL)
       {
        /*
-        * Stop polling if the job is finished...
+        * Stop polling if the job is finished or pending-held...
 	*/
 
-        if (job_state->values[0].integer > IPP_JOB_PROCESSING)
+        if (job_state->values[0].integer > IPP_JOB_PROCESSING ||
+	    job_state->values[0].integer == IPP_JOB_HELD)
 	{
 	  ippDelete(response);
 	  break;
@@ -641,5 +642,5 @@ password_cb(const char *prompt)	/* I - Prompt (not used) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.46 2001/06/21 15:33:08 mike Exp $".
+ * End of "$Id: ipp.c,v 1.47 2001/06/22 11:35:51 mike Exp $".
  */
