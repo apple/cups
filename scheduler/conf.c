@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.50 2004/04/20 13:40:30 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.51 2004/05/13 20:22:01 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -1230,9 +1230,13 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	if (value[0] == '*')
 	  value ++;
 
+        strlcpy(name, value, sizeof(name));
+	if ((nameptr = strchr(name, ' ')) != NULL)
+	  *nameptr = '\0';
+
         relay->from.type             = AUTH_NAME;
-	relay->from.mask.name.name   = strdup(value);
-	relay->from.mask.name.length = strlen(value);
+	relay->from.mask.name.name   = strdup(name);
+	relay->from.mask.name.length = strlen(name);
       }
       else
       {
@@ -2305,5 +2309,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.50 2004/04/20 13:40:30 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.51 2004/05/13 20:22:01 mike Exp $".
  */

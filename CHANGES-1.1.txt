@@ -3,6 +3,12 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The scheduler did not properly parse name-based
+	  BrowseRelay directives in the cupsd.conf file (STR
+	  #711)
+	- The IPP backend now supports the following options in
+	  the device URI: encryption, waitjob, and waitprinter
+	  (STR #699)
 	- The parallel, serial, socket, and USB backends did not
 	  return a non-zero exit status when a job failed to
 	  print in the middle of sending it (STR #715)
