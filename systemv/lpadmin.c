@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.1 1999/05/19 18:01:01 mike Exp $"
+ * "$Id: lpadmin.c,v 1.2 1999/05/20 14:19:38 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -31,6 +31,7 @@
  *   set_printer_device()        - Set the device-uri attribute.
  *   set_printer_file()          - Set the interface script or PPD file.
  *   set_printer_info()          - Set the printer description string.
+ *   set_printer_location()      - Set the printer location string.
  */
 
 /*
@@ -57,6 +58,7 @@ static void	delete_printer_from_class(http_t *, char *, char *);
 static void	set_printer_device(http_t *, char *, char *);
 static void	set_printer_file(http_t *, char *, char *);
 static void	set_printer_info(http_t *, char *, char *);
+static void	set_printer_location(http_t *, char *, char *);
 
 
 /*
@@ -222,6 +224,23 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    {
 	      i ++;
 	      set_printer_info(http, printer, argv[i]);
+	    }
+	    break;
+
+        case 'L' : /* Set the printer-location attribute */
+	    if (printer == NULL)
+	    {
+	      fputs("lpadmin: Unable to set the printer location:\n", stderr);
+	      fputs("         You must specify a printer name first!\n", stderr);
+	      return (1);
+	    }
+
+	    if (argv[i][2])
+	      set_printer_location(http, printer, argv[i] + 2);
+	    else
+	    {
+	      i ++;
+	      set_printer_location(http, printer, argv[i]);
 	    }
 	    break;
 
@@ -859,5 +878,65 @@ set_printer_info(http_t *http,		/* I - Server connection */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.1 1999/05/19 18:01:01 mike Exp $".
+ * 'set_printer_location()' - Set the printer location string.
+ */
+
+static void
+set_printer_location(http_t *http,	/* I - Server connection */
+                     char   *printer,	/* I - Printer */
+		     char   *location)	/* I - New location string */
+{
+  ipp_t		*request,		/* IPP Request */
+		*response;		/* IPP Response */
+  cups_lang_t	*language;		/* Default language */
+  char		uri[HTTP_MAX_URI];	/* URI for printer/class */
+
+
+ /*
+  * Build a CUPS_ADD_PRINTER request, which requires the following
+  * attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  *    printer-uri
+  */
+
+  sprintf(uri, "ipp://localhost/printers/%s", printer);
+
+  request = ippNew();
+
+  request->request.op.operation_id = CUPS_ADD_PRINTER;
+  request->request.op.request_id   = 1;
+
+  language = cupsLangDefault();
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
+               "printer-uri", NULL, uri);
+
+ /*
+  * Add the location string...
+  */
+
+  ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-location", NULL,
+               location);
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  if ((response = cupsDoRequest(http, request, "/admin/")) == NULL)
+    fputs("lpadmin: Unable to set printer-location attribute!\n", stderr);
+  else
+    ippDelete(response);
+}
+
+
+/*
+ * End of "$Id: lpadmin.c,v 1.2 1999/05/20 14:19:38 mike Exp $".
  */
