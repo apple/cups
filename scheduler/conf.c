@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.52 2000/07/17 12:32:00 mike Exp $"
+ * "$Id: conf.c,v 1.53 2000/07/31 16:51:03 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -358,6 +358,20 @@ ReadConfiguration(void)
 
   LogMessage(L_DEBUG, "ReadConfiguration() ConfigurationFile=\"%s\"",
              ConfigurationFile);
+
+ /*
+  * Make sure the request and temporary directories have the right
+  * permissions...
+  */
+
+  chown(RequestRoot, User, Group);
+  chmod(RequestRoot, 0700);
+
+  if (strncmp(TempDir, RequestRoot, strlen(RequestRoot)) == 0)
+  {
+    chown(TempDir, User, Group);
+    chmod(TempDir, 01700);
+  }
 
  /*
   * Check the MaxClients setting, and then allocate memory for it...
@@ -1395,5 +1409,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.52 2000/07/17 12:32:00 mike Exp $".
+ * End of "$Id: conf.c,v 1.53 2000/07/31 16:51:03 mike Exp $".
  */
