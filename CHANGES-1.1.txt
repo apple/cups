@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.23
 
+	- Updated the Spanish man pages (STR #1041)
+	- The lpstat man page contained a typo (STR #1040)
+	- The scheduler's is_path_absolute() code could cause a
+	  DoS (STR #1042)
 	- The scheduler's device loading code used the wrong
 	  size limits for the make/model and info parameters
 	  (STR #1035)

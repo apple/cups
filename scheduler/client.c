@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.96 2004/10/04 19:48:56 mike Exp $"
+ * "$Id: client.c,v 1.91.2.97 2005/01/03 18:48:04 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2853,8 +2853,12 @@ is_path_absolute(const char *path)	/* I - Input path */
   */
 
   while ((path = strstr(path, "/..")) != NULL)
+  {
     if (!path[3] || path[3] == '/')
       return (0);
+
+    path ++;
+  }
 
  /*
   * If we haven't found any relative paths, return 1 indicating an
@@ -3424,5 +3428,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.96 2004/10/04 19:48:56 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.97 2005/01/03 18:48:04 mike Exp $".
  */
