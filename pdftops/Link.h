@@ -2,7 +2,7 @@
 //
 // Link.h
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -63,10 +63,8 @@ enum LinkDestKind {
 class LinkDest {
 public:
 
-  // Build a LinkDest from the array.  If <pageIsRef> is true, the
-  // page is specified by an object reference; otherwise the page is
-  // specified by a (zero-relative) page number.
-  LinkDest(Array *a, GBool pageIsRef1);
+  // Build a LinkDest from the array.
+  LinkDest(Array *a);
 
   // Copy a LinkDest.
   LinkDest *copy() { return new LinkDest(this); }

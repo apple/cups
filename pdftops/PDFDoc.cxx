@@ -2,7 +2,7 @@
 //
 // PDFDoc.cc
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -10,6 +10,7 @@
 #pragma implementation
 #endif
 
+#include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -22,8 +23,8 @@
 #include "XRef.h"
 #include "Link.h"
 #include "OutputDev.h"
-#include "Params.h"
 #include "Error.h"
+#include "ErrorCodes.h"
 #include "Lexer.h"
 #include "Parser.h"
 #include "PDFDoc.h"
@@ -43,6 +44,7 @@ PDFDoc::PDFDoc(GString *fileNameA, GString *ownerPassword,
   GString *fileName2;
 
   ok = gFalse;
+  errCode = errNone;
 
   file = NULL;
   str = NULL;
@@ -57,6 +59,7 @@ PDFDoc::PDFDoc(GString *fileNameA, GString *ownerPassword,
 #ifdef VMS
   if (!(file = fopen(fileName->getCString(), "rb", "ctx=stm"))) {
     error(-1, "Couldn't open file '%s'", fileName->getCString());
+    errCode = errOpenFile;
     return;
   }
 #else
@@ -68,6 +71,7 @@ PDFDoc::PDFDoc(GString *fileNameA, GString *ownerPassword,
       if (!(file = fopen(fileName2->getCString(), "rb"))) {
 	error(-1, "Couldn't open file '%s'", fileName->getCString());
 	delete fileName2;
+	errCode = errOpenFile;
 	return;
       }
     }
@@ -77,7 +81,7 @@ PDFDoc::PDFDoc(GString *fileNameA, GString *ownerPassword,
 
   // create stream
   obj.initNull();
-  str = new FileStream(file, 0, -1, &obj);
+  str = new FileStream(file, 0, gFalse, 0, &obj);
 
   ok = setup(ownerPassword, userPassword);
 }
@@ -85,6 +89,7 @@ PDFDoc::PDFDoc(GString *fileNameA, GString *ownerPassword,
 PDFDoc::PDFDoc(BaseStream *strA, GString *ownerPassword,
 	       GString *userPassword, GBool printCommandsA) {
   ok = gFalse;
+  errCode = errNone;
   fileName = NULL;
   file = NULL;
   str = strA;
@@ -103,6 +108,7 @@ GBool PDFDoc::setup(GString *ownerPassword, GString *userPassword) {
   xref = new XRef(str, ownerPassword, userPassword);
   if (!xref->isOk()) {
     error(-1, "Couldn't read xref table");
+    errCode = xref->getErrorCode();
     return gFalse;
   }
 
@@ -110,6 +116,7 @@ GBool PDFDoc::setup(GString *ownerPassword, GString *userPassword) {
   catalog = new Catalog(xref, printCommands);
   if (!catalog->isOk()) {
     error(-1, "Couldn't read page catalog");
+    errCode = errBadCatalog;
     return gFalse;
   }
 
@@ -204,8 +211,9 @@ GBool PDFDoc::isLinearized() {
 
   lin = gFalse;
   obj1.initNull();
-  parser = new Parser(xref, new Lexer(xref, str->makeSubStream(str->getStart(),
-							       -1, &obj1)));
+  parser = new Parser(xref,
+	     new Lexer(xref,
+	       str->makeSubStream(str->getStart(), gFalse, 0, &obj1)));
   parser->getObj(&obj1);
   parser->getObj(&obj2);
   parser->getObj(&obj3);

@@ -2,7 +2,7 @@
 //
 // Gfx.h
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -24,7 +24,6 @@ class Dict;
 class OutputDev;
 class GfxFontDict;
 class GfxFont;
-struct GfxFontEncoding16;
 class GfxPattern;
 class GfxShading;
 class GfxAxialShading;
@@ -99,21 +98,31 @@ public:
       PDFRectangle *box, GBool crop, PDFRectangle *cropBox, int rotate,
       GBool printCommandsA);
 
-  // Destructor.
+  // Constructor for a sub-page object.
+  Gfx(XRef *xrefA, OutputDev *outA, Dict *resDict,
+      PDFRectangle *box, GBool crop, PDFRectangle *cropBox);
+
   ~Gfx();
 
   // Interpret a stream or array of streams.
   void display(Object *obj, GBool topLevel = gTrue);
 
-  void doWidgetForm(Object *str, double xMin, double yMin,
-		    double xMax, double yMax);
+  // Display an annotation, given its appearance (a Form XObject) and
+  // bounding box (in default user space).
+  void doAnnot(Object *str, double xMin, double yMin,
+	       double xMax, double yMax);
+
+  void pushResources(Dict *resDict);
+  void popResources();
 
 private:
 
   XRef *xref;			// the xref table for this PDF file
   OutputDev *out;		// output device
+  GBool subPage;		// is this a sub-page object?
   GBool printCommands;		// print the drawing commands (for debugging)
   GfxResources *res;		// resource stack
+  int updateLevel;
 
   GfxState *state;		// current graphics state
   GBool fontChanged;		// set if font or text matrix has changed
@@ -213,7 +222,6 @@ private:
   void opMoveSetShowText(Object args[], int numArgs);
   void opShowSpaceText(Object args[], int numArgs);
   void doShowText(GString *s);
-  int getNextChar16(GfxFontEncoding16 *enc, Guchar *p, int *c16);
 
   // XObject operators
   void opXObject(Object args[], int numArgs);

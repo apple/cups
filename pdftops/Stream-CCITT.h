@@ -4,7 +4,7 @@
 //
 // Tables for CCITT Fax decoding.
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 

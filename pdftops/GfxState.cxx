@@ -2,7 +2,7 @@
 //
 // GfxState.cc
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -10,6 +10,7 @@
 #pragma implementation
 #endif
 
+#include <config.h>
 #include <stddef.h>
 #include <math.h>
 #include <string.h> // for memcpy()
@@ -407,9 +408,22 @@ void GfxDeviceCMYKColorSpace::getGray(GfxColor *color, double *gray) {
 }
 
 void GfxDeviceCMYKColorSpace::getRGB(GfxColor *color, GfxRGB *rgb) {
-  rgb->r = clip01(1 - (color->c[0] + color->c[3]));
-  rgb->g = clip01(1 - (color->c[1] + color->c[3]));
-  rgb->b = clip01(1 - (color->c[2] + color->c[3]));
+  double c, m, y, aw, ac, am, ay, ar, ag, ab;
+
+  c = clip01(color->c[0] + color->c[3]);
+  m = clip01(color->c[1] + color->c[3]);
+  y = clip01(color->c[2] + color->c[3]);
+  aw = (1-c) * (1-m) * (1-y);
+  ac = c * (1-m) * (1-y);
+  am = (1-c) * m * (1-y);
+  ay = (1-c) * (1-m) * y;
+  ar = (1-c) * m * y;
+  ag = c * (1-m) * y;
+  ab = c * m * (1-y);
+  rgb->r = clip01(aw + 0.9137*am + 0.9961*ay + 0.9882*ar);
+  rgb->g = clip01(aw + 0.6196*ac + ay + 0.5176*ag);
+  rgb->b = clip01(aw + 0.7804*ac + 0.5412*am + 0.0667*ar + 0.2118*ag +
+		  0.4863*ab);
 }
 
 void GfxDeviceCMYKColorSpace::getCMYK(GfxColor *color, GfxCMYK *cmyk) {
@@ -915,15 +929,10 @@ GfxColorSpace *GfxSeparationColorSpace::parse(Array *arr) {
   if (!(funcA = Function::parse(&obj1))) {
     goto err4;
   }
-  if (!funcA->isOk()) {
-    goto err5;
-  }
   obj1.free();
   cs = new GfxSeparationColorSpace(nameA, altA, funcA);
   return cs;
 
- err5:
-  delete funcA;
  err4:
   delete altA;
  err3:
@@ -1027,9 +1036,6 @@ GfxColorSpace *GfxDeviceNColorSpace::parse(Array *arr) {
   if (!(funcA = Function::parse(&obj1))) {
     goto err4;
   }
-  if (!funcA->isOk()) {
-    goto err5;
-  }
   obj1.free();
   cs = new GfxDeviceNColorSpace(nCompsA, altA, funcA);
   for (i = 0; i < nCompsA; ++i) {
@@ -1037,8 +1043,6 @@ GfxColorSpace *GfxDeviceNColorSpace::parse(Array *arr) {
   }
   return cs;
 
- err5:
-  delete funcA;
  err4:
   delete altA;
  err3:
@@ -1277,10 +1281,6 @@ GfxShading *GfxShading::parse(Object *obj) {
     }
     typeA = obj1.getInt();
     obj1.free();
-    if (typeA < 2 || typeA > 3) {
-      error(-1, "Unimplemented shading type %d", typeA);
-      goto err1;
-    }
 
     obj->dictLookup("ColorSpace", &obj1);
     if (!(colorSpaceA = GfxColorSpace::parse(&obj1))) {
@@ -1326,10 +1326,17 @@ GfxShading *GfxShading::parse(Object *obj) {
     }
     obj1.free();
 
-    if (typeA == 2)
+    switch (typeA) {
+    case 2:
       shading = GfxAxialShading::parse(obj->getDict());
-    else
+      break;
+    case 3:
       shading = GfxRadialShading::parse(obj->getDict());
+      break;
+    default:
+      error(-1, "Unimplemented shading type %d", typeA);
+      goto err1;
+    }
 
     if (shading) {
       shading->type = typeA;
@@ -1341,6 +1348,8 @@ GfxShading *GfxShading::parse(Object *obj) {
       shading->xMax = xMaxA;
       shading->yMax = yMaxA;
       shading->hasBBox = hasBBoxA;
+    } else {
+      delete colorSpaceA;
     }
   }
 
@@ -1440,11 +1449,6 @@ GfxAxialShading *GfxAxialShading::parse(Dict *dict) {
     }
   }
   obj1.free();
-  for (i = 0; i < nFuncsA; ++i) {
-    if (!funcsA[i]->isOk()) {
-      goto err2;
-    }
-  }
 
   extend0A = extend1A = gFalse;
   if (dict->lookup("Extend", &obj1)->isArray() &&
@@ -1459,10 +1463,6 @@ GfxAxialShading *GfxAxialShading::parse(Dict *dict) {
   return new GfxAxialShading(x0A, y0A, x1A, y1A, t0A, t1A,
 			     funcsA, nFuncsA, extend0A, extend1A);
 
- err2:
-  for (i = 0; i < nFuncsA; ++i) {
-    delete funcsA[i];
-  }
  err1:
   return NULL;
 }
@@ -1656,18 +1656,6 @@ GfxImageColorMap::GfxImageColorMap(int bitsA, Object *decode,
   } else {
     goto err1;
   }
-
-#if 0 //~
-  // handle the case where fewer than 2^n palette entries of an n-bit
-  // indexed color space are populated (this happens, e.g., in files
-  // optimized by Distiller)
-  if (colorSpace->getMode() == csIndexed) {
-    i = ((GfxIndexedColorSpace *)colorSpace)->getIndexHigh();
-    if (i < maxPixel) {
-      maxPixel = i;
-    }
-  }
-#endif
 
   // Construct a lookup table -- this stores pre-computed decoded
   // values for each component, i.e., the result of applying the
@@ -1927,6 +1915,21 @@ void GfxPath::curveTo(double x1, double y1, double x2, double y2,
   subpaths[n-1]->curveTo(x1, y1, x2, y2, x3, y3);
 }
 
+void GfxPath::close() {
+  // this is necessary to handle the pathological case of
+  // moveto/closepath/clip, which defines an empty clipping region
+  if (justMoved) {
+    if (n >= size) {
+      size += 16;
+      subpaths = (GfxSubpath **)
+	           grealloc(subpaths, size * sizeof(GfxSubpath *));
+    }
+    subpaths[n] = new GfxSubpath(firstX, firstY);
+    ++n;
+    justMoved = gFalse;
+  }
+  subpaths[n-1]->close();
+}
 
 //------------------------------------------------------------------------
 // GfxState
@@ -2035,7 +2038,10 @@ GfxState::~GfxState() {
     delete strokePattern;
   }
   gfree(lineDash);
-  delete path;
+  if (path) {
+    // this gets set to NULL by restore()
+    delete path;
+  }
   if (saved) {
     delete saved;
   }
@@ -2060,8 +2066,68 @@ GfxState::GfxState(GfxState *state) {
     lineDash = (double *)gmalloc(lineDashLength * sizeof(double));
     memcpy(lineDash, state->lineDash, lineDashLength * sizeof(double));
   }
-  path = state->path->copy();
   saved = NULL;
+}
+
+void GfxState::getUserClipBBox(double *xMin, double *yMin,
+			       double *xMax, double *yMax) {
+  double ictm[6];
+  double xMin1, yMin1, xMax1, yMax1, det, tx, ty;
+
+  // invert the CTM
+  det = 1 / (ctm[0] * ctm[3] - ctm[1] * ctm[2]);
+  ictm[0] = ctm[3] * det;
+  ictm[1] = -ctm[1] * det;
+  ictm[2] = -ctm[2] * det;
+  ictm[3] = ctm[0] * det;
+  ictm[4] = (ctm[2] * ctm[5] - ctm[3] * ctm[4]) * det;
+  ictm[5] = (ctm[1] * ctm[4] - ctm[0] * ctm[5]) * det;
+
+  // transform all four corners of the clip bbox; find the min and max
+  // x and y values
+  xMin1 = xMax1 = clipXMin * ictm[0] + clipYMin * ictm[2] + ictm[4];
+  yMin1 = yMax1 = clipXMin * ictm[1] + clipYMin * ictm[3] + ictm[5];
+  tx = clipXMin * ictm[0] + clipYMax * ictm[2] + ictm[4];
+  ty = clipXMin * ictm[1] + clipYMax * ictm[3] + ictm[5];
+  if (tx < xMin1) {
+    xMin1 = tx;
+  } else if (tx > xMax1) {
+    xMax1 = tx;
+  }
+  if (ty < yMin1) {
+    yMin1 = ty;
+  } else if (ty > yMax1) {
+    yMax1 = ty;
+  }
+  tx = clipXMax * ictm[0] + clipYMin * ictm[2] + ictm[4];
+  ty = clipXMax * ictm[1] + clipYMin * ictm[3] + ictm[5];
+  if (tx < xMin1) {
+    xMin1 = tx;
+  } else if (tx > xMax1) {
+    xMax1 = tx;
+  }
+  if (ty < yMin1) {
+    yMin1 = ty;
+  } else if (ty > yMax1) {
+    yMax1 = ty;
+  }
+  tx = clipXMax * ictm[0] + clipYMax * ictm[2] + ictm[4];
+  ty = clipXMax * ictm[1] + clipYMax * ictm[3] + ictm[5];
+  if (tx < xMin1) {
+    xMin1 = tx;
+  } else if (tx > xMax1) {
+    xMax1 = tx;
+  }
+  if (ty < yMin1) {
+    yMin1 = ty;
+  } else if (ty > yMax1) {
+    yMax1 = ty;
+  }
+
+  *xMin = xMin1;
+  *yMin = yMin1;
+  *xMax = xMax1;
+  *yMax = yMax1;
 }
 
 double GfxState::transformWidth(double w) {
@@ -2092,12 +2158,23 @@ void GfxState::getFontTransMat(double *m11, double *m12,
 
 void GfxState::setCTM(double a, double b, double c,
 		      double d, double e, double f) {
+  int i;
+
   ctm[0] = a;
   ctm[1] = b;
   ctm[2] = c;
   ctm[3] = d;
   ctm[4] = e;
   ctm[5] = f;
+
+  // avoid FP exceptions on badly messed up PDF files
+  for (i = 0; i < 6; ++i) {
+    if (ctm[i] > 1e10) {
+      ctm[i] = 1e10;
+    } else if (ctm[i] < -1e10) {
+      ctm[i] = -1e10;
+    }
+  }
 }
 
 void GfxState::concatCTM(double a, double b, double c,
@@ -2106,6 +2183,7 @@ void GfxState::concatCTM(double a, double b, double c,
   double b1 = ctm[1];
   double c1 = ctm[2];
   double d1 = ctm[3];
+  int i;
 
   ctm[0] = a * a1 + b * c1;
   ctm[1] = a * b1 + b * d1;
@@ -2113,6 +2191,15 @@ void GfxState::concatCTM(double a, double b, double c,
   ctm[3] = c * b1 + d * d1;
   ctm[4] = e * a1 + f * c1 + ctm[4];
   ctm[5] = e * b1 + f * d1 + ctm[5];
+
+  // avoid FP exceptions on badly messed up PDF files
+  for (i = 0; i < 6; ++i) {
+    if (ctm[i] > 1e10) {
+      ctm[i] = 1e10;
+    } else if (ctm[i] < -1e10) {
+      ctm[i] = -1e10;
+    }
+  }
 }
 
 void GfxState::setFillColorSpace(GfxColorSpace *colorSpace) {
@@ -2197,18 +2284,15 @@ void GfxState::clip() {
   }
 }
 
-void GfxState::textShift(double tx) {
-  double dx, dy;
-
-  textTransformDelta(tx, 0, &dx, &dy);
-  curX += dx;
-  curY += dy;
-}
-
 void GfxState::textShift(double tx, double ty) {
   double dx, dy;
 
   textTransformDelta(tx, ty, &dx, &dy);
+  curX += dx;
+  curY += dy;
+}
+
+void GfxState::shift(double dx, double dy) {
   curX += dx;
   curY += dy;
 }
@@ -2226,10 +2310,21 @@ GfxState *GfxState::restore() {
 
   if (saved) {
     oldState = saved;
+
+    // these attributes aren't saved/restored by the q/Q operators
+    oldState->path = path;
+    oldState->curX = curX;
+    oldState->curY = curY;
+    oldState->lineX = lineX;
+    oldState->lineY = lineY;
+
+    path = NULL;
     saved = NULL;
     delete this;
+
   } else {
     oldState = this;
   }
+
   return oldState;
 }

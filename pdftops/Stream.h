@@ -2,7 +2,7 @@
 //
 // Stream.h
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -78,8 +78,10 @@ public:
   // Get current position in file.
   virtual int getPos() = 0;
 
-  // Go to a position in the stream.
-  virtual void setPos(int pos) = 0;
+  // Go to a position in the stream.  If <dir> is negative, the
+  // position is from the end of the file; otherwise the position is
+  // from the start of the file.
+  virtual void setPos(Guint pos, int dir = 0) = 0;
 
   // Get PostScript command for the filter(s).
   virtual GString *getPSFilter(char *indent);
@@ -118,18 +120,20 @@ public:
 
   BaseStream(Object *dictA);
   virtual ~BaseStream();
-  virtual Stream *makeSubStream(int start, int length, Object *dict) = 0;
-  virtual void setPos(int pos) = 0;
+  virtual Stream *makeSubStream(Guint start, GBool limited,
+				Guint length, Object *dict) = 0;
+  virtual void setPos(Guint pos, int dir = 0) = 0;
   virtual BaseStream *getBaseStream() { return this; }
   virtual Dict *getDict() { return dict.getDict(); }
 
   // Get/set position of first byte of stream within the file.
-  virtual int getStart() = 0;
+  virtual Guint getStart() = 0;
   virtual void moveStart(int delta) = 0;
 
 #ifndef NO_DECRYPTION
   // Set decryption for this stream.
-  void doDecryption(Guchar *fileKey, int keyLength, int objNum, int objGen);
+  virtual void doDecryption(Guchar *fileKey, int keyLength,
+			    int objNum, int objGen);
 #endif
 
 #ifndef NO_DECRYPTION
@@ -156,7 +160,7 @@ public:
   virtual ~FilterStream();
   virtual void close();
   virtual int getPos() { return str->getPos(); }
-  virtual void setPos(int pos);
+  virtual void setPos(Guint pos, int dir = 0);
   virtual BaseStream *getBaseStream() { return str->getBaseStream(); }
   virtual Dict *getDict() { return str->getDict(); }
 
@@ -242,9 +246,11 @@ private:
 class FileStream: public BaseStream {
 public:
 
-  FileStream(FILE *fA, int startA, int lengthA, Object *dictA);
+  FileStream(FILE *fA, Guint startA, GBool limitedA,
+	     Guint lengthA, Object *dictA);
   virtual ~FileStream();
-  virtual Stream *makeSubStream(int startA, int lengthA, Object *dictA);
+  virtual Stream *makeSubStream(Guint startA, GBool limitedA,
+				Guint lengthA, Object *dictA);
   virtual StreamKind getKind() { return strFile; }
   virtual void reset();
   virtual void close();
@@ -253,9 +259,9 @@ public:
   virtual int lookChar()
     { return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr & 0xff); }
   virtual int getPos() { return bufPos + (bufPtr - buf); }
-  virtual void setPos(int pos);
+  virtual void setPos(Guint pos, int dir = 0);
   virtual GBool isBinary(GBool last = gTrue) { return last; }
-  virtual int getStart() { return start; }
+  virtual Guint getStart() { return start; }
   virtual void moveStart(int delta);
 
 private:
@@ -263,13 +269,52 @@ private:
   GBool fillBuf();
 
   FILE *f;
-  int start;
-  int length;
+  Guint start;
+  GBool limited;
+  Guint length;
   char buf[fileStreamBufSize];
   char *bufPtr;
   char *bufEnd;
-  int bufPos;
+  Guint bufPos;
   int savePos;
+  GBool saved;
+};
+
+//------------------------------------------------------------------------
+// MemStream
+//------------------------------------------------------------------------
+
+class MemStream: public BaseStream {
+public:
+
+  MemStream(char *bufA, Guint lengthA, Object *dictA);
+  virtual ~MemStream();
+  virtual Stream *makeSubStream(Guint start, GBool limited,
+				Guint lengthA, Object *dictA);
+  virtual StreamKind getKind() { return strWeird; }
+  virtual void reset();
+  virtual void close();
+  virtual int getChar()
+    { return (bufPtr < bufEnd) ? (*bufPtr++ & 0xff) : EOF; }
+  virtual int lookChar()
+    { return (bufPtr < bufEnd) ? (*bufPtr & 0xff) : EOF; }
+  virtual int getPos() { return bufPtr - buf; }
+  virtual void setPos(Guint pos, int dir = 0);
+  virtual GBool isBinary(GBool last = gTrue) { return last; }
+  virtual Guint getStart() { return 0; }
+  virtual void moveStart(int delta);
+#ifndef NO_DECRYPTION
+  virtual void doDecryption(Guchar *fileKey, int keyLength,
+			    int objNum, int objGen);
+#endif
+
+private:
+
+  char *buf;
+  Guint length;
+  GBool needFree;
+  char *bufEnd;
+  char *bufPtr;
 };
 
 //------------------------------------------------------------------------
@@ -287,15 +332,16 @@ public:
 
   EmbedStream(Stream *strA, Object *dictA);
   virtual ~EmbedStream();
-  virtual Stream *makeSubStream(int start, int length, Object *dictA);
+  virtual Stream *makeSubStream(Guint start, GBool limited,
+				Guint length, Object *dictA);
   virtual StreamKind getKind() { return str->getKind(); }
   virtual void reset() {}
   virtual int getChar() { return str->getChar(); }
   virtual int lookChar() { return str->lookChar(); }
   virtual int getPos() { return str->getPos(); }
-  virtual void setPos(int pos);
+  virtual void setPos(Guint pos, int dir = 0);
   virtual GBool isBinary(GBool last = gTrue) { return last; }
-  virtual int getStart();
+  virtual Guint getStart();
   virtual void moveStart(int delta);
 
 private:
@@ -656,6 +702,37 @@ private:
 
   int length;
   int count;
+};
+
+//------------------------------------------------------------------------
+// ASCIIHexEncoder
+//------------------------------------------------------------------------
+
+class ASCIIHexEncoder: public FilterStream {
+public:
+
+  ASCIIHexEncoder(Stream *strA);
+  virtual ~ASCIIHexEncoder();
+  virtual StreamKind getKind() { return strWeird; }
+  virtual void reset();
+  virtual void close();
+  virtual int getChar()
+    { return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr++ & 0xff); }
+  virtual int lookChar()
+    { return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr & 0xff); }
+  virtual GString *getPSFilter(char *indent) { return NULL; }
+  virtual GBool isBinary(GBool last = gTrue) { return gFalse; }
+  virtual GBool isEncoder() { return gTrue; }
+
+private:
+
+  char buf[4];
+  char *bufPtr;
+  char *bufEnd;
+  int lineLen;
+  GBool eof;
+
+  GBool fillBuf();
 };
 
 //------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 //
 // Page.cc
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -10,6 +10,7 @@
 #pragma implementation
 #endif
 
+#include <config.h>
 #include <stddef.h>
 #include "Object.h"
 #include "Array.h"
@@ -19,11 +20,9 @@
 #include "OutputDev.h"
 #ifndef PDF_PARSER_ONLY
 #include "Gfx.h"
-#include "FormWidget.h"
+#include "Annot.h"
 #endif
 #include "Error.h"
-
-#include "Params.h"
 #include "Page.h"
 
 //------------------------------------------------------------------------
@@ -94,6 +93,14 @@ PageAttrs::PageAttrs(PageAttrs *attrs, Dict *dict) {
     rotate -= 360;
   }
 
+  // misc attributes
+  dict->lookup("LastModified", &lastModified);
+  dict->lookup("BoxColorInfo", &boxColorInfo);
+  dict->lookup("Group", &group);
+  dict->lookup("Metadata", &metadata);
+  dict->lookup("PieceInfo", &pieceInfo);
+  dict->lookup("SeparationInfo", &separationInfo);
+
   // resource dictionary
   dict->lookup("Resources", &obj1);
   if (obj1.isDict()) {
@@ -104,6 +111,12 @@ PageAttrs::PageAttrs(PageAttrs *attrs, Dict *dict) {
 }
 
 PageAttrs::~PageAttrs() {
+  lastModified.free();
+  boxColorInfo.free();
+  group.free();
+  metadata.free();
+  pieceInfo.free();
+  separationInfo.free();
   resources.free();
 }
 
@@ -210,7 +223,7 @@ void Page::display(OutputDev *out, double dpi, int rotate,
   Object obj;
   Link *link;
   int i;
-  FormWidgets *formWidgets;
+  Annots *annotList;
 
   box = getBox();
   cropBox = getCropBox();
@@ -248,20 +261,20 @@ void Page::display(OutputDev *out, double dpi, int rotate,
     out->dump();
   }
 
-  // draw AcroForm widgets
+  // draw non-link annotations
   //~ need to reset CTM ???
-  formWidgets = new FormWidgets(xref, annots.fetch(xref, &obj));
+  annotList = new Annots(xref, annots.fetch(xref, &obj));
   obj.free();
-  if (printCommands && formWidgets->getNumWidgets() > 0) {
-    printf("***** AcroForm widgets\n");
-  }
-  for (i = 0; i < formWidgets->getNumWidgets(); ++i) {
-    formWidgets->getWidget(i)->draw(gfx);
-  }
-  if (formWidgets->getNumWidgets() > 0) {
+  if (annotList->getNumAnnots() > 0) {
+    if (printCommands) {
+      printf("***** Annotations\n");
+    }
+    for (i = 0; i < annotList->getNumAnnots(); ++i) {
+      annotList->getAnnot(i)->draw(gfx);
+    }
     out->dump();
   }
-  delete formWidgets;
+  delete annotList;
 
   delete gfx;
 #endif

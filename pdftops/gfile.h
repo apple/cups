@@ -4,7 +4,7 @@
 //
 // Miscellaneous file and directory name manipulation.
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -72,11 +72,11 @@ extern GBool isAbsolutePath(const char *path);
 
 // Make this path absolute by prepending current directory (if path is
 // relative) or prepending user's directory (if path starts with '~').
-GString *makePathAbsolute(GString *path);
+extern GString *makePathAbsolute(GString *path);
 
 // Get the modification time for <fileName>.  Returns 0 if there is an
 // error.
-time_t getModTime(const char *fileName);
+extern time_t getModTime(const char *fileName);
 
 // Create a temporary file and open it for writing.  If <ext> is not
 // NULL, it will be used as the file name extension.  Returns both the
@@ -84,7 +84,14 @@ time_t getModTime(const char *fileName);
 // should be done to the returned file pointer; the file may be
 // reopened later for reading, but not for writing.  The <mode> string
 // should be "w" or "wb".  Returns true on success.
-GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext);
+extern GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext);
+
+// Execute <command>.  Returns true on success.
+extern GBool executeCommand(char *cmd);
+
+// Just like fgets, but handles Unix, Mac, and/or DOS end-of-line
+// conventions.
+extern char *getLine(char *buf, int size, FILE *f);
 
 //------------------------------------------------------------------------
 // GDir and GDirEntry

@@ -2,7 +2,7 @@
 //
 // Object.cc
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -10,6 +10,7 @@
 #pragma implementation
 #endif
 
+#include <config.h>
 #include <stddef.h>
 #include "Object.h"
 #include "Array.h"
@@ -151,7 +152,9 @@ void Object::print(FILE *f) {
     fprintf(f, "%g", real);
     break;
   case objString:
-    fprintf(f, "(%s)", string->getCString());
+    fprintf(f, "(");
+    fwrite(string->getCString(), 1, string->getLength(), stdout);
+    fprintf(f, ")");
     break;
   case objName:
     fprintf(f, "/%s", name);

@@ -2,7 +2,7 @@
 //
 // Catalog.cc
 //
-// Copyright 1996 Derek B. Noonburg
+// Copyright 1996-2002 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -10,6 +10,7 @@
 #pragma implementation
 #endif
 
+#include <config.h>
 #include <stddef.h>
 #include "gmem.h"
 #include "Object.h"
@@ -93,6 +94,12 @@ Catalog::Catalog(XRef *xrefA, GBool printCommands) {
   }
   obj.free();
 
+  // get the metadata stream
+  catDict.dictLookup("Metadata", &metadata);
+
+  // get the structure tree root
+  catDict.dictLookup("StructTreeRoot", &structTreeRoot);
+
   catDict.free();
   return;
 
@@ -124,6 +131,32 @@ Catalog::~Catalog() {
   if (baseURI) {
     delete baseURI;
   }
+  metadata.free();
+  structTreeRoot.free();
+}
+
+GString *Catalog::readMetadata() {
+  GString *s;
+  Dict *dict;
+  Object obj;
+  int c;
+
+  if (!metadata.isStream()) {
+    return NULL;
+  }
+  dict = metadata.streamGetDict();
+  if (!dict->lookup("Subtype", &obj)->isName("XML")) {
+    error(-1, "Unknown Metadata type: '%s'",
+	  obj.isName() ? obj.getName() : "???");
+  }
+  obj.free();
+  s = new GString();
+  metadata.streamReset();
+  while ((c = metadata.streamGetChar()) != EOF) {
+    s->append(c);
+  }
+  metadata.streamClose();
+  return s;
 }
 
 int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, int start,
@@ -232,10 +265,10 @@ LinkDest *Catalog::findDest(GString *name) {
   // construct LinkDest
   dest = NULL;
   if (obj1.isArray()) {
-    dest = new LinkDest(obj1.getArray(), gTrue);
+    dest = new LinkDest(obj1.getArray());
   } else if (obj1.isDict()) {
     if (obj1.dictLookup("D", &obj2)->isArray())
-      dest = new LinkDest(obj2.getArray(), gTrue);
+      dest = new LinkDest(obj2.getArray());
     else
       error(-1, "Bad named destination value");
     obj2.free();

@@ -3,7 +3,7 @@
  *
  * Command line argument parser.
  *
- * Copyright 1996 Derek B. Noonburg
+ * Copyright 1996-2002 Glyph & Cog, LLC
  */
 
 #include <stdio.h>

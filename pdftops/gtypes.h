@@ -3,7 +3,7 @@
  *
  * Some useful simple types.
  *
- * Copyright 1996 Derek B. Noonburg
+ * Copyright 1996-2002 Glyph & Cog, LLC
  */
 
 #ifndef GTYPES_H

@@ -3,7 +3,7 @@
  *
  * Memory routines with out-of-memory checking.
  *
- * Copyright 1996 Derek B. Noonburg
+ * Copyright 1996-2002 Glyph & Cog, LLC
  */
 
 #ifndef GMEM_H
