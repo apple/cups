@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.43.2.12 2002/06/27 20:00:01 mike Exp $"
+ * "$Id: gdevcups.c,v 1.43.2.13 2002/09/03 00:48:01 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -2003,12 +2003,6 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   }
 
  /*
-  * Set the margins to update the bitmap size...
-  */
-
-  gx_device_set_margins(pdev, margins, false);
-
- /*
   * Then process standard page device options...
   */
 
@@ -2023,6 +2017,11 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
 
   cups->header.PageSize[0] = pdev->MediaSize[0];
   cups->header.PageSize[1] = pdev->MediaSize[1];
+
+  cups->header.ImagingBoundingBox[0] = 72.0 * margins[0];
+  cups->header.ImagingBoundingBox[1] = 72.0 * margins[1];
+  cups->header.ImagingBoundingBox[2] = pdev->MediaSize[0] - 72.0 * margins[2];
+  cups->header.ImagingBoundingBox[3] = pdev->MediaSize[1] - 72.0 * margins[3];
 
   cups->header.ImagingBoundingBox[0] = 72.0 * margins[0];
   cups->header.ImagingBoundingBox[1] = 72.0 * margins[1];
@@ -3449,5 +3448,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.43.2.12 2002/06/27 20:00:01 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.43.2.13 2002/09/03 00:48:01 mike Exp $".
  */
