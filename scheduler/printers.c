@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.45 1999/12/08 15:01:41 mike Exp $"
+ * "$Id: printers.c,v 1.46 1999/12/14 23:19:11 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -61,6 +61,8 @@ AddPrinter(char *name)		/* I - Name of printer */
 		*current,	/* Current printer in list */
 		*prev;		/* Previous printer in list */
 
+
+  DEBUG_printf(("AddPrinter(\"%s\")\n", name));
 
  /*
   * Range check input...
@@ -241,7 +243,8 @@ DeletePrinter(printer_t *p)	/* I - Printer to delete */
 
   if (current == NULL)
   {
-    fputs("cupsd: WARNING - tried to delete a non-existent printer!\n", stderr);
+    LogMessage(LOG_ERROR, "Tried to delete a non-existent printer %s!\n",
+               p->name);
     return;
   }
 
@@ -1230,5 +1233,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.45 1999/12/08 15:01:41 mike Exp $".
+ * End of "$Id: printers.c,v 1.46 1999/12/14 23:19:11 mike Exp $".
  */
