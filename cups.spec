@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.40 2001/11/13 19:34:36 mike Exp $"
+# "$Id: cups.spec,v 1.41 2001/12/18 17:34:06 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -26,7 +26,7 @@
 
 Summary: Common Unix Printing System
 Name: cups
-Version: 1.1.12
+Version: 1.1.13
 Release: 0
 Copyright: GPL
 Group: System Environment/Daemons
@@ -86,6 +86,8 @@ rm -rf $RPM_BUILD_ROOT
 make BUILDROOT=$RPM_BUILD_ROOT install
 
 %post
+ldconfig
+
 if test -x /sbin/chkconfig; then
 	/sbin/chkconfig --add cups
 	/sbin/chkconfig cups on
@@ -222,5 +224,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/pstoraster/*
 
 #
-# End of "$Id: cups.spec,v 1.40 2001/11/13 19:34:36 mike Exp $".
+# End of "$Id: cups.spec,v 1.41 2001/12/18 17:34:06 mike Exp $".
 #

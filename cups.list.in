@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in,v 1.12 2001/11/13 19:34:36 mike Exp $"
+# "$Id: cups.list.in,v 1.13 2001/12/18 17:34:06 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -29,7 +29,7 @@
 %vendor Easy Software Products
 %license LICENSE.txt
 %readme README.txt
-%version 1.1.12
+%version 1.1.13
 %provides cups
 %provides cupsys
 %provides cups-devel
@@ -94,6 +94,11 @@ $MAN8DIR=@MAN8DIR@
 %postinstall if test -f $SERVERROOT/passwd.md5; then
 %postinstall chown $CUPS_USER $SERVERROOT/passwd.md5
 %postinstall fi
+
+# Make sure the shared libraries are refreshed...
+%system linux
+%postinstall ldconfig
+%system all
 
 # Server programs
 %system all
@@ -364,5 +369,5 @@ f 0444 root sys $AMANDIR/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list.in,v 1.12 2001/11/13 19:34:36 mike Exp $".
+# End of "$Id: cups.list.in,v 1.13 2001/12/18 17:34:06 mike Exp $".
 #
