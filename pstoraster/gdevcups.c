@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.4 1999/05/21 20:55:02 mike Exp $"
+ * "$Id: gdevcups.c,v 1.5 1999/05/26 20:03:28 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -461,6 +461,9 @@ cups_map_color_rgb(gx_device      *pdev,	/* I - Device info */
   switch (cups->header.cupsColorSpace)
   {
     case CUPS_CSPACE_K :
+    case CUPS_CSPACE_WHITE :
+    case CUPS_CSPACE_GOLD :
+    case CUPS_CSPACE_SILVER :
         prgb[0] =
         prgb[1] =
         prgb[2] = lut_color_rgb[c3];
@@ -531,6 +534,8 @@ cups_map_color_rgb(gx_device      *pdev,	/* I - Device info */
         break;
 
     case CUPS_CSPACE_YMCK :
+    case CUPS_CSPACE_GMCK :
+    case CUPS_CSPACE_GMCS :
         k    = lut_color_rgb[c3];
         divk = gx_max_color_value - k;
         if (divk == 0)
@@ -683,6 +688,9 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
         break;
 
     case CUPS_CSPACE_K :
+    case CUPS_CSPACE_WHITE :
+    case CUPS_CSPACE_GOLD :
+    case CUPS_CSPACE_SILVER :
         i = lut_rgb_color[gx_max_color_value - (r * 31 + g * 61 + b * 8) / 100];
         break;
 
@@ -838,6 +846,8 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
         break;
 
     case CUPS_CSPACE_YMCK :
+    case CUPS_CSPACE_GMCK :
+    case CUPS_CSPACE_GMCS :
 	ic = gx_max_color_value - r;
 	im = gx_max_color_value - g;
 	iy = gx_max_color_value - b;
@@ -1451,6 +1461,9 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
     default :
     case CUPS_CSPACE_W :
     case CUPS_CSPACE_K :
+    case CUPS_CSPACE_WHITE :
+    case CUPS_CSPACE_GOLD :
+    case CUPS_CSPACE_SILVER :
         cups->header.cupsBitsPerPixel   = cups->header.cupsBitsPerColor;
         cups->color_info.depth          = cups->header.cupsBitsPerPixel;
         cups->color_info.num_components = 1;
@@ -1486,6 +1499,8 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
     case CUPS_CSPACE_CMYK :
     case CUPS_CSPACE_YMCK :
     case CUPS_CSPACE_KCMY :
+    case CUPS_CSPACE_GMCK :
+    case CUPS_CSPACE_GMCS :
         if (cups->header.cupsColorOrder != CUPS_ORDER_CHUNKED)
           cups->header.cupsBitsPerPixel = cups->header.cupsBitsPerColor;
 	else
@@ -1496,8 +1511,7 @@ cups_set_color_info(gx_device *pdev)	/* I - Device info */
         break;
   }
 
-  if (cups->header.cupsColorSpace != CUPS_CSPACE_W &&
-      cups->header.cupsColorSpace != CUPS_CSPACE_K)
+  if (cups->color_info.num_components > 1)
   {
     cups->color_info.max_gray      = (1 << cups->header.cupsBitsPerColor) - 1;
     cups->color_info.max_color     = (1 << cups->header.cupsBitsPerColor) - 1;
@@ -2420,5 +2434,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.4 1999/05/21 20:55:02 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.5 1999/05/26 20:03:28 mike Exp $".
  */
