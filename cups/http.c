@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.42 1999/08/12 20:31:33 mike Exp $"
+ * "$Id: http.c,v 1.43 1999/08/16 15:38:18 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -825,6 +825,7 @@ httpGets(char   *line,			/* I - Line to read into */
 	*bufptr,			/* Pointer into input buffer */
 	*bufend;			/* Pointer to end of buffer */
   int	bytes;				/* Number of bytes read */
+  int	lasterror;			/* Last error received */
 
 
   DEBUG_printf(("httpGets(%08x, %d, %08x)\n", line, length, http));
@@ -835,6 +836,8 @@ httpGets(char   *line,			/* I - Line to read into */
  /*
   * Pre-scan the buffer and see if there is a newline in there...
   */
+
+  lasterror = 0;
 
   do
   {
@@ -859,22 +862,31 @@ httpGets(char   *line,			/* I - Line to read into */
 	* Nope, can't get a line this time...
 	*/
 
-        if (errno == EPIPE)
+        if (errno == EAGAIN || errno == EINTR)
+	{
+	  lasterror = errno;
 	  continue;
+	}
+
+        if (errno == EPIPE && lasterror != EPIPE)
+	{
+	  lasterror = errno;
+	  continue;
+	}
 
         DEBUG_printf(("httpGets(): recv() error %d!\n", errno));
 
         return (NULL);
       }
-      else
-      {
-       /*
-	* Yup, update the amount used and the end pointer...
-	*/
+      else if (bytes == 0)
+        return (NULL);
 
-	http->used += bytes;
-	bufend     += bytes;
-      }
+     /*
+      * Yup, update the amount used and the end pointer...
+      */
+
+      http->used += bytes;
+      bufend     += bytes;
     }
   }
   while (bufptr >= bufend);
@@ -1427,5 +1439,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.42 1999/08/12 20:31:33 mike Exp $".
+ * End of "$Id: http.c,v 1.43 1999/08/16 15:38:18 mike Exp $".
  */
