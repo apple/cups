@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.13
 
+	- The scheduler no longer replaces the JobSheets values
+	  from the printers.conf and classes.conf files with the
+	  classification level, if set.  This way the original
+	  banner settings are preserved when classification
+	  levels are changed or turned off.
 	- The serial backend didn't drain the output queue, nor
 	  did it restore the original settings.
 	- Updated the default system group under MacOS X.

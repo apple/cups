@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.34.2.3 2001/12/27 00:04:52 mike Exp $"
+ * "$Id: classes.c,v 1.34.2.4 2002/01/02 16:16:14 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -335,7 +335,8 @@ LoadAllClasses(void)
   char		line[1024],		/* Line from file */
 		name[256],		/* Parameter name */
 		*nameptr,		/* Pointer into name */
-		*value;			/* Pointer to value */
+		*value,			/* Pointer to value */
+		*valueptr;		/* Pointer into value */
   printer_t	*p,			/* Current printer class */
 		*temp;			/* Temporary pointer to printer */
 
@@ -490,6 +491,32 @@ LoadAllClasses(void)
       else
         p->accepting = 0;
     }
+    else if (strcmp(name, "JobSheets") == 0)
+    {
+     /*
+      * Set the initial job sheets...
+      */
+
+      for (valueptr = value; *valueptr && !isspace(*valueptr); valueptr ++);
+
+      if (*valueptr)
+        *valueptr++ = '\0';
+
+      strncpy(p->job_sheets[0], value, sizeof(p->job_sheets[0]) - 1);
+
+      while (isspace(*valueptr))
+        valueptr ++;
+
+      if (*valueptr)
+      {
+        for (value = valueptr; *valueptr && !isspace(*valueptr); valueptr ++);
+
+	if (*valueptr)
+          *valueptr++ = '\0';
+
+	strncpy(p->job_sheets[1], value, sizeof(p->job_sheets[1]) - 1);
+      }
+    }
     else if (strcmp(name, "AllowUser") == 0)
     {
       p->deny_users = 0;
@@ -629,5 +656,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.34.2.3 2001/12/27 00:04:52 mike Exp $".
+ * End of "$Id: classes.c,v 1.34.2.4 2002/01/02 16:16:14 mike Exp $".
  */

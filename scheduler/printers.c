@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.5 2001/12/27 00:04:53 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.6 2002/01/02 16:16:14 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -101,16 +101,8 @@ AddPrinter(const char *name)	/* I - Name of printer */
   p->accepting = 0;
   p->filetype  = mimeAddType(MimeDatabase, "printer", name);
 
-  if (Classification[0])
-  {
-    strcpy(p->job_sheets[0], Classification);
-    strcpy(p->job_sheets[1], Classification);
-  }
-  else
-  {
-    strcpy(p->job_sheets[0], "none");
-    strcpy(p->job_sheets[1], "none");
-  }
+  strcpy(p->job_sheets[0], "none");
+  strcpy(p->job_sheets[1], "none");
 
  /*
   * Setup required filters and IPP attributes...
@@ -623,31 +615,28 @@ LoadAllPrinters(void)
     }
     else if (strcmp(name, "JobSheets") == 0)
     {
-      if (!Classification[0])
-      {
-       /*
-	* Set the initial job sheets...
-	*/
+     /*
+      * Set the initial job sheets...
+      */
 
-	for (valueptr = value; *valueptr && !isspace(*valueptr); valueptr ++);
+      for (valueptr = value; *valueptr && !isspace(*valueptr); valueptr ++);
+
+      if (*valueptr)
+        *valueptr++ = '\0';
+
+      strncpy(p->job_sheets[0], value, sizeof(p->job_sheets[0]) - 1);
+
+      while (isspace(*valueptr))
+        valueptr ++;
+
+      if (*valueptr)
+      {
+        for (value = valueptr; *valueptr && !isspace(*valueptr); valueptr ++);
 
 	if (*valueptr)
           *valueptr++ = '\0';
 
-	strncpy(p->job_sheets[0], value, sizeof(p->job_sheets[0]) - 1);
-
-	while (isspace(*valueptr))
-          valueptr ++;
-
-	if (*valueptr)
-	{
-          for (value = valueptr; *valueptr && !isspace(*valueptr); valueptr ++);
-
-	  if (*valueptr)
-            *valueptr++ = '\0';
-
-	  strncpy(p->job_sheets[1], value, sizeof(p->job_sheets[1]) - 1);
-	}
+	strncpy(p->job_sheets[1], value, sizeof(p->job_sheets[1]) - 1);
       }
     }
     else if (strcmp(name, "AllowUser") == 0)
@@ -943,7 +932,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
     if ((auth = FindBest(resource, HTTP_POST)) != NULL)
     {
-      if (auth->type == AUTH_BASIC)
+      if (auth->type == AUTH_BASIC || auth->type == AUTH_BASICDIGEST)
 	auth_supported = "basic";
       else if (auth->type == AUTH_DIGEST)
 	auth_supported = "digest";
@@ -1071,8 +1060,10 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
       if (attr != NULL)
       {
-	attr->values[0].string.text = strdup(p->job_sheets[0]);
-	attr->values[1].string.text = strdup(p->job_sheets[1]);
+	attr->values[0].string.text = strdup(Classification[0] ?
+	                                     Classification : p->job_sheets[0]);
+	attr->values[1].string.text = strdup(Classification[0] ?
+	                                     Classification : p->job_sheets[1]);
       }
     }
   }
@@ -1819,5 +1810,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.5 2001/12/27 00:04:53 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.6 2002/01/02 16:16:14 mike Exp $".
  */
