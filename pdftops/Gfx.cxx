@@ -2,7 +2,7 @@
 //
 // Gfx.cc
 //
-// Copyright 1996-2003 Glyph & Cog, LLC
+// Copyright 1996-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -58,6 +58,20 @@
 
 // Max delta allowed in any color component for a radial shading fill.
 #define radialColorDelta (1 / 256.0)
+
+// Max recursive depth for a Gouraud triangle shading fill.
+#define gouraudMaxDepth 4
+
+// Max delta allowed in any color component for a Gouraud triangle
+// shading fill.
+#define gouraudColorDelta (1 / 256.0)
+
+// Max recursive depth for a patch mesh shading fill.
+#define patchMaxDepth 4
+
+// Max delta allowed in any color component for a patch mesh shading
+// fill.
+#define patchColorDelta (1 / 256.0)
 
 //------------------------------------------------------------------------
 // Operator table
@@ -540,14 +554,13 @@ void Gfx::go(GBool topLevel) {
     // got a command - execute it
     if (obj.isCmd()) {
       if (printCommands) {
-        fputs("DEBUG2: ", stderr);
-	obj.print(stderr);
+	obj.print(stdout);
 	for (i = 0; i < numArgs; ++i) {
-	  putc(' ', stderr);
-	  args[i].print(stderr);
+	  printf(" ");
+	  args[i].print(stdout);
 	}
-	putc('\n', stderr);
-	fflush(stderr);
+	printf("\n");
+	fflush(stdout);
       }
       execOp(&obj, args, numArgs);
       obj.free();
@@ -579,10 +592,10 @@ void Gfx::go(GBool topLevel) {
     } else {
       error(getPos(), "Too many args in content stream");
       if (printCommands) {
-	fputs("DEBUG2: throwing away arg: ", stderr);
-	obj.print(stderr);
-	putc('\n', stderr);
-	fflush(stderr);
+	printf("throwing away arg: ");
+	obj.print(stdout);
+	printf("\n");
+	fflush(stdout);
       }
       obj.free();
     }
@@ -596,13 +609,13 @@ void Gfx::go(GBool topLevel) {
   if (numArgs > 0) {
     error(getPos(), "Leftover args in content stream");
     if (printCommands) {
-      fprintf(stderr, "DEBUG2: %d leftovers:", numArgs);
+      printf("%d leftovers:", numArgs);
       for (i = 0; i < numArgs; ++i) {
-	putc(' ', stderr);
-	args[i].print(stderr);
+	printf(" ");
+	args[i].print(stdout);
       }
-      putc('\n', stderr);
-      fflush(stderr);
+      printf("\n");
+      fflush(stdout);
     }
     for (i = 0; i < numArgs; ++i)
       args[i].free();
@@ -806,6 +819,7 @@ void Gfx::opSetFillGray(Object args[], int numArgs) {
 
   state->setFillPattern(NULL);
   state->setFillColorSpace(new GfxDeviceGrayColorSpace());
+  out->updateFillColorSpace(state);
   color.c[0] = args[0].getNum();
   state->setFillColor(&color);
   out->updateFillColor(state);
@@ -816,6 +830,7 @@ void Gfx::opSetStrokeGray(Object args[], int numArgs) {
 
   state->setStrokePattern(NULL);
   state->setStrokeColorSpace(new GfxDeviceGrayColorSpace());
+  out->updateStrokeColorSpace(state);
   color.c[0] = args[0].getNum();
   state->setStrokeColor(&color);
   out->updateStrokeColor(state);
@@ -827,6 +842,7 @@ void Gfx::opSetFillCMYKColor(Object args[], int numArgs) {
 
   state->setFillPattern(NULL);
   state->setFillColorSpace(new GfxDeviceCMYKColorSpace());
+  out->updateFillColorSpace(state);
   for (i = 0; i < 4; ++i) {
     color.c[i] = args[i].getNum();
   }
@@ -840,6 +856,7 @@ void Gfx::opSetStrokeCMYKColor(Object args[], int numArgs) {
 
   state->setStrokePattern(NULL);
   state->setStrokeColorSpace(new GfxDeviceCMYKColorSpace());
+  out->updateStrokeColorSpace(state);
   for (i = 0; i < 4; ++i) {
     color.c[i] = args[i].getNum();
   }
@@ -853,6 +870,7 @@ void Gfx::opSetFillRGBColor(Object args[], int numArgs) {
 
   state->setFillPattern(NULL);
   state->setFillColorSpace(new GfxDeviceRGBColorSpace());
+  out->updateFillColorSpace(state);
   for (i = 0; i < 3; ++i) {
     color.c[i] = args[i].getNum();
   }
@@ -866,6 +884,7 @@ void Gfx::opSetStrokeRGBColor(Object args[], int numArgs) {
 
   state->setStrokePattern(NULL);
   state->setStrokeColorSpace(new GfxDeviceRGBColorSpace());
+  out->updateStrokeColorSpace(state);
   for (i = 0; i < 3; ++i) {
     color.c[i] = args[i].getNum();
   }
@@ -889,6 +908,7 @@ void Gfx::opSetFillColorSpace(Object args[], int numArgs) {
   obj.free();
   if (colorSpace) {
     state->setFillColorSpace(colorSpace);
+    out->updateFillColorSpace(state);
   } else {
     error(getPos(), "Bad color space (fill)");
   }
@@ -915,6 +935,7 @@ void Gfx::opSetStrokeColorSpace(Object args[], int numArgs) {
   obj.free();
   if (colorSpace) {
     state->setStrokeColorSpace(colorSpace);
+    out->updateStrokeColorSpace(state);
   } else {
     error(getPos(), "Bad color space (stroke)");
   }
@@ -1250,11 +1271,12 @@ void Gfx::doPatternFill(GBool eoFill) {
 	  pattern->getType());
     break;
   }
-  }
+}
 
 void Gfx::doTilingPatternFill(GfxTilingPattern *tPat, GBool eoFill) {
   GfxPatternColorSpace *patCS;
   GfxColorSpace *cs;
+  GfxPath *savedPath;
   double xMin, yMin, xMax, yMax, x, y, x1, y1;
   double cxMin, cyMin, cxMax, cyMax;
   int xi0, yi0, xi1, yi1, xi, yi;
@@ -1294,7 +1316,7 @@ void Gfx::doTilingPatternFill(GfxTilingPattern *tPat, GBool eoFill) {
   m[4] = m1[4] * ictm[0] + m1[5] * ictm[2] + ictm[4];
   m[5] = m1[4] * ictm[1] + m1[5] * ictm[3] + ictm[5];
 
-  // construct a (base space) -> (pattern space) transform matrix
+  // construct a (device space) -> (pattern space) transform matrix
   det = 1 / (m1[0] * m1[3] - m1[1] * m1[2]);
   imb[0] = m1[3] * det;
   imb[1] = -m1[1] * det;
@@ -1304,6 +1326,7 @@ void Gfx::doTilingPatternFill(GfxTilingPattern *tPat, GBool eoFill) {
   imb[5] = (m1[1] * m1[4] - m1[0] * m1[5]) * det;
 
   // save current graphics state
+  savedPath = state->getPath()->copy();
   saveState();
 
   // set underlying color space (for uncolored tiling patterns); set
@@ -1311,11 +1334,15 @@ void Gfx::doTilingPatternFill(GfxTilingPattern *tPat, GBool eoFill) {
   // Adobe's behavior
   if (tPat->getPaintType() == 2 && (cs = patCS->getUnder())) {
     state->setFillColorSpace(cs->copy());
+    out->updateFillColorSpace(state);
     state->setStrokeColorSpace(cs->copy());
+    out->updateStrokeColorSpace(state);
     state->setStrokeColor(state->getFillColor());
   } else {
     state->setFillColorSpace(new GfxDeviceGrayColorSpace());
+    out->updateFillColorSpace(state);
     state->setStrokeColorSpace(new GfxDeviceGrayColorSpace());
+    out->updateStrokeColorSpace(state);
   }
   state->setFillPattern(NULL);
   out->updateFillColor(state);
@@ -1379,30 +1406,41 @@ void Gfx::doTilingPatternFill(GfxTilingPattern *tPat, GBool eoFill) {
   //~ edge instead of left/bottom (?)
   xstep = fabs(tPat->getXStep());
   ystep = fabs(tPat->getYStep());
-  xi0 = (int)floor(xMin / xstep);
-  xi1 = (int)ceil(xMax / xstep);
-  yi0 = (int)floor(yMin / ystep);
-  yi1 = (int)ceil(yMax / ystep);
+  xi0 = (int)floor((xMin - tPat->getBBox()[0]) / xstep);
+  xi1 = (int)ceil((xMax - tPat->getBBox()[0]) / xstep);
+  yi0 = (int)floor((yMin - tPat->getBBox()[1]) / ystep);
+  yi1 = (int)ceil((yMax - tPat->getBBox()[1]) / ystep);
   for (i = 0; i < 4; ++i) {
     m1[i] = m[i];
   }
-  for (yi = yi0; yi < yi1; ++yi) {
-    for (xi = xi0; xi < xi1; ++xi) {
-      x = xi * xstep - tPat->getBBox()[0];
-      y = yi * ystep - tPat->getBBox()[1];
-      m1[4] = x * m[0] + y * m[2] + m[4];
-      m1[5] = x * m[1] + y * m[3] + m[5];
-      doForm1(tPat->getContentStream(), tPat->getResDict(),
-	      m1, tPat->getBBox());
+  if (out->useTilingPatternFill()) {
+    m1[4] = m[4];
+    m1[5] = m[5];
+    out->tilingPatternFill(state, tPat->getContentStream(),
+			   tPat->getPaintType(), tPat->getResDict(),
+			   m1, tPat->getBBox(),
+			   xi0, yi0, xi1, yi1, xstep, ystep);
+  } else {
+    for (yi = yi0; yi < yi1; ++yi) {
+      for (xi = xi0; xi < xi1; ++xi) {
+	x = xi * xstep;
+	y = yi * ystep;
+	m1[4] = x * m[0] + y * m[2] + m[4];
+	m1[5] = x * m[1] + y * m[3] + m[5];
+	doForm1(tPat->getContentStream(), tPat->getResDict(),
+		m1, tPat->getBBox());
+      }
     }
   }
 
   // restore graphics state
   restoreState();
+  state->setPath(savedPath);
 }
 
 void Gfx::doShadingPatternFill(GfxShadingPattern *sPat, GBool eoFill) {
   GfxShading *shading;
+  GfxPath *savedPath;
   double *ctm, *btm, *ptm;
   double m[6], ictm[6], m1[6];
   double xMin, yMin, xMax, yMax;
@@ -1411,6 +1449,7 @@ void Gfx::doShadingPatternFill(GfxShadingPattern *sPat, GBool eoFill) {
   shading = sPat->getShading();
 
   // save current graphics state
+  savedPath = state->getPath()->copy();
   saveState();
 
   // clip to bbox
@@ -1468,6 +1507,9 @@ void Gfx::doShadingPatternFill(GfxShadingPattern *sPat, GBool eoFill) {
 
   // set the color space
   state->setFillColorSpace(shading->getColorSpace()->copy());
+  out->updateFillColorSpace(state);
+
+  //~ should do background color fill here (?)
 
   // do shading type-specific operations
   switch (shading->getType()) {
@@ -1480,14 +1522,24 @@ void Gfx::doShadingPatternFill(GfxShadingPattern *sPat, GBool eoFill) {
   case 3:
     doRadialShFill((GfxRadialShading *)shading);
     break;
+  case 4:
+  case 5:
+    doGouraudTriangleShFill((GfxGouraudTriangleShading *)shading);
+    break;
+  case 6:
+  case 7:
+    doPatchMeshShFill((GfxPatchMeshShading *)shading);
+    break;
   }
 
   // restore graphics state
   restoreState();
+  state->setPath(savedPath);
 }
 
 void Gfx::opShFill(Object args[], int numArgs) {
   GfxShading *shading;
+  GfxPath *savedPath;
   double xMin, yMin, xMax, yMax;
 
   if (!(shading = res->lookupShading(args[0].getName()))) {
@@ -1495,6 +1547,7 @@ void Gfx::opShFill(Object args[], int numArgs) {
   }
 
   // save current graphics state
+  savedPath = state->getPath()->copy();
   saveState();
 
   // clip to bbox
@@ -1512,6 +1565,7 @@ void Gfx::opShFill(Object args[], int numArgs) {
 
   // set the color space
   state->setFillColorSpace(shading->getColorSpace()->copy());
+  out->updateFillColorSpace(state);
 
   // do shading type-specific operations
   switch (shading->getType()) {
@@ -1524,10 +1578,19 @@ void Gfx::opShFill(Object args[], int numArgs) {
   case 3:
     doRadialShFill((GfxRadialShading *)shading);
     break;
+  case 4:
+  case 5:
+    doGouraudTriangleShFill((GfxGouraudTriangleShading *)shading);
+    break;
+  case 6:
+  case 7:
+    doPatchMeshShFill((GfxPatchMeshShading *)shading);
+    break;
   }
 
   // restore graphics state
   restoreState();
+  state->setPath(savedPath);
 
   delete shading;
 }
@@ -1536,12 +1599,16 @@ void Gfx::doFunctionShFill(GfxFunctionShading *shading) {
   double x0, y0, x1, y1;
   GfxColor colors[4];
 
-  shading->getDomain(&x0, &y0, &x1, &y1);
-  shading->getColor(x0, y0, &colors[0]);
-  shading->getColor(x0, y1, &colors[1]);
-  shading->getColor(x1, y0, &colors[2]);
-  shading->getColor(x1, y1, &colors[3]);
-  doFunctionShFill1(shading, x0, y0, x1, y1, colors, 0);
+  if (out->useShadedFills()) {
+    out->functionShadedFill(state, shading);
+  } else {
+    shading->getDomain(&x0, &y0, &x1, &y1);
+    shading->getColor(x0, y0, &colors[0]);
+    shading->getColor(x0, y1, &colors[1]);
+    shading->getColor(x1, y0, &colors[2]);
+    shading->getColor(x1, y1, &colors[3]);
+    doFunctionShFill1(shading, x0, y0, x1, y1, colors, 0);
+  }
 }
 
 void Gfx::doFunctionShFill1(GfxFunctionShading *shading,
@@ -1666,170 +1733,104 @@ void Gfx::doAxialShFill(GfxAxialShading *shading) {
   int nComps;
   int i, j, k, kk;
 
-  // get the clip region bbox
-  state->getUserClipBBox(&xMin, &yMin, &xMax, &yMax);
+  if (out->useShadedFills()) {
 
-  // compute min and max t values, based on the four corners of the
-  // clip region bbox
-  shading->getCoords(&x0, &y0, &x1, &y1);
-  dx = x1 - x0;
-  dy = y1 - y0;
-  mul = 1 / (dx * dx + dy * dy);
-  tMin = tMax = ((xMin - x0) * dx + (yMin - y0) * dy) * mul;
-  t = ((xMin - x0) * dx + (yMax - y0) * dy) * mul;
-  if (t < tMin) {
-    tMin = t;
-  } else if (t > tMax) {
-    tMax = t;
-  }
-  t = ((xMax - x0) * dx + (yMin - y0) * dy) * mul;
-  if (t < tMin) {
-    tMin = t;
-  } else if (t > tMax) {
-    tMax = t;
-  }
-  t = ((xMax - x0) * dx + (yMax - y0) * dy) * mul;
-  if (t < tMin) {
-    tMin = t;
-  } else if (t > tMax) {
-    tMax = t;
-  }
-  if (tMin < 0 && !shading->getExtend0()) {
-    tMin = 0;
-  }
-  if (tMax > 1 && !shading->getExtend1()) {
-    tMax = 1;
-  }
+    out->axialShadedFill(state, shading);
 
-  // get the function domain
-  t0 = shading->getDomain0();
-  t1 = shading->getDomain1();
-
-  // Traverse the t axis and do the shading.
-  //
-  // For each point (tx, ty) on the t axis, consider a line through
-  // that point perpendicular to the t axis:
-  //
-  //     x(s) = tx + s * -dy   -->   s = (x - tx) / -dy
-  //     y(s) = ty + s * dx    -->   s = (y - ty) / dx
-  //
-  // Then look at the intersection of this line with the bounding box
-  // (xMin, yMin, xMax, yMax).  In the general case, there are four
-  // intersection points:
-  //
-  //     s0 = (xMin - tx) / -dy
-  //     s1 = (xMax - tx) / -dy
-  //     s2 = (yMin - ty) / dx
-  //     s3 = (yMax - ty) / dx
-  //
-  // and we want the middle two s values.
-  //
-  // In the case where dx = 0, take s0 and s1; in the case where dy =
-  // 0, take s2 and s3.
-  //
-  // Each filled polygon is bounded by two of these line segments
-  // perpdendicular to the t axis.
-  //
-  // The t axis is bisected into smaller regions until the color
-  // difference across a region is small enough, and then the region
-  // is painted with a single color.
-
-  // set up: require at least one split to avoid problems when the two
-  // ends of the t axis have the same color
-  nComps = shading->getColorSpace()->getNComps();
-  ta[0] = tMin;
-  next[0] = axialMaxSplits / 2;
-  ta[axialMaxSplits / 2] = 0.5 * (tMin + tMax);
-  next[axialMaxSplits / 2] = axialMaxSplits;
-  ta[axialMaxSplits] = tMax;
-
-  // compute the color at t = tMin
-  if (tMin < 0) {
-    tt = t0;
-  } else if (tMin > 1) {
-    tt = t1;
   } else {
-    tt = t0 + (t1 - t0) * tMin;
-  }
-  shading->getColor(tt, &color0);
 
-  // compute the coordinates of the point on the t axis at t = tMin;
-  // then compute the intersection of the perpendicular line with the
-  // bounding box
-  tx = x0 + tMin * dx;
-  ty = y0 + tMin * dy;
-  if (dx == 0 && dy == 0) {
-    sMin = sMax = 0;
-  } if (dx == 0) {
-    sMin = (xMin - tx) / -dy;
-    sMax = (xMax - tx) / -dy;
-    if (sMin > sMax) { tmp = sMin; sMin = sMax; sMax = tmp; }
-  } else if (dy == 0) {
-    sMin = (yMin - ty) / dx;
-    sMax = (yMax - ty) / dx;
-    if (sMin > sMax) { tmp = sMin; sMin = sMax; sMax = tmp; }
-  } else {
-    s[0] = (yMin - ty) / dx;
-    s[1] = (yMax - ty) / dx;
-    s[2] = (xMin - tx) / -dy;
-    s[3] = (xMax - tx) / -dy;
-    for (j = 0; j < 3; ++j) {
-      kk = j;
-      for (k = j + 1; k < 4; ++k) {
-	if (s[k] < s[kk]) {
-	  kk = k;
-	}
-      }
-      tmp = s[j]; s[j] = s[kk]; s[kk] = tmp;
+    // get the clip region bbox
+    state->getUserClipBBox(&xMin, &yMin, &xMax, &yMax);
+
+    // compute min and max t values, based on the four corners of the
+    // clip region bbox
+    shading->getCoords(&x0, &y0, &x1, &y1);
+    dx = x1 - x0;
+    dy = y1 - y0;
+    mul = 1 / (dx * dx + dy * dy);
+    tMin = tMax = ((xMin - x0) * dx + (yMin - y0) * dy) * mul;
+    t = ((xMin - x0) * dx + (yMax - y0) * dy) * mul;
+    if (t < tMin) {
+      tMin = t;
+    } else if (t > tMax) {
+      tMax = t;
     }
-    sMin = s[1];
-    sMax = s[2];
-  }
-  ux0 = tx - sMin * dy;
-  uy0 = ty + sMin * dx;
-  vx0 = tx - sMax * dy;
-  vy0 = ty + sMax * dx;
-
-  i = 0;
-  while (i < axialMaxSplits) {
-
-    // bisect until color difference is small enough or we hit the
-    // bisection limit
-    j = next[i];
-    while (j > i + 1) {
-      if (ta[j] < 0) {
-	tt = t0;
-      } else if (ta[j] > 1) {
-	tt = t1;
-      } else {
-	tt = t0 + (t1 - t0) * ta[j];
-      }
-      shading->getColor(tt, &color1);
-      for (k = 0; k < nComps; ++k) {
-	if (fabs(color1.c[k] - color0.c[k]) > axialColorDelta) {
-	  break;
-	}
-      }
-      if (k == nComps) {
-	break;
-      }
-      k = (i + j) / 2;
-      ta[k] = 0.5 * (ta[i] + ta[j]);
-      next[i] = k;
-      next[k] = j;
-      j = k;
+    t = ((xMax - x0) * dx + (yMin - y0) * dy) * mul;
+    if (t < tMin) {
+      tMin = t;
+    } else if (t > tMax) {
+      tMax = t;
+    }
+    t = ((xMax - x0) * dx + (yMax - y0) * dy) * mul;
+    if (t < tMin) {
+      tMin = t;
+    } else if (t > tMax) {
+      tMax = t;
+    }
+    if (tMin < 0 && !shading->getExtend0()) {
+      tMin = 0;
+    }
+    if (tMax > 1 && !shading->getExtend1()) {
+      tMax = 1;
     }
 
-    // use the average of the colors of the two sides of the region
-    for (k = 0; k < nComps; ++k) {
-      color0.c[k] = 0.5 * (color0.c[k] + color1.c[k]);
-    }
+    // get the function domain
+    t0 = shading->getDomain0();
+    t1 = shading->getDomain1();
 
-    // compute the coordinates of the point on the t axis; then
-    // compute the intersection of the perpendicular line with the
+    // Traverse the t axis and do the shading.
+    //
+    // For each point (tx, ty) on the t axis, consider a line through
+    // that point perpendicular to the t axis:
+    //
+    //     x(s) = tx + s * -dy   -->   s = (x - tx) / -dy
+    //     y(s) = ty + s * dx    -->   s = (y - ty) / dx
+    //
+    // Then look at the intersection of this line with the bounding box
+    // (xMin, yMin, xMax, yMax).  In the general case, there are four
+    // intersection points:
+    //
+    //     s0 = (xMin - tx) / -dy
+    //     s1 = (xMax - tx) / -dy
+    //     s2 = (yMin - ty) / dx
+    //     s3 = (yMax - ty) / dx
+    //
+    // and we want the middle two s values.
+    //
+    // In the case where dx = 0, take s0 and s1; in the case where dy =
+    // 0, take s2 and s3.
+    //
+    // Each filled polygon is bounded by two of these line segments
+    // perpdendicular to the t axis.
+    //
+    // The t axis is bisected into smaller regions until the color
+    // difference across a region is small enough, and then the region
+    // is painted with a single color.
+
+    // set up: require at least one split to avoid problems when the two
+    // ends of the t axis have the same color
+    nComps = shading->getColorSpace()->getNComps();
+    ta[0] = tMin;
+    next[0] = axialMaxSplits / 2;
+    ta[axialMaxSplits / 2] = 0.5 * (tMin + tMax);
+    next[axialMaxSplits / 2] = axialMaxSplits;
+    ta[axialMaxSplits] = tMax;
+
+    // compute the color at t = tMin
+    if (tMin < 0) {
+      tt = t0;
+    } else if (tMin > 1) {
+      tt = t1;
+    } else {
+      tt = t0 + (t1 - t0) * tMin;
+    }
+    shading->getColor(tt, &color0);
+
+    // compute the coordinates of the point on the t axis at t = tMin;
+    // then compute the intersection of the perpendicular line with the
     // bounding box
-    tx = x0 + ta[j] * dx;
-    ty = y0 + ta[j] * dy;
+    tx = x0 + tMin * dx;
+    ty = y0 + tMin * dy;
     if (dx == 0 && dy == 0) {
       sMin = sMax = 0;
     } if (dx == 0) {
@@ -1857,31 +1858,104 @@ void Gfx::doAxialShFill(GfxAxialShading *shading) {
       sMin = s[1];
       sMax = s[2];
     }
-    ux1 = tx - sMin * dy;
-    uy1 = ty + sMin * dx;
-    vx1 = tx - sMax * dy;
-    vy1 = ty + sMax * dx;
+    ux0 = tx - sMin * dy;
+    uy0 = ty + sMin * dx;
+    vx0 = tx - sMax * dy;
+    vy0 = ty + sMax * dx;
 
-    // set the color
-    state->setFillColor(&color0);
-    out->updateFillColor(state);
+    i = 0;
+    while (i < axialMaxSplits) {
 
-    // fill the region
-    state->moveTo(ux0, uy0);
-    state->lineTo(vx0, vy0);
-    state->lineTo(vx1, vy1);
-    state->lineTo(ux1, uy1);
-    state->closePath();
-    out->fill(state);
-    state->clearPath();
+      // bisect until color difference is small enough or we hit the
+      // bisection limit
+      j = next[i];
+      while (j > i + 1) {
+	if (ta[j] < 0) {
+	  tt = t0;
+	} else if (ta[j] > 1) {
+	  tt = t1;
+	} else {
+	  tt = t0 + (t1 - t0) * ta[j];
+	}
+	shading->getColor(tt, &color1);
+	for (k = 0; k < nComps; ++k) {
+	  if (fabs(color1.c[k] - color0.c[k]) > axialColorDelta) {
+	    break;
+	  }
+	}
+	if (k == nComps) {
+	  break;
+	}
+	k = (i + j) / 2;
+	ta[k] = 0.5 * (ta[i] + ta[j]);
+	next[i] = k;
+	next[k] = j;
+	j = k;
+      }
 
-    // set up for next region
-    ux0 = ux1;
-    uy0 = uy1;
-    vx0 = vx1;
-    vy0 = vy1;
-    color0 = color1;
-    i = next[i];
+      // use the average of the colors of the two sides of the region
+      for (k = 0; k < nComps; ++k) {
+	color0.c[k] = 0.5 * (color0.c[k] + color1.c[k]);
+      }
+
+      // compute the coordinates of the point on the t axis; then
+      // compute the intersection of the perpendicular line with the
+      // bounding box
+      tx = x0 + ta[j] * dx;
+      ty = y0 + ta[j] * dy;
+      if (dx == 0 && dy == 0) {
+	sMin = sMax = 0;
+      } if (dx == 0) {
+	sMin = (xMin - tx) / -dy;
+	sMax = (xMax - tx) / -dy;
+	if (sMin > sMax) { tmp = sMin; sMin = sMax; sMax = tmp; }
+      } else if (dy == 0) {
+	sMin = (yMin - ty) / dx;
+	sMax = (yMax - ty) / dx;
+	if (sMin > sMax) { tmp = sMin; sMin = sMax; sMax = tmp; }
+      } else {
+	s[0] = (yMin - ty) / dx;
+	s[1] = (yMax - ty) / dx;
+	s[2] = (xMin - tx) / -dy;
+	s[3] = (xMax - tx) / -dy;
+	for (j = 0; j < 3; ++j) {
+	  kk = j;
+	  for (k = j + 1; k < 4; ++k) {
+	    if (s[k] < s[kk]) {
+	      kk = k;
+	    }
+	  }
+	  tmp = s[j]; s[j] = s[kk]; s[kk] = tmp;
+	}
+	sMin = s[1];
+	sMax = s[2];
+      }
+      ux1 = tx - sMin * dy;
+      uy1 = ty + sMin * dx;
+      vx1 = tx - sMax * dy;
+      vy1 = ty + sMax * dx;
+
+      // set the color
+      state->setFillColor(&color0);
+      out->updateFillColor(state);
+
+      // fill the region
+      state->moveTo(ux0, uy0);
+      state->lineTo(vx0, vy0);
+      state->lineTo(vx1, vy1);
+      state->lineTo(ux1, uy1);
+      state->closePath();
+      out->fill(state);
+      state->clearPath();
+
+      // set up for next region
+      ux0 = ux1;
+      uy0 = uy1;
+      vx0 = vx1;
+      vy0 = vy1;
+      color0 = color1;
+      i = next[i];
+    }
   }
 }
 
@@ -1896,139 +1970,126 @@ void Gfx::doRadialShFill(GfxRadialShading *shading) {
   double *ctm;
   double angle, t;
 
-  // get the shading info
-  shading->getCoords(&x0, &y0, &r0, &x1, &y1, &r1);
-  t0 = shading->getDomain0();
-  t1 = shading->getDomain1();
-  nComps = shading->getColorSpace()->getNComps();
+  if (out->useShadedFills()) {
 
-  // compute the (possibly extended) s range
-  sMin = 0;
-  sMax = 1;
-  if (shading->getExtend0()) {
-    if (r0 < r1) {
-      // extend the smaller end
-      sMin = -r0 / (r1 - r0);
-    } else {
-      // extend the larger end
-      //~ this computes the diagonal of the bounding box -- we should
-      //~ really compute the intersection of the moving/expanding
-      //~ circles with each of the four corners and look for the max
-      //~ radius
-      state->getUserClipBBox(&xMin, &yMin, &xMax, &yMax);
-      sMin = (sqrt((xMax - xMin) * (xMax - xMin) +
-		   (yMax - yMin) * (yMax - yMin)) - r0) / (r1 - r0);
-      if (sMin > 0) {
-	sMin = 0;
-      } else if (sMin < -20) {
-	// sanity check
-	sMin = -20;
-      }
-    }
-  }
-  if (shading->getExtend1()) {
-    if (r1 < r0) {
-      // extend the smaller end
-      sMax = -r0 / (r1 - r0);
-    } else if (r1 > r0) {
-      // extend the larger end
-      state->getUserClipBBox(&xMin, &yMin, &xMax, &yMax);
-      sMax = (sqrt((xMax - xMin) * (xMax - xMin) +
-		   (yMax - yMin) * (yMax - yMin)) - r0) / (r1 - r0);
-      if (sMax < 1) {
-	sMin = 1;
-      } else if (sMax > 20) {
-	// sanity check
-	sMax = 20;
-      }
-    }
-  }
+    out->radialShadedFill(state, shading);
 
-  // compute the number of steps into which circles must be divided to
-  // achieve a curve flatness of 0.1 pixel in device space for the
-  // largest circle (note that "device space" is 72 dpi when generating
-  // PostScript, hence the relatively small 0.1 pixel accuracy)
-  ctm = state->getCTM();
-  t = fabs(ctm[0]);
-  if (fabs(ctm[1]) > t) {
-    t = fabs(ctm[1]);
-  }
-  if (fabs(ctm[2]) > t) {
-    t = fabs(ctm[2]);
-  }
-  if (fabs(ctm[3]) > t) {
-    t = fabs(ctm[3]);
-  }
-  if (r0 > r1) {
-    t *= r0;
   } else {
-    t *= r1;
-  }
-  if (t < 1) {
-    n = 3;
-  } else {
-    n = (int)(M_PI / acos(1 - 0.1 / t));
-    if (n < 3) {
-      n = 3;
-    } else if (n > 200) {
-      n = 200;
-    }
-  }
 
-  // Traverse the t axis and do the shading.
-  //
-  // This generates and fills a series of rings.  Each ring is defined
-  // by two circles:
-  //   sa, ta, xa, ya, ra, colorA
-  //   sb, tb, xb, yb, rb, colorB
-  //
-  // The s/t axis is divided into radialMaxSplits parts; these parts
-  // are combined as much as possible while respecting the
-  // radialColorDelta parameter.
+    // get the shading info
+    shading->getCoords(&x0, &y0, &r0, &x1, &y1, &r1);
+    t0 = shading->getDomain0();
+    t1 = shading->getDomain1();
+    nComps = shading->getColorSpace()->getNComps();
 
-  // setup for the start circle
-  ia = 0;
-  sa = sMin;
-  ta = t0 + sa * (t1 - t0);
-  xa = x0 + sa * (x1 - x0);
-  ya = y0 + sa * (y1 - y0);
-  ra = r0 + sa * (r1 - r0);
-  if (ta < t0) {
-    shading->getColor(t0, &colorA);
-  } else if (ta > t1) {
-    shading->getColor(t1, &colorA);
-  } else {
-    shading->getColor(ta, &colorA);
-  }
-
-  while (ia < radialMaxSplits) {
-
-    // go as far along the t axis (toward t1) as we can, such that the
-    // color difference is within the tolerance (radialColorDelta) --
-    // this uses bisection (between the current value, t, and t1),
-    // limited to radialMaxSplits points along the t axis; require at
-    // least one split to avoid problems when the innermost and
-    // outermost colors are the same
-    ib = radialMaxSplits;
-    sb = sMin + ((double)ib / (double)radialMaxSplits) * (sMax - sMin);
-    tb = t0 + sb * (t1 - t0);
-    if (tb < t0) {
-      shading->getColor(t0, &colorB);
-    } else if (tb > t1) {
-      shading->getColor(t1, &colorB);
-    } else {
-      shading->getColor(tb, &colorB);
-    }
-    while (ib - ia > 1) {
-      for (k = 0; k < nComps; ++k) {
-	if (fabs(colorB.c[k] - colorA.c[k]) > radialColorDelta) {
-	  break;
+    // compute the (possibly extended) s range
+    sMin = 0;
+    sMax = 1;
+    if (shading->getExtend0()) {
+      if (r0 < r1) {
+	// extend the smaller end
+	sMin = -r0 / (r1 - r0);
+      } else {
+	// extend the larger end
+	//~ this computes the diagonal of the bounding box -- we should
+	//~ really compute the intersection of the moving/expanding
+	//~ circles with each of the four corners and look for the max
+	//~ radius
+	state->getUserClipBBox(&xMin, &yMin, &xMax, &yMax);
+	sMin = (sqrt((xMax - xMin) * (xMax - xMin) +
+		     (yMax - yMin) * (yMax - yMin)) - r0) / (r1 - r0);
+	if (sMin > 0) {
+	  sMin = 0;
+	} else if (sMin < -20) {
+	  // sanity check
+	  sMin = -20;
 	}
       }
-      if (k == nComps && ib < radialMaxSplits) {
-	break;
+    }
+    if (shading->getExtend1()) {
+      if (r1 < r0) {
+	// extend the smaller end
+	sMax = -r0 / (r1 - r0);
+      } else if (r1 > r0) {
+	// extend the larger end
+	state->getUserClipBBox(&xMin, &yMin, &xMax, &yMax);
+	sMax = (sqrt((xMax - xMin) * (xMax - xMin) +
+		     (yMax - yMin) * (yMax - yMin)) - r0) / (r1 - r0);
+	if (sMax < 1) {
+	  sMin = 1;
+	} else if (sMax > 20) {
+	  // sanity check
+	  sMax = 20;
+	}
       }
-      ib = (ia + ib) / 2;
+    }
+
+    // compute the number of steps into which circles must be divided to
+    // achieve a curve flatness of 0.1 pixel in device space for the
+    // largest circle (note that "device space" is 72 dpi when generating
+    // PostScript, hence the relatively small 0.1 pixel accuracy)
+    ctm = state->getCTM();
+    t = fabs(ctm[0]);
+    if (fabs(ctm[1]) > t) {
+      t = fabs(ctm[1]);
+    }
+    if (fabs(ctm[2]) > t) {
+      t = fabs(ctm[2]);
+    }
+    if (fabs(ctm[3]) > t) {
+      t = fabs(ctm[3]);
+    }
+    if (r0 > r1) {
+      t *= r0;
+    } else {
+      t *= r1;
+    }
+    if (t < 1) {
+      n = 3;
+    } else {
+      n = (int)(M_PI / acos(1 - 0.1 / t));
+      if (n < 3) {
+	n = 3;
+      } else if (n > 200) {
+	n = 200;
+      }
+    }
+
+    // Traverse the t axis and do the shading.
+    //
+    // This generates and fills a series of rings.  Each ring is defined
+    // by two circles:
+    //   sa, ta, xa, ya, ra, colorA
+    //   sb, tb, xb, yb, rb, colorB
+    //
+    // The s/t axis is divided into radialMaxSplits parts; these parts
+    // are combined as much as possible while respecting the
+    // radialColorDelta parameter.
+
+    // setup for the start circle
+    ia = 0;
+    sa = sMin;
+    ta = t0 + sa * (t1 - t0);
+    xa = x0 + sa * (x1 - x0);
+    ya = y0 + sa * (y1 - y0);
+    ra = r0 + sa * (r1 - r0);
+    if (ta < t0) {
+      shading->getColor(t0, &colorA);
+    } else if (ta > t1) {
+      shading->getColor(t1, &colorA);
+    } else {
+      shading->getColor(ta, &colorA);
+    }
+
+    while (ia < radialMaxSplits) {
+
+      // go as far along the t axis (toward t1) as we can, such that the
+      // color difference is within the tolerance (radialColorDelta) --
+      // this uses bisection (between the current value, t, and t1),
+      // limited to radialMaxSplits points along the t axis; require at
+      // least one split to avoid problems when the innermost and
+      // outermost colors are the same
+      ib = radialMaxSplits;
       sb = sMin + ((double)ib / (double)radialMaxSplits) * (sMax - sMin);
       tb = t0 + sb * (t1 - t0);
       if (tb < t0) {
@@ -2038,48 +2099,261 @@ void Gfx::doRadialShFill(GfxRadialShading *shading) {
       } else {
 	shading->getColor(tb, &colorB);
       }
-    }
+      while (ib - ia > 1) {
+	for (k = 0; k < nComps; ++k) {
+	  if (fabs(colorB.c[k] - colorA.c[k]) > radialColorDelta) {
+	    break;
+	  }
+	}
+	if (k == nComps && ib < radialMaxSplits) {
+	  break;
+	}
+	ib = (ia + ib) / 2;
+	sb = sMin + ((double)ib / (double)radialMaxSplits) * (sMax - sMin);
+	tb = t0 + sb * (t1 - t0);
+	if (tb < t0) {
+	  shading->getColor(t0, &colorB);
+	} else if (tb > t1) {
+	  shading->getColor(t1, &colorB);
+	} else {
+	  shading->getColor(tb, &colorB);
+	}
+      }
 
-    // compute center and radius of the circle
-    xb = x0 + sb * (x1 - x0);
-    yb = y0 + sb * (y1 - y0);
-    rb = r0 + sb * (r1 - r0);
+      // compute center and radius of the circle
+      xb = x0 + sb * (x1 - x0);
+      yb = y0 + sb * (y1 - y0);
+      rb = r0 + sb * (r1 - r0);
 
-    // use the average of the colors at the two circles
-    for (k = 0; k < nComps; ++k) {
-      colorA.c[k] = 0.5 * (colorA.c[k] + colorB.c[k]);
+      // use the average of the colors at the two circles
+      for (k = 0; k < nComps; ++k) {
+	colorA.c[k] = 0.5 * (colorA.c[k] + colorB.c[k]);
+      }
+      state->setFillColor(&colorA);
+      out->updateFillColor(state);
+
+      // construct path for first circle
+      state->moveTo(xa + ra, ya);
+      for (k = 1; k < n; ++k) {
+	angle = ((double)k / (double)n) * 2 * M_PI;
+	state->lineTo(xa + ra * cos(angle), ya + ra * sin(angle));
+      }
+      state->closePath();
+
+      // construct and append path for second circle
+      state->moveTo(xb + rb, yb);
+      for (k = 1; k < n; ++k) {
+	angle = ((double)k / (double)n) * 2 * M_PI;
+	state->lineTo(xb + rb * cos(angle), yb + rb * sin(angle));
+      }
+      state->closePath();
+
+      // fill the ring
+      out->eoFill(state);
+      state->clearPath();
+
+      // step to the next value of t
+      ia = ib;
+      sa = sb;
+      ta = tb;
+      xa = xb;
+      ya = yb;
+      ra = rb;
+      colorA = colorB;
     }
-    state->setFillColor(&colorA);
+  }
+}
+
+void Gfx::doGouraudTriangleShFill(GfxGouraudTriangleShading *shading) {
+  double x0, y0, x1, y1, x2, y2;
+  GfxColor color0, color1, color2;
+  int i;
+
+  for (i = 0; i < shading->getNTriangles(); ++i) {
+    shading->getTriangle(i, &x0, &y0, &color0,
+			 &x1, &y1, &color1,
+			 &x2, &y2, &color2);
+    gouraudFillTriangle(x0, y0, &color0, x1, y1, &color1, x2, y2, &color2,
+			shading->getColorSpace()->getNComps(), 0);
+  }
+}
+
+void Gfx::gouraudFillTriangle(double x0, double y0, GfxColor *color0,
+			      double x1, double y1, GfxColor *color1,
+			      double x2, double y2, GfxColor *color2,
+			      int nComps, int depth) {
+  double x01, y01, x12, y12, x20, y20;
+  GfxColor color01, color12, color20;
+  int i;
+
+  for (i = 0; i < nComps; ++i) {
+    if (fabs(color0->c[i] - color1->c[i]) > gouraudColorDelta ||
+	fabs(color1->c[i] - color2->c[i]) > gouraudColorDelta) {
+      break;
+    }
+  }
+  if (i == nComps || depth == gouraudMaxDepth) {
+    state->setFillColor(color0);
     out->updateFillColor(state);
-
-    // construct path for first circle
-    state->moveTo(xa + ra, ya);
-    for (k = 1; k < n; ++k) {
-      angle = ((double)k / (double)n) * 2 * M_PI;
-      state->lineTo(xa + ra * cos(angle), ya + ra * sin(angle));
-    }
+    state->moveTo(x0, y0);
+    state->lineTo(x1, y1);
+    state->lineTo(x2, y2);
     state->closePath();
-
-    // construct and append path for second circle
-    state->moveTo(xb + rb, yb);
-    for (k = 1; k < n; ++k) {
-      angle = ((double)k / (double)n) * 2 * M_PI;
-      state->lineTo(xb + rb * cos(angle), yb + rb * sin(angle));
-    }
-    state->closePath();
-
-    // fill the ring
-    out->eoFill(state);
+    out->fill(state);
     state->clearPath();
+  } else {
+    x01 = 0.5 * (x0 + x1);
+    y01 = 0.5 * (y0 + y1);
+    x12 = 0.5 * (x1 + x2);
+    y12 = 0.5 * (y1 + y2);
+    x20 = 0.5 * (x2 + x0);
+    y20 = 0.5 * (y2 + y0);
+    //~ if the shading has a Function, this should interpolate on the
+    //~ function parameter, not on the color components
+    for (i = 0; i < nComps; ++i) {
+      color01.c[i] = 0.5 * (color0->c[i] + color1->c[i]);
+      color12.c[i] = 0.5 * (color1->c[i] + color2->c[i]);
+      color20.c[i] = 0.5 * (color2->c[i] + color0->c[i]);
+    }
+    gouraudFillTriangle(x0, y0, color0, x01, y01, &color01,
+			x20, y20, &color20, nComps, depth + 1);
+    gouraudFillTriangle(x01, y01, &color01, x1, y1, color1,
+			x12, y12, &color12, nComps, depth + 1);
+    gouraudFillTriangle(x01, y01, &color01, x12, y12, &color12,
+			x20, y20, &color20, nComps, depth + 1);
+    gouraudFillTriangle(x20, y20, &color20, x12, y12, &color12,
+			x2, y2, color2, nComps, depth + 1);
+  }
+}
 
-    // step to the next value of t
-    ia = ib;
-    sa = sb;
-    ta = tb;
-    xa = xb;
-    ya = yb;
-    ra = rb;
-    colorA = colorB;
+void Gfx::doPatchMeshShFill(GfxPatchMeshShading *shading) {
+  int i;
+
+  for (i = 0; i < shading->getNPatches(); ++i) {
+    fillPatch(shading->getPatch(i), shading->getColorSpace()->getNComps(), 0);
+  }
+}
+
+void Gfx::fillPatch(GfxPatch *patch, int nComps, int depth) {
+  GfxPatch patch00, patch01, patch10, patch11;
+  double xx[4][8], yy[4][8];
+  int i;
+
+  for (i = 0; i < nComps; ++i) {
+    if (fabs(patch->color[0][0].c[i] - patch->color[0][1].c[i])
+	  > patchColorDelta ||
+	fabs(patch->color[0][1].c[i] - patch->color[1][1].c[i])
+	  > patchColorDelta ||
+	fabs(patch->color[1][1].c[i] - patch->color[1][0].c[i])
+	  > patchColorDelta ||
+	fabs(patch->color[1][0].c[i] - patch->color[0][0].c[i])
+	  > patchColorDelta) {
+      break;
+    }
+  }
+  if (i == nComps || depth == patchMaxDepth) {
+    state->setFillColor(&patch->color[0][0]);
+    out->updateFillColor(state);
+    state->moveTo(patch->x[0][0], patch->y[0][0]);
+    state->curveTo(patch->x[0][1], patch->y[0][1],
+		   patch->x[0][2], patch->y[0][2],
+		   patch->x[0][3], patch->y[0][3]);
+    state->curveTo(patch->x[1][3], patch->y[1][3],
+		   patch->x[2][3], patch->y[2][3],
+		   patch->x[3][3], patch->y[3][3]);
+    state->curveTo(patch->x[3][2], patch->y[3][2],
+		   patch->x[3][1], patch->y[3][1],
+		   patch->x[3][0], patch->y[3][0]);
+    state->curveTo(patch->x[2][0], patch->y[2][0],
+		   patch->x[1][0], patch->y[1][0],
+		   patch->x[0][0], patch->y[0][0]);
+    state->closePath();
+    out->fill(state);
+    state->clearPath();
+  } else {
+    for (i = 0; i < 4; ++i) {
+      xx[i][0] = patch->x[i][0];
+      yy[i][0] = patch->y[i][0];
+      xx[i][1] = 0.5 * (patch->x[i][0] + patch->x[i][1]);
+      yy[i][1] = 0.5 * (patch->y[i][0] + patch->y[i][1]);
+      xx[i][2] = 0.25 * (patch->x[i][0] + 2 * patch->x[i][1] + patch->x[i][2]);
+      yy[i][2] = 0.25 * (patch->y[i][0] + 2 * patch->y[i][1] + patch->y[i][2]);
+      xx[i][3] = 0.5 * (patch->x[i][1] + patch->x[i][2]);
+      yy[i][3] = 0.5 * (patch->y[i][1] + patch->y[i][2]);
+      xx[i][4] = xx[i][3];
+      yy[i][4] = yy[i][3];
+      xx[i][5] = 0.25 * (patch->x[i][1] + 2 * patch->x[i][2] + patch->x[i][3]);
+      yy[i][5] = 0.25 * (patch->y[i][1] + 2 * patch->y[i][2] + patch->y[i][3]);
+      xx[i][6] = 0.5 * (patch->x[i][2] + patch->x[i][3]);
+      yy[i][6] = 0.5 * (patch->y[i][2] + patch->y[i][3]);
+      xx[i][7] = patch->x[i][3];
+      yy[i][7] = patch->y[i][3];
+    }
+    for (i = 0; i < 4; ++i) {
+      patch00.x[0][i] = xx[0][i];
+      patch00.y[0][i] = yy[0][i];
+      patch00.x[1][i] = 0.5 * (xx[0][i] + xx[1][i]);
+      patch00.y[1][i] = 0.5 * (yy[0][i] + yy[1][i]);
+      patch00.x[2][i] = 0.25 * (xx[0][i] + 2 * xx[1][i] + xx[2][i]);
+      patch00.y[2][i] = 0.25 * (yy[0][i] + 2 * yy[1][i] + yy[2][i]);
+      patch00.x[3][i] = 0.5 * (xx[1][i] + xx[2][i]);
+      patch00.y[3][i] = 0.5 * (yy[1][i] + yy[2][i]);
+      patch10.x[0][i] = patch00.x[3][i];
+      patch10.y[0][i] = patch00.y[3][i];
+      patch10.x[1][i] = 0.25 * (xx[1][i] + 2 * xx[2][i] + xx[3][i]);
+      patch10.y[1][i] = 0.25 * (yy[1][i] + 2 * yy[2][i] + yy[3][i]);
+      patch10.x[2][i] = 0.5 * (xx[2][i] + xx[3][i]);
+      patch10.y[2][i] = 0.5 * (yy[2][i] + yy[3][i]);
+      patch10.x[3][i] = xx[3][i];
+      patch10.y[3][i] = yy[3][i];
+    }
+    for (i = 4; i < 8; ++i) {
+      patch01.x[0][i-4] = xx[0][i];
+      patch01.y[0][i-4] = yy[0][i];
+      patch01.x[1][i-4] = 0.5 * (xx[0][i] + xx[1][i]);
+      patch01.y[1][i-4] = 0.5 * (yy[0][i] + yy[1][i]);
+      patch01.x[2][i-4] = 0.25 * (xx[0][i] + 2 * xx[1][i] + xx[2][i]);
+      patch01.y[2][i-4] = 0.25 * (yy[0][i] + 2 * yy[1][i] + yy[2][i]);
+      patch01.x[3][i-4] = 0.5 * (xx[1][i] + xx[2][i]);
+      patch01.y[3][i-4] = 0.5 * (yy[1][i] + yy[2][i]);
+      patch11.x[0][i-4] = patch01.x[3][i-4];
+      patch11.y[0][i-4] = patch01.y[3][i-4];
+      patch11.x[1][i-4] = 0.25 * (xx[1][i] + 2 * xx[2][i] + xx[3][i]);
+      patch11.y[1][i-4] = 0.25 * (yy[1][i] + 2 * yy[2][i] + yy[3][i]);
+      patch11.x[2][i-4] = 0.5 * (xx[2][i] + xx[3][i]);
+      patch11.y[2][i-4] = 0.5 * (yy[2][i] + yy[3][i]);
+      patch11.x[3][i-4] = xx[3][i];
+      patch11.y[3][i-4] = yy[3][i];
+    }
+    //~ if the shading has a Function, this should interpolate on the
+    //~ function parameter, not on the color components
+    for (i = 0; i < nComps; ++i) {
+      patch00.color[0][0].c[i] = patch->color[0][0].c[i];
+      patch00.color[0][1].c[i] = 0.5 * (patch->color[0][0].c[i] +
+					patch->color[0][1].c[i]);
+      patch01.color[0][0].c[i] = patch00.color[0][1].c[i];
+      patch01.color[0][1].c[i] = patch->color[0][1].c[i];
+      patch01.color[1][1].c[i] = 0.5 * (patch->color[0][1].c[i] +
+					patch->color[1][1].c[i]);
+      patch11.color[0][1].c[i] = patch01.color[1][1].c[i];
+      patch11.color[1][1].c[i] = patch->color[1][1].c[i];
+      patch11.color[1][0].c[i] = 0.5 * (patch->color[1][1].c[i] +
+					patch->color[1][0].c[i]);
+      patch10.color[1][1].c[i] = patch11.color[1][0].c[i];
+      patch10.color[1][0].c[i] = patch->color[1][0].c[i];
+      patch10.color[0][0].c[i] = 0.5 * (patch->color[1][0].c[i] +
+					patch->color[0][0].c[i]);
+      patch00.color[1][0].c[i] = patch10.color[0][0].c[i];
+      patch00.color[1][1].c[i] = 0.5 * (patch00.color[1][0].c[i] +
+					patch01.color[1][1].c[i]);
+      patch01.color[1][0].c[i] = patch00.color[1][1].c[i];
+      patch11.color[0][0].c[i] = patch00.color[1][1].c[i];
+      patch10.color[0][1].c[i] = patch00.color[1][1].c[i];
+    }
+    fillPatch(&patch00, nComps, depth + 1);
+    fillPatch(&patch10, nComps, depth + 1);
+    fillPatch(&patch01, nComps, depth + 1);
+    fillPatch(&patch11, nComps, depth + 1);
   }
 }
 
@@ -2140,11 +2414,11 @@ void Gfx::opSetFont(Object args[], int numArgs) {
     return;
   }
   if (printCommands) {
-    fprintf(stderr, "DEBUG2:   font: tag=%s name='%s' %g\n",
-	    font->getTag()->getCString(),
-	    font->getName() ? font->getName()->getCString() : "???",
-	    args[1].getNum());
-    fflush(stderr);
+    printf("  font: tag=%s name='%s' %g\n",
+	   font->getTag()->getCString(),
+	   font->getName() ? font->getName()->getCString() : "???",
+	   args[1].getNum());
+    fflush(stdout);
   }
   state->setFont(font, args[1].getNum());
   fontChanged = gTrue;
@@ -2348,6 +2622,8 @@ void Gfx::doShowText(GString *s) {
     newCTM[2] = mat[2] * newCTM[0] + mat[3] * newCTM[2];
     newCTM[3] = mat[2] * newCTM[1] + mat[3] * newCTM[3];
     newCTM[0] *= state->getFontSize();
+    newCTM[1] *= state->getFontSize();
+    newCTM[2] *= state->getFontSize();
     newCTM[3] *= state->getFontSize();
     newCTM[0] *= state->getHorizScaling();
     newCTM[2] *= state->getHorizScaling();
@@ -2374,7 +2650,8 @@ void Gfx::doShowText(GString *s) {
       saveState();
       state->setCTM(newCTM[0], newCTM[1], newCTM[2], newCTM[3], x, y);
       //~ out->updateCTM(???)
-      if (!out->beginType3Char(state, code, u, uLen)) {
+      if (!out->beginType3Char(state, curX + riseX, curY + riseY, tdx, tdy,
+			       code, u, uLen)) {
 	((Gfx8BitFont *)font)->getCharProc(code, &charProc);
 	if ((resDict = ((Gfx8BitFont *)font)->getResources())) {
 	  pushResources(resDict);
@@ -2528,7 +2805,7 @@ void Gfx::opXObject(Object args[], int numArgs) {
 }
 
 void Gfx::doImage(Object *ref, Stream *str, GBool inlineImg) {
-  Dict *dict;
+  Dict *dict, *maskDict;
   int width, height;
   int bits;
   GBool mask;
@@ -2536,8 +2813,11 @@ void Gfx::doImage(Object *ref, Stream *str, GBool inlineImg) {
   GfxColorSpace *colorSpace;
   GfxImageColorMap *colorMap;
   Object maskObj;
-  GBool haveMask;
+  GBool haveColorKeyMask, haveExplicitMask;
   int maskColors[2*gfxColorMaxComps];
+  int maskWidth, maskHeight;
+  GBool maskInvert;
+  Stream *maskStr;
   Object obj1, obj2;
   int i;
 
@@ -2652,20 +2932,82 @@ void Gfx::doImage(Object *ref, Stream *str, GBool inlineImg) {
     }
 
     // get the mask
-    haveMask = gFalse;
+    haveColorKeyMask = haveExplicitMask = gFalse;
+    maskStr = NULL; // make gcc happy
+    maskWidth = maskHeight = 0; // make gcc happy
+    maskInvert = gFalse; // make gcc hapyp
     dict->lookup("Mask", &maskObj);
     if (maskObj.isArray()) {
+      // color key mask
       for (i = 0; i < maskObj.arrayGetLength(); ++i) {
 	maskObj.arrayGet(i, &obj1);
 	maskColors[i] = obj1.getInt();
 	obj1.free();
       }
-      haveMask = gTrue;
+      haveColorKeyMask = gTrue;
+    } else if (maskObj.isStream()) {
+      // explicit mask
+      if (inlineImg) {
+	goto err1;
+      }
+      maskStr = maskObj.getStream();
+      maskDict = maskObj.streamGetDict();
+      maskDict->lookup("Width", &obj1);
+      if (obj1.isNull()) {
+	obj1.free();
+	maskDict->lookup("W", &obj1);
+      }
+      if (!obj1.isInt()) {
+	goto err2;
+      }
+      maskWidth = obj1.getInt();
+      obj1.free();
+      maskDict->lookup("Height", &obj1);
+      if (obj1.isNull()) {
+	obj1.free();
+	maskDict->lookup("H", &obj1);
+      }
+      if (!obj1.isInt()) {
+	goto err2;
+      }
+      maskHeight = obj1.getInt();
+      obj1.free();
+      maskDict->lookup("ImageMask", &obj1);
+      if (obj1.isNull()) {
+	obj1.free();
+	maskDict->lookup("IM", &obj1);
+      }
+      if (!obj1.isBool() || !obj1.getBool()) {
+	goto err2;
+      }
+      obj1.free();
+      maskInvert = gFalse;
+      maskDict->lookup("Decode", &obj1);
+      if (obj1.isNull()) {
+	obj1.free();
+	maskDict->lookup("D", &obj1);
+      }
+      if (obj1.isArray()) {
+	obj1.arrayGet(0, &obj2);
+	if (obj2.isInt() && obj2.getInt() == 1) {
+	  maskInvert = gTrue;
+	}
+	obj2.free();
+      } else if (!obj1.isNull()) {
+	goto err2;
+      }
+      obj1.free();
+      haveExplicitMask = gTrue;
     }
 
     // draw it
-    out->drawImage(state, ref, str, width, height, colorMap,
-		   haveMask ? maskColors : (int *)NULL,  inlineImg);
+    if (haveExplicitMask) {
+      out->drawMaskedImage(state, ref, str, width, height, colorMap,
+			   maskStr, maskWidth, maskHeight, maskInvert);
+    } else {
+      out->drawImage(state, ref, str, width, height, colorMap,
+		     haveColorKeyMask ? maskColors : (int *)NULL, inlineImg);
+    }
     delete colorMap;
 
     maskObj.free();
@@ -2703,7 +3045,7 @@ void Gfx::doForm(Object *str) {
 
   // check form type
   dict->lookup("FormType", &obj1);
-  if (!(obj1.isInt() && obj1.getInt() == 1)) {
+  if (!(obj1.isNull() || (obj1.isInt() && obj1.getInt() == 1))) {
     error(getPos(), "Unknown form type");
   }
   obj1.free();
@@ -2753,38 +3095,17 @@ void Gfx::doForm(Object *str) {
 void Gfx::doAnnot(Object *str, double xMin, double yMin,
 		  double xMax, double yMax) {
   Dict *dict, *resDict;
-  Object matrixObj, bboxObj, resObj, flagsObj, subTypeObj;
+  Object matrixObj, bboxObj, resObj;
   Object obj1;
   double m[6], bbox[6], ictm[6];
   double *ctm;
   double formX0, formY0, formX1, formY1;
   double annotX0, annotY0, annotX1, annotY1;
   double det, x, y, sx, sy;
-  int i, flags;
+  int i;
 
   // get stream dict
   dict = str->streamGetDict();
-
-  // get annotation flags and only print annotations that are hidden or
-  // don't have the print bit set.
-  dict->lookup("F", &flagsObj);
-  if (flagsObj.isInt()) {
-    flags = flagsObj.getInt();
-  } else {
-    // Print anything that doesn't have any flags set...
-    flags = 4;
-  }
-  flagsObj.free();
-
-  fprintf(stderr, "DEBUG: pdftops: doAnnot found annotation with flags = %x\n",
-          flags);
-
-  subTypeObj.free();
-
-  if ((flags & 2) == 2 || (flags & 4) == 0) {
-    // Don't print hidden or no-print annotations...
-    return;
-  }
 
   // get the form bounding box
   dict->lookup("BBox", &bboxObj);
@@ -3004,7 +3325,7 @@ Stream *Gfx::buildImageStream() {
   obj.free();
 
   // make stream
-  str = new EmbedStream(parser->getStream(), &dict);
+  str = new EmbedStream(parser->getStream(), &dict, gFalse, 0);
   str = str->addFilters(&dict);
 
   return str;
@@ -3051,11 +3372,11 @@ void Gfx::opEndIgnoreUndef(Object args[], int numArgs) {
 
 void Gfx::opBeginMarkedContent(Object args[], int numArgs) {
   if (printCommands) {
-    fprintf(stderr, "DEBUG2:   marked content: %s ", args[0].getName());
+    printf("  marked content: %s ", args[0].getName());
     if (numArgs == 2)
-      args[2].print(stderr);
-    putc('\n', stderr);
-    fflush(stderr);
+      args[2].print(stdout);
+    printf("\n");
+    fflush(stdout);
   }
 }
 
@@ -3064,11 +3385,11 @@ void Gfx::opEndMarkedContent(Object args[], int numArgs) {
 
 void Gfx::opMarkPoint(Object args[], int numArgs) {
   if (printCommands) {
-    fprintf(stderr, "DEBUG2:   mark point: %s ", args[0].getName());
+    printf("  mark point: %s ", args[0].getName());
     if (numArgs == 2)
-      args[2].print(stderr);
-    putc('\n', stderr);
-    fflush(stderr);
+      args[2].print(stdout);
+    printf("\n");
+    fflush(stdout);
   }
 }
 

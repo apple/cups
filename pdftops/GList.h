@@ -2,7 +2,7 @@
 //
 // GList.h
 //
-// Copyright 2001-2003 Glyph & Cog, LLC
+// Copyright 2001-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -57,6 +57,11 @@ public:
   // Deletes and returns the element at index <i>.
   // Assumes 0 <= i < length.
   void *del(int i);
+
+  // Sort the list accoring to the given comparison function.
+  // NB: this sorts an array of pointers, so the pointer args need to
+  // be double-dereferenced.
+  void sort(int (*cmp)(const void *ptr1, const void *ptr2));
 
   //----- control
 

@@ -2,14 +2,14 @@
 //
 // CompactFontTables.h
 //
-// Copyright 1999-2003 Glyph & Cog, LLC
+// Copyright 1999-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
 #ifndef COMPACTFONTINFO_H
 #define COMPACTFONTINFO_H
 
-static const char *type1CStdStrings[391] = {
+static char *type1CStdStrings[391] = {
   ".notdef",
   "space",
   "exclam",

@@ -2,7 +2,7 @@
 //
 // Object.cc
 //
-// Copyright 1996-2003 Glyph & Cog, LLC
+// Copyright 1996-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -24,7 +24,7 @@
 // Object
 //------------------------------------------------------------------------
 
-const char *objTypeNames[numObjTypes] = {
+char *objTypeNames[numObjTypes] = {
   "boolean",
   "integer",
   "real",
@@ -55,6 +55,13 @@ Object *Object::initArray(XRef *xref) {
 Object *Object::initDict(XRef *xref) {
   initObj(objDict);
   dict = new Dict(xref);
+  return this;
+}
+
+Object *Object::initDict(Dict *dictA) {
+  initObj(objDict);
+  dict = dictA;
+  dict->incRef();
   return this;
 }
 
@@ -134,7 +141,7 @@ void Object::free() {
   type = objNone;
 }
 
-const char *Object::getTypeName() {
+char *Object::getTypeName() {
   return objTypeNames[type];
 }
 

@@ -2,7 +2,7 @@
 //
 // Page.h
 //
-// Copyright 1996-2003 Glyph & Cog, LLC
+// Copyright 1996-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -78,7 +78,7 @@ public:
 
 private:
 
-  GBool readBox(Dict *dict, const char *key, PDFRectangle *box);
+  GBool readBox(Dict *dict, char *key, PDFRectangle *box);
 
   PDFRectangle mediaBox;
   PDFRectangle cropBox;
@@ -141,13 +141,15 @@ public:
   Object *getContents(Object *obj) { return contents.fetch(xref, obj); }
 
   // Display a page.
-  void display(OutputDev *out, double hDPI, double vDPI, int rotate,
+  void display(OutputDev *out, double hDPI, double vDPI,
+	       int rotate, GBool crop,
 	       Links *links, Catalog *catalog,
 	       GBool (*abortCheckCbk)(void *data) = NULL,
 	       void *abortCheckCbkData = NULL);
 
   // Display part of a page.
-  void displaySlice(OutputDev *out, double hDPI, double vDPI, int rotate,
+  void displaySlice(OutputDev *out, double hDPI, double vDPI,
+		    int rotate, GBool crop,
 		    int sliceX, int sliceY, int sliceW, int sliceH,
 		    Links *links, Catalog *catalog,
 		    GBool (*abortCheckCbk)(void *data) = NULL,

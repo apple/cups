@@ -2,7 +2,7 @@
 //
 // UnicodeMapTables.h
 //
-// Copyright 2001-2003 Glyph & Cog, LLC
+// Copyright 2001-2004 Glyph & Cog, LLC
 //
 //========================================================================
 

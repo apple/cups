@@ -2,7 +2,7 @@
 //
 // Parser.cc
 //
-// Copyright 1996-2003 Glyph & Cog, LLC
+// Copyright 1996-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -19,9 +19,7 @@
 #include "Parser.h"
 #include "XRef.h"
 #include "Error.h"
-#ifndef NO_DECRYPTION
 #include "Decrypt.h"
-#endif
 
 Parser::Parser(XRef *xrefA, Lexer *lexerA) {
   xref = xrefA;
@@ -37,23 +35,17 @@ Parser::~Parser() {
   delete lexer;
 }
 
-#ifndef NO_DECRYPTION
 Object *Parser::getObj(Object *obj,
 		       Guchar *fileKey, int keyLength,
 		       int objNum, int objGen) {
-#else
-Object *Parser::getObj(Object *obj) {
-#endif
   char *key;
   Stream *str;
   Object obj2;
   int num;
-#ifndef NO_DECRYPTION
   Decrypt *decrypt;
   GString *s;
   char *p;
   int i;
-#endif
 
   // refill buffer after inline image data
   if (inlineImg == 2) {
@@ -69,11 +61,7 @@ Object *Parser::getObj(Object *obj) {
     shift();
     obj->initArray(xref);
     while (!buf1.isCmd("]") && !buf1.isEOF())
-#ifndef NO_DECRYPTION
       obj->arrayAdd(getObj(&obj2, fileKey, keyLength, objNum, objGen));
-#else
-      obj->arrayAdd(getObj(&obj2));
-#endif
     if (buf1.isEOF())
       error(getPos(), "End of file inside array");
     shift();
@@ -93,11 +81,7 @@ Object *Parser::getObj(Object *obj) {
 	  gfree(key);
 	  break;
 	}
-#ifndef NO_DECRYPTION
 	obj->dictAdd(key, getObj(&obj2, fileKey, keyLength, objNum, objGen));
-#else
-	obj->dictAdd(key, getObj(&obj2));
-#endif
       }
     }
     if (buf1.isEOF())
@@ -105,12 +89,10 @@ Object *Parser::getObj(Object *obj) {
     if (buf2.isCmd("stream")) {
       if ((str = makeStream(obj))) {
 	obj->initStream(str);
-#ifndef NO_DECRYPTION
 	if (fileKey) {
 	  str->getBaseStream()->doDecryption(fileKey, keyLength,
 					     objNum, objGen);
 	}
-#endif
       } else {
 	obj->free();
 	obj->initError();
@@ -131,7 +113,6 @@ Object *Parser::getObj(Object *obj) {
       obj->initInt(num);
     }
 
-#ifndef NO_DECRYPTION
   // string
   } else if (buf1.isString() && fileKey) {
     buf1.copy(obj);
@@ -144,7 +125,6 @@ Object *Parser::getObj(Object *obj) {
     }
     delete decrypt;
     shift();
-#endif
 
   // simple object
   } else {
@@ -176,7 +156,7 @@ Stream *Parser::makeStream(Object *dict) {
   }
 
   // check for length in damaged file
-  if (xref->getStreamEnd(pos, &endPos)) {
+  if (xref && xref->getStreamEnd(pos, &endPos)) {
     length = endPos - pos;
   }
 

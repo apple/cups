@@ -2,7 +2,7 @@
 //
 // Stream.cc
 //
-// Copyright 1996-2003 Glyph & Cog, LLC
+// Copyright 1996-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -25,11 +25,10 @@
 #include "config.h"
 #include "Error.h"
 #include "Object.h"
-#ifndef NO_DECRYPTION
 #include "Decrypt.h"
-#endif
 #include "Stream.h"
 #include "JBIG2Stream.h"
+#include "JPXStream.h"
 #include "Stream-CCITT.h"
 
 #ifdef __DJGPP__
@@ -84,7 +83,7 @@ char *Stream::getLine(char *buf, int size) {
   return buf;
 }
 
-GString *Stream::getPSFilter(int psLevel, const char *indent) {
+GString *Stream::getPSFilter(int psLevel, char *indent) {
   return new GString();
 }
 
@@ -132,7 +131,7 @@ Stream *Stream::addFilters(Object *dict) {
   return str;
 }
 
-Stream *Stream::makeFilter(const char *name, Stream *str, Object *params) {
+Stream *Stream::makeFilter(char *name, Stream *str, Object *params) {
   int pred;			// parameters
   int colors;
   int bits;
@@ -256,6 +255,8 @@ Stream *Stream::makeFilter(const char *name, Stream *str, Object *params) {
     }
     str = new JBIG2Stream(str, &globals);
     globals.free();
+  } else if (!strcmp(name, "JPXDecode")) {
+    str = new JPXStream(str);
   } else {
     error(getPos(), "Unknown filter '%s'", name);
     str = new EOFStream(str);
@@ -269,25 +270,19 @@ Stream *Stream::makeFilter(const char *name, Stream *str, Object *params) {
 
 BaseStream::BaseStream(Object *dictA) {
   dict = *dictA;
-#ifndef NO_DECRYPTION
   decrypt = NULL;
-#endif
 }
 
 BaseStream::~BaseStream() {
   dict.free();
-#ifndef NO_DECRYPTION
   if (decrypt)
     delete decrypt;
-#endif
 }
 
-#ifndef NO_DECRYPTION
 void BaseStream::doDecryption(Guchar *fileKey, int keyLength,
 			      int objNum, int objGen) {
   decrypt = new Decrypt(fileKey, keyLength, objNum, objGen);
 }
-#endif
 
 //------------------------------------------------------------------------
 // FilterStream
@@ -450,7 +445,7 @@ GBool StreamPredictor::getNextLine() {
   int i, j, k;
 
   // get PNG optimum predictor number
-  if (predictor == 15) {
+  if (predictor >= 10) {
     if ((curPred = str->getRawChar()) == EOF) {
       return gFalse;
     }
@@ -593,10 +588,8 @@ void FileStream::reset() {
   saved = gTrue;
   bufPtr = bufEnd = buf;
   bufPos = start;
-#ifndef NO_DECRYPTION
   if (decrypt)
     decrypt->reset();
-#endif
 }
 
 void FileStream::close() {
@@ -614,9 +607,7 @@ void FileStream::close() {
 
 GBool FileStream::fillBuf() {
   int n;
-#ifndef NO_DECRYPTION
   char *p;
-#endif
 
   bufPos += bufEnd - buf;
   bufPtr = bufEnd = buf;
@@ -633,13 +624,11 @@ GBool FileStream::fillBuf() {
   if (bufPtr >= bufEnd) {
     return gFalse;
   }
-#ifndef NO_DECRYPTION
   if (decrypt) {
     for (p = buf; p < bufEnd; ++p) {
       *p = (char)decrypt->decryptByte((Guchar)*p);
     }
   }
-#endif
   return gTrue;
 }
 
@@ -728,11 +717,9 @@ Stream *MemStream::makeSubStream(Guint startA, GBool limited,
 
 void MemStream::reset() {
   bufPtr = buf + start;
-#ifndef NO_DECRYPTION
   if (decrypt) {
     decrypt->reset();
   }
-#endif
 }
 
 void MemStream::close() {
@@ -759,7 +746,6 @@ void MemStream::moveStart(int delta) {
   bufPtr = buf + start;
 }
 
-#ifndef NO_DECRYPTION
 void MemStream::doDecryption(Guchar *fileKey, int keyLength,
 			     int objNum, int objGen) {
   char *newBuf;
@@ -778,24 +764,41 @@ void MemStream::doDecryption(Guchar *fileKey, int keyLength,
     needFree = gTrue;
   }
 }
-#endif
 
 //------------------------------------------------------------------------
 // EmbedStream
 //------------------------------------------------------------------------
 
-EmbedStream::EmbedStream(Stream *strA, Object *dictA):
+EmbedStream::EmbedStream(Stream *strA, Object *dictA,
+			 GBool limitedA, Guint lengthA):
     BaseStream(dictA) {
   str = strA;
+  limited = limitedA;
+  length = lengthA;
 }
 
 EmbedStream::~EmbedStream() {
 }
 
-Stream *EmbedStream::makeSubStream(Guint start, GBool limited,
-				   Guint length, Object *dictA) {
+Stream *EmbedStream::makeSubStream(Guint start, GBool limitedA,
+				   Guint lengthA, Object *dictA) {
   error(-1, "Internal: called makeSubStream() on EmbedStream");
   return NULL;
+}
+
+int EmbedStream::getChar() {
+  if (limited && !length) {
+    return EOF;
+  }
+  --length;
+  return str->getChar();
+}
+
+int EmbedStream::lookChar() {
+  if (limited && !length) {
+    return EOF;
+  }
+  return str->lookChar();
 }
 
 void EmbedStream::setPos(Guint pos, int dir) {
@@ -884,7 +887,7 @@ int ASCIIHexStream::lookChar() {
   return buf;
 }
 
-GString *ASCIIHexStream::getPSFilter(int psLevel, const char *indent) {
+GString *ASCIIHexStream::getPSFilter(int psLevel, char *indent) {
   GString *s;
 
   if (psLevel < 2) {
@@ -965,7 +968,7 @@ int ASCII85Stream::lookChar() {
   return b[index];
 }
 
-GString *ASCII85Stream::getPSFilter(int psLevel, const char *indent) {
+GString *ASCII85Stream::getPSFilter(int psLevel, char *indent) {
   GString *s;
 
   if (psLevel < 2) {
@@ -1147,7 +1150,7 @@ int LZWStream::getCode() {
   return code;
 }
 
-GString *LZWStream::getPSFilter(int psLevel, const char *indent) {
+GString *LZWStream::getPSFilter(int psLevel, char *indent) {
   GString *s;
 
   if (psLevel < 2 || pred) {
@@ -1184,7 +1187,7 @@ void RunLengthStream::reset() {
   eof = gFalse;
 }
 
-GString *RunLengthStream::getPSFilter(int psLevel, const char *indent) {
+GString *RunLengthStream::getPSFilter(int psLevel, char *indent) {
   GString *s;
 
   if (psLevel < 2) {
@@ -1239,6 +1242,9 @@ CCITTFaxStream::CCITTFaxStream(Stream *strA, int encodingA, GBool endOfLineA,
   endOfLine = endOfLineA;
   byteAlign = byteAlignA;
   columns = columnsA;
+  if (columns < 1) {
+    columns = 1;
+  }
   rows = rowsA;
   endOfBlock = endOfBlockA;
   black = blackA;
@@ -1263,7 +1269,7 @@ CCITTFaxStream::~CCITTFaxStream() {
 }
 
 void CCITTFaxStream::reset() {
-  int n;
+  short code1;
 
   str->reset();
   eof = gFalse;
@@ -1275,16 +1281,13 @@ void CCITTFaxStream::reset() {
   a0 = 1;
   buf = EOF;
 
-  // get initial end-of-line marker and 2D encoding tag
-  if (endOfBlock) {
-    if (lookBits(12) == 0x001) {
-      eatBits(12);
-    }
-  } else {
-    for (n = 0; n < 11 && lookBits(n) == 0; ++n) ;
-    if (n == 11 && lookBits(12) == 0x001) {
-      eatBits(12);
-    }
+  // skip any initial zero bits and end-of-line marker, and get the 2D
+  // encoding tag
+  while ((code1 = lookBits(12)) == 0) {
+    eatBits(1);
+  }
+  if (code1 == 0x001) {
+    eatBits(12);
   }
   if (encoding > 0) {
     nextLine2D = !lookBits(1);
@@ -1295,10 +1298,7 @@ void CCITTFaxStream::reset() {
 int CCITTFaxStream::lookChar() {
   short code1, code2, code3;
   int a0New;
-#if 0
-  GBool err;
-#endif
-  GBool gotEOL;
+  GBool err, gotEOL;
   int ret;
   int bits, i;
 
@@ -1308,9 +1308,7 @@ int CCITTFaxStream::lookChar() {
   }
 
   // read the next row
-#if 0
   err = gFalse;
-#endif
   if (codingLine[a0] >= columns) {
 
     // 2-D encoding
@@ -1373,10 +1371,12 @@ int CCITTFaxStream::lookChar() {
 	  }
 	  break;
 	case twoDimVertL1:
-	  a0New = codingLine[++a0] = refLine[b1] - 1;
-	  --b1;
-	  while (refLine[b1] <= codingLine[a0] && refLine[b1] < columns)
-	    b1 += 2;
+	  if (a0 == 0 || refLine[b1] - 1 > a0New) {
+	    a0New = codingLine[++a0] = refLine[b1] - 1;
+	    --b1;
+	    while (refLine[b1] <= codingLine[a0] && refLine[b1] < columns)
+	      b1 += 2;
+	  }
 	  break;
 	case twoDimVertR2:
 	  a0New = codingLine[++a0] = refLine[b1] + 2;
@@ -1387,10 +1387,12 @@ int CCITTFaxStream::lookChar() {
 	  }
 	  break;
 	case twoDimVertL2:
-	  a0New = codingLine[++a0] = refLine[b1] - 2;
-	  --b1;
-	  while (refLine[b1] <= codingLine[a0] && refLine[b1] < columns)
-	    b1 += 2;
+	  if (a0 == 0 || refLine[b1] - 2 > a0New) {
+	    a0New = codingLine[++a0] = refLine[b1] - 2;
+	    --b1;
+	    while (refLine[b1] <= codingLine[a0] && refLine[b1] < columns)
+	      b1 += 2;
+	  }
 	  break;
 	case twoDimVertR3:
 	  a0New = codingLine[++a0] = refLine[b1] + 3;
@@ -1401,10 +1403,12 @@ int CCITTFaxStream::lookChar() {
 	  }
 	  break;
 	case twoDimVertL3:
-	  a0New = codingLine[++a0] = refLine[b1] - 3;
-	  --b1;
-	  while (refLine[b1] <= codingLine[a0] && refLine[b1] < columns)
-	    b1 += 2;
+	  if (a0 == 0 || refLine[b1] - 3 > a0New) {
+	    a0New = codingLine[++a0] = refLine[b1] - 3;
+	    --b1;
+	    while (refLine[b1] <= codingLine[a0] && refLine[b1] < columns)
+	      b1 += 2;
+	  }
 	  break;
 	case EOF:
 	  eof = gTrue;
@@ -1412,13 +1416,8 @@ int CCITTFaxStream::lookChar() {
 	  return EOF;
 	default:
 	  error(getPos(), "Bad 2D code %04x in CCITTFax stream", code1);
-#if 0
 	  err = gTrue;
 	  break;
-#else
-	  eof = gTrue;
-	  return EOF;
-#endif
 	}
       } while (codingLine[a0] < columns);
 
@@ -1447,9 +1446,12 @@ int CCITTFaxStream::lookChar() {
 
     if (codingLine[a0] != columns) {
       error(getPos(), "CCITTFax row is wrong length (%d)", codingLine[a0]);
-#if 0
+      // force the row to be the correct length
+      while (codingLine[a0] > columns) {
+	--a0;
+      }
+      codingLine[++a0] = columns;
       err = gTrue;
-#endif
     }
 
     // byte-align the row
@@ -1505,14 +1507,11 @@ int CCITTFaxStream::lookChar() {
 	}
 	eof = gTrue;
       }
-    }
 
-#if 0
-    // This looks for an end-of-line marker after an error, however
-    // some (most?) CCITT streams in PDF files don't use end-of-line
-    // markers, and the just-plow-on technique works better in those
-    // cases.
-    else if (err) {
+    // look for an end-of-line marker after an error -- we only do
+    // this if we know the stream contains end-of-line markers because
+    // the "just plow on" technique tends to work better otherwise
+    } else if (err && endOfLine) {
       do {
 	if (code1 == EOF) {
 	  eof = gTrue;
@@ -1522,13 +1521,11 @@ int CCITTFaxStream::lookChar() {
 	code1 = lookBits(13);
       } while ((code1 >> 1) != 0x001);
       eatBits(12); 
-      codingLine[++a0] = columns;
       if (encoding > 0) {
 	eatBits(1);
 	nextLine2D = !(code1 & 1);
       }
     }
-#endif
 
     a0 = 0;
     outputBits = codingLine[1] - codingLine[0];
@@ -1739,7 +1736,7 @@ short CCITTFaxStream::lookBits(int n) {
   return (inputBuf >> (inputBits - n)) & (0xffff >> (16 - n));
 }
 
-GString *CCITTFaxStream::getPSFilter(int psLevel, const char *indent) {
+GString *CCITTFaxStream::getPSFilter(int psLevel, char *indent) {
   GString *s;
   char s1[50];
 
@@ -1870,7 +1867,6 @@ DCTStream::~DCTStream() {
 }
 
 void DCTStream::reset() {
-  int minHSample, minVSample;
   int i, j;
 
   str->reset();
@@ -1892,24 +1888,21 @@ void DCTStream::reset() {
   }
 
   // compute MCU size
-  mcuWidth = minHSample = compInfo[0].hSample;
-  mcuHeight = minVSample = compInfo[0].vSample;
+  if (numComps == 1) {
+    compInfo[0].hSample = compInfo[0].vSample = 1;
+  }
+  mcuWidth = compInfo[0].hSample;
+  mcuHeight = compInfo[0].vSample;
   for (i = 1; i < numComps; ++i) {
-    if (compInfo[i].hSample < minHSample)
-      minHSample = compInfo[i].hSample;
-    if (compInfo[i].vSample < minVSample)
-      minVSample = compInfo[i].vSample;
-    if (compInfo[i].hSample > mcuWidth)
+    if (compInfo[i].hSample > mcuWidth) {
       mcuWidth = compInfo[i].hSample;
-    if (compInfo[i].vSample > mcuHeight)
+    }
+    if (compInfo[i].vSample > mcuHeight) {
       mcuHeight = compInfo[i].vSample;
+    }
   }
-  for (i = 0; i < numComps; ++i) {
-    compInfo[i].hSample /= minHSample;
-    compInfo[i].vSample /= minVSample;
-  }
-  mcuWidth = (mcuWidth / minHSample) * 8;
-  mcuHeight = (mcuHeight / minVSample) * 8;
+  mcuWidth *= 8;
+  mcuHeight *= 8;
 
   // figure out color transform
   if (!gotAdobeMarker && numComps == 3) {
@@ -2447,7 +2440,7 @@ GBool DCTStream::readProgressiveDataUnit(DCTHuffTable *dcHuffTable,
 void DCTStream::decodeImage() {
   int dataIn[64];
   Guchar dataOut[64];
-  Guchar *quantTable;
+  Gushort *quantTable;
   int pY, pCb, pCr, pR, pG, pB;
   int x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, cc, i;
   int h, v, horiz, vert, hSub, vSub;
@@ -2586,7 +2579,7 @@ void DCTStream::decodeImage() {
 //   988-991.
 // The stage numbers mentioned in the comments refer to Figure 1 in this
 // paper.
-void DCTStream::transformDataUnit(Guchar *quantTable,
+void DCTStream::transformDataUnit(Gushort *quantTable,
 				  int dataIn[64], Guchar dataOut[64]) {
   int v0, v1, v2, v3, v4, v5, v6, v7, t;
   int *p;
@@ -2980,22 +2973,32 @@ GBool DCTStream::readScanInfo() {
 }
 
 GBool DCTStream::readQuantTables() {
-  int length;
-  int i;
-  int index;
+  int length, prec, i, index;
 
   length = read16() - 2;
   while (length > 0) {
     index = str->getChar();
-    if ((index & 0xf0) || index >= 4) {
+    prec = (index >> 4) & 0x0f;
+    index &= 0x0f;
+    if (prec > 1 || index >= 4) {
       error(getPos(), "Bad DCT quantization table");
       return gFalse;
     }
-    if (index == numQuantTables)
+    if (index == numQuantTables) {
       numQuantTables = index + 1;
-    for (i = 0; i < 64; ++i)
-      quantTables[index][dctZigZag[i]] = str->getChar();
-    length -= 65;
+    }
+    for (i = 0; i < 64; ++i) {
+      if (prec) {
+	quantTables[index][dctZigZag[i]] = read16();
+      } else {
+	quantTables[index][dctZigZag[i]] = str->getChar();
+      }
+    }
+    if (prec) {
+      length -= 129;
+    } else {
+      length -= 65;
+    }
   }
   return gTrue;
 }
@@ -3154,7 +3157,7 @@ int DCTStream::read16() {
   return (c1 << 8) + c2;
 }
 
-GString *DCTStream::getPSFilter(int psLevel, const char *indent) {
+GString *DCTStream::getPSFilter(int psLevel, char *indent) {
   GString *s;
 
   if (psLevel < 2) {
@@ -3347,7 +3350,7 @@ int FlateStream::getRawChar() {
   return c;
 }
 
-GString *FlateStream::getPSFilter(int psLevel, const char *indent) {
+GString *FlateStream::getPSFilter(int psLevel, char *indent) {
   GString *s;
 
   if (psLevel < 3 || pred) {
@@ -3747,6 +3750,10 @@ int FixedLengthEncoder::lookChar() {
   return str->getChar();
 }
 
+GBool FixedLengthEncoder::isBinary(GBool last) {
+  return str->isBinary(gTrue);
+}
+
 //------------------------------------------------------------------------
 // ASCIIHexEncoder
 //------------------------------------------------------------------------
@@ -3772,7 +3779,7 @@ void ASCIIHexEncoder::reset() {
 }
 
 GBool ASCIIHexEncoder::fillBuf() {
-  static const char hex[] = "0123456789abcdef";
+  static char *hex = "0123456789abcdef";
   int c;
 
   if (eof) {

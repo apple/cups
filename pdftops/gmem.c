@@ -3,7 +3,7 @@
  *
  * Memory routines with out-of-memory checking.
  *
- * Copyright 1996-2003 Glyph & Cog, LLC
+ * Copyright 1996-2004 Glyph & Cog, LLC
  */
 
 #include <config.h>
@@ -195,7 +195,7 @@ void gMemReport(FILE *f) {
 }
 #endif
 
-char *copyString(const char *s) {
+char *copyString(char *s) {
   char *s1;
 
   s1 = (char *)gmalloc(strlen(s) + 1);

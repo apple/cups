@@ -2,7 +2,7 @@
 //
 // PDFDoc.h
 //
-// Copyright 1996-2003 Glyph & Cog, LLC
+// Copyright 1996-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -37,9 +37,9 @@ class PDFDoc {
 public:
 
   PDFDoc(GString *fileNameA, GString *ownerPassword = NULL,
-	 GString *userPassword = NULL);
+	 GString *userPassword = NULL, void *guiDataA = NULL);
   PDFDoc(BaseStream *strA, GString *ownerPassword = NULL,
-	 GString *userPassword = NULL);
+	 GString *userPassword = NULL, void *guiDataA = NULL);
   ~PDFDoc();
 
   // Was PDF document successfully opened?
@@ -80,21 +80,22 @@ public:
 
   // Display a page.
   void displayPage(OutputDev *out, int page, double hDPI, double vDPI,
-		   int rotate, GBool doLinks,
+		   int rotate, GBool crop, GBool doLinks,
 		   GBool (*abortCheckCbk)(void *data) = NULL,
 		   void *abortCheckCbkData = NULL);
 
   // Display a range of pages.
   void displayPages(OutputDev *out, int firstPage, int lastPage,
-		    double hDPI, double vDPI, int rotate, GBool doLinks,
+		    double hDPI, double vDPI, int rotate,
+		    GBool crop, GBool doLinks,
 		    GBool (*abortCheckCbk)(void *data) = NULL,
 		    void *abortCheckCbkData = NULL);
 
   // Display part of a page.
   void displayPageSlice(OutputDev *out, int page,
 			double hDPI, double vDPI,
-			int rotate, int sliceX, int sliceY,
-			int sliceW, int sliceH,
+			int rotate, GBool crop,
+			int sliceX, int sliceY, int sliceW, int sliceH,
 			GBool (*abortCheckCbk)(void *data) = NULL,
 			void *abortCheckCbkData = NULL);
 
@@ -146,16 +147,21 @@ public:
   // Save this file with another name.
   GBool saveAs(GString *name);
 
+  // Return a pointer to the GUI (XPDFCore or WinPDFCore object).
+  void *getGUIData() { return guiData; }
+
 
 private:
 
   GBool setup(GString *ownerPassword, GString *userPassword);
   void checkHeader();
+  GBool checkEncryption(GString *ownerPassword, GString *userPassword);
   void getLinks(Page *page);
 
   GString *fileName;
   FILE *file;
   BaseStream *str;
+  void *guiData;
   double pdfVersion;
   XRef *xref;
   Catalog *catalog;

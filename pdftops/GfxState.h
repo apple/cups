@@ -2,7 +2,7 @@
 //
 // GfxState.h
 //
-// Copyright 1996-2003 Glyph & Cog, LLC
+// Copyright 1996-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -98,7 +98,7 @@ public:
   static int getNumColorSpaceModes();
 
   // Return the name of the <idx>th color space mode.
-  static const char *getColorSpaceModeName(int idx);
+  static char *getColorSpaceModeName(int idx);
 
 private:
 };
@@ -429,7 +429,6 @@ private:
     *names[gfxColorMaxComps];
   GfxColorSpace *alt;		// alternate color space
   Function *func;		// tint transform (into alternate color space)
-  
 };
 
 //------------------------------------------------------------------------
@@ -600,6 +599,8 @@ public:
   void getDomain(double *x0A, double *y0A, double *x1A, double *y1A)
     { *x0A = x0; *y0A = y0; *x1A = x1; *y1A = y1; }
   double *getMatrix() { return matrix; }
+  int getNFuncs() { return nFuncs; }
+  Function *getFunc(int i) { return funcs[i]; }
   void getColor(double x, double y, GfxColor *color);
 
 private:
@@ -633,9 +634,11 @@ public:
     { *x0A = x0; *y0A = y0; *x1A = x1; *y1A = y1; }
   double getDomain0() { return t0; }
   double getDomain1() { return t1; }
-  void getColor(double t, GfxColor *color);
   GBool getExtend0() { return extend0; }
   GBool getExtend1() { return extend1; }
+  int getNFuncs() { return nFuncs; }
+  Function *getFunc(int i) { return funcs[i]; }
+  void getColor(double t, GfxColor *color);
 
 private:
 
@@ -670,9 +673,11 @@ public:
     { *x0A = x0; *y0A = y0; *r0A = r0; *x1A = x1; *y1A = y1; *r1A = r1; }
   double getDomain0() { return t0; }
   double getDomain1() { return t1; }
-  void getColor(double t, GfxColor *color);
   GBool getExtend0() { return extend0; }
   GBool getExtend1() { return extend1; }
+  int getNFuncs() { return nFuncs; }
+  Function *getFunc(int i) { return funcs[i]; }
+  void getColor(double t, GfxColor *color);
 
 private:
 
@@ -681,6 +686,77 @@ private:
   Function *funcs[gfxColorMaxComps];
   int nFuncs;
   GBool extend0, extend1;
+};
+
+//------------------------------------------------------------------------
+// GfxGouraudTriangleShading
+//------------------------------------------------------------------------
+
+struct GfxGouraudVertex {
+  double x, y;
+  GfxColor color;
+};
+
+class GfxGouraudTriangleShading: public GfxShading {
+public:
+
+  GfxGouraudTriangleShading(int typeA,
+			    GfxGouraudVertex *verticesA, int nVerticesA,
+			    int (*trianglesA)[3], int nTrianglesA,
+			    Function **funcsA, int nFuncsA);
+  GfxGouraudTriangleShading(GfxGouraudTriangleShading *shading);
+  virtual ~GfxGouraudTriangleShading();
+
+  static GfxGouraudTriangleShading *parse(int typeA, Dict *dict, Stream *str);
+
+  virtual GfxShading *copy();
+
+  int getNTriangles() { return nTriangles; }
+  void getTriangle(int i, double *x0, double *y0, GfxColor *color0,
+		   double *x1, double *y1, GfxColor *color1,
+		   double *x2, double *y2, GfxColor *color2);
+
+private:
+
+  GfxGouraudVertex *vertices;
+  int nVertices;
+  int (*triangles)[3];
+  int nTriangles;
+  Function *funcs[gfxColorMaxComps];
+  int nFuncs;
+};
+
+//------------------------------------------------------------------------
+// GfxPatchMeshShading
+//------------------------------------------------------------------------
+
+struct GfxPatch {
+  double x[4][4];
+  double y[4][4];
+  GfxColor color[2][2];
+};
+
+class GfxPatchMeshShading: public GfxShading {
+public:
+
+  GfxPatchMeshShading(int typeA, GfxPatch *patchesA, int nPatchesA,
+		      Function **funcsA, int nFuncsA);
+  GfxPatchMeshShading(GfxPatchMeshShading *shading);
+  virtual ~GfxPatchMeshShading();
+
+  static GfxPatchMeshShading *parse(int typeA, Dict *dict, Stream *str);
+
+  virtual GfxShading *copy();
+
+  int getNPatches() { return nPatches; }
+  GfxPatch *getPatch(int i) { return &patches[i]; }
+
+private:
+
+  GfxPatch *patches;
+  int nPatches;
+  Function *funcs[gfxColorMaxComps];
+  int nFuncs;
 };
 
 //------------------------------------------------------------------------
@@ -910,6 +986,7 @@ public:
   double getRise() { return rise; }
   int getRender() { return render; }
   GfxPath *getPath() { return path; }
+  void setPath(GfxPath *pathA);
   double getCurX() { return curX; }
   double getCurY() { return curY; }
   void getClipBBox(double *xMin, double *yMin, double *xMax, double *yMax)

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.6.2.12 2004/06/29 03:46:30 mike Exp $"
+# "$Id: Makefile,v 1.6.2.13 2004/07/03 03:30:43 mike Exp $"
 #
 #   pdftops filter Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -25,9 +25,12 @@ LIBOBJS	=	\
 		Decrypt.o \
 		Dict.o \
 		Error.o \
-		FontEncoding.o \
+		FoFiBase.o \
+		FoFiEncodings.o \
+		FoFiTrueType.o \
+		FoFiType1C.o \
+		FoFiType1.o \
 		FontEncodingTables.o \
-		FontFile.o \
 		Function.o \
 		gfile.o \
 		Gfx.o \
@@ -39,7 +42,9 @@ LIBOBJS	=	\
 		gmem.o \
 		gmempp.o \
 		GString.o \
+		JArithmeticDecoder.o \
 		JBIG2Stream.o \
+		JPXStream.o \
 		Lexer.o \
 		Link.o \
 		NameToCharCode.o \
@@ -47,25 +52,50 @@ LIBOBJS	=	\
 		Outline.o \
 		OutputDev.o \
 		Page.o \
-		Params.o \
 		parseargs.o \
 		Parser.o \
 		PDFDoc.o \
 		PDFDocEncoding.o \
 		PSOutputDev.o \
 		PSTokenizer.o \
+		SecurityHandler.o \
+		SplashBitmap.o \
+		SplashClip.o \
+		Splash.o \
+		SplashFont.o \
+		SplashFontEngine.o \
+		SplashFontFile.o \
+		SplashFontFileID.o \
+		SplashFTFont.o \
+		SplashFTFontEngine.o \
+		SplashFTFontFile.o \
+		SplashOutputDev.o \
+		SplashPath.o \
+		SplashPattern.o \
+		SplashScreen.o \
+		SplashState.o \
+		SplashT1Font.o \
+		SplashT1FontEngine.o \
+		SplashT1FontFile.o \
+		SplashXPath.o \
+		SplashXPathScanner.o \
 		Stream.o \
 		UnicodeMap.o \
+		UnicodeTypeTable.o \
+		XpdfPluginAPI.o \
 		XRef.o
 
 
 OBJS	=	pdftops.o $(LIBOBJS)
 
+TARGETS	=	libxpdf.a pdftops
+
+
 #
 # Make everything...
 #
 
-all:	pdftops
+all:	$(TARGETS)
 
 
 #
@@ -76,6 +106,7 @@ clean:
 	$(RM) $(OBJS)
 	$(RM) libxpdf.a
 	$(RM) pdftops
+	$(RM) pdftoraster
 
 
 #
@@ -123,5 +154,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.6.2.12 2004/06/29 03:46:30 mike Exp $".
+# End of "$Id: Makefile,v 1.6.2.13 2004/07/03 03:30:43 mike Exp $".
 #

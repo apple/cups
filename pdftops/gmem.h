@@ -3,7 +3,7 @@
  *
  * Memory routines with out-of-memory checking.
  *
- * Copyright 1996-2003 Glyph & Cog, LLC
+ * Copyright 1996-2004 Glyph & Cog, LLC
  */
 
 #ifndef GMEM_H
@@ -44,7 +44,7 @@ extern void gMemReport(FILE *f);
 /*
  * Allocate memory and copy a string into it.
  */
-extern char *copyString(const char *s);
+extern char *copyString(char *s);
 
 #ifdef __cplusplus
 }

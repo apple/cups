@@ -2,7 +2,7 @@
 //
 // PDFDoc.cc
 //
-// Copyright 1996-2003 Glyph & Cog, LLC
+// Copyright 1996-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -29,6 +29,7 @@
 #include "ErrorCodes.h"
 #include "Lexer.h"
 #include "Parser.h"
+#include "SecurityHandler.h"
 #ifndef DISABLE_OUTLINE
 #include "Outline.h"
 #endif
@@ -44,12 +45,14 @@
 //------------------------------------------------------------------------
 
 PDFDoc::PDFDoc(GString *fileNameA, GString *ownerPassword,
-	       GString *userPassword) {
+	       GString *userPassword, void *guiDataA) {
   Object obj;
   GString *fileName1, *fileName2;
 
   ok = gFalse;
   errCode = errNone;
+
+  guiData = guiDataA;
 
   file = NULL;
   str = NULL;
@@ -97,9 +100,10 @@ PDFDoc::PDFDoc(GString *fileNameA, GString *ownerPassword,
 }
 
 PDFDoc::PDFDoc(BaseStream *strA, GString *ownerPassword,
-	       GString *userPassword) {
+	       GString *userPassword, void *guiDataA) {
   ok = gFalse;
   errCode = errNone;
+  guiData = guiDataA;
   fileName = NULL;
   file = NULL;
   str = strA;
@@ -119,10 +123,16 @@ GBool PDFDoc::setup(GString *ownerPassword, GString *userPassword) {
   checkHeader();
 
   // read xref table
-  xref = new XRef(str, ownerPassword, userPassword);
+  xref = new XRef(str);
   if (!xref->isOk()) {
     error(-1, "Couldn't read xref table");
     errCode = xref->getErrorCode();
+    return gFalse;
+  }
+
+  // check for encryption
+  if (!checkEncryption(ownerPassword, userPassword)) {
+    errCode = errEncrypted;
     return gFalse;
   }
 
@@ -200,14 +210,48 @@ void PDFDoc::checkHeader() {
   }
 }
 
+GBool PDFDoc::checkEncryption(GString *ownerPassword, GString *userPassword) {
+  Object encrypt;
+  GBool encrypted;
+  SecurityHandler *secHdlr;
+  GBool ret;
+
+  xref->getTrailerDict()->dictLookup("Encrypt", &encrypt);
+  if ((encrypted = encrypt.isDict())) {
+    if ((secHdlr = SecurityHandler::make(this, &encrypt))) {
+      if (secHdlr->checkEncryption(ownerPassword, userPassword)) {
+	// authorization succeeded
+       	xref->setEncryption(secHdlr->getPermissionFlags(),
+			    secHdlr->getOwnerPasswordOk(),
+			    secHdlr->getFileKey(),
+			    secHdlr->getFileKeyLength(),
+			    secHdlr->getEncVersion());
+	ret = gTrue;
+      } else {
+	// authorization failed
+	ret = gFalse;
+      }
+      delete secHdlr;
+    } else {
+      // couldn't find the matching security handler
+      ret = gFalse;
+    }
+  } else {
+    // document is not encrypted
+    ret = gTrue;
+  }
+  encrypt.free();
+  return ret;
+}
+
 void PDFDoc::displayPage(OutputDev *out, int page, double hDPI, double vDPI,
-			 int rotate, GBool doLinks,
+			 int rotate, GBool crop, GBool doLinks,
 			 GBool (*abortCheckCbk)(void *data),
 			 void *abortCheckCbkData) {
   Page *p;
 
   if (globalParams->getPrintCommands()) {
-    fprintf(stderr, "DEBUG2: ***** page %d *****\n", page);
+    printf("***** page %d *****\n", page);
   }
   p = catalog->getPage(page);
   if (doLinks) {
@@ -215,36 +259,38 @@ void PDFDoc::displayPage(OutputDev *out, int page, double hDPI, double vDPI,
       delete links;
     }
     getLinks(p);
-    p->display(out, hDPI, vDPI, rotate, links, catalog,
+    p->display(out, hDPI, vDPI, rotate, crop, links, catalog,
 	       abortCheckCbk, abortCheckCbkData);
   } else {
-    p->display(out, hDPI, vDPI, rotate, NULL, catalog,
+    p->display(out, hDPI, vDPI, rotate, crop, NULL, catalog,
 	       abortCheckCbk, abortCheckCbkData);
   }
 }
 
 void PDFDoc::displayPages(OutputDev *out, int firstPage, int lastPage,
-			  double hDPI, double vDPI, int rotate, GBool doLinks,
+			  double hDPI, double vDPI, int rotate,
+			  GBool crop, GBool doLinks,
 			  GBool (*abortCheckCbk)(void *data),
 			  void *abortCheckCbkData) {
   int page;
 
   for (page = firstPage; page <= lastPage; ++page) {
-    displayPage(out, page, hDPI, vDPI, rotate, doLinks,
+    displayPage(out, page, hDPI, vDPI, rotate, crop, doLinks,
 		abortCheckCbk, abortCheckCbkData);
   }
 }
 
 void PDFDoc::displayPageSlice(OutputDev *out, int page,
 			      double hDPI, double vDPI,
-			      int rotate, int sliceX, int sliceY,
-			      int sliceW, int sliceH,
+			      int rotate, GBool crop,
+			      int sliceX, int sliceY, int sliceW, int sliceH,
 			      GBool (*abortCheckCbk)(void *data),
 			      void *abortCheckCbkData) {
   Page *p;
 
   p = catalog->getPage(page);
-  p->displaySlice(out, hDPI, vDPI, rotate, sliceX, sliceY, sliceW, sliceH,
+  p->displaySlice(out, hDPI, vDPI, rotate, crop,
+		  sliceX, sliceY, sliceW, sliceH,
 		  NULL, catalog, abortCheckCbk, abortCheckCbkData);
 }
 

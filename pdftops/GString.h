@@ -4,7 +4,7 @@
 //
 // Simple variable-length string type.
 //
-// Copyright 1996-2003 Glyph & Cog, LLC
+// Copyright 1996-2004 Glyph & Cog, LLC
 //
 //========================================================================
 

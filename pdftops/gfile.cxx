@@ -4,19 +4,13 @@
 //
 // Miscellaneous file and directory name manipulation.
 //
-// Copyright 1996-2003 Glyph & Cog, LLC
+// Copyright 1996-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
 #include <config.h>
 
-#ifdef WIN32
-   extern "C" {
-#  ifndef _MSC_VER
-#    include <kpathsea/win32lib.h>
-#  endif
-   }
-#else // !WIN32
+#ifndef WIN32
 #  if defined(MACOS)
 #    include <sys/stat.h>
 #  elif !defined(ACORN)
@@ -108,7 +102,7 @@ GString *getCurrentDir() {
   return new GString();
 }
 
-GString *appendToPath(GString *path, const char *fileName) {
+GString *appendToPath(GString *path, char *fileName) {
 #if defined(VMS)
   //---------- VMS ----------
   //~ this should handle everything necessary for file
@@ -274,7 +268,7 @@ GString *appendToPath(GString *path, const char *fileName) {
 #endif
 }
 
-GString *grabPath(const char *fileName) {
+GString *grabPath(char *fileName) {
 #ifdef VMS
   //---------- VMS ----------
   char *p;
@@ -315,7 +309,7 @@ GString *grabPath(const char *fileName) {
 
 #else
   //---------- Unix ----------
-  const char *p;
+  char *p;
 
   if ((p = strrchr(fileName, '/')))
     return new GString(fileName, p - fileName);
@@ -323,7 +317,7 @@ GString *grabPath(const char *fileName) {
 #endif
 }
 
-GBool isAbsolutePath(const char *path) {
+GBool isAbsolutePath(char *path) {
 #ifdef VMS
   //---------- VMS ----------
   return strchr(path, ':') ||
@@ -429,7 +423,7 @@ GString *makePathAbsolute(GString *path) {
 #endif
 }
 
-time_t getModTime(const char *fileName) {
+time_t getModTime(char *fileName) {
 #ifdef WIN32
   //~ should implement this, but it's (currently) only used in xpdf
   return 0;
@@ -443,8 +437,7 @@ time_t getModTime(const char *fileName) {
 #endif
 }
 
-#if 0 // MRS: This function is apparently no longer used...
-GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) {
+GBool openTempFile(GString **name, FILE **f, char *mode, char *ext) {
 #if defined(WIN32)
   //---------- Win32 ----------
   char *s;
@@ -528,9 +521,8 @@ GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) 
   return gTrue;
 #endif
 }
-#endif // 0
 
-GBool executeCommand(const char *cmd) {
+GBool executeCommand(char *cmd) {
 #ifdef VMS
   return system(cmd) ? gTrue : gFalse;
 #else
@@ -571,7 +563,7 @@ char *getLine(char *buf, int size, FILE *f) {
 // GDir and GDirEntry
 //------------------------------------------------------------------------
 
-GDirEntry::GDirEntry(const char *dirPath, const char *nameA, GBool doStat) {
+GDirEntry::GDirEntry(char *dirPath, char *nameA, GBool doStat) {
 #ifdef VMS
   char *p;
 #elif defined(WIN32)
@@ -610,7 +602,7 @@ GDirEntry::~GDirEntry() {
   delete name;
 }
 
-GDir::GDir(const char *name, GBool doStatA) {
+GDir::GDir(char *name, GBool doStatA) {
   path = new GString(name);
   doStat = doStatA;
 #if defined(WIN32)
@@ -649,10 +641,14 @@ GDirEntry *GDir::getNextEntry() {
   GDirEntry *e;
 
 #if defined(WIN32)
-  e = new GDirEntry(path->getCString(), ffd.cFileName, doStat);
-  if (hnd  && !FindNextFile(hnd, &ffd)) {
-    FindClose(hnd);
-    hnd = NULL;
+  if (hnd) {
+    e = new GDirEntry(path->getCString(), ffd.cFileName, doStat);
+    if (hnd  && !FindNextFile(hnd, &ffd)) {
+      FindClose(hnd);
+      hnd = NULL;
+    }
+  } else {
+    e = NULL;
   }
 #elif defined(ACORN)
 #elif defined(MACOS)
@@ -696,6 +692,7 @@ void GDir::rewind() {
   tmp = path->copy();
   tmp->append("/*.*");
   hnd = FindFirstFile(tmp->getCString(), &ffd);
+  delete tmp;
 #elif defined(ACORN)
 #elif defined(MACOS)
 #else

@@ -2,7 +2,7 @@
 //
 // GList.cc
 //
-// Copyright 2001-2003 Glyph & Cog, LLC
+// Copyright 2001-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -12,6 +12,7 @@
 #pragma implementation
 #endif
 
+#include <stdlib.h>
 #include <string.h>
 #include "gmem.h"
 #include "GList.h"
@@ -79,6 +80,10 @@ void *GList::del(int i) {
     shrink();
   }
   return p;
+}
+
+void GList::sort(int (*cmp)(const void *obj1, const void *obj2)) {
+  qsort(data, length, sizeof(void *), cmp);
 }
 
 void GList::expand() {

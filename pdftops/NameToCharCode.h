@@ -2,7 +2,7 @@
 //
 // NameToCharCode.h
 //
-// Copyright 2001-2003 Glyph & Cog, LLC
+// Copyright 2001-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -27,12 +27,12 @@ public:
   NameToCharCode();
   ~NameToCharCode();
 
-  void add(const char *name, CharCode c);
-  CharCode lookup(const char *name);
+  void add(char *name, CharCode c);
+  CharCode lookup(char *name);
 
 private:
 
-  int hash(const char *name);
+  int hash(char *name);
 
   NameToCharCodeEntry *tab;
   int size;

@@ -4,7 +4,7 @@
 //
 // Mapping from character codes to Unicode.
 //
-// Copyright 2001-2003 Glyph & Cog, LLC
+// Copyright 2001-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -66,6 +66,10 @@ public:
 
   // Map a CharCode to Unicode.
   int mapToUnicode(CharCode c, Unicode *u, int size);
+
+  // Return the mapping's length, i.e., one more than the max char
+  // code supported by the mapping.
+  CharCode getLength() { return mapLen; }
 
 private:
 

@@ -3,7 +3,7 @@
  *
  * Some useful simple types.
  *
- * Copyright 1996-2003 Glyph & Cog, LLC
+ * Copyright 1996-2004 Glyph & Cog, LLC
  */
 
 #ifndef GTYPES_H

@@ -2,7 +2,7 @@
 //
 // UnicodeMap.cc
 //
-// Copyright 2001-2003 Glyph & Cog, LLC
+// Copyright 2001-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -121,7 +121,7 @@ UnicodeMap::UnicodeMap(GString *encodingNameA) {
 #endif
 }
 
-UnicodeMap::UnicodeMap(const char *encodingNameA, GBool unicodeOutA,
+UnicodeMap::UnicodeMap(char *encodingNameA, GBool unicodeOutA,
 		       UnicodeMapRange *rangesA, int lenA) {
   encodingName = new GString(encodingNameA);
   unicodeOut = unicodeOutA;
@@ -136,7 +136,7 @@ UnicodeMap::UnicodeMap(const char *encodingNameA, GBool unicodeOutA,
 #endif
 }
 
-UnicodeMap::UnicodeMap(const char *encodingNameA, GBool unicodeOutA,
+UnicodeMap::UnicodeMap(char *encodingNameA, GBool unicodeOutA,
 		       UnicodeMapFunc funcA) {
   encodingName = new GString(encodingNameA);
   unicodeOut = unicodeOutA;
@@ -203,27 +203,27 @@ int UnicodeMap::mapUnicode(Unicode u, char *buf, int bufSize) {
   a = 0;
   b = len;
   if (u >= ranges[a].start) {
-  // invariant: ranges[a].start <= u < ranges[b].start
-  while (b - a > 1) {
-    m = (a + b) / 2;
-    if (u >= ranges[m].start) {
-      a = m;
-    } else if (u < ranges[m].start) {
-      b = m;
+    // invariant: ranges[a].start <= u < ranges[b].start
+    while (b - a > 1) {
+      m = (a + b) / 2;
+      if (u >= ranges[m].start) {
+	a = m;
+      } else if (u < ranges[m].start) {
+	b = m;
+      }
     }
-  }
-  if (u <= ranges[a].end) {
-    n = ranges[a].nBytes;
-    if (n > bufSize) {
-      return 0;
+    if (u <= ranges[a].end) {
+      n = ranges[a].nBytes;
+      if (n > bufSize) {
+	return 0;
+      }
+      code = ranges[a].code + (u - ranges[a].start);
+      for (i = n - 1; i >= 0; --i) {
+	buf[i] = (char)(code & 0xff);
+	code >>= 8;
+      }
+      return n;
     }
-    code = ranges[a].code + (u - ranges[a].start);
-    for (i = n - 1; i >= 0; --i) {
-      buf[i] = (char)(code & 0xff);
-      code >>= 8;
-    }
-    return n;
-  }
   }
 
   for (i = 0; i < eMapsLen; ++i) {

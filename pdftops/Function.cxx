@@ -2,7 +2,7 @@
 //
 // Function.cc
 //
-// Copyright 2001-2003 Glyph & Cog, LLC
+// Copyright 2001-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -634,11 +634,11 @@ StitchingFunction::~StitchingFunction() {
   int i;
 
   if (funcs) {
-  for (i = 0; i < k; ++i) {
-    if (funcs[i]) {
-      delete funcs[i];
+    for (i = 0; i < k; ++i) {
+      if (funcs[i]) {
+	delete funcs[i];
+      }
     }
-  }
   }
   gfree(funcs);
   gfree(bounds);
@@ -719,7 +719,7 @@ enum PSOp {
 // Note: 'if' and 'ifelse' are parsed separately.
 // The rest are listed here in alphabetical order.
 // The index in this table is equivalent to the entry in PSOp.
-const char *psOpNames[] = {
+char *psOpNames[] = {
   "abs",
   "add",
   "and",
@@ -990,6 +990,7 @@ PostScriptFunction::PostScriptFunction(Object *funcObj, Dict *dict) {
   str = funcObj->getStream();
 
   //----- parse the function
+  codeString = new GString();
   str->reset();
   if (!(tok = getToken(str)) || tok->cmp("{")) {
     error(-1, "Expected '{' at start of PostScript function");
@@ -1017,10 +1018,12 @@ PostScriptFunction::PostScriptFunction(PostScriptFunction *func) {
   memcpy(this, func, sizeof(PostScriptFunction));
   code = (PSObject *)gmalloc(codeSize * sizeof(PSObject));
   memcpy(code, func->code, codeSize * sizeof(PSObject));
+  codeString = func->codeString->copy();
 }
 
 PostScriptFunction::~PostScriptFunction() {
   gfree(code);
+  delete codeString;
 }
 
 void PostScriptFunction::transform(double *in, double *out) {
@@ -1174,6 +1177,9 @@ GString *PostScriptFunction::getToken(Stream *str) {
   s = new GString();
   do {
     c = str->getChar();
+    if (c != EOF) {
+      codeString->append(c);
+    }
   } while (c != EOF && isspace(c));
   if (c == '{' || c == '}') {
     s->append((char)c);
@@ -1185,6 +1191,9 @@ GString *PostScriptFunction::getToken(Stream *str) {
 	break;
       }
       str->getChar();
+      if (c != EOF) {
+	codeString->append(c);
+      }
     }
   } else {
     while (1) {
@@ -1194,6 +1203,9 @@ GString *PostScriptFunction::getToken(Stream *str) {
 	break;
       }
       str->getChar();
+      if (c != EOF) {
+	codeString->append(c);
+      }
     }
   }
   return s;

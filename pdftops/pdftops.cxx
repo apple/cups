@@ -1,10 +1,10 @@
 //
-// "$Id: pdftops.cxx,v 1.6.2.9 2004/02/06 21:01:59 mike Exp $"
+// "$Id: pdftops.cxx,v 1.6.2.10 2004/07/03 03:30:43 mike Exp $"
 //
 //   PDF to PostScript filter front-end for the Common UNIX Printing
 //   System (CUPS).
 //
-//   Copyright 1997-2003 by Easy Software Products.
+//   Copyright 1997-2004 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
 //   property of Easy Software Products and are protected by Federal
@@ -16,7 +16,7 @@
 //       Attn: CUPS Licensing Information
 //       Easy Software Products
 //       44141 Airport View Drive, Suite 204
-//       Hollywood, Maryland 20636-3111 USA
+//       Hollywood, Maryland 20636-3142 USA
 //
 //       Voice: (301) 373-9600
 //       EMail: cups-info@cups.org
@@ -47,7 +47,7 @@
 #include "Page.h"
 #include "PDFDoc.h"
 #include "PSOutputDev.h"
-#include "Params.h"
+#include "GlobalParams.h"
 #include "Error.h"
 #include "config.h"
 
@@ -285,7 +285,7 @@ main(int  argc,				// I - Number of command-line args
   globalParams->setPSPaperHeight(length);
   globalParams->setPSImageableArea(left, bottom, right, top);
   globalParams->setPSDuplex(duplex);
-  globalParams->setPSFit(fit);
+//  globalParams->setPSFit(fit);
   globalParams->setPSLevel(level);
   globalParams->setPSASCIIHex(level == psLevel1);
   globalParams->setPSEmbedType1(1);
@@ -311,7 +311,8 @@ main(int  argc,				// I - Number of command-line args
                             doc->getCatalog(), 1, doc->getNumPages(),
 			    psModePS);
     if (psOut->isOk())
-      doc->displayPages(psOut, 1, doc->getNumPages(), 72, 72, 0, gFalse);
+      doc->displayPages(psOut, 1, doc->getNumPages(), 72.0, 72.0, 0,
+                        gTrue, gFalse);
     delete psOut;
 
     // clean up
@@ -338,5 +339,5 @@ main(int  argc,				// I - Number of command-line args
 
 
 //
-// End of "$Id: pdftops.cxx,v 1.6.2.9 2004/02/06 21:01:59 mike Exp $".
+// End of "$Id: pdftops.cxx,v 1.6.2.10 2004/07/03 03:30:43 mike Exp $".
 //

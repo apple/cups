@@ -3,6 +3,7 @@ CHANGES.txt - 07/02/2004
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Updated pdftops filter to Xpdf 3.00.03. 
 	- The CUPS browsing protocol now offers a "delete" bit
 	  to remove printers as soon as they are deleted on the
 	  server or as soon as the server shuts down gracefully

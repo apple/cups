@@ -2,13 +2,13 @@
 //
 // NameToUnicodeTable.h
 //
-// Copyright 2001-2003 Glyph & Cog, LLC
+// Copyright 2001-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
 static struct {
   Unicode u;
-  const char *name;
+  char *name;
 } nameToUnicodeTab[] = {
   {0x0021, "!"},
   {0x0023, "#"},

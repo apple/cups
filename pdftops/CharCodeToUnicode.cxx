@@ -2,7 +2,7 @@
 //
 // CharCodeToUnicode.cc
 //
-// Copyright 2001-2003 Glyph & Cog, LLC
+// Copyright 2001-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -318,39 +318,39 @@ void CharCodeToUnicode::addMapping(CharCode code, char *uStr, int n,
   int j;
 
   if (code >= mapLen) {
-	  oldLen = mapLen;
+    oldLen = mapLen;
     mapLen = (code + 256) & ~255;
-	  map = (Unicode *)grealloc(map, mapLen * sizeof(Unicode));
-	  for (i = oldLen; i < mapLen; ++i) {
-	    map[i] = 0;
-	  }
-	}
+    map = (Unicode *)grealloc(map, mapLen * sizeof(Unicode));
+    for (i = oldLen; i < mapLen; ++i) {
+      map[i] = 0;
+    }
+  }
   if (n <= 4) {
     if (sscanf(uStr, "%x", &u) != 1) {
       error(-1, "Illegal entry in ToUnicode CMap");
       return;
-	  }
+    }
     map[code] = u + offset;
-	} else {
+  } else {
     if (sMapLen >= sMapSize) {
       sMapSize = sMapSize + 16;
-	    sMap = (CharCodeToUnicodeString *)
-	        grealloc(sMap, sMapSize * sizeof(CharCodeToUnicodeString));
-	  }
+      sMap = (CharCodeToUnicodeString *)
+	       grealloc(sMap, sMapSize * sizeof(CharCodeToUnicodeString));
+    }
     map[code] = 0;
     sMap[sMapLen].c = code;
     sMap[sMapLen].len = n / 4;
-	    for (j = 0; j < sMap[sMapLen].len && j < maxUnicodeString; ++j) {
+    for (j = 0; j < sMap[sMapLen].len && j < maxUnicodeString; ++j) {
       strncpy(uHex, uStr + j*4, 4);
-	      uHex[4] = '\0';
-	      if (sscanf(uHex, "%x", &sMap[sMapLen].u[j]) != 1) {
+      uHex[4] = '\0';
+      if (sscanf(uHex, "%x", &sMap[sMapLen].u[j]) != 1) {
 	error(-1, "Illegal entry in ToUnicode CMap");
-	      }
-	    }
+      }
+    }
     sMap[sMapLen].u[sMap[sMapLen].len - 1] += offset;
-	    ++sMapLen;
-	  }
-	}
+    ++sMapLen;
+  }
+}
 
 CharCodeToUnicode::CharCodeToUnicode(GString *tagA) {
   CharCode i;
@@ -524,10 +524,10 @@ void CharCodeToUnicodeCache::add(CharCodeToUnicode *ctu) {
 
   if (cache[size - 1]) {
     cache[size - 1]->decRefCnt();
-    }
+  }
   for (i = size - 1; i >= 1; --i) {
     cache[i] = cache[i - 1];
-    }
-    cache[0] = ctu;
-    ctu->incRefCnt();
+  }
+  cache[0] = ctu;
+  ctu->incRefCnt();
 }

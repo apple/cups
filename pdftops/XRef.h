@@ -2,7 +2,7 @@
 //
 // XRef.h
 //
-// Copyright 1996-2003 Glyph & Cog, LLC
+// Copyright 1996-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -20,22 +20,30 @@
 
 class Dict;
 class Stream;
+class Parser;
+class ObjectStream;
 
 //------------------------------------------------------------------------
 // XRef
 //------------------------------------------------------------------------
 
+enum XRefEntryType {
+  xrefEntryFree,
+  xrefEntryUncompressed,
+  xrefEntryCompressed
+};
+
 struct XRefEntry {
   Guint offset;
   int gen;
-  GBool used;
+  XRefEntryType type;
 };
 
 class XRef {
 public:
 
   // Constructor.  Read xref table from stream.
-  XRef(BaseStream *strA, GString *ownerPassword, GString *userPassword);
+  XRef(BaseStream *strA);
 
   // Destructor.
   ~XRef();
@@ -46,12 +54,12 @@ public:
   // Get the error code (if isOk() returns false).
   int getErrorCode() { return errCode; }
 
+  // Set the encryption parameters.
+  void setEncryption(int permFlagsA, GBool ownerPasswordOkA,
+		     Guchar *fileKeyA, int keyLengthA, int encVersionA);
+
   // Is the file encrypted?
-#ifndef NO_DECRYPTION
   GBool isEncrypted() { return encrypted; }
-#else
-  GBool isEncrypted() { return gFalse; }
-#endif
 
   // Check various permissions.
   GBool okToPrint(GBool ignoreOwnerPW = gFalse);
@@ -103,20 +111,20 @@ private:
   Guint *streamEnds;		// 'endstream' positions - only used in
 				//   damaged files
   int streamEndsLen;		// number of valid entries in streamEnds
-#ifndef NO_DECRYPTION
+  ObjectStream *objStr;		// cached object stream
   GBool encrypted;		// true if file is encrypted
-  int encVersion;		// encryption algorithm
-  int encRevision;		// security handler revision
-  int keyLength;		// length of key, in bytes
   int permFlags;		// permission bits
-  Guchar fileKey[16];		// file decryption key
   GBool ownerPasswordOk;	// true if owner password is correct
-#endif
+  Guchar fileKey[16];		// file decryption key
+  int keyLength;		// length of key, in bytes
+  int encVersion;		// encryption algorithm
 
-  Guint readTrailer();
+  Guint getStartXref();
   GBool readXRef(Guint *pos);
+  GBool readXRefTable(Parser *parser, Guint *pos);
+  GBool readXRefStreamSection(Stream *xrefStr, int *w, int first, int n);
+  GBool readXRefStream(Stream *xrefStr, Guint *pos);
   GBool constructXRef();
-  GBool checkEncrypted(GString *ownerPassword, GString *userPassword);
   Guint strToUnsigned(char *s);
 };
 

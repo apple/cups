@@ -4,7 +4,7 @@
 //
 // Mapping from Unicode to an encoding.
 //
-// Copyright 2001-2003 Glyph & Cog, LLC
+// Copyright 2001-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -53,12 +53,12 @@ public:
   static UnicodeMap *parse(GString *encodingNameA);
 
   // Create a resident UnicodeMap.
-  UnicodeMap(const char *encodingNameA, GBool unicodeOutA,
+  UnicodeMap(char *encodingNameA, GBool unicodeOutA,
 	     UnicodeMapRange *rangesA, int lenA);
 
   // Create a resident UnicodeMap that uses a function instead of a
   // list of ranges.
-  UnicodeMap(const char *encodingNameA, GBool unicodeOutA,
+  UnicodeMap(char *encodingNameA, GBool unicodeOutA,
 	     UnicodeMapFunc funcA);
 
   ~UnicodeMap();
