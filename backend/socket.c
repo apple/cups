@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.29 2002/03/01 21:18:28 mike Exp $"
+ * "$Id: socket.c,v 1.30 2002/03/25 17:13:55 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -181,7 +181,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	close(fd);
 	fd = -1;
 
-	if (error == ECONNREFUSED)
+	if (error == ECONNREFUSED || error == EHOSTDOWN ||
+            error == EHOSTUNREACH)
 	{
 	  fprintf(stderr, "INFO: Network host \'%s\' is busy; will retry in %d seconds...\n",
                   hostname, delay);
@@ -348,5 +349,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.29 2002/03/01 21:18:28 mike Exp $".
+ * End of "$Id: socket.c,v 1.30 2002/03/25 17:13:55 mike Exp $".
  */

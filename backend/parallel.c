@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c,v 1.40 2002/03/19 19:08:19 mike Exp $"
+ * "$Id: parallel.c,v 1.41 2002/03/25 17:13:55 mike Exp $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -176,6 +176,11 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       if (errno == EBUSY)
       {
         fputs("INFO: Parallel port busy; will retry in 30 seconds...\n", stderr);
+	sleep(30);
+      }
+      else if (errno == ENXIO || errno == EIO)
+      {
+        fputs("INFO: Printer not connected; will retry in 30 seconds...\n", stderr);
 	sleep(30);
       }
       else
@@ -653,5 +658,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c,v 1.40 2002/03/19 19:08:19 mike Exp $".
+ * End of "$Id: parallel.c,v 1.41 2002/03/25 17:13:55 mike Exp $".
  */
