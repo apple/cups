@@ -3,23 +3,25 @@
 % This file is part of GNU Ghostscript.
 % 
 % GNU Ghostscript is distributed in the hope that it will be useful, but
-% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
-% anyone for the consequences of using it or for whether it serves any
-% particular purpose or works at all, unless he says so in writing.  Refer to
-% the GNU General Public License for full details.
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+% to anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer
+% to the GNU General Public License for full details.
 % 
 % Everyone is granted permission to copy, modify and redistribute GNU
 % Ghostscript, but only under the conditions described in the GNU General
-% Public License.  A copy of this license is supposed to have been given to
-% you along with GNU Ghostscript so you can know your rights and
+% Public License.  A copy of this license is supposed to have been given
+% to you along with GNU Ghostscript so you can know your rights and
 % responsibilities.  It should be in a file named COPYING.  Among other
 % things, the copyright notice and this notice must be preserved on all
 % copies.
 % 
-% Aladdin Enterprises is not affiliated with the Free Software Foundation or
-% the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
-% does not depend on any other GNU software.
+% Aladdin Enterprises supports the work of the GNU Project, but is not
+% affiliated with the Free Software Foundation or the GNU Project.  GNU
+% Ghostscript, as distributed by Aladdin Enterprises, does not require any
+% GNU software to build or run it.
 
+% $Id: gs_ccfnt.ps,v 1.2 2000/03/08 23:14:28 mike Exp $
 % Find and register all the precompiled font operators in systemdict.
 
 /registerfont			% <fontname> <fontdict> registerfont <font>
@@ -38,7 +40,7 @@
      if
      dup /FDepVector known
       { /FDepVector [ FDepVector
-	 { FontDirectory 1 index .knownget
+	 { .FontDirectory 1 index .knownget
 	    { exch pop }
 	    { ccfonts 1 index .knownget
 	       { registerfont
@@ -68,7 +70,7 @@
      0 1 null .getccfont 1 sub { .getccfont dup /FontName get exch } for
    .dicttomark def
    ccfonts
-    { FontDirectory 2 index known { pop pop } { registerfont pop } ifelse }
+    { .FontDirectory 2 index known { pop pop } { registerfont pop } ifelse }
    forall
   currentdict /ccfonts .undef
 } bind def
@@ -87,7 +89,7 @@ currentdict /registerfont .undef
     }
     {		% Level 2 system, Level 1 mode
       /Font /Category level2dict /findresource get exec begin
-      FontDirectory
+      .FontDirectory
        { dup .gcheck { Instances } { LocalInstances } ifelse
 	 3 1 roll [exch 0 -1] .growput
        }

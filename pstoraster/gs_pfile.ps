@@ -3,23 +3,25 @@
 % This file is part of GNU Ghostscript.
 % 
 % GNU Ghostscript is distributed in the hope that it will be useful, but
-% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
-% anyone for the consequences of using it or for whether it serves any
-% particular purpose or works at all, unless he says so in writing.  Refer to
-% the GNU General Public License for full details.
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+% to anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer
+% to the GNU General Public License for full details.
 % 
 % Everyone is granted permission to copy, modify and redistribute GNU
 % Ghostscript, but only under the conditions described in the GNU General
-% Public License.  A copy of this license is supposed to have been given to
-% you along with GNU Ghostscript so you can know your rights and
+% Public License.  A copy of this license is supposed to have been given
+% to you along with GNU Ghostscript so you can know your rights and
 % responsibilities.  It should be in a file named COPYING.  Among other
 % things, the copyright notice and this notice must be preserved on all
 % copies.
 % 
-% Aladdin Enterprises is not affiliated with the Free Software Foundation or
-% the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
-% does not depend on any other GNU software.
+% Aladdin Enterprises supports the work of the GNU Project, but is not
+% affiliated with the Free Software Foundation or the GNU Project.  GNU
+% Ghostscript, as distributed by Aladdin Enterprises, does not require any
+% GNU software to build or run it.
 
+% $Id: gs_pfile.ps,v 1.2 2000/03/08 23:14:31 mike Exp $
 % Runtime support for minimum-space fonts and packed files.
 
 % ****** NOTE: This file must be kept consistent with
@@ -130,55 +132,4 @@
       ifelse put dup
     }
    repeat pop exch pop
- } bind def
-
-% ---------------- Synthetic font support ---------------- %
-
-% Create a new font by modifying an existing one.  paramdict contains
-% entries with the same keys as the ones found in a Type 1 font;
-% it should also contain enough empty entries to allow adding the
-% corresponding non-overridden entries from the original font dictionary,
-% including FID.  If paramdict includes a FontInfo entry, this will
-% also override the original font's FontInfo, entry by entry;
-% again, it must contain enough empty entries.
-
-% Note that this procedure does not perform a definefont.
-
-/.makemodifiedfont	% <fontdict> <paramdict> .makemodifiedfont <fontdict'>
- { exch
-    {			% Stack: destdict key value
-      1 index /FID ne
-       { 2 index 2 index known
-	  {		% Skip fontdict entry supplied in paramdict, but
-			% handle FontInfo specially.
-	    1 index /FontInfo eq
-	     { 2 index 2 index get		% new FontInfo
-	       1 index				% old FontInfo
-		{	% Stack: destdict key value destinfo key value
-		  2 index 2 index known
-		   { pop pop }
-		   { 2 index 3 1 roll put }
-		  ifelse
-		}
-	       forall pop
-	     }
-	    if
-	  }
-	  {		% No override, copy the fontdict entry.
-	    2 index 3 1 roll put
-	    dup dup	% to match pop pop below
-	  }
-	 ifelse
-       }
-      if
-      pop pop
-    } forall
- } bind def
-
-% Make a modified font and define it.  Note that unlike definefont,
-% this does not leave the font on the operand stack.
-
-/.definemodifiedfont	% <fontdict> <paramdict> .definemodifiedfont -
- { .makemodifiedfont
-   dup /FontName get exch definefont pop
  } bind def

@@ -1,31 +1,36 @@
-/* Copyright (C) 1989, 1995, 1996 Aladdin Enterprises.  All rights reserved.
+/* Copyright (C) 1989, 1995, 1996, 1997, 1998 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
   
   GNU Ghostscript is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
-  anyone for the consequences of using it or for whether it serves any
-  particular purpose or works at all, unless he says so in writing.  Refer to
-  the GNU General Public License for full details.
+  WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+  to anyone for the consequences of using it or for whether it serves any
+  particular purpose or works at all, unless he says so in writing.  Refer
+  to the GNU General Public License for full details.
   
   Everyone is granted permission to copy, modify and redistribute GNU
   Ghostscript, but only under the conditions described in the GNU General
-  Public License.  A copy of this license is supposed to have been given to
-  you along with GNU Ghostscript so you can know your rights and
+  Public License.  A copy of this license is supposed to have been given
+  to you along with GNU Ghostscript so you can know your rights and
   responsibilities.  It should be in a file named COPYING.  Among other
   things, the copyright notice and this notice must be preserved on all
   copies.
   
-  Aladdin Enterprises is not affiliated with the Free Software Foundation or
-  the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
-  does not depend on any other GNU software.
+  Aladdin Enterprises supports the work of the GNU Project, but is not
+  affiliated with the Free Software Foundation or the GNU Project.  GNU
+  Ghostscript, as distributed by Aladdin Enterprises, does not require any
+  GNU software to build or run it.
 */
 
-/* igstate.h */
+/*$Id: igstate.h,v 1.2 2000/03/08 23:15:11 mike Exp $ */
 /* Ghostscript interpreter graphics state definition */
+
+#ifndef igstate_INCLUDED
+#  define igstate_INCLUDED
+
 #include "gsstate.h"
-#include "gxstate.h"			/* for 'client data' access */
-#include "istruct.h"			/* for gstate obj definition */
+#include "gxstate.h"		/* for 'client data' access */
+#include "istruct.h"		/* for gstate obj definition */
 
 /*
  * From the interpreter's point of view, the graphics state is largely opaque,
@@ -51,33 +56,40 @@
  * is defined (see gsstruct.h for more information on this).
  */
 typedef struct igstate_obj_s {
-	ref gstate;		/* t_struct / st_gs_state */
+    ref gstate;			/* t_struct / st_gs_state */
 } igstate_obj;
+
 extern_st(st_igstate_obj);
 #define public_st_igstate_obj()	/* in zdps1.c */\
   gs_public_st_ref_struct(st_igstate_obj, igstate_obj, "gstatetype")
 #define igstate_ptr(rp) r_ptr(&r_ptr(rp, igstate_obj)->gstate, gs_state)
 
+/* DeviceN names and tint transform */
+typedef struct ref_device_n_params_s {
+    ref layer_names, tint_transform;
+} ref_device_n_params;
+
 /* CIE transformation procedures */
 typedef struct ref_cie_procs_s {
-	union {
-		ref DEFG;
-		ref DEF;
-	} PreDecode;
-	union {
-		ref ABC;
-		ref A;
-	} Decode;
-	ref DecodeLMN;
+    union {
+	ref DEFG;
+	ref DEF;
+    } PreDecode;
+    union {
+	ref ABC;
+	ref A;
+    } Decode;
+    ref DecodeLMN;
 } ref_cie_procs;
+
 /* CIE rendering transformation procedures */
 typedef struct ref_cie_render_procs_s {
-	ref TransformPQR, EncodeLMN, EncodeABC, RenderTableT;
+    ref TransformPQR, EncodeLMN, EncodeABC, RenderTableT;
 } ref_cie_render_procs;
 
 /* Separation name and tint transform */
 typedef struct ref_separation_params_s {
-	ref layer_name, tint_transform;
+    ref layer_name, tint_transform;
 } ref_separation_params;
 
 /* All color space parameters. */
@@ -85,57 +97,58 @@ typedef struct ref_separation_params_s {
 /* Note that they may actually be the parameters for an underlying or */
 /* alternate space for a special space. */
 typedef struct ref_color_procs_s {
-	ref_cie_procs cie;
-	union {
-		ref_separation_params separation;
-		ref index_proc;
-	} special;
+    ref_cie_procs cie;
+    union {
+	ref_device_n_params device_n;
+	ref_separation_params separation;
+	ref index_proc;
+    } special;
 } ref_color_procs;
 typedef struct ref_colorspace_s {
-	ref array;		/* color space (array), */
-		/* only relevant if the current */
-		/* color space has parameters associated with it. */
-	ref_color_procs procs;	/* associated procedures/parameters, */
-		/* only relevant for CIE, Separation, Indexed/CIE, */
-		/* Indexed with procedure, or a Pattern with one of these. */
+    ref array;			/* color space (array), */
+    /* only relevant if the current */
+    /* color space has parameters associated with it. */
+    ref_color_procs procs;	/* associated procedures/parameters, */
+    /* only relevant for DeviceN, CIE, Separation, Indexed/CIE, */
+    /* Indexed with procedure, or a Pattern with one of these. */
 } ref_colorspace;
 
 typedef struct int_gstate_s {
-	ref dash_pattern;		/* (array) */
-		/* Screen_procs are only relevant if setscreen was */
-		/* executed more recently than sethalftone */
-		/* (for this graphics context). */
-	union {
-		ref indexed[4];
-		struct {
-			/* The components must be in this order: */
-			ref red, green, blue, gray;
-		} colored;
-	} screen_procs,			/* halftone screen procedures */
-	  transfer_procs;		/* transfer procedures */
-	ref black_generation;		/* (procedure) */
-	ref undercolor_removal;		/* (procedure) */
-	ref_colorspace colorspace;
-		/* Pattern is only relevant if the current color space */
-		/* is a pattern space. */
-	ref pattern;			/* pattern (dictionary) */
+    ref dash_pattern;		/* (array) */
+    /* Screen_procs are only relevant if setscreen was */
+    /* executed more recently than sethalftone */
+    /* (for this graphics context). */
+    union {
+	ref indexed[4];
 	struct {
-		ref dict;		/* CIE color rendering dictionary */
-		ref_cie_render_procs procs;	/* (see above) */
-	} colorrendering;
-		/* Halftone is only relevant if sethalftone was executed */
-		/* more recently than setscreen for this graphics context. */
-		/* setscreen sets it to null. */
-	ref halftone;			/* halftone (dictionary) */
-		/* Pagedevice is only relevant if setpagedevice was */
-		/* executed more recently than nulldevice, setcachedevice, */
-		/* or setdevice with a non-page device (for this */
-		/* graphics context).  If the current device is not a */
-		/* page device, pagedevice is an empty dictionary. */
-	ref pagedevice;			/* page device (dictionary) */
+	    /* The components must be in this order: */
+	    ref red, green, blue, gray;
+	} colored;
+    } screen_procs,		/* halftone screen procedures */
+          transfer_procs;	/* transfer procedures */
+    ref black_generation;	/* (procedure) */
+    ref undercolor_removal;	/* (procedure) */
+    ref_colorspace colorspace;
+    /* Pattern is only relevant if the current color space */
+    /* is a pattern space. */
+    ref pattern;		/* pattern (dictionary) */
+    struct {
+	ref dict;		/* CIE color rendering dictionary */
+	ref_cie_render_procs procs;	/* (see above) */
+    } colorrendering;
+    /* Halftone is only relevant if sethalftone was executed */
+    /* more recently than setscreen for this graphics context. */
+    /* setscreen sets it to null. */
+    ref halftone;		/* halftone (dictionary) */
+    /* Pagedevice is only relevant if setpagedevice was */
+    /* executed more recently than nulldevice, setcachedevice, */
+    /* or setdevice with a non-page device (for this */
+    /* graphics context).  If the current device is not a */
+    /* page device, pagedevice is null. */
+    ref pagedevice;		/* page device (dictionary|null) */
 } int_gstate;
-extern ref i_null_pagedevice;
-#define clear_pagedevice(pigs) ((pigs)->pagedevice = i_null_pagedevice)
+
+#define clear_pagedevice(pigs) make_null(&(pigs)->pagedevice)
 /*
  * Even though the interpreter's part of the graphics state actually
  * consists of refs, allocating it as refs tends to create sandbars;
@@ -153,9 +166,16 @@ extern ref i_null_pagedevice;
    do { m(rp_); ++rp_; } while ( --i );\
  }
 
+/* Create the gstate for a new context. */
+/* We export this so that fork can use it. */
+gs_state *int_gstate_alloc(P1(gs_ref_memory_t * mem));
+
 /* Get the int_gstate from a gs_state. */
 #define gs_int_gstate(pgs) ((int_gstate *)gs_state_client_data(pgs))
 
 /* The current instances. */
 extern gs_state *igs;
+
 #define istate gs_int_gstate(igs)
+
+#endif /* igstate_INCLUDED */

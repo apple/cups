@@ -1,66 +1,83 @@
-%    Copyright (C) 1995 Aladdin Enterprises.  All rights reserved.
+%    Copyright (C) 1995, 1996, 1997 Aladdin Enterprises.  All rights reserved.
 % 
 % This file is part of GNU Ghostscript.
 % 
 % GNU Ghostscript is distributed in the hope that it will be useful, but
-% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
-% anyone for the consequences of using it or for whether it serves any
-% particular purpose or works at all, unless he says so in writing.  Refer to
-% the GNU General Public License for full details.
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+% to anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer
+% to the GNU General Public License for full details.
 % 
 % Everyone is granted permission to copy, modify and redistribute GNU
 % Ghostscript, but only under the conditions described in the GNU General
-% Public License.  A copy of this license is supposed to have been given to
-% you along with GNU Ghostscript so you can know your rights and
+% Public License.  A copy of this license is supposed to have been given
+% to you along with GNU Ghostscript so you can know your rights and
 % responsibilities.  It should be in a file named COPYING.  Among other
 % things, the copyright notice and this notice must be preserved on all
 % copies.
 % 
-% Aladdin Enterprises is not affiliated with the Free Software Foundation or
-% the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
-% does not depend on any other GNU software.
+% Aladdin Enterprises supports the work of the GNU Project, but is not
+% affiliated with the Free Software Foundation or the GNU Project.  GNU
+% Ghostscript, as distributed by Aladdin Enterprises, does not require any
+% GNU software to build or run it.
 
-% ProcSet for implementing CMap resource.
+% $Id: gs_cmap.ps,v 1.2 2000/03/08 23:14:28 mike Exp $
+% ProcSet for implementing CMap resources.
 % When this is run, systemdict is still writable.
 
-%**************** This file is not ready for use:
-%	- Rearranged fonts are not implemented.
-%	- It has never been tested on a real font.
+% NOTE: Rearranged fonts are not implemented yet.
 
-/.setlanguagelevel where { pop 2 .setlanguagelevel } if
-.currentglobal true .setglobal
-
-/GS_CMapInit_ProcSet 30 dict dup begin
-
-% ---------------- CMap operators ---------------- %
-
-% We create the following structures for character code mapping.
-%	Map - a multi-level array indexed by the successive bytes of
-%	  the character code.  All of the arrays are read-only.
-%	NotdefMap - the same.
-
-% ------ Font-level operators ------ %
+% ---------------- Public operators ---------------- %
 
 % composefont doesn't appear in CMap files -- it's documented in
 % the "PostScript Language Reference Manual Supplement".
-/composefont		% <name> <cmap|cmapname> <fonts> composefont <font>
- { exch dup /dicttype ne { /CMap findresource } if
-   10 dict
-     dup /FontType 0 put
-     dup /FMapType 9 put
-     dup /CMap 5 -1 roll put
-     dup /Encoding [ 0 1 6 index length 1 sub { } for ] put
-     dup /FDepVector 4 -1 roll put
-   /Font defineresource
- } bind def
+/composefont {		% <name> <cmap|cmapname> <fonts> composefont <font>
+  10 dict begin
+    /CMap 2 index dup type /dicttype ne { /CMap findresource } if def
+    /Encoding [ 0 1 4 index length 1 sub { } for ] def
+    /FDepVector [ 2 index {
+      dup type /dicttype ne {
+	dup /CIDFont resourcestatus {
+	  pop pop /CIDFont findresource
+	} {
+	  /Font findresource
+	} ifelse
+      } if
+    } forall ] readonly def
+    /FMapType 9 def
+    /FontMatrix matrix def
+    /FontName 3 index def
+    /CMap load /WMode .knownget { /WMode exch def } if
+    /FontType 0 def
+  pop pop currentdict end /Font defineresource
+} bind odef
+
+% ---------------- CMap operators ---------------- %
+
+30 dict begin
+
+% Our internal .CodeMaps structure is an array of two arrays: array 0
+% is the map for defined characters, array 1 is the map for notdefs.
+% Both are multi-level arrays indexed by the successive bytes of the
+% character code.  Each value is either a sub-array, null, a character name,
+% a CID (an integer), or a character code (expressed as a byte string).
+% All of the arrays are read-only after they have been built.
+%
+% Note that the code in zfcmap.c that constructs the C structures from
+% the PostScript structures has intimate knowledge of the above format.
+
+/.getmap { .CodeMaps exch get } bind def
+/.putmap { .CodeMaps exch 3 -1 roll put } bind def
+
+% ------ Font-level operators ------ %
 
 /begincmap		% - begincmap -
- { /Map 256 array def
-   /NotdefMap 256 array def
+ { /.CodeMaps [256 array 256 array] def
  } bind def
 /endcmap		% - endcmap -
- { /Map Map .endmap def
-   /NotdefMap NotdefMap .endmap def
+ { /.CodeMaps .CodeMaps .endmap def
+   /CodeMap null def		% for .buildcmap
+   currentdict end .buildcmap begin
  } bind def
 
 /begincodespacerange	% <count> begincodespacerange -
@@ -68,7 +85,7 @@
  } bind def
 /endcodespacerange	% <code_lo> <code_hi> ... endcodespacerange -
  { counttomark 2 idiv
-    { 2 copy Map .addcodespacerange NotdefMap .addcodespacerange
+    { .CodeMaps { 3 copy .addcodespacerange pop } forall pop pop
     } repeat pop
  } bind def
 
@@ -124,7 +141,7 @@
  { pop mark
  } bind def
 /endbfchar		% <code> <to_code|charname> ... endbfchar
- { Map .endmapchar /Map exch store pop
+ { 0 .getmap .endmapchar 0 .putmap
  } bind def
 
 /beginbfrange		% <count> beginbfrange -
@@ -132,7 +149,7 @@
  } bind def
 /endbfrange		% <code_lo> <code_hi> <to_code|(charname*)> ...
 			%   endbfrange -
- { Map counttomark 3 idiv { .addbfrange } repeat /Map exch store pop
+ { 0 .getmap counttomark 3 idiv { .addbfrange } repeat 0 .putmap pop
  } bind def
 
 /.addbfrange		% <code_lo> <code_hi> <to_code|(charname*)> <map>
@@ -156,18 +173,18 @@
  { pop mark
  } bind def
 /endcidchar		% <code> <cid> ... endcidchar -
- { Map .endmapchar /Map exch store pop
+ { 0 .getmap .endmapchar 0 .putmap
  } bind def
 
 /begincidrange		% <count> begincidrange -
  { pop mark
  } bind def
 /endcidrange		% <code_lo> <code_hi> <cid_base> ... endcidrange -
- { Map counttomark 3 idiv { { 1 add } exch .addmaprange exch pop } repeat
-   /Map exch store pop
+ { 0 .getmap counttomark 3 idiv { { 1 add } exch .addmaprange exch pop } repeat
+   0 .putmap pop
  } bind def
 
-/.endmapchar		% <code> <value> ... <map> .endmapchar -
+/.endmapchar		% -mark- <code> <value> ... <map> .endmapchar -
  { counttomark 2 idiv
     { 2 index 3 1 roll { } exch .addmaprange exch pop
     } repeat exch pop
@@ -217,19 +234,23 @@
  } bind def
 
 /.addnotdefrange	% <code_lo> <code_hi> <cid_base> .addnotdefrange -
- { { } NotdefMap .addmaprange /NotdefMap exch store pop
+ { { } 1 .getmap .addmaprange 1 .putmap pop
  } bind def
 
 % ---------------- Resource category definition ---------------- %
 
-end readonly def
+currentdict end
 
-/defineresource where
- { pop
-   /CMap /Generic /Category findresource dup length dict .copydict
-   /Category defineresource pop
-   /CMapInit GS_CMapInit_ProcSet /ProcSet defineresource pop
- }
-if
+languagelevel exch 2 .setlanguagelevel
 
-.setglobal
+/CMap /Generic /Category findresource dup length dict .copydict
+/Category defineresource pop
+	% We might have loaded CID font support already.
+/CIDInit /ProcSet 2 copy { findresource } .internalstopped
+	% An interior `stopped' might have reset VM allocation to local.
+true .setglobal
+ { pop pop 3 -1 roll }
+ { dup length 4 index length add dict .copydict 4 -1 roll exch .copydict }
+ifelse exch defineresource pop
+
+.setlanguagelevel

@@ -1,39 +1,43 @@
-/* Copyright (C) 1991, 1995 Aladdin Enterprises.  All rights reserved.
+/* Copyright (C) 1991, 1995, 1997, 1998 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
   
   GNU Ghostscript is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
-  anyone for the consequences of using it or for whether it serves any
-  particular purpose or works at all, unless he says so in writing.  Refer to
-  the GNU General Public License for full details.
+  WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+  to anyone for the consequences of using it or for whether it serves any
+  particular purpose or works at all, unless he says so in writing.  Refer
+  to the GNU General Public License for full details.
   
   Everyone is granted permission to copy, modify and redistribute GNU
   Ghostscript, but only under the conditions described in the GNU General
-  Public License.  A copy of this license is supposed to have been given to
-  you along with GNU Ghostscript so you can know your rights and
+  Public License.  A copy of this license is supposed to have been given
+  to you along with GNU Ghostscript so you can know your rights and
   responsibilities.  It should be in a file named COPYING.  Among other
   things, the copyright notice and this notice must be preserved on all
   copies.
   
-  Aladdin Enterprises is not affiliated with the Free Software Foundation or
-  the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
-  does not depend on any other GNU software.
+  Aladdin Enterprises supports the work of the GNU Project, but is not
+  affiliated with the Free Software Foundation or the GNU Project.  GNU
+  Ghostscript, as distributed by Aladdin Enterprises, does not require any
+  GNU software to build or run it.
 */
 
-/* iutil.h */
-/* Prototypes for procedures in iutil.c */
+/*$Id: iutil.h,v 1.2 2000/03/08 23:15:17 mike Exp $ */
 /* Requires imemory.h, ostack.h */
+
+#ifndef iutil_INCLUDED
+#  define iutil_INCLUDED
 
 /* ------ Object utilities ------ */
 
 /* Copy refs from one place to another. */
 /* (If we are copying to the stack, we can just use memcpy.) */
-void refcpy_to_new(P3(ref *to, const ref *from, uint size));
-int refcpy_to_old(P5(ref *aref, uint index, const ref *from, uint size, client_name_t cname));
+void refcpy_to_new(P3(ref * to, const ref * from, uint size));
+int refcpy_to_old(P5(ref * aref, uint index, const ref * from, uint size,
+		     client_name_t cname));
 
 /* Fill an array with nulls. */
-void refset_null(P2(ref *to, uint size));
+void refset_null(P2(ref * to, uint size));
 
 /* Compare two objects for equality. */
 bool obj_eq(P2(const ref *, const ref *));
@@ -50,10 +54,11 @@ bool obj_ident_eq(P2(const ref *, const ref *));
  * even if it was too large.  Note that if full_print is true, the only
  * allowed types are boolean, integer, and real.
  */
-int obj_cvp(P6(const ref *op, byte *str, uint len, uint *prlen,
-	       const byte **pchars, bool full_print));
-#define obj_cvs(op, str, len, prlen, pchars)\
-  obj_cvp(op, str, len, prlen, pchars, false)
+int obj_cvp(P6(const ref * op, byte * str, uint len, uint * prlen,
+	       const byte ** pchars, bool full_print));
+/* obj_cvs is equivalent to obj_cvp with full_print = false. */
+int obj_cvs(P5(const ref * op, byte * str, uint len, uint * prlen,
+	       const byte ** pchars));
 
 /* Get an element from an array (packed or not). */
 int array_get(P3(const ref *, long, ref *));
@@ -67,7 +72,7 @@ void packed_get(P2(const ref_packed *, ref *));
 /* Check to make sure an interval contains no object references */
 /* to a space younger than a given one. */
 /* Return 0 or e_invalidaccess. */
-int refs_check_space(P3(const ref *refs, uint size, uint space));
+int refs_check_space(P3(const ref * refs, uint size, uint space));
 
 /* ------ String utilities ------ */
 
@@ -81,17 +86,25 @@ char *ref_to_string(P3(const ref *, gs_memory_t *, client_name_t));
 /* ------ Operand utilities ------ */
 
 /* Get N numeric operands from the stack or an array. */
-int num_params(P3(const ref *, int, float *));
+int num_params(P3(const ref *, int, double *));
+
+/* float_params can lose accuracy for large integers. */
+int float_params(P3(const ref *, int, float *));
 
 /* Get a single real parameter. */
 /* The only possible error is e_typecheck. */
-int real_param(P2(const ref *, float *));
+int real_param(P2(const ref *, double *));
+
+/* float_param can lose accuracy for large integers. */
+int float_param(P2(const ref *, float *));
 
 /* Get an integer parameter in a given range. */
 int int_param(P3(const ref *, int, int *));
 
 /* Make real values on the stack. */
-void make_reals(P3(ref *, const float *, int));
+/* Return e_limitcheck for infinities or double->float overflow. */
+int make_reals(P3(ref *, const double *, int));
+int make_floats(P3(ref *, const float *, int));
 
 /* Define the gs_matrix type if necessary. */
 #ifndef gs_matrix_DEFINED
@@ -104,3 +117,5 @@ int read_matrix(P2(const ref *, gs_matrix *));
 
 /* Write a matrix operand. */
 int write_matrix(P2(ref *, const gs_matrix *));
+
+#endif /* iutil_INCLUDED */

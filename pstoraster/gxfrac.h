@@ -3,25 +3,26 @@
   This file is part of GNU Ghostscript.
   
   GNU Ghostscript is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
-  anyone for the consequences of using it or for whether it serves any
-  particular purpose or works at all, unless he says so in writing.  Refer to
-  the GNU General Public License for full details.
+  WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+  to anyone for the consequences of using it or for whether it serves any
+  particular purpose or works at all, unless he says so in writing.  Refer
+  to the GNU General Public License for full details.
   
   Everyone is granted permission to copy, modify and redistribute GNU
   Ghostscript, but only under the conditions described in the GNU General
-  Public License.  A copy of this license is supposed to have been given to
-  you along with GNU Ghostscript so you can know your rights and
+  Public License.  A copy of this license is supposed to have been given
+  to you along with GNU Ghostscript so you can know your rights and
   responsibilities.  It should be in a file named COPYING.  Among other
   things, the copyright notice and this notice must be preserved on all
   copies.
   
-  Aladdin Enterprises is not affiliated with the Free Software Foundation or
-  the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
-  does not depend on any other GNU software.
+  Aladdin Enterprises supports the work of the GNU Project, but is not
+  affiliated with the Free Software Foundation or the GNU Project.  GNU
+  Ghostscript, as distributed by Aladdin Enterprises, does not require any
+  GNU software to build or run it.
 */
 
-/* gxfrac.h */
+/*$Id: gxfrac.h,v 1.2 2000/03/08 23:14:59 mike Exp $ */
 /* Fraction representation for Ghostscript */
 
 #ifndef gxfrac_INCLUDED
@@ -35,6 +36,7 @@
  */
 typedef short frac;
 typedef short signed_frac;
+
 #define arch_log2_sizeof_frac arch_log2_sizeof_short
 #define arch_sizeof_frac arch_sizeof_short
 #define frac_bits 15
@@ -93,4 +95,4 @@ typedef short signed_frac;
 #define frac_1_rem(p, q)\
   ((frac)( (uint)(p) - ((q) << frac_bits) + ((q) << frac_1_0bits) ))
 
-#endif					/* gxfrac_INCLUDED */
+#endif /* gxfrac_INCLUDED */

@@ -1,27 +1,28 @@
-/* Copyright (C) 1992, 1993 Aladdin Enterprises.  All rights reserved.
+/* Copyright (C) 1992, 1993, 1998 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
   
   GNU Ghostscript is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
-  anyone for the consequences of using it or for whether it serves any
-  particular purpose or works at all, unless he says so in writing.  Refer to
-  the GNU General Public License for full details.
+  WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+  to anyone for the consequences of using it or for whether it serves any
+  particular purpose or works at all, unless he says so in writing.  Refer
+  to the GNU General Public License for full details.
   
   Everyone is granted permission to copy, modify and redistribute GNU
   Ghostscript, but only under the conditions described in the GNU General
-  Public License.  A copy of this license is supposed to have been given to
-  you along with GNU Ghostscript so you can know your rights and
+  Public License.  A copy of this license is supposed to have been given
+  to you along with GNU Ghostscript so you can know your rights and
   responsibilities.  It should be in a file named COPYING.  Among other
   things, the copyright notice and this notice must be preserved on all
   copies.
   
-  Aladdin Enterprises is not affiliated with the Free Software Foundation or
-  the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
-  does not depend on any other GNU software.
+  Aladdin Enterprises supports the work of the GNU Project, but is not
+  affiliated with the Free Software Foundation or the GNU Project.  GNU
+  Ghostscript, as distributed by Aladdin Enterprises, does not require any
+  GNU software to build or run it.
 */
 
-/* gsuid.h */
+/*$Id: gsuid.h,v 1.2 2000/03/08 23:14:49 mike Exp $ */
 /* Unique id definitions for Ghostscript */
 
 #ifndef gsuid_INCLUDED
@@ -32,16 +33,21 @@
 #ifndef gs_uid_DEFINED
 #  define gs_uid_DEFINED
 typedef struct gs_uid_s gs_uid;
+
 #endif
 struct gs_uid_s {
-	/* id >= 0 is a UniqueID, xvalues is 0. */
-	/* id < 0 is an XUID, size of xvalues is -id. */
-	long id;
-	long *xvalues;
+    /* id >= 0 is a UniqueID, xvalues is 0. */
+    /* id < 0 is an XUID, size of xvalues is -id. */
+    long id;
+    long *xvalues;
 };
 
-/* A UniqueID of no_UniqueID is an indication that there is no uid. */
-#define no_UniqueID 0x1000000
+/*
+ * A UniqueID of no_UniqueID is an indication that there is no uid.
+ * Since we sometimes use gs_ids as UniqueIDs, we want to choose as large
+ * a (positive) value as possible for no_UniqueID.
+ */
+#define no_UniqueID max_long
 #define uid_is_valid(puid)\
   ((puid)->id != no_UniqueID)
 #define uid_set_invalid(puid)\
@@ -50,12 +56,12 @@ struct gs_uid_s {
   (((puid)->id & ~0xffffff) == 0)
 #define uid_is_XUID(puid)\
   ((puid)->id < 0)
-	  
+
 /* Initialize a uid. */
 #define uid_set_UniqueID(puid, idv)\
   ((puid)->id = idv, (puid)->xvalues = 0)
 #define uid_set_XUID(puid, pvalues, siz)\
-  ((puid)->id = -siz, (puid)->xvalues = pvalues)
+  ((puid)->id = -(long)(siz), (puid)->xvalues = pvalues)
 
 /* Get the size and the data of an XUID. */
 #define uid_XUID_size(puid) ((uint)(-(puid)->id))
@@ -63,10 +69,10 @@ struct gs_uid_s {
 
 /* Compare two uids for equality. */
 /* This could be a macro, but the Zortech compiler compiles it wrong. */
-bool	uid_equal(P2(const gs_uid *, const gs_uid *)); /* in gsutil.c */
+bool uid_equal(P2(const gs_uid *, const gs_uid *));	/* in gsutil.c */
 
 /* Free the XUID array of a uid if necessary. */
 #define uid_free(puid, mem, cname)\
   gs_free_object(mem, (puid)->xvalues, cname)
 
-#endif					/* gsuid_INCLUDED */
+#endif /* gsuid_INCLUDED */

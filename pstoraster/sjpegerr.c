@@ -1,30 +1,35 @@
-/* Copyright (C) 1994, 1995 Aladdin Enterprises.  All rights reserved.
-  
+/*
+  Copyright 1993-2000 by Easy Software Products
+  Copyright (C) 1994, 1995, 1998 Aladdin Enterprises.  All rights reserved.
+
   This file is part of GNU Ghostscript.
-  
+
   GNU Ghostscript is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
-  anyone for the consequences of using it or for whether it serves any
-  particular purpose or works at all, unless he says so in writing.  Refer to
-  the GNU General Public License for full details.
-  
+  WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+  to anyone for the consequences of using it or for whether it serves any
+  particular purpose or works at all, unless he says so in writing.  Refer
+  to the GNU General Public License for full details.
+
   Everyone is granted permission to copy, modify and redistribute GNU
   Ghostscript, but only under the conditions described in the GNU General
-  Public License.  A copy of this license is supposed to have been given to
-  you along with GNU Ghostscript so you can know your rights and
+  Public License.  A copy of this license is supposed to have been given
+  to you along with GNU Ghostscript so you can know your rights and
   responsibilities.  It should be in a file named COPYING.  Among other
   things, the copyright notice and this notice must be preserved on all
   copies.
-  
-  Aladdin Enterprises is not affiliated with the Free Software Foundation or
-  the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
-  does not depend on any other GNU software.
+
+  Aladdin Enterprises supports the work of the GNU Project, but is not
+  affiliated with the Free Software Foundation or the GNU Project.  GNU
+  Ghostscript, as distributed by Aladdin Enterprises, does not require any
+  GNU software to build or run it.
 */
+
 #include <config.h>
 #ifdef HAVE_LIBJPEG
-/* sjpegerr.c */
+/*$Id: sjpegerr.c,v 1.4 2000/03/08 23:15:25 mike Exp $ */
 /* IJG error message table for Ghostscript. */
 #include "stdio_.h"
+#include "jpeglib.h"
 
 /*
  * MRS - these are normally found in jversion.h, however it seems that
@@ -33,10 +38,8 @@
  * The following definitions come from the 6B distribution...
  */
 
-#define JVERSION "6b  27-Mar-1998"
-#define JCOPYRIGHT "Copyright (C) 1998, Thomas G. Lane"
-
-#include "jpeglib.h"
+#define JVERSION	"6b  27-Mar-1998"
+#define JCOPYRIGHT	"Copyright (C) 1998, Thomas G. Lane"
 
 /*
  * This file exists solely to hold the rather large IJG error message string
@@ -58,7 +61,7 @@
  * use the IJG message code names as variables rather than as enum constants.
  */
 
-#if JPEG_LIB_VERSION <= 50		/**************** ****************/
+#if JPEG_LIB_VERSION <= 50	/**************** *************** */
 
 #include "jerror.h"		/* get error codes */
 #define JMAKE_MSG_TABLE
@@ -66,11 +69,11 @@
 
 #define jpeg_std_message_table jpeg_message_table
 
-#else /* JPEG_LIB_VERSION >= 51 */	/**************** ****************/
+#else	/* JPEG_LIB_VERSION >= 51 */ /**************** *************** */
 
 /* Create a static const char[] variable for each message string. */
 
-#define JMESSAGE(code,string)	static const char far_data code[] = string;
+#define JMESSAGE(code,string)	static const char code[] = string;
 
 #include "jerror.h"
 
@@ -78,20 +81,22 @@
 
 #define JMESSAGE(code,string)	code ,
 
-static const char far_data * const far_data jpeg_std_message_table[] = {
+static const char *const jpeg_std_message_table[] =
+{
 #include "jerror.h"
-  NULL
+    NULL
 };
 
-#endif /* JPEG_LIB_VERSION */		/**************** ****************/
+#endif	/* JPEG_LIB_VERSION */ /**************** *************** */
 
 /*
  * Return a pointer to the message table.
  * It is unsafe to do much more than this within the "huge" environment.
  */
 
-const char * const *
-gs_jpeg_message_table (void)
-{	return jpeg_std_message_table;
+const char *const *
+gs_jpeg_message_table(void)
+{
+    return jpeg_std_message_table;
 }
-#endif
+#endif /* HAVE_LIBJPEG */

@@ -3,25 +3,26 @@
   This file is part of GNU Ghostscript.
   
   GNU Ghostscript is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
-  anyone for the consequences of using it or for whether it serves any
-  particular purpose or works at all, unless he says so in writing.  Refer to
-  the GNU General Public License for full details.
+  WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+  to anyone for the consequences of using it or for whether it serves any
+  particular purpose or works at all, unless he says so in writing.  Refer
+  to the GNU General Public License for full details.
   
   Everyone is granted permission to copy, modify and redistribute GNU
   Ghostscript, but only under the conditions described in the GNU General
-  Public License.  A copy of this license is supposed to have been given to
-  you along with GNU Ghostscript so you can know your rights and
+  Public License.  A copy of this license is supposed to have been given
+  to you along with GNU Ghostscript so you can know your rights and
   responsibilities.  It should be in a file named COPYING.  Among other
   things, the copyright notice and this notice must be preserved on all
   copies.
   
-  Aladdin Enterprises is not affiliated with the Free Software Foundation or
-  the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
-  does not depend on any other GNU software.
+  Aladdin Enterprises supports the work of the GNU Project, but is not
+  affiliated with the Free Software Foundation or the GNU Project.  GNU
+  Ghostscript, as distributed by Aladdin Enterprises, does not require any
+  GNU software to build or run it.
 */
 
-/* gsxfont.h */
+/*$Id: gsxfont.h,v 1.2 2000/03/08 23:14:49 mike Exp $ */
 /* External font client definitions for Ghostscript library */
 
 #ifndef gsxfont_INCLUDED
@@ -30,6 +31,7 @@
 /* Define a character glyph identifier.  This is opaque, probably an index */
 /* into the font.  Glyph identifiers are font-specific. */
 typedef ulong gx_xglyph;
+
 #define gx_no_xglyph ((gx_xglyph)~0L)
 
 /* Structure for xfont procedures. */
@@ -40,4 +42,4 @@ typedef struct gx_xfont_procs_s gx_xfont_procs;
 struct gx_xfont_s;
 typedef struct gx_xfont_s gx_xfont;
 
-#endif					/* gsxfont_INCLUDED */
+#endif /* gsxfont_INCLUDED */

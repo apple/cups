@@ -1,30 +1,34 @@
-/* Copyright (C) 1991, 1995, 1996 Aladdin Enterprises.  All rights reserved.
+/* Copyright (C) 1991, 1995, 1996, 1997, 1998 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
   
   GNU Ghostscript is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
-  anyone for the consequences of using it or for whether it serves any
-  particular purpose or works at all, unless he says so in writing.  Refer to
-  the GNU General Public License for full details.
+  WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+  to anyone for the consequences of using it or for whether it serves any
+  particular purpose or works at all, unless he says so in writing.  Refer
+  to the GNU General Public License for full details.
   
   Everyone is granted permission to copy, modify and redistribute GNU
   Ghostscript, but only under the conditions described in the GNU General
-  Public License.  A copy of this license is supposed to have been given to
-  you along with GNU Ghostscript so you can know your rights and
+  Public License.  A copy of this license is supposed to have been given
+  to you along with GNU Ghostscript so you can know your rights and
   responsibilities.  It should be in a file named COPYING.  Among other
   things, the copyright notice and this notice must be preserved on all
   copies.
   
-  Aladdin Enterprises is not affiliated with the Free Software Foundation or
-  the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
-  does not depend on any other GNU software.
+  Aladdin Enterprises supports the work of the GNU Project, but is not
+  affiliated with the Free Software Foundation or the GNU Project.  GNU
+  Ghostscript, as distributed by Aladdin Enterprises, does not require any
+  GNU software to build or run it.
 */
 
-/* gdevmem.h */
+/*$Id: gdevmem.h,v 1.2 2000/03/08 23:14:24 mike Exp $ */
 /* Private definitions for memory devices. */
 
-#include "gsbitops.h"
+#ifndef gdevmem_INCLUDED
+#  define gdevmem_INCLUDED
+
+#include "gxbitops.h"
 
 /*
    The representation for a "memory" device is simply a
@@ -53,7 +57,7 @@
    Even though the scan lines are stored contiguously, we store a table
    of their base addresses, because indexing into it is faster than
    the multiplication that would otherwise be needed.
-*/
+ */
 
 /*
  * Macros for scan line access.
@@ -62,14 +66,17 @@
  * each procedure that uses the scanning macros should #define
  * (not typedef) chunk as either uint or byte.
  */
-#define declare_scan_ptr(ptr)	declare_scan_ptr_as(ptr, chunk *)
-#define declare_scan_ptr_as(ptr,ptype)\
-	register ptype ptr; uint draster
-#define setup_rect(ptr)   setup_rect_as(ptr, chunk *)
-#define setup_rect_as(ptr,ptype)\
+#define declare_scan_ptr(ptr)\
+	DECLARE_SCAN_PTR_VARS(ptr, chunk *, draster)
+#define DECLARE_SCAN_PTR_VARS(ptr, ptype, draster)\
+	register ptype ptr;\
+	uint draster
+#define setup_rect(ptr)\
+	SETUP_RECT_VARS(ptr, chunk *, draster)
+#define SETUP_RECT_VARS(ptr, ptype, draster)\
 	draster = mdev->raster;\
 	ptr = (ptype)(scan_line_base(mdev, y) +\
-		(x_to_byte(x) & -chunk_align_bytes))
+	  (x_to_byte(x) & -chunk_align_bytes))
 
 /* ------ Generic macros ------ */
 
@@ -86,12 +93,12 @@ dev_proc_close_device(mem_close);
 
 /* The following are used for all except planar or word-oriented devices. */
 dev_proc_open_device(mem_open);
-dev_proc_get_bits(mem_get_bits);
+dev_proc_get_bits_rectangle(mem_get_bits_rectangle);
 /* The following are for word-oriented devices. */
 #if arch_is_big_endian
-#  define mem_word_get_bits mem_get_bits
+#  define mem_word_get_bits_rectangle mem_get_bits_rectangle
 #else
-dev_proc_get_bits(mem_word_get_bits);
+dev_proc_get_bits_rectangle(mem_word_get_bits_rectangle);
 #endif
 /* The following are used for the non-true-color devices. */
 dev_proc_map_rgb_color(mem_mapped_map_rgb_color);
@@ -101,7 +108,7 @@ dev_proc_map_color_rgb(mem_mapped_map_color_rgb);
  * Macro for generating the device descriptor.
  * Various compilers have problems with the obvious definition
  * for max_value, namely:
- *	(depth >= 8 ? 255 : (1 << depth) - 1)
+ *      (depth >= 8 ? 255 : (1 << depth) - 1)
  * I tried changing (1 << depth) to (1 << (depth & 15)) to forestall bogus
  * error messages about invalid shift counts, but the H-P compiler chokes
  * on this.  Since the only values of depth we ever plan to support are
@@ -112,7 +119,7 @@ dev_proc_map_color_rgb(mem_mapped_map_color_rgb);
 #define max_value_rgb(rgb_depth, gray_depth)\
   (rgb_depth >= 8 ? 255 : rgb_depth == 4 ? 15 : rgb_depth == 2 ? 3 :\
    rgb_depth == 1 ? 1 : (1 << gray_depth) - 1)
-#define mem_full_alpha_device(name, rgb_depth, gray_depth, open, map_rgb_color, map_color_rgb, copy_mono, copy_color, fill_rectangle, get_bits, map_cmyk_color, copy_alpha, strip_tile_rectangle, strip_copy_rop)\
+#define mem_full_alpha_device(name, rgb_depth, gray_depth, open, map_rgb_color, map_color_rgb, copy_mono, copy_color, fill_rectangle, map_cmyk_color, copy_alpha, strip_tile_rectangle, strip_copy_rop, get_bits_rectangle)\
 {	std_device_dci_body(gx_device_memory, 0, name,\
 	  0, 0, 72, 72,\
 	  (rgb_depth ? 3 : 0) + (gray_depth ? 1 : 0),	/* num_components */\
@@ -134,7 +141,7 @@ dev_proc_map_color_rgb(mem_mapped_map_color_rgb);
 		copy_mono,		/* differs */\
 		copy_color,		/* differs */\
 		gx_default_draw_line,\
-		get_bits,		/* differs */\
+		gx_default_get_bits,\
 		gx_default_get_params,\
 		gx_default_put_params,\
 		map_cmyk_color,		/* differs */\
@@ -157,21 +164,29 @@ dev_proc_map_color_rgb(mem_mapped_map_color_rgb);
 		gx_default_image_data,\
 		gx_default_end_image,\
 		strip_tile_rectangle,	/* differs */\
-		strip_copy_rop		/* differs */\
+		strip_copy_rop,		/* differs */\
+		gx_default_get_clipping_box,\
+		gx_default_begin_typed_image,\
+		get_bits_rectangle,	/* differs */\
+		gx_default_map_color_rgb_alpha,\
+		gx_default_create_compositor,\
+		gx_default_get_hardware_params,\
+		gx_default_text_begin\
 	},\
 	0,			/* target */\
 	mem_device_init_private	/* see gxdevmem.h */\
 }
-#define mem_full_device(name, rgb_depth, gray_depth, open, map_rgb_color, map_color_rgb, copy_mono, copy_color, fill_rectangle, get_bits, map_cmyk_color, strip_tile_rectangle, strip_copy_rop)\
+#define mem_full_device(name, rgb_depth, gray_depth, open, map_rgb_color, map_color_rgb, copy_mono, copy_color, fill_rectangle, map_cmyk_color, strip_tile_rectangle, strip_copy_rop, get_bits_rectangle)\
   mem_full_alpha_device(name, rgb_depth, gray_depth, open, map_rgb_color,\
 			map_color_rgb, copy_mono, copy_color, fill_rectangle,\
-			get_bits, map_cmyk_color, gx_default_copy_alpha,\
-			strip_tile_rectangle, strip_copy_rop)
+			map_cmyk_color, gx_default_copy_alpha,\
+			strip_tile_rectangle, strip_copy_rop,\
+			get_bits_rectangle)
 #define mem_device(name, rgb_depth, gray_depth, map_rgb_color, map_color_rgb, copy_mono, copy_color, fill_rectangle, strip_copy_rop)\
   mem_full_device(name, rgb_depth, gray_depth, mem_open, map_rgb_color,\
 		  map_color_rgb, copy_mono, copy_color, fill_rectangle,\
-		  mem_get_bits, gx_default_map_cmyk_color,\
-		  gx_default_strip_tile_rectangle, strip_copy_rop)
+		  gx_default_map_cmyk_color, gx_default_strip_tile_rectangle,\
+		  strip_copy_rop, mem_get_bits_rectangle)
 
 /* Swap a rectangle of bytes, for converting between word- and */
 /* byte-oriented representation. */
@@ -184,19 +199,17 @@ void mem_swap_byte_rect(P6(byte *, uint, int, int, int, bool));
 		       base + x_to_byte(sourcex), sraster,\
 		       x_to_byte(w), h)
 
-/* Macro for casting gx_device argument */
-#define mdev ((gx_device_memory *)dev)
-
 /* ------ Implementations ------ */
 
-extern const gx_device_memory far_data mem_mono_device;
-extern const gx_device_memory far_data mem_mapped2_device;
-extern const gx_device_memory far_data mem_mapped4_device;
-extern const gx_device_memory far_data mem_mapped8_device;
-extern const gx_device_memory far_data mem_true16_device;
-extern const gx_device_memory far_data mem_true24_device;
-extern const gx_device_memory far_data mem_true32_device;
-extern const gx_device_memory far_data mem_planar_device;
+extern const gx_device_memory mem_mono_device;
+extern const gx_device_memory mem_mapped2_device;
+extern const gx_device_memory mem_mapped4_device;
+extern const gx_device_memory mem_mapped8_device;
+extern const gx_device_memory mem_true16_device;
+extern const gx_device_memory mem_true24_device;
+extern const gx_device_memory mem_true32_device;
+extern const gx_device_memory mem_planar_device;
+
 #if arch_is_big_endian
 #  define mem_mono_word_device mem_mono_device
 #  define mem_mapped2_word_device mem_mapped2_device
@@ -205,13 +218,16 @@ extern const gx_device_memory far_data mem_planar_device;
 #  define mem_true24_word_device mem_true24_device
 #  define mem_true32_word_device mem_true32_device
 #else
-extern const gx_device_memory far_data mem_mono_word_device;
-extern const gx_device_memory far_data mem_mapped2_word_device;
-extern const gx_device_memory far_data mem_mapped4_word_device;
-extern const gx_device_memory far_data mem_mapped8_word_device;
-extern const gx_device_memory far_data mem_true24_word_device;
-extern const gx_device_memory far_data mem_true32_word_device;
+extern const gx_device_memory mem_mono_word_device;
+extern const gx_device_memory mem_mapped2_word_device;
+extern const gx_device_memory mem_mapped4_word_device;
+extern const gx_device_memory mem_mapped8_word_device;
+extern const gx_device_memory mem_true24_word_device;
+extern const gx_device_memory mem_true32_word_device;
+
 #endif
 /* Provide standard palettes for 1-bit devices. */
 extern const gs_const_string mem_mono_b_w_palette;	/* black=1, white=0 */
 extern const gs_const_string mem_mono_w_b_palette;	/* black=0, white=1 */
+
+#endif /* gdevmem_INCLUDED */

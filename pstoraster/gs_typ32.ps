@@ -1,0 +1,134 @@
+%    Copyright (C) 1997 Aladdin Enterprises.  All rights reserved.
+% 
+% This file is part of GNU Ghostscript.
+% 
+% GNU Ghostscript is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+% to anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer
+% to the GNU General Public License for full details.
+% 
+% Everyone is granted permission to copy, modify and redistribute GNU
+% Ghostscript, but only under the conditions described in the GNU General
+% Public License.  A copy of this license is supposed to have been given
+% to you along with GNU Ghostscript so you can know your rights and
+% responsibilities.  It should be in a file named COPYING.  Among other
+% things, the copyright notice and this notice must be preserved on all
+% copies.
+% 
+% Aladdin Enterprises supports the work of the GNU Project, but is not
+% affiliated with the Free Software Foundation or the GNU Project.  GNU
+% Ghostscript, as distributed by Aladdin Enterprises, does not require any
+% GNU software to build or run it.
+
+% $Id: gs_typ32.ps,v 1.1 2000/03/08 23:14:32 mike Exp $
+% Initialization file for Type 32 fonts.
+
+% ------ Type 32 fonts ------ %
+
+% We need LanguageLevel 2 or higher in order to have defineresource.
+languagelevel dup 2 max .setlanguagelevel
+
+/BitmapFontInit mark
+
+/.makeglyph32 systemdict /.makeglyph32 get
+systemdict /.makeglyph32 .undef
+
+/addglyph {	% ([wx wy llx lly urx ury] |
+		%     [w0x w0y llx lly urx ury w1x w1y vx vy])
+		%   <bitmap> <cid> <type32font> addglyph -
+  1 index dup 2 index .removeglyphs
+  22 string .makeglyph32
+		% Stack: metrics bitmap cid font metstr
+  3 index () ne {
+		% Use G4 encoding to compress the bitmap.
+		% Define a string large enough to hold the metrics,
+		% an uncompressed bitmap (worst case = 5x expansion),
+		% and the 2 RTC codes (3 bytes).
+    dup length 4 index length 5 mul add 10 add string
+		% Stack: metrics bitmap cid font metstr buffer
+    dup 0 3 index putinterval
+    dup 2 index length 1 index length 1 index sub getinterval
+		% Stack: metrics bitmap cid font metstr buffer bitbuf
+    mark /Columns 8 index dup 4 get exch 2 get sub
+      /Rows 10 index dup 5 get exch 3 get sub
+      /K -1 /EndOfBlock true /BlackIs1 true
+    .dicttomark /CCITTFaxEncode filter
+		% Stack: metrics bitmap cid font metstr buffer filter
+    dup 6 index writestring closefile
+		% Find the end of the data by scanning backwards for the RTC.
+		% There are 2 RTCs x 12 bits = 3 bytes to remove.
+    {
+      dup dup length 1 sub get 0 ne { exit } if
+      0 1 index length 1 sub getinterval
+    } loop
+    0 1 index length 3 sub getinterval
+    exch pop	% metstr
+  } if
+  1 index /CharStrings get 3 index 3 -1 roll put
+  pop pop pop pop
+} obind
+
+/removeall {		% <type32font> removeall -
+  0 65535 2 index removeglyphs pop
+} obind
+
+/.removeglyphs systemdict /.removeglyphs get
+systemdict /.removeglyphs .undef
+
+/removeglyphs {		% <cid_min> <cid_max> <type32font> .removeglyphs -
+  3 copy .removeglyphs
+  dup /CharStrings get dup {
+		% Stack: cidmin cidmax font CharStrings cid bitmap
+    pop dup 5 index ge { dup 4 index le { 2 copy undef } if } if pop
+  } forall pop pop pop pop
+} obind
+
+.dicttomark /ProcSet defineresource pop
+
+/.cidfonttypes where { pop } { /.cidfonttypes 6 dict def } ifelse
+.cidfonttypes begin
+
+4	% CIDFontType 4 = FontType 32
+{ dup /FontType 32 put
+  dup /CharStrings 20 dict put
+  1 index exch .buildfont32 exch pop
+} bind def
+
+end		% .cidfonttypes
+
+% Define the BuildGlyph procedure.
+% Since Type 32 fonts are indexed by CID, there is no BuildChar procedure.
+% The name %Type32BuildGlyph is known to the interpreter.
+(%Type32BuildGlyph) cvn {	% <font> <cid> %Type32BuildGlyph -
+  1 index /CharStrings get
+		% Stack: font cid CharStrings
+  dup 2 index .knownget { exch pop } { 0 get } ifelse
+		% Stack: font cid cstr
+  dup .getmetrics32
+ dup 14 gt {
+    11 1 roll setcachedevice2
+  } {
+    7 1 roll setcachedevice
+  } ifelse
+		% Stack: font cid cstr w h nmetrics
+  4 -1 roll exch 1 index length 1 index sub getinterval
+		% Stack: font cid w h bitstr
+  dup () eq {
+    pop
+  } {
+    mark /Columns 4 index /Rows 5 index /K -1 /EndOfBlock false /BlackIs1 true
+    .dicttomark /CCITTFaxDecode filter 2 index 2 index true
+		% Stack: font cid w h filter w h true
+    [ 1 0 0 1 0 7 index ] 5 -1 roll imagemask
+  } ifelse
+  pop pop pop pop
+} bind def
+
+systemdict /.getmetrics32 .undef
+
+buildfontdict 32 /.buildfont32 cvx put
+
+32 dup /FontType defineresource pop
+
+.setlanguagelevel

@@ -1,25 +1,27 @@
-%    Copyright (C) 1989, 1996 Aladdin Enterprises.  All rights reserved.
+%    Copyright (C) 1989, 1996, 1997, 1998 Aladdin Enterprises.  All rights reserved.
 % 
 % This file is part of GNU Ghostscript.
 % 
 % GNU Ghostscript is distributed in the hope that it will be useful, but
-% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
-% anyone for the consequences of using it or for whether it serves any
-% particular purpose or works at all, unless he says so in writing.  Refer to
-% the GNU General Public License for full details.
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+% to anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer
+% to the GNU General Public License for full details.
 % 
 % Everyone is granted permission to copy, modify and redistribute GNU
 % Ghostscript, but only under the conditions described in the GNU General
-% Public License.  A copy of this license is supposed to have been given to
-% you along with GNU Ghostscript so you can know your rights and
+% Public License.  A copy of this license is supposed to have been given
+% to you along with GNU Ghostscript so you can know your rights and
 % responsibilities.  It should be in a file named COPYING.  Among other
 % things, the copyright notice and this notice must be preserved on all
 % copies.
 % 
-% Aladdin Enterprises is not affiliated with the Free Software Foundation or
-% the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
-% does not depend on any other GNU software.
+% Aladdin Enterprises supports the work of the GNU Project, but is not
+% affiliated with the Free Software Foundation or the GNU Project.  GNU
+% Ghostscript, as distributed by Aladdin Enterprises, does not require any
+% GNU software to build or run it.
 
+% $Id: gs_statd.ps,v 1.2 2000/03/08 23:14:31 mike Exp $
 % This file provides statusdict, serverdict, and assorted LaserWriter
 % operators, mostly for the benefit of poorly designed PostScript programs
 % that 'know' they are running on a LaserWriter.
@@ -28,10 +30,10 @@ systemdict begin
 	% We make statusdict a little larger for Level 2 stuff.
 	% Note that it must be allocated in local VM.
  .currentglobal false .setglobal
- /statusdict 89 dict def
+ /statusdict 89 dict .forcedef		% statusdict is local, sys'dict global
 	% To support the Level 2 job control features,
 	% serverdict must also be in local VM.
- /serverdict 10 dict def		% ditto
+ /serverdict 10 dict .forcedef		% serverdict is local, sys'dict global
  .setglobal
 end
 
@@ -40,47 +42,66 @@ end
 % These procedures are also accessed as data structures during initialization,
 % so the page dimensions must be the first two elements of the procedure.
 
-/.setpagesize { //systemdict /statusdict get begin .setpagesize end } bind def
+/.setpagesize { /statusdict .systemvar begin .setpagesize end } bind def
 userdict begin
- /letter {612 792 //.setpagesize exec} bind def
-% 'note' is an anomaly.  It is apparently supposed to use a 540x720 region
-% centered on a 612x792 page, with (0,0) at the lower left corner of the
-% 612x792 page, but we have no way to represent this.  In order to avoid
-% clipping the image, we define note as equivalent to letter.
-%/note {540 720 //.setpagesize exec} bind def
- /note /letter load def
+		% Page sizes defined by Adobe documentation
+ /11x17 {792 1224 //.setpagesize exec} bind def  % 11x17 portrait
+ /a3 {842 1190 //.setpagesize exec} bind def
+ /a4 {595 842 //.setpagesize exec} bind def
+% a4small should be a4 with an ImagingBBox of [25 25 570 817].
+ /a4small /a4 load def
+ /b5 {501 709 //.setpagesize exec} bind def
+ /ledger {1224 792 //.setpagesize exec} bind def  % 11x17 landscape
  /legal {612 1008 //.setpagesize exec} bind def
- /a0 {2380 3368 //.setpagesize exec} bind def  % ISO standard
- /a1 {1684 2380 //.setpagesize exec} bind def  % ISO standard
- /a2 {1190 1684 //.setpagesize exec} bind def  % ISO standard
- /a3 {842 1190 //.setpagesize exec} bind def  % ISO standard
- /a4 {595 842 //.setpagesize exec} bind def  % ISO standard
- /a5 {421 595 //.setpagesize exec} bind def  % ISO standard
- /a6 {297 421 //.setpagesize exec} bind def  % ISO standard
- /a7 {210 297 //.setpagesize exec} bind def  % ISO standard
- /a8 {148 210 //.setpagesize exec} bind def  % ISO standard
- /a9 {105 148 //.setpagesize exec} bind def  % ISO standard
- /a10 {74 105 //.setpagesize exec} bind def  % ISO standard
- /b0 {2836 4008 //.setpagesize exec} bind def  % ISO standard
- /b1 {2004 2836 //.setpagesize exec} bind def  % ISO standard
- /b2 {1418 2004 //.setpagesize exec} bind def  % ISO standard
- /b3 {1002 1418 //.setpagesize exec} bind def  % ISO standard
- /b4 {709 1002 //.setpagesize exec} bind def  % ISO standard
- /b5 {501 709 //.setpagesize exec} bind def  % ISO standard
- /archE {2592 3456 //.setpagesize exec} bind def % U.S. CAD std
- /archD {1728 2592 //.setpagesize exec} bind def % U.S. CAD std
- /archC {1296 1728 //.setpagesize exec} bind def % U.S. CAD std
- /archB {864 1296 //.setpagesize exec} bind def  % U.S. CAD std
- /archA {648 864 //.setpagesize exec} bind def  % U.S. CAD std
+ /letter {612 792 //.setpagesize exec} bind def
+% lettersmall should be letter with an ImagingBBox of [25 25 587 767].
+ /lettersmall /letter load def
+% note should be letter (or some other size) with the ImagingBBox
+% shrunk by 25 units on all 4 sides.
+ /note /letter load def
+		% End of Adobe-defined page sizes
+STRICT { (%END) .skipeof } if
+		% Other page sizes
+	% ISO standard paper sizes
+ /a0 {2380 3368 //.setpagesize exec} bind def
+ /a1 {1684 2380 //.setpagesize exec} bind def
+ /a2 {1190 1684 //.setpagesize exec} bind def
+% /a3 {842 1190 //.setpagesize exec} bind def	% defined by Adobe
+% /a4 {595 842 //.setpagesize exec} bind def	% defined by Adobe
+ /a5 {421 595 //.setpagesize exec} bind def
+ /a6 {297 421 //.setpagesize exec} bind def
+ /a7 {210 297 //.setpagesize exec} bind def
+ /a8 {148 210 //.setpagesize exec} bind def
+ /a9 {105 148 //.setpagesize exec} bind def
+ /a10 {74 105 //.setpagesize exec} bind def
+ /b0 {2836 4008 //.setpagesize exec} bind def
+ /b1 {2004 2836 //.setpagesize exec} bind def
+ /b2 {1418 2004 //.setpagesize exec} bind def
+ /b3 {1002 1418 //.setpagesize exec} bind def
+ /b4 {709 1002 //.setpagesize exec} bind def
+% /b5 {501 709 //.setpagesize exec} bind def	% defined by Adobe
+ /c0 {2600 3677 //.setpagesize exec} bind def
+ /c1 {1837 2600 //.setpagesize exec} bind def
+ /c2 {1298 1837 //.setpagesize exec} bind def
+ /c3 {918 1298 //.setpagesize exec} bind def
+ /c4 {649 918 //.setpagesize exec} bind def
+ /c5 {459 649 //.setpagesize exec} bind def
+ /c6 {323 459 //.setpagesize exec} bind def
+	% U.S. CAD standard paper sizes
+ /archE {2592 3456 //.setpagesize exec} bind def
+ /archD {1728 2592 //.setpagesize exec} bind def
+ /archC {1296 1728 //.setpagesize exec} bind def
+ /archB {864 1296 //.setpagesize exec} bind def
+ /archA {648 864 //.setpagesize exec} bind def
+	% Other paper sizes
  /flsa {612 936 //.setpagesize exec} bind def  % U.S. foolscap
  /flse {612 936 //.setpagesize exec} bind def  % European foolscap
  /halfletter {396 612 //.setpagesize exec} bind def
- /11x17 {792 1224 //.setpagesize exec} bind def  % 11x17 portrait
 % /tabloid {792 1224 //.setpagesize exec} bind def  % 11x17 portrait
- /ledger {1224 792 //.setpagesize exec} bind def  % 11x17 landscape
 % /csheet {1224 1584 //.setpagesize exec} bind def % ANSI C 17x22
 % /dsheet {1584 2448 //.setpagesize exec} bind def % ANSI D 22x34
 % /esheet {2448 3168 //.setpagesize exec} bind def % ANSI E 34x44
+%END SIZES
 end
 currentdict /.setpagesize .undef
 

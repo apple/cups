@@ -1,25 +1,27 @@
-%    Copyright (C) 1994, 1996 Aladdin Enterprises.  All rights reserved.
+%    Copyright (C) 1994, 1996, 1997, 1998 Aladdin Enterprises.  All rights reserved.
 % 
 % This file is part of GNU Ghostscript.
 % 
 % GNU Ghostscript is distributed in the hope that it will be useful, but
-% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
-% anyone for the consequences of using it or for whether it serves any
-% particular purpose or works at all, unless he says so in writing.  Refer to
-% the GNU General Public License for full details.
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+% to anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer
+% to the GNU General Public License for full details.
 % 
 % Everyone is granted permission to copy, modify and redistribute GNU
 % Ghostscript, but only under the conditions described in the GNU General
-% Public License.  A copy of this license is supposed to have been given to
-% you along with GNU Ghostscript so you can know your rights and
+% Public License.  A copy of this license is supposed to have been given
+% to you along with GNU Ghostscript so you can know your rights and
 % responsibilities.  It should be in a file named COPYING.  Among other
 % things, the copyright notice and this notice must be preserved on all
 % copies.
 % 
-% Aladdin Enterprises is not affiliated with the Free Software Foundation or
-% the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
-% does not depend on any other GNU software.
+% Aladdin Enterprises supports the work of the GNU Project, but is not
+% affiliated with the Free Software Foundation or the GNU Project.  GNU
+% Ghostscript, as distributed by Aladdin Enterprises, does not require any
+% GNU software to build or run it.
 
+% $Id: gs_setpd.ps,v 1.3 2000/03/08 23:14:31 mike Exp $
 % The current implementation of setpagedevice has the following limitations:
 %	- It doesn't attempt to "interact with the user" for Policy = 2.
 
@@ -31,23 +33,38 @@ level2dict begin
 % Redefine .beginpage and .endpage so that they call BeginPage and
 % EndPage respectively if appropriate.
 
-/.beginpage
- { .currentshowpagecount
-    { .currentpagedevice pop /BeginPage .knownget { exec } { pop } ifelse }
-   if
- } bind odef
+% We have to guard against the BeginPage procedure not popping its operand.
+% This is really stupid, but the Genoa CET does it.
+/.beginpage {		% - .beginpage -
+  .currentshowpagecount {
+    .currentpagedevice pop
+    dup null ne { /BeginPage .knownget } { pop false } ifelse {
+		% Stack: ... pagecount proc
+       count 2 .execn
+		% Stack: ... ..???.. oldcount
+       count 1 add exch sub { pop } repeat
+    } {
+      pop
+    } ifelse
+  } if
+} bind odef
 
-/.endpage
- { .currentshowpagecount
-    { exch .currentpagedevice pop /EndPage .knownget
-       { exec }
-       { exch pop 2 ne }
-      ifelse
-    }
-    { 2 ne
-    }
-   ifelse
- } bind odef
+% Guard similarly against EndPage not popping its operand.
+/.endpage {		% <reason> .endpage <print_bool>
+  .currentshowpagecount {
+    1 index .currentpagedevice pop
+    dup null ne { /EndPage .knownget } { pop false } ifelse {
+		% Stack: ... reason pagecount reason proc
+      count 2 .execn
+		% Stack: ... ..???.. print oldcount
+      count 2 add exch sub { exch pop } repeat
+    } {
+      pop pop 2 ne
+    } ifelse
+  } {
+    2 ne
+  } ifelse
+} bind odef
 
 % Define interpreter callouts for handling gstate-saving operators,
 % to make sure that they create a page device dictionary for use by
@@ -95,7 +112,9 @@ level2dict begin
       /.installpagedevice cvx /rangecheck signalerror
     }
    ifelse pop pop
-   erasepage initgraphics .beginpage
+	% A careful reading of the Red Book reveals that an erasepage
+	% should occur, but *not* an initgraphics.
+   erasepage .beginpage
  } bind def
 
 /.uninstallpagedevice
@@ -132,6 +151,16 @@ level2dict begin
    ifelse
  } bind odef
 
+% Redefine .currentpagedevice and .setpagedevice so they convert between
+% null and a fixed empty directionary.
+/.nullpagedevice 0 dict readonly def
+/.currentpagedevice {
+  //.currentpagedevice exch dup null eq { pop //.nullpagedevice } if exch
+} bind odef
+/.setpagedevice {
+  dup //.nullpagedevice eq { pop null } if //.setpagedevice
+} bind odef
+
 % ---------------- Auxiliary definitions ---------------- %
 
 % Define the required attributes of all page devices, and their default values.
@@ -148,7 +177,9 @@ level2dict begin
 % dummy media type that handles pages of any size.
 % Devices that care will override this.
   /InputAttributes mark 0
-    mark /PageSize [0 dup 16#7ffff dup] .dicttomark readonly
+	% Since sizes match within 5 user units, we need to set the smallest
+	% PageSize to 6 units so that [0 0] will fail.
+    mark /PageSize [6 dup 16#7ffff dup] .dicttomark readonly
   .dicttomark readonly
   (%MediaSource) 0
   /OutputAttributes mark 0
@@ -251,27 +282,18 @@ level2dict begin
 
 % Define the keys used in input attribute matching.
 /.inputattrkeys [
-%%%% MRS - The current CUPS backend driver does not register any of
-%%%%       these attributes with GhostScript from the PPD file.  As
-%%%%       a result, we must comment out everything but PageSize
-%%%%       which is processed differently from all other attributes.
-%  /PageSize /MediaColor /MediaWeight /MediaType /InsertSheet
-  /PageSize
+  /PageSize /MediaColor /MediaWeight /MediaType /InsertSheet
+	% The following are documented in Adobe's supplement for v2017.
+  /LeadingEdge /MediaClass
 ] readonly def
 % Define other keys used in media selection.
 /.inputselectionkeys [
-%%%% MRS - The current CUPS backend driver does not register any of
-%%%%       these attributes with GhostScript from the PPD file.  As
-%%%%       a result, we must comment out everything.
-%  /MediaPosition /Orientation
+  /MediaPosition /Orientation
 ] readonly def
 
 % Define the keys used in output attribute matching.
 /.outputattrkeys [
-%%%% MRS - The current CUPS backend driver does not register any of
-%%%%       these attributes with GhostScript from the PPD file.  As
-%%%%       a result, we must comment out everything.
-%  /OutputType
+  /OutputType
 ] readonly def
 
 % Define all the parameters that should always be copied to the merged
@@ -369,6 +391,33 @@ level2dict begin
 % in the <failed> dictionary with the policy value,
 % and we replace the key in the <merged> dictionary with its prior value
 % (or remove it if it had no prior value).
+/.policyprocs mark
+% These procedures are called with the following on the stack:
+%   <orig> <merged> <failed> <Policies> <key> <policy>
+% They are expected to consume the top 2 operands.
+% NOTE: we currently treat all values other than 0, 1, or 7 (for PageSize)
+% the same as 0, i.e., we signal an error.
+  0 {		% Set errorinfo and signal a configurationerror.
+	pop dup 4 index exch get 2 array astore
+	$error /errorinfo 3 -1 roll put
+	cleartomark
+	/setpagedevice load /configurationerror signalerror
+  } bind
+  1 {		% Roll back the failed request to its previous status.
+DEBUG { (Rolling back.\n) print pstack flush } if
+	3 index 2 index 3 -1 roll put
+	4 index 1 index .knownget
+	 { 4 index 3 1 roll put }
+	 { 3 index exch .undef }
+	ifelse
+  } bind
+  7 {		% For PageSize only, just impose the request.
+	1 index /PageSize eq
+	 { pop pop 1 index /PageSize 7 put }
+	 { .policyprocs 0 get exec }
+	ifelse
+  } bind
+.dicttomark readonly def
 /.applypolicies		% <orig> <merged> <failed> .applypolicies
 			%   <orig> <merged'> <failed'>
  { 1 index /Policies get 1 index
@@ -378,24 +427,7 @@ level2dict begin
        { 2 copy .knownget not { 1 index /PolicyNotFound get } if
 			% Stack: <orig> <merged> <failed> <Policies> <key>
 			%   <policy>
-	 dup 1 ne
-	  {	% Set errorinfo and signal a configurationerror.
-		% Note that we currently treat all Policy values other than 1
-		% the same as 0.
-	    pop dup 4 index exch get 2 array astore
-	    $error /errorinfo 3 -1 roll put
-	    cleartomark
-	    /setpagedevice load /configurationerror signalerror
-	  }
-	  {	% Roll back the failed request to its previous status.
-DEBUG { (Rolling back.\n) print pstack flush } if
-	    3 index 2 index 3 -1 roll put
-	    4 index 1 index .knownget
-	     { 4 index 3 1 roll put }
-	     { 3 index exch .undef }
-	    ifelse
-	  }
-	 ifelse
+	 .policyprocs 1 index .knownget not { .policyprocs 0 get } if exec
        }
       ifelse
     }
@@ -459,14 +491,21 @@ DEBUG { (Result of putting.\n) print pstack flush } if
       { exch pop } { /PolicyNotFound get } ifelse	% PageSize policy,
 							% affects scaling
    3 index /Orientation .knownget not { null } if
-   matrix .matchpagesize pop		% (can't fail)
+   4 index /RollFedMedia .knownget not { false } if
+   matrix .matchpagesize not {
+		% This is a "can't happen" condition!
+     /setpagedevice load /rangecheck signalerror
+   } if
    2 array astore
  } bind def
 
 % ---------------- setpagedevice itself ---------------- %
 
 /setpagedevice
- { mark exch currentpagedevice
+ {		% We mustn't pop the argument until the very end,
+		% so that the pseudo-operator machinery can restore the stack
+		% if an error occurs.
+   mark 1 index currentpagedevice
 
 		% Check whether we are changing OutputDevice;
 		% also handle the case where the current device
@@ -532,6 +571,12 @@ DEBUG { (Merging.\n) print pstack flush } if
 		% Hack: if FIXEDRESOLUTION is true, discard any attempt to
 		% change HWResolution.
    FIXEDRESOLUTION { dup /HWResolution .undef } if
+		% Hack: if FIXEDMEDIA is true, discard any attempt to change
+		% PageSize or HWSize.
+   FIXEDMEDIA
+    { dup /PageSize 4 index /PageSize get put
+      dup /HWSize 4 index /HWSize get put
+    } if
 
 		% Select input and output media.
 		% Stack: mark <orig> <request> <merged>
@@ -600,10 +645,22 @@ DEBUG { (Installing.\n) print pstack flush } if
    .setdevice pop
    .setpagedevice
 
-		% Merge the request into the current page device.
+		% Merge the request into the current page device,
+		% unless we're changing the OutputDevice.
 		% Stack: mark ... <merged> <failed>
    exch currentpagedevice dup length 2 index length add dict
-   .copydict .copydict
+		% Stack: mark ... <failed> <merged> <current> <newdict>
+   2 index /OutputDevice .knownget {
+     2 index /OutputDevice .knownget not { null } if eq
+   } {
+     true
+   } ifelse {
+		% Same OutputDevice, merge the dictionaries.
+     .copydict
+   } {
+		% Different OutputDevice, discard the old dictionary.
+     exch pop
+   } ifelse .copydict
 		% Initialize the default matrix, taking media matching
 		% into account.
    .computemediasize pop initmatrix concat
@@ -636,7 +693,7 @@ DEBUG { (Finishing.\n) print pstack flush } if
     }
     { cleartomark
     }
-   ifelse
+   ifelse pop
 
  } odef
 
