@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.15 2002/06/27 14:24:56 mike Exp $"
+ * "$Id: http.c,v 1.82.2.16 2002/07/18 16:32:31 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -700,10 +700,11 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 	     int        *port,		/* O - Port number to use */
              char       *resource)	/* O - Resource/filename [1024] */
 {
-  char		*ptr;				/* Pointer into string... */
-  const char	*atsign,			/* @ sign */
-		*slash;				/* Separator */
-  char		safeuri[HTTP_MAX_URI];		/* "Safe" local copy of URI */
+  char		*ptr;			/* Pointer into string... */
+  const char	*atsign,		/* @ sign */
+		*slash;			/* Separator */
+  char		safeuri[HTTP_MAX_URI];	/* "Safe" local copy of URI */
+  char		quoted;			/* Quoted character */
 
 
  /*
@@ -818,7 +819,30 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 
     for (ptr = username; uri < atsign; uri ++)
       if (ptr < (username + HTTP_MAX_URI - 1))
-	*ptr++ = *uri;
+      {
+        if (*uri == '%' && isxdigit(uri[1]) && isxdigit(uri[2]))
+	{
+	 /*
+	  * Grab a hex-encoded username and password...
+	  */
+
+          uri ++;
+	  if (isalpha(*uri))
+	    quoted = (tolower(*uri) - 'a' + 10) << 4;
+	  else
+	    quoted = (*uri - '0') << 4;
+
+          uri ++;
+	  if (isalpha(*uri))
+	    quoted |= tolower(*uri) - 'a' + 10;
+	  else
+	    quoted |= *uri - '0';
+
+          *ptr++ = quoted;
+	}
+	else
+	  *ptr++ = *uri;
+      }
 
     *ptr = '\0';
 
@@ -2262,5 +2286,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.15 2002/06/27 14:24:56 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.16 2002/07/18 16:32:31 mike Exp $".
  */

@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- Added several "hint" messages for common configuration
+	  problems that are stored in the error_log file.
+	- httpSeparate() now unquotes %xx characters in the
+	  username:password field of a URI.
 	- When starting the scheduler in daemon mode, the parent
 	  process now waits for the child to signal it is ready
 	  to accept connections.
