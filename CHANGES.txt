@@ -29,6 +29,9 @@ CHANGES IN CUPS V1.1.5
 	  /dev/usb/usblp# filenames.
 	- The PRINTER and LPDEST environment variables did not
 	  override the lpoptions default printer.
+	- The PPD read functions incorrectly included trailing
+	  characters (usually whitespace) after quoted string
+	  attributes.
 
 
 CHANGES IN CUPS v1.1.4
