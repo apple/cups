@@ -1,5 +1,5 @@
 /*
- * "$Id: lppasswd.c,v 1.14 2002/12/17 19:00:21 swdev Exp $"
+ * "$Id: lppasswd.c,v 1.15 2004/02/25 16:58:17 mike Exp $"
  *
  *   MD5 password program for the Common UNIX Printing System (CUPS).
  *
@@ -232,9 +232,9 @@ main(int  argc,			/* I - Number of command-line arguments */
     flag = 0;
 
     for (passwd = newpass; *passwd; passwd ++)
-      if (isdigit(*passwd))
+      if (isdigit(*passwd & 255))
 	flag |= 1;
-      else if (isalpha(*passwd))
+      else if (isalpha(*passwd & 255))
 	flag |= 2;
 
    /*
@@ -401,5 +401,5 @@ usage(FILE *fp)		/* I - File to send usage to */
 
 
 /*
- * End of "$Id: lppasswd.c,v 1.14 2002/12/17 19:00:21 swdev Exp $".
+ * End of "$Id: lppasswd.c,v 1.15 2004/02/25 16:58:17 mike Exp $".
  */
