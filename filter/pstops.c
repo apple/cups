@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.31 2003/01/15 21:32:20 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.32 2003/01/23 15:37:10 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -614,16 +614,47 @@ main(int  argc,			/* I - Number of command-line arguments */
 	if (!check_range(real_page))
 	{
 	  while (psgets(line, sizeof(line), fp) != NULL)
+	  {
+	    if (strncmp(line, "%%", 2) == 0)
+              fprintf(stderr, "DEBUG: %d %s", level, line);
+
 	    if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
         	strncmp(line, "%%BeginDocument ", 16) == 0)	/* Adobe Acrobat BUG */
               level ++;
-	    else if (strcmp(line, "%%EndDocument") == 0 && level > 0)
+	    else if (strncmp(line, "%%EndDocument", 13) == 0 && level > 0)
               level --;
 	    else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
 	    {
 	      real_page ++;
 	      break;
 	    }
+	    else if (strncmp(line, "%%BeginBinary:", 14) == 0 ||
+        	     (strncmp(line, "%%BeginData:", 12) == 0 &&
+	              strstr(line, "ASCII") == NULL && strstr(line, "Hex") == NULL))
+	    {
+	     /*
+              * Skip binary data...
+	      */
+
+              tbytes = atoi(strchr(line, ':') + 1);
+
+	      while (tbytes > 0)
+	      {
+		if (tbytes > sizeof(line))
+		  nbytes = fread(line, 1, sizeof(line), fp);
+		else
+		  nbytes = fread(line, 1, tbytes, fp);
+
+        	if (nbytes < 1)
+		{
+		  perror("ERROR: Early end-of-file while reading binary data");
+		  return (1);
+		}
+
+		tbytes -= nbytes;
+	      }
+	    }
+          }
 
           continue;
         }
@@ -1638,5 +1669,5 @@ start_nup(int number,		/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.31 2003/01/15 21:32:20 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.32 2003/01/23 15:37:10 mike Exp $".
  */
