@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in,v 1.13.2.1 2001/12/26 16:52:05 mike Exp $"
+# "$Id: cups.list.in,v 1.13.2.2 2001/12/29 21:44:30 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -29,14 +29,18 @@
 %vendor Easy Software Products
 %license LICENSE.txt
 %readme README.txt
-%version 1.1.13
-%provides cups
+%version 1.3.0a1
+%description The Common UNIX Printing System provides a portable printing
+%description layer for UNIX® operating systems.  It has been developed by
+%description Easy Software Products to promote a standard printing solution
+%description for all UNIX vendors and users.  CUPS provides the System V and
+%description Berkeley command-line interfaces. 
 %provides cupsys
 %provides cups-devel
 %provides cupsys-devel
 %provides cups-pstoraster
 %provides libcups1
-%provides libcups.so.2
+%provides libcups.so.3
 
 #
 # GNU variables...
@@ -123,7 +127,6 @@ d 0555 root sys $SERVERBIN/daemon -
 f 0555 root sys $SERVERBIN/daemon/cups-lpd scheduler/cups-lpd
 f 0555 root sys $SERVERBIN/daemon/cups-polld scheduler/cups-polld
 d 0555 root sys $SERVERBIN/filter -
-f 0555 root sys $SERVERBIN/filter/pstoraster pstoraster/pstoraster
 f 0555 root sys $SERVERBIN/filter/pdftops pdftops/pdftops
 f 0555 root sys $SERVERBIN/filter/imagetops filter/imagetops
 f 0555 root sys $SERVERBIN/filter/pstops filter/pstops
@@ -169,18 +172,18 @@ l 0555 root sys /usr/bsd/lprm $BINDIR/lprm
 
 # DSOs
 %system hpux
-f 0555 root sys $LIBDIR/libcups.sl.2 cups/libcups.sl.2
-l 0555 root sys $LIBDIR/libcups.sl libcups.sl.2
-f 0555 root sys $LIBDIR/libcupsimage.sl.2 filter/libcupsimage.sl.2
-l 0555 root sys $LIBDIR/libcupsimage.sl libcupsimage.sl.2
+f 0555 root sys $LIBDIR/libcups.sl.3 cups/libcups.sl.3
+l 0555 root sys $LIBDIR/libcups.sl libcups.sl.3
+f 0555 root sys $LIBDIR/libcupsimage.sl.3 filter/libcupsimage.sl.3
+l 0555 root sys $LIBDIR/libcupsimage.sl libcupsimage.sl.3
 %system aix
 f 0555 root sys $LIBDIR/libcups_s.a cups/libcups_s.a
 f 0555 root sys $LIBDIR/libcupsimage_s.a filter/libcupsimage_s.a
 %system !hpux !aix
-f 0555 root sys $LIBDIR/libcups.so.2 cups/libcups.so.2
-l 0555 root sys $LIBDIR/libcups.so libcups.so.2
-f 0555 root sys $LIBDIR/libcupsimage.so.2 filter/libcupsimage.so.2
-l 0555 root sys $LIBDIR/libcupsimage.so libcupsimage.so.2
+f 0555 root sys $LIBDIR/libcups.so.3 cups/libcups.so.3
+l 0555 root sys $LIBDIR/libcups.so libcups.so.3
+f 0555 root sys $LIBDIR/libcupsimage.so.3 filter/libcupsimage.so.3
+l 0555 root sys $LIBDIR/libcupsimage.so libcupsimage.so.3
 %system all
 
 # Directories
@@ -235,13 +238,6 @@ f 0444 root sys $DATADIR/data/HPGLprolog data/HPGLprolog
 f 0444 root sys $DATADIR/data/psglyphs data/psglyphs
 f 0444 root sys $DATADIR/data/testprint.ps data/testprint.ps
 
-d 0555 root sys $DATADIR/fonts -
-f 0444 root sys $DATADIR/fonts fonts/*
-
-d 0555 root sys $DATADIR/pstoraster -
-f 0444 root sys $DATADIR/pstoraster/Fontmap pstoraster/Fontmap
-f 0444 root sys $DATADIR/pstoraster pstoraster/gs*.ps
-
 d 0555 root sys $DATADIR/model -
 f 0444 root sys $DATADIR/model ppd/*.ppd
 
@@ -279,6 +275,7 @@ f 0444 root sys $INCLUDEDIR/cups/ppd.h cups/ppd.h
 f 0444 root sys $INCLUDEDIR/cups/raster.h filter/raster.h
 
 f 0444 root sys $LIBDIR/libcups.a cups/libcups.a
+f 0444 root sys $LIBDIR/libcupsimage.a filter/libcupsimage.a
 
 # Documentation files
 d 0555 root sys $DOCDIR -
@@ -369,5 +366,5 @@ f 0444 root sys $AMANDIR/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list.in,v 1.13.2.1 2001/12/26 16:52:05 mike Exp $".
+# End of "$Id: cups.list.in,v 1.13.2.2 2001/12/29 21:44:30 mike Exp $".
 #

@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.30.2.2 2001/12/26 16:52:05 mike Exp $"
+# "$Id: cups.spec,v 1.30.2.3 2001/12/29 21:44:30 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -26,7 +26,7 @@
 
 Summary: Common Unix Printing System
 Name: cups
-Version: 1.2
+Version: 1.2.0a1
 Release: 0
 Copyright: GPL
 Group: System Environment/Daemons
@@ -38,37 +38,21 @@ Vendor: Easy Software Products
 # Use buildroot so as not to disturb the version already installed
 BuildRoot: /var/tmp/%{name}-root
 
-# Dependencies...
-Conflicts: lpr, LPRng
-Provides: libcups.so.2
-Provides: libcupsimage.so.2
-Provides: cups
-
 %package devel
 Summary: Common Unix Printing System - development environment
 Group: Development/Libraries
 Provides: libcups1
 
-%package pstoraster
-Summary: Common Unix Printing System - PostScript RIP
-Group: System Environment/Daemons
-Provides: pstoraster
-
 %description
-The Common UNIX Printing System provides a portable printing layer for 
-UNIX® operating systems. It has been developed by Easy Software Products 
-to promote a standard printing solution for all UNIX vendors and users. 
-CUPS provides the System V and Berkeley command-line interfaces. 
+The Common UNIX Printing System provides a portable printing layer for
+UNIX® operating systems.  It has been developed by Easy Software Products
+to promote a standard printing solution for all UNIX vendors and users.
+CUPS provides the System V and Berkeley command-line interfaces.
 
 %description devel
 The Common UNIX Printing System provides a portable printing layer for 
-UNIX® operating systems. This is the development package for creating
+UNIX® operating systems.  This is the development package for creating
 additional printer drivers and other CUPS services.
-
-%description devel
-The Common UNIX Printing System provides a portable printing layer for 
-UNIX® operating systems. This is the PostScript RIP package for
-supporting non-PostScript printer drivers.
 
 %prep
 %setup
@@ -164,14 +148,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/lib/cups/cgi-bin
 /usr/lib/cups/cgi-bin/*
 %dir /usr/lib/cups/filter
-/usr/lib/cups/filter/hpgltops
-/usr/lib/cups/filter/imagetops
-/usr/lib/cups/filter/imagetoraster
-/usr/lib/cups/filter/pdftops
-/usr/lib/cups/filter/pstops
-/usr/lib/cups/filter/rastertoepson
-/usr/lib/cups/filter/rastertohp
-/usr/lib/cups/filter/texttops
+/usr/lib/cups/filter/*
 /usr/sbin/*
 %dir /usr/share/cups
 %dir /usr/share/cups/banners
@@ -213,14 +190,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/man3
 /usr/share/man/man1/*
 
-%files pstoraster
-%dir /usr/lib/cups/filter
-/usr/lib/cups/filter/pstoraster
-%dir /usr/share/cups/fonts
-/usr/share/cups/fonts/*
-%dir /usr/share/cups/pstoraster
-/usr/share/cups/pstoraster/*
-
 #
-# End of "$Id: cups.spec,v 1.30.2.2 2001/12/26 16:52:05 mike Exp $".
+# End of "$Id: cups.spec,v 1.30.2.3 2001/12/29 21:44:30 mike Exp $".
 #
