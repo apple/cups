@@ -1,5 +1,5 @@
 /*
- * "$Id: image-gif.c,v 1.8.2.8 2003/01/07 18:26:54 mike Exp $"
+ * "$Id: image-gif.c,v 1.8.2.9 2003/01/24 20:45:16 mike Exp $"
  *
  *   GIF image routines for the Common UNIX Printing System (CUPS).
  *
@@ -48,6 +48,7 @@
 #define GIF_COLORMAP	0x80
 
 typedef ib_t	gif_cmap_t[256][4];
+typedef short	gif_table_t[4096];
 
 
 /*
@@ -353,7 +354,7 @@ gif_get_code(FILE *fp,		/* I - File to read from */
 			lastbit,	/* Last bit in buffer */
 			done,		/* Done with this buffer? */
 			last_byte;	/* Last byte in buffer */
-  static unsigned char	bits[8] =	/* Bit masks for codes */
+  static const unsigned char bits[8] =	/* Bit masks for codes */
 			{
 			  0x01, 0x02, 0x04, 0x08,
 			  0x10, 0x20, 0x40, 0x80
@@ -443,21 +444,21 @@ gif_read_lzw(FILE *fp,			/* I - File to read from */
 	     int  first_time,		/* I - 1 = first time, 0 = not first time */
  	     int  input_code_size)	/* I - Code size in bits */
 {
-  int		i,			/* Looping var */
-		code,			/* Current code */
-		incode;			/* Input code */
-  static short	fresh = 0,		/* 1 = empty buffers */
-		code_size,		/* Current code size */
-		set_code_size,		/* Initial code size set */
-		max_code,		/* Maximum code used */
-		max_code_size,		/* Maximum code size */
-		firstcode,		/* First code read */
-		oldcode,		/* Last code read */
-		clear_code,		/* Clear code for LZW input */
-		end_code,		/* End code for LZW input */
-		table[2][4096],		/* String table */
-		stack[8192],		/* Output stack */
-		*sp;			/* Current stack pointer */
+  int			i,		/* Looping var */
+			code,		/* Current code */
+			incode;		/* Input code */
+  static short		fresh = 0,	/* 1 = empty buffers */
+			code_size,	/* Current code size */
+			set_code_size,	/* Initial code size set */
+			max_code,	/* Maximum code used */
+			max_code_size,	/* Maximum code size */
+			firstcode,	/* First code read */
+			oldcode,	/* Last code read */
+			clear_code,	/* Clear code for LZW input */
+			end_code,	/* End code for LZW input */
+			*stack = NULL,	/* Output stack */
+			*sp;		/* Current stack pointer */
+  static gif_table_t	*table = NULL;	/* String table */
 
 
   if (first_time)
@@ -472,6 +473,22 @@ gif_read_lzw(FILE *fp,			/* I - File to read from */
     end_code      = clear_code + 1;
     max_code_size = 2 * clear_code;
     max_code      = clear_code + 2;
+
+   /*
+    * Allocate memory for buffers...
+    */
+
+    if (table == NULL)
+      table = calloc(2, sizeof(gif_table_t));
+
+    if (table == NULL)
+      return (-1);
+
+    if (stack == NULL)
+      stack = calloc(8192, sizeof(short));
+
+    if (stack == NULL)
+      return (-1);
 
    /*
     * Initialize input buffers...
@@ -599,16 +616,18 @@ gif_read_image(FILE       *fp,		/* I - Input file */
 	       gif_cmap_t cmap,		/* I - Colormap */
 	       int        interlace)	/* I - Non-zero = interlaced image */
 {
-  unsigned char	code_size;		/* Code size */
-  ib_t		*pixels,		/* Pixel buffer */
-		*temp;			/* Current pixel */
-  int		xpos,			/* Current X position */
-		ypos,			/* Current Y position */
-		pass;			/* Current pass */
-  int		pixel;			/* Current pixel */
-  int		bpp;			/* Bytes per pixel */
-  static int	xpasses[4] = { 8, 8, 4, 2 },
-		ypasses[5] = { 0, 4, 2, 1, 999999 };
+  unsigned char		code_size;	/* Code size */
+  ib_t			*pixels,	/* Pixel buffer */
+			*temp;		/* Current pixel */
+  int			xpos,		/* Current X position */
+			ypos,		/* Current Y position */
+			pass;		/* Current pass */
+  int			pixel;		/* Current pixel */
+  int			bpp;		/* Bytes per pixel */
+  static const int	xpasses[4] =	/* X interleaving */
+			{ 8, 8, 4, 2 },
+			ypasses[5] =	/* Y interleaving */
+			{ 0, 4, 2, 1, 999999 };
 
 
   bpp       = ImageGetDepth(img);
@@ -671,5 +690,5 @@ gif_read_image(FILE       *fp,		/* I - Input file */
 
 
 /*
- * End of "$Id: image-gif.c,v 1.8.2.8 2003/01/07 18:26:54 mike Exp $".
+ * End of "$Id: image-gif.c,v 1.8.2.9 2003/01/24 20:45:16 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: image-colorspace.c,v 1.22.2.8 2003/01/07 18:26:53 mike Exp $"
+ * "$Id: image-colorspace.c,v 1.22.2.9 2003/01/24 20:45:16 mike Exp $"
  *
  *   Colorspace conversions for the Common UNIX Printing System (CUPS).
  *
@@ -81,15 +81,20 @@
 
 
 /*
+ * Lookup table structure...
+ */
+
+typedef int cups_clut_t[3][256];
+
+
+/*
  * Local globals...
  */
 
 static int		ImageHaveProfile = 0;
 					/* Do we have a color profile? */
-static int		ImageDensity[256];
-					/* Ink/marker density LUT */
-static int		ImageMatrix[3][3][256];
-					/* Color transform matrix LUT */
+static int		*ImageDensity;	/* Ink/marker density LUT */
+static cups_clut_t	*ImageMatrix;	/* Color transform matrix LUT */
 static cups_cspace_t	ImageColorSpace = CUPS_CSPACE_RGB;
 					/* Destination colorspace */
 
@@ -147,6 +152,27 @@ ImageSetProfile(float d,		/* I - Ink/marker density */
   int		i, j, k;		/* Looping vars */
   float		m;			/* Current matrix value */
   int		*im;			/* Pointer into ImageMatrix */
+
+
+ /*
+  * Allocate memory for the profile data...
+  */
+
+  if (ImageMatrix == NULL)
+    ImageMatrix = calloc(3, sizeof(cups_clut_t));
+
+  if (ImageMatrix == NULL)
+    return;
+
+  if (ImageDensity == NULL)
+    ImageDensity = calloc(256, sizeof(int));
+
+  if (ImageDensity == NULL)
+    return;
+
+ /*
+  * Populate the profile lookup tables...
+  */
 
   ImageHaveProfile  = 1;
 
@@ -964,16 +990,16 @@ ImageLut(ib_t       *pixels,	/* IO - Input/output pixels */
  */
 
 void
-ImageRGBAdjust(ib_t *pixels,	/* IO - Input/output pixels */
-               int  count,	/* I - Number of pixels to adjust */
-               int  saturation,	/* I - Color saturation (%) */
-               int  hue)	/* I - Color hue (degrees) */
+ImageRGBAdjust(ib_t *pixels,		/* IO - Input/output pixels */
+               int  count,		/* I - Number of pixels to adjust */
+               int  saturation,		/* I - Color saturation (%) */
+               int  hue)		/* I - Color hue (degrees) */
 {
-  int		i, j, k;	/* Looping vars */
-  float		mat[3][3];	/* Color adjustment matrix */
-  static int	last_sat = 100,	/* Last saturation used */
-		last_hue = 0;	/* Last hue used */
-  static int	lut[3][3][256];	/* Lookup table for matrix */
+  int			i, j, k;	/* Looping vars */
+  float			mat[3][3];	/* Color adjustment matrix */
+  static int		last_sat = 100,	/* Last saturation used */
+			last_hue = 0;	/* Last hue used */
+  static cups_clut_t	*lut = NULL;	/* Lookup table for matrix */
 
 
   if (saturation != last_sat ||
@@ -986,6 +1012,16 @@ ImageRGBAdjust(ib_t *pixels,	/* IO - Input/output pixels */
     ident(mat);
     saturate(mat, saturation * 0.01);
     huerotate(mat, (float)hue);
+
+   /*
+    * Allocate memory for the lookup table...
+    */
+
+    if (lut == NULL)
+      lut = calloc(3, sizeof(cups_clut_t));
+
+    if (lut == NULL)
+      return;
 
    /*
     * Convert the matrix into a 3x3 array of lookup tables...
@@ -1504,5 +1540,5 @@ zshear(float mat[3][3],	/* I - Matrix */
 
 
 /*
- * End of "$Id: image-colorspace.c,v 1.22.2.8 2003/01/07 18:26:53 mike Exp $".
+ * End of "$Id: image-colorspace.c,v 1.22.2.9 2003/01/24 20:45:16 mike Exp $".
  */

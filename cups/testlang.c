@@ -1,5 +1,5 @@
 /*
- * "$Id: testlang.c,v 1.1.2.2 2003/01/07 18:26:30 mike Exp $"
+ * "$Id: testlang.c,v 1.1.2.3 2003/01/24 20:45:15 mike Exp $"
  *
  *   HTTP test program for the Common UNIX Printing System (CUPS).
  *
@@ -45,7 +45,7 @@ main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
   cups_lang_t		*language;	/* Message catalog */
-  static const char	*charsets[] =	/* Character sets */
+  static const char * const charsets[] =/* Character sets */
 			{
 			  "us-ascii",
 			  "iso-8859-1",
@@ -92,5 +92,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testlang.c,v 1.1.2.2 2003/01/07 18:26:30 mike Exp $".
+ * End of "$Id: testlang.c,v 1.1.2.3 2003/01/24 20:45:15 mike Exp $".
  */

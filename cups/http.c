@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.24 2003/01/24 19:19:42 mike Exp $"
+ * "$Id: http.c,v 1.82.2.25 2003/01/24 20:45:11 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -122,7 +122,7 @@ static OSStatus		CDSAWriteFunc(SSLConnectionRef connection, const void *data, si
  * Local globals...
  */
 
-static const char	*http_fields[] =
+static const char * const http_fields[] =
 			{
 			  "Accept-Language",
 			  "Accept-Ranges",
@@ -152,7 +152,7 @@ static const char	*http_fields[] =
 			  "User-Agent",
 			  "WWW-Authenticate"
 			};
-static const char	*days[7] =
+static const char * const days[7] =
 			{
 			  "Sun",
 			  "Mon",
@@ -162,7 +162,7 @@ static const char	*days[7] =
 			  "Fri",
 			  "Sat"
 			};
-static const char	*months[12] =
+static const char * const months[12] =
 			{
 			  "Jan",
 			  "Feb",
@@ -1684,7 +1684,7 @@ httpEncode64(char       *out,	/* I - String to write to */
              const char *in)	/* I - String to read from */
 {
   char		*outptr;	/* Output pointer */
-  static char	base64[] =	/* Base64 characters... */
+  static const char base64[] =	/* Base64 characters... */
   		{
 		  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		  "abcdefghijklmnopqrstuvwxyz"
@@ -1800,8 +1800,8 @@ http_send(http_t       *http,	/* I - HTTP data */
   int		i;		/* Looping var */
   char		*ptr,		/* Pointer in buffer */
 		buf[1024];	/* Encoded URI buffer */
-  static const char *codes[] =	/* Request code strings */
-		{
+  static const char * const codes[] =
+		{		/* Request code strings */
 		  NULL,
 		  "OPTIONS",
 		  "GET",
@@ -1816,7 +1816,7 @@ http_send(http_t       *http,	/* I - HTTP data */
 		  "TRACE",
 		  "CLOSE"
 		};
-  static const char *hex = "0123456789ABCDEF";
+  static const char hex[] = "0123456789ABCDEF";
 				/* Hex digits */
 
 
@@ -2263,5 +2263,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.24 2003/01/24 19:19:42 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.25 2003/01/24 20:45:11 mike Exp $".
  */

@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- Merged several weight-reducing changes into the CUPS
+	  baseline donated by Apple.
 	- Added preliminary support for CDSA; patch provided by
 	  Apple.
 	- Implicit classes are now created from identical

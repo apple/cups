@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.20.2.11 2003/01/07 18:26:27 mike Exp $"
+ * "$Id: language.c,v 1.20.2.12 2003/01/24 20:45:13 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -51,7 +51,7 @@
 
 static cups_lang_t	*lang_cache = NULL;	/* Language string cache */
 static const char	*lang_blank = "";	/* Blank constant string */
-static const char	*lang_encodings[] =	/* Encoding strings */
+static const char * const lang_encodings[] =	/* Encoding strings */
 			{
 			  "us-ascii",		"iso-8859-1",
 			  "iso-8859-2",		"iso-8859-3",
@@ -120,7 +120,7 @@ static const char	*lang_encodings[] =	/* Encoding strings */
 			  "euc-cn",		"euc-jp",
 			  "euc-kr",		"euc-tw"
 			};
-static const char	*lang_default[] =	/* Default POSIX locale */
+static const char *const lang_default[] =	/* Default POSIX locale */
 			{
 #include "cups_C.h"
 			  NULL
@@ -153,9 +153,9 @@ const char *				/* O - Character encoding */
 cupsLangEncoding(cups_lang_t *lang)	/* I - Language data */
 {
   if (lang == NULL)
-    return (lang_encodings[0]);
+    return ((char*)lang_encodings[0]);
   else
-    return (lang_encodings[lang->encoding]);
+    return ((char*)lang_encodings[lang->encoding]);
 }
 
 
@@ -480,5 +480,5 @@ cupsLangGet(const char *language) /* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.20.2.11 2003/01/07 18:26:27 mike Exp $".
+ * End of "$Id: language.c,v 1.20.2.12 2003/01/24 20:45:13 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: encode.c,v 1.1.2.10 2003/01/07 18:26:24 mike Exp $"
+ * "$Id: encode.c,v 1.1.2.11 2003/01/24 20:45:11 mike Exp $"
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
@@ -49,7 +49,7 @@ typedef struct
   ipp_tag_t	value_tag;
 } ipp_option_t;
 
-static ipp_option_t	ipp_options[] =
+static const ipp_option_t ipp_options[] =
 			{
 			  { "blackplot",		IPP_TAG_BOOLEAN },
 			  { "brightness",		IPP_TAG_INTEGER },
@@ -380,5 +380,5 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 
 
 /*
- * End of "$Id: encode.c,v 1.1.2.10 2003/01/07 18:26:24 mike Exp $".
+ * End of "$Id: encode.c,v 1.1.2.11 2003/01/24 20:45:11 mike Exp $".
  */

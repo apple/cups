@@ -1,5 +1,5 @@
 /*
- * "$Id: tempfile.c,v 1.1.2.8 2003/01/15 16:08:44 mike Exp $"
+ * "$Id: tempfile.c,v 1.1.2.9 2003/01/24 20:45:14 mike Exp $"
  *
  *   Temp file utilities for the Common UNIX Printing System (CUPS).
  *
@@ -65,7 +65,7 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
 #else
   struct timeval curtime;		/* Current time */
 #endif /* WIN32 */
-  static char	buf[1024] = "";		/* Buffer if you pass in NULL and 0 */
+  static char	*buf = NULL;		/* Buffer if you pass in NULL and 0 */
 
 
  /*
@@ -74,8 +74,14 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
 
   if (filename == NULL)
   {
+    if (buf == NULL)
+      buf = calloc(1024, sizeof(char));
+
+    if (buf == NULL)
+      return (-1);
+
     filename = buf;
-    len      = sizeof(buf);
+    len      = 1024;
   }
 
  /*
@@ -211,5 +217,5 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
 
 
 /*
- * End of "$Id: tempfile.c,v 1.1.2.8 2003/01/15 16:08:44 mike Exp $".
+ * End of "$Id: tempfile.c,v 1.1.2.9 2003/01/24 20:45:14 mike Exp $".
  */

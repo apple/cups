@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.26 2003/01/16 13:48:10 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.27 2003/01/24 20:45:12 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -408,13 +408,13 @@ ippAddString(ipp_t      *ipp,			/* I - IPP request */
  */
 
 ipp_attribute_t *				/* O - New attribute */
-ippAddStrings(ipp_t      *ipp,			/* I - IPP request */
-              ipp_tag_t  group,			/* I - IPP group */
-	      ipp_tag_t  type,			/* I - Type of attribute */
-	      const char *name,			/* I - Name of attribute */
-	      int        num_values,		/* I - Number of values */
-	      const char *charset,		/* I - Character set */
-	      const char **values)		/* I - Values */
+ippAddStrings(ipp_t              *ipp,		/* I - IPP request */
+              ipp_tag_t          group,		/* I - IPP group */
+	      ipp_tag_t          type,		/* I - Type of attribute */
+	      const char         *name,		/* I - Name of attribute */
+	      int                num_values,	/* I - Number of values */
+	      const char         *charset,	/* I - Character set */
+	      const char * const *values)	/* I - Values */
 {
   int			i;			/* Looping var */
   ipp_attribute_t	*attr;			/* New attribute */
@@ -2562,5 +2562,5 @@ ipp_write_mem(ipp_mem_t   *m,			/* I - Memory buffer */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.26 2003/01/16 13:48:10 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.27 2003/01/24 20:45:12 mike Exp $".
  */

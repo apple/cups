@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.19.2.7 2003/01/07 18:27:25 mike Exp $"
+ * "$Id: log.c,v 1.19.2.8 2003/01/24 20:45:20 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -58,8 +58,8 @@ GetDateTime(time_t t)		/* I - Time value */
 {
   struct tm	*date;		/* Date/time value */
   static char	s[1024];	/* Date/time string */
-  static const char *months[12] =/* Months */
-		{
+  static const char * const months[12] =
+		{		/* Months */
 		  "Jan",
 		  "Feb",
 		  "Mar",
@@ -116,7 +116,7 @@ LogMessage(int        level,	/* I - Log level */
   int		len;		/* Length of message */
   char		line[1024];	/* Line for output file */
   va_list	ap;		/* Argument pointer */
-  static char	levels[] =	/* Log levels... */
+  static const char levels[] =	/* Log levels... */
 		{
 		  ' ',
 		  'X',
@@ -130,7 +130,7 @@ LogMessage(int        level,	/* I - Log level */
 		  'd'
 		};
 #ifdef HAVE_VSYSLOG
-  static int	syslevels[] =	/* SYSLOG levels... */
+  static const int syslevels[] =/* SYSLOG levels... */
 		{
 		  0,
 		  LOG_EMERG,
@@ -261,8 +261,8 @@ int				/* O - 1 on success, 0 on error */
 LogRequest(client_t      *con,	/* I - Request to log */
            http_status_t code)	/* I - Response code */
 {
-  static const char *states[] =	/* HTTP client states... */
-		{
+  static const char * const states[] =
+		{		/* HTTP client states... */
 		  "WAITING",
 		  "OPTIONS",
 		  "GET",
@@ -441,5 +441,5 @@ check_log_file(FILE       **log,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c,v 1.19.2.7 2003/01/07 18:27:25 mike Exp $".
+ * End of "$Id: log.c,v 1.19.2.8 2003/01/24 20:45:20 mike Exp $".
  */

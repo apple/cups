@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-support.c,v 1.2.2.2 2003/01/07 21:58:03 mike Exp $"
+ * "$Id: ipp-support.c,v 1.2.2.3 2003/01/24 20:45:12 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -61,7 +61,7 @@ const char *					/* O - Text string */
 ippErrorString(ipp_status_t error)		/* I - Error status */
 {
   static char	unknown[255];			/* Unknown error statuses */
-  static const char *status_oks[] =		/* "OK" status codes */
+  static const char * const status_oks[] =	/* "OK" status codes */
 		{
 		  "successful-ok",
 		  "successful-ok-ignored-or-substituted-attributes",
@@ -71,7 +71,7 @@ ippErrorString(ipp_status_t error)		/* I - Error status */
 		  "successful-ok-too-many-events",
 		  "successful-ok-but-cancel-subscription"
 		},
-		*status_400s[] =		/* Client errors */
+		* const status_400s[] =		/* Client errors */
 		{
 		  "client-error-bad-request",
 		  "client-error-forbidden",
@@ -98,7 +98,7 @@ ippErrorString(ipp_status_t error)		/* I - Error status */
 		  "client-error-ignored-all-notifications",
 		  "client-error-print-support-file-not-found"
 		},
-		*status_500s[] =		/* Server errors */
+		* const status_500s[] =		/* Server errors */
 		{
 		  "server-error-internal-error",
 		  "server-error-operation-not-supported",
@@ -171,5 +171,5 @@ ippSetPort(int p)				/* I - Port number to use */
 
 
 /*
- * End of "$Id: ipp-support.c,v 1.2.2.2 2003/01/07 21:58:03 mike Exp $".
+ * End of "$Id: ipp-support.c,v 1.2.2.3 2003/01/24 20:45:12 mike Exp $".
  */

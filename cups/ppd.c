@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.25 2003/01/15 14:52:50 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.26 2003/01/24 20:45:14 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -2054,7 +2054,7 @@ static void
 ppd_fix(char *string)			/* IO - String to fix */
 {
   unsigned char		*p;		/* Pointer into string */
-  static unsigned char	lut[32] =	/* Lookup table for characters */
+  static const unsigned char lut[32] =	/* Lookup table for characters */
 			{
 			  0x20,
 			  0x20,
@@ -2582,5 +2582,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.25 2003/01/15 14:52:50 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.26 2003/01/24 20:45:14 mike Exp $".
  */

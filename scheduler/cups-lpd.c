@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.24.2.11 2003/01/07 18:27:18 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.24.2.12 2003/01/24 20:45:19 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -921,7 +921,7 @@ send_state(const char *dest,		/* I - Destination */
   char		uri[HTTP_MAX_URI];	/* Printer URI */
   char		queue[256],		/* Printer/class queue */
 		*instance;		/* Printer/class instance */
-  static const char *ranks[10] =	/* Ranking strings */
+  static const char * const ranks[10] =	/* Ranking strings */
 		{
 		  "th",
 		  "st",
@@ -934,8 +934,8 @@ send_state(const char *dest,		/* I - Destination */
 		  "th",
 		  "th"
 		};
-  static const char *requested[] =	/* Requested attributes */
-		{
+  static const char * const requested[] =
+		{			/* Requested attributes */
 		  "job-id",
 		  "job-k-octets",
 		  "job-state",
@@ -1285,5 +1285,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.24.2.11 2003/01/07 18:27:18 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.24.2.12 2003/01/24 20:45:19 mike Exp $".
  */
