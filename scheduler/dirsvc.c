@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.10 1999/04/23 14:06:15 mike Exp $"
+ * "$Id: dirsvc.c,v 1.11 1999/04/23 16:57:18 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -45,7 +45,7 @@ StartBrowsing(void)
   struct sockaddr_in	addr;	/* Broadcast address */
 
 
-  if (!Browsing)
+  if (!Browsing || NumBrowsers < 1)
     return;
 
  /*
@@ -114,7 +114,7 @@ StartBrowsing(void)
 void
 StopBrowsing(void)
 {
-  if (!Browsing)
+  if (!Browsing || NumBrowsers < 1)
     return;
 
  /*
@@ -296,5 +296,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.10 1999/04/23 14:06:15 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.11 1999/04/23 16:57:18 mike Exp $".
  */
