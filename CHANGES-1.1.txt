@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- Support for more than 1024 files was broken on Solaris
+	  9 (STR #217)
 	- The setgroups() calls now pass in 1 group (the
 	  configured group) instead of 0 for compatibility with
 	  BSD and Darwin (STR #213)

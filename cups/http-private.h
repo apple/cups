@@ -1,5 +1,5 @@
 /*
- * "$Id: http-private.h,v 1.1.2.2 2003/01/24 19:19:42 mike Exp $"
+ * "$Id: http-private.h,v 1.1.2.3 2003/08/04 19:01:42 mike Exp $"
  *
  *   Private HTTP definitions for the Common UNIX Printing System (CUPS).
  *
@@ -31,8 +31,19 @@
  * Include necessary headers...
  */
 
-#  include "http.h"
 #  include "config.h"
+
+#  ifdef __sun
+/*
+ * Define FD_SETSIZE to CUPS_MAX_FDS on Solaris to get the correct version of
+ * select() for large numbers of file descriptors.
+ */
+
+#    define FD_SETSIZE	CUPS_MAX_FDS
+#    include <sys/select.h>
+#  endif /* __sun */
+
+#  include "http.h"
 
 #  if defined HAVE_LIBSSL
 /*
@@ -73,5 +84,5 @@ typedef SSLConnectionRef http_tls_t;
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id: http-private.h,v 1.1.2.2 2003/01/24 19:19:42 mike Exp $".
+ * End of "$Id: http-private.h,v 1.1.2.3 2003/08/04 19:01:42 mike Exp $".
  */
