@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.14 1999/05/11 19:46:18 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.15 1999/07/27 18:55:52 mike Exp $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
@@ -80,9 +80,9 @@ OutputProlog(char  *title,	/* I - Job title */
   else if (!ColorDevice)	/* Greyscale */
     puts("/setrgbcolor { 0.08 mul exch 0.61 mul add exch 0.31 mul add setgray } bind def\n");
 
-  if ((prolog = fopen(CUPS_DATADIR "/HPGLprolog", "r")) == NULL)
+  if ((prolog = fopen(CUPS_DATADIR "/data/HPGLprolog", "r")) == NULL)
   {
-    perror("ERROR: Unable to open HPGL prolog \"" CUPS_DATADIR "/HPGLprolog\" for reading");
+    perror("ERROR: Unable to open HPGL prolog \"" CUPS_DATADIR "/data/HPGLprolog\" for reading");
     exit(1);
   }
 
@@ -188,5 +188,5 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.14 1999/05/11 19:46:18 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.15 1999/07/27 18:55:52 mike Exp $".
  */
