@@ -1,5 +1,5 @@
 /*
- * "$Id: pstoraster.c,v 1.4 1999/05/10 21:34:54 mike Exp $"
+ * "$Id: pstoraster.c,v 1.5 1999/06/18 15:54:09 mike Exp $"
  *
  *   PostScript RIP filter main entry for the Common UNIX Printing System
  *   (CUPS).
@@ -37,7 +37,7 @@
  * Include necessary headers...
  */
 
-#include <config.h>
+#include <cups/string.h>
 #include "ghost.h"
 #include "imain.h"
 #include "iminst.h"
@@ -174,5 +174,5 @@ define_string(char *name,	/* I - Variable to set */
 
 
 /*
- * End of "$Id: pstoraster.c,v 1.4 1999/05/10 21:34:54 mike Exp $".
+ * End of "$Id: pstoraster.c,v 1.5 1999/06/18 15:54:09 mike Exp $".
  */

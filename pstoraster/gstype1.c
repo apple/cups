@@ -961,6 +961,6 @@ type1_endchar(gs_type1_state *pcis, gs_imager_state *pis, gx_path *ppath)
 	}
 	/* Set the flatness for curve rendering. */
 	if ( !pcis->charpath_flag )
-	  gs_setflat(pis, pcis->flatness);
+	  gs_setflat((gs_state *)pis, pcis->flatness);
 	return 0;
 }

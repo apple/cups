@@ -57,7 +57,7 @@ s_zlibE_process(stream_state *st, stream_cursor_read *pr,
 	  return 1;
 	if ( pr->ptr == pr->limit && !last )
 	  return 0;
-	szs->next_in = p + 1;
+	szs->next_in = (byte *)p + 1;
 	szs->avail_in = pr->limit - p;
 	szs->next_out = pw->ptr + 1;
 	szs->avail_out = pw->limit - pw->ptr;
