@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.14.2.13 2004/02/25 20:01:37 mike Exp $"
+ * "$Id: ppds.c,v 1.14.2.14 2004/02/26 16:07:08 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -66,6 +66,7 @@ typedef struct
  */
 
 static int		num_ppds,	/* Number of PPD files */
+			sorted_ppds,	/* Number of sorted PPD files */
 			alloc_ppds;	/* Number of allocated entries */
 static ppd_info_t	*ppds;		/* PPD file info */
 static int		changed_ppd;	/* Did we change the PPD database? */
@@ -138,8 +139,10 @@ LoadPPDs(const char *d)			/* I - Directory to scan... */
       */
 
       if (num_ppds > 1)
+      {
 	qsort(ppds, num_ppds, sizeof(ppd_info_t),
               (int (*)(const void *, const void *))compare_names);
+      }
     }
     else
     {
@@ -152,6 +155,8 @@ LoadPPDs(const char *d)			/* I - Directory to scan... */
  /*
   * Load all PPDs in the specified directory and below...
   */
+
+  sorted_ppds = num_ppds;
 
   load_ppds(d, "");
 
@@ -490,11 +495,11 @@ load_ppds(const char *d,		/* I - Actual directory */
     * See if this file has been scanned before...
     */
 
-    if (num_ppds > 0)
+    if (sorted_ppds > 0)
     {
       strcpy(key.record.ppd_name, name);
 
-      ppd = bsearch(&key, ppds, num_ppds, sizeof(ppd_info_t),
+      ppd = bsearch(&key, ppds, sorted_ppds, sizeof(ppd_info_t),
                     (int (*)(const void *, const void *))compare_names);
 
       if (ppd &&
@@ -765,14 +770,6 @@ load_ppds(const char *d,		/* I - Actual directory */
             sizeof(ppd->record.ppd_natural_language));
 
     changed_ppd = 1;
-
-   /*
-    * Re-sort the PPD array...
-    */
-
-    if (num_ppds > 1 && new_ppd)
-      qsort(ppds, num_ppds, sizeof(ppd_info_t),
-            (int (*)(const void *, const void *))compare_names);
   }
 
   closedir(dir);
@@ -780,5 +777,5 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * End of "$Id: ppds.c,v 1.14.2.13 2004/02/25 20:01:37 mike Exp $".
+ * End of "$Id: ppds.c,v 1.14.2.14 2004/02/26 16:07:08 mike Exp $".
  */
