@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2003, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SPM-1.1.19">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SPM-1.1.20">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Programmers Manual</TITLE>
 </HEAD>
@@ -11,7 +11,7 @@
 
 <P>This software programmers manual provides software
 programming information for the Common UNIX Printing System
-("CUPS") Version 1.1.19.
+("CUPS") Version 1.1.20.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -2851,7 +2851,25 @@ current state of a IPP request or response:
 </TR>
 </TABLE></CENTER>
 
+<H3><A NAME="ipp_attribute_t">IPP Attribute</A></H3>
+
+<P>TODO</P>
+
+<H2>PPD Structures</H2>
+
+<H3><A NAME="ppd_file_t">PPD File</A></H3>
+
+<P>TODO</P>
+
+<H3><A NAME="ppd_choice_t">PPD Choice</A></H3>
+
+<P>TODO</P>
+
 <H2>Raster Structures</H2>
+
+<H3><A NAME="cups_raster_t">Raster Stream</A></H3>
+
+<P>TODO</P>
 
 <H3><A NAME="cups_raster_header_t">Raster Page Header</A></H3>
 
@@ -3260,6 +3278,108 @@ cupsCancelJob("LaserJet", 1);
 <A HREF="#cupsLastError"><CODE>cupsLastError()</CODE></A>,
 <A HREF="#cupsPrintFile"><CODE>cupsPrintFile()</CODE></A>,
 <A HREF="#cupsPrintFiles"><CODE>cupsPrintFiles()</CODE></A>
+
+
+<!-- NEW PAGE --><H2><A NAME="cupsDoAuthentication">cupsDoAuthentication()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+int
+cupsDoAuthentication(http_t     *http,
+                     const char *method,
+                     const char *resource);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>http</TD>
+	<TD>HTTP connection to server.</TD>
+</TR>
+<TR>
+	<TD>method</TD>
+	<TD>HTTP method name ("GET", "POST", "PUT", etc.)</TD>
+</TR>
+<TR>
+	<TD>resource</TD>
+	<TD>HTTP resource name.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>0 if the authentication string was successfully generated, -1 otherwise.
+
+<H3>Description</H3>
+
+<P><CODE>cupsDoAuthentication()</CODE> generates an
+authentication string for the given method and request. It
+supports Basic, Digest, and CUPS local certificate
+authentication methods and uses the current user and password
+callback to collect authentication information as needed.
+
+<P>Applications using this function should set the
+<CODE>HTTP_FIELD_AUTHORIZATION</CODE> field to the
+<CODE>authstring</CODE> value in the <CODE>http_t</CODE>
+structure prior to issuing a new request.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups.h&gt;
+
+http_t        *http;
+char          resource[HTTP_MAX_URI];
+http_status_t status;
+
+...
+
+do
+{
+  httpClearFields(http);
+  httpSetField(http, HTTP_FIELD_AUTHORIZATION, http->authstring);
+
+  if (httpGet(http, resource))
+  {
+    if (httpReconnect(http))
+    {
+      status = HTTP_ERROR;
+      break;
+    }
+
+    continue;
+  }
+
+  while ((status = httpUpdate(http)) == HTTP_CONTINUE);
+
+  if (status == HTTP_UNAUTHORIZED)
+  {
+    httpFlush(http);
+
+    if (cupsDoAuthentication(http, "GET", resource))
+      break;
+
+    httpReconnect(http);
+    continue;
+  }
+}
+while (status == HTTP_UNAUTHORIZED);
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsDoAuthentication"><CODE>cupsDoAuthentication()</CODE></A>,
+<A HREF="#cupsGetPassword"><CODE>cupsGetPassword()</CODE></A>,
+<A HREF="#cupsSetPasswordCB"><CODE>cupsSetPasswordCB()</CODE></A>,
+<A HREF="#cupsSetUser"><CODE>cupsSetUser()</CODE></A>,
+<A HREF="#cupsUser"><CODE>cupsUser()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="cupsDoFileRequest">cupsDoFileRequest()</A></H2>
@@ -3954,6 +4074,152 @@ cupsFreeDests(num_dests, dests);
 <A HREF="#cupsGetJobs"><CODE>cupsGetJobs()</CODE></A>
 
 
+<!-- NEW PAGE --><H2><A NAME="cupsGetFd">cupsGetFd()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+http_status_t
+cupsGetFd(http_t     *http,
+          const char *resource,
+	  int        fd);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>http</TD>
+	<TD>The HTTP connection to the server.</TD>
+</TR>
+<TR>
+	<TD>resource</TD>
+	<TD>The resource name on the server.</TD>
+</TR>
+<TR>
+	<TD>fd</TD>
+	<TD>The file descriptor to write to.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>The HTTP status code associated with the request.
+
+<H3>Description</H3>
+
+<P><CODE>cupsGetFd()</CODE> gets a file from the given HTTP
+server and writes it to the specified file descriptor,
+performing any authentication or encryption as required.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+http_t        *http;
+int           fd;
+char          filename[1024];
+http_status_t status;
+...
+
+http   = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
+fd     = cupsTempFd(filename, sizeof(filename));
+status = cupsGetFd(http, "/admin/cupsd.conf", fd);
+
+...
+
+close(fd);
+unlink(filename);
+
+httpClose(http);
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsGetFile"><CODE>cupsGetFile()</CODE></A>,
+<A HREF="#cupsPutFd"><CODE>cupsPutFd()</CODE></A>,
+<A HREF="#cupsPutFile"><CODE>cupsPutFile()</CODE></A>
+
+
+<!-- NEW PAGE --><H2><A NAME="cupsGetFile">cupsGetFile()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+http_status_t
+cupsGetFile(http_t     *http,
+            const char *resource,
+	    const char *filename);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>http</TD>
+	<TD>The HTTP connection to the server.</TD>
+</TR>
+<TR>
+	<TD>resource</TD>
+	<TD>The resource name on the server.</TD>
+</TR>
+<TR>
+	<TD>filename</TD>
+	<TD>The filename to write to.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>The HTTP status code associated with the request.
+
+<H3>Description</H3>
+
+<P><CODE>cupsGetFile()</CODE> gets a file from the given HTTP
+server and writes it to the specified filename, performing any
+authentication or encryption as required.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+http_t        *http;
+char          filename[1024];
+http_status_t status;
+...
+
+http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
+
+cupsTempFile(filename, sizeof(filename));
+
+status = cupsGetFile(http, "/admin/cupsd.conf", filename);
+
+...
+
+unlink(filename);
+
+httpClose(http);
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsGetFd"><CODE>cupsGetFd()</CODE></A>,
+<A HREF="#cupsPutFd"><CODE>cupsPutFd()</CODE></A>,
+<A HREF="#cupsPutFile"><CODE>cupsPutFile()</CODE></A>
+
+
 <!-- NEW PAGE --><H2><A NAME="cupsGetJobs">cupsGetJobs()</A></H2>
 
 <H3>Usage</H3>
@@ -4144,6 +4410,7 @@ password = cupsGetPassword("Please enter a password:");
 <H3>See Also</H3>
 
 <P>
+<A HREF="#cupsDoAuthentication"><CODE>cupsDoAuthentication()</CODE></A>,
 <A HREF="#cupsServer"><CODE>cupsServer()</CODE></A>,
 <A HREF="#cupsSetPasswordCB"><CODE>cupsSetPasswordCB()</CODE></A>,
 <A HREF="#cupsSetServer"><CODE>cupsSetServer()</CODE></A>,
@@ -4726,7 +4993,7 @@ be called multiple times to combine the options from several strings.
 #include &lt;cups/cups.h&gt;
 
 int           num_options;
-<A HREF="#cups_options_t">cups_option_t</A> *options;
+<A HREF="#cups_option_t">cups_option_t</A> *options;
 
 ...
 
@@ -4900,6 +5167,137 @@ jobid = cupsPrintFiles("printer@hostname", num_files, files,
 <A HREF="#cupsLastError"><CODE>cupsLastError()</CODE></A>,
 <A HREF="#cupsPrintFile"><CODE>cupsPrintFile()</CODE></A>
 
+
+<!-- NEW PAGE --><H2><A NAME="cupsPutFd">cupsPutFd()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+http_status_t
+cupsPutFd(http_t     *http,
+          const char *resource,
+	  int        fd);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>http</TD>
+	<TD>The HTTP connection to the server.</TD>
+</TR>
+<TR>
+	<TD>resource</TD>
+	<TD>The resource name on the server.</TD>
+</TR>
+<TR>
+	<TD>fd</TD>
+	<TD>The file descriptor to read from.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>The HTTP status code associated with the request.
+
+<H3>Description</H3>
+
+<P><CODE>cupsPutFd()</CODE> puts a file to the given HTTP
+server, reading it from the specified file descriptor and
+performing any authentication or encryption as required.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+http_t        *http;
+int           fd;
+http_status_t status;
+...
+
+http   = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
+status = cupsPutFd(http, "/admin/cupsd.conf", fd);
+
+httpClose(http);
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsGetFd"><CODE>cupsGetFd()</CODE></A>,
+<A HREF="#cupsGetFile"><CODE>cupsGetFile()</CODE></A>,
+<A HREF="#cupsPutFile"><CODE>cupsPutFile()</CODE></A>
+
+
+<!-- NEW PAGE --><H2><A NAME="cupsPutFile">cupsPutFile()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+http_status_t
+cupsPutFile(http_t     *http,
+            const char *resource,
+	    const char *filename);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>http</TD>
+	<TD>The HTTP connection to the server.</TD>
+</TR>
+<TR>
+	<TD>resource</TD>
+	<TD>The resource name on the server.</TD>
+</TR>
+<TR>
+	<TD>filename</TD>
+	<TD>The filename to read from.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>The HTTP status code associated with the request.
+
+<H3>Description</H3>
+
+<P><CODE>cupsPutFile()</CODE> puts a file on the given HTTP
+server, reading it from the specified filename and performing
+any authentication or encryption as required.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+http_t        *http;
+char          filename[1024];
+http_status_t status;
+...
+
+http   = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
+status = cupsPutFile(http, "/admin/cupsd.conf", filename);
+
+httpClose(http);
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsGetFd"><CODE>cupsGetFd()</CODE></A>,
+<A HREF="#cupsGetFile"><CODE>cupsGetFile()</CODE></A>,
+<A HREF="#cupsPutFd"><CODE>cupsPutFd()</CODE></A>
 
 <!-- NEW PAGE --><H2><A NAME="cupsRasterClose">cupsRasterClose()</A></H2>
 
@@ -5492,6 +5890,7 @@ password = cupsGetPassword("Please enter a password:");
 <H3>See Also</H3>
 
 <P>
+<A HREF="#cupsDoAuthentication"><CODE>cupsDoAuthentication()</CODE></A>,
 <A HREF="#cupsServer"><CODE>cupsServer()</CODE></A>,
 <A HREF="#cupsSetServer"><CODE>cupsSetServer()</CODE></A>,
 <A HREF="#cupsSetUser"><CODE>cupsSetUser()</CODE></A>,
@@ -5584,6 +5983,7 @@ cupsSetUser("root");
 <H3>See Also</H3>
 
 <P>
+<A HREF="#cupsDoAuthentication"><CODE>cupsDoAuthentication()</CODE></A>,
 <A HREF="#cupsServer"><CODE>cupsServer()</CODE></A>,
 <A HREF="#cupsSetPasswordCB"><CODE>cupsSetPasswordCB()</CODE></A>,
 <A HREF="#cupsSetServer"><CODE>cupsSetServer()</CODE></A>,
@@ -5729,8 +6129,11 @@ user = cupsUser();
 <H3>See Also</H3>
 
 <P>
+<A HREF="#cupsDoAuthentication"><CODE>cupsDoAuthentication()</CODE></A>,
 <A HREF="#cupsGetPassword"><CODE>cupsGetPassword()</CODE></A>,
-<A HREF="#cupsServer"><CODE>cupsServer()</CODE></A>
+<A HREF="#cupsServer"><CODE>cupsServer()</CODE></A>,
+<A HREF="#cupsSetServer"><CODE>cupsSetServer()</CODE></A>,
+<A HREF="#cupsSetUser"><CODE>cupsSetUser()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="httpBlocking">httpBlocking()</A></H2>
@@ -9543,7 +9946,78 @@ ppdEmitFd(ppd, 1, PPD_ORDER_PAGE);
 
 <H3>See Also</H3>
 
-<A HREF="#ppdEmit"><CODE>ppdEmit()</CODE></A>
+<A HREF="#ppdEmit"><CODE>ppdEmit()</CODE></A>,
+<A HREF="#ppdEmitJCL"><CODE>ppdEmitJCL()</CODE></A>
+
+
+<!-- NEW PAGE --><H2><A NAME="ppdEmitJCL">ppdEmitJCL()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+int
+ppdEmitJCL(ppd_file_t    *ppd,
+           FILE          *file,
+	   int           job_id,
+           const char    *user,
+	   const char    *title);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>ppd</TD>
+	<TD>The PPD file</TD>
+</TR>
+<TR>
+	<TD>file</TD>
+	<TD>The file to write to</TD>
+</TR>
+<TR>
+	<TD>job_id</TD>
+	<TD>The job ID number</TD>
+</TR>
+<TR>
+	<TD>user</TD>
+	<TD>The job user</TD>
+</TR>
+<TR>
+	<TD>title</TD>
+	<TD>The job name</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>0 on success, -1 on error.
+
+<H3>Description</H3>
+
+<P>The <CODE>ppdEmitJCL()</CODE> function sends printer-specific
+job control commands to the specified file. For printers that
+support the HP Printer Job Language (PJL) job control language,
+the output also contains a display string that usually appears
+on the printer's LCD.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/ppd.h>
+
+ppd_file_t *ppd;
+
+ppdEmitJCL(ppd, stdout, job_id, user, title);
+</PRE>
+
+<H3>See Also</H3>
+
+<A HREF="#ppdEmit"><CODE>ppdEmit()</CODE></A>,
+<A HREF="#ppdEmitFd"><CODE>ppdEmitFd()</CODE></A>
 
 
 <!-- NEW PAGE --><H2><A NAME="ppdFindAttr">ppdFindAttr()</A></H2>

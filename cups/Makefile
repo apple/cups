@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.83 2003/03/20 02:45:21 mike Exp $"
+# "$Id: Makefile,v 1.84 2003/08/29 21:26:40 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -30,10 +30,10 @@ include ../Makedefs
 # Object files...
 #
 
-LIBOBJS	=	attr.o dest.o emit.o encode.o http.o http-addr.o \
-		http-support.o ipp.o ipp-support.o language.o mark.o \
-		md5.o md5passwd.o options.o page.o ppd.o snprintf.o \
-		string.o tempfile.o usersys.o util.o
+LIBOBJS	=	attr.o auth.o dest.o emit.o encode.o getputfile.o \
+		http.o http-addr.o http-support.o ipp.o ipp-support.o \
+		language.o mark.o md5.o md5passwd.o options.o page.o \
+		ppd.o snprintf.o string.o tempfile.o usersys.o util.o
 OBJS	=	$(LIBOBJS) testhttp.o testipp.o testlang.o
 
 
@@ -208,5 +208,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.83 2003/03/20 02:45:21 mike Exp $".
+# End of "$Id: Makefile,v 1.84 2003/08/29 21:26:40 mike Exp $".
 #

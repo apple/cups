@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.107 2003/08/20 17:21:18 mike Exp $"
+ * "$Id: util.c,v 1.108 2003/08/29 21:26:41 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -37,8 +37,6 @@
  *   cupsPrintFile()     - Print a file to a printer or class.
  *   cupsPrintFiles()    - Print one or more files to a printer or class.
  *   cups_connect()      - Connect to the specified host...
- *   cups_local_auth()   - Get the local authorization certificate if
- *                         available/applicable...
  */
 
 /*
@@ -68,9 +66,6 @@
 
 static http_t		*cups_server = NULL;	/* Current server connection */
 static ipp_status_t	last_error = IPP_OK;	/* Last IPP error */
-static char		authstring[HTTP_MAX_VALUE] = "";
-						/* Authorization string */
-static char		pwdstring[33] = "";	/* Last password string */
 
 
 /*
@@ -78,16 +73,15 @@ static char		pwdstring[33] = "";	/* Last password string */
  */
 
 static char	*cups_connect(const char *name, char *printer, char *hostname);
-static int	cups_local_auth(http_t *http);
 
 
 /*
  * 'cupsCancelJob()' - Cancel a print job.
  */
 
-int				/* O - 1 on success, 0 on failure */
-cupsCancelJob(const char *name,	/* I - Name of printer or class */
-              int        job)	/* I - Job ID */
+int					/* O - 1 on success, 0 on failure */
+cupsCancelJob(const char *name,		/* I - Name of printer or class */
+              int        job)		/* I - Job ID */
 {
   char		printer[HTTP_MAX_URI],	/* Printer name */
 		hostname[HTTP_MAX_URI],	/* Hostname */
@@ -178,13 +172,6 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
   struct stat	fileinfo;		/* File information */
   int		bytes;			/* Number of bytes read/written */
   char		buffer[32768];		/* Output buffer */
-  const char	*password;		/* Password string */
-  char		realm[HTTP_MAX_VALUE],	/* realm="xyz" string */
-		nonce[HTTP_MAX_VALUE],	/* nonce="xyz" string */
-		plain[255],		/* Plaintext username:password */
-		encode[512];		/* Encoded username:password */
-  char		prompt[1024];		/* Prompt string */
-  int		digest_tries;		/* Number of tries with Digest */
 
 
   DEBUG_printf(("cupsDoFileRequest(%p, %p, \'%s\', \'%s\')\n",
@@ -250,9 +237,8 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
   * Loop until we can send the request without authorization problems.
   */
 
-  response     = NULL;
-  status       = HTTP_ERROR;
-  digest_tries = 0;
+  response = NULL;
+  status   = HTTP_ERROR;
 
   while (response == NULL)
   {
@@ -271,9 +257,9 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     httpClearFields(http);
     httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, length);
     httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
-    httpSetField(http, HTTP_FIELD_AUTHORIZATION, authstring);
+    httpSetField(http, HTTP_FIELD_AUTHORIZATION, http->authstring);
 
-    DEBUG_printf(("cupsDoFileRequest: authstring=\"%s\"\n", authstring));
+    DEBUG_printf(("cupsDoFileRequest: authstring=\"%s\"\n", http->authstring));
 
    /*
     * Try the request...
@@ -334,70 +320,15 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
       */
 
       httpFlush(http);
+
+     /*
+      * See if we can do authentication...
+      */
+
+      if (cupsDoAuthentication(http, "POST", resource))
+        break;
+
       httpReconnect(http);
-
-     /*
-      * See if we can do local authentication...
-      */
-
-      if (cups_local_auth(http))
-        continue;
-
-     /*
-      * See if we should retry the current digest password...
-      */
-
-      if (strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5) == 0 ||
-          digest_tries > 1 || !pwdstring[0])
-      {
-       /*
-	* Nope - get a password from the user...
-	*/
-
-	snprintf(prompt, sizeof(prompt), "Password for %s on %s? ", cupsUser(),
-        	 http->hostname);
-
-        if ((password = cupsGetPassword(prompt)) == NULL)
-	  break;
-	if (!password[0])
-	  break;
-
-        strlcpy(pwdstring, password, sizeof(pwdstring));
-
-        digest_tries = 0;
-      }
-      else
-        digest_tries ++;
-
-     /*
-      * Got a password; encode it for the server...
-      */
-
-      if (strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5) == 0)
-      {
-       /*
-	* Basic authentication...
-	*/
-
-	snprintf(plain, sizeof(plain), "%s:%s", cupsUser(), pwdstring);
-	httpEncode64(encode, plain);
-	snprintf(authstring, sizeof(authstring), "Basic %s", encode);
-      }
-      else
-      {
-       /*
-	* Digest authentication...
-	*/
-
-        httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "realm", realm);
-        httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "nonce", nonce);
-
-	httpMD5(cupsUser(), realm, pwdstring, encode);
-	httpMD5Final(nonce, "POST", resource, encode);
-	snprintf(authstring, sizeof(authstring),
-	         "Digest username=\"%s\", realm=\"%s\", nonce=\"%s\", "
-	         "response=\"%s\"", cupsUser(), realm, nonce, encode);
-      }
 
       continue;
     }
@@ -512,10 +443,10 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
  */
 
 void
-cupsFreeJobs(int        num_jobs,/* I - Number of jobs */
-             cups_job_t *jobs)	/* I - Jobs */
+cupsFreeJobs(int        num_jobs,	/* I - Number of jobs */
+             cups_job_t *jobs)		/* I - Jobs */
 {
-  int	i;			/* Looping var */
+  int	i;				/* Looping var */
 
 
   if (num_jobs <= 0 || jobs == NULL)
@@ -537,15 +468,15 @@ cupsFreeJobs(int        num_jobs,/* I - Number of jobs */
  * 'cupsGetClasses()' - Get a list of printer classes.
  */
 
-int				/* O - Number of classes */
-cupsGetClasses(char ***classes)	/* O - Classes */
+int					/* O - Number of classes */
+cupsGetClasses(char ***classes)		/* O - Classes */
 {
-  int		n;		/* Number of classes */
-  ipp_t		*request,	/* IPP Request */
-		*response;	/* IPP Response */
-  ipp_attribute_t *attr;	/* Current attribute */
-  cups_lang_t	*language;	/* Default language */
-  char		**temp;		/* Temporary pointer */
+  int		n;			/* Number of classes */
+  ipp_t		*request,		/* IPP Request */
+		*response;		/* IPP Response */
+  ipp_attribute_t *attr;		/* Current attribute */
+  cups_lang_t	*language;		/* Default language */
+  char		**temp;			/* Temporary pointer */
 
 
   if (classes == NULL)
@@ -646,15 +577,15 @@ cupsGetClasses(char ***classes)	/* O - Classes */
  * 'cupsGetDefault()' - Get the default printer or class.
  */
 
-const char *			/* O - Default printer or NULL */
+const char *				/* O - Default printer or NULL */
 cupsGetDefault(void)
 {
-  ipp_t		*request,	/* IPP Request */
-		*response;	/* IPP Response */
-  ipp_attribute_t *attr;	/* Current attribute */
-  cups_lang_t	*language;	/* Default language */
-  const char	*var;		/* Environment variable */
-  static char	def_printer[256];/* Default printer */
+  ipp_t		*request,		/* IPP Request */
+		*response;		/* IPP Response */
+  ipp_attribute_t *attr;		/* Current attribute */
+  cups_lang_t	*language;		/* Default language */
+  const char	*var;			/* Environment variable */
+  static char	def_printer[256];	/* Default printer */
 
 
  /*
@@ -1004,14 +935,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 		hostname[HTTP_MAX_URI],	/* Hostname */
 		resource[HTTP_MAX_URI];	/* Resource name */
   int		port;			/* Port number */
-  const char	*password;		/* Password string */
-  char		realm[HTTP_MAX_VALUE],	/* realm="xyz" string */
-		nonce[HTTP_MAX_VALUE],	/* nonce="xyz" string */
-		plain[255],		/* Plaintext username:password */
-		encode[512];		/* Encoded username:password */
   http_status_t	status;			/* HTTP status from server */
-  char		prompt[1024];		/* Prompt string */
-  int		digest_tries;		/* Number of tries with Digest */
   static char	filename[HTTP_MAX_URI];	/* Local filename */
   static const char * const requested_attrs[] =
 		{			/* Requested attributes */
@@ -1020,6 +944,10 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 		  "member-uris"
 		};
 
+
+ /*
+  * Range check input...
+  */
 
   if (name == NULL)
   {
@@ -1173,139 +1101,9 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 
   snprintf(resource, sizeof(resource), "/printers/%s.ppd", printer);
 
-  digest_tries = 0;
+  status = cupsGetFd(cups_server, resource, fd);
 
-  do
-  {
-    httpClearFields(cups_server);
-    httpSetField(cups_server, HTTP_FIELD_HOST, hostname);
-    httpSetField(cups_server, HTTP_FIELD_AUTHORIZATION, authstring);
-
-    if (httpGet(cups_server, resource))
-    {
-      if (httpReconnect(cups_server))
-      {
-        status = HTTP_ERROR;
-	break;
-      }
-      else
-      {
-        status = HTTP_UNAUTHORIZED;
-        continue;
-      }
-    }
-
-    while ((status = httpUpdate(cups_server)) == HTTP_CONTINUE);
-
-    if (status == HTTP_ERROR && httpError(cups_server) == EPIPE)
-    {
-      if (httpReconnect(cups_server))
-	break;
-      else
-      {
-        status = HTTP_UNAUTHORIZED;
-        continue;
-      }
-    }
-    else if (status == HTTP_UNAUTHORIZED)
-    {
-      DEBUG_puts("cupsGetPPD: unauthorized...");
-
-     /*
-      * Flush any error message...
-      */
-
-      httpFlush(cups_server);
-
-     /*
-      * See if we can do local authentication...
-      */
-
-      if (cups_local_auth(cups_server))
-        continue;
-
-     /*
-      * See if we should retry the current digest password...
-      */
-
-      if (strncmp(cups_server->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5) == 0 ||
-          digest_tries > 1 || !pwdstring[0])
-      {
-       /*
-	* Nope - get a password from the user...
-	*/
-
-	snprintf(prompt, sizeof(prompt), "Password for %s on %s? ", cupsUser(),
-        	 cups_server->hostname);
-
-        if ((password = cupsGetPassword(prompt)) == NULL)
-	  break;
-	if (!password[0])
-	  break;
-
-        strlcpy(pwdstring, password, sizeof(pwdstring));
-
-        digest_tries = 0;
-      }
-      else
-        digest_tries ++;
-
-     /*
-      * Got a password; encode it for the server...
-      */
-
-      if (strncmp(cups_server->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5) == 0)
-      {
-       /*
-	* Basic authentication...
-	*/
-
-	snprintf(plain, sizeof(plain), "%s:%s", cupsUser(), pwdstring);
-	httpEncode64(encode, plain);
-	snprintf(authstring, sizeof(authstring), "Basic %s", encode);
-      }
-      else
-      {
-       /*
-	* Digest authentication...
-	*/
-
-        httpGetSubField(cups_server, HTTP_FIELD_WWW_AUTHENTICATE, "realm", realm);
-        httpGetSubField(cups_server, HTTP_FIELD_WWW_AUTHENTICATE, "nonce", nonce);
-
-	httpMD5(cupsUser(), realm, pwdstring, encode);
-	httpMD5Final(nonce, "GET", resource, encode);
-	snprintf(authstring, sizeof(authstring),
-	         "Digest username=\"%s\", realm=\"%s\", nonce=\"%s\", "
-	         "response=\"%s\"", cupsUser(), realm, nonce, encode);
-      }
-
-      continue;
-    }
-#ifdef HAVE_SSL
-    else if (status == HTTP_UPGRADE_REQUIRED)
-    {
-     /*
-      * Flush any error message...
-      */
-
-      httpFlush(cups_server);
-
-     /*
-      * Upgrade with encryption...
-      */
-
-      httpEncryption(cups_server, HTTP_ENCRYPT_REQUIRED);
-
-     /*
-      * Try again, this time with encryption enabled...
-      */
-
-      continue;
-    }
-#endif /* HAVE_SSL */
-  }
-  while (status == HTTP_UNAUTHORIZED || status == HTTP_UPGRADE_REQUIRED);
+  close(fd);
 
  /*
   * See if we actually got the file or an error...
@@ -1338,13 +1136,8 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   }
 
  /*
-  * OK, we need to copy the file...
+  * Return the PPD file...
   */
-
-  while ((bytes = httpRead(cups_server, buffer, sizeof(buffer))) > 0)
-    write(fd, buffer, bytes);
-
-  close(fd);
 
   return (filename);
 }
@@ -1357,12 +1150,12 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 int					/* O - Number of printers */
 cupsGetPrinters(char ***printers)	/* O - Printers */
 {
-  int		n;		/* Number of printers */
-  ipp_t		*request,	/* IPP Request */
-		*response;	/* IPP Response */
-  ipp_attribute_t *attr;	/* Current attribute */
-  cups_lang_t	*language;	/* Default language */
-  char		**temp;		/* Temporary pointer */
+  int		n;			/* Number of printers */
+  ipp_t		*request,		/* IPP Request */
+		*response;		/* IPP Response */
+  ipp_attribute_t *attr;		/* Current attribute */
+  cups_lang_t	*language;		/* Default language */
+  char		**temp;			/* Temporary pointer */
 
 
   if (printers == NULL)
@@ -1463,7 +1256,7 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
  * 'cupsLastError()' - Return the last IPP error that occurred.
  */
 
-ipp_status_t		/* O - IPP error code */
+ipp_status_t				/* O - IPP error code */
 cupsLastError(void)
 {
   return (last_error);
@@ -1497,7 +1290,8 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
                int           num_files,	/* I - Number of files */
                const char    **files,	/* I - File(s) to print */
 	       const char    *title,	/* I - Title of job */
-               int           num_options,/* I - Number of options */
+               int           num_options,
+					/* I - Number of options */
 	       cups_option_t *options)	/* I - Options */
 {
   int		i;			/* Looping var */
@@ -1730,88 +1524,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * 'cups_local_auth()' - Get the local authorization certificate if
- *                       available/applicable...
- */
-
-static int			/* O - 1 if available, 0 if not */
-cups_local_auth(http_t *http)	/* I - Connection */
-{
-#if defined(WIN32) || defined(__EMX__)
- /*
-  * Currently WIN32 and OS-2 do not support the CUPS server...
-  */
-
-  return (0);
-#else
-  int		pid;		/* Current process ID */
-  FILE		*fp;		/* Certificate file */
-  char		filename[1024],	/* Certificate filename */
-		certificate[33];/* Certificate string */
-  const char	*root;		/* Server root directory */
-
-
-  DEBUG_printf(("cups_local_auth(http=%p) hostaddr=%08x, hostname=\"%s\"\n",
-                http, ntohl(http->hostaddr.sin_addr.s_addr), http->hostname));
-
- /*
-  * See if we are accessing localhost...
-  */
-
-  if (ntohl(http->hostaddr.sin_addr.s_addr) != 0x7f000001 &&
-      strcasecmp(http->hostname, "localhost") != 0)
-  {
-    DEBUG_puts("cups_local_auth: Not a local connection!");
-    return (0);
-  }
-
- /*
-  * Try opening a certificate file for this PID.  If that fails,
-  * try the root certificate...
-  */
-
-  if ((root = getenv("CUPS_SERVERROOT")) == NULL)
-    root = CUPS_SERVERROOT;
-
-  pid = getpid();
-  snprintf(filename, sizeof(filename), "%s/certs/%d", root, pid);
-  if ((fp = fopen(filename, "r")) == NULL && pid > 0)
-  {
-    DEBUG_printf(("cups_local_auth: Unable to open file %s: %s\n",
-                  filename, strerror(errno)));
-
-    snprintf(filename, sizeof(filename), "%s/certs/0", root);
-    fp = fopen(filename, "r");
-  }
-
-  if (fp == NULL)
-  {
-    DEBUG_printf(("cups_local_auth: Unable to open file %s: %s\n",
-                  filename, strerror(errno)));
-    return (0);
-  }
-
- /*
-  * Read the certificate from the file...
-  */
-
-  fgets(certificate, sizeof(certificate), fp);
-  fclose(fp);
-
- /*
-  * Set the authorization string and return...
-  */
-
-  snprintf(authstring, sizeof(authstring), "Local %s", certificate);
-
-  DEBUG_printf(("cups_local_auth: Returning authstring = \"%s\"\n",
-                authstring));
-
-  return (1);
-#endif /* WIN32 || __EMX__ */
-}
-
-
-/*
- * End of "$Id: util.c,v 1.107 2003/08/20 17:21:18 mike Exp $".
+ * End of "$Id: util.c,v 1.108 2003/08/29 21:26:41 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.46 2003/05/09 18:34:15 mike Exp $"
+ * "$Id: http.h,v 1.47 2003/08/29 21:26:41 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -285,6 +285,12 @@ typedef struct
   fd_set		*input_set;	/* select() set for httpWait() */
   http_status_t		expect;		/* Expect: header */
   char			*cookie;	/* Cookie value(s) */
+  /**** New in CUPS 1.1.20 ****/
+  char			authstring[HTTP_MAX_VALUE],
+					/* Current Authentication value */
+			userpass[HTTP_MAX_VALUE];
+					/* Username:password string */
+  int			digest_tries;	/* Number of tries for digest auth */
 } http_t;
 
 
@@ -359,5 +365,5 @@ extern int		httpWait(http_t *http, int msec);
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.46 2003/05/09 18:34:15 mike Exp $".
+ * End of "$Id: http.h,v 1.47 2003/08/29 21:26:41 mike Exp $".
  */
