@@ -1,5 +1,5 @@
 /*
- * "$Id: server.c,v 1.16 2004/06/29 03:27:35 mike Exp $"
+ * "$Id: server.c,v 1.17 2004/09/09 15:10:18 mike Exp $"
  *
  *   Server start/stop routines for the Common UNIX Printing System (CUPS).
  *
@@ -93,10 +93,13 @@ StartServer(void)
   * Create a pipe for CGI processes...
   */
 
-  pipe(CGIPipes);
-
-  LogMessage(L_DEBUG2, "StartServer: Adding fd %d to InputSet...", CGIPipes[0]);
-  FD_SET(CGIPipes[0], InputSet);
+  if (cupsdPipe(CGIPipes))
+    LogMessage(L_ERROR, "StartServer: Unable to create pipes for CGI status!");
+  else
+  {
+    LogMessage(L_DEBUG2, "StartServer: Adding fd %d to InputSet...", CGIPipes[0]);
+    FD_SET(CGIPipes[0], InputSet);
+  }
 }
 
 
@@ -180,5 +183,5 @@ StopServer(void)
 
 
 /*
- * End of "$Id: server.c,v 1.16 2004/06/29 03:27:35 mike Exp $".
+ * End of "$Id: server.c,v 1.17 2004/09/09 15:10:18 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: file.c,v 1.8 2004/06/29 03:27:35 mike Exp $"
+ * "$Id: file.c,v 1.9 2004/09/09 15:10:18 mike Exp $"
  *
  *   File functions for the Common UNIX Printing System (CUPS).
  *
@@ -310,6 +310,12 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
     free(fp);
     return (NULL);
   }
+
+ /*
+  * Don't pass this file to child processes...
+  */
+
+  fcntl(fp->fd, F_SETFD, fcntl(fp->fd, F_GETFD) | FD_CLOEXEC);
 
   if (*mode == 'a')
     fp->pos = lseek(fp->fd, 0, SEEK_END);
@@ -981,5 +987,5 @@ cups_write(int        fd,		/* I - File descriptor */
 
 
 /*
- * End of "$Id: file.c,v 1.8 2004/06/29 03:27:35 mike Exp $".
+ * End of "$Id: file.c,v 1.9 2004/09/09 15:10:18 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.136 2004/08/23 18:42:52 mike Exp $"
+ * "$Id: dirsvc.c,v 1.137 2004/09/09 15:10:18 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -835,6 +835,12 @@ StartBrowsing(void)
     }
 
    /*
+    * Close the socket on exec...
+    */
+
+    fcntl(BrowseSocket, F_SETFD, fcntl(BrowseSocket, F_GETFD) | FD_CLOEXEC);
+
+   /*
     * Finally, add the socket to the input selection set...
     */
 
@@ -879,7 +885,6 @@ StartPolling(void)
   char		bport[10];	/* Browser port */
   char		interval[10];	/* Poll interval */
   int		statusfds[2];	/* Status pipe */
-  int		fd;		/* Current file descriptor */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;	/* POSIX signal handler */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -911,7 +916,7 @@ StartPolling(void)
   * polling daemon...
   */
 
-  if (pipe(statusfds))
+  if (cupsdPipe(statusfds))
   {
     LogMessage(L_ERROR, "Unable to create polling status pipes - %s.",
 	       strerror(errno));
@@ -978,9 +983,6 @@ StartPolling(void)
 
       close(2);
       dup(statusfds[1]);
-
-      for (fd = 3; fd < MaxFDs; fd ++)
-	close(fd);
 
      /*
       * Unblock signals before doing the exec...
@@ -1968,5 +1970,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.136 2004/08/23 18:42:52 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.137 2004/09/09 15:10:18 mike Exp $".
  */

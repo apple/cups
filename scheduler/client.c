@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.192 2004/08/28 19:46:15 mike Exp $"
+ * "$Id: client.c,v 1.193 2004/09/09 15:10:18 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1543,8 +1543,6 @@ ReadClient(client_t *con)		/* I - Client to read from */
 
             SetStringf(&con->filename, "%s/%08x", RequestRoot, request_id ++);
 	    con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
-	    fchmod(con->file, 0640);
-	    fchown(con->file, RunUser, Group);
 
             LogMessage(L_DEBUG2, "ReadClient: %d REQUEST %s=%d", con->http.fd,
 	               con->filename, con->file);
@@ -1554,6 +1552,10 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
 		return (CloseClient(con));
 	    }
+
+	    fchmod(con->file, 0640);
+	    fchown(con->file, RunUser, Group);
+	    fcntl(con->file, F_SETFD, fcntl(con->file, F_GETFD) | FD_CLOEXEC);
 	    break;
 
 	case HTTP_DELETE :
@@ -1783,8 +1785,6 @@ ReadClient(client_t *con)		/* I - Client to read from */
 
           SetStringf(&con->filename, "%s/%08x", RequestRoot, request_id ++);
 	  con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
-	  fchmod(con->file, 0640);
-	  fchown(con->file, RunUser, Group);
 
           LogMessage(L_DEBUG2, "ReadClient: %d REQUEST %s=%d", con->http.fd,
 	             con->filename, con->file);
@@ -1794,6 +1794,10 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	    if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
 	      return (CloseClient(con));
 	  }
+
+	  fchmod(con->file, 0640);
+	  fchown(con->file, RunUser, Group);
+          fcntl(con->file, F_SETFD, fcntl(con->file, F_GETFD) | FD_CLOEXEC);
 	}
 
 	if (con->http.state != HTTP_POST_SEND)
@@ -1909,6 +1913,16 @@ SendCommand(client_t      *con,
     fd = open(con->filename, O_RDONLY);
   else
     fd = open("/dev/null", O_RDONLY);
+
+  if (fd < 0)
+  {
+    LogMessage(L_ERROR, "SendCommand: %d Unable to open \"%s\" for reading: %s",
+               con->http.fd, con->filename ? con->filename : "/dev/null",
+	       strerror(errno));
+    return (0);
+  }
+
+  fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
 
   con->pipe_pid = pipe_command(con, fd, &(con->file), command, options);
 
@@ -2922,7 +2936,6 @@ pipe_command(client_t *con,		/* I - Client connection */
   int		pid;			/* Process ID */
   char		*commptr;		/* Command string pointer */
   char		*uriptr;		/* URI string pointer */
-  int		fd;			/* Looping var */
   int		fds[2];			/* Pipe FDs */
   int		argc;			/* Number of arguments */
   int		envc;			/* Number of environment variables */
@@ -3264,7 +3277,7 @@ pipe_command(client_t *con,		/* I - Client connection */
   * Create a pipe for the output...
   */
 
-  if (pipe(fds))
+  if (cupsdPipe(fds))
   {
     ClearString(&query_string);
 
@@ -3330,13 +3343,6 @@ pipe_command(client_t *con,		/* I - Client connection */
 
     close(2);
     dup(CGIPipes[1]);
-
-   /*
-    * Close extra file descriptors...
-    */
-
-    for (fd = 3; fd < MaxFDs; fd ++)
-      close(fd);
 
    /*
     * Change umask to restrict permissions on created files...
@@ -3458,5 +3464,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.192 2004/08/28 19:46:15 mike Exp $".
+ * End of "$Id: client.c,v 1.193 2004/09/09 15:10:18 mike Exp $".
  */
