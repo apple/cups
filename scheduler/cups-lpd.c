@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.13 2000/11/02 22:19:24 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.14 2000/11/03 14:13:28 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -277,7 +277,7 @@ print_file(const char    *name,		/* I - Printer or class name */
   request->request.op.operation_id = IPP_PRINT_JOB;
   request->request.op.request_id   = 1;
 
-  snprintf(uri, sizeof(uri) - 1, "ipp://localhost/printers/%s", name);
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", name);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
                "attributes-charset", NULL, cupsLangEncoding(language));
@@ -307,7 +307,7 @@ print_file(const char    *name,		/* I - Printer or class name */
   * Do the request...
   */
 
-  snprintf(uri, sizeof(uri) - 1, "/printers/%s", name);
+  snprintf(uri, sizeof(uri), "/printers/%s", name);
 
   response = cupsDoFileRequest(http, request, uri, file);
 
@@ -417,7 +417,7 @@ recv_print_job(const char    *dest,	/* I - Destination */
 	    break;
 	  }
 
-          snprintf(filename, sizeof(filename) - 1, "%s/%06d-0", tmpdir, getpid());
+          snprintf(filename, sizeof(filename), "%s/%06d-0", tmpdir, getpid());
 	  break;
       case 0x03 : /* Receive data file */
           if (strlen(name) < 2)
@@ -433,7 +433,7 @@ recv_print_job(const char    *dest,	/* I - Destination */
 	  data[num_data][sizeof(data[0]) - 1] = '\0';
 
           num_data ++;
-          snprintf(filename, sizeof(filename) - 1, "%s/%06d-%d", tmpdir, getpid(),
+          snprintf(filename, sizeof(filename), "%s/%06d-%d", tmpdir, getpid(),
 	           num_data);
 	  break;
     }
@@ -505,7 +505,7 @@ recv_print_job(const char    *dest,	/* I - Destination */
     * Process the control file and print stuff...
     */
 
-    snprintf(filename, sizeof(filename) - 1, "%s/%06d-0", tmpdir, getpid());
+    snprintf(filename, sizeof(filename), "%s/%06d-0", tmpdir, getpid());
     if ((fp = fopen(filename, "rb")) == NULL)
       status = 1;
     else
@@ -612,7 +612,7 @@ recv_print_job(const char    *dest,	/* I - Destination */
 	      * Send the print request...
 	      */
 
-              snprintf(filename, sizeof(filename) - 1, "%s/%06d-%d", tmpdir,
+              snprintf(filename, sizeof(filename), "%s/%06d-%d", tmpdir,
 	               getpid(), i + 1);
 
               if (print_file(queue, filename, title, docname, user, num_options,
@@ -637,7 +637,7 @@ recv_print_job(const char    *dest,	/* I - Destination */
 
   for (i = -1; i < num_data; i ++)
   {
-    snprintf(filename, sizeof(filename) - 1, "%s/%06d-%d", tmpdir, getpid(), i + 1);
+    snprintf(filename, sizeof(filename), "%s/%06d-%d", tmpdir, getpid(), i + 1);
     unlink(filename);
   }
 
@@ -797,7 +797,7 @@ send_state(const char *dest,		/* I - Destination */
   attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                       "attributes-natural-language", NULL, language->language);
 
-  snprintf(uri, sizeof(uri) - 1, "ipp://localhost/printers/%s", queue);
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", queue);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
@@ -925,7 +925,7 @@ send_state(const char *dest,		/* I - Destination */
         puts("");
 
         if (jobcopies > 1)
-	  snprintf(namestr, sizeof(namestr) - 1, "%d copies of %s", jobcopies,
+	  snprintf(namestr, sizeof(namestr), "%d copies of %s", jobcopies,
 	           jobname);
 	else
 	{
@@ -1067,5 +1067,5 @@ remove_jobs(const char *dest,		/* I - Destination */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.13 2000/11/02 22:19:24 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.14 2000/11/03 14:13:28 mike Exp $".
  */

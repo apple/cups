@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.17 2000/11/02 22:19:22 mike Exp $"
+ * "$Id: language.c,v 1.18 2000/11/03 14:13:26 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -214,7 +214,7 @@ cupsLangGet(const char *language) /* I - Language or locale */
   if ((localedir = getenv("LOCALEDIR")) == NULL)
     localedir = CUPS_LOCALEDIR;
 
-  snprintf(filename, sizeof(filename) - 1, "%s/%s/cups_%s", localedir, real, real);
+  snprintf(filename, sizeof(filename), "%s/%s/cups_%s", localedir, real, real);
 
   if ((fp = fopen(filename, "r")) == NULL)
     if (strlen(real) > 2)
@@ -224,7 +224,7 @@ cupsLangGet(const char *language) /* I - Language or locale */
       */
 
       real[2] = '\0';
-      snprintf(filename, sizeof(filename) - 1, "%s/%s/cups_%s", localedir, real,
+      snprintf(filename, sizeof(filename), "%s/%s/cups_%s", localedir, real,
                real);
       fp = fopen(filename, "r");
     }
@@ -398,5 +398,5 @@ cupsLangGet(const char *language) /* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.17 2000/11/02 22:19:22 mike Exp $".
+ * End of "$Id: language.c,v 1.18 2000/11/03 14:13:26 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.103 2000/11/02 22:19:24 mike Exp $"
+ * "$Id: ipp.c,v 1.104 2000/11/03 14:13:29 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -595,7 +595,7 @@ add_class(client_t        *con,		/* I - Client connection */
     * Rename the implicit class to "AnyClass"...
     */
 
-    snprintf(pclass->name, sizeof(pclass->name) - 1, "Any%s", resource + 10);
+    snprintf(pclass->name, sizeof(pclass->name), "Any%s", resource + 10);
     SortPrinters();
 
    /*
@@ -612,7 +612,7 @@ add_class(client_t        *con,		/* I - Client connection */
     */
 
     DeletePrinterFilters(pclass);
-    snprintf(pclass->name, sizeof(pclass->name) - 1, "%s@%s", resource + 10,
+    snprintf(pclass->name, sizeof(pclass->name), "%s@%s", resource + 10,
              pclass->hostname);
     SetPrinterAttrs(pclass);
     SortPrinters();
@@ -958,7 +958,7 @@ add_printer(client_t        *con,	/* I - Client connection */
     * Rename the implicit printer to "AnyPrinter"...
     */
 
-    snprintf(printer->name, sizeof(printer->name) - 1, "Any%s", resource + 10);
+    snprintf(printer->name, sizeof(printer->name), "Any%s", resource + 10);
     SortPrinters();
 
    /*
@@ -975,7 +975,7 @@ add_printer(client_t        *con,	/* I - Client connection */
     */
 
     DeletePrinterFilters(printer);
-    snprintf(printer->name, sizeof(printer->name) - 1, "%s@%s", resource + 10,
+    snprintf(printer->name, sizeof(printer->name), "%s@%s", resource + 10,
              printer->hostname);
     SetPrinterAttrs(printer);
     SortPrinters();
@@ -1079,7 +1079,7 @@ add_printer(client_t        *con,	/* I - Client connection */
   if (con->filename[0])
     strcpy(srcfile, con->filename);
   else if ((attr = ippFindAttribute(con->request, "ppd-name", IPP_TAG_NAME)) != NULL)
-    snprintf(srcfile, sizeof(srcfile) - 1, "%s/model/%s", DataDir,
+    snprintf(srcfile, sizeof(srcfile), "%s/model/%s", DataDir,
              attr->values[0].string.text);
   else
     srcfile[0] = '\0';
@@ -1109,7 +1109,7 @@ add_printer(client_t        *con,	/* I - Client connection */
     * Then see what kind of file it is...
     */
 
-    snprintf(dstfile, sizeof(dstfile) - 1, "%s/interfaces/%s", ServerRoot,
+    snprintf(dstfile, sizeof(dstfile), "%s/interfaces/%s", ServerRoot,
              printer->name);
 
     if (strncmp(line, "*PPD-Adobe", 10) == 0)
@@ -1142,7 +1142,7 @@ add_printer(client_t        *con,	/* I - Client connection */
       }
     }
 
-    snprintf(dstfile, sizeof(dstfile) - 1, "%s/ppd/%s.ppd", ServerRoot,
+    snprintf(dstfile, sizeof(dstfile), "%s/ppd/%s.ppd", ServerRoot,
              printer->name);
 
     if (strncmp(line, "*PPD-Adobe", 10) == 0)
@@ -4846,5 +4846,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.103 2000/11/02 22:19:24 mike Exp $".
+ * End of "$Id: ipp.c,v 1.104 2000/11/03 14:13:29 mike Exp $".
  */

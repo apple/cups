@@ -1,4 +1,4 @@
-CHANGES.txt - 10/16/2000
+CHANGES.txt - 11/02/2000
 ------------------------
 
 CHANGES IN CUPS V1.1.5
@@ -53,6 +53,10 @@ CHANGES IN CUPS V1.1.5
 	  text-with-language attributes.
 	- The scheduler's DeletePrinter() function would
 	  access freed memory under IRIX.
+	- The ppdClose() function didn't free all of the strings
+	  in the ppd_file_t structure.
+	- The LoadAllJobs() function in the scheduler did not
+	  close the spool directory.
 
 
 CHANGES IN CUPS v1.1.4

@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.12 2000/11/02 22:19:22 mike Exp $"
+ * "$Id: dest.c,v 1.13 2000/11/03 14:13:26 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -262,7 +262,7 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
 
   if ((home = getenv("CUPS_SERVERROOT")) != NULL)
   {
-    snprintf(filename, sizeof(filename) - 1, "%s/lpoptions", home);
+    snprintf(filename, sizeof(filename), "%s/lpoptions", home);
     num_dests = cups_get_dests(filename, num_dests, dests);
   }
   else
@@ -270,7 +270,7 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
 
   if ((home = getenv("HOME")) != NULL)
   {
-    snprintf(filename, sizeof(filename) - 1, "%s/.lpoptions", home);
+    snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
     num_dests = cups_get_dests(filename, num_dests, dests);
   }
 
@@ -305,12 +305,12 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
   if (getuid() == 0)
   {
     if ((home = getenv("CUPS_SERVERROOT")) != NULL)
-      snprintf(filename, sizeof(filename) - 1, "%s/lpoptions", home);
+      snprintf(filename, sizeof(filename), "%s/lpoptions", home);
     else
       strcpy(filename, CUPS_SERVERROOT "/lpoptions");
   }
   else if ((home = getenv("HOME")) != NULL)
-    snprintf(filename, sizeof(filename) - 1, "%s/.lpoptions", home);
+    snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
   else
     return;
 
@@ -510,5 +510,5 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
 
 
 /*
- * End of "$Id: dest.c,v 1.12 2000/11/02 22:19:22 mike Exp $".
+ * End of "$Id: dest.c,v 1.13 2000/11/03 14:13:26 mike Exp $".
  */

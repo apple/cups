@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.93 2000/11/02 22:19:25 mike Exp $"
+ * "$Id: job.c,v 1.94 2000/11/03 14:13:29 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -146,7 +146,7 @@ CancelJob(int id,		/* I - Job to cancel */
       if (!JobHistory || !JobFiles || purge)
         for (i = 1; i <= current->num_files; i ++)
 	{
-	  snprintf(filename, sizeof(filename) - 1, "%s/d%05d-%03d", RequestRoot,
+	  snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
 	           current->id, i);
           unlink(filename);
 	}
@@ -165,7 +165,7 @@ CancelJob(int id,		/* I - Job to cancel */
         * Remove the job info file...
 	*/
 
-	snprintf(filename, sizeof(filename) - 1, "%s/c%05d", RequestRoot,
+	snprintf(filename, sizeof(filename), "%s/c%05d", RequestRoot,
 	         current->id);
 	unlink(filename);
 
@@ -440,7 +440,7 @@ LoadAllJobs(void)
       * Load the job control file...
       */
 
-      snprintf(filename, sizeof(filename) - 1, "%s/%s", RequestRoot, dent->d_name);
+      snprintf(filename, sizeof(filename), "%s/%s", RequestRoot, dent->d_name);
       if (ipp_read_file(filename, job->attrs) != IPP_DATA)
       {
         LogMessage(L_ERROR, "LoadAllJobs: Unable to read job control file \"%s\"!",
@@ -474,13 +474,13 @@ LoadAllJobs(void)
 	  if (strncmp(resource, "/classes/", 9) == 0)
 	  {
 	    p = AddClass(resource + 9);
-	    snprintf(p->make_model, sizeof(p->make_model) - 1,
+	    snprintf(p->make_model, sizeof(p->make_model),
 	             "Remote Class on %s", host);
 	  }
 	  else
 	  {
 	    p = AddPrinter(resource + 10);
-	    snprintf(p->make_model, sizeof(p->make_model) - 1,
+	    snprintf(p->make_model, sizeof(p->make_model),
 	             "Remote Printer on %s", host);
 	  }
 
@@ -488,7 +488,7 @@ LoadAllJobs(void)
 	  p->browse_time = 2147483647;
 
 	  *strchr(resource, '@') = '\0';
-	  snprintf(uri, sizeof(uri) - 1, "ipp://%s:%d%s", host, port, resource);
+	  snprintf(uri, sizeof(uri), "ipp://%s:%d%s", host, port, resource);
 
 	  strcpy(p->uri, uri);
 	  strcpy(p->more_info, uri);
@@ -576,7 +576,7 @@ LoadAllJobs(void)
       jobid  = atoi(dent->d_name + 1);
       fileid = atoi(dent->d_name + 7);
 
-      snprintf(filename, sizeof(filename) - 1, "%s/%s", RequestRoot, dent->d_name);
+      snprintf(filename, sizeof(filename), "%s/%s", RequestRoot, dent->d_name);
 
       if ((job = FindJob(jobid)) == NULL)
       {
@@ -606,6 +606,8 @@ LoadAllJobs(void)
 
       job->filetypes[fileid - 1] = mimeFileType(MimeDatabase, filename);
     }
+
+  closedir(dir);
 
  /*
   * Check to see if we need to start any jobs...
@@ -715,7 +717,7 @@ SaveJob(int id)			/* I - Job ID */
   if ((job = FindJob(id)) == NULL)
     return;
 
-  snprintf(filename, sizeof(filename) - 1, "%s/c%05d", RequestRoot, id);
+  snprintf(filename, sizeof(filename), "%s/c%05d", RequestRoot, id);
   ipp_write_file(filename, job->attrs);
 }
 
@@ -1248,17 +1250,17 @@ StartJob(int       id,		/* I - Job ID */
   sprintf(content_type, "CONTENT_TYPE=%s/%s",
           current->filetypes[current->current_file]->super,
           current->filetypes[current->current_file]->type);
-  snprintf(device_uri, sizeof(device_uri) - 1, "DEVICE_URI=%s", printer->device_uri);
+  snprintf(device_uri, sizeof(device_uri), "DEVICE_URI=%s", printer->device_uri);
   snprintf(ppd, sizeof(ppd), "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
   sprintf(printer_name, "PRINTER=%s", printer->name);
-  snprintf(cache, sizeof(cache) - 1, "RIP_MAX_CACHE=%s", RIPCache);
-  snprintf(root, sizeof(root) - 1, "CUPS_SERVERROOT=%s", ServerRoot);
-  snprintf(tmpdir, sizeof(tmpdir) - 1, "TMPDIR=%s", TempDir);
-  snprintf(datadir, sizeof(datadir) - 1, "CUPS_DATADIR=%s", DataDir);
-  snprintf(fontpath, sizeof(fontpath) - 1, "CUPS_FONTPATH=%s", FontPath);
+  snprintf(cache, sizeof(cache), "RIP_MAX_CACHE=%s", RIPCache);
+  snprintf(root, sizeof(root), "CUPS_SERVERROOT=%s", ServerRoot);
+  snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
+  snprintf(datadir, sizeof(datadir), "CUPS_DATADIR=%s", DataDir);
+  snprintf(fontpath, sizeof(fontpath), "CUPS_FONTPATH=%s", FontPath);
 
   if (getenv("LD_LIBRARY_PATH") != NULL)
-    snprintf(ldpath, sizeof(ldpath) - 1, "LD_LIBRARY_PATH=%s", getenv("LD_LIBRARY_PATH"));
+    snprintf(ldpath, sizeof(ldpath), "LD_LIBRARY_PATH=%s", getenv("LD_LIBRARY_PATH"));
   else
     ldpath[0] = '\0';
 
@@ -2577,5 +2579,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.93 2000/11/02 22:19:25 mike Exp $".
+ * End of "$Id: job.c,v 1.94 2000/11/03 14:13:29 mike Exp $".
  */

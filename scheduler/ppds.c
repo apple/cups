@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.10 2000/11/02 22:19:25 mike Exp $"
+ * "$Id: ppds.c,v 1.11 2000/11/03 14:13:30 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -89,7 +89,7 @@ LoadPPDs(const char *d)		/* I - Directory to scan... */
   * See if we need to reload the PPD files...
   */
 
-  snprintf(filename, sizeof(filename) - 1, "%s/ppds.dat", ServerRoot);
+  snprintf(filename, sizeof(filename), "%s/ppds.dat", ServerRoot);
   if (stat(filename, &fileinfo))
     i = 1;
   else
@@ -223,7 +223,7 @@ check_ppds(const char *d,	/* I - Directory to scan */
     * Check the modification time of the file or directory...
     */
 
-    snprintf(filename, sizeof(filename) - 1, "%s/%s", d, dent->d_name);
+    snprintf(filename, sizeof(filename), "%s/%s", d, dent->d_name);
 
     if (stat(filename, &fileinfo))
       continue;
@@ -429,10 +429,10 @@ load_ppds(const char *d,		/* I - Actual directory */
     * See if this is a file...
     */
 
-    snprintf(filename, sizeof(filename) - 1, "%s/%s", d, dent->d_name);
+    snprintf(filename, sizeof(filename), "%s/%s", d, dent->d_name);
 
     if (p[0])
-      snprintf(name, sizeof(name) - 1, "%s/%s", p, dent->d_name);
+      snprintf(name, sizeof(name), "%s/%s", p, dent->d_name);
     else
       strcpy(name, dent->d_name);
 
@@ -647,5 +647,5 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * End of "$Id: ppds.c,v 1.10 2000/11/02 22:19:25 mike Exp $".
+ * End of "$Id: ppds.c,v 1.11 2000/11/03 14:13:30 mike Exp $".
  */

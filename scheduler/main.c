@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.48 2000/11/02 22:19:25 mike Exp $"
+ * "$Id: main.c,v 1.49 2000/11/03 14:13:30 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -327,7 +327,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       for (i = 0; i < MaxFDs; i ++)
         if (FD_ISSET(i, &InputSet))
-          snprintf(sptr, sizeof(s) - slen - 1, " %d", i);
+          snprintf(sptr, sizeof(s) - slen, " %d", i);
 
       LogMessage(L_ERROR, s);
 
@@ -337,7 +337,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       for (i = 0; i < MaxFDs; i ++)
         if (FD_ISSET(i, &OutputSet))
-          snprintf(sptr, sizeof(s) - slen - 1, " %d", i);
+          snprintf(sptr, sizeof(s) - slen, " %d", i);
 
       LogMessage(L_ERROR, s);
 
@@ -658,5 +658,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.48 2000/11/02 22:19:25 mike Exp $".
+ * End of "$Id: main.c,v 1.49 2000/11/03 14:13:30 mike Exp $".
  */

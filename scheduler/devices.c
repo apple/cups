@@ -1,5 +1,5 @@
 /*
- * "$Id: devices.c,v 1.10 2000/11/02 22:19:24 mike Exp $"
+ * "$Id: devices.c,v 1.11 2000/11/03 14:13:29 mike Exp $"
  *
  *   Device scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -139,7 +139,7 @@ LoadDevices(const char *d)	/* I - Directory to scan */
     * Run the backend with no arguments and collect the output...
     */
 
-    snprintf(filename, sizeof(filename) - 1, "%s/%s", d, dent->d_name);
+    snprintf(filename, sizeof(filename), "%s/%s", d, dent->d_name);
     if ((fp = popen(filename, "r")) != NULL)
     {
      /*
@@ -279,7 +279,7 @@ LoadDevices(const char *d)	/* I - Directory to scan */
 
 	memset(dev, 0, sizeof(dev_info_t));
 	strcpy(dev->device_class, "network");
-	snprintf(dev->device_info, sizeof(dev->device_info) - 1,
+	snprintf(dev->device_info, sizeof(dev->device_info),
 	         "Unknown Network Device (%s)", dent->d_name);
 	strcpy(dev->device_make_and_model, "Unknown");
 	strncpy(dev->device_uri, dent->d_name, sizeof(dev->device_uri) - 1);
@@ -470,5 +470,5 @@ sigalrm_handler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: devices.c,v 1.10 2000/11/02 22:19:24 mike Exp $".
+ * End of "$Id: devices.c,v 1.11 2000/11/03 14:13:29 mike Exp $".
  */

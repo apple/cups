@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.35 2000/11/02 22:19:23 mike Exp $"
+ * "$Id: auth.c,v 1.36 2000/11/03 14:13:27 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -805,7 +805,7 @@ get_md5_passwd(const char *username,	/* I - Username */
 	tempgroup[33];			/* Group from file */
 
 
-  snprintf(filename, sizeof(filename) - 1, "%s/passwd.md5", ServerRoot);
+  snprintf(filename, sizeof(filename), "%s/passwd.md5", ServerRoot);
   if ((fp = fopen(filename, "r")) == NULL)
     return (NULL);
 
@@ -900,5 +900,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.35 2000/11/02 22:19:23 mike Exp $".
+ * End of "$Id: auth.c,v 1.36 2000/11/03 14:13:27 mike Exp $".
  */

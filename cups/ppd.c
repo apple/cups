@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.47 2000/10/19 02:03:24 mike Exp $"
+ * "$Id: ppd.c,v 1.48 2000/11/03 14:13:27 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -108,6 +108,7 @@ ppdClose(ppd_file_t *ppd)	/* I - PPD file record */
   ppd_emul_t	*emul;		/* Current emulation */
   ppd_group_t	*group;		/* Current group */
   char		**font;		/* Current font */
+  char		**filter;	/* Current filter */
 
 
  /*
@@ -121,6 +122,10 @@ ppdClose(ppd_file_t *ppd)	/* I - PPD file record */
   * Free all strings at the top level...
   */
 
+  safe_free(ppd->patches);
+  safe_free(ppd->jcl_begin);
+  safe_free(ppd->jcl_ps);
+  safe_free(ppd->jcl_end);
   safe_free(ppd->lang_encoding);
   safe_free(ppd->lang_version);
   safe_free(ppd->modelname);
@@ -170,6 +175,18 @@ ppdClose(ppd_file_t *ppd)	/* I - PPD file record */
 
   if (ppd->num_consts > 0)
     safe_free(ppd->consts);
+
+ /*
+  * Free any filters...
+  */
+
+  if (ppd->num_filters > 0)
+  {
+    for (i = ppd->num_filters, filter = ppd->filters; i > 0; i --, filter ++)
+      safe_free(*filter);
+
+    safe_free(ppd->filters);
+  }
 
  /*
   * Free any fonts...
@@ -1883,5 +1900,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.47 2000/10/19 02:03:24 mike Exp $".
+ * End of "$Id: ppd.c,v 1.48 2000/11/03 14:13:27 mike Exp $".
  */
