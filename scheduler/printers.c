@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.162 2004/06/29 03:27:35 mike Exp $"
+ * "$Id: printers.c,v 1.163 2004/10/04 19:13:15 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -562,13 +562,6 @@ DeletePrinter(printer_t *p,		/* I - Printer to delete */
   }
 
  /*
-  * If this printer is the next for browsing, point to the next one...
-  */
-
-  if (p == BrowseNext)
-    BrowseNext = p->next;
-
- /*
   * Remove the printer from the list...
   */
 
@@ -584,6 +577,13 @@ DeletePrinter(printer_t *p,		/* I - Printer to delete */
   */
 
   StopPrinter(p, update);
+
+ /*
+  * If this printer is the next for browsing, point to the next one...
+  */
+
+  if (p == BrowseNext)
+    BrowseNext = p->next;
 
  /*
   * Remove the dummy interface/icon/option files under IRIX...
@@ -2431,5 +2431,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.162 2004/06/29 03:27:35 mike Exp $".
+ * End of "$Id: printers.c,v 1.163 2004/10/04 19:13:15 mike Exp $".
  */

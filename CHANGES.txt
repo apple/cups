@@ -1,8 +1,10 @@
-CHANGES.txt - 09/30/2004
+CHANGES.txt - 10/04/2004
 ------------------------
 
 CHANGES IN CUPS V1.1.22rc1
 
+	- Deleting a printer could cause a crash with browsing
+	  enabled (STR #865, STR #881, STR #928)
 	- Browsing would turn off if the scheduler got an EAGAIN
 	  error (STR #924)
 	- The mime.types file didn't recognize PostScript as a
