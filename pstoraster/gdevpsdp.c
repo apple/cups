@@ -1,4 +1,6 @@
-/* Copyright (C) 1997, 1998 Aladdin Enterprises.  All rights reserved.
+/*
+  Copyright 1993-2000 by Easy Software Products.
+  Copyright 1997, 1998 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
   
@@ -22,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gdevpsdp.c,v 1.1 2000/03/08 23:14:25 mike Exp $ */
+/*$Id: gdevpsdp.c,v 1.2 2000/03/14 13:52:35 mike Exp $ */
 /* (Distiller) parameter handling for PostScript and PDF writers */
 #include "string_.h"
 #include "gx.h"
@@ -32,11 +34,16 @@
 #include "gdevpstr.h"
 #include "strimpl.h"		/* for short-sighted compilers */
 #include "scfx.h"
+#include <config.h>
+#ifdef HAVE_LIBJPEG
 #include "jpeglib.h"		/* for sdct.h */
 #include "sdct.h"
+#endif /* HAVE_LIBJPEG */
 #include "slzwx.h"
 #include "srlx.h"
+#ifdef HAVE_LIBZ
 #include "szlibx.h"
+#endif /* HAVE_LIBZ */
 
 /* ---------------- Get/put Distiller parameters ---------------- */
 
@@ -72,8 +79,12 @@ private const psdf_image_param_names Color_names =
 };
 private const psdf_image_filter_name Poly_filters[] =
 {
+#ifdef HAVE_LIBJPEG
     {"DCTEncode", &s_DCTE_template},
+#endif /* HAVE_LIBJPEG */
+#ifdef HAVE_LIBZ
     {"FlateEncode", &s_zlibE_template, psdf_version_ll3},
+#endif /* HAVE_LIBZ */
     {"LZWEncode", &s_LZWE_template},
     {0, 0}
 };
@@ -94,7 +105,9 @@ private const psdf_image_param_names Mono_names =
 private const psdf_image_filter_name Mono_filters[] =
 {
     {"CCITTFaxEncode", &s_CFE_template},
+#ifdef HAVE_LIBZ
     {"FlateEncode", &s_zlibE_template, psdf_version_ll3},
+#endif /* HAVE_LIBZ */
     {"LZWEncode", &s_LZWE_template},
     {"RunLengthEncode", &s_RLE_template},
     {0, 0}
@@ -123,7 +136,9 @@ private const char *const UCRandBGInfo_names[] =
 
 /* -------- Get parameters -------- */
 
+#ifdef HAVE_LIBJPEG
 extern stream_state_proc_get_params(s_DCTE_get_params, stream_DCT_state);
+#endif /* HAVE_LIBJPEG */
 extern stream_state_proc_get_params(s_CF_get_params, stream_CF_state);
 typedef stream_state_proc_get_params((*ss_get_params_t), stream_state);
 
@@ -133,6 +148,7 @@ psdf_CF_get_params(gs_param_list * plist, const stream_state * ss, bool all)
     return (ss == 0 ? 0 :
 	    s_CF_get_params(plist, (const stream_CF_state *)ss, all));
 }
+#ifdef HAVE_LIBJPEG
 private int
 psdf_DCT_get_params(gs_param_list * plist, const stream_state * ss, bool all)
 {
@@ -152,6 +168,7 @@ psdf_DCT_get_params(gs_param_list * plist, const stream_state * ss, bool all)
 	return code;
     return 0;
 }
+#endif /* HAVE_LIBJPEG */
 
 /*
  * Get an image Dict parameter.  Note that we return a default (usually
@@ -185,9 +202,11 @@ psdf_get_image_params(gs_param_list * plist,
     param_string_from_string(dsts,
 			     DownsampleType_names[params->DownsampleType]);
     if (
+#ifdef HAVE_LIBJPEG
 	   (code = psdf_get_image_dict_param(plist, pnames->ACSDict,
 					     params->ACSDict,
 					     psdf_DCT_get_params)) < 0 ||
+#endif /* HAVE_LIBJPEG */
 	   (code = param_write_bool(plist, pnames->AntiAlias,
 				    &params->AntiAlias)) < 0 ||
 	   (pnames->AutoFilter != 0 &&
@@ -197,11 +216,15 @@ psdf_get_image_params(gs_param_list * plist,
 				   &params->Depth)) < 0 ||
 	   (code = psdf_get_image_dict_param(plist, pnames->Dict,
 					     params->Dict,
+#ifdef HAVE_LIBJPEG
 					     (params->Dict == 0 ||
 					      params->Dict->template ==
 					      &s_CFE_template ?
 					      psdf_CF_get_params :
 					      psdf_DCT_get_params))) < 0 ||
+#else
+					      psdf_CF_get_params)) < 0 ||
+#endif /* HAVE_LIBJPEG */
 	   (code = param_write_bool(plist, pnames->Downsample,
 				    &params->Downsample)) < 0 ||
 	   (code = param_write_name(plist, pnames->DownsampleType,
@@ -291,7 +314,9 @@ gdev_psdf_get_params(gx_device * dev, gs_param_list * plist)
 
 /* -------- Put parameters -------- */
 
+#ifdef HAVE_LIBJPEG
 extern stream_state_proc_put_params(s_DCTE_put_params, stream_DCT_state);
+#endif /* HAVE_LIBJPEG */
 extern stream_state_proc_put_params(s_CF_put_params, stream_CF_state);
 typedef stream_state_proc_put_params((*ss_put_params_t), stream_state);
 
@@ -305,11 +330,13 @@ psdf_CF_put_params(gs_param_list * plist, stream_state * st)
     ss->BlackIs1 = true;
     return s_CF_put_params(plist, (stream_CF_state *) ss);
 }
+#ifdef HAVE_LIBJPEG
 private int
 psdf_DCT_put_params(gs_param_list * plist, stream_state * ss)
 {
     return s_DCTE_put_params(plist, (stream_DCT_state *) ss);
 }
+#endif /* HAVE_LIBJPEG */
 
 /* Compare a C string and a gs_param_string. */
 bool
@@ -434,7 +461,10 @@ psdf_put_image_dict_param(gs_param_list * plist, const gs_param_name pname,
 	     ****** THIS CAUSES A SEGV FOR DCT FILTERS, BECAUSE
 	     ****** THEY DON'T INTIALIZE PROPERLY.
 	     ******/
-	    if (template != &s_DCTE_template) {
+#ifdef HAVE_LIBJPEG
+	    if (template != &s_DCTE_template)
+#endif /* HAVE_LIBJPEG */
+	    {
 		stream_state *ss_new =
 		    s_alloc_state(mem, template->stype, pname);
 
@@ -503,9 +533,11 @@ psdf_put_image_params(const gx_device_psdf * pdev, gs_param_list * plist,
 	if (pnames->Dict[0] == 'M')
 	    template = &s_CFE_template,
 		put_params = psdf_CF_put_params;
+#ifdef HAVE_LIBJPEG
 	else
 	    template = &s_DCTE_template,
 		put_params = psdf_DCT_put_params;
+#endif /* HAVE_LIBJPEG */
 	code = psdf_put_image_dict_param(plist, pname, &params->Dict,
 					 template, put_params, mem);
 	if (code < 0)
@@ -615,8 +647,10 @@ gdev_psdf_put_params(gx_device * dev, gs_param_list * plist)
 				    UCRandBGInfo_names, ecode);
 	params.UCRandBGInfo = (enum psdf_ucr_and_bg_info)ucrbgi;
     }
+#ifdef HAVE_LIBZ
     ecode = psdf_put_bool_param(plist, "UseFlateCompression",
 				&params.UseFlateCompression, ecode);
+#endif /* HAVE_LIBZ */
 
     /* Color sampled image parameters */
 

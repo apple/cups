@@ -1,4 +1,6 @@
-/* Copyright (C) 1995, 1996, 1998 Aladdin Enterprises.  All rights reserved.
+/*
+  Copyright 1993-2000 by Easy Software Products
+  Copyright 1995, 1996, 1998 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
   
@@ -22,7 +24,9 @@
   GNU software to build or run it.
 */
 
-/*$Id: zfzlib.c,v 1.3 2000/03/08 23:15:38 mike Exp $ */
+#include <config.h>
+#ifdef HAVE_LIBZ
+/*$Id: zfzlib.c,v 1.4 2000/03/14 13:52:36 mike Exp $ */
 /* zlib and Flate filter creation */
 #include "ghost.h"
 #include "oper.h"
@@ -98,3 +102,4 @@ const op_def zfzlib_op_defs[] =
     {"1FlateDecode", zFlateD},
     op_def_end(0)
 };
+#endif /* HAVE_LIBZ */

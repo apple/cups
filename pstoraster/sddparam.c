@@ -1,4 +1,6 @@
-/* Copyright (C) 1998 Aladdin Enterprises.  All rights reserved.
+/*
+  Copyright 1993-2000 by Easy Software Products.
+  Copyright 1998 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
   
@@ -22,7 +24,9 @@
   GNU software to build or run it.
 */
 
-/*$Id: sddparam.c,v 1.1 2000/03/08 23:15:23 mike Exp $ */
+#include <config.h>
+#ifdef HAVE_LIBJPEG
+/*$Id: sddparam.c,v 1.2 2000/03/14 13:52:36 mike Exp $ */
 /* DCTDecode filter parameter setting and reading */
 #include "std.h"
 #include "jpeglib.h"
@@ -76,3 +80,4 @@ s_DCTD_put_params(gs_param_list * plist, stream_DCT_state * pdct)
 	DO_NOTHING;
     return code;
 }
+#endif /* HAVE_LIBJPEG */

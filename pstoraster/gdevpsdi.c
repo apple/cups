@@ -1,4 +1,6 @@
-/* Copyright (C) 1997, 1998 Aladdin Enterprises.  All rights reserved.
+/*
+  Copyright 1993-2000 by Easy Software Products.
+  Copyright 1997, 1998 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
   
@@ -22,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gdevpsdi.c,v 1.2 2000/03/09 15:09:28 mike Exp $ */
+/*$Id: gdevpsdi.c,v 1.3 2000/03/14 13:52:35 mike Exp $ */
 /* Image compression for PostScript and PDF writers */
 #include "math_.h"
 #include "gx.h"
@@ -30,14 +32,19 @@
 #include "gscspace.h"
 #include "gdevpsdf.h"
 #include "gdevpsds.h"
-#include "jpeglib.h"		/* for sdct.h */
 #include "strimpl.h"
 #include "scfx.h"
+#include <config.h>
+#ifdef HAVE_LIBJPEG
+#include "jpeglib.h"		/* for sdct.h */
 #include "sdct.h"
+#endif /* HAVE_LIBJPEG */
 #include "slzwx.h"
 #include "spngpx.h"
 #include "srlx.h"
+#ifdef HAVE_LIBZ
 #include "szlibx.h"
+#endif /* HAVE_LIBZ */
 
 /* ---------------- Image compression ---------------- */
 
@@ -98,13 +105,18 @@ setup_image_compression(psdf_binary_writer * pbw, const psdf_image_params * pdip
 	 * it appears that if UseFlateCompression is true, the default
 	 * compressor for AutoFilter is FlateEncode, not LZWEncode.
 	 */
+#ifdef HAVE_LIBZ
 	template =
 	    (pdev->params.UseFlateCompression &&
 	     pdev->version >= psdf_version_ll3 ?
 	     &s_zlibE_template : &s_LZWE_template);
+#else
+	template = &s_LZWE_template;
+#endif /* HAVE_LIBZ */
     }
     if (!pdip->Encode || template == 0)		/* no compression */
 	return 0;
+#ifdef HAVE_LIBJPEG
     /* Only use DCTE for 8-bit data. */
     if (template == &s_DCTE_template &&
 	!(pdip->Downsample ?
@@ -115,6 +127,7 @@ setup_image_compression(psdf_binary_writer * pbw, const psdf_image_params * pdip
 	/* Use LZW instead. */
 	template = &s_LZWE_template;
     }
+#endif /* HAVE_LIBJPEG */
     st = s_alloc_state(pdev->v_memory, template->stype,
 		       "setup_image_compression");
     if (st == 0)
@@ -136,8 +149,12 @@ setup_image_compression(psdf_binary_writer * pbw, const psdf_image_params * pdip
 	}
 	ss->Columns = pim->Width;
 	ss->Rows = (ss->EndOfBlock ? 0 : pim->Height);
+#ifdef HAVE_LIBZ
     } else if (template == &s_LZWE_template ||
 	       template == &s_zlibE_template) {
+#else
+    } else if (template == &s_LZWE_template) {
+#endif /* HAVE_LIBZ */
 	/* Add a PNGPredictor filter. */
 	int code = psdf_encode_binary(pbw, template, st);
 
@@ -158,8 +175,10 @@ setup_image_compression(psdf_binary_writer * pbw, const psdf_image_params * pdip
 	    ss->Colors = gs_color_space_num_components(pim->ColorSpace);
 	    ss->Columns = pim->Width;
 	}
+#ifdef HAVE_LIBJPEG
     } else if (template == &s_DCTE_template) {
 	/****** ADD PARAMETERS FROM pdip->Dict ******/
+#endif /* HAVE_LIBJPEG */
     } {
 	int code = psdf_encode_binary(pbw, template, st);
 

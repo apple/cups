@@ -1,4 +1,6 @@
-/* Copyright (C) 1998 Aladdin Enterprises.  All rights reserved.
+/*
+  Copyright 1993-2000 by Easy Software Products.
+  Copyright 1998 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
   
@@ -22,7 +24,9 @@
   GNU software to build or run it.
 */
 
-/*$Id: sdcparam.c,v 1.1 2000/03/08 23:15:23 mike Exp $ */
+#include <config.h>
+#ifdef HAVE_LIBJPEG
+/*$Id: sdcparam.c,v 1.2 2000/03/14 13:52:35 mike Exp $ */
 /* DCT filter parameter setting and reading */
 #include "memory_.h"
 #include "jpeglib.h"
@@ -623,3 +627,4 @@ s_DCT_put_huffman_tables(gs_param_list * plist, stream_DCT_state * pdct,
 	return_error(gs_error_rangecheck);
     return 0;
 }
+#endif /* HAVE_LIBJPEG */
