@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127 2001/03/30 14:56:55 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.1 2001/04/02 19:51:48 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -284,7 +284,7 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 	  */
 
 	  if (strcmp(username->values[0].string.text, "root") == 0 &&
-	      ntohl(con->http.hostaddr.sin_addr.s_addr) != 0x7f000001 &&
+	      strcasecmp(con->http.hostname, "localhost") != 0 &&
 	      strcmp(con->username, "root") != 0)
 	  {
 	   /*
@@ -2051,15 +2051,28 @@ create_job(client_t        *con,	/* I - Client connection */
   if (dtype == CUPS_PRINTER_CLASS)
   {
     printer = FindClass(dest);
+
+#ifdef AF_INET6
+    if (con->http.hostaddr.addr.sa_family == AF_INET6)
     snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/classes/%s",
-             ServerName, ntohs(con->http.hostaddr.sin_port), dest);
+             ServerName, ntohs(con->http.hostaddr.ipv6.sin6_port), dest);
+    else
+#endif /* AF_INET6 */
+    snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/classes/%s",
+             ServerName, ntohs(con->http.hostaddr.ipv4.sin_port), dest);
   }
   else
   {
     printer = FindPrinter(dest);
 
+#ifdef AF_INET6
+    if (con->http.hostaddr.addr.sa_family == AF_INET6)
     snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/printers/%s",
-             ServerName, ntohs(con->http.hostaddr.sin_port), dest);
+             ServerName, ntohs(con->http.hostaddr.ipv6.sin6_port), dest);
+    else
+#endif /* AF_INET6 */
+    snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/printers/%s",
+             ServerName, ntohs(con->http.hostaddr.ipv4.sin_port), dest);
   }
 
   if (!printer->accepting)
@@ -2253,8 +2266,15 @@ create_job(client_t        *con,	/* I - Client connection */
   * Fill in the response info...
   */
 
+#ifdef AF_INET6
+  if (con->http.hostaddr.addr.sa_family == AF_INET6)
+    snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
+	     ntohs(con->http.hostaddr.ipv6.sin6_port), job->id);
+  else
+#endif /* AF_INET6 */
   snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	   ntohs(con->http.hostaddr.sin_port), job->id);
+	   ntohs(con->http.hostaddr.ipv4.sin_port), job->id);
+
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL, job_uri);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
@@ -2820,8 +2840,14 @@ get_jobs(client_t        *con,		/* I - Client connection */
     * Send the requested attributes for each job...
     */
 
+#ifdef AF_INET6
+    if (con->http.hostaddr.addr.sa_family == AF_INET6)
+      snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
+	       ntohs(con->http.hostaddr.ipv6.sin6_port), job->id);
+    else
+#endif /* AF_INET6 */
     snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	     ntohs(con->http.hostaddr.sin_port), job->id);
+	     ntohs(con->http.hostaddr.ipv4.sin_port), job->id);
 
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
                  "job-more-info", NULL, job_uri);
@@ -2940,8 +2966,15 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
   * Put out the standard attributes...
   */
 
+#ifdef AF_INET6
+  if (con->http.hostaddr.addr.sa_family == AF_INET6)
+    snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d",
+	     ServerName, ntohs(con->http.hostaddr.ipv6.sin6_port),
+	     job->id);
+  else
+#endif /* AF_INET6 */
   snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d",
-	   ServerName, ntohs(con->http.hostaddr.sin_port),
+	   ServerName, ntohs(con->http.hostaddr.ipv4.sin_port),
 	   job->id);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
@@ -3678,15 +3711,27 @@ print_job(client_t        *con,		/* I - Client connection */
   if (dtype == CUPS_PRINTER_CLASS)
   {
     printer = FindClass(dest);
+#ifdef AF_INET6
+    if (con->http.hostaddr.addr.sa_family == AF_INET6)
+      snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/classes/%s",
+               ServerName, ntohs(con->http.hostaddr.ipv6.sin6_port), dest);
+    else
+#endif /* AF_INET6 */
     snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/classes/%s",
-             ServerName, ntohs(con->http.hostaddr.sin_port), dest);
+             ServerName, ntohs(con->http.hostaddr.ipv4.sin_port), dest);
   }
   else
   {
     printer = FindPrinter(dest);
 
+#ifdef AF_INET6
+    if (con->http.hostaddr.addr.sa_family == AF_INET6)
+      snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/printers/%s",
+               ServerName, ntohs(con->http.hostaddr.ipv6.sin6_port), dest);
+    else
+#endif /* AF_INET6 */
     snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/printers/%s",
-             ServerName, ntohs(con->http.hostaddr.sin_port), dest);
+             ServerName, ntohs(con->http.hostaddr.ipv4.sin_port), dest);
   }
 
   if (!printer->accepting)
@@ -3920,8 +3965,15 @@ print_job(client_t        *con,		/* I - Client connection */
   * Fill in the response info...
   */
 
+#ifdef AF_INET6
+  if (con->http.hostaddr.addr.sa_family == AF_INET6)
+    snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
+	     ntohs(con->http.hostaddr.ipv6.sin6_port), job->id);
+  else
+#endif /* AF_INET6 */
   snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	   ntohs(con->http.hostaddr.sin_port), job->id);
+	   ntohs(con->http.hostaddr.ipv4.sin_port), job->id);
+
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL, job_uri);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
@@ -4642,8 +4694,15 @@ send_document(client_t        *con,	/* I - Client connection */
   * Fill in the response info...
   */
 
+#ifdef AF_INET6
+  if (con->http.hostaddr.addr.sa_family == AF_INET6)
+    snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
+	     ntohs(con->http.hostaddr.ipv6.sin6_port), job->id);
+  else
+#endif /* AF_INET6 */
   snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	   ntohs(con->http.hostaddr.sin_port), job->id);
+	   ntohs(con->http.hostaddr.ipv4.sin_port), job->id);
+
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL,
                job_uri);
 
@@ -5365,5 +5424,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127 2001/03/30 14:56:55 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.1 2001/04/02 19:51:48 mike Exp $".
  */

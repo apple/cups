@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.h,v 1.12 2001/01/22 15:03:59 mike Exp $"
+ * "$Id: dirsvc.h,v 1.12.2.1 2001/04/02 19:51:48 mike Exp $"
  *
  *   Directory services definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -30,7 +30,7 @@
 typedef struct
 {
   authmask_t		from;		/* Source address/name mask */
-  struct sockaddr_in	to;		/* Destination address */
+  http_addr_t		to;		/* Destination address */
 } dirsvc_relay_t;
 
 
@@ -40,7 +40,7 @@ typedef struct
 
 typedef struct
 {
-  char			hostname[16];	/* Hostname (actually, IP address) */
+  char			hostname[64];	/* Hostname (actually, IP address) */
   int			port;		/* Port number */
   int			pid;		/* Current poll server PID */
 } dirsvc_poll_t;
@@ -64,7 +64,7 @@ VAR int			Browsing	VALUE(TRUE),
 					/* Time out for printers in seconds */
 			NumBrowsers	VALUE(0);
 					/* Number of broadcast addresses */
-VAR struct sockaddr_in	Browsers[MAX_BROWSERS];
+VAR http_addr_t		Browsers[MAX_BROWSERS];
 					/* Broadcast addresses */
 VAR location_t		*BrowseACL	VALUE(NULL);
 					/* Browser access control list */
@@ -92,5 +92,5 @@ extern void	StopPolling(void);
 
 
 /*
- * End of "$Id: dirsvc.h,v 1.12 2001/01/22 15:03:59 mike Exp $".
+ * End of "$Id: dirsvc.h,v 1.12.2.1 2001/04/02 19:51:48 mike Exp $".
  */

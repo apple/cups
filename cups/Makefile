@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.53 2001/03/09 20:06:06 mike Exp $"
+# "$Id: Makefile,v 1.53.2.1 2001/04/02 19:51:43 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,9 +28,9 @@ include ../Makedefs
 # Object files...
 #
 
-LIBOBJS	=	dest.o emit.o encode.o http.o ipp.o language.o mark.o md5.o \
-		md5passwd.o options.o page.o ppd.o snprintf.o string.o \
-		tempfile.o usersys.o util.o
+LIBOBJS	=	dest.o emit.o encode.o http.o http-addr.o ipp.o language.o \
+		mark.o md5.o md5passwd.o options.o page.o ppd.o snprintf.o \
+		string.o tempfile.o usersys.o util.o
 OBJS	=	$(LIBOBJS) testhttp.o testppd.o
 
 
@@ -60,7 +60,7 @@ all:	$(TARGETS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) `basename $(LIBCUPS) .2`
+	$(RM) $(OBJS) $(TARGETS) `basename $(LIBCUPS) .3`
 
 
 #
@@ -77,20 +77,20 @@ install:	all
 	$(INSTALL_LIB) $(LIBCUPS) $(LIBDIR)
 	if test $(LIBCUPS) != "libcups.a" -a $(LIBCUPS) != "libcups.la"; then \
 		$(INSTALL_LIB) libcups.a $(LIBDIR); \
-		$(RM) $(LIBDIR)/`basename $(LIBCUPS) .2`; \
-		$(LN) $(LIBCUPS) $(LIBDIR)/`basename $(LIBCUPS) .2`; \
+		$(RM) $(LIBDIR)/`basename $(LIBCUPS) .3`; \
+		$(LN) $(LIBCUPS) $(LIBDIR)/`basename $(LIBCUPS) .3`; \
 	fi
 
 
 #
-# libcups.so.2, libcups.sl.1
+# libcups.so.3, libcups.sl.3
 #
 
-libcups.so.2 libcups.sl.2:	$(LIBOBJS) ../Makedefs
+libcups.so.3 libcups.sl.3:	$(LIBOBJS) ../Makedefs
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS) $(SSLLIBS)
-	$(RM) `basename $@ .2`
-	$(LN) $@ `basename $@ .2`
+	$(RM) `basename $@ .3`
+	$(LN) $@ `basename $@ .3`
 
 
 #
@@ -100,7 +100,7 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS) ../Makedefs
 libcups.la:    $(LIBOBJS) ../Makedefs
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
-		-version-info 2:2 $(SSLLIBS)
+		-version-info 3:0 $(SSLLIBS)
 
 
 #
@@ -127,6 +127,7 @@ dest.o:		cups.h http.h ipp.h language.h string.h
 emit.o:		ppd.h
 encode.o:	cups.h ipp.h string.h
 http.o:		http.h ipp.h md5.h string.h
+http-addr.o:	http.h string.h
 ipp.o:		http.h ipp.h string.h language.h
 language.o:	cups_C.h language.h string.h
 mark.o:		ppd.h
@@ -166,5 +167,5 @@ $(OBJS):	../Makedefs ../config.h
 
 
 #
-# End of "$Id: Makefile,v 1.53 2001/03/09 20:06:06 mike Exp $".
+# End of "$Id: Makefile,v 1.53.2.1 2001/04/02 19:51:43 mike Exp $".
 #

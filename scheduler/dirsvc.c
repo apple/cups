@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73 2001/03/28 16:55:54 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.1 2001/04/02 19:51:48 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -162,10 +162,10 @@ UpdateBrowseList(void)
   int		bytes;			/* Number of bytes left */
   char		packet[1540],		/* Broadcast packet */
 		*pptr;			/* Pointer into packet */
-  struct sockaddr_in srcaddr;		/* Source address */
+  http_addr_t	srcaddr;		/* Source address */
   char		srcname[1024];		/* Source hostname */
-  unsigned	address;		/* Source address (host order) */
-  struct hostent *srchost;		/* Host entry for source address */
+  unsigned	address[4],		/* Source address */
+		temp;			/* Temporary address var (host order) */
   cups_ptype_t	type;			/* Printer type */
   ipp_pstate_t	state;			/* Printer state */
   char		uri[HTTP_MAX_URI],	/* Printer URI */
@@ -217,27 +217,32 @@ UpdateBrowseList(void)
   * Figure out where it came from...
   */
 
-  address = ntohl(srcaddr.sin_addr.s_addr);
+#ifdef AF_INET6
+  if (srcaddr.addr.sa_family == AF_INET6)
+  {
+    address[0] = ntohl(srcaddr.ipv6.sin6_addr.s6_addr32[0]);
+    address[1] = ntohl(srcaddr.ipv6.sin6_addr.s6_addr32[1]);
+    address[2] = ntohl(srcaddr.ipv6.sin6_addr.s6_addr32[2]);
+    address[3] = ntohl(srcaddr.ipv6.sin6_addr.s6_addr32[3]);
+  }
+  else
+#endif /* AF_INET6 */
+  {
+    temp = ntohl(srcaddr.ipv4.sin_addr.s_addr);
+
+    address[3] = temp & 255;
+    temp       >>= 8;
+    address[2] = temp & 255;
+    temp       >>= 8;
+    address[1] = temp & 255;
+    temp       >>= 8;
+    address[0] = temp & 255;
+  }
 
   if (HostNameLookups)
-#ifndef __sgi
-    srchost = gethostbyaddr((char *)&(srcaddr.sin_addr), sizeof(struct in_addr),
-                            AF_INET);
-#else
-    srchost = gethostbyaddr(&(srcaddr.sin_addr), sizeof(struct in_addr),
-                            AF_INET);
-#endif /* !__sgi */
+    httpAddrLookup(&srcaddr, srcname, sizeof(srcname));
   else
-    srchost = NULL;
-
-  if (srchost == NULL)
-    sprintf(srcname, "%d.%d.%d.%d", address >> 24, (address >> 16) & 255,
-            (address >> 8) & 255, address & 255);
-  else
-  {
-    strncpy(srcname, srchost->h_name, sizeof(srcname) - 1);
-    srcname[sizeof(srcname) - 1] = '\0';
-  }
+    httpAddrString(&srcaddr, srcname, sizeof(srcname));
 
   len = strlen(srcname);
 
@@ -247,7 +252,7 @@ UpdateBrowseList(void)
 
   if (BrowseACL)
   {
-    if (address == 0x7f000001 || strcasecmp(srcname, "localhost") == 0)
+    if (httpAddrLocalhost(&srcaddr) || strcasecmp(srcname, "localhost") == 0)
     {
      /*
       * Access from localhost (127.0.0.1) is always allowed...
@@ -398,7 +403,7 @@ UpdateBrowseList(void)
     if (CheckAuth(address, srcname, len, 1, &(Relays[i].from)))
       if (sendto(BrowseSocket, packet, bytes, 0,
                  (struct sockaddr *)&(Relays[i].to),
-		 sizeof(struct sockaddr_in)) <= 0)
+		 sizeof(http_addr_t)) <= 0)
       {
 	LogMessage(L_ERROR, "UpdateBrowseList: sendto failed for relay %d - %s.",
 	           i + 1, strerror(errno));
@@ -948,5 +953,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73 2001/03/28 16:55:54 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.1 2001/04/02 19:51:48 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.81 2001/03/09 20:06:07 mike Exp $"
+ * "$Id: util.c,v 1.81.2.1 2001/04/02 19:51:44 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -1332,8 +1332,10 @@ cups_local_auth(http_t *http)	/* I - Connection */
   * See if we are accessing localhost...
   */
 
-  if (ntohl(http->hostaddr.sin_addr.s_addr) != 0x7f000001 &&
-      strcasecmp(http->hostname, "localhost") != 0)
+  if (strcasecmp(http->hostname, "localhost") != 0)
+    return (0);
+
+  if (!httpAddrLocalhost(&(http->hostaddr)))
     return (0);
 
  /*
@@ -1374,5 +1376,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.81 2001/03/09 20:06:07 mike Exp $".
+ * End of "$Id: util.c,v 1.81.2.1 2001/04/02 19:51:44 mike Exp $".
  */

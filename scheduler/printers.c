@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93 2001/03/30 14:56:57 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.1 2001/04/02 19:51:50 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -87,8 +87,15 @@ AddPrinter(const char *name)	/* I - Name of printer */
 
   strncpy(p->name, name, sizeof(p->name) - 1);
   strncpy(p->hostname, ServerName, sizeof(p->hostname) - 1);
+
+#ifdef AF_INET6
+  if (Listeners[0].address.addr.sa_family == AF_INET6)
+    snprintf(p->uri, sizeof(p->uri), "ipp://%s:%d/printers/%s", ServerName,
+             ntohs(Listeners[0].address.ipv6.sin6_port), name);
+  else
+#endif /* AF_INET6 */
   snprintf(p->uri, sizeof(p->uri), "ipp://%s:%d/printers/%s", ServerName,
-           ntohs(Listeners[0].address.sin_port), name);
+           ntohs(Listeners[0].address.ipv4.sin_port), name);
 
  /*
   * Since uri and more_info are URIs and use the HTTP_MAX_URI constant
@@ -1782,5 +1789,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.93 2001/03/30 14:56:57 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.1 2001/04/02 19:51:50 mike Exp $".
  */

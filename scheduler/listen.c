@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.9 2001/02/20 22:02:11 mike Exp $"
+ * "$Id: listen.c,v 1.9.2.1 2001/04/02 19:51:50 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -96,6 +96,7 @@ StartListening(void)
 		val;		/* Parameter value */
   listener_t	*lis;		/* Current listening socket */
   struct hostent *host;		/* Host entry for server address */
+  char		s[256];		/* String addresss */
 
 
   LogMessage(L_DEBUG, "StartListening: NumListeners=%d", NumListeners);
@@ -112,8 +113,7 @@ StartListening(void)
     * Found the server's address!
     */
 
-    memcpy((char *)&(ServerAddr.sin_addr), host->h_addr, host->h_length);
-    ServerAddr.sin_family = host->h_addrtype;
+    httpAddrLoad(host, 0, 0, &ServerAddr);
   }
   else
   {
@@ -124,7 +124,7 @@ StartListening(void)
     LogMessage(L_ERROR, "StartListening: Unable to find IP address for server name \"%s\"!\n",
                ServerName);
 
-    ServerAddr.sin_family = AF_INET;
+    ServerAddr.ipv4.sin_family = AF_INET;
   }
 
  /*
@@ -133,11 +133,18 @@ StartListening(void)
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
   {
-    LogMessage(L_DEBUG, "StartListening: address=%08x port=%d",
-               ntohl(lis->address.sin_addr.s_addr),
-	       ntohs(lis->address.sin_port));
+    httpAddrString(&(lis->address), s, sizeof(s));
 
-    if ((lis->fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+#ifdef AF_INET6
+    if (lis->address.addr.sa_family == AF_INET6)
+      LogMessage(L_DEBUG, "StartListening: address=%s port=%d (IPv6)", s,
+		 ntohs(lis->address.ipv6.sin6_port));
+    else
+#endif /* AF_INET6 */
+    LogMessage(L_DEBUG, "StartListening: address=%s port=%d", s,
+	       ntohs(lis->address.ipv4.sin_port));
+
+    if ((lis->fd = socket(lis->address.addr.sa_family, SOCK_STREAM, 0)) == -1)
     {
       LogMessage(L_ERROR, "StartListening: Unable to open listen socket - %s.",
                  strerror(errno));
@@ -163,7 +170,8 @@ StartListening(void)
 
     if (bind(lis->fd, (struct sockaddr *)&(lis->address), sizeof(lis->address)) < 0)
     {
-      LogMessage(L_ERROR, "StartListening: Unable to bind socket - %s.", strerror(errno));
+      LogMessage(L_ERROR, "StartListening: Unable to bind socket - %s.",
+                 strerror(errno));
       exit(errno);
     }
 
@@ -208,5 +216,5 @@ StopListening(void)
 
 
 /*
- * End of "$Id: listen.c,v 1.9 2001/02/20 22:02:11 mike Exp $".
+ * End of "$Id: listen.c,v 1.9.2.1 2001/04/02 19:51:50 mike Exp $".
  */

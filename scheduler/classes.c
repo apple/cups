@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.34 2001/03/15 20:00:57 andy Exp $"
+ * "$Id: classes.c,v 1.34.2.1 2001/04/02 19:51:47 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -62,8 +62,14 @@ AddClass(const char *name)	/* I - Name of class */
     */
 
     c->type = CUPS_PRINTER_CLASS;
+#ifdef AF_INET6
+    if (Listeners[0].address.addr.sa_family == AF_INET6)
+      snprintf(c->uri, sizeof(c->uri), "ipp://%s:%d/classes/%s", ServerName,
+               ntohs(Listeners[0].address.ipv6.sin6_port), name);
+    else
+#endif /* AF_INET6 */
     snprintf(c->uri, sizeof(c->uri), "ipp://%s:%d/classes/%s", ServerName,
-             ntohs(Listeners[0].address.sin_port), name);
+             ntohs(Listeners[0].address.ipv4.sin_port), name);
 
    /*
     * MRS - more_info and uri are both HTTP_MAX_URI in size, and will always
@@ -630,5 +636,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.34 2001/03/15 20:00:57 andy Exp $".
+ * End of "$Id: classes.c,v 1.34.2.1 2001/04/02 19:51:47 mike Exp $".
  */

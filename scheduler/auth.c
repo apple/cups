@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.41 2001/02/21 17:01:17 mike Exp $"
+ * "$Id: auth.c,v 1.41.2.1 2001/04/02 19:51:46 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -187,8 +187,8 @@ AllowHost(location_t *loc,	/* I - Location to add to */
 
 void
 AllowIP(location_t *loc,	/* I - Location to add to */
-        unsigned   address,	/* I - IP address to add */
-        unsigned   netmask)	/* I - Netmask of address */
+        unsigned   address[4],	/* I - IP address to add */
+        unsigned   netmask[4])	/* I - Netmask of address */
 {
   authmask_t	*temp;		/* New host/domain mask */
 
@@ -196,9 +196,9 @@ AllowIP(location_t *loc,	/* I - Location to add to */
   if ((temp = add_allow(loc)) == NULL)
     return;
 
-  temp->type            = AUTH_IP;
-  temp->mask.ip.address = address;
-  temp->mask.ip.netmask = netmask;
+  temp->type = AUTH_IP;
+  memcpy(temp->mask.ip.address, address, sizeof(address));
+  memcpy(temp->mask.ip.netmask, netmask, sizeof(netmask));
 
   LogMessage(L_DEBUG, "AllowIP: %s allow %08x/%08x", loc->location,
              address, netmask);
@@ -210,12 +210,15 @@ AllowIP(location_t *loc,	/* I - Location to add to */
  */
 
 int				/* O - 1 if mask matches, 0 otherwise */
-CheckAuth(unsigned   ip,	/* I - Client address */
+CheckAuth(unsigned   ip[4],	/* I - Client address */
           char       *name,	/* I - Client hostname */
           int        name_len,	/* I - Length of hostname */
           int        num_masks, /* I - Number of masks */
           authmask_t *masks)	/* I - Masks */
 {
+  int	i;			/* Looping var */
+
+
   while (num_masks > 0)
   {
     switch (masks->type)
@@ -244,7 +247,11 @@ CheckAuth(unsigned   ip,	/* I - Client address */
 	  * Check for IP/network address match...
 	  */
 
-          if ((ip & masks->mask.ip.netmask) == masks->mask.ip.address)
+          for (i = 0; i < 4; i ++)
+	    if ((ip[i] & masks->mask.ip.netmask[i]) != masks->mask.ip.address[i])
+	      break;
+
+	  if (i == 4)
 	    return (1);
           break;
     }
@@ -473,8 +480,8 @@ DenyHost(location_t *loc,	/* I - Location to add to */
 
 void
 DenyIP(location_t *loc,		/* I - Location to add to */
-       unsigned   address,	/* I - IP address to add */
-       unsigned   netmask)	/* I - Netmask of address */
+       unsigned   address[4],	/* I - IP address to add */
+       unsigned   netmask[4])	/* I - Netmask of address */
 {
   authmask_t	*temp;		/* New host/domain mask */
 
@@ -482,9 +489,9 @@ DenyIP(location_t *loc,		/* I - Location to add to */
   if ((temp = add_deny(loc)) == NULL)
     return;
 
-  temp->type            = AUTH_IP;
-  temp->mask.ip.address = address;
-  temp->mask.ip.netmask = netmask;
+  temp->type = AUTH_IP;
+  memcpy(temp->mask.ip.address, address, sizeof(address));
+  memcpy(temp->mask.ip.netmask, netmask, sizeof(netmask));
 
   LogMessage(L_DEBUG, "DenyIP: %s deny %08x/%08x\n", loc->location,
              address, netmask);
@@ -583,7 +590,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 {
   int		i, j,		/* Looping vars */
 		auth;		/* Authorization status */
-  unsigned	address;	/* Authorization address */
+  unsigned	address[4];	/* Authorization address */
   location_t	*best;		/* Best match for location so far */
   int		hostlen;	/* Length of hostname */
   struct passwd	*pw;		/* User password data */
@@ -637,13 +644,44 @@ IsAuthorized(client_t *con)	/* I - Connection */
   * Check host/ip-based accesses...
   */
 
-  address = ntohl(con->http.hostaddr.sin_addr.s_addr);
+#ifdef AF_INET6
+  if (con->http.hostaddr.addr.sa_family == AF_INET6)
+  {
+    address[0] = ntohl(con->http.hostaddr.ipv6.sin6_addr.s6_addr32[0]);
+    address[1] = ntohl(con->http.hostaddr.ipv6.sin6_addr.s6_addr32[1]);
+    address[2] = ntohl(con->http.hostaddr.ipv6.sin6_addr.s6_addr32[2]);
+    address[3] = ntohl(con->http.hostaddr.ipv6.sin6_addr.s6_addr32[3]);
+  }
+  else
+#endif /* AF_INET6 */
+  if (con->http.hostaddr.addr.sa_family == AF_INET)
+  {
+    unsigned temp;		/* Temporary address variable */
+
+
+   /*
+    * Convert 32-bit IPv4 address to 128 bits...
+    */
+
+    temp = ntohl(con->http.hostaddr.ipv4.sin_addr.s_addr);
+
+    address[3] = temp & 255;
+    temp       >>= 8;
+    address[2] = temp & 255;
+    temp       >>= 8;
+    address[1] = temp & 255;
+    temp       >>= 8;
+    address[0] = temp & 255;
+  }
+  else
+    memset(address, 0, sizeof(address));
+
   hostlen = strlen(con->http.hostname);
 
-  if (address == 0x7f000001 || strcasecmp(con->http.hostname, "localhost") == 0)
+  if (strcasecmp(con->http.hostname, "localhost") == 0)
   {
    /*
-    * Access from localhost (127.0.0.1) is always allowed...
+    * Access from localhost (127.0.0.1 or 0.0.0.1) is always allowed...
     */
 
     auth = AUTH_ALLOW;
@@ -733,8 +771,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
   DEBUG_printf(("IsAuthorized: Checking \"%s\", address = %08x, hostname = \"%s\"\n",
                 con->username, address, con->http.hostname));
 
-  if ((address != 0x7f000001 &&
-       strcasecmp(con->http.hostname, "localhost") != 0) ||
+  if (strcasecmp(con->http.hostname, "localhost") != 0 ||
       strncmp(con->http.fields[HTTP_FIELD_AUTHORIZATION], "Local", 5) != 0)
   {
    /*
@@ -1149,5 +1186,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.41 2001/02/21 17:01:17 mike Exp $".
+ * End of "$Id: auth.c,v 1.41.2.1 2001/04/02 19:51:46 mike Exp $".
  */

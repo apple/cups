@@ -1,7 +1,7 @@
 /*
- * "$Id: http.c,v 1.82 2001/03/06 14:57:00 mike Exp $"
+ * "$Id: http.c,v 1.82.2.1 2001/04/02 19:51:43 mike Exp $"
  *
- *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
+ *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-2001 by Easy Software Products, all rights reserved.
  *
@@ -311,6 +311,7 @@ http_t *			/* O - New HTTP connection */
 httpConnect(const char *host,	/* I - Host to connect to */
             int        port)	/* I - Port number */
 {
+  int			i;		/* Looping var */
   http_t		*http;		/* New HTTP connection */
   struct hostent	*hostaddr;	/* Host address data */
 
@@ -341,8 +342,14 @@ httpConnect(const char *host,	/* I - Host to connect to */
   * Verify that it is an IPv4 address (IPv6 support will come in CUPS 1.2...)
   */
 
+#ifdef AF_INET6
+  if ((hostaddr->h_addrtype != AF_INET || hostaddr->h_length != 4) &&
+      (hostaddr->h_addrtype != AF_INET6 || hostaddr->h_length != 16))
+    return (NULL);
+#else
   if (hostaddr->h_addrtype != AF_INET || hostaddr->h_length != 4)
     return (NULL);
+#endif /* AF_INET6 */
 
  /*
   * Allocate memory for the structure...
@@ -362,32 +369,50 @@ httpConnect(const char *host,	/* I - Host to connect to */
   */
 
   strncpy(http->hostname, host, sizeof(http->hostname) - 1);
-  memcpy((char *)&(http->hostaddr.sin_addr), hostaddr->h_addr, hostaddr->h_length);
-  http->hostaddr.sin_family = hostaddr->h_addrtype;
-#ifdef WIN32
-  http->hostaddr.sin_port   = htons((u_short)port);
-#else
-  http->hostaddr.sin_port   = htons(port);
-#endif /* WIN32 */
+  memset(&(http->hostaddr), 0, sizeof(http->hostaddr));
 
- /*
-  * Set the default encryption status...
-  */
+  http->hostaddr.addr.sa_family = hostaddr->h_addrtype;
 
   if (port == 443)
+  {
+   /*
+    * Set the default encryption status...
+    */
+
     http->encryption = HTTP_ENCRYPT_ALWAYS;
+  }
 
  /*
-  * Connect to the remote system...
+  * Loop through the addresses we have until one of them connects...
   */
 
-  if (httpReconnect(http))
+  for (i = 0; hostaddr->h_addr_list[i]; i ++)
+  {
+   /*
+    * Load the address...
+    */
+
+    httpAddrLoad(hostaddr, port, i, &(http->hostaddr));
+
+   /*
+    * Connect to the remote system...
+    */
+
+    if (!httpReconnect(http))
+      break;
+  }
+
+ /*
+  * Return the new structure if we could connect; otherwise, bail out...
+  */
+
+  if (hostaddr->h_addr_list[i])
+    return (http);
+  else
   {
     free(http);
     return (NULL);
   }
-  else
-    return (http);
 }
 
 
@@ -462,7 +487,7 @@ httpReconnect(http_t *http)	/* I - HTTP data */
   * Create the socket and set options to allow reuse.
   */
 
-  if ((http->fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+  if ((http->fd = socket(http->hostaddr.addr.sa_family, SOCK_STREAM, 0)) < 0)
   {
 #if defined(WIN32) || defined(__EMX__)
     http->error  = WSAGetLastError();
@@ -2038,5 +2063,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.82 2001/03/06 14:57:00 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.1 2001/04/02 19:51:43 mike Exp $".
  */

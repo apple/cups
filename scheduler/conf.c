@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77 2001/03/30 03:07:52 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.1 2001/04/02 19:51:48 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -27,6 +27,7 @@
  *   read_configuration() - Read a configuration file.
  *   read_location()      - Read a <Location path> definition.
  *   get_address()        - Get an address + port number from a line.
+ *   get_addr_and_mask()  - Get an IP address and netmask.
  */
 
 /*
@@ -96,6 +97,7 @@ static var_t	variables[] =
   { "KeepAlive",	&KeepAlive,		VAR_BOOLEAN,	0 },
   { "LimitRequestBody",	&MaxRequestSize,	VAR_INTEGER,	0 },
   { "ListenBackLog",	&ListenBackLog,		VAR_INTEGER,	0 },
+  { "MaxActiveJobs",	&MaxActiveJobs,		VAR_INTEGER,	0 },
   { "MaxClients",	&MaxClients,		VAR_INTEGER,	0 },
   { "MaxJobs",		&MaxJobs,		VAR_INTEGER,	0 },
   { "MaxJobsPerPrinter",&MaxJobsPerPrinter,	VAR_INTEGER,	0 },
@@ -124,6 +126,15 @@ static var_t	variables[] =
 };
 #define NUM_VARS	(sizeof(variables) / sizeof(variables[0]))
 
+static unsigned		ones[4] =
+			{
+			  0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff
+			};
+static unsigned		zeros[4] =
+			{
+			  0x00000000, 0x00000000, 0x00000000, 0x00000000
+			};
+
 
 /*
  * Local functions...
@@ -131,8 +142,10 @@ static var_t	variables[] =
 
 static int	read_configuration(FILE *fp);
 static int	read_location(FILE *fp, char *name, int linenum);
-static int	get_address(char *value, unsigned defaddress, int defport,
-		            struct sockaddr_in *address);
+static int	get_address(const char *value, unsigned defaddress, int defport,
+		            int deffamily, http_addr_t *address);
+static int	get_addr_and_mask(const char *value, unsigned *ip,
+		                  unsigned *mask);
 
 
 /*
@@ -295,33 +308,38 @@ ReadConfiguration(void)
   * Numeric options...
   */
 
-  FilterLevel      = 0;
-  FilterLimit      = 0;
-  HostNameLookups  = FALSE;
-  ImplicitClasses  = TRUE;
-  KeepAlive        = TRUE;
-  KeepAliveTimeout = DEFAULT_KEEPALIVE;
-  ListenBackLog    = SOMAXCONN;
-  LogLevel         = L_ERROR;
-  MaxClients       = 100;
-  MaxLogSize       = 1024 * 1024;
-  MaxRequestSize   = 0;
-  RunAsUser        = FALSE;
-  Timeout          = DEFAULT_TIMEOUT;
+  FilterLevel       = 0;
+  FilterLimit       = 0;
+  HostNameLookups   = FALSE;
+  ImplicitClasses   = TRUE;
+  KeepAlive         = TRUE;
+  KeepAliveTimeout  = DEFAULT_KEEPALIVE;
+  ListenBackLog     = SOMAXCONN;
+  LogLevel          = L_ERROR;
+  MaxClients        = 100;
+  MaxLogSize        = 1024 * 1024;
+  MaxRequestSize    = 0;
+  RunAsUser         = FALSE;
+  Timeout           = DEFAULT_TIMEOUT;
 
-  BrowseInterval   = DEFAULT_INTERVAL;
-  BrowsePort       = ippPort();
-  BrowseShortNames = TRUE;
-  BrowseTimeout    = DEFAULT_TIMEOUT;
-  Browsing         = TRUE;
-  NumBrowsers      = 0;
-  NumPolled        = 0;
+  BrowseInterval    = DEFAULT_INTERVAL;
+  BrowsePort        = ippPort();
+  BrowseShortNames  = TRUE;
+  BrowseTimeout     = DEFAULT_TIMEOUT;
+  Browsing          = TRUE;
+  NumBrowsers       = 0;
+  NumPolled         = 0;
 
-  NumListeners     = 0;
+  NumListeners      = 0;
 
-  JobHistory       = DEFAULT_HISTORY;
-  JobFiles         = DEFAULT_FILES;
-  JobAutoPurge     = 0;
+  JobHistory        = DEFAULT_HISTORY;
+  JobFiles          = DEFAULT_FILES;
+  JobAutoPurge      = 0;
+
+  MaxJobs           = 0;
+  MaxActiveJobs     = 0;
+  MaxJobsPerPrinter = 0;
+  MaxJobsPerUser    = 0;
 
  /*
   * Read the configuration file...
@@ -440,6 +458,14 @@ ReadConfiguration(void)
     LogMessage(L_INFO, "Configured for up to %d clients.", MaxClients);
 
  /*
+  * Check the MaxActiveJobs setting; limit to 1/3 the available
+  * file descriptors, since we need a pipe for each job...
+  */
+
+  if (MaxActiveJobs > (limit.rlim_max / 3))
+    MaxActiveJobs = limit.rlim_max / 3;
+
+ /*
   * Read the MIME type and conversion database...
   */
 
@@ -501,22 +527,12 @@ read_configuration(FILE *fp)		/* I - File to read from */
 		*nameptr,		/* Pointer into name */
 		*value;			/* Pointer to value */
   var_t		*var;			/* Current variable */
-  unsigned	address,		/* Address value */
-		netmask;		/* Netmask value */
-  int		ip[4],			/* IP address components */
-		ipcount,		/* Number of components provided */
- 		mask[4];		/* IP netmask components */
+  unsigned	ip[4],			/* Address value */
+		mask[4];		/* Netmask value */
   dirsvc_relay_t *relay;		/* Relay data */
   dirsvc_poll_t	*poll;			/* Polling data */
-  struct sockaddr_in polladdr;		/* Polling address */
+  http_addr_t	polladdr;		/* Polling address */
   location_t	*location;		/* Browse location */
-  static unsigned netmasks[4] =		/* Standard netmasks... */
-  {
-    0xff000000,
-    0xffff0000,
-    0xffffff00,
-    0xffffffff
-  };
 
 
  /*
@@ -599,12 +615,20 @@ read_configuration(FILE *fp)		/* I - File to read from */
 
       if (NumListeners < MAX_LISTENERS)
       {
-        if (get_address(value, INADDR_ANY, IPP_PORT,
+        if (get_address(value, INADDR_ANY, IPP_PORT, AF_INET,
 	                &(Listeners[NumListeners].address)))
         {
-          LogMessage(L_INFO, "Listening to %x:%d",
-                     ntohl(Listeners[NumListeners].address.sin_addr.s_addr),
-                     ntohs(Listeners[NumListeners].address.sin_port));
+          httpAddrString(&(Listeners[NumListeners].address), line,
+	                 sizeof(line));
+
+#ifdef AF_INET6
+          if (Listeners[NumListeners].address.addr.sa_family == AF_INET6)
+            LogMessage(L_INFO, "Listening to %s:%d (IPv6)", line,
+                       ntohs(Listeners[NumListeners].address.ipv6.sin6_port));
+	  else
+#endif /* AF_INET6 */
+          LogMessage(L_INFO, "Listening to %s:%d", line,
+                     ntohs(Listeners[NumListeners].address.ipv4.sin_port));
 	  NumListeners ++;
         }
 	else
@@ -625,12 +649,21 @@ read_configuration(FILE *fp)		/* I - File to read from */
 
       if (NumListeners < MAX_LISTENERS)
       {
-        if (get_address(value, INADDR_ANY, IPP_PORT,
+        if (get_address(value, INADDR_ANY, IPP_PORT, AF_INET,
 	                &(Listeners[NumListeners].address)))
         {
-          LogMessage(L_INFO, "Listening to %x:%d (SSL)",
-                     ntohl(Listeners[NumListeners].address.sin_addr.s_addr),
-                     ntohs(Listeners[NumListeners].address.sin_port));
+          httpAddrString(&(Listeners[NumListeners].address), line,
+	                 sizeof(line));
+
+#  ifdef AF_INET6
+          if (Listeners[NumListeners].address.addr.sa_family == AF_INET6)
+            LogMessage(L_INFO, "Listening to %s:%d (SSL, IPv6)", line,
+                       ntohs(Listeners[NumListeners].address.ipv6.sin6_port));
+	  else
+#  endif /* AF_INET6 */
+          LogMessage(L_INFO, "Listening to %s:%d (SSL)", line,
+                     ntohs(Listeners[NumListeners].address.ipv4.sin_port));
+
           Listeners[NumListeners].encryption = HTTP_ENCRYPT_ALWAYS;
 	  NumListeners ++;
         }
@@ -651,11 +684,19 @@ read_configuration(FILE *fp)		/* I - File to read from */
 
       if (NumBrowsers < MAX_BROWSERS)
       {
-        if (get_address(value, INADDR_NONE, BrowsePort, Browsers + NumBrowsers))
+        if (get_address(value, INADDR_NONE, BrowsePort, AF_INET,
+	                Browsers + NumBrowsers))
         {
-          LogMessage(L_INFO, "Sending browsing info to %x:%d",
-                     ntohl(Browsers[NumBrowsers].sin_addr.s_addr),
-                     ntohs(Browsers[NumBrowsers].sin_port));
+          httpAddrString(Browsers + NumBrowsers, line, sizeof(line));
+
+#ifdef AF_INET6
+          if (Browsers[NumBrowsers].addr.sa_family == AF_INET6)
+            LogMessage(L_INFO, "Sending browsing info to %s:%d (IPv6)", line,
+                       ntohs(Browsers[NumBrowsers].ipv6.sin6_port));
+	  else
+#endif /* AF_INET6 */
+          LogMessage(L_INFO, "Sending browsing info to %s:%d", line,
+                     ntohs(Browsers[NumBrowsers].ipv4.sin_port));
 	  NumBrowsers ++;
         }
 	else
@@ -735,9 +776,9 @@ read_configuration(FILE *fp)		/* I - File to read from */
 	  */
 
           if (strcasecmp(name, "BrowseAllow") == 0)
-	    AllowIP(location, 0, 0);
+	    AllowIP(location, zeros, zeros);
 	  else
-	    DenyIP(location, 0, 0);
+	    DenyIP(location, zeros, zeros);
 	}
 	else if (strcasecmp(value, "none") == 0)
 	{
@@ -746,9 +787,9 @@ read_configuration(FILE *fp)		/* I - File to read from */
 	  */
 
           if (strcasecmp(name, "BrowseAllow") == 0)
-	    AllowIP(location, ~0, 0);
+	    AllowIP(location, ones, zeros);
 	  else
-	    DenyIP(location, ~0, 0);
+	    DenyIP(location, ones, zeros);
 	}
 	else if (value[0] == '*' || value[0] == '.' || !isdigit(value[0]))
 	{
@@ -770,38 +811,17 @@ read_configuration(FILE *fp)		/* I - File to read from */
           * One of many IP address forms...
 	  */
 
-          memset(ip, 0, sizeof(ip));
-          ipcount = sscanf(value, "%d.%d.%d.%d", ip + 0, ip + 1, ip + 2, ip + 3);
-	  address = (((((ip[0] << 8) | ip[1]) << 8) | ip[2]) << 8) | ip[3];
-
-          if ((value = strchr(value, '/')) != NULL)
+          if (!get_addr_and_mask(value, ip, mask))
 	  {
-	    value ++;
-	    memset(mask, 0, sizeof(mask));
-            switch (sscanf(value, "%d.%d.%d.%d", mask + 0, mask + 1,
-	                   mask + 2, mask + 3))
-	    {
-	      case 1 :
-	          netmask = (0xffffffff << (32 - mask[0])) & 0xffffffff;
-	          break;
-	      case 4 :
-	          netmask = (((((mask[0] << 8) | mask[1]) << 8) |
-		              mask[2]) << 8) | mask[3];
-                  break;
-	      default :
-        	  LogMessage(L_ERROR, "Bad netmask value %s on line %d.",
-	        	     value, linenum);
-		  netmask = 0xffffffff;
-		  break;
-	    }
+            LogMessage(L_ERROR, "Bad netmask value %s on line %d.",
+	               value, linenum);
+	    break;
 	  }
-	  else
-	    netmask = netmasks[ipcount - 1];
 
           if (strcasecmp(name, "BrowseAllow") == 0)
-	    AllowIP(location, address, netmask);
+	    AllowIP(location, ip, mask);
 	  else
-	    DenyIP(location, address, netmask);
+	    DenyIP(location, ip, mask);
 	}
       }
     }
@@ -867,41 +887,18 @@ read_configuration(FILE *fp)		/* I - File to read from */
         * One of many IP address forms...
 	*/
 
-        memset(ip, 0, sizeof(ip));
-        ipcount = sscanf(value, "%d.%d.%d.%d", ip + 0, ip + 1, ip + 2, ip + 3);
-	address = (((((ip[0] << 8) | ip[1]) << 8) | ip[2]) << 8) | ip[3];
-
-        for (; *value; value ++)
-	  if (*value == '/' || isspace(*value))
-	    break;
-
-        if (*value == '/')
+        if (!get_addr_and_mask(value, ip, mask))
 	{
-	  value ++;
-	  memset(mask, 0, sizeof(mask));
-          switch (sscanf(value, "%d.%d.%d.%d", mask + 0, mask + 1,
-	                 mask + 2, mask + 3))
-	  {
-	    case 1 :
-	        netmask = (0xffffffff << (32 - mask[0])) & 0xffffffff;
-	        break;
-	    case 4 :
-	        netmask = (((((mask[0] << 8) | mask[1]) << 8) |
-		            mask[2]) << 8) | mask[3];
-                break;
-	    default :
-        	LogMessage(L_ERROR, "Bad netmask value %s on line %d.",
-	        	   value, linenum);
-		netmask = 0xffffffff;
-		break;
-	  }
+          LogMessage(L_ERROR, "Bad netmask value %s on line %d.",
+	             value, linenum);
+	  break;
 	}
-	else
-	  netmask = netmasks[ipcount - 1];
 
-        relay->from.type            = AUTH_IP;
-	relay->from.mask.ip.address = address;
-	relay->from.mask.ip.netmask = netmask;
+        relay->from.type = AUTH_IP;
+	memcpy(relay->from.mask.ip.address, ip,
+	       sizeof(relay->from.mask.ip.address));
+	memcpy(relay->from.mask.ip.netmask, mask,
+	       sizeof(relay->from.mask.ip.netmask));
       }
 
      /*
@@ -931,17 +928,34 @@ read_configuration(FILE *fp)		/* I - File to read from */
       * Get "to" address and port...
       */
 
-      if (get_address(value, INADDR_BROADCAST, BrowsePort, &(relay->to)))
+      if (get_address(value, INADDR_BROADCAST, BrowsePort, AF_INET, &(relay->to)))
       {
-        if (relay->from.type == AUTH_NAME)
-          LogMessage(L_INFO, "Relaying from %s to %x:%d",
-                     ntohl(relay->to.sin_addr.s_addr),
-                     ntohs(relay->to.sin_port));
-        else
-          LogMessage(L_INFO, "Relaying from %x/%x to %x:%d",
-                     relay->from.mask.ip.address, relay->from.mask.ip.netmask,
-                     ntohl(relay->to.sin_addr.s_addr),
-                     ntohs(relay->to.sin_port));
+        httpAddrString(&(relay->to), line, sizeof(line));
+
+        if (relay->from.type == AUTH_IP)
+	  snprintf(name, sizeof(name), "%u.%u.%u.%u/%u.%u.%u.%u",
+		   relay->from.mask.ip.address[0],
+		   relay->from.mask.ip.address[1],
+		   relay->from.mask.ip.address[2],
+		   relay->from.mask.ip.address[3],
+		   relay->from.mask.ip.netmask[0],
+		   relay->from.mask.ip.netmask[1],
+		   relay->from.mask.ip.netmask[2],
+		   relay->from.mask.ip.netmask[3]);
+	else
+	{
+	  strncpy(name, relay->from.mask.name.name, sizeof(name) - 1);
+	  name[sizeof(name) - 1] = '\0';
+	}
+
+#ifdef AF_INET6
+        if (relay->to.addr.sa_family == AF_INET6)
+          LogMessage(L_INFO, "Relaying from %s to %s:%d", name, line,
+                     ntohs(relay->to.ipv6.sin6_port));
+	else
+#endif /* AF_INET6 */
+        LogMessage(L_INFO, "Relaying from %s to %s:%d", name, line,
+                   ntohs(relay->to.ipv4.sin_port));
 
 	NumRelays ++;
       }
@@ -970,20 +984,22 @@ read_configuration(FILE *fp)		/* I - File to read from */
       * Get poll address and port...
       */
 
-      if (get_address(value, INADDR_NONE, ippPort(), &polladdr))
+      if (get_address(value, INADDR_NONE, ippPort(), AF_INET, &polladdr))
       {
-        LogMessage(L_INFO, "Polling %x:%d", ntohl(polladdr.sin_addr.s_addr),
-                   ntohs(polladdr.sin_port));
-
         poll = Polled + NumPolled;
 	NumPolled ++;
 	memset(poll, 0, sizeof(dirsvc_poll_t));
 
-        address = ntohl(polladdr.sin_addr.s_addr);
+        httpAddrString(&polladdr, poll->hostname, sizeof(poll->hostname));
 
-	sprintf(poll->hostname, "%d.%d.%d.%d", address >> 24,
-	        (address >> 16) & 255, (address >> 8) & 255, address & 255);
-        poll->port = ntohs(polladdr.sin_port);
+#ifdef AF_INET6
+        if (polladdr.addr.sa_family == AF_INET6)
+          poll->port = ntohs(polladdr.ipv6.sin6_port);
+	else
+#endif /* AF_INET6 */
+        poll->port = ntohs(polladdr.ipv4.sin_port);
+
+        LogMessage(L_INFO, "Polling %s:%d", poll->hostname, poll->port);
       }
       else
         LogMessage(L_ERROR, "Bad poll address %s at line %d.", value, linenum);
@@ -1165,18 +1181,8 @@ read_location(FILE *fp,		/* I - Configuration file */
 		*nameptr,		/* Pointer into name */
 		*value,			/* Value for directive */
 		*valptr;		/* Pointer into value */
-  unsigned	address,		/* Address value */
-		netmask;		/* Netmask value */
-  int		ip[4],			/* IP address components */
-		ipcount,		/* Number of components provided */
+  unsigned	ip[4],			/* IP address components */
  		mask[4];		/* IP netmask components */
-  static unsigned	netmasks[4] =	/* Standard netmasks... */
-  {
-    0xff000000,
-    0xffff0000,
-    0xffffff00,
-    0xffffffff
-  };
 
 
   if ((parent = AddLocation(location)) == NULL)
@@ -1350,9 +1356,9 @@ read_location(FILE *fp,		/* I - Configuration file */
 	*/
 
         if (strcasecmp(name, "Allow") == 0)
-	  AllowIP(loc, 0, 0);
+	  AllowIP(loc, zeros, zeros);
 	else
-	  DenyIP(loc, 0, 0);
+	  DenyIP(loc, zeros, zeros);
       }
       else  if (strcasecmp(value, "none") == 0)
       {
@@ -1361,9 +1367,9 @@ read_location(FILE *fp,		/* I - Configuration file */
 	*/
 
         if (strcasecmp(name, "Allow") == 0)
-	  AllowIP(loc, ~0, 0);
+	  AllowIP(loc, ones, zeros);
 	else
-	  DenyIP(loc, ~0, 0);
+	  DenyIP(loc, ones, zeros);
       }
       else if (value[0] == '*' || value[0] == '.' || !isdigit(value[0]))
       {
@@ -1385,38 +1391,17 @@ read_location(FILE *fp,		/* I - Configuration file */
         * One of many IP address forms...
 	*/
 
-        memset(ip, 0, sizeof(ip));
-        ipcount = sscanf(value, "%d.%d.%d.%d", ip + 0, ip + 1, ip + 2, ip + 3);
-	address = (((((ip[0] << 8) | ip[1]) << 8) | ip[2]) << 8) | ip[3];
-
-        if ((value = strchr(value, '/')) != NULL)
+        if (!get_addr_and_mask(value, ip, mask))
 	{
-	  value ++;
-	  memset(mask, 0, sizeof(mask));
-          switch (sscanf(value, "%d.%d.%d.%d", mask + 0, mask + 1,
-	                 mask + 2, mask + 3))
-	  {
-	    case 1 :
-	        netmask = (0xffffffff << (32 - mask[0])) & 0xffffffff;
-	        break;
-	    case 4 :
-	        netmask = (((((mask[0] << 8) | mask[1]) << 8) |
-		            mask[2]) << 8) | mask[3];
-                break;
-	    default :
-        	LogMessage(L_ERROR, "Bad netmask value %s on line %d.",
-	        	   value, linenum);
-		netmask = 0xffffffff;
-		break;
-	  }
+          LogMessage(L_ERROR, "Bad netmask value %s on line %d.",
+	             value, linenum);
+	  break;
 	}
-	else
-	  netmask = netmasks[ipcount - 1];
 
         if (strcasecmp(name, "Allow") == 0)
-	  AllowIP(loc, address, netmask);
+	  AllowIP(loc, ip, mask);
 	else
-	  DenyIP(loc, address, netmask);
+	  DenyIP(loc, ip, mask);
       }
     }
     else if (strcasecmp(name, "AuthType") == 0)
@@ -1544,26 +1529,42 @@ read_location(FILE *fp,		/* I - Configuration file */
  * 'get_address()' - Get an address + port number from a line.
  */
 
-static int					/* O - 1 if address good, 0 if bad */
-get_address(char               *value,		/* I - Value string */
-            unsigned           defaddress,	/* I - Default address */
-	    int                defport,		/* I - Default port */
-            struct sockaddr_in *address)	/* O - Socket address */
+static int				/* O - 1 if address good, 0 if bad */
+get_address(const char  *value,		/* I - Value string */
+            unsigned    defaddress,	/* I - Default address */
+	    int         defport,	/* I - Default port */
+	    int         deffamily,	/* I - Default family */
+            http_addr_t *address)	/* O - Socket address */
 {
-  char			hostname[256],		/* Hostname or IP */
-			portname[256];		/* Port number or name */
-  struct hostent	*host;			/* Host address */
-  struct servent	*port;			/* Port number */  
+  char			hostname[256],	/* Hostname or IP */
+			portname[256];	/* Port number or name */
+  struct hostent	*host;		/* Host address */
+  struct servent	*port;		/* Port number */  
 
 
  /*
   * Initialize the socket address to the defaults...
   */
 
-  memset(address, 0, sizeof(struct sockaddr_in));
-  address->sin_family      = AF_INET;
-  address->sin_addr.s_addr = htonl(defaddress);
-  address->sin_port        = htons(defport);
+  memset(address, 0, sizeof(http_addr_t));
+
+#ifdef AF_INET6
+  if (deffamily == AF_INET6)
+  {
+    address->ipv6.sin6_family            = AF_INET6;
+    address->ipv6.sin6_addr.s6_addr32[0] = htonl(defaddress);
+    address->ipv6.sin6_addr.s6_addr32[1] = htonl(defaddress);
+    address->ipv6.sin6_addr.s6_addr32[2] = htonl(defaddress);
+    address->ipv6.sin6_addr.s6_addr32[3] = htonl(defaddress);
+    address->ipv6.sin6_port              = htons(defport);
+  }
+  else
+#endif /* AF_INET6 */
+  {
+    address->ipv4.sin_family      = AF_INET;
+    address->ipv4.sin_addr.s_addr = htonl(defaddress);
+    address->ipv4.sin_port        = htons(defport);
+  }
 
  /*
   * Try to grab a hostname and port number...
@@ -1585,8 +1586,10 @@ get_address(char               *value,		/* I - Value string */
         else
           portname[0] = '\0';
         break;
+
     case 2 :
         break;
+
     default :
 	LogMessage(L_ERROR, "Unable to decode address \"%s\"!", value);
         return (0);
@@ -1605,14 +1608,20 @@ get_address(char               *value,		/* I - Value string */
       return (0);
     }
 
-    memcpy(&(address->sin_addr), host->h_addr, host->h_length);
-    address->sin_port = htons(defport);
+    httpAddrLoad(host, defport, 0, address);
   }
 
   if (portname[0] != '\0')
   {
     if (isdigit(portname[0]))
-      address->sin_port = htons(atoi(portname));
+    {
+#ifdef AF_INET6
+      if (address->addr.sa_family == AF_INET6)
+        address->ipv6.sin6_port = htons(atoi(portname));
+      else
+#endif /* AF_INET6 */
+      address->ipv6.sin6_port = htons(atoi(portname));
+    }
     else
     {
       if ((port = getservbyname(portname, NULL)) == NULL)
@@ -1622,7 +1631,14 @@ get_address(char               *value,		/* I - Value string */
         return (0);
       }
       else
-        address->sin_port = htons(port->s_port);
+      {
+#ifdef AF_INET6
+	if (address->addr.sa_family == AF_INET6)
+          address->ipv6.sin6_port = htons(port->s_port);
+	else
+#endif /* AF_INET6 */
+	address->ipv6.sin6_port = htons(port->s_port);
+      }
     }
   }
 
@@ -1631,5 +1647,135 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.77 2001/03/30 03:07:52 mike Exp $".
+ * 'get_addr_and_mask()' - Get an IP address and netmask.
+ */
+
+static int				/* O - 1 on success, 0 on failure */
+get_addr_and_mask(const char *value,	/* I - String from config file */
+                  unsigned   *ip,	/* O - Address value */
+		  unsigned   *mask)	/* O - Mask value */
+{
+  int		i,			/* Looping var */
+		family,			/* Address family */
+		ipcount;		/* Count of fields in address */
+  static unsigned netmasks[4][4] =	/* Standard netmasks... */
+  {
+    { 0xffffffff, 0x00000000, 0x00000000, 0x00000000 },
+    { 0xffffffff, 0xffffffff, 0x00000000, 0x00000000 },
+    { 0xffffffff, 0xffffffff, 0xffffffff, 0x00000000 },
+    { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff }
+  };
+
+
+ /*
+  * Get the address...
+  */
+
+  memset(ip, 0, sizeof(unsigned) * 4);
+  family  = AF_INET;
+  ipcount = sscanf(value, "%u.%u.%u.%u", ip + 0, ip + 1, ip + 2, ip + 3);
+
+#ifdef AF_INET6
+ /*
+  * See if we have any values > 255; if so, this is an IPv6 address only.
+  */
+
+  for (i = 0; i < ipcount; i ++)
+    if (ip[0] > 255)
+    {
+      family = AF_INET6;
+      break;
+    }
+#endif /* AF_INET6 */
+
+  if ((value = strchr(value, '/')) != NULL)
+  {
+   /*
+    * Get the netmask value(s)...
+    */
+
+    value ++;
+    memset(mask, 0, sizeof(unsigned) * 4);
+    switch (sscanf(value, "%u.%u.%u.%u", mask + 0, mask + 1,
+	           mask + 2, mask + 3))
+    {
+      case 1 :
+#ifdef AF_INET6
+          if (mask[0] >= 32)
+	    family = AF_INET6;
+
+          if (family == AF_INET6)
+	  {
+  	    i = 128 - mask[0];
+
+	    if (i <= 96)
+	      mask[0] = 0xffffffff;
+	    else
+	      mask[0] = (0xffffffff << (128 - mask[0])) & 0xffffffff;
+
+	    if (i <= 64)
+	      mask[1] = 0xffffffff;
+	    else if (i >= 96)
+	      mask[1] = 0;
+	    else
+	      mask[1] = (0xffffffff << (96 - mask[0])) & 0xffffffff;
+
+	    if (i <= 32)
+	      mask[1] = 0xffffffff;
+	    else if (i >= 64)
+	      mask[1] = 0;
+	    else
+	      mask[1] = (0xffffffff << (64 - mask[0])) & 0xffffffff;
+
+	    if (i >= 32)
+	      mask[1] = 0;
+	    else
+	      mask[1] = (0xffffffff << (32 - mask[0])) & 0xffffffff;
+          }
+	  else
+#endif /* AF_INET6 */
+	  {
+  	    i = 32 - mask[0];
+
+	    if (i <= 24)
+	      mask[0] = 0xffffffff;
+	    else
+	      mask[0] = (0xffffffff << (32 - mask[0])) & 0xffffffff;
+
+	    if (i <= 16)
+	      mask[1] = 0xffffffff;
+	    else if (i >= 24)
+	      mask[1] = 0;
+	    else
+	      mask[1] = (0xffffffff << (24 - mask[0])) & 0xffffffff;
+
+	    if (i <= 8)
+	      mask[1] = 0xffffffff;
+	    else if (i >= 16)
+	      mask[1] = 0;
+	    else
+	      mask[1] = (0xffffffff << (16 - mask[0])) & 0xffffffff;
+
+	    if (i >= 8)
+	      mask[1] = 0;
+	    else
+	      mask[1] = (0xffffffff << (8 - mask[0])) & 0xffffffff;
+          }
+
+      case 4 :
+	  break;
+
+      default :
+          return (0);
+    }
+  }
+  else
+    memcpy(mask, netmasks[ipcount - 1], sizeof(unsigned) * 4);
+
+  return (1);
+}
+
+
+/*
+ * End of "$Id: conf.c,v 1.77.2.1 2001/04/02 19:51:48 mike Exp $".
  */

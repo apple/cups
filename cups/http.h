@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.33 2001/01/22 15:03:25 mike Exp $"
+ * "$Id: http.h,v 1.33.2.1 2001/04/02 19:51:43 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -243,7 +243,21 @@ typedef enum
   HTTP_FIELD_WWW_AUTHENTICATE,
   HTTP_FIELD_MAX
 } http_field_t;
-  
+
+
+/*
+ * HTTP address structure (makes using IPv6 a little easier and more portable.)
+ */  
+
+typedef union
+{
+  struct sockaddr	addr;		/* Base structure for family value */
+  struct sockaddr_in	ipv4;		/* IPv4 address */
+#ifdef AF_INET6
+  struct sockaddr_in6	ipv6;		/* IPv6 address */
+#endif /* AF_INET6 */
+  char			pad[128];	/* Pad to ensure binary compatibility */
+} http_addr_t;
 
 /*
  * HTTP connection structure...
@@ -259,7 +273,7 @@ typedef struct
   http_status_t		status;		/* Status of last request */
   http_version_t	version;	/* Protocol version */
   http_keepalive_t	keep_alive;	/* Keep-alive supported? */
-  struct sockaddr_in	hostaddr;	/* Address of connected host */
+  http_addr_t		hostaddr;	/* Host address and port */
   char			hostname[HTTP_MAX_HOST],
   					/* Name of connected host */
 			fields[HTTP_FIELD_MAX][HTTP_MAX_VALUE];
@@ -327,6 +341,16 @@ extern char		*httpMD5Final(const char *, const char *, const char *,
 			              char [33]);
 extern char		*httpMD5String(const md5_byte_t *, char [33]);
 
+extern int		httpAddrEqual(const http_addr_t *addr1,
+			              const http_addr_t *addr2);
+extern void		httpAddrLoad(const struct hostent *host, int port,
+			             int n, http_addr_t *addr);
+extern int		httpAddrLocalhost(const http_addr_t *addr);
+extern char		*httpAddrLookup(const http_addr_t *addr,
+                                        char *name, int namelen);
+extern char		*httpAddrString(const http_addr_t *addr,
+			                char *s, int slen);
+
 
 /*
  * C++ magic...
@@ -338,5 +362,5 @@ extern char		*httpMD5String(const md5_byte_t *, char [33]);
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.33 2001/01/22 15:03:25 mike Exp $".
+ * End of "$Id: http.h,v 1.33.2.1 2001/04/02 19:51:43 mike Exp $".
  */

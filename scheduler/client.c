@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91 2001/03/10 15:19:36 mike Exp $"
+ * "$Id: client.c,v 1.91.2.1 2001/04/02 19:51:47 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -74,8 +74,8 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   int			i;	/* Looping var */
   int			val;	/* Parameter value */
   client_t		*con;	/* New client pointer */
-  unsigned		address;/* Address of client */
-  struct hostent	*host;	/* Host entry for address */
+  const struct hostent	*host;	/* Host entry for address */
+  http_addr_t		temp;	/* Temporary address variable */
 
 
   LogMessage(L_DEBUG2, "AcceptClient(%08x) %d NumClients = %d",
@@ -111,26 +111,24 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
     return;
   }
 
-  con->http.hostaddr.sin_port = lis->address.sin_port;
-
- /*
-  * Get the hostname or format the IP address as needed...
-  */
-
-  address = ntohl(con->http.hostaddr.sin_addr.s_addr);
+#ifdef AF_INET6
+  if (lis->address.addr.sa_family == AF_INET6)
+    con->http.hostaddr.ipv6.sin6_port = lis->address.ipv6.sin6_port;
+  else
+#endif /* AF_INET6 */
+  con->http.hostaddr.ipv4.sin_port = lis->address.ipv4.sin_port;
 
   if (HostNameLookups)
-#ifndef __sgi
-    host = gethostbyaddr((char *)&(con->http.hostaddr.sin_addr),
-                         sizeof(struct in_addr), AF_INET);
-#else
-    host = gethostbyaddr(&(con->http.hostaddr.sin_addr),
-                         sizeof(struct in_addr), AF_INET);
-#endif /* !__sgi */
+    host = httpAddrLookup(&(con->http.hostaddr), con->http.hostname,
+                          sizeof(con->http.hostname));
   else
+  {
     host = NULL;
+    httpAddrString(&(con->http.hostaddr), con->http.hostname,
+                   sizeof(con->http.hostname));
+  }
 
-  if (con->http.hostaddr.sin_addr.s_addr == ServerAddr.sin_addr.s_addr)
+  if (httpAddrEqual(&(con->http.hostaddr), &ServerAddr))
   {
    /*
     * Map accesses from the same host to the server name.
@@ -138,30 +136,23 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 
     strncpy(con->http.hostname, ServerName, sizeof(con->http.hostname) - 1);
   }
-  else if (host == NULL)
-  {
-    sprintf(con->http.hostname, "%d.%d.%d.%d", (address >> 24) & 255,
-            (address >> 16) & 255, (address >> 8) & 255, address & 255);
 
-    if (HostNameLookups == 2)
-    {
-     /*
-      * Can't have an unresolved IP address with double-lookups enabled...
-      */
+  if (host == NULL && HostNameLookups == 2)
+  {
+   /*
+    * Can't have an unresolved IP address with double-lookups enabled...
+    */
 
 #ifdef WIN32
-      closesocket(con->http.fd);
+    closesocket(con->http.fd);
 #else
-      close(con->http.fd);
+    close(con->http.fd);
 #endif /* WIN32 */
 
-      LogMessage(L_WARN, "Name lookup failed - connection from %s closed!",
-                 con->http.hostname);
-      return;
-    }
+    LogMessage(L_WARN, "Name lookup failed - connection from %s closed!",
+               con->http.hostname);
+    return;
   }
-  else
-    strncpy(con->http.hostname, host->h_name, sizeof(con->http.hostname) - 1);
 
   if (HostNameLookups == 2)
   {
@@ -172,13 +163,13 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
     if ((host = gethostbyname(con->http.hostname)) != NULL)
     {
      /*
-      * See if the hostname maps to the IP address...
+      * See if the hostname maps to the same IP address...
       */
 
-      if (host->h_length != 4 || host->h_addrtype != AF_INET)
+      if (host->h_addrtype != con->http.hostaddr.addr.sa_family)
       {
        /*
-        * Not an IPv4 address...
+        * Not the right type of address...
 	*/
 
 	host = NULL;
@@ -190,8 +181,12 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 	*/
 
 	for (i = 0; host->h_addr_list[i]; i ++)
-          if (memcmp(&(con->http.hostaddr.sin_addr), host->h_addr_list[i], 4) == 0)
+	{
+	  httpAddrLoad(host, 0, i, &temp);
+
+          if (httpAddrEqual(&(con->http.hostaddr), &temp))
 	    break;
+        }
 
         if (!host->h_addr_list[i])
 	  host = NULL;
@@ -217,8 +212,14 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
     }
   }
 
+#ifdef AF_INET6
+  if (con->http.hostaddr.addr.sa_family == AF_INET6)
+    LogMessage(L_DEBUG, "AcceptClient() %d from %s:%d.", con->http.fd,
+               con->http.hostname, ntohs(con->http.hostaddr.ipv6.sin6_port));
+  else
+#endif /* AF_INET6 */
   LogMessage(L_DEBUG, "AcceptClient() %d from %s:%d.", con->http.fd,
-             con->http.hostname, ntohs(con->http.hostaddr.sin_port));
+             con->http.hostname, ntohs(con->http.hostaddr.ipv4.sin_port));
 
  /*
   * Add the socket to the select() input mask.
@@ -1941,8 +1942,21 @@ pipe_command(client_t *con,	/* I - Client connection */
 
   snprintf(lang, sizeof(lang), "LANG=%s",
            con->language ? con->language->language : "C");
-  sprintf(ipp_port, "IPP_PORT=%d", ntohs(con->http.hostaddr.sin_port));
-  sprintf(server_port, "SERVER_PORT=%d", ntohs(con->http.hostaddr.sin_port));
+#ifdef AF_INET6
+  if (con->http.hostaddr.addr.sa_family == AF_INET6)
+  {
+    sprintf(ipp_port, "IPP_PORT=%d", ntohs(con->http.hostaddr.ipv6.sin6_port));
+    sprintf(server_port, "SERVER_PORT=%d",
+            ntohs(con->http.hostaddr.ipv6.sin6_port));
+  }
+  else
+#endif /* AF_INET6 */
+  {
+    sprintf(ipp_port, "IPP_PORT=%d", ntohs(con->http.hostaddr.ipv4.sin_port));
+    sprintf(server_port, "SERVER_PORT=%d",
+            ntohs(con->http.hostaddr.ipv4.sin_port));
+  }
+
   snprintf(server_name, sizeof(server_name), "SERVER_NAME=%s", ServerName);
   snprintf(remote_host, sizeof(remote_host), "REMOTE_HOST=%s", con->http.hostname);
   snprintf(remote_user, sizeof(remote_user), "REMOTE_USER=%s", con->username);
@@ -1956,7 +1970,7 @@ pipe_command(client_t *con,	/* I - Client connection */
     ldpath[0] = '\0';
 
   envp[0]  = "PATH=/bin:/usr/bin";
-  envp[1]  = "SERVER_SOFTWARE=CUPS/1.1";
+  envp[1]  = "SERVER_SOFTWARE=CUPS/1.2";
   envp[2]  = "GATEWAY_INTERFACE=CGI/1.1";
   envp[3]  = "SERVER_PROTOCOL=HTTP/1.1";
   envp[4]  = ipp_port;
@@ -2118,5 +2132,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91 2001/03/10 15:19:36 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.1 2001/04/02 19:51:47 mike Exp $".
  */

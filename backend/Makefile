@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.25 2001/01/24 19:40:32 mike Exp $"
+# "$Id: Makefile,v 1.25.2.1 2001/04/02 19:51:42 mike Exp $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -65,7 +65,7 @@ betest:	betest.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o betest betest.o $(LIBS)
 
-betest.o:	../cups/string.h ../Makedefs
+betest.o:	../cups/string.h
 
 
 #
@@ -78,7 +78,7 @@ ipp:	ipp.o ../cups/$(LIBCUPS)
 	$(RM) http
 	$(LN) ipp http
 
-ipp.o:	../cups/cups.h ../Makedefs
+ipp.o:	../cups/cups.h
 
 
 #
@@ -89,7 +89,7 @@ lpd:	lpd.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lpd lpd.o $(LIBS)
 
-lpd.o:	../cups/cups.h ../Makedefs
+lpd.o:	../cups/cups.h
 
 
 #
@@ -100,7 +100,7 @@ parallel:	parallel.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o parallel parallel.o $(LIBS)
 
-parallel.o:	../cups/cups.h ../Makedefs
+parallel.o:	../cups/cups.h
 
 
 #
@@ -111,7 +111,7 @@ serial:	serial.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o serial serial.o $(LIBS)
 
-serial.o:	../cups/cups.h ../Makedefs
+serial.o:	../cups/cups.h
 
 
 #
@@ -122,7 +122,7 @@ socket:	socket.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o socket socket.o $(LIBS)
 
-socket.o:	../cups/cups.h ../Makedefs
+socket.o:	../cups/cups.h
 
 
 #
@@ -133,9 +133,11 @@ usb:	usb.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o usb usb.o $(LIBS)
 
-usb.o:	../cups/cups.h ../Makedefs
+usb.o:	../cups/cups.h
 
+
+$(OBJS):	../config.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.25 2001/01/24 19:40:32 mike Exp $".
+# End of "$Id: Makefile,v 1.25.2.1 2001/04/02 19:51:42 mike Exp $".
 #
