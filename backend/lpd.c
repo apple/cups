@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.32 2002/01/27 21:16:08 mike Exp $"
+ * "$Id: lpd.c,v 1.33 2002/02/12 19:05:36 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -550,7 +550,7 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
     lpd_command(fd, "\002%d cfA%03.3d%s\n", strlen(control), getpid() % 1000,
         	localhost);
 
-    fprintf(stderr, "INFO: Sending control file (%d bytes)\n", strlen(control));
+    fprintf(stderr, "INFO: Sending control file (%lu bytes)\n", (unsigned long)strlen(control));
 
     if (lpd_write(fd, control, strlen(control) + 1) < (strlen(control) + 1))
     {
@@ -615,7 +615,7 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
     lpd_command(fd, "\002%d cfA%03.3d%s\n", strlen(control), getpid() % 1000,
         	localhost);
 
-    fprintf(stderr, "INFO: Sending control file (%d bytes)\n", strlen(control));
+    fprintf(stderr, "INFO: Sending control file (%lu bytes)\n", (unsigned long)strlen(control));
 
     if (lpd_write(fd, control, strlen(control) + 1) < (strlen(control) + 1))
     {
@@ -761,5 +761,5 @@ rresvport(int *port)		/* IO - Port number to bind to */
 #endif /* !HAVE_RRESVPORT */
 
 /*
- * End of "$Id: lpd.c,v 1.32 2002/01/27 21:16:08 mike Exp $".
+ * End of "$Id: lpd.c,v 1.33 2002/02/12 19:05:36 mike Exp $".
  */

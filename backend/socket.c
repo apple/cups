@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.26 2002/01/27 21:16:09 mike Exp $"
+ * "$Id: socket.c,v 1.27 2002/02/12 19:05:37 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -274,11 +274,12 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	*/
 
 	if ((nbytes = recv(fd, buffer, sizeof(buffer), 0)) > 0)
-	  fprintf(stderr, "INFO: Received %u bytes of back-channel data!\n",
-	          nbytes);
+	  fprintf(stderr, "INFO: Received %lu bytes of back-channel data!\n",
+	          (unsigned long)nbytes);
       }
       else if (argc > 6)
-	fprintf(stderr, "INFO: Sending print file, %u bytes...\n", tbytes);
+	fprintf(stderr, "INFO: Sending print file, %lu bytes...\n",
+	        (unsigned long)tbytes);
     }
 
    /*
@@ -313,8 +314,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	*/
 
 	if ((nbytes = recv(fd, buffer, sizeof(buffer), 0)) > 0)
-	  fprintf(stderr, "INFO: Received %u bytes of back-channel data!\n",
-	          nbytes);
+	  fprintf(stderr, "INFO: Received %lu bytes of back-channel data!\n",
+	          (unsigned long)nbytes);
         else
 	  break;
       }
@@ -343,5 +344,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.26 2002/01/27 21:16:09 mike Exp $".
+ * End of "$Id: socket.c,v 1.27 2002/02/12 19:05:37 mike Exp $".
  */
