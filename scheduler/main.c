@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.29 2003/01/29 20:08:26 mike Exp $"
+ * "$Id: main.c,v 1.57.2.30 2003/01/29 20:36:20 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -152,6 +152,9 @@ main(int  argc,			/* I - Number of command-line arguments */
       fprintf(stderr, "cupsd: Unknown argument \'%s\' - aborting!\n", argv[i]);
       usage();
     }
+
+  if (!ConfigurationFile)
+    SetString(&ConfigurationFile, CUPS_SERVERROOT "/cupsd.conf");
 
  /*
   * If the user hasn't specified "-f", run in the background...
@@ -1002,5 +1005,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.29 2003/01/29 20:08:26 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.30 2003/01/29 20:36:20 mike Exp $".
  */
