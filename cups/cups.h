@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h,v 1.16 1999/07/12 12:42:49 mike Exp $"
+ * "$Id: cups.h,v 1.17 1999/07/12 16:09:34 mike Exp $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -106,30 +106,31 @@ typedef struct				/**** Printer Options ****/
  * Functions...
  */
 
-extern int		cupsCancelJob(char *printer, int job);
+extern int		cupsCancelJob(const char *printer, int job);
 #define			cupsDoRequest(http,request,resource) cupsDoFileRequest((http),(request),(resource),NULL)
 extern ipp_t		*cupsDoFileRequest(http_t *http, ipp_t *request,
-			                   char *resource, char *filename);
+			                   const char *resource, const char *filename);
 extern int		cupsGetClasses(char ***classes);
-extern char		*cupsGetDefault(void);
-extern char		*cupsGetPPD(char *printer);
+extern const char	*cupsGetDefault(void);
+extern const char	*cupsGetPPD(const char *printer);
 extern int		cupsGetPrinters(char ***printers);
-extern int		cupsPrintFile(char *printer, char *filename, char *title,
-			              int num_options, cups_option_t *options);
+extern int		cupsPrintFile(const char *printer, const char *filename,
+			              const char *title, int num_options,
+				      cups_option_t *options);
 
-extern int		cupsAddOption(char *name, char *value, int num_options,
-			              cups_option_t **options);
+extern int		cupsAddOption(const char *name, const char *value,
+			              int num_options, cups_option_t **options);
 extern void		cupsFreeOptions(int num_options, cups_option_t *options);
-extern char		*cupsGetOption(char *name, int num_options,
+extern const char	*cupsGetOption(const char *name, int num_options,
 			               cups_option_t *options);
-extern int		cupsParseOptions(char *arg, int num_options,
+extern int		cupsParseOptions(const char *arg, int num_options,
 			                 cups_option_t **options);
 extern int		cupsMarkOptions(ppd_file_t *ppd, int num_options,
 			                cups_option_t *options);
 
-extern char		*cupsGetPassword(const char *prompt);
-extern char		*cupsServer();
-extern char		*cupsUser();
+extern const char	*cupsGetPassword(const char *prompt);
+extern const char	*cupsServer(void);
+extern const char	*cupsUser(void);
 
 #  ifdef __cplusplus
 }
@@ -138,5 +139,5 @@ extern char		*cupsUser();
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.16 1999/07/12 12:42:49 mike Exp $".
+ * End of "$Id: cups.h,v 1.17 1999/07/12 16:09:34 mike Exp $".
  */

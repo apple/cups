@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.38 1999/07/09 13:08:37 mike Exp $"
+ * "$Id: http.c,v 1.39 1999/07/12 16:09:35 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -89,15 +89,16 @@
  * Local functions...
  */
 
-static http_field_t	http_field(char *name);
-static int		http_send(http_t *http, http_state_t request, char *uri);
+static http_field_t	http_field(const char *name);
+static int		http_send(http_t *http, http_state_t request,
+			          const char *uri);
 
 
 /*
  * Local globals...
  */
 
-static char		*http_fields[] =
+static const char	*http_fields[] =
 			{
 			  "Accept-Language",
 			  "Accept-Ranges",
@@ -127,7 +128,7 @@ static char		*http_fields[] =
 			  "User-Agent",
 			  "WWW-Authenticate"
 			};
-static char		*days[7] =
+static const char	*days[7] =
 			{
 			  "Sun",
 			  "Mon",
@@ -137,7 +138,7 @@ static char		*days[7] =
 			  "Fri",
 			  "Sat"
 			};
-static char		*months[12] =
+static const char	*months[12] =
 			{
 			  "Jan",
 			  "Feb",
@@ -213,8 +214,8 @@ httpClose(http_t *http)		/* I - Connection to close */
  */
 
 http_t *			/* O - New HTTP connection */
-httpConnect(char *host,		/* I - Host to connect to */
-            int  port)		/* I - Port number */
+httpConnect(const char *host,	/* I - Host to connect to */
+            int        port)	/* I - Port number */
 {
   http_t		*http;		/* New HTTP connection */
   struct hostent	*hostaddr;	/* Host address data */
@@ -331,12 +332,12 @@ httpReconnect(http_t *http)	/* I - HTTP data */
  */
 
 void
-httpSeparate(char *uri,		/* I - Universal Resource Identifier */
-             char *method,	/* O - Method (http, https, etc.) */
-	     char *username,	/* O - Username */
-	     char *host,	/* O - Hostname */
-	     int  *port,	/* O - Port number to use */
-             char *resource)	/* O - Resource/filename */
+httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
+             char       *method,	/* O - Method (http, https, etc.) */
+	     char       *username,	/* O - Username */
+	     char       *host,		/* O - Hostname */
+	     int        *port,		/* O - Port number to use */
+             char       *resource)	/* O - Resource/filename */
 {
   char	*ptr;			/* Pointer into string... */
 
@@ -378,7 +379,7 @@ httpSeparate(char *uri,		/* I - Universal Resource Identifier */
       * OK, we have "hostname:port[/resource]"...
       */
 
-      *port = strtol(uri, &uri, 10);
+      *port = strtol(uri, (char **)&uri, 10);
 
       if (*uri == '/')
         strcpy(resource, uri);
@@ -494,7 +495,7 @@ httpSeparate(char *uri,		/* I - Universal Resource Identifier */
 void
 httpSetField(http_t       *http,	/* I - HTTP data */
              http_field_t field,	/* I - Field index */
-	     char         *value)	/* I - Value */
+	     const char   *value)	/* I - Value */
 {
   strncpy(http->fields[field], value, HTTP_MAX_VALUE - 1);
   http->fields[field][HTTP_MAX_VALUE - 1] = '\0';
@@ -506,8 +507,8 @@ httpSetField(http_t       *http,	/* I - HTTP data */
  */
 
 int					/* O - Status of call (0 = success) */
-httpDelete(http_t *http,		/* I - HTTP data */
-           char   *uri)			/* I - URI to delete */
+httpDelete(http_t     *http,		/* I - HTTP data */
+           const char *uri)		/* I - URI to delete */
 {
   return (http_send(http, HTTP_DELETE, uri));
 }
@@ -518,8 +519,8 @@ httpDelete(http_t *http,		/* I - HTTP data */
  */
 
 int					/* O - Status of call (0 = success) */
-httpGet(http_t *http,			/* I - HTTP data */
-        char   *uri)			/* I - URI to get */
+httpGet(http_t     *http,		/* I - HTTP data */
+        const char *uri)		/* I - URI to get */
 {
   return (http_send(http, HTTP_GET, uri));
 }
@@ -530,8 +531,8 @@ httpGet(http_t *http,			/* I - HTTP data */
  */
 
 int					/* O - Status of call (0 = success) */
-httpHead(http_t *http,			/* I - HTTP data */
-         char   *uri)			/* I - URI for head */
+httpHead(http_t     *http,		/* I - HTTP data */
+         const char *uri)		/* I - URI for head */
 {
   return (http_send(http, HTTP_HEAD, uri));
 }
@@ -542,8 +543,8 @@ httpHead(http_t *http,			/* I - HTTP data */
  */
 
 int					/* O - Status of call (0 = success) */
-httpOptions(http_t *http,		/* I - HTTP data */
-            char   *uri)		/* I - URI for options */
+httpOptions(http_t     *http,		/* I - HTTP data */
+            const char *uri)		/* I - URI for options */
 {
   return (http_send(http, HTTP_OPTIONS, uri));
 }
@@ -554,8 +555,8 @@ httpOptions(http_t *http,		/* I - HTTP data */
  */
 
 int					/* O - Status of call (0 = success) */
-httpPost(http_t *http,			/* I - HTTP data */
-         char   *uri)			/* I - URI for post */
+httpPost(http_t     *http,		/* I - HTTP data */
+         const char *uri)		/* I - URI for post */
 {
   httpGetLength(http);
 
@@ -568,8 +569,8 @@ httpPost(http_t *http,			/* I - HTTP data */
  */
 
 int					/* O - Status of call (0 = success) */
-httpPut(http_t *http,			/* I - HTTP data */
-        char   *uri)			/* I - URI to put */
+httpPut(http_t     *http,		/* I - HTTP data */
+        const char *uri)		/* I - URI to put */
 {
   httpGetLength(http);
 
@@ -582,8 +583,8 @@ httpPut(http_t *http,			/* I - HTTP data */
  */
 
 int					/* O - Status of call (0 = success) */
-httpTrace(http_t *http,			/* I - HTTP data */
-          char   *uri)			/* I - URI for trace */
+httpTrace(http_t     *http,		/* I - HTTP data */
+          const char *uri)		/* I - URI for trace */
 {
   return (http_send(http, HTTP_TRACE, uri));
 }
@@ -698,9 +699,9 @@ httpRead(http_t *http,			/* I - HTTP data */
  */
  
 int					/* O - Number of bytes written */
-httpWrite(http_t *http,			/* I - HTTP data */
-          char   *buffer,		/* I - Buffer for data */
-	  int    length)		/* I - Number of bytes to write */
+httpWrite(http_t     *http,		/* I - HTTP data */
+          const char *buffer,		/* I - Buffer for data */
+	  int        length)		/* I - Number of bytes to write */
 {
   int		tbytes,			/* Total bytes sent */
 		bytes;			/* Bytes sent */
@@ -897,7 +898,7 @@ httpPrintf(http_t     *http,		/* I - HTTP data */
  * 'httpStatus()' - Return a short string describing a HTTP status code.
  */
 
-char *					/* O - String or NULL */
+const char *				/* O - String or NULL */
 httpStatus(http_status_t status)	/* I - HTTP status code */
 {
   switch (status)
@@ -938,7 +939,7 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
  * 'httpGetDateString()' - Get a formatted date/time string from a time value.
  */
 
-char *					/* O - Date/time string */
+const char *				/* O - Date/time string */
 httpGetDateString(time_t t)		/* I - UNIX time */
 {
   struct tm	*tdate;
@@ -959,7 +960,7 @@ httpGetDateString(time_t t)		/* I - UNIX time */
  */
 
 time_t					/* O - UNIX time */
-httpGetDateTime(char *s)		/* I - Date/time string */
+httpGetDateTime(const char *s)		/* I - Date/time string */
 {
   int		i;			/* Looping var */
   struct tm	tdate;			/* Time/date structure */
@@ -1104,8 +1105,8 @@ httpUpdate(http_t *http)		/* I - HTTP data */
  */
 
 char *				/* O - Decoded string */
-httpDecode64(char *out,		/* I - String to write to */
-             char *in)		/* I - String to read from */
+httpDecode64(char       *out,	/* I - String to write to */
+             const char *in)	/* I - String to read from */
 {
   int	pos,			/* Bit position */
 	base64;			/* Value of this character */
@@ -1175,8 +1176,8 @@ httpDecode64(char *out,		/* I - String to write to */
  */
 
 char *				/* O - Encoded string */
-httpEncode64(char *out,		/* I - String to write to */
-             char *in)		/* I - String to read from */
+httpEncode64(char       *out,	/* I - String to write to */
+             const char *in)	/* I - String to read from */
 {
   char		*outptr;	/* Output pointer */
   static char	base64[] =	/* Base64 characters... */
@@ -1226,7 +1227,7 @@ httpEncode64(char *out,		/* I - String to write to */
  *                     content-length or transfer-encoding fields.
  */
 
-int
+int				/* O - Content length */
 httpGetLength(http_t *http)	/* I - HTTP data */
 {
   if (strcasecmp(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked") == 0)
@@ -1261,7 +1262,7 @@ httpGetLength(http_t *http)	/* I - HTTP data */
  */
 
 static http_field_t		/* O - Field index */
-http_field(char *name)		/* I - String name */
+http_field(const char *name)	/* I - String name */
 {
   int	i;			/* Looping var */
 
@@ -1281,12 +1282,12 @@ http_field(char *name)		/* I - String name */
 static int			/* O - 0 on success, non-zero on error */
 http_send(http_t       *http,	/* I - HTTP data */
           http_state_t request,	/* I - Request code */
-	  char         *uri)	/* I - URI */
+	  const char   *uri)	/* I - URI */
 {
   int		i;		/* Looping var */
   char		*ptr,		/* Pointer in buffer */
 		buf[1024];	/* Encoded URI buffer */
-  static char	*codes[] =	/* Request code strings */
+  static const char *codes[] =	/* Request code strings */
 		{
 		  NULL,
 		  "OPTIONS",
@@ -1302,7 +1303,7 @@ http_send(http_t       *http,	/* I - HTTP data */
 		  "TRACE",
 		  "CLOSE"
 		};
-  static char	*hex = "0123456789ABCDEF";
+  static const char *hex = "0123456789ABCDEF";
 				/* Hex digits */
 
 
@@ -1370,5 +1371,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.38 1999/07/09 13:08:37 mike Exp $".
+ * End of "$Id: http.c,v 1.39 1999/07/12 16:09:35 mike Exp $".
  */

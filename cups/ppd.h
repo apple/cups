@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.15 1999/05/17 18:11:46 mike Exp $"
+ * "$Id: ppd.h,v 1.16 1999/07/12 16:09:41 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -209,20 +209,20 @@ extern int		ppdEmit(ppd_file_t *ppd, FILE *fp,
 			        ppd_section_t section);
 extern int		ppdEmitFd(ppd_file_t *ppd, int fd,
 			          ppd_section_t section);
-extern int		ppdIsMarked(ppd_file_t *ppd, char *keyword,
-			            char *option);
+extern int		ppdIsMarked(ppd_file_t *ppd, const char *keyword,
+			            const char *option);
 extern void		ppdMarkDefaults(ppd_file_t *ppd);
-extern int		ppdMarkOption(ppd_file_t *ppd, char *keyword,
-			              char *option);
-extern ppd_choice_t	*ppdFindChoice(ppd_option_t *o, char *option);
-extern ppd_choice_t	*ppdFindMarkedChoice(ppd_file_t *ppd, char *keyword);
-extern ppd_option_t	*ppdFindOption(ppd_file_t *ppd, char *keyword);
+extern int		ppdMarkOption(ppd_file_t *ppd, const char *keyword,
+			              const char *option);
+extern ppd_choice_t	*ppdFindChoice(ppd_option_t *o, const char *option);
+extern ppd_choice_t	*ppdFindMarkedChoice(ppd_file_t *ppd, const char *keyword);
+extern ppd_option_t	*ppdFindOption(ppd_file_t *ppd, const char *keyword);
 extern ppd_file_t	*ppdOpen(FILE *fp);
 extern ppd_file_t	*ppdOpenFd(int fd);
-extern ppd_file_t	*ppdOpenFile(char *filename);
-extern float		ppdPageLength(ppd_file_t *ppd, char *name);
-extern ppd_size_t	*ppdPageSize(ppd_file_t *ppd, char *name);
-extern float		ppdPageWidth(ppd_file_t *ppd, char *name);
+extern ppd_file_t	*ppdOpenFile(const char *filename);
+extern float		ppdPageLength(ppd_file_t *ppd, const char *name);
+extern ppd_size_t	*ppdPageSize(ppd_file_t *ppd, const char *name);
+extern float		ppdPageWidth(ppd_file_t *ppd, const char *name);
 
 /*
  * C++ magic...
@@ -234,5 +234,5 @@ extern float		ppdPageWidth(ppd_file_t *ppd, char *name);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.15 1999/05/17 18:11:46 mike Exp $".
+ * End of "$Id: ppd.h,v 1.16 1999/07/12 16:09:41 mike Exp $".
  */

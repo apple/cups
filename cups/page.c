@@ -1,5 +1,5 @@
 /*
- * "$Id: page.c,v 1.7 1999/07/12 14:02:40 mike Exp $"
+ * "$Id: page.c,v 1.8 1999/07/12 16:09:40 mike Exp $"
  *
  *   Page size functions for the Common UNIX Printing System (CUPS).
  *
@@ -45,7 +45,7 @@
 
 ppd_size_t *			/* O - Size record for page or NULL */
 ppdPageSize(ppd_file_t *ppd,	/* I - PPD file record */
-            char       *name)	/* I - Size name */
+            const char *name)	/* I - Size name */
 {
   int	i;			/* Looping var */
   float	w, l;			/* Width and length of page */
@@ -154,7 +154,7 @@ ppdPageSize(ppd_file_t *ppd,	/* I - PPD file record */
 
 float				/* O - Width of page in points or 0.0 */
 ppdPageWidth(ppd_file_t *ppd,	/* I - PPD file record */
-             char       *name)	/* I - Size name */
+             const char *name)	/* I - Size name */
 {
   ppd_size_t	*size;		/* Page size */
 
@@ -172,7 +172,7 @@ ppdPageWidth(ppd_file_t *ppd,	/* I - PPD file record */
 
 float				/* O - Length of page in points or 0.0 */
 ppdPageLength(ppd_file_t *ppd,	/* I - PPD file */
-              char       *name)	/* I - Size name */
+              const char *name)	/* I - Size name */
 {
   ppd_size_t	*size;		/* Page size */
 
@@ -185,5 +185,5 @@ ppdPageLength(ppd_file_t *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: page.c,v 1.7 1999/07/12 14:02:40 mike Exp $".
+ * End of "$Id: page.c,v 1.8 1999/07/12 16:09:40 mike Exp $".
  */

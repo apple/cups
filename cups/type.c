@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.8 1999/06/18 18:36:13 mike Exp $"
+ * "$Id: type.c,v 1.9 1999/07/12 16:09:41 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -50,8 +50,8 @@
  */
 
 static int	compare(mime_type_t **, mime_type_t **);
-static int	checkrules(char *, FILE *, mime_magic_t *);
-static int	patmatch(char *, char *);
+static int	checkrules(const char *, FILE *, mime_magic_t *);
+static int	patmatch(const char *, const char *);
 
 
 /*
@@ -59,9 +59,9 @@ static int	patmatch(char *, char *);
  */
 
 mime_type_t *			/* O - New (or existing) MIME type */
-mimeAddType(mime_t *mime,	/* I - MIME database */
-            char   *super,	/* I - Super-type name */
-	    char   *type)	/* I - Type name */
+mimeAddType(mime_t     *mime,	/* I - MIME database */
+            const char *super,	/* I - Super-type name */
+	    const char *type)	/* I - Type name */
 {
   mime_type_t	*temp,		/* New MIME type */
 		**types;	/* New MIME types array */
@@ -125,7 +125,7 @@ mimeAddType(mime_t *mime,	/* I - MIME database */
 
 int					/* O - 0 on success, -1 on failure */
 mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
-                char        *rule)	/* I - Rule to add */
+                const char  *rule)	/* I - Rule to add */
 {
   int		num_values,		/* Number of values seen */
 		op,			/* Operation code */
@@ -497,14 +497,14 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
  * 'mimeFileType()' - Determine the type of a file.
  */
 
-mime_type_t *			/* O - Type of file */
-mimeFileType(mime_t *mime,	/* I - MIME database */
-             char   *pathname)	/* I - Name of file to check */
+mime_type_t *				/* O - Type of file */
+mimeFileType(mime_t     *mime,		/* I - MIME database */
+             const char *pathname)	/* I - Name of file to check */
 {
   int		i;		/* Looping var */
   FILE		*fp;		/* File pointer */
   mime_type_t	**types;	/* File types */
-  char		*filename;	/* Base filename of file */
+  const char	*filename;	/* Base filename of file */
 
 
  /*
@@ -556,9 +556,9 @@ mimeFileType(mime_t *mime,	/* I - MIME database */
  */
 
 mime_type_t *			/* O - Matching file type definition */
-mimeType(mime_t *mime,		/* I - MIME database */
-         char   *super,		/* I - Super-type name */
-	 char   *type)		/* I - Type name */
+mimeType(mime_t     *mime,	/* I - MIME database */
+         const char *super,	/* I - Super-type name */
+	 const char *type)	/* I - Type name */
 {
   mime_type_t	key,		/* MIME type search key*/
 		*keyptr,	/* Key pointer... */
@@ -620,7 +620,7 @@ compare(mime_type_t **t0,	/* I - First type */
  */
 
 static int				/* O - 1 if match, 0 if no match */
-checkrules(char         *filename,	/* I - Filename */
+checkrules(const char   *filename,	/* I - Filename */
            FILE         *fp,		/* I - File to check */
            mime_magic_t *rules)		/* I - Rules to check */
 {
@@ -906,9 +906,9 @@ checkrules(char         *filename,	/* I - Filename */
  * 'patmatch()' - Pattern matching...
  */
 
-static int		/* O - 1 if match, 0 if no match */
-patmatch(char *s,	/* I - String to match against */
-         char *pat)	/* I - Pattern to match against */
+static int			/* O - 1 if match, 0 if no match */
+patmatch(const char *s,		/* I - String to match against */
+         const char *pat)	/* I - Pattern to match against */
 {
  /*
   * Range check the input...
@@ -1007,5 +1007,5 @@ patmatch(char *s,	/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.8 1999/06/18 18:36:13 mike Exp $".
+ * End of "$Id: type.c,v 1.9 1999/07/12 16:09:41 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.h,v 1.5 1999/06/18 18:36:11 mike Exp $"
+ * "$Id: mime.h,v 1.6 1999/07/12 16:09:39 mike Exp $"
  *
  *   MIME type/conversion database definitions for the Common UNIX Printing System (CUPS).
  *
@@ -114,16 +114,16 @@ typedef struct				/**** MIME Database ****/
 
 extern void		mimeDelete(mime_t *mime);
 #define mimeLoad(pathname)	mimeMerge((mime_t *)0, (pathname));
-extern mime_t		*mimeMerge(mime_t *mime, char *pathname);
+extern mime_t		*mimeMerge(mime_t *mime, const char *pathname);
 extern mime_t		*mimeNew(void);
 
-extern mime_type_t	*mimeAddType(mime_t *mime, char *super, char *type);
-extern int		mimeAddTypeRule(mime_type_t *mt, char *rule);
-extern mime_type_t	*mimeFileType(mime_t *mime, char *pathname);
-extern mime_type_t	*mimeType(mime_t *mime, char *super, char *type);
+extern mime_type_t	*mimeAddType(mime_t *mime, const char *super, const char *type);
+extern int		mimeAddTypeRule(mime_type_t *mt, const char *rule);
+extern mime_type_t	*mimeFileType(mime_t *mime, const char *pathname);
+extern mime_type_t	*mimeType(mime_t *mime, const char *super, const char *type);
 
 extern mime_filter_t	*mimeAddFilter(mime_t *mime, mime_type_t *src, mime_type_t *dst,
-			               int cost, char *filter);
+			               int cost, const char *filter);
 extern mime_filter_t	*mimeFilter(mime_t *mime, mime_type_t *src, mime_type_t *dst,
 			            int *num_filters);
 
@@ -133,5 +133,5 @@ extern mime_filter_t	*mimeFilter(mime_t *mime, mime_type_t *src, mime_type_t *ds
 #endif /* !_MIME_H_ */
 
 /*
- * End of "$Id: mime.h,v 1.5 1999/06/18 18:36:11 mike Exp $".
+ * End of "$Id: mime.h,v 1.6 1999/07/12 16:09:39 mike Exp $".
  */

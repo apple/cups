@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.25 1999/07/12 12:42:50 mike Exp $"
+ * "$Id: util.c,v 1.26 1999/07/12 16:09:42 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -64,7 +64,7 @@ static http_t	*cups_server = NULL;
  * Local functions...
  */
 
-static char	*cups_connect(char *name, char *printer, char *hostname);
+static char	*cups_connect(const char *name, char *printer, char *hostname);
 
 
 /*
@@ -72,8 +72,8 @@ static char	*cups_connect(char *name, char *printer, char *hostname);
  */
 
 int				/* O - 1 on success, 0 on failure */
-cupsCancelJob(char *name,	/* I - Name of printer or class */
-              int  job)		/* I - Job ID */
+cupsCancelJob(const char *name,	/* I - Name of printer or class */
+              int        job)	/* I - Job ID */
 {
   char		printer[HTTP_MAX_URI],	/* Printer name */
 		hostname[HTTP_MAX_URI],	/* Hostname */
@@ -137,10 +137,10 @@ cupsCancelJob(char *name,	/* I - Name of printer or class */
  */
 
 ipp_t *					/* O - Response data */
-cupsDoFileRequest(http_t *http,		/* I - HTTP connection to server */
-                  ipp_t  *request,	/* I - IPP request */
-                  char   *resource,	/* I - HTTP resource for POST */
-		  char   *filename)	/* I - File to send or NULL */
+cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
+                  ipp_t      *request,	/* I - IPP request */
+                  const char *resource,	/* I - HTTP resource for POST */
+		  const char *filename)	/* I - File to send or NULL */
 {
   ipp_t		*response;	/* IPP response data */
   char		length[255];	/* Content-Length field */
@@ -149,8 +149,8 @@ cupsDoFileRequest(http_t *http,		/* I - HTTP connection to server */
   struct stat	fileinfo;	/* File information */
   int		bytes;		/* Number of bytes read/written */
   char		buffer[8192];	/* Output buffer */
-  char		*password,	/* Password string */
-		plain[255],	/* Plaintext username:password */
+  const char	*password;	/* Password string */
+  char		plain[255],	/* Plaintext username:password */
 		encode[255];	/* Encoded username:password */
   char		junk[8192];	/* Junk buffer for error data */
   static char	authstring[255] = "";
@@ -418,7 +418,7 @@ cupsGetClasses(char ***classes)	/* O - Classes */
  * 'cupsGetDefault()' - Get the default printer or class.
  */
 
-char *				/* O - Default printer or NULL */
+const char *			/* O - Default printer or NULL */
 cupsGetDefault(void)
 {
   ipp_t		*request,	/* IPP Request */
@@ -490,8 +490,8 @@ cupsGetDefault(void)
  * 'cupsGetPPD()' - Get the PPD file for a printer.
  */
 
-char *				/* O - Filename for PPD file */
-cupsGetPPD(char *name)		/* I - Printer name */
+const char *			/* O - Filename for PPD file */
+cupsGetPPD(const char *name)	/* I - Printer name */
 {
   FILE		*fp;			/* PPD file */
   int		bytes;			/* Number of bytes read */
@@ -655,9 +655,9 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
  */
 
 int					/* O - Job ID */
-cupsPrintFile(char          *name,	/* I - Printer or class name */
-              char          *filename,	/* I - File to print */
-	      char          *title,	/* I - Title of job */
+cupsPrintFile(const char    *name,	/* I - Printer or class name */
+              const char    *filename,	/* I - File to print */
+	      const char    *title,	/* I - Title of job */
               int           num_options,/* I - Number of options */
 	      cups_option_t *options)	/* I - Options */
 {
@@ -893,10 +893,10 @@ cupsPrintFile(char          *name,	/* I - Printer or class name */
  * 'cups_connect()' - Connect to the specified host...
  */
 
-static char *			/* I - Printer name if success, NULL if fail */
-cups_connect(char *name,	/* I - Destination (printer[@host]) */
-	     char *printer,	/* O - Printer name */
-             char *hostname)	/* O - Hostname */
+static char *				/* I - Printer name or NULL */
+cups_connect(const char *name,		/* I - Destination (printer[@host]) */
+	     char       *printer,	/* O - Printer name */
+             char       *hostname)	/* O - Hostname */
 {
   char		hostbuf[HTTP_MAX_URI];
 				/* Name of host */
@@ -936,5 +936,5 @@ cups_connect(char *name,	/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.25 1999/07/12 12:42:50 mike Exp $".
+ * End of "$Id: util.c,v 1.26 1999/07/12 16:09:42 mike Exp $".
  */

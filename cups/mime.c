@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.13 1999/06/18 18:36:10 mike Exp $"
+ * "$Id: mime.c,v 1.14 1999/07/12 16:09:38 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -33,6 +33,9 @@
  * Revision History:
  *
  *   $Log: mime.c,v $
+ *   Revision 1.14  1999/07/12 16:09:38  mike
+ *   Fixed all constant arrays to use "const" modifier.
+ *
  *   Revision 1.13  1999/06/18 18:36:10  mike
  *   Fixed address to 44141 Airport View Drive...
  *
@@ -177,8 +180,8 @@ mimeDelete(mime_t *mime)	/* I - MIME database */
  */
 
 mime_t *			/* O - Updated MIME database */
-mimeMerge(mime_t *mime,		/* I - MIME database to add to */
-          char   *pathname)	/* I - Directory to load */
+mimeMerge(mime_t     *mime,	/* I - MIME database to add to */
+          const char *pathname)	/* I - Directory to load */
 {
 #if defined(WIN32) || defined(__EMX__)
   HANDLE	dir;		/* Directory handle */
@@ -610,5 +613,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.13 1999/06/18 18:36:10 mike Exp $".
+ * End of "$Id: mime.c,v 1.14 1999/07/12 16:09:38 mike Exp $".
  */

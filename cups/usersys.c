@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c,v 1.1 1999/06/21 18:46:15 mike Exp $"
+ * "$Id: usersys.c,v 1.2 1999/07/12 16:09:42 mike Exp $"
  *
  *   User, system, and password routines for the Common UNIX Printing
  *   System (CUPS).
@@ -45,7 +45,7 @@
  * 'cupsUser()' - Return the current user's name.
  */
 
-char *					/* O - User name */
+const char *				/* O - User name */
 cupsUser(void)
 {
   return ("WindowsUser");
@@ -56,7 +56,7 @@ cupsUser(void)
  * 'cupsGetPassword()' - Get a password from the user...
  */
 
-char *					/* O - Password */
+const char *				/* O - Password */
 cupsGetPassword(const char *prompt)	/* I - Prompt string */
 {
   return (NULL);
@@ -72,7 +72,7 @@ cupsGetPassword(const char *prompt)	/* I - Prompt string */
  * 'cupsUser()' - Return the current user's name.
  */
 
-char *					/* O - User name */
+const char *				/* O - User name */
 cupsUser(void)
 {
   struct passwd	*pwd;			/* User/password entry */
@@ -105,7 +105,7 @@ cupsUser(void)
  * 'cupsGetPassword()' - Get a password from the user...
  */
 
-char *					/* O - Password */
+const char *				/* O - Password */
 cupsGetPassword(const char *prompt)	/* I - Prompt string */
 {
   return (getpass(prompt));
@@ -117,7 +117,7 @@ cupsGetPassword(const char *prompt)	/* I - Prompt string */
  * 'cupsServer()' - Return the hostname of the default server...
  */
 
-char *					/* O - Server name */
+const char *				/* O - Server name */
 cupsServer(void)
 {
   FILE		*fp;			/* cupsd.conf file */
@@ -171,5 +171,5 @@ cupsServer(void)
 
 
 /*
- * End of "$Id: usersys.c,v 1.1 1999/06/21 18:46:15 mike Exp $".
+ * End of "$Id: usersys.c,v 1.2 1999/07/12 16:09:42 mike Exp $".
  */

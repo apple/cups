@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.9 1999/06/18 18:36:09 mike Exp $"
+ * "$Id: language.c,v 1.10 1999/07/12 16:09:37 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -127,10 +127,11 @@ cupsLangFree(cups_lang_t *lang)	/* I - Language to free */
  */
 
 cups_lang_t *			/* O - Language data */
-cupsLangGet(char *language)	/* I - Language or locale */
+cupsLangGet(const char *language) /* I - Language or locale */
 {
   int		i, count;	/* Looping vars */
-  char		real[16],	/* Real language name */
+  char		langname[16],	/* Requested language name */
+		real[16],	/* Real language name */
 		filename[1024],	/* Filename for language locale file */
 		*localedir;	/* Directory for locale files */
   FILE		*fp;		/* Language locale file pointer */
@@ -149,26 +150,28 @@ cupsLangGet(char *language)	/* I - Language or locale */
   */
 
   if (language == NULL || language[0] == '\0')
-    language = "C";
+    strcpy(langname, "C");
+  else
+    strcpy(langname, language);
 
-  if (strlen(language) < 2)
+  if (strlen(langname) < 2)
     strcpy(real, "C");
   else
   {
-    real[0] = tolower(language[0]);
-    real[1] = tolower(language[1]);
+    real[0] = tolower(langname[0]);
+    real[1] = tolower(langname[1]);
 
-    if (language[2] == '_' || language[2] == '-')
+    if (langname[2] == '_' || langname[2] == '-')
     {
       real[2]     = '_';
-      real[3]     = toupper(language[3]);
-      real[4]     = toupper(language[4]);
+      real[3]     = toupper(langname[3]);
+      real[4]     = toupper(langname[4]);
       real[5]     = '\0';
-      language[5] = '\0';
+      langname[5] = '\0';
     }
     else
     {
-      language[2] = '\0';
+      langname[2] = '\0';
       real[2]     = '\0';
     }
   }
@@ -201,7 +204,7 @@ cupsLangGet(char *language)	/* I - Language or locale */
   */
 
   for (lang = lang_cache; lang != NULL; lang = lang->next)
-    if (strcmp(lang->language, language) == 0)
+    if (strcmp(lang->language, langname) == 0)
     {
       lang->used ++;
 
@@ -288,7 +291,7 @@ cupsLangGet(char *language)	/* I - Language or locale */
   */
 
   lang->used ++;
-  strcpy(lang->language, language);
+  strcpy(lang->language, langname);
 
   for (i = 0; i < (sizeof(lang_encodings) / sizeof(lang_encodings[0])); i ++)
     if (strcmp(lang_encodings[i], line) == 0)
@@ -366,5 +369,5 @@ cupsLangGet(char *language)	/* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.9 1999/06/18 18:36:09 mike Exp $".
+ * End of "$Id: language.c,v 1.10 1999/07/12 16:09:37 mike Exp $".
  */

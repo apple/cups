@@ -1,5 +1,5 @@
 /*
- * "$Id: mark.c,v 1.13 1999/07/12 14:02:39 mike Exp $"
+ * "$Id: mark.c,v 1.14 1999/07/12 16:09:38 mike Exp $"
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
@@ -180,7 +180,7 @@ ppdConflicts(ppd_file_t *ppd)	/* I - PPD to check */
 
 ppd_choice_t *				/* O - Choice pointer or NULL */
 ppdFindChoice(ppd_option_t *o,		/* I - Pointer to option */
-              char         *choice)	/* I - Name of choice */
+              const char   *choice)	/* I - Name of choice */
 {
   int		i;		/* Looping var */
   ppd_choice_t	*c;		/* Current choice */
@@ -203,7 +203,7 @@ ppdFindChoice(ppd_option_t *o,		/* I - Pointer to option */
 
 ppd_choice_t *				/* O - Pointer to choice or NULL */
 ppdFindMarkedChoice(ppd_file_t *ppd,	/* I - PPD file */
-                    char       *option)	/* I - Keyword/option name */
+                    const char *option)	/* I - Keyword/option name */
 {
   int		i;		/* Looping var */
   ppd_option_t	*o;		/* Pointer to option */
@@ -227,7 +227,7 @@ ppdFindMarkedChoice(ppd_file_t *ppd,	/* I - PPD file */
 
 ppd_option_t *				/* O - Pointer to option or NULL */
 ppdFindOption(ppd_file_t *ppd,		/* I - PPD file data */
-              char       *option)	/* I - Option/Keyword name */
+              const char *option)	/* I - Option/Keyword name */
 {
   int		i, j, k;	/* Looping vars */
   ppd_option_t	*o;		/* Pointer to option */
@@ -260,8 +260,8 @@ ppdFindOption(ppd_file_t *ppd,		/* I - PPD file data */
 
 int				/* O - Non-zero if option is marked */
 ppdIsMarked(ppd_file_t *ppd,	/* I - PPD file data */
-            char       *option,	/* I - Option/Keyword name */
-            char       *choice)	/* I - Choice name */
+            const char *option,	/* I - Option/Keyword name */
+            const char *choice)	/* I - Choice name */
 {
   ppd_option_t	*o;		/* Option pointer */
   ppd_choice_t	*c;		/* Choice pointer */
@@ -316,8 +316,8 @@ ppdMarkDefaults(ppd_file_t *ppd)/* I - PPD file record */
 
 int					/* O - Number of conflicts */
 ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
-              char       *option,	/* I - Keyword */
-              char       *choice)	/* I - Option name */
+              const char *option,	/* I - Keyword */
+              const char *choice)	/* I - Option name */
 {
   int		i;		/* Looping var */
   ppd_option_t	*o;		/* Option pointer */
@@ -436,5 +436,5 @@ ppd_default(ppd_option_t *o)	/* I - Option to default */
 
 
 /*
- * End of "$Id: mark.c,v 1.13 1999/07/12 14:02:39 mike Exp $".
+ * End of "$Id: mark.c,v 1.14 1999/07/12 16:09:38 mike Exp $".
  */

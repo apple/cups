@@ -1,5 +1,5 @@
 /*
- * "$Id: filter.c,v 1.8 1999/06/18 18:36:08 mike Exp $"
+ * "$Id: filter.c,v 1.9 1999/07/12 16:09:35 mike Exp $"
  *
  *   File type conversion routines for the Common UNIX Printing System (CUPS).
  *
@@ -58,7 +58,7 @@ mimeAddFilter(mime_t      *mime,	/* I - MIME database */
               mime_type_t *src,		/* I - Source type */
 	      mime_type_t *dst,		/* I - Destination type */
               int         cost,		/* I - Relative time/resource cost */
-	      char        *filter)	/* I - Filter program to run */
+	      const char  *filter)	/* I - Filter program to run */
 {
   mime_filter_t	*temp;			/* New filter */
 
@@ -293,5 +293,5 @@ lookup(mime_t      *mime,	/* I - MIME database */
 
 
 /*
- * End of "$Id: filter.c,v 1.8 1999/06/18 18:36:08 mike Exp $".
+ * End of "$Id: filter.c,v 1.9 1999/07/12 16:09:35 mike Exp $".
  */
