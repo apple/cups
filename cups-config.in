@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# "$Id: cups-config.in,v 1.1 2001/10/26 03:16:46 mike Exp $"
+# "$Id: cups-config.in,v 1.2 2001/11/13 18:49:35 mike Exp $"
 # 
 #   CUPS configuration utility.
 #
@@ -23,7 +23,7 @@
 #         WWW: http://www.cups.org
 #
 
-VERSION="1.1.11"
+VERSION="1.1.11-1"
 APIVERSION="1.1"
 
 prefix=@prefix@
@@ -32,6 +32,7 @@ bindir=@bindir@
 includedir=@includedir@
 libdir=@libdir@
 datadir=@datadir@
+sysconfdir=@sysconfdir@
 cups_datadir=@CUPS_DATADIR@
 cups_serverbin=@CUPS_SERVERBIN@
 cups_serverroot=@CUPS_SERVERROOT@
@@ -128,5 +129,5 @@ while test $# -gt 0; do
 done
 
 #
-# End of "$Id: cups-config.in,v 1.1 2001/10/26 03:16:46 mike Exp $".
+# End of "$Id: cups-config.in,v 1.2 2001/11/13 18:49:35 mike Exp $".
 #

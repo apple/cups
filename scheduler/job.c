@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.140 2001/11/09 20:14:50 mike Exp $"
+ * "$Id: job.c,v 1.141 2001/11/13 18:49:36 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -725,6 +725,7 @@ MoveJob(int        id,		/* I - Job ID */
         break;
 
       strncpy(current->dest, dest, sizeof(current->dest) - 1);
+      current->dtype = p->type & CUPS_PRINTER_CLASS;
 
       if ((attr = ippFindAttribute(current->attrs, "job-printer-uri", IPP_TAG_URI)) != NULL)
       {
@@ -2988,5 +2989,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.140 2001/11/09 20:14:50 mike Exp $".
+ * End of "$Id: job.c,v 1.141 2001/11/13 18:49:36 mike Exp $".
  */
