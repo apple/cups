@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.7 1999/03/05 14:51:40 mike Exp $"
+ * "$Id: job.c,v 1.8 1999/03/06 20:28:55 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -284,9 +284,11 @@ StartJob(int       id,		/* I - Job ID */
 		options[16384],	/* Full list of options */
 		*optptr;	/* Pointer to options */
   ipp_attribute_t *attr;	/* Current attribute */
-  char		*envp[8];	/* Environment variables */
+  char		*envp[10];	/* Environment variables */
   char		language[255],	/* LANG environment variable */
-		charset[255];	/* CHARSET environment variable */
+		charset[255],	/* CHARSET environment variable */
+		ppd[1024],	/* PPD environment variable */
+		root[1024];	/* SERVER_ROOT environment variable */
   int		pid;		/* Process ID of new filter process */
 
 
@@ -431,7 +433,7 @@ StartJob(int       id,		/* I - Job ID */
 
       sprintf(jobid, "%d", current->id);
 
-      argv[0] = (char *)printer->name;
+      argv[0] = printer->name;
       argv[1] = jobid;
       argv[2] = current->username;
       argv[3] = title;
@@ -459,6 +461,9 @@ StartJob(int       id,		/* I - Job ID */
         sprintf(charset, "CHARSET=%s", attr->values[0].string);
       }
 
+      sprintf(ppd, "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
+      sprintf(root, "SERVER_ROOT=%s", ServerRoot);
+
       envp[0] = "PATH=/bin:/usr/bin";
       envp[1] = "SOFTWARE=CUPS/1.0";
       envp[2] = "TZ=GMT";
@@ -466,7 +471,9 @@ StartJob(int       id,		/* I - Job ID */
       envp[4] = charset;
       envp[5] = language;
       envp[6] = "TZ=GMT";
-      envp[7] = NULL;
+      envp[7] = ppd;
+      envp[8] = root;
+      envp[9] = NULL;
 
      /*
       * Now create processes for all of the filters...
@@ -479,8 +486,8 @@ StartJob(int       id,		/* I - Job ID */
         return;
       }
 
-      current->pipe                   = statusfds[0];
-      current->procs[num_filters + 1] = 0;
+      current->pipe = statusfds[0];
+      memset(current->procs, 0, sizeof(current->procs));
 
       for (i = 0; i < num_filters; i ++)
       {
@@ -559,7 +566,6 @@ StartJob(int       id,		/* I - Job ID */
           DEBUG_printf(("StartJob: unable to fork() %s - %s.\n", command,
 	                strerror(errno)));
 
-          current->procs[i] = 0;
 	  CancelJob(current->id);
 	  return;
 	}
@@ -590,7 +596,9 @@ StartJob(int       id,		/* I - Job ID */
         sscanf(printer->device_uri, "%[^:]", method);
         sprintf(command, "%s/backend/%s", ServerRoot, method);
 
-        argv[6] = printer->device_uri;
+        argv[0] = printer->device_uri;
+	if (i)
+	  argv[4] = "1";
 
         if ((pid = fork()) == 0)
 	{
@@ -603,9 +611,14 @@ StartJob(int       id,		/* I - Job ID */
 	  */
 
           close(0);
-	  dup(filterfds[!(i & 1)][0]);
-          close(filterfds[!(i & 1)][0]);
-          close(filterfds[!(i & 1)][1]);
+	  if (i)
+	  {
+	    dup(filterfds[!(i & 1)][0]);
+            close(filterfds[!(i & 1)][0]);
+            close(filterfds[!(i & 1)][1]);
+	  }
+	  else
+	    open("/dev/null", O_RDONLY);
 
 	  close(1);
 	  open("/dev/null", O_WRONLY);
@@ -643,7 +656,6 @@ StartJob(int       id,		/* I - Job ID */
           DEBUG_printf(("StartJob: unable to fork() %s - %s.\n", command,
 	                strerror(errno)));
 
-          current->procs[i] = 0;
 	  CancelJob(current->id);
 	  return;
 	}
@@ -731,5 +743,5 @@ UpdateJob(job_t *job)	/* I - Job to check */
 
 
 /*
- * End of "$Id: job.c,v 1.7 1999/03/05 14:51:40 mike Exp $".
+ * End of "$Id: job.c,v 1.8 1999/03/06 20:28:55 mike Exp $".
  */
