@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.23.2.19 2004/02/25 20:01:37 mike Exp $"
+ * "$Id: ipp-var.c,v 1.23.2.20 2004/02/25 21:57:06 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -196,7 +196,8 @@ ippGetTemplateDir(void)
 char *					/* O - New URL */
 ippRewriteURL(const char *uri,		/* I - Current URI */
               char       *url,		/* O - New URL */
-	      int        urlsize)	/* I - Size of URL buffer */
+	      int        urlsize,	/* I - Size of URL buffer */
+	      const char *newresource)	/* I - Replacement resource */
 {
   char			method[HTTP_MAX_URI],
 			userpass[HTTP_MAX_URI],
@@ -248,27 +249,38 @@ ippRewriteURL(const char *uri,		/* I - Current URI */
   if (strcmp(method, "ipp") == 0 ||
       strcmp(method, "http") == 0)
   {
-   /*
-    * Rewrite the resource string so it doesn't contain any
-    * illegal chars...
-    */
+    if (newresource)
+    {
+     /*
+      * Force the specified resource name instead of the one in the URL...
+      */
 
-    for (rawptr = rawresource, resptr = resource; *rawptr; rawptr ++)
-      if ((*rawptr & 128) || *rawptr == '%' || *rawptr == ' ' ||
-	  *rawptr == '#' || *rawptr == '?' ||
-	  *rawptr == '.') /* For MSIE */
-      {
-	if (resptr < (resource + sizeof(resource) - 3))
+      strlcpy(resource, newresource, sizeof(resource));
+    }
+    else
+    {
+     /*
+      * Rewrite the resource string so it doesn't contain any
+      * illegal chars...
+      */
+
+      for (rawptr = rawresource, resptr = resource; *rawptr; rawptr ++)
+	if ((*rawptr & 128) || *rawptr == '%' || *rawptr == ' ' ||
+	    *rawptr == '#' || *rawptr == '?' ||
+	    *rawptr == '.') /* For MSIE */
 	{
-	  *resptr++ = '%';
-	  *resptr++ = hexchars[(*rawptr >> 4) & 15];
-	  *resptr++ = hexchars[*rawptr & 15];
+	  if (resptr < (resource + sizeof(resource) - 3))
+	  {
+	    *resptr++ = '%';
+	    *resptr++ = hexchars[(*rawptr >> 4) & 15];
+	    *resptr++ = hexchars[*rawptr & 15];
+	  }
 	}
-      }
-      else if (resptr < (resource + sizeof(resource) - 1))
-	*resptr++ = *rawptr;
+	else if (resptr < (resource + sizeof(resource) - 1))
+	  *resptr++ = *rawptr;
 
-    *resptr = '\0';
+      *resptr = '\0';
+    }
 
    /*
     * Map local access to a local URI...
@@ -436,6 +448,19 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
       }
 
      /*
+      * Add "admin_uri" variable if we have a "printer_uri_supported"
+      * attribute...
+      */
+
+      if (!strcmp(name, "printer_uri_supported"))
+      {
+	ippRewriteURL(attr->values[i].string.text, value, sizeof(value),
+	              "/admin/");
+
+        cgiSetArray("admin_uri", element, value);
+      }
+
+     /*
       * Copy values...
       */
 
@@ -499,7 +524,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 		*/
 
 		ippRewriteURL(attr->values[i].string.text, valptr,
-		              sizeof(value) - (valptr - value));
+		              sizeof(value) - (valptr - value), NULL);
         	break;
               }
 
@@ -546,5 +571,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.23.2.19 2004/02/25 20:01:37 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.23.2.20 2004/02/25 21:57:06 mike Exp $".
  */

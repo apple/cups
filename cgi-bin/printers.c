@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.21.2.11 2003/11/07 19:45:05 mike Exp $"
+ * "$Id: printers.c,v 1.21.2.12 2004/02/25 21:57:06 mike Exp $"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -134,7 +134,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
         cgiSetVariable("DEFAULT_URI",
 	               ippRewriteURL(attr->values[0].string.text,
-		                     url, sizeof(url)));
+		                     url, sizeof(url), NULL));
       }
 
       ippDelete(response);
@@ -352,5 +352,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: printers.c,v 1.21.2.11 2003/11/07 19:45:05 mike Exp $".
+ * End of "$Id: printers.c,v 1.21.2.12 2004/02/25 21:57:06 mike Exp $".
  */
