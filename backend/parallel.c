@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c,v 1.27 2001/01/24 17:14:01 mike Exp $"
+ * "$Id: parallel.c,v 1.28 2001/02/28 15:19:32 mike Exp $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -288,7 +288,8 @@ list_devices(void)
   int	i;			/* Looping var */
   int	fd;			/* File descriptor */
   char	device[255],		/* Device filename */
-	probefile[255];		/* Probe filename */
+	probefile[255],		/* Probe filename */
+	basedevice[255];	/* Base device filename for ports */
   FILE	*probe;			/* /proc/parport/n/autoprobe file */
   char	line[1024],		/* Line from file */
 	*delim,			/* Delimiter in file */
@@ -302,14 +303,30 @@ list_devices(void)
     * First open the device to make sure the driver module is loaded...
     */
 
-    sprintf(device, "/dev/lp%d", i);
-    if ((fd = open(device, O_WRONLY)) >= 0)
+    if ((fd = open("/dev/parallel/0", O_WRONLY)) >= 0)
+    {
       close(fd);
+      strcpy(basedevice, "/dev/parallel/");
+    }
     else
     {
-      sprintf(device, "/dev/par%d", i);
+      sprintf(device, "/dev/lp%d", i);
       if ((fd = open(device, O_WRONLY)) >= 0)
+      {
 	close(fd);
+	strcpy(basedevice, "/dev/lp");
+      }
+      else
+      {
+	sprintf(device, "/dev/par%d", i);
+	if ((fd = open(device, O_WRONLY)) >= 0)
+	{
+	  close(fd);
+	  strcpy(basedevice, "/dev/par");
+	}
+	else
+	  strcpy(basedevice, "/dev/unknown-parallel");
+      }
     }
 
    /*
@@ -363,11 +380,11 @@ list_devices(void)
       fclose(probe);
 
       if (make[0])
-	printf("direct parallel:/dev/lp%d \"%s %s\" \"Parallel Port #%d\"\n",
-	       i, make, model, i + 1);
+	printf("direct parallel:%s%d \"%s %s\" \"Parallel Port #%d\"\n",
+	       basedevice, i, make, model, i + 1);
       else
-	printf("direct parallel:/dev/lp%d \"%s\" \"Parallel Port #%d\"\n",
-	       i, model, i + 1);
+	printf("direct parallel:%s%d \"%s\" \"Parallel Port #%d\"\n",
+	       basedevice, i, model, i + 1);
     }
     else if (fd >= 0)
     {
@@ -595,5 +612,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c,v 1.27 2001/01/24 17:14:01 mike Exp $".
+ * End of "$Id: parallel.c,v 1.28 2001/02/28 15:19:32 mike Exp $".
  */

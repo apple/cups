@@ -38,6 +38,8 @@ CHANGES IN CUPS V1.1.7
 	  by address (127.0.0.1) for users the go to the
 	  trouble of removing the required localhost entry
 	  in /etc/hosts or on their DNS server...
+	- Added support for Linux 2.4.x devfs parallel port
+	  filenames (/dev/parallel/N).
 
 
 CHANGES IN CUPS V1.1.6-3
