@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.30.2.11 2003/04/10 21:02:06 mike Exp $"
+# "$Id: cups.spec,v 1.30.2.12 2003/06/02 16:37:44 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -140,21 +140,25 @@ rm -rf $RPM_BUILD_ROOT
 
 /etc/init.d/*
 /etc/rc0.d/*
+/etc/rc2.d/*
 /etc/rc3.d/*
 /etc/rc5.d/*
 
 # OLD RedHat/Mandrake
 #/etc/rc.d/init.d/*
 #/etc/rc.d/rc0.d/*
+#/etc/rc.d/rc2.d/*
 #/etc/rc.d/rc3.d/*
 #/etc/rc.d/rc5.d/*
 
 #/sbin/rc.d/*
 #/sbin/rc.d/rc0.d/*
+#/sbin/rc.d/rc2.d/*
 #/sbin/rc.d/rc3.d/*
 #/sbin/rc.d/rc5.d/*
 
 /usr/bin/cancel
+/usr/bin/cupstestppd
 /usr/bin/disable
 /usr/bin/enable
 /usr/bin/lp*
@@ -217,5 +221,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/*.so*
 
 #
-# End of "$Id: cups.spec,v 1.30.2.11 2003/04/10 21:02:06 mike Exp $".
+# End of "$Id: cups.spec,v 1.30.2.12 2003/06/02 16:37:44 mike Exp $".
 #

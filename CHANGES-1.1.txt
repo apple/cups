@@ -1,6 +1,12 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.20rc1
+
+	- The cups.spec file didn't list the rc2.d init
+	  directory or the cupstestppd file.
+
+
 CHANGES IN CUPS V1.1.19
 
 	- The GNU TLS code incorrectly used
