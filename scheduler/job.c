@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.37 1999/09/03 19:36:43 mike Exp $"
+ * "$Id: job.c,v 1.38 1999/09/22 18:08:42 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -301,11 +301,13 @@ StartJob(int       id,		/* I - Job ID */
 				/* Job title string */
 		copies[255],	/* # copies string */
 		options[16384],	/* Full list of options */
-		*envp[13],	/* Environment variables */
+		*envp[15],	/* Environment variables */
 		language[255],	/* LANG environment variable */
 		charset[255],	/* CHARSET environment variable */
 		content_type[255],/* CONTENT_TYPE environment variable */
+		device_uri[1024],/* DEVICE_URI environment variable */
 		ppd[1024],	/* PPD environment variable */
+		printer_name[255],/* PRINTER environment variable */
 		root[1024],	/* SERVER_ROOT environment variable */
 		cache[255],	/* RIP_MAX_CACHE environment variable */
 		tmpdir[1024];	/* TMPDIR environment variable */
@@ -529,12 +531,14 @@ StartJob(int       id,		/* I - Job ID */
     sprintf(charset, "CHARSET=%s", attr->values[0].string.text);
   }
 
-  sprintf(ppd, "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
-  sprintf(root, "SERVER_ROOT=%s", ServerRoot);
-  sprintf(cache, "RIP_MAX_CACHE=%s", RIPCache);
-  sprintf(tmpdir, "TMPDIR=%s", TempDir);
   sprintf(content_type, "CONTENT_TYPE=%s/%s", current->filetype->super,
           current->filetype->type);
+  sprintf(device_uri, "DEVICE_URI=%s", printer->device_uri);
+  sprintf(ppd, "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
+  sprintf(printer_name, "PRINTER=%s", printer->name);
+  sprintf(cache, "RIP_MAX_CACHE=%s", RIPCache);
+  sprintf(root, "SERVER_ROOT=%s", ServerRoot);
+  sprintf(tmpdir, "TMPDIR=%s", TempDir);
 
   envp[0]  = "PATH=/bin:/usr/bin";
   envp[1]  = "SOFTWARE=CUPS/1.0";
@@ -542,13 +546,15 @@ StartJob(int       id,		/* I - Job ID */
   envp[3]  = "USER=root";
   envp[4]  = charset;
   envp[5]  = language;
-  envp[6]  = "TZ=GMT";
+  envp[6]  = TZ;
   envp[7]  = ppd;
   envp[8]  = root;
   envp[9]  = cache;
   envp[10] = tmpdir;
   envp[11] = content_type;
-  envp[12] = NULL;
+  envp[12] = device_uri;
+  envp[13] = printer_name;
+  envp[14] = NULL;
 
   DEBUG_puts(envp[0]);
   DEBUG_puts(envp[1]);
@@ -562,6 +568,8 @@ StartJob(int       id,		/* I - Job ID */
   DEBUG_puts(envp[9]);
   DEBUG_puts(envp[10]);
   DEBUG_puts(envp[11]);
+  DEBUG_puts(envp[12]);
+  DEBUG_puts(envp[13]);
 
  /*
   * Now create processes for all of the filters...
@@ -969,5 +977,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.37 1999/09/03 19:36:43 mike Exp $".
+ * End of "$Id: job.c,v 1.38 1999/09/22 18:08:42 mike Exp $".
  */

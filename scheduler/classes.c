@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.11 1999/07/08 17:42:03 mike Exp $"
+ * "$Id: classes.c,v 1.12 1999/09/22 18:08:40 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -424,8 +424,26 @@ LoadAllClasses(void)
         p->state = IPP_PRINTER_IDLE;
       else if (strcasecmp(value, "stopped") == 0)
         p->state = IPP_PRINTER_STOPPED;
+    }
+    else if (strcmp(name, "Accepting") == 0)
+    {
+     /*
+      * Set the initial accepting state...
+      */
 
-      p->accepting = p->state != IPP_PRINTER_STOPPED;
+      if (strcasecmp(value, "yes") == 0)
+        p->accepting = 1;
+      else
+        p->accepting = 0;
+    }
+    else
+    {
+     /*
+      * Something else we don't understand...
+      */
+
+      LogMessage(LOG_ERROR, "Unknown configuration directive %s on line %d of classes.conf.",
+	         name, linenum);
     }
   }
 
@@ -506,6 +524,10 @@ SaveAllClasses(void)
       fputs("State Stopped\n", fp);
     else
       fputs("State Idle\n", fp);
+    if (pclass->accepting)
+      fputs("Accepting Yes\n", fp);
+    else
+      fputs("Accepting No\n", fp);
 
     for (i = 0; i < pclass->num_printers; i ++)
       fprintf(fp, "Printer %s\n", pclass->printers[i]->name);
@@ -518,5 +540,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.11 1999/07/08 17:42:03 mike Exp $".
+ * End of "$Id: classes.c,v 1.12 1999/09/22 18:08:40 mike Exp $".
  */

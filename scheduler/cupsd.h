@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.13 1999/08/28 16:17:51 mike Exp $"
+ * "$Id: cupsd.h,v 1.14 1999/09/22 18:08:41 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -148,6 +148,8 @@ VAR fd_set		InputSet,	/* Input files for select() */
 VAR time_t		StartTime;	/* Time server was started */
 VAR int			NeedReload	VALUE(TRUE);
 					/* Need to load configuration? */
+VAR char		TZ[1024]	VALUE("TZ=GMT");
+					/* Timezone configuration */
 
 
 /*
@@ -156,5 +158,5 @@ VAR int			NeedReload	VALUE(TRUE);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.13 1999/08/28 16:17:51 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.14 1999/09/22 18:08:41 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.35 1999/07/12 19:33:18 mike Exp $"
+ * "$Id: printers.c,v 1.36 1999/09/22 18:08:43 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -465,15 +465,20 @@ LoadAllPrinters(void)
       */
 
       if (strcasecmp(value, "idle") == 0)
-      {
-        p->state     = IPP_PRINTER_IDLE;
-        p->accepting = 1;
-      }
+        p->state = IPP_PRINTER_IDLE;
       else if (strcasecmp(value, "stopped") == 0)
-      {
-        p->state     = IPP_PRINTER_STOPPED;
+        p->state = IPP_PRINTER_STOPPED;
+    }
+    else if (strcmp(name, "Accepting") == 0)
+    {
+     /*
+      * Set the initial accepting state...
+      */
+
+      if (strcasecmp(value, "yes") == 0)
+        p->accepting = 1;
+      else
         p->accepting = 0;
-      }
     }
     else
     {
@@ -565,6 +570,10 @@ SaveAllPrinters(void)
       fputs("State Stopped\n", fp);
     else
       fputs("State Idle\n", fp);
+    if (printer->accepting)
+      fputs("Accepting Yes\n", fp);
+    else
+      fputs("Accepting No\n", fp);
 
     fputs("</Printer>\n", fp);
   }
@@ -578,34 +587,39 @@ SaveAllPrinters(void)
  */
 
 void
-SetPrinterAttrs(printer_t *p)	/* I - Printer to setup */
+SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 {
-  char		uri[HTTP_MAX_URI];/* URI for printer */
-  int		i;		/* Looping var */
-  char		filename[1024];	/* Name of PPD file */
-  int		num_media;	/* Number of media options */
-  ppd_file_t	*ppd;		/* PPD file data */
-  ppd_option_t	*input_slot,	/* InputSlot options */
-		*media_type,	/* MediaType options */
-		*page_size;	/* PageSize options */
-  ipp_attribute_t *attr;	/* Attribute data */
-  ipp_value_t	*val;		/* Attribute value */
-  int		nups[3] =	/* number-up-supported values */
+  char		uri[HTTP_MAX_URI];	/* URI for printer */
+  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+		username[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+  int		port;			/* Port portion of URI */
+  int		i;			/* Looping var */
+  char		filename[1024];		/* Name of PPD file */
+  int		num_media;		/* Number of media options */
+  ppd_file_t	*ppd;			/* PPD file data */
+  ppd_option_t	*input_slot,		/* InputSlot options */
+		*media_type,		/* MediaType options */
+		*page_size;		/* PageSize options */
+  ipp_attribute_t *attr;		/* Attribute data */
+  ipp_value_t	*val;			/* Attribute value */
+  int		nups[3] =		/* number-up-supported values */
 		{ 1, 2, 4 };
-  ipp_orient_t	orients[4] =	/* orientation-requested-supported values */
+  ipp_orient_t	orients[4] =		/* orientation-requested-supported values */
 		{
 		  IPP_PORTRAIT,
 		  IPP_LANDSCAPE,
 		  IPP_REVERSE_LANDSCAPE,
 		  IPP_REVERSE_PORTRAIT
 		};
-  const char	*sides[3] =	/* sides-supported values */
+  const char	*sides[3] =		/* sides-supported values */
 		{
 		  "one",
 		  "two-long-edge",
 		  "two-short-edge"
 		};
-  ipp_op_t	ops[] =		/* operations-supported values */
+  ipp_op_t	ops[] =			/* operations-supported values */
 		{
 		  IPP_PRINT_JOB,
 		  IPP_VALIDATE_JOB,
@@ -626,7 +640,7 @@ SetPrinterAttrs(printer_t *p)	/* I - Printer to setup */
 		  CUPS_ACCEPT_JOBS,
 		  CUPS_REJECT_JOBS
 		};
-  const char	*charsets[] =	/* charset-supported values */
+  const char	*charsets[] =		/* charset-supported values */
 		{
 		  "us-ascii",
 		  "iso-8859-1",
@@ -753,11 +767,30 @@ SetPrinterAttrs(printer_t *p)	/* I - Printer to setup */
     else
     {
      /*
-      * Add printer-specific attributes...
+      * Add printer-specific attributes...  Start by sanitizing the device
+      * URI so it doesn't have a username or password in it...
       */
 
+      if (strstr(p->device_uri, "://") != NULL)
+      {
+       /*
+        * http://..., ipp://..., etc.
+	*/
+
+        httpSeparate(p->device_uri, method, username, host, &port, resource);
+	sprintf(uri, "%s://%s:%d/%s", method, host, port, resource);
+      }
+      else
+      {
+       /*
+        * file:..., serial:..., etc.
+	*/
+
+        strcpy(uri, p->device_uri);
+      }
+
       ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "device-uri", NULL,
-        	   p->device_uri);
+        	   uri);
 
      /*
       * Assign additional attributes from the PPD file (if any)...
@@ -1031,5 +1064,5 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 
 
 /*
- * End of "$Id: printers.c,v 1.35 1999/07/12 19:33:18 mike Exp $".
+ * End of "$Id: printers.c,v 1.36 1999/09/22 18:08:43 mike Exp $".
  */

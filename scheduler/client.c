@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.35 1999/09/09 19:11:14 mike Exp $"
+ * "$Id: client.c,v 1.36 1999/09/22 18:08:41 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1345,6 +1345,7 @@ pipe_command(client_t *con,	/* I - Client connection */
   static char	remote_user[1024];	/* REMOTE_HOST env variable */
   static char	tmpdir[1024];		/* TMPDIR env variable */
 
+
  /*
   * Copy the command string...
   */
@@ -1418,7 +1419,7 @@ pipe_command(client_t *con,	/* I - Client connection */
   envp[7]  = remote_host;
   envp[8]  = remote_user;
   envp[9]  = lang;
-  envp[10] = "TZ=GMT";
+  envp[10] = TZ;
   envp[11] = tmpdir;
 
   if (con->operation == HTTP_GET)
@@ -1513,5 +1514,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.35 1999/09/09 19:11:14 mike Exp $".
+ * End of "$Id: client.c,v 1.36 1999/09/22 18:08:41 mike Exp $".
  */
