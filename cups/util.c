@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.81.2.36 2004/06/29 13:15:09 mike Exp $"
+ * "$Id: util.c,v 1.81.2.37 2004/08/19 12:46:28 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -1074,6 +1074,9 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
   * Range check input...
   */
 
+  DEBUG_printf(("cupsGetPPD2(http=%p, name=\"%s\")\n", http,
+                name ? name : "(null)"));
+
   if (!http || !name)
   {
     last_error = IPP_INTERNAL_ERROR;
@@ -1105,9 +1108,11 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
 
   cupsLangFree(language);
 
-  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", name);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, uri);
+
+  DEBUG_printf(("cupsGetPPD2: printer-uri=\"%s\"\n", uri));
 
   ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
                 "requested-attributes",
@@ -1703,5 +1708,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.81.2.36 2004/06/29 13:15:09 mike Exp $".
+ * End of "$Id: util.c,v 1.81.2.37 2004/08/19 12:46:28 mike Exp $".
  */

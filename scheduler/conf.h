@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.36.2.23 2004/06/29 13:15:10 mike Exp $"
+ * "$Id: conf.h,v 1.36.2.24 2004/08/19 12:46:28 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -96,6 +96,8 @@ VAR char		*SystemGroups[MAX_SYSTEM_GROUPS],
 					/* GUI program to use for IRIX */
 			*FontPath		VALUE(NULL),
 					/* Font search path */
+			*ReloadTimeout		VALUE(0),
+					/* Timeout before reload from SIGHUP */
 			*RemoteRoot		VALUE(NULL),
 					/* Remote root user */
 			*Classification		VALUE(NULL);
@@ -195,5 +197,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.36.2.23 2004/06/29 13:15:10 mike Exp $".
+ * End of "$Id: conf.h,v 1.36.2.24 2004/08/19 12:46:28 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.90 2004/07/02 20:49:23 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.91 2004/08/19 12:46:28 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -326,6 +326,10 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
        /*
         * Then try processing the operation...
 	*/
+
+        if (uri)
+          LogMessage(L_DEBUG2, "ProcessIPPRequest: URI=\"%s\"",
+	             uri->values[0].string.text);
 
 	switch (con->request->request.op.operation_id)
 	{
@@ -7079,5 +7083,5 @@ validate_user(job_t      *job,		/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.90 2004/07/02 20:49:23 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.91 2004/08/19 12:46:28 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.64 2004/07/02 19:12:48 mike Exp $"
+ * "$Id: main.c,v 1.57.2.65 2004/08/19 12:46:28 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -495,7 +495,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       */
 
       if ((NumClients == 0 && (!job || NeedReload != RELOAD_ALL)) ||
-          (time(NULL) - ReloadTime) >= 60)
+          (time(NULL) - ReloadTime) >= ReloadTime)
       {
         if (!ReadConfiguration())
         {
@@ -1342,5 +1342,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.64 2004/07/02 19:12:48 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.65 2004/08/19 12:46:28 mike Exp $".
  */

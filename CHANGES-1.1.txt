@@ -3,6 +3,13 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- Added a ReloadTimeout directive to control how long
+	  the scheduler waits for jobs to complete before
+	  restarting the scheduler (STR #861)
+	- Added a note to the default cupsd.conf file which
+	  mentions that you must allow connections from
+	  localhost for the command-line and web interfaces to
+	  work (STR #850)
 	- The IPP backend incorrectly used the local port when
 	  communicating with a remote server; this caused
 	  problems with some custom configurations (STR #852)
