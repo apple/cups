@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.28.2.7 2002/05/16 13:59:54 mike Exp $"
+ * "$Id: lpd.c,v 1.28.2.8 2002/07/11 17:51:35 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -77,8 +77,8 @@ extern int	rresvport(int *port);
 
 static int	lpd_command(int lpd_fd, char *format, ...);
 static int	lpd_queue(char *hostname, char *printer, char *filename,
-		          char *user, char *title, int copies, int banner,
-			  int format, int order);
+		          char *user, char *title, int copies,
+			  int banner, int format, int order, int reserve);
 static int	lpd_write(int lpd_fd, char *buffer, int length);
 
 
@@ -109,6 +109,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   int	banner;		/* Print banner page? */
   int	format;		/* Print format */
   int	order;		/* Order of control/data files */
+  int	reserve;	/* Reserve priviledged port? */
 
 
  /*
@@ -180,9 +181,10 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * See if there are any options...
   */
 
-  banner = 0;
-  format = 'l';
-  order  = ORDER_CONTROL_DATA;
+  banner  = 0;
+  format  = 'l';
+  order   = ORDER_CONTROL_DATA;
+  reserve = 0;
 
   if ((options = strchr(resource, '?')) != NULL)
   {
@@ -264,6 +266,17 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	else
 	  fprintf(stderr, "ERROR: Unknown file order \"%s\"\n", value);
       }
+      else if (strcasecmp(name, "reserve") == 0)
+      {
+       /*
+        * Set port reservation mode...
+	*/
+
+        reserve = !value[0] ||
+	          strcasecmp(value, "on") == 0 ||
+	 	  strcasecmp(value, "yes") == 0 ||
+	 	  strcasecmp(value, "true") == 0;
+      }
     }
   }
 
@@ -285,14 +298,15 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   {
     status = lpd_queue(hostname, resource + 1, filename,
                        argv[2] /* user */, title, atoi(argv[4]) /* copies */,
-		       banner, format, order);
+		       banner, format, order, reserve);
 
     if (!status)
       fprintf(stderr, "PAGE: 1 %d\n", atoi(argv[4]));
   }
   else
     status = lpd_queue(hostname, resource + 1, filename,
-                       argv[2] /* user */, title, 1, banner, format, order);
+                       argv[2] /* user */, title, 1,
+		       banner, format, order, reserve);
 
  /*
   * Remove the temporary file if necessary...
@@ -371,7 +385,8 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 	  int  copies,		/* I - Number of copies */
 	  int  banner,		/* I - Print LPD banner? */
           int  format,		/* I - Format specifier */
-          int  order)		/* I - Order of data/control files */
+          int  order,		/* I - Order of data/control files */
+	  int  reserve)		/* I - Reserve ports? */
 {
   FILE			*fp;		/* Job file */
   char			localhost[255];	/* Local host name */
@@ -413,10 +428,10 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
   for (port = 732;;)
   {
-    if (getuid())
+    if (getuid() || !reserve)
     {
      /*
-      * We're running as a normal user, so just create a regular socket...
+      * Just create a regular socket...
       */
 
       if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -428,7 +443,7 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
     else
     {
      /*
-      * We're running as root, so comply with RFC 1179 and reserve a
+      * We're running as root and want to comply with RFC 1179.  Reserve a
       * priviledged port between 721 and 732...
       */
 
@@ -755,5 +770,5 @@ rresvport(int *port)		/* IO - Port number to bind to */
 #endif /* !HAVE_RRESVPORT */
 
 /*
- * End of "$Id: lpd.c,v 1.28.2.7 2002/05/16 13:59:54 mike Exp $".
+ * End of "$Id: lpd.c,v 1.28.2.8 2002/07/11 17:51:35 mike Exp $".
  */

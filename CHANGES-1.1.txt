@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The LPD backend now supports a "reserve" option and no
+	  longer reserves a priviledged port by default.
 	- The cupsaddsmb command now continues past printers
 	  that do not have a PPD file to export.
 	- The lpstat command didn't treat printer names as
