@@ -11,7 +11,7 @@
 
 	# Attributes, starting in the operation group...
 	GROUP operation
-	ATTR charset attributes-charset us-ascii
+	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
@@ -33,7 +33,7 @@
 
 	# Attributes, starting in the operation group...
 	GROUP operation
-	ATTR charset attributes-charset us-ascii
+	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
@@ -65,7 +65,7 @@
 
 	# Attributes, starting in the operation group...
 	GROUP operation
-	ATTR charset attributes-charset us-ascii
+	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR integer job-id $job-id
@@ -91,7 +91,7 @@
 
 	# Attributes, starting in the operation group...
 	GROUP operation
-	ATTR charset attributes-charset us-ascii
+	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR integer job-id $job-id
@@ -117,7 +117,7 @@
 
 	# Attributes, starting in the operation group...
 	GROUP operation
-	ATTR charset attributes-charset us-ascii
+	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR integer job-id $job-id
@@ -143,7 +143,7 @@
 
 	# Attributes, starting in the operation group...
 	GROUP operation
-	ATTR charset attributes-charset us-ascii
+	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
@@ -165,7 +165,7 @@
 
 	# Attributes, starting in the operation group...
 	GROUP operation
-	ATTR charset attributes-charset us-ascii
+	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR integer job-id $job-id
