@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c,v 1.8 1999/03/23 14:10:17 mike Exp $"
+ * "$Id: testppd.c,v 1.9 1999/03/24 21:20:40 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -44,7 +44,7 @@ int				/* O - Exit status */
 main(int  argc,			/* I - Number of command-line arguments */
      char *argv[])		/* I - Command-line arguments */
 {
-  int		i, j, k, m;	/* Looping vars */
+  int		i, j, k, m, n;	/* Looping vars */
   ppd_file_t	*ppd;		/* PPD file record */
   ppd_size_t	*size;		/* Size record */
   ppd_group_t	*group;		/* UI group */
@@ -142,6 +142,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 		     size->left / 72.0, size->bottom / 72.0,
 		     size->right / 72.0, size->top / 72.0);
 
+            if (choice->num_data > 0)
+	    {
+	      putchar('[');
+	      for (n = 0; n < choice->num_data; n ++)
+	        printf(" %d", choice->data[n]);
+	      printf(" ]");
+	    }
+
             if (strcmp(option->defchoice, choice->choice) == 0)
 	      puts(" *");
 	    else
@@ -155,6 +163,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 	       m --, choice ++)
 	  {
 	    printf("                %s (%s)", choice->choice, choice->text);
+
+            if (choice->num_data > 0)
+	    {
+	      putchar('[');
+	      for (n = 0; n < choice->num_data; n ++)
+	        printf(" %d", choice->data[n]);
+	      printf(" ]");
+	    }
 
             if (strcmp(option->defchoice, choice->choice) == 0)
 	      puts(" *");
@@ -173,5 +189,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c,v 1.8 1999/03/23 14:10:17 mike Exp $".
+ * End of "$Id: testppd.c,v 1.9 1999/03/24 21:20:40 mike Exp $".
  */

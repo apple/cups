@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.c,v 1.2 1999/03/21 02:10:07 mike Exp $"
+ * "$Id: raster.c,v 1.3 1999/03/24 21:20:40 mike Exp $"
  *
  *   Raster file routines for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -194,5 +194,5 @@ cupsRasterWritePixels(cups_raster_t *r,
 
 
 /*
- * End of "$Id: raster.c,v 1.2 1999/03/21 02:10:07 mike Exp $".
+ * End of "$Id: raster.c,v 1.3 1999/03/24 21:20:40 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.8 1999/03/21 02:10:06 mike Exp $"
+ * "$Id: ppd.c,v 1.9 1999/03/24 21:20:39 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -61,14 +61,15 @@
 #define PPD_OPTION	2		/* Line contained an option name */
 #define PPD_TEXT	4		/* Line contained human-readable text */
 #define PPD_STRING	8		/* Line contained a string or code */
-
+#define PPD_DATA	16		/* Line contained CUPS-specific data */
 
 /*
  * Local functions...
  */
 
 static int	ppd_read(FILE *fp, char *keyword, char *option,
-		         unsigned char *text, unsigned char **string);
+		         unsigned char *text, unsigned char **string,
+			 int *num_data, int *data);
 static void	ppd_decode(unsigned char *string);
 static void	ppd_free_group(ppd_group_t *group);
 static void	ppd_free_option(ppd_option_t *option);
@@ -218,7 +219,11 @@ ppd_free_option(ppd_option_t *option)	/* I - Option to free */
     for (i = option->num_choices, choice = option->choices;
          i > 0;
          i --, choice ++)
+    {
       free(choice->code);
+      if (choice->num_data > 0)
+        free(choice->data);
+    }
 
     free(option->choices);
   }
@@ -250,6 +255,8 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 		*nameptr;	/* Pointer into name */
   float		order;		/* Order dependency number */
   ppd_section_t	section;	/* Order dependency section */
+  int		num_data,	/* Number of CUPS-specific data values */
+		data[256];	/* Pointer to CUPS-specific data */
 
 
  /*
@@ -263,7 +270,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
   * Grab the first line and make sure it reads '*PPD-Adobe: "major.minor"'...
   */
 
-  mask = ppd_read(fp, keyword, name, text, &string);
+  mask = ppd_read(fp, keyword, name, text, &string, &num_data, data);
 
   if (mask == 0 ||
       strcmp(keyword, "PPD-Adobe") != 0 ||
@@ -303,7 +310,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
   option   = NULL;
   choice   = NULL;
 
-  while ((mask = ppd_read(fp, keyword, name, text, &string)) != 0)
+  while ((mask = ppd_read(fp, keyword, name, text, &string, &num_data, data)) != 0)
   {
 #ifdef DEBUG
     printf("mask = %x, keyword = \"%s\"", mask, keyword);
@@ -989,6 +996,13 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 
       choice->code = string;
       string = NULL;			/* Don't free this string below */
+
+      if (mask & PPD_DATA)
+      {
+        choice->num_data = num_data;
+        choice->data     = malloc(sizeof(int) * num_data);
+	memcpy(choice->data, data, sizeof(int) * num_data);
+      }
     }
 
     if (string != NULL)
@@ -1110,7 +1124,9 @@ ppd_read(FILE          *fp,	/* I - File to read from */
          char          *keyword,/* O - Keyword from line */
 	 char          *option,	/* O - Option from line */
          unsigned char *text,	/* O - Human-readable text from line */
-	 unsigned char **string)/* O - Code/string data */
+	 unsigned char **string,/* O - Code/string data */
+	 int           *num_data,/* O - Number of data values */
+	 int           *data)	/* O - Data values */
 {
   int		ch,		/* Character from file */
 		endquote,	/* Waiting for an end quote */
@@ -1128,12 +1144,14 @@ ppd_read(FILE          *fp,	/* I - File to read from */
   */
 
   if (fp == NULL || keyword == NULL || option == NULL || text == NULL ||
-      string == NULL)
+      string == NULL || num_data == NULL || data == NULL)
     return (0);
 
  /*
   * Now loop until we have a valid line...
   */
+
+  *num_data  = 0;
 
   do
   {
@@ -1208,6 +1226,19 @@ ppd_read(FILE          *fp,	/* I - File to read from */
 
     if (line[0] != '*')			/* All lines start with an asterisk */
       continue;
+
+    if (strncmp((char *)line, "*%cupsData:", 11) == 0)
+    {
+     /*
+      * Got CUPS-specific data...
+      */
+
+      if (*num_data < 256)
+      {
+        data[*num_data] = strtol((char *)line + 11, NULL, 0);
+	(*num_data) ++;
+      }
+    }
 
     if (strncmp((char *)line, "*%", 2) == 0 ||	/* Comment line */
         strncmp((char *)line, "*?", 2) == 0 ||	/* Query line */
@@ -1294,6 +1325,9 @@ ppd_read(FILE          *fp,	/* I - File to read from */
   }
   while (mask == 0);
 
+  if (*num_data > 0)
+    mask |= PPD_DATA;
+
   return (mask);
 }
 
@@ -1353,5 +1387,5 @@ ppd_decode(unsigned char *string)	/* I - String to decode */
 
 
 /*
- * End of "$Id: ppd.c,v 1.8 1999/03/21 02:10:06 mike Exp $".
+ * End of "$Id: ppd.c,v 1.9 1999/03/24 21:20:39 mike Exp $".
  */
