@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.63 2000/04/20 19:56:43 mike Exp $"
+ * "$Id: job.c,v 1.64 2000/04/27 12:24:58 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1228,7 +1228,7 @@ StopJob(int id)			/* I - Job ID */
 	current->current_file --;
 
         for (i = 0; current->procs[i]; i ++)
-	  if (current->procs[i] > 0 && current->procs[i + 1])
+	  if (current->procs[i] > 0)
 	  {
 	    kill(current->procs[i], SIGTERM);
 	    current->procs[i] = 0;
@@ -2322,5 +2322,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.63 2000/04/20 19:56:43 mike Exp $".
+ * End of "$Id: job.c,v 1.64 2000/04/27 12:24:58 mike Exp $".
  */
