@@ -5,6 +5,12 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- The parallel and USB backends now retry if the backend
+	  detects that the printer is not connected to the
+	  system (rather than stopping the queue...)
+	- The network backends now retry if the backend detects
+	  that the printer is not connected to the network or is
+	  unreachable (rather than stopping the queue...)
 	- The cupsGetDests() function no longer lists options
 	  and instances for printers that no longer exist.
 	- The scheduler now converts the document language to
