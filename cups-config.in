@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: cups-config.in,v 1.8 2002/04/19 20:04:38 mike Exp $"
+# "$Id: cups-config.in,v 1.9 2002/05/01 19:26:57 mike Exp $"
 # 
 #   CUPS configuration utility.
 #
@@ -96,21 +96,10 @@ while test $# -gt 0; do
 	    ;;
 	--libs)
 	    if test $static = no; then
-	        # AIX requires all libraries for shared libraries, while
-		# other platforms store the referenced libraries in the
-		# shared library itself.
-	        if test x`uname` = xAIX; then
-	            if test $image = no; then
-	        	echo -lcups $LIBS
-		    else
-	        	echo -lcupsimage $IMGLIBS -lcups $LIBS
-		    fi
+	        if test $image = no; then
+	            echo -lcups $LIBS
 		else
-	            if test $image = no; then
-	        	echo -lcups
-		    else
-	        	echo -lcupsimage -lcups
-		    fi
+	            echo -lcupsimage $IMGLIBS -lcups $LIBS
 		fi
 	    else
 	        if test $image = no; then
@@ -141,5 +130,5 @@ while test $# -gt 0; do
 done
 
 #
-# End of "$Id: cups-config.in,v 1.8 2002/04/19 20:04:38 mike Exp $".
+# End of "$Id: cups-config.in,v 1.9 2002/05/01 19:26:57 mike Exp $".
 #
