@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.77 2004/02/25 20:01:37 mike Exp $"
+ * "$Id: client.c,v 1.91.2.78 2004/03/02 20:56:02 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -110,6 +110,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 
   memset(con, 0, sizeof(client_t));
   con->http.activity = time(NULL);
+  con->file          = -1;
 
  /*
   * Accept the client and get the remote address...
@@ -352,7 +353,7 @@ CloseAllClients(void)
  * 'CloseClient()' - Close a remote client.
  */
 
-void
+int				/* O - 1 if partial close, 0 if fully closed */
 CloseClient(client_t *con)	/* I - Client to close */
 {
   int		partial;	/* Do partial close for SSL? */
@@ -539,6 +540,8 @@ CloseClient(client_t *con)	/* I - Client to close */
     if (con < (Clients + NumClients))
       memmove(con, con + 1, (Clients + NumClients - con) * sizeof(client_t));
   }
+
+  return (partial);
 }
 
 
@@ -876,13 +879,13 @@ ReadClient(client_t *con)		/* I - Client to read from */
 
   status = HTTP_CONTINUE;
 
-  LogMessage(L_DEBUG2, "ReadClient() %d, used=%d", con->http.fd,
-             con->http.used);
+  LogMessage(L_DEBUG2, "ReadClient() %d, used=%d, file=%d", con->http.fd,
+             con->http.used, con->file);
 
   if (con->http.error)
   {
-    CloseClient(con);
-    return (0);
+    LogMessage(L_DEBUG2, "ReadClient: http error seen...");
+    return (CloseClient(con));
   }
 
   switch (con->http.state)
@@ -894,8 +897,8 @@ ReadClient(client_t *con)		/* I - Client to read from */
 
         if (httpGets(line, sizeof(line) - 1, HTTP(con)) == NULL)
 	{
-          CloseClient(con);
-	  return (0);
+	  LogMessage(L_DEBUG2, "ReadClient: httpGets returned EOF...");
+          return (CloseClient(con));
 	}
 
        /*
@@ -943,8 +946,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	  case 1 :
 	      LogMessage(L_ERROR, "Bad request line \"%s\"!", line);
 	      SendError(con, HTTP_BAD_REQUEST);
-	      CloseClient(con);
-	      return (0);
+	      return (CloseClient(con));
 	  case 2 :
 	      con->http.version = HTTP_0_9;
 	      break;
@@ -953,8 +955,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      {
 		LogMessage(L_ERROR, "Bad request line \"%s\"!", line);
 		SendError(con, HTTP_BAD_REQUEST);
-		CloseClient(con);
-		return (0);
+		return (CloseClient(con));
 	      }
 
 	      if (major < 2)
@@ -968,8 +969,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      else
 	      {
 	        SendError(con, HTTP_NOT_SUPPORTED);
-	        CloseClient(con);
-	        return (0);
+	        return (CloseClient(con));
 	      }
 	      break;
 	}
@@ -1008,8 +1008,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 
 	    LogMessage(L_ERROR, "Bad URI \"%s\" in request!", con->uri);
 	    SendError(con, HTTP_METHOD_NOT_ALLOWED);
-	    CloseClient(con);
-	    return (0);
+	    return (CloseClient(con));
 	  }
 
          /*
@@ -1042,8 +1041,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	{
 	  LogMessage(L_ERROR, "Bad operation \"%s\"!", operation);
 	  SendError(con, HTTP_BAD_REQUEST);
-	  CloseClient(con);
-	  return (0);
+	  return (CloseClient(con));
 	}
 
         con->start     = time(NULL);
@@ -1071,8 +1069,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	if (status != HTTP_OK && status != HTTP_CONTINUE)
 	{
 	  SendError(con, HTTP_BAD_REQUEST);
-	  CloseClient(con);
-	  return (0);
+	  return (CloseClient(con));
 	}
 	break;
 
@@ -1135,10 +1132,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
       */
 
       if (!SendError(con, HTTP_BAD_REQUEST))
-      {
-	CloseClient(con);
-	return (0);
-      }
+	return (CloseClient(con));
     }
     else if (con->operation == HTTP_OPTIONS)
     {
@@ -1150,10 +1144,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
           best->type != AUTH_NONE)
       {
 	if (!SendHeader(con, HTTP_UNAUTHORIZED, NULL))
-	{
-	  CloseClient(con);
-	  return (0);
-	}
+	  return (CloseClient(con));
       }
 
       if (strcasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Upgrade") == 0 &&
@@ -1165,10 +1156,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	*/
 
 	if (!SendHeader(con, HTTP_SWITCHING_PROTOCOLS, NULL))
-	{
-	  CloseClient(con);
-	  return (0);
-	}
+	  return (CloseClient(con));
 
 	httpPrintf(HTTP(con), "Connection: Upgrade\r\n");
 	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,HTTP/1.1\r\n");
@@ -1178,10 +1166,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
         EncryptClient(con);
 #else
 	if (!SendError(con, HTTP_NOT_IMPLEMENTED))
-	{
-	  CloseClient(con);
-          return (0);
-	}
+	  return (CloseClient(con));
 #endif /* HAVE_SSL */
       }
 
@@ -1191,10 +1176,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
       }
 
       if (!SendHeader(con, HTTP_OK, NULL))
-      {
-	CloseClient(con);
-	return (0);
-      }
+	return (CloseClient(con));
 
       httpPrintf(HTTP(con), "Allow: GET, HEAD, OPTIONS, POST, PUT\r\n");
       httpPrintf(HTTP(con), "Content-Length: 0\r\n");
@@ -1207,10 +1189,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
       */
 
       if (!SendError(con, HTTP_FORBIDDEN))
-      {
-	CloseClient(con);
-        return (0);
-      }
+	return (CloseClient(con));
     }
     else
     {
@@ -1223,10 +1202,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	*/
 
 	if (!SendHeader(con, HTTP_SWITCHING_PROTOCOLS, NULL))
-	{
-	  CloseClient(con);
-	  return (0);
-	}
+	  return (CloseClient(con));
 
 	httpPrintf(HTTP(con), "Connection: Upgrade\r\n");
 	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,HTTP/1.1\r\n");
@@ -1238,10 +1214,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	status = IsAuthorized(con);
 #else
 	if (!SendError(con, HTTP_NOT_IMPLEMENTED))
-	{
-	  CloseClient(con);
-          return (0);
-	}
+	  return (CloseClient(con));
 #endif /* HAVE_SSL */
       }
 
@@ -1250,8 +1223,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
         LogMessage(L_DEBUG2, "ReadClient: Unauthorized request for %s...\n",
 	           con->uri);
 	SendError(con, status);
-        CloseClient(con);
-	return (0);
+	return (CloseClient(con));
       }
 
       if (con->http.expect)
@@ -1277,10 +1249,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      else
 	      {
 		if (!SendError(con, HTTP_NOT_FOUND))
-		{
-	          CloseClient(con);
-		  return (0);
-		}
+		  return (CloseClient(con));
 
 		break;
 	      }
@@ -1323,10 +1292,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
               if (!SendCommand(con, con->command, con->options))
 	      {
 		if (!SendError(con, HTTP_NOT_FOUND))
-		{
-	          CloseClient(con);
-		  return (0);
-		}
+		  return (CloseClient(con));
               }
 	      else
         	LogRequest(con, HTTP_OK);
@@ -1344,10 +1310,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      */
 
 	      if (!SendError(con, HTTP_FORBIDDEN))
-	      {
-	        CloseClient(con);
-		return (0);
-	      }
+		return (CloseClient(con));
 
 	      break;
 	    }
@@ -1361,10 +1324,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	                               sizeof(buf))) == NULL)
 	      {
 		if (!SendError(con, HTTP_NOT_FOUND))
-		{
-	          CloseClient(con);
-		  return (0);
-		}
+		  return (CloseClient(con));
 
 		break;
 	      }
@@ -1376,10 +1336,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
         	if (!SendCommand(con, con->command, con->options))
 		{
 		  if (!SendError(con, HTTP_NOT_FOUND))
-		  {
-	            CloseClient(con);
-		    return (0);
-		  }
+		    return (CloseClient(con));
         	}
 		else
         	  LogRequest(con, HTTP_OK);
@@ -1392,10 +1349,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      if (!check_if_modified(con, &filestats))
               {
         	if (!SendError(con, HTTP_NOT_MODIFIED))
-		{
-		  CloseClient(con);
-		  return (0);
-		}
+		  return (CloseClient(con));
 	      }
 	      else
               {
@@ -1405,10 +1359,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	          snprintf(line, sizeof(line), "%s/%s", type->super, type->type);
 
         	if (!SendFile(con, HTTP_OK, filename, line, &filestats))
-		{
-		  CloseClient(con);
-		  return (0);
-		}
+		  return (CloseClient(con));
 	      }
 	    }
             break;
@@ -1431,10 +1382,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      */
 
               if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
-	      {
-		CloseClient(con);
-		return (0);
-	      }
+		return (CloseClient(con));
 
 	      break;
             }
@@ -1445,10 +1393,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      */
 
               if (!SendError(con, HTTP_BAD_REQUEST))
-	      {
-		CloseClient(con);
-		return (0);
-	      }
+		return (CloseClient(con));
 
 	      break;
 	    }
@@ -1510,10 +1455,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	                               sizeof(buf))) == NULL)
 	      {
 		if (!SendError(con, HTTP_NOT_FOUND))
-		{
-	          CloseClient(con);
-		  return (0);
-		}
+		  return (CloseClient(con));
 
 		break;
 	      }
@@ -1527,10 +1469,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 		*/
 
 		if (!SendError(con, HTTP_UNAUTHORIZED))
-		{
-		  CloseClient(con);
-		  return (0);
-		}
+		  return (CloseClient(con));
 	      }
 	    }
 	    break;
@@ -1550,10 +1489,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      */
 
 	      if (!SendError(con, HTTP_FORBIDDEN))
-	      {
-	        CloseClient(con);
-		return (0);
-	      }
+		return (CloseClient(con));
 
 	      break;
 	    }
@@ -1575,10 +1511,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      */
 
               if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
-	      {
-		CloseClient(con);
-		return (0);
-	      }
+		return (CloseClient(con));
 
 	      break;
             }
@@ -1589,10 +1522,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      */
 
               if (!SendError(con, HTTP_BAD_REQUEST))
-	      {
-		CloseClient(con);
-		return (0);
-	      }
+		return (CloseClient(con));
 
 	      break;
 	    }
@@ -1612,18 +1542,14 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	    if (con->file < 0)
 	    {
 	      if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
-	      {
-		CloseClient(con);
-		return (0);
-	      }
+		return (CloseClient(con));
 	    }
 	    break;
 
 	case HTTP_DELETE :
 	case HTTP_TRACE :
             SendError(con, HTTP_NOT_IMPLEMENTED);
-            CloseClient(con);
-	    return (0);
+	    return (CloseClient(con));
 
 	case HTTP_HEAD :
             if (strncmp(con->uri, "/printers/", 10) == 0 &&
@@ -1641,10 +1567,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      else
 	      {
 		if (!SendError(con, HTTP_NOT_FOUND))
-		{
-	          CloseClient(con);
-		  return (0);
-		}
+		  return (CloseClient(con));
 
 		break;
 	      }
@@ -1661,16 +1584,10 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      */
 
               if (!SendHeader(con, HTTP_OK, "text/html"))
-	      {
-		CloseClient(con);
-		return (0);
-	      }
+		return (CloseClient(con));
 
 	      if (httpPrintf(HTTP(con), "\r\n") < 0)
-	      {
-		CloseClient(con);
-		return (0);
-	      }
+		return (CloseClient(con));
 
               LogRequest(con, HTTP_OK);
 	    }
@@ -1684,10 +1601,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      */
 
 	      if (!SendError(con, HTTP_FORBIDDEN))
-	      {
-	        CloseClient(con);
-		return (0);
-	      }
+		return (CloseClient(con));
 
 	      break;
 	    }
@@ -1695,20 +1609,14 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	                                  sizeof(buf))) == NULL)
 	    {
 	      if (!SendHeader(con, HTTP_NOT_FOUND, "text/html"))
-	      {
-		CloseClient(con);
-		return (0);
-	      }
+		return (CloseClient(con));
 
               LogRequest(con, HTTP_NOT_FOUND);
 	    }
 	    else if (!check_if_modified(con, &filestats))
             {
               if (!SendError(con, HTTP_NOT_MODIFIED))
-	      {
-        	CloseClient(con);
-		return (0);
-	      }
+		return (CloseClient(con));
 
               LogRequest(con, HTTP_NOT_MODIFIED);
 	    }
@@ -1725,33 +1633,21 @@ ReadClient(client_t *con)		/* I - Client to read from */
 		snprintf(line, sizeof(line), "%s/%s", type->super, type->type);
 
               if (!SendHeader(con, HTTP_OK, line))
-	      {
-		CloseClient(con);
-		return (0);
-	      }
+		return (CloseClient(con));
 
 	      if (httpPrintf(HTTP(con), "Last-Modified: %s\r\n",
 	                     httpGetDateString(filestats.st_mtime)) < 0)
-	      {
-		CloseClient(con);
-		return (0);
-	      }
+		return (CloseClient(con));
 
 	      if (httpPrintf(HTTP(con), "Content-Length: %lu\r\n",
 	                     (unsigned long)filestats.st_size) < 0)
-	      {
-		CloseClient(con);
-		return (0);
-	      }
+		return (CloseClient(con));
 
               LogRequest(con, HTTP_OK);
 	    }
 
             if (httpPrintf(HTTP(con), "\r\n") < 0)
-	    {
-	      CloseClient(con);
-	      return (0);
-	    }
+	      return (CloseClient(con));
 
             con->http.state = HTTP_WAITING;
             break;
@@ -1775,10 +1671,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 		   con->http.data_remaining, con->file);
 
         if ((bytes = httpRead(HTTP(con), line, sizeof(line))) < 0)
-	{
-	  CloseClient(con);
-	  return (0);
-	}
+	  return (CloseClient(con));
 	else if (bytes > 0)
 	{
 	  con->bytes += bytes;
@@ -1800,10 +1693,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	    ClearString(&con->filename);
 
             if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
-	    {
-	      CloseClient(con);
-	      return (0);
-	    }
+	      return (CloseClient(con));
 	  }
 	}
 
@@ -1834,10 +1724,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	    ClearString(&con->filename);
 
             if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
-	    {
-	      CloseClient(con);
-	      return (0);
-	    }
+	      return (CloseClient(con));
 	  }
 
          /*
@@ -1851,10 +1738,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	  */
 
           if (!SendError(con, status))
-	  {
-	    CloseClient(con);
-	    return (0);
-	  }
+	    return (CloseClient(con));
 	}
         break;
 
@@ -1875,14 +1759,8 @@ ReadClient(client_t *con)		/* I - Client to read from */
             LogMessage(L_ERROR, "ReadClient() %d IPP Read Error!",
 	               con->http.fd);
 
-	    if (!SendError(con, HTTP_BAD_REQUEST))
-	    {
-	      CloseClient(con);
-	      return (0);
-	    }
-
-	    CloseClient(con);
-	    return (0);
+	    SendError(con, HTTP_BAD_REQUEST);
+	    return (CloseClient(con));
 	  }
 	  else if (ipp_state != IPP_DATA)
 	    break;
@@ -1907,20 +1785,14 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	  if (con->file < 0)
 	  {
 	    if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
-	    {
-	      CloseClient(con);
-	      return (0);
-	    }
+	      return (CloseClient(con));
 	  }
 	}
 
 	if (con->http.state != HTTP_POST_SEND)
 	{
           if ((bytes = httpRead(HTTP(con), line, sizeof(line))) < 0)
-	  {
-	    CloseClient(con);
-	    return (0);
-	  }
+	    return (CloseClient(con));
 	  else if (bytes > 0)
 	  {
 	    con->bytes += bytes;
@@ -1942,21 +1814,13 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      ClearString(&con->filename);
 
               if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
-	      {
-		CloseClient(con);
-		return (0);
-	      }
+		return (CloseClient(con));
 	    }
 	  }
 	  else if (con->http.state == HTTP_POST_RECV)
-	  {
-            return (0);
-	  }
+            return (1); /* ??? */
 	  else if (con->http.state != HTTP_POST_SEND)
-	  {
-	    CloseClient(con);
-	    return (0);
-	  }
+	    return (CloseClient(con));
 	}
 
 	if (con->http.state == HTTP_POST_SEND)
@@ -1994,10 +1858,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
               }
 
               if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
-	      {
-		CloseClient(con);
-		return (0);
-	      }
+		return (CloseClient(con));
 	    }
 
 	    if (con->command)
@@ -2005,10 +1866,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	      if (!SendCommand(con, con->command, con->options))
 	      {
 		if (!SendError(con, HTTP_NOT_FOUND))
-		{
-	          CloseClient(con);
-		  return (0);
-		}
+		  return (CloseClient(con));
               }
 	      else
         	LogRequest(con, HTTP_OK);
@@ -2025,10 +1883,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
   }
 
   if (!con->http.keep_alive && con->http.state == HTTP_WAITING)
-  {
-    CloseClient(con);
-    return (0);
-  }
+    return (CloseClient(con));
   else
     return (1);
 }
@@ -3522,5 +3377,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.77 2004/02/25 20:01:37 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.78 2004/03/02 20:56:02 mike Exp $".
  */
