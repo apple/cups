@@ -303,43 +303,44 @@ directive followed by its value. The following directives are
 understood: 
 <CENTER>
 <TABLE BORDER=1 WIDTH=90%>
-<TR><TH WIDTH=25%>Directive</TH><TH>Description</TH></TR>
-<TR><TD>AccessLog</TD><TD>Specifies the location of the access log file 
-(default  &quot;logs/access_log&quot;).</TD></TR>
-<TR><TD>Allow</TD><TD></TR>
-<TR><TD>AuthClass</TD><TD></TR>
-<TR><TD>AuthType</TD><TD></TR>
-<TR><TD>BrowseAddress</TD><TD></TR>
-<TR><TD>BrowseInterval</TD><TD></TR>
-<TR><TD>BrowsePort</TD><TD></TR>
-<TR><TD>BrowseTimeout</TD><TD></TR>
-<TR><TD>Browsing</TD><TD></TR>
-<TR><TD>DefaultCharset</TD><TD></TR>
-<TR><TD>DefaultLanguage</TD><TD></TR>
-<TR><TD>Deny</TD><TD></TR>
-<TR><TD>DocumentRoot</TD><TD></TR>
-<TR><TD>ErrorLog</TD><TD></TR>
-<TR><TD>Group</TD><TD></TR>
-<TR><TD>HostNameLookups</TD><TD></TR>
-<TR><TD>ImplicitClasses</TD><TD></TR>
-<TR><TD>KeepAlive</TD><TD></TR>
-<TR><TD>KeepAliveTimeout</TD><TD></TR>
+<TR><TH WIDTH=25%>Directive</TH><TH>Default</TH><TH>Description</TH></TR>
+<TR><TD>AccessLog</TD><TD><TD>Specifies the location of the access log 
+file (default  &quot;logs/access_log&quot;).</TD></TR>
+<TR><TD>Allow</TD><TD><TD></TR>
+<TR><TD>AuthClass</TD><TD><TD></TR>
+<TR><TD>AuthType</TD><TD><TD></TR>
+<TR><TD>BrowseAddress</TD><TD><TD></TR>
+<TR><TD>BrowseInterval</TD><TD><TD></TR>
+<TR><TD>BrowsePort</TD><TD><TD></TR>
+<TR><TD>BrowseTimeout</TD><TD><TD></TR>
+<TR><TD>Browsing</TD><TD><TD></TR>
+<TR><TD>DefaultCharset</TD><TD><TD></TR>
+<TR><TD>DefaultLanguage</TD><TD><TD></TR>
+<TR><TD>Deny</TD><TD><TD></TR>
+<TR><TD>DocumentRoot</TD><TD><TD></TR>
+<TR><TD>ErrorLog</TD><TD><TD></TR>
+<TR><TD>Group</TD><TD><TD></TR>
+<TR><TD>HostNameLookups</TD><TD><TD></TR>
+<TR><TD>ImplicitClasses</TD><TD><TD></TR>
+<TR><TD>KeepAlive</TD><TD><TD></TR>
+<TR><TD>KeepAliveTimeout</TD><TD><TD></TR>
 <TR><TD>&lt;Location path&gt;
-<BR> &lt;/Location&gt;</TD><TD></TR>
-<TR><TD>LogLevel</TD><TD></TR>
-<TR><TD>MaxLogSize</TD><TD></TR>
-<TR><TD>MaxRequestSize</TD><TD></TR>
-<TR><TD>Order</TD><TD></TR>
-<TR><TD>PageLog</TD><TD></TR>
-<TR><TD>Port</TD><TD></TR>
-<TR><TD>RIPCache</TD><TD></TR>
-<TR><TD>ServerAdmin</TD><TD></TR>
-<TR><TD>ServerName</TD><TD></TR>
-<TR><TD>ServerRoot</TD><TD></TR>
-<TR><TD>SystemGroup</TD><TD></TR>
-<TR><TD>TempDir</TD><TD></TR>
-<TR><TD>Timeout</TD><TD></TR>
-<TR><TD>User</TD><TD></TR>
+<BR> &lt;/Location&gt;</TD><TD><TD></TR>
+<TR><TD>LogLevel</TD><TD><TD></TR>
+<TR><TD>MaxClients</TD><TD><TD></TR>
+<TR><TD>MaxLogSize</TD><TD><TD></TR>
+<TR><TD>MaxRequestSize</TD><TD><TD></TR>
+<TR><TD>Order</TD><TD><TD></TR>
+<TR><TD>PageLog</TD><TD><TD></TR>
+<TR><TD>Port</TD><TD><TD></TR>
+<TR><TD>RIPCache</TD><TD><TD></TR>
+<TR><TD>ServerAdmin</TD><TD><TD></TR>
+<TR><TD>ServerName</TD><TD><TD></TR>
+<TR><TD>ServerRoot</TD><TD><TD></TR>
+<TR><TD>SystemGroup</TD><TD><TD></TR>
+<TR><TD>TempDir</TD><TD><TD></TR>
+<TR><TD>Timeout</TD><TD><TD></TR>
+<TR><TD>User</TD><TD><TD></TR>
 </TABLE>
 </CENTER>
 </P>
@@ -584,8 +585,8 @@ printer-more-info</CODE>, and <CODE>device-uri</CODE> attributes are
 required when initially adding a printer and optional when modifying a 
 printer. </P>
 <P>A PPD file or System V interface script may follow the IPP request 
-body. Note that the printer will be disabled until a valid interface 
-script or PPD file is sent. </P>
+body. If a valid interface script or PPD file is not provided then the 
+printer is treated as a generic PostScript device. </P>
 <P>Add printer will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-authorized</CODE>
 , <CODE>ipp-bad-request</CODE>, or <CODE>ipp-attributes</CODE>. </P>
 <H3><A NAME=4_7_4>4.7.4 Delete Printer (CUPS_DELETE_PRINTER = 0x4004)</A>

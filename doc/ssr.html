@@ -26,16 +26,16 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF=#2_1>2.1 CUPS Documentation</A></LI>
 <LI><A HREF=#2_2>2.2 Other Documents</A></LI>
 </UL>
-<B><A HREF=#3>3 3 - Local Access Risks</A></B>
+<B><A HREF=#3>3 Local Access Risks</A></B>
 <UL>
 <LI><A HREF=#3_1>3.1 Security Breaches</A></LI>
+</UL>
+<B><A HREF=#4>4 Remote Access Risks</A></B>
 <UL>
-<LI><A HREF=#4_0_1>4.0.1 Denial of Service Attacks</A></LI>
-<LI><A HREF=#4_0_2>4.0.2 Security Breaches</A></LI>
+<LI><A HREF=#4_1>4.1 Denial of Service Attacks</A></LI>
+<LI><A HREF=#4_2>4.2 Security Breaches</A></LI>
 </UL>
-</UL>
-<B><A HREF=#4>4 4 - Remote Access Risks</A></B><B><A HREF=#5>A Glossary</A>
-</B>
+<B><A HREF=#5>A Glossary</A></B>
 <UL>
 <LI><A HREF=#5_1>A.1 Terms</A></LI>
 <LI><A HREF=#5_2>A.2 Acronyms</A></LI>
@@ -96,7 +96,7 @@ sections:</P>
 <LI>IPP/1.0: Model and Semantics </LI>
 <LI>RFC 1179, Line Printer Daemon Protocol </LI>
 </UL>
-<H1><A NAME=3>3 3 - Local Access Risks</A></H1>
+<H1><A NAME=3>3 Local Access Risks</A></H1>
 <P>Local access risks are those that can be exploited only with a local 
 user account. This section does not address issues related to 
 dissemination of the root password or other security issues associated 
@@ -107,11 +107,11 @@ directory, it is possible for local users to read the contents of print
 files before they are printed. </P>
 <P>This problem can be alleviated by making the request directory 
 readable only by the user specified in the CUPS configuration file. </P>
-<H1><A NAME=4>4 4 - Remote Access Risks</A></H1>
+<H1><A NAME=4>4 Remote Access Risks</A></H1>
 <P>Remote access risks are those that can be exploited without a local 
 user account and/or from a remote system. This section does not address 
 issues related to network or firewall security. </P>
-<H3><A NAME=4_0_1>4.0.1 Denial of Service Attacks</A></H3>
+<H2><A NAME=4_1>4.1 Denial of Service Attacks</A></H2>
 <P>Like all internet services, the CUPS server is vulnerable to denial 
 of service attacks, including: </P>
 <OL>
@@ -153,7 +153,7 @@ large attribute values. </P>
  user-level access control as needed for expensive printers. </P>
 </LI>
 </OL>
-<H3><A NAME=4_0_2>4.0.2 Security Breaches</A></H3>
+<H2><A NAME=4_2>4.2 Security Breaches</A></H2>
 <P>The current CUPS server only supports Basic authentication with 
 usernames and passwords. This essentially places the clear text of the 
 username and password on the network. Since CUPS uses the UNIX username 
