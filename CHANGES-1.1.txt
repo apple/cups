@@ -3,6 +3,7 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc3
 
+	- More SLP changes (STR #259)
 	- Revamped the child signal handling code to completely
 	  avoid deadlock issues on Solaris (STR #325)
 	- The lpadmin command displayed an incorrect error
