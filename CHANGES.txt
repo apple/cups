@@ -9,6 +9,9 @@ CHANGES IN CUPS V1.2.0a1
 
 CHANGES IN CUPS V1.1.13
 
+	- Updated the default system group under MacOS X.
+	- If no SystemGroup was defined in cupsd.conf, the
+	  system default group was not used.
 	- The cups-lpd mini-daemon now supports LPD clients that
 	  send multiple control files.
 	- httpConnectEncrypt() now always uses encryption for

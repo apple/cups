@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.3 2001/12/27 00:04:52 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.4 2001/12/29 00:28:15 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -362,6 +362,13 @@ ReadConfiguration(void)
 
   if (!status)
     return (0);
+
+ /*
+  * Use the default system group if none was supplied in cupsd.conf...
+  */
+
+  if (NumSystemGroups == 0)
+    NumSystemGroups ++;
 
  /*
   * Get the access control list for browsing...
@@ -1988,5 +1995,5 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.3 2001/12/27 00:04:52 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.4 2001/12/29 00:28:15 mike Exp $".
  */

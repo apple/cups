@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-opsys.m4,v 1.5.2.1 2001/12/26 16:52:10 mike Exp $"
+dnl "$Id: cups-opsys.m4,v 1.5.2.2 2001/12/29 00:28:15 mike Exp $"
 dnl
 dnl   Operating system stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -55,23 +55,28 @@ AC_ARG_WITH(cups-user, [  --with-cups-user        set default user for CUPS],
 AC_ARG_WITH(cups-group, [  --with-cups-group       set default group for CUPS],
 	CUPS_GROUP="$withval",
 	AC_MSG_CHECKING(for default print group)
-	if test -f /etc/group; then
-		CUPS_GROUP=""
-		for group in sys system root; do
-			if test "`grep \^${group}: /etc/group`" != ""; then
-				CUPS_GROUP="$group"
-				AC_MSG_RESULT($group)
-				break;
-			fi
-		done
-
-		if test x$CUPS_GROUP = x; then
-			CUPS_GROUP="${GROUP:=nobody}"
-			AC_MSG_RESULT(not found, using "$CUPS_GROUP")
-		fi
+	if test x$uname = xDarwin; then
+		CUPS_GROUP="${GROUP:=admin}"
+		AC_MSG_RESULT(Darwin, using "$CUPS_GROUP")
 	else
-		CUPS_GROUP="${GROUP:=nobody}"
-		AC_MSG_RESULT(no group file, using "$CUPS_GROUP")
+		if test -f /etc/group; then
+			CUPS_GROUP=""
+			for group in sys system root; do
+				if test "`grep \^${group}: /etc/group`" != ""; then
+					CUPS_GROUP="$group"
+					AC_MSG_RESULT($group)
+					break;
+				fi
+			done
+
+			if test x$CUPS_GROUP = x; then
+				CUPS_GROUP="${GROUP:=nobody}"
+				AC_MSG_RESULT(not found, using "$CUPS_GROUP")
+			fi
+		else
+			CUPS_GROUP="${GROUP:=nobody}"
+			AC_MSG_RESULT(no group file, using "$CUPS_GROUP")
+		fi
 	fi)
 
 AC_SUBST(CUPS_USER)
@@ -81,5 +86,5 @@ AC_DEFINE_UNQUOTED(CUPS_DEFAULT_USER, "$CUPS_USER")
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_GROUP, "$CUPS_GROUP")
 
 dnl
-dnl "$Id: cups-opsys.m4,v 1.5.2.1 2001/12/26 16:52:10 mike Exp $"
+dnl "$Id: cups-opsys.m4,v 1.5.2.2 2001/12/29 00:28:15 mike Exp $"
 dnl
