@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.40 2004/02/25 20:14:50 mike Exp $"
+ * "$Id: socket.c,v 1.41 2004/03/30 19:19:30 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -414,5 +414,5 @@ print_backchannel(const unsigned char *buffer,	/* I - Data buffer */
 
 
 /*
- * End of "$Id: socket.c,v 1.40 2004/02/25 20:14:50 mike Exp $".
+ * End of "$Id: socket.c,v 1.41 2004/03/30 19:19:30 mike Exp $".
  */

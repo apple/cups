@@ -3,6 +3,8 @@ CHANGES.txt - 03/30/2004
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- Integrated the MacOS X/Darwin USB backend into the
+	  CUPS baseline (STR #661)
 	- The USB backend incorrectly reported "media tray
 	  empty" (STR #660)
 	- The scheduler did not use a case-insensitive
