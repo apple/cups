@@ -1,11 +1,11 @@
 #
-# "$Id: cups.list,v 1.13 1999/07/15 13:18:58 mike Exp $"
+# "$Id: cups.list,v 1.14 1999/07/30 14:18:19 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
 #
 #   EPM can be found in the "epm" subdirectory of this distribution.
-#   Please report problems and fixes to Michael Sweet (mike@easysw.com).
+#   Please report problems and fixes to "epm@easysw.com".
 #
 #   Copyright 1997-1999 by Easy Software Products, all rights reserved.
 #
@@ -31,7 +31,7 @@
 %vendor Easy Software Products
 %license LICENSE.cups
 %readme README.cups
-%version 1.0b5
+%version 1.0b6
 %incompat printpro
 
 %system all
@@ -48,6 +48,7 @@ f 0555 root sys /var/cups/cgi-bin/classes.cgi cgi-bin/classes.cgi
 f 0555 root sys /var/cups/cgi-bin/jobs.cgi cgi-bin/jobs.cgi
 f 0555 root sys /var/cups/cgi-bin/printers.cgi cgi-bin/printers.cgi
 f 0555 root sys /var/cups/filter/pstoraster pstoraster/pstoraster
+l 0555 root sys pstoraster /var/cups/filter/pdftops
 f 0555 root sys /var/cups/filter/imagetops filter/imagetops
 f 0555 root sys /var/cups/filter/pstops filter/pstops
 f 0555 root sys /var/cups/filter/texttops filter/texttops
@@ -75,12 +76,12 @@ f 0555 root sys /usr/lib/libcups.sl.1 cups/libcups.sl.1
 l 0555 root sys /usr/lib/libcups.sl libcups.sl.1
 f 0555 root sys /usr/lib/libcupsimage.sl.1 filter/libcupsimage.sl.1
 l 0555 root sys /usr/lib/libcupsimage.sl libcupsimage.sl.1
-%system irix irix64
+%system irix-6.5
 f 0555 root sys /usr/lib32/libcups.so.1 cups/libcups.so.1
 l 0555 root sys /usr/lib32/libcups.so libcups.so.1
 f 0555 root sys /usr/lib32/libcupsimage.so.1 filter/libcupsimage.so.1
 l 0555 root sys /usr/lib32/libcupsimage.so libcupsimage.so.1
-%system dunix linux solaris sunos
+%system !irix-6.5 !hpux
 f 0555 root sys /usr/lib/libcups.so.1 cups/libcups.so.1
 l 0555 root sys /usr/lib/libcups.so libcups.so.1
 f 0555 root sys /usr/lib/libcupsimage.so.1 filter/libcupsimage.so.1
@@ -200,8 +201,8 @@ f 0444 root sys /usr/share/cups/model/laserjet.ppd ppd/laserjet.ppd
 # Config files
 c 0600 root sys /var/cups/conf/classes.conf conf/classes.conf
 c 0600 root sys /var/cups/conf/cupsd.conf conf/cupsd.conf
-c 0600 root sys /var/cups/conf/mime.convs conf/mime.convs
-c 0600 root sys /var/cups/conf/mime.types conf/mime.types
+f 0600 root sys /var/cups/conf/mime.convs conf/mime.convs
+f 0600 root sys /var/cups/conf/mime.types conf/mime.types
 c 0600 root sys /var/cups/conf/printers.conf conf/printers.conf
 
 # Developer files
@@ -342,5 +343,5 @@ l 0555 root sys /etc/rc0.d/K20cups ../init.d/cups
 l 0555 root sys /etc/rc2.d/S80cups ../init.d/cups
 
 #
-# End of "$Id: cups.list,v 1.13 1999/07/15 13:18:58 mike Exp $".
+# End of "$Id: cups.list,v 1.14 1999/07/30 14:18:19 mike Exp $".
 #
