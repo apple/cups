@@ -1,5 +1,6 @@
+#define DEBUG
 /*
- * "$Id: ppd.c,v 1.83 2003/02/13 21:02:29 mike Exp $"
+ * "$Id: ppd.c,v 1.84 2003/02/14 03:04:07 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -2302,8 +2303,8 @@ ppd_read(FILE *fp,			/* I - File to read from */
 	            ungetc(ch, fp);
 
 		  ch = '\n';
-		  break;
 		}
+		break;
 	      }
 
             break;
@@ -2481,5 +2482,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.83 2003/02/13 21:02:29 mike Exp $".
+ * End of "$Id: ppd.c,v 1.84 2003/02/14 03:04:07 mike Exp $".
  */
