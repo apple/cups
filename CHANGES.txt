@@ -1,8 +1,10 @@
-CHANGES.txt - 05/22/2003
+CHANGES.txt - 05/23/2003
 ------------------------
 
 CHANGES IN CUPS V1.1.19
 
+	- The cupstestppd command did not list the conflicting
+	  options (STR #123)
 	- The lpq command did not ensure that there was
 	  whitespace between the fields in the job listing (STR
 	  #117)
