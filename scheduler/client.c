@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.5 1999/02/26 15:11:11 mike Exp $"
+ * "$Id: client.c,v 1.6 1999/02/26 22:02:05 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -49,7 +49,6 @@
  */
 
 #include "cupsd.h"
-#include <cups/debug.h>
 
 
 /*
@@ -1426,6 +1425,7 @@ process_ipp_request(client_t *con)	/* I - Client connection */
   ipp_attribute_t	*charset;	/* Character set attribute */
   ipp_attribute_t	*language;	/* Language attribute */
   ipp_attribute_t	*uri;		/* Printer URI attribute */
+  ipp_attribute_t	*format;	/* Document-format attribute */
   char			*dest;		/* Destination */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
   int			priority;	/* Job priority */
@@ -1441,6 +1441,11 @@ process_ipp_request(client_t *con)	/* I - Client connection */
 			resource[HTTP_MAX_URI];
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
+  mime_type_t		*filetype;	/* Type of file */
+  char			super[MIME_MAX_SUPER],
+					/* Supertype of file */
+			type[MIME_MAX_TYPE];
+					/* Subtype of file */
 
 
   DEBUG_printf(("process_ipp_request(%08x)\n", con));
@@ -1502,21 +1507,25 @@ process_ipp_request(client_t *con)	/* I - Client connection */
   */
 
   attr = con->request->attrs;
-  if (attr != NULL && strcmp(attr->name, "attributes-charset") == 0)
+  if (attr != NULL && strcmp(attr->name, "attributes-charset") == 0 &&
+      attr->value_tag == IPP_TAG_CHARSET)
     charset = attr;
   else
     charset = NULL;
 
   attr = attr->next;
-  if (attr != NULL && strcmp(attr->name, "attributes-natural-language") == 0)
+  if (attr != NULL && strcmp(attr->name, "attributes-natural-language") == 0 &&
+      attr->value_tag == IPP_TAG_LANGUAGE)
     language = attr;
   else
     language = NULL;
 
   attr = attr->next;
-  if (attr != NULL && strcmp(attr->name, "printer-uri") == 0)
+  if (attr != NULL && strcmp(attr->name, "printer-uri") == 0 &&
+      attr->value_tag == IPP_TAG_URI)
     uri = attr;
-  else if (attr != NULL && strcmp(attr->name, "job-uri") == 0)
+  else if (attr != NULL && strcmp(attr->name, "job-uri") == 0 &&
+           attr->value_tag == IPP_TAG_URI)
     uri = attr;
   else
     uri = NULL;
@@ -1580,6 +1589,51 @@ process_ipp_request(client_t *con)	/* I - Client connection */
 	}
 
        /*
+        * Is it a format we support?
+	*/
+
+        if ((format = ippFindAttribute(con->request, "document-format")) == NULL ||
+	    format->value_tag != IPP_TAG_MIMETYPE)
+	{
+	  DEBUG_puts("process_ipp_request: missing document-format attribute!");
+	  send_ipp_error(con, IPP_BAD_REQUEST);
+	  return;
+	}
+
+        if (sscanf(format->values[0].string, "%15[^/]/%31[^;]", super, type) != 2)
+	{
+	  DEBUG_printf(("process_ipp_request: could not scan type \'%s\'!\n",
+	                format->values[0].string));
+	  send_ipp_error(con, IPP_BAD_REQUEST);
+	  return;
+	}
+
+        if (strcmp(super, "application") == 0 &&
+	    strcmp(type, "octet-stream") == 0)
+	{
+	  DEBUG_puts("process_ipp_request: auto-typing request using magic rules.");
+	  filetype = mimeFileType(MimeDatabase, con->filename);
+	}
+	else
+	  filetype = mimeType(MimeDatabase, super, type);
+
+        if (filetype == NULL)
+	{
+	  DEBUG_printf(("process_ipp_request: Unsupported format \'%s\'!\n",
+	                format->values[0].string));
+	  send_ipp_error(con, IPP_ATTRIBUTES);
+	  attr            = ippAddString(con->response, IPP_TAG_UNSUPPORTED,
+	                                 "document-format",
+					 format->values[0].string);
+	  attr->value_tag = IPP_TAG_MIMETYPE;
+
+	  return;
+	}
+
+        DEBUG_printf(("process_ipp_request: request file type is %s/%s.\n",
+	              filetype->super, filetype->type));
+
+       /*
         * Is the destination valid?
 	*/
 
@@ -1629,7 +1683,8 @@ process_ipp_request(client_t *con)	/* I - Client connection */
         * Create the job and set things up...
 	*/
 
-        if ((attr = ippFindAttribute(con->request, "job-priority")) != NULL)
+        if ((attr = ippFindAttribute(con->request, "job-priority")) != NULL &&
+	    attr->value_tag == IPP_TAG_INTEGER)
           priority = attr->values[0].integer;
 	else
 	  priority = 50;
@@ -1640,15 +1695,25 @@ process_ipp_request(client_t *con)	/* I - Client connection */
 	  return;
 	}
 
-	job->dtype = dtype;
+	job->dtype    = dtype;
+	job->state    = IPP_JOB_PENDING;
+	job->filetype = filetype;
+	job->attrs    = con->request;
+	con->request  = NULL;
 
-	job->attrs   = con->request;
-	con->request = NULL;
-
-	strcpy(con->filename, job->filename);
+	strcpy(job->filename, con->filename);
 	con->filename[0] = '\0';
 
-	job->state = IPP_JOB_PENDING;
+        strcpy(job->username, con->username);
+	if ((attr = ippFindAttribute(con->request, "requesting-user-name")) != NULL &&
+	    attr->value_tag == IPP_TAG_NAME)
+	{
+	  strncpy(job->username, attr->values[0].string, sizeof(job->username) - 1);
+	  job->username[sizeof(job->username) - 1] = '\0';
+	}
+
+        if (job->username[0] == '\0')
+	  strcpy(job->username, "guest");
 
        /*
         * Start the job if possible...
@@ -1996,5 +2061,5 @@ show_printer_status(client_t *con)
 
 
 /*
- * End of "$Id: client.c,v 1.5 1999/02/26 15:11:11 mike Exp $".
+ * End of "$Id: client.c,v 1.6 1999/02/26 22:02:05 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.4 1999/02/09 22:04:12 mike Exp $"
+ * "$Id: cupsd.h,v 1.5 1999/02/26 22:02:06 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -52,6 +52,7 @@
 #include <cups/http.h>
 #include <cups/ipp.h>
 #include <cups/language.h>
+#include <cups/debug.h>
 
 
 /*
@@ -72,6 +73,7 @@
 #define MAX_LISTENERS		10	/* Maximum number of listener sockets */
 #define MAX_CLIENTS		100	/* Maximum number of client sockets */
 #define MAX_USERPASS		16	/* Maximum size of username/password */
+#define MAX_FILTERS		20	/* Maximum number of filters */
 
 /*
  * Defaults...
@@ -132,5 +134,5 @@ VAR int			NeedReload	VALUE(TRUE);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.4 1999/02/09 22:04:12 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.5 1999/02/26 22:02:06 mike Exp $".
  */

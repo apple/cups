@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h,v 1.4 1999/02/09 22:04:16 mike Exp $"
+ * "$Id: printers.h,v 1.5 1999/02/26 22:02:08 mike Exp $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -42,7 +42,9 @@ typedef struct printer_str
   cups_ptype_t	type;			/* Printer type (color, small, etc.) */
   time_t	state_time;		/* Time at this state */
   char		ppd[HTTP_MAX_URI],	/* PPD file name */
-		device_uri[HTTP_MAX_URI];/* Device URI */
+		device_uri[HTTP_MAX_URI],/* Device URI */
+		backend[1024];		/* Backend to use */
+  mime_type_t	*filetype;		/* Pseudo-filetype for printer */
   void		*job;			/* Current job in queue */
 } printer_t;
 
@@ -69,5 +71,5 @@ extern void		StopPrinter(printer_t *p);
 
 
 /*
- * End of "$Id: printers.h,v 1.4 1999/02/09 22:04:16 mike Exp $".
+ * End of "$Id: printers.h,v 1.5 1999/02/26 22:02:08 mike Exp $".
  */

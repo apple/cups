@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.5 1999/02/10 21:15:54 mike Exp $"
+ * "$Id: conf.h,v 1.6 1999/02/26 22:02:06 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -78,7 +78,7 @@ VAR FILE		*AccessFile	VALUE(NULL),
 					/* Access log file */
 			*ErrorFile	VALUE(NULL);
 					/* Error log file */
-VAR mime_t		*MimeTypes	VALUE(NULL);
+VAR mime_t		*MimeDatabase	VALUE(NULL);
 
 
 /*
@@ -91,5 +91,5 @@ extern int	LogMessage(int level, char *message, ...);
 
 
 /*
- * End of "$Id: conf.h,v 1.5 1999/02/10 21:15:54 mike Exp $".
+ * End of "$Id: conf.h,v 1.6 1999/02/26 22:02:06 mike Exp $".
  */

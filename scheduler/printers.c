@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.5 1999/02/26 15:11:13 mike Exp $"
+ * "$Id: printers.c,v 1.6 1999/02/26 22:02:07 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -23,7 +23,11 @@
  *
  * Contents:
  *
- *
+ *   AddPrinter()        - Add a printer to the system.
+ *   DeleteAllPrinters() - Delete all printers from the system.
+ *   DeletePrinter()     - Delete a printer from the system.
+ *   FindPrinter()       - Find a printer in the list.
+ *   LoadAllPrinters()   - Load printers from the printers.conf file.
  */
 
 /*
@@ -181,12 +185,20 @@ void
 LoadAllPrinters(void)
 {
   FILE		*fp;			/* printers.conf file */
+  int		i;			/* Looping var */
   int		linenum;		/* Current line number */
   int		len;			/* Length of line */
   char		line[HTTP_MAX_BUFFER],	/* Line from file */
 		name[256],		/* Parameter name */
 		*nameptr,		/* Pointer into name */
-		*value;			/* Pointer to value */
+		*value,			/* Pointer to value */
+		*lineptr,		/* Pointer in line */
+		super[MIME_MAX_SUPER],	/* Super-type name */
+		type[MIME_MAX_TYPE],	/* Type name */
+		*temp,			/* Temporary pointer */
+		*filter;		/* Filter program */
+  mime_type_t	**temptype;		/* MIME type looping var */
+  int		cost;			/* Cost of filter */
   printer_t	*p;			/* Current printer */
 
 
@@ -258,7 +270,8 @@ LoadAllPrinters(void)
       {
         line[len - 1] = '\0';
 
-        p = AddPrinter(value);
+        p           = AddPrinter(value);
+	p->filetype = mimeAddType(MimeDatabase, "printer", value);
       }
       else
       {
@@ -302,8 +315,65 @@ LoadAllPrinters(void)
     else if (strcmp(name, "AddFilter") == 0)
     {
      /*
-      * Add a file conversion filter...
+      * Get the source super-type and type names from the beginning of
+      * the value.
       */
+
+      lineptr = value;
+      temp    = super;
+
+      while (*lineptr != '/' && *lineptr != '\n' && *lineptr != '\0' &&
+             (temp - super + 1) < MIME_MAX_SUPER)
+	*temp++ = tolower(*lineptr++);
+
+      *temp = '\0';
+
+      if (*lineptr != '/')
+	continue;
+
+      lineptr ++;
+      temp = type;
+
+      while (*lineptr != ' ' && *lineptr != '\t' && *lineptr != '\n' &&
+             *lineptr != '\0' && (temp - type + 1) < MIME_MAX_TYPE)
+	*temp++ = tolower(*lineptr++);
+
+      *temp = '\0';
+
+     /*
+      * Then get the cost and filter program...
+      */
+
+      while (*lineptr == ' ' || *lineptr == '\t')
+	lineptr ++;
+
+      if (*lineptr < '0' || *lineptr > '9')
+	continue;
+
+      cost = atoi(lineptr);
+
+      while (*lineptr != ' ' && *lineptr != '\t' && *lineptr != '\0')
+	lineptr ++;
+      while (*lineptr == ' ' || *lineptr == '\t')
+	lineptr ++;
+
+      if (*lineptr == '\0' || *lineptr == '\n')
+	continue;
+
+      filter = lineptr;
+      if (filter[strlen(filter) - 1] == '\n')
+	filter[strlen(filter) - 1] = '\0';
+
+     /*
+      * Add the filter to the MIME database, supporting wildcards as needed...
+      */
+
+      for (temptype = MimeDatabase->types, i = 0;
+           i < MimeDatabase->num_types;
+	   i ++, temptype ++)
+	if ((super[0] == '*' || strcmp((*temptype)->super, super) == 0) &&
+            (type[0] == '*' || strcmp((*temptype)->type, type) == 0))
+	  mimeAddFilter(MimeDatabase, *temptype, p->filetype, cost, filter);
     }
     else if (strcmp(name, "State") == 0)
     {
@@ -343,5 +413,5 @@ StopPrinter(printer_t *p)
 
 
 /*
- * End of "$Id: printers.c,v 1.5 1999/02/26 15:11:13 mike Exp $".
+ * End of "$Id: printers.c,v 1.6 1999/02/26 22:02:07 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.6 1999/02/10 21:15:53 mike Exp $"
+ * "$Id: conf.c,v 1.7 1999/02/26 22:02:06 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -105,6 +105,7 @@ ReadConfiguration(void)
 {
   FILE	*fp;		/* Configuration file */
   int	status;		/* Return status */
+  char	directory[1024];/* Configuration directory */
 
 
  /*
@@ -176,6 +177,9 @@ ReadConfiguration(void)
 
   DeleteAllPrinters();
 
+  if (MimeDatabase != NULL)
+    mimeDelete(MimeDatabase);
+
   if ((fp = fopen(ConfigurationFile, "r")) == NULL)
     return (0);
 
@@ -186,11 +190,22 @@ ReadConfiguration(void)
   if (!status)
     return (0);
 
+ /*
+  * Read the MIME type and conversion database...
+  */
+
+  sprintf(directory, "%s/conf", ServerRoot);
+
+  MimeDatabase = mimeNew();
+  mimeMerge(MimeDatabase, directory);
+
   LoadAllPrinters();
   LoadAllClasses();
 
   StartListening();
   StartBrowsing();
+
+  CheckJobs();
 
   return (1);
 }
@@ -871,5 +886,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.6 1999/02/10 21:15:53 mike Exp $".
+ * End of "$Id: conf.c,v 1.7 1999/02/26 22:02:06 mike Exp $".
  */

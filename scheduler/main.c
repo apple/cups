@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.7 1999/02/26 15:11:12 mike Exp $"
+ * "$Id: main.c,v 1.8 1999/02/26 22:02:07 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -24,6 +24,7 @@
  * Contents:
  *
  *   main()           - Main entry for the CUPS scheduler.
+ *   sigcld_handler() - Handle 'child' signals from old processes.
  *   sighup_handler() - Handle 'hangup' signals to reconfigure the scheduler.
  *   usage()          - Show scheduler usage.
  */
@@ -40,6 +41,7 @@
  * Local functions...
  */
 
+static void	sigcld_handler(int sig);
 static void	sighup_handler(int sig);
 static void	usage(void);
 
@@ -57,6 +59,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   fd_set		input,		/* Input set for select() */
 			output;		/* Output set for select() */
   client_t		*con;		/* Current client */
+  job_t			*job,		/* Current job */
+			*next;		/* Next job */
   listener_t		*lis;		/* Current listener */
   time_t		activity;	/* Activity timer */
   struct timeval	timeout;	/* select() timeout */
@@ -99,10 +103,11 @@ main(int  argc,			/* I - Number of command-line arguments */
   tzset();
 
  /*
-  * Catch hangup signals...
+  * Catch hangup and child signals...
   */
 
   sigset(SIGHUP, sighup_handler);
+  sigset(SIGCHLD, sigcld_handler);
 
  /*
   * Loop forever...
@@ -209,6 +214,18 @@ main(int  argc,			/* I - Number of command-line arguments */
         continue;
       }
     }
+
+   /*
+    * Check for status info from job filters...
+    */
+
+    for (job = Jobs; job != NULL; job = next)
+    {
+      next = job->next;
+
+      if (job->pipe && FD_ISSET(job->pipe, &input))
+        UpdateJob(job);
+    }
   }
 
  /*
@@ -220,6 +237,60 @@ main(int  argc,			/* I - Number of command-line arguments */
   StopListening();
 
   return (1);
+}
+
+
+/*
+ * 'sigcld_handler()' - Handle 'child' signals from old processes.
+ */
+
+static void
+sigcld_handler(int sig)	/* I - Signal number */
+{
+  int	status;		/* Exit status of child */
+  int	pid;		/* Process ID of child */
+  job_t	*job;		/* Current job */
+  int	i;		/* Looping var */
+
+
+  (void)sig;
+
+  pid = wait(&status);
+
+  DEBUG_printf(("sigcld_handler: pid = %d, status = %d\n", pid, status));
+
+  for (job = Jobs; job != NULL; job = job->next)
+    if (job->state == IPP_JOB_PROCESSING)
+    {
+      for (i = 0; job->procs[i]; i ++)
+        if (job->procs[i] == pid)
+	  break;
+
+      if (job->procs[i])
+      {
+       /*
+        * OK, this process has gone away; what's left?
+	*/
+
+        job->procs[i] = -pid;
+
+        for (i = 0; job->procs[i]; i ++)
+	  if (job->procs[i] > 0)
+	    break;
+
+        if (job->procs[i])
+	  return; /* Still have active processes left */
+
+       /*
+        * OK, this was the last process; cancel the job...
+	*/
+
+        DEBUG_printf(("sigcld_handler: job %d is completed.\n", job->id));
+
+        CancelJob(job->id);
+	return;
+      }
+    }
 }
 
 
@@ -249,5 +320,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.7 1999/02/26 15:11:12 mike Exp $".
+ * End of "$Id: main.c,v 1.8 1999/02/26 22:02:07 mike Exp $".
  */
