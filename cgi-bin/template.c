@@ -1,5 +1,5 @@
 /*
- * "$Id: template.c,v 1.4 1999/09/10 13:38:33 mike Exp $"
+ * "$Id: template.c,v 1.5 1999/09/15 21:17:38 mike Exp $"
  *
  *   CGI template function.
  *
@@ -19,7 +19,7 @@
  * Local functions...
  */
 
-static void	cgi_copy(FILE *out, FILE *in, int element);
+static void	cgi_copy(FILE *out, FILE *in, int element, char term);
 
 
 /*
@@ -49,7 +49,7 @@ cgiCopyTemplateFile(FILE       *out,		/* I - Output file */
   * Parse the file to the end...
   */
 
-  cgi_copy(out, in, 0);
+  cgi_copy(out, in, 0, 0);
 
  /*
   * Close the template file and return...
@@ -66,12 +66,17 @@ cgiCopyTemplateFile(FILE       *out,		/* I - Output file */
 static void
 cgi_copy(FILE *out,		/* I - Output file */
          FILE *in,		/* I - Input file */
-	 int  element)		/* I - Element number (0 to N) */
+	 int  element,		/* I - Element number (0 to N) */
+	 char term)		/* I - Terminating character */
 {
   int		ch;			/* Character from file */
+  char		op;			/* Operation */
   char		name[255],		/* Name of variable */
 		*s;			/* String pointer */
   const char	*value;			/* Value of variable */
+  char		outval[1024],		/* Output string */
+		compare[1024];		/* Comparison string */
+  int		result;			/* Result of comparison */
 
 
  /*
@@ -79,7 +84,7 @@ cgi_copy(FILE *out,		/* I - Output file */
   */
 
   while ((ch = getc(in)) != EOF)
-    if (ch == '}')
+    if (ch == term)
       break;
     else if (ch == '{')
     {
@@ -87,11 +92,12 @@ cgi_copy(FILE *out,		/* I - Output file */
       * Get a variable name...
       */
 
-      for (s = name; (ch = getc(in)) != EOF; s ++)
-        if (ch == '}' || ch == ']')
+      for (s = name; (ch = getc(in)) != EOF;)
+        if (strchr("}]<>=!?", ch))
           break;
         else
-          *s = ch;
+          *s++ = ch;
+
       *s = '\0';
 
      /*
@@ -105,7 +111,9 @@ cgi_copy(FILE *out,		/* I - Output file */
 	*/
 
         if ((value = cgiGetArray(name + 1, element)) != NULL)
-          fputs(value, out);
+	  strcpy(outval, value);
+	else
+	  outval[0] = '\0';
       }
       else if (name[0] == '#')
       {
@@ -113,7 +121,7 @@ cgi_copy(FILE *out,		/* I - Output file */
         * Insert count...
 	*/
 
-        fprintf(out, "%d", cgiGetSize(name + 1));
+        sprintf(outval, "%d", cgiGetSize(name + 1));
       }
       else if (name[0] == '[')
       {
@@ -126,14 +134,23 @@ cgi_copy(FILE *out,		/* I - Output file */
 	int  count;	/* Number of elements */
 
 
-        count = cgiGetSize(name + 1);
-	pos   = ftell(in);
+        if (isdigit(name[1]))
+	  count = atoi(name + 1);
+	else
+          count = cgiGetSize(name + 1);
 
-        for (i = 0; i < count; i ++)
+	pos = ftell(in);
+
+        if (count > 0)
 	{
-	  fseek(in, pos, SEEK_SET);
-	  cgi_copy(out, in, i);
-	}
+          for (i = 0; i < count; i ++)
+	  {
+	    fseek(in, pos, SEEK_SET);
+	    cgi_copy(out, in, i, '}');
+	  }
+        }
+	else
+	  cgi_copy(NULL, in, i, '}');
       }
       else
       {
@@ -142,18 +159,118 @@ cgi_copy(FILE *out,		/* I - Output file */
 	*/
 
 	if ((value = cgiGetArray(name, element)) == NULL)
-          fprintf(out, "{%s}", name);
+          sprintf(outval, "{%s}", name);
 	else
-          fputs(value, out);
+          strcpy(outval, value);
+      }
+
+     /*
+      * See if the terminating character requires another test...
+      */
+
+      if (ch == '}')
+      {
+       /*
+        * End of substitution...
+        */
+
+	if (out)
+	  fputs(outval, out);
+
+        continue;
+      }
+
+     /*
+      * OK, process one of the following checks:
+      *
+      *   {name?exist:not-exist}     Exists?
+      *   {name=value?true:false}    Equal
+      *   {name<value?true:false}    Less than
+      *   {name>value?true:false}    Greater than
+      *   {name!value?true:false}    Not equal
+      */
+
+      if (ch == '?')
+      {
+       /*
+        * Test for existance...
+	*/
+
+        result = cgiGetVariable(name) != NULL;
+      }
+      else
+      {
+       /*
+        * Compare to a string...
+	*/
+
+        op = ch;
+
+	for (s = compare; (ch = getc(in)) != EOF;)
+          if (ch == '?')
+            break;
+          else if (ch == '\\')
+	    *s++ = getc(in);
+	  else
+            *s++ = ch;
+
+        *s = '\0';
+
+        if (ch != '?')
+	  return;
+
+       /*
+        * Do the comparison...
+	*/
+
+        switch (op)
+	{
+	  case '<' :
+	      result = strcasecmp(outval, compare) < 0;
+	      break;
+	  case '>' :
+	      result = strcasecmp(outval, compare) > 0;
+	      break;
+	  case '=' :
+	      result = strcasecmp(outval, compare) == 0;
+	      break;
+	  case '!' :
+	      result = strcasecmp(outval, compare) != 0;
+	      break;
+	}
+      }
+
+      if (result)
+      {
+       /*
+	* Comparison true; output first part and ignore second...
+	*/
+
+	cgi_copy(out, in, element, ':');
+	cgi_copy(NULL, in, element, '}');
+      }
+      else
+      {
+       /*
+	* Comparison false; ignore first part and output second...
+	*/
+
+	cgi_copy(NULL, in, element, ':');
+	cgi_copy(out, in, element, '}');
       }
     }
     else if (ch == '\\')	/* Quoted char */
-      putc(getc(in), out);
-    else
+    {
+      if (out)
+        putc(getc(in), out);
+      else
+        getc(in);
+    }
+    else if (out)
       putc(ch, out);
 }
 
 
 /*
- * End of "$Id: template.c,v 1.4 1999/09/10 13:38:33 mike Exp $".
+ * End of "$Id: template.c,v 1.5 1999/09/15 21:17:38 mike Exp $".
  */
