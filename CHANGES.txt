@@ -26,6 +26,10 @@ CHANGES IN CUPS V1.1.7-1
 	- Jobs weren't queued to remote classes (fix from
 	  Richard Begg.)
 	- AIX changes from Richard Begg.
+	- The imagetops filter produced PAGE: messages when
+	  generating PostScript for a non-PostScript printer
+	  (only affects page-label and Classification
+	   options.)
 
 
 CHANGES IN CUPS V1.1.7

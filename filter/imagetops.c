@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.37 2001/04/20 21:21:21 mike Exp $"
+ * "$Id: imagetops.c,v 1.38 2001/05/09 14:59:05 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -593,8 +593,10 @@ main(int  argc,		/* I - Number of command-line arguments */
     for (xpage = 0; xpage < xpages; xpage ++)
       for (ypage = 0; ypage < ypages; ypage ++, page ++)
       {
-        fprintf(stderr, "PAGE: %d %d\n", page, realcopies);
-        fprintf(stderr, "INFO: Printing page %d...\n", page);
+        if (ppd && ppd->num_filters == 0)
+          fprintf(stderr, "PAGE: %d %d\n", page, realcopies);
+
+	fprintf(stderr, "INFO: Printing page %d...\n", page);
 
         printf("%%%%Page: %d %d\n", page, page);
 
@@ -857,5 +859,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.37 2001/04/20 21:21:21 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.38 2001/05/09 14:59:05 mike Exp $".
  */
