@@ -19,6 +19,8 @@
 class Array;
 class Function;
 class GfxFont;
+struct PSObject;
+class PSStack;
 
 //------------------------------------------------------------------------
 // GfxColor
@@ -594,6 +596,31 @@ private:
   GBool ok;
 };
 
+//------------------------------------------------------------------------
+// PostScriptFunction
+//------------------------------------------------------------------------
+
+class PostScriptFunction: public Function {
+public:
+
+  PostScriptFunction(Object *funcObj, Dict *dict);
+  virtual ~PostScriptFunction();
+  virtual Function *copy() { return new PostScriptFunction(this); }
+  virtual void transform(double *in, double *out);
+  virtual GBool isOk() { return ok; }
+
+private:
+
+  PostScriptFunction(PostScriptFunction *func);
+  GBool parseCode(Stream *str, int *codePtr);
+  GString *getToken(Stream *str);
+  void resizeCode(int newSize);
+  void exec(PSStack *stack, int codePtr);
+
+  PSObject *code;
+  int codeSize;
+  GBool ok;
+};
 //------------------------------------------------------------------------
 // GfxImageColorMap
 //------------------------------------------------------------------------

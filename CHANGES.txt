@@ -1,9 +1,11 @@
-CHANGES.txt - 09/13/2001
+CHANGES.txt - 09/14/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.11
 
 	- Added support for embedded TrueType fonts in PDF
+	  files.
+	- Added support for PostScript functions in PDF
 	  files.
 	- The scheduler could crash when BrowseShortNames
 	  was set to "No".
