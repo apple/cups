@@ -3,6 +3,10 @@ CHANGES.txt - 11/07/2003
 
 CHANGES IN CUPS V1.1.20
 
+	- The scheduler did not check for invalid allow/deny
+	  addresses such as "11.22.33.44/24". It now masks off
+	  the extra address bits and logs a warning message in
+	  the error_log file (STR #337)
 	- The cupstestppd utility now checks for missing
 	  ImageableArea and PaperDimension attributes for each
 	  defined PageSize (STR #365)

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.139 2003/10/09 19:13:29 mike Exp $"
+ * "$Id: conf.c,v 1.140 2003/11/07 19:41:25 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -1127,6 +1127,13 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	  else
 	    netmask = netmasks[ipcount - 1];
 
+          if ((address & ~netmask) != 0)
+	  {
+	    LogMessage(L_WARN, "Discarding extra bits in %s address %08x for netmask %08x...",
+	               name, address, netmask);
+            address &= netmask;
+	  }
+
           if (strcasecmp(name, "BrowseAllow") == 0)
 	    AllowIP(location, address, netmask);
 	  else
@@ -1811,6 +1818,13 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 	else
 	  netmask = netmasks[ipcount - 1];
 
+        if ((address & ~netmask) != 0)
+	{
+	  LogMessage(L_WARN, "Discarding extra bits in %s address %08x for netmask %08x...",
+	             name, address, netmask);
+          address &= netmask;
+	}
+
         if (strcasecmp(name, "Allow") == 0)
 	  AllowIP(loc, address, netmask);
 	else
@@ -2133,5 +2147,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.139 2003/10/09 19:13:29 mike Exp $".
+ * End of "$Id: conf.c,v 1.140 2003/11/07 19:41:25 mike Exp $".
  */
