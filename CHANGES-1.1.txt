@@ -3,6 +3,7 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.17
 
+	- The image filters did not convert GIF images properly.
 	- The RunAsUser option was incompatible with the new
 	  daemon-mode code in 1.1.16.
 	- Fixed a problem with the Set-Job-Attributes and
