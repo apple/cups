@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.36.2.18 2004/09/09 20:24:07 mike Exp $"
+ * "$Id: imagetops.c,v 1.36.2.19 2004/12/16 20:03:22 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -296,8 +296,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   if (yppi == 0)
     yppi = xppi;
 
-  fprintf(stderr, "DEBUG: Before scaling: xprint=%.1f, yprint=%.1f, xppi=%d, yppi=%d, zoom=%.2f\n",
-          xprint, yprint, xppi, yppi, zoom);
+  fprintf(stderr, "DEBUG: Before scaling: xppi=%d, yppi=%d, zoom=%.2f\n",
+          xppi, yppi, zoom);
 
   if (xppi > 0)
   {
@@ -1027,5 +1027,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.36.2.18 2004/09/09 20:24:07 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.36.2.19 2004/12/16 20:03:22 mike Exp $".
  */

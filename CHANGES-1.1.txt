@@ -3,6 +3,14 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.23rc1
 
+	- The lpr man page did not document the "-U" option (STR
+	  #998)
+	- The scheduler no longer sends the page-set option when
+	  printing banner pages (STR #995)
+	- Fixed a debug message in the imagetops filter (STR
+	  #1012)
+	- The lprm man page listed the "-" option in the wrong
+	  order (STR #911)
 	- The hpgltops filter contained two buffer overflows
 	  that could potentially allow remote access to the "lp"
 	  account (STR #1024)
