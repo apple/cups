@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.52 2000/03/10 21:05:05 mike Exp $"
+# "$Id: cups.list,v 1.53 2000/03/13 18:56:08 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -153,6 +153,7 @@ f 0444 root sys /usr/share/cups/charsets/utf-8 data/utf-8
 
 f 0444 root sys /usr/share/cups/data/HPGLprolog data/HPGLprolog
 f 0444 root sys /usr/share/cups/data/psglyphs data/psglyphs
+f 0444 root sys /usr/share/cups/data/testprint.ps data/testprint.ps
 f 0444 root sys /usr/share/cups/fonts/AvantGarde-Book fonts/AvantGarde-Book
 f 0444 root sys /usr/share/cups/fonts/AvantGarde-BookOblique fonts/AvantGarde-BookOblique
 f 0444 root sys /usr/share/cups/fonts/AvantGarde-Demi fonts/AvantGarde-Demi
@@ -421,5 +422,5 @@ f 0444 root sys /usr/man/man5/printers.conf.5 man/printers.conf.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.52 2000/03/10 21:05:05 mike Exp $".
+# End of "$Id: cups.list,v 1.53 2000/03/13 18:56:08 mike Exp $".
 #
