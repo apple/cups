@@ -60,6 +60,9 @@ CHANGES IN CUPS V1.1.6
 	  increases the interval to 30 seconds.  This should
 	  provide faster printing when multiple jobs/files are
 	  queued for a printer.
+	- The filters and backends no longer buffer output to
+	  stderr.  This should provide much more accurate status
+	  reporting.
 
 
 CHANGES IN CUPS V1.1.5-2
