@@ -3,6 +3,8 @@ CHANGES.txt - 11/07/2003
 
 CHANGES IN CUPS V1.1.20
 
+	- The IPP code did not wait for a reply indefinitely on
+	  HTTP connections in "blocking" mode (STR #377)
 	- The web interfaces did not rewrite the default printer
 	  URI properly (STR #369 and #299)
 	- The LPD backend passed the C and L commands in the
