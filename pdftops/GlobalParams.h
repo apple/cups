@@ -146,6 +146,7 @@ public:
   int getPSPaperWidth();
   int getPSPaperHeight();
   GBool getPSDuplex();
+  GBool getPSFit();
   PSLevel getPSLevel();
   PSFontParam *getPSFont(GString *fontName);
   PSFontParam *getPSFont16(GString *fontName, GString *collection, int wMode);
@@ -181,6 +182,7 @@ public:
   void setPSPaperWidth(int width);
   void setPSPaperHeight(int height);
   void setPSDuplex(GBool duplex);
+  void setPSFit(GBool fit);
   void setPSLevel(PSLevel level);
   void setPSEmbedType1(GBool embed);
   void setPSEmbedTrueType(GBool embed);
@@ -261,6 +263,7 @@ private:
   int psRight;			//   ...
   int psTop;			//   ...
   GBool psDuplex;		// enable duplexing in PostScript?
+  GBool psFit;			// fit pages to device?
   PSLevel psLevel;		// PostScript level to generate
   GHash *psFonts;		// PostScript font info, indexed by PDF
 				//   font name [PSFontParam]

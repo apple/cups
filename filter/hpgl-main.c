@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-main.c,v 1.26 2003/03/21 02:44:26 mike Exp $"
+ * "$Id: hpgl-main.c,v 1.27 2003/08/28 14:30:02 mike Exp $"
  *
  *   HP-GL/2 filter main entry for the Common UNIX Printing System (CUPS).
  *
@@ -192,10 +192,14 @@ main(int  argc,		/* I - Number of command-line arguments */
   shading  = 1;
   PenWidth = 1.0;
 
-  if ((val = cupsGetOption("blackplot", num_options, options)) != NULL)
+  if ((val = cupsGetOption("blackplot", num_options, options)) != NULL &&
+      strcasecmp(val, "no") && strcasecmp(val, "off") &&
+      strcasecmp(val, "false"))
     shading = 0;
 
-  if ((val = cupsGetOption("fitplot", num_options, options)) != NULL)
+  if ((val = cupsGetOption("fitplot", num_options, options)) != NULL &&
+      strcasecmp(val, "no") && strcasecmp(val, "off") &&
+      strcasecmp(val, "false"))
     FitPlot = 1;
 
   if ((val = cupsGetOption("penwidth", num_options, options)) != NULL)
@@ -264,5 +268,5 @@ compare_names(const void *p1,	/* I - First name */
 
 
 /*
- * End of "$Id: hpgl-main.c,v 1.26 2003/03/21 02:44:26 mike Exp $".
+ * End of "$Id: hpgl-main.c,v 1.27 2003/08/28 14:30:02 mike Exp $".
  */
