@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.121 2003/09/03 13:51:20 mike Exp $"
+ * "$Id: dirsvc.c,v 1.122 2003/09/03 14:51:31 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1715,7 +1715,7 @@ AttrCallback(SLPHandle  hslp,
 
   if (GetSlpAttrVal(attrlist, "(printer-location=", &(p->location)))
     return (SLP_FALSE);
-  if (GetSlpAttrVal(attrlist, "(printer-make-and-model=", &(p->make_model))
+  if (GetSlpAttrVal(attrlist, "(printer-make-and-model=", &(p->make_model)))
     return (SLP_FALSE);
 
   if (GetSlpAttrVal(attrlist, "(color-supported=", &tmp))
@@ -1901,5 +1901,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.121 2003/09/03 13:51:20 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.122 2003/09/03 14:51:31 mike Exp $".
  */
