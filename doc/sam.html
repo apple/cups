@@ -1109,7 +1109,7 @@ BrowsePoll</CODE></A> directives in the<VAR> /etc/cups/cupsd.conf</VAR>
 BrowseRelay</CODE></A> directive that enables a single client to relay
  (broadcast) the polled printer information to the local subnet.</P>
 <P>For example, Server A and Server B are on subnet 1 and subnet 2,
- while theclients are on subnet 3. To provide printers to all of the
+ while the clients are on subnet 3. To provide printers to all of the
  clients in subnet 3, client C will be configured with the following
  directives in<VAR> /etc/cups/cupsd.conf</VAR>:</P>
 <UL>
@@ -2247,13 +2247,33 @@ Port</CODE></A> directive but allows you to restrict access to specific
  <CODE>Encryption</CODE></A>,<A HREF="#Limit"> <CODE>Limit</CODE></A>,<A HREF="#LimitExcept">
  <CODE>LimitExcept</CODE></A>,<A HREF="#Order"> <CODE>Order</CODE></A>,<A
 HREF="#Require"> <CODE>Require</CODE></A>, and<A HREF="#Satisfy"> <CODE>
-Satisfy</CODE></A> directives may all appear inside a location. Note
- that more specific resources override the less specific ones. So the
- directives inside the <CODE>/printers/name</CODE> location will
+Satisfy</CODE></A> directives may all appear inside a location.</P>
+<TABLE BORDER="1"><CAPTION>Locations on the Server.</CAPTION>
+<TR><TH>Location</TH><TH>Description</TH></TR>
+<TR><TD>/</TD><TD>The path for all get operations (get-printers,
+ get-jobs, etc.)</TD></TR>
+<TR><TD>/admin</TD><TD>The path for all administration operations
+ (add-printer, delete-printer, start-printer, etc.)</TD></TR>
+<TR><TD>/admin/conf</TD><TD>The path for access to the ESP Print Pro
+ configuration files (cupsd.conf, client.conf, etc.)</TD></TR>
+<TR><TD>/classes</TD><TD>The path for all classes</TD></TR>
+<TR><TD>/classes/name</TD><TD>The resource for class <CODE>name</CODE></TD>
+</TR>
+<TR><TD>/jobs</TD><TD>The path for all jobs (hold-job, release-job,
+ etc.)</TD></TR>
+<TR><TD>/jobs/id</TD><TD>The resource for job <CODE>id</CODE></TD></TR>
+<TR><TD>/printers</TD><TD>The path for all printers</TD></TR>
+<TR><TD>/printers/name</TD><TD>The path for printer <CODE>name</CODE></TD>
+</TR>
+<TR><TD>/printers/name.ppd</TD><TD>The PPD file path for printer <CODE>
+name</CODE></TD></TR>
+</TABLE>
+<P>Note that more specific resources override the less specific ones. So
+ the directives inside the <CODE>/printers/name</CODE> location will
  override ones from <CODE>/printers</CODE>. Directives inside <CODE>
-/printers</CODE> will override ones from <CODE>/</CODE>. None of the
- directives are inherited. More information can be found later in this
- chapter in<A HREF="#PRINTING_SECURITY"> &quot;Printing System Security&quot;</A>.
+/printers</CODE> will override ones from <CODE>/</CODE>. &nbsp; None of the
+ directives are inherited. More information can be found in section<A HREF="#PRINTING_SECURITY">
+ &quot;Printing System Security&quot;</A>.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="LogLevel">LogLevel</A></H3>
