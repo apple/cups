@@ -1,0 +1,79 @@
+/*
+ * "$Id: config.h.in,v 1.1 1999/04/21 19:24:37 mike Exp $"
+ *
+ *   Configuration file for the Common UNIX Printing System (CUPS).
+ *
+ *   @configure_input@
+ *
+ *   Copyright 1997-1999 by Easy Software Products.
+ *
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44145 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
+ */
+
+/*
+ * Version of software...
+ */
+
+#define CUPS_SVERSION	"1.0"
+
+/*
+ * Do we have various image libraries?
+ */
+
+#define HAVE_LIBPNG
+#define HAVE_LIBZ
+#define HAVE_LIBJPEG
+#define HAVE_LIBTIFF
+
+/*
+ * Does this machine store words in big-endian (MSB-first) order?
+ */
+
+#define WORDS_BIGENDIAN
+
+/*
+ * Which directory functions and headers do we use?
+ */
+
+#define HAVE_DIRENT_H	0
+#define HAVE_SYS_DIR_H	1
+#define HAVE_SYS_NDIR_H	0
+#define HAVE_NDIR_H	0
+
+/*
+ * Do we have <shadow.h>?
+ */
+
+#define HAVE_SHADOW_H 1
+
+/*
+ * Do we have the strXXX() functions?
+ */
+
+#define HAVE_STRDUP 1
+#define HAVE_STRCASECMP 1
+#define HAVE_STRNCASECMP 1
+
+/*
+ * Where are locale files stored?
+ */
+
+#define LOCALEDIR	"/usr/lib/locale"
+
+/*
+ * End of "$Id: config.h.in,v 1.1 1999/04/21 19:24:37 mike Exp $".
+ */

@@ -1,0 +1,70 @@
+#
+# "$Id: Makedefs.in,v 1.1 1999/04/21 19:24:36 mike Exp $"
+#
+#   Common makefile definitions for the Common UNIX Printing System (CUPS).
+#
+#   @configure_input@
+#
+#   Copyright 1997-1999 by Easy Software Products, all rights reserved.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Easy Software Products and are protected by Federal
+#   copyright law.  Distribution and use rights are outlined in the file
+#   "LICENSE.txt" which should have been included with this file.  If this
+#   file is missing or damaged please contact Easy Software Products
+#   at:
+#
+#       Attn: CUPS Licensing Information
+#       Easy Software Products
+#       44145 Airport View Drive, Suite 204
+#       Hollywood, Maryland 20636-3111 USA
+#
+#       Voice: (301) 373-9603
+#       EMail: cups-info@cups.org
+#         WWW: http://www.cups.org
+#
+
+AR	=	@AR@
+ARFLAGS	=	crvs
+BINDIR	=	@bindir@
+CC	=	@CC@
+CFLAGS	=	$(OPTIM) -fullwarn -woff 1174 -I.. $(OPTIONS)
+CP	=	@CP@
+CXX	=	@CXX@
+CXXFLAGS =	$(OPTIM) -fullwarn -woff 1174 -I.. $(OPTIONS)
+DATADIR	=	@datadir@
+FLUID	=	@FLUID@
+HTMLDOC	=	@HTMLDOC@
+IMGLIBS	=	@IMGLIBS@ $(LIBS) -lm
+INCDIR	=	@includedir@/cups
+LDFLAGS	=	@LDFLAGS@ $(OPTIM)
+LIBDIR	=	@libdir@
+LIBEXEC =	@libexec@
+LIBS	=	@LIBS@ -L../cups -lcups
+LN	=	/bin/ln -sf
+LOCAL	=	@localstatedir@
+MANDIR	=	@mandir@
+MKDIR	=	@MKDIR@ -p
+NROFF	=	@GROFF@ -T ascii
+OPTIM	=	@OPTIM@
+OPTIONS	=
+RANLIB	=	@RANLIB@
+RM	=	@RM@ -f
+SBINDIR	=	@sbindir@
+SHELL	=	/bin/sh
+
+.SUFFIXES:	.a .c .cxx .fl .h .man .o .z
+.c.o:
+	$(CC) $(CFLAGS) -c $<
+.cxx.o:
+	$(CXX) $(CXXFLAGS) -c $<
+.fl.cxx .fl.h:
+	$(FLUID) -c $<
+.man.z:
+	$(NROFF) -man $< >t
+	pack -f t
+	mv t $@
+
+#
+# End of "$Id: Makedefs.in,v 1.1 1999/04/21 19:24:36 mike Exp $"
+#
