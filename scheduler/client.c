@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.150 2003/03/13 06:22:10 mike Exp $"
+ * "$Id: client.c,v 1.151 2003/03/13 06:52:47 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2602,6 +2602,7 @@ pipe_command(client_t *con,		/* I - Client connection */
   int		i;			/* Looping var */
   int		pid;			/* Process ID */
   char		*commptr;		/* Command string pointer */
+  char		*uriptr;		/* URI string pointer */
   int		fd;			/* Looping var */
   int		fds[2];			/* Pipe FDs */
   int		argc;			/* Number of arguments */
@@ -2771,8 +2772,8 @@ pipe_command(client_t *con,		/* I - Client connection */
   }
 
   snprintf(script_name, sizeof(script_name), "SCRIPT_NAME=%s", con->uri);
-  if ((commptr = strchr(script_name, '?')) != NULL)
-    *commptr = '\0';
+  if ((uriptr = strchr(script_name, '?')) != NULL)
+    *uriptr = '\0';
   envp[envc ++] = script_name;
 
   if (con->operation == HTTP_GET)
@@ -3011,5 +3012,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.150 2003/03/13 06:22:10 mike Exp $".
+ * End of "$Id: client.c,v 1.151 2003/03/13 06:52:47 mike Exp $".
  */
