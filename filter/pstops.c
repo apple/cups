@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.41 2000/07/19 18:41:58 mike Exp $"
+ * "$Id: pstops.c,v 1.42 2000/07/20 16:48:36 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -101,6 +101,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		page_count;	/* Page count for NUp */
   int		subpage;	/* Sub-page number */
   int		copy;		/* Current copy */
+  int		saweof;		/* Did we see a %%EOF tag? */
 
 
  /* 
@@ -260,6 +261,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   puts(line);
 
+  saweof = 0;
+
   if (ppd != NULL && ppd->patches != NULL)
     puts(ppd->patches);
 
@@ -330,6 +333,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         level ++;
       else if (strcmp(line, "%%EndDocument") == 0 && level > 0)
         level --;
+      else if (strcmp(line, "%%EOF") == 0 && level == 0)
+        saweof = 1;
       else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
       {
         if (sscanf(line, "%*s%*s%d", &number) == 1)
@@ -398,7 +403,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 	}
       }
       else if (strcmp(line, "%%Trailer") == 0 && level == 0)
+      {
+       /*
+        * Assume that a file with a %%Trailer will likely also have %%EOF...
+	*/
+
+        saweof = 1;
         break;
+      }
       else
       {
         if (!sloworder)
@@ -550,6 +562,13 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
     }
   }
+
+ /*
+  * Send %%EOF if needed...
+  */
+
+  if (!saweof)
+    puts("%%EOF");
 
  /*
   * End the job with the appropriate JCL command or CTRL-D otherwise.
@@ -889,5 +908,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.41 2000/07/19 18:41:58 mike Exp $".
+ * End of "$Id: pstops.c,v 1.42 2000/07/20 16:48:36 mike Exp $".
  */
