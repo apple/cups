@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.29 2000/09/13 18:46:59 mike Exp $"
+ * "$Id: ipp.c,v 1.30 2000/09/26 14:06:28 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -440,11 +440,11 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
         strcasecmp(content_type, "application/vnd.cups-raw") == 0)
       num_options = cupsAddOption("raw", "", num_options, &options);
 
-    if (copies_sup)
-      ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies", atoi(argv[4]));
-
     cupsEncodeOptions(request, num_options, options);
     cupsFreeOptions(num_options, options);
+
+    if (copies_sup)
+      ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies", atoi(argv[4]));
 
    /*
     * Now fill in the HTTP request stuff...
@@ -610,5 +610,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.29 2000/09/13 18:46:59 mike Exp $".
+ * End of "$Id: ipp.c,v 1.30 2000/09/26 14:06:28 mike Exp $".
  */
