@@ -194,7 +194,7 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <UL>
 <LI><A HREF="#9_1">CUPS Structures</A></LI>
 <UL>
-<LI><A HREF="#cups_job_t">CUPS Destinations</A></LI>
+<LI><A HREF="#cups_dest_t">CUPS Destinations</A></LI>
 <LI><A HREF="#cups_job_t">CUPS Jobs</A></LI>
 <LI><A HREF="#cups_lang_t">CUPS Messages</A></LI>
 <LI><A HREF="#cups_option_t">CUPS Options</A></LI>
@@ -203,7 +203,6 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <UL>
 <LI><A HREF="#http_t">HTTP State</A></LI>
 <LI><A HREF="#ipp_t">IPP State</A></LI>
-<LI><A HREF="#cups_option_t">CUPS Options</A></LI>
 </UL>
 <LI><A HREF="#9_3">Raster Structures</A></LI>
 <UL>
@@ -3714,7 +3713,7 @@ cupsRasterOpen()</CODE></A> function to specify a stream for reading or
 <P>This appendix describes all of the structures that are defined by the
  CUPS API.</P>
 <H2><A NAME="9_1">CUPS Structures</A></H2>
-<H3><A NAME="cups_job_t">CUPS Destinations</A></H3>
+<H3><A NAME="cups_dest_t">CUPS Destinations</A></H3>
 <P>The CUPS destination structure (<CODE>cups_dest_t</CODE>) contains
  information on a specific destination or instance:
 <CENTER>
@@ -3845,16 +3844,6 @@ The options associated with this destination.</TD></TR>
 <H3><A NAME="ipp_t">IPP State</A></H3>
 <P>The IPP state structure (<CODE>ipp_t</CODE>) contains the current
  state of a IPP request or response:
-<CENTER>
-<TABLE BORDER="1" WIDTH="90%">
-<TR><TH>Member</TH><TH>Type</TH><TH>Description</TH></TR>
-<TR><TD></TD><TD></TD><TD></TD></TR>
-</TABLE>
-</CENTER>
-</P>
-<H3><A NAME="cups_option_t">CUPS Options</A></H3>
-<P>The CUPS option structure (<CODE>cups_option_t</CODE>) contains the
- option name and string value:
 <CENTER>
 <TABLE BORDER="1" WIDTH="90%">
 <TR><TH>Member</TH><TH>Type</TH><TH>Description</TH></TR>

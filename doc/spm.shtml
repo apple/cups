@@ -2534,7 +2534,7 @@ defined by the CUPS API.
 
 <H2>CUPS Structures</H2>
 
-<H3><A NAME="cups_job_t">CUPS Destinations</A></H3>
+<H3><A NAME="cups_dest_t">CUPS Destinations</A></H3>
 
 <P>The CUPS destination structure (<CODE>cups_dest_t</CODE>)
 contains information on a specific destination or instance:
@@ -2846,25 +2846,6 @@ current state of a IPP request or response:
 	<TD></TD>
 </TR>
 </TABLE></CENTER>
-
-<H3><A NAME="cups_option_t">CUPS Options</A></H3>
-
-<P>The CUPS option structure (<CODE>cups_option_t</CODE>)
-contains the option name and string value:
-
-<CENTER><TABLE WIDTH="90%" BORDER="1">
-<TR>
-	<TH>Member</TH>
-	<TH>Type</TH>
-	<TH>Description</TH>
-</TR>
-<TR>
-	<TD></TD>
-	<TD></TD>
-	<TD></TD>
-</TR>
-</TABLE></CENTER>
-
 
 <H2>Raster Structures</H2>
 

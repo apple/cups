@@ -4526,7 +4526,7 @@ Management"</A>.
 	<B>NOTE:</B>
 
 	<P>Allowing administration access from all hosts is a potential
-	security risk. Please read <A HREF="PRINTING_SECURITY">Chapter
+	security risk. Please read <A HREF="#PRINTING_SECURITY">Chapter
 	6, "Printing System Management"</A> for a description of these
 	risks and ways to minimize them.
 	</TD>
