@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.105 2003/06/14 16:15:05 mike Exp $"
+ * "$Id: ppd.c,v 1.106 2003/06/14 16:17:26 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -1084,7 +1084,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	}
 
       ppd->num_emulations = count;
-      ppd->emulations     = calloc(sizeof(ppd_emul_t), count);
+      ppd->emulations     = calloc(count, sizeof(ppd_emul_t));
 
       for (i = 0, sptr = string; i < count; i ++)
       {
@@ -1661,7 +1661,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
              strcmp(keyword, "NonUIConstraints") == 0)
     {
       if (ppd->num_consts == 0)
-	constraint = calloc(sizeof(ppd_const_t), 1);
+	constraint = calloc(1, sizeof(ppd_const_t));
       else
 	constraint = realloc(ppd->consts,
 	                     (ppd->num_consts + 1) * sizeof(ppd_const_t));
@@ -2911,5 +2911,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.105 2003/06/14 16:15:05 mike Exp $".
+ * End of "$Id: ppd.c,v 1.106 2003/06/14 16:17:26 mike Exp $".
  */
