@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.106 2002/07/18 10:50:33 mike Exp $"
+ * "$Id: conf.c,v 1.107 2002/08/12 16:20:04 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -92,6 +92,7 @@ static var_t	variables[] =
   { "DocumentRoot",	DocumentRoot,		VAR_STRING,	sizeof(DocumentRoot) },
   { "ErrorLog",		ErrorLog,		VAR_STRING,	sizeof(ErrorLog) },
   { "FilterLimit",	&FilterLimit,		VAR_INTEGER,	0 },
+  { "FilterNice",	&FilterNice,		VAR_INTEGER,	0 },
   { "FontPath",		FontPath,		VAR_STRING,	sizeof(FontPath) },
   { "HideImplicitMembers", &HideImplicitMembers, VAR_BOOLEAN,	0 },
   { "ImplicitClasses",	&ImplicitClasses,	VAR_BOOLEAN,	0 },
@@ -310,6 +311,7 @@ ReadConfiguration(void)
 
   FilterLevel         = 0;
   FilterLimit         = 0;
+  FilterNice          = 0;
   HostNameLookups     = FALSE;
   ImplicitClasses     = TRUE;
   ImplicitAnyClasses  = FALSE;
@@ -1886,5 +1888,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.106 2002/07/18 10:50:33 mike Exp $".
+ * End of "$Id: conf.c,v 1.107 2002/08/12 16:20:04 mike Exp $".
  */

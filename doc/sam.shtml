@@ -1083,6 +1083,7 @@ determine how the server operates:
 
 	<LI><A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A>
 	<LI><A HREF="#FilterLimit"><CODE>FilterLimit</CODE></A>
+	<LI><A HREF="#FilterNice"><CODE>FilterNice</CODE></A>
 	<LI><A HREF="#FontPath"><CODE>FontPath</CODE></A>
 	<LI><A HREF="#Group"><CODE>Group</CODE></A>
 	<LI><A HREF="#HideImplicitMembers"><CODE>HideImplicitMembers</CODE></A>
@@ -1990,6 +1991,28 @@ limit of about 200. A PostScript printer needs about half that
 limit the scheduler to printing a single job at any time.
 
 <P>The default limit is 0.
+
+<!-- NEED 3in -->
+<H3><A NAME="FilterNice">FilterNice</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+FilterNice 0
+FilterNice 39
+FilterNice -10
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>FilterNice</CODE> directive sets the scheduling
+priority of job filters. Values larger than 0 give filters a
+lower priority while values smaller than 0 give filters a higher
+priority. The <CODE>FilterNice</CODE> value does not affect the
+priority of job backends.
+
+<P>The default priority is 0.
 
 <!-- NEED 3in -->
 <H3><A NAME="FontPath">FontPath</A></H3>

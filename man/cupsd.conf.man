@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsd.conf.man,v 1.7 2002/05/23 20:55:01 mike Exp $"
+.\" "$Id: cupsd.conf.man,v 1.8 2002/08/12 16:20:04 mike Exp $"
 .\"
 .\"   cupsd.conf man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsd.conf 5 "Common UNIX Printing System" "23 May 2002" "Easy Software Products"
+.TH cupsd.conf 5 "Common UNIX Printing System" "12 August 2002" "Easy Software Products"
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -155,6 +155,11 @@ Specifies the error log filename.
 FilterLimit
 .br
 Specifies the maximum cost of filters that are run concurrently.
+.TP 5
+FilterNice
+.br
+Specifies the scheduling priority ("nice" value) of filters that
+are run to print a job.
 .TP 5
 FontPath
 .br
@@ -346,5 +351,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2002 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupsd.conf.man,v 1.7 2002/05/23 20:55:01 mike Exp $".
+.\" End of "$Id: cupsd.conf.man,v 1.8 2002/08/12 16:20:04 mike Exp $".
 .\"

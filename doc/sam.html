@@ -139,6 +139,7 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <LI><A HREF="#Encryption">Encryption</A></LI>
 <LI><A HREF="#ErrorLog">ErrorLog</A></LI>
 <LI><A HREF="#FilterLimit">FilterLimit</A></LI>
+<LI><A HREF="#FilterNice">FilterNice</A></LI>
 <LI><A HREF="#FontPath">FontPath</A></LI>
 <LI><A HREF="#Group">Group</A></LI>
 <LI><A HREF="#HideImplicitMembers">HideImplicitMembers</A></LI>
@@ -1277,6 +1278,7 @@ HREF="#CLIENT_SETUP"> Chapter 5, &quot;Client Setup&quot;</A> for more
 </TD><TD VALIGN="TOP"> &nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
 <LI><A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A></LI>
 <LI><A HREF="#FilterLimit"><CODE>FilterLimit</CODE></A></LI>
+<LI><A HREF="#FilterNice"><CODE>FilterNice</CODE></A></LI>
 <LI><A HREF="#FontPath"><CODE>FontPath</CODE></A></LI>
 <LI><A HREF="#Group"><CODE>Group</CODE></A></LI>
 <LI><A HREF="#HideImplicitMembers"><CODE>HideImplicitMembers</CODE></A></LI>
@@ -2018,6 +2020,24 @@ FilterLimit 1000
  the limit below these thresholds will effectively limit the scheduler
  to printing a single job at any time.</P>
 <P>The default limit is 0.
+<!-- NEED 3in -->
+</P>
+<H3><A NAME="FilterNice">FilterNice</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+FilterNice 0
+FilterNice 39
+FilterNice -10
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>FilterNice</CODE> directive sets the scheduling priority of
+ job filters. Values larger than 0 give filters a lower priority while
+ values smaller than 0 give filters a higher priority. The <CODE>
+FilterNice</CODE> value does not affect the priority of job backends.</P>
+<P>The default priority is 0.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="FontPath">FontPath</A></H3>
