@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.31 1999/07/12 19:33:18 mike Exp $"
+ * "$Id: job.c,v 1.32 1999/07/13 13:06:21 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -831,7 +831,8 @@ UpdateJob(job_t *job)		/* I - Job to check */
 	if (loglevel != LOG_INFO)
 	  LogMessage(loglevel, "%s", message);
 
-	if (loglevel <= LOG_INFO)
+	if ((loglevel <= LOG_INFO && !job->state) ||
+	    loglevel == LOG_ERROR)
           strncpy(job->printer->state_message, message,
                   sizeof(job->printer->state_message) - 1);
       }
@@ -949,5 +950,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.31 1999/07/12 19:33:18 mike Exp $".
+ * End of "$Id: job.c,v 1.32 1999/07/13 13:06:21 mike Exp $".
  */
