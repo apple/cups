@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.3 1999/06/25 17:28:52 mike Exp $"
+ * "$Id: classes.c,v 1.4 1999/08/06 13:22:02 mike Exp $"
  *
  *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -72,7 +72,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Connect to the HTTP server...
   */
 
-  http = httpConnect("localhost", ippPort());
+  http = httpConnect(getenv("SERVER_NAME"), ippPort());
 
  /*
   * Tell the client to expect HTML...
@@ -471,5 +471,5 @@ show_class_info(http_t      *http,
 
 
 /*
- * End of "$Id: classes.c,v 1.3 1999/06/25 17:28:52 mike Exp $".
+ * End of "$Id: classes.c,v 1.4 1999/08/06 13:22:02 mike Exp $".
  */

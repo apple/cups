@@ -1,5 +1,5 @@
 /*
- * "$Id: jobs.c,v 1.2 1999/06/23 14:08:35 mike Exp $"
+ * "$Id: jobs.c,v 1.3 1999/08/06 13:22:03 mike Exp $"
  *
  *   Job status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -62,8 +62,6 @@ main(int  argc,			/* I - Number of command-line arguments */
   http_t	*http;		/* Connection to the server */
 
 
-  setbuf(stdout, NULL);
-
  /*
   * Get the request language...
   */
@@ -74,7 +72,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Connect to the HTTP server...
   */
 
-  http = httpConnect("localhost", ippPort());
+  http = httpConnect(getenv("SERVER_NAME"), ippPort());
 
  /*
   * Tell the client to expect HTML...
@@ -573,5 +571,5 @@ show_job_info(http_t      *http,	/* I - Server connection */
 
 
 /*
- * End of "$Id: jobs.c,v 1.2 1999/06/23 14:08:35 mike Exp $".
+ * End of "$Id: jobs.c,v 1.3 1999/08/06 13:22:03 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.5 1999/06/25 17:28:53 mike Exp $"
+ * "$Id: printers.c,v 1.6 1999/08/06 13:22:03 mike Exp $"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -72,7 +72,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Connect to the HTTP server...
   */
 
-  http = httpConnect("localhost", ippPort());
+  http = httpConnect(getenv("SERVER_NAME"), ippPort());
 
  /*
   * Tell the client to expect HTML...
@@ -473,5 +473,5 @@ show_printer_info(http_t      *http,
 
 
 /*
- * End of "$Id: printers.c,v 1.5 1999/06/25 17:28:53 mike Exp $".
+ * End of "$Id: printers.c,v 1.6 1999/08/06 13:22:03 mike Exp $".
  */
