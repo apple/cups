@@ -1,7 +1,7 @@
 dnl
-dnl "$Id: configure.in,v 1.98 2001/06/27 19:06:44 mike Exp $"
+dnl "$Id: cups-pam.m4,v 1.1 2001/06/27 19:06:46 mike Exp $"
 dnl
-dnl   Configuration script for the Common UNIX Printing System (CUPS).
+dnl   PAM stuff for the Common UNIX Printing System (CUPS).
 dnl
 dnl   Copyright 1997-2001 by Easy Software Products, all rights reserved.
 dnl
@@ -22,24 +22,38 @@ dnl       EMail: cups-info@cups.org
 dnl         WWW: http://www.cups.org
 dnl
 
-AC_INIT(cups/cups.h)
+AC_ARG_ENABLE(pam, [  --enable-pam        turn on PAM support [default=yes]])
 
-sinclude(config-scripts/cups-opsys.m4)
-sinclude(config-scripts/cups-common.m4)
-sinclude(config-scripts/cups-directories.m4)
-sinclude(config-scripts/cups-manpages.m4)
+dnl Don't use PAM with AIX...
+if test $uname = AIX; then
+	enable_pam=no
+fi
 
-sinclude(config-scripts/cups-compiler.m4)
-sinclude(config-scripts/cups-sharedlibs.m4)
-sinclude(config-scripts/cups-libtool.m4)
+PAMDIR=""
+PAMLIBS=""
 
-sinclude(config-scripts/cups-image.m4)
-sinclude(config-scripts/cups-network.m4)
-sinclude(config-scripts/printpro-openssl.m4)
-sinclude(config-scripts/cups-pam.m4)
+if test x$enable_pam != xno; then
+	SAVELIBS="$LIBS"
+	AC_CHECK_LIB(dl,dlopen)
+	AC_CHECK_LIB(pam,pam_start)
 
-AC_OUTPUT(Makedefs cups.sh)
+	if test x$ac_cv_lib_pam_pam_start != xno; then
+		if test x$ac_cv_lib_dl_dlopen != xno; then
+			PAMLIBS="-lpam -ldl"
+		else
+			PAMLIBS="-lpam"
+		fi
+		if test -d /etc/pam.d; then
+			PAMDIR="/etc/pam.d"
+		fi
+	fi
+
+	LIBS="$SAVELIBS"
+fi
+
+AC_SUBST(PAMDIR)
+AC_SUBST(PAMLIBS)
 
 dnl
-dnl End of "$Id: configure.in,v 1.98 2001/06/27 19:06:44 mike Exp $".
+dnl End of "$Id: cups-pam.m4,v 1.1 2001/06/27 19:06:46 mike Exp $".
 dnl

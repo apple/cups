@@ -1,7 +1,7 @@
 dnl
-dnl "$Id: configure.in,v 1.98 2001/06/27 19:06:44 mike Exp $"
+dnl "$Id: cups-network.m4,v 1.1 2001/06/27 19:06:45 mike Exp $"
 dnl
-dnl   Configuration script for the Common UNIX Printing System (CUPS).
+dnl   Networking stuff for the Common UNIX Printing System (CUPS).
 dnl
 dnl   Copyright 1997-2001 by Easy Software Products, all rights reserved.
 dnl
@@ -22,24 +22,15 @@ dnl       EMail: cups-info@cups.org
 dnl         WWW: http://www.cups.org
 dnl
 
-AC_INIT(cups/cups.h)
+NETLIBS=""
 
-sinclude(config-scripts/cups-opsys.m4)
-sinclude(config-scripts/cups-common.m4)
-sinclude(config-scripts/cups-directories.m4)
-sinclude(config-scripts/cups-manpages.m4)
+if test "$uname" != "IRIX"; then
+	AC_CHECK_LIB(socket,socket,NETLIBS="-lsocket")
+	AC_CHECK_LIB(nsl,gethostbyaddr,NETLIBS="$NETLIBS -lnsl")
+fi
 
-sinclude(config-scripts/cups-compiler.m4)
-sinclude(config-scripts/cups-sharedlibs.m4)
-sinclude(config-scripts/cups-libtool.m4)
-
-sinclude(config-scripts/cups-image.m4)
-sinclude(config-scripts/cups-network.m4)
-sinclude(config-scripts/printpro-openssl.m4)
-sinclude(config-scripts/cups-pam.m4)
-
-AC_OUTPUT(Makedefs cups.sh)
+AC_SUBST(NETLIBS)
 
 dnl
-dnl End of "$Id: configure.in,v 1.98 2001/06/27 19:06:44 mike Exp $".
+dnl End of "$Id: cups-network.m4,v 1.1 2001/06/27 19:06:45 mike Exp $".
 dnl
