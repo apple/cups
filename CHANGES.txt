@@ -81,6 +81,9 @@ CHANGES IN CUPS V1.1.7
 	  CGI was currently running.
 	- cupsParseOptions() now sets boolean options to
 	  option=true or option=false.
+	- The "percent complete" calculations in the LPD backend
+	  could overflow on large files, causing the percentage
+	  to wrap to 0 every 40MB or so.
 
 
 CHANGES IN CUPS V1.1.6-3

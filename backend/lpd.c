@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.26 2001/03/06 16:06:05 mike Exp $"
+ * "$Id: lpd.c,v 1.27 2001/03/08 14:40:53 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -568,7 +568,7 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
     while ((nbytes = fread(buffer, 1, sizeof(buffer), fp)) > 0)
     {
       fprintf(stderr, "INFO: Spooling LPR job, %u%% complete...\n",
-              (unsigned)(100 * tbytes / filestats.st_size));
+              (unsigned)(100.0f * tbytes / filestats.st_size));
 
       if (lpd_write(fd, buffer, nbytes) < nbytes)
       {
@@ -657,5 +657,5 @@ lpd_write(int  lpd_fd,		/* I - LPD socket */
 
 
 /*
- * End of "$Id: lpd.c,v 1.26 2001/03/06 16:06:05 mike Exp $".
+ * End of "$Id: lpd.c,v 1.27 2001/03/08 14:40:53 mike Exp $".
  */
