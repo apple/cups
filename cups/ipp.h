@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.37 2001/04/15 11:52:43 mike Exp $"
+ * "$Id: ipp.h,v 1.38 2001/05/11 21:11:44 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -105,8 +105,8 @@ typedef enum			/**** Format tags for attribute formats... ****/
   IPP_TAG_LANGUAGE,
   IPP_TAG_MIMETYPE,
   IPP_TAG_MEMBERNAME,
-  IPP_TAG_MASK = 0x7fffffff,	/* Mask for copied attribute values */
-  IPP_TAG_COPY = 0x80000000	/* Bitflag for copied attribute values */
+  IPP_TAG_MASK = 0x3fffffff,	/* Mask for copied attribute values */
+  IPP_TAG_COPY = 0x40000000	/* Bitflag for copied attribute values */
 } ipp_tag_t;
 
 typedef enum			/**** Resolution units... ****/
@@ -426,5 +426,5 @@ extern void		_ipp_free_attr(ipp_attribute_t *);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.37 2001/04/15 11:52:43 mike Exp $".
+ * End of "$Id: ipp.h,v 1.38 2001/05/11 21:11:44 mike Exp $".
  */
