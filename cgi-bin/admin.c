@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.22.2.4 2002/03/22 15:47:17 mike Exp $"
+ * "$Id: admin.c,v 1.22.2.5 2002/03/25 18:02:46 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -992,7 +992,12 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 	 i > 0;
 	 i --, group ++)
     {
-      cgiSetVariable("GROUP", group->text);
+      if (strcmp(group->name, "InstallableOptions") == 0)
+	cgiSetVariable("GROUP",
+	               cupsLangString(language, CUPS_MSG_OPTIONS_INSTALLED));
+      else
+	cgiSetVariable("GROUP", group->text);
+
       cgiCopyTemplateLang(stdout, TEMPLATES, "option-header.tmpl",
                           getenv("LANG"));
       
@@ -1595,5 +1600,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.22.2.4 2002/03/22 15:47:17 mike Exp $".
+ * End of "$Id: admin.c,v 1.22.2.5 2002/03/25 18:02:46 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.7 2002/03/02 11:45:01 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.8 2002/03/25 18:02:47 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -94,9 +94,10 @@ static void		ppd_decode(char *string);
 static void		ppd_fix(char *string);
 static void		ppd_free_group(ppd_group_t *group);
 static void		ppd_free_option(ppd_option_t *option);
-static ppd_group_t	*ppd_get_group(ppd_file_t *ppd, char *name);
-static ppd_option_t	*ppd_get_option(ppd_group_t *group, char *name);
-static ppd_choice_t	*ppd_add_choice(ppd_option_t *option, char *name);
+static ppd_group_t	*ppd_get_group(ppd_file_t *ppd, const char *name,
+			               const char *text);
+static ppd_option_t	*ppd_get_option(ppd_group_t *group, const char *name);
+static ppd_choice_t	*ppd_add_choice(ppd_option_t *option, const char *name);
 
 
 /*
@@ -280,7 +281,8 @@ ppd_free_option(ppd_option_t *option)	/* I - Option to free */
 
 static ppd_group_t *		/* O - Named group */
 ppd_get_group(ppd_file_t *ppd,	/* I - PPD file */
-              char       *name)	/* I - Name of group */
+              const char *name,	/* I - Name of group */
+	      const char *text)	/* I - Text for group */
 {
   int		i;		/* Looping var */
   ppd_group_t	*group;		/* Group */
@@ -289,7 +291,7 @@ ppd_get_group(ppd_file_t *ppd,	/* I - PPD file */
   DEBUG_printf(("ppd_get_group(%p, \"%s\")\n", ppd, name));
 
   for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
-    if (strcmp(group->text, name) == 0)
+    if (strcmp(group->name, name) == 0)
       break;
 
   if (i == 0)
@@ -310,7 +312,8 @@ ppd_get_group(ppd_file_t *ppd,	/* I - PPD file */
     ppd->num_groups ++;
 
     memset(group, 0, sizeof(ppd_group_t));
-    strncpy(group->text, name, sizeof(group->text) - 1);
+    strncpy(group->name, name, sizeof(group->name) - 1);
+    strncpy(group->text, text, sizeof(group->text) - 1);
   }
 
   return (group);
@@ -323,7 +326,7 @@ ppd_get_group(ppd_file_t *ppd,	/* I - PPD file */
 
 static ppd_option_t *			/* O - Named option */
 ppd_get_option(ppd_group_t *group,	/* I - Group */
-               char        *name)	/* I - Name of option */
+               const char  *name)	/* I - Name of option */
 {
   int		i;			/* Looping var */
   ppd_option_t	*option;		/* Option */
@@ -362,7 +365,7 @@ ppd_get_option(ppd_group_t *group,	/* I - Group */
 
 static ppd_choice_t *			/* O - Named choice */
 ppd_add_choice(ppd_option_t *option,	/* I - Option */
-               char         *name)	/* I - Name of choice */
+               const char   *name)	/* I - Name of choice */
 {
   ppd_choice_t	*choice;		/* Choice */
 
@@ -393,7 +396,7 @@ ppd_add_choice(ppd_option_t *option,	/* I - Option */
 
 static ppd_size_t *		/* O - Named size */
 ppd_add_size(ppd_file_t *ppd,	/* I - PPD file */
-             char       *name)	/* I - Name of size */
+             const char *name)	/* I - Name of size */
 {
   ppd_size_t	*size;		/* Size */
 
@@ -732,7 +735,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
         ppd_group_t	*temp;
 
 
-	if ((temp = ppd_get_group(ppd,
+	if ((temp = ppd_get_group(ppd, "General",
                                   cupsLangString(language,
                                                  CUPS_MSG_GENERAL))) == NULL)
 	{
@@ -799,7 +802,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	  ppd_group_t	*temp;
 
 
-	  if ((temp = ppd_get_group(ppd,
+	  if ((temp = ppd_get_group(ppd, "General",
                                     cupsLangString(language,
                                                    CUPS_MSG_GENERAL))) == NULL)
 	  {
@@ -961,9 +964,11 @@ ppdOpen(FILE *fp)		/* I - File to read from */
             strcmp(name, "OutputOrder") != 0 &&
 	    strcmp(name, "PageSize") != 0 &&
             strcmp(name, "PageRegion") != 0)
-	  group = ppd_get_group(ppd, cupsLangString(language, CUPS_MSG_EXTRA));
+	  group = ppd_get_group(ppd, "Extra",
+	                        cupsLangString(language, CUPS_MSG_EXTRA));
 	else
-	  group = ppd_get_group(ppd, cupsLangString(language, CUPS_MSG_GENERAL));
+	  group = ppd_get_group(ppd, "General",
+	                        cupsLangString(language, CUPS_MSG_GENERAL));
 
         if (group == NULL)
 	{
@@ -1031,7 +1036,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       * Find the JCL group, and add if needed...
       */
 
-      group = ppd_get_group(ppd, "JCL");
+      group = ppd_get_group(ppd, "JCL", "JCL");
 
       if (group == NULL)
       {
@@ -1088,12 +1093,27 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	return (NULL);
       }
 
-      if (strchr(string, '/') != NULL)	/* Just show human readable text */
-        strcpy(string, strchr(string, '/') + 1);
+     /*
+      * Separate the group name from the text (name/text)...
+      */
 
-      ppd_decode(string);
-      ppd_fix(string);
-      group = ppd_get_group(ppd, string);
+      if ((sptr = strchr(string, '/')) != NULL)
+        *sptr++ = '\0';
+      else
+        sptr = string;
+
+     /*
+      * Fix up the text...
+      */
+
+      ppd_decode(sptr);
+      ppd_fix(sptr);
+
+     /*
+      * Find/add the group...
+      */
+
+      group = ppd_get_group(ppd, string, sptr);
     }
     else if (strcmp(keyword, "CloseGroup") == 0)
       group = NULL;
@@ -2009,5 +2029,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.7 2002/03/02 11:45:01 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.8 2002/03/25 18:02:47 mike Exp $".
  */

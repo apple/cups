@@ -5,6 +5,10 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- The InstallableOptions group name in a PPD file is now
+	  translated separately (CUPS_MSG_OPTIONS_INSTALLED) so
+	  that UIs can accurately detect the presence of this
+	  group.
 	- The scheduler no longer keeps job history data for
 	  remote printers on the client (just on the server.)
 	- The parallel and USB backends now retry if the backend

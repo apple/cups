@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.24.2.3 2002/03/01 19:55:13 mike Exp $"
+ * "$Id: ppd.h,v 1.24.2.4 2002/03/25 18:02:48 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -138,7 +138,9 @@ typedef struct			/**** Options ****/
 
 typedef struct ppd_group_str	/**** Groups ****/
 {
-  char		text[PPD_MAX_TEXT];
+  char		name[PPD_MAX_NAME],
+				/* Group name */
+		text[PPD_MAX_TEXT];
   				/* Human-readable group name */
   int		num_options;	/* Number of options */
   ppd_option_t	*options;	/* Options */
@@ -278,5 +280,5 @@ extern float		ppdPageWidth(ppd_file_t *ppd, const char *name);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.24.2.3 2002/03/01 19:55:13 mike Exp $".
+ * End of "$Id: ppd.h,v 1.24.2.4 2002/03/25 18:02:48 mike Exp $".
  */
