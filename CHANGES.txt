@@ -47,6 +47,8 @@ CHANGES IN CUPS V1.1.7
 	  server.
 	- Added new ppdEmitJCL() function to better handle
 	  PJL commands from PPD files.
+	- A bug in UpdateJob() would cause the scheduler to
+	  consume 100% CPU until another request was submitted.
 
 
 CHANGES IN CUPS V1.1.6-3
