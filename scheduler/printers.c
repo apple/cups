@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.92 2001/03/15 20:00:57 andy Exp $"
+ * "$Id: printers.c,v 1.93 2001/03/30 14:56:57 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1182,7 +1182,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
       */
 
       p->type        |= CUPS_PRINTER_BW;
-      finishings[0]  = IPP_FINISH_NONE;
+      finishings[0]  = IPP_FINISHINGS_NONE;
       num_finishings = 1;
 
       snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd", ServerRoot,
@@ -1298,13 +1298,13 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	if (ppdFindOption(ppd, "StapleLocation") != NULL)
 	{
 	  p->type |= CUPS_PRINTER_STAPLE;
-	  finishings[num_finishings++] = IPP_FINISH_STAPLE;
+	  finishings[num_finishings++] = IPP_FINISHINGS_STAPLE;
 	}
 
 	if (ppdFindOption(ppd, "BindEdge") != NULL)
 	{
 	  p->type |= CUPS_PRINTER_BIND;
-	  finishings[num_finishings++] = IPP_FINISH_BIND;
+	  finishings[num_finishings++] = IPP_FINISHINGS_BIND;
 	}
 
 	for (i = 0; i < ppd->num_sizes; i ++)
@@ -1375,7 +1375,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
       ippAddIntegers(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                      "finishings-supported", num_finishings, (int *)finishings);
       ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-                    "finishings-default", IPP_FINISH_NONE);
+                    "finishings-default", IPP_FINISHINGS_NONE);
     }
   }
 
@@ -1782,5 +1782,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.92 2001/03/15 20:00:57 andy Exp $".
+ * End of "$Id: printers.c,v 1.93 2001/03/30 14:56:57 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.126 2001/03/30 03:07:52 mike Exp $"
+ * "$Id: ipp.c,v 1.127 2001/03/30 14:56:55 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1386,7 +1386,6 @@ static void
 add_queued_job_count(client_t  *con,	/* I - Client connection */
                      printer_t *p)	/* I - Printer or class */
 {
-  job_t		*job;			/* Current job */
   cups_ptype_t	dtype;			/* Destination type */
   int		count;			/* Number of jobs on destination */
 
@@ -1756,7 +1755,7 @@ check_quotas(client_t  *con,	/* I - Client connection */
     * Check if there are too many pending jobs for this user...
     */
 
-    if (GetUserJobCount() >= MaxJobsPerUser)
+    if (GetUserJobCount(username) >= MaxJobsPerUser)
     {
       LogMessage(L_INFO, "Too many jobs for user \"%s\"...", username);
       return (0);
@@ -4881,11 +4880,11 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
 
     if (strcmp(attr->name, "job-originating-host-name") == 0 ||
         strcmp(attr->name, "job-originating-user-name") == 0 ||
-	strcpy(attr->name, "job-media-sheets-completed") == 0 ||
-	strcpy(attr->name, "job-k-octets") == 0 ||
-	strcpy(attr->name, "job-id") == 0 ||
-	strcpy(attr->name, "job-sheets") == 0 ||
-	strncpy(attr->name, "time-at-", 8) == 0)
+	strcmp(attr->name, "job-media-sheets-completed") == 0 ||
+	strcmp(attr->name, "job-k-octets") == 0 ||
+	strcmp(attr->name, "job-id") == 0 ||
+	strcmp(attr->name, "job-sheets") == 0 ||
+	strncmp(attr->name, "time-at-", 8) == 0)
       continue; /* Read-only attrs */
 
     if (strcmp(attr->name, "job-priority") == 0 &&
@@ -5366,5 +5365,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.126 2001/03/30 03:07:52 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127 2001/03/30 14:56:55 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.123 2001/03/30 03:20:40 mike Exp $"
+ * "$Id: job.c,v 1.124 2001/03/30 14:56:56 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -368,7 +368,7 @@ GetPrinterJobCount(const char *dest)	/* I - Printer or class name */
   job_t	*job;				/* Current job */
 
 
-  for (job = Jobs, count = 0; job != NULL, job = job->next)
+  for (job = Jobs, count = 0; job != NULL; job = job->next)
     if (job->state->values[0].integer <= IPP_JOB_PROCESSING &&
         strcasecmp(job->dest, dest) == 0)
       count ++;
@@ -389,7 +389,7 @@ GetUserJobCount(const char *username)	/* I - Username */
   job_t	*job;				/* Current job */
 
 
-  for (job = Jobs, count = 0; job != NULL, job = job->next)
+  for (job = Jobs, count = 0; job != NULL; job = job->next)
     if (job->state->values[0].integer <= IPP_JOB_PROCESSING &&
         strcmp(job->username, username) == 0)
       count ++;
@@ -2838,5 +2838,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.123 2001/03/30 03:20:40 mike Exp $".
+ * End of "$Id: job.c,v 1.124 2001/03/30 14:56:56 mike Exp $".
  */
