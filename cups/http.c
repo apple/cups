@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.54 1999/10/21 18:34:14 mike Exp $"
+ * "$Id: http.c,v 1.55 1999/10/22 20:00:32 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -790,8 +790,30 @@ httpWrite(http_t     *http,		/* I - HTTP data */
   if (http->data_encoding == HTTP_ENCODE_CHUNKED &&
       (http->state == HTTP_GET_SEND || http->state == HTTP_POST_RECV ||
        http->state == HTTP_POST_SEND || http->state == HTTP_PUT_RECV))
+  {
     if (httpPrintf(http, "%x\r\n", length) < 0)
       return (-1);
+
+    if (length == 0)
+    {
+     /*
+      * A zero-length chunk ends a transfer; unless we are sending POST
+      * data, go idle...
+      */
+
+      DEBUG_puts("httpWrite: changing states...");
+
+      if (http->state == HTTP_POST_RECV)
+	http->state ++;
+      else
+	http->state = HTTP_WAITING;
+
+      if (httpPrintf(http, "\r\n") < 0)
+	return (-1);
+
+      return (0);
+    }
+  }
 
   tbytes = 0;
 
@@ -818,12 +840,13 @@ httpWrite(http_t     *http,		/* I - HTTP data */
     if (httpPrintf(http, "\r\n") < 0)
       return (-1);
 
-  if ((http->data_remaining == 0 && http->data_encoding == HTTP_ENCODE_LENGTH) ||
-      length == 0)
+  if (http->data_remaining == 0 && http->data_encoding == HTTP_ENCODE_LENGTH)
   {
    /*
     * Finished with the transfer; unless we are sending POST data, go idle...
     */
+
+    DEBUG_puts("httpWrite: changing states...");
 
     if (http->state == HTTP_POST_RECV)
       http->state ++;
@@ -1479,5 +1502,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.54 1999/10/21 18:34:14 mike Exp $".
+ * End of "$Id: http.c,v 1.55 1999/10/22 20:00:32 mike Exp $".
  */
