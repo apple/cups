@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.18 2002/08/01 01:33:01 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.19 2002/08/10 00:05:45 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -98,6 +98,7 @@ static ppd_attr_t	*ppd_add_attr(ppd_file_t *ppd, const char *name,
 			              const char *spec, const char *value);
 static ppd_option_t	*ppd_get_option(ppd_group_t *group, const char *name);
 static ppd_choice_t	*ppd_add_choice(ppd_option_t *option, const char *name);
+static ppd_ext_option_t	*ppd_add_extopt(ppd_file_t *ppd, const char *name);
 
 
 /*
@@ -1762,6 +1763,56 @@ compare_options(ppd_option_t *o0,/* I - First option */
 
 
 /*
+ * 'ppd_add_extopt()' - Add an extended option record.
+ */
+
+static ppd_ext_option_t	*	/* O - Extended option... */
+ppd_add_extopt(ppd_file_t *ppd,	/* I - PPD file */
+               const char *name)/* I - Name of option */
+{
+  ppd_ext_option_t	**temp,	/* New array pointer */
+			*extopt;/* New extended option */
+
+
+ /*
+  * First create the extended option record...
+  */
+
+  if ((extopt = calloc(sizeof(ppd_ext_option_t), 1)) == NULL)
+    return (NULL);
+
+  strlcpy(extopt->keyword, name, sizeof(extopt->keyword));
+
+ /*
+  * Add this record to the end of the array...
+  */
+
+  if (ppd->num_extended == 0)
+    temp = malloc(sizeof(ppd_ext_option_t *));
+  else
+    temp = realloc(ppd->extended, sizeof(ppd_ext_option_t *) *
+                                  (ppd->num_extended + 1));
+
+  if (temp == NULL)
+  {
+    free(extopt);
+    return (NULL);
+  }
+
+  ppd->extended           = temp;
+  temp[ppd->num_extended] = extopt;
+
+  ppd->num_extended ++;
+
+ /*
+  * Return the new record...
+  */
+
+  return (extopt);
+}
+
+
+/*
  * 'ppd_read()' - Read a line from a PPD file, skipping comment lines as
  *                necessary.
  */
@@ -2153,5 +2204,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.18 2002/08/01 01:33:01 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.19 2002/08/10 00:05:45 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: mark.c,v 1.24.2.3 2002/03/01 19:55:13 mike Exp $"
+ * "$Id: mark.c,v 1.24.2.4 2002/08/10 00:05:45 mike Exp $"
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
@@ -33,7 +33,6 @@
  *   ppdFindOption()       - Return a pointer to the specified option.
  *   ppdIsMarked()         - Check to see if an option is marked...
  *   ppdMarkDefaults()     - Mark all default options in the PPD file.
- *   ppdMarkNumeric()      - Mark a numeric option.
  *   ppdMarkOption()       - Mark an option in a PPD file.
  *   ppd_defaults()        - Set the defaults for this group and all sub-groups.
  */
@@ -311,20 +310,6 @@ ppdMarkDefaults(ppd_file_t *ppd)/* I - PPD file record */
 
 
 /*
- * 'ppdMarkNumeric()' - Mark a numeric option.
- */
-
-int					/* O - 0 or number of comflicts */
-ppdMarkNumeric(ppd_file_t *ppd,		/* I - PPD file */
-               const char *keyword,	/* I - Option name */
-               int        num_values,	/* I - Number of values */
-	       float      *values)	/* I - Values */
-{
-  return (ppdConflicts(ppd));
-}
-
-
-/*
  * 'ppdMarkOption()' - Mark an option in a PPD file.
  *
  * Notes:
@@ -454,5 +439,5 @@ ppd_defaults(ppd_file_t  *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: mark.c,v 1.24.2.3 2002/03/01 19:55:13 mike Exp $".
+ * End of "$Id: mark.c,v 1.24.2.4 2002/08/10 00:05:45 mike Exp $".
  */
