@@ -225,7 +225,7 @@ dict_create_contents(uint size, const ref *pdref, bool pack)
 {	dict *pdict = pdref->value.pdict;
 	uint asize = (size == 0 ? 1 : size);
 	int code;
-	register uint i;
+	uint i;
 
 	/* If appropriate, round up the actual allocated size to the next */
 	/* higher power of 2, so we can use & instead of %. */
@@ -250,8 +250,11 @@ dict_create_contents(uint size, const ref *pdref, bool pack)
 		make_tasv_new(&pdict->keys, t_shortarray,
 			      r_space(&arr) | a_all,
 			      asize, packed, pkp);
-		for ( pzp = pkp, i = 0; i < asize || i % packed_per_ref; pzp++, i++ )
-		  *pzp = packed_key_empty;
+                /* MRS - unrolled loop to avoid SGI compiler bug */
+		for (pzp = pkp, i = 0; i < asize; i++ )
+		  *pzp++ = packed_key_empty;
+		for (; i % packed_per_ref; i++ )
+		  *pzp++ = packed_key_empty;
 		*pkp = packed_key_deleted;	/* wraparound entry */
 	   }
 	else				/* not packed */

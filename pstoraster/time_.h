@@ -27,29 +27,10 @@
 /* We must include std.h before any file that includes sys/types.h. */
 #include "std.h"
 
-/* The location (or existence) of certain system headers is */
-/* environment-dependent. We detect this in the makefile */
-/* and conditionally define switches in gconfig_.h. */
-#include "gconfig_.h"
-
 /* Some System V environments don't include sys/time.h. */
 /* The SYSTIME_H switch in gconfig_.h reflects this. */
-#ifdef SYSTIME_H
-#  include <sys/time.h>
-#  if defined(M_UNIX) || defined(_IBMR2)	/* SCO and AIX need both time.h and sys/time.h! */
-#    include <time.h>
-#  endif
-#else
-#  include <time.h>
-#  ifndef __DECC
-struct timeval {
-	long tv_sec, tv_usec;
-};
-#  endif
-struct timezone {
-	int tz_minuteswest, tz_dsttime;
-};
-#endif
+#include <sys/time.h>
+#include <time.h>
 
 #if defined(ultrix) && defined(mips)
 /* Apparently some versions of Ultrix for the DECstation include */

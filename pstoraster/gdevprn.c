@@ -23,6 +23,7 @@
 
 /* gdevprn.c */
 /* Generic printer driver support */
+#include <stdlib.h>
 #include "ctype_.h"
 #include "gdevprn.h"
 #include "gp.h"

@@ -1067,7 +1067,7 @@ sti:			state_slot =
 				      int diff, i;
 				      const byte *data;
 
-				      for ( i = 0; i < 4; b << 2, ++i )
+				      for ( i = 0; i < 4; b <<= 2, ++i )
 					switch ( (b >> 6) & 3 )
 					  {
 					  case 1:
