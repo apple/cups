@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.59 2003/03/30 21:49:20 mike Exp $"
+ * "$Id: job.c,v 1.124.2.60 2003/03/31 19:37:17 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -395,6 +395,8 @@ FreeAllJobs(void)
 	*next;		/* Next job */
 
 
+  HoldSignals();
+
   StopAllJobs();
 
   for (job = Jobs; job; job = next)
@@ -413,6 +415,8 @@ FreeAllJobs(void)
   }
 
   Jobs = NULL;
+
+  ReleaseSignals();
 }
 
 
@@ -2704,5 +2708,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.59 2003/03/30 21:49:20 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.60 2003/03/31 19:37:17 mike Exp $".
  */
