@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.10 1999/06/21 15:27:41 mike Exp $"
+# "$Id: Makefile,v 1.11 1999/06/21 18:59:04 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -37,6 +37,7 @@ DIRS	=	cups backend berkeley cgi-bin filter man pstoraster \
 
 all:
 	for dir in $(DIRS); do\
+		echo Making all in $$dir... ;\
 		(cd $$dir; make);\
 	done
 
@@ -46,6 +47,7 @@ all:
 
 clean:
 	for dir in $(DIRS); do\
+		echo Cleaning in $$dir... ;\
 		(cd $$dir; make clean);\
 	done
 
@@ -55,14 +57,20 @@ clean:
 
 install:
 	for dir in $(DIRS); do\
+		echo Installing in $$dir... ;\
 		(cd $$dir; make install);\
 	done
+	echo Installing in conf...
 	(cd conf; make install)
+	echo Installing in data...
 	(cd data; make install)
+	echo Installing in doc...
 	(cd doc; make install)
+	echo Installing in fonts...
 	(cd fonts; make install)
+	echo Installing in ppd...
 	(cd ppd; make install)
 
 #
-# End of "$Id: Makefile,v 1.10 1999/06/21 15:27:41 mike Exp $".
+# End of "$Id: Makefile,v 1.11 1999/06/21 18:59:04 mike Exp $".
 #

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.15 1999/06/21 18:46:12 mike Exp $"
+# "$Id: Makefile,v 1.16 1999/06/21 18:59:10 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -72,7 +72,7 @@ install:	all
 #
 
 libcups.a:	$(OBJS)
-	echo Archiving $<...
+	echo Archiving $@...
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ $(OBJS)
 	$(RANLIB) $@
@@ -82,7 +82,7 @@ libcups.a:	$(OBJS)
 #
 
 cups_C.h:	../locale/C/cups_C
-	echo Generating $<...
+	echo Generating $@...
 	$(RM) cups_C.h
 	$(AWK) '{print "\"" $$0 "\","}' < ../locale/C/cups_C > cups_C.h
 
@@ -107,7 +107,7 @@ util.o:		cups.h http.h ipp.h ../config.h ../Makedefs
 #
 
 testhttp:	testhttp.o libcups.a
-	echo Linking $<...
+	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testhttp.o $(LIBS)
 
 testhttp.o:	http.h ../Makedefs
@@ -117,7 +117,7 @@ testhttp.o:	http.h ../Makedefs
 #
 
 testmime:	testmime.o libcups.a
-	echo Linking $<...
+	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testmime.o $(LIBS)
 
 testmime.o:	mime.h ../Makedefs
@@ -127,11 +127,11 @@ testmime.o:	mime.h ../Makedefs
 #
 
 testppd:	testppd.o libcups.a
-	echo Linking $<...
+	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testppd.o $(LIBS)
 
 testppd.o:	ppd.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.15 1999/06/21 18:46:12 mike Exp $".
+# End of "$Id: Makefile,v 1.16 1999/06/21 18:59:10 mike Exp $".
 #
