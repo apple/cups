@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.9 1999/05/19 18:00:58 mike Exp $"
+# "$Id: Makefile,v 1.10 1999/06/13 12:38:15 mike Exp $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -24,21 +24,22 @@
 
 include ../Makedefs
 
-OBJS	=	auth.o classes.o client.o conf.o dirsvc.o main.o ipp.o job.o \
+CUPSDOBJS =	auth.o classes.o client.o conf.o dirsvc.o main.o ipp.o job.o \
 		printers.o
+OBJS	=	$(CUPSDOBJS) testspeed.o
 
 #
 # Make everything...
 #
 
-all:	cupsd
+all:	cupsd testspeed
 
 #
 # Clean all object files...
 #
 
 clean:
-	rm -f $(OBJS) cupsd
+	rm -f $(OBJS) cupsd testspeed
 
 #
 # Install the scheduler...
@@ -56,13 +57,24 @@ install:
 # Make the scheduler executable, "cupsd".
 #
 
-cupsd:	$(OBJS) ../cups/libcups.a
-	$(CC) $(LDFLAGS) -o cupsd $(OBJS) $(LIBS)
+cupsd:	$(CUPSDOBJS) ../cups/libcups.a
+	$(CC) $(LDFLAGS) -o cupsd $(CUPSDOBJS) $(LIBS)
 
-$(OBJS):	auth.h classes.h client.h conf.h cupsd.h dirsvc.h job.h \
+$(CUPSDOBJS):	auth.h classes.h client.h conf.h cupsd.h dirsvc.h job.h \
 		printers.h ../cups/cups.h ../cups/http.h ../cups/ipp.h \
-		../cups/mime.h ../cups/string.h ../Makedefs
+		../cups/language.h ../cups/mime.h ../cups/string.h
 
 #
-# End of "$Id: Makefile,v 1.9 1999/05/19 18:00:58 mike Exp $".
+# Make the test program, "testspeed".
+#
+
+testspeed:	testspeed.o ../cups/libcups.a
+	$(CC) $(LDFLAGS) -o testspeed testspeed.o $(LIBS)
+
+testspeed.o:	../cups/cups.h ../cups/http.h ../cups/ipp.h ../cups/language.h
+
+$(OBJS):	../config.h ../Makedefs
+
+#
+# End of "$Id: Makefile,v 1.10 1999/06/13 12:38:15 mike Exp $".
 #
