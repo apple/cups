@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.22.2.13 2002/08/15 03:17:19 mike Exp $"
+ * "$Id: admin.c,v 1.22.2.14 2002/08/16 16:52:45 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -1008,7 +1008,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 
         cgiSetVariable("KEYWORD", option->keyword);
         cgiSetVariable("KEYTEXT", option->text);
-	cgiSetVariable("DEFCHOICE", option->defchoice);
+	    
 
 	if (option->conflicted)
 	  cgiSetVariable("CONFLICTED", "1");
@@ -1021,6 +1021,9 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 	{
 	  cgiSetArray("CHOICES", k, option->choices[k].choice);
 	  cgiSetArray("TEXT", k, option->choices[k].text);
+
+          if (option->choices[k].marked)
+	    cgiSetVariable("DEFCHOICE", option->choices[k].choice);
 	}
 
         switch (option->ui)
@@ -1512,5 +1515,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.22.2.13 2002/08/15 03:17:19 mike Exp $".
+ * End of "$Id: admin.c,v 1.22.2.14 2002/08/16 16:52:45 mike Exp $".
  */
