@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.6 1999/04/21 14:14:55 mike Exp $"
+ * "$Id: auth.c,v 1.7 1999/04/21 21:19:35 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -55,10 +55,10 @@
  * Local functions...
  */
 
-static mask_t	*add_allow(location_t *loc);
-static mask_t	*add_deny(location_t *loc);
-static int	check_auth(unsigned ip, char *name, int namelen, int num_masks,
-		           mask_t *masks);
+static authmask_t	*add_allow(location_t *loc);
+static authmask_t	*add_deny(location_t *loc);
+static int		check_auth(unsigned ip, char *name, int namelen,
+				   int num_masks, authmask_t *masks);
 
 
 /*
@@ -113,7 +113,7 @@ void
 AllowHost(location_t *loc,	/* I - Location to add to */
           char       *name)	/* I - Name of host or domain to add */
 {
-  mask_t	*temp;		/* New host/domain mask */
+  authmask_t	*temp;		/* New host/domain mask */
 
 
   if ((temp = add_allow(loc)) == NULL)
@@ -137,7 +137,7 @@ AllowIP(location_t *loc,	/* I - Location to add to */
         unsigned   address,	/* I - IP address to add */
         unsigned   netmask)	/* I - Netmask of address */
 {
-  mask_t	*temp;		/* New host/domain mask */
+  authmask_t	*temp;		/* New host/domain mask */
 
 
   if ((temp = add_allow(loc)) == NULL)
@@ -161,7 +161,7 @@ DeleteAllLocations(void)
 {
   int		i, j;		/* Looping vars */
   location_t	*loc;		/* Current location */
-  mask_t	*mask;		/* Current mask */
+  authmask_t	*mask;		/* Current mask */
 
 
  /*
@@ -205,7 +205,7 @@ void
 DenyHost(location_t *loc,	/* I - Location to add to */
          char       *name)	/* I - Name of host or domain to add */
 {
-  mask_t	*temp;		/* New host/domain mask */
+  authmask_t	*temp;		/* New host/domain mask */
 
 
   if ((temp = add_deny(loc)) == NULL)
@@ -229,7 +229,7 @@ DenyIP(location_t *loc,		/* I - Location to add to */
        unsigned   address,	/* I - IP address to add */
        unsigned   netmask)	/* I - Netmask of address */
 {
-  mask_t	*temp;		/* New host/domain mask */
+  authmask_t	*temp;		/* New host/domain mask */
 
 
   if ((temp = add_deny(loc)) == NULL)
@@ -422,10 +422,10 @@ IsAuthorized(client_t *con)	/* I - Connection */
  * 'add_allow()' - Add an allow mask to the location.
  */
 
-static mask_t *			/* O - New mask record */
+static authmask_t *		/* O - New mask record */
 add_allow(location_t *loc)	/* I - Location to add to */
 {
-  mask_t	*temp;		/* New mask record */
+  authmask_t	*temp;		/* New mask record */
 
 
  /*
@@ -440,9 +440,9 @@ add_allow(location_t *loc)	/* I - Location to add to */
   */
 
   if (loc->num_allow == 0)
-    temp = malloc(sizeof(mask_t));
+    temp = malloc(sizeof(authmask_t));
   else
-    temp = realloc(loc->allow, sizeof(mask_t) * (loc->num_allow + 1));
+    temp = realloc(loc->allow, sizeof(authmask_t) * (loc->num_allow + 1));
 
   if (temp == NULL)
     return (NULL);
@@ -455,7 +455,7 @@ add_allow(location_t *loc)	/* I - Location to add to */
   * Clear the mask record and return...
   */
 
-  memset(temp, 0, sizeof(mask_t));
+  memset(temp, 0, sizeof(authmask_t));
   return (temp);
 }
 
@@ -464,10 +464,10 @@ add_allow(location_t *loc)	/* I - Location to add to */
  * 'add_deny()' - Add a deny mask to the location.
  */
 
-static mask_t *			/* O - New mask record */
+static authmask_t *		/* O - New mask record */
 add_deny(location_t *loc)	/* I - Location to add to */
 {
-  mask_t	*temp;		/* New mask record */
+  authmask_t	*temp;		/* New mask record */
 
 
  /*
@@ -482,9 +482,9 @@ add_deny(location_t *loc)	/* I - Location to add to */
   */
 
   if (loc->num_deny == 0)
-    temp = malloc(sizeof(mask_t));
+    temp = malloc(sizeof(authmask_t));
   else
-    temp = realloc(loc->deny, sizeof(mask_t) * (loc->num_deny + 1));
+    temp = realloc(loc->deny, sizeof(authmask_t) * (loc->num_deny + 1));
 
   if (temp == NULL)
     return (NULL);
@@ -497,7 +497,7 @@ add_deny(location_t *loc)	/* I - Location to add to */
   * Clear the mask record and return...
   */
 
-  memset(temp, 0, sizeof(mask_t));
+  memset(temp, 0, sizeof(authmask_t));
   return (temp);
 }
 
@@ -507,11 +507,11 @@ add_deny(location_t *loc)	/* I - Location to add to */
  */
 
 static int			/* O - 1 if mask matches, 0 otherwise */
-check_auth(unsigned ip,		/* I - Client address */
-           char     *name,	/* I - Client hostname */
-	   int      name_len,	/* I - Length of hostname */
-           int      num_masks,	/* I - Number of masks */
-	   mask_t   *masks)	/* I - Masks */
+check_auth(unsigned   ip,	/* I - Client address */
+           char       *name,	/* I - Client hostname */
+	   int        name_len,	/* I - Length of hostname */
+           int        num_masks,/* I - Number of masks */
+	   authmask_t *masks)	/* I - Masks */
 {
   while (num_masks > 0)
   {
@@ -555,5 +555,5 @@ check_auth(unsigned ip,		/* I - Client address */
 
 
 /*
- * End of "$Id: auth.c,v 1.6 1999/04/21 14:14:55 mike Exp $".
+ * End of "$Id: auth.c,v 1.7 1999/04/21 21:19:35 mike Exp $".
  */

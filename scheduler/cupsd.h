@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.5 1999/02/26 22:02:06 mike Exp $"
+ * "$Id: cupsd.h,v 1.6 1999/04/21 21:19:37 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -34,7 +34,7 @@
 #include <time.h>
 #include <signal.h>
 #include <fcntl.h>
-#include <bstring.h>
+/*#include <bstring.h>*/
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/stat.h>
@@ -134,5 +134,5 @@ VAR int			NeedReload	VALUE(TRUE);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.5 1999/02/26 22:02:06 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.6 1999/04/21 21:19:37 mike Exp $".
  */

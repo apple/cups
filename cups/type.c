@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.6 1999/03/01 20:51:54 mike Exp $"
+ * "$Id: type.c,v 1.7 1999/04/21 21:19:33 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -30,41 +30,6 @@
  *   compare()      - Compare two MIME super/type names.
  *   checkrules()   - Check each rule in a list.
  *   patmatch()     - Pattern matching...
- *
- * Revision History:
- *
- *   $Log: type.c,v $
- *   Revision 1.6  1999/03/01 20:51:54  mike
- *   Code cleanup - removed extraneous semi-colons...
- *
- *   Revision 1.5  1999/02/26 22:00:52  mike
- *   Added more debug statements.
- *
- *   Fixed bugs in cupsPrintFile() - wasn't setting the IPP_TAG_MIMETYPE
- *   value tag for the file type.
- *
- *   Updated conversion filter code to handle wildcards for super-type.
- *
- *   Revision 1.4  1999/02/05 17:40:57  mike
- *   Added IPP client read/write code.
- *
- *   Added string functions missing from some UNIXs.
- *
- *   Added option parsing functions.
- *
- *   Added IPP convenience functions (not implemented yet).
- *
- *   Updated source files to use local string.h as needed (for
- *   missing string functions)
- *
- *   Revision 1.3  1999/01/24 14:18:43  mike
- *   Check-in prior to CVS use.
- *
- *   Revision 1.2  1998/08/06 14:38:38  mike
- *   Finished coding and testing for CUPS 1.0.
- *
- *   Revision 1.1  1998/06/11 20:50:53  mike
- *   Initial revision
  */
 
 /*
@@ -428,6 +393,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	*/
 
 	sprintf(value[0], "*.%s", name);
+	length[0]  = strlen(value[0]);
 	num_values = 1;
 	op         = MIME_MAGIC_MATCH;
       }
@@ -1041,5 +1007,5 @@ patmatch(char *s,	/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.6 1999/03/01 20:51:54 mike Exp $".
+ * End of "$Id: type.c,v 1.7 1999/04/21 21:19:33 mike Exp $".
  */

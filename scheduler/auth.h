@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.h,v 1.4 1999/02/09 22:04:10 mike Exp $"
+ * "$Id: auth.h,v 1.5 1999/04/21 21:19:36 mike Exp $"
  *
  *   Authorization definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -62,7 +62,7 @@ typedef struct
     namemask_t	name;			/* Host/Domain name */
     ipmask_t	ip;			/* IP address/network */
   }		mask;			/* Mask data */
-} mask_t;
+} authmask_t;
 
 typedef struct
 {
@@ -72,9 +72,9 @@ typedef struct
 		level;			/* Access level required */
   char		group_name[MAX_USERPASS];/* User group name */
   int		num_allow;		/* Number of Allow lines */
-  mask_t	*allow;			/* Allow lines */
+  authmask_t	*allow;			/* Allow lines */
   int		num_deny;		/* Number of Deny lines */
-  mask_t	*deny;			/* Deny lines */
+  authmask_t	*deny;			/* Deny lines */
 } location_t;
 
 
@@ -104,5 +104,5 @@ extern http_status_t	IsAuthorized(client_t *con);
 
 
 /*
- * End of "$Id: auth.h,v 1.4 1999/02/09 22:04:10 mike Exp $".
+ * End of "$Id: auth.h,v 1.5 1999/04/21 21:19:36 mike Exp $".
  */

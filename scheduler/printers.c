@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.11 1999/04/21 19:33:16 mike Exp $"
+ * "$Id: printers.c,v 1.12 1999/04/21 21:19:37 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -540,7 +540,7 @@ set_printer_attrs(printer_t *p)	/* I - Printer to setup */
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                "pdl-override-supported", NULL, "not-attempted");
   ippAddIntegers(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "operations-supported",
-                 sizeof(ops) / sizeof(ops[0]), ops);
+                 sizeof(ops) / sizeof(ops[0]), (int *)ops);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_CHARSET, "charset-configured",
                NULL, DefaultCharset);
   ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_CHARSET, "charset-supported",
@@ -566,7 +566,7 @@ set_printer_attrs(printer_t *p)	/* I - Printer to setup */
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "number-up-default", 1);
   ippAddIntegers(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-                 "orientation-requested-supported", 4, orients);
+                 "orientation-requested-supported", 4, (int *)orients);
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                 "orientation-requested-default", IPP_PORTRAIT);
 
@@ -634,5 +634,5 @@ set_printer_attrs(printer_t *p)	/* I - Printer to setup */
 
 
 /*
- * End of "$Id: printers.c,v 1.11 1999/04/21 19:33:16 mike Exp $".
+ * End of "$Id: printers.c,v 1.12 1999/04/21 21:19:37 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.11 1999/04/21 19:31:29 mike Exp $"
+ * "$Id: mime.c,v 1.12 1999/04/21 21:19:33 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -33,6 +33,9 @@
  * Revision History:
  *
  *   $Log: mime.c,v $
+ *   Revision 1.12  1999/04/21 21:19:33  mike
+ *   Changes for HP-UX.
+ *
  *   Revision 1.11  1999/04/21 19:31:29  mike
  *   Changed the directory header stuff to use the autoconf-recommended
  *   sequence of #ifdef's.
@@ -108,6 +111,7 @@
 #elif HAVE_DIRENT_H
 #  include <dirent.h>
 typedef struct dirent DIRENT;
+#  define NAMLEN(dirent) strlen((dirent)->d_name)
 #else
 #  if HAVE_SYS_NDIR_H
 #    include <sys/ndir.h>
@@ -119,6 +123,7 @@ typedef struct dirent DIRENT;
 #    include <ndir.h>
 #  endif
 typedef struct direct DIRENT;
+#  define NAMLEN(dirent) (dirent)->d_namlen
 #endif
 
 
@@ -280,8 +285,8 @@ mimeMerge(mime_t *mime,		/* I - MIME database to add to */
 
   while ((dent = readdir(dir)) != NULL)
   {
-    if (dent->d_namlen > 6 &&
-        strcmp(dent->d_name + dent->d_namlen - 6, ".types") == 0)
+    if (NAMLEN(dent) > 6 &&
+        strcmp(dent->d_name + NAMLEN(dent) - 6, ".types") == 0)
     {
      /*
       * Load a mime.types file...
@@ -300,8 +305,8 @@ mimeMerge(mime_t *mime,		/* I - MIME database to add to */
 
   while ((dent = readdir(dir)) != NULL)
   {
-    if (dent->d_namlen > 6 &&
-        strcmp(dent->d_name + dent->d_namlen - 6, ".convs") == 0)
+    if (NAMLEN(dent) > 6 &&
+        strcmp(dent->d_name + NAMLEN(dent) - 6, ".convs") == 0)
     {
      /*
       * Load a mime.convs file...
@@ -602,5 +607,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.11 1999/04/21 19:31:29 mike Exp $".
+ * End of "$Id: mime.c,v 1.12 1999/04/21 21:19:33 mike Exp $".
  */

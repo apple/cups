@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.10 1999/04/19 21:17:10 mike Exp $"
+ * "$Id: main.c,v 1.11 1999/04/21 21:19:37 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -137,7 +137,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
       else if (!ReadConfiguration())
       {
-        fprintf(stderr, "cupsd: Unable to read configuration file \'%s\' - exiting!",
+        fprintf(stderr, "cupsd: Unable to read configuration file \'%s\' - exiting!\n",
 	        ConfigurationFile);
         exit(1);
       }
@@ -147,7 +147,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     * Check for available input or ready output.  If select() returns
     * 0 or -1, something bad happened and we should exit immediately.
     *
-    * Note that we at least have the listening socket open at all
+    * Note that we at least have one listening socket open at all
     * times.
     */
 
@@ -356,5 +356,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.10 1999/04/19 21:17:10 mike Exp $".
+ * End of "$Id: main.c,v 1.11 1999/04/21 21:19:37 mike Exp $".
  */

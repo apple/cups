@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.1 1999/04/21 19:24:38 mike Exp $"
+dnl "$Id: configure.in,v 1.2 1999/04/21 21:19:31 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -34,8 +34,10 @@ else
 fi)
 
 dnl Checks for programs...
+AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_CPP
+AC_PROG_RANLIB
 AC_PATH_PROG(AR,ar)
 AC_PATH_PROG(CP,cp)
 AC_PATH_PROG(MKDIR,mkdir)
@@ -61,6 +63,8 @@ AC_DEFINE(HAVE_LIBFLTK))
 AC_CHECK_LIB(jpeg,jpeg_destroy_decompress)
 AC_CHECK_LIB(z,deflate)
 AC_CHECK_LIB(png,png_init_io)
+AC_CHECK_LIB(tiff,TIFFFdOpen)
+AC_CHECK_LIB(sec,getspent)
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -77,5 +81,5 @@ AC_SUBST(OPTIM)
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.1 1999/04/21 19:24:38 mike Exp $".
+dnl End of "$Id: configure.in,v 1.2 1999/04/21 21:19:31 mike Exp $".
 dnl

@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.1 1999/04/21 19:24:36 mike Exp $"
+# "$Id: Makedefs.in,v 1.2 1999/04/21 21:19:30 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -28,10 +28,10 @@ AR	=	@AR@
 ARFLAGS	=	crvs
 BINDIR	=	@bindir@
 CC	=	@CC@
-CFLAGS	=	$(OPTIM) -fullwarn -woff 1174 -I.. $(OPTIONS)
+CFLAGS	=	$(OPTIM) -I.. $(OPTIONS)
 CP	=	@CP@
 CXX	=	@CXX@
-CXXFLAGS =	$(OPTIM) -fullwarn -woff 1174 -I.. $(OPTIONS)
+CXXFLAGS =	$(OPTIM) -I.. $(OPTIONS)
 DATADIR	=	@datadir@
 FLUID	=	@FLUID@
 HTMLDOC	=	@HTMLDOC@
@@ -66,5 +66,5 @@ SHELL	=	/bin/sh
 	mv t $@
 
 #
-# End of "$Id: Makedefs.in,v 1.1 1999/04/21 19:24:36 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.2 1999/04/21 21:19:30 mike Exp $"
 #

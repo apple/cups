@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.11 1999/04/21 14:14:56 mike Exp $"
+ * "$Id: client.c,v 1.12 1999/04/21 21:19:36 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -102,7 +102,11 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   address = ntohl(con->http.hostaddr.sin_addr.s_addr);
 
   if (HostNameLookups)
+#ifdef __hpux
+    host = gethostbyaddr((char *)&address, sizeof(address), AF_INET);
+#else
     host = gethostbyaddr(&address, sizeof(address), AF_INET);
+#endif /* __hpux */
   else
     host = NULL;
 
@@ -1550,5 +1554,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.11 1999/04/21 14:14:56 mike Exp $".
+ * End of "$Id: client.c,v 1.12 1999/04/21 21:19:36 mike Exp $".
  */

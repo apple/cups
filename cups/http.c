@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.24 1999/04/21 14:12:17 mike Exp $"
+ * "$Id: http.c,v 1.25 1999/04/21 21:19:32 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -73,6 +73,15 @@
 #if !defined(WIN32) && !defined(__EMX__)
 #  include <signal.h>
 #endif /* !WIN32 && !__EMX__ */
+
+/*
+ * Some operating systems have done away with the Fxxxx constants for
+ * the fcntl() call; this works around that "feature"...
+ */
+
+#ifndef FNONBLK
+#  define FNONBLK O_NONBLOCK
+#endif /* !FNONBLK */
 
 
 /*
@@ -1349,5 +1358,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.24 1999/04/21 14:12:17 mike Exp $".
+ * End of "$Id: http.c,v 1.25 1999/04/21 21:19:32 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-vector.c,v 1.8 1999/03/22 21:42:35 mike Exp $"
+ * "$Id: hpgl-vector.c,v 1.9 1999/04/21 21:19:34 mike Exp $"
  *
  *   HP-GL/2 vector routines for the Common UNIX Printing System (CUPS).
  *
@@ -48,7 +48,7 @@
  * Local functions...
  */
 
-static double	decode_number(char **, int, double);
+static double	decode_number(unsigned char **, int, double);
 static void	plot_points(int, param_t *);
 
 
@@ -347,7 +347,7 @@ void
 PE_polyline_encoded(int     num_params,	/* I - Number of parameters */
                     param_t *params)	/* I - Parameters */
 {
-  char		*s;			/* Pointer into string */
+  unsigned char	*s;			/* Pointer into string */
   int		temp,			/* Temporary value */
 		base_bits,		/* Data bits per byte */
 		draw,			/* Draw or move */
@@ -371,7 +371,7 @@ PE_polyline_encoded(int     num_params,	/* I - Number of parameters */
     Outputf("%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
   }
 
-  for (s = params[0].value.string; *s != '\0';)
+  for (s = (unsigned char *)params[0].value.string; *s != '\0';)
     switch (*s)
     {
       case '7' :
@@ -540,10 +540,10 @@ RT_arc_relative3(int     num_params,	/* I - Number of parameters */
  * 'decode_number()' - Decode an encoded number.
  */
 
-static double			/* O - Value */
-decode_number(char   **s,	/* IO - String to decode */
-              int    base_bits,	/* I - Number of data bits per byte */
-	      double frac_bits)	/* I - Multiplier for fractional data */
+static double				/* O - Value */
+decode_number(unsigned char **s,	/* IO - String to decode */
+              int           base_bits,	/* I - Number of data bits per byte */
+	      double        frac_bits)	/* I - Multiplier for fractional data */
 {
   double	temp,		/* Current value */
 		shift;		/* Multiplier */
@@ -700,5 +700,5 @@ plot_points(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-vector.c,v 1.8 1999/03/22 21:42:35 mike Exp $".
+ * End of "$Id: hpgl-vector.c,v 1.9 1999/04/21 21:19:34 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.1 1999/04/21 19:24:37 mike Exp $"
+ * "$Id: config.h.in,v 1.2 1999/04/21 21:19:31 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -34,10 +34,10 @@
  * Do we have various image libraries?
  */
 
-#define HAVE_LIBPNG
-#define HAVE_LIBZ
-#define HAVE_LIBJPEG
-#define HAVE_LIBTIFF
+#define HAVE_LIBPNG	1
+#define HAVE_LIBZ	1
+#define HAVE_LIBJPEG	1
+#define HAVE_LIBTIFF	1
 
 /*
  * Does this machine store words in big-endian (MSB-first) order?
@@ -75,5 +75,5 @@
 #define LOCALEDIR	"/usr/lib/locale"
 
 /*
- * End of "$Id: config.h.in,v 1.1 1999/04/21 19:24:37 mike Exp $".
+ * End of "$Id: config.h.in,v 1.2 1999/04/21 21:19:31 mike Exp $".
  */
