@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.46 2003/03/10 15:05:52 mike Exp $"
+ * "$Id: client.c,v 1.91.2.47 2003/03/12 21:51:02 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1155,8 +1155,31 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	          CloseClient(con);
 		  return (0);
 		}
+
+		break;
 	      }
-	      else if (!check_if_modified(con, &filestats))
+
+	      type = mimeFileType(MimeDatabase, filename);
+
+              if (IsCGI(con, filename, &filestats, type))
+	      {
+        	if (!SendCommand(con, con->command, con->options))
+		{
+		  if (!SendError(con, HTTP_NOT_FOUND))
+		  {
+	            CloseClient(con);
+		    return (0);
+		  }
+        	}
+		else
+        	  LogRequest(con, HTTP_OK);
+
+		if (con->http.version <= HTTP_1_0)
+		  con->http.keep_alive = HTTP_KEEPALIVE_OFF;
+	        break;
+	      }
+
+	      if (!check_if_modified(con, &filestats))
               {
         	if (!SendError(con, HTTP_NOT_MODIFIED))
 		{
@@ -1166,7 +1189,6 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      }
 	      else
               {
-		type = mimeFileType(MimeDatabase, filename);
 		if (type == NULL)
 	          strcpy(line, "text/plain");
 		else
@@ -1272,10 +1294,38 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      if (con->http.version <= HTTP_1_0)
 		con->http.keep_alive = HTTP_KEEPALIVE_OFF;
 	    }
-	    else if (!SendError(con, HTTP_UNAUTHORIZED))
+	    else
 	    {
-	      CloseClient(con);
-	      return (0);
+	     /*
+	      * POST to a file...
+	      */
+
+              if ((filename = get_file(con, &filestats, buf,
+	                               sizeof(buf))) == NULL)
+	      {
+		if (!SendError(con, HTTP_NOT_FOUND))
+		{
+	          CloseClient(con);
+		  return (0);
+		}
+
+		break;
+	      }
+
+	      type = mimeFileType(MimeDatabase, filename);
+
+              if (!IsCGI(con, filename, &filestats, type))
+	      {
+	       /*
+	        * Only POST to CGI's...
+		*/
+
+		if (!SendError(con, HTTP_UNAUTHORIZED))
+		{
+		  CloseClient(con);
+		  return (0);
+		}
+	      }
 	    }
 	    break;
 
@@ -2953,5 +3003,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.46 2003/03/10 15:05:52 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.47 2003/03/12 21:51:02 mike Exp $".
  */
