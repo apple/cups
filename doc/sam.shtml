@@ -1084,6 +1084,7 @@ determine how the server operates:
 <TD VALIGN="TOP">
 
 	<LI><A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A>
+	<LI><A HREF="#FileDevice"><CODE>FileDevice</CODE></A>
 	<LI><A HREF="#FilterLimit"><CODE>FilterLimit</CODE></A>
 	<LI><A HREF="#FilterNice"><CODE>FilterNice</CODE></A>
 	<LI><A HREF="#FontPath"><CODE>FontPath</CODE></A>
@@ -1968,6 +1969,48 @@ default error log file is <VAR>/var/log/cups/error_log</VAR>.
 
 <P>The special name "syslog" can be used to send the error information
 to the system log instead of a plain file.
+
+
+<!-- NEED 3in -->
+<H3><A NAME="FileDevice">FileDevice</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+FileDevice Yes
+FileDevice No
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>FileDevice</CODE> directive determines whether the
+scheduler allows new printers to be added using device URIs of the
+form <CODE>file:/filename</CODE>. File devices are most often used
+to test new printer drivers and do no support raw file printing.
+
+<P>The default setting is <CODE>No</CODE>.
+
+<CENTER><TABLE WIDTH="80%" BGCOLOR="#cccccc" CELLPADDING="5" BORDER="1">
+<TR>
+	<TD>
+
+	<B>Note:</B>
+
+	<P>File devices are managed by the scheduler. Since the
+	scheduler normally runs as the root user, file devices
+	can be used to overwrite system files and potentially
+	gain unauthorized access to the system. If you must
+	create printers using file devices, we recommend that
+	you set the <CODE>FileDevice</CODE> directive to
+	<CODE>Yes</CODE> for only as long as you need to add the
+	printers to the system, and then reset the directive to
+	<CODE>No</CODE>.
+
+	</TD>
+</TR>
+</TABLE></CENTER>
+
 
 <!-- NEED 3in -->
 <H3><A NAME="FilterLimit">FilterLimit</A></H3>

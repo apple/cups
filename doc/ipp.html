@@ -19,7 +19,7 @@ SUP { font-size: smaller }
 PRE { font-family: monospace }
 --></STYLE>
 </HEAD>
-<BODY>
+<BODY BGCOLOR="white">
 <CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
 <H1>CUPS Implementation of IPP</H1></A><BR>
 CUPS-IPP-1.1<BR>
@@ -1195,7 +1195,6 @@ VALIGN="TOP">0x4006</TD><TD VALIGN="TOP">Add or modify a printer class.</TD>
 <P>The URI returned by CUPS-Get-Devices will contain the maximum baud
  rate supported by the device and the best type of flow control
  available (&quot;soft&quot; or &quot;hard&quot;).</P>
-</LI>
 <LI>&quot;network&quot; - The device-uri will be of the form
  &quot;method://[username:password@]hostname[:port]/[resource]&quot;, where method
  may be &quot;http&quot;, &quot;ipp&quot;, &quot;lpd&quot;, &quot;smb&quot;, or &quot;socket&quot; in the current
@@ -1208,6 +1207,7 @@ VALIGN="TOP">0x4006</TD><TD VALIGN="TOP">Add or modify a printer class.</TD>
  any username and password information stripped; the information is
  still stored and used by the server internally to perform any needed
  authentication.</P>
+</LI>
 </LI>
 </UL>
 <H2><A NAME="5_2">5.2 Job Template Attributes</A></H2>

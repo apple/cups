@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.110 2002/12/17 19:00:14 swdev Exp $"
+ * "$Id: conf.c,v 1.111 2002/12/17 22:08:26 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -91,6 +91,7 @@ static var_t	variables[] =
   { "DefaultLanguage",	DefaultLanguage,	VAR_STRING,	sizeof(DefaultLanguage) },
   { "DocumentRoot",	DocumentRoot,		VAR_STRING,	sizeof(DocumentRoot) },
   { "ErrorLog",		ErrorLog,		VAR_STRING,	sizeof(ErrorLog) },
+  { "FileDevice",	&FileDevice,		VAR_BOOLEAN,	0 },
   { "FilterLimit",	&FilterLimit,		VAR_INTEGER,	0 },
   { "FilterNice",	&FilterNice,		VAR_INTEGER,	0 },
   { "FontPath",		FontPath,		VAR_STRING,	sizeof(FontPath) },
@@ -311,6 +312,7 @@ ReadConfiguration(void)
   ConfigFilePerm      = 0600;
   LogFilePerm         = 0644;
 
+  FileDevice          = FALSE;
   FilterLevel         = 0;
   FilterLimit         = 0;
   FilterNice          = 0;
@@ -1910,5 +1912,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.110 2002/12/17 19:00:14 swdev Exp $".
+ * End of "$Id: conf.c,v 1.111 2002/12/17 22:08:26 mike Exp $".
  */

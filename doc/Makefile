@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.42 2002/12/17 18:57:47 swdev Exp $"
+# "$Id: Makefile,v 1.43 2002/12/17 22:08:09 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -41,7 +41,7 @@ include ../Makedefs
 	$(HTMLDOC) --titleimage images/cups-large.gif --duplex --numbered \
 		--jpeg -f $@ $<
 
-HTMLDOC		=	htmldoc --strict --quiet --bodycolor white
+HTMLDOC		=	htmldoc --strict --verbose --bodycolor white
 
 
 #
