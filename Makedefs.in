@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.2 1999/04/21 21:19:30 mike Exp $"
+# "$Id: Makedefs.in,v 1.3 1999/04/21 22:40:23 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -24,34 +24,78 @@
 #         WWW: http://www.cups.org
 #
 
+#
+# Programs...
+#
+
 AR	=	@AR@
-ARFLAGS	=	crvs
-BINDIR	=	@bindir@
 CC	=	@CC@
-CFLAGS	=	$(OPTIM) -I.. $(OPTIONS)
 CP	=	@CP@
 CXX	=	@CXX@
-CXXFLAGS =	$(OPTIM) -I.. $(OPTIONS)
-DATADIR	=	@datadir@
 FLUID	=	@FLUID@
 HTMLDOC	=	@HTMLDOC@
-IMGLIBS	=	@IMGLIBS@ $(LIBS) -lm
-INCDIR	=	@includedir@/cups
-LDFLAGS	=	@LDFLAGS@ $(OPTIM)
-LIBDIR	=	@libdir@
-LIBEXEC =	@libexec@
-LIBS	=	@LIBS@ -L../cups -lcups
 LN	=	/bin/ln -sf
-LOCAL	=	@localstatedir@
-MANDIR	=	@mandir@
 MKDIR	=	@MKDIR@ -p
 NROFF	=	@GROFF@ -T ascii
-OPTIM	=	@OPTIM@
-OPTIONS	=
 RANLIB	=	@RANLIB@
 RM	=	@RM@ -f
-SBINDIR	=	@sbindir@
 SHELL	=	/bin/sh
+
+#
+# Program options...
+#
+# OPTIM   defines the common compiler optimization/debugging options.
+# OPTIONS defines other compile-time options (currently only -dDEBUG for
+#         extra debug info)
+#
+
+ARFLAGS	=	crvs
+CFLAGS	=	@CFLAGS@ $(OPTIM) -I.. $(OPTIONS)
+CXXFLAGS =	@CXXFLAGS@ $(OPTIM) -I.. $(OPTIONS)
+LDFLAGS	=	@LDFLAGS@ $(OPTIM)
+LIBS	=	@LIBS@ -L../cups -lcups
+OPTIM	=	@OPTIM@
+OPTIONS	=
+
+#
+# Directories...
+#
+# The first section uses the GNU names (which are *extremely*
+# difficult to find in a makefile because they are lowercase...)
+# We have to define these first because autoconf uses ${prefix}
+# and ${exec_prefix} for most of the other directories...
+#
+# This is immediately followed by definition in ALL CAPS for the
+# needed directories...
+#
+
+bindir		=	@bindir@
+datadir		=	@datadir@
+exec_prefix	=	@exec_prefix@
+includedir	=	@includedir@
+infodir		=	@infodir@
+libdir		=	@libdir@
+libexecdir	=	@libexecdir@
+localstatedir	=	@localstatedir@
+mandir		=	@mandir@
+oldincludedir	=	@oldincludedir@
+prefix		=	@prefix@
+sbindir		=	@sbindir@
+sharedstatedir	=	@sharedstatedir@
+srcdir		=	@srcdir@
+sysconfdir	=	@sysconfdir@
+top_srcdir	=	@top_srcdir@
+
+INCDIR	=	$(includedir)/cups
+LIBDIR	=	$(libdir)
+SPOOLDIR =	$(libexecdir)/cups
+LOCAL	=	@localstatedir@
+MANDIR	=	@mandir@
+SBINDIR	=	@sbindir@
+
+#
+# Rules...
+#
 
 .SUFFIXES:	.a .c .cxx .fl .h .man .o .z
 .c.o:
@@ -66,5 +110,5 @@ SHELL	=	/bin/sh
 	mv t $@
 
 #
-# End of "$Id: Makedefs.in,v 1.2 1999/04/21 21:19:30 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.3 1999/04/21 22:40:23 mike Exp $"
 #

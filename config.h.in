@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.2 1999/04/21 21:19:31 mike Exp $"
+ * "$Id: config.h.in,v 1.3 1999/04/21 22:40:23 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -31,49 +31,50 @@
 #define CUPS_SVERSION	"1.0"
 
 /*
+ * Where are files stored?
+ */
+
+#define LOCALEDIR	"/usr/lib/locale"
+#define SERVERDIR	"/var/cups"
+
+/*
  * Do we have various image libraries?
  */
 
-#define HAVE_LIBPNG	1
-#define HAVE_LIBZ	1
-#define HAVE_LIBJPEG	1
-#define HAVE_LIBTIFF	1
+#undef HAVE_LIBPNG
+#undef HAVE_LIBZ
+#undef HAVE_LIBJPEG
+#undef HAVE_LIBTIFF
 
 /*
  * Does this machine store words in big-endian (MSB-first) order?
  */
 
-#define WORDS_BIGENDIAN
+#undef WORDS_BIGENDIAN
 
 /*
  * Which directory functions and headers do we use?
  */
 
-#define HAVE_DIRENT_H	0
-#define HAVE_SYS_DIR_H	1
-#define HAVE_SYS_NDIR_H	0
-#define HAVE_NDIR_H	0
+#undef HAVE_DIRENT_H
+#undef HAVE_SYS_DIR_H
+#undef HAVE_SYS_NDIR_H
+#undef HAVE_NDIR_H
 
 /*
  * Do we have <shadow.h>?
  */
 
-#define HAVE_SHADOW_H 1
+#undef HAVE_SHADOW_H
 
 /*
  * Do we have the strXXX() functions?
  */
 
-#define HAVE_STRDUP 1
-#define HAVE_STRCASECMP 1
-#define HAVE_STRNCASECMP 1
+#undef HAVE_STRDUP
+#undef HAVE_STRCASECMP
+#undef HAVE_STRNCASECMP
 
 /*
- * Where are locale files stored?
- */
-
-#define LOCALEDIR	"/usr/lib/locale"
-
-/*
- * End of "$Id: config.h.in,v 1.2 1999/04/21 21:19:31 mike Exp $".
+ * End of "$Id: config.h.in,v 1.3 1999/04/21 22:40:23 mike Exp $".
  */
