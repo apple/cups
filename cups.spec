@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.36 2001/08/17 14:22:55 mike Exp $"
+# "$Id: cups.spec,v 1.37 2001/10/25 18:48:58 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -26,7 +26,7 @@
 
 Summary: Common Unix Printing System
 Name: cups
-Version: 1.1.10
+Version: 1.1.11
 Release: 1
 Copyright: GPL
 Group: System Environment/Daemons
@@ -71,7 +71,7 @@ supporting non-PostScript printer drivers.
 %setup
 
 %build
-./configure
+CFLAGS="$RPM_OPT_FLAGS" CXXFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_OPT_FLAGS" ./configure
 
 # If we got this far, all prerequisite libraries must be here.
 make
@@ -216,5 +216,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/pstoraster/*
 
 #
-# End of "$Id: cups.spec,v 1.36 2001/08/17 14:22:55 mike Exp $".
+# End of "$Id: cups.spec,v 1.37 2001/10/25 18:48:58 mike Exp $".
 #
