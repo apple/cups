@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.21 2002/12/17 18:56:39 swdev Exp $"
+dnl "$Id: cups-common.m4,v 1.22 2003/03/12 20:35:42 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -157,18 +157,21 @@ esac
 
 AC_SUBST(ARFLAGS)
 
-dnl Libraries for the backends...
+dnl Extra platform-specific libraries...
 case $uname in
         Darwin*)
-                BACKLIBS="-framework CoreFoundation -framework IOKit"
+                BACKLIBS="-framework IOKit"
+                COMMONLIBS="-framework CoreFoundation"
                 ;;
         *)
                 BACKLIBS=""
+		COMMONLIBS=""
                 ;;
 esac
 
 AC_SUBST(BACKLIBS)
+AC_SUBST(COMMONLIBS)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.21 2002/12/17 18:56:39 swdev Exp $".
+dnl End of "$Id: cups-common.m4,v 1.22 2003/03/12 20:35:42 mike Exp $".
 dnl

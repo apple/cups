@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.81 2003/01/29 17:03:37 mike Exp $"
+# "$Id: Makefile,v 1.82 2003/03/12 20:35:43 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -108,7 +108,7 @@ installhdrs:
 
 libcups.so.2 libcups.sl.2:	$(LIBOBJS) ../Makedefs
 	echo Linking $@...
-	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS) $(SSLLIBS)
+	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS)
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
 
@@ -123,7 +123,7 @@ libcups.2.dylib:	$(LIBOBJS) ../Makedefs
 		-install_name $(libdir)/$@ \
 		-current_version 2.5.0 \
 		-compatibility_version 2.0.0 \
-		$(LIBOBJS) $(SSLLIBS)
+		$(LIBOBJS) $(SSLLIBS) $(COMMONLIBS)
 	$(RM) libcups.dylib
 	$(LN) $@ libcups.dylib
 
@@ -136,7 +136,7 @@ libcups_s.a:	$(LIBOBJS) ../Makedefs
 	echo Creating $@...
 	$(RM) libcups_s.exp
 	(echo _ipp_add_attr; echo _ipp_free_attr) >libcups_s.exp
-	$(DSO) $(DSOFLAGS) -Wl,-bexport:libcups_s.exp -o libcups_s.o $(LIBOBJS) $(SSLLIBS) -lm
+	$(DSO) $(DSOFLAGS) -Wl,-bexport:libcups_s.exp -o libcups_s.o $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) -lm
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ libcups_s.o
 
@@ -148,7 +148,7 @@ libcups_s.a:	$(LIBOBJS) ../Makedefs
 libcups.la:    $(LIBOBJS) ../Makedefs
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
-		-version-info 2:5 $(SSLLIBS)
+		-version-info 2:5 $(SSLLIBS) $(COMMONLIBS)
 
 
 #
@@ -178,7 +178,7 @@ cups_C.h:	../locale/C/cups_C
 
 testhttp:	testhttp.o libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testhttp.o libcups.a $(NETLIBS) $(SSLLIBS)
+	$(CC) $(LDFLAGS) -o $@ testhttp.o libcups.a $(NETLIBS) $(SSLLIBS) $(COMMONLIBS)
 
 
 #
@@ -187,7 +187,7 @@ testhttp:	testhttp.o libcups.a
 
 testlang:	testlang.o libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testlang.o libcups.a $(NETLIBS) $(SSLLIBS)
+	$(CC) $(LDFLAGS) -o $@ testlang.o libcups.a $(NETLIBS) $(SSLLIBS) $(COMMONLIBS)
 
 
 #
@@ -198,5 +198,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.81 2003/01/29 17:03:37 mike Exp $".
+# End of "$Id: Makefile,v 1.82 2003/03/12 20:35:43 mike Exp $".
 #
