@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.36 2001/11/27 20:51:16 mike Exp $"
+ * "$Id: serial.c,v 1.37 2001/12/29 21:30:18 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -111,7 +111,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   int		bufsize;	/* Size of output buffer for writes */
   char		buffer[8192],	/* Output buffer */
 		*bufptr;	/* Pointer into buffer */
-  struct termios opts;		/* Parallel port options */
+  struct termios opts;		/* Serial port options */
+  struct termios origopts;	/* Original port options */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;	/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -209,6 +210,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Set any options provided...
   */
 
+  tcgetattr(fd, &origopts);
   tcgetattr(fd, &opts);
 
   opts.c_lflag &= ~(ICANON | ECHO | ISIG);	/* Raw mode */
@@ -484,6 +486,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
  /*
   * Close the serial port and input file and return...
   */
+
+  tcsetattr(fd, TCSADRAIN, &origopts);
 
   close(fd);
   if (fp != stdin)
@@ -858,5 +862,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.36 2001/11/27 20:51:16 mike Exp $".
+ * End of "$Id: serial.c,v 1.37 2001/12/29 21:30:18 mike Exp $".
  */
