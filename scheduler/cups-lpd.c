@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.34 2002/06/07 15:43:20 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.35 2002/07/29 19:06:21 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -27,7 +27,7 @@
  *   print_file()       - Print a file to a printer or class.
  *   recv_print_job()   - Receive a print job from the client.
  *   remove_jobs()      - Cancel one or more jobs.
- *   send_short_state() - Send the short queue state.
+ *   send_state()       - Send the queue state.
  *   smart_gets()       - Get a line of text, removing the trailing CR
  *                        and/or LF.
  */
@@ -1289,5 +1289,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.34 2002/06/07 15:43:20 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.35 2002/07/29 19:06:21 mike Exp $".
  */
