@@ -1,8 +1,10 @@
-CHANGES.txt - 11/21/2002
+CHANGES.txt - 11/22/2002
 ------------------------
 
 CHANGES IN CUPS V1.1.17
 
+	- The RunAsUser option was incompatible with the new
+	  daemon-mode code in 1.1.16.
 	- Fixed a problem with the Set-Job-Attributes and
 	  PostScript job ticket code in the scheduler - the
 	  "last" attribute pointer was never updated, which
