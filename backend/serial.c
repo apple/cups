@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.26 2001/01/03 16:10:28 mike Exp $"
+ * "$Id: serial.c,v 1.27 2001/01/03 17:44:40 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -484,10 +484,10 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 void
 list_devices(void)
 {
-#if defined(__hpux) || defined(__sgi) || defined(__sun) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+#if defined(__hpux) || defined(__sgi) || defined(__sun) || defined(__FreeBSD__) || defined(__OpenBSD__)
   static char	*funky_hex = "0123456789abcdefghijklmnopqrstuvwxyz";
 				/* Funky hex numbering used for some devices */
-#endif /* __hpux || __sgi || __sun || __FreeBSD__ || __NetBSD__ || __OpenBSD__ */
+#endif /* __hpux || __sgi || __sun || __FreeBSD__ || __OpenBSD__ */
 
 #ifdef __linux
   int	i;		/* Looping var */
@@ -718,7 +718,7 @@ list_devices(void)
       printf("serial serial:%s?baud=38400 \"Unknown\" \"Serial Port #%d\"\n",
              device, i + 1);
   }
-#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+#elif defined(__FreeBSD__) || defined(__OpenBSD__)
   int	i, j;		/* Looping vars */
   int	fd;		/* File descriptor */
   char	device[255];	/* Device filename */
@@ -800,10 +800,47 @@ list_devices(void)
              device, i + 1);
     }
   }
++#elif defined(__NetBSD__)
+  int	i, j;		/* Looping vars */
+  int	fd;		/* File descriptor */
+  char	device[255];	/* Device filename */
+
+
+ /*
+  * Standard serial ports...
+  */
+
+  for (i = 0; i < 4; i ++)
+  {
+    sprintf(device, "/dev/tty%02d", i);
+    if ((fd = open(device, O_WRONLY | O_NOCTTY | O_NDELAY)) >= 0)
+    {
+      close(fd);
+      printf("serial serial:%s?baud=115200 \"Unknown\" \"Serial Port #%d\"\n",
+             device, i + 1);
+    }
+  }
+
+ /*
+  * Cyclades-Z ports...
+  */
+
+  for (i = 0; i < 16; i ++) /* Should be up to 65536 boards... */
+    for (j = 0; j < 64; j ++)
+    {
+      sprintf(device, "/dev/ttyCZ%02d%02d", i, j);
+      if ((fd = open(device, O_WRONLY | O_NOCTTY | O_NDELAY)) >= 0)
+      {
+	close(fd);
+	printf("serial serial:%s?baud=115200 \"Unknown\" \"Cyclades #%d Serial Prt #%d\"\n",
+	       device, i, j + 1);
+      }
+    }
+
 #endif
 }
 
 
 /*
- * End of "$Id: serial.c,v 1.26 2001/01/03 16:10:28 mike Exp $".
+ * End of "$Id: serial.c,v 1.27 2001/01/03 17:44:40 mike Exp $".
  */

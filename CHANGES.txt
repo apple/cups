@@ -3,15 +3,34 @@ CHANGES.txt - 01/03/2000
 
 CHANGES IN CUPS V1.1.5-2
 
-	- More configure script changes for *BSD.
+	- Fixed configure check for OpenSSL to work with RSA
+	  code.
 	- Added configure check for <sys/ioctl.h>, and use this
 	  check in backend/serial.c.
+	- Updated configure script handling of data,
+	  configuration, and state directories to use datadir,
+	  sysconfdir, and localstatedir variables.
+	- NetBSD uses different serial port filenames than
+	  FreeBSD and OpenBSD.
 	- The pdftops filter didn't need some X-specific files.
+	- The scheduler makefile doesn't do a chown anymore when
+	  installing (cupsd did this automatically on startup
+	  anyways)
 
 
 CHANGES IN CUPS V1.1.5-1
 
-	- 
+	- There was a typo in the top-level Makefile
+	- The top-level Makefile did not install an init script
+	  for run level 5. 
+	- The configure script did not add the "crypto" library
+	  when checking for the OpenSSL library. 
+	- The OKIDATA PPD files were missing. 
+	- The config.h.in file defined the wrong version number. 
+	- The serial backend did not define "funky_hex" under *BSD. 
+	- Updated the Visual C++ project files and some of the
+	  CUPS API sources to compile under Windows again. 
+
 
 CHANGES IN CUPS V1.1.5
 

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.64 2001/01/03 16:10:27 mike Exp $"
+dnl "$Id: configure.in,v 1.65 2001/01/03 17:44:40 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -200,11 +200,26 @@ if test "$enable_ssl" = "yes"; then
 	dnl included...
 	SAVELIBS="$LIBS"
 
-	LIBS="-lcrypto $LIBS"
-	AC_CHECK_LIB(ssl,SSL_new,
-		SSLLIBS="-lssl -lcrypto"
-		AC_DEFINE(HAVE_LIBSSL)
-	)
+	dnl Some ELF systems can't resolve all the symbols in libcrypto
+	dnl if libcrypto was linked against RSAREF, and fail to link the
+	dnl test program correctly, even though a correct installation
+	dnl of OpenSSL exists.  So we test the linking three times in
+	dnl case the RSAREF libraries are needed.
+
+	for libcrypto in \
+		"-lcrypto" \
+		"-lcrypto -lrsaref" \
+		"-lcrypto -lRSAglue -lrsaref"
+	do
+		AC_CHECK_LIB(ssl,SSL_new,
+			[SSLLIBS="-lssl $libcrypto"
+			 AC_DEFINE(HAVE_LIBSSL)],,
+			$libcrypto
+		)
+		if test "x${SSLLIBS}" != "x"; then
+			break
+		fi
+	done
 
 	LIBS="$SAVELIBS"
 fi
@@ -396,7 +411,7 @@ if test "$datadir" = "\${prefix}/share"; then
 		datadir="/usr/share"
 	else
 		datadir="$prefix/share"
-        fi
+	fi
 fi
 
 dnl Fix "includedir" variable if it hasn't been specified...
@@ -519,13 +534,13 @@ AC_SUBST(INITDIR)
 AC_SUBST(INITDDIR)
 
 dnl Setup default locations...
-CUPS_SERVERROOT='${prefix}/etc/cups'
-CUPS_LOGDIR='${prefix}/var/log/cups'
-CUPS_REQUESTS='${prefix}/var/spool/cups'
+CUPS_SERVERROOT='${sysconfdif}/cups'
+CUPS_LOGDIR='${localstatedir}/log/cups'
+CUPS_REQUESTS='${localstatedir}/spool/cups'
 
-AC_DEFINE_UNQUOTED(CUPS_SERVERROOT, "$prefix/etc/cups")
-AC_DEFINE_UNQUOTED(CUPS_LOGDIR, "$prefix/var/log/cups")
-AC_DEFINE_UNQUOTED(CUPS_REQUESTS, "$prefix/var/spool/cups")
+AC_DEFINE_UNQUOTED(CUPS_SERVERROOT, "$sysconfdir/cups")
+AC_DEFINE_UNQUOTED(CUPS_LOGDIR, "$localstatedir/log/cups")
+AC_DEFINE_UNQUOTED(CUPS_REQUESTS, "$localstatedir/spool/cups")
 
 dnl See what directory to put server executables...
 case "$uname" in
@@ -552,8 +567,8 @@ AC_SUBST(CUPS_REQUESTS)
 dnl Set the CUPS_LOCALE directory...
 case "$uname" in
 	Linux* | FreeBSD* | NetBSD* | OpenBSD*)
-		CUPS_LOCALEDIR='${exec_prefix}/share/locale'
-		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$exec_prefix/share/locale")
+		CUPS_LOCALEDIR='${datadir}/locale'
+		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$datadir/locale")
 		;;
 
 	OSF1*)
@@ -571,13 +586,13 @@ esac
 AC_SUBST(CUPS_LOCALEDIR)
 
 dnl Set the CUPS_DATADIR directory...
-CUPS_DATADIR='${exec_prefix}/share/cups'
-AC_DEFINE_UNQUOTED(CUPS_DATADIR, "$exec_prefix/share/cups")
+CUPS_DATADIR='${datadir}/cups'
+AC_DEFINE_UNQUOTED(CUPS_DATADIR, "$datadir/cups")
 AC_SUBST(CUPS_DATADIR)
 
 dnl Set the CUPS_DOCROOT directory...
-CUPS_DOCROOT='${exec_prefix}/share/doc/cups'
-AC_DEFINE_UNQUOTED(CUPS_DOCROOT, "$exec_prefix/share/doc/cups")
+CUPS_DOCROOT='${datadir}/doc/cups'
+AC_DEFINE_UNQUOTED(CUPS_DOCROOT, "$datadir/doc/cups")
 AC_SUBST(CUPS_DOCROOT)
 
 dnl Set the CUPS_FONTPATH directory...
@@ -586,5 +601,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.64 2001/01/03 16:10:27 mike Exp $".
+dnl End of "$Id: configure.in,v 1.65 2001/01/03 17:44:40 mike Exp $".
 dnl
