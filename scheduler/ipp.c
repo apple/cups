@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.52 2003/03/20 03:05:40 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.53 2003/03/20 15:42:43 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3585,7 +3585,7 @@ get_printers(client_t *con,		/* I - Client connection */
 
   need_history = 0;
 
-  if (MaxPrinterHistory > 0 && printer->num_history > 0 && requested)
+  if (MaxPrinterHistory > 0 && requested)
   {
     for (i = 0; i < requested->num_values; i ++)
       if (!strcmp(requested->values[i].string.text, "all") ||
@@ -3685,7 +3685,7 @@ get_printers(client_t *con,		/* I - Client connection */
       copy_attrs(con->response, CommonData, requested, IPP_TAG_ZERO,
                  IPP_TAG_COPY);
 
-      if (need_history)
+      if (need_history && printer->num_history > 0)
       {
 	history = ippAddCollections(con->response, IPP_TAG_PRINTER,
                                     "printer-state-history",
@@ -6260,5 +6260,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.52 2003/03/20 03:05:40 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.53 2003/03/20 15:42:43 mike Exp $".
  */
