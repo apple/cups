@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.6 1999/08/04 13:08:36 mike Exp $"
+ * "$Id: lpr.c,v 1.7 1999/08/06 16:04:08 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -209,7 +209,7 @@ main(int  argc,		/* I - Number of command-line arguments */
       return (1);
     }
 
-    temp = fopen(tmpnam(tempfile), "w");
+    temp = fopen(cupsTempFile(tempfile, sizeof(tempfile)), "w");
 
     if (temp == NULL)
     {
@@ -248,5 +248,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lpr.c,v 1.6 1999/08/04 13:08:36 mike Exp $".
+ * End of "$Id: lpr.c,v 1.7 1999/08/06 16:04:08 mike Exp $".
  */
