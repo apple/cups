@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.83 2001/06/22 19:47:19 mike Exp $"
+ * "$Id: conf.c,v 1.84 2001/06/22 20:10:14 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -146,7 +146,8 @@ ReadConfiguration(void)
   int		i;		/* Looping var */
   FILE		*fp;		/* Configuration file */
   int		status;		/* Return status */
-  char		directory[1024];/* Configuration directory */
+  char		directory[1024],/* Configuration directory */
+		*slash;		/* Directory separator */
   char		type[MIME_MAX_SUPER + MIME_MAX_TYPE];
 				/* MIME type name */
   struct rlimit	limit;		/* Runtime limit */
@@ -212,7 +213,6 @@ ReadConfiguration(void)
 
   gethostname(ServerName, sizeof(ServerName));
   snprintf(ServerAdmin, sizeof(ServerAdmin), "root@%s", ServerName);
-  strcpy(ServerRoot, CUPS_SERVERROOT);
   strcpy(ServerBin, CUPS_SERVERBIN);
   strcpy(RequestRoot, CUPS_REQUESTS);
   strcpy(DocumentRoot, CUPS_DOCROOT);
@@ -223,6 +223,10 @@ ReadConfiguration(void)
   strcpy(Printcap, "/etc/printcap");
   strcpy(FontPath, CUPS_FONTPATH);
   strcpy(RemoteRoot, "remroot");
+
+  strcpy(ServerRoot, ConfigurationFile);
+  if ((slash = strrchr(ServerRoot, '/')) != NULL)
+    *slash = '\0';
 
   Classification[0] = '\0';
 
@@ -553,6 +557,8 @@ read_configuration(FILE *fp)		/* I - File to read from */
   dirsvc_poll_t	*poll;			/* Polling data */
   struct sockaddr_in polladdr;		/* Polling address */
   location_t	*location;		/* Browse location */
+  FILE		*incfile;		/* Include file */
+  char		incname[1024];		/* Include filename */
   static unsigned netmasks[4] =		/* Standard netmasks... */
   {
     0xff000000,
@@ -612,7 +618,30 @@ read_configuration(FILE *fp)		/* I - File to read from */
     * Decode the directive...
     */
 
-    if (strcasecmp(name, "<Location") == 0)
+    if (strcasecmp(name, "Include") == 0)
+    {
+     /*
+      * Include filename
+      */
+
+      if (value[0] == '/')
+      {
+        strncpy(incname, value, sizeof(incname) - 1);
+	incname[sizeof(incname) - 1] = '\0';
+      }
+      else
+        snprintf(incname, sizeof(incname), "%s/%s", ServerRoot, value);
+
+      if ((incfile = fopen(incname, "rb")) == NULL)
+        LogMessage(L_ERROR, "Unable to include config file \"%s\" - %s",
+	           incname, strerror(errno));
+      else
+      {
+        read_configuration(incfile);
+	fclose(incfile);
+      }
+    }
+    else if (strcasecmp(name, "<Location") == 0)
     {
      /*
       * <Location path>
@@ -1705,5 +1734,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.83 2001/06/22 19:47:19 mike Exp $".
+ * End of "$Id: conf.c,v 1.84 2001/06/22 20:10:14 mike Exp $".
  */

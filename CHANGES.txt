@@ -128,6 +128,8 @@ CHANGES IN CUPS V1.1.9
 	  (which use the uncompress program or gunzip)
 	- The SystemGroup directive now supports specification of
 	  multiple groups.
+	- Added new Include directive to cupsd.conf, a la
+	  Apache.
 
 
 CHANGES IN CUPS V1.1.8
