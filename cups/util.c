@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.99 2002/10/16 02:34:00 mike Exp $"
+ * "$Id: util.c,v 1.100 2002/10/18 17:39:15 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -215,7 +215,11 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
       return (NULL);
     }
 
+#ifdef WIN32
+    if (fileinfo.st_mode & _S_IFDIR)
+#else
     if (S_ISDIR(fileinfo.st_mode))
+#endif /* WIN32 */
     {
      /*
       * Can't send a directory...
@@ -1763,5 +1767,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.99 2002/10/16 02:34:00 mike Exp $".
+ * End of "$Id: util.c,v 1.100 2002/10/18 17:39:15 mike Exp $".
  */

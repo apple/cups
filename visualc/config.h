@@ -1,9 +1,7 @@
 /*
- * "$Id: config.h,v 1.8 2002/10/15 20:07:14 mike Exp $"
+ * "$Id: config.h,v 1.9 2002/10/18 17:39:21 mike Exp $"
  *
- *   Configuration file for the Common UNIX Printing System (CUPS).
- *
- *   @configure_input@
+ *   Configuration file for ESP Print Pro.
  *
  *   Copyright 1997-2002 by Easy Software Products.
  *
@@ -45,6 +43,14 @@
 #define CUPS_DATADIR    "C:/CUPS/share"
 #define CUPS_FONTPATH	"C:/CUPS/share/fonts"
 #define ESP_SOFTWARE	"C:/CUPS/etc/software"
+
+
+/*
+ * Default user and group...
+ */
+
+#define CUPS_DEFAULT_USER "lp"
+#define CUPS_DEFAULT_GROUP "sys"
 
 
 /*
@@ -237,5 +243,5 @@
 
 
 /*
- * End of "$Id: config.h,v 1.8 2002/10/15 20:07:14 mike Exp $".
+ * End of "$Id: config.h,v 1.9 2002/10/18 17:39:21 mike Exp $".
  */

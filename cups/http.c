@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.102 2002/09/05 21:12:00 mike Exp $"
+ * "$Id: http.c,v 1.103 2002/10/18 17:39:15 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -179,7 +179,9 @@ void
 httpInitialize(void)
 {
 #ifdef HAVE_LIBSSL
+#  ifndef WIN32
   struct timeval	curtime;	/* Current time in microseconds */
+#  endif // !WIN32
   int			i;		/* Looping var */
   unsigned char		data[1024];	/* Seed data */
 #endif /* HAVE_LIBSSL */
@@ -217,8 +219,11 @@ httpInitialize(void)
   * it is the best we can do (on others, this seed isn't even used...)
   */
 
+#ifdef WIN32
+#else
   gettimeofday(&curtime, NULL);
   srand(curtime.tv_sec + curtime.tv_usec);
+#endif // WIN32
 
   for (i = 0; i < sizeof(data); i ++)
     data[i] = rand(); /* Yes, this is a poor source of random data... */
@@ -1950,5 +1955,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.102 2002/09/05 21:12:00 mike Exp $".
+ * End of "$Id: http.c,v 1.103 2002/10/18 17:39:15 mike Exp $".
  */
