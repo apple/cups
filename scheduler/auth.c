@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.32 2000/06/27 21:07:10 mike Exp $"
+ * "$Id: auth.c,v 1.33 2000/07/20 19:00:52 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -35,6 +35,7 @@
  *                          to access the location.
  *   FindBest()           - Find the location entry that best matches the
  *                          resource.
+ *   FindLocation()       - Find the named location.
  *   IsAuthorized()       - Check to see if the user is authorized...
  *   add_allow()          - Add an allow mask to the location.
  *   add_deny()           - Add a deny mask to the location.
@@ -78,10 +79,10 @@ static int		pam_func(int, const struct pam_message **,
  * 'AddLocation()' - Add a location for authorization.
  */
 
-location_t *			/* O - Pointer to new location record */
-AddLocation(char *location)	/* I - Location path */
+location_t *				/* O - Pointer to new location record */
+AddLocation(const char *location)	/* I - Location path */
 {
-  location_t	*temp;		/* New location */
+  location_t	*temp;			/* New location */
 
 
  /*
@@ -343,6 +344,28 @@ FindBest(client_t *con)		/* I - Connection */
   */
 
   return (best);
+}
+
+
+/*
+ * 'FindLocation()' - Find the named location.
+ */
+
+location_t *				/* O - Location that matches */
+FindLocation(const char *location)	/* I - Connection */
+{
+  int		i;			/* Looping var */
+
+
+ /*
+  * Loop through the list of locations to find a match...
+  */
+
+  for (i = 0; i < NumLocations; i ++)
+    if (strcasecmp(Locations[i].location, location) == 0)
+      return (Locations + i);
+
+  return (NULL);
 }
 
 
@@ -877,5 +900,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.32 2000/06/27 21:07:10 mike Exp $".
+ * End of "$Id: auth.c,v 1.33 2000/07/20 19:00:52 mike Exp $".
  */
