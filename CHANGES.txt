@@ -1,8 +1,9 @@
-CHANGES.txt - 07/20/2003
+CHANGES.txt - 07/23/2003
 ------------------------
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- Fixed AIX shared library support (STR #201)
 	- Added support for live testing with Valgrind (STR
 	  #193)
 	- The CGI programs now collect the list of needed
