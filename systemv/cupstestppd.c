@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.8 2003/02/14 21:08:49 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.9 2003/02/14 21:24:12 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -300,6 +300,11 @@ main(int  argc,			/* I - Number of command-line arguments */
       {
 	if (verbose > 0)
 	  puts("        PASS    LanguageEncoding");
+      }
+      else if (ppdversion < 41)
+      {
+	if (verbose > 0)
+	  puts("        WARN    REQUIRED LanguageEncoding");
       }
       else
       {
@@ -656,5 +661,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.8 2003/02/14 21:08:49 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.9 2003/02/14 21:24:12 mike Exp $".
  */
