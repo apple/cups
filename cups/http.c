@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.73 2000/12/20 13:41:13 mike Exp $"
+ * "$Id: http.c,v 1.74 2001/01/08 14:58:18 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1271,6 +1271,7 @@ httpGets(char   *line,			/* I - Line to read into */
   lineptr = line;
   bufptr  = http->buffer;
   bytes   = 0;
+  length --;
 
   while (bufptr < bufend && bytes < length)
   {
@@ -1279,19 +1280,24 @@ httpGets(char   *line,			/* I - Line to read into */
     if (*bufptr == 0x0a)
     {
       bufptr ++;
-      *lineptr = '\0';
-
-      http->used -= bytes;
-      if (http->used > 0)
-	memcpy(http->buffer, bufptr, http->used);
-
-      DEBUG_printf(("httpGets(): Returning \"%s\"\n", line));
-      return (line);
+      break;
     }
     else if (*bufptr == 0x0d)
       bufptr ++;
     else
       *lineptr++ = *bufptr++;
+  }
+
+  if (bytes > 0)
+  {
+    *lineptr = '\0';
+
+    http->used -= bytes;
+    if (http->used > 0)
+      memcpy(http->buffer, bufptr, http->used);
+
+    DEBUG_printf(("httpGets(): Returning \"%s\"\n", line));
+    return (line);
   }
 
   DEBUG_puts("httpGets(): No new line available!");
@@ -1966,5 +1972,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.73 2000/12/20 13:41:13 mike Exp $".
+ * End of "$Id: http.c,v 1.74 2001/01/08 14:58:18 mike Exp $".
  */
