@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.5 2000/01/04 13:46:10 mike Exp $"
+ * "$Id: log.c,v 1.6 2000/03/09 17:51:27 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -36,6 +36,10 @@
 #include "cupsd.h"
 #include <stdarg.h>
 
+#ifdef HAVE_VSYSLOG
+#  include <syslog.h>
+#endif /* HAVE_VSYSLOG */
+
 
 /*
  * Local functions...
@@ -49,8 +53,8 @@ static char	*get_datetime(time_t t);
  */
 
 int				/* O - 1 on success, 0 on error */
-LogMessage(int  level,		/* I - Log level */
-           char *message,	/* I - printf-style message string */
+LogMessage(int        level,	/* I - Log level */
+           const char *message,	/* I - printf-style message string */
 	   ...)			/* I - Additional args as needed */
 {
   char		filename[1024],	/* Name of error log file */
@@ -64,83 +68,108 @@ LogMessage(int  level,		/* I - Log level */
 		  'I',
 		  'D'
 		};
+#ifdef HAVE_VSYSLOG
+  static int	syslevels[] =	/* SYSLOG levels... */
+		{
+		  LOG_NOTICE,
+		  LOG_ERR,
+		  LOG_WARNING,
+		  LOG_INFO,
+		  LOG_DEBUG
+		};
+#endif /* HAVE_VSYSLOG */
 
 
  /*
   * See if we want to log this message...
   */
 
-  if (level <= LogLevel)
+  if (level > LogLevel)
+    return (1);
+
+#ifdef HAVE_VSYSLOG
+ /*
+  * See if we are logging errors via syslog...
+  */
+
+  if (strcmp(ErrorLog, "syslog") == 0)
   {
-   /*
-    * See if the error log file is open...
-    */
-
-    if (ErrorFile == NULL)
-    {
-     /*
-      * Nope, open error log...
-      */
-
-      if (ErrorLog[0] == '\0')
-        return (1);
-      else if (ErrorLog[0] != '/')
-        sprintf(filename, "%s/%s", ServerRoot, ErrorLog);
-      else
-        strcpy(filename, ErrorLog);
-
-      if ((ErrorFile = fopen(filename, "a")) == NULL)
-        return (0);
-    }
-
-   /*
-    * Do we need to rotate the log?
-    */
-
-    if (ftell(ErrorFile) > MaxLogSize && MaxLogSize > 0)
-    {
-     /*
-      * Rotate error_log file...
-      */
-
-      fclose(ErrorFile);
-
-      if (ErrorLog[0] != '/')
-        sprintf(filename, "%s/%s", ServerRoot, ErrorLog);
-      else
-        strcpy(filename, ErrorLog);
-
-      strcpy(backname, filename);
-      strcat(backname, ".O");
-
-      unlink(backname);
-      rename(filename, backname);
-
-      if ((ErrorFile = fopen(filename, "a")) == NULL)
-        return (0);
-    }
-
-   /*
-    * Print the log level and date/time...
-    */
-
-    fprintf(ErrorFile, "%c %s ", levels[level], get_datetime(time(NULL)));
-
-   /*
-    * Then the log message...
-    */
-
     va_start(ap, message);
-    vfprintf(ErrorFile, message, ap);
+    vsyslog(syslevels[level], message, ap);
     va_end(ap);
 
+    return (1);
+  }
+#endif /* HAVE_VSYSLOG */
+
+ /*
+  * Not using syslog; see if the error log file is open...
+  */
+
+  if (ErrorFile == NULL)
+  {
    /*
-    * Then a newline...
+    * Nope, open error log...
     */
 
-    fputs("\n", ErrorFile);
-    fflush(ErrorFile);
+    if (ErrorLog[0] == '\0')
+      return (1);
+    else if (ErrorLog[0] != '/')
+      sprintf(filename, "%s/%s", ServerRoot, ErrorLog);
+    else
+      strcpy(filename, ErrorLog);
+
+    if ((ErrorFile = fopen(filename, "a")) == NULL)
+      return (0);
   }
+
+ /*
+  * Do we need to rotate the log?
+  */
+
+  if (ftell(ErrorFile) > MaxLogSize && MaxLogSize > 0)
+  {
+   /*
+    * Rotate error_log file...
+    */
+
+    fclose(ErrorFile);
+
+    if (ErrorLog[0] != '/')
+      sprintf(filename, "%s/%s", ServerRoot, ErrorLog);
+    else
+      strcpy(filename, ErrorLog);
+
+    strcpy(backname, filename);
+    strcat(backname, ".O");
+
+    unlink(backname);
+    rename(filename, backname);
+
+    if ((ErrorFile = fopen(filename, "a")) == NULL)
+      return (0);
+  }
+
+ /*
+  * Print the log level and date/time...
+  */
+
+  fprintf(ErrorFile, "%c %s ", levels[level], get_datetime(time(NULL)));
+
+ /*
+  * Then the log message...
+  */
+
+  va_start(ap, message);
+  vfprintf(ErrorFile, message, ap);
+  va_end(ap);
+
+ /*
+  * Then a newline...
+  */
+
+  fputs("\n", ErrorFile);
+  fflush(ErrorFile);
 
   return (1);
 }
@@ -151,12 +180,26 @@ LogMessage(int  level,		/* I - Log level */
  */
 
 int				/* O - 1 on success, 0 on error */
-LogPage(job_t *job,		/* I - Job being printed */
-        char  *page)		/* I - Page being printed */
+LogPage(job_t       *job,	/* I - Job being printed */
+        const char  *page)	/* I - Page being printed */
 {
   char		filename[1024],	/* Name of error log file */
 		backname[1024];	/* Backup filename */
 
+
+#ifdef HAVE_VSYSLOG
+ /*
+  * See if we are logging pages via syslog...
+  */
+
+  if (strcmp(PageLog, "syslog") == 0)
+  {
+    syslog(LOG_INFO, "PAGE %s %s %d %s", job->printer->name, job->username,
+           job->id, page);
+
+    return (1);
+  }
+#endif /* HAVE_VSYSLOG */
 
  /*
   * See if the page log file is open...
@@ -230,7 +273,7 @@ LogRequest(client_t      *con,	/* I - Request to log */
 {
   char		filename[1024],	/* Name of access log file */
 		backname[1024];	/* Backup filename */
-  static char	*states[] =	/* HTTP client states... */
+  static const char *states[] =	/* HTTP client states... */
 		{
 		  "WAITING",
 		  "OPTIONS",
@@ -248,6 +291,23 @@ LogRequest(client_t      *con,	/* I - Request to log */
 		  "STATUS"
 		};
 
+
+#ifdef HAVE_VSYSLOG
+ /*
+  * See if we are logging accesses via syslog...
+  */
+
+  if (strcmp(AccessLog, "syslog") == 0)
+  {
+    syslog(LOG_INFO, "REQUEST %s - %s \"%s %s HTTP/%d.%d\" %d %d\n",
+           con->http.hostname, con->username[0] != '\0' ? con->username : "-",
+	   states[con->operation], con->uri,
+	   con->http.version / 100, con->http.version % 100,
+	   code, con->bytes);
+
+    return (1);
+  }
+#endif /* HAVE_VSYSLOG */
 
  /*
   * See if the access log is open...
@@ -321,7 +381,7 @@ get_datetime(time_t t)		/* I - Time value */
 {
   struct tm	*date;		/* Date/time value */
   static char	s[1024];	/* Date/time string */
-  static char	*months[12] =	/* Months */
+  static const char *months[12] =/* Months */
 		{
 		  "Jan",
 		  "Feb",
@@ -354,7 +414,7 @@ get_datetime(time_t t)		/* I - Time value */
 
   date = localtime(&t);
 
-  sprintf(s, "[%02d/%s/%04d:%02d:%02d:%02d %+03d%02d]",
+  sprintf(s, "[%02d/%s/%04d:%02d:%02d:%02d %+03ld%02ld]",
 	  date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
 	  date->tm_hour, date->tm_min, date->tm_sec,
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
@@ -368,5 +428,5 @@ get_datetime(time_t t)		/* I - Time value */
 
 
 /*
- * End of "$Id: log.c,v 1.5 2000/01/04 13:46:10 mike Exp $".
+ * End of "$Id: log.c,v 1.6 2000/03/09 17:51:27 mike Exp $".
  */

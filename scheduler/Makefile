@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.21 2000/02/18 17:48:07 mike Exp $"
+# "$Id: Makefile,v 1.22 2000/03/09 17:51:27 mike Exp $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -41,7 +41,7 @@ all:	cupsd libmime.a testmime testspeed
 #
 
 clean:
-	rm -f $(OBJS) cupsd libmime.a testmime testspeed
+	$(RM) $(OBJS) cupsd libmime.a testmime testspeed
 
 
 #
@@ -109,5 +109,5 @@ testspeed.o:	../cups/cups.h ../cups/http.h ../cups/ipp.h ../cups/language.h
 $(OBJS):	../config.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.21 2000/02/18 17:48:07 mike Exp $".
+# End of "$Id: Makefile,v 1.22 2000/03/09 17:51:27 mike Exp $".
 #
