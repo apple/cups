@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.6 1999/03/01 20:51:52 mike Exp $"
+ * "$Id: ipp.h,v 1.7 1999/03/03 21:16:14 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -53,7 +53,7 @@ extern "C" {
  * Common limits...
  */
 
-#  define IPP_MAX_NAME		128
+#  define IPP_MAX_NAME		256
 #  define IPP_MAX_VALUES	100
 
 
@@ -176,7 +176,14 @@ typedef enum			/**** IPP operations... ****/
   IPP_GET_JOB_ATTRIBUTES,
   IPP_GET_JOBS,
   IPP_GET_PRINTER_ATTRIBUTES,
+  IPP_HOLD_JOB = 0x000c,
+  IPP_RELEASE_JOB,
+  IPP_RESTART_JOB,
+  IPP_PAUSE_PRINTER = 0x0010,
+  IPP_RESUME_PRINTER,
+  IPP_PURGE_JOBS,
   IPP_PRIVATE = 0x4000,
+  CUPS_GET_DEFAULT,
   CUPS_GET_PRINTERS,
   CUPS_ADD_PRINTER,
   CUPS_DELETE_PRINTER,
@@ -309,7 +316,10 @@ extern ipp_attribute_t	*ippAddIntegers(ipp_t *ipp, ipp_tag_t group, char *name, 
 extern ipp_attribute_t	*ippAddLString(ipp_t *ipp, ipp_tag_t group, char *name, char *charset, uchar *value);
 extern ipp_attribute_t	*ippAddLStrings(ipp_t *ipp, ipp_tag_t group, char *name, int num_values, char *charset, uchar **values);
 extern ipp_attribute_t	*ippAddRange(ipp_t *ipp, ipp_tag_t group, char *name, int lower, int upper);
+extern ipp_attribute_t	*ippAddRanges(ipp_t *ipp, ipp_tag_t group, char *name, int num_values, int *lower, int *upper);
 extern ipp_attribute_t	*ippAddResolution(ipp_t *ipp, ipp_tag_t group, char *name, ipp_res_t units, int xres, int yres);
+extern ipp_attribute_t	*ippAddResolutions(ipp_t *ipp, ipp_tag_t group, char *name, int num_values, ipp_res_t units, int *xres, int *yres);
+extern ipp_attribute_t	*ippAddSeparator(ipp_t *ipp);
 extern ipp_attribute_t	*ippAddString(ipp_t *ipp, ipp_tag_t group, char *name, char *value);
 extern ipp_attribute_t	*ippAddStrings(ipp_t *ipp, ipp_tag_t group, char *name, int num_values, char **values);
 extern void		ippDelete(ipp_t *ipp);
@@ -331,5 +341,5 @@ extern int		ippPort(void);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.6 1999/03/01 20:51:52 mike Exp $".
+ * End of "$Id: ipp.h,v 1.7 1999/03/03 21:16:14 mike Exp $".
  */

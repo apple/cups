@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.21 1999/03/01 20:51:51 mike Exp $"
+ * "$Id: http.c,v 1.22 1999/03/03 21:16:13 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -53,6 +53,7 @@
  *   http_field()        - Return the field index for a field name.
  *   http_send()         - Send a request with all fields and the trailing
  *                         blank line.
+ *   http_sighandler()   - Handle SIGPIPE signals...
  */
 
 /*
@@ -68,6 +69,10 @@
 
 #include "http.h"
 #include "debug.h"
+
+#if !defined(WIN32) && !defined(__EMX__)
+#  include <signal.h>
+#endif /* !WIN32 && !__EMX__ */
 
 
 /*
@@ -174,14 +179,16 @@ static char		*months[12] =
 void
 httpInitialize(void)
 {
-#ifdef WIN32
+#if defined(WIN32) || defined(__EMX__)
   WSADATA	winsockdata;	/* WinSock data */
   static int	initialized = 0;/* Has WinSock been initialized? */
 
 
   if (!initialized)
     WSAStartup(MAKEWORD(1,1), &winsockdata);
-#endif /* WIN32 */
+#else
+  sigset(SIGPIPE, SIG_IGN);
+#endif /* WIN32 || __EMX__ */
 }
 
 
@@ -864,6 +871,8 @@ httpPrintf(http_t     *http,		/* I - HTTP data */
   bytes = vsprintf(buf, format, ap);
   va_end(ap);
 
+  DEBUG_printf(("httpPrintf: %s", buf));
+
   return (send(http->fd, buf, bytes, 0));
 }
 
@@ -1003,8 +1012,7 @@ httpUpdate(http_t *http)		/* I - HTTP data */
       * the result code, too...
       */
 
-      if (http->state == HTTP_GET || http->state == HTTP_POST_SEND)
-        httpGetLength(http);
+      httpGetLength(http);
 
       switch (http->state)
       {
@@ -1299,6 +1307,9 @@ http_send(http_t       *http,	/* I - HTTP data */
   */
 
   http->state = request;
+  if (request == HTTP_POST || request == HTTP_PUT)
+    http->state ++;
+
   if (httpPrintf(http, "%s %s HTTP/1.1\n", codes[request], buf) < 1)
   {
    /*
@@ -1336,5 +1347,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.21 1999/03/01 20:51:51 mike Exp $".
+ * End of "$Id: http.c,v 1.22 1999/03/03 21:16:13 mike Exp $".
  */

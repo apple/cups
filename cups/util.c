@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.5 1999/03/01 22:24:24 mike Exp $"
+ * "$Id: util.c,v 1.6 1999/03/03 21:16:15 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -184,33 +184,16 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
   for (i = 0; i < num_options; i ++)
   {
    /*
-    * Ignore option names that don't start with a letter...
-    */
-
-    if (!isalpha(options[i].name[0]))
-      continue;
-
-   /*
     * See what the option value is; for compatibility with older interface
-    * scripts, we have to support single-argument options, option SPACE value,
+    * scripts, we have to support single-argument options as well as
     * option=value, option=low-high, and option=MxN.
     */
 
     name = options[i].name;
     val  = options[i].value;
 
-    if (val == NULL || *val == '\0')
-    {
-      if ((i + 1) < num_options &&
-          !isalpha(options[i + 1].name[0]))
-      {
-        i ++;
-
-        val = options[i].name;
-      }
-      else
-        val = NULL;
-    }
+    if (*val == '\0')
+      val = NULL;
 
     if (val != NULL)
     {
@@ -281,15 +264,17 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
       {
         n2 = strtol(s + 1, &s, 0);
 
-	if (strcmp(s, "dpc") == 0 || strcmp(s, "cm") == 0)
-          attr = ippAddResolution(request, IPP_TAG_JOB, name, n, n2,
-	                          IPP_RES_PER_CM);
+	if (strcmp(s, "dpc") == 0)
+          attr = ippAddResolution(request, IPP_TAG_JOB, name,
+	                          IPP_RES_PER_CM, n, n2);
+        else if (strcmp(s, "dpi") == 0)
+          attr = ippAddResolution(request, IPP_TAG_JOB, name,
+	                          IPP_RES_PER_INCH, n, n2);
         else
-          attr = ippAddResolution(request, IPP_TAG_JOB, name, n, n2,
-	                          IPP_RES_PER_INCH);
+          attr = ippAddString(request, IPP_TAG_JOB, name, val);
 
-	DEBUG_printf(("cupsPrintJob: Adding resolution option \'%s\' with value %dx%d%s...\n",
-                      name, n, n2, s));
+	DEBUG_printf(("cupsPrintJob: Adding resolution option \'%s\' with value %s...\n",
+                      name, val));
       }
       else
       {
@@ -330,12 +315,12 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
 
   if (httpPost(http, uri))
   {
-    fputs("httpPost() failed.\n", stderr);
+    DEBUG_puts("httpPost() failed.");
     jobid = 0;
   }
   else if (ippWrite(http, request) == IPP_ERROR)
   {
-    fputs("ippWrite() failed.\n", stderr);
+    DEBUG_puts("ippWrite() failed.");
     jobid = 0;
   }
   else
@@ -343,7 +328,7 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
     while ((i = fread(buffer, 1, sizeof(buffer), fp)) > 0)
       if (httpWrite(http, buffer, i) < i)
       {
-        fputs("httpWrite() failed.\n", stderr);
+        DEBUG_puts("httpWrite() failed.");
 
 	fclose(fp);
 	ippDelete(request);
@@ -354,27 +339,25 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
 
     httpWrite(http, buffer, 0);
 
-    while ((status = httpUpdate(http)) != HTTP_CONTINUE);
-
-    if (status == HTTP_ERROR)
+    if ((status = httpUpdate(http)) == HTTP_ERROR)
     {
-      fprintf(stderr, "httpUpdate() failed (%d).\n", status);
+      DEBUG_printf(("httpUpdate() failed (%d).\n", status));
       jobid = 0;
     }
     else if ((ippRead(http, response)) == IPP_ERROR)
     {
-      fputs("ippRead() failed.\n", stderr);
+      DEBUG_puts("ippRead() failed.");
       jobid = 0;
     }
-    else if (response->request.status.status_code != IPP_OK)
+    else if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      fprintf(stderr, "IPP response code was 0x%x!\n",
-              response->request.status.status_code);
+      DEBUG_printf(("IPP response code was 0x%x!\n",
+                    response->request.status.status_code));
       jobid = 0;
     }
     else if ((attr = ippFindAttribute(response, "job-id")) == NULL)
     {
-      fputs("No job ID!\n", stderr);
+      DEBUG_puts("No job ID!");
       jobid = 0;
     }
     else
@@ -391,5 +374,5 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
 
 
 /*
- * End of "$Id: util.c,v 1.5 1999/03/01 22:24:24 mike Exp $".
+ * End of "$Id: util.c,v 1.6 1999/03/03 21:16:15 mike Exp $".
  */
