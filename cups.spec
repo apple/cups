@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.1 1999/07/08 14:20:03 mike Exp $"
+# "$Id: cups.spec,v 1.2 1999/07/08 15:00:20 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -136,6 +136,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/man/man8/disable.8
 /usr/sbin/lpc
 /usr/sbin/cupsd
+/usr/lib/libcups.so.1
+/usr/lib/libcupsimage.so.1
 %dir /usr/share/cups
 /usr/share/cups/8859-1
 /usr/share/cups/8859-14
@@ -297,8 +299,9 @@ rm -rf $RPM_BUILD_ROOT
 /usr/include/cups/mime.h
 /usr/include/cups/ppd.h
 /usr/include/cups/raster.h
-/usr/lib/libcups.a
+/usr/lib/libcups.so
+/usr/lib/libcupsimage.so
 
 #
-# End of "$Id: cups.spec,v 1.1 1999/07/08 14:20:03 mike Exp $".
+# End of "$Id: cups.spec,v 1.2 1999/07/08 15:00:20 mike Exp $".
 #
