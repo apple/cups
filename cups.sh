@@ -1,8 +1,14 @@
 #!/bin/sh
 #
-# "$Id: cups.sh,v 1.4 1999/06/24 18:36:27 mike Exp $"
+# "$Id: cups.sh,v 1.5 1999/07/21 19:04:33 mike Exp $"
 #
 #   Startup/shutdown script for the Common UNIX Printing System (CUPS).
+#
+#   Linux chkconfig stuff:
+#
+#   chkconfig: 2345 60 60
+#   description: Startup/shutdown script for the Common UNIX \
+#                Printing System (CUPS).
 #
 #   Copyright 1997-1999 by Easy Software Products, all rights reserved.
 #
@@ -23,7 +29,26 @@
 #         WWW: http://www.cups.org
 #
 
-# See if the CUPS daemon is running, and if so stop it...
+# See what program to use for configuration stuff...
+case "`uname`" in
+	IRIX*)
+		IS_ON=/sbin/chkconfig
+		;;
+
+	*)
+		IS_ON=/bin/true
+		;;
+esac
+
+# The verbose flag controls the printing of the names of
+# daemons as they are started.
+if $IS_ON verbose; then
+	ECHO=echo
+else
+	ECHO=:
+fi
+
+# See if the CUPS server is running...
 case "`uname`" in
 	IRIX* | HP-UX | SunOS)
 		pid=`ps -e | awk '{print $1,$4}' | grep cupsd | awk '{print $1}'`
@@ -39,26 +64,49 @@ case "`uname`" in
 		;;
 esac
 
+# Start or stop the CUPS server based upon the first argument to the script.
 case $1 in
-	start | restart)
-	if test "$pid" != ""; then
-		echo "Restarting CUPS scheduler..."
-		kill -HUP $pid
-	else
-		echo "Starting CUPS scheduler..."
-		/usr/sbin/cupsd 2>&1 >/dev/null &
-	fi
-	;;
+	start | restart | reload)
+		if test "$pid" != ""; then
+			if $IS_ON cups; then
+				kill -HUP $pid
+				$ECHO "cups: scheduler restarted."
+			else
+				kill $pid
+				$ECHO "cups: scheduler stopped."
+			fi
+		else
+			if $IS_ON cups; then
+				/usr/sbin/cupsd 2>&1 >/dev/null &
+				$ECHO "cups: scheduler started."
+			fi
+		fi
+		;;
 
 	stop)
-	if test "$pid" != ""; then
-		echo "Stopping CUPS scheduler..."
-		kill $pid
-		sleep 1
-	fi
-	;;
+		if test "$pid" != ""; then
+			kill $pid
+			$ECHO "cups: scheduler stopped."
+		fi
+		;;
+
+	status)
+		if test "$pid" != ""; then
+			echo "cups: Scheduler is running."
+		else
+			echo "cups: Scheduler is not running."
+		fi
+		;;
+
+	*)
+		echo "Usage: cups {reload|restart|start|status|stop}"
+		exit 1
+		;;
 esac
 
+exit 0
+
+
 #
-# End of "$Id: cups.sh,v 1.4 1999/06/24 18:36:27 mike Exp $".
+# End of "$Id: cups.sh,v 1.5 1999/07/21 19:04:33 mike Exp $".
 #
