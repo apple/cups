@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.21 2000/11/10 15:32:40 mike Exp $"
+ * "$Id: classes.c,v 1.22 2000/11/14 20:06:54 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -235,7 +235,10 @@ FindAvailablePrinter(const char *name)	/* I - Class to check */
   */
 
   if ((c = FindClass(name)) == NULL)
+  {
+    LogMessage(L_ERROR, "Unable to find class \"%s\"!", name);
     return (NULL);
+  }
 
  /*
   * Loop through the printers in the class and return the first idle
@@ -275,7 +278,7 @@ FindClass(const char *name)	/* I - Name of class */
     switch (strcasecmp(name, c->name))
     {
       case 0 : /* name == c->name */
-          if (c->type & CUPS_PRINTER_CLASS)
+          if (c->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
 	    return (c);
       case 1 : /* name > c->name */
           break;
@@ -559,5 +562,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.21 2000/11/10 15:32:40 mike Exp $".
+ * End of "$Id: classes.c,v 1.22 2000/11/14 20:06:54 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.96 2000/11/10 15:32:40 mike Exp $"
+ * "$Id: job.c,v 1.97 2000/11/14 20:06:54 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -118,7 +118,7 @@ CancelJob(int id,		/* I - Job to cancel */
   char	filename[1024];		/* Job filename */
 
 
-  DEBUG_printf(("CancelJob(%d)\n", id));
+  LogMessage(L_DEBUG, "CancelJob(%d)\n", id);
 
   for (current = Jobs, prev = NULL; current != NULL; prev = current, current = current->next)
     if (current->id == id)
@@ -241,8 +241,8 @@ CheckJobs(void)
 
   for (current = Jobs, prev = NULL; current != NULL; prev = current)
   {
-    DEBUG_printf(("CheckJobs: current->state->values[0].integer = %d\n",
-                  current->state->values[0].integer));
+    LogMessage(L_DEBUG, "CheckJobs: current->state->values[0].integer = %d\n",
+               current->state->values[0].integer);
 
    /*
     * Start held jobs if they are ready...
@@ -259,7 +259,7 @@ CheckJobs(void)
 
     if (current->state->values[0].integer == IPP_JOB_PENDING)
     {
-      DEBUG_printf(("CheckJobs: current->dest = \'%s\'\n", current->dest));
+      LogMessage(L_DEBUG, "CheckJobs: current->dest = \'%s\'\n", current->dest);
 
       if ((pclass = FindClass(current->dest)) != NULL)
         printer = FindAvailablePrinter(current->dest);
@@ -299,7 +299,7 @@ CheckJobs(void)
 	* if so, start the job...
 	*/
 
-        DEBUG_printf(("CheckJobs: printer->state = %d\n", printer->state));
+        LogMessage(L_DEBUG, "CheckJobs: printer->state = %d\n", printer->state);
 
         if (printer->state == IPP_PRINTER_IDLE ||	/* Printer is idle */
 	    ((printer->type & CUPS_PRINTER_REMOTE) &&	/* Printer is remote */
@@ -345,7 +345,7 @@ HoldJob(int id)			/* I - Job ID */
   job_t	*job;			/* Job data */
 
 
-  DEBUG_printf(("HoldJob(%d)\n", id));
+  LogMessage(L_DEBUG, "HoldJob(%d)\n", id);
 
   if ((job = FindJob(id)) == NULL)
     return;
@@ -666,7 +666,7 @@ ReleaseJob(int id)		/* I - Job ID */
   job_t	*job;			/* Job data */
 
 
-  DEBUG_printf(("ReleaseJob(%d)\n", id));
+  LogMessage(L_DEBUG, "ReleaseJob(%d)\n", id);
 
   if ((job = FindJob(id)) == NULL)
     return;
@@ -739,7 +739,7 @@ SetJobHoldUntil(int        id,		/* I - Job ID */
   int		second;			/* Hold second */
 
 
-  DEBUG_printf(("SetJobHoldUntil(%d, \"%s\")\n", id, when));
+  LogMessage(L_DEBUG, "SetJobHoldUntil(%d, \"%s\")\n", id, when);
 
   if ((job = FindJob(id)) == NULL)
     return;
@@ -856,7 +856,7 @@ SetJobHoldUntil(int        id,		/* I - Job ID */
       job->hold_until += 24 * 60 * 60 * 60;
   }
 
-  DEBUG_printf(("SetJobHoldUntil: hold_until = %d\n", job->hold_until));
+  LogMessage(L_DEBUG, "SetJobHoldUntil: hold_until = %d\n", job->hold_until);
 }
 
 
@@ -975,7 +975,7 @@ StartJob(int       id,		/* I - Job ID */
 		fontpath[1050];	/* CUPS_FONTPATH environment variable */
 
 
-  DEBUG_printf(("StartJob(%d, %08x)\n", id, printer));
+  LogMessage(L_DEBUG, "StartJob(%d, %08x)\n", id, printer);
 
   for (current = Jobs; current != NULL; current = current->next)
     if (current->id == id)
@@ -1481,7 +1481,7 @@ StopJob(int id)			/* I - Job ID */
   job_t	*current;		/* Current job */
 
 
-  DEBUG_printf(("StopJob(%d)\n", id));
+  LogMessage(L_DEBUG, "StopJob(%d)\n", id);
 
   for (current = Jobs; current != NULL; current = current->next)
     if (current->id == id)
@@ -1499,7 +1499,7 @@ StopJob(int id)			/* I - Job ID */
 	else
 	  SetPrinterState(current->printer, IPP_PRINTER_IDLE);
 
-        DEBUG_printf(("StopJob: printer state is %d\n", current->printer->state));
+        LogMessage(L_DEBUG, "StopJob: printer state is %d\n", current->printer->state);
 
 	current->state->values[0].integer = IPP_JOB_STOPPED;
         current->printer->job = NULL;
@@ -2519,8 +2519,8 @@ start_process(const char *command,	/* I - Full path to command */
   int	pid;				/* Process ID */
 
 
-  DEBUG_printf(("start_process(\"%s\", %08x, %08x, %d, %d, %d)\n",
-                command, argv, envp, infd, outfd, errfd));
+  LogMessage(L_DEBUG, "start_process(\"%s\", %08x, %08x, %d, %d, %d)\n",
+             command, argv, envp, infd, outfd, errfd);
 
   if ((pid = fork()) == 0)
   {
@@ -2590,5 +2590,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.96 2000/11/10 15:32:40 mike Exp $".
+ * End of "$Id: job.c,v 1.97 2000/11/14 20:06:54 mike Exp $".
  */
