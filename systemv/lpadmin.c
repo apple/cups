@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.22.2.18 2003/01/15 04:25:57 mike Exp $"
+ * "$Id: lpadmin.c,v 1.22.2.19 2003/01/31 20:09:55 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -46,6 +46,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <errno.h>
 #include <cups/cups.h>
 #include <cups/string.h>
 #include <cups/language.h>
@@ -1795,6 +1796,7 @@ set_printer_options(http_t        *http,/* I - Server connection */
   FILE		*in,			/* PPD file */
 		*out;			/* Temporary file */
   int		outfd;			/* Temporary file descriptor */
+  const char	*protocol;		/* Protocol */
 
 
   DEBUG_printf(("set_printer_options(%p, \"%s\", %d, %p)\n", http, printer,
@@ -1896,14 +1898,40 @@ set_printer_options(http_t        *http,/* I - Server connection */
     * Set default options in the PPD file...
     */
 
-    outfd = cupsTempFd(tempfile, sizeof(tempfile));
+    if ((outfd = cupsTempFd(tempfile, sizeof(tempfile))) < 0)
+    {
+      fprintf(stderr, "lpadmin: Unable to create temporary file - %s\n",
+              strerror(errno));
+      ippDelete(request);
+      unlink(ppdfile);
+      return (1);
+    }
 
-    in  = fopen(ppdfile, "rb");
-    out = fdopen(outfd, "wb");
+    if ((in = fopen(ppdfile, "rb")) == NULL)
+    {
+      fprintf(stderr, "lpadmin: Unable to open PPD file \"%s\" - %s\n",
+              ppdfile, strerror(errno));
+      ippDelete(request);
+      unlink(ppdfile);
+      close(outfd);
+      unlink(tempfile);
+      return (1);
+    }
+
+    out      = fdopen(outfd, "wb");
+    protocol = cupsGetOption("protocol", num_options, options);    
 
     while (get_line(line, sizeof(line), in) != NULL)
     {
-      if (strncmp(line, "*Default", 8) != 0)
+      if (!strncmp(line, "*cupsProtocol:", 14) && protocol)
+      {
+       /*
+        * Set a new output protocol (BCP or TBCP) below...
+	*/
+
+        continue;
+      }
+      else if (strncmp(line, "*Default", 8))
         fprintf(out, "%s\n", line);
       else
       {
@@ -1930,6 +1958,9 @@ set_printer_options(http_t        *http,/* I - Server connection */
 	  fprintf(out, "%s\n", line);
       }
     }
+
+    if (protocol)
+      fprintf(out, "*cupsProtocol: \"%s\"\n", protocol);
 
     fclose(in);
     fclose(out);
@@ -2018,5 +2049,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.22.2.18 2003/01/15 04:25:57 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.22.2.19 2003/01/31 20:09:55 mike Exp $".
  */

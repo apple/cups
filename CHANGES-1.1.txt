@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The lpadmin command now supports a "protocol" option
+	  for specifying the binary communications protocol to
+	  use when printing binary PostScript data.
 	- The scheduler did not properly parse the SystemGroup
 	  directive, so only the first group would be used.
 	- Revamped how strings are stored in the scheduler,

@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.35 2003/01/28 20:37:07 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.36 2003/01/31 20:09:52 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -340,14 +340,14 @@ main(int  argc,			/* I - Number of command-line arguments */
     temp = NULL;
 
  /*
-  * See if we support a binary transmission protocol...
+  * See if we should use a binary transmission protocol...
   */
 
-  if (ppd && ppd->protocols)
+  if ((val = ppdFindAttr(ppd, "cupsProtocol", NULL)) != NULL)
   {
-    if (strstr(ppd->protocols, "TBCP"))
+    if (!strcasecmp(val, "TBCP"))
       Protocol = PROT_TBCP;
-    else if (strstr(ppd->protocols, "BCP"))
+    else if (!strcasecmp(val, "BCP"))
     {
       Protocol = PROT_BCP;
 
@@ -1877,5 +1877,5 @@ start_nup(int number,			/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.35 2003/01/28 20:37:07 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.36 2003/01/31 20:09:52 mike Exp $".
  */

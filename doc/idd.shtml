@@ -274,6 +274,12 @@ source/type cost program
 supports the source type directly the special filter program "-" may be
 specified.
 
+<H4>cupsFlipDuplex</H4>
+
+<P>This boolean attribute notifies the RIP filters that the
+destination printer requires an upside-down image for the back
+page. The default value is false.
+
 <H4>cupsManualCopies</H4>
 
 <P>This boolean attribute notifies the RIP filters that the destination printer
@@ -307,6 +313,13 @@ f(x) = density * x<SUP>gamma</SUP>
 <P>The <I>m00</I> through <I>m22</I> values define a 3x3 transformation
 matrix for the CMY color values. The density function is applied <I>after</I>
 the CMY transformation.
+
+<H4>cupsProtocol</H4>
+
+<P>This optional attribute describes which binary communication
+protocol to use when printing binary PostScript data. The
+strings "None", "BCP", and "TBCP" are recognized, corresponding
+to no encoding, BCP, and TBCP respectively.
 
 <H4>cupsVersion</H4>
 
