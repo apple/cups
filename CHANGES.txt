@@ -70,6 +70,13 @@ CHANGES IN CUPS V1.1.11
 	  PPD LanguageVersion values.  The new code also
 	  supports country codes as well, so "English-GB"
 	  maps to the "en_GB" locale.
+	- The cups-lpd mini-daemon did not support
+	  anonymous printing (no username specified).
+	  While the username is REQUIRED by RFC-1179,
+	  MacOS clients do not send the REQUIRED username
+	  information when printing via LPD.
+	- Added many warning and informational messages
+	  to cups-lpd where they were missing.
 
 
 CHANGES IN CUPS V1.1.10-1

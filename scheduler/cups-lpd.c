@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.25 2001/05/06 00:11:25 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.26 2001/10/18 19:28:40 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -277,7 +277,7 @@ print_file(const char    *name,		/* I - Printer or class name */
            const char    *file,		/* I - File to print */
            const char    *title,	/* I - Title of job */
            const char    *docname,	/* I - Name of job file */
-           const char    *user,		/* I - Title of job */
+           const char    *user,		/* I - Owner of job */
            int           num_options,	/* I - Number of options */
 	   cups_option_t *options)	/* I - Options */
 {
@@ -360,14 +360,20 @@ print_file(const char    *name,		/* I - Printer or class name */
   else
     jobid = attr->values[0].integer;
 
+  if (jobid)
+    syslog(LOG_INFO, "Print file - job ID = %d", jobid);
+  else if (response)
+    syslog(LOG_ERR, "Unable to print file - %s",
+           ippErrorString(response->request.status.status_code));
+  else
+    syslog(LOG_ERR, "Unable to print file - %s",
+           ippErrorString(cupsLastError()));
+
   if (response != NULL)
     ippDelete(response);
 
   httpClose(http);
   cupsLangFree(language);
-
-  if (jobid)
-    syslog(LOG_INFO, "Print file - job ID = %d", jobid);
 
   return (jobid);
 }
@@ -644,13 +650,14 @@ recv_print_job(const char    *dest,	/* I - Destination */
 	  case 't' : /* Print troff output file */
 	  case 'v' : /* Print raster file */
 	     /*
-	      * Verify that we have a username...
+	      * Check that we have a username...
 	      */
 
 	      if (!user[0])
 	      {
-	        status = 1;
-		break;
+		syslog(LOG_WARNING, "No username specified by client! "
+		                    "Using \"anonymous\"...");
+		strcpy(user, "anonymous");
 	      }
 
              /*
@@ -760,7 +767,10 @@ remove_jobs(const char *dest,		/* I - Destination */
 
   if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
                                  cupsEncryption())) == NULL)
+  {
+    syslog(LOG_ERR, "Unable to connect to server: %s", strerror(errno));
     return (1);
+  }
 
   language = cupsLangDefault();
 
@@ -914,7 +924,10 @@ send_state(const char *dest,		/* I - Destination */
 
   if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
                                  cupsEncryption())) == NULL)
+  {
+    syslog(LOG_ERR, "Unable to connect to server: %s", strerror(errno));
     return (1);
+  }
 
  /*
   * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
@@ -1233,5 +1246,5 @@ smart_gets(char *s,	/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.25 2001/05/06 00:11:25 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.26 2001/10/18 19:28:40 mike Exp $".
  */
