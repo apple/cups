@@ -1,7 +1,7 @@
 CHANGES.txt - 05/07/2001
 ------------------------
 
-CHANGES IN CUPS V1.1.7-1
+CHANGES IN CUPS V1.1.8
 
 	- Updated spec file to generate separate cups-pstoraster
 	  package for pstoraster.
@@ -26,6 +26,14 @@ CHANGES IN CUPS V1.1.7-1
 	- Jobs weren't queued to remote classes (fix from
 	  Richard Begg.)
 	- AIX changes from Richard Begg.
+	- Fixed the pstops fix for GNOME output - no longer use
+	  the page numbers in the %%Page: comment since GNOME
+	  puts a filename instead (!?@!#?!).  There is still an
+	  issue with N-up printing since GNOME defines its fonts
+	  in the first page instead of the document setup section
+	  (pages must be independent according to the DSC spec)
+	  People with GNOME printing problems should consult bug
+	  #54489...
 	- The imagetops filter produced PAGE: messages when
 	  generating PostScript for a non-PostScript printer
 	  (only affects page-label and Classification
