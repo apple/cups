@@ -1,8 +1,10 @@
-CHANGES.txt - 07/06/2003
+CHANGES.txt - 07/12/2003
 ------------------------
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The scheduler no longer calls malloc and free from the
+	  signal handlers (STR #190)
 	- The USB backend now uses the manufacturer and model
 	  strings if the description string is not available
 	  (STR #174)

@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.104 2003/05/09 15:11:13 mike Exp $"
+ * "$Id: main.c,v 1.105 2003/07/19 21:13:57 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -68,7 +68,7 @@ static void	usage(void);
  */
 
 static int	parent_signal = 0;	/* Set to signal number from child */
-static int	holdcount = 0;		/* Number of time "hold" was called */
+static int	holdcount = 0;		/* Number of times "hold" was called */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
 static sigset_t	holdmask;		/* Old POSIX signal mask */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -906,6 +906,12 @@ sigchld_handler(int sig)	/* I - Signal number */
   (void)sig;
 
  /*
+  * Bump the signal count...
+  */
+
+  SignalCount ++;
+
+ /*
   * Save the original error value (wait might overwrite it...)
   */
 
@@ -1000,6 +1006,12 @@ sigchld_handler(int sig)	/* I - Signal number */
 #elif !defined(HAVE_SIGACTION)
   signal(SIGCLD, sigchld_handler);
 #endif /* HAVE_SIGSET */
+
+ /*
+  * Restore the signal count...
+  */
+
+  SignalCount --;
 }
 
 
@@ -1035,6 +1047,12 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
   (void)sig;	/* remove compiler warnings... */
+
+ /*
+  * Bump the signal count...
+  */
+
+  SignalCount ++;
 
  /*
   * Log an error...
@@ -1079,5 +1097,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.104 2003/05/09 15:11:13 mike Exp $".
+ * End of "$Id: main.c,v 1.105 2003/07/19 21:13:57 mike Exp $".
  */
