@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.26 1999/06/24 13:57:56 mike Exp $"
+ * "$Id: printers.c,v 1.27 1999/06/24 14:10:55 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -40,7 +40,6 @@
  * Include necessary headers...
  */
 
-#define DEBUG
 #include "cupsd.h"
 
 
@@ -637,6 +636,8 @@ SetPrinterAttrs(printer_t *p)	/* I - Printer to setup */
   ipp_finish_t	finishings[5];
 
 
+  printf("SetPrinterAttrs: entering name = %s, type = %x\n", p->name, p->type);
+
  /*
   * Clear out old filters and add a filter from application/vnd.cups-raw to
   * printer/name to handle "raw" printing by users.
@@ -906,6 +907,8 @@ SetPrinterAttrs(printer_t *p)	/* I - Printer to setup */
   */
 
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-type", p->type);
+
+  printf("SetPrinterAttrs: leaving name = %s, type = %x\n", p->name, p->type);
 }
 
 
@@ -1005,5 +1008,5 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 
 
 /*
- * End of "$Id: printers.c,v 1.26 1999/06/24 13:57:56 mike Exp $".
+ * End of "$Id: printers.c,v 1.27 1999/06/24 14:10:55 mike Exp $".
  */

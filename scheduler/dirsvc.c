@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.32 1999/06/24 13:08:05 mike Exp $"
+ * "$Id: dirsvc.c,v 1.33 1999/06/24 14:10:54 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -33,7 +33,6 @@
  * Include necessary headers...
  */
 
-#define DEBUG
 #include "cupsd.h"
 
 
@@ -520,5 +519,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.32 1999/06/24 13:08:05 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.33 1999/06/24 14:10:54 mike Exp $".
  */
