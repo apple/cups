@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.13
 
+	- The cupsGetPPD() function didn't remove the @server
+	  portion of the printer name, and since it would
+	  connect immediately to the remote server instead of
+	  the local server, the printer would not be found.
 	- Classification and page labels were not rotated to
 	  match the page orientation.
 	- Now set the TCP "no delay" option on network
