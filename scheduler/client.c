@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.25 1999/06/21 19:43:48 mike Exp $"
+ * "$Id: client.c,v 1.26 1999/06/25 12:53:00 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1334,6 +1334,7 @@ pipe_command(client_t *con,	/* I - Client connection */
   static char	lang[1024];		/* LANG env variable */
   static char	content_length[1024];	/* CONTENT_LENGTH env variable */
   static char	content_type[1024];	/* CONTENT_TYPE env variable */
+  static char	ipp_port[1024];		/* Default listen port */
   static char	server_port[1024];	/* Default listen port */
   static char	server_name[1024];	/* Default listen hostname */
   static char	remote_host[1024];	/* REMOTE_HOST env variable */
@@ -1396,6 +1397,7 @@ pipe_command(client_t *con,	/* I - Client connection */
   gethostname(hostname, sizeof(hostname) - 1);
 
   sprintf(lang, "LANG=%s", con->language ? con->language->language : "C");
+  sprintf(ipp_port, "IPP_PORT=%d", ntohs(con->http.hostaddr.sin_port));
   sprintf(server_port, "SERVER_PORT=%d", ntohs(con->http.hostaddr.sin_port));
   sprintf(server_name, "SERVER_NAME=%s", hostname);
   sprintf(remote_host, "REMOTE_HOST=%s", con->http.hostname);
@@ -1406,18 +1408,19 @@ pipe_command(client_t *con,	/* I - Client connection */
   envp[1]  = "SERVER_SOFTWARE=CUPS/1.0";
   envp[2]  = "GATEWAY_INTERFACE=CGI/1.1";
   envp[3]  = "SERVER_PROTOCOL=HTTP/1.1";
-  envp[4]  = server_name;
-  envp[5]  = server_port;
-  envp[6]  = remote_host;
-  envp[7]  = remote_user;
-  envp[8]  = lang;
-  envp[9]  = "TZ=GMT";
-  envp[10] = tmpdir;
+  envp[4]  = ipp_port;
+  envp[5]  = server_name;
+  envp[6]  = server_port;
+  envp[7]  = remote_host;
+  envp[8]  = remote_user;
+  envp[9]  = lang;
+  envp[10] = "TZ=GMT";
+  envp[11] = tmpdir;
 
   if (con->operation == HTTP_GET)
   {
-    envp[11] = "REQUEST_METHOD=GET";
-    envp[12] = NULL;
+    envp[12] = "REQUEST_METHOD=GET";
+    envp[13] = NULL;
   }
   else
   {
@@ -1425,10 +1428,10 @@ pipe_command(client_t *con,	/* I - Client connection */
     sprintf(content_type, "CONTENT_TYPE=%s",
             con->http.fields[HTTP_FIELD_CONTENT_TYPE]);
 
-    envp[11] = "REQUEST_METHOD=POST";
-    envp[12] = content_length;
-    envp[13] = content_type;
-    envp[14] = NULL;
+    envp[12] = "REQUEST_METHOD=POST";
+    envp[13] = content_length;
+    envp[14] = content_type;
+    envp[15] = NULL;
   }
 
  /*
@@ -1497,5 +1500,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.25 1999/06/21 19:43:48 mike Exp $".
+ * End of "$Id: client.c,v 1.26 1999/06/25 12:53:00 mike Exp $".
  */

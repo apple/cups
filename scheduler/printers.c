@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.29 1999/06/25 12:30:47 mike Exp $"
+ * "$Id: printers.c,v 1.30 1999/06/25 12:53:01 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -71,6 +71,9 @@ AddPrinter(char *name)		/* I - Name of printer */
 
   strcpy(p->name, name);
   strcpy(p->hostname, ServerName);
+  sprintf(p->uri, "ipp://%s:%d/printers/%s", ServerName,
+          ntohs(Listeners[0].address.sin_port), name);
+
   p->state     = IPP_PRINTER_STOPPED;
   p->accepting = 0;
   p->filetype  = mimeAddType(MimeDatabase, "printer", name);
@@ -152,9 +155,10 @@ AddPrinterFilter(printer_t *p,		/* I - Printer to add to */
     if ((super[0] == '*' || strcmp((*temptype)->super, super) == 0) &&
         (type[0] == '*' || strcmp((*temptype)->type, type) == 0))
     {
-      DEBUG_printf(("Adding filter %s/%s %s/%s %d %s\n", (*temptype)->super,
-                    (*temptype)->type, p->filetype->super, p->filetype->type,
-                    cost, program));
+      LogMessage(LOG_DEBUG, "Adding filter %s/%s %s/%s %d %s",
+                 (*temptype)->super, (*temptype)->type,
+		 p->filetype->super, p->filetype->type,
+                 cost, program);
       mimeAddFilter(MimeDatabase, *temptype, p->filetype, cost, program);
     }
 }
@@ -656,12 +660,6 @@ SetPrinterAttrs(printer_t *p)	/* I - Printer to setup */
 
   p->attrs = ippNew();
 
-  if (p->type & CUPS_PRINTER_CLASS)
-    sprintf(p->uri, "ipp://%s:%d/classes/%s", ServerName,
-            ntohs(Listeners[0].address.sin_port), p->name);
-  else
-    sprintf(p->uri, "ipp://%s:%d/printers/%s", ServerName,
-            ntohs(Listeners[0].address.sin_port), p->name);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-uri-supported",
                NULL, p->uri);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
@@ -1010,5 +1008,5 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 
 
 /*
- * End of "$Id: printers.c,v 1.29 1999/06/25 12:30:47 mike Exp $".
+ * End of "$Id: printers.c,v 1.30 1999/06/25 12:53:01 mike Exp $".
  */

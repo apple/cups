@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.8 1999/06/25 12:35:32 mike Exp $"
+ * "$Id: classes.c,v 1.9 1999/06/25 12:53:00 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -56,7 +56,12 @@ AddClass(char *name)		/* I - Name of class */
   */
 
   if ((c = AddPrinter(name)) != NULL)
+  {
     c->type = CUPS_PRINTER_CLASS;
+    sprintf(c->uri, "ipp://%s:%d/classes/%s", ServerName,
+            ntohs(Listeners[0].address.sin_port), name);
+    SetPrinterAttrs(c);
+  }
 
   return (c);
 }
@@ -509,5 +514,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.8 1999/06/25 12:35:32 mike Exp $".
+ * End of "$Id: classes.c,v 1.9 1999/06/25 12:53:00 mike Exp $".
  */
