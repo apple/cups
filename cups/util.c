@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.115 2004/02/17 20:35:20 mike Exp $"
+ * "$Id: util.c,v 1.116 2004/02/24 21:21:31 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -1416,6 +1416,9 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
   else if ((attr = ippFindAttribute(response, "job-id", IPP_TAG_INTEGER)) == NULL)
   {
     DEBUG_puts("No job ID!");
+
+    last_error = IPP_SERVICE_UNAVAILABLE;
+
     jobid = 0;
   }
   else
@@ -1557,5 +1560,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.115 2004/02/17 20:35:20 mike Exp $".
+ * End of "$Id: util.c,v 1.116 2004/02/24 21:21:31 mike Exp $".
  */
