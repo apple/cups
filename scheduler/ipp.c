@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.167 2002/08/22 17:06:32 mike Exp $"
+ * "$Id: ipp.c,v 1.168 2002/08/23 09:54:05 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3967,7 +3967,7 @@ print_job(client_t        *con,		/* I - Client connection */
   */
 
   if (strcasecmp(filetype->super, "application") == 0 &&
-      strcasecmp(filetype->super, "postscript") == 0)
+      strcasecmp(filetype->type, "postscript") == 0)
     read_ps_job_ticket(con);
 
  /*
@@ -5976,5 +5976,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.167 2002/08/22 17:06:32 mike Exp $".
+ * End of "$Id: ipp.c,v 1.168 2002/08/23 09:54:05 mike Exp $".
  */
