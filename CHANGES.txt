@@ -1,4 +1,4 @@
-CHANGES.txt - 01/03/2000
+CHANGES.txt - 01/18/2000
 ------------------------
 
 CHANGES IN CUPS V1.1.6
@@ -37,6 +37,11 @@ CHANGES IN CUPS V1.1.6
 	- Fixed bug in CGI code - did not ignore control
 	  characters (e.g. newlines) in form data.  This caused
 	  sporatic web interface problems.
+	- The file type logging code in the scheduler referenced
+	  the optional document-format attribute; the new code
+	  uses the resolved MIME type instead.
+	- The client.conf parsing code now removes trailing
+	  whitespace.
 
 
 CHANGES IN CUPS V1.1.5-2

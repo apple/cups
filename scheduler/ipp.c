@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.111 2000/12/15 19:36:59 mike Exp $"
+ * "$Id: ipp.c,v 1.112 2001/01/18 00:42:36 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3446,11 +3446,14 @@ print_job(client_t        *con,		/* I - Client connection */
 
   if (filetype == NULL)
   {
-    LogMessage(L_ERROR, "print_job: Unsupported format \'%s\'!",
-	       format->values[0].string.text);
+    LogMessage(L_ERROR, "print_job: Unsupported format \'%s/%s\'!",
+	       syper, type);
     send_ipp_error(con, IPP_DOCUMENT_FORMAT);
-    ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
-                 "document-format", NULL, format->values[0].string.text);
+
+    if (format)
+      ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
+                   "document-format", NULL, format->values[0].string.text);
+
     return;
   }
 
@@ -4322,11 +4325,14 @@ send_document(client_t        *con,	/* I - Client connection */
 
   if (filetype == NULL)
   {
-    LogMessage(L_ERROR, "send_document: Unsupported format \'%s\'!",
-	       format->values[0].string.text);
+    LogMessage(L_ERROR, "send_document: Unsupported format \'%s/%s\'!",
+	       syper, type);
     send_ipp_error(con, IPP_DOCUMENT_FORMAT);
-    ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
-                 "document-format", NULL, format->values[0].string.text);
+
+    if (format)
+      ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
+                   "document-format", NULL, format->values[0].string.text);
+
     return;
   }
 
@@ -5119,5 +5125,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.111 2000/12/15 19:36:59 mike Exp $".
+ * End of "$Id: ipp.c,v 1.112 2001/01/18 00:42:36 mike Exp $".
  */

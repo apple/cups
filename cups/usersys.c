@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c,v 1.12 2000/12/20 13:41:13 mike Exp $"
+ * "$Id: usersys.c,v 1.13 2001/01/18 00:42:35 mike Exp $"
  *
  *   User, system, and password routines for the Common UNIX Printing
  *   System (CUPS).
@@ -33,6 +33,7 @@
  *   cupsSetUser()       - Set the default user name...
  *   cupsUser()          - Return the current users name.
  *   cups_get_password() - Get a password from the user...
+ *   cups_get_line()     - Get a line from a file...
  */
 
 /*
@@ -50,6 +51,7 @@
  */
 
 static const char	*cups_get_password(const char *prompt);
+static char		*cups_get_line(char *buf, int buflen, FILE *fp);
 
 
 /*
@@ -118,7 +120,7 @@ cupsEncryption(void)
 	* Read the config file and look for a ServerName line...
 	*/
 
-	while (fgets(line, sizeof(line), fp) != NULL)
+	while (cups_get_line(line, sizeof(line), fp) != NULL)
 	  if (strncmp(line, "Encryption ", 11) == 0)
 	  {
 	   /*
@@ -233,7 +235,7 @@ cupsServer(void)
 	* Read the config file and look for a ServerName line...
 	*/
 
-	while (fgets(line, sizeof(line), fp) != NULL)
+	while (cups_get_line(line, sizeof(line), fp) != NULL)
 	  if (strncmp(line, "ServerName ", 11) == 0)
 	  {
 	   /*
@@ -407,5 +409,39 @@ cups_get_password(const char *prompt)	/* I - Prompt string */
 
 
 /*
- * End of "$Id: usersys.c,v 1.12 2000/12/20 13:41:13 mike Exp $".
+ * 'cups_get_line()' - Get a line from a file.
+ */
+
+static char *			/* O - Line from file */
+cups_get_line(char *buf,	/* I - Line buffer */
+              int  buflen,	/* I - Size of line buffer */
+	      FILE *fp)		/* I - File to read from */
+{
+  char	*bufptr;		/* Pointer to end of buffer */
+
+
+ /*
+  * Get the line from a file...
+  */
+
+  if (fgets(buf, buflen, fp) == NULL)
+    return (NULL);
+
+ /*
+  * Remove all trailing whitespace...
+  */
+
+  bufptr = buf + strlen(buf) - 1;
+  if (bufptr < buf)
+    return (NULL);
+
+  while (isspace(*bufptr) && bufptr >= buf)
+    *bufptr-- = '\0';
+
+  return (buf);
+}
+
+
+/*
+ * End of "$Id: usersys.c,v 1.13 2001/01/18 00:42:35 mike Exp $".
  */
