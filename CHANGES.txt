@@ -1,8 +1,12 @@
-CHANGES.txt - 03/12/2003
+CHANGES.txt - 03/14/2003
 ------------------------
 
 CHANGES IN CUPS V1.1.19
 
+	- Added experimental support for generic CGI scripts and
+	  programs, Java, Perl, PHP, and Python to the
+	  scheduler. See the file "CGI.txt" for more
+	  information.
 	- The CUPS API now supports HTTP cookies and the Expect:
 	  field.
 	- The cancel command now correctly supports the "-u
