@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.7 1999/05/13 20:41:26 mike Exp $"
+ * "$Id: lpstat.c,v 1.8 1999/06/09 20:07:36 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -230,11 +230,11 @@ show_accepting(http_t *http,	/* I - HTTP connection to server */
 
   language = cupsLangDefault();
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                      "attributes-charset", NULL, cupsLangEncoding(language));
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                      "attributes-natural-language", NULL, language->language);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
 
  /*
   * Do the request and get back a response...
@@ -408,11 +408,11 @@ show_classes(http_t *http,	/* I - HTTP connection to server */
 
   language = cupsLangDefault();
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                      "attributes-charset", NULL, cupsLangEncoding(language));
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                      "attributes-natural-language", NULL, language->language);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
 
  /*
   * Do the request and get back a response...
@@ -572,11 +572,11 @@ show_default(http_t *http)	/* I - HTTP connection to server */
 
   language = cupsLangDefault();
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                      "attributes-charset", NULL, cupsLangEncoding(language));
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                      "attributes-natural-language", NULL, language->language);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
 
  /*
   * Do the request and get back a response...
@@ -633,11 +633,11 @@ show_devices(http_t *http,	/* I - HTTP connection to server */
 
   language = cupsLangDefault();
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                      "attributes-charset", NULL, cupsLangEncoding(language));
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                      "attributes-natural-language", NULL, language->language);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
 
  /*
   * Do the request and get back a response...
@@ -808,14 +808,14 @@ show_jobs(http_t *http,		/* I - HTTP connection to server */
 
   language = cupsLangDefault();
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                      "attributes-charset", NULL, cupsLangEncoding(language));
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                      "attributes-natural-language", NULL, language->language);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
-                      NULL, "http://localhost/jobs/");
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
+               NULL, "ipp://localhost/jobs/");
 
  /*
   * Do the request and get back a response...
@@ -1033,11 +1033,11 @@ show_printers(http_t *http,	/* I - HTTP connection to server */
 
   language = cupsLangDefault();
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                      "attributes-charset", NULL, cupsLangEncoding(language));
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                      "attributes-natural-language", NULL, language->language);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
 
  /*
   * Do the request and get back a response...
@@ -1180,20 +1180,20 @@ show_printers(http_t *http,	/* I - HTTP connection to server */
 
 	  language = cupsLangDefault();
 
-	  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                	      "attributes-charset", NULL,
-			      cupsLangEncoding(language));
+	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+            	       "attributes-charset", NULL,
+		       cupsLangEncoding(language));
 
-	  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                	      "attributes-natural-language", NULL,
-			      language->language);
+	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                       "attributes-natural-language", NULL,
+		       language->language);
 
-          sprintf(printer_uri, "http://localhost/printers/%s", printer);
-	  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
-	                      "printer-uri", NULL, printer_uri);
+          sprintf(printer_uri, "ipp://localhost/printers/%s", printer);
+	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
+	               "printer-uri", NULL, printer_uri);
 
-	  attr = ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER,
-	                       "limit", 1);
+	  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER,
+	        	"limit", 1);
 
           if ((jobs = cupsDoRequest(http, request, "/jobs/")) != NULL)
 	  {
@@ -1244,5 +1244,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.7 1999/05/13 20:41:26 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.8 1999/06/09 20:07:36 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: accept.c,v 1.1 1999/04/21 14:16:28 mike Exp $"
+ * "$Id: accept.c,v 1.2 1999/06/09 20:07:35 mike Exp $"
  *
  *   "accept", "disable", "enable", and "reject" commands for the Common
  *   UNIX Printing System (CUPS).
@@ -165,7 +165,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                    "attributes-natural-language", NULL, language->language);
 
-      sprintf(uri, "http://%s:%d/printers/%s", hostname, ippPort(), printer);
+      sprintf(uri, "ipp://%s:%d/printers/%s", hostname, ippPort(), printer);
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                    "printer-uri", NULL, uri);
 
@@ -194,5 +194,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: accept.c,v 1.1 1999/04/21 14:16:28 mike Exp $".
+ * End of "$Id: accept.c,v 1.2 1999/06/09 20:07:35 mike Exp $".
  */
