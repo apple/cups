@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.20 1999/06/18 18:36:49 mike Exp $"
+ * "$Id: main.c,v 1.21 1999/06/19 11:10:28 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -212,24 +212,42 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     if ((i = select(100, &input, &output, NULL, &timeout)) < 0)
     {
-      if (errno == EINTR)
+     /*
+      * Got an error from select!
+      */
+
+      if (errno == EINTR)	/* Just interrupted by a signal */
         continue;
+
+     /*
+      * Display all sorts of logging info to help track down the problem.
+      */
 
       perror("cupsd: select() failed");
 
-#ifdef DEBUG
-      printf("cupsd: InputSet =");
+      fprintf(stderr, "cupsd: InputSet =");
       for (i = 0; i < 100; i ++)
         if (FD_ISSET(i, &input))
-          printf(" %d", i);
-      puts("");
+          fprintf(stderr, " %d", i);
+      fputs("\n", stderr);
 
-      printf("cupsd: OutputSet =");
+      fprintf(stderr, "cupsd: OutputSet =");
       for (i = 0; i < 100; i ++)
         if (FD_ISSET(i, &output))
-          printf(" %d", i);
-      puts("");
-#endif /* 0 */
+          fprintf(stderr, " %d", i);
+      fputs("\n", stderr);
+
+      for (i = 0, con = Clients; i < Num_Clients; i ++, con ++)
+        fprintf(stderr, "cupsd: Clients[%d] = %d, file = %d, state = %d\n",
+	        i, con->http.fd, con->file, con->http.state);
+
+      for (i = 0, lis = Listeners; i < NumListeners; i ++, lis ++)
+        fprintf(stderr, "cupsd: Listeners[%d] = %d\n", i, lis->fd);
+
+      fprintf(strerr, "cupsd: BrowseSocket = %d\n", BrowseSocket);
+
+      for (job = Jobs; job != NULL; job = job->next)
+        fprintf(stderr, "cupsd: Jobs[%d] = %d\n", job->id, job->pipe);
 
       break;
     }
@@ -401,5 +419,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.20 1999/06/18 18:36:49 mike Exp $".
+ * End of "$Id: main.c,v 1.21 1999/06/19 11:10:28 mike Exp $".
  */
