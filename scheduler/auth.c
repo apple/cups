@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.56 2002/03/27 18:55:38 mike Exp $"
+ * "$Id: auth.c,v 1.57 2002/03/27 19:59:49 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -202,7 +202,7 @@ AllowHost(location_t *loc,	/* I - Location to add to */
     */
 
     temp->type             = AUTH_INTERFACE;
-    temp->mask.name.name   = strdup("@");
+    temp->mask.name.name   = strdup("*");
     temp->mask.name.length = 1;
   }
   else if (strncasecmp(name, "@IF(", 4) == 0)
@@ -321,12 +321,13 @@ CheckAuth(unsigned   ip,	/* I - Client address */
 	    * Check the named interface...
 	    */
 
-            iface = NetIFFind(masks->mask.name.name);
-
-            if ((netip & iface->mask.sin_addr.s_addr) ==
-	        (iface->address.sin_addr.s_addr &
-		 iface->mask.sin_addr.s_addr))
-	      return (1);
+            if ((iface = NetIFFind(masks->mask.name.name)) != NULL)
+	    {
+              if ((netip & iface->mask.sin_addr.s_addr) ==
+	          (iface->address.sin_addr.s_addr &
+		   iface->mask.sin_addr.s_addr))
+		return (1);
+            }
 	  }
 	  break;
 
@@ -577,7 +578,7 @@ DenyHost(location_t *loc,	/* I - Location to add to */
     */
 
     temp->type             = AUTH_INTERFACE;
-    temp->mask.name.name   = strdup("@");
+    temp->mask.name.name   = strdup("*");
     temp->mask.name.length = 1;
   }
   else if (strncasecmp(name, "@IF(", 4) == 0)
@@ -1623,5 +1624,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.56 2002/03/27 18:55:38 mike Exp $".
+ * End of "$Id: auth.c,v 1.57 2002/03/27 19:59:49 mike Exp $".
  */
