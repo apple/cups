@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# "$Id: cups-config.in,v 1.5 2002/02/12 18:47:10 mike Exp $"
+# "$Id: cups-config.in,v 1.6 2002/03/14 02:53:10 mike Exp $"
 # 
 #   CUPS configuration utility.
 #
@@ -23,7 +23,7 @@
 #         WWW: http://www.cups.org
 #
 
-VERSION="1.1.14"
+VERSION="1.1.15"
 APIVERSION="1.1"
 
 prefix=@prefix@
@@ -38,9 +38,10 @@ cups_serverbin=@CUPS_SERVERBIN@
 cups_serverroot=@CUPS_SERVERROOT@
 
 # flags for C++ compiler:
-CFLAGS="@CFLAGS@"
-LDFLAGS="@LDFLAGS@"
-LIBS="@SSLLIBS@ @NETLIBS@ @LIBS@"
+CFLAGS=""
+LDFLAGS=""
+LIBS="@SSLLIBS@ @NETLIBS@"
+IMGLIBS="@LIBTIFF@ @LIBJPEG@ @LIBPNG@ @LIBZ@"
 
 if test $includedir != /usr/include; then
     CFLAGS="$CFLAGS -I$includedir"
@@ -98,13 +99,13 @@ while test $# -gt 0; do
 	        if test $image = no; then
 	            echo -lcups $LIBS
 		else
-	            echo -lcupsimage -lcups $LIBS
+	            echo -lcupsimage $IMGLIBS -lcups $LIBS
 		fi
 	    else
 	        if test $image = no; then
 	            echo $libdir/libcups.a $LIBS
 		else
-	            echo $libdir/libcupsimage.a $libdir/libcups.a $LIBS
+	            echo $libdir/libcupsimage.a $IMGLIBS $libdir/libcups.a $LIBS
 		fi
 	    fi
 	    ;;
@@ -129,5 +130,5 @@ while test $# -gt 0; do
 done
 
 #
-# End of "$Id: cups-config.in,v 1.5 2002/02/12 18:47:10 mike Exp $".
+# End of "$Id: cups-config.in,v 1.6 2002/03/14 02:53:10 mike Exp $".
 #
