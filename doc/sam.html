@@ -4185,9 +4185,9 @@ I [20/May/1999:19:22:24 +0000] Job 2 was cancelled by 'mike'.
  printer. Each line contains the following information:</P>
 <UL>
 <PRE>
-printer user job-id date-time page-number num-copies job-billing
+printer user job-id date-time page-number num-copies job-billing hostname
 
-DeskJet root 2 [20/May/1999:19:21:05 +0000] 1 0 acme-123
+DeskJet root 2 [20/May/1999:19:21:05 +0000] 1 0 acme-123 localhost
 </PRE>
 </UL>
 <P>The<I> printer</I> field contains the name of the printer that
@@ -4208,7 +4208,10 @@ requesting-user-name</CODE> attribute) that submitted this file for
  will always be 1.</P>
 <P>The<I> job-billing</I> field contains a copy of the <CODE>job-billing</CODE>
  attribute provided with the IPP <CODE>create-job</CODE> or <CODE>
-print-job</CODE> requests or &quot;-&quot; if none was provided.
+print-job</CODE> requests or &quot;-&quot; if none was provided.</P>
+<P>The<I> hostname</I> field contains the name of the host (the IPP <CODE>
+job-originating-host-name</CODE> attribute) that originated the print
+ job.
 <!-- NEW PAGE -->
 </P>
 <H2><A NAME="FILE_TYPING_FILTERING">File Typing and Filtering</A></H2>
