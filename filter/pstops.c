@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.20 1999/06/15 20:40:33 mike Exp $"
+ * "$Id: pstops.c,v 1.21 1999/07/13 12:04:00 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -49,17 +49,17 @@
  * Globals...
  */
 
-int	NumPages = 0;		/* Number of pages in file */
-long	Pages[MAX_PAGES];	/* Offsets to each page */
-char	PageLabels[MAX_PAGES][64];
-				/* Page labels */
-char	*PageRanges = NULL;	/* Range of pages selected */
-char	*PageSet = NULL;	/* All, Even, Odd pages */
-int	Order = 0,		/* 0 = normal, 1 = reverse pages */
-	Flip = 0,		/* Flip/mirror pages */
-	NUp = 1,		/* Number of pages on each sheet (1, 2, 4) */
-	Collate = 0,		/* Collate copies? */
-	Copies = 1;		/* Number of copies */
+int		NumPages = 0;		/* Number of pages in file */
+long		Pages[MAX_PAGES];	/* Offsets to each page */
+char		PageLabels[MAX_PAGES][64];
+					/* Page labels */
+const char	*PageRanges = NULL;	/* Range of pages selected */
+const char	*PageSet = NULL;	/* All, Even, Odd pages */
+int		Order = 0,		/* 0 = normal, 1 = reverse pages */
+		Flip = 0,		/* Flip/mirror pages */
+		NUp = 1,		/* Number of pages on each sheet (1, 2, 4) */
+		Collate = 0,		/* Collate copies? */
+		Copies = 1;		/* Number of copies */
 
 
 /*
@@ -85,7 +85,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   ppd_file_t	*ppd;		/* PPD file */
   int		num_options;	/* Number of print options */
   cups_option_t	*options;	/* Print options */
-  char		*val;		/* Option value */
+  const char	*val;		/* Option value */
   char		tempfile[255];	/* Temporary file name */
   FILE		*temp;		/* Temporary file */
   int		number;		/* Page number */
@@ -506,8 +506,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 static int		/* O - 1 if selected, 0 otherwise */
 check_range(int page)	/* I - Page number */
 {
-  char	*range;		/* Pointer into range string */
-  int	lower, upper;	/* Lower and upper page numbers */
+  const char	*range;		/* Pointer into range string */
+  int		lower, upper;	/* Lower and upper page numbers */
 
 
   if (PageSet != NULL)
@@ -531,11 +531,11 @@ check_range(int page)	/* I - Page number */
     {
       lower = 1;
       range ++;
-      upper = strtol(range, &range, 10);
+      upper = strtol(range, (char **)&range, 10);
     }
     else
     {
-      lower = strtol(range, &range, 10);
+      lower = strtol(range, (char **)&range, 10);
 
       if (*range == '-')
       {
@@ -543,7 +543,7 @@ check_range(int page)	/* I - Page number */
 	if (!isdigit(*range))
 	  upper = 65535;
 	else
-	  upper = strtol(range, &range, 10);
+	  upper = strtol(range, (char **)&range, 10);
       }
       else
         upper = lower;
@@ -778,5 +778,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.20 1999/06/15 20:40:33 mike Exp $".
+ * End of "$Id: pstops.c,v 1.21 1999/07/13 12:04:00 mike Exp $".
  */

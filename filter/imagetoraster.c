@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.22 1999/06/09 20:04:47 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.23 1999/07/13 12:03:58 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -169,7 +169,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   cups_page_header_t header;	/* Page header */
   int		num_options;	/* Number of print options */
   cups_option_t	*options;	/* Print options */
-  char		*val;		/* Option value */
+  const char	*val;		/* Option value */
   int		slowcollate,	/* Collate copies the slow way */
 		slowcopies;	/* Make copies the "slow" way? */
   float		g;		/* Gamma correction value */
@@ -3838,5 +3838,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.22 1999/06/09 20:04:47 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.23 1999/07/13 12:03:58 mike Exp $".
  */

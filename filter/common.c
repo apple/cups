@@ -1,5 +1,5 @@
 /*
- * "$Id: common.c,v 1.5 1999/04/16 17:10:50 mike Exp $"
+ * "$Id: common.c,v 1.6 1999/07/13 12:03:55 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -61,7 +61,7 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
   float		temp;		/* Swapping variable */
   ppd_file_t	*ppd;		/* PPD file */
   ppd_size_t	*pagesize;	/* Current page size */
-  char		*val;		/* Option value */
+  const char	*val;		/* Option value */
 
 
   ppd = ppdOpenFile(getenv("PPD"));
@@ -246,5 +246,5 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
 
 
 /*
- * End of "$Id: common.c,v 1.5 1999/04/16 17:10:50 mike Exp $".
+ * End of "$Id: common.c,v 1.6 1999/07/13 12:03:55 mike Exp $".
  */
