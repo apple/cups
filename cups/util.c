@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.50 2000/05/11 15:14:39 mike Exp $"
+ * "$Id: util.c,v 1.51 2000/05/11 18:46:29 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -30,6 +30,7 @@
  *   cupsGetPPD()        - Get the PPD file for a printer.
  *   cupsGetPrinters()   - Get a list of printers.
  *   cupsPrintFile()     - Print a file to a printer or class.
+ *   cupsPrintFiles()    - Print one or more files to a printer or class.
  *   cups_connect()      - Connect to the specified host...
  *   cups_local_auth()   - Get the local authorization certificate if
  *                         available/applicable...
@@ -960,9 +961,6 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
   * Setup a connection and request data...
   */
 
-  if ((request = ippNew()) == NULL)
-    return (0);
-
   if (!cups_connect(name, printer, hostname))
   {
     DEBUG_printf(("cupsPrintFile: Unable to open connection - %s.\n",
@@ -978,6 +976,9 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
   * Build a standard CUPS URI for the printer and fill the standard IPP
   * attributes...
   */
+
+  if ((request = ippNew()) == NULL)
+    return (0);
 
   request->request.op.operation_id = num_files == 1 ? IPP_PRINT_JOB :
                                                       IPP_CREATE_JOB;
@@ -1181,6 +1182,9 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
       * Build a standard CUPS URI for the job and fill the standard IPP
       * attributes...
       */
+
+      if ((request = ippNew()) == NULL)
+	return (0);
 
       request->request.op.operation_id = IPP_SEND_DOCUMENT;
       request->request.op.request_id   = 1;
@@ -1409,5 +1413,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.50 2000/05/11 15:14:39 mike Exp $".
+ * End of "$Id: util.c,v 1.51 2000/05/11 18:46:29 mike Exp $".
  */
