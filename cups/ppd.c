@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.72 2002/08/23 02:27:41 mike Exp $"
+ * "$Id: ppd.c,v 1.73 2002/08/23 02:31:01 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -1372,9 +1372,6 @@ ppdOpen(FILE *fp)		/* I - File to read from */
     printf("Premature EOF at %lu...\n", (unsigned long)ftell(fp));
 #endif /* DEBUG */
 
- /*
- * For MacOS compatibility reasons we don't want to make a synthetic "Auto" choice.
- */
 #ifndef __APPLE__
  /*
   * Make sure that all PPD files with an InputSlot option have an
@@ -2057,5 +2054,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.72 2002/08/23 02:27:41 mike Exp $".
+ * End of "$Id: ppd.c,v 1.73 2002/08/23 02:31:01 mike Exp $".
  */
