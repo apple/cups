@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-main.c,v 1.11 1999/03/23 18:39:05 mike Exp $"
+ * "$Id: hpgl-main.c,v 1.12 1999/03/23 20:10:18 mike Exp $"
  *
  *   HP-GL/2 filter main entry for the Common UNIX Printing System (CUPS).
  *
@@ -128,13 +128,10 @@ main(int  argc,		/* I - Number of command-line arguments */
      char *argv[])	/* I - Command-line arguments */
 {
   FILE		*fp;		/* Input file */
-  float		temp;		/* Swapping variable */
   int		num_params;	/* Number of parameters */
   param_t	*params;	/* Command parameters */
   name_t	*command,	/* Command */
 		name;		/* Name of command */
-  ppd_file_t	*ppd;		/* PPD file */
-  ppd_size_t	*pagesize;	/* Page size */
   int		num_options;	/* Number of print options */
   cups_option_t	*options;	/* Print options */
   char		*val;		/* Option value */
@@ -172,28 +169,10 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Process command-line options and write the prolog...
   */
 
-  ppd = ppdOpenFile(getenv("PPD"));
-
   options     = NULL;
   num_options = cupsParseOptions(argv[5], 0, &options);
 
-  ppdMarkDefaults(ppd);
-  cupsMarkOptions(ppd, num_options, options);
-
-  if ((pagesize = ppdPageSize(ppd, NULL)) != NULL)
-  {
-    PageWidth  = pagesize->width;
-    PageLength = pagesize->length;
-    PageTop    = pagesize->top;
-    PageBottom = pagesize->bottom;
-    PageLeft   = pagesize->left;
-    PageRight  = pagesize->right;
-  }
-
-  LanguageLevel = ppd->language_level;
-  ColorDevice   = ppd->color_device;
-
-  ppdClose(ppd);
+  SetCommonOptions(num_options, options);
 
   shading  = 1;
   penwidth = 1.0;
@@ -206,161 +185,6 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if ((val = cupsGetOption("penwidth", num_options, options)) != NULL)
     penwidth = (float)atof(val);
-
-  if ((val = cupsGetOption("sides", num_options, options)) != NULL &&
-      strncmp(val, "two-", 4) == 0)
-    Duplex = 1;
-
-  if ((val = cupsGetOption("Duplex", num_options, options)) != NULL &&
-      strcmp(val, "NoTumble") == 0)
-    Duplex = 1;
-
-  if ((val = cupsGetOption("landscape", num_options, options)) != NULL)
-    Orientation = 1;
-
-  if ((val = cupsGetOption("orientation-requested", num_options, options)) != NULL)
-  {
-   /*
-    * Map IPP orientation values to 0 to 3:
-    *
-    *   3 = 0 degrees   = 0
-    *   4 = 90 degrees  = 1
-    *   5 = -90 degrees = 3
-    *   6 = 180 degrees = 2
-    */
-
-    Orientation = atoi(val) - 3;
-    if (Orientation >= 2)
-      Orientation ^= 1;
-  }
-
-  if ((val = cupsGetOption("page-left", num_options, options)) != NULL)
-  {
-    switch (Orientation)
-    {
-      case 0 :
-          PageLeft = (float)atof(val);
-	  break;
-      case 1 :
-          PageBottom = (float)atof(val);
-	  break;
-      case 2 :
-          PageRight = PageWidth - (float)atof(val);
-	  break;
-      case 3 :
-          PageTop = PageLength - (float)atof(val);
-	  break;
-    }
-  }
-
-  if ((val = cupsGetOption("page-right", num_options, options)) != NULL)
-  {
-    switch (Orientation)
-    {
-      case 0 :
-          PageRight = PageWidth - (float)atof(val);
-	  break;
-      case 1 :
-          PageTop = PageLength - (float)atof(val);
-	  break;
-      case 2 :
-          PageLeft = (float)atof(val);
-	  break;
-      case 3 :
-          PageBottom = (float)atof(val);
-	  break;
-    }
-  }
-
-  if ((val = cupsGetOption("page-bottom", num_options, options)) != NULL)
-  {
-    switch (Orientation)
-    {
-      case 0 :
-          PageBottom = (float)atof(val);
-	  break;
-      case 1 :
-          PageRight = PageWidth - (float)atof(val);
-	  break;
-      case 2 :
-          PageTop = PageLength - (float)atof(val);
-	  break;
-      case 3 :
-          PageLeft = (float)atof(val);
-	  break;
-    }
-  }
-
-  if ((val = cupsGetOption("page-top", num_options, options)) != NULL)
-  {
-    switch (Orientation)
-    {
-      case 0 :
-          PageTop = PageLength - (float)atof(val);
-	  break;
-      case 1 :
-          PageLeft = (float)atof(val);
-	  break;
-      case 2 :
-          PageBottom = (float)atof(val);
-	  break;
-      case 3 :
-          PageRight = PageWidth - (float)atof(val);
-	  break;
-    }
-  }
-
-  switch (Orientation)
-  {
-    case 0 : /* Portait */
-        break;
-
-    case 1 : /* Landscape */
-	temp       = PageLeft;
-	PageLeft   = PageBottom;
-	PageBottom = temp;
-
-	temp       = PageRight;
-	PageRight  = PageTop;
-	PageTop    = temp;
-
-	temp       = PageWidth;
-	PageWidth  = PageLength;
-	PageLength = temp;
-	break;
-
-    case 2 : /* Reverse Portrait */
-	temp       = PageWidth - PageLeft;
-	PageLeft   = PageWidth - PageRight;
-	PageRight  = temp;
-
-	temp       = PageLength - PageBottom;
-	PageBottom = PageLength - PageTop;
-	PageTop    = temp;
-        break;
-
-    case 3 : /* Reverse Landscape */
-	temp       = PageWidth - PageLeft;
-	PageLeft   = PageWidth - PageRight;
-	PageRight  = temp;
-
-	temp       = PageLength - PageBottom;
-	PageBottom = PageLength - PageTop;
-	PageTop    = temp;
-
-	temp       = PageLeft;
-	PageLeft   = PageBottom;
-	PageBottom = temp;
-
-	temp       = PageRight;
-	PageRight  = PageTop;
-	PageTop    = temp;
-
-	temp       = PageWidth;
-	PageWidth  = PageLength;
-	PageLength = temp;
-	break;
-  }
 
  /*
   * Write the PostScript prolog and initialize the plotting "engine"...
@@ -425,5 +249,5 @@ compare_names(const void *p1,	/* I - First name */
 
 
 /*
- * End of "$Id: hpgl-main.c,v 1.11 1999/03/23 18:39:05 mike Exp $".
+ * End of "$Id: hpgl-main.c,v 1.12 1999/03/23 20:10:18 mike Exp $".
  */

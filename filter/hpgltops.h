@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgltops.h,v 1.9 1999/03/23 18:39:06 mike Exp $"
+ * "$Id: hpgltops.h,v 1.10 1999/03/23 20:10:18 mike Exp $"
  *
  *   HP-GL/2 to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -26,13 +26,8 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "common.h"
 #include <math.h>
-#include <time.h>
-
-#include <cups/cups.h>
-#include <cups/string.h>
 
 #ifndef M_PI
 #  define M_PI	3.14159265358979323846
@@ -71,11 +66,6 @@ typedef struct
 #  define VALUE2(x,y)
 #endif /* _HPGL_MAIN_C_ */
 
-VAR int		ColorDevice	VALUE(1),	/* Color printer? */
-		LanguageLevel	VALUE(2),	/* PostScript level? */
-		Orientation	VALUE(0),	/* 0 = portrait, 1 = landscape, etc. */
-		Duplex		VALUE(0);	/* 1 = duplexed output */
-
 VAR float	P1[2],				/* Lower-lefthand physical limit */
 		P2[2],				/* Upper-righthand physical limit */
 		IW1[2],				/* Window lower-lefthand limit */
@@ -85,12 +75,6 @@ VAR int		ScalingType	VALUE(-1);	/* Type of scaling (-1 for none) */
 VAR float	Scaling1[2],			/* Lower-lefthand user limit */
 		Scaling2[2];			/* Upper-righthand user limit */
 VAR float	Transform[2][3];		/* Transform matrix */
-VAR float	PageWidth	VALUE(612.0f),	/* Hard clip limits in points */
-		PageLength	VALUE(792.0f),
-		PageLeft	VALUE(18.0f),
-		PageRight	VALUE(594.0f),
-		PageBottom	VALUE(36.0f),
-		PageTop		VALUE(756.0f);
 VAR int		PageRotation	VALUE(0);	/* Page/plot rotation */
 
 VAR char	StringTerminator VALUE('\003');	/* Terminator for labels */
@@ -208,5 +192,5 @@ extern void	OutputTrailer(void);
 extern int	Outputf(const char *format, ...);
 
 /*
- * End of "$Id: hpgltops.h,v 1.9 1999/03/23 18:39:06 mike Exp $".
+ * End of "$Id: hpgltops.h,v 1.10 1999/03/23 20:10:18 mike Exp $".
  */
