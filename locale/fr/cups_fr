@@ -3,16 +3,16 @@ OK
 Annulation 
 Aide 
 Quitté 
-Étroit
+Fermer
 Oui
 Non
-Sur
-Outre de
-Économiser
-Écart
+Oui
+Non
+Sauver
+Quitté 
 Défaut 
 Options 
-Plus D'Information 
+Plus d'information 
 Noir 
 Couleur 
 Cyan 
@@ -21,86 +21,86 @@ Jaune
 Copyright 1993-1999 par Easy Software Products, tous droits réservés. 
 Général 
 Imprimante 
-Options D'Image
-Options D'HP-GL/2
-Frais supplémentaires 
+Options d'Image
+Options d'HP-GL/2
+Options supplémentaires 
 Document 
 Autre 
-Pages D'Impression: 
-Entier Document 
-Chaîne De Page 
-Commande D'Inversion: 
-Format De Page: 
- 1-Up 
- 2-Up 
- 4-Up 
-Graduation D'Image: 
-Taille Normale D'Image D'Utilisation 
-Zoom par Percent 
+Pages d'impression: 
+Entier document 
+Chaîne de page 
+Commande d'Inversion: 
+Pages par feuilles: 
+ 1 
+ 2 
+ 4 
+Graduation d'image: 
+Emploi taille normale d'image
+Zoom par pourcent 
 Zoom par PPI 
-Image De Miroir: 
-Saturation De Couleur: 
-Tonalité De Couleur: 
-Adaptez pour paginer: 
+Image de miroir: 
+Saturation de couleur: 
+Teinture de couleur: 
+Correspondre au page: 
 Ombrageant: 
-Largeur De Crayon lecteur: 
-Gamma Correction: 
+Largeur de crayon lecteur: 
+Correction de Gamma: 
 Éclat: 
 Ajoutez 
-Effacement 
+Éffacer 
 Modifiez 
-URI D'Imprimante 
-Nom D'Imprimante 
-Emplacement D'Imprimante 
-Information D'Imprimante 
-L'imprimante font et modèlent 
-URI De Dispositif 
-Page De Formatage 
-Imprimant La Page 
-D' Initialisation Imprimante 
-État D'Imprimante 
-Recevant Les Travaux 
+URI de l'imprimante 
+Nom de l'imprimante 
+Emplacement de l'imprimante 
+Information de l'imprimante 
+Font et modèlent de l'imprimante 
+Dispositif de l'URI
+Formatage du page
+Imprimant la page 
+Initialisation de l'imprimante 
+État de l'Imprimante 
+Recevant les travaux
 Ne recevant pas Les Travaux 
 Tirages 
 Classe 
 Local 
-Périphérique 
+Distant
 Duplexage 
 Agrafant 
-Rapides Copies 
-Assemblées Copies 
-Poinçon De Trou 
+Copie Rapides 
+Copies Assemblées
+Poinçon de trou 
 Bâche 
 Liant 
 Triant 
-Petit (jusqu'à 9.5x1în) 
-Support (9.5x1în à 13x19in) 
-Grand (13x19in et plus grand) 
-Faite sur commande Taille 
-Ralenti 
+Petit (jusqu'à 9.5x1pouce) 
+Moyen (9.5x1pouce à 13x19pouce) 
+Grand (13x19pouce et plus grand) 
+Taille faite sur commande
+Arrêter
 Traitant 
 Arrêté 
 Tout 
 Impair 
 Même Pages 
 Plus foncé       Plus Lumineux
-Taille De Medias 
-Type De Supports 
-Source De Medias 
+Dimension du medias
+Sorte de medias 
+Source du medias 
 Orientation: 
 Verticale 
 Horizontal 
-Job State
-Job Name
-User Name
-Priority
+État du travail
+Nom du travail
+Nom de l'utilisateur
+Priorité
 Copies
-File Size
-Pending
-Output Mode
+Grandeur du fichier
+Imminent
+Method de sortie
 Resolution
-400 Votre browser a envoyé une demande que ce serveur ne pourrait pas comprendre. 
-Ce serveur ne pourrait pas vérifier que vous êtes autorisés à accéder à la ressource. 
+400 Votre browser a envoyé une demande que ce serveur ne pouvait pas comprendre. 
+Ce serveur ne pouvait pas vérifier que vous êtes autoriséz à accéder à la ressource. 
 Vous devez payer pour accéder à ce serveur. 
 Vous n'avez pas la permission d'accéder à la ressource sur ce serveur. 
 La ressource demandée n'a pas été trouvée sur ce serveur. 
@@ -112,12 +112,12 @@ La ressource demandée a plus d'une valeur.
 La ressource demandée est allée et n'a pas été substituée. 
 La méthode demandée exige un Content-Length valide. 
 La condition préalable sur la demande a évalué à faux. 
-La demande est trop grande pour que ce serveur traite. 
-L'cUri de demande est trop grand pour que ce serveur traite. 
+La demande est trop grande pour ce serveur. 
+L'Uri de demande est trop grand pour ce serveur. 
 Le format de demande n'est pas compris par ce serveur. 
 500 Le serveur a détecté une erreur irrémédiable et ne peut pas traiter votre demande. 
 La méthode demandée n'est pas appliquée par ce serveur. 
 Le proxy server a reçu une réponse incorrecte d'un serveur ascendant. 
-La ressource demandée est actuel indisponible sur ce serveur. 
+La ressource demandée est actuellement indisponible sur ce serveur. 
 Le proxy server a pris trop longtemps pour répondre à ce serveur. 
 Ce serveur ne supporte pas la version de HTTP exigée par votre browser. 
