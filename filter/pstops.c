@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.60 2001/05/23 15:28:02 mike Exp $"
+ * "$Id: pstops.c,v 1.61 2001/05/31 11:48:28 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -370,19 +370,10 @@ main(int  argc,			/* I - Number of command-line arguments */
         level --;
       else if (strcmp(line, "\004") == 0)
         continue;
-      else if (strncmp(line, "%%EOF", 5) == 0)
+      else if (strncmp(line, "%%EOF", 5) == 0 && level == 0)
       {
-       /*
-        * Use EOF comment to end non-conforming EPS files...
-	*/
-
-        if (level > 0)
-	  level --;
-	else
-	{
-          fputs("DEBUG: Saw EOF!\n", stderr);
-          saweof = 1;
-	}
+        fputs("DEBUG: Saw EOF!\n", stderr);
+        saweof = 1;
 	break;
       }
       else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
@@ -1002,5 +993,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.60 2001/05/23 15:28:02 mike Exp $".
+ * End of "$Id: pstops.c,v 1.61 2001/05/31 11:48:28 mike Exp $".
  */
