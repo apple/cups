@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.15 1999/08/06 16:04:53 mike Exp $"
+ * "$Id: image.c,v 1.16 1999/08/30 15:50:15 mike Exp $"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
@@ -67,12 +67,12 @@ static void	flush_tile(image_t *img);
  */
 
 image_t *			/* O - New image */
-ImageOpen(char *filename,	/* I - Filename of image */
-          int  primary,		/* I - Primary colorspace needed */
-          int  secondary,	/* I - Secondary colorspace if primary no good */
-          int  saturation,	/* I - Color saturation level */
-          int  hue,		/* I - Color hue adjustment */
-          ib_t *lut)		/* I - RGB gamma/brightness LUT */
+ImageOpen(char       *filename,	/* I - Filename of image */
+          int        primary,	/* I - Primary colorspace needed */
+          int        secondary,	/* I - Secondary colorspace if primary no good */
+          int        saturation,/* I - Color saturation level */
+          int        hue,	/* I - Color hue adjustment */
+          const ib_t *lut)	/* I - RGB gamma/brightness LUT */
 {
   FILE		*fp;		/* File pointer */
   unsigned char	header[16],	/* First 16 bytes of file */
@@ -105,6 +105,7 @@ ImageOpen(char *filename,	/* I - Filename of image */
   memset(header2, 0, sizeof(header2));
   fread(header2, 1, sizeof(header2), fp);
   fseek(fp, 0, SEEK_SET);
+  lseek(fileno(fp), 0, SEEK_SET); /* Avoid standard C library bugs */
 
  /*
   * Allocate memory...
@@ -179,23 +180,31 @@ ImageClose(image_t *img)	/* I - Image to close */
 
 
  /*
-  * Free the image cache...
-  */
-
-  for (current = img->first; current != NULL; current = next)
-  {
-    next = current->next;
-    free(current);
-  }
-
- /*
   * Wipe the tile cache file (if any)...
   */
 
   if (img->cachefile != NULL)
   {
+    fprintf(stderr, "DEBUG: Closing and removing swap file \"%s\"...\n",
+            img->cachename);
+
     fclose(img->cachefile);
     unlink(img->cachename);
+  }
+
+ /*
+  * Free the image cache...
+  */
+
+  fputs("DEBUG: Freeing memory...\n", stderr);
+
+  for (current = img->first; current != NULL; current = next)
+  {
+    fprintf(stderr, "DEBUG: Freeing cache (%08lx, next = %08lx)...\n",
+            current, next);
+
+    next = current->next;
+    free(current);
   }
 
  /*
@@ -204,7 +213,12 @@ ImageClose(image_t *img)	/* I - Image to close */
 
   if (img->tiles != NULL)
   {
+    fprintf(stderr, "DEBUG: Freeing tiles (%08lx)...\n", img->tiles[0]);
+
     free(img->tiles[0]);
+
+    fprintf(stderr, "DEBUG: Freeing tile pointers (%08lx)...\n", img->tiles);
+
     free(img->tiles);
   }
 
@@ -216,7 +230,7 @@ ImageClose(image_t *img)	/* I - Image to close */
  * 'ImageSetMaxTiles()' - Set the maximum number of tiles to cache.
  *
  * If the "max_tiles" argument is 0 then the maximum number of tiles is
- * computed from the image size.
+ * computed from the image size or the RIP_CACHE environment variable.
  */
 
 void
@@ -273,9 +287,7 @@ ImageSetMaxTiles(image_t *img,		/* I - Image to set */
 
   img->max_ics = max_tiles;
 
-#ifdef DEBUG
-  fprintf(stderr, "ImageSetMaxTiles: max_ics=%d...\n", img->max_ics);
-#endif /* DEBUG */
+  fprintf(stderr, "DEBUG: max_ics=%d...\n", img->max_ics);
 }
 
 
@@ -288,18 +300,19 @@ ImageSetProfile(float d,		/* I - Ink/marker density */
                 float g,		/* I - Ink/marker gamma */
                 float matrix[3][3])	/* I - Color transform matrix */
 {
-  int	i, j, k;			/* Looping vars */
-
+  int		i, j, k;		/* Looping vars */
+  float		m;			/* Current matrix value */
+  int		*im;			/* Pointer into ImageMatrix */
 
   ImageHaveProfile  = 1;
 
-  for (i = 0; i < 3; i ++)
+  for (i = 0, im = ImageMatrix[0][0]; i < 3; i ++)
     for (j = 0; j < 3; j ++)
-      for (k = 0; k < 256; k ++)
-        ImageMatrix[i][j][k] = (int)(k * matrix[i][j] + 0.5);
+      for (k = 0, m = matrix[i][j]; k < 256; k ++)
+        *im++ = (int)(k * m + 0.5);
 
-  for (k = 0; k < 256; k ++)
-    ImageDensity[k] = 255.0 * d * pow((float)k / 255.0, g) + 0.5;
+  for (k = 0, im = ImageDensity; k < 256; k ++)
+    *im++ = 255.0 * d * pow((float)k / 255.0, g) + 0.5;
 }
 
 
@@ -307,17 +320,17 @@ ImageSetProfile(float d,		/* I - Ink/marker density */
  * 'ImageGetCol()' - Get a column of pixels from an image.
  */
 
-int
-ImageGetCol(image_t *img,
-            int     x,
-            int     y,
-            int     height,
-            ib_t    *pixels)
+int				/* O - -1 on error, 0 on success */
+ImageGetCol(image_t *img,	/* I - Image */
+            int     x,		/* I - Column */
+            int     y,		/* I - Start row */
+            int     height,	/* I - Column height */
+            ib_t    *pixels)	/* O - Pixel data */
 {
-  int	bpp,
-	twidth,
-	count;
-  ib_t	*ib;
+  int		bpp,		/* Bytes per pixel */
+		twidth,		/* Tile width */
+		count;		/* Number of pixels to get */
+  const ib_t	*ib;		/* Pointer into tile */
 
 
   if (img == NULL || x < 0 || x >= img->xsize || y >= img->ysize)
@@ -374,16 +387,16 @@ ImageGetCol(image_t *img,
  * 'ImageGetRow()' - Get a row of pixels from an image.
  */
 
-int
-ImageGetRow(image_t *img,
-            int     x,
-            int     y,
-            int     width,
-            ib_t    *pixels)
+int				/* O - -1 on error, 0 on success */
+ImageGetRow(image_t *img,	/* I - Image */
+            int     x,		/* I - Start column */
+            int     y,		/* I - Row */
+            int     width,	/* I - Width of row */
+            ib_t    *pixels)	/* O - Pixel data */
 {
-  int	bpp,
-	count;
-  ib_t	*ib;
+  int		bpp,		/* Bytes per pixel */
+		count;		/* Number of pixels to get */
+  const ib_t	*ib;		/* Pointer to pixels */
 
 
   if (img == NULL || y < 0 || y >= img->ysize || x >= img->xsize)
@@ -427,19 +440,19 @@ ImageGetRow(image_t *img,
  * 'ImagePutCol()' - Put a column of pixels to an image.
  */
 
-int
-ImagePutCol(image_t *img,
-            int     x,
-            int     y,
-            int     height,
-            ib_t    *pixels)
+int				/* O - -1 on error, 0 on success */
+ImagePutCol(image_t    *img,	/* I - Image */
+            int        x,	/* I - Column */
+            int        y,	/* I - Start row */
+            int        height,	/* I - Column height */
+            const ib_t *pixels)	/* I - Pixels to put */
 {
-  int	bpp,
-	twidth,
-	count;
-  int	tilex,
-	tiley;
-  ib_t	*ib;
+  int	bpp,			/* Bytes per pixel */
+	twidth,			/* Width of tile */
+	count;			/* Number of pixels to put */
+  int	tilex,			/* Column within tile */
+	tiley;			/* Row within tile */
+  ib_t	*ib;			/* Pointer to pixels in tile */
 
 
   if (img == NULL || x < 0 || x >= img->xsize || y >= img->ysize)
@@ -501,18 +514,18 @@ ImagePutCol(image_t *img,
  * 'ImagePutRow()' - Put a row of pixels to an image.
  */
 
-int
-ImagePutRow(image_t *img,
-            int     x,
-            int     y,
-            int     width,
-            ib_t    *pixels)
+int				/* O - -1 on error, 0 on success */
+ImagePutRow(image_t    *img,	/* I - Image */
+            int        x,	/* I - Start column */
+            int        y,	/* I - Row */
+            int        width,	/* I - Row width */
+            const ib_t *pixels)	/* I - Pixel data */
 {
-  int	bpp,
-	count;
-  int	tilex,
-	tiley;
-  ib_t	*ib;
+  int	bpp,			/* Bytes per pixel */
+	count;			/* Number of pixels to put */
+  int	tilex,			/* Column within tile */
+	tiley;			/* Row within tile */
+  ib_t	*ib;			/* Pointer to pixels in tile */
 
 
   if (img == NULL || y < 0 || y >= img->ysize || x >= img->xsize)
@@ -561,28 +574,33 @@ ImagePutRow(image_t *img,
  * 'get_tile()' - Get a cached tile.
  */
 
-static ib_t *
-get_tile(image_t *img,
-         int     x,
-         int     y)
+static ib_t *		/* O - Pointer to tile or NULL */
+get_tile(image_t *img,	/* I - Image */
+         int     x,	/* I - Column in image */
+         int     y)	/* I - Row in image */
 {
-  int		bpp,
-		tilex,
-		tiley,
-		xtiles,
-		ytiles;
-  ic_t		*ic;
-  itile_t	*tile;
+  int		bpp,	/* Bytes per pixel */
+		tilex,	/* Column within tile */
+		tiley,	/* Row within tile */
+		xtiles,	/* Number of tiles horizontally */
+		ytiles;	/* Number of tiles vertically */
+  ic_t		*ic;	/* Cache pointer */
+  itile_t	*tile;	/* Tile pointer */
 
+
+  if (x >= img->xsize || y >= img->ysize)
+  {
+    fprintf(stderr, "ERROR: Internal image RIP error - %d,%d is outside of %dx%d\n",
+            x, y, img->xsize, img->ysize);
+    return (NULL);
+  }
 
   if (img->tiles == NULL)
   {
     xtiles = (img->xsize + TILE_SIZE - 1) / TILE_SIZE;
     ytiles = (img->ysize + TILE_SIZE - 1) / TILE_SIZE;
 
-#ifdef DEBUG
-    fprintf(stderr, "get_tile: Creating tile array (%dx%d)\n", xtiles, ytiles);
-#endif /* DEBUG */
+    fprintf(stderr, "DEBUG: Creating tile array (%dx%d)\n", xtiles, ytiles);
 
     img->tiles = calloc(sizeof(itile_t *), ytiles);
     tile       = calloc(sizeof(itile_t), xtiles * ytiles);
@@ -607,20 +625,18 @@ get_tile(image_t *img,
   {
     if (img->num_ics < img->max_ics)
     {
-#ifdef DEBUG
-      fputs("get_tile: Allocating new cache tile...\n", stderr);
-#endif /* DEBUG */
-
       ic         = calloc(sizeof(ic_t) + bpp * TILE_SIZE * TILE_SIZE, 1);
       ic->pixels = ((ib_t *)ic) + sizeof(ic_t);
 
       img->num_ics ++;
+
+      fprintf(stderr, "DEBUG: Allocated cache tile %d (%08lx)...\n",
+              img->num_ics, ic);
     }
     else
     {
-#ifdef DEBUG
-      fputs("get_tile: Flushing old cache tile...\n", stderr);
-#endif /* DEBUG */
+      fprintf(stderr, "DEBUG: Flushing old cache tile (%08lx)...\n",
+              img->first);
 
       flush_tile(img);
       ic = img->first;
@@ -631,10 +647,8 @@ get_tile(image_t *img,
 
     if (tile->pos >= 0)
     {
-#ifdef DEBUG
-      fprintf(stderr, "get_tile: loading cache tile from file position %d...\n",
+      fprintf(stderr, "DEBUG: Loading cache tile from file position %d...\n",
               tile->pos);
-#endif /* DEBUG */
 
       if (ftell(img->cachefile) != tile->pos)
         if (fseek(img->cachefile, tile->pos, SEEK_SET))
@@ -644,9 +658,7 @@ get_tile(image_t *img,
     }
     else
     {
-#ifdef DEBUG
-      fputs("get_tile: Clearing cache tile...\n", stderr);
-#endif /* DEBUG */
+      fputs("DEBUG: Clearing cache tile...\n", stderr);
 
       memset(ic->pixels, 0, bpp * TILE_SIZE * TILE_SIZE);
     }
@@ -677,16 +689,12 @@ get_tile(image_t *img,
  */
 
 static void
-flush_tile(image_t *img)
+flush_tile(image_t *img)	/* I - Image */
 {
-  int		bpp;
-  itile_t	*tile;
+  int		bpp;		/* Bytes per pixel */
+  itile_t	*tile;		/* Pointer to tile */
 
 
-
-#ifdef DEBUG
-  fprintf(stderr, "flush_tile(%08x)...\n", img);
-#endif /* DEBUG */
 
   bpp  = ImageGetDepth(img);
   tile = img->first->tile;
@@ -701,14 +709,13 @@ flush_tile(image_t *img)
   {
     cupsTempFile(img->cachename, sizeof(img->cachename));
 
-#ifdef DEBUG
-    fprintf(stderr, "flush_tile: Creating cache file %s...\n", img->cachename);
-#endif /* DEBUG */
+    fprintf(stderr, "DEBUG: Creating swap file \"%s\"...\n", img->cachename);
 
     if ((img->cachefile = fopen(img->cachename, "wb+")) == NULL)
     {
-      fprintf(stderr, "flush_tile: Unable to create swap file - %s\n",
-              strerror(errno));
+      perror("ERROR: Unable to create image swap file");
+      tile->ic    = NULL;
+      tile->dirty = 0;
       return;
     }
   }
@@ -717,27 +724,37 @@ flush_tile(image_t *img)
   {
     if (ftell(img->cachefile) != tile->pos)
       if (fseek(img->cachefile, tile->pos, SEEK_SET))
-        perror("flush_tile:");
+      {
+        perror("ERROR: Unable to seek in swap file");
+	tile->ic    = NULL;
+	tile->dirty = 0;
+	return;
+      }
   }
   else
   {
     if (fseek(img->cachefile, 0, SEEK_END))
-      perror("flush_tile:");
+    {
+      perror("ERROR: Unable to append to swap file");
+      tile->ic    = NULL;
+      tile->dirty = 0;
+      return;
+    }
 
     tile->pos = ftell(img->cachefile);
   }
 
-#ifdef DEBUG
-  fprintf(stderr, "flush_tile: Wrote tile cache at position %d...\n",
-          tile->pos);
-#endif /* DEBUG */
 
-  fwrite(tile->ic->pixels, bpp, TILE_SIZE * TILE_SIZE, img->cachefile);
+  if (fwrite(tile->ic->pixels, bpp, TILE_SIZE * TILE_SIZE, img->cachefile) < 1)
+    perror("ERROR: Unable to write tile to swap file");
+  else
+    fprintf(stderr, "DEBUG: Wrote tile at position %d...\n", tile->pos);
+
   tile->ic    = NULL;
   tile->dirty = 0;
 }
 
 
 /*
- * End of "$Id: image.c,v 1.15 1999/08/06 16:04:53 mike Exp $".
+ * End of "$Id: image.c,v 1.16 1999/08/30 15:50:15 mike Exp $".
  */

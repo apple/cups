@@ -1,5 +1,5 @@
 /*
- * "$Id: image-colorspace.c,v 1.12 1999/04/08 21:08:26 mike Exp $"
+ * "$Id: image-colorspace.c,v 1.13 1999/08/30 15:50:10 mike Exp $"
  *
  *   Colorspace conversions for the Common UNIX Printing System (CUPS).
  *
@@ -84,9 +84,9 @@ static void	zshear(float [3][3], float, float);
  */
 
 void
-ImageWhiteToWhite(ib_t *in,	/* I - Input pixels */
-                  ib_t *out,	/* I - Output pixels */
-                  int  count)	/* I - Number of pixels */
+ImageWhiteToWhite(const ib_t *in,	/* I - Input pixels */
+                  ib_t       *out,	/* I - Output pixels */
+                  int        count)	/* I - Number of pixels */
 {
   if (ImageHaveProfile)
     while (count > 0)
@@ -104,9 +104,9 @@ ImageWhiteToWhite(ib_t *in,	/* I - Input pixels */
  */
 
 void
-ImageWhiteToRGB(ib_t *in,	/* I - Input pixels */
-                ib_t *out,	/* I - Output pixels */
-                int  count)	/* I - Number of pixels */
+ImageWhiteToRGB(const ib_t *in,		/* I - Input pixels */
+                ib_t       *out,	/* I - Output pixels */
+                int        count)	/* I - Number of pixels */
 {
   if (ImageHaveProfile)
     while (count > 0)
@@ -133,9 +133,9 @@ ImageWhiteToRGB(ib_t *in,	/* I - Input pixels */
  */
 
 void
-ImageWhiteToBlack(ib_t *in,	/* I - Input pixels */
-                  ib_t *out,	/* I - Output pixels */
-                  int  count)	/* I - Number of pixels */
+ImageWhiteToBlack(const ib_t *in,	/* I - Input pixels */
+                  ib_t       *out,	/* I - Output pixels */
+                  int        count)	/* I - Number of pixels */
 {
   if (ImageHaveProfile)
     while (count > 0)
@@ -157,9 +157,9 @@ ImageWhiteToBlack(ib_t *in,	/* I - Input pixels */
  */
 
 void
-ImageWhiteToCMY(ib_t *in,	/* I - Input pixels */
-                ib_t *out,	/* I - Output pixels */
-                int  count)	/* I - Number of pixels */
+ImageWhiteToCMY(const ib_t *in,		/* I - Input pixels */
+                ib_t       *out,	/* I - Output pixels */
+                int        count)	/* I - Number of pixels */
 {
   if (ImageHaveProfile)
     while (count > 0)
@@ -186,9 +186,9 @@ ImageWhiteToCMY(ib_t *in,	/* I - Input pixels */
  */
 
 void
-ImageWhiteToCMYK(ib_t *in,	/* I - Input pixels */
-                 ib_t *out,	/* I - Output pixels */
-                 int  count)	/* I - Number of pixels */
+ImageWhiteToCMYK(const ib_t *in,	/* I - Input pixels */
+                 ib_t       *out,	/* I - Output pixels */
+                 int        count)	/* I - Number of pixels */
 {
   if (ImageHaveProfile)
     while (count > 0)
@@ -216,9 +216,9 @@ ImageWhiteToCMYK(ib_t *in,	/* I - Input pixels */
  */
 
 void
-ImageRGBToBlack(ib_t *in,	/* I - Input pixels */
-                ib_t *out,	/* I - Output pixels */
-                int count)	/* I - Number of pixels */
+ImageRGBToBlack(const ib_t *in,		/* I - Input pixels */
+                ib_t       *out,	/* I - Output pixels */
+                int        count)	/* I - Number of pixels */
 {
   if (ImageHaveProfile)
     while (count > 0)
@@ -242,9 +242,9 @@ ImageRGBToBlack(ib_t *in,	/* I - Input pixels */
  */
 
 void
-ImageRGBToCMY(ib_t *in,		/* I - Input pixels */
-              ib_t *out,	/* I - Output pixels */
-              int  count)	/* I - Number of pixels */
+ImageRGBToCMY(const ib_t *in,	/* I - Input pixels */
+              ib_t       *out,	/* I - Output pixels */
+              int        count)	/* I - Number of pixels */
 {
   int	c, m, y, k;		/* CMYK values */
   int	cc, cm, cy;		/* Calibrated CMY values */
@@ -316,9 +316,9 @@ ImageRGBToCMY(ib_t *in,		/* I - Input pixels */
  */
 
 void
-ImageRGBToCMYK(ib_t *in,	/* I - Input pixels */
-               ib_t *out,	/* I - Output pixels */
-               int  count)	/* I - Number of pixels */
+ImageRGBToCMYK(const ib_t *in,	/* I - Input pixels */
+               ib_t       *out,	/* I - Output pixels */
+               int        count)/* I - Number of pixels */
 {
   int	c, m, y, k,		/* CMYK values */
 	diff,			/* Color differences */
@@ -385,7 +385,7 @@ ImageRGBToCMYK(ib_t *in,	/* I - Input pixels */
       else if (cy > 255)
         *out++ = ImageDensity[255];
       else
-        *out++ = cy;
+        *out++ = ImageDensity[cy];
 
       *out++ = ImageDensity[k];
 
@@ -433,9 +433,9 @@ ImageRGBToCMYK(ib_t *in,	/* I - Input pixels */
  */
 
 void
-ImageRGBToWhite(ib_t *in,	/* I - Input pixels */
-                ib_t *out,	/* I - Output pixels */
-                int  count)	/* I - Number of pixels */
+ImageRGBToWhite(const ib_t *in,		/* I - Input pixels */
+                ib_t       *out,	/* I - Output pixels */
+                int        count)	/* I - Number of pixels */
 {
   if (ImageHaveProfile)
     while (count > 0)
@@ -459,9 +459,9 @@ ImageRGBToWhite(ib_t *in,	/* I - Input pixels */
  */
 
 void
-ImageRGBToRGB(ib_t *in,		/* I - Input pixels */
-              ib_t *out,	/* I - Output pixels */
-              int  count)	/* I - Number of pixels */
+ImageRGBToRGB(const ib_t *in,	/* I - Input pixels */
+              ib_t       *out,	/* I - Output pixels */
+              int        count)	/* I - Number of pixels */
 {
   int	c, m, y, k;		/* CMYK values */
   int	cr, cg, cb;		/* Calibrated RGB values */
@@ -521,9 +521,9 @@ ImageRGBToRGB(ib_t *in,		/* I - Input pixels */
  */
 
 void
-ImageLut(ib_t *pixels,	/* I - Input/output pixels */
-         int  count,	/* I - Number of pixels/bytes to adjust */
-         ib_t *lut)	/* I - Lookup table */
+ImageLut(ib_t       *pixels,	/* IO - Input/output pixels */
+         int        count,	/* I - Number of pixels/bytes to adjust */
+         const ib_t *lut)	/* I - Lookup table */
 {
   while (count > 0)
   {
@@ -539,7 +539,7 @@ ImageLut(ib_t *pixels,	/* I - Input/output pixels */
  */
 
 void
-ImageRGBAdjust(ib_t *pixels,	/* I - Input/output pixels */
+ImageRGBAdjust(ib_t *pixels,	/* IO - Input/output pixels */
                int  count,	/* I - Number of pixels to adjust */
                int  saturation,	/* I - Color saturation (%) */
                int  hue)	/* I - Color hue (degrees) */
@@ -906,5 +906,5 @@ zshear(float mat[3][3],	/* I - Matrix */
 
 
 /*
- * End of "$Id: image-colorspace.c,v 1.12 1999/04/08 21:08:26 mike Exp $".
+ * End of "$Id: image-colorspace.c,v 1.13 1999/08/30 15:50:10 mike Exp $".
  */

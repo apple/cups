@@ -1,5 +1,5 @@
 /*
- * "$Id: image-sgi.c,v 1.4 1999/04/01 18:24:58 mike Exp $"
+ * "$Id: image-sgi.c,v 1.5 1999/08/30 15:50:13 mike Exp $"
  *
  *   SGI image file routines for the Common UNIX Printing System (CUPS).
  *
@@ -38,14 +38,14 @@
  * 'ImageReadSGI()' - Read a SGI image file.
  */
 
-int				/* O - Read status */
-ImageReadSGI(image_t *img,	/* IO - Image */
-             FILE    *fp,	/* I - Image file */
-             int     primary,	/* I - Primary choice for colorspace */
-             int     secondary,	/* I - Secondary choice for colorspace */
-             int     saturation,/* I - Color saturation (%) */
-             int     hue,	/* I - Color hue (degrees) */
-	     ib_t    *lut)	/* I - Lookup table for gamma/brightness */
+int					/* O - Read status */
+ImageReadSGI(image_t    *img,		/* IO - Image */
+             FILE       *fp,		/* I - Image file */
+             int        primary,	/* I - Primary choice for colorspace */
+             int        secondary,	/* I - Secondary choice for colorspace */
+             int        saturation,	/* I - Color saturation (%) */
+             int        hue,		/* I - Color hue (degrees) */
+	     const ib_t *lut)		/* I - Lookup table for gamma/brightness */
 {
   int		i, y;		/* Looping vars */
   int		bpp;		/* Bytes per pixel */
@@ -263,5 +263,5 @@ ImageReadSGI(image_t *img,	/* IO - Image */
 
 
 /*
- * End of "$Id: image-sgi.c,v 1.4 1999/04/01 18:24:58 mike Exp $".
+ * End of "$Id: image-sgi.c,v 1.5 1999/08/30 15:50:13 mike Exp $".
  */

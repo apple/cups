@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.28 1999/08/28 16:21:57 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.29 1999/08/30 15:50:16 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -609,7 +609,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   fprintf(stderr, "DEBUG: cupsColorSpace = %d\n", header.cupsColorSpace);
   fprintf(stderr, "DEBUG: img->colorspace = %d\n", img->colorspace);
 
-  row   = malloc(header.cupsBytesPerLine);
+  row   = malloc(2 * header.cupsBytesPerLine);
   ras   = cupsRasterOpen(1, CUPS_RASTER_WRITE);
   blank = img->colorspace < 0 ? 0 : ~0;
 
@@ -3848,5 +3848,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.28 1999/08/28 16:21:57 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.29 1999/08/30 15:50:16 mike Exp $".
  */

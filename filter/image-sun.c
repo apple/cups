@@ -1,5 +1,5 @@
 /*
- * "$Id: image-sun.c,v 1.4 1999/04/01 18:25:00 mike Exp $"
+ * "$Id: image-sun.c,v 1.5 1999/08/30 15:50:14 mike Exp $"
  *
  *   Sun Raster image file routines for the Common UNIX Printing System (CUPS).
  *
@@ -75,13 +75,13 @@ static unsigned	read_unsigned(FILE *fp);
  */
 
 int					/* O - Read status */
-ImageReadSunRaster(image_t *img,	/* IO - Image */
-        	   FILE    *fp,		/* I - Image file */
-        	   int     primary,	/* I - Primary choice for colorspace */
-        	   int     secondary,	/* I - Secondary choice for colorspace */
-        	   int     saturation,	/* I - Color saturation (%) */
-        	   int     hue,		/* I - Color hue (degrees) */
-		   ib_t    *lut)	/* I - Lookup table for gamma/brightness */
+ImageReadSunRaster(image_t    *img,	/* IO - Image */
+        	   FILE       *fp,	/* I - Image file */
+        	   int        primary,	/* I - Primary choice for colorspace */
+        	   int        secondary,/* I - Secondary choice for colorspace */
+        	   int        saturation,/* I - Color saturation (%) */
+        	   int        hue,	/* I - Color hue (degrees) */
+		   const ib_t *lut)	/* I - Lookup table for gamma/brightness */
 {
   int		i, x, y,
 		bpp,			/* Bytes per pixel */
@@ -372,5 +372,5 @@ read_unsigned(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: image-sun.c,v 1.4 1999/04/01 18:25:00 mike Exp $".
+ * End of "$Id: image-sun.c,v 1.5 1999/08/30 15:50:14 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: image-gif.c,v 1.5 1999/04/01 18:24:55 mike Exp $"
+ * "$Id: image-gif.c,v 1.6 1999/08/30 15:50:11 mike Exp $"
  *
  *   GIF image routines for the Common UNIX Printing System (CUPS).
  *
@@ -72,14 +72,14 @@ static int	gif_read_image(FILE *fp, image_t *img, gif_cmap_t cmap,
  * 'ImageReadGIF()' - Read a GIF image file.
  */
 
-int				/* O - Read status */
-ImageReadGIF(image_t *img,	/* IO - Image */
-             FILE    *fp,	/* I - Image file */
-             int     primary,	/* I - Primary choice for colorspace */
-             int     secondary,	/* I - Secondary choice for colorspace */
-             int     saturation,/* I - Color saturation (%) */
-             int     hue,	/* I - Color hue (degrees) */
-	     ib_t    *lut)	/* I - Lookup table for gamma/brightness */
+int					/* O - Read status */
+ImageReadGIF(image_t    *img,		/* IO - Image */
+             FILE       *fp,		/* I - Image file */
+             int        primary,	/* I - Primary choice for colorspace */
+             int        secondary,	/* I - Secondary choice for colorspace */
+             int        saturation,	/* I - Color saturation (%) */
+             int        hue,		/* I - Color hue (degrees) */
+	     const ib_t *lut)		/* I - Lookup table for gamma/brightness */
 {
   unsigned char	buf[1024];	/* Input buffer */
   gif_cmap_t	cmap;		/* Colormap */
@@ -236,13 +236,13 @@ ImageReadGIF(image_t *img,	/* IO - Image */
  * 'gif_read_cmap()' - Read the colormap from a GIF file...
  */
 
-static int
-gif_read_cmap(FILE       *fp,
-  	      int        ncolors,
-	      gif_cmap_t cmap,
-	      int        *gray)
+static int				/* O - -1 on error, 0 on success */
+gif_read_cmap(FILE       *fp,		/* I - File to read from */
+  	      int        ncolors,	/* I - Number of colors in file */
+	      gif_cmap_t cmap,		/* O - Colormap information */
+	      int        *gray)		/* IO - Is the image grayscale? */
 {
-  int	i;
+  int	i;				/* Looping var */
 
 
  /*
@@ -640,5 +640,5 @@ gif_read_image(FILE       *fp,		/* I - Input file */
 
 
 /*
- * End of "$Id: image-gif.c,v 1.5 1999/04/01 18:24:55 mike Exp $".
+ * End of "$Id: image-gif.c,v 1.6 1999/08/30 15:50:11 mike Exp $".
  */

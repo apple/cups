@@ -1,5 +1,5 @@
 /*
- * "$Id: image-tiff.c,v 1.7 1999/04/01 18:25:01 mike Exp $"
+ * "$Id: image-tiff.c,v 1.8 1999/08/30 15:50:14 mike Exp $"
  *
  *   TIFF file routines for the Common UNIX Printing System (CUPS).
  *
@@ -42,13 +42,13 @@
  */
 
 int					/* O - Read status */
-ImageReadTIFF(image_t *img,		/* IO - Image */
-              FILE    *fp,		/* I - Image file */
-              int     primary,		/* I - Primary choice for colorspace */
-              int     secondary,	/* I - Secondary choice for colorspace */
-              int     saturation,	/* I - Color saturation (%) */
-              int     hue,		/* I - Color hue (degrees) */
-	      ib_t    *lut)		/* I - Lookup table for gamma/brightness */
+ImageReadTIFF(image_t    *img,		/* IO - Image */
+              FILE       *fp,		/* I - Image file */
+              int        primary,	/* I - Primary choice for colorspace */
+              int        secondary,	/* I - Secondary choice for colorspace */
+              int        saturation,	/* I - Color saturation (%) */
+              int        hue,		/* I - Color hue (degrees) */
+	      const ib_t *lut)		/* I - Lookup table for gamma/brightness */
 {
   TIFF		*tif;			/* TIFF file */
   uint32	width, height;		/* Size of image */
@@ -1618,5 +1618,5 @@ ImageReadTIFF(image_t *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-tiff.c,v 1.7 1999/04/01 18:25:01 mike Exp $".
+ * End of "$Id: image-tiff.c,v 1.8 1999/08/30 15:50:14 mike Exp $".
  */

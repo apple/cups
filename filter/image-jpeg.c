@@ -1,5 +1,5 @@
 /*
- * "$Id: image-jpeg.c,v 1.7 1999/04/01 18:24:56 mike Exp $"
+ * "$Id: image-jpeg.c,v 1.8 1999/08/30 15:50:11 mike Exp $"
  *
  *   JPEG image routines for the Common UNIX Printing System (CUPS).
  *
@@ -41,13 +41,13 @@
  */
 
 int					/* O - Read status */
-ImageReadJPEG(image_t *img,		/* IO - Image */
-              FILE    *fp,		/* I - Image file */
-              int     primary,		/* I - Primary choice for colorspace */
-              int     secondary,	/* I - Secondary choice for colorspace */
-              int     saturation,	/* I - Color saturation (%) */
-              int     hue,		/* I - Color hue (degrees) */
-	      ib_t    *lut)		/* I - Lookup table for gamma/brightness */
+ImageReadJPEG(image_t    *img,		/* IO - Image */
+              FILE       *fp,		/* I - Image file */
+              int        primary,	/* I - Primary choice for colorspace */
+              int        secondary,	/* I - Secondary choice for colorspace */
+              int        saturation,	/* I - Color saturation (%) */
+              int        hue,		/* I - Color hue (degrees) */
+	      const ib_t *lut)		/* I - Lookup table for gamma/brightness */
 {
   struct jpeg_decompress_struct	cinfo;	/* Decompressor info */
   struct jpeg_error_mgr		jerr;	/* Error handler info */
@@ -186,5 +186,5 @@ ImageReadJPEG(image_t *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-jpeg.c,v 1.7 1999/04/01 18:24:56 mike Exp $".
+ * End of "$Id: image-jpeg.c,v 1.8 1999/08/30 15:50:11 mike Exp $".
  */

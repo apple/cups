@@ -1,5 +1,5 @@
 /*
- * "$Id: image-photocd.c,v 1.6 1999/04/01 18:24:57 mike Exp $"
+ * "$Id: image-photocd.c,v 1.7 1999/08/30 15:50:12 mike Exp $"
  *
  *   PhotoCD routines for the Common UNIX Printing System (CUPS).
  *
@@ -44,13 +44,13 @@
  */
 
 int					/* O - Read status */
-ImageReadPhotoCD(image_t *img,		/* IO - Image */
-        	 FILE    *fp,		/* I - Image file */
-        	 int     primary,	/* I - Primary choice for colorspace */
-        	 int     secondary,	/* I - Secondary choice for colorspace */
-        	 int     saturation,	/* I - Color saturation (%) */
-        	 int     hue,		/* I - Color hue (degrees) */
-		 ib_t    *lut)		/* I - Lookup table for gamma/brightness */
+ImageReadPhotoCD(image_t    *img,	/* IO - Image */
+        	 FILE       *fp,	/* I - Image file */
+        	 int        primary,	/* I - Primary choice for colorspace */
+        	 int        secondary,	/* I - Secondary choice for colorspace */
+        	 int        saturation,	/* I - Color saturation (%) */
+        	 int        hue,	/* I - Color hue (degrees) */
+		 const ib_t *lut)	/* I - Lookup table for gamma/brightness */
 {
   int		x, y;		/* Looping vars */
   int		xdir,		/* X direction */
@@ -315,5 +315,5 @@ ImageReadPhotoCD(image_t *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-photocd.c,v 1.6 1999/04/01 18:24:57 mike Exp $".
+ * End of "$Id: image-photocd.c,v 1.7 1999/08/30 15:50:12 mike Exp $".
  */

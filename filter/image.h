@@ -1,5 +1,5 @@
 /*
- * "$Id: image.h,v 1.7 1999/07/27 16:46:25 mike Exp $"
+ * "$Id: image.h,v 1.8 1999/08/30 15:50:16 mike Exp $"
  *
  *   Image library definitions for the Common UNIX Printing System (CUPS).
  *
@@ -153,7 +153,7 @@ typedef struct
  */
 
 extern image_t	*ImageOpen(char *filename, int primary, int secondary,
-		           int saturation, int hue, ib_t *lut);
+		           int saturation, int hue, const ib_t *lut);
 extern void	ImageClose(image_t *img);
 extern void	ImageSetMaxTiles(image_t *img, int max_tiles);
 extern void	ImageSetProfile(float d, float g, float matrix[3][3]);
@@ -161,49 +161,51 @@ extern void	ImageSetProfile(float d, float g, float matrix[3][3]);
 #define 	ImageGetDepth(img)	((img)->colorspace < 0 ? -(img)->colorspace : (img)->colorspace)
 extern int	ImageGetCol(image_t *img, int x, int y, int height, ib_t *pixels);
 extern int	ImageGetRow(image_t *img, int x, int y, int width, ib_t *pixels);
-extern int	ImagePutCol(image_t *img, int x, int y, int height, ib_t *pixels);
-extern int	ImagePutRow(image_t *img, int x, int y, int width, ib_t *pixels);
+extern int	ImagePutCol(image_t *img, int x, int y, int height, const ib_t *pixels);
+extern int	ImagePutRow(image_t *img, int x, int y, int width, const ib_t *pixels);
 
 /*
  * File formats...
  */
 
 extern int	ImageReadGIF(image_t *img, FILE *fp, int primary, int secondary,
-		             int saturation, int hue, ib_t *lut);
+		             int saturation, int hue, const ib_t *lut);
 extern int	ImageReadJPEG(image_t *img, FILE *fp, int primary, int secondary,
-		              int saturation, int hue, ib_t *lut);
+		              int saturation, int hue, const ib_t *lut);
 extern int	ImageReadPNG(image_t *img, FILE *fp, int primary, int secondary,
-		             int saturation, int hue, ib_t *lut);
+		             int saturation, int hue, const ib_t *lut);
 extern int	ImageReadPNM(image_t *img, FILE *fp, int primary, int secondary,
-		             int saturation, int hue, ib_t *lut);
+		             int saturation, int hue, const ib_t *lut);
 extern int	ImageReadPhotoCD(image_t *img, FILE *fp, int primary,
-		                 int secondary, int saturation, int hue, ib_t *lut);
+		                 int secondary, int saturation, int hue,
+				 const ib_t *lut);
 extern int	ImageReadSGI(image_t *img, FILE *fp, int primary, int secondary,
-		             int saturation, int hue, ib_t *lut);
+		             int saturation, int hue, const ib_t *lut);
 extern int	ImageReadSunRaster(image_t *img, FILE *fp, int primary,
-		                   int secondary, int saturation, int hue, ib_t *lut);
+		                   int secondary, int saturation, int hue,
+				   const ib_t *lut);
 extern int	ImageReadTIFF(image_t *img, FILE *fp, int primary, int secondary,
-		              int saturation, int hue, ib_t *lut);
+		              int saturation, int hue, const ib_t *lut);
 
 /*
  * Colorspace conversions...
  */
 
-extern void	ImageWhiteToWhite(ib_t *in, ib_t *out, int count);
-extern void	ImageWhiteToRGB(ib_t *in, ib_t *out, int count);
-extern void	ImageWhiteToBlack(ib_t *in, ib_t *out, int count);
-extern void	ImageWhiteToCMY(ib_t *in, ib_t *out, int count);
-extern void	ImageWhiteToCMYK(ib_t *in, ib_t *out, int count);
+extern void	ImageWhiteToWhite(const ib_t *in, ib_t *out, int count);
+extern void	ImageWhiteToRGB(const ib_t *in, ib_t *out, int count);
+extern void	ImageWhiteToBlack(const ib_t *in, ib_t *out, int count);
+extern void	ImageWhiteToCMY(const ib_t *in, ib_t *out, int count);
+extern void	ImageWhiteToCMYK(const ib_t *in, ib_t *out, int count);
 
-extern void	ImageRGBToWhite(ib_t *in, ib_t *out, int count);
-extern void	ImageRGBToRGB(ib_t *in, ib_t *out, int count);
-extern void	ImageRGBToBlack(ib_t *in, ib_t *out, int count);
-extern void	ImageRGBToCMY(ib_t *in, ib_t *out, int count);
-extern void	ImageRGBToCMYK(ib_t *in, ib_t *out, int count);
+extern void	ImageRGBToWhite(const ib_t *in, ib_t *out, int count);
+extern void	ImageRGBToRGB(const ib_t *in, ib_t *out, int count);
+extern void	ImageRGBToBlack(const ib_t *in, ib_t *out, int count);
+extern void	ImageRGBToCMY(const ib_t *in, ib_t *out, int count);
+extern void	ImageRGBToCMYK(const ib_t *in, ib_t *out, int count);
 
 extern void	ImageRGBAdjust(ib_t *pixels, int count, int saturation, int hue);
 
-extern void	ImageLut(ib_t *pixels, int count, ib_t *lut);
+extern void	ImageLut(ib_t *pixels, int count, const ib_t *lut);
 
 /*
  * Image scaling operations...
@@ -219,5 +221,5 @@ extern void	ImageZoomFree(izoom_t *z);
 #endif /* !_IMAGE_H_ */
 
 /*
- * End of "$Id: image.h,v 1.7 1999/07/27 16:46:25 mike Exp $".
+ * End of "$Id: image.h,v 1.8 1999/08/30 15:50:16 mike Exp $".
  */
