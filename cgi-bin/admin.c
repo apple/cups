@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.50 2005/01/03 19:29:44 mike Exp $"
+ * "$Id$"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -1601,5 +1601,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.50 2005/01/03 19:29:44 mike Exp $".
+ * End of "$Id$".
  */

@@ -2,7 +2,7 @@
 //
 // BuiltinFont.cc
 //
-// Copyright 2001-2003 Glyph & Cog, LLC
+// Copyright 2001-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -39,7 +39,7 @@ BuiltinFontWidths::~BuiltinFontWidths() {
   gfree(tab);
 }
 
-GBool BuiltinFontWidths::getWidth(const char *name, Gushort *width) {
+GBool BuiltinFontWidths::getWidth(char *name, Gushort *width) {
   int h;
   BuiltinFontWidth *p;
 
@@ -53,8 +53,8 @@ GBool BuiltinFontWidths::getWidth(const char *name, Gushort *width) {
   return gFalse;
 }
 
-int BuiltinFontWidths::hash(const char *name) {
-  const char *p;
+int BuiltinFontWidths::hash(char *name) {
+  char *p;
   unsigned int h;
 
   h = 0;

@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h,v 1.14 2005/01/03 19:30:00 mike Exp $"
+ * "$Id$"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -34,7 +34,7 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION	"CUPS v1.1.20"
+#define CUPS_SVERSION	"CUPS v1.2.0b1"
 
 
 /*
@@ -43,6 +43,13 @@
 
 #define CUPS_DEFAULT_USER	"lp"
 #define CUPS_DEFAULT_GROUP	"sys"
+
+
+/*
+ * Default IPP port...
+ */
+
+#define CUPS_DEFAULT_IPP_PORT 631
 
 
 /*
@@ -286,5 +293,5 @@
 
 
 /*
- * End of "$Id: config.h,v 1.14 2005/01/03 19:30:00 mike Exp $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.33 2005/01/03 19:29:45 mike Exp $"
+ * "$Id$"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -352,5 +352,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: printers.c,v 1.33 2005/01/03 19:29:45 mike Exp $".
+ * End of "$Id$".
  */

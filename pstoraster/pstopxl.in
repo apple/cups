@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: pstopxl.in,v 1.3 2005/01/03 19:29:59 mike Exp $"
+# "$Id$"
 #
 # CUPS PCL XL/PCL 6 filter script for Ghostscript.
 #
@@ -63,5 +63,5 @@ echo DEBUG: Running $bindir/@GS@ $gsopts -sOUTPUTFILE="%stdout" "$ifile" 1>&2
 $bindir/@GS@ $gsopts -sOUTPUTFILE="%stdout" "$ifile"
 
 #
-# End of "$Id: pstopxl.in,v 1.3 2005/01/03 19:29:59 mike Exp $".
+# End of "$Id$".
 #

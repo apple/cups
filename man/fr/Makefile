@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.5 2004/08/11 14:10:22 mike Exp $"
+# "$Id: Makefile,v 1.1.2.3 2004/06/17 14:09:00 mike Exp $"
 #
 #   French man page makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1993-2004 by Easy Software Products.
+#   Copyright 1993-2002 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -15,9 +15,9 @@
 #       Attn: CUPS Licensing Information
 #       Easy Software Products
 #       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636-3142 USA
+#       Hollywood, Maryland 20636-3111 USA
 #
-#       Voice: (301) 373-9600
+#       Voice: (301) 373-9603
 #       EMail: cups-info@cups.org
 #         WWW: http://www.cups.org
 #
@@ -99,5 +99,5 @@ install:	all
 
 
 #
-# End of "$Id: Makefile,v 1.5 2004/08/11 14:10:22 mike Exp $".
+# End of "$Id: Makefile,v 1.1.2.3 2004/06/17 14:09:00 mike Exp $".
 #

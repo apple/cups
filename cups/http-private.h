@@ -1,5 +1,5 @@
 /*
- * "$Id: http-private.h,v 1.8 2005/01/03 19:29:45 mike Exp $"
+ * "$Id$"
  *
  *   Private HTTP definitions for the Common UNIX Printing System (CUPS).
  *
@@ -98,5 +98,5 @@ extern const char *hstrerror(int error);
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id: http-private.h,v 1.8 2005/01/03 19:29:45 mike Exp $".
+ * End of "$Id$".
  */

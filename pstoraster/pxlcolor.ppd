@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: pxlcolor.ppd,v 1.2 2005/01/03 19:29:59 mike Exp $"
+*% "$Id$"
 *%
 *%   Sample color PCL XL/PCL 6 driver PPD file for the Common UNIX
 *%   Printing System (CUPS).
@@ -201,5 +201,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: pxlcolor.ppd,v 1.2 2005/01/03 19:29:59 mike Exp $".
+*% End of "$Id$".
 *%

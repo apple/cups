@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.10 2005/01/03 19:30:00 mike Exp $"
+# "$Id$"
 #
 #   IPP test makefile for the Common UNIX Printing System (CUPS).
 #
@@ -81,5 +81,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.10 2005/01/03 19:30:00 mike Exp $".
+# End of "$Id$".
 #

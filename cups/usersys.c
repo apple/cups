@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c,v 1.27 2005/01/03 19:29:45 mike Exp $"
+ * "$Id$"
  *
  *   User, system, and password routines for the Common UNIX Printing
  *   System (CUPS).
@@ -44,8 +44,8 @@
 
 #include "cups.h"
 #include "string.h"
+#include "http-private.h"
 #include <stdlib.h>
-#include <ctype.h>
 
 #ifdef WIN32
 #  include <windows.h>
@@ -69,6 +69,9 @@ static char		cups_user[65] = "",
 			cups_server[256] = "";
 static const char	*(*cups_pwdcb)(const char *) = cups_get_password;
 
+#ifdef HAVE_DOMAINSOCKETS
+char			cups_server_domainsocket[104] = "";
+#endif /* HAVE_DOMAINSOCKETS */
 
 /*
  * 'cupsEncryption()' - Get the default encryption settings...
@@ -196,6 +199,7 @@ cupsServer(void)
   FILE		*fp;			/* client.conf file */
   char		*server;		/* Pointer to server name */
   const char	*home;			/* Home directory of user */
+  char		*port;			/* Port number */
   char		line[1024];		/* Line from file */
 
 
@@ -263,10 +267,18 @@ cupsServer(void)
     }
 
    /*
-    * Copy the server name over...
+    * Copy the server name over and set the port number, if any...
     */
 
     strlcpy(cups_server, server, sizeof(cups_server));
+
+    if (cups_server[0] != '/' && (port = strrchr(cups_server, ':')) != NULL &&
+        isdigit(port[1] & 255))
+    {
+      *port++ = '\0';
+
+      ippSetPort(atoi(port));
+    }
   }
 
   return (cups_server);
@@ -456,5 +468,5 @@ cups_get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: usersys.c,v 1.27 2005/01/03 19:29:45 mike Exp $".
+ * End of "$Id$".
  */

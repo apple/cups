@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.c,v 1.33 2005/01/03 19:29:58 mike Exp $"
+ * "$Id$"
  *
  *   Common text filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -1183,5 +1183,5 @@ getutf8(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: textcommon.c,v 1.33 2005/01/03 19:29:58 mike Exp $".
+ * End of "$Id$".
  */

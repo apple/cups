@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h,v 1.41 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -47,7 +47,10 @@ typedef struct printer_str
 		*name,			/* Printer name */
 		*location,		/* Location code */
 		*make_model,		/* Make and model */
-		*info;			/* Description */
+		*info,			/* Description */
+		*op_policy,		/* Operation policy name */
+		*error_policy;		/* Error policy */
+  policy_t	*op_policy_ptr;		/* Pointer to operation policy */
   int		accepting;		/* Accepting jobs? */
   ipp_pstate_t	state;			/* Printer state */
   char		state_message[1024];	/* Printer state message */
@@ -89,8 +92,13 @@ VAR int			NumPrinters	VALUE(0);
 					/* Number of printers */
 VAR printer_t		*Printers	VALUE(NULL);
 					/* Printer list */
-VAR printer_t		*DefaultPrinter VALUE(NULL);
+VAR printer_t		*DefaultPrinter	VALUE(NULL);
 					/* Default printer */
+VAR char		*DefaultPolicy	VALUE(NULL);
+					/* Default policy name */
+VAR policy_t		*DefaultPolicyPtr
+					VALUE(NULL);
+					/* Pointer to default policy */
 
 
 /*
@@ -123,7 +131,8 @@ extern quota_t		*UpdateQuota(printer_t *p, const char *username,
 			             int pages, int k);
 extern const char	*ValidateDest(const char *hostname,
 			              const char *resource,
-			              cups_ptype_t *dtype);
+			              cups_ptype_t *dtype,
+				      printer_t **printer);
 extern void		WritePrintcap(void);
 
 extern char		*cupsdSanitizeURI(const char *uri, char *buffer,
@@ -131,5 +140,5 @@ extern char		*cupsdSanitizeURI(const char *uri, char *buffer,
 
 
 /*
- * End of "$Id: printers.h,v 1.41 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

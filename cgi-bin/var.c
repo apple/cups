@@ -1,5 +1,5 @@
 /*
- * "$Id: var.c,v 1.26 2005/01/03 19:29:45 mike Exp $"
+ * "$Id$"
  *
  *   CGI form variable and array functions.
  *
@@ -668,5 +668,5 @@ cgi_sort_variables(void)
 
 
 /*
- * End of "$Id: var.c,v 1.26 2005/01/03 19:29:45 mike Exp $".
+ * End of "$Id$".
  */

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: pstoraster.in,v 1.7 2005/01/03 19:29:59 mike Exp $"
+# "$Id$"
 #
 # CUPS raster filter script for Ghostscript.
 #
@@ -58,5 +58,5 @@ echo DEBUG: Running $bindir/@GS@ $gsopts -sOUTPUTFILE="%stdout" -c"$profile" "$i
 $bindir/@GS@ $gsopts -sOUTPUTFILE="%stdout" -c"$profile" "$ifile"
 
 #
-# End of "$Id: pstoraster.in,v 1.7 2005/01/03 19:29:59 mike Exp $".
+# End of "$Id$".
 #

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.24 2005/01/03 19:29:45 mike Exp $"
+# "$Id$"
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,14 +28,76 @@ include ../Makedefs
 # Data files...
 #
 
-BANNERS	=	classified \
+BANNERS	=	\
+		classified \
 		confidential \
 		secret \
 		standard \
 		topsecret \
 		unclassified
 
-CHARSETS =	iso-8859-1 \
+CHARMAPS =	\
+		euc-cn.txt \
+		euc-jp.txt \
+		euc-kr.txt \
+		euc-tw.txt \
+		i18n_sdd.txt \
+		iso-8859-10.txt \
+		iso-8859-11.txt \
+		iso-8859-13.txt \
+		iso-8859-14.txt \
+		iso-8859-15.txt \
+		iso-8859-16.txt \
+		iso-8859-1.txt \
+		iso-8859-2.txt \
+		iso-8859-3.txt \
+		iso-8859-4.txt \
+		iso-8859-5.txt \
+		iso-8859-6.txt \
+		iso-8859-7.txt \
+		iso-8859-8.txt \
+		iso-8859-9.txt \
+		koi8-r.txt \
+		koi8-u.txt \
+		unibreak.txt \
+		uni-comb.txt \
+		uni-fold.txt \
+		uni-full.txt \
+		uni-line.txt \
+		uni-nfc.txt \
+		uni-nfd.txt \
+		uni-nfkd.txt \
+		uni-prop.txt \
+		windows-1250.txt \
+		windows-1251.txt \
+		windows-1252.txt \
+		windows-1253.txt \
+		windows-1254.txt \
+		windows-1255.txt \
+		windows-1256.txt \
+		windows-1257.txt \
+		windows-1258.txt \
+		windows-1361.txt \
+		windows-874.txt \
+		windows-932.txt \
+		windows-936.txt \
+		windows-949.txt \
+		windows-950.txt
+
+CHARSETS =	\
+		windows-874 \
+		windows-1250 \
+		windows-1251 \
+		windows-1252 \
+		windows-1253 \
+		windows-1254 \
+		windows-1255 \
+		windows-1256 \
+		windows-1257 \
+		windows-1258 \
+		koi8-r \
+		koi8-u \
+		iso-8859-1 \
 		iso-8859-2 \
 		iso-8859-3 \
 		iso-8859-4 \
@@ -48,21 +110,12 @@ CHARSETS =	iso-8859-1 \
 		iso-8859-13 \
 		iso-8859-14 \
 		iso-8859-15 \
-		koi8-r \
-		koi8-u \
-		utf-8 \
-		windows-874 \
-		windows-1250 \
-		windows-1251 \
-		windows-1252 \
-		windows-1253 \
-		windows-1254 \
-		windows-1255 \
-		windows-1256 \
-		windows-1257 \
-		windows-1258
+		utf-8
 
-DATAFILES =	HPGLprolog psglyphs testprint.ps
+DATAFILES =	\
+		HPGLprolog \
+		psglyphs \
+		testprint.ps
 
 
 #
@@ -88,6 +141,10 @@ install:
 	for file in $(BANNERS); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/banners; \
 	done
+	$(INSTALL_DIR) $(DATADIR)/charmaps
+	for file in $(CHARMAPS); do \
+		$(INSTALL_DATA) $$file $(DATADIR)/charmaps; \
+	done
 	$(INSTALL_DIR) $(DATADIR)/charsets
 	for file in $(CHARSETS); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/charsets; \
@@ -99,5 +156,5 @@ install:
 
 
 #
-# End of "$Id: Makefile,v 1.24 2005/01/03 19:29:45 mike Exp $".
+# End of "$Id$".
 #

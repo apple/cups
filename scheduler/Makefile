@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.53 2005/01/03 19:29:59 mike Exp $"
+# "$Id$"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -26,7 +26,7 @@ include ../Makedefs
 
 CUPSDOBJS =	auth.o banners.o cert.o classes.o client.o conf.o devices.o \
 		dirsvc.o main.o ipp.o listen.o job.o log.o network.o \
-		ppds.o printers.o quotas.o server.o
+		policy.o ppds.o printers.o quotas.o server.o statbuf.o
 MIMEOBJS =	file.o filter.o mime.o type.o
 OBJS	=	$(CUPSDOBJS) $(MIMEOBJS) cups-lpd.o cups-polld.o testmime.o \
 		testspeed.o
@@ -66,7 +66,7 @@ install:	all
 	$(INSTALL_DIR) $(SERVERBIN)/daemon
 	$(INSTALL_BIN) cups-lpd $(SERVERBIN)/daemon
 	$(INSTALL_BIN) cups-polld $(SERVERBIN)/daemon
-	$(INSTALL_DIR) -m 711 $(SERVERROOT)/certs
+	$(INSTALL_DIR) -m 711 -o $(CUPS_USER) -g $(CUPS_GROUP) $(SERVERROOT)/certs
 	$(INSTALL_DIR) $(SERVERROOT)/interfaces
 	$(INSTALL_DIR) $(SERVERROOT)/ppd
 	$(INSTALL_DIR) $(LOGDIR)
@@ -135,10 +135,10 @@ testspeed:	testspeed.o ../cups/$(LIBCUPS)
 #
 # Dependencies...
 #
-
+  
 include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.53 2005/01/03 19:29:59 mike Exp $".
+# End of "$Id$".
 #

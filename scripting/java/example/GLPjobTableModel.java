@@ -2,7 +2,7 @@
 import javax.swing.table.*; 
 import javax.swing.event.TableModelListener; 
 import javax.swing.event.TableModelEvent; 
-import org.cups.*;
+import com.easysw.cups.*;
 
 public class GLPjobTableModel extends AbstractTableModel 
                       implements TableModelListener 

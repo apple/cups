@@ -1,5 +1,5 @@
 /*
- * "$Id: quotas.c,v 1.13 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   Quota routines for the Common UNIX Printing System (CUPS).
  *
@@ -234,5 +234,5 @@ compare(const quota_t *q1,		/* I - First quota record */
 
 
 /*
- * End of "$Id: quotas.c,v 1.13 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

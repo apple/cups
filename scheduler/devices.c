@@ -1,5 +1,5 @@
 /*
- * "$Id: devices.c,v 1.24 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   Device scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -480,5 +480,5 @@ sigalrm_handler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: devices.c,v 1.24 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

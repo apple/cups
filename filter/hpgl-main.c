@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-main.c,v 1.30 2005/01/03 19:29:57 mike Exp $"
+ * "$Id$"
  *
  *   HP-GL/2 filter main entry for the Common UNIX Printing System (CUPS).
  *
@@ -270,5 +270,5 @@ compare_names(const void *p1,	/* I - First name */
 
 
 /*
- * End of "$Id: hpgl-main.c,v 1.30 2005/01/03 19:29:57 mike Exp $".
+ * End of "$Id$".
  */

@@ -3,8 +3,8 @@
 <HEAD>
 <TITLE>CUPS Software Design Description</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
-<META NAME="copyright" CONTENT="Copyright 1997-2005, All Rights Reserved">
-<META NAME="docnumber" CONTENT="CUPS-SDD-1.1">
+<META NAME="copyright" CONTENT="Copyright 1997-2003, All Rights Reserved">
+<META NAME="docnumber" CONTENT="CUPS-SDD-1.2">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
 <STYLE TYPE="text/css"><!--
 BODY { font-family: serif }
@@ -19,14 +19,14 @@ SUP { font-size: smaller }
 PRE { font-family: monospace }
 --></STYLE>
 </HEAD>
-<BODY BGCOLOR="white">
-<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511" ALT="CUPS Software Design Description"><BR>
+<BODY>
+<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
 <H1>CUPS Software Design Description</H1></A><BR>
-CUPS-SDD-1.1<BR>
+CUPS-SDD-1.2<BR>
 Easy Software Products<BR>
-Copyright 1997-2005, All Rights Reserved<BR>
+Copyright 1997-2003, All Rights Reserved<BR>
 </CENTER>
-<HR NOSHADE>
+<HR>
 <H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
 <BR>
 <BR><B><A HREF="#1">1 Scope</A></B>
@@ -42,7 +42,7 @@ Copyright 1997-2005, All Rights Reserved<BR>
 </UL>
 <B><A HREF="#3">3 Design Overview</A></B>
 <UL>
-<LI><A HREF="#3_1">3.1 Backends</A>
+<LI><A HREF="#3_1">3.1 Backends</A></LI>
 <UL>
 <LI><A HREF="#3_1_1">3.1.1 ipp</A></LI>
 <LI><A HREF="#3_1_2">3.1.2 lpd</A></LI>
@@ -51,24 +51,21 @@ Copyright 1997-2005, All Rights Reserved<BR>
 <LI><A HREF="#3_1_5">3.1.5 socket</A></LI>
 <LI><A HREF="#3_1_6">3.1.6 usb</A></LI>
 </UL>
-</LI>
-<LI><A HREF="#3_2">3.2 Berkeley Commands</A>
+<LI><A HREF="#3_2">3.2 Berkeley Commands</A></LI>
 <UL>
 <LI><A HREF="#3_2_1">3.2.1 lpc</A></LI>
 <LI><A HREF="#3_2_2">3.2.2 lpq</A></LI>
 <LI><A HREF="#3_2_3">3.2.3 lpr</A></LI>
 <LI><A HREF="#3_2_4">3.2.4 lprm</A></LI>
 </UL>
-</LI>
-<LI><A HREF="#3_3">3.3 CGI</A>
+<LI><A HREF="#3_3">3.3 CGI</A></LI>
 <UL>
 <LI><A HREF="#3_3_1">3.3.1 admin.cgi</A></LI>
 <LI><A HREF="#3_3_2">3.3.2 classes.cgi</A></LI>
 <LI><A HREF="#3_3_3">3.3.3 jobs.cgi</A></LI>
 <LI><A HREF="#3_3_4">3.3.4 printers.cgi</A></LI>
 </UL>
-</LI>
-<LI><A HREF="#3_4">3.4 CUPS Application Programmers Interface</A>
+<LI><A HREF="#3_4">3.4 CUPS Application Programmers Interface</A></LI>
 <UL>
 <LI><A HREF="#3_4_1">3.4.1 Convenience Functions</A></LI>
 <LI><A HREF="#3_4_2">3.4.2 HTTP Functions</A></LI>
@@ -76,8 +73,7 @@ Copyright 1997-2005, All Rights Reserved<BR>
 <LI><A HREF="#3_4_4">3.4.4 Language Functions</A></LI>
 <LI><A HREF="#3_4_5">3.4.5 PPD Functions</A></LI>
 </UL>
-</LI>
-<LI><A HREF="#3_5">3.5 CUPS Imaging Library</A>
+<LI><A HREF="#3_5">3.5 CUPS Imaging Library</A></LI>
 <UL>
 <LI><A HREF="#3_5_1">3.5.1 Colorspace Conversion Functions</A></LI>
 <LI><A HREF="#3_5_2">3.5.2 Color Management Functions</A></LI>
@@ -86,14 +82,12 @@ Copyright 1997-2005, All Rights Reserved<BR>
 <LI><A HREF="#3_5_5">3.5.5 Image File Functions</A></LI>
 <LI><A HREF="#3_5_6">3.5.6 Raster Functions</A></LI>
 </UL>
-</LI>
-<LI><A HREF="#3_6">3.6 Daemons</A>
+<LI><A HREF="#3_6">3.6 Daemons</A></LI>
 <UL>
 <LI><A HREF="#3_6_1">3.6.1 Line Printer Daemon</A></LI>
 <LI><A HREF="#3_6_2">3.6.2 Polling Daemon</A></LI>
 </UL>
-</LI>
-<LI><A HREF="#3_7">3.7 Filters</A>
+<LI><A HREF="#3_7">3.7 Filters</A></LI>
 <UL>
 <LI><A HREF="#3_7_1">3.7.1 hpgltops</A></LI>
 <LI><A HREF="#3_7_2">3.7.2 imagetops</A></LI>
@@ -105,8 +99,7 @@ Copyright 1997-2005, All Rights Reserved<BR>
 <LI><A HREF="#3_7_8">3.7.8 rastertohp</A></LI>
 <LI><A HREF="#3_7_9">3.7.9 texttops</A></LI>
 </UL>
-</LI>
-<LI><A HREF="#3_8">3.8 Scheduler</A>
+<LI><A HREF="#3_8">3.8 Scheduler</A></LI>
 <UL>
 <LI><A HREF="#3_8_1">3.8.1 Authorization</A></LI>
 <LI><A HREF="#3_8_2">3.8.2 Classes</A></LI>
@@ -122,8 +115,7 @@ Copyright 1997-2005, All Rights Reserved<BR>
 <LI><A HREF="#3_8_12">3.8.12 PPDs</A></LI>
 <LI><A HREF="#3_8_13">3.8.13 Printers</A></LI>
 </UL>
-</LI>
-<LI><A HREF="#3_9">3.9 System V Commands</A>
+<LI><A HREF="#3_9">3.9 System V Commands</A></LI>
 <UL>
 <LI><A HREF="#3_9_1">3.9.1 accept</A></LI>
 <LI><A HREF="#3_9_2">3.9.2 cancel</A></LI>
@@ -137,22 +129,21 @@ Copyright 1997-2005, All Rights Reserved<BR>
 <LI><A HREF="#3_9_10">3.9.10 lpstat</A></LI>
 <LI><A HREF="#3_9_11">3.9.11 reject</A></LI>
 </UL>
-</LI>
 </UL>
 <B><A HREF="#4">A Glossary</A></B>
 <UL>
 <LI><A HREF="#4_1">A.1 Terms</A></LI>
 <LI><A HREF="#4_2">A.2 Acronyms</A></LI>
 </UL>
-<HR NOSHADE>
+<HR>
 <H1><A NAME="1">1 Scope</A></H1>
 <H2><A NAME="1_1">1.1 Identification</A></H2>
  This software design description document provides general information
  on the architecture and coding of the Common UNIX Printing System
- (&quot;CUPS&quot;) Version 1.1.
+ (&quot;CUPS&quot;) Version 1.2.
 <H2><A NAME="1_2">1.2 System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating
- systems. It has been developed by <A HREF="http://www.easysw.com">Easy
+ systems. It has been developed by<A HREF="http://www.easysw.com"> Easy
  Software Products</A> to promote a standard printing solution for all
  UNIX vendors and users. CUPS provides the System V and Berkeley
  command-line interfaces.</P>
@@ -162,20 +153,10 @@ Copyright 1997-2005, All Rights Reserved<BR>
  also supported with reduced functionality. CUPS adds network printer
  browsing and PostScript Printer Description (&quot;PPD&quot;) based printing
  options to support real-world printing under UNIX.</P>
-<P>CUPS includes an image file RIP that supports printing of image files
- to non-PostScript printers. A customized version of GNU Ghostscript
- 7.05 for CUPS called ESP Ghostscript is available separately to support
- printing of PostScript files within the CUPS driver framework. Sample
- drivers for Dymo, EPSON, HP, and OKIDATA printers are included that use
- these filters.</P>
-<P>Drivers for thousands of printers are provided with our ESP Print Pro
- software, available at:</P>
-<PRE>
-    <A HREF="http://www.easysw.com/printpro/">http://www.easysw.com/printpro/</A>
-</PRE>
-<P>CUPS is licensed under the GNU General Public License and GNU Library
- General Public License. Please contact Easy Software Products for
- commercial support and &quot;binary distribution&quot; rights.</P>
+<P>CUPS also includes a customized version of GNU Ghostscript (currently
+ based off GNU Ghostscript 5.50) and an image file RIP that are used to
+ support non-PostScript printers. Sample drivers for HP and EPSON
+ printers are included that use these filters.</P>
 <H2><A NAME="1_3">1.3 Document Overview</A></H2>
  This software design description document is organized into the
  following sections:
@@ -189,16 +170,16 @@ Copyright 1997-2005, All Rights Reserved<BR>
 <H2><A NAME="2_1">2.1 CUPS Documentation</A></H2>
 <P>The following CUPS documentation is referenced by this document:</P>
 <UL>
-<LI>CUPS-CMP-1.1: CUPS Configuration Management Plan</LI>
-<LI>CUPS-IDD-1.1: CUPS System Interface Design Description</LI>
-<LI>CUPS-IPP-1.1: CUPS Implementation of IPP</LI>
-<LI>CUPS-SAM-1.1.x: CUPS Software Administrators Manual</LI>
-<LI>CUPS-SDD-1.1: CUPS Software Design Description</LI>
-<LI>CUPS-SPM-1.1.x: CUPS Software Programming Manual</LI>
-<LI>CUPS-SSR-1.1: CUPS Software Security Report</LI>
-<LI>CUPS-STP-1.1: CUPS Software Test Plan</LI>
-<LI>CUPS-SUM-1.1.x: CUPS Software Users Manual</LI>
-<LI>CUPS-SVD-1.1: CUPS Software Version Description</LI>
+<LI>CUPS-CMP-1.2: CUPS Configuration Management Plan</LI>
+<LI>CUPS-IDD-1.2: CUPS System Interface Design Description</LI>
+<LI>CUPS-IPP-1.2: CUPS Implementation of IPP</LI>
+<LI>CUPS-SAM-1.2.x: CUPS Software Administrators Manual</LI>
+<LI>CUPS-SDD-1.2: CUPS Software Design Description</LI>
+<LI>CUPS-SPM-1.2.x: CUPS Software Programming Manual</LI>
+<LI>CUPS-SSR-1.2: CUPS Software Security Report</LI>
+<LI>CUPS-STP-1.2: CUPS Software Test Plan</LI>
+<LI>CUPS-SUM-1.2.x: CUPS Software Users Manual</LI>
+<LI>CUPS-SVD-1.2: CUPS Software Version Description</LI>
 </UL>
 <H2><A NAME="2_2">2.2 Other Documents</A></H2>
 <P>The following non-CUPS documents are referenced by this document:</P>
@@ -208,11 +189,12 @@ Adobe PostScript Printer Description File Format Specification, Version
  4.3.</A></LI>
 <LI><A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/PLRM.pdf">
 Adobe PostScript Language Reference, Third Edition.</A></LI>
+<LI>IPP: Job and Printer Set Operations</LI>
+<LI>IPP/1.1: Encoding and Transport</LI>
 <LI>IPP/1.1: Implementers Guide</LI>
+<LI>IPP/1.1: Model and Semantics</LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc1179.txt">RFC 1179, Line Printer
  Daemon Protocol</A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2396.txt">RFC 2396, Uniform
- Resource Identifiers (URI): Generic Syntax</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2567.txt">RFC 2567, Design Goals
  for an Internet Printing Protocol</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2568.txt">RFC 2568, Rationale
@@ -224,12 +206,6 @@ Adobe PostScript Language Reference, Third Edition.</A></LI>
  Transfer Protocol -- HTTP/1.1</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617, HTTP
  Authentication: Basic and Digest Access</A> Authentication</LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2910.txt">RFC 2910, IPP/1.1:
- Encoding and Transport</A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2911.txt">RFC 2911, IPP/1.1:
- Model and Semantics</A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc3380.txt">RFC 3380, IPP: Job and
- Printer Set Operations</A></LI>
 </UL>
 <H1><A NAME="3">3 Design Overview</A></H1>
  CUPS is composed of 9 software sub-systems that operate together to

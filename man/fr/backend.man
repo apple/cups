@@ -1,10 +1,9 @@
 .\"
-.\" "$Id: backend.man,v 1.5 2005/01/03 19:29:58 mike Exp $"
+.\" "$Id: backend.man,v 1.1.2.1 2002/05/21 20:05:49 mike Exp $"
 .\"
 .\"   backend man page for the Common UNIX Printing System (CUPS).
-.\"   Based on cvs revision 1.11
 .\"
-.\"   Copyright 1997-2005 by Easy Software Products.
+.\"   Copyright 1997-2002 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -16,9 +15,9 @@
 .\"       Attn: CUPS Licensing Information
 .\"       Easy Software Products
 .\"       44141 Airport View Drive, Suite 204
-.\"       Hollywood, Maryland 20636 USA
+.\"       Hollywood, Maryland 20636-3111 USA
 .\"
-.\"       Voice: (301) 373-9600
+.\"       Voice: (301) 373-9603
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
@@ -46,10 +45,6 @@ lors de l'exécution d'un programme de transmission\ :
 CHARSET
 .br
 Le jeu de caractères par défaut (généralement us-ascii ou iso-8859-1).
-.TP 5
-CLASS
-.br
-Contient le nom de la classe lorsqu'un travail d'impression est envoyé à une classe d'imprimante. Cette variable n'est pas définie si le travail d'impression n'est pas envoyé à une classe.
 .TP 5
 CONTENT_TYPE
 .br
@@ -101,8 +96,7 @@ Le fuseau horaire du serveur.
 .TP 5
 USER
 .br
-L'utilisateur exécutant le programme (généralement root). Vous pouvez
-trouver cette information dans le fichier cupsd.conf.
+L'utilisateur exécutant le programme (généralement lp).
 .SH VOIR AUSSI
 cupsd(8), filter(1)
 CUPS Interface Design Description,
@@ -110,9 +104,10 @@ CUPS Software Administrators Manual,
 CUPS Software Programmers Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2005 Easy Software Products, Tous droits réservés.
+Copyright 1993-2002 Easy Software Products, Tous droits réservés.
 .SH TRADUCTION
 Gilles QUERRET <gilles.querret@nerim.net>
 .\"
-.\" End of "$Id: backend.man,v 1.5 2005/01/03 19:29:58 mike Exp $".
+.\" End of "$Id: backend.man,v 1.1.2.1 2002/05/21 20:05:49 mike Exp $".
 .\"
+

@@ -1,5 +1,5 @@
 /*
- * "$Id: cert.h,v 1.8 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   Authentication certificate definitions for the Common UNIX
  *   Printing System (CUPS).
@@ -56,5 +56,5 @@ extern void		InitCerts(void);
 
 
 /*
- * End of "$Id: cert.h,v 1.8 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

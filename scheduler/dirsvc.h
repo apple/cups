@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.h,v 1.23 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   Directory services definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -49,7 +49,7 @@
 typedef struct
 {
   char			iface[32];	/* Destination interface */
-  struct sockaddr_in	to;		/* Destination address */
+  http_addr_t		to;		/* Destination address */
 } dirsvc_addr_t;
 
 
@@ -60,7 +60,7 @@ typedef struct
 typedef struct
 {
   authmask_t		from;		/* Source address/name mask */
-  struct sockaddr_in	to;		/* Destination address */
+  http_addr_t		to;		/* Destination address */
 } dirsvc_relay_t;
 
 
@@ -70,7 +70,7 @@ typedef struct
 
 typedef struct
 {
-  char			hostname[16];	/* Hostname (actually, IP address) */
+  char			hostname[64];	/* Hostname (actually, IP address) */
   int			port;		/* Port number */
   int			pid;		/* Current poll server PID */
 } dirsvc_poll_t;
@@ -96,6 +96,12 @@ VAR int			Browsing	VALUE(TRUE),
 					/* Time out for printers in seconds */
 			NumBrowsers	VALUE(0);
 					/* Number of broadcast addresses */
+VAR char		*BrowseLocalOptions
+					VALUE(NULL),
+					/* Options to add to local printer URIs */
+			*BrowseRemoteOptions
+					VALUE(NULL);
+					/* Options to add to remote printer URIs */
 VAR dirsvc_addr_t	*Browsers	VALUE(NULL);
 					/* Broadcast addresses */
 VAR location_t		*BrowseACL	VALUE(NULL);
@@ -128,6 +134,7 @@ VAR time_t		BrowseSLPRefresh VALUE(0);
 extern void	ProcessBrowseData(const char *uri, cups_ptype_t type,
 		                  ipp_pstate_t state, const char *location,
 				  const char *info, const char *make_model);
+extern void	SendBrowseDelete(printer_t *p);
 extern void	SendBrowseList(void);
 extern void	SendCUPSBrowse(printer_t *p);
 extern void	SendSLPBrowse(printer_t *p);
@@ -141,5 +148,5 @@ extern void	UpdateSLPBrowse(void);
 
 
 /*
- * End of "$Id: dirsvc.h,v 1.23 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

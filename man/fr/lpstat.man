@@ -1,10 +1,9 @@
 .\"
-.\" "$Id: lpstat.man,v 1.4 2005/01/03 19:29:58 mike Exp $"
+.\" "$Id: lpstat.man,v 1.1.2.1 2002/05/21 20:05:50 mike Exp $"
 .\"
 .\"   lpstat man page for the Common UNIX Printing System (CUPS).
-.\"   Based on cvs revision 1.10
 .\"
-.\"   Copyright 1997-2005 by Easy Software Products.
+.\"   Copyright 1997-2002 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -16,26 +15,24 @@
 .\"       Attn: CUPS Licensing Information
 .\"       Easy Software Products
 .\"       44141 Airport View Drive, Suite 204
-.\"       Hollywood, Maryland 20636 USA
+.\"       Hollywood, Maryland 20636-3111 USA
 .\"
-.\"       Voice: (301) 373-9600
+.\"       Voice: (301) 373-9603
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpstat 1 "Common UNIX Printing System" "3 Janvier 2003" "Easy Software Products"
+.TH lpstat 1 "Common UNIX Printing System" "23 January 2001" "Easy Software Products"
 .SH NOM
 lpstat \- Affiche l'état de CUPS
 .SH SYNOPSIS
 .B lpstat
-[ -E ] [ -h
-.I serveur
-] [ -l ] [ -W
-.I quels_travaux
-] [ -a [
+[ -E ] [ -a [
 .I destination(s)
 ] ] [ -c [
 .I classe(s)
-] [ -d ] [ -o [
+] [ -d ] [ -h
+.I serveur
+] [ -l ] [ -o [
 .I destination(s)
 ] ] [ -p [
 .I imprimante(s)
@@ -116,19 +113,12 @@ la commande.
 Affiche les imprimantes et à quel matériel elles sont rattachées. Si aucune imprimante 
 n'est fournie dans
 la ligne de commande, toutes les imprimantes sont affichées.
-.TP 5
-\-W [\fiquels-travaux\fR]
-.br
-Définit quels sont les travaux à afficher, terminés («\ \fIcompleted\fR\ ») ou en cours («\ \fInot-completed\fR\ »),
-qui est l'option par défaut. Cette option \fBdoit\fR doit se trouver dans la ligne de commandes avant
-l'option \fI-o\fR et tout nom d'imprimante. Dans le cas contraire, la valeur par défaut («\ \fInot-completed\fR\ »)
-sera envoyée à l'ordonnanceur.
 .SH COMPATIBILITÉ
 Contrairement au système d'impression System V, CUPS permet des noms d'imprimantes
 contenant tout caractère imprimable sauf ESPACE et TABULATION. De plus, les noms
 d'imprimante et de classe ne sont pas sensibles à la casse.
 .LP
-Les options «\ -h\ » et «\ -W\ » sont spécifiques à CUPS.
+L'option System V «\ -h\ » n'est pas reconnue.
 .LP
 Les options «\ -f\ », «\ -P\ » et «\ -S\ » de Solaris sont ignorées.
 .SH VOIR AUSSI
@@ -136,9 +126,9 @@ cancel(1), lp(1),
 CUPS Software Users Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2005 Easy Software Products, Tous droits réservés.
+Copyright 1993-2002 Easy Software Products, Tous droits réservés.
 .SH TRADUCTION
 Gilles QUERRET <gilles.querret@nerim.net>
 .\"
-.\" "$Id: lpstat.man,v 1.4 2005/01/03 19:29:58 mike Exp $"
+.\" "$Id: lpstat.man,v 1.1.2.1 2002/05/21 20:05:50 mike Exp $"
 .\"

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.47 2005/01/03 19:29:44 mike Exp $"
+ * "$Id$"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -571,5 +571,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.47 2005/01/03 19:29:44 mike Exp $".
+ * End of "$Id$".
  */

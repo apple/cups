@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-support.c,v 1.6 2005/01/03 19:29:45 mike Exp $"
+ * "$Id$"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -57,12 +57,12 @@ static int	ipp_port = 0;
  * 'ippErrorString()' - Return a textual message for the given error message.
  */
 
-const char *				/* O - Text string */
-ippErrorString(ipp_status_t error)	/* I - Error status */
+const char *					/* O - Text string */
+ippErrorString(ipp_status_t error)		/* I - Error status */
 {
-  static char	unknown[255];		/* Unknown error statuses */
-  static const char * const status_oks[] =
-		{			/* "OK" status codes */
+  static char	unknown[255];			/* Unknown error statuses */
+  static const char * const status_oks[] =	/* "OK" status codes */
+		{
 		  "successful-ok",
 		  "successful-ok-ignored-or-substituted-attributes",
 		  "successful-ok-conflicting-attributes",
@@ -71,7 +71,7 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
 		  "successful-ok-too-many-events",
 		  "successful-ok-but-cancel-subscription"
 		},
-		* const status_400s[] =	/* Client errors */
+		* const status_400s[] =		/* Client errors */
 		{
 		  "client-error-bad-request",
 		  "client-error-forbidden",
@@ -98,7 +98,7 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
 		  "client-error-ignored-all-notifications",
 		  "client-error-print-support-file-not-found"
 		},
-		* const status_500s[] =	/* Server errors */
+		* const status_500s[] =		/* Server errors */
 		{
 		  "server-error-internal-error",
 		  "server-error-operation-not-supported",
@@ -141,11 +141,11 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
  * 'ippPort()' - Return the default IPP port number.
  */
 
-int				/* O - Port number */
+int						/* O - Port number */
 ippPort(void)
 {
-  const char	*server_port;	/* SERVER_PORT environment variable */
-  struct servent *port;		/* Port number info */  
+  const char	*server_port;			/* SERVER_PORT environment variable */
+  struct servent *port;				/* Port number info */  
 
 
   if (ipp_port)
@@ -153,7 +153,7 @@ ippPort(void)
   else if ((server_port = getenv("IPP_PORT")) != NULL)
     return (ipp_port = atoi(server_port));
   else if ((port = getservbyname("ipp", NULL)) == NULL)
-    return (ipp_port = IPP_PORT);
+    return (ipp_port = CUPS_DEFAULT_IPP_PORT);
   else
     return (ipp_port = ntohs(port->s_port));
 }
@@ -164,12 +164,12 @@ ippPort(void)
  */
 
 void
-ippSetPort(int p)		/* I - Port number to use */
+ippSetPort(int p)				/* I - Port number to use */
 {
   ipp_port = p;
 }
 
 
 /*
- * End of "$Id: ipp-support.c,v 1.6 2005/01/03 19:29:45 mike Exp $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: image-zoom.c,v 1.14 2005/01/03 19:29:57 mike Exp $"
+ * "$Id$"
  *
  *   Image zoom routines for the Common UNIX Printing System (CUPS).
  *
@@ -331,5 +331,5 @@ ImageZoomFree(izoom_t *z)	/* I - Zoom record to free */
 
 
 /*
- * End of "$Id: image-zoom.c,v 1.14 2005/01/03 19:29:57 mike Exp $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.56 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -122,9 +122,11 @@ extern const char *cups_hstrerror(int);
  * Other stuff for the scheduler...
  */
 
+#include "statbuf.h"
 #include "cert.h"
 #include "client.h"
 #include "auth.h"
+#include "policy.h"
 #include "printers.h"
 #include "classes.h"
 #include "job.h"
@@ -211,5 +213,5 @@ extern int	cupsdOpenPipe(int *fds);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.56 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

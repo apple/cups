@@ -1,5 +1,5 @@
 /*
- * "$Id: string.h,v 1.19 2005/01/03 19:29:45 mike Exp $"
+ * "$Id$"
  *
  *   String definitions for the Common UNIX Printing System (CUPS).
  *
@@ -126,5 +126,5 @@ extern int	cups_vsnprintf(char *, size_t, const char *, va_list);
 #endif /* !_CUPS_STRING_H_ */
 
 /*
- * End of "$Id: string.h,v 1.19 2005/01/03 19:29:45 mike Exp $".
+ * End of "$Id$".
  */

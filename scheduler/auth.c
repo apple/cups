@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.77 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -56,7 +56,6 @@
 #include "cupsd.h"
 #include <pwd.h>
 #include <grp.h>
-#include <cups/md5.h>
 #ifdef HAVE_SHADOW_H
 #  include <shadow.h>
 #endif /* HAVE_SHADOW_H */
@@ -249,8 +248,8 @@ AllowHost(location_t *loc,	/* I - Location to add to */
 
 void
 AllowIP(location_t *loc,	/* I - Location to add to */
-        unsigned   address,	/* I - IP address to add */
-        unsigned   netmask)	/* I - Netmask of address */
+        unsigned   address[4],	/* I - IP address to add */
+        unsigned   netmask[4])	/* I - Netmask of address */
 {
   authmask_t	*temp;		/* New host/domain mask */
 
@@ -258,12 +257,14 @@ AllowIP(location_t *loc,	/* I - Location to add to */
   if ((temp = add_allow(loc)) == NULL)
     return;
 
-  temp->type            = AUTH_IP;
-  temp->mask.ip.address = address;
-  temp->mask.ip.netmask = netmask;
+  temp->type = AUTH_IP;
+  memcpy(temp->mask.ip.address, address, sizeof(address));
+  memcpy(temp->mask.ip.netmask, netmask, sizeof(netmask));
 
-  LogMessage(L_DEBUG, "AllowIP: %s allow %08x/%08x", loc->location,
-             address, netmask);
+  LogMessage(L_DEBUG, "AllowIP: %s allow %x:%x:%x:%x/%x:%x:%x:%x",
+	     loc->location, address[0], address[1], address[2],
+	     address[3], netmask[0], netmask[1], netmask[2],
+	     netmask[3]);
 }
 
 
@@ -272,14 +273,16 @@ AllowIP(location_t *loc,	/* I - Location to add to */
  */
 
 int				/* O - 1 if mask matches, 0 otherwise */
-CheckAuth(unsigned   ip,	/* I - Client address */
+CheckAuth(unsigned   ip[4],	/* I - Client address */
           char       *name,	/* I - Client hostname */
           int        name_len,	/* I - Length of hostname */
           int        num_masks, /* I - Number of masks */
           authmask_t *masks)	/* I - Masks */
 {
+  int		i;		/* Looping var */
   cups_netif_t	*iface;		/* Network interface */
-  unsigned	netip;		/* Network address */
+  unsigned	netip4,		/* IPv4 network address */
+		netip6[4];	/* IPv6 network address */
 
 
   while (num_masks > 0)
@@ -291,7 +294,12 @@ CheckAuth(unsigned   ip,	/* I - Client address */
 	  * Check for a match with a network interface...
 	  */
 
-          netip = htonl(ip);
+          netip4    = htonl((((((ip[0] << 8) | ip[1]) << 8) |
+	                      ip[2]) << 8) | ip[3]);
+          netip6[0] = htonl(ip[0]);
+          netip6[1] = htonl(ip[1]);
+          netip6[2] = htonl(ip[2]);
+          netip6[3] = htonl(ip[3]);
 
           if (strcmp(masks->mask.name.name, "*") == 0)
 	  {
@@ -310,10 +318,34 @@ CheckAuth(unsigned   ip,	/* I - Client address */
 	      if (!iface->is_local)
 	        continue;
 
-              if ((netip & iface->mask.sin_addr.s_addr) ==
-	          (iface->address.sin_addr.s_addr &
-		   iface->mask.sin_addr.s_addr))
-		return (1);
+              if (iface->address.addr.sa_family == AF_INET)
+	      {
+	       /*
+	        * Check IPv4 address...
+		*/
+
+        	if ((netip4 & iface->mask.ipv4.sin_addr.s_addr) ==
+	            (iface->address.ipv4.sin_addr.s_addr &
+		     iface->mask.ipv4.sin_addr.s_addr))
+		  return (1);
+              }
+#ifdef AF_INET6
+	      else
+	      {
+	       /*
+	        * Check IPv6 address...
+		*/
+
+        	for (i = 0; i < 4; i ++)
+		  if ((netip6[i] & iface->mask.ipv6.sin6_addr.s6_addr32[i]) !=
+		      (iface->address.ipv6.sin6_addr.s6_addr32[i] &
+		       iface->mask.ipv6.sin6_addr.s6_addr32[i]))
+		    break;
+
+		if (i == 4)
+		  return (1);
+              }
+#endif /* AF_INET6 */
 	    }
 	  }
 	  else
@@ -324,11 +356,35 @@ CheckAuth(unsigned   ip,	/* I - Client address */
 
             if ((iface = NetIFFind(masks->mask.name.name)) != NULL)
 	    {
-              if ((netip & iface->mask.sin_addr.s_addr) ==
-	          (iface->address.sin_addr.s_addr &
-		   iface->mask.sin_addr.s_addr))
-		return (1);
-            }
+              if (iface->address.addr.sa_family == AF_INET)
+	      {
+	       /*
+		* Check IPv4 address...
+		*/
+
+        	if ((netip4 & iface->mask.ipv4.sin_addr.s_addr) ==
+	            (iface->address.ipv4.sin_addr.s_addr &
+		     iface->mask.ipv4.sin_addr.s_addr))
+		  return (1);
+              }
+#ifdef AF_INET6
+	      else
+	      {
+	       /*
+		* Check IPv6 address...
+		*/
+
+        	for (i = 0; i < 4; i ++)
+		  if ((netip6[i] & iface->mask.ipv6.sin6_addr.s6_addr32[i]) !=
+		      (iface->address.ipv6.sin6_addr.s6_addr32[i] &
+		       iface->mask.ipv6.sin6_addr.s6_addr32[i]))
+		    break;
+
+		if (i == 4)
+		  return (1);
+              }
+#endif /* AF_INET6 */
+	    }
 	  }
 	  break;
 
@@ -356,7 +412,11 @@ CheckAuth(unsigned   ip,	/* I - Client address */
 	  * Check for IP/network address match...
 	  */
 
-          if ((ip & masks->mask.ip.netmask) == masks->mask.ip.address)
+          for (i = 0; i < 4; i ++)
+	    if ((ip[i] & masks->mask.ip.netmask[i]) != masks->mask.ip.address[i])
+	      break;
+
+	  if (i == 4)
 	    return (1);
           break;
     }
@@ -632,8 +692,8 @@ DenyHost(location_t *loc,	/* I - Location to add to */
 
 void
 DenyIP(location_t *loc,		/* I - Location to add to */
-       unsigned   address,	/* I - IP address to add */
-       unsigned   netmask)	/* I - Netmask of address */
+       unsigned   address[4],	/* I - IP address to add */
+       unsigned   netmask[4])	/* I - Netmask of address */
 {
   authmask_t	*temp;		/* New host/domain mask */
 
@@ -641,12 +701,14 @@ DenyIP(location_t *loc,		/* I - Location to add to */
   if ((temp = add_deny(loc)) == NULL)
     return;
 
-  temp->type            = AUTH_IP;
-  temp->mask.ip.address = address;
-  temp->mask.ip.netmask = netmask;
+  temp->type = AUTH_IP;
+  memcpy(temp->mask.ip.address, address, sizeof(address));
+  memcpy(temp->mask.ip.netmask, netmask, sizeof(netmask));
 
-  LogMessage(L_DEBUG, "DenyIP: %s deny %08x/%08x\n", loc->location,
-             address, netmask);
+  LogMessage(L_DEBUG, "DenyIP: %s deny %x:%x:%x:%x/%x:%x:%x:%x",
+	     loc->location, address[0], address[1], address[2],
+	     address[3], netmask[0], netmask[1], netmask[2],
+	     netmask[3]);
 }
 
 
@@ -757,8 +819,7 @@ FindBest(const char   *path,	/* I - Resource path */
   * Return the match, if any...
   */
 
-  LogMessage(L_DEBUG2, "FindBest: best = \"%s\"",
-             best ? best->location : "NONE");
+  LogMessage(L_DEBUG2, "FindBest: best = %s", best ? best->location : "NONE");
 
   return (best);
 }
@@ -853,7 +914,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 {
   int		i, j,		/* Looping vars */
 		auth;		/* Authorization status */
-  unsigned	address;	/* Authorization address */
+  unsigned	address[4];	/* Authorization address */
   location_t	*best;		/* Best match for location so far */
   int		hostlen;	/* Length of hostname */
   struct passwd	*pw;		/* User password data */
@@ -909,13 +970,44 @@ IsAuthorized(client_t *con)	/* I - Connection */
   * Check host/ip-based accesses...
   */
 
-  address = ntohl(con->http.hostaddr.sin_addr.s_addr);
+#ifdef AF_INET6
+  if (con->http.hostaddr.addr.sa_family == AF_INET6)
+  {
+    address[0] = ntohl(con->http.hostaddr.ipv6.sin6_addr.s6_addr32[0]);
+    address[1] = ntohl(con->http.hostaddr.ipv6.sin6_addr.s6_addr32[1]);
+    address[2] = ntohl(con->http.hostaddr.ipv6.sin6_addr.s6_addr32[2]);
+    address[3] = ntohl(con->http.hostaddr.ipv6.sin6_addr.s6_addr32[3]);
+  }
+  else
+#endif /* AF_INET6 */
+  if (con->http.hostaddr.addr.sa_family == AF_INET)
+  {
+    unsigned temp;		/* Temporary address variable */
+
+
+   /*
+    * Convert 32-bit IPv4 address to 128 bits...
+    */
+
+    temp = ntohl(con->http.hostaddr.ipv4.sin_addr.s_addr);
+
+    address[3] = temp & 255;
+    temp       >>= 8;
+    address[2] = temp & 255;
+    temp       >>= 8;
+    address[1] = temp & 255;
+    temp       >>= 8;
+    address[0] = temp & 255;
+  }
+  else
+    memset(address, 0, sizeof(address));
+
   hostlen = strlen(con->http.hostname);
 
-  if (address == 0x7f000001 || strcasecmp(con->http.hostname, "localhost") == 0)
+  if (strcasecmp(con->http.hostname, "localhost") == 0)
   {
    /*
-    * Access from localhost (127.0.0.1) is always allowed...
+    * Access from localhost (127.0.0.1 or 0.0.0.1) is always allowed...
     */
 
     auth = AUTH_ALLOW;
@@ -1008,13 +1100,13 @@ IsAuthorized(client_t *con)	/* I - Connection */
   * Check the user's password...
   */
 
-  LogMessage(L_DEBUG2, "IsAuthorized: Checking \"%s\", address = %08x, hostname = \"%s\"",
-             con->username, address, con->http.hostname);
+  LogMessage(L_DEBUG2, "IsAuthorized: Checking \"%s\", address = %x:%x:%x:%x, hostname = \"%s\"",
+	     con->username, address[0], address[1], address[2],
+	     address[3], con->http.hostname);
 
   pw = NULL;
 
-  if ((address != 0x7f000001 &&
-       strcasecmp(con->http.hostname, "localhost") != 0) ||
+  if (strcasecmp(con->http.hostname, "localhost") != 0 ||
       strncmp(con->http.fields[HTTP_FIELD_AUTHORIZATION], "Local", 5) != 0)
   {
    /*
@@ -1207,7 +1299,6 @@ IsAuthorized(client_t *con)	/* I - Connection */
 	  else if (!GetMD5Passwd(con->username, NULL, md5))
 	    md5[0] = '\0';
 
-
 	  if (!md5[0])
 	  {
             LogMessage(L_DEBUG2, "IsAuthorized: No matching user:group for \"%s\" in passwd.md5!",
@@ -1303,6 +1394,12 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
     return (HTTP_UNAUTHORIZED);
   }
+
+ /*
+  * Check to see if this user is in any of the named groups...
+  */
+
+  LogMessage(L_DEBUG2, "IsAuthorized: Checking group membership...");
 
   if (best->type == AUTH_BASIC)
   {
@@ -1673,5 +1770,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.77 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.167 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -102,9 +102,8 @@ AddPrinter(const char *name)	/* I - Name of printer */
   SetString(&p->name, name);
   SetString(&p->info, name);
   SetString(&p->hostname, ServerName);
-  SetStringf(&p->uri, "ipp://%s:%d/printers/%s", ServerName,
-             NumListeners > 0 ? ntohs(Listeners[0].address.sin_port) : ippPort(),
-	     name);
+
+  SetStringf(&p->uri, "ipp://%s:%d/printers/%s", ServerName, LocalPort, name);
   SetStringf(&p->device_uri, "file:/dev/null");
 
   p->state     = IPP_PRINTER_STOPPED;
@@ -113,7 +112,12 @@ AddPrinter(const char *name)	/* I - Name of printer */
 
   SetString(&p->job_sheets[0], "none");
   SetString(&p->job_sheets[1], "none");
- 
+
+  SetString(&p->error_policy, "stop-printer");
+  SetString(&p->op_policy, DefaultPolicy);
+
+  p->op_policy_ptr = DefaultPolicyPtr;
+
   if (MaxPrinterHistory)
     p->history = calloc(MaxPrinterHistory, sizeof(ipp_t *));
 
@@ -198,8 +202,8 @@ AddPrinterFilter(printer_t  *p,		/* I - Printer to add to */
        i > 0;
        i --, temptype ++)
     if (((super[0] == '*' && strcasecmp((*temptype)->super, "printer") != 0) ||
-         strcasecmp((*temptype)->super, super) == 0) &&
-        (type[0] == '*' || strcasecmp((*temptype)->type, type) == 0))
+         !strcasecmp((*temptype)->super, super)) &&
+        (type[0] == '*' || !strcasecmp((*temptype)->type, type)))
     {
       LogMessage(L_DEBUG2, "Adding filter %s/%s %s/%s %d %s",
                  (*temptype)->super, (*temptype)->type,
@@ -309,6 +313,7 @@ CreateCommonData(void)
 {
   int		i;			/* Looping var */
   ipp_attribute_t *attr;		/* Attribute data */
+  printer_t	*p;			/* Current printer */
   static const int nups[] =		/* number-up-supported values */
 		{ 1, 2, 4, 6, 9, 16 };
   static const ipp_orient_t orients[4] =/* orientation-requested-supported values */
@@ -407,6 +412,12 @@ CreateCommonData(void)
 		  "separate-documents-uncollated-copies",
 		  "separate-documents-collated-copies"
 		};
+  static const char * const errors[] =	/* printer-error-policy-supported values */
+		{
+		  "abort-job",
+		  "retry-job",
+		  "stop-printer"
+		};
 
 
   if (CommonData)
@@ -470,6 +481,13 @@ CreateCommonData(void)
 		NULL, holds);
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                "job-hold-until-default", NULL, "no-hold");
+  attr = ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                       "printer-op-policy-supported", NumPolicies, NULL, NULL);
+  for (i = 0; i < NumPolicies; i ++)
+    attr->values[i].string.text = strdup(Policies[i]->name);
+  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                "printer-error-policy-supported",
+		sizeof(errors) / sizeof(errors[0]), NULL, errors);
 
   if (NumBanners > 0)
   {
@@ -496,6 +514,14 @@ CreateCommonData(void)
 	attr->values[i + 1].string.text = strdup(Banners[i].name);
     }
   }
+
+ /*
+  * Loop through the printers and update the op_policy_ptr values...
+  */
+
+  for (p = Printers; p; p = p->next)
+    if ((p->op_policy_ptr = FindPolicy(p->op_policy)) == NULL)
+      p->op_policy_ptr = DefaultPolicyPtr;
 }
 
 
@@ -623,11 +649,14 @@ DeletePrinter(printer_t *p,		/* I - Printer to delete */
   }
 
  /*
-  * Remove this printer from any classes...
+  * Remove this printer from any classes and send a browse delete message...
   */
 
   if (!(p->type & CUPS_PRINTER_IMPLICIT))
+  {
     DeletePrinterFromClasses(p);
+    SendBrowseDelete(p);
+  }
 
  /*
   * Free all memory used by the printer...
@@ -663,6 +692,8 @@ DeletePrinter(printer_t *p,		/* I - Printer to delete */
   ClearString(&p->job_sheets[0]);
   ClearString(&p->job_sheets[1]);
   ClearString(&p->device_uri);
+  ClearString(&p->op_policy);
+  ClearString(&p->error_policy);
 
   free(p);
 
@@ -863,8 +894,8 @@ LoadAllPrinters(void)
     * Decode the directive...
     */
 
-    if (strcmp(name, "<Printer") == 0 ||
-        strcmp(name, "<DefaultPrinter") == 0)
+    if (!strcasecmp(name, "<Printer") ||
+        !strcasecmp(name, "<DefaultPrinter"))
     {
      /*
       * <Printer name> or <DefaultPrinter name>
@@ -888,7 +919,7 @@ LoadAllPrinters(void)
         * Set the default printer as needed...
 	*/
 
-        if (strcmp(name, "<DefaultPrinter") == 0)
+        if (!strcasecmp(name, "<DefaultPrinter"))
 	  DefaultPrinter = p;
       }
       else
@@ -898,7 +929,7 @@ LoadAllPrinters(void)
         return;
       }
     }
-    else if (strcmp(name, "</Printer>") == 0)
+    else if (!strcasecmp(name, "</Printer>"))
     {
       if (p != NULL)
       {
@@ -919,24 +950,24 @@ LoadAllPrinters(void)
 	         linenum);
       return;
     }
-    else if (strcmp(name, "Info") == 0)
+    else if (!strcasecmp(name, "Info"))
       SetString(&p->info, value);
-    else if (strcmp(name, "Location") == 0)
+    else if (!strcasecmp(name, "Location"))
       SetString(&p->location, value);
-    else if (strcmp(name, "DeviceURI") == 0)
+    else if (!strcasecmp(name, "DeviceURI"))
       SetString(&p->device_uri, value);
-    else if (strcmp(name, "State") == 0)
+    else if (!strcasecmp(name, "State"))
     {
      /*
       * Set the initial queue state...
       */
 
-      if (strcasecmp(value, "idle") == 0)
+      if (!strcasecmp(value, "idle"))
         p->state = IPP_PRINTER_IDLE;
-      else if (strcasecmp(value, "stopped") == 0)
+      else if (!strcasecmp(value, "stopped"))
         p->state = IPP_PRINTER_STOPPED;
     }
-    else if (strcmp(name, "StateMessage") == 0)
+    else if (!strcasecmp(name, "StateMessage"))
     {
      /*
       * Set the initial queue state message...
@@ -947,18 +978,20 @@ LoadAllPrinters(void)
 
       strlcpy(p->state_message, value, sizeof(p->state_message));
     }
-    else if (strcmp(name, "Accepting") == 0)
+    else if (!strcasecmp(name, "Accepting"))
     {
      /*
       * Set the initial accepting state...
       */
 
-      if (strcasecmp(value, "yes") == 0)
+      if (!strcasecmp(value, "yes") ||
+          !strcasecmp(value, "on") ||
+          !strcasecmp(value, "true"))
         p->accepting = 1;
       else
         p->accepting = 0;
     }
-    else if (strcmp(name, "JobSheets") == 0)
+    else if (!strcasecmp(name, "JobSheets"))
     {
      /*
       * Set the initial job sheets...
@@ -984,22 +1017,26 @@ LoadAllPrinters(void)
 	SetString(&p->job_sheets[1], value);
       }
     }
-    else if (strcmp(name, "AllowUser") == 0)
+    else if (!strcasecmp(name, "AllowUser"))
     {
       p->deny_users = 0;
       AddPrinterUser(p, value);
     }
-    else if (strcmp(name, "DenyUser") == 0)
+    else if (!strcasecmp(name, "DenyUser"))
     {
       p->deny_users = 1;
       AddPrinterUser(p, value);
     }
-    else if (strcmp(name, "QuotaPeriod") == 0)
+    else if (!strcasecmp(name, "QuotaPeriod"))
       p->quota_period = atoi(value);
-    else if (strcmp(name, "PageLimit") == 0)
+    else if (!strcasecmp(name, "PageLimit"))
       p->page_limit = atoi(value);
-    else if (strcmp(name, "KLimit") == 0)
+    else if (!strcasecmp(name, "KLimit"))
       p->k_limit = atoi(value);
+    else if (!strcasecmp(name, "OpPolicy"))
+      SetString(&p->op_policy, value);
+    else if (!strcasecmp(name, "ErrorPolicy"))
+      SetString(&p->error_policy, value);
     else
     {
      /*
@@ -1127,6 +1164,9 @@ SaveAllPrinters(void)
     for (i = 0; i < printer->num_users; i ++)
       cupsFilePrintf(fp, "%sUser %s\n", printer->deny_users ? "Deny" : "Allow",
               printer->users[i]);
+
+    cupsFilePrintf(fp, "OpPolicy %s\n", printer->op_policy);
+    cupsFilePrintf(fp, "ErrorPolicy %s\n", printer->error_policy);
 
     cupsFilePuts(fp, "</Printer>\n");
 
@@ -1598,7 +1638,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	  AddPrinterFilter(p, filename);
 	}
 	else if (p->device_uri &&
-	         strncmp(p->device_uri, "ipp://", 6) == 0 &&
+	         !strncmp(p->device_uri, "ipp://", 6) &&
 	         (strstr(p->device_uri, "/printers/") != NULL ||
 		  strstr(p->device_uri, "/classes/") != NULL))
         {
@@ -1939,7 +1979,8 @@ StopPrinter(printer_t *p,		/* I - Printer to stop */
 const char *				/* O - Printer or class name */
 ValidateDest(const char   *hostname,	/* I - Host name */
              const char   *resource,	/* I - Resource name */
-             cups_ptype_t *dtype)	/* O - Type (printer or class) */
+             cups_ptype_t *dtype,	/* O - Type (printer or class) */
+	     printer_t    **printer)	/* O - Printer pointer */
 {
   printer_t	*p;			/* Current printer */
   char		localname[1024],	/* Localized hostname */
@@ -1947,13 +1988,23 @@ ValidateDest(const char   *hostname,	/* I - Host name */
 		*sptr;			/* Pointer into server name */
 
 
-  DEBUG_printf(("ValidateDest(\"%s\", \"%s\", %p)\n", hostname, resource, dtype));
+  DEBUG_printf(("ValidateDest(\"%s\", \"%s\", %p, %p)\n", hostname, resource,
+                dtype, printer));
+
+ /*
+  * Initialize return values...
+  */
+
+  if (printer)
+    *printer = NULL;
+
+  *dtype = (cups_ptype_t)0;
 
  /*
   * See if the resource is a class or printer...
   */
 
-  if (strncmp(resource, "/classes/", 9) == 0)
+  if (!strncmp(resource, "/classes/", 9))
   {
    /*
     * Class...
@@ -1961,7 +2012,7 @@ ValidateDest(const char   *hostname,	/* I - Host name */
 
     resource += 9;
   }
-  else if (strncmp(resource, "/printers/", 10) == 0)
+  else if (!strncmp(resource, "/printers/", 10))
   {
    /*
     * Printer...
@@ -1989,6 +2040,9 @@ ValidateDest(const char   *hostname,	/* I - Host name */
     return (NULL);
   else if (p != NULL)
   {
+    if (printer)
+      *printer = p;
+
     *dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
                         CUPS_PRINTER_REMOTE);
     return (p->name);
@@ -1998,12 +2052,12 @@ ValidateDest(const char   *hostname,	/* I - Host name */
   * Change localhost to the server name...
   */
 
-  if (strcasecmp(hostname, "localhost") == 0)
+  if (!strcasecmp(hostname, "localhost"))
     hostname = ServerName;
 
   strlcpy(localname, hostname, sizeof(localname));
 
-  if (strcasecmp(hostname, ServerName) != 0)
+  if (!strcasecmp(hostname, ServerName))
   {
    /*
     * Localize the hostname...
@@ -2020,7 +2074,7 @@ ValidateDest(const char   *hostname,	/* I - Host name */
 
       while (lptr != NULL)
       {
-	if (strcasecmp(lptr, sptr) == 0)
+	if (!strcasecmp(lptr, sptr))
 	{
           *lptr = '\0';
 	  break;
@@ -2038,9 +2092,12 @@ ValidateDest(const char   *hostname,	/* I - Host name */
   */
 
   for (p = Printers; p != NULL; p = p->next)
-    if (strcasecmp(p->hostname, localname) == 0 &&
-        strcasecmp(p->name, resource) == 0)
+    if (!strcasecmp(p->hostname, localname) &&
+        !strcasecmp(p->name, resource))
     {
+      if (printer)
+        *printer = p;
+
       *dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
                           CUPS_PRINTER_REMOTE);
       return (p->name);
@@ -2242,11 +2299,12 @@ cupsdSanitizeURI(const char *uri,	/* I - Original device URI */
  */
 
 static void
-write_irix_config(printer_t *p)	/* I - Printer to update */
+write_irix_config(printer_t *p)		/* I - Printer to update */
 {
-  char		filename[1024];	/* Interface script filename */
-  cups_file_t	*fp;		/* Interface script file */
-  ipp_attribute_t *attr;	/* Attribute value */
+  char		filename[1024];		/* Interface script filename */
+  cups_file_t	*fp;			/* Interface script file */
+  int		tag;			/* Status tag value */
+
 
 
  /*
@@ -2491,5 +2549,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.167 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

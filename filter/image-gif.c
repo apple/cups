@@ -1,5 +1,5 @@
 /*
- * "$Id: image-gif.c,v 1.20 2005/01/03 19:29:57 mike Exp $"
+ * "$Id$"
  *
  *   GIF image routines for the Common UNIX Printing System (CUPS).
  *
@@ -690,5 +690,5 @@ gif_read_image(FILE       *fp,		/* I - Input file */
 
 
 /*
- * End of "$Id: image-gif.c,v 1.20 2005/01/03 19:29:57 mike Exp $".
+ * End of "$Id$".
  */

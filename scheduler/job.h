@@ -1,5 +1,5 @@
 /*
- * "$Id: job.h,v 1.38 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   Print job definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -50,13 +50,14 @@ typedef struct job_str
   mime_type_t	**filetypes;		/* File types */
   int		*compressions;		/* Compression status of each file */
   ipp_t		*attrs;			/* Job attributes */
-  int		pipe;			/* Status pipe for this job */
+  cupsd_statbuf_t *status_buffer;	/* Status buffer for this job */
+  int		print_pipes[2],		/* Print data pipes */
+		back_pipes[2];		/* Backchannel pipes */
   int		cost;			/* Filtering cost */
-  int		procs[MAX_FILTERS + 2];	/* Process IDs, 0 terminated */
+  int		filters[MAX_FILTERS + 1];/* Filter process IDs, 0 terminated */
+  int		backend;		/* Backend process ID */
   int		status;			/* Status code from filters */
   printer_t	*printer;		/* Printer this job is assigned to */
-  char		*buffer;		/* Status buffer */
-  int		bufused;		/* Amount of buffer in use */
   int		tries;			/* Number of tries for this job */
 } job_t;
 
@@ -68,10 +69,12 @@ typedef struct job_str
 VAR int		JobHistory	VALUE(1);	/* Preserve job history? */
 VAR int		JobFiles	VALUE(0);	/* Preserve job files? */
 VAR int		MaxJobs		VALUE(0),	/* Max number of jobs */
+		MaxActiveJobs	VALUE(0),	/* Max number of active jobs */
 		MaxJobsPerUser	VALUE(0),	/* Max jobs per user */
 		MaxJobsPerPrinter VALUE(0);	/* Max jobs per printer */
 VAR int		JobAutoPurge	VALUE(0);	/* Automatically purge jobs */
-VAR int		NumJobs		VALUE(0);	/* Number of jobs in queue */
+VAR int		NumJobs		VALUE(0),	/* Number of jobs in queue */
+		ActiveJobs	VALUE(0);	/* Number of active jobs */
 VAR job_t	*Jobs		VALUE(NULL);	/* List of current jobs */
 VAR int		NextJobId	VALUE(1);	/* Next job ID to use */
 VAR int		FaxRetryLimit	VALUE(5),	/* Max number of tries */
@@ -89,6 +92,7 @@ extern void	CheckJobs(void);
 extern void	CleanJobs(void);
 extern void	DeleteJob(int id);
 extern job_t	*FindJob(int id);
+extern void	FinishJob(job_t *job);
 extern void	FreeAllJobs(void);
 extern int	GetPrinterJobCount(const char *dest);
 extern int	GetUserJobCount(const char *username);
@@ -107,5 +111,5 @@ extern void	UpdateJob(job_t *job);
 
 
 /*
- * End of "$Id: job.h,v 1.38 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

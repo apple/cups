@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.152 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -26,7 +26,9 @@
  *   ReadConfiguration()  - Read the cupsd.conf file.
  *   read_configuration() - Read a configuration file.
  *   read_location()      - Read a <Location path> definition.
+ *   read_policy()        - Read a <Policy name> definition.
  *   get_address()        - Get an address + port number from a line.
+ *   get_addr_and_mask()  - Get an IP address and netmask.
  *   CDSAGetServerCerts() - Convert a keychain name into the CFArrayRef
  *                          required by SSLSetCertificate.
  */
@@ -40,6 +42,10 @@
 #include <pwd.h>
 #include <grp.h>
 #include <sys/utsname.h>
+
+#ifdef HAVE_DOMAINSOCKETS
+#  include <sys/un.h>
+#endif /* HAVE_DOMAINSOCKETS */
 
 #ifdef HAVE_CDSASSL
 #  include <Security/SecureTransport.h>
@@ -85,7 +91,9 @@ static var_t	variables[] =
   { "AccessLog",		&AccessLog,		VAR_STRING },
   { "AutoPurgeJobs", 		&JobAutoPurge,		VAR_BOOLEAN },
   { "BrowseInterval",		&BrowseInterval,	VAR_INTEGER },
+  { "BrowseLocalOptions",	&BrowseLocalOptions,	VAR_STRING },
   { "BrowsePort",		&BrowsePort,		VAR_INTEGER },
+  { "BrowseRemoteOptions",	&BrowseRemoteOptions,	VAR_STRING },
   { "BrowseShortNames",		&BrowseShortNames,	VAR_BOOLEAN },
   { "BrowseTimeout",		&BrowseTimeout,		VAR_INTEGER },
   { "Browsing",			&Browsing,		VAR_BOOLEAN },
@@ -95,6 +103,7 @@ static var_t	variables[] =
   { "DataDir",			&DataDir,		VAR_STRING },
   { "DefaultCharset",		&DefaultCharset,	VAR_STRING },
   { "DefaultLanguage",		&DefaultLanguage,	VAR_STRING },
+  { "DefaultPolicy",		&DefaultPolicy,		VAR_STRING },
   { "DocumentRoot",		&DocumentRoot,		VAR_STRING },
   { "ErrorLog",			&ErrorLog,		VAR_STRING },
   { "FaxRetryLimit",		&FaxRetryLimit,		VAR_INTEGER },
@@ -111,6 +120,7 @@ static var_t	variables[] =
   { "LimitRequestBody",		&MaxRequestSize,	VAR_INTEGER },
   { "ListenBackLog",		&ListenBackLog,		VAR_INTEGER },
   { "LogFilePerm",		&LogFilePerm,		VAR_INTEGER },
+  { "MaxActiveJobs",		&MaxActiveJobs,		VAR_INTEGER },
   { "MaxClients",		&MaxClients,		VAR_INTEGER },
   { "MaxClientsPerHost",	&MaxClientsPerHost,	VAR_INTEGER },
   { "MaxCopies",		&MaxCopies,		VAR_INTEGER },
@@ -147,18 +157,32 @@ static var_t	variables[] =
 #define NUM_VARS	(sizeof(variables) / sizeof(variables[0]))
 
 
+static unsigned		ones[4] =
+			{
+			  0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff
+			};
+static unsigned		zeros[4] =
+			{
+			  0x00000000, 0x00000000, 0x00000000, 0x00000000
+			};
+
+#ifdef HAVE_CDSASSL
+static CFArrayRef CDSAGetServerCerts();
+#endif /* HAVE_CDSASSL */
+
+
 /*
  * Local functions...
  */
 
 static int	read_configuration(cups_file_t *fp);
 static int	read_location(cups_file_t *fp, char *name, int linenum);
-static int	get_address(char *value, unsigned defaddress, int defport,
-		            struct sockaddr_in *address);
-
-#ifdef HAVE_CDSASSL
-static CFArrayRef CDSAGetServerCerts();
-#endif /* HAVE_CDSASSL */
+static int	read_policy(cups_file_t *fp, char *name, int linenum);
+static int	get_address(const char *value, unsigned defaddress, int defport,
+		            int deffamily, http_addr_t *address);
+static int	get_addr_and_mask(const char *value, unsigned *ip,
+		                  unsigned *mask);
+static ipp_op_t	get_operation(const char *name);
 
 
 /*
@@ -230,6 +254,15 @@ ReadConfiguration(void)
 
   if (NumListeners > 0)
   {
+#ifdef HAVE_DOMAINSOCKETS
+    int i;				/* Looping var */
+    listener_t	*lis;			/* Current listening socket */
+
+    for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+      if (lis->address.sin_family == AF_LOCAL)
+	ClearString((char **)&lis->address.sin_addr);
+#endif /* HAVE_DOMAINSOCKETS */
+
     free(Listeners);
 
     NumListeners = 0;
@@ -368,13 +401,19 @@ ReadConfiguration(void)
   BrowseTimeout       = DEFAULT_TIMEOUT;
   Browsing            = TRUE;
 
+  ClearString(&BrowseLocalOptions);
+  ClearString(&BrowseRemoteOptions);
+
   JobHistory          = DEFAULT_HISTORY;
   JobFiles            = DEFAULT_FILES;
   JobAutoPurge        = 0;
   MaxJobs             = 500;
+  MaxActiveJobs       = 0;
   MaxJobsPerUser      = 0;
   MaxJobsPerPrinter   = 0;
   MaxCopies           = 100;
+
+  ClearString(&DefaultPolicy);
 
  /*
   * Read the configuration file...
@@ -565,6 +604,14 @@ ReadConfiguration(void)
   else
     LogMessage(L_INFO, "Configured for up to %d clients.", MaxClients);
 
+ /*
+  * Check the MaxActiveJobs setting; limit to 1/3 the available
+  * file descriptors, since we need a pipe for each job...
+  */
+
+  if (MaxActiveJobs > (MaxFDs / 3))
+    MaxActiveJobs = MaxFDs / 3;
+
   if (Classification && strcasecmp(Classification, "none") == 0)
     ClearString(&Classification);
 
@@ -583,6 +630,135 @@ ReadConfiguration(void)
 
   LogMessage(L_INFO, "Allowing up to %d client connections per host.",
              MaxClientsPerHost);
+
+ /*
+  * Update the default policy, as needed...
+  */
+
+  if (DefaultPolicy)
+    DefaultPolicyPtr = FindPolicy(DefaultPolicy);
+  else
+    DefaultPolicyPtr = NULL;
+
+  if (!DefaultPolicyPtr)
+  {
+    policy_t	*p;			/* New policy */
+    policyop_t	*po;			/* New policy operation */
+    char	groupname[255];		/* Group name */
+
+
+    if (DefaultPolicy)
+      LogMessage(L_ERROR, "Default policy \"%s\" not found!", DefaultPolicy);
+
+    if ((DefaultPolicyPtr = FindPolicy("default")) != NULL)
+      LogMessage(L_INFO, "Using policy \"default\" as the default!");
+    else
+    {
+      LogMessage(L_INFO, "Creating CUPS default administrative policy:");
+
+      DefaultPolicyPtr = p = AddPolicy("default");
+
+      LogMessage(L_INFO, "<Policy default>");
+      LogMessage(L_INFO, "<Limit Send-Document Send-URI Cancel-Job Hold-Job "
+                         "Release-Job Restart-Job Purge-Jobs "
+			 "Set-Job-Attributes Create-Job-Subscription "
+			 "Renew-Subscription Cancel-Subscription "
+			 "Get-Notifications Reprocess-Job Cancel-Current-Job "
+			 "Suspend-Current-Job Resume-Job CUPS-Move-Job>");
+      LogMessage(L_INFO, "Order Allow,Deny");
+      LogMessage(L_INFO, "Allow @OWNER");
+
+      po = AddPolicyOp(p, NULL, IPP_SEND_DOCUMENT);
+      po->order_type = POLICY_DENY;
+
+      AddPolicyOpName(po, POLICY_ALLOW, "@OWNER");
+
+      for (i = 0; i < NumSystemGroups; i ++)
+      {
+        snprintf(groupname, sizeof(groupname), "@%s", SystemGroups[i]);
+	AddPolicyOpName(po, POLICY_ALLOW, groupname);
+	LogMessage(L_INFO, "Allow %s", groupname);
+      }
+
+      AddPolicyOp(p, po, IPP_SEND_URI);
+      AddPolicyOp(p, po, IPP_CANCEL_JOB);
+      AddPolicyOp(p, po, IPP_HOLD_JOB);
+      AddPolicyOp(p, po, IPP_RELEASE_JOB);
+      AddPolicyOp(p, po, IPP_RESTART_JOB);
+      AddPolicyOp(p, po, IPP_PURGE_JOBS);
+      AddPolicyOp(p, po, IPP_SET_JOB_ATTRIBUTES);
+      AddPolicyOp(p, po, IPP_CREATE_JOB_SUBSCRIPTION);
+      AddPolicyOp(p, po, IPP_RENEW_SUBSCRIPTION);
+      AddPolicyOp(p, po, IPP_CANCEL_SUBSCRIPTION);
+      AddPolicyOp(p, po, IPP_GET_NOTIFICATIONS);
+      AddPolicyOp(p, po, IPP_REPROCESS_JOB);
+      AddPolicyOp(p, po, IPP_CANCEL_CURRENT_JOB);
+      AddPolicyOp(p, po, IPP_SUSPEND_CURRENT_JOB);
+      AddPolicyOp(p, po, IPP_RESUME_JOB);
+      AddPolicyOp(p, po, CUPS_MOVE_JOB);
+
+      LogMessage(L_INFO, "</Limit>");
+
+      LogMessage(L_INFO, "<Limit Pause-Printer Resume-Printer "
+                         "Set-Printer-Attributes Enable-Printer "
+			 "Disable-Printer Pause-Printer-After-Current-Job "
+			 "Hold-New-Jobs Release-Held-New-Jobs Deactivate-Printer "
+			 "Activate-Printer Restart-Printer Shutdown-Printer "
+			 "Startup-Printer Promote-Job Schedule-Job-After "
+			 "CUPS-Add-Printer CUPS-Delete-Printer "
+			 "CUPS-Add-Class CUPS-Delete-Class "
+			 "CUPS-Accept-Jobs CUPS-Reject-Jobs "
+			 "CUPS-Set-Default CUPS-Add-Device CUPS-Delete-Device>");
+      LogMessage(L_INFO, "Order Allow,Deny");
+      LogMessage(L_INFO, "Authenticate yes");
+
+      po = AddPolicyOp(p, NULL, IPP_PAUSE_PRINTER);
+      po->order_type   = POLICY_DENY;
+      po->authenticate = 1;
+
+      for (i = 0; i < NumSystemGroups; i ++)
+      {
+        snprintf(groupname, sizeof(groupname), "@%s", SystemGroups[i]);
+	AddPolicyOpName(po, POLICY_ALLOW, groupname);
+	LogMessage(L_INFO, "Allow %s", groupname);
+      }
+
+      AddPolicyOp(p, po, IPP_RESUME_PRINTER);
+      AddPolicyOp(p, po, IPP_SET_PRINTER_ATTRIBUTES);
+      AddPolicyOp(p, po, IPP_ENABLE_PRINTER);
+      AddPolicyOp(p, po, IPP_DISABLE_PRINTER);
+      AddPolicyOp(p, po, IPP_PAUSE_PRINTER_AFTER_CURRENT_JOB);
+      AddPolicyOp(p, po, IPP_HOLD_NEW_JOBS);
+      AddPolicyOp(p, po, IPP_RELEASE_HELD_NEW_JOBS);
+      AddPolicyOp(p, po, IPP_DEACTIVATE_PRINTER);
+      AddPolicyOp(p, po, IPP_ACTIVATE_PRINTER);
+      AddPolicyOp(p, po, IPP_RESTART_PRINTER);
+      AddPolicyOp(p, po, IPP_SHUTDOWN_PRINTER);
+      AddPolicyOp(p, po, IPP_STARTUP_PRINTER);
+      AddPolicyOp(p, po, IPP_PROMOTE_JOB);
+      AddPolicyOp(p, po, IPP_SCHEDULE_JOB_AFTER);
+      AddPolicyOp(p, po, CUPS_ADD_PRINTER);
+      AddPolicyOp(p, po, CUPS_DELETE_PRINTER);
+      AddPolicyOp(p, po, CUPS_ADD_CLASS);
+      AddPolicyOp(p, po, CUPS_DELETE_CLASS);
+      AddPolicyOp(p, po, CUPS_ACCEPT_JOBS);
+      AddPolicyOp(p, po, CUPS_REJECT_JOBS);
+      AddPolicyOp(p, po, CUPS_SET_DEFAULT);
+      AddPolicyOp(p, po, CUPS_ADD_DEVICE);
+      AddPolicyOp(p, po, CUPS_DELETE_DEVICE);
+
+      LogMessage(L_INFO, "</Limit>");
+
+      LogMessage(L_INFO, "<Limit All>");
+      LogMessage(L_INFO, "Order Deny,Allow");
+
+      po = AddPolicyOp(p, NULL, IPP_ANY_OPERATION);
+      po->order_type = POLICY_ALLOW;
+
+      LogMessage(L_INFO, "</Limit>");
+      LogMessage(L_INFO, "</Policy>");
+    }
+  }
 
  /*
   * If we are doing a full reload or the server root has changed, flush
@@ -735,24 +911,14 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 		*value;			/* Pointer to value */
   int		valuelen;		/* Length of value */
   var_t		*var;			/* Current variable */
-  unsigned	address,		/* Address value */
-		netmask;		/* Netmask value */
-  int		ip[4],			/* IP address components */
-		ipcount,		/* Number of components provided */
- 		mask[4];		/* IP netmask components */
+  unsigned	ip[4],			/* Address value */
+		mask[4];		/* Netmask value */
   dirsvc_relay_t *relay;		/* Relay data */
   dirsvc_poll_t	*poll;			/* Polling data */
-  struct sockaddr_in polladdr;		/* Polling address */
+  http_addr_t	polladdr;		/* Polling address */
   location_t	*location;		/* Browse location */
   cups_file_t	*incfile;		/* Include file */
   char		incname[1024];		/* Include filename */
-  static unsigned netmasks[4] =		/* Standard netmasks... */
-  {
-    0xff000000,
-    0xffff0000,
-    0xffffff00,
-    0xffffffff
-  };
 
 
  /*
@@ -846,6 +1012,27 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         return (0);
       }
     }
+    else if (!strcasecmp(name, "<Policy"))
+    {
+     /*
+      * <Policy name>
+      */
+
+      if (line[len - 1] == '>')
+      {
+        line[len - 1] = '\0';
+
+	linenum = read_policy(fp, value, linenum);
+	if (linenum == 0)
+	  return (0);
+      }
+      else
+      {
+        LogMessage(L_ERROR, "Syntax error on line %d.",
+	           linenum);
+        return (0);
+      }
+    }
     else if (strcasecmp(name, "Port") == 0 ||
              strcasecmp(name, "Listen") == 0)
     {
@@ -873,11 +1060,18 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
       memset(temp, 0, sizeof(listener_t));
 
-      if (get_address(value, INADDR_ANY, IPP_PORT, &(temp->address)))
+      if (get_address(value, INADDR_ANY, IPP_PORT, AF_INET, &(temp->address)))
       {
-        LogMessage(L_INFO, "Listening to %x:%d",
-                   (unsigned)ntohl(temp->address.sin_addr.s_addr),
-                   ntohs(temp->address.sin_port));
+        httpAddrString(&(temp->address), line, sizeof(line));
+
+#ifdef AF_INET6
+        if (temp->address.addr.sa_family == AF_INET6)
+          LogMessage(L_INFO, "Listening to %s:%d (IPv6)", line,
+                     ntohs(temp->address.ipv6.sin6_port));
+	else
+#endif /* AF_INET6 */
+        LogMessage(L_INFO, "Listening to %s:%d", line,
+                   ntohs(temp->address.ipv4.sin_port));
 	NumListeners ++;
       }
       else
@@ -910,11 +1104,18 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       Listeners = temp;
       temp      += NumListeners;
 
-      if (get_address(value, INADDR_ANY, IPP_PORT, &(temp->address)))
+      if (get_address(value, INADDR_ANY, IPP_PORT, AF_INET, &(temp->address)))
       {
-        LogMessage(L_INFO, "Listening to %x:%d (SSL)",
-                   (unsigned)ntohl(temp->address.sin_addr.s_addr),
-                   ntohs(temp->address.sin_port));
+        httpAddrString(&(temp->address), line, sizeof(line));
+
+#ifdef AF_INET6
+        if (temp->address.addr.sa_family == AF_INET6)
+          LogMessage(L_INFO, "Listening to %s:%d (IPv6)", line,
+                     ntohs(temp->address.ipv6.sin6_port));
+	else
+#endif /* AF_INET6 */
+        LogMessage(L_INFO, "Listening to %s:%d", line,
+                   ntohs(temp->address.ipv4.sin_port));
         temp->encryption = HTTP_ENCRYPT_ALWAYS;
 	NumListeners ++;
       }
@@ -972,11 +1173,18 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
 	NumBrowsers ++;
       }
-      else if (get_address(value, INADDR_NONE, BrowsePort, &(temp->to)))
+      else if (get_address(value, INADDR_NONE, BrowsePort, AF_INET, &(temp->to)))
       {
-        LogMessage(L_INFO, "Sending browsing info to %x:%d",
-                   (unsigned)ntohl(temp->to.sin_addr.s_addr),
-                   ntohs(temp->to.sin_port));
+        httpAddrString(&(temp->to), line, sizeof(line));
+
+#ifdef AF_INET6
+        if (temp->to.addr.sa_family == AF_INET6)
+          LogMessage(L_INFO, "Sending browsing info to %s:%d (IPv6)", line,
+                     ntohs(temp->to.ipv6.sin6_port));
+	else
+#endif /* AF_INET6 */
+        LogMessage(L_INFO, "Sending browsing info to %s:%d", line,
+                   ntohs(temp->to.ipv4.sin_port));
 
 	NumBrowsers ++;
       }
@@ -1093,9 +1301,9 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	  */
 
           if (strcasecmp(name, "BrowseAllow") == 0)
-	    AllowIP(location, 0, 0);
+	    AllowIP(location, zeros, zeros);
 	  else
-	    DenyIP(location, 0, 0);
+	    DenyIP(location, zeros, zeros);
 	}
 	else if (strcasecmp(value, "none") == 0)
 	{
@@ -1104,9 +1312,9 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	  */
 
           if (strcasecmp(name, "BrowseAllow") == 0)
-	    AllowIP(location, ~0, 0);
+	    AllowIP(location, ones, zeros);
 	  else
-	    DenyIP(location, ~0, 0);
+	    DenyIP(location, ones, zeros);
 	}
 	else if (value[0] == '*' || value[0] == '.' || !isdigit(value[0]))
 	{
@@ -1128,45 +1336,17 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
           * One of many IP address forms...
 	  */
 
-          memset(ip, 0, sizeof(ip));
-          ipcount = sscanf(value, "%d.%d.%d.%d", ip + 0, ip + 1, ip + 2, ip + 3);
-	  address = (((((ip[0] << 8) | ip[1]) << 8) | ip[2]) << 8) | ip[3];
-
-          if ((value = strchr(value, '/')) != NULL)
+          if (!get_addr_and_mask(value, ip, mask))
 	  {
-	    value ++;
-	    memset(mask, 0, sizeof(mask));
-            switch (sscanf(value, "%d.%d.%d.%d", mask + 0, mask + 1,
-	                   mask + 2, mask + 3))
-	    {
-	      case 1 :
-	          netmask = (0xffffffff << (32 - mask[0])) & 0xffffffff;
-	          break;
-	      case 4 :
-	          netmask = (((((mask[0] << 8) | mask[1]) << 8) |
-		              mask[2]) << 8) | mask[3];
-                  break;
-	      default :
-        	  LogMessage(L_ERROR, "Bad netmask value %s on line %d.",
-	        	     value, linenum);
-		  netmask = 0xffffffff;
-		  break;
-	    }
-	  }
-	  else
-	    netmask = netmasks[ipcount - 1];
-
-          if ((address & ~netmask) != 0)
-	  {
-	    LogMessage(L_WARN, "Discarding extra bits in %s address %08x for netmask %08x...",
-	               name, address, netmask);
-            address &= netmask;
+            LogMessage(L_ERROR, "Bad netmask value %s on line %d.",
+	               value, linenum);
+	    break;
 	  }
 
           if (strcasecmp(name, "BrowseAllow") == 0)
-	    AllowIP(location, address, netmask);
+	    AllowIP(location, ip, mask);
 	  else
-	    DenyIP(location, address, netmask);
+	    DenyIP(location, ip, mask);
 	}
       }
     }
@@ -1242,41 +1422,18 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         * One of many IP address forms...
 	*/
 
-        memset(ip, 0, sizeof(ip));
-        ipcount = sscanf(value, "%d.%d.%d.%d", ip + 0, ip + 1, ip + 2, ip + 3);
-	address = (((((ip[0] << 8) | ip[1]) << 8) | ip[2]) << 8) | ip[3];
-
-        for (; *value; value ++)
-	  if (*value == '/' || isspace(*value))
-	    break;
-
-        if (*value == '/')
+        if (!get_addr_and_mask(value, ip, mask))
 	{
-	  value ++;
-	  memset(mask, 0, sizeof(mask));
-          switch (sscanf(value, "%d.%d.%d.%d", mask + 0, mask + 1,
-	                 mask + 2, mask + 3))
-	  {
-	    case 1 :
-	        netmask = (0xffffffff << (32 - mask[0])) & 0xffffffff;
-	        break;
-	    case 4 :
-	        netmask = (((((mask[0] << 8) | mask[1]) << 8) |
-		            mask[2]) << 8) | mask[3];
-                break;
-	    default :
-        	LogMessage(L_ERROR, "Bad netmask value %s on line %d.",
-	        	   value, linenum);
-		netmask = 0xffffffff;
-		break;
-	  }
+          LogMessage(L_ERROR, "Bad netmask value %s on line %d.",
+	             value, linenum);
+	  break;
 	}
-	else
-	  netmask = netmasks[ipcount - 1];
 
-        relay->from.type            = AUTH_IP;
-	relay->from.mask.ip.address = address;
-	relay->from.mask.ip.netmask = netmask;
+        relay->from.type = AUTH_IP;
+	memcpy(relay->from.mask.ip.address, ip,
+	       sizeof(relay->from.mask.ip.address));
+	memcpy(relay->from.mask.ip.netmask, mask,
+	       sizeof(relay->from.mask.ip.netmask));
       }
 
      /*
@@ -1306,18 +1463,34 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * Get "to" address and port...
       */
 
-      if (get_address(value, INADDR_BROADCAST, BrowsePort, &(relay->to)))
+      if (get_address(value, INADDR_BROADCAST, BrowsePort, AF_INET, &(relay->to)))
       {
-        if (relay->from.type == AUTH_NAME)
-          LogMessage(L_INFO, "Relaying from %s to %x:%d",
-	             relay->from.mask.name.name,
-                     (unsigned)ntohl(relay->to.sin_addr.s_addr),
-                     ntohs(relay->to.sin_port));
-        else
-          LogMessage(L_INFO, "Relaying from %x/%x to %x:%d",
-                     relay->from.mask.ip.address, relay->from.mask.ip.netmask,
-                     (unsigned)ntohl(relay->to.sin_addr.s_addr),
-                     ntohs(relay->to.sin_port));
+        httpAddrString(&(relay->to), line, sizeof(line));
+
+        if (relay->from.type == AUTH_IP)
+	  snprintf(name, sizeof(name), "%u.%u.%u.%u/%u.%u.%u.%u",
+		   relay->from.mask.ip.address[0],
+		   relay->from.mask.ip.address[1],
+		   relay->from.mask.ip.address[2],
+		   relay->from.mask.ip.address[3],
+		   relay->from.mask.ip.netmask[0],
+		   relay->from.mask.ip.netmask[1],
+		   relay->from.mask.ip.netmask[2],
+		   relay->from.mask.ip.netmask[3]);
+	else
+	{
+	  strncpy(name, relay->from.mask.name.name, sizeof(name) - 1);
+	  name[sizeof(name) - 1] = '\0';
+	}
+
+#ifdef AF_INET6
+        if (relay->to.addr.sa_family == AF_INET6)
+          LogMessage(L_INFO, "Relaying from %s to %s:%d", name, line,
+                     ntohs(relay->to.ipv6.sin6_port));
+	else
+#endif /* AF_INET6 */
+        LogMessage(L_INFO, "Relaying from %s to %s:%d", name, line,
+                   ntohs(relay->to.ipv4.sin_port));
 
 	NumRelays ++;
       }
@@ -1354,20 +1527,21 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * Get poll address and port...
       */
 
-      if (get_address(value, INADDR_NONE, ippPort(), &polladdr))
+      if (get_address(value, INADDR_NONE, ippPort(), AF_INET, &polladdr))
       {
-        LogMessage(L_INFO, "Polling %x:%d",
-	           (unsigned)ntohl(polladdr.sin_addr.s_addr),
-                   ntohs(polladdr.sin_port));
-
 	NumPolled ++;
 	memset(poll, 0, sizeof(dirsvc_poll_t));
 
-        address = ntohl(polladdr.sin_addr.s_addr);
+        httpAddrString(&polladdr, poll->hostname, sizeof(poll->hostname));
 
-	sprintf(poll->hostname, "%d.%d.%d.%d", address >> 24,
-	        (address >> 16) & 255, (address >> 8) & 255, address & 255);
-        poll->port = ntohs(polladdr.sin_port);
+#ifdef AF_INET6
+        if (polladdr.addr.sa_family == AF_INET6)
+          poll->port = ntohs(polladdr.ipv6.sin6_port);
+	else
+#endif /* AF_INET6 */
+        poll->port = ntohs(polladdr.ipv4.sin_port);
+
+        LogMessage(L_INFO, "Polling %s:%d", poll->hostname, poll->port);
       }
       else
         LogMessage(L_ERROR, "Bad poll address %s at line %d.", value, linenum);
@@ -1530,27 +1704,27 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * Set the string used for the Server header...
       */
 
-      struct utsname plat;		/* Platform info */
+      struct utsname plat;	      /* Platform info */
 
 
       uname(&plat);
 
       if (!strcasecmp(value, "ProductOnly"))
-        SetString(&ServerHeader, "CUPS");
+	SetString(&ServerHeader, "CUPS");
       else if (!strcasecmp(value, "Major"))
-        SetString(&ServerHeader, "CUPS/1");
+	SetString(&ServerHeader, "CUPS/1");
       else if (!strcasecmp(value, "Minor"))
-        SetString(&ServerHeader, "CUPS/1.1");
+	SetString(&ServerHeader, "CUPS/1.1");
       else if (!strcasecmp(value, "Minimal"))
-        SetString(&ServerHeader, CUPS_MINIMAL);
+	SetString(&ServerHeader, CUPS_MINIMAL);
       else if (!strcasecmp(value, "OS"))
-        SetStringf(&ServerHeader, CUPS_MINIMAL " (%s)", plat.sysname);
+	SetStringf(&ServerHeader, CUPS_MINIMAL " (%s)", plat.sysname);
       else if (!strcasecmp(value, "Full"))
-        SetStringf(&ServerHeader, CUPS_MINIMAL " (%s) IPP/1.1", plat.sysname);
+	SetStringf(&ServerHeader, CUPS_MINIMAL " (%s) IPP/1.1", plat.sysname);
       else if (!strcasecmp(value, "None"))
-        ClearString(&ServerHeader);
+	ClearString(&ServerHeader);
       else
-        LogMessage(L_WARN, "Unknown ServerTokens %s on line %d.", value, linenum);
+	LogMessage(L_WARN, "Unknown ServerTokens %s on line %d.", value, linenum);
     }
     else
     {
@@ -1646,18 +1820,8 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 		*nameptr,		/* Pointer into name */
 		*value,			/* Value for directive */
 		*valptr;		/* Pointer into value */
-  unsigned	address,		/* Address value */
-		netmask;		/* Netmask value */
-  int		ip[4],			/* IP address components */
-		ipcount,		/* Number of components provided */
+  unsigned	ip[4],			/* IP address components */
  		mask[4];		/* IP netmask components */
-  static unsigned	netmasks[4] =	/* Standard netmasks... */
-  {
-    0xff000000,
-    0xffff0000,
-    0xffffff00,
-    0xffffffff
-  };
 
 
   if ((parent = AddLocation(location)) == NULL)
@@ -1836,9 +2000,9 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 	*/
 
         if (strcasecmp(name, "Allow") == 0)
-	  AllowIP(loc, 0, 0);
+	  AllowIP(loc, zeros, zeros);
 	else
-	  DenyIP(loc, 0, 0);
+	  DenyIP(loc, zeros, zeros);
       }
       else  if (strcasecmp(value, "none") == 0)
       {
@@ -1847,9 +2011,9 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 	*/
 
         if (strcasecmp(name, "Allow") == 0)
-	  AllowIP(loc, ~0, 0);
+	  AllowIP(loc, ones, zeros);
 	else
-	  DenyIP(loc, ~0, 0);
+	  DenyIP(loc, ones, zeros);
       }
       else if (value[0] == '*' || value[0] == '.' || !isdigit(value[0] & 255))
       {
@@ -1871,45 +2035,17 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
         * One of many IP address forms...
 	*/
 
-        memset(ip, 0, sizeof(ip));
-        ipcount = sscanf(value, "%d.%d.%d.%d", ip + 0, ip + 1, ip + 2, ip + 3);
-	address = (((((ip[0] << 8) | ip[1]) << 8) | ip[2]) << 8) | ip[3];
-
-        if ((value = strchr(value, '/')) != NULL)
+        if (!get_addr_and_mask(value, ip, mask))
 	{
-	  value ++;
-	  memset(mask, 0, sizeof(mask));
-          switch (sscanf(value, "%d.%d.%d.%d", mask + 0, mask + 1,
-	                 mask + 2, mask + 3))
-	  {
-	    case 1 :
-	        netmask = (0xffffffff << (32 - mask[0])) & 0xffffffff;
-	        break;
-	    case 4 :
-	        netmask = (((((mask[0] << 8) | mask[1]) << 8) |
-		            mask[2]) << 8) | mask[3];
-                break;
-	    default :
-        	LogMessage(L_ERROR, "Bad netmask value %s on line %d.",
-	        	   value, linenum);
-		netmask = 0xffffffff;
-		break;
-	  }
-	}
-	else
-	  netmask = netmasks[ipcount - 1];
-
-        if ((address & ~netmask) != 0)
-	{
-	  LogMessage(L_WARN, "Discarding extra bits in %s address %08x for netmask %08x...",
-	             name, address, netmask);
-          address &= netmask;
+          LogMessage(L_ERROR, "Bad netmask value %s on line %d.",
+	             value, linenum);
+	  break;
 	}
 
         if (strcasecmp(name, "Allow") == 0)
-	  AllowIP(loc, address, netmask);
+	  AllowIP(loc, ip, mask);
 	else
-	  DenyIP(loc, address, netmask);
+	  DenyIP(loc, ip, mask);
       }
     }
     else if (strcasecmp(name, "AuthType") == 0)
@@ -2020,7 +2156,27 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 
       for (value = valptr; *value;)
       {
-        for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+        while (isspace(*value & 255))
+	  value ++;
+
+        if (*value == '\"' || *value == '\'')
+	{
+	 /*
+	  * Grab quoted name...
+	  */
+
+          for (valptr = value + 1; *valptr != *value && *valptr; valptr ++);
+
+	  value ++;
+	}
+	else
+	{
+	 /*
+	  * Grab literal name.
+	  */
+
+          for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+        }
 
 	if (*valptr)
 	  *valptr++ = '\0';
@@ -2045,6 +2201,252 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 	         name, linenum);
   }
 
+  LogMessage(L_ERROR, "Unexpected end-of-file at line %d while reading location!",
+             linenum);
+
+  return (0);
+}
+
+
+/*
+ * 'read_policy()' - Read a <Policy name> definition.
+ */
+
+static int				/* O - New line number or 0 on error */
+read_policy(cups_file_t *fp,		/* I - Configuration file */
+            char        *policy,	/* I - Location name/path */
+	    int         linenum)	/* I - Current line number */
+{
+  int		i;			/* Looping var */
+  policy_t	*pol;			/* Policy */
+  policyop_t	*op;			/* Policy operation */
+  int		num_ops;		/* Number of IPP operations */
+  ipp_op_t	ops[100];		/* Operations */
+  int		len;			/* Length of line */
+  char		line[HTTP_MAX_BUFFER],	/* Line buffer */
+		name[256],		/* Configuration directive */
+		*nameptr,		/* Pointer into name */
+		*value,			/* Value for directive */
+		*valptr;		/* Pointer into value */
+
+
+ /*
+  * Create the policy...
+  */
+
+  if ((pol = AddPolicy(policy)) == NULL)
+    return (0);
+
+ /*
+  * Read from the file...
+  */
+
+  op      = NULL;
+  num_ops = 0;
+
+  while (cupsFileGets(fp, line, sizeof(line)) != NULL)
+  {
+    linenum ++;
+
+   /*
+    * Skip comment lines...
+    */
+
+    if (line[0] == '#')
+      continue;
+
+   /*
+    * Strip trailing whitespace, if any...
+    */
+
+    len = strlen(line);
+
+    while (len > 0 && isspace(line[len - 1] & 255))
+    {
+      len --;
+      line[len] = '\0';
+    }
+
+   /*
+    * Extract the name from the beginning of the line...
+    */
+
+    for (value = line; isspace(*value & 255); value ++);
+
+    for (nameptr = name; *value != '\0' && !isspace(*value & 255) &&
+                             nameptr < (name + sizeof(name) - 1);)
+      *nameptr++ = *value++;
+    *nameptr = '\0';
+
+    while (isspace(*value & 255))
+      value ++;
+
+    if (name[0] == '\0')
+      continue;
+
+   /*
+    * Decode the directive...
+    */
+
+    if (!strcasecmp(name, "</Policy>"))
+    {
+      if (op)
+        LogMessage(L_WARN, "Missing </Limit> before </Policy> on line %d!",
+	           linenum);
+
+      return (linenum);
+    }
+    else if (!strcasecmp(name, "<Limit") && !op)
+    {
+     /*
+      * Scan for IPP operation names...
+      */
+
+      num_ops = 0;
+
+      while (*value)
+      {
+        for (valptr = value;
+	     !isspace(*valptr & 255) && *valptr != '>' && *valptr;
+	     valptr ++);
+
+	if (*valptr)
+	  *valptr++ = '\0';
+
+        if (num_ops < (int)(sizeof(ops) / sizeof(ops[0])))
+	{
+	  if ((ops[num_ops] = get_operation(value)) == IPP_BAD_OPERATION)
+	    LogMessage(L_ERROR, "Bad IPP operation name \"%s\" on line %d!",
+	               value, linenum);
+          else
+	    num_ops ++;
+	}
+	else
+	  LogMessage(L_ERROR, "Too many operations listed on line %d!",
+	             linenum);
+
+        for (value = valptr; isspace(*value & 255) || *value == '>'; value ++);
+      }
+
+     /*
+      * If none are specified, apply the policy to all operations...
+      */
+
+      if (num_ops == 0)
+      {
+        ops[0]  = IPP_ANY_OPERATION;
+	num_ops = 1;
+      }
+
+     /*
+      * Add a new policy for the first operation...
+      */
+
+      op = AddPolicyOp(pol, NULL, ops[0]);
+    }
+    else if (!strcasecmp(name, "</Limit>") && op)
+    {
+     /*
+      * Finish the current operation limit...
+      */
+
+      if (num_ops > 1)
+      {
+       /*
+        * Copy the policy to the other operations...
+	*/
+
+        for (i = 1; i < num_ops; i ++)
+	  AddPolicyOp(pol, op, ops[i]);
+      }
+
+      op = NULL;
+    }
+    else if (!strcasecmp(name, "Authenticate") && op)
+    {
+     /*
+      * Authenticate boolean
+      */
+
+      if (!strcasecmp(value, "on") ||
+          !strcasecmp(value, "yes") ||
+          !strcasecmp(value, "true"))
+	op->authenticate = 1;
+      else if (!strcasecmp(value, "off") ||
+               !strcasecmp(value, "no") ||
+               !strcasecmp(value, "false"))
+	op->authenticate = 0;
+      else
+        LogMessage(L_ERROR, "Invalid Authenticate value \"%s\" on line %d!\n",
+	           value, linenum);
+    }
+    else if (!strcasecmp(name, "Order") && op)
+    {
+     /*
+      * "Order Deny,Allow" or "Order Allow,Deny"...
+      */
+
+      if (!strncasecmp(value, "deny", 4))
+        op->order_type = POLICY_ALLOW;
+      else if (!strncasecmp(value, "allow", 5))
+        op->order_type = POLICY_DENY;
+      else
+        LogMessage(L_ERROR, "Unknown Order value %s on line %d.",
+	           value, linenum);
+    }
+    else if ((!strcasecmp(name, "Allow") || !strcasecmp(name, "Deny")) && op)
+    {
+     /*
+      * Allow name, @group, @OWNER
+      * Deny name, @group, @OWNER
+      */
+
+      for (value = valptr; *value;)
+      {
+        while (isspace(*value & 255))
+	  value ++;
+
+        if (*value == '\"' || *value == '\'')
+	{
+	 /*
+	  * Grab quoted name...
+	  */
+
+          for (valptr = value + 1; *valptr != *value && *valptr; valptr ++);
+
+	  value ++;
+	}
+	else
+	{
+	 /*
+	  * Grab literal name.
+	  */
+
+          for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+        }
+
+	if (*valptr)
+	  *valptr++ = '\0';
+
+        if (!strcasecmp(name, "Allow"))
+          AddPolicyOpName(op, POLICY_ALLOW, value);
+	else
+          AddPolicyOpName(op, POLICY_DENY, value);
+
+        for (value = valptr; isspace(*value & 255); value ++);
+      }
+    }
+    else if (op)
+      LogMessage(L_ERROR, "Unknown Policy Limit directive %s on line %d.",
+	         name, linenum);
+    else
+      LogMessage(L_ERROR, "Unknown Policy directive %s on line %d.",
+	         name, linenum);
+  }
+
+  LogMessage(L_ERROR, "Unexpected end-of-file at line %d while reading policy \"%s\"!",
+             linenum, policy);
+
   return (0);
 }
 
@@ -2053,26 +2455,62 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
  * 'get_address()' - Get an address + port number from a line.
  */
 
-static int					/* O - 1 if address good, 0 if bad */
-get_address(char               *value,		/* I - Value string */
-            unsigned           defaddress,	/* I - Default address */
-	    int                defport,		/* I - Default port */
-            struct sockaddr_in *address)	/* O - Socket address */
+static int				/* O - 1 if address good, 0 if bad */
+get_address(const char  *value,		/* I - Value string */
+            unsigned    defaddress,	/* I - Default address */
+	    int         defport,	/* I - Default port */
+	    int         deffamily,	/* I - Default family */
+            http_addr_t *address)	/* O - Socket address */
 {
-  char			hostname[256],		/* Hostname or IP */
-			portname[256];		/* Port number or name */
-  struct hostent	*host;			/* Host address */
-  struct servent	*port;			/* Port number */  
+  char			hostname[256],	/* Hostname or IP */
+			portname[256];	/* Port number or name */
+  struct hostent	*host;		/* Host address */
+  struct servent	*port;		/* Port number */  
 
 
  /*
   * Initialize the socket address to the defaults...
   */
 
-  memset(address, 0, sizeof(struct sockaddr_in));
-  address->sin_family      = AF_INET;
-  address->sin_addr.s_addr = htonl(defaddress);
-  address->sin_port        = htons(defport);
+  memset(address, 0, sizeof(http_addr_t));
+
+#ifdef AF_INET6
+  if (deffamily == AF_INET6)
+  {
+    address->ipv6.sin6_family            = AF_INET6;
+    address->ipv6.sin6_addr.s6_addr32[0] = htonl(defaddress);
+    address->ipv6.sin6_addr.s6_addr32[1] = htonl(defaddress);
+    address->ipv6.sin6_addr.s6_addr32[2] = htonl(defaddress);
+    address->ipv6.sin6_addr.s6_addr32[3] = htonl(defaddress);
+    address->ipv6.sin6_port              = htons(defport);
+  }
+  else
+#endif /* AF_INET6 */
+  {
+    address->ipv4.sin_family      = AF_INET;
+    address->ipv4.sin_addr.s_addr = htonl(defaddress);
+    address->ipv4.sin_port        = htons(defport);
+  }
+
+#ifdef AF_LOCAL
+ /*
+  * If the address starts with a "/", it is a domain socket...
+  */
+
+  if (*value == '/')
+  {
+    if (strlen(value) >= sizeof(address->un.sun_path))
+    {
+      LogMessage(L_ERROR, "Domain socket name \"%s\" too long!", value);
+      return (0);
+    }
+
+    address->un.sun_family = AF_LOCAL;
+    strcpy(address->un.sun_path, value);
+
+    return (1);
+  }
+#endif /* AF_LOCAL */
 
  /*
   * Try to grab a hostname and port number...
@@ -2093,8 +2531,10 @@ get_address(char               *value,		/* I - Value string */
         else
           portname[0] = '\0';
         break;
+
     case 2 :
         break;
+
     default :
 	LogMessage(L_ERROR, "Unable to decode address \"%s\"!", value);
         return (0);
@@ -2113,14 +2553,20 @@ get_address(char               *value,		/* I - Value string */
       return (0);
     }
 
-    memcpy(&(address->sin_addr), host->h_addr, host->h_length);
-    address->sin_port = htons(defport);
+    httpAddrLoad(host, defport, 0, address);
   }
 
   if (portname[0] != '\0')
   {
     if (isdigit(portname[0] & 255))
-      address->sin_port = htons(atoi(portname));
+    {
+#ifdef AF_INET6
+      if (address->addr.sa_family == AF_INET6)
+        address->ipv6.sin6_port = htons(atoi(portname));
+      else
+#endif /* AF_INET6 */
+      address->ipv4.sin_port = htons(atoi(portname));
+    }
     else
     {
       if ((port = getservbyname(portname, NULL)) == NULL)
@@ -2130,11 +2576,251 @@ get_address(char               *value,		/* I - Value string */
         return (0);
       }
       else
-        address->sin_port = htons(port->s_port);
+      {
+#ifdef AF_INET6
+	if (address->addr.sa_family == AF_INET6)
+          address->ipv6.sin6_port = htons(port->s_port);
+	else
+#endif /* AF_INET6 */
+	address->ipv4.sin_port = htons(port->s_port);
+      }
     }
   }
 
   return (1);
+}
+
+
+/*
+ * 'get_addr_and_mask()' - Get an IP address and netmask.
+ */
+
+static int				/* O - 1 on success, 0 on failure */
+get_addr_and_mask(const char *value,	/* I - String from config file */
+                  unsigned   *ip,	/* O - Address value */
+		  unsigned   *mask)	/* O - Mask value */
+{
+  int		i,			/* Looping var */
+		family,			/* Address family */
+		ipcount;		/* Count of fields in address */
+  static unsigned netmasks[4][4] =	/* Standard netmasks... */
+  {
+    { 0xffffffff, 0x00000000, 0x00000000, 0x00000000 },
+    { 0xffffffff, 0xffffffff, 0x00000000, 0x00000000 },
+    { 0xffffffff, 0xffffffff, 0xffffffff, 0x00000000 },
+    { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff }
+  };
+
+
+ /*
+  * Get the address...
+  */
+
+  memset(ip, 0, sizeof(unsigned) * 4);
+  family  = AF_INET;
+  ipcount = sscanf(value, "%u.%u.%u.%u", ip + 0, ip + 1, ip + 2, ip + 3);
+
+#ifdef AF_INET6
+ /*
+  * See if we have any values > 255; if so, this is an IPv6 address only.
+  */
+
+  for (i = 0; i < ipcount; i ++)
+    if (ip[0] > 255)
+    {
+      family = AF_INET6;
+      break;
+    }
+#endif /* AF_INET6 */
+
+  if ((value = strchr(value, '/')) != NULL)
+  {
+   /*
+    * Get the netmask value(s)...
+    */
+
+    value ++;
+    memset(mask, 0, sizeof(unsigned) * 4);
+    switch (sscanf(value, "%u.%u.%u.%u", mask + 0, mask + 1,
+	           mask + 2, mask + 3))
+    {
+      case 1 :
+#ifdef AF_INET6
+          if (mask[0] >= 32)
+	    family = AF_INET6;
+
+          if (family == AF_INET6)
+	  {
+  	    i = 128 - mask[0];
+
+	    if (i <= 96)
+	      mask[0] = 0xffffffff;
+	    else
+	      mask[0] = (0xffffffff << (128 - mask[0])) & 0xffffffff;
+
+	    if (i <= 64)
+	      mask[1] = 0xffffffff;
+	    else if (i >= 96)
+	      mask[1] = 0;
+	    else
+	      mask[1] = (0xffffffff << (96 - mask[0])) & 0xffffffff;
+
+	    if (i <= 32)
+	      mask[1] = 0xffffffff;
+	    else if (i >= 64)
+	      mask[1] = 0;
+	    else
+	      mask[1] = (0xffffffff << (64 - mask[0])) & 0xffffffff;
+
+	    if (i >= 32)
+	      mask[1] = 0;
+	    else
+	      mask[1] = (0xffffffff << (32 - mask[0])) & 0xffffffff;
+          }
+	  else
+#endif /* AF_INET6 */
+	  {
+  	    i = 32 - mask[0];
+
+	    if (i <= 24)
+	      mask[0] = 0xffffffff;
+	    else
+	      mask[0] = (0xffffffff << (32 - mask[0])) & 0xffffffff;
+
+	    if (i <= 16)
+	      mask[1] = 0xffffffff;
+	    else if (i >= 24)
+	      mask[1] = 0;
+	    else
+	      mask[1] = (0xffffffff << (24 - mask[0])) & 0xffffffff;
+
+	    if (i <= 8)
+	      mask[1] = 0xffffffff;
+	    else if (i >= 16)
+	      mask[1] = 0;
+	    else
+	      mask[1] = (0xffffffff << (16 - mask[0])) & 0xffffffff;
+
+	    if (i >= 8)
+	      mask[1] = 0;
+	    else
+	      mask[1] = (0xffffffff << (8 - mask[0])) & 0xffffffff;
+          }
+
+      case 4 :
+	  break;
+
+      default :
+          return (0);
+    }
+  }
+  else
+    memcpy(mask, netmasks[ipcount - 1], sizeof(unsigned) * 4);
+
+ /*
+  * Check for a valid netmask; no fallback like in CUPS 1.1.x!
+  */
+
+  if ((ip[0] & ~mask[0]) != 0 ||
+      (ip[1] & ~mask[1]) != 0 ||
+      (ip[2] & ~mask[2]) != 0 ||
+      (ip[3] & ~mask[3]) != 0)
+    return (0);
+
+  return (1);
+}
+
+
+/*
+ * 'get_operation()' - Get an IPP opcode from an operation name...
+ */
+
+static ipp_op_t				/* O - Operation code or -1 on error */
+get_operation(const char *name)		/* I - Operating name */
+{
+  int		i;			/* Looping var */
+  static const char * const ipp_ops[] =	/* List of standard operations */
+		{
+		  /* 0x0000 */ "all",
+		  /* 0x0001 */ "",
+		  /* 0x0002 */ "print-job",
+		  /* 0x0003 */ "print-uri",
+		  /* 0x0004 */ "validate-job",
+		  /* 0x0005 */ "create-job",
+		  /* 0x0006 */ "send-document",
+		  /* 0x0007 */ "send-uri",
+		  /* 0x0008 */ "cancel-job",
+		  /* 0x0009 */ "get-job-attributes",
+		  /* 0x000a */ "get-jobs",
+		  /* 0x000b */ "get-printer-attributes",
+		  /* 0x000c */ "hold-job",
+		  /* 0x000d */ "release-job",
+		  /* 0x000e */ "restart-job",
+		  /* 0x000f */ "",
+		  /* 0x0010 */ "pause-printer",
+		  /* 0x0011 */ "resume-printer",
+		  /* 0x0012 */ "purge-jobs",
+		  /* 0x0013 */ "set-printer-attributes",
+		  /* 0x0014 */ "set-job-attributes",
+		  /* 0x0015 */ "get-printer-supported-values",
+		  /* 0x0016 */ "create-printer-subscription",
+		  /* 0x0017 */ "create-job-subscription",
+		  /* 0x0018 */ "get-subscription-attributes",
+		  /* 0x0019 */ "get-subscriptions",
+		  /* 0x001a */ "renew-subscription",
+		  /* 0x001b */ "cancel-subscription",
+		  /* 0x001c */ "get-notifications",
+		  /* 0x001d */ "send-notifications",
+		  /* 0x001e */ "",
+		  /* 0x001f */ "",
+		  /* 0x0020 */ "",
+		  /* 0x0021 */ "get-print-support-files",
+		  /* 0x0022 */ "enable-printer",
+		  /* 0x0023 */ "disable-printer",
+		  /* 0x0024 */ "pause-printer-after-current-job",
+		  /* 0x0025 */ "hold-new-jobs",
+		  /* 0x0026 */ "release-held-new-jobs",
+		  /* 0x0027 */ "deactivate-printer",
+		  /* 0x0028 */ "activate-printer",
+		  /* 0x0029 */ "restart-printer",
+		  /* 0x002a */ "shutdown-printer",
+		  /* 0x002b */ "startup-printer",
+		  /* 0x002c */ "reprocess-job",
+		  /* 0x002d */ "cancel-current-job",
+		  /* 0x002e */ "suspend-current-job",
+		  /* 0x002f */ "resume-job",
+		  /* 0x0030 */ "promote-job",
+		  /* 0x0031 */ "schedule-job-after"
+		},
+		*cups_ops[] =		/* List of CUPS operations */
+		{
+		  /* 0x4001 */ "cups-get-default",
+		  /* 0x4002 */ "cups-get-printers",
+		  /* 0x4003 */ "cups-add-printer",
+		  /* 0x4004 */ "cups-delete-printer",
+		  /* 0x4005 */ "cups-get-classes",
+		  /* 0x4006 */ "cups-add-class",
+		  /* 0x4007 */ "cups-delete-class",
+		  /* 0x4008 */ "cups-accept-jobs",
+		  /* 0x4009 */ "cups-reject-jobs",
+		  /* 0x400a */ "cups-set-default",
+		  /* 0x400b */ "cups-get-devices",
+		  /* 0x400c */ "cups-get-ppds",
+		  /* 0x400d */ "cups-move-job",
+		  /* 0x400e */ "cups-add-device",
+		  /* 0x400f */ "cups-delete-device"
+		};
+
+
+  for (i = 0; i < (int)(sizeof(ipp_ops) / sizeof(ipp_ops[0])); i ++)
+    if (!strcasecmp(name, ipp_ops[i]))
+      return ((ipp_op_t)i);
+
+  for (i = 0; i < (int)(sizeof(cups_ops) / sizeof(cups_ops[0])); i ++)
+    if (!strcasecmp(name, cups_ops[i]))
+      return ((ipp_op_t)(i + 0x4001));
+
+  return ((ipp_op_t)-1);
 }
 
 
@@ -2228,5 +2914,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.152 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

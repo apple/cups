@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cups-config.man,v 1.6 2005/01/03 19:29:58 mike Exp $"
+.\" "$Id$"
 .\"
 .\"   cups-config man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -91,5 +91,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cups-config.man,v 1.6 2005/01/03 19:29:58 mike Exp $".
+.\" End of "$Id$".
 .\"

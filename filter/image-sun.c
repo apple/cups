@@ -1,5 +1,5 @@
 /*
- * "$Id: image-sun.c,v 1.17 2005/01/03 19:29:57 mike Exp $"
+ * "$Id$"
  *
  *   Sun Raster image file routines for the Common UNIX Printing System (CUPS).
  *
@@ -395,5 +395,5 @@ read_unsigned(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: image-sun.c,v 1.17 2005/01/03 19:29:57 mike Exp $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.85 2005/01/03 19:29:44 mike Exp $"
+# "$Id$"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -26,8 +26,8 @@
 
 Summary: Common Unix Printing System
 Name: cups
-Version: 1.1.23
-Release: 1
+Version: 1.2.0b1
+Release: 0
 Copyright: GPL
 Group: System Environment/Daemons
 Source: ftp://ftp.easysw.com/pub/cups/%{version}/cups-%{version}-source.tar.gz
@@ -135,25 +135,24 @@ rm -rf $RPM_BUILD_ROOT
 # RC dirs are a pain under Linux...  Uncomment the appropriate ones if you
 # don't use Red Hat or Mandrake...
 
+/etc/init.d/*
+/etc/rc0.d/*
+/etc/rc2.d/*
+/etc/rc3.d/*
+/etc/rc5.d/*
+
 # OLD RedHat/Mandrake
-/etc/rc.d/init.d/*
-/etc/rc.d/rc0.d/*
-/etc/rc.d/rc2.d/*
-/etc/rc.d/rc3.d/*
-/etc/rc.d/rc5.d/*
+#/etc/rc.d/init.d/*
+#/etc/rc.d/rc0.d/*
+#/etc/rc.d/rc2.d/*
+#/etc/rc.d/rc3.d/*
+#/etc/rc.d/rc5.d/*
 
 #/sbin/rc.d/*
 #/sbin/rc.d/rc0.d/*
 #/sbin/rc.d/rc2.d/*
 #/sbin/rc.d/rc3.d/*
 #/sbin/rc.d/rc5.d/*
-
-# NEW RedHat/Mandrake
-#/etc/init.d/*
-#/etc/rc0.d/*
-#/etc/rc2.d/*
-#/etc/rc3.d/*
-#/etc/rc5.d/*
 
 /usr/bin/cancel
 /usr/bin/cupstestppd
@@ -201,37 +200,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/man8
 /usr/share/man/man8/*
 
-%dir /usr/share/man/es/cat1
-/usr/share/man/es/cat1/backend.1
-/usr/share/man/es/cat1/cupstestppd.1
-/usr/share/man/es/cat1/filter.1
-/usr/share/man/es/cat1/lp.1
-/usr/share/man/es/cat1/lpoptions.1
-/usr/share/man/es/cat1/lppasswd.1
-/usr/share/man/es/cat1/lpq.1
-/usr/share/man/es/cat1/lpr.1
-/usr/share/man/es/cat1/lprm.1
-/usr/share/man/es/cat1/lpstat.1
-%dir /usr/share/man/es/cat5
-/usr/share/man/es/cat5/*
-%dir /usr/share/man/es/cat8
-/usr/share/man/es/cat8/*
-%dir /usr/share/man/es/man1
-/usr/share/man/es/man1/backend.1.gz
-/usr/share/man/es/man1/cupstestppd.1.gz
-/usr/share/man/es/man1/filter.1.gz
-/usr/share/man/es/man1/lp.1.gz
-/usr/share/man/es/man1/lpoptions.1.gz
-/usr/share/man/es/man1/lppasswd.1.gz
-/usr/share/man/es/man1/lpq.1.gz
-/usr/share/man/es/man1/lpr.1.gz
-/usr/share/man/es/man1/lprm.1.gz
-/usr/share/man/es/man1/lpstat.1.gz
-%dir /usr/share/man/es/man5
-/usr/share/man/es/man5/*
-%dir /usr/share/man/es/man8
-/usr/share/man/es/man8/*
-
 %dir /usr/share/man/fr/cat1
 /usr/share/man/fr/cat1/backend.1
 /usr/share/man/fr/cat1/cupstestppd.1
@@ -248,16 +216,16 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/fr/cat8
 /usr/share/man/fr/cat8/*
 %dir /usr/share/man/fr/man1
-/usr/share/man/fr/man1/backend.1.gz
-/usr/share/man/fr/man1/cupstestppd.1.gz
-/usr/share/man/fr/man1/filter.1.gz
-/usr/share/man/fr/man1/lp.1.gz
-/usr/share/man/fr/man1/lpoptions.1.gz
-/usr/share/man/fr/man1/lppasswd.1.gz
-/usr/share/man/fr/man1/lpq.1.gz
-/usr/share/man/fr/man1/lpr.1.gz
-/usr/share/man/fr/man1/lprm.1.gz
-/usr/share/man/fr/man1/lpstat.1.gz
+/usr/share/man/fr/man1/backend.1
+/usr/share/man/fr/man1/cupstestppd.1
+/usr/share/man/fr/man1/filter.1
+/usr/share/man/fr/man1/lp.1
+/usr/share/man/fr/man1/lpoptions.1
+/usr/share/man/fr/man1/lppasswd.1
+/usr/share/man/fr/man1/lpq.1
+/usr/share/man/fr/man1/lpr.1
+/usr/share/man/fr/man1/lprm.1
+/usr/share/man/fr/man1/lpstat.1
 %dir /usr/share/man/fr/man5
 /usr/share/man/fr/man5/*
 %dir /usr/share/man/fr/man8
@@ -277,11 +245,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/es/man1
 /usr/share/man/es/man1/cups-config.1.gz
 
-%dir /usr/share/man/fr/cat1
-/usr/share/man/fr/cat1/cups-config.1
-%dir /usr/share/man/fr/man1
-/usr/share/man/fr/man1/cups-config.1.gz
-
 /usr/bin/cups-config
 %dir /usr/include/cups
 /usr/include/cups/*
@@ -291,5 +254,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/*.so*
 
 #
-# End of "$Id: cups.spec,v 1.85 2005/01/03 19:29:44 mike Exp $".
+# End of "$Id$".
 #

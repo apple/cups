@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.22 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -583,5 +583,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.22 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

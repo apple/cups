@@ -1,5 +1,5 @@
 /*
- * "$Id: ipptest.c,v 1.19 2005/01/03 19:30:00 mike Exp $"
+ * "$Id$"
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
@@ -822,5 +822,5 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 
 
 /*
- * End of "$Id: ipptest.c,v 1.19 2005/01/03 19:30:00 mike Exp $".
+ * End of "$Id$".
  */

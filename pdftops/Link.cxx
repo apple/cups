@@ -2,7 +2,7 @@
 //
 // Link.cc
 //
-// Copyright 1996-2003 Glyph & Cog, LLC
+// Copyright 1996-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -705,7 +705,7 @@ Link::Link(Dict *dict, GString *baseURI) {
     obj1.free();
     if (dict->lookup("Border", &obj1)->isArray()) {
       if (obj1.arrayGetLength() >= 3) {
-      if (obj1.arrayGet(2, &obj2)->isNum()) {
+	if (obj1.arrayGet(2, &obj2)->isNum()) {
 	  borderWidth = obj2.getNum();
 	}
 	obj2.free();
@@ -717,15 +717,15 @@ Link::Link(Dict *dict, GString *baseURI) {
 	    for (i = 0; i < borderDashLength; ++i) {
 	      if (obj2.arrayGet(i, &obj3)->isNum()) {
 		borderDash[i] = obj3.getNum();
-      } else {
+	      } else {
 		borderDash[i] = 1;
 	      }
 	      obj3.free();
 	    }
+	  }
+	  obj2.free();
+	}
       }
-      obj2.free();
-    }
-  }
     }
   }
   obj1.free();
@@ -780,7 +780,7 @@ Link::~Link() {
   }
   if (action) {
     delete action;
-}
+  }
 }
 
 //------------------------------------------------------------------------

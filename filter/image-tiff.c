@@ -1,5 +1,5 @@
 /*
- * "$Id: image-tiff.c,v 1.27 2005/01/03 19:29:57 mike Exp $"
+ * "$Id$"
  *
  *   TIFF file routines for the Common UNIX Printing System (CUPS).
  *
@@ -1739,5 +1739,5 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-tiff.c,v 1.27 2005/01/03 19:29:57 mike Exp $".
+ * End of "$Id$".
  */

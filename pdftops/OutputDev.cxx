@@ -2,7 +2,7 @@
 //
 // OutputDev.cc
 //
-// Copyright 1996-2003 Glyph & Cog, LLC
+// Copyright 1996-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -55,12 +55,15 @@ void OutputDev::updateAll(GfxState *state) {
   updateLineCap(state);
   updateMiterLimit(state);
   updateLineWidth(state);
+  updateFillColorSpace(state);
   updateFillColor(state);
+  updateStrokeColorSpace(state);
   updateStrokeColor(state);
   updateFont(state);
 }
 
-GBool OutputDev::beginType3Char(GfxState *state,
+GBool OutputDev::beginType3Char(GfxState *state, double x, double y,
+				double dx, double dy,
 				CharCode code, Unicode *u, int uLen) {
   return gFalse;
 }
@@ -92,6 +95,15 @@ void OutputDev::drawImage(GfxState *state, Object *ref, Stream *str,
       str->getChar();
     str->close();
   }
+}
+
+void OutputDev::drawMaskedImage(GfxState *state, Object *ref, Stream *str,
+				int width, int height,
+				GfxImageColorMap *colorMap,
+				Stream *maskStr,
+				int maskWidth, int maskHeight,
+				GBool maskInvert) {
+  drawImage(state, ref, str, width, height, colorMap, NULL, gFalse);
 }
 
 #if OPI_SUPPORT

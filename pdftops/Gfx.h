@@ -2,7 +2,7 @@
 //
 // Gfx.h
 //
-// Copyright 1996-2003 Glyph & Cog, LLC
+// Copyright 1996-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -33,8 +33,11 @@ class GfxShading;
 class GfxFunctionShading;
 class GfxAxialShading;
 class GfxRadialShading;
+class GfxGouraudTriangleShading;
+class GfxPatchMeshShading;
+class GfxPatch;
 class GfxState;
-class GfxColor;
+struct GfxColor;
 class Gfx;
 class PDFRectangle;
 
@@ -216,6 +219,13 @@ private:
 			 GfxColor *colors, int depth);
   void doAxialShFill(GfxAxialShading *shading);
   void doRadialShFill(GfxRadialShading *shading);
+  void doGouraudTriangleShFill(GfxGouraudTriangleShading *shading);
+  void gouraudFillTriangle(double x0, double y0, GfxColor *color0,
+			   double x1, double y1, GfxColor *color1,
+			   double x2, double y2, GfxColor *color2,
+			   int nComps, int depth);
+  void doPatchMeshShFill(GfxPatchMeshShading *shading);
+  void fillPatch(GfxPatch *patch, int nComps, int depth);
   void doEndPath();
 
   // path clipping operators

@@ -2,7 +2,7 @@
 //
 // JBIG2Stream.h
 //
-// Copyright 2002-2003 Glyph & Cog, LLC
+// Copyright 2002-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -22,8 +22,8 @@
 class GList;
 class JBIG2Segment;
 class JBIG2Bitmap;
-class JBIG2ArithmeticDecoder;
-class JBIG2ArithmeticDecoderStats;
+class JArithmeticDecoder;
+class JArithmeticDecoderStats;
 class JBIG2HuffmanDecoder;
 struct JBIG2HuffmanTable;
 class JBIG2MMRDecoder;
@@ -39,7 +39,7 @@ public:
   virtual void reset();
   virtual int getChar();
   virtual int lookChar();
-  virtual GString *getPSFilter(const char *indent);
+  virtual GString *getPSFilter(int psLevel, char *indent);
   virtual GBool isBinary(GBool last = gTrue);
 
 private:
@@ -99,9 +99,9 @@ private:
   JBIG2Segment *findSegment(Guint segNum);
   void discardSegment(Guint segNum);
   void resetGenericStats(Guint templ,
-				   JBIG2ArithmeticDecoderStats *prevStats);
+			 JArithmeticDecoderStats *prevStats);
   void resetRefinementStats(Guint templ,
-				      JBIG2ArithmeticDecoderStats *prevStats);
+			    JArithmeticDecoderStats *prevStats);
   void resetIntStats(int symCodeLen);
   GBool readUByte(Guint *x);
   GBool readByte(int *x);
@@ -119,23 +119,23 @@ private:
   Guchar *dataPtr;
   Guchar *dataEnd;
 
-  JBIG2ArithmeticDecoder *arithDecoder;
-  JBIG2ArithmeticDecoderStats *genericRegionStats;
-  JBIG2ArithmeticDecoderStats *refinementRegionStats;
-  JBIG2ArithmeticDecoderStats *iadhStats;
-  JBIG2ArithmeticDecoderStats *iadwStats;
-  JBIG2ArithmeticDecoderStats *iaexStats;
-  JBIG2ArithmeticDecoderStats *iaaiStats;
-  JBIG2ArithmeticDecoderStats *iadtStats;
-  JBIG2ArithmeticDecoderStats *iaitStats;
-  JBIG2ArithmeticDecoderStats *iafsStats;
-  JBIG2ArithmeticDecoderStats *iadsStats;
-  JBIG2ArithmeticDecoderStats *iardxStats;
-  JBIG2ArithmeticDecoderStats *iardyStats;
-  JBIG2ArithmeticDecoderStats *iardwStats;
-  JBIG2ArithmeticDecoderStats *iardhStats;
-  JBIG2ArithmeticDecoderStats *iariStats;
-  JBIG2ArithmeticDecoderStats *iaidStats;
+  JArithmeticDecoder *arithDecoder;
+  JArithmeticDecoderStats *genericRegionStats;
+  JArithmeticDecoderStats *refinementRegionStats;
+  JArithmeticDecoderStats *iadhStats;
+  JArithmeticDecoderStats *iadwStats;
+  JArithmeticDecoderStats *iaexStats;
+  JArithmeticDecoderStats *iaaiStats;
+  JArithmeticDecoderStats *iadtStats;
+  JArithmeticDecoderStats *iaitStats;
+  JArithmeticDecoderStats *iafsStats;
+  JArithmeticDecoderStats *iadsStats;
+  JArithmeticDecoderStats *iardxStats;
+  JArithmeticDecoderStats *iardyStats;
+  JArithmeticDecoderStats *iardwStats;
+  JArithmeticDecoderStats *iardhStats;
+  JArithmeticDecoderStats *iariStats;
+  JArithmeticDecoderStats *iaidStats;
   JBIG2HuffmanDecoder *huffDecoder;
   JBIG2MMRDecoder *mmrDecoder;
 };

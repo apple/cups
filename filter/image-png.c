@@ -1,5 +1,5 @@
 /*
- * "$Id: image-png.c,v 1.19 2005/01/03 19:29:57 mike Exp $"
+ * "$Id$"
  *
  *   PNG image routines for the Common UNIX Printing System (CUPS).
  *
@@ -266,5 +266,5 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-png.c,v 1.19 2005/01/03 19:29:57 mike Exp $".
+ * End of "$Id$".
  */

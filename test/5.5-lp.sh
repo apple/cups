@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: 5.5-lp.sh,v 1.8 2005/01/03 19:30:00 mike Exp $"
+# "$Id$"
 #
 #   Test the lp command.
 #
@@ -67,5 +67,5 @@ fi
 echo ""
 
 #
-# End of "$Id: 5.5-lp.sh,v 1.8 2005/01/03 19:30:00 mike Exp $".
+# End of "$Id$".
 #

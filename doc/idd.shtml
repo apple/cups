@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
-	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2005, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-IDD-1.1">
+	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2003, All Rights Reserved">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-IDD-1.2">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Interface Design Description</TITLE>
 </HEAD>
@@ -13,7 +13,7 @@
 
 <P>This interface design description document provides detailed file
 formats, message formats, and program conventions for the Common UNIX
-Printing System ("CUPS") Version 1.1.
+Printing System ("CUPS") Version 1.2.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -262,17 +262,9 @@ Specification Version 4.3</A>.
 
 <P>CUPS adds several new attributes that are described below.
 
-<H4>cupsFax</H4>
-
-<P>This optional boolean attributes specifies whether the
-printer should be treated as a facsimile device, where failed
-jobs should be retried according to the
-<TT>FaxRetryInterval</TT> and <TT>FaxRetryLimit</TT> directives
-in the <VAR>cupsd.conf</VAR> file.
-
 <H4>cupsFilter</H4>
 
-<P>This optional string attribute provides a conversion rule of the form:
+<P>This string attribute provides a conversion rule of the form:
 
 <UL><PRE>
 source/type cost program
@@ -284,26 +276,24 @@ specified.
 
 <H4>cupsFlipDuplex</H4>
 
-<P>This optional boolean attribute notifies the RIP filters that
-the destination printer requires an upside-down image for the
-back page. The default value is false.
+<P>This boolean attribute notifies the RIP filters that the
+destination printer requires an upside-down image for the back
+page. The default value is false.
 
 <H4>cupsManualCopies</H4>
 
-<P>This optional boolean attribute notifies the RIP filters that
-the destination printer does not support copy generation in
-hardware. The default value is false.
+<P>This boolean attribute notifies the RIP filters that the destination printer
+does not support copy generation in hardware. The default value is false.
 
 <H4>cupsModelNumber</H4>
 
-<P>This optional integer attribute specifies a printer-specific
-model number. This number can be used by a filter program to
-adjust the output for a specific model of printer.
+<P>This integer attribute specifies a printer-specific model number. This number
+can be used by a filter program to adjust the output for a specific model of
+printer.
 
 <H4>cupsProfile</H4>
 
-<P>This optional string attribute specifies a color profile of
-the form:
+<P>This string attribute specifies a color profile of the form:
 
 <UL><PRE>
 resolution/type density gamma m00 m01 m02 m10 m11 m12 m20 m21 m22
@@ -333,8 +323,9 @@ to no encoding, BCP, and TBCP respectively.
 
 <H4>cupsVersion</H4>
 
-<P>This required attribute describes which version of the CUPS IDD was used
-for the PPD file extensions. Currently it must be the string "1.0" or "1.1".
+<P>This required attribute describes which version of the CUPS
+IDD was used for the PPD file extensions. Currently it must be
+the string "1.0", "1.1", or "1.2".
 
 <H2>Scheduler Configuration Files</H2>
 
@@ -831,7 +822,7 @@ capability/type bits:
 </TR>
 <TR>
 	<TD>2</TD>
-	<TD>1 = can print B&amp;W</TD>
+	<TD>1 = can print B&W</TD>
 </TR>
 <TR>
 	<TD>3</TD>
@@ -884,22 +875,6 @@ capability/type bits:
 <TR>
 	<TD>15</TD>
 	<TD>1 = can print variable sizes</TD>
-</TR>
-<TR>
-	<TD>16</TD>
-	<TD>1 = is an implicit class (bit 1 must be 0)</TD>
-</TR>
-<TR>
-	<TD>17</TD>
-	<TD>1 = is the default printer on the network</TD>
-</TR>
-<TR>
-	<TD>18</TD>
-	<TD>1 = is a fax device</TD>
-</TR>
-<TR>
-	<TD>19</TD>
-	<TD>1 = printer is rejecting new jobs</TD>
 </TR>
 </TABLE></CENTER>
 
@@ -1337,30 +1312,7 @@ raster data for that page.
 	6 = CMYK<BR>
 	7 = YMCK<BR>
 	8 = KCMY<BR>
-	9 = KCMYcm<BR>
-	10 = GMCK<BR>
-	11 = GMCS<BR>
-	12 = WHITE<BR>
-	13 = GOLD<BR>
-	14 = SILVER<BR>
-	15 = CIE XYZ<BR>
-	16 = CIE Lab<BR>
-	32 = ICC1<BR>
-	33 = ICC2<BR>
-	34 = ICC3<BR>
-	35 = ICC4<BR>
-	36 = ICC5<BR>
-	37 = ICC6<BR>
-	38 = ICC7<BR>
-	39 = ICC8<BR>
-	40 = ICC9<BR>
-	41 = ICCA (10)<BR>
-	42 = ICCB (11)<BR>
-	43 = ICCC (12)<BR>
-	44 = ICCD (13)<BR>
-	45 = ICCE (14)<BR>
-	46 = ICCF (15)<BR>
-	</TD>
+	9 = KCMYcm</TD>
 </TR>
 <TR>
 	<TD>404-407</TD>

@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.53 2005/01/03 19:29:45 mike Exp $"
+ * "$Id$"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -25,6 +25,8 @@
  *
  * Contents:
  *
+ *   cupsEncodingName()   - Return the character encoding name string
+ *                          for the given encoding enumeration.
  *   cupsLangEncoding()   - Return the character encoding (us-ascii, etc.)
  *                          for the given language.
  *   cupsLangFlush()      - Flush all language data out of the cache.
@@ -67,7 +69,7 @@ static const char	*appleLangDefault(void);
 
 static cups_lang_t	*cups_cache_lookup(const char *name,
 			                   cups_encoding_t encoding);
-
+  
 
 /*
  * Local globals...
@@ -75,39 +77,78 @@ static cups_lang_t	*cups_cache_lookup(const char *name,
 
 static cups_lang_t	*lang_cache = NULL;
 					/* Language string cache */
-static const char	lang_blank[] = "";
+static const char	*lang_blank = "";
 					/* Blank constant string */
 static const char * const lang_encodings[] =
 			{		/* Encoding strings */
-			  "us-ascii",
-			  "iso-8859-1",
-			  "iso-8859-2",
-			  "iso-8859-3",
-			  "iso-8859-4",
-			  "iso-8859-5",
-			  "iso-8859-6",
-			  "iso-8859-7",
-			  "iso-8859-8",
-			  "iso-8859-9",
-			  "iso-8859-10",
-			  "utf-8",
-			  "iso-8859-13",
-			  "iso-8859-14",
-			  "iso-8859-15",
-			  "windows-874",
-			  "windows-1250",
-			  "windows-1251",
-			  "windows-1252",
-			  "windows-1253",
-			  "windows-1254",
-			  "windows-1255",
-			  "windows-1256",
-			  "windows-1257",
-			  "windows-1258",
-			  "koi8-r",
-			  "koi8-u"
+			  "us-ascii",		"iso-8859-1",
+			  "iso-8859-2",		"iso-8859-3",
+			  "iso-8859-4",		"iso-8859-5",
+			  "iso-8859-6",		"iso-8859-7",
+			  "iso-8859-8",		"iso-8859-9",
+			  "iso-8859-10",	"utf-8",
+			  "iso-8859-13",	"iso-8859-14",
+			  "iso-8859-15",	"windows-874",
+			  "windows-1250",	"windows-1251",
+			  "windows-1252",	"windows-1253",
+			  "windows-1254",	"windows-1255",
+			  "windows-1256",	"windows-1257",
+			  "windows-1258",	"koi8-r",
+			  "koi8-u",		"iso-8859-11",
+			  "iso-8859-16",	"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "windows-932",	"windows-936",
+			  "windows-949",	"windows-950",
+			  "windows-1361",	"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "euc-cn",		"euc-jp",
+			  "euc-kr",		"euc-tw"
 			};
-static const char * const lang_default[] =
+static const char *const lang_default[] =
 			{		/* Default POSIX locale */
 #include "cups_C.h"
 			  NULL
@@ -115,11 +156,28 @@ static const char * const lang_default[] =
 
 
 /*
+ * 'cupsEncodingName()' - Return the character encoding name string
+ *                        for the given encoding enumeration.
+ */
+
+const char *				/* O - Character encoding */
+cupsEncodingName(cups_encoding_t encoding)
+					/* I - Encoding enum */
+{
+  if (encoding < 0 ||
+      encoding >= (sizeof(lang_encodings) / sizeof(const char *)))
+    return (lang_encodings[0]);
+  else
+    return (lang_encodings[encoding]);
+}
+
+
+/*
  * 'cupsLangEncoding()' - Return the character encoding (us-ascii, etc.)
  *                        for the given language.
  */
 
-char *					/* O - Character encoding */
+const char *				/* O - Character encoding */
 cupsLangEncoding(cups_lang_t *lang)	/* I - Language data */
 {
   if (lang == NULL)
@@ -208,35 +266,45 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   cups_lang_t		*lang;		/* Current language... */
   char			*oldlocale;	/* Old locale name */
   static const char * const locale_encodings[] =
-			{		/* Locale charset names */
-			  "ASCII",
-			  "ISO88591",
-			  "ISO88592",
-			  "ISO88593",
-			  "ISO88594",
-			  "ISO88595",
-			  "ISO88596",
-			  "ISO88597",
-			  "ISO88598",
-			  "ISO88599",
-			  "ISO885910",
-			  "UTF8",
-			  "ISO885913",
-			  "ISO885914",
-			  "ISO885915",
-			  "CP874",
-			  "CP1250",
-			  "CP1251",
-			  "CP1252",
-			  "CP1253",
-			  "CP1254",
-			  "CP1255",
-			  "CP1256",
-			  "CP1257",
-			  "CP1258",
-			  "KOI8R",
-			  "KOI8U"
-			};
+		{			/* Locale charset names */
+		  "ASCII",	"ISO88591",	"ISO88592",	"ISO88593",
+		  "ISO88594",	"ISO88595",	"ISO88596",	"ISO88597",
+		  "ISO88598",	"ISO88599",	"ISO885910",	"UTF8",
+		  "ISO885913",	"ISO885914",	"ISO885915",	"CP874",
+		  "CP1250",	"CP1251",	"CP1252",	"CP1253",
+		  "CP1254",	"CP1255",	"CP1256",	"CP1257",
+		  "CP1258",	"KOI8R",	"KOI8U",	"ISO885911",
+		  "ISO885916",	"",		"",		"",
+
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+
+		  "CP932",	"CP936",	"CP949",	"CP950",
+		  "CP1361",	"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+
+		  "EUCCN",	"EUCJP",	"EUCKR",	"EUCTW"
+		};
 
 
   DEBUG_printf(("cupsLangGet(language=\"%s\")\n", language ? language : "(null)"));
@@ -565,7 +633,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     if (lang->messages[i] != NULL && lang->messages[i] != lang_blank)
       free(lang->messages[i]);
 
-    lang->messages[i] = (char*)lang_blank;
+    lang->messages[i] = (char *)lang_blank;
   }
 
  /*
@@ -972,6 +1040,11 @@ cups_cache_lookup(const char      *name,/* I - Name of locale */
   */
 
   for (lang = lang_cache; lang != NULL; lang = lang->next)
+  {
+    DEBUG_printf(("cups_cache_lookup: lang=%p, language=\"%s\", encoding=%d(%s)\n",
+                  lang, lang->language, lang->encoding,
+		  lang_encodings[lang->encoding]));
+
     if (!strcmp(lang->language, name) &&
         (encoding == CUPS_AUTO_ENCODING || encoding == lang->encoding))
     {
@@ -981,6 +1054,7 @@ cups_cache_lookup(const char      *name,/* I - Name of locale */
 
       return (lang);
     }
+  }
 
   DEBUG_puts("cups_cache_lookup: returning NULL!");
 
@@ -989,5 +1063,5 @@ cups_cache_lookup(const char      *name,/* I - Name of locale */
 
 
 /*
- * End of "$Id: language.c,v 1.53 2005/01/03 19:29:45 mike Exp $".
+ * End of "$Id$".
  */

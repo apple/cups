@@ -1,5 +1,5 @@
 /*
- * "$Id: image.h,v 1.19 2005/01/03 19:29:57 mike Exp $"
+ * "$Id$"
  *
  *   Image library definitions for the Common UNIX Printing System (CUPS).
  *
@@ -245,5 +245,5 @@ extern void	ImageZoomFree(izoom_t *z);
 #endif /* !_IMAGE_H_ */
 
 /*
- * End of "$Id: image.h,v 1.19 2005/01/03 19:29:57 mike Exp $".
+ * End of "$Id$".
  */

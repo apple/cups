@@ -1,5 +1,5 @@
 #
-# "$Id: mime.types,v 1.31 2005/01/03 19:29:45 mike Exp $"
+# "$Id$"
 #
 #   MIME types file for the Common UNIX Printing System (CUPS).
 #
@@ -158,5 +158,5 @@ application/vnd.cups-raw	(string(0,<1B>E) + !string(2,<1B>%0B)) \
 #application/octet-stream
 
 #
-# End of "$Id: mime.types,v 1.31 2005/01/03 19:29:45 mike Exp $".
+# End of "$Id$".
 #

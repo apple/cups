@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.26 2005/01/03 19:30:00 mike Exp $"
+# "$Id$"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -47,6 +47,7 @@ echo ""
 echo "OK, now that we have the Dirty Harry quote out of the way, please"
 echo "choose the type of test you wish to perform:"
 echo ""
+echo "0 - No testing, keep the scheduler running for me (all systems)"
 echo "1 - Basic conformance test, no load testing (all systems)"
 echo "2 - Basic conformance test, some load testing (minimum 256MB VM, 50MB disk)"
 echo "3 - Basic conformance test, extreme load testing (minimum 1GB VM, 500MB disk)"
@@ -57,6 +58,12 @@ echo "Please enter the number of the test you wish to perform:"
 read testtype
 
 case "$testtype" in
+	0)
+		echo "Running in test mode (0)"
+		nprinters1=0
+		nprinters2=0
+		pjobs=0
+		;;
 	2)
 		echo "Running the medium tests (2)"
 		nprinters1=10
@@ -208,6 +215,11 @@ Deny from all
 Allow from 127.0.0.1
 Require valid-user
 </Location>
+<Policy default>
+<Limit All>
+Order Deny,Allow
+</Limit>
+</Policy>
 EOF
 
 touch /tmp/$user/classes.conf
@@ -304,9 +316,23 @@ export HOME
 
 echo "Starting scheduler:"
 echo "    $valgrind ../scheduler/cupsd -c /tmp/$user/cupsd.conf -f >/tmp/$user/log/debug_log &"
+echo ""
 
 $valgrind ../scheduler/cupsd -c /tmp/$user/cupsd.conf -f >/tmp/$user/log/debug_log &
 cupsd=$!
+
+#if test -x /usr/bin/strace; then
+#	# Trace system calls in cupsd if we have strace...
+#	/usr/bin/strace -tt -o /tmp/$user/log/cupsd.trace -p $cupsd &
+#fi
+
+if test "x$testtype" = x0; then
+	echo "Scheduler is PID $cupsd and is listening on port 8631."
+	echo ""
+	echo "Set the IPP_PORT environment variable to 8631 to test the software"
+	echo "interactively from the command-line."
+	exit 0
+fi
 
 echo "Scheduler is PID $cupsd; run debugger now if you need to."
 echo ""
@@ -329,7 +355,7 @@ done
 # Create the test report source file...
 #
 
-strfile=cups-str-1.1-`date +%Y-%m-%d`-`whoami`.shtml
+strfile=cups-str-1.2-`date +%Y-%m-%d`-`whoami`.shtml
 
 rm -f $strfile
 cat str-header.html >$strfile
@@ -431,6 +457,13 @@ echo "<PRE>" >>$strfile
 cat /tmp/$user/log/page_log >>$strfile
 echo "</PRE>" >>$strfile
 
+if test -f /tmp/$user/log/cupsd.trace; then
+	echo "<H2>cupsd.trace</H2>" >>$strfile
+	echo "<PRE>" >>$strfile
+	cat /tmp/$user/log/cupsd.trace >>$strfile
+	echo "</PRE>" >>$strfile
+fi
+
 #
 # Format the reports and tell the user where to find them...
 #
@@ -467,5 +500,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.26 2005/01/03 19:30:00 mike Exp $"
+# End of "$Id$"
 #

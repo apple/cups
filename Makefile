@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.50 2005/01/03 19:29:44 mike Exp $"
+# "$Id$"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2004 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -15,7 +15,7 @@
 #       Attn: CUPS Licensing Information
 #       Easy Software Products
 #       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636 USA
+#       Hollywood, Maryland 20636-3142 USA
 #
 #       Voice: (301) 373-9600
 #       EMail: cups-info@cups.org
@@ -114,6 +114,7 @@ install:	installhdrs
 		fi \
 	fi
 
+
 #
 # Install source and header files...
 #
@@ -166,5 +167,5 @@ tardist:
 	epm $(EPMFLAGS) -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.50 2005/01/03 19:29:44 mike Exp $".
+# End of "$Id$".
 #

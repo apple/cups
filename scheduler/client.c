@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.197 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -87,8 +87,9 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   int			count;	/* Count of connections on a host */
   int			val;	/* Parameter value */
   client_t		*con;	/* New client pointer */
-  unsigned		address;/* Address of client */
-  struct hostent	*host;	/* Host entry for address */
+  const struct hostent	*host;	/* Host entry for address */
+  char			*hostname;/* Hostname for address */
+  http_addr_t		temp;	/* Temporary address variable */
   static time_t		last_dos = 0;
 				/* Time of last DoS attack */
 
@@ -127,7 +128,12 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
     return;
   }
 
-  con->http.hostaddr.sin_port = lis->address.sin_port;
+#ifdef AF_INET6
+  if (lis->address.addr.sa_family == AF_INET6)
+    con->http.hostaddr.ipv6.sin6_port = lis->address.ipv6.sin6_port;
+  else
+#endif /* AF_INET6 */
+  con->http.hostaddr.ipv4.sin_port = lis->address.ipv4.sin_port;
 
  /*
   * Check the number of clients on the same address...
@@ -135,11 +141,11 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 
   for (i = 0, count = 0; i < NumClients; i ++)
     if (memcmp(&(Clients[i].http.hostaddr), &(con->http.hostaddr),
-               sizeof(con->http.hostaddr)) == 0)
+	       sizeof(con->http.hostaddr)) == 0)
     {
       count ++;
       if (count >= MaxClientsPerHost)
-        break;
+	break;
     }
 
   if (count >= MaxClientsPerHost)
@@ -148,7 +154,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
     {
       last_dos = time(NULL);
       LogMessage(L_WARN, "Possible DoS attack - more than %d clients connecting from %s!",
-        	 MaxClientsPerHost, Clients[i].http.hostname);
+	         MaxClientsPerHost, Clients[i].http.hostname);
     }
 
 #ifdef WIN32
@@ -164,20 +170,17 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   * Get the hostname or format the IP address as needed...
   */
 
-  address = ntohl(con->http.hostaddr.sin_addr.s_addr);
-
   if (HostNameLookups)
-#ifndef __sgi
-    host = gethostbyaddr((char *)&(con->http.hostaddr.sin_addr),
-                         sizeof(struct in_addr), AF_INET);
-#else
-    host = gethostbyaddr(&(con->http.hostaddr.sin_addr),
-                         sizeof(struct in_addr), AF_INET);
-#endif /* !__sgi */
+    hostname = httpAddrLookup(&(con->http.hostaddr), con->http.hostname,
+                              sizeof(con->http.hostname));
   else
-    host = NULL;
+  {
+    hostname = NULL;
+    httpAddrString(&(con->http.hostaddr), con->http.hostname,
+                   sizeof(con->http.hostname));
+  }
 
-  if (address == 0x7f000001)
+  if (httpAddrLocalhost(&(con->http.hostaddr)))
   {
    /*
     * Map accesses from the loopback interface to "localhost"...
@@ -185,7 +188,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 
     strlcpy(con->http.hostname, "localhost", sizeof(con->http.hostname));
   }
-  else if (con->http.hostaddr.sin_addr.s_addr == ServerAddr.sin_addr.s_addr)
+  else if (httpAddrEqual(&(con->http.hostaddr), &ServerAddr))
   {
    /*
     * Map accesses from the same host to the server name.
@@ -193,30 +196,26 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 
     strlcpy(con->http.hostname, ServerName, sizeof(con->http.hostname));
   }
-  else if (host == NULL)
-  {
-    sprintf(con->http.hostname, "%d.%d.%d.%d", (address >> 24) & 255,
-            (address >> 16) & 255, (address >> 8) & 255, address & 255);
 
-    if (HostNameLookups == 2)
-    {
-     /*
-      * Can't have an unresolved IP address with double-lookups enabled...
-      */
+  if (hostname == NULL && HostNameLookups == 2)
+  {
+   /*
+    * Can't have an unresolved IP address with double-lookups enabled...
+    */
+
+    LogMessage(L_DEBUG2, "AcceptClient: Closing connection %d...",
+               con->http.fd);
 
 #ifdef WIN32
-      closesocket(con->http.fd);
+    closesocket(con->http.fd);
 #else
-      close(con->http.fd);
+    close(con->http.fd);
 #endif /* WIN32 */
 
-      LogMessage(L_WARN, "Name lookup failed - connection from %s closed!",
-                 con->http.hostname);
-      return;
-    }
+    LogMessage(L_WARN, "Name lookup failed - connection from %s closed!",
+               con->http.hostname);
+    return;
   }
-  else
-    strlcpy(con->http.hostname, host->h_name, sizeof(con->http.hostname));
 
   if (HostNameLookups == 2)
   {
@@ -227,13 +226,13 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
     if ((host = httpGetHostByName(con->http.hostname)) != NULL)
     {
      /*
-      * See if the hostname maps to the IP address...
+      * See if the hostname maps to the same IP address...
       */
 
-      if (host->h_length != 4 || host->h_addrtype != AF_INET)
+      if (host->h_addrtype != con->http.hostaddr.addr.sa_family)
       {
        /*
-        * Not an IPv4 address...
+        * Not the right type of address...
 	*/
 
 	host = NULL;
@@ -245,8 +244,12 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 	*/
 
 	for (i = 0; host->h_addr_list[i]; i ++)
-          if (memcmp(&(con->http.hostaddr.sin_addr), host->h_addr_list[i], 4) == 0)
+	{
+	  httpAddrLoad(host, 0, i, &temp);
+
+          if (httpAddrEqual(&(con->http.hostaddr), &temp))
 	    break;
+        }
 
         if (!host->h_addr_list[i])
 	  host = NULL;
@@ -260,6 +263,9 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
       * with double-lookups enabled...
       */
 
+      LogMessage(L_DEBUG2, "AcceptClient: Closing connection %d...",
+        	 con->http.fd);
+
 #ifdef WIN32
       closesocket(con->http.fd);
 #else
@@ -272,8 +278,14 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
     }
   }
 
+#ifdef AF_INET6
+  if (con->http.hostaddr.addr.sa_family == AF_INET6)
+    LogMessage(L_DEBUG, "AcceptClient: %d from %s:%d.", con->http.fd,
+               con->http.hostname, ntohs(con->http.hostaddr.ipv6.sin6_port));
+  else
+#endif /* AF_INET6 */
   LogMessage(L_DEBUG, "AcceptClient: %d from %s:%d.", con->http.fd,
-             con->http.hostname, ntohs(con->http.hostaddr.sin_port));
+             con->http.hostname, ntohs(con->http.hostaddr.ipv4.sin_port));
 
  /*
   * Using TCP_NODELAY improves responsiveness, especially on systems
@@ -449,7 +461,7 @@ CloseClient(client_t *con)	/* I - Client to close */
       close(con->http.fd);
       FD_CLR(con->http.fd, InputSet);
       FD_CLR(con->http.fd, OutputSet);
-      con->http.fd = 0;
+      con->http.fd = -1;
     }
   }
 
@@ -1179,6 +1191,11 @@ ReadClient(client_t *con)		/* I - Client to read from */
 #endif /* HAVE_SSL */
       }
 
+      if (con->http.expect)
+      {
+        /**** TODO: send expected header ****/
+      }
+
       if (!SendHeader(con, HTTP_OK, NULL))
 	return (CloseClient(con));
 
@@ -1226,6 +1243,11 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	           con->uri);
 	SendError(con, status);
 	return (CloseClient(con));
+      }
+
+      if (con->http.expect)
+      {
+        /**** TODO: send expected header ****/
       }
 
       switch (con->http.state)
@@ -1696,6 +1718,9 @@ ReadClient(client_t *con)		/* I - Client to read from */
             LogMessage(L_ERROR, "ReadClient: Unable to write %d bytes to %s: %s",
 	               bytes, con->filename, strerror(errno));
 
+	    LogMessage(L_DEBUG2, "ReadClient: Closing data file %d...",
+        	       con->file);
+
 	    close(con->file);
 	    con->file = -1;
 	    unlink(con->filename);
@@ -1815,6 +1840,9 @@ ReadClient(client_t *con)		/* I - Client to read from */
 	    {
               LogMessage(L_ERROR, "ReadClient: Unable to write %d bytes to %s: %s",
 	        	 bytes, con->filename, strerror(errno));
+
+	      LogMessage(L_DEBUG2, "ReadClient: Closing file %d...",
+        		 con->file);
 
 	      close(con->file);
 	      con->file = -1;
@@ -2165,129 +2193,23 @@ SendHeader(client_t    *con,	/* I - Client to send to */
 void
 UpdateCGI(void)
 {
-  int		bytes;		/* Number of bytes read */
-  char		*lineptr,	/* Pointer to end of line in buffer */
-		*message;	/* Pointer to message text */
-  int		loglevel;	/* Log level for message */
-  static int	bufused = 0;	/* Number of bytes used in buffer */
-  static char	buffer[1024];	/* Status buffer */
+  char		*ptr,			/* Pointer to end of line in buffer */
+		message[1024];		/* Pointer to message text */
+  int		loglevel;		/* Log level for message */
 
 
-  if ((bytes = read(CGIPipes[0], buffer + bufused,
-                    sizeof(buffer) - bufused - 1)) > 0)
-  {
-    bufused += bytes;
-    buffer[bufused] = '\0';
-    lineptr = strchr(buffer, '\n');
-  }
-  else if (bytes < 0 && errno == EINTR)
-    return;
-  else
-  {
-    lineptr    = buffer + bufused;
-    lineptr[1] = 0;
-  }
+  while ((ptr = cupsdStatBufUpdate(CGIStatusBuffer, &loglevel,
+                                   message, sizeof(message))) != NULL)
+    if (!strchr(CGIStatusBuffer->buffer, '\n'))
+      break;
 
-  if (bytes == 0 && bufused == 0)
-    lineptr = NULL;
-
-  while (lineptr != NULL)
-  {
-   /*
-    * Terminate each line and process it...
-    */
-
-    *lineptr++ = '\0';
-
-   /*
-    * Figure out the logging level...
-    */
-
-    if (strncmp(buffer, "EMERG:", 6) == 0)
-    {
-      loglevel = L_EMERG;
-      message  = buffer + 6;
-    }
-    else if (strncmp(buffer, "ALERT:", 6) == 0)
-    {
-      loglevel = L_ALERT;
-      message  = buffer + 6;
-    }
-    else if (strncmp(buffer, "CRIT:", 5) == 0)
-    {
-      loglevel = L_CRIT;
-      message  = buffer + 5;
-    }
-    else if (strncmp(buffer, "ERROR:", 6) == 0)
-    {
-      loglevel = L_ERROR;
-      message  = buffer + 6;
-    }
-    else if (strncmp(buffer, "WARNING:", 8) == 0)
-    {
-      loglevel = L_WARN;
-      message  = buffer + 8;
-    }
-    else if (strncmp(buffer, "NOTICE:", 6) == 0)
-    {
-      loglevel = L_NOTICE;
-      message  = buffer + 6;
-    }
-    else if (strncmp(buffer, "INFO:", 5) == 0)
-    {
-      loglevel = L_INFO;
-      message  = buffer + 5;
-    }
-    else if (strncmp(buffer, "DEBUG:", 6) == 0)
-    {
-      loglevel = L_DEBUG;
-      message  = buffer + 6;
-    }
-    else if (strncmp(buffer, "DEBUG2:", 7) == 0)
-    {
-      loglevel = L_DEBUG2;
-      message  = buffer + 7;
-    }
-    else if (strncmp(buffer, "PAGE:", 5) == 0)
-    {
-      loglevel = L_PAGE;
-      message  = buffer + 5;
-    }
-    else
-    {
-      loglevel = L_DEBUG;
-      message  = buffer;
-    }
-
-   /*
-    * Skip leading whitespace in the message...
-    */
-
-    while (isspace(*message))
-      message ++;
-
-    LogMessage(loglevel, "[CGI] %s", message);
-
-   /*
-    * Copy over the buffer data we've used up...
-    */
-
-    strcpy(buffer, lineptr);
-    bufused -= lineptr - buffer;
-
-    if (bufused < 0)
-      bufused = 0;
-
-    lineptr = strchr(buffer, '\n');
-  }
-
-  if (bytes <= 0)
+  if (ptr == NULL)
   {
    /*
     * Fatal error on pipe - should never happen!
     */
 
-    LogMessage(L_ERROR, "UpdateCGI: error reading from CGI error pipe - %s",
+    LogMessage(L_CRIT, "UpdateCGI: error reading from CGI error pipe - %s",
                strerror(errno));
   }
 }
@@ -2969,39 +2891,48 @@ pipe_command(client_t *con,		/* I - Client connection */
 		tmpdir[1024],		/* TMPDIR environment variable */
 		vg_args[1024],		/* VG_ARGS environment variable */
 		ld_assume_kernel[1024];	/* LD_ASSUME_KERNEL environment variable */
-  unsigned	address;		/* Address of client */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* POSIX signal handler */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
   static const char * const locale_encodings[] =
 		{			/* Locale charset names */
-		  "ASCII",
-		  "ISO8859-1",
-		  "ISO8859-2",
-		  "ISO8859-3",
-		  "ISO8859-4",
-		  "ISO8859-5",
-		  "ISO8859-6",
-		  "ISO8859-7",
-		  "ISO8859-8",
-		  "ISO8859-9",
-		  "ISO8859-10",
-		  "UTF-8",
-		  "ISO8859-13",
-		  "ISO8859-14",
-		  "ISO8859-15",
-		  "CP874",
-		  "CP1250",
-		  "CP1251",
-		  "CP1252",
-		  "CP1253",
-		  "CP1254",
-		  "CP1255",
-		  "CP1256",
-		  "CP1257",
-		  "CP1258",
-		  "KOI8R",
-		  "KOI8U"
+		  "ASCII",	"ISO8859-1",	"ISO8859-2",	"ISO8859-3",
+		  "ISO8859-4",	"ISO8859-5",	"ISO8859-6",	"ISO8859-7",
+		  "ISO8859-8",	"ISO8859-9",	"ISO8859-10",	"UTF-8",
+		  "ISO8859-13",	"ISO8859-14",	"ISO8859-15",	"CP874",
+		  "CP1250",	"CP1251",	"CP1252",	"CP1253",
+		  "CP1254",	"CP1255",	"CP1256",	"CP1257",
+		  "CP1258",	"KOI8R",	"KOI8U",	"ISO8859-11",
+		  "ISO8859-16",	"",		"",		"",
+
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+
+		  "CP932",	"CP936",	"CP949",	"CP950",
+		  "CP1361",	"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+		  "",		"",		"",		"",
+
+		  "EUC-CN",	"EUC-JP",	"EUC-KR",	"EUC-TW"
 		};
   static const char * const encryptions[] =
 		{
@@ -3116,8 +3047,6 @@ pipe_command(client_t *con,		/* I - Client connection */
   * Setup the environment variables as needed...
   */
 
-  address = ntohl(con->http.hostaddr.sin_addr.s_addr);
-
   if (con->language)
     snprintf(lang, sizeof(lang), "LANG=%s.%s", con->language->language,
              locale_encodings[con->language->encoding]);
@@ -3125,15 +3054,23 @@ pipe_command(client_t *con,		/* I - Client connection */
     strcpy(lang, "LANG=C");
 
   sprintf(ipp_port, "IPP_PORT=%d", LocalPort);
-  sprintf(server_port, "SERVER_PORT=%d", ntohs(con->http.hostaddr.sin_port));
-  if (!strcmp(con->http.hostname, "localhost"))
+#ifdef AF_INET6
+  if (con->http.hostaddr.addr.sa_family == AF_INET6)
+    sprintf(server_port, "SERVER_PORT=%d",
+            ntohs(con->http.hostaddr.ipv6.sin6_port));
+  else
+#endif /* AF_INET6 */
+    sprintf(server_port, "SERVER_PORT=%d",
+            ntohs(con->http.hostaddr.ipv4.sin_port));
+
+  if (strcmp(con->http.hostname, "localhost") == 0)
     strlcpy(server_name, "SERVER_NAME=localhost", sizeof(server_name));
   else
     snprintf(server_name, sizeof(server_name), "SERVER_NAME=%s", ServerName);
   snprintf(remote_host, sizeof(remote_host), "REMOTE_HOST=%s", con->http.hostname);
-  snprintf(remote_addr, sizeof(remote_addr), "REMOTE_ADDR=%d.%d.%d.%d",
-           (address >> 24) & 255, (address >> 16) & 255,
-	   (address >> 8) & 255, address & 255);
+  strcpy(remote_addr, "REMOTE_ADDR=");
+  httpAddrString(&(con->http.hostaddr), remote_addr + 12,
+                 sizeof(remote_addr) - 12);
   snprintf(remote_user, sizeof(remote_user), "REMOTE_USER=%s", con->username);
   snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
   snprintf(cups_datadir, sizeof(cups_datadir), "CUPS_DATADIR=%s", DataDir);
@@ -3232,6 +3169,8 @@ pipe_command(client_t *con,		/* I - Client connection */
 
   if (con->operation == HTTP_GET)
   {
+    for (i = 0; i < argc; i ++)
+      LogMessage(L_DEBUG2, "argv[%d] = \"%s\"", i, argv[i]);
     envp[envc ++] = "REQUEST_METHOD=GET";
 
     if (query_string)
@@ -3467,5 +3406,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.197 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

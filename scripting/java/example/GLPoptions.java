@@ -6,7 +6,7 @@ import javax.swing.filechooser.*;
 import java.net.URL;
 import java.net.*;
 import java.io.*;
-import org.cups.*;
+import com.easysw.cups.*;
 
 public class GLPoptions implements ActionListener 
 {

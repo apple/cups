@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.35 2005/01/03 19:29:57 mike Exp $"
+ * "$Id$"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
@@ -771,5 +771,5 @@ flush_tile(image_t *img)	/* I - Image */
 
 
 /*
- * End of "$Id: image.c,v 1.35 2005/01/03 19:29:57 mike Exp $".
+ * End of "$Id$".
  */

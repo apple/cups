@@ -2,7 +2,7 @@
 //
 // CMap.cc
 //
-// Copyright 2001-2003 Glyph & Cog, LLC
+// Copyright 2001-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -160,7 +160,7 @@ CMap::CMap(GString *collectionA, GString *cMapNameA, int wModeA) {
 #endif
 }
 
-void CMap::useCMap(CMapCache *cache, const char *useName) {
+void CMap::useCMap(CMapCache *cache, char *useName) {
   GString *useNameStr;
   CMap *subCMap;
 
@@ -303,7 +303,7 @@ GBool CMap::match(GString *collectionA, GString *cMapNameA) {
   return !collection->cmp(collectionA) && !cMapName->cmp(cMapNameA);
 }
 
-CID CMap::getCID(const char *s, int len, int *nUsed) {
+CID CMap::getCID(char *s, int len, int *nUsed) {
   CMapVectorEntry *vec;
   int n, i;
 

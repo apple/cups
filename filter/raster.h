@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.h,v 1.10 2005/01/03 19:29:58 mike Exp $"
+ * "$Id$"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -25,8 +25,8 @@
  *
  *   This code and any derivative of it may be used and distributed
  *   freely under the terms of the GNU General Public License when
- *   used with GNU/GPL Ghostscript or its derivatives.  Use of the code
- *   (or any derivative of it) with software other than GNU/GPL
+ *   used with GNU/GPL Ghostscript or its derivatives.  Use of the
+ *   code (or any derivative of it) with software other than GNU/GPL
  *   GhostScript (or its derivatives) is governed by the CUPS license
  *   agreement.
  *
@@ -36,25 +36,35 @@
 #ifndef _CUPS_RASTER_H_
 #  define _CUPS_RASTER_H_
 
+/*
+ * Include necessary headers...
+ */
+
+#  include <cups/ppd.h>
+
 #  ifdef __cplusplus
 extern "C" {
 #  endif /* __cplusplus */
 
 /*
- * Every non-PostScript printer driver that supports raster images should
- * use the application/vnd.cups-raster image file format.  Since both the
- * PostScript RIP (pstoraster, based on GNU Ghostscript) and Image RIP
- * (imagetoraster, located in the filter directory) use it, using this format
- * saves you a lot of work.  Also, the PostScript RIP passes any printer
- * options that are in a PS file to your driver this way as well...
+ * Every non-PostScript printer driver that supports raster images
+ * should use the application/vnd.cups-raster image file format.
+ * Since both the PostScript RIP (pstoraster, based on GNU/GPL
+ * Ghostscript) and Image RIP (imagetoraster, located in the filter
+ * directory) use it, using this format saves you a lot of work.
+ * Also, the PostScript RIP passes any printer options that are in
+ * a PS file to your driver this way as well...
  */
 
 /*
  * Constants...
  */
 
-#  define CUPS_RASTER_SYNC	0x52615374	/* RaSt */
-#  define CUPS_RASTER_REVSYNC	0x74536152	/* tSaR */
+#  define CUPS_RASTER_SYNC	0x52615332	/* RaS2 */
+#  define CUPS_RASTER_REVSYNC	0x32536152	/* 2SaR */
+
+#  define CUPS_RASTER_SYNCv1	0x52615374	/* RaSt */
+#  define CUPS_RASTER_REVSYNCv1	0x74536152	/* tSaR */
 
 
 /*
@@ -175,9 +185,12 @@ typedef enum
  * The page header structure contains the standard PostScript page device
  * dictionary, along with some CUPS-specific parameters that are provided
  * by the RIPs...
+ *
+ * The API supports a "version 1" (from CUPS 1.0 and 1.1) and a "version 2"
+ * (from CUPS 1.2 and higher) page header, for binary compatibility.
  */
 
-typedef struct
+typedef struct				/**** Version 1 Page Header ****/
 {
   /**** Standard Page Device Dictionary String Values ****/
   char		MediaClass[64];		/* MediaClass string */
@@ -226,6 +239,63 @@ typedef struct
 } cups_page_header_t;
 
 
+typedef struct				/**** Version 2 Page Header ****/
+{
+  /**** Standard Page Device Dictionary String Values ****/
+  char		MediaClass[64];		/* MediaClass string */
+  char		MediaColor[64];		/* MediaColor string */
+  char		MediaType[64];		/* MediaType string */
+  char		OutputType[64];		/* OutputType string */
+
+  /**** Standard Page Device Dictionary Integer Values ****/
+  unsigned	AdvanceDistance;	/* AdvanceDistance value in points */
+  cups_adv_t	AdvanceMedia;		/* AdvanceMedia value (see above) */
+  cups_bool_t	Collate;		/* Collated copies value */
+  cups_cut_t	CutMedia;		/* CutMedia value (see above) */
+  cups_bool_t	Duplex;			/* Duplexed (double-sided) value */
+  unsigned	HWResolution[2];	/* Resolution in dots-per-inch */
+  unsigned	ImagingBoundingBox[4];	/* Pixel region that is painted (points) */
+  cups_bool_t	InsertSheet;		/* InsertSheet value */
+  cups_jog_t	Jog;			/* Jog value (see above) */
+  cups_edge_t	LeadingEdge;		/* LeadingEdge value (see above) */
+  unsigned	Margins[2];		/* Lower-lefthand margins in points */
+  cups_bool_t	ManualFeed;		/* ManualFeed value */
+  unsigned	MediaPosition;		/* MediaPosition value */
+  unsigned	MediaWeight;		/* MediaWeight value in grams/m^2 */
+  cups_bool_t	MirrorPrint;		/* MirrorPrint value */
+  cups_bool_t	NegativePrint;		/* NegativePrint value */
+  unsigned	NumCopies;		/* Number of copies to produce */
+  cups_orient_t	Orientation;		/* Orientation value (see above) */
+  cups_bool_t	OutputFaceUp;		/* OutputFaceUp value */
+  unsigned	PageSize[2];		/* Width and length of page in points */
+  cups_bool_t	Separations;		/* Separations value */
+  cups_bool_t	TraySwitch;		/* TraySwitch value */
+  cups_bool_t	Tumble;			/* Tumble value */
+
+  /**** CUPS Page Device Dictionary Values ****/
+  unsigned	cupsWidth;		/* Width of page image in pixels */
+  unsigned	cupsHeight;		/* Height of page image in pixels */
+  unsigned	cupsMediaType;		/* Media type code */
+  unsigned	cupsBitsPerColor;	/* Number of bits for each color */
+  unsigned	cupsBitsPerPixel;	/* Number of bits for each pixel */
+  unsigned	cupsBytesPerLine;	/* Number of bytes per line */
+  cups_order_t	cupsColorOrder;		/* Order of colors */
+  cups_cspace_t	cupsColorSpace;		/* True colorspace */
+  unsigned	cupsCompression;	/* Device compression to use */
+  unsigned	cupsRowCount;		/* Rows per band */
+  unsigned	cupsRowFeed;		/* Feed between bands */
+  unsigned	cupsRowStep;		/* Spacing between lines */
+
+  /**** Version 2 Dictionary Values ****/
+  unsigned	cupsNumColors;		/* Number of colors */
+  unsigned	cupsInteger[16];	/* User-defined integer values */
+  float		cupsReal[16];		/* User-defined floating-point values */
+  char		cupsString[16][64];	/* User-defined string values */
+  char		cupsMarkerType[64];	/* Ink/toner type */
+  char		cupsRenderingIntent[64];/* Color rendering intent */
+} cups_page_header2_t;
+
+
 /*
  * The raster structure maintains information about a raster data
  * stream...
@@ -233,9 +303,16 @@ typedef struct
 
 typedef struct
 {
-  unsigned	sync;			/* Sync word from start of stream */
-  int		fd;			/* File descriptor */
-  cups_mode_t	mode;			/* Read/write mode */
+  unsigned		sync;		/* Sync word from start of stream */
+  int			fd;		/* File descriptor */
+  cups_mode_t		mode;		/* Read/write mode */
+  cups_page_header2_t	header;		/* Raster header for current page */
+  int			count,		/* Current row run-length count */
+			remaining,	/* Remaining rows in page image */
+			bpp;		/* Bytes per pixel/color */
+  unsigned char		*pixels,	/* Pixels for current row */
+			*pend,		/* End of pixel buffer */
+			*pcurrent;	/* Current byte in pixel buffer */
 } cups_raster_t;
 
 
@@ -244,15 +321,22 @@ typedef struct
  */
 
 extern void		cupsRasterClose(cups_raster_t *r);
+extern int		cupsRasterInterpretPPD(cups_page_header2_t *h,
+			                       ppd_file_t *ppd);
 extern cups_raster_t	*cupsRasterOpen(int fd, cups_mode_t mode);
 extern unsigned		cupsRasterReadHeader(cups_raster_t *r,
 			                     cups_page_header_t *h);
+extern unsigned		cupsRasterReadHeader2(cups_raster_t *r,
+			                      cups_page_header2_t *h);
 extern unsigned		cupsRasterReadPixels(cups_raster_t *r,
 			                     unsigned char *p, unsigned len);
 extern unsigned		cupsRasterWriteHeader(cups_raster_t *r,
 			                      cups_page_header_t *h);
+extern unsigned		cupsRasterWriteHeader2(cups_raster_t *r,
+			                       cups_page_header2_t *h);
 extern unsigned		cupsRasterWritePixels(cups_raster_t *r,
 			                      unsigned char *p, unsigned len);
+
 
 #  ifdef __cplusplus
 }
@@ -261,5 +345,5 @@ extern unsigned		cupsRasterWritePixels(cups_raster_t *r,
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h,v 1.10 2005/01/03 19:29:58 mike Exp $".
+ * End of "$Id$".
  */

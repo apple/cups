@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.h,v 1.14 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   MIME type/conversion database definitions for the Common UNIX Printing System (CUPS).
  *
@@ -143,5 +143,5 @@ extern mime_filter_t	*mimeFilter(mime_t *mime, mime_type_t *src, mime_type_t *ds
 #endif /* !_CUPS_MIME_H_ */
 
 /*
- * End of "$Id: mime.h,v 1.14 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

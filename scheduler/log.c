@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.43 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -525,5 +525,5 @@ check_log_file(cups_file_t **log,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c,v 1.43 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cert.c,v 1.22 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   Authentication certificate routines for the Common UNIX
  *   Printing System (CUPS).
@@ -293,5 +293,5 @@ InitCerts(void)
 
 
 /*
- * End of "$Id: cert.c,v 1.22 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

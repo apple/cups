@@ -1,5 +1,5 @@
 /*
- * "$Id: template.c,v 1.32 2005/01/03 19:29:45 mike Exp $"
+ * "$Id$"
  *
  *   CGI template function.
  *
@@ -488,5 +488,5 @@ cgi_puts(const char *s,
 
 
 /*
- * End of "$Id: template.c,v 1.32 2005/01/03 19:29:45 mike Exp $".
+ * End of "$Id$".
  */

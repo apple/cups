@@ -1,5 +1,5 @@
 /*
- * "$Id: string.c,v 1.14 2005/01/03 19:29:45 mike Exp $"
+ * "$Id$"
  *
  *   String functions for the Common UNIX Printing System (CUPS).
  *
@@ -222,5 +222,5 @@ cups_strlcpy(char       *dst,	/* O - Destination string */
 
 
 /*
- * End of "$Id: string.c,v 1.14 2005/01/03 19:29:45 mike Exp $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.123 2005/01/03 19:29:45 mike Exp $"
+ * "$Id$"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -1708,5 +1708,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.123 2005/01/03 19:29:45 mike Exp $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-darwin.c,v 1.4 2005/01/03 19:29:44 mike Exp $"
+ * "$Id$"
  *
  *   USB port on Darwin backend for the Common UNIX Printing System (CUPS).
  *
@@ -1895,5 +1895,5 @@ static CFStringRef CreateEncodedCFString(CFStringRef string)
 }
 
 /*
- * End of "$Id: usb-darwin.c,v 1.4 2005/01/03 19:29:44 mike Exp $".
+ * End of "$Id$".
  */

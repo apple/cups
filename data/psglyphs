@@ -11,7 +11,7 @@
 002a asterisk
 002b plus
 002c comma
-002d hyphen
+002d minus
 002e period
 002f slash
 0030 zero
@@ -106,7 +106,7 @@
 00aa ordfeminine
 00ab guillemotleft
 00ac logicalnot
-00ad minus
+00ad hyphen
 00ae registered
 00af macron
 00b0 degree

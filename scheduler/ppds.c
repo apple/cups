@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.37 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -777,5 +777,5 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * End of "$Id: ppds.c,v 1.37 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

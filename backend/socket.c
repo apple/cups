@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.43 2005/01/03 19:29:44 mike Exp $"
+ * "$Id$"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -414,5 +414,5 @@ print_backchannel(const unsigned char *buffer,	/* I - Data buffer */
 
 
 /*
- * End of "$Id: socket.c,v 1.43 2005/01/03 19:29:44 mike Exp $".
+ * End of "$Id$".
  */

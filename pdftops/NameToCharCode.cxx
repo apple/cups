@@ -2,7 +2,7 @@
 //
 // NameToCharCode.cc
 //
-// Copyright 2001-2003 Glyph & Cog, LLC
+// Copyright 2001-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -47,7 +47,7 @@ NameToCharCode::~NameToCharCode() {
   gfree(tab);
 }
 
-void NameToCharCode::add(const char *name, CharCode c) {
+void NameToCharCode::add(char *name, CharCode c) {
   NameToCharCodeEntry *oldTab;
   int h, i, oldSize;
 
@@ -89,7 +89,7 @@ void NameToCharCode::add(const char *name, CharCode c) {
   ++len;
 }
 
-CharCode NameToCharCode::lookup(const char *name) {
+CharCode NameToCharCode::lookup(char *name) {
   int h;
 
   h = hash(name);
@@ -104,8 +104,8 @@ CharCode NameToCharCode::lookup(const char *name) {
   return 0;
 }
 
-int NameToCharCode::hash(const char *name) {
-  const char *p;
+int NameToCharCode::hash(char *name) {
+  char *p;
   unsigned int h;
 
   h = 0;

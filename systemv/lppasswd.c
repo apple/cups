@@ -1,5 +1,5 @@
 /*
- * "$Id: lppasswd.c,v 1.19 2005/02/07 00:15:04 mike Exp $"
+ * "$Id$"
  *
  *   MD5 password program for the Common UNIX Printing System (CUPS).
  *
@@ -494,5 +494,5 @@ usage(FILE *fp)		/* I - File to send usage to */
 
 
 /*
- * End of "$Id: lppasswd.c,v 1.19 2005/02/07 00:15:04 mike Exp $".
+ * End of "$Id$".
  */

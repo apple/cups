@@ -2,7 +2,7 @@
 //
 // OutputDev.h
 //
-// Copyright 1996-2003 Glyph & Cog, LLC
+// Copyright 1996-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -22,6 +22,9 @@ class GString;
 class GfxState;
 class GfxColorSpace;
 class GfxImageColorMap;
+class GfxFunctionShading;
+class GfxAxialShading;
+class GfxRadialShading;
 class Stream;
 class Link;
 class Catalog;
@@ -47,6 +50,16 @@ public:
 
   // Does this device use drawChar() or drawString()?
   virtual GBool useDrawChar() = 0;
+
+  // Does this device use tilingPatternFill()?  If this returns false,
+  // tiling pattern fills will be reduced to a series of other drawing
+  // operations.
+  virtual GBool useTilingPatternFill() { return gFalse; }
+
+  // Does this device use functionShadedFill(), axialShadedFill(), and
+  // radialShadedFill()?  If this returns false, these shaded fills
+  // will be reduced to a series of other drawing operations.
+  virtual GBool useShadedFills() { return gFalse; }
 
   // Does this device use beginType3Char/endType3Char?  Otherwise,
   // text in Type 3 fonts will be drawn with drawChar/drawString.
@@ -92,6 +105,8 @@ public:
   virtual void updateLineCap(GfxState *state) {}
   virtual void updateMiterLimit(GfxState *state) {}
   virtual void updateLineWidth(GfxState *state) {}
+  virtual void updateFillColorSpace(GfxState *state) {}
+  virtual void updateStrokeColorSpace(GfxState *state) {}
   virtual void updateFillColor(GfxState *state) {}
   virtual void updateStrokeColor(GfxState *state) {}
   virtual void updateFillOpacity(GfxState *state) {}
@@ -112,6 +127,15 @@ public:
   virtual void stroke(GfxState *state) {}
   virtual void fill(GfxState *state) {}
   virtual void eoFill(GfxState *state) {}
+  virtual void tilingPatternFill(GfxState *state, Object *str,
+				 int paintType, Dict *resDict,
+				 double *mat, double *bbox,
+				 int x0, int y0, int x1, int y1,
+				 double xStep, double yStep) {}
+  virtual void functionShadedFill(GfxState *state,
+				  GfxFunctionShading *shading) {}
+  virtual void axialShadedFill(GfxState *state, GfxAxialShading *shading) {}
+  virtual void radialShadedFill(GfxState *state, GfxRadialShading *shading) {}
 
   //----- path clipping
   virtual void clip(GfxState *state) {}
@@ -125,7 +149,8 @@ public:
 			double originX, double originY,
 			CharCode code, Unicode *u, int uLen) {}
   virtual void drawString(GfxState *state, GString *s) {}
-  virtual GBool beginType3Char(GfxState *state,
+  virtual GBool beginType3Char(GfxState *state, double x, double y,
+			       double dx, double dy,
 			       CharCode code, Unicode *u, int uLen);
   virtual void endType3Char(GfxState *state) {}
   virtual void endTextObject(GfxState *state) {}
@@ -137,6 +162,11 @@ public:
   virtual void drawImage(GfxState *state, Object *ref, Stream *str,
 			 int width, int height, GfxImageColorMap *colorMap,
 			 int *maskColors, GBool inlineImg);
+  virtual void drawMaskedImage(GfxState *state, Object *ref, Stream *str,
+			       int width, int height,
+			       GfxImageColorMap *colorMap,
+			       Stream *maskStr, int maskWidth, int maskHeight,
+			       GBool maskInvert);
 
 #if OPI_SUPPORT
   //----- OPI functions

@@ -3,8 +3,8 @@
 <HEAD>
 <TITLE>CUPS Software Users Manual</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
-<META NAME="copyright" CONTENT="Copyright 1997-2005, All Rights Reserved">
-<META NAME="docnumber" CONTENT="CUPS-SUM-1.1.23">
+<META NAME="copyright" CONTENT="Copyright 1997-2003, All Rights Reserved">
+<META NAME="docnumber" CONTENT="CUPS-SUM-1.2.0">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
 <STYLE TYPE="text/css"><!--
 BODY { font-family: serif }
@@ -19,14 +19,14 @@ SUP { font-size: smaller }
 PRE { font-family: monospace }
 --></STYLE>
 </HEAD>
-<BODY BGCOLOR="white">
-<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511" ALT="CUPS Software Users Manual"><BR>
+<BODY BGCOLOR="#ffffff">
+<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
 <H1>CUPS Software Users Manual</H1></A><BR>
-CUPS-SUM-1.1.23<BR>
+CUPS-SUM-1.2.0<BR>
 Easy Software Products<BR>
-Copyright 1997-2005, All Rights Reserved<BR>
+Copyright 1997-2003, All Rights Reserved<BR>
 </CENTER>
-<HR NOSHADE>
+<HR>
 <H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
 <BR>
 <BR><B><A HREF="#1">Preface</A></B>
@@ -60,30 +60,25 @@ Copyright 1997-2005, All Rights Reserved<BR>
 </UL>
 <B><A HREF="#STANDARD_OPTIONS">3 - Standard Printer Options</A></B>
 <UL>
-<LI><A HREF="#4_1">General Options</A>
+<LI><A HREF="#4_1">General Options</A></LI>
 <UL>
 <LI><A HREF="#4_1_1">Selecting the Media Size, Type, and Source</A></LI>
 <LI><A HREF="#4_1_2">Setting the Orientation</A></LI>
 <LI><A HREF="#4_1_3">Printing On Both Sides of the Paper</A></LI>
 </UL>
-</LI>
-<LI><A HREF="#4_2">Banner Options</A>
+<LI><A HREF="#4_2">Banner Options</A></LI>
 <UL>
 <LI><A HREF="#4_2_1">Selecting the Banner Page(s)</A></LI>
 </UL>
-</LI>
-<LI><A HREF="#4_3">Document Options</A>
+<LI><A HREF="#4_3">Document Options</A></LI>
 <UL>
 <LI><A HREF="#4_3_1">Selecting a Range of Pages</A></LI>
 <LI><A HREF="#4_3_2">Selecting Even or Odd Pages</A></LI>
-<LI><A HREF="#4_3_3">Setting the Output Order</A></LI>
-<LI><A HREF="#4_3_4">N-Up Printing</A></LI>
-<LI><A HREF="#4_3_5">Mirroring Prints</A></LI>
-<LI><A HREF="#4_3_6">Setting the Brightness</A></LI>
-<LI><A HREF="#4_3_7">Setting the Gamma Correction</A></LI>
+<LI><A HREF="#4_3_3">N-Up Printing</A></LI>
+<LI><A HREF="#4_3_4">Setting the Brightness</A></LI>
+<LI><A HREF="#4_3_5">Setting the Gamma Correction</A></LI>
 </UL>
-</LI>
-<LI><A HREF="#4_4">Text Options</A>
+<LI><A HREF="#4_4">Text Options</A></LI>
 <UL>
 <LI><A HREF="#4_4_1">Setting the Number of Characters Per Inch</A></LI>
 <LI><A HREF="#4_4_2">Setting the Number of Lines Per Inch</A></LI>
@@ -91,22 +86,19 @@ Copyright 1997-2005, All Rights Reserved<BR>
 <LI><A HREF="#4_4_4">Setting the Page Margins</A></LI>
 <LI><A HREF="#4_4_5">Pretty Printing</A></LI>
 </UL>
-</LI>
-<LI><A HREF="#4_5">Image Options</A>
+<LI><A HREF="#4_5">Image Options</A></LI>
 <UL>
 <LI><A HREF="#4_5_1">Positioning the Image</A></LI>
 <LI><A HREF="#4_5_2">Scaling the Image</A></LI>
 <LI><A HREF="#4_5_3">Adjusting the Hue (Tint) of an Image</A></LI>
 <LI><A HREF="#4_5_4">Adjusting the Saturation (Color) of an Image</A></LI>
 </UL>
-</LI>
-<LI><A HREF="#4_6">HP-GL/2 Options</A>
+<LI><A HREF="#4_6">HP-GL/2 Options</A></LI>
 <UL>
 <LI><A HREF="#4_6_1">Printing in Black</A></LI>
 <LI><A HREF="#4_6_2">Fitting the Plot on the Page</A></LI>
 <LI><A HREF="#4_6_3">Setting the Default Pen Width</A></LI>
 </UL>
-</LI>
 <LI><A HREF="#4_7">Raw or Unfiltered Output</A></LI>
 </UL>
 <B><A HREF="#SAVING_OPTIONS">4 - Saving Printer Options and Defaults</A></B>
@@ -122,7 +114,7 @@ Copyright 1997-2005, All Rights Reserved<BR>
 </UL>
 <B><A HREF="#LICENSE">A - Software License Agreement</A></B>
 <UL>
-<LI><A HREF="#6_1">Common UNIX Printing System License Agreement</A>
+<LI><A HREF="#6_1">Common UNIX Printing System License Agreement</A></LI>
 <UL>
 <LI><A HREF="#6_1_1">Introduction</A></LI>
 <LI><A HREF="#6_1_2">License Exceptions</A></LI>
@@ -130,25 +122,16 @@ Copyright 1997-2005, All Rights Reserved<BR>
 <LI><A HREF="#6_1_4">Binary Distribution Rights</A></LI>
 <LI><A HREF="#6_1_5">Support</A></LI>
 </UL>
-</LI>
-<LI><A HREF="#6_2">GNU GENERAL PUBLIC LICENSE</A>
-<UL>
-<LI><A HREF="#6_2_1">Preamble</A></LI>
+<LI><A HREF="#6_2">GNU GENERAL PUBLIC LICENSE</A></LI>
+<LI><A HREF="#6_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A></LI>
 </UL>
-</LI>
-<LI><A HREF="#6_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A>
-<UL>
-<LI><A HREF="#6_3_1">Preamble</A></LI>
-</UL>
-</LI>
-</UL>
-<HR NOSHADE>
+<HR>
 <H1 ALIGN="RIGHT"><A NAME="1">Preface</A></H1>
 <P>This software users manual describes how to use the Common UNIX
- Printing System<SUP>TM</SUP> (&quot;CUPS<SUP>TM</SUP>&quot;) Version 1.1.23.</P>
+ Printing System<SUP>TM</SUP> (&quot;CUPS<SUP>TM</SUP>&quot;) Version 1.2.0.</P>
 <H2><A NAME="1_1">System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating
- systems. It has been developed by <A HREF="http://www.easysw.com">Easy
+ systems. It has been developed by<A HREF="http://www.easysw.com"> Easy
  Software Products</A> to promote a standard printing solution for all
  UNIX vendors and users. CUPS provides the System V and Berkeley
  command-line interfaces.</P>
@@ -158,20 +141,10 @@ Copyright 1997-2005, All Rights Reserved<BR>
  also supported with reduced functionality. CUPS adds network printer
  browsing and PostScript Printer Description (&quot;PPD&quot;) based printing
  options to support real-world printing under UNIX.</P>
-<P>CUPS includes an image file RIP that supports printing of image files
- to non-PostScript printers. A customized version of GNU Ghostscript
- 7.05 for CUPS called ESP Ghostscript is available separately to support
- printing of PostScript files within the CUPS driver framework. Sample
- drivers for Dymo, EPSON, HP, and OKIDATA printers are included that use
- these filters.</P>
-<P>Drivers for thousands of printers are provided with our ESP Print Pro
- software, available at:</P>
-<PRE>
-    <A HREF="http://www.easysw.com/printpro/">http://www.easysw.com/printpro/</A>
-</PRE>
-<P>CUPS is licensed under the GNU General Public License and GNU Library
- General Public License. Please contact Easy Software Products for
- commercial support and &quot;binary distribution&quot; rights.</P>
+<P>CUPS also includes a customized version of GNU Ghostscript (currently
+ based off GNU Ghostscript 5.50) and an image file RIP that are used to
+ support non-PostScript printers. Sample drivers for HP and EPSON
+ printers are included that use these filters.</P>
 
 <!-- NEED 2in -->
 <H2><A NAME="1_2">Document Overview</A></H2>
@@ -397,12 +370,12 @@ lpr(1)</CODE>) printing commands. Type the following command to print a
  printer options using the <CODE>-o</CODE> option:</P>
 <UL>
 <PRE>
-<B>lp -o landscape -o scaling=75 -o media=A4 filename.jpg ENTER</B>
-<B>lpr -o landscape -o scaling=75 -o media=A4 filename.jpg ENTER</B>
-</PRE>
+<B>lp -o landscape -o scaling=75 -o media=A4 filename.jpg
+<B>lpr -o landscape -o scaling=75 -o media=A4 filename.jpg
+</B></B></PRE>
 </UL>
 <P>The available printer options vary depending on the printer. The
- standard options are described in <A HREF="#STANDARD_OPTIONS">Chapter
+ standard options are described in<A HREF="#STANDARD_OPTIONS"> Chapter
  3, &quot;Standard Printing Options&quot;</A>.</P>
 <H2><A NAME="3_4">Printing Multiple Copies</A></H2>
 <P>Both the <CODE>lp</CODE> and <CODE>lpr</CODE> commands have options
@@ -608,17 +581,7 @@ printer DeskJet now printing DeskJet-1.
 </PRE>
 </UL>
 <P>The default is to print all pages.</P>
-<H3><A NAME="4_3_3">Setting the Output Order</A></H3>
-<P>The the <CODE>-o outputorder=order</CODE> option to set the output
- order of all pages:</P>
-<UL>
-<PRE>
-<B>lp -o outputorder=normal filename ENTER</B>
-<B>lp -o outputorder=reverse filename ENTER</B>
-<B>lpr -o outputorder=reverse filename ENTER</B>
-</PRE>
-</UL>
-<H3><A NAME="4_3_4">N-Up Printing</A></H3>
+<H3><A NAME="4_3_3">N-Up Printing</A></H3>
 <P>The <CODE>-o number-up=value</CODE> option selects N-Up printing.
  N-Up printing places multiple document pages on a single printed page.
  CUPS supports 1, 2, 4, 6, 9, and 16-Up formats; the default format is
@@ -657,17 +620,7 @@ printer DeskJet now printing DeskJet-1.
 <LI><CODE>-o number-up-layout=tblr</CODE>; Top to bottom, left to right</LI>
 <LI><CODE>-o number-up-layout=tbrl</CODE>; Top to bottom, right to left</LI>
 </UL>
-<H3><A NAME="4_3_5">Mirroring Prints</A></H3>
-<P>You can mirror a print using the <CODE>-o mirror</CODE> option:</P>
-<UL>
-<PRE>
-<B>lp -o mirror filename ENTER</B>
-<B>lpr -o mirror filename ENTER</B>
-</PRE>
-</UL>
-<P>This is useful for printing mirrored pages on transfer paper, for T
- shirts, mugs, etc.</P>
-<H3><A NAME="4_3_6">Setting the Brightness</A></H3>
+<H3><A NAME="4_3_4">Setting the Brightness</A></H3>
 <P>You can control the overall brightness of the printed output using
  the <CODE>-o brightness=percent</CODE> option:</P>
 <UL>
@@ -678,7 +631,7 @@ printer DeskJet now printing DeskJet-1.
 </UL>
 <P>Values greater than 100 will lighten the print, while values less
  than 100 will darken it.</P>
-<H3><A NAME="4_3_7">Setting the Gamma Correction</A></H3>
+<H3><A NAME="4_3_5">Setting the Gamma Correction</A></H3>
 <P>You can control the overall gamma correction of the printed output
  using the <CODE>-o gamma=value</CODE> option:</P>
 <UL>
@@ -920,7 +873,7 @@ printer DeskJet now printing DeskJet-1.
  and set your own default printer.</P>
 <H2><A NAME="5_1">Printer Options</A></H2>
 <P>Each printer supports a large number of options, which you learned
- about in <A HREF="#STANDARD_OPTIONS">Chapter 3, &quot;Standard Printer
+ about in<A HREF="#STANDARD_OPTIONS"> Chapter 3, &quot;Standard Printer
  Options&quot;</A>. Rather than specifying these options each time you print
  a file, CUPS allows you to save them as &quot;default&quot; options for the
  printer.</P>
@@ -935,17 +888,7 @@ printer DeskJet now printing DeskJet-1.
 </PRE>
 </UL>
 <P>Once saved, any <CODE>lp</CODE> or <CODE>lpr</CODE> command will use
- them when you print.
-<CENTER>
-<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" CELLSPACING="0" WIDTH="80%">
-<TR><TD><B>Note:</B>
-<P>Running the <CODE>lpoptions</CODE> command as the root user (or any
- user with a UID of 0) will set the default options for all users. The
- root account does not have its own set of default options.</P>
-</TD></TR>
-</TABLE>
-</CENTER>
-</P>
+ them when you print.</P>
 <H2><A NAME="5_2">Setting Options for a Specific Printer</A></H2>
 <P>The previous example shows how to set the options for the default
  printer. The <CODE>-p printer</CODE> option specifies the options are
@@ -1032,13 +975,13 @@ deskjet@server</CODE>).</P>
 <H1 ALIGN="RIGHT"><A NAME="LICENSE">A - Software License Agreement</A></H1>
 <H2 ALIGN="CENTER"><A NAME="6_1">Common UNIX Printing System License
  Agreement</A></H2>
-<P ALIGN="CENTER">Copyright 1997-2005 by Easy Software Products
+<P ALIGN="CENTER">Copyright 1997-2003 by Easy Software Products
 <BR> 44141 AIRPORT VIEW DR STE 204
-<BR> HOLLYWOOD, MARYLAND 20636 USA
+<BR> HOLLYWOOD, MARYLAND 20636-3111 USA
 <BR>
 <BR> Voice: +1.301.373.9600
-<BR> Email: <A HREF="mailto:cups-info@cups.org">cups-info@cups.org</A>
-<BR> WWW: <A HREF="http://www.cups.org">http://www.cups.org</A></P>
+<BR> Email:<A HREF="mailto:cups-info@cups.org"> cups-info@cups.org</A>
+<BR> WWW:<A HREF="http://www.cups.org"> http://www.cups.org</A></P>
 <H3><A NAME="6_1_1">Introduction</A></H3>
 <P>The Common UNIX Printing System<SUP>TM</SUP>, (&quot;CUPS<SUP>TM</SUP>&quot;),
  is provided under the GNU General Public License (&quot;GPL&quot;) and GNU
@@ -1113,8 +1056,8 @@ deskjet@server</CODE>).</P>
  work.</P>
 <H3><A NAME="6_1_3">Trademarks</A></H3>
 <P>Easy Software Products has trademarked the Common UNIX Printing
- System, CUPS, and CUPS logo. You may use these names and logos in any
- direct port or binary distribution of CUPS. Please contact Easy
+ System, CUPS, and CUPS logo. These names and logos may be used freely
+ in any direct port or binary distribution of CUPS. Please contract Easy
  Software Products for written permission to use them in derivative
  products. Our intention is to protect the value of these trademarks and
  ensure that any derivative product meets the same high-quality
@@ -1128,9 +1071,9 @@ deskjet@server</CODE>).</P>
 <P>The Common UNIX Printing System provides a &quot;pdftops&quot; filter that is
  based on the Xpdf software. For binary distribution licensing of this
  software, please contact:<BLOCKQUOTE> Derek B. Noonburg
-<BR> Email: <A HREF="mailto:derekn@foolabs.com">derekn@foolabs.com</A>
-<BR> WWW: <A HREF="http://www.foolabs.com/xpdf/">
-http://www.foolabs.com/xpdf/</A></BLOCKQUOTE></P>
+<BR> Email:<A HREF="mailto:derekn@foolabs.com"> derekn@foolabs.com</A>
+<BR> WWW:<A HREF="http://www.foolabs.com/xpdf/">
+ http://www.foolabs.com/xpdf/</A></BLOCKQUOTE></P>
 <H3><A NAME="6_1_5">Support</A></H3>
 <P>Easy Software Products sells software support for CUPS as well as a
  commercial printing product based on CUPS called ESP Print Pro. You can
@@ -1151,7 +1094,7 @@ Copyright 1989, 1991 Free Software Foundation, Inc.
 Everyone is permitted to copy and distribute verbatim
 copies of this license document, but changing it is not allowed.
 </PRE>
-<H3><A NAME="6_2_1">Preamble</A></H3>
+<H4>Preamble</H4>
 <P>The licenses for most software are designed to take away your freedom
  to share and change it. By contrast, the GNU General Public License is
  intended to guarantee your freedom to share and change free
@@ -1210,7 +1153,6 @@ copies of this license document, but changing it is not allowed.
  covered only if its contents constitute a work based on the Program
  (independent of having been made by running the Program). Whether that
  is true depends on what the Program does.</P>
-</LI>
 <LI>You may copy and distribute verbatim copies of the Program's source
  code as you receive it, in any medium, provided that you conspicuously
  and appropriately publish on each copy an appropriate copyright notice
@@ -1220,7 +1162,6 @@ copies of this license document, but changing it is not allowed.
  Program.
 <P>You may charge a fee for the physical act of transferring a copy, and
  you may at your option offer warranty protection in exchange for a fee.</P>
-</LI>
 <LI>You may modify your copy or copies of the Program or any portion of
  it, thus forming a work based on the Program, and copy and distribute
  such modifications or work under the terms of Section 1 above, provided
@@ -1260,7 +1201,6 @@ copies of this license document, but changing it is not allowed.
  Program with the Program (or with a work based on the Program) on a
  volume of a storage or distribution medium does not bring the other
  work under the scope of this License.</P>
-</LI>
 <LI>You may copy and distribute the Program (or a work based on it,
  under Section 2) in object code or executable form under the terms of
  Sections 1 and 2 above provided that you also do one of the following:
@@ -1295,7 +1235,6 @@ copies of this license document, but changing it is not allowed.
  to copy the source code from the same place counts as distribution of
  the source code, even though third parties are not compelled to copy
  the source along with the object code.</P>
-</LI>
 <LI>You may not copy, modify, sublicense, or distribute the Program
  except as expressly provided under this License. Any attempt otherwise
  to copy, modify, sublicense or distribute the Program is void, and will
@@ -1345,7 +1284,6 @@ copies of this license document, but changing it is not allowed.
  choice.</P>
 <P>This section is intended to make thoroughly clear what is believed to
  be a consequence of the rest of this License.</P>
-</LI>
 <LI>If the distribution and/or use of the Program is restricted in
  certain countries either by patents or by copyrighted interfaces, the
  original copyright holder who places the Program under this License may
@@ -1364,7 +1302,6 @@ copies of this license document, but changing it is not allowed.
  the Free Software Foundation. If the Program does not specify a version
  number of this License, you may choose any version ever published by
  the Free Software Foundation.</P>
-</LI>
 <LI>If you wish to incorporate parts of the Program into other free
  programs whose distribution conditions are different, write to the
  author to ask for permission. For software which is copyrighted by the
@@ -1372,6 +1309,12 @@ copies of this license document, but changing it is not allowed.
  sometimes make exceptions for this. Our decision will be guided by the
  two goals of preserving the free status of all derivatives of our free
  software and of promoting the sharing and reuse of software generally.</LI>
+</LI>
+</LI>
+</LI>
+</LI>
+</LI>
+</LI>
 </OL>
 <H4>NO WARRANTY</H4>
 <OL START="11">
@@ -1396,61 +1339,6 @@ copies of this license document, but changing it is not allowed.
  DAMAGES.</LI>
 </OL>
 <H4>END OF TERMS AND CONDITIONS</H4>
-<H4>How to Apply These Terms to Your New Programs</H4>
-<P>If you develop a new program, and you want it to be of the greatest
- possible use to the public, the best way to achieve this is to make it
- free software which everyone can redistribute and change under these
- terms.</P>
-<P>To do so, attach the following notices to the program. It is safest
- to attach them to the start of each source file to most effectively
- convey the exclusion of warranty; and each file should have at least
- the &quot;copyright&quot; line and a pointer to where the full notice is found.</P>
-<PRE>
-<VAR>one line to give the program's name and an idea of what it does.</VAR>
-Copyright (C) <VAR>yyyy</VAR>  <VAR>name of author</VAR>
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-</PRE>
-<P>Also add information on how to contact you by electronic and paper
- mail.</P>
-<P>If the program is interactive, make it output a short notice like
- this when it starts in an interactive mode:</P>
-<PRE>
-Gnomovision version 69, Copyright (C) <VAR>year</VAR> <VAR>name of author</VAR>
-Gnomovision comes with ABSOLUTELY NO WARRANTY; for details
-type `show w'.  This is free software, and you are welcome
-to redistribute it under certain conditions; type `show c' 
-for details.
-</PRE>
-<P>The hypothetical commands <SAMP>`show w'</SAMP> and <SAMP>`show c'</SAMP>
- should show the appropriate parts of the General Public License. Of
- course, the commands you use may be called something other than <SAMP>
-`show w'</SAMP> and <SAMP>`show c'</SAMP>; they could even be
- mouse-clicks or menu items--whatever suits your program.</P>
-<P>You should also get your employer (if you work as a programmer) or
- your school, if any, to sign a &quot;copyright disclaimer&quot; for the program,
- if necessary. Here is a sample; alter the names:</P>
-<PRE>
-Yoyodyne, Inc., hereby disclaims all copyright
-interest in the program `Gnomovision'
-(which makes passes at compilers) written 
-by James Hacker.
-
-<VAR>signature of Ty Coon</VAR>, 1 April 1989
-Ty Coon, President of Vice
-</PRE>
 
 <!-- NEW PAGE -->
 <H2><A NAME="6_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A></H2>
@@ -1464,7 +1352,7 @@ of this license document, but changing it is not allowed.
 [This is the first released version of the library GPL.  It is
  numbered 2 because it goes with version 2 of the ordinary GPL.]
 </PRE>
-<H3><A NAME="6_3_1">Preamble</A></H3>
+<H4>Preamble</H4>
 <P>The licenses for most software are designed to take away your freedom
  to share and change it. By contrast, the GNU General Public Licenses
  are intended to guarantee your freedom to share and change free
@@ -1582,15 +1470,12 @@ of this license document, but changing it is not allowed.
 <OL TYPE="a">
 <LI>The modified work must itself be a software library.
 <P></P>
-</LI>
 <LI>You must cause the files modified to carry prominent notices stating
  that you changed the files and the date of any change.
 <P></P>
-</LI>
 <LI>You must cause the whole of the work to be licensed at no charge to
  all third parties under the terms of this License.
 <P></P>
-</LI>
 <LI>If a facility in the modified Library refers to a function or a
  table of data to be supplied by an application program that uses the
  facility, other than as an argument passed when the facility is
@@ -1604,6 +1489,9 @@ of this license document, but changing it is not allowed.
  function or table used by this function must be optional: if the
  application does not supply it, the square root function must still
  compute square roots.)</P>
+</LI>
+</LI>
+</LI>
 </LI>
 </OL>
 <P>These requirements apply to the modified work as a whole. If
@@ -1699,20 +1587,20 @@ of this license document, but changing it is not allowed.
  in the Library will not necessarily be able to recompile the
  application to use the modified definitions.)
 <P></P>
-</LI>
 <LI>Accompany the work with a written offer, valid for at least three
  years, to give the same user the materials specified in Subsection 6a,
  above, for a charge no more than the cost of performing this
  distribution.
 <P></P>
-</LI>
 <LI>If distribution of the work is made by offering access to copy from
  a designated place, offer equivalent access to copy the above specified
  materials from the same place.
 <P></P>
-</LI>
 <LI>Verify that the user has already received a copy of these materials
  or that you have already sent this user a copy.</LI>
+</LI>
+</LI>
+</LI>
 </OL>
 <P>For an executable, the required form of the &quot;work that uses the
  Library&quot; must include any data and utility programs needed for
@@ -1738,10 +1626,10 @@ of this license document, but changing it is not allowed.
  the Library, uncombined with any other library facilities. This must be
  distributed under the terms of the Sections above.
 <P></P>
-</LI>
 <LI>Give prominent notice with the combined library of the fact that
  part of it is a work based on the Library, and explaining where to find
  the accompanying uncombined form of the same work.</LI>
+</LI>
 </OL>
 <P><STRONG>8.</STRONG> You may not copy, modify, sublicense, link with,
  or distribute the Library except as expressly provided under this
@@ -1840,48 +1728,5 @@ of this license document, but changing it is not allowed.
  SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
  DAMAGES.</P>
 <H4>END OF TERMS AND CONDITIONS</H4>
-<H4>How to Apply These Terms to Your New Libraries</H4>
-<P>If you develop a new library, and you want it to be of the greatest
- possible use to the public, we recommend making it free software that
- everyone can redistribute and change. You can do so by permitting
- redistribution under these terms (or, alternatively, under the terms of
- the ordinary General Public License).</P>
-<P>To apply these terms, attach the following notices to the library. It
- is safest to attach them to the start of each source file to most
- effectively convey the exclusion of warranty; and each file should have
- at least the &quot;copyright&quot; line and a pointer to where the full notice is
- found.</P>
-<PRE>
-<VAR>one line to give the library's name and an idea of what it does.</VAR>
-Copyright (C) <VAR>year</VAR>  <VAR>name of author</VAR>
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-</PRE>
-<P>Also add information on how to contact you by electronic and paper
- mail.</P>
-<P>You should also get your employer (if you work as a programmer) or
- your school, if any, to sign a &quot;copyright disclaimer&quot; for the library,
- if necessary. Here is a sample; alter the names:</P>
-<PRE>
-Yoyodyne, Inc., hereby disclaims all copyright interest in
-the library `Frob' (a library for tweaking knobs) written
-by James Random Hacker.
-
-<VAR>signature of Ty Coon</VAR>, 1 April 1990
-Ty Coon, President of Vice
-</PRE>
-<P>That's all there is to it!</P>
 </BODY>
 </HTML>

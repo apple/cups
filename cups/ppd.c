@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.119 2005/01/03 19:29:45 mike Exp $"
+ * "$Id$"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -52,6 +52,8 @@
  *                           0x9f to be valid ISO-8859-1 characters...
  *   ppd_free_group()      - Free a single UI group.
  *   ppd_free_option()     - Free a single option.
+ *   ppd_get_extoption()   - Get an extended option record.
+ *   ppd_get_extparam()    - Get an extended parameter record.
  *   ppd_get_group()       - Find or create the named group as needed.
  *   ppd_get_option()      - Find or create the named option as needed.
  *   ppd_read()            - Read a line from a PPD file, skipping comment
@@ -122,6 +124,10 @@ static void		ppd_fix(char *string);
 #endif /* !__APPLE__ */
 static void		ppd_free_group(ppd_group_t *group);
 static void		ppd_free_option(ppd_option_t *option);
+static ppd_ext_option_t	*ppd_get_extoption(ppd_file_t *ppd, const char *name);
+static ppd_ext_param_t	*ppd_get_extparam(ppd_ext_option_t *opt,
+			                  const char *param,
+					  const char *text);
 static ppd_group_t	*ppd_get_group(ppd_file_t *ppd, const char *name,
 			               const char *text);
 static ppd_option_t	*ppd_get_option(ppd_group_t *group, const char *name);
@@ -156,12 +162,14 @@ _ppd_attr_compare(ppd_attr_t **a,	/* I - First attribute */
 void
 ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
 {
-  int		i;			/* Looping var */
-  ppd_emul_t	*emul;			/* Current emulation */
-  ppd_group_t	*group;			/* Current group */
-  char		**font;			/* Current font */
-  char		**filter;		/* Current filter */
-  ppd_attr_t	**attr;			/* Current attribute */
+  int			i, j;		/* Looping var */
+  ppd_emul_t		*emul;		/* Current emulation */
+  ppd_group_t		*group;		/* Current group */
+  char			**font;		/* Current font */
+  char			**filter;	/* Current filter */
+  ppd_attr_t		**attr;		/* Current attribute */
+  ppd_ext_option_t	**opt;		/* Current extended option */
+  ppd_ext_param_t	**param;	/* Current extended parameter */
 
 
  /*
@@ -277,6 +285,21 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
     ppd_free(ppd->attrs);
   }
 
+  if (ppd->num_extended)
+  {
+    for (i = ppd->num_extended, opt = ppd->extended; i > 0; i --, opt ++)
+    {
+      ppd_free((*opt)->code);
+
+      for (j = (*opt)->num_params, param = (*opt)->params; j > 0; j --, param ++)
+        ppd_free((*param)->value);
+
+      ppd_free((*opt)->params);
+    }
+
+    ppd_free(ppd->extended);
+  }
+
  /*
   * Free the whole record...
   */
@@ -352,6 +375,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
   ppd_group_t		*group,		/* Current group */
 			*subgroup;	/* Current sub-group */
   ppd_option_t		*option;	/* Current option */
+  ppd_ext_option_t	*extopt;	/* Current extended option */
   ppd_choice_t		*choice;	/* Current choice */
   ppd_const_t		*constraint;	/* Current constraint */
   ppd_size_t		*size;		/* Current page size */
@@ -1499,6 +1523,220 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       choice->code = string;
       string       = NULL;		/* Don't add as an attribute below */
     }
+#if 0
+    else if (strcmp(keyword, "cupsUIType") == 0 &&
+             (mask & (PPD_KEYWORD | PPD_STRING)) == (PPD_KEYWORD | PPD_STRING) &&
+	     option != NULL)
+    {
+     /*
+      * Define an extended option value type...
+      */
+
+      extopt = ppd_get_extoption(ppd, name);
+
+      if (strcmp(string, "Text") == 0)
+        option->ui = PPD_UI_CUPS_TEXT;
+      else if (strcmp(string, "Integer") == 0)
+      {
+        option->ui             = PPD_UI_CUPS_INTEGER;
+	extopt->defval.integer = 0;
+	extopt->minval.integer = 0;
+	extopt->maxval.integer = 100;
+      }
+      else if (strcmp(string, "Real") == 0)
+      {
+        option->ui          = PPD_UI_CUPS_REAL;
+	extopt->defval.real = 0.0;
+	extopt->minval.real = 0.0;
+	extopt->maxval.real = 1.0;
+      }
+      else if (strcmp(string, "Gamma") == 0)
+      {
+        option->ui           = PPD_UI_CUPS_GAMMA;
+	extopt->defval.gamma = 1.0;
+	extopt->minval.gamma = 1.0;
+	extopt->maxval.gamma = 10.0;
+      }
+      else if (strcmp(string, "Curve") == 0)
+      {
+        option->ui                 = PPD_UI_CUPS_CURVE;
+	extopt->defval.curve.start = 0.0;
+	extopt->defval.curve.end   = 0.0;
+	extopt->defval.curve.gamma = 1.0;
+	extopt->minval.curve.start = 0.0;
+	extopt->minval.curve.end   = 0.0;
+	extopt->minval.curve.gamma = 1.0;
+	extopt->maxval.curve.start = 1.0;
+	extopt->maxval.curve.end   = 1.0;
+	extopt->maxval.curve.gamma = 10.0;
+      }
+      else if (strcmp(string, "IntegerArray") == 0)
+      {
+        option->ui                                = PPD_UI_CUPS_INTEGER_ARRAY;
+	extopt->defval.integer_array.num_elements = 2;
+	extopt->minval.integer_array.num_elements = 2;
+	extopt->maxval.integer_array.num_elements = 16;
+      }
+      else if (strcmp(string, "RealArray") == 0)
+      {
+        option->ui                             = PPD_UI_CUPS_REAL_ARRAY;
+	extopt->defval.real_array.num_elements = 2;
+	extopt->minval.real_array.num_elements = 2;
+	extopt->maxval.real_array.num_elements = 16;
+      }
+    }
+    else if (strcmp(keyword, "cupsUIDefault") == 0 &&
+             (mask & (PPD_KEYWORD | PPD_STRING)) == (PPD_KEYWORD | PPD_STRING) &&
+	     option != NULL)
+    {
+     /*
+      * Define an extended option minimum value...
+      */
+
+      extopt = ppd_get_extoption(ppd, name);
+
+      switch (option->ui)
+      {
+        case PPD_UI_CUPS_INTEGER :
+	    sscanf(string, "%d", &(extopt->defval.integer));
+	    break;
+
+        case PPD_UI_CUPS_REAL :
+	    sscanf(string, "%f", &(extopt->defval.real));
+	    break;
+
+        case PPD_UI_CUPS_GAMMA :
+	    sscanf(string, "%f", &(extopt->defval.gamma));
+	    break;
+
+        case PPD_UI_CUPS_CURVE :
+	    sscanf(string, "%f%f%f", &(extopt->defval.curve.start),
+	           &(extopt->defval.curve.end),
+	           &(extopt->defval.curve.gamma));
+	    break;
+
+        case PPD_UI_CUPS_INTEGER_ARRAY :
+	    extopt->defval.integer_array.elements = calloc(1, sizeof(int));
+	    sscanf(string, "%d%d", &(extopt->defval.integer_array.num_elements),
+	           extopt->defval.integer_array.elements);
+	    break;
+
+        case PPD_UI_CUPS_REAL_ARRAY :
+	    extopt->defval.real_array.elements = calloc(1, sizeof(float));
+	    sscanf(string, "%d%f", &(extopt->defval.real_array.num_elements),
+	           extopt->defval.real_array.elements);
+	    break;
+
+	default :
+            break;
+      }
+    }
+    else if (strcmp(keyword, "cupsUIMinimum") == 0 &&
+             (mask & (PPD_KEYWORD | PPD_STRING)) == (PPD_KEYWORD | PPD_STRING) &&
+	     option != NULL)
+    {
+     /*
+      * Define an extended option minimum value...
+      */
+
+      extopt = ppd_get_extoption(ppd, name);
+
+      switch (option->ui)
+      {
+        case PPD_UI_CUPS_INTEGER :
+	    sscanf(string, "%d", &(extopt->minval.integer));
+	    break;
+
+        case PPD_UI_CUPS_REAL :
+	    sscanf(string, "%f", &(extopt->minval.real));
+	    break;
+
+        case PPD_UI_CUPS_GAMMA :
+	    sscanf(string, "%f", &(extopt->minval.gamma));
+	    break;
+
+        case PPD_UI_CUPS_CURVE :
+	    sscanf(string, "%f%f%f", &(extopt->minval.curve.start),
+	           &(extopt->minval.curve.end),
+	           &(extopt->minval.curve.gamma));
+	    break;
+
+        case PPD_UI_CUPS_INTEGER_ARRAY :
+	    extopt->minval.integer_array.elements = calloc(1, sizeof(int));
+	    sscanf(string, "%d%d", &(extopt->minval.integer_array.num_elements),
+	           extopt->minval.integer_array.elements);
+	    break;
+
+        case PPD_UI_CUPS_REAL_ARRAY :
+	    extopt->minval.real_array.elements = calloc(1, sizeof(float));
+	    sscanf(string, "%d%f", &(extopt->minval.real_array.num_elements),
+	           extopt->minval.real_array.elements);
+	    break;
+
+	default :
+            break;
+      }
+    }
+    else if (strcmp(keyword, "cupsUIMaximum") == 0 &&
+             (mask & (PPD_KEYWORD | PPD_STRING)) == (PPD_KEYWORD | PPD_STRING) &&
+	     option != NULL)
+    {
+     /*
+      * Define an extended option maximum value...
+      */
+
+      extopt = ppd_get_extoption(ppd, name);
+
+      switch (option->ui)
+      {
+        case PPD_UI_CUPS_INTEGER :
+	    sscanf(string, "%d", &(extopt->maxval.integer));
+	    break;
+
+        case PPD_UI_CUPS_REAL :
+	    sscanf(string, "%f", &(extopt->maxval.real));
+	    break;
+
+        case PPD_UI_CUPS_GAMMA :
+	    sscanf(string, "%f", &(extopt->maxval.gamma));
+	    break;
+
+        case PPD_UI_CUPS_CURVE :
+	    sscanf(string, "%f%f%f", &(extopt->maxval.curve.start),
+	           &(extopt->maxval.curve.end),
+	           &(extopt->maxval.curve.gamma));
+	    break;
+
+        case PPD_UI_CUPS_INTEGER_ARRAY :
+	    extopt->maxval.integer_array.elements = calloc(1, sizeof(int));
+	    sscanf(string, "%d%d", &(extopt->maxval.integer_array.num_elements),
+	           extopt->maxval.integer_array.elements);
+	    break;
+
+        case PPD_UI_CUPS_REAL_ARRAY :
+	    extopt->maxval.real_array.elements = calloc(1, sizeof(float));
+	    sscanf(string, "%d%f", &(extopt->maxval.real_array.num_elements),
+	           extopt->maxval.real_array.elements);
+	    break;
+
+	default :
+            break;
+      }
+    }
+    else if (strcmp(keyword, "cupsUICommand") == 0 &&
+             (mask & (PPD_KEYWORD | PPD_STRING)) == (PPD_KEYWORD | PPD_STRING) &&
+	     option != NULL)
+    {
+     /*
+      * Define an extended option command...
+      */
+
+      extopt = ppd_get_extoption(ppd, name);
+
+      extopt->command = string;
+      string = NULL;
+    }
+#endif /* 0 */
 
    /*
     * Add remaining lines with keywords and string values as attributes...
@@ -1618,6 +1856,13 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       }
     }
   }
+
+ /*
+  * Set the option pointers for all extended options...
+  */
+
+  for (i = 0; i < ppd->num_extended; i ++)
+    ppd->extended[i]->option = ppdFindOption(ppd, ppd->extended[i]->keyword);
 
  /*
   * Sort the attributes...
@@ -2079,6 +2324,132 @@ ppd_free_option(ppd_option_t *option)	/* I - Option to free */
 
     ppd_free(option->choices);
   }
+}
+
+
+/*
+ * 'ppd_get_extoption()' - Get an extended option record.
+ */
+
+static ppd_ext_option_t	*		/* O - Extended option... */
+ppd_get_extoption(ppd_file_t *ppd,	/* I - PPD file */
+                  const char *name)	/* I - Name of option */
+{
+  ppd_ext_option_t	**temp,		/* New array pointer */
+			*extopt;	/* New extended option */
+
+
+ /*
+  * See if the option already exists...
+  */
+
+  if ((extopt = ppdFindExtOption(ppd, name)) != NULL)
+    return (extopt);
+
+ /*
+  * Not found, so create the extended option record...
+  */
+
+  if ((extopt = calloc(1, sizeof(ppd_ext_option_t))) == NULL)
+    return (NULL);
+
+  strlcpy(extopt->keyword, name, sizeof(extopt->keyword));
+
+ /*
+  * Add this record to the end of the array...
+  */
+
+  if (ppd->num_extended == 0)
+    temp = malloc(sizeof(ppd_ext_option_t *));
+  else
+    temp = realloc(ppd->extended, sizeof(ppd_ext_option_t *) *
+                                  (ppd->num_extended + 1));
+
+  if (temp == NULL)
+  {
+    free(extopt);
+    return (NULL);
+  }
+
+  ppd->extended           = temp;
+  temp[ppd->num_extended] = extopt;
+
+  ppd->num_extended ++;
+
+ /*
+  * Return the new record...
+  */
+
+  return (extopt);
+}
+
+
+/*
+ * 'ppd_get_extparam()' - Get an extended parameter record.
+ */
+
+static ppd_ext_param_t	*		/* O - Extended option... */
+ppd_get_extparam(ppd_ext_option_t *opt,	/* I - PPD file */
+                 const char      *param,/* I - Name of parameter */
+		 const char      *text)	/* I - Human-readable text */
+{
+  ppd_ext_param_t	**temp,		/* New array pointer */
+			*extparam;	/* New extended parameter */
+
+
+ /*
+  * See if the parameter already exists...
+  */
+
+  if ((extparam = ppdFindExtParam(opt, param)) != NULL)
+    return (extparam);
+
+ /*
+  * Not found, so create the extended parameter record...
+  */
+
+  if ((extparam = calloc(1, sizeof(ppd_ext_param_t))) == NULL)
+    return (NULL);
+
+  if ((extparam->value = calloc(4, sizeof(ppd_ext_value_t))) == NULL)
+  {
+    ppd_free(extparam);
+    return (NULL);
+  }
+
+  extparam->defval = extparam->value + 1;
+  extparam->minval = extparam->value + 2;
+  extparam->maxval = extparam->value + 3;
+
+  strlcpy(extparam->keyword, param, sizeof(extparam->keyword));
+  strlcpy(extparam->text, text, sizeof(extparam->text));
+
+ /*
+  * Add this record to the end of the array...
+  */
+
+  if (opt->num_params == 0)
+    temp = malloc(sizeof(ppd_ext_param_t *));
+  else
+    temp = realloc(opt->params, sizeof(ppd_ext_param_t *) *
+                                       (opt->num_params + 1));
+
+  if (temp == NULL)
+  {
+    free(extparam);
+    return (NULL);
+  }
+
+  opt->params           = temp;
+  temp[opt->num_params] = extparam;
+
+  opt->num_params ++;
+
+ /*
+  * Return the new record...
+  */
+
+  return (extparam);
 }
 
 
@@ -2655,5 +3026,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.119 2005/01/03 19:29:45 mike Exp $".
+ * End of "$Id$".
  */

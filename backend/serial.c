@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.57 2005/02/07 00:15:04 mike Exp $"
+ * "$Id$"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -1000,5 +1000,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.57 2005/02/07 00:15:04 mike Exp $".
+ * End of "$Id$".
  */

@@ -1,10 +1,9 @@
 .\"
-.\" "$Id: cups-lpd.man,v 1.5 2005/01/03 19:29:58 mike Exp $"
+.\" "$Id: cups-lpd.man,v 1.1.2.1 2002/05/21 20:05:49 mike Exp $"
 .\"
 .\"   cups-lpd man page for the Common UNIX Printing System (CUPS).
-.\"   Based on cvs revision 1.10
 .\"
-.\"   Copyright 1997-2005 by Easy Software Products.
+.\"   Copyright 1997-2002 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -16,9 +15,9 @@
 .\"       Attn: CUPS Licensing Information
 .\"       Easy Software Products
 .\"       44141 Airport View Drive, Suite 204
-.\"       Hollywood, Maryland 20636 USA
+.\"       Hollywood, Maryland 20636-3111 USA
 .\"
-.\"       Voice: (301) 373-9600
+.\"       Voice: (301) 373-9603
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
@@ -39,7 +38,7 @@ utilise le super-serveur \fBinetd(8)\fR. Ajoutez la ligne suivante au fichier
 .br
 .nf
 
-    printer stream tcp nowait lp /path/to/cups/daemon/cups-lpd cups-lpd
+    printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd
 .fi
 .LP
 Si vous utilisez le super-serveur \fIxinetd(8)\fR, ajoutez la ligne suivante au fichier
@@ -53,24 +52,9 @@ Si vous utilisez le super-serveur \fIxinetd(8)\fR, ajoutez la ligne suivante au 
         protocol = tcp
         wait = no
         user = lp
-        server = /path/to/cups/daemon/cups-lpd
+        server = /usr/lib/cups/daemon/cups-lpd
     }
 .fi
-.LP
-/path/to/cups/daemon est habituellement /usr/lib/cups/daemon ou
-/usr/libexec/cups/daemon, suivant votre système d'exploitation. Vous
-pouvez trouver cette information dans le fichier cupsd.conf.
-.SH SÉCURITÉ
-\fBcups-lpd\fR n'applique pour le moment aucun des contrôles d'accès définis
-dans les fichiers \fIcupsd.conf(5)\fR, \fIhosts.allow(5)\fR ou
-\fIhosts.deny(5)\fR utilisés par les wrappers TCP. L'exécution de
-\fBcups-lpd\fR sur un serveur permet donc le lancement d'impressions depuis
-n'importe quel ordinateur de votre réseau, voire même de n'importe quel
-ordinateur sur Terre.
-.LP
-Bien que \fIxinetd\fR possède un contrôle d'accès intégré, il est recommandé
-d'utiliser le wrapper TCP fourni avec \fIinetd\fR pour limiter les accès aux
-ordinateurs pouvant lancer des impressions sur un serveur.
 .SH OPTIONS
 L'option \fI-o\fR ajoute des options à tous les travaux d'impression.
 Cette option est souvent utilisée pour désactiver le filtre «\ l\ » de manière
@@ -78,14 +62,11 @@ Cette option est souvent utilisée pour désactiver le filtre «\ l\ » de manière
 .br
 .nf
 
-    printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd \ 
+    printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd \
         -o document-format=application/octet-stream
-
-    server = /usr/lib/cups/daemon/cups-lpd
-    server_args = -o document-format=application/octet-stream
 .fi
 .LP
-Dans cet exemple, le format du document est réinitialisé à la valeur
+Dans cet exemple, le format du documet est réinitialisé à la valeur
 \fIapplication/octet-stream\fR, ce qui force l'auto-détection du type de
 fichier.
 .SH COMPATIBILITÉ
@@ -104,9 +85,10 @@ inetd(8), xinetd(8),
 CUPS Software Administrators Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2005 Easy Software Products, Tous droits réservés.
+Copyright 1993-2002 Easy Software Products, Tous droits réservés.
 .SH TRADUCTION
 Gilles QUERRET <gilles.querret@nerim.net>
 .\"
-.\" End of "$Id: cups-lpd.man,v 1.5 2005/01/03 19:29:58 mike Exp $".
+.\" End of "$Id: cups-lpd.man,v 1.1.2.1 2002/05/21 20:05:49 mike Exp $".
 .\"
+

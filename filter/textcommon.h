@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.h,v 1.14 2005/01/03 19:29:58 mike Exp $"
+ * "$Id$"
  *
  *   Common text filter definitions for the Common UNIX Printing System (CUPS).
  *
@@ -118,5 +118,5 @@ extern void	WriteProlog(const char *title, const char *user,
 
 
 /*
- * End of "$Id: textcommon.h,v 1.14 2005/01/03 19:29:58 mike Exp $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cgi.h,v 1.18 2005/01/03 19:29:44 mike Exp $"
+ * "$Id$"
  *
  *   CGI support library definitions.
  *
@@ -82,5 +82,5 @@ extern void		cgiSetCookie(const char *name, const char *value,
 #endif /* !_CGI_H_ */
 
 /*
- * End of "$Id: cgi.h,v 1.18 2005/01/03 19:29:44 mike Exp $".
+ * End of "$Id$".
  */

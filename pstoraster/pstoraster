@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: pstoraster,v 1.4 2005/01/03 19:29:59 mike Exp $"
+# "$Id$"
 #
 # CUPS filter script for Ghostscript.
 #
@@ -48,5 +48,5 @@ done
 $bindir/gs $gsopts -sOUTPUTFILE="%stdout" $profile $6
 
 #
-# End of "$Id: pstoraster,v 1.4 2005/01/03 19:29:59 mike Exp $".
+# End of "$Id$".
 #

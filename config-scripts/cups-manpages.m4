@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-manpages.m4,v 1.11 2005/01/03 19:29:45 mike Exp $"
+dnl "$Id$"
 dnl
 dnl   Manpage stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -100,5 +100,5 @@ AC_SUBST(MAN8EXT)
 AC_SUBST(MAN8DIR)
 
 dnl
-dnl End of "$Id: cups-manpages.m4,v 1.11 2005/01/03 19:29:45 mike Exp $".
+dnl End of "$Id$".
 dnl

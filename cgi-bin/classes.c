@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.29 2005/01/03 19:29:44 mike Exp $"
+ * "$Id$"
  *
  *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -342,5 +342,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: classes.c,v 1.29 2005/01/03 19:29:44 mike Exp $".
+ * End of "$Id$".
  */

@@ -8,7 +8,7 @@ import javax.swing.JFrame;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import org.cups.*;
+import com.easysw.cups.*;
 
 public class GLPsearchProgressPanel 
 {

@@ -1,5 +1,5 @@
 /*
- * "$Id: html.c,v 1.10 2005/01/03 19:29:44 mike Exp $"
+ * "$Id$"
  *
  *   CGI HTML functions.
  *
@@ -85,5 +85,5 @@ cgiEndHTML(FILE *out)	/* I - Output file to use */
 
 
 /*
- * End of "$Id: html.c,v 1.10 2005/01/03 19:29:44 mike Exp $".
+ * End of "$Id$".
  */

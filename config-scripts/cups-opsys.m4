@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-opsys.m4,v 1.14 2005/01/03 19:29:45 mike Exp $"
+dnl "$Id$"
 dnl
 dnl   Operating system stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -95,5 +95,5 @@ AC_DEFINE_UNQUOTED(CUPS_DEFAULT_USER, "$CUPS_USER")
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_GROUP, "$CUPS_GROUP")
 
 dnl
-dnl "$Id: cups-opsys.m4,v 1.14 2005/01/03 19:29:45 mike Exp $"
+dnl "$Id$"
 dnl

@@ -2,7 +2,7 @@
 //
 // GlobalParams.cc
 //
-// Copyright 2001-2003 Glyph & Cog, LLC
+// Copyright 2001-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -13,7 +13,13 @@
 #endif
 
 #include <string.h>
+#include <stdio.h>
 #include <ctype.h>
+#ifdef ENABLE_PLUGINS
+#  ifndef WIN32
+#    include <dlfcn.h>
+#  endif
+#endif
 #if HAVE_PAPER_H
 #include <paper.h>
 #endif
@@ -29,6 +35,7 @@
 #include "CMap.h"
 #include "BuiltinFontTables.h"
 #include "FontEncodingTables.h"
+#include "XpdfPluginAPI.h"
 #include "GlobalParams.h"
 
 #if MULTITHREADED
@@ -49,13 +56,46 @@
 
 #include "NameToUnicodeTable.h"
 #include "UnicodeMapTables.h"
-#include "DisplayFontTable.h"
 #include "UTF8.h"
+
+#ifdef WIN32
+extern XpdfPluginVecTable xpdfPluginVecTable;
+#endif
 
 //------------------------------------------------------------------------
 
 #define cidToUnicodeCacheSize     4
 #define unicodeToUnicodeCacheSize 4
+
+//------------------------------------------------------------------------
+
+static struct {
+  char *name;
+  char *fileName;
+} displayFontTab[] = {
+  {"Courier",               "n022003l.pfb"},
+  {"Courier-Bold",          "n022004l.pfb"},
+  {"Courier-BoldOblique",   "n022024l.pfb"},
+  {"Courier-Oblique",       "n022023l.pfb"},
+  {"Helvetica",             "n019003l.pfb"},
+  {"Helvetica-Bold",        "n019004l.pfb"},
+  {"Helvetica-BoldOblique", "n019024l.pfb"},
+  {"Helvetica-Oblique",     "n019023l.pfb"},
+  {"Symbol",                "s050000l.pfb"},
+  {"Times-Bold",            "n021004l.pfb"},
+  {"Times-BoldItalic",      "n021024l.pfb"},
+  {"Times-Italic",          "n021023l.pfb"},
+  {"Times-Roman",           "n021003l.pfb"},
+  {"ZapfDingbats",          "d050000l.pfb"},
+  {NULL}
+};
+
+static char *displayFontDirs[] = {
+  "/usr/share/ghostscript/fonts",
+  "/usr/local/share/ghostscript/fonts",
+  "/usr/share/fonts/default/Type1",
+  NULL
+};
 
 //------------------------------------------------------------------------
 
@@ -70,10 +110,6 @@ DisplayFontParam::DisplayFontParam(GString *nameA,
   name = nameA;
   kind = kindA;
   switch (kind) {
-  case displayFontX:
-    x.xlfd = NULL;
-    x.encoding = NULL;
-    break;
   case displayFontT1:
     t1.fileName = NULL;
     break;
@@ -83,24 +119,9 @@ DisplayFontParam::DisplayFontParam(GString *nameA,
   }
 }
 
-DisplayFontParam::DisplayFontParam(const char *nameA, const char *xlfdA, const char *encodingA) {
-  name = new GString(nameA);
-  kind = displayFontX;
-  x.xlfd = new GString(xlfdA);
-  x.encoding = new GString(encodingA);
-}
-
 DisplayFontParam::~DisplayFontParam() {
   delete name;
   switch (kind) {
-  case displayFontX:
-    if (x.xlfd) {
-      delete x.xlfd;
-    }
-    if (x.encoding) {
-      delete x.encoding;
-    }
-    break;
   case displayFontT1:
     if (t1.fileName) {
       delete t1.fileName;
@@ -134,13 +155,154 @@ PSFontParam::~PSFontParam() {
   }
 }
 
+#ifdef ENABLE_PLUGINS
+//------------------------------------------------------------------------
+// Plugin
+//------------------------------------------------------------------------
+
+class Plugin {
+public:
+
+  static Plugin *load(char *type, char *name);
+  ~Plugin();
+
+private:
+
+#ifdef WIN32
+  Plugin(HMODULE libA);
+  HMODULE lib;
+#else
+  Plugin(void *dlA);
+  void *dl;
+#endif
+};
+
+Plugin *Plugin::load(char *type, char *name) {
+  GString *path;
+  Plugin *plugin;
+  XpdfPluginVecTable *vt;
+  XpdfBool (*xpdfInitPlugin)(void);
+#ifdef WIN32
+  HMODULE libA;
+#else
+  void *dlA;
+#endif
+
+  path = globalParams->getBaseDir();
+  appendToPath(path, "plugins");
+  appendToPath(path, type);
+  appendToPath(path, name);
+
+#ifdef WIN32
+  path->append(".dll");
+  if (!(libA = LoadLibrary(path->getCString()))) {
+    error(-1, "Failed to load plugin '%s'",
+	  path->getCString());
+    goto err1;
+  }
+  if (!(vt = (XpdfPluginVecTable *)
+	         GetProcAddress(libA, "xpdfPluginVecTable"))) {
+    error(-1, "Failed to find xpdfPluginVecTable in plugin '%s'",
+	  path->getCString());
+    goto err2;
+  }
+#else
+  //~ need to deal with other extensions here
+  path->append(".so");
+  if (!(dlA = dlopen(path->getCString(), RTLD_NOW))) {
+    error(-1, "Failed to load plugin '%s': %s",
+	  path->getCString(), dlerror());
+    goto err1;
+  }
+  if (!(vt = (XpdfPluginVecTable *)dlsym(dlA, "xpdfPluginVecTable"))) {
+    error(-1, "Failed to find xpdfPluginVecTable in plugin '%s'",
+	  path->getCString());
+    goto err2;
+  }
+#endif
+
+  if (vt->version != xpdfPluginVecTable.version) {
+    error(-1, "Plugin '%s' is wrong version", path->getCString());
+    goto err2;
+  }
+  memcpy(vt, &xpdfPluginVecTable, sizeof(xpdfPluginVecTable));
+
+#ifdef WIN32
+  if (!(xpdfInitPlugin = (XpdfBool (*)(void))
+	                     GetProcAddress(libA, "xpdfInitPlugin"))) {
+    error(-1, "Failed to find xpdfInitPlugin in plugin '%s'",
+	  path->getCString());
+    goto err2;
+  }
+#else
+  if (!(xpdfInitPlugin = (XpdfBool (*)(void))dlsym(dlA, "xpdfInitPlugin"))) {
+    error(-1, "Failed to find xpdfInitPlugin in plugin '%s'",
+	  path->getCString());
+    goto err2;
+  }
+#endif
+
+  if (!(*xpdfInitPlugin)()) {
+    error(-1, "Initialization of plugin '%s' failed",
+	  path->getCString());
+    goto err2;
+  }
+
+#ifdef WIN32
+  plugin = new Plugin(libA);
+#else
+  plugin = new Plugin(dlA);
+#endif
+
+  delete path;
+  return plugin;
+
+ err2:
+#ifdef WIN32
+  FreeLibrary(libA);
+#else
+  dlclose(dlA);
+#endif
+ err1:
+  delete path;
+  return NULL;
+}
+
+#ifdef WIN32
+Plugin::Plugin(HMODULE libA) {
+  lib = libA;
+}
+#else
+Plugin::Plugin(void *dlA) {
+  dl = dlA;
+}
+#endif
+
+Plugin::~Plugin() {
+  void (*xpdfFreePlugin)(void);
+
+#ifdef WIN32
+  if ((xpdfFreePlugin = (void (*)(void))
+                            GetProcAddress(lib, "xpdfFreePlugin"))) {
+    (*xpdfFreePlugin)();
+  }
+  FreeLibrary(lib);
+#else
+  if ((xpdfFreePlugin = (void (*)(void))dlsym(dl, "xpdfFreePlugin"))) {
+    (*xpdfFreePlugin)();
+  }
+  dlclose(dl);
+#endif
+}
+
+#endif // ENABLE_PLUGINS
+
 //------------------------------------------------------------------------
 // parsing
 //------------------------------------------------------------------------
 
-GlobalParams::GlobalParams(const char *cfgFileName) {
+GlobalParams::GlobalParams(char *cfgFileName) {
   UnicodeMap *map;
-  DisplayFontParam *dfp;
   GString *fileName;
   FILE *f;
   int i;
@@ -162,6 +324,12 @@ GlobalParams::GlobalParams(const char *cfgFileName) {
     }
   }
 
+#ifdef WIN32
+  // baseDir will be set by a call to setBaseDir
+  baseDir = new GString();
+#else
+  baseDir = appendToPath(getHomeDir(), ".xpdf");
+#endif
   nameToUnicode = new NameToCharCode();
   cidToUnicodes = new GHash(gTrue);
   unicodeToUnicodes = new GHash(gTrue);
@@ -173,7 +341,7 @@ GlobalParams::GlobalParams(const char *cfgFileName) {
   displayCIDFonts = new GHash();
   displayNamedCIDFonts = new GHash();
 #if HAVE_PAPER_H
-  const char *paperName;
+  char *paperName;
   const struct paper *paperType;
   paperinit();
   if ((paperName = systempapername())) {
@@ -190,10 +358,13 @@ GlobalParams::GlobalParams(const char *cfgFileName) {
   psPaperWidth = defPaperWidth;
   psPaperHeight = defPaperHeight;
 #endif
-  psLeft = 0;
-  psBottom = 0;
-  psRight = psPaperWidth;
-  psTop = psPaperHeight;
+  psImageableLLX = psImageableLLY = 0;
+  psImageableURX = psPaperWidth;
+  psImageableURY = psPaperHeight;
+  psCrop = gTrue;
+  psExpandSmaller = gFalse;
+  psShrinkLarger = gTrue;
+  psCenter = gTrue;
   psDuplex = gFalse;
   psLevel = psLevel2;
   psFile = NULL;
@@ -218,8 +389,9 @@ GlobalParams::GlobalParams(const char *cfgFileName) {
   textKeepTinyChars = gFalse;
   fontDirs = new GList();
   initialZoom = new GString("125");
-  t1libControl = fontRastAALow;
-  freetypeControl = fontRastAALow;
+  enableT1lib = gTrue;
+  enableFreeType = gTrue;
+  antialias = gTrue;
   urlCommand = NULL;
   movieCommand = NULL;
   mapNumericCharNames = gTrue;
@@ -231,6 +403,11 @@ GlobalParams::GlobalParams(const char *cfgFileName) {
       new CharCodeToUnicodeCache(unicodeToUnicodeCacheSize);
   unicodeMapCache = new UnicodeMapCache();
   cMapCache = new CMapCache();
+
+#ifdef ENABLE_PLUGINS
+  plugins = new GList();
+  securityHandlers = new GList();
+#endif
 
   // set up the initial nameToUnicode table
   for (i = 0; nameToUnicodeTab[i].name; ++i) {
@@ -254,14 +431,6 @@ GlobalParams::GlobalParams(const char *cfgFileName) {
   residentUnicodeMaps->add(map->getEncodingName(), map);
   map = new UnicodeMap("UCS-2", gTrue, &mapUCS2);
   residentUnicodeMaps->add(map->getEncodingName(), map);
-
-  // default displayFonts table
-  for (i = 0; displayFontTab[i].name; ++i) {
-    dfp = new DisplayFontParam(displayFontTab[i].name,
-			       displayFontTab[i].xlfd,
-			       displayFontTab[i].encoding);
-    displayFonts->add(dfp->name, dfp);
-  }
 
   // look for a user config file, then a system-wide config file
   f = NULL;
@@ -360,18 +529,10 @@ void GlobalParams::parseFile(GString *fileName, FILE *f) {
 	parseCMapDir(tokens, fileName, line);
       } else if (!cmd->cmp("toUnicodeDir")) {
 	parseToUnicodeDir(tokens, fileName, line);
-      } else if (!cmd->cmp("displayFontX")) {
-	parseDisplayFont(tokens, displayFonts, displayFontX, fileName, line);
       } else if (!cmd->cmp("displayFontT1")) {
 	parseDisplayFont(tokens, displayFonts, displayFontT1, fileName, line);
       } else if (!cmd->cmp("displayFontTT")) {
 	parseDisplayFont(tokens, displayFonts, displayFontTT, fileName, line);
-      } else if (!cmd->cmp("displayNamedCIDFontX")) {
-	parseDisplayFont(tokens, displayNamedCIDFonts,
-			 displayFontX, fileName, line);
-      } else if (!cmd->cmp("displayCIDFontX")) {
-	parseDisplayFont(tokens, displayCIDFonts,
-			 displayFontX, fileName, line);
       } else if (!cmd->cmp("displayNamedCIDFontT1")) {
 	parseDisplayFont(tokens, displayNamedCIDFonts,
 			 displayFontT1, fileName, line);
@@ -395,6 +556,17 @@ void GlobalParams::parseFile(GString *fileName, FILE *f) {
 	parsePSFont16("psFont16", psFonts16, tokens, fileName, line);
       } else if (!cmd->cmp("psPaperSize")) {
 	parsePSPaperSize(tokens, fileName, line);
+      } else if (!cmd->cmp("psImageableArea")) {
+	parsePSImageableArea(tokens, fileName, line);
+      } else if (!cmd->cmp("psCrop")) {
+	parseYesNo("psCrop", &psCrop, tokens, fileName, line);
+      } else if (!cmd->cmp("psExpandSmaller")) {
+	parseYesNo("psExpandSmaller", &psExpandSmaller,
+		   tokens, fileName, line);
+      } else if (!cmd->cmp("psShrinkLarger")) {
+	parseYesNo("psShrinkLarger", &psShrinkLarger, tokens, fileName, line);
+      } else if (!cmd->cmp("psCenter")) {
+	parseYesNo("psCenter", &psCenter, tokens, fileName, line);
       } else if (!cmd->cmp("psDuplex")) {
 	parseYesNo("psDuplex", &psDuplex, tokens, fileName, line);
       } else if (!cmd->cmp("psLevel")) {
@@ -428,12 +600,12 @@ void GlobalParams::parseFile(GString *fileName, FILE *f) {
 	parseFontDir(tokens, fileName, line);
       } else if (!cmd->cmp("initialZoom")) {
 	parseInitialZoom(tokens, fileName, line);
-      } else if (!cmd->cmp("t1libControl")) {
-	parseFontRastControl("t1libControl", &t1libControl,
-			     tokens, fileName, line);
-      } else if (!cmd->cmp("freetypeControl")) {
-	parseFontRastControl("freetypeControl", &freetypeControl,
-			     tokens, fileName, line);
+      } else if (!cmd->cmp("enableT1lib")) {
+	parseYesNo("enableT1lib", &enableT1lib, tokens, fileName, line);
+      } else if (!cmd->cmp("enableFreeType")) {
+	parseYesNo("enableFreeType", &enableFreeType, tokens, fileName, line);
+      } else if (!cmd->cmp("antialias")) {
+	parseYesNo("antialias", &antialias, tokens, fileName, line);
       } else if (!cmd->cmp("urlCommand")) {
 	parseCommand("urlCommand", &urlCommand, tokens, fileName, line);
       } else if (!cmd->cmp("movieCommand")) {
@@ -445,12 +617,19 @@ void GlobalParams::parseFile(GString *fileName, FILE *f) {
 	parseYesNo("printCommands", &printCommands, tokens, fileName, line);
       } else if (!cmd->cmp("errQuiet")) {
 	parseYesNo("errQuiet", &errQuiet, tokens, fileName, line);
-      } else if (!cmd->cmp("fontpath") || !cmd->cmp("fontmap")) {
-	error(-1, "Unknown config file command");
-	error(-1, "-- the config file format has changed since Xpdf 0.9x");
       } else {
 	error(-1, "Unknown config file command '%s' (%s:%d)",
 	      cmd->getCString(), fileName->getCString(), line);
+	if (!cmd->cmp("displayFontX") ||
+	    !cmd->cmp("displayNamedCIDFontX") ||
+	    !cmd->cmp("displayCIDFontX")) {
+	  error(-1, "-- Xpdf no longer supports X fonts");
+	} else if (!cmd->cmp("t1libControl") || !cmd->cmp("freetypeControl")) {
+	  error(-1, "-- The t1libControl and freetypeControl options have been replaced");
+	  error(-1, "   by the enableT1lib, enableFreeType, and antialias options");
+	} else if (!cmd->cmp("fontpath") || !cmd->cmp("fontmap")) {
+	  error(-1, "-- the config file format has changed since Xpdf 0.9x");
+	}
       }
     }
 
@@ -584,13 +763,6 @@ void GlobalParams::parseDisplayFont(GList *tokens, GHash *fontHash,
   param = new DisplayFontParam(((GString *)tokens->get(1))->copy(), kind);
   
   switch (kind) {
-  case displayFontX:
-    if (tokens->getLength() != 4) {
-      goto err2;
-    }
-    param->x.xlfd = ((GString *)tokens->get(2))->copy();
-    param->x.encoding = ((GString *)tokens->get(3))->copy();
-    break;
   case displayFontT1:
     if (tokens->getLength() != 3) {
       goto err2;
@@ -633,10 +805,26 @@ void GlobalParams::parsePSPaperSize(GList *tokens, GString *fileName,
     psPaperWidth = atoi(tok->getCString());
     tok = (GString *)tokens->get(2);
     psPaperHeight = atoi(tok->getCString());
+    psImageableLLX = psImageableLLY = 0;
+    psImageableURX = psPaperWidth;
+    psImageableURY = psPaperHeight;
   } else {
     error(-1, "Bad 'psPaperSize' config file command (%s:%d)",
 	  fileName->getCString(), line);
   }
+}
+
+void GlobalParams::parsePSImageableArea(GList *tokens, GString *fileName,
+					int line) {
+  if (tokens->getLength() != 5) {
+    error(-1, "Bad 'psImageableArea' config file command (%s:%d)",
+	  fileName->getCString(), line);
+    return;
+  }
+  psImageableLLX = atoi(((GString *)tokens->get(1))->getCString());
+  psImageableLLY = atoi(((GString *)tokens->get(2))->getCString());
+  psImageableURX = atoi(((GString *)tokens->get(3))->getCString());
+  psImageableURY = atoi(((GString *)tokens->get(4))->getCString());
 }
 
 void GlobalParams::parsePSLevel(GList *tokens, GString *fileName, int line) {
@@ -691,7 +879,7 @@ void GlobalParams::parsePSFont(GList *tokens, GString *fileName, int line) {
   psFonts->add(param->pdfFontName, param);
 }
 
-void GlobalParams::parsePSFont16(const char *cmdName, GList *fontList,
+void GlobalParams::parsePSFont16(char *cmdName, GList *fontList,
 				 GList *tokens, GString *fileName, int line) {
   PSFontParam *param;
   int wMode;
@@ -771,24 +959,7 @@ void GlobalParams::parseInitialZoom(GList *tokens,
   initialZoom = ((GString *)tokens->get(1))->copy();
 }
 
-void GlobalParams::parseFontRastControl(const char *cmdName, FontRastControl *val,
-					GList *tokens, GString *fileName,
-					int line) {
-  GString *tok;
-
-  if (tokens->getLength() != 2) {
-    error(-1, "Bad '%s' config file command (%s:%d)",
-	  cmdName, fileName->getCString(), line);
-    return;
-  }
-  tok = (GString *)tokens->get(1);
-  if (!setFontRastControl(val, tok->getCString())) {
-    error(-1, "Bad '%s' config file command (%s:%d)",
-	  cmdName, fileName->getCString(), line);
-  }
-}
-
-void GlobalParams::parseCommand(const char *cmdName, GString **val,
+void GlobalParams::parseCommand(char *cmdName, GString **val,
 				GList *tokens, GString *fileName, int line) {
   if (tokens->getLength() != 2) {
     error(-1, "Bad '%s' config file command (%s:%d)",
@@ -801,7 +972,7 @@ void GlobalParams::parseCommand(const char *cmdName, GString **val,
   *val = ((GString *)tokens->get(1))->copy();
 }
 
-void GlobalParams::parseYesNo(const char *cmdName, GBool *flag,
+void GlobalParams::parseYesNo(char *cmdName, GBool *flag,
 			      GList *tokens, GString *fileName, int line) {
   GString *tok;
 
@@ -811,14 +982,21 @@ void GlobalParams::parseYesNo(const char *cmdName, GBool *flag,
     return;
   }
   tok = (GString *)tokens->get(1);
-  if (!tok->cmp("yes")) {
-    *flag = gTrue;
-  } else if (!tok->cmp("no")) {
-    *flag = gFalse;
-  } else {
+  if (!parseYesNo2(tok->getCString(), flag)) {
     error(-1, "Bad '%s' config file command (%s:%d)",
 	  cmdName, fileName->getCString(), line);
   }
+}
+
+GBool GlobalParams::parseYesNo2(char *token, GBool *flag) {
+  if (!strcmp(token, "yes")) {
+    *flag = gTrue;
+  } else if (!strcmp(token, "no")) {
+    *flag = gFalse;
+  } else {
+    return gFalse;
+  }
+  return gTrue;
 }
 
 GlobalParams::~GlobalParams() {
@@ -830,6 +1008,7 @@ GlobalParams::~GlobalParams() {
 
   delete macRomanReverseMap;
 
+  delete baseDir;
   delete nameToUnicode;
   deleteGHash(cidToUnicodes, GString);
   deleteGHash(unicodeToUnicodes, GString);
@@ -866,6 +1045,11 @@ GlobalParams::~GlobalParams() {
   delete unicodeMapCache;
   delete cMapCache;
 
+#ifdef ENABLE_PLUGINS
+  delete securityHandlers;
+  deleteGList(plugins, Plugin);
+#endif
+
 #if MULTITHREADED
   gDestroyMutex(&mutex);
   gDestroyMutex(&unicodeMapCacheMutex);
@@ -874,15 +1058,77 @@ GlobalParams::~GlobalParams() {
 }
 
 //------------------------------------------------------------------------
+
+void GlobalParams::setBaseDir(char *dir) {
+  delete baseDir;
+  baseDir = new GString(dir);
+}
+
+void GlobalParams::setupBaseFonts(char *dir) {
+  GString *fontName;
+  GString *fileName;
+  FILE *f;
+  DisplayFontParam *dfp;
+  int i, j;
+
+  for (i = 0; displayFontTab[i].name; ++i) {
+    fontName = new GString(displayFontTab[i].name);
+    if (getDisplayFont(fontName)) {
+      delete fontName;
+      continue;
+    }
+    fileName = NULL;
+    if (dir) {
+      fileName = appendToPath(new GString(dir), displayFontTab[i].fileName);
+      if ((f = fopen(fileName->getCString(), "rb"))) {
+	fclose(f);
+      } else {
+	delete fileName;
+	fileName = NULL;
+      }
+    }
+#ifndef WIN32
+    for (j = 0; !fileName && displayFontDirs[j]; ++j) {
+      fileName = appendToPath(new GString(displayFontDirs[j]),
+			      displayFontTab[i].fileName);
+      if ((f = fopen(fileName->getCString(), "rb"))) {
+	fclose(f);
+      } else {
+	delete fileName;
+	fileName = NULL;
+      }
+    }
+#endif
+    if (!fileName) {
+      error(-1, "No display font for '%s'", displayFontTab[i].name);
+      delete fontName;
+      continue;
+    }
+    dfp = new DisplayFontParam(fontName, displayFontT1);
+    dfp->t1.fileName = fileName;
+    globalParams->addDisplayFont(dfp);
+  }
+}
+
+//------------------------------------------------------------------------
 // accessors
 //------------------------------------------------------------------------
 
-CharCode GlobalParams::getMacRomanCharCode(const char *charName) {
+CharCode GlobalParams::getMacRomanCharCode(char *charName) {
   // no need to lock - macRomanReverseMap is constant
   return macRomanReverseMap->lookup(charName);
 }
 
-Unicode GlobalParams::mapNameToUnicode(const char *charName) {
+GString *GlobalParams::getBaseDir() {
+  GString *s;
+
+  lockGlobalParams;
+  s = baseDir->copy();
+  unlockGlobalParams;
+  return s;
+}
+
+Unicode GlobalParams::mapNameToUnicode(char *charName) {
   // no need to lock - nameToUnicode is constant
   return nameToUnicode->lookup(charName);
 }
@@ -990,16 +1236,6 @@ GString *GlobalParams::getPSFile() {
   return s;
 }
 
-void GlobalParams::getPSImageableArea(int &left, int &bottom, int &right, int &top) {
-  lockGlobalParams;
-  left   = psLeft;
-  bottom = psBottom;
-  right  = psRight;
-  top    = psTop;
-  unlockGlobalParams;
-}
-
-
 int GlobalParams::getPSPaperWidth() {
   int w;
 
@@ -1018,20 +1254,56 @@ int GlobalParams::getPSPaperHeight() {
   return h;
 }
 
+void GlobalParams::getPSImageableArea(int *llx, int *lly, int *urx, int *ury) {
+  lockGlobalParams;
+  *llx = psImageableLLX;
+  *lly = psImageableLLY;
+  *urx = psImageableURX;
+  *ury = psImageableURY;
+  unlockGlobalParams;
+}
+
+GBool GlobalParams::getPSCrop() {
+  GBool f;
+
+  lockGlobalParams;
+  f = psCrop;
+  unlockGlobalParams;
+  return f;
+}
+
+GBool GlobalParams::getPSExpandSmaller() {
+  GBool f;
+
+  lockGlobalParams;
+  f = psExpandSmaller;
+  unlockGlobalParams;
+  return f;
+}
+
+GBool GlobalParams::getPSShrinkLarger() {
+  GBool f;
+
+  lockGlobalParams;
+  f = psShrinkLarger;
+  unlockGlobalParams;
+  return f;
+}
+
+GBool GlobalParams::getPSCenter() {
+  GBool f;
+
+  lockGlobalParams;
+  f = psCenter;
+  unlockGlobalParams;
+  return f;
+}
+
 GBool GlobalParams::getPSDuplex() {
   GBool d;
 
   lockGlobalParams;
   d = psDuplex;
-  unlockGlobalParams;
-  return d;
-}
-
-GBool GlobalParams::getPSFit() {
-  GBool d;
-
-  lockGlobalParams;
-  d = psFit;
   unlockGlobalParams;
   return d;
 }
@@ -1175,10 +1447,9 @@ GBool GlobalParams::getTextKeepTinyChars() {
   return tiny;
 }
 
-GString *GlobalParams::findFontFile(GString *fontName,
-				    const char **exts) {
+GString *GlobalParams::findFontFile(GString *fontName, char **exts) {
   GString *dir, *fileName;
-  const char **ext;
+  char **ext;
   FILE *f;
   int i;
 
@@ -1209,22 +1480,32 @@ GString *GlobalParams::getInitialZoom() {
   return s;
 }
 
-FontRastControl GlobalParams::getT1libControl() {
-  FontRastControl c;
+GBool GlobalParams::getEnableT1lib() {
+  GBool f;
 
   lockGlobalParams;
-  c = t1libControl;
+  f = enableT1lib;
   unlockGlobalParams;
-  return c;
+  return f;
 }
 
-FontRastControl GlobalParams::getFreeTypeControl() {
-  FontRastControl c;
+GBool GlobalParams::getEnableFreeType() {
+  GBool f;
 
   lockGlobalParams;
-  c = freetypeControl;
+  f = enableFreeType;
   unlockGlobalParams;
-  return c;
+  return f;
+}
+
+
+GBool GlobalParams::getAntialias() {
+  GBool f;
+
+  lockGlobalParams;
+  f = antialias;
+  unlockGlobalParams;
+  return f;
 }
 
 GBool GlobalParams::getMapNumericCharNames() {
@@ -1340,7 +1621,7 @@ void GlobalParams::addDisplayFont(DisplayFontParam *param) {
   unlockGlobalParams;
 }
 
-void GlobalParams::setPSFile(const char *file) {
+void GlobalParams::setPSFile(char *file) {
   lockGlobalParams;
   if (psFile) {
     delete psFile;
@@ -1349,16 +1630,7 @@ void GlobalParams::setPSFile(const char *file) {
   unlockGlobalParams;
 }
 
-void GlobalParams::setPSImageableArea(int left, int bottom, int right, int top) {
-  lockGlobalParams;
-  psLeft   = left;
-  psBottom = bottom;
-  psRight  = right;
-  psTop    = top;
-  unlockGlobalParams;
-}
-
-GBool GlobalParams::setPSPaperSize(const char *size) {
+GBool GlobalParams::setPSPaperSize(char *size) {
   lockGlobalParams;
   if (!strcmp(size, "match")) {
     psPaperWidth = psPaperHeight = -1;
@@ -1374,17 +1646,13 @@ GBool GlobalParams::setPSPaperSize(const char *size) {
   } else if (!strcmp(size, "A3")) {
     psPaperWidth = 842;
     psPaperHeight = 1190;
-  } else if (!strcmp(size, "Universal")) {
-    psPaperWidth = 595;
-    psPaperHeight = 792;
   } else {
     unlockGlobalParams;
     return gFalse;
   }
-  psLeft = 0;
-  psBottom = 0;
-  psRight = psPaperWidth;
-  psTop = psPaperHeight;
+  psImageableLLX = psImageableLLY = 0;
+  psImageableURX = psPaperWidth;
+  psImageableURY = psPaperHeight;
   unlockGlobalParams;
   return gTrue;
 }
@@ -1392,28 +1660,55 @@ GBool GlobalParams::setPSPaperSize(const char *size) {
 void GlobalParams::setPSPaperWidth(int width) {
   lockGlobalParams;
   psPaperWidth = width;
-  psLeft = 0;
-  psRight = psPaperWidth;
+  psImageableLLX = 0;
+  psImageableURX = psPaperWidth;
   unlockGlobalParams;
 }
 
 void GlobalParams::setPSPaperHeight(int height) {
   lockGlobalParams;
   psPaperHeight = height;
-  psBottom = 0;
-  psTop = psPaperHeight;
+  psImageableLLY = 0;
+  psImageableURY = psPaperHeight;
+  unlockGlobalParams;
+}
+
+void GlobalParams::setPSImageableArea(int llx, int lly, int urx, int ury) {
+  lockGlobalParams;
+  psImageableLLX = llx;
+  psImageableLLY = lly;
+  psImageableURX = urx;
+  psImageableURY = ury;
+  unlockGlobalParams;
+}
+
+void GlobalParams::setPSCrop(GBool crop) {
+  lockGlobalParams;
+  psCrop = crop;
+  unlockGlobalParams;
+}
+
+void GlobalParams::setPSExpandSmaller(GBool expand) {
+  lockGlobalParams;
+  psExpandSmaller = expand;
+  unlockGlobalParams;
+}
+
+void GlobalParams::setPSShrinkLarger(GBool shrink) {
+  lockGlobalParams;
+  psShrinkLarger = shrink;
+  unlockGlobalParams;
+}
+
+void GlobalParams::setPSCenter(GBool center) {
+  lockGlobalParams;
+  psCenter = center;
   unlockGlobalParams;
 }
 
 void GlobalParams::setPSDuplex(GBool duplex) {
   lockGlobalParams;
   psDuplex = duplex;
-  unlockGlobalParams;
-}
-
-void GlobalParams::setPSFit(GBool fit) {
-  lockGlobalParams;
-  psFit = fit;
   unlockGlobalParams;
 }
 
@@ -1459,14 +1754,14 @@ void GlobalParams::setPSASCIIHex(GBool hex) {
   unlockGlobalParams;
 }
 
-void GlobalParams::setTextEncoding(const char *encodingName) {
+void GlobalParams::setTextEncoding(char *encodingName) {
   lockGlobalParams;
   delete textEncoding;
   textEncoding = new GString(encodingName);
   unlockGlobalParams;
 }
 
-GBool GlobalParams::setTextEOL(const char *s) {
+GBool GlobalParams::setTextEOL(char *s) {
   lockGlobalParams;
   if (!strcmp(s, "unix")) {
     textEOL = eolUnix;
@@ -1494,47 +1789,39 @@ void GlobalParams::setTextKeepTinyChars(GBool keep) {
   unlockGlobalParams;
 }
 
-void GlobalParams::setInitialZoom(const char *s) {
+void GlobalParams::setInitialZoom(char *s) {
   lockGlobalParams;
   delete initialZoom;
   initialZoom = new GString(s);
   unlockGlobalParams;
 }
 
-GBool GlobalParams::setT1libControl(const char *s) {
+GBool GlobalParams::setEnableT1lib(char *s) {
   GBool ok;
 
   lockGlobalParams;
-  ok = setFontRastControl(&t1libControl, s);
+  ok = parseYesNo2(s, &enableT1lib);
   unlockGlobalParams;
   return ok;
 }
 
-GBool GlobalParams::setFreeTypeControl(const char *s) {
+GBool GlobalParams::setEnableFreeType(char *s) {
   GBool ok;
 
   lockGlobalParams;
-  ok = setFontRastControl(&freetypeControl, s);
+  ok = parseYesNo2(s, &enableFreeType);
   unlockGlobalParams;
   return ok;
 }
 
-GBool GlobalParams::setFontRastControl(FontRastControl *val, const char *s) {
+
+GBool GlobalParams::setAntialias(char *s) {
+  GBool ok;
+
   lockGlobalParams;
-  if (!strcmp(s, "none")) {
-    *val = fontRastNone;
-  } else if (!strcmp(s, "plain")) {
-    *val = fontRastPlain;
-  } else if (!strcmp(s, "low")) {
-    *val = fontRastAALow;
-  } else if (!strcmp(s, "high")) {
-    *val = fontRastAAHigh;
-  } else {
-    unlockGlobalParams;
-    return gFalse;
-  }
+  ok = parseYesNo2(s, &antialias);
   unlockGlobalParams;
-  return gTrue;
+  return ok;
 }
 
 void GlobalParams::setMapNumericCharNames(GBool map) {
@@ -1554,3 +1841,63 @@ void GlobalParams::setErrQuiet(GBool errQuietA) {
   errQuiet = errQuietA;
   unlockGlobalParams;
 }
+
+void GlobalParams::addSecurityHandler(XpdfSecurityHandler *handler) {
+#ifdef ENABLE_PLUGINS
+  lockGlobalParams;
+  securityHandlers->append(handler);
+  unlockGlobalParams;
+#endif
+}
+
+XpdfSecurityHandler *GlobalParams::getSecurityHandler(char *name) {
+#ifdef ENABLE_PLUGINS
+  XpdfSecurityHandler *hdlr;
+  int i;
+
+  lockGlobalParams;
+  for (i = 0; i < securityHandlers->getLength(); ++i) {
+    hdlr = (XpdfSecurityHandler *)securityHandlers->get(i);
+    if (!strcmp(hdlr->name, name)) {
+      unlockGlobalParams;
+      return hdlr;
+    }
+  }
+  unlockGlobalParams;
+
+  if (!loadPlugin("security", name)) {
+    return NULL;
+  }
+
+  lockGlobalParams;
+  for (i = 0; i < securityHandlers->getLength(); ++i) {
+    hdlr = (XpdfSecurityHandler *)securityHandlers->get(i);
+    if (!strcmp(hdlr->name, name)) {
+      unlockGlobalParams;
+      return hdlr;
+    }
+  }
+  unlockGlobalParams;
+#endif
+
+  return NULL;
+}
+
+#ifdef ENABLE_PLUGINS
+//------------------------------------------------------------------------
+// plugins
+//------------------------------------------------------------------------
+
+GBool GlobalParams::loadPlugin(char *type, char *name) {
+  Plugin *plugin;
+
+  if (!(plugin = Plugin::load(type, name))) {
+    return gFalse;
+  }
+  lockGlobalParams;
+  plugins->append(plugin);
+  unlockGlobalParams;
+  return gTrue;
+}
+
+#endif // ENABLE_PLUGINS

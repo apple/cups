@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.235 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -148,7 +148,8 @@ static void	set_job_attrs(client_t *con, ipp_attribute_t *uri);
 static void	start_printer(client_t *con, ipp_attribute_t *uri);
 static void	stop_printer(client_t *con, ipp_attribute_t *uri);
 static void	validate_job(client_t *con, ipp_attribute_t *uri);
-static int	validate_user(client_t *con, const char *owner, char *username,
+static int	validate_user(job_t *job, client_t *con,
+		              const char *owner, char *username,
 		              int userlen);
 
 
@@ -319,15 +320,14 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 	  */
 
 	  if (strcmp(username->values[0].string.text, "root") == 0 &&
-	      ntohl(con->http.hostaddr.sin_addr.s_addr) != 0x7f000001 &&
+	      strcasecmp(con->http.hostname, "localhost") != 0 &&
 	      strcmp(con->username, "root") != 0)
 	  {
 	   /*
 	    * Remote unauthenticated user masquerading as local root...
 	    */
 
-	    free(username->values[0].string.text);
-	    username->values[0].string.text = strdup(RemoteRoot);
+	    SetString(&(username->values[0].string.text), RemoteRoot);
 	  }
 	}
 
@@ -467,7 +467,6 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
 
   if (SendHeader(con, HTTP_OK, "application/ipp"))
   {
-#if 0
     if (con->http.version == HTTP_1_1)
     {
       con->http.data_encoding = HTTP_ENCODE_CHUNKED;
@@ -475,7 +474,6 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
       httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n\r\n");
     }
     else
-#endif /* 0 */
     {
       con->http.data_encoding  = HTTP_ENCODE_LENGTH;
       con->http.data_remaining = ippLength(con->response);
@@ -549,7 +547,7 @@ accept_jobs(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((name = ValidateDest(host, resource, &dtype)) == NULL)
+  if ((name = ValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
    /*
     * Bad URI...
@@ -561,13 +559,19 @@ accept_jobs(client_t        *con,	/* I - Client connection */
   }
 
  /*
-  * Accept jobs sent to the printer...
+  * Check policy...
   */
 
-  if (dtype & CUPS_PRINTER_CLASS)
-    printer = FindClass(name);
-  else
-    printer = FindPrinter(name);
+  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  {
+    LogMessage(L_ERROR, "accept_jobs: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * Accept jobs sent to the printer...
+  */
 
   printer->accepting        = 1;
   printer->state_message[0] = '\0';
@@ -608,7 +612,8 @@ add_class(client_t        *con,		/* I - Client connection */
 			resource[HTTP_MAX_URI];
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
-  printer_t		*pclass;	/* Class */
+  printer_t		*pclass,	/* Class */
+			*member;	/* Member printer/class */
   cups_ptype_t		dtype;		/* Destination type */
   const char		*dest;		/* Printer or class name */
   ipp_attribute_t	*attr;		/* Printer attribute */
@@ -643,6 +648,17 @@ add_class(client_t        *con,		/* I - Client connection */
     */
 
     send_ipp_error(con, IPP_BAD_REQUEST);
+    return;
+  }
+
+ /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  {
+    LogMessage(L_ERROR, "add_class: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
 
@@ -813,7 +829,42 @@ add_class(client_t        *con,		/* I - Client connection */
     FreeQuotas(pclass);
     pclass->page_limit = attr->values[0].integer;
   }
+  if ((attr = ippFindAttribute(con->request, "printer-op-policy", IPP_TAG_TEXT)) != NULL)
+  {
+    policy_t *p;			/* Policy */
 
+
+    if ((p = FindPolicy(attr->values[0].string.text)) != NULL)
+    {
+      LogMessage(L_DEBUG, "add_class: Setting printer-op-policy to \"%s\"...",
+                 attr->values[0].string.text);
+      SetString(&pclass->op_policy, attr->values[0].string.text);
+      pclass->op_policy_ptr = p;
+    }
+    else
+    {
+      LogMessage(L_ERROR, "add_class: Unknown printer-op-policy \"%s\"...",
+                 attr->values[0].string.text);
+      send_ipp_error(con, IPP_NOT_POSSIBLE);
+      return;
+    }
+  }
+  if ((attr = ippFindAttribute(con->request, "printer-error-policy", IPP_TAG_TEXT)) != NULL)
+  {
+    if (strcmp(attr->values[0].string.text, "abort-job") &&
+        strcmp(attr->values[0].string.text, "retry-job") &&
+        strcmp(attr->values[0].string.text, "stop-printer"))
+    {
+      LogMessage(L_ERROR, "add_class: Unknown printer-error-policy \"%s\"...",
+                 attr->values[0].string.text);
+      send_ipp_error(con, IPP_NOT_POSSIBLE);
+      return;
+    }
+
+    LogMessage(L_DEBUG, "add_class: Setting printer-error-policy to \"%s\"...",
+               attr->values[0].string.text);
+    SetString(&pclass->error_policy, attr->values[0].string.text);
+  }
   if ((attr = ippFindAttribute(con->request, "member-uris", IPP_TAG_URI)) != NULL)
   {
    /*
@@ -839,7 +890,7 @@ add_class(client_t        *con,		/* I - Client connection */
       httpSeparate(attr->values[i].string.text, method, username, host,
                    &port, resource);
 
-      if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
+      if ((dest = ValidateDest(host, resource, &dtype, &member)) == NULL)
       {
        /*
 	* Bad URI...
@@ -854,20 +905,7 @@ add_class(client_t        *con,		/* I - Client connection */
       * Add it to the class...
       */
 
-      if (dtype & CUPS_PRINTER_CLASS)
-      {
-        AddPrinterToClass(pclass, FindClass(dest));
-
-	LogMessage(L_DEBUG, "add_class: Added class \"%s\" to class \"%s\"...",
-	           dest, pclass->name);
-      }
-      else
-      {
-        AddPrinterToClass(pclass, FindPrinter(dest));
-
-	LogMessage(L_DEBUG, "add_class: Added printer \"%s\" to class \"%s\"...",
-	           dest, pclass->name);
-      }
+      AddPrinterToClass(pclass, member);
     }
   }
 
@@ -1077,6 +1115,17 @@ add_printer(client_t        *con,	/* I - Client connection */
     LogMessage(L_ERROR, "add_printer: bad printer URI \"%s\"!",
                uri->values[0].string.text);
     send_ipp_error(con, IPP_BAD_REQUEST);
+    return;
+  }
+
+ /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  {
+    LogMessage(L_ERROR, "add_printer: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
 
@@ -1315,6 +1364,42 @@ add_printer(client_t        *con,	/* I - Client connection */
                attr->values[0].integer);
     FreeQuotas(printer);
     printer->page_limit = attr->values[0].integer;
+  }
+  if ((attr = ippFindAttribute(con->request, "printer-op-policy", IPP_TAG_TEXT)) != NULL)
+  {
+    policy_t *p;			/* Policy */
+
+
+    if ((p = FindPolicy(attr->values[0].string.text)) != NULL)
+    {
+      LogMessage(L_DEBUG, "add_printer: Setting printer-op-policy to \"%s\"...",
+                 attr->values[0].string.text);
+      SetString(&printer->op_policy, attr->values[0].string.text);
+      printer->op_policy_ptr = p;
+    }
+    else
+    {
+      LogMessage(L_ERROR, "add_printer: Unknown printer-op-policy \"%s\"...",
+                 attr->values[0].string.text);
+      send_ipp_error(con, IPP_NOT_POSSIBLE);
+      return;
+    }
+  }
+  if ((attr = ippFindAttribute(con->request, "printer-error-policy", IPP_TAG_TEXT)) != NULL)
+  {
+    if (strcmp(attr->values[0].string.text, "abort-job") &&
+        strcmp(attr->values[0].string.text, "retry-job") &&
+        strcmp(attr->values[0].string.text, "stop-printer"))
+    {
+      LogMessage(L_ERROR, "add_printer: Unknown printer-error-policy \"%s\"...",
+                 attr->values[0].string.text);
+      send_ipp_error(con, IPP_NOT_POSSIBLE);
+      return;
+    }
+
+    LogMessage(L_DEBUG, "add_printer: Setting printer-error-policy to \"%s\"...",
+               attr->values[0].string.text);
+    SetString(&printer->error_policy, attr->values[0].string.text);
   }
 
  /*
@@ -1574,6 +1659,7 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
   ipp_attribute_t	*attr;		/* Attribute in request */
   const char		*username;	/* Username */
   int			purge;		/* Purge? */
+  printer_t		*printer;	/* Printer */
 
 
   LogMessage(L_DEBUG2, "cancel_all_jobs(%p[%d], %s)\n", con, con->http.fd,
@@ -1583,7 +1669,8 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
   * Was this operation called from the correct URI?
   */
 
-  if (strncmp(con->uri, "/admin/", 7) != 0)
+  if (strncmp(con->uri, "/admin/", 7) &&
+      strncmp(con->uri, "/jobs/", 7))
   {
     LogMessage(L_ERROR, "cancel_all_jobs: admin request on bad resource \'%s\'!",
                con->uri);
@@ -1595,7 +1682,7 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
   * See if we have a printer URI...
   */
 
-  if (strcmp(uri->name, "printer-uri") != 0)
+  if (strcmp(uri->name, "printer-uri"))
   {
     LogMessage(L_ERROR, "cancel_all_jobs: bad %s attribute \'%s\'!",
                uri->name, uri->values[0].string.text);
@@ -1623,6 +1710,16 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
   else
     username = NULL;
 
+  if ((!username ||
+       (username && con->username[0] && strcmp(username, con->username))) &&
+      strncmp(con->uri, "/admin/", 7))
+  {
+    LogMessage(L_ERROR, "cancel_all_jobs: only administrators can cancel "
+                        "other users\' jobs!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
  /*
   * Look for the "purge-jobs" attribute...
   */
@@ -1639,7 +1736,7 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
   httpSeparate(uri->values[0].string.text, method, userpass, host, &port,
                resource);
 
-  if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
+  if ((dest = ValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
    /*
     * Bad URI?
@@ -1649,6 +1746,17 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
     {
       LogMessage(L_ERROR, "cancel_all_jobs: resource name \'%s\' no good!", resource);
       send_ipp_error(con, IPP_NOT_FOUND);
+      return;
+    }
+
+   /*
+    * Check policy...
+    */
+
+    if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+    {
+      LogMessage(L_ERROR, "cancel_all_jobs: not authorized!");
+      send_ipp_error(con, IPP_NOT_AUTHORIZED);
       return;
     }
 
@@ -1663,6 +1771,17 @@ cancel_all_jobs(client_t        *con,	/* I - Client connection */
   }
   else
   {
+   /*
+    * Check policy...
+    */
+
+    if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+    {
+      LogMessage(L_ERROR, "cancel_all_jobs: not authorized!");
+      send_ipp_error(con, IPP_NOT_AUTHORIZED);
+      return;
+    }
+
    /*
     * Cancel all of the jobs on the named printer...
     */
@@ -1744,7 +1863,7 @@ cancel_job(client_t        *con,	/* I - Client connection */
 
       httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-      if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
+      if ((dest = ValidateDest(host, resource, &dtype, &printer)) == NULL)
       {
        /*
 	* Bad URI...
@@ -1754,11 +1873,6 @@ cancel_job(client_t        *con,	/* I - Client connection */
 	send_ipp_error(con, IPP_NOT_FOUND);
 	return;
       }
-
-      if (dtype & CUPS_PRINTER_CLASS)
-        printer = FindClass(dest);
-      else
-        printer = FindPrinter(dest);
 
      /*
       * See if the printer is currently printing a job...
@@ -1830,7 +1944,7 @@ cancel_job(client_t        *con,	/* I - Client connection */
   * See if the job is owned by the requesting user...
   */
 
-  if (!validate_user(con, job->username, username, sizeof(username)))
+  if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
     LogMessage(L_ERROR, "cancel_job: \"%s\" not authorized to delete job id %d owned by \"%s\"!",
                username, jobid, job->username);
@@ -2767,8 +2881,6 @@ create_job(client_t        *con,	/* I - Client connection */
   job_t			*job;		/* Current job */
   char			job_uri[HTTP_MAX_URI],
 					/* Job URI */
-			printer_uri[HTTP_MAX_URI],
-					/* Printer URI */
 			method[HTTP_MAX_URI],
 					/* Method portion of URI */
 			username[HTTP_MAX_URI],
@@ -2806,7 +2918,7 @@ create_job(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
+  if ((dest = ValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
    /*
     * Bad URI...
@@ -2818,22 +2930,19 @@ create_job(client_t        *con,	/* I - Client connection */
   }
 
  /*
-  * See if the printer is accepting jobs...
+  * Check policy...
   */
 
-  if (dtype & CUPS_PRINTER_CLASS)
+  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
   {
-    printer = FindClass(dest);
-    snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/classes/%s",
-             ServerName, ntohs(con->http.hostaddr.sin_port), dest);
+    LogMessage(L_ERROR, "create_job: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
   }
-  else
-  {
-    printer = FindPrinter(dest);
 
-    snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/printers/%s",
-             ServerName, ntohs(con->http.hostaddr.sin_port), dest);
-  }
+ /*
+  * See if the printer is accepting jobs...
+  */
 
   if (!printer->accepting)
   {
@@ -3044,7 +3153,7 @@ create_job(client_t        *con,	/* I - Client connection */
   job->sheets = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
                               "job-media-sheets-completed", 0);
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
-               printer_uri);
+               printer->uri);
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL,
                title);
 
@@ -3217,7 +3326,8 @@ create_job(client_t        *con,	/* I - Client connection */
   */
 
   snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	   ntohs(con->http.hostaddr.sin_port), job->id);
+	   LocalPort, job->id);
+
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL, job_uri);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
@@ -3273,7 +3383,7 @@ delete_printer(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
+  if ((dest = ValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
    /*
     * Bad URI...
@@ -3285,13 +3395,15 @@ delete_printer(client_t        *con,	/* I - Client connection */
   }
 
  /*
-  * Find the printer or class and delete it...
+  * Check policy...
   */
 
-  if (dtype & CUPS_PRINTER_CLASS)
-    printer = FindClass(dest);
-  else
-    printer = FindPrinter(dest);
+  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  {
+    LogMessage(L_ERROR, "delete_printer: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
 
  /*
   * Remove old jobs...
@@ -3349,6 +3461,17 @@ get_default(client_t *con)		/* I - Client connection */
 
   LogMessage(L_DEBUG2, "get_default(%p[%d])\n", con, con->http.fd);
 
+ /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  {
+    LogMessage(L_ERROR, "get_default: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
   if (DefaultPrinter != NULL)
   {
     requested = ippFindAttribute(con->request, "requested-attributes",
@@ -3399,6 +3522,17 @@ get_devices(client_t *con)		/* I - Client connection */
   LogMessage(L_DEBUG2, "get_devices(%p[%d])\n", con, con->http.fd);
 
  /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  {
+    LogMessage(L_ERROR, "get_devices: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
   * Copy the device attributes to the response using the requested-attributes
   * attribute that may be provided by the client.
   */
@@ -3439,6 +3573,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
   job_t			*job;		/* Current job pointer */
   char			job_uri[HTTP_MAX_URI];
 					/* Job URI... */
+  printer_t		*printer;	/* Printer */
 
 
   LogMessage(L_DEBUG2, "get_jobs(%p[%d], %s)\n", con, con->http.fd,
@@ -3453,23 +3588,26 @@ get_jobs(client_t        *con,		/* I - Client connection */
   if (strcmp(resource, "/") == 0 ||
       (strncmp(resource, "/jobs", 5) == 0 && strlen(resource) <= 6))
   {
-    dest  = NULL;
-    dtype = (cups_ptype_t)0;
-    dmask = (cups_ptype_t)0;
+    dest    = NULL;
+    dtype   = (cups_ptype_t)0;
+    dmask   = (cups_ptype_t)0;
+    printer = NULL;
   }
   else if (strncmp(resource, "/printers", 9) == 0 && strlen(resource) <= 10)
   {
-    dest  = NULL;
-    dtype = (cups_ptype_t)0;
-    dmask = CUPS_PRINTER_CLASS;
+    dest    = NULL;
+    dtype   = (cups_ptype_t)0;
+    dmask   = CUPS_PRINTER_CLASS;
+    printer = NULL;
   }
   else if (strncmp(resource, "/classes", 8) == 0 && strlen(resource) <= 9)
   {
-    dest  = NULL;
-    dtype = CUPS_PRINTER_CLASS;
-    dmask = CUPS_PRINTER_CLASS;
+    dest    = NULL;
+    dtype   = CUPS_PRINTER_CLASS;
+    dmask   = CUPS_PRINTER_CLASS;
+    printer = NULL;
   }
-  else if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
+  else if ((dest = ValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
    /*
     * Bad URI...
@@ -3481,6 +3619,26 @@ get_jobs(client_t        *con,		/* I - Client connection */
   }
   else
     dmask = CUPS_PRINTER_CLASS;
+
+ /*
+  * Check policy...
+  */
+
+  if (printer)
+  {
+    if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+    {
+      LogMessage(L_ERROR, "get_jobs: not authorized!");
+      send_ipp_error(con, IPP_NOT_AUTHORIZED);
+      return;
+    }
+  }
+  else if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  {
+    LogMessage(L_ERROR, "get_jobs: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
 
  /*
   * See if the "which-jobs" attribute have been specified...
@@ -3557,7 +3715,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
     */
 
     snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	     ntohs(con->http.hostaddr.sin_port), job->id);
+	     LocalPort, job->id);
 
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
                  "job-more-info", NULL, job_uri);
@@ -3673,12 +3831,22 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
   }
 
  /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  {
+    LogMessage(L_ERROR, "get_job_attrs: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
   * Put out the standard attributes...
   */
 
   snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d",
-	   ServerName, ntohs(con->http.hostaddr.sin_port),
-	   job->id);
+	   ServerName, LocalPort, job->id);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
 
@@ -3718,6 +3886,17 @@ static void
 get_ppds(client_t *con)			/* I - Client connection */
 {
   LogMessage(L_DEBUG2, "get_ppds(%p[%d])\n", con, con->http.fd);
+
+ /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  {
+    LogMessage(L_ERROR, "get_ppds: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
 
  /*
   * Copy the PPD attributes to the response using the requested-attributes
@@ -3768,7 +3947,7 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
+  if ((dest = ValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
    /*
     * Bad URI...
@@ -3779,10 +3958,16 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
     return;
   }
 
-  if (dtype & CUPS_PRINTER_CLASS)
-    printer = FindClass(dest);
-  else
-    printer = FindPrinter(dest);
+ /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  {
+    LogMessage(L_ERROR, "get_printer_attrs: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
 
   curtime = time(NULL);
 
@@ -3808,6 +3993,11 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
                 "printer-state-time", printer->state_time);
   ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
              ippTimeToDate(curtime));
+
+  ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
+               "printer-error-policy", NULL, printer->op_policy);
+  ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
+               "printer-op-policy", NULL, printer->op_policy);
 
   add_queued_job_count(con, printer);
 
@@ -3872,6 +4062,17 @@ get_printers(client_t *con,		/* I - Client connection */
 
 
   LogMessage(L_DEBUG2, "get_printers(%p[%d], %x)\n", con, con->http.fd, type);
+
+ /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  {
+    LogMessage(L_ERROR, "get_printers: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
 
  /*
   * See if they want to limit the number of printers reported...
@@ -3999,6 +4200,11 @@ get_printers(client_t *con,		/* I - Client connection */
       ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
         	 ippTimeToDate(curtime));
 
+      ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                   "printer-error-policy", NULL, printer->op_policy);
+      ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                   "printer-op-policy", NULL, printer->op_policy);
+
       add_queued_job_count(con, printer);
 
       copy_attrs(con->response, printer->attrs, requested, IPP_TAG_ZERO, 0);
@@ -4123,7 +4329,7 @@ hold_job(client_t        *con,	/* I - Client connection */
   * See if the job is owned by the requesting user...
   */
 
-  if (!validate_user(con, job->username, username, sizeof(username)))
+  if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
     LogMessage(L_ERROR, "hold_job: \"%s\" not authorized to hold job id %d owned by \"%s\"!",
                username, jobid, job->username);
@@ -4197,6 +4403,7 @@ move_job(client_t        *con,		/* I - Client connection */
 			resource[HTTP_MAX_URI];
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
+  printer_t		*printer;	/* Printer */
 
 
   LogMessage(L_DEBUG2, "move_job(%p[%d], %s)\n", con, con->http.fd,
@@ -4278,7 +4485,7 @@ move_job(client_t        *con,		/* I - Client connection */
   * See if the job is owned by the requesting user...
   */
 
-  if (!validate_user(con, job->username, username, sizeof(username)))
+  if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
     LogMessage(L_ERROR, "move_job: \"%s\" not authorized to move job id %d owned by \"%s\"!",
                username, jobid, job->username);
@@ -4298,12 +4505,12 @@ move_job(client_t        *con,		/* I - Client connection */
   }
     
  /*
-  * Move the job to a different printer or class...
+  * Get the new printer or class...
   */
 
   httpSeparate(attr->values[0].string.text, method, username, host, &port,
                resource);
-  if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
+  if ((dest = ValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
    /*
     * Bad URI...
@@ -4313,6 +4520,21 @@ move_job(client_t        *con,		/* I - Client connection */
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
+
+ /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  {
+    LogMessage(L_ERROR, "move_job: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * Move the job to a different printer or class...
+  */
 
   MoveJob(jobid, dest);
 
@@ -4466,8 +4688,6 @@ print_job(client_t        *con,		/* I - Client connection */
   int			jobid;		/* Job ID number */
   char			job_uri[HTTP_MAX_URI],
 					/* Job URI */
-			printer_uri[HTTP_MAX_URI],
-					/* Printer URI */
 			method[HTTP_MAX_URI],
 					/* Method portion of URI */
 			username[HTTP_MAX_URI],
@@ -4675,7 +4895,7 @@ print_job(client_t        *con,		/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
+  if ((dest = ValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
    /*
     * Bad URI...
@@ -4687,22 +4907,19 @@ print_job(client_t        *con,		/* I - Client connection */
   }
 
  /*
-  * See if the printer is accepting jobs...
+  * Check policy...
   */
 
-  if (dtype & CUPS_PRINTER_CLASS)
+  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
   {
-    printer = FindClass(dest);
-    snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/classes/%s",
-             ServerName, ntohs(con->http.hostaddr.sin_port), dest);
+    LogMessage(L_ERROR, "print_job: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
   }
-  else
-  {
-    printer = FindPrinter(dest);
 
-    snprintf(printer_uri, sizeof(printer_uri), "http://%s:%d/printers/%s",
-             ServerName, ntohs(con->http.hostaddr.sin_port), dest);
-  }
+ /*
+  * See if the printer is accepting jobs...
+  */
 
   if (!printer->accepting)
   {
@@ -4877,7 +5094,7 @@ print_job(client_t        *con,		/* I - Client connection */
   job->sheets = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
                               "job-media-sheets-completed", 0);
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
-               printer_uri);
+               printer->uri);
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL,
                title);
 
@@ -5103,7 +5320,8 @@ print_job(client_t        *con,		/* I - Client connection */
   */
 
   snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	   ntohs(con->http.hostaddr.sin_port), jobid);
+	   LocalPort, jobid);
+
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL, job_uri);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", jobid);
@@ -5340,7 +5558,7 @@ reject_jobs(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((name = ValidateDest(host, resource, &dtype)) == NULL)
+  if ((name = ValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
    /*
     * Bad URI...
@@ -5352,13 +5570,19 @@ reject_jobs(client_t        *con,	/* I - Client connection */
   }
 
  /*
-  * Reject jobs sent to the printer...
+  * Check policy...
   */
 
-  if (dtype & CUPS_PRINTER_CLASS)
-    printer = FindClass(name);
-  else
-    printer = FindPrinter(name);
+  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  {
+    LogMessage(L_ERROR, "reject_jobs: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * Reject jobs sent to the printer...
+  */
 
   printer->accepting = 0;
 
@@ -5509,7 +5733,7 @@ release_job(client_t        *con,	/* I - Client connection */
   * See if the job is owned by the requesting user...
   */
 
-  if (!validate_user(con, job->username, username, sizeof(username)))
+  if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
     LogMessage(L_ERROR, "release_job: \"%s\" not authorized to release job id %d owned by \"%s\"!",
                username, jobid, job->username);
@@ -5673,7 +5897,7 @@ restart_job(client_t        *con,	/* I - Client connection */
   * See if the job is owned by the requesting user...
   */
 
-  if (!validate_user(con, job->username, username, sizeof(username)))
+  if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
     LogMessage(L_ERROR, "restart_job: \"%s\" not authorized to restart job id %d owned by \"%s\"!",
                username, jobid, job->username);
@@ -5808,7 +6032,7 @@ send_document(client_t        *con,	/* I - Client connection */
   * See if the job is owned by the requesting user...
   */
 
-  if (!validate_user(con, job->username, username, sizeof(username)))
+  if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
     LogMessage(L_ERROR, "send_document: \"%s\" not authorized to send document for job id %d owned by \"%s\"!",
                username, jobid, job->username);
@@ -6037,7 +6261,8 @@ send_document(client_t        *con,	/* I - Client connection */
   */
 
   snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	   ntohs(con->http.hostaddr.sin_port), jobid);
+	   LocalPort, jobid);
+
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL,
                job_uri);
 
@@ -6096,6 +6321,7 @@ set_default(client_t        *con,	/* I - Client connection */
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
   const char		*name;		/* Printer name */
+  printer_t		*printer;	/* Printer */
 
 
   LogMessage(L_DEBUG2, "set_default(%p[%d], %s)\n", con, con->http.fd,
@@ -6119,7 +6345,7 @@ set_default(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((name = ValidateDest(host, resource, &dtype)) == NULL)
+  if ((name = ValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
    /*
     * Bad URI...
@@ -6131,13 +6357,21 @@ set_default(client_t        *con,	/* I - Client connection */
   }
 
  /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(DefaultPolicyPtr, con, NULL))
+  {
+    LogMessage(L_ERROR, "set_default: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
   * Set it as the default...
   */
 
-  if (dtype & CUPS_PRINTER_CLASS)
-    DefaultPrinter = FindClass(name);
-  else
-    DefaultPrinter = FindPrinter(name);
+  DefaultPrinter = printer;
 
   SaveAllPrinters();
   SaveAllClasses();
@@ -6262,7 +6496,7 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
   * See if the job is owned by the requesting user...
   */
 
-  if (!validate_user(con, job->username, username, sizeof(username)))
+  if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
     LogMessage(L_ERROR, "set_job_attrs: \"%s\" not authorized to alter job id %d owned by \"%s\"!",
                username, jobid, job->username);
@@ -6536,7 +6770,7 @@ start_printer(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((name = ValidateDest(host, resource, &dtype)) == NULL)
+  if ((name = ValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
    /*
     * Bad URI...
@@ -6548,13 +6782,19 @@ start_printer(client_t        *con,	/* I - Client connection */
   }
 
  /*
-  * Start the printer...
+  * Check policy...
   */
 
-  if (dtype & CUPS_PRINTER_CLASS)
-    printer = FindClass(name);
-  else
-    printer = FindPrinter(name);
+  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  {
+    LogMessage(L_ERROR, "start_printer: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * Start the printer...
+  */
 
   printer->state_message[0] = '\0';
 
@@ -6620,7 +6860,7 @@ stop_printer(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((name = ValidateDest(host, resource, &dtype)) == NULL)
+  if ((name = ValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
    /*
     * Bad URI...
@@ -6632,13 +6872,19 @@ stop_printer(client_t        *con,	/* I - Client connection */
   }
 
  /*
-  * Stop the printer...
+  * Check policy...
   */
 
-  if (dtype & CUPS_PRINTER_CLASS)
-    printer = FindClass(name);
-  else
-    printer = FindPrinter(name);
+  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  {
+    LogMessage(L_ERROR, "stop_printer: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * Stop the printer...
+  */
 
   if ((attr = ippFindAttribute(con->request, "printer-state-message",
                                IPP_TAG_TEXT)) == NULL)
@@ -6690,6 +6936,7 @@ validate_job(client_t        *con,	/* I - Client connection */
 					/* Supertype of file */
 			type[MIME_MAX_TYPE];
 					/* Subtype of file */
+  printer_t		*printer;	/* Printer */
 
 
   LogMessage(L_DEBUG2, "validate_job(%p[%d], %s)\n", con, con->http.fd,
@@ -6758,7 +7005,7 @@ validate_job(client_t        *con,	/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if (ValidateDest(host, resource, &dtype) == NULL)
+  if (ValidateDest(host, resource, &dtype, &printer) == NULL)
   {
    /*
     * Bad URI...
@@ -6766,6 +7013,17 @@ validate_job(client_t        *con,	/* I - Client connection */
 
     LogMessage(L_ERROR, "validate_job: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * Check policy...
+  */
+
+  if (!CheckPolicy(printer->op_policy_ptr, con, NULL))
+  {
+    LogMessage(L_ERROR, "validate_job: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
     return;
   }
 
@@ -6782,26 +7040,25 @@ validate_job(client_t        *con,	/* I - Client connection */
  */
 
 static int				/* O - 1 if permitted, 0 otherwise */
-validate_user(client_t   *con,		/* I - Client connection */
+validate_user(job_t      *job,		/* I - Job */
+              client_t   *con,		/* I - Client connection */
               const char *owner,	/* I - Owner of job/resource */
               char       *username,	/* O - Authenticated username */
 	      int        userlen)	/* I - Length of username */
 {
-  int			i, j;		/* Looping vars */
   ipp_attribute_t	*attr;		/* requesting-user-name attribute */
-  struct passwd		*user;		/* User info */
-  struct group		*group;		/* System group info */
-  char			junk[33];	/* MD5 password (not used) */
+  printer_t		*printer;	/* Printer for job */
 
 
-  LogMessage(L_DEBUG2, "validate_user(%p[%d], \"%s\", %p, %d)\n",
-             con, con->http.fd, owner, username, userlen);
+  LogMessage(L_DEBUG2, "validate_user(job=%d, con=%d, owner=\"%s\", username=%p, userlen=%d)\n",
+             job ? job->id : 0, con->http.fd, owner ? owner : "(null)",
+	     username, userlen);
 
  /*
   * Validate input...
   */
 
-  if (con == NULL || owner == NULL || username == NULL || userlen <= 0)
+  if (!con || !owner || !username || userlen <= 0)
     return (0);
 
  /*
@@ -6819,59 +7076,18 @@ validate_user(client_t   *con,		/* I - Client connection */
   * Check the username against the owner...
   */
 
-  if (strcasecmp(username, owner) != 0 && strcasecmp(username, "root") != 0)
-  {
-   /*
-    * Not the owner or root; check to see if the user is a member of the
-    * system group...
-    */
+  if (job->dtype & CUPS_PRINTER_CLASS)
+    printer = FindClass(job->dest);
+  else
+    printer = FindPrinter(job->dest);
 
-    user = getpwnam(username);
-    endpwent();
-
-    for (i = 0, j = 0, group = NULL; i < NumSystemGroups; i ++)
-    {
-      group = getgrnam(SystemGroups[i]);
-      endgrent();
-
-      if (group != NULL)
-      {
-	for (j = 0; group->gr_mem[j]; j ++)
-          if (strcasecmp(username, group->gr_mem[j]) == 0)
-	    break;
-
-        if (group->gr_mem[j])
-	  break;
-      }
-      else
-	j = 0;
-    }
-
-    if (user == NULL || group == NULL ||
-        (group->gr_mem[j] == NULL && group->gr_gid != user->pw_gid))
-    {
-     /*
-      * Username not found, group not found, or user is not part of the
-      * system group...  Check for a user and group in the MD5 password
-      * file...
-      */
-
-      for (i = 0; i < NumSystemGroups; i ++)
-        if (GetMD5Passwd(username, SystemGroups[i], junk) != NULL)
-	  return (1);
-
-     /*
-      * Nope, not an MD5 user, either.  Return 0 indicating no-go...
-      */
-
-      return (0);
-    }
-  }
-
-  return (1);
+  if (printer)
+    return (CheckPolicy(printer->op_policy_ptr, con, owner));
+  else
+    return (CheckPolicy(DefaultPolicyPtr, con, owner));
 }
 
 
 /*
- * End of "$Id: ipp.c,v 1.235 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

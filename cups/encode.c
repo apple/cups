@@ -1,5 +1,5 @@
 /*
- * "$Id: encode.c,v 1.18 2005/01/03 19:29:45 mike Exp $"
+ * "$Id$"
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
@@ -384,5 +384,5 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 
 
 /*
- * End of "$Id: encode.c,v 1.18 2005/01/03 19:29:45 mike Exp $".
+ * End of "$Id$".
  */

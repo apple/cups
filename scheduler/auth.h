@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.h,v 1.25 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   Authorization definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -62,8 +62,8 @@
 
 typedef struct
 {
-  unsigned	address,		/* IP address */
-		netmask;		/* IP netmask */
+  unsigned	address[4],		/* IP address */
+		netmask[4];		/* IP netmask */
 } ipmask_t;
 
 typedef struct
@@ -118,15 +118,15 @@ VAR location_t		*Locations	VALUE(NULL);
 extern location_t	*AddLocation(const char *location);
 extern void		AddName(location_t *loc, char *name);
 extern void		AllowHost(location_t *loc, char *name);
-extern void		AllowIP(location_t *loc, unsigned address,
-			        unsigned netmask);
-extern int		CheckAuth(unsigned ip, char *name, int namelen,
+extern void		AllowIP(location_t *loc, unsigned address[4],
+			        unsigned netmask[4]);
+extern int		CheckAuth(unsigned ip[4], char *name, int namelen,
 				  int num_masks, authmask_t *masks);
 extern location_t	*CopyLocation(location_t **loc);
 extern void		DeleteAllLocations(void);
 extern void		DenyHost(location_t *loc, char *name);
-extern void		DenyIP(location_t *loc, unsigned address,
-			       unsigned netmask);
+extern void		DenyIP(location_t *loc, unsigned address[4],
+			       unsigned netmask[4]);
 extern location_t	*FindBest(const char *path, http_state_t state);
 extern location_t	*FindLocation(const char *location);
 extern char		*GetMD5Passwd(const char *username, const char *group,
@@ -135,5 +135,5 @@ extern http_status_t	IsAuthorized(client_t *con);
 
 
 /*
- * End of "$Id: auth.h,v 1.25 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.36 2005/01/12 18:38:31 mike Exp $"
+ * "$Id$"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -1235,5 +1235,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.36 2005/01/12 18:38:31 mike Exp $".
+ * End of "$Id$".
  */

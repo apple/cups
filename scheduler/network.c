@@ -1,5 +1,5 @@
 /*
- * "$Id: network.c,v 1.16 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   Network interface functions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -129,12 +129,12 @@ NetIFFree(void)
 void
 NetIFUpdate(void)
 {
-  int		i;		/* Looping var */
+  int		i,		/* Looping var */
+		match;		/* Matching address? */
   listener_t	*lis;		/* Listen address */
   cups_netif_t	*temp;		/* Current interface */
   struct ifaddrs *addrs,	/* Interface address list */
 		*addr;		/* Current interface address */
-  struct hostent *host;		/* Host lookup info */
 
 
  /*
@@ -163,15 +163,20 @@ NetIFUpdate(void)
   for (addr = addrs; addr != NULL; addr = addr->ifa_next)
   {
    /*
-    * See if this interface address is IPv4...
+    * See if this interface address is IPv4 or IPv6...
     */
 
-    if (addr->ifa_addr == NULL || addr->ifa_addr->sa_family != AF_INET ||
+    if (addr->ifa_addr == NULL ||
+        (addr->ifa_addr->sa_family != AF_INET
+#ifdef AF_INET6
+	 && addr->ifa_addr->sa_family != AF_INET6
+#endif
+	) ||
         addr->ifa_netmask == NULL || addr->ifa_name == NULL)
       continue;
 
    /*
-    * OK, we have an IPv4 address, so create a new list node...
+    * OK, we have an IPv4/6 address, so create a new list node...
     */
 
     if ((temp = calloc(1, sizeof(cups_netif_t))) == NULL)
@@ -185,14 +190,36 @@ NetIFUpdate(void)
     */
 
     strlcpy(temp->name, addr->ifa_name, sizeof(temp->name));
-    memcpy(&(temp->address), addr->ifa_addr, sizeof(temp->address));
-    memcpy(&(temp->mask), addr->ifa_netmask, sizeof(temp->mask));
 
-    if (addr->ifa_dstaddr)
-      memcpy(&(temp->broadcast), addr->ifa_dstaddr, sizeof(temp->broadcast));
+    if (addr->ifa_addr->sa_family == AF_INET)
+    {
+     /*
+      * Copy IPv4 addresses...
+      */
+
+      memcpy(&(temp->address), addr->ifa_addr, sizeof(struct sockaddr_in));
+      memcpy(&(temp->mask), addr->ifa_netmask, sizeof(struct sockaddr_in));
+
+      if (addr->ifa_dstaddr)
+	memcpy(&(temp->broadcast), addr->ifa_dstaddr, sizeof(struct sockaddr_in));
+    }
+#ifdef AF_INET6
+    else
+    {
+     /*
+      * Copy IPv6 addresses...
+      */
+
+      memcpy(&(temp->address), addr->ifa_addr, sizeof(struct sockaddr_in6));
+      memcpy(&(temp->mask), addr->ifa_netmask, sizeof(struct sockaddr_in6));
+
+      if (addr->ifa_dstaddr)
+	memcpy(&(temp->broadcast), addr->ifa_dstaddr, sizeof(struct sockaddr_in6));
+    }
+#endif /* AF_INET6 */
 
     if (!(addr->ifa_flags & IFF_POINTOPOINT) &&
-        ntohl(temp->address.sin_addr.s_addr) != 0x7f000001)
+        !httpAddrLocalhost(&(temp->address)))
       temp->is_local = 1;
 
    /*
@@ -200,49 +227,68 @@ NetIFUpdate(void)
     */
 
     for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
-      if (lis->address.sin_addr.s_addr == 0x00000000 ||
-          (lis->address.sin_addr.s_addr & temp->mask.sin_addr.s_addr) ==
-	      temp->address.sin_addr.s_addr)
+    {
+      match = 0;
+
+      if (httpAddrAny(&(lis->address)))
+        match = 1;
+      else if (addr->ifa_addr->sa_family == AF_INET &&
+               lis->address.addr.sa_family == AF_INET &&
+               (lis->address.ipv4.sin_addr.s_addr &
+	           temp->mask.ipv4.sin_addr.s_addr) ==
+	               temp->address.ipv4.sin_addr.s_addr)
+        match = 1;
+#ifdef AF_INET6
+      else if (addr->ifa_addr->sa_family == AF_INET6 &&
+               lis->address.addr.sa_family == AF_INET6 &&
+               (lis->address.ipv6.sin6_addr.s6_addr[0] &
+	           temp->mask.ipv6.sin6_addr.s6_addr[0]) ==
+	               temp->address.ipv6.sin6_addr.s6_addr[0] &&
+               (lis->address.ipv6.sin6_addr.s6_addr[1] &
+	           temp->mask.ipv6.sin6_addr.s6_addr[1]) ==
+	               temp->address.ipv6.sin6_addr.s6_addr[1] &&
+               (lis->address.ipv6.sin6_addr.s6_addr[2] &
+	           temp->mask.ipv6.sin6_addr.s6_addr[2]) ==
+	               temp->address.ipv6.sin6_addr.s6_addr[2] &&
+               (lis->address.ipv6.sin6_addr.s6_addr[3] &
+	           temp->mask.ipv6.sin6_addr.s6_addr[3]) ==
+	               temp->address.ipv6.sin6_addr.s6_addr[3])
+        match = 1;
+#endif /* AF_INET6 */
+
+      if (match)
       {
-        temp->port = ntohs(lis->address.sin_port);
+        if (lis->address.addr.sa_family == AF_INET)
+          temp->port = ntohs(lis->address.ipv4.sin_port);
+#ifdef AF_INET6
+        else if (lis->address.addr.sa_family == AF_INET6)
+          temp->port = ntohs(lis->address.ipv6.sin6_port);
+#endif /* AF_INET6 */
 	break;
       }
+    }
 
    /*
     * Finally, try looking up the hostname for the address as needed...
     */
 
     if (HostNameLookups)
-    {
-#ifndef __sgi
-      host = gethostbyaddr((char *)&(temp->address.sin_addr),
-                           sizeof(struct in_addr), AF_INET);
-#else
-      host = gethostbyaddr(&(temp->address.sin_addr),
-                           sizeof(struct in_addr), AF_INET);
-#endif /* !__sgi */
-    }
-    else
-      host = NULL;
-
-   /*
-    * Map the default server address and localhost to the server name
-    * and localhost, respectively; for all other addresses, use the
-    * dotted notation...
-    */
-
-    if (host != NULL)
-      strlcpy(temp->hostname, host->h_name, sizeof(temp->hostname));
-    else if (ntohl(temp->address.sin_addr.s_addr) == 0x7f000001)
-      strcpy(temp->hostname, "localhost");
-    else if (temp->address.sin_addr.s_addr == ServerAddr.sin_addr.s_addr)
-      strlcpy(temp->hostname, ServerName, sizeof(temp->hostname));
+      httpAddrLookup(&(temp->address), temp->hostname, sizeof(temp->hostname));
     else
     {
-      unsigned ip = ntohl(temp->address.sin_addr.s_addr);
+     /*
+      * Map the default server address and localhost to the server name
+      * and localhost, respectively; for all other addresses, use the
+      * dotted notation...
+      */
 
-      snprintf(temp->hostname, sizeof(temp->hostname), "%d.%d.%d.%d",
-	       (ip >> 24) & 255, (ip >> 16) & 255, (ip >> 8) & 255, ip & 255);
+      if (httpAddrLocalhost(&(temp->address)))
+        strcpy(temp->hostname, "localhost");
+      else if (httpAddrEqual(&(temp->address), &ServerAddr))
+        strlcpy(temp->hostname, ServerName, sizeof(temp->hostname));
+      else
+        httpAddrString(&(temp->address), temp->hostname,
+	               sizeof(temp->hostname));
     }
   }
 
@@ -487,5 +533,5 @@ freeifaddrs(struct ifaddrs *addrs)	/* I - Interface list to free */
 
 
 /*
- * End of "$Id: network.c,v 1.16 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

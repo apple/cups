@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: 5.1-lpadmin.sh,v 1.5 2005/01/03 19:30:00 mike Exp $"
+# "$Id$"
 #
 #   Test the lpadmin command.
 #
@@ -60,5 +60,5 @@ fi
 echo ""
 
 #
-# End of "$Id: 5.1-lpadmin.sh,v 1.5 2005/01/03 19:30:00 mike Exp $".
+# End of "$Id$".
 #

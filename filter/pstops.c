@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.116 2005/01/03 19:29:57 mike Exp $"
+ * "$Id$"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -1896,5 +1896,5 @@ start_nup(int number,			/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.116 2005/01/03 19:29:57 mike Exp $".
+ * End of "$Id$".
  */

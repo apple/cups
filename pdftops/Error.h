@@ -2,7 +2,7 @@
 //
 // Error.h
 //
-// Copyright 1996-2003 Glyph & Cog, LLC
+// Copyright 1996-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -18,6 +18,6 @@
 #include <stdio.h>
 #include "config.h"
 
-extern void CDECL error(int pos, const char *msg, ...);
+extern void CDECL error(int pos, char *msg, ...);
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.144 2005/01/03 19:29:45 mike Exp $"
+ * "$Id$"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -322,11 +322,11 @@ httpClose(http_t *http)		/* I - Connection to close */
  * 'httpConnect()' - Connect to a HTTP server.
  */
 
-http_t *			/* O - New HTTP connection */
-httpConnect(const char *host,	/* I - Host to connect to */
-            int        port)	/* I - Port number */
+http_t *				/* O - New HTTP connection */
+httpConnect(const char *host,		/* I - Host to connect to */
+            int        port)		/* I - Port number */
 {
-  http_encryption_t	encrypt;/* Type of encryption to use */
+  http_encryption_t	encrypt;	/* Type of encryption to use */
 
 
  /*
@@ -383,10 +383,17 @@ httpConnectEncrypt(const char *host,	/* I - Host to connect to */
   }
 
  /*
-  * Verify that it is an IPv4 address (IPv6 support will come in CUPS 1.2...)
+  * Verify that it is an IPv4, IPv6, or domain address...
   */
 
-  if (hostaddr->h_addrtype != AF_INET || hostaddr->h_length != 4)
+  if ((hostaddr->h_addrtype != AF_INET || hostaddr->h_length != 4)
+#ifdef AF_INET6
+      && (hostaddr->h_addrtype != AF_INET6 || hostaddr->h_length != 16)
+#endif /* AF_INET6 */
+#ifdef AF_LOCAL
+      && (hostaddr->h_addrtype != AF_LOCAL)
+#endif /* AF_LOCAL */
+      )
     return (NULL);
 
  /*
@@ -403,22 +410,10 @@ httpConnectEncrypt(const char *host,	/* I - Host to connect to */
   http->fd       = -1;
 
  /*
-  * Copy the hostname and port and then "reconnect"...
-  */
-
-  strlcpy(http->hostname, host, sizeof(http->hostname));
-  http->hostaddr.sin_family = hostaddr->h_addrtype;
-#ifdef WIN32
-  http->hostaddr.sin_port   = htons((u_short)port);
-#else
-  http->hostaddr.sin_port   = htons(port);
-#endif /* WIN32 */
-
- /*
   * Set the encryption status...
   */
 
-  if (port == 443)	/* Always use encryption for https */
+  if (port == 443)			/* Always use encryption for https */
     http->encryption = HTTP_ENCRYPT_ALWAYS;
   else
     http->encryption = encrypt;
@@ -435,8 +430,7 @@ httpConnectEncrypt(const char *host,	/* I - Host to connect to */
     * Load the address...
     */
 
-    memcpy((char *)&(http->hostaddr.sin_addr), hostaddr->h_addr_list[i],
-           hostaddr->h_length);
+    httpAddrLoad(hostaddr, port, i, &(http->hostaddr));
 
    /*
     * Connect to the remote system...
@@ -491,10 +485,11 @@ httpEncryption(http_t            *http,	/* I - HTTP data */
  * 'httpReconnect()' - Reconnect to a HTTP server...
  */
 
-int				/* O - 0 on success, non-zero on failure */
-httpReconnect(http_t *http)	/* I - HTTP data */
+int					/* O - 0 on success, non-zero on failure */
+httpReconnect(http_t *http)		/* I - HTTP data */
 {
-  int		val;		/* Socket option value */
+  int		val;			/* Socket option value */
+  int		status;			/* Connect status */
 
 
   DEBUG_printf(("httpReconnect(http=%p)\n", http));
@@ -522,7 +517,7 @@ httpReconnect(http_t *http)	/* I - HTTP data */
   * Create the socket and set options to allow reuse.
   */
 
-  if ((http->fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+  if ((http->fd = socket(http->hostaddr.addr.sa_family, SOCK_STREAM, 0)) < 0)
   {
 #ifdef WIN32
     http->error  = WSAGetLastError();
@@ -564,8 +559,22 @@ httpReconnect(http_t *http)	/* I - HTTP data */
   * Connect to the server...
   */
 
-  if (connect(http->fd, (struct sockaddr *)&(http->hostaddr),
-              sizeof(http->hostaddr)) < 0)
+#ifdef AF_INET6
+  if (http->hostaddr.addr.sa_family == AF_INET6)
+    status = connect(http->fd, (struct sockaddr *)&(http->hostaddr),
+                     sizeof(http->hostaddr.ipv6));
+  else
+#endif /* AF_INET6 */
+#ifdef AF_LOCAL
+  if (http->hostaddr.addr.sa_family == AF_LOCAL)
+    status = connect(http->fd, (struct sockaddr *)&(http->hostaddr),
+                     SUN_LEN(&(http->hostaddr.un)));
+  else
+#endif /* AF_LOCAL */
+  status = connect(http->fd, (struct sockaddr *)&(http->hostaddr),
+                   sizeof(http->hostaddr.ipv4));
+
+  if (status < 0)
   {
 #ifdef WIN32
     http->error  = WSAGetLastError();
@@ -2557,5 +2566,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.144 2005/01/03 19:29:45 mike Exp $".
+ * End of "$Id$".
  */

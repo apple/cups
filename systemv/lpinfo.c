@@ -1,5 +1,5 @@
 /*
- * "$Id: lpinfo.c,v 1.11 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   "lpinfo" command for the Common UNIX Printing System (CUPS).
  *
@@ -450,5 +450,5 @@ show_models(http_t *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpinfo.c,v 1.11 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

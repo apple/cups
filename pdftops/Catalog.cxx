@@ -2,7 +2,7 @@
 //
 // Catalog.cc
 //
-// Copyright 1996-2003 Glyph & Cog, LLC
+// Copyright 1996-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -64,12 +64,15 @@ Catalog::Catalog(XRef *xrefA) {
   }
   pagesSize = numPages0 = (int)obj.getNum();
   obj.free();
+  // The gcc doesnt optimize this away, so this check is ok,
+  // even if it looks like a pagesSize != pagesSize check
   if (pagesSize*sizeof(Page *)/sizeof(Page *) != pagesSize ||
       pagesSize*sizeof(Ref)/sizeof(Ref) != pagesSize) {
     error(-1, "Invalid 'pagesSize'");
     ok = gFalse;
     return;
   }
+
   pages = (Page **)gmalloc(pagesSize * sizeof(Page *));
   pageRefs = (Ref *)gmalloc(pagesSize * sizeof(Ref));
   for (i = 0; i < pagesSize; ++i) {

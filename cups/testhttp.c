@@ -1,5 +1,5 @@
 /*
- * "$Id: testhttp.c,v 1.18 2005/01/03 19:29:45 mike Exp $"
+ * "$Id$"
  *
  *   HTTP test program for the Common UNIX Printing System (CUPS).
  *
@@ -123,5 +123,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testhttp.c,v 1.18 2005/01/03 19:29:45 mike Exp $".
+ * End of "$Id$".
  */

@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
-	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2005 All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-IPP-1.1">
+	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2003 All Rights Reserved">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-IPP-1.2">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Implementation of IPP</TITLE>
 </HEAD>
@@ -13,7 +13,7 @@
 
 <P>This document provides an overview of the Internet Printing Protocol
 ("IPP") version 1.1 as implemented in the Common UNIX Printing System
-("CUPS") version 1.1.
+("CUPS") version 1.2.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -104,13 +104,13 @@ standard IPP and registered extension operations:
 </TR>
 <TR>
 	<TD VALIGN="TOP">Create-Job</TD>
-	<TD VALIGN="TOP">1.1</TD>
+	<TD VALIGN="TOP">1.2</TD>
 	<TD VALIGN="TOP">0x0005</TD>
 	<TD VALIGN="TOP">Create a print job.</TD>
 </TR>
 <TR>
 	<TD VALIGN="TOP">Send-Document</TD>
-	<TD VALIGN="TOP">1.1</TD>
+	<TD VALIGN="TOP">1.2</TD>
 	<TD VALIGN="TOP">0x0006</TD>
 	<TD VALIGN="TOP">Send a file for a print job.</TD>
 </TR>
@@ -140,13 +140,13 @@ standard IPP and registered extension operations:
 </TR>
 <TR>
 	<TD VALIGN="TOP">Hold-Job</TD>
-	<TD VALIGN="TOP">1.1</TD>
+	<TD VALIGN="TOP">1.2</TD>
 	<TD VALIGN="TOP">0x000C</TD>
 	<TD VALIGN="TOP">Hold a job for printing.</TD>
 </TR>
 <TR>
 	<TD VALIGN="TOP">Release-Job</TD>
-	<TD VALIGN="TOP">1.1</TD>
+	<TD VALIGN="TOP">1.2</TD>
 	<TD VALIGN="TOP">0x000D</TD>
 	<TD VALIGN="TOP">Release a job for printing.</TD>
 </TR>
@@ -170,7 +170,7 @@ standard IPP and registered extension operations:
 </TR>
 <TR>
 	<TD VALIGN="TOP">Set-Job-Attributes</TD>
-	<TD VALIGN="TOP">1.1</TD>
+	<TD VALIGN="TOP">1.2</TD>
 	<TD VALIGN="TOP">0x0014</TD>
 	<TD VALIGN="TOP">Set attributes for a pending or held job.</TD>
 </TR>
@@ -236,19 +236,19 @@ standard IPP and registered extension operations:
 </TR>
 <TR>
 	<TD VALIGN="TOP">CUPS-Get-Devices</TD>
-	<TD VALIGN="TOP">1.1</TD>
+	<TD VALIGN="TOP">1.2</TD>
 	<TD VALIGN="TOP">0x400B</TD>
 	<TD VALIGN="TOP">Get all of the available devices.</TD>
 </TR>
 <TR>
 	<TD VALIGN="TOP">CUPS-Get-PPDs</TD>
-	<TD VALIGN="TOP">1.1</TD>
+	<TD VALIGN="TOP">1.2</TD>
 	<TD VALIGN="TOP">0x400C</TD>
 	<TD VALIGN="TOP">Get all of the available PPDs.</TD>
 </TR>
 <TR>
 	<TD VALIGN="TOP">CUPS-Move-Job</TD>
-	<TD VALIGN="TOP">1.1</TD>
+	<TD VALIGN="TOP">1.2</TD>
 	<TD VALIGN="TOP">0x400D</TD>
 	<TD VALIGN="TOP">Move a job to a different printer.</TD>
 </TR>
@@ -690,18 +690,6 @@ CUPS-Get-Printers Response:
 <P>The CUPS-Add-Modify-Printer operation (0x4003) adds a new printer or
 modifies an existing printer on the system.
 
-<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
-<TR>
-	<TD><B>Note:</B>
-
-	<P>This operation requires administrative priviledges
-	and must be POSTed to "/admin/". POSTs to other paths
-	will result in a client-error-not-authorized
-	(IPP_NOT_AUTHORIZED) error.
-
-</TR>
-</TABLE></CENTER>
-
 <H3>CUPS-Add-Modify-Printer Request</H3>
 
 <P>The following groups of attributes are supplied as part of the
@@ -825,18 +813,6 @@ CUPS-Add-Modify-Printer Response:
 
 <P>The CUPS-Delete-Printer operation (0x4004) removes an existing
 printer from the system.
-
-<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
-<TR>
-	<TD><B>Note:</B>
-
-	<P>This operation requires administrative priviledges
-	and must be POSTed to "/admin/". POSTs to other paths
-	will result in a client-error-not-authorized
-	(IPP_NOT_AUTHORIZED) error.
-
-</TR>
-</TABLE></CENTER>
 
 <H3>CUPS-Delete-Printer Request</H3>
 
@@ -979,18 +955,6 @@ CUPS-Get-Classes Response:
 <P>The CUPS-Add-Modify-Class operation (0x4006) adds a new printer class or
 modifies and existing printer class on the system.
 
-<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
-<TR>
-	<TD><B>Note:</B>
-
-	<P>This operation requires administrative priviledges
-	and must be POSTed to "/admin/". POSTs to other paths
-	will result in a client-error-not-authorized
-	(IPP_NOT_AUTHORIZED) error.
-
-</TR>
-</TABLE></CENTER>
-
 <H3>CUPS-Add-Modify-Class Request</H3>
 
 <P>The following groups of attributes are supplied as part of the
@@ -1088,18 +1052,6 @@ CUPS-Add-Modify-Class request:
 <P>The CUPS-Delete-Class operation (0x4007) removes an existing printer
 class from the system.
 
-<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
-<TR>
-	<TD><B>Note:</B>
-
-	<P>This operation requires administrative priviledges
-	and must be POSTed to "/admin/". POSTs to other paths
-	will result in a client-error-not-authorized
-	(IPP_NOT_AUTHORIZED) error.
-
-</TR>
-</TABLE></CENTER>
-
 <H3>CUPS-Delete-Class Request</H3>
 
 <P>The following groups of attributes are supplied as part of the
@@ -1148,18 +1100,6 @@ CUPS-Delete-Class Response:
 "printer-is-accepting-jobs" attribute to true for the specified printer
 or printer class.
 
-<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
-<TR>
-	<TD><B>Note:</B>
-
-	<P>This operation requires administrative priviledges
-	and must be POSTed to "/admin/". POSTs to other paths
-	will result in a client-error-not-authorized
-	(IPP_NOT_AUTHORIZED) error.
-
-</TR>
-</TABLE></CENTER>
-
 <H3>CUPS-Accept-Jobs Request</H3>
 
 <P>The following groups of attributes are supplied as part of the
@@ -1204,21 +1144,9 @@ CUPS-Accept-Jobs Response:
 
 <H2>CUPS-Reject-Jobs Operation</H2>
 
-<P>The CUPS-Reject-Jobs operation (0x4009) sets the
-"printer-is-accepting-jobs" attribute to false for the specified
+<P>The CUPS-Reject-Jobs operation (0x4009) sets
+the"printer-is-accepting-jobs" attribute to false for the specified
 printer or printer class.
-
-<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
-<TR>
-	<TD><B>Note:</B>
-
-	<P>This operation requires administrative priviledges
-	and must be POSTed to "/admin/". POSTs to other paths
-	will result in a client-error-not-authorized
-	(IPP_NOT_AUTHORIZED) error.
-
-</TR>
-</TABLE></CENTER>
 
 <H3>CUPS-Reject-Jobs Request</H3>
 
@@ -1276,19 +1204,8 @@ CUPS-Reject-Jobs Response:
 <H2>CUPS-Set-Default Operation</H2>
 
 <P>The CUPS-Set-Default operation (0x400A) sets the default printer
-destination for all clients.
-
-<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
-<TR>
-	<TD><B>Note:</B>
-
-	<P>This operation requires administrative priviledges
-	and must be POSTed to "/admin/". POSTs to other paths
-	will result in a client-error-not-authorized
-	(IPP_NOT_AUTHORIZED) error.
-
-</TR>
-</TABLE></CENTER>
+destination for all clients when a resource name of "/printers" is
+specified.
 
 <H3>CUPS-Set-Default Request</H3>
 
@@ -2030,14 +1947,6 @@ information and the PPD file for the printer. The following bits are defined:
 <TR>
 	<TD VALIGN="TOP">0x00010000</TD>
 	<TD VALIGN="TOP">Is an implicit (server-generated) class.</TD>
-</TR>
-<TR>
-	<TD VALIGN="TOP">0x00020000</TD>
-	<TD VALIGN="TOP">Is a network default printer.</TD>
-</TR>
-<TR>
-	<TD VALIGN="TOP">0x00040000</TD>
-	<TD VALIGN="TOP">Is a facsimile device.</TD>
 </TR>
 </TABLE></CENTER>
 

@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.81 2005/01/03 19:29:44 mike Exp $"
+ * "$Id$"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -31,8 +31,8 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION	"CUPS v1.1.21"
-#define CUPS_MINIMAL	"CUPS/1.1.21"
+#define CUPS_SVERSION	""
+#define CUPS_MINIMAL	""
 
 
 /*
@@ -44,10 +44,24 @@
 
 
 /*
+ * Default IPP port...
+ */
+
+#define CUPS_DEFAULT_IPP_PORT	631
+
+
+/*
  * Maximum number of file descriptors to support.
  */
 
 #define CUPS_MAX_FDS		4096
+
+
+/*
+ * Do we have domain socket support?
+ */
+
+#define CUPS_DEFAULT_DOMAINSOCKET ""
 
 
 /*
@@ -79,13 +93,6 @@
 #undef HAVE_LIBZ
 #undef HAVE_LIBJPEG
 #undef HAVE_LIBTIFF
-
-
-/*
- * Does this machine store words in big-endian (MSB-first) order?
- */
-
-#undef WORDS_BIGENDIAN
 
 
 /*
@@ -301,5 +308,5 @@
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in,v 1.81 2005/01/03 19:29:44 mike Exp $".
+ * End of "$Id$".
  */

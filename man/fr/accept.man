@@ -1,10 +1,9 @@
 .\"
-.\" "$Id: accept.man,v 1.4 2005/01/03 19:29:58 mike Exp $"
+.\" "$Id: accept.man,v 1.1.2.1 2002/05/21 20:05:49 mike Exp $"
 .\"
 .\"   accept/reject man page for the Common UNIX Printing System (CUPS).
-.\"   Based on cvs revision 1.7
 .\"
-.\"   Copyright 1997-2005 by Easy Software Products.
+.\"   Copyright 1997-2002 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -16,9 +15,9 @@
 .\"       Attn: CUPS Licensing Information
 .\"       Easy Software Products
 .\"       44141 Airport View Drive, Suite 204
-.\"       Hollywood, Maryland 20636 USA
+.\"       Hollywood, Maryland 20636-3111 USA
 .\"
-.\"       Voice: (301) 373-9600
+.\"       Voice: (301) 373-9603
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
@@ -55,9 +54,9 @@ cancel(1), disable(8), enable(8), lp(1), lpadmin(8), lpstat(1),
 CUPS Software Administrators Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2005 Easy Software Products, Tous droits réservés.
+Copyright 1993-2002 Easy Software Products, Tous droits réservés.
 .SH TRADUCTION
 Gilles QUERRET <gilles.querret@nerim.net>
 .\"
-.\" End of "$Id: accept.man,v 1.4 2005/01/03 19:29:58 mike Exp $".
+.\" End of "$Id: accept.man,v 1.1.2.1 2002/05/21 20:05:49 mike Exp $".
 .\"

@@ -1,5 +1,5 @@
 #
-# "$Id: pstoraster.convs,v 1.5 2005/01/03 19:29:59 mike Exp $"
+# "$Id$"
 #
 #   MIME converts file for Ghostscript.
 #
@@ -25,5 +25,5 @@
 application/vnd.cups-postscript	application/vnd.cups-raster	100	pstoraster
 
 #
-# End of "$Id: pstoraster.convs,v 1.5 2005/01/03 19:29:59 mike Exp $".
+# End of "$Id$".
 #

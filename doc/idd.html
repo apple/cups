@@ -3,8 +3,8 @@
 <HEAD>
 <TITLE>CUPS Interface Design Description</TITLE>
 <META NAME="author" CONTENT="Easy Software Products">
-<META NAME="copyright" CONTENT="Copyright 1997-2005, All Rights Reserved">
-<META NAME="docnumber" CONTENT="CUPS-IDD-1.1">
+<META NAME="copyright" CONTENT="Copyright 1997-2003, All Rights Reserved">
+<META NAME="docnumber" CONTENT="CUPS-IDD-1.2">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
 <STYLE TYPE="text/css"><!--
 BODY { font-family: serif }
@@ -19,14 +19,14 @@ SUP { font-size: smaller }
 PRE { font-family: monospace }
 --></STYLE>
 </HEAD>
-<BODY BGCOLOR="white">
-<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511" ALT="CUPS Interface Design Description"><BR>
+<BODY>
+<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511"><BR>
 <H1>CUPS Interface Design Description</H1></A><BR>
-CUPS-IDD-1.1<BR>
+CUPS-IDD-1.2<BR>
 Easy Software Products<BR>
-Copyright 1997-2005, All Rights Reserved<BR>
+Copyright 1997-2003, All Rights Reserved<BR>
 </CENTER>
-<HR NOSHADE>
+<HR>
 <H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
 <BR>
 <BR><B><A HREF="#1">1 Scope</A></B>
@@ -42,43 +42,38 @@ Copyright 1997-2005, All Rights Reserved<BR>
 </UL>
 <B><A HREF="#3">3 Internal Interfaces</A></B>
 <UL>
-<LI><A HREF="#3_1">3.1 Character Set Files</A>
+<LI><A HREF="#3_1">3.1 Character Set Files</A></LI>
 <UL>
 <LI><A HREF="#3_1_1">3.1.1 8-Bit Character Set Files</A></LI>
 <LI><A HREF="#3_1_2">3.1.2 Unicode Character Set Files</A></LI>
 </UL>
-</LI>
 <LI><A HREF="#3_2">3.2 Language Files</A></LI>
-<LI><A HREF="#3_3">3.3 MIME Files</A>
+<LI><A HREF="#3_3">3.3 MIME Files</A></LI>
 <UL>
 <LI><A HREF="#3_3_1">3.3.1 mime.types</A></LI>
 <LI><A HREF="#3_3_2">3.3.2 mime.convs</A></LI>
 </UL>
-</LI>
 <LI><A HREF="#3_4">3.4 Option Files</A></LI>
-<LI><A HREF="#3_5">3.5 PostScript Printer Description Files</A>
+<LI><A HREF="#3_5">3.5 PostScript Printer Description Files</A></LI>
 <UL>
 <LI><A HREF="#3_5_1">3.5.1 PPD Specification</A></LI>
 <LI><A HREF="#3_5_2">3.5.2 CUPS Extensions to PPD Files</A></LI>
 </UL>
-</LI>
-<LI><A HREF="#3_6">3.6 Scheduler Configuration Files</A>
+<LI><A HREF="#3_6">3.6 Scheduler Configuration Files</A></LI>
 <UL>
 <LI><A HREF="#3_6_1">3.6.1 classes.conf</A></LI>
 <LI><A HREF="#3_6_2">3.6.2 cupsd.conf</A></LI>
 <LI><A HREF="#3_6_3">3.6.3 printers.conf</A></LI>
 </UL>
-</LI>
 </UL>
 <B><A HREF="#4">4 External Interfaces</A></B>
 <UL>
 <LI><A HREF="#4_1">4.1 AppSocket Protocol</A></LI>
 <LI><A HREF="#4_2">4.2 CUPS Browsing Protocol</A></LI>
-<LI><A HREF="#4_3">4.3 CUPS Form File</A>
+<LI><A HREF="#4_3">4.3 CUPS Form File</A></LI>
 <UL>
 <LI><A HREF="#4_3_1">4.3.1 CUPS Form DTD</A></LI>
 </UL>
-</LI>
 <LI><A HREF="#4_4">4.4 CUPS PostScript File</A></LI>
 <LI><A HREF="#4_5">4.5 CUPS Raster File</A></LI>
 <LI><A HREF="#4_6">4.6 CUPS Raw Files</A></LI>
@@ -93,15 +88,15 @@ Copyright 1997-2005, All Rights Reserved<BR>
 <LI><A HREF="#6_1">A.1 Terms</A></LI>
 <LI><A HREF="#6_2">A.2 Acronyms</A></LI>
 </UL>
-<HR NOSHADE>
+<HR>
 <H1><A NAME="1">1 Scope</A></H1>
 <H2><A NAME="1_1">1.1 Identification</A></H2>
 <P>This interface design description document provides detailed file
  formats, message formats, and program conventions for the Common UNIX
- Printing System (&quot;CUPS&quot;) Version 1.1.</P>
+ Printing System (&quot;CUPS&quot;) Version 1.2.</P>
 <H2><A NAME="1_2">1.2 System Overview</A></H2>
 <P>CUPS provides a portable printing layer for UNIX&reg;-based operating
- systems. It has been developed by <A HREF="http://www.easysw.com">Easy
+ systems. It has been developed by<A HREF="http://www.easysw.com"> Easy
  Software Products</A> to promote a standard printing solution for all
  UNIX vendors and users. CUPS provides the System V and Berkeley
  command-line interfaces.</P>
@@ -111,20 +106,10 @@ Copyright 1997-2005, All Rights Reserved<BR>
  also supported with reduced functionality. CUPS adds network printer
  browsing and PostScript Printer Description (&quot;PPD&quot;) based printing
  options to support real-world printing under UNIX.</P>
-<P>CUPS includes an image file RIP that supports printing of image files
- to non-PostScript printers. A customized version of GNU Ghostscript
- 7.05 for CUPS called ESP Ghostscript is available separately to support
- printing of PostScript files within the CUPS driver framework. Sample
- drivers for Dymo, EPSON, HP, and OKIDATA printers are included that use
- these filters.</P>
-<P>Drivers for thousands of printers are provided with our ESP Print Pro
- software, available at:</P>
-<PRE>
-    <A HREF="http://www.easysw.com/printpro/">http://www.easysw.com/printpro/</A>
-</PRE>
-<P>CUPS is licensed under the GNU General Public License and GNU Library
- General Public License. Please contact Easy Software Products for
- commercial support and &quot;binary distribution&quot; rights.</P>
+<P>CUPS also includes a customized version of GNU Ghostscript (currently
+ based off GNU Ghostscript 5.50) and an image file RIP that are used to
+ support non-PostScript printers. Sample drivers for HP and EPSON
+ printers are included that use these filters.</P>
 <H2><A NAME="1_3">1.3 Document Overview</A></H2>
 <P>This interface design description document is organized into the
  following sections:</P>
@@ -140,16 +125,16 @@ Copyright 1997-2005, All Rights Reserved<BR>
 <H2><A NAME="2_1">2.1 CUPS Documentation</A></H2>
 <P>The following CUPS documentation is referenced by this document:</P>
 <UL>
-<LI>CUPS-CMP-1.1: CUPS Configuration Management Plan</LI>
-<LI>CUPS-IDD-1.1: CUPS System Interface Design Description</LI>
-<LI>CUPS-IPP-1.1: CUPS Implementation of IPP</LI>
-<LI>CUPS-SAM-1.1.x: CUPS Software Administrators Manual</LI>
-<LI>CUPS-SDD-1.1: CUPS Software Design Description</LI>
-<LI>CUPS-SPM-1.1.x: CUPS Software Programming Manual</LI>
-<LI>CUPS-SSR-1.1: CUPS Software Security Report</LI>
-<LI>CUPS-STP-1.1: CUPS Software Test Plan</LI>
-<LI>CUPS-SUM-1.1.x: CUPS Software Users Manual</LI>
-<LI>CUPS-SVD-1.1: CUPS Software Version Description</LI>
+<LI>CUPS-CMP-1.2: CUPS Configuration Management Plan</LI>
+<LI>CUPS-IDD-1.2: CUPS System Interface Design Description</LI>
+<LI>CUPS-IPP-1.2: CUPS Implementation of IPP</LI>
+<LI>CUPS-SAM-1.2.x: CUPS Software Administrators Manual</LI>
+<LI>CUPS-SDD-1.2: CUPS Software Design Description</LI>
+<LI>CUPS-SPM-1.2.x: CUPS Software Programming Manual</LI>
+<LI>CUPS-SSR-1.2: CUPS Software Security Report</LI>
+<LI>CUPS-STP-1.2: CUPS Software Test Plan</LI>
+<LI>CUPS-SUM-1.2.x: CUPS Software Users Manual</LI>
+<LI>CUPS-SVD-1.2: CUPS Software Version Description</LI>
 </UL>
 <H2><A NAME="2_2">2.2 Other Documents</A></H2>
 <P>The following non-CUPS documents are referenced by this document:</P>
@@ -159,11 +144,12 @@ Adobe PostScript Printer Description File Format Specification, Version
  4.3.</A></LI>
 <LI><A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/PLRM.pdf">
 Adobe PostScript Language Reference, Third Edition.</A></LI>
+<LI>IPP: Job and Printer Set Operations</LI>
+<LI>IPP/1.1: Encoding and Transport</LI>
 <LI>IPP/1.1: Implementers Guide</LI>
+<LI>IPP/1.1: Model and Semantics</LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc1179.txt">RFC 1179, Line Printer
  Daemon Protocol</A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2396.txt">RFC 2396, Uniform
- Resource Identifiers (URI): Generic Syntax</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2567.txt">RFC 2567, Design Goals
  for an Internet Printing Protocol</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2568.txt">RFC 2568, Rationale
@@ -175,12 +161,6 @@ Adobe PostScript Language Reference, Third Edition.</A></LI>
  Transfer Protocol -- HTTP/1.1</A></LI>
 <LI><A HREF="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617, HTTP
  Authentication: Basic and Digest Access</A> Authentication</LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2910.txt">RFC 2910, IPP/1.1:
- Encoding and Transport</A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2911.txt">RFC 2911, IPP/1.1:
- Model and Semantics</A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc3380.txt">RFC 3380, IPP: Job and
- Printer Set Operations</A></LI>
 </UL>
 <H1><A NAME="3">3 Internal Interfaces</A></H1>
 <H2><A NAME="3_1">3.1 Character Set Files</A></H2>
@@ -371,19 +351,13 @@ Default name/instance option=value option=value ... option=value
  capabilities of each printer and are used by CUPS to support
  printer-specific features and intelligent filtering.</P>
 <H3><A NAME="3_5_1">3.5.1 PPD Specification</A></H3>
-<P>The PPD file format is described in <A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/5003.PPD_Spec_v4.3.pdf">
+<P>The PPD file format is described in<A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/5003.PPD_Spec_v4.3.pdf">
  Adobe TechNote #5003: PostScript Printer Description File Format
  Specification Version 4.3</A>.</P>
 <H3><A NAME="3_5_2">3.5.2 CUPS Extensions to PPD Files</A></H3>
 <P>CUPS adds several new attributes that are described below.</P>
-<H4>3.5.2.1 cupsFax</H4>
-<P>This optional boolean attributes specifies whether the printer should
- be treated as a facsimile device, where failed jobs should be retried
- according to the <TT>FaxRetryInterval</TT> and <TT>FaxRetryLimit</TT>
- directives in the<VAR> cupsd.conf</VAR> file.</P>
-<H4>3.5.2.2 cupsFilter</H4>
-<P>This optional string attribute provides a conversion rule of the
- form:</P>
+<H4>3.5.2.1 cupsFilter</H4>
+<P>This string attribute provides a conversion rule of the form:</P>
 <UL>
 <PRE>
 source/type cost program
@@ -392,20 +366,16 @@ source/type cost program
 <P>The destination type is assumed to the printer's type. If a printer
  supports the source type directly the special filter program &quot;-&quot; may be
  specified.</P>
-<H4>3.5.2.3 cupsFlipDuplex</H4>
-<P>This optional boolean attribute notifies the RIP filters that the
- destination printer requires an upside-down image for the back page.
- The default value is false.</P>
-<H4>3.5.2.4 cupsManualCopies</H4>
-<P>This optional boolean attribute notifies the RIP filters that the
- destination printer does not support copy generation in hardware. The
- default value is false.</P>
-<H4>3.5.2.5 cupsModelNumber</H4>
-<P>This optional integer attribute specifies a printer-specific model
- number. This number can be used by a filter program to adjust the
- output for a specific model of printer.</P>
-<H4>3.5.2.6 cupsProfile</H4>
-<P>This optional string attribute specifies a color profile of the form:</P>
+<H4>3.5.2.2 cupsManualCopies</H4>
+<P>This boolean attribute notifies the RIP filters that the destination
+ printer does not support copy generation in hardware. The default value
+ is false.</P>
+<H4>3.5.2.3 cupsModelNumber</H4>
+<P>This integer attribute specifies a printer-specific model number.
+ This number can be used by a filter program to adjust the output for a
+ specific model of printer.</P>
+<H4>3.5.2.4 cupsProfile</H4>
+<P>This string attribute specifies a color profile of the form:</P>
 <UL>
 <PRE>
 resolution/type density gamma m00 m01 m02 m10 m11 m12 m20 m21 m22
@@ -424,15 +394,10 @@ f(x) = density * x<SUP>gamma</SUP>
 <P>The<I> m00</I> through<I> m22</I> values define a 3x3 transformation
  matrix for the CMY color values. The density function is applied<I>
  after</I> the CMY transformation.</P>
-<H4>3.5.2.7 cupsProtocol</H4>
-<P>This optional attribute describes which binary communication protocol
- to use when printing binary PostScript data. The strings &quot;None&quot;, &quot;BCP&quot;,
- and &quot;TBCP&quot; are recognized, corresponding to no encoding, BCP, and TBCP
- respectively.</P>
-<H4>3.5.2.8 cupsVersion</H4>
+<H4>3.5.2.5 cupsVersion</H4>
 <P>This required attribute describes which version of the CUPS IDD was
- used for the PPD file extensions. Currently it must be the string &quot;1.0&quot;
- or &quot;1.1&quot;.</P>
+ used for the PPD file extensions. Currently it must be the string
+ &quot;1.0&quot;, &quot;1.1&quot;, or &quot;1.2&quot;.</P>
 <H2><A NAME="3_6">3.6 Scheduler Configuration Files</A></H2>
 <P>The scheduler reads three configuration files that define the
  available printers, classes, and services:</P>
@@ -670,7 +635,7 @@ printer-info</CODE>, and <CODE>printer-make-and-model</CODE> attributes.</P>
 <TR><TD>1</TD><TD>0 = local
 <BR> 1 = remote
 <BR> (always 1)</TD></TR>
-<TR><TD>2</TD><TD>1 = can print B&amp;W</TD></TR>
+<TR><TD>2</TD><TD>1 = can print B</TD></TR>
 <TR><TD>3</TD><TD>1 = can print color</TD></TR>
 <TR><TD>4</TD><TD>1 = can duplex</TD></TR>
 <TR><TD>5</TD><TD>1 = can staple</TD></TR>
@@ -684,10 +649,6 @@ printer-info</CODE>, and <CODE>printer-make-and-model</CODE> attributes.</P>
 <TR><TD>13</TD><TD>1 = can print up to 18x24 inches</TD></TR>
 <TR><TD>14</TD><TD>1 = can print up to 36x48 inches</TD></TR>
 <TR><TD>15</TD><TD>1 = can print variable sizes</TD></TR>
-<TR><TD>16</TD><TD>1 = is an implicit class (bit 1 must be 0)</TD></TR>
-<TR><TD>17</TD><TD>1 = is the default printer on the network</TD></TR>
-<TR><TD>18</TD><TD>1 = is a fax device</TD></TR>
-<TR><TD>19</TD><TD>1 = printer is rejecting new jobs</TD></TR>
 </TABLE>
 </CENTER>
 </P>
@@ -877,7 +838,7 @@ printer-info</CODE>, and <CODE>printer-make-and-model</CODE> attributes.</P>
 </P>
 <H2><A NAME="4_4">4.4 CUPS PostScript File</A></H2>
 <P>CUPS PostScript files are device-dependent Adobe PostScript program
- files. The PostScript language is described in the <A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/PLRM.pdf">
+ files. The PostScript language is described in the<A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/PLRM.pdf">
  Adobe PostScript Language Reference Manual, Third Edition</A>.</P>
 <P>The MIME type for CUPS PostScript files is <CODE>
 application/vnd.cups-postscript</CODE>.</P>
@@ -992,30 +953,7 @@ application/vnd.cups-postscript</CODE>.</P>
 <BR> 6 = CMYK
 <BR> 7 = YMCK
 <BR> 8 = KCMY
-<BR> 9 = KCMYcm
-<BR> 10 = GMCK
-<BR> 11 = GMCS
-<BR> 12 = WHITE
-<BR> 13 = GOLD
-<BR> 14 = SILVER
-<BR> 15 = CIE XYZ
-<BR> 16 = CIE Lab
-<BR> 32 = ICC1
-<BR> 33 = ICC2
-<BR> 34 = ICC3
-<BR> 35 = ICC4
-<BR> 36 = ICC5
-<BR> 37 = ICC6
-<BR> 38 = ICC7
-<BR> 39 = ICC8
-<BR> 40 = ICC9
-<BR> 41 = ICCA (10)
-<BR> 42 = ICCB (11)
-<BR> 43 = ICCC (12)
-<BR> 44 = ICCD (13)
-<BR> 45 = ICCE (14)
-<BR> 46 = ICCF (15)
-<BR></TD></TR>
+<BR> 9 = KCMYcm</TD></TR>
 <TR><TD>404-407</TD><TD>cupsCompression</TD><TD>Driver-specific 0 to 2<SUP>
 32</SUP> - 1</TD></TR>
 <TR><TD>408-411</TD><TD>cupsRowCount</TD><TD>Driver-specific 0 to 2<SUP>
@@ -1037,13 +975,13 @@ application/vnd.cups-raster</CODE>.</P>
 <P>The Internet Printing Protocol and the CUPS extensions to it are
  described in the CUPS Implementation of IPP document.</P>
 <H2><A NAME="4_8">4.8 Line Printer Daemon Protocol</A></H2>
-<P>The Line Printer Daemon (LPD) protocol is described by <A HREF="http://www.ietf.org/rfc/rfc1179.txt">
-RFC 1179: Line Printer Daemon Protocol</A>.</P>
+<P>The Line Printer Daemon (LPD) protocol is described by<A HREF="http://www.ietf.org/rfc/rfc1179.txt">
+ RFC 1179: Line Printer Daemon Protocol</A>.</P>
 <P>The URI method name for LPD is &quot;lpd&quot;.</P>
 <H2><A NAME="4_9">4.9 Server Message Block Protocol</A></H2>
 <P>The Server Message Block (SMB) and related Common Internet File
- System (CIFS) protocols are described at <A HREF="http://anu.samba.org/cifs">
-http://anu.samba.org/cifs</A>.</P>
+ System (CIFS) protocols are described at<A HREF="http://anu.samba.org/cifs">
+ http://anu.samba.org/cifs</A>.</P>
 <P>The URI method name for SMB is &quot;smb&quot;. Support for this protocol is
  provided via the SAMBA <CODE>smbspool(1)</CODE> program provided with
  SAMBA 2.0.6 and higher.</P>

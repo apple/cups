@@ -2,7 +2,7 @@
 //
 // ErrorCodes.h
 //
-// Copyright 2002-2003 Glyph & Cog, LLC
+// Copyright 2002-2004 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -30,5 +30,7 @@
 #define errPermission       8	// PDF file doesn't allow that operation
 
 #define errBadPageNum       9	// invalid page number
+
+#define errFileIO          10   // file I/O error
 
 #endif

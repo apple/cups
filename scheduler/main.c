@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.129 2005/02/07 00:15:04 mike Exp $"
+ * "$Id$"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -578,7 +578,10 @@ main(int  argc,				/* I - Number of command-line arguments */
       LogMessage(L_EMERG, "BrowseSocket = %d", BrowseSocket);
 
       for (job = Jobs; job != NULL; job = job->next)
-        LogMessage(L_EMERG, "Jobs[%d] = %d", job->id, job->pipe);
+        LogMessage(L_EMERG, "Jobs[%d] = %d < [%d %d] > [%d %d]",
+	           job->id, job->status_buffer ? job->status_buffer->fd : -1,
+		   job->print_pipes[0], job->print_pipes[1],
+		   job->back_pipes[0], job->back_pipes[1]);
 
       break;
     }
@@ -665,14 +668,14 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       next = job->next;
 
-      if (job->pipe >= 0 && FD_ISSET(job->pipe, input))
+      if (job->status_buffer && FD_ISSET(job->status_buffer->fd, input))
       {
        /*
         * Clear the input bit to avoid updating the next job
 	* using the same status pipe file descriptor...
 	*/
 
-        FD_CLR(job->pipe, input);
+        FD_CLR(job->status_buffer->fd, input);
 
        /*
         * Read any status messages from the filters...
@@ -1125,17 +1128,20 @@ process_children(void)
       if (job->state != NULL &&
           job->state->values[0].integer == IPP_JOB_PROCESSING)
       {
-	for (i = 0; job->procs[i]; i ++)
-          if (job->procs[i] == pid)
+	for (i = 0; job->filters[i]; i ++)
+          if (job->filters[i] == pid)
 	    break;
 
-	if (job->procs[i])
+	if (job->filters[i] || job->backend == pid)
 	{
 	 /*
           * OK, this process has gone away; what's left?
 	  */
 
-          job->procs[i] = -pid;
+          if (job->filters[i])
+	    job->filters[i] = -pid;
+	  else
+	    job->backend = -pid;
 
           if (status && job->status >= 0)
 	  {
@@ -1147,10 +1153,29 @@ process_children(void)
 	    * printer needs to be stopped.
 	    */
 
-            if (!job->procs[i + 1])
- 	      job->status = -status;	/* Backend failed */
-	    else
+            if (job->filters[i])
  	      job->status = status;	/* Filter failed */
+	    else
+ 	      job->status = -status;	/* Backend failed */
+	  }
+
+	 /*
+	  * If this is not the last file in a job, see if all of the
+	  * filters are done, and if so move to the next file.
+	  */
+
+          if (job->current_file < job->num_files)
+	  {
+	    for (i = 0; job->filters[i] < 0; i ++);
+
+	    if (!job->filters[i])
+	    {
+	     /*
+	      * Process the next file...
+	      */
+
+	      FinishJob(job);
+	    }
 	  }
 	  break;
 	}
@@ -1387,5 +1412,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.129 2005/02/07 00:15:04 mike Exp $".
+ * End of "$Id$".
  */

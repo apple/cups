@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.18 2005/01/03 19:29:45 mike Exp $"
+# "$Id$"
 #
 #   Configuration file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -72,5 +72,5 @@ install:
 
 
 #
-# End of "$Id: Makefile,v 1.18 2005/01/03 19:29:45 mike Exp $".
+# End of "$Id$".
 #

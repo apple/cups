@@ -1,5 +1,15 @@
-README - CUPS v1.1.23 - 01/03/2005
-----------------------------------
+README - CUPS v1.2.0b1 - 02/17/2005
+-----------------------------------
+
+*****************************************************************
+*****************************************************************
+****                                                         ****
+**** WARNING: THIS IS BETA RELEASE SOFTWARE AND MAY BE       ****
+****          TOTALLY UNSTABLE.  DO NOT USE IN ENVIRONMENTS  ****
+****          WHERE RELIABLE SOFTWARE IS REQUIRED!           ****
+****                                                         ****
+*****************************************************************
+*****************************************************************
 
 Looking for compile instructions?  Read the file "INSTALL.txt"
 instead...
@@ -35,7 +45,7 @@ OKIDATA printers are included that use these filters.
 Drivers for thousands of printers are provided with our ESP
 Print Pro software, available at:
 
-	http://www.easysw.com/printpro
+	http://www.easysw.com/printpro/
 
 CUPS is licensed under the GNU General Public License and GNU
 Library General Public License.  Please contact Easy Software

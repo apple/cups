@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-attr.c,v 1.23 2005/01/03 19:29:57 mike Exp $"
+ * "$Id$"
  *
  *   HP-GL/2 attribute processing for the Common UNIX Printing System (CUPS).
  *
@@ -450,5 +450,5 @@ WU_width_units(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-attr.c,v 1.23 2005/01/03 19:29:57 mike Exp $".
+ * End of "$Id$".
  */

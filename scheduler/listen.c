@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.26 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -54,7 +54,7 @@ PauseListening(void)
   if (NumClients == MaxClients)
     LogMessage(L_WARN, "Max clients reached, holding new connections...");
 
-  LogMessage(L_DEBUG, "PauseListening: clearing input bits...");
+  LogMessage(L_DEBUG, "PauseListening: Clearing input bits...");
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
   {
@@ -83,13 +83,12 @@ ResumeListening(void)
   if (NumClients >= (MaxClients - 1))
     LogMessage(L_WARN, "Resuming new connection processing...");
 
-  LogMessage(L_DEBUG, "ResumeListening: setting input bits...");
+  LogMessage(L_DEBUG, "ResumeListening: Setting input bits...");
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
   {
     LogMessage(L_DEBUG2, "ResumeListening: Adding fd %d to InputSet...",
                lis->fd);
-
     FD_SET(lis->fd, InputSet);
   }
 }
@@ -102,10 +101,14 @@ ResumeListening(void)
 void
 StartListening(void)
 {
-  int		i,		/* Looping var */
-		val;		/* Parameter value */
-  listener_t	*lis;		/* Current listening socket */
-  struct hostent *host;		/* Host entry for server address */
+  int		status;			/* Bind result */
+  int		i,			/* Looping var */
+		p,			/* Port number */
+		val;			/* Parameter value */
+  listener_t	*lis;			/* Current listening socket */
+  struct hostent *host;			/* Host entry for server address */
+  char		s[256];			/* String addresss */
+  int		have_domain;		/* Have a domain socket */
 
 
   LogMessage(L_DEBUG, "StartListening: NumListeners=%d", NumListeners);
@@ -122,8 +125,7 @@ StartListening(void)
     * Found the server's address!
     */
 
-    memcpy((char *)&(ServerAddr.sin_addr), host->h_addr, host->h_length);
-    ServerAddr.sin_family = host->h_addrtype;
+    httpAddrLoad(host, 0, 0, &ServerAddr);
   }
   else
   {
@@ -134,29 +136,45 @@ StartListening(void)
     LogMessage(L_ERROR, "StartListening: Unable to find IP address for server name \"%s\" - %s\n",
                ServerName, hstrerror(h_errno));
 
-    ServerAddr.sin_family = AF_INET;
+    ServerAddr.ipv4.sin_family = AF_INET;
   }
 
  /*
   * Setup socket listeners...
   */
 
-  for (i = NumListeners, lis = Listeners, LocalPort = 0; i > 0; i --, lis ++)
+  for (i = NumListeners, lis = Listeners, LocalPort = 0, have_domain = 0;
+       i > 0; i --, lis ++)
   {
-    LogMessage(L_DEBUG, "StartListening: address=%08x port=%d",
-               (unsigned)ntohl(lis->address.sin_addr.s_addr),
-	       ntohs(lis->address.sin_port));
+    httpAddrString(&(lis->address), s, sizeof(s));
+
+#ifdef AF_INET6
+    if (lis->address.addr.sa_family == AF_INET6)
+      p = ntohs(lis->address.ipv6.sin6_port);
+    else
+#endif /* AF_INET6 */
+#ifdef AF_LOCAL
+    if (lis->address.addr.sa_family == AF_LOCAL)
+    {
+      have_domain = 1;
+      p           = 0;
+    }
+    else
+#endif /* AF_LOCAL */
+    p = ntohs(lis->address.ipv4.sin_port);
+
+    LogMessage(L_DEBUG, "StartListening: address=%s port=%d", s, p);
 
    /*
     * Save the first port that is bound to the local loopback or
     * "any" address...
     */
 
-    if (!LocalPort &&
-        (ntohl(lis->address.sin_addr.s_addr) == 0x7f000001 ||
-         ntohl(lis->address.sin_addr.s_addr) == 0x00000000))
+    if (!LocalPort && p > 0 &&
+        (httpAddrLocalhost(&(lis->address)) ||
+         httpAddrAny(&(lis->address))))
     {
-      LocalPort       = ntohs(lis->address.sin_port);
+      LocalPort       = p;
       LocalEncryption = lis->encryption;
     }
 
@@ -164,13 +182,14 @@ StartListening(void)
     * Create a socket for listening...
     */
 
-    if ((lis->fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+    if ((lis->fd = socket(lis->address.addr.sa_family, SOCK_STREAM, 0)) == -1)
     {
-      LogMessage(L_ERROR, "StartListening: Unable to open listen socket for address %08x:%d - %s.",
-                 (unsigned)ntohl(lis->address.sin_addr.s_addr),
-		 ntohs(lis->address.sin_port), strerror(errno));
+      LogMessage(L_ERROR, "StartListening: Unable to open listen socket for address %s:%d - %s.",
+                 s, p, strerror(errno));
       exit(errno);
     }
+
+    LogMessage(L_DEBUG2, "StartListening: fd=%d", lis->fd);
 
     fcntl(lis->fd, F_SETFD, fcntl(lis->fd, F_GETFD) | FD_CLOEXEC);
 
@@ -189,11 +208,52 @@ StartListening(void)
     * Bind to the port we found...
     */
 
-    if (bind(lis->fd, (struct sockaddr *)&(lis->address), sizeof(lis->address)) < 0)
+#ifdef AF_INET6
+    if (lis->address.addr.sa_family == AF_INET6)
+      status = bind(lis->fd, (struct sockaddr *)&(lis->address),
+	            sizeof(lis->address.ipv6));
+    else
+#endif /* AF_INET6 */
+#ifdef AF_LOCAL
+    if (lis->address.addr.sa_family == AF_LOCAL)
     {
-      LogMessage(L_ERROR, "StartListening: Unable to bind socket for address %08x:%d - %s.",
-                 (unsigned)ntohl(lis->address.sin_addr.s_addr),
-		 ntohs(lis->address.sin_port), strerror(errno));
+      mode_t	mask;			/* Umask setting */
+
+
+     /*
+      * Remove any existing domain socket file...
+      */
+
+      unlink(lis->address.un.sun_path);
+
+     /*
+      * Save the curent umask and set it to 0...
+      */
+
+      mask = umask(0);
+
+     /*
+      * Bind the domain socket...
+      */
+
+      status = bind(lis->fd, (struct sockaddr *)&(lis->address),
+	            SUN_LEN(&(lis->address.un)));
+
+     /*
+      * Restore the umask...
+      */
+
+      umask(mask);
+    }
+    else
+#endif /* AF_LOCAL */
+    status = bind(lis->fd, (struct sockaddr *)&(lis->address),
+                  sizeof(lis->address.ipv4));
+
+    if (status < 0)
+    {
+      LogMessage(L_ERROR, "StartListening: Unable to bind socket for address %s:%d - %s.",
+                 s, p, strerror(errno));
       exit(errno);
     }
 
@@ -203,9 +263,8 @@ StartListening(void)
 
     if (listen(lis->fd, ListenBackLog) < 0)
     {
-      LogMessage(L_ERROR, "StartListening: Unable to listen for clients on address %08x:%d - %s.",
-                 (unsigned)ntohl(lis->address.sin_addr.s_addr),
-		 ntohs(lis->address.sin_port), strerror(errno));
+      LogMessage(L_ERROR, "StartListening: Unable to listen for clients on address %s:%d - %s.",
+                 s, p, strerror(errno));
       exit(errno);
     }
   }
@@ -214,7 +273,7 @@ StartListening(void)
   * Make sure that we are listening on localhost!
   */
 
-  if (!LocalPort)
+  if (!LocalPort && !have_domain)
   {
     LogMessage(L_EMERG, "No Listen or Port lines were found to allow access via localhost!");
 
@@ -245,14 +304,25 @@ StopListening(void)
   PauseListening();
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+  {
 #ifdef WIN32
     closesocket(lis->fd);
 #else
     close(lis->fd);
 #endif /* WIN32 */
+
+#ifdef AF_LOCAL
+   /*
+    * Remove domain sockets...
+    */
+
+    if (lis->address.addr.sa_family == AF_LOCAL)
+      unlink(lis->address.un.sun_path);
+#endif /* AF_LOCAL */
+  }
 }
 
 
 /*
- * End of "$Id: listen.c,v 1.26 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

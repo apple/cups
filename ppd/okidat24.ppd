@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: okidat24.ppd,v 1.5 2005/01/03 19:29:59 mike Exp $"
+*% "$Id$"
 *%
 *%   Sample OKIDATA 24-Pin driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -124,5 +124,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: okidat24.ppd,v 1.5 2005/01/03 19:29:59 mike Exp $".
+*% End of "$Id$".
 *%

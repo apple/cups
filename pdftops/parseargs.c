@@ -3,7 +3,7 @@
  *
  * Command line argument parser.
  *
- * Copyright 1996-2003 Glyph & Cog, LLC
+ * Copyright 1996-2004 Glyph & Cog, LLC
  */
 
 #include <stdio.h>
@@ -41,7 +41,7 @@ GBool parseArgs(ArgDesc *args, int *argc, char *argv[]) {
 
 void printUsage(char *program, char *otherArgs, ArgDesc *args) {
   ArgDesc *arg;
-  const char *typ;
+  char *typ;
   int w, w1;
 
   w = 0;
@@ -150,7 +150,7 @@ static GBool grabArg(ArgDesc *arg, int i, int *argc, char *argv[]) {
 GBool isInt(char *s) {
   if (*s == '-' || *s == '+')
     ++s;
-  while (isdigit(*s & 255))
+  while (isdigit(*s & 0xff))
     ++s;
   if (*s)
     return gFalse;
@@ -163,13 +163,13 @@ GBool isFP(char *s) {
   if (*s == '-' || *s == '+')
     ++s;
   n = 0;
-  while (isdigit(*s & 255)) {
+  while (isdigit(*s & 0xff)) {
     ++s;
     ++n;
   }
   if (*s == '.')
     ++s;
-  while (isdigit(*s & 255)) {
+  while (isdigit(*s & 0xff)) {
     ++s;
     ++n;
   }
@@ -178,11 +178,11 @@ GBool isFP(char *s) {
     if (*s == '-' || *s == '+')
       ++s;
     n = 0;
-    if (!isdigit(*s & 255))
+    if (!isdigit(*s & 0xff))
       return gFalse;
     do {
       ++s;
-    } while (isdigit(*s & 255));
+    } while (isdigit(*s & 0xff));
   }
   if (*s)
     return gFalse;

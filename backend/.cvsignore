@@ -1,8 +1,7 @@
-betest
 ipp
 lpd
+usb
 parallel
-scsi
+betest
 serial
 socket
-usb

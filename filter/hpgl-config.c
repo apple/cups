@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.36 2005/01/03 19:29:57 mike Exp $"
+ * "$Id$"
  *
  *   HP-GL/2 configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -641,5 +641,5 @@ SC_scale(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.36 2005/01/03 19:29:57 mike Exp $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h,v 1.59 2005/01/03 19:29:45 mike Exp $"
+ * "$Id$"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -48,10 +48,10 @@ extern "C" {
  * Constants...
  */
 
-#  define CUPS_VERSION		1.0123
+#  define CUPS_VERSION		1.0190
 #  define CUPS_VERSION_MAJOR	1
-#  define CUPS_VERSION_MINOR	1
-#  define CUPS_VERSION_PATCH	23
+#  define CUPS_VERSION_MINOR	2
+#  define CUPS_VERSION_PATCH	-10
 #  define CUPS_DATE_ANY		-1
 
 
@@ -60,7 +60,7 @@ extern "C" {
  */
 
 typedef unsigned cups_ptype_t;		/**** Printer Type/Capability Bits ****/
-enum					/* Not a typedef'd enum so we can OR */
+enum cups_ptype_e			/* Not a typedef'd enum so we can OR */
 {
   CUPS_PRINTER_LOCAL = 0x0000,		/* Local printer or class */
   CUPS_PRINTER_CLASS = 0x0001,		/* Printer class */
@@ -83,16 +83,17 @@ enum					/* Not a typedef'd enum so we can OR */
   CUPS_PRINTER_DEFAULT = 0x20000,	/* Default printer on network */
   CUPS_PRINTER_FAX = 0x40000,		/* Fax queue */
   CUPS_PRINTER_REJECTING = 0x80000,	/* Printer is rejecting jobs */
+  CUPS_PRINTER_DELETE = 0x100000,	/* Delete printer */
   CUPS_PRINTER_OPTIONS = 0x6fffc	/* ~(CLASS | REMOTE | IMPLICIT) */
 };
 
-typedef struct				/**** Printer Options ****/
+typedef struct cups_option_s		/**** Printer Options ****/
 {
   char		*name;			/* Name of option */
   char		*value;			/* Value of option */
 } cups_option_t;
 
-typedef struct				/**** Destination ****/
+typedef struct cups_dest_s		/**** Destination ****/
 {
   char		*name,			/* Printer or class name */
 		*instance;		/* Local instance name or NULL */
@@ -101,7 +102,7 @@ typedef struct				/**** Destination ****/
   cups_option_t	*options;		/* Options */
 } cups_dest_t;
 
-typedef struct				/**** Job ****/
+typedef struct cups_job_s		/**** Job ****/
 {
   int		id;			/* The job ID */
   char		*dest,			/* Printer or class name */
@@ -207,5 +208,5 @@ extern int		cupsSetDests2(http_t *http, int num_dests,
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.59 2005/01/03 19:29:45 mike Exp $".
+ * End of "$Id$".
  */

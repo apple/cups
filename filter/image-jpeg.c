@@ -1,5 +1,5 @@
 /*
- * "$Id: image-jpeg.c,v 1.19 2005/01/03 19:29:57 mike Exp $"
+ * "$Id$"
  *
  *   JPEG image routines for the Common UNIX Printing System (CUPS).
  *
@@ -311,5 +311,5 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-jpeg.c,v 1.19 2005/01/03 19:29:57 mike Exp $".
+ * End of "$Id$".
  */

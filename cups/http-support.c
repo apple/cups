@@ -1,7 +1,7 @@
 /*
- * "$Id: http-support.c,v 1.15 2005/01/03 19:29:45 mike Exp $"
+ * "$Id$"
  *
- *   HTTP support routines for the Common UNIX Printing System (CUPS).
+ *   HTTP support routines for the Common UNIX Printing System (CUPS) scheduler.
  *
  *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
  *
@@ -374,5 +374,5 @@ http_copy_decode(char       *dst,	/* O - Destination buffer */
 
 
 /*
- * End of "$Id: http-support.c,v 1.15 2005/01/03 19:29:45 mike Exp $".
+ * End of "$Id$".
  */

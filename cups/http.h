@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.52 2005/01/03 19:29:45 mike Exp $"
+ * "$Id$"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -49,6 +49,9 @@
 #    if !defined(__APPLE__) || !defined(TCP_NODELAY)
 #      include <netinet/tcp.h>
 #    endif /* !__APPLE__ || !TCP_NODELAY */
+#    ifdef AF_LOCAL
+#      include <sys/un.h>
+#    endif /* AF_LOCAL */
 #  endif /* WIN32 */
 
 #  include "md5.h"
@@ -61,6 +64,29 @@
 #  ifdef __cplusplus
 extern "C" {
 #  endif /* __cplusplus */
+
+
+/*
+ * Oh, the wonderful world of IPv6 compatibility.  Apparently some
+ * implementations expose the (more logical) 32-bit address parts
+ * to everyone, while others only expose it to kernel code...  To
+ * make supporting IPv6 even easier, each vendor chose different
+ * core structure and union names, so the same defines or code
+ * can't be used on all platforms.
+ *
+ * The following will likely need tweeking on new platforms that
+ * support IPv6 - the "s6_addr32" define maps to the 32-bit integer
+ * array in the in6_addr union, which is named differently on various
+ * platforms.
+ */
+
+#if defined(AF_INET6) && !defined(s6_addr32)
+#  if defined(__sun)
+#    define s6_addr32	_S6_un._S6_u32
+#  elif defined(__FreeBSD__) || defined(__APPLE__)
+#    define s6_addr32	__u6_addr.__u6_addr32
+#  endif /* __sun */
+#endif /* AF_INET6 && !s6_addr32 */
 
 
 /*
@@ -247,7 +273,24 @@ typedef enum
   HTTP_FIELD_WWW_AUTHENTICATE,
   HTTP_FIELD_MAX
 } http_field_t;
-  
+
+
+/*
+ * HTTP address structure (makes using IPv6 a little easier and more portable.)
+ */  
+
+typedef union
+{
+  struct sockaddr	addr;		/* Base structure for family value */
+  struct sockaddr_in	ipv4;		/* IPv4 address */
+#ifdef AF_INET6
+  struct sockaddr_in6	ipv6;		/* IPv6 address */
+#endif /* AF_INET6 */
+#ifdef AF_LOCAL
+  struct sockaddr_un	un;		/* Domain socket file */
+#endif /* AF_LOCAL */
+  char			pad[128];	/* Pad to ensure binary compatibility */
+} http_addr_t;
 
 /*
  * HTTP connection structure...
@@ -263,7 +306,7 @@ typedef struct
   http_status_t		status;		/* Status of last request */
   http_version_t	version;	/* Protocol version */
   http_keepalive_t	keep_alive;	/* Keep-alive supported? */
-  struct sockaddr_in	hostaddr;	/* Address of connected host */
+  struct sockaddr_in	oldaddr;	/* Address of connected host */
   char			hostname[HTTP_MAX_HOST],
   					/* Name of connected host */
 			fields[HTTP_FIELD_MAX][HTTP_MAX_VALUE];
@@ -291,6 +334,8 @@ typedef struct
 			userpass[HTTP_MAX_VALUE];
 					/* Username:password string */
   int			digest_tries;	/* Number of tries for digest auth */
+  /**** New in CUPS 1.2 ****/
+  http_addr_t		hostaddr;	/* Host address and port */
 } http_t;
 
 
@@ -364,6 +409,18 @@ extern void		httpSeparate2(const char *uri,
 				      char *host, int hostlen, int *port,
 				      char *resource, int resourcelen);
 
+/**** New in CUPS 1.2 ****/
+extern int		httpAddrAny(const http_addr_t *addr);
+extern int		httpAddrEqual(const http_addr_t *addr1,
+			              const http_addr_t *addr2);
+extern void		httpAddrLoad(const struct hostent *host, int port,
+			             int n, http_addr_t *addr);
+extern int		httpAddrLocalhost(const http_addr_t *addr);
+extern char		*httpAddrLookup(const http_addr_t *addr,
+                                        char *name, int namelen);
+extern char		*httpAddrString(const http_addr_t *addr,
+			                char *s, int slen);
+
 
 /*
  * C++ magic...
@@ -375,5 +432,5 @@ extern void		httpSeparate2(const char *uri,
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.52 2005/01/03 19:29:45 mike Exp $".
+ * End of "$Id$".
  */

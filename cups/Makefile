@@ -1,7 +1,7 @@
 #
-# "$Id: Makefile,v 1.87 2005/01/03 19:29:45 mike Exp $"
+# "$Id$"
 #
-#   Support library Makefile for the Common UNIX Printing System (CUPS).
+#   API library Makefile for the Common UNIX Printing System (CUPS).
 #
 #   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 #
@@ -30,18 +30,20 @@ include ../Makedefs
 # Object files...
 #
 
-LIBOBJS	=	attr.o auth.o dest.o emit.o encode.o getputfile.o \
+LIBOBJS	=	attr.o auth.o dest.o emit.o encode.o extended.o getputfile.o \
 		http.o http-addr.o http-support.o ipp.o ipp-support.o \
-		language.o mark.o md5.o md5passwd.o options.o page.o \
-		ppd.o snprintf.o string.o tempfile.o usersys.o util.o
-OBJS	=	$(LIBOBJS) testhttp.o testipp.o testlang.o
+		langprintf.o language.o mark.o md5.o md5passwd.o normalize.o \
+		options.o page.o ppd.o snprintf.o string.o tempfile.o \
+		transcode.o usersys.o util.o
+OBJS	=	$(LIBOBJS) testhttp.o testi18n.o testipp.o testlang.o
 
 
 #
 # Header files to install...
 #
 
-HEADERS	=	cups.h http.h ipp.h language.h md5.h ppd.h
+HEADERS	=	cups.h http.h ipp.h language.h md5.h normalize.h ppd.h \
+		transcode.h
 
 
 #
@@ -49,7 +51,7 @@ HEADERS	=	cups.h http.h ipp.h language.h md5.h ppd.h
 #
 
 TARGETS	=	$(LIBCUPS) libcups.a \
-		testhttp testipp testlang
+		testhttp testi18n testipp testlang
 
 
 #
@@ -107,7 +109,7 @@ installhdrs:
 # libcups.so.2, libcups.sl.2
 #
 
-libcups.so.2 libcups.sl.2:	$(LIBOBJS) ../Makedefs
+libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS)
 	$(RM) `basename $@ .2`
@@ -118,10 +120,10 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS) ../Makedefs
 # libcups.2.dylib
 #
 
-libcups.2.dylib:	$(LIBOBJS) ../Makedefs
+libcups.2.dylib:	$(LIBOBJS)
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ \
-		-install_name $(libdir)/$@ \
+		-install_name $(libdir)/libcups.dylib \
 		-current_version 2.7.0 \
 		-compatibility_version 2.0.0 \
 		$(LIBOBJS) $(SSLLIBS) $(COMMONLIBS)
@@ -133,7 +135,7 @@ libcups.2.dylib:	$(LIBOBJS) ../Makedefs
 # libcups_s.a
 #
 
-libcups_s.a:	$(LIBOBJS) ../Makedefs
+libcups_s.a:	$(LIBOBJS)
 	echo Creating $@...
 	$(RM) libcups_s.exp
 	(echo _ipp_add_attr; echo _ipp_free_attr) >libcups_s.exp
@@ -146,9 +148,9 @@ libcups_s.a:	$(LIBOBJS) ../Makedefs
 # libcups.la
 #
 
-libcups.la:    $(LIBOBJS) ../Makedefs
+libcups.la:    $(LIBOBJS)
 	echo Linking $@...
-	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
+	$(CC) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
 		-version-info 2:7 $(SSLLIBS) $(COMMONLIBS)
 
 
@@ -192,12 +194,35 @@ testipp:	testipp.o libcups.a
 
 
 #
+# testi18n (dependency on static CUPS library is intentional)
+#
+
+testi18n:	testi18n.o libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testi18n.o libcups.a $(NETLIBS) $(SSLLIBS) $(COMMONLIBS)
+
+
+#
 # testlang (dependency on static CUPS library is intentional)
 #
 
 testlang:	testlang.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testlang.o libcups.a $(NETLIBS) $(SSLLIBS) $(COMMONLIBS)
+
+
+#
+# Automatic API reference manual...
+#
+
+apirm.xml:	$(HEADERS) $(LIBOBJS:.o=.c)
+	echo Generating CUPS API Reference Manual...
+	$(RM) apirm.xml
+#	mxmldoc apirm.xml $(HEADERS) $(LIBOBJS:.o=.c) >../doc/apirm.html
+	valgrind --leak-check=yes ~/c/mxml/mxmldoc apirm.xml \
+		ppd.h attr.c emit.c extended.c mark.c page.c ppd.c \
+		>../doc/apirm.html 2>apirm.out
+#		$(HEADERS) $(LIBOBJS:.o=.c) >../doc/apirm.html 2>apirm.out
 
 
 #
@@ -208,5 +233,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.87 2005/01/03 19:29:45 mike Exp $".
+# End of "$Id$".
 #

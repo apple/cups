@@ -1,7 +1,7 @@
 
 import java.awt.*;
 import javax.swing.*;
-import org.cups.*;
+import com.easysw.cups.*;
 
 public class GLPcolors
 {

@@ -1,10 +1,9 @@
 .\"
-.\" "$Id: cupstestppd.man,v 1.5 2005/01/03 19:29:58 mike Exp $"
+.\" "$Id: cupstestppd.man,v 1.1.2.1 2002/12/13 21:22:04 mike Exp $"
 .\"
 .\"   cupstestppd man page for the Common UNIX Printing System (CUPS).
-.\"   Based on cvs revision 1.4
 .\"
-.\"   Copyright 1997-2005 by Easy Software Products.
+.\"   Copyright 1997-2002 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -16,87 +15,60 @@
 .\"       Attn: CUPS Licensing Information
 .\"       Easy Software Products
 .\"       44141 Airport View Drive, Suite 204
-.\"       Hollywood, Maryland 20636 USA
+.\"       Hollywood, Maryland 20636-3111 USA
 .\"
-.\"       Voice: (301) 373-9600
+.\"       Voice: (301) 373-9603
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupstestppd 1 "Common UNIX Printing System" "14 Février 2003" "Easy Software Products"
-.SH NOM
-cupstestppd \- Teste la conformité des fichiers PPD
+.TH cupstestppd 1 "Common UNIX Printing System" "13 December 2002" "Easy Software Products"
+.SH NAME
+cupstestppd \- test conformance of ppd files
 .SH SYNOPSIS
 .B cupstestppd
-[ -q ] [ -v[v] ] nom_fichier.ppd[.gz] [ ... nom_fichierN.ppd[.gz] ]
+[ -v ] filename.ppd [ ... filenameN.ppd ]
 .br
 .B cupstestppd
-[ -v[v] ] -
+[ -v ] -
 .SH DESCRIPTION
-\fIcupstestppd\fR teste la conformité des fichiers PPD envers la
-spécification de format de fichier édictée par Adobe, dans sa version
-4.3. Cette commande peut également être utilisée pour voir la
-liste des options reconnues et des polices disponibles d'un
-fichier PPD. Toutes les sorties sont effectuées sur la sortie standard.
+\fIcupstestppd\fR tests the conformance of PPD files to the
+Adobe PostScript Printer Description file format specification
+version 4.3. It can also be used to list the supported options
+and available fonts in a PPD file. The results of testing and
+any other output are sent to the standard output.
 .LP
-Le premier mode d'appel de \fIcupstestppd\fR nécessite la présence
-d'un ou plusieurs fichiers PPD dans la ligne de commandes. Le second
-mode d'appel affiche les caractéristiques des fichiers PPD fournis sur
-l'entrée standard.
+The first form of \fIcupstestppd\fR lists one or more PPD files
+on the command-line. The second form lists the PPD file provided
+on the standard input. The second form can be used to test
+compressed PPD files using the appropriate utility.
 .LP
-L'option \fB-q\fR indique qu'aucune information ne doit être affichée
-à l'écran.
-.LP
-L'option \fI-v\fR indique qu'il faut afficher toutes les informations d'un fichier
-PPD à la place du statut PASS/FAILED/ERROR (conforme/non conforme/erreur).
-.LP
-L'option \fI-vv\fR indique qu'il faut afficher toutes les informations d'un fichier
-PPD en plus du résultat des tests de conformité.
-.LP
-Les options \fB-q\fR, \fI-v\fR et \fI-vv\fR sont mutuellement exclusives.
-.SH CODE DE RETOUR
-\fIcupstestppd\fR renvoie 0 en cas de réussite aux tests et une valeur différente de 0
-en cas d'échec. Les codes d'erreur sont les suivants\ :
+The \fI-v\fR option specifies that all information in the PPD file
+should be displayed in addition to the conformance testing results.
+.SH EXIT STATUS
+\fIcupstestppd\fR returns zero on success and non-zero on error. The
+error codes are as follows:
 .TP 5
 1
 .br
-Arguments de la ligne de commandes incorrects ou fichier PPD non trouvé.
+Bad command-line arguments or missing PPD filename.
 .TP 5
 2
 .br
-Impossible d'ouvrir ou de lire le fichier PPD.
+Unable to open or read PPD file.
 .TP 5
 3
 .br
-Le fichier PPD contient des erreurs de format ne pouvant être ignorées.
+The PPD file contains format errors that cannot be skipped.
 .TP 5
 4
 .br
-Le fichier PPD n'est pas conforme à la spécification Adobe.
-.SH EXEMPLES
-La commande suivante teste tous les fichiers PPD du répertoire courant, et
-affiche le nom de tous les fichiers non conformes\ :
-.nf
-
-    find . -name \\*.ppd \\! -exec cupstestppd -q '{}' \\; print
-
-.fi
-La commande suivante teste tous les fichiers PPD du répertoire courant, et
-affiche les résultats détaillées des fichiers non conformes\ :
-.nf
-
-    find . -name \\*.ppd \\! -exec cupstestppd -q '{}' \\; \\
-        -exec cupstestppd -v '{}' \\;
-
-.fi
-.SH VOIR AUSSI
+The PPD file does not conform to the Adobe PPD specification.
+.SH SEE ALSO
 CUPS Software Administrators Manual,
 CUPS Software Programmers Manual,
-http://localhost:631/documentation.html,
-Spécification du format de fichier Adobe Postscript Printer, version 4.3
+http://localhost:631/documentation.html
 .SH COPYRIGHT
-Copyright 1993-2005 Easy Software Products, All Rights Reserved.
-.SH TRADUCTION
-Gilles QUERRET <gilles.querret@nerim.net>
+Copyright 1993-2002 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupstestppd.man,v 1.5 2005/01/03 19:29:58 mike Exp $".
+.\" End of "$Id: cupstestppd.man,v 1.1.2.1 2002/12/13 21:22:04 mike Exp $".
 .\"

@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.49 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -104,10 +104,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 		*agent,			/* Pointer to user */
 		status;			/* Status for client */
   int		hostlen;		/* Size of client address */
-  unsigned	hostip;			/* (32-bit) IP address */
-  struct sockaddr_in hostaddr;		/* Address of client */
-  struct hostent *hostent;		/* Host entry of client */
-  char		hostname[256];		/* Hostname of client */
+  http_addr_t	hostaddr;		/* Address of client */
+  char		hostname[256],		/* Name of client */
+		hostip[256],		/* IP address */
+		*hostfamily;		/* Address family */
 
 
  /*
@@ -135,21 +135,17 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
   else
   {
-    hostip   = ntohl(hostaddr.sin_addr.s_addr);
-    hostent  = gethostbyaddr((void *)&(hostaddr.sin_addr), hostlen, AF_INET);
+    httpAddrLookup(&hostaddr, hostname, sizeof(hostname));
+    httpAddrString(&hostaddr, hostip, sizeof(hostip));
 
-    if (hostent)
-      strlcpy(hostname, hostent->h_name, sizeof(hostname));
+#ifdef AF_INET6
+    if (hostaddr.addr.sa_family == AF_INET6)
+      hostfamily = "IPv6";
     else
-    {
-      snprintf(hostname, sizeof(hostname), "%d.%d.%d.%d",
-               (hostip >> 24) & 255, (hostip >> 16) & 255,
-	       (hostip >> 8) & 255, hostip & 255);
-    }
+#endif /* AF_INET6 */
+    hostfamily = "IPv4";
 
-    syslog(LOG_INFO, "Connection from %s (%d.%d.%d.%d)",
-           hostname, (hostip >> 24) & 255, (hostip >> 16) & 255,
-	   (hostip >> 8) & 255, hostip & 255);
+    syslog(LOG_INFO, "Connection from %s (%s %s)", hostname, hostfamily, hostip);
   }
 
  /*
@@ -1423,5 +1419,5 @@ smart_gets(char *s,			/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.49 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

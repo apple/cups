@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsaddsmb.c,v 1.20 2005/01/03 19:29:59 mike Exp $"
+ * "$Id$"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
@@ -947,5 +947,5 @@ write_option(FILE            *dstfp,	/* I - PPD file */
 
 
 /*
- * End of "$Id: cupsaddsmb.c,v 1.20 2005/01/03 19:29:59 mike Exp $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: cups.mak,v 1.8 2005/01/03 19:29:59 mike Exp $"
+# "$Id$"
 #
 # CUPS driver makefile for Ghostscript.
 #
@@ -49,5 +49,5 @@ install-cups:
 
 
 #
-# End of "$Id: cups.mak,v 1.8 2005/01/03 19:29:59 mike Exp $".
+# End of "$Id$".
 #
