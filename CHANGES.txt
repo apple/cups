@@ -24,6 +24,16 @@ CHANGES IN CUPS V1.1.6
 	- The cups-lpd mini-daemon now logs the client address
 	  and hostname as well as all commands and errors in the
 	  syslog file.
+	- The IPP backend now detects the supported file formats
+	  and only specifies the document format if it is
+	  supported.  This makes IPP printing to network print
+	  servers and cards more reliable without affecting the
+	  capabilities of CUPS servers.
+	- The time_at_xyz attributes are now converted to human-
+	  readable dates and times for the web interfaces.
+	- The HP and EPSON sample drivers now correctly catch
+	  signals and eject the current page when a job is
+	  cancelled.
 
 
 CHANGES IN CUPS V1.1.5-2

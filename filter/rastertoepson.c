@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertoepson.c,v 1.6 2000/10/19 18:42:50 mike Exp $"
+ * "$Id: rastertoepson.c,v 1.7 2001/01/12 17:24:22 mike Exp $"
  *
  *   EPSON ESC/P and ESC/P2 filter for the Common UNIX Printing System
  *   (CUPS).
@@ -44,6 +44,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <signal.h>
 
 
 /*
@@ -90,6 +91,7 @@ void	StartPage(const ppd_file_t *ppd, const cups_page_header_t *header);
 void	EndPage(const cups_page_header_t *header);
 void	Shutdown(void);
 
+void	CancelJob(int sig);
 void	CompressData(const unsigned char *line, int length, int plane,
 	             int type, int xstep, int ystep);
 void	OutputLine(const cups_page_header_t *header);
@@ -116,7 +118,27 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
 {
   int	n, t;					/* Numbers */
   int	plane;					/* Looping var */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;			/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
+
+ /*
+  * Register a signal handler to eject the current page if the
+  * job is cancelled.
+  */
+
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+  sigset(SIGTERM, CancelJob);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+
+  sigemptyset(&action.sa_mask);
+  action.sa_handler = CancelJob;
+  sigaction(SIGTERM, &action, NULL);
+#else
+  signal(SIGTERM, CancelJob);
+#endif /* HAVE_SIGSET */
 
  /*
   * Send a reset sequence.
@@ -253,6 +275,8 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
 
   if (header->cupsCompression || DotBytes)
     CompBuffer = calloc(2, header->cupsWidth);
+  else
+    CompBuffer = NULL;
 
   if (DotBytes)
   {
@@ -273,7 +297,12 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
 void
 EndPage(const cups_page_header_t *header)	/* I - Page header */
 {
-  if (DotBytes)
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;			/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+
+
+  if (DotBytes && header)
   {
    /*
     * Flush remaining graphics as needed...
@@ -298,6 +327,23 @@ EndPage(const cups_page_header_t *header)	/* I - Page header */
   */
 
   putchar(12);		/* Form feed */
+  fflush(stdout);
+
+ /*
+  * Unregister the signal handler...
+  */
+
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+  sigset(SIGTERM, SIG_IGN);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+
+  sigemptyset(&action.sa_mask);
+  action.sa_handler = SIG_IGN;
+  sigaction(SIGTERM, &action, NULL);
+#else
+  signal(SIGTERM, SIG_IGN);
+#endif /* HAVE_SIGSET */
 
  /*
   * Free memory...
@@ -305,7 +351,7 @@ EndPage(const cups_page_header_t *header)	/* I - Page header */
 
   free(Planes[0]);
 
-  if (header->cupsCompression || DotBytes)
+  if (CompBuffer)
     free(CompBuffer);
 
   if (DotBytes)
@@ -325,6 +371,41 @@ Shutdown(void)
   */
 
   printf("\033@");
+}
+
+
+/*
+ * 'CancelJob()' - Cancel the current job...
+ */
+
+void
+CancelJob(int sig)			/* I - Signal */
+{
+  int	i;				/* Looping var */
+
+
+  (void)sig;
+
+ /*
+  * Send out lots of NUL bytes to clear out any pending raster data...
+  */
+
+  if (DotBytes)
+    i = DotBytes * 360 * 8;
+  else
+    i = 720;
+
+  for (; i > 0; i --)
+    putchar(0);
+
+ /*
+  * End the current page and exit...
+  */
+
+  EndPage(NULL);
+  Shutdown();
+
+  exit(0);
 }
 
 
@@ -510,6 +591,7 @@ CompressData(const unsigned char *line,	/* I - Data to compress */
   putchar(length >> 8);
 
   pwrite(line_ptr, line_end - line_ptr);
+  fflush(stdout);
 }
 
 
@@ -836,6 +918,8 @@ OutputRows(const cups_page_header_t *header,	/* I - Page image header */
       printf("\n");
   }
 
+  fflush(stdout);
+
  /*
   * Clear the buffer...
   */
@@ -848,9 +932,9 @@ OutputRows(const cups_page_header_t *header,	/* I - Page image header */
  * 'main()' - Main entry and processing of driver.
  */
 
-int			/* O - Exit status */
-main(int  argc,		/* I - Number of command-line arguments */
-     char *argv[])	/* I - Command-line arguments */
+int				/* O - Exit status */
+main(int  argc,			/* I - Number of command-line arguments */
+     char *argv[])		/* I - Command-line arguments */
 {
   int			fd;	/* File descriptor */
   cups_raster_t		*ras;	/* Raster stream for printing */
@@ -988,5 +1072,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertoepson.c,v 1.6 2000/10/19 18:42:50 mike Exp $".
+ * End of "$Id: rastertoepson.c,v 1.7 2001/01/12 17:24:22 mike Exp $".
  */

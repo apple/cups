@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertohp.c,v 1.11 2000/09/26 21:29:25 mike Exp $"
+ * "$Id: rastertohp.c,v 1.12 2001/01/12 17:24:22 mike Exp $"
  *
  *   Hewlett-Packard Page Control Language filter for the Common UNIX
  *   Printing System (CUPS).
@@ -28,6 +28,7 @@
  *   StartPage()    - Start a page of graphics.
  *   EndPage()      - Finish a page of graphics.
  *   Shutdown()     - Shutdown the printer.
+ *   CancelJob()    - Cancel the current job...
  *   CompressData() - Compress a line of graphics.
  *   OutputLine()   - Output a line of graphics.
  *   main()         - Main entry and processing of driver.
@@ -43,6 +44,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <signal.h>
 
 
 /*
@@ -53,6 +55,7 @@ unsigned char	*Planes[4],		/* Output buffers */
 		*CompBuffer;		/* Compression buffer */
 int		NumPlanes,		/* Number of color planes */
 		Feed,			/* Number of lines to skip */
+		Duplex,			/* Current duplex mode */
 		Page;			/* Current page number */
 
 
@@ -62,9 +65,10 @@ int		NumPlanes,		/* Number of color planes */
 
 void	Setup(void);
 void	StartPage(cups_page_header_t *header);
-void	EndPage(cups_page_header_t *header);
+void	EndPage(void);
 void	Shutdown(void);
 
+void	CancelJob(int sig);
 void	CompressData(unsigned char *line, int length, int plane, int type);
 void	OutputLine(cups_page_header_t *header);
 
@@ -93,9 +97,35 @@ void
 StartPage(cups_page_header_t *header)	/* I - Page header */
 {
   int	plane;				/* Looping var */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;		/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
-  if (!header->Duplex || (Page & 1))
+ /*
+  * Register a signal handler to eject the current page if the
+  * job is cancelled.
+  */
+
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+  sigset(SIGTERM, CancelJob);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+
+  sigemptyset(&action.sa_mask);
+  action.sa_handler = CancelJob;
+  sigaction(SIGTERM, &action, NULL);
+#else
+  signal(SIGTERM, CancelJob);
+#endif /* HAVE_SIGSET */
+
+ /*
+  * Setup printer/job attributes...
+  */
+
+  Duplex = header->Duplex;
+
+  if (!Duplex || (Page & 1))
   {
    /*
     * Set the media type, position, and size...
@@ -213,6 +243,8 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
 
   if (header->cupsCompression)
     CompBuffer = malloc(header->cupsBytesPerLine * 2);
+  else
+    CompBuffer = NULL;
 }
 
 
@@ -221,8 +253,13 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
  */
 
 void
-EndPage(cups_page_header_t *header)	/* I - Page header */
+EndPage(void)
 {
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;	/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+
+
  /*
   * Eject the current page...
   */
@@ -236,9 +273,27 @@ EndPage(cups_page_header_t *header)	/* I - Page header */
   {
      printf("\033*r0B");		/* End GFX */
 
-     if (!(header->Duplex && (Page & 1)))
+     if (!(Duplex && (Page & 1)))
        printf("\014");			/* Eject current page */
   }
+
+  fflush(stdout);
+
+ /*
+  * Unregister the signal handler...
+  */
+
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+  sigset(SIGTERM, SIG_IGN);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+
+  sigemptyset(&action.sa_mask);
+  action.sa_handler = SIG_IGN;
+  sigaction(SIGTERM, &action, NULL);
+#else
+  signal(SIGTERM, SIG_IGN);
+#endif /* HAVE_SIGSET */
 
  /*
   * Free memory...
@@ -246,7 +301,7 @@ EndPage(cups_page_header_t *header)	/* I - Page header */
 
   free(Planes[0]);
 
-  if (header->cupsCompression)
+  if (CompBuffer)
     free(CompBuffer);
 }
 
@@ -264,6 +319,36 @@ Shutdown(void)
 
   putchar(0x1b);
   putchar('E');
+}
+
+
+/*
+ * 'CancelJob()' - Cancel the current job...
+ */
+
+void
+CancelJob(int sig)			/* I - Signal */
+{
+  int	i;				/* Looping var */
+
+
+  (void)sig;
+
+ /*
+  * Send out lots of NUL bytes to clear out any pending raster data...
+  */
+
+  for (i = 0; i < 600; i ++)
+    putchar(0);
+
+ /*
+  * End the current page and exit...
+  */
+
+  EndPage();
+  Shutdown();
+
+  exit(0);
 }
 
 
@@ -426,6 +511,8 @@ OutputLine(cups_page_header_t *header)	/* I - Page header */
     CompressData(Planes[plane], header->cupsBytesPerLine / NumPlanes,
 		 plane < (NumPlanes - 1) ? 'V' : 'W',
 		 header->cupsCompression);
+
+  fflush(stdout);
 }
 
 
@@ -441,6 +528,9 @@ main(int  argc,		/* I - Number of command-line arguments */
   cups_raster_t		*ras;	/* Raster stream for printing */
   cups_page_header_t	header;	/* Page header from file */
   int			y;	/* Current line */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;	/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
  /*
@@ -540,7 +630,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     * Eject the page...
     */
 
-    EndPage(&header);
+    EndPage();
   }
 
  /*
@@ -571,5 +661,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertohp.c,v 1.11 2000/09/26 21:29:25 mike Exp $".
+ * End of "$Id: rastertohp.c,v 1.12 2001/01/12 17:24:22 mike Exp $".
  */
