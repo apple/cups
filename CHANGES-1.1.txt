@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The cupstestppd program did not allow a default choice
+	  of "Unknown" as required by the PPD spec (STR #651)
 	- The select() buffers are now allocated to be at least
 	  as large as sizeof(fd_set) (STR #639)
 	- The LPD backend now supports overriding the print job
@@ -37,7 +39,7 @@ CHANGES IN CUPS V1.1.21rc1
 	  sbin directories (STR #598)
 	- The web interface did not redirect administration
 	  tasks to the primary server for a class or printer
-	  (STR #491)
+	  (STR #491, #652)
 	- The cups-lpd mini-daemon did not reject print jobs to
 	  queues that were rejecting new print jobs (STR #515)
 	- Some calls to the ctype functions did not account for

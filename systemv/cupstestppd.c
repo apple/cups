@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.29 2004/02/26 16:27:51 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.30 2004/03/24 21:05:59 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -380,7 +380,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	  if (option->defchoice[0])
 	  {
-            if (ppdFindChoice(option, option->defchoice) == NULL)
+            if (ppdFindChoice(option, option->defchoice) == NULL &&
+	        strcmp(option->defchoice, "Unknown"))
 	    {
 	      if (verbose >= 0)
 	      {
@@ -1158,5 +1159,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.29 2004/02/26 16:27:51 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.30 2004/03/24 21:05:59 mike Exp $".
  */
