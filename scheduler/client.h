@@ -1,5 +1,5 @@
 /*
- * "$Id: client.h,v 1.17.2.6 2003/03/12 21:51:03 mike Exp $"
+ * "$Id: client.h,v 1.17.2.7 2003/03/13 03:35:00 mike Exp $"
  *
  *   Client definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -37,8 +37,8 @@ typedef struct
   char		username[33],		/* Username from Authorization: line */
 		password[33],		/* Password from Authorization: line */
 		uri[HTTP_MAX_URI],	/* Localized URL/URI for GET/PUT */
-		filename[HTTP_MAX_URI],	/* Filename of output file */
-		command[HTTP_MAX_URI],	/* Command to run */
+		*filename,		/* Filename of output file */
+		*command,		/* Command to run */
 		*options;		/* Options for command */
   int		file;			/* Input/output file */
   int		pipe_pid;		/* Pipe process ID (or 0 if not a pipe) */
@@ -104,5 +104,5 @@ extern int	WriteClient(client_t *con);
 
 
 /*
- * End of "$Id: client.h,v 1.17.2.6 2003/03/12 21:51:03 mike Exp $".
+ * End of "$Id: client.h,v 1.17.2.7 2003/03/13 03:35:00 mike Exp $".
  */

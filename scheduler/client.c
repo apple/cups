@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.47 2003/03/12 21:51:02 mike Exp $"
+ * "$Id: client.c,v 1.91.2.48 2003/03/13 03:34:59 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -372,6 +372,10 @@ CloseClient(client_t *con)	/* I - Client to close */
   if (con->http.input_set)
     free(con->http.input_set);
 
+  ClearString(&con->filename);
+  ClearString(&con->command);
+  ClearString(&con->options);
+
 #ifdef HAVE_SSL
  /*
   * Shutdown encryption as needed...
@@ -742,10 +746,12 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	con->bytes               = 0;
 	con->file                = 0;
 	con->pipe_pid            = 0;
-	con->command[0]          = '\0';
 	con->username[0]         = '\0';
 	con->password[0]         = '\0';
 	con->uri[0]              = '\0';
+
+	ClearString(&con->command);
+	ClearString(&con->options);
 
 	if (con->language != NULL)
 	{
@@ -1084,31 +1090,27 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
               if (strncmp(con->uri, "/admin", 6) == 0)
 	      {
-		snprintf(con->command, sizeof(con->command),
-	        	 "%s/cgi-bin/admin.cgi", ServerBin);
-		con->options = con->uri + 6;
+		SetStringf(&con->command, "%s/cgi-bin/admin.cgi", ServerBin);
+		SetString(&con->options, con->uri + 6);
 	      }
               else if (strncmp(con->uri, "/printers", 9) == 0)
 	      {
-		snprintf(con->command, sizeof(con->command),
-	        	 "%s/cgi-bin/printers.cgi", ServerBin);
-		con->options = con->uri + 9;
+		SetStringf(&con->command, "%s/cgi-bin/printers.cgi", ServerBin);
+		SetString(&con->options, con->uri + 9);
 	      }
 	      else if (strncmp(con->uri, "/classes", 8) == 0)
 	      {
-		snprintf(con->command, sizeof(con->command),
-	        	 "%s/cgi-bin/classes.cgi", ServerBin);
-		con->options = con->uri + 8;
+		SetStringf(&con->command, "%s/cgi-bin/classes.cgi", ServerBin);
+		SetString(&con->options, con->uri + 8);
 	      }
 	      else
 	      {
-		snprintf(con->command, sizeof(con->command),
-	        	 "%s/cgi-bin/jobs.cgi", ServerBin);
-		con->options = con->uri + 5;
+		SetStringf(&con->command, "%s/cgi-bin/jobs.cgi", ServerBin);
+		SetString(&con->options, con->uri + 5);
 	      }
 
 	      if (con->options[0] == '/')
-		con->options ++;
+		strcpy(con->options, con->options + 1);
 
               if (!SendCommand(con, con->command, con->options))
 	      {
@@ -1262,31 +1264,27 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
               if (strncmp(con->uri, "/admin", 6) == 0)
 	      {
-		snprintf(con->command, sizeof(con->command),
-	        	 "%s/cgi-bin/admin.cgi", ServerBin);
-		con->options = con->uri + 6;
+		SetStringf(&con->command, "%s/cgi-bin/admin.cgi", ServerBin);
+		SetString(&con->options, con->uri + 6);
 	      }
               else if (strncmp(con->uri, "/printers", 9) == 0)
 	      {
-		snprintf(con->command, sizeof(con->command),
-	        	 "%s/cgi-bin/printers.cgi", ServerBin);
-		con->options = con->uri + 9;
+		SetStringf(&con->command, "%s/cgi-bin/printers.cgi", ServerBin);
+		SetString(&con->options, con->uri + 9);
 	      }
 	      else if (strncmp(con->uri, "/classes", 8) == 0)
 	      {
-		snprintf(con->command, sizeof(con->command),
-	        	 "%s/cgi-bin/classes.cgi", ServerBin);
-		con->options = con->uri + 8;
+		SetStringf(&con->command, "%s/cgi-bin/classes.cgi", ServerBin);
+		SetString(&con->options, con->uri + 8);
 	      }
 	      else
 	      {
-		snprintf(con->command, sizeof(con->command),
-	        	 "%s/cgi-bin/jobs.cgi", ServerBin);
-		con->options = con->uri + 5;
+		SetStringf(&con->command, "%s/cgi-bin/jobs.cgi", ServerBin);
+		SetString(&con->options, con->uri + 5);
 	      }
 
 	      if (con->options[0] == '/')
-		con->options ++;
+		strcpy(con->options, con->options + 1);
 
               LogMessage(L_DEBUG2, "ReadClient() %d command=\"%s\", options = \"%s\"",
 	        	 con->http.fd, con->command, con->options);
@@ -1381,8 +1379,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	    * Open a temporary file to hold the request...
 	    */
 
-            snprintf(con->filename, sizeof(con->filename), "%s/%08x",
-	             RequestRoot, request_id ++);
+            SetStringf(&con->filename, "%s/%08x", RequestRoot, request_id ++);
 	    con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
 	    fchmod(con->file, 0640);
 	    fchown(con->file, User, Group);
@@ -1578,7 +1575,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	    close(con->file);
 	    con->file = 0;
 	    unlink(con->filename);
-	    con->filename[0] = '\0';
+	    ClearString(&con->filename);
 
             if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
 	    {
@@ -1612,7 +1609,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
             LogMessage(L_DEBUG2, "ReadClient() %d Removing temp file %s",
 	               con->http.fd, con->filename);
 	    unlink(con->filename);
-	    con->filename[0] = '\0';
+	    ClearString(&con->filename);
 
             if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
 	    {
@@ -1677,8 +1674,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  * Create a file as needed for the request data...
 	  */
 
-          snprintf(con->filename, sizeof(con->filename), "%s/%08x",
-	           RequestRoot, request_id ++);
+          SetStringf(&con->filename, "%s/%08x", RequestRoot, request_id ++);
 	  con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
 	  fchmod(con->file, 0640);
 	  fchown(con->file, User, Group);
@@ -1721,7 +1717,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      close(con->file);
 	      con->file = 0;
 	      unlink(con->filename);
-	      con->filename[0] = '\0';
+	      ClearString(&con->filename);
 
               if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
 	      {
@@ -1759,7 +1755,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
               LogMessage(L_DEBUG2, "ReadClient() %d Removing temp file %s",
 	                 con->http.fd, con->filename);
 	      unlink(con->filename);
-	      con->filename[0] = '\0';
+	      ClearString(&con->filename);
 
 	      if (con->request)
 	      {
@@ -1778,7 +1774,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      }
 	    }
 
-	    if (con->command[0])
+	    if (con->command)
 	    {
 	      if (!SendCommand(con, con->command, con->options))
 	      {
@@ -1824,7 +1820,7 @@ SendCommand(client_t      *con,
   int	fd;
 
 
-  if (con->filename[0])
+  if (con->filename)
     fd = open(con->filename, O_RDONLY);
   else
     fd = open("/dev/null", O_RDONLY);
@@ -2221,12 +2217,12 @@ WriteClient(client_t *con)		/* I - Client connection */
       con->pipe_pid = 0;
     }
 
-    if (con->filename[0])
+    if (con->filename)
     {
       LogMessage(L_DEBUG2, "WriteClient() %d Removing temp file %s",
                  con->http.fd, con->filename);
       unlink(con->filename);
-      con->filename[0] = '\0';
+      ClearString(&con->filename);
     }
 
     if (con->request != NULL)
@@ -2240,6 +2236,9 @@ WriteClient(client_t *con)		/* I - Client connection */
       ippDelete(con->response);
       con->response = NULL;
     }
+
+    ClearString(&con->command);
+    ClearString(&con->options);
 
     if (!con->http.keep_alive)
     {
@@ -2559,7 +2558,7 @@ install_conf_file(client_t *con)	/* I - Connection */
   */
 
   unlink(con->filename);
-  con->filename[0] = '\0';
+  ClearString(&con->filename);
 
  /*
   * Unlink the old backup, rename the current config file to the backup
@@ -3003,5 +3002,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.47 2003/03/12 21:51:02 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.48 2003/03/13 03:34:59 mike Exp $".
  */
