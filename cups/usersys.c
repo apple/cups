@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c,v 1.10 2000/11/03 14:13:27 mike Exp $"
+ * "$Id: usersys.c,v 1.11 2000/12/13 00:41:19 mike Exp $"
  *
  *   User, system, and password routines for the Common UNIX Printing
  *   System (CUPS).
@@ -267,7 +267,7 @@ cupsUser(void)
     else
     {
      /*
-      * Rewind the password file again and copy the username...
+      * Copy the username...
       */
 
       setpwent();
@@ -275,6 +275,12 @@ cupsUser(void)
       strncpy(cups_user, pwd->pw_name, sizeof(cups_user) - 1);
       cups_user[sizeof(cups_user) - 1] = '\0';
     }
+
+   /*
+    * Rewind the password file again...
+    */
+
+    setpwent();
   }
 
   return (cups_user);
@@ -294,5 +300,5 @@ cups_get_password(const char *prompt)	/* I - Prompt string */
 
 
 /*
- * End of "$Id: usersys.c,v 1.10 2000/11/03 14:13:27 mike Exp $".
+ * End of "$Id: usersys.c,v 1.11 2000/12/13 00:41:19 mike Exp $".
  */
