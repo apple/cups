@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.79 2004/08/02 18:16:36 mike Exp $"
+ * "$Id: config.h.in,v 1.80 2004/08/19 13:54:37 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -17,7 +17,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -190,6 +190,13 @@
 
 
 /*
+ * Do we have the langinfo.h header file?
+ */
+
+#undef HAVE_LANGINFO_H
+
+
+/*
  * Which encryption libraries do we have?
  */
 
@@ -294,5 +301,5 @@
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in,v 1.79 2004/08/02 18:16:36 mike Exp $".
+ * End of "$Id: config.h.in,v 1.80 2004/08/19 13:54:37 mike Exp $".
  */
