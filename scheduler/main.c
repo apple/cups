@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.100 2003/04/10 20:14:06 mike Exp $"
+ * "$Id: main.c,v 1.101 2003/04/28 20:14:27 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -33,6 +33,7 @@
  *   sigchld_handler()    - Handle 'child' signals from old processes.
  *   sighup_handler()     - Handle 'hangup' signals to reconfigure the scheduler.
  *   sigterm_handler()    - Handle 'terminate' signals that stop the scheduler.
+ *   sigusr1_handler()    - Catch USR1 signals...
  *   usage()              - Show scheduler usage.
  */
 
@@ -1061,5 +1062,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.100 2003/04/10 20:14:06 mike Exp $".
+ * End of "$Id: main.c,v 1.101 2003/04/28 20:14:27 mike Exp $".
  */
