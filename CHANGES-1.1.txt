@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- Changes in the default printer and printer attributes
+	  were not always reflected in the generated printcap
+	  file.
 	- Implicit classes did not inherit the location or
 	  description from member printers.
 	- The httpGetHostByName() function did not handle

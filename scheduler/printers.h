@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h,v 1.22.2.3 2002/04/14 12:58:54 mike Exp $"
+ * "$Id: printers.h,v 1.22.2.4 2002/06/27 15:10:43 mike Exp $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -116,8 +116,9 @@ extern quota_t		*UpdateQuota(printer_t *p, const char *username,
 extern const char	*ValidateDest(const char *hostname,
 			              const char *resource,
 			              cups_ptype_t *dtype);
+extern void		WritePrintcap(void);
 
 
 /*
- * End of "$Id: printers.h,v 1.22.2.3 2002/04/14 12:58:54 mike Exp $".
+ * End of "$Id: printers.h,v 1.22.2.4 2002/06/27 15:10:43 mike Exp $".
  */

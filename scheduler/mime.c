@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.7.2.5 2002/05/16 14:00:15 mike Exp $"
+ * "$Id: mime.c,v 1.7.2.6 2002/06/27 15:14:40 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -502,17 +502,20 @@ load_convs(mime_t     *mime,		/* I - MIME database */
     filter = lineptr;
 
 #ifndef WIN32
-   /*
-    * Verify that the filter exists and is executable...
-    */
+    if (strcmp(filename, "-") != 0)
+    {
+     /*
+      * Verify that the filter exists and is executable...
+      */
 
-    if (filter[0] == '/')
-      strlcpy(filterprog, filter, sizeof(filterprog));
-    else
-      snprintf(filterprog, sizeof(filterprog), "%s/%s", filterpath, filter);
+      if (filter[0] == '/')
+	strlcpy(filterprog, filter, sizeof(filterprog));
+      else
+	snprintf(filterprog, sizeof(filterprog), "%s/%s", filterpath, filter);
 
-    if (access(filterprog, X_OK))
-      continue;
+      if (access(filterprog, X_OK))
+	continue;
+    }
 #endif /* !WIN32 */
 
    /*
@@ -593,5 +596,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.7.2.5 2002/05/16 14:00:15 mike Exp $".
+ * End of "$Id: mime.c,v 1.7.2.6 2002/06/27 15:14:40 mike Exp $".
  */
