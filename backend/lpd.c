@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.18 2000/03/21 04:03:23 mike Exp $"
+ * "$Id: lpd.c,v 1.19 2000/04/19 21:25:57 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -201,12 +201,16 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
   * Send the command...
   */
 
+  fprintf(stderr, "DEBUG: Sending command string (%d bytes)...\n", bytes);
+
   if (send(fd, buf, bytes, 0) < bytes)
     return (-1);
 
  /*
   * Read back the status from the command and return it...
   */
+
+  fprintf(stderr, "DEBUG: Reading command status...\n");
 
   if (recv(fd, &status, 1, 0) < 1)
     return (-1);
@@ -299,6 +303,8 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
     else
       break;
   }
+
+  fprintf(stderr, "INFO: Connected on port %d...\n", port);
 
  /*
   * Next, open the print file and figure out its size...
@@ -410,5 +416,5 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
 
 /*
- * End of "$Id: lpd.c,v 1.18 2000/03/21 04:03:23 mike Exp $".
+ * End of "$Id: lpd.c,v 1.19 2000/04/19 21:25:57 mike Exp $".
  */

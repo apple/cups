@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.20 2000/03/30 05:19:27 mike Exp $"
+# "$Id: Makefile,v 1.21 2000/04/19 21:25:59 mike Exp $"
 #
 #   GNU Ghostscript makefile for the Common UNIX Printing System (CUPS).
 #
@@ -336,7 +336,7 @@ LIBOBJS	=	gconfig.o \
 		zupath.o \
 		zusparam.o \
 		zvmem2.o \
-		zvmem.o \
+		zvmem.o
 
 OBJS	=	$(LIBOBJS) genarch.o pstoraster.o
 
@@ -431,5 +431,5 @@ pstoraster:	pstoraster.o libgs.a ../Makedefs ../cups/$(LIBCUPS)
 pstoraster.o:	arch.h ../config.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.20 2000/03/30 05:19:27 mike Exp $".
+# End of "$Id: Makefile,v 1.21 2000/04/19 21:25:59 mike Exp $".
 #

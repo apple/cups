@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.25 2000/03/30 05:19:28 mike Exp $"
+# "$Id: Makefile,v 1.26 2000/04/19 21:26:00 mike Exp $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -27,14 +27,15 @@ include ../Makedefs
 CUPSDOBJS =	auth.o banners.o cert.o classes.o client.o conf.o devices.o \
 		dirsvc.o main.o ipp.o listen.o job.o log.o ppds.o printers.o
 MIMEOBJS =	filter.o mime.o type.o
-OBJS	=	$(CUPSDOBJS) $(MIMEOBJS) cups-polld.o testmime.o testspeed.o
+OBJS	=	$(CUPSDOBJS) $(MIMEOBJS) cups-lpd.o cups-polld.o testmime.o \
+		testspeed.o
 
 
 #
 # Make everything...
 #
 
-all:	cupsd cups-polld libmime.a testmime testspeed
+all:	cupsd cups-lpd cups-polld libmime.a testmime testspeed
 
 
 #
@@ -42,7 +43,7 @@ all:	cupsd cups-polld libmime.a testmime testspeed
 #
 
 clean:
-	$(RM) $(OBJS) cupsd cups-polld libmime.a testmime testspeed
+	$(RM) $(OBJS) cupsd cups-lpd cups-polld libmime.a testmime testspeed
 
 
 #
@@ -54,6 +55,7 @@ install:
 	$(INSTALL_BIN) cupsd $(SBINDIR)
 	$(CHMOD) g-rwx,o-rwx $(SBINDIR)/cupsd
 	-$(MKDIR) $(SERVERBIN)/daemon
+	$(INSTALL_BIN) cups-lpd $(SERVERBIN)/daemon
 	$(INSTALL_BIN) cups-polld $(SERVERBIN)/daemon
 	-$(MKDIR) $(SERVERROOT)/certs
 	-$(MKDIR) $(SERVERROOT)/interfaces
@@ -73,6 +75,18 @@ cupsd:	$(CUPSDOBJS) libmime.a ../cups/$(LIBCUPS)
 $(CUPSDOBJS):	auth.h banners.h cert.h classes.h client.h conf.h \
 		cupsd.h dirsvc.h job.h mime.h printers.h \
 		../cups/cups.h ../cups/http.h ../cups/ipp.h \
+		../cups/language.h ../cups/string.h
+
+
+#
+# Make the line printer daemon, "cups-lpd".
+#
+
+cups-lpd:	cups-lpd.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o cups-lpd cups-lpd.o $(LIBS)
+
+cups-lpd.o:	../cups/cups.h ../cups/http.h ../cups/ipp.h \
 		../cups/language.h ../cups/string.h
 
 
@@ -125,5 +139,5 @@ $(OBJS):	../config.h ../Makedefs
 
 
 #
-# End of "$Id: Makefile,v 1.25 2000/03/30 05:19:28 mike Exp $".
+# End of "$Id: Makefile,v 1.26 2000/04/19 21:26:00 mike Exp $".
 #

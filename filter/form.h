@@ -1,5 +1,5 @@
 /*
- * "$Id: form.h,v 1.2 2000/04/18 19:41:11 mike Exp $"
+ * "$Id: form.h,v 1.3 2000/04/19 21:25:59 mike Exp $"
  *
  *   CUPS form header file for the Common UNIX Printing System (CUPS).
  *
@@ -35,8 +35,9 @@
 
 typedef enum
 {
-  ELEMENT_COMMENT = -2,	/* <!-- .... --> */
-  ELEMENT_FILE,		/* Pseudo element, not in file, but above */
+  ELEMENT_FILE = -1,		/* Pseudo element, not in file, but above */
+  ELEMENT_FRAGMENT,	/* Text fragment */
+  ELEMENT_COMMENT,	/* <!-- .... --> */
   ELEMENT_ARC,
   ELEMENT_BOX,
   ELEMENT_BR,
@@ -135,6 +136,7 @@ typedef struct tree_str
   float			x, y, w, h;	/* Position and size in points */
   float			bg[3], fg[3];	/* Colors of element */
   float			thickness;	/* Thickness of lines */
+  int			preformatted;	/* Preformatted text? */
   float			size;		/* Height of text in points */
   char			*typeface;	/* Typeface of text */
   style_t		style;		/* Style of text */
@@ -162,12 +164,12 @@ extern ppd_file_t	*PPD;		/* PPD file */
 
 extern void	formDelete(tree_t *t);
 extern char	*formGetAttr(tree_t *t, const char *name);
-extern tree_t	*formNew(element_t e, tree_t *p);
+extern tree_t	*formNew(tree_t *p);
 extern tree_t	*formRead(FILE *fp, tree_t *p);
 extern void	formSetAttr(tree_t *t, const char *name, const char *value);
 extern void	formWrite(tree_t *p);
 
 
 /*
- * End of "$Id: form.h,v 1.2 2000/04/18 19:41:11 mike Exp $".
+ * End of "$Id: form.h,v 1.3 2000/04/19 21:25:59 mike Exp $".
  */
