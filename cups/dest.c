@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.10 2000/07/21 15:31:06 mike Exp $"
+ * "$Id: dest.c,v 1.11 2000/10/19 01:51:30 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -369,7 +369,17 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
 		*lineptr,		/* Pointer into line */
 		*name,			/* Name of destination/option */
 		*instance;		/* Instance of destination */
+  const char	*printer;		/* PRINTER or LPDEST */
 
+
+ /*
+  * Check environment variables...
+  */
+
+  if ((printer = getenv("LPDEST")) == NULL)
+    if ((printer = getenv("PRINTER")) != NULL)
+      if (strcmp(printer, "lp") == 0)
+        printer = NULL;
 
  /*
   * Try to open the file...
@@ -480,7 +490,7 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
     * Set this as default if needed...
     */
 
-    if (strncasecmp(line, "default", 7) == 0)
+    if (strncasecmp(line, "default", 7) == 0 && printer == NULL)
     {
       for (i = 0; i < num_dests; i ++)
         (*dests)[i].is_default = 0;
@@ -500,5 +510,5 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
 
 
 /*
- * End of "$Id: dest.c,v 1.10 2000/07/21 15:31:06 mike Exp $".
+ * End of "$Id: dest.c,v 1.11 2000/10/19 01:51:30 mike Exp $".
  */

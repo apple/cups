@@ -27,6 +27,8 @@ CHANGES IN CUPS V1.1.5
 	  with large numbers of printers on slower machines.
 	- Updated the Linux USB backend to support Mandrake's
 	  /dev/usb/usblp# filenames.
+	- The PRINTER and LPDEST environment variables did not
+	  override the lpoptions default printer.
 
 
 CHANGES IN CUPS v1.1.4
