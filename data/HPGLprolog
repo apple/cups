@@ -1,6 +1,6 @@
-%%BeginResource: procset hpgltops 1.0 0
+%%BeginResource: procset hpgltops 1.1 0
 %
-% "$Id: HPGLprolog,v 1.5 1999/12/07 21:56:29 mike Exp $"
+% "$Id: HPGLprolog,v 1.6 2000/02/26 20:01:37 mike Exp $"
 %
 %   HP-GL/2 filter procset for the Common UNIX Printing System (CUPS).
 %
@@ -9,7 +9,7 @@
 %   should be called 'NP' (newpath), but GhostScript uses the 'NP' name
 %   for 'noaccess put' in some of its font files...
 %
-%   Copyright 1993-1999 Easy Software Products
+%   Copyright 1993-2000 Easy Software Products
 %
 %   These coded instructions, statements, and computer programs are the
 %   property of Easy Software Products and are protected by Federal
