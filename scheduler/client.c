@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.114 2002/06/07 15:43:20 mike Exp $"
+ * "$Id: client.c,v 1.115 2002/06/07 20:39:27 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2327,6 +2327,9 @@ pipe_command(client_t *con,	/* I - Client connection */
   else if (getenv("DYLD_LIBRARY_PATH") != NULL)
     snprintf(ldpath, sizeof(ldpath), "DYLD_LIBRARY_PATH=%s",
              getenv("DYLD_LIBRARY_PATH"));
+  else if (getenv("SHLIB_PATH") != NULL)
+    snprintf(ldpath, sizeof(ldpath), "SHLIB_PATH=%s",
+             getenv("SHLIB_PATH"));
   else
     ldpath[0] = '\0';
 
@@ -2508,5 +2511,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.114 2002/06/07 15:43:20 mike Exp $".
+ * End of "$Id: client.c,v 1.115 2002/06/07 20:39:27 mike Exp $".
  */

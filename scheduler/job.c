@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.154 2002/05/16 13:45:01 mike Exp $"
+ * "$Id: job.c,v 1.155 2002/06/07 20:39:27 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1496,6 +1496,9 @@ StartJob(int       id,		/* I - Job ID */
   else if (getenv("DYLD_LIBRARY_PATH") != NULL)
     snprintf(ldpath, sizeof(ldpath), "DYLD_LIBRARY_PATH=%s",
              getenv("DYLD_LIBRARY_PATH"));
+  else if (getenv("SHLIB_PATH") != NULL)
+    snprintf(ldpath, sizeof(ldpath), "SHLIB_PATH=%s",
+             getenv("SHLIB_PATH"));
   else
     ldpath[0] = '\0';
 
@@ -3056,5 +3059,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.154 2002/05/16 13:45:01 mike Exp $".
+ * End of "$Id: job.c,v 1.155 2002/06/07 20:39:27 mike Exp $".
  */
