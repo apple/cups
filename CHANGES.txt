@@ -62,6 +62,18 @@ CHANGES IN CUPS v1.1.3
 	- The scheduler now handles better localization of
 	  hostnames (e.g. server is host.foo.com, remote is
 	  host.subfoo.foo.com, localized is not host.subfoo...)
+	- The scheduler logging functions now use a common
+	  log file checking/rotation function (courtesy of
+	  Crutcher Dunnavant at Red Hat)
+	- The scheduler could accept more client connections
+	  than it allocated for if more than one Port or Listen
+	  line was present in cupsd.conf.
+	- Other minor scheduler performance tweeks.
+	- The lpq and lprm commands didn't support the default
+	  printer set using lpoptions.
+	- The lpoptions command now supports a "-l" option to
+	  list the printer-specific options and their current
+	  settings.
 
 
 CHANGES IN CUPS v1.1.2

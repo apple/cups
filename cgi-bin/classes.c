@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.15 2000/04/09 23:08:58 mike Exp $"
+ * "$Id: classes.c,v 1.16 2000/09/05 21:08:30 mike Exp $"
  *
  *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -46,6 +46,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   http_t	*http;		/* Connection to the server */
   ipp_t		*request,	/* IPP request */
 		*response;	/* IPP response */
+  ipp_attribute_t *attr;	/* IPP attribute */
   ipp_status_t	status;		/* Operation status... */
   char		uri[HTTP_MAX_URI];
 				/* Printer URI */
@@ -98,6 +99,62 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if (op == NULL || strcasecmp(op, "print-test-page") != 0)
   {
+   /*
+    * Get the default destination...
+    */
+
+    request = ippNew();
+    request->request.op.operation_id = CUPS_GET_DEFAULT;
+    request->request.op.request_id   = 1;
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	 "attributes-charset", NULL, cupsLangEncoding(language));
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+        	 "attributes-natural-language", NULL, language->language);
+
+    if ((response = cupsDoRequest(http, request, "/")) != NULL)
+    {
+      if ((attr = ippFindAttribute(response, "printer-name", IPP_TAG_NAME)) != NULL)
+        cgiSetVariable("DEFAULT_NAME", attr->values[0].string.text);
+
+      if ((attr = ippFindAttribute(response, "printer-uri-supported", IPP_TAG_URI)) != NULL)
+      {
+	char	method[HTTP_MAX_URI],
+		username[HTTP_MAX_URI],
+		hostname[HTTP_MAX_URI],
+		resource[HTTP_MAX_URI],
+		uri[HTTP_MAX_URI];
+	int	port;			/* URI data */
+	char	server[1024];		/* Name of server */
+
+
+       /*
+	* Map localhost access to localhost...
+	*/
+
+	httpSeparate(attr->values[0].string.text, method, username,
+		     hostname, &port, resource);
+
+	if (strcasecmp(hostname, server) == 0 &&
+	    (strcmp(getenv("REMOTE_HOST"), "127.0.0.1") == 0 ||
+	     strcmp(getenv("REMOTE_HOST"), "localhost") == 0 ||
+	     strcmp(getenv("REMOTE_HOST"), server) == 0))
+	  strcpy(hostname, "localhost");
+
+       /*
+	* Rewrite URI with HTTP address...
+	*/
+
+	snprintf(uri, sizeof(uri), "http://%s:%d%s", hostname, port,
+		 resource);
+
+        cgiSetVariable("DEFAULT_URI", uri);
+      }
+
+      ippDelete(response);
+    }
+
    /*
     * Get the class info...
     */
@@ -297,5 +354,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: classes.c,v 1.15 2000/04/09 23:08:58 mike Exp $".
+ * End of "$Id: classes.c,v 1.16 2000/09/05 21:08:30 mike Exp $".
  */
