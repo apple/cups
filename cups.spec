@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.23 2000/08/04 14:53:49 mike Exp $"
+# "$Id: cups.spec,v 1.24 2000/09/06 12:38:12 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -26,16 +26,16 @@
 
 Summary: Common Unix Printing System
 Name: cups
-Version: 1.1.2
+Version: 1.1.3
 Release: 0
 Copyright: GPL
 Group: System Environment/Daemons
-Source: ftp://ftp.easysw.com/pub/cups/%version/cups-%version-source.tar.gz
+Source: ftp://ftp.easysw.com/pub/cups/%{version}/cups-%{version}-source.tar.gz
 Url: http://www.cups.org
 Packager: Michael Sweet <mike@easysw.com>
 Vendor: Easy Software Products
 # use buildroot so as not to disturb the version already installed
-BuildRoot: /tmp/rpmbuild
+BuildRoot: /var/tmp/%{name}-root
 Conflicts: lpr
 
 %package devel
@@ -67,6 +67,9 @@ make
 # RPM_BUILD_ROOT exists
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
+mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc0.d
+mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc3.d
+mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc5.d
 
 make	prefix=$RPM_BUILD_ROOT \
 	exec_prefix=$RPM_BUILD_ROOT/usr \
@@ -120,34 +123,52 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-/etc/cups/certs
-%config /etc/cups/classes.conf
-%config /etc/cups/client.conf
-%config /etc/cups/cupsd.conf
-/etc/cups/interfaces
+%dir /etc/cups
+%config /etc/cups/*.conf
+%dir /etc/cups/certs
+%dir /etc/cups/interfaces
 /etc/cups/mime.types
 /etc/cups/mime.convs
-/etc/cups/ppd
-%config /etc/cups/printers.conf
+%dir /etc/cups/ppd
+%dir /etc/pam.d
 /etc/pam.d/*
-/etc/init.d/*
-/etc/rc0.d/*
-/etc/rc2.d/*
-/etc/rc.d/*
+
+# RC dirs are a pain under Linux...  Uncomment the appropriate ones if you
+# don't use Red Hat or Mandrake...
+
+/etc/rc.d/init.d/*
+/etc/rc.d/rc0.d/*
+/etc/rc.d/rc3.d/*
+/etc/rc.d/rc5.d/*
+
+#/etc/init.d/*
+#/etc/rc0.d/*
+#/etc/rc3.d/*
+#/etc/rc5.d/*
+
+#/sbin/rc.d/*
+#/sbin/rc.d/rc0.d/*
+#/sbin/rc.d/rc3.d/*
+#/sbin/rc.d/rc5.d/*
+
 /usr/bin/*
 /usr/lib/*.so*
+%dir /usr/lib/cups
+/usr/lib/cups/*
 /usr/man/*
 /usr/sbin/*
-/usr/share/*
-/usr/lib/cups/*
-%attr(0700,lp,root) /var/spool/cups
-%attr(1700,lp,root) /var/spool/cups/tmp
-/sbin/init.d/*
+%dir /usr/share/cups
+/usr/share/cups/*
+%dir /usr/share/locale
+/usr/share/locale/*
+%attr(0700,lp,root) %dir /var/spool/cups
+%attr(1700,lp,root) %dir/var/spool/cups/tmp
 
 %files devel
+%dir /usr/include/cups
 /usr/include/cups/*
 /usr/lib/*.a
 
 #
-# End of "$Id: cups.spec,v 1.23 2000/08/04 14:53:49 mike Exp $".
+# End of "$Id: cups.spec,v 1.24 2000/09/06 12:38:12 mike Exp $".
 #

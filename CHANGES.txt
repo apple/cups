@@ -4,6 +4,7 @@ CHANGES.txt - 08/04/2000
 CHANGES IN CUPS v1.1.3
 
 	- Makefile fixes.
+	- RPM spec file changes.
 	- Documentation updates.
 	- Enabled pstoraster debug messages for everything
 	  (only logged when LogLevel set to "debug"...)
@@ -74,6 +75,8 @@ CHANGES IN CUPS v1.1.3
 	- The lpoptions command now supports a "-l" option to
 	  list the printer-specific options and their current
 	  settings.
+	- The web printer and class lists now show a link to the
+	  default printer or class at the top of the page.
 
 
 CHANGES IN CUPS v1.1.2
