@@ -1,5 +1,5 @@
 /*
- * "$Id: image-colorspace.c,v 1.22.2.2 2002/01/02 18:04:44 mike Exp $"
+ * "$Id: image-colorspace.c,v 1.22.2.3 2002/01/27 21:20:30 mike Exp $"
  *
  *   Colorspace conversions for the Common UNIX Printing System (CUPS).
  *
@@ -54,6 +54,23 @@
 
 #include "image.h"
 #include <math.h>
+
+
+/*
+ * Define some math constants that are required...
+ */
+
+#ifndef M_PI
+#  define M_PI		3.14159265358979323846
+#endif /* !M_PI */
+
+#ifndef M_SQRT2
+#  define M_SQRT2	1.41421356237309504880
+#endif /* !M_SQRT2 */
+
+#ifndef M_SQRT1_2
+#  define M_SQRT1_2	0.70710678118654752440
+#endif /* !M_SQRT1_2 */
 
 
 /*
@@ -905,5 +922,5 @@ zshear(float mat[3][3],	/* I - Matrix */
 
 
 /*
- * End of "$Id: image-colorspace.c,v 1.22.2.2 2002/01/02 18:04:44 mike Exp $".
+ * End of "$Id: image-colorspace.c,v 1.22.2.3 2002/01/27 21:20:30 mike Exp $".
  */

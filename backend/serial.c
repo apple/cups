@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.32.2.4 2002/01/18 16:48:01 mike Exp $"
+ * "$Id: serial.c,v 1.32.2.5 2002/01/27 21:20:26 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -42,7 +42,7 @@
 #  include <sys/modem.h>
 #endif /* __hpux */
 
-#if defined(WIN32) || defined(__EMX__)
+#ifdef WIN32
 #  include <io.h>
 #else
 #  include <unistd.h>
@@ -51,7 +51,7 @@
 #  ifdef HAVE_SYS_IOCTL_H
 #    include <sys/ioctl.h>
 #  endif /* HAVE_SYS_IOCTL_H */
-#endif /* WIN32 || __EMX__ */
+#endif /* WIN32 */
 
 #ifdef __sgi
 #  include <invent.h>
@@ -863,5 +863,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.32.2.4 2002/01/18 16:48:01 mike Exp $".
+ * End of "$Id: serial.c,v 1.32.2.5 2002/01/27 21:20:26 mike Exp $".
  */

@@ -3,6 +3,7 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.13
 
+	- More changes to support CUPS on OS/2.
 	- Added Simplified Chinese message catalog.
 	- Added PAM support for IRIX.
 	- The cupsGetPPD() function didn't remove the @server

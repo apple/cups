@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.28.2.2 2002/01/02 18:04:18 mike Exp $"
+ * "$Id: lpd.c,v 1.28.2.3 2002/01/27 21:20:25 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -44,14 +44,14 @@
 #include <sys/stat.h>
 #include <signal.h>
 
-#if defined(WIN32) || defined(__EMX__)
+#ifdef WIN32
 #  include <winsock.h>
 #else
 #  include <sys/socket.h>
 #  include <netinet/in.h>
 #  include <arpa/inet.h>
 #  include <netdb.h>
-#endif /* WIN32 || __EMX__ */
+#endif /* WIN32 */
 
 
 /*
@@ -668,6 +668,93 @@ lpd_write(int  lpd_fd,		/* I - LPD socket */
 }
 
 
+#ifndef HAVE_RRESVPORT
 /*
- * End of "$Id: lpd.c,v 1.28.2.2 2002/01/02 18:04:18 mike Exp $".
+ * 'rresvport()' - A simple implementation of rresvport().
+ */
+
+int				/* O  - Socket or -1 on error */
+rresvport(int *port)		/* IO - Port number to bind to */
+{
+  struct sockaddr_in	addr;	/* Socket address */
+  int			fd;	/* Socket file descriptor */
+
+
+ /*
+  * Try to create an IPv4 socket...
+  */
+
+  if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    return (-1);
+
+ /*
+  * Initialize the address buffer...
+  */
+
+  memset(&addr, 0, sizeof(addr));
+
+  addr.sin_family      = AF_INET;
+  addr.sin_addr.s_addr = INADDR_ANY;
+
+ /*
+  * Try to bind the socket to a reserved port; unlike the standard
+  * BSD rresvport(), we limit the port number to 721 through 732
+  * (instead of 512 to 1023) since RFC 1179 defines the local port
+  * number between 721 and 732...
+  */
+
+  while (*port > 720)
+  {
+   /*
+    * Set the port number...
+    */
+
+    addr.sin_port = htons(*port);
+
+   /*
+    * Try binding the port to the socket; return if all is OK...
+    */
+
+    if (!bind(fd, (struct sockaddr *)&addr, sizeof(addr)))
+      return (fd);
+
+   /*
+    * Stop if we have any error other than "address already in use"...
+    */
+
+    if (errno != EADDRINUSE)
+    {
+#  ifdef WIN32
+      closesocket(fd);
+#  else
+      close(fd);
+#  endif /* WIN32 */
+
+      return (-1);
+    }
+
+   /*
+    * Try the next port...
+    */
+
+    (*port)--;
+  }
+
+ /*
+  * Wasn't able to bind to a reserved port, so close the socket and return
+  * -1...
+  */
+
+#  ifdef WIN32
+  closesocket(fd);
+#  else
+  close(fd);
+#  endif /* WIN32 */
+
+  return (-1);
+}
+#endif /* !HAVE_RRESVPORT */
+
+/*
+ * End of "$Id: lpd.c,v 1.28.2.3 2002/01/27 21:20:25 mike Exp $".
  */

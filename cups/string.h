@@ -1,5 +1,5 @@
 /*
- * "$Id: string.h,v 1.7.2.2 2002/01/02 18:04:30 mike Exp $"
+ * "$Id: string.h,v 1.7.2.3 2002/01/27 21:20:29 mike Exp $"
  *
  *   String definitions for the Common UNIX Printing System (CUPS).
  *
@@ -29,9 +29,11 @@
  * Include necessary headers...
  */
 
+#  include <config.h>
+
 #  include <stdio.h>
 #  include <stdarg.h>
-#  include <config.h>
+#  include <ctype.h>
 
 #  ifdef HAVE_STRING_H
 #    include <string.h>
@@ -97,5 +99,5 @@ extern int	vsnprintf(char *, size_t, const char *, va_list);
 #endif /* !_CUPS_STRING_H_ */
 
 /*
- * End of "$Id: string.h,v 1.7.2.2 2002/01/02 18:04:30 mike Exp $".
+ * End of "$Id: string.h,v 1.7.2.3 2002/01/27 21:20:29 mike Exp $".
  */

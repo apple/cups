@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.9.2.3 2002/01/02 18:05:04 mike Exp $"
+ * "$Id: listen.c,v 1.9.2.4 2002/01/27 21:20:32 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -207,14 +207,14 @@ StopListening(void)
   PauseListening();
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
-#if defined(WIN32) || defined(__EMX__)
+#ifdef WIN32
     closesocket(lis->fd);
 #else
     close(lis->fd);
-#endif /* WIN32 || __EMX__ */
+#endif /* WIN32 */
 }
 
 
 /*
- * End of "$Id: listen.c,v 1.9.2.3 2002/01/02 18:05:04 mike Exp $".
+ * End of "$Id: listen.c,v 1.9.2.4 2002/01/27 21:20:32 mike Exp $".
  */

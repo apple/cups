@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.7 2002/01/26 21:36:36 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.8 2002/01/27 21:20:31 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -612,11 +612,11 @@ StartBrowsing(void)
       LogMessage(L_ERROR, "StartBrowsing: Unable to set broadcast mode - %s.",
         	 strerror(errno));
 
-  #if defined(WIN32) || defined(__EMX__)
+#ifdef WIN32
       closesocket(BrowseSocket);
-  #else
+#else
       close(BrowseSocket);
-  #endif /* WIN32 || __EMX__ */
+#endif /* WIN32 */
 
       BrowseSocket = -1;
       Browsing     = 0;
@@ -637,11 +637,11 @@ StartBrowsing(void)
       LogMessage(L_ERROR, "StartBrowsing: Unable to bind broadcast socket - %s.",
         	 strerror(errno));
 
-  #if defined(WIN32) || defined(__EMX__)
+#ifdef WIN32
       closesocket(BrowseSocket);
-  #else
+#else
       close(BrowseSocket);
-  #endif /* WIN32 || __EMX__ */
+#endif /* WIN32 */
 
       BrowseSocket = -1;
       Browsing     = 0;
@@ -830,11 +830,11 @@ StopBrowsing(void)
 
     if (BrowseSocket >= 0)
     {
-#if defined(WIN32) || defined(__EMX__)
+#ifdef WIN32
       closesocket(BrowseSocket);
 #else
       close(BrowseSocket);
-#endif /* WIN32 || __EMX__ */
+#endif /* WIN32 */
 
       LogMessage(L_DEBUG2, "StopBrowsing: Removing fd %d from InputSet...",
         	 BrowseSocket);
@@ -1721,5 +1721,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.7 2002/01/26 21:36:36 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.8 2002/01/27 21:20:31 mike Exp $".
  */

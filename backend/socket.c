@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.17.2.3 2002/01/02 18:04:18 mike Exp $"
+ * "$Id: socket.c,v 1.17.2.4 2002/01/27 21:20:26 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -40,14 +40,14 @@
 #include <sys/stat.h>
 #include <signal.h>
 
-#if defined(WIN32) || defined(__EMX__)
+#ifdef WIN32
 #  include <winsock.h>
 #else
 #  include <sys/socket.h>
 #  include <netinet/in.h>
 #  include <arpa/inet.h>
 #  include <netdb.h>
-#endif /* WIN32 || __EMX__ */
+#endif /* WIN32 */
 
 
 /*
@@ -339,5 +339,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.17.2.3 2002/01/02 18:04:18 mike Exp $".
+ * End of "$Id: socket.c,v 1.17.2.4 2002/01/27 21:20:26 mike Exp $".
  */

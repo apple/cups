@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.7.2.1 2002/01/02 18:05:04 mike Exp $"
+ * "$Id: mime.c,v 1.7.2.2 2002/01/27 21:20:33 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -42,7 +42,7 @@
 #include <cups/string.h>
 #include "mime.h"
 
-#if defined(WIN32) || defined(__EMX__)
+#ifdef WIN32
 #  include <windows.h>
 #elif HAVE_DIRENT_H
 #  include <dirent.h>
@@ -113,7 +113,7 @@ mime_t *			/* O - Updated MIME database */
 mimeMerge(mime_t     *mime,	/* I - MIME database to add to */
           const char *pathname)	/* I - Directory to load */
 {
-#if defined(WIN32) || defined(__EMX__)
+#ifdef WIN32
   HANDLE	dir;		/* Directory handle */
   WIN32_FIND_DATA dent;		/* Directory entry */
   char		filename[1024],	/* Full filename of types/converts file */
@@ -267,7 +267,7 @@ mimeMerge(mime_t     *mime,	/* I - MIME database to add to */
   closedir(dir);
 
   return (mime);
-#endif /* WIN32 || __EMX__ */
+#endif /* WIN32 */
 }
 
 
@@ -568,5 +568,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.7.2.1 2002/01/02 18:05:04 mike Exp $".
+ * End of "$Id: mime.c,v 1.7.2.2 2002/01/27 21:20:33 mike Exp $".
  */

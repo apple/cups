@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.81.2.5 2002/01/25 22:25:41 mike Exp $"
+ * "$Id: util.c,v 1.81.2.6 2002/01/27 21:20:29 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -363,11 +363,11 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     }
     else if (status == HTTP_ERROR)
     {
-#if defined(WIN32) || defined(__EMX__)
+#ifdef WIN32
       if (http->error != WSAENETDOWN && http->error != WSAENETUNREACH)
 #else
       if (http->error != ENETDOWN && http->error != ENETUNREACH)
-#endif /* WIN32 || __EMX__ */
+#endif /* WIN32 */
         continue;
       else
         break;
@@ -1678,5 +1678,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.81.2.5 2002/01/25 22:25:41 mike Exp $".
+ * End of "$Id: util.c,v 1.81.2.6 2002/01/27 21:20:29 mike Exp $".
  */
