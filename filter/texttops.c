@@ -1,39 +1,28 @@
 /*
- * "$Id: texttops.c,v 1.5 1998/08/14 19:07:45 mike Exp $"
+ * "$Id: texttops.c,v 1.6 1999/03/06 20:28:11 mike Exp $"
  *
- *   PostScript text output filter for espPrint, a collection of printer
- *   drivers.
+ *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1998 by Easy Software Products
+ *   Copyright 1997-1999 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs contain
- *   unpublished proprietary information of Easy Software Products, and
- *   are protected by Federal copyright law. They may not be disclosed
- *   to third parties or copied or duplicated in any form, in whole or
- *   in part, without the prior written consent of Easy Software Products.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44145 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
  *
- * Revision History:
- *
- *   $Log: texttops.c,v $
- *   Revision 1.5  1998/08/14 19:07:45  mike
- *   Fixed bug in multi-column output - second (& third) column were being
- *   positioned off the page.
- *
- *   Revision 1.4  1998/08/10  17:14:06  mike
- *   Added wrap/nowrap option.
- *
- *   Revision 1.3  1998/07/28  17:42:01  mike
- *   Updated the page count at the end of the file - off by one...
- *
- *   Revision 1.2  1996/10/14  16:28:08  mike
- *   Updated for 3.2 release.
- *   Added width, length, left, right, top, and bottom margin options.
- *   Revamped Setup() code for new options.
- *
- *   Revision 1.1  1996/10/14  16:07:57  mike
- *   Initial revision
  */
 
 /*
@@ -45,35 +34,30 @@
 #include <string.h>
 #include <errno.h>
 
-#include <pod.h>
-#include <errorcodes.h>
-#include <license.h>
+#include <cups/cups.h>
+#include <cups/ppd.h>
+#include <cups/language.h>
+#include <cups/string.h>
 
 
 /*
  * Constants...
  */
 
-#ifndef FALSE
-#  define FALSE	0
-#  define TRUE	(!FALSE)
-#endif /* !FALSE */
-
-#define MAX_COLUMNS	256
-#define MAX_LINES	256
-
 #define ATTR_BOLD	0x01
 #define ATTR_UNDERLINE	0x02
-
+#define ATTR_RAISED	0x04
+#define ATTR_LOWERED	0x08
 
 /*
- * Character/attribute structure...
+ * Structures...
  */
 
-typedef struct
+typedef struct			/**** Character/attribute structure... ****/
+
 {
-  char ch,		/* ASCII character */
-       attr;		/* Any attributes */
+  short	ch,			/* Character */
+	attr;			/* Any attributes */
 } lchar_t;
 
 
@@ -81,14 +65,241 @@ typedef struct
  * Globals...
  */
 
-int	Verbosity = 0,
-	WrapLines = 1;
-int	SizeLines = 60,
-	SizeColumns = 80,
-	PageColumns = 1;
+int	Verbosity = 0,		/* Be verbose? */
+	WrapLines = 1;		/* Wrap text in lines */
+int	SizeLines = 60,		/* Number of lines on a page */
+	SizeColumns = 80,	/* Number of columns on a line */
+	PageColumns = 1,	/* Number of columns on a page */
+	ColumnGutter = 0,	/* Number of characters between text columns */
+	ColumnWidth = 80;	/* Width of each column */
+lchar_t	**Page = NULL;		/* Page characters */
+int	CharsPerInch = 10;	/* Number of character columns per inch */
+int	LinesPerInch = 6;	/* Number of lines per inch */
+int	Top = 36;		/* Top position in points */
+	Left = 18;		/* Left position in points */
 
-float	CharsPerInch = 10.0;
-float	LinesPerInch = 6.0;
+
+/*
+ * Local functions...
+ */
+
+static int	getutf8(FILE *fp);
+static int	write_line(int row, lchar_t *line);
+static int	write_string(int col, int row, int len, lchar_t *s);
+
+
+/*
+ * 'getutf8()' - Get a UTF-8 encoded wide character...
+ */
+
+static int		/* O - Character or -1 on error */
+getutf8(FILE *fp)	/* I - File to read from */
+{
+  int	ch;		/* Current character value */
+  int	next;		/* Next character from file */
+
+
+ /*
+  * Read the first character and process things accordingly...
+  *
+  * UTF-8 maps 16-bit characters to:
+  *
+  *        0 to 127 = 0xxxxxxx
+  *     128 to 2047 = 110xxxxx 10yyyyyy (xxxxxyyyyyy)
+  *   2048 to 65535 = 1110xxxx 10yyyyyy 10zzzzzz (xxxxyyyyyyzzzzzz)
+  *
+  * We also accept:
+  *
+  *      128 to 191 = 10xxxxxx
+  *
+  * since this range of values is otherwise undefined unless you are
+  * in the middle of a multi-byte character...
+  *
+  * This code currently does not support anything beyond 16-bit
+  * characters, in part because PostScript doesn't support more than
+  * 16-bit characters...
+  */
+
+  if ((ch = getc(fp)) == EOF)
+    return (EOF);
+
+  if (ch < 0xc0)	/* One byte character? */
+    return (ch);
+  else if ((ch & 0xe0) == 0xc0)
+  {
+   /*
+    * Two byte character...
+    */
+
+    if ((next = getc(fp)) == EOF)
+      return (EOF)
+    else
+      return (((ch & 0x1f) << 6) | (next & 0x3f));
+  }
+  else if ((ch & 0xf0) == 0xe0)
+  {
+   /*
+    * Three byte character...
+    */
+
+    if ((next = getc(fp)) == EOF)
+      return (EOF)
+
+    ch = ((ch & 0x0f) << 6) | (next & 0x3f);
+
+    if ((next = getc(fp)) == EOF)
+      return (EOF)
+    else
+      return ((ch << 6) | (next & 0x3f));
+  }
+  else
+  {
+   /*
+    * More than three bytes...  We don't support that...
+    */
+
+    return (EOF);
+  }
+}
+
+
+/*
+ * 'write_line()' - Write a row of text.
+ */
+
+static int			/* O - 0 on success, -1 on error */
+write_line(int     row,		/* I - Row number (0 to N) */
+           lchar_t *line)	/* I - Line to print */
+{
+  int		col;		/* Current column */
+  int		attr;		/* Current attribute */
+  lchar_t	*start;		/* First character in sequence */
+
+  
+  for (col = 0, attr = 0, start = line;
+       col < SizeColumns;
+       col ++, line ++)
+    if (attr != line->attr || line->ch == 0)
+    {
+      if (start < line)
+        if (write_string(col - (line - start), row, line - start, start))
+	  return (-1);
+
+      if (line->ch == 0)
+      {
+	start = line + 1;
+	attr  = 0;
+	continue;
+      }
+      else
+      {
+        start = line;
+	attr  = line->attr;
+      }
+    }
+
+  if (start < line)
+    if (write_string(col - (line - start), row, line - start, start))
+      return (-1);
+
+  return (0);
+}
+
+
+/*
+ * 'write_string()' - Write a string of text.
+ */
+
+static int			/* O - 0 on success, -1 on error */
+write_string(int     col,	/* I - Start column */
+             int     row,	/* I - Row */
+             int     len,	/* I - Number of characters */
+             lchar_t *s)	/* I - String to print */
+{
+  int	i;			/* Looping var */
+  float	x, y;			/* Position of text */
+
+
+ /*
+  * Position the text and set the font...
+  */
+
+  x = (float)Left + (float)col * 72.0 / (float)CharsPerInch;
+  y = (float)Top - (float)row * 72.0 / (float)LinesPerInch;
+
+  if (s->attr & ATTR_RAISED)
+    y += 36.0 / (float)LinesPerInch;
+  else if (s->attr & ATTR_LOWERED)
+    y -= 36.0 / (float)LinesPerInch;
+
+  printf("%.1f %.1f %s", x, y, (s->attr & ATTR_BOLD) ? "B" : "N");
+
+  if (s->attr & ATTR_UNDERLINE)
+    printf(" %.1f U", (float)len * 72.0 / (float)CharsPerInch);
+
+ /*
+  * See if the string contains 16-bit characters...
+  */
+
+  for (i = 0; i < len; i ++)
+    if (s[i].ch > 255)
+      break;
+
+  if (i < len)
+  {
+   /*
+    * Write a hex Unicode string...
+    */
+
+    fputs("<feff", stdout);
+
+    while (len > 0)
+    {
+      printf("%04x", s->ch);
+      len --;
+      s ++;
+    }
+
+    puts(">S");
+  }
+  else
+  {
+   /*
+    * Write a quoted string...
+    */
+
+    putchar('(');
+
+    while (len > 0)
+    {
+      if (s->ch > 126)
+      {
+       /*
+        * Quote 8-bit characters...
+	*/
+
+        printf("\%03o", s->ch);
+      }
+      else
+      {
+       /*
+        * Quote the parenthesis and backslash as needed...
+	*/
+
+        if (s->ch == '(' || s->ch == ')' || s->ch == '\\')
+	  putchar('\\');
+
+	putchar(s->ch);
+      }
+
+      len --;
+      s ++;
+    }
+
+    puts(")S");
+  }
+}
+
 
 
 /*
@@ -770,5 +981,5 @@ main(int  argc,    /* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: texttops.c,v 1.5 1998/08/14 19:07:45 mike Exp $".
+ * End of "$Id: texttops.c,v 1.6 1999/03/06 20:28:11 mike Exp $".
  */

@@ -1,62 +1,107 @@
-#!/usr/sbin/smake
 #
-# "$Id: Makefile,v 1.2 1999/03/06 18:02:26 mike Exp $"
+# "$Id: Makefile,v 1.3 1999/03/06 20:28:10 mike Exp $"
 #
-#    for espPrint, a collection of printer/image software.
+#   Filter makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright (c) 1993-1995 by Easy Software Products
+#   Copyright 1997-1999 by Easy Software Products.
 #
-#   These coded instructions, statements, and computer  programs  contain
-#   unpublished  proprietary  information  of Easy Software Products, and
-#   are protected by Federal copyright law.  They may  not  be  disclosed
-#   to  third  parties  or  copied or duplicated in any form, in whole or
-#   in part, without the prior written consent of Easy Software Products.
+#   These coded instructions, statements, and computer programs are the
+#   property of Easy Software Products and are protected by Federal
+#   copyright law.  Distribution and use rights are outlined in the file
+#   "LICENSE.txt" which should have been included with this file.  If this
+#   file is missing or damaged please contact Easy Software Products
+#   at:
 #
-# Revision History:
+#       Attn: CUPS Licensing Information
+#       Easy Software Products
+#       44145 Airport View Drive, Suite 204
+#       Hollywood, Maryland 20636-3111 USA
 #
-#   $Log: Makefile,v $
-#   Revision 1.2  1999/03/06 18:02:26  mike
-#   Updated for CVS check-in.
-#
-#   Revision 1.1  1996/08/24  19:41:24  mike
-#   Initial revision
-#
-#
-
-#
-# Standard definitions...
+#       Voice: (301) 373-9603
+#       EMail: cups-info@cups.org
+#         WWW: http://www.cups.org
 #
 
-include ../Makedefs.$(HOSTTYPE)
+include ../Makedefs
 
-
-TARGETS	=	$(HOSTTYPE)/hpgl2ps
+TARGETS	=	hpgltops image.a imagetops imagetoraster pstops texttops
+HPGLOBJS =	hpgl-attr.o hpgl-config.o hpgl-main.o hpgl-prolog.o \
+		hpgl-char.o hpgl-input.o hpgl-polygon.o hpgl-vector.o
+IMAGEOBJS =	image-colorspace.o image-photocd.o image-sgilib.o \
+		image-tiff.o image-gif.o image-png.o image-sgi.o image-zoom.o \
+		image-jpeg.o image-pnm.o image-sun.o
+OBJS	=	$(HPGLOBJS) $(IMAGEOBJS) imagetops.o imagetoraster.o \
+		pstops.o texttops.o
 
 #
 # Make all targets...
 #
 
-m_$(HOSTTYPE):	$(TARGETS)
+all:	$(TARGETS)
 
 #
-# Clean all garbage...
+# Clean all object files...
 #
 
 clean:
+	rm -f $(OBJS) $(TARGETS)
 
 #
-# hpgl2ps
+# Install all targets...
 #
 
-OBJS	=	$(HOSTTYPE)/attr.o $(HOSTTYPE)/char.o $(HOSTTYPE)/config.o \
-		$(HOSTTYPE)/input.o $(HOSTTYPE)/main.o $(HOSTTYPE)/polygon.o \
-		$(HOSTTYPE)/prolog.o $(HOSTTYPE)/vector.o
-
-$(HOSTTYPE)/hpgl2ps:	$(OBJS)
-	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(DRVLIBS)
-	$(STRIP) $@
-$(OBJS):	hpgl2ps.h
+install:
 
 #
-# End of "$Id: Makefile,v 1.2 1999/03/06 18:02:26 mike Exp $".
+# hpgltops
+#
+
+hpgltops:	$(HPGLOBJS) ../Makedefs ../cups/libcups.a
+	$(CC) $(LDFLAGS) -o $@ $(HPGLOBJS) $(LIBS)
+$(HPGLOBJS):	hpgl2ps.h ../Makedefs
+
+#
+# image.a
+#
+
+image.a:	$(IMAGEOBJS) ../Makedefs ../cups/libcups.a
+	$(RM) $@
+	$(AR) $(ARFLAGS) $@ $(IMAGEOBJS)
+	$(RANLIB) $@
+$(IMAGEOBJS):	image.h ../Makedefs
+
+#
+# imagetops
+#
+
+imagetops:	imagetops.o image.a ../Makedefs ../cups/libcups.a
+	$(CC) $(LDFLAGS) -o $@ imagetops.o image.a $(LIBS)
+imagetops:	image.h ../Makedefs
+
+#
+# imagetoraster
+#
+
+imagetoraster:	imagetoraster.o image.a ../Makedefs ../cups/libcups.a
+	$(CC) $(LDFLAGS) -o $@ imagetoraster.o image.a $(LIBS)
+imagetoraster:	image.h ../Makedefs
+
+#
+# pstops
+#
+
+pstops:	pstops.o ../Makedefs ../cups/libcups.a
+	$(CC) $(LDFLAGS) -o $@ pstops.o $(LIBS)
+pstops.o:	../Makedefs
+
+#
+# texttops
+#
+
+texttops:	texttops.o ../Makedefs ../cups/libcups.a
+	$(CC) $(LDFLAGS) -o $@ texttops.o $(LIBS)
+texttops.o:	../Makedefs
+
+#
+# End of "$Id: Makefile,v 1.3 1999/03/06 20:28:10 mike Exp $".
 #
