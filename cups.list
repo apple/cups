@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.71 2000/07/07 17:27:35 mike Exp $"
+# "$Id: cups.list,v 1.72 2000/07/07 21:25:17 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -35,33 +35,33 @@
 # Server files
 f 0555 root sys $SBINDIR/cupsd scheduler/cupsd
 
-d 0555 root sys $LIBDIR/cups -
-d 0555 root sys $LIBDIR/cups/backend -
-f 0555 root sys $LIBDIR/cups/backend/ipp backend/ipp
-l 0555 root sys $LIBDIR/cups/backend/http ipp
-f 0555 root sys $LIBDIR/cups/backend/lpd backend/lpd
-f 0555 root sys $LIBDIR/cups/backend/parallel backend/parallel
-f 0555 root sys $LIBDIR/cups/backend/serial backend/serial
-f 0555 root sys $LIBDIR/cups/backend/socket backend/socket
-f 0555 root sys $LIBDIR/cups/backend/usb backend/usb
-d 0555 root sys $LIBDIR/cups/cgi-bin -
-f 0555 root sys $LIBDIR/cups/cgi-bin/admin.cgi cgi-bin/admin.cgi
-f 0555 root sys $LIBDIR/cups/cgi-bin/classes.cgi cgi-bin/classes.cgi
-f 0555 root sys $LIBDIR/cups/cgi-bin/jobs.cgi cgi-bin/jobs.cgi
-f 0555 root sys $LIBDIR/cups/cgi-bin/printers.cgi cgi-bin/printers.cgi
-d 0555 root sys $LIBDIR/cups/daemon -
-f 0555 root sys $LIBDIR/cups/daemon/cups-lpd scheduler/cups-lpd
-f 0555 root sys $LIBDIR/cups/daemon/cups-polld scheduler/cups-polld
-d 0555 root sys $LIBDIR/cups/filter -
-f 0555 root sys $LIBDIR/cups/filter/pstoraster pstoraster/pstoraster
-f 0555 root sys $LIBDIR/cups/filter/pdftops pdftops/pdftops
-f 0555 root sys $LIBDIR/cups/filter/imagetops filter/imagetops
-f 0555 root sys $LIBDIR/cups/filter/pstops filter/pstops
-f 0555 root sys $LIBDIR/cups/filter/texttops filter/texttops
-f 0555 root sys $LIBDIR/cups/filter/rastertoepson filter/rastertoepson
-f 0555 root sys $LIBDIR/cups/filter/rastertohp filter/rastertohp
-f 0555 root sys $LIBDIR/cups/filter/hpgltops filter/hpgltops
-f 0555 root sys $LIBDIR/cups/filter/imagetoraster filter/imagetoraster
+d 0555 root sys $SERVERBIN -
+d 0555 root sys $SERVERBIN/backend -
+f 0555 root sys $SERVERBIN/backend/ipp backend/ipp
+l 0555 root sys $SERVERBIN/backend/http ipp
+f 0555 root sys $SERVERBIN/backend/lpd backend/lpd
+f 0555 root sys $SERVERBIN/backend/parallel backend/parallel
+f 0555 root sys $SERVERBIN/backend/serial backend/serial
+f 0555 root sys $SERVERBIN/backend/socket backend/socket
+f 0555 root sys $SERVERBIN/backend/usb backend/usb
+d 0555 root sys $SERVERBIN/cgi-bin -
+f 0555 root sys $SERVERBIN/cgi-bin/admin.cgi cgi-bin/admin.cgi
+f 0555 root sys $SERVERBIN/cgi-bin/classes.cgi cgi-bin/classes.cgi
+f 0555 root sys $SERVERBIN/cgi-bin/jobs.cgi cgi-bin/jobs.cgi
+f 0555 root sys $SERVERBIN/cgi-bin/printers.cgi cgi-bin/printers.cgi
+d 0555 root sys $SERVERBIN/daemon -
+f 0555 root sys $SERVERBIN/daemon/cups-lpd scheduler/cups-lpd
+f 0555 root sys $SERVERBIN/daemon/cups-polld scheduler/cups-polld
+d 0555 root sys $SERVERBIN/filter -
+f 0555 root sys $SERVERBIN/filter/pstoraster pstoraster/pstoraster
+f 0555 root sys $SERVERBIN/filter/pdftops pdftops/pdftops
+f 0555 root sys $SERVERBIN/filter/imagetops filter/imagetops
+f 0555 root sys $SERVERBIN/filter/pstops filter/pstops
+f 0555 root sys $SERVERBIN/filter/texttops filter/texttops
+f 0555 root sys $SERVERBIN/filter/rastertoepson filter/rastertoepson
+f 0555 root sys $SERVERBIN/filter/rastertohp filter/rastertohp
+f 0555 root sys $SERVERBIN/filter/hpgltops filter/hpgltops
+f 0555 root sys $SERVERBIN/filter/imagetoraster filter/imagetoraster
 
 # Admin commands
 l 0555 root sys $BINDIR/disable $SBINDIR/accept
@@ -502,5 +502,5 @@ f 0444 root sys $MANDIR/man5/printers.conf.5 man/printers.conf.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.71 2000/07/07 17:27:35 mike Exp $".
+# End of "$Id: cups.list,v 1.72 2000/07/07 21:25:17 mike Exp $".
 #
