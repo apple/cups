@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.30 1999/06/25 14:50:24 mike Exp $"
+ * "$Id: job.c,v 1.31 1999/07/12 19:33:18 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -206,7 +206,8 @@ CheckJobs(void)
 	* cancel the job...
 	*/
 
-        DEBUG_puts("CheckJobs: printer/class has gone away; cancelling the job!");
+        LogMessage(LOG_WARN, "Printer/class %s has gone away; cancelling job %d!",
+	           current->dest, current->id);
         CancelJob(current->id);
 
 	if (prev == NULL)
@@ -214,7 +215,7 @@ CheckJobs(void)
 	else
 	  current = prev->next;
       }
-      else
+      else if (printer != NULL)
       {
        /*
         * See if the printer is available; if so, start the job...
@@ -227,6 +228,8 @@ CheckJobs(void)
 
         current = current->next;
       }
+      else
+        current = current->next;
     }
     else
       current = current->next;
@@ -946,5 +949,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.30 1999/06/25 14:50:24 mike Exp $".
+ * End of "$Id: job.c,v 1.31 1999/07/12 19:33:18 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.34 1999/06/27 12:42:29 mike Exp $"
+ * "$Id: printers.c,v 1.35 1999/07/12 19:33:18 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -599,7 +599,7 @@ SetPrinterAttrs(printer_t *p)	/* I - Printer to setup */
 		  IPP_REVERSE_LANDSCAPE,
 		  IPP_REVERSE_PORTRAIT
 		};
-  char		*sides[3] =	/* sides-supported values */
+  const char	*sides[3] =	/* sides-supported values */
 		{
 		  "one",
 		  "two-long-edge",
@@ -626,7 +626,7 @@ SetPrinterAttrs(printer_t *p)	/* I - Printer to setup */
 		  CUPS_ACCEPT_JOBS,
 		  CUPS_REJECT_JOBS
 		};
-  char		*charsets[] =	/* charset-supported values */
+  const char	*charsets[] =	/* charset-supported values */
 		{
 		  "us-ascii",
 		  "iso-8859-1",
@@ -973,38 +973,46 @@ void
 SortPrinters(void)
 {
   printer_t	*current,	/* Current printer */
+ 		*start,		/* Starting printer */
 		*prev,		/* Previous printer */
 		*next;		/* Next printer */
+  int		did_swap;	/* Non-zero if we did a swap */
 
 
-  for (current = Printers, prev = NULL; current != NULL;)
-    if (current->next == NULL)
-      break;
-    else if (strcasecmp(current->name, current->next->name) > 0)
-    {
-      DEBUG_printf(("Swapping %s and %s...\n", current->name,
-                    current->next->name));
+  do
+  {
+    for (did_swap = 0, current = Printers, prev = NULL; current != NULL;)
+      if (current->next == NULL)
+	break;
+      else if (strcasecmp(current->name, current->next->name) > 0)
+      {
+	DEBUG_printf(("Swapping %s and %s...\n", current->name,
+                      current->next->name));
 
-     /*
-      * Need to swap these two printers...
-      */
+       /*
+	* Need to swap these two printers...
+	*/
 
-      if (prev == NULL)
-        Printers = current->next;
+        did_swap = 1;
+
+	if (prev == NULL)
+          Printers = current->next;
+	else
+          prev->next = current->next;
+
+       /*
+	* Yes, we can all get a headache from the next bunch of pointer
+	* swapping...
+	*/
+
+	next          = current->next;
+	current->next = next->next;
+	next->next    = current;
+      }
       else
-        prev->next = current->next;
-
-     /*
-      * Yes, we can all get a headache from the next bunch of pointer
-      * swapping...
-      */
-
-      next          = current->next;
-      current->next = next->next;
-      next->next    = current;
-    }
-    else
-      current = current->next;
+	current = current->next;
+  }
+  while (did_swap);
 }
 
 
@@ -1023,5 +1031,5 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 
 
 /*
- * End of "$Id: printers.c,v 1.34 1999/06/27 12:42:29 mike Exp $".
+ * End of "$Id: printers.c,v 1.35 1999/07/12 19:33:18 mike Exp $".
  */
