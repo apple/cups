@@ -1,5 +1,5 @@
 /*
- * "$Id: image-colorspace.c,v 1.11 1999/04/06 19:37:12 mike Exp $"
+ * "$Id: image-colorspace.c,v 1.12 1999/04/08 21:08:26 mike Exp $"
  *
  *   Colorspace conversions for the Common UNIX Printing System (CUPS).
  *
@@ -335,16 +335,12 @@ ImageRGBToCMYK(ib_t *in,	/* I - Input pixels */
       k = min(c, min(m, y));
 
       diff = 255 - (max(c, max(m, y)) - k);
-      if (diff > 0)
-	k = diff * k / 255;
-      else
-	k = 0;
+      k = k * diff / 255;
 
       if (k == 255)
         c = m = y = 0;
       else if (k > 0)
       {
-#if 1
         divk = 255 - k;
 	c    = 255 * (c - k) / divk;
 	m    = 255 * (m - k) / divk;
@@ -358,11 +354,6 @@ ImageRGBToCMYK(ib_t *in,	/* I - Input pixels */
 
 	if (y > 255)
 	  y = 255;
-#else
-	c -= k;
-	m -= k;
-	y -= k;
-#endif /* 0 */
       }
 
       cc = (ImageMatrix[0][0][c] +
@@ -408,22 +399,28 @@ ImageRGBToCMYK(ib_t *in,	/* I - Input pixels */
       y = 255 - *in++;
       k = min(c, min(m, y));
 
-      if (k > 0)
+      if (k == 255)
+        c = m = y = 0;
+      else if (k > 0)
       {
-       /*
-        * Adjust black level based on the amount of color present.
-	*/
+        divk = 255 - k;
+	c    = 255 * (c - k) / divk;
+	m    = 255 * (m - k) / divk;
+	y    = 255 * (y - k) / divk;
 
-	diff = 255 - 255 * (c + m + y - 3 * k) / k;
-	if (diff <= 0)
-          k = 0;
-	else if (diff < 255)
-          k = diff * diff * k / 65025;
+	if (c > 255)
+	  c = 255;
+
+	if (m > 255)
+	  m = 255;
+
+	if (y > 255)
+	  y = 255;
       }
 
-      *out++ = c - k;
-      *out++ = m - k;
-      *out++ = y - k;
+      *out++ = c;
+      *out++ = m;
+      *out++ = y;
       *out++ = k;
 
       count --;
@@ -909,5 +906,5 @@ zshear(float mat[3][3],	/* I - Matrix */
 
 
 /*
- * End of "$Id: image-colorspace.c,v 1.11 1999/04/06 19:37:12 mike Exp $".
+ * End of "$Id: image-colorspace.c,v 1.12 1999/04/08 21:08:26 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.14 1999/04/06 19:37:14 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.15 1999/04/08 21:08:27 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -57,6 +57,7 @@
 int	Flip = 0,		/* Flip/mirror pages */
 	Collate = 0,		/* Collate copies? */
 	Copies = 1;		/* Number of copies */
+#if 0
 int	Floyd16x16[16][16] =	/* Traditional Floyd ordered dither */
 	{
 	  { 0,   128, 32,  160, 8,   136, 40,  168,
@@ -92,6 +93,27 @@ int	Floyd16x16[16][16] =	/* Traditional Floyd ordered dither */
 	  { 254, 127, 223, 95,  247, 119, 215, 87,
 	    253, 125, 221, 93,  245, 117, 213, 85 }
 	};
+#else
+int	Floyd16x16[16][16] =
+	{
+	  {   0, 223,  48, 207,  14, 237,  62, 221,   3, 226,  51, 210,  13, 236,  61, 220 },
+	  { 175,  80, 128,  96, 189,  94, 141, 110, 178,  83, 130,  99, 188,  93, 140, 109 },
+	  { 191,  32, 239,  16, 205,  46, 253,  30, 194,  35, 242,  19, 204,  45, 252,  29 },
+	  { 112, 143,  64, 159, 126, 157,  78, 173, 115, 146,  67, 162, 125, 156,  77, 172 },
+	  {  11, 234,  59, 218,   5, 228,  53, 212,   8, 231,  56, 215,   6, 229,  54, 213 },
+	  { 186,  91, 138, 107, 180,  85, 132, 101, 183,  88, 135, 104, 181,  86, 133, 102 },
+	  { 202,  43, 250,  27, 196,  37, 244,  21, 199,  40, 247,  24, 197,  38, 245,  22 },
+	  { 123, 154,  75, 170, 117, 148,  69, 164, 120, 151,  72, 167, 118, 149,  70, 165 },
+	  {  12, 235,  60, 219,   2, 225,  50, 209,  15, 238,  63, 222,   1, 224,  49, 208 },
+	  { 187,  92, 139, 108, 177,  82, 129,  98, 190,  95, 142, 111, 176,  81, 128,  97 },
+	  { 203,  44, 251,  28, 193,  34, 241,  18, 206,  47, 254,  31, 192,  33, 240,  17 },
+	  { 124, 155,  76, 171, 114, 145,  66, 161, 127, 158,  79, 174, 113, 144,  65, 160 },
+	  {   7, 230,  55, 214,   9, 232,  57, 216,   4, 227,  52, 211,  10, 233,  58, 217 },
+	  { 182,  87, 134, 103, 184,  89, 136, 105, 179,  84, 131, 100, 185,  90, 137, 106 },
+	  { 198,  39, 246,  23, 200,  41, 248,  25, 195,  36, 243,  20, 201,  42, 249,  26 },
+	  { 119, 150,  71, 166, 121, 152,  73, 168, 116, 147,  68, 163, 122, 153,  74, 169 }
+	};
+#endif /* 0 */
 int	Floyd8x8[8][8] =
 	{
 	  {  0, 32,  8, 40,  2, 34, 10, 42 },
@@ -120,7 +142,8 @@ int	Planes[] =	/* Number of planes for each colorspace */
 /*
  * Local functions...
  */
-
+ 
+static void	exec_choice(cups_page_header_t *header, ppd_choice_t *choice);
 static void	format_CMY(cups_page_header_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
 static void	format_CMYK(cups_page_header_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
 static void	format_K(cups_page_header_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, ib_t *r0, ib_t *r1);
@@ -207,7 +230,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   ppi  = 0;
   hue  = 0;
   sat  = 100;
-  g    = 1.0;
+  g    = 1.7;
   b    = 1.0;
 
   options     = NULL;
@@ -262,65 +285,35 @@ main(int  argc,		/* I - Number of command-line arguments */
   */
 
   memset(&header, 0, sizeof(header));
+  header.HWResolution[0]  = 100;
+  header.HWResolution[1]  = 100;
+  header.cupsBitsPerColor = 1;
+  header.cupsColorOrder   = CUPS_ORDER_CHUNKED;
+  header.cupsColorSpace   = CUPS_CSPACE_RGB;
 
   if ((choice = ppdFindMarkedChoice(ppd, "ColorModel")) != NULL)
-  {
-    if (choice->num_data > 1)
-    {
-      header.cupsColorOrder = (cups_order_t)choice->data[0];
-      header.cupsColorSpace = (cups_cspace_t)choice->data[1];
-    }
-    else
-    {
-      header.cupsColorOrder = CUPS_ORDER_CHUNKED;
-      header.cupsColorSpace = CUPS_CSPACE_RGB;
-    }
+    exec_choice(&header, choice);
 
-    if (choice->num_data > 2)
-      header.cupsCompression = choice->data[2];
-  }
-  else
-  {
-    header.cupsColorOrder = CUPS_ORDER_CHUNKED;
-    header.cupsColorSpace = CUPS_CSPACE_RGB;
-  }
-
-  if ((choice = ppdFindMarkedChoice(ppd, "InputSlot")) != NULL &&
-      choice->num_data > 0)
-    header.MediaPosition = choice->data[0];
+  if ((choice = ppdFindMarkedChoice(ppd, "InputSlot")) != NULL)
+    exec_choice(&header, choice);
 
   if ((choice = ppdFindMarkedChoice(ppd, "MediaType")) != NULL)
   {
-    media_type = choice->choice;
+    exec_choice(&header, choice);
 
-    strcpy(header.MediaType, media_type);
-    if (choice->num_data > 0)
-      header.cupsMediaType = choice->data[0];
+    media_type = choice->choice;
   }
   else
     media_type = "";
 
   if ((choice = ppdFindMarkedChoice(ppd, "Resolution")) != NULL)
   {
+    exec_choice(&header, choice);
+
     resolution = choice->choice;
-
-    if (sscanf(resolution, "%dx%d", header.HWResolution + 0,
-               header.HWResolution + 1) == 1)
-      header.HWResolution[1] = header.HWResolution[0];
-
-    if (choice->num_data > 0)
-      header.cupsBitsPerColor = choice->data[0];
-    else
-      header.cupsBitsPerColor = 1;
   }
   else
-  {
     resolution = "";
-
-    header.HWResolution[0]  = 100;
-    header.HWResolution[1]  = 100;
-    header.cupsBitsPerColor = 1;
-  }
 
  /*
   * Choose the appropriate colorspace and color profile...
@@ -816,6 +809,134 @@ main(int  argc,		/* I - Number of command-line arguments */
   ppdClose(ppd);
 
   return (0);
+}
+
+
+/*
+ * 'exec_choice()' - Execute PostScript setpagedevice commands as appropriate.
+ */
+
+static void
+exec_choice(cups_page_header_t *header,	/* I - Page header */
+            ppd_choice_t       *choice)	/* I - Option choice to execute */
+{
+  char	*code,				/* Pointer into code string */
+	*ptr,				/* Pointer into name/value string */
+	name[255],			/* Name of pagedevice entry */
+	value[1024];			/* Value of pagedevice entry */
+
+
+  for (code = (char *)choice->code; *code != '\0';)
+  {
+   /*
+    * Search for the start of a dictionary name...
+    */
+
+    while (*code != '/' && *code != '\0')
+      code ++;
+
+    if (*code == '\0')
+      break;
+
+   /*
+    * Get the name...
+    */
+
+    code ++;
+    for (ptr = name; isalnum(*code) && (ptr - name) < (sizeof(name) - 1);)
+      *ptr++ = *code++;
+    *ptr = '\0';
+
+   /*
+    * The parse the value as needed...
+    */
+
+    while (isspace(*code))
+      code ++;
+
+    if (*code == '\0')
+      break;
+
+    if (*code == '[')
+    {
+     /*
+      * Read array of values...
+      */
+
+      code ++;
+      for (ptr = value;
+           *code != ']' && *code != '\0' &&
+	       (ptr - value) < (sizeof(value) - 1);)
+	*ptr++ = *code++;
+      *ptr = '\0';
+    }
+    else if (*code == '(')
+    {
+     /*
+      * Read string value...
+      */
+
+      code ++;
+      for (ptr = value;
+           *code != ')' && *code != '\0' &&
+	       (ptr - value) < (sizeof(value) - 1);)
+        if (*code == '\\')
+	{
+	  code ++;
+	  if (isdigit(*code))
+	    *ptr++ = (char)strtol(code, &code, 8);
+          else
+	    *ptr++ = *code++;
+	}
+	else
+          *ptr++ = *code++;
+
+      *ptr = '\0';
+    }
+    else if (isdigit(*code) || *code == '-')
+    {
+     /*
+      * Read single number...
+      */
+
+      for (ptr = value;
+           (isdigit(*code) || *code == '-') &&
+	       (ptr - value) < (sizeof(value) - 1);)
+	*ptr++ = *code++;
+      *ptr = '\0';
+    }
+    else
+      continue;
+
+   /*
+    * Assign the value as needed...
+    */
+
+    if (strcmp(name, "cupsMediaType") == 0)
+      header->cupsMediaType = atoi(value);
+    else if (strcmp(name, "cupsBitsPerColor") == 0)
+      header->cupsBitsPerColor = atoi(value);
+    else if (strcmp(name, "cupsColorOrder") == 0)
+      header->cupsColorOrder = (cups_order_t)atoi(value);
+    else if (strcmp(name, "cupsColorSpace") == 0)
+      header->cupsColorSpace = (cups_cspace_t)atoi(value);
+    else if (strcmp(name, "cupsCompression") == 0)
+      header->cupsCompression = atoi(value);
+    else if (strcmp(name, "cupsRowCount") == 0)
+      header->cupsRowCount = atoi(value);
+    else if (strcmp(name, "cupsRowFeed") == 0)
+      header->cupsRowFeed = atoi(value);
+    else if (strcmp(name, "cupsRowStep") == 0)
+      header->cupsRowStep = atoi(value);
+    else if (strcmp(name, "HWResolution") == 0)
+      sscanf(value, "%d%d", header->HWResolution + 0, header->HWResolution + 1);
+    else if (strcmp(name, "MediaPosition") == 0)
+      header->MediaPosition = atoi(value);
+    else if (strcmp(name, "MediaType") == 0)
+      strcpy(header->MediaType, value);
+    else if (strcmp(name, "OutputType") == 0)
+      strcpy(header->OutputType, value);
+  }
 }
 
 
@@ -3610,5 +3731,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.14 1999/04/06 19:37:14 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.15 1999/04/08 21:08:27 mike Exp $".
  */
