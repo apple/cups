@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.33.2.16 2003/03/13 05:11:55 mike Exp $"
+ * "$Id: http.h,v 1.33.2.17 2003/03/13 05:45:29 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -318,12 +318,11 @@ typedef struct
   int			nonce_count;	/* Nonce count */
   void			*tls;		/* TLS state information */
   http_encryption_t	encryption;	/* Encryption requirements */
-  /* ADDED IN CUPS 1.1.19 */
+  /**** New in CUPS 1.1.19 ****/
   fd_set		*input_set;	/* select() set for httpWait() */
   http_status_t		expect;		/* Expect: header */
-  char			cookie[HTTP_MAX_VALUE * 2];
-					/* Cookie value(s) */
-  /* ADDED IN CUPS 1.2 */
+  char			*cookie;	/* Cookie value(s) */
+  /**** New in CUPS 1.2 ****/
   http_addr_t		hostaddr;	/* Host address and port */
 } http_t;
 
@@ -383,6 +382,12 @@ extern char		*httpMD5Final(const char *, const char *, const char *,
 			              char [33]);
 extern char		*httpMD5String(const md5_byte_t *, char [33]);
 
+/**** New in CUPS 1.1.19 ****/
+extern void		httpClearCookie(http_t *http);
+#define httpGetCookie(http) ((http)->cookie)
+extern void		httpSetCookie(http_t *http, const char *cookie);
+
+/**** New in CUPS 1.2 ****/
 extern int		httpAddrEqual(const http_addr_t *addr1,
 			              const http_addr_t *addr2);
 extern void		httpAddrLoad(const struct hostent *host, int port,
@@ -404,5 +409,5 @@ extern char		*httpAddrString(const http_addr_t *addr,
 #endif /* !_IPP_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.33.2.16 2003/03/13 05:11:55 mike Exp $".
+ * End of "$Id: http.h,v 1.33.2.17 2003/03/13 05:45:29 mike Exp $".
  */

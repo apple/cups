@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The CUPS API now supports HTTP cookies and the Expect:
+	  field.
 	- The cancel command now correctly supports the "-u
 	  user" option to cancel all jobs for the named user.
 	- The Purge-Jobs operation now supports the my-jobs

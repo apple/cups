@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.24.2.15 2003/02/28 21:07:34 mike Exp $"
+ * "$Id: ppd.h,v 1.24.2.16 2003/03/13 05:45:29 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -78,13 +78,15 @@ typedef enum			/**** UI types ****/
   PPD_UI_BOOLEAN,		/* True or False option */
   PPD_UI_PICKONE,		/* Pick one from a list */
   PPD_UI_PICKMANY,		/* Pick zero or more from a list */
+  /**** New in CUPS 1.2 ****/
   PPD_UI_CUPS_TEXT,		/* Specify a string */
   PPD_UI_CUPS_INTEGER,		/* Specify an integer number */
   PPD_UI_CUPS_REAL,		/* Specify a real number */
   PPD_UI_CUPS_GAMMA,		/* Specify a gamma number */
   PPD_UI_CUPS_CURVE,		/* Specify start, end, and gamma numbers */
   PPD_UI_CUPS_INTEGER_ARRAY,	/* Specify an array of integer numbers */
-  PPD_UI_CUPS_REAL_ARRAY	/* Specify an array of real numbers */
+  PPD_UI_CUPS_REAL_ARRAY,	/* Specify an array of real numbers */
+  PPD_UI_CUPS_XY_ARRAY		/* Specify an array of X/Y real numbers */
 } ppd_ui_t;
 
 typedef enum			/**** Order dependency sections ****/
@@ -191,6 +193,13 @@ typedef union			/**** Extended Values ****/
   int		integer;	/* Integer value */
   float		real;		/* Real value */
   float		gamma;		/* Gamma value */
+  /**** New in CUPS 1.2 ****/
+  struct
+  {
+    float	start,		/* Linear (density) start value for curve */
+		end,		/* Linear (density) end value for curve */
+		gamma;		/* Gamma correction */
+  }		curve;		/* Curve values */
   struct
   {
     int		num_elements,	/* Number of array elements */
@@ -203,12 +212,12 @@ typedef union			/**** Extended Values ****/
   }		real_array;	/* Real array value */
   struct
   {
-    float	start,		/* Linear (density) start value for curve */
-		end,		/* Linear (density) end value for curve */
-		gamma;		/* Gamma correction */
-  }		curve;		/* Curve values */
+    int		num_elements;	/* Number of array elements */
+    float	*elements;	/* Array of XY values */
+  }		xy_array;	/* XY array value */
 } ppd_ext_value_t;
 
+/**** New in CUPS 1.2 ****/
 typedef struct			/**** Extended Options ****/
 {
   char		keyword[PPD_MAX_NAME];
@@ -317,7 +326,7 @@ typedef struct			/**** Files ****/
 		cur_attr;	/* Current attribute */
   ppd_attr_t	**attrs;	/* Attributes */
 
-  /**** New for CUPS 1.2 ****/
+  /**** New in CUPS 1.2 ****/
   int		num_extended;	/* Number of extended options */
   ppd_ext_option_t **extended;	/* Extended options */
 } ppd_file_t;
@@ -376,6 +385,8 @@ extern int		ppdMarkRealArray(ppd_file_t *ppd, const char *keyword,
 			                 int num_values, const float *values);
 extern int		ppdMarkText(ppd_file_t *ppd, const char *keyword,
 			            const char *value);
+extern int		ppdMarkXYArray(ppd_file_t *ppd, const char *keyword,
+			               int num_values, const float *values);
 extern int		ppdSave(ppd_file_t *ppd, FILE *fp);
 extern int		ppdSaveFd(ppd_file_t *ppd, int fd);
 extern int		ppdSaveFile(ppd_file_t *ppd, const char *filename);
@@ -391,5 +402,5 @@ extern int		ppdSaveFile(ppd_file_t *ppd, const char *filename);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.24.2.15 2003/02/28 21:07:34 mike Exp $".
+ * End of "$Id: ppd.h,v 1.24.2.16 2003/03/13 05:45:29 mike Exp $".
  */
