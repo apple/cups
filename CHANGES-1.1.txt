@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- The USB backend now defaults to using the newer
+	  /dev/usb/lpN filenames; this helps on systems which
+	  use the devfs filesystem type on Linux (STR #818)
 	- The config.h file did not define the HAVE_USERSEC_H
 	  constant when the configure script detected the
 	  usersec.h header file. This caused authentication

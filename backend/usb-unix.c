@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-unix.c,v 1.2.2.3 2004/05/13 15:13:52 mike Exp $"
+ * "$Id: usb-unix.c,v 1.2.2.4 2004/08/02 19:02:42 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -426,12 +426,12 @@ list_devices(void)
   * First figure out which USB printer filename to use...
   */
 
-  if (access("/dev/usb/lp0", 0) == 0)
-    strcpy(format, "/dev/usb/lp%d");
+  if (access("/dev/usblp0", 0) == 0)
+    strcpy(format, "/dev/usblp%d");
   else if (access("/dev/usb/usblp0", 0) == 0)
     strcpy(format, "/dev/usb/usblp%d");
   else
-    strcpy(format, "/dev/usblp%d");
+    strcpy(format, "/dev/usb/lp%d");
 
  /*
   * Then open each USB device...
@@ -600,12 +600,12 @@ open_device(const char *uri)		/* I - Device URI */
     * First figure out which USB printer filename to use...
     */
 
-    if (access("/dev/usb/lp0", 0) == 0)
-      strcpy(format, "/dev/usb/lp%d");
+    if (access("/dev/usblp0", 0) == 0)
+      strcpy(format, "/dev/usblp%d");
     else if (access("/dev/usb/usblp0", 0) == 0)
       strcpy(format, "/dev/usb/usblp%d");
     else
-      strcpy(format, "/dev/usblp%d");
+      strcpy(format, "/dev/usb/lp%d");
 
    /*
     * Then find the correct USB device...
@@ -803,5 +803,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb-unix.c,v 1.2.2.3 2004/05/13 15:13:52 mike Exp $".
+ * End of "$Id: usb-unix.c,v 1.2.2.4 2004/08/02 19:02:42 mike Exp $".
  */
