@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.36 1999/10/21 20:51:57 mike Exp $"
+ * "$Id: util.c,v 1.37 1999/10/22 15:53:11 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -57,8 +57,9 @@
  * Local globals...
  */
 
-static http_t		*cups_server = NULL;
-static ipp_status_t	last_error = IPP_OK;
+static http_t		*cups_server = NULL;	/* Current server connection */
+static ipp_status_t	last_error = IPP_OK;	/* Last IPP error */
+static char		authstring[255] = "";	/* Authorization string */
 
 
 /*
@@ -164,8 +165,6 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
   const char	*password;	/* Password string */
   char		plain[255],	/* Plaintext username:password */
 		encode[255];	/* Encoded username:password */
-  static char	authstring[255] = "";
-				/* Authorization string */
 
 
   DEBUG_printf(("cupsDoFileRequest(%08x, %08s, \'%s\', \'%s\')\n",
@@ -272,7 +271,10 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 
       httpFlush(http);
 
-      if ((password = cupsGetPassword("Password:")) != NULL)
+      printf("Authentication required for %s on %s...\n", cupsUser(),
+             http->hostname);
+
+      if ((password = cupsGetPassword("UNIX Password:")) != NULL)
       {
        /*
 	* Got a password; send it to the server...
@@ -524,8 +526,12 @@ cupsGetPPD(const char *name)	/* I - Printer name */
   char		printer[HTTP_MAX_URI],	/* Printer name */
 		hostname[HTTP_MAX_URI],	/* Hostname */
 		resource[HTTP_MAX_URI];	/* Resource name */
-  static char	filename[HTTP_MAX_URI];	/* Local filename */
   char		*tempdir;		/* Temporary file directory */
+  const char	*password;		/* Password string */
+  char		plain[255],		/* Plaintext username:password */
+		encode[255];		/* Encoded username:password */
+  http_status_t	status;			/* HTTP status from server */
+  static char	filename[HTTP_MAX_URI];	/* Local filename */
 
 
  /*
@@ -556,17 +562,52 @@ cupsGetPPD(const char *name)	/* I - Printer name */
 
   snprintf(resource, sizeof(resource), "/printers/%s.ppd", printer);
 
-  httpClearFields(cups_server);
-  httpSetField(cups_server, HTTP_FIELD_HOST, hostname);
-  httpGet(cups_server, resource);
-
-  switch (httpUpdate(cups_server))
+  do
   {
-    case HTTP_OK : /* New file - get it! */
+    httpClearFields(cups_server);
+    httpSetField(cups_server, HTTP_FIELD_HOST, hostname);
+    httpSetField(cups_server, HTTP_FIELD_AUTHORIZATION, authstring);
+
+    if (httpGet(cups_server, resource))
+    {
+      status = HTTP_UNAUTHORIZED;
+      continue;
+    }
+
+    while ((status = httpUpdate(cups_server)) == HTTP_CONTINUE);
+
+    if (status == HTTP_UNAUTHORIZED)
+    {
+      DEBUG_puts("cupsGetPPD: unauthorized...");
+
+     /*
+      * Flush any error message...
+      */
+
+      httpFlush(cups_server);
+
+      printf("Authentication required for %s on %s...\n", cupsUser(),
+             cups_server->hostname);
+
+      if ((password = cupsGetPassword("UNIX Password:")) != NULL)
+      {
+       /*
+	* Got a password; send it to the server...
+	*/
+
+        if (!password[0])
+          break;
+	snprintf(plain, sizeof(plain), "%s:%s", cupsUser(), password);
+	httpEncode64(encode, plain);
+	snprintf(authstring, sizeof(authstring), "Basic %s", encode);
+
+        continue;
+      }
+      else
         break;
-    default :
-        return (NULL);
+    }
   }
+  while (status == HTTP_UNAUTHORIZED);
 
  /*
   * OK, we need to copy the file; open the file and copy it...
@@ -1036,5 +1077,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.36 1999/10/21 20:51:57 mike Exp $".
+ * End of "$Id: util.c,v 1.37 1999/10/22 15:53:11 mike Exp $".
  */

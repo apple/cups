@@ -1,5 +1,5 @@
 /*
- * "$Id: string.h,v 1.2 1999/06/18 18:36:11 mike Exp $"
+ * "$Id: string.h,v 1.3 1999/10/22 15:53:10 mike Exp $"
  *
  *   String definitions for the Common UNIX Printing System (CUPS).
  *
@@ -29,6 +29,8 @@
  * Include necessary headers...
  */
 
+#  include <stdio.h>
+#  include <stdarg.h>
 #  include <config.h>
 #  include <string.h>
 
@@ -59,8 +61,16 @@ extern int	strcasecmp(const char *, const char *);
 extern int	strncasecmp(const char *, const char *, size_t n);
 #  endif /* !HAVE_STRNCASECMP */
 
+#  ifndef HAVE_SNPRINTF
+extern int	snprintf(char *, ssize_t, const char *, ...);
+#  endif /* !HAVE_SNPRINTF */
+
+#  ifndef HAVE_VSNPRINTF
+extern int	vsnprintf(char *, ssize_t, const char *, va_list);
+#  endif /* !HAVE_VSNPRINTF */
+
 #endif /* !_CUPS_STRING_H_ */
 
 /*
- * End of "$Id: string.h,v 1.2 1999/06/18 18:36:11 mike Exp $".
+ * End of "$Id: string.h,v 1.3 1999/10/22 15:53:10 mike Exp $".
  */
