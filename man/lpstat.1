@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpstat.1,v 1.1 1999/05/14 17:03:04 mike Exp $"
+.\" "$Id: lpstat.1,v 1.2 1999/06/10 16:15:04 mike Exp $"
 .\"
 .\"   lpstat man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -26,17 +26,34 @@
 lpstat \- print cups status information
 .SH SYNOPSIS
 .B lpstat
+[ -a [
+.I destination(s)
+] ] [ -c [
+.I class(es)
+] ] [ -d ] [ -h
+.I server
+] [ -o [
+.I destination(s)
+] ] [ -p [
+.I printer(s)
+] ] [ -r ] [ -s ] [ -t ] [ -u [
+.I user(s)
+] ] [ -v [
+.I printer(s)
+] ]
 .SH DESCRIPTION
-\fBlpstat\fR
+\fBlpstat\fR displays status information about the current classes, jobs, and
+printers. When run with no arguments, \fBlpstat\fR will list jobs queued by
+the user.
 .SH COMPATIBILITY
 Unlike the System V printing system, CUPS allows printer names to contain
 any printable character except SPACE and TAB. Also, printer and class names are
-\fBnot\fR case-sensitive. 
+\fBnot\fR case-sensitive.
 .SH SEE ALSO
 cancel(1), lp(1),
 CUPS Software User's Manual
 .SH COPYRIGHT
 Copyright 1993-1999 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpstat.1,v 1.1 1999/05/14 17:03:04 mike Exp $".
+.\" End of "$Id: lpstat.1,v 1.2 1999/06/10 16:15:04 mike Exp $".
 .\"

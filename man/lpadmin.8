@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpadmin.8,v 1.5 1999/05/20 16:16:45 mike Exp $"
+.\" "$Id: lpadmin.8,v 1.6 1999/06/10 16:15:04 mike Exp $"
 .\"
 .\"   lpadmin man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -26,16 +26,22 @@
 lpadmin \- configure cups printers and classes
 .SH SYNOPSIS
 .B lpadmin
-\-d
+[ -h
+.I server
+] \-d
 .I destination
 .br
 .B lpadmin
-\-p
+[ -h
+.I server
+] \-p
 .I printer
 .I option(s)
 .br
 .B lpadmin
-\-x
+[ -h
+.I server
+] \-x
 .I destination
 .SH DESCRIPTION
 \fBlpadmin\fR configures printer and class queues provided by CUPS. It can also
@@ -109,5 +115,5 @@ CUPS Software Administrator's Manual
 .SH COPYRIGHT
 Copyright 1993-1999 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpadmin.8,v 1.5 1999/05/20 16:16:45 mike Exp $".
+.\" End of "$Id: lpadmin.8,v 1.6 1999/06/10 16:15:04 mike Exp $".
 .\"

@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: accept.8,v 1.1 1999/05/14 17:03:00 mike Exp $"
+.\" "$Id: accept.8,v 1.2 1999/06/10 16:15:01 mike Exp $"
 .\"
 .\"   accept/reject man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -29,7 +29,11 @@ accept/reject \- accept/reject jobs sent to a destination
 destination(s)
 .br
 .B reject
-.I [ -r [ reason ] ]
+[ -h
+.I server
+] [ -r [
+.I reason
+] ]
 destination(s)
 .SH DESCRIPTION
 \fBaccept\fR instructs the printing system to accept print jobs to the
@@ -49,5 +53,5 @@ CUPS Software Administrator's Manual
 .SH COPYRIGHT
 Copyright 1993-1999 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: accept.8,v 1.1 1999/05/14 17:03:00 mike Exp $".
+.\" End of "$Id: accept.8,v 1.2 1999/06/10 16:15:01 mike Exp $".
 .\"

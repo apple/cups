@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: enable.8,v 1.1 1999/05/14 17:03:02 mike Exp $"
+.\" "$Id: enable.8,v 1.2 1999/06/10 16:15:03 mike Exp $"
 .\"
 .\"   enable/disable man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -29,9 +29,11 @@ disable, disable \- stop/start printers and classes
 destination(s)
 .br
 .B disable
-.I [ \-c ]
-.I [ \-r [ reason ] ]
-destination(s)
+[ \-c ] [ -h
+.I server
+] [ \-r [
+.I reason
+] ] destination(s)
 .SH DESCRIPTION
 \fBenable\fR starts the named printers or classes.
 .LP
@@ -58,5 +60,5 @@ CUPS Software Administrator's Manual
 Copyright 1993-1999 by Easy Software Products, All Rights Reserved.
 
 .\"
-.\" End of "$Id: enable.8,v 1.1 1999/05/14 17:03:02 mike Exp $".
+.\" End of "$Id: enable.8,v 1.2 1999/06/10 16:15:03 mike Exp $".
 .\"
