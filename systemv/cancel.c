@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.7 1999/07/30 15:01:18 mike Exp $"
+ * "$Id: cancel.c,v 1.8 1999/07/30 15:36:00 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -197,9 +197,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       if (response != NULL)
       {
-        if (response->request->status.status_code == IPP_NOT_FOUND)
+        if (response->request.status.status_code == IPP_NOT_FOUND)
           fputs("cancel: Job or printer not found!\n", stderr);
-        else if (response->request->status.status_code > IPP_OK_CONFLICT)
+        else if (response->request.status.status_code > IPP_OK_CONFLICT)
           fputs("cancel: Unable to cancel job(s)!\n", stderr);
 
         ippDelete(response);
@@ -216,5 +216,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c,v 1.7 1999/07/30 15:01:18 mike Exp $".
+ * End of "$Id: cancel.c,v 1.8 1999/07/30 15:36:00 mike Exp $".
  */
