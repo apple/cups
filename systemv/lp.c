@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.20 2000/03/09 19:47:34 mike Exp $"
+ * "$Id: lp.c,v 1.21 2000/05/11 18:47:00 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -71,7 +71,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   char		*title;		/* Job title */
   int		priority;	/* Job priority (1-100) */
   int		num_copies;	/* Number of copies per file */
-  int		num_files;	/* Number of files printed */
+  int		num_files;	/* Number of files to print */
+  const char	*files[1000];	/* Files to print */
   int		num_dests;	/* Number of destinations */
   cups_dest_t	*dests,		/* Destinations */
 		*dest;		/* Selected destination */
@@ -208,90 +209,59 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    fprintf(stderr, "lp: Unknown option \'%c\'!\n", argv[i][1]);
 	    return (1);
       }
-    else
+    else if (num_files < 1000)
     {
      /*
       * Print a file...
       */
 
-      if (printer == NULL)
-      {
-	if (num_dests == 0)
-	  num_dests = cupsGetDests(&dests);
-
-        for (j = 0, dest = dests; j < num_dests; j ++, dest ++)
-	  if (dest->is_default)
-	  {
-	    printer = dests[j].name;
-
-	    for (j = 0; j < dest->num_options; j ++)
-	      num_options = cupsAddOption(dest->options[j].name,
-		                	  dest->options[j].value,
-					  num_options, &options);
-            break;
-	  }
-      }
-
-      if (printer == NULL)
-      {
-	fputs("lp: error - no default destination available.\n", stderr);
-	return (1);
-      }
-
+      files[num_files] = argv[i];
       num_files ++;
-      if (title)
-        job_id = cupsPrintFile(printer, argv[i], title, num_options, options);
-      else
-      {
-        char *filename;
 
-        if ((filename = strrchr(argv[i], '/')) != NULL)
-	  filename ++;
+      if (title == NULL)
+      {
+        if ((title = strrchr(argv[i], '/')) != NULL)
+	  title ++;
 	else
-	  filename = argv[i];
-
-        job_id = cupsPrintFile(printer, argv[i], filename, num_options, options);
+          title = argv[i];
       }
-
-      if (job_id < 1)
-      {
-	fprintf(stderr, "lp: unable to print file \'%s\': %s\n",
-	        argv[i], ippErrorString(cupsLastError()));
-	return (1);
-      }
-      else if (!silent)
-	fprintf(stderr, "request id is %s-%d (1 file(s))\n", printer, job_id);
     }
+    else
+      fprintf(stderr, "lp: Too many files - \"%s\"\n", argv[i]);
 
  /*
-  * See if we printed anything; if not, print from stdin...
+  * See if we have any files to print; if not, print from stdin...
   */
 
-  if (num_files == 0)
+  if (printer == NULL)
   {
-    if (printer == NULL)
-    {
-      if (num_dests == 0)
-	num_dests = cupsGetDests(&dests);
+    if (num_dests == 0)
+      num_dests = cupsGetDests(&dests);
 
-      for (j = 0, dest = dests; j < num_dests; j ++, dest ++)
-	if (dest->is_default)
-	{
-	  printer = dests[j].name;
+    for (j = 0, dest = dests; j < num_dests; j ++, dest ++)
+      if (dest->is_default)
+      {
+	printer = dests[j].name;
 
-	  for (j = 0; j < dest->num_options; j ++)
-	    num_options = cupsAddOption(dest->options[j].name,
-		                	dest->options[j].value,
-					num_options, &options);
-          break;
-	}
-    }
+	for (j = 0; j < dest->num_options; j ++)
+	  num_options = cupsAddOption(dest->options[j].name,
+		                      dest->options[j].value,
+				      num_options, &options);
+        break;
+      }
+  }
 
-    if (printer == NULL)
-    {
-      fputs("lp: error - no default destination available.\n", stderr);
-      return (1);
-    }
+  if (printer == NULL)
+  {
+    fputs("lp: error - no default destination available.\n", stderr);
+    return (1);
+  }
+
+  if (num_files > 0)
+    job_id = cupsPrintFiles(printer, num_files, files, title, num_options, options);
+  else
+  {
+    num_files = 1;
 
 #ifndef WIN32
 #  if defined(HAVE_SIGSET)
@@ -338,16 +308,17 @@ main(int  argc,		/* I - Number of command-line arguments */
       job_id = cupsPrintFile(printer, tempfile, "(stdin)", num_options, options);
 
     unlink(tempfile);
-
-    if (job_id < 1)
-    {
-      fprintf(stderr, "lp: unable to print stdin: %s\n",
-	      ippErrorString(cupsLastError()));
-      return (1);
-    }
-    else if (!silent)
-      fprintf(stderr, "request id is %s-%d (1 file(s))\n", printer, job_id);
   }
+
+  if (job_id < 1)
+  {
+    fprintf(stderr, "lp: unable to print file: %s\n",
+	    ippErrorString(cupsLastError()));
+    return (1);
+  }
+  else if (!silent)
+    fprintf(stderr, "request id is %s-%d (%d file(s))\n", printer, job_id,
+            num_files);
 
   return (0);
 }
@@ -377,5 +348,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.20 2000/03/09 19:47:34 mike Exp $".
+ * End of "$Id: lp.c,v 1.21 2000/05/11 18:47:00 mike Exp $".
  */
