@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.3 1998/04/02 21:06:54 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.4 1998/07/28 18:49:15 mike Exp $"
  *
  *   Image file to STIFF conversion program for espPrint, a collection
  *   of printer drivers.
@@ -17,7 +17,10 @@
  * Revision History:
  *
  *   $Log: imagetoraster.c,v $
- *   Revision 1.3  1998/04/02 21:06:54  mike
+ *   Revision 1.4  1998/07/28 18:49:15  mike
+ *   Fixed bug in rotation code - was rotating variable size media as well...
+ *
+ *   Revision 1.3  1998/04/02  21:06:54  mike
  *   Fixed problem with dither array (off by one).
  *
  *   Revision 1.2  1998/02/24  21:06:28  mike
@@ -520,6 +523,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Figure out the image colorspace...
   */
 
+  blank = 0;
+
   switch (scolorspace)
   {
     case ST_TYPE_K :
@@ -535,10 +540,20 @@ main(int  argc,		/* I - Number of command-line arguments */
           icolorspace = IMAGE_CMYK;
         break;
     case ST_TYPE_W :
-        icolorspace = IMAGE_WHITE;
+        if (bits == 8)
+          icolorspace = IMAGE_WHITE;
+	else
+          icolorspace = IMAGE_BLACK;
+
+        blank = 255;
         break;
     case ST_TYPE_RGB :
-        icolorspace = IMAGE_RGB;
+        if (bits == 8)
+          icolorspace = IMAGE_RGB;
+	else
+          icolorspace = IMAGE_CMY;
+
+        blank = 255;
         break;
   };
 
@@ -765,27 +780,26 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Output the pages...
   */
 
-  header.type           = scolorspace;
-  header.plane          = ST_PLANE_PACKED;
-  header.resUnit	= PST_RES_UNIT_INCH;
-  header.xRes		= xdpi;
-  header.yRes		= ydpi;
-  header.thresholding	= PST_THRESHOLD_NONE;
-  header.compression	= PST_COMPRESSION_NONE;
-  header.pageNumbers[0]	= 0;
-  header.pageNumbers[1]	= xpages * ypages * copies;
-  header.dateTime	= NULL;
-  header.hostComputer	= NULL;
-  header.software	= "img2stiff - ESP Print " SVERSION;
-  header.docName	= infile;
-  header.targetPrinter	= printer;
-  header.driverOptions	= NULL;
-  header.bitsPerSample  = bits;
+  header.type            = scolorspace;
+  header.plane           = ST_PLANE_PACKED;
+  header.resUnit	 = PST_RES_UNIT_INCH;
+  header.xRes		 = xdpi;
+  header.yRes		 = ydpi;
+  header.thresholding	 = PST_THRESHOLD_NONE;
+  header.compression	 = PST_COMPRESSION_NONE;
+  header.pageNumbers[0]	 = 0;
+  header.pageNumbers[1]	 = xpages * ypages * copies;
+  header.dateTime	 = NULL;
+  header.hostComputer	 = NULL;
+  header.software	 = "img2stiff - ESP Print " SVERSION;
+  header.docName	 = infile;
+  header.targetPrinter	 = printer;
+  header.driverOptions	 = NULL;
+  header.bitsPerSample   = bits;
+  header.samplesPerPixel = ImageGetDepth(img);
 
-  if (bits == 1 && icolorspace == IMAGE_CMY)
+  if ((bits == 1 || bits == 2) && header.samplesPerPixel == 3)
     header.samplesPerPixel = 4;
-  else
-    header.samplesPerPixel = ImageGetDepth(img);
 
   if (variable)
   {
@@ -796,14 +810,13 @@ main(int  argc,		/* I - Number of command-line arguments */
     }
     else
     {
-      width  = ydpi * xinches / xpages;
-      height = xdpi * yinches / ypages;
+      width  = xdpi * yinches / xpages;
+      height = ydpi * xinches / ypages;
     };
   };
 
   bpp    = header.bitsPerSample * header.samplesPerPixel;
   bwidth = (width * bpp + 7) / 8;
-  blank  = icolorspace < 0 ? 0 : 255;
 
   header.width    = width;
   header.height   = height;
@@ -862,12 +875,18 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 	memset(row, blank, bwidth);
 
-	for (y = (header.height - z->ysize) / 2; y > 0; y --)
-	  if (STWrite(st, row, bwidth) < bwidth)
+        if (header.height > z->ysize)
+	  for (y = (header.height - z->ysize) / 2; y > 0; y --)
 	  {
-	    ImageClose(img);
-	    exit(ERR_TRANSMISSION);
-	  };
+	    if (Verbosity > 1)
+	      fprintf(stderr, "img2stiff: blanking line %d\n", y);
+
+	    if (STWrite(st, row, bwidth) < bwidth)
+	    {
+	      ImageClose(img);
+	      exit(ERR_TRANSMISSION);
+	    };
+          };
 
 	for (y = z->ysize, yerr0 = z->ysize, yerr1 = 0, iy = 0, last_iy = -2;
              y > 0;
@@ -893,7 +912,7 @@ main(int  argc,		/* I - Number of command-line arguments */
           switch (bits)
           {
             case 1 :
-    		memset(row, blank, bwidth);
+    		memset(row, 0, bwidth);
 
                 bitoffset = header.samplesPerPixel *
                             ((header.width - z->xsize) / 2);
@@ -906,7 +925,7 @@ main(int  argc,		/* I - Number of command-line arguments */
         	     x --, r0 ++)
         	{
         	  if (*r0 > dither[x & 7])
-        	    *rowptr ^= bitmask;
+        	    *rowptr |= bitmask;
 
         	  if ((bitmask == 32 || bitmask == 2) &&
         	      (icolorspace == IMAGE_RGB || icolorspace == IMAGE_CMY))
@@ -928,10 +947,13 @@ main(int  argc,		/* I - Number of command-line arguments */
         	      *rowptr ^= 0xf0;
         	    if ((*rowptr & 0x0e) == 0x0e)
         	      *rowptr ^= 0x0f;
-        	  };
+        	  }
+		else if (blank == 255)
+        	  for (rowptr = row, x = bwidth; x > 0; x --, rowptr ++)
+         	    *rowptr = ~*rowptr;
                 break;
             case 2 :
-    		memset(row, blank, bwidth);
+    		memset(row, 0, bwidth);
 
                 bitoffset = 2 * header.samplesPerPixel *
                             ((header.width - z->xsize) / 2);
@@ -944,9 +966,9 @@ main(int  argc,		/* I - Number of command-line arguments */
         	     x --, r0 ++)
         	{
         	  if (*r0 > dither[x & 7])
-        	    *rowptr ^= (bitmask & onpixels[*r0]);
+        	    *rowptr |= (bitmask & onpixels[*r0]);
         	  else
-        	    *rowptr ^= (bitmask & offpixels[*r0]);
+        	    *rowptr |= (bitmask & offpixels[*r0]);
 
         	  if (bitmask > 3)
         	    bitmask >>= 2;
@@ -956,9 +978,13 @@ main(int  argc,		/* I - Number of command-line arguments */
         	    rowptr ++;
         	  };
         	};
+
+		if (blank == 255)
+        	  for (rowptr = row, x = bwidth; x > 0; x --, rowptr ++)
+         	    *rowptr = ~*rowptr;
                 break;
             case 4 :
-    		memset(row, blank, bwidth);
+    		memset(row, 0, bwidth);
 
                 bitoffset = 4 * header.samplesPerPixel *
                             ((header.width - z->xsize) / 2);
@@ -971,9 +997,9 @@ main(int  argc,		/* I - Number of command-line arguments */
         	     x --, r0 ++)
         	{
         	  if (*r0 > dither[x & 7])
-        	    *rowptr ^= (bitmask & onpixels[*r0]);
+        	    *rowptr |= (bitmask & onpixels[*r0]);
         	  else
-        	    *rowptr ^= (bitmask & offpixels[*r0]);
+        	    *rowptr |= (bitmask & offpixels[*r0]);
 
         	  if (bitmask == 0xf0)
         	    bitmask = 0x0f;
@@ -983,6 +1009,10 @@ main(int  argc,		/* I - Number of command-line arguments */
         	    rowptr ++;
         	  };
         	};
+
+		if (blank == 255)
+        	  for (rowptr = row, x = bwidth; x > 0; x --, rowptr ++)
+         	    *rowptr = ~*rowptr;
                 break;
             case 8 :
                 bitoffset = header.samplesPerPixel *
@@ -1017,19 +1047,25 @@ main(int  argc,		/* I - Number of command-line arguments */
 	  };
 	};
 
-	if (Verbosity)
-	  fputs("img2stiff: done with this page...\n", stderr);
-
 	memset(row, blank, bwidth);
 
-	for (y = (header.height + z->ysize) / 2; y < header.height; y ++)
-	  if (STWrite(st, row, bwidth) < bwidth)
+        if (header.height > z->ysize)
+	  for (y = (header.height + z->ysize) / 2; y < header.height; y ++)
 	  {
-	    ImageClose(img);
-	    exit(ERR_TRANSMISSION);
-	  };
+	    if (Verbosity > 1)
+	      fprintf(stderr, "img2stiff: blanking line %d\n", y);
+
+	    if (STWrite(st, row, bwidth) < bwidth)
+	    {
+	      ImageClose(img);
+	      exit(ERR_TRANSMISSION);
+	    };
+          };
 
         ImageZoomFree(z);
+
+	if (Verbosity)
+	  fputs("img2stiff: done with this page...\n", stderr);
       };
 
   ImageClose(img);
@@ -1107,5 +1143,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.3 1998/04/02 21:06:54 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.4 1998/07/28 18:49:15 mike Exp $".
  */
