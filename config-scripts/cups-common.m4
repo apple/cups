@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.12.2.11 2003/01/07 18:26:22 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.12.2.12 2003/03/12 20:40:09 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -161,6 +161,21 @@ esac
 
 AC_SUBST(ARFLAGS)
 
+dnl Extra platform-specific libraries...
+case $uname in
+        Darwin*)
+                BACKLIBS="-framework IOKit"
+                COMMONLIBS="-framework CoreFoundation"
+                ;;
+        *)
+                BACKLIBS=""
+		COMMONLIBS=""
+                ;;
+esac
+
+AC_SUBST(BACKLIBS)
+AC_SUBST(COMMONLIBS)
+
 dnl New default port definition for IPP...
 AC_ARG_WITH(ipp-port, [  --with-ipp-port         set default port number for IPP ],
 	DEFAULT_IPP_PORT="$withval",
@@ -170,5 +185,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.12.2.11 2003/01/07 18:26:22 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.12.2.12 2003/03/12 20:40:09 mike Exp $".
 dnl

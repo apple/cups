@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.53.2.21 2003/01/28 15:32:59 mike Exp $"
+# "$Id: Makefile,v 1.53.2.22 2003/03/12 20:40:10 mike Exp $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -110,7 +110,7 @@ installhdrs:
 
 libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 	echo Linking $@...
-	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS)
+	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS)
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
 
@@ -125,7 +125,7 @@ libcups.2.dylib:	$(LIBOBJS)
 		-install_name $(libdir)/libcups.dylib \
 		-current_version 2.6.0 \
 		-compatibility_version 2.0.0 \
-		$(LIBOBJS)
+		$(LIBOBJS) $(SSLLIBS) $(COMMONLIBS)
 	$(RM) libcups.dylib
 	$(LN) $@ libcups.dylib
 
@@ -136,7 +136,7 @@ libcups.2.dylib:	$(LIBOBJS)
 
 libcups_s.a:	$(LIBOBJS)
 	echo Creating $@...
-	$(DSO) $(DSOFLAGS) -o libcups_s.o $(LIBOBJS) -lm
+	$(DSO) $(DSOFLAGS) -o libcups_s.o $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) -lm
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ libcups_s.o
 
@@ -148,7 +148,7 @@ libcups_s.a:	$(LIBOBJS)
 libcups.la:    $(LIBOBJS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
-		-version-info 2:5
+		-version-info 2:5 $(SSLLIBS) $(COMMONLIBS)
 
 
 #
@@ -178,7 +178,7 @@ cups_C.h:	../locale/C/cups_C
 
 testhttp:	testhttp.o libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testhttp.o libcups.a $(NETLIBS) $(SSLLIBS)
+	$(CC) $(LDFLAGS) -o $@ testhttp.o libcups.a $(NETLIBS) $(SSLLIBS) $(COMMONLIBS)
 
 
 #
@@ -196,7 +196,7 @@ testi18n:	testi18n.o libcups.a
 
 testlang:	testlang.o libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testlang.o libcups.a $(NETLIBS) $(SSLLIBS)
+	$(CC) $(LDFLAGS) -o $@ testlang.o libcups.a $(NETLIBS) $(SSLLIBS) $(COMMONLIBS)
 
 
 #
@@ -207,5 +207,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.53.2.21 2003/01/28 15:32:59 mike Exp $".
+# End of "$Id: Makefile,v 1.53.2.22 2003/03/12 20:40:10 mike Exp $".
 #
