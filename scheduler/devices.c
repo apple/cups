@@ -1,5 +1,5 @@
 /*
- * "$Id: devices.c,v 1.6 2000/04/27 12:19:27 mike Exp $"
+ * "$Id: devices.c,v 1.7 2000/07/10 14:46:27 mike Exp $"
  *
  *   Device scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -72,6 +72,7 @@ LoadDevices(const char *d)	/* I - Directory to scan */
 {
   int		i;		/* Looping var */
   int		count;		/* Number of devices from backend */
+  int		compat;		/* Compatibility device? */
   FILE		*fp;		/* Pipe to device backend */
   DIR		*dir;		/* Directory pointer */
   DIRENT	*dent;		/* Directory entry */
@@ -160,7 +161,8 @@ LoadDevices(const char *d)	/* I - Directory to scan */
 #endif /* HAVE_SIGSET */
 
       alarm(30);
-      count = 0;
+      count  = 0;
+      compat = 0;
 
       while (fgets(line, sizeof(line), fp) != NULL)
       {
@@ -186,6 +188,7 @@ LoadDevices(const char *d)	/* I - Directory to scan */
 	  line[strlen(line) - 1] = '\0';
 	  LogMessage(L_ERROR, "LoadDevices: Bad line from \"%s\": %s",
 	             dent->d_name, line);
+          compat = 1;
         }
 	else
 	{
@@ -244,7 +247,7 @@ LoadDevices(const char *d)	/* I - Directory to scan */
       * add a network device with the method == backend name.
       */
 
-      if (count == 0)
+      if (count == 0 && compat)
       {
 	if (num_devs >= alloc_devs)
 	{
@@ -463,5 +466,5 @@ sigalrm_handler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: devices.c,v 1.6 2000/04/27 12:19:27 mike Exp $".
+ * End of "$Id: devices.c,v 1.7 2000/07/10 14:46:27 mike Exp $".
  */
