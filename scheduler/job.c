@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.92 2004/07/02 21:36:57 mike Exp $"
+ * "$Id: job.c,v 1.124.2.93 2004/08/11 14:58:31 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1315,7 +1315,8 @@ StartJob(int       id,			/* I - Job ID */
   int		num_filters;		/* Number of filters for job */
   mime_filter_t	*filters;		/* Filters for job */
   char		method[255],		/* Method for output */
-		*optptr;		/* Pointer to options */
+		*optptr,		/* Pointer to options */
+		*valptr;		/* Pointer in value string */
   ipp_attribute_t *attr;		/* Current attribute */
   int		pid;			/* Process ID of new filter process */
   int		banner_page;		/* 1 if banner page, 0 otherwise */
@@ -1734,18 +1735,14 @@ StartJob(int       id,			/* I - Job ID */
 	  case IPP_TAG_KEYWORD :
 	  case IPP_TAG_CHARSET :
 	  case IPP_TAG_LANGUAGE :
-	      if (strchr(attr->values[i].string.text, ' ') != NULL ||
-		  strchr(attr->values[i].string.text, '\t') != NULL ||
-		  strchr(attr->values[i].string.text, '\n') != NULL)
+	      for (valptr = attr->values[i].string.text, ' '); *valptr;)
 	      {
-		strlcat(optptr, "\'", optlength - (optptr - options));
-		strlcat(optptr, attr->values[i].string.text,
-		        optlength - (optptr - options));
-		strlcat(optptr, "\'", optlength - (optptr - options));
+	        if (strchr(" \t\n\\\'\"", *valptr))
+		  *optptr++ = '\\';
+		*optptr++ = *valptr++;
 	      }
-	      else
-		strlcat(optptr, attr->values[i].string.text,
-		        optlength - (optptr - options));
+
+	      *optptr = '\0';
 	      break;
 
           default :
@@ -2768,5 +2765,5 @@ set_hold_until(job_t *job, 		/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.92 2004/07/02 21:36:57 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.93 2004/08/11 14:58:31 mike Exp $".
  */
