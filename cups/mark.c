@@ -1,5 +1,5 @@
 /*
- * "$Id: mark.c,v 1.8 1999/03/24 21:20:38 mike Exp $"
+ * "$Id: mark.c,v 1.9 1999/03/31 18:08:01 mike Exp $"
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
@@ -25,14 +25,15 @@
  *
  * Contents:
  *
- *   ppdConflicts()    - Check to see if there are any conflicts.
- *   ppdFindChoice()   - Return a pointer to an option choice.
- *   ppdFindOption()   - Return a pointer to the specified option.
- *   ppdIsMarked()     - Check to see if an option is marked...
- *   ppdMarkDefaults() - Mark all default options in the PPD file.
- *   ppdMarkOption()   - Mark an option in a PPD file.
- *   ppd_defaults()    - Set the defaults for this group and all sub-groups.
- *   ppd_default()     - Set the default choice for an option.
+ *   ppdConflicts()        - Check to see if there are any conflicts.
+ *   ppdFindChoice()       - Return a pointer to an option choice.
+ *   ppdFindMarkedChoice() - Return the marked choice for the specified option.
+ *   ppdFindOption()       - Return a pointer to the specified option.
+ *   ppdIsMarked()         - Check to see if an option is marked...
+ *   ppdMarkDefaults()     - Mark all default options in the PPD file.
+ *   ppdMarkOption()       - Mark an option in a PPD file.
+ *   ppd_defaults()        - Set the defaults for this group and all sub-groups.
+ *   ppd_default()         - Set the default choice for an option.
  */
 
 /*
@@ -180,6 +181,33 @@ ppdFindChoice(ppd_option_t *o,		/* I - Pointer to option */
 
   for (i = o->num_choices, c = o->choices; i > 0; i --, c ++)
     if (strcmp(c->choice, choice) == 0)
+      return (c);
+
+  return (NULL);
+}
+
+
+/*
+ * 'ppdFindMarkedChoice()' - Return the marked choice for the specified option.
+ */
+
+ppd_choice_t *				/* O - Pointer to choice or NULL */
+ppdFindMarkedChoice(ppd_file_t *ppd,	/* I - PPD file */
+                    char       *option,	/* I - Keyword/option name */
+                    char       *choice)	/* I - Choice name */
+{
+  int		i;		/* Looping var */
+  ppd_option_t	*o;		/* Pointer to option */
+  ppd_choice_t	*c;		/* Pointer to choice */
+  ppd_group_t	*g,		/* Pointer to group */
+		*sg;		/* Pointer to subgroup */
+
+
+  if ((o = ppdFindOption(ppd, option)) == NULL)
+    return (NULL);
+
+  for (i = o->num_choices, c = o->choices; i > 0; i --, c ++)
+    if (c->marked)
       return (c);
 
   return (NULL);
@@ -379,5 +407,5 @@ ppd_default(ppd_option_t *o)	/* I - Option to default */
 
 
 /*
- * End of "$Id: mark.c,v 1.8 1999/03/24 21:20:38 mike Exp $".
+ * End of "$Id: mark.c,v 1.9 1999/03/31 18:08:01 mike Exp $".
  */
