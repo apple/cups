@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: zebra.ppd,v 1.1.2.1 2004/05/11 20:16:05 mike Exp $"
+*% "$Id: zebra.ppd,v 1.1.2.2 2004/05/12 19:32:07 mike Exp $"
 *%
 *%   Sample Zebra label printer driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -31,13 +31,15 @@
 *Manufacturer:	"ESP"
 *Product:	"(GNU Ghostscript)"
 *Product:	"(ESP Ghostscript)"
-*cupsVersion:	1.2
+*cupsVersion:	1.1
 *cupsManualCopies: False
 *cupsFilter:	"application/vnd.cups-raster 0 rastertodymo"
-*cupsModelNumber: 16
-*ModelName:     "Zebra Label Printer"
-*ShortNickName: "Zebra Label Printer"
-*NickName:      "Zebra Label Printer CUPS v1.1"
+*% cupsModelNumber is 16 for EPL line mode, 17 for EPL page mode,
+*% and 18 for ZPL mode.
+*cupsModelNumber: 18
+*ModelName:     "Zebra ZPL Label Printer"
+*ShortNickName: "Zebra ZPL Label Printer"
+*NickName:      "Zebra ZPL Label Printer CUPS v1.1"
 *PSVersion:	"(3010.000) 707"
 *LanguageLevel:	"3"
 *ColorDevice:	False
@@ -64,26 +66,37 @@
 
 *DefaultImageableArea: w288h360
 *ImageableArea w288h360/Label - 4 x 5": "0 0 288 360"
-*ImageableArea w288h432/Label - 4 x 5": "0 0 288 360"
+*ImageableArea w288h432/Label - 4 x 5": "0 0 288 432"
 
 *DefaultPaperDimension: w288h360
 *PaperDimension w288h360/Label - 4 x 5": "288 360"
-*PaperDimension w288h432/Label - 4 x 5": "288 360"
+*PaperDimension w288h432/Label - 4 x 5": "288 432"
+
+*MaxMediaWidth: "288"
+*MaxMediaHeight: "3600"
+*HWMargins: 0 0 0 0
+*CustomPageSize True: "pop pop pop <</PageSize[5 -2 roll]/ImagingBBox null>>setpagedevice"
+*ParamCustomPageSize Width: 1 points 36 288
+*ParamCustomPageSize Height: 2 points 36 3600
+*ParamCustomPageSize WidthOffset: 3 points 0 0
+*ParamCustomPageSize HeightOffset: 4 points 0 0
+*ParamCustomPageSize Orientation: 5 int 0 0
 
 *OpenUI *Resolution/Output Resolution: PickOne
 *OrderDependency: 20 AnySetup *Resolution
-*DefaultResolution: 200dpi
-*Resolution 200dpi/200 DPI: "<</HWResolution[200 200]>>setpagedevice"
+*DefaultResolution: 203dpi
+*Resolution 203dpi/203 DPI: "<</HWResolution[203 203]>>setpagedevice"
 *Resolution 300dpi/300 DPI: "<</HWResolution[300 300]>>setpagedevice"
+*Resolution 600dpi/600 DPI: "<</HWResolution[600 600]>>setpagedevice"
 *CloseUI: *Resolution
 
 *OpenUI *Darkness/Output Darkness: PickOne
 *OrderDependency: 20 AnySetup *Darkness
 *DefaultDarkness: Normal
 *Darkness Light: "<</cupsCompression 0>>setpagedevice"
-*Darkness Medium: "<</cupsCompression 10>>setpagedevice"
-*Darkness Normal: "<</cupsCompression 20>>setpagedevice"
-*Darkness Dark: "<</cupsCompression 30>>setpagedevice"
+*Darkness Medium: "<</cupsCompression 33>>setpagedevice"
+*Darkness Normal: "<</cupsCompression 67>>setpagedevice"
+*Darkness Dark: "<</cupsCompression 100>>setpagedevice"
 *CloseUI: *Darkness
 
 *OpenUI *CutMedia/Cut Labels: Boolean
@@ -130,5 +143,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: zebra.ppd,v 1.1.2.1 2004/05/11 20:16:05 mike Exp $".
+*% End of "$Id: zebra.ppd,v 1.1.2.2 2004/05/12 19:32:07 mike Exp $".
 *%

@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.56.2.17 2004/02/25 20:01:37 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.56.2.18 2004/05/12 19:32:07 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -150,21 +150,21 @@ int	Planes[] =	/* Number of planes for each colorspace */
 	  0,		/* ... reserved ... */
 	  0,		/* ... reserved ... */
 	  0,		/* ... reserved ... */
-	  1,		/* CUPS_CSPACE_ICC1 */
-	  2,		/* CUPS_CSPACE_ICC2 */
+	  3,		/* CUPS_CSPACE_ICC1 */
+	  3,		/* CUPS_CSPACE_ICC2 */
 	  3,		/* CUPS_CSPACE_ICC3 */
-	  4,		/* CUPS_CSPACE_ICC4 */
-	  5,		/* CUPS_CSPACE_ICC5 */
-	  6,		/* CUPS_CSPACE_ICC6 */
-	  7,		/* CUPS_CSPACE_ICC7 */
-	  8,		/* CUPS_CSPACE_ICC8 */
-	  9,		/* CUPS_CSPACE_ICC9 */
-	  10,		/* CUPS_CSPACE_ICCA */
-	  11,		/* CUPS_CSPACE_ICCB */
-	  12,		/* CUPS_CSPACE_ICCC */
-	  13,		/* CUPS_CSPACE_ICCD */
-	  14,		/* CUPS_CSPACE_ICCE */
-	  15		/* CUPS_CSPACE_ICCF */
+	  3,		/* CUPS_CSPACE_ICC4 */
+	  3,		/* CUPS_CSPACE_ICC5 */
+	  3,		/* CUPS_CSPACE_ICC6 */
+	  3,		/* CUPS_CSPACE_ICC7 */
+	  3,		/* CUPS_CSPACE_ICC8 */
+	  3,		/* CUPS_CSPACE_ICC9 */
+	  3,		/* CUPS_CSPACE_ICCA */
+	  3,		/* CUPS_CSPACE_ICCB */
+	  3,		/* CUPS_CSPACE_ICCC */
+	  3,		/* CUPS_CSPACE_ICCD */
+	  3,		/* CUPS_CSPACE_ICCE */
+	  3		/* CUPS_CSPACE_ICCF */
 	};
 
 
@@ -4594,5 +4594,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.56.2.17 2004/02/25 20:01:37 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.56.2.18 2004/05/12 19:32:07 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertodymo.c,v 1.4.2.10 2004/05/11 20:20:31 mike Exp $"
+ * "$Id: rastertodymo.c,v 1.4.2.11 2004/05/12 19:32:07 mike Exp $"
  *
  *   Label printer filter for the Common UNIX Printing System (CUPS).
  *
@@ -54,9 +54,9 @@
  * and 330 Turbo label printers; it may also work with older models.
  * The Dymo printers support printing at 136, 203, and 300 DPI.
  *
- * The Zebra portion of the driver has been tested with the 2844Z label
+ * The Zebra portion of the driver has been tested with the LP-2844Z label
  * printer; it may also work with other models.  The driver supports both
- * ZPL and ZPL II as defined in Zebra's on-line developer documentation.
+ * EPL and ZPL as defined in Zebra's on-line developer documentation.
  */
 
 /*
@@ -65,8 +65,9 @@
 
 #define DYMO_3x0	0		/* Dymo Labelwriter 300/330/330 Turbo */
 
-#define ZEBRA_ZPL	0x10		/* Zebra ZPL-based printers */
-#define ZEBRA_ZPL2	0x11		/* Zebra ZPL II-based printers */
+#define ZEBRA_EPL_LINE	0x10		/* Zebra EPL line mode printers */
+#define ZEBRA_EPL_PAGE	0x11		/* Zebra EPL page mode printers */
+#define ZEBRA_ZPL	0x12		/* Zebra ZPL-based printers */
 
 
 /*
@@ -77,7 +78,7 @@ unsigned char	*Buffer;		/* Output buffer */
 int		ModelNumber,		/* cupsModelNumber attribute */
 		Page,			/* Current page */
 		Feed,			/* Number of lines to skip */
-		Cancelled;		/* Non-zero if job is cancelled */
+		Canceled;		/* Non-zero if job is canceled */
 
 
 /*
@@ -88,7 +89,7 @@ void	Setup(void);
 void	StartPage(cups_page_header_t *header);
 void	EndPage(cups_page_header_t *header);
 void	CancelJob(int sig);
-void	OutputLine(cups_page_header_t *header);
+void	OutputLine(cups_page_header_t *header, int y);
 
 
 /*
@@ -133,8 +134,13 @@ Setup(void)
 	fputs("\033@", stdout);
 	break;
 
+    case ZEBRA_EPL_LINE :
+	break;
+
+    case ZEBRA_EPL_PAGE :
+	break;
+
     case ZEBRA_ZPL :
-    case ZEBRA_ZPL2 :
         break;
   }
 }
@@ -155,7 +161,7 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
 
  /*
   * Register a signal handler to eject the current page if the
-  * job is cancelled.
+  * job is canceled.
   */
 
 #ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
@@ -185,13 +191,40 @@ StartPage(cups_page_header_t *header)	/* I - Page header */
 	printf("\033%c", header->cupsCompression + 'c'); /* Darkness */
 	break;
 
-    case ZEBRA_ZPL :
-    case ZEBRA_ZPL2 :
+    case ZEBRA_EPL_LINE :
        /*
         * Set darkness...
 	*/
 
-	printf("~SD%02d\n", header->cupsCompression);
+	printf("D%d", 7 * header->cupsCompression / 100);
+
+       /*
+        * Start buffered output...
+	*/
+
+        putchar('B');
+        break;
+
+    case ZEBRA_EPL_PAGE :
+       /*
+        * Set darkness...
+	*/
+
+	printf("D%d", 15 * header->cupsCompression / 100);
+
+       /*
+        * Set label size...
+	*/
+
+        printf("q%d\n", header->cupsWidth);
+        break;
+
+    case ZEBRA_ZPL :
+       /*
+        * Set darkness...
+	*/
+
+	printf("~SD%02d\n", 30 * header->cupsCompression / 100);
 
        /*
         * Start bitmap graphics...
@@ -232,13 +265,26 @@ EndPage(cups_page_header_t *header)	/* I - Page header */
 	*/
 
 	fputs("\033E", stdout);
+	break;
 
-	fflush(stdout);
+    case ZEBRA_EPL_LINE :
+       /*
+        * End buffered output, eject the label...
+	*/
+
+        putchar('E');
+	break;
+
+    case ZEBRA_EPL_PAGE :
+       /*
+        * Print the label...
+	*/
+
+        puts("P1");
 	break;
 
     case ZEBRA_ZPL :
-    case ZEBRA_ZPL2 :
-        if (Cancelled)
+        if (Canceled)
 	{
 	 /*
 	  * Cancel bitmap download...
@@ -249,11 +295,12 @@ EndPage(cups_page_header_t *header)	/* I - Page header */
 	}
 
        /*
-        * Start label, set origin and length...
+        * Start label, set origin to 1/8,1/16", and set length...
 	*/
 
         puts("^XA");
-	puts("^LH0,0");
+	printf("^LH%d,%d\n", header->HWResolution[0] / 8,
+	       header->HWResolution[1] / 16);
 	printf("^LL%d\n", header->cupsHeight);
 
        /*
@@ -262,6 +309,8 @@ EndPage(cups_page_header_t *header)	/* I - Page header */
 
 	if (header->CutMedia)
 	  puts("^MMC");
+	else
+	  puts("^MMT");
 
        /*
         * Display the label image...
@@ -276,6 +325,8 @@ EndPage(cups_page_header_t *header)	/* I - Page header */
         puts("^XZ");
         break;
   }
+
+  fflush(stdout);
 
  /*
   * Unregister the signal handler...
@@ -314,7 +365,7 @@ CancelJob(int sig)			/* I - Signal */
 
   (void)sig;
 
-  Cancelled = 1;
+  Canceled = 1;
 }
 
 
@@ -323,7 +374,8 @@ CancelJob(int sig)			/* I - Signal */
  */
 
 void
-OutputLine(cups_page_header_t *header)	/* I - Page header */
+OutputLine(cups_page_header_t *header,	/* I - Page header */
+           int                y)	/* I - Line number */
 {
   int		i;			/* Looping var */
   unsigned char	*ptr;			/* Pointer into buffer */
@@ -370,17 +422,27 @@ OutputLine(cups_page_header_t *header)	/* I - Page header */
           Feed ++;
 	break;
 
+    case ZEBRA_EPL_LINE :
+        printf("g%03d", header->cupsBytesPerLine);
+	fwrite(Buffer, 1, header->cupsBytesPerLine, stdout);
+	fflush(stdout);
+        break;
+
+    case ZEBRA_EPL_PAGE :
+        printf("GW0,%d,%d,1", y, header->cupsBytesPerLine);
+	fwrite(Buffer, 1, header->cupsBytesPerLine, stdout);
+	putchar('\n');
+	fflush(stdout);
+        break;
+
     case ZEBRA_ZPL :
-    case ZEBRA_ZPL2 :
         for (i = header->cupsBytesPerLine, ptr = Buffer; i > 0; i --, ptr ++)
-#if 1
 	  if (!*ptr && (i == 1 || !memcmp(ptr, ptr + 1, i - 1)))
 	  {
 	    putchar(',');
 	    break;
 	  }
 	  else
-#endif /* 0 */
 	    printf("%02X", *ptr);
 
         putchar('\n');
@@ -453,7 +515,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   Page      = 0;
-  Cancelled = 0;
+  Canceled = 0;
 
   while (cupsRasterReadHeader(ras, &header))
   {
@@ -475,7 +537,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Loop for each line on the page...
     */
 
-    for (y = 0; y < header.cupsHeight && !Cancelled; y ++)
+    for (y = 0; y < header.cupsHeight && !Canceled; y ++)
     {
      /*
       * Let the user know how far we have progressed...
@@ -496,7 +558,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       * Write it to the printer...
       */
 
-      OutputLine(&header);
+      OutputLine(&header, y);
     }
 
    /*
@@ -505,7 +567,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     EndPage(&header);
 
-    if (Cancelled)
+    if (Canceled)
       break;
   }
 
@@ -531,5 +593,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertodymo.c,v 1.4.2.10 2004/05/11 20:20:31 mike Exp $".
+ * End of "$Id: rastertodymo.c,v 1.4.2.11 2004/05/12 19:32:07 mike Exp $".
  */
