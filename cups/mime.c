@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.5 1999/01/30 13:25:57 mike Exp $"
+ * "$Id: mime.c,v 1.6 1999/02/01 22:08:39 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -33,10 +33,8 @@
  * Revision History:
  *
  *   $Log: mime.c,v $
- *   Revision 1.5  1999/01/30 13:25:57  mike
- *   Added additional Windows project files.
- *
- *   Fixed compile errors under Windows.
+ *   Revision 1.6  1999/02/01 22:08:39  mike
+ *   Restored original directory-scanning functionality of mimeLoad().
  *
  *   Revision 1.4  1999/01/27 18:31:56  mike
  *   Updated PPD routines to handle emulations and patch files.
@@ -59,7 +57,15 @@
 
 #include "mime.h"
 #include <config.h>
-#include <sys/stat.h>
+
+#ifdef HAVE_SYS_DIR_H
+#  include <sys/types.h>
+#  include <sys/dir.h>
+typedef struct direct DIRENT;
+#else
+#  include <dirent.h>
+typedef struct dirent DIRENT;
+#endif /* HAVE_SYS_DIR_H */
 
 
 /*
@@ -112,25 +118,69 @@ mime_t *			/* O - Updated MIME database */
 mimeMerge(mime_t *mime,		/* I - MIME database to add to */
           char   *pathname)	/* I - Directory to load */
 {
+  DIR		*dir;		/* Directory */
+  DIRENT	*dent;		/* Directory entry */
   char		filename[1024];	/* Full filename of types/converts file */
 
+
+ /*
+  * First open the directory specified by pathname...  Return NULL if nothing
+  * was read or if the pathname is NULL...
+  */
 
   if (pathname == NULL)
     return (NULL);
 
- /*
-  * Load a mime.types file...
-  */
-
-  sprintf(filename, "%s/mime.types", pathname);
-  load_types(mime, filename);
+  if ((dir = opendir(pathname)) == NULL)
+    return (NULL);
 
  /*
-  * Load a mime.convs file...
+  * If "mime" is NULL, make a new, blank database...
   */
 
-  sprintf(filename, "%s/mime.convs", pathname);
-  load_convs(mime, filename);
+  if (mime == NULL)
+    if ((mime = mimeNew()) == NULL)
+      return (NULL);
+
+ /*
+  * Read all the .types files...
+  */
+
+  while ((dent = readdir(dir)) != NULL)
+  {
+    if (dent->d_namlen > 6 &&
+        strcmp(dent->d_name + dent->d_namlen - 6, ".types") == 0)
+    {
+     /*
+      * Load a mime.types file...
+      */
+
+      sprintf(filename, "%s/%s", pathname, dent->d_name);
+      load_types(mime, filename);
+    };
+  };
+
+  rewinddir(dir);
+
+ /*
+  * Read all the .convs files...
+  */
+
+  while ((dent = readdir(dir)) != NULL)
+  {
+    if (dent->d_namlen > 6 &&
+        strcmp(dent->d_name + dent->d_namlen - 6, ".convs") == 0)
+    {
+     /*
+      * Load a mime.convs file...
+      */
+
+      sprintf(filename, "%s/%s", pathname, dent->d_name);
+      load_convs(mime, filename);
+    };
+  };
+
+  closedir(dir);
 
   return (mime);
 }
@@ -440,5 +490,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.5 1999/01/30 13:25:57 mike Exp $".
+ * End of "$Id: mime.c,v 1.6 1999/02/01 22:08:39 mike Exp $".
  */
