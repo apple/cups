@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.92 2001/05/21 21:32:50 mike Exp $"
+dnl "$Id: configure.in,v 1.93 2001/05/31 19:33:10 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -127,6 +127,10 @@ if test "$LIBTOOL" != ""; then
 else
 	LINKCUPS="-L../cups -lcups"
 	LINKCUPSIMAGE="-L../filter -lcupsimage"
+
+	if test $enable_shared = no; then
+		LINKCUPS="$LINKCUPS \$(SSLLIBS)"
+	fi
 fi
 
 AC_ARG_ENABLE(pam, [  --enable-pam        turn on PAM support [default=yes]])
@@ -716,5 +720,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.92 2001/05/21 21:32:50 mike Exp $".
+dnl End of "$Id: configure.in,v 1.93 2001/05/31 19:33:10 mike Exp $".
 dnl
