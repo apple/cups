@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c,v 1.16 2000/03/02 21:40:00 mike Exp $"
+ * "$Id: parallel.c,v 1.17 2000/03/02 22:04:12 mike Exp $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -479,6 +479,7 @@ list_devices(void)
       }
 #elif defined(__osf__)
   int	i;			/* Looping var */
+  int	fd;			/* File descriptor */
   char	device[255];		/* Device filename */
 
 
@@ -510,5 +511,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c,v 1.16 2000/03/02 21:40:00 mike Exp $".
+ * End of "$Id: parallel.c,v 1.17 2000/03/02 22:04:12 mike Exp $".
  */
