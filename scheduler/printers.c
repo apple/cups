@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.24 2002/08/01 00:45:48 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.25 2002/08/21 17:24:29 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1496,12 +1496,6 @@ SetPrinterState(printer_t    *p,	/* I - Printer to change */
 
   if ((old_state == IPP_PRINTER_STOPPED) != (s == IPP_PRINTER_STOPPED))
     SaveAllPrinters();
-
- /*
-  * Check to see if any pending jobs can now be printed...
-  */
-
-  CheckJobs();
 }
 
 
@@ -1568,7 +1562,13 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 {
   job_t	*job;			/* Active print job */
 
+
+ /*
+  * Set the printer state...
+  */
+
   p->state = IPP_PRINTER_STOPPED;
+
  /*
   * See if we have a job printing on this printer...
   */
@@ -2086,5 +2086,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.24 2002/08/01 00:45:48 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.25 2002/08/21 17:24:29 mike Exp $".
  */

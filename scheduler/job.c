@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.28 2002/08/21 02:06:25 mike Exp $"
+ * "$Id: job.c,v 1.124.2.29 2002/08/21 17:24:28 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -68,7 +68,8 @@
 static void		set_time(job_t *job, const char *name);
 static int		start_process(const char *command, char *argv[],
 			              char *envp[], int infd, int outfd,
-				      int errfd, int backfd, int root);
+				      int errfd, int backfd, int root,
+				      int *pid);
 
 
 /*
@@ -1718,7 +1719,7 @@ StartJob(int       id,		/* I - Job ID */
 
     pid = start_process(command, argv, envp, filterfds[!slot][0],
                         filterfds[slot][1], statusfds[1],
-			current->back_pipes[0], 0);
+			current->back_pipes[0], 0, current->filters + i);
 
     LogMessage(L_DEBUG2, "StartJob: Closing filter pipes for slot %d [ %d %d ]...",
                !slot, filterfds[!slot][0], filterfds[!slot][1]);
@@ -1735,8 +1736,6 @@ StartJob(int       id,		/* I - Job ID */
                filters[i].filter, strerror(errno));
       return;
     }
-
-    current->filters[i] = pid;
 
     LogMessage(L_INFO, "Started filter %s (PID %d) for job %d.",
                command, pid, current->id);
@@ -1770,7 +1769,8 @@ StartJob(int       id,		/* I - Job ID */
 
       pid = start_process(command, argv, envp, filterfds[!slot][0],
 			  filterfds[slot][1], statusfds[1],
-			  current->back_pipes[1], 1);
+			  current->back_pipes[1], 1,
+			  &(current->backend));
 
       if (pid == 0)
       {
@@ -1801,10 +1801,8 @@ StartJob(int       id,		/* I - Job ID */
       }
       else
       {
-	current->backend = pid;
-
-	LogMessage(L_INFO, "Started backend %s (PID %d) for job %d.", command, pid,
-                   current->id);
+	LogMessage(L_INFO, "Started backend %s (PID %d) for job %d.",
+	           command, pid, current->id);
       }
     }
 
@@ -2190,6 +2188,13 @@ UpdateJob(job_t *job)		/* I - Job to check */
       StopJob(job->id, 0);
       job->state->values[0].integer = IPP_JOB_PENDING;
       SaveJob(job->id);
+
+     /*
+      * If the job was queued to a class, try requeuing it...
+      */
+
+      if (job->dtype & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
+        CheckJobs();
     }
     else if (job->status > 0)
     {
@@ -2271,10 +2276,10 @@ start_process(const char *command,	/* I - Full path to command */
 	      int        outfd,		/* I - Standard output file descriptor */
 	      int        errfd,		/* I - Standard error file descriptor */
 	      int        backfd,	/* I - Backchannel file descriptor */
-	      int        root)		/* I - Run as root? */
+	      int        root,		/* I - Run as root? */
+	      int        *pid)          /* O - Process ID */
 {
   int	fd;				/* Looping var */
-  int	pid;				/* Process ID */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   sigset_t	oldmask,		/* POSIX signal masks */
 		newmask;
@@ -2288,14 +2293,17 @@ start_process(const char *command,	/* I - Full path to command */
   * Block signals before forking...
   */
 
-#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+#ifdef HAVE_SIGSET
+  sighold(SIGTERM);
+  sighold(SIGCHLD);
+#elif defined(HAVE_SIGACTION)
   sigemptyset(&newmask);
   sigaddset(&newmask, SIGTERM);
   sigaddset(&newmask, SIGCHLD);
   sigprocmask(SIG_BLOCK, &newmask, &oldmask);
-#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+#endif /* HAVE_SIGSET */
 
-  if ((pid = fork()) == 0)
+  if ((*pid = fork()) == 0)
   {
    /*
     * Child process goes here...
@@ -2374,7 +2382,7 @@ start_process(const char *command,	/* I - Full path to command */
 
     exit(errno);
   }
-  else if (pid < 0)
+  else if (*pid < 0)
   {
    /*
     * Error - couldn't fork a new process!
@@ -2382,17 +2390,20 @@ start_process(const char *command,	/* I - Full path to command */
 
     LogMessage(L_ERROR, "Unable to fork %s - %s.", command, strerror(errno));
 
-    return (0);
+    *pid = 0;
   }
 
-#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+#ifdef HAVE_SIGSET
+  sigrelse(SIGTERM);
+  sigrelse(SIGCHLD);
+#elif defined(HAVE_SIGACTION)
   sigprocmask(SIG_SETMASK, &oldmask, NULL);
-#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+#endif /* HAVE_SIGSET */
 
-  return (pid);
+  return (*pid);
 }
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.28 2002/08/21 02:06:25 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.29 2002/08/21 17:24:28 mike Exp $".
  */
