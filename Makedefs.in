@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.26 2000/07/07 19:13:52 mike Exp $"
+# "$Id: Makedefs.in,v 1.27 2000/07/31 16:12:10 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -30,6 +30,7 @@ AR	=	@AR@
 AWK	=	@AWK@
 CC	=	@LIBTOOL@ @CC@
 CHMOD	=	@CHMOD@
+CHOWN	=	@CHOWN@
 CP	=	@CP@
 CXX	=	@LIBTOOL@ @CXX@
 DSO	=	@DSO@
@@ -159,5 +160,5 @@ CAT8EXT		=	@CAT8EXT@
 	$(MV) t.z $@
 
 #
-# End of "$Id: Makedefs.in,v 1.26 2000/07/07 19:13:52 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.27 2000/07/31 16:12:10 mike Exp $"
 #

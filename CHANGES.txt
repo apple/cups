@@ -1,4 +1,4 @@
-CHANGES.txt - 07/24/2000
+CHANGES.txt - 07/31/2000
 ------------------------
 
 CHANGES IN CUPS v1.1.2
@@ -8,6 +8,10 @@ CHANGES IN CUPS v1.1.2
 	  them to avoid possible security exploitation.
 	- Now use /dev/random (if available) to seed the random
 	  number generator for certificates.
+	- The /var/spool/cups and /var/spool/cups/tmp directories
+	  were incorrectly owned by root; they are now owned by
+	  the filter user (typically "lp")
+	- Makefile/configure fixes
 
 
 CHANGES IN CUPS v1.1.1

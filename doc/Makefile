@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.27 2000/07/10 17:44:20 mike Exp $"
+# "$Id: Makefile,v 1.28 2000/07/31 16:12:13 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -99,14 +99,6 @@ all:	$(DOCUMENTS:.shtml=.pdf) $(DOCUMENTS:.shtml=.html) overview.pdf
 #
 
 ps:	$(DOCUMENTS:.shtml=.ps) overview.ps
-
-
-#
-# Make manuals for printing...
-#
-
-print:	sam-7x8.pdf spm-7x8.pdf sum-7x8.pdf \
-	sam-7x8.ps spm-7x8.ps sum-7x8.ps
 
 
 #

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.49 2000/07/20 17:07:00 mike Exp $"
+dnl "$Id: configure.in,v 1.50 2000/07/31 16:12:12 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -121,6 +121,7 @@ AC_PROG_CPP
 AC_PROG_RANLIB
 AC_PATH_PROG(AR,ar)
 AC_PATH_PROG(CHMOD,chmod)
+AC_PATH_PROG(CHOWN,chown)
 AC_PATH_PROG(CP,cp)
 AC_PATH_PROG(MV,mv)
 AC_PATH_PROG(NROFF,nroff)
@@ -479,5 +480,5 @@ AC_SUBST(CUPS_DOCROOT)
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.49 2000/07/20 17:07:00 mike Exp $".
+dnl End of "$Id: configure.in,v 1.50 2000/07/31 16:12:12 mike Exp $".
 dnl

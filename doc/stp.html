@@ -29,146 +29,146 @@ Copyright 1997-2000, All Rights Reserved<BR>
 <HR>
 <H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
 <BR>
-<BR><B><A HREF="#1">1  Scope</A></B>
+<BR><B><A HREF="#1">1 Scope</A></B>
 <UL>
-<LI><A HREF="#1_1">1.1  Identification</A></LI>
-<LI><A HREF="#1_2">1.2  System Overview</A></LI>
-<LI><A HREF="#1_3">1.3  Document Overview</A></LI>
+<LI><A HREF="#1_1">1.1 Identification</A></LI>
+<LI><A HREF="#1_2">1.2 System Overview</A></LI>
+<LI><A HREF="#1_3">1.3 Document Overview</A></LI>
 </UL>
-<B><A HREF="#2">2  References</A></B>
+<B><A HREF="#2">2 References</A></B>
 <UL>
-<LI><A HREF="#2_1">2.1  CUPS Documentation</A></LI>
-<LI><A HREF="#2_2">2.2  Other Documents</A></LI>
+<LI><A HREF="#2_1">2.1 CUPS Documentation</A></LI>
+<LI><A HREF="#2_2">2.2 Other Documents</A></LI>
 </UL>
-<B><A HREF="#3">3  Local Tests</A></B>
+<B><A HREF="#3">3 Local Tests</A></B>
 <BR>
-<BR><B><A HREF="#4">4  Remote Tests</A></B>
+<BR><B><A HREF="#4">4 Remote Tests</A></B>
 <BR>
-<BR><B><A HREF="#5">A  Glossary</A></B>
+<BR><B><A HREF="#5">A Glossary</A></B>
 <UL>
-<LI><A HREF="#5_1">A.1  Terms</A></LI>
-<LI><A HREF="#5_2">A.2  Acronyms</A></LI>
+<LI><A HREF="#5_1">A.1 Terms</A></LI>
+<LI><A HREF="#5_2">A.2 Acronyms</A></LI>
 </UL>
 <HR>
-<H1><A NAME="1">1  Scope</A></H1>
-<H2><A NAME="1_1">1.1  Identification</A></H2>
-<P> This software test plan provides detailed tests that are used to 
+<H1><A NAME="1">1 Scope</A></H1>
+<H2><A NAME="1_1">1.1 Identification</A></H2>
+<P>This software test plan provides detailed tests that are used to 
 evaluate the stability of the Common UNIX Printing System (&quot;CUPS&quot;) 
 Version 1.1. </P>
-<H2><A NAME="1_2">1.2  System Overview</A></H2>
-<P> CUPS provides a portable printing layer for UNIX&reg;-based operating 
+<H2><A NAME="1_2">1.2 System Overview</A></H2>
+<P>CUPS provides a portable printing layer for UNIX&reg;-based operating 
 systems. It has been developed by <A HREF="http://www.easysw.com">Easy 
 Software Products</A> to promote a standard printing solution for all 
 UNIX vendors and users. CUPS provides the System V and Berkeley 
 command-line interfaces. </P>
-<P> CUPS uses the Internet Printing Protocol (&quot;IPP&quot;) as the basis for 
+<P>CUPS uses the Internet Printing Protocol (&quot;IPP&quot;) as the basis for 
 managing print jobs and queues. The Line Printer Daemon (&quot;LPD&quot;) Server 
 Message Block (&quot;SMB&quot;), and AppSocket (a.k.a. JetDirect) protocols are 
 also supported with reduced functionality. CUPS adds network printer 
 browsing and PostScript Printer Description (&quot;PPD&quot;) based printing 
 options to support real-world printing under UNIX. </P>
-<P> CUPS also includes a customized version of GNU Ghostscript 
+<P>CUPS also includes a customized version of GNU Ghostscript 
 (currently based off GNU Ghostscript 5.50) and an image file RIP that 
 are used to support non-PostScript printers. Sample drivers for HP and 
 EPSON printers are included that use these filters. </P>
-<H2><A NAME="1_3">1.3  Document Overview</A></H2>
-<P> This software test plan is organized into the following sections: </P>
+<H2><A NAME="1_3">1.3 Document Overview</A></H2>
+<P>This software test plan is organized into the following sections: </P>
 <UL>
-<LI> 1 - Scope</LI>
-<LI> 2 - References</LI>
-<LI> 3 - Local Tests</LI>
-<LI> 4 - Remote Tests</LI>
-<LI> A - Glossary</LI>
+<LI>1 - Scope</LI>
+<LI>2 - References</LI>
+<LI>3 - Local Tests</LI>
+<LI>4 - Remote Tests</LI>
+<LI>A - Glossary</LI>
 </UL>
-<H1><A NAME="2">2  References</A></H1>
-<H2><A NAME="2_1">2.1  CUPS Documentation</A></H2>
-<P> The following CUPS documentation is referenced by this document: </P>
+<H1><A NAME="2">2 References</A></H1>
+<H2><A NAME="2_1">2.1 CUPS Documentation</A></H2>
+<P>The following CUPS documentation is referenced by this document: </P>
 <UL>
-<LI> CUPS-CMP-1.1: CUPS Configuration Management Plan </LI>
-<LI> CUPS-IDD-1.1: CUPS System Interface Design Description </LI>
-<LI> CUPS-IPP-1.1: CUPS Implmentation of IPP </LI>
-<LI> CUPS-SAM-1.1.x: CUPS Software Administrators Manual </LI>
-<LI> CUPS-SDD-1.1: CUPS Software Design Description </LI>
-<LI> CUPS-SPM-1.1.x: CUPS Software Programming Manual </LI>
-<LI> CUPS-SSR-1.1: CUPS Software Security Report </LI>
-<LI> CUPS-STP-1.1: CUPS Software Test Plan </LI>
-<LI> CUPS-SUM-1.1.x: CUPS Software Users Manual </LI>
-<LI> CUPS-SVD-1.1.x: CUPS Software Version Description </LI>
+<LI>CUPS-CMP-1.1: CUPS Configuration Management Plan </LI>
+<LI>CUPS-IDD-1.1: CUPS System Interface Design Description </LI>
+<LI>CUPS-IPP-1.1: CUPS Implmentation of IPP </LI>
+<LI>CUPS-SAM-1.1.x: CUPS Software Administrators Manual </LI>
+<LI>CUPS-SDD-1.1: CUPS Software Design Description </LI>
+<LI>CUPS-SPM-1.1.x: CUPS Software Programming Manual </LI>
+<LI>CUPS-SSR-1.1: CUPS Software Security Report </LI>
+<LI>CUPS-STP-1.1: CUPS Software Test Plan </LI>
+<LI>CUPS-SUM-1.1.x: CUPS Software Users Manual </LI>
+<LI>CUPS-SVD-1.1: CUPS Software Version Description </LI>
 </UL>
-<H2><A NAME="2_2">2.2  Other Documents</A></H2>
-<P> The following non-CUPS documents are referenced by this document: </P>
+<H2><A NAME="2_2">2.2 Other Documents</A></H2>
+<P>The following non-CUPS documents are referenced by this document: </P>
 <UL>
 <LI><A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/5003.PPD_Spec_v4.3.pdf">
- Adobe  PostScript Printer Description File Format Specification, 
+Adobe  PostScript Printer Description File Format Specification, 
  Version 4.3.</A></LI>
 <LI><A HREF="http://partners.adobe.com/asn/developer/PDFS/TN/PLRM.pdf">
- Adobe  PostScript Language Reference, Third Edition.</A></LI>
-<LI> IPP: Job and Printer Set Operations </LI>
-<LI> IPP/1.1: Encoding and Transport </LI>
-<LI> IPP/1.1: Implementers Guide </LI>
-<LI> IPP/1.1: Model and Semantics </LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc1179.txt"> RFC 1179, Line 
+Adobe  PostScript Language Reference, Third Edition.</A></LI>
+<LI>IPP: Job and Printer Set Operations </LI>
+<LI>IPP/1.1: Encoding and Transport </LI>
+<LI>IPP/1.1: Implementers Guide </LI>
+<LI>IPP/1.1: Model and Semantics </LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc1179.txt">RFC 1179, Line 
 Printer Daemon Protocol</A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2567.txt"> RFC 2567, Design 
+<LI><A HREF="http://www.ietf.org/rfc/rfc2567.txt">RFC 2567, Design 
 Goals for an Internet Printing Protocol</A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2568.txt"> RFC 2568, Rationale 
+<LI><A HREF="http://www.ietf.org/rfc/rfc2568.txt">RFC 2568, Rationale 
 for the Structure of the Model and Protocol</A> for the Internet 
 Printing Protocol</LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2569.txt"> RFC 2569, Mapping 
+<LI><A HREF="http://www.ietf.org/rfc/rfc2569.txt">RFC 2569, Mapping 
 between LPD and IPP Protocols</A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2616.txt"> RFC 2616, Hypertext 
+<LI><A HREF="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616, Hypertext 
 Transfer Protocol -- HTTP/1.1</A></LI>
-<LI><A HREF="http://www.ietf.org/rfc/rfc2617.txt"> RFC 2617, HTTP 
+<LI><A HREF="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617, HTTP 
 Authentication: Basic and Digest Access</A> Authentication </LI>
 </UL>
-<H1><A NAME="3">3  Local Tests</A></H1>
-<H1><A NAME="4">4  Remote Tests</A></H1>
-<H1 TYPE="A" VALUE="1"><A NAME="5">A  Glossary</A></H1>
-<H2><A NAME="5_1">A.1  Terms</A></H2>
+<H1><A NAME="3">3 Local Tests</A></H1>
+<H1><A NAME="4">4 Remote Tests</A></H1>
+<H1 TYPE="A" VALUE="1"><A NAME="5">A Glossary</A></H1>
+<H2><A NAME="5_1">A.1 Terms</A></H2>
 <DL>
-<DT> C </DT>
-<DD> A computer language. </DD>
-<DT> parallel </DT>
-<DD> Sending or receiving data more than 1 bit at a time. </DD>
-<DT> pipe </DT>
-<DD> A one-way communications channel between two programs. </DD>
-<DT> serial </DT>
-<DD> Sending or receiving data 1 bit at a time. </DD>
-<DT> socket </DT>
-<DD> A two-way network communications channel. </DD>
+<DT>C </DT>
+<DD>A computer language. </DD>
+<DT>parallel </DT>
+<DD>Sending or receiving data more than 1 bit at a time. </DD>
+<DT>pipe </DT>
+<DD>A one-way communications channel between two programs. </DD>
+<DT>serial </DT>
+<DD>Sending or receiving data 1 bit at a time. </DD>
+<DT>socket </DT>
+<DD>A two-way network communications channel. </DD>
 </DL>
-<H2><A NAME="5_2">A.2  Acronyms</A></H2>
+<H2><A NAME="5_2">A.2 Acronyms</A></H2>
 <DL>
-<DT> ASCII </DT>
-<DD> American Standard Code for Information Interchange </DD>
-<DT> CUPS </DT>
-<DD> Common UNIX Printing System </DD>
-<DT> ESC/P </DT>
-<DD> EPSON Standard Code for Printers </DD>
-<DT> FTP </DT>
-<DD> File Transfer Protocol </DD>
-<DT> HP-GL </DT>
-<DD> Hewlett-Packard Graphics Language </DD>
-<DT> HP-PCL </DT>
-<DD> Hewlett-Packard Page Control Language </DD>
-<DT> HP-PJL </DT>
-<DD> Hewlett-Packard Printer Job Language </DD>
-<DT> IETF </DT>
-<DD> Internet Engineering Task Force </DD>
-<DT> IPP </DT>
-<DD> Internet Printing Protocol </DD>
-<DT> ISO </DT>
-<DD> International Standards Organization </DD>
-<DT> LPD </DT>
-<DD> Line Printer Daemon </DD>
-<DT> MIME </DT>
-<DD> Multimedia Internet Mail Exchange </DD>
-<DT> PPD </DT>
-<DD> PostScript Printer Description </DD>
-<DT> SMB </DT>
-<DD> Server Message Block </DD>
-<DT> TFTP </DT>
-<DD> Trivial File Transfer Protocol </DD>
+<DT>ASCII </DT>
+<DD>American Standard Code for Information Interchange </DD>
+<DT>CUPS </DT>
+<DD>Common UNIX Printing System </DD>
+<DT>ESC/P </DT>
+<DD>EPSON Standard Code for Printers </DD>
+<DT>FTP </DT>
+<DD>File Transfer Protocol </DD>
+<DT>HP-GL </DT>
+<DD>Hewlett-Packard Graphics Language </DD>
+<DT>HP-PCL </DT>
+<DD>Hewlett-Packard Page Control Language </DD>
+<DT>HP-PJL </DT>
+<DD>Hewlett-Packard Printer Job Language </DD>
+<DT>IETF </DT>
+<DD>Internet Engineering Task Force </DD>
+<DT>IPP </DT>
+<DD>Internet Printing Protocol </DD>
+<DT>ISO </DT>
+<DD>International Standards Organization </DD>
+<DT>LPD </DT>
+<DD>Line Printer Daemon </DD>
+<DT>MIME </DT>
+<DD>Multimedia Internet Mail Exchange </DD>
+<DT>PPD </DT>
+<DD>PostScript Printer Description </DD>
+<DT>SMB </DT>
+<DD>Server Message Block </DD>
+<DT>TFTP </DT>
+<DD>Trivial File Transfer Protocol </DD>
 </DL>
 </BODY>
 </HTML>
