@@ -1,7 +1,7 @@
 /*
- * "$Id: ieee1394.c,v 1.1.2.1 2002/05/24 18:15:46 mike Exp $"
+ * "$Id: ieee1394.c,v 1.1.2.2 2002/05/24 20:57:35 mike Exp $"
  *
- *   AppSocket backend for the Common UNIX Printing System (CUPS).
+ *   IEEE-1394 backend for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 2002 by Easy Software Products, all rights reserved.
  *
@@ -259,5 +259,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: ieee1394.c,v 1.1.2.1 2002/05/24 18:15:46 mike Exp $".
+ * End of "$Id: ieee1394.c,v 1.1.2.2 2002/05/24 20:57:35 mike Exp $".
  */
