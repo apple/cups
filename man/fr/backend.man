@@ -1,0 +1,113 @@
+.\"
+.\" "$Id: backend.man,v 1.1 2002/05/21 19:59:41 mike Exp $"
+.\"
+.\"   backend man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2002 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH backend 1 "Common UNIX Printing System" "22 Juin 2000" "Easy Software Products"
+.SH NOM
+backend \- Programme de transmission de CUPS
+.SH SYNOPSIS
+.B backend
+travail utilisateur titre nb-copies options [
+.I fichier
+]
+.SH DESCRIPTION
+Les programmes de transmission de CUPS fournissent une méthode standard
+d'envoi des fichiers aux différentes interfaces physiques.
+.LP
+Ces programmes doivent être capable de lire un fichier de la ligne de
+commande ou via l'entrée standard, si besoin est en recopiant son contenu
+dans un fichier temporaire.
+.LP
+Le nom de la commande (argv[0]) est l'URI de l'imprimante.
+.SH VARIABLES D'ENVIRONNEMENT
+Les variables d'environnement suivantes sont définies par le serveur CUPS
+lors de l'exécution d'un programme de transmission\ :
+.TP 5
+CHARSET
+.br
+Le jeu de caractères par défaut (généralement us-ascii ou iso-8859-1).
+.TP 5
+CONTENT_TYPE
+.br
+Le type MIME associé au fichier (ex\ : application/postscript).
+.TP 5
+CUPS_DATADIR
+.br
+Le répertoire où se trouvent les données.
+.TP 5
+CUPS_SERVERROOT
+.br
+Le répertoire racine du serveur.
+.TP 5
+DEVICE_URI
+.br
+L'URI de l'imprimante, ceci pour les scripts shells qui ne sont pas
+toujours capables de récupérer l'argument argv[0].
+.TP 5
+LANG
+.br
+La langue (généralement C ou en).
+.TP 5
+PATH
+.br
+La liste des chemins où chercher les programmes pouvant être exécutés
+par le programme.
+.TP 5
+PPD
+.br
+Le chemin complet d'accès au fichier PPD (PostScript Printer Description)
+de l'imprimante.
+.TP 5
+PRINTER
+.br
+Le nom de l'imprimante.
+.TP 5
+RIP_CACHE
+.br
+La quantité de mémoire recommandée pour l'utilisation du RIP (Raster Image
+Processors).
+.TP 5
+SOFTWARE
+.br
+Le nom et le numéro de version du serveur (généralement CUPS/1.1).
+.TP 5
+TZ
+.br
+Le fuseau horaire du serveur.
+.TP 5
+USER
+.br
+L'utilisateur exécutant le programme (généralement lp).
+.SH VOIR AUSSI
+cupsd(8), filter(1)
+CUPS Interface Design Description,
+CUPS Software Administrators Manual,
+CUPS Software Programmers Manual,
+http://localhost:631/documentation.html
+.SH COPYRIGHT
+Copyright 1993-2002 Easy Software Products, Tous droits réservés.
+.SH TRADUCTION
+Gilles QUERRET <gilles.querret@nerim.net>
+.\"
+.\" End of "$Id: backend.man,v 1.1 2002/05/21 19:59:41 mike Exp $".
+.\"
+

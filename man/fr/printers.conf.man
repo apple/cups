@@ -1,0 +1,75 @@
+.\"
+.\" "$Id: printers.conf.man,v 1.1 2002/05/21 19:59:43 mike Exp $"
+.\"
+.\"   printers.conf man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2002 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH printers.conf 5 "Common UNIX Printing System" "22 June 2000" "Easy Software Products"
+.SH NOM
+printers.conf \- Fichier de configuration des imprimantes CUPS
+.SH DESCRIPTION
+Le fichier \fIprinters.conf\fR définit les imprimantes locales
+de la machine. Il est habituellement situé dans le répertoire \fI/etc/cups\fR
+et est généré automatiquement par le programme \fIcupsd(8)\fR lors
+de l'ajout ou de la suppression d'imprimantes.
+.LP
+Chaque ligne du fichier est une directive de configuration, une ligne
+vide ou un commentaire (ligne commençant par la caractère #).
+.SH DIRECTIVES
+.TP 5
+Accepting
+.br
+Définit si l'imprimante accepte ou non les travaux d'impression.
+.TP 5
+Info
+.br
+Définit un commentaire de description de l'imprimante.
+.TP 5
+Location
+.br
+Définit un commentaire concernant la localisation physique de l'imprimante.
+.TP 5
+DeviceURI
+.br
+Définit l'URI de l'imprimante.
+.TP 5
+<Printer name> ... </Printer>
+.br
+Définit une imprimante.
+.TP 5
+State
+.br
+Définit l'état initial de l'imprimante (Idle ou Stopped).
+.TP 5
+StateMessage
+.br
+Définit le message associé à cet état.
+.SH VOIR AUSSI
+classes.conf(5), cupsd(8), cupsd.conf(5), mime.convs(5), mime.types(5),
+CUPS Software Administrators Manual,
+CUPS Interface Design Description,
+http://localhost:631/documentation.html
+.SH COPYRIGHT
+Copyright 1993-2002 Easy Software Products, Tous droits réservés.
+.SH TRADUCTION
+Gilles QUERRET <gilles.querret@nerim.net>
+.\"
+.\" End of "$Id: printers.conf.man,v 1.1 2002/05/21 19:59:43 mike Exp $".
+.\"

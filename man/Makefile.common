@@ -1,0 +1,84 @@
+#
+# "$Id: Makefile.common,v 1.1 2002/05/21 19:59:41 mike Exp $"
+#
+#   Man pages definitions for the Common UNIX Printing System (CUPS).
+#
+#   Copyright 1993-2002 by Easy Software Products.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Easy Software Products and are protected by Federal
+#   copyright law.  Distribution and use rights are outlined in the file
+#   "LICENSE.txt" which should have been included with this file.  If this
+#   file is missing or damaged please contact Easy Software Products
+#   at:
+#
+#       Attn: CUPS Licensing Information
+#       Easy Software Products
+#       44141 Airport View Drive, Suite 204
+#       Hollywood, Maryland 20636-3111 USA
+#
+#       Voice: (301) 373-9603
+#       EMail: cups-info@cups.org
+#         WWW: http://www.cups.org
+#
+
+#
+# Man pages...
+#
+
+MAN1	=	backend.man \
+		filter.man \
+		lp.man \
+		lpoptions.man \
+		lppasswd.man \
+		lpq.man \
+		lprm.man \
+		lpr.man \
+		lpstat.man
+MAN3	=	cups-config.man
+MAN5	=	classes.conf.man \
+		cupsd.conf.man \
+		mime.convs.man \
+		mime.types.man \
+		printers.conf.man
+MAN8	=	accept.man \
+		cupsaddsmb.man \
+		cups-lpd.man \
+		cups-polld.man \
+		cupsd.man \
+		enable.man \
+		lpadmin.man \
+		lpinfo.man \
+		lpmove.man \
+		lpc.man
+
+CAT1	=	backend.$(CAT1EXT) \
+		filter.$(CAT1EXT) \
+		lp.$(CAT1EXT) \
+		lpoptions.$(CAT1EXT) \
+		lppasswd.$(CAT1EXT) \
+		lpq.$(CAT1EXT) \
+		lprm.$(CAT1EXT) \
+		lpr.$(CAT1EXT) \
+		lpstat.$(CAT1EXT)
+CAT3	=	cups-config.$(CAT3EXT)
+CAT5	=	classes.conf.$(CAT5EXT) \
+		cupsd.conf.$(CAT5EXT) \
+		mime.convs.$(CAT5EXT) \
+		mime.types.$(CAT5EXT) \
+		printers.conf.$(CAT5EXT)
+CAT8	=	accept.$(CAT8EXT) \
+		cupsaddsmb.$(CAT8EXT) \
+		cups-lpd.$(CAT8EXT) \
+		cups-polld.$(CAT8EXT) \
+		cupsd.$(CAT8EXT) \
+		enable.$(CAT8EXT) \
+		lpadmin.$(CAT8EXT) \
+		lpinfo.$(CAT8EXT) \
+		lpmove.$(CAT8EXT) \
+		lpc.$(CAT8EXT)
+
+
+#
+# End of "$Id: Makefile.common,v 1.1 2002/05/21 19:59:41 mike Exp $".
+#

@@ -1,0 +1,59 @@
+.\"
+.\" "$Id: lpq.man,v 1.1 2002/05/21 19:59:43 mike Exp $"
+.\"
+.\"   lpq man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2001 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH lpq 1 "Common UNIX Printing System" "13 Février 2001" "Easy Software Products"
+.SH NOM
+lpq \- Affiche les travaux en attente d'une imprimante
+.SH SYNOPSIS
+.B lpq
+[ -E ] [ \-P
+.I destination
+] [ \-a ] [ \-l ] [
+.I +intervalle
+]
+.SH DESCRIPTION
+\fIlpq\fR affiche les travaux en attente d'une imprimante. Si aucune imprimante
+ou classe n'est donnée dans la ligne de commande, les travaux en attente
+sur la destination par défaut seront affichés.
+.LP
+L'option \fIintervalle\fR permet d'afficher les travaux en attente en continu
+jusqu'à ce qu'il n'y en ait plus. La liste est réaffichée toutes les \fIintervalle\fR
+secondes.
+.LP
+L'option \fI-E\fR force le cryptage lors de la connexion au serveur.
+.LP
+L'option \fI-a\fR affiche les travaux de toutes les imprimantes.
+.LP
+L'option \fI-l\fR affiche les travaux dans un format verbeux.
+.SH VOIR AUSSI
+cancel(1), lp(1), lpr(1), lprm(1), lpstat(1)
+.br
+CUPS Software Users Manual,
+http://localhost:631/documentation.html
+.SH COPYRIGHT
+Copyright 1993-2001 Easy Software Products, Tous droits réservés.
+.SH TRADUCTION
+Gilles QUERRET <gilles.querret@nerim.net>
+.\"
+.\" End of "$Id: lpq.man,v 1.1 2002/05/21 19:59:43 mike Exp $".
+.\"

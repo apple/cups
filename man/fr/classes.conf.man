@@ -1,0 +1,75 @@
+.\"
+.\" "$Id: classes.conf.man,v 1.1 2002/05/21 19:59:42 mike Exp $"
+.\"
+.\"   classes.conf man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2002 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH classes.conf 5 "Common UNIX Printing System" "22 Juin 2000" "Easy Software Products"
+.SH NOM
+classes.conf \- Fichier de configuration des classes de CUPS
+.SH DESCRIPTION
+Le fichier \fIclasses.conf\fR définit les classes d'imprimantes disponibles. Il est
+habituellement situé dans le répertoire \fI/etc/cups\fR et est généré automatiquement
+par le programme \fIcupsd(8)\fR lorsque des classes d'imprimantes sont créées ou
+supprimées.
+.LP
+Chaque ligne de ce fichier est une directive de configuration, une ligne vide ou
+un commentaire. Les commentaires commencent par le symbole #.
+.SH DIRECTIVES
+.TP 5
+<Class name> ... </Class>
+.br
+Définit une classe d'imprimantes.
+.TP 5
+Accepting
+.br
+Définit si la classe d'imprimante accepte les travaux d'impression ou non.
+.TP 5
+Info
+.br
+Définit une information à destination des utilisateurs pour la classe d'imprimantes.
+.TP 5
+Location
+.br
+Définit la localisation physique de la classe d'imprimantes à destination des utilisateurs.
+.TP 5
+Printer
+.br
+Associe une imprimante à une classe.
+.TP 5
+State
+.br
+Définit l'état initial de la classe d'imprimante (Idle ou Stopped).
+.TP 5
+StateMessage
+.br
+Définit le message associé à l'état.
+.SH VOIR AUSSI
+cupsd(8), cupsd.conf(5), mime.convs(5), mime.types(5), printers.conf(5),
+CUPS Software Administrators Manual,
+http://localhost:631/documentation.html
+.SH COPYRIGHT
+Copyright 1993-2002 Easy Software Products, Tous droits réservés.
+.SH TRADUCTION
+Gilles QUERRET <gilles.querret@nerim.net>
+.\"
+.\" End of "$Id: classes.conf.man,v 1.1 2002/05/21 19:59:42 mike Exp $".
+.\"
+

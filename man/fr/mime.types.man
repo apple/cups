@@ -1,0 +1,104 @@
+.\"
+.\" "$Id: mime.types.man,v 1.1 2002/05/21 19:59:43 mike Exp $"
+.\"
+.\"   mime.types man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2002 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH mime.types 5 "Common UNIX Printing System" "22 June 2000" "Easy Software Products"
+.SH NOM
+mime.types \- Fichier de description des types MIME de CUPS
+.SH DESCRIPTION
+Le fichier \fImime.types\fR définit les types de fichier reconnus par CUPS.
+.LP
+D'autres types de fichiers peuvent être ajoutés au fichier \fImime.types\fR
+ou à d'autres fichier dans le répertoire \fB/etc/cups\fR. Ceux-ci doivent
+porter l'extension «\ .types\ ».
+.LP
+Chaque ligne du fichier \fImime.types\fR est soit une règle, soit
+une ligne vide, soit un commentaire (ligne commençant par le caractère
+#). Chaque ligne définissant une règle commence par le nom du type MIME,
+et peut être suivi par une liste de règle des reconnaissance utilisées
+pour déterminer le type du fichier\ :
+.br
+.nf
+
+    super/type règle [ ... règleN]
+.fi
+Ces règles doivent être mises entre parenthèses, liées par un "+" pour
+exprimer un ET logique, "," ou une espace pour exprimer un OU logique.
+Elles sont précédées de "!" pour exprimer un NON logique.
+.SH RÈGLES
+Les règles sont composées de deux parties\ : une extension de fichier et des
+fonctions de tests entre parenthèses. Les fonctions suivantes peuvent être
+utilisées\ :
+.TP 5
+match("motif")
+.br
+Reconnaissance d'un motif sur le nom du fichier
+.TP 5
+ascii(début, longueur)
+.br
+Vrai si tous les octets de la portion de document sont des caractères ASCII
+imprimables (CR, NL, TAB, BS, 32-126)
+.TP 5
+printable(début, longueur)
+.br
+Vrai si tous les octets de la portion de document sont des caractères 8 bits
+imprimables (CR, NL, TAB, BS, 32-126, 128-254)
+.TP 5
+string(début, "chaîne")
+.br
+Vrai si les octets sont identiques à "chaîne"
+.TP 5
+char(début, valeur)
+.br
+Vrai si les octets sont identiques
+.TP 5
+short(début, valeur)
+.br
+Vrai si les nombres entiers (16 bits) sont identiques
+.TP 5
+int(début, valeur)
+.br
+Vrai si les nombres entiers (32 bits) sont identiques
+.TP 5
+locale("chaîne")
+.br
+Vrai si les définitions de langage sont identiques
+.TP 5
+contains(début, portée, "chaîne")
+.br
+Vrai si la chaîne est trouvée dans la portion de document
+.SH CHAÎNES DE CARACTÈRES
+Les chaînes de caractères peuvent être définies entre guillemets ("")
+pour des chaînes contenant des espaces ou entre crochets (<>) pour des
+chaînes en hexadécimal.
+.SH VOIR AUSSI
+classes.conf(5), cupsd(8), cupsd.conf(5), mime.convs(5), printers.conf(5),
+CUPS Software Administrators Manual,
+http://localhost:631/documentation.html
+.SH COPYRIGHT
+Copyright 1993-2002 Easy Software Products, Tous droits réservés.
+.SH TRADUCTION
+Gilles QUERRET <gilles.querret@nerim.net>
+.\"
+.\" End of "$Id: mime.types.man,v 1.1 2002/05/21 19:59:43 mike Exp $".
+.\"
+
