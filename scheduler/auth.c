@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.11 1999/05/17 18:03:40 mike Exp $"
+ * "$Id: auth.c,v 1.12 1999/05/20 18:43:05 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -356,15 +356,24 @@ IsAuthorized(client_t *con)	/* I - Connection */
     return (HTTP_UNAUTHORIZED);
   }
 
+  DEBUG_printf(("pw->pw_passwd = \"%s\"\n", pw->pw_passwd));
+
 #ifdef HAVE_SHADOW_H
   spw = getspnam(con->username);
   endspent();
 
-  if (spw == NULL)			/* No such user or damaged shadow file */
-    return (HTTP_UNAUTHORIZED);
+  if (spw == NULL && strcmp(pw->pw_passwd, "x") == 0)
+    return (HTTP_UNAUTHORIZED);		/* No such user or bad shadow file */
 
-  if (spw->sp_pwdp[0] == '\0')		/* Don't allow blank passwords! */
-  {
+#  ifdef DEBUG
+  if (spw != NULL)
+    printf("spw->sp_pwdp = \"%s\"\n", spw->sp_pwdp);
+  else
+    puts("spw = NULL");
+#  endif /* DEBUG */
+
+  if (spw != NULL && spw->sp_pwdp[0] == '\0')
+  {					/* Don't allow blank passwords! */
     LogMessage(LOG_WARN, "IsAuthorized: Username \"%s\" has no password; access denied.",
                con->username);
     return (HTTP_UNAUTHORIZED);
@@ -567,5 +576,5 @@ check_auth(unsigned   ip,	/* I - Client address */
 
 
 /*
- * End of "$Id: auth.c,v 1.11 1999/05/17 18:03:40 mike Exp $".
+ * End of "$Id: auth.c,v 1.12 1999/05/20 18:43:05 mike Exp $".
  */

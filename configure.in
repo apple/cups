@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.12 1999/05/19 20:17:11 mike Exp $"
+dnl "$Id: configure.in,v 1.13 1999/05/20 18:43:03 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -60,7 +60,7 @@ fi
 
 dnl Check for libraries...
 AC_CHECK_LIB(c,crypt,LIBS="$LIBS",AC_CHECK_LIB(crypt,crypt))
-AC_CHECK_HEADER(crypt.h)
+AC_CHECK_HEADER(crypt.h, AC_DEFINE(HAVE_CRYPT_H))
 AC_CHECK_LIB(sec,getspent)
 AC_CHECK_LIB(socket,socket,
 if test "$uname" != "IRIX"; then
@@ -135,5 +135,5 @@ AC_SUBST(CUPS_DATADIR)
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.12 1999/05/19 20:17:11 mike Exp $".
+dnl End of "$Id: configure.in,v 1.13 1999/05/20 18:43:03 mike Exp $".
 dnl
