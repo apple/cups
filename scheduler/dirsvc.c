@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.6 1999/04/22 20:42:19 mike Exp $"
+ * "$Id: dirsvc.c,v 1.7 1999/04/22 21:24:05 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -72,10 +72,6 @@ StartBrowsing(void)
 
  /*
   * Bind the socket to browse port...
-  */
-
- /*
-  * Setup the broadcast address...
   */
 
   memset(&addr, 0, sizeof(addr));
@@ -160,7 +156,10 @@ UpdateBrowseList(void)
   */
 
   if ((bytes = recv(BrowseSocket, packet, sizeof(packet), 0)) <= 0)
+  {
+    perror("UpdateBrowseList");
     return;
+  }
 
   packet[bytes] = '\0';
   fprintf(stderr, "UpdateBrowseList: %s", packet);
@@ -283,12 +282,14 @@ SendBrowseList(void)
       */
 
       for (i = 0; i < NumBrowsers; i ++)
-	sendto(BrowseSocket, packet, bytes, 0, Browsers + i, sizeof(Browsers[0]));
+	if (sendto(BrowseSocket, packet, bytes, 0, Browsers + i,
+	           sizeof(Browsers[0])) <= 0)
+	  perror("SendBrowseList");
     }
   }
 }
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.6 1999/04/22 20:42:19 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.7 1999/04/22 21:24:05 mike Exp $".
  */
