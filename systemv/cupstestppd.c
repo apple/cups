@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.28 2004/02/25 20:01:37 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.29 2004/02/26 16:27:51 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -310,12 +310,7 @@ main(int  argc,			/* I - Number of command-line arguments */
         }
       }
 
-      if (ppdFindAttr(ppd, "DefaultImageableArea", NULL) != NULL)
-      {
-	if (verbose > 0)
-	  puts("        PASS    DefaultImageableArea");
-      }
-      else
+      if ((attr = ppdFindAttr(ppd, "DefaultImageableArea", NULL)) == NULL)
       {
 	if (verbose >= 0)
 	{
@@ -328,13 +323,26 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	errors ++;
       }
-
-      if (ppdFindAttr(ppd, "DefaultPaperDimension", NULL) != NULL)
+      else if (ppdPageSize(ppd, attr->value) == NULL)
       {
-	if (verbose > 0)
-	  puts("        PASS    DefaultPaperDimension");
+	if (verbose >= 0)
+	{
+	  if (!errors && !verbose)
+	    puts(" FAIL");
+
+	  printf("      **FAIL**  BAD DefaultImageableArea %s!\n", attr->value);
+	  puts("                REF: Page 102, section 5.15.");
+        }
+
+	errors ++;
       }
       else
+      {
+	if (verbose > 0)
+	  puts("        PASS    DefaultImageableArea");
+      }
+
+      if (ppdFindAttr(ppd, "DefaultPaperDimension", NULL) == NULL)
       {
 	if (verbose >= 0)
 	{
@@ -347,6 +355,21 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	errors ++;
       }
+      else if (ppdPageSize(ppd, attr->value) == NULL)
+      {
+	if (verbose >= 0)
+	{
+	  if (!errors && !verbose)
+	    puts(" FAIL");
+
+	  printf("      **FAIL**  BAD DefaultPaperDimension %s!\n", attr->value);
+	  puts("                REF: Page 103, section 5.15.");
+        }
+
+	errors ++;
+      }
+      else if (verbose > 0)
+	puts("        PASS    DefaultPaperDimension");
 
       for (j = 0, group = ppd->groups; j < ppd->num_groups; j ++, group ++)
 	for (k = 0, option = group->options; k < group->num_options; k ++, option ++)
@@ -357,7 +380,21 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	  if (option->defchoice[0])
 	  {
-	    if (verbose > 0)
+            if (ppdFindChoice(option, option->defchoice) == NULL)
+	    {
+	      if (verbose >= 0)
+	      {
+		if (!errors && !verbose)
+		  puts(" FAIL");
+
+		printf("      **FAIL**  BAD Default%s %s\n", option->keyword,
+	               option->defchoice);
+		puts("                REF: Page 40, section 4.5.");
+              }
+
+	      errors ++;
+	    }
+	    else if (verbose > 0)
 	      printf("        PASS    Default%s\n", option->keyword);
 	  }
 	  else
@@ -1121,5 +1158,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.28 2004/02/25 20:01:37 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.29 2004/02/26 16:27:51 mike Exp $".
  */

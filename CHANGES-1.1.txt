@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The cupstestppd utility now fails PPD files that have
+	  a DefaultOption keyword for a non-existance option
+	  name (STR #476)
 	- Optimized the scanning of new PPD files on scheduler
 	  startup (STR #424)
 	- The EPM list file did not include the bin, lib, or
