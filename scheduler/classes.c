@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.32 2001/02/09 18:40:34 mike Exp $"
+ * "$Id: classes.c,v 1.33 2001/03/15 19:26:22 andy Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -201,7 +201,9 @@ DeletePrinterFromClass(printer_t *c,	/* I - Class to delete from */
 void
 DeletePrinterFromClasses(printer_t *p)	/* I - Printer to delete */
 {
-  printer_t	*c;			/* Pointer to current class */
+  printer_t	*c,			/* Pointer to current class */
+		*prev,
+		*next;			/* Pointer to next class */
 
 
  /*
@@ -209,9 +211,13 @@ DeletePrinterFromClasses(printer_t *p)	/* I - Printer to delete */
   * from each class listed...
   */
 
-  for (c = Printers; c != NULL; c = c->next)
+  for (c = Printers, prev = NULL; c != NULL; prev = c, c = next)
+  {
+    next = c->next;
+
     if (c->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
       DeletePrinterFromClass(c, p);
+  }
 }
 
 
@@ -619,5 +625,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.32 2001/02/09 18:40:34 mike Exp $".
+ * End of "$Id: classes.c,v 1.33 2001/03/15 19:26:22 andy Exp $".
  */
