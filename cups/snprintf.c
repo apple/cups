@@ -1,5 +1,5 @@
 /*
- * "$Id: snprintf.c,v 1.1 1999/10/22 15:53:10 mike Exp $"
+ * "$Id: snprintf.c,v 1.2 1999/10/22 20:04:01 mike Exp $"
  *
  *   snprintf functions for the Common UNIX Printing System (CUPS).
  *
@@ -43,7 +43,7 @@
 
 int				/* O - Number of bytes formatted */
 vsnprintf(char       *buffer,	/* O - Output buffer */
-          ssize_t    bufsize,	/* O - Size of output buffer */
+          size_t     bufsize,	/* O - Size of output buffer */
 	  const char *format,	/* I - printf-style format string */
 	  va_list    ap)	/* I - Pointer to additional arguments */
 {
@@ -264,7 +264,7 @@ vsnprintf(char       *buffer,	/* O - Output buffer */
 
 int				/* O - Number of bytes formatted */
 snprintf(char       *buffer,	/* O - Output buffer */
-         ssize_t    bufsize,	/* O - Size of output buffer */
+         size_t     bufsize,	/* O - Size of output buffer */
          const char *format,	/* I - printf-style format string */
 	 ...)			/* I - Additional arguments as needed */
 {
@@ -282,6 +282,6 @@ snprintf(char       *buffer,	/* O - Output buffer */
 
 
 /*
- * End of "$Id: snprintf.c,v 1.1 1999/10/22 15:53:10 mike Exp $".
+ * End of "$Id: snprintf.c,v 1.2 1999/10/22 20:04:01 mike Exp $".
  */
 
