@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c,v 1.18 2001/02/06 23:40:05 mike Exp $"
+ * "$Id: lpr.c,v 1.19 2001/02/13 15:16:52 mike Exp $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -108,6 +108,10 @@ main(int  argc,		/* I - Number of command-line arguments */
 #endif /* HAVE_LIBSSL */
 	    break;
 
+	case '1' : /* TROFF font set 1 */
+	case '2' : /* TROFF font set 2 */
+	case '3' : /* TROFF font set 3 */
+	case '4' : /* TROFF font set 4 */
 	case 'i' : /* indent */
 	case 'w' : /* width */
 	    if (argv[i][2] == '\0')
@@ -362,5 +366,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c,v 1.18 2001/02/06 23:40:05 mike Exp $".
+ * End of "$Id: lpr.c,v 1.19 2001/02/13 15:16:52 mike Exp $".
  */
