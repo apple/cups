@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.21 1999/07/07 18:24:38 mike Exp $"
+ * "$Id: ipp.c,v 1.22 1999/07/08 17:27:10 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1488,7 +1488,6 @@ get_printers(client_t *con,		/* I - Client connection */
       *    printer-state
       *    printer-state-message
       *    printer-is-accepting-jobs
-      *    printer-device-uri
       *    + all printer attributes
       */
 
@@ -1501,9 +1500,6 @@ get_printers(client_t *con,		/* I - Client connection */
 
       ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs",
                     printer->accepting);
-
-      ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_URI,
-                   "printer-device-uri", NULL, printer->device_uri);
 
       ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                     "printer-up-time", curtime - StartTime);
@@ -2323,5 +2319,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.21 1999/07/07 18:24:38 mike Exp $".
+ * End of "$Id: ipp.c,v 1.22 1999/07/08 17:27:10 mike Exp $".
  */
