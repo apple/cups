@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.159 2002/07/18 10:50:33 mike Exp $"
+ * "$Id: job.c,v 1.160 2002/07/18 15:39:22 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1157,6 +1157,11 @@ StartJob(int       id,		/* I - Job ID */
     {
       LogMessage(L_ERROR, "Unable to convert file %d to printable format for job %d!",
 	         current->current_file, current->id);
+      LogMessage(L_INFO, "Hint: Do you have ESP Ghostscript installed?");
+
+      if (LogLevel < L_DEBUG)
+        LogMessage(L_INFO, "Hint: Try setting the LogLevel to \"debug\".");
+
       current->current_file ++;
 
       if (current->current_file == current->num_files)
@@ -1976,7 +1981,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
       * Other status message; send it to the error_log file...
       */
 
-      if (loglevel != L_INFO)
+      if (loglevel != L_INFO || LogLevel == L_DEBUG2)
 	LogMessage(loglevel, "%s", message);
 
       if ((loglevel == L_INFO && !job->status) ||
@@ -3097,5 +3102,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.159 2002/07/18 10:50:33 mike Exp $".
+ * End of "$Id: job.c,v 1.160 2002/07/18 15:39:22 mike Exp $".
  */

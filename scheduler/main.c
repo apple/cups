@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.74 2002/07/18 10:50:34 mike Exp $"
+ * "$Id: main.c,v 1.75 2002/07/18 15:39:23 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -701,6 +701,9 @@ sigchld_handler(int sig)	/* I - Signal number */
       else
 	LogMessage(L_ERROR, "PID %d stopped with status %d!", pid,
 	           status / 256);
+
+      if (LogLevel < L_DEBUG)
+        LogMessage(L_INFO, "Hint: Try setting the LogLevel to \"debug\" to find out more.");
     }
 
     for (job = Jobs; job != NULL; job = job->next)
@@ -863,5 +866,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.74 2002/07/18 10:50:34 mike Exp $".
+ * End of "$Id: main.c,v 1.75 2002/07/18 15:39:23 mike Exp $".
  */
