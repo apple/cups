@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.51 2000/02/28 19:18:56 mike Exp $"
+# "$Id: cups.list,v 1.52 2000/03/10 21:05:05 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -28,11 +28,12 @@
 %vendor Easy Software Products
 %license LICENSE.txt
 %readme README.txt
-%version 1.1b1
+%version 1.1b2
 %incompat printpro
 
 %system all
 # Server files
+f 0500 root sys /usr/sbin/cupsd scheduler/cupsd
 f 0555 root sys /usr/lib/cups/backend/ipp backend/ipp
 l 0555 root sys /usr/lib/cups/backend/http ipp
 f 0555 root sys /usr/lib/cups/backend/lpd backend/lpd
@@ -40,11 +41,11 @@ f 0555 root sys /usr/lib/cups/backend/parallel backend/parallel
 f 0555 root sys /usr/lib/cups/backend/serial backend/serial
 f 0555 root sys /usr/lib/cups/backend/socket backend/socket
 f 0555 root sys /usr/lib/cups/backend/usb backend/usb
-f 0500 root sys /usr/sbin/cupsd scheduler/cupsd
 f 0555 root sys /usr/lib/cups/cgi-bin/admin.cgi cgi-bin/admin.cgi
 f 0555 root sys /usr/lib/cups/cgi-bin/classes.cgi cgi-bin/classes.cgi
 f 0555 root sys /usr/lib/cups/cgi-bin/jobs.cgi cgi-bin/jobs.cgi
 f 0555 root sys /usr/lib/cups/cgi-bin/printers.cgi cgi-bin/printers.cgi
+f 0555 root sys /usr/lib/cups/daemon/cups-polld scheduler/cups-polld
 f 0555 root sys /usr/lib/cups/filter/pstoraster pstoraster/pstoraster
 l 0555 root sys /usr/lib/cups/filter/pdftops pstoraster
 f 0555 root sys /usr/lib/cups/filter/imagetops filter/imagetops
@@ -160,6 +161,10 @@ f 0444 root sys /usr/share/cups/fonts/Bookman-Demi fonts/Bookman-Demi
 f 0444 root sys /usr/share/cups/fonts/Bookman-DemiItalic fonts/Bookman-DemiItalic
 f 0444 root sys /usr/share/cups/fonts/Bookman-Light fonts/Bookman-Light
 f 0444 root sys /usr/share/cups/fonts/Bookman-LightItalic fonts/Bookman-LightItalic
+f 0444 root sys /usr/share/cups/fonts/Charter-Bold fonts/Charter-Bold
+f 0444 root sys /usr/share/cups/fonts/Charter-BoldItalic fonts/Charter-BoldItalic
+f 0444 root sys /usr/share/cups/fonts/Charter-Italic fonts/Charter-Italic
+f 0444 root sys /usr/share/cups/fonts/Charter-Roman fonts/Charter-Roman
 f 0444 root sys /usr/share/cups/fonts/Courier fonts/Courier
 f 0444 root sys /usr/share/cups/fonts/Courier-Bold fonts/Courier-Bold
 f 0444 root sys /usr/share/cups/fonts/Courier-BoldOblique fonts/Courier-BoldOblique
@@ -192,47 +197,53 @@ f 0444 root sys /usr/share/cups/fonts/Utopia-Regular fonts/Utopia-Regular
 f 0444 root sys /usr/share/cups/fonts/ZapfChancery-MediumItalic fonts/ZapfChancery-MediumItalic
 f 0444 root sys /usr/share/cups/fonts/ZapfDingbats fonts/ZapfDingbats
 f 0444 root sys /usr/share/cups/pstoraster/Fontmap pstoraster/Fontmap
+f 0444 root sys /usr/share/cups/pstoraster/gs_btokn.ps pstoraster/gs_btokn.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_ccfnt.ps pstoraster/gs_ccfnt.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_cff.ps pstoraster/gs_cff.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_cidfn.ps pstoraster/gs_cidfn.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_cmap.ps pstoraster/gs_cmap.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_cmdl.ps pstoraster/gs_cmdl.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_dbt_e.ps pstoraster/gs_dbt_e.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_diskf.ps pstoraster/gs_diskf.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_dpnxt.ps pstoraster/gs_dpnxt.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_dps1.ps pstoraster/gs_dps1.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_dps2.ps pstoraster/gs_dps2.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_dps.ps pstoraster/gs_dps.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_epsf.ps pstoraster/gs_epsf.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_fform.ps pstoraster/gs_fform.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_fonts.ps pstoraster/gs_fonts.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_init.ps pstoraster/gs_init.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_iso_e.ps pstoraster/gs_iso_e.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_kanji.ps pstoraster/gs_kanji.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_ksb_e.ps pstoraster/gs_ksb_e.ps
 f 0444 root sys /usr/share/cups/pstoraster/gs_l2img.ps pstoraster/gs_l2img.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_lev2.ps pstoraster/gs_lev2.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_ll3.ps pstoraster/gs_ll3.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_mex_e.ps pstoraster/gs_mex_e.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_mro_e.ps pstoraster/gs_mro_e.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_pdfwr.ps pstoraster/gs_pdfwr.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_pdf_e.ps pstoraster/gs_pdf_e.ps
 f 0444 root sys /usr/share/cups/pstoraster/gs_pfile.ps pstoraster/gs_pfile.ps
-f 0444 root sys /usr/share/cups/pstoraster/pfbtogs.ps pstoraster/pfbtogs.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_res.ps pstoraster/gs_res.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_setpd.ps pstoraster/gs_setpd.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_statd.ps pstoraster/gs_statd.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_std_e.ps pstoraster/gs_std_e.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_sym_e.ps pstoraster/gs_sym_e.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_ttf.ps pstoraster/gs_ttf.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_typ32.ps pstoraster/gs_typ32.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_typ42.ps pstoraster/gs_typ42.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_type1.ps pstoraster/gs_type1.ps
+f 0444 root sys /usr/share/cups/pstoraster/gs_wan_e.ps pstoraster/gs_wan_e.ps
 f 0444 root sys /usr/share/cups/pstoraster/gs_wl1_e.ps pstoraster/gs_wl1_e.ps
 f 0444 root sys /usr/share/cups/pstoraster/gs_wl2_e.ps pstoraster/gs_wl2_e.ps
 f 0444 root sys /usr/share/cups/pstoraster/gs_wl5_e.ps pstoraster/gs_wl5_e.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_wan_e.ps pstoraster/gs_wan_e.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_pdf_e.ps pstoraster/gs_pdf_e.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_sym_e.ps pstoraster/gs_sym_e.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_std_e.ps pstoraster/gs_std_e.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_dbt_e.ps pstoraster/gs_dbt_e.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_mex_e.ps pstoraster/gs_mex_e.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_mro_e.ps pstoraster/gs_mro_e.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_iso_e.ps pstoraster/gs_iso_e.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_ksb_e.ps pstoraster/gs_ksb_e.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_ttf.ps pstoraster/gs_ttf.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_pdf.ps pstoraster/gs_pdf.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_ccfnt.ps pstoraster/gs_ccfnt.ps
-f 0444 root sys /usr/share/cups/pstoraster/pdf_sec.ps pstoraster/pdf_sec.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_res.ps pstoraster/gs_res.ps
+f 0444 root sys /usr/share/cups/pstoraster/pdf2dsc.ps pstoraster/pdf2dsc.ps
 f 0444 root sys /usr/share/cups/pstoraster/pdf_base.ps pstoraster/pdf_base.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_btokn.ps pstoraster/gs_btokn.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_diskf.ps pstoraster/gs_diskf.ps
-f 0444 root sys /usr/share/cups/pstoraster/pdf_2ps.ps pstoraster/pdf_2ps.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_init.ps pstoraster/gs_init.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_kanji.ps pstoraster/gs_kanji.ps
 f 0444 root sys /usr/share/cups/pstoraster/pdf_draw.ps pstoraster/pdf_draw.ps
 f 0444 root sys /usr/share/cups/pstoraster/pdf_font.ps pstoraster/pdf_font.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_type1.ps pstoraster/gs_type1.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_fonts.ps pstoraster/gs_fonts.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_statd.ps pstoraster/gs_statd.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_lev2.ps pstoraster/gs_lev2.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_typ42.ps pstoraster/gs_typ42.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_pdfwr.ps pstoraster/gs_pdfwr.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_cidfn.ps pstoraster/gs_cidfn.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_cmdl.ps pstoraster/gs_cmdl.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_dps1.ps pstoraster/gs_dps1.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_setpd.ps pstoraster/gs_setpd.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_cmap.ps pstoraster/gs_cmap.ps
-f 0444 root sys /usr/share/cups/pstoraster/gs_fform.ps pstoraster/gs_fform.ps
 f 0444 root sys /usr/share/cups/pstoraster/pdf_main.ps pstoraster/pdf_main.ps
+f 0444 root sys /usr/share/cups/pstoraster/pdf_ops.ps pstoraster/pdf_ops.ps
+f 0444 root sys /usr/share/cups/pstoraster/pdf_sec.ps pstoraster/pdf_sec.ps
 f 0444 root sys /usr/share/cups/model/deskjet.ppd ppd/deskjet.ppd
 f 0444 root sys /usr/share/cups/model/laserjet.ppd ppd/laserjet.ppd
 f 0444 root sys /usr/share/cups/model/stcolor.ppd ppd/stcolor.ppd
@@ -410,5 +421,5 @@ f 0444 root sys /usr/man/man5/printers.conf.5 man/printers.conf.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.51 2000/02/28 19:18:56 mike Exp $".
+# End of "$Id: cups.list,v 1.52 2000/03/10 21:05:05 mike Exp $".
 #
