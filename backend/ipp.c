@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.6 2002/01/30 18:31:23 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.7 2002/02/06 19:21:42 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -556,6 +556,10 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-id",
         	    job_id);
 
+      if (argv[2][0])
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+        	     NULL, argv[2]);
+
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                    "requested-attributes", NULL, "job-state");
 
@@ -630,8 +634,12 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
         	   NULL, uri);
 
+      if (argv[2][0])
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+        	     NULL, argv[2]);
+
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-                   "requested-attributes", NULL, "job-state-reasons");
+                   "requested-attributes", NULL, "printer-state-reasons");
 
      /*
       * Do the request...
@@ -789,5 +797,5 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.6 2002/01/30 18:31:23 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.7 2002/02/06 19:21:42 mike Exp $".
  */

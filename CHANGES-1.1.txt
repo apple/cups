@@ -1,6 +1,15 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.14
+
+	- The IPP backend did not pass the requesting user name
+	  when checking on the print job status. This prevented
+	  it from waiting for the job to complete when
+	  communicating with some IPP implementations that
+	  require it.
+
+
 CHANGES IN CUPS V1.1.13
 
 	- The lpstat command did not report jobs submitted to
