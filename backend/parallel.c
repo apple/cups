@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c,v 1.33 2002/01/02 17:58:34 mike Exp $"
+ * "$Id: parallel.c,v 1.34 2002/01/18 16:48:16 mike Exp $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -178,7 +178,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       }
       else
       {
-	perror("ERROR: Unable to open parallel port device file");
+	fprintf(stderr, "ERROR: Unable to open parallel port device file \"%s\": %s\n",
+	        resource, strerror(errno));
 	return (1);
       }
     }
@@ -638,5 +639,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c,v 1.33 2002/01/02 17:58:34 mike Exp $".
+ * End of "$Id: parallel.c,v 1.34 2002/01/18 16:48:16 mike Exp $".
  */
