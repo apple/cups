@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.12.2.3 2002/05/21 20:05:48 mike Exp $"
+# "$Id: Makefile,v 1.12.2.4 2002/10/20 20:18:32 mike Exp $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -40,7 +40,7 @@ LANGDIRS =	fr
 all:	$(CAT1) $(CAT3) $(CAT5) $(CAT8)
 	for dir in $(LANGDIRS); do \
 		echo "Making all in man/$$dir..."; \
-		(cd $$dir; make all); \
+		(cd $$dir; $(MAKE) $(MFLAGS) all); \
 	done
 
 
@@ -52,7 +52,7 @@ clean:
 	$(RM) $(CAT1) $(CAT3) $(CAT5) $(CAT8)
 	for dir in $(LANGDIRS); do \
 		echo "Cleaning all in man/$$dir..."; \
-		(cd $$dir; make clean); \
+		(cd $$dir; $(MAKE) $(MFLAGS) clean); \
 	done
 
 
@@ -114,10 +114,10 @@ install:	all
 	$(LN) enable.$(CAT8EXT) $(AMANDIR)/cat$(MAN8EXT)/disable.$(CAT8EXT)
 	for dir in $(LANGDIRS); do \
 		echo "Installing all in man/$$dir..."; \
-		(cd $$dir; make install); \
+		(cd $$dir; $(MAKE) $(MFLAGS) install); \
 	done
 
 
 #
-# End of "$Id: Makefile,v 1.12.2.3 2002/05/21 20:05:48 mike Exp $".
+# End of "$Id: Makefile,v 1.12.2.4 2002/10/20 20:18:32 mike Exp $".
 #
