@@ -1,4 +1,4 @@
-README - CUPS v1.1.20 - 11/24/2003
+README - CUPS v1.1.22 - 10/29/2004
 ----------------------------------
 
 Looking for compile instructions?  Read the file "INSTALL.txt"
@@ -61,11 +61,10 @@ The following operating system software is required to install
 one of the binary distributions from Easy Software Products:
 
     - AIX 4.3 or higher
-    - Compaq Tru64 UNIX (aka OSF1 aka Digital UNIX) 4.0 or higher
-    - HP-UX 10.20 or higher
-    - IRIX 5.3 or higher
-    - Linux 2.0 with glibc2 or higher
-    - Solaris 2.5 or higher (SPARC or Intel)
+    - HP-UX 11.00 or higher
+    - IRIX 6.5 or higher
+    - Linux 2.4 with glibc 2.2 or higher
+    - Solaris 7 or higher (SPARC or Intel)
 
 
 INSTALLING "PORTABLE" CUPS DISTRIBUTIONS
@@ -168,10 +167,6 @@ utilize the PostScript and image file RIPs and the sample EPSON
 and HP printer drivers.  To add the sample DeskJet driver to the
 system for a printer connected to the parallel port, use one of
 the following commands:
-
-    Digital UNIX:
-
-        /usr/lib/lpadmin -p DeskJet -m deskjet.ppd -v parallel:/dev/lp0 -E
 
     HP-UX:
 
