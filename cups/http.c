@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.59 2000/01/25 03:12:58 mike Exp $"
+ * "$Id: http.c,v 1.60 2000/02/29 20:34:39 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -405,55 +405,70 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
   * Grab the method portion of the URI...
   */
 
-  ptr = host;
-  while (*uri != ':' && *uri != '\0')
-    *ptr++ = *uri++;
-
-  *ptr = '\0';
-  if (*uri == ':')
-    uri ++;
-
- /*
-  * If the method contains a period or slash, then it's probably
-  * hostname/filename...
-  */
-
-  if (strchr(host, '.') != NULL || strchr(host, '/') != NULL || *uri == '\0')
+  if (strncmp(uri, "//", 2) == 0)
   {
-    if ((ptr = strchr(host, '/')) != NULL)
-    {
-      strncpy(resource, ptr, HTTP_MAX_URI - 1);
-      resource[HTTP_MAX_URI - 1] = '\0';
-      *ptr = '\0';
-    }
-    else
-      resource[0] = '\0';
+   /*
+    * Workaround for HP IPP client bug...
+    */
 
-    if (isdigit(*uri))
-    {
-     /*
-      * OK, we have "hostname:port[/resource]"...
-      */
-
-      *port = strtol(uri, (char **)&uri, 10);
-
-      if (*uri == '/')
-      {
-        strncpy(resource, uri, HTTP_MAX_URI - 1);
-        resource[HTTP_MAX_URI - 1] = '\0';
-      }
-    }
-    else
-      *port = 0;
-
-    strcpy(method, "http");
-    username[0] = '\0';
-    return;
+    strcpy(method, "ipp");
   }
   else
   {
-    strncpy(method, host, 31);
-    method[31] = '\0';
+   /*
+    * Standard URI with method...
+    */
+
+    ptr = host;
+    while (*uri != ':' && *uri != '\0')
+      *ptr++ = *uri++;
+
+    *ptr = '\0';
+    if (*uri == ':')
+      uri ++;
+
+   /*
+    * If the method contains a period or slash, then it's probably
+    * hostname/filename...
+    */
+
+    if (strchr(host, '.') != NULL || strchr(host, '/') != NULL || *uri == '\0')
+    {
+      if ((ptr = strchr(host, '/')) != NULL)
+      {
+	strncpy(resource, ptr, HTTP_MAX_URI - 1);
+	resource[HTTP_MAX_URI - 1] = '\0';
+	*ptr = '\0';
+      }
+      else
+	resource[0] = '\0';
+
+      if (isdigit(*uri))
+      {
+       /*
+	* OK, we have "hostname:port[/resource]"...
+	*/
+
+	*port = strtol(uri, (char **)&uri, 10);
+
+	if (*uri == '/')
+	{
+          strncpy(resource, uri, HTTP_MAX_URI - 1);
+          resource[HTTP_MAX_URI - 1] = '\0';
+	}
+      }
+      else
+	*port = 80;
+
+      strcpy(method, "http");
+      username[0] = '\0';
+      return;
+    }
+    else
+    {
+      strncpy(method, host, 31);
+      method[31] = '\0';
+    }
   }
 
  /*
@@ -1524,5 +1539,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.59 2000/01/25 03:12:58 mike Exp $".
+ * End of "$Id: http.c,v 1.60 2000/02/29 20:34:39 mike Exp $".
  */
