@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.29 1999/08/05 20:46:59 mike Exp $"
+ * "$Id: util.c,v 1.30 1999/08/19 20:32:41 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -500,7 +500,6 @@ cupsGetPPD(const char *name)	/* I - Printer name */
 		resource[HTTP_MAX_URI];	/* Resource name */
   static char	filename[HTTP_MAX_URI];	/* Local filename */
   char		*tempdir;		/* Temporary file directory */
-  struct stat	fileinfo;		/* File information */
 
 
  /*
@@ -516,33 +515,29 @@ cupsGetPPD(const char *name)	/* I - Printer name */
 
 #if defined(WIN32) || defined(__EMX__)
   tempdir = "C:/WINDOWS/TEMP";
+
+  sprintf(filename, "%s/%s.ppd", tempdir, printer);
 #else
   if ((tempdir = getenv("TMPDIR")) == NULL)
     tempdir = "/tmp";
+
+  sprintf(filename, "%s/%d.%s.ppd", tempdir, getuid(), printer);
 #endif /* WIN32 || __EMX__ */
 
-  sprintf(filename, "%s/%s.ppd", tempdir, printer);
-  if (stat(filename, &fileinfo))
-    memset(&fileinfo, 0, sizeof(fileinfo));
-
  /*
-  * And send a request to the HTTP server using "if-modified-since"...
+  * And send a request to the HTTP server...
   */
 
   sprintf(resource, "/printers/%s.ppd", printer);
 
   httpClearFields(cups_server);
   httpSetField(cups_server, HTTP_FIELD_HOST, hostname);
-  httpSetField(cups_server, HTTP_FIELD_IF_MODIFIED_SINCE,
-               httpGetDateString(fileinfo.st_mtime));
   httpGet(cups_server, resource);
 
   switch (httpUpdate(cups_server))
   {
     case HTTP_OK : /* New file - get it! */
         break;
-    case HTTP_NOT_MODIFIED : /* File hasn't been modified; use the current copy */
-        return (filename);
     default :
         return (NULL);
   }
@@ -985,5 +980,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.29 1999/08/05 20:46:59 mike Exp $".
+ * End of "$Id: util.c,v 1.30 1999/08/19 20:32:41 mike Exp $".
  */
