@@ -131,11 +131,11 @@
   0 0
   2 index 1.5 mul 3 index
 
-  % Do the "metallic" fill from white to 25% black...
+  % Do the "metallic" fill from 10% black to 40% black...
   1 -0.01 0 {
     dup			% loopval
-    -0.125 mul		% loopval * -1/8
-    1 add		% 1 - loopval * 1/8
+    -0.15 mul		% loopval * -0.15
+    0.9 add		% 0.9 - loopval * 0.15
     setgray		% set gray shade
 
     0			% x
@@ -159,8 +159,8 @@
     fill
 
     dup			% loopval
-    0.125 mul		% loopval * 1/8
-    0.750 add		% 3/4 + loopval * 1/8
+    0.15 mul		% loopval * 0.15
+    0.6 add		% 0.6 + loopval * 0.15
     setgray
 
     dup			% loopval
@@ -517,6 +517,6 @@ gsave
 grestore
 showpage
 %
-% End of "$Id: testprint.ps,v 1.1 1999/05/11 19:45:40 mike Exp $".
+% End of "$Id: testprint.ps,v 1.2 1999/05/26 19:37:31 mike Exp $".
 %
 %%EOF
