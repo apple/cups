@@ -1,5 +1,5 @@
 /*
- * "$Id: image-tiff.c,v 1.2 1998/03/19 17:00:21 mike Exp $"
+ * "$Id: image-tiff.c,v 1.3 1998/07/28 20:51:43 mike Exp $"
  *
  *   TIFF file routines for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,10 @@
  * Revision History:
  *
  *   $Log: image-tiff.c,v $
- *   Revision 1.2  1998/03/19 17:00:21  mike
+ *   Revision 1.3  1998/07/28 20:51:43  mike
+ *   Fixed default orientation code.
+ *
+ *   Revision 1.2  1998/03/19  17:00:21  mike
  *   Added check for units in resolution (physical) chunk; if undefined
  *   assume meters instead of centimeters...
  *
@@ -58,7 +61,7 @@ ImageReadTIFF(image_t *img,
 		xcount, ycount,
 		pstep,
 		scanwidth,
-		r, g, b, k, ik;
+		r, g, b, k;
   ib_t		*in,
 		*out,
 		*p,
@@ -69,6 +72,10 @@ ImageReadTIFF(image_t *img,
 		zero,
 		one;
 
+
+#ifdef hpux
+  lseek(fileno(fp), 0, SEEK_SET); /* Work around "feature" in HPUX stdio */
+#endif /* hpux */
 
   if ((tif = TIFFFdOpen(fileno(fp), "", "r")) == NULL)
   {
@@ -744,8 +751,7 @@ ImageReadTIFF(image_t *img,
         	{
         	  pixel = *scanptr;
         	  k     = 255 * (pixel & 3) / 3;
-        	  ik    = 255 - k;
-        	  if (ik == 0)
+        	  if (k == 255)
         	  {
         	    p[0] = 0;
         	    p[1] = 0;
@@ -754,31 +760,31 @@ ImageReadTIFF(image_t *img,
         	  else
         	  {
                     pixel >>= 2;
-                    r = 255 - 65025 * (pixel & 3) / 3 / ik - k;
-                    if (r < 0)
-                      p[2] = 0;
-                    else if (r < 256)
-                      p[2] = r;
-                    else
-                      p[2] = 255;
-
-                    pixel >>= 2;
-                    g = 255 - 65025 * (pixel & 3) / 3 / ik - k;
-                    if (g < 0)
-                      p[2] = 0;
-                    else if (g < 256)
-                      p[2] = g;
-                    else
-                      p[2] = 255;
-
-                    pixel >>= 2;
-                    b = 255 - 65025 * (pixel & 3) / 3 / ik - k;
+                    b = 255 - 255 * (pixel & 3) / 3 - k;
                     if (b < 0)
                       p[2] = 0;
                     else if (b < 256)
                       p[2] = b;
                     else
                       p[2] = 255;
+
+                    pixel >>= 2;
+                    g = 255 - 255 * (pixel & 3) / 3 - k;
+                    if (g < 0)
+                      p[1] = 0;
+                    else if (g < 256)
+                      p[1] = g;
+                    else
+                      p[1] = 255;
+
+                    pixel >>= 2;
+                    r = 255 - 255 * (pixel & 3) / 3 - k;
+                    if (r < 0)
+                      p[0] = 0;
+                    else if (r < 256)
+                      p[0] = r;
+                    else
+                      p[0] = 255;
                   };
         	};
               }
@@ -791,8 +797,7 @@ ImageReadTIFF(image_t *img,
         	{
         	  pixel = scanptr[1];
         	  k     = 255 * (pixel & 15) / 15;
-        	  ik    = 255 - k;
-        	  if (ik == 0)
+        	  if (k == 255)
         	  {
         	    p[0] = 0;
         	    p[1] = 0;
@@ -801,7 +806,7 @@ ImageReadTIFF(image_t *img,
         	  else
         	  {
                     pixel >>= 4;
-                    b = 255 - 65025 * (pixel & 15) / 15 / ik - k;
+                    b = 255 - 255 * (pixel & 15) / 15 - k;
                     if (b < 0)
                       p[2] = 0;
                     else if (b < 256)
@@ -810,22 +815,22 @@ ImageReadTIFF(image_t *img,
                       p[2] = 255;
 
                     pixel = scanptr[0];
-                    r = 255 - 65025 * (pixel & 15) / 15 / ik - k;
-                    if (r < 0)
-                      p[2] = 0;
-                    else if (r < 256)
-                      p[2] = r;
+                    g = 255 - 255 * (pixel & 15) / 15 - k;
+                    if (g < 0)
+                      p[1] = 0;
+                    else if (g < 256)
+                      p[1] = g;
                     else
-                      p[2] = 255;
+                      p[1] = 255;
 
                     pixel >>= 4;
-                    g = 255 - 65025 * (pixel & 15) / 15 / ik - k;
-                    if (g < 0)
-                      p[2] = 0;
-                    else if (g < 256)
-                      p[2] = g;
+                    r = 255 - 255 * (pixel & 15) / 15 - k;
+                    if (r < 0)
+                      p[0] = 0;
+                    else if (r < 256)
+                      p[0] = r;
                     else
-                      p[2] = 255;
+                      p[0] = 255;
                   };
         	};
               }
@@ -838,8 +843,7 @@ ImageReadTIFF(image_t *img,
                      xcount --, p += pstep, scanptr += 4)
         	{
         	  k = scanptr[3];
-        	  ik = 255 - k;
-        	  if (ik == 0)
+        	  if (k == 255)
         	  {
         	    p[0] = 0;
         	    p[1] = 0;
@@ -847,23 +851,23 @@ ImageReadTIFF(image_t *img,
         	  }
         	  else
         	  {
-                    r = 255 - 255 * scanptr[0] / ik - k;
+                    r = 255 - scanptr[0] - k;
                     if (r < 0)
-                      p[2] = 0;
+                      p[0] = 0;
                     else if (r < 256)
-                      p[2] = r;
+                      p[0] = r;
                     else
-                      p[2] = 255;
+                      p[0] = 255;
 
-                    g = 255 - 255 * scanptr[1] / ik - k;
+                    g = 255 - scanptr[1] - k;
                     if (g < 0)
-                      p[2] = 0;
+                      p[1] = 0;
                     else if (g < 256)
-                      p[2] = g;
+                      p[1] = g;
                     else
-                      p[2] = 255;
+                      p[1] = 255;
 
-                    b = 255 - 255 * scanptr[2] / ik - k;
+                    b = 255 - scanptr[2] - k;
                     if (b < 0)
                       p[2] = 0;
                     else if (b < 256)
@@ -960,8 +964,7 @@ ImageReadTIFF(image_t *img,
         	{
         	  pixel = *scanptr;
         	  k     = 255 * (pixel & 3) / 3;
-        	  ik    = 255 - k;
-        	  if (ik == 0)
+        	  if (k == 255)
         	  {
         	    p[0] = 0;
         	    p[1] = 0;
@@ -970,31 +973,31 @@ ImageReadTIFF(image_t *img,
         	  else
         	  {
                     pixel >>= 2;
-                    r = 255 - 65025 * (pixel & 3) / 3 / ik - k;
-                    if (r < 0)
-                      p[2] = 0;
-                    else if (r < 256)
-                      p[2] = r;
-                    else
-                      p[2] = 255;
-
-                    pixel >>= 2;
-                    g = 255 - 65025 * (pixel & 3) / 3 / ik - k;
-                    if (g < 0)
-                      p[2] = 0;
-                    else if (g < 256)
-                      p[2] = g;
-                    else
-                      p[2] = 255;
-
-                    pixel >>= 2;
-                    b = 255 - 65025 * (pixel & 3) / 3 / ik - k;
+                    b = 255 - 255 * (pixel & 3) / 3 - k;
                     if (b < 0)
                       p[2] = 0;
                     else if (b < 256)
                       p[2] = b;
                     else
                       p[2] = 255;
+
+                    pixel >>= 2;
+                    g = 255 - 255 * (pixel & 3) / 3 - k;
+                    if (g < 0)
+                      p[1] = 0;
+                    else if (g < 256)
+                      p[1] = g;
+                    else
+                      p[1] = 255;
+
+                    pixel >>= 2;
+                    r = 255 - 255 * (pixel & 3) / 3 - k;
+                    if (r < 0)
+                      p[0] = 0;
+                    else if (r < 256)
+                      p[0] = r;
+                    else
+                      p[0] = 255;
                   };
         	};
               }
@@ -1007,8 +1010,7 @@ ImageReadTIFF(image_t *img,
         	{
         	  pixel = scanptr[1];
         	  k     = 255 * (pixel & 15) / 15;
-        	  ik    = 255 - k;
-        	  if (ik == 0)
+        	  if (k == 255)
         	  {
         	    p[0] = 0;
         	    p[1] = 0;
@@ -1017,7 +1019,7 @@ ImageReadTIFF(image_t *img,
         	  else
         	  {
                     pixel >>= 4;
-                    b = 255 - 65025 * (pixel & 15) / 15 / ik - k;
+                    b = 255 - 255 * (pixel & 15) / 15 - k;
                     if (b < 0)
                       p[2] = 0;
                     else if (b < 256)
@@ -1026,22 +1028,22 @@ ImageReadTIFF(image_t *img,
                       p[2] = 255;
 
                     pixel = scanptr[0];
-                    r = 255 - 65025 * (pixel & 15) / 15 / ik - k;
-                    if (r < 0)
-                      p[2] = 0;
-                    else if (r < 256)
-                      p[2] = r;
+                    g = 255 - 255 * (pixel & 15) / 15 - k;
+                    if (g < 0)
+                      p[1] = 0;
+                    else if (g < 256)
+                      p[1] = g;
                     else
-                      p[2] = 255;
+                      p[1] = 255;
 
                     pixel >>= 4;
-                    g = 255 - 65025 * (pixel & 15) / 15 / ik - k;
-                    if (g < 0)
-                      p[2] = 0;
-                    else if (g < 256)
-                      p[2] = g;
+                    r = 255 - 255 * (pixel & 15) / 15 - k;
+                    if (r < 0)
+                      p[0] = 0;
+                    else if (r < 256)
+                      p[0] = r;
                     else
-                      p[2] = 255;
+                      p[0] = 255;
                   };
         	};
               }
@@ -1054,8 +1056,7 @@ ImageReadTIFF(image_t *img,
                      ycount --, p += pstep, scanptr += 4)
         	{
         	  k = scanptr[3];
-        	  ik = 255 - k;
-        	  if (ik == 0)
+        	  if (k == 255)
         	  {
         	    p[0] = 0;
         	    p[1] = 0;
@@ -1063,23 +1064,23 @@ ImageReadTIFF(image_t *img,
         	  }
         	  else
         	  {
-                    r = 255 - 255 * scanptr[0] / ik - k;
+                    r = 255 - scanptr[0] - k;
                     if (r < 0)
-                      p[2] = 0;
+                      p[0] = 0;
                     else if (r < 256)
-                      p[2] = r;
+                      p[0] = r;
                     else
-                      p[2] = 255;
+                      p[0] = 255;
 
-                    g = 255 - 255 * scanptr[1] / ik - k;
+                    g = 255 - scanptr[1] - k;
                     if (g < 0)
-                      p[2] = 0;
+                      p[1] = 0;
                     else if (g < 256)
-                      p[2] = g;
+                      p[1] = g;
                     else
-                      p[2] = 255;
+                      p[1] = 255;
 
-                    b = 255 - 255 * scanptr[2] / ik - k;
+                    b = 255 - scanptr[2] - k;
                     if (b < 0)
                       p[2] = 0;
                     else if (b < 256)
@@ -1140,5 +1141,5 @@ ImageReadTIFF(image_t *img,
 
 
 /*
- * End of "$Id: image-tiff.c,v 1.2 1998/03/19 17:00:21 mike Exp $".
+ * End of "$Id: image-tiff.c,v 1.3 1998/07/28 20:51:43 mike Exp $".
  */
