@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c,v 1.21.2.6 2002/12/10 19:56:43 mike Exp $"
+ * "$Id: options.c,v 1.21.2.7 2002/12/17 15:15:27 mike Exp $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -308,11 +308,12 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
                 int           num_options,	/* I - Number of options */
                 cups_option_t *options)		/* I - Options */
 {
-  int	i;					/* Looping var */
-  int	conflict;				/* Option conflicts */
-  char	*val,					/* Pointer into value */
-	*ptr,					/* Pointer into string */
-	s[255];					/* Temporary string */
+  int		i;				/* Looping var */
+  int		conflict;			/* Option conflicts */
+  char		*val,				/* Pointer into value */
+		*ptr,				/* Pointer into string */
+		s[255];				/* Temporary string */
+  cups_option_t	*optptr;			/* Current option */
 
 
  /*
@@ -328,15 +329,15 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 
   conflict = 0;
 
-  for (i = num_options; i > 0; i --, options ++)
-    if (strcasecmp(options->name, "media") == 0)
+  for (i = num_options, optptr = options; i > 0; i --, optptr ++)
+    if (strcasecmp(optptr->name, "media") == 0)
     {
      /*
       * Loop through the option string, separating it at commas and
       * marking each individual option.
       */
 
-      for (val = options->value; *val;)
+      for (val = optptr->value; *val;)
       {
        /*
         * Extract the sub-option from the string...
@@ -375,7 +376,7 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 	    conflict = 1;
       }
     }
-    else if (strcasecmp(options->name, "sides") == 0)
+    else if (strcasecmp(optptr->name, "sides") == 0)
     {
       if (cupsGetOption("Duplex", num_options, options) != NULL ||
           cupsGetOption("JCLDuplex", num_options, options) != NULL ||
@@ -388,7 +389,7 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 
         continue;
       }
-      else if (strcasecmp(options->value, "one-sided") == 0)
+      else if (strcasecmp(optptr->value, "one-sided") == 0)
       {
         if (ppdMarkOption(ppd, "Duplex", "None"))
 	  conflict = 1;
@@ -399,7 +400,7 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
         if (ppdMarkOption(ppd, "KD03Duplex", "None"))	/* Kodak */
 	  conflict = 1;
       }
-      else if (strcasecmp(options->value, "two-sided-long-edge") == 0)
+      else if (strcasecmp(optptr->value, "two-sided-long-edge") == 0)
       {
         if (ppdMarkOption(ppd, "Duplex", "DuplexNoTumble"))
 	  conflict = 1;
@@ -410,7 +411,7 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
         if (ppdMarkOption(ppd, "KD03Duplex", "DuplexNoTumble"))	/* Kodak */
 	  conflict = 1;
       }
-      else if (strcasecmp(options->value, "two-sided-short-edge") == 0)
+      else if (strcasecmp(optptr->value, "two-sided-short-edge") == 0)
       {
         if (ppdMarkOption(ppd, "Duplex", "DuplexTumble"))
 	  conflict = 1;
@@ -422,26 +423,26 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 	  conflict = 1;
       }
     }
-    else if (strcasecmp(options->name, "resolution") == 0 ||
-             strcasecmp(options->name, "printer-resolution") == 0)
+    else if (strcasecmp(optptr->name, "resolution") == 0 ||
+             strcasecmp(optptr->name, "printer-resolution") == 0)
     {
-      if (ppdMarkOption(ppd, "Resolution", options->value))
+      if (ppdMarkOption(ppd, "Resolution", optptr->value))
         conflict = 1;
-      if (ppdMarkOption(ppd, "SetResolution", options->value))
+      if (ppdMarkOption(ppd, "SetResolution", optptr->value))
       	/* Calcomp, Linotype, QMS, Summagraphics, Tektronix, Varityper */
         conflict = 1;
-      if (ppdMarkOption(ppd, "JCLResolution", options->value))	/* HP */
+      if (ppdMarkOption(ppd, "JCLResolution", optptr->value))	/* HP */
         conflict = 1;
-      if (ppdMarkOption(ppd, "CNRes_PGP", options->value))	/* Canon */
+      if (ppdMarkOption(ppd, "CNRes_PGP", optptr->value))	/* Canon */
         conflict = 1;
     }
-    else if (strcasecmp(options->name, "output-bin") == 0)
+    else if (strcasecmp(optptr->name, "output-bin") == 0)
     {
       if (cupsGetOption("OutputBin", num_options, options) == NULL)
-        if (ppdMarkOption(ppd, "OutputBin", options->value))
+        if (ppdMarkOption(ppd, "OutputBin", optptr->value))
           conflict = 1;
     }
-    else if (ppdMarkOption(ppd, options->name, options->value))
+    else if (ppdMarkOption(ppd, optptr->name, optptr->value))
       conflict = 1;
 
   return (conflict);
@@ -449,5 +450,5 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: options.c,v 1.21.2.6 2002/12/10 19:56:43 mike Exp $".
+ * End of "$Id: options.c,v 1.21.2.7 2002/12/17 15:15:27 mike Exp $".
  */
