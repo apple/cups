@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.43.2.20 2003/08/26 21:15:48 mike Exp $"
+ * "$Id: gdevcups.c,v 1.43.2.21 2003/08/27 18:12:48 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -2243,13 +2243,36 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
                pdev->HWResolution[1] / 72.0f + 0.499f;
     }
 
-    fprintf(stderr, "DEBUG: Reallocating memory, [%.0f %.0f] = %dx%d pixels...\n",
-            pdev->MediaSize[0], pdev->MediaSize[1], width, height);
+   /*
+    * Don't reallocate memory unless the device has been opened...
+    */
 
-    sp = ((gx_device_printer *)pdev)->space_params;
+    if (pdev->is_open)
+    {
+     /*
+      * Device is open, so reallocate...
+      */
 
-    if ((code = gdev_prn_reallocate_memory(pdev, &sp, width, height)) < 0)
-      return (code);
+      fprintf(stderr, "DEBUG: Reallocating memory, [%.0f %.0f] = %dx%d pixels...\n",
+              pdev->MediaSize[0], pdev->MediaSize[1], width, height);
+
+      sp = ((gx_device_printer *)pdev)->space_params;
+
+      if ((code = gdev_prn_reallocate_memory(pdev, &sp, width, height)) < 0)
+	return (code);
+    }
+    else
+    {
+     /*
+      * Device isn't yet open, so just save the new width and height...
+      */
+
+      fprintf(stderr, "DEBUG: Setting initial media size, [%.0f %.0f] = %dx%d pixels...\n",
+              pdev->MediaSize[0], pdev->MediaSize[1], width, height);
+
+      pdev->width  = width;
+      pdev->height = height;
+    }
   }
 
 #ifdef DEBUG
@@ -3649,5 +3672,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.43.2.20 2003/08/26 21:15:48 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.43.2.21 2003/08/27 18:12:48 mike Exp $".
  */
