@@ -1,8 +1,10 @@
-CHANGES.txt - 02/03/2004
+CHANGES.txt - 02/04/2004
 ------------------------
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The httpFlush() function did not always flush the
+	  remaining response data in requests (STR #558)
 	- The scheduler could complete a job before it collected
 	  the exit status from all filters and the backend (STR
 	  #448)
