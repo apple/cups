@@ -1,8 +1,10 @@
 CHANGES-1.1.txt
 ---------------
 
-CHANGES IN CUPS V1.1.19
+CHANGES IN CUPS V1.1.19rc4
 
+	- The scheduler would consume all available CPU if
+	  started with a pending job in the queue (STR #35)
 	- The polling daemon allocated an extra localization
 	  buffer but did not free it, causing cups-polld to
 	  eventually use all available memory (STR #40)
