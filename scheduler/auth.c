@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.22 2000/01/04 13:46:08 mike Exp $"
+ * "$Id: auth.c,v 1.23 2000/01/20 13:05:41 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -400,7 +400,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
     if (pamerr != PAM_SUCCESS)
     {
       LogMessage(LOG_ERROR, "IsAuthorized: pam_start() returned %d (%s)!\n",
-        	 pamerr, pam_strerror(pamerr));
+        	 pamerr, pam_strerror(pamh, pamerr));
       pam_end(pamh, 0);
       return (HTTP_UNAUTHORIZED);
     }
@@ -409,7 +409,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
     if (pamerr != PAM_SUCCESS)
     {
       LogMessage(LOG_ERROR, "IsAuthorized: pam_authenticate() returned %d (%s)!\n",
-        	 pamerr, pam_strerror(pamerr));
+        	 pamerr, pam_strerror(pamh, pamerr));
       pam_end(pamh, 0);
       return (HTTP_UNAUTHORIZED);
     }
@@ -418,7 +418,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
     if (pamerr != PAM_SUCCESS)
     {
       LogMessage(LOG_ERROR, "IsAuthorized: pam_acct_mgmt() returned %d (%s)!\n",
-        	 pamerr, pam_strerror(pamerr));
+        	 pamerr, pam_strerror(pamh, pamerr));
       pam_end(pamh, 0);
       return (HTTP_UNAUTHORIZED);
     }
@@ -728,5 +728,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.22 2000/01/04 13:46:08 mike Exp $".
+ * End of "$Id: auth.c,v 1.23 2000/01/20 13:05:41 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertohp.c,v 1.2 2000/01/04 13:45:48 mike Exp $"
+ * "$Id: rastertohp.c,v 1.3 2000/01/20 13:05:40 mike Exp $"
  *
  *   Hewlett-Packard Page Control Language and Raster Transfer Language
  *   filter for ESP Print.
@@ -21,8 +21,8 @@
  */
 
 #include <cups/cups.h>
-#include <cups/raster.h>
 #include <cups/string.h>
+#include "raster.h"
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -489,5 +489,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertohp.c,v 1.2 2000/01/04 13:45:48 mike Exp $".
+ * End of "$Id: rastertohp.c,v 1.3 2000/01/20 13:05:40 mike Exp $".
  */

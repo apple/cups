@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.38 2000/01/04 13:45:46 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.39 2000/01/20 13:05:39 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -46,7 +46,7 @@
 
 #include "common.h"
 #include "image.h"
-#include <cups/raster.h>
+#include "raster.h"
 #include <math.h>
 
 
@@ -3971,5 +3971,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.38 2000/01/04 13:45:46 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.39 2000/01/20 13:05:39 mike Exp $".
  */

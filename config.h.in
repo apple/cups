@@ -1,11 +1,11 @@
 /*
- * "$Id: config.h.in,v 1.14 1999/12/29 02:15:39 mike Exp $"
+ * "$Id: config.h.in,v 1.15 2000/01/20 13:05:38 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
  *   @configure_input@
  *
- *   Copyright 1997-1999 by Easy Software Products.
+ *   Copyright 1997-2000 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -28,18 +28,19 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION	"CUPS v1.0.3"
+#define CUPS_SVERSION	"CUPS v1.1"
 
 /*
  * Where are files stored?
  */
 
-#define CUPS_LOCALEDIR	"/usr/lib/locale"
+#define CUPS_LOCALEDIR	"/usr/share/locale"
 #define CUPS_SERVERROOT	"/etc/cups"
+#define CUPS_SERVERBIN	"/usr/lib/cups"
+#define CUPS_DOCROOT	"/usr/share/doc/cups"
 #define CUPS_REQUESTS	"/var/spool/cups"
-#define CUPS_SERVERBIN	"/var/cups"
-#define CUPS_DATADIR	"/usr/share/cups"
-#define CUPS_DOCDIR	"/usr/share/doc/cups"
+#define CUPS_LOGDIR	"/var/logs/cups"
+#define CUPS_DATADIR    "/usr/share/cups"
 
 
 /*
@@ -116,5 +117,5 @@
 #undef HAVE_WAIT3
 
 /*
- * End of "$Id: config.h.in,v 1.14 1999/12/29 02:15:39 mike Exp $".
+ * End of "$Id: config.h.in,v 1.15 2000/01/20 13:05:38 mike Exp $".
  */

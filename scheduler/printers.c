@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.49 2000/01/04 13:46:10 mike Exp $"
+ * "$Id: printers.c,v 1.50 2000/01/20 13:05:41 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -379,7 +379,7 @@ LoadAllPrinters(void)
   * Open the printer.conf file...
   */
 
-  sprintf(line, "%s/conf/printers.conf", ServerRoot);
+  sprintf(line, "%s/printers.conf", ServerRoot);
   if ((fp = fopen(line, "r")) == NULL)
     return;
 
@@ -552,7 +552,7 @@ SaveAllPrinters(void)
   * Create the printers.conf file...
   */
 
-  sprintf(temp, "%s/conf/printers.conf", ServerRoot);
+  sprintf(temp, "%s/printers.conf", ServerRoot);
   if ((fp = fopen(temp, "w")) == NULL)
   {
     LogMessage(LOG_ERROR, "Unable to save printers.conf - %s", strerror(errno));
@@ -1239,5 +1239,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.49 2000/01/04 13:46:10 mike Exp $".
+ * End of "$Id: printers.c,v 1.50 2000/01/20 13:05:41 mike Exp $".
  */

@@ -1,11 +1,11 @@
 #
-# "$Id: Makedefs.in,v 1.16 1999/10/22 17:37:34 mike Exp $"
+# "$Id: Makedefs.in,v 1.17 2000/01/20 13:05:37 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
 #   @configure_input@
 #
-#   Copyright 1997-1999 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2000 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -114,8 +114,11 @@ DATADIR		=	@CUPS_DATADIR@
 INCLUDEDIR	=	$(includedir)
 LIBDIR		=	$(libdir)
 LOCALEDIR	= 	@CUPS_LOCALEDIR@
+LOGDIR		= 	@CUPS_LOGDIR@
 MANDIR		=	@mandir@
+REQUESTS	= 	@CUPS_REQUESTS@
 SBINDIR		=	@sbindir@
+SERVERBIN	= 	@CUPS_SERVERBIN@
 SERVERROOT	= 	@CUPS_SERVERROOT@
 
 #
@@ -134,5 +137,5 @@ SERVERROOT	= 	@CUPS_SERVERROOT@
 	-mv t.$(CAT) $@
 
 #
-# End of "$Id: Makedefs.in,v 1.16 1999/10/22 17:37:34 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.17 2000/01/20 13:05:37 mike Exp $"
 #

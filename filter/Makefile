@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.20 1999/12/15 15:18:07 mike Exp $"
+# "$Id: Makefile,v 1.21 2000/01/20 13:05:39 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -33,7 +33,8 @@ IMAGEOBJS =	image-colorspace.o image-photocd.o image-sgilib.o \
 		image-tiff.o image-gif.o image-png.o image-sgi.o image-zoom.o \
 		image-jpeg.o image-pnm.o image-sun.o image.o
 OBJS	=	$(HPGLOBJS) $(IMAGEOBJS) imagetops.o imagetoraster.o \
-		common.o pstops.o rastertohp.o texttops.o textcommon.o
+		common.o pstops.o raster.o rastertohp.o texttops.o \
+		textcommon.o
 
 #
 # Make all targets...
@@ -75,22 +76,23 @@ $(HPGLOBJS):	hpgltops.h
 # libcupsimage.so.1, libcupsimage.sl.1
 #
 
-libcupsimage.so.1 libcupsimage.sl.1:	$(IMAGEOBJS) ../Makedefs
+libcupsimage.so.1 libcupsimage.sl.1:	$(IMAGEOBJS) raster.o ../Makedefs
 	echo Linking $@...
-	$(DSO) $@ $(IMAGEOBJS) $(DSOLIBS) -lm
+	$(DSO) $@ $(IMAGEOBJS) raster.o $(DSOLIBS) -lm
 	-$(LN) $@ `basename $@ .1`
 
 #
 # libcupsimage.a
 #
 
-libcupsimage.a:	$(IMAGEOBJS) ../Makedefs
+libcupsimage.a:	$(IMAGEOBJS) raster.o ../Makedefs
 	echo Archiving $@...
 	$(RM) $@
-	$(AR) $(ARFLAGS) $@ $(IMAGEOBJS)
+	$(AR) $(ARFLAGS) $@ $(IMAGEOBJS) raster.o
 	$(RANLIB) $@
 
 $(IMAGEOBJS):	image.h
+raster.o:	raster.h
 
 #
 # imagetops
@@ -112,7 +114,7 @@ imagetoraster:	imagetoraster.o common.o $(LIBCUPSIMAGE) ../Makedefs \
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ imagetoraster.o common.o -L. -lcupsimage \
 		$(IMGLIBS) $(LIBS)
-imagetoraster:	common.h image.h
+imagetoraster:	common.h image.h raster.h
 
 #
 # pstops
@@ -129,8 +131,8 @@ pstops.o:	common.h
 
 rastertohp:	rastertohp.o ../Makedefs ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ rastertohp.o $(LIBS)
-rastertohp.o:	../cups/raster.h
+	$(CC) $(LDFLAGS) -o $@ rastertohp.o -L. -lcupsimage $(LIBS)
+rastertohp.o:	raster.h
 
 #
 # texttops
@@ -147,5 +149,5 @@ textcommon.o:	textcommon.h common.h
 $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 #
-# End of "$Id: Makefile,v 1.20 1999/12/15 15:18:07 mike Exp $".
+# End of "$Id: Makefile,v 1.21 2000/01/20 13:05:39 mike Exp $".
 #

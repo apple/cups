@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: configure.in,v 1.27 1999/12/15 20:09:06 mike Exp $"
+dnl "$Id: configure.in,v 1.28 2000/01/20 13:05:38 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-1999 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2000 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -183,12 +183,10 @@ AC_CHECK_LIB(z, deflate,
 dnl PNG library uses math library functions...
 AC_CHECK_LIB(m, pow)
 
-dnl AC_CHECK_HEADER(png.h,
 AC_CHECK_LIB(png, png_read_info,
     AC_DEFINE(HAVE_LIBPNG)
     LIBPNG="-lpng")
 
-dnl AC_CHECK_HEADER(tiff.h,
 AC_CHECK_LIB(tiff, TIFFReadScanline,
     AC_DEFINE(HAVE_LIBTIFF)
     LIBTIFF="-ltiff")
@@ -302,14 +300,26 @@ if test "$uname" = "IRIX" -a $uversion -ge 65; then
 	libdir="/usr/lib32"
 fi
 
-dnl CUPS_SERVERROOT needs special attention for the default location...
+dnl Need special attention for the default location...
 if test "$prefix" = "/usr"; then
-	CUPS_SERVERROOT="/var/cups"
+	CUPS_SERVERROOT="/etc/cups"
+	CUPS_SERVERBIN="/usr/lib/cups"
+	CUPS_LOGDIR="/var/log/cups"
+	CUPS_REQUESTS="/var/spool/cups"
 else
-	CUPS_SERVERROOT="$prefix/var/cups"
+	CUPS_SERVERROOT="$prefix/etc/cups"
+	CUPS_SERVERBIN="$prefix/lib/cups"
+	CUPS_LOGDIR="$prefix/log/cups"
+	CUPS_REQUESTS="$prefix/spool/cups"
 fi
 AC_DEFINE_UNQUOTED(CUPS_SERVERROOT, "$CUPS_SERVERROOT")
+AC_DEFINE_UNQUOTED(CUPS_SERVERBIN, "$CUPS_SERVERBIN")
+AC_DEFINE_UNQUOTED(CUPS_LOGDIR, "$CUPS_LOGDIR")
+AC_DEFINE_UNQUOTED(CUPS_REQUESTS, "$CUPS_REQUESTS")
 AC_SUBST(CUPS_SERVERROOT)
+AC_SUBST(CUPS_SERVERBIN)
+AC_SUBST(CUPS_LOGDIR)
+AC_SUBST(CUPS_REQUESTS)
 
 dnl Set the CUPS_LOCALE directory...
 case "$uname" in
@@ -338,5 +348,5 @@ AC_SUBST(CUPS_DATADIR)
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.27 1999/12/15 20:09:06 mike Exp $".
+dnl End of "$Id: configure.in,v 1.28 2000/01/20 13:05:38 mike Exp $".
 dnl

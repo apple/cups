@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.19 1999/12/16 23:13:15 mike Exp $"
+ * "$Id: gdevcups.c,v 1.20 2000/01/20 13:05:41 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -57,7 +57,7 @@
 #include "gsparam.h"
 
 #include <stdlib.h>
-#include <cups/raster.h>
+#include <filter/raster.h>
 #include <cups/ppd.h>
 #include <math.h>
 
@@ -2349,5 +2349,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.19 1999/12/16 23:13:15 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.20 2000/01/20 13:05:41 mike Exp $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.16 1999/09/27 18:21:21 mike Exp $"
+# "$Id: Makefile,v 1.17 2000/01/20 13:05:41 mike Exp $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -24,7 +24,7 @@
 
 include ../Makedefs
 
-CUPSDOBJS =	auth.o classes.o client.o conf.o dirsvc.o main.o ipp.o \
+CUPSDOBJS =	auth.o cert.o classes.o client.o conf.o dirsvc.o main.o ipp.o \
 		listen.o job.o log.o printers.o
 OBJS	=	$(CUPSDOBJS) testspeed.o
 
@@ -61,7 +61,7 @@ cupsd:	$(CUPSDOBJS) ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cupsd $(CUPSDOBJS) $(LIBS)
 
-$(CUPSDOBJS):	auth.h classes.h client.h conf.h cupsd.h dirsvc.h job.h \
+$(CUPSDOBJS):	auth.h cert.h classes.h client.h conf.h cupsd.h dirsvc.h job.h \
 		printers.h ../cups/cups.h ../cups/http.h ../cups/ipp.h \
 		../cups/language.h ../cups/mime.h ../cups/string.h
 
@@ -78,5 +78,5 @@ testspeed.o:	../cups/cups.h ../cups/http.h ../cups/ipp.h ../cups/language.h
 $(OBJS):	../config.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.16 1999/09/27 18:21:21 mike Exp $".
+# End of "$Id: Makefile,v 1.17 2000/01/20 13:05:41 mike Exp $".
 #

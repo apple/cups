@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.14 2000/01/04 13:46:06 mike Exp $"
+# "$Id: Makefile,v 1.15 2000/01/20 13:05:40 mike Exp $"
 #
 #   GNU Ghostscript makefile for the Common UNIX Printing System (CUPS).
 #
@@ -147,7 +147,7 @@ libgs.a:	$(LIBOBJS) ../Makedefs
 	$(AR) $(ARFLAGS) $@ $(LIBOBJS)
 	$(RANLIB) $@
 
-gdevcups.o:	../cups/raster.h
+gdevcups.o:	../filter/raster.h
 gconf.o iconf.o gscdef.o:	gconfig.h
 $(LIBOBJS):	arch.h ../config.h ../Makedefs
 
@@ -159,9 +159,9 @@ $(LIBOBJS):	arch.h ../config.h ../Makedefs
 pstoraster:	pstoraster.o libgs.a ../Makedefs ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o pstoraster pstoraster.o libgs.a \
-		$(LIBJPEG) $(LIBZ) $(LIBS) -lm
+		../filter/$(LIBCUPSIMAGE) $(LIBJPEG) $(LIBZ) $(LIBS) -lm
 pstoraster.o:	arch.h ../config.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.14 2000/01/04 13:46:06 mike Exp $".
+# End of "$Id: Makefile,v 1.15 2000/01/20 13:05:40 mike Exp $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.14 2000/01/04 13:46:08 mike Exp $"
+ * "$Id: classes.c,v 1.15 2000/01/20 13:05:41 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -300,7 +300,7 @@ LoadAllClasses(void)
   * Open the classes.conf file...
   */
 
-  sprintf(line, "%s/conf/classes.conf", ServerRoot);
+  sprintf(line, "%s/classes.conf", ServerRoot);
   if ((fp = fopen(line, "r")) == NULL)
     return;
 
@@ -470,7 +470,7 @@ SaveAllClasses(void)
   * Create the classes.conf file...
   */
 
-  sprintf(temp, "%s/conf/classes.conf", ServerRoot);
+  sprintf(temp, "%s/classes.conf", ServerRoot);
   if ((fp = fopen(temp, "w")) == NULL)
   {
     LogMessage(LOG_ERROR, "Unable to save classes.conf - %s", strerror(errno));
@@ -540,5 +540,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.14 2000/01/04 13:46:08 mike Exp $".
+ * End of "$Id: classes.c,v 1.15 2000/01/20 13:05:41 mike Exp $".
  */

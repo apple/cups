@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.39 2000/01/04 13:46:09 mike Exp $"
+ * "$Id: conf.c,v 1.40 2000/01/20 13:05:41 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -343,10 +343,8 @@ ReadConfiguration(void)
   * Read the MIME type and conversion database...
   */
 
-  snprintf(directory, sizeof(directory), "%s/conf", ServerRoot);
-
   MimeDatabase = mimeNew();
-  mimeMerge(MimeDatabase, directory);
+  mimeMerge(MimeDatabase, ServerRoot);
 
  /*
   * Load printers, classes, and jobs...
@@ -978,5 +976,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.39 2000/01/04 13:46:09 mike Exp $".
+ * End of "$Id: conf.c,v 1.40 2000/01/20 13:05:41 mike Exp $".
  */
