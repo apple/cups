@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.37 2000/05/11 15:14:38 mike Exp $"
+ * "$Id: ipp.c,v 1.38 2000/06/12 13:47:07 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -259,6 +259,22 @@ ippAddString(ipp_t      *ipp,		/* I - IPP request */
   attr->value_tag                 = type;
   attr->values[0].string.charset  = charset ? strdup(charset) : NULL;
   attr->values[0].string.text     = strdup(value);
+
+  if (type == IPP_TAG_LANGUAGE || type == IPP_TAG_CHARSET)
+  {
+   /*
+    * Convert to lowercase and change _ to - as needed...
+    */
+
+    char *p;
+
+
+    for (p = attr->values[0].string.text; *p;)
+      if (*p == '_')
+        *p++ = '-';
+      else
+        *p++ = tolower(*p++);
+  }
 
   return (attr);
 }
@@ -1679,5 +1695,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.37 2000/05/11 15:14:38 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38 2000/06/12 13:47:07 mike Exp $".
  */
