@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.68 2003/01/23 19:25:07 mike Exp $"
+ * "$Id: ipp.c,v 1.69 2003/01/23 20:16:08 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -44,6 +44,7 @@
 #include <cups/language.h>
 #include <cups/string.h>
 #include <signal.h>
+#include <sys/wait.h>
 
 
 /*
@@ -975,11 +976,13 @@ run_pictwps_filter(char **argv,			/* I - Command-line arguments */
   {
     fprintf(stderr, "ERROR: Unable to get PPD file for printer \"%s\" - %s.\n",
             printer, ippErrorString(cupsLastError()));
-    return (-1);
+    /*return (-1);*/
   }
-
-  snprintf(ppdenv, sizeof(ppdenv), "PPD=%s", ppdfile);
-  putenv(ppdenv);
+  else
+  {
+    snprintf(ppdenv, sizeof(ppdenv), "PPD=%s", ppdfile);
+    putenv(ppdenv);
+  }
 
  /*
   * Then create a temporary file for printing...
@@ -988,7 +991,7 @@ run_pictwps_filter(char **argv,			/* I - Command-line arguments */
   if ((fd = cupsTempFd(filename, length)) < 0)
   {
     fprintf(stderr, "ERROR: Unable to create temporary file - %s.\n",
-            printer, strerror(errno));
+            strerror(errno));
     return (-1);
   }
 
@@ -1078,5 +1081,5 @@ run_pictwps_filter(char **argv,			/* I - Command-line arguments */
 
 
 /*
- * End of "$Id: ipp.c,v 1.68 2003/01/23 19:25:07 mike Exp $".
+ * End of "$Id: ipp.c,v 1.69 2003/01/23 20:16:08 mike Exp $".
  */
