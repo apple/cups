@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.57 2002/05/16 13:44:49 mike Exp $"
+ * "$Id: config.h.in,v 1.58 2002/05/29 16:36:54 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -94,6 +94,8 @@
 #ifndef HAVE_LIBPAM
 #define HAVE_LIBPAM 0
 #endif /* !HAVE_LIBPAM */
+
+#undef HAVE_PAM_PAM_APPL_H
 
 
 /*
@@ -233,5 +235,5 @@
 
 
 /*
- * End of "$Id: config.h.in,v 1.57 2002/05/16 13:44:49 mike Exp $".
+ * End of "$Id: config.h.in,v 1.58 2002/05/29 16:36:54 mike Exp $".
  */
