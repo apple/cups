@@ -1,5 +1,5 @@
 /*
- * "$Id: image.h,v 1.11.2.2 2002/03/01 19:55:20 mike Exp $"
+ * "$Id: image.h,v 1.11.2.3 2002/04/19 16:18:11 mike Exp $"
  *
  *   Image library definitions for the Common UNIX Printing System (CUPS).
  *
@@ -47,6 +47,8 @@
 #  define IMAGE_BLACK	-1		/* Black */
 #  define IMAGE_WHITE	1		/* White (luminance) */
 #  define IMAGE_RGB	3		/* Red, green, and blue */
+#  define IMAGE_RGB_CMYK 4		/* Use RGB or CMYK */
+
 
 /*
  * Tile definitions...
@@ -211,6 +213,12 @@ extern void	ImageRGBToBlack(const ib_t *in, ib_t *out, int count);
 extern void	ImageRGBToCMY(const ib_t *in, ib_t *out, int count);
 extern void	ImageRGBToCMYK(const ib_t *in, ib_t *out, int count);
 
+extern void	ImageCMYKToWhite(const ib_t *in, ib_t *out, int count);
+extern void	ImageCMYKToRGB(const ib_t *in, ib_t *out, int count);
+extern void	ImageCMYKToBlack(const ib_t *in, ib_t *out, int count);
+extern void	ImageCMYKToCMY(const ib_t *in, ib_t *out, int count);
+extern void	ImageCMYKToCMYK(const ib_t *in, ib_t *out, int count);
+
 extern void	ImageRGBAdjust(ib_t *pixels, int count, int saturation, int hue);
 
 extern void	ImageLut(ib_t *pixels, int count, const ib_t *lut);
@@ -229,5 +237,5 @@ extern void	ImageZoomFree(izoom_t *z);
 #endif /* !_IMAGE_H_ */
 
 /*
- * End of "$Id: image.h,v 1.11.2.2 2002/03/01 19:55:20 mike Exp $".
+ * End of "$Id: image.h,v 1.11.2.3 2002/04/19 16:18:11 mike Exp $".
  */

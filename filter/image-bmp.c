@@ -1,5 +1,5 @@
 /*
- * "$Id: image-bmp.c,v 1.3.2.3 2002/03/01 19:55:17 mike Exp $"
+ * "$Id: image-bmp.c,v 1.3.2.4 2002/04/19 16:18:09 mike Exp $"
  *
  *   BMP image routines for the Common UNIX Printing System (CUPS).
  *
@@ -156,7 +156,7 @@ ImageReadBMP(image_t    *img,		/* IO - Image */
   * Setup image and buffers...
   */
 
-  img->colorspace = primary;
+  img->colorspace = (primary == IMAGE_RGB_CMYK) ? IMAGE_RGB : primary;
 
   ImageSetMaxTiles(img, 0);
 
@@ -508,5 +508,5 @@ read_long(FILE *fp)               /* I - File to read from */
 
 
 /*
- * End of "$Id: image-bmp.c,v 1.3.2.3 2002/03/01 19:55:17 mike Exp $".
+ * End of "$Id: image-bmp.c,v 1.3.2.4 2002/04/19 16:18:09 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: image-colorspace.c,v 1.22.2.4 2002/03/01 19:55:18 mike Exp $"
+ * "$Id: image-colorspace.c,v 1.22.2.5 2002/04/19 16:18:09 mike Exp $"
  *
  *   Colorspace conversions for the Common UNIX Printing System (CUPS).
  *
@@ -36,6 +36,11 @@
  *   ImageRGBToCMYK()    - Convert RGB colors to CMYK.
  *   ImageRGBToWhite()   - Convert RGB colors to luminance.
  *   ImageRGBToRGB()     - Convert RGB colors to device-dependent RGB.
+ *   ImageCMYKToBlack()  - Convert CMYK data to black.
+ *   ImageCMYKToCMY()    - Convert CMYK colors to CMY.
+ *   ImageCMYKToCMYK()   - Convert CMYK colors to CMYK.
+ *   ImageCMYKToWhite()  - Convert CMYK colors to luminance.
+ *   ImageCMYKToRGB()    - Convert CMYK colors to device-dependent RGB.
  *   ImageLut()          - Adjust all pixel values with the given LUT.
  *   ImageRGBAdjust()    - Adjust the hue and saturation of the given RGB
  *                         colors.
@@ -535,6 +540,339 @@ ImageRGBToRGB(const ib_t *in,	/* I - Input pixels */
 
 
 /*
+ * 'ImageCMYKToBlack()' - Convert CMYK data to black.
+ */
+
+void
+ImageCMYKToBlack(const ib_t *in,	/* I - Input pixels */
+                 ib_t       *out,	/* I - Output pixels */
+                 int        count)	/* I - Number of pixels */
+{
+  int	k;				/* Black value */
+
+
+  if (ImageHaveProfile)
+    while (count > 0)
+    {
+      k = (31 * in[0] + 61 * in[1] + 8 * in[2]) / 100 + in[3];
+
+      if (k < 255)
+        *out++ = ImageDensity[k];
+      else
+        *out++ = ImageDensity[255];
+
+      in += 4;
+      count --;
+    }
+  else
+    while (count > 0)
+    {
+      k = (31 * in[0] + 61 * in[1] + 8 * in[2]) / 100 + in[3];
+
+      if (k < 255)
+        *out++ = k;
+      else
+        *out++ = 255;
+
+      in += 4;
+      count --;
+    }
+}
+
+
+/*
+ * 'ImageCMYKToCMY()' - Convert CMYK colors to CMY.
+ */
+
+void
+ImageCMYKToCMY(const ib_t *in,	/* I - Input pixels */
+              ib_t       *out,	/* I - Output pixels */
+              int        count)	/* I - Number of pixels */
+{
+  int	c, m, y, k;		/* CMYK values */
+  int	cc, cm, cy;		/* Calibrated CMY values */
+
+
+  if (ImageHaveProfile)
+    while (count > 0)
+    {
+      c = *in++;
+      m = *in++;
+      y = *in++;
+      k = *in++;
+
+      cc = ImageMatrix[0][0][c] +
+           ImageMatrix[0][1][m] +
+	   ImageMatrix[0][2][y] + k;
+      cm = ImageMatrix[1][0][c] +
+           ImageMatrix[1][1][m] +
+	   ImageMatrix[1][2][y] + k;
+      cy = ImageMatrix[2][0][c] +
+           ImageMatrix[2][1][m] +
+	   ImageMatrix[2][2][y] + k;
+
+      if (cc < 0)
+        *out++ = 0;
+      else if (cc > 255)
+        *out++ = ImageDensity[255];
+      else
+        *out++ = ImageDensity[cc];
+
+      if (cm < 0)
+        *out++ = 0;
+      else if (cm > 255)
+        *out++ = ImageDensity[255];
+      else
+        *out++ = ImageDensity[cm];
+
+      if (cy < 0)
+        *out++ = 0;
+      else if (cy > 255)
+        *out++ = ImageDensity[255];
+      else
+        *out++ = ImageDensity[cy];
+
+      count --;
+    }
+  else
+    while (count > 0)
+    {
+      c = *in++;
+      m = *in++;
+      y = *in++;
+      k = *in++;
+
+      c += k;
+      m += k;
+      y += k;
+
+      if (c < 255)
+        *out++ = c;
+      else
+        *out++ = 255;
+
+      if (m < 255)
+        *out++ = y;
+      else
+        *out++ = 255;
+
+      if (y < 255)
+        *out++ = y;
+      else
+        *out++ = 255;
+
+      count --;
+    }
+}
+
+
+/*
+ * 'ImageCMYKToCMYK()' - Convert CMYK colors to CMYK.
+ */
+
+void
+ImageCMYKToCMYK(const ib_t *in,	/* I - Input pixels */
+                ib_t       *out,/* I - Output pixels */
+                int        count)/* I - Number of pixels */
+{
+  int	c, m, y, k;		/* CMYK values */
+  int	cc, cm, cy;		/* Calibrated CMY values */
+
+
+  if (ImageHaveProfile)
+    while (count > 0)
+    {
+      c = *in++;
+      m = *in++;
+      y = *in++;
+      k = *in++;
+
+      cc = (ImageMatrix[0][0][c] +
+            ImageMatrix[0][1][m] +
+	    ImageMatrix[0][2][y]);
+      cm = (ImageMatrix[1][0][c] +
+            ImageMatrix[1][1][m] +
+	    ImageMatrix[1][2][y]);
+      cy = (ImageMatrix[2][0][c] +
+            ImageMatrix[2][1][m] +
+	    ImageMatrix[2][2][y]);
+
+      if (cc < 0)
+        *out++ = 0;
+      else if (cc > 255)
+        *out++ = ImageDensity[255];
+      else
+        *out++ = ImageDensity[cc];
+
+      if (cm < 0)
+        *out++ = 0;
+      else if (cm > 255)
+        *out++ = ImageDensity[255];
+      else
+        *out++ = ImageDensity[cm];
+
+      if (cy < 0)
+        *out++ = 0;
+      else if (cy > 255)
+        *out++ = ImageDensity[255];
+      else
+        *out++ = ImageDensity[cy];
+
+      *out++ = ImageDensity[k];
+
+      count --;
+    }
+  else if (in != out)
+  {
+    while (count > 0)
+    {
+      *out++ = *in++;
+      *out++ = *in++;
+      *out++ = *in++;
+      *out++ = *in++;
+
+      count --;
+    }
+  }
+}
+
+
+/*
+ * 'ImageCMYKToWhite()' - Convert CMYK colors to luminance.
+ */
+
+void
+ImageCMYKToWhite(const ib_t *in,	/* I - Input pixels */
+                 ib_t       *out,	/* I - Output pixels */
+                 int        count)	/* I - Number of pixels */
+{
+  int	w;				/* White value */
+
+
+  if (ImageHaveProfile)
+  {
+    while (count > 0)
+    {
+      w = 255 - (31 * in[0] + 61 * in[1] + 8 * in[2]) / 100 - in[3];
+
+      if (w > 0)
+        *out++ = ImageDensity[w];
+      else
+        *out++ = ImageDensity[0];
+
+      in += 4;
+      count --;
+    }
+  }
+  else
+  {
+    while (count > 0)
+    {
+      w = 255 - (31 * in[0] + 61 * in[1] + 8 * in[2]) / 100 - in[3];
+
+      if (w > 0)
+        *out++ = w;
+      else
+        *out++ = 0;
+
+      in += 4;
+      count --;
+    }
+  }
+}
+
+
+/*
+ * 'ImageCMYKToRGB()' - Convert CMYK colors to device-dependent RGB.
+ */
+
+void
+ImageCMYKToRGB(const ib_t *in,	/* I - Input pixels */
+               ib_t       *out,	/* I - Output pixels */
+               int        count)/* I - Number of pixels */
+{
+  int	c, m, y, k;		/* CMYK values */
+  int	cr, cg, cb;		/* Calibrated RGB values */
+
+
+  if (ImageHaveProfile)
+  {
+    while (count > 0)
+    {
+      c = *in++;
+      m = *in++;
+      y = *in++;
+      k = *in++;
+
+      cr = ImageMatrix[0][0][c] +
+           ImageMatrix[0][1][m] +
+           ImageMatrix[0][2][y] + k;
+      cg = ImageMatrix[1][0][c] +
+           ImageMatrix[1][1][m] +
+	   ImageMatrix[1][2][y] + k;
+      cb = ImageMatrix[2][0][c] +
+           ImageMatrix[2][1][m] +
+	   ImageMatrix[2][2][y] + k;
+
+      if (cr < 0)
+        *out++ = 255;
+      else if (cr > 255)
+        *out++ = 255 - ImageDensity[255];
+      else
+        *out++ = 255 - ImageDensity[cr];
+
+      if (cg < 0)
+        *out++ = 255;
+      else if (cg > 255)
+        *out++ = 255 - ImageDensity[255];
+      else
+        *out++ = 255 - ImageDensity[cg];
+
+      if (cb < 0)
+        *out++ = 255;
+      else if (cb > 255)
+        *out++ = 255 - ImageDensity[255];
+      else
+        *out++ = 255 - ImageDensity[cb];
+
+      count --;
+    }
+  }
+  else
+  {
+    while (count > 0)
+    {
+      c = 255 - *in++;
+      m = 255 - *in++;
+      y = 255 - *in++;
+      k = *in++;
+
+      c -= k;
+      m -= k;
+      y -= k;
+
+      if (c > 0)
+	*out++ = c;
+      else
+        *out++ = 0;
+
+      if (m > 0)
+	*out++ = m;
+      else
+        *out++ = 0;
+
+      if (y > 0)
+	*out++ = y;
+      else
+        *out++ = 0;
+
+      count --;
+    }
+  }
+}
+
+
+/*
  * 'ImageLut()' - Adjust all pixel values with the given LUT.
  */
 
@@ -924,5 +1262,5 @@ zshear(float mat[3][3],	/* I - Matrix */
 
 
 /*
- * End of "$Id: image-colorspace.c,v 1.22.2.4 2002/03/01 19:55:18 mike Exp $".
+ * End of "$Id: image-colorspace.c,v 1.22.2.5 2002/04/19 16:18:09 mike Exp $".
  */

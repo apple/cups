@@ -5,6 +5,11 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- The PostScript image filter (imagetops) now supports
+	  printing CMYK images using the CMYK colorspace.
+	- The image filters now support CMYK JPEG files, and
+	  correctly handles the inverted files from Photoshop
+	  (which seems to save RGBW data, not CMYK...)
 	- Added a "check" target to the top-level makefile to
 	  conform with GNU standards (same as "test").
 	- The IPP code didn't always map the POSIX locale "C" to

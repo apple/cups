@@ -1,5 +1,5 @@
 /*
- * "$Id: image-photocd.c,v 1.10.2.2 2002/03/01 19:55:18 mike Exp $"
+ * "$Id: image-photocd.c,v 1.10.2.3 2002/04/19 16:18:10 mike Exp $"
  *
  *   PhotoCD routines for the Common UNIX Printing System (CUPS).
  *
@@ -91,7 +91,7 @@ ImageReadPhotoCD(image_t    *img,	/* IO - Image */
   * Allocate and initialize...
   */
 
-  img->colorspace = primary;
+  img->colorspace = (primary == IMAGE_RGB_CMYK) ? IMAGE_RGB : primary;
   img->xppi       = 128;
   img->yppi       = 128;
 
@@ -321,5 +321,5 @@ ImageReadPhotoCD(image_t    *img,	/* IO - Image */
 
 
 /*
- * End of "$Id: image-photocd.c,v 1.10.2.2 2002/03/01 19:55:18 mike Exp $".
+ * End of "$Id: image-photocd.c,v 1.10.2.3 2002/04/19 16:18:10 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: image-png.c,v 1.11.2.2 2002/03/01 19:55:18 mike Exp $"
+ * "$Id: image-png.c,v 1.11.2.3 2002/04/19 16:18:10 mike Exp $"
  *
  *   PNG image routines for the Common UNIX Printing System (CUPS).
  *
@@ -88,7 +88,7 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
       info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
     img->colorspace = secondary;
   else
-    img->colorspace = primary;
+    img->colorspace = (primary == IMAGE_RGB_CMYK) ? IMAGE_RGB : primary;
 
   img->xsize = info->width;
   img->ysize = info->height;
@@ -248,5 +248,5 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-png.c,v 1.11.2.2 2002/03/01 19:55:18 mike Exp $".
+ * End of "$Id: image-png.c,v 1.11.2.3 2002/04/19 16:18:10 mike Exp $".
  */

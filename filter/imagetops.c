@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.36.2.6 2002/03/01 19:55:20 mike Exp $"
+ * "$Id: imagetops.c,v 1.36.2.7 2002/04/19 16:18:11 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -266,7 +266,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Open the input image to print...
   */
 
-  colorspace = ColorDevice ? IMAGE_RGB : IMAGE_WHITE;
+  colorspace = ColorDevice ? IMAGE_RGB_CMYK : IMAGE_WHITE;
 
   img = ImageOpen(filename, colorspace, IMAGE_WHITE, sat, hue, NULL);
 
@@ -674,7 +674,8 @@ main(int  argc,		/* I - Number of command-line arguments */
           if (colorspace == IMAGE_WHITE)
             puts("{currentfile picture readhexstring pop} image");
           else
-            puts("{currentfile picture readhexstring pop} false 3 colorimage");
+            printf("{currentfile picture readhexstring pop} false %d colorimage\n",
+	           abs(colorspace));
 
           for (y = y0; y <= y1; y ++)
           {
@@ -684,10 +685,18 @@ main(int  argc,		/* I - Number of command-line arguments */
 	}
 	else
 	{
-          if (colorspace == IMAGE_WHITE)
-            puts("/DeviceGray setcolorspace");
-          else
-            puts("/DeviceRGB setcolorspace");
+          switch (colorspace)
+	  {
+	    case IMAGE_WHITE :
+                puts("/DeviceGray setcolorspace");
+		break;
+            case IMAGE_RGB :
+                puts("/DeviceRGB setcolorspace");
+		break;
+            case IMAGE_CMYK :
+                puts("/DeviceCMYK setcolorspace");
+		break;
+          }
 
           printf("<<"
                  "/ImageType 1"
@@ -696,10 +705,18 @@ main(int  argc,		/* I - Number of command-line arguments */
 		 "/BitsPerComponent 8",
 		 x1 - x0 + 1, y1 - y0 + 1);
 
-          if (colorspace == IMAGE_WHITE)
-            fputs("/Decode[0 1]", stdout);
-          else
-            fputs("/Decode[0 1 0 1 0 1]", stdout);
+          switch (colorspace)
+	  {
+	    case IMAGE_WHITE :
+                fputs("/Decode[0 1]", stdout);
+		break;
+            case IMAGE_RGB :
+                fputs("/Decode[0 1 0 1 0 1]", stdout);
+		break;
+            case IMAGE_CMYK :
+                fputs("/Decode[0 1 0 1 0 1 0 1]", stdout);
+		break;
+          }
 
           fputs("/DataSource currentfile /ASCII85Decode filter", stdout);
 
@@ -868,5 +885,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.36.2.6 2002/03/01 19:55:20 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.36.2.7 2002/04/19 16:18:11 mike Exp $".
  */

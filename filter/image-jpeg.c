@@ -1,5 +1,5 @@
 /*
- * "$Id: image-jpeg.c,v 1.11.2.3 2002/03/01 19:55:18 mike Exp $"
+ * "$Id: image-jpeg.c,v 1.11.2.4 2002/04/19 16:18:10 mike Exp $"
  *
  *   JPEG image routines for the Common UNIX Printing System (CUPS).
  *
@@ -55,9 +55,32 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
   struct jpeg_error_mgr		jerr;	/* Error handler info */
   ib_t				*in,	/* Input pixels */
 				*out;	/* Output pixels */
+  char				header[16];
+  					/* Photoshop JPEG header */
+  int				psjpeg;	/* Non-zero if Photoshop JPEG */
+  static const char		*cspaces[] =
+				{	/* JPEG colorspaces... */
+				  "JCS_UNKNOWN",
+				  "JCS_GRAYSCALE",
+				  "JCS_RGB",
+				  "JCS_YCbCr",
+				  "JCS_CMYK",
+				  "JCS_YCCK"
+				};
 
 
-  (void)secondary;
+ /*
+  * Read the first 16 bytes to determine if this is a Photoshop JPEG file...
+  */
+
+  fread(header, sizeof(header), 1, fp);
+  rewind(fp);
+
+  psjpeg = memcmp(header + 6, "Photoshop ", 10) == 0;
+
+ /*
+  * Read the JPEG header...
+  */
 
   cinfo.err = jpeg_std_error(&jerr);
   jpeg_create_decompress(&cinfo);
@@ -66,24 +89,45 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
 
   cinfo.quantize_colors = 0;
 
+  fprintf(stderr, "DEBUG: num_components = %d\n", cinfo.num_components);
+  fprintf(stderr, "DEBUG: jpeg_color_space = %s\n",
+          cspaces[cinfo.jpeg_color_space]);
+
   if (cinfo.num_components == 1)
   {
+    fputs("DEBUG: Converting image to grayscale...\n", stderr);
+
     cinfo.out_color_space      = JCS_GRAYSCALE;
     cinfo.out_color_components = 1;
     cinfo.output_components    = 1;
+
+    img->colorspace = secondary;
+  }
+  else if (cinfo.num_components == 4)
+  {
+    fputs("DEBUG: Converting image to CMYK...\n", stderr);
+
+    cinfo.out_color_space      = JCS_CMYK;
+    cinfo.out_color_components = 4;
+    cinfo.output_components    = 4;
+
+    img->colorspace = (primary == IMAGE_RGB_CMYK) ? IMAGE_CMYK : primary;
   }
   else
   {
+    fputs("DEBUG: Converting image to RGB...\n", stderr);
+
     cinfo.out_color_space      = JCS_RGB;
     cinfo.out_color_components = 3;
     cinfo.output_components    = 3;
+
+    img->colorspace = (primary == IMAGE_RGB_CMYK) ? IMAGE_RGB : primary;
   }
 
   jpeg_calc_output_dimensions(&cinfo);
 
   img->xsize      = cinfo.output_width;
   img->ysize      = cinfo.output_height;
-  img->colorspace = primary;
 
   if (cinfo.X_density > 0 && cinfo.Y_density > 0 && cinfo.density_unit > 0)
   {
@@ -105,11 +149,8 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
 
   ImageSetMaxTiles(img, 0);
 
-  in = malloc(img->xsize * cinfo.output_components);
-  if (primary < 0)
-    out = malloc(-img->xsize * primary);
-  else
-    out = malloc(img->xsize * primary);
+  in  = malloc(img->xsize * cinfo.output_components);
+  out = malloc(img->xsize * ImageGetDepth(img));
 
   jpeg_start_decompress(&cinfo);
 
@@ -117,12 +158,46 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
   {
     jpeg_read_scanlines(&cinfo, (JSAMPROW *)&in, (JDIMENSION)1);
 
-    if ((saturation != 100 || hue != 0) && cinfo.output_components > 1)
+    if (psjpeg && cinfo.output_components == 4)
+    {
+     /*
+      * Invert CMYK data from Photoshop...
+      */
+
+      ib_t	*ptr;	/* Pointer into buffer */
+      int	i;	/* Looping var */
+
+
+      for (ptr = in, i = img->xsize * 4; i > 0; i --, ptr ++)
+        *ptr = 255 - *ptr;
+    }
+
+    if ((saturation != 100 || hue != 0) && cinfo.output_components == 3)
       ImageRGBAdjust(in, img->xsize, saturation, hue);
 
-    if ((primary == IMAGE_WHITE && cinfo.out_color_space == JCS_GRAYSCALE) ||
-        (primary == IMAGE_RGB && cinfo.out_color_space == JCS_RGB))
+    if ((img->colorspace == IMAGE_WHITE && cinfo.out_color_space == JCS_GRAYSCALE) ||
+        (img->colorspace == IMAGE_RGB && cinfo.out_color_space == JCS_RGB) ||
+	(img->colorspace == IMAGE_CMYK && cinfo.out_color_space == JCS_CMYK))
     {
+#ifdef DEBUG
+      int	i, j;
+      ib_t	*ptr;
+
+
+      fputs("DEBUG: Direct Data...\n", stderr);
+
+      fputs("DEBUG:", stderr);
+
+      for (i = 0, ptr = in; i < img->xsize; i ++)
+      {
+        putc(' ', stderr);
+	for (j = 0; j < cinfo.output_components; j ++, ptr ++)
+	  fprintf(stderr, "%02X", *ptr & 255);
+      }
+
+      putc('\n', stderr);
+#endif /* DEBUG */
+
       if (lut)
         ImageLut(in, img->xsize * ImageGetDepth(img), lut);
 
@@ -130,7 +205,7 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
     }
     else if (cinfo.out_color_space == JCS_GRAYSCALE)
     {
-      switch (primary)
+      switch (img->colorspace)
       {
         case IMAGE_BLACK :
             ImageWhiteToBlack(in, out, img->xsize);
@@ -151,9 +226,9 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
 
       ImagePutRow(img, 0, cinfo.output_scanline - 1, img->xsize, out);
     }
-    else
+    else if (cinfo.out_color_space == JCS_RGB)
     {
-      switch (primary)
+      switch (img->colorspace)
       {
         case IMAGE_WHITE :
             ImageRGBToWhite(in, out, img->xsize);
@@ -166,6 +241,31 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
             break;
         case IMAGE_CMYK :
             ImageRGBToCMYK(in, out, img->xsize);
+            break;
+      }
+
+      if (lut)
+        ImageLut(out, img->xsize * ImageGetDepth(img), lut);
+
+      ImagePutRow(img, 0, cinfo.output_scanline - 1, img->xsize, out);
+    }
+    else /* JCS_CMYK */
+    {
+      fputs("DEBUG: JCS_CMYK\n", stderr);
+
+      switch (img->colorspace)
+      {
+        case IMAGE_WHITE :
+            ImageCMYKToWhite(in, out, img->xsize);
+            break;
+        case IMAGE_BLACK :
+            ImageCMYKToBlack(in, out, img->xsize);
+            break;
+        case IMAGE_CMY :
+            ImageCMYKToCMY(in, out, img->xsize);
+            break;
+        case IMAGE_RGB :
+            ImageCMYKToRGB(in, out, img->xsize);
             break;
       }
 
@@ -192,5 +292,5 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-jpeg.c,v 1.11.2.3 2002/03/01 19:55:18 mike Exp $".
+ * End of "$Id: image-jpeg.c,v 1.11.2.4 2002/04/19 16:18:10 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: image-tiff.c,v 1.17.2.5 2002/03/04 14:20:41 mike Exp $"
+ * "$Id: image-tiff.c,v 1.17.2.6 2002/04/19 16:18:11 mike Exp $"
  *
  *   TIFF file routines for the Common UNIX Printing System (CUPS).
  *
@@ -197,8 +197,14 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
   if (photometric == PHOTOMETRIC_MINISBLACK ||
       photometric == PHOTOMETRIC_MINISWHITE)
     img->colorspace = secondary;
+  else if (photometric == PHOTOMETRIC_SEPARATED && primary == IMAGE_RGB_CMYK)
+    img->colorspace = IMAGE_CMYK;
+  else if (primary == IMAGE_RGB_CMYK)
+    img->colorspace = IMAGE_RGB;
   else
     img->colorspace = primary;
+
+  fprintf(stderr, "DEBUG: img->colorspace = %d\n", img->colorspace);
 
   bpp = ImageGetDepth(img);
 
@@ -1212,6 +1218,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
         break;
 
     case PHOTOMETRIC_SEPARATED :
+        inkset  = INKSET_CMYK;
         numinks = 4;
 
 #ifdef TIFFTAG_NUMBEROFINKS
@@ -1221,9 +1228,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
         if (!TIFFGetField(tif, TIFFTAG_INKSET, &inkset))
 #endif /* TIFFTAG_NUMBEROFINKS */
 	{
-          fputs("ERROR: No inkset or number-of-inks tag in the file!\n", stderr);
-	  fclose(fp);
-	  return (-1);
+          fputs("WARNING: No inkset or number-of-inks tag in the file!\n", stderr);
 	}
 
 	if (inkset == INKSET_CMYK || numinks == 4)
@@ -1429,7 +1434,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 
         	ImagePutRow(img, 0, y, img->xsize, in);
 	      }
-              else
+              else if (img->colorspace == IMAGE_WHITE)
               {
 		switch (img->colorspace)
 		{
@@ -1655,7 +1660,7 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 
         	ImagePutCol(img, x, 0, img->ysize, in);
               }
-	      else
+              else if (img->colorspace == IMAGE_WHITE)
               {
 		switch (img->colorspace)
 		{
@@ -1711,5 +1716,5 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-tiff.c,v 1.17.2.5 2002/03/04 14:20:41 mike Exp $".
+ * End of "$Id: image-tiff.c,v 1.17.2.6 2002/04/19 16:18:11 mike Exp $".
  */

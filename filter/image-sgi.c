@@ -1,5 +1,5 @@
 /*
- * "$Id: image-sgi.c,v 1.8.2.2 2002/03/01 19:55:19 mike Exp $"
+ * "$Id: image-sgi.c,v 1.8.2.3 2002/04/19 16:18:11 mike Exp $"
  *
  *   SGI image file routines for the Common UNIX Printing System (CUPS).
  *
@@ -76,7 +76,7 @@ ImageReadSGI(image_t    *img,		/* IO - Image */
   if (sgip->zsize < 3)
     img->colorspace = secondary;
   else
-    img->colorspace = primary;
+    img->colorspace = (primary == IMAGE_RGB_CMYK) ? IMAGE_RGB : primary;
 
   img->xsize = sgip->xsize;
   img->ysize = sgip->ysize;
@@ -265,5 +265,5 @@ ImageReadSGI(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-sgi.c,v 1.8.2.2 2002/03/01 19:55:19 mike Exp $".
+ * End of "$Id: image-sgi.c,v 1.8.2.3 2002/04/19 16:18:11 mike Exp $".
  */
