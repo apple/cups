@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.23 1999/06/23 14:09:00 mike Exp $"
+ * "$Id: util.c,v 1.24 1999/07/07 13:16:51 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -730,13 +730,8 @@ cupsPrintFile(char          *name,	/* I - Printer or class name */
     ippAddString(request, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format",
         	 NULL, "application/octet-stream");
 
-#if defined(WIN32) || defined(__EMX__)
   ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME, "requesting-user-name",
-               NULL, "WindowsUser");
-#else
-  ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME, "requesting-user-name",
-               NULL, cuserid(NULL));
-#endif /* WIN32 || __EMX__ */
+               NULL, cupsUser());
 
   if (title)
     ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL, title);
@@ -941,5 +936,5 @@ cups_connect(char *name,	/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.23 1999/06/23 14:09:00 mike Exp $".
+ * End of "$Id: util.c,v 1.24 1999/07/07 13:16:51 mike Exp $".
  */
