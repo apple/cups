@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: cups-config.in,v 1.9 2002/05/01 19:26:57 mike Exp $"
+# "$Id: cups-config.in,v 1.10 2002/06/06 19:39:37 mike Exp $"
 # 
 #   CUPS configuration utility.
 #
@@ -40,8 +40,8 @@ cups_serverroot=@CUPS_SERVERROOT@
 # flags for C++ compiler:
 CFLAGS=""
 LDFLAGS=""
-LIBS="@SSLLIBS@ @NETLIBS@"
-IMGLIBS="@LIBTIFF@ @LIBJPEG@ @LIBPNG@ @LIBZ@"
+LIBS="@EXPORT_SSLLIBS@ @NETLIBS@"
+IMGLIBS="@EXPORT_LIBTIFF@ @EXPORT_LIBJPEG@ @EXPORT_LIBPNG@ @EXPORT_LIBZ@"
 
 if test $includedir != /usr/include; then
     CFLAGS="$CFLAGS -I$includedir"
@@ -130,5 +130,5 @@ while test $# -gt 0; do
 done
 
 #
-# End of "$Id: cups-config.in,v 1.9 2002/05/01 19:26:57 mike Exp $".
+# End of "$Id: cups-config.in,v 1.10 2002/06/06 19:39:37 mike Exp $".
 #

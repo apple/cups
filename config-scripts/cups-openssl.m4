@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-openssl.m4,v 1.8 2002/06/04 20:58:55 mike Exp $"
+dnl "$Id: cups-openssl.m4,v 1.9 2002/06/06 19:39:37 mike Exp $"
 dnl
 dnl   OpenSSL stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -65,6 +65,10 @@ fi
 
 AC_SUBST(SSLLIBS)
 
+EXPORT_SSLLIBS="$SSLLIBS"
+AC_SUBST(EXPORT_SSLLIBS)
+
+
 dnl
-dnl End of "$Id: cups-openssl.m4,v 1.8 2002/06/04 20:58:55 mike Exp $".
+dnl End of "$Id: cups-openssl.m4,v 1.9 2002/06/06 19:39:37 mike Exp $".
 dnl
