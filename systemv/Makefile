@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.26 2001/07/19 20:17:58 mike Exp $"
+# "$Id: Makefile,v 1.27 2001/08/17 14:22:55 mike Exp $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -59,9 +59,9 @@ install:
 	$(INSTALL_BIN) lpmove $(SBINDIR)
 	$(INSTALL_BIN) cancel $(BINDIR)
 	$(RM) $(BINDIR)/disable
-	$(LN) $(SBINDIR)/accept $(SBINDIR)/disable
+	$(LN) ../sbin/accept $(BINDIR)/disable
 	$(RM) $(BINDIR)/enable
-	$(LN) $(SBINDIR)/accept $(SBINDIR)/enable
+	$(LN) ../sbin/accept $(BINDIR)/enable
 	$(INSTALL_BIN) lp $(BINDIR)
 	$(INSTALL_BIN) lpoptions $(BINDIR)
 	$(INSTALL_BIN) lpstat $(BINDIR)
@@ -174,5 +174,5 @@ lpstat.o:	../cups/cups.h
 $(OBJS):	../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.26 2001/07/19 20:17:58 mike Exp $".
+# End of "$Id: Makefile,v 1.27 2001/08/17 14:22:55 mike Exp $".
 #
