@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.63 2004/07/01 21:28:38 mike Exp $"
+ * "$Id: main.c,v 1.57.2.64 2004/07/02 19:12:48 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -579,7 +579,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       for (job = Jobs; job != NULL; job = job->next)
         LogMessage(L_EMERG, "Jobs[%d] = %d < [%d %d] > [%d %d]",
-	           job->id, job->status_pipe,
+	           job->id, job->status_buffer ? job->status_buffer->fd : -1,
 		   job->print_pipes[0], job->print_pipes[1],
 		   job->back_pipes[0], job->back_pipes[1]);
 
@@ -660,14 +660,14 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       next = job->next;
 
-      if (job->status_pipe >= 0 && FD_ISSET(job->status_pipe, input))
+      if (job->status_buffer && FD_ISSET(job->status_buffer->fd, input))
       {
        /*
         * Clear the input bit to avoid updating the next job
 	* using the same status pipe file descriptor...
 	*/
 
-        FD_CLR(job->status_pipe, input);
+        FD_CLR(job->status_buffer->fd, input);
 
        /*
         * Read any status messages from the filters...
@@ -1342,5 +1342,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.63 2004/07/01 21:28:38 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.64 2004/07/02 19:12:48 mike Exp $".
  */

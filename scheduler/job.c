@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.89 2004/06/30 18:24:18 mike Exp $"
+ * "$Id: job.c,v 1.124.2.90 2004/07/02 19:12:48 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -110,7 +110,6 @@ AddJob(int        priority,		/* I - Job priority */
   job->back_pipes[1]  = -1;
   job->print_pipes[0] = -1;
   job->print_pipes[1] = -1;
-  job->status_pipe    = -1;
 
   SetString(&job->dest, dest);
 
@@ -402,22 +401,23 @@ FinishJob(job_t *job)			/* I - Job */
   LogMessage(L_DEBUG, "FinishJob: job %d, file %d is complete.",
              job->id, job->current_file - 1);
 
-  if (job->status_pipe >= 0 && job->current_file >= job->num_files)
+  if (job->status_buffer && job->current_file >= job->num_files)
   {
    /*
     * Close the pipe and clear the input bit.
     */
 
-    LogMessage(L_DEBUG2, "FinishJob: Closing status input pipe %d...",
-               job->status_pipe);
-
-    close(job->status_pipe);
-
     LogMessage(L_DEBUG2, "FinishJob: Removing fd %d from InputSet...",
-               job->status_pipe);
+               job->status_buffer->fd);
 
-    FD_CLR(job->status_pipe, InputSet);
-    job->status_pipe = -1;
+    FD_CLR(job->status_buffer->fd, InputSet);
+
+    LogMessage(L_DEBUG2, "FinishJob: Closing status input pipe %d...",
+               job->status_buffer->fd);
+
+    cupsdStatBufDelete(job->status_buffer);
+
+    job->status_buffer = NULL;
   }
 
   if (job->status < 0)
@@ -724,7 +724,6 @@ LoadAllJobs(void)
       job->back_pipes[1]  = -1;
       job->print_pipes[0] = -1;
       job->print_pipes[1] = -1;
-      job->status_pipe    = -1;
 
       LogMessage(L_DEBUG, "LoadAllJobs: Loading attributes for job %d...\n",
                  job->id);
@@ -1952,25 +1951,6 @@ StartJob(int       id,			/* I - Job ID */
   current->current_file ++;
 
  /*
-  * Make sure we have a buffer to read status info into...
-  */
-
-  if (current->buffer == NULL)
-  {
-    LogMessage(L_DEBUG2, "StartJob: Allocating status buffer...");
-
-    if ((current->buffer = malloc(JOB_BUFFER_SIZE)) == NULL)
-    {
-      LogMessage(L_EMERG, "Unable to allocate memory for job status buffer - %s",
-                 strerror(errno));
-      CancelJob(current->id, 0);
-      return;
-    }
-
-    current->bufused = 0;
-  }
-
- /*
   * Now create processes for all of the filters...
   */
 
@@ -1988,8 +1968,9 @@ StartJob(int       id,			/* I - Job ID */
   LogMessage(L_DEBUG, "StartJob: statusfds = [ %d %d ]",
              statusfds[0], statusfds[1]);
 
-  current->status_pipe = statusfds[0];
-  current->status      = 0;
+  current->status_buffer = cupsdStatBufNew(statusfds[0], "[Job %d]",
+                                           current->id);
+  current->status        = 0;
   memset(current->filters, 0, sizeof(current->filters));
 
   filterfds[1][0] = open("/dev/null", O_RDONLY);
@@ -2207,9 +2188,9 @@ StartJob(int       id,			/* I - Job ID */
   close(statusfds[1]);
 
   LogMessage(L_DEBUG2, "StartJob: Adding fd %d to InputSet...",
-             current->status_pipe);
+             current->status_buffer->fd);
 
-  FD_SET(current->status_pipe, InputSet);
+  FD_SET(current->status_buffer->fd, InputSet);
 }
 
 
@@ -2305,36 +2286,24 @@ StopJob(int id,				/* I - Job ID */
 	current->back_pipes[0] = -1;
 	current->back_pipes[1] = -1;
 
-        if (current->status_pipe >= 0)
+        if (current->status_buffer)
         {
 	 /*
 	  * Close the pipe and clear the input bit.
 	  */
 
-	  LogMessage(L_DEBUG2, "StopJob: Closing status input pipe %d...",
-        	     current->status_pipe);
-
-          close(current->status_pipe);
-
           LogMessage(L_DEBUG2, "StopJob: Removing fd %d from InputSet...",
-	             current->status_pipe);
+	             current->status_buffer->fd);
 
-	  FD_CLR(current->status_pipe, InputSet);
-	  current->status_pipe = -1;
+	  FD_CLR(current->status_buffer->fd, InputSet);
+
+	  LogMessage(L_DEBUG2, "StopJob: Closing status input pipe %d...",
+        	     current->status_buffer->fd);
+
+          cupsdStatBufDelete(current->status_buffer);
+
+	  current->status_buffer = NULL;
         }
-
-        if (current->buffer)
-	{
-	 /*
-	  * Free the status buffer...
-	  */
-
-          LogMessage(L_DEBUG2, "StopJob: Freeing status buffer...");
-
-          free(current->buffer);
-	  current->buffer  = NULL;
-	  current->bufused = 0;
-	}
       }
       return;
     }
@@ -2349,116 +2318,17 @@ void
 UpdateJob(job_t *job)			/* I - Job to check */
 {
   int		i;			/* Looping var */
-  int		bytes;			/* Number of bytes read */
   int		copies;			/* Number of copies printed */
-  char		*lineptr,		/* Pointer to end of line in buffer */
-		*message;		/* Pointer to message text */
+  char		message[1024],		/* Message text */
+		*ptr;			/* Pointer update... */
   int		loglevel;		/* Log level for message */
 
 
-  if ((bytes = read(job->status_pipe, job->buffer + job->bufused,
-                    JOB_BUFFER_SIZE - job->bufused - 1)) > 0)
-  {
-    job->bufused += bytes;
-    job->buffer[job->bufused] = '\0';
-
-    if ((lineptr = strchr(job->buffer, '\n')) == NULL &&
-        job->bufused == (JOB_BUFFER_SIZE - 1))
-      lineptr  = job->buffer + job->bufused;
-  }
-  else if (bytes < 0 && errno == EINTR)
-    return;
-  else
-  {
-    lineptr  = job->buffer + job->bufused;
-    *lineptr = '\0';
-  }
-
-  if (job->bufused == 0 && bytes == 0)
-    lineptr = NULL;
-
-  while (lineptr != NULL)
+  while ((ptr = cupsdStatBufUpdate(job->status_buffer, &loglevel,
+                                   message, sizeof(message))) != NULL)
   {
    /*
-    * Terminate each line and process it...
-    */
-
-    *lineptr++ = '\0';
-
-   /*
-    * Figure out the logging level...
-    */
-
-    if (strncmp(job->buffer, "EMERG:", 6) == 0)
-    {
-      loglevel = L_EMERG;
-      message  = job->buffer + 6;
-    }
-    else if (strncmp(job->buffer, "ALERT:", 6) == 0)
-    {
-      loglevel = L_ALERT;
-      message  = job->buffer + 6;
-    }
-    else if (strncmp(job->buffer, "CRIT:", 5) == 0)
-    {
-      loglevel = L_CRIT;
-      message  = job->buffer + 5;
-    }
-    else if (strncmp(job->buffer, "ERROR:", 6) == 0)
-    {
-      loglevel = L_ERROR;
-      message  = job->buffer + 6;
-    }
-    else if (strncmp(job->buffer, "WARNING:", 8) == 0)
-    {
-      loglevel = L_WARN;
-      message  = job->buffer + 8;
-    }
-    else if (strncmp(job->buffer, "NOTICE:", 6) == 0)
-    {
-      loglevel = L_NOTICE;
-      message  = job->buffer + 6;
-    }
-    else if (strncmp(job->buffer, "INFO:", 5) == 0)
-    {
-      loglevel = L_INFO;
-      message  = job->buffer + 5;
-    }
-    else if (strncmp(job->buffer, "DEBUG:", 6) == 0)
-    {
-      loglevel = L_DEBUG;
-      message  = job->buffer + 6;
-    }
-    else if (strncmp(job->buffer, "DEBUG2:", 7) == 0)
-    {
-      loglevel = L_DEBUG2;
-      message  = job->buffer + 7;
-    }
-    else if (strncmp(job->buffer, "PAGE:", 5) == 0)
-    {
-      loglevel = L_PAGE;
-      message  = job->buffer + 5;
-    }
-    else if (strncmp(job->buffer, "STATE:", 6) == 0)
-    {
-      loglevel = L_STATE;
-      message  = job->buffer + 6;
-    }
-    else
-    {
-      loglevel = L_DEBUG;
-      message  = job->buffer;
-    }
-
-   /*
-    * Skip leading whitespace in the message...
-    */
-
-    while (isspace(*message & 255))
-      message ++;
-
-   /*
-    * Send it to the log file and printer state message as needed...
+    * Process page and printer state messages as needed...
     */
 
     if (loglevel == L_PAGE)
@@ -2492,39 +2362,12 @@ UpdateJob(job_t *job)			/* I - Job to check */
     }
     else if (loglevel == L_STATE)
       SetPrinterReasons(job->printer, message);
-    else
-    {
-     /*
-      * Other status message; send it to the error_log file...
-      */
 
-      if (loglevel != L_INFO || LogLevel == L_DEBUG2)
-	LogMessage(loglevel, "[Job %d] %s", job->id, message);
-
-      if ((loglevel == L_INFO && !job->status) ||
-	  loglevel < L_INFO)
-      {
-        strlcpy(job->printer->state_message, message,
-                sizeof(job->printer->state_message));
-
-        AddPrinterHistory(job->printer);
-      }
-    }
-
-   /*
-    * Copy over the buffer data we've used up...
-    */
-
-    cups_strcpy(job->buffer, lineptr);
-    job->bufused -= lineptr - job->buffer;
-
-    if (job->bufused < 0)
-      job->bufused = 0;
-
-    lineptr = strchr(job->buffer, '\n');
+    if (!strchr(job->status_buffer->buffer, '\n'))
+      break;
   }
 
-  if (bytes <= 0)
+  if (ptr == NULL)
   {
    /*
     * See if all of the filters and the backend have returned their
@@ -2891,5 +2734,5 @@ set_hold_until(job_t *job, 		/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.89 2004/06/30 18:24:18 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.90 2004/07/02 19:12:48 mike Exp $".
  */
