@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.37 2003/02/18 22:43:28 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.38 2003/03/10 19:07:17 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -75,11 +75,11 @@ AddPrinter(const char *name)	/* I - Name of printer */
 		*prev;		/* Previous printer in list */
 
 
-  DEBUG_printf(("AddPrinter(\"%s\")\n", name));
-
  /*
   * Range check input...
   */
+
+  LogMessage(L_DEBUG2, "AddPrinter(\"%s\")", name ? name : "(null)");
 
   if (name == NULL)
     return (NULL);
@@ -89,7 +89,11 @@ AddPrinter(const char *name)	/* I - Name of printer */
   */
 
   if ((p = calloc(1, sizeof(printer_t))) == NULL)
+  {
+    LogMessage(L_ERROR, "Unable to allocate memory for printer - %s",
+               strerror(errno));
     return (NULL);
+  }
 
   SetString(&p->name, name);
   SetString(&p->info, name);
@@ -2154,5 +2158,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.37 2003/02/18 22:43:28 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.38 2003/03/10 19:07:17 mike Exp $".
  */
