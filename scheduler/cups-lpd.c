@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.1 2000/04/19 21:26:00 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.2 2000/05/11 14:11:54 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,10 @@
  *
  * Contents:
  *
+ *   main()             - Process an incoming LPD request...
+ *   recv_print_job()   - Receive a print job from the client.
+ *   send_short_state() - Send the short queue state.
+ *   remove_jobs()      - Cancel one or more jobs.
  */
 
 /*
@@ -48,11 +52,11 @@
  *
  *     - This daemon does not check to make sure that the source port is
  *       between 721 and 731, since it isn't necessary for proper
- *       functioning, and port-based security is no security at all!
+ *       functioning and port-based security is no security at all!
  *
  *     - The "Print any waiting jobs" command is a no-op.
  *
- * The LPD-to-IPP mapping is as defined in RFC 2569.
+ * The LPD-to-IPP mapping and report formats are as defined in RFC 2569.
  */
 
 /*
@@ -60,8 +64,7 @@
  */
 
 int	recv_print_job(const char *dest);
-int	send_short_state(const char *dest, const char *list);
-int	send_long_state(const char *dest, const char *list);
+int	send_state(const char *dest, const char *list, int longstatus);
 int	remove_jobs(const char *dest, const char *agent, const char *list);
 
 
@@ -142,13 +145,13 @@ main(int  argc,		/* I - Number of command-line arguments */
     case 0x03 : /* Send queue state (short) */
 	putchar(0);
 
-        status = send_short_state(dest, list);
+        status = send_state(dest, list, 0);
 	break;
 
     case 0x04 : /* Send queue state (long) */
 	putchar(0);
 
-        status = send_long_state(dest, list);
+        status = send_state(dest, list, 1);
 	break;
 
     case 0x05 : /* Remove jobs */
@@ -487,24 +490,301 @@ recv_print_job(const char *dest)	/* I - Destination */
  */
 
 int					/* O - Command status */
-send_short_state(const char *dest,	/* I - Destination */
-                 const char *list)	/* I - List of jobs or users */
+send_state(const char *dest,		/* I - Destination */
+           const char *list,		/* I - Job or user */
+	   int        longstatus)	/* I - List of jobs or users */
 {
-  puts("Sorry, not yet implemented!");
-  return (1);
-}
+  int		id;			/* Job ID from list */
+  http_t	*http;			/* HTTP server connection */
+  ipp_t		*request,		/* IPP Request */
+		*response;		/* IPP Response */
+  ipp_attribute_t *attr;		/* Current attribute */
+  cups_lang_t	*language;		/* Default language */
+  ipp_pstate_t	state;			/* Printer state */
+  const char	*jobdest,		/* Pointer into job-printer-uri */
+		*jobuser,		/* Pointer to job-originating-user-name */
+		*jobname;		/* Pointer to job-name */
+  ipp_jstate_t	jobstate;		/* job-state */
+  int		jobid,			/* job-id */
+		jobsize,		/* job-k-octets */
+		jobcount,		/* Number of jobs */
+		jobcopies,		/* Number of copies */
+		rank;			/* Rank of job */
+  char		rankstr[255];		/* Rank string */
+  char		namestr[1024];		/* Job name string */
+  char		uri[HTTP_MAX_URI];	/* Printer URI */
+  static const char *ranks[10] =	/* Ranking strings */
+		{
+		  "th",
+		  "st",
+		  "nd",
+		  "rd",
+		  "th",
+		  "th",
+		  "th",
+		  "th",
+		  "th",
+		  "th"
+		};
 
 
-/*
- * 'send_long_state()' - Send the long queue state.
- */
+ /*
+  * Try connecting to the local server...
+  */
 
-int					/* O - Command status */
-send_long_state(const char *dest,	/* I - Destination */
-                const char *list)	/* I - List of jobs or users */
-{
-  puts("Sorry, not yet implemented!");
-  return (1);
+  if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
+    return (1);
+
+ /*
+  * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
+  * attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  *    printer-uri
+  */
+
+  request = ippNew();
+
+  request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+  request->request.op.request_id   = 1;
+
+  language = cupsLangDefault();
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
+
+  sprintf(uri, "ipp://localhost/printers/%s", dest);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
+               "printer-uri", NULL, uri);
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
+  {
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    {
+      printf("get-printer-attributes failed: %s\n",
+             ippErrorString(response->request.status.status_code));
+      ippDelete(response);
+      return (1);
+    }
+
+    if ((attr = ippFindAttribute(response, "printer-state", IPP_TAG_ENUM)) != NULL)
+      state = (ipp_pstate_t)attr->values[0].integer;
+    else
+      state = IPP_PRINTER_STOPPED;
+
+    switch (state)
+    {
+      case IPP_PRINTER_IDLE :
+          printf("%s is ready\n", dest);
+	  break;
+      case IPP_PRINTER_PROCESSING :
+          printf("%s is ready and printing\n", dest);
+	  break;
+      case IPP_PRINTER_STOPPED :
+          printf("%s is not ready\n", dest);
+	  break;
+    }
+
+    ippDelete(response);
+  }
+  else
+  {
+    printf("get-printer-attributes failed: %s\n", ippErrorString(cupsLastError()));
+    return (1);
+  }
+
+ /*
+  * Build an IPP_GET_JOBS or IPP_GET_JOB_ATTRIBUTES request, which requires
+  * the following attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  *    job-uri or printer-uri
+  */
+
+  id = atoi(list);
+
+  request = ippNew();
+
+  request->request.op.operation_id = id ? IPP_GET_JOB_ATTRIBUTES : IPP_GET_JOBS;
+  request->request.op.request_id   = 1;
+
+  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+                      "attributes-charset", NULL, cupsLangEncoding(language));
+
+  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                      "attributes-natural-language", NULL, language->language);
+
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", dest);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+               NULL, uri);
+
+  if (id)
+    ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-id", id);
+  else
+  {
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                 "requesting-user-name", NULL, list);
+    ippAddBoolean(request, IPP_TAG_OPERATION, "my-jobs", 1);
+  }
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  jobcount = 0;
+
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
+  {
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    {
+      printf("get-jobs failed: %s\n",
+             ippErrorString(response->request.status.status_code));
+      ippDelete(response);
+      return (1);
+    }
+
+    rank = 1;
+
+   /*
+    * Loop through the job list and display them...
+    */
+
+    for (attr = response->attrs; attr != NULL; attr = attr->next)
+    {
+     /*
+      * Skip leading attributes until we hit a job...
+      */
+
+      while (attr != NULL && attr->group_tag != IPP_TAG_JOB)
+        attr = attr->next;
+
+      if (attr == NULL)
+        break;
+
+     /*
+      * Pull the needed attributes from this job...
+      */
+
+      jobid       = 0;
+      jobsize     = 0;
+      jobstate    = IPP_JOB_PENDING;
+      jobname     = "untitled";
+      jobuser     = NULL;
+      jobdest     = NULL;
+      jobcopies   = 1;
+
+      while (attr != NULL && attr->group_tag == IPP_TAG_JOB)
+      {
+        if (strcmp(attr->name, "job-id") == 0 &&
+	    attr->value_tag == IPP_TAG_INTEGER)
+	  jobid = attr->values[0].integer;
+
+        if (strcmp(attr->name, "job-k-octets") == 0 &&
+	    attr->value_tag == IPP_TAG_INTEGER)
+	  jobsize = attr->values[0].integer * 1024;
+
+        if (strcmp(attr->name, "job-state") == 0 &&
+	    attr->value_tag == IPP_TAG_ENUM)
+	  jobstate = (ipp_jstate_t)attr->values[0].integer;
+
+        if (strcmp(attr->name, "job-printer-uri") == 0 &&
+	    attr->value_tag == IPP_TAG_URI)
+	  if ((jobdest = strrchr(attr->values[0].string.text, '/')) != NULL)
+	    jobdest ++;
+
+        if (strcmp(attr->name, "job-originating-user-name") == 0 &&
+	    attr->value_tag == IPP_TAG_NAME)
+	  jobuser = attr->values[0].string.text;
+
+        if (strcmp(attr->name, "job-name") == 0 &&
+	    attr->value_tag == IPP_TAG_NAME)
+	  jobname = attr->values[0].string.text;
+
+        if (strcmp(attr->name, "copies") == 0 &&
+	    attr->value_tag == IPP_TAG_INTEGER)
+	  jobcopies = attr->values[0].integer;
+
+        attr = attr->next;
+      }
+
+     /*
+      * See if we have everything needed...
+      */
+
+      if (jobdest == NULL || jobid == 0)
+      {
+        if (attr == NULL)
+	  break;
+	else
+          continue;
+      }
+
+      if (!longstatus && jobcount == 0)
+	puts("Rank   Owner      Job             Files                       Total Size");
+
+      jobcount ++;
+
+     /*
+      * Display the job...
+      */
+
+      if (jobstate == IPP_JOB_PROCESSING)
+	strcpy(rankstr, "active");
+      else
+      {
+	sprintf(rankstr, "%d%s", rank, ranks[rank % 10]);
+	rank ++;
+      }
+
+      if (longstatus)
+      {
+        puts("");
+
+        if (jobcopies > 1)
+	  snprintf(namestr, sizeof(namestr), "%d copies of %s", jobcopies,
+	           jobname);
+	else
+	{
+	  strncpy(namestr, jobname, sizeof(namestr) - 1);
+	  namestr[sizeof(namestr) - 1] = '\0';
+	}
+
+        printf("%s: %-31s [job %d localhost]\n", jobuser, rankstr, jobid);
+        printf("        %-31.31s %d bytes\n", namestr, jobsize);
+      }
+      else
+        printf("%-6s %-10.10s %-15d %-27.27s %d bytes\n", rankstr, jobuser,
+	       jobid, jobname, jobsize);
+
+      if (attr == NULL)
+        break;
+    }
+
+    ippDelete(response);
+  }
+  else
+  {
+    printf("get-jobs failed: %s\n", ippErrorString(cupsLastError()));
+    return (1);
+  }
+
+  if (jobcount == 0)
+    puts("no entries");
+
+  cupsLangFree(language);
+  httpClose(http);
+
+  return (0);
 }
 
 
@@ -517,10 +797,99 @@ remove_jobs(const char *dest,		/* I - Destination */
             const char *agent,		/* I - User agent */
 	    const char *list)		/* I - List of jobs or users */
 {
-  return (1);
+  int		id;			/* Job ID */
+  http_t	*http;			/* HTTP server connection */
+  ipp_t		*request,		/* IPP Request */
+		*response;		/* IPP Response */
+  cups_lang_t	*language;		/* Default language */
+  char		uri[HTTP_MAX_URI];	/* Job URI */
+
+
+ /*
+  * Try connecting to the local server...
+  */
+
+  if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
+    return (1);
+
+  language = cupsLangDefault();
+
+ /*
+  * Loop for each job...
+  */
+
+  while ((id = atoi(list)) > 0)
+  {
+   /*
+    * Skip job ID in list...
+    */
+
+    while (isdigit(*list))
+      list ++;
+    while (isspace(*list))
+      list ++;
+
+   /*
+    * Build an IPP_CANCEL_JOB request, which requires the following
+    * attributes:
+    *
+    *    attributes-charset
+    *    attributes-natural-language
+    *    job-uri
+    *    requesting-user-name
+    */
+
+    request = ippNew();
+
+    request->request.op.operation_id = IPP_CANCEL_JOB;
+    request->request.op.request_id   = 1;
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	 "attributes-charset", NULL, cupsLangEncoding(language));
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+        	 "attributes-natural-language", NULL, language->language);
+
+    sprintf(uri, "ipp://localhost/jobs/%d", id);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri", NULL, uri);
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                 "requesting-user-name", NULL, agent);
+
+   /*
+    * Do the request and get back a response...
+    */
+
+    if ((response = cupsDoRequest(http, request, "/jobs")) != NULL)
+    {
+      if (response->request.status.status_code > IPP_OK_CONFLICT)
+      {
+	printf("cancel-job failed: %s\n",
+               ippErrorString(response->request.status.status_code));
+	ippDelete(response);
+	cupsLangFree(language);
+	httpClose(http);
+	return (1);
+      }
+
+      ippDelete(response);
+    }
+    else
+    {
+      printf("cancel-job failed: %s\n", ippErrorString(cupsLastError()));
+      cupsLangFree(language);
+      httpClose(http);
+      return (1);
+    }
+  }
+
+  cupsLangFree(language);
+  httpClose(http);
+
+  return (0);
 }
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.1 2000/04/19 21:26:00 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.2 2000/05/11 14:11:54 mike Exp $".
  */
