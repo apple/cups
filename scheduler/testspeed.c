@@ -1,5 +1,5 @@
 /*
- * "$Id: testspeed.c,v 1.3.2.2 2003/01/07 18:27:28 mike Exp $"
+ * "$Id: testspeed.c,v 1.3.2.3 2003/09/04 16:04:17 mike Exp $"
  *
  *   Scheduler speed test for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,8 @@
  *
  * Contents:
  *
+ *   main() - Send multiple IPP requests and report on the average response
+ *            time.
  */
 
 /*
@@ -32,10 +34,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <sys/types.h>
 #include <sys/time.h>
+#include <sys/wait.h>
 #include <cups/cups.h>
 #include <cups/language.h>
 #include <cups/debug.h>
+#include <errno.h>
+
+
+/*
+ * Local functions...
+ */
+
+int	do_test(const char *server, http_encryption_t encryption,
+		int requests);
+void	usage(void);
 
 
 /*
@@ -44,23 +58,145 @@
  */
 
 int
-main(int  argc,		/* I - Number of command-line arguments */
-     char *argv[])	/* I - Command-line arguments */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  int		i;		/* Looping var */
-  http_t	*http;		/* Connection to server */
-  ipp_t		*request,	/* IPP Request */
-		*response;	/* IPP Response */
-  cups_lang_t	*language;	/* Default language */
-  struct timeval start,		/* Start time */
-		end;		/* End time */
-  double	elapsed;	/* Elapsed time */
+  int		i;			/* Looping var */
+  const char	*server;		/* Server to use */
+  http_encryption_t encryption;		/* Encryption to use */
+  int		requests;		/* Number of requests to send */
+  int		children;		/* Number of children to fork */
+  int		pid;			/* Child PID */
+  int		status;			/* Child status */
+  time_t	start,			/* Start time */
+		end;			/* End time */
+  double	elapsed;		/* Elapsed time */
 
 
-  if (argc > 1)
-    http = httpConnect(argv[1], ippPort());
-  else
-    http = httpConnect("localhost", ippPort());
+ /*
+  * Parse command-line options...
+  */
+
+  requests   = 100;
+  children   = 5;
+  server     = cupsServer();
+  encryption = HTTP_ENCRYPT_IF_REQUESTED;
+
+  for (i = 1; i < argc; i ++)
+    if (!strcmp(argv[i], "-c"))
+    {
+      i ++;
+      if (i >= argc)
+        usage();
+
+      children = atoi(argv[i]);
+    }
+    else if (!strcmp(argv[i], "-r"))
+    {
+      i ++;
+      if (i >= argc)
+        usage();
+
+      requests = atoi(argv[i]);
+    }
+    else if (!strcmp(argv[i], "-E"))
+      encryption = HTTP_ENCRYPT_REQUIRED;
+    else if (argv[i][0] == '-')
+      usage();
+    else
+      server = argv[i];
+
+ /*
+  * Then create child processes to act as clients...
+  */
+
+  printf("testspeed: Simulating %d clients with %d requests to %s with %s encryption...\n",
+         children, requests, server,
+	 encryption == HTTP_ENCRYPT_IF_REQUESTED ? "no" : "");
+
+  start = time(NULL);
+
+  for (i = 0; i < children; i ++)
+    if ((pid = fork()) == 0)
+    {
+     /*
+      * Child goes here...
+      */
+
+      exit(do_test(server, encryption, requests));
+    }
+    else if (pid < 0)
+    {
+      perror("fork failed");
+      break;
+    }
+    else
+      printf("testspeed(%d): Started...\n", pid);
+
+ /*
+  * Wait for children to finish...
+  */
+
+  for (;;)
+  {
+    pid = wait(&status);
+
+    if (pid < 0 && errno != EINTR)
+      break;
+
+    printf("testspeed(%d): Ended (%d)...\n", pid, status);
+  }
+
+ /*
+  * Compute the total run time...
+  */
+
+  end     = time(NULL);
+  elapsed = end - start;
+  i       = children * requests;
+
+  printf("testspeed: %dx%d=%d requests in %.1fs (%.3fs/r, %.1fr/s)\n",
+         children, requests, i, elapsed, elapsed / i, i / elapsed);
+
+ /*
+  * Exit with no errors...
+  */
+
+  return (status);
+}
+
+
+/*
+ * 'do_test()' - Run a test on a specific host...
+ */
+
+int					/* O - Exit status */
+do_test(const char        *server,	/* I - Server to use */
+        http_encryption_t encryption,	/* I - Encryption to use */
+	int               requests)	/* I - Number of requests to send */
+{
+  int		i;			/* Looping var */
+  http_t	*http;			/* Connection to server */
+  ipp_t		*request,		/* IPP Request */
+		*response;		/* IPP Response */
+  cups_lang_t	*language;		/* Default language */
+  struct timeval start,			/* Start time */
+		end;			/* End time */
+  double	elapsed;		/* Elapsed time */
+  static ipp_op_t ops[4] =		/* Operations to test... */
+		{
+		  CUPS_GET_DEFAULT,
+		  CUPS_GET_PRINTERS,
+		  CUPS_GET_CLASSES,
+		  IPP_GET_JOBS
+		};
+
+
+ /*
+  * Connect to the server...
+  */
+
+  http = httpConnectEncrypt(server, ippPort(), encryption);
 
   if (http == NULL)
   {
@@ -71,27 +207,26 @@ main(int  argc,		/* I - Number of command-line arguments */
   language = cupsLangDefault();
 
  /*
-  * Do requests 100 times...
+  * Do multiple requests...
   */
 
-  printf("Testing: ");
-
-  for (elapsed = 0.0, i = 0; i < 100; i ++)
+  for (elapsed = 0.0, i = 0; i < requests; i ++)
   {
-    putchar('>');
-    fflush(stdout);
+    if ((i % 10) == 0)
+      printf("testspeed(%d): %d%% complete...\n", getpid(), i * 100 / requests);
 
    /*
-    * Build a CUPS_GET_PRINTERS request, which requires the following
-    * attributes:
+    * Build a request which requires the following attributes:
     *
     *    attributes-charset
     *    attributes-natural-language
+    *
+    * In addition, IPP_GET_JOBS needs a printer-uri attribute.
     */
 
     request = ippNew();
 
-    request->request.op.operation_id = CUPS_GET_PRINTERS;
+    request->request.op.operation_id = ops[i & 3];
     request->request.op.request_id   = 1;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
@@ -100,11 +235,13 @@ main(int  argc,		/* I - Number of command-line arguments */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
         	 "attributes-natural-language", NULL, language->language);
 
-    gettimeofday(&start, NULL);
-    response = cupsDoRequest(http, request, "/printers/");
-    gettimeofday(&end, NULL);
+    if (ops[i & 3] == IPP_GET_JOBS)
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+                   NULL, "ipp://localhost/printers/");
 
-    putchar('<');
+    gettimeofday(&start, NULL);
+    response = cupsDoRequest(http, request, "/");
+    gettimeofday(&end, NULL);
 
     if (response != NULL)
       ippDelete(response);
@@ -113,14 +250,29 @@ main(int  argc,		/* I - Number of command-line arguments */
                0.000001 * (end.tv_usec - start.tv_usec);
   }
 
-  puts("");
-  printf("Total elapsed time for %d requests was %.1fs (%.3fs/r)\n",
-         i, elapsed, elapsed / i);
+  cupsLangFree(language);
+  httpClose(http);
+
+  printf("testspeed(%d): %d requests in %.1fs (%.3fs/r, %.1fr/s)\n",
+         getpid(), i, elapsed, elapsed / i, i / elapsed);
 
   return (0);
 }
 
 
 /*
- * End of "$Id: testspeed.c,v 1.3.2.2 2003/01/07 18:27:28 mike Exp $".
+ * 'usage()' - Show program usage...
+ */
+
+void
+usage(void)
+{
+  puts("Usage: testspeed [-c children] [-h] [-r requests] [-E] hostname");
+  exit(0);
+}
+
+
+
+/*
+ * End of "$Id: testspeed.c,v 1.3.2.3 2003/09/04 16:04:17 mike Exp $".
  */
