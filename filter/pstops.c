@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.12 2002/03/01 21:19:23 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.13 2002/03/09 15:42:40 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -310,28 +310,6 @@ main(int  argc,			/* I - Number of command-line arguments */
     UseESPsp = 1;
   }
 
-  if (NUp == 2)
-  {
-   /*
-    * For 2-up output, rotate the labels to match the orientation
-    * of the pages...
-    */
-
-    if (Orientation & 1)
-      WriteLabelProlog(val, PageBottom, PageWidth - PageLength + PageTop,
-                       PageLength);
-    else
-      WriteLabelProlog(val, PageLeft, PageRight, PageLength);
-  }
-  else
-    WriteLabelProlog(val, PageBottom, PageTop, PageWidth);
-
-  if (UseESPsp)
-    puts("userdict begin\n"
-	 "/ESPshowpage /showpage load def\n"
-	 "/showpage { } def\n"
-	 "end");
-
   if (Copies > 1 && (!Collate || !slowcollate))
   {
     if (Collate)
@@ -363,6 +341,18 @@ main(int  argc,			/* I - Number of command-line arguments */
         level ++;
       else if (strncmp(line, "%%EndDocument", 13) == 0 && level > 0)
         level --;
+      else if (strncmp(line, "%%Orientation", 13) == 0)
+      {
+       /*
+        * Reset orientation of document?
+	*/
+
+        if (strstr(line, "Landscape") != NULL && !(Orientation & 1))
+	{
+	  Orientation = 1;
+	  UpdatePageVars();
+	}
+      }
       else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
         break;
       else if (strncmp(line, "%%BeginBinary:", 14) == 0 ||
@@ -396,6 +386,32 @@ main(int  argc,			/* I - Number of command-line arguments */
       else
         fputs(line, stdout);
     }
+
+   /*
+    * Write the page and label prologs...
+    */
+
+    if (NUp == 2)
+    {
+     /*
+      * For 2-up output, rotate the labels to match the orientation
+      * of the pages...
+      */
+
+      if (Orientation & 1)
+	WriteLabelProlog(val, PageBottom, PageWidth - PageLength + PageTop,
+                	 PageLength);
+      else
+	WriteLabelProlog(val, PageLeft, PageRight, PageLength);
+    }
+    else
+      WriteLabelProlog(val, PageBottom, PageTop, PageWidth);
+
+    if (UseESPsp)
+      puts("userdict begin\n"
+	   "/ESPshowpage /showpage load def\n"
+	   "/showpage { } def\n"
+	   "end");
 
    /*
     * Then read all of the pages, filtering as needed...
@@ -1149,5 +1165,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.12 2002/03/01 21:19:23 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.13 2002/03/09 15:42:40 mike Exp $".
  */

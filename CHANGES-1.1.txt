@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- The PostScript filter now supports the Orientation
+	  comment and rotates the page as needed automatically.
 	- Revamped the makefiles slightly to use automatically
 	  generated dependencies.
 	- Build fixes for OS X.

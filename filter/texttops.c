@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.34.2.5 2002/03/01 19:55:23 mike Exp $"
+ * "$Id: texttops.c,v 1.34.2.6 2002/03/09 15:42:40 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -104,22 +104,6 @@ WritePage(void)
   printf("%%%%Page: %d %d\n", NumPages, NumPages);
 
   puts("gsave");
-
-  if (getenv("PPD") == NULL)
-  {
-    switch (Orientation)
-    {
-      case 1 : /* Landscape */
-          printf("%.3f 0.0 translate 90 rotate\n", PageLength);
-          break;
-      case 2 : /* Reverse Portrait */
-          printf("%.3f %.3f translate 180 rotate\n", PageWidth, PageLength);
-          break;
-      case 3 : /* Reverse Landscape */
-          printf("0.0 %.3f translate -90 rotate\n", PageWidth);
-          break;
-    }
-  }
 
   if (PrettyPrint)
     printf("%d H\n", NumPages);
@@ -1310,5 +1294,5 @@ write_text(const char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c,v 1.34.2.5 2002/03/01 19:55:23 mike Exp $".
+ * End of "$Id: texttops.c,v 1.34.2.6 2002/03/09 15:42:40 mike Exp $".
  */
