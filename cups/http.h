@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.45 2003/03/13 05:44:23 mike Exp $"
+ * "$Id: http.h,v 1.46 2003/05/09 18:34:15 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -332,7 +332,6 @@ extern void		httpSetField(http_t *http, http_field_t field,
 extern const char	*httpStatus(http_status_t status);
 extern int		httpTrace(http_t *http, const char *uri);
 extern http_status_t	httpUpdate(http_t *http);
-extern int		httpWait(http_t *http, int msec);
 extern int		httpWrite(http_t *http, const char *buffer, int length);
 extern char		*httpEncode64(char *out, const char *in);
 extern char		*httpDecode64(char *out, const char *in);
@@ -347,6 +346,7 @@ extern char		*httpMD5String(const md5_byte_t *, char [33]);
 extern void		httpClearCookie(http_t *http);
 #define httpGetCookie(http) ((http)->cookie)
 extern void		httpSetCookie(http_t *http, const char *cookie);
+extern int		httpWait(http_t *http, int msec);
 
 
 /*
@@ -359,5 +359,5 @@ extern void		httpSetCookie(http_t *http, const char *cookie);
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.45 2003/03/13 05:44:23 mike Exp $".
+ * End of "$Id: http.h,v 1.46 2003/05/09 18:34:15 mike Exp $".
  */
