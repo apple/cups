@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.17
 
+	- The scheduler now allows accounts authenticated via
+	  PAM to not have a corresponding UNIX account, but
+	  group membership still requires the account name to be
+	  listed in the UNIX group file(s)...
 	- The scheduler used a fixed-size (16k) buffer for
 	  encoding job options for filters; it now dynamically
 	  allocates and expands the buffer as needed depending
