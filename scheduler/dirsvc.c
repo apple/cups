@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.61 2000/09/14 18:54:13 mike Exp $"
+ * "$Id: dirsvc.c,v 1.62 2000/11/02 22:19:24 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -422,7 +422,7 @@ UpdateBrowseList(void)
     */
 
     if (strncmp(resource, "/classes/", 9) == 0)
-      snprintf(name, sizeof(name), "%s@%s", resource + 9, host);
+      snprintf(name, sizeof(name) - 1, "%s@%s", resource + 9, host);
     else
       return;
 
@@ -485,7 +485,7 @@ UpdateBrowseList(void)
     */
 
     if (strncmp(resource, "/printers/", 10) == 0)
-      snprintf(name, sizeof(name), "%s@%s", resource + 10, host);
+      snprintf(name, sizeof(name) - 1, "%s@%s", resource + 10, host);
     else
       return;
 
@@ -571,10 +571,10 @@ UpdateBrowseList(void)
   if (!make_model[0])
   {
     if (type & CUPS_PRINTER_CLASS)
-      snprintf(make_model, sizeof(p->make_model), "Remote Class on %s",
+      snprintf(make_model, sizeof(p->make_model) - 1, "Remote Class on %s",
                host);
     else
-      snprintf(make_model, sizeof(p->make_model), "Remote Printer on %s",
+      snprintf(make_model, sizeof(p->make_model) - 1, "Remote Printer on %s",
                host);
   }
   else
@@ -776,7 +776,7 @@ SendBrowseList(void)
 
       p->browse_time = time(NULL);
 
-      snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"\n",
+      snprintf(packet, sizeof(packet) - 1, "%x %x %s \"%s\" \"%s\" \"%s\"\n",
                p->type | CUPS_PRINTER_REMOTE, p->state, p->uri,
 	       p->location, p->info, p->make_model);
 
@@ -878,5 +878,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.61 2000/09/14 18:54:13 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.62 2000/11/02 22:19:24 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: banners.c,v 1.2 2000/04/26 20:47:08 mike Exp $"
+ * "$Id: banners.c,v 1.3 2000/11/02 22:19:23 mike Exp $"
  *
  *   Banner routines for the Common UNIX Printing System (CUPS).
  *
@@ -160,7 +160,7 @@ LoadBanners(const char *d)	/* I - Directory to search */
     * file of some sort...
     */
 
-    snprintf(filename, sizeof(filename), "%s/%s", d, dent->d_name);
+    snprintf(filename, sizeof(filename) - 1, "%s/%s", d, dent->d_name);
 
     if (stat(filename, &fileinfo))
     {
@@ -213,5 +213,5 @@ compare(const banner_t *b0,	/* I - First banner */
 
 
 /*
- * End of "$Id: banners.c,v 1.2 2000/04/26 20:47:08 mike Exp $".
+ * End of "$Id: banners.c,v 1.3 2000/11/02 22:19:23 mike Exp $".
  */

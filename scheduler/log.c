@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.13 2000/11/02 18:20:09 mike Exp $"
+ * "$Id: log.c,v 1.14 2000/11/02 22:19:25 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -176,7 +176,7 @@ LogMessage(int        level,	/* I - Log level */
   */
 
   va_start(ap, message);
-  len = vsnprintf(line, sizeof(line), message, ap);
+  len = vsnprintf(line, sizeof(line) - 1, message, ap);
   va_end(ap);
 
   if (len >= sizeof(line))
@@ -337,14 +337,14 @@ check_log_file(FILE       **log,	/* IO - Log file */
     if (logname[0] == '\0')
       return (1);
     else if (logname[0] != '/')
-      snprintf(backname, sizeof(backname), "%s/%s", ServerRoot, logname);
+      snprintf(backname, sizeof(backname) - 1, "%s/%s", ServerRoot, logname);
     else
     {
       strncpy(backname, logname, sizeof(backname) - 1);
       backname[sizeof(backname) - 1] = '\0';
     }
 
-    snprintf(filename, sizeof(filename), backname, ServerName);
+    snprintf(filename, sizeof(filename) - 1, backname, ServerName);
 
     if ((*log = fopen(filename, "a")) == NULL)
       return (0);
@@ -365,14 +365,14 @@ check_log_file(FILE       **log,	/* IO - Log file */
     if (logname[0] == '\0')
       return (1);
     else if (logname[0] != '/')
-      snprintf(backname, sizeof(backname), "%s/%s", ServerRoot, logname);
+      snprintf(backname, sizeof(backname) - 1, "%s/%s", ServerRoot, logname);
     else
     {
       strncpy(backname, logname, sizeof(backname) - 1);
       backname[sizeof(backname) - 1] = '\0';
     }
 
-    snprintf(filename, sizeof(filename), backname, ServerName);
+    snprintf(filename, sizeof(filename) - 1, backname, ServerName);
 
     strcpy(backname, filename);
     strncat(backname, ".O", sizeof(backname) - 1);
@@ -390,5 +390,5 @@ check_log_file(FILE       **log,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c,v 1.13 2000/11/02 18:20:09 mike Exp $".
+ * End of "$Id: log.c,v 1.14 2000/11/02 22:19:25 mike Exp $".
  */

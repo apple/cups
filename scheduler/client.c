@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.72 2000/09/26 13:55:42 mike Exp $"
+ * "$Id: client.c,v 1.73 2000/11/02 22:19:23 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -541,25 +541,25 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
             if (strncmp(con->uri, "/admin", 6) == 0)
 	    {
-	      snprintf(con->command, sizeof(con->command),
+	      snprintf(con->command, sizeof(con->command) - 1,
 	               "%s/cgi-bin/admin.cgi", ServerBin);
 	      con->options = con->uri + 6;
 	    }
             else if (strncmp(con->uri, "/printers", 9) == 0)
 	    {
-	      snprintf(con->command, sizeof(con->command),
+	      snprintf(con->command, sizeof(con->command) - 1,
 	               "%s/cgi-bin/printers.cgi", ServerBin);
 	      con->options = con->uri + 9;
 	    }
 	    else if (strncmp(con->uri, "/classes", 8) == 0)
 	    {
-	      snprintf(con->command, sizeof(con->command),
+	      snprintf(con->command, sizeof(con->command) - 1,
 	               "%s/cgi-bin/classes.cgi", ServerBin);
 	      con->options = con->uri + 8;
 	    }
 	    else
 	    {
-	      snprintf(con->command, sizeof(con->command),
+	      snprintf(con->command, sizeof(con->command) - 1,
 	               "%s/cgi-bin/jobs.cgi", ServerBin);
 	      con->options = con->uri + 5;
 	    }
@@ -664,25 +664,25 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
             if (strncmp(con->uri, "/admin", 6) == 0)
 	    {
-	      snprintf(con->command, sizeof(con->command),
+	      snprintf(con->command, sizeof(con->command) - 1,
 	               "%s/cgi-bin/admin.cgi", ServerBin);
 	      con->options = con->uri + 6;
 	    }
             else if (strncmp(con->uri, "/printers", 9) == 0)
 	    {
-	      snprintf(con->command, sizeof(con->command),
+	      snprintf(con->command, sizeof(con->command) - 1,
 	               "%s/cgi-bin/printers.cgi", ServerBin);
 	      con->options = con->uri + 9;
 	    }
 	    else if (strncmp(con->uri, "/classes", 8) == 0)
 	    {
-	      snprintf(con->command, sizeof(con->command),
+	      snprintf(con->command, sizeof(con->command) - 1,
 	               "%s/cgi-bin/classes.cgi", ServerBin);
 	      con->options = con->uri + 8;
 	    }
 	    else
 	    {
-	      snprintf(con->command, sizeof(con->command),
+	      snprintf(con->command, sizeof(con->command) - 1,
 	               "%s/cgi-bin/jobs.cgi", ServerBin);
 	      con->options = con->uri + 5;
 	    }
@@ -718,7 +718,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	    * Send PPD file...
 	    */
 
-            snprintf(con->command, sizeof(con->command),
+            snprintf(con->command, sizeof(con->command) - 1,
 	             "/ppd/%s", con->uri + 10);
 	    strcpy(con->uri, con->command);
 	    con->command[0] = '\0';
@@ -856,7 +856,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  * Create a file as needed for the request data...
 	  */
 
-          snprintf(con->filename, sizeof(con->filename), "%s/%08x",
+          snprintf(con->filename, sizeof(con->filename) - 1, "%s/%08x",
 	           RequestRoot, request_id ++);
 	  con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
 	  fchmod(con->file, 0640);
@@ -1074,7 +1074,7 @@ SendError(client_t      *con,	/* I - Connection */
     * Send a human-readable error message.
     */
 
-    snprintf(message, sizeof(message),
+    snprintf(message, sizeof(message) - 1,
              "<HTML><HEAD><TITLE>%d %s</TITLE></HEAD>"
              "<BODY><H1>%s</H1>%s</BODY></HTML>\n",
              code, httpStatus(code), httpStatus(code),
@@ -1512,12 +1512,12 @@ get_file(client_t    *con,	/* I - Client connection */
   */
 
   if (strncmp(con->uri, "/ppd/", 5) == 0)
-    snprintf(filename, sizeof(filename), "%s%s", ServerRoot, con->uri);
+    snprintf(filename, sizeof(filename) - 1, "%s%s", ServerRoot, con->uri);
   else if (con->language != NULL)
-    snprintf(filename, sizeof(filename), "%s/%s%s", DocumentRoot, con->language->language,
+    snprintf(filename, sizeof(filename) - 1, "%s/%s%s", DocumentRoot, con->language->language,
             con->uri);
   else
-    snprintf(filename, sizeof(filename), "%s%s", DocumentRoot, con->uri);
+    snprintf(filename, sizeof(filename) - 1, "%s%s", DocumentRoot, con->uri);
 
   if ((params = strchr(filename, '?')) != NULL)
     *params = '\0';
@@ -1535,7 +1535,7 @@ get_file(client_t    *con,	/* I - Client connection */
 
     if (strncmp(con->uri, "/ppd/", 5) != 0)
     {
-      snprintf(filename, sizeof(filename), "%s%s", DocumentRoot, con->uri);
+      snprintf(filename, sizeof(filename) - 1, "%s%s", DocumentRoot, con->uri);
 
       status = stat(filename, filestats);
     }
@@ -1659,15 +1659,15 @@ pipe_command(client_t *con,	/* I - Client connection */
   sprintf(lang, "LANG=%s", con->language ? con->language->language : "C");
   sprintf(ipp_port, "IPP_PORT=%d", ntohs(con->http.hostaddr.sin_port));
   sprintf(server_port, "SERVER_PORT=%d", ntohs(con->http.hostaddr.sin_port));
-  snprintf(server_name, sizeof(server_name), "SERVER_NAME=%s", ServerName);
-  snprintf(remote_host, sizeof(remote_host), "REMOTE_HOST=%s", con->http.hostname);
-  snprintf(remote_user, sizeof(remote_user), "REMOTE_USER=%s", con->username);
-  snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
-  snprintf(datadir, sizeof(datadir), "CUPS_DATADIR=%s", DataDir);
-  snprintf(root, sizeof(root), "CUPS_SERVERROOT=%s", ServerRoot);
+  snprintf(server_name, sizeof(server_name) - 1, "SERVER_NAME=%s", ServerName);
+  snprintf(remote_host, sizeof(remote_host) - 1, "REMOTE_HOST=%s", con->http.hostname);
+  snprintf(remote_user, sizeof(remote_user) - 1, "REMOTE_USER=%s", con->username);
+  snprintf(tmpdir, sizeof(tmpdir) - 1, "TMPDIR=%s", TempDir);
+  snprintf(datadir, sizeof(datadir) - 1, "CUPS_DATADIR=%s", DataDir);
+  snprintf(root, sizeof(root) - 1, "CUPS_SERVERROOT=%s", ServerRoot);
 
   if (getenv("LD_LIBRARY_PATH") != NULL)
-    snprintf(ldpath, sizeof(ldpath), "LD_LIBRARY_PATH=%s", getenv("LD_LIBRARY_PATH"));
+    snprintf(ldpath, sizeof(ldpath) - 1, "LD_LIBRARY_PATH=%s", getenv("LD_LIBRARY_PATH"));
   else
     ldpath[0] = '\0';
 
@@ -1703,14 +1703,14 @@ pipe_command(client_t *con,	/* I - Client connection */
 
       *commptr++ = '\0';
 
-      snprintf(query_string, sizeof(query_string), "QUERY_STRING=%s", commptr);
+      snprintf(query_string, sizeof(query_string) - 1, "QUERY_STRING=%s", commptr);
       envp[envc ++] = query_string;
     }
   }
   else
   {
     sprintf(content_length, "CONTENT_LENGTH=%d", con->bytes);
-    snprintf(content_type, sizeof(content_type), "CONTENT_TYPE=%s",
+    snprintf(content_type, sizeof(content_type) - 1, "CONTENT_TYPE=%s",
              con->http.fields[HTTP_FIELD_CONTENT_TYPE]);
 
     envp[envc ++] = "REQUEST_METHOD=POST";
@@ -1807,5 +1807,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.72 2000/09/26 13:55:42 mike Exp $".
+ * End of "$Id: client.c,v 1.73 2000/11/02 22:19:23 mike Exp $".
  */

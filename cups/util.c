@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.63 2000/10/20 17:19:44 mike Exp $"
+ * "$Id: util.c,v 1.64 2000/11/02 22:19:23 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -127,7 +127,7 @@ cupsCancelJob(const char *name,	/* I - Name of printer or class */
                "attributes-natural-language", NULL,
                language != NULL ? language->language : "C");
 
-  snprintf(uri, sizeof(uri), "ipp://%s:%d/printers/%s", hostname, ippPort(), printer);
+  snprintf(uri, sizeof(uri) - 1, "ipp://%s:%d/printers/%s", hostname, ippPort(), printer);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
 
@@ -309,7 +309,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
       * Nope - get a password from the user...
       */
 
-      snprintf(prompt, sizeof(prompt), "Password for %s on %s? ", cupsUser(),
+      snprintf(prompt, sizeof(prompt) - 1, "Password for %s on %s? ", cupsUser(),
                http->hostname);
 
       if ((password = cupsGetPassword(prompt)) != NULL)
@@ -327,9 +327,9 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 	  * Basic authentication...
 	  */
 
-	  snprintf(plain, sizeof(plain), "%s:%s", cupsUser(), password);
+	  snprintf(plain, sizeof(plain) - 1, "%s:%s", cupsUser(), password);
 	  httpEncode64(encode, plain);
-	  snprintf(authstring, sizeof(authstring), "Basic %s", encode);
+	  snprintf(authstring, sizeof(authstring) - 1, "Basic %s", encode);
 	}
         else
 	{
@@ -342,7 +342,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 
 	  httpMD5(cupsUser(), realm, password, encode);
 	  httpMD5Final(nonce, "POST", resource, encode);
-	  snprintf(authstring, sizeof(authstring),
+	  snprintf(authstring, sizeof(authstring) - 1,
 	           "Digest username=\"%s\", realm=\"%s\", nonce=\"%s\", "
 	           "response=\"%s\"", cupsUser(), realm, nonce, encode);
 	}
@@ -573,7 +573,7 @@ cupsGetDefault(void)
   */
 
   if ((var = getenv("CUPS_SERVERROOT")) != NULL)
-    snprintf(line, sizeof(line), "%s/client.conf", var);
+    snprintf(line, sizeof(line) - 1, "%s/client.conf", var);
   else
     strcpy(line, CUPS_SERVERROOT "/client.conf");
 
@@ -742,7 +742,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
 
-  snprintf(buffer, sizeof(buffer), "ipp://localhost/printers/%s", name);
+  snprintf(buffer, sizeof(buffer) - 1, "ipp://localhost/printers/%s", name);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, buffer);
 
@@ -836,7 +836,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   * And send a request to the HTTP server...
   */
 
-  snprintf(resource, sizeof(resource), "/printers/%s.ppd", printer);
+  snprintf(resource, sizeof(resource) - 1, "/printers/%s.ppd", printer);
 
   do
   {
@@ -873,7 +873,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
       * Nope, get a password from the user...
       */
 
-      snprintf(prompt, sizeof(prompt), "Password for %s on %s? ", cupsUser(),
+      snprintf(prompt, sizeof(prompt) - 1, "Password for %s on %s? ", cupsUser(),
                cups_server->hostname);
 
       if ((password = cupsGetPassword(prompt)) != NULL)
@@ -891,9 +891,9 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 	  * Basic authentication...
 	  */
 
-	  snprintf(plain, sizeof(plain), "%s:%s", cupsUser(), password);
+	  snprintf(plain, sizeof(plain) - 1, "%s:%s", cupsUser(), password);
 	  httpEncode64(encode, plain);
-	  snprintf(authstring, sizeof(authstring), "Basic %s", encode);
+	  snprintf(authstring, sizeof(authstring) - 1, "Basic %s", encode);
 	}
         else
 	{
@@ -906,7 +906,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 
 	  httpMD5(cupsUser(), realm, password, encode);
 	  httpMD5Final(nonce, "GET", resource, encode);
-	  snprintf(authstring, sizeof(authstring),
+	  snprintf(authstring, sizeof(authstring) - 1,
 	           "Digest username=\"%s\", realm=\"%s\", nonce=\"%s\", "
 	           "response=\"%s\"", cupsUser(), realm, nonce, encode);
 	}
@@ -1136,7 +1136,7 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
                                                       IPP_CREATE_JOB;
   request->request.op.request_id   = 1;
 
-  snprintf(uri, sizeof(uri), "ipp://%s:%d/printers/%s", hostname, ippPort(), printer);
+  snprintf(uri, sizeof(uri) - 1, "ipp://%s:%d/printers/%s", hostname, ippPort(), printer);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
                "attributes-charset", NULL, cupsLangEncoding(language));
@@ -1164,7 +1164,7 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
   * Do the request...
   */
 
-  snprintf(uri, sizeof(uri), "/printers/%s", printer);
+  snprintf(uri, sizeof(uri) - 1, "/printers/%s", printer);
 
   if (num_files == 1)
     response = cupsDoFileRequest(cups_server, request, uri, *files);
@@ -1208,7 +1208,7 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
       request->request.op.operation_id = IPP_SEND_DOCUMENT;
       request->request.op.request_id   = 1;
 
-      snprintf(uri, sizeof(uri), "ipp://%s:%d/jobs/%d", hostname, ippPort(),
+      snprintf(uri, sizeof(uri) - 1, "ipp://%s:%d/jobs/%d", hostname, ippPort(),
                jobid);
 
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
@@ -1249,7 +1249,7 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
       * Send the file...
       */
 
-      snprintf(uri, sizeof(uri), "/printers/%s", printer);
+      snprintf(uri, sizeof(uri) - 1, "/printers/%s", printer);
 
       if ((response = cupsDoFileRequest(cups_server, request, uri,
                                         files[i])) != NULL)
@@ -1320,7 +1320,7 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
     * Format a string using the hex time values...
     */
 
-    snprintf(filename, len, "%s/%08x%05x", tmpdir,
+    snprintf(filename, len - 1, "%s/%08x%05x", tmpdir,
              curtime.tv_sec, curtime.tv_usec);
 
    /*
@@ -1472,5 +1472,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.63 2000/10/20 17:19:44 mike Exp $".
+ * End of "$Id: util.c,v 1.64 2000/11/02 22:19:23 mike Exp $".
  */

@@ -48,6 +48,11 @@ CHANGES IN CUPS V1.1.5
 	- Added PPD files for 9-pin and 24-pin OKIDATA printers.
 	- The httpSeparate() function didn't handle passwords
 	  that started with a number.
+	- ippDelete() could free the character set string
+	  multiple times in name-with-language and
+	  text-with-language attributes.
+	- The scheduler's DeletePrinter() function would
+	  access freed memory under IRIX.
 
 
 CHANGES IN CUPS v1.1.4

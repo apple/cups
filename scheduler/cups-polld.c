@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-polld.c,v 1.2 2000/03/10 20:11:42 mike Exp $"
+ * "$Id: cups-polld.c,v 1.3 2000/11/02 22:19:24 mike Exp $"
  *
  *   Polling daemon for the Common UNIX Printing System (CUPS).
  *
@@ -272,7 +272,7 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 	* Send the printer information...
 	*/
 
-	snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"\n",
+	snprintf(packet, sizeof(packet) - 1, "%x %x %s \"%s\" \"%s\" \"%s\"\n",
         	 type | CUPS_PRINTER_REMOTE, state, uri,
 		 location, info, make_model);
         puts(packet);
@@ -304,5 +304,5 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: cups-polld.c,v 1.2 2000/03/10 20:11:42 mike Exp $".
+ * End of "$Id: cups-polld.c,v 1.3 2000/11/02 22:19:24 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.58 2000/09/29 17:42:56 mike Exp $"
+ * "$Id: conf.c,v 1.59 2000/11/02 22:19:24 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -193,7 +193,7 @@ ReadConfiguration(void)
   DeleteAllClasses();
 
   gethostname(ServerName, sizeof(ServerName));
-  snprintf(ServerAdmin, sizeof(ServerAdmin), "root@%s", ServerName);
+  snprintf(ServerAdmin, sizeof(ServerAdmin) - 1, "root@%s", ServerName);
   strcpy(ServerRoot, CUPS_SERVERROOT);
   strcpy(ServerBin, CUPS_SERVERBIN);
   strcpy(RequestRoot, CUPS_REQUESTS);
@@ -338,19 +338,19 @@ ReadConfiguration(void)
 
   if (DocumentRoot[0] != '/')
   {
-    snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, DocumentRoot);
+    snprintf(directory, sizeof(directory) - 1, "%s/%s", ServerRoot, DocumentRoot);
     strcpy(DocumentRoot, directory);
   }
 
   if (RequestRoot[0] != '/')
   {
-    snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, RequestRoot);
+    snprintf(directory, sizeof(directory) - 1, "%s/%s", ServerRoot, RequestRoot);
     strcpy(RequestRoot, directory);
   }
 
   if (ServerBin[0] != '/')
   {
-    snprintf(directory, sizeof(directory), "%s/%s", ServerRoot, ServerBin);
+    snprintf(directory, sizeof(directory) - 1, "%s/%s", ServerRoot, ServerBin);
     strcpy(ServerBin, directory);
   }
 
@@ -408,7 +408,7 @@ ReadConfiguration(void)
   * Load banners...
   */
 
-  snprintf(directory, sizeof(directory), "%s/banners", DataDir);
+  snprintf(directory, sizeof(directory) - 1, "%s/banners", DataDir);
   LoadBanners(directory);
 
  /*
@@ -422,10 +422,10 @@ ReadConfiguration(void)
   * Load devices and PPDs...
   */
 
-  snprintf(directory, sizeof(directory), "%s/model", DataDir);
+  snprintf(directory, sizeof(directory) - 1, "%s/model", DataDir);
   LoadPPDs(directory);
 
-  snprintf(directory, sizeof(directory), "%s/backend", ServerBin);
+  snprintf(directory, sizeof(directory) - 1, "%s/backend", ServerBin);
   LoadDevices(directory);
 
  /*
@@ -1416,5 +1416,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.58 2000/09/29 17:42:56 mike Exp $".
+ * End of "$Id: conf.c,v 1.59 2000/11/02 22:19:24 mike Exp $".
  */

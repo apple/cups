@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.5 2000/04/24 21:00:57 mike Exp $"
+ * "$Id: type.c,v 1.6 2000/11/02 22:19:25 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -394,7 +394,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
         * This is just a filename match on the extension...
 	*/
 
-	snprintf(value[0], sizeof(value[0]), "*.%s", name);
+	snprintf(value[0], sizeof(value[0]) - 1, "*.%s", name);
 	length[0]  = strlen(value[0]);
 	num_values = 1;
 	op         = MIME_MAGIC_MATCH;
@@ -1061,5 +1061,5 @@ patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.5 2000/04/24 21:00:57 mike Exp $".
+ * End of "$Id: type.c,v 1.6 2000/11/02 22:19:25 mike Exp $".
  */

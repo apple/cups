@@ -1,5 +1,5 @@
 /*
- * "$Id: md5passwd.c,v 1.2 2000/06/05 00:37:01 mike Exp $"
+ * "$Id: md5passwd.c,v 1.3 2000/11/02 22:19:23 mike Exp $"
  *
  *   MD5 password support for the Common UNIX Printing System (CUPS).
  *
@@ -56,7 +56,7 @@ httpMD5(const char *username,	/* I - User name */
   * Compute the MD5 sum of the user name, group name, and password.
   */
 
-  snprintf(line, sizeof(line), "%s:%s:%s", username, realm, passwd);
+  snprintf(line, sizeof(line) - 1, "%s:%s:%s", username, realm, passwd);
   md5_init(&state);
   md5_append(&state, (md5_byte_t *)line, strlen(line));
   md5_finish(&state, sum);
@@ -91,7 +91,7 @@ httpMD5Final(const char *nonce,		/* I - Server nonce value */
   * First compute the MD5 sum of the method and resource...
   */
 
-  snprintf(line, sizeof(line), "%s:%s", method, resource);
+  snprintf(line, sizeof(line) - 1, "%s:%s", method, resource);
   md5_init(&state);
   md5_append(&state, (md5_byte_t *)line, strlen(line));
   md5_finish(&state, sum);
@@ -103,7 +103,7 @@ httpMD5Final(const char *nonce,		/* I - Server nonce value */
   * request...
   */
 
-  snprintf(line, sizeof(line), "%s%s:%s", md5, nonce, a2);
+  snprintf(line, sizeof(line) - 1, "%s%s:%s", md5, nonce, a2);
 
   md5_init(&state);
   md5_append(&state, (md5_byte_t *)line, strlen(line));
@@ -144,5 +144,5 @@ httpMD5String(const md5_byte_t *sum,	/* I - MD5 sum data */
 
 
 /*
- * End of "$Id: md5passwd.c,v 1.2 2000/06/05 00:37:01 mike Exp $".
+ * End of "$Id: md5passwd.c,v 1.3 2000/11/02 22:19:23 mike Exp $".
  */
