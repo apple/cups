@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cups-lpd.man,v 1.5.2.5 2004/06/29 13:15:10 mike Exp $"
+.\" "$Id: cups-lpd.man,v 1.5.2.6 2004/08/11 13:49:01 mike Exp $"
 .\"
 .\"   cups-lpd man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cups-lpd 8 "Common UNIX Printing System" "4 March 2002" "Easy Software Products"
+.TH cups-lpd 8 "Common UNIX Printing System" "11 August 2004" "Easy Software Products"
 .SH NAME
 cups-lpd \- receive print jobs and report printer status to lpd clients
 .SH SYNOPSIS
@@ -39,7 +39,7 @@ following line to the \fBinetd.conf\fR file to enable the
 .br
 .nf
 
-    printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd
+    printer stream tcp nowait lp /path/to/cups/daemon/cups-lpd cups-lpd -o document-format=application/octet-stream
 .fi
 .LP
 If you are using the newer \fIxinetd(8)\fR daemon, add the following
@@ -53,21 +53,16 @@ lines to the \fBxinetd.conf\fR file:
         protocol = tcp
         wait = no
         user = lp
-        server = /usr/lib/cups/daemon/cups-lpd
+	group = sys
+	passenv =
+        server = /path/to/cups/daemon/cups-lpd
+	server_args = -o document-format=application/octet-stream
     }
 .fi
-.SH SECURITY
-\fBcups-lpd\fR currently does not perform any access control
-based on the settings in \fIcupsd.conf(5)\fR or in the
-\fIhosts.allow(5)\fR or \fIhosts.deny\fR files used by TCP
-wrappers. Therefore, running \fBcups-lpd\fR on your server will
-allow any computer on your network (and perhaps the entire
-Internet) to print to your server.
 .LP
-While \fIxinetd\fR has built-in access control support, you
-should use the TCP wrappers package with \fIinetd\fR to limit
-access to only those computers that should be able to print
-through your server.
+The /path/to/cups/daemon is usually /usr/lib/cups/daemon or
+/usr/libexec/cups/daemon, depending on the operating system.
+Consult the cupsd.conf file for the local setting.
 .SH OPTIONS
 The \fI-o\fR option to \fBcups-lpd\fR inserts options for all print queues.
 Most often this is used to disable the "l" filter so that remote print jobs
@@ -85,23 +80,46 @@ are filtered as needed for printing:
 The example shown resets the document format to be
 \fIapplication/octet-stream\fR, which forces auto-detection of the print
 file type.
+.SH PERFORMANCE
+\fBcups-lpd\fR performs well with small numbers of clients and
+printers. However, since a new process is created for each
+connection and since each process must query the printing system
+before each job submission, it does not scale to larger
+configurations. We highly recommend that large configurations
+use the native IPP support provided by CUPS instead.
+.SH SECURITY
+\fBcups-lpd\fR currently does not perform any access control
+based on the settings in \fIcupsd.conf(5)\fR or in the
+\fIhosts.allow(5)\fR or \fIhosts.deny\fR files used by TCP
+wrappers. Therefore, running \fBcups-lpd\fR on your server will
+allow any computer on your network (and perhaps the entire
+Internet) to print to your server.
+.LP
+While \fIxinetd\fR has built-in access control support, you
+should use the TCP wrappers package with \fIinetd\fR to limit
+access to only those computers that should be able to print
+through your server.
+.LP
+\fBcups-lpd\fR is not enabled by the standard CUPS distribution.
+Please consult with your operating system vendor to determine
+whether it is enabled in their distributions.
 .SH COMPATIBILITY
 \fBcups-lpd\fR does not enforce the restricted source port
 number specified in RFC 1179, as using restricted ports does not
-prevent determined users from submitting print jobs. While this
-behavior is different than standard Berkeley LPD
-implementations, it should not affect normal client operations.
+prevent users from submitting print jobs. While this behavior is
+different than standard Berkeley LPD implementations, it should
+not affect normal client operations.
 .LP
 The output of the status requests follows RFC 2569, Mapping
 between LPD and IPP Protocols. Since many LPD implementations
 stray from this definition, remote status reporting to LPD
 clients may be unreliable.
 .SH SEE ALSO
-inetd(8), xinetd(8),
+cupsd(8), inetd(8), xinetd(8),
 CUPS Software Administrators Manual,
 http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2004 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cups-lpd.man,v 1.5.2.5 2004/06/29 13:15:10 mike Exp $".
+.\" End of "$Id: cups-lpd.man,v 1.5.2.6 2004/08/11 13:49:01 mike Exp $".
 .\"

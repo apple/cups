@@ -3,6 +3,7 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- Updated the cups-lpd man page (STR #843)
 	- Fixed a typo in the cupsd man page (STR #833)
 	- The USB backend now defaults to using the newer
 	  /dev/usb/lpN filenames; this helps on systems which
