@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.39 1999/11/04 14:56:33 mike Exp $"
+ * "$Id: client.c,v 1.40 1999/12/08 13:15:30 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1227,7 +1227,7 @@ decode_basic_auth(client_t *con)	/* I - Client to decode to */
 
 
  /*
-  * Decode the string and pull the username and password out...
+  * Decode the string...
   */
 
   s = con->http.fields[HTTP_FIELD_AUTHORIZATION];
@@ -1240,7 +1240,24 @@ decode_basic_auth(client_t *con)	/* I - Client to decode to */
 
   httpDecode64(value, s);
 
-  sscanf(value, "%31[^:]:%31s", con->username, con->password);
+ /*
+  * Pull the username and password out...
+  */
+
+  if ((s = strchr(value, ':')) == NULL)
+  {
+    LogMessage(LOG_DEBUG, "decode_basic_auth() %d no colon in auth string \"%s\"",
+               con->http.fd, value);
+    return;
+  }
+
+  *s++ = '\0';
+
+  strncpy(con->username, value, sizeof(con->username) - 1);
+  con->username[sizeof(con->username) - 1] = '\0';
+
+  strncpy(con->password, s, sizeof(con->password) - 1);
+  con->password[sizeof(con->password) - 1] = '\0';
 
   LogMessage(LOG_DEBUG, "decode_basic_auth() %d username=\"%s\"",
              con->http.fd, con->username);
@@ -1516,5 +1533,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.39 1999/11/04 14:56:33 mike Exp $".
+ * End of "$Id: client.c,v 1.40 1999/12/08 13:15:30 mike Exp $".
  */
