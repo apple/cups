@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.7 2003/02/14 20:04:01 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.8 2003/02/14 21:08:49 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -74,6 +74,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		verbose;	/* Want verbose output? */
   int		status;		/* Exit status */
   int		errors;		/* Number of conformance errors */
+  int		ppdversion;	/* PPD spec version in PPD file */
   ppd_status_t	error;		/* Status of ppdOpen*() */
   int		line;		/* Line number for error */
   ppd_file_t	*ppd;		/* PPD file record */
@@ -217,7 +218,16 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (verbose > 0)
         puts("\n    CONFORMANCE TESTS:");
 
-      errors = 0;
+      errors     = 0;
+      ppdversion = 43;
+      
+      if ((ptr = ppdFindAttr(ppd, "FormatVersion", NULL)) != NULL)
+      {
+        ppdversion = (int)(10 * atof(ptr) + 0.5);
+
+	if (ppdversion < 43 && verbose > 0)
+	  printf("        WARN    Obsolete PPD version %s!\n", ptr);
+      }
 
       if (ppdFindAttr(ppd, "DefaultImageableArea", NULL) != NULL)
       {
@@ -316,6 +326,11 @@ main(int  argc,			/* I - Number of command-line arguments */
       {
 	if (verbose > 0)
 	  puts("        PASS    Manufacturer");
+      }
+      else if (ppdversion < 43)
+      {
+	if (verbose > 0)
+	  puts("        WARN    REQUIRED Manufacturer");
       }
       else
       {
@@ -467,6 +482,11 @@ main(int  argc,			/* I - Number of command-line arguments */
 	}
 	else if (verbose > 0)
 	  puts("        PASS    ShortNickName");
+      }
+      else if (ppdversion < 43)
+      {
+	if (verbose > 0)
+	  puts("        WARN    REQUIRED ShortNickName");
       }
       else
       {
@@ -636,5 +656,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.7 2003/02/14 20:04:01 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.8 2003/02/14 21:08:49 mike Exp $".
  */
