@@ -305,16 +305,19 @@ when printing with the <CODE>lp</CODE> command.
 
 <P>The following options apply when printing all types of files.
 
-<H3>Selecting the Media Size</H3>
+<H3>Selecting the Media Size, Type, and Source</H3>
 
-<P>The "-o media=size" option sets the media size:
+<P>The "-o media=xyz" option sets the media size, type, and/or source:
 
 <UL><PRE>
 % lp -o media=Letter filename ENTER
+% lp -o media=Letter,MultiPurpose filename ENTER
+% lp -o media=Letter,Transparency filename ENTER
+% lp -o media=Letter,MultiPurpose,Transparency filename ENTER
 </PRE></UL>
 
-<P>The available media sizes depend on the printer, but most support at
-least the following sizes (case is significant):
+<P>The available media sizes, types, and sources depend on the printer, but
+most support the following options (case is significant):
 
 <UL>
 
@@ -329,7 +332,21 @@ least the following sizes (case is significant):
 
 	<LI><CODE>DL</CODE> - ISO DL Envelope (8.66x4.33 inches, or 220x110mm)
 
+	<LI><CODE>Transparency</CODE> - Transparency media type or source
+
+	<LI><CODE>Upper</CODE> - Upper paper tray
+
+	<LI><CODE>Lower</CODE> - Lower paper tray
+
+	<LI><CODE>MultiPurpose</CODE> - Multi-purpose paper tray
+
+	<LI><CODE>LargeCapacity</CODE> - Large capacity paper tray
+
 </UL>
+
+<P>The actual options supported are defined in the printer's PPD file in the
+<CODE>PageSize</CODE>, <CODE>InputSlot</CODE>, and <CODE>MediaType</CODE>
+options.
 
 <H3>Setting the Orientation</H3>
 
@@ -354,12 +371,12 @@ suitable for portrait pages:
 
 <H3>Selecting a Range of Pages</H3>
 
-<P>The "-o page-range=pages" option selects a range of pages for printing:
+<P>The "-o page-ranges=pages" option selects a range of pages for printing:
 
 <UL><PRE>
-% lp -o page-range=1 filename ENTER
-% lp -o page-range=1-4 filename ENTER
-% lp -o page-range=1-4,7,9-12 filename ENTER
+% lp -o page-ranges=1 filename ENTER
+% lp -o page-ranges=1-4 filename ENTER
+% lp -o page-ranges=1-4,7,9-12 filename ENTER
 </PRE></UL>
 
 <P>As shown above, the <I>pages</I> value can be a single page, a range of

@@ -44,7 +44,7 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <UL>
 <LI><A HREF=#4_1>General Options</A></LI>
 <UL>
-<LI><A HREF=#4_1_1>Selecting the Media Size</A></LI>
+<LI><A HREF=#4_1_1>Selecting the Media Size, Type, and Source</A></LI>
 <LI><A HREF=#4_1_2>Setting the Orientation</A></LI>
 <LI><A HREF=#4_1_3>Printing On Both Sides of the Paper</A></LI>
 <LI><A HREF=#4_1_4>Selecting a Range of Pages</A></LI>
@@ -317,15 +317,18 @@ lp</CODE> or <CODE>lpstat</CODE> commands. </P>
 available when printing with the <CODE>lp</CODE> command. </P>
 <H2><A NAME=4_1>General Options</A></H2>
 <P>The following options apply when printing all types of files. </P>
-<H3><A NAME=4_1_1>Selecting the Media Size</A></H3>
-<P>The &quot;-o media=size&quot; option sets the media size: </P>
+<H3><A NAME=4_1_1>Selecting the Media Size, Type, and Source</A></H3>
+<P>The &quot;-o media=xyz&quot; option sets the media size, type, and/or source: </P>
 <UL>
 <PRE>
 % lp -o media=Letter filename ENTER
+% lp -o media=Letter,MultiPurpose filename ENTER
+% lp -o media=Letter,Transparency filename ENTER
+% lp -o media=Letter,MultiPurpose,Transparency filename ENTER
 </PRE>
 </UL>
-<P>The available media sizes depend on the printer, but most support at 
-least the following sizes (case is significant): </P>
+<P>The available media sizes, types, and sources depend on the printer, 
+but most support the following options (case is significant): </P>
 <UL>
 <LI><CODE>Letter</CODE> - US Letter (8.5x11 inches, or 216x279mm) </LI>
 <LI><CODE>Legal</CODE> - US Legal (8.5x14 inches, or 216x356mm) </LI>
@@ -333,7 +336,15 @@ least the following sizes (case is significant): </P>
 <LI><CODE>COM10</CODE> - US #10 Envelope (9.5x4.125 inches, or 
  241x105mm) </LI>
 <LI><CODE>DL</CODE> - ISO DL Envelope (8.66x4.33 inches, or 220x110mm) </LI>
+<LI><CODE>Transparency</CODE> - Transparency media type or source </LI>
+<LI><CODE>Upper</CODE> - Upper paper tray </LI>
+<LI><CODE>Lower</CODE> - Lower paper tray </LI>
+<LI><CODE>MultiPurpose</CODE> - Multi-purpose paper tray </LI>
+<LI><CODE>LargeCapacity</CODE> - Large capacity paper tray </LI>
 </UL>
+<P>The actual options supported are defined in the printer's PPD file 
+in the <CODE>PageSize</CODE>, <CODE>InputSlot</CODE>, and <CODE>
+MediaType</CODE> options. </P>
 <H3><A NAME=4_1_2>Setting the Orientation</A></H3>
 <P>The &quot;-o landscape&quot; option will rotate the page 90 degrees to print 
 in landscape orientation: </P>
@@ -354,13 +365,13 @@ will enable duplexing on the printer (if the printer supports it.) The
 </PRE>
 </UL>
 <H3><A NAME=4_1_4>Selecting a Range of Pages</A></H3>
-<P>The &quot;-o page-range=pages&quot; option selects a range of pages for 
+<P>The &quot;-o page-ranges=pages&quot; option selects a range of pages for 
 printing: </P>
 <UL>
 <PRE>
-% lp -o page-range=1 filename ENTER
-% lp -o page-range=1-4 filename ENTER
-% lp -o page-range=1-4,7,9-12 filename ENTER
+% lp -o page-ranges=1 filename ENTER
+% lp -o page-ranges=1-4 filename ENTER
+% lp -o page-ranges=1-4,7,9-12 filename ENTER
 </PRE>
 </UL>
 <P>As shown above, the <I>pages</I> value can be a single page, a range 
