@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.17.2.12 2004/02/25 16:58:32 mike Exp $"
+ * "$Id: lpq.c,v 1.17.2.13 2004/05/27 15:37:47 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -69,6 +69,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 		*user;		/* Desired user */
   char		*instance;	/* Printer instance */
   int		id,		/* Desired job ID */
+		all,		/* All printers */
 		interval,	/* Reporting interval */
 		longstatus;	/* Show file details */
   int		num_dests;	/* Number of destinations */
@@ -98,12 +99,9 @@ main(int  argc,		/* I - Number of command-line arguments */
   id         = 0;
   interval   = 0;
   longstatus = 0;
+  all        = 0;
 
   num_dests = cupsGetDests(&dests);
-
-  for (i = 0; i < num_dests; i ++)
-    if (dests[i].is_default)
-      dest = dests[i].name;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '+')
@@ -158,7 +156,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
 	case 'a' : /* All printers */
-	    dest = NULL;
+	    all = 1;
 	    break;
 
 	case 'l' : /* Long status */
@@ -177,6 +175,21 @@ main(int  argc,		/* I - Number of command-line arguments */
       id = atoi(argv[i]);
     else
       user = argv[i];
+
+  if (dest == NULL && !all)
+  {
+    for (i = 0; i < num_dests; i ++)
+      if (dests[i].is_default)
+	dest = dests[i].name;
+
+    if (dest == NULL)
+    {
+      fputs("lpq: error - no default destination available.\n", stderr);
+      httpClose(http);
+      cupsFreeDests(num_dests, dests);
+      return (1);
+    }
+  }
 
  /*
   * Show the status in a loop...
@@ -569,5 +582,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpq.c,v 1.17.2.12 2004/02/25 16:58:32 mike Exp $".
+ * End of "$Id: lpq.c,v 1.17.2.13 2004/05/27 15:37:47 mike Exp $".
  */

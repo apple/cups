@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-darwin.c,v 1.1.2.2 2004/05/13 15:13:52 mike Exp $"
+ * "$Id: usb-darwin.c,v 1.1.2.3 2004/05/27 15:37:47 mike Exp $"
  *
  *   USB port on Darwin backend for the Common UNIX Printing System (CUPS).
  *
@@ -47,7 +47,7 @@
  *
  * Contents:
  *
- *   main()	    - Send a file to the specified USB port.
+ *   print_device() - Send a file to the specified USB port.
  *   list_devices() - List all USB devices.
  */
 
@@ -627,7 +627,7 @@ readthread( void *reference )
 * 'print_device()' - Send a file to the specified USB port.
 */
 
-int print_device(const char *hostname, const char *resource, const char *options, int fd, int copies)
+int print_device(const char *uri, const char *hostname, const char *resource, const char *options, int fd, int copies)
 {
     UInt32	wbytes,		/* Number of bytes written */
 		buffersize = 2048;
@@ -1895,5 +1895,5 @@ static CFStringRef CreateEncodedCFString(CFStringRef string)
 }
 
 /*
- * End of "$Id: usb-darwin.c,v 1.1.2.2 2004/05/13 15:13:52 mike Exp $".
+ * End of "$Id: usb-darwin.c,v 1.1.2.3 2004/05/27 15:37:47 mike Exp $".
  */

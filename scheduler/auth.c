@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.41.2.24 2004/05/13 15:13:52 mike Exp $"
+ * "$Id: auth.c,v 1.41.2.25 2004/05/27 15:37:47 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -439,6 +439,7 @@ CopyLocation(location_t **loc)	/* IO - Original location */
   int		i;		/* Looping var */
   int		locindex;	/* Index into Locations array */
   location_t	*temp;		/* New location */
+  char		location[HTTP_MAX_URI];	/* Location of resource */
 
 
  /*
@@ -448,7 +449,14 @@ CopyLocation(location_t **loc)	/* IO - Original location */
 
   locindex = *loc - Locations;
 
-  if ((temp = AddLocation((*loc)->location)) == NULL)
+ /*
+  * Use a local copy of location because AddLocation may cause
+  * this memory to be moved...
+  */
+
+  strlcpy(location, (*loc)->location, sizeof(location));
+
+  if ((temp = AddLocation(location)) == NULL)
     return (NULL);
 
   *loc = Locations + locindex;
@@ -590,14 +598,14 @@ DeleteAllLocations(void)
       free(loc->names);
 
     for (j = loc->num_allow, mask = loc->allow; j > 0; j --, mask ++)
-      if (mask->type == AUTH_NAME)
+      if (mask->type == AUTH_NAME || mask->type == AUTH_INTERFACE)
         free(mask->mask.name.name);
 
     if (loc->num_allow > 0)
       free(loc->allow);
 
     for (j = loc->num_deny, mask = loc->deny; j > 0; j --, mask ++)
-      if (mask->type == AUTH_NAME)
+      if (mask->type == AUTH_NAME || mask->type == AUTH_INTERFACE)
         free(mask->mask.name.name);
 
     if (loc->num_deny > 0)
@@ -1772,5 +1780,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.41.2.24 2004/05/13 15:13:52 mike Exp $".
+ * End of "$Id: auth.c,v 1.41.2.25 2004/05/27 15:37:47 mike Exp $".
  */

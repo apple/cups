@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.37.2.18 2004/02/25 16:58:32 mike Exp $"
+ * "$Id: lpstat.c,v 1.37.2.19 2004/05/27 15:37:47 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -1128,6 +1128,7 @@ show_default(int         num_dests,	/* I - Number of user-defined dests */
 {
   cups_dest_t	*dest;			/* Destination */
 
+
   if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) != NULL)
   {
     if (dest->instance)
@@ -2162,5 +2163,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.37.2.18 2004/02/25 16:58:32 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.37.2.19 2004/05/27 15:37:47 mike Exp $".
  */

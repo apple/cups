@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.29.2.16 2003/11/07 20:16:03 mike Exp $"
+ * "$Id: lp.c,v 1.29.2.17 2004/05/27 15:37:47 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -520,10 +520,10 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (printer == NULL)
   {
-    if (cupsLastError() >= IPP_BAD_REQUEST)
-      fputs("lp: error - scheduler not responding!\n", stderr);
-    else
+    if (cupsLastError() == IPP_NOT_FOUND)
       fputs("lp: error - no default destination available.\n", stderr);
+    else
+      fputs("lp: error - scheduler not responding!\n", stderr);
 
     return (1);
   }
@@ -747,5 +747,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.29.2.16 2003/11/07 20:16:03 mike Exp $".
+ * End of "$Id: lp.c,v 1.29.2.17 2004/05/27 15:37:47 mike Exp $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in,v 1.13.2.23 2004/02/26 16:59:02 mike Exp $"
+# "$Id: cups.list.in,v 1.13.2.24 2004/05/27 15:37:47 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -335,6 +335,7 @@ d 0555 root sys $PMANDIR/cat3 -
 d 0555 root sys $PMANDIR/man3 -
 
 f 0444 root sys $MANDIR/cat1/backend.$CAT1EXT man/backend.$CAT1EXT
+f 0444 root sys $MANDIR/cat1/cups-config.$CAT1EXT man/cups-config.$CAT1EXT
 f 0444 root sys $MANDIR/cat1/cupstestppd.$CAT1EXT man/cupstestppd.$CAT1EXT
 f 0444 root sys $MANDIR/cat1/filter.$CAT1EXT man/filter.$CAT1EXT
 f 0444 root sys $MANDIR/cat1/lpoptions.$CAT1EXT man/lpoptions.$CAT1EXT
@@ -345,8 +346,6 @@ f 0444 root sys $MANDIR/cat1/lpr.$CAT1EXT man/lpr.$CAT1EXT
 f 0444 root sys $MANDIR/cat1/lpstat.$CAT1EXT man/lpstat.$CAT1EXT
 f 0444 root sys $MANDIR/cat1/lp.$CAT1EXT man/lp.$CAT1EXT
 l 0444 root sys $MANDIR/cat1/cancel.$CAT1EXT lp.$CAT1EXT
-
-f 0444 root sys $PMANDIR/cat3/cups-config.$CAT3EXT man/cups-config.$CAT3EXT
 
 f 0444 root sys $MANDIR/cat5/classes.conf.$CAT5EXT man/classes.conf.$CAT5EXT
 f 0444 root sys $MANDIR/cat5/cupsd.conf.$CAT5EXT man/cupsd.conf.$CAT5EXT
@@ -368,6 +367,7 @@ f 0444 root sys $AMANDIR/cat$MAN8DIR/lpinfo.$CAT8EXT man/lpinfo.$CAT8EXT
 f 0444 root sys $AMANDIR/cat$MAN8DIR/lpmove.$CAT8EXT man/lpmove.$CAT8EXT
 
 f 0444 root sys $MANDIR/man1/backend.1 man/backend.man
+f 0444 root sys $MANDIR/man1/cups-config.1 man/cups-config.man
 f 0444 root sys $MANDIR/man1/cupstestppd.1 man/cupstestppd.man
 f 0444 root sys $MANDIR/man1/filter.1 man/filter.man
 f 0444 root sys $MANDIR/man1/lpoptions.1 man/lpoptions.man
@@ -378,8 +378,6 @@ f 0444 root sys $MANDIR/man1/lpr.1 man/lpr.man
 f 0444 root sys $MANDIR/man1/lpstat.1 man/lpstat.man
 f 0444 root sys $MANDIR/man1/lp.1 man/lp.man
 l 0444 root sys $MANDIR/man1/cancel.1 lp.1
-
-f 0444 root sys $PMANDIR/man3/cups-config.3 man/cups-config.man
 
 f 0444 root sys $MANDIR/man5/classes.conf.5 man/classes.conf.man
 f 0444 root sys $MANDIR/man5/cupsd.conf.5 man/cupsd.conf.man
@@ -405,5 +403,5 @@ f 0444 root sys $AMANDIR/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list.in,v 1.13.2.23 2004/02/26 16:59:02 mike Exp $".
+# End of "$Id: cups.list.in,v 1.13.2.24 2004/05/27 15:37:47 mike Exp $".
 #
