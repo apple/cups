@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.30 1999/11/17 18:50:52 mike Exp $"
+ * "$Id: pstops.c,v 1.31 1999/11/17 20:20:52 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -89,7 +89,6 @@ main(int  argc,			/* I - Number of command-line arguments */
   char		tempfile[255];	/* Temporary file name */
   FILE		*temp;		/* Temporary file */
   int		number;		/* Page number */
-  int		offset;		/* NUp offset */
   int		slowcollate;	/* 1 if we need to collate manually */
   int		sloworder;	/* 1 if we need to order manually */
   char		line[8192];	/* Line buffer */
@@ -99,6 +98,9 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		nbytes,		/* Number of bytes read */
 		tbytes;		/* Total bytes to read for binary data */
   int		page;		/* Current page sequence number */
+  int		page_count;	/* Page count for NUp */
+  int		subpage;	/* Sub-page number */
+  int		copy;		/* Current copy */
 
 
   if (argc < 6 || argc > 7)
@@ -397,7 +399,10 @@ main(int  argc,			/* I - Number of command-line arguments */
       end_nup(NumPages - 1);
 
       if (NumPages & (NUp - 1))
+      {
+	start_nup(NUp - 1);
         end_nup(NUp - 1);
+      }
     }
 
     if (slowcollate || sloworder)
@@ -429,44 +434,55 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  }
 
           if (NumPages & (NUp - 1))
+	  {
+	    start_nup(NUp - 1);
             end_nup(NUp - 1);
+	  }
 
 	  Copies --;
 	}
       }
       else
       {
-        offset = NumPages & (NUp - 1);
-	if (offset)
-	  offset = NUp - offset;
+        page_count = (NumPages + NUp - 1) / NUp;
+	copy       = 0;
 
         do
 	{
-	  for (number = NumPages - 1; number >= 0; number --)
+	  for (page = page_count - 1; page >= 0; page --)
 	  {
-	    if (((number + offset) & (NUp - 1)) == 0)
-	    {
-	      if (ppd == NULL || ppd->num_filters == 0)
-		fprintf(stderr, "PAGE: %d %d\n", page,
-	        	slowcollate ? 1 : Copies);
+	    if (ppd == NULL || ppd->num_filters == 0)
+	      fprintf(stderr, "PAGE: %d %d\n", page + 1,
+	              slowcollate ? 1 : Copies);
 
-              printf("%%%%Page: %d %d\n", page, page);
-	      page ++;
-	      ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
+            if (slowcollate)
+              printf("%%%%Page: %d %d\n", page + 1,
+	             page_count - page + copy * page_count);
+            else
+	      printf("%%%%Page: %d %d\n", page + 1, page_count - page);
+
+	    ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
+
+	    for (subpage = 0, number = page * NUp;
+	         subpage < NUp && number < NumPages;
+		 subpage ++, number ++)
+	    {
+	      start_nup(number);
+	      fseek(temp, Pages[number], SEEK_SET);
+	      copy_bytes(temp, Pages[number + 1] - Pages[number]);
+	      end_nup(number);
 	    }
 
-	    start_nup(number + offset);
-	    fseek(temp, Pages[number], SEEK_SET);
-	    copy_bytes(temp, Pages[number + 1] - Pages[number]);
-	    end_nup(number + offset);
+            if (number & (NUp - 1))
+	    {
+	      start_nup(NUp - 1);
+              end_nup(NUp - 1);
+	    }
 	  }
 
-          if (NumPages & (NUp - 1))
-            end_nup(NUp - 1);
-
-	  Copies --;
+	  copy ++;
 	}
-	while (Copies > 0 || !slowcollate);
+	while (copy < Copies && slowcollate);
       }
     }
   }
@@ -615,7 +631,12 @@ copy_bytes(FILE   *fp,		/* I - File to read from */
 
   while (nleft > 0 || length == 0)
   {
-    if ((nbytes = fread(buffer, 1, sizeof(buffer), fp)) < 1)
+    if (nleft > sizeof(buffer))
+      nbytes = sizeof(buffer);
+    else
+      nbytes = nleft;
+
+    if ((nbytes = fread(buffer, 1, nbytes, fp)) < 1)
       return;
 
     nleft -= nbytes;
@@ -838,5 +859,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.30 1999/11/17 18:50:52 mike Exp $".
+ * End of "$Id: pstops.c,v 1.31 1999/11/17 20:20:52 mike Exp $".
  */
