@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.50 2003/07/20 12:51:54 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.51 2003/08/06 18:05:46 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -974,9 +974,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 		};
   const char	*sides[3] =		/* sides-supported values */
 		{
-		  "one",
-		  "two-long-edge",
-		  "two-short-edge"
+		  "one-sided",
+		  "two-sided-long-edge",
+		  "two-sided-short-edge"
 		};
   const char	*versions[] =		/* ipp-versions-supported values */
 		{
@@ -2389,5 +2389,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.50 2003/07/20 12:51:54 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.51 2003/08/06 18:05:46 mike Exp $".
  */
