@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.4 1999/04/21 15:02:00 mike Exp $"
+ * "$Id: lpd.c,v 1.5 1999/06/15 20:38:51 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -109,14 +109,14 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
     if ((fp = fopen(tmpnam(filename), "w")) == NULL)
     {
-      perror("lpd: unable to create temporary file");
+      perror("ERROR: unable to create temporary file");
       return (1);
     }
 
     while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
       if (fwrite(buffer, 1, bytes, fp) < bytes)
       {
-        perror("lpd: unable to write to temporary file");
+        perror("ERROR: unable to write to temporary file");
 	fclose(fp);
 	unlink(filename);
 	return (1);
@@ -178,7 +178,7 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
   bytes = vsprintf(buf, format, ap);
   va_end(ap);
 
-  fprintf(stderr, "lpd: lpd_command %02.2x %s", buf[0], buf + 1);
+  fprintf(stderr, "DEBUG: lpd_command %02.2x %s", buf[0], buf + 1);
 
  /*
   * Send the command...
@@ -194,7 +194,7 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
   if (recv(fd, &status, 1, 0) < 1)
     return (-1);
 
-  fprintf(stderr, "lpd: lpd_command returning %d\n", status);
+  fprintf(stderr, "DEBUG: lpd_command returning %d\n", status);
 
   return (status);
 }
@@ -288,13 +288,13 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
   if (stat(filename, &filestats))
   {
-    perror("lpd: unable to stat print file");
+    perror("ERROR: unable to stat print file");
     return (1);
   }
 
   if ((fp = fopen(filename, "rb")) == NULL)
   {
-    perror("lpd: unable to open print file for reading");
+    perror("ERROR: unable to open print file for reading");
     return (1);
   }
 
@@ -306,8 +306,7 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
   lpd_command(fd, "\002%s\n", printer);	/* Receive print job(s) */
 
   gethostname(localhost, sizeof(localhost));
-  if (strchr(localhost, '.') != NULL)
-    *strchr(localhost, '.') = '\0';
+  localhost[31] = '\0'; /* RFC 1179, Section 7.2 - host name < 32 chars */
 
   sprintf(control, "H%s\nP%s\n", localhost, user);
   cptr = control + strlen(control);
@@ -323,12 +322,12 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
           getpid() % 1000, localhost,
           getpid() % 1000, localhost);
 
-  fprintf(stderr, "lpd: Control file is:\n%s", control);
+  fprintf(stderr, "DEBUG: Control file is:\n%s", control);
 
   lpd_command(fd, "\002%d cfA%03.3d%s\n", strlen(control), getpid() % 1000,
               localhost);
 
-  fprintf(stderr, "lpd: Sending control file (%d bytes)\n", strlen(control));
+  fprintf(stderr, "INFO: Sending control file (%d bytes)\n", strlen(control));
 
   if (send(fd, control, strlen(control) + 1, 0) < (strlen(control) + 1))
   {
@@ -344,12 +343,12 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
     * Send the print file...
     */
 
-    fputs("lpd: Control file sent successfully\n", stderr);
+    fputs("INFO: Control file sent successfully\n", stderr);
 
     lpd_command(fd, "\003%d dfA%03.3d%s\n", filestats.st_size,
                 getpid() % 1000, localhost);
 
-    fprintf(stderr, "lpd: Sending data file (%u bytes)\n",
+    fprintf(stderr, "INFO: Sending data file (%u bytes)\n",
             (unsigned)filestats.st_size);
 
     tbytes = 0;
@@ -375,7 +374,7 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
       fprintf(stderr, "ERROR: Remote host did not accept data file (%d)\n",
               status);
     else
-      fputs("lpd: Data file sent successfully\n", stderr);
+      fputs("INFO: Data file sent successfully\n", stderr);
   }
 
  /*
@@ -390,5 +389,5 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
 
 /*
- * End of "$Id: lpd.c,v 1.4 1999/04/21 15:02:00 mike Exp $".
+ * End of "$Id: lpd.c,v 1.5 1999/06/15 20:38:51 mike Exp $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.2 1999/05/10 21:32:17 mike Exp $"
+# "$Id: Makefile,v 1.3 1999/06/15 20:38:50 mike Exp $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -24,8 +24,8 @@
 
 include ../Makedefs
 
-TARGETS	=	lpd parallel serial smb socket
-OBJS	=	lpd.o parallel.o serial.o smb.o socket.o
+TARGETS	=	ipp lpd parallel serial smb socket
+OBJS	=	ipp.o lpd.o parallel.o serial.o socket.o
 
 #
 # Make all targets...
@@ -47,6 +47,16 @@ clean:
 install:
 	-$(MKDIR) $(SERVERROOT)/backend
 	$(CP) $(TARGETS) $(SERVERROOT)/backend
+	$(CHMOD) u+s $(SERVERROOT)/backend/lpd
+
+#
+# ipp
+#
+
+ipp:	ipp.o ../cups/libcups.a
+	$(CC) $(LDFLAGS) -o ipp ipp.o $(LIBS)
+
+ipp.o:	../cups/cups.h ../Makedefs
 
 #
 # lpd
@@ -79,10 +89,10 @@ serial.o:	../cups/cups.h ../Makedefs
 # smb
 #
 
-smb:	smb.o ../cups/libcups.a
-	$(CC) $(LDFLAGS) -o smb smb.o $(LIBS)
-
-smb.o:	../cups/cups.h ../Makedefs
+smb:	smb.sh ../Makedefs
+	$(RM) smb
+	$(SED) -e "1,$$s/^SMBCLIENT=.*/SMBCLIENT=$(SMBCLIENT)/" <smb.sh >smb
+	$(CHMOD) +x smb
 
 #
 # socket
@@ -94,5 +104,5 @@ socket:	socket.o ../cups/libcups.a
 socket.o:	../cups/cups.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.2 1999/05/10 21:32:17 mike Exp $".
+# End of "$Id: Makefile,v 1.3 1999/06/15 20:38:50 mike Exp $".
 #
