@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.48 2000/07/10 20:58:19 mike Exp $"
+dnl "$Id: configure.in,v 1.49 2000/07/20 17:07:00 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -328,8 +328,12 @@ if test "$prefix" = "NONE"; then
 fi
 
 dnl Fix "exec_prefix" variable if it hasn't been specified...
-if test "$exec_prefix" = "NONE" -a "$prefix" = "/"; then
-	exec_prefix="/usr"
+if test "$exec_prefix" = "NONE"; then
+	if test "$prefix" = "/"; then
+		exec_prefix="/usr"
+	else
+		exec_prefix="$prefix"
+	fi
 fi
 
 dnl Fix "sharedstatedir" variable if it hasn't been specified...
@@ -353,13 +357,21 @@ if test "$includedir" = "\${prefix}/include" -a "$prefix" = "/"; then
 fi
 
 dnl Fix "localstatedir" variable if it hasn't been specified...
-if test "$localstatedir" = "\${prefix}/var" -a "$prefix" = "/"; then
-	localstatedir="/var"
+if test "$localstatedir" = "\${prefix}/var"; then
+	if test "$prefix" = "/"; then
+		localstatedir="/var"
+	else
+		localstatedir="$prefix/var"
+	fi
 fi
 
 dnl Fix "sysconfdir" variable if it hasn't been specified...
-if test "$sysconfdir" = "\${prefix}/etc" -a "$prefix" = "/"; then
-	sysconfdir="/etc"
+if test "$sysconfdir" = "\${prefix}/etc"; then
+	if test "$prefix" = "/"; then
+		sysconfdir="/etc"
+	else
+		sysconfdir="$prefix/etc"
+	fi
 fi
 
 dnl Fix "libdir" variable for IRIX 6.x...
@@ -467,5 +479,5 @@ AC_SUBST(CUPS_DOCROOT)
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.48 2000/07/10 20:58:19 mike Exp $".
+dnl End of "$Id: configure.in,v 1.49 2000/07/20 17:07:00 mike Exp $".
 dnl
