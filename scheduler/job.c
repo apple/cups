@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.155 2002/06/07 20:39:27 mike Exp $"
+ * "$Id: job.c,v 1.156 2002/06/14 12:22:08 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2423,7 +2423,7 @@ ipp_write_file(const char *filename,	/* I - File to write to */
   int			fd;		/* File descriptor */
   int			i;		/* Looping var */
   int			n;		/* Length of data */
-  unsigned char		buffer[8192],	/* Data buffer */
+  unsigned char		buffer[32768],	/* Data buffer */
 			*bufptr;	/* Pointer into buffer */
   ipp_attribute_t	*attr;		/* Current attribute */
 
@@ -2631,7 +2631,7 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 
                   n = strlen(attr->values[i].string.text);
 
-                  if (n > sizeof(buffer))
+                  if (n > (sizeof(buffer) - 2))
 		    return (IPP_ERROR);
 
                   DEBUG_printf(("ipp_write_file: writing string = %d, \'%s\'\n", n,
@@ -2799,7 +2799,7 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 		      strlen(attr->values[i].string.text) +
 		      4;
 
-                  if (n > sizeof(buffer))
+                  if (n > (sizeof(buffer) - 2))
 		    return (IPP_ERROR);
 
                   if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
@@ -2865,7 +2865,7 @@ ipp_write_file(const char *filename,	/* I - File to write to */
 
                   n = attr->values[i].unknown.length;
 
-                  if (n > sizeof(buffer))
+                  if (n > (sizeof(buffer) - 2))
 		    return (IPP_ERROR);
 
                   if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
@@ -3059,5 +3059,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.155 2002/06/07 20:39:27 mike Exp $".
+ * End of "$Id: job.c,v 1.156 2002/06/14 12:22:08 mike Exp $".
  */

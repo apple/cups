@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.70 2002/04/06 09:35:33 mike Exp $"
+ * "$Id: ipp.c,v 1.71 2002/06/14 12:22:07 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -1343,7 +1343,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
 {
   int			i;		/* Looping var */
   int			n;		/* Length of data */
-  unsigned char		buffer[8192],	/* Data buffer */
+  unsigned char		buffer[32768],	/* Data buffer */
 			*bufptr;	/* Pointer into buffer */
   ipp_attribute_t	*attr;		/* Current attribute */
   ipp_value_t		*value;		/* Current value */
@@ -1359,7 +1359,12 @@ ippWrite(http_t *http,		/* I - HTTP data */
 
     case IPP_HEADER :
        /*
-        * Send the request header...
+        * Send the request header:
+	*
+	*                 Version = 2 bytes
+	*   Operation/Status Code = 2 bytes
+	*              Request ID = 4 bytes
+	*                   Total = 8 bytes
 	*/
 
         bufptr = buffer;
@@ -1378,6 +1383,11 @@ ippWrite(http_t *http,		/* I - HTTP data */
 	  DEBUG_puts("ippWrite: Could not write IPP header...");
 	  return (IPP_ERROR);
 	}
+
+       /*
+        * Reset the state engine to point to the first attribute
+	* in the request/response, with no current group.
+	*/
 
         ipp->state   = IPP_ATTRIBUTE;
 	ipp->current = ipp->attrs;
@@ -1409,7 +1419,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
           if (ipp->curtag != attr->group_tag)
 	  {
 	   /*
-	    * Send a group operation tag...
+	    * Send a group tag byte...
 	    */
 
 	    ipp->curtag = attr->group_tag;
@@ -1421,17 +1431,35 @@ ippWrite(http_t *http,		/* I - HTTP data */
 	    *bufptr++ = attr->group_tag;
 	  }
 
-          if ((n = strlen(attr->name)) > (sizeof(buffer) - 3))
+         /*
+	  * Get the length of the attribute name, and make sure it won't
+	  * overflow the buffer...
+	  */
+
+          if ((n = strlen(attr->name)) > (sizeof(buffer) - 4))
 	    return (IPP_ERROR);
 
           DEBUG_printf(("ippWrite: writing value tag = %x\n", attr->value_tag));
           DEBUG_printf(("ippWrite: writing name = %d, \'%s\'\n", n, attr->name));
+
+         /*
+	  * Write the attribute tag and name.  The current implementation
+	  * does not support the extension value tags above 0x7f, so all
+	  * value tags are 1 byte.
+	  *
+	  * The attribute name length does not include the trailing nul
+	  * character in the source string.
+	  */
 
           *bufptr++ = attr->value_tag;
 	  *bufptr++ = n >> 8;
 	  *bufptr++ = n;
 	  memcpy(bufptr, attr->name, n);
 	  bufptr += n;
+
+         /*
+	  * Now write the attribute value(s)...
+	  */
 
 	  switch (attr->value_tag & ~IPP_TAG_COPY)
 	  {
@@ -1463,6 +1491,13 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		    *bufptr++ = 0;
 		    *bufptr++ = 0;
 		  }
+
+		 /*
+	          * Integers and enumerations are both 4-byte signed
+		  * (twos-complement) values.
+		  *
+		  * Put the 2-byte length and 4-byte value into the buffer...
+		  */
 
 	          *bufptr++ = 0;
 		  *bufptr++ = 4;
@@ -1500,6 +1535,12 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		    *bufptr++ = 0;
 		    *bufptr++ = 0;
 		  }
+
+                 /*
+		  * Boolean values are 1-byte; 0 = false, 1 = true.
+		  *
+		  * Put the 2-byte length and 1-byte value into the buffer...
+		  */
 
 	          *bufptr++ = 0;
 		  *bufptr++ = 1;
@@ -1547,9 +1588,17 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		    *bufptr++ = 0;
 		  }
 
+		 /*
+		  * All simple strings consist of the 2-byte length and
+		  * character data without the trailing nul normally found
+		  * in C strings.  Also, strings cannot be longer than 32767
+		  * bytes since the 2-byte length is a signed (twos-complement)
+		  * value.
+		  */
+
                   n = strlen(value->string.text);
 
-                  if (n > sizeof(buffer))
+                  if (n > (sizeof(buffer) - 2))
 		    return (IPP_ERROR);
 
                   DEBUG_printf(("ippWrite: writing string = %d, \'%s\'\n", n,
@@ -1565,6 +1614,11 @@ ippWrite(http_t *http,		/* I - HTTP data */
 
 		    bufptr = buffer;
 		  }
+
+                 /*
+		  * Put the 2-byte length and string characters in the
+		  * buffer.
+		  */
 
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
@@ -1601,6 +1655,14 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		    *bufptr++ = 0;
 		  }
 
+                 /*
+		  * Date values consist of a 2-byte length and an
+		  * 11-byte date/time structure defined by RFC 1903.
+		  *
+		  * Put the 2-byte length and 11-byte date/time
+		  * structure in the buffer.
+		  */
+
 	          *bufptr++ = 0;
 		  *bufptr++ = 11;
 		  memcpy(bufptr, value->date, 11);
@@ -1635,6 +1697,15 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		    *bufptr++ = 0;
 		    *bufptr++ = 0;
 		  }
+
+                 /*
+		  * Resolution values consist of a 2-byte length,
+		  * 4-byte horizontal resolution value, 4-byte vertical
+		  * resolution value, and a 1-byte units value.
+		  *
+		  * Put the 2-byte length and resolution value data
+		  * into the buffer.
+		  */
 
 	          *bufptr++ = 0;
 		  *bufptr++ = 9;
@@ -1678,6 +1749,14 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		    *bufptr++ = 0;
 		  }
 
+                 /*
+		  * Range values consist of a 2-byte length,
+		  * 4-byte lower value, and 4-byte upper value.
+		  *
+		  * Put the 2-byte length and range value data
+		  * into the buffer.
+		  */
+
 	          *bufptr++ = 0;
 		  *bufptr++ = 8;
 		  *bufptr++ = value->range.lower >> 24;
@@ -1720,11 +1799,21 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		    *bufptr++ = 0;
 		  }
 
+                 /*
+		  * textWithLanguage and nameWithLanguage values consist
+		  * of a 2-byte length for both strings and their
+		  * individual lengths, a 2-byte length for the
+		  * character string, the character string without the
+		  * trailing nul, a 2-byte length for the character
+		  * set string, and the character set string without
+		  * the trailing nul.
+		  */
+
                   n = strlen(value->string.charset) +
 		      strlen(value->string.text) +
 		      4;
 
-                  if (n > sizeof(buffer))
+                  if (n > (sizeof(buffer) - 2))
 		    return (IPP_ERROR);
 
                   if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
@@ -1790,9 +1879,16 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		    *bufptr++ = 0;
 		  }
 
+                 /*
+		  * An unknown value might just be a collection value,
+		  * or some new value that a vendor has come up with.
+		  * It consists of a 2-byte length and the bytes in
+		  * the unknown value buffer.
+		  */
+
                   n = value->unknown.length;
 
-                  if (n > sizeof(buffer))
+                  if (n > (sizeof(buffer) - 2))
 		    return (IPP_ERROR);
 
                   if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
@@ -2063,5 +2159,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.70 2002/04/06 09:35:33 mike Exp $".
+ * End of "$Id: ipp.c,v 1.71 2002/06/14 12:22:07 mike Exp $".
  */
