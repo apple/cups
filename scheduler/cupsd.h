@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.7 1999/04/21 22:41:28 mike Exp $"
+ * "$Id: cupsd.h,v 1.8 1999/05/10 16:38:42 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -80,10 +80,12 @@
  */
 
 #define DEFAULT_TIMEOUT		300	/* Timeout during requests/updates */
-#define DEFAULT_KEEPALIVE	30	/* Timeout between requests */
+#define DEFAULT_KEEPALIVE	60	/* Timeout between requests */
 #define DEFAULT_INTERVAL	30	/* Interval between browse updates */
-#define DEFAULT_LANGUAGE	"en"	/* Default language encoding */
-#define DEFAULT_CHARSET		"iso-8859-1"	/* Default charset */
+#define DEFAULT_LANGUAGE	setlocale(LC_ALL,NULL)
+					/* Default language encoding */
+#define DEFAULT_CHARSET		"iso-8859-1"
+					/* Default charset */
 #define DEFAULT_GROUP		"sys"	/* Default system group */
 #define DEFAULT_UID		9	/* Default user ID */
 #define DEFAULT_GID		0	/* Default group ID */
@@ -133,5 +135,5 @@ VAR int			NeedReload	VALUE(TRUE);
 
 
 /*
- * End of "$Id: cupsd.h,v 1.7 1999/04/21 22:41:28 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.8 1999/05/10 16:38:42 mike Exp $".
  */

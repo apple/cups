@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.17 1999/05/03 18:35:35 mike Exp $"
+ * "$Id: client.c,v 1.18 1999/05/10 16:38:40 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -244,6 +244,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 		version[64];	/* HTTP version number string */
   int		major, minor;	/* HTTP version numbers */
   http_status_t	status;		/* Transfer status */
+  ipp_state_t   ipp_state;	/* State of IPP transfer */
   int		bytes;		/* Number of bytes to POST */
   char		*filename;	/* Name of file for GET/HEAD */
   struct stat	filestats;	/* File information */
@@ -732,7 +733,14 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  * Grab any request data from the connection...
 	  */
 
-	  if (ippRead(&(con->http), con->request) != IPP_DATA)
+	  if ((ipp_state = ippRead(&(con->http), con->request)) == IPP_ERROR)
+	  {
+            LogMessage(LOG_ERROR, "ReadClient() %d IPP Read Error!",
+	               con->http.fd);
+	    CloseClient(con);
+	    return (0);
+	  }
+	  else if (ipp_state != IPP_DATA)
 	    break;
 
           if (con->file == 0 && con->http.state != HTTP_POST_SEND)
@@ -743,7 +751,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
             sprintf(con->filename, "%s/requests/XXXXXX", ServerRoot);
 	    con->file = mkstemp(con->filename);
-	    /*fchmod(con->file, 0644);*/
+	    fchmod(con->file, 0644);
 
             LogMessage(LOG_INFO, "ReadClient() %d REQUEST %s", con->http.fd,
 	               con->filename);
@@ -784,6 +792,11 @@ ReadClient(client_t *con)	/* I - Client to read from */
 		return (0);
 	      }
 	    }
+	  }
+	  else if (con->http.state != HTTP_POST_SEND)
+	  {
+	    CloseClient(con);
+	    return (0);
 	  }
 	}
 
@@ -1552,5 +1565,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.17 1999/05/03 18:35:35 mike Exp $".
+ * End of "$Id: client.c,v 1.18 1999/05/10 16:38:40 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.16 1999/05/07 14:46:02 mike Exp $"
+ * "$Id: main.c,v 1.17 1999/05/10 16:38:43 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -33,7 +33,6 @@
  * Include necessary headers...
  */
 
-#define DEBUG
 #define _MAIN_C_
 #include "cupsd.h"
 
@@ -407,5 +406,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.16 1999/05/07 14:46:02 mike Exp $".
+ * End of "$Id: main.c,v 1.17 1999/05/10 16:38:43 mike Exp $".
  */

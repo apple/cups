@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.15 1999/04/23 18:46:54 mike Exp $"
+ * "$Id: conf.c,v 1.16 1999/05/10 16:38:41 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -91,6 +91,8 @@ static var_t	variables[] =
   { "BrowsePort",	&BrowsePort,		VAR_INTEGER,	0 },
   { "BrowseInterval",	&BrowseInterval,	VAR_INTEGER,	0 },
   { "BrowseTimeout",	&BrowseTimeout,		VAR_INTEGER,	0 },
+  { "MaxLogSize",	&MaxLogSize,		VAR_INTEGER,	0 },
+  { "MaxRequestSize",	&MaxRequestSize,	VAR_INTEGER,	0 }
 };
 #define NUM_VARS	(sizeof(variables) / sizeof(variables[0]))
 
@@ -159,8 +161,8 @@ ReadConfiguration(void)
 
   gethostname(ServerName, sizeof(ServerName));
   sprintf(ServerAdmin, "root@%s", ServerName);
-  strcpy(ServerRoot, SERVERDIR);
-  strcpy(DocumentRoot, SERVERDIR "/doc");
+  strcpy(ServerRoot, CUPS_SERVERROOT);
+  strcpy(DocumentRoot, CUPS_DATADIR "/doc");
   strcpy(SystemGroup, DEFAULT_GROUP);
   strcpy(AccessLog, "logs/access_log");
   strcpy(ErrorLog, "logs/error_log");
@@ -177,8 +179,11 @@ ReadConfiguration(void)
   KeepAliveTimeout = DEFAULT_KEEPALIVE;
   ImplicitClasses  = TRUE;
 
+  MaxLogSize       = 1024 * 1024;
+  MaxRequestSize   = 0;
+
   Browsing         = TRUE;
-  BrowsePort       = IPP_PORT;
+  BrowsePort       = ippPort();
   BrowseInterval   = DEFAULT_INTERVAL;
   BrowseTimeout    = DEFAULT_TIMEOUT;
   NumBrowsers      = 0;
@@ -256,7 +261,8 @@ int				/* O - 1 on success, 0 on error */
 LogRequest(client_t      *con,	/* I - Request to log */
            http_status_t code)	/* I - Response code */
 {
-  char		filename[1024];	/* Name of error log file */
+  char		filename[1024],	/* Name of access log file */
+		backname[1024];	/* Backup filename */
   struct tm	*date;		/* Date information */
   static char	*months[12] =	/* Months */
 		{
@@ -292,8 +298,16 @@ LogRequest(client_t      *con,	/* I - Request to log */
 		};
 
 
+ /*
+  * See if the access log is open...
+  */
+
   if (AccessFile == NULL)
   {
+   /*
+    * Nope, open the access log file...
+    */
+
     if (AccessLog[0] != '/')
       sprintf(filename, "%s/%s", ServerRoot, AccessLog);
     else
@@ -302,6 +316,37 @@ LogRequest(client_t      *con,	/* I - Request to log */
     if ((AccessFile = fopen(filename, "a")) == NULL)
       AccessFile = stderr;
   }
+
+ /*
+  * See if we need to rotate the log file...
+  */
+
+  if (ftell(AccessFile) > MaxLogSize && MaxLogSize > 0)
+  {
+   /*
+    * Rotate access_log file...
+    */
+
+    fclose(AccessFile);
+
+    if (AccessLog[0] != '/')
+      sprintf(filename, "%s/%s", ServerRoot, AccessLog);
+    else
+      strcpy(filename, AccessLog);
+
+    strcpy(backname, filename);
+    strcat(backname, ".O");
+
+    unlink(backname);
+    rename(filename, backname);
+
+    if ((AccessFile = fopen(filename, "a")) == NULL)
+      AccessFile = stderr;
+  }
+
+ /*
+  * Write a log of the request in "common log format"...
+  */
 
   date = gmtime(&(con->start));
 
@@ -330,12 +375,49 @@ LogMessage(int  level,		/* I - Log level */
   char		filename[1024],	/* Name of error log file */
 		backname[1024];	/* Backup filename */
   va_list	ap;		/* Argument pointer */
+  time_t	dtime;		/* Time value */
+  struct tm	*date;		/* Date information */
+  static char	*months[12] =	/* Months */
+		{
+		  "Jan",
+		  "Feb",
+		  "Mar",
+		  "Apr",
+		  "May",
+		  "Jun",
+		  "Jul",
+		  "Aug",
+		  "Sep",
+		  "Oct",
+		  "Nov",
+		  "Dec"
+		};
+  static char	levels[] =	/* Log levels... */
+		{
+		  'N',
+		  'E',
+		  'W',
+		  'I',
+		  'D'
+		};
 
+
+ /*
+  * See if we want to log this message...
+  */
 
   if (level <= LogLevel)
   {
+   /*
+    * See if the error log file is open...
+    */
+
     if (ErrorFile == NULL)
     {
+     /*
+      * Nope, open error log...
+      */
+
       if (ErrorLog[0] != '/')
         sprintf(filename, "%s/%s", ServerRoot, ErrorLog);
       else
@@ -345,7 +427,11 @@ LogMessage(int  level,		/* I - Log level */
         ErrorFile = stderr;
     }
 
-    if (ftell(ErrorFile) > 1048576)
+   /*
+    * Do we need to rotate the log?
+    */
+
+    if (ftell(ErrorFile) > MaxLogSize && MaxLogSize > 0)
     {
      /*
       * Rotate error_log file...
@@ -368,18 +454,32 @@ LogMessage(int  level,		/* I - Log level */
         ErrorFile = stderr;
     }
 
-    va_start(ap, message);
+   /*
+    * Print the log level and date/time...
+    */
 
+    dtime = time(NULL);
+    date  = gmtime(&dtime);
+
+    fprintf(ErrorFile, "%c [%02d/%s/%04d:%02d:%02d:%02d +0000] ",
+            levels[level],
+	    date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
+	    date->tm_hour, date->tm_min, date->tm_sec);
+
+   /*
+    * Then the log message...
+    */
+
+    va_start(ap, message);
     vfprintf(ErrorFile, message, ap);
+    va_end(ap);
+
+   /*
+    * Then a newline...
+    */
+
     fputs("\n", ErrorFile);
     fflush(ErrorFile);
-
-#ifdef DEBUG
-    vprintf(message, ap);
-    puts("");
-#endif /* DEBUG */
-
-    va_end(ap);
   }
 
   return (1);
@@ -960,5 +1060,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.15 1999/04/23 18:46:54 mike Exp $".
+ * End of "$Id: conf.c,v 1.16 1999/05/10 16:38:41 mike Exp $".
  */

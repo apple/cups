@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.8 1999/04/21 22:41:28 mike Exp $"
+ * "$Id: conf.h,v 1.9 1999/05/10 16:38:41 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -38,15 +38,15 @@
  * Globals...
  */
 
-VAR char		ConfigurationFile[256]	VALUE(SERVERDIR "/conf/cupsd.conf"),
+VAR char		ConfigurationFile[256]	VALUE(CUPS_SERVERROOT "/conf/cupsd.conf"),
 					/* Configuration file to use */
 			ServerName[256]		VALUE(""),
 					/* FQDN for server */
 			ServerAdmin[256]	VALUE(""),
 					/* Administrator's email */
-			ServerRoot[1024]	VALUE(SERVERDIR),
+			ServerRoot[1024]	VALUE(CUPS_SERVERROOT),
 					/* Root directory for scheduler */
-			DocumentRoot[1024]	VALUE(SERVERDIR "/doc"),
+			DocumentRoot[1024]	VALUE(CUPS_DATADIR "/doc"),
 					/* Root directory for documents */
 			SystemGroup[32]		VALUE(DEFAULT_GROUP),
 					/* System group name */
@@ -54,7 +54,7 @@ VAR char		ConfigurationFile[256]	VALUE(SERVERDIR "/conf/cupsd.conf"),
 					/* Access log filename */
 			ErrorLog[1024]		VALUE("logs/error_log"),
 					/* Error log filename */
-			DefaultLanguage[32]	VALUE(DEFAULT_LANGUAGE),
+			DefaultLanguage[32]	VALUE("C"),
 					/* Default language encoding */
 			DefaultCharset[32]	VALUE(DEFAULT_CHARSET),
 					/* Default charset */
@@ -65,6 +65,10 @@ VAR int			User			VALUE(DEFAULT_UID),
 					/* Group ID for server */
 			LogLevel		VALUE(LOG_ERROR),
 					/* Log level */
+			MaxLogSize		VALUE(1024 * 1024),
+					/* Maximum size of log files */
+			MaxRequestSize		VALUE(0),
+					/* Maximum size of IPP requests */
 			HostNameLookups		VALUE(FALSE),
 					/* Do we do reverse lookups? */
 			Timeout			VALUE(DEFAULT_TIMEOUT),
@@ -92,5 +96,5 @@ extern int	LogMessage(int level, char *message, ...);
 
 
 /*
- * End of "$Id: conf.h,v 1.8 1999/04/21 22:41:28 mike Exp $".
+ * End of "$Id: conf.h,v 1.9 1999/05/10 16:38:41 mike Exp $".
  */
