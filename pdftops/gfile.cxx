@@ -10,19 +10,21 @@
 
 #ifdef WIN32
    extern "C" {
-#  include <sys/stat.h>
 #  ifndef _MSC_VER
 #    include <kpathsea/win32lib.h>
 #  endif
    }
 #else // !WIN32
-#  ifndef ACORN
+#  if defined(MACOS)
+#    include <sys/stat.h>
+#  elif !defined(ACORN)
 #    include <sys/types.h>
 #    include <sys/stat.h>
+#    include <fcntl.h>
 #  endif
 #  include <limits.h>
 #  include <string.h>
-#  if !defined(VMS) && !defined(ACORN)
+#  if !defined(VMS) && !defined(ACORN) && !defined(MACOS)
 #    include <pwd.h>
 #  endif
 #  if defined(VMS) && (__DECCXX_VER < 50200000)
@@ -60,6 +62,10 @@ GString *getHomeDir() {
   //---------- RISCOS ----------
   return new GString("@");
 
+#elif defined(MACOS)
+  //---------- MacOS ----------
+  return new GString(":");
+
 #else
   //---------- Unix ----------
   char *s;
@@ -91,6 +97,8 @@ GString *getCurrentDir() {
   if (GetCurrentDirectory(sizeof(buf), buf))
 #elif defined(ACORN)
   if (strcpy(buf, "@"))
+#elif defined(MACOS)
+  if (strcpy(buf, ":"))
 #else
   if (getcwd(buf, sizeof(buf)))
 #endif
@@ -167,6 +175,23 @@ GString *appendToPath(GString *path, char *fileName) {
       *p = '.';
     } else if (*p == '.') {
       *p = '/';
+    }
+  }
+  return path;
+
+#elif defined(MACOS)
+  //---------- MacOS ----------
+  char *p;
+  int i;
+
+  path->append(":");
+  i = path->getLength();
+  path->append(fileName);
+  for (p = path->getCString() + i; *p; ++p) {
+    if (*p == '/') {
+      *p = ':';
+    } else if (*p == '.') {
+      *p = ':';
     }
   }
   return path;
@@ -278,6 +303,14 @@ GString *grabPath(char *fileName) {
     return new GString(fileName, p - fileName);
   return new GString();
 
+#elif defined(MACOS)
+  //---------- MacOS ----------
+  char *p;
+
+  if ((p = strrchr(fileName, ':')))
+    return new GString(fileName, p - fileName);
+  return new GString();
+
 #else
   //---------- Unix ----------
   char *p;
@@ -302,6 +335,10 @@ GBool isAbsolutePath(char *path) {
   //---------- RISCOS ----------
   return path[0] == '$';
 
+#elif defined(MACOS)
+  //---------- MacOS ----------
+  return path[0] != ':';
+
 #else
   //---------- Unix ----------
   return path[0] == '/';
@@ -315,15 +352,7 @@ GString *makePathAbsolute(GString *path) {
 
   if (!isAbsolutePath(path->getCString())) {
     if (getcwd(buf, sizeof(buf))) {
-      if (path->getChar(0) == '[') {
-	if (path->getChar(1) != '.')
-	  path->insert(0, '.');
-	path->insert(0, buf);
-      } else {
-	path->insert(0, '[');
-	path->insert(1, ']');
-	path->insert(1, buf);
-      }
+      path->insert(0, buf);
     }
   }
   return path;
@@ -345,6 +374,11 @@ GString *makePathAbsolute(GString *path) {
 #elif defined(ACORN)
   //---------- RISCOS ----------
   path->insert(0, '@');
+  return path;
+
+#elif defined(MACOS)
+  //---------- MacOS ----------
+  path->del(0, 1);
   return path;
 
 #else
@@ -390,6 +424,82 @@ GString *makePathAbsolute(GString *path) {
     }
   }
   return path;
+#endif
+}
+
+time_t getModTime(char *fileName) {
+#ifdef WIN32
+  //~ should implement this, but it's (currently) only used in xpdf
+  return 0;
+#else
+  struct stat statBuf;
+
+  if (stat(fileName, &statBuf)) {
+    return 0;
+  }
+  return statBuf.st_mtime;
+#endif
+}
+
+GBool openTempFile(GString **name, FILE **f, char *mode, char *ext) {
+#if defined(VMS) || defined(__EMX__) || defined(WIN32) || defined(ACORN) || defined(MACOS)
+  //---------- non-Unix ----------
+  char *s;
+
+  // There is a security hole here: an attacker can create a symlink
+  // with this file name after the tmpnam call and before the fopen
+  // call.  I will happily accept fixes to this function for non-Unix
+  // OSs.
+  if (!(s = tmpnam(NULL))) {
+    return gFalse;
+  }
+  *name = new GString(s);
+  if (ext) {
+    (*name)->append(ext);
+  }
+  if (!(*f = fopen((*name)->getCString(), mode))) {
+    delete (*name);
+    return gFalse;
+  }
+  return gTrue;
+#else
+  //---------- Unix ----------
+  char *s, *p;
+  int fd;
+
+  if (ext) {
+    if (!(s = tmpnam(NULL))) {
+      return gFalse;
+    }
+    *name = new GString(s);
+    s = (*name)->getCString();
+    if ((p = strrchr(s, '.'))) {
+      (*name)->del(p - s, (*name)->getLength() - (p - s));
+    }
+    (*name)->append(ext);
+    fd = open((*name)->getCString(), O_WRONLY | O_CREAT | O_EXCL, 0600);
+  } else {
+#if HAVE_MKSTEMP
+    if ((s = getenv("TMPDIR"))) {
+      *name = new GString(s);
+    } else {
+      *name = new GString("/tmp");
+    }
+    (*name)->append("/XXXXXX");
+    fd = mkstemp((*name)->getCString());
+#else // HAVE_MKSTEMP
+    if (!(s = tmpnam(NULL))) {
+      return gFalse;
+    }
+    *name = new GString(s);
+    fd = open((*name)->getCString(), O_WRONLY | O_CREAT | O_EXCL, 0600);
+#endif // HAVE_MKSTEMP
+  }
+  if (fd < 0 || !(*f = fdopen(fd, mode))) {
+    delete *name;
+    return gFalse;
+  }
+  return gTrue;
 #endif
 }
 
@@ -447,6 +557,7 @@ GDir::GDir(char *name, GBool doStat1) {
   hnd = FindFirstFile(tmp->getCString(), &ffd);
   delete tmp;
 #elif defined(ACORN)
+#elif defined(MACOS)
 #else
   dir = opendir(name);
 #ifdef VMS
@@ -463,6 +574,7 @@ GDir::~GDir() {
     hnd = NULL;
   }
 #elif defined(ACORN)
+#elif defined(MACOS)
 #else
   if (dir)
     closedir(dir);
@@ -481,6 +593,7 @@ GDirEntry *GDir::getNextEntry() {
     hnd = NULL;
   }
 #elif defined(ACORN)
+#elif defined(MACOS)
 #else
   if (dir) {
 #ifdef VMS
@@ -512,6 +625,7 @@ void GDir::rewind() {
   tmp->append("/*.*");
   hnd = FindFirstFile(tmp->getCString(), &ffd);
 #elif defined(ACORN)
+#elif defined(MACOS)
 #else
   if (dir)
     rewinddir(dir);

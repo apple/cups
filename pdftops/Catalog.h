@@ -41,6 +41,9 @@ public:
   // Get a page.
   Page *getPage(int i) { return pages[i-1]; }
 
+  // Get the reference for a page object.
+  Ref *getPageRef(int i) { return &pageRefs[i-1]; }
+
   // Return base URI, or NULL if none.
   GString *getBaseURI() { return baseURI; }
 
@@ -57,6 +60,7 @@ private:
   Page **pages;			// array of pages
   Ref *pageRefs;		// object ID for each page
   int numPages;			// number of pages
+  int pagesSize;		// size of pages array
   Object dests;			// named destination dictionary
   Object nameTree;		// name tree
   GString *baseURI;		// base URI for URI-type links

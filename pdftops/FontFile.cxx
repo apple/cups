@@ -115,7 +115,7 @@ Type1FontFile::Type1FontFile(char *file, int len) {
 
 Type1FontFile::~Type1FontFile() {
   if (name)
-    delete name;
+    gfree(name);
   if (encoding && freeEnc)
     delete encoding;
 }
@@ -307,7 +307,7 @@ Type1CFontFile::Type1CFontFile(char *file, int len) {
 
 Type1CFontFile::~Type1CFontFile() {
   if (name)
-    delete name;
+    gfree(name);
   if (encoding && freeEnc)
     delete encoding;
 }
@@ -1596,11 +1596,13 @@ void Type1CFontConverter::getDeltaInt(char *buf, char *name, double *op,
 				      int n) {
   int x, i;
 
-  buf += sprintf(buf, "/%s [", name);
+  sprintf(buf, "/%s [", name);
+  buf += strlen(buf);
   x = 0;
   for (i = 0; i < n; ++i) {
     x += (int)op[i];
-    buf += sprintf(buf, "%s%d", i > 0 ? " " : "", x);
+    sprintf(buf, "%s%d", i > 0 ? " " : "", x);
+    buf += strlen(buf);
   }
   sprintf(buf, "] def\n");
 }
@@ -1610,11 +1612,13 @@ void Type1CFontConverter::getDeltaReal(char *buf, char *name, double *op,
   double x;
   int i;
 
-  buf += sprintf(buf, "/%s [", name);
+  sprintf(buf, "/%s [", name);
+  buf += strlen(buf);
   x = 0;
   for (i = 0; i < n; ++i) {
     x += op[i];
-    buf += sprintf(buf, "%s%g", i > 0 ? " " : "", x);
+    sprintf(buf, "%s%g", i > 0 ? " " : "", x);
+    buf += strlen(buf);
   }
   sprintf(buf, "] def\n");
 }

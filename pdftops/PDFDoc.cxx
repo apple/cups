@@ -18,28 +18,35 @@
 #include "config.h"
 #include "Page.h"
 #include "Catalog.h"
+#include "Stream.h"
 #include "XRef.h"
 #include "Link.h"
 #include "OutputDev.h"
 #include "Params.h"
 #include "Error.h"
+#include "Lexer.h"
+#include "Parser.h"
 #include "PDFDoc.h"
+
+//------------------------------------------------------------------------
+
+#define headerSearchSize 1024	// read this many bytes at beginning of
+				//   file to look for '%PDF'
 
 //------------------------------------------------------------------------
 // PDFDoc
 //------------------------------------------------------------------------
 
-PDFDoc::PDFDoc(GString *fileName1) {
-  FileStream *str;
-  Object catObj;
+PDFDoc::PDFDoc(GString *fileName1, GString *userPassword) {
   Object obj;
   GString *fileName2;
 
-  // setup
   ok = gFalse;
-  catalog = NULL;
-  xref = NULL;
+
   file = NULL;
+  str = NULL;
+  xref = NULL;
+  catalog = NULL;
   links = NULL;
 
   // try to open file
@@ -70,15 +77,31 @@ PDFDoc::PDFDoc(GString *fileName1) {
   obj.initNull();
   str = new FileStream(file, 0, -1, &obj);
 
+  ok = setup(userPassword);
+}
+
+PDFDoc::PDFDoc(BaseStream *str, GString *userPassword) {
+  ok = gFalse;
+  fileName = NULL;
+  file = NULL;
+  this->str = str;
+  xref = NULL;
+  catalog = NULL;
+  links = NULL;
+  ok = setup(userPassword);
+}
+
+GBool PDFDoc::setup(GString *userPassword) {
+  Object catObj;
+
   // check header
-  str->checkHeader();
+  checkHeader();
 
   // read xref table
-  xref = new XRef(str);
-  delete str;
+  xref = new XRef(str, userPassword);
   if (!xref->isOk()) {
     error(-1, "Couldn't read xref table");
-    return;
+    return gFalse;
   }
 
   // read catalog
@@ -86,84 +109,142 @@ PDFDoc::PDFDoc(GString *fileName1) {
   catObj.free();
   if (!catalog->isOk()) {
     error(-1, "Couldn't read page catalog");
-    return;
+    return gFalse;
   }
 
   // done
-  ok = gTrue;
-  return;
+  return gTrue;
 }
 
 PDFDoc::~PDFDoc() {
-  if (catalog)
+  if (catalog) {
     delete catalog;
-  if (xref)
+  }
+  if (xref) {
     delete xref;
-  if (file)
+  }
+  if (str) {
+    delete str;
+  }
+  if (file) {
     fclose(file);
-  if (fileName)
+  }
+  if (fileName) {
     delete fileName;
-  if (links)
+  }
+  if (links) {
     delete links;
+  }
+}
+
+// Check for a PDF header on this stream.  Skip past some garbage
+// if necessary.
+void PDFDoc::checkHeader() {
+  char hdrBuf[headerSearchSize+1];
+  char *p;
+  int i;
+
+  pdfVersion = 0;
+  for (i = 0; i < headerSearchSize; ++i) {
+    hdrBuf[i] = str->getChar();
+  }
+  hdrBuf[headerSearchSize] = '\0';
+  for (i = 0; i < headerSearchSize - 5; ++i) {
+    if (!strncmp(&hdrBuf[i], "%PDF-", 5)) {
+      break;
+    }
+  }
+  if (i >= headerSearchSize - 5) {
+    error(-1, "May not be a PDF file (continuing anyway)");
+    return;
+  }
+  str->moveStart(i);
+  p = strtok(&hdrBuf[i+5], " \t\n\r");
+  pdfVersion = atof(p);
+  if (!(hdrBuf[i+5] >= '0' && hdrBuf[i+5] <= '9') ||
+      pdfVersion > supportedPDFVersionNum + 0.0001) {
+    error(-1, "PDF version %s -- xpdf supports version %s"
+	  " (continuing anyway)", p, supportedPDFVersionStr);
+  }
 }
 
 void PDFDoc::displayPage(OutputDev *out, int page, int zoom, int rotate,
 			 GBool doLinks) {
-  Link *link;
-  double x1, y1, x2, y2;
-  double w;
-  int i;
+  Page *p;
 
-  if (printCommands)
+  if (printCommands) {
     printf("***** page %d *****\n", page);
-  catalog->getPage(page)->display(out, zoom, rotate);
+  }
+  p = catalog->getPage(page);
   if (doLinks) {
-    if (links)
+    if (links) {
       delete links;
-    getLinks(page);
-    for (i = 0; i < links->getNumLinks(); ++i) {
-      link = links->getLink(i);
-      link->getBorder(&x1, &y1, &x2, &y2, &w);
-      if (w > 0)
-	out->drawLinkBorder(x1, y1, x2, y2, w);
     }
-    out->dump();
+    getLinks(p);
+    p->display(out, zoom, rotate, links, catalog);
+  } else {
+    p->display(out, zoom, rotate, NULL, catalog);
   }
 }
 
 void PDFDoc::displayPages(OutputDev *out, int firstPage, int lastPage,
-			  int zoom, int rotate) {
-  Page *p;
+			  int zoom, int rotate, GBool doLinks) {
   int page;
 
   for (page = firstPage; page <= lastPage; ++page) {
-    if (printCommands)
-      printf("***** page %d *****\n", page);
-    p = catalog->getPage(page);
-    p->display(out, zoom, rotate);
+    displayPage(out, page, zoom, rotate, doLinks);
   }
+}
+
+GBool PDFDoc::isLinearized() {
+  Parser *parser;
+  Object obj1, obj2, obj3, obj4, obj5;
+  GBool lin;
+
+  lin = gFalse;
+  obj1.initNull();
+  parser = new Parser(new Lexer(str->makeSubStream(str->getStart(),
+						   -1, &obj1)));
+  parser->getObj(&obj1);
+  parser->getObj(&obj2);
+  parser->getObj(&obj3);
+  parser->getObj(&obj4);
+  if (obj1.isInt() && obj2.isInt() && obj3.isCmd("obj") &&
+      obj4.isDict()) {
+    obj4.dictLookup("Linearized", &obj5);
+    if (obj5.isNum() && obj5.getNum() > 0) {
+      lin = gTrue;
+    }
+    obj5.free();
+  }
+  obj4.free();
+  obj3.free();
+  obj2.free();
+  obj1.free();
+  delete parser;
+  return lin;
 }
 
 GBool PDFDoc::saveAs(GString *name) {
   FILE *f;
-  char buf[4096];
-  int n;
+  int c;
 
   if (!(f = fopen(name->getCString(), "wb"))) {
     error(-1, "Couldn't open file '%s'", name->getCString());
     return gFalse;
   }
-  rewind(file);
-  while ((n = fread(buf, 1, sizeof(buf), file)) > 0)
-    fwrite(buf, 1, n, f);
+  str->reset();
+  while ((c = str->getChar()) != EOF) {
+    fputc(c, f);
+  }
   fclose(f);
   return gTrue;
 }
 
-void PDFDoc::getLinks(int page) {
+void PDFDoc::getLinks(Page *page) {
   Object obj;
 
-  links = new Links(catalog->getPage(page)->getAnnots(&obj),
-		    catalog->getBaseURI());
+  links = new Links(page->getAnnots(&obj), catalog->getBaseURI());
   obj.free();
 }
+

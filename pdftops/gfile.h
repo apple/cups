@@ -12,15 +12,18 @@
 #define GFILE_H
 
 #include <config.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
 #if defined(WIN32)
-#  ifdef _MSC_VER
-#    include <windows.h>
+#  include <sys/stat.h>
+#  ifdef FPTEX
+#    include <win32lib.h>
 #  else
-#    include <kpathsea/win32lib.h>
+#    include <windows.h>
 #  endif
 #elif defined(ACORN)
+#elif defined(MACOS)
 #else
 #  include <unistd.h>
 #  include <sys/types.h>
@@ -28,10 +31,10 @@
 #    include "vms_dirent.h"
 #  elif HAVE_DIRENT_H
 #    include <dirent.h>
-#    define NAMLEN(dirent) strlen((dirent)->d_name)
+#    define NAMLEN(d) strlen((d)->d_name)
 #  else
 #    define dirent direct
-#    define NAMLEN(dirent) (dirent)->d_namlen
+#    define NAMLEN(d) (d)->d_namlen
 #    if HAVE_SYS_NDIR_H
 #      include <sys/ndir.h>
 #    endif
@@ -70,6 +73,18 @@ extern GBool isAbsolutePath(char *path);
 // relative) or prepending user's directory (if path starts with '~').
 GString *makePathAbsolute(GString *path);
 
+// Get the modification time for <fileName>.  Returns 0 if there is an
+// error.
+time_t getModTime(char *fileName);
+
+// Create a temporary file and open it for writing.  If <ext> is not
+// NULL, it will be used as the file name extension.  Returns both the
+// name and the file pointer.  For security reasons, all writing
+// should be done to the returned file pointer; the file may be
+// reopened later for reading, but not for writing.  The <mode> string
+// should be "w" or "wb".  Returns true on success.
+GBool openTempFile(GString **name, FILE **f, char *mode, char *ext);
+
 //------------------------------------------------------------------------
 // GDir and GDirEntry
 //------------------------------------------------------------------------
@@ -104,6 +119,7 @@ private:
   WIN32_FIND_DATA ffd;
   HANDLE hnd;
 #elif defined(ACORN)
+#elif defined(MACOS)
 #else
   DIR *dir;			// the DIR structure from opendir()
 #ifdef VMS

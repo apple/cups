@@ -189,6 +189,10 @@ Operator Gfx::opTab[] = {
 #define numOps (sizeof(opTab) / sizeof(Operator))
 
 //------------------------------------------------------------------------
+
+GBool printCommands = gFalse;
+
+//------------------------------------------------------------------------
 // Gfx
 //------------------------------------------------------------------------
 
@@ -288,6 +292,8 @@ void Gfx::display(Object *obj) {
   }
   parser = new Parser(new Lexer(obj));
   go();
+  delete parser;
+  parser = NULL;
 }
 
 void Gfx::go() {
@@ -364,8 +370,6 @@ void Gfx::go() {
     out->dump();
 
   // clean up
-  if (parser)
-    delete parser;
   if (printCommands)
     fflush(stdout);
 }
@@ -446,7 +450,7 @@ GBool Gfx::checkArg(Object *arg, TchkType type) {
 }
 
 int Gfx::getPos() {
-  return parser->getPos();
+  return parser ? parser->getPos() : -1;
 }
 
 GfxFont *Gfx::lookupFont(char *name) {
@@ -502,6 +506,12 @@ void Gfx::opSave(Object args[], int numArgs) {
 void Gfx::opRestore(Object args[], int numArgs) {
   state = state->restore();
   out->restoreState(state);
+
+  // Some PDF producers (Macromedia FreeHand) generate a save (q) and
+  // restore (Q) inside a path sequence.  The PDF spec seems to imply
+  // that this is illegal.  Calling clearPath() here implements the
+  // behavior apparently expected by this software.
+  state->clearPath();
 }
 
 void Gfx::opConcat(Object args[], int numArgs) {
@@ -1097,8 +1107,18 @@ void Gfx::doShowText(GString *s) {
   Guchar c8;
   int c16;
   GString *s16;
+  char s16a[2];
   int m, n;
-  double dx, dy, width, height, w, h;
+#if 0 //~type3
+  double dx, dy, width, height, w, h, x, y;
+  double oldCTM[6], newCTM[6];
+  double *mat;
+  Object charProc;
+  Parser *oldParser;
+  int i;
+#else
+  double dx, dy, width, height, w, h, sWidth, sHeight;
+#endif
 
   if (fontChanged) {
     out->updateFont(state);
@@ -1113,8 +1133,9 @@ void Gfx::doShowText(GString *s) {
       out->beginString(state, s);
       s16 = NULL;
     } else {
-      s16 = new GString("  ");
+      s16 = new GString();
     }
+    sWidth = sHeight = 0;
     state->textTransformDelta(0, state->getRise(), &dx, &dy);
     p = (Guchar *)s->getCString();
     n = s->getLength();
@@ -1136,22 +1157,78 @@ void Gfx::doShowText(GString *s) {
       if (out->useDrawChar()) {
 	out->drawChar16(state, state->getCurX() + dx, state->getCurY() + dy,
 			w, h, c16);
+	state->textShift(width, height);
       } else {
-	s16->setChar(0, (char)(c16 >> 8));
-	s16->setChar(1, (char)c16);
-	out->drawString16(state, s16);
+	s16a[0] = (char)(c16 >> 8);
+	s16a[1] = (char)c16;
+	s16->append(s16a, 2);
+	sWidth += w;
+	sHeight += h;
       }
-      state->textShift(width, height);
       n -= m;
       p += m;
     }
-    if (out->useDrawChar())
+    if (out->useDrawChar()) {
       out->endString(state);
-    else
+    } else {
+      out->drawString16(state, s16);
       delete s16;
+      state->textShift(sWidth, sHeight);
+    }
 
   //----- 8-bit font
   } else {
+#if 0 //~type3
+    //~ also check out->renderType3()
+    if (font->getType() == fontType3) {
+      out->beginString(state, s);
+      mat = state->getCTM();
+      for (i = 0; i < 6; ++i) {
+	oldCTM[i] = mat[i];
+      }
+      mat = state->getTextMat();
+      newCTM[0] = mat[0] * oldCTM[0] + mat[1] * oldCTM[2];
+      newCTM[1] = mat[0] * oldCTM[1] + mat[1] * oldCTM[3];
+      newCTM[2] = mat[2] * oldCTM[0] + mat[3] * oldCTM[2];
+      newCTM[3] = mat[2] * oldCTM[1] + mat[3] * oldCTM[3];
+      mat = font->getFontMatrix();
+      newCTM[0] = mat[0] * newCTM[0] + mat[1] * newCTM[2];
+      newCTM[1] = mat[0] * newCTM[1] + mat[1] * newCTM[3];
+      newCTM[2] = mat[2] * newCTM[0] + mat[3] * newCTM[2];
+      newCTM[3] = mat[2] * newCTM[1] + mat[3] * newCTM[3];
+      newCTM[0] *= state->getFontSize();
+      newCTM[3] *= state->getFontSize();
+      newCTM[0] *= state->getHorizScaling();
+      newCTM[2] *= state->getHorizScaling();
+      state->textTransformDelta(0, state->getRise(), &dx, &dy);
+      oldParser = parser;
+      for (p = (Guchar *)s->getCString(), n = s->getLength(); n; ++p, --n) {
+	c8 = *p;
+	font->getCharProc(c8, &charProc);
+	state->transform(state->getCurX() + dx, state->getCurY() + dy, &x, &y);
+	state->setCTM(newCTM[0], newCTM[1], newCTM[2], newCTM[3], x, y);
+	//~ out->updateCTM(???)
+	if (charProc.isStream()) {
+	  display(&charProc);
+	} else {
+	  error(getPos(), "Missing or bad Type3 CharProc entry");
+	}
+	state->setCTM(oldCTM[0], oldCTM[1], oldCTM[2],
+		      oldCTM[3], oldCTM[4], oldCTM[5]);
+	//~ out->updateCTM(???) - use gsave/grestore instead?
+	charProc.free();
+	width = state->getFontSize() * state->getHorizScaling() *
+	        font->getWidth(c8) +
+	        state->getCharSpace();
+	if (c8 == ' ') {
+	  width += state->getWordSpace();
+	}
+	state->textShift(width);
+      }
+      parser = oldParser;
+      out->endString(state);
+    } else
+#endif
     if (out->useDrawChar()) {
       out->beginString(state, s);
       state->textTransformDelta(0, state->getRise(), &dx, &dy);
@@ -1215,14 +1292,23 @@ int Gfx::getNextChar16(GfxFontEncoding16 *enc, Guchar *p, int *c16) {
 
 void Gfx::opXObject(Object args[], int numArgs) {
   Object obj1, obj2;
+#if OPI_SUPPORT
+  Object opiDict;
+#endif
 
   if (!lookupXObject(args[0].getName(), &obj1))
     return;
-  if (!obj1.isStream("XObject")) {
+  if (!obj1.isStream()) {
     error(getPos(), "XObject '%s' is wrong type", args[0].getName());
     obj1.free();
     return;
   }
+#if OPI_SUPPORT
+  obj1.streamGetDict()->lookup("OPI", &opiDict);
+  if (opiDict.isDict()) {
+    out->opiBegin(state, opiDict.getDict());
+  }
+#endif
   obj1.streamGetDict()->lookup("Subtype", &obj2);
   if (obj2.isName("Image"))
     doImage(obj1.getStream(), gFalse);
@@ -1233,6 +1319,12 @@ void Gfx::opXObject(Object args[], int numArgs) {
   else
     error(getPos(), "XObject subtype is missing or wrong type");
   obj2.free();
+#if OPI_SUPPORT
+  if (opiDict.isDict()) {
+    out->opiEnd(state, opiDict.getDict());
+  }
+  opiDict.free();
+#endif
   obj1.free();
 }
 
@@ -1367,14 +1459,9 @@ void Gfx::doImage(Stream *str, GBool inlineImg) {
 }
 
 void Gfx::doForm(Object *str) {
-  Parser *oldParser;
-  GfxResources *resPtr;
   Dict *dict;
-  Dict *resDict;
   Object matrixObj, bboxObj;
-  double m[6];
-  Object obj1, obj2;
-  int i;
+  Object obj1;
 
   // get stream dict
   dict = str->streamGetDict();
@@ -1401,6 +1488,58 @@ void Gfx::doForm(Object *str) {
     return;
   }
 
+  doForm1(str, dict, &matrixObj, &bboxObj);
+
+  matrixObj.free();
+  bboxObj.free();
+}
+
+void Gfx::doWidgetForm(Object *str, double x, double y) {
+  Dict *dict;
+  Object matrixObj, bboxObj;
+  Object obj1;
+
+  // get stream dict
+  dict = str->streamGetDict();
+
+  // get bounding box
+  dict->lookup("BBox", &bboxObj);
+  if (!bboxObj.isArray()) {
+    bboxObj.free();
+    error(getPos(), "Bad form bounding box");
+    return;
+  }
+
+  // construct matrix
+  matrixObj.initArray();
+  obj1.initReal(1);
+  matrixObj.arrayAdd(&obj1);
+  obj1.initReal(0);
+  matrixObj.arrayAdd(&obj1);
+  obj1.initReal(0);
+  matrixObj.arrayAdd(&obj1);
+  obj1.initReal(1);
+  matrixObj.arrayAdd(&obj1);
+  obj1.initReal(x);
+  matrixObj.arrayAdd(&obj1);
+  obj1.initReal(y);
+  matrixObj.arrayAdd(&obj1);
+
+  doForm1(str, dict, &matrixObj, &bboxObj);
+
+  matrixObj.free();
+  bboxObj.free();
+}
+
+void Gfx::doForm1(Object *str, Dict *dict,
+		  Object *matrixObj, Object *bboxObj) {
+  Parser *oldParser;
+  GfxResources *resPtr;
+  Dict *resDict;
+  double m[6];
+  Object obj1, obj2;
+  int i;
+
   // push new resources on stack
   res = new GfxResources(res);
   dict->lookup("Resources", &obj1);
@@ -1425,7 +1564,7 @@ void Gfx::doForm(Object *str) {
 
   // set form transformation matrix
   for (i = 0; i < 6; ++i) {
-    matrixObj.arrayGet(i, &obj1);
+    matrixObj->arrayGet(i, &obj1);
     m[i] = obj1.getNum();
     obj1.free();
   }
@@ -1434,24 +1573,20 @@ void Gfx::doForm(Object *str) {
 
   // set form bounding box
   for (i = 0; i < 4; ++i) {
-    bboxObj.arrayGet(i, &obj1);
+    bboxObj->arrayGet(i, &obj1);
     m[i] = obj1.getNum();
     obj1.free();
   }
   state->moveTo(m[0], m[1]);
-  state->lineTo(m[0]+m[2], m[1]);
-  state->lineTo(m[0]+m[2], m[1]+m[3]);
-  state->lineTo(m[0], m[1]+m[3]);
+  state->lineTo(m[2], m[1]);
+  state->lineTo(m[2], m[3]);
+  state->lineTo(m[0], m[3]);
   state->closePath();
   out->clip(state);
   state->clearPath();
 
   // draw the form
   display(str);
-
-  // free matrix and bounding box
-  matrixObj.free();
-  bboxObj.free();
 
   // restore parser
   parser = oldParser;
@@ -1523,7 +1658,7 @@ Stream *Gfx::buildImageStream() {
   obj.free();
 
   // make stream
-  str = new SubStream(parser->getStream(), &dict);
+  str = new EmbedStream(parser->getStream(), &dict);
   str = str->addFilters(&dict);
 
   return str;

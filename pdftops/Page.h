@@ -18,6 +18,8 @@
 class Dict;
 class XRef;
 class OutputDev;
+class Links;
+class Catalog;
 
 //------------------------------------------------------------------------
 // PageAttrs
@@ -87,7 +89,7 @@ public:
   double getHeight() { return attrs->getY2() - attrs->getY1(); }
   int getRotate() { return attrs->getRotate(); }
 
-  // Get resource
+  // Get resource dictionary.
   Dict *getResourceDict() { return attrs->getResourceDict(); }
 
   // Get annotations array.
@@ -97,7 +99,8 @@ public:
   Object *getContents(Object *obj) { return contents.fetch(obj); }
 
   // Display a page.
-  void display(OutputDev *out, int dpi, int rotate);
+  void display(OutputDev *out, int dpi, int rotate,
+	       Links *links, Catalog *catalog);
 
 private:
 

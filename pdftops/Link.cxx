@@ -557,9 +557,7 @@ LinkAction *Links::find(double x, double y) {
 
   for (i = 0; i < numLinks; ++i) {
     if (links[i]->inRect(x, y)) {
-      if (links[i]->getAction())
-	return links[i]->getAction();
-      return NULL;
+      return links[i]->getAction();
     }
   }
   return NULL;

@@ -13,12 +13,11 @@
 #pragma interface
 #endif
 
-#include <stdio.h>
 #include "gtypes.h"
 #include "Object.h"
 
 class Dict;
-class FileStream;
+class Stream;
 
 //------------------------------------------------------------------------
 // XRef
@@ -34,7 +33,7 @@ class XRef {
 public:
 
   // Constructor.  Read xref table from stream.
-  XRef(FileStream *str);
+  XRef(BaseStream *str, GString *userPassword);
 
   // Destructor.
   ~XRef();
@@ -43,11 +42,17 @@ public:
   GBool isOk() { return ok; }
 
   // Is the file encrypted?
+#ifndef NO_DECRYPTION
+  GBool isEncrypted() { return encrypted; }
+#else
   GBool isEncrypted() { return gFalse; }
+#endif
 
-  // Are printing and copying allowed?  If not, print an error message.
+  // Check various permissions.
   GBool okToPrint();
+  GBool okToChange();
   GBool okToCopy();
+  GBool okToAddNotes();
 
   // Get catalog object.
   Object *getCatalog(Object *obj) { return fetch(rootNum, rootGen, obj); }
@@ -58,9 +63,19 @@ public:
   // Return the document's Info dictionary (if any).
   Object *getDocInfo(Object *obj);
 
+  // Return the number of objects in the xref table.
+  int getNumObjects() { return size; }
+
+  // Return the offset of the last xref table.
+  int getLastXRefPos() { return lastXRefPos; }
+
+  // Return the catalog object reference.
+  int getRootNum() { return rootNum; }
+  int getRootGen() { return rootGen; }
+
 private:
 
-  FILE *file;			// input file
+  BaseStream *str;		// input stream
   int start;			// offset in file (to allow for garbage
 				//   at beginning of file)
   XRefEntry *entries;		// xref entries
@@ -68,11 +83,17 @@ private:
   int rootNum, rootGen;		// catalog dict
   GBool ok;			// true if xref table is valid
   Object trailerDict;		// trailer dictionary
+  int lastXRefPos;		// offset of last xref table
+#ifndef NO_DECRYPTION
+  GBool encrypted;		// true if file is encrypted
+  int permFlags;		// permission bits
+  Guchar fileKey[16];		// file decryption key
+#endif
 
-  int readTrailer(FileStream *str);
-  GBool readXRef(FileStream *str, int *pos);
-  GBool constructXRef(FileStream *str);
-  GBool checkEncrypted();
+  int readTrailer();
+  GBool readXRef(int *pos);
+  GBool constructXRef();
+  GBool checkEncrypted(GString *userPassword);
 };
 
 //------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.3 2000/08/18 17:24:44 mike Exp $"
+# "$Id: Makefile,v 1.4 2000/10/13 02:05:10 mike Exp $"
 #
 #   pdftops filter Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -14,11 +14,12 @@ include ../Makedefs
 # Object files...
 #
 
-LIBOBJS	=	GString.o gfile.o gmempp.o gmem.o parseargs.o \
+LIBOBJS	=	Decrypt.o GString.o gfile.o gmempp.o gmem.o parseargs.o \
 		Array.o Catalog.o Dict.o Error.o FontEncoding.o \
-		FontFile.o Gfx.o GfxFont.o GfxState.o Lexer.o Link.o \
-		Object.o OutputDev.o Page.o Params.o Parser.o PDFDoc.o \
-		PSOutputDev.o Stream.o XRef.o
+		FontFile.o FormWidget.o Gfx.o GfxFont.o GfxState.o \
+		Lexer.o Link.o Object.o OutputDev.o Page.o Params.o \
+		Parser.o PDFDoc.o PSOutputDev.o SFont.o Stream.o \
+		T1Font.o TTFont.o XRef.o
 OBJS	=	pdftops.o $(LIBOBJS)
 
 #
@@ -81,12 +82,14 @@ parseargs.o:	parseargs.h gtypes.h
 Array.o:	gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h
 Catalog.o:	gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h \
 		Page.h Error.h config.h Link.h Catalog.h
+Decrypt.o:	gmem.h Decrypt.h gtypes.h GString.h
 Dict.o:		gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h \
 		XRef.h
 Error.o:	gtypes.h Params.h Error.h config.h
 FontEncoding.o:	gmem.h FontEncoding.h gtypes.h
 FontFile.o:	gmem.h Error.h config.h FontFile.h gtypes.h GString.h \
 		FontEncoding.h StdFontInfo.h CompactFontInfo.h
+FormWidget.o:	FormWidget.h gmem.h Object.h Gfx.h
 Gfx.o:		gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h \
 		Lexer.h Parser.h GfxFont.h FontEncoding.h GfxState.h \
 		OutputDev.h Params.h Error.h config.h Gfx.h
@@ -116,8 +119,11 @@ PDFDoc.o:	GString.h config.h Page.h Object.h gtypes.h gmem.h Array.h \
 PSOutputDev.o:	GString.h config.h Object.h gtypes.h gmem.h Array.h Dict.h \
 		Stream.h Error.h GfxState.h GfxFont.h FontEncoding.h \
 		FontFile.h Catalog.h Page.h PSOutputDev.h OutputDev.h
+SFont.o:	SFont.h gtypes.h
 Stream.o:	gmem.h config.h Error.h Object.h gtypes.h GString.h Array.h \
 		Dict.h Stream.h Stream-CCITT.h
+T1Font.o:	T1Font.h gmem.h FontEncoding.h
+TTFont.o:	TTFont.h gmem.h FontEncoding.h
 XRef.o:		gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h \
 		Lexer.h Parser.h Error.h config.h XRef.h
 
@@ -125,5 +131,5 @@ XRef.o:		gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h \
 $(OBJS):	../config.h ../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.3 2000/08/18 17:24:44 mike Exp $".
+# End of "$Id: Makefile,v 1.4 2000/10/13 02:05:10 mike Exp $".
 #

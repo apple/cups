@@ -22,12 +22,12 @@
 //------------------------------------------------------------------------
 
 inline int FontEncoding::hash(char *name) {
-  int h;
+  Guint h;
 
-  h = name[0];
-  if (name[1])
-    h = h * 61 + name[1];
-  return h % fontEncHashSize;
+  h = (Guint)name[0] & 0xff;
+  if (h && name[1])
+    h = h * 61 + ((Guint)name[1] & 0xff);
+  return (int)(h % (Guint)fontEncHashSize);
 }
 
 FontEncoding::FontEncoding() {

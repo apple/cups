@@ -29,7 +29,12 @@ public:
   ~Parser();
 
   // Get the next object from the input stream.
+#ifndef NO_DECRYPTION
+  Object *getObj(Object *obj,
+		 Guchar *fileKey = NULL, int objNum = 0, int objGen = 0);
+#else
   Object *getObj(Object *obj);
+#endif
 
   // Get stream.
   Stream *getStream() { return lexer->getStream(); }

@@ -15,10 +15,12 @@
 
 #include <stdio.h>
 #include "Link.h"
+#include "Catalog.h"
+#include "Page.h"
 
 class GString;
+class BaseStream;
 class XRef;
-class Catalog;
 class OutputDev;
 class Links;
 class LinkAction;
@@ -31,7 +33,8 @@ class LinkDest;
 class PDFDoc {
 public:
 
-  PDFDoc(GString *fileName1);
+  PDFDoc(GString *fileName1, GString *userPassword = NULL);
+  PDFDoc(BaseStream *str, GString *userPassword = NULL);
   ~PDFDoc();
 
   // Was PDF document successfully opened?
@@ -42,6 +45,9 @@ public:
 
   // Get catalog.
   Catalog *getCatalog() { return catalog; }
+
+  // Get base stream.
+  BaseStream *getBaseStream() { return str; }
 
   // Get page parameters.
   double getPageWidth(int page)
@@ -60,7 +66,7 @@ public:
 
   // Display a range of pages.
   void displayPages(OutputDev *out, int firstPage, int lastPage,
-		    int zoom, int rotate);
+		    int zoom, int rotate, GBool doLinks);
 
   // Find a page, given its object ID.  Returns page number, or 0 if
   // not found.
@@ -81,22 +87,34 @@ public:
   // Is the file encrypted?
   GBool isEncrypted() { return xref->isEncrypted(); }
 
-  // Are printing and copying allowed?  If not, print an error message.
+  // Check various permissions.
   GBool okToPrint() { return xref->okToPrint(); }
+  GBool okToChange() { return xref->okToChange(); }
   GBool okToCopy() { return xref->okToCopy(); }
+  GBool okToAddNotes() { return xref->okToAddNotes(); }
+
+  // Is this document linearized?
+  GBool isLinearized();
 
   // Return the document's Info dictionary (if any).
   Object *getDocInfo(Object *obj) { return xref->getDocInfo(obj); }
+
+  // Return the PDF version specified by the file.
+  double getPDFVersion() { return pdfVersion; }
 
   // Save this file with another name.
   GBool saveAs(GString *name);
 
 private:
 
-  void getLinks(int page);
+  GBool setup(GString *userPassword);
+  void checkHeader();
+  void getLinks(Page *page);
 
   GString *fileName;
   FILE *file;
+  BaseStream *str;
+  double pdfVersion;
   XRef *xref;
   Catalog *catalog;
   Links *links;

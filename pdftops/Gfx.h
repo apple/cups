@@ -85,6 +85,8 @@ public:
   // Interpret a stream or array of streams.
   void display(Object *obj);
 
+  void doWidgetForm(Object *str, double x, double y);
+
 private:
 
   OutputDev *out;		// output device
@@ -192,6 +194,8 @@ private:
   void opXObject(Object args[], int numArgs);
   void doImage(Stream *str, GBool inlineImg);
   void doForm(Object *str);
+  void doForm1(Object *str, Dict *dict,
+	       Object *matrixObj, Object *bboxObj);
 
   // in-line image operators
   void opBeginImage(Object args[], int numArgs);

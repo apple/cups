@@ -22,13 +22,119 @@
 // GfxColor
 //------------------------------------------------------------------------
 
+void GfxColor::setGray(double gray) {
+  if (gray < 0) {
+    r = g = b = 0;
+  } else if (gray > 1) {
+    r = g = b = 1;
+  } else {
+    r = g = b = gray;
+  }
+}
+
 void GfxColor::setCMYK(double c, double m, double y, double k) {
-  if ((r = 1 - (c + k)) < 0)
+  if ((r = 1 - (c + k)) < 0) {
     r = 0;
-  if ((g = 1 - (m + k)) < 0)
+  } else if (r > 1) {
+    r = 1;
+  }
+  if ((g = 1 - (m + k)) < 0) {
     g = 0;
-  if ((b = 1 - (y + k)) < 0)
+  } else if (g > 1) {
+    g = 1;
+  }
+  if ((b = 1 - (y + k)) < 0) {
     b = 0;
+  } else if (b > 1) {
+    b = 1;
+  }
+}
+
+void GfxColor::setRGB(double r1, double g1, double b1) {
+  if (r1 < 0) {
+    r = 0;
+  } else if (r1 > 1) {
+    r = 1;
+  } else {
+    r = r1;
+  }
+  if (g1 < 0) {
+    g = 0;
+  } else if (g1 > 1) {
+    g = 1;
+  } else {
+    g = g1;
+  }
+  if (b1 < 0) {
+    b = 0;
+  } else if (b1 > 1) {
+    b = 1;
+  } else {
+    b = b1;
+  }
+}
+
+// Handle colors in the L*a*b* color space.
+void GfxColor::setLab(double L, double a, double bb, LabParams *params) {
+  double X, Y, Z;
+  double t1, t2;
+
+  // convert L*a*b* to CIE 1931 XYZ color space
+  // (This ignores the white point parameter, because I don't
+  // understand exactly how it should work.)
+  t1 = (L + 16) / 116;
+  t2 = t1 + a / 500;
+  if (t2 >= (6.0 / 29.0)) {
+    X = t2 * t2 * t2;
+  } else {
+    X = (108.0 / 841.0) * (t2 - (4.0 / 29.0));
+  }
+#if 0 //~
+  X *= params->whiteX;
+#endif
+  if (t1 >= (6.0 / 29.0)) {
+    Y = t1 * t1 * t1;
+  } else {
+    Y = (108.0 / 841.0) * (t1 - (4.0 / 29.0));
+  }
+#if 0 //~
+  Y *= params->whiteY;
+#endif
+  t2 = t1 - bb / 200;
+  if (t2 >= (6.0 / 29.0)) {
+    Z = t2 * t2 * t2;
+  } else {
+    Z = (108.0 / 841.0) * (t2 - (4.0 / 29.0));
+  }
+#if 0 //~
+  Z *= params->whiteZ;
+#endif
+
+  // convert XYZ to RGB
+#if 0 //~
+  X *= 0.9505;
+  Z *= 1.0890;
+#endif
+  r =  3.240479 * X - 1.537150 * Y - 0.498535 * Z;
+  g = -0.969256 * X + 1.875992 * Y + 0.041556 * Z;
+  b =  0.055648 * X - 0.204043 * Y + 1.057311 * Z;
+
+  // clip RGB
+  if (r < 0) {
+    r = 0;
+  } else if (r > 1) {
+    r = 1;
+  }
+  if (g < 0) {
+    g = 0;
+  } else if (g > 1) {
+    g = 1;
+  }
+  if (b < 0) {
+    b = 0;
+  } else if (b > 1) {
+    b = 1;
+  }
 }
 
 //------------------------------------------------------------------------
@@ -37,7 +143,8 @@ void GfxColor::setCMYK(double c, double m, double y, double k) {
 
 GfxColorSpace::GfxColorSpace(Object *colorSpace) {
   Object csObj;
-  Object obj, obj2;
+  Object obj, obj2, obj3;
+  Dict *dict;
   char *s;
   int x;
   int i, j;
@@ -45,7 +152,7 @@ GfxColorSpace::GfxColorSpace(Object *colorSpace) {
   ok = gTrue;
   lookup = NULL;
 
-  // check for Separation, DeviceN, and Pattern colorspaces
+  // check for Separation, DeviceN, ICCBased, and Pattern colorspaces
   colorSpace->copy(&csObj);
   sepFunc = NULL;
   if (colorSpace->isArray()) {
@@ -59,6 +166,32 @@ GfxColorSpace::GfxColorSpace(Object *colorSpace) {
 	delete sepFunc;
 	sepFunc = NULL;
       }
+    } else if (obj.isName("ICCBased")) {
+      colorSpace->arrayGet(1, &obj2);
+      if (obj2.isStream()) {
+	if ((dict = obj2.streamGetDict())) {
+	  dict->lookup("Alternate", &obj3);
+	  if (!obj3.isNull()) {
+	    csObj.free();
+	    csObj = obj3;
+	  } else {
+	    obj3.free();
+	    dict->lookup("N", &obj3);
+	    if (!obj3.isNull()) {
+	      csObj.free();
+	      if (obj3.getInt() == 4) {
+		csObj.initName("DeviceCMYK");
+	      } else if (obj3.getInt() == 3) {
+		csObj.initName("DeviceRGB");
+	      } else {
+		csObj.initName("DeviceGray");
+	      }
+	    }
+	    obj3.free();
+	  }
+	}
+      }
+      obj2.free();
     } else if (obj.isName("Pattern")) {
       csObj.free();
       colorSpace->arrayGet(1, &csObj);
@@ -134,6 +267,7 @@ GfxColorSpace::GfxColorSpace(GfxColorMode mode1) {
   case colorGray: numComps = 1; break;
   case colorCMYK: numComps = 4; break;
   case colorRGB:  numComps = 3; break;
+  case colorLab:  numComps = 3; break;
   }
   lookup = NULL;
   ok = gTrue;
@@ -167,7 +301,7 @@ GfxColorSpace::GfxColorSpace(GfxColorSpace *colorSpace) {
 }
 
 void GfxColorSpace::setMode(Object *colorSpace) {
-  Object obj;
+  Object obj1, obj2, obj3, obj4;
 
   if (colorSpace->isName("DeviceGray") || colorSpace->isName("G")) {
     mode = colorGray;
@@ -179,22 +313,101 @@ void GfxColorSpace::setMode(Object *colorSpace) {
     mode = colorCMYK;
     numComps = 4;
   } else if (colorSpace->isArray()) {
-    colorSpace->arrayGet(0, &obj);
-    if (obj.isName("CalGray")) {
+    colorSpace->arrayGet(0, &obj1);
+    if (obj1.isName("CalGray")) {
       mode = colorGray;
       numComps = 1;
-    } else if (obj.isName("CalRGB")) {
+    } else if (obj1.isName("CalRGB")) {
       mode = colorRGB;
       numComps = 3;
-    } else if (obj.isName("CalCMYK")) {
+    } else if (obj1.isName("CalCMYK")) {
       mode = colorCMYK;
       numComps = 4;
+    } else if (obj1.isName("Lab")) {
+      mode = colorLab;
+      numComps = 3;
+      labParams.whiteX = 0.9505;
+      labParams.whiteY = 1;
+      labParams.whiteZ = 1.0890;
+      labParams.aMin = -100;
+      labParams.aMax = 100;
+      labParams.bMin = -100;
+      labParams.bMax = 100;
+      colorSpace->arrayGet(1, &obj2);
+      if (obj2.isDict()) {
+	obj2.dictLookup("WhitePoint", &obj3);
+	if (obj3.isArray() && obj3.arrayGetLength() == 3) {
+	  obj3.arrayGet(0, &obj4);
+	  if (obj4.isNum()) {
+	    labParams.whiteX = obj4.getNum();
+	  }
+	  obj4.free();
+	  obj3.arrayGet(1, &obj4);
+	  if (obj4.isNum()) {
+	    labParams.whiteY = obj4.getNum();
+	  }
+	  obj4.free();
+	  obj3.arrayGet(2, &obj4);
+	  if (obj4.isNum()) {
+	    labParams.whiteZ = obj4.getNum();
+	  }
+	  obj4.free();
+	}
+	obj3.free();
+	obj2.dictLookup("Range", &obj3);
+	if (obj3.isArray() && obj3.arrayGetLength() == 4) {
+	  obj3.arrayGet(0, &obj4);
+	  if (obj4.isNum()) {
+	    labParams.aMin = obj4.getNum();
+	  }
+	  obj4.free();
+	  obj3.arrayGet(1, &obj4);
+	  if (obj4.isNum()) {
+	    labParams.aMax = obj4.getNum();
+	  }
+	  obj4.free();
+	  obj3.arrayGet(2, &obj4);
+	  if (obj4.isNum()) {
+	    labParams.bMin = obj4.getNum();
+	  }
+	  obj4.free();
+	  obj3.arrayGet(3, &obj4);
+	  if (obj4.isNum()) {
+	    labParams.bMax = obj4.getNum();
+	  }
+	  obj4.free();
+	}
+	obj3.free();
+      }
+      obj2.free();
     } else {
       ok = gFalse;
     }
-    obj.free();
+    obj1.free();
   } else {
     ok = gFalse;
+  }
+}
+
+void GfxColorSpace::getDefaultRanges(double *decodeLow, double *decodeRange,
+				     int maxPixel) {
+  int i;
+
+  if (indexed) {
+    decodeLow[0] = 0;
+    decodeRange[0] = maxPixel;
+  } else if (mode == colorLab) {
+    decodeLow[0] = 0;
+    decodeRange[0] = 100;
+    decodeLow[1] = labParams.aMin;
+    decodeRange[1] = labParams.aMax - labParams.aMin;
+    decodeLow[2] = labParams.bMin;
+    decodeRange[2] = labParams.bMax - labParams.bMin;
+  } else {
+    for (i = 0; i < numComps; ++i) {
+      decodeLow[i] = 0;
+      decodeRange[i] = 1;
+    }
   }
 }
 
@@ -222,6 +435,9 @@ void GfxColorSpace::getColor(double x[4], GfxColor *color) {
     case colorRGB:
       color->setRGB(p[0] / 255.0, p[1] / 255.0, p[2] / 255.0);
       break;
+    case colorLab:
+      color->setLab(p[0] / 255.0, p[1] / 255.0, p[2] / 255.0, &labParams);
+      break;
     }
   } else {
     switch (mode) {
@@ -233,6 +449,9 @@ void GfxColorSpace::getColor(double x[4], GfxColor *color) {
       break;
     case colorRGB:
       color->setRGB(y[0], y[1], y[2]);
+      break;
+    case colorLab:
+      color->setLab(y[0], y[1], y[2], &labParams);
       break;
     }
   }
@@ -277,7 +496,7 @@ Function::Function(Object *funcObj) {
     goto err2;
   }
   m = obj1.arrayGetLength() / 2;
-  if (m > 4) {
+  if (m > 1) {
     error(-1, "Functions with more than 1 input are unsupported");
     goto err2;
   }
@@ -533,20 +752,11 @@ GfxImageColorMap::GfxImageColorMap(int bits1, Object *decode,
   mode = colorSpace->getMode();
 
   // get decode map
+  indexed = colorSpace->isIndexed();
+  sep = colorSpace->isSeparation();
   if (decode->isNull()) {
-    if (colorSpace->isIndexed()) {
-      indexed = gTrue;
-      numComps = 1;
-      decodeLow[0] = 0;
-      decodeRange[0] = maxPixel;
-    } else {
-      indexed = gFalse;
-      numComps = colorSpace->getNumPixelComps();
-      for (i = 0; i < numComps; ++i) {
-	decodeLow[i] = 0;
-	decodeRange[i] = 1;
-      }
-    }
+    numComps = colorSpace->getNumPixelComps();
+    colorSpace->getDefaultRanges(decodeLow, decodeRange, maxPixel);
   } else if (decode->isArray()) {
     numComps = decode->arrayGetLength() / 2;
     if (numComps != colorSpace->getNumPixelComps())
@@ -575,9 +785,24 @@ GfxImageColorMap::GfxImageColorMap(int bits1, Object *decode,
     maxPixel = colorSpace->getIndexHigh();
   }
 
+  // handle the case where fewer than 2^n palette entries of an n-bit
+  // indexed color space are populated (this happens, e.g., in files
+  // optimized by Distiller)
+  if (indexed && maxPixel > colorSpace->getIndexHigh()) {
+    maxPixel = colorSpace->getIndexHigh();
+  }
+
   // construct lookup table
   lookup = (double (*)[4])gmalloc((maxPixel + 1) * 4 * sizeof(double));
-  if (indexed) {
+  if (sep) {
+    for (i = 0; i <= maxPixel; ++i) {
+      x[0] = (double)i / (double)maxPixel;
+      colorSpace->getColor(x, &color);
+      lookup[i][0] = color.getR();
+      lookup[i][1] = color.getG();
+      lookup[i][2] = color.getB();
+    }
+  } else if (indexed) {
     for (i = 0; i <= maxPixel; ++i) {
       x[0] = (double)i;
       colorSpace->getColor(x, &color);
@@ -607,7 +832,7 @@ GfxImageColorMap::~GfxImageColorMap() {
 void GfxImageColorMap::getColor(Guchar x[4], GfxColor *color) {
   double *p;
 
-  if (indexed) {
+  if (sep || indexed) {
     p = lookup[x[0]];
     color->setRGB(p[0], p[1], p[2]);
   } else {
@@ -621,6 +846,10 @@ void GfxImageColorMap::getColor(Guchar x[4], GfxColor *color) {
       break;
     case colorRGB:
       color->setRGB(lookup[x[0]][0], lookup[x[1]][1], lookup[x[2]][2]);
+      break;
+    case colorLab:
+      color->setLab(lookup[x[0]][0], lookup[x[1]][1], lookup[x[2]][2],
+		    colorSpace->getLabParams());
       break;
     }
   }
@@ -639,6 +868,7 @@ GfxSubpath::GfxSubpath(double x1, double y1) {
   x[0] = x1;
   y[0] = y1;
   curve[0] = gFalse;
+  closed = gFalse;
 }
 
 GfxSubpath::~GfxSubpath() {
@@ -657,6 +887,7 @@ GfxSubpath::GfxSubpath(GfxSubpath *subpath) {
   memcpy(x, subpath->x, n * sizeof(double));
   memcpy(y, subpath->y, n * sizeof(double));
   memcpy(curve, subpath->curve, n * sizeof(GBool));
+  closed = subpath->closed;
 }
 
 void GfxSubpath::lineTo(double x1, double y1) {
@@ -691,10 +922,18 @@ void GfxSubpath::curveTo(double x1, double y1, double x2, double y2,
   n += 3;
 }
 
+void GfxSubpath::close() {
+  if (x[n-1] != x[0] || y[n-1] != y[0]) {
+    lineTo(x[0], y[0]);
+  }
+  closed = gTrue;
+}
+
 GfxPath::GfxPath() {
   justMoved = gFalse;
   size = 16;
   n = 0;
+  firstX = firstY = 0;
   subpaths = (GfxSubpath **)gmalloc(size * sizeof(GfxSubpath *));
 }
 
@@ -777,8 +1016,8 @@ GfxState::GfxState(int dpi, double px1a, double py1a, double px2a, double py2a,
     ctm[3] = 0;
     ctm[4] = -k * py1;
     ctm[5] = k * (upsideDown ? -px1 : px2);
-    pageWidth = (int)(k * (py2 - py1));
-    pageHeight = (int)(k * (px2 - px1));
+    pageWidth = k * (py2 - py1);
+    pageHeight = k * (px2 - px1);
   } else if (rotate == 180) {
     ctm[0] = -k;
     ctm[1] = 0;
@@ -786,8 +1025,8 @@ GfxState::GfxState(int dpi, double px1a, double py1a, double px2a, double py2a,
     ctm[3] = upsideDown ? k : -k;
     ctm[4] = k * px2;
     ctm[5] = k * (upsideDown ? -py1 : py2);
-    pageWidth = (int)(k * (px2 - px1));
-    pageHeight = (int)(k * (py2 - py1));
+    pageWidth = k * (px2 - px1);
+    pageHeight = k * (py2 - py1);
   } else if (rotate == 270) {
     ctm[0] = 0;
     ctm[1] = upsideDown ? -k : k;
@@ -795,8 +1034,8 @@ GfxState::GfxState(int dpi, double px1a, double py1a, double px2a, double py2a,
     ctm[3] = 0;
     ctm[4] = k * py2;
     ctm[5] = k * (upsideDown ? px2 : -px1);
-    pageWidth = (int)(k * (py2 - py1));
-    pageHeight = (int)(k * (px2 - px1));
+    pageWidth = k * (py2 - py1);
+    pageHeight = k * (px2 - px1);
   } else {
     ctm[0] = k;
     ctm[1] = 0;
@@ -804,8 +1043,8 @@ GfxState::GfxState(int dpi, double px1a, double py1a, double px2a, double py2a,
     ctm[3] = upsideDown ? -k : k;
     ctm[4] = -k * px1;
     ctm[5] = k * (upsideDown ? py2 : -py1);
-    pageWidth = (int)(k * (px2 - px1));
-    pageHeight = (int)(k * (py2 - py1));
+    pageWidth = k * (px2 - px1);
+    pageHeight = k * (py2 - py1);
   }
 
   fillColorSpace = new GfxColorSpace(colorGray);
@@ -891,6 +1130,16 @@ void GfxState::getFontTransMat(double *m11, double *m12,
   *m12 = (textMat[0] * ctm[1] + textMat[1] * ctm[3]) * fontSize;
   *m21 = (textMat[2] * ctm[0] + textMat[3] * ctm[2]) * fontSize;
   *m22 = (textMat[2] * ctm[1] + textMat[3] * ctm[3]) * fontSize;
+}
+
+void GfxState::setCTM(double a, double b, double c,
+		      double d, double e, double f) {
+  ctm[0] = a;
+  ctm[1] = b;
+  ctm[2] = c;
+  ctm[3] = d;
+  ctm[4] = e;
+  ctm[5] = f;
 }
 
 void GfxState::concatCTM(double a, double b, double c,

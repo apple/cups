@@ -16,6 +16,7 @@ CHANGES IN CUPS V1.1.5
 	- Updated IPP code to support copied strings (that
 	  should not be freed); this provides slightly more
 	  efficient IPP server performance.
+	- Updated PDF filter to Xpdf 0.91.
 
 
 CHANGES IN CUPS v1.1.4

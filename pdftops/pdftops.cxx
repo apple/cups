@@ -28,8 +28,6 @@
 #include "config.h"
 #include <cups/cups.h>
 
-GBool printCommands = gFalse;
-
 
 int main(int argc, char *argv[]) {
   PDFDoc	*doc;
@@ -108,7 +106,7 @@ int main(int argc, char *argv[]) {
 
   // open PDF file
   xref = NULL;
-  doc = new PDFDoc(fileName);
+  doc = new PDFDoc(fileName, NULL);
   if (!doc->isOk()) {
     goto err1;
   }
@@ -116,18 +114,17 @@ int main(int argc, char *argv[]) {
   // check for print permission
   if (!doc->okToPrint()) {
     error(-1, "Printing this document is not allowed.");
-    goto err2;
+    goto err1;
   }
 
   // write PostScript file
   psOut = new PSOutputDev("-", doc->getCatalog(), 1, doc->getNumPages(), 1, 0);
   if (psOut->isOk())
-    doc->displayPages(psOut, 1, doc->getNumPages(), 72, 0);
+    doc->displayPages(psOut, 1, doc->getNumPages(), 72, 0, gFalse);
 
   delete psOut;
 
   // clean up
- err2:
   delete doc;
  err1:
   freeParams();

@@ -20,6 +20,8 @@ class GfxState;
 class GfxColorSpace;
 class GfxImageColorMap;
 class Stream;
+class Link;
+class Catalog;
 
 //------------------------------------------------------------------------
 // OutputDev
@@ -64,8 +66,7 @@ public:
   virtual void cvtUserToDev(double ux, double uy, int *dx, int *dy);
 
   //----- link borders
-  virtual void drawLinkBorder(double x1, double y1, double x2, double y2,
-			      double w) {}
+  virtual void drawLink(Link *link, Catalog *catalog) {}
 
   //----- save/restore graphics state
   virtual void saveState(GfxState *state) {}
@@ -121,6 +122,12 @@ public:
   virtual void drawImage(GfxState *state, Stream *str, int width,
 			 int height, GfxImageColorMap *colorMap,
 			 GBool inlineImg);
+
+#if OPI_SUPPORT
+  //----- OPI functions
+  virtual void opiBegin(GfxState *state, Dict *opiDict);
+  virtual void opiEnd(GfxState *state, Dict *opiDict);
+#endif
 
 private:
 

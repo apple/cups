@@ -26,7 +26,8 @@ struct BuiltinFont;
 //------------------------------------------------------------------------
 
 enum GfxFontCharSet16 {
-  font16AdobeJapan12			// Adobe-Japan1-2
+  font16AdobeJapan12,		// Adobe-Japan1-2
+  font16AdobeGB12		// Adobe-GB1-2 (Chinese)
 };
 
 //------------------------------------------------------------------------
@@ -131,8 +132,7 @@ public:
 
   // Get the name of the external font file.  Returns NULL if there
   // is no external font file.
-  char *getExtFontFile()
-    { return extFontFile ? extFontFile->getCString() : (char *)NULL; }
+  GString *getExtFontFile() { return extFontFile; }
 
   // Get font descriptor flags.
   GBool isFixedWidth() { return flags & fontFixedWidth; }
@@ -160,6 +160,9 @@ public:
   // Return the code associated with <name>.
   int getCharCode(char *charName) { return encoding->getCharCode(charName); }
 
+  // Return the Type 3 CharProc for the character associated with <code>.
+  Object *getCharProc(int code, Object *proc);
+
   // Return the 16-bit character set and encoding.
   GfxFontCharSet16 getCharSet16() { return enc16.charSet; }
   GfxFontEncoding16 *getEncoding16() { return enc16.enc; }
@@ -176,10 +179,11 @@ public:
 
 private:
 
-  void getEncAndWidths(Dict *fontDict, BuiltinFont *builtinFont);
+  void getEncAndWidths(Dict *fontDict, BuiltinFont *builtinFont,
+		       int missingWidth);
   void findExtFontFile();
   void makeWidths(Dict *fontDict, FontEncoding *builtinEncoding,
-		  Gushort *builtinWidths);
+		  Gushort *builtinWidths, int missingWidth);
   void getType0EncAndWidths(Dict *fontDict);
 
   GString *tag;			// PDF font tag
@@ -191,6 +195,7 @@ private:
   GString *embFontName;		// name of embedded font
   Ref embFontID;		// ref to embedded font file stream
   GString *extFontFile;		// external font file name
+  Object charProcs;		// Type3 CharProcs dictionary
   double fontMat[6];		// font matrix
   union {
     FontEncoding *encoding;	// 8-bit font encoding

@@ -20,6 +20,16 @@ class Function;
 class GfxFont;
 
 //------------------------------------------------------------------------
+// LabParams
+//------------------------------------------------------------------------
+
+// Parameters for L*a*b* color spaces.
+struct LabParams {
+  double whiteX, whiteY, whiteZ;
+  double aMin, aMax, bMin, bMax;
+};
+
+//------------------------------------------------------------------------
 // GfxColor
 //------------------------------------------------------------------------
 
@@ -29,11 +39,10 @@ public:
   GfxColor(): r(0), g(0), b(0) {}
 
   // Set color.
-  void setGray(double gray)
-    { r = g = b = gray; }
+  void setGray(double gray);
   void setCMYK(double c, double m, double y, double k);
-  void setRGB(double r1, double g1, double b1)
-    { r = r1; g = g1; b = b1; }
+  void setRGB(double r1, double g1, double b1);
+  void setLab(double L, double a, double bb, LabParams *params);
 
   // Accessors.
   double getR() { return r; }
@@ -51,7 +60,7 @@ private:
 //------------------------------------------------------------------------
 
 enum GfxColorMode {
-  colorGray, colorCMYK, colorRGB
+  colorGray, colorCMYK, colorRGB, colorLab
 };
 
 class GfxColorSpace {
@@ -77,7 +86,7 @@ public:
   GfxColorMode getMode() { return mode; }
 
   // Get number of components in pixels of this colorspace.
-  int getNumPixelComps() { return indexed ? 1 : numComps; }
+  int getNumPixelComps() { return (sepFunc || indexed) ? 1 : numComps; }
 
   // Get number of components in colors of this colorspace.
   int getNumColorComps() { return numComps; }
@@ -85,12 +94,21 @@ public:
   // Return true if colorspace is indexed.
   GBool isIndexed() { return indexed; }
 
+  // Return true for a separation colorspace.
+  GBool isSeparation() { return sepFunc ? gTrue : gFalse; }
+
+  // Get default ranges for the components.
+  void getDefaultRanges(double *decodeLow, double *decodeRange, int maxPixel);
+
   // Get lookup table (only for indexed colorspaces).
   int getIndexHigh() { return indexHigh; }
   Guchar *getLookupVal(int i) { return lookup[i]; }
 
   // Convert a pixel to a color.
   void getColor(double x[4], GfxColor *color);
+
+  // Get the L*a*b* color space parameters.
+  LabParams *getLabParams() { return &labParams; }
 
 private:
 
@@ -101,6 +119,7 @@ private:
   int indexHigh;		// max pixel for indexed colorspace
   Guchar (*lookup)[4];		// lookup table (only for indexed
 				//   colorspaces)
+  LabParams labParams;		// parameters for L*a*b* color space
   GBool ok;			// is color space valid?
 
   GfxColorSpace(GfxColorSpace *colorSpace);
@@ -134,13 +153,13 @@ private:
 
   Function(Function *func);
 
-  int m, n;
-  double domain[1][2];
-  double range[4][2];
-  int sampleSize[1];
-  double encode[1][2];
-  double decode[4][2];
-  double *samples;
+  int m, n;			// size of input and output tuples
+  double domain[1][2];		// min and max values for function domain
+  double range[4][2];		// min and max values for function range
+  int sampleSize[1];		// number of samples for each domain element
+  double encode[1][2];		// min and max values for domain encoder
+  double decode[4][2];		// min and max values for range decoder
+  double *samples;		// the samples
   GBool ok;
 };
 
@@ -180,6 +199,7 @@ private:
   int bits;			// bits per component
   int numComps;			// number of components in a pixel
   GBool indexed;		// set for indexed color space
+  GBool sep;			// set for separation colorspaces
   GfxColorMode mode;		// color mode
   double (*lookup)[4];		// lookup table
   double decodeLow[4];		// minimum values for each component
@@ -221,8 +241,8 @@ public:
 	       double x3, double y3);
 
   // Close the subpath.
-  void close()
-    { if (x[n-1] != x[0] || y[n-1] != y[0]) lineTo(x[0], y[0]); }
+  void close();
+  GBool isClosed() { return closed; }
 
 private:
 
@@ -231,6 +251,7 @@ private:
 				//   for a Bezier curve
   int n;			// number of points
   int size;			// size of x/y arrays
+  GBool closed;			// set if path is closed
 
   GfxSubpath(GfxSubpath *subpath);
 };
@@ -362,6 +383,8 @@ public:
   void getFontTransMat(double *m11, double *m12, double *m21, double *m22);
 
   // Change state parameters.
+  void setCTM(double a, double b, double c,
+	      double d, double e, double f);
   void concatCTM(double a, double b, double c,
 		 double d, double e, double f);
   void setFillGray(double gray)

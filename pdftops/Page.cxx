@@ -15,9 +15,11 @@
 #include "Array.h"
 #include "Dict.h"
 #include "XRef.h"
+#include "Link.h"
 #include "OutputDev.h"
 #ifndef PDF_PARSER_ONLY
 #include "Gfx.h"
+#include "FormWidget.h"
 #endif
 #include "Error.h"
 
@@ -106,8 +108,8 @@ PageAttrs::PageAttrs(PageAttrs *attrs, Dict *dict) {
   w = 0.25 * (cropX2 - cropX1);
   h = 0.25 * (cropY2 - cropY1);
   if (cropX2 > cropX1 &&
-      (cropX1 - x1 > w || x2 - cropX2 > w ||
-       cropY1 - y1 > h || y2 - cropY2 > h)) {
+      ((cropX1 - x1) + (x2 - cropX2) > w ||
+       (cropY1 - y1) + (y2 - cropY2) > h)) {
     limitToCropBox = gTrue;
   }
 
@@ -180,10 +182,14 @@ Page::~Page() {
   contents.free();
 }
 
-void Page::display(OutputDev *out, int dpi, int rotate) {
+void Page::display(OutputDev *out, int dpi, int rotate,
+		   Links *links, Catalog *catalog) {
 #ifndef PDF_PARSER_ONLY
   Gfx *gfx;
   Object obj;
+  Link *link;
+  int i;
+  FormWidgets *formWidgets;
 
   if (printCommands) {
     printf("***** MediaBox = ll:%g,%g ur:%g,%g\n",
@@ -194,18 +200,43 @@ void Page::display(OutputDev *out, int dpi, int rotate) {
     }
     printf("***** Rotate = %d\n", attrs->getRotate());
   }
+
   rotate += getRotate();
-  if (rotate >= 360)
+  if (rotate >= 360) {
     rotate -= 360;
-  else if (rotate < 0)
+  } else if (rotate < 0) {
     rotate += 360;
+  }
   gfx = new Gfx(out, num, attrs->getResourceDict(),
 		dpi, getX1(), getY1(), getX2(), getY2(), isCropped(),
 		getCropX1(), getCropY1(), getCropX2(), getCropY2(), rotate);
   contents.fetch(&obj);
-  if (!obj.isNull())
+  if (!obj.isNull()) {
     gfx->display(&obj);
+  }
   obj.free();
+
+  // draw links
+  if (links) {
+    for (i = 0; i < links->getNumLinks(); ++i) {
+      link = links->getLink(i);
+      out->drawLink(link, catalog);
+    }
+    out->dump();
+  }
+
+  // draw AcroForm widgets
+  //~ need to reset CTM ???
+  formWidgets = new FormWidgets(annots.fetch(&obj));
+  obj.free();
+  if (printCommands && formWidgets->getNumWidgets() > 0) {
+    printf("***** AcroForm widgets\n");
+  }
+  for (i = 0; i < formWidgets->getNumWidgets(); ++i) {
+    formWidgets->getWidget(i)->draw(gfx);
+  }
+  delete formWidgets;
+
   delete gfx;
 #endif
 }

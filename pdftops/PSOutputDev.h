@@ -28,6 +28,14 @@ class GfxFont;
 // Generate Level 1 PostScript?
 extern GBool psOutLevel1;
 
+// Generate Encapsulated PostScript?
+extern GBool psOutEPS;
+
+#if OPI_SUPPORT
+// Generate OPI comments?
+extern GBool psOutOPI;
+#endif
+
 // Paper size.
 extern int paperWidth;
 extern int paperHeight;
@@ -111,6 +119,7 @@ public:
 
   //----- text drawing
   virtual void drawString(GfxState *state, GString *s);
+  virtual void drawString16(GfxState *state, GString *s);
 
   //----- image drawing
   virtual void drawImageMask(GfxState *state, Stream *str,
@@ -120,13 +129,19 @@ public:
 			 int height, GfxImageColorMap *colorMap,
 			 GBool inlineImg);
 
+#if OPI_SUPPORT
+  //----- OPI functions
+  virtual void opiBegin(GfxState *state, Dict *opiDict);
+  virtual void opiEnd(GfxState *state, Dict *opiDict);
+#endif
+
 private:
 
   void setupFonts(Dict *resDict);
   void setupFont(GfxFont *font);
-  void setupEmbeddedType1Font(Ref *id);
-  void setupEmbeddedType1Font(char *fileName);
-  void setupEmbeddedType1CFont(GfxFont *font, Ref *id);
+  void setupEmbeddedType1Font(Ref *id, char *psName);
+  void setupEmbeddedType1Font(GString *fileName, char *psName);
+  void setupEmbeddedType1CFont(GfxFont *font, Ref *id, char *psName);
   void doPath(GfxPath *path);
   void doImageL1(GfxImageColorMap *colorMap,
 		 GBool invert, GBool inlineImg,
@@ -134,6 +149,11 @@ private:
   void doImage(GfxImageColorMap *colorMap,
 	       GBool invert, GBool inlineImg,
 	       Stream *str, int width, int height, int len);
+  void opiBegin20(GfxState *state, Dict *dict);
+  void opiBegin13(GfxState *state, Dict *dict);
+  void opiTransform(GfxState *state, double x0, double y0,
+		    double *x1, double *y1);
+  GBool getFileSpec(Object *fileSpec, Object *fileName);
   void writePS(const char *fmt, ...);
   void writePSString(GString *s);
 
@@ -150,9 +170,20 @@ private:
   Ref *fontFileIDs;		// list of object IDs of all embedded fonts
   int fontFileIDLen;		// number of entries in fontFileIDs array
   int fontFileIDSize;		// size of fontFileIDs array
-  char **fontFileNames;		// list of names of all embedded external fonts
+  GString **fontFileNames;	// list of names of all embedded external fonts
   int fontFileNameLen;		// number of entries in fontFileNames array
   int fontFileNameSize;		// size of fontFileNames array
+
+  double tx, ty;		// global translation
+  double xScale, yScale;	// global scaling
+  GBool landscape;		// true for landscape, false for portrait
+
+  GString *embFontList;		// resource comments for embedded fonts
+
+#if OPI_SUPPORT
+  int opi13Nest;		// nesting level of OPI 1.3 objects
+  int opi20Nest;		// nesting level of OPI 2.0 objects
+#endif
 
   GBool ok;			// set up ok?
 };

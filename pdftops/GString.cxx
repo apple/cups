@@ -16,6 +16,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <ctype.h>
+#include "gtypes.h"
 #include "GString.h"
 
 static inline int size(int len) {
@@ -44,7 +45,7 @@ GString::GString() {
   s[0] = '\0';
 }
 
-GString::GString(char *s1) {
+GString::GString(const char *s1) {
   int n = strlen(s1);
 
   s = NULL;
@@ -52,7 +53,7 @@ GString::GString(char *s1) {
   memcpy(s, s1, n + 1);
 }
 
-GString::GString(char *s1, int length1) {
+GString::GString(const char *s1, int length1) {
   s = NULL;
   resize(length = length1);
   memcpy(s, s1, length * sizeof(char));
@@ -73,6 +74,32 @@ GString::GString(GString *str1, GString *str2) {
   resize(length = n1 + n2);
   memcpy(s, str1->getCString(), n1);
   memcpy(s + n1, str2->getCString(), n2 + 1);
+}
+
+GString *GString::fromInt(int x) {
+  char buf[24]; // enough space for 64-bit ints plus a little extra
+  GBool neg;
+  Guint y;
+  int i;
+
+  i = 24;
+  if (x == 0) {
+    buf[--i] = '0';
+  } else {
+    if ((neg = x < 0)) {
+      y = (Guint)-x;
+    } else {
+      y = (Guint)x;
+    }
+    while (i > 0 && y > 0) {
+      buf[--i] = '0' + y % 10;
+      y /= 10;
+    }
+    if (neg && i > 0) {
+      buf[--i] = '-';
+    }
+  }
+  return new GString(buf + i, 24 - i);
 }
 
 GString::~GString() {
@@ -101,7 +128,7 @@ GString *GString::append(GString *str) {
   return this;
 }
 
-GString *GString::append(char *str) {
+GString *GString::append(const char *str) {
   int n = strlen(str);
 
   resize(length + n);
@@ -110,7 +137,7 @@ GString *GString::append(char *str) {
   return this;
 }
 
-GString *GString::append(char *str, int length1) {
+GString *GString::append(const char *str, int length1) {
   resize(length + length1);
   memcpy(s + length, str, length1);
   length += length1;
@@ -141,7 +168,7 @@ GString *GString::insert(int i, GString *str) {
   return this;
 }
 
-GString *GString::insert(int i, char *str) {
+GString *GString::insert(int i, const char *str) {
   int n = strlen(str);
   int j;
 
@@ -153,7 +180,7 @@ GString *GString::insert(int i, char *str) {
   return this;
 }
 
-GString *GString::insert(int i, char *str, int length1) {
+GString *GString::insert(int i, const char *str, int length1) {
   int j;
 
   resize(length + length1);

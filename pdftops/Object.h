@@ -115,6 +115,7 @@ public:
   void free();
 
   // Type checking.
+  ObjType getType() { return type; }
   GBool isBool() { return type == objBool; }
   GBool isInt() { return type == objInt; }
   GBool isReal() { return type == objReal; }
@@ -177,7 +178,6 @@ public:
   char *streamGetLine(char *buf, int size);
   int streamGetPos();
   void streamSetPos(int pos);
-  FILE *streamGetFile();
   Dict *streamGetDict();
 
   // Output.
@@ -289,9 +289,6 @@ inline int Object::streamGetPos()
 
 inline void Object::streamSetPos(int pos)
   { stream->setPos(pos); }
-
-inline FILE *Object::streamGetFile()
-  { return stream->getFile(); }
 
 inline Dict *Object::streamGetDict()
   { return stream->getDict(); }

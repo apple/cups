@@ -83,3 +83,11 @@ void OutputDev::drawImage(GfxState *state, Stream *str, int width,
       str->getChar();
   }
 }
+
+#if OPI_SUPPORT
+void OutputDev::opiBegin(GfxState *state, Dict *opiDict) {
+}
+
+void OutputDev::opiEnd(GfxState *state, Dict *opiDict) {
+}
+#endif
