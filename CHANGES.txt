@@ -1,8 +1,11 @@
-CHANGES.txt - 06/14/2003
+CHANGES.txt - 06/19/2003
 ------------------------
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The cups.list file referenced MAN1EXT, MAN3EXT, and
+	  MAN5EXT, but none of those were actually defined (STR
+	  #147)
 	- Chunked requests could cause a Denial of Service if
 	  the connection is terminated before the first byte of
 	  chunk data is sent/received (STR #143)
