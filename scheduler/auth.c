@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.50 2001/10/31 01:49:13 mike Exp $"
+ * "$Id: auth.c,v 1.51 2001/11/26 00:32:11 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -993,6 +993,15 @@ IsAuthorized(client_t *con)	/* I - Connection */
       }
     }
   }
+  else
+  {
+   /*
+    * Get password entry for certificate-based auth...
+    */
+
+    pw = getpwnam(con->username);	/* Get the current password */
+    endpwent();				/* Close the password file */
+  }
 
  /*
   * OK, the password is good.  See if we need normal user access, or group
@@ -1289,5 +1298,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.50 2001/10/31 01:49:13 mike Exp $".
+ * End of "$Id: auth.c,v 1.51 2001/11/26 00:32:11 mike Exp $".
  */

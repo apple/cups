@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.89 2001/10/30 20:58:56 mike Exp $"
+ * "$Id: http.c,v 1.90 2001/11/26 00:32:11 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -404,7 +404,10 @@ httpConnectEncrypt(const char *host,	/* I - Host to connect to */
   * Set the encryption status...
   */
 
-  http->encryption = encrypt;
+  if (port == 443)	/* Always use encryption for https */
+    http->encryption = HTTP_ENCRYPT_ALWAYS;
+  else
+    http->encryption = encrypt;
 
  /*
   * Loop through the addresses we have until one of them connects...
@@ -2198,5 +2201,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.89 2001/10/30 20:58:56 mike Exp $".
+ * End of "$Id: http.c,v 1.90 2001/11/26 00:32:11 mike Exp $".
  */

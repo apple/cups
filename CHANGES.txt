@@ -1,11 +1,17 @@
-CHANGES.txt - 11/22/2001
+CHANGES.txt - 11/25/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.13
 
 	- The cups-lpd mini-daemon now supports LPD clients that
 	  send multiple control files.
-
+	- httpConnectEncrypt() now always uses encryption for
+	  connections on port 443, since port 443 is reserved
+	  for the "https" scheme.
+	- Group authentication via certificates did not work
+	  from the web interface for accounts other than
+	  "root".	
+  
 
 CHANGES IN CUPS V1.1.12
 
