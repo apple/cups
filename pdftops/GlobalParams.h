@@ -142,6 +142,7 @@ public:
   DisplayFontParam *getDisplayFont(GString *fontName);
   DisplayFontParam *getDisplayCIDFont(GString *fontName, GString *collection);
   GString *getPSFile();
+  void getPSImageableArea(int &left, int &bottom, int &right, int &top);
   int getPSPaperWidth();
   int getPSPaperHeight();
   GBool getPSDuplex();
@@ -176,6 +177,7 @@ public:
   void addDisplayFont(DisplayFontParam *param);
   void setPSFile(char *file);
   GBool setPSPaperSize(char *size);
+  void setPSImageableArea(int left, int bottom, int right, int top);
   void setPSPaperWidth(int width);
   void setPSPaperHeight(int height);
   void setPSDuplex(GBool duplex);
@@ -254,6 +256,10 @@ private:
   GString *psFile;		// PostScript file or command (for xpdf)
   int psPaperWidth;		// paper size, in PostScript points, for
   int psPaperHeight;		//   PostScript output
+  int psLeft;			// imageable area, in PostScript points,
+  int psBottom;			//   for PostScript output
+  int psRight;			//   ...
+  int psTop;			//   ...
   GBool psDuplex;		// enable duplexing in PostScript?
   PSLevel psLevel;		// PostScript level to generate
   GHash *psFonts;		// PostScript font info, indexed by PDF

@@ -174,6 +174,10 @@ GlobalParams::GlobalParams(char *cfgFileName) {
   psPaperWidth = defPaperWidth;
   psPaperHeight = defPaperHeight;
 #endif
+  psLeft = 0;
+  psBottom = 0;
+  psRight = psPaperWidth;
+  psTop = psPaperHeight;
   psDuplex = gFalse;
   psLevel = psLevel2;
   psFile = NULL;
@@ -920,6 +924,16 @@ GString *GlobalParams::getPSFile() {
   return s;
 }
 
+void GlobalParams::getPSImageableArea(int &left, int &bottom, int &right, int &top) {
+  globalParamsLock;
+  left   = psLeft;
+  bottom = psBottom;
+  right  = psRight;
+  top    = psTop;
+  globalParamsUnlock;
+}
+
+
 int GlobalParams::getPSPaperWidth() {
   int w;
 
@@ -1216,6 +1230,15 @@ void GlobalParams::setPSFile(char *file) {
   globalParamsUnlock;
 }
 
+void GlobalParams::setPSImageableArea(int left, int bottom, int right, int top) {
+  globalParamsLock;
+  psLeft   = left;
+  psBottom = bottom;
+  psRight  = right;
+  psTop    = top;
+  globalParamsUnlock;
+}
+
 GBool GlobalParams::setPSPaperSize(char *size) {
   globalParamsLock;
   if (!strcmp(size, "letter")) {
@@ -1230,10 +1253,17 @@ GBool GlobalParams::setPSPaperSize(char *size) {
   } else if (!strcmp(size, "A3")) {
     psPaperWidth = 842;
     psPaperHeight = 1190;
+  } else if (!strcmp(size, "Universal")) {
+    psPaperWidth = 595;
+    psPaperHeight = 792;
   } else {
     globalParamsUnlock;
     return gFalse;
   }
+  psLeft = 0;
+  psBottom = 0;
+  psRight = psPaperWidth;
+  psTop = psPaperHeight;
   globalParamsUnlock;
   return gTrue;
 }
@@ -1241,12 +1271,16 @@ GBool GlobalParams::setPSPaperSize(char *size) {
 void GlobalParams::setPSPaperWidth(int width) {
   globalParamsLock;
   psPaperWidth = width;
+  psLeft = 0;
+  psRight = psPaperWidth;
   globalParamsUnlock;
 }
 
 void GlobalParams::setPSPaperHeight(int height) {
   globalParamsLock;
   psPaperHeight = height;
+  psBottom = 0;
+  psTop = psPaperHeight;
   globalParamsUnlock;
 }
 

@@ -45,6 +45,7 @@ int main(int argc, char *argv[]) {
   char		buffer[8192];
   int		bytes;
   int		width, length;
+  int		left, bottom, right, top;
   int		duplex;
 
 
@@ -78,6 +79,10 @@ int main(int argc, char *argv[]) {
   }
 
   // Default to "Universal" size - min of A4 and Letter...
+  left   = 0;
+  bottom = 0;
+  right  = 595;
+  top    = 792;
   width  = 595;
   length = 792;
   level  = psLevel2;
@@ -95,6 +100,10 @@ int main(int argc, char *argv[]) {
 
     if ((size = ppdPageSize(ppd, NULL)) != NULL)
     {
+      left   = (int)size->left;
+      bottom = (int)size->bottom;
+      right  = (int)size->right;
+      top    = (int)size->top;
       width  = (int)size->width;
       length = (int)size->length;
     }
@@ -145,6 +154,7 @@ int main(int argc, char *argv[]) {
 
   globalParams->setPSPaperWidth(width);
   globalParams->setPSPaperHeight(length);
+  globalParams->setPSImageableArea(left, bottom, right, top);
   globalParams->setPSDuplex(duplex);
   globalParams->setPSLevel(level);
   globalParams->setPSASCIIHex(level == psLevel1);
