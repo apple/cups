@@ -1,11 +1,11 @@
 /*
- * "$Id: http.c,v 1.70 2000/12/18 21:38:55 mike Exp $"
+ * "$Id: http.c,v 1.71 2000/12/19 15:10:38 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
  *   Copyright 1997-2000 by Easy Software Products, all rights reserved.
  *
- *   These statusd instructions, statements, and computer programs are the
+ *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
  *   copyright law.  Distribution and use rights are outlined in the file
  *   "LICENSE.txt" which should have been included with this file.  If this
@@ -29,6 +29,7 @@
  *                         the server.
  *   httpClose()         - Close an HTTP connection...
  *   httpConnect()       - Connect to a HTTP server.
+ *   httpEncryption()    - Set the required encryption on the link.
  *   httpReconnect()     - Reconnect to a HTTP server...
  *   httpSeparate()      - Separate a Universal Resource Identifier into its
  *                         components.
@@ -342,6 +343,27 @@ httpConnect(const char *host,	/* I - Host to connect to */
   }
   else
     return (http);
+}
+
+
+/*
+ * 'httpEncryption()' - Set the required encryption on the link.
+ */
+
+int					/* O - -1 on error, 0 on success */
+httpEncryption(http_t            *http,	/* I - HTTP data */
+               http_encryption_t e)	/* I - New encryption preference */
+{
+  if (!http)
+    return;
+
+  http->encryption = e;
+
+  if ((http->encryption == HTTP_ENCRYPT_ALWAYS && !http->tls) ||
+      (http->encryption == HTTP_ENCRYPT_NEVER && http->tls))
+    return (httpReconnect(http));
+  else
+    return (0);
 }
 
 
@@ -1318,6 +1340,10 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
 {
   switch (status)
   {
+    case HTTP_CONTINUE :
+        return ("Continue");
+    case HTTP_SWITCHING_PROTOCOLS :
+        return ("Switching Protocols");
     case HTTP_OK :
         return ("OK");
     case HTTP_CREATED :
@@ -1340,6 +1366,8 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
         return ("Request Entity Too Large");
     case HTTP_URI_TOO_LONG :
         return ("URI Too Long");
+    case HTTP_UPGRADE_REQUIRED :
+        return ("Upgrade Required");
     case HTTP_NOT_IMPLEMENTED :
         return ("Not Implemented");
     case HTTP_NOT_SUPPORTED :
@@ -1456,7 +1484,7 @@ httpUpdate(http_t *http)		/* I - HTTP data */
         return (http->status);
 
 #ifdef HAVE_LIBSSL
-      if (http->status == HTTP_UPGRADE_NOW && !http->tls)
+      if (http->status == HTTP_SWITCHING_PROTOCOLS && !http->tls)
       {
 	context = SSL_CTX_new(TLSv1_method());
 	conn    = SSL_new(context);
@@ -1861,5 +1889,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.70 2000/12/18 21:38:55 mike Exp $".
+ * End of "$Id: http.c,v 1.71 2000/12/19 15:10:38 mike Exp $".
  */

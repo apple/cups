@@ -124,6 +124,7 @@ I prerequisiti per la richiesta non sono soddisfatti.
 La richiesta è troppo grande per essere elaborata da questo server.
 L'URI della richiesta è troppo grande per essere elaborato da questo server.
 Il formato della richiesta non è capito da questo server. 
+426 An upgrade to a secure connection is required. If you are seeing this message in a web browser then it does not support HTTP encryption upgrades.
 500 Il server ha rilevato un errore non recuperabile e non può elaborare la vostra richiesta. 
 Il metodo chiesto non è implementato da questo server. 
 Il proxy server ha ricevuto una risposta non valida da un server di livello superiore.

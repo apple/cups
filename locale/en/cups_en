@@ -124,6 +124,7 @@ The precondition on the request evaluated to false.
 The request is too large for this server to process.
 The request URI is too large for this server to process.
 The request format is not understood by this server.
+426 An upgrade to a secure connection is required. If you are seeing this message in a web browser then it does not support HTTP encryption upgrades.
 500 The server has detected an unrecoverable error and cannot process your request.
 The requested method is not implemented by this server.
 The proxy server received an invalid response from an upstream server.

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.30 2000/12/17 21:23:20 mike Exp $"
+ * "$Id: http.h,v 1.31 2000/12/19 15:10:38 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -163,7 +163,7 @@ typedef enum
   HTTP_ERROR = -1,		/* An error response from httpXxxx() */
 
   HTTP_CONTINUE = 100,		/* Everything OK, keep going... */
-  HTTP_UPGRADE_NOW,		/* Upgrade to TLS/SSL now */
+  HTTP_SWITCHING_PROTOCOLS,	/* HTTP upgrade to TLS/SSL */
 
   HTTP_OK = 200,		/* OPTIONS/GET/HEAD/POST/TRACE command was successful */
   HTTP_CREATED,			/* PUT command was successful */
@@ -338,5 +338,5 @@ extern char		*httpMD5String(const md5_byte_t *, char [33]);
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.30 2000/12/17 21:23:20 mike Exp $".
+ * End of "$Id: http.h,v 1.31 2000/12/19 15:10:38 mike Exp $".
  */

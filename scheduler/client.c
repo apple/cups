@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.76 2000/12/18 21:38:58 mike Exp $"
+ * "$Id: client.c,v 1.77 2000/12/19 15:10:41 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -516,7 +516,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
         * Do encryption stuff...
 	*/
 
-	if (!SendHeader(con, HTTP_UPGRADE_NOW, NULL))
+	if (!SendHeader(con, HTTP_SWITCHING_PROTOCOLS, NULL))
 	{
 	  CloseClient(con);
 	  return (0);
@@ -569,322 +569,352 @@ ReadClient(client_t *con)	/* I - Client to read from */
         return (0);
       }
     }
-    else if ((status = IsAuthorized(con)) != HTTP_OK)
+    else
     {
-      SendError(con, status);
-      CloseClient(con);
-      return (0);
-    }
-    else switch (con->http.state)
-    {
-      case HTTP_GET_SEND :
-          if (strncmp(con->uri, "/printers/", 10) == 0 &&
-	      strcmp(con->uri + strlen(con->uri) - 4, ".ppd") == 0)
-	  {
-	   /*
-	    * Send PPD file - get the real printer name since printer
-	    * names are not case sensitive but filename can be...
-	    */
+      if ((status = IsAuthorized(con)) == HTTP_UPGRADE_REQUIRED)
+      {
+#ifdef HAVE_LIBSSL
+       /*
+        * Do encryption stuff...
+	*/
 
-            con->uri[strlen(con->uri) - 4] = '\0';	/* Drop ".ppd" */
+	if (!SendHeader(con, HTTP_SWITCHING_PROTOCOLS, NULL))
+	{
+	  CloseClient(con);
+	  return (0);
+	}
 
-            if ((p = FindPrinter(con->uri + 10)) != NULL)
-	      snprintf(con->uri, sizeof(con->uri), "/ppd/%s.ppd", p->name);
+	httpPrintf(HTTP(con), "Connection: Upgrade\r\n");
+	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,SSL/2.0,SSL/3.0\r\n");
+	httpPrintf(HTTP(con), "\r\n");
+
+        EncryptClient(con);
+#else
+	if (!SendError(con, HTTP_NOT_IMPLEMENTED))
+	{
+	  CloseClient(con);
+          return (0);
+	}
+#endif /* HAVE_LIBSSL */
+      }
+      else if (status != HTTP_OK)
+      {
+	SendError(con, status);
+	CloseClient(con);
+	return (0);
+      }
+
+      switch (con->http.state)
+      {
+	case HTTP_GET_SEND :
+            if (strncmp(con->uri, "/printers/", 10) == 0 &&
+		strcmp(con->uri + strlen(con->uri) - 4, ".ppd") == 0)
+	    {
+	     /*
+	      * Send PPD file - get the real printer name since printer
+	      * names are not case sensitive but filenames can be...
+	      */
+
+              con->uri[strlen(con->uri) - 4] = '\0';	/* Drop ".ppd" */
+
+              if ((p = FindPrinter(con->uri + 10)) != NULL)
+		snprintf(con->uri, sizeof(con->uri), "/ppd/%s.ppd", p->name);
+	      else
+	      {
+		if (!SendError(con, HTTP_NOT_FOUND))
+		{
+	          CloseClient(con);
+		  return (0);
+		}
+
+		break;
+	      }
+	    }
+
+	    if (strncmp(con->uri, "/admin", 6) == 0 ||
+		strncmp(con->uri, "/printers", 9) == 0 ||
+		strncmp(con->uri, "/classes", 8) == 0 ||
+		strncmp(con->uri, "/jobs", 5) == 0)
+	    {
+	     /*
+	      * Send CGI output...
+	      */
+
+              if (strncmp(con->uri, "/admin", 6) == 0)
+	      {
+		snprintf(con->command, sizeof(con->command),
+	        	 "%s/cgi-bin/admin.cgi", ServerBin);
+		con->options = con->uri + 6;
+	      }
+              else if (strncmp(con->uri, "/printers", 9) == 0)
+	      {
+		snprintf(con->command, sizeof(con->command),
+	        	 "%s/cgi-bin/printers.cgi", ServerBin);
+		con->options = con->uri + 9;
+	      }
+	      else if (strncmp(con->uri, "/classes", 8) == 0)
+	      {
+		snprintf(con->command, sizeof(con->command),
+	        	 "%s/cgi-bin/classes.cgi", ServerBin);
+		con->options = con->uri + 8;
+	      }
+	      else
+	      {
+		snprintf(con->command, sizeof(con->command),
+	        	 "%s/cgi-bin/jobs.cgi", ServerBin);
+		con->options = con->uri + 5;
+	      }
+
+	      if (con->options[0] == '/')
+		con->options ++;
+
+              if (!SendCommand(con, con->command, con->options))
+	      {
+		if (!SendError(con, HTTP_NOT_FOUND))
+		{
+	          CloseClient(con);
+		  return (0);
+		}
+              }
+	      else
+        	LogRequest(con, HTTP_OK);
+
+	      if (con->http.version <= HTTP_1_0)
+		con->http.keep_alive = HTTP_KEEPALIVE_OFF;
+	    }
 	    else
 	    {
-	      if (!SendError(con, HTTP_NOT_FOUND))
+	     /*
+	      * Serve a file...
+	      */
+
+              if ((filename = get_file(con, &filestats)) == NULL)
 	      {
-	        CloseClient(con);
+		if (!SendError(con, HTTP_NOT_FOUND))
+		{
+	          CloseClient(con);
+		  return (0);
+		}
+	      }
+	      else if (!check_if_modified(con, &filestats))
+              {
+        	if (!SendError(con, HTTP_NOT_MODIFIED))
+		{
+		  CloseClient(con);
+		  return (0);
+		}
+	      }
+	      else
+              {
+		type = mimeFileType(MimeDatabase, filename);
+		if (type == NULL)
+	          strcpy(line, "text/plain");
+		else
+	          snprintf(line, sizeof(line), "%s/%s", type->super, type->type);
+
+        	if (!SendFile(con, HTTP_OK, filename, line, &filestats))
+		{
+		  CloseClient(con);
+		  return (0);
+		}
+	      }
+	    }
+            break;
+
+	case HTTP_POST_RECV :
+           /*
+	    * See if the POST request includes a Content-Length field, and if
+	    * so check the length against any limits that are set...
+	    */
+
+            LogMessage(L_DEBUG2, "POST %s", con->uri);
+	    LogMessage(L_DEBUG2, "CONTENT_TYPE = %s", con->http.fields[HTTP_FIELD_CONTENT_TYPE]);
+
+            if (con->http.fields[HTTP_FIELD_CONTENT_LENGTH][0] &&
+		atoi(con->http.fields[HTTP_FIELD_CONTENT_LENGTH]) > MaxRequestSize &&
+		MaxRequestSize > 0)
+	    {
+	     /*
+	      * Request too large...
+	      */
+
+              if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
+	      {
+		CloseClient(con);
 		return (0);
 	      }
 
 	      break;
-	    }
-	  }
-
-	  if (strncmp(con->uri, "/admin", 6) == 0 ||
-	      strncmp(con->uri, "/printers", 9) == 0 ||
-	      strncmp(con->uri, "/classes", 8) == 0 ||
-	      strncmp(con->uri, "/jobs", 5) == 0)
-	  {
-	   /*
-	    * Send CGI output...
-	    */
-
-            if (strncmp(con->uri, "/admin", 6) == 0)
-	    {
-	      snprintf(con->command, sizeof(con->command),
-	               "%s/cgi-bin/admin.cgi", ServerBin);
-	      con->options = con->uri + 6;
-	    }
-            else if (strncmp(con->uri, "/printers", 9) == 0)
-	    {
-	      snprintf(con->command, sizeof(con->command),
-	               "%s/cgi-bin/printers.cgi", ServerBin);
-	      con->options = con->uri + 9;
-	    }
-	    else if (strncmp(con->uri, "/classes", 8) == 0)
-	    {
-	      snprintf(con->command, sizeof(con->command),
-	               "%s/cgi-bin/classes.cgi", ServerBin);
-	      con->options = con->uri + 8;
-	    }
-	    else
-	    {
-	      snprintf(con->command, sizeof(con->command),
-	               "%s/cgi-bin/jobs.cgi", ServerBin);
-	      con->options = con->uri + 5;
-	    }
-
-	    if (con->options[0] == '/')
-	      con->options ++;
-
-            if (!SendCommand(con, con->command, con->options))
-	    {
-	      if (!SendError(con, HTTP_NOT_FOUND))
-	      {
-	        CloseClient(con);
-		return (0);
-	      }
             }
-	    else
-              LogRequest(con, HTTP_OK);
 
-	    if (con->http.version <= HTTP_1_0)
-	      con->http.keep_alive = HTTP_KEEPALIVE_OFF;
-	  }
-	  else
-	  {
-	   /*
-	    * Serve a file...
+           /*
+	    * See what kind of POST request this is; for IPP requests the
+	    * content-type field will be "application/ipp"...
 	    */
 
-            if ((filename = get_file(con, &filestats)) == NULL)
+	    if (strcmp(con->http.fields[HTTP_FIELD_CONTENT_TYPE], "application/ipp") == 0)
+              con->request = ippNew();
+	    else if (strncmp(con->uri, "/admin", 6) == 0 ||
+	             strncmp(con->uri, "/printers", 9) == 0 ||
+	             strncmp(con->uri, "/classes", 8) == 0 ||
+	             strncmp(con->uri, "/jobs", 5) == 0)
 	    {
-	      if (!SendError(con, HTTP_NOT_FOUND))
+	     /*
+	      * CGI request...
+	      */
+
+              if (strncmp(con->uri, "/admin", 6) == 0)
 	      {
-	        CloseClient(con);
+		snprintf(con->command, sizeof(con->command),
+	        	 "%s/cgi-bin/admin.cgi", ServerBin);
+		con->options = con->uri + 6;
+	      }
+              else if (strncmp(con->uri, "/printers", 9) == 0)
+	      {
+		snprintf(con->command, sizeof(con->command),
+	        	 "%s/cgi-bin/printers.cgi", ServerBin);
+		con->options = con->uri + 9;
+	      }
+	      else if (strncmp(con->uri, "/classes", 8) == 0)
+	      {
+		snprintf(con->command, sizeof(con->command),
+	        	 "%s/cgi-bin/classes.cgi", ServerBin);
+		con->options = con->uri + 8;
+	      }
+	      else
+	      {
+		snprintf(con->command, sizeof(con->command),
+	        	 "%s/cgi-bin/jobs.cgi", ServerBin);
+		con->options = con->uri + 5;
+	      }
+
+	      if (con->options[0] == '/')
+		con->options ++;
+
+              LogMessage(L_DEBUG2, "ReadClient() %d command=\"%s\", options = \"%s\"",
+	        	 con->http.fd, con->command, con->options);
+
+	      if (con->http.version <= HTTP_1_0)
+		con->http.keep_alive = HTTP_KEEPALIVE_OFF;
+	    }
+	    else if (!SendError(con, HTTP_UNAUTHORIZED))
+	    {
+	      CloseClient(con);
+	      return (0);
+	    }
+	    break;
+
+	case HTTP_PUT_RECV :
+	case HTTP_DELETE :
+	case HTTP_TRACE :
+            SendError(con, HTTP_NOT_IMPLEMENTED);
+            CloseClient(con);
+	    return (0);
+
+	case HTTP_HEAD :
+            if (strncmp(con->uri, "/printers", 9) == 0 &&
+		strcmp(con->uri + strlen(con->uri) - 4, ".ppd") == 0)
+	    {
+	     /*
+	      * Send PPD file...
+	      */
+
+              snprintf(con->command, sizeof(con->command),
+	               "/ppd/%s", con->uri + 10);
+	      strcpy(con->uri, con->command);
+	      con->command[0] = '\0';
+	    }
+
+	    if (strncmp(con->uri, "/admin/", 7) == 0 ||
+		strncmp(con->uri, "/printers/", 10) == 0 ||
+		strncmp(con->uri, "/classes/", 9) == 0 ||
+		strncmp(con->uri, "/jobs/", 6) == 0)
+	    {
+	     /*
+	      * CGI output...
+	      */
+
+              if (!SendHeader(con, HTTP_OK, "text/html"))
+	      {
+		CloseClient(con);
 		return (0);
 	      }
+
+	      if (httpPrintf(HTTP(con), "\r\n") < 0)
+	      {
+		CloseClient(con);
+		return (0);
+	      }
+
+              LogRequest(con, HTTP_OK);
+	    }
+	    else if ((filename = get_file(con, &filestats)) == NULL)
+	    {
+	      if (!SendHeader(con, HTTP_NOT_FOUND, "text/html"))
+	      {
+		CloseClient(con);
+		return (0);
+	      }
+
+              LogRequest(con, HTTP_NOT_FOUND);
 	    }
 	    else if (!check_if_modified(con, &filestats))
             {
               if (!SendError(con, HTTP_NOT_MODIFIED))
 	      {
-		CloseClient(con);
+        	CloseClient(con);
 		return (0);
 	      }
+
+              LogRequest(con, HTTP_NOT_MODIFIED);
 	    }
 	    else
-            {
+	    {
+	     /*
+	      * Serve a file...
+	      */
+
 	      type = mimeFileType(MimeDatabase, filename);
 	      if (type == NULL)
-	        strcpy(line, "text/plain");
+		strcpy(line, "text/plain");
 	      else
-	        snprintf(line, sizeof(line), "%s/%s", type->super, type->type);
+		snprintf(line, sizeof(line), "%s/%s", type->super, type->type);
 
-              if (!SendFile(con, HTTP_OK, filename, line, &filestats))
+              if (!SendHeader(con, HTTP_OK, line))
 	      {
 		CloseClient(con);
 		return (0);
 	      }
+
+	      if (httpPrintf(HTTP(con), "Last-Modified: %s\r\n",
+	                     httpGetDateString(filestats.st_mtime)) < 0)
+	      {
+		CloseClient(con);
+		return (0);
+	      }
+
+	      if (httpPrintf(HTTP(con), "Content-Length: %d\r\n",
+	                     filestats.st_size) < 0)
+	      {
+		CloseClient(con);
+		return (0);
+	      }
+
+              LogRequest(con, HTTP_OK);
 	    }
-	  }
-          break;
 
-      case HTTP_POST_RECV :
-         /*
-	  * See if the POST request includes a Content-Length field, and if
-	  * so check the length against any limits that are set...
-	  */
-
-          LogMessage(L_DEBUG2, "POST %s", con->uri);
-	  LogMessage(L_DEBUG2, "CONTENT_TYPE = %s", con->http.fields[HTTP_FIELD_CONTENT_TYPE]);
-
-          if (con->http.fields[HTTP_FIELD_CONTENT_LENGTH][0] &&
-	      atoi(con->http.fields[HTTP_FIELD_CONTENT_LENGTH]) > MaxRequestSize &&
-	      MaxRequestSize > 0)
-	  {
-	   /*
-	    * Request too large...
-	    */
-
-            if (!SendError(con, HTTP_REQUEST_TOO_LARGE))
+            if (httpPrintf(HTTP(con), "\r\n") < 0)
 	    {
 	      CloseClient(con);
 	      return (0);
 	    }
 
-	    break;
-          }
+            con->http.state = HTTP_WAITING;
+            break;
 
-         /*
-	  * See what kind of POST request this is; for IPP requests the
-	  * content-type field will be "application/ipp"...
-	  */
-
-	  if (strcmp(con->http.fields[HTTP_FIELD_CONTENT_TYPE], "application/ipp") == 0)
-            con->request = ippNew();
-	  else if (strncmp(con->uri, "/admin", 6) == 0 ||
-	           strncmp(con->uri, "/printers", 9) == 0 ||
-	           strncmp(con->uri, "/classes", 8) == 0 ||
-	           strncmp(con->uri, "/jobs", 5) == 0)
-	  {
-	   /*
-	    * CGI request...
-	    */
-
-            if (strncmp(con->uri, "/admin", 6) == 0)
-	    {
-	      snprintf(con->command, sizeof(con->command),
-	               "%s/cgi-bin/admin.cgi", ServerBin);
-	      con->options = con->uri + 6;
-	    }
-            else if (strncmp(con->uri, "/printers", 9) == 0)
-	    {
-	      snprintf(con->command, sizeof(con->command),
-	               "%s/cgi-bin/printers.cgi", ServerBin);
-	      con->options = con->uri + 9;
-	    }
-	    else if (strncmp(con->uri, "/classes", 8) == 0)
-	    {
-	      snprintf(con->command, sizeof(con->command),
-	               "%s/cgi-bin/classes.cgi", ServerBin);
-	      con->options = con->uri + 8;
-	    }
-	    else
-	    {
-	      snprintf(con->command, sizeof(con->command),
-	               "%s/cgi-bin/jobs.cgi", ServerBin);
-	      con->options = con->uri + 5;
-	    }
-
-	    if (con->options[0] == '/')
-	      con->options ++;
-
-            LogMessage(L_DEBUG2, "ReadClient() %d command=\"%s\", options = \"%s\"",
-	               con->http.fd, con->command, con->options);
-
-	    if (con->http.version <= HTTP_1_0)
-	      con->http.keep_alive = HTTP_KEEPALIVE_OFF;
-	  }
-	  else if (!SendError(con, HTTP_UNAUTHORIZED))
-	  {
-	    CloseClient(con);
-	    return (0);
-	  }
-	  break;
-
-      case HTTP_PUT_RECV :
-      case HTTP_DELETE :
-      case HTTP_TRACE :
-          SendError(con, HTTP_NOT_IMPLEMENTED);
-          CloseClient(con);
-	  return (0);
-
-      case HTTP_HEAD :
-          if (strncmp(con->uri, "/printers", 9) == 0 &&
-	      strcmp(con->uri + strlen(con->uri) - 4, ".ppd") == 0)
-	  {
-	   /*
-	    * Send PPD file...
-	    */
-
-            snprintf(con->command, sizeof(con->command),
-	             "/ppd/%s", con->uri + 10);
-	    strcpy(con->uri, con->command);
-	    con->command[0] = '\0';
-	  }
-
-	  if (strncmp(con->uri, "/admin/", 7) == 0 ||
-	      strncmp(con->uri, "/printers/", 10) == 0 ||
-	      strncmp(con->uri, "/classes/", 9) == 0 ||
-	      strncmp(con->uri, "/jobs/", 6) == 0)
-	  {
-	   /*
-	    * CGI output...
-	    */
-
-            if (!SendHeader(con, HTTP_OK, "text/html"))
-	    {
-	      CloseClient(con);
-	      return (0);
-	    }
-
-	    if (httpPrintf(HTTP(con), "\r\n") < 0)
-	    {
-	      CloseClient(con);
-	      return (0);
-	    }
-
-            LogRequest(con, HTTP_OK);
-	  }
-	  else if ((filename = get_file(con, &filestats)) == NULL)
-	  {
-	    if (!SendHeader(con, HTTP_NOT_FOUND, "text/html"))
-	    {
-	      CloseClient(con);
-	      return (0);
-	    }
-
-            LogRequest(con, HTTP_NOT_FOUND);
-	  }
-	  else if (!check_if_modified(con, &filestats))
-          {
-            if (!SendError(con, HTTP_NOT_MODIFIED))
-	    {
-              CloseClient(con);
-	      return (0);
-	    }
-
-            LogRequest(con, HTTP_NOT_MODIFIED);
-	  }
-	  else
-	  {
-	   /*
-	    * Serve a file...
-	    */
-
-	    type = mimeFileType(MimeDatabase, filename);
-	    if (type == NULL)
-	      strcpy(line, "text/plain");
-	    else
-	      snprintf(line, sizeof(line), "%s/%s", type->super, type->type);
-
-            if (!SendHeader(con, HTTP_OK, line))
-	    {
-	      CloseClient(con);
-	      return (0);
-	    }
-
-	    if (httpPrintf(HTTP(con), "Last-Modified: %s\r\n",
-	                   httpGetDateString(filestats.st_mtime)) < 0)
-	    {
-	      CloseClient(con);
-	      return (0);
-	    }
-
-	    if (httpPrintf(HTTP(con), "Content-Length: %d\r\n",
-	                   filestats.st_size) < 0)
-	    {
-	      CloseClient(con);
-	      return (0);
-	    }
-
-            LogRequest(con, HTTP_OK);
-	  }
-
-          if (httpPrintf(HTTP(con), "\r\n") < 0)
-	  {
-	    CloseClient(con);
-	    return (0);
-	  }
-
-          con->http.state = HTTP_WAITING;
-          break;
-
-      default :
-          break; /* Anti-compiler-warning-code */
+	default :
+            break; /* Anti-compiler-warning-code */
+      }
     }
   }
 
@@ -1894,5 +1924,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.76 2000/12/18 21:38:58 mike Exp $".
+ * End of "$Id: client.c,v 1.77 2000/12/19 15:10:41 mike Exp $".
  */

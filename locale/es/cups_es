@@ -124,6 +124,7 @@ La condición previa en la petición evaluó a falso.
 La petición es demasiado grande para que este servidor procese. 
 El URI de la petición es demasiado grande para que este servidor procese. 
 El formato de la petición no es entendido por este servidor. 
+426 An upgrade to a secure connection is required. If you are seeing this message in a web browser then it does not support HTTP encryption upgrades.
 500 El servidor ha detectado un error irrecuperable y no puede procesar su petición. 
 El método solicitado no es puesto en ejecución por este servidor. 
 El proxy server recibió una respuesta inválida de un servidor por aguas arriba. 

@@ -124,6 +124,7 @@ Die Voraussetzungen für den Auftrag sind nicht erfüllt.
 Der Auftrag ist zu groß, um auf diesem Server verarbeitet zu werden. 
 Die URI des Auftrags ist zu groß, um auf diesem Server verarbeitet zu werden. 
 Das Format des Auftrags wird von diesem Server nicht verstanden. 
+426 An upgrade to a secure connection is required. If you are seeing this message in a web browser then it does not support HTTP encryption upgrades.
 500 Der Server hat einen nicht behebbaren Fehler entdeckt und kann Ihren Auftrag nicht verarbeiten. 
 Die gewünschte Methode ist auf diesen Server nicht implementiert. 
 Der Proxy-Server empfing eine unzulässige Antwort von einem höheren Server. 
