@@ -1,9 +1,9 @@
 /*
- * "$Id: util.c,v 1.71 2001/01/18 00:42:35 mike Exp $"
+ * "$Id: util.c,v 1.72 2001/01/22 15:03:32 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2000 by Easy Software Products.
+ *   Copyright 1997-2001 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1458,5 +1458,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.71 2001/01/18 00:42:35 mike Exp $".
+ * End of "$Id: util.c,v 1.72 2001/01/22 15:03:32 mike Exp $".
  */

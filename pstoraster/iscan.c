@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2000 by Easy Software Products.
+  Copyright 1993-2001 by Easy Software Products.
   Copyright 1989, 1995, 1996, 1997, 1998 Aladdin Enterprises.  All rights reserved.
 
   This file is part of GNU Ghostscript.
@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: iscan.c,v 1.3 2000/03/08 23:15:15 mike Exp $ */
+/*$Id: iscan.c,v 1.4 2001/01/22 15:03:55 mike Exp $ */
 /* Token scanner for Ghostscript interpreter */
 #include "ghost.h"
 #include "memory_.h"

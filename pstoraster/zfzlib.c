@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2000 by Easy Software Products
+  Copyright 1993-2001 by Easy Software Products
   Copyright 1995, 1996, 1998 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
@@ -26,7 +26,7 @@
 
 #include <config.h>
 #ifdef HAVE_LIBZ
-/*$Id: zfzlib.c,v 1.4 2000/03/14 13:52:36 mike Exp $ */
+/*$Id: zfzlib.c,v 1.5 2001/01/22 15:03:57 mike Exp $ */
 /* zlib and Flate filter creation */
 #include "ghost.h"
 #include "oper.h"

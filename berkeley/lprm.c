@@ -1,9 +1,9 @@
 /*
- * "$Id: lprm.c,v 1.12 2000/09/07 12:35:13 mike Exp $"
+ * "$Id: lprm.c,v 1.13 2001/01/22 15:03:21 mike Exp $"
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2000 by Easy Software Products.
+ *   Copyright 1997-2001 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -239,5 +239,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lprm.c,v 1.12 2000/09/07 12:35:13 mike Exp $".
+ * End of "$Id: lprm.c,v 1.13 2001/01/22 15:03:21 mike Exp $".
  */

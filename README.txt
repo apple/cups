@@ -236,7 +236,7 @@ file.
 
 LEGAL STUFF
 
-CUPS is Copyright 1993-2000 by Easy Software Products.  CUPS,
+CUPS is Copyright 1993-2001 by Easy Software Products.  CUPS,
 the CUPS logo, and the Common UNIX Printing System are the
 trademark property of Easy Software Products.
 

@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2000 by Easy Software Products.
+  Copyright 1993-2001 by Easy Software Products.
   Copyright 1991, 1995, 1997, 1998 Aladdin Enterprises.  All rights reserved.
 
   This file is part of GNU Ghostscript.
@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: time_.h,v 1.4 2000/03/08 23:15:30 mike Exp $ */
+/*$Id: time_.h,v 1.5 2001/01/22 15:03:57 mike Exp $ */
 /* Generic substitute for Unix sys/time.h */
 
 #ifndef time__INCLUDED

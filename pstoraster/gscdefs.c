@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2000 by Easy Software Products.
+  Copyright 1993-2001 by Easy Software Products.
   Copyright 1996, 1997, 1998 Aladdin Enterprises.  All rights reserved.
 
   This file is part of GNU Ghostscript.
@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gscdefs.c,v 1.3 2000/06/28 18:42:49 mike Exp $ */
+/*$Id: gscdefs.c,v 1.4 2001/01/22 15:03:55 mike Exp $ */
 /* Configuration scalars */
 #include "stdpre.h"
 #include "gscdefs.h"		/* interface */
@@ -44,7 +44,7 @@ CONFIG_CONST long gs_buildtime = GS_BUILDTIME;
 
 #ifndef GS_COPYRIGHT
 #  define GS_COPYRIGHT\
- 	"Copyright 1993-2000 Easy Software Products, All Rights Reserved.\n"\
+ 	"Copyright 1993-2001 Easy Software Products, All Rights Reserved.\n"\
  	"Copyright 1998 Aladdin Enterprises, Menlo Park, CA.  All rights reserved."
 #endif
 const char *CONFIG_CONST gs_copyright = GS_COPYRIGHT;

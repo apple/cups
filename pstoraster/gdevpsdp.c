@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2000 by Easy Software Products.
+  Copyright 1993-2001 by Easy Software Products.
   Copyright 1997, 1998 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gdevpsdp.c,v 1.3 2000/05/17 14:25:16 mike Exp $ */
+/*$Id: gdevpsdp.c,v 1.4 2001/01/22 15:03:55 mike Exp $ */
 /* (Distiller) parameter handling for PostScript and PDF writers */
 #include "string_.h"
 #include "gx.h"

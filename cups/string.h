@@ -1,9 +1,9 @@
 /*
- * "$Id: string.h,v 1.6 2000/01/04 13:45:37 mike Exp $"
+ * "$Id: string.h,v 1.7 2001/01/22 15:03:31 mike Exp $"
  *
  *   String definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2000 by Easy Software Products.
+ *   Copyright 1997-2001 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -90,5 +90,5 @@ extern int	vsnprintf(char *, size_t, const char *, va_list);
 #endif /* !_CUPS_STRING_H_ */
 
 /*
- * End of "$Id: string.h,v 1.6 2000/01/04 13:45:37 mike Exp $".
+ * End of "$Id: string.h,v 1.7 2001/01/22 15:03:31 mike Exp $".
  */

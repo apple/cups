@@ -21,7 +21,7 @@
 #define supportedPDFVersionNum 1.3
   
 // copyright notice
-#define xpdfCopyright "Copyright 1996-2000 Derek B. Noonburg"
+#define xpdfCopyright "Copyright 1996-2001 Derek B. Noonburg"
 
 //------------------------------------------------------------------------
 // uncompress program

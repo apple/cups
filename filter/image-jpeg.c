@@ -1,9 +1,9 @@
 /*
- * "$Id: image-jpeg.c,v 1.10 2000/04/24 20:47:49 mike Exp $"
+ * "$Id: image-jpeg.c,v 1.11 2001/01/22 15:03:38 mike Exp $"
  *
  *   JPEG image routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2000 by Easy Software Products.
+ *   Copyright 1993-2001 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -190,5 +190,5 @@ ImageReadJPEG(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-jpeg.c,v 1.10 2000/04/24 20:47:49 mike Exp $".
+ * End of "$Id: image-jpeg.c,v 1.11 2001/01/22 15:03:38 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: cupsd.h,v 1.26 2000/11/17 19:57:13 mike Exp $"
+ * "$Id: cupsd.h,v 1.27 2001/01/22 15:03:59 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-2000 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2001 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -174,5 +174,5 @@ extern void	LoadDevices(const char *d);
 extern void	LoadPPDs(const char *d);
 
 /*
- * End of "$Id: cupsd.h,v 1.26 2000/11/17 19:57:13 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.27 2001/01/22 15:03:59 mike Exp $".
  */

@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.34 2001/01/03 17:44:42 mike Exp $"
+# "$Id: Makefile,v 1.35 2001/01/22 15:03:57 mike Exp $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2000 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2001 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -149,5 +149,5 @@ $(OBJS):	../config.h ../Makedefs
 
 
 #
-# End of "$Id: Makefile,v 1.34 2001/01/03 17:44:42 mike Exp $".
+# End of "$Id: Makefile,v 1.35 2001/01/22 15:03:57 mike Exp $".
 #

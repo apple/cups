@@ -1,9 +1,9 @@
 /*
- * "$Id: common.c,v 1.11 2000/09/06 14:29:13 mike Exp $"
+ * "$Id: common.c,v 1.12 2001/01/22 15:03:37 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2000 by Easy Software Products.
+ *   Copyright 1997-2001 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -251,5 +251,5 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
 
 
 /*
- * End of "$Id: common.c,v 1.11 2000/09/06 14:29:13 mike Exp $".
+ * End of "$Id: common.c,v 1.12 2001/01/22 15:03:37 mike Exp $".
  */

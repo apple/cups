@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.39 2001/01/03 16:10:28 mike Exp $"
+# "$Id: Makefile,v 1.40 2001/01/22 15:03:36 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2000 by Easy Software Products.
+#   Copyright 1997-2001 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -203,5 +203,5 @@ $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 
 #
-# End of "$Id: Makefile,v 1.39 2001/01/03 16:10:28 mike Exp $".
+# End of "$Id: Makefile,v 1.40 2001/01/22 15:03:36 mike Exp $".
 #

@@ -1,9 +1,9 @@
 /*
- * "$Id: dirsvc.c,v 1.68 2000/12/19 19:19:56 mike Exp $"
+ * "$Id: dirsvc.c,v 1.69 2001/01/22 15:03:59 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2000 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2001 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -917,5 +917,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.68 2000/12/19 19:19:56 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.69 2001/01/22 15:03:59 mike Exp $".
  */

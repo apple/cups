@@ -1,9 +1,9 @@
 /*
- * "$Id: banners.h,v 1.1 2000/03/21 04:06:44 mike Exp $"
+ * "$Id: banners.h,v 1.2 2001/01/22 15:03:58 mike Exp $"
  *
  *   Banner definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2000 by Easy Software Products.
+ *   Copyright 1997-2001 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -54,5 +54,5 @@ extern void	LoadBanners(const char *d);
 
 
 /*
- * End of "$Id: banners.h,v 1.1 2000/03/21 04:06:44 mike Exp $".
+ * End of "$Id: banners.h,v 1.2 2001/01/22 15:03:58 mike Exp $".
  */

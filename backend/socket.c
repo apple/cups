@@ -1,9 +1,9 @@
 /*
- * "$Id: socket.c,v 1.14 2000/12/20 13:41:12 mike Exp $"
+ * "$Id: socket.c,v 1.15 2001/01/22 15:03:20 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2000 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2001 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -277,5 +277,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.14 2000/12/20 13:41:12 mike Exp $".
+ * End of "$Id: socket.c,v 1.15 2001/01/22 15:03:20 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2000 by Easy Software Products
+  Copyright 1993-2001 by Easy Software Products
   Copyright (C) 1994, 1995, 1998 Aladdin Enterprises.  All rights reserved.
 
   This file is part of GNU Ghostscript.
@@ -26,7 +26,7 @@
 
 #include <config.h>
 #ifdef HAVE_LIBJPEG
-/*$Id: sjpegerr.c,v 1.4 2000/03/08 23:15:25 mike Exp $ */
+/*$Id: sjpegerr.c,v 1.5 2001/01/22 15:03:56 mike Exp $ */
 /* IJG error message table for Ghostscript. */
 #include "stdio_.h"
 #include "jpeglib.h"

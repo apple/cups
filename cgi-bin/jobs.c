@@ -1,9 +1,9 @@
 /*
- * "$Id: jobs.c,v 1.14 2000/04/09 23:08:59 mike Exp $"
+ * "$Id: jobs.c,v 1.15 2001/01/22 15:03:22 mike Exp $"
  *
  *   Job status CGI for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2000 by Easy Software Products.
+ *   Copyright 1997-2001 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -135,5 +135,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: jobs.c,v 1.14 2000/04/09 23:08:59 mike Exp $".
+ * End of "$Id: jobs.c,v 1.15 2001/01/22 15:03:22 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: lpd.c,v 1.21 2000/08/01 17:12:20 mike Exp $"
+ * "$Id: lpd.c,v 1.22 2001/01/22 15:03:20 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2000 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2001 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -532,5 +532,5 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
 
 /*
- * End of "$Id: lpd.c,v 1.21 2000/08/01 17:12:20 mike Exp $".
+ * End of "$Id: lpd.c,v 1.22 2001/01/22 15:03:20 mike Exp $".
  */

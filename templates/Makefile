@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.5 2000/07/07 17:02:49 mike Exp $"
+# "$Id: Makefile,v 1.6 2001/01/22 15:04:03 mike Exp $"
 #
 #   Template makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1993-2000 by Easy Software Products.
+#   Copyright 1993-2001 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -98,5 +98,5 @@ install:
 
 
 #
-# End of "$Id: Makefile,v 1.5 2000/07/07 17:02:49 mike Exp $".
+# End of "$Id: Makefile,v 1.6 2001/01/22 15:04:03 mike Exp $".
 #

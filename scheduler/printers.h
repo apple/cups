@@ -1,9 +1,9 @@
 /*
- * "$Id: printers.h,v 1.21 2000/11/18 19:16:33 mike Exp $"
+ * "$Id: printers.h,v 1.22 2001/01/22 15:04:01 mike Exp $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-2000 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2001 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -114,5 +114,5 @@ extern const char	*ValidateDest(const char *hostname,
 
 
 /*
- * End of "$Id: printers.h,v 1.21 2000/11/18 19:16:33 mike Exp $".
+ * End of "$Id: printers.h,v 1.22 2001/01/22 15:04:01 mike Exp $".
  */

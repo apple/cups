@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2000 by Easy Software Products.
+  Copyright 1993-2001 by Easy Software Products.
   Copyright 1989, 1996, 1997, 1998 Aladdin Enterprises.  All rights reserved.
 
   This file is part of GNU Ghostscript.
@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: idict.c,v 1.4 2000/03/08 23:15:09 mike Exp $ */
+/*$Id: idict.c,v 1.5 2001/01/22 15:03:55 mike Exp $ */
 /* Dictionary implementation */
 #include "string_.h"		/* for strlen */
 #include "ghost.h"

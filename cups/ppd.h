@@ -1,10 +1,10 @@
 /*
- * "$Id: ppd.h,v 1.21 2000/08/01 15:43:24 mike Exp $"
+ * "$Id: ppd.h,v 1.22 2001/01/22 15:03:31 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 1997-2000 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2001 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -239,5 +239,5 @@ extern float		ppdPageWidth(ppd_file_t *ppd, const char *name);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.21 2000/08/01 15:43:24 mike Exp $".
+ * End of "$Id: ppd.h,v 1.22 2001/01/22 15:03:31 mike Exp $".
  */

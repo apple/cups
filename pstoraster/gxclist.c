@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2000 by Easy Software Products.
+  Copyright 1993-2001 by Easy Software Products.
   Copyright 1991, 1996, 1997, 1998 Aladdin Enterprises.  All rights reserved.
 
   This file is part of GNU Ghostscript.
@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gxclist.c,v 1.5 2000/03/08 23:14:52 mike Exp $ */
+/*$Id: gxclist.c,v 1.6 2001/01/22 15:03:55 mike Exp $ */
 /* Command list document- and page-level code. */
 #include "memory_.h"
 #include "string_.h"

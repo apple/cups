@@ -1,10 +1,10 @@
 /*
- * "$Id: http.h,v 1.32 2000/12/20 13:41:13 mike Exp $"
+ * "$Id: http.h,v 1.33 2001/01/22 15:03:25 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 1997-2000 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2001 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -338,5 +338,5 @@ extern char		*httpMD5String(const md5_byte_t *, char [33]);
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.32 2000/12/20 13:41:13 mike Exp $".
+ * End of "$Id: http.h,v 1.33 2001/01/22 15:03:25 mike Exp $".
  */

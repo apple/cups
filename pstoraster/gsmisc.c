@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2000 by Easy Software Products.
+  Copyright 1993-2001 by Easy Software Products.
   Copyright 1989, 1996, 1997, 1998 Aladdin Enterprises.  All rights reserved.
 
   This file is part of GNU Ghostscript.
@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gsmisc.c,v 1.6 2000/08/16 15:18:43 mike Exp $ */
+/*$Id: gsmisc.c,v 1.7 2001/01/22 15:03:55 mike Exp $ */
 /* Miscellaneous utilities for Ghostscript library */
 #include "ctype_.h"
 #include "malloc_.h"

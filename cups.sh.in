@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: cups.sh.in,v 1.5 2000/09/09 22:43:58 mike Exp $"
+# "$Id: cups.sh.in,v 1.6 2001/01/22 15:03:16 mike Exp $"
 #
 #   Startup/shutdown script for the Common UNIX Printing System (CUPS).
 #
@@ -10,7 +10,7 @@
 #   description: Startup/shutdown script for the Common UNIX \
 #                Printing System (CUPS).
 #
-#   Copyright 1997-2000 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2001 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -110,5 +110,5 @@ exit 0
 
 
 #
-# End of "$Id: cups.sh.in,v 1.5 2000/09/09 22:43:58 mike Exp $".
+# End of "$Id: cups.sh.in,v 1.6 2001/01/22 15:03:16 mike Exp $".
 #

@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2000 by Easy Software Products
+  Copyright 1993-2001 by Easy Software Products
   Copyright 1995, 1996, 1997, 1998 Aladdin Enterprises.  All rights reserved.
 
   This file is part of GNU Ghostscript.
@@ -26,7 +26,7 @@
 #include <config.h>
 #ifdef HAVE_LIBZ
 
-/*$Id: szlibe.c,v 1.4 2000/03/08 23:15:30 mike Exp $ */
+/*$Id: szlibe.c,v 1.5 2001/01/22 15:03:57 mike Exp $ */
 /* zlib encoding (compression) filter stream */
 #include "std.h"
 #include "gsmemory.h"

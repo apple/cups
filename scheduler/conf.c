@@ -1,9 +1,9 @@
 /*
- * "$Id: conf.c,v 1.65 2000/12/20 13:41:17 mike Exp $"
+ * "$Id: conf.c,v 1.66 2001/01/22 15:03:59 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2000 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2001 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1464,5 +1464,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.65 2000/12/20 13:41:17 mike Exp $".
+ * End of "$Id: conf.c,v 1.66 2001/01/22 15:03:59 mike Exp $".
  */

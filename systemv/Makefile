@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.22 2000/07/07 17:02:48 mike Exp $"
+# "$Id: Makefile,v 1.23 2001/01/22 15:04:02 mike Exp $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2000 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2001 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -177,5 +177,5 @@ lpstat.o:	../cups/cups.h
 $(OBJS):	../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.22 2000/07/07 17:02:48 mike Exp $".
+# End of "$Id: Makefile,v 1.23 2001/01/22 15:04:02 mike Exp $".
 #

@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2000 by Easy Software Products
+  Copyright 1993-2001 by Easy Software Products
   Copyright 1995, 1997, 1998 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
@@ -26,7 +26,7 @@
 #include <config.h>
 #ifdef HAVE_LIBZ
 
-/*$Id: szlibc.c,v 1.5 2000/06/22 20:33:31 mike Exp $ */
+/*$Id: szlibc.c,v 1.6 2001/01/22 15:03:56 mike Exp $ */
 /* Code common to zlib encoding and decoding streams */
 #include "std.h"
 #include "gserror.h"
