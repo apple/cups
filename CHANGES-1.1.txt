@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- Now just shutdown the receiving end of a client
+	  connection when sending an error that requires the
+	  server to disconnect from the client afterwards.  This
+	  fixes a problem when doing remote administration with
+	  encryption enabled.
 	- The scheduler did not send a printer-state-message
 	  attribute if the string was empty; it now always sends
 	  this attribute.  This caused the printer message to be

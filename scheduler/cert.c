@@ -1,5 +1,5 @@
 /*
- * "$Id: cert.c,v 1.7.2.4 2002/05/16 14:00:07 mike Exp $"
+ * "$Id: cert.c,v 1.7.2.5 2002/08/30 20:43:26 mike Exp $"
  *
  *   Authentication certificate routines for the Common UNIX
  *   Printing System (CUPS).
@@ -158,6 +158,7 @@ DeleteCert(int pid)			/* I - Process ID */
 
       snprintf(filename, sizeof(filename), "%s/certs/%d", ServerRoot, pid);
       unlink(filename);
+
       return;
     }
 }
@@ -271,5 +272,5 @@ InitCerts(void)
 
 
 /*
- * End of "$Id: cert.c,v 1.7.2.4 2002/05/16 14:00:07 mike Exp $".
+ * End of "$Id: cert.c,v 1.7.2.5 2002/08/30 20:43:26 mike Exp $".
  */

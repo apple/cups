@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.81.2.15 2002/08/12 21:03:00 mike Exp $"
+ * "$Id: util.c,v 1.81.2.16 2002/08/30 20:43:24 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -191,7 +191,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     return (NULL);
   }
 
-  DEBUG_printf(("cupsDoFileRequest(%p, %08x, \'%s\', \'%s\')\n",
+  DEBUG_printf(("cupsDoFileRequest(%p, %p, \'%s\', \'%s\')\n",
                 http, request, resource, filename ? filename : "(null)"));
 
  /*
@@ -262,6 +262,8 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
     httpSetField(http, HTTP_FIELD_AUTHORIZATION, authstring);
 
+    DEBUG_printf(("cupsDoFileRequest: authstring=\"%s\"\n", authstring));
+
    /*
     * Try the request...
     */
@@ -309,6 +311,8 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     DEBUG_puts("cupsDoFileRequest: update...");
 
     while ((status = httpUpdate(http)) == HTTP_CONTINUE);
+
+    DEBUG_printf(("cupsDoFileRequest: status = %d\n", status));
 
     if (status == HTTP_UNAUTHORIZED)
     {
@@ -1636,15 +1640,24 @@ cups_local_auth(http_t *http)	/* I - Connection */
   const char	*root;		/* Server root directory */
 
 
+  DEBUG_printf(("cups_local_auth(http=%p) hostname=\"%s\"\n",
+                http, http->hostname));
+
  /*
   * See if we are accessing localhost...
   */
 
   if (strcasecmp(http->hostname, "localhost") != 0)
+  {
+    DEBUG_puts("cups_local_auth: Not a local connection!");
     return (0);
+  }
 
   if (!httpAddrLocalhost(&(http->hostaddr)))
+  {
+    DEBUG_puts("cups_local_auth: Not a local connection!");
     return (0);
+  }
 
  /*
   * Try opening a certificate file for this PID.  If that fails,
@@ -1658,12 +1671,19 @@ cups_local_auth(http_t *http)	/* I - Connection */
   snprintf(filename, sizeof(filename), "%s/certs/%d", root, pid);
   if ((fp = fopen(filename, "r")) == NULL && pid > 0)
   {
+    DEBUG_printf(("cups_local_auth: Unable to open file %s: %s\n",
+                  filename, strerror(errno)));
+
     snprintf(filename, sizeof(filename), "%s/certs/0", root);
     fp = fopen(filename, "r");
   }
 
   if (fp == NULL)
+  {
+    DEBUG_printf(("cups_local_auth: Unable to open file %s: %s\n",
+                  filename, strerror(errno)));
     return (0);
+  }
 
  /*
   * Read the certificate from the file...
@@ -1678,11 +1698,14 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
   snprintf(authstring, sizeof(authstring), "Local %s", certificate);
 
+  DEBUG_printf(("cups_local_auth: Returning authstring = \"%s\"\n",
+                authstring));
+
   return (1);
 #endif /* WIN32 || __EMX__ */
 }
 
 
 /*
- * End of "$Id: util.c,v 1.81.2.15 2002/08/12 21:03:00 mike Exp $".
+ * End of "$Id: util.c,v 1.81.2.16 2002/08/30 20:43:24 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.17 2002/08/21 17:24:27 mike Exp $"
+ * "$Id: client.c,v 1.91.2.18 2002/08/30 20:43:26 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -32,6 +32,7 @@
  *   SendError()           - Send an error message via HTTP.
  *   SendFile()            - Send a file via HTTP.
  *   SendHeader()          - Send an HTTP request.
+ *   ShutdownClient()      - Shutdown the receiving end of a connection.
  *   WriteClient()         - Write data to a client as needed.
  *   check_if_modified()   - Decode an "If-Modified-Since" line.
  *   decode_auth()         - Decode an authorization string.
@@ -307,10 +308,11 @@ CloseAllClients(void)
 void
 CloseClient(client_t *con)	/* I - Client to close */
 {
-  int	status;			/* Exit status of pipe command */
+  int		status;		/* Exit status of pipe command */
 #ifdef HAVE_LIBSSL
   SSL_CTX	*context;	/* Context for encryption */
   SSL		*conn;		/* Connection for encryption */
+  unsigned long	error;		/* Error code */
 #endif /* HAVE_LIBSSL */
 
 
@@ -326,7 +328,19 @@ CloseClient(client_t *con)	/* I - Client to close */
     conn    = (SSL *)(con->http.tls);
     context = SSL_get_SSL_CTX(conn);
 
-    SSL_shutdown(conn);
+    switch (SSL_shutdown(conn))
+    {
+      case 1 :
+          LogMessage(L_INFO, "CloseClient: SSL shutdown successful!");
+	  break;
+      case -1 :
+          LogMessage(L_ERROR, "CloseClient: Fatal error during SSL shutdown!");
+      default :
+	  while ((error = ERR_get_error()) != 0)
+	    LogMessage(L_ERROR, "CloseClient: %s", ERR_error_string(error, NULL));
+          break;
+    }
+
     SSL_CTX_free(context);
     SSL_free(conn);
 
@@ -534,7 +548,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	{
 	  case 1 :
 	      SendError(con, HTTP_BAD_REQUEST);
-	      CloseClient(con);
+	      ShutdownClient(con);
 	      return (0);
 	  case 2 :
 	      con->http.version = HTTP_0_9;
@@ -543,7 +557,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      if (sscanf(version, "HTTP/%d.%d", &major, &minor) != 2)
 	      {
 		SendError(con, HTTP_BAD_REQUEST);
-		CloseClient(con);
+		ShutdownClient(con);
 		return (0);
 	      }
 
@@ -558,7 +572,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      else
 	      {
 	        SendError(con, HTTP_NOT_SUPPORTED);
-	        CloseClient(con);
+	        ShutdownClient(con);
 	        return (0);
 	      }
 	      break;
@@ -585,7 +599,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	else
 	{
 	  SendError(con, HTTP_BAD_REQUEST);
-	  CloseClient(con);
+	  ShutdownClient(con);
 	  return (0);
 	}
 
@@ -614,7 +628,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	if (status != HTTP_OK && status != HTTP_CONTINUE)
 	{
 	  SendError(con, HTTP_BAD_REQUEST);
-	  CloseClient(con);
+	  ShutdownClient(con);
 	  return (0);
 	}
 	break;
@@ -765,7 +779,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
       if (status != HTTP_OK)
       {
 	SendError(con, status);
-	CloseClient(con);
+        ShutdownClient(con);
 	return (0);
       }
 
@@ -1062,7 +1076,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	case HTTP_DELETE :
 	case HTTP_TRACE :
             SendError(con, HTTP_NOT_IMPLEMENTED);
-            CloseClient(con);
+            ShutdownClient(con);
 	    return (0);
 
 	case HTTP_HEAD :
@@ -1711,6 +1725,27 @@ SendHeader(client_t    *con,	/* I - Client to send to */
 
 
 /*
+ * 'ShutdownClient()' - Shutdown the receiving end of a connection.
+ */
+
+void
+ShutdownClient(client_t *con)		/* I - Client connection */
+{
+ /*
+  * Shutdown the receiving end of the socket, since the client
+  * still needs to read the error message...
+  */
+
+  shutdown(con->http.fd, 0);
+
+  LogMessage(L_DEBUG2, "ShutdownClient: Removing fd %d from InputSet...",
+             con->http.fd);
+
+  FD_CLR(con->http.fd, &InputSet);
+}
+
+
+/*
  * 'WriteClient()' - Write data to a client as needed.
  */
 
@@ -1949,6 +1984,8 @@ decode_auth(client_t *con)		/* I - Client to decode to */
   s = con->http.fields[HTTP_FIELD_AUTHORIZATION];
 
   LogMessage(L_DEBUG2, "decode_auth(%p): Authorization string = \"%s\"",
+             con, s);
+  LogMessage(L_INFO, "decode_auth(%p): Authorization string = \"%s\"",
              con, s);
 
   if (strncmp(s, "Basic", 5) == 0)
@@ -2562,5 +2599,5 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.17 2002/08/21 17:24:27 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.18 2002/08/30 20:43:26 mike Exp $".
  */
