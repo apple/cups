@@ -919,15 +919,21 @@ void PSOutputDev::endPage() {
 }
 
 void PSOutputDev::saveState(GfxState *state) {
+  (void)state;
+
   writePS("q\n");
 }
 
 void PSOutputDev::restoreState(GfxState *state) {
+  (void)state;
+
   writePS("Q\n");
 }
 
 void PSOutputDev::updateCTM(GfxState *state, double m11, double m12,
 			    double m21, double m22, double m31, double m32) {
+  (void)state;
+
   writePS("[%g %g %g %g %g %g] cm\n", m11, m12, m21, m22, m31, m32);
 }
 
@@ -1032,6 +1038,8 @@ void PSOutputDev::updateTextPos(GfxState *state) {
 }
 
 void PSOutputDev::updateTextShift(GfxState *state, double shift) {
+  (void)state;
+
   writePS("%g TJm\n", shift);
 }
 
@@ -1126,9 +1134,13 @@ void PSOutputDev::drawString(GfxState *state, GString *s) {
 }
 
 void PSOutputDev::drawString16(GfxState *state, GString *s) {
+#if defined(JAPANESE_SUPPORT) || defined(CHINESE_SUPPORT)
   int c1, c2;
   double w;
   int i;
+#else
+  (void)s;
+#endif /* JAPANESE_SUPPORT || CHINESE_SUPPORT */
 
   // check for invisible text -- this is used by Acrobat Capture
   if ((state->getRender() & 3) == 3)
@@ -1168,6 +1180,8 @@ void PSOutputDev::drawImageMask(GfxState *state, Stream *str,
 				GBool inlineImg) {
   int len;
 
+  (void)state;
+
   len = height * ((width + 7) / 8);
   if (psOutLevel1)
     doImageL1(NULL, invert, inlineImg, str, width, height, len);
@@ -1179,6 +1193,8 @@ void PSOutputDev::drawImage(GfxState *state, Stream *str, int width,
 			    int height, GfxImageColorMap *colorMap,
 			    GBool inlineImg) {
   int len;
+
+  (void)state;
 
   len = height * ((width * colorMap->getNumPixelComps() *
 		   colorMap->getBits() + 7) / 8);
@@ -1195,6 +1211,9 @@ void PSOutputDev::doImageL1(GfxImageColorMap *colorMap,
   Guchar pixBuf[4];
   GfxColor color;
   int x, y, i;
+
+  (void)inlineImg;
+  (void)len;
 
   // width, height, matrix, bits per component
   if (colorMap) {

@@ -37,10 +37,12 @@
 
 //------------------------------------------------------------------------
 
+#if defined(JAPANESE_SUPPORT) || defined(CHINESE_SUPPORT)
 extern "C" {
 static int cmpWidthExcep(const void *w1, const void *w2);
 static int cmpWidthExcepV(const void *w1, const void *w2);
 }
+#endif /* JAPANESE_SUPPORT || CHINESE_SUPPORT */
 
 //------------------------------------------------------------------------
 
@@ -650,8 +652,10 @@ void GfxFont::makeWidths(Dict *fontDict, FontEncoding *builtinEncoding,
 
 void GfxFont::getType0EncAndWidths(Dict *fontDict) {
   Object obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8;
+#if defined(JAPANESE_SUPPORT) || defined(CHINESE_SUPPORT)
   int excepsSize;
   int i, j, k, n;
+#endif /* JAPANESE_SUPPORT || CHINESE_SUPPORT */
 
   widths16.exceps = NULL;
   widths16.excepsV = NULL;
@@ -704,6 +708,8 @@ void GfxFont::getType0EncAndWidths(Dict *fontDict) {
     error(-1, "Unknown Type 0 character set");
     goto err4;
   }
+
+#if defined(JAPANESE_SUPPORT) || defined(CHINESE_SUPPORT)
   obj5.free();
   obj4.free();
   obj3.free();
@@ -895,7 +901,7 @@ void GfxFont::getType0EncAndWidths(Dict *fontDict) {
     error(-1, "Bad encoding for Type 0 font");
     goto err1;
   }
-#if JAPANESE_SUPPORT
+#  if JAPANESE_SUPPORT
   if (enc16.charSet == font16AdobeJapan12) {
     for (i = 0; gfxJapan12Tab[i].name; ++i) {
       if (!strcmp(obj1.getName(), gfxJapan12Tab[i].name))
@@ -908,8 +914,8 @@ void GfxFont::getType0EncAndWidths(Dict *fontDict) {
     }
     enc16.enc = gfxJapan12Tab[i].enc;
   }
-#endif
-#if CHINESE_SUPPORT
+#  endif
+#  if CHINESE_SUPPORT
   if (enc16.charSet == font16AdobeGB12) {
     for (i = 0; gfxGB12Tab[i].name; ++i) {
       if (!strcmp(obj1.getName(), gfxGB12Tab[i].name))
@@ -922,10 +928,11 @@ void GfxFont::getType0EncAndWidths(Dict *fontDict) {
     }
     enc16.enc = gfxGB12Tab[i].enc;
   }
-#endif
+#  endif
   obj1.free();
 
   return;
+#endif /* JAPANESE_SUPPORT || CHINESE_SUPPORT */
 
  err4:
   obj5.free();
@@ -941,6 +948,7 @@ void GfxFont::getType0EncAndWidths(Dict *fontDict) {
   makeWidths(fontDict, NULL, NULL, 0);
 }
 
+#if defined(JAPANESE_SUPPORT) || defined(CHINESE_SUPPORT)
 static int cmpWidthExcep(const void *w1, const void *w2) {
   return ((GfxFontWidthExcep *)w1)->first - ((GfxFontWidthExcep *)w2)->first;
 }
@@ -948,6 +956,7 @@ static int cmpWidthExcep(const void *w1, const void *w2) {
 static int cmpWidthExcepV(const void *w1, const void *w2) {
   return ((GfxFontWidthExcepV *)w1)->first - ((GfxFontWidthExcepV *)w2)->first;
 }
+#endif /* JAPANESE_SUPPORT || CHINESE_SUPPORT */
 
 //------------------------------------------------------------------------
 // GfxFontDict

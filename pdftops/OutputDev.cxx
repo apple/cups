@@ -62,6 +62,9 @@ void OutputDev::drawImageMask(GfxState *state, Stream *str,
 			      GBool inlineImg) {
   int i, j;
 
+  (void)state;
+  (void)invert;
+
   if (inlineImg) {
     str->reset();
     j = height * ((width + 7) / 8);
@@ -74,6 +77,8 @@ void OutputDev::drawImage(GfxState *state, Stream *str, int width,
 			  int height, GfxImageColorMap *colorMap,
 			  GBool inlineImg) {
   int i, j;
+
+  (void)state;
 
   if (inlineImg) {
     str->reset();

@@ -135,7 +135,7 @@ Type1CFontFile::Type1CFontFile(const char *file, int len) {
   char buf[256];
   Guchar *topPtr, *idxStartPtr, *idxPtr0, *idxPtr1;
   Guchar *stringIdxPtr, *stringStartPtr;
-  int topOffSize, idxOffSize, stringOffSize;
+  int idxOffSize, stringOffSize;
   int nFonts, nStrings, nGlyphs;
   int nCodes, nRanges, nLeft, nSups;
   Gushort *glyphNames;
@@ -148,13 +148,14 @@ Type1CFontFile::Type1CFontFile(const char *file, int len) {
   int key;
   int i, j, n;
 
+  (void)len;
+
   name = NULL;
   encoding = NULL;
   freeEnc = gTrue;
 
   // read header
   topPtr = (Guchar *)file + (file[2] & 0xff);
-  topOffSize = file[3] & 0xff;
 
   // read name index (first font only)
   nFonts = getWord(topPtr, 2);
@@ -454,7 +455,7 @@ void Type1CFontConverter::convert() {
   char buf[256], eBuf[256];
   Guchar *topPtr, *idxStartPtr, *idxPtr0, *idxPtr1;
   Guchar *stringIdxPtr, *stringStartPtr;
-  int topOffSize, idxOffSize, stringOffSize;
+  int idxOffSize, stringOffSize;
   int nFonts, nStrings, nGlyphs;
   int nCodes, nRanges, nLeft, nSups;
   Gushort *glyphNames;
@@ -469,7 +470,6 @@ void Type1CFontConverter::convert() {
 
   // read header
   topPtr = (Guchar *)file + (file[2] & 0xff);
-  topOffSize = file[3] & 0xff;
 
   // read name (first font only)
   nFonts = getWord(topPtr, 2);
@@ -578,15 +578,8 @@ void Type1CFontConverter::convert() {
   topPtr = stringStartPtr + getWord(topPtr + nStrings * stringOffSize,
 				    stringOffSize);
 
-#if 1 //~
-  // get global subrs
-  int nGSubrs;
-  int gSubrOffSize;
-
-  nGSubrs = getWord(topPtr, 2);
-  gSubrOffSize = topPtr[2];
+  // skip global subrs
   topPtr += 3;
-#endif
 
   // write header and font dictionary, up to encoding
   fprintf(out, "%%!FontType1-1.0: %s", fontName);

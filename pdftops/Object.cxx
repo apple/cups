@@ -216,5 +216,7 @@ void Object::memCheck(FILE *f) {
 	fprintf(f, "  %-20s: %6d\n", objTypeNames[i], numAlloc[i]);
     }
   }
+#else
+  (void)f;
 #endif
 }

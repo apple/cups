@@ -623,8 +623,8 @@ public:
   virtual void reset() {}
   virtual int getChar() { return EOF; }
   virtual int lookChar() { return EOF; }
-  virtual GString *getPSFilter(const char *indent)  { return NULL; }
-  virtual GBool isBinary(GBool last = gTrue) { return gFalse; }
+  virtual GString *getPSFilter(const char *indent)  { (void)indent; return NULL; }
+  virtual GBool isBinary(GBool last = gTrue) { (void)last; return gFalse; }
 };
 
 //------------------------------------------------------------------------
@@ -640,8 +640,8 @@ public:
   virtual void reset();
   virtual int getChar();
   virtual int lookChar();
-  virtual GString *getPSFilter(const char *indent) { return NULL; }
-  virtual GBool isBinary(GBool last = gTrue) { return gFalse; }
+  virtual GString *getPSFilter(const char *indent) { (void)indent; return NULL; }
+  virtual GBool isBinary(GBool last = gTrue) { (void)last; return gFalse; }
   virtual GBool isEncoder() { return gTrue; }
 
 private:
@@ -665,8 +665,8 @@ public:
     { return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr++ & 0xff); }
   virtual int lookChar()
     { return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr & 0xff); }
-  virtual GString *getPSFilter(const char *indent) { return NULL; }
-  virtual GBool isBinary(GBool last = gTrue) { return gFalse; }
+  virtual GString *getPSFilter(const char *indent) { (void)indent; return NULL; }
+  virtual GBool isBinary(GBool last = gTrue) { (void)last; return gFalse; }
   virtual GBool isEncoder() { return gTrue; }
 
 private:
@@ -695,8 +695,8 @@ public:
     { return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr++ & 0xff); }
   virtual int lookChar()
     { return (bufPtr >= bufEnd && !fillBuf()) ? EOF : (*bufPtr & 0xff); }
-  virtual GString *getPSFilter(const char *indent) { return NULL; }
-  virtual GBool isBinary(GBool last = gTrue) { return gFalse; }
+  virtual GString *getPSFilter(const char *indent) { (void)indent; return NULL; }
+  virtual GBool isBinary(GBool last = gTrue) { (void)last; return gFalse; }
   virtual GBool isEncoder() { return gTrue; }
 
 private:

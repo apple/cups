@@ -411,6 +411,8 @@ GBool openTempFile(GString **name, FILE **f, const char *mode, const char *ext) 
   int	fd;		// File descriptor...
 
 
+  (void)ext;
+
   // Use the CUPS temporary file function on all platforms...
   if ((fd = cupsTempFd(filename, sizeof(filename))) < 0)
     return (gFalse);

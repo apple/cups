@@ -86,6 +86,8 @@ char *Stream::getLine(char *buf, int size) {
 }
 
 GString *Stream::getPSFilter(const char *indent) {
+  (void)indent;
+
   return new GString();
 }
 
@@ -295,6 +297,8 @@ FilterStream::~FilterStream() {
 }
 
 void FilterStream::setPos(int pos) {
+  (void)pos;
+
   error(-1, "Internal: called setPos() on FilterStream");
 }
 
@@ -639,11 +643,17 @@ EmbedStream::~EmbedStream() {
 }
 
 Stream *EmbedStream::makeSubStream(int start, int length, Object *ndict) {
+  (void)start;
+  (void)length;
+  (void)ndict;
+
   error(-1, "Internal: called makeSubStream() on EmbedStream");
   return NULL;
 }
 
 void EmbedStream::setPos(int pos) {
+  (void)pos;
+
   error(-1, "Internal: called setPos() on EmbedStream");
 }
 
@@ -653,6 +663,8 @@ int EmbedStream::getStart() {
 }
 
 void EmbedStream::moveStart(int start) {
+  (void)start;
+
   error(-1, "Internal: called moveStart() on EmbedStream");
 }
 
@@ -738,6 +750,8 @@ GString *ASCIIHexStream::getPSFilter(const char *indent) {
 }
 
 GBool ASCIIHexStream::isBinary(GBool last) {
+  (void)last;
+
   return str->isBinary(gFalse);
 }
 
@@ -814,6 +828,8 @@ GString *ASCII85Stream::getPSFilter(const char *indent) {
 }
 
 GBool ASCII85Stream::isBinary(GBool last) {
+  (void)last;
+
   return str->isBinary(gFalse);
 }
 
@@ -1129,6 +1145,8 @@ GString *LZWStream::getPSFilter(const char *indent) {
 }
 
 GBool LZWStream::isBinary(GBool last) {
+  (void)last;
+
   return str->isBinary(gTrue);
 }
 
@@ -1161,6 +1179,8 @@ GString *RunLengthStream::getPSFilter(const char *indent) {
 }
 
 GBool RunLengthStream::isBinary(GBool last) {
+  (void)last;
+
   return str->isBinary(gTrue);
 }
 
@@ -1194,7 +1214,7 @@ GBool RunLengthStream::fillBuf() {
 // CCITTFaxStream
 //------------------------------------------------------------------------
 
-CCITTFaxStream::CCITTFaxStream(Stream *nstr, int nencoding, GBool nendOfLine,
+CCITTFaxStream::CCITTFaxStream(Stream *str, int nencoding, GBool nendOfLine,
 			       GBool nbyteAlign, int ncolumns, int nrows,
 			       GBool nendOfBlock, GBool nblack):
     FilterStream(str) {
@@ -1724,6 +1744,8 @@ GString *CCITTFaxStream::getPSFilter(const char *indent) {
 }
 
 GBool CCITTFaxStream::isBinary(GBool last) {
+  (void)last;
+
   return str->isBinary(gTrue);
 }
 
@@ -2691,6 +2713,8 @@ GString *DCTStream::getPSFilter(const char *indent) {
 }
 
 GBool DCTStream::isBinary(GBool last) {
+  (void)last;
+
   return str->isBinary(gTrue);
 }
 
@@ -2866,10 +2890,14 @@ int FlateStream::getRawChar() {
 }
 
 GString *FlateStream::getPSFilter(const char *indent) {
+  (void)indent;
+
   return NULL;
 }
 
 GBool FlateStream::isBinary(GBool last) {
+  (void)last;
+
   return str->isBinary(gTrue);
 }
 

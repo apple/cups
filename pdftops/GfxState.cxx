@@ -79,6 +79,8 @@ void GfxColor::setLab(double L, double a, double bb, LabParams *params) {
   double X, Y, Z;
   double t1, t2;
 
+  (void)params;
+
   // convert L*a*b* to CIE 1931 XYZ color space
   // (This ignores the white point parameter, because I don't
   // understand exactly how it should work.)

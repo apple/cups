@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.56 2001/03/15 17:48:07 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.57 2001/04/15 11:52:44 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -2197,6 +2197,8 @@ format_K(cups_page_header_t *header,	/* I - Page header */
 		*dither;	/* Pointer into dither array */
 
 
+  (void)z;
+
   switch (XPosition)
   {
     case -1 :
@@ -3461,6 +3463,8 @@ format_W(cups_page_header_t *header,	/* I - Page header */
 		*dither;	/* Pointer into dither array */
 
 
+  (void)z;
+
   switch (XPosition)
   {
     case -1 :
@@ -4389,5 +4393,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.56 2001/03/15 17:48:07 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.57 2001/04/15 11:52:44 mike Exp $".
  */

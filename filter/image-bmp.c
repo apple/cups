@@ -1,5 +1,5 @@
 /*
- * "$Id: image-bmp.c,v 1.4 2001/04/12 17:25:03 mike Exp $"
+ * "$Id: image-bmp.c,v 1.5 2001/04/15 11:52:43 mike Exp $"
  *
  *   BMP image routines for the Common UNIX Printing System (CUPS).
  *
@@ -89,6 +89,8 @@ ImageReadBMP(image_t    *img,		/* IO - Image */
 		*ptr;			/* Pointer into pixels */
   ib_t		colormap[256][4];	/* Colormap */
 
+
+  (void)secondary;
 
  /*
   * Get the header...
@@ -504,5 +506,5 @@ read_long(FILE *fp)               /* I - File to read from */
 
 
 /*
- * End of "$Id: image-bmp.c,v 1.4 2001/04/12 17:25:03 mike Exp $".
+ * End of "$Id: image-bmp.c,v 1.5 2001/04/15 11:52:43 mike Exp $".
  */
