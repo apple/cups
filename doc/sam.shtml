@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2001, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.1.12">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.1.13">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Administrators Manual</TITLE>
 </HEAD>
@@ -11,7 +11,7 @@
 
 <P>This software administrators manual provides printer administration
 information for the Common UNIX Printing System<SUP>TM</SUP>
-("CUPS<SUP>TM</SUP>"), version 1.1.12.
+("CUPS<SUP>TM</SUP>"), version 1.1.13.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -1114,6 +1114,7 @@ AuthGroupName lp
 AuthType None
 AuthType Basic
 AuthType Digest
+AuthType BasicDigest
 </PRE></UL>
 
 <H4>Description</H4>
@@ -1132,10 +1133,14 @@ perform:
 	<LI><CODE>Digest</CODE> - Digest authentication should be
 	performed using the <VAR>/etc/cups/passwd.md5</VAR> file.
 
+	<LI><CODE>BasicDigest</CODE> - Basic authentication should be
+	performed using the <VAR>/etc/cups/passwd.md5</VAR> file.
+
 </UL>
 
-<P>When using <CODE>Basic</CODE> or <CODE>Digest</CODE> authentication,
-clients connecting through the <CODE>localhost</CODE> interface can also
+<P>When using <CODE>Basic</CODE>, <CODE>Digest</CODE>, or
+<CODE>BasicDigest</CODE> authentication, clients connecting
+through the <CODE>localhost</CODE> interface can also
 authenticate using <A HREF="#CERTIFICATES">certificates</A>.
 
 <P>The <CODE>AuthType</CODE> directive must appear inside a

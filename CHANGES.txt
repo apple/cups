@@ -25,6 +25,9 @@ CHANGES IN CUPS V1.1.13
 	  option (if present) in PPD files.
 	- Updated pdftops to Xpdf 0.93a.
 	- Added support for MD5 passwords under Slackware.
+	- Added new AuthType BasicDigest that does Basic
+	  authentication using the MD5 password file managed by
+	  the lppasswd command.
 
 
 CHANGES IN CUPS V1.1.12

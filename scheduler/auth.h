@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.h,v 1.17 2001/07/24 14:00:07 mike Exp $"
+ * "$Id: auth.h,v 1.18 2001/12/13 20:44:42 mike Exp $"
  *
  *   Authorization definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -30,6 +30,7 @@
 #define AUTH_NONE		0	/* No authentication */
 #define AUTH_BASIC		1	/* Basic authentication */
 #define AUTH_DIGEST		2	/* Digest authentication */
+#define AUTH_BASICDIGEST	3	/* Basic authentication w/passwd.md5 */
 
 #define AUTH_ANON		0	/* Anonymous access */
 #define AUTH_USER		1	/* Must have a valid username/password */
@@ -131,5 +132,5 @@ extern http_status_t	IsAuthorized(client_t *con);
 
 
 /*
- * End of "$Id: auth.h,v 1.17 2001/07/24 14:00:07 mike Exp $".
+ * End of "$Id: auth.h,v 1.18 2001/12/13 20:44:42 mike Exp $".
  */
