@@ -1,5 +1,5 @@
 /*
- * "$Id: lppasswd.c,v 1.10 2001/02/07 19:53:55 mike Exp $"
+ * "$Id: lppasswd.c,v 1.11 2001/02/14 16:06:43 mike Exp $"
  *
  *   MD5 password program for the Common UNIX Printing System (CUPS).
  *
@@ -375,7 +375,7 @@ fail_out:
  * 'usage()' - Show program usage.
  */
 
-void
+static void
 usage(FILE *fp)		/* I - File to send usage to */
 {
   if (getuid())
@@ -417,5 +417,5 @@ xstrdup(const char *in)		/* I - String to duplicate */
 
 
 /*
- * End of "$Id: lppasswd.c,v 1.10 2001/02/07 19:53:55 mike Exp $".
+ * End of "$Id: lppasswd.c,v 1.11 2001/02/14 16:06:43 mike Exp $".
  */
