@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.20 2001/06/06 18:39:19 mike Exp $"
+ * "$Id: dest.c,v 1.21 2001/07/02 19:38:04 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -589,15 +589,15 @@ cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
                 int         num_dests,	/* I - Number of destinations */
                 cups_dest_t **dests)	/* IO - Destinations */
 {
-  cups_dest_t	*dest;			// Current destination
-  http_t	*http;			// HTTP connection
-  ipp_t		*request,		// IPP Request
-		*response;		// IPP Response
-  ipp_attribute_t *attr;		// Current attribute
-  cups_lang_t	*language;		// Default language
-  const char	*name;			// printer-name attribute
-  char		job_sheets[1024];	// job-sheets option
-  static const char	*pattrs[] =	// Attributes we're interested in
+  cups_dest_t	*dest;			/* Current destination */
+  http_t	*http;			/* HTTP connection */
+  ipp_t		*request,		/* IPP Request */
+		*response;		/* IPP Response */
+  ipp_attribute_t *attr;		/* Current attribute */
+  cups_lang_t	*language;		/* Default language */
+  const char	*name;			/* printer-name attribute */
+  char		job_sheets[1024];	/* job-sheets option */
+  static const char	*pattrs[] =	/* Attributes we're interested in */
 		{
 		  "printer-name",
 		  "job-sheets-default"
@@ -722,5 +722,5 @@ cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
 
 
 /*
- * End of "$Id: dest.c,v 1.20 2001/06/06 18:39:19 mike Exp $".
+ * End of "$Id: dest.c,v 1.21 2001/07/02 19:38:04 mike Exp $".
  */
