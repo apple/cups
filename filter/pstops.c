@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.5 1998/12/16 16:35:25 mike Exp $"
+ * "$Id: pstops.c,v 1.6 1999/01/26 14:34:52 mike Exp $"
  *
  *   PostScript filter for espPrint, a collection of printer drivers.
  *
@@ -17,7 +17,10 @@
  * Revision History:
  *
  *   $Log: pstops.c,v $
- *   Revision 1.5  1998/12/16 16:35:25  mike
+ *   Revision 1.6  1999/01/26 14:34:52  mike
+ *   Updated to filter out BeginFeature/EndFeature commands.
+ *
+ *   Revision 1.5  1998/12/16  16:35:25  mike
  *   Updated to support landscape 2-up and 4-up printing.
  *
  *   Revision 1.4  1998/01/15  15:35:22  mike
@@ -133,25 +136,32 @@ test_page(int number)
 
 void
 copy_bytes(FILE *fp,
-           int  nleft)
+           int  length)
 {
   char	buffer[8192];
-  int	nbytes;
+  int	nbytes, nleft;
+  int	feature;
 
 
-  while (nleft > 0)
+  feature = 0;
+  nleft   = length;
+
+  while (nleft > 0 || length == -1)
   {
-    if (nleft > sizeof(buffer))
-      nbytes = sizeof(buffer);
-    else
-      nbytes = nleft;
-
-    nbytes = fread(buffer, 1, nbytes, fp);
-    if (nbytes < 0)
+    if (fgets(buffer, sizeof(buffer), fp) == NULL)
       return;
 
-    fwrite(buffer, 1, nbytes, stdout);
-    nleft -= nbytes;
+    nbytes = strlen(buffer);
+    nleft  -= nbytes;
+
+    if (strncmp(buffer, "%%BeginFeature", 14) == 0)
+      feature = 1;
+    else if (strncmp(buffer, "%%EndFeature", 12) == 0 ||
+             strncmp(buffer, "%%EndSetup", 10) == 0)
+      feature = 0;
+
+    if (!feature)
+      fputs(buffer, stdout);
   };
 }
 
@@ -191,8 +201,8 @@ print_page(FILE *fp,
 
 #define PS_MAX		1000
 
-#define pushdoc(n)	{ if (doclevel < PS_MAX) { doclevel ++; docstack[doclevel] = (n); if (Verbosity) fprintf(stderr, "psfilter: pushdoc(%d), doclevel = %d\n", (n), doclevel); }; }
-#define popdoc(n)	{ if (doclevel >= 0 && docstack[doclevel] == (n)) doclevel --; if (Verbosity) fprintf(stderr, "psfilter: popdoc(%d), doclevel = %d\n", (n), doclevel); }
+#define pushdoc(n)	{ if (doclevel < PS_MAX) { indent[doclevel] = '\t'; doclevel ++; docstack[doclevel] = (n); if (Verbosity) fprintf(stderr, "psfilter: pushdoc(%d), doclevel = %d\n", (n), doclevel); }; }
+#define popdoc(n)	{ if (doclevel >= 0 && docstack[doclevel] == (n)) doclevel --; indent[doclevel] = '\0'; if (Verbosity) fprintf(stderr, "psfilter: popdoc(%d), doclevel = %d\n", (n), doclevel); }
 
 void
 scan_file(FILE *fp)
@@ -200,11 +210,13 @@ scan_file(FILE *fp)
   char	line[8192];
   int	doclevel,		/* Sub-document stack level */
 	docstack[PS_MAX + 1];	/* Stack contents... */
+  char	indent[1024];
 
 
   PrintNumPages = 0;
   PrintPages[0] = 0;
   doclevel = -1;
+  memset(indent, 0, sizeof(indent));
 
   rewind(fp);
 
@@ -220,36 +232,47 @@ scan_file(FILE *fp)
     if (line[0] == '%' && line[1] == '%')
     {
       if (Verbosity)
-        fprintf(stderr, "psfilter: Control line - %s\n", line);
+        fprintf(stderr, "psfilter: Control line - %s%s\n", indent, line);
 
      /*
-      * Note that we do not (correctly) check for colons after the BeginXXXX control
+      * Note that we check for colons and spaces after the BeginXXXX control
       * lines because Adobe's Acrobat product produces incorrect output!
       */
 
-      if (strncmp(line, "%%BeginDocument", 15) == 0)
+      if (strncmp(line, "%%BeginDocument:", 16) == 0 ||
+          strncmp(line, "%%BeginDocument ", 16) == 0)
 	pushdoc(PS_DOCUMENT)
-      else if (strncmp(line, "%%BeginFont", 11) == 0)
+      else if (strncmp(line, "%%BeginFont:", 12) == 0 ||
+               strncmp(line, "%%BeginFont ", 12) == 0)
 	pushdoc(PS_FONT)
-      else if (strncmp(line, "%%BeginFile", 11) == 0)
+      else if (strncmp(line, "%%BeginFile:", 12) == 0 ||
+               strncmp(line, "%%BeginFile ", 12) == 0)
 	pushdoc(PS_FILE)
-      else if (strncmp(line, "%%BeginResource", 15) == 0)
+      else if (strncmp(line, "%%BeginResource:", 16) == 0 ||
+               strncmp(line, "%%BeginResource ", 16) == 0)
 	pushdoc(PS_RESOURCE)
-      else if (strncmp(line, "%%EndDocument", 13) == 0)
+      else if (strcmp(line, "%%EndDocument") == 0)
 	popdoc(PS_DOCUMENT)
-      else if (strncmp(line, "%%EndFont", 9) == 0)
+      else if (strcmp(line, "%%EndFont") == 0)
 	popdoc(PS_FONT)
-      else if (strncmp(line, "%%EndFile", 9) == 0)
+      else if (strcmp(line, "%%EndFile") == 0)
 	popdoc(PS_FILE)
-      else if (strncmp(line, "%%EndResource", 13) == 0)
+      else if (strcmp(line, "%%EndResource") == 0)
 	popdoc(PS_RESOURCE)
-      else if (strncmp(line, "%%Page:", 7) == 0 && doclevel < 0)
+      else if (strncmp(line, "%%Page:", 7) == 0)
       {
-	if (Verbosity)
-	  fprintf(stderr, "psfilter: Page %d begins at offset %u\n",
-	          PrintNumPages + 2, PrintPages[PrintNumPages]);
+        if (doclevel < 0)
+	{
+	  if (Verbosity)
+	    fprintf(stderr, "psfilter: Page %d begins at offset %u\n",
+	            PrintNumPages + 2, PrintPages[PrintNumPages]);
 
-	PrintNumPages ++;
+	  PrintNumPages ++;
+	}
+	else if (Verbosity)
+	  fprintf(stderr, "psfilter: embedded page %d begins at offset %u (doclevel = %d [%d])\n",
+	          PrintNumPages + 2, PrintPages[PrintNumPages],
+		  doclevel, docstack[doclevel]);
       }
       else if (strcmp(line, "%%Trailer") == 0 && doclevel < 0)
         break;
@@ -761,9 +784,7 @@ main(int  argc,
 
         if ((temp = fopen(argv[i], "r")) != NULL)
         {
-          while ((n = fread(buffer, 1, sizeof(buffer), temp)) > 0)
-            fwrite(buffer, 1, n, stdout);
-
+	  copy_bytes(temp, -1);
           fclose(temp);
         };
       }
@@ -797,8 +818,7 @@ main(int  argc,
 
       print_header(gammaval, brightness);
 
-      while ((n = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
-        fwrite(buffer, 1, n, stdout);
+      copy_bytes(stdin, -1);
     }
     else
     {
@@ -824,5 +844,5 @@ main(int  argc,
 
 
 /*
- * End of "$Id: pstops.c,v 1.5 1998/12/16 16:35:25 mike Exp $".
+ * End of "$Id: pstops.c,v 1.6 1999/01/26 14:34:52 mike Exp $".
  */
