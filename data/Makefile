@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.1 1999/05/14 17:02:56 mike Exp $"
+# "$Id: Makefile,v 1.2 1999/07/30 14:22:10 mike Exp $"
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
@@ -48,9 +48,9 @@ clean:
 #
 
 install:
-	-$(MKDIR) $(DATADIR)
-	$(CP) $(FILES) $(DATADIR)
+	-$(MKDIR) $(DATADIR)/data
+	$(CP) $(FILES) $(DATADIR)/data
 
 #
-# End of "$Id: Makefile,v 1.1 1999/05/14 17:02:56 mike Exp $".
+# End of "$Id: Makefile,v 1.2 1999/07/30 14:22:10 mike Exp $".
 #
