@@ -211,7 +211,7 @@ gs_jpeg_destroy (stream_DCT_state *st)
 	return 0;
 }
 
-
+#if 0
 /*
  * These routines replace the low-level memory manager of the IJG library.
  * They pass malloc/free calls to the Ghostscript memory manager.
@@ -267,3 +267,4 @@ jpeg_mem_term (j_common_ptr cinfo)
 {
   /* no work */
 }
+#endif /* 0 */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.1 1999/04/21 19:32:38 mike Exp $"
+# "$Id: Makefile,v 1.2 1999/04/22 20:20:03 mike Exp $"
 #
 #   GNU Ghostscript makefile for the Common UNIX Printing System (CUPS).
 #
@@ -54,7 +54,7 @@ GS_INIT		=	gs_init.ps
 # Language and device features to include.
 #
 
-FEATURE_DEVS	=	fzlib.dev level2.dev pdf.dev pipe.dev ttfont.dev \
+FEATURE_DEVS	=	fzlib.dev level2.dev pdf.dev pipe.dev ttfont.dev
 PLATFORM	=	unix_
 DEVICE_DEVS	=	x11.dev
 DEVS_ALL	=	$(PLATFORM).dev $(FEATURE_DEVS) $(DEVICE_DEVS)
@@ -2387,5 +2387,5 @@ gconfigv.h: unix-end.mak $(MAKEFILE) $(ECHOGS_XE)
 	./echogs -a gconfigv.h -x 23 define EXTEND_NAMES 0$(EXTEND_NAMES)
 
 #
-# End of "$Id: Makefile,v 1.1 1999/04/21 19:32:38 mike Exp $".
+# End of "$Id: Makefile,v 1.2 1999/04/22 20:20:03 mike Exp $".
 #
