@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.7 1999/06/24 14:20:34 mike Exp $"
+ * "$Id: classes.c,v 1.8 1999/06/25 12:35:32 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -474,6 +474,7 @@ SaveAllClasses(void)
     */
 
     if ((pclass->type & CUPS_PRINTER_REMOTE) ||
+        (pclass->type & CUPS_PRINTER_IMPLICIT) ||
         !(pclass->type & CUPS_PRINTER_CLASS))
       continue;
 
@@ -508,5 +509,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.7 1999/06/24 14:20:34 mike Exp $".
+ * End of "$Id: classes.c,v 1.8 1999/06/25 12:35:32 mike Exp $".
  */
