@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.23 2002/05/16 13:45:04 mike Exp $"
+ * "$Id: cancel.c,v 1.24 2002/06/27 18:52:52 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -51,6 +51,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   http_t	*http;		/* HTTP connection to server */
   int		i;		/* Looping var */
   int		job_id;		/* Job ID */
+  int		num_dests;	/* Number of destinations */
+  cups_dest_t	*dests;		/* Destinations */
   char		*dest,		/* Destination printer */
 		*host,		/* Host name */
 		*job;		/* Job ID pointer */
@@ -72,6 +74,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   dest       = NULL;
   http       = NULL;
   encryption = cupsEncryption();
+  num_dests  = 0;
+  dests      = NULL;
 
  /*
   * Process command-line arguments...
@@ -150,7 +154,10 @@ main(int  argc,			/* I - Number of command-line arguments */
       * Cancel a job or printer...
       */
 
-      if (isdigit(argv[i][0]))
+      if (num_dests == 0)
+        num_dests = cupsGetDests(&dests);
+
+      if (isdigit(argv[i][0]) && cupsGetDest(argv[i], NULL, num_dests, dests) == NULL)
       {
         dest   = NULL;
 	op     = IPP_CANCEL_JOB;
@@ -168,17 +175,18 @@ main(int  argc,			/* I - Number of command-line arguments */
 	dest   = name;
         job_id = 0;
 
-	if ((job = strrchr(name, '-')) != NULL)
-	  if (isdigit(job[1]))
-	  {
-	    *job++ = '\0';
-	    job_id = atoi(job);
-	  }
+	if ((job = strrchr(name, '-')) != NULL &&
+	    cupsGetDest(name, NULL, num_dests, dests) == NULL &&
+	    isdigit(job[1]))
+	{
+	  *job++ = '\0';
+	  job_id = atoi(job);
+	}
 	    
 	if (job_id)
 	  op = IPP_CANCEL_JOB;
 
-        if ((host = strchr(name, '@')) != NULL)
+        if ((host = strrchr(name, '@')) != NULL)
 	{
 	 /*
 	  * Reconnect to the named host...
@@ -281,5 +289,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c,v 1.23 2002/05/16 13:45:04 mike Exp $".
+ * End of "$Id: cancel.c,v 1.24 2002/06/27 18:52:52 mike Exp $".
  */

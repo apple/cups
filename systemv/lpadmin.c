@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.30 2002/05/16 13:45:04 mike Exp $"
+ * "$Id: lpadmin.c,v 1.31 2002/06/27 18:52:52 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -36,7 +36,7 @@
  *   set_printer_model()         - Set the driver model file.
  *   set_printer_options()       - Set the printer options.
  *   validate_name()             - Make sure the printer name only contains
- *                                 letters, numbers, and the underscore...
+ *                                 valid chars...
  */
 
 /*
@@ -139,7 +139,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
             if (!validate_name(pclass))
 	    {
-	      fputs("lpadmin: Class name can only contain letters, numbers, and the underscore!\n", stderr);
+	      fputs("lpadmin: Class name can only contain printable characters!\n", stderr);
 	      return (1);
 	    }
 
@@ -175,7 +175,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
             if (!validate_name(printer))
 	    {
-	      fputs("lpadmin: Printer name can only contain letters, numbers, and the underscore!\n", stderr);
+	      fputs("lpadmin: Printer name can only contain printable characters!\n", stderr);
 	      return (1);
 	    }
 
@@ -356,7 +356,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
             if (!validate_name(printer))
 	    {
-	      fputs("lpadmin: Printer name can only contain letters, numbers, and the underscore!\n", stderr);
+	      fputs("lpadmin: Printer name can only contain printable characters!\n", stderr);
 	      return (1);
 	    }
 	    break;
@@ -397,7 +397,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
             if (!validate_name(pclass))
 	    {
-	      fputs("lpadmin: Class name can only contain letters, numbers, and the underscore!\n", stderr);
+	      fputs("lpadmin: Class name can only contain printable characters!\n", stderr);
 	      return (1);
 	    }
 
@@ -498,7 +498,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
             if (!validate_name(printer))
 	    {
-	      fputs("lpadmin: Printer name can only contain letters, numbers, and the underscore!\n", stderr);
+	      fputs("lpadmin: Printer name can only contain printable characters!\n", stderr);
 	      return (1);
 	    }
 
@@ -1832,20 +1832,12 @@ set_printer_options(http_t        *http,	/* I - Server connection */
 
 
 /*
- * 'validate_name()' - Make sure the printer name only contains letters,
- *                     numbers, and the underscore...
+ * 'validate_name()' - Make sure the printer name only contains valid chars.
  */
 
 static int			/* O - 0 if name is no good, 1 if name is good */
 validate_name(const char *name)	/* I - Name to check */
 {
- /*
-  * Don't allow names to start with a digit...
-  */
-
-  if (isdigit(*name))
-    return (0);
-
  /*
   * Scan the whole name...
   */
@@ -1853,7 +1845,7 @@ validate_name(const char *name)	/* I - Name to check */
   while (*name)
     if (*name == '@')
       return (1);
-    else if (!isalnum(*name) && *name != '_')
+    else if (*name <= ' ' || *name == 127)
       return (0);
     else
       name ++;
@@ -1863,5 +1855,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.30 2002/05/16 13:45:04 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.31 2002/06/27 18:52:52 mike Exp $".
  */
