@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- Added new cupsDoAuthentication(), cupsGetFd(),
+	  cupsGetFile(), cupsPutFd(), and cupsPutFile() functions
+	  to the CUPS API (STR #112)
 	- The PDF filter always scaled and offset pages; this
 	  caused problems under MacOS X, so now the "fitplot"
 	  option controls whether PDF files are scaled to fit

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.82.2.38 2003/08/28 15:16:26 mike Exp $"
+ * "$Id: http.c,v 1.82.2.39 2003/08/29 23:58:37 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -1124,7 +1124,7 @@ httpWrite(http_t     *http,		/* I - HTTP data */
     {
      /*
       * A zero-length chunk ends a transfer; unless we are sending POST
-      * data, go idle...
+      * or PUT data, go idle...
       */
 
       DEBUG_puts("httpWrite: changing states...");
@@ -1191,13 +1191,16 @@ httpWrite(http_t     *http,		/* I - HTTP data */
   if (http->data_remaining == 0 && http->data_encoding == HTTP_ENCODE_LENGTH)
   {
    /*
-    * Finished with the transfer; unless we are sending POST data, go idle...
+    * Finished with the transfer; unless we are sending POST or PUT
+    * data, go idle...
     */
 
     DEBUG_puts("httpWrite: changing states...");
 
     if (http->state == HTTP_POST_RECV)
       http->state ++;
+    else if (http->state == HTTP_PUT_RECV)
+      http->state = HTTP_STATUS;
     else
       http->state = HTTP_WAITING;
   }
@@ -2450,5 +2453,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.82.2.38 2003/08/28 15:16:26 mike Exp $".
+ * End of "$Id: http.c,v 1.82.2.39 2003/08/29 23:58:37 mike Exp $".
  */
