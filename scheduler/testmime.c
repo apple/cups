@@ -1,5 +1,5 @@
 /*
- * "$Id: testmime.c,v 1.6 2002/01/02 17:59:18 mike Exp $"
+ * "$Id: testmime.c,v 1.7 2002/03/28 12:46:40 mike Exp $"
  *
  *   MIME test program for the Common UNIX Printing System (CUPS).
  *
@@ -31,7 +31,8 @@
  */
 
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
+#include <cups/string.h>
 #include "mime.h"
 
 
@@ -61,76 +62,88 @@ main(int  argc,				/* I - Number of command-line args */
   int		num_filters;		/* Number of filters for the file */
 
 
-  mime = mimeLoad("../conf");
+  mime = NULL;
+  src  = NULL;
+  dst  = NULL;
 
-  puts("MIME database types:");
-  for (i = 0, types = mime->types; i < mime->num_types; i ++, types ++)
-  {
-    printf("\t%s/%s:\n", (*types)->super, (*types)->type);
-    print_rules((*types)->rules);
-    puts("");
-  }
+  for (i = 1; i < argc; i ++)
+    if (strcmp(argv[i], "-d") == 0)
+    {
+      i ++;
 
-  puts("");
+      if (i < argc)
+        mime = mimeLoad(argv[i]);
+    }
+    else if (src == NULL)
+    {
+      if (!mime)
+	mime = mimeLoad("../conf");
 
-  puts("MIME database filters:");
-  for (i = 0, filters = mime->filters; i < mime->num_filters; i ++, filters ++)
-    printf("\t%s/%s to %s/%s: %s (%d)\n",
-           filters->src->super, filters->src->type,
-	   filters->dst->super, filters->dst->type,
-	   filters->filter, filters->cost);
+      src = mimeFileType(mime, argv[i]);
 
-  puts("");
-
-  switch (argc)
-  {
-    default :
-        fputs("Usage: testmime source-file [destination-type]\n", stderr);
-	mimeDelete(mime);
+      if (src != NULL)
+      {
+	printf("%s: %s/%s\n", argv[i], src->super, src->type);
+	if (mime)
+	  mimeDelete(mime);
+	return (0);
+      }
+      else
+      {
+	printf("%s: unknown\n", argv[i]);
+	if (mime)
+	  mimeDelete(mime);
 	return (1);
+      }
+    }
+    else
+    {
+      sscanf(argv[i], "%15[^/]/%31s", super, type);
+      dst = mimeType(mime, super, type);
 
-    case 2 :
-        src = mimeFileType(mime, argv[1]);
+      filters = mimeFilter(mime, src, dst, &num_filters);
 
-	if (src != NULL)
-	{
-	  printf("%s: %s/%s\n", argv[1], src->super, src->type);
-	  mimeDelete(mime);
-	  return (0);
-	}
-	else
-	{
-	  printf("%s: unknown\n", argv[1]);
-	  mimeDelete(mime);
-	  return (1);
-	}
+      if (filters == NULL)
+      {
+	printf("No filters to convert from %s/%s to %s.\n", src->super,
+	       src->type, argv[i]);
+      }
+      else
+      {
+	for (i = 0; i < num_filters; i ++)
+	  if (i < (num_filters - 1))
+	    printf("%s | ", filters[i].filter);
+	  else
+	    puts(filters[i].filter);
 
-    case 3 :
-        src = mimeFileType(mime, argv[1]);
+        free(filters);
+      }
+    }
 
-	sscanf(argv[2], "%15[^/]/%31s", super, type);
-        dst = mimeType(mime, super, type);
+  if (!mime)
+    mime = mimeLoad("../conf");
 
-        filters = mimeFilter(mime, src, dst, &num_filters);
+  if (src == NULL)
+  {
+    puts("MIME database types:");
+    for (i = 0, types = mime->types; i < mime->num_types; i ++, types ++)
+    {
+      printf("\t%s/%s:\n", (*types)->super, (*types)->type);
+      print_rules((*types)->rules);
+      puts("");
+    }
 
-        if (filters == NULL)
-	{
-	  printf("No filters to convert from %s to %s.\n", argv[1], argv[2]);
-	  mimeDelete(mime);
-	  return (1);
-	}
-	else
-	{
-	  for (i = 0; i < num_filters; i ++)
-	    if (i < (num_filters - 1))
-	      printf("%s | ", filters[i].filter);
-	    else
-	      puts(filters[i].filter);
+    puts("");
 
-	  mimeDelete(mime);
-          return (0);
-	}
+    puts("MIME database filters:");
+    for (i = 0, filters = mime->filters; i < mime->num_filters; i ++, filters ++)
+      printf("\t%s/%s to %s/%s: %s (%d)\n",
+             filters->src->super, filters->src->type,
+	     filters->dst->super, filters->dst->type,
+	     filters->filter, filters->cost);
   }
+
+  return (0);
 }
 
 
@@ -224,5 +237,5 @@ print_rules(mime_magic_t *rules)	/* I - Rules to print */
 
 
 /*
- * End of "$Id: testmime.c,v 1.6 2002/01/02 17:59:18 mike Exp $".
+ * End of "$Id: testmime.c,v 1.7 2002/03/28 12:46:40 mike Exp $".
  */
