@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.145 2002/02/10 00:10:33 mike Exp $"
+ * "$Id: job.c,v 1.146 2002/02/11 23:19:12 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2289,6 +2289,12 @@ ipp_read_file(const char *filename,	/* I - File to read from */
 	        break;
 	    case IPP_TAG_TEXTLANG :
 	    case IPP_TAG_NAMELANG :
+	        if (n > sizeof(buffer))
+		{
+		  DEBUG_printf(("ipp_read_file: bad value length %d!\n", n));
+		  return (IPP_ERROR);
+		}
+
 	        if (read(fd, buffer, n) < n)
 		  return (IPP_ERROR);
 
@@ -2999,5 +3005,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.145 2002/02/10 00:10:33 mike Exp $".
+ * End of "$Id: job.c,v 1.146 2002/02/11 23:19:12 mike Exp $".
  */
