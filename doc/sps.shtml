@@ -1,0 +1,341 @@
+<HTML>
+<HEAD>
+	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2000, All Rights Reserved">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SPS-1.1">
+	<META NAME="Author" CONTENT="Easy Software Products">
+	<TITLE>CUPS Software Performance Specification</TITLE>
+</HEAD>
+<BODY>
+
+<H1>Scope</H1>
+
+<H2>Identification</H2>
+
+<P>This software performance specification provides an analysis of the
+memory, disk, and processor utilitization of each program in the
+Common UNIX Printing System ("CUPS") Version 1.1.</P>
+
+<P>For the purposes of comparison, all figures are for the Linux Intel
+platform. Memory utilization on other platforms should be similar.
+
+<EMBED SRC="system-overview.shtml">
+
+<H2>Document Overview</H2>
+
+<P>This software performance specification is organized into the following sections:</P>
+
+<UL>
+	<LI>1 - Scope</LI>
+	<LI>2 - References</LI>
+	<LI>3 - Memory Use</LI>
+	<LI>4 - Disk Use</LI>
+	<LI>5 - Scheduler Requirements</LI>
+	<LI>A - Glossary</LI>
+</UL>
+
+<EMBED SRC="references.shtml">
+
+<H1>Memory Use</H1>
+
+<CENTER><TABLE WIDTH="80%" BORDER="1">
+<TR>
+	<TH COLSPAN="3">Backends</TH>
+</TR>
+<TR>
+	<TH>Program</TH>
+	<TH>Base Memory</TH>
+	<TH>Max Memory</TH>
+</TR>
+<TR>
+	<TD>ipp</TD>
+	<TD>91k</TD>
+	<TD>-</TD>
+</TR>
+<TR>
+	<TD>lpd</TD>
+	<TD>89k</TD>
+	<TD>-</TD>
+</TR>
+<TR>
+	<TD>parallel</TD>
+	<TD>85k</TD>
+	<TD>-</TD>
+</TR>
+<TR>
+	<TD>serial</TD>
+	<TD>85k</TD>
+	<TD>-</TD>
+</TR>
+<TR>
+	<TD>socket</TD>
+	<TD>85k</TD>
+	<TD>-</TD>
+</TR>
+<TR>
+	<TD>usb</TD>
+	<TD>85k</TD>
+	<TD>-</TD>
+</TR>
+<TR>
+	<TH COLSPAN="3">CGIs</TH>
+</TR>
+<TR>
+	<TH>Program</TH>
+	<TH>Base Memory</TH>
+	<TH>Max Memory</TH>
+</TR>
+<TR>
+	<TD>admin.cgi</TD>
+	<TD>107k</TD>
+	<TD>-</TD>
+</TR>
+<TR>
+	<TD>classes.cgi</TD>
+	<TD>95k</TD>
+	<TD>-</TD>
+</TR>
+<TR>
+	<TD>jobs.cgi</TD>
+	<TD>93k</TD>
+	<TD>-</TD>
+</TR>
+<TR>
+	<TD>printers.cgi</TD>
+	<TD>95k</TD>
+	<TD>-</TD>
+</TR>
+<TR>
+	<TH COLSPAN="3">Command-Line Programs</TH>
+</TR>
+<TR>
+	<TD>accept</TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD>cancel</TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD>disable</TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD>enable</TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD>lp</TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD>lpadmin</TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD>lpc</TD>
+	<TD>86k</TD>
+	<TD>-</TD>
+</TR>
+<TR>
+	<TD>lpinfo</TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD>lpmove</TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD>lpoptions</TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD>lppasswd</TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD>lpq</TD>
+	<TD>87k</TD>
+	<TD>-</TD>
+</TR>
+<TR>
+	<TD>lpr</TD>
+	<TD>87k</TD>
+	<TD>-</TD>
+</TR>
+<TR>
+	<TD>lprm</TD>
+	<TD>84k</TD>
+	<TD>-</TD>
+</TR>
+<TR>
+	<TD>lpstat</TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD>reject</TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TH COLSPAN="3">Daemons</TH>
+</TR>
+<TR>
+	<TH>Program</TH>
+	<TH>Base Memory</TH>
+	<TH>Max Memory</TH>
+</TR>
+<TR>
+	<TD>cups-lpd</TD>
+	<TD>92k</TD>
+	<TD>-</TD>
+</TR>
+<TR>
+	<TD>cupsd</TD>
+	<TD>308k</TD>
+	<TD>See Scheduler Requirements</TD>
+</TR>
+<TR>
+	<TD>cups-polld</TD>
+	<TD>84k</TD>
+	<TD>-</TD>
+</TR>
+<TR>
+	<TH COLSPAN="3">Filters</TH>
+</TR>
+<TR>
+	<TH>Program</TH>
+	<TH>Base Memory</TH>
+	<TH>Max Memory</TH>
+</TR>
+<TR>
+	<TD>hpgltops</TD>
+	<TD>263k</TD>
+	<TD>-</TD>
+</TR>
+<TR>
+	<TD>imagetops</TD>
+	<TD>628k</TD>
+	<TD>10M</TD>
+</TR>
+<TR>
+	<TD>imagetoraster</TD>
+	<TD>652k</TD>
+	<TD>10M</TD>
+</TR>
+<TR>
+	<TD>pstops</TD>
+	<TD>775k</TD>
+	<TD>-</TD>
+</TR>
+<TR>
+	<TD>pstoraster</TD>
+	<TD>4M</TD>
+	<TD>14M</TD>
+</TR>
+<TR>
+	<TD>rastertoepson</TD>
+	<TD>693k</TD>
+	<TD>1M</TD>
+</TR>
+<TR>
+	<TD>rastertohp</TD>
+	<TD>690k</TD>
+	<TD>1M</TD>
+</TR>
+<TR>
+	<TD>texttops</TD>
+	<TD>638k</TD>
+	<TD>-</TD>
+</TR>
+</TABLE></CENTER>
+
+
+<H1>Disk Use</H1>
+
+
+<H1>Scheduler Requirements</H1>
+
+<CENTER><TABLE WIDTH="80%" BORDER="1">
+<TR>
+	<TH>Object</TH>
+	<TH>Memory Per</TH>
+	<TH>Disk Per</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+
+<EMBED SRC="glossary.shtml">
+
+</BODY>
+</HTML>
