@@ -3,6 +3,8 @@ CHANGES.txt - 04/20/2004
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- Fixed a segfault problem with some of the client
+	  programs (STR #668)
 	- When using RunAsUser, the scheduler did not correctly
 	  set the ownership of the log files, preventing log
 	  file rotation (STR #686)

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.134 2004/03/19 22:19:35 mike Exp $"
+ * "$Id: http.c,v 1.135 2004/04/20 14:13:54 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -1193,7 +1193,7 @@ httpWrite(http_t     *http,		/* I - HTTP data */
 #else
       if (errno == EINTR)
         continue;
-      else if (errno != http->error)
+      else if (errno != http->error && errno != ECONNRESET)
       {
         http->error = errno;
 	continue;
@@ -2462,5 +2462,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.134 2004/03/19 22:19:35 mike Exp $".
+ * End of "$Id: http.c,v 1.135 2004/04/20 14:13:54 mike Exp $".
  */
