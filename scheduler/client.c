@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.26 1999/06/25 12:53:00 mike Exp $"
+ * "$Id: client.c,v 1.27 1999/06/30 16:19:10 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -449,6 +449,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	    * Send PPD file - get the real printer name since printer
 	    * names are not case sensitive but filename can be...
 	    */
+
+            con->uri[strlen(con->uri) - 4] = '\0';	/* Drop ".ppd" */
 
             if ((p = FindPrinter(con->uri + 10)) != NULL)
 	      sprintf(con->uri, "/ppd/%s.ppd", p->name);
@@ -1500,5 +1502,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.26 1999/06/25 12:53:00 mike Exp $".
+ * End of "$Id: client.c,v 1.27 1999/06/30 16:19:10 mike Exp $".
  */
