@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpadmin.8,v 1.1 1999/05/14 17:03:03 mike Exp $"
+.\" "$Id: lpadmin.8,v 1.2 1999/05/17 18:12:01 mike Exp $"
 .\"
 .\"   lpadmin man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -76,15 +76,6 @@ becomes empty it is removed.
 Sets the \fIdevice-uri\fR attribute of the printer queue.  If \fIdevice-uri\fR
 is a filename it is automatically converted to the form \fBfile:/file/name\fR.
 .TP 5
-\-F \fIfilter\fR
-.br
-Adds a filter for the printer.  \fIFilter\fR is a string of the form
-\fI"mime-type cost program"\fR, where \fImime-type\fR is a MIME type string
-(e.g. "application/postscript", "text/*"), \fIcost\fR is a filtering cost from
-0 to 100, and \fIprogram\fR is the filter program to use.  If \fIprogram\fR
-is not an absolute path then the filter is assumed to reside in the
-scheduler's standard filter directory.
-.TP 5
 \-P \fIppd-file\fR
 .br
 Specifies a PostScript Printer Description file to use with the printer. If
@@ -105,5 +96,5 @@ CUPS Software Administrator's Manual
 .SH COPYRIGHT
 Copyright 1993-1999 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpadmin.8,v 1.1 1999/05/14 17:03:03 mike Exp $".
+.\" End of "$Id: lpadmin.8,v 1.2 1999/05/17 18:12:01 mike Exp $".
 .\"
