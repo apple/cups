@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.136 2003/07/20 12:42:33 mike Exp $"
+ * "$Id: conf.c,v 1.137 2003/08/22 22:01:23 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -210,6 +210,8 @@ ReadConfiguration(void)
   int		run_user;		/* User that will be running cupsd */
   char		*old_serverroot,	/* Old ServerRoot */
 		*old_requestroot;	/* Old RequestRoot */
+  time_t	temptime;		/* Temporary time info */
+  struct tm	*tempdate;		/* Temporary date/time info */
 
 
  /*
@@ -403,6 +405,22 @@ ReadConfiguration(void)
   MaxJobsPerUser      = 0;
   MaxJobsPerPrinter   = 0;
   MaxCopies           = 100;
+
+ /*
+  * Set the time zone offset based on the output from localtime()...
+  * We do this so that GetDateTime() can use gmtime() and avoid the
+  * opportunity for a deadlock condition that Solaris offers if you
+  * call localtime() from a signal handler...
+  */
+
+  temptime = time(NULL);
+  tempdate = localtime(&temptime);
+
+#ifdef HAVE_TM_GMTOFF
+  TimeZoneOffset = tempdate->tm_gmtoff;
+#else
+  TimeZoneOffset = timezone;
+#endif /* HAVE_TM_GMTOFF */
 
  /*
   * Read the configuration file...
@@ -2158,5 +2176,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.136 2003/07/20 12:42:33 mike Exp $".
+ * End of "$Id: conf.c,v 1.137 2003/08/22 22:01:23 mike Exp $".
  */
