@@ -46,6 +46,8 @@ CHANGES IN CUPS V1.1.11
 	  processing.
 	- The lp command sent the "request ID is ..." message
 	  to stderr instead of stdout...
+	- The PostScript filter (pstops) now handles EPS files,
+	  adding a showpage command to the files as needed.
 
 
 CHANGES IN CUPS V1.1.10-1

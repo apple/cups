@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.64 2001/06/25 14:16:39 mike Exp $"
+ * "$Id: pstops.c,v 1.65 2001/10/03 18:28:08 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -269,6 +269,12 @@ main(int  argc,			/* I - Number of command-line arguments */
   }
 
  /*
+  * See if this is an EPS file...
+  */
+
+  UseESPsp = strstr(line, "EPS") != NULL;
+
+ /*
   * Start sending the document with any commands needed...
   */
 
@@ -300,14 +306,15 @@ main(int  argc,			/* I - Number of command-line arguments */
     */
 
     UseESPsp = 1;
+  }
 
-    WriteLabelProlog(val);
+  WriteLabelProlog(val);
 
+  if (UseESPsp)
     puts("userdict begin\n"
 	 "/ESPshowpage /showpage load def\n"
 	 "/showpage { } def\n"
 	 "end");
-  }
 
   if (Copies > 1 && (!Collate || !slowcollate))
   {
@@ -1106,5 +1113,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.64 2001/06/25 14:16:39 mike Exp $".
+ * End of "$Id: pstops.c,v 1.65 2001/10/03 18:28:08 mike Exp $".
  */
