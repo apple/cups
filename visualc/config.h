@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h,v 1.10 2002/12/17 19:00:27 swdev Exp $"
+ * "$Id: config.h,v 1.11 2003/01/15 20:45:29 mike Exp $"
  *
  *   Configuration file for ESP Print Pro.
  *
@@ -26,7 +26,7 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION	"CUPS v1.1.17"
+#define CUPS_SVERSION	"CUPS v1.1.19"
 #define ESP_SVERSION	"ESP Print Pro v4.3"
 
 
@@ -186,10 +186,12 @@
 
 
 /*
- * Do we have the OpenSSL library?
+ * Which encryption libraries do we have?
  */
 
+#define HAVE_SSL
 #define HAVE_LIBSSL
+#undef HAVE_GNUTLS
 
 
 /*
@@ -243,5 +245,5 @@
 
 
 /*
- * End of "$Id: config.h,v 1.10 2002/12/17 19:00:27 swdev Exp $".
+ * End of "$Id: config.h,v 1.11 2003/01/15 20:45:29 mike Exp $".
  */
