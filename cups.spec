@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.38 2001/10/26 03:16:46 mike Exp $"
+# "$Id: cups.spec,v 1.39 2001/10/26 05:19:15 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -83,7 +83,7 @@ make
 # Make sure the RPM_BUILD_ROOT directory exists.
 rm -rf $RPM_BUILD_ROOT
 
-make BUILDROOT=$RPM_BUILD_ROOT/ install
+make BUILDROOT=$RPM_BUILD_ROOT install
 
 %post
 if test -x /sbin/chkconfig; then
@@ -222,5 +222,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/pstoraster/*
 
 #
-# End of "$Id: cups.spec,v 1.38 2001/10/26 03:16:46 mike Exp $".
+# End of "$Id: cups.spec,v 1.39 2001/10/26 05:19:15 mike Exp $".
 #

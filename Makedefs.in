@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.45 2001/10/26 03:16:46 mike Exp $"
+# "$Id: Makedefs.in,v 1.46 2001/10/26 05:19:15 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -109,40 +109,40 @@ SSLLIBS	=	@SSLLIBS@
 # needed directories...
 #
 
-bindir		=	$(BUILDROOT)@bindir@
-datadir		=	$(BUILDROOT)@datadir@
-exec_prefix	=	$(BUILDROOT)@exec_prefix@
-includedir	=	$(BUILDROOT)@includedir@
-infodir		=	$(BUILDROOT)@infodir@
-libdir		=	$(BUILDROOT)@libdir@
-libexecdir	=	$(BUILDROOT)@libexecdir@
-localstatedir	=	$(BUILDROOT)@localstatedir@
-mandir		=	$(BUILDROOT)@mandir@
-oldincludedir	=	$(BUILDROOT)@oldincludedir@
-prefix		=	$(BUILDROOT)@prefix@
-sbindir		=	$(BUILDROOT)@sbindir@
-sharedstatedir	=	$(BUILDROOT)@sharedstatedir@
-srcdir		=	$(BUILDROOT)@srcdir@
-sysconfdir	=	$(BUILDROOT)@sysconfdir@
-top_srcdir	=	$(BUILDROOT)@top_srcdir@
+bindir		=	@bindir@
+datadir		=	@datadir@
+exec_prefix	=	@exec_prefix@
+includedir	=	@includedir@
+infodir		=	@infodir@
+libdir		=	@libdir@
+libexecdir	=	@libexecdir@
+localstatedir	=	@localstatedir@
+mandir		=	@mandir@
+oldincludedir	=	@oldincludedir@
+prefix		=	@prefix@
+sbindir		=	@sbindir@
+sharedstatedir	=	@sharedstatedir@
+srcdir		=	@srcdir@
+sysconfdir	=	@sysconfdir@
+top_srcdir	=	@top_srcdir@
 
 AMANDIR		=	$(BUILDROOT)@AMANDIR@
 BINDIR		=	$(BUILDROOT)@bindir@
 DATADIR		=	$(BUILDROOT)@CUPS_DATADIR@
 DOCDIR		=	$(BUILDROOT)@CUPS_DOCROOT@
-INCLUDEDIR	=	$(includedir)
+INCLUDEDIR	=	$(BUILDROOT)$(includedir)
 INITDIR		=	@INITDIR@
 INITDDIR	=	@INITDDIR@
-LIBDIR		=	$(libdir)
-LOCALEDIR	= 	@CUPS_LOCALEDIR@
-LOGDIR		= 	@CUPS_LOGDIR@
+LIBDIR		=	$(BUILDROOT)$(libdir)
+LOCALEDIR	= 	$(BUILDROOT)@CUPS_LOCALEDIR@
+LOGDIR		= 	$(BUILDROOT)@CUPS_LOGDIR@
 MANDIR		=	$(BUILDROOT)@mandir@
 PAMDIR		=	$(BUILDROOT)@PAMDIR@
 PMANDIR		=	$(BUILDROOT)@PMANDIR@
-REQUESTS	= 	@CUPS_REQUESTS@
+REQUESTS	= 	$(BUILDROOT)@CUPS_REQUESTS@
 SBINDIR		=	$(BUILDROOT)@sbindir@
-SERVERBIN	= 	@CUPS_SERVERBIN@
-SERVERROOT	= 	@CUPS_SERVERROOT@
+SERVERBIN	= 	$(BUILDROOT)@CUPS_SERVERBIN@
+SERVERROOT	= 	$(BUILDROOT)@CUPS_SERVERROOT@
 
 CAT1EXT		=	@CAT1EXT@
 CAT3EXT		=	@CAT3EXT@
@@ -175,5 +175,5 @@ MAN8DIR		=	@MAN8DIR@
 	$(MV) t.z $@
 
 #
-# End of "$Id: Makedefs.in,v 1.45 2001/10/26 03:16:46 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.46 2001/10/26 05:19:15 mike Exp $"
 #
