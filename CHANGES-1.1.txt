@@ -3,6 +3,17 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The "lpstat -o" command would truncate the
+	  "printer-jobid" string if it was longer than 21
+	  characters.
+	- The PJL-based MIME type rules now look in the first
+	  1024 bytes instead of just the first 512 bytes to find
+	  the language mode.
+	- The image file types are now listed explicitly in the
+	  mime.convs file so that additional image file formats
+	  do not use the standard CUPS image filters by default.
+	- Updated the Software Programmers Manual to include
+	  all of the CUPS API functions.
 	- ppdOpen*() no longer sorts choices for an option.
 	- The web interface now enforces constraints in PPD
 	  files when configuring a printer.

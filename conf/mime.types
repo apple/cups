@@ -1,5 +1,5 @@
 #
-# "$Id: mime.types,v 1.17.2.4 2002/03/19 15:49:01 mike Exp $"
+# "$Id: mime.types,v 1.17.2.5 2002/08/09 00:05:29 mike Exp $"
 #
 #   MIME types file for the Common UNIX Printing System (CUPS).
 #
@@ -76,9 +76,9 @@ application/vnd.hp-HPGL		hpgl string(0,<1B>&)\
 				string(0,<1B>%-1B) string(0,<201B>)\
 				string(0,BP;) string(0,IN;) string(0,DF;) \
 				string(0,BPINPS;) \
-				(string(0,<1B>%-12345X) + \
-				 (contains(9,512,"LANGUAGE=HPGL") \
-				  contains(9,512,"LANGUAGE = HPGL")))
+				(contains(0,128,<1B>%-12345X) + \
+				 (contains(0,1024,"LANGUAGE=HPGL") \
+				  contains(0,1024,"LANGUAGE = HPGL")))
 
 ########################################################################
 #
@@ -130,16 +130,16 @@ text/plain			txt printable(0,1024)
 #
 
 application/vnd.cups-form	string(0,"<CUPSFORM>")
-application/vnd.cups-postscript	string(0,<1B>%-12345X) + \
-				(contains(9,512,"LANGUAGE=POSTSCRIPT") \
-				 contains(9,512,"LANGUAGE = Postscript") \
-				 contains(9,512,"LANGUAGE = POSTSCRIPT"))
+application/vnd.cups-postscript	contains(0,128,<1B>%-12345X) + \
+				(contains(0,1024,"LANGUAGE=POSTSCRIPT") \
+				 contains(0,1024,"LANGUAGE = Postscript") \
+				 contains(0,1024,"LANGUAGE = POSTSCRIPT"))
 application/vnd.cups-raster	string(0,"RaSt") string(0,"tSaR")
 application/vnd.cups-raw	(string(0,<1B>E) + !string(2,<1B>%0B)) \
 				string(0,<1B>@) \
-				(string(0,<1B>%-12345X) + \
-				 (contains(9,512,"LANGUAGE=PCL") \
-				  contains(9,512,"LANGUAGE = PCL")))
+				(contains(0,128,<1B>%-12345X) + \
+				 (contains(0,1024,"LANGUAGE=PCL") \
+				  contains(0,1024,"LANGUAGE = PCL")))
 
 ########################################################################
 #
@@ -153,5 +153,5 @@ application/vnd.cups-raw	(string(0,<1B>E) + !string(2,<1B>%0B)) \
 #application/octet-stream
 
 #
-# End of "$Id: mime.types,v 1.17.2.4 2002/03/19 15:49:01 mike Exp $".
+# End of "$Id: mime.types,v 1.17.2.5 2002/08/09 00:05:29 mike Exp $".
 #

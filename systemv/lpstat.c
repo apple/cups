@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.37.2.7 2002/07/02 20:09:27 mike Exp $"
+ * "$Id: lpstat.c,v 1.37.2.8 2002/08/09 00:05:30 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -1257,7 +1257,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
   const char	*dptr,		/* Pointer into destination list */
 		*ptr;		/* Pointer into printer name */
   int		match;		/* Non-zero if this job matches */
-  char		temp[22],	/* Temporary buffer */
+  char		temp[255],	/* Temporary buffer */
 		date[32];	/* Date buffer */
   static const char *jattrs[] =	/* Attributes we need for jobs... */
 		{
@@ -1929,5 +1929,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.37.2.7 2002/07/02 20:09:27 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.37.2.8 2002/08/09 00:05:30 mike Exp $".
  */
