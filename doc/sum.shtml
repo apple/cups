@@ -799,6 +799,7 @@ Like the <CODE>lp</CODE> and <CODE>lpr</CODE> commands, it accepts printer
 options using the <CODE>-o</CODE> argument:
 
 <UL><PRE>
+<B>lpoptions -o prettyprint ENTER</B>
 <B>lpoptions -o media=A4 -o sides=two-sided-long-edge ENTER</B>
 <B>lpoptions -o media=Legal -o scaling=100 ENTER</B>
 </PRE></UL>
@@ -813,8 +814,20 @@ printer. The <CODE>-p printer</CODE> option specifies the options are
 for another printer:
 
 <UL><PRE>
+<B>lpoptions -p laserjet -o prettyprint ENTER</B>
 <B>lpoptions -p laserjet -o media=A4 -o sides=two-sided-long-edge ENTER</B>
 <B>lpoptions -p deskjet -o media=Legal -o scaling=100 ENTER</B>
+</PRE></UL>
+
+<H2>Removing Options</H2>
+
+<P>The previous two examples shows how to set options for the default
+and a specific printer.  Below, shows you how to remove the saved 
+option using the <CODE>-r</CODE> argument:
+
+<UL><PRE>
+<KBD>lpoptions -r prettyprint <I>ENTER</I></KBD>
+<KBD>lpoptions -p laserjet -r prettyprint <I>ENTER</I></KBD>
 </PRE></UL>
 
 <H2>Viewing the Current Defaults</H2>
