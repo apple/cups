@@ -1589,6 +1589,17 @@ files. The default value is 0.
 <P>The job-billing attribute provides a text value to associate with a job
 for billing purposes.
 
+<H3>job-hold-until (keyword | name(MAX))</H3>
+
+<P><I>(CUPS 1.1 and higher)</I>
+
+<P>The job-hold-until attribute specifies a hold time. In addition to the
+standard IPP/1.1 keyword names, CUPS supports name values of the form
+"HH:MM" and "HH:MM:SS" that specify a hold time. The hold time is in
+Greenwich Mean Time (GMT) and <I>not</I> in the local time zone. If the
+specified time is less than the current time, the job is held until the
+next day.
+
 <H3>job-sheets (1setof type3 keyword | name(MAX))</H3>
 
 <P><I>(CUPS 1.1 and higher)</I>
