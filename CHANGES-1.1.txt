@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- When stopping a printer, the scheduler didn't set the
+	  printer state before stopping the current job.
 	- The cupsaddsmb utility now lists all data files for
 	  Win9x and WinMe clients when installing that Windows
 	  driver.
