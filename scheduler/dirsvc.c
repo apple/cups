@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.38 2003/09/03 10:38:46 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.39 2003/09/03 13:51:41 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1697,13 +1697,13 @@ GetSlpAttrVal(const char *attrlist,	/* I - Attribute list string */
       */
 
       *valbuf = malloc(ptr2 - ptr1 + 1);
-      strcpy(valbuf, ptr1);
+      strcpy(*valbuf, ptr1);
 
      /*
       * Dequote the value...
       */
 
-      for (ptr1 = valbuf; *ptr1; ptr1 ++)
+      for (ptr1 = *valbuf; *ptr1; ptr1 ++)
 	if (*ptr1 == '\\' && ptr1[1])
 	  cups_strcpy(ptr1, ptr1 + 1);
 
@@ -1938,5 +1938,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.38 2003/09/03 10:38:46 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.39 2003/09/03 13:51:41 mike Exp $".
  */
