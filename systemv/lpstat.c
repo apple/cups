@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.30 2000/11/21 16:52:59 mike Exp $"
+ * "$Id: lpstat.c,v 1.31 2000/12/14 20:51:28 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -610,17 +610,30 @@ show_classes(http_t     *http,	/* I - HTTP connection to server */
 {
   int		i;		/* Looping var */
   ipp_t		*request,	/* IPP Request */
-		*response;	/* IPP Response */
+		*response,	/* IPP Response */
+		*response2;	/* IPP response from remote server */
+  http_t	*http2;		/* Remote server */
   ipp_attribute_t *attr;	/* Current attribute */
   cups_lang_t	*language;	/* Default language */
-  const char	*printer;	/* Printer class name */
+  const char	*printer,	/* Printer class name */
+		*printer_uri;	/* Printer class URI */
   ipp_attribute_t *members;	/* Printer members */
+  char		method[HTTP_MAX_URI],
+				/* Request method */
+		username[HTTP_MAX_URI],
+				/* Username:password */
+		server[HTTP_MAX_URI],
+				/* Server name */
+		resource[HTTP_MAX_URI];
+				/* Resource name */
+  int		port;		/* Port number */
   const char	*dptr,		/* Pointer into destination list */
 		*ptr;		/* Pointer into printer name */
   int		match;		/* Non-zero if this job matches */
   static const char *cattrs[] =	/* Attributes we need for classes... */
 		{
 		  "printer-name",
+		  "printer-uri-supported",
 		  "member-names"
 		};
 
@@ -705,6 +718,10 @@ show_classes(http_t     *http,	/* I - HTTP connection to server */
 	    attr->value_tag == IPP_TAG_NAME)
 	  printer = attr->values[0].string.text;
 
+        if (strcmp(attr->name, "printer-uri-supported") == 0 &&
+	    attr->value_tag == IPP_TAG_URI)
+	  printer_uri = attr->values[0].string.text;
+
         if (strcmp(attr->name, "member-names") == 0 &&
 	    attr->value_tag == IPP_TAG_NAME)
 	  members = attr;
@@ -713,11 +730,63 @@ show_classes(http_t     *http,	/* I - HTTP connection to server */
       }
 
      /*
+      * If this is a remote class, grab the class info from the
+      * remote server...
+      */
+
+      response2 = NULL;
+      if (members == NULL && printer_uri != NULL)
+      {
+        httpSeparate(printer_uri, method, username, server, &port, resource);
+
+        if ((http2 = httpConnect(server, port)) != NULL)
+	{
+	 /*
+	  * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the
+	  * following attributes:
+	  *
+	  *    attributes-charset
+	  *    attributes-natural-language
+	  *    printer-uri
+	  *    requested-attributes
+	  */
+
+	  request = ippNew();
+
+	  request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+	  request->request.op.request_id   = 1;
+
+	  language = cupsLangDefault();
+
+	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	       "attributes-charset", NULL, cupsLangEncoding(language));
+
+	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+        	       "attributes-natural-language", NULL, language->language);
+
+	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
+        	       "printer-uri", NULL, printer_uri);
+
+	  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                	"requested-attributes", sizeof(cattrs) / sizeof(cattrs[0]),
+			NULL, cattrs);
+
+          if ((response2 = cupsDoRequest(http2, request, "/")) != NULL)
+	    members = ippFindAttribute(response2, "member-names", IPP_TAG_NAME);
+
+          httpClose(http2);
+        }
+      }
+
+     /*
       * See if we have everything needed...
       */
 
-      if (printer == NULL || members == NULL)
+      if (printer == NULL)
       {
+        if (response2)
+	  ippDelete(response2);
+
         if (attr == NULL)
 	  break;
 	else
@@ -779,9 +848,18 @@ show_classes(http_t     *http,	/* I - HTTP connection to server */
       if (match)
       {
         printf("members of class %s:\n", printer);
-	for (i = 0; i < members->num_values; i ++)
-	  printf("\t%s\n", members->values[i].string.text);
+
+	if (members)
+	{
+	  for (i = 0; i < members->num_values; i ++)
+	    printf("\t%s\n", members->values[i].string.text);
+        }
+	else
+	  puts("\tunknown");
       }
+
+      if (response2)
+	ippDelete(response2);
 
       if (attr == NULL)
         break;
@@ -1741,5 +1819,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.30 2000/11/21 16:52:59 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.31 2000/12/14 20:51:28 mike Exp $".
  */
