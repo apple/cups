@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.c,v 1.3 1999/03/24 21:20:40 mike Exp $"
+ * "$Id: raster.c,v 1.4 1999/03/29 22:05:11 mike Exp $"
  *
  *   Raster file routines for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,13 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This code and any derivative of it may be used and distributed
+ *   freely under the terms of the GNU General Public License when
+ *   used with GNU Ghostscript or its derivatives.  Use of the code
+ *   (or any derivative of it) with software other than GNU
+ *   GhostScript (or its derivatives) is governed by the CUPS license
+ *   agreement.
  *
  * Contents:
  *
@@ -194,5 +201,5 @@ cupsRasterWritePixels(cups_raster_t *r,
 
 
 /*
- * End of "$Id: raster.c,v 1.3 1999/03/24 21:20:40 mike Exp $".
+ * End of "$Id: raster.c,v 1.4 1999/03/29 22:05:11 mike Exp $".
  */

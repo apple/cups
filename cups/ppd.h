@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.7 1999/03/24 21:20:39 mike Exp $"
+ * "$Id: ppd.h,v 1.8 1999/03/29 22:05:11 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -23,6 +23,13 @@
  *         WWW: http://www.cups.org
  *
  *   PostScript is a trademark of Adobe Systems, Inc.
+ *
+ *   This code and any derivative of it may be used and distributed
+ *   freely under the terms of the GNU General Public License when
+ *   used with GNU Ghostscript or its derivatives.  Use of the code
+ *   (or any derivative of it) with software other than GNU
+ *   GhostScript (or its derivatives) is governed by the CUPS license
+ *   agreement.
  */
 
 #ifndef _CUPS_PPD_H_
@@ -143,7 +150,15 @@ typedef struct			/**** Emulators ****/
 		*stop;		/* Code to stop this emulation */
 } ppd_emul_t;
 
-typedef struct			/**** File ****/
+typedef struct			/**** sRGB Color Profiles ****/
+{
+  char		resolution[41],	/* Resolution or "-" */
+		media_type[41];	/* Media type of "-" */
+  float		density,	/* Ink density to use */
+		matrix[3][3];	/* Transform matrix */
+} ppd_profile_t;
+
+typedef struct			/**** Files ****/
 {
   int		language_level,	/* Language level of device */
 		color_device,	/* 1 = color device, 0 = grayscale */
@@ -177,6 +192,8 @@ typedef struct			/**** File ****/
   ppd_const_t	*consts;	/* UI/Non-UI constraints */
   int		num_fonts;	/* Number of pre-loaded fonts */
   char		**fonts;	/* Pre-loaded fonts */
+  int		num_profiles;	/* Number of sRGB color profiles */
+  ppd_profile_t	*profiles;	/* sRGB color profiles */
 } ppd_file_t;
 
 
@@ -214,5 +231,5 @@ extern float		ppdPageWidth(ppd_file_t *ppd, char *name);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.7 1999/03/24 21:20:39 mike Exp $".
+ * End of "$Id: ppd.h,v 1.8 1999/03/29 22:05:11 mike Exp $".
  */

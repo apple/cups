@@ -1,5 +1,5 @@
 /*
- * "$Id: testhttp.c,v 1.5 1999/02/09 22:01:25 mike Exp $"
+ * "$Id: testhttp.c,v 1.6 1999/03/29 22:05:12 mike Exp $"
  *
  *   HTTP test program for the Common UNIX Printing System (CUPS).
  *
@@ -49,8 +49,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		bytes;		/* Number of bytes read */
   FILE		*out;		/* Output file */
 
-#define HOST "localhost"
-#define PORT 8631
+#define HOST "dns.easysw.com"
+#define PORT 80
 
   puts("Connecting to " HOST "...");
 
@@ -105,5 +105,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testhttp.c,v 1.5 1999/02/09 22:01:25 mike Exp $".
+ * End of "$Id: testhttp.c,v 1.6 1999/03/29 22:05:12 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.h,v 1.3 1999/03/24 21:20:40 mike Exp $"
+ * "$Id: raster.h,v 1.4 1999/03/29 22:05:11 mike Exp $"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,13 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This code and any derivative of it may be used and distributed
+ *   freely under the terms of the GNU General Public License when
+ *   used with GNU Ghostscript or its derivatives.  Use of the code
+ *   (or any derivative of it) with software other than GNU
+ *   GhostScript (or its derivatives) is governed by the CUPS license
+ *   agreement.
  */
 
 #ifndef _CUPS_RASTER_H_
@@ -28,7 +35,7 @@
 /*
  * Every non-PostScript printer driver that supports raster images should
  * use the application/vnd.cups-raster image file format.  Since both the
- * PostScript RIP (pstoraster, based on GNU GhostScript 4.03) and Image RIP
+ * PostScript RIP (pstoraster, based on GNU Ghostscript 4.03) and Image RIP
  * (imagetoraster, located in the filter directory) use it, using this format
  * saves you a lot of work.  Also, the PostScript RIP passes any printer
  * options that are in a PS file to your driver this way as well...
@@ -102,7 +109,7 @@ typedef enum
 
 typedef enum
 {
-  CUPS_ORDER_SEPARATE,			/* CMYK CMYK CMYK ... */
+  CUPS_ORDER_CHUNKED,			/* CMYK CMYK CMYK ... */
   CUPS_ORDER_BANDED,			/* CCC MMM YYY KKK ... */
   CUPS_ORDER_PLANAR			/* CCC ... MMM ... YYY ... KKK ... */
 } cups_order_t;
@@ -202,5 +209,5 @@ extern unsigned		cupsRasterWritePixels(cups_raster_t *r,
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h,v 1.3 1999/03/24 21:20:40 mike Exp $".
+ * End of "$Id: raster.h,v 1.4 1999/03/29 22:05:11 mike Exp $".
  */

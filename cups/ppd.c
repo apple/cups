@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.9 1999/03/24 21:20:39 mike Exp $"
+ * "$Id: ppd.c,v 1.10 1999/03/29 22:05:10 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -22,6 +22,13 @@
  *         WWW: http://www.cups.org
  *
  *   PostScript is a trademark of Adobe Systems, Inc.
+ *
+ *   This code and any derivative of it may be used and distributed
+ *   freely under the terms of the GNU General Public License when
+ *   used with GNU Ghostscript or its derivatives.  Use of the code
+ *   (or any derivative of it) with software other than GNU
+ *   GhostScript (or its derivatives) is governed by the CUPS license
+ *   agreement.
  *
  * Contents:
  *
@@ -162,6 +169,13 @@ ppdClose(ppd_file_t *ppd)	/* I - PPD file record */
   }
 
  /*
+  * Free any profiles...
+  */
+
+  if (ppd->num_profiles > 0)
+    free(ppd->profiles);
+
+ /*
   * Free the whole record...
   */
 
@@ -257,6 +271,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
   ppd_section_t	section;	/* Order dependency section */
   int		num_data,	/* Number of CUPS-specific data values */
 		data[256];	/* Pointer to CUPS-specific data */
+  ppd_profile_t	*profile;	/* Pointer to color profile */
 
 
  /*
@@ -412,6 +427,28 @@ ppdOpen(FILE *fp)		/* I - File to read from */
         ppd->colorspace = PPD_CS_N;
       else
         ppd->colorspace = PPD_CS_GRAY;
+    }
+    else if (strcmp(keyword, "ColorProfile") == 0)
+    {
+      if (ppd->num_profiles == 0)
+        profile = malloc(sizeof(ppd_profile_t));
+      else
+        profile = realloc(ppd->profiles, sizeof(ppd_profile_t) *
+	                                 (ppd->num_profiles + 1));
+
+      ppd->profiles     = profile;
+      profile           += ppd->num_profiles;
+      ppd->num_profiles ++;
+
+      memset(profile, 0, sizeof(ppd_profile_t));
+      strcpy(profile->resolution, name);
+      strcpy(profile->media_type, (char *)text);
+      sscanf((char *)string, "%f%f%f%f%f%f%f%f%f%f", &(profile->density),
+	     profile->matrix[0] + 0, profile->matrix[0] + 1,
+	     profile->matrix[0] + 2, profile->matrix[1] + 0,
+	     profile->matrix[1] + 1, profile->matrix[1] + 2,
+	     profile->matrix[2] + 0, profile->matrix[2] + 1,
+	     profile->matrix[2] + 2);
     }
     else if (strcmp(keyword, "LandscapeOrientation") == 0)
     {
@@ -1387,5 +1424,5 @@ ppd_decode(unsigned char *string)	/* I - String to decode */
 
 
 /*
- * End of "$Id: ppd.c,v 1.9 1999/03/24 21:20:39 mike Exp $".
+ * End of "$Id: ppd.c,v 1.10 1999/03/29 22:05:10 mike Exp $".
  */
