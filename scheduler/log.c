@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.10 2000/06/27 19:31:23 mike Exp $"
+ * "$Id: log.c,v 1.11 2000/07/21 15:39:30 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,10 +23,10 @@
  *
  * Contents:
  *
- *   LogMessage()   - Log a message to the error log file.
- *   LogPage()      - Log a page to the page log file.
- *   LogRequest()   - Log an HTTP request in Common Log Format.
- *   get_datetime() - Returns a pointer to a date/time string.
+ *   GetDateTime() - Returns a pointer to a date/time string.
+ *   LogMessage()  - Log a message to the error log file.
+ *   LogPage()     - Log a page to the page log file.
+ *   LogRequest()  - Log an HTTP request in Common Log Format.
  */
 
 /*
@@ -42,10 +42,58 @@
 
 
 /*
- * Local functions...
+ * 'GetDateTime()' - Returns a pointer to a date/time string.
  */
 
-static char	*get_datetime(time_t t);
+char *				/* O - Date/time string */
+GetDateTime(time_t t)		/* I - Time value */
+{
+  struct tm	*date;		/* Date/time value */
+  static char	s[1024];	/* Date/time string */
+  static const char *months[12] =/* Months */
+		{
+		  "Jan",
+		  "Feb",
+		  "Mar",
+		  "Apr",
+		  "May",
+		  "Jun",
+		  "Jul",
+		  "Aug",
+		  "Sep",
+		  "Oct",
+		  "Nov",
+		  "Dec"
+		};
+
+
+ /*
+  * Get the date and time from the UNIX time value, and then format it
+  * into a string.  Note that we *can't* use the strftime() function since
+  * it is localized and will seriously confuse automatic programs if the
+  * month names are in the wrong language!
+  *
+  * Also, we use the "timezone" variable that contains the current timezone
+  * offset from GMT in seconds so that we are reporting local time in the
+  * log files.  If you want GMT, set the TZ environment variable accordingly
+  * before starting the scheduler.
+  *
+  * (*BSD stores the timezone offset in the tm structure)
+  */
+
+  date = localtime(&t);
+
+  sprintf(s, "[%02d/%s/%04d:%02d:%02d:%02d %+03ld%02ld]",
+	  date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
+	  date->tm_hour, date->tm_min, date->tm_sec,
+#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+          -date->tm_gmtoff / 3600, (date->tm_gmtoff / 60) % 60);
+#else
+          -timezone / 3600, (timezone / 60) % 60);
+#endif /* __*BSD__ */
+ 
+  return (s);
+}
 
 
 /*
@@ -165,7 +213,7 @@ LogMessage(int        level,	/* I - Log level */
   * Print the log level and date/time...
   */
 
-  fprintf(ErrorFile, "%c %s ", levels[level], get_datetime(time(NULL)));
+  fprintf(ErrorFile, "%c %s ", levels[level], GetDateTime(time(NULL)));
 
  /*
   * Then the log message...
@@ -284,7 +332,7 @@ LogPage(job_t       *job,	/* I - Job being printed */
   */
 
   fprintf(PageFile, "%s %s %d %s %s %s\n", job->printer->name, job->username,
-          job->id, get_datetime(time(NULL)), page,
+          job->id, GetDateTime(time(NULL)), page,
 	  billing ? billing->values[0].string.text : "");
   fflush(PageFile);
 
@@ -402,7 +450,7 @@ LogRequest(client_t      *con,	/* I - Request to log */
 
   fprintf(AccessFile, "%s - %s %s \"%s %s HTTP/%d.%d\" %d %d\n",
           con->http.hostname, con->username[0] != '\0' ? con->username : "-",
-	  get_datetime(con->start), states[con->operation], con->uri,
+	  GetDateTime(con->start), states[con->operation], con->uri,
 	  con->http.version / 100, con->http.version % 100,
 	  code, con->bytes);
   fflush(AccessFile);
@@ -412,60 +460,5 @@ LogRequest(client_t      *con,	/* I - Request to log */
 
 
 /*
- * 'get_datetime()' - Returns a pointer to a date/time string.
- */
-
-static char *			/* O - Date/time string */
-get_datetime(time_t t)		/* I - Time value */
-{
-  struct tm	*date;		/* Date/time value */
-  static char	s[1024];	/* Date/time string */
-  static const char *months[12] =/* Months */
-		{
-		  "Jan",
-		  "Feb",
-		  "Mar",
-		  "Apr",
-		  "May",
-		  "Jun",
-		  "Jul",
-		  "Aug",
-		  "Sep",
-		  "Oct",
-		  "Nov",
-		  "Dec"
-		};
-
-
- /*
-  * Get the date and time from the UNIX time value, and then format it
-  * into a string.  Note that we *can't* use the strftime() function since
-  * it is localized and will seriously confuse automatic programs if the
-  * month names are in the wrong language!
-  *
-  * Also, we use the "timezone" variable that contains the current timezone
-  * offset from GMT in seconds so that we are reporting local time in the
-  * log files.  If you want GMT, set the TZ environment variable accordingly
-  * before starting the scheduler.
-  *
-  * (*BSD stores the timezone offset in the tm structure)
-  */
-
-  date = localtime(&t);
-
-  sprintf(s, "[%02d/%s/%04d:%02d:%02d:%02d %+03ld%02ld]",
-	  date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
-	  date->tm_hour, date->tm_min, date->tm_sec,
-#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
-          -date->tm_gmtoff / 3600, (date->tm_gmtoff / 60) % 60);
-#else
-          -timezone / 3600, (timezone / 60) % 60);
-#endif /* __*BSD__ */
- 
-  return (s);
-}
-
-
-/*
- * End of "$Id: log.c,v 1.10 2000/06/27 19:31:23 mike Exp $".
+ * End of "$Id: log.c,v 1.11 2000/07/21 15:39:30 mike Exp $".
  */

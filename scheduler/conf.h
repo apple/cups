@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.25 2000/07/17 12:32:00 mike Exp $"
+ * "$Id: conf.h,v 1.26 2000/07/21 15:39:30 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -109,6 +109,7 @@ VAR mime_t		*MimeDatabase		VALUE(NULL);
  * Prototypes...
  */
 
+extern char	*GetDateTime(time_t t);
 extern int	ReadConfiguration(void);
 extern int	LogRequest(client_t *con, http_status_t code);
 extern int	LogMessage(int level, const char *message, ...);
@@ -116,5 +117,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.25 2000/07/17 12:32:00 mike Exp $".
+ * End of "$Id: conf.h,v 1.26 2000/07/21 15:39:30 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.83 2000/07/17 12:32:00 mike Exp $"
+ * "$Id: ipp.c,v 1.84 2000/07/21 15:39:30 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1959,7 +1959,10 @@ copy_banner(client_t   *con,	/* I - Client connection */
 	{
 	  case IPP_TAG_INTEGER :
 	  case IPP_TAG_ENUM :
-	      fprintf(out, "%d", attr->values[i].integer);
+	      if (strncmp(attrname, "time-at-", 8) == 0)
+	        fputs(GetDateTime(attr->values[i].integer), out);
+	      else
+	        fprintf(out, "%d", attr->values[i].integer);
 	      break;
 
 	  case IPP_TAG_BOOLEAN :
@@ -5004,5 +5007,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.83 2000/07/17 12:32:00 mike Exp $".
+ * End of "$Id: ipp.c,v 1.84 2000/07/21 15:39:30 mike Exp $".
  */
