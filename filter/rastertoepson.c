@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertoepson.c,v 1.12 2001/06/06 20:40:25 mike Exp $"
+ * "$Id: rastertoepson.c,v 1.13 2001/06/07 16:03:39 mike Exp $"
  *
  *   EPSON ESC/P and ESC/P2 filter for the Common UNIX Printing System
  *   (CUPS).
@@ -233,7 +233,7 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
 	* Set the media size...
 	*/
 
-        if (Model < MODEL_ICOLOR)
+        if (Model < EPSON_ICOLOR)
 	{
 	  pwrite("\033(U\001\000", 5);		/* Resolution/units */
 	  putchar(3600 / header->HWResolution[1]);
@@ -588,7 +588,7 @@ CompressData(const unsigned char *line,	/* I - Data to compress */
 
   putchar(0x0d);			/* Move print head to left margin */
 
-  if (Model < MODEL_ICOLOR)
+  if (Model < EPSON_ICOLOR)
   {
    /*
     * Do graphics the "old" way...
@@ -1127,5 +1127,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertoepson.c,v 1.12 2001/06/06 20:40:25 mike Exp $".
+ * End of "$Id: rastertoepson.c,v 1.13 2001/06/07 16:03:39 mike Exp $".
  */
