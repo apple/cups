@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gdevmem.c,v 1.2 2000/03/08 23:14:24 mike Exp $ */
+/*$Id: gdevmem.c,v 1.3 2001/05/31 13:55:07 mike Exp $ */
 /* Generic "memory" (stored bitmap) device */
 #include "memory_.h"
 #include "gx.h"
@@ -192,8 +192,7 @@ private ulong
 mem_bitmap_bits_size(const gx_device_memory * dev, int width, int height)
 {
     return round_up((ulong) height *
-		    bitmap_raster(width * dev->color_info.depth),
-		    max(align_bitmap_mod, arch_align_ptr_mod));
+		    bitmap_raster(width * dev->color_info.depth), 8);
 }
 ulong
 gdev_mem_data_size(const gx_device_memory * dev, int width, int height)
@@ -233,6 +232,8 @@ mem_open(gx_device * dev)
 int
 gdev_mem_open_scan_lines(gx_device_memory *mdev, int setup_height)
 {
+    int offset;
+
     if (setup_height < 0 || setup_height > mdev->height)
 	return_error(gs_error_rangecheck);
     if (mdev->bitmap_memory != 0) {	/* Allocate the data now. */
@@ -253,10 +254,12 @@ gdev_mem_open_scan_lines(gx_device_memory *mdev, int setup_height)
  */
 #define huge_ptr_add(base, offset)\
    ((void *)((byte huge *)(base) + (offset)))
+
+
+    offset = mem_bitmap_bits_size(mdev, mdev->width, mdev->height);
+
     mem_set_line_ptrs(mdev,
-		      huge_ptr_add(mdev->base,
-				   mem_bitmap_bits_size(mdev, mdev->width,
-							mdev->height)),
+		      huge_ptr_add(mdev->base, offset),
 		      mdev->base, setup_height);
     return 0;
 }

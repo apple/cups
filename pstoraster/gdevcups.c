@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.43 2001/03/29 14:58:54 mike Exp $"
+ * "$Id: gdevcups.c,v 1.44 2001/05/31 13:55:06 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -1492,6 +1492,8 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   gs_param_string	stringval;	/* String value */
   gs_param_float_array	arrayval;	/* Float array value */
   int			old_depth;	/* Old color depth */
+  int			old_width;	/* Old bitmap width */
+  int			old_height;	/* Old bitmap height */
   gdev_prn_space_params	sp;		/* Space parameter data */
 
 
@@ -1569,7 +1571,9 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
       cups->header.name[i] = (unsigned)arrayval.data[i]; \
   }
 
-  old_depth = pdev->color_info.depth;
+  old_depth  = pdev->color_info.depth;
+  old_width  = pdev->width;
+  old_height = pdev->height;
 
   stringoption(MediaClass, "MediaClass")
   stringoption(MediaColor, "MediaColor")
@@ -1607,16 +1611,6 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   intoption(cupsRowStep, "cupsRowStep", unsigned)
 
   cups_set_color_info(pdev);
-
-  if (old_depth != pdev->color_info.depth)
-  {
-    fputs("DEBUG: Reallocating memory for new color depth...\n", stderr);
-    sp = ((gx_device_printer *)pdev)->space_params;
-
-    if ((code = gdev_prn_reallocate_memory(pdev, &sp, pdev->width,
-                                           pdev->height)) < 0)
-      return (code);
-  }
 
  /*
   * Compute the page margins...
@@ -1700,6 +1694,22 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
 
   cups->header.PageSize[0] = pdev->PageSize[0];
   cups->header.PageSize[1] = pdev->PageSize[1];
+
+ /*
+  * Reallocate memory as required...
+  */
+
+  if (old_depth != pdev->color_info.depth ||
+      old_width != pdev->width ||
+      old_height != pdev->height)
+  {
+    fputs("DEBUG: Reallocating memory for new color depth...\n", stderr);
+    sp = ((gx_device_printer *)pdev)->space_params;
+
+    if ((code = gdev_prn_reallocate_memory(pdev, &sp, pdev->width,
+                                           pdev->height)) < 0)
+      return (code);
+  }
 
 #ifdef DEBUG
   fprintf(stderr, "DEBUG: ppd = %8x\n", cups->ppd);
@@ -3035,5 +3045,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.43 2001/03/29 14:58:54 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.44 2001/05/31 13:55:06 mike Exp $".
  */
