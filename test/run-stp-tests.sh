@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.19 2003/07/20 12:42:36 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.20 2003/07/22 18:21:28 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -444,6 +444,10 @@ else
 	echo "All tests were successful."
 fi
 
+if test "x$valgrind" != x; then
+	echo "Valgrind lof files can be found in /tmp/$user/log."
+fi
+
 echo ""
 echo "See the following files for details:"
 echo ""
@@ -452,5 +456,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.19 2003/07/20 12:42:36 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.20 2003/07/22 18:21:28 mike Exp $"
 #
