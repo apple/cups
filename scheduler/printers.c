@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.71 2000/08/30 22:04:17 mike Exp $"
+ * "$Id: printers.c,v 1.72 2000/09/06 19:40:12 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1381,8 +1381,6 @@ ValidateDest(const char   *hostname,	/* I - Host name */
              cups_ptype_t *dtype)	/* O - Type (printer or class) */
 {
   printer_t	*p;			/* Current printer */
-  int		rlen;			/* Length of name sans @ */
-  const char	*temp;			/* Pointer to @ */
   char		localname[1024],	/* Localized hostname */
 		*lptr,			/* Pointer into localized hostname */
 		*sptr;			/* Pointer into server name */
@@ -1420,13 +1418,21 @@ ValidateDest(const char   *hostname,	/* I - Host name */
   }
 
  /*
-  * Get the length of the printer or class name, sans @server if present.
+  * See if the printer or class name is dest@server; if so, just lookup the
+  * name instead...
   */
 
-  if ((temp = strchr(resource, '@')) != NULL)
-    rlen = temp - resource;
-  else
-    rlen = strlen(resource);
+  if (strchr(resource, '@') != NULL)
+  {
+    if ((p = FindPrinter(resource)) == NULL)
+      p = FindClass(resource);
+
+    if (p == NULL)
+      return (NULL);
+
+    *dtype = p->type & CUPS_PRINTER_CLASS;
+    return (p->name);
+  }
 
  /*
   * Change localhost to the server name...
@@ -1474,9 +1480,7 @@ ValidateDest(const char   *hostname,	/* I - Host name */
 
   for (p = Printers; p != NULL; p = p->next)
     if (strcasecmp(p->hostname, localname) == 0 &&
-        (strcasecmp(p->name, resource) == 0 ||
-	 (strncasecmp(p->name, resource, rlen) == 0 &&
-	  p->name[rlen] == '@')))
+        strcasecmp(p->name, resource) == 0)
     {
       *dtype = p->type & CUPS_PRINTER_CLASS;
       return (p->name);
@@ -1531,5 +1535,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.71 2000/08/30 22:04:17 mike Exp $".
+ * End of "$Id: printers.c,v 1.72 2000/09/06 19:40:12 mike Exp $".
  */
