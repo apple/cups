@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.14.2.10 2003/03/30 20:01:48 mike Exp $"
+ * "$Id: ppds.c,v 1.14.2.11 2003/07/20 12:51:53 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -589,7 +589,7 @@ load_ppds(const char *d,		/* I - Actual directory */
       strcpy(make_model, model_name);
 
     while (isspace(make_model[0]))
-      strcpy(make_model, make_model + 1);
+      cups_strcpy(make_model, make_model + 1);
 
     if (!make_model[0])
       continue;	/* Nope... */
@@ -599,7 +599,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     */
 
     while (isspace(manufacturer[0]))
-      strcpy(manufacturer, manufacturer + 1);
+      cups_strcpy(manufacturer, manufacturer + 1);
 
     if (!manufacturer[0] || strcmp(manufacturer, "ESP") == 0)
     {
@@ -670,7 +670,7 @@ load_ppds(const char *d,		/* I - Actual directory */
       */
 
       country[0] = '_';
-      strcpy(country + 1, ptr);
+      cups_strcpy(country + 1, ptr);
     }
     else
     {
@@ -781,5 +781,5 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * End of "$Id: ppds.c,v 1.14.2.10 2003/03/30 20:01:48 mike Exp $".
+ * End of "$Id: ppds.c,v 1.14.2.11 2003/07/20 12:51:53 mike Exp $".
  */

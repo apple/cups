@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.75 2003/07/20 02:34:27 mike Exp $"
+ * "$Id: job.c,v 1.124.2.76 2003/07/20 12:51:51 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1198,6 +1198,7 @@ StartJob(int       id,			/* I - Job ID */
 		processPath[1050],	/* CFProcessPath environment variable */
 #endif	/* __APPLE__ */
 		path[1024],		/* PATH environment variable */
+		ipp_port[1024],		/* IPP_PORT environment variable */
 		language[255],		/* LANG environment variable */
 		charset[255],		/* CHARSET environment variable */
 		classification[1024],	/* CLASSIFICATION environment variable */
@@ -1215,7 +1216,8 @@ StartJob(int       id,			/* I - Job ID */
 		shlib_path[1024],	/* SHLIB_PATH environment variable */
 		nlspath[1024],		/* NLSPATH environment variable */
 		datadir[1024],		/* CUPS_DATADIR environment variable */
-		fontpath[1050];		/* CUPS_FONTPATH environment variable */
+		fontpath[1050],		/* CUPS_FONTPATH environment variable */
+		vg_args[1024];		/* VG_ARGS environment variable */
   static char	*options = NULL;	/* Full list of options */
   static int	optlength = 0;		/* Length of option buffer */
 
@@ -1707,6 +1709,7 @@ StartJob(int       id,			/* I - Job ID */
   snprintf(tmpdir, sizeof(tmpdir), "TMPDIR=%s", TempDir);
   snprintf(datadir, sizeof(datadir), "CUPS_DATADIR=%s", DataDir);
   snprintf(fontpath, sizeof(fontpath), "CUPS_FONTPATH=%s", FontPath);
+  sprintf(ipp_port, "IPP_PORT=%d", LocalPort);
 
   envc = 0;
 
@@ -1715,7 +1718,8 @@ StartJob(int       id,			/* I - Job ID */
   envp[envc ++] = "USER=root";
   envp[envc ++] = charset;
   envp[envc ++] = language;
-  envp[envc ++] = TZ;
+  if (TZ && TZ[0])
+    envp[envc ++] = TZ;
   envp[envc ++] = ppd;
   envp[envc ++] = root;
   envp[envc ++] = cache;
@@ -1725,6 +1729,14 @@ StartJob(int       id,			/* I - Job ID */
   envp[envc ++] = printer_name;
   envp[envc ++] = datadir;
   envp[envc ++] = fontpath;
+  envp[envc ++] = "CUPS_SERVER=localhost";
+  envp[envc ++] = ipp_port;
+
+  if (getenv("VG_ARGS") != NULL)
+  {
+    snprintf(vg_args, sizeof(vg_args), "VG_ARGS=%s", getenv("VG_ARGS"));
+    envp[envc ++] = vg_args;
+  }
 
   if (getenv("LD_LIBRARY_PATH") != NULL)
   {
@@ -2360,7 +2372,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
     * Copy over the buffer data we've used up...
     */
 
-    strcpy(job->buffer, lineptr);
+    cups_strcpy(job->buffer, lineptr);
     job->bufused -= lineptr - job->buffer;
 
     if (job->bufused < 0)
@@ -2791,5 +2803,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.75 2003/07/20 02:34:27 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.76 2003/07/20 12:51:51 mike Exp $".
  */

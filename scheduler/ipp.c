@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.70 2003/05/13 14:50:54 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.71 2003/07/20 12:51:47 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2668,10 +2668,18 @@ copy_model(const char *from,		/* I - Source file */
   */
 
   if ((src = cupsFileOpen(from, "rb")) == NULL)
+  {
+    if (num_defaults > 0)
+      free(defaults);
+
     return (-1);
+  }
 
   if ((dst = cupsFileOpen(to, "wb")) == NULL)
   {
+    if (num_defaults > 0)
+      free(defaults);
+
     cupsFileClose(src);
     return (-1);
   }
@@ -2710,6 +2718,9 @@ copy_model(const char *from,		/* I - Source file */
 
   if (cups_protocol[0])
     cupsFilePrintf(dst, "%s\n", cups_protocol);
+
+  if (num_defaults > 0)
+    free(defaults);
 
  /*
   * Close both files and return...
@@ -6741,5 +6752,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.70 2003/05/13 14:50:54 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.71 2003/07/20 12:51:47 mike Exp $".
  */

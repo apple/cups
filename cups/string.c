@@ -1,5 +1,5 @@
 /*
- * "$Id: string.c,v 1.5.2.7 2003/01/07 18:26:30 mike Exp $"
+ * "$Id: string.c,v 1.5.2.8 2003/07/20 12:51:42 mike Exp $"
  *
  *   String functions for the Common UNIX Printing System (CUPS).
  *
@@ -25,6 +25,7 @@
  *
  * Contents:
  *
+ *   cups_strcpy()      - Copy a string allowing for overlapping strings.
  *   cups_strdup()      - Duplicate a string.
  *   cups_strcasecmp()  - Do a case-insensitive comparison.
  *   cups_strncasecmp() - Do a case-insensitive comparison on up to N chars.
@@ -37,6 +38,21 @@
  */
 
 #include "string.h"
+
+
+/*
+ * 'cups_strcpy()' - Copy a string allowing for overlapping strings.
+ */
+
+void
+cups_strcpy(char       *dst,		/* I - Destination string */
+            const char *src)		/* I - Source string */
+{
+  while (*src)
+    *dst++ = *src++;
+
+  *dst = '\0';
+}
 
 
 /*
@@ -206,5 +222,5 @@ cups_strlcpy(char       *dst,	/* O - Destination string */
 
 
 /*
- * End of "$Id: string.c,v 1.5.2.7 2003/01/07 18:26:30 mike Exp $".
+ * End of "$Id: string.c,v 1.5.2.8 2003/07/20 12:51:42 mike Exp $".
  */

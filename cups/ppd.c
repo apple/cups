@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.55 2003/07/20 01:33:11 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.56 2003/07/20 12:51:41 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -117,7 +117,7 @@ static void		ppd_decode(char *string);
 #ifndef __APPLE__
 static void		ppd_fix(char *string);
 #else
-#  define ppd_fix(s)
+#  define		ppd_fix(s)
 #endif /* !__APPLE__ */
 static void		ppd_free_group(ppd_group_t *group);
 static void		ppd_free_option(ppd_option_t *option);
@@ -217,14 +217,18 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
   */
 
   if (ppd->num_sizes > 0)
+  {
     ppd_free(ppd->sizes);
+  }
 
  /*
   * Free any constraints...
   */
 
   if (ppd->num_consts > 0)
+  {
     ppd_free(ppd->consts);
+  }
 
  /*
   * Free any filters...
@@ -233,7 +237,9 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
   if (ppd->num_filters > 0)
   {
     for (i = ppd->num_filters, filter = ppd->filters; i > 0; i --, filter ++)
+    {
       ppd_free(*filter);
+    }
 
     ppd_free(ppd->filters);
   }
@@ -245,7 +251,9 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
   if (ppd->num_fonts > 0)
   {
     for (i = ppd->num_fonts, font = ppd->fonts; i > 0; i --, font ++)
+    {
       ppd_free(*font);
+    }
 
     ppd_free(ppd->fonts);
   }
@@ -255,7 +263,9 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
   */
 
   if (ppd->num_profiles > 0)
+  {
     ppd_free(ppd->profiles);
+  }
 
  /*
   * Free any attributes...
@@ -889,6 +899,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
       choice->code = string;
       option       = NULL;
+      string       = NULL;		/* Don't add as an attribute below */
     }
     else if (strcmp(keyword, "LandscapeOrientation") == 0)
     {
@@ -984,7 +995,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       */
 
       if (name[0] == '*')
-        strcpy(name, name + 1); /* Eliminate leading asterisk */
+        cups_strcpy(name, name + 1); /* Eliminate leading asterisk */
 
       for (i = strlen(name) - 1; i > 0 && isspace(name[i]); i --)
         name[i] = '\0'; /* Eliminate trailing spaces */
@@ -1120,7 +1131,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       */
 
       if (name[0] == '*')
-        strcpy(name, name + 1);
+        cups_strcpy(name, name + 1);
 
       option = ppd_get_option(group, name);
 
@@ -1239,7 +1250,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
       }
 
       if (keyword[0] == '*')
-        strcpy(keyword, keyword + 1);
+        cups_strcpy(keyword, keyword + 1);
 
       if (strcmp(name, "ExitServer") == 0)
         section = PPD_ORDER_EXIT;
@@ -1384,12 +1395,12 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	    */
 
 	    if (constraint->option1[0] == '*')
-	      strcpy(constraint->option1, constraint->option1 + 1);
+	      cups_strcpy(constraint->option1, constraint->option1 + 1);
 
 	    if (constraint->choice1[0] == '*')
-	      strcpy(constraint->option2, constraint->choice1 + 1);
+	      cups_strcpy(constraint->option2, constraint->choice1 + 1);
 	    else
-	      strcpy(constraint->option2, constraint->choice1);
+	      cups_strcpy(constraint->option2, constraint->choice1);
 
             constraint->choice1[0] = '\0';
             constraint->choice2[0] = '\0';
@@ -1397,23 +1408,23 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	    
 	case 3 : /* Two options, one choice... */
 	   /*
-	    * The following strcpy's are safe, as optionN and
+	    * The following cups_strcpy's are safe, as optionN and
 	    * choiceN are all the same size (size defined by PPD spec...)
 	    */
 
 	    if (constraint->option1[0] == '*')
-	      strcpy(constraint->option1, constraint->option1 + 1);
+	      cups_strcpy(constraint->option1, constraint->option1 + 1);
 
 	    if (constraint->choice1[0] == '*')
 	    {
-	      strcpy(constraint->choice2, constraint->option2);
-	      strcpy(constraint->option2, constraint->choice1 + 1);
+	      cups_strcpy(constraint->choice2, constraint->option2);
+	      cups_strcpy(constraint->option2, constraint->choice1 + 1);
               constraint->choice1[0] = '\0';
 	    }
 	    else
 	    {
 	      if (constraint->option2[0] == '*')
-  	        strcpy(constraint->option2, constraint->option2 + 1);
+  	        cups_strcpy(constraint->option2, constraint->option2 + 1);
 
               constraint->choice2[0] = '\0';
 	    }
@@ -1421,10 +1432,10 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	    
 	case 4 : /* Two options, two choices... */
 	    if (constraint->option1[0] == '*')
-	      strcpy(constraint->option1, constraint->option1 + 1);
+	      cups_strcpy(constraint->option1, constraint->option1 + 1);
 
 	    if (constraint->option2[0] == '*')
-  	      strcpy(constraint->option2, constraint->option2 + 1);
+  	      cups_strcpy(constraint->option2, constraint->option2 + 1);
 	    break;
       }
 
@@ -1513,7 +1524,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
         ppd_decode(string);		/* Decode quoted string */
 
       choice->code = string;
-      string = NULL;			/* Don't add as an attribute below */
+      string       = NULL;		/* Don't add as an attribute below */
     }
 #if 0
     else if (strcmp(keyword, "cupsUIType") == 0 &&
@@ -1738,7 +1749,9 @@ ppdOpen(FILE *fp)			/* I - File to read from */
         (mask & (PPD_KEYWORD | PPD_STRING)) == (PPD_KEYWORD | PPD_STRING))
       ppd_add_attr(ppd, keyword, name, text, string);
     else
+    {
       ppd_free(string);
+    }
   }
 
  /*
@@ -1778,7 +1791,8 @@ ppdOpen(FILE *fp)			/* I - File to read from */
   if ((option = ppdFindOption(ppd, "InputSlot")) != NULL)
   {
     for (i = 0; i < option->num_choices; i ++)
-      if (option->choices[i].code == NULL || !option->choices[i].code[0])
+      if (option->choices[i].code == NULL || !option->choices[i].code[0] ||
+          !strncasecmp(option->choices[i].choice, "Auto", 4))
 	break;
 
     if (i >= option->num_choices)
@@ -2291,7 +2305,9 @@ ppd_free_option(ppd_option_t *option)	/* I - Option to free */
     for (i = option->num_choices, choice = option->choices;
          i > 0;
          i --, choice ++)
+    {
       ppd_free(choice->code);
+    }
 
     ppd_free(option->choices);
   }
@@ -2933,5 +2949,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.55 2003/07/20 01:33:11 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.56 2003/07/20 12:51:41 mike Exp $".
  */

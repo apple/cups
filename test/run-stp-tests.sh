@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.4.2.14 2003/04/23 18:39:23 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.4.2.15 2003/07/20 12:51:55 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -91,6 +91,30 @@ user=`whoami`
 port=8631
 cwd=`pwd`
 root=`dirname $cwd`
+
+#
+# See if we want to use valgrind...
+#
+
+echo ""
+echo "This test script can use the Valgrind software from:"
+echo ""
+echo "    http://developer.kde.org/~sewardj/"
+echo ""
+echo "Please enter Y to use Valgrind or N to not use Valgrind:"
+
+read usevalgrind
+
+case "$usevalgrind" in
+	Y* | y*)
+		valgrind="valgrind --logfile=/tmp/$user/log/valgrind --error-limit=no --leak-check=yes --trace-children=yes"
+		echo "Using Valgrind; log files can be found in /tmp/$user/log..."
+		;;
+
+	*)
+		valgrind=""
+		;;
+esac
 
 #
 # Start by creating temporary directories for the tests...
@@ -270,7 +294,7 @@ export HOME
 
 echo "Starting scheduler..."
 
-../scheduler/cupsd -c /tmp/$user/cupsd.conf -f >/tmp/$user/log/debug_log &
+$valgrind ../scheduler/cupsd -c /tmp/$user/cupsd.conf -f >/tmp/$user/log/debug_log &
 cupsd=$!
 
 #if test -x /usr/bin/strace; then
@@ -440,5 +464,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.4.2.14 2003/04/23 18:39:23 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.4.2.15 2003/07/20 12:51:55 mike Exp $"
 #
