@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.5 1999/05/26 20:03:28 mike Exp $"
+ * "$Id: gdevcups.c,v 1.6 1999/06/29 14:38:41 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -311,8 +311,16 @@ private int				/* O - Error status */
 cups_get_params(gx_device     *pdev,	/* I - Device info */
                 gs_param_list *plist)	/* I - Parameter list */
 {
-  int	code;				/* Return code */
+  int			code;		/* Return code */
+  gs_param_string	stringval;	/* String value */
 
+
+#define write_string(pl, ps, s)\
+  stringval.data = (const byte *)(s);\
+  stringval.size = strlen((s));\
+  stringval.persistent = true;\
+  if ((code = param_write_string((pl), (ps), &stringval)) < 0)\
+    return (code);
 
 #ifdef DEBUG
   fprintf(stderr, "DEBUG: cups_get_params(%08x, %08x)\n", pdev, plist);
@@ -1243,7 +1251,7 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
   else if (code == 0) \
   { \
     strncpy(cups->header.name, (const char *)stringval.data, \
-          stringval.size); \
+            stringval.size); \
     cups->header.name[stringval.size] = '\0'; \
   }
 
@@ -2434,5 +2442,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.5 1999/05/26 20:03:28 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.6 1999/06/29 14:38:41 mike Exp $".
  */

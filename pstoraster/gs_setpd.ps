@@ -251,16 +251,27 @@ level2dict begin
 
 % Define the keys used in input attribute matching.
 /.inputattrkeys [
-  /PageSize /MediaColor /MediaWeight /MediaType /InsertSheet
+%%%% MRS - The current CUPS backend driver does not register any of
+%%%%       these attributes with GhostScript from the PPD file.  As
+%%%%       a result, we must comment out everything but PageSize
+%%%%       which is processed differently from all other attributes.
+%  /PageSize /MediaColor /MediaWeight /MediaType /InsertSheet
+  /PageSize
 ] readonly def
 % Define other keys used in media selection.
 /.inputselectionkeys [
-  /MediaPosition /Orientation
+%%%% MRS - The current CUPS backend driver does not register any of
+%%%%       these attributes with GhostScript from the PPD file.  As
+%%%%       a result, we must comment out everything.
+%  /MediaPosition /Orientation
 ] readonly def
 
 % Define the keys used in output attribute matching.
 /.outputattrkeys [
-  /OutputType
+%%%% MRS - The current CUPS backend driver does not register any of
+%%%%       these attributes with GhostScript from the PPD file.  As
+%%%%       a result, we must comment out everything.
+%  /OutputType
 ] readonly def
 
 % Define all the parameters that should always be copied to the merged
