@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.21 2003/01/29 15:38:43 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.22 2003/01/31 21:24:22 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -44,6 +44,7 @@
 #include <cups/language.h>
 #include <cups/string.h>
 #include <signal.h>
+#include <sys/wait.h>
 
 
 /*
@@ -1003,11 +1004,13 @@ run_pictwps_filter(char **argv,			/* I - Command-line arguments */
   {
     fprintf(stderr, "ERROR: Unable to get PPD file for printer \"%s\" - %s.\n",
             printer, ippErrorString(cupsLastError()));
-    return (-1);
+    /*return (-1);*/
   }
-
-  snprintf(ppdenv, sizeof(ppdenv), "PPD=%s", ppdfile);
-  putenv(ppdenv);
+  else
+  {
+    snprintf(ppdenv, sizeof(ppdenv), "PPD=%s", ppdfile);
+    putenv(ppdenv);
+  }
 
  /*
   * Then create a temporary file for printing...
@@ -1016,7 +1019,9 @@ run_pictwps_filter(char **argv,			/* I - Command-line arguments */
   if ((fd = cupsTempFd(filename, length)) < 0)
   {
     fprintf(stderr, "ERROR: Unable to create temporary file - %s.\n",
-            printer, strerror(errno));
+            strerror(errno));
+    if (ppdfile)
+      unlink(ppdfile);
     return (-1);
   }
 
@@ -1026,6 +1031,11 @@ run_pictwps_filter(char **argv,			/* I - Command-line arguments */
   */
 
   stat(argv[6], &fileinfo);
+
+  if (ppdfile)
+    chown(ppdfile, fileinfo.st_uid, fileinfo.st_gid);
+
+  fchown(fd, fileinfo.st_uid, fileinfo.st_gid);
 
  /*
   * Finally, run the filter to convert the file...
@@ -1057,15 +1067,19 @@ run_pictwps_filter(char **argv,			/* I - Command-line arguments */
     perror("ERROR: Unable to exec pictwpstops");
     return (errno);
   }
-  else if (pid < 0)
+
+  close(fd);
+
+  if (pid < 0)
   {
    /*
     * Error!
     */
 
     perror("ERROR: Unable to fork pictwpstops");
-    close(fd);
     unlink(filename);
+    if (ppdfile)
+      unlink(ppdfile);
     return (-1);
   }
 
@@ -1078,8 +1092,13 @@ run_pictwps_filter(char **argv,			/* I - Command-line arguments */
     perror("ERROR: Unable to wait for pictwpstops");
     close(fd);
     unlink(filename);
+    if (ppdfile)
+      unlink(ppdfile);
     return (-1);
   }
+
+  if (ppdfile)
+    unlink(ppdfile);
 
   close(fd);
 
@@ -1106,5 +1125,5 @@ run_pictwps_filter(char **argv,			/* I - Command-line arguments */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.21 2003/01/29 15:38:43 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.22 2003/01/31 21:24:22 mike Exp $".
  */
