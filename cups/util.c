@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.39 1999/10/25 17:27:11 mike Exp $"
+ * "$Id: util.c,v 1.40 1999/12/07 17:14:35 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -367,6 +367,7 @@ cupsGetClasses(char ***classes)	/* O - Classes */
 		*response;	/* IPP Response */
   ipp_attribute_t *attr;	/* Current attribute */
   cups_lang_t	*language;	/* Default language */
+  char		**temp;		/* Temporary pointer */
 
 
  /*
@@ -392,10 +393,10 @@ cupsGetClasses(char ***classes)	/* O - Classes */
   language = cupsLangDefault();
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                      "attributes-charset", NULL, cupsLangEncoding(language));
+               "attributes-charset", NULL, cupsLangEncoding(language));
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                      "attributes-natural-language", NULL, language->language);
+               "attributes-natural-language", NULL, language->language);
 
  /*
   * Do the request and get back a response...
@@ -404,7 +405,7 @@ cupsGetClasses(char ***classes)	/* O - Classes */
   n        = 0;
   *classes = NULL;
 
-  if ((response = cupsDoRequest(cups_server, request, "/classes/")) != NULL)
+  if ((response = cupsDoRequest(cups_server, request, "/")) != NULL)
   {
     last_error = response->request.status.status_code;
 
@@ -413,17 +414,29 @@ cupsGetClasses(char ***classes)	/* O - Classes */
           attr->value_tag == IPP_TAG_NAME)
       {
         if (n == 0)
-	  *classes = malloc(sizeof(char *));
+	  temp = malloc(sizeof(char *));
 	else
-	  *classes = realloc(*classes, sizeof(char *) * (n + 1));
+	  temp = realloc(*classes, sizeof(char *) * (n + 1));
 
-	if (*classes == NULL)
+	if (temp == NULL)
 	{
+	 /*
+	  * Ran out of memory!
+	  */
+
+          while (n > 0)
+	  {
+	    n --;
+	    free((*classes)[n]);
+	  }
+
+	  free(*classes);
 	  ippDelete(response);
 	  return (0);
 	}
 
-        (*classes)[n] = strdup(attr->values[0].string.text);
+        *classes = temp;
+        temp[n]  = strdup(attr->values[0].string.text);
 	n ++;
       }
 
@@ -646,6 +659,7 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
 		*response;	/* IPP Response */
   ipp_attribute_t *attr;	/* Current attribute */
   cups_lang_t	*language;	/* Default language */
+  char		**temp;		/* Temporary pointer */
 
 
  /*
@@ -671,10 +685,10 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
   language = cupsLangDefault();
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                      "attributes-charset", NULL, cupsLangEncoding(language));
+               "attributes-charset", NULL, cupsLangEncoding(language));
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                      "attributes-natural-language", NULL, language->language);
+               "attributes-natural-language", NULL, language->language);
 
  /*
   * Do the request and get back a response...
@@ -683,7 +697,7 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
   n         = 0;
   *printers = NULL;
 
-  if ((response = cupsDoRequest(cups_server, request, "/printers/")) != NULL)
+  if ((response = cupsDoRequest(cups_server, request, "/")) != NULL)
   {
     last_error = response->request.status.status_code;
 
@@ -692,17 +706,29 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
           attr->value_tag == IPP_TAG_NAME)
       {
         if (n == 0)
-	  *printers = malloc(sizeof(char *));
+	  temp = malloc(sizeof(char *));
 	else
-	  *printers = realloc(*printers, sizeof(char *) * (n + 1));
+	  temp = realloc(*printers, sizeof(char *) * (n + 1));
 
-	if (*printers == NULL)
+	if (temp == NULL)
 	{
+	 /*
+	  * Ran out of memory!
+	  */
+
+	  while (n > 0)
+	  {
+	    n --;
+	    free((*printers)[n]);
+	  }
+
+	  free(*printers);
 	  ippDelete(response);
 	  return (0);
 	}
 
-        (*printers)[n] = strdup(attr->values[0].string.text);
+        *printers = temp;
+        temp[n]   = strdup(attr->values[0].string.text);
 	n ++;
       }
 
@@ -1077,5 +1103,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.39 1999/10/25 17:27:11 mike Exp $".
+ * End of "$Id: util.c,v 1.40 1999/12/07 17:14:35 mike Exp $".
  */
