@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.32 2004/06/29 02:45:24 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.33 2004/06/29 03:18:10 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -272,6 +272,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * See if there are any options...
   */
 
+  version     = 1;
   waitjob     = 1;
   waitprinter = 1;
 
@@ -361,6 +362,18 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	  fprintf(stderr, "ERROR: Unknown encryption option value \"%s\"!\n",
 	          value);
         }
+      }
+      else if (!strcasecmp(name, "version"))
+      {
+        if (!strcmp(value, "1.0"))
+	  version = 0;
+	else if (!strcmp(value, "1.1"))
+	  version = 1;
+	else
+	{
+	  fprintf(stderr, "ERROR: Unknown version option value \"%s\"!\n",
+	          value);
+	}
       }
       else
       {
@@ -464,7 +477,6 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   charset_sup = NULL;
   copies_sup  = NULL;
   format_sup  = NULL;
-  version     = 1;
   supported   = NULL;
 
   do
@@ -1366,5 +1378,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.32 2004/06/29 02:45:24 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.33 2004/06/29 03:18:10 mike Exp $".
  */
