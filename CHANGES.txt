@@ -1,8 +1,11 @@
-CHANGES.txt - 08/19/2004
+CHANGES.txt - 08/23/2004
 ------------------------
 
 CHANGES IN CUPS V1.1.21rc2
 
+	- The scheduler used a select() timeout of INT_MAX
+	  seconds when there was nothing to do, which doesn't
+	  work on IRIX (STR #864)
 	- Updated the cupsaddsmb program to use the new Windows
 	  2000 PostScript drivers instead of the Windows NT
 	  printer drivers (STR #390)

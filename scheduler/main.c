@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.121 2004/08/18 17:57:53 mike Exp $"
+ * "$Id: main.c,v 1.122 2004/08/23 18:00:59 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -491,11 +491,11 @@ main(int  argc,				/* I - Number of command-line arguments */
 
      /*
       * Restart if all clients are closed and all jobs finished, or
-      * if 60 seconds has elapsed...
+      * if the reload timeout has elapsed...
       */
 
       if ((NumClients == 0 && (!job || NeedReload != RELOAD_ALL)) ||
-          (time(NULL) - ReloadTime) >= ReloadTime)
+          (time(NULL) - ReloadTime) >= ReloadTimeout)
       {
         if (!ReadConfiguration())
         {
@@ -1186,7 +1186,7 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
   */
 
   now     = time(NULL);
-  timeout = 2147483647;
+  timeout = now + 86400;		/* 86400 == 1 day */
   why     = "do nothing";
 
  /*
@@ -1276,23 +1276,16 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
   }
 
  /*
-  * Adjust the timeout as needed...
+  * Adjust from absolute to relative time.  If p->browse_time above
+  * was 0 then we can end up with a negative value here, so check.
+  * We add 1 second to the timeout since events occur after the
+  * timeout expires...
   */
 
-  if (timeout != 2147483647)
-  {
-   /*
-    * Adjust from absolute to relative time.  If p->browse_time above
-    * was 0 then we can end up with a negative value here, so check.
-    * We add 1 second to the timeout since events occur after the
-    * timeout expires...
-    */
+  timeout = timeout - now + 1;
 
-    timeout = timeout - now + 1;
-
-    if (timeout < 1)
-      timeout = 1;
-  }
+  if (timeout < 1)
+    timeout = 1;
 
  /*
   * Log and return the timeout value...
@@ -1317,5 +1310,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.121 2004/08/18 17:57:53 mike Exp $".
+ * End of "$Id: main.c,v 1.122 2004/08/23 18:00:59 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.63 2004/08/18 17:57:53 mike Exp $"
+ * "$Id: conf.h,v 1.64 2004/08/23 18:00:59 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -16,9 +16,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  */
@@ -96,8 +96,6 @@ VAR char		*SystemGroups[MAX_SYSTEM_GROUPS],
 					/* GUI program to use for IRIX */
 			*FontPath		VALUE(NULL),
 					/* Font search path */
-			*ReloadTimeout		VALUE(0),
-					/* Timeout before reload from SIGHUP */
 			*RemoteRoot		VALUE(NULL),
 					/* Remote root user */
 			*Classification		VALUE(NULL);
@@ -148,6 +146,8 @@ VAR int			ClassifyOverride	VALUE(0),
 					/* Current filter level */
 			FilterNice		VALUE(0),
 					/* Nice value for filters */
+			ReloadTimeout		VALUE(0),
+					/* Timeout before reload from SIGHUP */
 			RootCertDuration	VALUE(300),
 					/* Root certificate update interval */
 			RunAsUser		VALUE(FALSE),
@@ -197,5 +197,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.63 2004/08/18 17:57:53 mike Exp $".
+ * End of "$Id: conf.h,v 1.64 2004/08/23 18:00:59 mike Exp $".
  */
