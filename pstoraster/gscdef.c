@@ -49,7 +49,7 @@ const char *gs_copyright = GS_COPYRIGHT;
 
 #ifndef GS_PRODUCT
 #  define GS_PRODUCT\
-	"ESP Print Pro v4.0"
+	"ESP Print Pro v4.1"
 #endif
 const char *gs_product = GS_PRODUCT;
 
