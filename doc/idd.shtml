@@ -1311,7 +1311,30 @@ raster data for that page.
 	6 = CMYK<BR>
 	7 = YMCK<BR>
 	8 = KCMY<BR>
-	9 = KCMYcm</TD>
+	9 = KCMYcm<BR>
+	10 = GMCK<BR>
+	11 = GMCS<BR>
+	12 = WHITE<BR>
+	13 = GOLD<BR>
+	14 = SILVER<BR>
+	15 = CIE XYZ<BR>
+	16 = CIE Lab<BR>
+	32 = ICC1<BR>
+	33 = ICC2<BR>
+	34 = ICC3<BR>
+	35 = ICC4<BR>
+	36 = ICC5<BR>
+	37 = ICC6<BR>
+	38 = ICC7<BR>
+	39 = ICC8<BR>
+	40 = ICC9<BR>
+	41 = ICCA (10)<BR>
+	42 = ICCB (11)<BR>
+	43 = ICCC (12)<BR>
+	44 = ICCD (13)<BR>
+	45 = ICCE (14)<BR>
+	46 = ICCF (15)<BR>
+	</TD>
 </TR>
 <TR>
 	<TD>404-407</TD>
