@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.27 1999/08/10 17:23:18 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.28 1999/08/28 16:21:57 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -296,7 +296,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     resolution = "";
 
  /*
-  * Choose the appropriate colorspace and color profile...
+  * Choose the appropriate colorspace...
   */
 
   switch (header.cupsColorSpace)
@@ -388,12 +388,25 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (ppd != NULL)
   {
+    fprintf(stderr, "DEBUG: Searching for profile \"%s/%s\"...\n",
+            resolution, media_type);
+
     for (i = 0, profile = ppd->profiles; i < ppd->num_profiles; i ++, profile ++)
+    {
+      fprintf(stderr, "DEBUG: \"%s/%s\" = ", profile->resolution,
+              profile->media_type);
+
       if ((strcmp(profile->resolution, resolution) == 0 ||
            profile->resolution[0] == '-') &&
           (strcmp(profile->media_type, media_type) == 0 ||
            profile->media_type[0] == '-'))
+      {
+        fputs("MATCH!\n", stderr);
 	break;
+      }
+      else
+        fputs("no.\n", stderr);
+    }
 
    /*
     * If we found a color profile, use it!
@@ -3835,5 +3848,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.27 1999/08/10 17:23:18 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.28 1999/08/28 16:21:57 mike Exp $".
  */
