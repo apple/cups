@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.27 2003/01/28 15:29:40 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.28 2003/01/28 15:37:53 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -170,7 +170,6 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
   ppd_free(ppd->modelname);
   ppd_free(ppd->ttrasterizer);
   ppd_free(ppd->manufacturer);
-  ppd_free(ppd->product);
   ppd_free(ppd->nickname);
   ppd_free(ppd->shortnickname);
 
@@ -461,7 +460,16 @@ ppdOpen(FILE *fp)			/* I - File to read from */
     }
     else if (strcmp(keyword, "Product") == 0)
     {
-      ppd_free(ppd->product);
+     /*
+      * Add each Product keyword as an attribute...
+      */
+
+      ppd_add_attr(ppd, keyword, "", string);
+
+     /*
+      * Save the last one in the product element...
+      */
+
       ppd->product = string;
       string = NULL;			/* Don't free this string below */
     }
@@ -2600,5 +2608,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.27 2003/01/28 15:29:40 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.28 2003/01/28 15:37:53 mike Exp $".
  */
