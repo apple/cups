@@ -1,21 +1,19 @@
 <H2>System Overview</H2>
 
-<P>The Common UNIX Printing System<SUP>TM</SUP> ("CUPS") provides a portable
-printing layer for 
-UNIX&reg; operating systems. It has been developed by
+<P>CUPS provides a portable printing layer for UNIX&reg;-based
+operating systems. It has been developed by
 <A HREF="http://www.easysw.com">Easy Software Products</A> to promote a
-standard printing solution for all UNIX vendors and users. CUPS provides
-the System V and Berkeley command-line interfaces.
+standard printing solution for all UNIX vendors and users. CUPS
+provides the System V and Berkeley command-line interfaces.
 
-<P>CUPS uses the Internet Printing Protocol (IETF-IPP) as the basis
-for managing print jobs and queues. The Line Printer Daemon (LPD,
-RFC1179), Server Message Block (SMB), and AppSocket protocols are also
-supported with reduced functionality.
+<P>CUPS uses the Internet Printing Protocol ("IPP") as the basis for
+managing print jobs and queues. The Line Printer Daemon ("LPD") Server
+Message Block ("SMB"), and AppSocket (a.k.a. JetDirect) protocols are
+also supported with reduced functionality. CUPS adds network printer
+browsing and PostScript Printer Description ("PPD") based
+printing options to support real-world printing under UNIX.
 
-<P>CUPS adds network printer browsing and PostScript Printer
-Description (&quot;PPD&quot;)-based printing options to support real-world
-printing under UNIX.
-
-<P>CUPS also includes a customized version of GNU GhostScript
-(currently based off GNU GhostScript 5.50) and an image file RIP that
-are used to support non-PostScript printers.
+<P>CUPS also includes a customized version of GNU Ghostscript
+(currently based off GNU Ghostscript 5.50) and an image file RIP that
+are used to support non-PostScript printers. Sample drivers for HP and
+EPSON printers are included that use these filters.

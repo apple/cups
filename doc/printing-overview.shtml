@@ -5,9 +5,9 @@ works.
 
 <H2>The Printing Problem</H2>
 
-<P>For years <I>the printing problem</I> has plagued UNIX&reg;. Unlike
-Microsoft&reg; Windows&reg; or MacOS, UNIX has no standard interface or
-system in place for supporting printers. Among the solutions previously
+<P>For years <I>the printing problem</I> has plagued UNIX. Unlike
+Microsoft&reg; Windows&reg; or Mac OS, UNIX has no standard interface or
+system in place for supporting printers. Among the solutions currently
 available, the Berkeley and System V printing systems are the most
 prevalent.
 
@@ -15,26 +15,25 @@ prevalent.
 PostScript printers (text and graphics), and with some coaxing they can
 be made to support a full range of printers and file formats. However,
 because each varient of the UNIX operating system uses a different
-printing system than the next, developing printer drivers for a wide
+printing system than the next developing printer drivers for a wide
 range of printers and operating systems is extremely difficult. That
 combined with the limited volume of customers for each UNIX varient has
 forced most printer vendors to give up supporting UNIX entirely.
 
-<P>The Common UNIX Printing System ("CUPS") is designed to eliminate
-<I>the printing problem</I>. One common printing system can be used by
-all UNIX varients to support the printing needs of users. Printer
-vendors can use its modular filter interface to develop a single driver
-program that supports a wide range of file formats with little or no
-effort.  Since CUPS provides both the System V and Berkeley printing
-commands, users (and applications) can reap the benefits of this new
-technology with no changes.
+<P>CUPS is designed to eliminate <I>the printing problem</I>. One
+common printing system can be used by all UNIX varients to support the
+printing needs of users. Printer vendors can use its modular filter
+interface to develop a single driver program that supports a wide range
+of file formats with little or no effort.  Since CUPS provides both the
+System V and Berkeley printing commands, users (and applications) can
+reap the benefits of this new technology with no changes.
 
 <H2>The Technology</H2>
 
 <P>CUPS is based upon an emerging Internet standard called the Internet
-Printing Protocol ("IPP"). IPP has been embraced by dozens of printer
-and printer server manufacturers, and is supported by the Microsoft
-Windows 2000.
+Printing Protocol. IPP has been embraced by dozens of printer and
+printer server manufacturers and is supported by Microsoft Windows
+2000.
 
 <P>IPP defines a standard protocol for printing as well as managing
 print jobs and printer options like media size, resolution, and so
@@ -57,7 +56,7 @@ versions of CUPS.
 <H2>Jobs</H2>
 
 <P>Each file or set of files that is submitted for printing is called a
-<I>job</I>.  Jobs are identified by a unique number starting at 1 and
+<I>job</I>. Jobs are identified by a unique number starting at 1 and
 are assigned to a particular destination, usually a printer. Jobs can
 also have options associated with them such as media size, number of
 copies, and priority.
@@ -90,11 +89,11 @@ filtered print data to the printer.
 <P>CUPS provides backends for printing over parallel, serial, and USB
 ports, and over the network via the IPP, JetDirect (AppSocket), and
 Line Printer Daemon ("LPD") protocols. Additional backends are
-available in other network service packages such as the SMB backend
+available in network service packages such as the SMB backend
 included with the popular SAMBA software.
 
-<P>Backends are also used to determine the available devices; on
-startup, each backend is asked for a list of devices it supports,
+<P>Backends are also used to determine the available devices. On
+startup each backend is asked for a list of devices it supports,
 and any information that is available. This allows the parallel
 backend to tell CUPS that an EPSON Stylus Color 600 printer is
 attached to parallel port 1, for example.
@@ -114,11 +113,8 @@ incorporate them into CUPS.
 <P>Printers and classes on the local system are automatically shared
 with other systems on the network. This allows you to setup one system
 to print to a printer and use this system as a printer server or spool
-host for all of the others.  If there is only one occurrence of a
-printer on a network, then that printer can be accessed using its name
-alone. If more than one printer exists with the same name, users must
-select the printer by specifying which server to use (e.g.
-"printer@host1" or "printer@host2".)
+host for all of the others. Users may then select a local printer by
+name or a remote printer using "name@server".
 
 <P>CUPS also provides <I>implicit classes</I>, which are collections of
 printers and/or classes with the same name. This allows you to setup

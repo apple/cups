@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.20 2000/04/20 19:56:44 mike Exp $"
+# "$Id: Makefile,v 1.21 2000/05/08 21:13:36 mike Exp $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -24,8 +24,10 @@
 
 include ../Makedefs
 
-TARGETS	=	accept cancel lp lpadmin lpoptions lppasswd lpstat
-OBJS	=	accept.o cancel.o lp.o lpadmin.o lpoptions.o lppasswd.o lpstat.o
+TARGETS	=	accept cancel lp lpadmin lpinfo lpmove lpoptions lppasswd \
+		lpstat
+OBJS	=	accept.o cancel.o lp.o lpadmin.o lpinfo.o lpmove.o \
+		lpoptions.o lppasswd.o lpstat.o
 
 
 #
@@ -50,7 +52,7 @@ clean:
 install:	$(INSTALL_SYSV)
 	-$(MKDIR) $(BINDIR)
 	-$(MKDIR) $(LIBDIR)
-	$(INSTALL_BIN) accept lpadmin $(SBINDIR)
+	$(INSTALL_BIN) accept lpadmin lpinfo lpmove $(SBINDIR)
 	$(INSTALL_BIN) cancel lp lpoptions lppasswd lpstat $(BINDIR)
 	$(CHMOD) u+s $(BINDIR)/lppasswd
 	$(RM) $(SBINDIR)/reject
@@ -63,6 +65,8 @@ install:	$(INSTALL_SYSV)
 install-sysv:
 	$(RM) $(LIBDIR)/lpadmin
 	$(LN) ../sbin/lpadmin $(LIBDIR)
+	$(RM) $(LIBDIR)/lpmove
+	$(LN) ../sbin/lpmove $(LIBDIR)
 	$(RM) $(LIBDIR)/accept
 	$(LN) ../sbin/accept $(LIBDIR)
 	$(RM) $(LIBDIR)/reject
@@ -114,6 +118,28 @@ lpadmin.o:	../cups/cups.h
 
 
 #
+# lpinfo
+#
+
+lpinfo:	lpinfo.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o lpinfo lpinfo.o $(LIBS)
+
+lpinfo.o:	../cups/cups.h
+
+
+#
+# lpmove
+#
+
+lpmove:	lpmove.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o lpmove lpmove.o $(LIBS)
+
+lpmove.o:	../cups/cups.h
+
+
+#
 # lpoptions
 #
 
@@ -149,5 +175,5 @@ lpstat.o:	../cups/cups.h
 $(OBJS):	../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.20 2000/04/20 19:56:44 mike Exp $".
+# End of "$Id: Makefile,v 1.21 2000/05/08 21:13:36 mike Exp $".
 #

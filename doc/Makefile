@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.21 2000/04/09 23:09:02 mike Exp $"
+# "$Id: Makefile,v 1.22 2000/05/08 21:13:34 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -128,6 +128,9 @@ install:
 overview.pdf:	overview.html
 	echo Formatting $@...
 	htmldoc --duplex --compression=9 --jpeg --webpage -f overview.pdf overview.html
+overview.ps:	overview.html
+	echo Formatting $@...
+	htmldoc --duplex --jpeg --webpage -f overview.ps overview.html
 
 sam.html:	sam.shtml
 	echo Formatting $@...
@@ -136,6 +139,9 @@ sam.pdf:	sam.shtml
 	echo Formatting $@...
 	htmldoc --titleimage images/cups-large.gif --duplex --compression=9 \
 		--jpeg -f $@ $<
+sam.ps:		sam.shtml
+	echo Formatting $@...
+	htmldoc --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
 
 spm.html:	spm.shtml
 	echo Formatting $@...
@@ -144,6 +150,9 @@ spm.pdf:	spm.shtml
 	echo Formatting $@...
 	htmldoc --titleimage images/cups-large.gif --duplex --compression=9 \
 		--jpeg -f $@ $<
+spm.ps:		spm.shtml
+	echo Formatting $@...
+	htmldoc --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
 
 sum.html:	sum.shtml
 	echo Formatting $@...
@@ -152,6 +161,9 @@ sum.pdf:	sum.shtml
 	echo Formatting $@...
 	htmldoc --titleimage images/cups-large.gif --duplex --compression=9 \
 		--jpeg -f $@ $<
+sum.ps:		sum.shtml
+	echo Formatting $@...
+	htmldoc --titleimage images/cups-large.gif --duplex --jpeg -f $@ $<
 
 #
 # End of Makefile.
