@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.17 2003/04/08 03:45:20 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.18 2003/04/23 18:38:37 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -47,10 +47,10 @@ echo ""
 echo "OK, now that we have the Dirty Harry quote out of the way, please"
 echo "choose the type of test you wish to perform:"
 echo ""
-echo "1 - Basic conformance test with no load testing (all systems)"
-echo "2 - Basic conformance test with some load testing (minimum 256MB VM)"
-echo "3 - Basic conformance test with extreme load testing (minimum 1024MB VM)"
-echo "4 - Basic conformance test with torture load testing (minimum 2048MB VM)"
+echo "1 - Basic conformance test, no load testing (all systems)"
+echo "2 - Basic conformance test, some load testing (minimum 256MB VM, 50MB disk)"
+echo "3 - Basic conformance test, extreme load testing (minimum 1GB VM, 500MB disk)"
+echo "4 - Basic conformance test, torture load testing (minimum 2GB VM, 1GB disk)"
 echo ""
 echo "Please enter the number of the test you wish to perform:"
 
@@ -128,7 +128,6 @@ ln -s $root/filter/rastertoepson /tmp/$user/bin/filter
 ln -s $root/filter/rastertohp /tmp/$user/bin/filter
 ln -s $root/filter/texttops /tmp/$user/bin/filter
 ln -s $root/pdftops/pdftops /tmp/$user/bin/filter
-ln -s $root/pstoraster/pstoraster /tmp/$user/bin/filter
 
 ln -s $root/data/classified /tmp/$user/share/banners
 ln -s $root/data/confidential /tmp/$user/share/banners
@@ -140,7 +139,6 @@ ln -s $root/data /tmp/$user/share/charsets
 ln -s $root/data /tmp/$user/share
 ln -s $root/fonts /tmp/$user/share
 ln -s $root/ppd/*.ppd /tmp/$user/share/model
-ln -s $root/pstoraster /tmp/$user/share
 ln -s $root/templates /tmp/$user/share
 
 #
@@ -159,6 +157,7 @@ FontPath /tmp/$user/share/fonts
 DocumentRoot $root/doc
 RequestRoot /tmp/$user/spool
 TempDir /tmp/$user/spool/temp
+MaxLogSize 0
 AccessLog /tmp/$user/log/access_log
 ErrorLog /tmp/$user/log/error_log
 PageLog /tmp/$user/log/page_log
@@ -429,5 +428,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.17 2003/04/08 03:45:20 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.18 2003/04/23 18:38:37 mike Exp $"
 #
