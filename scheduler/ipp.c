@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.25 1999/09/03 14:45:44 mike Exp $"
+ * "$Id: ipp.c,v 1.26 1999/09/23 18:21:55 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -175,6 +175,13 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
       else
 	uri = NULL;
 
+      ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	   "attributes-charset", NULL, charset->values[0].string.text);
+
+      ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                   "attributes-natural-language", NULL,
+		   language->values[0].string.text);
+
       if (charset == NULL || language == NULL ||
 	  (uri == NULL && con->request->request.op.operation_id < IPP_PRIVATE))
       {
@@ -190,14 +197,6 @@ ProcessIPPRequest(client_t *con)	/* I - Client connection */
       }
       else
       {
-	attr = ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                	    "attributes-charset", NULL,
-			    charset->values[0].string.text);
-
-	attr = ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                	    "attributes-natural-language", NULL,
-			    language->values[0].string.text);
-
        /*
 	* OK, all the checks pass so far; try processing the operation...
 	*/
@@ -2039,12 +2038,6 @@ send_ipp_error(client_t     *con,	/* I - Client connection */
     unlink(con->filename);
 
   con->response->request.status.status_code = status;
-
-  ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, DefaultCharset);
-
-  ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, DefaultLanguage);
 }
 
 
@@ -2441,5 +2434,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.25 1999/09/03 14:45:44 mike Exp $".
+ * End of "$Id: ipp.c,v 1.26 1999/09/23 18:21:55 mike Exp $".
  */
