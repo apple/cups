@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.2 2000/01/27 03:25:35 mike Exp $"
+ * "$Id: dest.c,v 1.3 2000/02/28 19:18:57 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -340,7 +340,7 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
   */
 
   if ((fp = fopen(filename, "r")) == NULL)
-    return;
+    return (0);
 
  /*
   * Read each printer; each line looks like:
@@ -418,7 +418,7 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
       */
 
       fclose(fp);
-      return;
+      return (0);
     }
 
    /*
@@ -475,9 +475,11 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
   */
 
   fclose(fp);      
+
+  return (num_dests);
 }
 
 
 /*
- * End of "$Id: dest.c,v 1.2 2000/01/27 03:25:35 mike Exp $".
+ * End of "$Id: dest.c,v 1.3 2000/02/28 19:18:57 mike Exp $".
  */
