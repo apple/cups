@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.15 2003/01/04 15:29:22 mike Exp $"
+ * "$Id: listen.c,v 1.16 2003/01/23 16:26:38 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -131,8 +131,8 @@ StartListening(void)
     * Didn't find it!  Use an address of 0...
     */
 
-    LogMessage(L_ERROR, "StartListening: Unable to find IP address for server name \"%s\"!\n",
-               ServerName);
+    LogMessage(L_ERROR, "StartListening: Unable to find IP address for server name \"%s\" - %s\n",
+               ServerName, hstrerror(h_errno));
 
     ServerAddr.sin_family = AF_INET;
   }
@@ -218,5 +218,5 @@ StopListening(void)
 
 
 /*
- * End of "$Id: listen.c,v 1.15 2003/01/04 15:29:22 mike Exp $".
+ * End of "$Id: listen.c,v 1.16 2003/01/23 16:26:38 mike Exp $".
  */

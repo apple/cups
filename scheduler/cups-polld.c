@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-polld.c,v 1.13 2002/12/17 19:00:15 swdev Exp $"
+ * "$Id: cups-polld.c,v 1.14 2003/01/23 16:26:38 mike Exp $"
  *
  *   Polling daemon for the Common UNIX Printing System (CUPS).
  *
@@ -116,7 +116,7 @@ main(int  argc,				/* I - Number of command-line arguments */
                                     cupsEncryption())) == NULL)
   {
     fprintf(stderr, "cups-polld: Unable to connect to %s on port %s: %s\n",
-            argv[1], argv[2], strerror(errno));
+            argv[1], argv[2], h_errno ? hstrerror(h_errno) : strerror(errno));
     sleep (interval);
   }
 
@@ -379,5 +379,5 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: cups-polld.c,v 1.13 2002/12/17 19:00:15 swdev Exp $".
+ * End of "$Id: cups-polld.c,v 1.14 2003/01/23 16:26:38 mike Exp $".
  */

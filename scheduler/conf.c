@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.113 2003/01/15 04:15:48 mike Exp $"
+ * "$Id: conf.c,v 1.114 2003/01/23 16:26:37 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -1883,7 +1883,7 @@ get_address(char               *value,		/* I - Value string */
     if ((host = httpGetHostByName(hostname)) == NULL)
     {
       LogMessage(L_ERROR, "httpGetHostByName(\"%s\") failed - %s!", hostname,
-                 strerror(errno));
+                 hstrerror(h_errno));
       return (0);
     }
 
@@ -1913,5 +1913,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.113 2003/01/15 04:15:48 mike Exp $".
+ * End of "$Id: conf.c,v 1.114 2003/01/23 16:26:37 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.66 2002/12/17 18:56:33 swdev Exp $"
+ * "$Id: ipp.c,v 1.67 2003/01/23 16:26:36 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -248,6 +248,12 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       {
 	fprintf(stderr, "INFO: Network host \'%s\' is busy; will retry in 30 seconds...",
                 hostname);
+	sleep(30);
+      }
+      else if (h_errno)
+      {
+        fprintf(stderr, "INFO: Unable to lookup host \'%s\' - %s\n",
+	        hostname, hstrerror(h_errno));
 	sleep(30);
       }
       else
@@ -902,5 +908,5 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
 
 
 /*
- * End of "$Id: ipp.c,v 1.66 2002/12/17 18:56:33 swdev Exp $".
+ * End of "$Id: ipp.c,v 1.67 2003/01/23 16:26:36 mike Exp $".
  */
