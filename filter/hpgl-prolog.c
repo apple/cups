@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.22 2000/01/28 17:14:21 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.23 2000/01/28 17:22:44 mike Exp $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
@@ -369,9 +369,5 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
-<<<<<<< hpgl-prolog.c
- * End of "$Id: hpgl-prolog.c,v 1.22 2000/01/28 17:14:21 mike Exp $".
-=======
- * End of "$Id: hpgl-prolog.c,v 1.22 2000/01/28 17:14:21 mike Exp $".
->>>>>>> 1.20.4.2
+ * End of "$Id: hpgl-prolog.c,v 1.23 2000/01/28 17:22:44 mike Exp $".
  */
