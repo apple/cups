@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.96 2004/10/04 19:48:56 mike Exp $"
+ * "$Id: job.c,v 1.124.2.97 2004/10/04 20:24:17 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1340,6 +1340,7 @@ StartJob(int       id,			/* I - Job ID */
 		classification[1024],	/* CLASSIFICATION environment variable */
 		content_type[1024],	/* CONTENT_TYPE environment variable */
 		device_uri[1024],	/* DEVICE_URI environment variable */
+		sani_uri[1024],		/* Sanitized DEVICE_URI env var */
 		ppd[1024],		/* PPD environment variable */
 		class_name[255],	/* CLASS environment variable */
 		printer_name[255],	/* PRINTER environment variable */
@@ -1944,7 +1945,12 @@ StartJob(int       id,			/* I - Job ID */
   envp[envc] = NULL;
 
   for (i = 0; i < envc; i ++)
-    LogMessage(L_DEBUG, "StartJob: envp[%d]=\"%s\"", i, envp[i]);
+    if (strncmp(envp[i], "DEVICE_URI=", 11))
+      LogMessage(L_DEBUG, "StartJob: envp[%d]=\"%s\"", i, envp[i]);
+    else
+      LogMessage(L_DEBUG, "StartJob: envp[%d]=\"DEVICE_URI=%s\"", i,
+                 cupsdSanitizeURI(printer->device_uri, sani_uri,
+		                  sizeof(sani_uri)));
 
   current->current_file ++;
 
@@ -2802,5 +2808,5 @@ set_hold_until(job_t *job, 		/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.96 2004/10/04 19:48:56 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.97 2004/10/04 20:24:17 mike Exp $".
  */

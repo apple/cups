@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.68 2004/10/04 19:48:56 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.69 2004/10/04 20:24:17 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -43,6 +43,7 @@
  *   ValidateDest()         - Validate a printer/class destination.
  *   WritePrintcap()        - Write a pseudo-printcap file for older
  *                            applications that need it...
+ *   cupsdSanitizeURI()     - Sanitize a device URI...
  *   write_irix_config()    - Update the config files used by the IRIX
  *                            desktop tools.
  *   write_irix_state()     - Update the status files used by IRIX printing
@@ -1189,11 +1190,7 @@ void
 SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 {
   char		uri[HTTP_MAX_URI];	/* URI for printer */
-  char		method[HTTP_MAX_URI],	/* Method portion of URI */
-		username[HTTP_MAX_URI],	/* Username portion of URI */
-		host[HTTP_MAX_URI],	/* Host portion of URI */
-		resource[HTTP_MAX_URI];	/* Resource portion of URI */
-  int		port;			/* Port portion of URI */
+  char		resource[HTTP_MAX_URI];	/* Resource portion of URI */
   int		i;			/* Looping var */
   char		filename[1024];		/* Name of PPD file */
   int		num_media;		/* Number of media options */
@@ -1399,12 +1396,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
         * http://..., ipp://..., etc.
 	*/
 
-        httpSeparate(p->device_uri, method, username, host, &port, resource);
-	if (port)
-	  snprintf(uri, sizeof(uri), "%s://%s:%d%s", method, host, port,
-	           resource);
-	else
-	  snprintf(uri, sizeof(uri), "%s://%s%s", method, host, resource);
+        cupsdSanitizeURI(p->device_uri, uri, sizeof(uri));
       }
       else
       {
@@ -2231,6 +2223,74 @@ WritePrintcap(void)
 }
 
 
+/*
+ * 'cupsdSanitizeURI()' - Sanitize a device URI...
+ */
+
+char *					/* O - New device URI */
+cupsdSanitizeURI(const char *uri,	/* I - Original device URI */
+                 char       *buffer,	/* O - New device URI */
+                 int        buflen)	/* I - Size of new device URI buffer */
+{
+  char	*start,				/* Start of data after scheme */
+	*slash,				/* First slash after scheme:// */
+	*ptr;				/* Pointer into user@host:port part */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!uri || !buffer || buflen < 2)
+    return (NULL);
+
+ /*
+  * Copy the device URI to the new buffer...
+  */
+
+  strlcpy(buffer, uri, buflen);
+
+ /*
+  * Find the end of the scheme:// part...
+  */
+
+  if ((ptr = strchr(buffer, ':')) == NULL)
+    return (buffer);			/* No scheme: part... */
+
+  for (start = ptr + 1; *start; start ++)
+    if (*start != '/')
+      break;
+
+ /*
+  * Find the next slash (/) in the URI...
+  */
+
+  if ((slash = strchr(start, '/')) == NULL)
+    slash = start + strlen(start);	/* No slash, point to the end */
+
+ /*
+  * Check for an @ sign before the slash...
+  */
+
+  if ((ptr = strchr(start, '@')) != NULL && ptr < slash)
+  {
+   /*
+    * Found an @ sign and it is before the resource part, so we have
+    * an authentication string.  Copy the remaining URI over the
+    * authentication string...
+    */
+
+    cups_strcpy(start, ptr + 1);
+  }
+
+ /*
+  * Return the new device URI...
+  */
+
+  return (buffer);
+}
+
+
 #ifdef __sgi
 /*
  * 'write_irix_config()' - Update the config files used by the IRIX
@@ -2487,5 +2547,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.68 2004/10/04 19:48:56 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.69 2004/10/04 20:24:17 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.92 2004/08/23 18:43:12 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.93 2004/10/04 20:24:16 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1265,7 +1265,9 @@ add_printer(client_t        *con,	/* I - Client connection */
     }
 
     LogMessage(L_INFO, "Setting %s device-uri to \"%s\" (was \"%s\".)",
-               printer->name, attr->values[0].string.text, printer->device_uri);
+               printer->name,
+	       cupsdSanitizeURI(attr->values[0].string.text, line, sizeof(line)),
+	       cupsdSanitizeURI(printer->device_uri, resource, sizeof(resource)));
 
     SetString(&printer->device_uri, attr->values[0].string.text);
   }
@@ -7083,5 +7085,5 @@ validate_user(job_t      *job,		/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.92 2004/08/23 18:43:12 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.93 2004/10/04 20:24:16 mike Exp $".
  */

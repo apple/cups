@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.22rc1
 
+	- Now sanitize the device URI that is reported in the
+	  error_log file (STR #920)
 	- Fixed some memory and file descriptor leaks in the job
 	  dispatch code (STR #921)
 	- Deleting a printer could cause a crash with browsing
