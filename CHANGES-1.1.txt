@@ -1,6 +1,17 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.19rc2
+
+	- The scheduler would try to write a debug log message
+	  when starting a job that contained a NULL string. 
+	  Since not all versions of snprintf() support NULL
+	  string pointers this caused some problems.
+	- The testipp program now supports reading of IPP
+	  message files such as those used for the job history
+	  in /var/spool/cups.
+
+
 CHANGES IN CUPS V1.1.19rc1
 
 	- Added CUPS support files for Java, Perl, and PHP

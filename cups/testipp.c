@@ -1,5 +1,5 @@
 /*
- * "$Id: testipp.c,v 1.1.2.4 2003/04/14 18:07:38 mike Exp $"
+ * "$Id: testipp.c,v 1.1.2.5 2003/04/14 18:33:41 mike Exp $"
  *
  *   IPP test program for the Common UNIX Printing System (CUPS).
  *
@@ -377,7 +377,7 @@ print_attributes(ipp_t *ipp,		/* I - IPP request */
       for (i = 2; i < indent; i ++)
         putchar(' ');
 
-      puts(tags[group]);
+      printf("%s:\n\n", tags[group]);
     }
 
     for (i = 0; i < indent; i ++)
@@ -397,6 +397,36 @@ print_attributes(ipp_t *ipp,		/* I - IPP request */
       case IPP_TAG_BOOLEAN :
           for (i = 0, val = attr->values; i < attr->num_values; i ++, val ++)
 	    printf(" %s", val->boolean ? "true" : "false");
+          putchar('\n');
+          break;
+
+      case IPP_TAG_RANGE :
+          for (i = 0, val = attr->values; i < attr->num_values; i ++, val ++)
+	    printf(" %d-%d", val->range.lower, val->range.upper);
+          putchar('\n');
+          break;
+
+      case IPP_TAG_DATE :
+          {
+	    time_t	vtime;		/* Date/Time value */
+	    struct tm	*vdate;		/* Date info */
+	    char	vstring[256];	/* Formatted time */
+
+	    for (i = 0, val = attr->values; i < attr->num_values; i ++, val ++)
+	    {
+	      vtime = ippDateToTime(val->date);
+	      vdate = localtime(&vtime);
+	      strftime(vstring, sizeof(vstring), "%c", vdate);
+	      printf(" (%s)", vstring);
+	    }
+          }
+          putchar('\n');
+          break;
+
+      case IPP_TAG_RESOLUTION :
+          for (i = 0, val = attr->values; i < attr->num_values; i ++, val ++)
+	    printf(" %dx%d%s", val->resolution.xres, val->resolution.yres,
+	           val->resolution.units == IPP_RES_PER_INCH ? "dpi" : "dpc");
           putchar('\n');
           break;
 
@@ -487,5 +517,5 @@ write_cb(void        *data,		/* I - Data */
 
 
 /*
- * End of "$Id: testipp.c,v 1.1.2.4 2003/04/14 18:07:38 mike Exp $".
+ * End of "$Id: testipp.c,v 1.1.2.5 2003/04/14 18:33:41 mike Exp $".
  */

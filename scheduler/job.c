@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.64 2003/04/10 20:15:53 mike Exp $"
+ * "$Id: job.c,v 1.124.2.65 2003/04/14 18:33:41 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1766,7 +1766,7 @@ StartJob(int       id,			/* I - Job ID */
   envp[envc ++] = processPath;
 #endif	/* __APPLE__ */
 
-  envp[envc ++] = NULL;
+  envp[envc] = NULL;
 
   for (i = 0; i < envc; i ++)
     LogMessage(L_DEBUG, "StartJob: envp[%d]=\"%s\"", i, envp[i]);
@@ -2750,5 +2750,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.64 2003/04/10 20:15:53 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.65 2003/04/14 18:33:41 mike Exp $".
  */
