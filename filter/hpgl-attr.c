@@ -1,9 +1,9 @@
 /*
- * "$Id: hpgl-attr.c,v 1.1 1996/08/24 19:41:24 mike Exp $"
+ * "$Id: hpgl-attr.c,v 1.2 1996/10/14 16:50:14 mike Exp $"
  *
- *   for espPrint, a collection of printer/image software.
+ *   HPGL attribute processing for espPrint, a collection of printer drivers.
  *
- *   Copyright (c) 1993-1995 by Easy Software Products
+ *   Copyright 1993-1996 by Easy Software Products
  *
  *   These coded instructions, statements, and computer  programs  contain
  *   unpublished  proprietary  information  of Easy Software Products, and
@@ -16,9 +16,15 @@
  * Revision History:
  *
  *   $Log: hpgl-attr.c,v $
- *   Revision 1.1  1996/08/24 19:41:24  mike
- *   Initial revision
+ *   Revision 1.2  1996/10/14 16:50:14  mike
+ *   Updated for 3.2 release.
+ *   Added 'blackplot', grayscale, and default pen width options.
+ *   Added encoded polyline support.
+ *   Added fit-to-page code.
+ *   Added pen color palette support.
  *
+ *   Revision 1.1  1996/08/24  19:41:24  mike
+ *   Initial revision
  */
 
 /*
@@ -54,7 +60,7 @@ LA_line_attributes(int num_params, param_t *params)
 
   if (num_params == 0)
   {
-    fputs("5.0 setmiterlimit\n", OutputFile);
+    fputs("3.0 setmiterlimit\n", OutputFile);
     fputs("0 setlinecap\n", OutputFile);
     fputs("0 setlinejoin\n", OutputFile);
   }
@@ -83,7 +89,8 @@ LA_line_attributes(int num_params, param_t *params)
           };
           break;
       case 3 :
-          fprintf(OutputFile, "%f setmiterlimit\n", params[i + 1].value.number);
+          fprintf(OutputFile, "%f setmiterlimit\n",
+                  1.0 + 0.5 * (params[i + 1].value.number - 1.0));
           break;
     };
 }
@@ -96,14 +103,102 @@ LT_line_type(int num_params, param_t *params)
 
 
 void
+NP_number_pens(int num_params, param_t *params)
+{
+  int	i;
+
+
+  if (num_params < 1)
+    PenCount = 8;
+  else
+    PenCount = params[0].value.number;
+
+  PC_pen_color(0, NULL);
+
+  for (i = 0; i < PenCount; i ++)
+    fprintf(OutputFile, "/W%d { 1.0 setlinewidth } bind def\n", i);
+}
+
+
+void
+PC_pen_color(int num_params, param_t *params)
+{
+  int		i;
+  static float	standard_colors[8][3] =
+  {
+    { 1.0, 1.0, 1.0 },
+    { 0.0, 0.0, 0.0 },
+    { 1.0, 0.0, 0.0 },
+    { 0.0, 1.0, 0.0 },
+    { 1.0, 1.0, 0.0 },
+    { 0.0, 0.0, 1.0 },
+    { 1.0, 0.0, 1.0 },
+    { 0.0, 1.0, 1.0 }
+  };
+
+  if (num_params == 0)
+  {
+    for (i = 0; i < PenCount; i ++)
+      if (i < 8)
+	fprintf(OutputFile, "/P%d { %.3f %.3f %.3f setrgbcolor } bind def\n",
+        	i, standard_colors[i][0],
+        	standard_colors[i][1], standard_colors[i][2]);
+      else
+	fprintf(OutputFile, "/P%d { 0.0 0.0 0.0 setrgbcolor } bind def\n", i);
+  }
+  else
+  {
+    i = params[0].value.number;
+
+    if (num_params == 1)
+      fprintf(OutputFile, "/P%d { %.3f %.3f %.3f setrgbcolor } bind def\n",
+              i, standard_colors[i][0],
+              standard_colors[i][1], standard_colors[i][2]);
+    else
+      fprintf(OutputFile, "/P%d { %.3f %.3f %.3f setrgbcolor } bind def\n",
+              i, params[1].value.number,
+              params[2].value.number, params[3].value.number);
+  };
+}
+
+
+void
 PW_pen_width(int num_params, param_t *params)
 {
-  if (num_params == 0)
-    PenWidth = 0.45 / 25.4 * 72.0;
-  else
-    PenWidth = params[0].value.number / 25.4 * 72.0;
+  float	w;
 
-  fprintf(OutputFile, "%.1f setlinewidth\n", PenWidth);
+
+  if (WidthUnits == 0)
+  {
+   /*
+    * Metric...
+    */
+
+    if (num_params == 0)
+      w = 0.35 / 25.0 * 72.0;
+    else
+      w = params[0].value.number / 25.4 * 72.0;
+  }
+  else
+  {
+   /*
+    * Relative...
+    */
+
+    w = hypot(PlotSize[0], PlotSize[1]) / 1016.0 * 72.0;
+
+    if (num_params == 0)
+      w *= 0.01;
+    else
+      w *= params[0].value.number;
+  };
+
+  if (num_params > 1)
+    fprintf(OutputFile, "/W%d { %.1f setlinewidth } bind def W%d\n",
+            (int)params[1].value.number, w, (int)params[1].value.number);
+  else
+    fprintf(OutputFile, "/W%d { %.1f setlinewidth } bind def W%d\n", PenNumber,
+            w, PenNumber);
 }
 
 
@@ -123,9 +218,11 @@ void
 SP_select_pen(int num_params, param_t *params)
 {
   if (num_params == 0)
-    fputs("P0\n", OutputFile);
+    PenNumber = 1;
   else
-    fprintf(OutputFile, "P%d\n", (int)(params[0].value.number));
+    PenNumber = params[0].value.number;
+
+  fprintf(OutputFile, "P%d W%d\n", PenNumber, PenNumber);
 }
 
 
@@ -138,10 +235,13 @@ UL_user_line_type(int num_params, param_t *params)
 void
 WU_width_units(int num_params, param_t *params)
 {
+  if (num_params == 0)
+    WidthUnits = 0;
+  else
+    WidthUnits = params[0].value.number;
 }
 
 
 /*
- * End of "$Id: hpgl-attr.c,v 1.1 1996/08/24 19:41:24 mike Exp $".
+ * End of "$Id: hpgl-attr.c,v 1.2 1996/10/14 16:50:14 mike Exp $".
  */
-

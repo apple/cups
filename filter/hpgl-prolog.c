@@ -1,10 +1,10 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.1 1996/08/24 19:41:24 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.2 1996/10/14 16:50:14 mike Exp $"
  *
  *   PostScript prolog routines for the HPGL2PS program for espPrint, a
- *   collection of printer/image software.
+ *   collection of printer drivers.
  *
- *   Copyright (c) 1993-1995 by Easy Software Products
+ *   Copyright 1993-1996 by Easy Software Products
  *
  *   These coded instructions, statements, and computer  programs  contain
  *   unpublished  proprietary  information  of Easy Software Products, and
@@ -17,9 +17,15 @@
  * Revision History:
  *
  *   $Log: hpgl-prolog.c,v $
- *   Revision 1.1  1996/08/24 19:41:24  mike
- *   Initial revision
+ *   Revision 1.2  1996/10/14 16:50:14  mike
+ *   Updated for 3.2 release.
+ *   Added 'blackplot', grayscale, and default pen width options.
+ *   Added encoded polyline support.
+ *   Added fit-to-page code.
+ *   Added pen color palette support.
  *
+ *   Revision 1.1  1996/08/24  19:41:24  mike
+ *   Initial revision
  */
 
 /*
@@ -28,40 +34,42 @@
 
 #include "hpgl2ps.h"
 
-#define PROLOG_FILE	"/usr/lib/print/data/HPGLprolog"
-/*#define PROLOG_FILE	"HPGLprolog" */
+#define PROLOG_FILE	BASEDIR "/print/data/HPGLprolog"
 
 
 int
-OutputProlog(PDInfoStruct *info)
+OutputProlog(int   shading,
+             float penwidth)
 {
-  FILE			*prolog;
-  char			line[255];
-  time_t		curtime;
-  PDSizeTableStruct	*pagesize;
+  FILE		*prolog;
+  char		line[255];
+  time_t	curtime;
 
 
   curtime  = time(NULL);
-  pagesize = PDFindPageSize(info, PD_SIZE_CURRENT);
 
   fputs("%!PS-Adobe-3.0\n", OutputFile);
-  fputs("%%Creator: hpgl2ps (ESP Print 2.2)\n", OutputFile);
+  fputs("%%Creator: hpgl2ps (ESP Print 3.2)\n", OutputFile);
   cftime(line, "%%%%CreationDate: %c\n", &curtime);
   fputs(line, OutputFile);
   fputs("%%LanguageLevel: 2\n", OutputFile);
   fputs("%%Pages: (atend)\n", OutputFile);
   fprintf(OutputFile, "%%%%BoundingBox: %.0f %.0f %.0f %.0f\n",
-          pagesize->left_margin * 72.0,
-          pagesize->top_margin * 72.0,
-          (pagesize->width - pagesize->left_margin) * 72.0,
-          (pagesize->length - pagesize->top_margin) * 72.0);
+          PageLeft, PageBottom, PageWidth + PageLeft, PageHeight + PageBottom);
   fputs("%%DocumentData: Clean7Bit\n", OutputFile);
   fputs("%%EndComments\n", OutputFile);
-
-  PageWidth  = (pagesize->width - pagesize->left_margin * 2.0) * 72.0;
-  PageHeight = (pagesize->length - pagesize->top_margin * 2.0) * 72.0;
-  PageLeft   = pagesize->left_margin * 72.0;
-  PageBottom = pagesize->top_margin * 72.0;
+  fputs("%%BeginProlog\n", OutputFile);
+  fprintf(OutputFile, "/DefaultPenWidth %.2f def\n", penwidth * 72.0 / 25.4);
+  switch (shading)
+  {
+    case -1 : /* Black only */
+        fputs("/setrgbcolor { pop pop pop } bind def\n", OutputFile);
+        break;
+    case 0 : /* Greyscale */
+        fputs("/setrgbcolor { 0.31 mul exch 0.61 mul add exch 0.08 mul add setgray } bind def\n",
+              OutputFile);
+        break;
+  };
 
   if ((prolog = fopen(PROLOG_FILE, "r")) == NULL)
   {
@@ -74,6 +82,7 @@ OutputProlog(PDInfoStruct *info)
 
   fclose(prolog);
 
+  fputs("%%EndProlog\n", OutputFile);
   fputs("%%Page: 1\n", OutputFile);
   fputs("gsave\n", OutputFile);
   fprintf(OutputFile, "%.1f %.1f translate\n", PageLeft, PageBottom);
@@ -83,10 +92,13 @@ OutputProlog(PDInfoStruct *info)
 
 
 int
-OutputTrailer(PDInfoStruct *info)
+OutputTrailer(void)
 {
   fputs("grestore\n", OutputFile);
-  fputs("showpage\n", OutputFile);
+  if (PageDirty)
+    fputs("showpage\n", OutputFile);
+  else
+    PageCount --;
   fputs("%%EndPage\n", OutputFile);
 
   fputs("%%BeginTrailer\n", OutputFile);
@@ -98,5 +110,5 @@ OutputTrailer(PDInfoStruct *info)
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.1 1996/08/24 19:41:24 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.2 1996/10/14 16:50:14 mike Exp $".
  */

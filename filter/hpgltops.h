@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgltops.h,v 1.1 1996/08/24 19:41:24 mike Exp $"
+ * "$Id: hpgltops.h,v 1.2 1996/10/14 16:50:14 mike Exp $"
  *
  *   HPGL to PostScript conversion program header file for espPrint, a
  *   collection of printer/image software.
@@ -15,9 +15,15 @@
  * Revision History:
  *
  *   $Log: hpgltops.h,v $
- *   Revision 1.1  1996/08/24 19:41:24  mike
- *   Initial revision
+ *   Revision 1.2  1996/10/14 16:50:14  mike
+ *   Updated for 3.2 release.
+ *   Added 'blackplot', grayscale, and default pen width options.
+ *   Added encoded polyline support.
+ *   Added fit-to-page code.
+ *   Added pen color palette support.
  *
+ *   Revision 1.1  1996/08/24  19:41:24  mike
+ *   Initial revision
  */
 
 /*
@@ -31,6 +37,7 @@
 #include <time.h>
 
 #include <pod.h>
+#include <errorcodes.h>
 
 
 /*
@@ -66,32 +73,40 @@ typedef struct
 #  define VALUE2(x,y)
 #endif /* _MAIN_C_ */
 
-VAR FILE	*InputFile,	/* Input file */
-		*OutputFile;	/* Output file */
+VAR FILE	*InputFile,			/* Input file */
+		*OutputFile;			/* Output file */
 
-VAR int		P1[2],		/* Lower-lefthand physical limit */
-		P2[2];		/* Upper-righthand physical limit */
-VAR int		Rotation VALUE(0);	/* Page rotation */
-VAR int		ScalingType VALUE(-1);	/* Type of scaling (-1 for none) */
-VAR float	Scaling1[2],	/* Lower-lefthand user limit */
-		Scaling2[2];	/* Upper-righthand user limit */
-VAR float	Transform[3][2];
-VAR float	PageWidth, PageHeight, PageLeft, PageBottom;
+VAR int		P1[2],				/* Lower-lefthand physical limit */
+		P2[2];				/* Upper-righthand physical limit */
+VAR int		Rotation	VALUE(0);	/* Page rotation */
+VAR int		ScalingType	VALUE(-1);	/* Type of scaling (-1 for none) */
+VAR float	Scaling1[2],			/* Lower-lefthand user limit */
+		Scaling2[2];			/* Upper-righthand user limit */
+VAR float	Transform[2][3];		/* Transform matrix */
+VAR float	PageWidth	VALUE(612),	/* Hard clip limits in points */
+		PageHeight	VALUE(792),
+		PageLeft	VALUE(0),
+		PageRight	VALUE(0),
+		PageBottom	VALUE(0),
+		PageTop		VALUE(0);
+VAR int		PageRotation	VALUE(0);
 
 VAR char	StringTerminator VALUE('\003');
-VAR float	PenPosition[2] VALUE({0}),
-		PenWidth VALUE(1.0),
-		PenMotion VALUE(0); /* 0 = absolute, 1 = relative */
-VAR int		PenDown VALUE(0),
-		PolygonMode VALUE(0),
-		PageCount VALUE(1);
-
-VAR int		CharFillMode VALUE(0),
-		CharPen VALUE(0),
-		CharFont VALUE(0);
-VAR float	CharHeight[2] VALUE2(11.5,11.5);
-VAR int		Verbosity VALUE(0);
-
+VAR float	PenPosition[2]	VALUE({0});
+VAR int		PenMotion	VALUE(0), 	/* 0 = absolute, 1 = relative */
+		PenNumber	VALUE(1),	/* Current pen number */
+		PenCount	VALUE(8),	/* Number of pens */
+		PenDown		VALUE(0),
+		PolygonMode	VALUE(0),
+		PageCount	VALUE(1),
+		PageDirty	VALUE(0),
+		WidthUnits	VALUE(0);
+VAR float	PlotSize[2]	VALUE2(1.0, 1.0);	/* Scaling to plot size */
+VAR int		CharFillMode	VALUE(0),
+		CharPen		VALUE(0),
+		CharFont	VALUE(0);
+VAR float	CharHeight[2]	VALUE2(11.5,11.5);
+VAR int		Verbosity	VALUE(0);
 
 /*
  * Prototypes...
@@ -101,12 +116,14 @@ extern void	update_transform(void);
 extern int	ParseCommand(char *name, param_t **params);
 extern void	FreeParameters(int num_params, param_t *params);
 
-extern void	IN_initialize(int num_params, param_t *params);
+extern void	BP_begin_plot(int num_params, param_t *params);
 extern void	DF_default_values(int num_params, param_t *params);
+extern void	IN_initialize(int num_params, param_t *params);
 extern void	IP_input_absolute(int num_params, param_t *params);
 extern void	IR_input_relative(int num_params, param_t *params);
 extern void	IW_input_window(int num_params, param_t *params);
 extern void	PG_advance_page(int num_params, param_t *params);
+extern void	PS_plot_size(int num_params, param_t *params);
 extern void	RO_rotate(int num_params, param_t *params);
 extern void	RP_replot(int num_params, param_t *params);
 extern void	SC_scale(int num_params, param_t *params);
@@ -154,6 +171,8 @@ extern void	AC_anchor_corner(int num_params, param_t *params);
 extern void	FT_fill_type(int num_params, param_t *params);
 extern void	LA_line_attributes(int num_params, param_t *params);
 extern void	LT_line_type(int num_params, param_t *params);
+extern void	NP_number_pens(int num_params, param_t *params);
+extern void	PC_pen_color(int num_params, param_t *params);
 extern void	PW_pen_width(int num_params, param_t *params);
 extern void	RF_raster_fill(int num_params, param_t *params);
 extern void	SM_symbol_mode(int num_params, param_t *params);
@@ -161,9 +180,9 @@ extern void	SP_select_pen(int num_params, param_t *params);
 extern void	UL_user_line_type(int num_params, param_t *params);
 extern void	WU_width_units(int num_params, param_t *params);
 
-extern int	OutputProlog(PDInfoStruct *info);
-extern int	OutputTrailer(PDInfoStruct *info);
+extern int	OutputProlog(int shading, float penwidth);
+extern int	OutputTrailer(void);
 
 /*
- * End of "$Id: hpgltops.h,v 1.1 1996/08/24 19:41:24 mike Exp $".
+ * End of "$Id: hpgltops.h,v 1.2 1996/10/14 16:50:14 mike Exp $".
  */

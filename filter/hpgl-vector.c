@@ -1,9 +1,10 @@
 /*
- * "$Id: hpgl-vector.c,v 1.1 1996/08/24 19:41:24 mike Exp $"
+ * "$Id: hpgl-vector.c,v 1.2 1996/10/14 16:50:14 mike Exp $"
  *
- *   for espPrint, a collection of printer/image software.
+ *   HPGL vector processing routines for espPrint, a collection of printer
+ *   drivers.
  *
- *   Copyright (c) 1993-1995 by Easy Software Products
+ *   Copyright 1993-1996 by Easy Software Products
  *
  *   These coded instructions, statements, and computer  programs  contain
  *   unpublished  proprietary  information  of Easy Software Products, and
@@ -16,9 +17,15 @@
  * Revision History:
  *
  *   $Log: hpgl-vector.c,v $
- *   Revision 1.1  1996/08/24 19:41:24  mike
- *   Initial revision
+ *   Revision 1.2  1996/10/14 16:50:14  mike
+ *   Updated for 3.2 release.
+ *   Added 'blackplot', grayscale, and default pen width options.
+ *   Added encoded polyline support.
+ *   Added fit-to-page code.
+ *   Added pen color palette support.
  *
+ *   Revision 1.1  1996/08/24  19:41:24  mike
+ *   Initial revision
  */
 
 /*
@@ -50,7 +57,7 @@ AA_arc_absolute(int num_params, param_t *params)
 
   start  = 180.0 * atan2(dx, dy) / M_PI;
   end    = start + params[2].value.number;
-  radius = fhypot(dx, dy);
+  radius = hypot(dx, dy);
 
   if (PenDown)
   {
@@ -101,6 +108,8 @@ AA_arc_absolute(int num_params, param_t *params)
     fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
     if (!PolygonMode)
       fputs("ST\n", OutputFile);
+
+    PageDirty = 1;
   };
 }
 
@@ -178,6 +187,8 @@ AR_arc_relative(int num_params, param_t *params)
     fprintf(OutputFile, "%.3f %.3f LI\n", PenPosition[0], PenPosition[1]);
     if (!PolygonMode)
       fputs("ST\n", OutputFile);
+
+    PageDirty = 1;
   };
 }
 
@@ -232,6 +243,8 @@ CI_circle(int num_params, param_t *params)
   fputs("CP\n", OutputFile);
   if (!PolygonMode)
     fputs("ST\n", OutputFile);
+
+  PageDirty = 1;
 }
 
 
@@ -279,6 +292,8 @@ plot_points(int num_params, param_t *params)
 
   if (PenDown && !PolygonMode)
     fputs("ST\n", OutputFile);
+
+    PageDirty = 1;
 }
 
 
@@ -302,9 +317,147 @@ PD_pen_down(int num_params, param_t *params)
 }
 
 
+static int
+decode_number(char **s, int base_bits)
+{
+  unsigned	temp,
+		shift;
+
+
+  if (base_bits == 5)
+  {
+    for (temp = 0, shift = 0; **s != '\0'; (*s) ++, shift += 5)
+      if (**s >= 95)
+      {
+        temp |= (**s - 95) << shift;
+        break;
+      }
+      else
+        temp |= (**s - 63) << shift;
+  }
+  else
+  {
+    for (temp = 0, shift = 0; **s != '\0'; (*s) ++, shift += 6)
+      if (**s >= 191)
+      {
+        temp |= (**s - 191) << shift;
+        break;
+      }
+      else
+        temp |= (**s - 63) << shift;
+  };
+
+  (*s) ++;
+
+  if (temp & 1)
+    return (-(temp >> 1));
+  else
+    return (temp >> 1);
+}
+
+
 void
 PE_polyline_encoded(int num_params, param_t *params)
 {
+  char	*s;
+  int	temp,
+	base_bits,
+	draw,
+	abscoords;
+  float	x, y,
+	tx, ty,
+	frac_bits;
+
+
+  base_bits = 6;
+  frac_bits = 1.0;
+  draw      = 1;
+  abscoords = 0;
+
+  if (num_params == 0)
+    return;
+
+  if (!PolygonMode)
+    fputs("MP\n", OutputFile);
+  fprintf(OutputFile, "%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
+
+  for (s = params[0].value.string; *s != '\0';)
+    switch (*s)
+    {
+      case '7' :
+          s ++;
+          base_bits = 5;
+          break;
+      case ':' :	/* Select pen */
+          s ++;
+          temp = decode_number(&s, base_bits);
+          fprintf(OutputFile, "P%d W%d\n", temp, temp);
+          break;
+      case '<' :	/* Next coords are a move-to */
+          draw = 0;
+          s ++;
+          break;
+      case '>' :	/* Set fractional bits */
+          s ++;
+          temp      = decode_number(&s, base_bits);
+          frac_bits = 1.0 / (1 << temp);
+          break;
+      case '=' :	/* Next coords are absolute */
+          s ++;
+          abscoords = 1;
+          break;
+      default :
+          if (*s >= 63)
+          {
+           /*
+            * Coordinate...
+            */
+
+            temp = decode_number(&s, base_bits);
+            x    = temp * frac_bits;
+            temp = decode_number(&s, base_bits);
+            y    = temp * frac_bits;
+
+            if (abscoords)
+            {
+	      tx = Transform[0][0] * x + Transform[0][1] * y +
+        	   Transform[0][2];
+	      ty = Transform[1][0] * x + Transform[1][1] * y +
+        	   Transform[1][2];
+	    }
+	    else
+	    {
+	      tx = Transform[0][0] * x + Transform[0][1] * y +
+        	   PenPosition[0];
+	      ty = Transform[1][0] * x + Transform[1][1] * y +
+        	   PenPosition[1];
+	    };
+
+            if (draw)
+              fprintf(OutputFile, "%.3f %.3f LI\n", tx, ty);
+            else
+              fprintf(OutputFile, "%.3f %.3f MO\n", tx, ty);
+
+	    PenPosition[0] = tx;
+	    PenPosition[1] = ty;
+	    draw           = 1;
+	    abscoords      = 0;
+          }
+          else
+          {
+           /*
+            * Junk - ignore...
+            */
+
+            s ++;
+          };
+          break;
+    };
+
+  if (!PolygonMode)
+    fputs("ST\n", OutputFile);
+
+  PageDirty = 1;
 }
 
 
@@ -344,6 +497,6 @@ RT_arc_relative3(int num_params, param_t *params)
 
 
 /*
- * End of "$Id: hpgl-vector.c,v 1.1 1996/08/24 19:41:24 mike Exp $".
+ * End of "$Id: hpgl-vector.c,v 1.2 1996/10/14 16:50:14 mike Exp $".
  */
 

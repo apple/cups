@@ -1,9 +1,9 @@
 /*
- * "$Id: hpgl-char.c,v 1.1 1996/08/24 19:41:24 mike Exp $"
+ * "$Id: hpgl-char.c,v 1.2 1996/10/14 16:50:14 mike Exp $"
  *
- *   for espPrint, a collection of printer/image software.
+ *   HPGL character processing for espPrint, a collection of printer drivers.
  *
- *   Copyright (c) 1993-1995 by Easy Software Products
+ *   Copyright 1993-1996 by Easy Software Products
  *
  *   These coded instructions, statements, and computer  programs  contain
  *   unpublished  proprietary  information  of Easy Software Products, and
@@ -16,9 +16,15 @@
  * Revision History:
  *
  *   $Log: hpgl-char.c,v $
- *   Revision 1.1  1996/08/24 19:41:24  mike
- *   Initial revision
+ *   Revision 1.2  1996/10/14 16:50:14  mike
+ *   Updated for 3.2 release.
+ *   Added 'blackplot', grayscale, and default pen width options.
+ *   Added encoded polyline support.
+ *   Added fit-to-page code.
+ *   Added pen color palette support.
  *
+ *   Revision 1.1  1996/08/24  19:41:24  mike
+ *   Initial revision
  */
 
 /*
@@ -160,6 +166,7 @@ LB_label(int num_params, param_t *params)
     return;
 
   fputs("gsave\n", OutputFile);
+  fputs("currentmiterlimit 1.0 setmiterlimit\n", OutputFile);
   fputs("MP\n", OutputFile);
   fprintf(OutputFile, "%.3f %.3f MO\n", PenPosition[0], PenPosition[1]);
 
@@ -176,7 +183,10 @@ LB_label(int num_params, param_t *params)
   if (CharFillMode == 1 || CharFillMode == 3)
     fprintf(OutputFile, "P%d ST\n", CharPen);
 
+  fputs("setmiterlimit\n", OutputFile);
   fputs("grestore\n", OutputFile);
+
+  PageDirty = 1;
 }
 
 
@@ -268,6 +278,6 @@ TD_transparent_data(int num_params, param_t *params)
 
 
 /*
- * End of "$Id: hpgl-char.c,v 1.1 1996/08/24 19:41:24 mike Exp $".
+ * End of "$Id: hpgl-char.c,v 1.2 1996/10/14 16:50:14 mike Exp $".
  */
 

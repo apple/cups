@@ -1,9 +1,9 @@
 /*
- * "$Id: hpgl-polygon.c,v 1.1 1996/08/24 19:41:24 mike Exp $"
+ * "$Id: hpgl-polygon.c,v 1.2 1996/10/14 16:50:14 mike Exp $"
  *
- *   for espPrint, a collection of printer/image software.
+ *   HPGL polygon routines for espPrint, a collection of printer drivers.
  *
- *   Copyright (c) 1993-1995 by Easy Software Products
+ *   Copyright 1993-1996 by Easy Software Products
  *
  *   These coded instructions, statements, and computer  programs  contain
  *   unpublished  proprietary  information  of Easy Software Products, and
@@ -16,9 +16,15 @@
  * Revision History:
  *
  *   $Log: hpgl-polygon.c,v $
- *   Revision 1.1  1996/08/24 19:41:24  mike
- *   Initial revision
+ *   Revision 1.2  1996/10/14 16:50:14  mike
+ *   Updated for 3.2 release.
+ *   Added 'blackplot', grayscale, and default pen width options.
+ *   Added encoded polyline support.
+ *   Added fit-to-page code.
+ *   Added pen color palette support.
  *
+ *   Revision 1.1  1996/08/24  19:41:24  mike
+ *   Initial revision
  */
 
 /*
@@ -55,6 +61,8 @@ EA_edge_rect_absolute(int num_params, param_t *params)
   fputs("CP\n", OutputFile);
   if (!PolygonMode)
     fputs("ST\n", OutputFile);
+
+  PageDirty = 1;
 }
 
 
@@ -62,6 +70,8 @@ void
 EP_edge_polygon(int num_params, param_t *params)
 {
   fputs("ST\n", OutputFile);
+
+  PageDirty = 1;
 }
 
 
@@ -92,6 +102,8 @@ ER_edge_rect_relative(int num_params, param_t *params)
   fputs("CP\n", OutputFile);
   if (!PolygonMode)
     fputs("ST\n", OutputFile);
+
+  PageDirty = 1;
 }
 
 
@@ -155,6 +167,8 @@ EW_edge_wedge(int num_params, param_t *params)
   fputs("CP\n", OutputFile);
   if (!PolygonMode)
     fputs("ST\n", OutputFile);
+
+  PageDirty = 1;
 }
 
 
@@ -162,6 +176,8 @@ void
 FP_fill_polygon(int num_params, param_t *params)
 {
   fputs("FI\n", OutputFile);
+
+  PageDirty = 1;
 }
 
 
@@ -206,6 +222,8 @@ RA_fill_rect_absolute(int num_params, param_t *params)
   fputs("CP\n", OutputFile);
   if (!PolygonMode)
     fputs("FI\n", OutputFile);
+
+  PageDirty = 1;
 }
 
 
@@ -236,6 +254,8 @@ RR_fill_rect_relative(int num_params, param_t *params)
   fputs("CP\n", OutputFile);
   if (!PolygonMode)
     fputs("FI\n", OutputFile);
+
+  PageDirty = 1;
 }
 
 
@@ -299,9 +319,11 @@ WG_fill_wedge(int num_params, param_t *params)
   fputs("CP\n", OutputFile);
   if (!PolygonMode)
     fputs("FI\n", OutputFile);
+
+  PageDirty = 1;
 }
 
 
 /*
- * End of "$Id: hpgl-polygon.c,v 1.1 1996/08/24 19:41:24 mike Exp $".
+ * End of "$Id: hpgl-polygon.c,v 1.2 1996/10/14 16:50:14 mike Exp $".
  */

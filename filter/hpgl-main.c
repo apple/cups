@@ -1,9 +1,10 @@
 /*
- * "$Id: hpgl-main.c,v 1.1 1996/08/24 19:41:24 mike Exp $"
+ * "$Id: hpgl-main.c,v 1.2 1996/10/14 16:50:14 mike Exp $"
  *
- *   for espPrint, a collection of printer/image software.
+ *   Main entry for HPGL converter for espPrint, a collection of printer
+ *   drivers.
  *
- *   Copyright (c) 1993-1995 by Easy Software Products
+ *   Copyright 1993-1996 by Easy Software Products
  *
  *   These coded instructions, statements, and computer  programs  contain
  *   unpublished  proprietary  information  of Easy Software Products, and
@@ -16,15 +17,22 @@
  * Revision History:
  *
  *   $Log: hpgl-main.c,v $
- *   Revision 1.1  1996/08/24 19:41:24  mike
- *   Initial revision
+ *   Revision 1.2  1996/10/14 16:50:14  mike
+ *   Updated for 3.2 release.
+ *   Added 'blackplot', grayscale, and default pen width options.
+ *   Added encoded polyline support.
+ *   Added fit-to-page code.
+ *   Added pen color palette support.
  *
+ *   Revision 1.1  1996/08/24  19:41:24  mike
+ *   Initial revision
  */
 
 /*
  * Include necessary headers...
  */
 
+/*#define DEBUG*/
 #define _MAIN_C_
 #include "hpgl2ps.h"
 
@@ -37,8 +45,9 @@ typedef struct
 
 static name_t commands[] =
 {
-  "IN", IN_initialize,
+  "BP", BP_begin_plot,
   "DF", DF_default_values,
+  "IN", IN_initialize,
   "IP", IP_input_absolute,
   "IR", IR_input_relative,
   "IW", IW_input_window,
@@ -54,6 +63,7 @@ static name_t commands[] =
   "PD", PD_pen_down,
   "PE", PE_polyline_encoded,
   "PR", PR_plot_relative,
+  "PS", PS_plot_size,
   "PU", PU_pen_up,
   "RT", RT_arc_relative3,
   "EA", EA_edge_rect_absolute,
@@ -86,6 +96,8 @@ static name_t commands[] =
   "FT", FT_fill_type,
   "LA", LA_line_attributes,
   "LT", LT_line_type,
+  "NP", NP_number_pens,
+  "PC", PC_pen_color,
   "PW", PW_pen_width,
   "RF", RF_raster_fill,
   "SM", SM_symbol_mode,
@@ -106,8 +118,8 @@ compare_names(void *p1, void *p2)
 void
 Usage(void)
 {
-  fputs("Usage: hpgl2ps -P printer [filename]\n", stderr);
-  exit(1);
+  fputs("Usage: hpgl2ps [-P printer] [filename]\n", stderr);
+  exit(ERR_BAD_ARG);
 }
 
 
@@ -115,30 +127,30 @@ void
 main(int  argc,
      char *argv[])
 {
-  int		i,		/* Looping var */
-		val;		/* Temporary value */
-  char		*opt;		/* Current option character */
-  char		*filename,	/* Input filename, if specified (NULL otherwise). */
-		*printer_name,
-		*outfile;
-  PDInfoStruct	*info;
-  time_t	modtime;
-  param_t	*params;
-  int		num_params;
-  name_t	*command,
-		name;
+  int			i,		/* Looping var */
+			val;		/* Temporary value */
+  char			*opt;		/* Current option character */
+  char			*filename,	/* Input filename, if specified (NULL otherwise). */
+			*outfile;
+  PDInfoStruct		*info;
+  PDSizeTableStruct	*size;
+  time_t		modtime;
+  param_t		*params;
+  int			num_params;
+  name_t		*command,
+			name;
+  int			shading;	/* -1 = black, 0 = grey, 1 = color */
+  float			penwidth;
 
 
  /*
   * Process any command-line args...
   */
 
-  filename     = NULL;
-  printer_name = NULL;
-  outfile      = NULL;
-
-  if (argc < 3)
-    Usage();
+  filename = NULL;
+  outfile  = NULL;
+  shading  = 1;
+  penwidth = 1.0;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -150,13 +162,69 @@ main(int  argc,
               if (i >= argc)
                 Usage();
 
-              printer_name = argv[i];
+	     /*
+	      * Open the POD database files and get the printer definition record.
+	      */
+
+	      if (PDLocalReadInfo(argv[i], &info, &modtime) < 0)
+	      {
+		fprintf(stderr, "hpgl2ps: Could not open required POD database files for printer \'%s\'.\n", 
+        		argv[i]);
+		fprintf(stderr, "          Are you sure all required POD files are properly installed?\n");
+
+		PDPerror("hpgl2ps");
+		exit(1);
+	      };
+	     
+	      size = PDFindPageSize(info, PD_SIZE_CURRENT);
+
+              if (!strncasecmp(info->printer_class, "Color", 5))
+                shading = 0;
+
+	     /*
+	      * Grab the margin and printable area info from the database...
+	      */
+
+	      PageWidth      = 72.0 * size->horizontal_addr /
+	                       info->horizontal_resolution;
+	      PageHeight     = 72.0 * size->vertical_addr /
+	                       info->vertical_resolution;
+	      PageTop        = 72.0 * size->top_margin;
+	      PageBottom     = 72.0 * size->length - PageHeight - PageTop;
+	      PageLeft       = 72.0 * size->left_margin;
+	      PageRight      = 72.0 * size->width - PageWidth - PageLeft;
               break;
+
+          case 'W' :
+	      i ++;
+	      if (i < argc)
+	        PageWidth = atoi(argv[i]);
+	      break;
+
+          case 'H' :
+	      i ++;
+	      if (i < argc)
+	        PageHeight = atoi(argv[i]);
+	      break;
+
+          case 'U' :
+	      i ++;
+	      if (i < argc)
+	        PageLeft = PageRight = atoi(argv[i]);
+	      break;
+
+          case 'V' :
+	      i ++;
+	      if (i < argc)
+	        PageTop = PageBottom = atoi(argv[i]);
+	      break;
 
           case 'r' : /* Rotate */
               i ++;
               if (i >= argc)
                 Usage();
+
+              PageRotation = Rotation = atoi(argv[i]);
               break;
 
           case 'z' : /* Page zoom */
@@ -185,6 +253,18 @@ main(int  argc,
               Verbosity ++;
               break;
 
+          case 'b' : /* Produce black plot */
+              shading = -1;
+              break;
+
+          case 'w' : /* Set default pen width */
+              i ++;
+              if (i >= argc)
+                Usage();
+
+              penwidth = atof(argv[i]);
+              break;
+
           default :
               Usage();
               break;
@@ -202,27 +282,6 @@ main(int  argc,
     fputs("\n", stderr);
   };
 
- /*
-  * Check for necessary args...
-  */
-
-  if (printer_name == NULL)
-    Usage();
-
- /*
-  * Open the POD database files and get the printer definition record.
-  */
-  
-  if (PDLocalReadInfo(printer_name, &info, &modtime) < 0)
-  {
-    fprintf(stderr, "hpgl2ps: Could not open required POD database files for printer \'%s\'.\n", 
-            printer_name);
-    fprintf(stderr, "          Are you sure all required POD files are properly installed?\n");
-
-    PDPerror("hpgl2ps");
-    exit(1);
-  };
-
   if (filename == NULL)
     InputFile = stdin;
   else if ((InputFile = fopen(filename, "r")) == NULL)
@@ -230,7 +289,7 @@ main(int  argc,
     fprintf(stderr, "hpgl2ps: Could not open \'%s\' for reading.\n", filename);
 
     PDPerror("hpgl2ps");
-    exit(1);
+    exit(ERR_FILE_CONVERT);
   };
 
   if (outfile == NULL)
@@ -240,12 +299,15 @@ main(int  argc,
     fprintf(stderr, "hpgl2ps: Could not create \'%s\' for writing.\n", outfile);
 
     PDPerror("hpgl2ps");
-    exit(1);
+    exit(ERR_FILE_CONVERT);
   };
 
-  OutputProlog(info);
+  IP_input_absolute(0, NULL);
 
-  qsort(commands, NUM_COMMANDS, sizeof(name_t), compare_names);
+  OutputProlog(shading, penwidth);
+
+  qsort(commands, NUM_COMMANDS, sizeof(name_t),
+        (int (*)(const void *, const void *))compare_names);
 
   while ((num_params = ParseCommand(name.name, &params)) >= 0)
   {
@@ -260,16 +322,16 @@ main(int  argc,
 #endif /* DEBUG */
 
     if ((command = bsearch(&name, commands, NUM_COMMANDS, sizeof(name_t),
-                           compare_names)) != NULL)
+                           (int (*)(const void *, const void *))compare_names)) != NULL)
       (*command->func)(num_params, params);
 
     FreeParameters(num_params, params);
   };
 
-  OutputTrailer(info);
+  OutputTrailer();
 }
 
 
 /*
- * End of "$Id: hpgl-main.c,v 1.1 1996/08/24 19:41:24 mike Exp $".
+ * End of "$Id: hpgl-main.c,v 1.2 1996/10/14 16:50:14 mike Exp $".
  */

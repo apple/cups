@@ -1,9 +1,9 @@
 /*
- * "$Id: hpgl-config.c,v 1.1 1996/08/24 19:41:24 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.2 1996/10/14 16:50:14 mike Exp $"
  *
- *   for espPrint, a collection of printer/image software.
+ *   HPGL configuration routines for espPrint, a collection of printer drivers.
  *
- *   Copyright (c) 1993-1995 by Easy Software Products
+ *   Copyright 1993-1996 by Easy Software Products
  *
  *   These coded instructions, statements, and computer  programs  contain
  *   unpublished  proprietary  information  of Easy Software Products, and
@@ -16,9 +16,15 @@
  * Revision History:
  *
  *   $Log: hpgl-config.c,v $
- *   Revision 1.1  1996/08/24 19:41:24  mike
- *   Initial revision
+ *   Revision 1.2  1996/10/14 16:50:14  mike
+ *   Updated for 3.2 release.
+ *   Added 'blackplot', grayscale, and default pen width options.
+ *   Added encoded polyline support.
+ *   Added fit-to-page code.
+ *   Added pen color palette support.
  *
+ *   Revision 1.1  1996/08/24  19:41:24  mike
+ *   Initial revision
  */
 
 /*
@@ -36,6 +42,16 @@ update_transform(void)
 
   switch (ScalingType)
   {
+    case 2 :
+        if (Scaling2[0] != 0.0 && Scaling2[1] != 0.0)
+        {
+          p1[0] = P1[0] / fabs(Scaling2[0]);
+          p1[1] = P1[1] / fabs(Scaling2[1]);
+          p2[0] = P2[0] / fabs(Scaling2[0]);
+          p2[1] = P2[1] / fabs(Scaling2[1]);
+  	  break;
+  	};
+
     case -1 :
         p1[0] = P1[0];
         p1[1] = P1[1];
@@ -54,56 +70,37 @@ update_transform(void)
   switch (Rotation)
   {
     case 0 :
-	Transform[0][0] = PageWidth / (p2[0] - p1[0]);
+    case 180 :
+	Transform[0][0] = PlotSize[0] * PageWidth / (p2[0] - p1[0]);
 	Transform[0][1] = 0.0;
-	Transform[1][0] = 0.0;
-	Transform[1][1] = PageHeight / (p2[1] - p1[1]);
-	Transform[2][0] = -p1[0] * PageWidth / (p2[0] - p1[0]);
-	Transform[2][1] = -p1[1] * PageHeight / (p2[1] - p1[1]);
+	Transform[0][2] = -p1[0] * PlotSize[0] * PageWidth / (p2[0] - p1[0]);
+	Transform[1][1] = 0.0;
+	Transform[1][1] = PlotSize[1] * PageHeight / (p2[1] - p1[1]);
+	Transform[1][2] = -p1[1] * PlotSize[1] * PageHeight / (p2[1] - p1[1]);
 	break;
 
     case 90 :
-	Transform[0][0] = 0.0;
-	Transform[0][1] = PageWidth / (p1[1] - p2[1]);
-	Transform[1][0] = PageHeight / (p2[0] - p1[0]);
-	Transform[1][1] = 0.0;
-	Transform[2][0] = p1[1] * PageWidth / (p1[1] - p2[1]);
-	Transform[2][1] = -p1[0] * PageHeight / (p2[0] - p1[0]);
-	break;
-
-    case 180 :
-	Transform[0][0] = PageWidth / (p1[0] - p2[0]);
-	Transform[0][1] = 0.0;
-	Transform[1][0] = 0.0;
-	Transform[1][1] = PageHeight / (p1[1] - p2[1]);
-	Transform[2][0] = p1[0] * PageWidth / (p1[0] - p2[0]);
-	Transform[2][1] = p1[1] * PageHeight / (p1[1] - p2[1]);
-	break;
-
     case 270 :
 	Transform[0][0] = 0.0;
-	Transform[0][1] = PageWidth / (p2[1] - p1[1]);
-	Transform[1][0] = PageHeight / (p1[0] - p2[0]);
+	Transform[0][1] = PlotSize[1] * PageHeight / (p2[1] - p1[1]);
+	Transform[0][2] = p1[0] * PlotSize[0] * PageWidth / (p1[0] - p2[0]);
+	Transform[1][0] = PlotSize[0] * PageWidth / (p1[0] - p2[0]);
 	Transform[1][1] = 0.0;
-	Transform[2][0] = -p1[1] * PageWidth / (p2[1] - p1[1]);
-	Transform[2][1] = p1[0] * PageHeight / (p1[0] - p2[0]);
+	Transform[1][2] = (PageHeight + PageTop + PageBottom) -
+	                  p1[1] * PlotSize[1] * PageHeight / (p2[1] - p1[1]);
 	break;
   };
+
+  if (Verbosity)
+    fprintf(stderr, "hpgl2ps: transform matrix = [ %f %f %f %f %f %f ]\n",
+            Transform[0][0], Transform[0][1], Transform[0][2],
+            Transform[1][0], Transform[1][1], Transform[1][2]);
 }
 
 
 void
-IN_initialize(int num_params, param_t *params)
+BP_begin_plot(int num_params, param_t *params)
 {
-  DF_default_values(0, NULL);
-  PU_pen_up(0, NULL);
-  RO_rotate(0, NULL);
-  IP_input_absolute(0, NULL);
-  WU_width_units(0, NULL);
-  PW_pen_width(0, NULL);
-  SP_select_pen(0, NULL);
-
-  PenPosition[0] = PenPosition[1] = 0.0;
 }
 
 
@@ -135,14 +132,29 @@ DF_default_values(int num_params, param_t *params)
 
 
 void
+IN_initialize(int num_params, param_t *params)
+{
+  DF_default_values(0, NULL);
+  PU_pen_up(0, NULL);
+  RO_rotate(0, NULL);
+  IP_input_absolute(0, NULL);
+  WU_width_units(0, NULL);
+  PW_pen_width(0, NULL);
+  SP_select_pen(0, NULL);
+
+  PenPosition[0] = PenPosition[1] = 0.0;
+}
+
+
+void
 IP_input_absolute(int num_params, param_t *params)
 {
   if (num_params == 0)
   {
-    P1[0] = 0;
-    P1[1] = 0;
-    P2[0] = PageWidth / 72.0 * 1016.0 - 1.0;
-    P2[1] = PageHeight / 72.0 * 1016.0 - 1.0;
+    P1[0] = PageLeft / 72.0 * 1016.0;
+    P1[1] = PageBottom / 72.0 * 1016.0;
+    P2[0] = (PageLeft + PageWidth) / 72.0 * 1016.0;
+    P2[1] = (PageBottom + PageHeight) / 72.0 * 1016.0;
   }
   else if (num_params == 2)
   {
@@ -170,10 +182,10 @@ IR_input_relative(int num_params, param_t *params)
 {
   if (num_params == 0)
   {
-    P1[0] = 0;
-    P1[1] = 0;
-    P2[0] = PageWidth / 72.0 * 1016.0 - 1.0;
-    P2[1] = PageHeight / 72.0 * 1016.0 - 1.0;
+    P1[0] = PageLeft / 72.0 * 1016.0;
+    P1[1] = PageBottom / 72.0 * 1016.0;
+    P2[0] = (PageLeft + PageWidth) / 72.0 * 1016.0;
+    P2[1] = (PageBottom + PageHeight) / 72.0 * 1016.0;
   }
   else if (num_params == 2)
   {
@@ -210,6 +222,7 @@ PG_advance_page(int num_params, param_t *params)
   fputs("%%EndPage\n", OutputFile);
 
   PageCount ++;
+  PageDirty = 0;
   fprintf(OutputFile, "%%%%Page: %d\n", PageCount);
   fputs("gsave\n", OutputFile);
   fprintf(OutputFile, "%.1f %.1f translate\n", PageLeft, PageBottom);
@@ -217,10 +230,39 @@ PG_advance_page(int num_params, param_t *params)
 
 
 void
+PS_plot_size(int num_params, param_t *params)
+{
+  switch (num_params)
+  {
+    case 0 :
+        break;
+    case 1 :
+        PlotSize[1] = PageHeight / (72.0 * params[0].value.number / 1016.0);
+        PlotSize[0] = PlotSize[1];
+        break;
+    case 2 :
+        if (Rotation == 0 || Rotation == 180)
+        {
+          PlotSize[0] = PageWidth / (72.0 * params[1].value.number / 1016.0);
+          PlotSize[1] = PageHeight / (72.0 * params[0].value.number / 1016.0);
+        }
+        else
+        {
+          PlotSize[0] = PageHeight / (72.0 * params[1].value.number / 1016.0);
+          PlotSize[1] = PageWidth / (72.0 * params[0].value.number / 1016.0);
+        };
+        break;
+  };
+
+  update_transform();
+}
+
+
+void
 RO_rotate(int num_params, param_t *params)
 {
   if (num_params == 0)
-    Rotation = 0;
+    Rotation = PageRotation;
   else
     Rotation = params[0].value.number;
 
@@ -258,5 +300,5 @@ SC_scale(int num_params, param_t *params)
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.1 1996/08/24 19:41:24 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.2 1996/10/14 16:50:14 mike Exp $".
  */

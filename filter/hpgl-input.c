@@ -1,9 +1,9 @@
 /*
- * "$Id: hpgl-input.c,v 1.1 1996/08/24 19:41:24 mike Exp $"
+ * "$Id: hpgl-input.c,v 1.2 1996/10/14 16:50:14 mike Exp $"
  *
- *   for espPrint, a collection of printer/image software.
+ *   HPGL input processing for espPrint, a collection of printer drivers.
  *
- *   Copyright (c) 1993-1995 by Easy Software Products
+ *   Copyright 1993-1996 by Easy Software Products
  *
  *   These coded instructions, statements, and computer  programs  contain
  *   unpublished  proprietary  information  of Easy Software Products, and
@@ -19,9 +19,15 @@
  * Revision History:
  *
  *   $Log: hpgl-input.c,v $
- *   Revision 1.1  1996/08/24 19:41:24  mike
- *   Initial revision
+ *   Revision 1.2  1996/10/14 16:50:14  mike
+ *   Updated for 3.2 release.
+ *   Added 'blackplot', grayscale, and default pen width options.
+ *   Added encoded polyline support.
+ *   Added fit-to-page code.
+ *   Added pen color palette support.
  *
+ *   Revision 1.1  1996/08/24  19:41:24  mike
+ *   Initial revision
  */
 
 /*
@@ -48,7 +54,7 @@ ParseCommand(char    *name,	/* O - Name of command */
 	ch,		/* Current char */
 	done;		/* Non-zero when the current command is read */
   int	i;
-  char	buf[1024];
+  char	buf[262144];
   static param_t	p[MAX_PARAMS];
   			/* Parameter buffer */
 
@@ -133,6 +139,17 @@ ParseCommand(char    *name,	/* O - Name of command */
       p[num_params].value.string = strdup(buf);
       num_params ++;
     };
+  }
+  else if (strcasecmp(name, "PE") == 0)
+  {
+    for (i = 0; i < (sizeof(buf) - 1); i ++)
+      if ((buf[i] = getc(InputFile)) == ';')
+        break;
+
+    buf[i] = '\0';
+    p[num_params].type = PARAM_STRING;
+    p[num_params].value.string = strdup(buf);
+    num_params ++;
   };
 
   while (!done)
@@ -144,6 +161,14 @@ ParseCommand(char    *name,	/* O - Name of command */
       case '\r' :
       case '\t' :
           break;
+
+      case '\"' :
+          fscanf(InputFile, "%[^\"]\"", buf);
+          p[num_params].type = PARAM_STRING;
+          p[num_params].value.string = strdup(buf);
+          num_params ++;
+          break;
+
       case '-' :
       case '+' :
           ungetc(ch, InputFile);
@@ -196,5 +221,5 @@ FreeParameters(int     num_params, /* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-input.c,v 1.1 1996/08/24 19:41:24 mike Exp $".
+ * End of "$Id: hpgl-input.c,v 1.2 1996/10/14 16:50:14 mike Exp $".
  */
