@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.10 1999/03/22 17:02:30 mike Exp $"
+ * "$Id: emit.c,v 1.11 1999/04/09 14:21:23 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -65,6 +65,7 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
   int		i,			/* Looping var */
 		count;			/* Number of choices */
   ppd_choice_t	**choices;		/* Choices */
+  ppd_size_t	*size;			/* Custom page size */
 
 
   if ((count = ppd_collect(ppd, section, &choices)) == 0)
@@ -85,7 +86,32 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
         return (-1);
       }
 
-      if (choices[i]->code[0] != '\0')
+      if (strcmp(((ppd_option_t *)choices[i]->option)->keyword, "PageSize") == 0 &&
+          strcmp(choices[i]->choice, "Custom") == 0)
+      {
+       /*
+        * Variable size; write out standard size options (this should
+	* eventually be changed to use the parameter positions defined
+	* in the PPD file...)
+	*/
+
+        size = ppdPageSize(ppd, "Custom");
+        fprintf(fp, "%.0f %.0f 0 0 0\n", size->width, size->length);
+
+	if (choices[i]->code == NULL)
+	{
+	 /*
+	  * This can happen with certain buggy PPD files that don't include
+	  * a CustomPageSize command sequence...  We just use a generic
+	  * Level 2 command sequence...
+	  */
+
+	  fputs("pop pop pop\n", fp);
+	  fputs("<</PageSize[7 -2 roll]/ImagingBBox null>>setpagedevice\n", fp);
+	}
+      }
+
+      if (choices[i]->code != NULL && choices[i]->code[0] != '\0')
       {
         if (fputs((char *)choices[i]->code, fp) < 0)
         {
@@ -271,5 +297,5 @@ ppd_collect(ppd_file_t    *ppd,		/* I - PPD file data */
 
 
 /*
- * End of "$Id: emit.c,v 1.10 1999/03/22 17:02:30 mike Exp $".
+ * End of "$Id: emit.c,v 1.11 1999/04/09 14:21:23 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.12 1999/04/07 14:44:13 mike Exp $"
+ * "$Id: ppd.h,v 1.13 1999/04/09 14:21:25 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -184,10 +184,10 @@ typedef struct			/**** Files ****/
   int		num_groups;	/* Number of UI groups */
   ppd_group_t	*groups;	/* UI groups */
   int		num_sizes;	/* Number of page sizes */
-  ppd_size_t	*sizes,		/* Page sizes */
-		custom_min,	/* Minimum variable page size */
-		custom_max;	/* Maximum variable page size */
-  unsigned char	*custom_code;	/* Custom page size code */
+  ppd_size_t	*sizes;		/* Page sizes */
+  float		custom_min[2],	/* Minimum variable page size */
+		custom_max[2],	/* Maximum variable page size */
+		custom_margins[4];/* Margins around page */
   int		num_consts;	/* Number of UI/Non-UI constraints */
   ppd_const_t	*consts;	/* UI/Non-UI constraints */
   int		num_fonts;	/* Number of pre-loaded fonts */
@@ -232,5 +232,5 @@ extern float		ppdPageWidth(ppd_file_t *ppd, char *name);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.12 1999/04/07 14:44:13 mike Exp $".
+ * End of "$Id: ppd.h,v 1.13 1999/04/09 14:21:25 mike Exp $".
  */
