@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.14.2.6 2002/06/27 19:43:48 mike Exp $"
+ * "$Id: ppds.c,v 1.14.2.7 2002/08/22 16:52:57 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -487,7 +487,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     { "japanese",	"jp" },
     { "norwegian",	"no" },
     { "polish",		"pl" },
-    { "portugese",	"pt" },
+    { "portuguese",	"pt" },
     { "russian",	"ru" },
     { "slovak",		"sk" },
     { "swedish",	"sv" },
@@ -892,5 +892,5 @@ ppd_gets(buf_t *fp,		/* I - File to read from */
 
 
 /*
- * End of "$Id: ppds.c,v 1.14.2.6 2002/06/27 19:43:48 mike Exp $".
+ * End of "$Id: ppds.c,v 1.14.2.7 2002/08/22 16:52:57 mike Exp $".
  */
