@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.5 1999/02/10 19:28:53 mike Exp $"
+ * "$Id: conf.c,v 1.6 1999/02/10 21:15:53 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -201,9 +201,67 @@ ReadConfiguration(void)
  */
 
 int				/* O - 1 on success, 0 on error */
-LogRequest(client_t *con,	/* I - Request to log */
-           int      code)	/* I - Response code */
+LogRequest(client_t      *con,	/* I - Request to log */
+           http_status_t code)	/* I - Response code */
 {
+  char		filename[1024];	/* Name of error log file */
+  struct tm	*date;		/* Date information */
+  static char	*months[12] =	/* Months */
+		{
+		  "Jan",
+		  "Feb",
+		  "Mar",
+		  "Apr",
+		  "May",
+		  "Jun",
+		  "Jul",
+		  "Aug",
+		  "Sep",
+		  "Oct",
+		  "Nov",
+		  "Dec"
+		};
+  static char	*states[] =	/* HTTP client states... */
+		{
+		  "WAITING",
+		  "OPTIONS",
+		  "GET",
+		  "GET",
+		  "HEAD",
+		  "POST",
+		  "POST",
+		  "POST",
+		  "PUT",
+		  "PUT",
+		  "DELETE",
+		  "TRACE",
+		  "CLOSE",
+		  "STATUS"
+		};
+
+
+  if (AccessFile == NULL)
+  {
+    if (AccessLog[0] != '/')
+      sprintf(filename, "%s/%s", ServerRoot, AccessLog);
+    else
+      strcpy(filename, AccessLog);
+
+    if ((AccessFile = fopen(filename, "a")) == NULL)
+      AccessFile = stderr;
+  }
+
+  date = gmtime(&(con->start));
+
+  fprintf(AccessFile, "%s - %s [%02d/%s/%04d:%02d:%02d:%02d +0000] \"%s %s HTTP/%d.%d\" %d %d\n",
+          con->http.hostname, con->username[0] != '\0' ? con->username : "-",
+	  date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
+	  date->tm_hour, date->tm_min, date->tm_sec,
+	  states[con->operation], con->uri,
+	  con->http.version / 100, con->http.version % 100,
+	  code, con->bytes);
+  fflush(AccessFile);
+
   return (1);
 }
 
@@ -237,6 +295,7 @@ LogMessage(int  level,		/* I - Log level */
     va_start(ap, message);
     vfprintf(ErrorFile, message, ap);
     fputs("\n", ErrorFile);
+    fflush(ErrorFile);
     va_end(ap);
   }
 
@@ -812,5 +871,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.5 1999/02/10 19:28:53 mike Exp $".
+ * End of "$Id: conf.c,v 1.6 1999/02/10 21:15:53 mike Exp $".
  */

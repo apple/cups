@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.2 1999/02/10 19:28:53 mike Exp $"
+ * "$Id: client.c,v 1.3 1999/02/10 21:15:52 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -266,6 +266,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	con->http.keep_alive     = HTTP_KEEPALIVE_OFF;
 	con->http.data_encoding  = HTTP_ENCODE_LENGTH;
 	con->http.data_remaining = 0;
+	con->operation           = HTTP_WAITING;
+	con->bytes               = 0;
 	con->file                = 0;
 	con->pipe_pid            = 0;
 	con->username[0]         = '\0';
@@ -342,6 +344,9 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  CloseClient(con);
 	  return (0);
 	}
+
+        con->start     = time(NULL);
+        con->operation = con->http.state;
 
         LogMessage(LOG_INFO, "ReadClient() %d %s %s HTTP/%d.%d", con->http.fd,
 	           operation, con->uri,
@@ -440,6 +445,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 		return (0);
 	      }
             }
+	    else
+              LogRequest(con, HTTP_OK);
 
             con->http.state = HTTP_WAITING;
 
@@ -528,6 +535,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      CloseClient(con);
 	      return (0);
 	    }
+
+            LogRequest(con, HTTP_OK);
 	  }
 	  else if ((filename = get_file(con, &filestats)) == NULL)
 	  {
@@ -536,6 +545,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      CloseClient(con);
 	      return (0);
 	    }
+
+            LogRequest(con, HTTP_NOT_FOUND);
 	  }
 	  else if (!check_if_modified(con, &filestats))
           {
@@ -544,6 +555,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
               CloseClient(con);
 	      return (0);
 	    }
+
+            LogRequest(con, HTTP_NOT_MODIFIED);
 	  }
 	  else
 	  {
@@ -573,6 +586,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      CloseClient(con);
 	      return (0);
 	    }
+
+            LogRequest(con, HTTP_OK);
 	  }
 
           if (send(con->http.fd, "\r\n", 2, 0) < 0)
@@ -621,6 +636,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	}
 	else
 	{
+	  con->bytes += bytes;
+
           LogMessage(LOG_DEBUG, "ReadClient() %d writing %d bytes", bytes);
 
           if (write(con->file, line, bytes) < bytes)
@@ -714,6 +731,12 @@ SendError(client_t      *con,	/* I - Connection */
 {
   char	message[1024];		/* Text version of error code */
 
+
+ /*
+  * Put the request in the access_log file...
+  */
+
+  LogRequest(con, code);
 
  /*
   * To work around bugs in some proxies, don't use Keep-Alive for some
@@ -996,9 +1019,13 @@ WriteClient(client_t *con)
       CloseClient(con);
       return (0);
     }
+
+    con->bytes += bytes;
   }
   else
   {
+    LogRequest(con, HTTP_OK);
+
     if (con->http.data_encoding == HTTP_ENCODE_CHUNKED)
     {
       if (httpPrintf(HTTP(con), "0\r\n\r\n") < 0)
@@ -1415,7 +1442,7 @@ show_printer_status(client_t *con)
 		    p->name, p->name, p->info, p->more_info,
 		    p->location, p->device_uri, p->ppd);
 
-    httpWrite(HTTP(con), buffer, strlen(buffer));
+    con->bytes += httpWrite(HTTP(con), buffer, strlen(buffer));
   }
   else
   {
@@ -1433,13 +1460,13 @@ show_printer_status(client_t *con)
 		   "<CENTER><TABLE BORDER=1 WIDTH=80%%>\n"
                    "<TR><TH>Name</TH><TH>State</TH><TH>Info</TH></TR>\n");
 
-    httpWrite(HTTP(con), buffer, strlen(buffer));
+    con->bytes += httpWrite(HTTP(con), buffer, strlen(buffer));
 
     for (p = Printers; p != NULL; p = p->next)
     {
       sprintf(buffer, "<TR><TD><A HREF=/printers/%s>%s</A></TD><TD>%s</TD><TD>%s</TD></TR>\n",
 	      p->name, p->name, states[p->state], p->info);
-      httpWrite(HTTP(con), buffer, strlen(buffer));
+      con->bytes += httpWrite(HTTP(con), buffer, strlen(buffer));
     }
   }
 
@@ -1450,7 +1477,7 @@ show_printer_status(client_t *con)
 		 "trademark property of Easy Software Products.\n"
 		 "</BODY>\n"
                  "</HTML>\n");
-  httpWrite(HTTP(con), buffer, strlen(buffer));
+  con->bytes += httpWrite(HTTP(con), buffer, strlen(buffer));
   httpWrite(HTTP(con), buffer, 0);
 
   return (1);
@@ -1470,5 +1497,5 @@ sigpipe_handler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: client.c,v 1.2 1999/02/10 19:28:53 mike Exp $".
+ * End of "$Id: client.c,v 1.3 1999/02/10 21:15:52 mike Exp $".
  */
