@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.35 1999/06/24 14:24:40 mike Exp $"
+ * "$Id: dirsvc.c,v 1.36 1999/06/25 12:27:55 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -278,11 +278,11 @@ UpdateBrowseList(void)
       * Force the URI to point to the real server...
       */
 
+      p->type = type;
       strcpy(p->uri, uri);
       strcpy(p->device_uri, uri);
       strcpy(p->hostname, host);
-      free(p->attrs->attrs->values[0].string.text);
-      p->attrs->attrs->values[0].string.text = strdup(uri);
+      SetPrinterAttrs(p);
     }
   }
   else
@@ -330,14 +330,14 @@ UpdateBrowseList(void)
       p = AddPrinter(name);
 
      /*
-      * First the URI to point to the real server...
+      * Force the URI to point to the real server...
       */
 
+      p->type = type;
       strcpy(p->uri, uri);
       strcpy(p->device_uri, uri);
       strcpy(p->hostname, host);
-      free(p->attrs->attrs->values[0].string.text);
-      p->attrs->attrs->values[0].string.text = strdup(uri);
+      SetPrinterAttrs(p);
     }
   }
 
@@ -526,5 +526,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.35 1999/06/24 14:24:40 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.36 1999/06/25 12:27:55 mike Exp $".
  */
