@@ -10,9 +10,9 @@
 %%Title: Test Page
 %%EndComments
 %%BeginProlog
-%%BeginResource procset testprint 1.0 0
+%%BeginResource procset testprint 1.1 0
 %
-%   PostScript test page for ESP Print Pro.
+%   PostScript test page for the Common UNIX Printing System ("CUPS").
 %
 %   Copyright 1993-2000 Easy Software Products
 %
@@ -463,9 +463,9 @@ gsave
 
   % Draw the copyright notice at the bottom...
   pageWidth 36 mul			% Center of page
-  pageWidth 19 mul			% Bottom of page
+  pageWidth 14 mul			% Bottom of page
   2 copy moveto				% Position text
-  (Printed Using ESP Print Pro v4.1) CENTER	% Show text centered
+  (Printed Using CUPS v1.1) CENTER	% Show text centered
 
   pageWidth 3 mul sub			% Move down...
   2 copy moveto				% Position text
@@ -473,20 +473,13 @@ gsave
   (Copyright 1993-2000 Easy Software Products, All Rights Reserved.) CENTER
   pageWidth 1.5 mul sub			% Move down...
   2 copy moveto				% Position text
-  (ESP Print Pro, CUPS, and the CUPS logo are the trademark property of) CENTER
+  (CUPS, and the CUPS logo are the trademark property of) CENTER
   pageWidth 1.5 mul sub			% Move down...
   2 copy moveto				% Position text
   (Easy Software Products, 44141 Airport View Drive, Suite 204,) CENTER
   pageWidth 1.5 mul sub			% Move down...
   2 copy moveto				% Position text
   (Hollywood, Maryland, 20636-3111, USA.) CENTER
-
-  pageWidth 3 mul sub			% Move down...
-  2 copy moveto				% Position text
-  (If you encounter difficulties with this software, please contact us at) CENTER
-  pageWidth 1.5 mul sub			% Move down...
-  moveto				% Position text
-  (+1.301.373.9600, "print@easysw.com", or "http://www.easysw.com".) CENTER
 
   % Then the CUPS logo....
   gsave
@@ -507,6 +500,6 @@ gsave
 grestore
 showpage
 %
-% End of "$Id: testprint.ps,v 1.8 2000/01/04 13:45:38 mike Exp $".
+% End of "$Id: testprint.ps,v 1.9 2000/03/13 18:55:00 mike Exp $".
 %
 %%EOF
