@@ -25,8 +25,18 @@
 /* sjpegerr.c */
 /* IJG error message table for Ghostscript. */
 #include "stdio_.h"
+
+/*
+ * MRS - these are normally found in jversion.h, however it seems that
+ * many vendors (Red Hat, SGI, etc.) do not distribute it...
+ *
+ * The following definitions come from the 6B distribution...
+ */
+
+#define JVERSION "6b  27-Mar-1998"
+#define JCOPYRIGHT "Copyright (C) 1998, Thomas G. Lane"
+
 #include "jpeglib.h"
-#include "jversion.h"
 
 /*
  * This file exists solely to hold the rather large IJG error message string

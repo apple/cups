@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.11 1999/05/17 18:03:29 mike Exp $"
+dnl "$Id: configure.in,v 1.12 1999/05/19 20:17:11 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -77,22 +77,18 @@ fi)
 
 IMGLIBS=""
 AC_SUBST(IMGLIBS)
-AC_CHECK_LIB(jpeg,jpeg_destroy_decompress,
-    AC_CHECK_HEADER(jpeglib.h,
-        AC_DEFINE(HAVE_LIBJPEG)
-        IMGLIBS="$IMGLIBS -ljpeg"))
-AC_CHECK_LIB(png,png_read_info,
-    AC_CHECK_HEADER(png.h,
-        AC_DEFINE(HAVE_LIBPNG)
-        IMGLIBS="$IMGLIBS -lpng"))
-AC_CHECK_LIB(tiff,TIFFGetField,
-    AC_CHECK_HEADER(tiff.h,
-        AC_DEFINE(HAVE_LIBTIFF)
-        IMGLIBS="$IMGLIBS -ltiff"))
-AC_CHECK_LIB(z,deflate,
-    AC_CHECK_HEADER(zlib.h,
-        AC_DEFINE(HAVE_LIBZ)
-        IMGLIBS="$IMGLIBS -lz"))
+AC_CHECK_HEADER(jpeglib.h,
+    AC_DEFINE(HAVE_LIBJPEG)
+    IMGLIBS="$IMGLIBS -ljpeg")
+AC_CHECK_HEADER(zlib.h,
+    AC_DEFINE(HAVE_LIBZ)
+    IMGLIBS="$IMGLIBS -lz")
+AC_CHECK_HEADER(png.h,
+    AC_DEFINE(HAVE_LIBPNG)
+    IMGLIBS="$IMGLIBS -lpng")
+AC_CHECK_HEADER(tiff.h,
+    AC_DEFINE(HAVE_LIBTIFF)
+    IMGLIBS="$IMGLIBS -ltiff")
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -139,5 +135,5 @@ AC_SUBST(CUPS_DATADIR)
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.11 1999/05/17 18:03:29 mike Exp $".
+dnl End of "$Id: configure.in,v 1.12 1999/05/19 20:17:11 mike Exp $".
 dnl
