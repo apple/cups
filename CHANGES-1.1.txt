@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The scheduler did not refresh the common printer data
+	  after a fast reload; this prevented banner and other
+	  information from being updated (STR #562)
 	- The scheduler did not send common or history data to
 	  the client when processing a CUPS-Get-Default request
 	  (STR #559)

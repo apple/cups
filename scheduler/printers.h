@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h,v 1.22.2.14 2003/04/26 17:19:49 mike Exp $"
+ * "$Id: printers.h,v 1.22.2.15 2004/02/05 16:20:12 mike Exp $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -100,6 +100,7 @@ extern void		AddPrinterFilter(printer_t *p, const char *filter);
 extern void		AddPrinterHistory(printer_t *p);
 extern void		AddPrinterUser(printer_t *p, const char *username);
 extern quota_t		*AddQuota(printer_t *p, const char *username);
+extern void		CreateCommonData(void);
 extern void		DeleteAllPrinters(void);
 extern void		DeletePrinter(printer_t *p, int update);
 extern void		DeletePrinterFilters(printer_t *p);
@@ -125,5 +126,5 @@ extern void		WritePrintcap(void);
 
 
 /*
- * End of "$Id: printers.h,v 1.22.2.14 2003/04/26 17:19:49 mike Exp $".
+ * End of "$Id: printers.h,v 1.22.2.15 2004/02/05 16:20:12 mike Exp $".
  */

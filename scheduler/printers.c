@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.53 2003/10/29 16:53:36 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.54 2004/02/05 16:20:12 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -299,6 +299,205 @@ AddPrinterUser(printer_t  *p,		/* I - Printer */
 
 
 /*
+ * 'CreateCommonData()' - Create the common printer data.
+ */
+
+void
+CreateCommonData(void)
+{
+  int		i;			/* Looping var */
+  ipp_attribute_t *attr;		/* Attribute data */
+  static const int nups[] =		/* number-up-supported values */
+		{ 1, 2, 4, 6, 9, 16 };
+  static const ipp_orient_t orients[4] =/* orientation-requested-supported values */
+		{
+		  IPP_PORTRAIT,
+		  IPP_LANDSCAPE,
+		  IPP_REVERSE_LANDSCAPE,
+		  IPP_REVERSE_PORTRAIT
+		};
+  static const char * const holds[] =	/* job-hold-until-supported values */
+		{
+		  "no-hold",
+		  "indefinite",
+		  "day-time",
+		  "evening",
+		  "night",
+		  "second-shift",
+		  "third-shift",
+		  "weekend"
+		};
+  static const char * const versions[] =/* ipp-versions-supported values */
+		{
+		  "1.0",
+		  "1.1"
+		};
+  static const ipp_op_t	ops[] =		/* operations-supported values */
+		{
+		  IPP_PRINT_JOB,
+		  IPP_VALIDATE_JOB,
+		  IPP_CREATE_JOB,
+		  IPP_SEND_DOCUMENT,
+		  IPP_CANCEL_JOB,
+		  IPP_GET_JOB_ATTRIBUTES,
+		  IPP_GET_JOBS,
+		  IPP_GET_PRINTER_ATTRIBUTES,
+		  IPP_HOLD_JOB,
+		  IPP_RELEASE_JOB,
+		  IPP_PAUSE_PRINTER,
+		  IPP_RESUME_PRINTER,
+		  IPP_PURGE_JOBS,
+		  IPP_SET_JOB_ATTRIBUTES,
+		  IPP_ENABLE_PRINTER,
+		  IPP_DISABLE_PRINTER,
+		  CUPS_GET_DEFAULT,
+		  CUPS_GET_PRINTERS,
+		  CUPS_ADD_PRINTER,
+		  CUPS_DELETE_PRINTER,
+		  CUPS_GET_CLASSES,
+		  CUPS_ADD_CLASS,
+		  CUPS_DELETE_CLASS,
+		  CUPS_ACCEPT_JOBS,
+		  CUPS_REJECT_JOBS,
+		  CUPS_GET_DEVICES,
+		  CUPS_GET_PPDS,
+		  IPP_RESTART_JOB
+		};
+  static const char * const charsets[] =/* charset-supported values */
+		{
+		  "us-ascii",
+		  "iso-8859-1",
+		  "iso-8859-2",
+		  "iso-8859-3",
+		  "iso-8859-4",
+		  "iso-8859-5",
+		  "iso-8859-6",
+		  "iso-8859-7",
+		  "iso-8859-8",
+		  "iso-8859-9",
+		  "iso-8859-10",
+		  "iso-8859-13",
+		  "iso-8859-14",
+		  "iso-8859-15",
+		  "utf-8",
+		  "windows-874",
+		  "windows-1250",
+		  "windows-1251",
+		  "windows-1252",
+		  "windows-1253",
+		  "windows-1254",
+		  "windows-1255",
+		  "windows-1256",
+		  "windows-1257",
+		  "windows-1258",
+		  "koi8-r",
+		  "koi8-u",
+		};
+  static const char * const compressions[] =
+		{			/* document-compression-supported values */
+		  "none"
+#ifdef HAVE_LIBZ
+		  ,"gzip"
+#endif /* HAVE_LIBZ */
+		};
+  static const char * const multiple_document_handling[] =
+		{			/* multiple-document-handling-supported values */
+		  "separate-documents-uncollated-copies",
+		  "separate-documents-collated-copies"
+		};
+
+
+  if (CommonData)
+    ippDelete(CommonData);
+
+  CommonData = ippNew();
+
+  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+               "pdl-override-supported", NULL, "not-attempted");
+  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                "ipp-versions-supported", sizeof(versions) / sizeof(versions[0]),
+		NULL, versions);
+  ippAddIntegers(CommonData, IPP_TAG_PRINTER, IPP_TAG_ENUM,
+                 "operations-supported",
+                 sizeof(ops) / sizeof(ops[0]) + JobFiles - 1, (int *)ops);
+  ippAddBoolean(CommonData, IPP_TAG_PRINTER,
+                "multiple-document-jobs-supported", 1);
+  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                "multiple-operation-time-out", 60);
+  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                "multiple-document-handling-supported",
+                sizeof(multiple_document_handling) /
+		    sizeof(multiple_document_handling[0]), NULL,
+	        multiple_document_handling);
+  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_CHARSET,
+               "charset-configured", NULL, DefaultCharset);
+  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_CHARSET,
+                "charset-supported", sizeof(charsets) / sizeof(charsets[0]),
+		NULL, charsets);
+  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
+               "natural-language-configured", NULL, DefaultLanguage);
+  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
+               "generated-natural-language-supported", NULL, DefaultLanguage);
+  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
+               "document-format-default", NULL, "application/octet-stream");
+  ippAddStrings(CommonData, IPP_TAG_PRINTER,
+                (ipp_tag_t)(IPP_TAG_MIMETYPE | IPP_TAG_COPY),
+                "document-format-supported", NumMimeTypes, NULL, MimeTypes);
+  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+        	"compression-supported",
+		sizeof(compressions) / sizeof(compressions[0]),
+		NULL, compressions);
+  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                "job-priority-supported", 100);
+  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                "job-priority-default", 50);
+  ippAddRange(CommonData, IPP_TAG_PRINTER, "copies-supported", 1, MaxCopies);
+  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                "copies-default", 1);
+  ippAddBoolean(CommonData, IPP_TAG_PRINTER, "page-ranges-supported", 1);
+  ippAddIntegers(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                 "number-up-supported", sizeof(nups) / sizeof(nups[0]), nups);
+  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                "number-up-default", 1);
+  ippAddIntegers(CommonData, IPP_TAG_PRINTER, IPP_TAG_ENUM,
+                 "orientation-requested-supported", 4, (int *)orients);
+  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_ENUM,
+                "orientation-requested-default", IPP_PORTRAIT);
+  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                "job-hold-until-supported", sizeof(holds) / sizeof(holds[0]),
+		NULL, holds);
+  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+               "job-hold-until-default", NULL, "no-hold");
+
+  if (NumBanners > 0)
+  {
+   /*
+    * Setup the job-sheets-supported and job-sheets-default attributes...
+    */
+
+    if (Classification && !ClassifyOverride)
+      attr = ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                	  "job-sheets-supported", NULL, Classification);
+    else
+      attr = ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                	   "job-sheets-supported", NumBanners + 1, NULL, NULL);
+
+    if (attr == NULL)
+      LogMessage(L_EMERG, "SetPrinterAttrs: Unable to allocate memory for "
+                          "job-sheets-supported attribute: %s!",
+	         strerror(errno));
+    else if (!Classification || ClassifyOverride)
+    {
+      attr->values[0].string.text = strdup("none");
+
+      for (i = 0; i < NumBanners; i ++)
+	attr->values[i + 1].string.text = strdup(Banners[i].name);
+    }
+  }
+}
+
+
+/*
  * 'DeleteAllPrinters()' - Delete all printers from the system.
  */
 
@@ -315,12 +514,6 @@ DeleteAllPrinters(void)
 
     if (!(p->type & CUPS_PRINTER_CLASS))
       DeletePrinter(p, 0);
-  }
-
-  if (CommonData)
-  {
-    ippDelete(CommonData);
-    CommonData = NULL;
   }
 }
 
@@ -963,115 +1156,14 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   ppd_attr_t	*ppdattr;		/* PPD attribute */
   ipp_attribute_t *attr;		/* Attribute data */
   ipp_value_t	*val;			/* Attribute value */
-  static const int nups[] =		/* number-up-supported values */
-		{ 1, 2, 4, 6, 9, 16 };
-  static const ipp_orient_t orients[4] =/* orientation-requested-supported values */
-		{
-		  IPP_PORTRAIT,
-		  IPP_LANDSCAPE,
-		  IPP_REVERSE_LANDSCAPE,
-		  IPP_REVERSE_PORTRAIT
-		};
+  int		num_finishings;
+  ipp_finish_t	finishings[5];		/* finishings-supported values */
   static const char * const sides[3] =	/* sides-supported values */
 		{
 		  "one",
 		  "two-long-edge",
 		  "two-short-edge"
 		};
-  static const char * const holds[] =	/* job-hold-until-supported values */
-		{
-		  "no-hold",
-		  "indefinite",
-		  "day-time",
-		  "evening",
-		  "night",
-		  "second-shift",
-		  "third-shift",
-		  "weekend"
-		};
-  static const char * const versions[] =/* ipp-versions-supported values */
-		{
-		  "1.0",
-		  "1.1"
-		};
-  static const ipp_op_t	ops[] =		/* operations-supported values */
-		{
-		  IPP_PRINT_JOB,
-		  IPP_VALIDATE_JOB,
-		  IPP_CREATE_JOB,
-		  IPP_SEND_DOCUMENT,
-		  IPP_CANCEL_JOB,
-		  IPP_GET_JOB_ATTRIBUTES,
-		  IPP_GET_JOBS,
-		  IPP_GET_PRINTER_ATTRIBUTES,
-		  IPP_HOLD_JOB,
-		  IPP_RELEASE_JOB,
-		  IPP_PAUSE_PRINTER,
-		  IPP_RESUME_PRINTER,
-		  IPP_PURGE_JOBS,
-		  IPP_SET_JOB_ATTRIBUTES,
-		  IPP_ENABLE_PRINTER,
-		  IPP_DISABLE_PRINTER,
-		  CUPS_GET_DEFAULT,
-		  CUPS_GET_PRINTERS,
-		  CUPS_ADD_PRINTER,
-		  CUPS_DELETE_PRINTER,
-		  CUPS_GET_CLASSES,
-		  CUPS_ADD_CLASS,
-		  CUPS_DELETE_CLASS,
-		  CUPS_ACCEPT_JOBS,
-		  CUPS_REJECT_JOBS,
-		  CUPS_GET_DEVICES,
-		  CUPS_GET_PPDS,
-		  IPP_RESTART_JOB
-		};
-  static const char * const charsets[] =/* charset-supported values */
-		{
-		  "us-ascii",
-		  "iso-8859-1",
-		  "iso-8859-2",
-		  "iso-8859-3",
-		  "iso-8859-4",
-		  "iso-8859-5",
-		  "iso-8859-6",
-		  "iso-8859-7",
-		  "iso-8859-8",
-		  "iso-8859-9",
-		  "iso-8859-10",
-		  "iso-8859-13",
-		  "iso-8859-14",
-		  "iso-8859-15",
-		  "utf-8",
-		  "windows-874",
-		  "windows-1250",
-		  "windows-1251",
-		  "windows-1252",
-		  "windows-1253",
-		  "windows-1254",
-		  "windows-1255",
-		  "windows-1256",
-		  "windows-1257",
-		  "windows-1258",
-		  "koi8-r",
-		  "koi8-u",
-		};
-  static const char * const compressions[] =
-		{			/* document-compression-supported values */
-		  "none"
-#ifdef HAVE_LIBZ
-		  ,"gzip"
-#endif /* HAVE_LIBZ */
-		};
-  int		num_finishings;
-  ipp_finish_t	finishings[5];		/* finishings-supported values */
-  static const char * const multiple_document_handling[] =
-		{			/* multiple-document-handling-supported values */
-		  "separate-documents-uncollated-copies",
-		  "separate-documents-collated-copies"
-		};
-#ifdef __sgi
-  cups_file_t	*fp;		/* Interface script file */
-#endif /* __sgi */
 
 
   DEBUG_printf(("SetPrinterAttrs: entering name = %s, type = %x\n", p->name,
@@ -1082,89 +1174,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   */
 
   if (!CommonData)
-  {
-    CommonData = ippNew();
-
-    ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-        	 "pdl-override-supported", NULL, "not-attempted");
-    ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-                  "ipp-versions-supported", sizeof(versions) / sizeof(versions[0]),
-		  NULL, versions);
-    ippAddIntegers(CommonData, IPP_TAG_PRINTER, IPP_TAG_ENUM, "operations-supported",
-                   sizeof(ops) / sizeof(ops[0]) + JobFiles - 1, (int *)ops);
-    ippAddBoolean(CommonData, IPP_TAG_PRINTER, "multiple-document-jobs-supported", 1);
-    ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                  "multiple-operation-time-out", 60);
-    ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-                  "multiple-document-handling-supported",
-                  sizeof(multiple_document_handling) /
-		      sizeof(multiple_document_handling[0]), NULL,
-	          multiple_document_handling);
-    ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_CHARSET, "charset-configured",
-        	 NULL, DefaultCharset);
-    ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_CHARSET, "charset-supported",
-                  sizeof(charsets) / sizeof(charsets[0]), NULL, charsets);
-    ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
-        	 "natural-language-configured", NULL, DefaultLanguage);
-    ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
-        	 "generated-natural-language-supported", NULL, DefaultLanguage);
-    ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
-        	 "document-format-default", NULL, "application/octet-stream");
-    ippAddStrings(CommonData, IPP_TAG_PRINTER,
-                  (ipp_tag_t)(IPP_TAG_MIMETYPE | IPP_TAG_COPY),
-                  "document-format-supported", NumMimeTypes, NULL, MimeTypes);
-    ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-        	  "compression-supported",
-		  sizeof(compressions) / sizeof(compressions[0]),
-		  NULL, compressions);
-    ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                  "job-priority-supported", 100);
-    ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                  "job-priority-default", 50);
-    ippAddRange(CommonData, IPP_TAG_PRINTER, "copies-supported", 1, MaxCopies);
-    ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                  "copies-default", 1);
-    ippAddBoolean(CommonData, IPP_TAG_PRINTER, "page-ranges-supported", 1);
-    ippAddIntegers(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                   "number-up-supported", sizeof(nups) / sizeof(nups[0]), nups);
-    ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                  "number-up-default", 1);
-    ippAddIntegers(CommonData, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-                   "orientation-requested-supported", 4, (int *)orients);
-    ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-                  "orientation-requested-default", IPP_PORTRAIT);
-    ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-                  "job-hold-until-supported", sizeof(holds) / sizeof(holds[0]),
-		  NULL, holds);
-    ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-                 "job-hold-until-default", NULL, "no-hold");
-
-    if (NumBanners > 0)
-    {
-     /*
-      * Setup the job-sheets-supported and job-sheets-default attributes...
-      */
-
-      if (Classification && !ClassifyOverride)
-	attr = ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                	    "job-sheets-supported", NULL, Classification);
-      else
-	attr = ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                	     "job-sheets-supported", NumBanners + 1, NULL, NULL);
-
-      if (attr == NULL)
-	LogMessage(L_EMERG, "SetPrinterAttrs: Unable to allocate memory for "
-                            "job-sheets-supported attribute: %s!",
-	           strerror(errno));
-      else if (!Classification || ClassifyOverride)
-      {
-	attr->values[0].string.text = strdup("none");
-
-	for (i = 0; i < NumBanners; i ++)
-	  attr->values[i + 1].string.text = strdup(Banners[i].name);
-      }
-    }
-  }
+    CreateCommonData();
 
  /*
   * Clear out old filters and add a filter from application/vnd.cups-raw to
@@ -2403,5 +2413,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.53 2003/10/29 16:53:36 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.54 2004/02/05 16:20:12 mike Exp $".
  */
