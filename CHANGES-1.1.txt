@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The scheduler did not return the correct exit code
+	  when startup failed (STR #718)
+	- The cupsRasterReadPixels() function checked for
+	  EAGAIN, which caused problems on FreeBSD (STR #723)
 	- The cupsGetDests() function did not use the current
 	  encryption setting (STR #653)
 	- The scheduler did not properly parse name-based

@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.57 2004/03/19 22:19:44 mike Exp $"
+ * "$Id: main.c,v 1.57.2.58 2004/05/21 23:00:58 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -225,14 +225,20 @@ main(int  argc,				/* I - Number of command-line arguments */
       if (wait(&i) < 0)
       {
         perror("cupsd");
-	i = 1;
+	return (1);
       }
-      else if (i >= 256)
-        fprintf(stderr, "cupsd: Child exited with status %d!\n", i / 256);
+      else if (WIFEXITED(i))
+      {
+        fprintf(stderr, "cupsd: Child exited with status %d!\n", WEXITSTATUS(i));
+	return (2);
+      }
       else
-        fprintf(stderr, "cupsd: Child exited on signal %d!\n", i);
+      {
+        fprintf(stderr, "cupsd: Child exited on signal %d!\n", WTERMSIG(i));
+	return (3);
+      }
 
-      return (i);
+      return (0);
     }
   }
 
@@ -1307,5 +1313,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.57 2004/03/19 22:19:44 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.58 2004/05/21 23:00:58 mike Exp $".
  */
