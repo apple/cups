@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.32.2.3 2002/01/02 18:04:18 mike Exp $"
+ * "$Id: serial.c,v 1.32.2.4 2002/01/18 16:48:01 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -199,7 +199,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       }
       else
       {
-	perror("ERROR: Unable to open serial port device file");
+	fprintf(stderr, "ERROR: Unable to open serial port device file \"%s\": %s\n",
+	        resource, strerror(errno));
 	return (1);
       }
     }
@@ -862,5 +863,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.32.2.3 2002/01/02 18:04:18 mike Exp $".
+ * End of "$Id: serial.c,v 1.32.2.4 2002/01/18 16:48:01 mike Exp $".
  */

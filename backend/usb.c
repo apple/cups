@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.18.2.2 2002/01/02 18:04:18 mike Exp $"
+ * "$Id: usb.c,v 1.18.2.3 2002/01/18 16:48:01 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -167,7 +167,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       }
       else
       {
-	perror("ERROR: Unable to open USB port device file");
+	fprintf(stderr, "ERROR: Unable to open USB port device file \"%s\": %s\n",
+	        resource, strerror(errno));
 	return (1);
       }
     }
@@ -445,5 +446,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: usb.c,v 1.18.2.2 2002/01/02 18:04:18 mike Exp $".
+ * End of "$Id: usb.c,v 1.18.2.3 2002/01/18 16:48:01 mike Exp $".
  */
