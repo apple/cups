@@ -9,6 +9,8 @@
 #ifndef GTYPES_H
 #define GTYPES_H
 
+#define HAVE_LIBCUPS
+
 /*
  * These have stupid names to avoid conflicts with some (but not all)
  * C++ compilers which define them.

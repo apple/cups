@@ -61,6 +61,8 @@ XRef::XRef(BaseStream *str, GString *userPassword) {
   ok = gTrue;
   size = 0;
   entries = NULL;
+  streamEnds = NULL;
+  streamEndsLen = 0;
 
   // get rid of old xref (otherwise it will try to fetch the Root object
   // in the new document, using the old xref)
@@ -119,6 +121,9 @@ XRef::XRef(BaseStream *str, GString *userPassword) {
 XRef::~XRef() {
   gfree(entries);
   trailerDict.free();
+  if (streamEnds) {
+    gfree(streamEnds);
+  }
 }
 
 // Read startxref position, xref table size, and root.  Returns
@@ -324,25 +329,28 @@ GBool XRef::constructXRef() {
   int pos;
   int num, gen;
   int newSize;
+  int streamEndsSize;
   char *p;
   int i;
   GBool gotRoot;
 
   error(0, "PDF file is damaged - attempting to reconstruct xref table...");
   gotRoot = gFalse;
+  streamEndsLen = streamEndsSize = 0;
 
   str->reset();
   while (1) {
     pos = str->getPos();
-    if (!str->getLine(buf, 256))
+    if (!str->getLine(buf, 256)) {
       break;
+    }
     p = buf;
 
     // got trailer dictionary
     if (!strncmp(p, "trailer", 7)) {
       obj.initNull();
       parser = new Parser(new Lexer(
-		      str->makeSubStream(start + pos + 8, -1, &obj)));
+		      str->makeSubStream(start + pos + 7, -1, &obj)));
       if (!trailerDict.isNone())
 	trailerDict.free();
       parser->getObj(&trailerDict);
@@ -398,6 +406,13 @@ GBool XRef::constructXRef() {
 	  }
 	}
       }
+
+    } else if (!strncmp(p, "endstream", 9)) {
+      if (streamEndsLen == streamEndsSize) {
+	streamEndsSize += 64;
+	streamEnds = (int *)grealloc(streamEnds, streamEndsSize * sizeof(int));
+      }
+      streamEnds[streamEndsLen++] = pos;
     }
   }
 
@@ -552,4 +567,26 @@ Object *XRef::fetch(int num, int gen, Object *obj) {
 
 Object *XRef::getDocInfo(Object *obj) {
   return trailerDict.dictLookup("Info", obj);
+}
+
+int XRef::getStreamEnd(int start) {
+  int a, b, m;
+
+  if (streamEndsLen == 0 ||
+      start > streamEnds[streamEndsLen - 1]) {
+    return -1;
+  }
+
+  a = -1;
+  b = streamEndsLen - 1;
+  // invariant: streamEnds[a] < start <= streamEnds[b]
+  while (b - a > 1) {
+    m = (a + b) / 2;
+    if (start <= streamEnds[m]) {
+      b = m;
+    } else {
+      a = m;
+    }
+  }
+  return streamEnds[b];
 }

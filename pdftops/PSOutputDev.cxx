@@ -180,7 +180,11 @@ static const char *prolog[] = {
   "      sub 1 index length dup 0 ne { div } { pop pop 0 } ifelse",
   "      pdfWordSpacing 0 pdfTextMat dtransform 32",
   "      4 3 roll pdfCharSpacing add 0 pdfTextMat dtransform",
+#if 0 /* temporary fix until we can figure out why the width is wrong */
   "      6 5 roll awidthshow",
+#else
+  "      6 5 roll show pop pop pop pop pop",
+#endif /* 0 */
   "      0 pdfTextRise neg pdfTextMat dtransform rmoveto } def",
   "/TJm { pdfFontSize 0.001 mul mul neg 0",
   "       pdfTextMat dtransform rmoveto } def",
