@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.72 2000/09/06 19:40:12 mike Exp $"
+ * "$Id: printers.c,v 1.73 2000/09/12 18:41:29 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1418,18 +1418,16 @@ ValidateDest(const char   *hostname,	/* I - Host name */
   }
 
  /*
-  * See if the printer or class name is dest@server; if so, just lookup the
-  * name instead...
+  * See if the printer or class name exists...
   */
 
-  if (strchr(resource, '@') != NULL)
+  if ((p = FindPrinter(resource)) == NULL)
+    p = FindClass(resource);
+
+  if (p == NULL && strchr(resource, '@') == NULL)
+    return (NULL);
+  else if (p != NULL)
   {
-    if ((p = FindPrinter(resource)) == NULL)
-      p = FindClass(resource);
-
-    if (p == NULL)
-      return (NULL);
-
     *dtype = p->type & CUPS_PRINTER_CLASS;
     return (p->name);
   }
@@ -1535,5 +1533,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.72 2000/09/06 19:40:12 mike Exp $".
+ * End of "$Id: printers.c,v 1.73 2000/09/12 18:41:29 mike Exp $".
  */
