@@ -392,6 +392,20 @@ the pages in the "page-range" option.
 % lp -o page-set=even filename ENTER
 </PRE></UL>
 
+<H3>N-Up Printing</H3>
+
+<P>The "-o number-up=value" option selects N-Up printing.  N-Up
+printing places multiple document pages on a single printed
+page.  CUPS supports 1-Up, 2-Up, and 4-Up formats:
+
+<UL><PRE>
+% lp -o number-up=1 filename ENTER
+% lp -o number-up=2 filename ENTER
+% lp -o number-up=4 filename ENTER
+</PRE></UL>
+
+<P>The default format is 1-Up.
+
 <H3>Setting the Brightness</H3>
 
 <P>You can control the overall brightness of the printed output using the

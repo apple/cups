@@ -48,8 +48,9 @@ Copyright 1997-1999, All Rights Reserved<BR>
 <LI><A HREF=#4_1_2>Setting the Orientation</A></LI>
 <LI><A HREF=#4_1_3>Printing On Both Sides of the Paper</A></LI>
 <LI><A HREF=#4_1_4>Selecting a Range of Pages</A></LI>
-<LI><A HREF=#4_1_5>Setting the Brightness</A></LI>
-<LI><A HREF=#4_1_6>Setting the Gamma Correction</A></LI>
+<LI><A HREF=#4_1_5>N-Up Printing</A></LI>
+<LI><A HREF=#4_1_6>Setting the Brightness</A></LI>
+<LI><A HREF=#4_1_7>Setting the Gamma Correction</A></LI>
 </UL>
 <LI><A HREF=#4_2>Text Options</A></LI>
 <UL>
@@ -386,7 +387,19 @@ of the order of the pages in the &quot;page-range&quot; option. </P>
 % lp -o page-set=even filename ENTER
 </PRE>
 </UL>
-<H3><A NAME=4_1_5>Setting the Brightness</A></H3>
+<H3><A NAME=4_1_5>N-Up Printing</A></H3>
+<P>The &quot;-o number-up=value&quot; option selects N-Up printing.  N-Up 
+printing places multiple document pages on a single printed page.  CUPS 
+supports 1-Up, 2-Up, and 4-Up formats: </P>
+<UL>
+<PRE>
+% lp -o number-up=1 filename ENTER
+% lp -o number-up=2 filename ENTER
+% lp -o number-up=4 filename ENTER
+</PRE>
+</UL>
+<P>The default format is 1-Up. </P>
+<H3><A NAME=4_1_6>Setting the Brightness</A></H3>
 <P>You can control the overall brightness of the printed output using 
 the &quot;-o brightness=percent&quot; option: </P>
 <UL>
@@ -396,7 +409,7 @@ the &quot;-o brightness=percent&quot; option: </P>
 </UL>
 <P>Values greater than 100 will lighten the print, while values less 
 than 100 will darken it. </P>
-<H3><A NAME=4_1_6>Setting the Gamma Correction</A></H3>
+<H3><A NAME=4_1_7>Setting the Gamma Correction</A></H3>
 <P>You can control the overall gamma correction of the printed output 
 using the &quot;-o gamma=value&quot; option: </P>
 <UL>
