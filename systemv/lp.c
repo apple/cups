@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.8 1999/06/23 16:53:03 mike Exp $"
+ * "$Id: lp.c,v 1.9 1999/07/13 12:05:14 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -45,7 +45,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 {
   int		i;		/* Looping var */
   int		job_id;		/* Job ID */
-  char		*dest;		/* Destination printer */
+  const char	*dest;		/* Destination printer */
   char		*title;		/* Job title */
   int		priority;	/* Job priority (1-100) */
   int		num_copies;	/* Number of copies per file */
@@ -240,5 +240,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lp.c,v 1.8 1999/06/23 16:53:03 mike Exp $".
+ * End of "$Id: lp.c,v 1.9 1999/07/13 12:05:14 mike Exp $".
  */
