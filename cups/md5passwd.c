@@ -1,5 +1,5 @@
 /*
- * "$Id: md5passwd.c,v 1.1 2000/05/01 19:50:25 mike Exp $"
+ * "$Id: md5passwd.c,v 1.2 2000/06/05 00:37:01 mike Exp $"
  *
  *   MD5 password support for the Common UNIX Printing System (CUPS).
  *
@@ -23,10 +23,10 @@
  *
  * Contents:
  *
- *   httpMD5() - Compute the MD5 sum of the username:group:password.
- * 'httpMD5Nonce()' - Combine the MD5 sum of the username, group, and password
- *                    with the server-supplied nonce value.
- * 'httpMD5String()' - Convert an MD5 sum to a character string.
+ *   httpMD5()       - Compute the MD5 sum of the username:group:password.
+ *   httpMD5Nonce()  - Combine the MD5 sum of the username, group, and password
+ *                     with the server-supplied nonce value.
+ *   httpMD5String() - Convert an MD5 sum to a character string.
  */
 
 /*
@@ -144,5 +144,5 @@ httpMD5String(const md5_byte_t *sum,	/* I - MD5 sum data */
 
 
 /*
- * End of "$Id: md5passwd.c,v 1.1 2000/05/01 19:50:25 mike Exp $".
+ * End of "$Id: md5passwd.c,v 1.2 2000/06/05 00:37:01 mike Exp $".
  */
