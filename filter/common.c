@@ -1,5 +1,5 @@
 /*
- * "$Id: common.c,v 1.22 2002/09/24 13:36:37 mike Exp $"
+ * "$Id: common.c,v 1.23 2002/10/11 16:31:57 mike Exp $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -363,12 +363,32 @@ WriteLabelProlog(const char *label,	/* I - Page label */
   else
     printf("/ESPpl(");
 
-  if (classification[0] && label)
-    printf(" - %s)put\n", label);
-  else if (label)
-    printf("%s)put\n", label);
-  else
-    puts(")put");
+  if (label)
+  {
+    if (classification[0])
+      printf(" - ");
+
+   /*
+    * Quote the label string as needed...
+    */
+
+    while (*label)
+    {
+      if (*label < 32 || *label > 126)
+        printf("\\%03o", *label);
+      else
+      {
+	if (*label == '(' || *label == ')' || *label == '\\')
+	  putchar('\\');
+
+	putchar(*label);
+      }
+
+      label ++;
+    }
+  }
+
+  puts(")put");
 
  /*
   * Then get a 14 point Helvetica-Bold font...
@@ -440,5 +460,5 @@ WriteLabels(int orient)	/* I - Orientation of the page */
 
 
 /*
- * End of "$Id: common.c,v 1.22 2002/09/24 13:36:37 mike Exp $".
+ * End of "$Id: common.c,v 1.23 2002/10/11 16:31:57 mike Exp $".
  */
