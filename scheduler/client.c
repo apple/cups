@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.92 2004/08/19 15:33:02 mike Exp $"
+ * "$Id: client.c,v 1.91.2.93 2004/08/28 19:47:08 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -39,6 +39,7 @@
  *   decode_auth()         - Decode an authorization string.
  *   get_file()            - Get a filename and state info.
  *   install_conf_file()   - Install a configuration file.
+ *   is_path_absolute()    - Is a path absolute and free of relative elements.
  *   pipe_command()        - Pipe the output of a command to the remote client.
  *   CDSAReadFunc()        - Read function for CDSA decryption code.
  *   CDSAWriteFunc()       - Write function for CDSA encryption code.
@@ -63,6 +64,7 @@ static void		decode_auth(client_t *con);
 static char		*get_file(client_t *con, struct stat *filestats, 
 			          char *filename, int len);
 static http_status_t	install_conf_file(client_t *con);
+static int		is_path_absolute(const char *path);
 static int		pipe_command(client_t *con, int infile, int *outfile,
 			             char *command, char *options);
 
@@ -1203,7 +1205,7 @@ ReadClient(client_t *con)		/* I - Client to read from */
       httpPrintf(HTTP(con), "Content-Length: 0\r\n");
       httpPrintf(HTTP(con), "\r\n");
     }
-    else if (strstr(con->uri, "..") != NULL)
+    else if (!is_path_absolute(con->uri))
     {
      /*
       * Protect against malicious users!
@@ -2819,6 +2821,37 @@ install_conf_file(client_t *con)	/* I - Connection */
 
 
 /*
+ * 'is_path_absolute()' - Is a path absolute and free of relative elements (i.e. "..").
+ */
+
+static int				/* O - 0 if relative, 1 if absolute */
+is_path_absolute(const char *path)	/* I - Input path */
+{
+ /*
+  * Check for a leading slash...
+  */
+
+  if (path[0] != '/')
+    return (0);
+
+ /*
+  * Check for "/.." in the path...
+  */
+
+  while ((path = strstr(path, "/..")) != NULL)
+    if (!path[3] || path[3] == '/')
+      return (0);
+
+ /*
+  * If we haven't found any relative paths, return 1 indicating an
+  * absolute path...
+  */
+
+  return (1);
+}
+
+
+/*
  * 'pipe_command()' - Pipe the output of a command to the remote client.
  */
 
@@ -3381,5 +3414,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.92 2004/08/19 15:33:02 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.93 2004/08/28 19:47:08 mike Exp $".
  */

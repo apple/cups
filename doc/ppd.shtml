@@ -70,16 +70,24 @@ PPD file:</p>
 
 <pre>
     PPD-FILE = HEADER +(DATA / COMMENT / LINE-END)
-    HEADER   = "*PPD-Adobe: " DQUOTE "4.3" DQUOTE LINE-END
+
+    HEADER   = "*" 0x50.50.44.2D.41.64.6F.62.65 ":"   ; *PPD-Adobe:
+               *WSP DQUOTE "4.3" DQUOTE LINE-END
+
     COMMENT  = "*%" *TCHAR LINE-END
-    DATA     = "*" 1*KCHAR [ SPACE 1*KCHAR [ "/" 1*TCHAR ] ] ":"
-               VALUE *(SPACE VALUE) LINE-END
+
+    DATA     = "*" 1*KCHAR [ WSP 1*KCHAR [ "/" 1*TCHAR ] ] ":"
+               1*(*WSP VALUE) LINE-END
+
     VALUE    = 1*TCHAR / DQUOTE 1*SCHAR DQUOTE
 
     KCHAR    = ALPHA / DIGIT / "_" / "." / "-"
-    SCHAR    = LINE-END / %x09 / %x20 / %x21 / %x23-%x7E / %xA0-%xFF
-    TCHAR    = %x20-%x7E / %xA0-%xFF
-    LINE-END = %x0A / %x0D / %x0D %x0A
+
+    SCHAR    = LINE-END / WSP / %x21 / %x23-7E / %xA0-FF
+
+    TCHAR    = %x20-7E / %xA0-FF
+
+    LINE-END = CR / LF / CR LF
 </pre>
 
 
@@ -163,6 +171,66 @@ function is applied <i>after</i> the CMY transformation.</p>
 
 <h1>I18N Support</h1>
 
+<p>CUPS 1.2 and higher adds support for PPD files containing multiple
+languages by following the following rules:</p>
+
+<ol>
+
+	<li>The <tt>LanguageVersion is <tt>English</tt></li>
+
+	<li>The <tt>LanguageEncoding</tt> is <tt>ISOLatin1</tt></li>
+
+	<li>Main and option keywords may not exceed 34
+	characters (subset of what the PPD spec allows)</li>
+
+	<li>Translations are specified using a locale prefix of
+	the form "ll_CC." where "ll" is the 2-letter ISO
+	language code and "CC" is the 2-letter ISO country
+	code</li>
+
+	<li>Translation strings are encoded using UTF-8.</li>
+
+	<li>Main keywords are translated using the following
+	form: <tt>*ll_CC.Translation MainKeyword/translation
+	text: ""</tt></li>
+
+	<li>Option keywords are translated using the following
+	form: <tt>*ll_CC.MainKeyword OptionKeyword/translation
+	text: ""</tt></li>
+
+</ol>
+
+<p>This would update the previous example to look like:
+
+<pre>
+    *LanguageVersion: English
+    *LanguageEncoding: ISOLatin1
+    *ModelName: "HP LaserJet 9999"
+    *fr_FR.Translation ModelName/La HP LaserJet 9999: ""
+    *de_DE.Translation ModelName/HP LaserDrucken 9999: ""
+    ...
+    *OpenUI *InputSlot/Paper Source: PickOne
+    *OrderDependency: 10 AnySetup *InputSlot
+    *DefaultInputSlot: Auto
+    *fr_FR.Translation InputSlot/Papier source: ""
+    *de_DE.Translation InputSlot/Papiereinzug: ""
+    *InputSlot Auto/Default: "<</ManualFeed false>>setpagedevice"
+    *fr_FR.InputSlot Auto/Par Defaut: ""
+    *de_DE.InputSlot Auto/Standard: ""
+    *InputSlot Manual/Manual Feed: "<</ManualFeed true>>setpagedevice"
+    *fr_FR.InputSlot Manual/Manuel mecanisme de alimentation: ""
+    *de_DE.InputSlot Manual/Manueller Einzug: ""
+    *CloseUI: *InputSlot
+</pre>
+
+<p>Notice that this scheme allows for other main keywords, such
+as ModelName, to be translated as well.  We need localized model
+and product names for devices like the Epson inkjet
+printers...</p>
+
+<p>By using UTF-8 as the translation encoding, we can transcode
+to whatever locale encoding is needed when presenting the human-
+readable text to the user.</p>
 
 <embed src="glossary.shtml"/>
 
