@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.32 2002/03/08 19:18:46 mike Exp $"
+# "$Id: Makefile,v 1.33 2002/03/22 14:21:42 mike Exp $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -77,6 +77,18 @@ betest:	betest.o ../cups/$(LIBCUPS)
 
 
 #
+# ieee1394
+#
+
+ieee1394:	ieee1394.o ieee1394-linux.o
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o ieee1394 ieee1394.o ieee1394-linux.o -lraw1394 $(LIBS)
+
+ieee1394.o:		ieee1394.h
+ieee1394-linux.o:	ieee1394.h
+
+
+#
 # ipp
 #
 
@@ -140,5 +152,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.32 2002/03/08 19:18:46 mike Exp $".
+# End of "$Id: Makefile,v 1.33 2002/03/22 14:21:42 mike Exp $".
 #
