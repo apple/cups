@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.67 2000/05/11 20:02:21 mike Exp $"
+ * "$Id: ipp.c,v 1.68 2000/05/11 20:49:36 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -698,7 +698,7 @@ add_file(client_t    *con,		/* I - Connection to client */
 
   if (filetypes == NULL)
   {
-    CancelJob(job->id);
+    CancelJob(job->id, 1);
     LogMessage(L_ERROR, "add_file: unable to allocate memory for file types!");
     send_ipp_error(con, IPP_INTERNAL_ERROR);
     return (-1);
@@ -1364,7 +1364,7 @@ cancel_job(client_t        *con,	/* I - Client connection */
   * Cancel the job and return...
   */
 
-  CancelJob(jobid);
+  CancelJob(jobid, 0);
   CheckJobs();
 
   LogMessage(L_INFO, "Job %d was cancelled by \'%s\'.", jobid,
@@ -4790,5 +4790,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.67 2000/05/11 20:02:21 mike Exp $".
+ * End of "$Id: ipp.c,v 1.68 2000/05/11 20:49:36 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.66 2000/05/11 15:47:12 mike Exp $"
+ * "$Id: job.c,v 1.67 2000/05/11 20:49:36 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -109,7 +109,8 @@ AddJob(int        priority,	/* I - Job priority */
  */
 
 void
-CancelJob(int id)		/* I - Job to cancel */
+CancelJob(int id,		/* I - Job to cancel */
+          int purge)		/* I - Purge jobs? */
 {
   int	i;			/* Looping var */
   job_t	*current,		/* Current job */
@@ -142,7 +143,7 @@ CancelJob(int id)		/* I - Job to cancel */
 
       current->current_file = 0;
 
-      if (!JobHistory || !JobFiles)
+      if (!JobHistory || !JobFiles || purge)
         for (i = 1; i <= current->num_files; i ++)
 	{
 	  snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
@@ -150,7 +151,7 @@ CancelJob(int id)		/* I - Job to cancel */
           unlink(filename);
 	}
 
-      if (JobHistory)
+      if (JobHistory && !purge)
       {
        /*
         * Save job state info...
@@ -212,7 +213,7 @@ CancelJobs(const char *dest)	/* I - Destination to cancel */
       * Cancel all jobs matching this destination...
       */
 
-      CancelJob(current->id);
+      CancelJob(current->id, 1);
 
       if (prev == NULL)
 	current = Jobs;
@@ -288,7 +289,7 @@ CheckJobs(void)
 
         LogMessage(L_WARN, "Printer/class %s has gone away; cancelling job %d!",
 	           current->dest, current->id);
-        CancelJob(current->id);
+        CancelJob(current->id, 0);
 
 	if (prev == NULL)
 	  current = Jobs;
@@ -813,7 +814,7 @@ StartJob(int       id,		/* I - Job ID */
     {
       LogMessage(L_ERROR, "Unable to convert file to printable format for job %s-%d!",
 	         printer->name, current->id);
-      CancelJob(current->id);
+      CancelJob(current->id, 0);
       return;
     }
   }
@@ -1404,7 +1405,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
         StartJob(job->id, job->printer);
       else
       {
-        CancelJob(job->id);
+        CancelJob(job->id, 0);
 
         if (JobHistory)
           job->state->values[0].integer = IPP_JOB_ABORTED;
@@ -1422,7 +1423,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
         StartJob(job->id, job->printer);
       else
       {
-	CancelJob(job->id);
+	CancelJob(job->id, 0);
 
 	if (JobHistory)
           job->state->values[0].integer = IPP_JOB_COMPLETED;
@@ -2343,5 +2344,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.66 2000/05/11 15:47:12 mike Exp $".
+ * End of "$Id: job.c,v 1.67 2000/05/11 20:49:36 mike Exp $".
  */
