@@ -1,5 +1,5 @@
 /*
- * "$Id: image-tiff.c,v 1.9 1999/09/03 19:58:40 mike Exp $"
+ * "$Id: image-tiff.c,v 1.10 1999/12/03 20:01:42 mike Exp $"
  *
  *   TIFF file routines for the Common UNIX Printing System (CUPS).
  *
@@ -135,8 +135,8 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
     }
     else
     {
-      img->xppi = xres * 0.0254;
-      img->yppi = yres * 0.0254;
+      img->xppi = 128;
+      img->yppi = 128;
     }
   }
 
@@ -1616,5 +1616,5 @@ ImageReadTIFF(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-tiff.c,v 1.9 1999/09/03 19:58:40 mike Exp $".
+ * End of "$Id: image-tiff.c,v 1.10 1999/12/03 20:01:42 mike Exp $".
  */
