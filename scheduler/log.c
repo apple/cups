@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.11 2000/07/21 15:39:30 mike Exp $"
+ * "$Id: log.c,v 1.12 2000/09/05 17:09:46 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,10 +23,11 @@
  *
  * Contents:
  *
- *   GetDateTime() - Returns a pointer to a date/time string.
- *   LogMessage()  - Log a message to the error log file.
- *   LogPage()     - Log a page to the page log file.
- *   LogRequest()  - Log an HTTP request in Common Log Format.
+ *   GetDateTime()    - Returns a pointer to a date/time string.
+ *   LogMessage()     - Log a message to the error log file.
+ *   LogPage()        - Log a page to the page log file.
+ *   LogRequest()     - Log an HTTP request in Common Log Format.
+ *   check_log_file() - Open/rotate a log file if it needs it.
  */
 
 /*
@@ -39,6 +40,13 @@
 #ifdef HAVE_VSYSLOG
 #  include <syslog.h>
 #endif /* HAVE_VSYSLOG */
+
+
+/*
+ * Local functions...
+ */
+
+static int	check_log_file(FILE **, const char *);
 
 
 /*
@@ -105,9 +113,7 @@ LogMessage(int        level,	/* I - Log level */
            const char *message,	/* I - printf-style message string */
 	   ...)			/* I - Additional args as needed */
 {
-  char		filename[1024],	/* Name of error log file */
-		backname[1024],	/* Backup filename */
-		line[1024];	/* Line for output file */
+  char		line[1024];	/* Line for output file */
   va_list	ap;		/* Argument pointer */
   static char	levels[] =	/* Log levels... */
 		{
@@ -152,63 +158,12 @@ LogMessage(int        level,	/* I - Log level */
 #endif /* HAVE_VSYSLOG */
 
  /*
-  * Not using syslog; see if the error log file is open...
+  * Not using syslog; check the log file...
   */
 
-  if (ErrorFile == NULL)
-  {
-   /*
-    * Nope, open error log...
-    */
-
-    if (ErrorLog[0] == '\0')
-      return (1);
-    else if (ErrorLog[0] != '/')
-      snprintf(backname, sizeof(backname), "%s/%s", ServerRoot, ErrorLog);
-    else
-    {
-      strncpy(backname, ErrorLog, sizeof(backname) - 1);
-      backname[sizeof(backname) - 1] = '\0';
-    }
-
-    snprintf(filename, sizeof(filename), backname, ServerName);
-
-    if ((ErrorFile = fopen(filename, "a")) == NULL)
-      return (0);
-  }
-
- /*
-  * Do we need to rotate the log?
-  */
-
-  if (ftell(ErrorFile) > MaxLogSize && MaxLogSize > 0)
-  {
-   /*
-    * Rotate error_log file...
-    */
-
-    fclose(ErrorFile);
-
-    if (ErrorLog[0] != '/')
-      snprintf(backname, sizeof(backname), "%s/%s", ServerRoot, ErrorLog);
-    else
-    {
-      strncpy(backname, ErrorLog, sizeof(backname) - 1);
-      backname[sizeof(backname) - 1] = '\0';
-    }
-
-    snprintf(filename, sizeof(filename), backname, ServerName);
-
-    strcpy(backname, filename);
-    strcat(backname, ".O");
-
-    unlink(backname);
-    rename(filename, backname);
-
-    if ((ErrorFile = fopen(filename, "a")) == NULL)
-      return (0);
-  }
-
+  if (!check_log_file(&ErrorFile, ErrorLog))
+    return (0);
+  
  /*
   * Print the log level and date/time...
   */
@@ -245,8 +200,6 @@ int				/* O - 1 on success, 0 on error */
 LogPage(job_t       *job,	/* I - Job being printed */
         const char  *page)	/* I - Page being printed */
 {
-  char		filename[1024],	/* Name of error log file */
-		backname[1024];	/* Backup filename */
   ipp_attribute_t *billing;	/* job-billing attribute */
 
 
@@ -268,62 +221,11 @@ LogPage(job_t       *job,	/* I - Job being printed */
 #endif /* HAVE_VSYSLOG */
 
  /*
-  * See if the page log file is open...
+  * Not using syslog; check the log file...
   */
 
-  if (PageFile == NULL)
-  {
-   /*
-    * Nope, open page log...
-    */
-
-    if (PageLog[0] == '\0')
-      return (1);
-    else if (PageLog[0] != '/')
-      snprintf(backname, sizeof(backname), "%s/%s", ServerRoot, PageLog);
-    else
-    {
-      strncpy(backname, PageLog, sizeof(backname) - 1);
-      backname[sizeof(backname) - 1] = '\0';
-    }
-
-    snprintf(filename, sizeof(filename), backname, ServerName);
-
-    if ((PageFile = fopen(filename, "a")) == NULL)
-      return (0);
-  }
-
- /*
-  * Do we need to rotate the log?
-  */
-
-  if (ftell(PageFile) > MaxLogSize && MaxLogSize > 0)
-  {
-   /*
-    * Rotate page_log file...
-    */
-
-    fclose(PageFile);
-
-    if (PageLog[0] != '/')
-      snprintf(backname, sizeof(backname), "%s/%s", ServerRoot, PageLog);
-    else
-    {
-      strncpy(backname, PageLog, sizeof(backname) - 1);
-      backname[sizeof(backname) - 1] = '\0';
-    }
-
-    snprintf(filename, sizeof(filename), backname, ServerName);
-
-    strcpy(backname, filename);
-    strcat(backname, ".O");
-
-    unlink(backname);
-    rename(filename, backname);
-
-    if ((PageFile = fopen(filename, "a")) == NULL)
-      return (0);
-  }
+  if (!check_log_file(&PageFile, PageLog))
+    return (0);
 
  /*
   * Print a page log entry of the form:
@@ -348,8 +250,6 @@ int				/* O - 1 on success, 0 on error */
 LogRequest(client_t      *con,	/* I - Request to log */
            http_status_t code)	/* I - Response code */
 {
-  char		filename[1024],	/* Name of access log file */
-		backname[1024];	/* Backup filename */
   static const char *states[] =	/* HTTP client states... */
 		{
 		  "WAITING",
@@ -387,62 +287,11 @@ LogRequest(client_t      *con,	/* I - Request to log */
 #endif /* HAVE_VSYSLOG */
 
  /*
-  * See if the access log is open...
+  * Not using syslog; check the log file...
   */
 
-  if (AccessFile == NULL)
-  {
-   /*
-    * Nope, open the access log file...
-    */
-
-    if (AccessLog[0] == '\0')
-      return (1);
-    else if (AccessLog[0] != '/')
-      snprintf(backname, sizeof(backname), "%s/%s", ServerRoot, AccessLog);
-    else
-    {
-      strncpy(backname, AccessLog, sizeof(backname) - 1);
-      backname[sizeof(backname) - 1] = '\0';
-    }
-
-    snprintf(filename, sizeof(filename), backname, ServerName);
-
-    if ((AccessFile = fopen(filename, "a")) == NULL)
-      return (0);
-  }
-
- /*
-  * See if we need to rotate the log file...
-  */
-
-  if (ftell(AccessFile) > MaxLogSize && MaxLogSize > 0)
-  {
-   /*
-    * Rotate access_log file...
-    */
-
-    fclose(AccessFile);
-
-    if (AccessLog[0] != '/')
-      snprintf(backname, sizeof(backname), "%s/%s", ServerRoot, AccessLog);
-    else
-    {
-      strncpy(backname, AccessLog, sizeof(backname) - 1);
-      backname[sizeof(backname) - 1] = '\0';
-    }
-
-    snprintf(filename, sizeof(filename), backname, ServerName);
-
-    strcpy(backname, filename);
-    strcat(backname, ".O");
-
-    unlink(backname);
-    rename(filename, backname);
-
-    if ((AccessFile = fopen(filename, "a")) == NULL)
-      return (0);
-  }
+  if (!check_log_file(&AccessFile, AccessLog))
+    return (0);
 
  /*
   * Write a log of the request in "common log format"...
@@ -460,5 +309,82 @@ LogRequest(client_t      *con,	/* I - Request to log */
 
 
 /*
- * End of "$Id: log.c,v 1.11 2000/07/21 15:39:30 mike Exp $".
+ * 'check_log_file()' - Open/rotate a log file if it needs it.
+ */
+
+static int				/* O  - 1 if log file open */
+check_log_file(FILE       **log,	/* IO - Log file */
+	       const char *logname)	/* I  - Log filename */
+{
+  char	backname[1024],			/* Backup log filename */
+	filename[1024];			/* Formatted log filename */
+
+
+ /*
+  * See if the log file is open...
+  */
+
+  if (*log == NULL)
+  {
+   /*
+    * Nope, open the log file...
+    */
+
+    if (logname[0] == '\0')
+      return (1);
+    else if (logname[0] != '/')
+      snprintf(backname, sizeof(backname), "%s/%s", ServerRoot, logname);
+    else
+    {
+      strncpy(backname, logname, sizeof(backname) - 1);
+      backname[sizeof(backname) - 1] = '\0';
+    }
+
+    snprintf(filename, sizeof(filename), backname, ServerName);
+
+    if ((*log = fopen(filename, "a")) == NULL)
+      return (0);
+  }
+
+ /*
+  * Do we need to rotate the log?
+  */
+
+  if (ftell(*log) > MaxLogSize && MaxLogSize > 0)
+  {
+   /*
+    * Rotate log file...
+    */
+
+    fclose(*log);
+
+    if (logname[0] == '\0')
+      return (1);
+    else if (logname[0] != '/')
+      snprintf(backname, sizeof(backname), "%s/%s", ServerRoot, logname);
+    else
+    {
+      strncpy(backname, logname, sizeof(backname) - 1);
+      backname[sizeof(backname) - 1] = '\0';
+    }
+
+    snprintf(filename, sizeof(filename), backname, ServerName);
+
+    strcpy(backname, filename);
+    strncat(backname, ".O", sizeof(backname) - 1);
+    backname[sizeof(backname) - 1] = '\0';
+
+    unlink(backname);
+    rename(filename, backname);
+
+    if ((*log = fopen(filename, "a")) == NULL)
+      return (0);
+  }
+
+  return (1);
+}
+
+
+/*
+ * End of "$Id: log.c,v 1.12 2000/09/05 17:09:46 mike Exp $".
  */
