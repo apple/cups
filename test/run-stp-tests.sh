@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.8 2002/01/14 19:08:37 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.9 2002/05/09 03:31:55 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -140,6 +140,9 @@ else
 fi
 
 export LD_LIBRARY_PATH
+
+LD_PRELOAD="$root/cups/libcups.so:$root/filter/libcupsimage.so"
+export LD_PRELOAD
 
 if test "x$DYLD_LIBRARY_PATH" = x; then
 	DYLD_LIBRARY_PATH="$root/cups:$root/filter"
@@ -323,5 +326,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.8 2002/01/14 19:08:37 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.9 2002/05/09 03:31:55 mike Exp $"
 #
