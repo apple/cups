@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.13 2000/09/05 21:08:30 mike Exp $"
+ * "$Id: ipp-var.c,v 1.14 2000/09/14 19:05:03 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -96,12 +96,12 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 			resource[HTTP_MAX_URI],
 			uri[HTTP_MAX_URI];
   int			port;		/* URI data */
-  char			server[1024];	/* Name of server */
+  const char		*server;	/* Name of server */
 
 
   ippSetServerVersion();
 
-  strcpy(server, cupsServer());
+  server = getenv("SERVER_NAME");
 
   for (attr = response->attrs;
        attr && attr->group_tag == IPP_TAG_OPERATION;
@@ -254,5 +254,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.13 2000/09/05 21:08:30 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.14 2000/09/14 19:05:03 mike Exp $".
  */

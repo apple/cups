@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.16 2000/09/05 21:08:30 mike Exp $"
+ * "$Id: classes.c,v 1.17 2000/09/14 19:05:03 mike Exp $"
  *
  *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -126,12 +126,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 		resource[HTTP_MAX_URI],
 		uri[HTTP_MAX_URI];
 	int	port;			/* URI data */
-	char	server[1024];		/* Name of server */
+	const char *server;		/* Name of server */
 
 
        /*
 	* Map localhost access to localhost...
 	*/
+
+        server = getenv("SERVER_NAME");
 
 	httpSeparate(attr->values[0].string.text, method, username,
 		     hostname, &port, resource);
@@ -354,5 +356,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: classes.c,v 1.16 2000/09/05 21:08:30 mike Exp $".
+ * End of "$Id: classes.c,v 1.17 2000/09/14 19:05:03 mike Exp $".
  */
