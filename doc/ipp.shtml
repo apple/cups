@@ -13,7 +13,7 @@
 
 <P>This document provides an overview of the Internet Printing Protocol
 ("IPP") version 1.1 as implemented in the Common UNIX Printing System
-("CUPS") Version 1.1.
+("CUPS") version 1.1.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -44,7 +44,7 @@ support multiple IPP printers and printer classes on a single host.
 
 <H2>IPP URIs</H2>
 
-<P>CUPS supports both the "http" and "ipp" method names. The following
+<P>CUPS supports both the "http" and "ipp" methods. The following
 resource names are used:
 
 <DL>
@@ -262,7 +262,7 @@ IPP attributes are not described.
 <H3>Print-Job Request</H3>
 
 <P>The following groups of attributes are supplied as part of the
-Print-Job Request:
+Print-Job request:
 
 <P>Group 1: Operation Attributes
 
@@ -308,7 +308,7 @@ Print-Job Request:
 
 </UL>
 
-<P>The Print-Job Request is followed by a file to be printed.
+<P>The Print-Job request is followed by a file to be printed.
 
 <H3>Print-Job Response</H3>
 
@@ -346,7 +346,7 @@ Response:
 <H3>Create-Job Request</H3>
 
 <P>The following groups of attributes are supplied as part of the
-Create-Job Request:
+Create-Job request:
 
 <P>Group 1: Operation Attributes
 
@@ -423,12 +423,13 @@ Create-Job Response:
 
 <H2>Set-Job-Attributes Operation</H2>
 
-<P>The Set-Job-Attributes operation (0x0002) prints a file.
+<P>The Set-Job-Attributes operation (0x0014) changes the attributes of
+an active (not completed) job.
 
 <H3>Set-Job-Attributes Request</H3>
 
 <P>The following groups of attributes are supplied as part of the
-Set-Job-Attributes Request:
+Set-Job-Attributes request:
 
 <P>Group 1: Operation Attributes
 
@@ -517,7 +518,7 @@ URI and attributes.
 <H3>CUPS-Get-Default Request</H3>
 
 <P>The following groups of attributes are supplied as part of the
-CUPS-Get-Default Request:
+CUPS-Get-Default request:
 
 <P>Group 1: Operation Attributes
 
@@ -577,7 +578,7 @@ printers that are not served directly by the server.
 <H3>CUPS-Get-Printers Request</H3>
 
 <P>The following groups of attributes are supplied as part of the
-CUPS-Get-Printers Request:
+CUPS-Get-Printers request:
 
 <P>Group 1: Operation Attributes
 
@@ -663,7 +664,7 @@ CUPS-Get-Printers Response:
 
 </UL>
 
-<H3>CUPS-Add-Printer Operation</H3>
+<H2>CUPS-Add-Printer Operation</H2>
 
 <P>The CUPS-Add-Printer operation (0x4003) adds a new printer or
 modifies an existing printer on the system.
@@ -671,7 +672,7 @@ modifies an existing printer on the system.
 <H3>CUPS-Add-Printer Request</H3>
 
 <P>The following groups of attributes are supplied as part of the
-CUPS-Add-Printer Request:
+CUPS-Add-Printer request:
 
 <P>Group 1: Operation Attributes
 
@@ -761,7 +762,7 @@ CUPS-Add-Printer Request:
 
 </UL>
 
-<P>The CUPS-Add-Printer Request can optionally be followed by a PPD
+<P>The CUPS-Add-Printer request can optionally be followed by a PPD
 file or System V interface script to be used for the printer. The
 "ppd-name" attribute overrides any file that is attached to the end of
 the request with a local CUPS PPD file.
@@ -795,7 +796,7 @@ printer from the system.
 <H3>CUPS-Delete-Printer Request</H3>
 
 <P>The following groups of attributes are supplied as part of the
-CUPS-Delete-Printer Request:
+CUPS-Delete-Printer request:
 
 <P>Group 1: Operation Attributes
 
@@ -843,7 +844,7 @@ include printer classes that are not served directly by the server.
 <H3>CUPS-Get-Classes Request</H3>
 
 <P>The following groups of attributes are supplied as part of the
-CUPS-Get-Classes Request:
+CUPS-Get-Classes request:
 
 <P>Group 1: Operation Attributes
 
@@ -936,7 +937,7 @@ modifies and existing printer class on the system.
 <H3>CUPS-Add-Class Request</H3>
 
 <P>The following groups of attributes are supplied as part of the
-CUPS-Add-Class Request:
+CUPS-Add-Class request:
 
 <P>Group 1: Operation Attributes
 
@@ -1033,7 +1034,7 @@ class from the system.
 <H3>CUPS-Delete-Class Request</H3>
 
 <P>The following groups of attributes are supplied as part of the
-CUPS-Delete-Class Request:
+CUPS-Delete-Class request:
 
 <P>Group 1: Operation Attributes
 
@@ -1081,7 +1082,7 @@ or printer class.
 <H3>CUPS-Accept-Jobs Request</H3>
 
 <P>The following groups of attributes are supplied as part of the
-CUPS-Accept-Jobs Request:
+CUPS-Accept-Jobs request:
 
 <P>Group 1: Operation Attributes
 
@@ -1129,7 +1130,7 @@ printer or printer class.
 <H3>CUPS-Reject-Jobs Request</H3>
 
 <P>The following groups of attributes are supplied as part of the
-CUPS-Reject-Jobs Request:
+CUPS-Reject-Jobs request:
 
 <P>Group 1: Operation Attributes
 
@@ -1188,7 +1189,7 @@ specified.
 <H3>CUPS-Set-Default Request</H3>
 
 <P>The following groups of attributes are supplied as part of the
-CUPS-Set-Default Request:
+CUPS-Set-Default request:
 
 <P>Group 1: Operation Attributes
 
@@ -1236,7 +1237,7 @@ device-uri's for the server (CUPS 1.1 and higher).
 <H3>CUPS-Get-Devices Request</H3>
 
 <P>The following groups of attributes are supplied as part of the
-CUPS-Get-Devices Request:
+CUPS-Get-Devices request:
 
 <P>Group 1: Operation Attributes
 
@@ -1305,7 +1306,7 @@ available PPD files on the system (CUPS 1.1 and higher).
 <H3>CUPS-Get-PPDs Request</H3>
 
 <P>The following groups of attributes are supplied as part of the
-CUPS-Get-PPDs Request:
+CUPS-Get-PPDs request:
 
 <P>Group 1: Operation Attributes
 
@@ -1400,7 +1401,7 @@ one of the following:
 <H3>device-info (text(127))</H3>
 
 <P>The device-info attribute specifies a human-readable string describing
-the device, e.g. "EPP Parallel Port #1".
+the device, e.g. "Parallel Port #1".
 
 <H3>device-make-and-model (text(127))</H3>
 
@@ -1731,6 +1732,8 @@ identically to the printer-type attribute and default to all 1's.
 
 <H3>requesting-user-name-allowed (1setof name(127))</H3>
 
+<P><I>(CUPS 1.1 and higher)</I>
+
 <P>The requesting-user-name-allowed attribute lists all of the users that are
 allowed to access a printer or class. Either this attribute or the
 requesting-user-name-denied attribute will be defined, but not both.
@@ -1739,6 +1742,8 @@ requesting-user-name-denied attribute will be defined, but not both.
 allowed.
 
 <H3>requesting-user-name-denied (1setof name(127))</H3>
+
+<P><I>(CUPS 1.1 and higher)</I>
 
 <P>The requesting-user-name-denied attribute lists all of the users that are
 not allowed to access a printer or class. Either this attribute or the

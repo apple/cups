@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.5 2000/03/11 16:19:12 mike Exp $"
+ * "$Id: ppds.c,v 1.6 2000/03/14 21:06:35 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -509,7 +509,7 @@ load_ppds(const char *d,		/* I - Actual directory */
       else if (strncmp(line, "*ModelName:", 11) == 0)
 	sscanf(line, "%*[^\"]\"%127[^\"]", make_model);
       else if (strncmp(line, "*LanguageVersion:", 17) == 0)
-	sscanf(line, "%*[^\"]\"%63[^\"]", language);
+	sscanf(line, "%*[^:]:%63s", language);
       else if (strncmp(line, "*NickName:", 10) == 0)
       {
 	sscanf(line, "%*[^\"]\"%255[^\"]", make_model);
@@ -544,7 +544,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     while (isspace(manufacturer[0]))
       strcpy(manufacturer, manufacturer + 1);
 
-    if (manufacturer[0] || strcmp(manufacturer, "ESP") == 0)
+    if (!manufacturer[0] || strcmp(manufacturer, "ESP") == 0)
     {
      /*
       * Nope, copy the first part of the make and model then...
@@ -655,5 +655,5 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * End of "$Id: ppds.c,v 1.5 2000/03/11 16:19:12 mike Exp $".
+ * End of "$Id: ppds.c,v 1.6 2000/03/14 21:06:35 mike Exp $".
  */

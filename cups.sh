@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: cups.sh,v 1.8 2000/02/08 20:38:40 mike Exp $"
+# "$Id: cups.sh,v 1.9 2000/03/14 21:06:32 mike Exp $"
 #
 #   Startup/shutdown script for the Common UNIX Printing System (CUPS).
 #
@@ -31,7 +31,7 @@
 
 # See what program to use for configuration stuff...
 case "`uname`" in
-	IRIX* | Linux*)
+	IRIX*)
 		IS_ON=/sbin/chkconfig
 		;;
 
@@ -82,7 +82,7 @@ case $1 in
 			fi
 		else
 			if $IS_ON cups; then
-				/usr/sbin/cupsd 2>&1 >/dev/null &
+				/usr/sbin/cupsd >/dev/null 2>&1 &
 				$ECHO "cups: scheduler started."
 			fi
 		fi
@@ -113,5 +113,5 @@ exit 0
 
 
 #
-# End of "$Id: cups.sh,v 1.8 2000/02/08 20:38:40 mike Exp $".
+# End of "$Id: cups.sh,v 1.9 2000/03/14 21:06:32 mike Exp $".
 #

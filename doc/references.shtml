@@ -7,6 +7,7 @@
 <UL>
 	<LI>CUPS-CMP-1.1: CUPS Configuration Management Plan 
 	<LI>CUPS-IDD-1.1: CUPS System Interface Design Description 
+	<LI>CUPS-IPP-1.1: CUPS Implmentation of IPP
 	<LI>CUPS-SAM-1.1.x: CUPS Software Administrators Manual 
 	<LI>CUPS-SDD-1.1: CUPS Software Design Description 
 	<LI>CUPS-SPM-1.1: CUPS Software Programming Manual
