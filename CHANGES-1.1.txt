@@ -3,8 +3,13 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The cupsEmitJCL() function not outputs an empty @PJL
+	  command after the PJL language escape to work around
+	  bugs in certain PJL implementations (STR #131)
+	- The cupsEmit*() functions didn't set the orientation
+	  value properly (STR #127)
 	- The cups.spec file didn't list the rc2.d init
-	  directory or the cupstestppd file.
+	  directory or the cupstestppd file (STR #134)
 
 
 CHANGES IN CUPS V1.1.19

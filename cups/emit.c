@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.23.2.8 2003/05/25 14:43:34 mike Exp $"
+ * "$Id: emit.c,v 1.23.2.9 2003/06/02 20:08:50 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -207,7 +207,8 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
 
         ppd_attr_t	*attr;		/* PPD attribute */
 	int		pos,		/* Position of custom value */
-			values[5];	/* Values for custom command */
+			values[5],	/* Values for custom command */
+			orientation;	/* Orientation to use */
 
 
         fputs("%%BeginFeature: *CustomPageSize True\n", fp);
@@ -239,6 +240,36 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
 	  pos = 1;
 
 	values[pos] = (int)size->length;
+
+        if (size->width < size->length)
+	  orientation = 1;
+	else
+	  orientation = 0;
+
+	if ((attr = ppdFindAttr(ppd, "ParamCustomPageSize",
+	                        "Orientation")) != NULL)
+	{
+	  int min_orient, max_orient;	/* Minimum and maximum orientations */
+
+
+          if (sscanf(attr->value, "%d%*s%d%d", &pos, &min_orient,
+	             &max_orient) != 3)
+	    pos = 4;
+	  else
+	  {
+            if (pos < 0 || pos > 4)
+	      pos = 4;
+
+            if (orientation > max_orient)
+	      orientation = max_orient;
+	    else if (orientation < min_orient)
+	      orientation = min_orient;
+	  }
+	}
+	else
+	  pos = 4;
+
+	values[pos] = orientation;
 
         fprintf(fp, "%d %d %d %d %d\n", values[0], values[1],
 	        values[2], values[3], values[4]);
@@ -377,7 +408,8 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
 
         ppd_attr_t	*attr;		/* PPD attribute */
 	int		pos,		/* Position of custom value */
-			values[5];	/* Values for custom command */
+			values[5],	/* Values for custom command */
+			orientation;	/* Orientation to use */
 
 
         size = ppdPageSize(ppd, "Custom");
@@ -407,6 +439,36 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
 	  pos = 1;
 
 	values[pos] = (int)size->length;
+
+        if (size->width < size->length)
+	  orientation = 1;
+	else
+	  orientation = 0;
+
+	if ((attr = ppdFindAttr(ppd, "ParamCustomPageSize",
+	                        "Orientation")) != NULL)
+	{
+	  int min_orient, max_orient;	/* Minimum and maximum orientations */
+
+
+          if (sscanf(attr->value, "%d%*s%d%d", &pos, &min_orient,
+	             &max_orient) != 3)
+	    pos = 4;
+	  else
+	  {
+            if (pos < 0 || pos > 4)
+	      pos = 4;
+
+            if (orientation > max_orient)
+	      orientation = max_orient;
+	    else if (orientation < min_orient)
+	      orientation = min_orient;
+	  }
+	}
+	else
+	  pos = 4;
+
+	values[pos] = orientation;
 
         snprintf(buf, sizeof(buf), "%d %d %d %d %d\n", values[0], values[1],
 	         values[2], values[3], values[4]);
@@ -477,6 +539,7 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
 	   const char *title)		/* I - Title */
 {
   const char	*ptr;			/* Pointer into JCL string */
+  char		temp[81];		/* Local title string */
 
 
   if (ppd == NULL || ppd->jcl_begin == NULL || ppd->jcl_ps == NULL)
@@ -487,9 +550,13 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
    /*
     * This printer uses HP PJL commands for output; filter the output
     * so that we only have a single "@PJL JOB" command in the header...
+    *
+    * To avoid bugs in the PJL implementation of certain vendors' products
+    * (Xerox in particular), we add a dummy "@PJL" command at the beginning
+    * of the PJL commands to initialize PJL processing.
     */
 
-    fputs("\033%-12345X", fp);
+    fputs("\033%-12345X@PJL\n", fp);
     for (ptr = ppd->jcl_begin + 9; *ptr;)
       if (strncmp(ptr, "@PJL JOB", 8) == 0)
       {
@@ -522,11 +589,22 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
       }
 
    /*
+    * Replace double quotes with single quotes so that the title
+    * does not cause a PJL syntax error.
+    */
+
+    strlcpy(temp, title, sizeof(temp));
+
+    for (ptr = temp; *ptr; ptr ++)
+      if (*ptr == '\"')
+        *ptr = '\'';
+
+   /*
     * Send PJL JOB command before we enter PostScript mode...
     */
 
-    fprintf(fp, "@PJL JOB NAME = \"%s\" DISPLAY = \"%d %s %s\"\n", title,
-            job_id, user, title);
+    fprintf(fp, "@PJL JOB NAME = \"%s\" DISPLAY = \"%d %s %s\"\n", temp,
+            job_id, user, temp);
   }
   else
     fputs(ppd->jcl_begin, stdout);
@@ -631,5 +709,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c,v 1.23.2.8 2003/05/25 14:43:34 mike Exp $".
+ * End of "$Id: emit.c,v 1.23.2.9 2003/06/02 20:08:50 mike Exp $".
  */
