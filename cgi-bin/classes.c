@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.18.2.4 2002/05/09 03:07:58 mike Exp $"
+ * "$Id: classes.c,v 1.18.2.5 2002/12/10 19:14:04 mike Exp $"
  *
  *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -325,7 +325,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       ippDelete(response);
     }
     else
-      status = IPP_GONE;
+      status = cupsLastError();
 
     cgiSetVariable("PRINTER_NAME", pclass);
 
@@ -356,5 +356,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: classes.c,v 1.18.2.4 2002/05/09 03:07:58 mike Exp $".
+ * End of "$Id: classes.c,v 1.18.2.5 2002/12/10 19:14:04 mike Exp $".
  */

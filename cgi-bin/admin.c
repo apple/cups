@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.22.2.18 2002/10/16 22:13:00 mike Exp $"
+ * "$Id: admin.c,v 1.22.2.19 2002/12/10 19:14:04 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -939,8 +939,24 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 
   if ((filename = cupsGetPPD(printer)) == NULL)
   {
-    cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
-    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    if (cupsLastError() == IPP_NOT_FOUND)
+    {
+     /*
+      * No PPD file for this printer, so we can't configure it!
+      */
+
+      cgiSetVariable("ERROR", ippErrorString(IPP_NOT_POSSIBLE));
+      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    }
+    else
+    {
+     /*
+      * Unable to access the PPD file for some reason...
+      */
+
+      cgiSetVariable("ERROR", ippErrorString(cupsLastError()));
+      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    }
     return;
   }
 
@@ -1531,5 +1547,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.22.2.18 2002/10/16 22:13:00 mike Exp $".
+ * End of "$Id: admin.c,v 1.22.2.19 2002/12/10 19:14:04 mike Exp $".
  */
