@@ -1,5 +1,5 @@
 /*
- * "$Id: tempfile.c,v 1.1.2.4 2002/05/14 01:25:39 mike Exp $"
+ * "$Id: tempfile.c,v 1.1.2.5 2002/08/16 17:43:05 mike Exp $"
  *
  *   Temp file utilities for the Common UNIX Printing System (CUPS).
  *
@@ -57,6 +57,7 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
            int  len)			/* I - Size of buffer */
 {
   int		fd;			/* File descriptor for temp file */
+  int		tries;			/* Number of tries */
 #ifdef WIN32
   char		tmpdir[1024];		/* Windows temporary directory */
   DWORD		curtime;		/* Current time */
@@ -101,6 +102,8 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
   * Make the temporary name using the specified directory...
   */
 
+  tries = 0;
+
   do
   {
 #ifdef WIN32
@@ -141,10 +144,12 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
     fd = open(filename, O_RDWR | O_CREAT | O_EXCL, 0600);
 #endif /* O_NOFOLLOW */
 
-    if (fd < 0 && (errno == EPERM || errno == ENOENT))
-      break; /* Stop immediately if permission denied or the dir doesn't exist! */
+    if (fd < 0 && errno != EEXIST)
+      break;
+
+    tries ++;
   }
-  while (fd < 0);
+  while (fd < 0 && tries < 1000);
 
  /*
   * Return the file descriptor...
@@ -198,5 +203,5 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
 
 
 /*
- * End of "$Id: tempfile.c,v 1.1.2.4 2002/05/14 01:25:39 mike Exp $".
+ * End of "$Id: tempfile.c,v 1.1.2.5 2002/08/16 17:43:05 mike Exp $".
  */

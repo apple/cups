@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- cupsTempFd() now stops trying to create a temporary
+	  file after 1000 tries, and aborts on any error other
+	  than EEXIST.  This should prevent lp/lpr hangs due to
+	  a bad or missing temporary directory.
 	- The lpadmin command did not send the right URI to the
 	  scheduler when setting options on classes.  This
 	  caused a client-error-bad-request error.
