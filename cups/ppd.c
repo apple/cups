@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.9 2002/04/17 18:07:03 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.10 2002/05/09 02:55:38 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -96,6 +96,8 @@ static void		ppd_free_group(ppd_group_t *group);
 static void		ppd_free_option(ppd_option_t *option);
 static ppd_group_t	*ppd_get_group(ppd_file_t *ppd, const char *name,
 			               const char *text);
+static ppd_attr_t	*ppd_add_attr(ppd_file_t *ppd, const char *name,
+			              const char *spec, const char *value);
 static ppd_option_t	*ppd_get_option(ppd_group_t *group, const char *name);
 static ppd_choice_t	*ppd_add_choice(ppd_option_t *option, const char *name);
 
@@ -112,6 +114,7 @@ ppdClose(ppd_file_t *ppd)	/* I - PPD file record */
   ppd_group_t	*group;		/* Current group */
   char		**font;		/* Current font */
   char		**filter;	/* Current filter */
+  ppd_attr_t	**attr;		/* Current attribute */
 
 
  /*
@@ -211,10 +214,104 @@ ppdClose(ppd_file_t *ppd)	/* I - PPD file record */
     safe_free(ppd->profiles);
 
  /*
+  * Free any attributes...
+  */
+
+  if (ppd->num_attrs > 0)
+  {
+    for (i = ppd->num_attrs, attr = ppd->attrs; i > 0; i --, attr ++)
+    {
+      safe_free((*attr)->value);
+      safe_free(*attr);
+    }
+
+    safe_free(ppd->attrs);
+  }
+
+ /*
   * Free the whole record...
   */
 
   safe_free(ppd);
+}
+
+
+/*
+ * 'ppd_add_attr()' - Add an attribute to the PPD data.
+ */
+
+static ppd_attr_t *		/* O - New attribute */
+ppd_add_attr(ppd_file_t *ppd,	/* I - PPD file data */
+             const char *name,	/* I - Attribute name */
+             const char *spec,	/* I - Specifier string, if any */
+	     const char *value)	/* I - Value of attribute */
+{
+  ppd_attr_t	**ptr,		/* New array */
+		*temp;		/* New attribute */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (ppd == NULL || name == NULL || spec == NULL)
+    return (NULL);
+
+ /*
+  * Allocate memory for the new attribute...
+  */
+
+  if (ppd->num_attrs == 0)
+    ptr = malloc(sizeof(ppd_attr_t *));
+  else
+    ptr = realloc(ppd->attrs, (ppd->num_attrs + 1) * sizeof(ppd_attr_t *));
+
+  if (ptr == NULL)
+    return (NULL);
+
+  ppd->attrs = ptr;
+  ptr += ppd->num_attrs;
+
+  if ((temp = calloc(1, sizeof(ppd_attr_t))) == NULL)
+    return (NULL);
+
+  *ptr = temp;
+
+  ppd->num_attrs ++;
+
+ /*
+  * Copy data over...
+  */
+
+  strncpy(temp->name, name, sizeof(temp->name) - 1);
+  strncpy(temp->spec, spec, sizeof(temp->spec) - 1);
+  temp->value = (char *)value;
+
+ /*
+  * Return the attribute...
+  */
+
+  return (temp);
+}
+
+
+/*
+ * '_ppd_attr_compare()' - Compare two attributes.
+ */
+
+int					/* O - Result of comparison */
+_ppd_attr_compare(ppd_attr_t **a,	/* I - First attribute */
+                  ppd_attr_t **b)	/* I - Second attribute */
+{
+  int	ret;				/* Result of comparison */
+
+
+  if ((ret = strcasecmp((*a)->name, (*b)->name)) != 0)
+    return (ret);
+  else if ((*a)->spec[0] && (*b)->spec[0])
+    return (strcasecmp((*a)->spec, (*b)->spec));
+  else
+    return (0);
 }
 
 
@@ -1362,6 +1459,16 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       choice->code = string;
       string = NULL;			/* Don't free this string below */
     }
+    else if (strcmp(keyword, "OpenSubGroup") != 0 &&
+             strcmp(keyword, "CloseSubGroup") != 0)
+    {
+      char	spec[PPD_MAX_NAME + PPD_MAX_TEXT];
+
+      snprintf(spec, sizeof(spec), "%s/%s", name, text);
+      ppd_add_attr(ppd, keyword, spec, string);
+
+      string = NULL;			/* Don't free this string below */
+    }
 
     safe_free(string);
   }
@@ -1418,6 +1525,14 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       }
     }
   }
+
+ /*
+  * Sort the attributes...
+  */
+
+  if (ppd->num_attrs > 1)
+    qsort(ppd->attrs, ppd->num_attrs, sizeof(ppd_attr_t *),
+          (int (*)(const void *, const void *))_ppd_attr_compare);
 
   return (ppd);
 }
@@ -2029,5 +2144,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.9 2002/04/17 18:07:03 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.10 2002/05/09 02:55:38 mike Exp $".
  */
