@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The ppdOpen() functions could get in an infinite loop
+	  if the PPD file contained a keyword or text that was
+	  too large for the buffer.
 	- Added preliminary support for GNU TLS; patch provided
 	  by Jeff Licquia.
 	- Now timeout IPP attribute reads after 1 second inside
