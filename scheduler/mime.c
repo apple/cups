@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.9 2002/01/27 21:16:14 mike Exp $"
+ * "$Id: mime.c,v 1.10 2002/01/29 18:20:12 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -429,6 +429,15 @@ load_convs(mime_t *mime,		/* I - MIME database */
       continue;
 
    /*
+    * Strip trailing whitespace...
+    */
+
+    for (lineptr = line + strlen(line) - 1;
+         lineptr >= line && isspace(*lineptr);
+	 lineptr --)
+      *lineptr = '\0';
+
+   /*
     * Extract the destination super-type and type names from the middle of
     * the line.
     */
@@ -487,8 +496,6 @@ load_convs(mime_t *mime,		/* I - MIME database */
       continue;
 
     filter = lineptr;
-    if (filter[strlen(filter) - 1] == '\n')
-      filter[strlen(filter) - 1] = '\0';
 
    /*
     * Finally, get the source super-type and type names from the beginning of
@@ -568,5 +575,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.9 2002/01/27 21:16:14 mike Exp $".
+ * End of "$Id: mime.c,v 1.10 2002/01/29 18:20:12 mike Exp $".
  */
