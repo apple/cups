@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.17 1999/06/18 18:36:47 mike Exp $"
+ * "$Id: ipp.c,v 1.18 1999/06/19 12:56:53 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -582,20 +582,26 @@ add_printer(client_t        *con,	/* I - Client connection */
     strcpy(printer->more_info, attr->values[0].string.text);
   if ((attr = ippFindAttribute(con->request, "device-uri", IPP_TAG_URI)) != NULL)
     strcpy(printer->device_uri, attr->values[0].string.text);
+  if ((attr = ippFindAttribute(con->request, "printer-is-accepting-jobs", IPP_TAG_BOOLEAN)) != NULL)
+    printer->accepting = attr->values[0].boolean;
+  if ((attr = ippFindAttribute(con->request, "printer-state", IPP_TAG_ENUM)) != NULL)
+  {
+    printer->state       = (ipp_pstate_t)attr->values[0].integer;
+    printer->browse_time = 0;
+  }
+  if ((attr = ippFindAttribute(con->request, "printer-state-message", IPP_TAG_TEXT)) != NULL)
+  {
+    strncpy(printer->state_message, attr->values[0].string.text,
+            sizeof(printer->state_message) - 1);
+    printer->state_message[sizeof(printer->state_message) - 1] = '\0';
+  }
 
  /*
   * See if we have all required attributes...
   */
 
   if (printer->device_uri[0] == '\0')
-  {
-   /*
-    * Nope, return an error...
-    */
-
-    send_ipp_error(con, IPP_ATTRIBUTES);
-    return;
-  }
+    strcpy(printer->device_uri, "file:/dev/null");
 
  /*
   * See if we have an interface script or PPD file attached to the request...
@@ -2241,5 +2247,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.17 1999/06/18 18:36:47 mike Exp $".
+ * End of "$Id: ipp.c,v 1.18 1999/06/19 12:56:53 mike Exp $".
  */
