@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
 
     psOutLevel1 = ppd->language_level == 1;
 
-    fprintf(stderr, "DEBUG: pstops - psOutLevel1 = %d, paperWidth = %d, paperHeight = %d\n",
+    fprintf(stderr, "DEBUG: pdftops - psOutLevel1 = %d, paperWidth = %d, paperHeight = %d\n",
             psOutLevel1, paperWidth, paperHeight);
 
     ppdClose(ppd);
