@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.6 1999/03/06 20:28:11 mike Exp $"
+ * "$Id: texttops.c,v 1.7 1999/03/11 20:55:05 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -73,6 +73,7 @@ int	SizeLines = 60,		/* Number of lines on a page */
 	ColumnGutter = 0,	/* Number of characters between text columns */
 	ColumnWidth = 80;	/* Width of each column */
 lchar_t	**Page = NULL;		/* Page characters */
+int	NumPages = 0;		/* Number of pages in document */
 int	CharsPerInch = 10;	/* Number of character columns per inch */
 int	LinesPerInch = 6;	/* Number of lines per inch */
 int	Top = 36;		/* Top position in points */
@@ -84,7 +85,10 @@ int	Top = 36;		/* Top position in points */
  */
 
 static int	getutf8(FILE *fp);
+static int	write_epilogue(ppd_t *ppd);
 static int	write_line(int row, lchar_t *line);
+static int	write_page(void);
+static int	write_prolog(ppd_t *ppd);
 static int	write_string(int col, int row, int len, lchar_t *s);
 
 
@@ -164,6 +168,16 @@ getutf8(FILE *fp)	/* I - File to read from */
 
 
 /*
+ * 'write_epilogue()' - Write the PostScript file epilogue.
+ */
+
+static int
+write_epilogue(ppd_t *ppd)
+{
+}
+
+
+/*
  * 'write_line()' - Write a row of text.
  */
 
@@ -203,6 +217,26 @@ write_line(int     row,		/* I - Row number (0 to N) */
       return (-1);
 
   return (0);
+}
+
+
+/*
+ * 'write_page()' - Write a page of text.
+ */
+
+static int
+write_page(void)
+{
+}
+
+
+/*
+ * 'write_prolog()' - Write the PostScript file prolog with options.
+ */
+
+static int
+write_prolog(ppd_t *ppd)
+{
 }
 
 
@@ -301,6 +335,19 @@ write_string(int     col,	/* I - Start column */
 }
 
 
+/*
+ * Control codes:
+ *
+ *   BS		Backspace (0x08)
+ *   HT		Horizontal tab; next 8th column (0x09)
+ *   LF		Line feed; forward full line (0x0a)
+ *   VT		Vertical tab; reverse full line (0x0b)
+ *   FF		Form feed (0x0c)
+ *   CR		Carriage return (0x0d)
+ *   ESC 7	Reverse full line (0x1b 0x37)
+ *   ESC 8	Reverse half line (0x1b 0x38)
+ *   ESC 9	Forward half line (0x1b 0x39)
+ */
 
 /*
  * 'Setup()' - Output a PostScript prolog for this page.
@@ -981,5 +1028,5 @@ main(int  argc,    /* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: texttops.c,v 1.6 1999/03/06 20:28:11 mike Exp $".
+ * End of "$Id: texttops.c,v 1.7 1999/03/11 20:55:05 mike Exp $".
  */
