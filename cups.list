@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.34 2000/01/03 17:19:45 mike Exp $"
+# "$Id: cups.list,v 1.35 2000/01/03 21:25:22 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -95,18 +95,38 @@ l 0555 root sys /usr/lib/libcupsimage.so libcupsimage.so.1
 %system all
 
 # Directories
-d 0755 root sys /var/cups/interfaces
-d 0755 root sys /var/cups/logs
-d 0755 root sys /var/cups/ppd
-d 0755 root sys /var/cups/requests
+d 0711 root sys /etc/cups/certs
+d 0755 root sys /etc/cups/interfaces
+d 0755 root sys /etc/cups/ppd
+d 0755 root sys /var/log/cups
+d 0755 root sys /var/spool/cups
 
 # Data files
+%system linux
+f 0444 root sys /usr/share/locale/C/cups_C locale/C/cups_C
+f 0444 root sys /usr/share/locale/de/cups_de locale/de/cups_de
+f 0444 root sys /usr/share/locale/en/cups_en locale/en/cups_en
+f 0444 root sys /usr/share/locale/es/cups_es locale/es/cups_es
+f 0444 root sys /usr/share/locale/fr/cups_fr locale/fr/cups_fr
+f 0444 root sys /usr/share/locale/it/cups_it locale/it/cups_it
+
+%system dunix
+f 0444 root sys /usr/lib/nls/msg/C/cups_C locale/C/cups_C
+f 0444 root sys /usr/lib/nls/msg/de/cups_de locale/de/cups_de
+f 0444 root sys /usr/lib/nls/msg/en/cups_en locale/en/cups_en
+f 0444 root sys /usr/lib/nls/msg/es/cups_es locale/es/cups_es
+f 0444 root sys /usr/lib/nls/msg/fr/cups_fr locale/fr/cups_fr
+f 0444 root sys /usr/lib/nls/msg/it/cups_it locale/it/cups_it
+
+%system !linux dunix
 f 0444 root sys /usr/lib/locale/C/cups_C locale/C/cups_C
 f 0444 root sys /usr/lib/locale/de/cups_de locale/de/cups_de
 f 0444 root sys /usr/lib/locale/en/cups_en locale/en/cups_en
 f 0444 root sys /usr/lib/locale/es/cups_es locale/es/cups_es
 f 0444 root sys /usr/lib/locale/fr/cups_fr locale/fr/cups_fr
 f 0444 root sys /usr/lib/locale/it/cups_it locale/it/cups_it
+
+%system all
 f 0444 root sys /usr/share/cups/data/8859-1 data/8859-1
 f 0444 root sys /usr/share/cups/data/8859-14 data/8859-14
 f 0444 root sys /usr/share/cups/data/8859-15 data/8859-15
@@ -205,11 +225,11 @@ f 0444 root sys /usr/share/cups/model/deskjet.ppd ppd/deskjet.ppd
 f 0444 root sys /usr/share/cups/model/laserjet.ppd ppd/laserjet.ppd
 
 # Config files
-c 0644 root sys /var/cups/conf/classes.conf conf/classes.conf
-c 0644 root sys /var/cups/conf/cupsd.conf conf/cupsd.conf
-f 0644 root sys /var/cups/conf/mime.convs conf/mime.convs
-f 0644 root sys /var/cups/conf/mime.types conf/mime.types
-c 0644 root sys /var/cups/conf/printers.conf conf/printers.conf
+c 0644 root sys /etc/cups/classes.conf conf/classes.conf
+c 0644 root sys /etc/cups/cupsd.conf conf/cupsd.conf
+f 0644 root sys /etc/cups/mime.convs conf/mime.convs
+f 0644 root sys /etc/cups/mime.types conf/mime.types
+c 0644 root sys /etc/cups/printers.conf conf/printers.conf
 
 # Dummy printcap file for Digital UNIX and Linux...
 %system dunix linux
@@ -234,37 +254,37 @@ f 0444 root sys /usr/lib/libcups.a cups/libcups.a
 %system all
 
 # Documentation files
-f 0444 root sys /usr/share/cups/doc/cmp.html doc/cmp.html
-f 0444 root sys /usr/share/cups/doc/cmp.pdf doc/cmp.pdf
-f 0444 root sys /usr/share/cups/doc/cupsdoc.css doc/cupsdoc.css
-f 0444 root sys /usr/share/cups/doc/cups.css doc/cups.css
-f 0444 root sys /usr/share/cups/doc/documentation.html doc/documentation.html
-f 0444 root sys /usr/share/cups/doc/idd.html doc/idd.html
-f 0444 root sys /usr/share/cups/doc/idd.pdf doc/idd.pdf
-f 0444 root sys /usr/share/cups/doc/images/classes.gif doc/images/classes.gif
-f 0444 root sys /usr/share/cups/doc/images/cups-bar.gif doc/images/cups-bar.gif
-f 0444 root sys /usr/share/cups/doc/images/cups-block-diagram.gif doc/images/cups-block-diagram.gif
-f 0444 root sys /usr/share/cups/doc/images/cups-large.gif doc/images/cups-large.gif
-f 0444 root sys /usr/share/cups/doc/images/cups-medium.gif doc/images/cups-medium.gif
-f 0444 root sys /usr/share/cups/doc/images/cups-small.gif doc/images/cups-small.gif
-f 0444 root sys /usr/share/cups/doc/images/logo.gif doc/images/logo.gif
-f 0444 root sys /usr/share/cups/doc/images/navbar.gif doc/images/navbar.gif
-f 0444 root sys /usr/share/cups/doc/images/printer-idle.gif doc/images/printer-idle.gif
-f 0444 root sys /usr/share/cups/doc/images/printer-processing.gif doc/images/printer-processing.gif
-f 0444 root sys /usr/share/cups/doc/images/printer-stopped.gif doc/images/printer-stopped.gif
-f 0444 root sys /usr/share/cups/doc/index.html doc/index.html
-f 0444 root sys /usr/share/cups/doc/overview.html doc/overview.html
-f 0444 root sys /usr/share/cups/doc/overview.pdf doc/overview.pdf
-f 0444 root sys /usr/share/cups/doc/sam.html doc/sam.html
-f 0444 root sys /usr/share/cups/doc/sam.pdf doc/sam.pdf
-f 0444 root sys /usr/share/cups/doc/sdd.html doc/sdd.html
-f 0444 root sys /usr/share/cups/doc/sdd.pdf doc/sdd.pdf
-f 0444 root sys /usr/share/cups/doc/spm.html doc/spm.html
-f 0444 root sys /usr/share/cups/doc/spm.pdf doc/spm.pdf
-f 0444 root sys /usr/share/cups/doc/ssr.html doc/ssr.html
-f 0444 root sys /usr/share/cups/doc/ssr.pdf doc/ssr.pdf
-f 0444 root sys /usr/share/cups/doc/sum.html doc/sum.html
-f 0444 root sys /usr/share/cups/doc/sum.pdf doc/sum.pdf
+f 0444 root sys /usr/share/doc/cups/cmp.html doc/cmp.html
+f 0444 root sys /usr/share/doc/cups/cmp.pdf doc/cmp.pdf
+f 0444 root sys /usr/share/doc/cups/cupsdoc.css doc/cupsdoc.css
+f 0444 root sys /usr/share/doc/cups/cups.css doc/cups.css
+f 0444 root sys /usr/share/doc/cups/documentation.html doc/documentation.html
+f 0444 root sys /usr/share/doc/cups/idd.html doc/idd.html
+f 0444 root sys /usr/share/doc/cups/idd.pdf doc/idd.pdf
+f 0444 root sys /usr/share/doc/cups/images/classes.gif doc/images/classes.gif
+f 0444 root sys /usr/share/doc/cups/images/cups-bar.gif doc/images/cups-bar.gif
+f 0444 root sys /usr/share/doc/cups/images/cups-block-diagram.gif doc/images/cups-block-diagram.gif
+f 0444 root sys /usr/share/doc/cups/images/cups-large.gif doc/images/cups-large.gif
+f 0444 root sys /usr/share/doc/cups/images/cups-medium.gif doc/images/cups-medium.gif
+f 0444 root sys /usr/share/doc/cups/images/cups-small.gif doc/images/cups-small.gif
+f 0444 root sys /usr/share/doc/cups/images/logo.gif doc/images/logo.gif
+f 0444 root sys /usr/share/doc/cups/images/navbar.gif doc/images/navbar.gif
+f 0444 root sys /usr/share/doc/cups/images/printer-idle.gif doc/images/printer-idle.gif
+f 0444 root sys /usr/share/doc/cups/images/printer-processing.gif doc/images/printer-processing.gif
+f 0444 root sys /usr/share/doc/cups/images/printer-stopped.gif doc/images/printer-stopped.gif
+f 0444 root sys /usr/share/doc/cups/index.html doc/index.html
+f 0444 root sys /usr/share/doc/cups/overview.html doc/overview.html
+f 0444 root sys /usr/share/doc/cups/overview.pdf doc/overview.pdf
+f 0444 root sys /usr/share/doc/cups/sam.html doc/sam.html
+f 0444 root sys /usr/share/doc/cups/sam.pdf doc/sam.pdf
+f 0444 root sys /usr/share/doc/cups/sdd.html doc/sdd.html
+f 0444 root sys /usr/share/doc/cups/sdd.pdf doc/sdd.pdf
+f 0444 root sys /usr/share/doc/cups/spm.html doc/spm.html
+f 0444 root sys /usr/share/doc/cups/spm.pdf doc/spm.pdf
+f 0444 root sys /usr/share/doc/cups/ssr.html doc/ssr.html
+f 0444 root sys /usr/share/doc/cups/ssr.pdf doc/ssr.pdf
+f 0444 root sys /usr/share/doc/cups/sum.html doc/sum.html
+f 0444 root sys /usr/share/doc/cups/sum.pdf doc/sum.pdf
 
 # Man pages
 %system irix
@@ -315,5 +335,5 @@ f 0444 root sys /usr/man/man5/printers.conf.5 man/printers.conf.5
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.34 2000/01/03 17:19:45 mike Exp $".
+# End of "$Id: cups.list,v 1.35 2000/01/03 21:25:22 mike Exp $".
 #
