@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.15.2.3 2002/03/08 20:23:00 mike Exp $"
+# "$Id: Makefile,v 1.15.2.4 2002/03/22 16:24:33 mike Exp $"
 #
 #   CGI makefile for the Common UNIX Printing System (CUPS).
 #
@@ -79,7 +79,7 @@ libcgi.a:	$(LIBOBJS)
 # admin.cgi
 #
 
-admin.cgi:	admin.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
+admin.cgi:	admin.o ../cups/$(LIBCUPS) libcgi.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ admin.o libcgi.a $(LIBS)
 
@@ -88,7 +88,7 @@ admin.cgi:	admin.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
 # classes.cgi
 #
 
-classes.cgi:	classes.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
+classes.cgi:	classes.o ../cups/$(LIBCUPS) libcgi.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ classes.o libcgi.a $(LIBS)
 
@@ -97,7 +97,7 @@ classes.cgi:	classes.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
 # jobs.cgi
 #
 
-jobs.cgi:	jobs.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
+jobs.cgi:	jobs.o ../cups/$(LIBCUPS) libcgi.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ jobs.o libcgi.a $(LIBS)
 
@@ -106,7 +106,7 @@ jobs.cgi:	jobs.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
 # printers.cgi
 #
 
-printers.cgi:	printers.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
+printers.cgi:	printers.o ../cups/$(LIBCUPS) libcgi.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ printers.o libcgi.a $(LIBS)
 
@@ -119,5 +119,5 @@ include Dependencies
 
   
 #
-# End of "$Id: Makefile,v 1.15.2.3 2002/03/08 20:23:00 mike Exp $".
+# End of "$Id: Makefile,v 1.15.2.4 2002/03/22 16:24:33 mike Exp $".
 #

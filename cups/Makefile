@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.53.2.8 2002/03/22 15:47:19 mike Exp $"
+# "$Id: Makefile,v 1.53.2.9 2002/03/22 16:24:34 mike Exp $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -105,7 +105,7 @@ installhdrs:
 # libcups.so.3, libcups.sl.3
 #
 
-libcups.so.3 libcups.sl.3:	$(LIBOBJS) ../Makedefs
+libcups.so.3 libcups.sl.3:	$(LIBOBJS)
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS)
 	$(RM) `basename $@ .3`
@@ -116,7 +116,7 @@ libcups.so.3 libcups.sl.3:	$(LIBOBJS) ../Makedefs
 # libcups.2.dylib
 #
 
-libcups.3.dylib:	$(LIBOBJS) ../Makedefs
+libcups.3.dylib:	$(LIBOBJS)
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/libcups.dylib \
@@ -131,7 +131,7 @@ libcups.3.dylib:	$(LIBOBJS) ../Makedefs
 # libcups_s.a
 #
 
-libcups_s.a:	$(LIBOBJS) ../Makedefs
+libcups_s.a:	$(LIBOBJS)
 	echo Creating $@...
 	$(DSO) $(DSOFLAGS) -o libcups_s.o $(LIBOBJS) -lm
 	$(RM) $@
@@ -142,7 +142,7 @@ libcups_s.a:	$(LIBOBJS) ../Makedefs
 # libcups.la
 #
 
-libcups.la:    $(LIBOBJS) ../Makedefs
+libcups.la:    $(LIBOBJS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
 		-version-info 3:0
@@ -186,5 +186,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.53.2.8 2002/03/22 15:47:19 mike Exp $".
+# End of "$Id: Makefile,v 1.53.2.9 2002/03/22 16:24:34 mike Exp $".
 #

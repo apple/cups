@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.41.2.11 2002/03/12 20:39:22 mike Exp $"
+# "$Id: Makefile,v 1.41.2.12 2002/03/22 16:24:34 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -96,7 +96,7 @@ installhdrs:
 # formtops
 #
 
-formtops:	$(FORMOBJS) common.o ../Makedefs ../cups/$(LIBCUPS)
+formtops:	$(FORMOBJS) common.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ $(FORMOBJS) common.o $(LIBS) -lm
 
@@ -105,7 +105,7 @@ formtops:	$(FORMOBJS) common.o ../Makedefs ../cups/$(LIBCUPS)
 # hpgltops
 #
 
-hpgltops:	$(HPGLOBJS) common.o ../Makedefs ../cups/$(LIBCUPS)
+hpgltops:	$(HPGLOBJS) common.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ $(HPGLOBJS) common.o $(LIBS) -lm
 
@@ -114,7 +114,7 @@ hpgltops:	$(HPGLOBJS) common.o ../Makedefs ../cups/$(LIBCUPS)
 # libcupsimage.so.3, libcupsimage.sl.3
 #
 
-libcupsimage.so.3 libcupsimage.sl.3:	$(IMAGEOBJS) ../Makedefs
+libcupsimage.so.3 libcupsimage.sl.3:	$(IMAGEOBJS)
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ $(IMAGEOBJS) $(DSOLIBS) -lm
 	$(RM) `basename $@ .3`
@@ -125,7 +125,7 @@ libcupsimage.so.3 libcupsimage.sl.3:	$(IMAGEOBJS) ../Makedefs
 # libcupsimage.3.dylib
 #
 
-libcupsimage.3.dylib:	$(IMAGEOBJS) ../Makedefs
+libcupsimage.3.dylib:	$(IMAGEOBJS)
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/libcupsimage.dylib \
@@ -140,7 +140,7 @@ libcupsimage.3.dylib:	$(IMAGEOBJS) ../Makedefs
 # libcupsimage_s.a
 #
 
-libcupsimage_s.a:	$(IMAGEOBJS) ../Makedefs
+libcupsimage_s.a:	$(IMAGEOBJS)
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o libcupsimage_s.o $(IMAGEOBJS) $(DSOLIBS) \
 		$(LINKCUPS) -lm
@@ -152,7 +152,7 @@ libcupsimage_s.a:	$(IMAGEOBJS) ../Makedefs
 # libcupsimage.la
 #
 
-libcupsimage.la:       $(IMAGEOBJS) ../Makedefs
+libcupsimage.la:       $(IMAGEOBJS)
 	echo Linking $@...
 	$(DSO) -o $(DSOFLAGS) $@ $(IMAGEOBJS:.o=.lo) $(DSOLIBS) \
 		-rpath $(LIBDIR) -version-info 2:0
@@ -162,7 +162,7 @@ libcupsimage.la:       $(IMAGEOBJS) ../Makedefs
 # libcupsimage.a
 #
 
-libcupsimage.a:	$(IMAGEOBJS) ../Makedefs
+libcupsimage.a:	$(IMAGEOBJS)
 	echo Archiving $@...
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ $(IMAGEOBJS)
@@ -173,7 +173,7 @@ libcupsimage.a:	$(IMAGEOBJS) ../Makedefs
 # imagetops
 #
 
-imagetops:	imagetops.o common.o $(LIBCUPSIMAGE) ../Makedefs \
+imagetops:	imagetops.o common.o $(LIBCUPSIMAGE) \
 		../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ imagetops.o common.o $(LINKCUPSIMAGE) \
@@ -184,7 +184,7 @@ imagetops:	imagetops.o common.o $(LIBCUPSIMAGE) ../Makedefs \
 # imagetoraster
 #
 
-imagetoraster:	imagetoraster.o common.o $(LIBCUPSIMAGE) ../Makedefs \
+imagetoraster:	imagetoraster.o common.o $(LIBCUPSIMAGE) \
 		../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ imagetoraster.o common.o $(LINKCUPSIMAGE) \
@@ -195,7 +195,7 @@ imagetoraster:	imagetoraster.o common.o $(LIBCUPSIMAGE) ../Makedefs \
 # pstops
 #
 
-pstops:	pstops.o common.o ../Makedefs ../cups/$(LIBCUPS)
+pstops:	pstops.o common.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ pstops.o common.o $(LIBS)
 
@@ -204,7 +204,7 @@ pstops:	pstops.o common.o ../Makedefs ../cups/$(LIBCUPS)
 # rastertodymo
 #
 
-rastertodymo:	rastertodymo.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
+rastertodymo:	rastertodymo.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ rastertodymo.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
 
@@ -213,7 +213,7 @@ rastertodymo:	rastertodymo.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 # rastertoepson
 #
 
-rastertoepson:	rastertoepson.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
+rastertoepson:	rastertoepson.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ rastertoepson.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
 
@@ -222,7 +222,7 @@ rastertoepson:	rastertoepson.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 # rastertohp
 #
 
-rastertohp:	rastertohp.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
+rastertohp:	rastertohp.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ rastertohp.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
 
@@ -240,7 +240,7 @@ testraster:	testraster.o raster.o
 # texttops
 #
 
-texttops:	texttops.o textcommon.o common.o ../Makedefs \
+texttops:	texttops.o textcommon.o common.o \
 		../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ texttops.o textcommon.o common.o $(LIBS)
@@ -254,5 +254,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.41.2.11 2002/03/12 20:39:22 mike Exp $".
+# End of "$Id: Makefile,v 1.41.2.12 2002/03/22 16:24:34 mike Exp $".
 #

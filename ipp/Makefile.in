@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile.in,v 1.1.2.2 2002/03/22 16:01:36 mike Exp $"
+# "$Id: Makefile.in,v 1.1.2.3 2002/03/22 16:24:35 mike Exp $"
 #
 #   IPP library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -40,6 +40,14 @@ OBJS	=	$(LIBOBJS) testhttp.o
 #
 
 HEADERS	=	http.h ipp.h md5.h
+
+
+#
+# Source distribution definitions...
+#
+
+SRCDIR	=	ipp-@CUPS_VERSION@
+SRCDIST	=	ipp-@CUPS_VERSION@-source.tar.gz
 
 
 #
@@ -105,7 +113,7 @@ installhdrs:
 # libipp.so.3, libipp.sl.3
 #
 
-libipp.so.3 libipp.sl.3:	$(LIBOBJS) ../Makedefs
+libipp.so.3 libipp.sl.3:	$(LIBOBJS)
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS) $(SSLLIBS)
 	$(RM) `basename $@ .3`
@@ -116,7 +124,7 @@ libipp.so.3 libipp.sl.3:	$(LIBOBJS) ../Makedefs
 # libipp.2.dylib
 #
 
-libipp.3.dylib:	$(LIBOBJS) ../Makedefs
+libipp.3.dylib:	$(LIBOBJS)
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/libipp.dylib \
@@ -131,7 +139,7 @@ libipp.3.dylib:	$(LIBOBJS) ../Makedefs
 # libipp_s.a
 #
 
-libipp_s.a:	$(LIBOBJS) ../Makedefs
+libipp_s.a:	$(LIBOBJS)
 	echo Creating $@...
 	$(RM) libipp_s.exp
 	(echo _ipp_add_attr; echo _ipp_free_attr) >libipp_s.exp
@@ -144,7 +152,7 @@ libipp_s.a:	$(LIBOBJS) ../Makedefs
 # libipp.la
 #
 
-libipp.la:    $(LIBOBJS) ../Makedefs
+libipp.la:    $(LIBOBJS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
 		-version-info 3:0 $(SSLLIBS)
@@ -168,6 +176,22 @@ libipp.a:	$(LIBOBJS)
 testhttp:	testhttp.o libipp.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testhttp.o libipp.a $(NETLIBS) $(SSLLIBS)
+
+
+#
+# Make a source distribution...
+#
+
+srcdist:
+	echo Making source distribution file $(SRCDIST)...
+	$(RM) -rf $(SRCDIR) $(SRCDIST)
+	mkdir $(SRCDIR)
+	autoconf -f
+	cp configure $(SRCDIR)
+	cp Dependencies.dist $(SRCDIR)/Dependencies
+	cp *.c *.h *.in *.spec *.txt $(SRCDIR)
+	cp ../LICENSE.txt ../LICENSE.html $(SRCDIR)
+	tar cvzf $(SRCDIST) $(SRCDIR)
 
 
 #
@@ -209,5 +233,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile.in,v 1.1.2.2 2002/03/22 16:01:36 mike Exp $".
+# End of "$Id: Makefile.in,v 1.1.2.3 2002/03/22 16:24:35 mike Exp $".
 #

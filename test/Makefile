@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.2.2.2 2002/01/02 18:05:09 mike Exp $"
+# "$Id: Makefile,v 1.2.2.3 2002/03/22 16:24:36 mike Exp $"
 #
 #   IPP test makefile for the Common UNIX Printing System (CUPS).
 #
@@ -55,7 +55,7 @@ ipptest:	ipptest.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o ipptest ipptest.o $(LIBS)
 
-ipptest.o:	../cups/cups.h ../Makedefs
+ipptest.o:	../cups/cups.h
 
 
 #
@@ -68,5 +68,5 @@ purify:	ipptest.o ../cups/$(LIBCUPS)
 
 
 #
-# End of "$Id: Makefile,v 1.2.2.2 2002/01/02 18:05:09 mike Exp $".
+# End of "$Id: Makefile,v 1.2.2.3 2002/03/22 16:24:36 mike Exp $".
 #
