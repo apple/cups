@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.19 2000/06/26 15:09:37 mike Exp $"
+# "$Id: Makefile,v 1.20 2000/07/07 15:18:40 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -38,7 +38,7 @@ DIRS	=	cups backend berkeley cgi-bin filter man pdftops pstoraster \
 all:
 	for dir in $(DIRS); do\
 		echo Making all in $$dir... ;\
-		(cd $$dir ; $(MAKE) -$(MAKEFLAGS)) || exit 1;\
+		(cd $$dir ; $(MAKE) $(MFLAGS)) || exit 1;\
 	done
 
 #
@@ -48,7 +48,7 @@ all:
 clean:
 	for dir in $(DIRS); do\
 		echo Cleaning in $$dir... ;\
-		(cd $$dir; $(MAKE) -$(MAKEFLAGS) clean) || exit 1;\
+		(cd $$dir; $(MAKE) $(MFLAGS) clean) || exit 1;\
 	done
 
 #
@@ -58,61 +58,73 @@ clean:
 install:
 	for dir in $(DIRS); do\
 		echo Installing in $$dir... ;\
-		(cd $$dir; $(MAKE) -$(MAKEFLAGS) install) || exit 1;\
+		(cd $$dir; $(MAKE) $(MFLAGS) install) || exit 1;\
 	done
 	echo Installing in conf...
-	(cd conf; $(MAKE) -$(MAKEFLAGS) install)
+	(cd conf; $(MAKE) $(MFLAGS) install)
 	echo Installing in data...
-	(cd data; $(MAKE) -$(MAKEFLAGS) install)
+	(cd data; $(MAKE) $(MFLAGS) install)
 	echo Installing in doc...
-	(cd doc; $(MAKE) -$(MAKEFLAGS) install)
+	(cd doc; $(MAKE) $(MFLAGS) install)
 	echo Installing in fonts...
-	(cd fonts; $(MAKE) -$(MAKEFLAGS) install)
-	(cd fonts; $(MAKE) -$(MAKEFLAGS) install)
+	(cd fonts; $(MAKE) $(MFLAGS) install)
+	(cd fonts; $(MAKE) $(MFLAGS) install)
 	echo Installing in locale...
 	echo Installing in ppd...
-	(cd ppd; $(MAKE) -$(MAKEFLAGS) install)
+	(cd ppd; $(MAKE) $(MFLAGS) install)
 	echo Installing in templates...
-	(cd templates; $(MAKE) -$(MAKEFLAGS) install)
+	(cd templates; $(MAKE) $(MFLAGS) install)
 	echo Installing startup script...
-	if test -d /sbin/init.d; then \
-		cp cups.sh /sbin/init.d/cups; \
-		ln -s ../init.d/cups /sbin/rc0.d/K000cups; \
-		ln -s ../init.d/cups /sbin/rc2.d/S999cups; \
+	if test -d $(prefix)/sbin/init.d; then \
+		$(INSTALL_SCRIPT) cups.sh $(prefix)/sbin/init.d/cups; \
+		$(CHMOD) ugo+rx $(prefix)/sbin/init.d/cups; \
+		ln -s ../init.d/cups $(prefix)/sbin/rc0.d/K000cups; \
+		ln -s ../init.d/cups $(prefix)/sbin/rc2.d/S999cups; \
 	fi
-	if test -d /etc/rc.d/init.d; then \
-		cp cups.sh /etc/rc.d/init.d/cups; \
-		ln -s ../init.d/cups /etc/rc.d/rc0.d/K00cups; \
-		ln -s ../init.d/cups /etc/rc.d/rc2.d/S99cups; \
+	if test -d $(prefix)/etc/rc.d/init.d; then \
+		$(INSTALL_SCRIPT) cups.sh $(prefix)/etc/rc.d/init.d/cups; \
+		$(CHMOD) ugo+rx $(prefix)/etc/rc.d/cups; \
+		ln -s ../init.d/cups $(prefix)/etc/rc.d/rc0.d/K00cups; \
+		ln -s ../init.d/cups $(prefix)/etc/rc.d/rc2.d/S99cups; \
 	fi
-	if test -d /etc/init.d; then \
-		cp cups.sh /etc/init.d/cups; \
-		ln -s ../init.d/cups /etc/rc0.d/K00cups; \
-		ln -s ../init.d/cups /etc/rc2.d/S99cups; \
+	if test -d $(prefix)/etc/init.d; then \
+		$(INSTALL_SCRIPT) cups.sh $(prefix)/etc/init.d/cups; \
+		$(CHMOD) ugo+rx $(prefix)/etc/init.d/cups; \
+		ln -s ../init.d/cups $(prefix)/etc/rc0.d/K00cups; \
+		ln -s ../init.d/cups $(prefix)/etc/rc2.d/S99cups; \
 	fi
 
 #
-# Make a software distribution...
+# Make software distributions using EPM (http://www.easysw.com/epm)...
 #
+
+EPMFLAGS	=	-v \
+			BINDIR=$(BINDIR) DATADIR=$(DATADIR) \
+			DOCDIR=$(DOCDIR) ESP_ROOT=$(ESP_ROOT) \
+			INCLUDEDIR=$(INCLUDEDIR) LIBDIR=$(LIBDIR) \
+			LOCALEDIR=$(LOCALEDIR) LOGDIR=$(LOGDIR) \
+			MANDIR=$(MANDIR) PAMDIR=$(PAMDIR) \
+			REQUESTS=$(REQUESTS) SBINDIR=$(SBINDIR) \
+			SERVERBIN=$(SERVERBIN) SERVERROOT=$(SERVERROOT)
 
 epm:
-	epm -v cups
+	epm $(EPMFLAGS) cups
 
 rpm:
-	epm -v -f rpm cups
+	epm $(EPMFLAGS) -f rpm cups
 
 deb:
-	epm -v -f deb cups
+	epm $(EPMFLAGS) -f deb cups
 
 depot:
-	epm -v -f depot cups
+	epm $(EPMFLAGS) -f depot cups
 
 pkg:
-	epm -v -f pkg cups
+	epm $(EPMFLAGS) -f pkg cups
 
 tardist:
-	epm -v -f tardist cups
+	epm $(EPMFLAGS) -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.19 2000/06/26 15:09:37 mike Exp $".
+# End of "$Id: Makefile,v 1.20 2000/07/07 15:18:40 mike Exp $".
 #

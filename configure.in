@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.42 2000/06/20 16:56:43 mike Exp $"
+dnl "$Id: configure.in,v 1.43 2000/07/07 15:18:41 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -24,7 +24,7 @@ dnl
 
 AC_INIT(cups/cups.h)
 AC_CONFIG_HEADER(config.h)
-AC_PREFIX_DEFAULT(/usr)
+AC_PREFIX_DEFAULT(/)
 
 dnl Get the operating system and version number...
 
@@ -335,48 +335,52 @@ AC_SUBST(LIBTOOL)
 AC_SUBST(LINKCUPS)
 AC_SUBST(LINKCUPSIMAGE)
 
-dnl Fix prefix as needed..
-if test "$prefix" = "NONE" ; then
-	prefix="/usr"
+dnl Fix "prefix" variable if it hasn't been specified...
+if test "$prefix" = "NONE"; then
+	prefix="/"
+fi
+
+dnl Fix "exec_prefix" variable if it hasn't been specified...
+if test "$exec_prefix" = "\${prefix}" -a "$prefix" = "/"; then
+	exec_prefix="/usr"
 fi
 
 dnl Fix "libdir" variable for IRIX 6.x...
-if test "$uname" = "IRIX" -a $uversion -ge 65; then
+if test "$uname" = "IRIX" -a $uversion -ge 62; then
 	libdir="${prefix}/lib32"
 fi
 
-dnl Need special attention for the default location...
-if test "$prefix" = "/usr" ; then
-	CUPS_SERVERROOT="/etc/cups"
-	CUPS_LOGDIR="/var/log/cups"
-	CUPS_REQUESTS="/var/spool/cups"
-
-	AC_DEFINE_UNQUOTED(CUPS_SERVERROOT, "$CUPS_SERVERROOT")
-	AC_DEFINE_UNQUOTED(CUPS_LOGDIR, "$CUPS_LOGDIR")
-	AC_DEFINE_UNQUOTED(CUPS_REQUESTS, "$CUPS_REQUESTS")
-else
-	CUPS_SERVERROOT='${prefix}/etc/cups'
-	CUPS_LOGDIR='${prefix}/log/cups'
-	CUPS_REQUESTS='${prefix}/spool/cups'
-
-	AC_DEFINE_UNQUOTED(CUPS_SERVERROOT, "$prefix/etc/cups")
-	AC_DEFINE_UNQUOTED(CUPS_LOGDIR, "$prefix/log/cups")
-	AC_DEFINE_UNQUOTED(CUPS_REQUESTS, "$prefix/spool/cups")
+dnl Fix "mandir" variable...
+if test "$mandir" == "\${prefix}/man" -a "$prefix" = "/"; then
+	if test "$uname" = "IRIX"; then
+		mandir="/usr/share/catman"
+	else
+		mandir="/usr/man"
+	fi
 fi
+
+dnl Setup default locations...
+CUPS_SERVERROOT='${prefix}/etc/cups'
+CUPS_LOGDIR='${prefix}/var/log/cups'
+CUPS_REQUESTS='${prefix}/var/spool/cups'
+
+AC_DEFINE_UNQUOTED(CUPS_SERVERROOT, "$prefix/etc/cups")
+AC_DEFINE_UNQUOTED(CUPS_LOGDIR, "$prefix/var/log/cups")
+AC_DEFINE_UNQUOTED(CUPS_REQUESTS, "$prefix/var/spool/cups")
 
 dnl See what directory to put server executables...
 case "$uname" in
 	FreeBSD* | NetBSD* | OpenBSD*)
 		# *BSD
 		INSTALL_SYSV=""
-		CUPS_SERVERBIN='${prefix}/libexec/cups'
-		AC_DEFINE_UNQUOTED(CUPS_SERVERBIN, "$prefix/libexec/cups")
+		CUPS_SERVERBIN='${exec_prefix}/libexec/cups'
+		AC_DEFINE_UNQUOTED(CUPS_SERVERBIN, "$exec_prefix/libexec/cups")
 		;;
 	*)
 		# All others
 		INSTALL_SYSV="install-sysv"
-		CUPS_SERVERBIN='${prefix}/lib/cups'
-		AC_DEFINE_UNQUOTED(CUPS_SERVERBIN, "$prefix/lib/cups")
+		CUPS_SERVERBIN='${exec_prefix}/lib/cups'
+		AC_DEFINE_UNQUOTED(CUPS_SERVERBIN, "$exec_prefix/lib/cups")
 		;;
 esac
 
@@ -389,36 +393,36 @@ AC_SUBST(CUPS_REQUESTS)
 dnl Set the CUPS_LOCALE directory...
 case "$uname" in
 	Linux* | FreeBSD* | NetBSD* | OpenBSD*)
-		CUPS_LOCALEDIR='${prefix}/share/locale'
-		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$prefix/share/locale")
+		CUPS_LOCALEDIR='${exec_prefix}/share/locale'
+		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$exec_prefix/share/locale")
 		;;
 
 	OSF1*)
-		CUPS_LOCALEDIR='${prefix}/lib/nls/msg'
-		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$prefix/lib/nls/msg")
+		CUPS_LOCALEDIR='${exec_prefix}/lib/nls/msg'
+		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$exec_prefix/lib/nls/msg")
 		;;
 
 	*)
 		# This is the standard System V location...
-		CUPS_LOCALEDIR='${prefix}/lib/locale'
-		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$prefix/lib/locale")
+		CUPS_LOCALEDIR='${exec_prefix}/lib/locale'
+		AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$exec_prefix/lib/locale")
 		;;
 esac
 
 AC_SUBST(CUPS_LOCALEDIR)
 
 dnl Set the CUPS_DATADIR directory...
-CUPS_DATADIR='${datadir}/cups'
-AC_DEFINE_UNQUOTED(CUPS_DATADIR, "$prefix/share/cups")
+CUPS_DATADIR='${exec_prefix}/share/cups'
+AC_DEFINE_UNQUOTED(CUPS_DATADIR, "$exec_prefix/share/cups")
 AC_SUBST(CUPS_DATADIR)
 
 dnl Set the CUPS_DOCROOT directory...
-CUPS_DOCROOT='${datadir}/doc/cups'
-AC_DEFINE_UNQUOTED(CUPS_DOCROOT, "$prefix/share/doc/cups")
+CUPS_DOCROOT='${exec_prefix}/share/doc/cups'
+AC_DEFINE_UNQUOTED(CUPS_DOCROOT, "$exec_prefix/share/doc/cups")
 AC_SUBST(CUPS_DOCROOT)
 
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.42 2000/06/20 16:56:43 mike Exp $".
+dnl End of "$Id: configure.in,v 1.43 2000/07/07 15:18:41 mike Exp $".
 dnl
