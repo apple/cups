@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c,v 1.22.2.8 2002/05/27 14:47:11 mike Exp $"
+ * "$Id: admin.c,v 1.22.2.9 2002/06/27 19:04:32 mike Exp $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -256,17 +256,14 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
   }
 
   name = cgiGetVariable("PRINTER_NAME");
-  if (isdigit(*name))
-    ptr = name;
-  else
-    for (ptr = name; *ptr; ptr ++)
-      if (!isalnum(*ptr) && *ptr != '_')
-	break;
+  for (ptr = name; *ptr; ptr ++)
+    if (*ptr <= ' ' || *ptr == 127)
+      break;
 
   if (*ptr || ptr == name)
   {
-    cgiSetVariable("ERROR", "The class name may only contain letters, "
-                            "numbers, and the underscore.");
+    cgiSetVariable("ERROR", "The class name may only contain printable "
+                            "characters.");
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     return;
   }
@@ -570,17 +567,14 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     return;
   }
 
-  if (isdigit(*name))
-    ptr = name;
-  else
-    for (ptr = name; *ptr; ptr ++)
-      if (!isalnum(*ptr) && *ptr != '_')
-	break;
+  for (ptr = name; *ptr; ptr ++)
+    if (*ptr <= ' ' || *ptr == 127)
+      break;
 
   if (*ptr || ptr == name)
   {
-    cgiSetVariable("ERROR", "The printer name may only contain letters, "
-                            "numbers, and the underscore.");
+    cgiSetVariable("ERROR", "The printer name may only contain printable "
+                            "characters.");
     cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
     return;
   }
@@ -1498,5 +1492,5 @@ get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: admin.c,v 1.22.2.8 2002/05/27 14:47:11 mike Exp $".
+ * End of "$Id: admin.c,v 1.22.2.9 2002/06/27 19:04:32 mike Exp $".
  */

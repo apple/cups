@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- CUPS now supports printer names containing any
+	  printable character, e.g. "123-abc", "foo-bar", etc.
 	- The null filter was not supported in mime.convs due to
 	  a bug in the filter validation code.
 	- Changes in the default printer and printer attributes

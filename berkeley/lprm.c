@@ -1,5 +1,5 @@
 /*
- * "$Id: lprm.c,v 1.15.2.5 2002/06/06 12:32:40 mike Exp $"
+ * "$Id: lprm.c,v 1.15.2.6 2002/06/27 19:04:32 mike Exp $"
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
@@ -133,7 +133,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       * Cancel a job or printer...
       */
 
-      if (isdigit(argv[i][0]))
+      if (isdigit(argv[i][0]) && cupsGetDest(argv[i], NULL, num_dests, dests) == NULL)
       {
         dest   = NULL;
 	op     = IPP_CANCEL_JOB;
@@ -263,5 +263,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lprm.c,v 1.15.2.5 2002/06/06 12:32:40 mike Exp $".
+ * End of "$Id: lprm.c,v 1.15.2.6 2002/06/27 19:04:32 mike Exp $".
  */
