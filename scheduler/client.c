@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.91.2.51 2003/03/13 06:53:46 mike Exp $"
+ * "$Id: client.c,v 1.91.2.52 2003/03/14 18:10:41 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -27,6 +27,7 @@
  *   CloseAllClients()     - Close all remote clients immediately.
  *   CloseClient()         - Close a remote client.
  *   EncryptClient()       - Enable encryption for the client...
+ *   IsCGI()               - Is the resource a CGI script/program?
  *   ReadClient()          - Read data from a client.
  *   SendCommand()         - Send output from a command via HTTP.
  *   SendError()           - Send an error message via HTTP.
@@ -676,6 +677,148 @@ EncryptClient(client_t *con)	/* I - Client to encrypt */
 #else
   return (0);
 #endif /* HAVE_GNUTLS */
+}
+
+
+/*
+ * 'IsCGI()' - Is the resource a CGI script/program?
+ */
+
+int						/* O - 1 = CGI, 0 = file */
+IsCGI(client_t    *con,				/* I - Client connection */
+      const char  *filename,			/* I - Real filename */
+      struct stat *filestats,			/* I - File information */
+      mime_type_t *type)			/* I - MIME type */
+{
+  const char	*options;			/* Options on URL */
+
+
+  LogMessage(L_DEBUG2, "IsCGI(con=%p, filename=\"%s\", filestats=%p, type=%s/%s)\n",
+             con, filename, filestats, type ? type->super : "unknown",
+	     type ? type->type : "unknown");
+
+ /*
+  * Get the options, if any...
+  */
+
+  if ((options = strchr(con->uri, '?')) != NULL)
+    options ++;
+
+ /*
+  * Check for known types...
+  */
+
+  if (strcasecmp(type->super, "application"))
+  {
+    LogMessage(L_DEBUG2, "IsCGI: Returning 0...");
+    return (0);
+  }
+
+  if (!strcasecmp(type->type, "x-httpd-cgi") &&
+      (filestats->st_mode & 0111))
+  {
+   /*
+    * "application/x-httpd-cgi" is a CGI script.
+    */
+
+    SetString(&con->command, filename);
+
+    filename = strrchr(filename, '/') + 1; /* Filename always absolute */
+
+    if (options)
+      SetStringf(&con->options, "%s %s", filename, options);
+    else
+      SetStringf(&con->options, "%s", filename);
+
+    LogMessage(L_DEBUG2, "IsCGI: Returning 1 with command=\"%s\" and options=\"%s\"",
+               con->command, con->options);
+
+    return (1);
+  }
+#ifdef HAVE_JAVA
+  else if (!strcasecmp(type->type, "x-httpd-java"))
+  {
+   /*
+    * "application/x-httpd-java" is a Java servlet.
+    */
+
+    SetString(&con->command, CUPS_JAVA);
+
+    if (options)
+      SetStringf(&con->options, "java %s %s", filename, options);
+    else
+      SetStringf(&con->options, "java %s", filename);
+
+    LogMessage(L_DEBUG2, "IsCGI: Returning 1 with command=\"%s\" and options=\"%s\"",
+               con->command, con->options);
+
+    return (1);
+  }
+#endif /* HAVE_JAVA */
+#ifdef HAVE_PERL
+  else if (!strcasecmp(type->type, "x-httpd-perl"))
+  {
+   /*
+    * "application/x-httpd-perl" is a Perl page.
+    */
+
+    SetString(&con->command, CUPS_PERL);
+
+    if (options)
+      SetStringf(&con->options, "perl %s %s", filename, options);
+    else
+      SetStringf(&con->options, "perl %s", filename);
+
+    LogMessage(L_DEBUG2, "IsCGI: Returning 1 with command=\"%s\" and options=\"%s\"",
+               con->command, con->options);
+
+    return (1);
+  }
+#endif /* HAVE_PERL */
+#ifdef HAVE_PHP
+  else if (!strcasecmp(type->type, "x-httpd-php"))
+  {
+   /*
+    * "application/x-httpd-php" is a PHP page.
+    */
+
+    SetString(&con->command, CUPS_PHP);
+
+    if (options)
+      SetStringf(&con->options, "php %s %s", filename, options);
+    else
+      SetStringf(&con->options, "php %s", filename);
+
+    LogMessage(L_DEBUG2, "IsCGI: Returning 1 with command=\"%s\" and options=\"%s\"",
+               con->command, con->options);
+
+    return (1);
+  }
+#endif /* HAVE_PHP */
+#ifdef HAVE_PYTHON
+  else if (!strcasecmp(type->type, "x-httpd-python"))
+  {
+   /*
+    * "application/x-httpd-python" is a Python page.
+    */
+
+    SetString(&con->command, CUPS_PYTHON);
+
+    if (options)
+      SetStringf(&con->options, "python %s %s", filename, options);
+    else
+      SetStringf(&con->options, "python %s", filename);
+
+    LogMessage(L_DEBUG2, "IsCGI: Returning 1 with command=\"%s\" and options=\"%s\"",
+               con->command, con->options);
+
+    return (1);
+  }
+#endif /* HAVE_PYTHON */
+
+  LogMessage(L_DEBUG2, "IsCGI: Returning 0...");
+
+  return (0);
 }
 
 
@@ -3051,5 +3194,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.91.2.51 2003/03/13 06:53:46 mike Exp $".
+ * End of "$Id: client.c,v 1.91.2.52 2003/03/14 18:10:41 mike Exp $".
  */

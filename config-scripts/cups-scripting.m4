@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-scripting.m4,v 1.1 2003/03/14 17:04:08 mike Exp $"
+dnl "$Id: cups-scripting.m4,v 1.1.2.1 2003/03/14 18:10:40 mike Exp $"
 dnl
 dnl   Scripting configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -87,5 +87,5 @@ if test "x$CUPS_PYTHON" != x; then
 fi
 
 dnl
-dnl End of "$Id: cups-scripting.m4,v 1.1 2003/03/14 17:04:08 mike Exp $".
+dnl End of "$Id: cups-scripting.m4,v 1.1.2.1 2003/03/14 18:10:40 mike Exp $".
 dnl

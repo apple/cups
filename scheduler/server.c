@@ -1,5 +1,5 @@
 /*
- * "$Id: server.c,v 1.2.2.6 2003/03/12 21:51:03 mike Exp $"
+ * "$Id: server.c,v 1.2.2.7 2003/03/14 18:10:42 mike Exp $"
  *
  *   Server start/stop routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,7 +23,6 @@
  *
  * Contents:
  *
- *   IsCGI()       - Is the resource a CGI script/program?
  *   StartServer() - Start the server.
  *   StopServer()  - Stop the server.
  */
@@ -42,30 +41,6 @@
 #elif defined HAVE_GNUTLS
 #  include <gnutls/gnutls.h>
 #endif /* HAVE_LIBSSL */
-
-
-/*
- * 'IsCGI()' - Is the resource a CGI script/program?
- */
-
-int						/* O - 1 = CGI, 0 = file */
-IsCGI(client_t    *con,				/* I - Client connection */
-      const char  *filename,			/* I - Real filename */
-      struct stat *filestats,			/* I - File information */
-      mime_type_t *type)			/* I - MIME type */
-{
- /*
-  * Currently generic CGI is not implemented, however it will be in a
-  * future release.
-  */
-
-  (void)con;
-  (void)filename;
-  (void)filestats;
-  (void)type;
-
-  return (0);
-}
 
 
 /*
@@ -179,5 +154,5 @@ StopServer(void)
 
 
 /*
- * End of "$Id: server.c,v 1.2.2.6 2003/03/12 21:51:03 mike Exp $".
+ * End of "$Id: server.c,v 1.2.2.7 2003/03/14 18:10:42 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in,v 1.39.2.18 2003/02/12 19:32:26 mike Exp $"
+ * "$Id: config.h.in,v 1.39.2.19 2003/03/14 18:10:40 mike Exp $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -253,5 +253,19 @@
 
 
 /*
- * End of "$Id: config.h.in,v 1.39.2.18 2003/02/12 19:32:26 mike Exp $".
+ * Various scripting languages...
+ */
+
+#undef HAVE_JAVA
+#define CUPS_JAVA	"/usr/bin/java"
+#undef HAVE_PERL
+#define CUPS_PERL	"/usr/bin/perl"
+#undef HAVE_PHP
+#define CUPS_PHP	"/usr/bin/php"
+#undef HAVE_PYTHON
+#define CUPS_PYTHON	"/usr/bin/python"
+
+
+/*
+ * End of "$Id: config.h.in,v 1.39.2.19 2003/03/14 18:10:40 mike Exp $".
  */
