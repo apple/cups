@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.7 2000/08/18 17:49:39 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.8 2000/08/21 20:22:35 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -262,12 +262,12 @@ print_file(const char    *name,		/* I - Printer or class name */
   * Handle raw print files...
   */
 
-  if (cupsGetOption("raw", num_options, options))
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
-        	 NULL, "application/vnd.cups-raw");
-  else if ((val = cupsGetOption("document-format", num_options, options)) != NULL)
+  if ((val = cupsGetOption("document-format", num_options, options)) != NULL)
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
         	 NULL, val);
+  else if (cupsGetOption("raw", num_options, options))
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
+        	 NULL, "application/vnd.cups-raw");
   else
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
         	 NULL, "application/octet-stream");
@@ -1143,5 +1143,5 @@ remove_jobs(const char *dest,		/* I - Destination */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.7 2000/08/18 17:49:39 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.8 2000/08/21 20:22:35 mike Exp $".
  */
