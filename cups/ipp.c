@@ -1,7 +1,7 @@
 /*
- * "$Id: ipp.c,v 1.71 2002/06/14 12:22:07 mike Exp $"
+ * "$Id: ipp.c,v 1.72 2002/09/05 21:11:16 mike Exp $"
  *
- *   Internet Printing Protocol support functions for the Common UNIX
+ *   Internet Printing Protocol object functions for the Common UNIX
  *   Printing System (CUPS).
  *
  *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
@@ -41,15 +41,11 @@
  *   ippDateToTime()        - Convert from RFC 1903 Date/Time format to UNIX
  *                            time in seconds.
  *   ippDelete()            - Delete an IPP request.
- *   ippErrorString()       - Return a textual message for the given error
- *                            message.
  *   ippFindAttribute()     - Find a named attribute in a request...
  *   ippFindNextAttribute() - Find the next named attribute in a request...
  *   ippLength()            - Compute the length of an IPP request.
  *   ippNew()               - Allocate a new IPP request.
- *   ippPort()              - Return the default IPP port number.
  *   ippRead()              - Read data for an IPP request.
- *   ippSetPort()           - Set the default port number.
  *   ippTimeToDate()        - Convert from UNIX time to RFC 1903 format.
  *   ippWrite()             - Write data for an IPP request.
  *   _ipp_add_attr()        - Add a new attribute to the request.
@@ -69,13 +65,6 @@
 #include "ipp.h"
 #include "debug.h"
 #include <ctype.h>
-
-
-/*
- * Local globals...
- */
-
-static int	ipp_port = 0;
 
 
 /*
@@ -617,90 +606,6 @@ ippDelete(ipp_t *ipp)		/* I - IPP request */
   }
 
   free(ipp);
-}
-
-
-/*
- * 'ippErrorString()' - Return a textual message for the given error message.
- */
-
-const char *				/* O - Text string */
-ippErrorString(ipp_status_t error)	/* I - Error status */
-{
-  static char	unknown[255];		/* Unknown error statuses */
-  static const char *status_oks[] =	/* "OK" status codes */
-		{
-		  "successful-ok",
-		  "successful-ok-ignored-or-substituted-attributes",
-		  "successful-ok-conflicting-attributes",
-		  "successful-ok-ignored-subscriptions",
-		  "successful-ok-ignored-notifications",
-		  "successful-ok-too-many-events",
-		  "successful-ok-but-cancel-subscription"
-		},
-		*status_400s[] =	/* Client errors */
-		{
-		  "client-error-bad-request",
-		  "client-error-forbidden",
-		  "client-error-not-authenticated",
-		  "client-error-not-authorized",
-		  "client-error-not-possible",
-		  "client-error-timeout",
-		  "client-error-not-found",
-		  "client-error-gone",
-		  "client-error-request-entity-too-large",
-		  "client-error-request-value-too-long",
-		  "client-error-document-format-not-supported",
-		  "client-error-attributes-or-values-not-supported",
-		  "client-error-uri-scheme-not-supported",
-		  "client-error-charset-not-supported",
-		  "client-error-conflicting-attributes",
-		  "client-error-compression-not-supported",
-		  "client-error-compression-error",
-		  "client-error-document-format-error",
-		  "client-error-document-access-error",
-		  "client-error-attributes-not-settable",
-		  "client-error-ignored-all-subscriptions",
-		  "client-error-too-many-subscriptions",
-		  "client-error-ignored-all-notifications",
-		  "client-error-print-support-file-not-found"
-		},
-		*status_500s[] =	/* Server errors */
-		{
-		  "server-error-internal-error",
-		  "server-error-operation-not-supported",
-		  "server-error-service-unavailable",
-		  "server-error-version-not-supported",
-		  "server-error-device-error",
-		  "server-error-temporary-error",
-		  "server-error-not-accepting-jobs",
-		  "server-error-busy",
-		  "server-error-job-canceled",
-		  "server-error-multiple-document-jobs-not-supported",
-		  "server-error-printer-is-deactivated"
-		};
-
-
- /*
-  * See if the error code is a known value...
-  */
-
-  if (error >= IPP_OK && error <= IPP_OK_BUT_CANCEL_SUBSCRIPTION)
-    return (status_oks[error]);
-  else if (error == IPP_REDIRECTION_OTHER_SITE)
-    return ("redirection-other-site");
-  else if (error >= IPP_BAD_REQUEST && error <= IPP_PRINT_SUPPORT_FILE_NOT_FOUND)
-    return (status_400s[error - IPP_BAD_REQUEST]);
-  else if (error >= IPP_INTERNAL_ERROR && error <= IPP_PRINTER_IS_DEACTIVATED)
-    return (status_500s[error - IPP_INTERNAL_ERROR]);
-
- /*
-  * No, build an "unknown-xxxx" error string...
-  */
-
-  sprintf(unknown, "unknown-%04x", error);
-
-  return (unknown);
 }
 
 
@@ -1965,39 +1870,6 @@ ippWrite(http_t *http,		/* I - HTTP data */
 
 
 /*
- * 'ippPort()' - Return the default IPP port number.
- */
-
-int				/* O - Port number */
-ippPort(void)
-{
-  const char	*server_port;	/* SERVER_PORT environment variable */
-  struct servent *port;		/* Port number info */  
-
-
-  if (ipp_port)
-    return (ipp_port);
-  else if ((server_port = getenv("IPP_PORT")) != NULL)
-    return (ipp_port = atoi(server_port));
-  else if ((port = getservbyname("ipp", NULL)) == NULL)
-    return (ipp_port = IPP_PORT);
-  else
-    return (ipp_port = ntohs(port->s_port));
-}
-
-
-/*
- * 'ippSetPort()' - Set the default port number.
- */
-
-void
-ippSetPort(int p)		/* I - Port number to use */
-{
-  ipp_port = p;
-}
-
-
-/*
  * '_ipp_add_attr()' - Add a new attribute to the request.
  */
 
@@ -2159,5 +2031,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.71 2002/06/14 12:22:07 mike Exp $".
+ * End of "$Id: ipp.c,v 1.72 2002/09/05 21:11:16 mike Exp $".
  */
