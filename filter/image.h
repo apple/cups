@@ -1,5 +1,5 @@
 /*
- * "$Id: image.h,v 1.6 1999/04/01 18:25:03 mike Exp $"
+ * "$Id: image.h,v 1.7 1999/07/27 16:46:25 mike Exp $"
  *
  *   Image library definitions for the Common UNIX Printing System (CUPS).
  *
@@ -156,7 +156,7 @@ extern image_t	*ImageOpen(char *filename, int primary, int secondary,
 		           int saturation, int hue, ib_t *lut);
 extern void	ImageClose(image_t *img);
 extern void	ImageSetMaxTiles(image_t *img, int max_tiles);
-extern void	ImageSetProfile(float density, float matrix[3][3]);
+extern void	ImageSetProfile(float d, float g, float matrix[3][3]);
 
 #define 	ImageGetDepth(img)	((img)->colorspace < 0 ? -(img)->colorspace : (img)->colorspace)
 extern int	ImageGetCol(image_t *img, int x, int y, int height, ib_t *pixels);
@@ -219,5 +219,5 @@ extern void	ImageZoomFree(izoom_t *z);
 #endif /* !_IMAGE_H_ */
 
 /*
- * End of "$Id: image.h,v 1.6 1999/04/01 18:25:03 mike Exp $".
+ * End of "$Id: image.h,v 1.7 1999/07/27 16:46:25 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.13 1999/07/22 20:59:02 mike Exp $"
+ * "$Id: image.c,v 1.14 1999/07/27 16:46:25 mike Exp $"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
@@ -284,11 +284,11 @@ ImageSetMaxTiles(image_t *img,		/* I - Image to set */
  */
 
 void
-ImageSetProfile(float density,		/* I - Ink/marker density */
+ImageSetProfile(float d,		/* I - Ink/marker density */
+                float g,		/* I - Ink/marker gamma */
                 float matrix[3][3])	/* I - Color transform matrix */
 {
   int	i, j, k;			/* Looping vars */
-  float	g;				/* Gamma correction */
 
 
   ImageHaveProfile  = 1;
@@ -298,10 +298,8 @@ ImageSetProfile(float density,		/* I - Ink/marker density */
       for (k = 0; k < 256; k ++)
         ImageMatrix[i][j][k] = (int)(k * matrix[i][j] + 0.5);
 
-  g = 1.0 / (density * density);
-
   for (k = 0; k < 256; k ++)
-    ImageDensity[k] = 255.0 * density * pow((float)k / 255.0, g) + 0.5;
+    ImageDensity[k] = 255.0 * d * pow((float)k / 255.0, g) + 0.5;
 }
 
 
@@ -741,5 +739,5 @@ flush_tile(image_t *img)
 
 
 /*
- * End of "$Id: image.c,v 1.13 1999/07/22 20:59:02 mike Exp $".
+ * End of "$Id: image.c,v 1.14 1999/07/27 16:46:25 mike Exp $".
  */

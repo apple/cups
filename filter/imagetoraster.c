@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.24 1999/07/27 13:33:40 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.25 1999/07/27 16:46:26 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -402,7 +402,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     if (i < ppd->num_profiles)
     {
       fputs("Setting color profile!\n", stderr);
-      ImageSetProfile(profile->density, profile->matrix);
+      ImageSetProfile(profile->density, profile->gamma, profile->matrix);
     }
   }
 
@@ -3836,5 +3836,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.24 1999/07/27 13:33:40 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.25 1999/07/27 16:46:26 mike Exp $".
  */
