@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.23 2000/01/20 13:05:41 mike Exp $"
+ * "$Id: auth.c,v 1.24 2000/01/21 04:32:25 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -362,7 +362,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
   DEBUG_printf(("IsAuthorized: username = \"%s\", password = \"%s\"\n",
 		con->username, con->password));
 
-  if (con->username[0] == '\0' || con->password[0] == '\0')
+  if (con->username[0] == '\0')
     return (HTTP_UNAUTHORIZED);		/* Non-anonymous needs user/pass */
 
  /*
@@ -379,6 +379,9 @@ IsAuthorized(client_t *con)	/* I - Connection */
     return (HTTP_UNAUTHORIZED);
   }
 
+  DEBUG_printf(("IsAuthorized: Checking \"%s\", address = %08x, hostname = \"%s\"\n",
+                con->username, address, con->http.hostname));
+
   if ((address != 0x7f000001 &&
        strcasecmp(con->http.hostname, "localhost") != 0) ||
       strncmp(con->http.fields[HTTP_FIELD_AUTHORIZATION], "Local", 5) != 0)
@@ -386,6 +389,9 @@ IsAuthorized(client_t *con)	/* I - Connection */
    /*
     * Not doing local certificate-based authentication; check the password...
     */
+
+    if (!con->password[0])
+      return (HTTP_UNAUTHORIZED);
 
 #if HAVE_LIBPAM
    /*
@@ -728,5 +734,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.23 2000/01/20 13:05:41 mike Exp $".
+ * End of "$Id: auth.c,v 1.24 2000/01/21 04:32:25 mike Exp $".
  */

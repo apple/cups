@@ -1,6 +1,5 @@
-#define DEBUG
 /*
- * "$Id: client.c,v 1.45 2000/01/21 02:23:28 mike Exp $"
+ * "$Id: client.c,v 1.46 2000/01/21 04:32:25 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1249,6 +1248,9 @@ decode_auth(client_t *con)		/* I - Client to decode to */
 
   s = con->http.fields[HTTP_FIELD_AUTHORIZATION];
 
+  DEBUG_printf(("decode_auth(%08x): Authorization string = \"%s\"\n",
+                con, s));
+
   if (strncmp(s, "Basic", 5) == 0)
   {
     s += 5;
@@ -1288,6 +1290,8 @@ decode_auth(client_t *con)		/* I - Client to decode to */
 
   LogMessage(LOG_DEBUG, "decode_auth() %d username=\"%s\"",
              con->http.fd, con->username);
+  DEBUG_printf(("decode_auth() %d username=\"%s\" password=\"%s\"\n",
+                con->http.fd, con->username, con->password));
 }
 
 
@@ -1562,5 +1566,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.45 2000/01/21 02:23:28 mike Exp $".
+ * End of "$Id: client.c,v 1.46 2000/01/21 04:32:25 mike Exp $".
  */

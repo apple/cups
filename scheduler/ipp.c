@@ -1,6 +1,5 @@
-#define DEBUG
 /*
- * "$Id: ipp.c,v 1.44 2000/01/21 03:58:45 mike Exp $"
+ * "$Id: ipp.c,v 1.45 2000/01/21 04:32:25 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3551,5 +3550,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.44 2000/01/21 03:58:45 mike Exp $".
+ * End of "$Id: ipp.c,v 1.45 2000/01/21 04:32:25 mike Exp $".
  */
