@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.100 2000/10/13 01:04:41 mike Exp $"
+ * "$Id: ipp.c,v 1.101 2000/10/13 03:29:18 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2281,7 +2281,8 @@ static void
 get_jobs(client_t        *con,		/* I - Client connection */
 	 ipp_attribute_t *uri)		/* I - Printer URI */
 {
-  ipp_attribute_t	*attr;		/* Current attribute */
+  ipp_attribute_t	*attr,		/* Current attribute */
+			*requested;	/* Requested attributes */
   const char		*dest;		/* Destination */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
   char			method[HTTP_MAX_URI],
@@ -2371,6 +2372,9 @@ get_jobs(client_t        *con,		/* I - Client connection */
   else
     username[0] = '\0';
 
+  requested = ippFindAttribute(con->request, "requested-attributes",
+	                       IPP_TAG_KEYWORD);
+
  /*
   * OK, build a list of jobs for this printer...
   */
@@ -2421,16 +2425,14 @@ get_jobs(client_t        *con,		/* I - Client connection */
     * attribute that may be provided by the client.
     */
 
-    copy_attrs(con->response, job->attrs,
-               ippFindAttribute(con->request, "requested-attributes",
-	                	IPP_TAG_KEYWORD), IPP_TAG_JOB);
+    copy_attrs(con->response, job->attrs, requested, IPP_TAG_JOB);
 
     add_job_state_reasons(con, job);
 
     ippAddSeparator(con->response);
   }
 
-  if (ippFindAttribute(con->request, "requested-attributes", IPP_TAG_KEYWORD) != NULL)
+  if (requested != NULL)
     con->response->request.status.status_code = IPP_OK_SUBST;
   else
     con->response->request.status.status_code = IPP_OK;
@@ -2445,7 +2447,8 @@ static void
 get_job_attrs(client_t        *con,		/* I - Client connection */
 	      ipp_attribute_t *uri)		/* I - Job URI */
 {
-  ipp_attribute_t	*attr;		/* Current attribute */
+  ipp_attribute_t	*attr,		/* Current attribute */
+			*requested;	/* Requested attributes */
   int			jobid;		/* Job ID */
   job_t			*job;		/* Current job */
   char			method[HTTP_MAX_URI],
@@ -2543,13 +2546,14 @@ get_job_attrs(client_t        *con,		/* I - Client connection */
   * attribute that may be provided by the client.
   */
 
-  copy_attrs(con->response, job->attrs,
-             ippFindAttribute(con->request, "requested-attributes",
-	                      IPP_TAG_KEYWORD), IPP_TAG_JOB);
+  requested = ippFindAttribute(con->request, "requested-attributes",
+	                       IPP_TAG_KEYWORD);
+
+  copy_attrs(con->response, job->attrs, requested, IPP_TAG_JOB);
 
   add_job_state_reasons(con, job);
 
-  if (ippFindAttribute(con->request, "requested-attributes", IPP_TAG_KEYWORD) != NULL)
+  if (requested != NULL)
     con->response->request.status.status_code = IPP_OK_SUBST;
   else
     con->response->request.status.status_code = IPP_OK;
@@ -2660,14 +2664,15 @@ get_printer_attrs(client_t        *con,	/* I - Client connection */
 
 
 /*
- * 'get_printers()' - Get a list of printers.
+ * 'get_printers()' - Get a list of printers or classes.
  */
 
 static void
 get_printers(client_t *con,		/* I - Client connection */
              int      type)		/* I - 0 or CUPS_PRINTER_CLASS */
 {
-  ipp_attribute_t	*attr;		/* Current attribute */
+  ipp_attribute_t	*attr,		/* Current attribute */
+			*requested;	/* Requested attributes */
   int			limit;		/* Maximum number of printers to return */
   int			count;		/* Number of printers that match */
   printer_t		*printer;	/* Current printer pointer */
@@ -2706,6 +2711,9 @@ get_printers(client_t *con,		/* I - Client connection */
     location = attr->values[0].string.text;
   else
     location = NULL;
+
+  requested = ippFindAttribute(con->request, "requested-attributes",
+	                       IPP_TAG_KEYWORD);
 
  /*
   * OK, build a list of printers for this printer...
@@ -2753,9 +2761,7 @@ get_printers(client_t *con,		/* I - Client connection */
 
       add_queued_job_count(con, printer);
 
-      copy_attrs(con->response, printer->attrs,
-        	 ippFindAttribute(con->request, "requested-attributes",
-	                	  IPP_TAG_KEYWORD), IPP_TAG_ZERO);
+      copy_attrs(con->response, printer->attrs, requested, IPP_TAG_ZERO);
     }
 
   con->response->request.status.status_code = IPP_OK;
@@ -4834,5 +4840,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.100 2000/10/13 01:04:41 mike Exp $".
+ * End of "$Id: ipp.c,v 1.101 2000/10/13 03:29:18 mike Exp $".
  */

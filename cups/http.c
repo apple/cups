@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.64 2000/05/01 19:50:25 mike Exp $"
+ * "$Id: http.c,v 1.65 2000/10/13 03:29:17 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1040,7 +1040,7 @@ httpGets(char   *line,			/* I - Line to read into */
       else
 	bufptr ++;
 
-    if (bufptr >= bufend)
+    if (bufptr >= bufend && http->used < HTTP_MAX_BUFFER)
     {
      /*
       * No newline; see if there is more data to be read...
@@ -1088,7 +1088,7 @@ httpGets(char   *line,			/* I - Line to read into */
       bufend     += bytes;
     }
   }
-  while (bufptr >= bufend);
+  while (bufptr >= bufend && http->used < HTTP_MAX_BUFFER);
 
   http->activity = time(NULL);
 
@@ -1661,5 +1661,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.64 2000/05/01 19:50:25 mike Exp $".
+ * End of "$Id: http.c,v 1.65 2000/10/13 03:29:17 mike Exp $".
  */

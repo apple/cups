@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.44 2000/10/13 01:04:37 mike Exp $"
+ * "$Id: ipp.c,v 1.45 2000/10/13 03:29:17 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -93,7 +93,7 @@ ippAddBoolean(ipp_t      *ipp,		/* I - IPP request */
   ipp_attribute_t	*attr;		/* New attribute */
 
 
-  DEBUG_printf(("ippAddBoolean(%08x, %02x, \'%s\', %d)\n", ipp, group, name, value));
+  DEBUG_printf(("ippAddBoolean(%p, %02x, \'%s\', %d)\n", ipp, group, name, value));
 
   if (ipp == NULL || name == NULL)
     return (NULL);
@@ -125,7 +125,7 @@ ippAddBooleans(ipp_t      *ipp,		/* I - IPP request */
   ipp_attribute_t	*attr;		/* New attribute */
 
 
-  DEBUG_printf(("ippAddBooleans(%08x, %02x, \'%s\', %d, %08x)\n", ipp,
+  DEBUG_printf(("ippAddBooleans(%p, %02x, \'%s\', %d, %p)\n", ipp,
                 group, name, num_values, values));
 
   if (ipp == NULL || name == NULL)
@@ -159,7 +159,7 @@ ippAddDate(ipp_t             *ipp,	/* I - IPP request */
   ipp_attribute_t	*attr;		/* New attribute */
 
 
-  DEBUG_printf(("ippAddDate(%08x, %02x, \'%s\', %08x)\n", ipp, group, name,
+  DEBUG_printf(("ippAddDate(%p, %02x, \'%s\', %p)\n", ipp, group, name,
                 value));
 
   if (ipp == NULL || name == NULL || value == NULL)
@@ -191,7 +191,7 @@ ippAddInteger(ipp_t      *ipp,		/* I - IPP request */
   ipp_attribute_t	*attr;		/* New attribute */
 
 
-  DEBUG_printf(("ippAddInteger(%08x, %d, \'%s\', %d)\n", ipp, group, name,
+  DEBUG_printf(("ippAddInteger(%p, %d, \'%s\', %d)\n", ipp, group, name,
                 value));
 
   if (ipp == NULL || name == NULL)
@@ -480,7 +480,7 @@ ippAddSeparator(ipp_t *ipp)		/* I - IPP request */
   ipp_attribute_t	*attr;		/* New attribute */
 
 
-  DEBUG_printf(("ippAddSeparator(%08x)\n", ipp));
+  DEBUG_printf(("ippAddSeparator(%p)\n", ipp));
 
   if (ipp == NULL)
     return (NULL);
@@ -660,14 +660,14 @@ ippFindAttribute(ipp_t      *ipp,	/* I - IPP request */
   ipp_tag_t		value_tag;	/* Value tag */
 
 
-  DEBUG_printf(("ippFindAttribute(%08x, \'%s\')\n", ipp, name));
+  DEBUG_printf(("ippFindAttribute(%p, \'%s\')\n", ipp, name));
 
   if (ipp == NULL || name == NULL)
     return (NULL);
 
   for (attr = ipp->attrs; attr != NULL; attr = attr->next)
   {
-    DEBUG_printf(("ippFindAttribute: attr = %08x, name = \'%s\'\n", attr,
+    DEBUG_printf(("ippFindAttribute: attr = %p, name = \'%s\'\n", attr,
                   attr->name));
 
     value_tag = attr->value_tag & ~IPP_TAG_COPY;
@@ -730,7 +730,7 @@ ippLength(ipp_t *ipp)		/* I - IPP request */
     bytes += 2 * attr->num_values;	/* Name lengths */
     bytes += 2 * attr->num_values;	/* Value lengths */
 
-    switch (attr->value_tag)
+    switch (attr->value_tag & ~IPP_TAG_COPY)
     {
       case IPP_TAG_INTEGER :
       case IPP_TAG_ENUM :
@@ -830,7 +830,7 @@ ippRead(http_t *http,		/* I - HTTP data */
   ipp_tag_t		tag;		/* Current tag */
 
 
-  DEBUG_printf(("ippRead(%08x, %08x)\n", http, ipp));
+  DEBUG_printf(("ippRead(%p, %p)\n", http, ipp));
 
   if (http == NULL || ipp == NULL)
     return (IPP_ERROR);
@@ -875,6 +875,10 @@ ippRead(http_t *http,		/* I - HTTP data */
         ipp->state   = IPP_ATTRIBUTE;
 	ipp->current = NULL;
 	ipp->curtag  = IPP_TAG_ZERO;
+
+        DEBUG_printf(("ippRead: version=%d.%d\n", buffer[0], buffer[1]));
+	DEBUG_printf(("ippRead: op_status=%04x\n", ipp->request.any.op_status));
+	DEBUG_printf(("ippRead: request_id=%d\n", ipp->request.any.request_id));
 
        /*
         * If blocking is disabled, stop here...
@@ -1210,6 +1214,10 @@ ippWrite(http_t *http,		/* I - HTTP data */
 	ipp->current = ipp->attrs;
 	ipp->curtag  = IPP_TAG_ZERO;
 
+        DEBUG_printf(("ippWrite: version=%d.%d\n", buffer[0], buffer[1]));
+	DEBUG_printf(("ippWrite: op_status=%04x\n", ipp->request.any.op_status));
+	DEBUG_printf(("ippWrite: request_id=%d\n", ipp->request.any.request_id));
+
        /*
         * If blocking is disabled, stop here...
 	*/
@@ -1255,7 +1263,7 @@ ippWrite(http_t *http,		/* I - HTTP data */
 	  memcpy(bufptr, attr->name, n);
 	  bufptr += n;
 
-	  switch (attr->value_tag)
+	  switch (attr->value_tag & ~IPP_TAG_COPY)
 	  {
 	    case IPP_TAG_INTEGER :
 	    case IPP_TAG_ENUM :
@@ -1621,7 +1629,7 @@ _ipp_add_attr(ipp_t *ipp,	/* I - IPP request */
   ipp_attribute_t	*attr;	/* New attribute */
 
 
-  DEBUG_printf(("_ipp_add_attr(%08x, %d)\n", ipp, num_values));
+  DEBUG_printf(("_ipp_add_attr(%p, %d)\n", ipp, num_values));
 
   if (ipp == NULL || num_values < 0)
     return (NULL);
@@ -1721,5 +1729,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.44 2000/10/13 01:04:37 mike Exp $".
+ * End of "$Id: ipp.c,v 1.45 2000/10/13 03:29:17 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.26 2000/09/18 16:28:46 mike Exp $"
+ * "$Id: lpstat.c,v 1.27 2000/10/13 03:29:19 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -406,9 +406,15 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
   const char	*dptr,		/* Pointer into destination list */
 		*ptr;		/* Pointer into printer name */
   int		match;		/* Non-zero if this job matches */
+  static const char *pattrs[] =	/* Attributes we need for printers... */
+		{
+		  "printer-name",
+		  "printer-state-message",
+		  "printer-is-accepting-jobs"
+		};
 
 
-  DEBUG_printf(("show_accepting(%08x, %08x)\n", http, printers));
+  DEBUG_printf(("show_accepting(%p, %p)\n", http, printers));
 
   if (http == NULL)
     return;
@@ -422,6 +428,7 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
   *
   *    attributes-charset
   *    attributes-natural-language
+  *    requested-attributes
   */
 
   request = ippNew();
@@ -436,6 +443,10 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
+
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                "requested-attributes", sizeof(pattrs) / sizeof(pattrs[0]),
+		NULL, pattrs);
 
  /*
   * Do the request and get back a response...
@@ -609,9 +620,14 @@ show_classes(http_t     *http,	/* I - HTTP connection to server */
   const char	*dptr,		/* Pointer into destination list */
 		*ptr;		/* Pointer into printer name */
   int		match;		/* Non-zero if this job matches */
+  static const char *cattrs[] =	/* Attributes we need for classes... */
+		{
+		  "printer-name",
+		  "member-names"
+		};
 
 
-  DEBUG_printf(("show_classes(%08x, %08x)\n", http, dests));
+  DEBUG_printf(("show_classes(%p, %p)\n", http, dests));
 
   if (http == NULL)
     return;
@@ -625,6 +641,7 @@ show_classes(http_t     *http,	/* I - HTTP connection to server */
   *
   *    attributes-charset
   *    attributes-natural-language
+  *    requested-attributes
   */
 
   request = ippNew();
@@ -639,6 +656,10 @@ show_classes(http_t     *http,	/* I - HTTP connection to server */
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
+
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                "requested-attributes", sizeof(cattrs) / sizeof(cattrs[0]),
+		NULL, cattrs);
 
  /*
   * Do the request and get back a response...
@@ -825,9 +846,15 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
 		*dptr,		/* Pointer into destination list */
 		*ptr;		/* Pointer into printer name */
   int		match;		/* Non-zero if this job matches */
+  static const char *pattrs[] =	/* Attributes we need for printers... */
+		{
+		  "printer-name",
+		  "printer-uri-supported",
+		  "device-uri"
+		};
 
 
-  DEBUG_printf(("show_devices(%08x, %08x)\n", http, dests));
+  DEBUG_printf(("show_devices(%p, %p)\n", http, dests));
 
   if (http == NULL)
     return;
@@ -841,6 +868,7 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
   *
   *    attributes-charset
   *    attributes-natural-language
+  *    requested-attributes
   */
 
   request = ippNew();
@@ -855,6 +883,10 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
+
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                "requested-attributes", sizeof(pattrs) / sizeof(pattrs[0]),
+		NULL, pattrs);
 
  /*
   * Do the request and get back a response...
@@ -1071,9 +1103,17 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
   int		match;		/* Non-zero if this job matches */
   char		temp[22],	/* Temporary buffer */
 		date[32];	/* Date buffer */
+  static const char *jattrs[] =	/* Attributes we need for jobs... */
+		{
+		  "job-id",
+		  "job-k-octets",
+		  "time-at-creation",
+		  "job-printer-uri",
+		  "job-originating-user-name"
+		};
 
 
-  DEBUG_printf(("show_jobs(%08x, %08x, %08x)\n", http, dests, users));
+  DEBUG_printf(("show_jobs(%p, %p, %p)\n", http, dests, users));
 
   if (http == NULL)
     return;
@@ -1088,6 +1128,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
   *    attributes-charset
   *    attributes-natural-language
   *    job-uri
+  *    requested-attributes
   */
 
   request = ippNew();
@@ -1102,6 +1143,10 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
+
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                "requested-attributes", sizeof(jattrs) / sizeof(jattrs[0]),
+		NULL, jattrs);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
                NULL, "ipp://localhost/jobs/");
@@ -1339,9 +1384,21 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
   char		printer_uri[HTTP_MAX_URI];
 				/* Printer URI */
   const char	*root;		/* Server root directory... */
+  static const char *pattrs[] =	/* Attributes we need for printers... */
+		{
+		  "printer-name",
+		  "printer-state",
+		  "printer-state-message",
+		  "printer-type",
+		  "printer-info"
+		};
+  static const char *jattrs[] =	/* Attributes we need for jobs... */
+		{
+		  "job-id"
+		};
 
 
-  DEBUG_printf(("show_printers(%08x, %08x)\n", http, dests));
+  DEBUG_printf(("show_printers(%p, %p)\n", http, dests));
 
   if (http == NULL)
     return;
@@ -1358,6 +1415,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
   *
   *    attributes-charset
   *    attributes-natural-language
+  *    requested-attributes
   */
 
   request = ippNew();
@@ -1372,6 +1430,10 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
+
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                "requested-attributes", sizeof(pattrs) / sizeof(pattrs[0]),
+		NULL, pattrs);
 
  /*
   * Do the request and get back a response...
@@ -1430,10 +1492,6 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
         if (strcmp(attr->name, "printer-type") == 0 &&
 	    attr->value_tag == IPP_TAG_ENUM)
 	  ptype = (cups_ptype_t)attr->values[0].integer;
-
-        if (strcmp(attr->name, "printer-state") == 0 &&
-	    attr->value_tag == IPP_TAG_ENUM)
-	  pstate = (ipp_pstate_t)attr->values[0].integer;
 
         if (strcmp(attr->name, "printer-state-message") == 0 &&
 	    attr->value_tag == IPP_TAG_TEXT)
@@ -1527,6 +1585,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	  *    attributes-natural-language
 	  *    printer-uri
 	  *    limit
+          *    requested-attributes
 	  */
 
 	  request = ippNew();
@@ -1544,6 +1603,10 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
                        "attributes-natural-language", NULL,
 		       language->language);
 
+	  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                	"requested-attributes",
+		        sizeof(jattrs) / sizeof(jattrs[0]), NULL, jattrs);
+
           sprintf(printer_uri, "ipp://%s/printers/%s", http->hostname, printer);
 	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
 	               "printer-uri", NULL, printer_uri);
@@ -1551,7 +1614,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER,
 	        	"limit", 1);
 
-          if ((jobs = cupsDoRequest(http, request, "/jobs/")) != NULL)
+          if ((jobs = cupsDoRequest(http, request, "/")) != NULL)
 	  {
 	    if ((jobattr = ippFindAttribute(jobs, "job-id", IPP_TAG_INTEGER)) != NULL)
               jobid = jobattr->values[0].integer;
@@ -1679,5 +1742,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.26 2000/09/18 16:28:46 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.27 2000/10/13 03:29:19 mike Exp $".
  */

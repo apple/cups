@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.61 2000/10/12 03:18:04 mike Exp $"
+ * "$Id: util.c,v 1.62 2000/10/13 03:29:17 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -467,6 +467,7 @@ cupsGetClasses(char ***classes)	/* O - Classes */
   *
   *    attributes-charset
   *    attributes-natural-language
+  *    requested-attributes
   */
 
   request = ippNew();
@@ -481,6 +482,9 @@ cupsGetClasses(char ***classes)	/* O - Classes */
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+               "requested-attributes", NULL, "printer-name");
 
  /*
   * Do the request and get back a response...
@@ -941,6 +945,7 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
   *
   *    attributes-charset
   *    attributes-natural-language
+  *    requested-attributes
   */
 
   request = ippNew();
@@ -955,6 +960,9 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+               "requested-attributes", NULL, "printer-name");
 
  /*
   * Do the request and get back a response...
@@ -1429,5 +1437,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.61 2000/10/12 03:18:04 mike Exp $".
+ * End of "$Id: util.c,v 1.62 2000/10/13 03:29:17 mike Exp $".
  */

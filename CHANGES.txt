@@ -17,6 +17,14 @@ CHANGES IN CUPS V1.1.5
 	  should not be freed); this provides slightly more
 	  efficient IPP server performance.
 	- Updated PDF filter to Xpdf 0.91.
+	- httpGets() could go into an infinite loop if a line
+	  longer than the input buffer size was sent by a
+	  client. This could be used in a Denial-of-Service
+	  attack.
+	- The lpstat and CUPS API functions now request only the
+	  data required when getting the list of printer or
+	  class information.  This should improve performance
+	  with large numbers of printers on slower machines.
 
 
 CHANGES IN CUPS v1.1.4
