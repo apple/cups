@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.7 1999/03/21 02:10:08 mike Exp $"
+ * "$Id: util.c,v 1.8 1999/03/24 16:09:48 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -40,18 +40,32 @@
 #include <sys/stat.h>
 
 
+/*
+ * 'cupsCancelJob()' - Cancel a print job.
+ */
+
 int
 cupsCancelJob(char *printer,
               int  job)
 {
+  return (0);
 }
 
+
+/*
+ * 'cupsGetClasses()' - Get a list of printer classes.
+ */
 
 int
 cupsGetClasses(char ***classes)
 {
+  return (0);
 }
 
+
+/*
+ * 'cupsGetDefault()' - Get the default printer or class.
+ */
 
 char *
 cupsGetDefault(void)
@@ -60,15 +74,24 @@ cupsGetDefault(void)
 }
 
 
+/*
+ * 'cupsGetPPD()' - Get the PPD file for a printer.
+ */
+
 char *
 cupsGetPPD(char *printer)
 {
 }
 
 
+/*
+ * 'cupsGetPrinters()' - Get a list of printers.
+ */
+
 int
 cupsGetPrinters(char ***printers)
 {
+  return (0);
 }
 
 
@@ -376,5 +399,5 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
 
 
 /*
- * End of "$Id: util.c,v 1.7 1999/03/21 02:10:08 mike Exp $".
+ * End of "$Id: util.c,v 1.8 1999/03/24 16:09:48 mike Exp $".
  */
