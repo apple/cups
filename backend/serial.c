@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.9 2000/01/25 03:50:47 mike Exp $"
+ * "$Id: serial.c,v 1.10 2000/01/26 02:42:47 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -139,10 +139,10 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   }
 
  /*
-  * Open the parallel port device...
+  * Open the serial port device...
   */
 
-  if ((fd = open(resource, O_WRONLY)) == -1)
+  if ((fd = open(resource, O_WRONLY | O_NOCTTY)) == -1)
   {
     perror("ERROR: Unable to open serial port device file");
     return (1);
@@ -330,15 +330,18 @@ list_devices(void)
 {
 #ifdef __linux
   int	i;		/* Looping var */
+  int	fd;		/* File descriptor */
   char	device[255];	/* Device filename */
 
 
   for (i = 0; i < 4; i ++)
   {
     sprintf(device, "/dev/ttyS%d", i);
-    if (access(device, F_OK) == 0)
-      fprintf(stderr, "serial serial:/dev/ttyS%d \"\" \"Serial Port #%d\"\n", i,
-              i + 1);
+    if ((fd = open(device, O_WRONLY | O_NOCTTY)) >= 0)
+    {
+      close(fd);
+      fprintf(stderr, "serial serial:%s \"\" \"Serial Port #%d\"\n", device, i + 1);
+    }
   }
 #elif defined(__sgi)
 #elif defined(__sun)
@@ -350,5 +353,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.9 2000/01/25 03:50:47 mike Exp $".
+ * End of "$Id: serial.c,v 1.10 2000/01/26 02:42:47 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c,v 1.9 2000/01/25 03:50:47 mike Exp $"
+ * "$Id: parallel.c,v 1.10 2000/01/26 02:42:46 mike Exp $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -213,15 +213,29 @@ list_devices(void)
 {
 #ifdef __linux
   int	i;		/* Looping var */
+  int	fd;		/* File descriptor */
   char	device[255];	/* Device filename */
 
 
   for (i = 0; i < 4; i ++)
   {
     sprintf(device, "/dev/lp%d", i);
-    if (access(device, F_OK) == 0)
-      fprintf(stderr, "parallel parallel:/dev/lp%d \"\" \"Parallel Port #%d\"\n",
-              i, i + 1);
+    if ((fd = open(device, O_WRONLY)) >= 0)
+    {
+      close(fd);
+      fprintf(stderr, "parallel parallel:%s \"\" "
+                      "\"Parallel Port #%d\"\n", device, i + 1);
+    }
+    else
+    {
+      sprintf(device, "/dev/par%d", i);
+      if ((fd = open(device, O_WRONLY)) >= 0)
+      {
+	close(fd);
+	fprintf(stderr, "parallel parallel:%s \"\" "
+                	"\"Parallel Port #%d\"\n", device, i + 1);
+      }
+    }
   }
 #elif defined(__sgi)
 #elif defined(__sun)
@@ -233,5 +247,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c,v 1.9 2000/01/25 03:50:47 mike Exp $".
+ * End of "$Id: parallel.c,v 1.10 2000/01/26 02:42:46 mike Exp $".
  */
