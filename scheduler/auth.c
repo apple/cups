@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.26 2000/02/24 02:37:06 mike Exp $"
+ * "$Id: auth.c,v 1.27 2000/03/09 15:42:29 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -402,7 +402,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
     pamdata.conv        = pam_func;
     pamdata.appdata_ptr = con;
 
-    pamerr = pam_start("passwd", con->username, &pamdata, &pamh);
+    pamerr = pam_start("cups", con->username, &pamdata, &pamh);
     if (pamerr != PAM_SUCCESS)
     {
       LogMessage(L_ERROR, "IsAuthorized: pam_start() returned %d (%s)!\n",
@@ -734,5 +734,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.26 2000/02/24 02:37:06 mike Exp $".
+ * End of "$Id: auth.c,v 1.27 2000/03/09 15:42:29 mike Exp $".
  */
