@@ -22,6 +22,11 @@ CHANGES IN CUPS V1.1.9
 	  a carriage return (i.e. MacOS PPD files); the new code
 	  is also about 40% faster, so servers with thousands of
 	  PPD files should start much faster now.
+	- The scheduler now stores the PPD file size and
+	  modification times in the ppds.dat file, so it can now
+	  incrementally update the PPD database from the model
+	  directory, resulting in significantly faster startup
+	  times.
 	- The lpinfo command did not return a non-zero status
 	  code if an error occurred.
 	- Fixed a bug in the scheduler's UpdateJob() function.

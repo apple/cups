@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.16 2001/06/05 21:32:02 mike Exp $"
+ * "$Id: ppds.c,v 1.17 2001/06/06 20:16:44 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,13 +23,14 @@
  *
  * Contents:
  *
- *   LoadPPDs()     - Load PPD files from the specified directory...
- *   buf_read()     - Read a buffer of data into memory...
- *   check_ppds()   - Check to see if we need to regenerate the PPD file
- *                    list...
- *   compare_ppds() - Compare PPD file make and model names for sorting.
- *   load_ppds()    - Load PPD files recursively.
- *   ppd_gets()     - Read a line from a PPD file.
+ *   LoadPPDs()      - Load PPD files from the specified directory...
+ *   buf_read()      - Read a buffer of data into memory...
+ *   check_ppds()    - Check to see if we need to regenerate the PPD file
+ *                     list...
+ *   compare_names() - Compare PPD filenames for sorting.
+ *   compare_ppds()  - Compare PPD file make and model names for sorting.
+ *   load_ppds()     - Load PPD files recursively.
+ *   ppd_gets()      - Read a line from a PPD file.
  */
 
 /*
@@ -50,15 +51,23 @@
 
 
 /*
- * PPD information structure...
+ * PPD information structures...
  */
 
 typedef struct
 {
   char	ppd_make[128],			/* Manufacturer */
-	ppd_make_and_model[256],	/* Make and model */
-	ppd_name[256],			/* PPD filename */
+	ppd_make_and_model[248];	/* Make and model */
+  int	ppd_size,			/* Size in bytes */
+	ppd_mtime;			/* Modification time */
+  char	ppd_name[256],			/* PPD filename */
 	ppd_natural_language[16];	/* Natural language */
+} ppd_rec_t;
+
+typedef struct
+{
+  int		found;			/* 1 if PPD is found */
+  ppd_rec_t	record;			/* ppds.dat record */
 } ppd_info_t;
 
 
@@ -82,6 +91,7 @@ typedef struct
 static int		num_ppds,	/* Number of PPD files */
 			alloc_ppds;	/* Number of allocated entries */
 static ppd_info_t	*ppds;		/* PPD file info */
+static int		changed_ppd;	/* Did we change the PPD database? */
 
 
 /*
@@ -89,7 +99,7 @@ static ppd_info_t	*ppds;		/* PPD file info */
  */
 
 static int	buf_read(buf_t *fp);
-static int	check_ppds(const char *d, time_t mtime, int *count);
+static int	compare_names(const ppd_info_t *p0, const ppd_info_t *p1);
 static int	compare_ppds(const ppd_info_t *p0, const ppd_info_t *p1);
 static void	load_ppds(const char *d, const char *p);
 static char	*ppd_gets(buf_t *fp, char *buf, int buflen);
@@ -103,7 +113,6 @@ void
 LoadPPDs(const char *d)		/* I - Directory to scan... */
 {
   int		i;		/* Looping var */
-  int		count;		/* Number of PPD files seen */
   ppd_info_t	*ppd;		/* Current PPD file */
   FILE		*fp;		/* ppds.dat file */
   struct stat	fileinfo;	/* ppds.dat information */
@@ -111,58 +120,20 @@ LoadPPDs(const char *d)		/* I - Directory to scan... */
 
 
  /*
-  * See if we need to reload the PPD files...
+  * See if we a PPD database file...
   */
 
+  num_ppds    = 0;
+  alloc_ppds  = 0;
+  ppds        = (ppd_info_t *)0;
+  changed_ppd = 0;
+
   snprintf(filename, sizeof(filename), "%s/ppds.dat", ServerRoot);
-  if (stat(filename, &fileinfo))
-    i = 1;
-  else
-  {
-    count = 0;
-    i     = check_ppds(d, fileinfo.st_mtime, &count);
-
-    if (fileinfo.st_size != (count * sizeof(ppd_info_t)))
-      i = 1;
-  }
-
-  if (i)
+  if (!stat(filename, &fileinfo) &&
+      (num_ppds = fileinfo.st_size / sizeof(ppd_rec_t)) > 0)
   {
    /*
-    * Load all PPDs in the specified directory and below...
-    */
-
-    num_ppds   = 0;
-    alloc_ppds = 0;
-    ppds       = (ppd_info_t *)0;
-
-    load_ppds(d, "");
-
-   /*
-    * Sort the PPDs...
-    */
-
-    if (num_ppds > 1)
-      qsort(ppds, num_ppds, sizeof(ppd_info_t),
-            (int (*)(const void *, const void *))compare_ppds);
-
-   /*
-    * Write the new ppds.dat file...
-    */
-
-    if ((fp = fopen(filename, "wb")) != NULL)
-    {
-      fwrite(ppds, num_ppds, sizeof(ppd_info_t), fp);
-      fclose(fp);
-      LogMessage(L_INFO, "LoadPPDs: Wrote %s (%d PPDs)...", filename, num_ppds);
-    }
-    else
-      LogMessage(L_ERROR, "LoadPPDs: Unable to write %s...", filename);
-  }
-  else if ((num_ppds = fileinfo.st_size / sizeof(ppd_info_t)) > 0)
-  {
-   /*
-    * Load the ppds.dat file instead...
+    * We have a ppds.dat file, so read it!
     */
 
     alloc_ppds = num_ppds;
@@ -176,16 +147,87 @@ LoadPPDs(const char *d)		/* I - Directory to scan... */
     }
     else if ((fp = fopen(filename, "rb")) != NULL)
     {
-      fread(ppds, num_ppds, sizeof(ppd_info_t), fp);
+      for (i = num_ppds, ppd = ppds; i > 0; i --, ppd ++)
+      {
+        fread(&(ppd->record), 1, sizeof(ppd_rec_t), fp);
+	ppd->found = 0;
+      }
+
       fclose(fp);
-      LogMessage(L_INFO, "LoadPPDs: Read %s...", filename);
+
+      LogMessage(L_INFO, "LoadPPDs: Read \"%s\", %d PPDs...", filename,
+                 num_ppds);
+
+     /*
+      * Sort the PPDs by name...
+      */
+
+      if (num_ppds > 1)
+	qsort(ppds, num_ppds, sizeof(ppd_info_t),
+              (int (*)(const void *, const void *))compare_names);
     }
     else
     {
-      LogMessage(L_ERROR, "LoadPPDs: Unable to read %s...", filename);
+      LogMessage(L_ERROR, "LoadPPDs: Unable to read \"%s\" - %s", filename,
+                 strerror(errno));
       num_ppds = 0;
     }
   }
+
+ /*
+  * Load all PPDs in the specified directory and below...
+  */
+
+  load_ppds(d, "");
+
+ /*
+  * Cull PPD files that are no longer present...
+  */
+
+  for (i = num_ppds, ppd = ppds; i > 0; i --, ppd ++)
+    if (!ppd->found)
+    {
+     /*
+      * Remove this PPD file from the list...
+      */
+
+      if (i > 1)
+        memcpy(ppd, ppd + 1, (i - 1) * sizeof(ppd_info_t));
+
+      num_ppds --;
+      ppd --;
+    }
+
+ /*
+  * Sort the PPDs by make and model...
+  */
+
+  if (num_ppds > 1)
+    qsort(ppds, num_ppds, sizeof(ppd_info_t),
+          (int (*)(const void *, const void *))compare_ppds);
+
+ /*
+  * Write the new ppds.dat file...
+  */
+
+  if (changed_ppd)
+  {
+    if ((fp = fopen(filename, "wb")) != NULL)
+    {
+      for (i = num_ppds, ppd = ppds; i > 0; i --, ppd ++)
+	fwrite(&(ppd->record), 1, sizeof(ppd_rec_t), fp);
+
+      fclose(fp);
+
+      LogMessage(L_INFO, "LoadPPDs: Wrote \"%s\", %d PPDs...", filename,
+        	 num_ppds);
+    }
+    else
+      LogMessage(L_ERROR, "LoadPPDs: Unable to write \"%s\" - %s", filename,
+        	 strerror(errno));
+  }
+  else
+    LogMessage(L_INFO, "LoadPPDs: No new or changed PPDs...");
 
  /*
   * Create the list of PPDs...
@@ -199,13 +241,13 @@ LoadPPDs(const char *d)		/* I - Directory to scan... */
       ippAddSeparator(PPDs);
 
     ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                 "ppd-name", NULL, ppd->ppd_name);
+                 "ppd-name", NULL, ppd->record.ppd_name);
     ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                 "ppd-make", NULL, ppd->ppd_make);
+                 "ppd-make", NULL, ppd->record.ppd_make);
     ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                 "ppd-make-and-model", NULL, ppd->ppd_make_and_model);
+                 "ppd-make-and-model", NULL, ppd->record.ppd_make_and_model);
     ippAddString(PPDs, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
-                 "ppd-natural-language", NULL, ppd->ppd_natural_language);
+                 "ppd-natural-language", NULL, ppd->record.ppd_natural_language);
   }
 
  /*
@@ -246,71 +288,14 @@ buf_read(buf_t *fp)		/* I - File to read from */
 
 
 /*
- * 'check_ppds()' - Check to see if we need to regenerate the PPD file
- *                  list...
+ * 'compare_names()' - Compare PPD filenames for sorting.
  */
 
-static int			/* O - 1 if reload needed, 0 otherwise */
-check_ppds(const char *d,	/* I - Directory to scan */
-           time_t     mtime,	/* I - Modification time of ppds.dat */
-           int        *count)	/* IO - Number of PPD files seen */
+static int				/* O - Result of comparison */
+compare_names(const ppd_info_t *p0,	/* I - First PPD file */
+              const ppd_info_t *p1)	/* I - Second PPD file */
 {
-  DIR		*dir;		/* Directory pointer */
-  DIRENT	*dent;		/* Directory entry */
-  struct stat	fileinfo;	/* File information */
-  char		filename[1024];	/* Name of file */
-
-
-  if ((dir = opendir(d)) == NULL)
-  {
-    LogMessage(L_ERROR, "LoadPPDs: Unable to open PPD directory \"%s\": %s",
-               d, strerror(errno));
-    return (1);
-  }
-
-  while ((dent = readdir(dir)) != NULL)
-  {
-   /*
-    * Skip "." and ".."...
-    */
-
-    if (dent->d_name[0] == '.')
-      continue;
-
-   /*
-    * Check the modification time of the file or directory...
-    */
-
-    snprintf(filename, sizeof(filename), "%s/%s", d, dent->d_name);
-
-    if (stat(filename, &fileinfo))
-      continue;
-
-    if (fileinfo.st_mtime >= mtime)
-    {
-      closedir(dir);
-      return (1);
-    }
-
-    if (S_ISDIR(fileinfo.st_mode))
-    {
-     /*
-      * Do subdirectory...
-      */
-
-      if (check_ppds(filename, mtime, count))
-      {
-        closedir(dir);
-        return (1);
-      }
-    }
-    else
-      (*count) ++;
-  }
-
-  closedir(dir);
-
-  return (0);
+  return (strcasecmp(p0->record.ppd_name, p1->record.ppd_name));
 }
 
 
@@ -332,15 +317,15 @@ compare_ppds(const ppd_info_t *p0,	/* I - First PPD file */
   * First compare manufacturers...
   */
 
-  if ((diff = strcasecmp(p0->ppd_make, p1->ppd_make)) != 0)
+  if ((diff = strcasecmp(p0->record.ppd_make, p1->record.ppd_make)) != 0)
     return (diff);
 
  /* 
   * Then compare names...
   */
 
-  s = p0->ppd_make_and_model;
-  t = p1->ppd_make_and_model;
+  s = p0->record.ppd_make_and_model;
+  t = p1->record.ppd_make_and_model;
 
  /*
   * Loop through both nicknames, returning only when a difference is
@@ -437,7 +422,8 @@ compare_ppds(const ppd_info_t *p0,	/* I - First PPD file */
   else if (*t)
     return (-1);
   else
-    return (strcasecmp(p0->ppd_natural_language, p1->ppd_natural_language));
+    return (strcasecmp(p0->record.ppd_natural_language,
+                       p1->record.ppd_natural_language));
 }
 
 
@@ -449,7 +435,7 @@ static void
 load_ppds(const char *d,		/* I - Actual directory */
           const char *p)		/* I - Virtual path in name */
 {
-  buf_t	fp;			/* Pointer to file */
+  buf_t		fp;			/* Pointer to file */
   DIR		*dir;			/* Directory pointer */
   DIRENT	*dent;			/* Directory entry */
   struct stat	fileinfo;		/* File information */
@@ -462,7 +448,9 @@ load_ppds(const char *d,		/* I - Actual directory */
 		make_model[256],	/* Make and Model */
 		model_name[256],	/* ModelName */
 		nick_name[256];		/* NickName */
-  ppd_info_t	*ppd;			/* New PPD file */
+  ppd_info_t	*ppd,			/* New PPD file */
+		key;			/* Search key */
+  int		new_ppd;		/* Is this a new PPD? */
 
 
   if ((dir = opendir(d)) == NULL)
@@ -508,13 +496,39 @@ load_ppds(const char *d,		/* I - Actual directory */
       continue;
     }
 
+   /*
+    * See if this file has been scanned before...
+    */
+
+    if (num_ppds > 0)
+    {
+      strcpy(key.record.ppd_name, name);
+
+      ppd = bsearch(&key, ppds, num_ppds, sizeof(ppd_info_t),
+                    (int (*)(const void *, const void *))compare_names);
+
+      if (ppd &&
+          ppd->record.ppd_size == fileinfo.st_size &&
+	  ppd->record.ppd_mtime == fileinfo.st_mtime)
+      {
+        ppd->found = 1;
+        continue;
+      }
+    }
+    else
+      ppd = NULL;
+
+   /*
+    * No, file is new/changed, so re-scan it...
+    */
+
     if ((fp.fp = gzopen(filename, "rb")) == NULL)
       continue;
 
     fp.ptr = fp.end = NULL;
 
    /*
-    * Yup, now see if this is a PPD file...
+    * Now see if this is a PPD file...
     */
 
     line[0] = '\0';
@@ -670,41 +684,73 @@ load_ppds(const char *d,		/* I - Actual directory */
     * Add the PPD file...
     */
 
-    if (num_ppds >= alloc_ppds)
+    new_ppd = !ppd;
+
+    if (new_ppd)
     {
      /*
-      * Allocate (more) memory for the PPD files...
+      * Allocate memory for the new PPD file...
       */
 
-      if (alloc_ppds == 0)
-        ppd = malloc(sizeof(ppd_info_t) * 32);
-      else
-        ppd = realloc(ppds, sizeof(ppd_info_t) * (alloc_ppds + 32));
+      LogMessage(L_DEBUG, "LoadPPDs: Adding ppd \"%s\"...", name);
 
-      if (ppd == NULL)
+      if (num_ppds >= alloc_ppds)
       {
-        LogMessage(L_ERROR, "load_ppds: Ran out of memory for %d PPD files!",
-	           alloc_ppds + 32);
-        closedir(dir);
-	return;
+       /*
+	* Allocate (more) memory for the PPD files...
+	*/
+
+	if (alloc_ppds == 0)
+          ppd = malloc(sizeof(ppd_info_t) * 32);
+	else
+          ppd = realloc(ppds, sizeof(ppd_info_t) * (alloc_ppds + 32));
+
+	if (ppd == NULL)
+	{
+          LogMessage(L_ERROR, "load_ppds: Ran out of memory for %d PPD files!",
+	             alloc_ppds + 32);
+          closedir(dir);
+	  return;
+	}
+
+	ppds = ppd;
+	alloc_ppds += 32;
       }
 
-      ppds = ppd;
-      alloc_ppds += 32;
+      ppd = ppds + num_ppds;
+      num_ppds ++;
     }
+    else
+      LogMessage(L_DEBUG, "LoadPPDs: Updating ppd \"%s\"...", name);
 
-    ppd = ppds + num_ppds;
-    num_ppds ++;
+   /*
+    * Zero the PPD record and copy the info over...
+    */
 
     memset(ppd, 0, sizeof(ppd_info_t));
-    strncpy(ppd->ppd_name, name, sizeof(ppd->ppd_name) - 1);
-    strncpy(ppd->ppd_make, manufacturer, sizeof(ppd->ppd_make) - 1);
-    strncpy(ppd->ppd_make_and_model, make_model,
-            sizeof(ppd->ppd_make_and_model) - 1);
-    strncpy(ppd->ppd_natural_language, language,
-            sizeof(ppd->ppd_natural_language) - 1);
 
-    LogMessage(L_DEBUG, "LoadPPDs: Added ppd \"%s\"...", name);
+    ppd->found            = 1;
+    ppd->record.ppd_mtime = fileinfo.st_mtime;
+    ppd->record.ppd_size  = fileinfo.st_size;
+
+    strncpy(ppd->record.ppd_name, name,
+            sizeof(ppd->record.ppd_name) - 1);
+    strncpy(ppd->record.ppd_make, manufacturer,
+            sizeof(ppd->record.ppd_make) - 1);
+    strncpy(ppd->record.ppd_make_and_model, make_model,
+            sizeof(ppd->record.ppd_make_and_model) - 1);
+    strncpy(ppd->record.ppd_natural_language, language,
+            sizeof(ppd->record.ppd_natural_language) - 1);
+
+    changed_ppd = 1;
+
+   /*
+    * Re-sort the PPD array...
+    */
+
+    if (num_ppds > 1 && new_ppd)
+      qsort(ppds, num_ppds, sizeof(ppd_info_t),
+            (int (*)(const void *, const void *))compare_names);
   }
 
   closedir(dir);
@@ -773,5 +819,5 @@ ppd_gets(buf_t *fp,		/* I - File to read from */
 
 
 /*
- * End of "$Id: ppds.c,v 1.16 2001/06/05 21:32:02 mike Exp $".
+ * End of "$Id: ppds.c,v 1.17 2001/06/06 20:16:44 mike Exp $".
  */
