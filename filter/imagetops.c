@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.26 2000/07/18 19:45:52 mike Exp $"
+ * "$Id: imagetops.c,v 1.27 2000/07/21 15:57:44 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -251,31 +251,35 @@ main(int  argc,		/* I - Number of command-line arguments */
     xinches = (float)img->xsize / (float)xppi;
     yinches = (float)img->ysize / (float)yppi;
 
-   /*
-    * Rotate the image if it will fit landscape but not portrait...
-    */
-
-    if ((xinches > xprint || yinches > yprint) &&
-        xinches <= yprint && yinches <= xprint)
+    if (cupsGetOption("orientation", num_options, options) == NULL &&
+        cupsGetOption("landscape", num_options, options) == NULL)
     {
      /*
-      * Rotate the image as needed...
+      * Rotate the image if it will fit landscape but not portrait...
       */
 
-      Orientation = (Orientation + 1) & 3;
-      xsize       = yprint;
-      yprint      = xprint;
-      xprint      = xsize;
+      if ((xinches > xprint || yinches > yprint) &&
+          xinches <= yprint && yinches <= xprint)
+      {
+       /*
+	* Rotate the image as needed...
+	*/
 
-      xsize       = PageLeft;
-      PageLeft    = PageBottom;
-      PageBottom  = PageWidth - PageRight;
-      PageRight   = PageTop;
-      PageTop     = PageLength - xsize;
+	Orientation = (Orientation + 1) & 3;
+	xsize       = yprint;
+	yprint      = xprint;
+	xprint      = xsize;
 
-      xsize       = PageWidth;
-      PageWidth   = PageLength;
-      PageLength  = xsize;
+	xsize       = PageLeft;
+	PageLeft    = PageBottom;
+	PageBottom  = PageWidth - PageRight;
+	PageRight   = PageTop;
+	PageTop     = PageLength - xsize;
+
+	xsize       = PageWidth;
+	PageWidth   = PageLength;
+	PageLength  = xsize;
+      }
     }
   }
   else
@@ -310,18 +314,49 @@ main(int  argc,		/* I - Number of command-line arguments */
     fprintf(stderr, "DEBUG: xsize = %.0f, ysize = %.0f\n", xsize, ysize);
     fprintf(stderr, "DEBUG: xsize2 = %.0f, ysize2 = %.0f\n", xsize2, ysize2);
 
-   /*
-    * Choose the rotation with the largest area, but prefer
-    * portrait if they are equal...
-    */
-
-    if ((xsize * ysize) < (xsize2 * xsize2))
+    if (cupsGetOption("orientation", num_options, options) == NULL &&
+        cupsGetOption("landscape", num_options, options) == NULL)
     {
      /*
-      * Do landscape orientation...
+      * Choose the rotation with the largest area, but prefer
+      * portrait if they are equal...
       */
 
-      Orientation = 1;
+      if ((xsize * ysize) < (xsize2 * xsize2))
+      {
+       /*
+	* Do landscape orientation...
+	*/
+
+	Orientation = 1;
+	xinches     = xsize2;
+	yinches     = ysize2;
+	xprint      = (PageTop - PageBottom) / 72.0;
+	yprint      = (PageRight - PageLeft) / 72.0;
+
+	xsize       = PageLeft;
+	PageLeft    = PageBottom;
+	PageBottom  = PageWidth - PageRight;
+	PageRight   = PageTop;
+	PageTop     = PageLength - xsize;
+
+	xsize       = PageWidth;
+	PageWidth   = PageLength;
+	PageLength  = xsize;
+      }
+      else
+      {
+       /*
+	* Do portrait orientation...
+	*/
+
+	Orientation = 0;
+	xinches     = xsize;
+	yinches     = ysize;
+      }
+    }
+    else if (Orientation & 1)
+    {
       xinches     = xsize2;
       yinches     = ysize2;
       xprint      = (PageTop - PageBottom) / 72.0;
@@ -336,16 +371,6 @@ main(int  argc,		/* I - Number of command-line arguments */
       xsize       = PageWidth;
       PageWidth   = PageLength;
       PageLength  = xsize;
-    }
-    else
-    {
-     /*
-      * Do portrait orientation...
-      */
-
-      Orientation = 0;
-      xinches     = xsize;
-      yinches     = ysize;
     }
   }
 
@@ -656,5 +681,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.26 2000/07/18 19:45:52 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.27 2000/07/21 15:57:44 mike Exp $".
  */
