@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.202 2003/03/30 21:43:02 mike Exp $"
+ * "$Id: ipp.c,v 1.203 2003/04/01 22:11:12 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -42,6 +42,8 @@
  *   copy_banner()               - Copy a banner file to the requests directory
  *                                 for the specified job.
  *   copy_file()                 - Copy a PPD file or interface script...
+ *   copy_model()                - Copy a PPD model file, substituting default
+ *                                 values as needed...
  *   delete_printer()            - Remove a printer or class from the system.
  *   get_default()               - Get the default destination.
  *   get_devices()               - Get the list of available devices on the
@@ -54,6 +56,8 @@
  *   get_printers()              - Get a list of printers.
  *   hold_job()                  - Hold a print job.
  *   move_job()                  - Move a job to a new destination.
+ *   ppd_add_default()           - Add a PPD default choice.
+ *   ppd_parse_line()            - Parse a PPD default line.
  *   print_job()                 - Print a file to a printer or class.
  *   read_ps_line()              - Read a line from a PS file...
  *   read_ps_job_ticket()        - Reads a job ticket embedded in a PS file.
@@ -77,9 +81,18 @@
 #include "cupsd.h"
 #include <pwd.h>
 #include <grp.h>
-#ifdef HAVE_LIBZ
-#  include <zlib.h>
-#endif /* HAVE_LIBZ */
+
+
+/*
+ * PPD default choice structure...
+ */
+
+typedef struct
+{
+  char	option[PPD_MAX_NAME];		/* Main keyword (option name) */
+  char	choice[PPD_MAX_NAME];		/* Option keyword (choice name) */
+} ppd_default_t;
+
 
 
 /*
@@ -103,6 +116,7 @@ static void	copy_attrs(ipp_t *to, ipp_t *from, ipp_attribute_t *req,
 		           ipp_tag_t group, int quickcopy);
 static int	copy_banner(client_t *con, job_t *job, const char *name);
 static int	copy_file(const char *from, const char *to);
+static int	copy_model(const char *from, const char *to);
 static void	create_job(client_t *con, ipp_attribute_t *uri);
 static void	delete_printer(client_t *con, ipp_attribute_t *uri);
 static void	get_default(client_t *con);
@@ -114,6 +128,10 @@ static void	get_printers(client_t *con, int type);
 static void	get_printer_attrs(client_t *con, ipp_attribute_t *uri);
 static void	hold_job(client_t *con, ipp_attribute_t *uri);
 static void	move_job(client_t *con, ipp_attribute_t *uri);
+static int	ppd_add_default(const char *option, const char *choice,
+		                int num_defaults, ppd_default_t **defaults);
+static int	ppd_parse_line(const char *line, char *option, int olen,
+		               char *choice, int clen);
 static void	print_job(client_t *con, ipp_attribute_t *uri);
 static void	read_ps_job_ticket(client_t *con);
 static void	reject_jobs(client_t *con, ipp_attribute_t *uri);
@@ -1288,92 +1306,123 @@ add_printer(client_t        *con,	/* I - Client connection */
   */
 
   if (con->filename)
+  {
     strlcpy(srcfile, con->filename, sizeof(srcfile));
+
+    if ((fp = cupsFileOpen(srcfile, "rb")) != NULL)
+    {
+     /*
+      * Yes; get the first line from it...
+      */
+
+      line[0] = '\0';
+      cupsFileGets(fp, line, sizeof(line));
+      cupsFileClose(fp);
+
+     /*
+      * Then see what kind of file it is...
+      */
+
+      snprintf(dstfile, sizeof(dstfile), "%s/interfaces/%s", ServerRoot,
+               printer->name);
+
+      if (strncmp(line, "*PPD-Adobe", 10) == 0)
+      {
+       /*
+	* The new file is a PPD file, so remove any old interface script
+	* that might be lying around...
+	*/
+
+	unlink(dstfile);
+      }
+      else
+      {
+       /*
+	* This must be an interface script, so move the file over to the
+	* interfaces directory and make it executable...
+	*/
+
+	if (copy_file(srcfile, dstfile))
+	{
+          LogMessage(L_ERROR, "add_printer: Unable to copy interface script from %s to %s - %s!",
+	             srcfile, dstfile, strerror(errno));
+          send_ipp_error(con, IPP_INTERNAL_ERROR);
+	  return;
+	}
+	else
+	{
+          LogMessage(L_DEBUG, "add_printer: Copied interface script successfully!");
+          chmod(dstfile, 0755);
+	}
+      }
+
+      snprintf(dstfile, sizeof(dstfile), "%s/ppd/%s.ppd", ServerRoot,
+               printer->name);
+
+      if (strncmp(line, "*PPD-Adobe", 10) == 0)
+      {
+       /*
+	* The new file is a PPD file, so move the file over to the
+	* ppd directory and make it readable by all...
+	*/
+
+	if (copy_file(srcfile, dstfile))
+	{
+          LogMessage(L_ERROR, "add_printer: Unable to copy PPD file from %s to %s - %s!",
+	             srcfile, dstfile, strerror(errno));
+          send_ipp_error(con, IPP_INTERNAL_ERROR);
+	  return;
+	}
+	else
+	{
+          LogMessage(L_DEBUG, "add_printer: Copied PPD file successfully!");
+          chmod(dstfile, 0644);
+	}
+      }
+      else
+      {
+       /*
+	* This must be an interface script, so remove any old PPD file that
+	* may be lying around...
+	*/
+
+	unlink(dstfile);
+      }
+    }
+  }
   else if ((attr = ippFindAttribute(con->request, "ppd-name", IPP_TAG_NAME)) != NULL)
   {
     if (strcmp(attr->values[0].string.text, "raw") == 0)
-      strcpy(srcfile, "raw");
-    else
-      snprintf(srcfile, sizeof(srcfile), "%s/model/%s", DataDir,
-               attr->values[0].string.text);
-  }
-  else
-    srcfile[0] = '\0';
-
-  LogMessage(L_DEBUG, "add_printer: srcfile = \"%s\"", srcfile);
-
-  if (strcmp(srcfile, "raw") == 0)
-  {
-   /*
-    * Raw driver, remove any existing PPD or interface script files.
-    */
-
-    snprintf(dstfile, sizeof(dstfile), "%s/interfaces/%s", ServerRoot,
-             printer->name);
-    unlink(dstfile);
-
-    snprintf(dstfile, sizeof(dstfile), "%s/ppd/%s.ppd", ServerRoot,
-             printer->name);
-    unlink(dstfile);
-  }
-  else if (srcfile[0] && (fp = cupsFileOpen(srcfile, "rb")) != NULL)
-  {
-   /*
-    * Yes; get the first line from it...
-    */
-
-    line[0] = '\0';
-    cupsFileGets(fp, line, sizeof(line));
-    cupsFileClose(fp);
-
-   /*
-    * Then see what kind of file it is...
-    */
-
-    snprintf(dstfile, sizeof(dstfile), "%s/interfaces/%s", ServerRoot,
-             printer->name);
-
-    if (strncmp(line, "*PPD-Adobe", 10) == 0)
     {
      /*
-      * The new file is a PPD file, so remove any old interface script
-      * that might be lying around...
+      * Raw driver, remove any existing PPD or interface script files.
       */
 
+      snprintf(dstfile, sizeof(dstfile), "%s/interfaces/%s", ServerRoot,
+               printer->name);
+      unlink(dstfile);
+
+      snprintf(dstfile, sizeof(dstfile), "%s/ppd/%s.ppd", ServerRoot,
+               printer->name);
       unlink(dstfile);
     }
     else
     {
      /*
-      * This must be an interface script, so move the file over to the
-      * interfaces directory and make it executable...
+      * PPD model file...
       */
 
-      if (copy_file(srcfile, dstfile))
-      {
-        LogMessage(L_ERROR, "add_printer: Unable to copy interface script from %s to %s - %s!",
-	           srcfile, dstfile, strerror(errno));
-        send_ipp_error(con, IPP_INTERNAL_ERROR);
-	return;
-      }
-      else
-      {
-        LogMessage(L_DEBUG, "add_printer: Copied interface script successfully!");
-        chmod(dstfile, 0755);
-      }
-    }
+      snprintf(srcfile, sizeof(srcfile), "%s/model/%s", DataDir,
+               attr->values[0].string.text);
 
-    snprintf(dstfile, sizeof(dstfile), "%s/ppd/%s.ppd", ServerRoot,
-             printer->name);
+      snprintf(dstfile, sizeof(dstfile), "%s/interfaces/%s", ServerRoot,
+               printer->name);
+      unlink(dstfile);
 
-    if (strncmp(line, "*PPD-Adobe", 10) == 0)
-    {
-     /*
-      * The new file is a PPD file, so move the file over to the
-      * ppd directory and make it readable by all...
-      */
+      snprintf(dstfile, sizeof(dstfile), "%s/ppd/%s.ppd", ServerRoot,
+               printer->name);
 
-      if (copy_file(srcfile, dstfile))
+      if (copy_model(srcfile, dstfile))
       {
         LogMessage(L_ERROR, "add_printer: Unable to copy PPD file from %s to %s - %s!",
 	           srcfile, dstfile, strerror(errno));
@@ -1385,15 +1434,6 @@ add_printer(client_t        *con,	/* I - Client connection */
         LogMessage(L_DEBUG, "add_printer: Copied PPD file successfully!");
         chmod(dstfile, 0644);
       }
-    }
-    else
-    {
-     /*
-      * This must be an interface script, so remove any old PPD file that
-      * may be lying around...
-      */
-
-      unlink(dstfile);
     }
   }
 
@@ -2861,60 +2901,199 @@ static int				/* O - 0 = success, -1 = error */
 copy_file(const char *from,		/* I - Source file */
           const char *to)		/* I - Destination file */
 {
-#ifdef HAVE_LIBZ
-  gzFile	src;			/* Source file */
-#else
-  int		src;			/* Source file */
-#endif /* HAVE_LIBZ */
-  int		dst,			/* Destination file */
-		bytes;			/* Bytes to read/write */
-  char		buffer[8192];		/* Copy buffer */
+  cups_file_t	*src,			/* Source file */
+		*dst;			/* Destination file */
+  int		bytes;			/* Bytes to read/write */
+  char		buffer[2048];		/* Copy buffer */
 
 
   LogMessage(L_DEBUG2, "copy_file(\"%s\", \"%s\")\n", from, to);
 
-#ifdef HAVE_LIBZ
-  if ((src = gzopen(from, "rb")) == NULL)
-    return (-1);
-#else
-  if ((src = open(from, O_RDONLY)) < 0)
-    return (-1);
-#endif /* HAVE_LIBZ */
+ /*
+  * Open the source and destination file for a copy...
+  */
 
-  if ((dst = open(to, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
+  if ((src = cupsFileOpen(from, "rb")) == NULL)
+    return (-1);
+
+  if ((dst = cupsFileOpen(to, "wb")) == NULL)
   {
-#ifdef HAVE_LIBZ
-    gzclose(src);
-#else
-    close(src);
-#endif /* HAVE_LIBZ */
+    cupsFileClose(src);
     return (-1);
   }
 
-#ifdef HAVE_LIBZ
-  while ((bytes = gzread(src, buffer, sizeof(buffer))) > 0)
-#else
-  while ((bytes = read(src, buffer, sizeof(buffer))) > 0)
-#endif /* HAVE_LIBZ */
-    if (write(dst, buffer, bytes) < bytes)
+ /*
+  * Copy the source file to the destination...
+  */
+
+  while ((bytes = cupsFileRead(src, buffer, sizeof(buffer))) > 0)
+    if (cupsFileWrite(dst, buffer, bytes) < bytes)
     {
-#ifdef HAVE_LIBZ
-      gzclose(src);
-#else
-      close(src);
-#endif /* HAVE_LIBZ */
-      close(dst);
+      cupsFileClose(src);
+      cupsFileClose(dst);
       return (-1);
     }
 
-#ifdef HAVE_LIBZ
-  gzclose(src);
-#else
-  close(src);
-#endif /* HAVE_LIBZ */
-  close(dst);
+ /*
+  * Close both files and return...
+  */
 
-  return (0);
+  cupsFileClose(src);
+
+  return (cupsFileClose(dst));
+}
+
+
+/*
+ * 'copy_model()' - Copy a PPD model file, substituting default values
+ *                  as needed...
+ */
+
+static int				/* O - 0 = success, -1 = error */
+copy_model(const char *from,		/* I - Source file */
+           const char *to)		/* I - Destination file */
+{
+  cups_file_t	*src,			/* Source file */
+		*dst;			/* Destination file */
+  char		buffer[2048];		/* Copy buffer */
+  int		i;			/* Looping var */
+  char		option[PPD_MAX_NAME],	/* Option name */
+		choice[PPD_MAX_NAME];	/* Choice name */
+  int		num_defaults;		/* Number of default options */
+  ppd_default_t	*defaults;		/* Default options */
+
+
+  LogMessage(L_DEBUG2, "copy_model(\"%s\", \"%s\")\n", from, to);
+
+ /*
+  * Open the destination (if possible) and set the default options...
+  */
+
+  num_defaults = 0;
+  defaults     = NULL;
+
+  if ((dst = cupsFileOpen(to, "rb")) != NULL)
+  {
+   /*
+    * Read all of the default lines from the old PPD...
+    */
+
+    while (cupsFileGets(src, buffer, sizeof(buffer)) != NULL)
+      if (!strncmp(buffer, "*Default", 8))
+      {
+       /*
+	* Add the default option...
+	*/
+
+        if (!ppd_parse_line(buffer, option, sizeof(option),
+	                    choice, sizeof(choice)))
+          num_defaults = ppd_add_default(option, choice, num_defaults,
+	                                 &defaults);
+      }
+
+    cupsFileClose(dst);
+  }
+  else
+  {
+   /*
+    * Add the default media sizes...
+    *
+    * Note: These values are generally not valid for large-format devices
+    *       like plotters, however it is probably safe to say that those
+    *       users will configure the media size after initially adding
+    *       the device anyways...
+    */
+
+    if (!DefaultLanguage ||
+        !strcasecmp(DefaultLanguage, "C") ||
+        !strcasecmp(DefaultLanguage, "POSIX") ||
+	!strcasecmp(DefaultLanguage, "en") ||
+	!strncasecmp(DefaultLanguage, "en_US", 5) ||
+	!strncasecmp(DefaultLanguage, "en_CA", 5) ||
+	!strncasecmp(DefaultLanguage, "fr_CA", 5))
+    {
+     /*
+      * These are the only locales that will default to "letter" size...
+      */
+
+      num_defaults = ppd_add_default("PageSize", "Letter", num_defaults,
+                                     &defaults);
+      num_defaults = ppd_add_default("PageRegion", "Letter", num_defaults,
+                                     &defaults);
+      num_defaults = ppd_add_default("PaperDimension", "Letter", num_defaults,
+                                     &defaults);
+      num_defaults = ppd_add_default("ImageableArea", "Letter", num_defaults,
+                                     &defaults);
+    }
+    else
+    {
+     /*
+      * The rest default to "a4" size...
+      */
+
+      num_defaults = ppd_add_default("PageSize", "A4", num_defaults,
+                                     &defaults);
+      num_defaults = ppd_add_default("PageRegion", "A4", num_defaults,
+                                     &defaults);
+      num_defaults = ppd_add_default("PaperDimension", "A4", num_defaults,
+                                     &defaults);
+      num_defaults = ppd_add_default("ImageableArea", "A4", num_defaults,
+                                     &defaults);
+    }
+  }
+
+ /*
+  * Open the source and destination file for a copy...
+  */
+
+  if ((src = cupsFileOpen(from, "rb")) == NULL)
+    return (-1);
+
+  if ((dst = cupsFileOpen(to, "wb")) == NULL)
+  {
+    cupsFileClose(src);
+    return (-1);
+  }
+
+ /*
+  * Copy the source file to the destination...
+  */
+
+  while (cupsFileGets(src, buffer, sizeof(buffer)) != NULL)
+  {
+    if (!strncmp(buffer, "*Default", 8))
+    {
+     /*
+      * Check for an previous default option choice...
+      */
+
+      if (!ppd_parse_line(buffer, option, sizeof(option),
+	                  choice, sizeof(choice)))
+      {
+        for (i = 0; i < num_defaults; i ++)
+	  if (!strcmp(option, defaults[i].option))
+	  {
+	   /*
+	    * Substitute the previous choice...
+	    */
+
+	    snprintf(buffer, sizeof(buffer), "*Default%s: %s", option,
+	             defaults[i].choice);
+	    break;
+	  }
+      }
+    }
+
+    cupsFilePrintf(dst, "%s\n", buffer);
+  }
+
+ /*
+  * Close both files and return...
+  */
+
+  cupsFileClose(src);
+
+  return (cupsFileClose(dst));
 }
 
 
@@ -3983,6 +4162,124 @@ move_job(client_t        *con,		/* I - Client connection */
   */
 
   con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
+ * 'ppd_add_default()' - Add a PPD default choice.
+ */
+
+static int				/* O  - Number of defaults */
+ppd_add_default(const char    *option,	/* I  - Option name */
+                const char    *choice,	/* I  - Choice name */
+                int           num_defaults,
+					/* I  - Number of defaults */
+		ppd_default_t **defaults)
+					/* IO - Defaults */
+{
+  int		i;			/* Looping var */
+  ppd_default_t	*temp;			/* Temporary defaults array */
+
+
+ /*
+  * First check if the option already has a default value; the PPD spec
+  * says that the first one is used...
+  */
+
+  for (i = 0, temp = *defaults; i < num_defaults; i ++)
+    if (!strcmp(option, temp[i].option))
+      return (num_defaults);
+
+ /*
+  * Now add the option...
+  */
+
+  if (num_defaults == 0)
+    temp = malloc(sizeof(ppd_default_t));
+  else
+    temp = realloc(*defaults, (num_defaults + 1) * sizeof(ppd_default_t));
+
+  if (!temp)
+  {
+    LogMessage(L_ERROR, "ppd_add_default: Unable to add default value for \"%s\" - %s",
+               option, strerror(errno));
+    return (num_defaults);
+  }
+
+  *defaults = temp;
+  temp      += num_defaults;
+
+  strlcpy(temp->option, option, sizeof(temp->option));
+  strlcpy(temp->choice, choice, sizeof(temp->choice));
+
+  return (num_defaults + 1);
+}
+
+
+/*
+ * 'ppd_parse_line()' - Parse a PPD default line.
+ */
+
+static int				/* O - 0 on success, -1 on failure */
+ppd_parse_line(const char *line,	/* I - Line */
+               char       *option,	/* O - Option name */
+	       int        olen,		/* I - Size of option name */
+               char       *choice,	/* O - Choice name */
+	       int        clen)		/* I - Size of choice name */
+{
+ /*
+  * Verify this is a default option line...
+  */
+
+  if (strncmp(line, "*Default", 8))
+    return (-1);
+
+ /*
+  * Read the option name...
+  */
+
+  for (line += 8, olen --; isalnum(*line); line ++)
+    if (olen > 0)
+    {
+      *option++ = *line;
+      olen --;
+    }
+
+  *option = '\0';
+
+ /*
+  * Skip everything else up to the colon (:)...
+  */
+
+  while (*line && *line != ':')
+    line ++;
+
+  if (!*line)
+    return (-1);
+
+  line ++;
+
+ /*
+  * Now grab the option choice, skipping leading whitespace...
+  */
+
+  while (isspace(*line))
+    line ++;
+
+  for (clen --; isalnum(*line); line ++)
+    if (clen > 0)
+    {
+      *choice++ = *line;
+      clen --;
+    }
+
+  *choice = '\0';
+
+ /*
+  * Return with no errors...
+  */
+
+  return (0);
 }
 
 
@@ -6239,5 +6536,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.202 2003/03/30 21:43:02 mike Exp $".
+ * End of "$Id: ipp.c,v 1.203 2003/04/01 22:11:12 mike Exp $".
  */
