@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.41 2001/01/22 15:03:54 mike Exp $"
+ * "$Id: gdevcups.c,v 1.42 2001/03/27 14:26:04 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -317,9 +317,12 @@ cups_get_matrix(gx_device *pdev,	/* I - Device info */
   */
 
   fprintf(stderr, "DEBUG: cups->header.Duplex = %d\n", cups->header.Duplex);
-  fprintf(stderr, "DEBUG: cups->ppd = %p\n", cups->ppd);
-  fprintf(stderr, "DEBUG: cups->ppd->flip_duplex = %d\n", cups->ppd->flip_duplex);
   fprintf(stderr, "DEBUG: cups->page = %d\n", cups->page);
+  if (cups->ppd)
+  {
+    fprintf(stderr, "DEBUG: cups->ppd = %p\n", cups->ppd);
+    fprintf(stderr, "DEBUG: cups->ppd->flip_duplex = %d\n", cups->ppd->flip_duplex);
+  }
 
   if (cups->header.Duplex && cups->ppd && cups->ppd->flip_duplex &&
       !(cups->page & 1))
@@ -3011,5 +3014,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.41 2001/01/22 15:03:54 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.42 2001/03/27 14:26:04 mike Exp $".
  */
