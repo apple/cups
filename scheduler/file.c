@@ -1,5 +1,5 @@
 /*
- * "$Id: file.c,v 1.9 2004/09/09 15:10:18 mike Exp $"
+ * "$Id: file.c,v 1.10 2004/10/04 19:40:35 mike Exp $"
  *
  *   File functions for the Common UNIX Printing System (CUPS).
  *
@@ -20,7 +20,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -987,5 +987,5 @@ cups_write(int        fd,		/* I - File descriptor */
 
 
 /*
- * End of "$Id: file.c,v 1.9 2004/09/09 15:10:18 mike Exp $".
+ * End of "$Id: file.c,v 1.10 2004/10/04 19:40:35 mike Exp $".
  */

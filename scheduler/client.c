@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.194 2004/09/12 18:49:26 mike Exp $"
+ * "$Id: client.c,v 1.195 2004/10/04 19:40:35 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -3277,7 +3277,7 @@ pipe_command(client_t *con,		/* I - Client connection */
   * Create a pipe for the output...
   */
 
-  if (cupsdPipe(fds))
+  if (cupsdOpenPipe(fds))
   {
     ClearString(&query_string);
 
@@ -3389,8 +3389,7 @@ pipe_command(client_t *con,		/* I - Client connection */
     LogMessage(L_ERROR, "Unable to fork for CGI %s - %s", argv[0],
                strerror(errno));
 
-    close(fds[0]);
-    close(fds[1]);
+    cupsdClosePipe(fds);
     pid = 0;
   }
   else
@@ -3464,5 +3463,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.194 2004/09/12 18:49:26 mike Exp $".
+ * End of "$Id: client.c,v 1.195 2004/10/04 19:40:35 mike Exp $".
  */

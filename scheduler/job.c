@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.230 2004/09/09 15:10:18 mike Exp $"
+ * "$Id: job.c,v 1.231 2004/10/04 19:40:35 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -15,7 +15,7 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3142 USA
+ *       Hollywood, Maryland 20636 USA
  *
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
@@ -1364,7 +1364,8 @@ StartJob(int       id,			/* I - Job ID */
       LogMessage(L_ERROR, "Unable to add decompression filter - %s",
                  strerror(errno));
 
-      free(filters);
+      if (filters != NULL)
+        free(filters);
 
       current->current_file ++;
 
@@ -1818,6 +1819,14 @@ StartJob(int       id,			/* I - Job ID */
     {
       LogMessage(L_EMERG, "Unable to allocate memory for job status buffer - %s",
                  strerror(errno));
+      snprintf(printer->state_message, sizeof(printer->state_message),
+	       "Unable to allocate memory for job status buffer - %s.",
+	       strerror(errno));
+
+      if (filters != NULL)
+        free(filters);
+
+      AddPrinterHistory(printer);
       CancelJob(current->id, 0);
       return;
     }
@@ -1829,7 +1838,7 @@ StartJob(int       id,			/* I - Job ID */
   * Now create processes for all of the filters...
   */
 
-  if (cupsdPipe(statusfds))
+  if (cupsdOpenPipe(statusfds))
   {
     LogMessage(L_ERROR, "Unable to create job status pipes - %s.",
 	       strerror(errno));
@@ -1841,6 +1850,7 @@ StartJob(int       id,			/* I - Job ID */
     if (filters != NULL)
       free(filters);
 
+    CancelJob(current->id, 0);
     return;
   }
 
@@ -1865,6 +1875,7 @@ StartJob(int       id,			/* I - Job ID */
     if (filters != NULL)
       free(filters);
 
+    cupsdClosePipe(statusfds);
     CancelJob(current->id, 0);
     return;
   }
@@ -1894,7 +1905,24 @@ StartJob(int       id,			/* I - Job ID */
 
     if (i < (num_filters - 1) ||
 	strncmp(printer->device_uri, "file:", 5) != 0)
-      cupsdPipe(filterfds[slot]);
+    {
+      if (cupsdOpenPipe(filterfds[slot]))
+      {
+	LogMessage(L_ERROR, "Unable to create job filter pipes - %s.",
+		strerror(errno));
+	snprintf(printer->state_message, sizeof(printer->state_message),
+        	"Unable to create filter pipes - %s.", strerror(errno));
+	AddPrinterHistory(printer);
+
+	if (filters != NULL)
+	  free(filters);
+
+	cupsdClosePipe(statusfds);
+	cupsdClosePipe(filterfds[!slot]);
+	CancelJob(current->id, 0);
+	return;
+      }
+    }
     else
     {
       filterfds[slot][0] = -1;
@@ -1918,6 +1946,7 @@ StartJob(int       id,			/* I - Job ID */
 	if (filters != NULL)
 	  free(filters);
 
+	cupsdClosePipe(statusfds);
 	CancelJob(current->id, 0);
 	return;
       }
@@ -1934,10 +1963,7 @@ StartJob(int       id,			/* I - Job ID */
                         filterfds[slot][1], statusfds[1], 0,
 			current->procs + i);
 
-    if (filterfds[!slot][0] >= 0)
-      close(filterfds[!slot][0]);
-    if (filterfds[!slot][1] >= 0)
-      close(filterfds[!slot][1]);
+    cupsdClosePipe(filterfds[!slot]);
 
     if (pid == 0)
     {
@@ -1952,6 +1978,8 @@ StartJob(int       id,			/* I - Job ID */
       if (filters != NULL)
 	free(filters);
 
+      cupsdClosePipe(statusfds);
+      cupsdClosePipe(filterfds[slot]);
       CancelJob(current->id, 0);
       return;
     }
@@ -2016,10 +2044,7 @@ StartJob(int       id,			/* I - Job ID */
 			filterfds[slot][1], statusfds[1], 1,
 			current->procs + i);
 
-    if (filterfds[!slot][0] >= 0)
-      close(filterfds[!slot][0]);
-    if (filterfds[!slot][1] >= 0)
-      close(filterfds[!slot][1]);
+    cupsdClosePipe(filterfds[!slot]);
 
     if (pid == 0)
     {
@@ -2030,6 +2055,11 @@ StartJob(int       id,			/* I - Job ID */
 
       AddPrinterHistory(printer);
 
+      if (filters != NULL)
+        free(filters);
+
+      cupsdClosePipe(statusfds);
+      cupsdClosePipe(filterfds[slot]);
       CancelJob(current->id, 0);
       return;
     }
@@ -2044,16 +2074,10 @@ StartJob(int       id,			/* I - Job ID */
     filterfds[slot][0] = -1;
     filterfds[slot][1] = -1;
 
-    if (filterfds[!slot][0] >= 0)
-      close(filterfds[!slot][0]);
-    if (filterfds[!slot][1] >= 0)
-      close(filterfds[!slot][1]);
+    cupsdClosePipe(filterfds[!slot]);
   }
 
-  if (filterfds[slot][0] >= 0)
-    close(filterfds[slot][0]);
-  if (filterfds[slot][1] >= 0)
-    close(filterfds[slot][1]);
+  cupsdClosePipe(filterfds[slot]);
 
   close(statusfds[1]);
 
@@ -2811,5 +2835,5 @@ set_hold_until(job_t *job, 		/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c,v 1.230 2004/09/09 15:10:18 mike Exp $".
+ * End of "$Id: job.c,v 1.231 2004/10/04 19:40:35 mike Exp $".
  */
