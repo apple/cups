@@ -163,6 +163,12 @@ CHANGES IN CUPS V1.1.7
 	  Base85 encoded output, causing files to contain
 	  lines longer than 255 characters (violation of the
 	  DSC).
+	- Added support for the DeskJet 900 series duplexer
+	  and CRET color modes in the HP driver.
+	- Added support for PPD-defined margins in the HP
+	  driver.
+	- Fixed the debugging output from pstoraster - the
+	  font list was not terminated by a newline.
 
 
 CHANGES IN CUPS V1.1.6-3

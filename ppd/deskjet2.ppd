@@ -1,8 +1,8 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: deskjet.ppd,v 1.10 2001/04/23 19:52:31 mike Exp $"
+*% "$Id: deskjet2.ppd,v 1.1 2001/04/23 19:52:31 mike Exp $"
 *%
-*%   Sample HP DeskJet driver PPD file for the Common UNIX Printing
+*%   Second sample HP DeskJet driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
 *%
 *%   Copyright 1997-2001 by Easy Software Products.
@@ -27,16 +27,19 @@
 *FileVersion:	"1.1"
 *LanguageVersion: English 
 *LanguageEncoding: ISOLatin1
-*PCFileName:	"DESKJET.PPD"
+*PCFileName:	"DESKJET2.PPD"
 *Manufacturer:	"ESP"
 *Product:	"(CUPS v1.1)"
 *cupsVersion:	1.1
 *cupsManualCopies: True
 *cupsFilter:	"application/vnd.cups-raster 0 rastertohp"
-*cupsModelNumber: 1
-*ModelName:     "HP DeskJet Series"
-*ShortNickName: "HP DeskJet Series"
-*NickName:      "HP DeskJet Series CUPS v1.1"
+*cupsModelNumber: 2
+*cupsFlipDuplex: True
+*cupsColorProfile -/-:	"1.0 1.5 1.0 -0.25 -0.225 -0.25 1.0 -0.225 -0.25 -0.25 0.9"
+
+*ModelName:     "HP New DeskJet Series"
+*ShortNickName: "HP New DeskJet Series"
+*NickName:      "HP New DeskJet Series CUPS v1.1"
 *PSVersion:	"(3010.000) 550"
 *LanguageLevel:	"3"
 *ColorDevice:	True
@@ -55,7 +58,7 @@
 *UIConstraints: *PageSize A4 *InputSlot Envelope
 *UIConstraints: *PageSize A5 *InputSlot Envelope
 *UIConstraints: *PageSize B5 *InputSlot Envelope
-*UIConstraints: *Resolution 600dpi *ColorModel CMYK
+*UIConstraints:	*Duplex *Option1 False
 
 *OpenUI *PageSize/Media Size: PickOne
 *OrderDependency: 10 AnySetup *PageSize
@@ -94,19 +97,19 @@
 *CloseUI: *PageRegion
 
 *DefaultImageableArea: Letter 
-*ImageableArea Letter/US Letter:	"18 36 594 756"
-*ImageableArea Legal/US Legal:		"18 36 594 972"
-*ImageableArea Executive/US Executive:	"18 36 504 684"
-*ImageableArea Tabloid/US Tabloid:	"18 36 774 1188"
-*ImageableArea A3/A3:			"18 36 824 1155"
-*ImageableArea A4/A4:			"18 36 577 806"
-*ImageableArea A5/A5:			"18 36 403 559"
-*ImageableArea B5/JIS B5:		"18 36 498 693"
-*ImageableArea EnvISOB5/B5 (ISO):	"18 36 463 673"
-*ImageableArea Env10/Com-10:		"18 36 279 648"
-*ImageableArea EnvC5/EnvC5:		"18 36 441 613"
-*ImageableArea EnvDL/EnvDL:		"18 36 294 588"
-*ImageableArea EnvMonarch/Envelope Monarch: "18 36 261 504"
+*ImageableArea Letter/US Letter:	"18 36 594 786"
+*ImageableArea Legal/US Legal:		"18 36 594 1002"
+*ImageableArea Executive/US Executive:	"18 36 504 714"
+*ImageableArea Tabloid/US Tabloid:	"18 36 774 1218"
+*ImageableArea A3/A3:			"18 36 824 1185"
+*ImageableArea A4/A4:			"18 36 577 836"
+*ImageableArea A5/A5:			"18 36 403 589"
+*ImageableArea B5/JIS B5:		"18 36 498 723"
+*ImageableArea EnvISOB5/B5 (ISO):	"18 36 463 703"
+*ImageableArea Env10/Com-10:		"18 36 279 678"
+*ImageableArea EnvC5/EnvC5:		"18 36 441 643"
+*ImageableArea EnvDL/EnvDL:		"18 36 294 618"
+*ImageableArea EnvMonarch/Envelope Monarch: "18 36 261 534"
 
 *DefaultPaperDimension: Letter
 *PaperDimension Letter/US Letter:	"612 792"
@@ -144,18 +147,34 @@
 *OpenUI *Resolution/Output Resolution: PickOne
 *OrderDependency: 20 AnySetup *Resolution
 *DefaultResolution: 300dpi
-*Resolution 150dpi/150 DPI: "<</HWResolution[150 150]>>setpagedevice"
 *Resolution 300dpi/300 DPI: "<</HWResolution[300 300]>>setpagedevice"
-*Resolution 600dpi/600 DPI: "<</HWResolution[600 600]/cupsColorSpace 3>>setpagedevice"
+*Resolution 600x300dpi/600x300 DPI: "<</HWResolution[600 300]>>setpagedevice"
+*Resolution 600dpi/600 DPI: "<</HWResolution[600 600]>>setpagedevice"
 *CloseUI: *Resolution
 
 *OpenUI *ColorModel/Output Mode: PickOne
 *OrderDependency: 10 AnySetup *ColorModel
 *DefaultColorModel: CMYK
+*ColorModel CMYK2/CRET Color: "<</cupsColorOrder 1/cupsColorSpace 8/cupsCompression 2/cupsBitsPerColor 2>>setpagedevice"
 *ColorModel CMYK/CMYK Color: "<</cupsColorOrder 1/cupsColorSpace 8/cupsCompression 2>>setpagedevice"
-*ColorModel RGB/CMY Color: "<</cupsColorOrder 1/cupsColorSpace 4/cupsCompression 2>>setpagedevice"
 *ColorModel Gray/Grayscale: "<</cupsColorOrder 0/cupsColorSpace 3/cupsCompression 2>>setpagedevice"
 *CloseUI: *ColorModel
+
+*OpenUI *Duplex/Double-Sided Printing: PickOne
+*OrderDependency: 20 AnySetup *Duplex
+*DefaultDuplex: None
+*Duplex None/Off:	"<</Duplex false>>setpagedevice"
+*Duplex DuplexNoTumble/Long Edge (Standard):	"<</Duplex true/Tumble false>>setpagedevice"
+*Duplex DuplexTumble/Short Edge (Flip):	"<</Duplex true/Tumble true>>setpagedevice"
+*CloseUI:	*Duplex
+
+*OpenGroup: InstallableOptions
+*OpenUI *Option1/Duplexer: Boolean
+*DefaultOption1: False
+*Option1 True/Installed:	""
+*Option1 False/Not Installed:	""
+*CloseUI *Option1
+*CloseGroup: InstallableOptions
 
 *DefaultFont: Courier
 *Font AvantGarde-Book: Standard "(001.006S)" Standard ROM
@@ -194,5 +213,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: deskjet.ppd,v 1.10 2001/04/23 19:52:31 mike Exp $".
+*% End of "$Id: deskjet2.ppd,v 1.1 2001/04/23 19:52:31 mike Exp $".
 *%
