@@ -1,5 +1,5 @@
 /*
- * "$Id: client.h,v 1.7 2000/01/04 13:46:08 mike Exp $"
+ * "$Id: client.h,v 1.8 2000/02/03 14:18:54 mike Exp $"
  *
  *   Client definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -40,6 +40,8 @@ typedef struct
 		filename[HTTP_MAX_URI];	/* Filename of output file */
   int		file;			/* Input/output file */
   int		pipe_pid;		/* Pipe process ID (or 0 if not a pipe) */
+  int		got_fields,		/* Non-zero if all fields seen */
+		field_col;		/* Column within line */
   cups_lang_t	*language;		/* Language to use */
 } client_t;
 
@@ -90,5 +92,5 @@ extern void	StopListening(void);
 extern int	WriteClient(client_t *con);
 
 /*
- * End of "$Id: client.h,v 1.7 2000/01/04 13:46:08 mike Exp $".
+ * End of "$Id: client.h,v 1.8 2000/02/03 14:18:54 mike Exp $".
  */

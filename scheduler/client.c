@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.48 2000/02/01 17:55:56 mike Exp $"
+ * "$Id: client.c,v 1.49 2000/02/03 14:18:53 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -926,6 +926,9 @@ SendCommand(client_t      *con,
       return (0);
   }
 
+  con->got_fields = 0;
+  con->field_col  = 0;
+
   return (1);
 }
 
@@ -1099,7 +1102,8 @@ int					/* O - 1 if success, 0 if fail */
 WriteClient(client_t *con)		/* I - Client connection */
 {
   int		bytes;			/* Number of bytes written */
-  char		buf[HTTP_MAX_BUFFER];	/* Data buffer */
+  char		buf[HTTP_MAX_BUFFER + 1];/* Data buffer */
+  char		*bufptr;		/* Pointer into buffer */
   ipp_state_t	ipp_state;		/* IPP state value */
 
 
@@ -1112,8 +1116,67 @@ WriteClient(client_t *con)		/* I - Client connection */
     ipp_state = ippWrite(&(con->http), con->response);
     bytes     = ipp_state != IPP_ERROR && ipp_state != IPP_DATA;
   }
-  else if ((bytes = read(con->file, buf, sizeof(buf))) > 0)
+  else if ((bytes = read(con->file, buf, HTTP_MAX_BUFFER)) > 0)
   {
+    if (con->pipe_pid && !con->got_fields)
+    {
+     /*
+      * Inspect the data for Content-Type and other fields.
+      */
+
+      buf[bytes] = '\0';
+
+      for (bufptr = buf; !con->got_fields && *bufptr; bufptr ++)
+        if (*bufptr == '\n')
+	{
+	 /*
+	  * Send line to client...
+	  */
+
+	  if (bufptr > buf && bufptr[-1] == '\r')
+	    bufptr[-1] = '\0';
+	  *bufptr++ = '\0';
+
+	  httpPrintf(HTTP(con), "%s\r\n", buf);
+
+         /*
+	  * Update buffer...
+	  */
+
+	  bytes -= (bufptr - buf);
+	  memcpy(buf, bufptr, bytes + 1);
+	  bufptr = buf - 1;
+
+         /*
+	  * See if the line was empty...
+	  */
+
+	  if (con->field_col == 0)
+	    con->got_fields = 1;
+	  else
+	    con->field_col = 0;
+	}
+	else if (*bufptr != '\r')
+	  con->field_col ++;
+
+      if (bytes > 0 && !con->got_fields)
+      {
+       /*
+        * Remaining text needs to go out...
+	*/
+
+        httpPrintf(HTTP(con), "%s", buf);
+
+        con->http.activity = time(NULL);
+        return (1);
+      }
+      else if (bytes == 0)
+      {
+        con->http.activity = time(NULL);
+        return (1);
+      }
+    }
+
     if (httpWrite(HTTP(con), buf, bytes) < 0)
     {
       CloseClient(con);
@@ -1570,5 +1633,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.48 2000/02/01 17:55:56 mike Exp $".
+ * End of "$Id: client.c,v 1.49 2000/02/03 14:18:53 mike Exp $".
  */
