@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.40 1999/12/07 17:14:35 mike Exp $"
+ * "$Id: util.c,v 1.41 1999/12/15 15:21:34 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -410,7 +410,8 @@ cupsGetClasses(char ***classes)	/* O - Classes */
     last_error = response->request.status.status_code;
 
     for (attr = response->attrs; attr != NULL; attr = attr->next)
-      if (strcasecmp(attr->name, "printer-name") == 0 &&
+      if (attr->name != NULL &&
+          strcasecmp(attr->name, "printer-name") == 0 &&
           attr->value_tag == IPP_TAG_NAME)
       {
         if (n == 0)
@@ -702,7 +703,8 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
     last_error = response->request.status.status_code;
 
     for (attr = response->attrs; attr != NULL; attr = attr->next)
-      if (strcasecmp(attr->name, "printer-name") == 0 &&
+      if (attr->name != NULL &&
+          strcasecmp(attr->name, "printer-name") == 0 &&
           attr->value_tag == IPP_TAG_NAME)
       {
         if (n == 0)
@@ -1103,5 +1105,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.40 1999/12/07 17:14:35 mike Exp $".
+ * End of "$Id: util.c,v 1.41 1999/12/15 15:21:34 mike Exp $".
  */
