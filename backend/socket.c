@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.7 1999/10/28 20:32:41 mike Exp $"
+ * "$Id: socket.c,v 1.8 1999/12/14 17:30:11 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -147,7 +147,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     {
       if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
       {
-	perror("ERROR: Unable to connect to printer");
+	perror("ERROR: Unable to create socket");
 	return (1);
       }
 
@@ -166,7 +166,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	else
 	{
 	  perror("ERROR: Unable to connect to printer");
-          return (1);
+	  sleep(30);
 	}
       }
       else
@@ -250,5 +250,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.7 1999/10/28 20:32:41 mike Exp $".
+ * End of "$Id: socket.c,v 1.8 1999/12/14 17:30:11 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.12 1999/10/28 20:32:40 mike Exp $"
+ * "$Id: lpd.c,v 1.13 1999/12/14 17:30:11 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -262,8 +262,9 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
   {
     if ((fd = rresvport(&port)) < 0)
     {
-      perror("ERROR: Unable to connect to printer");
-      return (1);
+      perror("ERROR: Unable to reserve port");
+      sleep(30);
+      continue;
     }
 
     if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
@@ -287,7 +288,7 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
       else
       {
 	perror("ERROR: Unable to connect to printer");
-        return (1);
+        sleep(30);
       }
     }
     else
@@ -404,5 +405,5 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
 
 /*
- * End of "$Id: lpd.c,v 1.12 1999/10/28 20:32:40 mike Exp $".
+ * End of "$Id: lpd.c,v 1.13 1999/12/14 17:30:11 mike Exp $".
  */

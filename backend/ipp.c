@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.15 1999/12/08 14:59:49 mike Exp $"
+ * "$Id: ipp.c,v 1.16 1999/12/14 17:30:11 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -166,10 +166,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       else
       {
 	perror("ERROR: Unable to connect to IPP host");
-
-	if (fp != stdin)
-	  fclose(fp);
-	return (1);
+	sleep(30);
       }
   }
   while (http == NULL);
@@ -651,5 +648,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.15 1999/12/08 14:59:49 mike Exp $".
+ * End of "$Id: ipp.c,v 1.16 1999/12/14 17:30:11 mike Exp $".
  */
