@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.33 1999/08/27 18:22:51 mike Exp $"
+ * "$Id: ppd.c,v 1.34 1999/09/13 20:18:37 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -630,7 +630,8 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       string  = NULL;
     }
     else if (strcmp(keyword, "VariablePaperSize") == 0 &&
-             strcmp(string, "True") == 0)
+             strcmp(string, "True") == 0 &&
+	     !ppd->variable_sizes)
     {
       ppd->variable_sizes = 1;
 
@@ -690,9 +691,51 @@ ppdOpen(FILE *fp)		/* I - File to read from */
              ppd->custom_margins + 1, ppd->custom_margins + 2,
              ppd->custom_margins + 3);
     else if (strcmp(keyword, "CustomPageSize") == 0 &&
-             strcmp(name, "True") == 0 &&
-	     ppd->variable_sizes)
+             strcmp(name, "True") == 0)
     {
+      if (!ppd->variable_sizes)
+      {
+	ppd->variable_sizes = 1;
+
+       /*
+	* Add a "Custom" page size entry...
+	*/
+
+	ppd_add_size(ppd, "Custom");
+
+       /*
+	* Add a "Custom" page size option...
+	*/
+
+	if ((group = ppd_get_group(ppd,
+                                   cupsLangString(language,
+                                                  CUPS_MSG_GENERAL))) == NULL)
+	{
+          ppdClose(ppd);
+	  safe_free(string);
+	  return (NULL);
+	}
+
+	if ((option = ppd_get_option(group, "PageSize")) == NULL)
+	{
+          ppdClose(ppd);
+	  safe_free(string);
+	  return (NULL);
+	}
+
+	if ((choice = ppd_add_choice(option, "Custom")) == NULL)
+	{
+          ppdClose(ppd);
+	  safe_free(string);
+	  return (NULL);
+	}
+
+	strncpy(choice->text, cupsLangString(language, CUPS_MSG_VARIABLE),
+        	sizeof(choice->text) - 1);
+	group  = NULL;
+	option = NULL;
+      }
+
       if ((option = ppdFindOption(ppd, "PageSize")) == NULL)
       {
 	ppdClose(ppd);
@@ -1767,5 +1810,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.33 1999/08/27 18:22:51 mike Exp $".
+ * End of "$Id: ppd.c,v 1.34 1999/09/13 20:18:37 mike Exp $".
  */
