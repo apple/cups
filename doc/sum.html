@@ -74,9 +74,11 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <UL>
 <LI><A HREF="#4_3_1">Selecting a Range of Pages</A></LI>
 <LI><A HREF="#4_3_2">Selecting Even or Odd Pages</A></LI>
-<LI><A HREF="#4_3_3">N-Up Printing</A></LI>
-<LI><A HREF="#4_3_4">Setting the Brightness</A></LI>
-<LI><A HREF="#4_3_5">Setting the Gamma Correction</A></LI>
+<LI><A HREF="#4_3_3">Setting the Output Order</A></LI>
+<LI><A HREF="#4_3_4">N-Up Printing</A></LI>
+<LI><A HREF="#4_3_5">Mirroring Prints</A></LI>
+<LI><A HREF="#4_3_6">Setting the Brightness</A></LI>
+<LI><A HREF="#4_3_7">Setting the Gamma Correction</A></LI>
 </UL>
 <LI><A HREF="#4_4">Text Options</A></LI>
 <UL>
@@ -581,7 +583,17 @@ printer DeskJet now printing DeskJet-1.
 </PRE>
 </UL>
 <P>The default is to print all pages.</P>
-<H3><A NAME="4_3_3">N-Up Printing</A></H3>
+<H3><A NAME="4_3_3">Setting the Output Order</A></H3>
+<P>The the <CODE>-o outputorder=order</CODE> option to set the output
+ order of all pages:</P>
+<UL>
+<PRE>
+<B>lp -o outputorder=normal filename ENTER</B>
+<B>lp -o outputorder=reverse filename ENTER</B>
+<B>lpr -o outputorder=reverse filename ENTER</B>
+</PRE>
+</UL>
+<H3><A NAME="4_3_4">N-Up Printing</A></H3>
 <P>The <CODE>-o number-up=value</CODE> option selects N-Up printing.
  N-Up printing places multiple document pages on a single printed page.
  CUPS supports 1, 2, 4, 6, 9, and 16-Up formats; the default format is
@@ -620,7 +632,17 @@ printer DeskJet now printing DeskJet-1.
 <LI><CODE>-o number-up-layout=tblr</CODE>; Top to bottom, left to right</LI>
 <LI><CODE>-o number-up-layout=tbrl</CODE>; Top to bottom, right to left</LI>
 </UL>
-<H3><A NAME="4_3_4">Setting the Brightness</A></H3>
+<H3><A NAME="4_3_5">Mirroring Prints</A></H3>
+<P>You can mirror a print using the <CODE>-o mirror</CODE> option:</P>
+<UL>
+<PRE>
+<B>lp -o mirror filename ENTER</B>
+<B>lpr -o mirror filename ENTER</B>
+</PRE>
+</UL>
+<P>This is useful for printing mirrored pages on transfer paper, for T
+ shirts, mugs, etc.</P>
+<H3><A NAME="4_3_6">Setting the Brightness</A></H3>
 <P>You can control the overall brightness of the printed output using
  the <CODE>-o brightness=percent</CODE> option:</P>
 <UL>
@@ -631,7 +653,7 @@ printer DeskJet now printing DeskJet-1.
 </UL>
 <P>Values greater than 100 will lighten the print, while values less
  than 100 will darken it.</P>
-<H3><A NAME="4_3_5">Setting the Gamma Correction</A></H3>
+<H3><A NAME="4_3_7">Setting the Gamma Correction</A></H3>
 <P>You can control the overall gamma correction of the printed output
  using the <CODE>-o gamma=value</CODE> option:</P>
 <UL>

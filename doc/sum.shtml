@@ -446,6 +446,17 @@ of the order of the pages in the <CODE>page-ranges</CODE> option.
 
 <P>The default is to print all pages.
 
+<H3>Setting the Output Order</H3>
+
+<P>The the <CODE>-o outputorder=order</CODE> option to set the output
+order of all pages:
+
+<UL><PRE>
+<B>lp -o outputorder=normal filename ENTER</B>
+<B>lp -o outputorder=reverse filename ENTER</B>
+<B>lpr -o outputorder=reverse filename ENTER</B>
+</PRE></UL>
+
 <H3>N-Up Printing</H3>
 
 <P>The <CODE>-o number-up=value</CODE> option selects N-Up printing. 
@@ -484,6 +495,18 @@ of the pages on each output page:
 	<LI><CODE>-o number-up-layout=tblr</CODE>; Top to bottom, left to right</LI>
 	<LI><CODE>-o number-up-layout=tbrl</CODE>; Top to bottom, right to left</LI>
 </UL>
+
+<H3>Mirroring Prints</H3>
+
+<P>You can mirror a print using the <CODE>-o mirror</CODE> option:
+
+<UL><PRE>
+<B>lp -o mirror filename ENTER</B>
+<B>lpr -o mirror filename ENTER</B>
+</PRE></UL>
+
+<P>This is useful for printing mirrored pages on transfer paper, for
+T shirts, mugs, etc.
 
 <H3>Setting the Brightness</H3>
 
