@@ -3,6 +3,12 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The lp command now supports a "-H restart" option to
+	  restart previously printed jobs.  This functionality
+	  only works if you have enabled the PreserveJobFiles
+	  option.
+	- The scheduler now supports URIs in HTTP request lines
+	  to conform to the HTTP/1.1 specification.
 	- The time-at-xyz attributes were not recognized in
 	  banner files if prefixed by a question mark, e.g.
 	  "{?time-at-creation}".

@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.29.2.11 2003/01/15 04:25:57 mike Exp $"
+ * "$Id: lp.c,v 1.29.2.12 2003/01/24 16:53:52 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -23,8 +23,10 @@
  *
  * Contents:
  *
- *   main()       - Parse options and send files for printing.
- *   sighandler() - Signal catcher for when we print from stdin...
+ *   main()          - Parse options and send files for printing.
+ *   restart_job()   - Restart a job.
+ *   set_job_attrs() - Set job attributes.
+ *   sighandler()    - Signal catcher for when we print from stdin...
  */
 
 /*
@@ -50,6 +52,7 @@
 
 void	sighandler(int);
 #endif /* !WIN32 */
+int	restart_job(int job_id);
 int	set_job_attrs(int job_id, int num_options, cups_option_t *options);
 
 
@@ -379,6 +382,17 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    else if (strcmp(val, "immediate") == 0)
               num_options = cupsAddOption("job-priority", "100",
 	                                  num_options, &options);
+	    else if (strcmp(val, "restart") == 0)
+	    {
+	      if (job_id < 1)
+	      {
+	        fputs("lp: Need job ID (-i) before \"-H restart\"!\n", stderr);
+		return (1);
+	      }
+
+	      if (restart_job(job_id))
+	        return (1);
+	    }
 	    else
               num_options = cupsAddOption("job-hold-until", val,
 	                                  num_options, &options);
@@ -572,6 +586,65 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
+ * 'restart_job()' - Restart a job.
+ */
+
+int					/* O - Exit status */
+restart_job(int job_id)			/* I - Job ID */
+{
+  http_t	*http;			/* HTTP connection to server */
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  cups_lang_t	*language;		/* Language for request */
+  char		uri[HTTP_MAX_URI];	/* URI for job */
+
+
+  http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
+
+  language = cupsLangDefault();
+
+  request = ippNew();
+  request->request.op.operation_id = IPP_RESTART_JOB;
+  request->request.op.request_id   = 1;
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
+
+  sprintf(uri, "ipp://localhost/jobs/%d", job_id);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
+               "job-uri", NULL, uri);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+               "requesting-user-name", NULL, cupsUser());
+
+  if ((response = cupsDoRequest(http, request, "/jobs")) != NULL)
+  {
+    if (response->request.status.status_code > IPP_OK_CONFLICT)
+    {
+      fprintf(stderr, "lp: restart-job failed: %s\n",
+              ippErrorString(response->request.status.status_code));
+      ippDelete(response);
+      return (1);
+    }
+
+    ippDelete(response);
+  }
+  else
+  {
+    fprintf(stderr, "lp: restart-job failed: %s\n",
+            ippErrorString(cupsLastError()));
+    return (1);
+  }
+
+  return (0);
+}
+
+
+/*
  * 'set_job_attrs()' - Set job attributes.
  */
 
@@ -658,5 +731,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.29.2.11 2003/01/15 04:25:57 mike Exp $".
+ * End of "$Id: lp.c,v 1.29.2.12 2003/01/24 16:53:52 mike Exp $".
  */
