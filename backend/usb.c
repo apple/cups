@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.44 2003/01/27 17:12:08 mike Exp $"
+ * "$Id: usb.c,v 1.45 2003/07/06 20:19:34 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -327,6 +327,8 @@ decode_device_id(int        port,		/* I - Port number */
   char	*attr,					/* 1284 attribute */
   	*delim,					/* 1284 delimiter */
 	*uriptr,				/* Pointer into URI */
+	*mfg,					/* Manufacturer string */
+	*mdl,					/* Model string */
 	serial_number[1024];			/* Serial number string */
 
 
@@ -338,6 +340,16 @@ decode_device_id(int        port,		/* I - Port number */
     attr += 4;
   else if ((attr = strstr(device_id, "DESCRIPTION:")) != NULL)
     attr += 12;
+
+  if ((mfg = strstr(device_id, "MANUFACTURER:")) != NULL)
+    mfg += 13;
+  else if ((mfg = strstr(device_id, "MFG:")) != NULL)
+    mfg += 4;
+
+  if ((mdl = strstr(device_id, "MODEL:")) != NULL)
+    mdl += 6;
+  else if ((mdl = strstr(device_id, "MDL:")) != NULL)
+    mdl += 4;
 
   if (attr)
   {
@@ -354,8 +366,31 @@ decode_device_id(int        port,		/* I - Port number */
     if ((delim = strchr(make_model, ';')) != NULL)
       *delim = '\0';
   }
+  else if (mfg && mdl)
+  {
+   /*
+    * Build a make-model string from the manufacturer and model attributes...
+    */
+
+    strlcpy(make_model, mfg, mmsize);
+
+    if ((delim = strchr(make_model, ';')) != NULL)
+      *delim = '\0';
+
+    strlcat(make_model, " ", mmsize);
+    strlcat(make_model, mdl, mmsize);
+
+    if ((delim = strchr(make_model, ';')) != NULL)
+      *delim = '\0';
+  }
   else
+  {
+   /*
+    * Use "Unknown" as the printer make and model...
+    */
+
     strlcpy(make_model, "Unknown", mmsize);
+  }
 
  /*
   * Look for the serial number field...
@@ -652,7 +687,15 @@ open_device(const char *uri)		/* I - Device URI */
                 	 device_uri, sizeof(device_uri));
 
         if (strcmp(uri, device_uri) == 0)
-	  return (fd);	/* Yes, return this file descriptor... */
+	{
+	 /*
+	  * Yes, return this file descriptor...
+	  */
+
+	  fprintf(stderr, "DEBUG: Printer using device file \"%s\"...\n", device);
+
+	  return (fd);
+	}
       }
 
      /*
@@ -752,5 +795,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb.c,v 1.44 2003/01/27 17:12:08 mike Exp $".
+ * End of "$Id: usb.c,v 1.45 2003/07/06 20:19:34 mike Exp $".
  */
