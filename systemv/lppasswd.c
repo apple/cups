@@ -1,5 +1,5 @@
 /*
- * "$Id: lppasswd.c,v 1.6 2000/07/17 19:44:35 mike Exp $"
+ * "$Id: lppasswd.c,v 1.7 2000/07/20 23:20:03 mike Exp $"
  *
  *   MD5 password program for the Common UNIX Printing System (CUPS).
  *
@@ -33,6 +33,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <ctype.h>
 #include <grp.h>
 #include <sys/types.h>
@@ -412,5 +413,5 @@ usage(FILE *fp)		/* I - File to send usage to */
 
 
 /*
- * End of "$Id: lppasswd.c,v 1.6 2000/07/17 19:44:35 mike Exp $".
+ * End of "$Id: lppasswd.c,v 1.7 2000/07/20 23:20:03 mike Exp $".
  */
