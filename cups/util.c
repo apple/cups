@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.6 1999/03/03 21:16:15 mike Exp $"
+ * "$Id: util.c,v 1.7 1999/03/21 02:10:08 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -158,24 +158,26 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
 
   language = cupsLangDefault();
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, "attributes-charset",
-                      cupsLangEncoding(language));
-  attr->value_tag = IPP_TAG_CHARSET;
+  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+                      "attributes-charset", NULL, cupsLangEncoding(language));
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, "attributes-natural-language",
+  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                      "attributes-natural-language", NULL,
                       language != NULL ? language->language : "C");
-  attr->value_tag = IPP_TAG_LANGUAGE;
 
-  attr = ippAddString(request, IPP_TAG_OPERATION, "printer-uri", uri);
-  attr->value_tag = IPP_TAG_URI;
+  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+                      NULL, uri);
 
-  attr = ippAddString(request, IPP_TAG_JOB, "document-format",
-                      "application/octet-stream");
-  attr->value_tag = IPP_TAG_MIMETYPE;
+  attr = ippAddString(request, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format",
+                      NULL, "application/octet-stream");
 
-  attr = ippAddString(request, IPP_TAG_JOB, "requesting-user-name",
-                      cuserid(NULL));
-  attr->value_tag = IPP_TAG_NAME;
+#if defined(WIN32) || defined(__EMX__)
+  attr = ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME, "requesting-user-name",
+                      NULL, "WindowsUser");
+#else
+  attr = ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME, "requesting-user-name",
+                      NULL, cuserid(NULL));
+#endif /* WIN32 || __EMX__ */
 
  /*
   * Then add all options on the command-line...
@@ -244,7 +246,7 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
       DEBUG_printf(("cupsPrintJob: Adding string option \'%s\' with value \'%s\'...\n",
                     name, val));
 
-      attr = ippAddString(request, IPP_TAG_JOB, name, val);
+      attr = ippAddString(request, IPP_TAG_JOB, IPP_TAG_STRING, name, NULL, val);
     }
     else if (val != NULL)
     {
@@ -271,14 +273,14 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
           attr = ippAddResolution(request, IPP_TAG_JOB, name,
 	                          IPP_RES_PER_INCH, n, n2);
         else
-          attr = ippAddString(request, IPP_TAG_JOB, name, val);
+          attr = ippAddString(request, IPP_TAG_JOB, IPP_TAG_STRING, name, NULL, val);
 
 	DEBUG_printf(("cupsPrintJob: Adding resolution option \'%s\' with value %s...\n",
                       name, val));
       }
       else
       {
-        attr = ippAddInteger(request, IPP_TAG_JOB, name, n);
+        attr = ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, name, n);
 
 	DEBUG_printf(("cupsPrintJob: Adding integer option \'%s\' with value %d...\n",
                       name, n));
@@ -292,7 +294,7 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
 
       DEBUG_printf(("cupsPrintJob: Adding boolean option \'%s\' with value %d...\n",
                     name, n));
-      attr = ippAddBoolean(request, IPP_TAG_JOB, name, n);
+      attr = ippAddBoolean(request, IPP_TAG_JOB, name, (char)n);
     }
   }
 
@@ -355,7 +357,7 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
                     response->request.status.status_code));
       jobid = 0;
     }
-    else if ((attr = ippFindAttribute(response, "job-id")) == NULL)
+    else if ((attr = ippFindAttribute(response, "job-id", IPP_TAG_INTEGER)) == NULL)
     {
       DEBUG_puts("No job ID!");
       jobid = 0;
@@ -374,5 +376,5 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
 
 
 /*
- * End of "$Id: util.c,v 1.6 1999/03/03 21:16:15 mike Exp $".
+ * End of "$Id: util.c,v 1.7 1999/03/21 02:10:08 mike Exp $".
  */

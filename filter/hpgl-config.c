@@ -1,86 +1,57 @@
 /*
- * "$Id: hpgl-config.c,v 1.9 1999/02/17 21:51:57 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.10 1999/03/21 02:10:11 mike Exp $"
  *
- *   HPGL configuration routines for espPrint, a collection of printer drivers.
+ *   HP-GL/2 configuration routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1998 by Easy Software Products
+ *   Copyright 1993-1999 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs contain
- *   unpublished proprietary information of Easy Software Products, and
- *   are protected by Federal copyright law. They may not be disclosed
- *   to third parties or copied or duplicated in any form, in whole or
- *   in part, without the prior written consent of Easy Software Products.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
  *
- * Revision History:
- *
- *   $Log: hpgl-config.c,v $
- *   Revision 1.9  1999/02/17 21:51:57  mike
- *   Updated scaling code to ignore the PlotSize.
- *
- *   Added support for IW command.
- *
- *   Revision 1.8  1998/09/16  14:37:29  mike
- *   Fixed landscape printing bug.
- *   Fixed margins when page is rotated.
- *
- *   Revision 1.7  1998/08/31  20:35:49  mike
- *   Updated pen width code to automatically adjust scaling as needed.
- *   Updated PS code to adjust width/height by a factor of 0.75 for better
- *   scaling of plots.
- *
- *   Revision 1.7  1998/08/31  20:35:49  mike
- *   Updated pen width code to automatically adjust scaling as needed.
- *   Updated PS code to adjust width/height by a factor of 0.75 for better
- *   scaling of plots.
- *
- *   Revision 1.6  1998/05/20 13:18:48  mike
- *   Updated to offset page by the left/bottom margin no matter what.
- *
- *   Revision 1.5  1998/03/18  20:47:27  mike
- *   Fixed problem with some HPGL files not plotting - added IP call after
- *   a PS command.
- *
- *   Revision 1.4  1998/03/18  20:46:04  mike
- *   Updated to do optional page scaling.
- *   Now support 0, 90, 180, and 270 degree rotations.
- *
- *   Revision 1.3  1997/12/11  13:49:06  mike
- *   Updated PS_plot_size() code - now if a single size is provide we scale
- *   to the smallest page dimension (not just the length as before).
- *
- *   Revision 1.2  1996/10/14  16:50:14  mike
- *   Updated for 3.2 release.
- *   Added 'blackplot', grayscale, and default pen width options.
- *   Added encoded polyline support.
- *   Added fit-to-page code.
- *   Added pen color palette support.
- *
- *   Revision 1.1  1996/08/24  19:41:24  mike
- *   Initial revision
  */
 
 /*
  * Include necessary headers...
  */
 
-#include "hpgl2ps.h"
+#include "hpgltops.h"
 
+
+/*
+ * 'update_transform()' - Update the page transformation matrix as needed.
+ */
 
 void
 update_transform(void)
 {
   float p1[2], p2[2];
   float	width, height;
+  float	page_width, page_length;
   float	xoff, yoff;
   float	plotsize[2];
   float	scaling,
 	pen_scaling;
 
 
-  width  = IW2[0] - IW1[0];
-  height = IW2[1] - IW1[1];
+  width       = IW2[0] - IW1[0];
+  height      = IW2[1] - IW1[1];
+  page_width  = PageRight - PageLeft;
+  page_length = PageTop - PageBottom;
 
   if (width == 0 || height == 0)
     return;
@@ -89,27 +60,21 @@ update_transform(void)
   {
     if (Rotation == 0 || Rotation == 180)
     {
-      scaling = PageWidth / width;
+      scaling = page_width / width;
 
-      if (scaling > (PageHeight / height))
-      {
-	if ((scaling * height) > PageHeight)
-          scaling = PageHeight / height;
-      }
-      else if ((PageHeight / height * width) <= PageWidth)
-        scaling = PageHeight / height;
+      if (scaling > (page_length / height))
+        scaling = page_length / height;
+      else if ((page_length / height * width) <= page_width)
+        scaling = page_length / height;
     }
     else
     {
-      scaling = PageWidth / height;
+      scaling = page_width / height;
 
-      if (scaling > (PageHeight / width))
-      {
-	if ((scaling * width) > PageHeight)
-          scaling = PageHeight / width;
-      }
-      else if ((PageHeight / width * height) <= PageWidth)
-        scaling = PageHeight / width;
+      if (scaling > (page_length / width))
+        scaling = page_length / width;
+      else if ((page_length / width * height) <= page_width)
+        scaling = page_length / width;
     };
 
     plotsize[0] = width * scaling;
@@ -191,41 +156,20 @@ update_transform(void)
 	Transform[1][1] = 0.0;
 	Transform[1][2] = (width - IW1[1]) * scaling;
 	break;
-  };
-
-  if (Verbosity)
-  {
-    fprintf(stderr, "hpgl2ps: IW1 = { %d %d }, IW2 = { %d %d }\n",
-            IW1[0], IW1[1], IW2[0], IW2[1]);
-    fprintf(stderr, "hpgl2ps: P1 = { %d %d }, P2 = { %d %d }\n",
-            P1[0], P1[1], P2[0], P2[1]);
-    fprintf(stderr, "hpgl2ps: PlotSize = { %f %f }\n",
-            PlotSize[0], PlotSize[1]);
-    fprintf(stderr, "hpgl2ps: Rotation = %d\n", Rotation);
-    fprintf(stderr, "hpgl2ps: Scaling1 = { %d %d }, Scaling2 = { %d %d }\n",
-            Scaling1[0], Scaling1[1], Scaling2[0], Scaling2[1]);
-    fprintf(stderr, "hpgl2ps: p1 = { %f %f }, p2 = { %f %f }\n",
-            p1[0], p1[1], p2[0], p2[1]);
-    fprintf(stderr, "hpgl2ps: width = %f, height = %f\n", width, height);
-    fprintf(stderr, "hpgl2ps: plotsize = { %f %f }\n",
-            plotsize[0], plotsize[1]);
-    fprintf(stderr, "hpgl2ps: scaling = %f\n", scaling);
-    fprintf(stderr, "hpgl2ps: transform matrix = [ %f %f %f %f %f %f ]\n",
-            Transform[0][0], Transform[1][0], 
-            Transform[0][1], Transform[1][1], 
-            Transform[0][2], Transform[1][2]);
-  };
+  }
 
   if (FitPlot)
   {
-    pen_scaling = Transform[0][0] + Transform[0][1];
-    if (pen_scaling < 0.0)
-      pen_scaling = -pen_scaling;
+    PenScaling = Transform[0][0] + Transform[0][1];
+
+    if (PenScaling < 0.0)
+      PenScaling = -pen_scaling;
   }
   else
-    pen_scaling = 1.0;
+    PenScaling = 1.0;
 
-  fprintf(OutputFile, "/PenScaling %.3f def W%d\n", pen_scaling, PenNumber);
+  if (PageDirty)
+    printf("/PenScaling %.3f def W%d\n", PenScaling, PenNumber);
 }
 
 
@@ -320,24 +264,24 @@ IR_input_relative(int num_params, param_t *params)
   {
     P1[0] = PageLeft / 72.0 * 1016.0;
     P1[1] = PageBottom / 72.0 * 1016.0;
-    P2[0] = (PageLeft + PageWidth) / 72.0 * 1016.0;
-    P2[1] = (PageBottom + PageHeight) / 72.0 * 1016.0;
+    P2[0] = PageRight / 72.0 * 1016.0;
+    P2[1] = PageTop / 72.0 * 1016.0;
   }
   else if (num_params == 2)
   {
     P2[0] -= P1[0];
     P2[1] -= P1[1];
-    P1[0] = params[0].value.number * PageWidth / 72.0 * 1016.0 / 100.0;
-    P1[1] = params[1].value.number * PageHeight / 72.0 * 1016.0 / 100.0;
+    P1[0] = params[0].value.number * (PageRight - PageLeft) / 72.0 * 1016.0 / 100.0;
+    P1[1] = params[1].value.number * (PageTop - PageBottom) / 72.0 * 1016.0 / 100.0;
     P2[0] += P1[0];
     P2[1] += P1[1];
   }
   else if (num_params == 4)
   {
-    P1[0] = params[0].value.number * PageWidth / 72.0 * 1016.0 / 100.0;
-    P1[1] = params[1].value.number * PageHeight / 72.0 * 1016.0 / 100.0;
-    P2[0] = params[2].value.number * PageWidth / 72.0 * 1016.0 / 100.0;
-    P2[1] = params[3].value.number * PageHeight / 72.0 * 1016.0 / 100.0;
+    P1[0] = params[0].value.number * (PageRight - PageLeft) / 72.0 * 1016.0 / 100.0;
+    P1[1] = params[1].value.number * (PageTop - PageBottom) / 72.0 * 1016.0 / 100.0;
+    P2[0] = params[2].value.number * (PageRight - PageLeft) / 72.0 * 1016.0 / 100.0;
+    P2[1] = params[3].value.number * (PageTop - PageBottom) / 72.0 * 1016.0 / 100.0;
   };
 
   IW1[0] = P1[0];
@@ -374,31 +318,14 @@ IW_input_window(int num_params, param_t *params)
 void
 PG_advance_page(int num_params, param_t *params)
 {
-  fputs("grestore\n", OutputFile);
-  fputs("showpage\n", OutputFile);
-  fputs("%%EndPage\n", OutputFile);
-
-  PageCount ++;
-  PageDirty = 0;
-  fprintf(OutputFile, "%%%%Page: %d\n", PageCount);
-  fputs("gsave\n", OutputFile);
-
-  switch (PageRotation)
+  if (PageDirty)
   {
-    case 0 :
-        fprintf(OutputFile, "%.1f %.1f translate\n", PageLeft, PageBottom);
-	break;
-    case 90 :
-        fprintf(OutputFile, "%.1f %.1f translate\n", PageBottom, PageRight);
-	break;
-    case 180 :
-        fprintf(OutputFile, "%.1f %.1f translate\n", PageRight, PageTop);
-	break;
-    case 270 :
-        fprintf(OutputFile, "%.1f %.1f translate\n", PageTop, PageLeft);
-	break;
-  };
+    puts("grestore");
+    puts("showpage");
+    puts("%%EndPage");
 
+    PageDirty = 0;
+  }
 }
 
 
@@ -464,7 +391,6 @@ RO_rotate(int num_params, param_t *params)
 void
 RP_replot(int num_params, param_t *params)
 {
-  fputs("copypage\n", OutputFile);
 }
 
 
@@ -491,5 +417,5 @@ SC_scale(int num_params, param_t *params)
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.9 1999/02/17 21:51:57 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.10 1999/03/21 02:10:11 mike Exp $".
  */

@@ -1,56 +1,28 @@
 /*
- * "$Id: hpgl-main.c,v 1.6 1999/03/06 18:02:26 mike Exp $"
+ * "$Id: hpgl-main.c,v 1.7 1999/03/21 02:10:12 mike Exp $"
  *
- *   Main entry for HPGL converter for espPrint, a collection of printer
- *   drivers.
+ *   Main entry for HP-GL/2 filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1996 by Easy Software Products
+ *   Copyright 1993-1999 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer  programs  contain
- *   unpublished  proprietary  information  of Easy Software Products, and
- *   are protected by Federal copyright law.  They may  not  be  disclosed
- *   to  third  parties  or  copied or duplicated in any form, in whole or
- *   in part, without the prior written consent of Easy Software Products.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
  *
- * Revision History:
- *
- *   $Log: hpgl-main.c,v $
- *   Revision 1.6  1999/03/06 18:02:26  mike
- *   Updated for CVS check-in.
- *
- *   Revision 1.5  1998/09/16  14:37:29  mike
- *   Fixed landscape printing bug.
- *   Fixed margins when page is rotated.
- *
- *   Revision 1.5  1998/09/16  14:37:29  mike
- *   Fixed landscape printing bug.
- *   Fixed margins when page is rotated.
- *
- *   Revision 1.4  1998/08/31  20:35:49  mike
- *   Updated pen width code to automatically adjust scaling as needed.
- *   Updated PS code to adjust width/height by a factor of 0.75 for better
- *   scaling of plots.
- *
- *   Revision 1.4  1998/08/31  20:35:49  mike
- *   Updated pen width code to automatically adjust scaling as needed.
- *   Updated PS code to adjust width/height by a factor of 0.75 for better
- *   scaling of plots.
- *
- *   Revision 1.3  1998/03/17  22:00:22  mike
- *   Added CR (color range) support.
- *   Added "to fit or not to fit" plot code.
- *
- *   Revision 1.2  1996/10/14  16:50:14  mike
- *   Updated for 3.2 release.
- *   Added 'blackplot', grayscale, and default pen width options.
- *   Added encoded polyline support.
- *   Added fit-to-page code.
- *   Added pen color palette support.
- *
- *   Revision 1.1  1996/08/24  19:41:24  mike
- *   Initial revision
  */
 
 /*
@@ -58,8 +30,8 @@
  */
 
 /*#define DEBUG*/
-#define _MAIN_C_
-#include "hpgl2ps.h"
+#define _HPGL_MAIN_C_
+#include "hpgltops.h"
 
 
 typedef struct
@@ -378,5 +350,5 @@ main(int  argc,
 
 
 /*
- * End of "$Id: hpgl-main.c,v 1.6 1999/03/06 18:02:26 mike Exp $".
+ * End of "$Id: hpgl-main.c,v 1.7 1999/03/21 02:10:12 mike Exp $".
  */

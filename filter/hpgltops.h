@@ -1,48 +1,25 @@
 /*
- * "$Id: hpgltops.h,v 1.5 1999/02/17 21:51:57 mike Exp $"
+ * "$Id: hpgltops.h,v 1.6 1999/03/21 02:10:14 mike Exp $"
  *
- *   HPGL to PostScript conversion program header file for espPrint, a
- *   collection of printer/image software.
+ *   HP-GL/2 to PostScript filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1998 by Easy Software Products
+ *   Copyright 1993-1999 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer  programs  contain
- *   unpublished  proprietary  information  of Easy Software Products, and
- *   are protected by Federal copyright law.  They may  not  be  disclosed
- *   to  third  parties  or  copied or duplicated in any form, in whole or
- *   in part, without the prior written consent of Easy Software Products.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
  *
- * Revision History:
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
  *
- *   $Log: hpgltops.h,v $
- *   Revision 1.5  1999/02/17 21:51:57  mike
- *   Updated scaling code to ignore the PlotSize.
- *
- *   Added support for IW command.
- *
- *   Revision 1.4  1998/08/31  20:35:49  mike
- *   Updated pen width code to automatically adjust scaling as needed.
- *   Updated PS code to adjust width/height by a factor of 0.75 for better
- *   scaling of plots.
- *
- *   Revision 1.4  1998/08/31  20:35:49  mike
- *   Updated pen width code to automatically adjust scaling as needed.
- *   Updated PS code to adjust width/height by a factor of 0.75 for better
- *   scaling of plots.
- *
- *   Revision 1.3  1998/03/17  22:00:22  mike
- *   Added CR (color range) support.
- *   Added "to fit or not to fit" plot code.
- *
- *   Revision 1.2  1996/10/14  16:50:14  mike
- *   Updated for 3.2 release.
- *   Added 'blackplot', grayscale, and default pen width options.
- *   Added encoded polyline support.
- *   Added fit-to-page code.
- *   Added pen color palette support.
- *
- *   Revision 1.1  1996/08/24  19:41:24  mike
- *   Initial revision
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  */
 
 /*
@@ -55,8 +32,7 @@
 #include <math.h>
 #include <time.h>
 
-#include <pod.h>
-#include <errorcodes.h>
+#include <cups/cups.h>
 
 
 /*
@@ -82,7 +58,7 @@ typedef struct
  * Globals...
  */
 
-#ifdef _MAIN_C_
+#ifdef _HPGL_MAIN_C_
 #  define VAR
 #  define VALUE(x) =x
 #  define VALUE2(x,y) ={x,y}
@@ -90,10 +66,10 @@ typedef struct
 #  define VAR extern
 #  define VALUE(x)
 #  define VALUE2(x,y)
-#endif /* _MAIN_C_ */
+#endif /* _HPGL_MAIN_C_ */
 
-VAR FILE	*InputFile,			/* Input file */
-		*OutputFile;			/* Output file */
+VAR int		ColorDevice	VALUE(1),	/* Color printer? */
+		LanguageLevel	VALUE(2);	/* PostScript level? */
 
 VAR int		P1[2],				/* Lower-lefthand physical limit */
 		P2[2],				/* Upper-righthand physical limit */
@@ -104,50 +80,54 @@ VAR int		ScalingType	VALUE(-1);	/* Type of scaling (-1 for none) */
 VAR float	Scaling1[2],			/* Lower-lefthand user limit */
 		Scaling2[2];			/* Upper-righthand user limit */
 VAR float	Transform[2][3];		/* Transform matrix */
-VAR float	PageWidth	VALUE(612),	/* Hard clip limits in points */
-		PageHeight	VALUE(792),
-		PageLeft	VALUE(0),
-		PageRight	VALUE(0),
-		PageBottom	VALUE(0),
-		PageTop		VALUE(0);
-VAR int		PageRotation	VALUE(0);
+VAR float	PageWidth	VALUE(612.0f),	/* Hard clip limits in points */
+		PageLength	VALUE(792.0f),
+		PageLeft	VALUE(18.0f),
+		PageRight	VALUE(594.0f),
+		PageBottom	VALUE(36.0f),
+		PageTop		VALUE(756.0f);
+VAR int		PageRotation	VALUE(0);	/* Page/plot rotation */
 
-VAR char	StringTerminator VALUE('\003');
-VAR float	PenPosition[2]	VALUE({0});
+VAR char	StringTerminator VALUE('\003');	/* Terminator for labels */
+VAR float	PenPosition[2]	VALUE2(0.0f, 0.0f),
+						/* Current pen position */
+		PenScaling	VALUE(1.0f);	/* Pen width scaling factor */
 VAR int		PenMotion	VALUE(0), 	/* 0 = absolute, 1 = relative */
 		PenNumber	VALUE(1),	/* Current pen number */
 		PenCount	VALUE(8),	/* Number of pens */
-		PenDown		VALUE(0),
-		PolygonMode	VALUE(0),
-		PageCount	VALUE(1),
-		PageDirty	VALUE(0),
-		WidthUnits	VALUE(0);
-VAR float	PlotSize[2]	VALUE2(2592.0, 3456.0);
+		PenDown		VALUE(0),	/* 0 = pen up, 1 = pen down */
+		PolygonMode	VALUE(0),	/* Drawing polygons? */
+		PageCount	VALUE(1),	/* Number of pages in plot */
+		PageDirty	VALUE(0),	/* Current page written on? */
+		WidthUnits	VALUE(0);	/* 0 = mm, 1 = proportionate */
+VAR float	PlotSize[2]	VALUE2(2592.0f, 3456.0f);
 						/* Plot size */
-VAR int		CharFillMode	VALUE(0),
-		CharPen		VALUE(0),
-		CharFont	VALUE(0);
-VAR float	CharHeight[2]	VALUE2(11.5,11.5);
-VAR int		Verbosity	VALUE(0);
-VAR int		FitPlot		VALUE(0);
-VAR float	ColorRange[3][2]
-#ifdef _MAIN_C_
+VAR int		CharFillMode	VALUE(0),	/* Where to draw labels */
+		CharPen		VALUE(0),	/* Pen to use for labels */
+		CharFont	VALUE(0);	/* Font to use for labels */
+VAR float	CharHeight[2]	VALUE2(11.5f,11.5f);
+						/* Size of font for labels */
+VAR int		FitPlot		VALUE(0);	/* 1 = fit to page */
+VAR float	ColorRange[3][2]		/* Range of color values */
+#ifdef _HPGL_MAIN_C_
 		= {
 		  { 0.0, 255.0 },
 		  { 0.0, 255.0 },
 		  { 0.0, 255.0 }
 		}
-#endif /* _MAIN_C_ */
+#endif /* _HPGL_MAIN_C_ */
 ;
 
 /*
  * Prototypes...
  */
 
-extern void	update_transform(void);
+/* hpgl-input.c */
 extern int	ParseCommand(char *name, param_t **params);
 extern void	FreeParameters(int num_params, param_t *params);
 
+/* hpgl-config.c */
+extern void	update_transform(void);
 extern void	BP_begin_plot(int num_params, param_t *params);
 extern void	DF_default_values(int num_params, param_t *params);
 extern void	IN_initialize(int num_params, param_t *params);
@@ -160,6 +140,7 @@ extern void	RO_rotate(int num_params, param_t *params);
 extern void	RP_replot(int num_params, param_t *params);
 extern void	SC_scale(int num_params, param_t *params);
 
+/* hpgl-vector.c */
 extern void	AA_arc_absolute(int num_params, param_t *params);
 extern void	AR_arc_relative(int num_params, param_t *params);
 extern void	AT_arc_absolute3(int num_params, param_t *params);
@@ -171,6 +152,7 @@ extern void	PR_plot_relative(int num_params, param_t *params);
 extern void	PU_pen_up(int num_params, param_t *params);
 extern void	RT_arc_relative3(int num_params, param_t *params);
 
+/* hpgl-polygon.c */
 extern void	EA_edge_rect_absolute(int num_params, param_t *params);
 extern void	EP_edge_polygon(int num_params, param_t *params);
 extern void	ER_edge_rect_relative(int num_params, param_t *params);
@@ -181,6 +163,7 @@ extern void	RA_fill_rect_absolute(int num_params, param_t *params);
 extern void	RR_fill_rect_relative(int num_params, param_t *params);
 extern void	WG_fill_wedge(int num_params, param_t *params);
 
+/* hpgl-char.c */
 extern void	AD_define_alternate(int num_params, param_t *params);
 extern void	CF_character_fill(int num_params, param_t *params);
 extern void	CP_character_plot(int num_params, param_t *params);
@@ -199,6 +182,7 @@ extern void	SR_relative_size(int num_params, param_t *params);
 extern void	SS_select_standard(int num_params, param_t *params);
 extern void	TD_transparent_data(int num_params, param_t *params);
 
+/* hpgl-attr.c */
 extern void	AC_anchor_corner(int num_params, param_t *params);
 extern void	CR_color_range(int num_params, param_t *params);
 extern void	FT_fill_type(int num_params, param_t *params);
@@ -213,9 +197,11 @@ extern void	SP_select_pen(int num_params, param_t *params);
 extern void	UL_user_line_type(int num_params, param_t *params);
 extern void	WU_width_units(int num_params, param_t *params);
 
+/* hpgl-prolog.c */
 extern int	OutputProlog(int shading, float penwidth);
 extern int	OutputTrailer(void);
+extern int	Outputf(const char *format, ...);
 
 /*
- * End of "$Id: hpgltops.h,v 1.5 1999/02/17 21:51:57 mike Exp $".
+ * End of "$Id: hpgltops.h,v 1.6 1999/03/21 02:10:14 mike Exp $".
  */

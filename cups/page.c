@@ -1,5 +1,5 @@
 /*
- * "$Id: page.c,v 1.4 1999/02/05 17:40:54 mike Exp $"
+ * "$Id: page.c,v 1.5 1999/03/21 02:10:06 mike Exp $"
  *
  *   Page size functions for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -49,12 +49,29 @@ ppdPageSize(ppd_file_t *ppd,	/* I - PPD file record */
   int	i;			/* Looping var */
 
 
-  if (ppd == NULL || name == NULL)
+  if (ppd == NULL)
     return (NULL);
 
-  for (i = 0; i < ppd->num_sizes; i ++)
-    if (strcmp(name, ppd->sizes[i].name) == 0)
-      return (ppd->sizes + i);
+  if (name != NULL)
+  {
+   /*
+    * Lookup by name...
+    */
+
+    for (i = 0; i < ppd->num_sizes; i ++)
+      if (strcmp(name, ppd->sizes[i].name) == 0)
+        return (ppd->sizes + i);
+  }
+  else
+  {
+   /*
+    * Find default...
+    */
+
+    for (i = 0; i < ppd->num_sizes; i ++)
+      if (ppd->sizes[i].marked)
+        return (ppd->sizes + i);
+  }
 
   return (NULL);
 }
@@ -83,7 +100,7 @@ ppdPageWidth(ppd_file_t *ppd,	/* I - PPD file record */
  */
 
 float				/* O - Length of page in points or 0.0 */
-ppdPageLength(ppd_file_t *ppd,	/* I - Size name */
+ppdPageLength(ppd_file_t *ppd,	/* I - PPD file */
               char       *name)	/* I - Size name */
 {
   ppd_size_t	*size;		/* Page size */
@@ -97,5 +114,5 @@ ppdPageLength(ppd_file_t *ppd,	/* I - Size name */
 
 
 /*
- * End of "$Id: page.c,v 1.4 1999/02/05 17:40:54 mike Exp $".
+ * End of "$Id: page.c,v 1.5 1999/03/21 02:10:06 mike Exp $".
  */

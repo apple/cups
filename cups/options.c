@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c,v 1.3 1999/03/01 22:24:24 mike Exp $"
+ * "$Id: options.c,v 1.4 1999/03/21 02:10:05 mike Exp $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -27,6 +27,7 @@
  *   cupsFreeOptions()  - Free all memory used by options.
  *   cupsGetOption()    - Get an option value.
  *   cupsParseOptions() - Parse options from a command-line argument.
+ *   cupsMarkOptions()  - Mark command-line options in a PPD file.
  */
 
 /*
@@ -268,5 +269,65 @@ cupsParseOptions(char          *arg,		/* I - Argument to parse */
 
 
 /*
- * End of "$Id: options.c,v 1.3 1999/03/01 22:24:24 mike Exp $".
+ * 'cupsMarkOptions()' - Mark command-line options in a PPD file.
+ */
+
+int						/* O - 1 if conflicting */
+cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
+                int           num_options,	/* I - Number of options */
+                cups_option_t *options)		/* I - Options */
+{
+  int	i;					/* Looping var */
+  int	conflict;				/* Option conflicts */
+  char	media_size[64];				/* Updated media size */
+
+
+  conflict = 0;
+
+  for (i = num_options; i > 0; i --, options ++)
+    if (strcmp(options->name, "media-size") == 0)
+    {
+      strcpy(media_size, options->value);
+
+      if (strncmp(options->value, "us-", 3) == 0)
+      {
+        strcpy(media_size, media_size + 3);
+	media_size[0] = toupper(media_size[0]);
+      }
+      else if (strncmp(options->value, "iso-", 4) == 0)
+      {
+        strcpy(media_size, media_size + 4);
+	media_size[0] = toupper(media_size[0]);
+      }
+
+      if (ppdMarkOption(ppd, "PageSize", media_size))
+        conflict = 1;
+    }
+    else if (strcmp(options->name, "sides") == 0)
+    {
+      if (strcmp(options->value, "one-sided") == 0)
+      {
+        if (ppdMarkOption(ppd, "Duplex", "None"))
+	  conflict = 1;
+      }
+      else if (strcmp(options->value, "two-sided-long-edge") == 0)
+      {
+        if (ppdMarkOption(ppd, "Duplex", "NoTumble"))
+	  conflict = 1;
+      }
+      else if (strcmp(options->value, "two-sided-short-edge") == 0)
+      {
+        if (ppdMarkOption(ppd, "Duplex", "Tumble"))
+	  conflict = 1;
+      }
+    }
+    else if (ppdMarkOption(ppd, options->name, options->value))
+      conflict = 1;
+
+  return (conflict);
+}
+
+
+/*
+ * End of "$Id: options.c,v 1.4 1999/03/21 02:10:05 mike Exp $".
  */

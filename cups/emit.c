@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.8 1999/02/20 16:04:33 mike Exp $"
+ * "$Id: emit.c,v 1.9 1999/03/21 02:10:01 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -79,25 +79,31 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
 
       if (fprintf(fp, "%%%%BeginFeature: %s %s\n",
                   ((ppd_option_t *)choices[i]->option)->keyword,
-		  choices[i]->choice) < 1)
+		  choices[i]->choice) < 0)
       {
         free(choices);
         return (-1);
       }
 
-      if (fputs((char *)choices[i]->code, fp) < 1)
+      if (choices[i]->code[0] != '\0')
       {
-        free(choices);
-        return (-1);
+        if (fputs((char *)choices[i]->code, fp) < 0)
+        {
+          free(choices);
+          return (-1);
+        }
+
+        if (choices[i]->code[strlen(choices[i]->code) - 1] != '\n')
+          putc('\n', fp);
       }
 
-      if (fputs("%%EndFeature\n", fp) < 1)
+      if (fputs("%%EndFeature\n", fp) < 0)
       {
         free(choices);
         return (-1);
       }
     }
-    else if (fputs((char *)choices[i]->code, fp) < 1)
+    else if (fputs((char *)choices[i]->code, fp) < 0)
     {
       free(choices);
       return (-1);
@@ -215,33 +221,6 @@ ppd_collect(ppd_file_t    *ppd,		/* I - PPD file data */
   * Loop through all options and add choices as needed...
   */
 
-  for (i = ppd->num_jcls, o = ppd->jcls; i > 0; i --, o ++)
-    if (o->section == section)
-      for (j = o->num_choices, c = o->choices; j > 0; j --, c ++)
-	if (c->marked && count < 1000)
-	{
-          collect[count] = c;
-	  count ++;
-	}
-
-  for (i = ppd->num_options, o = ppd->options; i > 0; i --, o ++)
-    if (o->section == section)
-      for (j = o->num_choices, c = o->choices; j > 0; j --, c ++)
-	if (c->marked && count < 1000)
-	{
-          collect[count] = c;
-	  count ++;
-	}
-
-  for (i = ppd->num_nonuis, o = ppd->nonuis; i > 0; i --, o ++)
-    if (o->section == section)
-      for (j = o->num_choices, c = o->choices; j > 0; j --, c ++)
-	if (c->marked && count < 1000)
-	{
-          collect[count] = c;
-	  count ++;
-	}
-
   for (i = ppd->num_groups, g = ppd->groups; i > 0; i --, g ++)
   {
     for (j = g->num_options, o = g->options; j > 0; j --, o ++)
@@ -292,5 +271,5 @@ ppd_collect(ppd_file_t    *ppd,		/* I - PPD file data */
 
 
 /*
- * End of "$Id: emit.c,v 1.8 1999/02/20 16:04:33 mike Exp $".
+ * End of "$Id: emit.c,v 1.9 1999/03/21 02:10:01 mike Exp $".
  */

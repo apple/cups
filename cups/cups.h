@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h,v 1.5 1999/02/26 15:10:22 mike Exp $"
+ * "$Id: cups.h,v 1.6 1999/03/21 02:10:00 mike Exp $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -117,6 +117,8 @@ extern char		*cupsGetOption(char *name, int num_options,
 			               cups_option_t *options);
 extern int		cupsParseOptions(char *arg, int num_options,
 			                 cups_option_t **options);
+extern int		cupsMarkOptions(ppd_file_t *ppd, int num_options,
+			                cups_option_t *options);
 
 #  ifdef _cplusplus
 }
@@ -125,5 +127,5 @@ extern int		cupsParseOptions(char *arg, int num_options,
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.5 1999/02/26 15:10:22 mike Exp $".
+ * End of "$Id: cups.h,v 1.6 1999/03/21 02:10:00 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.h,v 1.1 1999/03/11 19:59:25 mike Exp $"
+ * "$Id: raster.h,v 1.2 1999/03/21 02:10:07 mike Exp $"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -39,6 +39,7 @@
  */
 
 #  define CUPS_RASTER_SYNC	0x52615374	/* RaSt */
+#  define CUPS_RASTER_REVSYNC	0x74536152	/* tSaR */
 
 
 /*
@@ -47,51 +48,79 @@
 
 typedef enum
 {
-  CUPS_FALSE,
-  CUPS_TRUE
+  CUPS_RASTER_READ,			/* Open stream for reading */
+  CUPS_RASTER_WRITE			/* Open stream for writing */
+} cups_mode_t;
+
+typedef enum
+{
+  CUPS_FALSE,				/* Logical false */
+  CUPS_TRUE				/* Logical true */
 } cups_bool_t;
 
 typedef enum
 {
-  CUPS_JOG_NONE,
-  CUPS_JOG_FILE,
-  CUPS_JOG_JOB,
-  CUPS_JOG_SET
+  CUPS_JOG_NONE,			/* Never move pages */
+  CUPS_JOG_FILE,			/* Move pages after this file */
+  CUPS_JOG_JOB,				/* Move pages after this job */
+  CUPS_JOG_SET				/* Move pages after this set */
 } cups_jog_t;
 
 typedef enum
 {
-  CUPS_ORIENT_0,
-  CUPS_ORIENT_90,
-  CUPS_ORIENT_180,
-  CUPS_ORIENT_270
+  CUPS_ORIENT_0,			/* Don't rotate the page */
+  CUPS_ORIENT_90,			/* Rotate the page counter-clockwise */
+  CUPS_ORIENT_180,			/* Turn the page upside down */
+  CUPS_ORIENT_270			/* Rotate the page clockwise */
 } cups_orient_t;
 
 typedef enum
 {
-  CUPS_CUT_NONE,
-  CUPS_CUT_FILE,
-  CUPS_CUT_JOB,
-  CUPS_CUT_SET,
-  CUPS_CUT_PAGE
+  CUPS_CUT_NONE,			/* Never cut the roll */
+  CUPS_CUT_FILE,			/* Cut the roll after this file */
+  CUPS_CUT_JOB,				/* Cut the roll after this job */
+  CUPS_CUT_SET,				/* Cut the roll after this set */
+  CUPS_CUT_PAGE				/* Cut the roll after this page */
 } cups_cut_t;
 
 typedef enum
 {
-  CUPS_ADVANCE_NONE,
-  CUPS_ADVANCE_FILE,
-  CUPS_ADVANCE_JOB,
-  CUPS_ADVANCE_SET,
-  CUPS_ADVANCE_PAGE
+  CUPS_ADVANCE_NONE,			/* Never advance the roll */
+  CUPS_ADVANCE_FILE,			/* Advance the roll after this file */
+  CUPS_ADVANCE_JOB,			/* Advance the roll after this job */
+  CUPS_ADVANCE_SET,			/* Advance the roll after this set */
+  CUPS_ADVANCE_PAGE			/* Advance the roll after this page */
 } cups_adv_t;
 
 typedef enum
 {
-  CUPS_COLOR_CMYK = -4,
-  CUPS_COLOR_CMY,
-  CUPS_COLOR_GRAY = -1,
-  CUPS_COLOR_RGB = 3
-} cups_color_t;
+  CUPS_EDGE_TOP,			/* Leading edge is the top of the page */
+  CUPS_EDGE_RIGHT,			/* Leading edge is the right of the page */
+  CUPS_EDGE_BOTTOM,			/* Leading edge is the bottom of the page */
+  CUPS_EDGE_LEFT			/* Leading edge is the left of the page */
+} cups_edge_t;
+
+typedef enum
+{
+  CUPS_ORDER_SEPARATE,			/* CMYK CMYK CMYK ... */
+  CUPS_ORDER_BANDED,			/* CCC MMM YYY KKK ... */
+  CUPS_ORDER_PLANAR			/* CCC ... MMM ... YYY ... KKK ... */
+} cups_order_t;
+
+typedef enum
+{
+  CUPS_CSPACE_W,			/* Luminance */
+  CUPS_CSPACE_RGB,			/* Red, green, blue */
+  CUPS_CSPACE_RGBA,			/* Red, green, blue, alpha */
+  CUPS_CSPACE_K,			/* Black */
+  CUPS_CSPACE_CMY,			/* Cyan, magenta, yellow */
+  CUPS_CSPACE_YMC,			/* Yellow, magenta, cyan */
+  CUPS_CSPACE_CMYK,			/* Cyan, magenta, yellow, black */
+  CUPS_CSPACE_YMCK,			/* Yellow, magenta, cyan, black */
+  CUPS_CSPACE_KCMY,			/* Black, cyan, magenta, yellow */
+  CUPS_CSPACE_KCMYcm			/* Black, cyan, magenta, yellow, *
+					 * light-cyan, light-magenta     */
+} cups_cspace_t;
 
 
 /*
@@ -102,40 +131,76 @@ typedef enum
 
 typedef struct
 {
-  /**** Standard Page Device Dictionary Values ****/
+  /**** Standard Page Device Dictionary String Values ****/
+  char		MediaClass[64];		/* MediaClass string */
+  char		MediaColor[64];		/* MediaColor string */
+  char		MediaType[64];		/* MediaType string */
+  char		OutputType[64];		/* OutputType string */
+
+  /**** Standard Page Device Dictionary Integer Values ****/
   unsigned	AdvanceDistance;	/* AdvanceDistance value in pixels */
   cups_adv_t	AdvanceMedia;		/* AdvanceMedia value (see above) */
   cups_bool_t	Collate;		/* Collated copies value */
   cups_cut_t	CutMedia;		/* CutMedia value (see above) */
   cups_bool_t	Duplex;			/* Duplexed (double-sided) value */
+  unsigned	HWResolution[2];	/* Resolution in dots-per-inch */
+  unsigned	ImagingBoundingBox[4];	/* Pixel region that is painted */
+  cups_bool_t	InsertSheet;		/* InsertSheet value */
   cups_jog_t	Jog;			/* Jog value (see above) */
+  cups_edge_t	LeadingEdge;		/* LeadingEdge value (see above) */
   unsigned	Margins[2];		/* Lower-lefthand margins in pixels */
   cups_bool_t	ManualFeed;		/* ManualFeed value */
-  char		MediaColor[64];		/* MediaColor string */
   unsigned	MediaPosition;		/* MediaPosition value */
-  char		MediaType[64];		/* MediaType string */
   unsigned	MediaWeight;		/* MediaWeight value in grams/m^2 */
   cups_bool_t	MirrorPrint;		/* MirrorPrint value */
   cups_bool_t	NegativePrint;		/* NegativePrint value */
   unsigned	NumCopies;		/* Number of copies to produce */
   cups_orient_t	Orientation;		/* Orientation value (see above) */
   cups_bool_t	OutputFaceUp;		/* OutputFaceUp value */
-  char		OutputType[64];		/* OutputType string */
-  unsigned	ImagingBoundingBox[4];	/* Pixel region that is painted */
-  unsigned	HWResolution[2];	/* Resolution in dots-per-inch */
   cups_bool_t	Separations;		/* Separations value */
   cups_bool_t	TraySwitch;		/* TraySwitch value */
   cups_bool_t	Tumble;			/* Tumble value */
   unsigned	PageSize[2];		/* Width and length of page in pixels */
-  cups_color_t	ProcessColorModel;	/* ProcessColorModel value (see above) */
 
   /**** CUPS Page Device Dictionary Values ****/
-  unsigned	
+  unsigned	cupsBitsPerColor;	/* Number of bits for each color */
+  unsigned	cupsBitsPerPixel;	/* Number of bits for each pixel */
+  unsigned	cupsBytesPerLine;	/* Number of bytes per line */
+  cups_order_t	cupsColorOrder;		/* Order of colors */
+  cups_cspace_t	cupsColorSpace;		/* True colorspace */
 } cups_page_header_t;
 
+
+/*
+ * The raster structure maintains information about a raster data
+ * stream...
+ */
+
+typedef struct
+{
+  unsigned	sync;			/* Sync word from start of stream */
+  int		fd;			/* File descriptor */
+  cups_mode_t	mode;			/* Read/write mode */
+} cups_raster_t;
+
+
+/*
+ * Prototypes...
+ */
+
+extern void		cupsRasterClose(cups_raster_t *r);
+extern cups_raster_t	*cupsRasterOpen(int fd, cups_mode_t mode);
+extern unsigned		cupsRasterReadHeader(cups_raster_t *r,
+			                     cups_page_header_t *h);
+extern unsigned		cupsRasterReadPixels(cups_raster_t *r,
+			                     unsigned char *p, unsigned len);
+extern unsigned		cupsRasterWriteHeader(cups_raster_t *r,
+			                      cups_page_header_t *h);
+extern unsigned		cupsRasterWritePixels(cups_raster_t *r,
+			                      unsigned char *p, unsigned len);
 
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h,v 1.1 1999/03/11 19:59:25 mike Exp $".
+ * End of "$Id: raster.h,v 1.2 1999/03/21 02:10:07 mike Exp $".
  */

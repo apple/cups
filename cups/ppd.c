@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.7 1999/03/01 20:51:53 mike Exp $"
+ * "$Id: ppd.c,v 1.8 1999/03/21 02:10:06 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -84,7 +84,6 @@ ppdClose(ppd_file_t *ppd)	/* I - PPD file record */
   int		i;		/* Looping var */
   ppd_emul_t	*emul;		/* Current emulation */
   ppd_group_t	*group;		/* Current group */
-  ppd_option_t	*option;	/* Current option */
   char		**font;		/* Current font */
 
 
@@ -124,18 +123,6 @@ ppdClose(ppd_file_t *ppd)	/* I - PPD file record */
   }
 
  /*
-  * Free any JCLs...
-  */
-
-  if (ppd->num_jcls > 0)
-  {
-    for (i = ppd->num_jcls, option = ppd->jcls; i > 0; i --, option ++)
-      ppd_free_option(option);
-
-    free(ppd->jcls);
-  }
-
- /*
   * Free any UI groups, subgroups, and options...
   */
 
@@ -145,18 +132,6 @@ ppdClose(ppd_file_t *ppd)	/* I - PPD file record */
       ppd_free_group(group);
 
     free(ppd->groups);
-  }
-
- /*
-  * Free any Non-UI options...
-  */
-
-  if (ppd->num_nonuis > 0)
-  {
-    for (i = ppd->num_nonuis, option = ppd->nonuis; i > 0; i --, option ++)
-      ppd_free_option(option);
-
-    free(ppd->nonuis);
   }
 
  /*
@@ -257,7 +232,7 @@ ppd_free_option(ppd_option_t *option)	/* I - Option to free */
 ppd_file_t *			/* O - PPD file record */
 ppdOpen(FILE *fp)		/* I - File to read from */
 {
-  int		i;		/* Looping var */
+  int		i, j, k, m;	/* Looping vars */
   int		count;		/* Temporary count */
   ppd_file_t	*ppd;		/* PPD file record */
   ppd_group_t	*group,		/* Current group */
@@ -424,6 +399,10 @@ ppdOpen(FILE *fp)		/* I - File to read from */
         ppd->colorspace = PPD_CS_CMYK;
       else if (strcmp((char *)string, "RGB") == 0)
         ppd->colorspace = PPD_CS_RGB;
+      else if (strcmp((char *)string, "RGBK") == 0)
+        ppd->colorspace = PPD_CS_RGBK;
+      else if (strcmp((char *)string, "N") == 0)
+        ppd->colorspace = PPD_CS_N;
       else
         ppd->colorspace = PPD_CS_GRAY;
     }
@@ -530,91 +509,60 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	option += subgroup->num_options;
 	subgroup->num_options ++;
       }
-      else if (group != NULL)
-      {
-        if (group->num_options == 0)
-	  option = malloc(sizeof(ppd_option_t));
-	else
-	  option = realloc(group->options,
-	                   (group->num_options + 1) * sizeof(ppd_option_t));
-
-        if (option == NULL)
-	{
-	  ppdClose(ppd);
-	  free(string);
-	  return (NULL);
-	}
-
-        group->options = option;
-	option += group->num_options;
-	group->num_options ++;
-      }
-      else if (strcmp(name, "Collate") != 0 &&
-               strcmp(name, "Duplex") != 0 &&
-               strcmp(name, "InputSlot") != 0 &&
-               strcmp(name, "ManualFeed") != 0 &&
-               strcmp(name, "MediaType") != 0 &&
-               strcmp(name, "MediaColor") != 0 &&
-               strcmp(name, "MediaWeight") != 0 &&
-               strcmp(name, "OutputBin") != 0 &&
-               strcmp(name, "OutputMode") != 0 &&
-               strcmp(name, "OutputOrder") != 0 &&
-	       strcmp(name, "PageSize") != 0 &&
-               strcmp(name, "PageRegion") != 0)
-      {
-        for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
-	  if (strcmp((char *)group->text, "Printer") == 0)
-	    break;
-
-	if (i <= 0)
-	{
-	  if (ppd->num_groups == 0)
-	    group = malloc(sizeof(ppd_group_t));
-	  else
-	    group = realloc(ppd->groups,
-	                    (ppd->num_groups + 1) * sizeof(ppd_group_t));
-
-	  if (group == NULL)
-	  {
-	    ppdClose(ppd);
-	    free(string);
-	    return (NULL);
-	  }
-
-	  ppd->groups = group;
-	  group += ppd->num_groups;
-	  ppd->num_groups ++;
-
-	  memset(group, 0, sizeof(ppd_group_t));
-
-	  strcpy((char *)group->text, "Printer");
-        }
-
-        if (group->num_options == 0)
-	  option = malloc(sizeof(ppd_option_t));
-	else
-	  option = realloc(group->options,
-	                   (group->num_options + 1) * sizeof(ppd_option_t));
-
-        if (option == NULL)
-	{
-	  ppdClose(ppd);
-	  free(string);
-	  return (NULL);
-	}
-
-        group->options = option;
-	option += group->num_options;
-	group->num_options ++;
-        group = NULL;
-      }
       else
       {
-        if (ppd->num_options == 0)
+        if (group == NULL)
+	{
+          if (strcmp(name, "Collate") != 0 &&
+              strcmp(name, "Duplex") != 0 &&
+              strcmp(name, "InputSlot") != 0 &&
+              strcmp(name, "ManualFeed") != 0 &&
+              strcmp(name, "MediaType") != 0 &&
+              strcmp(name, "MediaColor") != 0 &&
+              strcmp(name, "MediaWeight") != 0 &&
+              strcmp(name, "OutputBin") != 0 &&
+              strcmp(name, "OutputMode") != 0 &&
+              strcmp(name, "OutputOrder") != 0 &&
+	      strcmp(name, "PageSize") != 0 &&
+              strcmp(name, "PageRegion") != 0)
+	    nameptr = "Printer";
+	  else
+	    nameptr = "General";
+
+          for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
+	    if (strcmp((char *)group->text, nameptr) == 0)
+	      break;
+
+	  if (i <= 0)
+	  {
+	    if (ppd->num_groups == 0)
+	      group = malloc(sizeof(ppd_group_t));
+	    else
+	      group = realloc(ppd->groups,
+	                      (ppd->num_groups + 1) * sizeof(ppd_group_t));
+
+	    if (group == NULL)
+	    {
+	      ppdClose(ppd);
+	      free(string);
+	      return (NULL);
+	    }
+
+	    ppd->groups = group;
+	    group += ppd->num_groups;
+	    ppd->num_groups ++;
+
+	    memset(group, 0, sizeof(ppd_group_t));
+
+	    strcpy((char *)group->text, nameptr);
+          }
+	}
+
+        if (group->num_options == 0)
 	  option = malloc(sizeof(ppd_option_t));
 	else
-	  option = realloc(ppd->options,
-	                   (ppd->num_options + 1) * sizeof(ppd_option_t));
+	  option = realloc(group->options,
+	                   (group->num_options + 1) * sizeof(ppd_option_t));
 
         if (option == NULL)
 	{
@@ -623,9 +571,13 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	  return (NULL);
 	}
 
-        ppd->options = option;
-	option += ppd->num_options;
-	ppd->num_options ++;
+        group->options = option;
+	option += group->num_options;
+	group->num_options ++;
+
+        if (strcmp((char *)group->text, "General") == 0 ||
+	    strcmp((char *)group->text, "Printer") == 0)
+	  group = NULL;
       }
 
      /*
@@ -649,17 +601,56 @@ ppdOpen(FILE *fp)		/* I - File to read from */
     else if (strcmp(keyword, "JCLOpenUI") == 0)
     {
      /*
+      * Find the JCL group, and add if needed...
+      */
+
+      if (group != NULL)
+      {
+        ppdClose(ppd);
+	free(string);
+	return (NULL);
+      }
+
+      for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
+        if (strcmp((char *)group->text, "JCL") == 0)
+	  break;
+
+      if (i <= 0)
+      {
+	if (ppd->num_groups == 0)
+	  group = malloc(sizeof(ppd_group_t));
+	else
+	  group = realloc(ppd->groups,
+	                  (ppd->num_groups + 1) * sizeof(ppd_group_t));
+
+	if (group == NULL)
+	{
+	  ppdClose(ppd);
+	  free(string);
+	  return (NULL);
+	}
+
+	ppd->groups = group;
+	group += ppd->num_groups;
+	ppd->num_groups ++;
+
+	memset(group, 0, sizeof(ppd_group_t));
+
+	strcpy((char *)group->text, "JCL");
+      }
+
+     /*
       * Add an option record to the current JCLs...
       */
 
       if (name[0] == '*')
         strcpy(name, name + 1);
 
-      if (ppd->num_jcls == 0)
+      if (group->num_options == 0)
 	option = malloc(sizeof(ppd_option_t));
       else
-	option = realloc(ppd->jcls,
-	                 (ppd->num_jcls + 1) * sizeof(ppd_option_t));
+	option = realloc(group->options,
+	                 (group->num_options + 1) * sizeof(ppd_option_t));
 
       if (option == NULL)
       {
@@ -668,9 +659,9 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	return (NULL);
       }
 
-      ppd->jcls = option;
-      option += ppd->num_jcls;
-      ppd->num_jcls ++;
+      group->options = option;
+      option += group->num_options;
+      group->num_options ++;
 
      /*
       * Now fill in the initial information for the option...
@@ -689,6 +680,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       strcpy((char *)option->text, (char *)text);
 
       option->section = PPD_ORDER_JCL;
+      group = NULL;
     }
     else if (strcmp(keyword, "CloseUI") == 0 ||
              strcmp(keyword, "JCLCloseUI") == 0)
@@ -800,13 +792,20 @@ ppdOpen(FILE *fp)		/* I - File to read from */
         * Only valid for Non-UI options...
 	*/
 
-        for (i = 0; i < ppd->num_nonuis; i ++)
-	  if (strcmp(keyword, ppd->nonuis[i].keyword) == 0)
-	  {
-	    ppd->nonuis[i].section = section;
-	    ppd->nonuis[i].order   = order;
+        for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
+          if (group->text[0] == '\0')
 	    break;
-	  }
+
+        if (i > 0)
+          for (i = 0; i < group->num_options; i ++)
+	    if (strcmp(keyword, group->options[i].keyword) == 0)
+	    {
+	      group->options[i].section = section;
+	      group->options[i].order   = order;
+	      break;
+	    }
+
+        group = NULL;
       }
       else
       {
@@ -816,18 +815,28 @@ ppdOpen(FILE *fp)		/* I - File to read from */
     }
     else if (strncmp(keyword, "Default", 7) == 0)
     {
+      if (strchr((char *)string, '/') != NULL)
+        *strchr((char *)string, '/') = '\0';
+
       if (option == NULL)
       {
        /*
         * Only valid for Non-UI options...
 	*/
 
-        for (i = 0; i < ppd->num_nonuis; i ++)
-	  if (strcmp(keyword + 7, ppd->nonuis[i].keyword) == 0)
-	  {
-	    strcpy(ppd->nonuis[i].defchoice, (char *)string);
+        for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
+          if (group->text[0] == '\0')
 	    break;
-	  }
+
+        if (i > 0)
+          for (i = 0; i < group->num_options; i ++)
+	    if (strcmp(keyword, group->options[i].keyword) == 0)
+	    {
+	      strcpy(group->options[i].defchoice, (char *)string);
+	      break;
+	    }
+
+        group = NULL;
       }
       else
         strcpy(option->defchoice, (char *)string);
@@ -964,7 +973,6 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 
       memset(choice, 0, sizeof(ppd_choice_t));
 
-      choice->option = (void *)option;
       strcpy(choice->choice, name);
 
       if (mask & PPD_TEXT)
@@ -991,6 +999,30 @@ ppdOpen(FILE *fp)		/* I - File to read from */
   if (!feof(fp))
     printf("Premature EOF at %d...\n", ftell(fp));
 #endif /* DEBUG */
+
+ /*
+  * Set the option back-pointer for each choice...
+  */
+
+  for (i = ppd->num_groups, group = ppd->groups;
+       i > 0;
+       i --, group ++)
+  {
+    for (j = group->num_options, option = group->options;
+         j > 0;
+	 j --, option ++)
+      for (k = 0; k < option->num_choices; k ++)
+        option->choices[k].option = (void *)option;
+
+    for (j = group->num_subgroups, subgroup = group->subgroups;
+         j > 0;
+	 j --, subgroup ++)
+      for (k = group->num_options, option = group->options;
+           k > 0;
+	   k --, option ++)
+        for (m = 0; m < option->num_choices; m ++)
+          option->choices[m].option = (void *)option;
+  }
 
   return (ppd);
 }
@@ -1240,7 +1272,7 @@ ppd_read(FILE          *fp,	/* I - File to read from */
       * Get string...
       */
 
-      *string = malloc(strlen((char *)lineptr));
+      *string = malloc(strlen((char *)lineptr) + 1);
 
       while (*lineptr == ':' || isspace(*lineptr))
         lineptr ++;
@@ -1256,6 +1288,7 @@ ppd_read(FILE          *fp,	/* I - File to read from */
       }
 
       *strptr = '\0';
+
       mask |= PPD_STRING;
     }
   }
@@ -1320,5 +1353,5 @@ ppd_decode(unsigned char *string)	/* I - String to decode */
 
 
 /*
- * End of "$Id: ppd.c,v 1.7 1999/03/01 20:51:53 mike Exp $".
+ * End of "$Id: ppd.c,v 1.8 1999/03/21 02:10:06 mike Exp $".
  */

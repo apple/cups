@@ -64,7 +64,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I ".." /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /I ".." /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -113,11 +113,19 @@ SOURCE=.\mime.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\options.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\page.c
 # End Source File
 # Begin Source File
 
 SOURCE=.\ppd.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\raster.c
 # End Source File
 # Begin Source File
 
@@ -149,11 +157,19 @@ SOURCE=.\ipp.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\language.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\mime.h
 # End Source File
 # Begin Source File
 
 SOURCE=.\ppd.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\raster.h
 # End Source File
 # End Group
 # End Target

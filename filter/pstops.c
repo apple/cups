@@ -1,46 +1,28 @@
 /*
- * "$Id: pstops.c,v 1.7 1999/02/01 17:27:15 mike Exp $"
+ * "$Id: pstops.c,v 1.8 1999/03/21 02:10:14 mike Exp $"
  *
- *   PostScript filter for espPrint, a collection of printer drivers.
+ *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1997 by Easy Software Products
+ *   Copyright 1993-1999 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs contain
- *   unpublished proprietary information of Easy Software Products, and
- *   are protected by Federal copyright law.  They may not be disclosed
- *   to third parties or copied or duplicated in any form, in whole or
- *   in part, without the prior written consent of Easy Software Products.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
  *
- *
- * Revision History:
- *
- *   $Log: pstops.c,v $
- *   Revision 1.7  1999/02/01 17:27:15  mike
- *   Updated to accept color profile option.
- *
- *   Revision 1.6  1999/01/26  14:34:52  mike
- *   Updated to filter out BeginFeature/EndFeature commands.
- *
- *   Revision 1.5  1998/12/16  16:35:25  mike
- *   Updated to support landscape 2-up and 4-up printing.
- *
- *   Revision 1.4  1998/01/15  15:35:22  mike
- *   Updated gamma/brightness code to support full CMYK.
- *   Fixed to not disable settransfer and setcolortransfer.
- *   Fixed to not redefine settransfer and setcolortransfer (damn Adobe!)
- *
- *   Revision 1.3  1997/06/19  20:05:05  mike
- *   Optimized code so that non-filtered output is just copied to stdout.
- *
- *   Revision 1.2  1996/10/23  20:06:28  mike
- *   Added gamma and brightness correction.
- *   Added 1/2/4up printing.
- *   Added 'userdict' code around gamma/brightness stuff.
- *
- *   Revision 1.1  1996/09/30  18:43:52  mike
- *   Initial revision
  */
 
 /*
@@ -52,29 +34,37 @@
 #include <string.h>
 #include <errno.h>
 #include <ctype.h>
-#include <unistd.h>
-#include <pod.h>
-#include <errorcodes.h>
-#include <printutil.h>
 
+#if defined(WIN32) || defined(__EMX__)
+#  include <io.h>
+#else
+#  include <unistd.h>
+#endif /* WIN32 || __EMX__ */
+
+#include <cups/cups.h>
+#include <cups/language.h>
+#include <cups/string.h>
+
+
+/*
+ * Constants...
+ */
 
 #define MAX_PAGES	10000
-#define FALSE		0
-#define TRUE		(!FALSE)
 
-int	PrintNumPages = 0;
-long	PrintPages[MAX_PAGES];
-int	PrintEvenPages = 1,
-	PrintOddPages = 1,
-	PrintReversed = 0,
-	PrintColor = 0,
-	PrintWidth = 612,
-	PrintLength = 792,
-	PrintFlip = 0;
-char	*PrintRange = NULL;
-int	Verbosity = 0;
-float	ColorProfile[6] =			/* Color profile */
-        { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };
+
+/*
+ * Globals...
+ */
+
+int	NumPages = 0;		/* Number of pages in file */
+size_t	Pages[MAX_PAGES];	/* Offsets to each page */
+char	*PageRanges = NULL;	/* Range of pages selected */
+char	*PageSet = NULL;	/* All, Even, Odd pages */
+int	Reversed = 0,		/* Reverse pages */
+	Flip = 0;		/* Flip/mirror pages */
+float	Width = 612.0f,		/* Total page width */
+	Height = 792.0f;	/* Total page height */
 
 
 /*
@@ -846,5 +836,5 @@ main(int  argc,
 
 
 /*
- * End of "$Id: pstops.c,v 1.7 1999/02/01 17:27:15 mike Exp $".
+ * End of "$Id: pstops.c,v 1.8 1999/03/21 02:10:14 mike Exp $".
  */

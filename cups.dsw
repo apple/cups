@@ -15,6 +15,30 @@ Package=<4>
 
 ###############################################################################
 
+Project: "hpgltops"=.\filter\hpgltops.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "pstops"=.\filter\pstops.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "testmime"=.\cups\testmime.dsp - Package Owner=<4>
 
 Package=<5>
@@ -31,6 +55,21 @@ Package=<4>
 ###############################################################################
 
 Project: "testppd"=.\cups\testppd.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name cups
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "texttops"=.\filter\texttops.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

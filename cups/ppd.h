@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.5 1999/02/05 17:40:55 mike Exp $"
+ * "$Id: ppd.h,v 1.6 1999/03/21 02:10:06 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -15,7 +15,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -77,7 +77,9 @@ typedef enum			/**** Colorspaces ****/
   PPD_CS_CMYK = -4,		/* CMYK colorspace */
   PPD_CS_CMY,			/* CMY colorspace */
   PPD_CS_GRAY = 1,		/* Grayscale colorspace */
-  PPD_CS_RGB = 3		/* RGB colorspace */
+  PPD_CS_RGB = 3,		/* RGB colorspace */
+  PPD_CS_RGBK,			/* RGBK (K = gray) colorspace */
+  PPD_CS_N			/* DeviceN colorspace */
 } ppd_cs_t;
 
 typedef struct			/**** Option choices ****/
@@ -122,6 +124,7 @@ typedef struct			/**** Constraints ****/
 
 typedef struct			/**** Page Sizes ****/
 {
+  int		marked;		/* Page size selected? */
   char		name[41];	/* Media size option */
   float		width,		/* Width of media in points */
 		length,		/* Length of media in points */
@@ -153,8 +156,6 @@ typedef struct			/**** File ****/
   unsigned char	*jcl_begin,	/* Start JCL commands */
 		*jcl_ps,	/* Enter PostScript interpreter */
 		*jcl_end;	/* End JCL commands */
-  int		num_jcls;	/* Number of job control commands supported */
-  ppd_option_t	*jcls;		/* JCLs and the code to invoke them */
   char		*lang_encoding,	/* Language encoding */
 		*lang_version,	/* Language version (English, Spanish, etc.) */
 		*modelname,	/* Model name (general) */
@@ -165,10 +166,6 @@ typedef struct			/**** File ****/
 		*shortnickname;	/* Short version of nickname */
   int		num_groups;	/* Number of UI groups */
   ppd_group_t	*groups;	/* UI groups */
-  int		num_options;	/* Number of UI options (not in groups) */
-  ppd_option_t	*options;	/* UI options (not in groups) */
-  int		num_nonuis;	/* Number of non-UI options */
-  ppd_option_t	*nonuis;	/* Non-UI options */
   int		num_sizes;	/* Number of page sizes */
   ppd_size_t	*sizes,		/* Page sizes */
 		custom_min,	/* Minimum variable page size */
@@ -196,6 +193,7 @@ extern int		ppdIsMarked(ppd_file_t *ppd, char *keyword,
 extern void		ppdMarkDefaults(ppd_file_t *ppd);
 extern int		ppdMarkOption(ppd_file_t *ppd, char *keyword,
 			              char *option);
+extern ppd_option_t	*ppdFindOption(ppd_file_t *ppd, char *keyword);
 extern ppd_file_t	*ppdOpen(FILE *fp);
 extern ppd_file_t	*ppdOpenFd(int fd);
 extern ppd_file_t	*ppdOpenFile(char *filename);
@@ -213,5 +211,5 @@ extern float		ppdPageWidth(ppd_file_t *ppd, char *name);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.5 1999/02/05 17:40:55 mike Exp $".
+ * End of "$Id: ppd.h,v 1.6 1999/03/21 02:10:06 mike Exp $".
  */

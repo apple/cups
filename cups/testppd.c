@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c,v 1.6 1999/03/01 20:51:54 mike Exp $"
+ * "$Id: testppd.c,v 1.7 1999/03/21 02:10:08 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -50,9 +50,9 @@ main(int  argc,			/* I - Number of command-line arguments */
   ppd_group_t	*group;		/* UI group */
   ppd_option_t	*option;	/* Standard UI option */
   ppd_choice_t	*choice;	/* Standard UI option choice */
-  static char	*uis[] = { "PPD_UI_BOOLEAN", "PPD_UI_PICKONE", "PPD_UI_PICKMANY" };
-  static char	*sections[] = { "PPD_ORDER_ANY", "PPD_ORDER_DOCUMENT", "PPD_ORDER_EXIT",
-                                "PPD_ORDER_JCL", "PPD_ORDER_PAGE", "PPD_ORDER_PROLOG" };
+  static char	*uis[] = { "BOOLEAN", "PICKONE", "PICKMANY" };
+  static char	*sections[] = { "ANY", "DOCUMENT", "EXIT",
+                                "JCL", "PAGE", "PROLOG" };
 
 
  /*
@@ -102,18 +102,6 @@ main(int  argc,			/* I - Number of command-line arguments */
     for (j = 0; j < ppd->num_emulations; j ++)
       printf("        emulations[%d] = %s\n", j, ppd->emulations[j].name);
 
-    printf("    num_jcls = %d\n", ppd->num_jcls);
-    for (j = 0, option = ppd->jcls; j < ppd->num_jcls; j ++, option ++)
-    {
-      printf("        jcls[%d] = %s (%s) %s %s %.0f\n", j, option->keyword, option->text,
-             uis[option->ui], sections[option->section], option->order);
-
-      for (k = option->num_choices, choice = option->choices;
-	   k > 0;
-	   k --, choice ++)
-	printf("            %s (%s)\n", choice->choice, choice->text);
-    }
-
     printf("    lang_encoding = %s\n", ppd->lang_encoding);
     printf("    lang_version = %s\n", ppd->lang_version);
     printf("    modelname = %s\n", ppd->modelname);
@@ -126,36 +114,6 @@ main(int  argc,			/* I - Number of command-line arguments */
     printf("    patches = %d bytes\n",
            ppd->patches == NULL ? 0 : strlen((char *)ppd->patches));
 
-    printf("    num_options = %d\n", ppd->num_options);
-    for (j = 0, option = ppd->options; j < ppd->num_options; j ++, option ++)
-    {
-      printf("        option[%d] = %s (%s) %s %s %.0f\n", j, option->keyword,
-             option->text, uis[option->ui], sections[option->section], option->order);
-
-      if (strcmp(option->keyword, "PageSize") == 0 ||
-          strcmp(option->keyword, "PageRegion") == 0)
-      {
-        for (k = option->num_choices, choice = option->choices;
-	     k > 0;
-	     k --, choice ++)
-	{
-	  size = ppdPageSize(ppd, choice->choice);
-	  if (size == NULL)
-	    printf("            %s (%s) = ERROR\n", choice->choice, choice->text);
-          else
-	    printf("            %s (%s) = %.2fx%.2fin\n", choice->choice,
-	           choice->text, size->width / 72.0, size->length / 72.0);
-        }
-      }
-      else
-      {
-        for (k = option->num_choices, choice = option->choices;
-	     k > 0;
-	     k --, choice ++)
-	  printf("            %s (%s)\n", choice->choice, choice->text);
-      }
-    }
-
     printf("    num_groups = %d\n", ppd->num_groups);
     for (j = 0, group = ppd->groups; j < ppd->num_groups; j ++, group ++)
     {
@@ -163,13 +121,45 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       for (k = 0, option = group->options; k < group->num_options; k ++, option ++)
       {
-	printf("            options[%d] = %s (%s) %s %s %.0f\n", k, option->keyword,
-	       option->text, uis[option->ui], sections[option->section], option->order);
+	printf("            options[%d] = %s (%s) %s %s %.0f\n", k,
+	       option->keyword, option->text, uis[option->ui],
+	       sections[option->section], option->order);
 
-	for (m = option->num_choices, choice = option->choices;
-	     m > 0;
-	     m --, choice ++)
-	  printf("                %s (%s)\n", choice->choice, choice->text);
+        if (strcmp(option->keyword, "PageSize") == 0 ||
+            strcmp(option->keyword, "PageRegion") == 0)
+        {
+          for (m = option->num_choices, choice = option->choices;
+	       m > 0;
+	       m --, choice ++)
+	  {
+	    size = ppdPageSize(ppd, choice->choice);
+
+	    if (size == NULL)
+	      printf("                %s (%s) = ERROR", choice->choice, choice->text);
+            else
+	      printf("                %s (%s) = %.2fx%.2fin", choice->choice,
+	             choice->text, size->width / 72.0, size->length / 72.0);
+
+            if (strcmp(option->defchoice, choice->choice) == 0)
+	      puts(" *");
+	    else
+	      putchar('\n');
+          }
+	}
+	else
+	{
+	  for (m = option->num_choices, choice = option->choices;
+	       m > 0;
+	       m --, choice ++)
+	  {
+	    printf("                %s (%s)", choice->choice, choice->text);
+
+            if (strcmp(option->defchoice, choice->choice) == 0)
+	      puts(" *");
+	    else
+	      putchar('\n');
+	  }
+        }
       }
     }
 
@@ -181,5 +171,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c,v 1.6 1999/03/01 20:51:54 mike Exp $".
+ * End of "$Id: testppd.c,v 1.7 1999/03/21 02:10:08 mike Exp $".
  */

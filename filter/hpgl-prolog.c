@@ -1,159 +1,182 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.7 1999/03/06 18:02:26 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.8 1999/03/21 02:10:13 mike Exp $"
  *
- *   PostScript prolog routines for the HPGL2PS program for espPrint, a
- *   collection of printer drivers.
+ *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1998 by Easy Software Products
+ *   Copyright 1993-1999 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs contain
- *   unpublished proprietary information of Easy Software Products, and
- *   are protected by Federal copyright law.  They may not be disclosed
- *   to third parties or copied or duplicated in any form, in whole or
- *   in part, without the prior written consent of Easy Software Products.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
  *
- * Revision History:
- *
- *   $Log: hpgl-prolog.c,v $
- *   Revision 1.7  1999/03/06 18:02:26  mike
- *   Updated for CVS check-in.
- *
- *   Revision 1.6  1998/09/16  14:37:29  mike
- *   Fixed landscape printing bug.
- *   Fixed margins when page is rotated.
- *
- *   Revision 1.6  1998/09/16  14:37:29  mike
- *   Fixed landscape printing bug.
- *   Fixed margins when page is rotated.
- *
- *   Revision 1.5  1998/08/31  20:35:49  mike
- *   Updated pen width code to automatically adjust scaling as needed.
- *   Updated PS code to adjust width/height by a factor of 0.75 for better
- *   scaling of plots.
- *
- *   Revision 1.4  1998/03/17  21:43:10  mike
- *   Fixed grayscale mode - had red & blue reversed...
- *
- *   Revision 1.3  1998/03/10  16:49:58  mike
- *   Changed cftime call to strftime for portability.
- *   Added return values to OutputProlog and OutputTrailer.
- *
- *   Revision 1.2  1996/10/14  16:50:14  mike
- *   Updated for 3.2 release.
- *   Added 'blackplot', grayscale, and default pen width options.
- *   Added encoded polyline support.
- *   Added fit-to-page code.
- *   Added pen color palette support.
- *
- *   Revision 1.1  1996/08/24  19:41:24  mike
- *   Initial revision
+ *  OutputProlog()  - Output the PostScript prolog...
+ *  OutputTrailer() - Output the PostScript trailer...
+ *  Outputf()       - Write a formatted string to the output file, creating the
+ *                    page header as needed...
  */
 
 /*
  * Include necessary headers...
  */
 
-#include "hpgl2ps.h"
+#include "hpgltops.h"
+#include <stdarg.h>
 
-#define PROLOG_FILE	BASEDIR "/print/data/HPGLprolog"
 
+/*
+ * 'OutputProlog()' - Output the PostScript prolog...
+ */
 
-int
-OutputProlog(int   shading,
-             float penwidth)
+void
+OutputProlog(char  *title,	/* I - Job title */
+             int   shading,	/* I - Type of shading */
+             float penwidth)	/* I - Default pen width */
 {
-  FILE		*prolog;
-  char		line[255];
-  time_t	curtime;
-  struct tm	*curtm;
+  char		*server_root;	/* Root directory of server */
+  char		filename[1024];	/* Prolog filename */
+  FILE		*prolog;	/* Prolog file */
+  char		line[255];	/* Line from prolog file */
+  time_t	curtime;	/* Current time */
+  struct tm	*curtm;		/* Current date */
 
 
   curtime = time(NULL);
   curtm   = localtime(&curtime);
 
-  fputs("%!PS-Adobe-3.0\n", OutputFile);
-  fputs("%%Creator: hpgl2ps (ESP Print 3.2)\n", OutputFile);
+  puts("%!PS-Adobe-3.0");
+  puts("%%Creator: hpgltops/CUPS-" CUPS_VERSION "");
   strftime(line, sizeof(line), "%%%%CreationDate: %c\n", curtm);
-  fputs(line, OutputFile);
-  fputs("%%LanguageLevel: 1\n", OutputFile);
-  fputs("%%Pages: (atend)\n", OutputFile);
-  fprintf(OutputFile, "%%%%BoundingBox: %.0f %.0f %.0f %.0f\n",
-          PageLeft, PageBottom, PageWidth + PageLeft, PageHeight + PageBottom);
-  fputs("%%DocumentData: Clean7Bit\n", OutputFile);
-  fputs("%%EndComments\n", OutputFile);
-  fputs("%%BeginProlog\n", OutputFile);
-  fprintf(OutputFile, "/DefaultPenWidth %.2f def\n", penwidth * 72.0 / 25.4);
-  fputs("/PenScaling 1.0 def\n", OutputFile);
+  puts(line, OutputFile);
+  printf("%%LanguageLevel: %d\n", LanguageLevel);
+  puts("%%Pages: (atend)");
+  printf("%%%%BoundingBox: %.0f %.0f %.0f %.0f\n",
+          PageLeft, PageBottom, PageRight, PageTop);
+  puts("%%DocumentData: Clean7Bit");
+  puts("%%EndComments");
+  puts("%%BeginProlog");
+  printf("/DefaultPenWidth %.2f def\n", penwidth * 72.0 / 25.4);
   switch (shading)
   {
     case -1 : /* Black only */
-        fputs("/setrgbcolor { pop pop pop } bind def\n", OutputFile);
+        puts("/setrgbcolor { pop pop pop } bind def");
         break;
     case 0 : /* Greyscale */
-        fputs("/setrgbcolor { 0.08 mul exch 0.61 mul add exch 0.31 mul add setgray } bind def\n",
+        puts("/setrgbcolor { 0.08 mul exch 0.61 mul add exch 0.31 mul add setgray } bind def\n",
               OutputFile);
         break;
   };
 
-  if ((prolog = fopen(PROLOG_FILE, "r")) == NULL)
+  if ((server_root = getenv("SERVER_ROOT")) != NULL)
+    sprintf(filename, "%s/filter/HPGLprolog.dat", server_root);
+  else
+    strcpy(filename, "HPGLprolog.dat");
+
+  if ((prolog = fopen(filename, "r")) == NULL)
   {
-    fputs("hpgl2ps: Unable to open HPGL prolog \'" PROLOG_FILE "\' for reading!\n", stderr);
-    return (-1);
-  };
+    fprintf(stderr, "ERROR: Unable to open HPGL prolog \"%s\" for reading!\n",
+            filename);
+    return (1);
+  }
 
   while (fgets(line, sizeof(line), prolog) != NULL)
-    fputs(line, OutputFile);
+    puts(line, OutputFile);
 
   fclose(prolog);
 
-  fputs("%%EndProlog\n", OutputFile);
-  fputs("%%Page: 1\n", OutputFile);
-  fputs("gsave\n", OutputFile);
-
-  switch (PageRotation)
-  {
-    case 0 :
-        fprintf(OutputFile, "%.1f %.1f translate\n", PageLeft, PageBottom);
-	break;
-    case 90 :
-        fprintf(OutputFile, "%.1f %.1f translate\n", PageBottom, PageRight);
-	break;
-    case 180 :
-        fprintf(OutputFile, "%.1f %.1f translate\n", PageRight, PageTop);
-	break;
-    case 270 :
-        fprintf(OutputFile, "%.1f %.1f translate\n", PageTop, PageLeft);
-	break;
-  };
+  puts("%%EndProlog");
 
   IN_initialize(0, NULL);
-
-  return (0);
-}
-
-
-int
-OutputTrailer(void)
-{
-  fputs("grestore\n", OutputFile);
-  if (PageDirty)
-    fputs("showpage\n", OutputFile);
-  else
-    PageCount --;
-  fputs("%%EndPage\n", OutputFile);
-
-  fputs("%%BeginTrailer\n", OutputFile);
-  fprintf(OutputFile, "%%%%Pages: %d\n", PageCount);
-  fputs("%%EndTrailer\n", OutputFile);
-
-  fputs("%%EOF\n", OutputFile);
-
-  return (0);
 }
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.7 1999/03/06 18:02:26 mike Exp $".
+ * 'OutputTrailer()' - Output the PostScript trailer...
+ */
+
+void
+OutputTrailer(void)
+{
+  if (PageDirty)
+    PG_advance_page(0, NULL);
+
+  puts("%%BeginTrailer");
+  printf("%%%%Pages: %d\n", PageCount);
+  puts("%%EndTrailer");
+
+  puts("%%EOF");
+}
+
+
+/*
+ * 'Outputf()' - Write a formatted string to the output file, creating the
+ *               page header as needed...
+ */
+
+int				/* O - Number of bytes written */
+Outputf(const char *format,	/* I - Printf-style string */
+        ...)			/* I - Additional args as needed */
+{
+  va_list	ap;		/* Argument pointer */
+  int		bytes;		/* Number of bytes written */
+
+
+ /*
+  * Write the page header as needed...
+  */
+
+  if (!PageDirty)
+  {
+    PageDirty = 1;
+    PageCount ++;
+
+    printf("%%%%Page: %d %d\n", PageCount, PageCount);
+    printf("/PenScaling %.3f def\n", PenScaling);
+    puts("gsave");
+
+    switch (PageRotation)
+    {
+      case 0 :
+          printf("%.1f %.1f translate\n", PageLeft, PageBottom);
+	  break;
+      case 90 :
+          printf("%.1f %.1f translate\n", PageBottom, PageWidth - PageRight);
+	  break;
+      case 180 :
+          printf("%.1f %.1f translate\n", PageWidth - PageRight,
+	          PageLength - PageTop);
+	  break;
+      case 270 :
+          printf("%.1f %.1f translate\n", PageLength - PageTop, PageLeft);
+	  break;
+    }
+  }
+
+ /*
+  * Write the string to the output file...
+  */
+
+  va_start(ap, format);
+  bytes = vprintf(format, ap);
+  va_end(ap);
+
+  return (bytes);
+}
+
+
+/*
+ * End of "$Id: hpgl-prolog.c,v 1.8 1999/03/21 02:10:13 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: texttops.c,v 1.7 1999/03/11 20:55:05 mike Exp $"
+ * "$Id: texttops.c,v 1.8 1999/03/21 02:10:15 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-1999 by Easy Software Products.
+ *   Copyright 1993-1999 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -23,6 +23,15 @@
  *
  * Contents:
  *
+ *   check_range()    - Check to see if the current page is selected for
+ *                      printing.
+ *   getutf8()        - Get a UTF-8 encoded wide character...
+ *   write_epilogue() - Write the PostScript file epilogue.
+ *   write_line()     - Write a row of text.
+ *   write_page()     - Write a page of text.
+ *   write_prolog()   - Write the PostScript file prolog with options.
+ *   write_string()   - Write a string of text.
+ *   main()           - Main entry and processing of driver.
  */
 
 /*
@@ -35,7 +44,6 @@
 #include <errno.h>
 
 #include <cups/cups.h>
-#include <cups/ppd.h>
 #include <cups/language.h>
 #include <cups/string.h>
 
@@ -54,10 +62,9 @@
  */
 
 typedef struct			/**** Character/attribute structure... ****/
-
 {
-  short	ch,			/* Character */
-	attr;			/* Any attributes */
+  unsigned short ch,		/* Character */
+		attr;		/* Any attributes */
 } lchar_t;
 
 
@@ -65,31 +72,108 @@ typedef struct			/**** Character/attribute structure... ****/
  * Globals...
  */
 
-int	Verbosity = 0,		/* Be verbose? */
-	WrapLines = 1;		/* Wrap text in lines */
-int	SizeLines = 60,		/* Number of lines on a page */
+int	WrapLines = 0,		/* Wrap text in lines */
+	SizeLines = 60,		/* Number of lines on a page */
 	SizeColumns = 80,	/* Number of columns on a line */
 	PageColumns = 1,	/* Number of columns on a page */
 	ColumnGutter = 0,	/* Number of characters between text columns */
-	ColumnWidth = 80;	/* Width of each column */
+	ColumnWidth = 80,	/* Width of each column */
+	Landscape = 0,		/* Landscape orientation? */
+	Duplex = 0;		/* Duplexed? */
 lchar_t	**Page = NULL;		/* Page characters */
-int	NumPages = 0;		/* Number of pages in document */
+int	NumPages = 0,		/* Number of pages in document */
+	PageNumber = 0;		/* Current page number */
+char	*PageRanges = NULL;	/* Range of pages selected */
+char	*PageSet = NULL;	/* All, Even, Odd pages */
+int	Reversed = 0,		/* Reverse pages */
+	Flip = 0;		/* Flip/mirror pages */
 int	CharsPerInch = 10;	/* Number of character columns per inch */
 int	LinesPerInch = 6;	/* Number of lines per inch */
-int	Top = 36;		/* Top position in points */
-	Left = 18;		/* Left position in points */
+float	Left = 18.0f,		/* Left margin */
+	Right = 594.0f,		/* Right margin */
+	Bottom = 36.0f,		/* Bottom margin */
+	Top = 756.0f,		/* Top margin */
+	Width = 612.0f,		/* Total page width */
+	Length = 792.0f;	/* Total page length */
+int	UTF8 = 0;		/* Use UTF-8 encoding? */
+char	*Glyphs[65536];		/* PostScript glyphs for Unicode */
 
 
 /*
  * Local functions...
  */
 
+static int	check_range(void);
 static int	getutf8(FILE *fp);
-static int	write_epilogue(ppd_t *ppd);
-static int	write_line(int row, lchar_t *line);
-static int	write_page(void);
-static int	write_prolog(ppd_t *ppd);
-static int	write_string(int col, int row, int len, lchar_t *s);
+static void	write_epilogue(ppd_file_t *ppd);
+static void	write_line(int row, lchar_t *line);
+static void	write_page(ppd_file_t *ppd);
+static void	write_prolog(ppd_file_t *ppd, char *title, int num_copies);
+static void	write_string(int col, int row, int len, lchar_t *s);
+
+
+/*
+ * 'check_range()' - Check to see if the current page is selected for
+ *                   printing.
+ */
+
+static int		/* O - 1 if selected, 0 otherwise */
+check_range(void)
+{
+  char	*range;		/* Pointer into range string */
+  int	lower, upper;	/* Lower and upper page numbers */
+
+
+  if (PageSet != NULL)
+  {
+   /*
+    * See if we only print even or odd pages...
+    */
+
+    if (strcmp(PageSet, "even") == 0 && (PageNumber & 1))
+      return (0);
+    if (strcmp(PageSet, "odd") == 0 && !(PageNumber & 1))
+      return (0);
+  }
+
+  if (PageRanges == NULL)
+    return (1);		/* No range, print all pages... */
+
+  for (range = PageRanges; *range != '\0';)
+  {
+    if (*range == '-')
+    {
+      lower = 1;
+      range ++;
+      upper = strtol(range, &range, 10);
+    }
+    else
+    {
+      lower = strtol(range, &range, 10);
+
+      if (*range == '-')
+      {
+        range ++;
+	if (!isdigit(*range))
+	  upper = 65535;
+	else
+	  upper = strtol(range, &range, 10);
+      }
+      else
+        upper = lower;
+    }
+
+    if (PageNumber >= lower && PageNumber <= upper)
+      return (1);
+
+    if (*range == ',')
+      range ++;
+    else
+      break;
+  }
+
+  return (0);
+}
 
 
 /*
@@ -127,7 +211,7 @@ getutf8(FILE *fp)	/* I - File to read from */
   if ((ch = getc(fp)) == EOF)
     return (EOF);
 
-  if (ch < 0xc0)	/* One byte character? */
+  if (ch < 0xc0 || !UTF8)	/* One byte character? */
     return (ch);
   else if ((ch & 0xe0) == 0xc0)
   {
@@ -136,7 +220,7 @@ getutf8(FILE *fp)	/* I - File to read from */
     */
 
     if ((next = getc(fp)) == EOF)
-      return (EOF)
+      return (EOF);
     else
       return (((ch & 0x1f) << 6) | (next & 0x3f));
   }
@@ -147,12 +231,12 @@ getutf8(FILE *fp)	/* I - File to read from */
     */
 
     if ((next = getc(fp)) == EOF)
-      return (EOF)
+      return (EOF);
 
     ch = ((ch & 0x0f) << 6) | (next & 0x3f);
 
     if ((next = getc(fp)) == EOF)
-      return (EOF)
+      return (EOF);
     else
       return ((ch << 6) | (next & 0x3f));
   }
@@ -171,9 +255,15 @@ getutf8(FILE *fp)	/* I - File to read from */
  * 'write_epilogue()' - Write the PostScript file epilogue.
  */
 
-static int
-write_epilogue(ppd_t *ppd)
+static void
+write_epilogue(ppd_file_t *ppd)	/* I - PPD file */
 {
+  puts("%%BeginEpilogue");
+  printf("%%%%Pages: %d\n", NumPages);
+  puts("%%EOF");
+
+  free(Page[0]);
+  free(Page);
 }
 
 
@@ -181,7 +271,7 @@ write_epilogue(ppd_t *ppd)
  * 'write_line()' - Write a row of text.
  */
 
-static int			/* O - 0 on success, -1 on error */
+static void
 write_line(int     row,		/* I - Row number (0 to N) */
            lchar_t *line)	/* I - Line to print */
 {
@@ -196,8 +286,7 @@ write_line(int     row,		/* I - Row number (0 to N) */
     if (attr != line->attr || line->ch == 0)
     {
       if (start < line)
-        if (write_string(col - (line - start), row, line - start, start))
-	  return (-1);
+        write_string(col - (line - start), row, line - start, start);
 
       if (line->ch == 0)
       {
@@ -213,10 +302,7 @@ write_line(int     row,		/* I - Row number (0 to N) */
     }
 
   if (start < line)
-    if (write_string(col - (line - start), row, line - start, start))
-      return (-1);
-
-  return (0);
+    write_string(col - (line - start), row, line - start, start);
 }
 
 
@@ -224,9 +310,40 @@ write_line(int     row,		/* I - Row number (0 to N) */
  * 'write_page()' - Write a page of text.
  */
 
-static int
-write_page(void)
+static void
+write_page(ppd_file_t *ppd)	/* I - PPD file */
 {
+  int	line;			/* Current line */
+
+
+  PageNumber ++;
+  if (check_range())
+  {
+    NumPages ++;
+    printf("%%%%Page: %d %d\n", PageNumber, NumPages);
+    puts("%%BeginPageSetup");
+    ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
+    puts("%%EndPageSetup");
+
+    puts("gsave");
+
+    if (Landscape)
+    {
+      if (Duplex && (NumPages & 1) == 0)
+        printf("0 %.1f translate -90 rotate\n", Width);
+      else
+        printf("%.1f 0 translate 90 rotate\n", Length);
+    }
+
+    for (line = 0; line < SizeLines; line ++)
+      write_line(line, Page[line]);
+
+    puts("grestore");
+    puts("showpage");
+    puts("%%EndPage");
+  }
+
+  memset(Page[0], 0, sizeof(lchar_t) * SizeColumns * SizeLines);
 }
 
 
@@ -234,9 +351,189 @@ write_page(void)
  * 'write_prolog()' - Write the PostScript file prolog with options.
  */
 
-static int
-write_prolog(ppd_t *ppd)
+static void
+write_prolog(ppd_file_t *ppd,		/* I - PPD file */
+             char       *title,		/* I - Title of job */
+             int        num_copies)	/* I - Number of copies */
 {
+  int	line;				/* Current output line */
+  float	temp;				/* Swapping variable */
+  char	*charset;			/* Character set string */
+  char	*server_root;			/* SERVER_ROOT variable */
+  char	filename[1024];			/* Glyph filenames */
+  FILE	*fp;				/* Glyph files */
+  int	ch, unicode;			/* Character values */
+  char	glyph[64];			/* Glyph name */
+  int	chars[256];			/* Character encoding array */
+
+
+  ppdEmit(ppd, stdout, PPD_ORDER_EXIT);
+  ppdEmit(ppd, stdout, PPD_ORDER_JCL);
+
+  puts("%!PS-Adobe-3.0");
+  printf("%%%%BoundingBox: %.0f %.0f %.0f %.0f\n", Left, Bottom, Right, Top);
+  if (ppd)
+    printf("%%%%LanguageLevel: %d\n", ppd->language_level);
+  else
+    puts("%%LanguageLevel: 1");
+  puts("%%Creator: texttops/CUPS-" CUPS_VERSION);
+  printf("%%%%Title: %s\n", title);
+  puts("%%DocumentFonts: Courier Courier-Bold");
+  puts("%%Pages: (atend)");
+  puts("%%EndComments");
+
+  if (Landscape)
+  {
+    temp   = Left;
+    Left   = Bottom;
+    Bottom = temp;
+
+    temp   = Right;
+    Right  = Top;
+    Top    = temp;
+
+    temp   = Width;
+    Width  = Length;
+    Length = temp;
+  }
+
+  SizeColumns = (Right - Left) / 72.0 * CharsPerInch;
+  SizeLines   = (Top - Bottom) / 72.0 * LinesPerInch;
+
+  Page    = calloc(sizeof(lchar_t *), SizeLines);
+  Page[0] = calloc(sizeof(lchar_t), SizeColumns * SizeLines);
+  for (line = 1; line < SizeLines; line ++)
+    Page[line] = Page[0] + line * SizeColumns;
+
+  if (PageColumns > 1)
+  {
+    ColumnGutter = CharsPerInch / 2;
+    ColumnWidth  = (SizeColumns - ColumnGutter * (PageColumns - 1)) / PageColumns;
+  }
+  else
+    ColumnWidth = SizeColumns;
+
+  puts("%%BeginDocumentSetup");
+  ppdEmit(ppd, stdout, PPD_ORDER_DOCUMENT);
+  ppdEmit(ppd, stdout, PPD_ORDER_ANY);
+  puts("%%EndDocumentSetup");
+
+  puts("%%BeginProlog");
+  ppdEmit(ppd, stdout, PPD_ORDER_PROLOG);
+
+ /*
+  * Get the output character set; if it is undefined or "us-ascii", do
+  * nothing because we can use the default encoding...
+  */
+
+  charset = getenv("CHARSET");
+  if (charset != NULL && strcmp(charset, "us-ascii") != 0)
+  {
+   /*
+    * Load the PostScript glyph names and the corresponding character
+    * set definition...
+    */
+
+    if ((server_root = getenv("SERVER_ROOT")) == NULL)
+      strcpy(filename, "psglyphs.dat");
+    else
+      sprintf(filename, "%s/filter/psglyphs.dat");
+
+    memset(Glyphs, 0, sizeof(Glyphs));
+
+    if ((fp = fopen(filename, "r")) != NULL)
+    {
+      while (fscanf(fp, "%x%s", &unicode, glyph) == 2)
+        Glyphs[unicode] = strdup(glyph);
+
+      fclose(fp);
+    }
+
+    if (strncmp(charset, "iso-", 4) == 0)
+    {
+      memset(chars, 0, sizeof(chars));
+
+      if (server_root == NULL)
+        sprintf(filename, "%s.dat", charset + 4);
+      else
+        sprintf(filename, "%s/filter/%s.dat", server_root, charset + 4);
+
+      if ((fp = fopen(filename, "r")) != NULL)
+      {
+        while (fscanf(fp, "%x%x", &ch, &unicode) == 2)
+          chars[ch] = unicode;
+
+        fclose(fp);
+      }
+    }
+    else
+    {
+     /*
+      * UTF-8 encoding - just pass the first 256 characters for now...
+      */
+
+      UTF8 = 1;
+
+      for (unicode = 0; unicode < 256; unicode ++)
+        chars[unicode] = unicode;
+    }
+
+   /*
+    * Write the encoding array...
+    */
+
+    printf("%% %s encoding\n", charset);
+    puts("/textEncoding [");
+
+    for (ch = 0; ch < 256; ch ++)
+    {
+      if (Glyphs[chars[ch]])
+	printf("/%s", Glyphs[chars[ch]]);
+      else
+	printf("/.notdef");
+
+      if ((ch & 7) == 7)
+        putchar('\n');
+    }
+
+    puts("] def");
+
+    puts("% Reencode fonts");
+    puts("/Courier findfont");
+    puts("dup length dict begin\n"
+         "	{ 1 index /FID ne { def } { pop pop } ifelse } forall\n"
+         "	/Encoding textEncoding def\n"
+         "	currentdict\n"
+         "end");
+    puts("/Courier exch definefont pop");
+
+    puts("/Courier-Bold findfont");
+    puts("dup length dict begin\n"
+         "	{ 1 index /FID ne { def } { pop pop } ifelse } forall\n"
+         "	/Encoding textEncoding def\n"
+         "	currentdict\n"
+         "end");
+    puts("/Courier-Bold exch definefont pop");
+  }
+
+  puts("% Define fonts");
+
+  printf("/FN /Courier findfont [%.1f 0 0 %.1f 0 0] makefont def\n",
+         120.0 / CharsPerInch, 68.0 / LinesPerInch);
+  printf("/FB /Courier-Bold findfont [%.1f 0 0 %.1f 0 0] makefont def\n",
+         120.0 / CharsPerInch, 68.0 / LinesPerInch);
+
+  puts("% Common procedures");
+
+  puts("/N { FN setfont moveto } bind def");
+  puts("/B { FB setfont moveto } bind def");
+  puts("/U { dup 0 rlineto stroke neg 0 rmoveto } bind def");
+  puts("/S { show } bind def");
+
+  puts("% Number copies");
+  printf("/#copies %d def\n", num_copies);
+
+  puts("%%EndProlog");
 }
 
 
@@ -244,7 +541,7 @@ write_prolog(ppd_t *ppd)
  * 'write_string()' - Write a string of text.
  */
 
-static int			/* O - 0 on success, -1 on error */
+static void
 write_string(int     col,	/* I - Start column */
              int     row,	/* I - Row */
              int     len,	/* I - Number of characters */
@@ -258,8 +555,19 @@ write_string(int     col,	/* I - Start column */
   * Position the text and set the font...
   */
 
-  x = (float)Left + (float)col * 72.0 / (float)CharsPerInch;
-  y = (float)Top - (float)row * 72.0 / (float)LinesPerInch;
+  if (Duplex && (NumPages & 1) == 0)
+  {
+    x = Width - Right;
+    y = Length - Bottom;
+  }
+  else
+  {
+    x = Left;
+    y = Top;
+  }
+
+  x += (float)col * 72.0 / (float)CharsPerInch;
+  y -= (float)(row + 1) * 72.0 / (float)LinesPerInch;
 
   if (s->attr & ATTR_RAISED)
     y += 36.0 / (float)LinesPerInch;
@@ -312,7 +620,7 @@ write_string(int     col,	/* I - Start column */
         * Quote 8-bit characters...
 	*/
 
-        printf("\%03o", s->ch);
+        printf("\\%03o", s->ch);
       }
       else
       {
@@ -336,574 +644,121 @@ write_string(int     col,	/* I - Start column */
 
 
 /*
- * Control codes:
- *
- *   BS		Backspace (0x08)
- *   HT		Horizontal tab; next 8th column (0x09)
- *   LF		Line feed; forward full line (0x0a)
- *   VT		Vertical tab; reverse full line (0x0b)
- *   FF		Form feed (0x0c)
- *   CR		Carriage return (0x0d)
- *   ESC 7	Reverse full line (0x1b 0x37)
- *   ESC 8	Reverse half line (0x1b 0x38)
- *   ESC 9	Forward half line (0x1b 0x39)
- */
-
-/*
- * 'Setup()' - Output a PostScript prolog for this page.
- */
-
-void
-Setup(FILE  *out,
-      float width,
-      float length,
-      float left,
-      float right,
-      float bottom,
-      float top,
-      char  *fontname,
-      float fontsize,
-      int   landscape)
-{
-  float	temp;
-
-
-  CharsPerInch = 120.0 / fontsize;
-
-  if (CharsPerInch > 12)
-    LinesPerInch = 8;
-  else if (CharsPerInch < 10)
-    LinesPerInch = 4;
-  else
-    LinesPerInch = 6;
-  
-  if (landscape)
-  {
-    SizeColumns = ((length - bottom - top) / 72.0 - (PageColumns - 1) * 0.25) *
-                  CharsPerInch;
-    SizeLines   = (width - left - right) / 72.0 * LinesPerInch;
-
-    temp   = width;
-    width  = length;
-    length = temp;
-
-    temp   = left;
-    left   = bottom;
-    bottom = temp;
-
-    temp   = right;
-    right  = top;
-    top    = temp;
-  }
-  else
-  {
-    SizeColumns = ((width - left - right) / 72.0 - (PageColumns - 1) * 0.25) *
-                  CharsPerInch;
-    SizeLines   = (length - bottom - top) / 72.0 * LinesPerInch;
-  };
-
-  SizeColumns /= PageColumns;
-
-  fputs("%!PS-Adobe-3.0\n", out);
-  fprintf(out, "%%%%BoundingBox: %f %f %f %f\n",
-          left, bottom, width - right, length - top);
-  fputs("%%LanguageLevel: 1\n", out);
-  fputs("%%Creator: text2ps 3.2 Copyright 1993-1996 Easy Software Products\n", out);
-  fprintf(out, "%%%%Pages: (atend)\n");
-  fputs("%%EndComments\n\n", out);
-
-  fputs("%%BeginProlog\n", out);
-
- /*
-  * Oh, joy, another font encoding.  For now assume that all documents use
-  * ISO-8859-1 encoding (this covers about 1/2 of the human population)...
-  */
-
-  fputs("/iso8859encoding [\n", out);
-  fputs("/.notdef /.notdef /.notdef /.notdef\n", out);
-  fputs("/.notdef /.notdef /.notdef /.notdef\n", out);
-  fputs("/.notdef /.notdef /.notdef /.notdef\n", out);
-  fputs("/.notdef /.notdef /.notdef /.notdef\n", out);
-  fputs("/.notdef /.notdef /.notdef /.notdef\n", out);
-  fputs("/.notdef /.notdef /.notdef /.notdef\n", out);
-  fputs("/.notdef /.notdef /.notdef /.notdef\n", out);
-  fputs("/.notdef /.notdef /.notdef /.notdef\n", out);
-  fputs("/space /exclam /quotedbl /numbersign\n", out);
-  fputs("/dollar /percent /ampersand /quoteright\n", out);
-  fputs("/parenleft /parenright /asterisk /plus\n", out);
-  fputs("/comma /minus /period /slash\n", out);
-  fputs("/zero /one /two /three /four /five /six /seven\n", out);
-  fputs("/eight /nine /colon /semicolon\n", out);
-  fputs("/less /equal /greater /question\n", out);
-  fputs("/at /A /B /C /D /E /F /G\n", out);
-  fputs("/H /I /J /K /L /M /N /O\n", out);
-  fputs("/P /Q /R /S /T /U /V /W\n", out);
-  fputs("/X /Y /Z /bracketleft\n", out);
-  fputs("/backslash /bracketright /asciicircum /underscore\n", out);
-  fputs("/quoteleft /a /b /c /d /e /f /g\n", out);
-  fputs("/h /i /j /k /l /m /n /o\n", out);
-  fputs("/p /q /r /s /t /u /v /w\n", out);
-  fputs("/x /y /z /braceleft\n", out);
-  fputs("/bar /braceright /asciitilde /guilsinglright\n", out);
-  fputs("/fraction /florin /quotesingle /quotedblleft\n", out);
-  fputs("/guilsinglleft /fi /fl /endash\n", out);
-  fputs("/dagger /daggerdbl /bullet /quotesinglbase\n", out);
-  fputs("/quotedblbase /quotedblright /ellipsis /trademark\n", out);
-  fputs("/dotlessi /grave /acute /circumflex\n", out);
-  fputs("/tilde /macron /breve /dotaccent\n", out);
-  fputs("/dieresis /perthousand /ring /cedilla\n", out);
-  fputs("/Ydieresis /hungarumlaut /ogonek /caron\n", out);
-  fputs("/emdash /exclamdown /cent /sterling\n", out);
-  fputs("/currency /yen /brokenbar /section\n", out);
-  fputs("/dieresis /copyright /ordfeminine /guillemotleft\n", out);
-  fputs("/logicalnot /hyphen /registered /macron\n", out);
-  fputs("/degree /plusminus /twosuperior /threesuperior\n", out);
-  fputs("/acute /mu /paragraph /periodcentered\n", out);
-  fputs("/cedilla /onesuperior /ordmasculine /guillemotright\n", out);
-  fputs("/onequarter /onehalf /threequarters /questiondown\n", out);
-  fputs("/Agrave /Aacute /Acircumflex /Atilde\n", out);
-  fputs("/Adieresis /Aring /AE /Ccedilla\n", out);
-  fputs("/Egrave /Eacute /Ecircumflex /Edieresis\n", out);
-  fputs("/Igrave /Iacute /Icircumflex /Idieresis\n", out);
-  fputs("/Eth /Ntilde /Ograve /Oacute\n", out);
-  fputs("/Ocircumflex /Otilde /Odieresis /multiply\n", out);
-  fputs("/Oslash /Ugrave /Uacute /Ucircumflex\n", out);
-  fputs("/Udieresis /Yacute /Thorn /germandbls\n", out);
-  fputs("/agrave /aacute /acircumflex /atilde\n", out);
-  fputs("/adieresis /aring /ae /ccedilla\n", out);
-  fputs("/egrave /eacute /ecircumflex /edieresis\n", out);
-  fputs("/igrave /iacute /icircumflex /idieresis\n", out);
-  fputs("/eth /ntilde /ograve /oacute\n", out);
-  fputs("/ocircumflex /otilde /odieresis /divide\n", out);
-  fputs("/oslash /ugrave /uacute /ucircumflex\n", out);
-  fputs("/udieresis /yacute /thorn /ydieresis ] def\n", out);
-
-  fprintf(out, "/%s findfont\n", fontname);
-  fputs("dup length dict begin\n"
-        "	{ 1 index /FID ne { def } { pop pop } ifelse } forall\n"
-        "	/Encoding iso8859encoding def\n"
-        "	currentdict\n"
-        "end\n", out);
-  fprintf(out, "/%s exch definefont pop\n", fontname);
-
-  fprintf(out, "/R /%s findfont %f scalefont def\n", fontname, fontsize);
-
-  if (strcasecmp(fontname, "Times-Roman") == 0)
-    fputs("/Times-Bold findfont\n", out);
-  else
-    fprintf(out, "/%s findfont\n", fontname);
-  fputs("dup length dict begin\n"
-        "	{ 1 index /FID ne { def } { pop pop } ifelse } forall\n"
-        "	/Encoding iso8859encoding def\n"
-        "	currentdict\n"
-        "end\n", out);
-  if (strcasecmp(fontname, "Times-Roman") == 0)
-    fputs("/Times-Bold exch definefont pop\n", out);
-  else
-    fprintf(out, "/%s exch definefont pop\n", fontname);
-
-  if (strcasecmp(fontname, "Times-Roman") == 0)
-    fprintf(out, "/B /Times-Bold findfont %f scalefont def\n", fontsize);
-  else
-    fprintf(out, "/B /%s-Bold findfont %f scalefont def\n", fontname, fontsize);
-
-  fprintf(out, "/S { setfont /y exch %f mul %f sub neg def %f mul %f add exch %f mul add /x exch def "
-               "x y moveto show } bind def\n",
-          fontsize, length - top - fontsize, 72.0 / CharsPerInch, left,
-	  left + 72.0 * SizeColumns / CharsPerInch);
-
-  fprintf(out, "/U { setfont /y exch %f mul %f sub neg def %f mul %f add exch %f mul add /x exch def "
-               "x y moveto dup show x y moveto stringwidth rlineto } bind def\n",
-          fontsize, length - top - fontsize, 72.0 / CharsPerInch, left,
-	  left + 72.0 * SizeColumns / CharsPerInch);
-
-  fputs("%%EndProlog\n", out);
-
-  if (Verbosity)
-    fprintf(stderr, "text2ps: cpi = %.2f, lpi = %.2f, chars/col = %d\n"
-                    "text2ps: columns = %d, lines = %d\n",
-            CharsPerInch, LinesPerInch, SizeColumns, PageColumns, SizeLines);
-}
-
-
-void
-Shutdown(FILE *out,
-         int  pages)
-{
-  fprintf(out, "%%%%Pages: %d\n", pages - 1);
-  fputs("%%EOF\n", out);
-}
-
-
-void
-StartPage(FILE *out,
-          int  page)
-{
-  fprintf(out, "%%%%Page: %d\n", page);
-}
-
-
-void
-EndPage(FILE *out)
-{
-  fputs("showpage\n", out);
-  fputs("%%EndPage\n", out);
-}
-
-
-void
-output_line(FILE *out, int page_column, int column, int row, int attr, char *line)
-{
-  fprintf(out, "(%s) %d %d %d %s %s\n", line, page_column, column,
-          row, (attr & ATTR_BOLD) ? "B" : "R", (attr & ATTR_UNDERLINE) ? "U" : "S");
-}
-
-
-void
-OutputLine(FILE    *out,
-           int     page_column,
-           int     row,
-           lchar_t *buffer)
-{
-  int	column,
-        linecol,
-	attr;
-  char	line[MAX_COLUMNS * 2 + 1],
-	*lineptr;
-
-
-  for (column = 0, attr = 0, lineptr = line, linecol = 0;
-       column < SizeColumns;
-       column ++, buffer ++)
-  {
-    if (buffer->ch == '\0')
-      break;
-
-    if (attr ^ buffer->attr)
-    {
-      if (lineptr > line)
-      {
-        *lineptr = '\0';
-        output_line(out, page_column, linecol, row, attr, line);
-        lineptr = line;
-      };
-
-      attr    = buffer->attr;
-      linecol = column;
-    };
-
-    if (strchr("()\\", buffer->ch) != NULL)
-    {
-      *lineptr++ = '\\';
-      *lineptr++ = buffer->ch;
-    }
-    else if (buffer->ch < ' ' || buffer->ch > 126)
-    {
-      sprintf(lineptr, "\\%03o", buffer->ch);
-      lineptr += 4;
-    }
-    else
-      *lineptr++ = buffer->ch;
-  };
-
-  if (lineptr > line)
-  {
-    *lineptr = '\0';
-    output_line(out, page_column, linecol, row, attr, line);
-  };
-}
-
-
-/*
- * 'Usage()' - Print usage message and exit.
- */
-
-void
-Usage(void)
-{    
-  fputs("Usage: text2ps -P <printer-name> [-D]\n", stderr);
-  fputs("               [-e] [-s] [-w] [-Z]\n", stderr);
-  fputs("               [-L <log-file>] [-O <output-file>]\n", stderr);
-  fputs("               [-M <printer-model]\n", stderr);
-
-  exit(ERR_BAD_ARG);
-}
-
-
-/*
  * 'main()' - Main entry and processing of driver.
  */
 
-int
-main(int  argc,    /* I - Number of command-line arguments */
-     char *argv[]) /* I - Command-line arguments */
+int			/* O - Exit status */
+main(int  argc,		/* I - Number of command-line arguments */
+     char *argv[])	/* I - Command-line arguments */
 {
-  int			i,		/* Looping var */
-			ch;		/* Current char from file */
-  char			*opt;		/* Current option character */
-  int			empty_infile;	/* TRUE if the input file is empty */
-  char			*filename;	/* Input filename, if specified (NULL otherwise). */
-  FILE			*fp;		/* Input file */
-  int			line,
-  			column,
-  			page_column,
-  			page,
-  			landscape;
-  char			*fontname;
-  float			fontsize,
-			width,
-			length,
-			temp,
-			left,
-			right,
-			bottom,
-			top;
-  PDInfoStruct		*info;		/* POD info */
-  PDStatusStruct	*status;	/* POD status */
-  time_t		mod_time;	/* Modification time */
-  PDSizeTableStruct	*size;		/* Page size */
-  char			*outfile;
-  FILE			*out;
-  lchar_t		buffer[MAX_COLUMNS];
+  FILE		*fp;		/* Print file */
+  int		i,		/* Looping var */
+		ch,		/* Current char from file */
+		attr,		/* Current attribute */
+		line,		/* Current line */
+  		column,		/* Current column */
+  		page_column;	/* Current page column */
+  ppd_file_t	*ppd;		/* PPD file */
+  ppd_size_t	*pagesize;	/* Current page size */
+  int		num_options;	/* Number of print options */
+  cups_option_t	*options;	/* Print options */
+  char		*val;		/* Option value */
 
 
- /*
-  * Process any command-line args...
-  */
-
-  filename  = NULL;
-  outfile   = NULL;
-  fontname  = "Courier";
-  fontsize  = 12.0;
-  landscape = 0;
-  width     = 612;
-  length    = 792;
-  left      = 18;
-  right     = 18;
-  bottom    = 36;
-  top       = 36;
-  
-  for (i = 1; i < argc; i ++)
-    if (argv[i][0] == '-')
-      for (opt = argv[i] + 1; *opt != '\0'; opt ++)
-        switch (*opt)
-        {
-          case 'P' : /* Specify the printer name */
-              i ++;
-              if (i >= argc)
-                Usage();
-
-	     /*
-	      * Open the POD database files and get the printer definition record.
-	      */
-
-	      if (PDLocalReadInfo(argv[i], &info, &mod_time) < 0)
-	      {
-		fprintf(stderr, "text2ps: Could not open required POD database files for printer \'%s\'.\n", 
-        		argv[i]);
-		fprintf(stderr, "text2ps: Are you sure all required POD files are properly installed?\n");
-
-		PDPerror("text2ps");
-		exit(ERR_POD_ACCESS);
-	      };
-
-	      status = info->active_status;
-	      size   = PDFindPageSize(info, PD_SIZE_CURRENT);
-
-              width  = size->width * 72.0;
-              length = size->length * 72.0;
-
-              temp = size->left_margin * 72.0;
-	      if (temp > left)
-	        left = temp;
-
-              temp = 72.0 * (size->width - size->left_margin -
-                             size->horizontal_addr / (float)info->horizontal_resolution);
-              if (temp > right)
-	        right = temp;
-
-              temp = 72.0 * (size->length - size->top_margin -
-                             size->vertical_addr / (float)info->vertical_resolution);
-              if (temp > bottom)
-	        bottom = temp;
-
-              temp = size->top_margin * 72.0;
-	      if (temp > top)
-	        top = temp;
-              break;
-
-          case 'O' : /* Output file */
-              i ++;
-              if (i >= argc || outfile != NULL)
-                Usage();
-
-              outfile = argv[i];
-              break;
-
-          case 'D' : /* Produce debugging messages */
-              Verbosity ++;
-              break;
-
-          case 'l' : /* Landscape output */
-              landscape = TRUE;
-              break;
-
-          case 'w' : /* Line wrapping */
-              i ++;
-              if (i >= argc)
-                Usage();
-
-              WrapLines = atoi(argv[i]);
-              break;
-
-          case 'F' : /* Font name */
-              i ++;
-              if (i >= argc)
-                Usage();
-
-              fontname = argv[i];
-              break;
-
-          case 'p' : /* Font pointsize */
-              i ++;
-              if (i >= argc)
-                Usage();
-
-              fontsize = atof(argv[i]);
-              break;
-
-          case 'M' : /* Multiple column mode */
-              i ++;
-              if (i >= argc)
-                Usage();
-
-              PageColumns = atof(argv[i]);
-              break;
-
-          case 'W' : /* Width */
-              i ++;
-              if (i >= argc)
-                Usage();
-
-              width = atof(argv[i]) * 72.0;
-              break;
-
-          case 'H' : /* Length */
-              i ++;
-              if (i >= argc)
-                Usage();
-
-              length = atof(argv[i]) * 72.0;
-              break;
-
-          case 'L' : /* Left margin */
-              i ++;
-              if (i >= argc)
-                Usage();
-
-              left = atof(argv[i]) * 72.0;
-              break;
-
-          case 'R' : /* Right margin */
-              i ++;
-              if (i >= argc)
-                Usage();
-
-              right = atof(argv[i]) * 72.0;
-              break;
-
-          case 'T' : /* Top margin */
-              i ++;
-              if (i >= argc)
-                Usage();
-
-              top = atof(argv[i]) * 72.0;
-              break;
-
-          case 'B' : /* Bottom margin */
-              i ++;
-              if (i >= argc)
-                Usage();
-
-              bottom = atof(argv[i]) * 72.0;
-              break;
-
-          default :
-              Usage();
-              break;
-        }
-    else if (filename != NULL)
-      Usage();
-    else
-      filename = argv[i];
-
-  if (Verbosity)
+  if (argc < 6 || argc > 7)
   {
-    fputs("text2ps: Command-line args are:", stderr);
-    for (i = 1; i < argc; i ++)
-      fprintf(stderr, " %s", argv[i]);
-    fputs("\n", stderr);
-  };
-
- /*
-  * Setup the output file...
-  */
-
-  if (outfile == NULL)
-    out = stdout;
-  else
-    out = fopen(outfile, "w");
-
-  if (out == NULL)
-  {
-    fprintf(stderr, "text2ps: Unable to create PostScript output to %s - %s\n",
-            outfile == NULL ? "(stdout)" : outfile, strerror(errno));
-    exit(ERR_TRANSMISSION);
-  };
-
-  Setup(out, width, length, left, right, bottom, top, fontname, fontsize,
-        landscape);
-
- /*
-  * Read text from the specified source and print them...
-  */
-
-  if (filename != NULL)
-  {
-    if ((fp = fopen(filename, "r")) == NULL)
-    {
-      Shutdown(out, 0);
-      exit(ERR_DATA_FILE);
-    };
+    fprintf(stderr, "Usage: %s job-id user title copies options [file]\n",
+            argv[0]);
+    return (1);
   }
-  else
+
+ /*
+  * If we have 7 arguments, print the file named on the command-line.
+  * Otherwise, send stdin instead...
+  */
+
+  if (argc == 6)
     fp = stdin;
-
-  if (fp == NULL)
+  else
   {
-    Shutdown(out, 0);
-    exit(ERR_DATA_SHORT_FILE);
-  };
+   /*
+    * Try to open the print file...
+    */
 
-  empty_infile = TRUE;
-  column       = 0;
-  line         = -1;
-  page         = 0;
-  page_column  = 0;
-
-  memset(buffer, 0, sizeof(buffer));
-
-  while ((ch = getc(fp)) >= 0)
-  {
-    empty_infile = FALSE;
-
-    if (line < 0)
+    if ((fp = fopen(argv[6], "rb")) == NULL)
     {
-      page ++;
-      StartPage(out, page);
-      line         = 0;
-      page_column  = 0;
-    };
+      perror("ERROR: unable to open print file - ");
+      return (1);
+    }
+  }
+
+ /*
+  * Process command-line options and write the prolog...
+  */
+
+  ppd = ppdOpenFile(getenv("PPD"));
+
+  options     = NULL;
+  num_options = cupsParseOptions(argv[5], 0, &options);
+
+  ppdMarkDefaults(ppd);
+  cupsMarkOptions(ppd, num_options, options);
+
+  if ((pagesize = ppdPageSize(ppd, NULL)) != NULL)
+  {
+    Width  = pagesize->width;
+    Length = pagesize->length;
+    Top    = pagesize->top;
+    Bottom = pagesize->bottom;
+    Left   = pagesize->left;
+    Right  = pagesize->right;
+  }
+
+  Landscape = cupsGetOption("landscape", num_options, options) != NULL;
+  WrapLines = cupsGetOption("wrap", num_options, options) != NULL;
+  if ((val = cupsGetOption("columns", num_options, options)) != NULL)
+    PageColumns = atoi(val);
+  if ((val = cupsGetOption("cpi", num_options, options)) != NULL)
+    CharsPerInch = atoi(val);
+  if ((val = cupsGetOption("lpi", num_options, options)) != NULL)
+    LinesPerInch = atoi(val);
+  if ((val = cupsGetOption("sides", num_options, options)) != NULL &&
+      atoi(val) == 2)
+    Duplex = 1;
+  if ((val = cupsGetOption("Duplex", num_options, options)) != NULL &&
+      strcmp(val, "NoTumble") == 0)
+    Duplex = 1;
+  if ((val = cupsGetOption("page-ranges", num_options, options)) != NULL)
+    PageRanges = val;
+  if ((val = cupsGetOption("page-set", num_options, options)) != NULL)
+    PageSet = val;
+
+  write_prolog(ppd, argv[3], atoi(argv[4]));
+
+ /*
+  * Read text from the specified source and print it...
+  */
+
+  column       = 0;
+  line         = 0;
+  page_column  = 0;
+  attr         = 0;
+
+  while ((ch = getutf8(fp)) >= 0)
+  {
+   /*
+    * Control codes:
+    *
+    *   BS	Backspace (0x08)
+    *   HT	Horizontal tab; next 8th column (0x09)
+    *   LF	Line feed; forward full line (0x0a)
+    *   VT	Vertical tab; reverse full line (0x0b)
+    *   FF	Form feed (0x0c)
+    *   CR	Carriage return (0x0d)
+    *   ESC 7	Reverse full line (0x1b 0x37)
+    *   ESC 8	Reverse half line (0x1b 0x38)
+    *   ESC 9	Forward half line (0x1b 0x39)
+    */
 
     switch (ch)
     {
@@ -911,122 +766,170 @@ main(int  argc,    /* I - Number of command-line arguments */
           if (column > 0)
             column --;
           break;
+
       case 0x09 :		/* HT - tab to next 8th column */
-          do
-          {
-            if (column >= SizeColumns && WrapLines)
-            {			/* Wrap text to margins */
-              OutputLine(out, page_column, line, buffer);
-              line ++;
-              if (line >= SizeLines)
-              {
-                page_column ++;
-                line = 0;
-                if (page_column >= PageColumns)
-                {
-          	  EndPage(out);
-        	  line = -1;
-        	};
-              };
-              memset(buffer, 0, sizeof(buffer));
-              column = 0;
-            };
+          column = (column + 8) & ~7;
 
-            if (column < SizeColumns)
-              buffer[column].ch = ' ';
-
-            column ++;
-          }
-          while (column & 7);
-          break;
-      case 0x0a :		/* LF - output current line */
-          OutputLine(out, page_column, line, buffer);
-          line ++;
-          if (line >= SizeLines)
-          {
-            page_column ++;
-            line = 0;
-            if (page_column >= PageColumns)
-            {
-              EndPage(out);
-              line = -1;
-            };
-          };
-          memset(buffer, 0, sizeof(buffer));
-          column = 0;
-          break;
-      case 0x0c :		/* FF - eject current page... */
-          OutputLine(out, page_column, line, buffer);
-          page_column ++;
-          line = 0;
-          if (page_column >= PageColumns)
-          {
-            EndPage(out);
-            line = -1;
-          };
-          memset(buffer, 0, sizeof(buffer));
-          column = 0;
-          break;
-      case 0x0d :		/* CR */
-          column = 0;
-          break;
-      default :			/* All others... */
-          if (ch < ' ')
-            break;		/* Ignore other control chars */
-
-          if (column >= SizeColumns && WrapLines)
+          if (column >= ColumnWidth && WrapLines)
           {			/* Wrap text to margins */
-            OutputLine(out, page_column, line, buffer);
             line ++;
+            column = 0;
+
             if (line >= SizeLines)
             {
               page_column ++;
               line = 0;
+
               if (page_column >= PageColumns)
               {
-        	EndPage(out);
-        	line = -1;
-              };
-            };
-            memset(buffer, 0, sizeof(buffer));
-            column = 0;
-          };
+                write_page(ppd);
+		page_column = 0;
+              }
+            }
+          }
+          break;
 
-          if (column < SizeColumns)
+      case 0x0a :		/* LF - output current line */
+          line ++;
+          column = 0;
+
+          if (line >= SizeLines)
+          {
+            page_column ++;
+            line = 0;
+
+            if (page_column >= PageColumns)
+            {
+              write_page(ppd);
+	      page_column = 0;
+            }
+          }
+          break;
+
+      case 0x0b :		/* VT - move up 1 line */
+          if (line > 0)
+	    line --;
+          break;
+
+      case 0x0c :		/* FF - eject current page... */
+          page_column ++;
+	  column = 0;
+          line = 0;
+
+          if (page_column >= PageColumns)
+          {
+            write_page(ppd);
+            page_column = 0;
+          }
+          break;
+
+      case 0x0d :		/* CR */
+          column = 0;
+          break;
+
+      case 0x1b :		/* Escape sequence */
+          ch = getutf8(fp);
+	  if (ch == '7')
 	  {
-            if (ch == buffer[column].ch)
-              buffer[column].attr |= ATTR_BOLD;
-            else if (buffer[column].ch == '_')
-              buffer[column].attr |= ATTR_UNDERLINE;
+	   /*
+	    * ESC 7	Reverse full line (0x1b 0x37)
+	    */
 
-            buffer[column].ch = ch;
-	  };
+            if (line > 0)
+	      line --;
+	  }
+	  else if (ch == '8')
+	  {
+           /*
+	    *   ESC 8	Reverse half line (0x1b 0x38)
+	    */
+
+            if ((attr & ATTR_RAISED) && line > 0)
+	    {
+	      attr &= ~ATTR_RAISED;
+              line --;
+	    }
+	    else if (attr & ATTR_LOWERED)
+	      attr &= ~ATTR_LOWERED;
+	    else
+	      attr |= ATTR_RAISED;
+	  }
+	  else if (ch == '9')
+	  {
+           /*
+	    *   ESC 9	Forward half line (0x1b 0x39)
+	    */
+
+            if ((attr & ATTR_LOWERED) && line < (SizeLines - 1))
+	    {
+	      attr &= ~ATTR_LOWERED;
+              line ++;
+	    }
+	    else if (attr & ATTR_RAISED)
+	      attr &= ~ATTR_RAISED;
+	    else
+	      attr |= ATTR_LOWERED;
+	  }
+	  break;
+
+      default :			/* All others... */
+          if (ch < ' ')
+            break;		/* Ignore other control chars */
+
+          if (column >= ColumnWidth && WrapLines)
+          {			/* Wrap text to margins */
+            column = 0;
+	    line ++;
+
+            if (line >= SizeLines)
+            {
+              page_column ++;
+              line = 0;
+
+              if (page_column >= PageColumns)
+              {
+        	write_page(ppd);
+        	page_column = 0;
+              }
+            }
+          }
+
+          if (column < ColumnWidth)
+	  {
+	    i = column + page_column * (ColumnWidth + ColumnGutter);
+
+            if (ch == Page[line][i].ch)
+              Page[line][i].attr |= ATTR_BOLD;
+            else if (Page[line][i].ch == '_')
+              Page[line][i].attr |= ATTR_UNDERLINE;
+	    else
+              Page[line][i].attr = attr;
+
+            Page[line][i].ch = ch;
+	  }
 
           column ++;
           break;          
-    };
-  };
-
-  if (line >= 0)
-  {
-    OutputLine(out, page_column, line, buffer);
-    EndPage(out);
-    page ++;
-  };
-
-  Shutdown(out, page);
-
-  if (empty_infile)
-    exit(ERR_DATA_SHORT_FILE);
+    }
+  }
 
  /*
-  * Exit with no errors...
+  * Write any remaining page data...
   */
 
-  return (NO_ERROR);
+  if (line > 0 || page_column > 0 || column > 0)
+    write_page(ppd);
+
+ /*
+  * Write the epilog and return...
+  */
+
+  write_epilogue(ppd);
+
+  return (0);
 }
 
 
 /*
- * End of "$Id: texttops.c,v 1.7 1999/03/11 20:55:05 mike Exp $".
+ * End of "$Id: texttops.c,v 1.8 1999/03/21 02:10:15 mike Exp $".
  */

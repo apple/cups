@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.9 1999/03/03 21:16:14 mike Exp $"
+ * "$Id: ipp.c,v 1.10 1999/03/21 02:10:01 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -15,7 +15,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -29,15 +29,13 @@
  *   ippAddDate()        - Add a date attribute to an IPP request.
  *   ippAddInteger()     - Add a integer attribute to an IPP request.
  *   ippAddIntegers()    - Add an array of integer values.
- *   ippAddLString()     - Add a language-encoded string to an IPP request.
- *   ippAddLStrings()    - Add language-encoded strings to an IPP request.
+ *   ippAddString()      - Add a language-encoded string to an IPP request.
+ *   ippAddStrings()     - Add language-encoded strings to an IPP request.
  *   ippAddRange()       - Add a range of values to an IPP request.
  *   ippAddRanges()      - Add ranges of values to an IPP request.
  *   ippAddResolution()  - Add a resolution value to an IPP request.
  *   ippAddResolutions() - Add resolution values to an IPP request.
  *   ippAddSeparator()   - Add a group separator to an IPP request.
- *   ippAddString()      - Add an ASCII string to an IPP request.
- *   ippAddStrings()     - Add ASCII strings to an IPP request.
  *   ippDateToTime()     - Convert from RFC 1903 Date/Time format to UNIX time
  *   ippDelete()         - Delete an IPP request.
  *   ippFindAttribute()  - Find a named attribute in a request...
@@ -171,6 +169,7 @@ ippAddDate(ipp_t     *ipp,		/* I - IPP request */
 ipp_attribute_t *			/* O - New attribute */
 ippAddInteger(ipp_t     *ipp,		/* I - IPP request */
               ipp_tag_t group,		/* I - IPP group */
+	      ipp_tag_t type,		/* I - Type of attribute */
               char      *name,		/* I - Name of attribute */
               int       value)		/* I - Value of attribute */
 {
@@ -188,7 +187,7 @@ ippAddInteger(ipp_t     *ipp,		/* I - IPP request */
 
   attr->name              = strdup(name);
   attr->group_tag         = group;
-  attr->value_tag         = IPP_TAG_INTEGER;
+  attr->value_tag         = type;
   attr->values[0].integer = value;
 
   return (attr);
@@ -202,6 +201,7 @@ ippAddInteger(ipp_t     *ipp,		/* I - IPP request */
 ipp_attribute_t *			/* O - New attribute */
 ippAddIntegers(ipp_t     *ipp,		/* I - IPP request */
                ipp_tag_t group,		/* I - IPP group */
+	       ipp_tag_t type,		/* I - Type of attribute */
 	       char      *name,		/* I - Name of attribute */
 	       int       num_values,	/* I - Number of values */
 	       int       *values)	/* I - Values */
@@ -218,7 +218,7 @@ ippAddIntegers(ipp_t     *ipp,		/* I - IPP request */
 
   attr->name      = strdup(name);
   attr->group_tag = group;
-  attr->value_tag = IPP_TAG_INTEGER;
+  attr->value_tag = type;
 
   if (values != NULL)
     for (i = 0; i < num_values; i ++)
@@ -229,15 +229,16 @@ ippAddIntegers(ipp_t     *ipp,		/* I - IPP request */
 
 
 /*
- * 'ippAddLString()' - Add a language-encoded string to an IPP request.
+ * 'ippAddString()' - Add a language-encoded string to an IPP request.
  */
 
 ipp_attribute_t *			/* O - New attribute */
-ippAddLString(ipp_t     *ipp,		/* I - IPP request */
-              ipp_tag_t group,		/* I - IPP group */
-	      char      *name,		/* I - Name of attribute */
-	      char      *charset,	/* I - Character set */
-	      uchar     *value)		/* I - Value */
+ippAddString(ipp_t     *ipp,		/* I - IPP request */
+             ipp_tag_t group,		/* I - IPP group */
+	     ipp_tag_t type,		/* I - Type of attribute */
+             char      *name,		/* I - Name of attribute */
+             char      *charset,	/* I - Character set */
+             char      *value)		/* I - Value */
 {
   ipp_attribute_t	*attr;		/* New attribute */
 
@@ -250,25 +251,26 @@ ippAddLString(ipp_t     *ipp,		/* I - IPP request */
 
   attr->name                      = strdup(name);
   attr->group_tag                 = group;
-  attr->value_tag                 = IPP_TAG_TEXTLANG;
-  attr->values[0].lstring.charset = strdup(charset);
-  attr->values[0].lstring.string  = (uchar *)strdup((char *)value);
+  attr->value_tag                 = type;
+  attr->values[0].string.charset  = charset ? strdup(charset) : NULL;
+  attr->values[0].string.text     = strdup(value);
 
   return (attr);
 }
 
 
 /*
- * 'ippAddLStrings()' - Add language-encoded strings to an IPP request.
+ * 'ippAddStrings()' - Add language-encoded strings to an IPP request.
  */
 
 ipp_attribute_t *			/* O - New attribute */
-ippAddLStrings(ipp_t     *ipp,		/* I - IPP request */
-               ipp_tag_t group,		/* I - IPP group */
-	       char      *name,		/* I - Name of attribute */
-	       int       num_values,	/* I - Number of values */
-	       char      *charset,	/* I - Character set */
-	       uchar     **values)	/* I - Values */
+ippAddStrings(ipp_t     *ipp,		/* I - IPP request */
+              ipp_tag_t group,		/* I - IPP group */
+	      ipp_tag_t type,		/* I - Type of attribute */
+	      char      *name,		/* I - Name of attribute */
+	      int       num_values,	/* I - Number of values */
+	      char      *charset,	/* I - Character set */
+	      char      **values)	/* I - Values */
 {
   int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* New attribute */
@@ -282,17 +284,17 @@ ippAddLStrings(ipp_t     *ipp,		/* I - IPP request */
 
   attr->name      = strdup(name);
   attr->group_tag = group;
-  attr->value_tag = IPP_TAG_TEXTLANG;
+  attr->value_tag = type;
 
   if (values != NULL)
     for (i = 0; i < num_values; i ++)
     {
       if (i == 0)
-	attr->values[0].lstring.charset = strdup(charset);
+	attr->values[0].string.charset = charset ? strdup(charset) : NULL;
       else
-	attr->values[i].lstring.charset = attr->values[0].lstring.charset;
+	attr->values[i].string.charset = attr->values[0].string.charset;
 
-      attr->values[i].lstring.string = (uchar *)strdup((char *)values[i]);
+      attr->values[i].string.text = strdup(values[i]);
     }
 
   return (attr);
@@ -463,73 +465,6 @@ ippAddSeparator(ipp_t *ipp)		/* I - IPP request */
 
 
 /*
- * 'ippAddString()' - Add an ASCII string to an IPP request.
- */
-
-ipp_attribute_t *			/* O - New attribute */
-ippAddString(ipp_t     *ipp,		/* I - IPP request */
-             ipp_tag_t group,		/* I - IPP group */
-	     char      *name,		/* I - Name of attribute */
-	     char      *value)		/* I - Value */
-{
-  ipp_attribute_t	*attr;		/* New attribute */
-
-
-  DEBUG_printf(("ippAddString(%08x, %d, \'%s\', \'%s\')\n", ipp, group, name,
-                value));
-
-  if (ipp == NULL || name == NULL)
-    return (NULL);
-
-  if ((attr = add_attr(ipp, 1)) == NULL)
-    return (NULL);
-
-  attr->name             = strdup(name);
-  attr->group_tag        = group;
-  attr->value_tag        = IPP_TAG_STRING;
-  attr->values[0].string = strdup(value);
-
-  return (attr);
-}
-
-
-/*
- * 'ippAddStrings()' - Add ASCII strings to an IPP request.
- */
-
-ipp_attribute_t *			/* O - New attribute */
-ippAddStrings(ipp_t     *ipp,		/* I - IPP request */
-              ipp_tag_t group,		/* I - IPP group */
-	      char      *name,		/* I - Name of attribute */
-	      int       num_values,	/* I - Number of values */
-	      char      **values)	/* I - Values */
-{
-  int			i;		/* Looping var */
-  ipp_attribute_t	*attr;		/* New attribute */
-
-
-  DEBUG_printf(("ippAddStrings(%08x, %d, \'%s\', %d, %08x)\n", ipp, group,
-                name, num_values, values));
-
-  if (ipp == NULL || name == NULL)
-    return (NULL);
-
-  if ((attr = add_attr(ipp, num_values)) == NULL)
-    return (NULL);
-
-  attr->name      = strdup(name);
-  attr->group_tag = group;
-  attr->value_tag = IPP_TAG_STRING;
-
-  if (values != NULL)
-    for (i = 0; i < num_values; i ++)
-      attr->values[i].string = strdup(values[i]);
-
-  return (attr);
-}
-
-
-/*
  * 'ippDateToTime()' - Convert from RFC 1903 Date/Time format to UNIX time
  *                      in seconds.
  */
@@ -607,15 +542,16 @@ ippDelete(ipp_t *ipp)		/* I - IPP request */
       case IPP_TAG_LANGUAGE :
       case IPP_TAG_MIMETYPE :
           for (i = 0; i < attr->num_values; i ++)
-	    free(attr->values[i].string);
+	    free(attr->values[i].string.text);
 	  break;
 
       case IPP_TAG_TEXTLANG :
       case IPP_TAG_NAMELANG :
           for (i = 0; i < attr->num_values; i ++)
 	  {
-	    free(attr->values[i].lstring.charset);
-	    free(attr->values[i].lstring.string);
+	    if (attr->values[i].string.charset)
+	      free(attr->values[i].string.charset);
+	    free(attr->values[i].string.text);
 	  }
 	  break;
     }
@@ -636,9 +572,10 @@ ippDelete(ipp_t *ipp)		/* I - IPP request */
  * 'ippFindAttribute()' - Find a named attribute in a request...
  */
 
-ipp_attribute_t	*		/* O - Matching attribute */
-ippFindAttribute(ipp_t *ipp,	/* I - IPP request */
-                 char  *name)	/* I - Name of attribute */
+ipp_attribute_t	*			/* O - Matching attribute */
+ippFindAttribute(ipp_t     *ipp,	/* I - IPP request */
+                 char      *name,	/* I - Name of attribute */
+		 ipp_tag_t type)	/* I - Type of attribute */
 {
   ipp_attribute_t	*attr;	/* Current atttribute */
 
@@ -653,7 +590,10 @@ ippFindAttribute(ipp_t *ipp,	/* I - IPP request */
     DEBUG_printf(("ippFindAttribute: attr = %08x, name = \'%s\'\n", attr,
                   attr->name));
 
-    if (attr->name != NULL && strcmp(attr->name, name) == 0)
+    if (attr->name != NULL && strcmp(attr->name, name) == 0 &&
+        (attr->value_tag == type ||
+	 (attr->value_tag == IPP_TAG_TEXTLANG && type == IPP_TAG_TEXT) ||
+	 (attr->value_tag == IPP_TAG_NAMELANG && type == IPP_TAG_NAME)))
       return (attr);
   }
 
@@ -729,7 +669,7 @@ ippLength(ipp_t *ipp)		/* I - IPP request */
       case IPP_TAG_LANGUAGE :
       case IPP_TAG_MIMETYPE :
           for (i = 0; i < attr->num_values; i ++)
-	    bytes += strlen(attr->values[i].string);
+	    bytes += strlen(attr->values[i].string.text);
 	  break;
 
       case IPP_TAG_DATE :
@@ -748,8 +688,8 @@ ippLength(ipp_t *ipp)		/* I - IPP request */
       case IPP_TAG_NAMELANG :
           bytes += 2 * attr->num_values;/* Charset length */
           for (i = 0; i < attr->num_values; i ++)
-	    bytes += strlen(attr->values[i].lstring.charset) +
-	             strlen((char *)attr->values[i].lstring.string);
+	    bytes += strlen(attr->values[i].string.charset) +
+	             strlen(attr->values[i].string.text);
 	  break;
     }
   }
@@ -968,7 +908,7 @@ ippRead(http_t *http,		/* I - HTTP data */
                 buffer[n] = '\0';
 		DEBUG_printf(("ippRead: value = \'%s\'\n", buffer));
 
-                attr->values[attr->num_values].string = strdup(buffer);
+                attr->values[attr->num_values].string.text = strdup(buffer);
 	        break;
 	    case IPP_TAG_DATE :
 	        if (httpRead(http, buffer, 11) < 11)
@@ -1007,7 +947,7 @@ ippRead(http_t *http,		/* I - HTTP data */
 
                 buffer[n] = '\0';
 
-                attr->values[attr->num_values].lstring.charset = strdup(buffer);
+                attr->values[attr->num_values].string.charset = strdup(buffer);
 
 	        if (httpRead(http, buffer, 2) < 2)
 		  return (IPP_ERROR);
@@ -1019,8 +959,7 @@ ippRead(http_t *http,		/* I - HTTP data */
 
                 buffer[n] = '\0';
 
-                attr->values[attr->num_values].lstring.string =
-		    (unsigned char *)strdup(buffer);
+                attr->values[attr->num_values].string.text = strdup(buffer);
 	        break;
 	  }
 
@@ -1098,11 +1037,11 @@ ipp_state_t			/* O - Current state */
 ippWrite(http_t *http,		/* I - HTTP data */
          ipp_t  *ipp)		/* I - IPP data */
 {
-  int			i;	/* Looping var */
-  int			n;	/* Length of data */
+  int			i;		/* Looping var */
+  int			n;		/* Length of data */
   char			buffer[8192],	/* Data buffer */
-			*bufptr;/* Pointer into buffer */
-  ipp_attribute_t	*attr;	/* Current attribute */
+			*bufptr;	/* Pointer into buffer */
+  ipp_attribute_t	*attr;		/* Current attribute */
 
 
   if (http == NULL || ipp == NULL)
@@ -1259,14 +1198,14 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		    *bufptr++ = 0;
 		  }
 
-                  n = strlen(attr->values[i].string);
+                  n = strlen(attr->values[i].string.text);
 
                   DEBUG_printf(("ippWrite: writing string = %d, \'%s\'\n", n,
-		                attr->values[i].string));
+		                attr->values[i].string.text));
 
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
-		  memcpy(bufptr, attr->values[i].string, n);
+		  memcpy(bufptr, attr->values[i].string.text, n);
 		  bufptr += n;
 		}
 		break;
@@ -1366,16 +1305,16 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		    *bufptr++ = 0;
 		  }
 
-                  n = strlen(attr->values[i].lstring.charset);
+                  n = strlen(attr->values[i].string.charset);
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
-		  memcpy(bufptr, attr->values[i].lstring.charset, n);
+		  memcpy(bufptr, attr->values[i].string.charset, n);
 		  bufptr += n;
 
-                  n = strlen((char *)attr->values[i].lstring.string);
+                  n = strlen(attr->values[i].string.text);
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
-		  memcpy(bufptr, attr->values[i].lstring.string, n);
+		  memcpy(bufptr, attr->values[i].string.text, n);
 		  bufptr += n;
 		}
 		break;
@@ -1479,5 +1418,5 @@ add_attr(ipp_t *ipp,			/* I - IPP request */
 
 
 /*
- * End of "$Id: ipp.c,v 1.9 1999/03/03 21:16:14 mike Exp $".
+ * End of "$Id: ipp.c,v 1.10 1999/03/21 02:10:01 mike Exp $".
  */

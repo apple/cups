@@ -1,53 +1,37 @@
 /*
- * "$Id: hpgl-input.c,v 1.4 1999/02/17 21:51:57 mike Exp $"
+ * "$Id: hpgl-input.c,v 1.5 1999/03/21 02:10:11 mike Exp $"
  *
- *   HPGL input processing for espPrint, a collection of printer drivers.
+ *   HP-GL/2 input processing for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-1996 by Easy Software Products
+ *   Copyright 1993-1999 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer  programs  contain
- *   unpublished  proprietary  information  of Easy Software Products, and
- *   are protected by Federal copyright law.  They may  not  be  disclosed
- *   to  third  parties  or  copied or duplicated in any form, in whole or
- *   in part, without the prior written consent of Easy Software Products.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
  *
  *   ParseCommand()   - Parse an HPGL/2 command.
  *   FreeParameters() - Free all string parameter values.
- *
- * Revision History:
- *
- *   $Log: hpgl-input.c,v $
- *   Revision 1.4  1999/02/17 21:51:57  mike
- *   Updated scaling code to ignore the PlotSize.
- *
- *   Added support for IW command.
- *
- *   Revision 1.3  1997/05/02  14:52:03  mike
- *   Updated ParseCommand() to range-check parameter buffer additions.
- *   Increased the maximum number of parameters from 1000 to 16384.
- *
- *   Revision 1.3  1997/05/02  14:52:03  mike
- *   Updated ParseCommand() to range-check parameter buffer additions.
- *   Increased the maximum number of parameters from 1000 to 16384.
- *
- *   Revision 1.2  1996/10/14  16:50:14  mike
- *   Updated for 3.2 release.
- *   Added 'blackplot', grayscale, and default pen width options.
- *   Added encoded polyline support.
- *   Added fit-to-page code.
- *   Added pen color palette support.
- *
- *   Revision 1.1  1996/08/24  19:41:24  mike
- *   Initial revision
  */
 
 /*
  * Include necessary headers...
  */
 
-#include "hpgl2ps.h"
+#include "hpgltops.h"
 #include <ctype.h>
 
 #define MAX_PARAMS 16384
@@ -243,5 +227,5 @@ FreeParameters(int     num_params, /* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-input.c,v 1.4 1999/02/17 21:51:57 mike Exp $".
+ * End of "$Id: hpgl-input.c,v 1.5 1999/03/21 02:10:11 mike Exp $".
  */

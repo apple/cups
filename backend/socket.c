@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.3 1999/03/06 20:26:07 mike Exp $"
+ * "$Id: socket.c,v 1.4 1999/03/21 02:09:58 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -14,7 +14,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -216,5 +216,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.3 1999/03/06 20:26:07 mike Exp $".
+ * End of "$Id: socket.c,v 1.4 1999/03/21 02:09:58 mike Exp $".
  */

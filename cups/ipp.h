@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.7 1999/03/03 21:16:14 mike Exp $"
+ * "$Id: ipp.h,v 1.8 1999/03/21 02:10:03 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -15,7 +15,7 @@
  *
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
+ *       44141 Airport View Drive, Suite 204
  *       Hollywood, Maryland 20636-3111 USA
  *
  *       Voice: (301) 373-9603
@@ -257,8 +257,6 @@ typedef union			/**** Attribute Value ****/
 
   char		boolean;	/* Boolean value */
 
-  char		*string;	/* String value */
-
   uchar		date[11];	/* Date/time value */
 
   struct
@@ -277,8 +275,8 @@ typedef union			/**** Attribute Value ****/
   struct
   {
     char	*charset;	/* Character set */
-    uchar	*string;	/* String */
-  }		lstring;	/* String with language value */
+    char	*text;		/* String */
+  }		string;		/* String with language value */
 } ipp_value_t;
 
 typedef struct ipp_attribute_s	/**** Attribute ****/
@@ -311,19 +309,17 @@ extern time_t		ippDateToTime(uchar *date);
 extern ipp_attribute_t	*ippAddBoolean(ipp_t *ipp, ipp_tag_t group, char *name, char value);
 extern ipp_attribute_t	*ippAddBooleans(ipp_t *ipp, ipp_tag_t group, char *name, int num_values, char *values);
 extern ipp_attribute_t	*ippAddDate(ipp_t *ipp, ipp_tag_t group, char *name, uchar *value);
-extern ipp_attribute_t	*ippAddInteger(ipp_t *ipp, ipp_tag_t group, char *name, int value);
-extern ipp_attribute_t	*ippAddIntegers(ipp_t *ipp, ipp_tag_t group, char *name, int num_values, int *values);
-extern ipp_attribute_t	*ippAddLString(ipp_t *ipp, ipp_tag_t group, char *name, char *charset, uchar *value);
-extern ipp_attribute_t	*ippAddLStrings(ipp_t *ipp, ipp_tag_t group, char *name, int num_values, char *charset, uchar **values);
+extern ipp_attribute_t	*ippAddInteger(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, char *name, int value);
+extern ipp_attribute_t	*ippAddIntegers(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, char *name, int num_values, int *values);
 extern ipp_attribute_t	*ippAddRange(ipp_t *ipp, ipp_tag_t group, char *name, int lower, int upper);
 extern ipp_attribute_t	*ippAddRanges(ipp_t *ipp, ipp_tag_t group, char *name, int num_values, int *lower, int *upper);
 extern ipp_attribute_t	*ippAddResolution(ipp_t *ipp, ipp_tag_t group, char *name, ipp_res_t units, int xres, int yres);
 extern ipp_attribute_t	*ippAddResolutions(ipp_t *ipp, ipp_tag_t group, char *name, int num_values, ipp_res_t units, int *xres, int *yres);
 extern ipp_attribute_t	*ippAddSeparator(ipp_t *ipp);
-extern ipp_attribute_t	*ippAddString(ipp_t *ipp, ipp_tag_t group, char *name, char *value);
-extern ipp_attribute_t	*ippAddStrings(ipp_t *ipp, ipp_tag_t group, char *name, int num_values, char **values);
+extern ipp_attribute_t	*ippAddString(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, char *name, char *charset, char *value);
+extern ipp_attribute_t	*ippAddStrings(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, char *name, int num_values, char *charset, char **values);
 extern void		ippDelete(ipp_t *ipp);
-extern ipp_attribute_t	*ippFindAttribute(ipp_t *ipp, char *name);
+extern ipp_attribute_t	*ippFindAttribute(ipp_t *ipp, char *name, ipp_tag_t type);
 extern size_t		ippLength(ipp_t *ipp);
 extern ipp_t		*ippNew(void);
 extern ipp_state_t	ippRead(http_t *http, ipp_t *ipp);
@@ -341,5 +337,5 @@ extern int		ippPort(void);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.7 1999/03/03 21:16:14 mike Exp $".
+ * End of "$Id: ipp.h,v 1.8 1999/03/21 02:10:03 mike Exp $".
  */
