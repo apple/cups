@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.56.2.20 2004/09/09 15:39:55 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.56.2.21 2004/09/09 20:24:07 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -904,11 +904,26 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
    /*
+    * Use the correct width and length for the current orientation...
+    */
+
+    if (Orientation & 1)
+    {
+      width  = yprint * 72.0;
+      length = xprint * 72.0;
+    }
+    else
+    {
+      width  = xprint * 72.0;
+      length = yprint * 72.0;
+    }
+
+   /*
     * Add margins to page size...
     */
 
-    width  = xprint * 72.0 + ppd->custom_margins[0] + ppd->custom_margins[2];
-    length = yprint * 72.0 + ppd->custom_margins[1] + ppd->custom_margins[3];
+    width  += ppd->custom_margins[0] + ppd->custom_margins[2];
+    length += ppd->custom_margins[1] + ppd->custom_margins[3];
 
    /*
     * Enforce minimums...
@@ -4579,5 +4594,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.56.2.20 2004/09/09 15:39:55 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.56.2.21 2004/09/09 20:24:07 mike Exp $".
  */

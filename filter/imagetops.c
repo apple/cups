@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.36.2.17 2004/09/09 15:39:55 mike Exp $"
+ * "$Id: imagetops.c,v 1.36.2.18 2004/09/09 20:24:07 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -477,11 +477,26 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
    /*
+    * Use the correct width and length for the current orientation...
+    */
+
+    if (Orientation & 1)
+    {
+      width  = yprint * 72.0;
+      length = xprint * 72.0;
+    }
+    else
+    {
+      width  = xprint * 72.0;
+      length = yprint * 72.0;
+    }
+
+   /*
     * Add margins to page size...
     */
 
-    width  = xprint * 72.0 + ppd->custom_margins[0] + ppd->custom_margins[2];
-    length = yprint * 72.0 + ppd->custom_margins[1] + ppd->custom_margins[3];
+    width  += ppd->custom_margins[0] + ppd->custom_margins[2];
+    length += ppd->custom_margins[1] + ppd->custom_margins[3];
 
    /*
     * Enforce minimums...
@@ -582,8 +597,30 @@ main(int  argc,		/* I - Number of command-line arguments */
            "ifelse %.3f mul } bind settransfer\n", g, b);
 
   WriteCommon();
-  WriteLabelProlog(cupsGetOption("page-label", num_options, options),
-                   PageBottom, PageTop, PageWidth);
+  switch (Orientation)
+  {
+    case 0 :
+	WriteLabelProlog(cupsGetOption("page-label", num_options, options),
+                	 PageBottom, PageTop, PageWidth);
+        break;
+
+    case 1 :
+	WriteLabelProlog(cupsGetOption("page-label", num_options, options),
+                	 PageLeft, PageRight, PageLength);
+        break;
+
+    case 2 :
+	WriteLabelProlog(cupsGetOption("page-label", num_options, options),
+                	 PageLength - PageTop, PageLength - PageBottom,
+			 PageWidth);
+        break;
+
+    case 3 :
+	WriteLabelProlog(cupsGetOption("page-label", num_options, options),
+                	 PageWidth - PageRight, PageWidth - PageLeft,
+			 PageLength);
+        break;
+  }
 
   if (realcopies > 1)
   {
@@ -609,6 +646,123 @@ main(int  argc,		/* I - Number of command-line arguments */
   fprintf(stderr, "DEBUG: PageBottom=%.0f, PageTop=%.0f, PageLength=%.0f\n",
           PageBottom, PageTop, PageLength);
 
+  switch (Orientation)
+  {
+    case 0 :
+	switch (XPosition)
+	{
+	  case -1 :
+              left = PageLeft;
+	      break;
+	  default :
+              left = (PageRight + PageLeft - xprint * 72) / 2;
+	      break;
+	  case 1 :
+              left = PageRight - xprint * 72;
+	      break;
+	}
+
+	switch (YPosition)
+	{
+	  case -1 :
+	      top = PageBottom + yprint * 72;
+	      break;
+	  default :
+	      top = (PageTop + PageBottom + yprint * 72) / 2;
+	      break;
+	  case 1 :
+	      top = PageTop;
+	      break;
+	}
+	break;
+
+    case 1 :
+	switch (XPosition)
+	{
+	  case -1 :
+              left = PageBottom;
+	      break;
+	  default :
+              left = (PageTop + PageBottom - xprint * 72) / 2;
+	      break;
+	  case 1 :
+              left = PageTop - xprint * 72;
+	      break;
+	}
+
+	switch (YPosition)
+	{
+	  case -1 :
+	      top = PageLeft + yprint * 72;
+	      break;
+	  default :
+	      top = (PageRight + PageLeft + yprint * 72) / 2;
+	      break;
+	  case 1 :
+	      top = PageRight;
+	      break;
+	}
+	break;
+
+    case 2 :
+	switch (XPosition)
+	{
+	  case 1 :
+              left = PageLeft;
+	      break;
+	  default :
+              left = (PageRight + PageLeft - xprint * 72) / 2;
+	      break;
+	  case -1 :
+              left = PageRight - xprint * 72;
+	      break;
+	}
+
+	switch (YPosition)
+	{
+	  case 1 :
+	      top = PageBottom + yprint * 72;
+	      break;
+	  default :
+	      top = (PageTop + PageBottom + yprint * 72) / 2;
+	      break;
+	  case -1 :
+	      top = PageTop;
+	      break;
+	}
+	break;
+
+    case 3 :
+	switch (XPosition)
+	{
+	  case 1 :
+              left = PageBottom;
+	      break;
+	  default :
+              left = (PageTop + PageBottom - xprint * 72) / 2;
+	      break;
+	  case -1 :
+              left = PageTop - xprint * 72;
+	      break;
+	}
+
+	switch (YPosition)
+	{
+	  case 1 :
+	      top = PageLeft + yprint * 72;
+	      break;
+	  default :
+	      top = (PageRight + PageLeft + yprint * 72) / 2;
+	      break;
+	  case -1 :
+	      top = PageRight;
+	      break;
+	}
+	break;
+  }
+
+  fprintf(stderr, "DEBUG: left=%.2f, top=%.2f\n", left, top);
+
   for (page = 1; Copies > 0; Copies --)
     for (xpage = 0; xpage < xpages; xpage ++)
       for (ypage = 0; ypage < ypages; ypage ++, page ++)
@@ -630,46 +784,22 @@ main(int  argc,		/* I - Number of command-line arguments */
 	switch (Orientation)
 	{
 	  case 1 : /* Landscape */
-              printf("%.0f 0 translate 90 rotate\n", PageLength);
+              printf("%.0f 0 translate 90 rotate\n", PageWidth);
               break;
 	  case 2 : /* Reverse Portrait */
               printf("%.0f %.0f translate 180 rotate\n", PageWidth, PageLength);
               break;
 	  case 3 : /* Reverse Landscape */
-              printf("0 %.0f translate -90 rotate\n", PageWidth);
+              printf("0 %.0f translate -90 rotate\n", PageLength);
               break;
 	}
+
+        puts("gsave");
 
 	x0 = img->xsize * xpage / xpages;
 	x1 = img->xsize * (xpage + 1) / xpages - 1;
 	y0 = img->ysize * ypage / ypages;
 	y1 = img->ysize * (ypage + 1) / ypages - 1;
-
-        switch (XPosition)
-	{
-	  case -1 :
-              left = PageLeft;
-	      break;
-	  default :
-	      left = (PageLeft + PageRight - xprint * 72.0) * 0.5;
-	      break;
-	  case 1 :
-	      left = PageRight - xprint * 72.0;
-	      break;
-	}
-
-        switch (YPosition)
-	{
-	  case -1 :
-	      top = PageBottom + 72.0 * yprint;
-	      break;
-	  default :
-	      top = (PageBottom + PageTop + yprint * 72.0) * 0.5;
-	      break;
-	  case 1 :
-	      top = PageTop;
-	      break;
-	}
 
         printf("%.1f %.1f translate\n", left, top);
 
@@ -751,7 +881,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 	}
 
 	puts("grestore");
-	WriteLabels(Orientation);
+	WriteLabels(0);
+	puts("grestore");
 	puts("showpage");
       }
 
@@ -896,5 +1027,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.36.2.17 2004/09/09 15:39:55 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.36.2.18 2004/09/09 20:24:07 mike Exp $".
  */
