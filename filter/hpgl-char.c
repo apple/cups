@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-char.c,v 1.10 2000/01/04 13:45:43 mike Exp $"
+ * "$Id: hpgl-char.c,v 1.11 2000/05/02 19:16:52 mike Exp $"
  *
  *   HP-GL/2 character processing for the Common UNIX Printing System (CUPS).
  *
@@ -198,6 +198,7 @@ DI_absolute_direction(int     num_params,	/* I - Number of parameters */
 	     -AlternateFont.y * AlternateFont.height,
 	     AlternateFont.y * AlternateFont.height,
 	     AlternateFont.x * AlternateFont.height);
+      puts("SA");
     }
   }
   else
@@ -223,6 +224,7 @@ DI_absolute_direction(int     num_params,	/* I - Number of parameters */
 	     -StandardFont.y * StandardFont.height,
 	     StandardFont.y * StandardFont.height,
 	     StandardFont.x * StandardFont.height);
+      puts("SS");
     }
   }
 }
@@ -494,5 +496,5 @@ TD_transparent_data(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-char.c,v 1.10 2000/01/04 13:45:43 mike Exp $".
+ * End of "$Id: hpgl-char.c,v 1.11 2000/05/02 19:16:52 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c,v 1.14 2000/01/27 19:28:51 mike Exp $"
+ * "$Id: options.c,v 1.15 2000/05/02 19:16:51 mike Exp $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -367,6 +367,11 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
       if (ppdMarkOption(ppd, "CNRes_PGP", options->value))	/* Canon */
         conflict = 1;
     }
+    else if (strcasecmp(options->name, "output-bin") == 0)
+    {
+      if (ppdMarkOption(ppd, "OutputBin", options->value))
+        conflict = 1;
+    }
     else if (ppdMarkOption(ppd, options->name, options->value))
       conflict = 1;
 
@@ -375,5 +380,5 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: options.c,v 1.14 2000/01/27 19:28:51 mike Exp $".
+ * End of "$Id: options.c,v 1.15 2000/05/02 19:16:51 mike Exp $".
  */

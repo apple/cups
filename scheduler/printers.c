@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.62 2000/04/20 20:11:32 mike Exp $"
+ * "$Id: printers.c,v 1.63 2000/05/02 19:16:52 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -682,7 +682,8 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   ppd_file_t	*ppd;			/* PPD file data */
   ppd_option_t	*input_slot,		/* InputSlot options */
 		*media_type,		/* MediaType options */
-		*page_size;		/* PageSize options */
+		*page_size,		/* PageSize options */
+		*output_bin;		/* OutputBin options */
   ipp_attribute_t *attr;		/* Attribute data */
   ipp_value_t	*val;			/* Attribute value */
   int		nups[3] =		/* number-up-supported values */
@@ -1059,6 +1060,26 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
                      NULL, page_size->defchoice);
 
+       /*
+        * Output bin...
+	*/
+
+	if ((output_bin = ppdFindOption(ppd, "OutputBin")) != NULL)
+	{
+	  attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                               "output-bin-supported", output_bin->num_choices,
+			       NULL, NULL);
+
+	  for (i = 0, val = attr->values;
+	       i < output_bin->num_choices;
+	       i ++, val ++)
+	    val->string.text = strdup(output_bin->choices[i].choice);
+        }
+
+       /*
+        * Duplexing, etc...
+	*/
+
 	if (ppdFindOption(ppd, "Duplex") != NULL)
 	{
 	  p->type |= CUPS_PRINTER_DUPLEX;
@@ -1377,5 +1398,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.62 2000/04/20 20:11:32 mike Exp $".
+ * End of "$Id: printers.c,v 1.63 2000/05/02 19:16:52 mike Exp $".
  */
