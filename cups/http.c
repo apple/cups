@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.128 2004/02/04 19:06:49 mike Exp $"
+ * "$Id: http.c,v 1.129 2004/02/04 19:17:59 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -204,8 +204,8 @@ httpInitialize(void)
 #endif /* HAVE_LIBSSL */
 
 #ifdef WIN32
-  WSADATA	winsockdata;	/* WinSock data */
-  static int	initialized = 0;/* Has WinSock been initialized? */
+  WSADATA	winsockdata;		/* WinSock data */
+  static int	initialized = 0;	/* Has WinSock been initialized? */
 
 
   if (!initialized)
@@ -213,7 +213,7 @@ httpInitialize(void)
 #elif defined(HAVE_SIGSET)
   sigset(SIGPIPE, SIG_IGN);
 #elif defined(HAVE_SIGACTION)
-  struct sigaction	action;	/* POSIX sigaction data */
+  struct sigaction	action;		/* POSIX sigaction data */
 
 
  /*
@@ -622,14 +622,14 @@ httpGetSubField(http_t       *http,	/* I - HTTP data */
 		*ptr;			/* Pointer into string buffer */
 
 
+  DEBUG_printf(("httpGetSubField(http=%p, field=%d, name=\"%s\", value=%p)\n",
+                http, field, name, value));
+
   if (http == NULL ||
       field < HTTP_FIELD_ACCEPT_LANGUAGE ||
       field > HTTP_FIELD_WWW_AUTHENTICATE ||
       name == NULL || value == NULL)
     return (NULL);
-
-  DEBUG_printf(("httpGetSubField(http=%p, field=%d, name=\"%s\", value=%p)\n",
-                http, field, name, value));
 
   for (fptr = http->fields[field]; *fptr;)
   {
@@ -1583,11 +1583,11 @@ httpUpdate(http_t *http)		/* I - HTTP data */
       {
 	if (http_setup_ssl(http) != 0)
 	{
-#ifdef WIN32
+#  ifdef WIN32
 	  closesocket(http->fd);
-#else
+#  else
 	  close(http->fd);
-#endif
+#  endif /* WIN32 */
 
 	  return (HTTP_ERROR);
 	}
@@ -2441,5 +2441,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.128 2004/02/04 19:06:49 mike Exp $".
+ * End of "$Id: http.c,v 1.129 2004/02/04 19:17:59 mike Exp $".
  */
