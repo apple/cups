@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.c,v 1.5 1999/04/06 16:23:01 mike Exp $"
+ * "$Id: raster.c,v 1.6 1999/04/06 16:24:46 mike Exp $"
  *
  *   Raster file routines for the Common UNIX Printing System (CUPS).
  *
@@ -174,7 +174,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
   while (remaining > 0)
   {
     bytes = read(r->fd, p, remaining);
-    if (bytes < 0)
+    if (bytes <= 0)
       return (0);
 
     remaining -= bytes;
@@ -223,7 +223,7 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
   while (remaining > 0)
   {
     bytes = write(r->fd, p, remaining);
-    if (bytes < 0)
+    if (bytes <= 0)
       return (0);
 
     remaining -= bytes;
@@ -235,5 +235,5 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
 
 
 /*
- * End of "$Id: raster.c,v 1.5 1999/04/06 16:23:01 mike Exp $".
+ * End of "$Id: raster.c,v 1.6 1999/04/06 16:24:46 mike Exp $".
  */
