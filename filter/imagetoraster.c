@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.4 1998/07/28 18:49:15 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.5 1998/07/28 20:48:30 mike Exp $"
  *
  *   Image file to STIFF conversion program for espPrint, a collection
  *   of printer drivers.
@@ -17,7 +17,10 @@
  * Revision History:
  *
  *   $Log: imagetoraster.c,v $
- *   Revision 1.4  1998/07/28 18:49:15  mike
+ *   Revision 1.5  1998/07/28 20:48:30  mike
+ *   Updated size/page computation code to work properly.
+ *
+ *   Revision 1.4  1998/07/28  18:49:15  mike
  *   Fixed bug in rotation code - was rotating variable size media as well...
  *
  *   Revision 1.3  1998/04/02  21:06:54  mike
@@ -676,16 +679,8 @@ main(int  argc,		/* I - Number of command-line arguments */
     yinches = ysize;
   };
 
-  if (rotation == 0)
-  {
-    xpages = ceil(xinches / xprint);
-    ypages = ceil(yinches / yprint);
-  }
-  else
-  {
-    xpages = ceil(xinches / yprint);
-    ypages = ceil(yinches / xprint);
-  };
+  xpages = ceil(xinches / xprint);
+  ypages = ceil(yinches / yprint);
 
   if (Verbosity)
   {
@@ -803,16 +798,11 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (variable)
   {
-    if (rotation == 0)
-    {
-      width  = xdpi * xinches / xpages;
-      height = ydpi * yinches / ypages;
-    }
-    else
-    {
-      width  = xdpi * yinches / xpages;
-      height = ydpi * xinches / ypages;
-    };
+    width  = xdpi * xinches / xpages;
+    height = ydpi * yinches / ypages;
+
+    fprintf(stderr, "img2stiff: Set variable size to %dx%d pixels...\n",
+            width, height);
   };
 
   bpp    = header.bitsPerSample * header.samplesPerPixel;
@@ -834,9 +824,6 @@ main(int  argc,		/* I - Number of command-line arguments */
 	  x1 = img->xsize * (xpage + 1) / xpages - 1;
 	  y0 = img->ysize * ypage / ypages;
 	  y1 = img->ysize * (ypage + 1) / ypages - 1;
-
-	  xtemp = xdpi * xinches / xpages;
-	  ytemp = ydpi * yinches / ypages;
 	}
 	else
 	{
@@ -844,10 +831,10 @@ main(int  argc,		/* I - Number of command-line arguments */
 	  x1 = img->xsize * (ypage + 1) / ypages - 1;
 	  y0 = img->ysize * xpage / xpages;
 	  y1 = img->ysize * (xpage + 1) / xpages - 1;
-
-	  xtemp = ydpi * xinches / xpages;
-	  ytemp = xdpi * yinches / ypages;
 	};
+
+	xtemp = xdpi * xinches / xpages;
+	ytemp = ydpi * yinches / ypages;
 
 	z = ImageZoomAlloc(img, x0, y0, x1, y1, xtemp, ytemp, rotation);
 
@@ -865,12 +852,8 @@ main(int  argc,		/* I - Number of command-line arguments */
         	  header.xRes, header.yRes, header.width, header.height);
 	  fprintf(stderr, "img2stiff: (x0, y0) = (%d, %d), (x1, y1) = (%d, %d)\n",
 	          x0, y0, x1, y1);
-	  if (rotation == 0)
-	    fprintf(stderr, "img2stiff: image area = %.0fx%.0f pixels\n",
-	            xtemp, ytemp);
-	  else
-	    fprintf(stderr, "img2stiff: image area = %.0fx%.0f pixels\n",
-	            ytemp, xtemp);
+	  fprintf(stderr, "img2stiff: image area = %.0fx%.0f pixels\n",
+	          xtemp, ytemp);
 	};
 
 	memset(row, blank, bwidth);
@@ -1143,5 +1126,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.4 1998/07/28 18:49:15 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.5 1998/07/28 20:48:30 mike Exp $".
  */

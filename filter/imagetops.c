@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.3 1998/04/23 15:52:20 mike Exp $"
+ * "$Id: imagetops.c,v 1.4 1998/07/28 20:48:30 mike Exp $"
  *
  *   Image file to PostScript conversion program for espPrint, a collection
  *   of printer drivers.
@@ -17,7 +17,10 @@
  * Revision History:
  *
  *   $Log: imagetops.c,v $
- *   Revision 1.3  1998/04/23 15:52:20  mike
+ *   Revision 1.4  1998/07/28 20:48:30  mike
+ *   Updated size/page computation code to work properly.
+ *
+ *   Revision 1.3  1998/04/23  15:52:20  mike
  *   Removed whitespace from the ASCII85 image data.
  *   Now use an image dictionary for Level 2 printers.
  *   Now enable interpolation for Level 2 printers.
@@ -386,16 +389,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Scale as necessary...
   */
 
-  if (landscape)
-  {
-    xprint = (float)size->vertical_addr / (float)info->vertical_resolution;
-    yprint = (float)size->horizontal_addr / (float)info->horizontal_resolution;
-  }
-  else
-  {
-    xprint = (float)size->horizontal_addr / (float)info->horizontal_resolution;
-    yprint = (float)size->vertical_addr / (float)info->vertical_resolution;
-  };
+  xprint = (float)size->horizontal_addr / (float)info->horizontal_resolution;
+  yprint = (float)size->vertical_addr / (float)info->vertical_resolution;
 
   if (rotation >= 0 && landscape)
     rotation = 1 - (rotation & 1);
@@ -498,16 +493,8 @@ main(int  argc,		/* I - Number of command-line arguments */
     yinches = ysize;
   };
 
-  if (rotation == 0)
-  {
-    xpages = ceil(xinches / xprint);
-    ypages = ceil(yinches / yprint);
-  }
-  else
-  {
-    xpages = ceil(xinches / yprint);
-    ypages = ceil(yinches / xprint);
-  };
+  xpages = ceil(xinches / xprint);
+  ypages = ceil(yinches / yprint);
 
   if (Verbosity)
   {
@@ -558,42 +545,41 @@ main(int  argc,		/* I - Number of command-line arguments */
       fprintf(out, "%%Page: %d\n", xpage * ypages + ypage + 1);
       fputs("gsave\n", out);
 
-      x0 = img->xsize * xpage / xpages;
-      x1 = img->xsize * (xpage + 1) / xpages - 1;
-      y0 = img->ysize * ypage / ypages;
-      y1 = img->ysize * (ypage + 1) / ypages - 1;
+      if (rotation == 0)
+      {
+	x0 = img->xsize * xpage / xpages;
+	x1 = img->xsize * (xpage + 1) / xpages - 1;
+	y0 = img->ysize * ypage / ypages;
+	y1 = img->ysize * (ypage + 1) / ypages - 1;
+      }
+      else
+      {
+	x0 = img->xsize * ypage / ypages;
+	x1 = img->xsize * (ypage + 1) / ypages - 1;
+	y0 = img->ysize * xpage / xpages;
+	y1 = img->ysize * (xpage + 1) / xpages - 1;
+      };
 
       xprint = xinches / xpages;
       yprint = yinches / ypages;
 
+      if (flip)
+	fprintf(out, "\t%.1f %.1f translate\n",
+        	(size->width + xprint) * 36.0,
+        	(size->length - yprint) * 36.0);
+      else
+	fprintf(out, "\t%.1f %.1f translate\n",
+        	(size->width - xprint) * 36.0,
+        	(size->length - yprint) * 36.0);
+
       if (rotation == 0)
-      {
-        if (flip)
-	  fprintf(out, "\t%.1f %.1f translate\n",
-        	  (size->width + xprint) * 36.0,
-        	  (size->length + yprint) * 36.0);
-        else
-	  fprintf(out, "\t%.1f %.1f translate\n",
-        	  (size->width - xprint) * 36.0,
-        	  (size->length + yprint) * 36.0);
 	fprintf(out, "\t%.3f %.3f scale\n\n",
 	        xprint * 72.0 / (x1 - x0 + 1),
 	        yprint * 72.0 / (y1 - y0 + 1));
-      }
       else
-      {
-        if (flip)
-	  fprintf(out, "\t%.1f %.1f translate\n",
-        	  (size->width + yprint) * 36.0,
-        	  (size->length - xprint) * 36.0);
-        else
-	  fprintf(out, "\t%.1f %.1f translate\n",
-        	  (size->width - yprint) * 36.0,
-        	  (size->length - xprint) * 36.0);
 	fprintf(out, "\t%.3f %.3f scale\n\n",
-	        yprint * 72.0 / (y1 - y0 + 1),
-	        xprint * 72.0 / (x1 - x0 + 1));
-      };
+	        xprint * 72.0 / (y1 - y0 + 1),
+	        yprint * 72.0 / (x1 - x0 + 1));
 
       if (level == 1)
       {
@@ -649,7 +635,9 @@ main(int  argc,		/* I - Number of command-line arguments */
           fputs("\t/Decode [ 0 1 0 1 0 1 ]\n", out);
 
         fputs("\t/DataSource currentfile /ASCII85Decode filter\n", out);
-        fputs("\t/Interpolate true\n", out);
+
+        if (((x1 - x0 + 1) / xprint) < 100.0)
+          fputs("\t/Interpolate true\n", out);
 
 	if (rotation == 0)
 	{
@@ -746,6 +734,7 @@ ps_ascii85(FILE *prn,		/* I - File to print to */
 	   int  length,		/* I - Number of bytes to print */
 	   int  last_line)	/* I - Last line of raster data? */
 {
+  int		i;		/* Looping var */
   unsigned	b;		/* Binary data word */
   unsigned char	c[5];		/* ASCII85 encoded chars */
 
@@ -779,7 +768,7 @@ ps_ascii85(FILE *prn,		/* I - File to print to */
   {
     if (length > 0)
     {
-      for (b = 0, col = length; col > 0; b = (b << 8) | data[0], data ++, col --);
+      for (b = 0, i = length; i > 0; b = (b << 8) | data[0], data ++, i --);
 
       c[4] = (b % 85) + '!';
       b /= 85;
@@ -926,5 +915,5 @@ print_prolog(FILE  *out,
 
 
 /*
- * End of "$Id: imagetops.c,v 1.3 1998/04/23 15:52:20 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.4 1998/07/28 20:48:30 mike Exp $".
  */
