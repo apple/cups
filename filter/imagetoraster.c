@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.9 1999/03/24 18:01:47 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.10 1999/04/01 18:25:04 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -29,599 +29,409 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <math.h>
-#include <time.h>
-#include <unistd.h>
-#include <fcntl.h>
-
-#include <pod.h>
-#include <ppd.h>
-#include <printutil.h>
-#include <printstiff.h>
-#include <errorcodes.h>
-
-#include "image.h"
-
-
 /*
- * Constants...
+ * Include necessary headers...
  */
 
-#ifndef FALSE				/* Boolean stuff */
-#  define FALSE 0
-#  define TRUE  (!FALSE)
-#endif /* !FALSE */
+#include "common.h"
+#include "image.h"
+#include <cups/raster.h>
+#include <math.h>
 
 
 /*
  * Globals...
  */
 
-int	Verbosity = 0;
-int	FloydDither[16][16] =
-{
-  { 0, 128, 32, 160, 8, 136, 40, 168, 2, 130, 34, 162, 10, 138, 42, 170 },
-  { 192, 64, 224, 96, 200, 72, 232, 104, 194, 66, 226, 98, 202, 74, 234, 106 },
-  { 48, 176, 16, 144, 56, 184, 24, 152, 50, 178, 18, 146, 58, 186, 26, 154 },
-  { 240, 112, 208, 80, 248, 120, 216, 88, 242, 114, 210, 82, 250, 122, 218, 90 },
-  { 12, 140, 44, 172, 4, 132, 36, 164, 14, 142, 46, 174, 6, 134, 38, 166 },
-  { 204, 76, 236, 108, 196, 68, 228, 100, 206, 78, 238, 110, 198, 70, 230, 102 },
-  { 60, 188, 28, 156, 52, 180, 20, 148, 62, 190, 30, 158, 54, 182, 22, 150 },
-  { 252, 124, 220, 92, 244, 116, 212, 84, 254, 126, 222, 94, 246, 118, 214, 86 },
-  { 3, 131, 35, 163, 11, 139, 43, 171, 1, 129, 33, 161, 9, 137, 41, 169 },
-  { 195, 67, 227, 99, 203, 75, 235, 107, 193, 65, 225, 97, 201, 73, 233, 105 },
-  { 51, 179, 19, 147, 59, 187, 27, 155, 49, 177, 17, 145, 57, 185, 25, 153 },
-  { 243, 115, 211, 83, 251, 123, 219, 91, 241, 113, 209, 81, 249, 121, 217, 89 },
-  { 15, 143, 47, 175, 7, 135, 39, 167, 13, 141, 45, 173, 5, 133, 37, 165 },
-  { 207, 79, 239, 111, 199, 71, 231, 103, 205, 77, 237, 109, 197, 69, 229, 101 },
-  { 63, 191, 31, 159, 55, 183, 23, 151, 61, 189, 29, 157, 53, 181, 21, 149 },
-  { 254, 127, 223, 95, 247, 119, 215, 87, 253, 125, 221, 93, 245, 117, 213, 85 }
-};
+int	Flip = 0,		/* Flip/mirror pages */
+	Collate = 0,		/* Collate copies? */
+	Copies = 1;		/* Number of copies */
+int	FloydDither[16][16] =	/* Traditional Floyd ordered dither */
+	{
+	  { 0,   128, 32,  160, 8,   136, 40,  168,
+	    2,   130, 34,  162, 10,  138, 42,  170 },
+	  { 192, 64,  224, 96,  200, 72,  232, 104,
+	    194, 66,  226, 98,  202, 74,  234, 106 },
+	  { 48,  176, 16,  144, 56,  184, 24,  152,
+	    50,  178, 18,  146, 58,  186, 26,  154 },
+	  { 240, 112, 208, 80,  248, 120, 216, 88,
+	    242, 114, 210, 82,  250, 122, 218, 90 },
+	  { 12,  140, 44,  172, 4,   132, 36,  164,
+	    14,  142, 46,  174, 6,   134, 38,  166 },
+	  { 204, 76,  236, 108, 196, 68,  228, 100,
+	    206, 78,  238, 110, 198, 70,  230, 102 },
+	  { 60,  188, 28,  156, 52,  180, 20,  148,
+	    62,  190, 30,  158, 54,  182, 22,  150 },
+	  { 252, 124, 220, 92,  244, 116, 212, 84,
+	    254, 126, 222, 94,  246, 118, 214, 86 },
+	  { 3,   131, 35,  163, 11,  139, 43,  171,
+	    1,   129, 33,  161, 9,   137, 41,  169 },
+	  { 195, 67,  227, 99,  203, 75,  235, 107,
+	    193, 65,  225, 97,  201, 73,  233, 105 },
+	  { 51,  179, 19,  147, 59,  187, 27,  155,
+	    49,  177, 17,  145, 57,  185, 25,  153 },
+	  { 243, 115, 211, 83,  251, 123, 219, 91,
+	    241, 113, 209, 81,  249, 121, 217, 89 },
+	  { 15,  143, 47,  175, 7,   135, 39,  167,
+	    13,  141, 45,  173, 5,   133, 37,  165 },
+	  { 207, 79,  239, 111, 199, 71,  231, 103,
+	    205, 77,  237, 109, 197, 69,  229, 101 },
+	  { 63,  191, 31,  159, 55,  183, 23,  151,
+	    61,  189, 29,  157, 53,  181, 21,  149 },
+	  { 254, 127, 223, 95,  247, 119, 215, 87,
+	    253, 125, 221, 93,  245, 117, 213, 85 }
+	};
 
 
 /*
  * Local functions...
  */
 
-static void	usage(void);
-static void	make_lut(ib_t *, int, float, float, float, float);
+static void	make_lut(ib_t *, int, float, float);
 
 
 /*
  * 'main()' - Main entry...
  */
 
-int
+int			/* O - Exit status */
 main(int  argc,		/* I - Number of command-line arguments */
      char *argv[])	/* I - Command-line arguments */
 {
-  int			i;		/* Looping var */
-  char			*opt,		/* Current option character */
-			*infile,	/* Input filename */
-			*outfile,	/* Output filename */
-			*printer;	/* Printer */
-  STStream		*st;		/* output image stream */
-  PSTImageHeader	header;		/* Output image header */
-  PDInfoStruct		*info;		/* POD info */
-  PDStatusStruct	*status;	/* POD status */
-  time_t		mod_time;	/* Modification time */
-  PDSizeTableStruct	*size;		/* Page size */
-  image_t		*img;		/* Image to print */
-  izoom_t		*z;		/* ImageZoom buffer */
-  int			bits,		/* Bits-per-channel */
-			icolorspace,	/* Image colorspace */
-                        scolorspace,	/* STIFF colorspace */
-                        variable,	/* Non-zero if page is variable size */
-			width,		/* Width (pixels) of each image */
-			height,		/* Height (pixels) of each image */
-			xdpi,		/* Horizontal resolution */
-			ydpi,		/* Vertical resolution */
-			copies;		/* Number of copies */
-  float			xzoom,		/* X zoom facter */
-			yzoom,		/* Y zoom facter */
-			xprint,
-			yprint,
-			xinches,
-			yinches;
-  float			xsize,
-			ysize,
-			xtemp,
-			ytemp;
-  int			xpages,		/* X pages */
-			ypages,		/* Y pages */
-			xpage,		/* Current x page */
-			ypage;		/* Current y page */
-  int			level,		/* PostScript "level" */
-			flip,		/* Flip */
-			rotation,	/* Rotation */
-			landscape,	/* Landscape orientation? */
-			xppi, yppi;	/* Pixels-per-inch */
-  float			profile[6];
-  float			gammaval[4];
-  int			brightness[4];
-  int			x0, y0,		/* Corners of the page in image coords */
-			x1, y1;
-  ib_t			*row,
-			*rowptr,
-			*r0,
-			*r1,
-			bitmask;
-  int			bwidth,
-			bpp,
-			bitoffset;
-  int			x,
-			y,
-			iy,
-			last_iy,
-			yerr0,
-			yerr1,
-			blank,
-			*dither;
-  int			hue, sat;
-  ib_t			luts[1024],
-			onpixels[256],
-			offpixels[256];
-  static ib_t		bitmasks[8] = { 128, 64, 32, 16, 8, 4, 2, 1 };
+  int		i;		/* Looping var */
+  image_t	*img;		/* Image to print */
+  float		xprint,		/* Printable area */
+		yprint,
+		xinches,	/* Total size in inches */
+		yinches;
+  float		xsize,		/* Total size in points */
+		ysize;
+  int		xpages,		/* # x pages */
+		ypages,		/* # y pages */
+		xpage,		/* Current x page */
+		ypage,		/* Current y page */
+		xtemp,		/* Bitmap width in pixels */
+		ytemp,		/* Bitmap height in pixels */
+		page;		/* Current page number */
+  int		x0, y0,		/* Corners of the page in image coords */
+		x1, y1;
+  ppd_file_t	*ppd;		/* PPD file */
+  ppd_choice_t	*choice;	/* PPD option choice */
+  char		*resolution,	/* Output resolution */
+		*media_type;	/* Media type */
+  ppd_profile_t	*profile;	/* Color profile */
+  cups_raster_t	*ras;		/* Raster stream */
+  cups_page_header_t header;	/* Page header */
+  int		num_options;	/* Number of print options */
+  cups_option_t	*options;	/* Print options */
+  char		*val;		/* Option value */
+  int		slowcollate;	/* Collate copies the slow way */
+  float		g;		/* Gamma correction value */
+  float		b;		/* Brightness factor */
+  float		zoom;		/* Zoom facter */
+  int		ppi;		/* Pixels-per-inch */
+  int		hue, sat;	/* Hue and saturation adjustment */
+  izoom_t	*z;		/* ImageZoom buffer */
+  int		primary,	/* Primary image colorspace */
+		secondary;	/* Secondary image colorspace */
+  ib_t		*row,		/* Current row */
+		*rowptr,	/* Pointer into row */
+		*r0,		/* Top row */
+		*r1,		/* Bottom row */
+		bitmask;	/* Current mask for pixel */
+  int		bitoffset;	/* Current offset in line */
+  int		x,		/* Current X coordinate on page */
+		y,		/* Current Y coordinate on page */
+		iy,		/* Current Y coordinate in image */
+		last_iy,	/* Previous Y coordinate in image */
+		yerr0,		/* Top Y error value */
+		yerr1,		/* Bottom Y error value */
+		blank,		/* Blank value */
+		*dither;	/* Pointer into dither array */
+  ib_t		lut[256],	/* Gamma/brightness LUT */
+		onpixels[256],	/* On-pixel LUT */
+		offpixels[256];	/* Off-pixel LUT */
+  static ib_t	bitmasks[8] =	/* Bit masks */
+		{ 128, 64, 32, 16, 8, 4, 2, 1 };
+  static int	planes[] =	/* Number of planes for each colorspace */
+		{ 1, 3, 4, 1, 3, 3, 4, 4, 4, 6 };
 
+
+  if (argc != 7)
+  {
+    fputs("ERROR: imagetoraster job-id user title copies options file\n", stderr);
+    return (1);
+  }
 
  /*
-  * Process any command-line args...
+  * Process command-line options and write the prolog...
   */
 
-  infile        = NULL;
-  outfile       = NULL;
-  printer       = NULL;
-  level         = 0;
-  rotation      = -1;
-  xzoom = yzoom = 0.0;
-  flip          = 0;
-  xppi          = 0;
-  yppi          = 0;
-  hue           = 0;
-  sat           = 100;
-  landscape     = 0;
-  profile[0]    = 1.0;
-  profile[1]    = 1.0;
-  profile[2]    = 1.0;
-  profile[3]    = 1.0;
-  profile[4]    = 1.0;
-  profile[5]    = 1.0;
-  gammaval[0]   = 0.0;
-  gammaval[1]   = 0.0;
-  gammaval[2]   = 0.0;
-  gammaval[3]   = 0.0;
-  brightness[0] = 100;
-  brightness[1] = 100;
-  brightness[2] = 100;
-  brightness[3] = 100;
-  bits          = 1;
-  scolorspace   = ST_TYPE_K;
-  width         = 850;
-  height        = 1100;
-  variable      = 1;
-  xdpi          = 100;
-  ydpi          = 100;
-  copies        = 1;
+  zoom = 0.0;
+  ppi  = 0;
+  hue  = 0;
+  sat  = 100;
+  g    = 1.0;
+  b    = 1.0;
 
-  for (i = 1; i < argc; i ++)
-    if (argv[i][0] == '-')
-      for (opt = argv[i] + 1; *opt != '\0'; opt ++)
-        switch (*opt)
-        {
-          case 'L' : /* Log file */
-              i ++;
-              if (i >= argc)
-                usage();
+  options     = NULL;
+  num_options = cupsParseOptions(argv[5], 0, &options);
 
-              freopen(argv[i], "w", stderr);
-              break;
+  ppd = SetCommonOptions(num_options, options);
 
-          case 'O' : /* Output file */
-              i ++;
-              if (i >= argc || outfile != NULL)
-                usage();
+  ppdMarkDefaults(ppd);
+  cupsMarkOptions(ppd, num_options, options);
 
-              outfile = argv[i];
-              break;
+  if ((val = cupsGetOption("copies", num_options, options)) != NULL)
+    Copies = atoi(val);
 
-          case 'P' : /* Specify the printer name */
-              i ++;
-              if (i >= argc)
-                usage();
+  if ((val = cupsGetOption("multiple-document-handling", num_options, options)) != NULL)
+  {
+   /*
+    * This IPP attribute is unnecessarily complicated...
+    *
+    *   single-document, separate-documents-collated-copies, and
+    *   single-document-new-sheet all require collated copies.
+    *
+    *   separate-documents-collated-copies allows for uncollated copies.
+    */
 
-              printer = argv[i];
+    Collate = strcmp(val, "separate-documents-collated-copies") != 0;
+  }
 
-	     /*
-	      * Open the POD database files and get the printer definition record.
-	      */
+  if ((val = cupsGetOption("Collate", num_options, options)) != NULL &&
+      strcmp(val, "True") == 0)
+    Collate = 1;
 
-	      if (PDLocalReadInfo(printer, &info, &mod_time) < 0)
-	      {
-		fprintf(stderr, "img2stiff: Could not open required POD database files for printer \'%s\'.\n", 
-        		printer);
-		fprintf(stderr, "img2stiff: Are you sure all required POD files are properly installed?\n");
+  if ((val = cupsGetOption("gamma", num_options, options)) != NULL)
+    g = atoi(val) * 0.001f;
 
-		PDPerror("img2stiff");
-		exit(ERR_BAD_ARG);
-	      };
+  if ((val = cupsGetOption("brightness", num_options, options)) != NULL)
+    b = atoi(val) * 0.01f;
 
-	      status   = info->active_status;
-	      size     = PDFindPageSize(info, PD_SIZE_CURRENT);
-	      variable = (status->media_size == PD_SIZE_VARIABLE);
+  if ((val = cupsGetOption("scaling", num_options, options)) != NULL)
+    zoom = atoi(val) * 0.01;
 
-	     /*
-	      * Figure out what we need to generate...
-	      */
+  if ((val = cupsGetOption("ppi", num_options, options)) != NULL)
+    ppi = atoi(val);
 
-              width  = size->horizontal_addr;
-              height = size->vertical_addr;
-              xdpi   = info->horizontal_resolution;
-              ydpi   = info->vertical_resolution;
+  if ((val = cupsGetOption("saturation", num_options, options)) != NULL)
+    sat = atoi(val);
 
-              memcpy(profile, status->color_profile, sizeof(profile));
+  if ((val = cupsGetOption("hue", num_options, options)) != NULL)
+    hue = atoi(val);
 
-	      switch (PD_GET_DEPTH_CODE(status->number_of_colors))
-	      {
-	        case PD_DATA_DEPTH1 :
-	            bits = 1;
-	            break;
-	        case PD_DATA_DEPTH2 :
-	            bits = 2;
-	            break;
-	        case PD_DATA_DEPTH4 :
-	            bits = 4;
-	            break;
-	        case PD_DATA_DEPTH8 :
-	            bits = 8;
-	            break;
-	      };
+ /*
+  * Set the needed options in the page header...
+  */
 
-	      switch (PD_GET_COLORSPACE_CODE(status->number_of_colors))
-	      {
-	        case PD_DATA_K :
-	            scolorspace = ST_TYPE_K;
-	            break;
-	        case PD_DATA_CMY :
-	        case PD_DATA_YMC :
-	            scolorspace = ST_TYPE_CMY;
-	            break;
-	        case PD_DATA_CMYK :
-	        case PD_DATA_YMCK :
-	        case PD_DATA_KCMY :
-	            scolorspace = ST_TYPE_CMYK;
-	            break;
-	        case PD_DATA_W :
-	            scolorspace = ST_TYPE_W;
-	            break;
-	        case PD_DATA_RGB :
-	            scolorspace = ST_TYPE_RGB;
-	            break;
-	      };
-              break;
+  memset(&header, 0, sizeof(header));
 
-          case 'B' : /* Bits per pixel */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              bits = atoi(argv[i]);
-
-              if (bits != 1 && bits != 2 && bits != 4 && bits != 8)
-                usage();
-              break;
-
-          case 'F' : /* Format */
-              i ++;
-              if (i >= argc)
-                usage();
-              break;
-
-          case 'C' : /* Colorspace */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              if (strcasecmp(argv[i], "k") == 0)
-                scolorspace = ST_TYPE_K;
-              else if (strcasecmp(argv[i], "w") == 0)
-                scolorspace = ST_TYPE_W;
-              else if (strcasecmp(argv[i], "rgb") == 0)
-                scolorspace = ST_TYPE_RGB;
-              else if (strcasecmp(argv[i], "cmy") == 0)
-                scolorspace = ST_TYPE_CMY;
-              else if (strcasecmp(argv[i], "cmyk") == 0)
-                scolorspace = ST_TYPE_CMYK;
-              else if (strcasecmp(argv[i], "kcmy") == 0)
-                scolorspace = ST_TYPE_CMYK;
-              else if (strcasecmp(argv[i], "ymc") == 0)
-                scolorspace = ST_TYPE_CMY;
-              else if (strcasecmp(argv[i], "ymck") == 0)
-                scolorspace = ST_TYPE_CMYK;
-              else
-                usage();
-              break;
-
-          case 'X' : /* X resolution */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              xdpi = atoi(argv[i]);
-              break;
-
-          case 'Y' : /* Y resolution */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              ydpi = atoi(argv[i]);
-              break;
-
-          case 'R' : /* Resolution */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              xdpi = ydpi = atoi(argv[i]);
-              break;
-
-          case 'W' : /* Pixel width */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              width    = atoi(argv[i]);
-	      variable = 0;
-              break;
-
-          case 'H' : /* Pixel height */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              height   = atoi(argv[i]);
-	      variable = 0;
-              break;
-
-          case 'M' : /* Model (PostScript Level) */
-              i ++;
-              if (i >= argc)
-                usage();
-              break;
-
-          case 'l' : /* Landscape */
-              landscape = 1;
-              break;
-
-          case 'f' : /* Flip the image */
-              flip = 1;
-              break;
-
-          case 'r' : /* Rotate */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              rotation = (atoi(argv[i]) % 180) / 90;
-              break;
-
-          case 'z' : /* Page zoom */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              if (sscanf(argv[i], "%f,%f", &xzoom, &yzoom) == 1)
-                yzoom = xzoom;
-
-              if (strchr(argv[i], '.') == NULL)
-              {
-                xzoom *= 0.01;
-                yzoom *= 0.01;
-              };
-              break;
-
-          case 'p' : /* Scale to pixels/inch */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              if (sscanf(argv[i], "%d,%d", &xppi, &yppi) == 1)
-                yppi = xppi;
-              break;
-
-          case 'n' : /* Number of copies */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              copies = atoi(argv[i]);
-              break;
-
-          case 'D' : /* Produce debugging messages */
-              Verbosity ++;
-              break;
-
-          case 'h' : /* Color Hue */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              hue = atoi(argv[i]);
-              break;
-
-          case 's' : /* Color Saturation */
-              i ++;
-              if (i >= argc)
-                usage();
-
-              sat = atoi(argv[i]);
-              break;
-
-          case 'g' :	/* Gamma correction */
-	      i ++;
-	      if (i < argc)
-	        switch (sscanf(argv[i], "%f,%f,%f,%f", gammaval + 0,
-	                       gammaval + 1, gammaval + 2, gammaval + 3))
-	        {
-	          case 1 :
-	              gammaval[1] = gammaval[0];
-	          case 2 :
-	              gammaval[2] = gammaval[1];
-	              gammaval[3] = gammaval[1];
-	              break;
-	        };
-	      break;
-
-          case 'b' :	/* Brightness */
-	      i ++;
-	      if (i < argc)
-	        switch (sscanf(argv[i], "%d,%d,%d,%d", brightness + 0,
-	                brightness + 1, brightness + 2, brightness + 3))
-	        {
-	          case 1 :
-	              brightness[1] = brightness[0];
-	          case 2 :
-	              brightness[2] = brightness[1];
-	              brightness[3] = brightness[1];
-	              break;
-	        };
-	      break;
-
-          case 'c' : /* Color profile */
-              i ++;
-              if (i < argc)
-                sscanf(argv[i], "%f,%f,%f,%f,%f,%f",
-                       profile + 0,
-                       profile + 1,
-                       profile + 2,
-                       profile + 3,
-                       profile + 4,
-                       profile + 5);
-              break;
-
-          default :
-              usage();
-              break;
-        }
-    else if (infile != NULL)
-      usage();
+  if ((choice = ppdFindMarkedChoice(ppd, "ColorModel")) != NULL)
+  {
+    if (choice->num_data > 1)
+    {
+      header.cupsColorOrder = (cups_order_t)choice->data[0];
+      header.cupsColorSpace = (cups_cspace_t)choice->data[1];
+    }
     else
-      infile = argv[i];
-
-  if (Verbosity)
+    {
+      header.cupsColorOrder = CUPS_ORDER_CHUNKED;
+      header.cupsColorSpace = CUPS_CSPACE_RGB;
+    }
+  }
+  else
   {
-    fputs("img2stiff: Command-line args are:", stderr);
-    for (i = 1; i < argc; i ++)
-      fprintf(stderr, " %s", argv[i]);
-    fputs("\n", stderr);
-  };
+    header.cupsColorOrder = CUPS_ORDER_CHUNKED;
+    header.cupsColorSpace = CUPS_CSPACE_CMYK;
+  }
+
+  if ((choice = ppdFindMarkedChoice(ppd, "InputSlot")) != NULL)
+    header.MediaPosition = choice->data[0];
+
+  if ((choice = ppdFindMarkedChoice(ppd, "MediaType")) != NULL)
+  {
+    media_type = choice->choice;
+
+    strcpy(header.MediaType, media_type);
+  }
+  else
+    media_type = "";
+
+  if ((choice = ppdFindMarkedChoice(ppd, "Resolution")) != NULL)
+  {
+    resolution = choice->choice;
+
+    if (sscanf(resolution, "%dx%d", header.HWResolution + 0,
+               header.HWResolution + 1) == 1)
+      header.HWResolution[1] = header.HWResolution[0];
+
+    if (choice->num_data > 0)
+      header.cupsBitsPerColor = choice->data[0];
+    else
+      header.cupsBitsPerColor = 1;
+  }
+  else
+  {
+    resolution = "";
+    header.HWResolution[0]  = 100;
+    header.HWResolution[1]  = 100;
+    header.cupsBitsPerColor = 8;
+  }
 
  /*
-  * Check for necessary args...
+  * Choose the appropriate colorspace and color profile...
   */
 
-  if (infile == NULL)
-    usage();
+  switch (header.cupsColorSpace)
+  {
+    case CUPS_CSPACE_W :
+        primary   = IMAGE_WHITE;
+	secondary = IMAGE_WHITE;
+        header.cupsBitsPerPixel = header.cupsBitsPerColor;
+	break;
+
+    case CUPS_CSPACE_RGB :
+    case CUPS_CSPACE_RGBA :
+        primary   = IMAGE_RGB;
+	secondary = IMAGE_RGB;
+
+	if (header.cupsColorOrder == CUPS_ORDER_CHUNKED)
+	{
+	  if (header.cupsBitsPerColor >= 8)
+            header.cupsBitsPerPixel = header.cupsBitsPerColor * 3;
+	  else
+            header.cupsBitsPerPixel = header.cupsBitsPerColor * 4;
+	}
+	else
+	  header.cupsBitsPerPixel = header.cupsBitsPerColor;
+	break;
+
+    case CUPS_CSPACE_K :
+        primary   = IMAGE_BLACK;
+	secondary = IMAGE_BLACK;
+        header.cupsBitsPerPixel = header.cupsBitsPerColor;
+	break;
+
+    default :
+        if (header.cupsBitsPerColor > 1)
+	{
+          primary   = IMAGE_CMYK;
+	  secondary = IMAGE_CMYK;
+
+	  if (header.cupsColorOrder == CUPS_ORDER_CHUNKED)
+            header.cupsBitsPerPixel = header.cupsBitsPerColor * 4;
+	  else
+	    header.cupsBitsPerPixel = header.cupsBitsPerColor;
+	  break;
+	}
+
+    case CUPS_CSPACE_CMY :
+    case CUPS_CSPACE_YMC :
+        primary   = IMAGE_CMY;
+	secondary = IMAGE_CMY;
+
+	if (header.cupsColorOrder == CUPS_ORDER_CHUNKED)
+	{
+	  if (header.cupsBitsPerColor >= 8)
+            header.cupsBitsPerPixel = 24;
+	  else
+            header.cupsBitsPerPixel = header.cupsBitsPerColor * 4;
+	}
+	else
+	  header.cupsBitsPerPixel = header.cupsBitsPerColor;
+	break;
+
+    case CUPS_CSPACE_KCMYcm :
+	if (header.cupsBitsPerPixel == 1)
+	{
+          primary   = IMAGE_CMY;
+	  secondary = IMAGE_CMY;
+
+	  if (header.cupsColorOrder == CUPS_ORDER_CHUNKED)
+	    header.cupsBitsPerPixel = 8;
+	  else
+	    header.cupsBitsPerPixel = 1;
+	}
+	else
+	{
+          primary   = IMAGE_CMYK;
+	  secondary = IMAGE_CMYK;
+
+	  if (header.cupsColorOrder == CUPS_ORDER_CHUNKED)
+	  {
+	    if (header.cupsBitsPerPixel >= 8)
+	      header.cupsBitsPerPixel = header.cupsBitsPerColor * 6;
+	    else
+	      header.cupsBitsPerPixel = header.cupsBitsPerColor * 8;
+	  }
+	  else
+	    header.cupsBitsPerPixel = header.cupsBitsPerColor;
+	}
+	break;
+  }
 
  /*
-  * Figure out the image colorspace...
+  * Find a color profile matching the current options...
   */
 
-  blank = 0;
-
-  switch (scolorspace)
+  if (ppd != NULL)
   {
-    case ST_TYPE_K :
-        icolorspace = IMAGE_BLACK;
-        break;
-    case ST_TYPE_CMY :
-        icolorspace = IMAGE_CMY;
-        break;
-    case ST_TYPE_CMYK :
-        if (bits == 1)
-          icolorspace = IMAGE_CMY;
-        else
-          icolorspace = IMAGE_CMYK;
-        break;
-    case ST_TYPE_W :
-        if (bits == 8)
-          icolorspace = IMAGE_WHITE;
-	else
-          icolorspace = IMAGE_BLACK;
+    for (i = 0, profile = ppd->profiles; i < ppd->num_profiles; i ++, profile ++)
+      if ((strcmp(profile->resolution, resolution) == 0 ||
+           profile->resolution[0] == '-') &&
+          (strcmp(profile->media_type, media_type) == 0 ||
+           profile->media_type[0] == '-'))
+	break;
 
-        blank = 255;
-        break;
-    case ST_TYPE_RGB :
-        if (bits == 8)
-          icolorspace = IMAGE_RGB;
-	else
-          icolorspace = IMAGE_CMY;
+   /*
+    * If we found a color profile, use it!
+    */
 
-        blank = 255;
-        break;
-  };
+    if (i < ppd->num_profiles)
+    {
+      fputs("Setting color profile!\n", stderr);
+      ImageSetProfile(profile->density, profile->matrix);
+    }
+  }
+
+ /*
+  * Create a gamma/brightness LUT...
+  */
+
+  make_lut(lut, primary, g, b);
 
  /*
   * Open the input image to print...
   */
 
-  if ((img = ImageOpen(infile, icolorspace, icolorspace, sat, hue)) == NULL)
-    exit (ERR_FILE_CONVERT);
+  fputs("INFO: Loading image file...\n", stderr);
 
-  if (Verbosity)
-    fprintf(stderr, "img2stiff: Original image is %dx%d pixels...\n",
-            img->xsize, img->ysize);
+  if ((img = ImageOpen(argv[6], primary, secondary, sat, hue, lut)) == NULL)
+  {
+    fputs("ERROR: Unable to open image file for printing!\n", stderr);
+    ppdClose(ppd);
+    return (1);
+  }
 
  /*
   * Scale as necessary...
   */
 
-  xprint = (float)width / (float)xdpi;
-  yprint = (float)height / (float)ydpi;
+  xprint = (PageRight - PageLeft) / 72.0;
+  yprint = (PageTop - PageBottom) / 72.0;
 
-  if (rotation >= 0 && landscape)
-    rotation = 1 - (rotation & 1);
+  if (zoom == 0.0 && ppi == 0)
+    ppi = img->xppi;
 
-  if (xzoom == 0.0 && xppi == 0)
-  {
-    xppi = img->xppi;
-    yppi = img->yppi;
-  };
-
-  if (xppi > 0)
+  if (ppi > 0)
   {
    /*
     * Scale the image as neccesary to match the desired pixels-per-inch.
     */
     
-
-    if (rotation == 0)
-    {
-      xinches = (float)img->xsize / (float)xppi;
-      yinches = (float)img->ysize / (float)yppi;
-    }
-    else if (rotation == 1)
-    {
-      xinches = (float)img->ysize / (float)yppi;
-      yinches = (float)img->xsize / (float)xppi;
-    }
-    else
-    {
-      xinches  = (float)img->xsize / (float)xppi;
-      yinches  = (float)img->ysize / (float)yppi;
-      rotation = 0;
-
-      if (xinches > xprint && xinches <= yprint)
-      {
-	xinches  = (float)img->ysize / (float)yppi;
-	yinches  = (float)img->xsize / (float)xppi;
-        rotation = 1;
-      };
-    };
+    xinches = (float)img->xsize / (float)ppi;
+    yinches = (float)img->ysize / (float)ppi;
   }
   else
   {
@@ -629,148 +439,102 @@ main(int  argc,		/* I - Number of command-line arguments */
     * Scale percentage of page size...
     */
 
-    if (rotation == 0)
-    {
-      xsize = xprint * xzoom;
-      ysize = xsize * img->ysize / img->xsize;
+    xsize = xprint * zoom;
+    ysize = xsize * img->ysize / img->xsize;
 
-      if (ysize > (yprint * yzoom))
-      {
-        ysize = yprint * yzoom;
-        xsize = ysize * img->xsize / img->ysize;
-      };
-    }
-    else if (rotation == 1)
+    if (ysize > (yprint * zoom))
     {
-      ysize = xprint * yzoom;
+      ysize = yprint * zoom;
       xsize = ysize * img->xsize / img->ysize;
-
-      if (xsize > (yprint * xzoom))
-      {
-        xsize = yprint * xzoom;
-        ysize = xsize * img->ysize / img->xsize;
-      };
     }
-    else
-    {
-      xsize = xprint * xzoom;
-      ysize = xsize * img->ysize / img->xsize;
 
-      if (ysize > (yprint * yzoom))
-      {
-        ysize = yprint * yzoom;
-        xsize = ysize * img->xsize / img->ysize;
-      };
-
-      ytemp = xprint * yzoom;
-      xtemp = ytemp * img->xsize / img->ysize;
-
-      if (xtemp > (yprint * xzoom))
-      {
-        xtemp = yprint * xzoom;
-        ytemp = xtemp * img->ysize / img->xsize;
-      };
-
-      if ((xsize * ysize) < (xtemp * ytemp))
-      {
-        xsize = xtemp;
-        ysize = ytemp;
-
-        rotation = 1;
-      }
-      else
-        rotation = 0;
-    };
-
-    if (rotation)
-    {
-      xinches = ysize;
-      yinches = xsize;
-    }
-    else
-    {
-      xinches = xsize;
-      yinches = ysize;
-    };
-  };
+    xinches = xsize;
+    yinches = ysize;
+  }
 
   xpages = ceil(xinches / xprint);
   ypages = ceil(yinches / yprint);
 
-  if (Verbosity)
-  {
-    fprintf(stderr, "img2stiff: Page size is %.1fx%.1f inches\n", xprint, yprint);
-    fprintf(stderr, "img2stiff: Output image is rotated %d degrees, %.1fx%.1f inches.\n",
-            rotation * 90, xinches, yinches);
-    fprintf(stderr, "img2stiff: Output image to %dx%d pages...\n", xpages, ypages);
-  };
-
  /*
-  * Create the output stream...
+  * Compute the bitmap size...
   */
 
-  if (outfile == NULL)
-    st = STOpen(1, ST_WRITE);
+  xprint = xinches / xpages;
+  yprint = yinches / ypages;
+
+  if (ppd != NULL && ppd->variable_sizes)
+  {
+    header.cupsWidth   = xprint * header.HWResolution[0];
+    header.cupsHeight  = yprint * header.HWResolution[1];
+    header.PageSize[0] = header.cupsWidth;
+    header.PageSize[1] = header.cupsHeight;
+  }
   else
-    st = STOpen(open(outfile, O_WRONLY | O_TRUNC | O_CREAT, 0666), ST_WRITE);
-
-  if (st == NULL)
   {
-    fprintf(stderr, "img2stiff: Unable to create STIFF output to %s - %s\n",
-            outfile == NULL ? "(stdout)" : outfile, strerror(errno));
-    exit(ERR_TRANSMISSION);
-  };
+    header.cupsWidth   = (PageRight - PageLeft) * header.HWResolution[0] / 72.0;
+    header.cupsHeight  = (PageTop - PageBottom) * header.HWResolution[1] / 72.0;
+    header.PageSize[0] = PageWidth * header.HWResolution[0] / 72.0;
+    header.PageSize[1] = PageLength * header.HWResolution[1] / 72.0;
+  }
+
+  switch (header.cupsColorOrder)
+  {
+    case CUPS_ORDER_CHUNKED :
+        header.cupsBytesPerLine = (header.cupsBitsPerPixel *
+	                           header.cupsWidth + 7) / 8;
+        break;
+
+    case CUPS_ORDER_BANDED :
+        header.cupsBytesPerLine = (header.cupsBitsPerPixel *
+	                           header.cupsWidth + 7) / 8 *
+				  planes[header.cupsColorSpace];
+        break;
+
+    case CUPS_ORDER_PLANAR :
+        header.cupsBytesPerLine = (header.cupsBitsPerPixel *
+	                           header.cupsWidth + 7) / 8;
+        break;
+  }
 
  /*
-  * Create the lookup tables...
+  * See if we need to collate, and if so how we need to do it...
   */
 
-  switch (img->colorspace)
+  if (xpages == 1 && ypages == 1)
+    Collate = 0;
+
+  slowcollate = Collate && ppdFindOption(ppd, "Collate") == NULL;
+
+  if (Copies > 1 && !slowcollate)
   {
-    case IMAGE_WHITE :
-    case IMAGE_BLACK :
-        make_lut(luts, img->colorspace, gammaval[0], 100.0 / brightness[0],
-                 profile[PD_PROFILE_KG], profile[PD_PROFILE_KD]);
-        break;
-    case IMAGE_RGB :
-    case IMAGE_CMY :
-        make_lut(luts + 0, img->colorspace, gammaval[1], 100.0 / brightness[1],
-                 profile[PD_PROFILE_BG], profile[PD_PROFILE_CD]);
-        make_lut(luts + 1, img->colorspace, gammaval[2], 100.0 / brightness[2],
-                 profile[PD_PROFILE_BG], profile[PD_PROFILE_MD]);
-        make_lut(luts + 2, img->colorspace, gammaval[3], 100.0 / brightness[3],
-                 profile[PD_PROFILE_BG], profile[PD_PROFILE_YD]);
-        break;
-    case IMAGE_CMYK :
-        make_lut(luts + 0, img->colorspace, gammaval[1], 100.0 / brightness[1],
-                 profile[PD_PROFILE_BG], profile[PD_PROFILE_CD]);
-        make_lut(luts + 1, img->colorspace, gammaval[2], 100.0 / brightness[2],
-                 profile[PD_PROFILE_BG], profile[PD_PROFILE_MD]);
-        make_lut(luts + 2, img->colorspace, gammaval[3], 100.0 / brightness[3],
-                 profile[PD_PROFILE_BG], profile[PD_PROFILE_YD]);
-        make_lut(luts + 3, img->colorspace, gammaval[0], 100.0 / brightness[0],
-                 profile[PD_PROFILE_KG], profile[PD_PROFILE_KD]);
-        break;
-  };
+    header.Collate   = (cups_bool_t)Collate;
+    header.NumCopies = Copies;
+
+    Copies = 1;
+  }
+
+ /*
+  * Create the dithering lookup tables...
+  */
 
   onpixels[0]  = 0;
   offpixels[0] = 0;
 
-  switch (bits)
+  switch (header.cupsBitsPerColor)
   {
     case 2 :
 	for (i = 1; i < 64; i ++)
 	  onpixels[i] = 0;
-	for (; i < 170; i ++)
+	for (; i < 128; i ++)
 	  onpixels[i] = 1;
-	for (; i < 234; i ++)
+	for (; i < 192; i ++)
 	  onpixels[i] = 2;
 	for (; i < 256; i ++)
 	  onpixels[i] = 3;
 
-	for (i = 1; i < 117; i ++)
+	for (i = 1; i < 96; i ++)
 	  offpixels[i] = 1;
-	for (; i < 202; i ++)
+	for (; i < 224; i ++)
 	  offpixels[i] = 2;
 	for (; i < 256; i ++)
 	  offpixels[i] = 3;
@@ -782,58 +546,33 @@ main(int  argc,		/* I - Number of command-line arguments */
           onpixels[i]  |= onpixels[i] << 4;
           offpixels[i] = i / 17 + 1;
           offpixels[i] |= offpixels[i] << 4;
-        };
+        }
         break;
-  };
+  }
 
  /*
   * Output the pages...
   */
 
-  header.type            = scolorspace;
-  header.plane           = ST_PLANE_PACKED;
-  header.resUnit	 = PST_RES_UNIT_INCH;
-  header.xRes		 = xdpi;
-  header.yRes		 = ydpi;
-  header.thresholding	 = PST_THRESHOLD_NONE;
-  header.compression	 = PST_COMPRESSION_NONE;
-  header.pageNumbers[0]	 = 0;
-  header.pageNumbers[1]	 = xpages * ypages * copies;
-  header.dateTime	 = NULL;
-  header.hostComputer	 = NULL;
-  header.software	 = "img2stiff - ESP Print " SVERSION;
-  header.docName	 = infile;
-  header.targetPrinter	 = printer;
-  header.driverOptions	 = NULL;
-  header.bitsPerSample   = bits;
-  header.samplesPerPixel = ImageGetDepth(img);
+  fprintf(stderr, "DEBUG: cupsWidth = %d\n", header.cupsWidth);
+  fprintf(stderr, "DEBUG: cupsHeight = %d\n", header.cupsHeight);
+  fprintf(stderr, "DEBUG: cupsBitsPerColor = %d\n", header.cupsBitsPerColor);
+  fprintf(stderr, "DEBUG: cupsBitsPerPixel = %d\n", header.cupsBitsPerPixel);
+  fprintf(stderr, "DEBUG: cupsBytesPerLine = %d\n", header.cupsBytesPerLine);
+  fprintf(stderr, "DEBUG: cupsColorOrder = %d\n", header.cupsColorOrder);
+  fprintf(stderr, "DEBUG: cupsColorSpace = %d\n", header.cupsColorSpace);
 
-  if ((bits == 1 || bits == 2) && header.samplesPerPixel == 3)
-    header.samplesPerPixel = 4;
+  row   = malloc(header.cupsBytesPerLine);
+  ras   = cupsRasterOpen(1, CUPS_RASTER_WRITE);
+  blank = img->colorspace < 0 ? 0 : ~0;
 
-  if (variable)
-  {
-    width  = xdpi * xinches / xpages;
-    height = ydpi * yinches / ypages;
-
-    fprintf(stderr, "img2stiff: Set variable size to %dx%d pixels...\n",
-            width, height);
-  };
-
-  bpp    = header.bitsPerSample * header.samplesPerPixel;
-  bwidth = (width * bpp + 7) / 8;
-
-  header.width    = width;
-  header.height   = height;
-  header.imgbytes = header.height * bwidth;
-
-  row = (ib_t *)malloc(bwidth);
-
-  for (i = 0; i < copies; i ++)
+  for (i = 0, page = 1; i < Copies; i ++)
     for (xpage = 0; xpage < xpages; xpage ++)
-      for (ypage = 0; ypage < ypages; ypage ++)
+      for (ypage = 0; ypage < ypages; ypage ++, page ++)
       {
-	if (rotation == 0)
+        fprintf(stderr, "INFO: Formatting page %d...\n", page);
+
+	if (!(Orientation & 1))
 	{
 	  x0 = img->xsize * xpage / xpages;
 	  x1 = img->xsize * (xpage + 1) / xpages - 1;
@@ -846,76 +585,64 @@ main(int  argc,		/* I - Number of command-line arguments */
 	  x1 = img->xsize * (ypage + 1) / ypages - 1;
 	  y0 = img->ysize * xpage / xpages;
 	  y1 = img->ysize * (xpage + 1) / xpages - 1;
-	};
+	}
 
-	xtemp = xdpi * xinches / xpages;
-	ytemp = ydpi * yinches / ypages;
+	xtemp = header.HWResolution[0] * xinches / xpages;
+	ytemp = header.HWResolution[1] * yinches / ypages;
 
-	z = ImageZoomAlloc(img, x0, y0, x1, y1, xtemp, ytemp, rotation);
+	z = ImageZoomAlloc(img, x0, y0, x1, y1, xtemp, ytemp, Orientation & 1);
 
-	header.pageNumbers[0] ++;
-	PSTWriteImageHeader(st, &header,
-                            header.pageNumbers[0] == header.pageNumbers[1]);
+        cupsRasterWriteHeader(ras, &header);
 
-	if (Verbosity)
-	{
-	  fprintf(stderr, "img2stiff: Starting page %d\n",
-        	  header.pageNumbers[0]);
-	  fprintf(stderr, "img2stiff: type = %04x, bitsPerSample = %d, samplesPerPixel = %d\n",
-        	  header.type, header.bitsPerSample, header.samplesPerPixel);
-	  fprintf(stderr, "img2stiff: xRes = %d, yRes = %d, width = %d, height = %d\n",
-        	  header.xRes, header.yRes, header.width, header.height);
-	  fprintf(stderr, "img2stiff: (x0, y0) = (%d, %d), (x1, y1) = (%d, %d)\n",
-	          x0, y0, x1, y1);
-	  fprintf(stderr, "img2stiff: image area = %.0fx%.0f pixels\n",
-	          xtemp, ytemp);
-	};
+	memset(row, blank, header.cupsBytesPerLine);
 
-	memset(row, blank, bwidth);
-
-        if (header.height > z->ysize)
-	  for (y = (header.height - z->ysize) / 2; y > 0; y --)
+        if (header.cupsHeight > z->ysize && Orientation < 2)
+	  for (y = header.cupsHeight - z->ysize; y > 0; y --)
 	  {
-	    if (Verbosity > 1)
-	      fprintf(stderr, "img2stiff: blanking line %d\n", y);
-
-	    if (STWrite(st, row, bwidth) < bwidth)
+	    if (cupsRasterWritePixels(ras, row, header.cupsBytesPerLine) <
+	            header.cupsBytesPerLine)
 	    {
+	      fputs("ERROR: Unable to write raster data to driver!\n", stderr);
 	      ImageClose(img);
-	      exit(ERR_TRANSMISSION);
-	    };
-          };
+	      exit(1);
+	    }
+          }
 
 	for (y = z->ysize, yerr0 = z->ysize, yerr1 = 0, iy = 0, last_iy = -2;
              y > 0;
              y --)
 	{
-	  if (Verbosity > 1)
-	    fprintf(stderr, "img2stiff: generating line %d\n", y);
-
 	  if (iy != last_iy)
 	  {
-	    if (bits == 8)
+	    if (header.cupsBitsPerColor == 8)
 	    {
               if ((iy - last_iy) > 1)
-        	ImageZoomFill(z, iy, luts);
-              ImageZoomFill(z, iy + z->yincr, luts);
+        	ImageZoomFill(z, iy);
+              ImageZoomFill(z, iy + z->yincr);
             }
             else
-              ImageZoomQFill(z, iy, luts);
+              ImageZoomQFill(z, iy);
 
             last_iy = iy;
-	  };
+	  }
 
-          switch (bits)
+    	  memset(row, blank, header.cupsBytesPerLine);
+
+          switch (header.cupsBitsPerColor)
           {
             case 1 :
-    		memset(row, 0, bwidth);
+                if (Orientation == 1 || Orientation == 2)
+                  bitoffset = header.cupsBitsPerPixel *
+                              (header.cupsWidth - z->xsize);
+                else
+		  bitoffset = 0;
 
-                bitoffset = header.samplesPerPixel *
-                            ((header.width - z->xsize) / 2);
-                bitmask   = bitmasks[bitoffset & 7];
-                dither    = FloydDither[y & 15];
+        	if (img->colorspace == IMAGE_RGB ||
+		    img->colorspace == IMAGE_CMY)
+		  bitoffset ++;
+
+                bitmask = bitmasks[bitoffset & 7];
+                dither  = FloydDither[y & 15];
 
                 for (x = z->xsize * z->depth, rowptr = row + bitoffset / 8,
                          r0 = z->rows[z->row];
@@ -923,40 +650,55 @@ main(int  argc,		/* I - Number of command-line arguments */
         	     x --, r0 ++)
         	{
         	  if (*r0 > dither[x & 7])
-        	    *rowptr |= bitmask;
+        	    *rowptr ^= bitmask;
 
-        	  if ((bitmask == 32 || bitmask == 2) &&
-        	      (icolorspace == IMAGE_RGB || icolorspace == IMAGE_CMY))
-        	    bitmask >>= 1;
+        	  if (img->colorspace == IMAGE_RGB ||
+		      img->colorspace == IMAGE_CMY)
+		  {
+		    if (bitmask == 16)
+        	      bitmask = 8;
+		    else if (bitmask > 1)
+        	      bitmask >>= 1;
+        	    else
+        	    {
+        	      bitmask = 64;
+        	      rowptr ++;
+        	    }
+		  }
+		  else
+		  {
+		    if (bitmask > 1)
+        	      bitmask >>= 1;
+        	    else
+        	    {
+        	      bitmask = 128;
+        	      rowptr ++;
+        	    }
+		  }
+        	}
 
-        	  if (bitmask > 1)
-        	    bitmask >>= 1;
-        	  else
-        	  {
-        	    bitmask = 128;
-        	    rowptr ++;
-        	  };
-        	};
-
-        	if (scolorspace == ST_TYPE_CMYK)
-        	  for (rowptr = row, x = bwidth; x > 0; x --, rowptr ++)
+        	if (img->colorspace == IMAGE_CMYK)
+        	  for (rowptr = row, x = header.cupsBytesPerLine; x > 0; x --, rowptr ++)
         	  {
         	    if ((*rowptr & 0xe0) == 0xe0)
         	      *rowptr ^= 0xf0;
         	    if ((*rowptr & 0x0e) == 0x0e)
         	      *rowptr ^= 0x0f;
         	  }
-		else if (blank == 255)
-        	  for (rowptr = row, x = bwidth; x > 0; x --, rowptr ++)
-         	    *rowptr = ~*rowptr;
                 break;
             case 2 :
-    		memset(row, 0, bwidth);
+                if (Orientation == 1 || Orientation == 2)
+                  bitoffset = header.cupsBitsPerPixel *
+                              (header.cupsWidth - z->xsize);
+                else
+		  bitoffset = 0;
 
-                bitoffset = 2 * header.samplesPerPixel *
-                            ((header.width - z->xsize) / 2);
-                bitmask   = 0xc0 >> (bitoffset & 7);
-                dither    = FloydDither[y & 15];
+        	if (img->colorspace == IMAGE_RGB ||
+		    img->colorspace == IMAGE_CMY)
+		  bitoffset += 2;
+
+                bitmask = 0xc0 >> (bitoffset & 7);
+                dither  = FloydDither[y & 15];
 
                 for (x = z->xsize * z->depth, rowptr = row + bitoffset / 8,
                          r0 = z->rows[z->row];
@@ -964,30 +706,33 @@ main(int  argc,		/* I - Number of command-line arguments */
         	     x --, r0 ++)
         	{
         	  if (*r0 > dither[x & 7])
-        	    *rowptr |= (bitmask & onpixels[*r0]);
+        	    *rowptr ^= (bitmask & onpixels[*r0]);
         	  else
-        	    *rowptr |= (bitmask & offpixels[*r0]);
+        	    *rowptr ^= (bitmask & offpixels[*r0]);
 
         	  if (bitmask > 3)
         	    bitmask >>= 2;
         	  else
         	  {
-        	    bitmask = 0xc0;
-        	    rowptr ++;
-        	  };
-        	};
+		    if (img->colorspace == IMAGE_RGB ||
+		        img->colorspace == IMAGE_CMY)
+        	      bitmask = 0xc0;
+		    else
+        	      bitmask = 0x30;
 
-		if (blank == 255)
-        	  for (rowptr = row, x = bwidth; x > 0; x --, rowptr ++)
-         	    *rowptr = ~*rowptr;
+        	    rowptr ++;
+        	  }
+        	}
                 break;
             case 4 :
-    		memset(row, 0, bwidth);
+                if (Orientation == 1 || Orientation == 2)
+                  bitoffset = header.cupsBitsPerPixel *
+                              (header.cupsWidth - z->xsize);
+                else
+		  bitoffset = 0;
 
-                bitoffset = 4 * header.samplesPerPixel *
-                            ((header.width - z->xsize) / 2);
-                bitmask   = 0xf0 >> (bitoffset & 7);
-                dither    = FloydDither[y & 15];
+                bitmask = 0xf0 >> (bitoffset & 7);
+                dither  = FloydDither[y & 15];
 
                 for (x = z->xsize * z->depth, rowptr = row + bitoffset / 8,
                          r0 = z->rows[z->row];
@@ -995,9 +740,9 @@ main(int  argc,		/* I - Number of command-line arguments */
         	     x --, r0 ++)
         	{
         	  if (*r0 > dither[x & 7])
-        	    *rowptr |= (bitmask & onpixels[*r0]);
+        	    *rowptr ^= (bitmask & onpixels[*r0]);
         	  else
-        	    *rowptr |= (bitmask & offpixels[*r0]);
+        	    *rowptr ^= (bitmask & offpixels[*r0]);
 
         	  if (bitmask == 0xf0)
         	    bitmask = 0x0f;
@@ -1005,16 +750,15 @@ main(int  argc,		/* I - Number of command-line arguments */
         	  {
         	    bitmask = 0xf0;
         	    rowptr ++;
-        	  };
-        	};
-
-		if (blank == 255)
-        	  for (rowptr = row, x = bwidth; x > 0; x --, rowptr ++)
-         	    *rowptr = ~*rowptr;
+        	  }
+        	}
                 break;
             case 8 :
-                bitoffset = header.samplesPerPixel *
-                            ((header.width - z->xsize) / 2);
+                if (Orientation == 1 || Orientation == 2)
+                  bitoffset = header.cupsBitsPerPixel *
+                              (header.cupsWidth - z->xsize);
+                else
+		  bitoffset = 0;
 
                 for (x = z->xsize * z->depth,
         		 rowptr = row + bitoffset,
@@ -1026,13 +770,15 @@ main(int  argc,		/* I - Number of command-line arguments */
         	  else
                     *rowptr = (*r0 * yerr0 + *r1 * yerr1) / z->ysize;
                 break;
-          };
+          }
 
-	  if (STWrite(st, row, bwidth) < bwidth)
+	  if (cupsRasterWritePixels(ras, row, header.cupsBytesPerLine) <
+	          header.cupsBytesPerLine)
 	  {
+            fputs("ERROR: Unable to write raster data to driver!\n", stderr);
 	    ImageClose(img);
-	    exit(ERR_TRANSMISSION);
-	  };
+	    exit(1);
+	  }
 
 	  iy    += z->ystep;
 	  yerr0 -= z->ymod;
@@ -1042,106 +788,73 @@ main(int  argc,		/* I - Number of command-line arguments */
             yerr0 += z->ysize;
             yerr1 -= z->ysize;
             iy    += z->yincr;
-	  };
-	};
+	  }
+	}
 
-	memset(row, blank, bwidth);
+	memset(row, blank, header.cupsBytesPerLine);
 
-        if (header.height > z->ysize)
-	  for (y = (header.height + z->ysize) / 2; y < header.height; y ++)
+        if (header.cupsHeight > z->ysize && Orientation >= 2)
+	  for (y = header.cupsHeight - z->ysize; y > 0; y --)
 	  {
-	    if (Verbosity > 1)
-	      fprintf(stderr, "img2stiff: blanking line %d\n", y);
-
-	    if (STWrite(st, row, bwidth) < bwidth)
+	    if (cupsRasterWritePixels(ras, row, header.cupsBytesPerLine) <
+	            header.cupsBytesPerLine)
 	    {
+	      fputs("ERROR: Unable to write raster data to driver!\n", stderr);
 	      ImageClose(img);
-	      exit(ERR_TRANSMISSION);
-	    };
-          };
+	      exit(1);
+	    }
+          }
 
         ImageZoomFree(z);
+      }
 
-	if (Verbosity)
-	  fputs("img2stiff: done with this page...\n", stderr);
-      };
+ /*
+  * Close files...
+  */
 
-  ImageClose(img);
   free(row);
+  cupsRasterClose(ras);
+  ImageClose(img);
+  ppdClose(ppd);
 
-  STClose(st);
-
-  if (Verbosity)
-    fputs("img2stiff: Exiting with no errors!\n", stderr);
-
-  return (NO_ERROR);
+  return (0);
 }
 
 
 /*
- * 'usage()' - Print usage message and exit.
- */
-
-static void
-usage(void)
-{    
-  fputs("usage: img2stiff -P <printer-name> <filename> [-D] [-L <log-file>]\n", stderr);
-  fputs("              [-O <output-file>] [-b <brightness-val(s)>] [-f]\n", stderr);
-  fputs("              [-g <gamma-val(s)>] [-h <hue>] [-l] [-p <ppi>]\n", stderr);
-  fputs("              [-r <rotation>] [-s <saturation]\n", stderr);
-
-  exit(ERR_BAD_ARG);
-}
-
-
-/*
- * 'make_lut()' - Make a lookup table given gamma, brightness, and color
- *                profile values.
+ * 'make_lut()' - Make a lookup table given gamma and brightness values.
  */
 
 static void
 make_lut(ib_t  *lut,		/* I - Lookup table */
 	 int   colorspace,	/* I - Colorspace */
-         float ig,		/* I - Image gamma */
-         float ib,		/* I - Image brightness */
-         float pg,		/* I - Profile gamma */
-         float pd)		/* I - Profile ink density */
+         float g,		/* I - Image gamma */
+         float b)		/* I - Image brightness */
 {
   int	i;			/* Looping var */
-  float	v;			/* Current value */
+  int	v;			/* Current value */
 
 
-  if (ig == 0.0)
-    ig = LutDefaultGamma();
-
-  ig = 1.0 / ig;
-  pg = 1.0 / pg;
+  g = 1.0 / g;
+  b = 1.0 / b;
 
   for (i = 0; i < 256; i ++)
   {
     if (colorspace < 0)
-      v = 1.0 - pow(1.0 - (float)i / 255.0, ig);
+      v = 255.0 * b * (1.0 - pow(1.0 - (float)i / 255.0, g)) + 0.5;
     else
-      v = 1.0 - pow((float)i / 255.0, ig);
+      v = 255.0 * (1.0 - b * (1.0 - pow((float)i / 255.0, g))) + 0.5;
 
-    v = pd * pow(v * ib, pg);
-    if (v > 1.0)
-      v = 1.0;
-
-    if (colorspace < 0)
-    {
-      *lut = 255.0 * v + 0.5;
-      lut -= colorspace;
-    }
+    if (v < 0)
+      *lut++ = 0;
+    else if (v > 255)
+      *lut++ = 255;
     else
-    {
-      *lut = 255.5 - 255.0 * v;
-      lut += colorspace;
-    };
-  };
+      *lut++ = v;
+  }
 }
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.9 1999/03/24 18:01:47 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.10 1999/04/01 18:25:04 mike Exp $".
  */

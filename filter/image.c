@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.7 1999/03/25 20:39:07 mike Exp $"
+ * "$Id: image.c,v 1.8 1999/04/01 18:25:02 mike Exp $"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,16 @@
  *
  * Contents:
  *
+ *   ImageOpen()        - Open an image file and read it into memory.
+ *   ImageClose()       - Close an image file.
+ *   ImageSetMaxTiles() - Set the maximum number of tiles to cache.
+ *   ImageSetProfile()  - Set the device color profile.
+ *   ImageGetCol()      - Get a column of pixels from an image.
+ *   ImageGetRow()      - Get a row of pixels from an image.
+ *   ImagePutCol()      - Put a column of pixels to an image.
+ *   ImagePutRow()      - Put a row of pixels to an image.
+ *   get_tile()         - Get a cached tile.
+ *   flush_tile()       - Flush the least-recently-used tile in the cache.
  */
 
 /*
@@ -35,20 +45,33 @@
 
 
 /*
- * Local functions...
+ * Globals...
  */
 
+int	ImageHaveProfile = 0;	/* Do we have a color profile? */
+int	ImageDensity;		/* Ink/marker density */
+int	ImageMatrix[3][3][256];	/* Color transform matrix LUT */
+
+
+/*
+ * Local functions...
+ */
 
 static ib_t	*get_tile(image_t *img, int x, int y);
 static void	flush_tile(image_t *img);
 
 
-image_t *
-ImageOpen(char *filename,
-          int  primary,
-          int  secondary,
-          int  saturation,
-          int  hue)
+/*
+ * 'ImageOpen()' - Open an image file and read it into memory.
+ */
+
+image_t *			/* O - New image */
+ImageOpen(char *filename,	/* I - Filename of image */
+          int  primary,		/* I - Primary colorspace needed */
+          int  secondary,	/* I - Secondary colorspace if primary no good */
+          int  saturation,	/* I - Color saturation level */
+          int  hue,		/* I - Color hue adjustment */
+          ib_t *lut)		/* I - RGB gamma/brightness LUT */
 {
   FILE		*fp;		/* File pointer */
   unsigned char	header[16],	/* First 16 bytes of file */
@@ -104,28 +127,28 @@ ImageOpen(char *filename,
 
   if (memcmp(header, "GIF87a", 6) == 0 ||
            memcmp(header, "GIF89a", 6) == 0)
-    status = ImageReadGIF(img, fp, primary, secondary, saturation, hue);
+    status = ImageReadGIF(img, fp, primary, secondary, saturation, hue, lut);
   else if (header[0] == 0x01 && header[1] == 0xda)
-    status = ImageReadSGI(img, fp, primary, secondary, saturation, hue);
+    status = ImageReadSGI(img, fp, primary, secondary, saturation, hue, lut);
   else if (header[0] == 0x59 && header[1] == 0xa6 &&
            header[2] == 0x6a && header[3] == 0x95)
-    status = ImageReadSunRaster(img, fp, primary, secondary, saturation, hue);
+    status = ImageReadSunRaster(img, fp, primary, secondary, saturation, hue, lut);
   else if (header[0] == 'P' && header[1] >= '1' && header[1] <= '6')
-    status = ImageReadPNM(img, fp, primary, secondary, saturation, hue);
+    status = ImageReadPNM(img, fp, primary, secondary, saturation, hue, lut);
   else if (memcmp(header2, "PCD_IPI", 7) == 0)
-    status = ImageReadPhotoCD(img, fp, primary, secondary, saturation, hue);
+    status = ImageReadPhotoCD(img, fp, primary, secondary, saturation, hue, lut);
 #if defined(HAVE_LIBPNG) && defined(HAVE_LIBZ)
   else if (memcmp(header, "\211PNG", 4) == 0)
-    status = ImageReadPNG(img, fp, primary, secondary, saturation, hue);
+    status = ImageReadPNG(img, fp, primary, secondary, saturation, hue, lut);
 #endif /* HAVE_LIBPNG && HAVE_LIBZ */
 #ifdef HAVE_LIBJPEG
   else if (memcmp(header + 6, "JFIF", 4) == 0)
-    status = ImageReadJPEG(img, fp, primary, secondary, saturation, hue);
+    status = ImageReadJPEG(img, fp, primary, secondary, saturation, hue, lut);
 #endif /* HAVE_LIBJPEG */
 #ifdef HAVE_LIBTIFF
   else if (memcmp(header, "MM", 2) == 0 ||
            memcmp(header, "II", 2) == 0)
-    status = ImageReadTIFF(img, fp, primary, secondary, saturation, hue);
+    status = ImageReadTIFF(img, fp, primary, secondary, saturation, hue, lut);
 #endif /* HAVE_LIBTIFF */
   else
   {
@@ -143,11 +166,15 @@ ImageOpen(char *filename,
 }
 
 
+/*
+ * 'ImageClose()' - Close an image file.
+ */
+
 void
-ImageClose(image_t *img)
+ImageClose(image_t *img)	/* I - Image to close */
 {
-  ic_t	*current,
-	*next;
+  ic_t	*current,		/* Current cached tile */
+	*next;			/* Next cached tile */
 
 
  /*
@@ -252,6 +279,27 @@ ImageSetMaxTiles(image_t *img,		/* I - Image to set */
 
 
 /*
+ * 'ImageSetProfile()' - Set the device color profile.
+ */
+
+void
+ImageSetProfile(float density,		/* I - Ink/marker density */
+                float matrix[3][3])	/* I - Color transform matrix */
+{
+  int	i, j, k;			/* Looping var */
+
+
+  ImageHaveProfile  = 1;
+  ImageDensity      = (int)(256.0 * density + 0.5);
+
+  for (i = 0; i < 3; i ++)
+    for (j = 0; j < 3; j ++)
+      for (k = 0; k < 256; k ++)
+        ImageMatrix[i][j][k] = (int)(k * matrix[i][j] + 0.5);
+}
+
+
+/*
  * 'ImageGetCol()' - Get a column of pixels from an image.
  */
 
@@ -318,6 +366,10 @@ ImageGetCol(image_t *img,
 }
 
 
+/*
+ * 'ImageGetRow()' - Get a row of pixels from an image.
+ */
+
 int
 ImageGetRow(image_t *img,
             int     x,
@@ -366,6 +418,10 @@ ImageGetRow(image_t *img,
   return (0);
 }
 
+
+/*
+ * 'ImagePutCol()' - Put a column of pixels to an image.
+ */
 
 int
 ImagePutCol(image_t *img,
@@ -437,6 +493,10 @@ ImagePutCol(image_t *img,
 }
 
 
+/*
+ * 'ImagePutRow()' - Put a row of pixels to an image.
+ */
+
 int
 ImagePutRow(image_t *img,
             int     x,
@@ -492,6 +552,10 @@ ImagePutRow(image_t *img,
   return (0);
 }
 
+
+/*
+ * 'get_tile()' - Get a cached tile.
+ */
 
 static ib_t *
 get_tile(image_t *img,
@@ -604,6 +668,10 @@ get_tile(image_t *img,
 }
 
 
+/*
+ * 'flush_tile()' - Flush the least-recently-used tile in the cache.
+ */
+
 static void
 flush_tile(image_t *img)
 {
@@ -667,5 +735,5 @@ flush_tile(image_t *img)
 
 
 /*
- * End of "$Id: image.c,v 1.7 1999/03/25 20:39:07 mike Exp $".
+ * End of "$Id: image.c,v 1.8 1999/04/01 18:25:02 mike Exp $".
  */

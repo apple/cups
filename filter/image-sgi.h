@@ -1,5 +1,5 @@
 /*
- * "$Id: image-sgi.h,v 1.2 1999/03/24 18:01:44 mike Exp $"
+ * "$Id: image-sgi.h,v 1.3 1999/04/01 18:24:59 mike Exp $"
  *
  *   SGI image file format library definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -66,7 +66,7 @@ typedef struct
 			nextrow,	/* File offset for next row */
 			**table,	/* Offset table for compression */
 			**length;	/* Length table for compression */
-  short			*arle_row;	/* Advanced RLE compression buffer */
+  unsigned short	*arle_row;	/* Advanced RLE compression buffer */
   long			arle_offset,	/* Advanced RLE buffer offset */
 			arle_length;	/* Advanced RLE buffer length */
 } sgi_t;
@@ -77,12 +77,12 @@ typedef struct
  */
 
 extern int	sgiClose(sgi_t *sgip);
-extern int	sgiGetRow(sgi_t *sgip, short *row, int y, int z);
+extern int	sgiGetRow(sgi_t *sgip, unsigned short *row, int y, int z);
 extern sgi_t	*sgiOpen(char *filename, int mode, int comp, int bpp,
 		         int xsize, int ysize, int zsize);
 extern sgi_t	*sgiOpenFile(FILE *file, int mode, int comp, int bpp,
 		             int xsize, int ysize, int zsize);
-extern int	sgiPutRow(sgi_t *sgip, short *row, int y, int z);
+extern int	sgiPutRow(sgi_t *sgip, unsigned short *row, int y, int z);
 
 #  ifdef __cplusplus
 }
@@ -90,5 +90,5 @@ extern int	sgiPutRow(sgi_t *sgip, short *row, int y, int z);
 #endif /* !_SGI_H_ */
 
 /*
- * End of "$Id: image-sgi.h,v 1.2 1999/03/24 18:01:44 mike Exp $".
+ * End of "$Id: image-sgi.h,v 1.3 1999/04/01 18:24:59 mike Exp $".
  */

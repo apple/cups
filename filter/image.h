@@ -1,5 +1,5 @@
 /*
- * "$Id: image.h,v 1.5 1999/03/24 18:01:47 mike Exp $"
+ * "$Id: image.h,v 1.6 1999/04/01 18:25:03 mike Exp $"
  *
  *   Image library definitions for the Common UNIX Printing System (CUPS).
  *
@@ -153,9 +153,10 @@ typedef struct
  */
 
 extern image_t	*ImageOpen(char *filename, int primary, int secondary,
-		           int saturation, int hue);
+		           int saturation, int hue, ib_t *lut);
 extern void	ImageClose(image_t *img);
 extern void	ImageSetMaxTiles(image_t *img, int max_tiles);
+extern void	ImageSetProfile(float density, float matrix[3][3]);
 
 #define 	ImageGetDepth(img)	((img)->colorspace < 0 ? -(img)->colorspace : (img)->colorspace)
 extern int	ImageGetCol(image_t *img, int x, int y, int height, ib_t *pixels);
@@ -168,39 +169,41 @@ extern int	ImagePutRow(image_t *img, int x, int y, int width, ib_t *pixels);
  */
 
 extern int	ImageReadGIF(image_t *img, FILE *fp, int primary, int secondary,
-		             int saturation, int hue);
+		             int saturation, int hue, ib_t *lut);
 extern int	ImageReadJPEG(image_t *img, FILE *fp, int primary, int secondary,
-		              int saturation, int hue);
+		              int saturation, int hue, ib_t *lut);
 extern int	ImageReadPNG(image_t *img, FILE *fp, int primary, int secondary,
-		             int saturation, int hue);
+		             int saturation, int hue, ib_t *lut);
 extern int	ImageReadPNM(image_t *img, FILE *fp, int primary, int secondary,
-		             int saturation, int hue);
+		             int saturation, int hue, ib_t *lut);
 extern int	ImageReadPhotoCD(image_t *img, FILE *fp, int primary,
-		                 int secondary, int saturation, int hue);
+		                 int secondary, int saturation, int hue, ib_t *lut);
 extern int	ImageReadSGI(image_t *img, FILE *fp, int primary, int secondary,
-		             int saturation, int hue);
+		             int saturation, int hue, ib_t *lut);
 extern int	ImageReadSunRaster(image_t *img, FILE *fp, int primary,
-		                   int secondary, int saturation, int hue);
+		                   int secondary, int saturation, int hue, ib_t *lut);
 extern int	ImageReadTIFF(image_t *img, FILE *fp, int primary, int secondary,
-		              int saturation, int hue);
+		              int saturation, int hue, ib_t *lut);
 
 /*
  * Colorspace conversions...
  */
 
-extern void	ImageWhiteToBlack(ib_t *in, ib_t *out, int count);
+extern void	ImageWhiteToWhite(ib_t *in, ib_t *out, int count);
 extern void	ImageWhiteToRGB(ib_t *in, ib_t *out, int count);
+extern void	ImageWhiteToBlack(ib_t *in, ib_t *out, int count);
 extern void	ImageWhiteToCMY(ib_t *in, ib_t *out, int count);
 extern void	ImageWhiteToCMYK(ib_t *in, ib_t *out, int count);
 
-extern void	ImageRGBToBlack(ib_t *in, ib_t *out, int count);
 extern void	ImageRGBToWhite(ib_t *in, ib_t *out, int count);
+extern void	ImageRGBToRGB(ib_t *in, ib_t *out, int count);
+extern void	ImageRGBToBlack(ib_t *in, ib_t *out, int count);
 extern void	ImageRGBToCMY(ib_t *in, ib_t *out, int count);
 extern void	ImageRGBToCMYK(ib_t *in, ib_t *out, int count);
 
 extern void	ImageRGBAdjust(ib_t *pixels, int count, int saturation, int hue);
 
-extern void	ImageLut(ib_t *lut, ib_t *pixels, int count, int skip);
+extern void	ImageLut(ib_t *pixels, int count, ib_t *lut);
 
 /*
  * Image scaling operations...
@@ -208,13 +211,13 @@ extern void	ImageLut(ib_t *lut, ib_t *pixels, int count, int skip);
 
 extern izoom_t	*ImageZoomAlloc(image_t *img, int x0, int y0, int x1, int y1,
 		                int xsize, int ysize, int rotated);
-extern void	ImageZoomFill(izoom_t *z, int iy, ib_t *luts);
-extern void	ImageZoomQFill(izoom_t *z, int iy, ib_t *luts);
+extern void	ImageZoomFill(izoom_t *z, int iy);
+extern void	ImageZoomQFill(izoom_t *z, int iy);
 extern void	ImageZoomFree(izoom_t *z);
 
 
 #endif /* !_IMAGE_H_ */
 
 /*
- * End of "$Id: image.h,v 1.5 1999/03/24 18:01:47 mike Exp $".
+ * End of "$Id: image.h,v 1.6 1999/04/01 18:25:03 mike Exp $".
  */

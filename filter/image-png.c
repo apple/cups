@@ -1,5 +1,5 @@
 /*
- * "$Id: image-png.c,v 1.5 1999/03/24 18:01:43 mike Exp $"
+ * "$Id: image-png.c,v 1.6 1999/04/01 18:24:57 mike Exp $"
  *
  *   PNG image routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,7 @@
  *
  * Contents:
  *
+ *   ImageReadPNG() - Read a PNG image file.
  */
 
 /*
@@ -35,13 +36,18 @@
 #include <png.h>	/* Portable Network Graphics (PNG) definitions */
 
 
-int
-ImageReadPNG(image_t *img,
-             FILE    *fp,
-             int     primary,
-             int     secondary,
-             int     saturation,
-             int     hue)
+/*
+ * 'ImageReadPNG()' - Read a PNG image file.
+ */
+
+int				/* O - Read status */
+ImageReadPNG(image_t *img,	/* IO - Image */
+             FILE    *fp,	/* I - Image file */
+             int     primary,	/* I - Primary choice for colorspace */
+             int     secondary,	/* I - Secondary choice for colorspace */
+             int     saturation,/* I - Color saturation (%) */
+             int     hue,	/* I - Color hue (degrees) */
+	     ib_t    *lut)	/* I - Lookup table for gamma/brightness */
 {
   int		y;		/* Looping var */
   png_structp	pp;		/* PNG read pointer */
@@ -107,7 +113,7 @@ ImageReadPNG(image_t *img,
   else
     in = malloc(img->xsize * 3);
 
-  bpp = img->colorspace < 0 ? -img->colorspace : img->colorspace;
+  bpp = ImageGetDepth(img);
   out = malloc(img->xsize * bpp);
 
  /*
@@ -176,6 +182,9 @@ ImageReadPNG(image_t *img,
       }
     }
 
+    if (lut)
+      ImageLut(out, img->xsize * bpp, lut);
+
     ImagePutRow(img, 0, y, img->xsize, out);
   }
 
@@ -192,5 +201,5 @@ ImageReadPNG(image_t *img,
 
 
 /*
- * End of "$Id: image-png.c,v 1.5 1999/03/24 18:01:43 mike Exp $".
+ * End of "$Id: image-png.c,v 1.6 1999/04/01 18:24:57 mike Exp $".
  */

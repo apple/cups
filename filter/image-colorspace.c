@@ -1,5 +1,5 @@
 /*
- * "$Id: image-colorspace.c,v 1.8 1999/03/24 18:01:42 mike Exp $"
+ * "$Id: image-colorspace.c,v 1.9 1999/04/01 18:24:55 mike Exp $"
  *
  *   Colorspace conversions for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,28 @@
  *
  * Contents:
  *
+ *   ImageWhiteToWhite() - Convert luminance colors to device-dependent
+ *   ImageWhiteToRGB()   - Convert luminance data to RGB.
+ *   ImageWhiteToBlack() - Convert luminance colors to black.
+ *   ImageWhiteToCMY()   - Convert luminance colors to CMY.
+ *   ImageWhiteToCMYK()  - Convert luminance colors to CMYK.
+ *   ImageRGBToBlack()   - Convert RGB data to black.
+ *   ImageRGBToCMY()     - Convert RGB colors to CMY.
+ *   ImageRGBToCMYK()    - Convert RGB colors to CMYK.
+ *   ImageRGBToWhite()   - Convert RGB colors to luminance.
+ *   ImageRGBToRGB()     - Convert RGB colors to device-dependent RGB.
+ *   ImageLut()          - Adjust all pixel values with the given LUT.
+ *   ImageRGBAdjust()    - Adjust the hue and saturation of the given RGB
+ *                         colors.
+ *   huerotate()         - Rotate the hue, maintaining luminance.
+ *   ident()             - Make an identity matrix.
+ *   mult()              - Multiply two matrices.
+ *   saturate()          - Make a saturation matrix.
+ *   xform()             - Transform a 3D point using a matrix...
+ *   xrotate()           - Rotate about the x (red) axis...
+ *   yrotate()           - Rotate about the y (green) axis...
+ *   zrotate()           - Rotate about the z (blue) axis...
+ *   zshear()            - Shear z using x and y...
  */
 
 /*
@@ -34,247 +56,453 @@
 
 
 /*
+ * Globals...
+ */
+
+extern int	ImageHaveProfile;
+extern int	ImageDensity;
+extern int	ImageMatrix[3][3][256];
+
+/*
  * Local functions...
  */
 
-static void	matrixmult(float a[3][3], float b[3][3], float c[3][3]);
-static void	identmat(float matrix[3][3]);
-static void	saturatemat(float mat[3][3], float sat);
-static void	xrotatemat(float mat[3][3], float rs, float rc);
-static void	yrotatemat(float mat[3][3], float rs, float rc);
-static void	zrotatemat(float mat[3][3], float rs, float rc);
-static void	huerotatemat(float mat[3][3], float rot);
+static void	huerotate(float [3][3], float);
+static void	ident(float [3][3]);
+static void	mult(float [3][3], float [3][3], float [3][3]);
+static void	saturate(float [3][3], float);
+static void	xform(float [3][3], float, float, float, float *, float *, float *);
+static void	xrotate(float [3][3], float, float);
+static void	yrotate(float [3][3], float, float);
+static void	zrotate(float [3][3], float, float);
+static void	zshear(float [3][3], float, float);
 
+
+/*
+ * 'ImageWhiteToWhite()' - Convert luminance colors to device-dependent
+ *                         luminance.
+ */
 
 void
-ImageWhiteToBlack(ib_t *in,
-                  ib_t *out,
-                  int  count)
+ImageWhiteToWhite(ib_t *in,	/* I - Input pixels */
+                  ib_t *out,	/* I - Output pixels */
+                  int  count)	/* I - Number of pixels */
 {
-  while (count > 0)
-  {
-    *out++ = 255 - *in++;
-    count --;
-  };
+  if (ImageHaveProfile)
+    while (count > 0)
+    {
+      *out++ = 255 - (255 - *in++) * ImageDensity / 256;
+      count --;
+    }
+  else if (in != out)
+    memcpy(out, in, count);
 }
 
 
+/*
+ * 'ImageWhiteToRGB()' - Convert luminance data to RGB.
+ */
+
 void
-ImageWhiteToRGB(ib_t *in,
-                ib_t *out,
-                int  count)
+ImageWhiteToRGB(ib_t *in,	/* I - Input pixels */
+                ib_t *out,	/* I - Output pixels */
+                int  count)	/* I - Number of pixels */
 {
-  while (count > 0)
-  {
-    *out++ = *in;
-    *out++ = *in;
-    *out++ = *in++;
-    count --;
-  };
+  if (ImageHaveProfile)
+    while (count > 0)
+    {
+      out[0] = 255 - (255 - *in++) * ImageDensity / 256;
+      out[1] = out[0];
+      out[2] = out[0];
+      out += 3;
+      count --;
+    }
+  else
+    while (count > 0)
+    {
+      *out++ = *in;
+      *out++ = *in;
+      *out++ = *in++;
+      count --;
+    }
 }
 
 
+/*
+ * 'ImageWhiteToBlack()' - Convert luminance colors to black.
+ */
+
 void
-ImageWhiteToCMY(ib_t *in,
-                ib_t *out,
-                int  count)
+ImageWhiteToBlack(ib_t *in,	/* I - Input pixels */
+                  ib_t *out,	/* I - Output pixels */
+                  int  count)	/* I - Number of pixels */
 {
-  while (count > 0)
-  {
-    *out++ = 255 - *in;
-    *out++ = 255 - *in;
-    *out++ = 255 - *in++;
-    count --;
-  };
+  if (ImageHaveProfile)
+    while (count > 0)
+    {
+      *out++ = (255 - *in++) * ImageDensity / 256;
+      count --;
+    }
+  else
+    while (count > 0)
+    {
+      *out++ = 255 - *in++;
+      count --;
+    }
 }
 
 
+/*
+ * 'ImageWhiteToCMY()' - Convert luminance colors to CMY.
+ */
+
 void
-ImageWhiteToCMYK(ib_t *in,
-                 ib_t *out,
-                 int  count)
+ImageWhiteToCMY(ib_t *in,	/* I - Input pixels */
+                ib_t *out,	/* I - Output pixels */
+                int  count)	/* I - Number of pixels */
 {
-  while (count > 0)
-  {
-    *out++ = 0;
-    *out++ = 0;
-    *out++ = 0;
-    *out++ = 255 - *in++;
-    count --;
-  };
+  if (ImageHaveProfile)
+    while (count > 0)
+    {
+      out[0] = (255 - *in++) * ImageDensity / 256;
+      out[1] = out[0];
+      out[2] = out[0];
+      out += 3;
+      count --;
+    }
+  else
+    while (count > 0)
+    {
+      *out++ = 255 - *in;
+      *out++ = 255 - *in;
+      *out++ = 255 - *in++;
+      count --;
+    }
 }
 
 
+/*
+ * 'ImageWhiteToCMYK()' - Convert luminance colors to CMYK.
+ */
 
 void
-ImageRGBToBlack(ib_t *in,
-                ib_t *out,
-                int count)
+ImageWhiteToCMYK(ib_t *in,	/* I - Input pixels */
+                 ib_t *out,	/* I - Output pixels */
+                 int  count)	/* I - Number of pixels */
 {
-  while (count > 0)
-  {
-    *out++ = 255 - (31 * in[0] + 61 * in[1] + 8 * in[2]) / 100;
-    in += 3;
-    count --;
-  };
+  if (ImageHaveProfile)
+    while (count > 0)
+    {
+      *out++ = 0;
+      *out++ = 0;
+      *out++ = 0;
+      *out++ = (255 - *in++) * ImageDensity / 256;
+      count --;
+    }
+  else
+    while (count > 0)
+    {
+      *out++ = 0;
+      *out++ = 0;
+      *out++ = 0;
+      *out++ = 255 - *in++;
+      count --;
+    }
 }
 
 
+/*
+ * 'ImageRGBToBlack()' - Convert RGB data to black.
+ */
+
 void
-ImageRGBToWhite(ib_t *in,
-                ib_t *out,
-                int  count)
+ImageRGBToBlack(ib_t *in,	/* I - Input pixels */
+                ib_t *out,	/* I - Output pixels */
+                int count)	/* I - Number of pixels */
 {
-  while (count > 0)
-  {
-    *out++ = (31 * in[0] + 61 * in[1] + 8 * in[2]) / 100;
-    in += 3;
-    count --;
-  };
+  if (ImageHaveProfile)
+    while (count > 0)
+    {
+      *out++ = (255 - (31 * in[0] + 61 * in[1] + 8 * in[2]) / 100) *
+               ImageDensity / 256;
+      in += 3;
+      count --;
+    }
+  else
+    while (count > 0)
+    {
+      *out++ = 255 - (31 * in[0] + 61 * in[1] + 8 * in[2]) / 100;
+      in += 3;
+      count --;
+    }
 }
 
 
+/*
+ * 'ImageRGBToCMY()' - Convert RGB colors to CMY.
+ */
+
 void
-ImageRGBToCMY(ib_t *in,
-              ib_t *out,
-              int  count)
+ImageRGBToCMY(ib_t *in,		/* I - Input pixels */
+              ib_t *out,	/* I - Output pixels */
+              int  count)	/* I - Number of pixels */
 {
   int	c, m, y, k;		/* CMYK values */
 
 
-  while (count > 0)
-  {
-    c    = 255 - in[0];
-    m    = 255 - in[1];
-    y    = 255 - in[2];
-    k    = min(c, min(m, y));
+  if (ImageHaveProfile)
+    while (count > 0)
+    {
+      c = 255 - *in++;
+      m = 255 - *in++;
+      y = 255 - *in++;
+      k = min(c, min(m, y));
+      c -= k;
+      m -= k;
+      y -= k;
 
-    *out++ = (255 - in[1] / 4) * (c - k) / 255 + k;
-    *out++ = (255 - in[2] / 4) * (m - k) / 255 + k;
-    *out++ = (255 - in[0] / 4) * (y - k) / 255 + k;
-    in += 3;
-    count --;
-  };
+      *out++ = (ImageMatrix[0][0][c] +
+                ImageMatrix[0][1][m] +
+		ImageMatrix[0][2][y] + k) * ImageDensity / 256;
+      *out++ = (ImageMatrix[1][0][c] +
+                ImageMatrix[1][1][m] +
+		ImageMatrix[1][2][y] + k) * ImageDensity / 256;
+      *out++ = (ImageMatrix[2][0][c] +
+                ImageMatrix[2][1][m] +
+		ImageMatrix[2][2][y] + k) * ImageDensity / 256;
+      count --;
+    }
+  else
+    while (count > 0)
+    {
+      c    = 255 - in[0];
+      m    = 255 - in[1];
+      y    = 255 - in[2];
+      k    = min(c, min(m, y));
+
+      *out++ = (255 - in[1] / 4) * (c - k) / 255 + k;
+      *out++ = (255 - in[2] / 4) * (m - k) / 255 + k;
+      *out++ = (255 - in[0] / 4) * (y - k) / 255 + k;
+      in += 3;
+      count --;
+    }
 }
 
 
+/*
+ * 'ImageRGBToCMYK()' - Convert RGB colors to CMYK.
+ */
+
 void
-ImageRGBToCMYK(ib_t *in,
-               ib_t *out,
-               int  count)
+ImageRGBToCMYK(ib_t *in,	/* I - Input pixels */
+               ib_t *out,	/* I - Output pixels */
+               int  count)	/* I - Number of pixels */
 {
   int	c, m, y, k,		/* CMYK values */
-	diff,			/* Color differences */
-	divk;			/* Black divisor */
+	diff;			/* Color differences */
 
 
+  if (ImageHaveProfile)
+    while (count > 0)
+    {
+      c = 255 - *in++;
+      m = 255 - *in++;
+      y = 255 - *in++;
+      k = min(c, min(m, y));
+
+      if (k > 0)
+      {
+       /*
+        * Adjust black level based on the amount of color present.
+	*/
+
+	diff = 255 - 255 * (c + m + y - 3 * k) / k;
+	if (diff <= 0)
+          k = 0;
+	else if (diff < 255)
+          k = diff * diff * k / 65025;
+      }
+
+      c -= k;
+      m -= k;
+      y -= k;
+
+      *out++ = (ImageMatrix[0][0][c] +
+                ImageMatrix[0][1][m] +
+		ImageMatrix[0][2][y]) * ImageDensity / 256;
+      *out++ = (ImageMatrix[1][0][c] +
+                ImageMatrix[1][1][m] +
+		ImageMatrix[1][2][y]) * ImageDensity / 256;
+      *out++ = (ImageMatrix[2][0][c] +
+                ImageMatrix[2][1][m] +
+		ImageMatrix[2][2][y]) * ImageDensity / 256;
+      *out++ = k * ImageDensity / 256;
+
+      count --;
+    }
+  else
+    while (count > 0)
+    {
+      c = 255 - *in++;
+      m = 255 - *in++;
+      y = 255 - *in++;
+      k = min(c, min(m, y));
+
+      if (k > 0)
+      {
+       /*
+        * Adjust black level based on the amount of color present.
+	*/
+
+	diff = 255 - 255 * (c + m + y - 3 * k) / k;
+	if (diff <= 0)
+          k = 0;
+	else if (diff < 255)
+          k = diff * diff * k / 65025;
+      }
+
+      *out++ = c - k;
+      *out++ = m - k;
+      *out++ = y - k;
+      *out++ = k;
+
+      count --;
+    }
+}
+
+
+/*
+ * 'ImageRGBToWhite()' - Convert RGB colors to luminance.
+ */
+
+void
+ImageRGBToWhite(ib_t *in,	/* I - Input pixels */
+                ib_t *out,	/* I - Output pixels */
+                int  count)	/* I - Number of pixels */
+{
+  if (ImageHaveProfile)
+    while (count > 0)
+    {
+      *out++ = 255 - (255 - (31 * in[0] + 61 * in[1] + 8 * in[2]) / 100) *
+                     ImageDensity / 256;
+      in += 3;
+      count --;
+    }
+  else
+    while (count > 0)
+    {
+      *out++ = (31 * in[0] + 61 * in[1] + 8 * in[2]) / 100;
+      in += 3;
+      count --;
+    }
+}
+
+
+/*
+ * 'ImageRGBToRGB()' - Convert RGB colors to device-dependent RGB.
+ */
+
+void
+ImageRGBToRGB(ib_t *in,		/* I - Input pixels */
+              ib_t *out,	/* I - Output pixels */
+              int  count)	/* I - Number of pixels */
+{
+  int	c, m, y, k;		/* CMYK values */
+
+
+  if (ImageHaveProfile)
+    while (count > 0)
+    {
+      c = 255 - *in++;
+      m = 255 - *in++;
+      y = 255 - *in++;
+      k = min(c, min(m, y));
+      c -= k;
+      m -= k;
+      y -= k;
+
+      *out++ = 255 - (ImageMatrix[0][0][c] +
+                      ImageMatrix[0][1][m] +
+		      ImageMatrix[0][2][y] + k) * ImageDensity / 256;
+      *out++ = 255 - (ImageMatrix[1][0][c] +
+                      ImageMatrix[1][1][m] +
+		      ImageMatrix[1][2][y] + k) * ImageDensity / 256;
+      *out++ = 255 - (ImageMatrix[2][0][c] +
+                      ImageMatrix[2][1][m] +
+		      ImageMatrix[2][2][y] + k) * ImageDensity / 256;
+      count --;
+    }
+  else if (in != out)
+    memcpy(out, in, count * 3);
+}
+
+
+/*
+ * 'ImageLut()' - Adjust all pixel values with the given LUT.
+ */
+
+void
+ImageLut(ib_t *pixels,	/* I - Input/output pixels */
+         int  count,	/* I - Number of pixels/bytes to adjust */
+         ib_t *lut)	/* I - Lookup table */
+{
   while (count > 0)
   {
-    c    = 255 - in[0];
-    m    = 255 - in[1];
-    y    = 255 - in[2];
-    k    = min(c, min(m, y));
-
-    if (k > 0)
-    {
-      diff = 255 - 255 * (c + m + y - 3 * k) / k;
-      if (diff <= 0)
-        k = 0;
-      else if (diff < 255)
-        k = diff * diff * k / 65025;
-    };
-
-    divk = 255 - k;
-
-    if (divk == 0)
-    {
-      *out++ = 0;
-      *out++ = 0;
-      *out++ = 0;
-      *out++ = k;
-    }
-    else
-    {
-      *out++ = (255 - in[1] / 4) * (c - k) / divk;
-      *out++ = (255 - in[2] / 4) * (m - k) / divk;
-      *out++ = (255 - in[0] / 4) * (y - k) / divk;
-      *out++ = k;
-    };
-
-    in += 3;
+    *pixels = lut[*pixels];
+    pixels ++;
     count --;
-  };
+  }
 }
 
 
-void
-ImageLut(ib_t *lut,
-         ib_t *pixels,
-         int  count,
-         int  colorspace)
-{
-  switch (colorspace)
-  {
-    case IMAGE_BLACK :
-    case IMAGE_WHITE :
-        while (count > 0)
-        {
-          *pixels++ = lut[*pixels];
-          count --;
-        };
-        break;
-    case IMAGE_CMY :
-    case IMAGE_RGB :
-        while (count > 0)
-        {
-          *pixels++ = lut[*pixels * 3 + 0];
-          *pixels++ = lut[*pixels * 3 + 1];
-          *pixels++ = lut[*pixels * 3 + 2];
-          count --;
-        };
-        break;
-    case IMAGE_CMYK :
-        while (count > 0)
-        {
-          *pixels++ = lut[*pixels * 4 + 0];
-          *pixels++ = lut[*pixels * 4 + 1];
-          *pixels++ = lut[*pixels * 4 + 2];
-          *pixels++ = lut[*pixels * 4 + 3];
-          count --;
-        };
-        break;
-  };
-}
-
+/*
+ * 'ImageRGBAdjust()' - Adjust the hue and saturation of the given RGB colors.
+ */
 
 void
-ImageRGBAdjust(ib_t *pixels,
-               int  count,
-               int  saturation,
-               int  hue)
+ImageRGBAdjust(ib_t *pixels,	/* I - Input/output pixels */
+               int  count,	/* I - Number of pixels to adjust */
+               int  saturation,	/* I - Color saturation (%) */
+               int  hue)	/* I - Color hue (degrees) */
 {
-  int		i, j, k;
-  float		mat[3][3];
-  static int	last_saturation = 100,
-		last_hue = 0;
-  static int	lut[3][3][256];
+  int		i, j, k;	/* Looping vars */
+  float		mat[3][3];	/* Color adjustment matrix */
+  static int	last_sat = 100,	/* Last saturation used */
+		last_hue = 0;	/* Last hue used */
+  static int	lut[3][3][256];	/* Lookup table for matrix */
 
 
-  if (saturation != last_saturation ||
+  if (saturation != last_sat ||
       hue != last_hue)
   {
-    identmat(mat);
-    saturatemat(mat, saturation * 0.01);
-    huerotatemat(mat, (float)hue);
+   /*
+    * Build the color adjustment matrix...
+    */
+
+    ident(mat);
+    saturate(mat, saturation * 0.01);
+    huerotate(mat, (float)hue);
+
+   /*
+    * Convert the matrix into a 3x3 array of lookup tables...
+    */
 
     for (i = 0; i < 3; i ++)
       for (j = 0; j < 3; j ++)
         for (k = 0; k < 256; k ++)
           lut[i][j][k] = mat[i][j] * k + 0.5;
 
-    last_saturation = saturation;
-    last_hue        = hue;
-  };
+   /*
+    * Save the saturation and hue to compare later...
+    */
+
+    last_sat = saturation;
+    last_hue = hue;
+  }
+
+ /*
+  * Adjust each pixel in the given buffer.
+  */
 
   while (count > 0)
   {
@@ -288,296 +516,316 @@ ImageRGBAdjust(ib_t *pixels,
     else
       pixels[0] = i;
 
-    j = lut[0][1][pixels[0]] +
+    i = lut[0][1][pixels[0]] +
         lut[1][1][pixels[1]] +
         lut[2][1][pixels[2]];
-    if (j < 0)
+    if (i < 0)
       pixels[1] = 0;
-    else if (j > 255)
+    else if (i > 255)
       pixels[1] = 255;
     else
-      pixels[1] = j;
+      pixels[1] = i;
 
-    k = lut[0][2][pixels[0]] +
+    i = lut[0][2][pixels[0]] +
         lut[1][2][pixels[1]] +
         lut[2][2][pixels[2]];
-    if (k < 0)
+    if (i < 0)
       pixels[2] = 0;
-    else if (k > 255)
+    else if (i > 255)
       pixels[2] = 255;
     else
-      pixels[2] = k;
+      pixels[2] = i;
 
     count --;
     pixels += 3;
-  };
+  }
+}
+
+
+/*
+ * The color saturation/hue matrix stuff is provided thanks to Mr. Paul
+ * Haeberli at "http://www.sgi.com/grafica/matrix/index.html".
+ */
+
+/* 
+ * 'huerotate()' - Rotate the hue, maintaining luminance.
+ */
+
+static void
+huerotate(float mat[3][3],	/* I - Matrix to append to */
+          float rot)		/* I - Hue rotation in degrees */
+{
+  float hmat[3][3];		/* Hue matrix */
+  float lx, ly, lz;		/* Luminance vector */
+  float xrs, xrc;		/* X rotation sine/cosine */
+  float yrs, yrc;		/* Y rotation sine/cosine */
+  float zrs, zrc;		/* Z rotation sine/cosine */
+  float zsx, zsy;		/* Z shear x/y */
+
+
+ /*
+  * Load the identity matrix...
+  */
+
+  ident(hmat);
+
+ /*
+  * Rotate the grey vector into positive Z...
+  */
+
+  xrs = M_SQRT1_2;
+  xrc = M_SQRT1_2;
+  xrotate(hmat,xrs,xrc);
+
+  yrs = -1.0 / sqrt(3.0);
+  yrc = -M_SQRT2 * yrs;
+  yrotate(hmat,yrs,yrc);
+
+ /*
+  * Shear the space to make the luminance plane horizontal...
+  */
+
+  xform(hmat, 0.3086, 0.6094, 0.0820, &lx, &ly, &lz);
+  zsx = lx / lz;
+  zsy = ly / lz;
+  zshear(hmat, zsx, zsy);
+
+ /*
+  * Rotate the hue...
+  */
+
+  zrs = sin(rot * M_PI / 180.0);
+  zrc = cos(rot * M_PI / 180.0);
+
+  zrotate(hmat, zrs, zrc);
+
+ /*
+  * Unshear the space to put the luminance plane back...
+  */
+
+  zshear(hmat, -zsx, -zsy);
+
+ /*
+  * Rotate the grey vector back into place...
+  */
+
+  yrotate(hmat, -yrs, yrc);
+  xrotate(hmat, -xrs, xrc);
+
+ /*
+  * Append it to the current matrix...
+  */
+
+  mult(hmat, mat, mat);
 }
 
 
 /* 
- *	matrixmult -	
- *		multiply two matricies
+ * 'ident()' - Make an identity matrix.
  */
+
 static void
-matrixmult(float a[3][3],
-           float b[3][3],
-           float c[3][3])
+ident(float mat[3][3])	/* I - Matrix to identify */
 {
-  int x, y;
-  float temp[3][3];
+  mat[0][0] = 1.0;
+  mat[0][1] = 0.0;
+  mat[0][2] = 0.0;
+  mat[1][0] = 0.0;
+  mat[1][1] = 1.0;
+  mat[1][2] = 0.0;
+  mat[2][0] = 0.0;
+  mat[2][1] = 0.0;
+  mat[2][2] = 1.0;
+}
 
 
-  for(y = 0; y < 3; y ++)
-    for(x = 0; x < 3; x ++)
+/* 
+ * 'mult()' - Multiply two matrices.
+ */
+
+static void
+mult(float a[3][3],	/* I - First matrix */
+     float b[3][3],	/* I - Second matrix */
+     float c[3][3])	/* I - Destination matrix */
+{
+  int	x, y;		/* Looping vars */
+  float	temp[3][3];	/* Temporary matrix */
+
+
+ /*
+  * Multiply a and b, putting the result in temp...
+  */
+
+  for (y = 0; y < 3; y ++)
+    for (x = 0; x < 3; x ++)
       temp[y][x] = b[y][0] * a[0][x] +
                    b[y][1] * a[1][x] +
                    b[y][2] * a[2][x];
+
+ /*
+  * Copy temp to c (that way c can be a pointer to a or b).
+  */
 
   memcpy(c, temp, sizeof(temp));
 }
 
 
-#define RLUM    (0.3086)
-#define GLUM    (0.6094)
-#define BLUM    (0.0820)
-
 /* 
- *	identmat -	
- *		make an identity matrix
+ * 'saturate()' - Make a saturation matrix.
  */
+
 static void
-identmat(float matrix[3][3])
+saturate(float mat[3][3],	/* I - Matrix to append to */
+         float sat)		/* I - Desired color saturation */
 {
-  matrix[0][0] = 1.0;
-  matrix[0][1] = 0.0;
-  matrix[0][2] = 0.0;
-  matrix[1][0] = 0.0;
-  matrix[1][1] = 1.0;
-  matrix[1][2] = 0.0;
-  matrix[2][0] = 0.0;
-  matrix[2][1] = 0.0;
-  matrix[2][2] = 1.0;
+  float	smat[3][3];		/* Saturation matrix */
+
+
+  smat[0][0] = (1.0 - sat) * 0.3086 + sat;
+  smat[0][1] = (1.0 - sat) * 0.3086;
+  smat[0][2] = (1.0 - sat) * 0.3086;
+  smat[1][0] = (1.0 - sat) * 0.6094;
+  smat[1][1] = (1.0 - sat) * 0.6094 + sat;
+  smat[1][2] = (1.0 - sat) * 0.6094;
+  smat[2][0] = (1.0 - sat) * 0.0820;
+  smat[2][1] = (1.0 - sat) * 0.0820;
+  smat[2][2] = (1.0 - sat) * 0.0820 + sat;
+
+  mult(smat, mat, mat);
 }
 
 
 /* 
- *	saturatemat -	
- *		make a saturation marix
+ * 'xform()' - Transform a 3D point using a matrix...
  */
+
 static void
-saturatemat(float mat[3][3],
-            float sat)
+xform(float mat[3][3],	/* I - Matrix */
+      float x,		/* I - Input X coordinate */
+      float y,		/* I - Input Y coordinate */
+      float z,		/* I - Input Z coordinate */
+      float *tx,	/* O - Output X coordinate */
+      float *ty,	/* O - Output Y coordinate */
+      float *tz)	/* O - Output Z coordinate */
 {
-  float mmat[3][3];
-  float a, b, c, d, e, f, g, h, i;
-  float rwgt, gwgt, bwgt;
-
-
-  rwgt = RLUM;
-  gwgt = GLUM;
-  bwgt = BLUM;
-
-  a = (1.0-sat)*rwgt + sat;
-  b = (1.0-sat)*rwgt;
-  c = (1.0-sat)*rwgt;
-  d = (1.0-sat)*gwgt;
-  e = (1.0-sat)*gwgt + sat;
-  f = (1.0-sat)*gwgt;
-  g = (1.0-sat)*bwgt;
-  h = (1.0-sat)*bwgt;
-  i = (1.0-sat)*bwgt + sat;
-
-  mmat[0][0] = a;
-  mmat[0][1] = b;
-  mmat[0][2] = c;
-
-  mmat[1][0] = d;
-  mmat[1][1] = e;
-  mmat[1][2] = f;
-
-  mmat[2][0] = g;
-  mmat[2][1] = h;
-  mmat[2][2] = i;
-
-  matrixmult(mmat, mat, mat);
+  *tx = x * mat[0][0] + y * mat[1][0] + z * mat[2][0];
+  *ty = x * mat[0][1] + y * mat[1][1] + z * mat[2][1];
+  *tz = x * mat[0][2] + y * mat[1][2] + z * mat[2][2];
 }
 
+
 /* 
- *	xrotate -	
- *		rotate about the x (red) axis
+ * 'xrotate()' - Rotate about the x (red) axis...
  */
+
 static void
-xrotatemat(float mat[3][3],
-           float rs,
-           float rc)
+xrotate(float mat[3][3],	/* I - Matrix */
+        float rs,		/* I - Rotation angle sine */
+        float rc)		/* I - Rotation angle cosine */
 {
-  float mmat[3][3];
+  float rmat[3][3];		/* I - Rotation matrix */
 
 
-  mmat[0][0] = 1.0;
-  mmat[0][1] = 0.0;
-  mmat[0][2] = 0.0;
+  rmat[0][0] = 1.0;
+  rmat[0][1] = 0.0;
+  rmat[0][2] = 0.0;
 
-  mmat[1][0] = 0.0;
-  mmat[1][1] = rc;
-  mmat[1][2] = rs;
+  rmat[1][0] = 0.0;
+  rmat[1][1] = rc;
+  rmat[1][2] = rs;
 
-  mmat[2][0] = 0.0;
-  mmat[2][1] = -rs;
-  mmat[2][2] = rc;
+  rmat[2][0] = 0.0;
+  rmat[2][1] = -rs;
+  rmat[2][2] = rc;
 
-  matrixmult(mmat,mat,mat);
+  mult(rmat, mat, mat);
 }
 
+
 /* 
- *	yrotate -	
- *		rotate about the y (green) axis
+ * 'yrotate()' - Rotate about the y (green) axis...
  */
+
 static void
-yrotatemat(float mat[3][3],
-           float rs,
-           float rc)
+yrotate(float mat[3][3],	/* I - Matrix */
+        float rs,		/* I - Rotation angle sine */
+        float rc)		/* I - Rotation angle cosine */
 {
-  float mmat[3][3];
+  float rmat[3][3];		/* I - Rotation matrix */
 
 
-  mmat[0][0] = rc;
-  mmat[0][1] = 0.0;
-  mmat[0][2] = -rs;
+  rmat[0][0] = rc;
+  rmat[0][1] = 0.0;
+  rmat[0][2] = -rs;
 
-  mmat[1][0] = 0.0;
-  mmat[1][1] = 1.0;
-  mmat[1][2] = 0.0;
+  rmat[1][0] = 0.0;
+  rmat[1][1] = 1.0;
+  rmat[1][2] = 0.0;
 
-  mmat[2][0] = rs;
-  mmat[2][1] = 0.0;
-  mmat[2][2] = rc;
+  rmat[2][0] = rs;
+  rmat[2][1] = 0.0;
+  rmat[2][2] = rc;
 
-  matrixmult(mmat,mat,mat);
+  mult(rmat,mat,mat);
 }
 
+
 /* 
- *	zrotate -	
- *		rotate about the z (blue) axis
+ * 'zrotate()' - Rotate about the z (blue) axis...
  */
+
 static void
-zrotatemat(float mat[3][3],
-           float rs,
-           float rc)
+zrotate(float mat[3][3],	/* I - Matrix */
+        float rs,		/* I - Rotation angle sine */
+        float rc)		/* I - Rotation angle cosine */
 {
-  float mmat[3][3];
+  float rmat[3][3];		/* I - Rotation matrix */
 
 
-  mmat[0][0] = rc;
-  mmat[0][1] = rs;
-  mmat[0][2] = 0.0;
+  rmat[0][0] = rc;
+  rmat[0][1] = rs;
+  rmat[0][2] = 0.0;
 
-  mmat[1][0] = -rs;
-  mmat[1][1] = rc;
-  mmat[1][2] = 0.0;
+  rmat[1][0] = -rs;
+  rmat[1][1] = rc;
+  rmat[1][2] = 0.0;
 
-  mmat[2][0] = 0.0;
-  mmat[2][1] = 0.0;
-  mmat[2][2] = 1.0;
+  rmat[2][0] = 0.0;
+  rmat[2][1] = 0.0;
+  rmat[2][2] = 1.0;
 
-  matrixmult(mmat,mat,mat);
+  mult(rmat,mat,mat);
 }
 
-/* 
- *	xformpnt -	
- *		transform a 3D point using a matrix
- */
-static void
-xformpnt(float matrix[3][3],
-         float x,
-         float y,
-         float z,
-         float *tx,
-         float *ty,
-         float *tz)
-{
-  *tx = x*matrix[0][0] + y*matrix[1][0] + z*matrix[2][0];
-  *ty = x*matrix[0][1] + y*matrix[1][1] + z*matrix[2][1];
-  *tz = x*matrix[0][2] + y*matrix[1][2] + z*matrix[2][2];
-}
 
 /* 
- *	zshear -	
- *		shear z using x and y.
+ * 'zshear()' - Shear z using x and y...
  */
+
 static void
-zshearmat(float mat[3][3],
-          float dx,
-          float dy)
+zshear(float mat[3][3],	/* I - Matrix */
+       float dx,	/* I - X shear */
+       float dy)	/* I - Y shear */
 {
-  float mmat[3][3];
+  float smat[3][3];	/* Shear matrix */
 
 
-  mmat[0][0] = 1.0;
-  mmat[0][1] = 0.0;
-  mmat[0][2] = dx;
+  smat[0][0] = 1.0;
+  smat[0][1] = 0.0;
+  smat[0][2] = dx;
 
-  mmat[1][0] = 0.0;
-  mmat[1][1] = 1.0;
-  mmat[1][2] = dy;
+  smat[1][0] = 0.0;
+  smat[1][1] = 1.0;
+  smat[1][2] = dy;
 
-  mmat[2][0] = 0.0;
-  mmat[2][1] = 0.0;
-  mmat[2][2] = 1.0;
+  smat[2][0] = 0.0;
+  smat[2][1] = 0.0;
+  smat[2][2] = 1.0;
 
-  matrixmult(mmat,mat,mat);
-}
-
-/* 
- *	huerotatemat -	
- *		rotate the hue, while maintaining luminance.
- */
-static void
-huerotatemat(float mat[3][3],
-             float rot)
-{
-  float mmat[3][3];
-  float mag;
-  float lx, ly, lz;
-  float xrs, xrc;
-  float yrs, yrc;
-  float zrs, zrc;
-  float zsx, zsy;
-
-  identmat(mmat);
-
-/* rotate the grey vector into positive Z */
-  mag = sqrt(2.0);
-  xrs = 1.0/mag;
-  xrc = 1.0/mag;
-  xrotatemat(mmat,xrs,xrc);
-  mag = sqrt(3.0);
-  yrs = -1.0/mag;
-  yrc = sqrt(2.0)/mag;
-  yrotatemat(mmat,yrs,yrc);
-
-/* shear the space to make the luminance plane horizontal */
-  xformpnt(mmat,RLUM,GLUM,BLUM,&lx,&ly,&lz);
-  zsx = lx/lz;
-  zsy = ly/lz;
-  zshearmat(mmat,zsx,zsy);
-
-/* rotate the hue */
-  zrs = sin(rot*M_PI/180.0);
-  zrc = cos(rot*M_PI/180.0);
-  zrotatemat(mmat,zrs,zrc);
-
-/* unshear the space to put the luminance plane back */
-  zshearmat(mmat,-zsx,-zsy);
-
-/* rotate the grey vector back into place */
-  yrotatemat(mmat,-yrs,yrc);
-  xrotatemat(mmat,-xrs,xrc);
-
-  matrixmult(mmat,mat,mat);
+  mult(smat, mat, mat);
 }
 
 
 /*
- * End of "$Id: image-colorspace.c,v 1.8 1999/03/24 18:01:42 mike Exp $".
+ * End of "$Id: image-colorspace.c,v 1.9 1999/04/01 18:24:55 mike Exp $".
  */

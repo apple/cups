@@ -1,5 +1,5 @@
 /*
- * "$Id: image-photocd.c,v 1.5 1999/03/25 21:49:38 mike Exp $"
+ * "$Id: image-photocd.c,v 1.6 1999/04/01 18:24:57 mike Exp $"
  *
  *   PhotoCD routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,7 @@
  *
  * Contents:
  *
+ *   ImageReadPhotoCD() - Read a PhotoCD image file.
  */
 
 /*
@@ -39,16 +40,17 @@
  */
 
 /*
- * 'ImageReadPhotoCD()' - Read a PhotoCD image from the specified file.
+ * 'ImageReadPhotoCD()' - Read a PhotoCD image file.
  */
 
-int					/* O - 0 = success, non-0 = failure */
-ImageReadPhotoCD(image_t *img,		/* I - Image to store in */
-                 FILE    *fp,		/* I - File to read from */
-                 int     primary,	/* I - Primary colorspace */
-                 int     secondary,	/* I - Secondary colorspace */
-        	 int     saturation,	/* I - Desired color saturation */
-        	 int     hue)		/* I - Desired color hue */
+int					/* O - Read status */
+ImageReadPhotoCD(image_t *img,		/* IO - Image */
+        	 FILE    *fp,		/* I - Image file */
+        	 int     primary,	/* I - Primary choice for colorspace */
+        	 int     secondary,	/* I - Secondary choice for colorspace */
+        	 int     saturation,	/* I - Color saturation (%) */
+        	 int     hue,		/* I - Color hue (degrees) */
+		 ib_t    *lut)		/* I - Lookup table for gamma/brightness */
 {
   int		x, y;		/* Looping vars */
   int		xdir,		/* X direction */
@@ -168,11 +170,18 @@ ImageReadPhotoCD(image_t *img,		/* I - Image to store in */
 	    for (rgbptr = out + xstart, x = 0; x < 768; x ++)
 	      *rgbptr-- = 255 - *iy++;
 
+	    if (lut)
+	      ImageLut(out, 768, lut);
+
             ImagePutCol(img, 511 - y - pass, 0, 768, out);
 	  }
 	  else
 	  {
             ImageWhiteToBlack(iy, out, 768);
+
+	    if (lut)
+	      ImageLut(out, 768, lut);
+
             ImagePutRow(img, 0, y + pass, 768, out);
             iy += 768;
 	  }
@@ -182,10 +191,16 @@ ImageReadPhotoCD(image_t *img,		/* I - Image to store in */
 	  for (rgbptr = out + xstart, x = 0; x < 768; x ++)
 	    *rgbptr-- = 255 - *iy++;
 
+	  if (lut)
+	    ImageLut(out, 768, lut);
+
           ImagePutCol(img, 511 - y - pass, 0, 768, out);
 	}
 	else
 	{
+	  if (lut)
+	    ImageLut(iy, 768, lut);
+
           ImagePutRow(img, 0, y + pass, 768, iy);
           iy += 768;
 	}
@@ -206,8 +221,6 @@ ImageReadPhotoCD(image_t *img,		/* I - Image to store in */
 	    cb = (float)(*icb - 156);
 	    cr = (float)(*icr - 137);
 	  }
-
-          temp = 1.407488 * (float)(*iy);
 
           temp = 92241 * (*iy);
 
@@ -256,6 +269,9 @@ ImageReadPhotoCD(image_t *img,		/* I - Image to store in */
 
         if (img->colorspace == IMAGE_RGB)
 	{
+	  if (lut)
+	    ImageLut(rgb, 768 * 3, lut);
+
 	  if (rotation)
             ImagePutCol(img, 511 - y - pass, 0, 768, rgb);
 	  else
@@ -272,6 +288,9 @@ ImageReadPhotoCD(image_t *img,		/* I - Image to store in */
 		ImageRGBToCMYK(rgb, out, 768);
 		break;
 	  }
+
+	  if (lut)
+	    ImageLut(out, 768 * bpp, lut);
 
 	  if (rotation)
             ImagePutCol(img, 511 - y - pass, 0, 768, out);
@@ -296,5 +315,5 @@ ImageReadPhotoCD(image_t *img,		/* I - Image to store in */
 
 
 /*
- * End of "$Id: image-photocd.c,v 1.5 1999/03/25 21:49:38 mike Exp $".
+ * End of "$Id: image-photocd.c,v 1.6 1999/04/01 18:24:57 mike Exp $".
  */

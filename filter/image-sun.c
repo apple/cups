@@ -1,5 +1,5 @@
 /*
- * "$Id: image-sun.c,v 1.3 1999/03/24 18:01:45 mike Exp $"
+ * "$Id: image-sun.c,v 1.4 1999/04/01 18:25:00 mike Exp $"
  *
  *   Sun Raster image file routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,8 @@
  *
  * Contents:
  *
+ *   ImageReadSunRaster() - Read a SunRaster image file.
+ *   read_unsigned()      - Read a 32-bit unsigned integer.
  */
 
 /*
@@ -68,13 +70,18 @@
 static unsigned	read_unsigned(FILE *fp);
 
 
-int
-ImageReadSunRaster(image_t *img,
-                   FILE    *fp,
-                   int     primary,
-                   int     secondary,
-        	   int     saturation,
-        	   int     hue)
+/*
+ * 'ImageReadSunRaster()' - Read a SunRaster image file.
+ */
+
+int					/* O - Read status */
+ImageReadSunRaster(image_t *img,	/* IO - Image */
+        	   FILE    *fp,		/* I - Image file */
+        	   int     primary,	/* I - Primary choice for colorspace */
+        	   int     secondary,	/* I - Secondary choice for colorspace */
+        	   int     saturation,	/* I - Color saturation (%) */
+        	   int     hue,		/* I - Color hue (degrees) */
+		   ib_t    *lut)	/* I - Lookup table for gamma/brightness */
 {
   int		i, x, y,
 		bpp,			/* Bytes per pixel */
@@ -264,7 +271,12 @@ ImageReadSunRaster(image_t *img,
     if (bpp == 1)
     {
       if (img->colorspace == IMAGE_WHITE)
+      {
+        if (lut)
+	  ImageLut(in, img->xsize, lut);
+
         ImagePutRow(img, 0, y, img->xsize, in);
+      }
       else
       {
 	switch (img->colorspace)
@@ -283,6 +295,9 @@ ImageReadSunRaster(image_t *img,
 	      break;
 	}
 
+        if (lut)
+	  ImageLut(out, img->xsize * bpp, lut);
+
         ImagePutRow(img, 0, y, img->xsize, out);
       }
     }
@@ -292,6 +307,9 @@ ImageReadSunRaster(image_t *img,
       {
 	if (saturation != 100 || hue != 0)
 	  ImageRGBAdjust(in, img->xsize, saturation, hue);
+
+        if (lut)
+	  ImageLut(in, img->xsize * 3, lut);
 
         ImagePutRow(img, 0, y, img->xsize, in);
       }
@@ -316,6 +334,9 @@ ImageReadSunRaster(image_t *img,
 	      break;
 	}
 
+        if (lut)
+	  ImageLut(out, img->xsize * bpp, lut);
+
         ImagePutRow(img, 0, y, img->xsize, out);
       }
     }
@@ -331,10 +352,14 @@ ImageReadSunRaster(image_t *img,
 }
 
 
-static unsigned
-read_unsigned(FILE *fp)
+/*
+ * 'read_unsigned()' - Read a 32-bit unsigned integer.
+ */
+
+static unsigned		/* O - Integer from file */
+read_unsigned(FILE *fp)	/* I - File to read from */
 {
-  unsigned	v;
+  unsigned	v;	/* Integer from file */
 
 
   v = getc(fp);
@@ -347,5 +372,5 @@ read_unsigned(FILE *fp)
 
 
 /*
- * End of "$Id: image-sun.c,v 1.3 1999/03/24 18:01:45 mike Exp $".
+ * End of "$Id: image-sun.c,v 1.4 1999/04/01 18:25:00 mike Exp $".
  */

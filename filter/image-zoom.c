@@ -1,5 +1,5 @@
 /*
- * "$Id: image-zoom.c,v 1.4 1999/03/24 18:01:46 mike Exp $"
+ * "$Id: image-zoom.c,v 1.5 1999/04/01 18:25:02 mike Exp $"
  *
  *   Image zoom routines for the Common UNIX Printing System (CUPS).
  *
@@ -150,8 +150,7 @@ ImageZoomAlloc(image_t *img,	/* I - Image to zoom */
 
 void
 ImageZoomFill(izoom_t *z,	/* I - Zoom record to fill */
-              int     iy,	/* I - Zoom image row */
-              ib_t    *luts)	/* I - Lookup tables */
+              int     iy)	/* I - Zoom image row */
 {
   ib_t	*r,			/* Row pointer */
 	*inptr;			/* Pixel pointer */
@@ -188,8 +187,6 @@ ImageZoomFill(izoom_t *z,	/* I - Zoom record to fill */
     ImageGetCol(z->img, z->xorig - iy, z->yorig, z->width, z->in);
   else
     ImageGetRow(z->img, z->xorig, z->yorig + iy, z->width, z->in);
-
-  ImageLut(luts, z->in, z->width, z->img->colorspace);
 
   if (z_inincr < 0)
     inptr = z->in + (z->width - 1) * z_depth;
@@ -233,8 +230,7 @@ ImageZoomFill(izoom_t *z,	/* I - Zoom record to fill */
 
 void
 ImageZoomQFill(izoom_t *z,	/* I - Zoom record to fill */
-               int     iy,	/* I - Zoom image row */
-               ib_t    *luts)	/* I - Lookup tables */
+               int     iy)	/* I - Zoom image row */
 {
   ib_t	*r,			/* Row pointer */
 	*inptr;			/* Pixel pointer */
@@ -268,8 +264,6 @@ ImageZoomQFill(izoom_t *z,	/* I - Zoom record to fill */
     ImageGetCol(z->img, z->xorig - iy, z->yorig, z->width, z->in);
   else
     ImageGetRow(z->img, z->xorig, z->yorig + iy, z->width, z->in);
-
-  ImageLut(luts, z->in, z->width, z->img->colorspace);
 
   if (z_inincr < 0)
     inptr = z->in + (z->width - 1) * z_depth;
@@ -312,5 +306,5 @@ ImageZoomFree(izoom_t *z)	/* I - Zoom record to free */
 
 
 /*
- * End of "$Id: image-zoom.c,v 1.4 1999/03/24 18:01:46 mike Exp $".
+ * End of "$Id: image-zoom.c,v 1.5 1999/04/01 18:25:02 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: image-sgilib.c,v 1.2 1999/03/24 18:01:45 mike Exp $"
+ * "$Id: image-sgilib.c,v 1.3 1999/04/01 18:25:00 mike Exp $"
  *
  *   SGI image file format library routines for the Common UNIX Printing
  *   System (CUPS).
@@ -49,11 +49,11 @@
 static int	getlong(FILE *);
 static int	getshort(FILE *);
 static int	putlong(long, FILE *);
-static int	putshort(short, FILE *);
-static int	read_rle8(FILE *, short *, int);
-static int	read_rle16(FILE *, short *, int);
-static int	write_rle8(FILE *, short *, int);
-static int	write_rle16(FILE *, short *, int);
+static int	putshort(unsigned short, FILE *);
+static int	read_rle8(FILE *, unsigned short *, int);
+static int	read_rle16(FILE *, unsigned short *, int);
+static int	write_rle8(FILE *, unsigned short *, int);
+static int	write_rle16(FILE *, unsigned short *, int);
 
 
 /*
@@ -118,13 +118,13 @@ sgiClose(sgi_t *sgip)	/* I - SGI image */
  */
 
 int
-sgiGetRow(sgi_t *sgip,	/* I - SGI image */
-          short *row,	/* O - Row to read */
-          int   y,	/* I - Line to read */
-          int   z)	/* I - Channel to read */
+sgiGetRow(sgi_t          *sgip,	/* I - SGI image */
+          unsigned short *row,	/* O - Row to read */
+          int            y,	/* I - Line to read */
+          int            z)	/* I - Channel to read */
 {
-  int	x;		/* X coordinate */
-  long	offset;		/* File offset */
+  int	x;			/* X coordinate */
+  long	offset;			/* File offset */
 
 
   if (sgip == NULL ||
@@ -327,7 +327,7 @@ sgiOpenFile(FILE *file,	/* I - File to open */
               break;
 
           case SGI_COMP_ARLE : /* Aggressive RLE */
-              sgip->arle_row    = calloc(xsize, sizeof(short));
+              sgip->arle_row    = calloc(xsize, sizeof(unsigned short));
               sgip->arle_offset = 0;
 
           case SGI_COMP_RLE : /* Run-Length Encoding */
@@ -366,10 +366,10 @@ sgiOpenFile(FILE *file,	/* I - File to open */
  */
 
 int
-sgiPutRow(sgi_t *sgip,	/* I - SGI image */
-          short *row,	/* I - Row to write */
-          int   y,	/* I - Line to write */
-          int   z)	/* I - Channel to write */
+sgiPutRow(sgi_t          *sgip,	/* I - SGI image */
+          unsigned short *row,	/* I - Row to write */
+          int            y,	/* I - Line to write */
+          int            z)	/* I - Channel to write */
 {
   int	x;		/* X coordinate */
   long	offset;		/* File offset */
@@ -435,7 +435,7 @@ sgiPutRow(sgi_t *sgip,	/* I - SGI image */
 
         if (sgip->bpp == 1)
         {
-          do
+          for (;;)
           {
             sgip->arle_offset = ftell(sgip->file);
             if ((sgip->arle_length = read_rle8(sgip->file, sgip->arle_row, sgip->xsize)) < 0)
@@ -444,15 +444,16 @@ sgiPutRow(sgi_t *sgip,	/* I - SGI image */
               break;
             }
 
-            for (x = 0; x < sgip->xsize; x ++)
-              if (row[x] != sgip->arle_row[x])
-        	break;
+            if (memcmp(row, sgip->arle_row, sgip->xsize * sizeof(unsigned short)) == 0)
+	    {
+	      x = sgip->xsize;
+	      break;
+	    }
           }
-          while (x < sgip->xsize);
         }
         else
         {
-          do
+          for (;;)
           {
             sgip->arle_offset = ftell(sgip->file);
             if ((sgip->arle_length = read_rle16(sgip->file, sgip->arle_row, sgip->xsize)) < 0)
@@ -461,11 +462,12 @@ sgiPutRow(sgi_t *sgip,	/* I - SGI image */
               break;
             }
 
-            for (x = 0; x < sgip->xsize; x ++)
-              if (row[x] != sgip->arle_row[x])
-        	break;
+            if (memcmp(row, sgip->arle_row, sgip->xsize * sizeof(unsigned short)) == 0)
+	    {
+	      x = sgip->xsize;
+	      break;
+	    }
           }
-          while (x < sgip->xsize);
         }
 
 	if (x == sgip->xsize)
@@ -495,7 +497,7 @@ sgiPutRow(sgi_t *sgip,	/* I - SGI image */
         {
           sgip->arle_offset = offset;
           sgip->arle_length = x;
-          memcpy(sgip->arle_row, row, sgip->xsize * sizeof(short));
+          memcpy(sgip->arle_row, row, sgip->xsize * sizeof(unsigned short));
         }
 
         sgip->nextrow      = ftell(sgip->file);
@@ -564,8 +566,8 @@ putlong(long n,		/* I - Long to write */
  */
 
 static int
-putshort(short n,	/* I - Short to write */
-         FILE  *fp)	/* I - File to write to */
+putshort(unsigned short n,	/* I - Short to write */
+         FILE           *fp)	/* I - File to write to */
 {
   if (putc(n >> 8, fp) == EOF)
     return (EOF);
@@ -581,9 +583,9 @@ putshort(short n,	/* I - Short to write */
  */
 
 static int
-read_rle8(FILE  *fp,	/* I - File to read from */
-          short *row,	/* O - Data */
-          int   xsize)	/* I - Width of data in pixels */
+read_rle8(FILE           *fp,	/* I - File to read from */
+          unsigned short *row,	/* O - Data */
+          int            xsize)	/* I - Width of data in pixels */
 {
   int	i,		/* Looping var */
 	ch,		/* Current character */
@@ -626,9 +628,9 @@ read_rle8(FILE  *fp,	/* I - File to read from */
  */
 
 static int
-read_rle16(FILE  *fp,	/* I - File to read from */
-           short *row,	/* O - Data */
-           int   xsize)	/* I - Width of data in pixels */
+read_rle16(FILE           *fp,	/* I - File to read from */
+           unsigned short *row,	/* O - Data */
+           int            xsize)/* I - Width of data in pixels */
 {
   int	i,		/* Looping var */
 	ch,		/* Current character */
@@ -671,16 +673,16 @@ read_rle16(FILE  *fp,	/* I - File to read from */
  */
 
 static int
-write_rle8(FILE  *fp,	/* I - File to write to */
-           short *row,	/* I - Data */
-           int   xsize)	/* I - Width of data in pixels */
+write_rle8(FILE           *fp,	/* I - File to write to */
+           unsigned short *row,	/* I - Data */
+           int            xsize)/* I - Width of data in pixels */
 {
-  int	length,
-	count,
-	i,
-	x;
-  short	*start,
-	repeat;
+  int		length,
+		count,
+		i,
+		x;
+  unsigned short *start,
+		repeat;
 
 
   for (x = xsize, length = 0; x > 0;)
@@ -763,16 +765,16 @@ write_rle8(FILE  *fp,	/* I - File to write to */
  */
 
 static int
-write_rle16(FILE  *fp,	/* I - File to write to */
-            short *row,	/* I - Data */
-            int   xsize)/* I - Width of data in pixels */
+write_rle16(FILE           *fp,  /* I - File to write to */
+            unsigned short *row, /* I - Data */
+            int            xsize)/* I - Width of data in pixels */
 {
-  int	length,
-	count,
-	i,
-	x;
-  short	*start,
-	repeat;
+  int		length,
+		count,
+		i,
+		x;
+  unsigned short *start,
+		repeat;
 
 
   for (x = xsize, length = 0; x > 0;)
@@ -851,5 +853,5 @@ write_rle16(FILE  *fp,	/* I - File to write to */
 
 
 /*
- * End of "$Id: image-sgilib.c,v 1.2 1999/03/24 18:01:45 mike Exp $".
+ * End of "$Id: image-sgilib.c,v 1.3 1999/04/01 18:25:00 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: image-jpeg.c,v 1.6 1999/03/24 18:01:43 mike Exp $"
+ * "$Id: image-jpeg.c,v 1.7 1999/04/01 18:24:56 mike Exp $"
  *
  *   JPEG image routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,7 @@
  *
  * Contents:
  *
+ *   ImageReadJPEG() - Read a JPEG image file.
  */
 
 /*
@@ -35,18 +36,23 @@
 #  include <jpeglib.h>	/* JPEG/JFIF image definitions */
 
 
-int
-ImageReadJPEG(image_t *img,
-              FILE    *fp,
-              int     primary,
-              int     secondary,
-              int     saturation,
-              int     hue)
+/*
+ * 'ImageReadJPEG()' - Read a JPEG image file.
+ */
+
+int					/* O - Read status */
+ImageReadJPEG(image_t *img,		/* IO - Image */
+              FILE    *fp,		/* I - Image file */
+              int     primary,		/* I - Primary choice for colorspace */
+              int     secondary,	/* I - Secondary choice for colorspace */
+              int     saturation,	/* I - Color saturation (%) */
+              int     hue,		/* I - Color hue (degrees) */
+	      ib_t    *lut)		/* I - Lookup table for gamma/brightness */
 {
-  struct jpeg_decompress_struct	cinfo;		/* Decompressor info */
-  struct jpeg_error_mgr		jerr;		/* Error handler info */
-  ib_t				*in,		/* Input pixels */
-				*out;		/* Output pixels */
+  struct jpeg_decompress_struct	cinfo;	/* Decompressor info */
+  struct jpeg_error_mgr		jerr;	/* Error handler info */
+  ib_t				*in,	/* Input pixels */
+				*out;	/* Output pixels */
 
 
   (void)secondary;
@@ -110,7 +116,12 @@ ImageReadJPEG(image_t *img,
 
     if ((primary == IMAGE_WHITE && cinfo.out_color_space == JCS_GRAYSCALE) ||
         (primary == IMAGE_RGB && cinfo.out_color_space == JCS_RGB))
+    {
+      if (lut)
+        ImageLut(in, img->xsize * ImageGetDepth(img), lut);
+
       ImagePutRow(img, 0, cinfo.output_scanline - 1, img->xsize, in);
+    }
     else if (cinfo.out_color_space == JCS_GRAYSCALE)
     {
       switch (primary)
@@ -128,6 +139,9 @@ ImageReadJPEG(image_t *img,
             ImageWhiteToCMYK(in, out, img->xsize);
             break;
       }
+
+      if (lut)
+        ImageLut(out, img->xsize * ImageGetDepth(img), lut);
 
       ImagePutRow(img, 0, cinfo.output_scanline - 1, img->xsize, out);
     }
@@ -149,6 +163,9 @@ ImageReadJPEG(image_t *img,
             break;
       }
 
+      if (lut)
+        ImageLut(out, img->xsize * ImageGetDepth(img), lut);
+
       ImagePutRow(img, 0, cinfo.output_scanline - 1, img->xsize, out);
     }
   }
@@ -169,5 +186,5 @@ ImageReadJPEG(image_t *img,
 
 
 /*
- * End of "$Id: image-jpeg.c,v 1.6 1999/03/24 18:01:43 mike Exp $".
+ * End of "$Id: image-jpeg.c,v 1.7 1999/04/01 18:24:56 mike Exp $".
  */

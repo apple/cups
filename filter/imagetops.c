@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.8 1999/03/24 18:01:47 mike Exp $"
+ * "$Id: imagetops.c,v 1.9 1999/04/01 18:25:04 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -163,7 +163,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   colorspace = ColorDevice ? IMAGE_RGB : IMAGE_WHITE;
 
-  if ((img = ImageOpen(argv[6], colorspace, IMAGE_WHITE, sat, hue)) == NULL)
+  if ((img = ImageOpen(argv[6], colorspace, IMAGE_WHITE, sat, hue, NULL)) == NULL)
   {
     fputs("ERROR: Unable to open image file for printing!\n", stderr);
     ppdClose(ppd);
@@ -483,5 +483,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.8 1999/03/24 18:01:47 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.9 1999/04/01 18:25:04 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: image-pnm.c,v 1.3 1999/03/24 18:01:44 mike Exp $"
+ * "$Id: image-pnm.c,v 1.4 1999/04/01 18:24:58 mike Exp $"
  *
  *   Portable Any Map file routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,7 @@
  *
  * Contents:
  *
+ *   ImageReadPNM() - Read a PNM image file.
  */
 
 /*
@@ -32,13 +33,19 @@
 #include "image.h"
 #include <ctype.h>
 
-int
-ImageReadPNM(image_t *img,
-             FILE    *fp,
-             int     primary,
-             int     secondary,
-             int     saturation,
-             int     hue)
+
+/*
+ * 'ImageReadPNM()' - Read a PNM image file.
+ */
+
+int				/* O - Read status */
+ImageReadPNM(image_t *img,	/* IO - Image */
+             FILE    *fp,	/* I - Image file */
+             int     primary,	/* I - Primary choice for colorspace */
+             int     secondary,	/* I - Secondary choice for colorspace */
+             int     saturation,/* I - Color saturation (%) */
+             int     hue,	/* I - Color hue (degrees) */
+	     ib_t    *lut)	/* I - Lookup table for gamma/brightness */
 {
   int		x, y;		/* Looping vars */
   int		bpp;		/* Bytes per pixel */
@@ -86,7 +93,7 @@ ImageReadPNM(image_t *img,
     }
     else
       lineptr ++;
-  };
+  }
 
   while (lineptr != NULL && img->ysize == 0)
   {
@@ -100,7 +107,7 @@ ImageReadPNM(image_t *img,
     }
     else
       lineptr ++;
-  };
+  }
 
   if (format != 1 && format != 4)
   {
@@ -118,7 +125,7 @@ ImageReadPNM(image_t *img,
       }
       else
 	lineptr ++;
-    };
+    }
   }
   else
     maxval = 1;
@@ -158,7 +165,7 @@ ImageReadPNM(image_t *img,
               inptr[1] = 255 * val / maxval;
             if (fscanf(fp, "%d", &val) == 1)
               inptr[2] = 255 * val / maxval;
-          };
+          }
           break;
 
       case 4 :
@@ -178,8 +185,8 @@ ImageReadPNM(image_t *img,
             {
               bit = 128;
               inptr ++;
-            };
-          };
+            }
+          }
           break;
 
       case 5 :
@@ -189,7 +196,7 @@ ImageReadPNM(image_t *img,
       case 6 :
           fread(in, img->xsize, 3, fp);
           break;
-    };
+    }
 
     switch (format)
     {
@@ -198,7 +205,12 @@ ImageReadPNM(image_t *img,
       case 4 :
       case 5 :
           if (img->colorspace == IMAGE_WHITE)
+	  {
+	    if (lut)
+	      ImageLut(in, img->xsize, lut);
+
             ImagePutRow(img, 0, y, img->xsize, in);
+	  }
 	  else
 	  {
 	    switch (img->colorspace)
@@ -215,10 +227,13 @@ ImageReadPNM(image_t *img,
 	      case IMAGE_CMYK :
 		  ImageWhiteToCMYK(in, out, img->xsize);
 		  break;
-	    };
+	    }
+
+	    if (lut)
+	      ImageLut(out, img->xsize * bpp, lut);
 
             ImagePutRow(img, 0, y, img->xsize, out);
-	  };
+	  }
 	  break;
 
       default :
@@ -226,7 +241,12 @@ ImageReadPNM(image_t *img,
 	    ImageRGBAdjust(in, img->xsize, saturation, hue);
 
 	  if (img->colorspace == IMAGE_RGB)
+	  {
+	    if (lut)
+	      ImageLut(in, img->xsize * 3, lut);
+
             ImagePutRow(img, 0, y, img->xsize, in);
+	  }
 	  else
 	  {
 	    switch (img->colorspace)
@@ -243,13 +263,16 @@ ImageReadPNM(image_t *img,
 	      case IMAGE_CMYK :
 		  ImageRGBToCMYK(in, out, img->xsize);
 		  break;
-	    };
+	    }
+
+	    if (lut)
+	      ImageLut(out, img->xsize * bpp, lut);
 
             ImagePutRow(img, 0, y, img->xsize, out);
-	  };
+	  }
   	  break;
-    };
-  };
+    }
+  }
 
   free(in);
   free(out);
@@ -261,5 +284,5 @@ ImageReadPNM(image_t *img,
 
 
 /*
- * End of "$Id: image-pnm.c,v 1.3 1999/03/24 18:01:44 mike Exp $".
+ * End of "$Id: image-pnm.c,v 1.4 1999/04/01 18:24:58 mike Exp $".
  */

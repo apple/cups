@@ -1,5 +1,5 @@
 /*
- * "$Id: image-tiff.c,v 1.6 1999/03/24 18:01:45 mike Exp $"
+ * "$Id: image-tiff.c,v 1.7 1999/04/01 18:25:01 mike Exp $"
  *
  *   TIFF file routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,7 @@
  *
  * Contents:
  *
+ *   ImageReadTIFF() - Read a TIFF image file.
  */
 
 /*
@@ -36,52 +37,61 @@
 #  include <tiffio.h>
 
 
-int
-ImageReadTIFF(image_t *img,
-              FILE    *fp,
-              int     primary,
-              int     secondary,
-              int     saturation,
-              int     hue)
-{
-  TIFF		*tif;
-  uint32	width, height;
-  uint16	photometric,
-		orientation,
-		resunit,
-		samples,
-		bits,
-		inkset;
-  float		xres,
-		yres;
-  uint16	*redcmap,
-		*greencmap,
-		*bluecmap;
-  int		c,
-		num_colors,
-		bpp,
-		x, y,
-		xstart, ystart,
-		xdir, ydir,
-		xcount, ycount,
-		pstep,
-		scanwidth,
-		r, g, b, k,
-		alpha;
-  ib_t		*in,
-		*out,
-		*p,
-		*scanline,
-		*scanptr,
-		bit,
-		pixel,
-		zero,
-		one;
+/*
+ * 'ImageReadTIFF()' - Read a TIFF image file.
+ */
 
+int					/* O - Read status */
+ImageReadTIFF(image_t *img,		/* IO - Image */
+              FILE    *fp,		/* I - Image file */
+              int     primary,		/* I - Primary choice for colorspace */
+              int     secondary,	/* I - Secondary choice for colorspace */
+              int     saturation,	/* I - Color saturation (%) */
+              int     hue,		/* I - Color hue (degrees) */
+	      ib_t    *lut)		/* I - Lookup table for gamma/brightness */
+{
+  TIFF		*tif;			/* TIFF file */
+  uint32	width, height;		/* Size of image */
+  uint16	photometric,		/* Colorspace */
+		orientation,		/* Orientation */
+		resunit,		/* Units for resolution */
+		samples,		/* Number of samples/pixel */
+		bits,			/* Number of bits/pixel */
+		inkset;			/* Ink set for color separations */
+  float		xres,			/* Horizontal resolution */
+		yres;			/* Vertical resolution */
+  uint16	*redcmap,		/* Red colormap information */
+		*greencmap,		/* Green colormap information */
+		*bluecmap;		/* Blue colormap information */
+  int		c,			/* Color index */
+		num_colors,		/* Number of colors */
+		bpp,			/* Bytes per pixel */
+		x, y,			/* Current x & y */
+		xstart, ystart,		/* Starting x & y */
+		xdir, ydir,		/* X & y direction */
+		xcount, ycount,		/* X & Y counters */
+		pstep,			/* Pixel step (= bpp or -2 * bpp) */
+		scanwidth,		/* Width of scanline */
+		r, g, b, k,		/* Red, green, blue, and black values */
+		alpha;			/* Image includes alpha? */
+  ib_t		*in,			/* Input buffer */
+		*out,			/* Output buffer */
+		*p,			/* Pointer into buffer */
+		*scanline,		/* Scanline buffer */
+		*scanptr,		/* Pointer into scanline buffer */
+		bit,			/* Current bit */
+		pixel,			/* Current pixel */
+		zero,			/* Zero value (bitmaps) */
+		one;			/* One value (bitmaps) */
+
+
+ /*
+  * Open the TIFF file and get the required parameters...
+  */
 
 #ifdef __hpux
-  lseek(fileno(fp), 0, SEEK_SET); /* Work around "feature" in HPUX stdio */
-#endif /* hpux */
+  lseek(fileno(fp), 0, SEEK_SET); /* Work around "feature" in HP-UX stdio */
+#endif /* __hpux */
 
   if ((tif = TIFFFdOpen(fileno(fp), "", "r")) == NULL)
   {
@@ -95,12 +105,21 @@ ImageReadTIFF(image_t *img,
       !TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &samples) ||
       !TIFFGetField(tif, TIFFTAG_BITSPERSAMPLE, &bits))
   {
+    TIFFClose(tif);
     fclose(fp);
     return (-1);
   }
 
+ /*
+  * Get the image orientation...
+  */
+
   if (!TIFFGetField(tif, TIFFTAG_ORIENTATION, &orientation))
     orientation = 0;
+
+ /*
+  * Get the image resolution...
+  */
 
   if (TIFFGetField(tif, TIFFTAG_XRESOLUTION, &xres) &&
       TIFFGetField(tif, TIFFTAG_YRESOLUTION, &yres) &&
@@ -123,10 +142,18 @@ ImageReadTIFF(image_t *img,
     }
   }
 
+ /*
+  * See if the image has an alpha channel...
+  */
+
   if (samples == 2 || (samples == 4 && photometric == PHOTOMETRIC_RGB))
     alpha = 1;
   else
     alpha = 0;
+
+ /*
+  * Setup the image size and colorspace...
+  */
 
   img->xsize = width;
   img->ysize = height;
@@ -139,6 +166,10 @@ ImageReadTIFF(image_t *img,
   bpp = ImageGetDepth(img);
 
   ImageSetMaxTiles(img, 0);
+
+ /*
+  * Set the X & Y start and direction according to the image orientation...
+  */
 
   switch (orientation)
   {
@@ -173,8 +204,16 @@ ImageReadTIFF(image_t *img,
         break;
   }
 
+ /*
+  * Allocate a scanline buffer...
+  */
+
   scanwidth = TIFFScanlineSize(tif);
   scanline  = _TIFFmalloc(scanwidth);
+
+ /*
+  * Allocate input and output buffers...
+  */
 
   if (orientation < ORIENTATION_LEFTTOP)
   {
@@ -196,6 +235,12 @@ ImageReadTIFF(image_t *img,
     in  = malloc(img->ysize * 3 + 3);
     out = malloc(img->ysize * bpp);
   }
+
+ /*
+  * Read the image.  This is greatly complicated by the fact that TIFF
+  * supports literally hundreds of different colorspaces and orientations,
+  * each which must be handled separately...
+  */
 
   switch (photometric)
   {
@@ -329,7 +374,12 @@ ImageReadTIFF(image_t *img,
               TIFFReadScanline(tif, in, y, 0);
 
             if (img->colorspace == IMAGE_WHITE)
+	    {
+	      if (lut)
+	        ImageLut(in, img->xsize, lut);
+
               ImagePutRow(img, 0, y, img->xsize, in);
+	    }
             else
             {
 	      switch (img->colorspace)
@@ -347,6 +397,9 @@ ImageReadTIFF(image_t *img,
 		    ImageWhiteToCMYK(in, out, img->xsize);
 		    break;
 	      }
+
+	      if (lut)
+	        ImageLut(out, img->xsize * bpp, lut);
 
               ImagePutRow(img, 0, y, img->xsize, out);
 	    }
@@ -470,7 +523,12 @@ ImageReadTIFF(image_t *img,
               TIFFReadScanline(tif, in, x, 0);
 
             if (img->colorspace == IMAGE_WHITE)
+	    {
+	      if (lut)
+	        ImageLut(in, img->ysize, lut);
+
               ImagePutCol(img, x, 0, img->ysize, in);
+	    }
             else
             {
 	      switch (img->colorspace)
@@ -488,6 +546,9 @@ ImageReadTIFF(image_t *img,
 		    ImageWhiteToCMYK(in, out, img->ysize);
 		    break;
 	      }
+
+	      if (lut)
+	        ImageLut(out, img->ysize * bpp, lut);
 
               ImagePutCol(img, x, 0, img->ysize, out);
 	    }
@@ -617,7 +678,12 @@ ImageReadTIFF(image_t *img,
             }
 
             if (img->colorspace == IMAGE_RGB)
+	    {
+	      if (lut)
+	        ImageLut(in, img->xsize * 3, lut);
+
               ImagePutRow(img, 0, y, img->xsize, in);
+	    }
             else
             {
 	      switch (img->colorspace)
@@ -635,6 +701,9 @@ ImageReadTIFF(image_t *img,
 		    ImageRGBToCMYK(in, out, img->xsize);
 		    break;
 	      }
+
+	      if (lut)
+	        ImageLut(out, img->xsize * bpp, lut);
 
               ImagePutRow(img, 0, y, img->xsize, out);
 	    }
@@ -746,7 +815,12 @@ ImageReadTIFF(image_t *img,
             }
 
             if (img->colorspace == IMAGE_RGB)
+	    {
+	      if (lut)
+	        ImageLut(in, img->ysize * 3, lut);
+
               ImagePutCol(img, x, 0, img->ysize, in);
+	    }
             else
             {
 	      switch (img->colorspace)
@@ -764,6 +838,9 @@ ImageReadTIFF(image_t *img,
 		    ImageRGBToCMYK(in, out, img->ysize);
 		    break;
 	      }
+
+	      if (lut)
+	        ImageLut(out, img->ysize * bpp, lut);
 
               ImagePutCol(img, x, 0, img->ysize, out);
 	    }
@@ -886,7 +963,12 @@ ImageReadTIFF(image_t *img,
               ImageRGBAdjust(in, img->xsize, saturation, hue);
 
             if (img->colorspace == IMAGE_RGB)
+	    {
+	      if (lut)
+	        ImageLut(in, img->xsize * 3, lut);
+
               ImagePutRow(img, 0, y, img->xsize, in);
+	    }
             else
             {
 	      switch (img->colorspace)
@@ -904,6 +986,9 @@ ImageReadTIFF(image_t *img,
 		    ImageRGBToCMYK(in, out, img->xsize);
 		    break;
 	      }
+
+	      if (lut)
+	        ImageLut(out, img->xsize * bpp, lut);
 
               ImagePutRow(img, 0, y, img->xsize, out);
 	    }
@@ -1023,8 +1108,13 @@ ImageReadTIFF(image_t *img,
               ImageRGBAdjust(in, img->ysize, saturation, hue);
 
             if (img->colorspace == IMAGE_RGB)
+	    {
+	      if (lut)
+	        ImageLut(in, img->ysize * 3, lut);
+
               ImagePutCol(img, x, 0, img->ysize, in);
-            else
+            }
+	    else
             {
 	      switch (img->colorspace)
 	      {
@@ -1041,6 +1131,9 @@ ImageReadTIFF(image_t *img,
 		    ImageRGBToCMYK(in, out, img->ysize);
 		    break;
 	      }
+
+	      if (lut)
+	        ImageLut(out, img->ysize * bpp, lut);
 
               ImagePutCol(img, x, 0, img->ysize, out);
 	    }
@@ -1243,7 +1336,12 @@ ImageReadTIFF(image_t *img,
         	ImageRGBAdjust(in, img->xsize, saturation, hue);
 
               if (img->colorspace == IMAGE_RGB)
+	      {
+	        if (lut)
+	          ImageLut(in, img->xsize * 3, lut);
+
         	ImagePutRow(img, 0, y, img->xsize, in);
+	      }
               else
               {
 		switch (img->colorspace)
@@ -1261,6 +1359,9 @@ ImageReadTIFF(image_t *img,
 		      ImageRGBToCMYK(in, out, img->xsize);
 		      break;
 		}
+
+		if (lut)
+	          ImageLut(out, img->xsize * 3, lut);
 
         	ImagePutRow(img, 0, y, img->xsize, out);
 	      }
@@ -1456,8 +1557,13 @@ ImageReadTIFF(image_t *img,
         	ImageRGBAdjust(in, img->ysize, saturation, hue);
 
               if (img->colorspace == IMAGE_RGB)
+	      {
+		if (lut)
+	          ImageLut(in, img->ysize * 3, lut);
+
         	ImagePutCol(img, x, 0, img->ysize, in);
-              else
+              }
+	      else
               {
 		switch (img->colorspace)
 		{
@@ -1474,6 +1580,9 @@ ImageReadTIFF(image_t *img,
 		      ImageRGBToCMYK(in, out, img->ysize);
 		      break;
 		}
+
+		if (lut)
+	          ImageLut(out, img->ysize * bpp, lut);
 
         	ImagePutCol(img, x, 0, img->ysize, out);
 	      }
@@ -1492,6 +1601,10 @@ ImageReadTIFF(image_t *img,
 	return (-1);
   }
 
+ /*
+  * Free temporary buffers, close the TIFF file, and return.
+  */
+
   _TIFFfree(scanline);
   free(in);
   free(out);
@@ -1505,5 +1618,5 @@ ImageReadTIFF(image_t *img,
 
 
 /*
- * End of "$Id: image-tiff.c,v 1.6 1999/03/24 18:01:45 mike Exp $".
+ * End of "$Id: image-tiff.c,v 1.7 1999/04/01 18:25:01 mike Exp $".
  */

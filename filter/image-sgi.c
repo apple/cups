@@ -1,5 +1,5 @@
 /*
- * "$Id: image-sgi.c,v 1.3 1999/03/24 18:01:44 mike Exp $"
+ * "$Id: image-sgi.c,v 1.4 1999/04/01 18:24:58 mike Exp $"
  *
  *   SGI image file routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,7 @@
  *
  * Contents:
  *
+ *   ImageReadSGI() - Read a SGI image file.
  */
 
 /*
@@ -33,13 +34,18 @@
 #include "image-sgi.h"
 
 
-int
-ImageReadSGI(image_t *img,
-             FILE    *fp,
-             int     primary,
-             int     secondary,
-             int     saturation,
-             int     hue)
+/*
+ * 'ImageReadSGI()' - Read a SGI image file.
+ */
+
+int				/* O - Read status */
+ImageReadSGI(image_t *img,	/* IO - Image */
+             FILE    *fp,	/* I - Image file */
+             int     primary,	/* I - Primary choice for colorspace */
+             int     secondary,	/* I - Secondary choice for colorspace */
+             int     saturation,/* I - Color saturation (%) */
+             int     hue,	/* I - Color hue (degrees) */
+	     ib_t    *lut)	/* I - Lookup table for gamma/brightness */
 {
   int		i, y;		/* Looping vars */
   int		bpp;		/* Bytes per pixel */
@@ -47,7 +53,7 @@ ImageReadSGI(image_t *img,
   ib_t		*in,		/* Input pixels */
 		*inptr,		/* Current input pixel */
 		*out;		/* Output pixels */
-  short		*rows[4],	/* Row pointers for image data */
+  unsigned short *rows[4],	/* Row pointers for image data */
 		*red,
 		*green,
 		*blue,
@@ -79,7 +85,7 @@ ImageReadSGI(image_t *img,
   in  = malloc(img->xsize * sgip->zsize);
   out = malloc(img->xsize * bpp);
 
-  rows[0] = calloc(img->xsize * sgip->zsize, sizeof(short));
+  rows[0] = calloc(img->xsize * sgip->zsize, sizeof(unsigned short));
   for (i = 1; i < sgip->zsize; i ++)
     rows[i] = rows[0] + i * img->xsize;
 
@@ -108,7 +114,7 @@ ImageReadSGI(image_t *img,
 		 i --)
             {
               *inptr++ = (*gray++) / 256 + 128;
-            };
+            }
           break;
       case 2 :
           if (sgip->bpp == 1)
@@ -124,7 +130,7 @@ ImageReadSGI(image_t *img,
 		 i --)
             {
               *inptr++ = ((*gray++) / 256 + 128) * (*alpha++) / 32767;
-            };
+            }
           break;
       case 3 :
           if (sgip->bpp == 1)
@@ -146,7 +152,7 @@ ImageReadSGI(image_t *img,
               *inptr++ = (*red++) / 256 + 128;
               *inptr++ = (*green++) / 256 + 128;
               *inptr++ = (*blue++) / 256 + 128;
-            };
+            }
           break;
       case 4 :
           if (sgip->bpp == 1)
@@ -168,14 +174,19 @@ ImageReadSGI(image_t *img,
               *inptr++ = ((*red++) / 256 + 128) * (*alpha) / 32767;
               *inptr++ = ((*green++) / 256 + 128) * (*alpha) / 32767;
               *inptr++ = ((*blue++) / 256 + 128) * (*alpha++) / 32767;
-            };
+            }
           break;
-    };
+    }
 
     if (sgip->zsize < 3)
     {
       if (img->colorspace == IMAGE_WHITE)
+      {
+        if (lut)
+	  ImageLut(in, img->xsize, lut);
+
         ImagePutRow(img, 0, y, img->xsize, in);
+      }
       else
       {
 	switch (img->colorspace)
@@ -192,10 +203,13 @@ ImageReadSGI(image_t *img,
 	  case IMAGE_CMYK :
 	      ImageWhiteToCMYK(in, out, img->xsize);
 	      break;
-	};
+	}
+
+        if (lut)
+	  ImageLut(out, img->xsize * bpp, lut);
 
         ImagePutRow(img, 0, y, img->xsize, out);
-      };
+      }
     }
     else
     {
@@ -203,6 +217,9 @@ ImageReadSGI(image_t *img,
       {
 	if (saturation != 100 || hue != 0)
 	  ImageRGBAdjust(in, img->xsize, saturation, hue);
+
+        if (lut)
+	  ImageLut(in, img->xsize * 3, lut);
 
         ImagePutRow(img, 0, y, img->xsize, in);
       }
@@ -225,12 +242,15 @@ ImageReadSGI(image_t *img,
 	  case IMAGE_CMYK :
 	      ImageRGBToCMYK(in, out, img->xsize);
 	      break;
-	};
+	}
+
+        if (lut)
+	  ImageLut(out, img->xsize * bpp, lut);
 
         ImagePutRow(img, 0, y, img->xsize, out);
-      };
-    };
-  };
+      }
+    }
+  }
 
   free(in);
   free(out);
@@ -243,5 +263,5 @@ ImageReadSGI(image_t *img,
 
 
 /*
- * End of "$Id: image-sgi.c,v 1.3 1999/03/24 18:01:44 mike Exp $".
+ * End of "$Id: image-sgi.c,v 1.4 1999/04/01 18:24:58 mike Exp $".
  */
