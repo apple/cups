@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.15 1999/07/13 12:03:58 mike Exp $"
+ * "$Id: imagetops.c,v 1.16 1999/08/12 13:10:19 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -91,6 +91,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   float		zoom;		/* Zoom facter */
   int		ppi;		/* Pixels-per-inch */
   int		hue, sat;	/* Hue and saturation adjustment */
+  int		realcopies;	/* Real copies being printed */
 
 
   if (argc != 7)
@@ -258,8 +259,11 @@ main(int  argc,		/* I - Number of command-line arguments */
   if (Copies > 1 && !slowcollate)
   {
     printf("/#copies %d def\n", Copies);
-    Copies = 1;
+    realcopies = Copies;
+    Copies     = 1;
   }
+  else
+    realcopies = 1;
 
  /*
   * Output the pages...
@@ -273,6 +277,7 @@ main(int  argc,		/* I - Number of command-line arguments */
     for (xpage = 0; xpage < xpages; xpage ++)
       for (ypage = 0; ypage < ypages; ypage ++, page ++)
       {
+        fprintf(stderr, "PAGE: %d %d\n", page, realcopies);
         fprintf(stderr, "INFO: Printing page %d...\n", page);
 
         ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
@@ -485,5 +490,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.15 1999/07/13 12:03:58 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.16 1999/08/12 13:10:19 mike Exp $".
  */
