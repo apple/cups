@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The cupstestppd program has been upgraded to provide a
+	  concise PASS/FAIL report, additional detailed
+	  conformance testing, and support for gzip'd PPD files.
+	- The PPD loading code is now much more strict when
+	  loading a PPD file, and tracks more format errors.
 	- The scheduler ignored child signals when gathering the
 	  list of available devices, when it should have been
 	  using the default signal handler.

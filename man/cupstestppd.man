@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupstestppd.man,v 1.1.2.3 2003/01/24 21:32:32 mike Exp $"
+.\" "$Id: cupstestppd.man,v 1.1.2.4 2003/02/14 20:04:00 mike Exp $"
 .\"
 .\"   cupstestppd man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,15 +21,15 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupstestppd 1 "Common UNIX Printing System" "13 December 2002" "Easy Software Products"
+.TH cupstestppd 1 "Common UNIX Printing System" "14 February 2003" "Easy Software Products"
 .SH NAME
 cupstestppd \- test conformance of ppd files
 .SH SYNOPSIS
 .B cupstestppd
-[ -q ] [ -v ] filename.ppd [ ... filenameN.ppd ]
+[ -q ] [ -v[v] ] filename.ppd[.gz] [ ... filenameN.ppd[.gz] ]
 .br
 .B cupstestppd
-[ -q ] [ -v ] -
+[ -q ] [ -v[v] ] -
 .SH DESCRIPTION
 \fIcupstestppd\fR tests the conformance of PPD files to the
 Adobe PostScript Printer Description file format specification
@@ -37,17 +37,21 @@ version 4.3. It can also be used to list the supported options
 and available fonts in a PPD file. The results of testing and
 any other output are sent to the standard output.
 .LP
-The first form of \fIcupstestppd\fR lists one or more PPD files
-on the command-line. The second form lists the PPD file provided
-on the standard input. The second form can be used to test
-compressed PPD files using the appropriate utility.
+The first form of \fIcupstestppd\fR tests one or more PPD files
+on the command-line. The second form tests the PPD file provided
+on the standard input.
 .LP
 The \fI-q\fR option specifies that no information should be displayed.
 .LP
-The \fI-v\fR option specifies that all information in the PPD file
-should be displayed in addition to the conformance testing results.
+The \fI-v\fR option specifies that detailed conformance testing
+results should be displayed rather than the concise PASS/FAIL/ERROR
+status.
 .LP
-The \fI-q\fR and \fI-v\fR options are mutually exclusive.
+The \fI-vv\fR option specifies that all information in the PPD
+file should be displayed in addition to the detailed conformance
+testing results.
+.LP
+The \fI-q\fR, \fI-v\fR, and \fI-vv\fR options are mutually exclusive.
 .SH EXIT STATUS
 \fIcupstestppd\fR returns zero on success and non-zero on error. The
 error codes are as follows:
@@ -68,19 +72,30 @@ The PPD file contains format errors that cannot be skipped.
 .br
 The PPD file does not conform to the Adobe PPD specification.
 .SH EXAMPLES
-The following command will test all PPD files in the current directory
-and print the names of each file that does not conform:
+The following command will test all PPD files under the current
+directory and print the names of each file that does not
+conform:
 .nf
 
-    find . -name \\*.ppd -exec cupstestppd -q '{}' \\; -print
+    find . -name \\*.ppd \\! -exec cupstestppd -q '{}' \\; -print
+
+.fi
+The next command tests all PPD files under the current directory
+and print detailed conformance testing results for the files
+that do not conform:
+.nf
+
+    find . -name \\*.ppd \\! -exec cupstestppd -q '{}' \\; \\
+        -exec cupstestppd -v '{}' \\;
 
 .fi
 .SH SEE ALSO
 CUPS Software Administrators Manual,
 CUPS Software Programmers Manual,
-http://localhost:631/documentation.html
+http://localhost:631/documentation.html,
+Adobe PostScript Printer Description File Format Specification, Version 4.3.
 .SH COPYRIGHT
 Copyright 1993-2003 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupstestppd.man,v 1.1.2.3 2003/01/24 21:32:32 mike Exp $".
+.\" End of "$Id: cupstestppd.man,v 1.1.2.4 2003/02/14 20:04:00 mike Exp $".
 .\"

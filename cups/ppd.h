@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h,v 1.24.2.11 2003/01/29 17:04:34 mike Exp $"
+ * "$Id: ppd.h,v 1.24.2.12 2003/02/14 20:03:59 mike Exp $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -118,7 +118,13 @@ typedef enum			/**** Status Codes ****/
   PPD_INTERNAL_ERROR,		/* Internal error */
   PPD_NESTED_OPEN_GROUP,	/* OpenGroup without a CloseGroup first */
   PPD_BAD_ORDER_DEPENDENCY,	/* Bad OrderDependency */
-  PPD_BAD_UI_CONSTRAINTS	/* Bad UIConstraints */
+  PPD_BAD_UI_CONSTRAINTS,	/* Bad UIConstraints */
+  PPD_MISSING_ASTERISK,		/* Missing asterisk in column 0 */
+  PPD_LINE_TOO_LONG,		/* Line longer than 255 chars */
+  PPD_ILLEGAL_CHARACTER,	/* Illegal control character */
+  PPD_ILLEGAL_MAIN_KEYWORD,	/* Illegal main keyword string */
+  PPD_ILLEGAL_OPTION_KEYWORD,	/* Illegal option keyword string */
+  PPD_ILLEGAL_TRANSLATION	/* Illegal translation string */
 } ppd_status_t;
 
 typedef struct			/**** PPD Attribute Structure ****/
@@ -380,5 +386,5 @@ extern int		ppdSaveFile(ppd_file_t *ppd, const char *filename);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h,v 1.24.2.11 2003/01/29 17:04:34 mike Exp $".
+ * End of "$Id: ppd.h,v 1.24.2.12 2003/02/14 20:03:59 mike Exp $".
  */
