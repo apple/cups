@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.4 1999/03/21 02:09:58 mike Exp $"
+ * "$Id: socket.c,v 1.5 1999/04/16 20:43:54 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -70,9 +70,11 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   int		error;		/* Error code (if any) */
   struct sockaddr_in addr;	/* Socket address */
   struct hostent *hostaddr;	/* Host address */
-  size_t	nbytes,		/* Number of bytes written */
+  int		wbytes;		/* Number of bytes written */
+  size_t	nbytes,		/* Number of bytes read */
 		tbytes;		/* Total number of bytes written */
-  char		buffer[8192];	/* Output buffer */
+  char		buffer[8192],	/* Output buffer */
+		*bufptr;	/* Pointer into buffer */
   struct timeval timeout;	/* Timeout for select() */
   fd_set	input;		/* Input set for select() */
 
@@ -148,13 +150,13 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
       if (error == ECONNREFUSED)
       {
-	fprintf(stderr, "INFO: Network host \'%s\' is busy; will retry in 30 seconds...",
+	fprintf(stderr, "INFO: Network host \'%s\' is busy; will retry in 30 seconds...\n",
                 hostname);
 	sleep(30);
       }
       else
       {
-	perror("ERROR: Unable to connect to printer - ");
+	perror("ERROR: Unable to connect to printer");
         return (1);
       }
     }
@@ -166,6 +168,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Finally, send the print file...
   */
 
+  fputs("INFO: Connected to host, sending print job...\n", stderr);
+
   tbytes = 0;
   while ((nbytes = fread(buffer, 1, sizeof(buffer), fp)) > 0)
   {
@@ -173,13 +177,20 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     * Write the print data to the printer...
     */
 
-    if (send(fd, buffer, nbytes, 0) < nbytes)
+    tbytes += nbytes;
+    bufptr = buffer;
+
+    while (nbytes > 0)
     {
-      perror("ERROR: Unable to send print file to printer - ");
-      break;
+      if ((wbytes = send(fd, bufptr, nbytes, 0)) < 0)
+      {
+	perror("ERROR: Unable to send print file to printer");
+	break;
+      }
+
+      nbytes -= wbytes;
+      bufptr += wbytes;
     }
-    else
-      tbytes += nbytes;
 
    /*
     * Check for possible data coming back from the printer...
@@ -216,5 +227,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.4 1999/03/21 02:09:58 mike Exp $".
+ * End of "$Id: socket.c,v 1.5 1999/04/16 20:43:54 mike Exp $".
  */

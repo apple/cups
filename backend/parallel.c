@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c,v 1.3 1999/03/06 20:26:06 mike Exp $"
+ * "$Id: parallel.c,v 1.4 1999/04/16 20:43:53 mike Exp $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -34,9 +34,17 @@
 #include <stdlib.h>
 #include <cups/string.h>
 
+#if defined(WIN32) || defined(__EMX__)
+#  include <io.h>
+#else
+#  include <unistd.h>
+#  include <fcntl.h>
+#  include <termios.h>
+#endif /* WIN32 || __EMX__ */
+
 
 /*
- * 'main()' - Send a file to the printer or server.
+ * 'main()' - Send a file to the specified parallel port.
  *
  * Usage:
  *
@@ -47,19 +55,123 @@ int			/* O - Exit status */
 main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
      char *argv[])	/* I - Command-line arguments */
 {
+  char		method[255],	/* Method in URI */
+		hostname[1024],	/* Hostname */
+		username[255],	/* Username info (not used) */
+		resource[1024],	/* Resource info (device and options) */
+		*options;	/* Pointer to options */
+  int		port;		/* Port number (not used) */
+  FILE		*fp;		/* Print file */
+  int		fd;		/* Parallel device */
+  int		error;		/* Error code (if any) */
+  size_t	nbytes,		/* Number of bytes written */
+		tbytes;		/* Total number of bytes written */
+  char		buffer[8192];	/* Output buffer */
+  struct termios opts;		/* Parallel port options */
+
+
   if (argc < 6 || argc > 7)
   {
-    fprintf(stderr, "Usage: %s job-id user title copies options [file]\n",
-            argv[0]);
+    fputs("Usage: parallel job-id user title copies options [file]\n", stderr);
     return (1);
   }
 
-  fputs("ERROR: Backend not implemented yet!\n", stderr);
+ /*
+  * If we have 7 arguments, print the file named on the command-line.
+  * Otherwise, send stdin instead...
+  */
 
-  return (1);
+  if (argc == 6)
+    fp = stdin;
+  else
+  {
+   /*
+    * Try to open the print file...
+    */
+
+    if ((fp = fopen(argv[6], "rb")) == NULL)
+    {
+      perror("ERROR: unable to open print file - ");
+      return (1);
+    }
+  }
+
+ /*
+  * Extract the device name and options from the URI...
+  */
+
+  httpSeparate(argv[0], method, username, hostname, &port, resource);
+
+ /*
+  * See if there are any options...
+  */
+
+  if ((options = strchr(resource, '?')) != NULL)
+  {
+   /*
+    * Yup, terminate the device name string and move to the first
+    * character of the options...
+    */
+
+    *options++ = '\0';
+  }
+
+ /*
+  * Open the parallel port device...
+  */
+
+  if ((fd = open(resource, O_WRONLY)) == -1)
+  {
+    perror("ERROR: Unable to open parallel port device file - ");
+    return (1);
+  }
+
+ /*
+  * Set any options provided...
+  */
+
+  tcgetattr(fd, &opts);
+
+  opts.c_lflag &= ~(ICANON | ECHO | ISIG);	/* Raw mode */
+
+  /**** No options supported yet ****/
+
+  tcsetattr(fd, TCSANOW, &opts);
+
+ /*
+  * Finally, send the print file...
+  */
+
+  tbytes = 0;
+  while ((nbytes = fread(buffer, 1, sizeof(buffer), fp)) > 0)
+  {
+   /*
+    * Write the print data to the printer...
+    */
+
+    if (write(fd, buffer, nbytes) < nbytes)
+    {
+      perror("ERROR: Unable to send print file to printer - ");
+      break;
+    }
+    else
+      tbytes += nbytes;
+
+    fprintf(stderr, "INFO: Sending print file, %u bytes...\n", tbytes);
+  }
+
+ /*
+  * Close the socket connection and input file and return...
+  */
+
+  close(fd);
+  if (fp != stdin)
+    fclose(fp);
+
+  return (0);
 }
 
 
 /*
- * End of "$Id: parallel.c,v 1.3 1999/03/06 20:26:06 mike Exp $".
+ * End of "$Id: parallel.c,v 1.4 1999/04/16 20:43:53 mike Exp $".
  */
