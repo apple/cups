@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.8 2002/01/31 13:00:26 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.9 2002/02/13 17:35:35 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -4020,7 +4020,7 @@ print_job(client_t        *con,		/* I - Client connection */
     strncpy(job->username, con->username, sizeof(job->username) - 1);
     job->username[sizeof(job->username) - 1] = '\0';
   }
-  if (attr != NULL)
+  else if (attr != NULL)
   {
     LogMessage(L_DEBUG, "print_job: requesting-user-name = \'%s\'",
                attr->values[0].string.text);
@@ -5684,5 +5684,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.8 2002/01/31 13:00:26 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.9 2002/02/13 17:35:35 mike Exp $".
  */
