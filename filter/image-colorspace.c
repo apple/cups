@@ -1,5 +1,5 @@
 /*
- * "$Id: image-colorspace.c,v 1.2 1998/02/24 21:05:22 mike Exp $"
+ * "$Id: image-colorspace.c,v 1.3 1998/02/24 21:45:43 mike Exp $"
  *
  *   Colorspace conversions for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,10 @@
  * Revision History:
  *
  *   $Log: image-colorspace.c,v $
- *   Revision 1.2  1998/02/24 21:05:22  mike
+ *   Revision 1.3  1998/02/24 21:45:43  mike
+ *   Fixed CMY conversion - don't adjust black...
+ *
+ *   Revision 1.2  1998/02/24  21:05:22  mike
  *   Added color adjustments for CMY.
  *
  *   Revision 1.1  1998/02/19  15:35:50  mike
@@ -140,11 +143,19 @@ ImageRGBToCMY(ib_t *in,
               ib_t *out,
               int  count)
 {
+  int	c, m, y, k;		/* CMYK values */
+
+
   while (count > 0)
   {
-    *out++ = (255 - (in[1] + in[2]) / 8) * (255 - in[0]) / 255;
-    *out++ = (255 - (in[0] + in[2]) / 8) * (255 - in[1]) / 255;
-    *out++ = (255 - (in[0] + in[1]) / 8) * (255 - in[2]) / 255;
+    c    = 255 - in[0];
+    m    = 255 - in[1];
+    y    = 255 - in[2];
+    k    = min(c, min(m, y));
+
+    *out++ = (255 - (in[1] + in[2]) / 8) * (c - k) / 255 + k;
+    *out++ = (255 - (in[0] + in[2]) / 8) * (m - k) / 255 + k;
+    *out++ = (255 - (in[0] + in[1]) / 8) * (y - k) / 255 + k;
     in += 3;
     count --;
   };
@@ -563,5 +574,5 @@ huerotatemat(float mat[3][3],
 
 
 /*
- * End of "$Id: image-colorspace.c,v 1.2 1998/02/24 21:05:22 mike Exp $".
+ * End of "$Id: image-colorspace.c,v 1.3 1998/02/24 21:45:43 mike Exp $".
  */
