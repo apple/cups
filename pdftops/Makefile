@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.18 2003/05/14 18:22:23 mike Exp $"
+# "$Id: Makefile,v 1.19 2003/05/14 20:03:03 mike Exp $"
 #
 #   pdftops filter Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -9,8 +9,6 @@
 
 
 include ../Makedefs
-
-OPTIONS	=	-Wwrite-strings
 
 #
 # Object files...
@@ -125,5 +123,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.18 2003/05/14 18:22:23 mike Exp $".
+# End of "$Id: Makefile,v 1.19 2003/05/14 20:03:03 mike Exp $".
 #
