@@ -1,10 +1,5 @@
-README - CUPS v1.1.19rc3 - 04/28/2003
--------------------------------------
-
-**** THIS IS A RELEASE CANDIDATE AND NOT A PRODUCTION     ****
-**** RELEASE.  REPORT ALL PROBLEMS USING THE FORM AT:     ****
-****                                                      ****
-****             http://www.cups.org/str.php              ****
+README - CUPS v1.1.19 - 05/27/2003
+----------------------------------
 
 Looking for compile instructions?  Read the file "INSTALL.txt"
 instead...

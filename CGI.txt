@@ -1,4 +1,4 @@
-CGI - CUPS v1.1.19 - 03/14/2003
+CGI - CUPS v1.1.19 - 05/27/2003
 -------------------------------
 
 This file describes the experimental scripting/CGI support
