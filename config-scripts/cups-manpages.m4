@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-manpages.m4,v 1.3 2001/10/07 12:16:08 mike Exp $"
+dnl "$Id: cups-manpages.m4,v 1.4 2001/10/26 03:16:47 mike Exp $"
 dnl
 dnl   Manpage stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -25,38 +25,39 @@ dnl
 dnl Fix "mandir" variable...
 if test "$mandir" = "\${prefix}/man" -a "$prefix" = "/"; then
 	case "$uname" in
-        	Darwin*)
-        		# Darwin and MacOS X
+        	Darwin* | Linux* | FreeBSD* | NetBSD* | OpenBSD* | AIX*)
+        		# Darwin, MacOS X, Linux, *BSD, and AIX
         		mandir="/usr/share/man"
         		AMANDIR="/usr/share/man"
-        		;;
-        	FreeBSD* | NetBSD* | OpenBSD* | AIX*)
-        		# *BSD + AIX
-        		mandir="/usr/share/man"
-        		AMANDIR="/usr/share/man"
+        		PMANDIR="/usr/share/man"
         		;;
         	IRIX*)
         		# SGI IRIX
         		mandir="/usr/share/catman/u_man"
         		AMANDIR="/usr/share/catman/a_man"
+        		PMANDIR="/usr/share/catman/p_man"
         		;;
         	*)
         		# All others
         		mandir="/usr/man"
         		AMANDIR="/usr/man"
+        		PMANDIR="/usr/man"
         		;;
 	esac
 else
 	AMANDIR="$mandir"
+	PMANDIR="$mandir"
 fi
 
 AC_SUBST(AMANDIR)
+AC_SUBST(PMANDIR)
 
 dnl Setup manpage extensions...
 case "$uname" in
 	FreeBSD* | NetBSD* | OpenBSD*)
 		# *BSD
 		CAT1EXT=0
+		CAT3EXT=0
 		CAT5EXT=0
 		CAT8EXT=0
 		MAN8EXT=8
@@ -65,6 +66,7 @@ case "$uname" in
 	IRIX*)
 		# SGI IRIX
 		CAT1EXT=z
+		CAT3EXT=z
 		CAT5EXT=z
 		CAT8EXT=z
 		MAN8EXT=1m
@@ -73,6 +75,7 @@ case "$uname" in
 	SunOS* | HP-UX*)
 		# Solaris and HP-UX
 		CAT1EXT=1
+		CAT3EXT=3
 		CAT5EXT=5
 		CAT8EXT=1m
 		MAN8EXT=1m
@@ -81,6 +84,7 @@ case "$uname" in
 	*)
 		# All others
 		CAT1EXT=1
+		CAT3EXT=3
 		CAT5EXT=5
 		CAT8EXT=8
 		MAN8EXT=8
@@ -89,11 +93,12 @@ case "$uname" in
 esac
 
 AC_SUBST(CAT1EXT)
+AC_SUBST(CAT3EXT)
 AC_SUBST(CAT5EXT)
 AC_SUBST(CAT8EXT)
 AC_SUBST(MAN8EXT)
 AC_SUBST(MAN8DIR)
 
 dnl
-dnl End of "$Id: cups-manpages.m4,v 1.3 2001/10/07 12:16:08 mike Exp $".
+dnl End of "$Id: cups-manpages.m4,v 1.4 2001/10/26 03:16:47 mike Exp $".
 dnl

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.18 2001/09/18 19:14:47 mike Exp $"
+# "$Id: Makefile,v 1.19 2001/10/26 03:16:48 mike Exp $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -30,6 +30,7 @@ include ../Makedefs
 
 MAN1	=	backend.man filter.man lp.man lpoptions.man lppasswd.man \
 		lpq.man lprm.man lpr.man lpstat.man
+MAN3	=	cups-config.man
 MAN5	=	classes.conf.man cupsd.conf.man mime.convs.man mime.types.man \
 		printers.conf.man
 MAN8	=	accept.man cupsaddsmb.man cups-lpd.man cups-polld.man \
@@ -37,6 +38,7 @@ MAN8	=	accept.man cupsaddsmb.man cups-lpd.man cups-polld.man \
 		lpc.man
 
 CAT1	=	$(MAN1:.man=.$(CAT1EXT))
+CAT3	=	$(MAN3:.man=.$(CAT3EXT))
 CAT5	=	$(MAN5:.man=.$(CAT5EXT))
 CAT8	=	$(MAN8:.man=.$(CAT8EXT))
 
@@ -45,7 +47,7 @@ CAT8	=	$(MAN8:.man=.$(CAT8EXT))
 # Make everything...
 #
 
-all:	$(CAT1) $(CAT5) $(CAT8)
+all:	$(CAT1) $(CAT3) $(CAT5) $(CAT8)
 
 
 #
@@ -53,7 +55,7 @@ all:	$(CAT1) $(CAT5) $(CAT8)
 #
 
 clean:
-	$(RM) $(CAT1) $(CAT5) $(CAT8)
+	$(RM) $(CAT1) $(CAT3) $(CAT5) $(CAT8)
 
 
 #
@@ -67,6 +69,10 @@ install:
 	done
 	$(RM) $(MANDIR)/man1/cancel.1
 	$(LN) lp.1 $(MANDIR)/man1/cancel.1
+	$(INSTALL_DIR) $(PMANDIR)/man3
+	for file in $(MAN3); do \
+		$(INSTALL_MAN) $$file $(PMANDIR)/man3/`basename $$file man`3; \
+	done
 	$(INSTALL_DIR) $(MANDIR)/man5
 	for file in $(MAN5); do \
 		$(INSTALL_MAN) $$file $(MANDIR)/man5/`basename $$file man`5; \
@@ -85,6 +91,10 @@ install:
 	done
 	$(RM) $(MANDIR)/cat1/cancel.$(CAT1EXT)
 	$(LN) lp.$(CAT1EXT) $(MANDIR)/cat1/cancel.$(CAT1EXT)
+	$(INSTALL_DIR) $(PMANDIR)/cat3
+	for file in $(CAT3); do \
+		$(INSTALL_MAN) $$file $(PMANDIR)/cat3; \
+	done
 	$(INSTALL_DIR) $(MANDIR)/cat5
 	for file in $(CAT5); do \
 		$(INSTALL_MAN) $$file $(MANDIR)/cat5; \
@@ -100,5 +110,5 @@ install:
 
 
 #
-# End of "$Id: Makefile,v 1.18 2001/09/18 19:14:47 mike Exp $".
+# End of "$Id: Makefile,v 1.19 2001/10/26 03:16:48 mike Exp $".
 #

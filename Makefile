@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.36 2001/10/07 12:16:07 mike Exp $"
+# "$Id: Makefile,v 1.37 2001/10/26 03:16:46 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -74,24 +74,27 @@ install:
 	(cd ppd; $(MAKE) $(MFLAGS) install)
 	echo Installing in templates...
 	(cd templates; $(MAKE) $(MFLAGS) install)
+	echo Installing cups-config script...
+	$(INSTALL_DIR) $(bindir)
+	$(INSTALL_SCRIPT) cups-config $(bindir)/cups-config
 	echo Installing startup script...
 	if test "x$(INITDIR)" != "x"; then \
-		$(INSTALL_DIR) $(INSTALLHERE)/$(INITDIR)/init.d; \
-		$(INSTALL_SCRIPT) cups.sh $(INSTALLHERE)/$(INITDIR)/init.d/cups; \
-		$(INSTALL_DIR) $(INSTALLHERE)/$(INITDIR)/rc0.d; \
-		$(INSTALL_SCRIPT) cups.sh  $(INSTALLHERE)/$(INITDIR)/rc0.d/K00cups; \
-		$(INSTALL_DIR) $(INSTALLHERE)/$(INITDIR)/rc2.d; \
-		$(INSTALL_SCRIPT) cups.sh $(INSTALLHERE)/$(INITDIR)/rc2.d/S99cups; \
-		$(INSTALL_DIR) $(INSTALLHERE)/$(INITDIR)/rc3.d; \
-		$(INSTALL_SCRIPT) cups.sh $(INSTALLHERE)/$(INITDIR)/rc3.d/S99cups; \
-		$(INSTALL_DIR) $(INSTALLHERE)/$(INITDIR)/rc5.d; \
-		$(INSTALL_SCRIPT) cups.sh $(INSTALLHERE)/$(INITDIR)/rc5.d/S99cups; \
+		$(INSTALL_DIR) $(BUILDROOT)$(INITDIR)/init.d; \
+		$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDIR)/init.d/cups; \
+		$(INSTALL_DIR) $(BUILDROOT)$(INITDIR)/rc0.d; \
+		$(INSTALL_SCRIPT) cups.sh  $(BUILDROOT)$(INITDIR)/rc0.d/K00cups; \
+		$(INSTALL_DIR) $(BUILDROOT)$(INITDIR)/rc2.d; \
+		$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDIR)/rc2.d/S99cups; \
+		$(INSTALL_DIR) $(BUILDROOT)$(INITDIR)/rc3.d; \
+		$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDIR)/rc3.d/S99cups; \
+		$(INSTALL_DIR) $(BUILDROOT)$(INITDIR)/rc5.d; \
+		$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDIR)/rc5.d/S99cups; \
 	fi
 	if test "x$(INITDIR)" = "x" -a "x$(INITDDIR)" != "x"; then \
-		$(INSTALL_DIR) $(INSTALLHERE)/$(INITDDIR); \
-		$(INSTALL_SCRIPT) cups.sh $(INSTALLHERE)/$(INITDDIR)/cups; \
+		$(INSTALL_DIR) $(BUILDROOT)$(INITDDIR); \
+		$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDDIR)/cups; \
 		if test "$(INITDDIR)" = "/System/Library/StartupItems/cups"; then \
-			$(INSTALL_DATA) cups.plist $(INSTALLHERE)/$(INITDDIR)/cups.plist; \
+			$(INSTALL_DATA) cups.plist $(BUILDROOT)$(INITDDIR)/cups.plist; \
 		fi \
 	fi
 
@@ -136,5 +139,5 @@ tardist:
 	epm $(EPMFLAGS) -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.36 2001/10/07 12:16:07 mike Exp $".
+# End of "$Id: Makefile,v 1.37 2001/10/26 03:16:46 mike Exp $".
 #

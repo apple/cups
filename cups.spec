@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.37 2001/10/25 18:48:58 mike Exp $"
+# "$Id: cups.spec,v 1.38 2001/10/26 03:16:46 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -34,8 +34,11 @@ Source: ftp://ftp.easysw.com/pub/cups/%{version}/cups-%{version}-source.tar.gz
 Url: http://www.cups.org
 Packager: Michael Sweet <mike@easysw.com>
 Vendor: Easy Software Products
-# use buildroot so as not to disturb the version already installed
+
+# Use buildroot so as not to disturb the version already installed
 BuildRoot: /var/tmp/%{name}-root
+
+# Dependencies...
 Conflicts: lpr, LPRng
 Provides: libcups.so.2
 Provides: libcupsimage.so.2
@@ -60,7 +63,7 @@ CUPS provides the System V and Berkeley command-line interfaces.
 %description devel
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This is the development package for creating
-additional printer drivers, and other CUPS services.
+additional printer drivers and other CUPS services.
 
 %description pstoraster
 The Common UNIX Printing System provides a portable printing layer for 
@@ -80,23 +83,7 @@ make
 # Make sure the RPM_BUILD_ROOT directory exists.
 rm -rf $RPM_BUILD_ROOT
 
-make	prefix=$RPM_BUILD_ROOT \
-	exec_prefix=$RPM_BUILD_ROOT/usr \
-	AMANDIR=$RPM_BUILD_ROOT/usr/man \
-	BINDIR=$RPM_BUILD_ROOT/usr/bin \
-	DATADIR=$RPM_BUILD_ROOT/usr/share/cups \
-	DOCDIR=$RPM_BUILD_ROOT/usr/share/doc/cups \
-	INCLUDEDIR=$RPM_BUILD_ROOT/usr/include \
-	LIBDIR=$RPM_BUILD_ROOT/usr/lib \
-	LOGDIR=$RPM_BUILD_ROOT/var/log/cups \
-	LOCALEDIR=$RPM_BUILD_ROOT/usr/share/locale \
-	MANDIR=$RPM_BUILD_ROOT/usr/man \
-	PAMDIR=$RPM_BUILD_ROOT/etc/pam.d \
-	REQUESTS=$RPM_BUILD_ROOT/var/spool/cups \
-	SBINDIR=$RPM_BUILD_ROOT/usr/sbin \
-	SERVERBIN=$RPM_BUILD_ROOT/usr/lib/cups \
-	SERVERROOT=$RPM_BUILD_ROOT/etc/cups \
-	install
+make BUILDROOT=$RPM_BUILD_ROOT/ install
 
 %post
 if test -x /sbin/chkconfig; then
@@ -164,7 +151,10 @@ rm -rf $RPM_BUILD_ROOT
 #/sbin/rc.d/rc3.d/*
 #/sbin/rc.d/rc5.d/*
 
-/usr/bin/*
+/usr/bin/cancel
+/usr/bin/disable
+/usr/bin/enable
+/usr/bin/lp*
 /usr/lib/*.so*
 %dir /usr/lib/cups
 %dir /usr/lib/cups/backend
@@ -182,7 +172,6 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/cups/filter/rastertoepson
 /usr/lib/cups/filter/rastertohp
 /usr/lib/cups/filter/texttops
-/usr/man/*
 /usr/sbin/*
 %dir /usr/share/cups
 %dir /usr/share/cups/banners
@@ -199,6 +188,19 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/doc/cups/*
 %dir /usr/share/locale
 /usr/share/locale/*
+%dir /usr/share/man/cat1
+/usr/share/man/cat1/*
+%dir /usr/share/man/cat5
+/usr/share/man/cat5/*
+%dir /usr/share/man/cat8
+/usr/share/man/cat8/*
+%dir /usr/share/man/man1
+/usr/share/man/man1/*
+%dir /usr/share/man/man5
+/usr/share/man/man5/*
+%dir /usr/share/man/man8
+/usr/share/man/man8/*
+
 %attr(0700,lp,root) %dir /var/spool/cups
 %attr(1700,lp,root) %dir /var/spool/cups/tmp
 
@@ -206,6 +208,10 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/include/cups
 /usr/include/cups/*
 /usr/lib/*.a
+%dir /usr/share/man/cat3
+/usr/share/man/cat3/*
+%dir /usr/share/man/man3
+/usr/share/man/man1/*
 
 %files pstoraster
 %dir /usr/lib/cups/filter
@@ -216,5 +222,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/pstoraster/*
 
 #
-# End of "$Id: cups.spec,v 1.37 2001/10/25 18:48:58 mike Exp $".
+# End of "$Id: cups.spec,v 1.38 2001/10/26 03:16:46 mike Exp $".
 #

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-sharedlibs.m4,v 1.5 2001/10/07 12:16:08 mike Exp $"
+dnl "$Id: cups-sharedlibs.m4,v 1.6 2001/10/26 03:16:47 mike Exp $"
 dnl
 dnl   Shared library support for the Common UNIX Printing System (CUPS).
 dnl
@@ -126,6 +126,11 @@ if test "$DSO" != ":"; then
                 	DSOFLAGS="-Wl,-R$libdir $DSOFLAGS"
                         LDFLAGS="$LDFLAGS -Wl,-R$libdir"
                         ;;
+                Linux*)
+                        # Linux
+                	DSOFLAGS="-Wl,-rpath,$libdir $DSOFLAGS"
+                        LDFLAGS="$LDFLAGS -Wl,-rpath,$libdir"
+                        ;;
 	esac
 else
 	DSOLIBS=""
@@ -136,5 +141,5 @@ AC_SUBST(DSOLIBS)
 AC_SUBST(IMGLIBS)
 
 dnl
-dnl End of "$Id: cups-sharedlibs.m4,v 1.5 2001/10/07 12:16:08 mike Exp $".
+dnl End of "$Id: cups-sharedlibs.m4,v 1.6 2001/10/26 03:16:47 mike Exp $".
 dnl

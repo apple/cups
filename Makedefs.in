@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.44 2001/10/07 12:16:07 mike Exp $"
+# "$Id: Makedefs.in,v 1.45 2001/10/26 03:16:46 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -109,43 +109,43 @@ SSLLIBS	=	@SSLLIBS@
 # needed directories...
 #
 
-bindir		=	@bindir@
-datadir		=	@datadir@
-exec_prefix	=	@exec_prefix@
-includedir	=	@includedir@
-infodir		=	@infodir@
-libdir		=	@libdir@
-libexecdir	=	@libexecdir@
-localstatedir	=	@localstatedir@
-mandir		=	@mandir@
-oldincludedir	=	@oldincludedir@
-prefix		=	@prefix@
-sbindir		=	@sbindir@
-sharedstatedir	=	@sharedstatedir@
-srcdir		=	@srcdir@
-sysconfdir	=	@sysconfdir@
-top_srcdir	=	@top_srcdir@
+bindir		=	$(BUILDROOT)@bindir@
+datadir		=	$(BUILDROOT)@datadir@
+exec_prefix	=	$(BUILDROOT)@exec_prefix@
+includedir	=	$(BUILDROOT)@includedir@
+infodir		=	$(BUILDROOT)@infodir@
+libdir		=	$(BUILDROOT)@libdir@
+libexecdir	=	$(BUILDROOT)@libexecdir@
+localstatedir	=	$(BUILDROOT)@localstatedir@
+mandir		=	$(BUILDROOT)@mandir@
+oldincludedir	=	$(BUILDROOT)@oldincludedir@
+prefix		=	$(BUILDROOT)@prefix@
+sbindir		=	$(BUILDROOT)@sbindir@
+sharedstatedir	=	$(BUILDROOT)@sharedstatedir@
+srcdir		=	$(BUILDROOT)@srcdir@
+sysconfdir	=	$(BUILDROOT)@sysconfdir@
+top_srcdir	=	$(BUILDROOT)@top_srcdir@
 
-AMANDIR		=	@AMANDIR@
-BINDIR		=	@bindir@
-DATADIR		=	@CUPS_DATADIR@
-DOCDIR		=	@CUPS_DOCROOT@
+AMANDIR		=	$(BUILDROOT)@AMANDIR@
+BINDIR		=	$(BUILDROOT)@bindir@
+DATADIR		=	$(BUILDROOT)@CUPS_DATADIR@
+DOCDIR		=	$(BUILDROOT)@CUPS_DOCROOT@
 INCLUDEDIR	=	$(includedir)
 INITDIR		=	@INITDIR@
 INITDDIR	=	@INITDDIR@
 LIBDIR		=	$(libdir)
 LOCALEDIR	= 	@CUPS_LOCALEDIR@
 LOGDIR		= 	@CUPS_LOGDIR@
-MANDIR		=	@mandir@
-PAMDIR		=	@PAMDIR@
+MANDIR		=	$(BUILDROOT)@mandir@
+PAMDIR		=	$(BUILDROOT)@PAMDIR@
+PMANDIR		=	$(BUILDROOT)@PMANDIR@
 REQUESTS	= 	@CUPS_REQUESTS@
-SBINDIR		=	@sbindir@
+SBINDIR		=	$(BUILDROOT)@sbindir@
 SERVERBIN	= 	@CUPS_SERVERBIN@
 SERVERROOT	= 	@CUPS_SERVERROOT@
 
-INSTALLHERE	=
-
 CAT1EXT		=	@CAT1EXT@
+CAT3EXT		=	@CAT3EXT@
 CAT5EXT		=	@CAT5EXT@
 CAT8EXT		=	@CAT8EXT@
 MAN8EXT		=	@MAN8EXT@
@@ -156,14 +156,14 @@ MAN8DIR		=	@MAN8DIR@
 #
 
 .SILENT:
-.SUFFIXES:	.a .c .cxx .h .man .o .0 .1 .1m .5 .8 .z
+.SUFFIXES:	.a .c .cxx .h .man .o .0 .1 .1m .3 .5 .8 .z
 .c.o:
 	echo Compiling $<...
 	$(CC) $(OPTIM) $(CFLAGS) -c $<
 .cxx.o:
 	echo Compiling $<...
 	$(CXX) $(OPTIM) $(CXXFLAGS) -c $<
-.man.0 .man.1 .man.1m .man.5 .man.8:
+.man.0 .man.1 .man.1m .man.3 .man.5 .man.8:
 	echo Formatting $<...
 	$(RM) $@
 	$(NROFF) -man $< >$@
@@ -175,5 +175,5 @@ MAN8DIR		=	@MAN8DIR@
 	$(MV) t.z $@
 
 #
-# End of "$Id: Makedefs.in,v 1.44 2001/10/07 12:16:07 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.45 2001/10/26 03:16:46 mike Exp $"
 #
