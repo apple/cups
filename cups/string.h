@@ -1,5 +1,5 @@
 /*
- * "$Id: string.h,v 1.7.2.3 2002/01/27 21:20:29 mike Exp $"
+ * "$Id: string.h,v 1.7.2.4 2002/03/01 19:55:14 mike Exp $"
  *
  *   String definitions for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_STRING_H_
@@ -99,5 +101,5 @@ extern int	vsnprintf(char *, size_t, const char *, va_list);
 #endif /* !_CUPS_STRING_H_ */
 
 /*
- * End of "$Id: string.h,v 1.7.2.3 2002/01/27 21:20:29 mike Exp $".
+ * End of "$Id: string.h,v 1.7.2.4 2002/03/01 19:55:14 mike Exp $".
  */

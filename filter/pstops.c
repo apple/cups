@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.10 2002/02/27 02:31:47 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.11 2002/03/01 19:55:21 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -1145,5 +1147,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.10 2002/02/27 02:31:47 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.11 2002/03/01 19:55:21 mike Exp $".
  */

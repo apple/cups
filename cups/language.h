@@ -1,5 +1,5 @@
 /*
- * "$Id: language.h,v 1.18.2.6 2002/02/12 19:23:10 mike Exp $"
+ * "$Id: language.h,v 1.18.2.7 2002/03/01 19:55:13 mike Exp $"
  *
  *   Multi-language support for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_LANGUAGE_H_
@@ -220,5 +222,5 @@ extern cups_lang_t	*cupsLangGet(const char *language);
 #endif /* !_CUPS_LANGUAGE_H_ */
 
 /*
- * End of "$Id: language.h,v 1.18.2.6 2002/02/12 19:23:10 mike Exp $".
+ * End of "$Id: language.h,v 1.18.2.7 2002/03/01 19:55:13 mike Exp $".
  */

@@ -3,6 +3,14 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.15
 
+	- Updated the CUPS license agreement for the new MacOS
+	  license exception.
+	- The cups-polld program now throttles the local
+	  broadcasts of polled printers and classes so that the
+	  local system is not overwhelmed with hundreds of
+	  printers and classes all at once.
+	- Updated the serial backend to support 230,400 baud for
+	  the Linux PPC port.
 	- The cupsGetJobs() function wouldn't report completed
 	  jobs that did not have a document-format attribute
 	  value.

@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.h,v 1.2.2.1 2002/01/02 18:04:48 mike Exp $"
+ * "$Id: raster.h,v 1.2.2.2 2002/03/01 19:55:22 mike Exp $"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -27,6 +27,8 @@
  *   (or any derivative of it) with software other than GNU
  *   GhostScript (or its derivatives) is governed by the CUPS license
  *   agreement.
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_RASTER_H_
@@ -229,5 +231,5 @@ extern unsigned		cupsRasterWritePixels(cups_raster_t *r,
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h,v 1.2.2.1 2002/01/02 18:04:48 mike Exp $".
+ * End of "$Id: raster.h,v 1.2.2.2 2002/03/01 19:55:22 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: debug.h,v 1.4.2.1 2002/01/02 18:04:23 mike Exp $"
+ * "$Id: debug.h,v 1.4.2.2 2002/03/01 19:55:10 mike Exp $"
  *
  *   Debugging macros for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_DEBUG_H_
@@ -53,5 +55,5 @@
 #endif /* !_CUPS_DEBUG_H_ */
 
 /*
- * End of "$Id: debug.h,v 1.4.2.1 2002/01/02 18:04:23 mike Exp $".
+ * End of "$Id: debug.h,v 1.4.2.2 2002/03/01 19:55:10 mike Exp $".
  */

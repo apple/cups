@@ -1,5 +1,5 @@
 /*
- * "$Id: image-png.c,v 1.11.2.1 2002/01/02 18:04:45 mike Exp $"
+ * "$Id: image-png.c,v 1.11.2.2 2002/03/01 19:55:18 mike Exp $"
  *
  *   PNG image routines for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -246,5 +248,5 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-png.c,v 1.11.2.1 2002/01/02 18:04:45 mike Exp $".
+ * End of "$Id: image-png.c,v 1.11.2.2 2002/03/01 19:55:18 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.51.2.5 2002/02/12 19:23:10 mike Exp $"
+ * "$Id: ppd.c,v 1.51.2.6 2002/03/01 19:55:13 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -29,6 +29,8 @@
  *   (or any derivative of it) with software other than GNU
  *   GhostScript (or its derivatives) is governed by the CUPS license
  *   agreement.
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -2007,5 +2009,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.51.2.5 2002/02/12 19:23:10 mike Exp $".
+ * End of "$Id: ppd.c,v 1.51.2.6 2002/03/01 19:55:13 mike Exp $".
  */

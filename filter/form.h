@@ -1,5 +1,5 @@
 /*
- * "$Id: form.h,v 1.4.2.1 2002/01/02 18:04:43 mike Exp $"
+ * "$Id: form.h,v 1.4.2.2 2002/03/01 19:55:16 mike Exp $"
  *
  *   CUPS form header file for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -171,5 +173,5 @@ extern void	formWrite(tree_t *p);
 
 
 /*
- * End of "$Id: form.h,v 1.4.2.1 2002/01/02 18:04:43 mike Exp $".
+ * End of "$Id: form.h,v 1.4.2.2 2002/03/01 19:55:16 mike Exp $".
  */

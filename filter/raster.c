@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.c,v 1.2.2.1 2002/01/02 18:04:48 mike Exp $"
+ * "$Id: raster.c,v 1.2.2.2 2002/03/01 19:55:22 mike Exp $"
  *
  *   Raster file routines for the Common UNIX Printing System (CUPS).
  *
@@ -27,6 +27,8 @@
  *   (or any derivative of it) with software other than GNU
  *   GhostScript (or its derivatives) is governed by the CUPS license
  *   agreement.
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -248,5 +250,5 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
 
 
 /*
- * End of "$Id: raster.c,v 1.2.2.1 2002/01/02 18:04:48 mike Exp $".
+ * End of "$Id: raster.c,v 1.2.2.2 2002/03/01 19:55:22 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-vector.c,v 1.14.2.1 2002/01/02 18:04:44 mike Exp $"
+ * "$Id: hpgl-vector.c,v 1.14.2.2 2002/03/01 19:55:17 mike Exp $"
  *
  *   HP-GL/2 vector routines for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -727,5 +729,5 @@ plot_points(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-vector.c,v 1.14.2.1 2002/01/02 18:04:44 mike Exp $".
+ * End of "$Id: hpgl-vector.c,v 1.14.2.2 2002/03/01 19:55:17 mike Exp $".
  */

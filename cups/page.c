@@ -1,5 +1,5 @@
 /*
- * "$Id: page.c,v 1.12.2.1 2002/01/02 18:04:29 mike Exp $"
+ * "$Id: page.c,v 1.12.2.2 2002/03/01 19:55:13 mike Exp $"
  *
  *   Page size functions for the Common UNIX Printing System (CUPS).
  *
@@ -22,6 +22,8 @@
  *         WWW: http://www.cups.org
  *
  *   PostScript is a trademark of Adobe Systems, Inc.
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -185,5 +187,5 @@ ppdPageLength(ppd_file_t *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: page.c,v 1.12.2.1 2002/01/02 18:04:29 mike Exp $".
+ * End of "$Id: page.c,v 1.12.2.2 2002/03/01 19:55:13 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertodymo.c,v 1.4.2.1 2001/12/26 16:52:40 mike Exp $"
+ * "$Id: rastertodymo.c,v 1.4.2.2 2002/03/01 19:55:22 mike Exp $"
  *
  *   DYMO label printer filter for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -357,5 +359,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertodymo.c,v 1.4.2.1 2001/12/26 16:52:40 mike Exp $".
+ * End of "$Id: rastertodymo.c,v 1.4.2.2 2002/03/01 19:55:22 mike Exp $".
  */

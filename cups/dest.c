@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.18.2.5 2002/01/29 20:28:01 mike Exp $"
+ * "$Id: dest.c,v 1.18.2.6 2002/03/01 19:55:10 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -21,6 +21,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -785,5 +787,5 @@ cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
 
 
 /*
- * End of "$Id: dest.c,v 1.18.2.5 2002/01/29 20:28:01 mike Exp $".
+ * End of "$Id: dest.c,v 1.18.2.6 2002/03/01 19:55:10 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c,v 1.21.2.4 2002/01/29 02:29:46 mike Exp $"
+ * "$Id: options.c,v 1.21.2.5 2002/03/01 19:55:13 mike Exp $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -426,5 +428,5 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: options.c,v 1.21.2.4 2002/01/29 02:29:46 mike Exp $".
+ * End of "$Id: options.c,v 1.21.2.5 2002/03/01 19:55:13 mike Exp $".
  */

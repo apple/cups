@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.c,v 1.16.2.4 2002/01/17 21:40:21 mike Exp $"
+ * "$Id: textcommon.c,v 1.16.2.5 2002/03/01 19:55:23 mike Exp $"
  *
  *   Common text filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -1151,5 +1153,5 @@ getutf8(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: textcommon.c,v 1.16.2.4 2002/01/17 21:40:21 mike Exp $".
+ * End of "$Id: textcommon.c,v 1.16.2.5 2002/03/01 19:55:23 mike Exp $".
  */

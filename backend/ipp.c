@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.7 2002/02/06 19:21:42 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.8 2002/03/01 19:55:08 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -797,5 +799,5 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.7 2002/02/06 19:21:42 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.8 2002/03/01 19:55:08 mike Exp $".
  */

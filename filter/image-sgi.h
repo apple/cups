@@ -1,5 +1,5 @@
 /*
- * "$Id: image-sgi.h,v 1.5.2.1 2002/01/02 18:04:45 mike Exp $"
+ * "$Id: image-sgi.h,v 1.5.2.2 2002/03/01 19:55:19 mike Exp $"
  *
  *   SGI image file format library definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -21,6 +21,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _SGI_H_
@@ -90,5 +92,5 @@ extern int	sgiPutRow(sgi_t *sgip, unsigned short *row, int y, int z);
 #endif /* !_SGI_H_ */
 
 /*
- * End of "$Id: image-sgi.h,v 1.5.2.1 2002/01/02 18:04:45 mike Exp $".
+ * End of "$Id: image-sgi.h,v 1.5.2.2 2002/03/01 19:55:19 mike Exp $".
  */

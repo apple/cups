@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h,v 1.32.2.3 2002/01/02 18:04:23 mike Exp $"
+ * "$Id: cups.h,v 1.32.2.4 2002/03/01 19:55:09 mike Exp $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_CUPS_H_
@@ -171,5 +173,5 @@ extern const char	*cupsUser(void);
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.32.2.3 2002/01/02 18:04:23 mike Exp $".
+ * End of "$Id: cups.h,v 1.32.2.4 2002/03/01 19:55:09 mike Exp $".
  */

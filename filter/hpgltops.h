@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgltops.h,v 1.17.2.1 2002/01/02 18:04:44 mike Exp $"
+ * "$Id: hpgltops.h,v 1.17.2.2 2002/03/01 19:55:17 mike Exp $"
  *
  *   HP-GL/2 to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -229,5 +231,5 @@ extern void	OutputTrailer(void);
 extern int	Outputf(const char *format, ...);
 
 /*
- * End of "$Id: hpgltops.h,v 1.17.2.1 2002/01/02 18:04:44 mike Exp $".
+ * End of "$Id: hpgltops.h,v 1.17.2.2 2002/03/01 19:55:17 mike Exp $".
  */

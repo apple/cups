@@ -1,5 +1,5 @@
 /*
- * "$Id: md5passwd.c,v 1.5.2.2 2002/01/05 01:30:07 mike Exp $"
+ * "$Id: md5passwd.c,v 1.5.2.3 2002/03/01 19:55:13 mike Exp $"
  *
  *   MD5 password support for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -144,5 +146,5 @@ httpMD5String(const md5_byte_t *sum,	/* I - MD5 sum data */
 
 
 /*
- * End of "$Id: md5passwd.c,v 1.5.2.2 2002/01/05 01:30:07 mike Exp $".
+ * End of "$Id: md5passwd.c,v 1.5.2.3 2002/03/01 19:55:13 mike Exp $".
  */

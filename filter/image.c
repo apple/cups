@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.28.2.2 2002/01/02 18:04:46 mike Exp $"
+ * "$Id: image.c,v 1.28.2.3 2002/03/01 19:55:20 mike Exp $"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -769,5 +771,5 @@ flush_tile(image_t *img)	/* I - Image */
 
 
 /*
- * End of "$Id: image.c,v 1.28.2.2 2002/01/02 18:04:46 mike Exp $".
+ * End of "$Id: image.c,v 1.28.2.3 2002/03/01 19:55:20 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-polld.c,v 1.5.2.4 2002/01/14 19:15:04 mike Exp $"
+ * "$Id: cups-polld.c,v 1.5.2.5 2002/03/01 19:55:24 mike Exp $"
  *
  *   Polling daemon for the Common UNIX Printing System (CUPS).
  *
@@ -42,7 +42,7 @@
  */
 
 int	poll_server(http_t *http, cups_lang_t *language, ipp_op_t op,
-	            int sock, int port);
+	            int sock, int port, int interval);
 
 
 /*
@@ -126,10 +126,24 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   for (;;)
   {
-    if (!poll_server(http, language, CUPS_GET_PRINTERS, sock, port))
-      poll_server(http, language, CUPS_GET_CLASSES, sock, port);
+    if (!poll_server(http, language, CUPS_GET_PRINTERS, sock, port,
+                     interval / 2))
+    {
+     /*
+      * We got the printers, now get the classes...
+      */
 
-    sleep(interval);
+      poll_server(http, language, CUPS_GET_CLASSES, sock, port, interval / 2);
+    }
+    else
+    {
+     /*
+      * If successful, poll_server() will sleep for us; otherwise sleep
+      * here...
+      */
+
+      sleep(interval);
+    }
   }
 }
 
@@ -143,8 +157,11 @@ poll_server(http_t      *http,		/* I - HTTP connection */
             cups_lang_t *language,	/* I - Language */
 	    ipp_op_t    op,		/* I - Operation code */
 	    int         sock,		/* I - Broadcast sock */
-	    int         port)		/* I - Broadcast port */
+	    int         port,		/* I - Broadcast port */
+	    int         interval)	/* I - Polling interval */
 {
+  int			count,		/* Current number of printers/classes */
+			max_count;	/* Maximum printers/classes per second */
   ipp_t			*request,	/* Request data */
 			*response;	/* Response data */
   ipp_attribute_t	*attr;		/* Current attribute */
@@ -212,6 +229,19 @@ poll_server(http_t      *http,		/* I - HTTP connection */
       ippDelete(response);
       return (-1);
     }
+
+   /*
+    * Figure out how many printers/classes we have...
+    */
+
+    for (attr = ippFindAttribute(response, "printer-name", IPP_TAG_NAME),
+             max_count = 0;
+	 attr != NULL;
+	 attr = ippFindNextAttribute(response, "printer-name", IPP_TAG_NAME),
+	     max_count ++);
+
+    count     = 0;
+    max_count = max_count / interval + 1;
 
    /*
     * Loop through the printers or classes returned in the list...
@@ -285,7 +315,7 @@ poll_server(http_t      *http,		/* I - HTTP connection */
       * See if this is a local printer or class...
       */
 
-      if (!(type & CUPS_PRINTER_REMOTE))
+      if (!(type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
       {
        /*
 	* Send the printer information...
@@ -301,6 +331,23 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 	{
 	  perror("cups-polld");
 	  return (-1);
+	}
+
+       /*
+        * Throttle the local broadcasts as needed so that we don't
+	* overwhelm the local server...
+	*/
+
+        count ++;
+	if (count >= max_count)
+	{
+	 /*
+	  * Sleep for a second...
+	  */
+
+	  count = 0;
+	  sleep(1);
+	  interval --;
 	}
       }
 
@@ -318,10 +365,17 @@ poll_server(http_t      *http,		/* I - HTTP connection */
     return (-1);
   }
 
+ /*
+  * OK, sleep for the remaining time interval...
+  */
+
+  if (interval)
+    sleep(interval);
+
   return (0);
 }
 
 
 /*
- * End of "$Id: cups-polld.c,v 1.5.2.4 2002/01/14 19:15:04 mike Exp $".
+ * End of "$Id: cups-polld.c,v 1.5.2.5 2002/03/01 19:55:24 mike Exp $".
  */

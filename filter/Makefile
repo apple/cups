@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.41.2.7 2002/01/23 22:31:26 mike Exp $"
+# "$Id: Makefile,v 1.41.2.8 2002/03/01 19:55:15 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -20,6 +20,8 @@
 #       Voice: (301) 373-9603
 #       EMail: cups-info@cups.org
 #         WWW: http://www.cups.org
+#
+#   This file is subject to the Apple OS-Developed Software exception.
 #
 
 include ../Makedefs
@@ -242,5 +244,5 @@ $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 
 #
-# End of "$Id: Makefile,v 1.41.2.7 2002/01/23 22:31:26 mike Exp $".
+# End of "$Id: Makefile,v 1.41.2.8 2002/03/01 19:55:15 mike Exp $".
 #

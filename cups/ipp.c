@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.11 2002/02/12 19:23:08 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.12 2002/03/01 19:55:11 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -21,6 +21,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -2215,5 +2217,5 @@ ipp_write_mem(ipp_mem_t   *m,		/* I - Memory buffer */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.11 2002/02/12 19:23:08 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.12 2002/03/01 19:55:11 mike Exp $".
  */

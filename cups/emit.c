@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c,v 1.23.2.1 2002/01/02 18:04:23 mike Exp $"
+ * "$Id: emit.c,v 1.23.2.2 2002/03/01 19:55:10 mike Exp $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -22,6 +22,8 @@
  *         WWW: http://www.cups.org
  *
  *   PostScript is a trademark of Adobe Systems, Inc.
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -406,5 +408,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c,v 1.23.2.1 2002/01/02 18:04:23 mike Exp $".
+ * End of "$Id: emit.c,v 1.23.2.2 2002/03/01 19:55:10 mike Exp $".
  */

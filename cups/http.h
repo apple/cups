@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h,v 1.33.2.6 2002/01/27 21:20:29 mike Exp $"
+ * "$Id: http.h,v 1.33.2.7 2002/03/01 19:55:11 mike Exp $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -21,6 +21,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_HTTP_H_
@@ -368,5 +370,5 @@ extern char		*httpAddrString(const http_addr_t *addr,
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h,v 1.33.2.6 2002/01/27 21:20:29 mike Exp $".
+ * End of "$Id: http.h,v 1.33.2.7 2002/03/01 19:55:11 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.56.2.4 2002/02/20 19:00:02 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.56.2.5 2002/03/01 19:55:20 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -4448,5 +4450,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.56.2.4 2002/02/20 19:00:02 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.56.2.5 2002/03/01 19:55:20 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c,v 1.18.2.3 2002/01/09 20:58:31 mike Exp $"
+ * "$Id: testppd.c,v 1.18.2.4 2002/03/01 19:55:14 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -22,6 +22,8 @@
  *         WWW: http://www.cups.org
  *
  *   PostScript is a trademark of Adobe Systems, Inc.
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -196,5 +198,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c,v 1.18.2.3 2002/01/09 20:58:31 mike Exp $".
+ * End of "$Id: testppd.c,v 1.18.2.4 2002/03/01 19:55:14 mike Exp $".
  */

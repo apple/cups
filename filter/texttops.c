@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.34.2.4 2002/01/30 16:34:08 mike Exp $"
+ * "$Id: texttops.c,v 1.34.2.5 2002/03/01 19:55:23 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -1308,5 +1310,5 @@ write_text(const char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c,v 1.34.2.4 2002/01/30 16:34:08 mike Exp $".
+ * End of "$Id: texttops.c,v 1.34.2.5 2002/03/01 19:55:23 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.36.2.7 2002/01/02 18:04:26 mike Exp $"
+ * "$Id: ipp.h,v 1.36.2.8 2002/03/01 19:55:12 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -21,6 +21,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_IPP_H_
@@ -435,5 +437,5 @@ extern void		_ipp_free_attr(ipp_attribute_t *);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.36.2.7 2002/01/02 18:04:26 mike Exp $".
+ * End of "$Id: ipp.h,v 1.36.2.8 2002/03/01 19:55:12 mike Exp $".
  */

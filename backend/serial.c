@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.32.2.6 2002/02/12 19:23:04 mike Exp $"
+ * "$Id: serial.c,v 1.32.2.7 2002/03/01 19:55:09 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -511,7 +513,7 @@ list_devices(void)
 				/* Funky hex numbering used for some devices */
 #endif /* __hpux || __sgi || __sun || __FreeBSD__ || __OpenBSD__ */
 
-#ifdef __linux
+#if defined(__linux) || defined(linux) || defined(__linux__)
   int	i;		/* Looping var */
   int	fd;		/* File descriptor */
   char	device[255];	/* Device filename */
@@ -523,8 +525,13 @@ list_devices(void)
     if ((fd = open(device, O_WRONLY | O_NOCTTY | O_NDELAY)) >= 0)
     {
       close(fd);
+#  if defined(_ARCH_PPC) || defined(powerpc) || defined(__powerpc)
+      printf("serial serial:%s?baud=230400 \"Unknown\" \"Serial Port #%d\"\n",
+             device, i + 1);
+#  else
       printf("serial serial:%s?baud=115200 \"Unknown\" \"Serial Port #%d\"\n",
              device, i + 1);
+#  endif // _ARCH_PPC || powerpc || __powerpc
     }
   }
 #elif defined(__sgi)
@@ -864,5 +871,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.32.2.6 2002/02/12 19:23:04 mike Exp $".
+ * End of "$Id: serial.c,v 1.32.2.7 2002/03/01 19:55:09 mike Exp $".
  */

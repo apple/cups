@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-attr.c,v 1.18.2.1 2002/01/02 18:04:43 mike Exp $"
+ * "$Id: hpgl-attr.c,v 1.18.2.2 2002/03/01 19:55:16 mike Exp $"
  *
  *   HP-GL/2 attribute processing for the Common UNIX Printing System (CUPS).
  *
@@ -20,6 +20,8 @@
  *       Voice: (301) 373-9603
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -448,5 +450,5 @@ WU_width_units(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-attr.c,v 1.18.2.1 2002/01/02 18:04:43 mike Exp $".
+ * End of "$Id: hpgl-attr.c,v 1.18.2.2 2002/03/01 19:55:16 mike Exp $".
  */
