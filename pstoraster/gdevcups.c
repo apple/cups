@@ -1,6 +1,6 @@
-#define DEBUG
+/*#define DEBUG*/
 /*
- * "$Id: gdevcups.c,v 1.43.2.5 2002/04/21 16:11:28 mike Exp $"
+ * "$Id: gdevcups.c,v 1.43.2.6 2002/04/21 20:26:17 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -1824,6 +1824,16 @@ cups_put_params(gx_device     *pdev,	/* I - Device info */
 
   if (old_depth != pdev->color_info.depth || size_set)
   {
+   /*
+    * Make sure the page image is the correct size (current Ghostscript
+    * does not keep track of the margins in the bitmap size...
+    */
+
+    pdev->width  = (pdev->MediaSize[0] / 72.0f - margins[0] - margins[2]) *
+                   pdev->HWResolution[0] + 0.499f;
+    pdev->height = (pdev->MediaSize[1] / 72.0f - margins[1] - margins[3]) *
+                   pdev->HWResolution[1] + 0.499f;
+
     fputs("DEBUG: Reallocating memory...\n", stderr);
     sp = ((gx_device_printer *)pdev)->space_params;
 
@@ -3176,5 +3186,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.43.2.5 2002/04/21 16:11:28 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.43.2.6 2002/04/21 20:26:17 mike Exp $".
  */
