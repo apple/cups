@@ -137,6 +137,12 @@ CHANGES IN CUPS v1.1.3
 	  files and don't follow the hierarchy rules.
 	- Added new wrapper code around options so that duplex
 	  options for some HP printers don't prevent prints.
+	- Added support for Digital UNIX/Tru64 UNIX/OSF/1 format
+	  for "lpstat -v" output.
+	- Now show the URI for remote printers instead of
+	  /dev/null in "lpstat -v" output.
+	- Creating classes and adding printers to a class with
+	  the lpadmin command didn't work.
 
 
 CHANGES IN CUPS v1.1.2

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.16 2000/08/29 18:42:33 mike Exp $"
+ * "$Id: lpadmin.c,v 1.17 2000/09/18 16:36:03 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -135,6 +135,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 	      fputs("lpadmin: Class name can only contain letters, numbers, and the underscore!\n", stderr);
 	      return (1);
 	    }
+
+	    add_printer_to_class(http, printer, pclass);
 	    break;
 
         case 'd' : /* Set as default destination */
@@ -1477,5 +1479,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.16 2000/08/29 18:42:33 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.17 2000/09/18 16:36:03 mike Exp $".
  */
