@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.29 1999/11/17 18:27:13 mike Exp $"
+ * "$Id: pstops.c,v 1.30 1999/11/17 18:50:52 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -89,6 +89,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   char		tempfile[255];	/* Temporary file name */
   FILE		*temp;		/* Temporary file */
   int		number;		/* Page number */
+  int		offset;		/* NUp offset */
   int		slowcollate;	/* 1 if we need to collate manually */
   int		sloworder;	/* 1 if we need to order manually */
   char		line[8192];	/* Line buffer */
@@ -337,7 +338,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
           if (!sloworder)
 	  {
-	    if ((NumPages % NUp) == 0)
+	    if ((NumPages & (NUp - 1)) == 0)
 	    {
 	      if (ppd == NULL || ppd->num_filters == 0)
 		fprintf(stderr, "PAGE: %d %d\n", page, Copies);
@@ -393,10 +394,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     if (!sloworder)
     {
+      end_nup(NumPages - 1);
+
       if (NumPages & (NUp - 1))
         end_nup(NUp - 1);
-      else
-        end_nup(0);
     }
 
     if (slowcollate || sloworder)
@@ -412,7 +413,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	  for (number = 0; number < NumPages; number ++)
 	  {
-	    if ((number % NUp) == 0)
+	    if ((number & (NUp - 1)) == 0)
 	    {
 	      if (ppd == NULL || ppd->num_filters == 0)
 		fprintf(stderr, "PAGE: %d 1\n", page);
@@ -429,19 +430,21 @@ main(int  argc,			/* I - Number of command-line arguments */
 
           if (NumPages & (NUp - 1))
             end_nup(NUp - 1);
-          else
-            end_nup(0);
 
 	  Copies --;
 	}
       }
       else
       {
+        offset = NumPages & (NUp - 1);
+	if (offset)
+	  offset = NUp - offset;
+
         do
 	{
 	  for (number = NumPages - 1; number >= 0; number --)
 	  {
-	    if ((number % NUp) == 0)
+	    if (((number + offset) & (NUp - 1)) == 0)
 	    {
 	      if (ppd == NULL || ppd->num_filters == 0)
 		fprintf(stderr, "PAGE: %d %d\n", page,
@@ -452,16 +455,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
 	    }
 
-	    start_nup(NumPages - 1 - number);
+	    start_nup(number + offset);
 	    fseek(temp, Pages[number], SEEK_SET);
 	    copy_bytes(temp, Pages[number + 1] - Pages[number]);
-	    end_nup(NumPages - 1 - number);
+	    end_nup(number + offset);
 	  }
 
           if (NumPages & (NUp - 1))
             end_nup(NUp - 1);
-          else
-            end_nup(0);
 
 	  Copies --;
 	}
@@ -837,5 +838,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.29 1999/11/17 18:27:13 mike Exp $".
+ * End of "$Id: pstops.c,v 1.30 1999/11/17 18:50:52 mike Exp $".
  */
