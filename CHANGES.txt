@@ -80,19 +80,27 @@ CHANGES IN CUPS V1.1.5
 	- The mimeLoadType() function didn't handle the
           3-argument contains() function.
 	- The LoadPPDs() function in the scheduler didn't
-	  properly set the alloc_ppds variable or handle
-	  a PPD database containing 0 printers.
-	- The scheduler FindAvailablePrinter() function
-	  didn't use the same queuing logic as the
-	  CheckJobs() function.  This caused classes to
-	  stall if a remote printer was always busy.
+	  properly set the alloc_ppds variable or handle a PPD
+	  database containing 0 printers.
+	- The scheduler FindAvailablePrinter() function didn't
+	  use the same queuing logic as the CheckJobs()
+	  function.  This caused classes to stall if a remote
+	  printer was always busy.
 	- Jobs are now assigned to printers in a class
-	  round-robin style.  This should prevent the
-	  first server in the class from bearing the
-	  brunt of the jobs.
-	- The scheduler's LoadAllJobs() function didn't
-	  always restore remote printers for queued jobs
-	  on startup.
+	  round-robin style.  This should prevent the first
+	  server in the class from bearing the brunt of the
+	  jobs.
+	- The scheduler's LoadAllJobs() function didn't always
+	  restore remote printers for queued jobs on startup.
+	- The serial backend didn't support the higher baud
+	  rates with the old termios interface. It now supports
+	  57600 and 115200 baud.
+	- The serial backend now supports different types of
+	  flow control; previously it ignored the flow=XYZ
+	  option in the device URI.
+	- The serial backend now supports DTR/DSR flow control,
+	  which is popular on dot-matrix printers (access with
+	  "flow=dtrdsr" in the device URI)
 
 
 CHANGES IN CUPS v1.1.4

@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c,v 1.19 2000/10/13 01:04:36 mike Exp $"
+ * "$Id: serial.c,v 1.20 2000/11/10 15:53:39 mike Exp $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -57,6 +57,14 @@
 #  endif /* !INV_EPP_ECP_PLP */
 #endif /* __sgi */
 
+#ifndef CRTSCTS
+#  ifdef CNEW_RTSCTS
+#    define CRTSCTS CNEW_RTSCTS
+#  else
+#    define CRTSCTS 0
+#  endif /* CNEW_RTSCTS */
+#endif /* !CRTSCTS */
+
 
 /*
  * Local functions...
@@ -92,6 +100,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   int		wbytes;		/* Number of bytes written */
   size_t	nbytes,		/* Number of bytes read */
 		tbytes;		/* Total number of bytes written */
+  int		dtrdsr;		/* Do dtr/dsr flow control? */
+  int		bufsize;	/* Size of output buffer for writes */
   char		buffer[8192],	/* Output buffer */
 		*bufptr;	/* Pointer into buffer */
   struct termios opts;		/* Parallel port options */
@@ -186,6 +196,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
   opts.c_lflag &= ~(ICANON | ECHO | ISIG);	/* Raw mode */
 
+  bufsize = 480;	/* 9600 baud / 10 bits/char / 2Hz */
+  dtrdsr  = 0;		/* No dtr/dsr flow control */
+
   if (options != NULL)
     while (*options)
     {
@@ -225,6 +238,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
         * Set the baud rate...
 	*/
 
+        bufsize = atoi(value) / 20;
+
 #if B19200 == 19200
         cfsetispeed(&opts, atoi(value));
 	cfsetospeed(&opts, atoi(value));
@@ -255,6 +270,18 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	      cfsetispeed(&opts, B38400);
 	      cfsetospeed(&opts, B38400);
 	      break;
+#ifdef B57600
+	  case 57600 :
+	      cfsetispeed(&opts, B57600);
+	      cfsetospeed(&opts, B57600);
+	      break;
+#endif /* B57600 */
+#ifdef B115200
+	  case 115200 :
+	      cfsetispeed(&opts, B115200);
+	      cfsetospeed(&opts, B115200);
+	      break;
+#endif /* B115200 */
           default :
 	      fprintf(stderr, "WARNING: Unsupported baud rate %s!\n", value);
 	      break;
@@ -301,6 +328,36 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	else if (strcasecmp(value, "none") == 0)
 	  opts.c_cflag &= ~PARENB;
       }
+      else if (strcasecmp(name, "flow") == 0)
+      {
+       /*
+	* Set flow control...
+	*/
+
+	if (strcasecmp(value, "none") == 0)
+	{
+	  opts.c_iflag &= ~(IXON | IXOFF | IXANY);
+          opts.c_cflag &= ~CRTSCTS;
+	}
+	else if (strcasecmp(value, "soft") == 0)
+	{
+	  opts.c_iflag |= IXON | IXOFF | IXANY;
+          opts.c_cflag &= ~CRTSCTS;
+	}
+	else if (strcasecmp(value, "hard") == 0 ||
+	         strcasecmp(value, "rtscts") == 0)
+        {
+	  opts.c_iflag &= ~(IXON | IXOFF | IXANY);
+          opts.c_cflag |= CRTSCTS;
+	}
+	else if (strcasecmp(value, "dtrdsr") == 0)
+	{
+	  opts.c_iflag &= ~(IXON | IXOFF | IXANY);
+          opts.c_cflag &= ~CRTSCTS;
+
+	  dtrdsr = 1;
+	}
+      }
     }
 
   tcsetattr(fd, TCSANOW, &opts);
@@ -327,6 +384,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Finally, send the print file...
   */
 
+  if (bufsize > sizeof(buffer))
+    bufsize = sizeof(buffer);
+
   while (copies > 0)
   {
     copies --;
@@ -337,8 +397,38 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
       rewind(fp);
     }
 
+    if (dtrdsr)
+    {
+     /*
+      * Check the port and sleep until DSR is set...
+      */
+
+      int status;
+
+
+      if (!ioctl(fd, TIOCMGET, &status))
+        if (!(status & TIOCM_DSR))
+	{
+	 /*
+	  * Wait for DSR to go high...
+	  */
+
+	  fputs("DEBUG: DSR is low; waiting for device...\n", stderr);
+
+          do
+	  {
+	    sleep(1);
+	    if (ioctl(fd, TIOCMGET, &status))
+	      break;
+	  }
+	  while (!(status & TIOCM_DSR));
+
+	  fputs("DEBUG: DSR is high; writing to device...\n", stderr);
+        }
+    }
+
     tbytes = 0;
-    while ((nbytes = fread(buffer, 1, sizeof(buffer), fp)) > 0)
+    while ((nbytes = fread(buffer, 1, bufsize, fp)) > 0)
     {
      /*
       * Write the print data to the printer...
@@ -703,5 +793,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c,v 1.19 2000/10/13 01:04:36 mike Exp $".
+ * End of "$Id: serial.c,v 1.20 2000/11/10 15:53:39 mike Exp $".
  */
