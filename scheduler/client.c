@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.122 2002/09/25 12:50:59 mike Exp $"
+ * "$Id: client.c,v 1.123 2002/09/26 15:19:30 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1585,7 +1585,8 @@ SendError(client_t      *con,	/* I - Connection */
 
     if (httpPrintf(HTTP(con), "Content-Type: text/html\r\n") < 0)
       return (0);
-    if (httpPrintf(HTTP(con), "Content-Length: %d\r\n", strlen(message)) < 0)
+    if (httpPrintf(HTTP(con), "Content-Length: %d\r\n",
+                   (int)strlen(message)) < 0)
       return (0);
     if (httpPrintf(HTTP(con), "\r\n") < 0)
       return (0);
@@ -2605,5 +2606,5 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.122 2002/09/25 12:50:59 mike Exp $".
+ * End of "$Id: client.c,v 1.123 2002/09/26 15:19:30 mike Exp $".
  */
