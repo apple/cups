@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.56 2000/05/09 14:10:15 mike Exp $"
+ * "$Id: client.c,v 1.57 2000/05/17 14:32:48 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -242,6 +242,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
   struct stat	filestats;	/* File information */
   mime_type_t	*type;		/* MIME type of file */
   printer_t	*p;		/* Printer */
+  location_t	*best;		/* Best match for authentication */
   static unsigned request_id = 0;/* Request ID for temp files */
 
 
@@ -366,8 +367,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 		   con->http.version / 100, con->http.version % 100);
 
 	con->http.status = HTTP_OK;
-        break;
 
+    case HTTP_OPTIONS :
     case HTTP_CLOSE :
     case HTTP_DELETE :
     case HTTP_GET :
@@ -418,6 +419,33 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	CloseClient(con);
 	return (0);
       }
+    }
+    else if (con->operation == HTTP_OPTIONS)
+    {
+     /*
+      * Do OPTIONS command...
+      */
+
+      if ((best = FindBest(con)) != NULL &&
+          best->type != AUTH_NONE)
+      {
+	if (!SendHeader(con, HTTP_UNAUTHORIZED, NULL))
+	{
+	  CloseClient(con);
+	  return (0);
+	}
+      }
+      else
+      {
+	if (!SendHeader(con, HTTP_OK, NULL))
+	{
+	  CloseClient(con);
+	  return (0);
+	}
+      }
+
+      httpPrintf(HTTP(con), "Allow: CLOSE, OPTIONS, GET, HEAD, POST\r\n");
+      httpPrintf(HTTP(con), "\r\n");
     }
     else if (strstr(con->uri, "..") != NULL)
     {
@@ -1109,6 +1137,10 @@ SendHeader(client_t    *con,	/* I - Client to send to */
     if (httpPrintf(HTTP(con), "Keep-Alive: timeout=%d\r\n", KeepAliveTimeout) < 0)
       return (0);
   }
+  if (code == HTTP_METHOD_NOT_ALLOWED)
+    if (httpPrintf(HTTP(con), "Allow: CLOSE, OPTIONS, GET, HEAD, POST\r\n") < 0)
+      return (0);
+
   if (code == HTTP_UNAUTHORIZED)
   {
     loc = FindBest(con); /* This already succeeded in IsAuthorized */
@@ -1725,5 +1757,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.56 2000/05/09 14:10:15 mike Exp $".
+ * End of "$Id: client.c,v 1.57 2000/05/17 14:32:48 mike Exp $".
  */
