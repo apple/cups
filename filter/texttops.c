@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.34.2.2 2002/01/02 18:04:49 mike Exp $"
+ * "$Id: texttops.c,v 1.34.2.3 2002/01/29 15:40:31 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -102,6 +102,22 @@ WritePage(void)
   printf("%%%%Page: %d %d\n", NumPages, NumPages);
 
   puts("gsave");
+
+  if (getenv("PPD") == NULL)
+  {
+    switch (Orientation)
+    {
+      case 1 : /* Landscape */
+          printf("%.1f 0.0 translate 90 rotate\n", PageLength);
+          break;
+      case 2 : /* Reverse Portrait */
+          printf("%.1f %.1f translate 180 rotate\n", PageWidth, PageLength);
+          break;
+      case 3 : /* Reverse Landscape */
+          printf("0.0 %.1f translate -90 rotate\n", PageWidth);
+          break;
+    }
+  }
 
   if (PrettyPrint)
     printf("%d H\n", NumPages);
@@ -699,7 +715,7 @@ WriteProlog(const char *title,		/* I - Title of job */
     else
       j = 0;
 
-    if (ppd == NULL || j >= ppd->num_fonts)
+    if (ppd != NULL && j >= ppd->num_fonts)
     {
      /*
       * Need to embed this font...
@@ -728,7 +744,7 @@ WriteProlog(const char *title,		/* I - Title of job */
     else
       j = 0;
 
-    if (ppd == NULL || j >= ppd->num_fonts)
+    if (ppd != NULL && j >= ppd->num_fonts)
     {
      /*
       * Need to embed this font...
@@ -1292,5 +1308,5 @@ write_text(const char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c,v 1.34.2.2 2002/01/02 18:04:49 mike Exp $".
+ * End of "$Id: texttops.c,v 1.34.2.3 2002/01/29 15:40:31 mike Exp $".
  */
