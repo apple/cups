@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.93 2001/05/31 19:33:10 mike Exp $"
+dnl "$Id: configure.in,v 1.94 2001/06/01 21:01:11 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -271,26 +271,30 @@ AC_SUBST(LIBPNG)
 AC_SUBST(LIBTIFF)
 AC_SUBST(LIBZ)
 
-AC_CHECK_LIB(jpeg, jpeg_destroy_decompress,
-    AC_DEFINE(HAVE_LIBJPEG)
-    LIBJPEG="-ljpeg"
-    LIBS="$LIBS -ljpeg")
+AC_CHECK_HEADER(jpeglib.h,
+    AC_CHECK_LIB(jpeg, jpeg_destroy_decompress,
+	AC_DEFINE(HAVE_LIBJPEG)
+	LIBJPEG="-ljpeg"
+	LIBS="$LIBS -ljpeg"))
 
-AC_CHECK_LIB(z, gzgets,
-    AC_DEFINE(HAVE_LIBZ)
-    LIBZ="-lz"
-    LIBS="$LIBS -lz")
+AC_CHECK_HEADER(zlib.h,
+    AC_CHECK_LIB(z, gzgets,
+	AC_DEFINE(HAVE_LIBZ)
+	LIBZ="-lz"
+	LIBS="$LIBS -lz"))
 
 dnl PNG library uses math library functions...
 AC_CHECK_LIB(m, pow)
 
-AC_CHECK_LIB(png, png_set_tRNS_to_alpha,
-    AC_DEFINE(HAVE_LIBPNG)
-    LIBPNG="-lpng")
+AC_CHECK_HEADER(png.h,
+    AC_CHECK_LIB(png, png_set_tRNS_to_alpha,
+	AC_DEFINE(HAVE_LIBPNG)
+	LIBPNG="-lpng"))
 
-AC_CHECK_LIB(tiff, TIFFReadScanline,
-    AC_DEFINE(HAVE_LIBTIFF)
-    LIBTIFF="-ltiff")
+AC_CHECK_HEADER(tiff.h,
+    AC_CHECK_LIB(tiff, TIFFReadScanline,
+	AC_DEFINE(HAVE_LIBTIFF)
+	LIBTIFF="-ltiff"))
 
 dnl Restore original LIBS settings...
 LIBS="$SAVELIBS"
@@ -720,5 +724,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.93 2001/05/31 19:33:10 mike Exp $".
+dnl End of "$Id: configure.in,v 1.94 2001/06/01 21:01:11 mike Exp $".
 dnl
