@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.142 2001/07/23 19:10:20 mike Exp $"
+ * "$Id: ipp.c,v 1.143 2001/07/23 21:17:48 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -669,12 +669,6 @@ add_class(client_t        *con,		/* I - Client connection */
     pclass->info[sizeof(pclass->info) - 1] = '\0';
   }
 
-  if ((attr = ippFindAttribute(con->request, "printer-more-info", IPP_TAG_URI)) != NULL)
-  {
-    strncpy(pclass->more_info, attr->values[0].string.text, sizeof(pclass->more_info) - 1);
-    pclass->more_info[sizeof(pclass->more_info) - 1] = '\0';
-  }
-
   if ((attr = ippFindAttribute(con->request, "printer-is-accepting-jobs", IPP_TAG_BOOLEAN)) != NULL)
   {
     LogMessage(L_INFO, "Setting %s printer-is-accepting-jobs to %d (was %d.)",
@@ -1096,12 +1090,6 @@ add_printer(client_t        *con,	/* I - Client connection */
   {
     strncpy(printer->info, attr->values[0].string.text, sizeof(printer->info) - 1);
     printer->info[sizeof(printer->info) - 1] = '\0';
-  }
-
-  if ((attr = ippFindAttribute(con->request, "printer-more-info", IPP_TAG_URI)) != NULL)
-  {
-    strncpy(printer->more_info, attr->values[0].string.text, sizeof(printer->more_info) - 1);
-    printer->more_info[sizeof(printer->more_info) - 1] = '\0';
   }
 
   if ((attr = ippFindAttribute(con->request, "device-uri", IPP_TAG_URI)) != NULL)
@@ -5512,5 +5500,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.142 2001/07/23 19:10:20 mike Exp $".
+ * End of "$Id: ipp.c,v 1.143 2001/07/23 21:17:48 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.80 2001/07/23 18:48:52 mike Exp $"
+ * "$Id: dirsvc.c,v 1.81 2001/07/23 21:17:48 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,6 +23,21 @@
  *
  * Contents:
  *
+ *   ProcessBrowseData() - Process new browse data.
+ *   SendBrowseList()    - Send new browsing information as necessary.
+ *   SendCUPSBrowse()    - Send new browsing information using the CUPS protocol.
+ *   StartBrowsing()     - Start sending and receiving broadcast information.
+ *   StartPolling()      - Start polling servers as needed.
+ *   StopBrowsing()      - Stop sending and receiving broadcast information.
+ *   StopPolling()       - Stop polling servers as needed.
+ *   UpdateCUPSBrowse()  - Update the browse lists using the CUPS protocol.
+ *   RegReportCallback() - Empty SLPRegReport.
+ *   SendSLPBrowse()     - Register the specified printer with SLP.
+ *   SLPDeregPrinter()   - SLPDereg() the specified printer
+ *   GetSlpAttrVal()     - Get an attribute from an SLP registration.
+ *   AttrCallback()      - SLP attribute callback 
+ *   SrvUrlCallback()    - SLP service url callback
+ *   UpdateSLPBrowse()   - Get browsing information via SLP.
  */
 
 /*
@@ -136,7 +151,6 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 	  /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
           strncpy(p->hostname, host, sizeof(p->hostname) - 1);
 	  strncpy(p->uri, uri, sizeof(p->uri) - 1);
-	  strncpy(p->more_info, uri, sizeof(p->more_info) - 1);
 	  strncpy(p->device_uri, uri, sizeof(p->device_uri) - 1);
           update = 1;
         }
@@ -152,7 +166,6 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
       /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
       strncpy(p->hostname, host, sizeof(p->hostname) - 1);
       strncpy(p->uri, uri, sizeof(p->uri) - 1);
-      strncpy(p->more_info, uri, sizeof(p->more_info) - 1);
       strncpy(p->device_uri, uri, sizeof(p->device_uri) - 1);
       update = 1;
     }
@@ -174,7 +187,6 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
       p->type = type;
       /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
       strncpy(p->uri, uri, sizeof(p->uri) - 1);
-      strncpy(p->more_info, uri, sizeof(p->more_info) - 1);
       strncpy(p->device_uri, uri, sizeof(p->device_uri) - 1);
       strncpy(p->hostname, host, sizeof(p->hostname) - 1);
 
@@ -220,7 +232,6 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
 	  /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
           strncpy(p->hostname, host, sizeof(p->hostname) - 1);
 	  strncpy(p->uri, uri, sizeof(p->uri) - 1);
-	  strncpy(p->more_info, uri, sizeof(p->more_info) - 1);
 	  strncpy(p->device_uri, uri, sizeof(p->device_uri) - 1);
           update = 1;
         }
@@ -236,7 +247,6 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
       /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
       strncpy(p->hostname, host, sizeof(p->hostname) - 1);
       strncpy(p->uri, uri, sizeof(p->uri) - 1);
-      strncpy(p->more_info, uri, sizeof(p->more_info) - 1);
       strncpy(p->device_uri, uri, sizeof(p->device_uri) - 1);
       update = 1;
     }
@@ -259,7 +269,6 @@ ProcessBrowseData(const char   *uri,	/* I - URI of printer/class */
       /* No "p->var[sizeof(p->var) - 1] = '\0';" because p is zeroed */
       strncpy(p->hostname, host, sizeof(p->hostname) - 1);
       strncpy(p->uri, uri, sizeof(p->uri) - 1);
-      strncpy(p->more_info, uri, sizeof(p->more_info) - 1);
       strncpy(p->device_uri, uri, sizeof(p->device_uri) - 1);
 
       update = 1;
@@ -1106,12 +1115,23 @@ RegReportCallback(SLPHandle hslp,
  */
 
 void 
-SendSLPBrowse(printer_t *p)	/* I - Printer to register */
+SendSLPBrowse(printer_t *p)		/* I - Printer to register */
 {
-  char	srvurl[HTTP_MAX_URI];	/* Printer service URI */
-  char	attrs[8192];		/* Printer attributes */
-  char	finishings[1024];	/* Finishings to support */
+  char		srvurl[HTTP_MAX_URI],	/* Printer service URI */
+		attrs[8192],		/* Printer attributes */
+		finishings[1024],	/* Finishings to support */
+		make_model[IPP_MAX_NAME * 2],
+					/* Make and model, quoted */
+		location[IPP_MAX_NAME * 2],
+					/* Location, quoted */
+		info[IPP_MAX_NAME * 2],
+					/* Info, quoted */
+		*src,			/* Pointer to original string */
+		*dst;			/* Pointer to destination string */
+  SLPError	error;			/* SLP error, if any */
 
+
+  LogMessage(L_DEBUG, "SendSLPBrowse(%p = \"%s\")", p, p->name);
 
  /*
   * Make the SLP service URL that conforms to the IANA 
@@ -1119,6 +1139,8 @@ SendSLPBrowse(printer_t *p)	/* I - Printer to register */
   */
 
   snprintf(srvurl, sizeof(srvurl), SLP_CUPS_SRVTYPE ":%s", p->uri);
+
+  LogMessage(L_DEBUG2, "Service URL = \"%s\"", srvurl);
 
  /*
   * Figure out the finishings string...
@@ -1161,7 +1183,55 @@ SendSLPBrowse(printer_t *p)	/* I - Printer to register */
       strcpy(finishings, "sort");
   }
 
+  if (!finishings[0])
+    strcpy(finishings, "none");
+
   finishings[sizeof(finishings) - 1] = '\0';
+
+ /*
+  * Quote any commas in the make and model, location, and info strings
+  * (local strings are twice the size of the ones in the printer_t
+  * structure, so no buffer overflow is possible...)
+  */
+
+  for (src = p->make_model, dst = make_model; *src;)
+  {
+    if (*src == ',' || *src == '\\' || *src == ')')
+      *dst++ = '\\';
+
+    *dst++ = *src;
+  }
+
+  *dst = '\0';
+
+  if (!make_model[0])
+    strcpy(make_model, "Unknown");
+
+  for (src = p->location, dst = location; *src;)
+  {
+    if (*src == ',' || *src == '\\' || *src == ')')
+      *dst++ = '\\';
+
+    *dst++ = *src;
+  }
+
+  *dst = '\0';
+
+  if (!location[0])
+    strcpy(location, "Unknown");
+
+  for (src = p->info, dst = info; *src;)
+  {
+    if (*src == ',' || *src == '\\' || *src == ')')
+      *dst++ = '\\';
+
+    *dst++ = *src;
+  }
+
+  *dst = '\0';
+
+  if (!info[0])
+    strcpy(info, "Unknown");
 
  /*
   * Make the SLP attribute string list that conforms to
@@ -1180,23 +1250,24 @@ SendSLPBrowse(printer_t *p)	/* I - Printer to register */
            "(sides-supported=%s),"
 	   "(multiple-document-jobs-supported=true)"
 	   "(ipp-versions-supported=1.0,1.1)",
-           p->uri,
-	   p->name,
-           *(p->location) ? p->location : "unknown",
-           *(p->info) ? p->info :"unknown",
-           p->more_info,
-           *(p->make_model) ? p->make_model : "unknown",
+	   p->uri, p->name, location, info, p->uri, make_model,
            p->type & CUPS_PRINTER_COLOR ? "true" : "false",
            finishings,
            p->type & CUPS_PRINTER_DUPLEX ?
 	       "two-sided-long-edge,two-sided-short-edge" : "one-sided");
 
+  LogMessage(L_DEBUG2, "Attributes = \"%s\"", attrs);
+
  /*
   * Register the printer with the SLP server...
   */
 
-  SLPReg(BrowseSLPHandle, srvurl, BrowseTimeout,
-	 SLP_CUPS_SRVTYPE, attrs, SLP_TRUE, RegReportCallback, 0);
+  error = SLPReg(BrowseSLPHandle, srvurl, BrowseTimeout,
+	         SLP_CUPS_SRVTYPE, attrs, SLP_TRUE, RegReportCallback, 0);
+
+  if (error != SLP_OK)
+    LogMessage(L_ERROR, "SLPReg of \"%s\" failed with status %d!", p->name,
+               error);
 }
 
 
@@ -1232,28 +1303,41 @@ SLPDeregPrinter(printer_t *p)
  * 'GetSlpAttrVal()' - Get an attribute from an SLP registration.
  */
 
-int 
-GetSlpAttrVal(const char *attrlist,
-              const char *tag,
-              char       *valbuf,
-              int        valbuflen)
+int 					/* O - 0 on success */
+GetSlpAttrVal(const char *attrlist,	/* I - Attribute list string */
+              const char *tag,		/* I - Name of attribute */
+              char       *valbuf,	/* O - Value */
+              int        valbuflen)	/* I - Max length of value */
 {
-  char	*slider1;
-  char	*slider2;
+  char	*ptr1,				/* Pointer into string */
+	*ptr2;				/* ... */
 
 
   valbuf[0] = '\0';
 
-  if ((slider1 = strstr(attrlist, tag)) != NULL)
+  if ((ptr1 = strstr(attrlist, tag)) != NULL)
   {
-    slider1 += strlen(tag);
+    ptr1 += strlen(tag);
 
-    if ((slider2 = strchr(slider1,')')) != NULL)
+    if ((ptr2 = strchr(ptr1,')')) != NULL)
     {
-      if (valbuflen > (slider2 - slider1))
+      if (valbuflen > (ptr2 - ptr1))
       {
-        strncpy(valbuf, slider1, slider2 - slider1);
-	valbuf[slider2 - slider1] = '\0';
+       /*
+        * Copy the value...
+	*/
+
+        strncpy(valbuf, ptr1, ptr2 - ptr1);
+	valbuf[ptr2 - ptr1] = '\0';
+
+       /*
+        * Dequote the value...
+	*/
+
+	for (ptr1 = valbuf; *ptr1; ptr1 ++)
+	  if (*ptr1 == '\\' && ptr1[1])
+	    strcpy(ptr1, ptr1 + 1);
+
         return (0);
       }
     }
@@ -1402,6 +1486,8 @@ UpdateSLPBrowse(void)
   const char	*uri;	/* Pointer to printer URI */
 
 
+  LogMessage(L_DEBUG, "UpdateSLPBrowse() Start...");
+
  /*
   * Reset the refresh time...
   */
@@ -1458,10 +1544,12 @@ UpdateSLPBrowse(void)
     next = s->next;
     free(s);
   }       
+
+  LogMessage(L_DEBUG, "UpdateSLPBrowse() End...");
 }
 #endif /* HAVE_LIBSLP */
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.80 2001/07/23 18:48:52 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.81 2001/07/23 21:17:48 mike Exp $".
  */

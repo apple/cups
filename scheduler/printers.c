@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.101 2001/07/23 19:10:21 mike Exp $"
+ * "$Id: printers.c,v 1.102 2001/07/23 21:17:49 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -89,13 +89,6 @@ AddPrinter(const char *name)	/* I - Name of printer */
   strncpy(p->hostname, ServerName, sizeof(p->hostname) - 1);
   snprintf(p->uri, sizeof(p->uri), "ipp://%s:%d/printers/%s", ServerName,
            ntohs(Listeners[0].address.sin_port), name);
-
- /*
-  * Since uri and more_info are URIs and use the HTTP_MAX_URI constant
-  * to determine the size of the strings, this copy is safe.
-  */
-
-  strcpy(p->more_info, p->uri);
 
   p->state     = IPP_PRINTER_STOPPED;
   p->accepting = 0;
@@ -764,7 +757,7 @@ SaveAllPrinters(void)
     if (printer->info[0])
       fprintf(fp, "Info %s\n", printer->info);
 
-    if (printer->more_info[0])
+    if (printer->location[0])
       fprintf(fp, "Location %s\n", printer->location);
 
     if (printer->device_uri[0])
@@ -1001,7 +994,7 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-info",
                NULL, p->info);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-more-info",
-               NULL, p->more_info);
+               NULL, p->uri);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                "pdl-override-supported", NULL, "not-attempted");
   ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
@@ -1803,5 +1796,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.101 2001/07/23 19:10:21 mike Exp $".
+ * End of "$Id: printers.c,v 1.102 2001/07/23 21:17:49 mike Exp $".
  */

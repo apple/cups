@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.37 2001/07/12 18:10:13 mike Exp $"
+ * "$Id: classes.c,v 1.38 2001/07/23 21:17:48 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -64,13 +64,6 @@ AddClass(const char *name)	/* I - Name of class */
     c->type = CUPS_PRINTER_CLASS;
     snprintf(c->uri, sizeof(c->uri), "ipp://%s:%d/classes/%s", ServerName,
              ntohs(Listeners[0].address.sin_port), name);
-
-   /*
-    * MRS - more_info and uri are both HTTP_MAX_URI in size, and will always
-    * be, so this strcpy is safe...
-    */
-
-    strcpy(c->more_info, c->uri);
 
    /*
     * Set the printer attributes to make this a class.
@@ -663,7 +656,7 @@ SaveAllClasses(void)
     if (pclass->info[0])
       fprintf(fp, "Info %s\n", pclass->info);
 
-    if (pclass->more_info[0])
+    if (pclass->location[0])
       fprintf(fp, "Location %s\n", pclass->location);
 
     if (pclass->state == IPP_PRINTER_STOPPED)
@@ -704,5 +697,5 @@ SaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.37 2001/07/12 18:10:13 mike Exp $".
+ * End of "$Id: classes.c,v 1.38 2001/07/23 21:17:48 mike Exp $".
  */
