@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.144 2001/10/02 16:32:54 mike Exp $"
+ * "$Id: ipp.c,v 1.145 2001/10/05 18:41:39 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2377,7 +2377,49 @@ copy_banner(client_t   *con,	/* I - Client connection */
   fchmod(fileno(out), 0640);
   fchown(fileno(out), User, Group);
 
-  if ((in = fopen(banner->filename, "r")) == NULL)
+  if (con->language)
+  {
+   /*
+    * Try the localized banner file under the subdirectory...
+    */
+
+    snprintf(filename, sizeof(filename), "%s/banners/%s/%s", DataDir,
+             con->language->language, name);
+
+    if (access(filename, 0) && con->language->language[2])
+    {
+     /*
+      * Wasn't able to find "ll_CC" locale file; try the non-national
+      * localization banner directory.
+      */
+
+      attrname[0] = con->language->language[0];
+      attrname[1] = con->language->language[1];
+      attrname[2] = '\0';
+
+      snprintf(filename, sizeof(filename), "%s/banners/%s/%s", DataDir,
+               attrname, name);
+    }
+
+    if (access(filename, 0))
+    {
+     /*
+      * Use the non-localized banner file.
+      */
+
+      snprintf(filename, sizeof(filename), "%s/banners/%s", DataDir, name);
+    }
+  }
+  else
+  {
+   /*
+    * Use the non-localized banner file.
+    */
+
+    snprintf(filename, sizeof(filename), "%s/banners/%s", DataDir, name);
+  }
+
+  if ((in = fopen(filename, "r")) == NULL)
   {
     fclose(out);
     unlink(filename);
@@ -5500,5 +5542,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.144 2001/10/02 16:32:54 mike Exp $".
+ * End of "$Id: ipp.c,v 1.145 2001/10/05 18:41:39 mike Exp $".
  */

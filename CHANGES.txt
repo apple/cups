@@ -52,6 +52,10 @@ CHANGES IN CUPS V1.1.11
 	  file before the JPEG libraries; since the JPEG headers
 	  can define HAVE_STDLIB_H, the configure check would
 	  cause the JPEG check to fail on some systems.
+	- The scheduler now supports localized banner files,
+	  using the subdirectory approach, e.g. the "es"
+	  subdirectory under /usr/share/cups/banners is used for
+	  the Spanish banner files.
 
 
 CHANGES IN CUPS V1.1.10-1
