@@ -1,5 +1,5 @@
 /*
- * "$Id: textcommon.c,v 1.31 2004/02/25 20:14:52 mike Exp $"
+ * "$Id: textcommon.c,v 1.32 2004/04/26 19:01:40 mike Exp $"
  *
  *   Common text filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -110,6 +110,7 @@ static char *code_keywords[] =	/* List of known C/C++ keywords... */
 	  "protected",
 	  "public",
 	  "register",
+	  "reinterpret_cast",
 	  "return",
 	  "short",
 	  "signed",
@@ -1182,5 +1183,5 @@ getutf8(FILE *fp)	/* I - File to read from */
 
 
 /*
- * End of "$Id: textcommon.c,v 1.31 2004/02/25 20:14:52 mike Exp $".
+ * End of "$Id: textcommon.c,v 1.32 2004/04/26 19:01:40 mike Exp $".
  */
