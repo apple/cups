@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.25 2002/03/28 12:54:41 mike Exp $"
+ * "$Id: ipp-var.c,v 1.26 2002/03/28 13:45:03 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -245,22 +245,28 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 		       strcmp(getenv("REMOTE_HOST"), "localhost") == 0 ||
 		       strcmp(getenv("REMOTE_HOST"), server) == 0))
 		  {
-		    strcpy(hostname, "localhost");
-		    port = atoi(getenv("SERVER_PORT"));
+		   /*
+		    * Make URI relative to the current server...
+		    */
+
+                    strncpy(uri, resource, sizeof(uri) - 1);
+		    uri[sizeof(uri) - 1] = '\0';
 		  }
+		  else
+		  {
+        	   /*
+		    * Rewrite URI with HTTP address...
+		    */
 
-        	 /*
-		  * Rewrite URI with HTTP address...
-		  */
-
-		  if (username[0])
-		    snprintf(uri, sizeof(uri), "%s://%s@%s:%d%s",
-		             ishttps ? "https" : "http",
-		             username, hostname, port, resource);
-        	  else
-		    snprintf(uri, sizeof(uri), "%s://%s:%d%s", 
-		             ishttps ? "https" : "http",
-			     hostname, port, resource);
+		    if (username[0])
+		      snprintf(uri, sizeof(uri), "%s://%s@%s:%d%s",
+		               ishttps ? "https" : "http",
+		               username, hostname, port, resource);
+        	    else
+		      snprintf(uri, sizeof(uri), "%s://%s:%d%s", 
+		               ishttps ? "https" : "http",
+			       hostname, port, resource);
+                  }
 
 		  strncat(valptr, uri, sizeof(value) - (valptr - value) - 1);
         	  break;
@@ -296,5 +302,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.25 2002/03/28 12:54:41 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.26 2002/03/28 13:45:03 mike Exp $".
  */
