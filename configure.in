@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.8 1999/04/23 14:06:13 mike Exp $"
+dnl "$Id: configure.in,v 1.9 1999/04/29 19:22:49 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -119,6 +119,14 @@ AC_CHECK_FUNCS(strdup)
 AC_CHECK_FUNCS(strcasecmp)
 AC_CHECK_FUNCS(strncasecmp)
 
+dnl Checks for signal functions.
+AC_CHECK_FUNCS(sigset)
+AC_CHECK_FUNCS(sigaction)
+
+dnl Checks for wait functions.
+AC_CHECK_FUNCS(waitpid)
+AC_CHECK_FUNCS(wait3)
+
 dnl Fix "prefix" variable if it hasn't been specified...
 if test "$prefix" = "NONE"; then
 	prefix="/usr"
@@ -137,5 +145,5 @@ AC_DEFINE_UNQUOTED(LOCALEDIR, "$prefix/lib/locale")
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.8 1999/04/23 14:06:13 mike Exp $".
+dnl End of "$Id: configure.in,v 1.9 1999/04/29 19:22:49 mike Exp $".
 dnl
