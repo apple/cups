@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.11.2.7 2003/01/07 18:27:28 mike Exp $"
+ * "$Id: type.c,v 1.11.2.8 2003/01/24 14:44:10 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -904,10 +904,10 @@ checkrules(const char   *filename,	/* I - Filename */
 	  break;
 
       case MIME_MAGIC_LOCALE :
-#ifdef __APPLE__
-          result = (strcmp(rules->value.localev, setlocale(LC_ALL, NULL)) == 0);
+#if defined(WIN32) || defined(__EMX__) || defined(__APPLE__)
+          result = (strcmp(rules->value.localev, setlocale(LC_ALL, "")) == 0);
 #else
-          result = (strcmp(rules->value.localev, setlocale(LC_MESSAGES, NULL)) == 0);
+          result = (strcmp(rules->value.localev, setlocale(LC_MESSAGES, "")) == 0);
 #endif /* __APPLE__ */
 	  break;
 
@@ -1092,5 +1092,5 @@ patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.11.2.7 2003/01/07 18:27:28 mike Exp $".
+ * End of "$Id: type.c,v 1.11.2.8 2003/01/24 14:44:10 mike Exp $".
  */
