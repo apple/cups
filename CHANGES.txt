@@ -1,8 +1,11 @@
-CHANGES.txt - 10/28/2002
+CHANGES.txt - 10/30/2002
 ------------------------
 
 CHANGES IN CUPS V1.1.17
 
+	- Fixed a potential bug in the HTTP code which was
+	  caused by servers sending the status line and
+	  newline(s) in separate packets.
 	- User-defined classification strings are now printed
 	  verbatim - previously the classification box would be
 	  empty.
