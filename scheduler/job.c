@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.13 1999/04/22 20:42:20 mike Exp $"
+ * "$Id: job.c,v 1.14 1999/04/22 20:54:21 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -803,7 +803,7 @@ start_process(char *command,	/* I - Full path to command */
     * Close extra file descriptors...
     */
 
-    for (fd = 3; fd < OPEN_MAX; fd ++)
+    for (fd = 3; fd < 1024; fd ++)
       close(fd);
 
    /*
@@ -841,5 +841,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.13 1999/04/22 20:42:20 mike Exp $".
+ * End of "$Id: job.c,v 1.14 1999/04/22 20:54:21 mike Exp $".
  */
