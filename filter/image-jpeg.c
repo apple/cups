@@ -1,5 +1,5 @@
 /*
- * "$Id: image-jpeg.c,v 1.1 1998/02/19 20:43:33 mike Exp $"
+ * "$Id: image-jpeg.c,v 1.2 1998/02/24 18:39:46 mike Exp $"
  *
  *   JPEG image routines for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,11 @@
  * Revision History:
  *
  *   $Log: image-jpeg.c,v $
- *   Revision 1.1  1998/02/19 20:43:33  mike
+ *   Revision 1.2  1998/02/24 18:39:46  mike
+ *   Fixed bug in colorspace conversion - now check the number of components
+ *   in the image and adjust accordingly.
+ *
+ *   Revision 1.1  1998/02/19  20:43:33  mike
  *   Initial revision
  *
  */
@@ -50,7 +54,7 @@ ImageReadJPEG(image_t *img,
 
   cinfo.quantize_colors = 0;
 
-  if (primary == IMAGE_BLACK || primary == IMAGE_WHITE)
+  if (cinfo.num_components == 1)
   {
     cinfo.out_color_space      = JCS_GRAYSCALE;
     cinfo.out_color_components = 1;
@@ -98,14 +102,38 @@ ImageReadJPEG(image_t *img,
     if ((saturation != 100 || hue != 0) && cinfo.output_components > 1)
       ImageRGBAdjust(in, img->xsize, saturation, hue);
 
-    if (primary > 0)
+    if ((primary == IMAGE_WHITE && cinfo.out_color_space == JCS_GRAYSCALE) ||
+        (primary == IMAGE_RGB && cinfo.out_color_space == JCS_RGB))
       ImagePutRow(img, 0, cinfo.output_scanline - 1, img->xsize, in);
-    else
+    else if (cinfo.out_color_space == JCS_GRAYSCALE)
     {
       switch (primary)
       {
         case IMAGE_BLACK :
             ImageWhiteToBlack(in, out, img->xsize);
+            break;
+        case IMAGE_RGB :
+            ImageWhiteToRGB(in, out, img->xsize);
+            break;
+        case IMAGE_CMY :
+            ImageWhiteToCMY(in, out, img->xsize);
+            break;
+        case IMAGE_CMYK :
+            ImageWhiteToCMYK(in, out, img->xsize);
+            break;
+      };
+
+      ImagePutRow(img, 0, cinfo.output_scanline - 1, img->xsize, out);
+    }
+    else
+    {
+      switch (primary)
+      {
+        case IMAGE_WHITE :
+            ImageRGBToWhite(in, out, img->xsize);
+            break;
+        case IMAGE_BLACK :
+            ImageRGBToBlack(in, out, img->xsize);
             break;
         case IMAGE_CMY :
             ImageRGBToCMY(in, out, img->xsize);
@@ -133,5 +161,5 @@ ImageReadJPEG(image_t *img,
 
 
 /*
- * End of "$Id: image-jpeg.c,v 1.1 1998/02/19 20:43:33 mike Exp $".
+ * End of "$Id: image-jpeg.c,v 1.2 1998/02/24 18:39:46 mike Exp $".
  */
