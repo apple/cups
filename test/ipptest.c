@@ -1,5 +1,5 @@
 /*
- * "$Id: ipptest.c,v 1.8.2.8 2004/06/29 13:15:11 mike Exp $"
+ * "$Id: ipptest.c,v 1.8.2.9 2004/10/27 14:16:50 mike Exp $"
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
@@ -83,7 +83,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (argc < 3)
   {
-    fputs("Usage: testipp URL testfile [ ... testfileN ]\n", stderr);
+    fputs("Usage: ipptest URL testfile [ ... testfileN ]\n", stderr);
     return (1);
   }
 
@@ -807,5 +807,5 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 
 
 /*
- * End of "$Id: ipptest.c,v 1.8.2.8 2004/06/29 13:15:11 mike Exp $".
+ * End of "$Id: ipptest.c,v 1.8.2.9 2004/10/27 14:16:50 mike Exp $".
  */

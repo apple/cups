@@ -3,6 +3,12 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.22
 
+	- cupsDoFileRequest() now sets cupsLastError() to
+	  IPP_ERROR on network errors (STR #953)
+	- The pdftops filter didn't scale small pages up to the
+	  output page size when the fitplot option was used (STR
+	  #984)
+	- Fixed the ipptest program usage message (STR #959)
 	- Added Spanish man pages (STR #963)
 	- Fixed the order of comparisons in the client.conf
 	  reading code (STR #971)
@@ -12,6 +18,8 @@ CHANGES IN CUPS V1.1.22
 
 CHANGES IN CUPS V1.1.22rc2
 
+	- The pdftops filter didn't check the range of all
+	  integer attributes (STR #972)
 	- Documentation corrections (STR #944, STR #946)
 	- Also sanitize device URI in argv[0] (STR #933)
 	- cupsRasterReadHeader() didn't swap bytes for the

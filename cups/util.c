@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.81.2.37 2004/08/19 12:46:28 mike Exp $"
+ * "$Id: util.c,v 1.81.2.38 2004/10/27 14:16:50 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -1237,8 +1237,8 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
           last_error = IPP_NOT_FOUND;
 	  break;
       case HTTP_ERROR :
-          DEBUG_puts("Mapping HTTP error to IPP_SERVICE_UNAVAILABLE");
-          last_error = IPP_SERVICE_UNAVAILABLE;
+          DEBUG_puts("Mapping HTTP error to IPP_ERROR");
+          last_error = IPP_ERROR;
 	  break;
       case HTTP_UNAUTHORIZED :
           last_error = IPP_NOT_AUTHORIZED;
@@ -1708,5 +1708,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.81.2.37 2004/08/19 12:46:28 mike Exp $".
+ * End of "$Id: util.c,v 1.81.2.38 2004/10/27 14:16:50 mike Exp $".
  */
