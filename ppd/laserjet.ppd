@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: laserjet.ppd,v 1.5 2000/01/20 22:33:12 mike Exp $"
+*% "$Id: laserjet.ppd,v 1.6 2000/05/24 13:18:28 mike Exp $"
 *%
 *%   Sample HP LaserJet driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -36,8 +36,8 @@
 *ModelName:     "HP LaserJet Series"
 *ShortNickName: "HP LaserJet Series"
 *NickName:      "HP LaserJet Series CUPS v1.1"
-*PSVersion:	"(2017.000) 0"
-*LanguageLevel:	"2"
+*PSVersion:	"(3010.000) 550"
+*LanguageLevel:	"3"
 *ColorDevice:	False
 *DefaultColorSpace: Gray
 *FileSystem:	False
@@ -49,18 +49,23 @@
 *UIConstraints: *PageSize Executive *InputSlot Envelope
 *UIConstraints: *PageSize Letter *InputSlot Envelope
 *UIConstraints: *PageSize Legal *InputSlot Envelope
+*UIConstraints: *PageSize Tabloid *InputSlot Envelope
+*UIConstraints: *PageSize A3 *InputSlot Envelope
 *UIConstraints: *PageSize A4 *InputSlot Envelope
 *UIConstraints: *PageSize A5 *InputSlot Envelope
 *UIConstraints: *PageSize B5 *InputSlot Envelope
+*UIConstraints:	*Duplex *Option1 False
 
 *OpenUI *PageSize/Media Size: PickOne
 *OrderDependency: 10 AnySetup *PageSize
 *DefaultPageSize: Letter
-*PageSize Letter/Letter:	"<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
-*PageSize Legal/Legal:		"<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
-*PageSize Executive/Executive:	"<</PageSize[522 756]/ImagingBBox null>>setpagedevice"
+*PageSize Letter/US Letter:	"<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*PageSize Legal/US Legal:	"<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+*PageSize Executive/US Executive: "<</PageSize[522 756]/ImagingBBox null>>setpagedevice"
+*PageSize Tabloid/US Tabloid:	"<</PageSize[792 1224]/ImagingBBox null>>setpagedevice"
+*PageSize A3/A3:		"<</PageSize[842 1191]/ImagingBBox null>>setpagedevice"
 *PageSize A4/A4:		"<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
-*PageSize A5/A5:		"<</PageSize[420 595]/ImagingBBox null>>setpagedevice"
+*PageSize A5/A5:		"<</PageSize[421 595]/ImagingBBox null>>setpagedevice"
 *PageSize B5/B5 (JIS):		"<</PageSize[516 729]/ImagingBBox null>>setpagedevice"
 *PageSize EnvISOB5/Envelope B5: "<</PageSize[499 709]/ImagingBBox null>>setpagedevice"
 *PageSize Env10/Envelope #10:	"<</PageSize[297 684]/ImagingBBox null>>setpagedevice"
@@ -72,9 +77,11 @@
 *OpenUI *PageRegion: PickOne
 *OrderDependency: 10 AnySetup *PageRegion
 *DefaultPageRegion: Letter
-*PageRegion Letter/Letter:	"<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
-*PageRegion Legal/Legal:	"<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
-*PageRegion Executive/Executive: "<</PageSize[522 756]/ImagingBBox null>>setpagedevice"
+*PageRegion Letter/US Letter:	"<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*PageRegion Legal/US Legal:	"<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+*PageRegion Executive/US Executive: "<</PageSize[522 756]/ImagingBBox null>>setpagedevice"
+*PageRegion Tabloid/US Tabloid:	"<</PageSize[792 1224]/ImagingBBox null>>setpagedevice"
+*PageRegion A3/A3:		"<</PageSize[842 1191]/ImagingBBox null>>setpagedevice"
 *PageRegion A4/A4:		"<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
 *PageRegion A5/A5:		"<</PageSize[421 595]/ImagingBBox null>>setpagedevice"
 *PageRegion B5/B5 (JIS):	"<</PageSize[516 729]/ImagingBBox null>>setpagedevice"
@@ -85,10 +92,12 @@
 *PageRegion EnvMonarch/Envelope Monarch: "<</PageSize[279 540]/ImagingBBox null>>setpagedevice"
 *CloseUI: *PageRegion
 
-*DefaultImageableArea: Letter
+*DefaultImageableArea: Letter 
 *ImageableArea Letter/US Letter:	"18 36 594 756"
 *ImageableArea Legal/US Legal:		"18 36 594 972"
-*ImageableArea Executive/Executive:	"18 36 504 684"
+*ImageableArea Executive/US Executive:	"18 36 504 684"
+*ImageableArea Tabloid/US Tabloid:	"18 36 774 1188"
+*ImageableArea A3/A3:			"18 36 824 1155"
 *ImageableArea A4/A4:			"18 36 577 806"
 *ImageableArea A5/A5:			"18 36 403 559"
 *ImageableArea B5/JIS B5:		"18 36 498 693"
@@ -99,9 +108,11 @@
 *ImageableArea EnvMonarch/Envelope Monarch: "18 36 261 504"
 
 *DefaultPaperDimension: Letter
-*PaperDimension Letter/Letter:		"612 792"
-*PaperDimension Legal/Legal:		"612 1008"
-*PaperDimension Executive/Executive:	"522 756"
+*PaperDimension Letter/US Letter:	"612 792"
+*PaperDimension Legal/US Legal:		"612 1008"
+*PaperDimension Executive/US Executive:	"522 756"
+*PaperDimension Tabloid/US Tabloid:	"792 1224"
+*PaperDimension A3/A3:			"842 1191"
 *PaperDimension A4/A4:			"595 842"
 *PaperDimension A5/A5:			"421 595"
 *PaperDimension B5/B5 (JIS):		"516 729"
@@ -130,6 +141,22 @@
 *Resolution 300dpi/300 DPI: "<</HWResolution[300 300]/cupsColorOrder 0/cupsColorSpace 3/cupsCompression 2>>setpagedevice"
 *Resolution 600dpi/600 DPI: "<</HWResolution[600 600]/cupsColorOrder 0/cupsColorSpace 3/cupsCompression 2>>setpagedevice"
 *CloseUI: *Resolution
+
+*OpenUI *Duplex/Double-Sided Printing: PickOne
+*OrderDependency: 20 AnySetup *Duplex
+*DefaultDuplex: None
+*Duplex None/Off:	"<</Duplex false>>setpagedevice"
+*Duplex DuplexNoTumble/Long Edge (Standard):	"<</Duplex true/Tumble false>>setpagedevice"
+*Duplex DuplexTumble/Short Edge (Flip):	"<</Duplex true/Tumble true>>setpagedevice"
+*CloseUI:	*Duplex
+
+*OpenGroup: InstallableOptions
+*OpenUI *Option1/Duplexer: Boolean
+*DefaultOption1: False
+*Option1 True/Installed:	""
+*Option1 False/Not Installed:	""
+*CloseUI *Option1
+*CloseGroup: InstallableOptions
 
 *DefaultFont: Courier
 *Font AvantGarde-Book: Standard "(001.006S)" Standard ROM
@@ -168,5 +195,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: laserjet.ppd,v 1.5 2000/01/20 22:33:12 mike Exp $".
+*% End of "$Id: laserjet.ppd,v 1.6 2000/05/24 13:18:28 mike Exp $".
 *%
