@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.58 2000/04/27 21:31:37 mike Exp $"
+# "$Id: cups.list,v 1.59 2000/04/29 12:35:53 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -28,7 +28,7 @@
 %vendor Easy Software Products
 %license LICENSE.txt
 %readme README.txt
-%version 1.1b3
+%version 1.1b4
 %incompat printpro
 
 %system all
@@ -129,16 +129,23 @@ f 0444 root sys /usr/lib/locale/fr/cups_fr locale/fr/cups_fr
 f 0444 root sys /usr/lib/locale/it/cups_it locale/it/cups_it
 
 %system all
-f 0444 root sys /usr/share/cups/charsets/cp874 data/cp874
-f 0444 root sys /usr/share/cups/charsets/cp1250 data/cp1250
-f 0444 root sys /usr/share/cups/charsets/cp1251 data/cp1251
-f 0444 root sys /usr/share/cups/charsets/cp1252 data/cp1252
-f 0444 root sys /usr/share/cups/charsets/cp1253 data/cp1253
-f 0444 root sys /usr/share/cups/charsets/cp1254 data/cp1254
-f 0444 root sys /usr/share/cups/charsets/cp1255 data/cp1255
-f 0444 root sys /usr/share/cups/charsets/cp1256 data/cp1256
-f 0444 root sys /usr/share/cups/charsets/cp1257 data/cp1257
-f 0444 root sys /usr/share/cups/charsets/cp1258 data/cp1258
+f 0444 root sys /usr/share/cups/banners/classified data/classified
+f 0444 root sys /usr/share/cups/banners/confidential data/confidential
+f 0444 root sys /usr/share/cups/banners/secret data/secret
+f 0444 root sys /usr/share/cups/banners/standard data/standard
+f 0444 root sys /usr/share/cups/banners/topsecret data/topsecret
+f 0444 root sys /usr/share/cups/banners/classified data/unclassified
+
+f 0444 root sys /usr/share/cups/charsets/windows-874 data/windows-874
+f 0444 root sys /usr/share/cups/charsets/windows-1250 data/windows-1250
+f 0444 root sys /usr/share/cups/charsets/windows-1251 data/windows-1251
+f 0444 root sys /usr/share/cups/charsets/windows-1252 data/windows-1252
+f 0444 root sys /usr/share/cups/charsets/windows-1253 data/windows-1253
+f 0444 root sys /usr/share/cups/charsets/windows-1254 data/windows-1254
+f 0444 root sys /usr/share/cups/charsets/windows-1255 data/windows-1255
+f 0444 root sys /usr/share/cups/charsets/windows-1256 data/windows-1256
+f 0444 root sys /usr/share/cups/charsets/windows-1257 data/windows-1257
+f 0444 root sys /usr/share/cups/charsets/windows-1258 data/windows-1258
 f 0444 root sys /usr/share/cups/charsets/iso-8859-1 data/iso-8859-1
 f 0444 root sys /usr/share/cups/charsets/iso-8859-14 data/iso-8859-14
 f 0444 root sys /usr/share/cups/charsets/iso-8859-15 data/iso-8859-15
@@ -441,5 +448,5 @@ i 0555 root sys cups cups.sh
 f 0444 root sys /etc/pam.d/cups data/cups.pam
 
 #
-# End of "$Id: cups.list,v 1.58 2000/04/27 21:31:37 mike Exp $".
+# End of "$Id: cups.list,v 1.59 2000/04/29 12:35:53 mike Exp $".
 #

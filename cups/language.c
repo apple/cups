@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.15 2000/04/09 23:08:59 mike Exp $"
+ * "$Id: language.c,v 1.16 2000/04/29 12:35:54 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -50,30 +50,30 @@ static char		*lang_blank = "";	/* Blank constant string */
 static char		*lang_encodings[] =	/* Encoding strings */
 			{
 			  "us-ascii",
-			  "iso8859-1",
-			  "iso8859-2",
-			  "iso8859-3",
-			  "iso8859-4",
-			  "iso8859-5",
-			  "iso8859-6",
-			  "iso8859-7",
-			  "iso8859-8",
-			  "iso8859-9",
-			  "iso8859-10",
-			  "utf8",
-			  "iso8859-13",
-			  "iso8859-14",
-			  "iso8859-15",
-			  "cp874",
-			  "cp1250",
-			  "cp1251",
-			  "cp1252",
-			  "cp1253",
-			  "cp1254",
-			  "cp1255",
-			  "cp1256",
-			  "cp1257",
-			  "cp1258"
+			  "iso-8859-1",
+			  "iso-8859-2",
+			  "iso-8859-3",
+			  "iso-8859-4",
+			  "iso-8859-5",
+			  "iso-8859-6",
+			  "iso-8859-7",
+			  "iso-8859-8",
+			  "iso-8859-9",
+			  "iso-8859-10",
+			  "utf-8",
+			  "iso-8859-13",
+			  "iso-8859-14",
+			  "iso-8859-15",
+			  "windows-874",
+			  "windows-1250",
+			  "windows-1251",
+			  "windows-1252",
+			  "windows-1253",
+			  "windows-1254",
+			  "windows-1255",
+			  "windows-1256",
+			  "windows-1257",
+			  "windows-1258"
 			};
 static char		*lang_default[] =	/* Default POSIX locale */
 			{
@@ -303,7 +303,6 @@ cupsLangGet(const char *language) /* I - Language or locale */
     lang_cache = lang;
   }
 
-
  /*
   * Free all old strings as needed...
   */
@@ -399,5 +398,5 @@ cupsLangGet(const char *language) /* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.15 2000/04/09 23:08:59 mike Exp $".
+ * End of "$Id: language.c,v 1.16 2000/04/29 12:35:54 mike Exp $".
  */

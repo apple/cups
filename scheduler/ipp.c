@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.62 2000/04/26 20:47:08 mike Exp $"
+ * "$Id: ipp.c,v 1.63 2000/04/29 12:35:57 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3193,8 +3193,6 @@ print_job(client_t        *con,		/* I - Client connection */
 
   strncpy(job->title, title, sizeof(job->title) - 1);
 
-  con->filename[0] = '\0';
-
   attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME);
 
   if (con->username[0])
@@ -3275,6 +3273,7 @@ print_job(client_t        *con,		/* I - Client connection */
 
   sprintf(filename, "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
   rename(con->filename, filename);
+  con->filename[0] = '\0';
 
  /*
   * See if we need to add the ending sheet...
@@ -4765,5 +4764,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.62 2000/04/26 20:47:08 mike Exp $".
+ * End of "$Id: ipp.c,v 1.63 2000/04/29 12:35:57 mike Exp $".
  */
