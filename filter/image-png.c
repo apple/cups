@@ -1,5 +1,5 @@
 /*
- * "$Id: image-png.c,v 1.2 1998/03/19 16:57:12 mike Exp $"
+ * "$Id: image-png.c,v 1.3 1998/07/28 18:48:34 mike Exp $"
  *
  *   PNG image routines for espPrint, a collection of printer drivers.
  *
@@ -16,12 +16,14 @@
  * Revision History:
  *
  *   $Log: image-png.c,v $
- *   Revision 1.2  1998/03/19 16:57:12  mike
+ *   Revision 1.3  1998/07/28 18:48:34  mike
+ *   Fixed possible bug in printing of grayscale images < 8bpp.
+ *
+ *   Revision 1.2  1998/03/19  16:57:12  mike
  *   Fixed PPI calculation - was dividing instead of multiplying...
  *
  *   Revision 1.1  1998/02/19  20:43:33  mike
  *   Initial revision
- *
  */
 
 /*
@@ -91,7 +93,6 @@ ImageReadPNG(image_t *img,
   if (info->bit_depth < 8)
   {
     png_set_packing(pp);
-    png_set_expand(pp);
 
     if (info->valid & PNG_INFO_sBIT)
       png_set_shift(pp, &(info->sig_bit));
@@ -187,5 +188,5 @@ ImageReadPNG(image_t *img,
 
 
 /*
- * End of "$Id: image-png.c,v 1.2 1998/03/19 16:57:12 mike Exp $".
+ * End of "$Id: image-png.c,v 1.3 1998/07/28 18:48:34 mike Exp $".
  */
