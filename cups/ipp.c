@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.6 2001/12/29 00:05:24 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.7 2001/12/29 23:33:03 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -931,7 +931,7 @@ ippRead(http_t *http,		/* I - HTTP connection */
   if (http == NULL)
     return (IPP_ERROR);
 
-  return (ippReadIO(http, (ipp_iocb_t *)ipp_read_http,
+  return (ippReadIO(http, (ipp_iocb_t)ipp_read_http,
                     http->blocking || http->used != 0, NULL, ipp));
 }
 
@@ -946,7 +946,7 @@ ippReadFile(int   fd,		/* I - HTTP data */
 {
   DEBUG_printf(("ippReadFile(%d, %p)\n", fd, ipp));
 
-  return (ippReadIO(&fd, (ipp_iocb_t *)ipp_read_file, 1, NULL, ipp));
+  return (ippReadIO(&fd, (ipp_iocb_t)ipp_read_file, 1, NULL, ipp));
 }
 
 
@@ -956,7 +956,7 @@ ippReadFile(int   fd,		/* I - HTTP data */
 
 ipp_state_t			/* O - Current state */
 ippReadIO(void       *src,	/* I - Data source */
-          ipp_iocb_t *cb,	/* I - Read callback function */
+          ipp_iocb_t cb,	/* I - Read callback function */
 	  int        blocking,	/* I - Use blocking IO? */
 	  ipp_t      *parent,	/* I - Parent request, if any */
           ipp_t      *ipp)	/* I - IPP data */
@@ -969,7 +969,8 @@ ippReadIO(void       *src,	/* I - Data source */
   ipp_value_t		*value;		/* Current value */
 
 
-  DEBUG_printf(("ippReadIO(%p, %p)\n", src, ipp));
+  DEBUG_printf(("ippReadIO(%p, %p, %d, %p, %p)\n", src, cb, blocking,
+                parent, ipp));
 
   if (src == NULL || ipp == NULL)
     return (IPP_ERROR);
@@ -1367,7 +1368,7 @@ ippWrite(http_t *http,		/* I - HTTP connection */
   if (http == NULL)
     return (IPP_ERROR);
 
-  return (ippWriteIO(http, (ipp_iocb_t *)httpWrite,
+  return (ippWriteIO(http, (ipp_iocb_t)httpWrite,
                      http->blocking, NULL, ipp));
 }
 
@@ -1382,7 +1383,7 @@ ippWriteFile(int   fd,		/* I - HTTP data */
 {
   DEBUG_printf(("ippWriteFile(%d, %p)\n", fd, ipp));
 
-  return (ippWriteIO(&fd, (ipp_iocb_t *)ipp_write_file, 1, NULL, ipp));
+  return (ippWriteIO(&fd, (ipp_iocb_t)ipp_write_file, 1, NULL, ipp));
 }
 
 
@@ -1392,7 +1393,7 @@ ippWriteFile(int   fd,		/* I - HTTP data */
 
 ipp_state_t			/* O - Current state */
 ippWriteIO(void       *dst,	/* I - Destination */
-           ipp_iocb_t *cb,	/* I - Write callback function */
+           ipp_iocb_t cb,	/* I - Write callback function */
 	   int        blocking,	/* I - Use blocking IO? */
 	   ipp_t      *parent,	/* I - Parent IPP request */
            ipp_t      *ipp)	/* I - IPP data */
@@ -1404,6 +1405,9 @@ ippWriteIO(void       *dst,	/* I - Destination */
   ipp_attribute_t	*attr;		/* Current attribute */
   ipp_value_t		*value;		/* Current value */
 
+
+  DEBUG_printf(("ippWriteIO(%p, %p, %d, %p, %p)\n", dst, cb, blocking,
+                parent, ipp));
 
   if (dst == NULL || ipp == NULL)
     return (IPP_ERROR);
@@ -2199,5 +2203,5 @@ ipp_write_mem(ipp_mem_t   *m,		/* I - Memory buffer */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.6 2001/12/29 00:05:24 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.7 2001/12/29 23:33:03 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: http-addr.c,v 1.1.2.1 2001/04/02 19:54:02 mike Exp $"
+ * "$Id: http-addr.c,v 1.1.2.2 2001/12/29 23:33:03 mike Exp $"
  *
  *   HTTP address routines for the Common UNIX Printing System (CUPS).
  *
@@ -80,6 +80,7 @@ httpAddrLoad(const struct hostent *host,	/* I - Host entry */
 
     memcpy((char *)&(addr->ipv6.sin6_addr), host->h_addr_list[n],
            host->h_length);
+    addr->ipv6.sin6_family = AF_INET6;
   }
   else
 #endif /* AF_INET6 */
@@ -92,6 +93,7 @@ httpAddrLoad(const struct hostent *host,	/* I - Host entry */
 
     memcpy((char *)&(addr->ipv4.sin_addr), host->h_addr_list[n],
            host->h_length);
+    addr->ipv4.sin_family = AF_INET;
   }
 }
 
@@ -200,5 +202,5 @@ httpAddrString(const http_addr_t *addr,		/* I - Address to convert */
 
 
 /*
- * End of "$Id: http-addr.c,v 1.1.2.1 2001/04/02 19:54:02 mike Exp $".
+ * End of "$Id: http-addr.c,v 1.1.2.2 2001/12/29 23:33:03 mike Exp $".
  */
