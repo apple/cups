@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.148 2003/04/03 03:30:13 mike Exp $"
+ * "$Id: printers.c,v 1.149 2003/04/16 20:31:45 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -223,6 +223,8 @@ AddPrinterHistory(printer_t *p)		/* I - Printer */
   * Retire old history data as needed...
   */
 
+  p->sequence_number ++;
+
   if (p->num_history >= MaxPrinterHistory)
   {
     p->num_history --;
@@ -238,6 +240,8 @@ AddPrinterHistory(printer_t *p)		/* I - Printer */
   history = ippNew();
   ippAddInteger(history, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state",
                 p->state);
+  ippAddBoolean(history, IPP_TAG_PRINTER, "printer-is-accepting-jobs",
+                p->accepting);
   ippAddString(history, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-state-message",
                NULL, p->state_message);
   if (p->num_reasons == 0)
@@ -248,8 +252,10 @@ AddPrinterHistory(printer_t *p)		/* I - Printer */
     ippAddStrings(history, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                   "printer-state-reasons", p->num_reasons, NULL,
 		  (const char * const *)p->reasons);
-  ippAddInteger(history, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state-time",
-                p->state_time);
+  ippAddInteger(history, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                "printer-state-time", p->state_time);
+  ippAddInteger(history, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                "printer-state-sequence-number", p->sequence_number);
 
   p->history[p->num_history] = history;
   p->num_history ++;
@@ -1771,7 +1777,12 @@ SetPrinterState(printer_t    *p,	/* I - Printer to change */
   */
 
   if ((old_state == IPP_PRINTER_STOPPED) != (s == IPP_PRINTER_STOPPED))
-    SaveAllPrinters();
+  {
+    if (p->type & CUPS_PRINTER_CLASS)
+      SaveAllClasses();
+    else
+      SaveAllPrinters();
+  }
 }
 
 
@@ -1843,7 +1854,7 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
   * Set the printer state...
   */
 
-  p->state = IPP_PRINTER_STOPPED;
+  SetPrinterState(p, IPP_PRINTER_STOPPED);
 
  /*
   * See if we have a job printing on this printer...
@@ -2365,5 +2376,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.148 2003/04/03 03:30:13 mike Exp $".
+ * End of "$Id: printers.c,v 1.149 2003/04/16 20:31:45 mike Exp $".
  */
