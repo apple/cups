@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.6 1998/08/10 16:20:08 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.7 1998/11/16 15:47:04 mike Exp $"
  *
  *   Image file to STIFF conversion program for espPrint, a collection
  *   of printer drivers.
@@ -17,7 +17,10 @@
  * Revision History:
  *
  *   $Log: imagetoraster.c,v $
- *   Revision 1.6  1998/08/10 16:20:08  mike
+ *   Revision 1.7  1998/11/16 15:47:04  mike
+ *   make_lut() didn't limit value to 1.0 (255)...
+ *
+ *   Revision 1.6  1998/08/10  16:20:08  mike
  *   Fixed scaling problems.
  *
  *   Revision 1.5  1998/07/28  20:48:30  mike
@@ -1125,6 +1128,8 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
       v = 1.0 - pow((float)i / 255.0, ig);
 
     v = pd * pow(v * ib, pg);
+    if (v > 1.0)
+      v = 1.0;
 
     if (colorspace < 0)
     {
@@ -1141,5 +1146,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.6 1998/08/10 16:20:08 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.7 1998/11/16 15:47:04 mike Exp $".
  */
