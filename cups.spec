@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.32 2001/05/21 21:39:39 mike Exp $"
+# "$Id: cups.spec,v 1.33 2001/05/30 16:01:30 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -26,7 +26,7 @@
 
 Summary: Common Unix Printing System
 Name: cups
-Version: 1.1.8
+Version: 1.1.9
 Release: 1
 Copyright: GPL
 Group: System Environment/Daemons
@@ -61,7 +61,7 @@ The Common UNIX Printing System provides a portable printing layer for
 UNIX® operating systems. This is the development package for creating
 additional printer drivers, and other CUPS services.
 
-%description devel
+%description pstoraster
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This is the PostScript RIP package for
 supporting non-PostScript printer drivers.
@@ -170,6 +170,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/cups/backend/*
 %dir /usr/lib/cups/cgi-bin
 /usr/lib/cups/cgi-bin/*
+%dir /usr/lib/cups/daemon
+/usr/lib/cups/daemon/*
 %dir /usr/lib/cups/filter
 /usr/lib/cups/filter/hpgltops
 /usr/lib/cups/filter/imagetops
@@ -213,5 +215,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/pstoraster/*
 
 #
-# End of "$Id: cups.spec,v 1.32 2001/05/21 21:39:39 mike Exp $".
+# End of "$Id: cups.spec,v 1.33 2001/05/30 16:01:30 mike Exp $".
 #
