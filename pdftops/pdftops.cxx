@@ -43,6 +43,9 @@ int main(int argc, char *argv[]) {
   int		bytes;
 
 
+  // Make sure status messages are not buffered...
+  setbuf(stderr, NULL);
+
   // Make sure we have the right number of arguments for CUPS!
   if (argc < 6 || argc > 7)
   {
