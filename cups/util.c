@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.55 2000/07/18 16:56:11 mike Exp $"
+ * "$Id: util.c,v 1.56 2000/07/20 16:31:38 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -652,12 +652,19 @@ cupsGetDefault(void)
 const char *				/* O - Filename for PPD file */
 cupsGetPPD(const char *name)		/* I - Printer name */
 {
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  ipp_attribute_t *attr;		/* Current attribute */
+  cups_lang_t	*language;		/* Local language */
   FILE		*fp;			/* PPD file */
   int		bytes;			/* Number of bytes read */
   char		buffer[8192];		/* Buffer for file */
   char		printer[HTTP_MAX_URI],	/* Printer name */
+		method[HTTP_MAX_URI],	/* Method/scheme name */
+		username[HTTP_MAX_URI],	/* Username:password */
 		hostname[HTTP_MAX_URI],	/* Hostname */
 		resource[HTTP_MAX_URI];	/* Resource name */
+  int		port;			/* Port number */
   const char	*password;		/* Password string */
   char		realm[HTTP_MAX_VALUE],	/* realm="xyz" string */
 		nonce[HTTP_MAX_VALUE],	/* nonce="xyz" string */
@@ -675,6 +682,84 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   {
     last_error = IPP_SERVICE_UNAVAILABLE;
     return (NULL);
+  }
+
+  if (strchr(name, '@') == NULL)
+  {
+   /*
+    * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
+    * attributes:
+    *
+    *    attributes-charset
+    *    attributes-natural-language
+    *    printer-uri
+    */
+
+    request = ippNew();
+
+    request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+    request->request.op.request_id   = 1;
+
+    language = cupsLangDefault();
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	 "attributes-charset", NULL, cupsLangEncoding(language));
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+        	 "attributes-natural-language", NULL, language->language);
+
+    snprintf(buffer, sizeof(buffer), "ipp://localhost/printers/%s", name);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
+                 "printer-uri", NULL, buffer);
+
+   /*
+    * Do the request and get back a response...
+    */
+
+    if ((response = cupsDoRequest(cups_server, request, "/")) != NULL)
+    {
+      last_error = response->request.status.status_code;
+
+      if ((attr = ippFindAttribute(response, "printer-uri-supported",
+                                   IPP_TAG_URI)) != NULL)
+      {
+       /*
+        * Get the actual server and printer names...
+	*/
+
+        httpSeparate(attr->values[0].string.text, method, username, hostname,
+	             &port, resource);
+        strcpy(printer, strrchr(resource, '/') + 1);
+
+       /*
+        * Remap local hostname to localhost...
+	*/
+
+        gethostname(buffer, sizeof(buffer));
+
+	if (strcasecmp(buffer, hostname) == 0)
+	  strcpy(hostname, "localhost");
+      }
+
+      ippDelete(response);
+    }
+
+    cupsLangFree(language);
+
+   /*
+    * Reconnect to the correct server as needed...
+    */
+
+    if (strcasecmp(cups_server->hostname, hostname) != 0)
+    {
+      httpClose(cups_server);
+
+      if ((cups_server = httpConnect(hostname, ippPort())) == NULL)
+      {
+	last_error = IPP_SERVICE_UNAVAILABLE;
+	return (NULL);
+      }
+    }
   }
 
  /*
@@ -780,6 +865,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
     * Can't open file; close the server connection and return NULL...
     */
 
+    httpFlush(cups_server);
     httpClose(cups_server);
     cups_server = NULL;
     return (NULL);
@@ -1272,7 +1358,7 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
     * Put root temp files in restricted temp directory...
     */
 
-    if (getuid())
+    if (getuid() == 0)
       tmpdir = CUPS_REQUESTS "/tmp";
     else
       tmpdir = "/var/tmp";
@@ -1410,5 +1496,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.55 2000/07/18 16:56:11 mike Exp $".
+ * End of "$Id: util.c,v 1.56 2000/07/20 16:31:38 mike Exp $".
  */
