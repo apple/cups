@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.19 1999/06/03 13:47:27 mike Exp $"
+ * "$Id: ppd.c,v 1.20 1999/06/03 19:06:51 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -40,6 +40,7 @@
  *   ppdOpenFile()     - Read a PPD file into memory.
  *   ppd_read()        - Read a line from a PPD file, skipping comment lines
  *                       as necessary.
+ *   compare_strings() - Compare two strings.
  *   compare_groups()  - Compare two groups.
  *   compare_options() - Compare two options.
  *   compare_choices() - Compare two choices.
@@ -78,6 +79,7 @@
  * Local functions...
  */
 
+static int		compare_strings(char *s, char *t);
 static int		compare_groups(ppd_group_t *g0, ppd_group_t *g1);
 static int		compare_options(ppd_option_t *o0, ppd_option_t *o1);
 static int		compare_choices(ppd_choice_t *c0, ppd_choice_t *c1);
@@ -793,7 +795,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
             strcmp(name, "OutputOrder") != 0 &&
 	    strcmp(name, "PageSize") != 0 &&
             strcmp(name, "PageRegion") != 0)
-	  group = ppd_get_group(ppd, "Printer");
+	  group = ppd_get_group(ppd, "Extra");
 	else
 	  group = ppd_get_group(ppd, "General");
 
@@ -1288,6 +1290,111 @@ ppdOpenFile(char *filename)	/* I - File to read from */
 
 
 /*
+ * 'compare_strings()' - Compare two strings.
+ */
+
+int				/* O - Result of comparison */
+compare_strings(char *s,	/* I - First string */
+                char *t)	/* I - Second string */
+{
+  int	diff,			/* Difference between digits */
+	digits;			/* Number of digits */
+
+
+ /*
+  * Loop through both strings, returning only when a difference is
+  * seen.  Also, compare whole numbers rather than just characters, too!
+  */
+
+  while (*s && *t)
+  {
+    if (isdigit(*s) && isdigit(*t))
+    {
+     /*
+      * Got a number; start by skipping leading 0's...
+      */
+
+      while (*s == '0')
+        s ++;
+      while (*t == '0')
+        t ++;
+
+     /*
+      * Skip equal digits...
+      */
+
+      while (isdigit(*s) && *s == *t)
+      {
+        s ++;
+	t ++;
+      }
+
+     /*
+      * Bounce out if *s and *t aren't both digits...
+      */
+
+      if (!isdigit(*s) || !isdigit(*t))
+        continue;     
+
+      if (*s < *t)
+        diff = -1;
+      else
+        diff = 1;
+
+     /*
+      * Figure out how many more digits there are...
+      */
+
+      digits = 0;
+
+      while (isdigit(*s))
+      {
+        digits ++;
+	s ++;
+      }
+
+      while (isdigit(*t))
+      {
+        digits --;
+	t ++;
+      }
+
+     /*
+      * Return if the number or value of the digits is different...
+      */
+
+      if (digits < 0)
+        return (-1);
+      else if (digits > 0)
+        return (1);
+      else
+        return (diff);
+    }
+    else if (tolower(*s) < tolower(*t))
+      return (-1);
+    else if (tolower(*s) > tolower(*t))
+      return (1);
+    else
+    {
+      s ++;
+      t ++;
+    }
+  }
+
+ /*
+  * Return the results of the final comparison...
+  */
+
+  if (*s)
+    return (1);
+  else if (*t)
+    return (-1);
+  else
+    return (0);
+}
+
+
+/*
  * 'compare_groups()' - Compare two groups.
  */
 
@@ -1295,7 +1402,7 @@ static int			/* O - Result of comparison */
 compare_groups(ppd_group_t *g0,	/* I - First group */
                ppd_group_t *g1)	/* I - Second group */
 {
-  return (strcasecmp(g0->text, g1->text));
+  return (compare_strings(g0->text, g1->text));
 }
 
 
@@ -1307,7 +1414,7 @@ static int			/* O - Result of comparison */
 compare_options(ppd_option_t *o0,/* I - First option */
                 ppd_option_t *o1)/* I - Second option */
 {
-  return (strcasecmp(o0->text, o1->text));
+  return (compare_strings(o0->text, o1->text));
 }
 
 
@@ -1319,7 +1426,7 @@ static int			/* O - Result of comparison */
 compare_choices(ppd_choice_t *c0,/* I - First choice */
                 ppd_choice_t *c1)/* I - Second choice */
 {
-  return (strcasecmp(c0->text, c1->text));
+  return (compare_strings(c0->text, c1->text));
 }
 
 
@@ -1573,8 +1680,6 @@ ppd_decode(char *string)	/* I - String to decode */
 }
 
 
-
-
 /*
- * End of "$Id: ppd.c,v 1.19 1999/06/03 13:47:27 mike Exp $".
+ * End of "$Id: ppd.c,v 1.20 1999/06/03 19:06:51 mike Exp $".
  */
