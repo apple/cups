@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.27 2003/01/24 20:45:12 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.28 2003/01/28 21:43:57 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -2143,7 +2143,7 @@ _ipp_add_attr(ipp_t *ipp,			/* I - IPP request */
 
   DEBUG_printf(("_ipp_add_attr(%p, %d)\n", ipp, num_values));
 
-  if (ipp == NULL || num_values < 1)
+  if (ipp == NULL || num_values < 0)
     return (NULL);
 
   attr = calloc(sizeof(ipp_attribute_t) +
@@ -2562,5 +2562,5 @@ ipp_write_mem(ipp_mem_t   *m,			/* I - Memory buffer */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.27 2003/01/24 20:45:12 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.28 2003/01/28 21:43:57 mike Exp $".
  */
