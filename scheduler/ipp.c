@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.79 2000/06/28 16:13:13 mike Exp $"
+ * "$Id: ipp.c,v 1.80 2000/06/28 16:26:02 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2751,7 +2751,8 @@ hold_job(client_t        *con,	/* I - Client connection */
          ipp_attribute_t *uri)	/* I - Job or Printer URI */
 {
   int			i;		/* Looping var */
-  ipp_attribute_t	*attr;		/* Current attribute */
+  ipp_attribute_t	*attr,		/* Current job-hold-until */
+			*newattr;	/* New job-hold-until */
   int			jobid;		/* Job ID */
   char			method[HTTP_MAX_URI],
 					/* Method portion of URI */
@@ -2897,11 +2898,31 @@ hold_job(client_t        *con,	/* I - Client connection */
 
   HoldJob(jobid);
 
+  if ((newattr = ippFindAttribute(con->request, "job-hold-until", IPP_TAG_KEYWORD)) == NULL)
+    newattr = ippFindAttribute(con->request, "job-hold-until", IPP_TAG_NAME);
+
   if ((attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_KEYWORD)) == NULL)
     attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
 
-  if (attr != NULL && strcmp(attr->values[0].string.text, "no-hold") != 0)
+  if (attr != NULL)
   {
+   /*
+    * Free the old hold value and copy the new one over...
+    */
+
+    free(attr->values[0].string.text);
+
+    if (newattr != NULL)
+    {
+      attr->value_tag = newattr->value_tag;
+      attr->values[0].string.text = strdup(newattr->values[0].string.text);
+    }
+    else
+    {
+      attr->value_tag = IPP_TAG_KEYWORD;
+      attr->values[0].string.text = strdup("indefinite");
+    }
+
    /*
     * Hold job until specified time...
     */
@@ -3742,6 +3763,20 @@ release_job(client_t        *con,	/* I - Client connection */
       send_ipp_error(con, IPP_FORBIDDEN);
       return;
     }
+  }
+
+ /*
+  * Reset the job-hold-until value to "no-hold"...
+  */
+
+  if ((attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_KEYWORD)) == NULL)
+    attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
+
+  if (attr != NULL)
+  {
+    free(attr->values[0].string.text);
+    attr->value_tag = IPP_TAG_KEYWORD;
+    attr->values[0].string.text = strdup("no-hold");
   }
 
  /*
@@ -4937,5 +4972,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.79 2000/06/28 16:13:13 mike Exp $".
+ * End of "$Id: ipp.c,v 1.80 2000/06/28 16:26:02 mike Exp $".
  */
