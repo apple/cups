@@ -21,7 +21,7 @@
 % Ghostscript, as distributed by Aladdin Enterprises, does not require any
 % GNU software to build or run it.
 
-% $Id: pdf_base.ps,v 1.3 2000/03/09 15:09:29 mike Exp $
+% $Id: pdf_base.ps,v 1.4 2000/04/12 14:20:26 mike Exp $
 % pdf_base.ps
 % Basic parser for PDF reader.
 
@@ -403,7 +403,8 @@ pdfdict begin
 	 if
 	 pdf_run_resolve	% PDFfile resolveopdict .pdfrun
        }
-       { Objects exch null lput pop null
+       {		% Don't cache if the generation # is wrong.
+	 pop pop null
        }
       ifelse exch PDFfile exch setfileposition
     }

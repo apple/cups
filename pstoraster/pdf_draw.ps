@@ -1,5 +1,4 @@
-% Copyright 1993-2000 by Easy Software Products.
-% Copyright 1994, 1995, 1997, 1998 Aladdin Enterprises.  All rights reserved.
+%    Copyright (C) 1994, 1995, 1997, 1998 Aladdin Enterprises.  All rights reserved.
 % 
 % This file is part of GNU Ghostscript.
 % 
@@ -22,7 +21,7 @@
 % Ghostscript, as distributed by Aladdin Enterprises, does not require any
 % GNU software to build or run it.
 
-% $Id: pdf_draw.ps,v 1.6 2000/03/13 18:30:14 mike Exp $
+% $Id: pdf_draw.ps,v 1.7 2000/04/12 14:20:26 mike Exp $
 % pdf_draw.ps
 % PDF drawing operations (graphics, text, and images).
 
@@ -304,8 +303,10 @@ end
     4 array astore
   }
   /Indexed {
-    aload pop 3 -1 roll oforce resolvecolorspace 3 1 roll
-    oforce dup type /stringtype ne {
+    aload pop 3 -1 roll resolvecolorspace 3 1 roll
+    oforce dup type /stringtype eq {
+      pop
+    } {
 		% The color lookup table is a stream.
 		% Get its contents.  Don't lose our place in PDFfile.
 		% Stack: /Indexed basespace hival lookup
@@ -320,7 +321,7 @@ end
 		% Stack: filepos /Indexed basespace hival table
 	5 -1 roll PDFfile exch setfileposition
     }
-    if 4 array astore
+    ifelse 4 array astore
   }
   /Pattern
    { dup type /nametype ne
@@ -366,30 +367,36 @@ end
    if
    count 1 gt
  } bdef
-/resolvepattern		% <patternstreamdict> resolvepattern <patterndict>
- {		% Don't do the resolvestream now: just capture the data
+/resolvepattern {	% <patternstreamdict> resolvepattern <patterndict>
+		% Don't do the resolvestream now: just capture the data
 		% from the file if necessary.
-   dup length dict copy
-   dup /FilePosition .knownget
-    { 1 index /File get dup fileposition 3 1 roll
+  dup length dict copy
+  dup /FilePosition .knownget {
+    1 index /File get dup fileposition 3 1 roll
 		% Stack: dict savepos pos file
-      dup 3 -1 roll setfileposition
-      dup 3 index /Length get string readstring pop
+    dup 3 -1 roll setfileposition
+    dup 3 index /Length get string readstring pop
 		% Stack: dict savepos file string
-      3 1 roll exch setfileposition
-      1 index /File 3 -1 roll put
-      dup /FilePosition undef
-    }
-   if
-   dup /PaintProc {
-     DEBUG { (%Begin PaintProc) = flush } if
-     false resolvestream pdfopdict .pdfrun
-     DEBUG { (%End PaintProc) = flush } if
-   } put
-   DEBUG {
-     (%Pattern: ) print dup === flush
-   } if
- } bdef
+    3 1 roll exch setfileposition
+    1 index /File 3 -1 roll put
+    dup /FilePosition undef
+  } if
+  dup /PaintProc {
+    DEBUG { (%Begin PaintProc) = flush } if
+		% For uncolored patterns, we have to unbind the current
+		% color and color space before running the PaintProc.
+		% There's no harm in doing this for colored patterns,
+		% so for simplicity, we always do it.
+    q
+    null sc1 null SC1
+    false resolvestream pdfopdict .pdfrun
+    Q
+    DEBUG { (%End PaintProc) = flush } if
+  } put
+  DEBUG {
+    (%Pattern: ) print dup === flush
+  } if
+} bdef
 
 drawopdict begin
   /g { /DeviceGray cssubst { cs sc1 } { g } ifelse } bdef
@@ -459,10 +466,10 @@ end
   }
 .dicttomark readonly def
 
+% dict makeimagedict dict
 /makeimagedict
  { dup length dict
    1 index /ColorSpace knownoget
-    %%%% MRS - fixed to work with indexed images...
     { dup resolvecolorspace
       dup type /arraytype eq { 0 get } {pop} ifelse
       exch begin /ColorSpace exch def

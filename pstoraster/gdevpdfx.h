@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gdevpdfx.h,v 1.3 2000/03/13 19:00:47 mike Exp $ */
+/*$Id: gdevpdfx.h,v 1.4 2000/04/12 14:20:26 mike Exp $ */
 /* Internal definitions for PDF-writing driver. */
 
 #ifndef gdevpdfx_INCLUDED
