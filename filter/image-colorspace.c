@@ -1,5 +1,5 @@
 /*
- * "$Id: image-colorspace.c,v 1.5 1998/07/23 20:42:04 mike Exp $"
+ * "$Id: image-colorspace.c,v 1.6 1998/07/28 20:48:30 mike Exp $"
  *
  *   Colorspace conversions for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,10 @@
  * Revision History:
  *
  *   $Log: image-colorspace.c,v $
- *   Revision 1.5  1998/07/23 20:42:04  mike
+ *   Revision 1.6  1998/07/28 20:48:30  mike
+ *   Even better CMYK generation code...
+ *
+ *   Revision 1.5  1998/07/23  20:42:04  mike
  *   Updated with new CMYK generation code.
  *
  *   Revision 1.4  1998/03/05  16:58:38  mike
@@ -52,15 +55,6 @@ static void	xrotatemat(float mat[3][3], float rs, float rc);
 static void	yrotatemat(float mat[3][3], float rs, float rc);
 static void	zrotatemat(float mat[3][3], float rs, float rc);
 static void	huerotatemat(float mat[3][3], float rot);
-#ifndef max
-#  define 	max(a,b)	((a) > (b) ? (a) : (b))
-#endif /* !max */
-#ifndef min
-#  define 	min(a,b)	((a) < (b) ? (a) : (b))
-#endif /* !min */
-#ifndef abs
-#  define	abs(a)		((a) < 0 ? -(a) : (a))
-#endif /* !abs */
 
 
 void
@@ -596,5 +590,5 @@ huerotatemat(float mat[3][3],
 
 
 /*
- * End of "$Id: image-colorspace.c,v 1.5 1998/07/23 20:42:04 mike Exp $".
+ * End of "$Id: image-colorspace.c,v 1.6 1998/07/28 20:48:30 mike Exp $".
  */
