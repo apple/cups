@@ -5,6 +5,9 @@ CHANGES IN CUPS V1.1.15
 
 	- Updated the CUPS license agreement for the new MacOS
 	  license exception.
+	- The auto-generated printcap/printers.conf files now
+	  have a small comment header explaining where the file
+	  comes from...
 	- The PostScript filter now supports 6, 9, and 16-up
 	  output, as well as new number-up-border and
 	  number-up-layout options.
