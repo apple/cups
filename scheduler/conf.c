@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.123 2003/02/04 19:02:25 mike Exp $"
+ * "$Id: conf.c,v 1.124 2003/02/05 21:10:15 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -39,7 +39,6 @@
 #include <stdarg.h>
 #include <pwd.h>
 #include <grp.h>
-#include <sys/resource.h>
 
 #ifdef HAVE_CDSASSL
 #  include <Security/SecureTransport.h>
@@ -197,7 +196,6 @@ ReadConfiguration(void)
 		*slash;			/* Directory separator */
   char		type[MIME_MAX_SUPER + MIME_MAX_TYPE];
 					/* MIME type name */
-  struct rlimit	limit;			/* Runtime limit */
   char		*language;		/* Language string */
   struct passwd	*user;			/* Default user */
   struct group	*group;			/* Default group */
@@ -541,10 +539,14 @@ ReadConfiguration(void)
   * Check the MaxClients setting, and then allocate memory for it...
   */
 
-  getrlimit(RLIMIT_NOFILE, &limit);
+  if (MaxClients > (MaxFDs / 3) || MaxClients <= 0)
+  {
+    if (MaxClients > 0)
+      LogMessage(L_INFO, "MaxClients limited to 1/3 of the file descriptor limit (%d)...",
+                 MaxFDs);
 
-  if (MaxClients > (limit.rlim_max / 3) || MaxClients <= 0)
-    MaxClients = limit.rlim_max / 3;
+    MaxClients = MaxFDs / 3;
+  }
 
   if ((Clients = calloc(sizeof(client_t), MaxClients)) == NULL)
   {
@@ -2047,5 +2049,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.123 2003/02/04 19:02:25 mike Exp $".
+ * End of "$Id: conf.c,v 1.124 2003/02/05 21:10:15 mike Exp $".
  */

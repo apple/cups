@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.185 2003/02/04 05:27:23 mike Exp $"
+ * "$Id: job.c,v 1.186 2003/02/05 21:10:17 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1819,7 +1819,7 @@ StartJob(int       id,		/* I - Job ID */
 
   LogMessage(L_DEBUG2, "StartJob: Adding fd %d to InputSet...", current->pipe);
 
-  FD_SET(current->pipe, &InputSet);
+  FD_SET(current->pipe, InputSet);
 }
 
 
@@ -1900,7 +1900,7 @@ StopJob(int id,			/* I - Job ID */
 	             current->pipe);
 
           close(current->pipe);
-	  FD_CLR(current->pipe, &InputSet);
+	  FD_CLR(current->pipe, InputSet);
 	  current->pipe = 0;
         }
 
@@ -2106,7 +2106,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
                  job->pipe);
 
       close(job->pipe);
-      FD_CLR(job->pipe, &InputSet);
+      FD_CLR(job->pipe, InputSet);
       job->pipe = 0;
     }
 
@@ -3403,5 +3403,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.185 2003/02/04 05:27:23 mike Exp $".
+ * End of "$Id: job.c,v 1.186 2003/02/05 21:10:17 mike Exp $".
  */

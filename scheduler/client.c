@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.142 2003/02/03 02:33:42 mike Exp $"
+ * "$Id: client.c,v 1.143 2003/02/05 21:10:15 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -289,7 +289,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
 
   LogMessage(L_DEBUG2, "AcceptClient: Adding fd %d to InputSet...",
              con->http.fd);
-  FD_SET(con->http.fd, &InputSet);
+  FD_SET(con->http.fd, InputSet);
 
   NumClients ++;
 
@@ -418,8 +418,8 @@ CloseClient(client_t *con)	/* I - Client to close */
     LogMessage(L_DEBUG2, "CloseClient: Removing fd %d from InputSet and OutputSet...",
                con->http.fd);
     close(con->http.fd);
-    FD_CLR(con->http.fd, &InputSet);
-    FD_CLR(con->http.fd, &OutputSet);
+    FD_CLR(con->http.fd, InputSet);
+    FD_CLR(con->http.fd, OutputSet);
     con->http.fd = 0;
   }
 
@@ -427,7 +427,7 @@ CloseClient(client_t *con)	/* I - Client to close */
   {
     LogMessage(L_DEBUG2, "CloseClient: Removing fd %d from InputSet...",
                con->file);
-    FD_CLR(con->file, &InputSet);
+    FD_CLR(con->file, InputSet);
   }
 
   if (con->file)
@@ -447,7 +447,7 @@ CloseClient(client_t *con)	/* I - Client to close */
     LogMessage(L_DEBUG2, "CloseClient: %d Removing fd %d from InputSet.",
                con->http.fd, con->file);
 
-    FD_CLR(con->file, &InputSet);
+    FD_CLR(con->file, InputSet);
     close(con->file);
     con->file = 0;
   }
@@ -1762,8 +1762,8 @@ SendCommand(client_t      *con,
   LogMessage(L_DEBUG2, "SendCommand: Adding fd %d to OutputSet...",
              con->http.fd);
 
-  FD_SET(con->file, &InputSet);
-  FD_SET(con->http.fd, &OutputSet);
+  FD_SET(con->file, InputSet);
+  FD_SET(con->http.fd, OutputSet);
 
   if (!SendHeader(con, HTTP_OK, NULL))
     return (0);
@@ -1902,7 +1902,7 @@ SendFile(client_t    *con,
 
   LogMessage(L_DEBUG2, "SendFile: Adding fd %d to OutputSet...", con->http.fd);
 
-  FD_SET(con->http.fd, &OutputSet);
+  FD_SET(con->http.fd, OutputSet);
 
   return (1);
 }
@@ -2003,7 +2003,7 @@ ShutdownClient(client_t *con)		/* I - Client connection */
   LogMessage(L_DEBUG2, "ShutdownClient: Removing fd %d from InputSet...",
              con->http.fd);
 
-  FD_CLR(con->http.fd, &InputSet);
+  FD_CLR(con->http.fd, InputSet);
 }
 
 
@@ -2118,13 +2118,13 @@ WriteClient(client_t *con)		/* I - Client connection */
     LogMessage(L_DEBUG2, "WriteClient: Removing fd %d from OutputSet...",
                con->http.fd);
 
-    FD_CLR(con->http.fd, &OutputSet);
+    FD_CLR(con->http.fd, OutputSet);
 
     if (con->file)
     {
       LogMessage(L_DEBUG2, "WriteClient: Removing fd %d from InputSet...",
                  con->file);
-      FD_CLR(con->file, &InputSet);
+      FD_CLR(con->file, InputSet);
 
       if (con->pipe_pid)
 	kill(con->pipe_pid, SIGTERM);
@@ -2932,5 +2932,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.142 2003/02/03 02:33:42 mike Exp $".
+ * End of "$Id: client.c,v 1.143 2003/02/05 21:10:15 mike Exp $".
  */
