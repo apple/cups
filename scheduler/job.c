@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.82 2003/11/05 19:11:54 mike Exp $"
+ * "$Id: job.c,v 1.124.2.83 2004/02/03 12:56:07 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2214,6 +2214,7 @@ StopJob(int id,			/* I - Job ID */
 void
 UpdateJob(job_t *job)		/* I - Job to check */
 {
+  int		i;		/* Looping var */
   int		bytes;		/* Number of bytes read */
   int		copies;		/* Number of copies printed */
   char		*lineptr,	/* Pointer to end of line in buffer */
@@ -2393,6 +2394,22 @@ UpdateJob(job_t *job)		/* I - Job to check */
 
   if (bytes <= 0)
   {
+   /*
+    * See if all of the filters and the backend have returned their
+    * exit statuses.
+    */
+
+    for (i = 0; job->filters[i]; i ++)
+      if (job->filters[i] > 0)
+	return;
+
+    if (job->current_file >= job->num_files && job->backend > 0)
+      return;
+
+   /*
+    * Handle the end of job stuff...
+    */
+
     LogMessage(L_DEBUG, "UpdateJob: job %d, file %d is complete.",
                job->id, job->current_file - 1);
 
@@ -2860,5 +2877,5 @@ set_hold_until(job_t *job, 		/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.82 2003/11/05 19:11:54 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.83 2004/02/03 12:56:07 mike Exp $".
  */

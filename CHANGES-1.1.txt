@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The scheduler could complete a job before it collected
+	  the exit status from all filters and the backend (STR
+	  #448)
 	- The PPD conformance tests did not catch group
 	  translation strings that exceeded the maximum allowed
 	  size (STR #454)
