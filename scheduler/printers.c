@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.38 1999/09/23 16:31:47 mike Exp $"
+ * "$Id: printers.c,v 1.39 1999/09/28 21:00:53 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -60,10 +60,6 @@ AddPrinter(char *name)		/* I - Name of printer */
   printer_t	*p,		/* New printer */
 		*current,	/* Current printer in list */
 		*prev;		/* Previous printer in list */
-#ifdef __sgi
-  char		filename[1024];	/* Interface script filename */
-  FILE		*fp;		/* Interface script file */
-#endif /* __sgi */
 
 
  /*
@@ -117,47 +113,10 @@ AddPrinter(char *name)		/* I - Name of printer */
   p->next = current;
 
  /*
-  * Write a new /etc/printcap file, and add a dummy interface and GUI scripts
-  * to fool SGI's stupid printing tools.
+  * Write a new /etc/printcap or /var/spool/lp/pstatus file.
   */
 
   write_printcap();
-
-#ifdef __sgi
-  sprintf(filename, "/var/spool/lp/interface/%s", p->name);
-  if ((fp = fopen(filename, "w")) != NULL)
-  {
-    fputs("#!/bin/sh\n", fp);
-    fprintf(fp, "NAME=\"%s\"\n", p->info);
-    if (p->type & CUPS_PRINTER_COLOR)
-      fputs("TYPE=ColorPostScript\n", fp);
-    else
-      fputs("TYPE=PostScript\n", fp);
-    fclose(fp);
-    chmod(filename, 0755);
-  }
-
-  sprintf(filename, "/var/spool/lp/gui_interface/ELF/%s.gui", p->name);
-  if ((fp = fopen(filename, "w")) != NULL)
-  {
-    fputs("#!/bin/sh\n", fp);
-    fprintf(fp, "/usr/bin/glpoptions -d %s -o \"$*\"\n", p->name);
-    fclose(fp);
-    chmod(filename, 0755);
-  }
-
-  sprintf(filename, "/var/spool/lp/activeicons/%s", p->name);
-  if ((fp = fopen(filename, "w")) != NULL)
-  {
-    fputs("#!/bin/sh\n", fp);
-    if (p->type & CUPS_PRINTER_COLOR)
-      fputs("#Tag 66240\n", fp);
-    else
-      fputs("#Tag 66208\n", fp);
-    fclose(fp);
-    chmod(filename, 0755);
-  }
-#endif /* __sgi */
 
   return (p);
 }
@@ -732,6 +691,9 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 		};
   int		num_finishings;
   ipp_finish_t	finishings[5];
+#ifdef __sgi
+  FILE		*fp;		/* Interface script file */
+#endif /* __sgi */
 
 
   DEBUG_printf(("SetPrinterAttrs: entering name = %s, type = %x\n", p->name,
@@ -1025,6 +987,64 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
 
   DEBUG_printf(("SetPrinterAttrs: leaving name = %s, type = %x\n", p->name,
                 p->type));
+
+#ifdef __sgi
+ /*
+  * Add dummy interface and GUI scripts to fool SGI's "challenged" printing
+  * tools.
+  */
+
+  sprintf(filename, "/var/spool/lp/interface/%s", p->name);
+  if ((fp = fopen(filename, "w")) != NULL)
+  {
+    fputs("#!/bin/sh\n", fp);
+
+    if ((attr = ippFindAttribute(p->attrs, "printer-make-and-model",
+                                 IPP_TAG_TEXT)) != NULL)
+      fprintf(fp, "NAME=\"%s\"\n", attr->values[0].string.text);
+    else if (p->type & CUPS_PRINTER_CLASS)
+      fputs("NAME=\"Printer Class\"\n", fp);
+    else
+      fputs("NAME=\"Remote Destination\"\n", fp);
+
+    if (p->type & CUPS_PRINTER_COLOR)
+      fputs("TYPE=ColorPostScript\n", fp);
+    else
+      fputs("TYPE=PostScript\n", fp);
+
+    fclose(fp);
+    chmod(filename, 0755);
+  }
+
+  sprintf(filename, "/var/spool/lp/member/%s", p->name);
+  if ((fp = fopen(filename, "w")) != NULL)
+  {
+    fputs("/dev/null\n", fp);
+    fclose(fp);
+    chmod(filename, 0644);
+  }
+
+  sprintf(filename, "/var/spool/lp/gui_interface/ELF/%s.gui", p->name);
+  if ((fp = fopen(filename, "w")) != NULL)
+  {
+    fputs("#!/bin/sh\n", fp);
+    fprintf(fp, "/usr/bin/glpoptions -d %s -o \"$3\"\n", p->name);
+    fclose(fp);
+    chmod(filename, 0755);
+  }
+
+  sprintf(filename, "/var/spool/lp/activeicons/%s", p->name);
+  if ((fp = fopen(filename, "w")) != NULL)
+  {
+    fputs("#!/bin/sh\n", fp);
+    if (p->type & CUPS_PRINTER_COLOR)
+      fputs("#Tag 66240\n", fp);
+    else
+      fputs("#Tag 66208\n", fp);
+    fclose(fp);
+    chmod(filename, 0755);
+  }
+#endif /* __sgi */
 }
 
 
@@ -1146,8 +1166,8 @@ StopPrinter(printer_t *p)	/* I - Printer to stop */
 static void
 write_printcap(void)
 {
-  FILE		*fp;	/* printcap file */
-  printer_t	*p;	/* Current printer */
+  FILE		*fp;		/* printcap file */
+  printer_t	*p;		/* Current printer */
 
 
  /*
@@ -1175,7 +1195,7 @@ write_printcap(void)
     fprintf(fp, "%s:\n", p->name);
 
  /*
-  * Close the file and return...
+  * Close the file...
   */
 
   fclose(fp);
@@ -1183,5 +1203,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.38 1999/09/23 16:31:47 mike Exp $".
+ * End of "$Id: printers.c,v 1.39 1999/09/28 21:00:53 mike Exp $".
  */
