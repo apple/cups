@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c,v 1.14 2000/02/11 05:04:12 mike Exp $"
+ * "$Id: parallel.c,v 1.15 2000/02/24 21:01:38 mike Exp $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -43,6 +43,17 @@
 #  include <fcntl.h>
 #  include <termios.h>
 #endif /* WIN32 || __EMX__ */
+
+#ifdef __sgi
+#  include <invent.h>
+#  ifndef INV_EPP_ECP_PLP
+#    define INV_EPP_ECP_PLP	6	/* From 6.3/6.4/6.5 sys/invent.h */
+#    define INV_ASO_SERIAL	14	/* serial portion of SGI ASO board */
+#    define INV_IOC3_DMA	16	/* DMA mode IOC3 serial */
+#    define INV_IOC3_PIO	17	/* PIO mode IOC3 serial */
+#    define INV_ISA_DMA		19	/* DMA mode ISA serial -- O2 */
+#  endif /* !INV_EPP_ECP_PLP */
+#endif /* __sgi */
 
 
 /*
@@ -211,6 +222,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 void
 list_devices(void)
 {
+  static char	*funky_hex = "0123456789abcdefghijklmnopqrstuvwxyz";
+				/* Funky hex numbering used for some devices */
+
 #ifdef __linux
   int	i;			/* Looping var */
   int	fd;			/* File descriptor */
@@ -283,14 +297,219 @@ list_devices(void)
     }
   }
 #elif defined(__sgi)
+  int		i, j, n;	/* Looping vars */
+  char		device[255];	/* Device filename */
+  inventory_t	*inv;		/* Hardware inventory info */
+
+
+ /*
+  * IRIX maintains a hardware inventory of most devices...
+  */
+
+  setinvent();
+
+  while ((inv = getinvent()) != NULL)
+  {
+    if (inv->inv_class == INV_PARALLEL &&
+        (inv->inv_type == INV_ONBOARD_PLP ||
+         inv->inv_type == INV_EPP_ECP_PLP))
+    {
+     /*
+      * Standard parallel port...
+      */
+
+      puts("direct parallel:/dev/plp \"Unknown\" \"Onboard Parallel Port\"");
+    }
+    else if (inv->inv_class == INV_PARALLEL &&
+             inv->inv_type == INV_EPC_PLP)
+    {
+     /*
+      * EPC parallel port...
+      */
+
+      printf("direct parallel:/dev/plp%d \"Unknown\" \"Integral EPC parallel port, Ebus slot %d\"\n",
+             inv->inv_controller, inv->inv_controller);
+    }
+  }
+
+  endinvent();
+
+ /*
+  * Central Data makes serial and parallel "servers" that can be
+  * connected in a number of ways.  Look for ports...
+  */
+
+  for (i = 0; i < 10; i ++)
+    for (j = 0; j < 8; j ++)
+      for (n = 0; n < 32; n ++)
+      {
+        if (i == 8)		/* EtherLite */
+          sprintf(device, "/dev/lpn%d%c", j, funky_hex[n]);
+        else if (i == 9)	/* PCI */
+          sprintf(device, "/dev/lpp%d%c", j, funky_hex[n]);
+        else			/* SCSI */
+          sprintf(device, "/dev/lp%d%d%c", i, j, funky_hex[n]);
+
+	if (access(device, 0) == 0)
+	{
+	  if (i == 8)
+	    printf("direct parallel:%s \"Unknown\" \"Central Data EtherLite Parallel Port, ID %d, port %d\"\n",
+	           device, j, n);
+	  else if (i == 9)
+	    printf("direct parallel:%s \"Unknown\" \"Central Data PCI Parallel Port, ID %d, port %d\"\n",
+	           device, j, n);
+  	  else
+	    printf("direct parallel:%s \"Unknown\" \"Central Data SCSI Parallel Port, logical bus %d, ID %d, port %d\"\n",
+	           device, i, j, n);
+	}
+      }
 #elif defined(__sun)
+  int		i, j, n;	/* Looping vars */
+  char		device[255];	/* Device filename */
+  inventory_t	*inv;		/* Hardware inventory info */
+
+
+ /*
+  * Standard parallel ports...
+  */
+
+  for (i = 0; i < 10; i ++)
+  {
+    sprintf(device, "/dev/ecpp%d", i);
+    if (access(device, 0) == 0)
+      printf("direct parallel:%s \"Unknown\" \"Sun IEEE-1284 Parallel Port #%d\"\n",
+             device, i + 1);
+  }
+
+  for (i = 0; i < 10; i ++)
+  {
+    sprintf(device, "/dev/bpp%d", i);
+    if (access(device, 0) == 0)
+      printf("direct parallel:%s \"Unknown\" \"Sun Standard Parallel Port #%d\"\n",
+             device, i + 1);
+  }
+
+  for (i = 0; i < 3; i ++)
+  {
+    sprintf(device, "/dev/lp%d", i);
+
+    if (access(device, 0) == 0)
+      printf("direct parallel:%s \"Unknown\" \"PC Parallel Port #%d\"\n",
+             device, i + 1);
+  }
+
+ /*
+  * MAGMA parallel ports...
+  */
+
+  for (i = 0; i < 40; i ++)
+  {
+    sprintf(device, "/dev/pm%02d", i);
+    if (access(device, 0) == 0)
+      printf("direct parallel:%s \"Unknown\" \"MAGMA Parallel Board #%d Port #%d\"\n",
+             device, (i / 10) + 1, (i % 10) + 1);
+  }
+
+ /*
+  * Central Data parallel ports...
+  */
+
+  for (i = 0; i < 9; i ++)
+    for (j = 0; j < 8; j ++)
+      for (n = 0; n < 32; n ++)
+      {
+        if (i == 8)	/* EtherLite */
+          sprintf(device, "/dev/sts/lpN%d%c", j, funky_hex[n]);
+        else
+          sprintf(device, "/dev/sts/lp%c%d%c", i + 'C', j,
+                  funky_hex[n]);
+
+	if (access(device, 0) == 0)
+	{
+	  if (i == 8)
+	    printf("direct parallel:%s \"Unknown\" \"Central Data EtherLite Parallel Port, ID %d, port %d\"\n",
+	           device, j, n);
+  	  else
+	    printf("direct parallel:%s \"Unknown\" \"Central Data SCSI Parallel Port, logical bus %d, ID %d, port %d\"\n",
+	           device, i, j, n);
+	}
+      }
 #elif defined(__hpux)
-#elif defined(__osf)
+  int		i, j, n;	/* Looping vars */
+  char		device[255];	/* Device filename */
+
+
+ /*
+  * Standard parallel ports...
+  */
+
+  if (access("/dev/rlp", 0) == 0)
+    puts("direct parallel:/dev/rlp \"Unknown\" \"Standard Parallel Port (/dev/rlp)\"");
+
+  for (i = 0; i < 7; i ++)
+    for (j = 0; j < 7; j ++)
+    {
+      sprintf(device, "/dev/c%dt%dd0_lp", i, j);
+      if (access(device, 0) == 0)
+	printf("direct parallel:%s \"Unknown\" \"Parallel Port #%d,%d\"\n", i, j);
+    }
+
+ /*
+  * Central Data parallel ports...
+  */
+
+  for (i = 0; i < 9; i ++)
+    for (j = 0; j < 8; j ++)
+      for (n = 0; n < 32; n ++)
+      {
+        if (i == 8)	/* EtherLite */
+          sprintf(device, "/dev/lpN%d%c", j, funky_hex[n]);
+        else
+          sprintf(device, "/dev/lp%c%d%c", i + 'C', j,
+                  funky_hex[n]);
+
+	if (access(device, 0) == 0)
+	{
+	  if (i == 8)
+	    printf("direct parallel:%s \"Unknown\" \"Central Data EtherLite Parallel Port, ID %d, port %d\"\n",
+	           device, j, n);
+  	  else
+	    printf("direct parallel:%s \"Unknown\" \"Central Data SCSI Parallel Port, logical bus %d, ID %d, port %d\"\n",
+	           device, i, j, n);
+	}
+      }
+#elif defined(__osf__)
+  int	i;			/* Looping var */
+  char	device[255];		/* Device filename */
+
+
+  for (i = 0; i < 3; i ++)
+  {
+    sprintf(device, "/dev/lp%d", i);
+    if ((fd = open(device, O_WRONLY)) >= 0)
+    {
+      close(fd);
+      printf("direct parallel:%s \"Unknown\" \"Parallel Port #%d\"\n", device, i + 1);
+    }
+  }
 #elif defined(FreeBSD) || defined(OpenBSD) || defined(NetBSD)
+  int	i;			/* Looping var */
+  char	device[255];		/* Device filename */
+
+
+  for (i = 0; i < 3; i ++)
+  {
+    sprintf(device, "/dev/lpt%d", i);
+    if ((fd = open(device, O_WRONLY)) >= 0)
+    {
+      close(fd);
+      printf("direct parallel:%s \"Unknown\" \"Parallel Port #%d\"\n", device, i + 1);
+    }
+  }
 #endif
 }
 
 
 /*
- * End of "$Id: parallel.c,v 1.14 2000/02/11 05:04:12 mike Exp $".
+ * End of "$Id: parallel.c,v 1.15 2000/02/24 21:01:38 mike Exp $".
  */
