@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.40 1999/07/27 12:53:23 mike Exp $"
+ * "$Id: http.c,v 1.41 1999/07/27 16:27:24 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1342,7 +1342,7 @@ http_send(http_t       *http,	/* I - HTTP data */
   if (request == HTTP_POST || request == HTTP_PUT)
     http->state ++;
 
-  if (httpPrintf(http, "%s %s HTTP/1.1\n", codes[request], buf) < 1)
+  if (httpPrintf(http, "%s %s HTTP/1.1\r\n", codes[request], buf) < 1)
   {
    /*
     * Might have lost connection; try to reconnect...
@@ -1355,7 +1355,7 @@ http_send(http_t       *http,	/* I - HTTP data */
     * OK, we've reconnected, send the request again...
     */
 
-    if (httpPrintf(http, "%s %s HTTP/%d.%d\n", codes[request], buf,
+    if (httpPrintf(http, "%s %s HTTP/%d.%d\r\n", codes[request], buf,
                    http->version / 100, http->version % 100) < 1)
       return (-1);
   }
@@ -1365,11 +1365,11 @@ http_send(http_t       *http,	/* I - HTTP data */
     {
       DEBUG_printf(("%s: %s\n", http_fields[i], http->fields[i]));
 
-      if (httpPrintf(http, "%s: %s\n", http_fields[i], http->fields[i]) < 1)
+      if (httpPrintf(http, "%s: %s\r\n", http_fields[i], http->fields[i]) < 1)
         return (-1);
     }
 
-  if (httpPrintf(http, "\n") < 1)
+  if (httpPrintf(http, "\r\n") < 1)
     return (-1);
 
   httpClearFields(http);
@@ -1379,5 +1379,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.40 1999/07/27 12:53:23 mike Exp $".
+ * End of "$Id: http.c,v 1.41 1999/07/27 16:27:24 mike Exp $".
  */
