@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.168 2002/08/26 00:07:07 mike Exp $"
+ * "$Id: job.c,v 1.169 2002/09/06 12:23:08 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1339,7 +1339,8 @@ StartJob(int       id,		/* I - Job ID */
 	continue;
 
       if ((strcmp(attr->name, "page-label") == 0 ||
-           strcmp(attr->name, "number-up") == 0) &&
+           strcmp(attr->name, "page-border") == 0 ||
+           strncmp(attr->name, "number-up", 9) == 0) &&
 	  banner_page)
         continue;
 
@@ -3160,5 +3161,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.168 2002/08/26 00:07:07 mike Exp $".
+ * End of "$Id: job.c,v 1.169 2002/09/06 12:23:08 mike Exp $".
  */
