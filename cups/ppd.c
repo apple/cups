@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.17 1999/05/17 18:11:46 mike Exp $"
+ * "$Id: ppd.c,v 1.18 1999/06/03 13:20:43 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -40,6 +40,9 @@
  *   ppdOpenFile()     - Read a PPD file into memory.
  *   ppd_read()        - Read a line from a PPD file, skipping comment lines
  *                       as necessary.
+ *   compare_groups()  - Compare two groups.
+ *   compare_options() - Compare two options.
+ *   compare_choices() - Compare two choices.
  */
 
 /*
@@ -75,6 +78,9 @@
  * Local functions...
  */
 
+static int		compare_groups(ppd_group_t *g0, ppd_group_t *g1);
+static int		compare_options(ppd_option_t *o0, ppd_option_t *o1);
+static int		compare_choices(ppd_choice_t *c0, ppd_choice_t *c1);
 static int		ppd_read(FILE *fp, char *keyword, char *option,
 			         char *text, char **string);
 static void		ppd_decode(char *string);
@@ -773,40 +779,36 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 
       if (subgroup != NULL)
         option = ppd_get_option(subgroup, name);
-      else
+      else if (group == NULL)
       {
+        if (strcmp(name, "Collate") != 0 &&
+            strcmp(name, "Duplex") != 0 &&
+            strcmp(name, "InputSlot") != 0 &&
+            strcmp(name, "ManualFeed") != 0 &&
+            strcmp(name, "MediaType") != 0 &&
+            strcmp(name, "MediaColor") != 0 &&
+            strcmp(name, "MediaWeight") != 0 &&
+            strcmp(name, "OutputBin") != 0 &&
+            strcmp(name, "OutputMode") != 0 &&
+            strcmp(name, "OutputOrder") != 0 &&
+	    strcmp(name, "PageSize") != 0 &&
+            strcmp(name, "PageRegion") != 0)
+	  group = ppd_get_group(ppd, "Printer");
+	else
+	  group = ppd_get_group(ppd, "General");
+
         if (group == NULL)
 	{
-          if (strcmp(name, "Collate") != 0 &&
-              strcmp(name, "Duplex") != 0 &&
-              strcmp(name, "InputSlot") != 0 &&
-              strcmp(name, "ManualFeed") != 0 &&
-              strcmp(name, "MediaType") != 0 &&
-              strcmp(name, "MediaColor") != 0 &&
-              strcmp(name, "MediaWeight") != 0 &&
-              strcmp(name, "OutputBin") != 0 &&
-              strcmp(name, "OutputMode") != 0 &&
-              strcmp(name, "OutputOrder") != 0 &&
-	      strcmp(name, "PageSize") != 0 &&
-              strcmp(name, "PageRegion") != 0)
-	    group = ppd_get_group(ppd, "Printer");
-	  else
-	    group = ppd_get_group(ppd, "General");
-
-          if (group == NULL)
-	  {
-	    ppdClose(ppd);
-	    free(string);
-	    return (NULL);
-	  }
-
-          option = ppd_get_option(group, name);
-	  group  = NULL;
+	  ppdClose(ppd);
+	  free(string);
+	  return (NULL);
 	}
-	else
-          option = ppd_get_option(group, name);
+
+        option = ppd_get_option(group, name);
 	group  = NULL;
       }
+      else
+        option = ppd_get_option(group, name);
 
       if (option == NULL)
       {
@@ -826,7 +828,19 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       else
         option->ui = PPD_UI_PICKONE;
 
-      strcpy(option->text, text);
+      if (text[0])
+        strcpy(option->text, text);
+      else
+      {
+        if (strcmp(name, "PageSize") == 0)
+	  strcpy(option->text, "Media Size");
+	else if (strcmp(name, "MediaType") == 0)
+	  strcpy(option->text, "Media Type");
+	else if (strcmp(name, "InputSlot") == 0)
+	  strcpy(option->text, "Media Source");
+        else
+	  strcpy(option->text, name);
+      }
 
       option->section = PPD_ORDER_ANY;
     }
@@ -1149,24 +1163,48 @@ ppdOpen(FILE *fp)		/* I - File to read from */
   * Set the option back-pointer for each choice...
   */
 
+  qsort(ppd->groups, ppd->num_groups, sizeof(ppd_group_t),
+        (int (*)(const void *, const void *))compare_groups);
+
   for (i = ppd->num_groups, group = ppd->groups;
        i > 0;
        i --, group ++)
   {
+    qsort(group->options, group->num_options, sizeof(ppd_option_t),
+          (int (*)(const void *, const void *))compare_options);
+
     for (j = group->num_options, option = group->options;
          j > 0;
 	 j --, option ++)
+    {
+      qsort(option->choices, option->num_choices, sizeof(ppd_choice_t),
+            (int (*)(const void *, const void *))compare_choices);
+
       for (k = 0; k < option->num_choices; k ++)
         option->choices[k].option = (void *)option;
+    }
+
+    qsort(group->subgroups, group->num_subgroups, sizeof(ppd_group_t),
+          (int (*)(const void *, const void *))compare_groups);
 
     for (j = group->num_subgroups, subgroup = group->subgroups;
          j > 0;
 	 j --, subgroup ++)
+    {
+      qsort(subgroup->options, subgroup->num_options, sizeof(ppd_option_t),
+            (int (*)(const void *, const void *))compare_options);
+
       for (k = group->num_options, option = group->options;
            k > 0;
 	   k --, option ++)
+      {
+	qsort(option->choices, option->num_choices, sizeof(ppd_choice_t),
+              (int (*)(const void *, const void *))compare_choices);
+
         for (m = 0; m < option->num_choices; m ++)
           option->choices[m].option = (void *)option;
+      }
+    }
   }
 
   return (ppd);
@@ -1242,6 +1280,42 @@ ppdOpenFile(char *filename)	/* I - File to read from */
     ppd = NULL;
 
   return (ppd);
+}
+
+
+/*
+ * 'compare_groups()' - Compare two groups.
+ */
+
+static int			/* O - Result of comparison */
+compare_groups(ppd_group_t *g0,	/* I - First group */
+               ppd_group_t *g1)	/* I - Second group */
+{
+  return (strcmp(g0->text, g1->text));
+}
+
+
+/*
+ * 'compare_options()' - Compare two options.
+ */
+
+static int			/* O - Result of comparison */
+compare_options(ppd_option_t *o0,/* I - First option */
+                ppd_option_t *o1)/* I - Second option */
+{
+  return (strcmp(o0->text, o1->text));
+}
+
+
+/*
+ * 'compare_choices()' - Compare two choices.
+ */
+
+static int			/* O - Result of comparison */
+compare_choices(ppd_choice_t *c0,/* I - First choice */
+                ppd_choice_t *c1)/* I - Second choice */
+{
+  return (strcmp(c0->text, c1->text));
 }
 
 
@@ -1498,5 +1572,5 @@ ppd_decode(char *string)	/* I - String to decode */
 
 
 /*
- * End of "$Id: ppd.c,v 1.17 1999/05/17 18:11:46 mike Exp $".
+ * End of "$Id: ppd.c,v 1.18 1999/06/03 13:20:43 mike Exp $".
  */

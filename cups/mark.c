@@ -1,5 +1,5 @@
 /*
- * "$Id: mark.c,v 1.11 1999/04/16 16:57:49 mike Exp $"
+ * "$Id: mark.c,v 1.12 1999/06/03 13:20:42 mike Exp $"
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
@@ -59,9 +59,10 @@ static void	ppd_default(ppd_option_t *o);
 int				/* O - Number of conflicts found */
 ppdConflicts(ppd_file_t *ppd)	/* I - PPD to check */
 {
-  int		i, j,		/* Looping variables */
+  int		i, j, k,	/* Looping variables */
 		conflicts;	/* Number of conflicts */
   ppd_const_t	*c;		/* Current constraint */
+  ppd_group_t	*g, *sg;	/* Groups */
   ppd_option_t	*o1, *o2;	/* Options */
   ppd_choice_t	*c1, *c2;	/* Choices */
 
@@ -69,7 +70,21 @@ ppdConflicts(ppd_file_t *ppd)	/* I - PPD to check */
   if (ppd == NULL)
     return (0);
 
+ /*
+  * Clear all conflicts...
+  */
+
   conflicts = 0;
+
+  for (i = ppd->num_groups, g = ppd->groups; i > 0; i --, g ++)
+  {
+    for (j = g->num_options, o1 = g->options; j > 0; j --, o1 ++)
+      o1->conflicted = 0;
+
+    for (j = g->num_subgroups, sg = g->subgroups; j > 0; j --, sg ++)
+      for (k = sg->num_options, o1 = sg->options; k > 0; k --, o1 ++)
+        o1->conflicted = 0;
+  }
 
  /*
   * Loop through all of the UI constraints and flag any options
@@ -148,11 +163,6 @@ ppdConflicts(ppd_file_t *ppd)	/* I - PPD to check */
       conflicts ++;
       o1->conflicted = 1;
       o2->conflicted = 1;
-    }
-    else
-    {
-      o1->conflicted = 0;
-      o2->conflicted = 0;
     }
   }
 
@@ -414,5 +424,5 @@ ppd_default(ppd_option_t *o)	/* I - Option to default */
 
 
 /*
- * End of "$Id: mark.c,v 1.11 1999/04/16 16:57:49 mike Exp $".
+ * End of "$Id: mark.c,v 1.12 1999/06/03 13:20:42 mike Exp $".
  */
