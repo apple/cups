@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.10 1999/04/21 21:19:33 mike Exp $"
+ * "$Id: ipp.h,v 1.11 1999/04/21 22:40:42 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -48,6 +48,13 @@ extern "C" {
 
 #  define IPP_VERSION		"\001\000"
 
+/*
+ * IPP registered port number...  This is the default value - applications
+ * should use the ippPort() function so that you can customize things in
+ * /etc/services if needed!
+ */
+
+#  define IPP_PORT		631
 
 /*
  * Common limits...
@@ -334,5 +341,5 @@ extern int		ippPort(void);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.10 1999/04/21 21:19:33 mike Exp $".
+ * End of "$Id: ipp.h,v 1.11 1999/04/21 22:40:42 mike Exp $".
  */
