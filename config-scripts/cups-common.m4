@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.13 2002/01/02 18:50:43 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.14 2002/01/12 21:31:01 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -59,12 +59,8 @@ dnl Architecture checks...
 AC_C_BIGENDIAN
 
 dnl Check for libraries...
-AC_CHECK_LIB(c,crypt,LIBS="$LIBS")
-if test "$ac_cv_lib_c_crypt" = "no"; then
-	AC_CHECK_LIB(crypt,crypt)
-fi
-AC_CHECK_LIB(sec,getspent)
-AC_CHECK_LIB(gen,getspent)
+AC_SEARCH_LIBS(crypt, crypt)
+AC_SEARCH_LIBS(getspent, sec gen)
 
 LIBMALLOC=""
 AC_CHECK_LIB(c,mallinfo,LIBS="$LIBS"; AC_DEFINE(HAVE_MALLINFO),LIBS="$LIBS")
@@ -150,5 +146,5 @@ esac
 AC_SUBST(ARFLAGS)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.13 2002/01/02 18:50:43 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.14 2002/01/12 21:31:01 mike Exp $".
 dnl
