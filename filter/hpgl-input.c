@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-input.c,v 1.10.2.7 2004/12/16 19:42:32 mike Exp $"
+ * "$Id: hpgl-input.c,v 1.10.2.8 2004/12/27 14:58:09 mike Exp $"
  *
  *   HP-GL/2 input processing for the Common UNIX Printing System (CUPS).
  *
@@ -69,7 +69,9 @@ ParseCommand(FILE    *fp,	/* I - File to read from */
         break;
 
     if (ch == EOF)
+    {
       return (-1);
+    }
 
     if (ch == 0x1b)
       switch (getc(fp))
@@ -105,17 +107,21 @@ ParseCommand(FILE    *fp,	/* I - File to read from */
             break;
 
         case '%' : /* PJL command? */
-            if (getc(fp) == '-')
-	    {
-	     /*
-	      * Yes, dump everything up to the "ENTER LANGUAGE" line...
-	      */
+            if ((i = getc(fp)) == '-')
+	      if ((i = getc(fp)) == '1')
+	        if ((i = getc(fp)) == '2')
+		{
+		 /*
+		  * Yes, dump everything up to the "ENTER LANGUAGE" line...
+		  */
 
-              while (fgets(buf, sizeof(buf), fp) != NULL)
-	        if (strstr(buf, "ENTER") && strstr(buf, "LANGUAGE"))
+        	  while (fgets(buf, sizeof(buf), fp) != NULL)
+	            if (strstr(buf, "ENTER") && strstr(buf, "LANGUAGE"))
+		      break;
 		  break;
-	      break;
-	    }
+		}
+
+            ungetc(i, fp);
 
         default : /* HP RTL/PCL control */
             while ((i = getc(fp)) != EOF && !isupper(i & 255));
@@ -248,5 +254,5 @@ FreeParameters(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-input.c,v 1.10.2.7 2004/12/16 19:42:32 mike Exp $".
+ * End of "$Id: hpgl-input.c,v 1.10.2.8 2004/12/27 14:58:09 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: devices.c,v 1.14.2.8 2004/10/04 19:48:56 mike Exp $"
+ * "$Id: devices.c,v 1.14.2.9 2004/12/27 14:58:09 mike Exp $"
  *
  *   Device scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -179,7 +179,7 @@ LoadDevices(const char *d)	/* I - Directory to scan */
 
         if (strncasecmp(line, "Usage", 5) == 0)
 	  compat = 1;
-        else if (sscanf(line, "%63s%1023s%*[ \t]\"%127[^\"]\"%*[ \t]\"%255[^\"]",
+        else if (sscanf(line, "%63s%1023s%*[ \t]\"%255[^\"]\"%*[ \t]\"%127[^\"]",
 	                dclass, uri, make_model, info) != 4)
         {
 	 /*
@@ -480,5 +480,5 @@ sigalrm_handler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: devices.c,v 1.14.2.8 2004/10/04 19:48:56 mike Exp $".
+ * End of "$Id: devices.c,v 1.14.2.9 2004/12/27 14:58:09 mike Exp $".
  */

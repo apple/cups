@@ -1,6 +1,21 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.23
+
+	- The scheduler's device loading code used the wrong
+	  size limits for the make/model and info parameters
+	  (STR #1035)
+	- The PNG loading code did not use a "long unsigned
+	  integer" format specifier for the width and height
+	  (STR #1032)
+	- The web interface only showed the first 4 or 8
+	  characters of "{variable-name}" for undefined template
+	  variables (STR #1031)
+	- The hpgltops filter did not handle a common PCL
+	  command to enter HP-GL/2 mode (STR #1037)
+
+
 CHANGES IN CUPS V1.1.23rc1
 
 	- The lpr man page did not document the "-U" option (STR
