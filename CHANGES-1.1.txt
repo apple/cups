@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The imagetops filter didn't always correctly position
+	  the image on the page when printing in landscape
+	  orientation.
 	- The ppdEmit() functions now support the
 	  RequiresPageRegion attribute when sending InputSlot
 	  and ManualFeed commands.

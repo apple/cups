@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c,v 1.36.2.12 2003/01/07 18:26:57 mike Exp $"
+ * "$Id: imagetops.c,v 1.36.2.13 2003/02/24 20:09:42 mike Exp $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -80,7 +80,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 		ypages,		/* # y pages */
 		xpage,		/* Current x page */
 		ypage,		/* Current y page */
-		page;		/* Current page number */
+		page,		/* Current page number */
+		pos;		/* Position on page */
   int		x0, y0,		/* Corners of the page in image coords */
 		x1, y1;
   ib_t		*row;		/* Current row */
@@ -410,16 +411,6 @@ main(int  argc,		/* I - Number of command-line arguments */
 	yinches     = ysize2;
 	xprint      = (PageTop - PageBottom) / 72.0;
 	yprint      = (PageRight - PageLeft) / 72.0;
-
-	xsize       = PageLeft;
-	PageLeft    = PageBottom;
-	PageBottom  = PageWidth - PageRight;
-	PageRight   = PageTop;
-	PageTop     = PageLength - xsize;
-
-	xsize       = PageWidth;
-	PageWidth   = PageLength;
-	PageLength  = xsize;
       }
       else
       {
@@ -442,16 +433,6 @@ main(int  argc,		/* I - Number of command-line arguments */
       yinches     = ysize2;
       xprint      = (PageTop - PageBottom) / 72.0;
       yprint      = (PageRight - PageLeft) / 72.0;
-
-      xsize       = PageLeft;
-      PageLeft    = PageBottom;
-      PageBottom  = PageWidth - PageRight;
-      PageRight   = PageTop;
-      PageTop     = PageLength - xsize;
-
-      xsize       = PageWidth;
-      PageWidth   = PageLength;
-      PageLength  = xsize;
     }
     else
     {
@@ -660,26 +641,58 @@ main(int  argc,		/* I - Number of command-line arguments */
 	y0 = img->ysize * ypage / ypages;
 	y1 = img->ysize * (ypage + 1) / ypages - 1;
 
-        switch (XPosition)
+        switch (Orientation)
+	{
+	  case 0 : /* Portrait */
+	      pos = XPosition;
+	      break;
+	  case 1 : /* Landscape */
+	      pos = YPosition;
+	      break;
+	  case 2 : /* Reverse Portrait */
+	      pos = -XPosition;
+	      break;
+	  case 3 : /* Reverse Lanscape */
+	      pos = -YPosition;
+	      break;
+	}
+
+        switch (pos)
 	{
 	  case -1 :
 	      left = PageLeft;
 	      break;
 	  default :
-	      left = (PageWidth - xprint * 72.0) * 0.5;
+	      left = PageLeft + (PageWidth - xprint * 72.0) * 0.5;
 	      break;
 	  case 1 :
 	      left = PageRight - xprint * 72.0;
 	      break;
 	}
 
-        switch (YPosition)
+        switch (Orientation)
+	{
+	  case 0 : /* Portrait */
+	      pos = YPosition;
+	      break;
+	  case 1 : /* Landscape */
+	      pos = -XPosition;
+	      break;
+	  case 2 : /* Reverse Portrait */
+	      pos = -YPosition;
+	      break;
+	  case 3 : /* Reverse Lanscape */
+	      pos = XPosition;
+	      break;
+	}
+
+        switch (pos)
 	{
 	  case -1 :
 	      top = PageBottom + 72.0 * yprint;
 	      break;
 	  default :
-	      top = (PageLength + yprint * 72.0) * 0.5;
+	      top = PageBottom + (PageLength + yprint * 72.0) * 0.5;
 	      break;
 	  case 1 :
 	      top = PageTop;
@@ -911,5 +924,5 @@ ps_ascii85(ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c,v 1.36.2.12 2003/01/07 18:26:57 mike Exp $".
+ * End of "$Id: imagetops.c,v 1.36.2.13 2003/02/24 20:09:42 mike Exp $".
  */
