@@ -1,6 +1,13 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.20
+
+	- The ppdEmit() functions did not use the correct
+	  orientation value position for custom page sizes (STR
+	  #292)
+
+
 CHANGES IN CUPS V1.1.20rc2
 
 	- The serial backend set the IXANY option on the port
