@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.77 2000/08/04 14:53:49 mike Exp $"
+# "$Id: cups.list,v 1.78 2000/08/24 17:54:26 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -28,7 +28,7 @@
 %vendor Easy Software Products
 %license LICENSE.txt
 %readme README.txt
-%version 1.1.2
+%version 1.1.3
 %incompat printpro
 
 %system all
@@ -311,10 +311,12 @@ f 0644 root sys $SERVERROOT/mime.types conf/mime.types
 c 0644 root sys $SERVERROOT/printers.conf conf/printers.conf
 
 %system linux
-# Linux version needs PAM...
-%requires /lib/libpam.so.0
 d 0555 root sys $PAMDIR -
 c 0644 root sys $PAMDIR/cups data/cups.pam
+c 0644 root sys $PAMDIR/cups.suse data/cups.suse
+%install if test -f /lib/security/pam_unix.so; then
+%install     mv $PAMDIR/cups.suse $PAMDIR/cups
+%install fi
 %system all
 
 # Developer files
@@ -505,5 +507,5 @@ f 0444 root sys $MANDIR/man5/printers.conf.5 man/printers.conf.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.77 2000/08/04 14:53:49 mike Exp $".
+# End of "$Id: cups.list,v 1.78 2000/08/24 17:54:26 mike Exp $".
 #

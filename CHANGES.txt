@@ -4,7 +4,7 @@ CHANGES.txt - 08/04/2000
 CHANGES IN CUPS v1.1.3
 
 	- Makefile fixes.
-	- Documentation fixes.
+	- Documentation updates.
 	- Enabled pstoraster debug messages for everything
 	  (only logged when LogLevel set to "debug"...)
 	- Changed the Input/OutputAttributes fix in
@@ -28,6 +28,18 @@ CHANGES IN CUPS v1.1.3
 	  an unauthenticated "root" user is sent.
 	- The cancel-job, hold-job, release-job, and restart-job
 	  operations didn't log the authenticated username.
+	- The cups-lpd mini-daemon now checks for a
+	  document-format option before forcing raw mode with
+	  filter mode 'l'.
+	- The pstops filter assumed that a file with a Trailer
+	  comment would also have an EOF comment.
+	- Added new cupsSetPasswordCB(), cupsSetServer(),
+	  cupsSetUser(), and ippSetPort() functions to better
+	  support client applications (especially GUIs...)
+	- The CUPS-add-class and CUPS-add-printer operations
+	  didn't reset the printer-name attribute on remote
+	  print queues that had to be renamed when a local
+	  printer was defined with the same name.
 
 
 CHANGES IN CUPS v1.1.2

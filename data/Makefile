@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.10 2000/07/07 17:02:38 mike Exp $"
+# "$Id: Makefile,v 1.11 2000/08/24 17:54:27 mike Exp $"
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
@@ -94,10 +94,14 @@ install:
 	-if test "$(PAMDIR)" != ""; then \
 		$(MKDIR) $(PAMDIR); \
 		$(CHMOD) ugo+rx $(PAMDIR); \
-		$(INSTALL_DATA) cups.pam $(PAMDIR)/cups; \
+		if test -f /lib/security/pam_unix.so; then \
+			$(INSTALL_DATA) cups.suse $(PAMDIR)/cups; \
+		else \
+			$(INSTALL_DATA) cups.pam $(PAMDIR)/cups; \
+		fi \
 	fi
 
 
 #
-# End of "$Id: Makefile,v 1.10 2000/07/07 17:02:38 mike Exp $".
+# End of "$Id: Makefile,v 1.11 2000/08/24 17:54:27 mike Exp $".
 #
