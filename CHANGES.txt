@@ -21,6 +21,8 @@ CHANGES IN CUPS V1.1.13
 	  inside a Location, which is not valid.
 	- The CUPS startup script now checks for the timezone
 	  information under Linux.
+	- Now also map the sides attribute to the JCLDuplex
+	  option (if present) in PPD files.
 
 
 CHANGES IN CUPS V1.1.12
