@@ -1,8 +1,11 @@
-CHANGES.txt - 04/10/2003
+CHANGES.txt - 11/29/2003
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Now put "-I.." compiler option in front of all others
+	  to ensure that local CUPS headers are used before
+	  installed headers (STR #437)
 	- New cupsLangPrintf() and cupsLangPuts() for localized
 	  interfaces.
 	- Now support custom attributes and extended options in
