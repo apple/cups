@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.32 1999/10/22 18:30:19 mike Exp $"
+ * "$Id: ipp.c,v 1.33 1999/10/22 18:45:54 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -811,7 +811,7 @@ add_printer(client_t        *con,	/* I - Client connection */
       {
         LogMessage(LOG_ERROR, "add_printer: Unable to rename interface script - %s!",
 	           strerror(errno));
-        SendIPPError(con, IPP_INTERNAL_ERROR);
+        send_ipp_error(con, IPP_INTERNAL_ERROR);
 	return;
       }
       else
@@ -831,7 +831,7 @@ add_printer(client_t        *con,	/* I - Client connection */
       {
         LogMessage(LOG_ERROR, "add_printer: Unable to rename PPD file - %s!",
 	           strerror(errno));
-        SendIPPError(con, IPP_INTERNAL_ERROR);
+        send_ipp_error(con, IPP_INTERNAL_ERROR);
 	return;
       }
       else
@@ -1047,7 +1047,7 @@ cancel_job(client_t        *con,	/* I - Client connection */
   * See if the job is owned by the requesting user...
   */
 
-  if ((attr = ippFindAttribute(con->request, IPP_TAG_NAME, "requesting-user-name")) != NULL)
+  if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
   {
     strncpy(username, attr->values[0].string.text, sizeof(username) - 1);
     username[sizeof(username) - 1] = '\0';
@@ -2576,5 +2576,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.32 1999/10/22 18:30:19 mike Exp $".
+ * End of "$Id: ipp.c,v 1.33 1999/10/22 18:45:54 mike Exp $".
  */
