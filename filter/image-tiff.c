@@ -1,5 +1,5 @@
 /*
- * "$Id: image-tiff.c,v 1.1 1998/02/19 20:44:58 mike Exp $"
+ * "$Id: image-tiff.c,v 1.2 1998/03/19 17:00:21 mike Exp $"
  *
  *   TIFF file routines for espPrint, a collection of printer drivers.
  *
@@ -16,7 +16,11 @@
  * Revision History:
  *
  *   $Log: image-tiff.c,v $
- *   Revision 1.1  1998/02/19 20:44:58  mike
+ *   Revision 1.2  1998/03/19 17:00:21  mike
+ *   Added check for units in resolution (physical) chunk; if undefined
+ *   assume meters instead of centimeters...
+ *
+ *   Revision 1.1  1998/02/19  20:44:58  mike
  *   Initial revision
  *
  */
@@ -54,7 +58,6 @@ ImageReadTIFF(image_t *img,
 		xcount, ycount,
 		pstep,
 		scanwidth,
-		white,
 		r, g, b, k, ik;
   ib_t		*in,
 		*out,
@@ -93,10 +96,15 @@ ImageReadTIFF(image_t *img,
       img->xppi = xres;
       img->yppi = yres;
     }
-    else
+    else if (resunit == RESUNIT_CENTIMETER)
     {
       img->xppi = xres * 2.54;
       img->yppi = yres * 2.54;
+    }
+    else
+    {
+      img->xppi = xres * 0.0254;
+      img->yppi = yres * 0.0254;
     };
   };
 
@@ -1132,5 +1140,5 @@ ImageReadTIFF(image_t *img,
 
 
 /*
- * End of "$Id: image-tiff.c,v 1.1 1998/02/19 20:44:58 mike Exp $".
+ * End of "$Id: image-tiff.c,v 1.2 1998/03/19 17:00:21 mike Exp $".
  */
