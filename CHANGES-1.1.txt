@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The image filters did not correctly load 1-bit PNG
+	  files (STR #687)
 	- The pdftops filter did not show all annotation objects
 	  in a PDF file (STR #674)
 	- The pdftops filter did not print the contents of

@@ -1,5 +1,5 @@
 /*
- * "$Id: image-png.c,v 1.11.2.5 2003/01/07 18:26:54 mike Exp $"
+ * "$Id: image-png.c,v 1.11.2.6 2004/04/20 10:09:37 mike Exp $"
  *
  *   PNG image routines for the Common UNIX Printing System (CUPS).
  *
@@ -62,6 +62,7 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
 		*out;			/* Output pixels */
   png_color_16	bg;			/* Background color */
 
+
  /*
   * Setup the PNG data structures...
   */
@@ -81,14 +82,26 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
 
   png_read_info(pp, info);
 
-  if (info->color_type == PNG_COLOR_TYPE_PALETTE)
-    png_set_expand(pp);
+  fprintf(stderr, "DEBUG: PNG image: %dx%dx%d, color_type=%x (%s%s%s)\n",
+          info->width, info->height, info->bit_depth, info->color_type,
+	  (info->color_type & PNG_COLOR_MASK_COLOR) ? "RGB" : "GRAYSCALE",
+	  (info->color_type & PNG_COLOR_MASK_ALPHA) ? "+ALPHA" : "",
+	  (info->color_type & PNG_COLOR_MASK_PALETTE) ? "+PALETTE" : "");
 
-  if (info->color_type == PNG_COLOR_TYPE_GRAY ||
-      info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
-    img->colorspace = secondary;
-  else
+  if (info->color_type & PNG_COLOR_MASK_PALETTE)
+    png_set_expand(pp);
+  else if (info->bit_depth < 8)
+  {
+    png_set_packing(pp);
+    png_set_expand(pp);
+  }
+  else if (info->bit_depth == 16)
+    png_set_strip_16(pp);
+
+  if (info->color_type & PNG_COLOR_MASK_COLOR)
     img->colorspace = (primary == IMAGE_RGB_CMYK) ? IMAGE_RGB : primary;
+  else
+    img->colorspace = secondary;
 
   if (info->width == 0 || info->width > IMAGE_MAX_WIDTH ||
       info->height == 0 || info->height > IMAGE_MAX_HEIGHT)
@@ -118,16 +131,6 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
   }
 
   ImageSetMaxTiles(img, 0);
-
-  if (info->bit_depth < 8)
-  {
-    png_set_packing(pp);
-
-    if (info->valid & PNG_INFO_sBIT)
-      png_set_shift(pp, &(info->sig_bit));
-  }
-  else if (info->bit_depth == 16)
-    png_set_strip_16(pp);
 
   passes = png_set_interlace_handling(pp);
 
@@ -187,29 +190,7 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
         * Output this row...
 	*/
 
-	if (info->color_type == PNG_COLOR_TYPE_GRAY ||
-	     info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
-	{
-	  switch (img->colorspace)
-	  {
-	    case IMAGE_WHITE :
-		memcpy(out, inptr, img->xsize);
-		break;
-	    case IMAGE_RGB :
-		ImageWhiteToRGB(inptr, out, img->xsize);
-		break;
-	    case IMAGE_BLACK :
-		ImageWhiteToBlack(inptr, out, img->xsize);
-		break;
-	    case IMAGE_CMY :
-		ImageWhiteToCMY(inptr, out, img->xsize);
-		break;
-	    case IMAGE_CMYK :
-		ImageWhiteToCMYK(inptr, out, img->xsize);
-		break;
-	  }
-	}
-	else
+	if (info->color_type & PNG_COLOR_MASK_COLOR)
 	{
 	  if ((saturation != 100 || hue != 0) && bpp > 1)
 	    ImageRGBAdjust(inptr, img->xsize, saturation, hue);
@@ -233,6 +214,27 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
 		break;
 	  }
 	}
+	else
+	{
+	  switch (img->colorspace)
+	  {
+	    case IMAGE_WHITE :
+		memcpy(out, inptr, img->xsize);
+		break;
+	    case IMAGE_RGB :
+		ImageWhiteToRGB(inptr, out, img->xsize);
+		break;
+	    case IMAGE_BLACK :
+		ImageWhiteToBlack(inptr, out, img->xsize);
+		break;
+	    case IMAGE_CMY :
+		ImageWhiteToCMY(inptr, out, img->xsize);
+		break;
+	    case IMAGE_CMYK :
+		ImageWhiteToCMYK(inptr, out, img->xsize);
+		break;
+	  }
+	}
 
 	if (lut)
 	  ImageLut(out, img->xsize * bpp, lut);
@@ -242,11 +244,10 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
 
       if (passes > 1)
       {
-	if (info->color_type == PNG_COLOR_TYPE_GRAY ||
-		 info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
-          inptr += img->xsize;
-	else
+	if (info->color_type & PNG_COLOR_MASK_COLOR)
           inptr += img->xsize * 3;
+	else
+          inptr += img->xsize;
       }
     }
 
@@ -265,5 +266,5 @@ ImageReadPNG(image_t    *img,		/* IO - Image */
 
 
 /*
- * End of "$Id: image-png.c,v 1.11.2.5 2003/01/07 18:26:54 mike Exp $".
+ * End of "$Id: image-png.c,v 1.11.2.6 2004/04/20 10:09:37 mike Exp $".
  */
