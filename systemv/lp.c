@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.7 1999/05/20 16:16:48 mike Exp $"
+ * "$Id: lp.c,v 1.8 1999/06/23 16:53:03 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -228,7 +228,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
     if (job_id < 1)
     {
-      fprintf(stderr, "lp: unable to print file \'%s\'.\n", argv[i]);
+      fputs("lp: unable to print stdin.\n", stderr);
       return (1);
     }
     else if (!silent)
@@ -240,5 +240,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lp.c,v 1.7 1999/05/20 16:16:48 mike Exp $".
+ * End of "$Id: lp.c,v 1.8 1999/06/23 16:53:03 mike Exp $".
  */
