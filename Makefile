@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.34 2001/06/28 16:20:08 mike Exp $"
+# "$Id: Makefile,v 1.35 2001/08/06 19:37:08 mike Exp $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -75,7 +75,7 @@ install:
 	echo Installing in templates...
 	(cd templates; $(MAKE) $(MFLAGS) install)
 	echo Installing startup script...
-	if test "x$INITDIR" != "x"; then \
+	if test "x$(INITDIR)" != "x"; then \
 		$(INSTALL_DIR) $(prefix)/$(INITDIR)/init.d; \
 		$(INSTALL_SCRIPT) cups.sh $(prefix)/$(INITDIR)/init.d/cups; \
 		$(INSTALL_DIR) $(prefix)/$(INITDIR)/rc0.d; \
@@ -133,5 +133,5 @@ tardist:
 	epm $(EPMFLAGS) -f tardist cups
 
 #
-# End of "$Id: Makefile,v 1.34 2001/06/28 16:20:08 mike Exp $".
+# End of "$Id: Makefile,v 1.35 2001/08/06 19:37:08 mike Exp $".
 #

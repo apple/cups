@@ -1,5 +1,5 @@
-INSTALL - CUPS v1.1.9 - 07/06/2001
-----------------------------------
+INSTALL - CUPS v1.1.10 - 08/06/2001
+-----------------------------------
 
 This file describes how to compile and install CUPS from source
 code. For more information on CUPS see the file called
@@ -48,11 +48,12 @@ another location:
 
 If the PNG, JPEG, TIFF, and ZLIB libraries are not installed in
 a system default location (typically "/usr/include" and
-"/usr/lib") you'll need to set the CFLAGS, CXXFLAGS, and LDFLAGS
-environment variables prior to running configure:
+"/usr/lib") you'll need to set the CFLAGS, CXXFLAGS, DSOFLAGS,
+and LDFLAGS environment variables prior to running configure:
 
     setenv CFLAGS "-I/some/directory" ENTER
     setenv CXXFLAGS "-I/some/directory" ENTER
+    setenv DSOFLAGS "-L/some/directory" ENTER
     setenv LDFLAGS "-L/some/directory" ENTER
     ./configure ... ENTER
 
@@ -60,6 +61,7 @@ or:
 
     CFLAGS="-I/some/directory"; export CFLAGS ENTER
     CXXFLAGS="-I/some/directory"; export CXXFLAGS ENTER
+    DSOFLAGS="-L/some/directory"; export DSOFLAGS ENTER
     LDFLAGS="-L/some/directory"; export LDFLAGS ENTER
     ./configure ... ENTER
 

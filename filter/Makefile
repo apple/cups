@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.47 2001/07/24 19:56:41 mike Exp $"
+# "$Id: Makefile,v 1.48 2001/08/06 19:37:10 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -122,8 +122,8 @@ libcupsimage_s.a:	$(IMAGEOBJS) ../Makedefs
 
 libcupsimage.la:       $(IMAGEOBJS) ../Makedefs
 	echo Linking $@...
-	$(CC) -o $@ $(IMAGEOBJS:.o=.lo) -rpath $(LIBDIR) \
-		-version-info 2:0
+	$(DSO) -o $(DSOFLAGS) $@ $(IMAGEOBJS:.o=.lo) $(DSOLIBS) \
+		-rpath $(LIBDIR) -version-info 2:0
 
 
 #
@@ -222,5 +222,5 @@ $(OBJS):	../Makedefs ../cups/cups.h ../cups/ppd.h ../cups/language.h
 
 
 #
-# End of "$Id: Makefile,v 1.47 2001/07/24 19:56:41 mike Exp $".
+# End of "$Id: Makefile,v 1.48 2001/08/06 19:37:10 mike Exp $".
 #
