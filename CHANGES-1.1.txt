@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The cupstestppd utility did not show a warning message
+	  when a PPD file indicated BCP protocol support with
+	  PJL (STR #720)
 	- The scheduler did not return the correct exit code
 	  when startup failed (STR #718)
 	- The cupsRasterReadPixels() function checked for

@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c,v 1.1.2.30 2004/03/24 21:05:59 mike Exp $"
+ * "$Id: cupstestppd.c,v 1.1.2.31 2004/05/24 18:38:47 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -877,6 +877,29 @@ main(int  argc,			/* I - Number of command-line arguments */
 	}
 
        /*
+        * Check the Protocols line and flag PJL + BCP since TBCP is
+	* usually used with PJL...
+	*/
+
+        if (ppd->protocols)
+	{
+	  if (strstr(ppd->protocols, "PJL") &&
+	      strstr(ppd->protocols, "BCP") &&
+	      !strstr(ppd->protocols, "TBCP"))
+	  {
+	    puts("        WARN    Protocols contains both PJL and BCP; expected TBCP.");
+	    puts("                REF: Pages 78-79, section 5.7.");
+	  }
+
+	  if (strstr(ppd->protocols, "PJL") &&
+	      (!ppd->jcl_begin || !ppd->jcl_end || !ppd->jcl_ps))
+	  {
+	    puts("        WARN    Protocols contains PJL but JCL attributes are not set.");
+	    puts("                REF: Pages 78-79, section 5.7.");
+	  }
+	}
+
+       /*
         * Check for options with a common prefix, e.g. Duplex and Duplexer,
 	* which are errors according to the spec but won't cause problems
 	* with CUPS specifically...
@@ -1159,5 +1182,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c,v 1.1.2.30 2004/03/24 21:05:59 mike Exp $".
+ * End of "$Id: cupstestppd.c,v 1.1.2.31 2004/05/24 18:38:47 mike Exp $".
  */
