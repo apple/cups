@@ -1,4 +1,4 @@
-CREDITS.txt - 01/27/2000
+CREDITS.txt - 04/23/2003
 ------------------------
 
 Few projects are completed by one person, and CUPS is no exception.  We'd
@@ -8,19 +8,25 @@ like to thank the following individuals for their contributions:
     N. Becker           - setsid().
     Jean-Eric Cuendet   - GhostScript filters for CUPS.
     Van Dang            - HTTP and IPP policeman.
+    L. Peter Deutsch    - MD5 code.
     Dr. ZP Han          - setgid()/setuid().
     Guy Harris          - *BSD shared libraries and lots of other fixes.
+    Bjoern Jacke        - I18N stuff.
     Wang Jian           - CUPS RPM corrections.
     Roderick Johnstone  - Beta tester of the millenium.
+    Till Kamppeter      - Bug fixes, beta testing, evangelism.
+    Kiko                - Bug fixes.
     Sergey V. Kovalyov  - ESP Print Pro and CUPS beta tester.
     Mark Lawrence       - Microsoft interoperability testing.
+    Jeff Licquia        - Bug fixes, beta testing, evangelism.
     Jason McMullan      - Original CUPS RPM distributions.
     Wes Morgan          - *BSD fixes.
     Ulrich Oldendorf    - German locale.
+    Giulio Orsero       - Bug fixes and testing.
+    Kurt Pfeifle        - Bug fixes, beta testing, evangelism.
     Petter Reinholdtsen - HP-UX compiler stuff.
     Stuart Stevens      - HP JetDirect IPP information.
-    Kiko                - Bug fixes.
-    L. Peter Deutsch    - MD5 code.
+    Andrea Suatoni      - IRIX desktop integration and testing.
 
 If I've missed someone, please let me know by sending an email to
 "mike@easysw.com".

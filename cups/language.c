@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.20.2.16 2003/04/18 13:37:36 mike Exp $"
+ * "$Id: language.c,v 1.20.2.17 2003/04/23 14:42:09 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -228,6 +228,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   cups_msg_t		msg;		/* Message number */
   char			*text;		/* Message text */
   cups_lang_t		*lang;		/* Current language... */
+  const char		*oldlocale;	/* Old locale name */
   static const char * const locale_encodings[] =
 		{			/* Locale charset names */
 		  "ASCII",	"ISO8859-1",	"ISO8859-2",	"ISO8859-3",
@@ -288,6 +289,18 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   if (language == NULL)
     language = setlocale(LC_ALL, "");
 #endif /* __APPLE__ */
+
+ /*
+  * Set the locale back to POSIX while we do string ops, since
+  * apparently some buggy C libraries break ctype() for non-I18N
+  * chars...
+  */
+
+#if defined(__APPLE__) || !defined(LC_CTYPE)
+  oldlocale = setlocale(LC_ALL, "C");
+#else
+  oldlocale = setlocale(LC_CTYPE, "C");
+#endif /* __APPLE__ || !LC_CTYPE */
 
  /*
   * Parse the language string passed in to a locale string. "C" is the
@@ -383,6 +396,16 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     else
       strcpy(real, "C");
   }
+
+ /*
+  * Restore the locale...
+  */
+
+#if defined(__APPLE__) || !defined(LC_CTYPE)
+  setlocale(LC_ALL, oldlocale);
+#else
+  setlocale(LC_CTYPE, oldlocale);
+#endif /* __APPLE__ || !LC_CTYPE */
 
  /*
   * See if we already have this language loaded...
@@ -707,5 +730,5 @@ appleLangDefault(void)
 
 
 /*
- * End of "$Id: language.c,v 1.20.2.16 2003/04/18 13:37:36 mike Exp $".
+ * End of "$Id: language.c,v 1.20.2.17 2003/04/23 14:42:09 mike Exp $".
  */

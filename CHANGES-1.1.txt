@@ -3,10 +3,15 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19rc3
 
+	- cupsLangGet() needs to set the CTYPE locale to "C"
+	  (POSIX) to avoid erroneous tolower/toupper values (fix
+	  suggested by Bjoern Jacke)
 	- Fixed a typo in the cups.list.in file.
 	- Updated all of the Western European locales to default
-	  to ISO-8859-15 (for Euro support)
-	- Updated the German message catalog.
+	  to ISO-8859-15 (for Euro support, suggested by Bjoern
+	  Jacke)
+	- Updated the German message catalog (update provided by
+	  Bjoern Jacke)
 
 
 CHANGES IN CUPS V1.1.19rc2
