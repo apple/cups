@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.45 2003/09/10 02:49:12 mike Exp $"
+ * "$Id: language.c,v 1.46 2003/10/31 23:10:17 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -367,7 +367,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   * Figure out the desired encoding...
   */
 
-  encoding = CUPS_US_ASCII;
+  encoding = CUPS_AUTO_ENCODING;
 
   if (charset[0])
   {
@@ -505,10 +505,12 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   lang->used ++;
   strlcpy(lang->language, real, sizeof(lang->language));
 
-  if (charset[0])
+  if (encoding != CUPS_AUTO_ENCODING)
     lang->encoding = encoding;
   else
   {
+    lang->encoding = CUPS_US_ASCII;
+
     for (i = 0; i < (sizeof(lang_encodings) / sizeof(lang_encodings[0])); i ++)
       if (strcmp(lang_encodings[i], line) == 0)
       {
@@ -896,7 +898,8 @@ cups_cache_lookup(const char      *name,/* I - Name of locale */
   */
 
   for (lang = lang_cache; lang != NULL; lang = lang->next)
-    if (!strcmp(lang->language, name) && encoding == lang->encoding)
+    if (!strcmp(lang->language, name) &&
+        (encoding == CUPS_AUTO_ENCODING || encoding == lang->encoding))
     {
       lang->used ++;
 
@@ -908,5 +911,5 @@ cups_cache_lookup(const char      *name,/* I - Name of locale */
 
 
 /*
- * End of "$Id: language.c,v 1.45 2003/09/10 02:49:12 mike Exp $".
+ * End of "$Id: language.c,v 1.46 2003/10/31 23:10:17 mike Exp $".
  */
