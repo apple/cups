@@ -1,52 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>
 <HEAD>
 <TITLE>DRAFT - CUPS Software Security Report</TITLE>
 <META NAME="AUTHOR" CONTENT="Easy Software Products">
 <META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
 <META NAME="DOCNUMBER" CONTENT="CUPS-SSR-1.0">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<STYLE>
+BODY { font-family: serif; font-size: 11.0pt }
+H1 { font-family: sans-serif; font-size: 19.0pt }
+H2 { font-family: sans-serif; font-size: 19.0pt }
+H3 { font-family: sans-serif; font-size: 19.0pt }
+H4 { font-family: sans-serif; font-size: 19.0pt }
+H5 { font-family: sans-serif; font-size: 19.0pt }
+H6 { font-family: sans-serif; font-size: 19.0pt }
+SUB { font-size: 7.6pt }
+SUP { font-size: 7.6pt }
+PRE { font-size: 9.2pt }
+</STYLE>
 </HEAD>
 <BODY>
-<CENTER><A HREF=#contents><IMG SRC="images/cups-large.gif" BORDER=0><BR>
-<H1>DRAFT - CUPS Software Security Report</H1></A><BR>
+<CENTER><A HREF="#CONTENTS"><H1>DRAFT - CUPS Software Security Report</H1></A><BR>
 CUPS-SSR-1.0<BR>
 Easy Software Products<BR>
 Copyright 1997-1999, All Rights Reserved<BR>
 </CENTER>
 <HR>
-<H1 ALIGN=CENTER><A NAME=CONTENTS>Table of Contents</A></H1>
+<H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
 <BR>
-<BR><B><A HREF=#1>1 Scope</A></B>
+<BR><B><A HREF="#1">1 Scope</A></B>
 <UL>
-<LI><A HREF=#1_1>1.1 Identification</A></LI>
-<LI><A HREF=#1_2>1.2 System Overview</A></LI>
-<LI><A HREF=#1_3>1.3 Document Overview</A></LI>
+<LI><A HREF="#1_1">1.1 Identification</A></LI>
+<LI><A HREF="#1_2">1.2 System Overview</A></LI>
+<LI><A HREF="#1_3">1.3 Document Overview</A></LI>
 </UL>
-<B><A HREF=#2>2 References</A></B>
+<B><A HREF="#2">2 References</A></B>
 <UL>
-<LI><A HREF=#2_1>2.1 CUPS Documentation</A></LI>
-<LI><A HREF=#2_2>2.2 Other Documents</A></LI>
+<LI><A HREF="#2_1">2.1 CUPS Documentation</A></LI>
+<LI><A HREF="#2_2">2.2 Other Documents</A></LI>
 </UL>
-<B><A HREF=#3>3 Local Access Risks</A></B>
+<B><A HREF="#3">3 Local Access Risks</A></B>
 <UL>
-<LI><A HREF=#3_1>3.1 Security Breaches</A></LI>
+<LI><A HREF="#3_1">3.1 Security Breaches</A></LI>
 </UL>
-<B><A HREF=#4>4 Remote Access Risks</A></B>
+<B><A HREF="#4">4 Remote Access Risks</A></B>
 <UL>
-<LI><A HREF=#4_1>4.1 Denial of Service Attacks</A></LI>
-<LI><A HREF=#4_2>4.2 Security Breaches</A></LI>
+<LI><A HREF="#4_1">4.1 Denial of Service Attacks</A></LI>
+<LI><A HREF="#4_2">4.2 Security Breaches</A></LI>
 </UL>
-<B><A HREF=#5>A Glossary</A></B>
+<B><A HREF="#5">A Glossary</A></B>
 <UL>
-<LI><A HREF=#5_1>A.1 Terms</A></LI>
-<LI><A HREF=#5_2>A.2 Acronyms</A></LI>
+<LI><A HREF="#5_1">A.1 Terms</A></LI>
+<LI><A HREF="#5_2">A.2 Acronyms</A></LI>
 </UL>
 <HR>
-<H1><A NAME=1>1 Scope</A></H1>
-<H2><A NAME=1_1>1.1 Identification</A></H2>
+GIF89a&macr;&yuml;&ograve;&Igrave;&Igrave;&Igrave;™™™fff333&yuml;&yuml;&yuml;&yuml;&yuml;&yuml;&yuml;&yuml;&yuml;!&ugrave;,&macr;&yuml;B&thorn;X&ordm;&Uuml;&thorn;0&Ecirc;I&laquo;&frac12;8&euml;&Iacute;&raquo;&yuml;`(Ždižh&ordf;2€0p,&Iuml;tm&szlig;x&reg;&iuml;
+
+<!--=•pH,Ö«Çl:ŸÐ¨”ù ¯Ø¬ÖXN¿à°xL~¬Û´zmxËð¸|N§Ùø¼(Pïûÿ€bwz…jn‚‰Š‹Œ9„†‘!-->
+;&plusmn;&Yacute;&iacute;ˆnd&yacute; !&cedil; ž&sup3;w&agrave;…MƒƒY~&iquest;{,g&Uacute;\‚&auml;&eacute; 
+Œ&times;&Oslash;(t&Ugrave;&icirc;!&Iuml;=&Ntilde;.&ucirc;z&macr;&aacute;&Ntilde;Ÿ:&igrave;;&Atilde;9q&ouml;&iacute;&Eacute;&euml;]/&iquest;&ordm;&Eacute;&curren;Et/†'&Icirc;&thorn;t9&Agrave;&Oslash;–ž_&Ugrave;&Ccedil;\|W•wAr&ouml;&cedil;&Yacute;2&Ocirc;&times; 
+tN&deg;0T&iuml;}&iexcl;&ucirc;‰$!‚yMx&icirc;)ˆš‰&Ocirc;&oslash;@nB&deg;U&frac12;&Ecirc;wE„&sect;!ŠF H&nbsp;L8B 
+c‰;ždŠ-&aelig;DVWd&ETH;&sup3;€h&plusmn;&auml;&Uacute;“P&para;%#(4Fi&aring;•&Iuml;\hŠ:Re!\&Ograve;&Auml;—X^&brvbar;%€&yen;&Agrave;-$E€&Ouml;/&uacute;HŽšl&acirc;&acirc;&ouml;&Igrave;QX
+
+<!--äÇ"iL	:a7‚]›0IZ¡YØø¡‡D}¤–Uj±á
+^âä™æ`Ú@¦5b|šà«Á±§3Ñ KwÔ\ªB¨±H)+=¡Ó©"
+©¢	8uƒ†¸öŠD§•lþ:„dRXilÌ:Ë!´;¹t+„e<
+‡;øô+‚bbhaÚ0Ê6é.D™ðÞ¹Ì¹ñÖkoê({ï¾ü{f¿-->
+&cedil;1N&ocirc;&macr;b&quot;œŠ&uuml;j&aring;&Aacute;&Acirc;E0…&Egrave;8&ouml;5GkZ|&Ograve;&Aacute;wt„C&raquo;&Ocirc;QS&Ccedil;o6&Ocirc;&Ugrave;[W„$&sup2;*Ž+4Pb-8&sup1;P1&thorn;'8&quot;‘Š&curren;&Auml;$&nbsp;Cy&ecirc;‘„)&gt;&atilde;Št&egrave;`&ETH;3&Acirc;‡‹&frac34;z&quot;&laquo;rE'&Acirc;qf&auml;&deg;&Euml; 
+‘q&Acirc;\|€„Ž&iexcl;&ocirc;&ouml;&raquo;%&Eacute;(.—b&Uacute;&frac12;&Egrave;€&iacute;&Eacute;`{&not;E&Ccedil;1w’ &raquo;[H&szlig;`(B6&ouml;“&nbsp; 
+†')&Ecirc;RŽ&Icirc;a[&Atilde;rbC!T&aring;&deg;Œ 
+2Q&middot;&Egrave;HZ&ecirc;#–&reg;&uuml;&Euml;/&agrave;&ocirc;&macr;F&Yacute;&ecirc;(&Ucirc;&sup2;%&nbsp;&ordm;X&Euml;9&ouml;&Agrave;b&Aacute;4f.&ugrave;-o&yacute;™X&Euml;B…I&Icirc;&Ograve;7&sup1;*@&Atilde;&Oacute;Ž&Iacute;T€h&agrave;‘&Igrave;W&acirc;™&Atilde;$f:&micro;yžn†&oacute;†r„'t&eacute;Kv` 
+&Ccedil;+d&ordf;– œ79s&ograve;|'=&times;&cent;&Igrave;x&para;&ograve;œ&yuml;„&brvbar;œˆe&Icirc;;*&agrave;$&thorn;” I&Yacute;&AElig;a&Iuml;{–3Ž&Aring;&Aacute; 
+P“&Iacute;S[&Ugrave;L&uml;3&copy;&ograve;Q7&eacute;&AElig;&ograve;#&atilde;&ucirc;&ocirc;0F&times;&eth;sE&deg;t&sect;@‘&Oslash;Q&Uuml;&acute;&acute;&nbsp;&copy;:3&Oacute;R&iacute;d&nbsp;&yen;*MITnŒ&pound;&uml;H]&Oslash;Q&Aacute;d 
+@&ograve;&thorn;—&not;rMœŽaO
+<!--x‹ŒÖ3½4 °XT'ª®ƒ:T£uéWeºádËeú¸è¬Ù7
+
+ëÒÏ;„sœåµ7m(ýÐŸtl¤RV)-->
+r&euml;^y&Agrave;&middot;(&cedil;&icirc;&eacute;&ecirc;&ucirc;$uD&ograve;r&atilde;/a,I.&deg;&Ugrave;U&Agrave;œb hˆ`&frac34;B&nbsp;&euml;&quot; 
+&Uuml;`H&Oslash;x&Egrave;&cedil;o1&thorn;[&aacute;\8f^&aelig;|\&yacute;‚&cent;&cent;z&oslash;0(ˆ\ {ƒ&Auml;g&auml;&THORN;&otilde;€&ccedil;&acirc;&sect;&Aacute;˜0*\&sup3;n&frac14;‹m&para;/&Auml;e&ordf;&plusmn;&yuml;†&igrave; 
+&Ccedil;,&frac12;DN2€œ&ordm;+&ugrave;&Eacute;|&iacute;0L&iexcl;Le*&eth;&cedil;&Atilde;&gt;&shy;2&euml;f,eIPO&Euml;&Aring;&agrave;r—&plusmn;”80SAŸcF&ordf;at&ccedil;&raquo;&atilde;y&curren;&cedil;rš&ccedil;&Igrave;&iexcl;5&iuml;o&otilde;&Euml;sž&iuml;|&iquest;8&Euml;™&Icirc;&brvbar;&not;&thorn;,&iuml;&frac14;&egrave;&agrave;)&Aacute;&Igrave;;&oslash;k&iexcl;—†dDp&Ntilde;&ograve;&oslash;2&cent;qfH&atilde;!&Euml;“~&Ugrave;Ÿ-&iacute; 
+'g:,&aelig;4y?&yacute;&auml;P‹Z›ž#&Iuml;&Otilde;&acute;&Icirc;5AK‰k]&ucirc;š›&Ograve;K&otilde;&macr;‡m&euml;€&otilde;z&Oslash;&Egrave;&AElig;&laquo;&Oslash;Ž&Yacute;&gt;B{P&ETH;&ordf;.6hf]&ordm;?&copy;&Igrave;IŽuO„&iacute;M‚&Igrave;&Ccedil;&Uuml;c&micro;3˜ 
+61‹N&Ograve;[†W&pound; &brvbar;m&iquest;&shy;{&Acirc;P&acirc;v&Icirc;&para;KnUˆ[ &ograve;n&Auml;&frac12;&plusmn;&divide;n?l:&Aacute;ž3uš&euml;&not;sP[&yuml;nn&frac34;&ccedil;P…W&otilde;&Ocirc;Fj[&Acirc;&divide; 
+&sup1;v&Iuml;™&agrave;‰˜x&uacute;'ˆ&pound;&Agrave;&Agrave;†p&cedil;4.&ecirc;&atilde;K&Ccedil;&iquest;&Acirc;&Aacute;&plusmn;o&sect;&cent;&uuml;&quot;&Aacute;|Nk`&icirc;&Ecirc;˜
+<!--•¤7 yþ	D-->
+ 
+jl&copy;&Igrave;uˆ&Euml;i™0pmC&acute;&laquo;+‰&divide;6&curren;2&shy;&eacute;&Iuml;e`(ŽJ]&yen;i&otilde;&eth;3ƒ&Oslash;&iacute;&quot;p|&ordf;!:q&oslash;F&Oslash;&sup3; 6&pound; 
+@&shy;,&thorn;Šq&uuml;&atilde;o&Igrave;&Ccedil;&reg;ž&Ouml;&uuml;V“&para;Q&Ccedil;›Ev&icirc;&sup1;&sup2;&Eacute;8&Ugrave;&ordf;S&quot;&aelig;&Agrave;&ccedil;‡x&plusmn; &agrave;&thorn;‡&gt;—I&atilde;g 
+&iuml;&Yacute;&gt;Y‰&ccedil;N80&aelig;&sect;&nbsp;&plusmn;&frac34;GLL&igrave;&Otilde;&micro;…(1&THORN;&frac14;!8}&thorn;&not;“*…&ordf;‰&Ugrave;&igrave;:e&raquo;&acute;œ 
+&ordf;&iquest;&ecirc;n_6&Acirc;&Atilde;S&Agrave;`eG;&Ouml;„CƒCcˆ&iquest;‡4&cedil;ye&icirc;&macr;&Iacute;)o&oslash;ByRm&frac12;0?&iacute;L&icirc;&Aring;`Q&yuml;j&Oacute;&Ugrave;/&ordm;&ocirc;&Oacute;N|&Yacute;
+<!--â9ço‘SŽà•?œýáu¿þá¯~!ÒŸ¿ÍÏüýÏIw1ßþZÈN¥Ex£&\(¤á[É¤€v2€WW-->
+
+&thorn;&Ugrave;A&Uuml;Œ&Aacute;&cedil;D5&copy;D a&aelig;vx ?Š&para;x&deg;DM@•!h‰&agrave;&Egrave;€Ž&sect;&reg; 
+•&nbsp;&aacute;&times;B`&eth;&curren;&ordf;E?›“”&THORN;dƒ&quot;8$&Yacute;`Ki0…O&eth;ƒn&Icirc;“&plusmn;&micro;vtž&egrave;€I([,&sup1;Nd&Eacute;&uml;h\'6X 
+P&atilde;—Š‰&Eacute;&oslash;t &cent;‘&yen;˜&not;&egrave; €ˆ†Ky™FˆŒ&euml;`š”yƒ„&uml;š €š‰ƒM&copy;‡&oslash;FQhY„ 
+9&para;X&macr;&times;–&iacute;4š&curren;™Y\)&quot;&sup1;AN]‰x&eacute;z&divide;Gq07)&copy;&ntilde;™•Y€r&deg;ŒŽi‹ z ™&Ccedil;&auml;F&Iacute;&Eacute;T–&ugrave;› 
+&Euml;ŽC œwI›&uuml;X]‹&sup1;\&euml;Y]&thorn;f l&iuml;Ybj8Ÿ&Egrave;uœbŸ&Iacute;&Aring;t&uacute;&copy;f&THORN;&times;ŸfBI—“*&oslash;&eacute;:&Ucirc;&Oslash;Uj&nbsp;&Ograve; 
+ˆ&otilde;&sup1;&nbsp;&Otilde;p&nbsp;$(~  &iexcl;&Uacute; &iexcl;g&ugrave;{&icirc;pZI?&iexcl;ƒ&icirc;&Agrave;v:“a&brvbar;˜6&cent;&sect;&Ocirc;]&Yacute;‘(&ordf;&ecirc;)!Ÿ&Uacute;&cent;: 
+jw&micro;&iexcl;4&Uacute;v&iacute;H&Ucirc;&Ccedil;˜9&ordm;Xh&oacute;•&uuml;&ugrave;&pound;&yen;&Aacute;&cent;V&Eacute;{D&ordm;2š‰(&deg;&curren;3š&curren;a&divide;&nbsp;+&ETH;&pound;&yen;“p&cent;&thorn;&ograve;4V&ordm;—  
+E&acute;&yen;&egrave;&curren;k&deg;7&ordm;hT*€&iquest;&egrave;w`&Uacute;ži&Auml; …S&brvbar;&AElig;&brvbar;m&ecirc; N&ecirc;ƒ#&uacute;&cent;f€ x&ecirc;†&yacute; 
+8z&copy;7u&Uacute;p{&Uacute;=~]7`&laquo;h‡&Uacute;s&Uacute;g:…zd˜&oacute;&sect;&Icirc;A-v&thorn;A&ntilde;r&brvbar;'–A&Uacute;)9–š&cent;&acirc;Si;&pound;…š 1&ordf;o&quot;&ordf; 
+&brvbar;J;“&ordm; r&ordm;8Ui|&eacute;&gt;&iexcl;&Uacute;œ&uacute;
+<!--pv³2<ƒj£·«É¦kÉ	1Š:¬Èe ”«ÉÚlÑ•ªÍZn¯Š2Ì­‹s«Á­ÖÚàé¨Ûº=¤zŽŸú­6­áU­ä
+Øš¨¿újá
+¦0®éJ«
+¯NÕäº•öÐVeÎ¶¯õbm¶7ù´Ž-->
+“&euml;&yen;Dfn&yacute;2&raquo;ƒ–0j&laquo;&reg;&raquo;&ordm;K;z&euml;&cent;&Iacute;&ouml;&raquo;—!&micro;—S&raquo;&sup3;r&gt;K+6ˆ‹&uml;X&Ograve;&raquo;; C&Egrave; 
+8&Ecirc;;&cent;&raquo;&Atilde;&Ucirc;/Œ‹&yen;ž!&not;s&frac12;VR&frac12;&oacute;&otilde;&Iuml;‹O&acirc;[/&ccedil;K&uml;&thorn;˜&Ntilde;:&Iacute;‹\&Yacute;+&nbsp;Sc:&iuml;&Euml;ž’&ordm;&para;&euml;9&AElig;&raquo;
+<!--ëSç½¤tj ½YUÀœãÀ©%
+Ìró)Á0¨§—³½Ç…Á¬Ì¤LÛ6øK!<Á:Àê*ª…ÃÁî…Á.‡²
+¥¼‘z Âä	¦ýËÀ~¸7<,´GóÃý‹ÂöêÀe:Ä¢‰°ë«£m£,žyAI¡…˜Q!8-->
+&ocirc; 8ly$ 
+8&copy;&Ugrave;&Aring;mX2&Ugrave;h&gt;—?&macr;!šH&uuml;&Aacute;^LsP,Ÿ&laquo;Y‹&acirc;&aacute;&iquest;&yuml;tš&igrave;‚&pound;Y 
+r&brvbar;&Eacute;š&yen;9&Ccedil;jž&Auml;8-&AElig;&Ccedil;Œ&para;i&ecirc;P&Acirc;bA&Acirc;˜&ugrave;‰&Atilde;&cedil;š&raquo;&sup3;7RœCWRo&igrave;Š&aring; MŒŠ”&aring;t™ Œ›r&eacute;&Eacute;q
+<!--Zva&‹Z¤jzÊŠ¬‡7èV)“‹|›ká!¦*€Á¶öÄ84’Wž¶LÊñ½Fª6ÄOqÌ°Š}Å¬—|žÎ|4!ÍAh+è•L¢
+%|‹Û¬Å$-->
+
+&aring;&gt;}L&ecirc;}&Icirc;&Ccedil;&uml;&nbsp;5:&agrave;Œ|&quot;&thorn;&Ccedil;w&ETH;s&oslash;&aelig;N&Icirc;&deg;&sup1;#R&gt;~-N‰&reg;&egrave;ƒ&nbsp;&szlig;c&eth;&THORN;&Atilde;š&Icirc;&Ntilde;&yen;&reg;&aring;G&Icirc;&acirc;&iacute;ˆ‰&Yacute;&egrave;*‚&cedil; 
+=‚ž &ordm;&euml;&acirc;…&shy;&euml;&Agrave;&gt;&Ucirc;&middot;ž&euml;n^žm&egrave;&Ecirc;&euml;&eth;&frac14;&atilde;&gt;&aring;&times;&Icirc;›&laquo;}&ecirc;&Oslash;&divide; 
+“Œ&not;&Euml;I&Aacute;&middot;A&Ocirc;N&Iacute;&euml;v&gt;]t.&acirc;&Uacute;L&ETH;&laquo;&thorn;&iacute;&iuml;&frac34;&ntilde;n&auml;&Ouml;&Uuml;&aelig;s&sup1;&iquest;&plusmn;&acirc;&deg;+† 
+&not;U&Oslash;&iuml;&icirc;•.&ccedil;&not;&Icirc;&igrave;&Iacute;.&egrave;&acute;&THORN;ŠG=&eth;&ugrave;‚&sect;ž&macr;”&euml;^&auml;&Ucirc;&reg;&ecirc;h-‹&ecirc;&ecirc;!i!&Otilde;vM&iacute;i&ordf;&icirc;&thorn;&frac34;&ograve;&icirc;&aacute;/&thorn;&icirc;™&cedil;&Ntilde;-O&Ouml;G&eth;,o&ntilde;&ordm;!&aring;’gO&acirc;&nbsp;PO&igrave;O&ocirc;B&thorn;&Egrave;&agrave;h&acirc;+?&iuml;&gt;&szlig;&Ecirc;VH&Agrave;sa&otilde;™€&otilde;$&oacute;S&icirc;&otilde;—&raquo;&oacute;8.ž&szlig;&sup1; 
+~&aacute;&szlig;&Egrave;&copy;&ouml;&raquo;]&ograve;3&euml;&AElig;t_&divide;[&iuml;&ocirc;b&macr;&ccedil;‚&Uuml;&divide;&Otilde;&laquo;@u™&eth;;z&Uuml;˜‘&Uuml;@&oacute;Ž2’?&ugrave;ƒ&cedil;&Ugrave;l&ugrave;F&nbsp;&para;™&macr;&ugrave;›N&nbsp;ž0œ&uacute;&pound;&para;&curren;&yuml;0#9:&szlig;&sect;&frac12;ž&copy;Ÿ\#&Atilde;&Ugrave;&aelig;&oacute;2&eacute;+&ucirc;‚&Agrave;&Oacute;&cedil;_&auml;M/&Oacute;ta&Uacute;&yacute;3”]&Ugrave;&laquo;&iquest;&cedil;i&icirc;aF&gt;&ordf;}Œ&Oslash;v&Iacute;&iuml;M&Iacute;&divide;&ETH;&euml;&auml;&copy;&icirc;r&Uuml;Œ&ouml;q&ntilde;_&Agrave;&uuml;&ordf;r&acirc;F&reg;&ograve;
+&yacute;&thorn;&cedil;—hT_&atilde;4sx”&yacute;&Yacute;&icirc;)&ccedil;.Qg&Atilde;&raquo;&agrave;Ÿ&Iuml;%&igrave;‹}i&acute;AS&ucirc;|&thorn;&eth;@Q&Uuml; 
+$J9€&raquo;-&Igrave;&plusmn;&divide;&Uuml;&ocirc;M&Oslash;‘hZ˜&brvbar;:&deg;œ*&Iuml;l&szlig;x&Ograve;|&Iuml;&frac14;&iexcl;&Aring;L&Agrave; &not;&Aacute;f&ugrave;9B&Ntilde;d&igrave;&Aacute;|&laquo;VV„&cent;“&eacute;nKv
+<!--uè´®Ì®iiçÍ¦t›šV/.²ê}mywu#|Yc‚X|jŽx‹dE“)0U’ T–<W€o zbQ`F¥2›³:°Ctª·‰!™²*¨…º»¢~Š°z¬†Á¯Ä‡´ÕŽ¶Ó(iÃm²F›ÍÚhÜÞ“Æ¡Ö…äc|ØËUÒÙþ²ëøçõƒ³ÜØ<î™w‰Ö¿Eéhä›@ðÂ-->
+
+kB_ƒg 3&Ecirc;&sup3;8#&THORN;&not;L=0;J&curren;&auml;&Egrave;@&curren;F|'i~&plusmn;&copy;  ža&Ecirc;Š&AElig;g;d*3&sup2;”&copy;bP&Iuml;&cent;T&auml;H&ocirc;&brvbar;?[† 
+&Auml;&auml;ƒhN6ZM&cent;D:c*BR!$&plusmn;ckƒ’V&shy;-u&Ucirc;@[&oslash;p„Ÿ]&frac14;8&ouml;-1{T&Icirc;&reg;W&Iuml;2&ntilde;&nbsp;Šp=&cedil;q&laquo;&Ntilde;&frac12;es.‰„4+#&Euml;e&brvbar;&yen;W5&micro;ekxr&auml;›“/X&Iacute;š5I&Ccedil;ƒ=k&Yacute;&uacute;&micro;&igrave;&Euml;&deg;&ucirc;N–2q&Aring;[r&brvbar;yZ&pound;QŽ›&Ccedil;&THORN;txŠ&auml;cK—&Iacute;&iacute;&Eacute;&sup1; 
+i&thorn;&iexcl;9&frac14;m1o&ntilde;&cent;&copy;/&sup2;8&icirc;&igrave;St&eacute;4l’Wm&frac34;9&oacute;&eacute;&Ouml;&Ucirc;&ETH;&atilde;&atilde;{{&uuml;z&THORN;&iquest;&ccedil;&oslash;&ecirc;&ouml;&THORN;z&agrave;}œ&agrave;L&uml;&nbsp;&quot;˜ 
+&Auml;&ETH;s&agrave;&para;PGLU&uacute;&aring;`M&THORN; &nbsp;&iexcl;†9&not;&sect;&Ucirc;{pX&cedil;&iexcl;w&Uacute;w&szlig;‡&iexcl;&uml;&nbsp;‰&iacute; &quot;MUXNx
+<!--É……¡×ƒà¨âŠêÄõ#ƒå“Ž:Å(ã4Ö¸Až˜:@Ùw¸	YÝ‹tIã’Ö”˜$…a(å‹X¥F7×IÈbŠ["Y€Mç¸¹K~`¶Øä-->
++l&acute;&aacute;&brvbar; 
+j&sup2;F:&Aacute;.&ecirc;&AElig;&Ucirc;j&curren;&sup3;B&uacute;&icirc; &frac14;&Ecirc;&laquo;/&pound;&Ouml;’[&ETH;&frac12;#&iacute;+&eth;&yen;&aelig;nJ&THORN;&cedil;&laquo;&aelig;;&eth;&Acirc;&copy;&otilde;‹&uml; _&Euml;&eth;&Auml;Š&Ograve;&raquo;*&ordm;? 
+ƒ&Acirc;wœ&Atilde;yzh&plusmn;&deg;&Oslash;zl2,#oZ2&Egrave;›r|&ograve;&Euml;‚&deg;&frac14;$&Ccedil;)&euml; 
+&oacute;&Iacute;&Ugrave;&Ocirc;,&eacute;fs€1&Icirc;@/&oslash;&icirc;&Iuml;P&otilde;&Igrave;i&ETH;H&middot;&eth;&Atilde;BkLt&Ograve;P&macr;b&ocirc;S;N&Yacute;W&Ocirc;X&Iuml; 
+&oacute;’dl&Iacute;t&Ouml;`&deg;tžOc&nbsp;&oacute;&Aring;a&sect;}A&Auml;›&sup2;1v&Euml;j&Ccedil;m&thorn;u+`&Iacute;&Iacute;&Aacute;&middot;qw&uuml;6˜‚&igrave;&frac12;s&THORN;XŸ&uml;&Euml;$xM6&agrave;P&sup3;-i&Eacute;S&Uacute;&frac12;A&Ugrave;ˆ&iuml;&euml;84–&oslash;=x&auml;8^!&auml;*L&gt;&THORN;˜ƒk&sup1;Œ({I&egrave;^!&aacute;&cedil;˜N$&ecirc; 
+&laquo;&reg;&ccedil;!&ordm;&ucirc;&Acirc;‚&yuml;&Yacute;&nbsp;&euml;&macr;&szlig;o&icirc;—O&uuml;&uml;&frac34;&yuml;&icirc;9&iacute;]&ntilde;&THORN;{&ntilde;&Ugrave;&Ecirc;&reg;&atilde;lhŽ(&egrave;&Igrave;&Atilde;&ecirc;&frac14;~&Ocirc;S&cent;|&ouml;&Otilde;Ÿz&yacute;w&not;&Euml;&sect;|&oslash;&Yacute;—*&frac12;Œ&Egrave;&times;&shy;|&uacute;&aring;wz&thorn;&aelig;“)Nr&ucirc;&frac34;&Ecirc;?*&ocirc;&yen; 
+&iquest;*&divide;&ocirc;7&uacute;&frac12;~M&uacute;&uacute;&uacute;&divide;&ordf;&divide;&Eacute;ˆ•S3x*&ucirc;&iacute;P”&ugrave;H&pound;&deg;&deg;&agrave;&oacute;(&egrave;&frac34;&iacute;-Jƒ&uacute;™ 
+&aring;AF{#\”g…&Aacute;œ)!),&Ocirc; #&Oacute;&Acirc;&Ccedil;&frac14;j&thorn;1œŒ&thorn;h&copy;&sup2;K„9$ƒY&egrave;)Ž ˆA &Egrave; 
+—‡)#1‰&Oacute;p&quot;˜&eth;'&Atilde;%n‰P&acute;‡&Ugrave;&uml;-‹1&sup3;&cent;^\%&AElig;ˆ&Ocirc;p„CL&Ouml;5&Atilde;
+<!--a‘^œß­âx¯
+€±peŒ-->
+<HR>
+<H1><A NAME="1">1 Scope</A></H1>
+<H2><A NAME="1_1">1.1 Identification</A></H2>
  This software security report provides an analysis of possible 
 security concerns for the Common UNIX Printing System (&quot;CUPS&quot;) Version 
 1.0.
-<H2><A NAME=1_2>1.2 System Overview</A></H2>
+<H2><A NAME="1_2">1.2 System Overview</A></H2>
  The Common UNIX Printing System provides a portable printing layer for 
  UNIX&reg; operating systems. It has been developed by Easy Software 
  Products to promote a standard printing solution for all UNIX vendors 
@@ -62,7 +162,7 @@ applications under UNIX. </P>
 <P>CUPS also includes a customized version of GNU GhostScript 
 (currently based off GNU GhostScript 4.03) and an image file RIP that 
 can be used to support non-PostScript printers. </P>
-<H2><A NAME=1_3>1.3 Document Overview</A></H2>
+<H2><A NAME="1_3">1.3 Document Overview</A></H2>
 <P>This software security report is organized into the following 
 sections:</P>
 <UL>
@@ -72,8 +172,8 @@ sections:</P>
 <LI>4 - Remote Access Risks</LI>
 <LI>A - Glossary</LI>
 </UL>
-<H1><A NAME=2>2 References</A></H1>
-<H2><A NAME=2_1>2.1 CUPS Documentation</A></H2>
+<H1><A NAME="2">2 References</A></H1>
+<H2><A NAME="2_1">2.1 CUPS Documentation</A></H2>
  The following CUPS documentation is referenced by this document: 
 <UL>
 <LI>CUPS-CMP-1.0: CUPS Configuration Management Plan </LI>
@@ -86,7 +186,7 @@ sections:</P>
 <LI>CUPS-SUM-1.0.x: CUPS Software Users Manual </LI>
 <LI>CUPS-SVD-1.0.x: CUPS Software Version Description </LI>
 </UL>
-<H2><A NAME=2_2>2.2 Other Documents</A></H2>
+<H2><A NAME="2_2">2.2 Other Documents</A></H2>
  The following non-CUPS documents are referenced by this document: 
 <UL>
 <LI>IEEE 1387.4, System Administration: Printing (draft) </LI>
@@ -96,12 +196,12 @@ sections:</P>
 <LI>RFC 2566, IPP/1.0: Model and Semantics </LI>
 <LI>RFC 2639, IPP/1.0: Implementers Guide </LI>
 </UL>
-<H1><A NAME=3>3 Local Access Risks</A></H1>
+<H1><A NAME="3">3 Local Access Risks</A></H1>
 <P>Local access risks are those that can be exploited only with a local 
 user account. This section does not address issues related to 
 dissemination of the root password or other security issues associated 
 with the UNIX operating system. </P>
-<H2><A NAME=3_1>3.1 Security Breaches</A></H2>
+<H2><A NAME="3_1">3.1 Security Breaches</A></H2>
 <P>There are two known security vulnerabilities with local access: </P>
 <OL>
 <LI>Since the default installation creates a world-readable  request 
@@ -122,11 +222,11 @@ can be minimized. </P>
 exploit this vulnerability. </P>
 </LI>
 </OL>
-<H1><A NAME=4>4 Remote Access Risks</A></H1>
+<H1><A NAME="4">4 Remote Access Risks</A></H1>
 <P>Remote access risks are those that can be exploited without a local 
 user account and/or from a remote system. This section does not address 
 issues related to network or firewall security. </P>
-<H2><A NAME=4_1>4.1 Denial of Service Attacks</A></H2>
+<H2><A NAME="4_1">4.1 Denial of Service Attacks</A></H2>
 <P>Like all Internet services, the CUPS server is vulnerable to denial 
 of service attacks, including: </P>
 <OL>
@@ -168,7 +268,7 @@ large attribute values. </P>
  user-level access control as needed for expensive printers. </P>
 </LI>
 </OL>
-<H2><A NAME=4_2>4.2 Security Breaches</A></H2>
+<H2><A NAME="4_2">4.2 Security Breaches</A></H2>
 <P>The current CUPS server only supports Basic authentication with 
 usernames and passwords. This essentially places the clear text of the 
 username and password on the network. Since CUPS uses the UNIX username 
@@ -183,8 +283,8 @@ restricted accordingly. </P>
 the entire message body using separate MD5-based username and password 
 files. This will protect password information and prevent unauthorized 
 access due to compromised account passwords. </P>
-<H1 TYPE=A VALUE=1><A NAME=5>A Glossary</A></H1>
-<H2><A NAME=5_1>A.1 Terms</A></H2>
+<H1 TYPE="A" VALUE="1"><A NAME="5">A Glossary</A></H1>
+<H2><A NAME="5_1">A.1 Terms</A></H2>
 <DL>
 <DT>C </DT>
 <DD>A computer language. </DD>
@@ -197,7 +297,7 @@ access due to compromised account passwords. </P>
 <DT>socket </DT>
 <DD>A two-way network communications channel. </DD>
 </DL>
-<H2><A NAME=5_2>A.2 Acronyms</A></H2>
+<H2><A NAME="5_2">A.2 Acronyms</A></H2>
 <DL>
 <DT>ASCII </DT>
 <DD>American Standard Code for Information Interchange </DD>

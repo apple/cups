@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.13 1999/09/22 20:06:17 mike Exp $"
+# "$Id: Makefile,v 1.14 1999/12/08 22:09:32 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -41,8 +41,8 @@ include ../Makedefs
 # Document files...
 #
 
-DOCUMENTS	=	cmp.shtml idd.shtml sam.shtml sdd.shtml ssr.shtml \
-			stp.shtml sum.shtml
+DOCUMENTS	=	cmp.shtml idd.shtml sam.shtml sdd.shtml spm.shtml \
+			ssr.shtml stp.shtml sum.shtml
 DOCIMAGES	=	images/cups-block-diagram.gif images/cups-large.gif \
 			images/cups-medium.gif images/cups-small.gif
 WEBPAGES	=	cups.css cupsdoc.css index.html documentation.html
@@ -81,7 +81,8 @@ install:
 	$(CP) $(DOCIMAGES) $(DATADIR)/doc/images
 
 #
-# The overview, admin guide, and user's guide get special attention...
+# The overview, admin manual, programmers manual, and users manual get
+# special attention...
 #
 
 overview.pdf:	overview.html
@@ -92,6 +93,14 @@ sam.html:	sam.shtml
 	echo Formatting $@...
 	htmldoc --title images/cups-large.gif -f $@ $<
 sam.pdf:	sam.shtml
+	echo Formatting $@...
+	htmldoc --title images/cups-large.gif --duplex --compression=9 \
+		--jpeg -f $@ $<
+
+spm.html:	spm.shtml
+	echo Formatting $@...
+	htmldoc --title images/cups-large.gif -f $@ $<
+spm.pdf:	spm.shtml
 	echo Formatting $@...
 	htmldoc --title images/cups-large.gif --duplex --compression=9 \
 		--jpeg -f $@ $<

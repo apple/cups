@@ -1,91 +1,191 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>
 <HEAD>
 <TITLE>CUPS Interface Design Description</TITLE>
 <META NAME="AUTHOR" CONTENT="Easy Software Products">
 <META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
 <META NAME="DOCNUMBER" CONTENT="CUPS-IDD-1.0">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<STYLE>
+BODY { font-family: serif; font-size: 11.0pt }
+H1 { font-family: sans-serif; font-size: 19.0pt }
+H2 { font-family: sans-serif; font-size: 19.0pt }
+H3 { font-family: sans-serif; font-size: 19.0pt }
+H4 { font-family: sans-serif; font-size: 19.0pt }
+H5 { font-family: sans-serif; font-size: 19.0pt }
+H6 { font-family: sans-serif; font-size: 19.0pt }
+SUB { font-size: 7.6pt }
+SUP { font-size: 7.6pt }
+PRE { font-size: 9.2pt }
+</STYLE>
 </HEAD>
 <BODY>
-<CENTER><A HREF=#contents><IMG SRC="images/cups-large.gif" BORDER=0><BR>
-<H1>CUPS Interface Design Description</H1></A><BR>
+<CENTER><A HREF="#CONTENTS"><H1>CUPS Interface Design Description</H1></A><BR>
 CUPS-IDD-1.0<BR>
 Easy Software Products<BR>
 Copyright 1997-1999, All Rights Reserved<BR>
 </CENTER>
 <HR>
-<H1 ALIGN=CENTER><A NAME=CONTENTS>Table of Contents</A></H1>
+<H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
 <BR>
-<BR><B><A HREF=#1>1 Scope</A></B>
+<BR><B><A HREF="#1">1 Scope</A></B>
 <UL>
-<LI><A HREF=#1_1>1.1 Identification</A></LI>
-<LI><A HREF=#1_2>1.2 System Overview</A></LI>
-<LI><A HREF=#1_3>1.3 Document Overview</A></LI>
+<LI><A HREF="#1_1">1.1 Identification</A></LI>
+<LI><A HREF="#1_2">1.2 System Overview</A></LI>
+<LI><A HREF="#1_3">1.3 Document Overview</A></LI>
 </UL>
-<B><A HREF=#2>2 References</A></B>
+<B><A HREF="#2">2 References</A></B>
 <UL>
-<LI><A HREF=#2_1>2.1 CUPS Documentation</A></LI>
-<LI><A HREF=#2_2>2.2 Other Documents</A></LI>
+<LI><A HREF="#2_1">2.1 CUPS Documentation</A></LI>
+<LI><A HREF="#2_2">2.2 Other Documents</A></LI>
 </UL>
-<B><A HREF=#3>3 Internal Interfaces</A></B>
+<B><A HREF="#3">3 Internal Interfaces</A></B>
 <UL>
-<LI><A HREF=#3_1>3.1 Character Set Files</A></LI>
-<LI><A HREF=#3_2>3.2 Language Files</A></LI>
-<LI><A HREF=#3_3>3.3 MIME Files</A></LI>
+<LI><A HREF="#3_1">3.1 Character Set Files</A></LI>
+<LI><A HREF="#3_2">3.2 Language Files</A></LI>
+<LI><A HREF="#3_3">3.3 MIME Files</A></LI>
 <UL>
-<LI><A HREF=#3_3_1>3.3.1 mime.types</A></LI>
-<LI><A HREF=#3_3_2>3.3.2 mime.convs</A></LI>
+<LI><A HREF="#3_3_1">3.3.1 mime.types</A></LI>
+<LI><A HREF="#3_3_2">3.3.2 mime.convs</A></LI>
 </UL>
-<LI><A HREF=#3_4>3.4 PostScript Printer Description Files</A></LI>
+<LI><A HREF="#3_4">3.4 PostScript Printer Description Files</A></LI>
 <UL>
-<LI><A HREF=#3_4_1>3.4.1 CUPS Extensions to PPD Files</A></LI>
+<LI><A HREF="#3_4_1">3.4.1 CUPS Extensions to PPD Files</A></LI>
 </UL>
-<LI><A HREF=#3_5>3.5 Scheduler Configuration Files</A></LI>
+<LI><A HREF="#3_5">3.5 Scheduler Configuration Files</A></LI>
 <UL>
-<LI><A HREF=#3_5_1>3.5.1 classes.conf</A></LI>
-<LI><A HREF=#3_5_2>3.5.2 cupsd.conf</A></LI>
-<LI><A HREF=#3_5_3>3.5.3 printers.conf</A></LI>
+<LI><A HREF="#3_5_1">3.5.1 classes.conf</A></LI>
+<LI><A HREF="#3_5_2">3.5.2 cupsd.conf</A></LI>
+<LI><A HREF="#3_5_3">3.5.3 printers.conf</A></LI>
 </UL>
 </UL>
-<B><A HREF=#4>4 External Interfaces</A></B>
+<B><A HREF="#4">4 External Interfaces</A></B>
 <UL>
-<LI><A HREF=#4_1>4.1 AppSocket Protocol</A></LI>
-<LI><A HREF=#4_2>4.2 CUPS Browsing Protocol</A></LI>
-<LI><A HREF=#4_3>4.3 CUPS PostScript File</A></LI>
-<LI><A HREF=#4_4>4.4 CUPS Raster File</A></LI>
-<LI><A HREF=#4_5>4.5 CUPS Raw Files</A></LI>
-<LI><A HREF=#4_6>4.6 Internet Printing Protocol</A></LI>
+<LI><A HREF="#4_1">4.1 AppSocket Protocol</A></LI>
+<LI><A HREF="#4_2">4.2 CUPS Browsing Protocol</A></LI>
+<LI><A HREF="#4_3">4.3 CUPS PostScript File</A></LI>
+<LI><A HREF="#4_4">4.4 CUPS Raster File</A></LI>
+<LI><A HREF="#4_5">4.5 CUPS Raw Files</A></LI>
+<LI><A HREF="#4_6">4.6 Internet Printing Protocol</A></LI>
 <UL>
-<LI><A HREF=#4_6_1>4.6.1 Get Default Destination (CUPS_GET_DEFAULT = 
+<LI><A HREF="#4_6_1">4.6.1 Get Default Destination (CUPS_GET_DEFAULT = 
 0x4001)</A></LI>
-<LI><A HREF=#4_6_2>4.6.2 Get Printers (CUPS_GET_PRINTERS = 0x4002)</A></LI>
-<LI><A HREF=#4_6_3>4.6.3 Add Printer (CUPS_ADD_PRINTER = 0x4003)</A></LI>
-<LI><A HREF=#4_6_4>4.6.4 Delete Printer (CUPS_DELETE_PRINTER = 0x4004)</A>
+<LI><A HREF="#4_6_2">4.6.2 Get Printers (CUPS_GET_PRINTERS = 0x4002)</A></LI>
+<LI><A HREF="#4_6_3">4.6.3 Add Printer (CUPS_ADD_PRINTER = 0x4003)</A></LI>
+<LI><A HREF="#4_6_4">4.6.4 Delete Printer (CUPS_DELETE_PRINTER = 0x4004)</A>
 </LI>
-<LI><A HREF=#4_6_5>4.6.5 Get Classes (CUPS_GET_CLASSES = 0x4005)</A></LI>
-<LI><A HREF=#4_6_6>4.6.6 Add Class (CUPS_ADD_CLASS = 0x4006)</A></LI>
-<LI><A HREF=#4_6_7>4.6.7 Delete Class (CUPS_DELETE_CLASS = 0x4007)</A></LI>
-<LI><A HREF=#4_6_8>4.6.8 Accept Jobs (CUPS_ACCEPT_JOBS = 0x4008)</A></LI>
-<LI><A HREF=#4_6_9>4.6.9 Reject Jobs (CUPS_REJECT_JOBS = 0x4009)</A></LI>
-<LI><A HREF=#4_6_10>4.6.10 Set Default Destination (CUPS_SET_DEFAULT = 
-0x400A)</A></LI>
+<LI><A HREF="#4_6_5">4.6.5 Get Classes (CUPS_GET_CLASSES = 0x4005)</A></LI>
+<LI><A HREF="#4_6_6">4.6.6 Add Class (CUPS_ADD_CLASS = 0x4006)</A></LI>
+<LI><A HREF="#4_6_7">4.6.7 Delete Class (CUPS_DELETE_CLASS = 0x4007)</A></LI>
+<LI><A HREF="#4_6_8">4.6.8 Accept Jobs (CUPS_ACCEPT_JOBS = 0x4008)</A></LI>
+<LI><A HREF="#4_6_9">4.6.9 Reject Jobs (CUPS_REJECT_JOBS = 0x4009)</A></LI>
+<LI><A HREF="#4_6_10">4.6.10 Set Default Destination (CUPS_SET_DEFAULT 
+= 0x400A)</A></LI>
 </UL>
-<LI><A HREF=#4_7>4.7 Line Printer Daemon Protocol</A></LI>
-<LI><A HREF=#4_8>4.8 Server Message Block Protocol</A></LI>
+<LI><A HREF="#4_7">4.7 Line Printer Daemon Protocol</A></LI>
+<LI><A HREF="#4_8">4.8 Server Message Block Protocol</A></LI>
 </UL>
-<B><A HREF=#5>5 5 - Directories</A></B>
+<B><A HREF="#5">5 5 - Directories</A></B>
 <BR>
-<BR><B><A HREF=#6>A Glossary</A></B>
+<BR><B><A HREF="#6">A Glossary</A></B>
 <UL>
-<LI><A HREF=#6_1>A.1 Terms</A></LI>
-<LI><A HREF=#6_2>A.2 Acronyms</A></LI>
+<LI><A HREF="#6_1">A.1 Terms</A></LI>
+<LI><A HREF="#6_2">A.2 Acronyms</A></LI>
 </UL>
 <HR>
-<H1><A NAME=1>1 Scope</A></H1>
-<H2><A NAME=1_1>1.1 Identification</A></H2>
+GIF89a&macr;&yuml;&ograve;&Igrave;&Igrave;&Igrave;™™™fff333&yuml;&yuml;&yuml;&yuml;&yuml;&yuml;&yuml;&yuml;&yuml;!&ugrave;,&macr;&yuml;B&thorn;X&ordm;&Uuml;&thorn;0&Ecirc;I&laquo;&frac12;8&euml;&Iacute;&raquo;&yuml;`(Ždižh&ordf;2€0p,&Iuml;tm&szlig;x&reg;&iuml;
+
+<!--=•pH,Ö«Çl:ŸÐ¨”ù ¯Ø¬ÖXN¿à°xL~¬Û´zmxËð¸|N§Ùø¼(Pïûÿ€bwz…jn‚‰Š‹Œ9„†‘!-->
+;&plusmn;&Yacute;&iacute;ˆnd&yacute; !&cedil; ž&sup3;w&agrave;…MƒƒY~&iquest;{,g&Uacute;\‚&auml;&eacute; 
+Œ&times;&Oslash;(t&Ugrave;&icirc;!&Iuml;=&Ntilde;.&ucirc;z&macr;&aacute;&Ntilde;Ÿ:&igrave;;&Atilde;9q&ouml;&iacute;&Eacute;&euml;]/&iquest;&ordm;&Eacute;&curren;Et/†'&Icirc;&thorn;t9&Agrave;&Oslash;–ž_&Ugrave;&Ccedil;\|W•wAr&ouml;&cedil;&Yacute;2&Ocirc;&times; 
+tN&deg;0T&iuml;}&iexcl;&ucirc;‰$!‚yMx&icirc;)ˆš‰&Ocirc;&oslash;@nB&deg;U&frac12;&Ecirc;wE„&sect;!ŠF H&nbsp;L8B 
+c‰;ždŠ-&aelig;DVWd&ETH;&sup3;€h&plusmn;&auml;&Uacute;“P&para;%#(4Fi&aring;•&Iuml;\hŠ:Re!\&Ograve;&Auml;—X^&brvbar;%€&yen;&Agrave;-$E€&Ouml;/&uacute;HŽšl&acirc;&acirc;&ouml;&Igrave;QX
+
+<!--äÇ"iL	:a7‚]›0IZ¡YØø¡‡D}¤–Uj±á
+^âä™æ`Ú@¦5b|šà«Á±§3Ñ KwÔ\ªB¨±H)+=¡Ó©"
+©¢	8uƒ†¸öŠD§•lþ:„dRXilÌ:Ë!´;¹t+„e<
+‡;øô+‚bbhaÚ0Ê6é.D™ðÞ¹Ì¹ñÖkoê({ï¾ü{f¿-->
+&cedil;1N&ocirc;&macr;b&quot;œŠ&uuml;j&aring;&Aacute;&Acirc;E0…&Egrave;8&ouml;5GkZ|&Ograve;&Aacute;wt„C&raquo;&Ocirc;QS&Ccedil;o6&Ocirc;&Ugrave;[W„$&sup2;*Ž+4Pb-8&sup1;P1&thorn;'8&quot;‘Š&curren;&Auml;$&nbsp;Cy&ecirc;‘„)&gt;&atilde;Št&egrave;`&ETH;3&Acirc;‡‹&frac34;z&quot;&laquo;rE'&Acirc;qf&auml;&deg;&Euml; 
+‘q&Acirc;\|€„Ž&iexcl;&ocirc;&ouml;&raquo;%&Eacute;(.—b&Uacute;&frac12;&Egrave;€&iacute;&Eacute;`{&not;E&Ccedil;1w’ &raquo;[H&szlig;`(B6&ouml;“&nbsp; 
+†')&Ecirc;RŽ&Icirc;a[&Atilde;rbC!T&aring;&deg;Œ 
+2Q&middot;&Egrave;HZ&ecirc;#–&reg;&uuml;&Euml;/&agrave;&ocirc;&macr;F&Yacute;&ecirc;(&Ucirc;&sup2;%&nbsp;&ordm;X&Euml;9&ouml;&Agrave;b&Aacute;4f.&ugrave;-o&yacute;™X&Euml;B…I&Icirc;&Ograve;7&sup1;*@&Atilde;&Oacute;Ž&Iacute;T€h&agrave;‘&Igrave;W&acirc;™&Atilde;$f:&micro;yžn†&oacute;†r„'t&eacute;Kv` 
+&Ccedil;+d&ordf;– œ79s&ograve;|'=&times;&cent;&Igrave;x&para;&ograve;œ&yuml;„&brvbar;œˆe&Icirc;;*&agrave;$&thorn;” I&Yacute;&AElig;a&Iuml;{–3Ž&Aring;&Aacute; 
+P“&Iacute;S[&Ugrave;L&uml;3&copy;&ograve;Q7&eacute;&AElig;&ograve;#&atilde;&ucirc;&ocirc;0F&times;&eth;sE&deg;t&sect;@‘&Oslash;Q&Uuml;&acute;&acute;&nbsp;&copy;:3&Oacute;R&iacute;d&nbsp;&yen;*MITnŒ&pound;&uml;H]&Oslash;Q&Aacute;d 
+@&ograve;&thorn;—&not;rMœŽaO
+<!--x‹ŒÖ3½4 °XT'ª®ƒ:T£uéWeºádËeú¸è¬Ù7
+
+ëÒÏ;„sœåµ7m(ýÐŸtl¤RV)-->
+r&euml;^y&Agrave;&middot;(&cedil;&icirc;&eacute;&ecirc;&ucirc;$uD&ograve;r&atilde;/a,I.&deg;&Ugrave;U&Agrave;œb hˆ`&frac34;B&nbsp;&euml;&quot; 
+&Uuml;`H&Oslash;x&Egrave;&cedil;o1&thorn;[&aacute;\8f^&aelig;|\&yacute;‚&cent;&cent;z&oslash;0(ˆ\ {ƒ&Auml;g&auml;&THORN;&otilde;€&ccedil;&acirc;&sect;&Aacute;˜0*\&sup3;n&frac14;‹m&para;/&Auml;e&ordf;&plusmn;&yuml;†&igrave; 
+&Ccedil;,&frac12;DN2€œ&ordm;+&ugrave;&Eacute;|&iacute;0L&iexcl;Le*&eth;&cedil;&Atilde;&gt;&shy;2&euml;f,eIPO&Euml;&Aring;&agrave;r—&plusmn;”80SAŸcF&ordf;at&ccedil;&raquo;&atilde;y&curren;&cedil;rš&ccedil;&Igrave;&iexcl;5&iuml;o&otilde;&Euml;sž&iuml;|&iquest;8&Euml;™&Icirc;&brvbar;&not;&thorn;,&iuml;&frac14;&egrave;&agrave;)&Aacute;&Igrave;;&oslash;k&iexcl;—†dDp&Ntilde;&ograve;&oslash;2&cent;qfH&atilde;!&Euml;“~&Ugrave;Ÿ-&iacute; 
+'g:,&aelig;4y?&yacute;&auml;P‹Z›ž#&Iuml;&Otilde;&acute;&Icirc;5AK‰k]&ucirc;š›&Ograve;K&otilde;&macr;‡m&euml;€&otilde;z&Oslash;&Egrave;&AElig;&laquo;&Oslash;Ž&Yacute;&gt;B{P&ETH;&ordf;.6hf]&ordm;?&copy;&Igrave;IŽuO„&iacute;M‚&Igrave;&Ccedil;&Uuml;c&micro;3˜ 
+61‹N&Ograve;[†W&pound; &brvbar;m&iquest;&shy;{&Acirc;P&acirc;v&Icirc;&para;KnUˆ[ &ograve;n&Auml;&frac12;&plusmn;&divide;n?l:&Aacute;ž3uš&euml;&not;sP[&yuml;nn&frac34;&ccedil;P…W&otilde;&Ocirc;Fj[&Acirc;&divide; 
+&sup1;v&Iuml;™&agrave;‰˜x&uacute;'ˆ&pound;&Agrave;&Agrave;†p&cedil;4.&ecirc;&atilde;K&Ccedil;&iquest;&Acirc;&Aacute;&plusmn;o&sect;&cent;&uuml;&quot;&Aacute;|Nk`&icirc;&Ecirc;˜
+<!--•¤7 yþ	D-->
+ 
+jl&copy;&Igrave;uˆ&Euml;i™0pmC&acute;&laquo;+‰&divide;6&curren;2&shy;&eacute;&Iuml;e`(ŽJ]&yen;i&otilde;&eth;3ƒ&Oslash;&iacute;&quot;p|&ordf;!:q&oslash;F&Oslash;&sup3; 6&pound; 
+@&shy;,&thorn;Šq&uuml;&atilde;o&Igrave;&Ccedil;&reg;ž&Ouml;&uuml;V“&para;Q&Ccedil;›Ev&icirc;&sup1;&sup2;&Eacute;8&Ugrave;&ordf;S&quot;&aelig;&Agrave;&ccedil;‡x&plusmn; &agrave;&thorn;‡&gt;—I&atilde;g 
+&iuml;&Yacute;&gt;Y‰&ccedil;N80&aelig;&sect;&nbsp;&plusmn;&frac34;GLL&igrave;&Otilde;&micro;…(1&THORN;&frac14;!8}&thorn;&not;“*…&ordf;‰&Ugrave;&igrave;:e&raquo;&acute;œ 
+&ordf;&iquest;&ecirc;n_6&Acirc;&Atilde;S&Agrave;`eG;&Ouml;„CƒCcˆ&iquest;‡4&cedil;ye&icirc;&macr;&Iacute;)o&oslash;ByRm&frac12;0?&iacute;L&icirc;&Aring;`Q&yuml;j&Oacute;&Ugrave;/&ordm;&ocirc;&Oacute;N|&Yacute;
+<!--â9ço‘SŽà•?œýáu¿þá¯~!ÒŸ¿ÍÏüýÏIw1ßþZÈN¥Ex£&\(¤á[É¤€v2€WW-->
+
+&thorn;&Ugrave;A&Uuml;Œ&Aacute;&cedil;D5&copy;D a&aelig;vx ?Š&para;x&deg;DM@•!h‰&agrave;&Egrave;€Ž&sect;&reg; 
+•&nbsp;&aacute;&times;B`&eth;&curren;&ordf;E?›“”&THORN;dƒ&quot;8$&Yacute;`Ki0…O&eth;ƒn&Icirc;“&plusmn;&micro;vtž&egrave;€I([,&sup1;Nd&Eacute;&uml;h\'6X 
+P&atilde;—Š‰&Eacute;&oslash;t &cent;‘&yen;˜&not;&egrave; €ˆ†Ky™FˆŒ&euml;`š”yƒ„&uml;š €š‰ƒM&copy;‡&oslash;FQhY„ 
+9&para;X&macr;&times;–&iacute;4š&curren;™Y\)&quot;&sup1;AN]‰x&eacute;z&divide;Gq07)&copy;&ntilde;™•Y€r&deg;ŒŽi‹ z ™&Ccedil;&auml;F&Iacute;&Eacute;T–&ugrave;› 
+&Euml;ŽC œwI›&uuml;X]‹&sup1;\&euml;Y]&thorn;f l&iuml;Ybj8Ÿ&Egrave;uœbŸ&Iacute;&Aring;t&uacute;&copy;f&THORN;&times;ŸfBI—“*&oslash;&eacute;:&Ucirc;&Oslash;Uj&nbsp;&Ograve; 
+ˆ&otilde;&sup1;&nbsp;&Otilde;p&nbsp;$(~  &iexcl;&Uacute; &iexcl;g&ugrave;{&icirc;pZI?&iexcl;ƒ&icirc;&Agrave;v:“a&brvbar;˜6&cent;&sect;&Ocirc;]&Yacute;‘(&ordf;&ecirc;)!Ÿ&Uacute;&cent;: 
+jw&micro;&iexcl;4&Uacute;v&iacute;H&Ucirc;&Ccedil;˜9&ordm;Xh&oacute;•&uuml;&ugrave;&pound;&yen;&Aacute;&cent;V&Eacute;{D&ordm;2š‰(&deg;&curren;3š&curren;a&divide;&nbsp;+&ETH;&pound;&yen;“p&cent;&thorn;&ograve;4V&ordm;—  
+E&acute;&yen;&egrave;&curren;k&deg;7&ordm;hT*€&iquest;&egrave;w`&Uacute;ži&Auml; …S&brvbar;&AElig;&brvbar;m&ecirc; N&ecirc;ƒ#&uacute;&cent;f€ x&ecirc;†&yacute; 
+8z&copy;7u&Uacute;p{&Uacute;=~]7`&laquo;h‡&Uacute;s&Uacute;g:…zd˜&oacute;&sect;&Icirc;A-v&thorn;A&ntilde;r&brvbar;'–A&Uacute;)9–š&cent;&acirc;Si;&pound;…š 1&ordf;o&quot;&ordf; 
+&brvbar;J;“&ordm; r&ordm;8Ui|&eacute;&gt;&iexcl;&Uacute;œ&uacute;
+<!--pv³2<ƒj£·«É¦kÉ	1Š:¬Èe ”«ÉÚlÑ•ªÍZn¯Š2Ì­‹s«Á­ÖÚàé¨Ûº=¤zŽŸú­6­áU­ä
+Øš¨¿újá
+¦0®éJ«
+¯NÕäº•öÐVeÎ¶¯õbm¶7ù´Ž-->
+“&euml;&yen;Dfn&yacute;2&raquo;ƒ–0j&laquo;&reg;&raquo;&ordm;K;z&euml;&cent;&Iacute;&ouml;&raquo;—!&micro;—S&raquo;&sup3;r&gt;K+6ˆ‹&uml;X&Ograve;&raquo;; C&Egrave; 
+8&Ecirc;;&cent;&raquo;&Atilde;&Ucirc;/Œ‹&yen;ž!&not;s&frac12;VR&frac12;&oacute;&otilde;&Iuml;‹O&acirc;[/&ccedil;K&uml;&thorn;˜&Ntilde;:&Iacute;‹\&Yacute;+&nbsp;Sc:&iuml;&Euml;ž’&ordm;&para;&euml;9&AElig;&raquo;
+<!--ëSç½¤tj ½YUÀœãÀ©%
+Ìró)Á0¨§—³½Ç…Á¬Ì¤LÛ6øK!<Á:Àê*ª…ÃÁî…Á.‡²
+¥¼‘z Âä	¦ýËÀ~¸7<,´GóÃý‹ÂöêÀe:Ä¢‰°ë«£m£,žyAI¡…˜Q!8-->
+&ocirc; 8ly$ 
+8&copy;&Ugrave;&Aring;mX2&Ugrave;h&gt;—?&macr;!šH&uuml;&Aacute;^LsP,Ÿ&laquo;Y‹&acirc;&aacute;&iquest;&yuml;tš&igrave;‚&pound;Y 
+r&brvbar;&Eacute;š&yen;9&Ccedil;jž&Auml;8-&AElig;&Ccedil;Œ&para;i&ecirc;P&Acirc;bA&Acirc;˜&ugrave;‰&Atilde;&cedil;š&raquo;&sup3;7RœCWRo&igrave;Š&aring; MŒŠ”&aring;t™ Œ›r&eacute;&Eacute;q
+<!--Zva&‹Z¤jzÊŠ¬‡7èV)“‹|›ká!¦*€Á¶öÄ84’Wž¶LÊñ½Fª6ÄOqÌ°Š}Å¬—|žÎ|4!ÍAh+è•L¢
+%|‹Û¬Å$-->
+
+&aring;&gt;}L&ecirc;}&Icirc;&Ccedil;&uml;&nbsp;5:&agrave;Œ|&quot;&thorn;&Ccedil;w&ETH;s&oslash;&aelig;N&Icirc;&deg;&sup1;#R&gt;~-N‰&reg;&egrave;ƒ&nbsp;&szlig;c&eth;&THORN;&Atilde;š&Icirc;&Ntilde;&yen;&reg;&aring;G&Icirc;&acirc;&iacute;ˆ‰&Yacute;&egrave;*‚&cedil; 
+=‚ž &ordm;&euml;&acirc;…&shy;&euml;&Agrave;&gt;&Ucirc;&middot;ž&euml;n^žm&egrave;&Ecirc;&euml;&eth;&frac14;&atilde;&gt;&aring;&times;&Icirc;›&laquo;}&ecirc;&Oslash;&divide; 
+“Œ&not;&Euml;I&Aacute;&middot;A&Ocirc;N&Iacute;&euml;v&gt;]t.&acirc;&Uacute;L&ETH;&laquo;&thorn;&iacute;&iuml;&frac34;&ntilde;n&auml;&Ouml;&Uuml;&aelig;s&sup1;&iquest;&plusmn;&acirc;&deg;+† 
+&not;U&Oslash;&iuml;&icirc;•.&ccedil;&not;&Icirc;&igrave;&Iacute;.&egrave;&acute;&THORN;ŠG=&eth;&ugrave;‚&sect;ž&macr;”&euml;^&auml;&Ucirc;&reg;&ecirc;h-‹&ecirc;&ecirc;!i!&Otilde;vM&iacute;i&ordf;&icirc;&thorn;&frac34;&ograve;&icirc;&aacute;/&thorn;&icirc;™&cedil;&Ntilde;-O&Ouml;G&eth;,o&ntilde;&ordm;!&aring;’gO&acirc;&nbsp;PO&igrave;O&ocirc;B&thorn;&Egrave;&agrave;h&acirc;+?&iuml;&gt;&szlig;&Ecirc;VH&Agrave;sa&otilde;™€&otilde;$&oacute;S&icirc;&otilde;—&raquo;&oacute;8.ž&szlig;&sup1; 
+~&aacute;&szlig;&Egrave;&copy;&ouml;&raquo;]&ograve;3&euml;&AElig;t_&divide;[&iuml;&ocirc;b&macr;&ccedil;‚&Uuml;&divide;&Otilde;&laquo;@u™&eth;;z&Uuml;˜‘&Uuml;@&oacute;Ž2’?&ugrave;ƒ&cedil;&Ugrave;l&ugrave;F&nbsp;&para;™&macr;&ugrave;›N&nbsp;ž0œ&uacute;&pound;&para;&curren;&yuml;0#9:&szlig;&sect;&frac12;ž&copy;Ÿ\#&Atilde;&Ugrave;&aelig;&oacute;2&eacute;+&ucirc;‚&Agrave;&Oacute;&cedil;_&auml;M/&Oacute;ta&Uacute;&yacute;3”]&Ugrave;&laquo;&iquest;&cedil;i&icirc;aF&gt;&ordf;}Œ&Oslash;v&Iacute;&iuml;M&Iacute;&divide;&ETH;&euml;&auml;&copy;&icirc;r&Uuml;Œ&ouml;q&ntilde;_&Agrave;&uuml;&ordf;r&acirc;F&reg;&ograve;
+&yacute;&thorn;&cedil;—hT_&atilde;4sx”&yacute;&Yacute;&icirc;)&ccedil;.Qg&Atilde;&raquo;&agrave;Ÿ&Iuml;%&igrave;‹}i&acute;AS&ucirc;|&thorn;&eth;@Q&Uuml; 
+$J9€&raquo;-&Igrave;&plusmn;&divide;&Uuml;&ocirc;M&Oslash;‘hZ˜&brvbar;:&deg;œ*&Iuml;l&szlig;x&Ograve;|&Iuml;&frac14;&iexcl;&Aring;L&Agrave; &not;&Aacute;f&ugrave;9B&Ntilde;d&igrave;&Aacute;|&laquo;VV„&cent;“&eacute;nKv
+<!--uè´®Ì®iiçÍ¦t›šV/.²ê}mywu#|Yc‚X|jŽx‹dE“)0U’ T–<W€o zbQ`F¥2›³:°Ctª·‰!™²*¨…º»¢~Š°z¬†Á¯Ä‡´ÕŽ¶Ó(iÃm²F›ÍÚhÜÞ“Æ¡Ö…äc|ØËUÒÙþ²ëøçõƒ³ÜØ<î™w‰Ö¿Eéhä›@ðÂ-->
+
+kB_ƒg 3&Ecirc;&sup3;8#&THORN;&not;L=0;J&curren;&auml;&Egrave;@&curren;F|'i~&plusmn;&copy;  ža&Ecirc;Š&AElig;g;d*3&sup2;”&copy;bP&Iuml;&cent;T&auml;H&ocirc;&brvbar;?[† 
+&Auml;&auml;ƒhN6ZM&cent;D:c*BR!$&plusmn;ckƒ’V&shy;-u&Ucirc;@[&oslash;p„Ÿ]&frac14;8&ouml;-1{T&Icirc;&reg;W&Iuml;2&ntilde;&nbsp;Šp=&cedil;q&laquo;&Ntilde;&frac12;es.‰„4+#&Euml;e&brvbar;&yen;W5&micro;ekxr&auml;›“/X&Iacute;š5I&Ccedil;ƒ=k&Yacute;&uacute;&micro;&igrave;&Euml;&deg;&ucirc;N–2q&Aring;[r&brvbar;yZ&pound;QŽ›&Ccedil;&THORN;txŠ&auml;cK—&Iacute;&iacute;&Eacute;&sup1; 
+i&thorn;&iexcl;9&frac14;m1o&ntilde;&cent;&copy;/&sup2;8&icirc;&igrave;St&eacute;4l’Wm&frac34;9&oacute;&eacute;&Ouml;&Ucirc;&ETH;&atilde;&atilde;{{&uuml;z&THORN;&iquest;&ccedil;&oslash;&ecirc;&ouml;&THORN;z&agrave;}œ&agrave;L&uml;&nbsp;&quot;˜ 
+&Auml;&ETH;s&agrave;&para;PGLU&uacute;&aring;`M&THORN; &nbsp;&iexcl;†9&not;&sect;&Ucirc;{pX&cedil;&iexcl;w&Uacute;w&szlig;‡&iexcl;&uml;&nbsp;‰&iacute; &quot;MUXNx
+<!--É……¡×ƒà¨âŠêÄõ#ƒå“Ž:Å(ã4Ö¸Až˜:@Ùw¸	YÝ‹tIã’Ö”˜$…a(å‹X¥F7×IÈbŠ["Y€Mç¸¹K~`¶Øä-->
++l&acute;&aacute;&brvbar; 
+j&sup2;F:&Aacute;.&ecirc;&AElig;&Ucirc;j&curren;&sup3;B&uacute;&icirc; &frac14;&Ecirc;&laquo;/&pound;&Ouml;’[&ETH;&frac12;#&iacute;+&eth;&yen;&aelig;nJ&THORN;&cedil;&laquo;&aelig;;&eth;&Acirc;&copy;&otilde;‹&uml; _&Euml;&eth;&Auml;Š&Ograve;&raquo;*&ordm;? 
+ƒ&Acirc;wœ&Atilde;yzh&plusmn;&deg;&Oslash;zl2,#oZ2&Egrave;›r|&ograve;&Euml;‚&deg;&frac14;$&Ccedil;)&euml; 
+&oacute;&Iacute;&Ugrave;&Ocirc;,&eacute;fs€1&Icirc;@/&oslash;&icirc;&Iuml;P&otilde;&Igrave;i&ETH;H&middot;&eth;&Atilde;BkLt&Ograve;P&macr;b&ocirc;S;N&Yacute;W&Ocirc;X&Iuml; 
+&oacute;’dl&Iacute;t&Ouml;`&deg;tžOc&nbsp;&oacute;&Aring;a&sect;}A&Auml;›&sup2;1v&Euml;j&Ccedil;m&thorn;u+`&Iacute;&Iacute;&Aacute;&middot;qw&uuml;6˜‚&igrave;&frac12;s&THORN;XŸ&uml;&Euml;$xM6&agrave;P&sup3;-i&Eacute;S&Uacute;&frac12;A&Ugrave;ˆ&iuml;&euml;84–&oslash;=x&auml;8^!&auml;*L&gt;&THORN;˜ƒk&sup1;Œ({I&egrave;^!&aacute;&cedil;˜N$&ecirc; 
+&laquo;&reg;&ccedil;!&ordm;&ucirc;&Acirc;‚&yuml;&Yacute;&nbsp;&euml;&macr;&szlig;o&icirc;—O&uuml;&uml;&frac34;&yuml;&icirc;9&iacute;]&ntilde;&THORN;{&ntilde;&Ugrave;&Ecirc;&reg;&atilde;lhŽ(&egrave;&Igrave;&Atilde;&ecirc;&frac14;~&Ocirc;S&cent;|&ouml;&Otilde;Ÿz&yacute;w&not;&Euml;&sect;|&oslash;&Yacute;—*&frac12;Œ&Egrave;&times;&shy;|&uacute;&aring;wz&thorn;&aelig;“)Nr&ucirc;&frac34;&Ecirc;?*&ocirc;&yen; 
+&iquest;*&divide;&ocirc;7&uacute;&frac12;~M&uacute;&uacute;&uacute;&divide;&ordf;&divide;&Eacute;ˆ•S3x*&ucirc;&iacute;P”&ugrave;H&pound;&deg;&deg;&agrave;&oacute;(&egrave;&frac34;&iacute;-Jƒ&uacute;™ 
+&aring;AF{#\”g…&Aacute;œ)!),&Ocirc; #&Oacute;&Acirc;&Ccedil;&frac14;j&thorn;1œŒ&thorn;h&copy;&sup2;K„9$ƒY&egrave;)Ž ˆA &Egrave; 
+—‡)#1‰&Oacute;p&quot;˜&eth;'&Atilde;%n‰P&acute;‡&Ugrave;&uml;-‹1&sup3;&cent;^\%&AElig;ˆ&Ocirc;p„CL&Ouml;5&Atilde;
+<!--a‘^œß­âx¯
+€±peŒ-->
+<HR>
+<H1><A NAME="1">1 Scope</A></H1>
+<H2><A NAME="1_1">1.1 Identification</A></H2>
 <P>This interface design description document provides detailed file 
 formats, message formats, and program conventions for the Common UNIX 
 Printing System (&quot;CUPS&quot;) Version 1.0. </P>
-<H2><A NAME=1_2>1.2 System Overview</A></H2>
+<H2><A NAME="1_2">1.2 System Overview</A></H2>
 <P>The Common UNIX Printing System provides a portable printing layer 
 for  UNIX&reg; operating systems. It has been developed by Easy Software 
  Products to promote a standard printing solution for all UNIX vendors 
@@ -101,7 +201,7 @@ applications under UNIX. </P>
 <P>CUPS also includes a customized version of GNU GhostScript 
 (currently based off GNU GhostScript 4.03) and an image file RIP that 
 can be used to support non-PostScript printers. </P>
-<H2><A NAME=1_3>1.3 Document Overview</A></H2>
+<H2><A NAME="1_3">1.3 Document Overview</A></H2>
 <P>This interface design description document is organized into the 
 following sections: </P>
 <UL>
@@ -112,8 +212,8 @@ following sections: </P>
 <LI>5 - Directories </LI>
 <LI>A - Glossary </LI>
 </UL>
-<H1><A NAME=2>2 References</A></H1>
-<H2><A NAME=2_1>2.1 CUPS Documentation</A></H2>
+<H1><A NAME="2">2 References</A></H1>
+<H2><A NAME="2_1">2.1 CUPS Documentation</A></H2>
 <P>The following CUPS documentation is referenced by this document: </P>
 <UL>
 <LI>CUPS-CMP-1.0: CUPS Configuration Management Plan </LI>
@@ -126,7 +226,7 @@ following sections: </P>
 <LI>CUPS-SUM-1.0.x: CUPS Software Users Manual </LI>
 <LI>CUPS-SVD-1.0.x: CUPS Software Version Description </LI>
 </UL>
-<H2><A NAME=2_2>2.2 Other Documents</A></H2>
+<H2><A NAME="2_2">2.2 Other Documents</A></H2>
 <P>The following non-CUPS documents are referenced by this document: </P>
 <UL>
 <LI>IEEE 1387.4, System Administration: Printing (draft) </LI>
@@ -136,8 +236,8 @@ following sections: </P>
 <LI>RFC 2566, IPP/1.0: Model and Semantics </LI>
 <LI>RFC 2639, IPP/1.0: Implementers Guide </LI>
 </UL>
-<H1><A NAME=3>3 Internal Interfaces</A></H1>
-<H2><A NAME=3_1>3.1 Character Set Files</A></H2>
+<H1><A NAME="3">3 Internal Interfaces</A></H1>
+<H2><A NAME="3_1">3.1 Character Set Files</A></H2>
 <P>The character set files define a mapping between 8-bit characters 
 and the Unicode character set. They are named using the ISO standard 
 number defined for the character set. Each file consists of up to 256 
@@ -145,7 +245,7 @@ lines of ASCII text. Each line consists of two hexadecimal numbers; the
 first number is the character number in the character set (0x00 to 
 0xff), and the second number is the Unicode character number (0x0000 to 
 0xffff). </P>
-<H2><A NAME=3_2>3.2 Language Files</A></H2>
+<H2><A NAME="3_2">3.2 Language Files</A></H2>
 <P>The language files define the default character set and a collection 
 of text messages in that language. They are named by prefixing the 
 string &quot;cups_&quot; to the front of the language specifier (e.g. &quot;cups_en&quot;, 
@@ -170,9 +270,9 @@ messages. The currently recognized values are: </P>
 <P>The second and succeeding lines define text messages. If the message 
 text is preceded by a number, then the current message number is 
 updated and the text after the number is used. </P>
-<H2><A NAME=3_3>3.3 MIME Files</A></H2>
+<H2><A NAME="3_3">3.3 MIME Files</A></H2>
 <P>CUPS uses two MIME files in its standard configuration. </P>
-<H3><A NAME=3_3_1>3.3.1 mime.types</A></H3>
+<H3><A NAME="3_3_1">3.3.1 mime.types</A></H3>
 <P>The mime.types file defines the recognized file types and consists 
 of 1 or more lines of ASCII text. Comment lines start with the pound 
 (&quot;#&quot;) character. The backslash (&quot;\&quot;) character can be used at the end 
@@ -203,7 +303,7 @@ operator := &quot;+&quot; |	[ logical AND ]
 <P>The <CODE>int</CODE> and <CODE>short</CODE> rules match look for 
 integers in network byte order (a.k.a. big-endian) with the 
 most-significant byte first. </P>
-<H3><A NAME=3_3_2>3.3.2 mime.convs</A></H3>
+<H3><A NAME="3_3_2">3.3.2 mime.convs</A></H3>
 <P>The mime.types file defines the recognized file filters and consists 
 of 1 or more lines of ASCII text. Comment lines start with the pound 
 (&quot;#&quot;) character. </P>
@@ -212,12 +312,12 @@ of 1 or more lines of ASCII text. Comment lines start with the pound
 the MIME types are a cost value (0 to 100) and the filter program to 
 use. If the filter program is not specified using the full path then it 
 must reside in the CUPS filter directory. </P>
-<H2><A NAME=3_4>3.4 PostScript Printer Description Files</A></H2>
+<H2><A NAME="3_4">3.4 PostScript Printer Description Files</A></H2>
 <P>The PostScript Printer Description (PPD) file format is described in <A
-HREF=http://partners.adobe.com/supportservice/devrelations/PDFS/TN/5003.PPD_Spec_v4.3.pdf>
-Adobe TechNote #5003: PostScript Printer Description File Format 
+HREF="http://partners.adobe.com/supportservice/devrelations/PDFS/TN/5003.PPD_Spec_v4.3.pdf">
+ Adobe TechNote #5003: PostScript Printer Description File Format 
 Specification Version 4.3</A>. </P>
-<H3><A NAME=3_4_1>3.4.1 CUPS Extensions to PPD Files</A></H3>
+<H3><A NAME="3_4_1">3.4.1 CUPS Extensions to PPD Files</A></H3>
 <P>CUPS adds several new attributes that are described below. </P>
 <H4>3.4.1.1 cupsFilter</H4>
 <P>This string attribute provides a conversion rule of the form: </P>
@@ -261,7 +361,7 @@ after</I> the CMY transformation. </P>
 <P>This required attribute describes which version of the CUPS IDD was 
 used for the PPD file extensions. Currently it must be the string 
 &quot;1.0&quot;. </P>
-<H2><A NAME=3_5>3.5 Scheduler Configuration Files</A></H2>
+<H2><A NAME="3_5">3.5 Scheduler Configuration Files</A></H2>
 <P>The scheduler reads three configuration files that define the 
 available printers, classes, and services: </P>
 <DL>
@@ -273,15 +373,15 @@ the scheduler. </DD>
 <DT>printers.conf </DT>
 <DD>This file defines all of the printers known to the system. </DD>
 </DL>
-<H3><A NAME=3_5_1>3.5.1 classes.conf</A></H3>
+<H3><A NAME="3_5_1">3.5.1 classes.conf</A></H3>
 <P>The classes.conf file consists of 1 or more lines of ASCII text. 
  Comment lines start with the pound (&quot;#&quot;) character. </P>
 <P>Each non-blank line starts with the name of a configuration 
 directive followed by its value. The following directives are 
 understood: 
 <CENTER>
-<TABLE BORDER=1 WIDTH=90%>
-<TR><TH WIDTH=25%>Directive</TH><TH>Description</TH></TR>
+<TABLE BORDER="1" WIDTH="90%">
+<TR><TH WIDTH="25%">Directive</TH><TH>Description</TH></TR>
 <TR><TD>&lt;Class name&gt;
 <BR> &lt;/Class&gt;</TD><TD>Surrounds a class definition.</TD></TR>
 <TR><TD>&lt;DefaultClass name&gt;
@@ -298,15 +398,15 @@ class.</TD></TR>
 </TABLE>
 </CENTER>
 </P>
-<H3><A NAME=3_5_2>3.5.2 cupsd.conf</A></H3>
+<H3><A NAME="3_5_2">3.5.2 cupsd.conf</A></H3>
 <P>The cupsd.conf file consists of 1 or more lines of ASCII text. 
  Comment lines start with the pound (&quot;#&quot;) character. </P>
 <P>Each non-blank line starts with the name of a configuration 
 directive followed by its value. The following directives are 
 understood: 
 <CENTER>
-<TABLE BORDER=1 WIDTH=90%>
-<TR><TH WIDTH=25%>Directive</TH><TH>Default</TH><TH>Description</TH></TR>
+<TABLE BORDER="1" WIDTH="90%">
+<TR><TH WIDTH="25%">Directive</TH><TH>Default</TH><TH>Description</TH></TR>
 <TR><TD>AccessLog</TD><TD>logs/access_log</TD><TD>Specifies the 
 location of the access log file.</TD></TR>
 <TR><TD>Allow</TD><TD>-</TD><TD>Allows connections from the specified 
@@ -396,15 +496,15 @@ running external programs.</TD></TR>
 </TABLE>
 </CENTER>
 </P>
-<H3><A NAME=3_5_3>3.5.3 printers.conf</A></H3>
+<H3><A NAME="3_5_3">3.5.3 printers.conf</A></H3>
 <P>The printers.conf file consists of 1 or more lines of ASCII text. 
  Comment lines start with the pound (&quot;#&quot;) character. </P>
 <P>Each non-blank line starts with the name of a configuration 
 directive followed by its value. The following directives are 
 understood: 
 <CENTER>
-<TABLE BORDER=1 WIDTH=90%>
-<TR><TH WIDTH=25%>Directive</TH><TH>Description</TH></TR>
+<TABLE BORDER="1" WIDTH="90%">
+<TR><TH WIDTH="25%">Directive</TH><TH>Description</TH></TR>
 <TR><TD>Accepting</TD><TD>Specifies whether the printer is accepting 
 new jobs. May be  the names &quot;Yes&quot; or &quot;No&quot;.</TD></TR>
 <TR><TD>&lt;DefaultPrinter name&gt;
@@ -423,11 +523,11 @@ be &quot;Idle&quot; or  &quot;Stopped&quot;.</TD></TR>
 </TABLE>
 </CENTER>
 </P>
-<H1><A NAME=4>4 External Interfaces</A></H1>
-<H2><A NAME=4_1>4.1 AppSocket Protocol</A></H2>
+<H1><A NAME="4">4 External Interfaces</A></H1>
+<H2><A NAME="4_1">4.1 AppSocket Protocol</A></H2>
 <P>The AppSocket protocol is an 8-bit clean TCP/IP socket connection. 
 The default IP service port is 9100. The URI method name is &quot;socket&quot;. </P>
-<H2><A NAME=4_2>4.2 CUPS Browsing Protocol</A></H2>
+<H2><A NAME="4_2">4.2 CUPS Browsing Protocol</A></H2>
 <P>The CUPS Browsing Protocol is a UDP/IP-based broadcast service. By 
 default this service operates on IP service port 631. </P>
 <P>Each broadcast packet describes the state of a single printer or 
@@ -443,8 +543,8 @@ printer-state</CODE> and <CODE>printer-uri-supported</CODE> attributes. </P>
 <P>The <I>type</I> value is a hexadecimal number string representing 
 capability/type bits: 
 <CENTER>
-<TABLE BORDER=1 WIDTH=40%>
-<TR><TH WIDTH=8%>Bit</TH><TH>Description</TH></TR>
+<TABLE BORDER="1" WIDTH="40%">
+<TR><TH WIDTH="8%">Bit</TH><TH>Description</TH></TR>
 <TR><TD>0</TD><TD>0 = printer
 <BR> 1 = class</TD></TR>
 <TR><TD>1</TD><TD>0 = local
@@ -467,13 +567,13 @@ capability/type bits:
 </TABLE>
 </CENTER>
 </P>
-<H2><A NAME=4_3>4.3 CUPS PostScript File</A></H2>
+<H2><A NAME="4_3">4.3 CUPS PostScript File</A></H2>
 <P>CUPS PostScript files are device-dependent Adobe PostScript program 
-files. The PostScript language is described in the <A HREF=http://partners.adobe.com/supportservice/devrelations/PDFS/TN/PLRM.pdf>
-Adobe PostScript Language Reference Manual, Third Edition</A>. </P>
+files. The PostScript language is described in the <A HREF="http://partners.adobe.com/supportservice/devrelations/PDFS/TN/PLRM.pdf">
+ Adobe PostScript Language Reference Manual, Third Edition</A>. </P>
 <P>The MIME type for CUPS PostScript files is <CODE>
 application/vnd.cups-postscript</CODE>. </P>
-<H2><A NAME=4_4>4.4 CUPS Raster File</A></H2>
+<H2><A NAME="4_4">4.4 CUPS Raster File</A></H2>
 <P>CUPS raster files are device-dependent raster image files that 
 contain a PostScript page device dictionary and device-dependent raster 
 imagery for each page in the document.  These files are used to 
@@ -491,8 +591,8 @@ automatically. </P>
  Each page starts with a page device dictionary header and is followed 
 immediately by the raster data for that page. 
 <CENTER>
-<TABLE BORDER=1 WIDTH=80%>
-<TR><TH WIDTH=10%>Bytes</TH><TH WIDTH=20%>Description</TH><TH>Values</TH>
+<TABLE BORDER="1" WIDTH="80%">
+<TR><TH WIDTH="10%">Bytes</TH><TH WIDTH="20%">Description</TH><TH>Values</TH>
 </TR>
 <TR><TD>0-63</TD><TD>MediaClass</TD><TD>Nul-terminated ASCII string</TD></TR>
 <TR><TD>64-127</TD><TD>MediaColor</TD><TD>Nul-terminated ASCII string</TD>
@@ -599,40 +699,40 @@ CMYK CMYK)
 </P>
 <P>The MIME type for CUPS Raster files is <CODE>
 application/vnd.cups-raster</CODE>. </P>
-<H2><A NAME=4_5>4.5 CUPS Raw Files</A></H2>
+<H2><A NAME="4_5">4.5 CUPS Raw Files</A></H2>
 <P>Raw files are printer-dependent print files that are in a format 
 suitable to the destination printer (e.g. HP-PCL, HP-RTL, etc.) The 
 MIME type for CUPS Raw files is <CODE>application/vnd.cups-raw</CODE>. </P>
-<H2><A NAME=4_6>4.6 Internet Printing Protocol</A></H2>
+<H2><A NAME="4_6">4.6 Internet Printing Protocol</A></H2>
 <P>The Internet Printing Protocol is described by the following RFCs: </P>
 <UL>
-<LI><A HREF=http://www.ietf.org/rfc/rfc2565.txt>RFC 2565: Internet 
+<LI><A HREF="http://www.ietf.org/rfc/rfc2565.txt"> RFC 2565: Internet 
 Printing Protocol/1.0: Encoding and Transport</A></LI>
-<LI><A HREF=http://www.ietf.org/rfc/rfc2566.txt>RFC 2566: Internet 
+<LI><A HREF="http://www.ietf.org/rfc/rfc2566.txt"> RFC 2566: Internet 
 Printing Protocol/1.0: Model and Semantics</A></LI>
-<LI><A HREF=http://www.ietf.org/rfc/rfc2567.txt>RFC 2567: Design Goals 
-for an Internet Printing Protocol</A></LI>
-<LI><A HREF=http://www.ietf.org/rfc/rfc2568.txt>RFC 2568: Rationale for 
-the Structure of the Model and Protocol  for the Internet Printing 
+<LI><A HREF="http://www.ietf.org/rfc/rfc2567.txt"> RFC 2567: Design 
+Goals for an Internet Printing Protocol</A></LI>
+<LI><A HREF="http://www.ietf.org/rfc/rfc2568.txt"> RFC 2568: Rationale 
+for the Structure of the Model and Protocol  for the Internet Printing 
 Protocol</A></LI>
-<LI><A HREF=http://www.ietf.org/rfc/rfc2569.txt>RFC 2569: Mapping 
+<LI><A HREF="http://www.ietf.org/rfc/rfc2569.txt"> RFC 2569: Mapping 
 between LPD and IPP Protocols</A></LI>
 </UL>
 <P>The URI method name for IPP is &quot;ipp&quot;. </P>
 <P>CUPS defines the following extension operations to IPP. </P>
-<H3><A NAME=4_6_1>4.6.1 Get Default Destination (CUPS_GET_DEFAULT = 
+<H3><A NAME="4_6_1">4.6.1 Get Default Destination (CUPS_GET_DEFAULT = 
 0x4001)</A></H3>
 <P>The get default destination operation returns the printer attributes 
 for the system default printer or class. The only required attributes 
 are <CODE>attributes-charset</CODE> and <CODE>
 attributes-natural-language</CODE>. </P>
 <P>Get default destination will only return <CODE>ipp-ok</CODE>. </P>
-<H3><A NAME=4_6_2>4.6.2 Get Printers (CUPS_GET_PRINTERS = 0x4002)</A></H3>
+<H3><A NAME="4_6_2">4.6.2 Get Printers (CUPS_GET_PRINTERS = 0x4002)</A></H3>
 <P>The get printers operation returns the printer attributes for all 
 printers known to the system. The only required attributes are <CODE>
 attributes-charset</CODE> and <CODE>attributes-natural-language</CODE>. </P>
 <P>Get printers will only return <CODE>ipp-ok</CODE>. </P>
-<H3><A NAME=4_6_3>4.6.3 Add Printer (CUPS_ADD_PRINTER = 0x4003)</A></H3>
+<H3><A NAME="4_6_3">4.6.3 Add Printer (CUPS_ADD_PRINTER = 0x4003)</A></H3>
 <P>The add printer operation adds or replaces the specified printer. 
 The <CODE>attributes-charset</CODE>, <CODE>attributes-natural-language</CODE>
  and <CODE>printer-uri</CODE> attributes are required. </P>
@@ -645,19 +745,19 @@ body. If a valid interface script or PPD file is not provided then the
 printer is treated as a generic PostScript device. </P>
 <P>Add printer will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-authorized</CODE>
 , <CODE>ipp-bad-request</CODE>, or <CODE>ipp-attributes</CODE>. </P>
-<H3><A NAME=4_6_4>4.6.4 Delete Printer (CUPS_DELETE_PRINTER = 0x4004)</A>
+<H3><A NAME="4_6_4">4.6.4 Delete Printer (CUPS_DELETE_PRINTER = 0x4004)</A>
 </H3>
 <P>The delete printer operation removes the specified printer. The only 
 required attributes are <CODE>attributes-charset</CODE>, <CODE>
 attributes-natural-language</CODE>, and <CODE>printer-uri</CODE>. </P>
 <P>Delete printer will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-found</CODE>
 , or <CODE>ipp-not-authorized</CODE>. </P>
-<H3><A NAME=4_6_5>4.6.5 Get Classes (CUPS_GET_CLASSES = 0x4005)</A></H3>
+<H3><A NAME="4_6_5">4.6.5 Get Classes (CUPS_GET_CLASSES = 0x4005)</A></H3>
 <P>The get classes operation returns the printer attributes for all 
 classes known to the system. The only required attributes are <CODE>
 attributes-charset</CODE> and <CODE>attributes-natural-language</CODE>. </P>
 <P>Get classes will only return <CODE>ipp-ok</CODE>. </P>
-<H3><A NAME=4_6_6>4.6.6 Add Class (CUPS_ADD_CLASS = 0x4006)</A></H3>
+<H3><A NAME="4_6_6">4.6.6 Add Class (CUPS_ADD_CLASS = 0x4006)</A></H3>
 <P>The add class operation adds or replaces the specified class. The <CODE>
 attributes-charset</CODE>, <CODE>attributes-natural-language</CODE>, 
 and <CODE>printer-uri</CODE> attributes are required. </P>
@@ -667,27 +767,27 @@ required when initially adding a printer and optional when modifying a
 printer. </P>
 <P>Add class will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-authorized</CODE>
 , <CODE>ipp-bad-request</CODE>, or <CODE>ipp-attributes</CODE>. </P>
-<H3><A NAME=4_6_7>4.6.7 Delete Class (CUPS_DELETE_CLASS = 0x4007)</A></H3>
+<H3><A NAME="4_6_7">4.6.7 Delete Class (CUPS_DELETE_CLASS = 0x4007)</A></H3>
 <P>The delete class operation removes the specified class. The only 
 required attributes are <CODE>attributes-charset</CODE>, <CODE>
 attributes-natural-language</CODE>, and <CODE>printer-uri</CODE>. </P>
 <P>Delete class will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-found</CODE>
 , or <CODE>ipp-not-authorized</CODE>. </P>
-<H3><A NAME=4_6_8>4.6.8 Accept Jobs (CUPS_ACCEPT_JOBS = 0x4008)</A></H3>
+<H3><A NAME="4_6_8">4.6.8 Accept Jobs (CUPS_ACCEPT_JOBS = 0x4008)</A></H3>
 <P>The accept jobs operation allows jobs to be accepted by the 
 specified destination. The only required attributes are <CODE>
 attributes-charset</CODE>, <CODE>attributes-natural-language</CODE>, 
 and <CODE>printer-uri</CODE>. </P>
 <P>Accept jobs will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-found</CODE>
 , or <CODE>ipp-not-authorized</CODE>. </P>
-<H3><A NAME=4_6_9>4.6.9 Reject Jobs (CUPS_REJECT_JOBS = 0x4009)</A></H3>
+<H3><A NAME="4_6_9">4.6.9 Reject Jobs (CUPS_REJECT_JOBS = 0x4009)</A></H3>
 <P>The reject jobs operation prevents jobs from being accepted by the 
 specified destination. The only required attributes are <CODE>
 attributes-charset</CODE>, <CODE>attributes-natural-language</CODE>, 
 and <CODE>printer-uri</CODE>. </P>
 <P>Reject jobs will return <CODE>ipp-ok</CODE>, <CODE>ipp-not-found</CODE>
 , or <CODE>ipp-not-authorized</CODE>. </P>
-<H3><A NAME=4_6_10>4.6.10 Set Default Destination (CUPS_SET_DEFAULT = 
+<H3><A NAME="4_6_10">4.6.10 Set Default Destination (CUPS_SET_DEFAULT = 
 0x400A)</A></H3>
 <P>The set default destination operation returns the printer attributes 
 for the system default printer or class. The only required attributes 
@@ -696,16 +796,16 @@ are <CODE>attributes-charset</CODE>, <CODE>attributes-natural-language</CODE>
 <P>Set default destination will return <CODE>ipp-ok</CODE>, <CODE>
 ipp-not-authorized</CODE>, <CODE>ipp-bad-request</CODE>, or <CODE>
 ipp-not-found</CODE>. </P>
-<H2><A NAME=4_7>4.7 Line Printer Daemon Protocol</A></H2>
-<P>The Line Printer Daemon (LPD) protocol is described by <A HREF=http://www.ietf.org/rfc/rfc1179.txt>
+<H2><A NAME="4_7">4.7 Line Printer Daemon Protocol</A></H2>
+<P>The Line Printer Daemon (LPD) protocol is described by <A HREF="http://www.ietf.org/rfc/rfc1179.txt">
 RFC 1179: Line Printer Daemon Protocol</A>. </P>
 <P>The URI method name for LPD is &quot;lpd&quot;. </P>
-<H2><A NAME=4_8>4.8 Server Message Block Protocol</A></H2>
+<H2><A NAME="4_8">4.8 Server Message Block Protocol</A></H2>
 <P>The Server Message Block (SMB) and related Common Internet File 
-System (CIFS) protocols are described at <A HREF=http://anu.samba.org/cifs>
+System (CIFS) protocols are described at <A HREF="http://anu.samba.org/cifs">
 http://anu.samba.org/cifs</A>. </P>
 <P>The URI method name for SMB is &quot;smb&quot;. </P>
-<H1><A NAME=5>5 5 - Directories</A></H1>
+<H1><A NAME="5">5 5 - Directories</A></H1>
 <DL>
 <DT>/usr/bin </DT>
 <DD>The <CODE>cancel</CODE>, <CODE>lp</CODE>, <CODE>lpq</CODE>, <CODE>
@@ -746,8 +846,8 @@ page_log</CODE> files reside here. </DD>
 <DT>/var/cups/requests </DT>
 <DD>This directory contains pending print job files. </DD>
 </DL>
-<H1 TYPE=A VALUE=1><A NAME=6>A Glossary</A></H1>
-<H2><A NAME=6_1>A.1 Terms</A></H2>
+<H1 TYPE="A" VALUE="1"><A NAME="6">A Glossary</A></H1>
+<H2><A NAME="6_1">A.1 Terms</A></H2>
 <DL>
 <DT>C </DT>
 <DD>A computer language. </DD>
@@ -760,7 +860,7 @@ page_log</CODE> files reside here. </DD>
 <DT>socket </DT>
 <DD>A two-way network communications channel. </DD>
 </DL>
-<H2><A NAME=6_2>A.2 Acronyms</A></H2>
+<H2><A NAME="6_2">A.2 Acronyms</A></H2>
 <DL>
 <DT>ASCII </DT>
 <DD>American Standard Code for Information Interchange </DD>

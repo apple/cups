@@ -1,99 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>
 <HEAD>
 <TITLE>CUPS Software Administrators Manual</TITLE>
 <META NAME="AUTHOR" CONTENT="Easy Software Products">
 <META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
 <META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.0.2">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<STYLE>
+BODY { font-family: serif; font-size: 11.0pt }
+H1 { font-family: sans-serif; font-size: 19.0pt }
+H2 { font-family: sans-serif; font-size: 19.0pt }
+H3 { font-family: sans-serif; font-size: 19.0pt }
+H4 { font-family: sans-serif; font-size: 19.0pt }
+H5 { font-family: sans-serif; font-size: 19.0pt }
+H6 { font-family: sans-serif; font-size: 19.0pt }
+SUB { font-size: 7.6pt }
+SUP { font-size: 7.6pt }
+PRE { font-size: 9.2pt }
+</STYLE>
 </HEAD>
 <BODY>
-<CENTER><A HREF=#contents><IMG SRC="images/cups-large.gif" BORDER=0><BR>
-<H1>CUPS Software Administrators Manual</H1></A><BR>
+<CENTER><A HREF="#CONTENTS"><H1>CUPS Software Administrators Manual</H1></A><BR>
 CUPS-SAM-1.0.2<BR>
 Easy Software Products<BR>
 Copyright 1997-1999, All Rights Reserved<BR>
 </CENTER>
 <HR>
-<H1 ALIGN=CENTER><A NAME=CONTENTS>Table of Contents</A></H1>
+<H1 ALIGN="CENTER"><A NAME="CONTENTS">Table of Contents</A></H1>
 <BR>
-<BR><B><A HREF=#1>Preface</A></B>
+<BR><B><A HREF="#1">Preface</A></B>
 <UL>
-<LI><A HREF=#1_1>System Overview</A></LI>
-<LI><A HREF=#1_2>Document Overview</A></LI>
+<LI><A HREF="#1_1">System Overview</A></LI>
+<LI><A HREF="#1_2">Document Overview</A></LI>
 </UL>
-<B><A HREF=#2>1 - Printing System Overview</A></B>
+<B><A HREF="#2">1 - Printing System Overview</A></B>
 <UL>
-<LI><A HREF=#2_1>The Printing Problem</A></LI>
-<LI><A HREF=#2_2>The Technology</A></LI>
-<LI><A HREF=#2_3>Jobs</A></LI>
-<LI><A HREF=#2_4>Classes</A></LI>
-<LI><A HREF=#2_5>Filters</A></LI>
-<LI><A HREF=#2_6>Printer Drivers</A></LI>
-<LI><A HREF=#2_7>Networking</A></LI>
+<LI><A HREF="#2_1">The Printing Problem</A></LI>
+<LI><A HREF="#2_2">The Technology</A></LI>
+<LI><A HREF="#2_3">Jobs</A></LI>
+<LI><A HREF="#2_4">Classes</A></LI>
+<LI><A HREF="#2_5">Filters</A></LI>
+<LI><A HREF="#2_6">Printer Drivers</A></LI>
+<LI><A HREF="#2_7">Networking</A></LI>
 </UL>
-<B><A HREF=#3>2 - Building and Installing CUPS</A></B>
+<B><A HREF="#3">2 - Building and Installing CUPS</A></B>
 <UL>
-<LI><A HREF=#3_1>Installing a Source Distribution</A></LI>
+<LI><A HREF="#3_1">Installing a Source Distribution</A></LI>
 <UL>
-<LI><A HREF=#3_1_1>Requirements</A></LI>
-<LI><A HREF=#3_1_2>Compiling CUPS</A></LI>
-<LI><A HREF=#3_1_3>Installing the Software</A></LI>
-<LI><A HREF=#3_1_4>Running the Software</A></LI>
+<LI><A HREF="#3_1_1">Requirements</A></LI>
+<LI><A HREF="#3_1_2">Compiling CUPS</A></LI>
+<LI><A HREF="#3_1_3">Installing the Software</A></LI>
+<LI><A HREF="#3_1_4">Running the Software</A></LI>
 </UL>
-<LI><A HREF=#binary>Installing a Binary Distribution</A></LI>
+<LI><A HREF="#binary">Installing a Binary Distribution</A></LI>
 </UL>
-<B><A HREF=#4>3 - Printer Queue Management</A></B>
+<B><A HREF="#4">3 - Printer Queue Management</A></B>
 <UL>
-<LI><A HREF=#4_1>The lpadmin Command</A></LI>
-<LI><A HREF=#4_2>Adding and Modifying Printers</A></LI>
+<LI><A HREF="#4_1">The lpadmin Command</A></LI>
+<LI><A HREF="#4_2">Adding and Modifying Printers</A></LI>
 <UL>
-<LI><A HREF=#4_2_1>Using Standard Printer Drivers</A></LI>
+<LI><A HREF="#4_2_1">Using Standard Printer Drivers</A></LI>
 </UL>
-<LI><A HREF=#4_3>Removing Printers</A></LI>
-<LI><A HREF=#4_4>Printer Classes</A></LI>
-<LI><A HREF=#4_5>Setting the Default Printer</A></LI>
-<LI><A HREF=#4_6>Starting and Stopping Printers</A></LI>
-<LI><A HREF=#4_7>Accepting and Rejecting Print Jobs</A></LI>
+<LI><A HREF="#4_3">Removing Printers</A></LI>
+<LI><A HREF="#4_4">Printer Classes</A></LI>
+<LI><A HREF="#4_5">Setting the Default Printer</A></LI>
+<LI><A HREF="#4_6">Starting and Stopping Printers</A></LI>
+<LI><A HREF="#4_7">Accepting and Rejecting Print Jobs</A></LI>
 </UL>
-<B><A HREF=#5>4 - Printing System Management</A></B>
+<B><A HREF="#5">4 - Printing System Management</A></B>
 <UL>
-<LI><A HREF=#5_1>Changing the Configuration Files</A></LI>
-<LI><A HREF=#5_2>Temporary Files</A></LI>
-<LI><A HREF=#5_3>Network Configuration</A></LI>
+<LI><A HREF="#5_1">Changing the Configuration Files</A></LI>
+<LI><A HREF="#5_2">Temporary Files</A></LI>
+<LI><A HREF="#5_3">Network Configuration</A></LI>
 <UL>
-<LI><A HREF=#5_3_1>Port</A></LI>
-<LI><A HREF=#5_3_2>Listen</A></LI>
-<LI><A HREF=#5_3_3>BrowsePort</A></LI>
-<LI><A HREF=#5_3_4>BrowseAddress</A></LI>
+<LI><A HREF="#5_3_1">Port</A></LI>
+<LI><A HREF="#5_3_2">Listen</A></LI>
+<LI><A HREF="#5_3_3">BrowsePort</A></LI>
+<LI><A HREF="#5_3_4">BrowseAddress</A></LI>
 </UL>
-<LI><A HREF=#5_4>Printer Security</A></LI>
+<LI><A HREF="#5_4">Printer Security</A></LI>
 <UL>
-<LI><A HREF=#5_4_1>Location</A></LI>
-<LI><A HREF=#5_4_2>Order</A></LI>
-<LI><A HREF=#5_4_3>Allow</A></LI>
-<LI><A HREF=#5_4_4>Deny</A></LI>
-<LI><A HREF=#5_4_5>AuthType</A></LI>
-<LI><A HREF=#5_4_6>AuthClass</A></LI>
-<LI><A HREF=#5_4_7>AuthGroupName</A></LI>
-<LI><A HREF=#5_4_8>SystemGroup</A></LI>
+<LI><A HREF="#5_4_1">Location</A></LI>
+<LI><A HREF="#5_4_2">Order</A></LI>
+<LI><A HREF="#5_4_3">Allow</A></LI>
+<LI><A HREF="#5_4_4">Deny</A></LI>
+<LI><A HREF="#5_4_5">AuthType</A></LI>
+<LI><A HREF="#5_4_6">AuthClass</A></LI>
+<LI><A HREF="#5_4_7">AuthGroupName</A></LI>
+<LI><A HREF="#5_4_8">SystemGroup</A></LI>
 </UL>
-<LI><A HREF=#5_5>File Formats</A></LI>
+<LI><A HREF="#5_5">File Formats</A></LI>
 <UL>
-<LI><A HREF=#5_5_1>mime.types</A></LI>
-<LI><A HREF=#5_5_2>mime.convs</A></LI>
+<LI><A HREF="#5_5_1">mime.types</A></LI>
+<LI><A HREF="#5_5_2">mime.convs</A></LI>
 </UL>
 </UL>
-<B><A HREF=#6>5 - Printer Accounting</A></B>
+<B><A HREF="#6">5 - Printer Accounting</A></B>
 <UL>
-<LI><A HREF=#6_1>Where to Find the Log Files</A></LI>
-<LI><A HREF=#6_2>The access_log File</A></LI>
-<LI><A HREF=#6_3>The error_log File</A></LI>
-<LI><A HREF=#6_4>The page_log File</A></LI>
+<LI><A HREF="#6_1">Where to Find the Log Files</A></LI>
+<LI><A HREF="#6_2">The access_log File</A></LI>
+<LI><A HREF="#6_3">The error_log File</A></LI>
+<LI><A HREF="#6_4">The page_log File</A></LI>
 </UL>
 <HR>
-<H1 ALIGN=RIGHT><A NAME=1>Preface</A></H1>
+GIF89a&macr;&yuml;&ograve;&Igrave;&Igrave;&Igrave;™™™fff333&yuml;&yuml;&yuml;&yuml;&yuml;&yuml;&yuml;&yuml;&yuml;!&ugrave;,&macr;&yuml;B&thorn;X&ordm;&Uuml;&thorn;0&Ecirc;I&laquo;&frac12;8&euml;&Iacute;&raquo;&yuml;`(Ždižh&ordf;2€0p,&Iuml;tm&szlig;x&reg;&iuml;
+
+<!--=•pH,Ö«Çl:ŸÐ¨”ù ¯Ø¬ÖXN¿à°xL~¬Û´zmxËð¸|N§Ùø¼(Pïûÿ€bwz…jn‚‰Š‹Œ9„†‘!-->
+;&plusmn;&Yacute;&iacute;ˆnd&yacute; !&cedil; ž&sup3;w&agrave;…MƒƒY~&iquest;{,g&Uacute;\‚&auml;&eacute; 
+Œ&times;&Oslash;(t&Ugrave;&icirc;!&Iuml;=&Ntilde;.&ucirc;z&macr;&aacute;&Ntilde;Ÿ:&igrave;;&Atilde;9q&ouml;&iacute;&Eacute;&euml;]/&iquest;&ordm;&Eacute;&curren;Et/†'&Icirc;&thorn;t9&Agrave;&Oslash;–ž_&Ugrave;&Ccedil;\|W•wAr&ouml;&cedil;&Yacute;2&Ocirc;&times; 
+tN&deg;0T&iuml;}&iexcl;&ucirc;‰$!‚yMx&icirc;)ˆš‰&Ocirc;&oslash;@nB&deg;U&frac12;&Ecirc;wE„&sect;!ŠF H&nbsp;L8B 
+c‰;ždŠ-&aelig;DVWd&ETH;&sup3;€h&plusmn;&auml;&Uacute;“P&para;%#(4Fi&aring;•&Iuml;\hŠ:Re!\&Ograve;&Auml;—X^&brvbar;%€&yen;&Agrave;-$E€&Ouml;/&uacute;HŽšl&acirc;&acirc;&ouml;&Igrave;QX
+
+<!--äÇ"iL	:a7‚]›0IZ¡YØø¡‡D}¤–Uj±á
+^âä™æ`Ú@¦5b|šà«Á±§3Ñ KwÔ\ªB¨±H)+=¡Ó©"
+©¢	8uƒ†¸öŠD§•lþ:„dRXilÌ:Ë!´;¹t+„e<
+‡;øô+‚bbhaÚ0Ê6é.D™ðÞ¹Ì¹ñÖkoê({ï¾ü{f¿-->
+&cedil;1N&ocirc;&macr;b&quot;œŠ&uuml;j&aring;&Aacute;&Acirc;E0…&Egrave;8&ouml;5GkZ|&Ograve;&Aacute;wt„C&raquo;&Ocirc;QS&Ccedil;o6&Ocirc;&Ugrave;[W„$&sup2;*Ž+4Pb-8&sup1;P1&thorn;'8&quot;‘Š&curren;&Auml;$&nbsp;Cy&ecirc;‘„)&gt;&atilde;Št&egrave;`&ETH;3&Acirc;‡‹&frac34;z&quot;&laquo;rE'&Acirc;qf&auml;&deg;&Euml; 
+‘q&Acirc;\|€„Ž&iexcl;&ocirc;&ouml;&raquo;%&Eacute;(.—b&Uacute;&frac12;&Egrave;€&iacute;&Eacute;`{&not;E&Ccedil;1w’ &raquo;[H&szlig;`(B6&ouml;“&nbsp; 
+†')&Ecirc;RŽ&Icirc;a[&Atilde;rbC!T&aring;&deg;Œ 
+2Q&middot;&Egrave;HZ&ecirc;#–&reg;&uuml;&Euml;/&agrave;&ocirc;&macr;F&Yacute;&ecirc;(&Ucirc;&sup2;%&nbsp;&ordm;X&Euml;9&ouml;&Agrave;b&Aacute;4f.&ugrave;-o&yacute;™X&Euml;B…I&Icirc;&Ograve;7&sup1;*@&Atilde;&Oacute;Ž&Iacute;T€h&agrave;‘&Igrave;W&acirc;™&Atilde;$f:&micro;yžn†&oacute;†r„'t&eacute;Kv` 
+&Ccedil;+d&ordf;– œ79s&ograve;|'=&times;&cent;&Igrave;x&para;&ograve;œ&yuml;„&brvbar;œˆe&Icirc;;*&agrave;$&thorn;” I&Yacute;&AElig;a&Iuml;{–3Ž&Aring;&Aacute; 
+P“&Iacute;S[&Ugrave;L&uml;3&copy;&ograve;Q7&eacute;&AElig;&ograve;#&atilde;&ucirc;&ocirc;0F&times;&eth;sE&deg;t&sect;@‘&Oslash;Q&Uuml;&acute;&acute;&nbsp;&copy;:3&Oacute;R&iacute;d&nbsp;&yen;*MITnŒ&pound;&uml;H]&Oslash;Q&Aacute;d 
+@&ograve;&thorn;—&not;rMœŽaO
+<!--x‹ŒÖ3½4 °XT'ª®ƒ:T£uéWeºádËeú¸è¬Ù7
+
+ëÒÏ;„sœåµ7m(ýÐŸtl¤RV)-->
+r&euml;^y&Agrave;&middot;(&cedil;&icirc;&eacute;&ecirc;&ucirc;$uD&ograve;r&atilde;/a,I.&deg;&Ugrave;U&Agrave;œb hˆ`&frac34;B&nbsp;&euml;&quot; 
+&Uuml;`H&Oslash;x&Egrave;&cedil;o1&thorn;[&aacute;\8f^&aelig;|\&yacute;‚&cent;&cent;z&oslash;0(ˆ\ {ƒ&Auml;g&auml;&THORN;&otilde;€&ccedil;&acirc;&sect;&Aacute;˜0*\&sup3;n&frac14;‹m&para;/&Auml;e&ordf;&plusmn;&yuml;†&igrave; 
+&Ccedil;,&frac12;DN2€œ&ordm;+&ugrave;&Eacute;|&iacute;0L&iexcl;Le*&eth;&cedil;&Atilde;&gt;&shy;2&euml;f,eIPO&Euml;&Aring;&agrave;r—&plusmn;”80SAŸcF&ordf;at&ccedil;&raquo;&atilde;y&curren;&cedil;rš&ccedil;&Igrave;&iexcl;5&iuml;o&otilde;&Euml;sž&iuml;|&iquest;8&Euml;™&Icirc;&brvbar;&not;&thorn;,&iuml;&frac14;&egrave;&agrave;)&Aacute;&Igrave;;&oslash;k&iexcl;—†dDp&Ntilde;&ograve;&oslash;2&cent;qfH&atilde;!&Euml;“~&Ugrave;Ÿ-&iacute; 
+'g:,&aelig;4y?&yacute;&auml;P‹Z›ž#&Iuml;&Otilde;&acute;&Icirc;5AK‰k]&ucirc;š›&Ograve;K&otilde;&macr;‡m&euml;€&otilde;z&Oslash;&Egrave;&AElig;&laquo;&Oslash;Ž&Yacute;&gt;B{P&ETH;&ordf;.6hf]&ordm;?&copy;&Igrave;IŽuO„&iacute;M‚&Igrave;&Ccedil;&Uuml;c&micro;3˜ 
+61‹N&Ograve;[†W&pound; &brvbar;m&iquest;&shy;{&Acirc;P&acirc;v&Icirc;&para;KnUˆ[ &ograve;n&Auml;&frac12;&plusmn;&divide;n?l:&Aacute;ž3uš&euml;&not;sP[&yuml;nn&frac34;&ccedil;P…W&otilde;&Ocirc;Fj[&Acirc;&divide; 
+&sup1;v&Iuml;™&agrave;‰˜x&uacute;'ˆ&pound;&Agrave;&Agrave;†p&cedil;4.&ecirc;&atilde;K&Ccedil;&iquest;&Acirc;&Aacute;&plusmn;o&sect;&cent;&uuml;&quot;&Aacute;|Nk`&icirc;&Ecirc;˜
+<!--•¤7 yþ	D-->
+ 
+jl&copy;&Igrave;uˆ&Euml;i™0pmC&acute;&laquo;+‰&divide;6&curren;2&shy;&eacute;&Iuml;e`(ŽJ]&yen;i&otilde;&eth;3ƒ&Oslash;&iacute;&quot;p|&ordf;!:q&oslash;F&Oslash;&sup3; 6&pound; 
+@&shy;,&thorn;Šq&uuml;&atilde;o&Igrave;&Ccedil;&reg;ž&Ouml;&uuml;V“&para;Q&Ccedil;›Ev&icirc;&sup1;&sup2;&Eacute;8&Ugrave;&ordf;S&quot;&aelig;&Agrave;&ccedil;‡x&plusmn; &agrave;&thorn;‡&gt;—I&atilde;g 
+&iuml;&Yacute;&gt;Y‰&ccedil;N80&aelig;&sect;&nbsp;&plusmn;&frac34;GLL&igrave;&Otilde;&micro;…(1&THORN;&frac14;!8}&thorn;&not;“*…&ordf;‰&Ugrave;&igrave;:e&raquo;&acute;œ 
+&ordf;&iquest;&ecirc;n_6&Acirc;&Atilde;S&Agrave;`eG;&Ouml;„CƒCcˆ&iquest;‡4&cedil;ye&icirc;&macr;&Iacute;)o&oslash;ByRm&frac12;0?&iacute;L&icirc;&Aring;`Q&yuml;j&Oacute;&Ugrave;/&ordm;&ocirc;&Oacute;N|&Yacute;
+<!--â9ço‘SŽà•?œýáu¿þá¯~!ÒŸ¿ÍÏüýÏIw1ßþZÈN¥Ex£&\(¤á[É¤€v2€WW-->
+
+&thorn;&Ugrave;A&Uuml;Œ&Aacute;&cedil;D5&copy;D a&aelig;vx ?Š&para;x&deg;DM@•!h‰&agrave;&Egrave;€Ž&sect;&reg; 
+•&nbsp;&aacute;&times;B`&eth;&curren;&ordf;E?›“”&THORN;dƒ&quot;8$&Yacute;`Ki0…O&eth;ƒn&Icirc;“&plusmn;&micro;vtž&egrave;€I([,&sup1;Nd&Eacute;&uml;h\'6X 
+P&atilde;—Š‰&Eacute;&oslash;t &cent;‘&yen;˜&not;&egrave; €ˆ†Ky™FˆŒ&euml;`š”yƒ„&uml;š €š‰ƒM&copy;‡&oslash;FQhY„ 
+9&para;X&macr;&times;–&iacute;4š&curren;™Y\)&quot;&sup1;AN]‰x&eacute;z&divide;Gq07)&copy;&ntilde;™•Y€r&deg;ŒŽi‹ z ™&Ccedil;&auml;F&Iacute;&Eacute;T–&ugrave;› 
+&Euml;ŽC œwI›&uuml;X]‹&sup1;\&euml;Y]&thorn;f l&iuml;Ybj8Ÿ&Egrave;uœbŸ&Iacute;&Aring;t&uacute;&copy;f&THORN;&times;ŸfBI—“*&oslash;&eacute;:&Ucirc;&Oslash;Uj&nbsp;&Ograve; 
+ˆ&otilde;&sup1;&nbsp;&Otilde;p&nbsp;$(~  &iexcl;&Uacute; &iexcl;g&ugrave;{&icirc;pZI?&iexcl;ƒ&icirc;&Agrave;v:“a&brvbar;˜6&cent;&sect;&Ocirc;]&Yacute;‘(&ordf;&ecirc;)!Ÿ&Uacute;&cent;: 
+jw&micro;&iexcl;4&Uacute;v&iacute;H&Ucirc;&Ccedil;˜9&ordm;Xh&oacute;•&uuml;&ugrave;&pound;&yen;&Aacute;&cent;V&Eacute;{D&ordm;2š‰(&deg;&curren;3š&curren;a&divide;&nbsp;+&ETH;&pound;&yen;“p&cent;&thorn;&ograve;4V&ordm;—  
+E&acute;&yen;&egrave;&curren;k&deg;7&ordm;hT*€&iquest;&egrave;w`&Uacute;ži&Auml; …S&brvbar;&AElig;&brvbar;m&ecirc; N&ecirc;ƒ#&uacute;&cent;f€ x&ecirc;†&yacute; 
+8z&copy;7u&Uacute;p{&Uacute;=~]7`&laquo;h‡&Uacute;s&Uacute;g:…zd˜&oacute;&sect;&Icirc;A-v&thorn;A&ntilde;r&brvbar;'–A&Uacute;)9–š&cent;&acirc;Si;&pound;…š 1&ordf;o&quot;&ordf; 
+&brvbar;J;“&ordm; r&ordm;8Ui|&eacute;&gt;&iexcl;&Uacute;œ&uacute;
+<!--pv³2<ƒj£·«É¦kÉ	1Š:¬Èe ”«ÉÚlÑ•ªÍZn¯Š2Ì­‹s«Á­ÖÚàé¨Ûº=¤zŽŸú­6­áU­ä
+Øš¨¿újá
+¦0®éJ«
+¯NÕäº•öÐVeÎ¶¯õbm¶7ù´Ž-->
+“&euml;&yen;Dfn&yacute;2&raquo;ƒ–0j&laquo;&reg;&raquo;&ordm;K;z&euml;&cent;&Iacute;&ouml;&raquo;—!&micro;—S&raquo;&sup3;r&gt;K+6ˆ‹&uml;X&Ograve;&raquo;; C&Egrave; 
+8&Ecirc;;&cent;&raquo;&Atilde;&Ucirc;/Œ‹&yen;ž!&not;s&frac12;VR&frac12;&oacute;&otilde;&Iuml;‹O&acirc;[/&ccedil;K&uml;&thorn;˜&Ntilde;:&Iacute;‹\&Yacute;+&nbsp;Sc:&iuml;&Euml;ž’&ordm;&para;&euml;9&AElig;&raquo;
+<!--ëSç½¤tj ½YUÀœãÀ©%
+Ìró)Á0¨§—³½Ç…Á¬Ì¤LÛ6øK!<Á:Àê*ª…ÃÁî…Á.‡²
+¥¼‘z Âä	¦ýËÀ~¸7<,´GóÃý‹ÂöêÀe:Ä¢‰°ë«£m£,žyAI¡…˜Q!8-->
+&ocirc; 8ly$ 
+8&copy;&Ugrave;&Aring;mX2&Ugrave;h&gt;—?&macr;!šH&uuml;&Aacute;^LsP,Ÿ&laquo;Y‹&acirc;&aacute;&iquest;&yuml;tš&igrave;‚&pound;Y 
+r&brvbar;&Eacute;š&yen;9&Ccedil;jž&Auml;8-&AElig;&Ccedil;Œ&para;i&ecirc;P&Acirc;bA&Acirc;˜&ugrave;‰&Atilde;&cedil;š&raquo;&sup3;7RœCWRo&igrave;Š&aring; MŒŠ”&aring;t™ Œ›r&eacute;&Eacute;q
+<!--Zva&‹Z¤jzÊŠ¬‡7èV)“‹|›ká!¦*€Á¶öÄ84’Wž¶LÊñ½Fª6ÄOqÌ°Š}Å¬—|žÎ|4!ÍAh+è•L¢
+%|‹Û¬Å$-->
+
+&aring;&gt;}L&ecirc;}&Icirc;&Ccedil;&uml;&nbsp;5:&agrave;Œ|&quot;&thorn;&Ccedil;w&ETH;s&oslash;&aelig;N&Icirc;&deg;&sup1;#R&gt;~-N‰&reg;&egrave;ƒ&nbsp;&szlig;c&eth;&THORN;&Atilde;š&Icirc;&Ntilde;&yen;&reg;&aring;G&Icirc;&acirc;&iacute;ˆ‰&Yacute;&egrave;*‚&cedil; 
+=‚ž &ordm;&euml;&acirc;…&shy;&euml;&Agrave;&gt;&Ucirc;&middot;ž&euml;n^žm&egrave;&Ecirc;&euml;&eth;&frac14;&atilde;&gt;&aring;&times;&Icirc;›&laquo;}&ecirc;&Oslash;&divide; 
+“Œ&not;&Euml;I&Aacute;&middot;A&Ocirc;N&Iacute;&euml;v&gt;]t.&acirc;&Uacute;L&ETH;&laquo;&thorn;&iacute;&iuml;&frac34;&ntilde;n&auml;&Ouml;&Uuml;&aelig;s&sup1;&iquest;&plusmn;&acirc;&deg;+† 
+&not;U&Oslash;&iuml;&icirc;•.&ccedil;&not;&Icirc;&igrave;&Iacute;.&egrave;&acute;&THORN;ŠG=&eth;&ugrave;‚&sect;ž&macr;”&euml;^&auml;&Ucirc;&reg;&ecirc;h-‹&ecirc;&ecirc;!i!&Otilde;vM&iacute;i&ordf;&icirc;&thorn;&frac34;&ograve;&icirc;&aacute;/&thorn;&icirc;™&cedil;&Ntilde;-O&Ouml;G&eth;,o&ntilde;&ordm;!&aring;’gO&acirc;&nbsp;PO&igrave;O&ocirc;B&thorn;&Egrave;&agrave;h&acirc;+?&iuml;&gt;&szlig;&Ecirc;VH&Agrave;sa&otilde;™€&otilde;$&oacute;S&icirc;&otilde;—&raquo;&oacute;8.ž&szlig;&sup1; 
+~&aacute;&szlig;&Egrave;&copy;&ouml;&raquo;]&ograve;3&euml;&AElig;t_&divide;[&iuml;&ocirc;b&macr;&ccedil;‚&Uuml;&divide;&Otilde;&laquo;@u™&eth;;z&Uuml;˜‘&Uuml;@&oacute;Ž2’?&ugrave;ƒ&cedil;&Ugrave;l&ugrave;F&nbsp;&para;™&macr;&ugrave;›N&nbsp;ž0œ&uacute;&pound;&para;&curren;&yuml;0#9:&szlig;&sect;&frac12;ž&copy;Ÿ\#&Atilde;&Ugrave;&aelig;&oacute;2&eacute;+&ucirc;‚&Agrave;&Oacute;&cedil;_&auml;M/&Oacute;ta&Uacute;&yacute;3”]&Ugrave;&laquo;&iquest;&cedil;i&icirc;aF&gt;&ordf;}Œ&Oslash;v&Iacute;&iuml;M&Iacute;&divide;&ETH;&euml;&auml;&copy;&icirc;r&Uuml;Œ&ouml;q&ntilde;_&Agrave;&uuml;&ordf;r&acirc;F&reg;&ograve;
+&yacute;&thorn;&cedil;—hT_&atilde;4sx”&yacute;&Yacute;&icirc;)&ccedil;.Qg&Atilde;&raquo;&agrave;Ÿ&Iuml;%&igrave;‹}i&acute;AS&ucirc;|&thorn;&eth;@Q&Uuml; 
+$J9€&raquo;-&Igrave;&plusmn;&divide;&Uuml;&ocirc;M&Oslash;‘hZ˜&brvbar;:&deg;œ*&Iuml;l&szlig;x&Ograve;|&Iuml;&frac14;&iexcl;&Aring;L&Agrave; &not;&Aacute;f&ugrave;9B&Ntilde;d&igrave;&Aacute;|&laquo;VV„&cent;“&eacute;nKv
+<!--uè´®Ì®iiçÍ¦t›šV/.²ê}mywu#|Yc‚X|jŽx‹dE“)0U’ T–<W€o zbQ`F¥2›³:°Ctª·‰!™²*¨…º»¢~Š°z¬†Á¯Ä‡´ÕŽ¶Ó(iÃm²F›ÍÚhÜÞ“Æ¡Ö…äc|ØËUÒÙþ²ëøçõƒ³ÜØ<î™w‰Ö¿Eéhä›@ðÂ-->
+
+kB_ƒg 3&Ecirc;&sup3;8#&THORN;&not;L=0;J&curren;&auml;&Egrave;@&curren;F|'i~&plusmn;&copy;  ža&Ecirc;Š&AElig;g;d*3&sup2;”&copy;bP&Iuml;&cent;T&auml;H&ocirc;&brvbar;?[† 
+&Auml;&auml;ƒhN6ZM&cent;D:c*BR!$&plusmn;ckƒ’V&shy;-u&Ucirc;@[&oslash;p„Ÿ]&frac14;8&ouml;-1{T&Icirc;&reg;W&Iuml;2&ntilde;&nbsp;Šp=&cedil;q&laquo;&Ntilde;&frac12;es.‰„4+#&Euml;e&brvbar;&yen;W5&micro;ekxr&auml;›“/X&Iacute;š5I&Ccedil;ƒ=k&Yacute;&uacute;&micro;&igrave;&Euml;&deg;&ucirc;N–2q&Aring;[r&brvbar;yZ&pound;QŽ›&Ccedil;&THORN;txŠ&auml;cK—&Iacute;&iacute;&Eacute;&sup1; 
+i&thorn;&iexcl;9&frac14;m1o&ntilde;&cent;&copy;/&sup2;8&icirc;&igrave;St&eacute;4l’Wm&frac34;9&oacute;&eacute;&Ouml;&Ucirc;&ETH;&atilde;&atilde;{{&uuml;z&THORN;&iquest;&ccedil;&oslash;&ecirc;&ouml;&THORN;z&agrave;}œ&agrave;L&uml;&nbsp;&quot;˜ 
+&Auml;&ETH;s&agrave;&para;PGLU&uacute;&aring;`M&THORN; &nbsp;&iexcl;†9&not;&sect;&Ucirc;{pX&cedil;&iexcl;w&Uacute;w&szlig;‡&iexcl;&uml;&nbsp;‰&iacute; &quot;MUXNx
+<!--É……¡×ƒà¨âŠêÄõ#ƒå“Ž:Å(ã4Ö¸Až˜:@Ùw¸	YÝ‹tIã’Ö”˜$…a(å‹X¥F7×IÈbŠ["Y€Mç¸¹K~`¶Øä-->
++l&acute;&aacute;&brvbar; 
+j&sup2;F:&Aacute;.&ecirc;&AElig;&Ucirc;j&curren;&sup3;B&uacute;&icirc; &frac14;&Ecirc;&laquo;/&pound;&Ouml;’[&ETH;&frac12;#&iacute;+&eth;&yen;&aelig;nJ&THORN;&cedil;&laquo;&aelig;;&eth;&Acirc;&copy;&otilde;‹&uml; _&Euml;&eth;&Auml;Š&Ograve;&raquo;*&ordm;? 
+ƒ&Acirc;wœ&Atilde;yzh&plusmn;&deg;&Oslash;zl2,#oZ2&Egrave;›r|&ograve;&Euml;‚&deg;&frac14;$&Ccedil;)&euml; 
+&oacute;&Iacute;&Ugrave;&Ocirc;,&eacute;fs€1&Icirc;@/&oslash;&icirc;&Iuml;P&otilde;&Igrave;i&ETH;H&middot;&eth;&Atilde;BkLt&Ograve;P&macr;b&ocirc;S;N&Yacute;W&Ocirc;X&Iuml; 
+&oacute;’dl&Iacute;t&Ouml;`&deg;tžOc&nbsp;&oacute;&Aring;a&sect;}A&Auml;›&sup2;1v&Euml;j&Ccedil;m&thorn;u+`&Iacute;&Iacute;&Aacute;&middot;qw&uuml;6˜‚&igrave;&frac12;s&THORN;XŸ&uml;&Euml;$xM6&agrave;P&sup3;-i&Eacute;S&Uacute;&frac12;A&Ugrave;ˆ&iuml;&euml;84–&oslash;=x&auml;8^!&auml;*L&gt;&THORN;˜ƒk&sup1;Œ({I&egrave;^!&aacute;&cedil;˜N$&ecirc; 
+&laquo;&reg;&ccedil;!&ordm;&ucirc;&Acirc;‚&yuml;&Yacute;&nbsp;&euml;&macr;&szlig;o&icirc;—O&uuml;&uml;&frac34;&yuml;&icirc;9&iacute;]&ntilde;&THORN;{&ntilde;&Ugrave;&Ecirc;&reg;&atilde;lhŽ(&egrave;&Igrave;&Atilde;&ecirc;&frac14;~&Ocirc;S&cent;|&ouml;&Otilde;Ÿz&yacute;w&not;&Euml;&sect;|&oslash;&Yacute;—*&frac12;Œ&Egrave;&times;&shy;|&uacute;&aring;wz&thorn;&aelig;“)Nr&ucirc;&frac34;&Ecirc;?*&ocirc;&yen; 
+&iquest;*&divide;&ocirc;7&uacute;&frac12;~M&uacute;&uacute;&uacute;&divide;&ordf;&divide;&Eacute;ˆ•S3x*&ucirc;&iacute;P”&ugrave;H&pound;&deg;&deg;&agrave;&oacute;(&egrave;&frac34;&iacute;-Jƒ&uacute;™ 
+&aring;AF{#\”g…&Aacute;œ)!),&Ocirc; #&Oacute;&Acirc;&Ccedil;&frac14;j&thorn;1œŒ&thorn;h&copy;&sup2;K„9$ƒY&egrave;)Ž ˆA &Egrave; 
+—‡)#1‰&Oacute;p&quot;˜&eth;'&Atilde;%n‰P&acute;‡&Ugrave;&uml;-‹1&sup3;&cent;^\%&AElig;ˆ&Ocirc;p„CL&Ouml;5&Atilde;
+<!--a‘^œß­âx¯
+€±peŒ-->
+<HR>
+<H1 ALIGN="RIGHT"><A NAME="1">Preface</A></H1>
  This software administrators manual provides printer administration 
 information for the Common UNIX Printing System (&quot;CUPS&quot;) Version 1.0.2. 
-<H2><A NAME=1_1>System Overview</A></H2>
+<H2><A NAME="1_1">System Overview</A></H2>
  The Common UNIX Printing System provides a portable printing layer for 
  UNIX&reg; operating systems. It has been developed by Easy Software 
  Products to promote a standard printing solution for all UNIX vendors 
@@ -109,7 +209,7 @@ applications under UNIX. </P>
 <P>CUPS also includes a customized version of GNU GhostScript 
 (currently based off GNU GhostScript 4.03) and an image file RIP that 
 can be used to support non-PostScript printers. </P>
-<H2><A NAME=1_2>Document Overview</A></H2>
+<H2><A NAME="1_2">Document Overview</A></H2>
 <P>This software administrators manual is organized into the following 
 sections:</P>
 <UL>
@@ -119,10 +219,10 @@ sections:</P>
 <LI>4 - Printing System Management</LI>
 <LI>5 - Printer Accounting</LI>
 </UL>
-<H1 ALIGN=RIGHT><A NAME=2>1 - Printing System Overview</A></H1>
+<H1 ALIGN="RIGHT"><A NAME="2">1 - Printing System Overview</A></H1>
 <P>This chapter provides an overview of how the Common UNIX Printing 
 System works. </P>
-<H2><A NAME=2_1>The Printing Problem</A></H2>
+<H2><A NAME="2_1">The Printing Problem</A></H2>
 <P>For years <I>the printing problem</I> has plagued UNIX&reg;. Unlike 
 Microsoft&reg; Windows&reg; or MacOS, UNIX has no standard interface or system 
 in place for supporting printers. Among the solutions previously 
@@ -144,7 +244,7 @@ that supports a wide range of file formats with little or no effort.
  Since CUPS provides both the System V and Berkeley printing commands, 
 users (and applications) can reap the benefits of this new technology 
 with no changes. </P>
-<H2><A NAME=2_2>The Technology</A></H2>
+<H2><A NAME="2_2">The Technology</A></H2>
 <P>CUPS is based upon an emerging Internet standard called the Internet 
 Printing Protocol, or IPP. IPP has been embraced by dozens of printer 
 and printer server manufacturers, and will be supported by the next 
@@ -164,17 +264,17 @@ using their web browser. </P>
 Basic authentication and domain or IP-based access control. Digest 
 authentication and TLS encryption will be available in future versions 
 of CUPS. </P>
-<H2><A NAME=2_3>Jobs</A></H2>
+<H2><A NAME="2_3">Jobs</A></H2>
 <P>Each file that is submitted for printing is called a <I>job</I>. 
  Jobs are identified by a unique number starting at 1 and are assigned 
 to a particular destination (usually a printer). Jobs can also have 
 options associated with them such as media size, number of copies, and 
 priority. </P>
-<H2><A NAME=2_4>Classes</A></H2>
+<H2><A NAME="2_4">Classes</A></H2>
 <P>CUPS supports collections of printers known as <I>classes</I>. Jobs 
 sent to a class are forwarded to the first available printer in the 
 class. </P>
-<H2><A NAME=2_5>Filters</A></H2>
+<H2><A NAME="2_5">Filters</A></H2>
 <P>Filters allow a user or application to print many types of files 
 without extra effort. Print jobs sent to a CUPS server are filtered 
 before sending them to a printer. Some filters convert job files to 
@@ -190,13 +290,13 @@ printer. </P>
 <P>CUPS provides backends for printing over parallel and serial ports, 
 and over the network via the JetDirect (AppSocket), Server Message 
 Block, and Line Printer Daemon protocols. </P>
-<H2><A NAME=2_6>Printer Drivers</A></H2>
+<H2><A NAME="2_6">Printer Drivers</A></H2>
 <P>Printer drivers in CUPS consist of one of more filters specific to a 
 printer. CUPS includes a sample printer driver for Hewlett-Packard 
 LaserJet and DeskJet printers. While this driver does not generate 
 optimal output for different printer models, it does demonstrate how 
 you can write your own printer drivers and incorporate them into CUPS. </P>
-<H2><A NAME=2_7>Networking</A></H2>
+<H2><A NAME="2_7">Networking</A></H2>
 <P>Printers and classes on the local system are automatically shared 
 with other systems on the network. This allows you to setup one system 
 to print to a printer and use this system as a printer server or spool 
@@ -212,13 +312,13 @@ example, so that you aren't relying on a single system for printing.
 Because this also works with printer classes, you can setup multiple 
 servers and printers and never worry about a &quot;single point of failure&quot; 
 unless all of the printers and servers goes down! </P>
-<H1 ALIGN=RIGHT><A NAME=3>2 - Building and Installing CUPS</A></H1>
+<H1 ALIGN="RIGHT"><A NAME="3">2 - Building and Installing CUPS</A></H1>
 <P>This chapter shows how to build and install the Common UNIX Printing 
 System. If you are installing a binary distribution from the CUPS web 
-site, proceed to the section titled, <A HREF=#binary>Installing a 
+site, proceed to the section titled, <A HREF="#binary">Installing a 
 Binary Distribution</A>. </P>
-<H2><A NAME=3_1>Installing a Source Distribution</A></H2>
-<H3><A NAME=3_1_1>Requirements</A></H3>
+<H2><A NAME="3_1">Installing a Source Distribution</A></H2>
+<H3><A NAME="3_1_1">Requirements</A></H3>
 <P>You'll need an ANSI C compiler to build CUPS on your system. As its 
 name implies, CUPS is designed to run on the UNIX operating system, 
 however the CUPS interface library and most of the filters and backends 
@@ -229,24 +329,24 @@ reduced functionality. Easy Software Products maintains a mirror of the
 current versions of these libraries at: </P>
 <UL>
 <PRE>
-<A HREF=ftp://ftp.easysw.com/pub/libraries>ftp://ftp.easysw.com/pub/libraries</A>
+<A HREF="ftp://ftp.easysw.com/pub/libraries">ftp://ftp.easysw.com/pub/libraries</A>
 </PRE>
 </UL>
 <P>If you make changes to the man pages you'll need GNU groff or 
 another nroff-like package. GNU groff is available from: </P>
 <UL>
 <PRE>
-<A HREF=ftp://ftp.gnu.org/pub/groff>ftp://ftp.gnu.org/pub/groff</A>
+<A HREF="ftp://ftp.gnu.org/pub/groff">ftp://ftp.gnu.org/pub/groff</A>
 </PRE>
 </UL>
 <P>The documentation is formatted using the HTMLDOC software. If you 
 need to make changes you can get the HTMLDOC software from: </P>
 <UL>
 <PRE>
-<A HREF=http://www.easysw.com/htmldoc>http://www.easysw.com/htmldoc</A>
+<A HREF="http://www.easysw.com/htmldoc">http://www.easysw.com/htmldoc</A>
 </PRE>
 </UL>
-<H3><A NAME=3_1_2>Compiling CUPS</A></H3>
+<H3><A NAME="3_1_2">Compiling CUPS</A></H3>
 <P>CUPS uses GNU autoconf to configure the makefiles and source code 
 for your system. To configure CUPS for your system type: </P>
 <UL>
@@ -281,14 +381,14 @@ LDFLAGS</CODE> environment variables prior to running configure: </P>
 </PRE>
 </UL>
 <P>to build the software. </P>
-<H3><A NAME=3_1_3>Installing the Software</A></H3>
+<H3><A NAME="3_1_3">Installing the Software</A></H3>
 <P>To install the software type: </P>
 <UL>
 <PRE>
 % make install ENTER
 </PRE>
 </UL>
-<H3><A NAME=3_1_4>Running the Software</A></H3>
+<H3><A NAME="3_1_4">Running the Software</A></H3>
  Once you have installed the software you can start the CUPS daemon by 
 typing: 
 <UL>
@@ -296,7 +396,7 @@ typing:
 % /usr/sbin/cupsd &amp; ENTER
 </PRE>
 </UL>
-<H2><A NAME=binary>Installing a Binary Distribution</A></H2>
+<H2><A NAME="binary">Installing a Binary Distribution</A></H2>
 <P>We are currently distributing CUPS binary distributions in TAR 
 format with installation and removal scripts. </P>
 <UL><B>WARNING:</B>
@@ -316,16 +416,16 @@ installation script with: </P>
 </UL>
 <P>After asking you a few yes/no questions the CUPS software will be 
 installed and the scheduler will be started automatically. </P>
-<H1 ALIGN=RIGHT><A NAME=4>3 - Printer Queue Management</A></H1>
+<H1 ALIGN="RIGHT"><A NAME="4">3 - Printer Queue Management</A></H1>
 <P>This chapter discusses how to add, modify, and delete print queues 
 on your system. </P>
-<H2><A NAME=4_1>The lpadmin Command</A></H2>
+<H2><A NAME="4_1">The lpadmin Command</A></H2>
 <P>The <CODE>lpadmin</CODE> command allows you to perform most printer 
 administration tasks from the command-line. Since <CODE>lpadmin</CODE>
  is also a System V printing system command, it is located in the <CODE>
 /usr/lib</CODE> directory instead of a more common one like <CODE>
 /usr/bin</CODE> or <CODE>/usr/sbin</CODE>. </P>
-<H2><A NAME=4_2>Adding and Modifying Printers</A></H2>
+<H2><A NAME="4_2">Adding and Modifying Printers</A></H2>
 <P>To add a printer to CUPS you simply run the <CODE>lpadmin</CODE>
  command with the &quot;-p&quot; option: </P>
 <UL>
@@ -376,7 +476,7 @@ protocol. The <I>port</I> parameter defaults to 9100. </DD>
 file to use for this printer. Many options (such as media size, etc.) 
 will not be available if you omit this part of the <CODE>lpadmin</CODE>
  command. </P>
-<H3><A NAME=4_2_1>Using Standard Printer Drivers</A></H3>
+<H3><A NAME="4_2_1">Using Standard Printer Drivers</A></H3>
 <P>The <CODE>lpadmin</CODE> command allows you to use &quot;standard&quot; PPD 
 files and interface scripts located in the <CODE>/usr/share/cups/model</CODE>
  directory with the &quot;-m&quot; option: </P>
@@ -394,7 +494,7 @@ would use: </P>
 % /usr/lib/lpadmin -pDeskJet -E -vparallel:/dev/par1 -mdeskjet.ppd ENTER
 </PRE>
 </UL>
-<H2><A NAME=4_3>Removing Printers</A></H2>
+<H2><A NAME="4_3">Removing Printers</A></H2>
 <P>To remove a printer to CUPS you simply run the <CODE>lpadmin</CODE>
  command with the &quot;-x&quot; option: </P>
 <UL>
@@ -402,7 +502,7 @@ would use: </P>
 % /usr/lib/lpadmin -x<I>printer</I> ENTER
 </PRE>
 </UL>
-<H2><A NAME=4_4>Printer Classes</A></H2>
+<H2><A NAME="4_4">Printer Classes</A></H2>
 <P>CUPS allows you to group similar printers in a <I>printer class</I>. 
 When a user sends a print job to a class, the job will be processed by 
 the first available printer in that class. </P>
@@ -420,7 +520,7 @@ remove a class just use the &quot;-x&quot; option: </P>
 % /usr/lib/lpadmin -x<I>class</I> ENTER
 </PRE>
 </UL>
-<H2><A NAME=4_5>Setting the Default Printer</A></H2>
+<H2><A NAME="4_5">Setting the Default Printer</A></H2>
 <P>To set the default printer or class simply run the <CODE>lpadmin</CODE>
  command with the &quot;-d&quot; option: </P>
 <UL>
@@ -429,7 +529,7 @@ remove a class just use the &quot;-x&quot; option: </P>
 </PRE>
 </UL>
 <P>The <I>destination</I> argument is the name of the printer or class. </P>
-<H2><A NAME=4_6>Starting and Stopping Printers</A></H2>
+<H2><A NAME="4_6">Starting and Stopping Printers</A></H2>
 <P>The <CODE>enable</CODE> and <CODE>disable</CODE> commands start and 
 stop printer queues, respectively: </P>
 <UL>
@@ -442,7 +542,7 @@ stop printer queues, respectively: </P>
 won't actually print any files until they are restarted. This is useful 
 if the printer malfunctions and you need time to correct the problem. 
 Any queues jobs are printed after the printer is enabled (started). </P>
-<H2><A NAME=4_7>Accepting and Rejecting Print Jobs</A></H2>
+<H2><A NAME="4_7">Accepting and Rejecting Print Jobs</A></H2>
 <P>The <CODE>accept</CODE> and <CODE>reject</CODE> commands accept and 
 reject print jobs for the named printer, respectively: </P>
 <UL>
@@ -456,9 +556,9 @@ jobs. A printer can also be rejecting new print jobs while it finishes
 those that have been queued. This is useful for when you must perform 
 maintenance on the printer and will not have it available to users for 
 a long period of time. </P>
-<H1 ALIGN=RIGHT><A NAME=5>4 - Printing System Management</A></H1>
+<H1 ALIGN="RIGHT"><A NAME="5">4 - Printing System Management</A></H1>
 <P>This chapter shows how you can configure the CUPS server. </P>
-<H2><A NAME=5_1>Changing the Configuration Files</A></H2>
+<H2><A NAME="5_1">Changing the Configuration Files</A></H2>
 <P>All of the server configuration files are located in the <CODE>
 /var/cups/conf</CODE> directory. Once you have made a change to a file 
 you need to restart the CUPS server by sending it a HUP signal or using 
@@ -471,7 +571,7 @@ the supplied script &quot;<CODE>cups.sh</CODE>&quot;: </P>
 <P>The binary distribution installs the script in the <CODE>init.d</CODE>
  directory with the name <CODE>lp</CODE> or <CODE>lpd</CODE> depending 
 on the vendor-supplied printing system. </P>
-<H2><A NAME=5_2>Temporary Files</A></H2>
+<H2><A NAME="5_2">Temporary Files</A></H2>
 <P>Normally CUPS puts all of its temporary files in <CODE>/var/tmp</CODE>
 . If you'd like to change this directory you'll need to edit the <CODE>
 /var/cups/conf/cupsd.conf</CODE> file. </P>
@@ -492,19 +592,19 @@ TempDir <I>/foo/bar/tmp</I>
 </UL>
 <P>Finally, restart the server as outlined in the first section of this 
 chapter. </P>
-<H2><A NAME=5_3>Network Configuration</A></H2>
+<H2><A NAME="5_3">Network Configuration</A></H2>
 <P>The default configuration of the CUPS server listens for connections 
 from all network interfaces on port 631 (the standard IPP port). 
 Administration functions are limited to local connections with the 
 appropriate username and password. </P>
 <P>If you'd like to limit access to your system you'll need to edit the <CODE>
 /var/cups/conf/cupsd.conf</CODE> file. </P>
-<H3><A NAME=5_3_1>Port</A></H3>
+<H3><A NAME="5_3_1">Port</A></H3>
 <P>The <CODE>Port</CODE> directive specifies a port to listen on for 
 all interfaces. Besides the standard IPP port (631) you can also setup 
 your server to listen on the HTTP port (80) to use your CUPS server as 
 a standard web server as well. </P>
-<H3><A NAME=5_3_2>Listen</A></H3>
+<H3><A NAME="5_3_2">Listen</A></H3>
 <P>The <CODE>Listen</CODE> directive specifies a listening address and 
 port, extending the functionality of the <CODE>Port</CODE> directive. 
 If you want to allow connections only from the local machine you can 
@@ -518,7 +618,7 @@ Listen 127.0.0.1:631
 <P>If you want to limit access to a specific network/subnet, make sure 
 you specify only the network address and not your system's network 
 address! </P>
-<H3><A NAME=5_3_3>BrowsePort</A></H3>
+<H3><A NAME="5_3_3">BrowsePort</A></H3>
 <P>The <CODE>BrowsePort</CODE> directive controls which port is 
 monitored for remote printers. By default it is set to the IPP port 
 (631), however you can change it as needed. </P>
@@ -526,7 +626,7 @@ monitored for remote printers. By default it is set to the IPP port
 <P>You must set the <CODE>BrowsePort</CODE> to the same value  on all 
 of the systems that you want to see. </P>
 </UL>
-<H3><A NAME=5_3_4>BrowseAddress</A></H3>
+<H3><A NAME="5_3_4">BrowseAddress</A></H3>
 <P>The <CODE>BrowseAddress</CODE> directive specifies a broadcast 
 address to use when sending printer status updates over the network. 
 The default browse address is <CODE>255.255.255.255</CODE> which will 
@@ -536,10 +636,10 @@ send printer information to all subnets. </P>
 bits, printer browsing (and in fact all broadcast  reception) will not 
 work. This problem appears to be fixed in  HP-UX 11.0. </P>
 </UL>
-<H2><A NAME=5_4>Printer Security</A></H2>
+<H2><A NAME="5_4">Printer Security</A></H2>
 <P>CUPS provides IP and domain-name based access control and Basic 
 authentication for authentication. </P>
-<H3><A NAME=5_4_1>Location</A></H3>
+<H3><A NAME="5_4_1">Location</A></H3>
 <P>The <CODE>Location</CODE> directive defines access control for a 
 specific HTTP directory. The following pseudo directories are provided 
 by the CUPS server: </P>
@@ -570,7 +670,7 @@ Allow From 127.0.0.1
 &lt;/Location&gt;
 </PRE>
 </UL>
-<H3><A NAME=5_4_2>Order</A></H3>
+<H3><A NAME="5_4_2">Order</A></H3>
 <P>The <CODE>Order</CODE> directive defines the default access control. 
 The following values are supported: </P>
 <UL>
@@ -581,7 +681,7 @@ listed in an <CODE>Allow</CODE> directive. </LI>
 </UL>
 <P>The <CODE>Order</CODE> directive must appear inside a <CODE>Location</CODE>
  directive. </P>
-<H3><A NAME=5_4_3>Allow</A></H3>
+<H3><A NAME="5_4_3">Allow</A></H3>
 <P>The <CODE>Allow</CODE> directive specifies a hostname, IP address, 
 or network that is allowed access to the server: </P>
 <UL>
@@ -603,7 +703,7 @@ Allow from nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
 Allow</CODE> directives can be used to allow access for multiple hosts 
 or networks.  The <CODE>/mm</CODE> notation specifies a CIDR netmask: 
 <CENTER>
-<TABLE BORDER=1 WIDTH=80%>
+<TABLE BORDER="1" WIDTH="80%">
 <TR><TH>mm</TH><TH>netmask</TH></TR>
 <TR><TD>0</TD><TD>0.0.0.0</TD></TR>
 <TR><TD>1</TD><TD>128.0.0.0</TD></TR>
@@ -618,7 +718,7 @@ or networks.  The <CODE>/mm</CODE> notation specifies a CIDR netmask:
 </P>
 <P>The <CODE>Allow</CODE> directive must appear inside a <CODE>Location</CODE>
  directive. </P>
-<H3><A NAME=5_4_4>Deny</A></H3>
+<H3><A NAME="5_4_4">Deny</A></H3>
 <P>The <CODE>Deny</CODE> directive specifies a hostname, IP address, or 
 network that is allowed access to the server: </P>
 <UL>
@@ -640,7 +740,7 @@ Deny from nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
  directives can be used to allow access for multiple hosts or networks. 
  The <CODE>/mm</CODE> notation specifies a CIDR netmask: 
 <CENTER>
-<TABLE BORDER=1 WIDTH=80%>
+<TABLE BORDER="1" WIDTH="80%">
 <TR><TH>mm</TH><TH>netmask</TH></TR>
 <TR><TD>0</TD><TD>0.0.0.0</TD></TR>
 <TR><TD>1</TD><TD>128.0.0.0</TD></TR>
@@ -655,7 +755,7 @@ Deny from nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
 </P>
 <P>The <CODE>Deny</CODE> directive must appear inside a <CODE>Location</CODE>
  directive. </P>
-<H3><A NAME=5_4_5>AuthType</A></H3>
+<H3><A NAME="5_4_5">AuthType</A></H3>
 <P>The <CODE>AuthType</CODE> directive defines the type of 
 authentication to perform: </P>
 <UL>
@@ -666,7 +766,7 @@ using the UNIX password and group files. </LI>
 </UL>
 <P>The <CODE>AuthType</CODE> directive must appear inside a <CODE>
 Location</CODE> directive. </P>
-<H3><A NAME=5_4_6>AuthClass</A></H3>
+<H3><A NAME="5_4_6">AuthClass</A></H3>
 <P>The <CODE>AuthClass</CODE> directive defines what level of <CODE>
 Basic</CODE> access is required: </P>
 <UL>
@@ -682,21 +782,21 @@ AuthGroupName</CODE> directive. </LI>
 </UL>
 <P>The <CODE>AuthClass</CODE> directive must appear inside a <CODE>
 Location</CODE> directive. </P>
-<H3><A NAME=5_4_7>AuthGroupName</A></H3>
+<H3><A NAME="5_4_7">AuthGroupName</A></H3>
 <P>The <CODE>AuthGroupName</CODE> directive sets the group to use for <CODE>
 Group</CODE> authentication. </P>
 <P>The <CODE>AuthGroupName</CODE> directive must appear inside a <CODE>
 Location</CODE> directive. </P>
-<H3><A NAME=5_4_8>SystemGroup</A></H3>
+<H3><A NAME="5_4_8">SystemGroup</A></H3>
 <P>The <CODE>SystemGroup</CODE> directive sets the administration group 
 used when authenticating the <CODE>System</CODE> type. It defaults to 
 the &quot;sys&quot; group. </P>
-<H2><A NAME=5_5>File Formats</A></H2>
+<H2><A NAME="5_5">File Formats</A></H2>
 <P>CUPS provides a MIME-based file typing and filtering mechanism to 
 convert files to a printable format for each printer. The <CODE>
 mime.types</CODE> and <CODE>mime.convs</CODE> files define the file 
 type and filters that are available on the system. </P>
-<H3><A NAME=5_5_1>mime.types</A></H3>
+<H3><A NAME="5_5_1">mime.types</A></H3>
 <P>The <CODE>mime.types</CODE> defines the known file types. Each line 
 of the file starts with the MIME type and may be followed by one or 
 more file type recognition rules. For example, the <CODE>text/html</CODE>
@@ -738,7 +838,7 @@ identical (network or &quot;big-endian&quot; byte order) </LI>
 <LI><CODE>locale(&quot;string&quot;)</CODE> - True if current locale  matches 
 string </LI>
 </UL>
-<H3><A NAME=5_5_2>mime.convs</A></H3>
+<H3><A NAME="5_5_2">mime.convs</A></H3>
 <P>The <CODE>mime.convs</CODE> file defines all of the filter programs 
 that are known to the system. Each line consists of: </P>
 <UL>
@@ -775,13 +875,13 @@ program job user title options [filename]
 <P>If specified, the <I>filename</I> argument defines a file to read 
 when filtering, otherwise the filter must read from the standard input. 
 All filtered output must go to the standard output. </P>
-<H1 ALIGN=RIGHT><A NAME=6>5 - Printer Accounting</A></H1>
+<H1 ALIGN="RIGHT"><A NAME="6">5 - Printer Accounting</A></H1>
  This chapter describes the CUPS log files. 
-<H2><A NAME=6_1>Where to Find the Log Files</A></H2>
+<H2><A NAME="6_1">Where to Find the Log Files</A></H2>
 <P>The log files are normally stored in the <CODE>/var/cups/logs</CODE>
  directory. You can change this by editing the <CODE>
 /var/cups/conf/cupsd.conf</CODE> configuration file. </P>
-<H2><A NAME=6_2>The access_log File</A></H2>
+<H2><A NAME="6_2">The access_log File</A></H2>
 <P>The <CODE>access_log</CODE> file lists each HTTP resource that is 
 accessed by a web browser or CUPS/IPP client. Each line is in the 
 so-called &quot;Common Log Format&quot; used by many web servers and web 
@@ -820,7 +920,7 @@ above. </P>
 <P>The <I>bytes</I> field contains the number of bytes in the request. 
 For POST requests the <I>bytes</I> field contains the number of bytes 
 of non-IPP data that is received from the client. </P>
-<H2><A NAME=6_3>The error_log File</A></H2>
+<H2><A NAME="6_3">The error_log File</A></H2>
 <P>The <CODE>error_log</CODE> file lists messages from the scheduler 
 (errors, warnings, etc.): </P>
 <UL>
@@ -843,7 +943,7 @@ I [20/May/1999:19:22:24 +0000] Job 2 was cancelled by 'mike'.
 page started printing. The format of this field is identical to the <I>
 data-time</I> field in the <CODE>access_log</CODE> file. </P>
 <P>The <I>message</I> fields contains a free-form textual message. </P>
-<H2><A NAME=6_4>The page_log File</A></H2>
+<H2><A NAME="6_4">The page_log File</A></H2>
 <P>The <CODE>page_log</CODE> file lists each page that is sent to a 
 printer. Each line contains the following information: </P>
 <UL>

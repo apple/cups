@@ -1,0 +1,3197 @@
+<HTML>
+<HEAD>
+	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-1999, All Rights Reserved">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SPM-1.0b1">
+	<META NAME="Author" CONTENT="Easy Software Products">
+	<TITLE>DRAFT - CUPS Software Programmers Manual</TITLE>
+</HEAD>
+<BODY>
+
+<H1 ALIGN="RIGHT">Preface</H1>
+
+This software programmers manual provides software programming
+information for the Common UNIX Printing System ("CUPS") Version 1.0.
+
+<H2>System Overview</H2>
+
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX&reg; operating systems. It has been developed by Easy Software 
+Products to promote a standard printing solution for all UNIX vendors 
+and users. CUPS provides the System V and Berkeley command-line interfaces.
+
+<P>CUPS uses the Internet Printing Protocol (IETF-IPP) as the basis
+for managing print jobs and queues. The Line Printer Daemon (LPD,
+RFC1179), Server Message Block (SMB), and AppSocket protocols are also
+supported with reduced functionality.
+
+<P>CUPS adds network printer browsing and PostScript Printer
+Description (&quot;PPD&quot;)-based printing options to support real
+world applications under UNIX.
+
+<P>CUPS also includes a customized version of GNU GhostScript
+(currently based off GNU GhostScript 4.03) and an image file RIP that
+can be used to support non-PostScript printers.
+
+<H2>Document Overview</H2>
+
+<P>This software administrators manual is organized into the following sections:</P>
+
+<UL>
+	<LI>1 - Printing System Overview</LI>
+	<LI>2 - The CUPS API</LI>
+	<LI>3 - Writing Filters</LI>
+	<LI>4 - Writing Printer Drivers</LI>
+	<LI>5 - Writing Backends</LI>
+	<LI>A - Constants</LI>
+	<LI>B - Structures</LI>
+	<LI>C - Functions</LI>
+</UL>
+
+<H1 ALIGN="RIGHT">1 - Printing System Overview</H1>
+
+<P>This chapter provides an overview of how the Common UNIX Printing System
+works.
+
+<H2>The Printing Problem</H2>
+
+<P>For years <I>the printing problem</I> has plagued UNIX&reg;. Unlike
+Microsoft&reg; Windows&reg; or MacOS, UNIX has no standard interface or
+system in place for supporting printers. Among the solutions previously
+available, the Berkeley and System V printing systems are the most
+prevalent.
+
+<P>These printing systems support line printers (text only) or
+PostScript printers (text and graphics), and with some coaxing they can
+be made to support a full range of printers and file formats. However,
+because each varient of the UNIX operating system uses a different
+printing system than the next, developing printer drivers for a wide
+range of printers is extremely difficult. That combined with the
+limited volume of customers for each UNIX varient has forced most
+printer vendors to give up supporting UNIX entirely.
+
+<P>The Common UNIX Printing System, or CUPS, is designed to eliminate
+<I>the printing problem</I>. One common printing system can be used by
+all UNIX varients to support the printing needs of users. Printer
+vendors can use its modular filter interface to develop a single driver
+program that supports a wide range of file formats with little or no
+effort.  Since CUPS provides both the System V and Berkeley printing
+commands, users (and applications) can reap the benefits of this new
+technology with no changes.
+
+<H2>The Technology</H2>
+
+<P>CUPS is based upon an emerging Internet standard called the Internet
+Printing Protocol, or IPP. IPP has been embraced by dozens of printer
+and printer server manufacturers, and will be supported by the next
+Microsoft Windows operating system.
+
+<P>IPP defines a standard protocol for printing as well as managing print
+jobs and printer options like media size, resolution, and so forth. Like all
+IP-based protocols, IPP can be used locally or over the Internet to printers
+hundreds or thousands of miles away. Unlike other protocols, however, IPP
+also supports access control, authentication, and encryption, making it a
+much more secure printing solution than older ones.
+
+<P>IPP is layered on top of the Hyper-Text Transport Protocol, or HTTP,
+which is the basis of web servers on the Internet. This allows the user to
+view documentation and status information on a printer or server using their
+web browser.
+
+<P>CUPS provides a complete IPP/1.0-based printing system that provides Basic
+authentication and domain or IP-based access control. Digest authentication
+and TLS encryption will be available in future versions of CUPS.
+
+<H2>Jobs</H2>
+
+<P>Each file that is submitted for printing is called a <I>job</I>. 
+Jobs are identified by a unique number starting at 1 and are assigned
+to a particular destination (usually a printer). Jobs can also have
+options associated with them such as media size, number of copies, and
+priority.
+
+<H2>Classes</H2>
+
+<P>CUPS supports collections of printers known as <I>classes</I>. Jobs sent
+to a class are forwarded to the first available printer in the class.
+
+<H2>Filters</H2>
+
+<P>Filters allow a user or application to print many types of files
+without extra effort. Print jobs sent to a CUPS server are filtered
+before sending them to a printer. Some filters convert job files to
+different formats that the printer can understand. Others perform page
+selection and ordering tasks. <I>Backend</I> filters perform the most
+important task of all - they send the filtered print data to the
+printer.
+
+<P>CUPS provides filters for printing many types of image files,
+HP-GL/2 files, PDF files, and text files. CUPS also supplies
+PostScript and image file Raster Image Processors, or RIPs, that
+convert PostScript or image files into bitmaps that can be sent to a
+raster printer.
+
+<P>CUPS provides backends for printing over parallel and serial ports,
+and over the network via the JetDirect (AppSocket), Server Message
+Block, and Line Printer Daemon protocols.
+
+<H2>Printer Drivers</H2>
+
+<P>Printer drivers in CUPS consist of one of more filters specific to a
+printer. CUPS includes a sample printer driver for Hewlett-Packard
+LaserJet and DeskJet printers. While this driver does not generate
+optimal output for different printer models, it does demonstrate how
+you can write your own printer drivers and incorporate them into CUPS.
+
+<H2>Networking</H2>
+
+<P>Printers and classes on the local system are automatically shared with
+other systems on the network. This allows you to setup one system to print
+to a printer and use this system as a printer server or spool host for all
+of the others.  If there is only one occurrence of a printer on a network,
+then that printer can be accessed using its name alone. If more than one
+printer exists with the same name, users must select the printer by specifying
+which server to use (e.g. "printer@host1" or "printer@host2".)
+
+<P>CUPS also provides <I>implicit classes</I>, which are collections of
+printers and/or classes with the same name. This allows you to setup multiple
+servers pointing to the same physical network printer, for example, so that
+you aren't relying on a single system for printing. Because this also works
+with printer classes, you can setup multiple servers and printers and never
+worry about a "single point of failure" unless all of the printers and servers
+goes down!
+
+<H1 ALIGN="RIGHT">2 - The CUPS API</H1>
+
+<P>This chapter describes the CUPS Application Programmers Interface ("API").
+
+<H2>The CUPS Library</H2>
+
+<H3>Detecting the CUPS Library in Autoconf</H3>
+
+
+<H2>Basic Services</H2>
+
+<H3>Include Files</H3>
+
+<H3>Getting the Available Printers and Classes</H3>
+
+<H3>Printing Files</H3>
+
+<H3>Setting Printer Options</H3>
+
+<H3>Cancelling Jobs</H3>
+
+
+<H2>HTTP Services</H2>
+
+<H3>Include Files</H3>
+
+<H3>Connecting to a Server</H3>
+
+<H3>Setting Request Fields</H3>
+
+<H3>Issuing a Request</H3>
+
+<H3>Getting the Request Status</H3>
+
+<H3>Sending Request Data</H3>
+
+<H3>Reading Request Data</H3>
+
+
+<H2>IPP Services</H2>
+
+<H3>Include Files</H3>
+
+<H3>Creating an IPP Request</H3>
+
+<H3>Adding Attributes</H3>
+
+<H3>Sending an IPP Request</H3>
+
+<H3>Reading an IPP Response</H3>
+
+<H3>Finding Attributes</H3>
+
+<H3>Looping Through Attributes</H3>
+
+<H3>IPP Standard Operations</H3>
+
+<H3>IPP Extension Operations</H3>
+
+<H3>CUPS Extension Operations</H3>
+
+
+<H2>Language Services</H2>
+
+<H3>Include Files</H3>
+
+<H3>Getting the Default Language</H3>
+
+<H3>Getting the Language Encoding</H3>
+
+<H3>Getting a Language String</H3>
+
+
+<H2>MIME Services</H2>
+
+<H3>Include Files</H3>
+
+<H3>Loading a MIME Database</H3>
+
+<H3>Finding a Specific MIME Type</H3>
+
+<H3>Finding the MIME Type of a File</H3>
+
+<H3>Filters</H3>
+
+
+<H2>PPD Services</H2>
+
+<H3>Include Files</H3>
+
+<H3>Loading a PPD File</H3>
+
+<H3>Options and Groups</H3>
+
+<H3>Finding an Option</H3>
+
+<H3>Finding a Page Size</H3>
+
+<H3>Marking Options</H3>
+
+<H3>Checking for Conflicts</H3>
+
+<H3>Sending Options</H3>
+
+
+<H1 ALIGN="RIGHT">3 - Writing Filters</H1>
+
+<P>This chapter describes how to write a file filter for CUPS.
+
+<H2>Overview</H2>
+
+<H3>Security Considerations</H3>
+
+Users and Groups
+
+<H3>Temporary Files</H3>
+
+<H3>Page Accounting</H3>
+
+
+<H2>Command-Line Arguments</H2>
+
+<H3>Copy Generation</H3>
+
+
+<H2>Environment Variables</H2>
+
+
+<H2>Writing a HTML Filter</H2>
+
+
+<H1 ALIGN="RIGHT">4 - Writing Printer Drivers</H1>
+
+<P>This chapter discusses how to write a printer driver, which is a
+special filter program that converts CUPS raster data into the
+appropriate commands and data required for a printer.
+
+<H2>Overview</H2>
+
+<H3>Page Accounting</H3>
+
+<H3>Color Management</H3>
+
+
+<H2>Raster Functions</H2>
+
+<H3>cupsRasterOpen()</H3>
+
+<H3>cupsRasterReadHeader()</H3>
+
+<H3>cupsRasterReadPixels()</H3>
+
+<H3>cupsRasterClose()</H3>
+
+
+<H2>Writing a HP-PCL Driver</H2>
+
+
+<H1 ALIGN="RIGHT">5 - Writing Backends</H1>
+
+<P>This chapter describes how to write a backend for CUPS.  Backends
+communicate directly with printers and allow printer drivers and
+filters to send data using any type of connection transparently.
+
+<H2>Overview</H2>
+
+<H3>Security Considerations</H3>
+
+Users and Groups
+
+<H3>Temporary Files</H3>
+
+<H3>Page Accounting</H3>
+
+<H3>Retries</H3>
+
+
+<H2>Command-Line Arguments</H2>
+
+<H3>Copy Generation</H3>
+
+
+<H2>Environment Variables</H2>
+
+
+<H2>Writing a Serial Port Backend</H2>
+
+
+<H1 ALIGN="RIGHT">A - Constants</H1>
+
+<P>This appendix lists all of the constants that are defined by the CUPS
+API.
+
+<H2>CUPS Constants</H2>
+
+<H2>HTTP Constants</H2>
+
+<H2>IPP Constants</H2>
+
+<H2>Language Constants</H2>
+
+<H2>MIME Constants</H2>
+
+<H2>PPD Constants</H2>
+
+<H2>Raster Constants</H2>
+
+
+<H1 ALIGN="RIGHT">B - Structures</H1>
+
+<P>This appendix describes all of the structures that are defined by the CUPS
+API.
+
+<H2></H2>
+
+
+<H1 ALIGN="RIGHT">C - Functions</H1>
+
+<P>This appendix provides a reference for all of the CUPS API functions.
+
+<!-- NEW PAGE --><H2><A NAME="cupsAddOption">cupsAddOption()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+int
+cupsAddOption(const char *name,
+              const char *value,
+              int num_options,
+	      cups_option_t **options);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>name</TD>
+	<TD>The name of the option.</TD>
+</TR>
+<TR>
+	<TD>value</TD>
+	<TD>The value of the option.</TD>
+</TR>
+<TR>
+	<TD>num_options</TD>
+	<TD>Number of options currently in the array.</TD>
+</TR>
+<TR>
+	<TD>options</TD>
+	<TD>Pointer to the options array.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>The new number of options.
+
+<H3>Description</H3>
+
+<P><CODE>cupsAddOption()</CODE> adds an option to the specified array.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups.h&gt;
+
+...
+
+/* Declare the options array */
+int           num_options;
+cups_option_t *options;
+
+/* Initialize the options array */
+num_options = 0;
+options     = (cups_option_t *)0;
+
+/* Add options using cupsAddOption() */
+num_options = cupsAddOption("media", "letter", num_options, &amp;options);
+num_options = cupsAddOption("resolution", "300dpi", num_options, &amp;options);
+</PRE>
+
+<H3>See Also</H3>
+
+<A HREF="#cupsFreeOptions"><CODE>cupsFreeOptions()</CODE></A>,
+<A HREF="#cupsGetOption"><CODE>cupsGetOption()</CODE></A>,
+<A HREF="#cupsParseOptions"><CODE>cupsParseOptions()</CODE></A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsCancelJob">cupsCancelJob()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+int
+cupsCancelJob(const char *printer,
+              int job);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>printer</TD>
+	<TD>Printer name</TD>
+</TR>
+<TR>
+	<TD>job</TD>
+	<TD>Job ID</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>1 on success, 0 on failure.
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsDoFileRequest()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsDoRequest()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsFreeOptions()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsGetClasses()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsGetDefault()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsGetOption()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsGetPassword()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsGetPPD()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsGetPrinters()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsLangDefault()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsLangEncoding()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsLangFlush()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsLangFree()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsLangGet()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsLangString()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsLastError()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsMarkOptions()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsParseOptions()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsPrintFile()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsRasterClose()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsRasterOpen()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsRasterReadHeader()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsRasterReadPixels()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsRasterWriteHeader()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsRasterWritePixels()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsServer()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsTempFile()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">cupsUser()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpBlocking()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpCheck()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpClearFields()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpClose()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpConnect()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpDecode64()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpDelete()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpEncode64()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpError()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpFlush()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpGet()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpGets()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpGetDateString()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpGetDateTime()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpGetField()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpGetLength()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpHead()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpInitialize()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpOptions()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpPost()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpPrintf()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpPut()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpRead()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpReconnect()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpSeparate()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpSetField()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpTrace()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpUpdate()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">httpWrite()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ippAddBoolean()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ippAddBooleans()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ippAddDate()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ippAddInteger()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ippAddIntegers()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ippAddRange()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ippAddRanges()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ippAddResolution()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ippAddResolutions()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ippAddSeparator()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ippAddString()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ippAddStrings()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ippDateToTime()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ippDelete()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ippFindAttribute()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ippLength()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ippNew()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ippPort()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ippRead()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ippTimeToDate()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ippWrite()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">mimeAddFilter()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">mimeAddType()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">mimeAddTypeRule()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">mimeDelete()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">mimeFileType()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">mimeFilter()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">mimeLoad()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">mimeMerge()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">mimeNew()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">mimeType()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ppdClose()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ppdConflicts()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">pddEmitFd()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ppdEmit()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ppdFindChoice()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ppdFindMarkedChoice()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ppdFindOption()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ppdIsMarked()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ppdMarkDefaults()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ppdMarkOption()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ppdOpenFd()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ppdOpenFile()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ppdOpen()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ppdPageLength()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ppdPageSize()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="">ppdPageWidth()</A></H2>
+
+<H3>Usage</H3>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%">
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Examples</H3>
+
+<H3>See Also</H3>
+
+
+</BODY>
+</HTML>
