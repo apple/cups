@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.18.2.23 2003/01/23 18:55:00 mike Exp $"
+ * "$Id: usb.c,v 1.18.2.24 2003/01/27 17:12:27 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -60,7 +60,11 @@
 #endif /* __linux */
 
 #ifdef __sun
-#  include <sys/ecppio.h>
+#  ifdef __sparc
+#    include <sys/ecppio.h>
+#  else
+#    include <sys/ecppsys.h>
+#  endif /* __sparc */
 #endif /* __sun */
 
 
@@ -744,5 +748,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb.c,v 1.18.2.23 2003/01/23 18:55:00 mike Exp $".
+ * End of "$Id: usb.c,v 1.18.2.24 2003/01/27 17:12:27 mike Exp $".
  */

@@ -3,6 +3,7 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The USB backend didn't compile on Solaris Intel.
 	- The cupstestppd utility now supports the "-q" option
 	  (quiet) for use in scripts, etc.
 	- Merged several weight-reducing changes into the CUPS
