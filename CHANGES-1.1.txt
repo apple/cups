@@ -1,6 +1,12 @@
 CHANGES-1.1.txt
 ---------------
 
+CHANGES IN CUPS V1.1.20
+
+	- The cupsCancelJob() function did not return 0 when the
+	  job could not be canceled (STR #340)
+
+
 CHANGES IN CUPS V1.1.20rc4
 
 	- The scheduler did not move the incoming job attributes

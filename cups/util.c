@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.81.2.27 2003/10/16 19:21:11 mike Exp $"
+ * "$Id: util.c,v 1.81.2.28 2003/10/22 03:17:35 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -139,18 +139,10 @@ cupsCancelJob(const char *name,		/* I - Name of printer or class */
   * Do the request...
   */
 
-  if ((response = cupsDoRequest(cups_server, request, "/jobs/")) == NULL)
-  {
-    last_error = IPP_BAD_REQUEST;
-    return (0);
-  }
-  else
-  {
-    last_error = response->request.status.status_code;
+  if ((response = cupsDoRequest(cups_server, request, "/jobs/")) != NULL)
     ippDelete(response);
 
-    return (1);
-  }
+  return (last_error < IPP_REDIRECTION_OTHER_SITE);
 }
 
 
@@ -1556,5 +1548,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.81.2.27 2003/10/16 19:21:11 mike Exp $".
+ * End of "$Id: util.c,v 1.81.2.28 2003/10/22 03:17:35 mike Exp $".
  */
