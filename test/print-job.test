@@ -13,7 +13,8 @@
 	GROUP operation
 	ATTR charset attributes-charset us-ascii
 	ATTR language attributes-natural-language en
-	ATTR name requesting-user-name guest
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
 	ATTR mimetype document-format application/octet-stream
 
 	GROUP job

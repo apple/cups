@@ -1,5 +1,5 @@
 /*
- * "$Id: ipptest.c,v 1.1 2000/05/19 21:14:01 mike Exp $"
+ * "$Id: ipptest.c,v 1.2 2000/05/22 18:41:20 mike Exp $"
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
@@ -117,6 +117,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
   ipp_op_t	op;			/* Operation */
   ipp_tag_t	group;			/* Current group */
   ipp_tag_t	value;			/* Current value type */
+  ipp_attribute_t *attrptr;		/* Attribute pointer */
   char		attr[128];		/* Attribute name */
   int		num_statuses;		/* Number of valid status codes */
   ipp_status_t	statuses[100];		/* Valid status codes */
@@ -125,6 +126,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
   char		name[1024];		/* Name of test */
   char		filename[1024];		/* Filename */
   int		pass;			/* Did we pass the test? */
+  int		job_id;			/* Job ID from last operation */
 
 
  /*
@@ -154,7 +156,8 @@ do_tests(const char *uri,		/* I - URI to connect on */
   */
 
   printf("\"%s\":\n", testfile);
-  pass = 1;
+  pass   = 1;
+  job_id = 0;
 
   while (get_token(fp, token, sizeof(token)) != NULL)
   {
@@ -238,10 +241,37 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	get_token(fp, attr, sizeof(attr));
 	get_token(fp, token, sizeof(token));
 
+        if (token[0] == '$')
+	{
+	 /*
+	  * Substitute a string/number...
+	  */
+
+          if (strcasecmp(token + 1, "uri") == 0)
+	    strcpy(token, uri);
+	  else if (strcasecmp(token + 1, "method") == 0)
+	    strcpy(token, method);
+	  else if (strcasecmp(token + 1, "username") == 0)
+	    strcpy(token, userpass);
+	  else if (strcasecmp(token + 1, "hostname") == 0)
+	    strcpy(token, server);
+	  else if (strcasecmp(token + 1, "port") == 0)
+	    sprintf(token, "%d", port);
+	  else if (strcasecmp(token + 1, "resource") == 0)
+	    strcpy(token, resource);
+	  else if (strcasecmp(token + 1, "job-id") == 0)
+	    sprintf(token, "%d", job_id);
+	  else if (strcasecmp(token + 1, "user") == 0)
+	    strcpy(token, cupsUser());
+	}
+
         switch (value)
 	{
 	  case IPP_TAG_BOOLEAN :
-	      ippAddBoolean(request, group, attr, atoi(token));
+	      if (strcasecmp(token, "true") == 0)
+		ippAddBoolean(request, group, attr, 1);
+              else
+		ippAddBoolean(request, group, attr, atoi(token));
 	      break;
 
 	  case IPP_TAG_INTEGER :
@@ -250,7 +280,12 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	      break;
 
 	  case IPP_TAG_RESOLUTION :
+	      puts("    ERROR: resolution tag not yet supported!");
+	      break;
+
 	  case IPP_TAG_RANGE :
+	      puts("    ERROR: range tag not yet supported!");
+	      break;
 
 	  default :
 	      ippAddString(request, group, value, attr, NULL, token);
@@ -298,8 +333,6 @@ do_tests(const char *uri,		/* I - URI to connect on */
     * Submit the IPP request...
     */
 
-    request = ippNew();
-
     request->request.op.operation_id = op;
     request->request.op.request_id   = 1;
 
@@ -315,10 +348,15 @@ do_tests(const char *uri,		/* I - URI to connect on */
     {
       printf("\b\b\b\b\bFAIL]\n");
       printf("        ERROR %x\n", cupsLastError());
+      printf("        (%s)\n",
+	     ippErrorString(cupsLastError()));
       pass = 0;
     }
     else
     {
+      if ((attrptr = ippFindAttribute(response, "job-id", IPP_TAG_INTEGER)) != NULL)
+        job_id = attrptr->values[0].integer;
+
       for (i = 0; i < num_statuses; i ++)
         if (response->request.status.status_code == statuses[i])
 	  break;
@@ -327,6 +365,8 @@ do_tests(const char *uri,		/* I - URI to connect on */
       {
 	printf("\b\b\b\b\bFAIL]\n");
         printf("        STATUS %x\n", response->request.status.status_code);
+        printf("        (%s)\n",
+	       ippErrorString(response->request.status.status_code));
 	pass = 0;
       }
       else
@@ -607,5 +647,5 @@ get_token(FILE *fp,		/* I - File to read from */
 
 
 /*
- * End of "$Id: ipptest.c,v 1.1 2000/05/19 21:14:01 mike Exp $".
+ * End of "$Id: ipptest.c,v 1.2 2000/05/22 18:41:20 mike Exp $".
  */
