@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c,v 1.22 2002/01/02 17:58:41 mike Exp $"
+ * "$Id: testppd.c,v 1.23 2002/01/09 20:58:03 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -45,7 +45,6 @@ main(int  argc,			/* I - Number of command-line arguments */
      char *argv[])		/* I - Command-line arguments */
 {
   int		i, j, k, m;	/* Looping vars */
-  const char	*filename;	/* File to load */
   ppd_file_t	*ppd;		/* PPD file record */
   ppd_size_t	*size;		/* Size record */
   ppd_group_t	*group;		/* UI group */
@@ -76,7 +75,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       continue;
     }
 
-    printf("FILE: %s\n", filename);
+    printf("FILE: %s\n", argv[i]);
     printf("    language_level = %d\n", ppd->language_level);
     printf("    color_device = %s\n", ppd->color_device ? "TRUE" : "FALSE");
     printf("    variable_sizes = %s\n", ppd->variable_sizes ? "TRUE" : "FALSE");
@@ -115,7 +114,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     printf("    nickname = %s\n", ppd->nickname);
     printf("    shortnickname = %s\n", ppd->shortnickname);
     printf("    patches = %d bytes\n",
-           ppd->patches == NULL ? 0 : strlen(ppd->patches));
+           ppd->patches == NULL ? 0 : (int)strlen(ppd->patches));
 
     printf("    num_groups = %d\n", ppd->num_groups);
     for (j = 0, group = ppd->groups; j < ppd->num_groups; j ++, group ++)
@@ -192,5 +191,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c,v 1.22 2002/01/02 17:58:41 mike Exp $".
+ * End of "$Id: testppd.c,v 1.23 2002/01/09 20:58:03 mike Exp $".
  */
