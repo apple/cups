@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list,v 1.81 2000/10/19 19:19:49 mike Exp $"
+# "$Id: cups.list,v 1.82 2000/12/11 04:40:31 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -23,14 +23,16 @@
 #         WWW: http://www.cups.org
 #
 
+# Product information
 %product Common UNIX Printing System
 %copyright 1993-2000 by Easy Software Products, All Rights Reserved.
 %vendor Easy Software Products
 %license LICENSE.txt
 %readme README.txt
-%version 1.1.4
+%version 1.1.5
 %incompat printpro
 
+# Server programs
 %system all
 # Server files
 f 0555 root sys $SBINDIR/cupsd scheduler/cupsd
@@ -162,155 +164,26 @@ f 0444 root sys $DATADIR/data/psglyphs data/psglyphs
 f 0444 root sys $DATADIR/data/testprint.ps data/testprint.ps
 
 d 0555 root sys $DATADIR/fonts -
-f 0444 root sys $DATADIR/fonts/AvantGarde-Book fonts/AvantGarde-Book
-f 0444 root sys $DATADIR/fonts/AvantGarde-BookOblique fonts/AvantGarde-BookOblique
-f 0444 root sys $DATADIR/fonts/AvantGarde-Demi fonts/AvantGarde-Demi
-f 0444 root sys $DATADIR/fonts/AvantGarde-DemiOblique fonts/AvantGarde-DemiOblique
-f 0444 root sys $DATADIR/fonts/Bookman-Demi fonts/Bookman-Demi
-f 0444 root sys $DATADIR/fonts/Bookman-DemiItalic fonts/Bookman-DemiItalic
-f 0444 root sys $DATADIR/fonts/Bookman-Light fonts/Bookman-Light
-f 0444 root sys $DATADIR/fonts/Bookman-LightItalic fonts/Bookman-LightItalic
-f 0444 root sys $DATADIR/fonts/Charter-Bold fonts/Charter-Bold
-f 0444 root sys $DATADIR/fonts/Charter-BoldItalic fonts/Charter-BoldItalic
-f 0444 root sys $DATADIR/fonts/Charter-Italic fonts/Charter-Italic
-f 0444 root sys $DATADIR/fonts/Charter-Roman fonts/Charter-Roman
-f 0444 root sys $DATADIR/fonts/Courier fonts/Courier
-f 0444 root sys $DATADIR/fonts/Courier-Bold fonts/Courier-Bold
-f 0444 root sys $DATADIR/fonts/Courier-BoldOblique fonts/Courier-BoldOblique
-f 0444 root sys $DATADIR/fonts/Courier-Oblique fonts/Courier-Oblique
-f 0444 root sys $DATADIR/fonts/Helvetica fonts/Helvetica
-f 0444 root sys $DATADIR/fonts/Helvetica-Bold fonts/Helvetica-Bold
-f 0444 root sys $DATADIR/fonts/Helvetica-BoldOblique fonts/Helvetica-BoldOblique
-f 0444 root sys $DATADIR/fonts/Helvetica-Narrow fonts/Helvetica-Narrow
-f 0444 root sys $DATADIR/fonts/Helvetica-Narrow-Bold fonts/Helvetica-Narrow-Bold
-f 0444 root sys $DATADIR/fonts/Helvetica-Narrow-BoldOblique fonts/Helvetica-Narrow-BoldOblique
-f 0444 root sys $DATADIR/fonts/Helvetica-Narrow-Oblique fonts/Helvetica-Narrow-Oblique
-f 0444 root sys $DATADIR/fonts/Helvetica-Oblique fonts/Helvetica-Oblique
-f 0444 root sys $DATADIR/fonts/NewCenturySchlbk-Bold fonts/NewCenturySchlbk-Bold
-f 0444 root sys $DATADIR/fonts/NewCenturySchlbk-BoldItalic fonts/NewCenturySchlbk-BoldItalic
-f 0444 root sys $DATADIR/fonts/NewCenturySchlbk-Italic fonts/NewCenturySchlbk-Italic
-f 0444 root sys $DATADIR/fonts/NewCenturySchlbk-Roman fonts/NewCenturySchlbk-Roman
-f 0444 root sys $DATADIR/fonts/Palatino-Bold fonts/Palatino-Bold
-f 0444 root sys $DATADIR/fonts/Palatino-BoldItalic fonts/Palatino-BoldItalic
-f 0444 root sys $DATADIR/fonts/Palatino-Italic fonts/Palatino-Italic
-f 0444 root sys $DATADIR/fonts/Palatino-Roman fonts/Palatino-Roman
-f 0444 root sys $DATADIR/fonts/Symbol fonts/Symbol
-f 0444 root sys $DATADIR/fonts/Times-Bold fonts/Times-Bold
-f 0444 root sys $DATADIR/fonts/Times-BoldItalic fonts/Times-BoldItalic
-f 0444 root sys $DATADIR/fonts/Times-Italic fonts/Times-Italic
-f 0444 root sys $DATADIR/fonts/Times-Roman fonts/Times-Roman
-f 0444 root sys $DATADIR/fonts/Utopia-Bold fonts/Utopia-Bold
-f 0444 root sys $DATADIR/fonts/Utopia-BoldItalic fonts/Utopia-BoldItalic
-f 0444 root sys $DATADIR/fonts/Utopia-Italic fonts/Utopia-Italic
-f 0444 root sys $DATADIR/fonts/Utopia-Regular fonts/Utopia-Regular
-f 0444 root sys $DATADIR/fonts/ZapfChancery-MediumItalic fonts/ZapfChancery-MediumItalic
-f 0444 root sys $DATADIR/fonts/ZapfDingbats fonts/ZapfDingbats
+f 0444 root sys $DATADIR/fonts fonts/*
 
 d 0555 root sys $DATADIR/pstoraster -
 f 0444 root sys $DATADIR/pstoraster/Fontmap pstoraster/Fontmap
-f 0444 root sys $DATADIR/pstoraster/gs_btokn.ps pstoraster/gs_btokn.ps
-f 0444 root sys $DATADIR/pstoraster/gs_ccfnt.ps pstoraster/gs_ccfnt.ps
-f 0444 root sys $DATADIR/pstoraster/gs_cff.ps pstoraster/gs_cff.ps
-f 0444 root sys $DATADIR/pstoraster/gs_cidfn.ps pstoraster/gs_cidfn.ps
-f 0444 root sys $DATADIR/pstoraster/gs_cmap.ps pstoraster/gs_cmap.ps
-f 0444 root sys $DATADIR/pstoraster/gs_cmdl.ps pstoraster/gs_cmdl.ps
-f 0444 root sys $DATADIR/pstoraster/gs_dbt_e.ps pstoraster/gs_dbt_e.ps
-f 0444 root sys $DATADIR/pstoraster/gs_diskf.ps pstoraster/gs_diskf.ps
-f 0444 root sys $DATADIR/pstoraster/gs_dpnxt.ps pstoraster/gs_dpnxt.ps
-f 0444 root sys $DATADIR/pstoraster/gs_dps.ps pstoraster/gs_dps.ps
-f 0444 root sys $DATADIR/pstoraster/gs_dps1.ps pstoraster/gs_dps1.ps
-f 0444 root sys $DATADIR/pstoraster/gs_dps2.ps pstoraster/gs_dps2.ps
-f 0444 root sys $DATADIR/pstoraster/gs_epsf.ps pstoraster/gs_epsf.ps
-f 0444 root sys $DATADIR/pstoraster/gs_fform.ps pstoraster/gs_fform.ps
-f 0444 root sys $DATADIR/pstoraster/gs_fonts.ps pstoraster/gs_fonts.ps
-f 0444 root sys $DATADIR/pstoraster/gs_init.ps pstoraster/gs_init.ps
-f 0444 root sys $DATADIR/pstoraster/gs_iso_e.ps pstoraster/gs_iso_e.ps
-f 0444 root sys $DATADIR/pstoraster/gs_kanji.ps pstoraster/gs_kanji.ps
-f 0444 root sys $DATADIR/pstoraster/gs_ksb_e.ps pstoraster/gs_ksb_e.ps
-f 0444 root sys $DATADIR/pstoraster/gs_lev2.ps pstoraster/gs_lev2.ps
-f 0444 root sys $DATADIR/pstoraster/gs_ll3.ps pstoraster/gs_ll3.ps
-f 0444 root sys $DATADIR/pstoraster/gs_mex_e.ps pstoraster/gs_mex_e.ps
-f 0444 root sys $DATADIR/pstoraster/gs_mro_e.ps pstoraster/gs_mro_e.ps
-f 0444 root sys $DATADIR/pstoraster/gs_pfile.ps pstoraster/gs_pfile.ps
-f 0444 root sys $DATADIR/pstoraster/gs_res.ps pstoraster/gs_res.ps
-f 0444 root sys $DATADIR/pstoraster/gs_setpd.ps pstoraster/gs_setpd.ps
-f 0444 root sys $DATADIR/pstoraster/gs_statd.ps pstoraster/gs_statd.ps
-f 0444 root sys $DATADIR/pstoraster/gs_std_e.ps pstoraster/gs_std_e.ps
-f 0444 root sys $DATADIR/pstoraster/gs_sym_e.ps pstoraster/gs_sym_e.ps
-f 0444 root sys $DATADIR/pstoraster/gs_ttf.ps pstoraster/gs_ttf.ps
-f 0444 root sys $DATADIR/pstoraster/gs_typ32.ps pstoraster/gs_typ32.ps
-f 0444 root sys $DATADIR/pstoraster/gs_typ42.ps pstoraster/gs_typ42.ps
-f 0444 root sys $DATADIR/pstoraster/gs_type1.ps pstoraster/gs_type1.ps
-f 0444 root sys $DATADIR/pstoraster/gs_wan_e.ps pstoraster/gs_wan_e.ps
-f 0444 root sys $DATADIR/pstoraster/gs_wl1_e.ps pstoraster/gs_wl1_e.ps
-f 0444 root sys $DATADIR/pstoraster/gs_wl2_e.ps pstoraster/gs_wl2_e.ps
-f 0444 root sys $DATADIR/pstoraster/gs_wl5_e.ps pstoraster/gs_wl5_e.ps
+f 0444 root sys $DATADIR/pstoraster pstoraster/gs*.ps
 
 d 0555 root sys $DATADIR/model -
-f 0444 root sys $DATADIR/model/deskjet.ppd ppd/deskjet.ppd
-f 0444 root sys $DATADIR/model/laserjet.ppd ppd/laserjet.ppd
-f 0444 root sys $DATADIR/model/epson9.ppd ppd/epson9.ppd
-f 0444 root sys $DATADIR/model/epson24.ppd ppd/epson24.ppd
-f 0444 root sys $DATADIR/model/okidata9.ppd ppd/okidata9.ppd
-f 0444 root sys $DATADIR/model/okidat24.ppd ppd/okidat24.ppd
-f 0444 root sys $DATADIR/model/stcolor.ppd ppd/stcolor.ppd
-f 0444 root sys $DATADIR/model/stphoto.ppd ppd/stphoto.ppd
+f 0444 root sys $DATADIR/model ppd/*.ppd
 
 d 0555 root sys $DATADIR/templates -
-f 0444 root sys $DATADIR/templates/add-class.tmpl templates/add-class.tmpl
-f 0444 root sys $DATADIR/templates/add-printer.tmpl templates/add-printer.tmpl
-f 0444 root sys $DATADIR/templates/admin-op.tmpl templates/admin-op.tmpl
-f 0444 root sys $DATADIR/templates/admin.tmpl templates/admin.tmpl
-f 0444 root sys $DATADIR/templates/choose-device.tmpl templates/choose-device.tmpl
-f 0444 root sys $DATADIR/templates/choose-make.tmpl templates/choose-make.tmpl
-f 0444 root sys $DATADIR/templates/choose-members.tmpl templates/choose-members.tmpl
-f 0444 root sys $DATADIR/templates/choose-model.tmpl templates/choose-model.tmpl
-f 0444 root sys $DATADIR/templates/choose-serial.tmpl templates/choose-serial.tmpl
-f 0444 root sys $DATADIR/templates/choose-uri.tmpl templates/choose-uri.tmpl
-f 0444 root sys $DATADIR/templates/class-added.tmpl templates/class-added.tmpl
-f 0444 root sys $DATADIR/templates/class-confirm.tmpl templates/class-confirm.tmpl
-f 0444 root sys $DATADIR/templates/class-deleted.tmpl templates/class-deleted.tmpl
-f 0444 root sys $DATADIR/templates/class-modified.tmpl templates/class-modified.tmpl
-f 0444 root sys $DATADIR/templates/classes.tmpl templates/classes.tmpl
-f 0444 root sys $DATADIR/templates/config-printer.tmpl templates/config-printer.tmpl
-f 0444 root sys $DATADIR/templates/config-printer2.tmpl templates/config-printer2.tmpl
-f 0444 root sys $DATADIR/templates/error.tmpl templates/error.tmpl
-f 0444 root sys $DATADIR/templates/header.tmpl templates/header.tmpl
-f 0444 root sys $DATADIR/templates/job-cancel.tmpl templates/job-cancel.tmpl
-f 0444 root sys $DATADIR/templates/job-hold.tmpl templates/job-hold.tmpl
-f 0444 root sys $DATADIR/templates/job-release.tmpl templates/job-release.tmpl
-f 0444 root sys $DATADIR/templates/job-restart.tmpl templates/job-restart.tmpl
-f 0444 root sys $DATADIR/templates/jobs.tmpl templates/jobs.tmpl
-f 0444 root sys $DATADIR/templates/modify-class.tmpl templates/modify-class.tmpl
-f 0444 root sys $DATADIR/templates/modify-printer.tmpl templates/modify-printer.tmpl
-f 0444 root sys $DATADIR/templates/option-boolean.tmpl templates/option-boolean.tmpl
-f 0444 root sys $DATADIR/templates/option-header.tmpl templates/option-header.tmpl
-f 0444 root sys $DATADIR/templates/option-pickmany.tmpl templates/option-pickmany.tmpl
-f 0444 root sys $DATADIR/templates/option-pickone.tmpl templates/option-pickone.tmpl
-f 0444 root sys $DATADIR/templates/option-trailer.tmpl templates/option-trailer.tmpl
-f 0444 root sys $DATADIR/templates/printer-accept.tmpl templates/printer-accept.tmpl
-f 0444 root sys $DATADIR/templates/printer-added.tmpl templates/printer-added.tmpl
-f 0444 root sys $DATADIR/templates/printer-configured.tmpl templates/printer-configured.tmpl
-f 0444 root sys $DATADIR/templates/printer-confirm.tmpl templates/printer-confirm.tmpl
-f 0444 root sys $DATADIR/templates/printer-deleted.tmpl templates/printer-deleted.tmpl
-f 0444 root sys $DATADIR/templates/printer-modified.tmpl templates/printer-modified.tmpl
-f 0444 root sys $DATADIR/templates/printer-reject.tmpl templates/printer-reject.tmpl
-f 0444 root sys $DATADIR/templates/printer-start.tmpl templates/printer-start.tmpl
-f 0444 root sys $DATADIR/templates/printer-stop.tmpl templates/printer-stop.tmpl
-f 0444 root sys $DATADIR/templates/printers.tmpl templates/printers.tmpl
-f 0444 root sys $DATADIR/templates/test-page.tmpl templates/test-page.tmpl
-f 0444 root sys $DATADIR/templates/trailer.tmpl templates/trailer.tmpl
+f 0444 root sys $DATADIR/templates templates/*.tmpl
 
 # Config files
 d 0555 root sys $SERVERROOT -
 d 0711 root sys $SERVERROOT/certs -
 d 0755 root sys $SERVERROOT/interfaces -
 d 0755 root sys $SERVERROOT/ppd -
-c 0644 root sys $SERVERROOT/classes.conf conf/classes.conf
-c 0644 root sys $SERVERROOT/cupsd.conf conf/cupsd.conf
+c 0644 root sys $SERVERROOT conf/*.conf
 f 0644 root sys $SERVERROOT/mime.convs conf/mime.convs
 f 0644 root sys $SERVERROOT/mime.types conf/mime.types
-c 0644 root sys $SERVERROOT/printers.conf conf/printers.conf
 
 %system linux
 d 0555 root sys $PAMDIR -
@@ -337,76 +210,10 @@ f 0444 root sys $LIBDIR/libcups.a cups/libcups.a
 # Documentation files
 d 0555 root sys $DOCDIR -
 f 0444 root sys $DOCDIR/cups.css doc/cups.css
-f 0444 root sys $DOCDIR/documentation.html doc/documentation.html
-f 0444 root sys $DOCDIR/index.html doc/index.html
-
+f 0444 root sys $DOCDIR doc/*.html
+f 0444 root sys $DOCDIR doc/*.pdf
 d 0555 root sys $DOCDIR/images -
-
-f 0444 root sys $DOCDIR/images/classes.gif doc/images/classes.gif
-f 0444 root sys $DOCDIR/images/printer-idle.gif doc/images/printer-idle.gif
-f 0444 root sys $DOCDIR/images/printer-processing.gif doc/images/printer-processing.gif
-f 0444 root sys $DOCDIR/images/printer-stopped.gif doc/images/printer-stopped.gif
-
-f 0444 root sys $DOCDIR/images/accept-jobs.gif doc/images/accept-jobs.gif
-f 0444 root sys $DOCDIR/images/add-class.gif doc/images/add-class.gif
-f 0444 root sys $DOCDIR/images/add-printer.gif doc/images/add-printer.gif
-f 0444 root sys $DOCDIR/images/cancel-job.gif doc/images/cancel-job.gif
-f 0444 root sys $DOCDIR/images/cancel-jobs.gif doc/images/cancel-jobs.gif
-f 0444 root sys $DOCDIR/images/cancel.gif doc/images/cancel.gif
-f 0444 root sys $DOCDIR/images/continue.gif doc/images/continue.gif
-f 0444 root sys $DOCDIR/images/config-printer.gif doc/images/config-printer.gif
-f 0444 root sys $DOCDIR/images/cups-block-diagram.gif doc/images/cups-block-diagram.gif
-f 0444 root sys $DOCDIR/images/delete-class.gif doc/images/delete-class.gif
-f 0444 root sys $DOCDIR/images/delete-printer.gif doc/images/delete-printer.gif
-f 0444 root sys $DOCDIR/images/hold-job.gif doc/images/hold-job.gif
-f 0444 root sys $DOCDIR/images/left.gif doc/images/left.gif
-f 0444 root sys $DOCDIR/images/logo.gif doc/images/logo.gif
-f 0444 root sys $DOCDIR/images/manage-classes.gif doc/images/manage-classes.gif
-f 0444 root sys $DOCDIR/images/manage-jobs.gif doc/images/manage-jobs.gif
-f 0444 root sys $DOCDIR/images/manage-printers.gif doc/images/manage-printers.gif
-f 0444 root sys $DOCDIR/images/modify-class.gif doc/images/modify-class.gif
-f 0444 root sys $DOCDIR/images/modify-printer.gif doc/images/modify-printer.gif
-f 0444 root sys $DOCDIR/images/navbar.gif doc/images/navbar.gif
-f 0444 root sys $DOCDIR/images/print-test-page.gif doc/images/print-test-page.gif
-f 0444 root sys $DOCDIR/images/reject-jobs.gif doc/images/reject-jobs.gif
-f 0444 root sys $DOCDIR/images/release-job.gif doc/images/release-job.gif
-f 0444 root sys $DOCDIR/images/restart-job.gif doc/images/restart-job.gif
-f 0444 root sys $DOCDIR/images/right.gif doc/images/right.gif
-f 0444 root sys $DOCDIR/images/show-active.gif doc/images/show-active.gif
-f 0444 root sys $DOCDIR/images/show-completed.gif doc/images/show-completed.gif
-f 0444 root sys $DOCDIR/images/start-class.gif doc/images/start-class.gif
-f 0444 root sys $DOCDIR/images/start-printer.gif doc/images/start-printer.gif
-f 0444 root sys $DOCDIR/images/stop-class.gif doc/images/stop-class.gif
-f 0444 root sys $DOCDIR/images/stop-printer.gif doc/images/stop-printer.gif
-
-f 0444 root sys $DOCDIR/cmp.html doc/cmp.html
-f 0444 root sys $DOCDIR/cmp.pdf doc/cmp.pdf
-f 0444 root sys $DOCDIR/cupsdoc.css doc/cupsdoc.css
-f 0444 root sys $DOCDIR/idd.html doc/idd.html
-f 0444 root sys $DOCDIR/idd.pdf doc/idd.pdf
-f 0444 root sys $DOCDIR/ipp.html doc/ipp.html
-f 0444 root sys $DOCDIR/ipp.pdf doc/ipp.pdf
-f 0444 root sys $DOCDIR/overview.html doc/overview.html
-f 0444 root sys $DOCDIR/overview.pdf doc/overview.pdf
-f 0444 root sys $DOCDIR/sam.html doc/sam.html
-f 0444 root sys $DOCDIR/sam.pdf doc/sam.pdf
-f 0444 root sys $DOCDIR/sdd.html doc/sdd.html
-f 0444 root sys $DOCDIR/sdd.pdf doc/sdd.pdf
-f 0444 root sys $DOCDIR/spm.html doc/spm.html
-f 0444 root sys $DOCDIR/spm.pdf doc/spm.pdf
-f 0444 root sys $DOCDIR/sps.html doc/sps.html
-f 0444 root sys $DOCDIR/sps.pdf doc/sps.pdf
-f 0444 root sys $DOCDIR/ssr.html doc/ssr.html
-f 0444 root sys $DOCDIR/ssr.pdf doc/ssr.pdf
-f 0444 root sys $DOCDIR/sum.html doc/sum.html
-f 0444 root sys $DOCDIR/sum.pdf doc/sum.pdf
-f 0444 root sys $DOCDIR/svd.html doc/svd.html
-f 0444 root sys $DOCDIR/svd.pdf doc/svd.pdf
-f 0444 root sys $DOCDIR/images/cups-bar.gif doc/images/cups-bar.gif
-f 0444 root sys $DOCDIR/images/cups-large.gif doc/images/cups-large.gif
-f 0444 root sys $DOCDIR/images/cups-medium.gif doc/images/cups-medium.gif
-f 0444 root sys $DOCDIR/images/cups-small.gif doc/images/cups-small.gif
-
+f 0444 root sys $DOCDIR/images doc/images/*.gif
 
 # Man pages
 %system irix
@@ -509,5 +316,5 @@ f 0444 root sys $MANDIR/man5/printers.conf.5 man/printers.conf.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list,v 1.81 2000/10/19 19:19:49 mike Exp $".
+# End of "$Id: cups.list,v 1.82 2000/12/11 04:40:31 mike Exp $".
 #
