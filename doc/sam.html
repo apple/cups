@@ -157,6 +157,7 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <LI><A HREF="#LogFilePerm">LogFilePerm</A></LI>
 <LI><A HREF="#LogLevel">LogLevel</A></LI>
 <LI><A HREF="#MaxClients">MaxClients</A></LI>
+<LI><A HREF="#MaxCopies">MaxCopies</A></LI>
 <LI><A HREF="#MaxJobs">MaxJobs</A></LI>
 <LI><A HREF="#MaxJobsPerPrinter">MaxJobsPerPrinter</A></LI>
 <LI><A HREF="#MaxJobsPerUser">MaxJobsPerUser</A></LI>
@@ -1296,6 +1297,7 @@ HREF="#CLIENT_SETUP"> Chapter 5, &quot;Client Setup&quot;</A> for more
 <LI><A HREF="#LogFilePerm"><CODE>LogFilePerm</CODE></A></LI>
 <LI><A HREF="#LogLevel"><CODE>LogLevel</CODE></A></LI>
 <LI><A HREF="#MaxClients"><CODE>MaxClients</CODE></A></LI>
+<LI><A HREF="#MaxCopies"><CODE>MaxCopies</CODE></A></LI>
 <LI><A HREF="#MaxJobs"><CODE>MaxJobs</CODE></A></LI>
 <LI><A HREF="#MaxJobsPerPrinter"><CODE>MaxJobsPerPrinter</CODE></A></LI>
 <LI><A HREF="#MaxJobsPerUser"><CODE>MaxJobsPerUser</CODE></A></LI>
@@ -2415,6 +2417,28 @@ MaxClients 1024
  the CUPS server internally limits the <CODE>MaxClients</CODE> value to
  1/3 of the available file descriptors to avoid possible problems when
  printing large numbers of jobs.</P>
+</TD></TR>
+</TABLE>
+</CENTER>
+
+<!-- NEED 3in -->
+<H3><A NAME="MaxCopies">MaxCopies</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+MaxCopies 100
+MaxCopies 65535
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>MaxCopies</CODE> directive controls the maximum number of
+ copies that a user can print of a job. The default is 100 copies.</P>
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B> NOTE:</B>
+<P>Most HP PCL laser printers internally limit the number of copies to
+ 100.</P>
 </TD></TR>
 </TABLE>
 </CENTER>

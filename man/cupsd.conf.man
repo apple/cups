@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsd.conf.man,v 1.8 2002/08/12 16:20:04 mike Exp $"
+.\" "$Id: cupsd.conf.man,v 1.9 2002/08/22 17:13:48 mike Exp $"
 .\"
 .\"   cupsd.conf man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -223,6 +223,10 @@ MaxClients
 .br
 Specifies the maximum number of simultaneous clients to support.
 .TP 5
+MaxCopies
+.br
+Specifies the maximum number of copies that a user can print of each job.
+.TP 5
 MaxJobs
 .br
 Specifies the maximum number of simultaneous jobs to support.
@@ -351,5 +355,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2002 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupsd.conf.man,v 1.8 2002/08/12 16:20:04 mike Exp $".
+.\" End of "$Id: cupsd.conf.man,v 1.9 2002/08/22 17:13:48 mike Exp $".
 .\"
