@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.23 1999/08/31 14:41:54 mike Exp $"
+dnl "$Id: configure.in,v 1.24 1999/10/14 18:48:58 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -45,8 +45,8 @@ CFLAGS="${CFLAGS:=}"
 AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging [default=no]],[if eval "test x$enable_debug = xyes"; then
 	OPTIM="-g "
 fi])
-AC_ARG_ENABLE(shared, [  --disable-shared         turn off shared libraries [default=no]])
-if test "$disable_shared" != "yes"; then
+AC_ARG_ENABLE(shared, [  --enable-shared        turn on shared libraries [default=yes]])
+if test "$enable_shared" != "no"; then
 	case "$uname" in
 		SunOS* | UNIX_S*)
 			LIBCUPS="libcups.so.1"
@@ -58,7 +58,12 @@ if test "$disable_shared" != "yes"; then
 			LIBCUPSIMAGE="libcupsimage.sl.1"
 			DSO="ld -b -z +h \$@ -o"
 			;;
-		OSF1* | Linux* | FreeBSD*)
+		FreeBSD* | NetBSD* | OpenBSD*)
+			LIBCUPS="libcups.so.1"
+			LIBCUPSIMAGE="libcupsimage.so.1"
+			DSO="\$(CC) -Wl,-soname,\$@ -shared \$(OPTIM) -o"
+			;;
+		OSF1* | Linux*)
 			LIBCUPS="libcups.so.1"
 			LIBCUPSIMAGE="libcupsimage.so.1"
 			DSO="\$(CC) -Wl,-soname,\$@ -shared \$(OPTIM) -o"
@@ -160,16 +165,23 @@ AC_SUBST(LIBPNG)
 AC_SUBST(LIBTIFF)
 AC_SUBST(LIBZ)
 
-AC_CHECK_HEADER(jpeglib.h,
+dnl AC_CHECK_HEADER(jpeglib.h,
+AC_CHECK_LIB(jpeg, jpeg_destroy_decompress,
     AC_DEFINE(HAVE_LIBJPEG)
     LIBJPEG="-ljpeg")
-AC_CHECK_HEADER(png.h,
+
+dnl AC_CHECK_HEADER(png.h,
+AC_CHECK_LIB(png, png_read_info,
     AC_DEFINE(HAVE_LIBPNG)
     LIBPNG="-lpng")
-AC_CHECK_HEADER(tiff.h,
+
+dnl AC_CHECK_HEADER(tiff.h,
+AC_CHECK_LIB(tiff, TIFFReadScanline,
     AC_DEFINE(HAVE_LIBTIFF)
     LIBTIFF="-ltiff")
-AC_CHECK_HEADER(zlib.h,
+
+dnl AC_CHECK_HEADER(zlib.h,
+AC_CHECK_LIB(z, deflateInit,
     AC_DEFINE(HAVE_LIBZ)
     LIBZ="-lz")
 
@@ -194,7 +206,7 @@ AC_CHECK_FUNCS(wait3)
 dnl Update compiler options...
 if test -n "$GXX"; then
 	if test -z "$OPTIM"; then
-        	OPTIM="-O2"
+	       	OPTIM="-O2"
 	fi
 	if test $PICFLAG = 1; then
     		OPTIM="-fPIC $OPTIM"
@@ -313,5 +325,5 @@ AC_SUBST(CUPS_DATADIR)
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.23 1999/08/31 14:41:54 mike Exp $".
+dnl End of "$Id: configure.in,v 1.24 1999/10/14 18:48:58 mike Exp $".
 dnl
