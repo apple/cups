@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c,v 1.4 1999/03/21 02:10:05 mike Exp $"
+ * "$Id: options.c,v 1.5 1999/05/20 16:10:57 mike Exp $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -279,28 +279,18 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 {
   int	i;					/* Looping var */
   int	conflict;				/* Option conflicts */
-  char	media_size[64];				/* Updated media size */
 
 
   conflict = 0;
 
   for (i = num_options; i > 0; i --, options ++)
-    if (strcmp(options->name, "media-size") == 0)
+    if (strcmp(options->name, "media") == 0)
     {
-      strcpy(media_size, options->value);
-
-      if (strncmp(options->value, "us-", 3) == 0)
-      {
-        strcpy(media_size, media_size + 3);
-	media_size[0] = toupper(media_size[0]);
-      }
-      else if (strncmp(options->value, "iso-", 4) == 0)
-      {
-        strcpy(media_size, media_size + 4);
-	media_size[0] = toupper(media_size[0]);
-      }
-
-      if (ppdMarkOption(ppd, "PageSize", media_size))
+      if (ppdMarkOption(ppd, "PageSize", options->value))
+        conflict = 1;
+      if (ppdMarkOption(ppd, "InputSlot", options->value))
+        conflict = 1;
+      if (ppdMarkOption(ppd, "MediaType", options->value))
         conflict = 1;
     }
     else if (strcmp(options->name, "sides") == 0)
@@ -329,5 +319,5 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: options.c,v 1.4 1999/03/21 02:10:05 mike Exp $".
+ * End of "$Id: options.c,v 1.5 1999/05/20 16:10:57 mike Exp $".
  */
