@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c,v 1.15 2000/01/21 20:28:00 mike Exp $"
+ * "$Id: cancel.c,v 1.16 2000/11/11 19:56:24 mike Exp $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -92,7 +92,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        fputs("Error: need hostname after \'-h\' option!\n", stderr);
+	        fputs("cancel: Error - expected hostname after \'-h\' option!\n", stderr);
 		return (1);
               }
 	      else
@@ -103,6 +103,23 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    {
 	      perror("cancel: Unable to connect to server");
 	      return (1);
+	    }
+	    break;
+
+        case 'u' : /* Username */
+	    if (argv[i][2] != '\0')
+	      cupsSetUser(argv[i] + 2);
+	    else
+	    {
+	      i ++;
+
+	      if (i >= argc)
+	      {
+	        fputs("cancel: Error - expected username after \'-u\' option!\n", stderr);
+		return (1);
+              }
+	      else
+		cupsSetUser(argv[i]);
 	    }
 	    break;
 
@@ -232,5 +249,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c,v 1.15 2000/01/21 20:28:00 mike Exp $".
+ * End of "$Id: cancel.c,v 1.16 2000/11/11 19:56:24 mike Exp $".
  */

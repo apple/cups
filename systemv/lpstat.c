@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.28 2000/11/06 16:18:13 mike Exp $"
+ * "$Id: lpstat.c,v 1.29 2000/11/11 19:56:24 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -100,6 +100,7 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'S' : /* Show charsets */
 	    if (!argv[i][2])
 	      i ++;
+	    break;
 
         case 'a' : /* Show acceptance status */
 	    if (!http)
@@ -1743,5 +1744,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.28 2000/11/06 16:18:13 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.29 2000/11/11 19:56:24 mike Exp $".
  */

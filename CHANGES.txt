@@ -1,4 +1,4 @@
-CHANGES.txt - 11/10/2000
+CHANGES.txt - 11/11/2000
 ------------------------
 
 CHANGES IN CUPS V1.1.5
@@ -110,6 +110,9 @@ CHANGES IN CUPS V1.1.5
 	  job attributes to be changed.
 	- Expanded the click area for the navigation bar in the
 	  web interface.
+	- Updated the lp and cancel commands to support all of
+	  the Solaris print options (some are simply ignored
+	  since they do not map)
 
 
 CHANGES IN CUPS v1.1.4
