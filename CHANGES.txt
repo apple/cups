@@ -79,6 +79,8 @@ CHANGES IN CUPS V1.1.7
 	- The scheduler enforced a 30 second timeout on all
 	  clients regardless of the Timeout directive and if a
 	  CGI was currently running.
+	- cupsParseOptions() now sets boolean options to
+	  option=true or option=false.
 
 
 CHANGES IN CUPS V1.1.6-3

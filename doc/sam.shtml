@@ -3207,7 +3207,7 @@ would look like:
 Printer Description:MyPrinter@MyServer:\
         :pr=|/usr/bin/lp -d MyPrinter:\
         :op=daemon:\
-        :pd=/etc/cups/ppd/MyPrinter.ppd
+        :pd=/etc/cups/ppd/MyPrinter.ppd:
 </PRE></UL>
 
 <!-- NEED 2in -->

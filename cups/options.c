@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c,v 1.19 2001/02/09 16:23:35 mike Exp $"
+ * "$Id: options.c,v 1.20 2001/03/07 16:54:20 mike Exp $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -476,7 +476,12 @@ cupsParseOptions(const char    *arg,		/* I - Argument to parse */
       * Start of another option...
       */
 
-      num_options = cupsAddOption(name, "", num_options, options);
+      if (strncasecmp(name, "no", 2) == 0)
+        num_options = cupsAddOption(name + 2, "false", num_options,
+	                            options);
+      else
+        num_options = cupsAddOption(name, "true", num_options, options);
+
       continue;
     }
 
@@ -672,5 +677,5 @@ cupsMarkOptions(ppd_file_t    *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: options.c,v 1.19 2001/02/09 16:23:35 mike Exp $".
+ * End of "$Id: options.c,v 1.20 2001/03/07 16:54:20 mike Exp $".
  */
