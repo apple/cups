@@ -1,5 +1,5 @@
 /*
- * "$Id: var.c,v 1.5 1997/05/13 16:38:07 mike Exp $"
+ * "$Id: var.c,v 1.6 1997/08/26 16:49:24 mike Exp $"
  *
  *   CGI form variable functions.
  *
@@ -21,7 +21,11 @@
  * Revision History:
  *
  *   $Log: var.c,v $
- *   Revision 1.5  1997/05/13 16:38:07  mike
+ *   Revision 1.6  1997/08/26 16:49:24  mike
+ *   Updated cgiInitialize() to always return FALSE if no parameter data
+ *   is present.
+ *
+ *   Revision 1.5  1997/05/13  16:38:07  mike
  *   Fixed a bug in the cgi_initialize_string() code - was not sorting vars!
  *
  *   Revision 1.4  1997/05/13  15:16:30  mike
@@ -91,14 +95,14 @@ cgiInitialize(int need_content)	/* I - True if input is required */
   method = getenv("REQUEST_METHOD");
 
   if (method == NULL)
-    return (!need_content);
+    return (0);
 
   if (strcasecmp(method, "GET") == 0)
     return (cgi_initialize_get(need_content));
   else if (strcasecmp(method, "POST") == 0)
     return (cgi_initialize_post(need_content));
   else
-    return (!need_content);
+    return (0);
 }
 
 
@@ -469,5 +473,5 @@ cgi_initialize_post(int need_content)	/* I - True if input is required */
 
 
 /*
- * End of "$Id: var.c,v 1.5 1997/05/13 16:38:07 mike Exp $".
+ * End of "$Id: var.c,v 1.6 1997/08/26 16:49:24 mike Exp $".
  */
