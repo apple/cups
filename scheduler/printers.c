@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.40 1999/09/30 17:25:54 mike Exp $"
+ * "$Id: printers.c,v 1.41 1999/10/10 15:41:12 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -151,7 +151,7 @@ AddPrinterFilter(printer_t *p,		/* I - Printer to add to */
   *     super/type cost program
   */
 
-  if (sscanf(filter, "%[^/]/%s%d%s", super, type, &cost, program) != 4)
+  if (sscanf(filter, "%15[^/]/%31s%d%1023s", super, type, &cost, program) != 4)
   {
     LogMessage(LOG_ERROR, "AddPrinterFilter: Invalid filter string \"%s\"!",
                filter);
@@ -1206,5 +1206,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.40 1999/09/30 17:25:54 mike Exp $".
+ * End of "$Id: printers.c,v 1.41 1999/10/10 15:41:12 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.10 1999/09/27 17:36:29 mike Exp $"
+ * "$Id: printers.c,v 1.11 1999/10/10 15:40:19 mike Exp $"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -297,7 +297,7 @@ show_printer_info(http_t      *http,
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
 
-  sprintf(uri, "ipp://localhost/printers/%s", name);
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", name);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
 
@@ -341,7 +341,8 @@ show_printer_info(http_t      *http,
   if ((attr = ippFindAttribute(response, "printer-uri-supported", IPP_TAG_URI)) != NULL)
   {
     strcpy(uri, "http:");
-    strcpy(uri + 5, strchr(attr->values[0].string.text, '/'));
+    strncpy(uri + 5, strchr(attr->values[0].string.text, '/'), sizeof(uri) - 6);
+    uri[sizeof(uri) - 1] = '\0';
   }
 
  /*
@@ -399,7 +400,7 @@ show_printer_info(http_t      *http,
                  "attributes-natural-language", NULL,
 		 language->language);
 
-    sprintf(uri, "ipp://localhost/printers/%s", name);
+    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", name);
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
 	         "printer-uri", NULL, uri);
 
@@ -483,5 +484,5 @@ show_printer_info(http_t      *http,
 
 
 /*
- * End of "$Id: printers.c,v 1.10 1999/09/27 17:36:29 mike Exp $".
+ * End of "$Id: printers.c,v 1.11 1999/10/10 15:40:19 mike Exp $".
  */

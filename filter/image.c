@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c,v 1.17 1999/09/03 19:58:40 mike Exp $"
+ * "$Id: image.c,v 1.18 1999/10/10 15:40:36 mike Exp $"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
@@ -255,7 +255,7 @@ ImageSetMaxTiles(image_t *img,		/* I - Image to set */
 
   if ((cache_env = getenv("RIP_MAX_CACHE")) != NULL)
   {
-    switch (sscanf(cache_env, "%d%s", &max_size, cache_units))
+    switch (sscanf(cache_env, "%d%254s", &max_size, cache_units))
     {
       case 0 :
           max_size = 32 * 1024 * 1024;
@@ -755,5 +755,5 @@ flush_tile(image_t *img)	/* I - Image */
 
 
 /*
- * End of "$Id: image.c,v 1.17 1999/09/03 19:58:40 mike Exp $".
+ * End of "$Id: image.c,v 1.18 1999/10/10 15:40:36 mike Exp $".
  */

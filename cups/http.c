@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.51 1999/10/10 13:42:11 mike Exp $"
+ * "$Id: http.c,v 1.52 1999/10/10 15:40:21 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -284,8 +284,7 @@ httpConnect(const char *host,	/* I - Host to connect to */
   * Copy the hostname and port and then "reconnect"...
   */
 
-  strcpy(http->hostname, host);
-  memset((char *)&(http->hostaddr), 0, sizeof(http->hostaddr));
+  strncpy(http->hostname, host, sizeof(http->hostname) - 1);
   memcpy((char *)&(http->hostaddr.sin_addr), hostaddr->h_addr, hostaddr->h_length);
   http->hostaddr.sin_family = hostaddr->h_addrtype;
 #ifdef WIN32
@@ -381,11 +380,11 @@ httpReconnect(http_t *http)	/* I - HTTP data */
 
 void
 httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
-             char       *method,	/* O - Method (http, https, etc.) */
-	     char       *username,	/* O - Username */
-	     char       *host,		/* O - Hostname */
+             char       *method,	/* O - Method [32] (http, https, etc.) */
+	     char       *username,	/* O - Username [32] */
+	     char       *host,		/* O - Hostname [32] */
 	     int        *port,		/* O - Port number to use */
-             char       *resource)	/* O - Resource/filename */
+             char       *resource)	/* O - Resource/filename [1024] */
 {
   char	*ptr;			/* Pointer into string... */
 
@@ -415,7 +414,8 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
   {
     if ((ptr = strchr(host, '/')) != NULL)
     {
-      strcpy(resource, ptr);
+      strncpy(resource, ptr, HTTP_MAX_URI - 1);
+      resource[HTTP_MAX_URI - 1] = '\0';
       *ptr = '\0';
     }
     else
@@ -430,7 +430,10 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
       *port = strtol(uri, (char **)&uri, 10);
 
       if (*uri == '/')
-        strcpy(resource, uri);
+      {
+        strncpy(resource, uri, HTTP_MAX_URI - 1);
+        resource[HTTP_MAX_URI - 1] = '\0';
+      }
     }
     else
       *port = 0;
@@ -440,7 +443,10 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
     return;
   }
   else
-    strcpy(method, host);
+  {
+    strncpy(method, host, 31);
+    method[31] = '\0';
+  }
 
  /*
   * If the method starts with less than 2 slashes then it is a local resource...
@@ -448,7 +454,9 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 
   if (strncmp(uri, "//", 2) != 0)
   {
-    strcpy(resource, uri);
+    strncpy(resource, uri, 1023);
+    resource[1023] = '\0';
+
     username[0] = '\0';
     host[0]     = '\0';
     *port       = 0;
@@ -474,7 +482,8 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
     * Got a username...
     */
 
-    strcpy(username, host);
+    strncpy(username, host, 31);
+    username[31] = '\0';
     
     ptr = host;
     while (*uri != ':' && *uri != '/' && *uri != '\0')
@@ -532,7 +541,8 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
   * The remaining portion is the resource string...
   */
 
-  strcpy(resource, uri);
+  strncpy(resource, uri, HTTP_MAX_URI - 1);
+  resource[HTTP_MAX_URI - 1] = '\0';
 }
 
 
@@ -973,7 +983,7 @@ httpPrintf(http_t     *http,		/* I - HTTP data */
 
 
   va_start(ap, format);
-  bytes = vsprintf(buf, format, ap);
+  bytes = vsnprintf(buf, sizeof(buf), format, ap);
   va_end(ap);
 
   DEBUG_printf(("httpPrintf: %s", buf));
@@ -1482,5 +1492,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.51 1999/10/10 13:42:11 mike Exp $".
+ * End of "$Id: http.c,v 1.52 1999/10/10 15:40:21 mike Exp $".
  */

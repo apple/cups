@@ -1,5 +1,5 @@
 /*
- * "$Id: lprm.c,v 1.7 1999/07/30 15:35:36 mike Exp $"
+ * "$Id: lprm.c,v 1.8 1999/10/10 15:40:16 mike Exp $"
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
@@ -146,7 +146,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       if (dest)
       {
-        sprintf(uri, "ipp://localhost/printers/%s", dest);
+        snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", dest);
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
 	             "printer-uri", NULL, uri);
 	ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-id",
@@ -201,5 +201,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lprm.c,v 1.7 1999/07/30 15:35:36 mike Exp $".
+ * End of "$Id: lprm.c,v 1.8 1999/10/10 15:40:16 mike Exp $".
  */

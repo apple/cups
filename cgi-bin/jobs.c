@@ -1,5 +1,5 @@
 /*
- * "$Id: jobs.c,v 1.7 1999/09/27 17:36:29 mike Exp $"
+ * "$Id: jobs.c,v 1.8 1999/10/10 15:40:18 mike Exp $"
  *
  *   Job status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -386,7 +386,7 @@ show_job_info(http_t      *http,	/* I - Server connection */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
 
-  sprintf(uri, "ipp://localhost/jobs/%s", name);
+  snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%s", name);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri", NULL, uri);
 
  /*
@@ -581,5 +581,5 @@ show_job_info(http_t      *http,	/* I - Server connection */
 
 
 /*
- * End of "$Id: jobs.c,v 1.7 1999/09/27 17:36:29 mike Exp $".
+ * End of "$Id: jobs.c,v 1.8 1999/10/10 15:40:18 mike Exp $".
  */

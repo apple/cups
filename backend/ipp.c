@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.10 1999/09/02 14:28:24 mike Exp $"
+ * "$Id: ipp.c,v 1.11 1999/10/10 15:40:07 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -133,7 +133,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   request->request.op.operation_id = IPP_PRINT_JOB;
   request->request.op.request_id   = 1;
 
-  sprintf(uri, "%s://%s:%d%s", method, hostname, port, resource);
+  snprintf(uri, sizeof(uri), "%s://%s:%d%s", method, hostname, port, resource);
 
   language = cupsLangDefault();
 
@@ -403,5 +403,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.10 1999/09/02 14:28:24 mike Exp $".
+ * End of "$Id: ipp.c,v 1.11 1999/10/10 15:40:07 mike Exp $".
  */

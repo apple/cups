@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.9 1999/09/22 20:48:02 mike Exp $"
+ * "$Id: lpadmin.c,v 1.10 1999/10/10 15:41:15 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -185,11 +185,11 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    }
 
 	    if (argv[i][2])
-	      sprintf(filename, CUPS_DATADIR "/model/%s", argv[i] + 2);
+	      snprintf(filename, sizeof(filename), CUPS_DATADIR "/model/%s", argv[i] + 2);
 	    else
 	    {
 	      i ++;
-	      sprintf(filename, CUPS_DATADIR "/model/%s", argv[i]);
+	      snprintf(filename, sizeof(filename), CUPS_DATADIR "/model/%s", argv[i]);
 	    }
 
             set_printer_file(http, printer, filename);
@@ -393,7 +393,7 @@ add_printer_to_class(http_t *http,	/* I - Server connection */
   *    printer-uri
   */
 
-  sprintf(uri, "ipp://localhost/classes/%s", pclass);
+  snprintf(uri, sizeof(uri), "ipp://localhost/classes/%s", pclass);
 
   request = ippNew();
 
@@ -463,7 +463,7 @@ add_printer_to_class(http_t *http,	/* I - Server connection */
   * OK, the printer isn't part of the class, so add it...
   */
 
-  sprintf(uri, "ipp://localhost/printers/%s", printer);
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
 
   if (response != NULL &&
       (members = ippFindAttribute(response, "member-uris", IPP_TAG_URI)) != NULL)
@@ -520,7 +520,7 @@ default_printer(http_t *http,		/* I - Server connection */
   *    printer-uri
   */
 
-  sprintf(uri, "ipp://localhost/printers/%s", printer);
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
 
   request = ippNew();
 
@@ -579,7 +579,7 @@ delete_printer(http_t *http,		/* I - Server connection */
   *    printer-uri
   */
 
-  sprintf(uri, "ipp://localhost/printers/%s", printer);
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
 
   request = ippNew();
 
@@ -643,7 +643,7 @@ delete_printer_from_class(http_t *http,		/* I - Server connection */
   *    printer-uri
   */
 
-  sprintf(uri, "ipp://localhost/classes/%s", pclass);
+  snprintf(uri, sizeof(uri), "ipp://localhost/classes/%s", pclass);
 
   request = ippNew();
 
@@ -804,7 +804,7 @@ enable_printer(http_t *http,		/* I - Server connection */
   *    printer-is-accepting-jobs
   */
 
-  sprintf(uri, "ipp://localhost/printers/%s", printer);
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
 
   request = ippNew();
 
@@ -870,7 +870,7 @@ set_printer_device(http_t *http,	/* I - Server connection */
   *    printer-uri
   */
 
-  sprintf(uri, "ipp://localhost/printers/%s", printer);
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
 
   request = ippNew();
 
@@ -898,7 +898,7 @@ set_printer_device(http_t *http,	/* I - Server connection */
     * Convert filename to URI...
     */
 
-    sprintf(uri, "file:%s", device);
+    snprintf(uri, sizeof(uri), "file:%s", device);
     ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_URI, "device-uri", NULL,
                  uri);
   }
@@ -985,7 +985,7 @@ set_printer_file(http_t *http,		/* I - Server connection */
   *    printer-uri
   */
 
-  sprintf(uri, "ipp://localhost/printers/%s", printer);
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
 
   request = ippNew();
 
@@ -1050,7 +1050,7 @@ set_printer_info(http_t *http,		/* I - Server connection */
   *    printer-uri
   */
 
-  sprintf(uri, "ipp://localhost/printers/%s", printer);
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
 
   request = ippNew();
 
@@ -1113,7 +1113,7 @@ set_printer_location(http_t *http,	/* I - Server connection */
   *    printer-uri
   */
 
-  sprintf(uri, "ipp://localhost/printers/%s", printer);
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
 
   request = ippNew();
 
@@ -1150,5 +1150,5 @@ set_printer_location(http_t *http,	/* I - Server connection */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.9 1999/09/22 20:48:02 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.10 1999/10/10 15:41:15 mike Exp $".
  */

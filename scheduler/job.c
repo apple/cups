@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.39 1999/09/29 12:29:20 mike Exp $"
+ * "$Id: job.c,v 1.40 1999/10/10 15:41:11 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -662,7 +662,7 @@ StartJob(int       id,		/* I - Job ID */
 
   if (strncmp(printer->device_uri, "file:", 5) != 0)
   {
-    sscanf(printer->device_uri, "%[^:]", method);
+    sscanf(printer->device_uri, "%254[^:]", method);
     sprintf(command, "%s/backend/%s", ServerRoot, method);
 
     argv[0] = printer->device_uri;
@@ -977,5 +977,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.39 1999/09/29 12:29:20 mike Exp $".
+ * End of "$Id: job.c,v 1.40 1999/10/10 15:41:11 mike Exp $".
  */

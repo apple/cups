@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.33 1999/09/30 18:48:21 mike Exp $"
+ * "$Id: conf.c,v 1.34 1999/10/10 15:41:09 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -177,14 +177,18 @@ ReadConfiguration(void)
   else if (strcmp(language, "C") == 0 || strcmp(language, "POSIX") == 0)
     language = "en";
 
-  strcpy(DefaultLanguage, language);
+  strncpy(DefaultLanguage, language, sizeof(DefaultLanguage) - 1);
+  DefaultLanguage[sizeof(DefaultLanguage) - 1] = '\0';
 
   strcpy(DefaultCharset, DEFAULT_CHARSET);
   strcpy(RIPCache, "8m");
   if (getenv("TMPDIR") == NULL)
     strcpy(TempDir, "/var/tmp");
   else
-    strcpy(TempDir, getenv("TMPDIR"));
+  {
+    strncpy(TempDir, getenv("TMPDIR"), sizeof(TempDir) - 1);
+    TempDir[sizeof(TempDir) - 1] = '\0';
+  }
 
  /*
   * Find the default system group: "sys", "system", or "root"...
@@ -837,7 +841,7 @@ get_address(char               *value,		/* I - Value string */
   * Try to grab a hostname and port number...
   */
 
-  switch (sscanf(value, "%[^:]:%s", hostname, portname))
+  switch (sscanf(value, "%255[^:]:%255s", hostname, portname))
   {
     case 1 :
         if (strchr(hostname, '.') == NULL)
@@ -903,5 +907,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.33 1999/09/30 18:48:21 mike Exp $".
+ * End of "$Id: conf.c,v 1.34 1999/10/10 15:41:09 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.8 1999/09/27 17:36:28 mike Exp $"
+ * "$Id: classes.c,v 1.9 1999/10/10 15:40:18 mike Exp $"
  *
  *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -297,7 +297,7 @@ show_class_info(http_t      *http,
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
 
-  sprintf(uri, "ipp://localhost/classes/%s", name);
+  snprintf(uri, sizeof(uri), "ipp://localhost/classes/%s", name);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
 
@@ -341,7 +341,8 @@ show_class_info(http_t      *http,
   if ((attr = ippFindAttribute(response, "printer-uri-supported", IPP_TAG_URI)) != NULL)
   {
     strcpy(uri, "http:");
-    strcpy(uri + 5, strchr(attr->values[0].string.text, '/'));
+    strncpy(uri + 5, strchr(attr->values[0].string.text, '/'), sizeof(uri) - 6);
+    uri[sizeof(uri) - 1] = '\0';
   }
 
  /*
@@ -397,7 +398,7 @@ show_class_info(http_t      *http,
                  "attributes-natural-language", NULL,
 		 language->language);
 
-    sprintf(uri, "ipp://localhost/printers/%s", name);
+    snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", name);
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
 	         "printer-uri", NULL, uri);
 
@@ -481,5 +482,5 @@ show_class_info(http_t      *http,
 
 
 /*
- * End of "$Id: classes.c,v 1.8 1999/09/27 17:36:28 mike Exp $".
+ * End of "$Id: classes.c,v 1.9 1999/10/10 15:40:18 mike Exp $".
  */

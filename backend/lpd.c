@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.9 1999/08/09 17:13:54 mike Exp $"
+ * "$Id: lpd.c,v 1.10 1999/10/10 15:40:08 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -125,7 +125,10 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     fclose(fp);
   }
   else
-    strcpy(filename, argv[6]);
+  {
+    strncpy(filename, argv[6], sizeof(filename) - 1);
+    filename[sizeof(filename) - 1] = '\0';
+  }
 
  /*
   * Extract the hostname and printer name from the URI...
@@ -175,7 +178,7 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
   */
 
   va_start(ap, format);
-  bytes = vsprintf(buf, format, ap);
+  bytes = vsnprintf(buf, sizoef(buf), format, ap);
   va_end(ap);
 
   fprintf(stderr, "DEBUG: lpd_command %02.2x %s", buf[0], buf + 1);
@@ -308,19 +311,20 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
   gethostname(localhost, sizeof(localhost));
   localhost[31] = '\0'; /* RFC 1179, Section 7.2 - host name < 32 chars */
 
-  sprintf(control, "H%s\nP%s\n", localhost, user);
+  snprintf(control, sizeof(control), "H%s\nP%s\n", localhost, user);
   cptr = control + strlen(control);
 
   while (copies > 0)
   {
-    sprintf(cptr, "ldfA%03.3d%s\n", getpid() % 1000, localhost);
+    snprintf(cptr, sizeof(control) - cptr + control, "ldfA%03.3d%s\n",
+             getpid() % 1000, localhost);
     cptr   += strlen(cptr);
     copies --;
   }
 
-  sprintf(cptr, "UdfA%03.3d%s\nNdfA%03.3d%s\n",
-          getpid() % 1000, localhost,
-          getpid() % 1000, localhost);
+  snprintf(cptr, sizeof(control) - cptr + control, "UdfA%03.3d%s\nNdfA%03.3d%s\n",
+           getpid() % 1000, localhost,
+           getpid() % 1000, localhost);
 
   fprintf(stderr, "DEBUG: Control file is:\n%s", control);
 
@@ -389,5 +393,5 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
 
 /*
- * End of "$Id: lpd.c,v 1.9 1999/08/09 17:13:54 mike Exp $".
+ * End of "$Id: lpd.c,v 1.10 1999/10/10 15:40:08 mike Exp $".
  */

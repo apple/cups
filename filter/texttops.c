@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.17 1999/08/04 16:12:29 mike Exp $"
+ * "$Id: texttops.c,v 1.18 1999/10/10 15:40:40 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -188,7 +188,7 @@ WriteProlog(char       *title,	/* I - Title of job */
 
     if ((fp = fopen(CUPS_DATADIR "/data/psglyphs", "r")) != NULL)
     {
-      while (fscanf(fp, "%x%s", &unicode, glyph) == 2)
+      while (fscanf(fp, "%x%63s", &unicode, glyph) == 2)
         Glyphs[unicode] = strdup(glyph);
 
       fclose(fp);
@@ -198,7 +198,7 @@ WriteProlog(char       *title,	/* I - Title of job */
     {
       memset(chars, 0, sizeof(chars));
 
-      sprintf(filename, CUPS_DATADIR "/%s", charset + 4);
+      snprintf(filename, sizeof(filename), CUPS_DATADIR "/%s", charset + 4);
 
       if ((fp = fopen(filename, "r")) != NULL)
       {
@@ -564,5 +564,5 @@ write_string(int     col,	/* I - Start column */
 
 
 /*
- * End of "$Id: texttops.c,v 1.17 1999/08/04 16:12:29 mike Exp $".
+ * End of "$Id: texttops.c,v 1.18 1999/10/10 15:40:40 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.41 1999/09/17 19:11:46 mike Exp $"
+ * "$Id: dirsvc.c,v 1.42 1999/10/10 15:41:10 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -207,7 +207,7 @@ UpdateBrowseList(void)
   packet[bytes] = '\0';
 #endif /* DEBUG */
 
-  if (sscanf(packet, "%x%x%s", &type, &state, uri) != 3)
+  if (sscanf(packet, "%x%x%1023s", &type, &state, uri) != 3)
   {
     LogMessage(LOG_WARN, "UpdateBrowseList: Garbled browse packet - %s",
                packet);
@@ -246,7 +246,7 @@ UpdateBrowseList(void)
     */
 
     if (strncmp(resource, "/classes/", 9) == 0)
-      sprintf(name, "%s@%s", resource + 9, host);
+      snprintf(name, sizeof(name), "%s@%s", resource + 9, host);
     else
       return;
 
@@ -273,7 +273,10 @@ UpdateBrowseList(void)
 	}
       }
       else
-        strcpy(name, resource + 9);
+      {
+        strncpy(name, resource + 9, sizeof(name) - 1);
+        name[sizeof(name) - 1] = '\0';
+      }
 
     if (p == NULL)
     {
@@ -301,7 +304,7 @@ UpdateBrowseList(void)
     */
 
     if (strncmp(resource, "/printers/", 10) == 0)
-      sprintf(name, "%s@%s", resource + 10, host);
+      snprintf(name, sizeof(name), "%s@%s", resource + 10, host);
     else
       return;
 
@@ -328,7 +331,10 @@ UpdateBrowseList(void)
 	}
       }
       else
-        strcpy(name, resource + 10);
+      {
+        strncpy(name, resource + 10, sizeof(name) - 1);
+        name[sizeof(name) - 1] = '\0';
+      }
 
     if (p == NULL)
     {
@@ -548,5 +554,5 @@ SendBrowseList(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.41 1999/09/17 19:11:46 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.42 1999/10/10 15:41:10 mike Exp $".
  */

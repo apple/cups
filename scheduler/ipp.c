@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.28 1999/09/29 19:20:15 mike Exp $"
+ * "$Id: ipp.c,v 1.29 1999/10/10 15:41:11 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -478,11 +478,23 @@ add_class(client_t        *con,		/* I - Client connection */
   */
 
   if ((attr = ippFindAttribute(con->request, "printer-location", IPP_TAG_TEXT)) != NULL)
-    strcpy(pclass->location, attr->values[0].string.text);
+  {
+    strncpy(pclass->location, attr->values[0].string.text, sizeof(pclass->location) - 1);
+    pclass->location[sizeof(pclass->location) - 1] = '\0';
+  }
+
   if ((attr = ippFindAttribute(con->request, "printer-info", IPP_TAG_TEXT)) != NULL)
-    strcpy(pclass->info, attr->values[0].string.text);
+  {
+    strncpy(pclass->info, attr->values[0].string.text, sizeof(pclass->info) - 1);
+    pclass->info[sizeof(pclass->info) - 1] = '\0';
+  }
+
   if ((attr = ippFindAttribute(con->request, "printer-more-info", IPP_TAG_URI)) != NULL)
-    strcpy(pclass->more_info, attr->values[0].string.text);
+  {
+    strncpy(pclass->more_info, attr->values[0].string.text, sizeof(pclass->more_info) - 1);
+    pclass->more_info[sizeof(pclass->more_info) - 1] = '\0';
+  }
+
   if ((attr = ippFindAttribute(con->request, "printer-is-accepting-jobs", IPP_TAG_BOOLEAN)) != NULL)
   {
     LogMessage(LOG_INFO, "Setting %s printer-is-accepting-jobs to %d (was %d.)",
@@ -690,18 +702,33 @@ add_printer(client_t        *con,	/* I - Client connection */
   */
 
   if ((attr = ippFindAttribute(con->request, "printer-location", IPP_TAG_TEXT)) != NULL)
-    strcpy(printer->location, attr->values[0].string.text);
+  {
+    strncpy(printer->location, attr->values[0].string.text, sizeof(printer->location) - 1);
+    printer->location[sizeof(printer->location) - 1] = '\0';
+  }
+
   if ((attr = ippFindAttribute(con->request, "printer-info", IPP_TAG_TEXT)) != NULL)
-    strcpy(printer->info, attr->values[0].string.text);
+  {
+    strncpy(printer->info, attr->values[0].string.text, sizeof(printer->info) - 1);
+    printer->info[sizeof(printer->info) - 1] = '\0';
+  }
+
   if ((attr = ippFindAttribute(con->request, "printer-more-info", IPP_TAG_URI)) != NULL)
-    strcpy(printer->more_info, attr->values[0].string.text);
+  {
+    strncpy(printer->more_info, attr->values[0].string.text, sizeof(printer->more_info) - 1);
+    printer->more_info[sizeof(printer->more_info) - 1] = '\0';
+  }
+
   if ((attr = ippFindAttribute(con->request, "device-uri", IPP_TAG_URI)) != NULL)
   {
     LogMessage(LOG_INFO, "Setting %s device-uri to \"%s\" (was \"%s\".)",
                printer->name, attr->values[0].string.text, printer->device_uri);
 
-    strcpy(printer->device_uri, attr->values[0].string.text);
+    strncpy(printer->device_uri, attr->values[0].string.text,
+            sizeof(printer->device_uri) - 1);
+    printer->device_uri[sizeof(printer->device_uri) - 1] = '\0';
   }
+
   if ((attr = ippFindAttribute(con->request, "printer-is-accepting-jobs", IPP_TAG_BOOLEAN)) != NULL)
   {
     LogMessage(LOG_INFO, "Setting %s printer-is-accepting-jobs to %d (was %d.)",
@@ -1915,7 +1942,8 @@ print_job(client_t        *con,		/* I - Client connection */
   con->request  = NULL;
 
   strcpy(job->filename, con->filename);
-  strcpy(job->title, title);
+  strncpy(job->title, title, sizeof(job->title) - 1);
+
   con->filename[0] = '\0';
 
   strcpy(job->username, con->username);
@@ -2031,7 +2059,11 @@ reject_jobs(client_t        *con,	/* I - Client connection */
                                IPP_TAG_TEXT)) == NULL)
     strcpy(printer->state_message, "Rejecting Jobs");
   else
-    strcpy(printer->state_message, attr->values[0].string.text);
+  {
+    strncpy(printer->state_message, attr->values[0].string.text,
+            sizeof(printer->state_message) - 1);
+    printer->state_message[sizeof(printer->state_message) - 1] = '\0';
+  }
 
   if (dtype == CUPS_PRINTER_CLASS)
     LogMessage(LOG_INFO, "Class \'%s\' rejecting jobs (\'%s\').", name,
@@ -2301,7 +2333,11 @@ stop_printer(client_t        *con,	/* I - Client connection */
                                IPP_TAG_TEXT)) == NULL)
     strcpy(printer->state_message, "Paused");
   else
-    strcpy(printer->state_message, attr->values[0].string.text);
+  {
+    strncpy(printer->state_message, attr->values[0].string.text,
+            sizeof(printer->state_message) - 1);
+    printer->state_message[sizeof(printer->state_message) - 1] = '\0';
+  }
 
   if (dtype == CUPS_PRINTER_CLASS)
     LogMessage(LOG_INFO, "Class \'%s\' stopped by \'%s\'.", name,
@@ -2461,5 +2497,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.28 1999/09/29 19:20:15 mike Exp $".
+ * End of "$Id: ipp.c,v 1.29 1999/10/10 15:41:11 mike Exp $".
  */

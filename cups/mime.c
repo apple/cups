@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.14 1999/07/12 16:09:38 mike Exp $"
+ * "$Id: mime.c,v 1.15 1999/10/10 15:40:23 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -33,6 +33,9 @@
  * Revision History:
  *
  *   $Log: mime.c,v $
+ *   Revision 1.15  1999/10/10 15:40:23  mike
+ *   Scanf, strcpy, and sprintf security changes.
+ *
  *   Revision 1.14  1999/07/12 16:09:38  mike
  *   Fixed all constant arrays to use "const" modifier.
  *
@@ -198,7 +201,9 @@ mimeMerge(mime_t     *mime,	/* I - MIME database to add to */
   if (pathname == NULL)
     return (NULL);
 
-  strcpy(filename, pathname);
+  strncpy(filename, pathname, sizeof(filename) - 1);
+  filename[sizeof(filename) - 1] = '\0';
+
   pathsep = filename + strlen(filename);
   if (pathsep == filename ||
       (pathsep[-1] != '/' && pathsep[-1] != '\\'))
@@ -298,7 +303,7 @@ mimeMerge(mime_t     *mime,	/* I - MIME database to add to */
       * Load a mime.types file...
       */
 
-      sprintf(filename, "%s/%s", pathname, dent->d_name);
+      snprintf(filename, sizeof(filename), "%s/%s", pathname, dent->d_name);
       load_types(mime, filename);
     }
   }
@@ -318,7 +323,7 @@ mimeMerge(mime_t     *mime,	/* I - MIME database to add to */
       * Load a mime.convs file...
       */
 
-      sprintf(filename, "%s/%s", pathname, dent->d_name);
+      snprintf(filename, sizeof(filename), "%s/%s", pathname, dent->d_name);
       load_convs(mime, filename);
     }
   }
@@ -613,5 +618,5 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * End of "$Id: mime.c,v 1.14 1999/07/12 16:09:38 mike Exp $".
+ * End of "$Id: mime.c,v 1.15 1999/10/10 15:40:23 mike Exp $".
  */

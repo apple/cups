@@ -1,5 +1,5 @@
 /*
- * "$Id: lpc.c,v 1.5 1999/09/27 16:11:49 mike Exp $"
+ * "$Id: lpc.c,v 1.6 1999/10/10 15:40:15 mike Exp $"
  *
  *   "lpc" command for the Common UNIX Printing System (CUPS).
  *
@@ -411,7 +411,8 @@ show_status(http_t *http,	/* I - HTTP connection to server */
                        "attributes-natural-language", NULL,
 		       language->language);
 
-          sprintf(printer_uri, "ipp://localhost/printers/%s", printer);
+          snprintf(printer_uri, sizeof(printer_uri),
+                   "ipp://localhost/printers/%s", printer);
 	  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
 	                      "printer-uri", NULL, printer_uri);
 
@@ -462,5 +463,5 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpc.c,v 1.5 1999/09/27 16:11:49 mike Exp $".
+ * End of "$Id: lpc.c,v 1.6 1999/10/10 15:40:15 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.34 1999/10/10 13:42:13 mike Exp $"
+ * "$Id: util.c,v 1.35 1999/10/10 15:40:25 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -114,7 +114,7 @@ cupsCancelJob(const char *name,	/* I - Name of printer or class */
                "attributes-natural-language", NULL,
                language != NULL ? language->language : "C");
 
-  sprintf(uri, "ipp://%s:%d/printers/%s", hostname, ippPort(), printer);
+  snprintf(uri, sizeof(uri), "ipp://%s:%d/printers/%s", hostname, ippPort(), printer);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
 
@@ -268,9 +268,9 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 
         if (!password[0])
           break;
-	sprintf(plain, "%s:%s", cupsUser(), password);
+	snprintf(plain, sizeof(plain), "%s:%s", cupsUser(), password);
 	httpEncode64(encode, plain);
-	sprintf(authstring, "Basic %s", encode);
+	snprintf(authstring, sizeof(authstring), "Basic %s", encode);
 
         continue;
       }
@@ -478,7 +478,8 @@ cupsGetDefault(void)
   {
     if ((attr = ippFindAttribute(response, "printer-name", IPP_TAG_NAME)) != NULL)
     {
-      strcpy(def_printer, attr->values[0].string.text);
+      strncpy(def_printer, attr->values[0].string.text, sizeof(def_printer) - 1);
+      def_printer[sizeof(def_printer) - 1] = '\0';
       ippDelete(response);
       return (def_printer);
     }
@@ -521,19 +522,19 @@ cupsGetPPD(const char *name)	/* I - Printer name */
 #if defined(WIN32) || defined(__EMX__)
   tempdir = "C:/WINDOWS/TEMP";
 
-  sprintf(filename, "%s/%s.ppd", tempdir, printer);
+  snprintf(filename, sizeof(filename), "%s/%s.ppd", tempdir, printer);
 #else
   if ((tempdir = getenv("TMPDIR")) == NULL)
     tempdir = "/tmp";
 
-  sprintf(filename, "%s/%d.%s.ppd", tempdir, getuid(), printer);
+  snprintf(filename, sizeof(filename), "%s/%d.%s.ppd", tempdir, getuid(), printer);
 #endif /* WIN32 || __EMX__ */
 
  /*
   * And send a request to the HTTP server...
   */
 
-  sprintf(resource, "/printers/%s.ppd", printer);
+  snprintf(resource, sizeof(resource), "/printers/%s.ppd", printer);
 
   httpClearFields(cups_server);
   httpSetField(cups_server, HTTP_FIELD_HOST, hostname);
@@ -704,7 +705,7 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
   request->request.op.operation_id = IPP_PRINT_JOB;
   request->request.op.request_id   = 1;
 
-  sprintf(uri, "ipp://%s:%d/printers/%s", hostname, ippPort(), printer);
+  snprintf(uri, sizeof(uri), "ipp://%s:%d/printers/%s", hostname, ippPort(), printer);
 
   language = cupsLangDefault();
 
@@ -863,7 +864,7 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
   * Try printing the file...
   */
 
-  sprintf(uri, "/printers/%s", printer);
+  snprintf(uri, sizeof(uri), "/printers/%s", printer);
 
   if ((response = cupsDoFileRequest(cups_server, request, uri, filename)) == NULL)
     jobid = 0;
@@ -944,8 +945,8 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
 
 static char *				/* I - Printer name or NULL */
 cups_connect(const char *name,		/* I - Destination (printer[@host]) */
-	     char       *printer,	/* O - Printer name */
-             char       *hostname)	/* O - Hostname */
+	     char       *printer,	/* O - Printer name [HTTP_MAX_URI] */
+             char       *hostname)	/* O - Hostname [HTTP_MAX_URI] */
 {
   char		hostbuf[HTTP_MAX_URI];
 				/* Name of host */
@@ -957,15 +958,24 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
     return (NULL);
 
   if (sscanf(name, "%1023[^@]@%1023s", printerbuf, hostbuf) == 1)
-    strcpy(hostbuf, cupsServer());
+  {
+    strncpy(hostbuf, cupsServer(), sizeof(hostbuf) - 1);
+    hostbuf[sizeof(hostbuf) - 1] = '\0';
+  }
 
   if (hostname != NULL)
-    strcpy(hostname, hostbuf);
+  {
+    strncpy(hostname, hostbuf, HTTP_MAX_URI - 1);
+    hostname[HTTP_MAX_URI - 1] = '\0';
+  }
   else
     hostname = hostbuf;
 
   if (printer != NULL)
-    strcpy(printer, printerbuf);
+  {
+    strncpy(printer, printerbuf, HTTP_MAX_URI - 1);
+    printer[HTTP_MAX_URI - 1] = '\0';
+  }
   else
     printer = printerbuf;
 
@@ -985,5 +995,5 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.34 1999/10/10 13:42:13 mike Exp $".
+ * End of "$Id: util.c,v 1.35 1999/10/10 15:40:25 mike Exp $".
  */

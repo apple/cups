@@ -86,7 +86,7 @@ gdev_prn_alloc(gx_device *pdev)
 
 	if ((cache_env = getenv("RIP_MAX_CACHE")) != NULL)
 	{
-	  switch (sscanf(cache_env, "%d%s", &cache_size, cache_units))
+	  switch (sscanf(cache_env, "%d%254s", &cache_size, cache_units))
 	  {
 	    case 0 :
         	cache_size = 32 * 1024 * 1024;

@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.10 1999/07/27 11:37:18 mike Exp $"
+ * "$Id: type.c,v 1.11 1999/10/10 15:40:24 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -108,8 +108,8 @@ mimeAddType(mime_t     *mime,	/* I - MIME database */
   mime->num_types ++;
 
   *types = temp;
-  strcpy(temp->super, super);
-  strcpy(temp->type, type);
+  strncpy(temp->super, super, sizeof(temp->super) - 1);
+  strncpy(temp->type, type, sizeof(temp->type) - 1);
 
   if (mime->num_types > 1)
     qsort(mime->types, mime->num_types, sizeof(mime_type_t *),
@@ -392,7 +392,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
         * This is just a filename match on the extension...
 	*/
 
-	sprintf(value[0], "*.%s", name);
+	snprintf(value[0], sizeof(value[0]), "*.%s", name);
 	length[0]  = strlen(value[0]);
 	num_values = 1;
 	op         = MIME_MAGIC_MATCH;
@@ -582,8 +582,11 @@ mimeType(mime_t     *mime,	/* I - MIME database */
   * Lookup the type in the array...
   */
 
-  strcpy(key.super, super);
-  strcpy(key.type, type);
+  strncpy(key.super, super, sizeof(key.super) - 1);
+  key.super[sizeof(key.super) - 1] = '\0';
+  strncpy(key.type, type, sizeof(key.type) - 1);
+  key.type[sizeof(key.type) - 1] = '\0';
+
   keyptr = &key;
 
   match = (mime_type_t **)bsearch(&keyptr, mime->types, mime->num_types,
@@ -1007,5 +1010,5 @@ patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.10 1999/07/27 11:37:18 mike Exp $".
+ * End of "$Id: type.c,v 1.11 1999/10/10 15:40:24 mike Exp $".
  */
