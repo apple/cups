@@ -1,5 +1,5 @@
 /*
- * "$Id: cert.c,v 1.1 2000/01/20 03:51:33 mike Exp $"
+ * "$Id: cert.c,v 1.2 2000/07/24 15:30:15 mike Exp $"
  *
  *   Authentication certificate routines for the Common UNIX
  *   Printing System (CUPS).
@@ -53,9 +53,22 @@ AddCert(int        pid,			/* I - Process ID */
   FILE		*fp;			/* Certificate file */
   char		filename[1024];		/* Certificate filename */
   struct group	*grp;			/* System group */
+  struct timeval tod;			/* Time of day */
   static const char *hex = "0123456789ABCDEF";
 					/* Hex constants... */
 
+
+  if (pid == 0)
+  {
+   /*
+    * Initialize the random number generator using the current time,
+    * including milliseconds...
+    */
+
+    gettimeofday(&tod, NULL);
+
+    srandom(tod.tv_sec + tod.tv_usec);
+  }
 
  /*
   * Allocate memory for the certificate...
@@ -225,18 +238,6 @@ FindCert(const char *certificate)	/* I - Certificate */
 void
 InitCerts(void)
 {
-  struct timeval	tod;	/* Time of day */
-
-
- /*
-  * Initialize the random number generator using the current time,
-  * including milliseconds...
-  */
-
-  gettimeofday(&tod, NULL);
-
-  srandom(tod.tv_sec + tod.tv_usec);
-
  /*
   * Create a root certificate and return...
   */
@@ -246,5 +247,5 @@ InitCerts(void)
 
 
 /*
- * End of "$Id: cert.c,v 1.1 2000/01/20 03:51:33 mike Exp $".
+ * End of "$Id: cert.c,v 1.2 2000/07/24 15:30:15 mike Exp $".
  */
