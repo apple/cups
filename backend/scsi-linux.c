@@ -1,5 +1,5 @@
 /*
- * "$Id: scsi-linux.c,v 1.1 2002/05/24 21:04:47 mike Exp $"
+ * "$Id: scsi-linux.c,v 1.2 2002/06/04 18:26:03 mike Exp $"
  *
  *   Linux SCSI printer support for the Common UNIX Printing System (CUPS).
  *
@@ -58,6 +58,19 @@
 
 
 /*
+ * We currently only support the Linux 2.4 generic SCSI interface.
+ */
+
+#ifndef SG_DXFER_TO_DEV
+/*
+ * Dummy functions that do nothing on unsupported platforms...
+ */
+void	list_devices(void) {}
+int	print_device(const char *resource, int fd, int copies) { return (1); }
+#else
+
+
+/*
  * 'list_devices()' - List the available SCSI printer devices.
  */
 
@@ -84,9 +97,9 @@ print_device(const char *resource,	/* I - SCSI device */
   sg_io_hdr_t	scsi_req;		/* SCSI request */
   char		scsi_cmd[6],		/* SCSI command data */
 		scsi_sense[32];		/* SCSI sense data */
-#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+#  if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
-#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+#  endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
  /*
@@ -132,17 +145,17 @@ print_device(const char *resource,	/* I - SCSI device */
 
   if (fd != 0)
   {
-#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+#  ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
     sigset(SIGTERM, SIG_IGN);
-#elif defined(HAVE_SIGACTION)
+#  elif defined(HAVE_SIGACTION)
     memset(&action, 0, sizeof(action));
 
     sigemptyset(&action.sa_mask);
     action.sa_handler = SIG_IGN;
     sigaction(SIGTERM, &action, NULL);
-#else
+#  else
     signal(SIGTERM, SIG_IGN);
-#endif /* HAVE_SIGSET */
+#  endif /* HAVE_SIGSET */
   }
 
  /*
@@ -207,8 +220,9 @@ print_device(const char *resource,	/* I - SCSI device */
 
   return (0);
 }
+#endif /* !SG_DXFER_TO_DEV */
 
 
 /*
- * End of "$Id: scsi-linux.c,v 1.1 2002/05/24 21:04:47 mike Exp $".
+ * End of "$Id: scsi-linux.c,v 1.2 2002/06/04 18:26:03 mike Exp $".
  */
