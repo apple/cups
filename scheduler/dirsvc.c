@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.83 2001/07/24 14:00:07 mike Exp $"
+ * "$Id: dirsvc.c,v 1.84 2001/07/24 14:41:16 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1128,6 +1128,7 @@ SendSLPBrowse(printer_t *p)		/* I - Printer to register */
 					/* Info, quoted */
 		*src,			/* Pointer to original string */
 		*dst;			/* Pointer to destination string */
+  ipp_attribute_t *authentication;	/* uri-authentication-supported value */
   SLPError	error;			/* SLP error, if any */
 
 
@@ -1234,27 +1235,44 @@ SendSLPBrowse(printer_t *p)		/* I - Printer to register */
     strcpy(info, "Unknown");
 
  /*
+  * Get the authentication value...
+  */
+
+  authentication = ippFindAttribute(p->attrs, "uri-authentication-supported",
+                                    IPP_TAG_KEYWORD);
+
+ /*
   * Make the SLP attribute string list that conforms to
   * the IANA 'printer:' template.
   */
 
   snprintf(attrs, sizeof(attrs),
-           "(printer-xri-supported=%s),"
+           "(printer-uri-supported=%s),"
+           "(uri-authentication-supported=%s>),"
+#ifdef HAVE_LIBSSL
+           "(uri-security-supported=tls>),"
+#else
+           "(uri-security-supported=none>),"
+#endif /* HAVE_LIBSSL */
            "(printer-name=%s),"
            "(printer-location=%s),"
            "(printer-info=%s),"
            "(printer-more-info=%s),"
            "(printer-make-and-model=%s),"
+	   "(charset-supported=utf-8),"
+	   "(natural-language-configured=%s),"
+	   "(natural-language-supported=de,en,es,fr,it),"
            "(color-supported=%s),"
            "(finishings-supported=%s),"
-           "(sides-supported=%s),"
+           "(sides-supported=one-sided%s),"
 	   "(multiple-document-jobs-supported=true)"
 	   "(ipp-versions-supported=1.0,1.1)",
-	   p->uri, p->name, location, info, p->uri, make_model,
+	   p->uri, authentication->values[0].string.text, p->name, location,
+	   info, p->uri, make_model, DefaultLanguage,
            p->type & CUPS_PRINTER_COLOR ? "true" : "false",
            finishings,
            p->type & CUPS_PRINTER_DUPLEX ?
-	       "two-sided-long-edge,two-sided-short-edge" : "one-sided");
+	       ",two-sided-long-edge,two-sided-short-edge" : "");
 
   LogMessage(L_DEBUG2, "Attributes = \"%s\"", attrs);
 
@@ -1565,5 +1583,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.83 2001/07/24 14:00:07 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.84 2001/07/24 14:41:16 mike Exp $".
  */
