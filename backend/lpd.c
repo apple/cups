@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.20 2000/04/27 21:31:38 mike Exp $"
+ * "$Id: lpd.c,v 1.21 2000/08/01 17:12:20 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -60,7 +60,8 @@ extern int	rresvport(int *port);	/* Hello?  No prototype for this... */
 
 static int	lpd_command(int lpd_fd, char *format, ...);
 static int	lpd_queue(char *hostname, char *printer, char *filename,
-		          char *user, int copies);
+		          char *user, char *title, int copies, int banner,
+			  int format);
 
 
 /*
@@ -79,9 +80,15 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	hostname[1024],	/* Hostname */
 	username[255],	/* Username info (not used) */
 	resource[1024],	/* Resource info (printer name) */
+	*options,	/* Pointer to options */
+	name[255],	/* Name of option */
+	value[255],	/* Value of option */
+	*ptr,		/* Pointer into name or value */
 	filename[1024];	/* File to print */
   int	port;		/* Port number (not used) */
   int	status;		/* Status of LPD job */
+  int	banner;		/* Print banner page? */
+  int	format;		/* Print format */
 
 
   if (argc == 1)
@@ -143,20 +150,99 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   httpSeparate(argv[0], method, username, hostname, &port, resource);
 
  /*
+  * See if there are any options...
+  */
+
+  banner = 0;
+  format = 'l';
+
+  if ((options = strchr(resource, '?')) != NULL)
+  {
+   /*
+    * Yup, terminate the device name string and move to the first
+    * character of the options...
+    */
+
+    *options++ = '\0';
+
+   /*
+    * Parse options...
+    */
+
+    while (*options)
+    {
+     /*
+      * Get the name...
+      */
+
+      for (ptr = name; *options && *options != '=';)
+        *ptr++ = *options++;
+      *ptr = '\0';
+
+      if (*options == '=')
+      {
+       /*
+        * Get the value...
+	*/
+
+        options ++;
+
+	for (ptr = value; *options && *options != '+';)
+          *ptr++ = *options++;
+	*ptr = '\0';
+
+	if (*options == '+')
+	  options ++;
+      }
+      else
+        value[0] = '\0';
+
+     /*
+      * Process the option...
+      */
+
+      if (strcasecmp(name, "banner") == 0)
+      {
+       /*
+        * Set the banner...
+	*/
+
+        banner = !value[0] ||
+	         strcasecmp(value, "on") == 0 ||
+		 strcasecmp(value, "yes") == 0 ||
+		 strcasecmp(value, "true") == 0;
+      }
+      else if (strcasecmp(name, "format") == 0 && value[0])
+      {
+       /*
+        * Set output format...
+	*/
+
+        if (strchr("cdfglnoprtv", value[0]) != NULL)
+	  format = value[0];
+	else
+	  fprintf(stderr, "ERROR: Unknown format character \"%c\"\n", value[0]);
+      }
+    }
+  }
+
+ /*
   * Queue the job...
   */
 
   if (argc > 6)
   {
     status = lpd_queue(hostname, resource + 1, filename,
-                       argv[2] /* user */, atoi(argv[4]) /* copies */);
+                       argv[2] /* user */, argv[3] /* title */,
+		       atoi(argv[4]) /* copies */, banner, format);
 
     if (!status)
       fprintf(stderr, "PAGE: 1 %d\n", atoi(argv[4]));
   }
   else
     status = lpd_queue(hostname, resource + 1, filename,
-                       argv[2] /* user */, 1);
+                       argv[2] /* user */, argv[3] /* title */, 1,
+		       banner, format);
 
  /*
   * Remove the temporary file if necessary...
@@ -231,7 +317,10 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
           char *printer,	/* I - Printer/queue name */
 	  char *filename,	/* I - File to print */
           char *user,		/* I - Requesting user */
-	  int  copies)		/* I - Number of copies */
+	  char *title,		/* I - Job title */
+	  int  copies,		/* I - Number of copies */
+	  int  banner,		/* I - Print LPD banner? */
+          int  format)		/* I - Format specifier */
 {
   FILE			*fp;		/* Job file */
   char			localhost[255];	/* Local host name */
@@ -354,13 +443,18 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
   gethostname(localhost, sizeof(localhost));
   localhost[31] = '\0'; /* RFC 1179, Section 7.2 - host name < 32 chars */
 
-  snprintf(control, sizeof(control), "H%s\nP%s\n", localhost, user);
+  snprintf(control, sizeof(control), "H%s\nP%s\nJ%s\n", localhost, user, title);
   cptr = control + strlen(control);
+
+  if (banner)
+  {
+    snprintf(cptr, sizeof(control) - (cptr - control), "L%s\n", user);
+    cptr   += strlen(cptr);
+  }
 
   while (copies > 0)
   {
-    
-    snprintf(cptr, sizeof(control) - (cptr - control), "ldfA%03d%s\n",
+    snprintf(cptr, sizeof(control) - (cptr - control), "%cdfA%03d%s\n", format,
              getpid() % 1000, localhost);
     cptr   += strlen(cptr);
     copies --;
@@ -438,5 +532,5 @@ lpd_queue(char *hostname,	/* I - Host to connect to */
 
 
 /*
- * End of "$Id: lpd.c,v 1.20 2000/04/27 21:31:38 mike Exp $".
+ * End of "$Id: lpd.c,v 1.21 2000/08/01 17:12:20 mike Exp $".
  */
