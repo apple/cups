@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpoptions.man,v 1.9 2002/10/07 14:11:42 mike Exp $"
+.\" "$Id: lpoptions.man,v 1.10 2002/10/21 13:45:17 mike Exp $"
 .\"
 .\"   lpoptions man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpoptions 1 "Common UNIX Printing System" "7 October 2002" "Easy Software Products"
+.TH lpoptions 1 "Common UNIX Printing System" "21 October 2002" "Easy Software Products"
 .SH NAME
 lpoptions \- display or set printer options and defaults
 .SH SYNOPSIS
@@ -106,8 +106,17 @@ options for the named printer are reported on the standard output.
 .LP
 Options set with the \fBlpoptions\fR command are used by the \fBlp(1)\fR
 and \fBlpr(1)\fR commands when submitting jobs.
+.SH ROOT ACCOUNT OPTIONS
+When run by the root user, \fBlpoptions\fR gets and sets default
+options and instances for \fIall users\fR in the
+/etc/cups/lpoptions file.
 .SH COMPATIBILITY
 The \fBlpoptions\fR command is unique to CUPS.
+.SH FILES
+~/.lpoptions - user defaults and instances created by non-root users.
+.br
+/etc/cups/lpoptions - system-wide defaults and instances created by the root
+user.
 .SH SEE ALSO
 cancel(1), lp(1),
 CUPS Software Users Manual,
@@ -115,5 +124,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2002 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpoptions.man,v 1.9 2002/10/07 14:11:42 mike Exp $".
+.\" End of "$Id: lpoptions.man,v 1.10 2002/10/21 13:45:17 mike Exp $".
 .\"

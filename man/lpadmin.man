@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpadmin.man,v 1.7 2002/02/12 18:47:12 mike Exp $"
+.\" "$Id: lpadmin.man,v 1.8 2002/10/21 13:45:17 mike Exp $"
 .\"
 .\"   lpadmin man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpadmin 8 "Common UNIX Printing System" "23 January 2001" "Easy Software Products"
+.TH lpadmin 8 "Common UNIX Printing System" "21 October 2002" "Easy Software Products"
 .SH NAME
 lpadmin \- configure cups printers and classes
 .SH SYNOPSIS
@@ -44,8 +44,9 @@ lpadmin \- configure cups printers and classes
 ] \-x
 .I destination
 .SH DESCRIPTION
-\fIlpadmin\fR configures printer and class queues provided by CUPS. It can also
-be used to set the system default printer or class.
+\fIlpadmin\fR configures printer and class queues provided by
+CUPS. It can also be used to set the server default printer or
+class.
 .LP
 When specified before the \fI-d\fR, \fI-p\fR, or \fI-x\fR options,
 the \fI-E\fR option forces encryption when connecting to the server.
@@ -53,7 +54,7 @@ the \fI-E\fR option forces encryption when connecting to the server.
 The first form of the command sets the default printer or class to
 \fIdestination\fR.  Subsequent print jobs submitted via the \fIlp(1)\fR or
 \fIlpr(1)\fR commands will use this destination unless the user specifies
-otherwise.
+otherwise with the \fIlpoptions(1)\fR command.
 .LP
 The second form of the command configures the named printer.  The additional
 options are described below.
@@ -152,5 +153,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2002 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpadmin.man,v 1.7 2002/02/12 18:47:12 mike Exp $".
+.\" End of "$Id: lpadmin.man,v 1.8 2002/10/21 13:45:17 mike Exp $".
 .\"
