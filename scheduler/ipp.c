@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.7 2002/01/29 03:10:19 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.8 2002/01/31 13:00:26 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2874,6 +2874,7 @@ get_jobs(client_t        *con,		/* I - Client connection */
 			*requested;	/* Requested attributes */
   const char		*dest;		/* Destination */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  cups_ptype_t		dmask;		/* Destination type mask */
   char			method[HTTP_MAX_URI],
 					/* Method portion of URI */
 			username[HTTP_MAX_URI],
@@ -2900,16 +2901,24 @@ get_jobs(client_t        *con,		/* I - Client connection */
 
   httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
 
-  if ((strncmp(resource, "/jobs", 5) == 0 && strlen(resource) <= 6) ||
-      (strncmp(resource, "/printers", 9) == 0 && strlen(resource) <= 10))
+  if (strcmp(resource, "/") == 0 ||
+      (strncmp(resource, "/jobs", 5) == 0 && strlen(resource) <= 6))
   {
     dest  = NULL;
     dtype = (cups_ptype_t)0;
+    dmask = (cups_ptype_t)0;
+  }
+  else if (strncmp(resource, "/printers", 9) == 0 && strlen(resource) <= 10)
+  {
+    dest  = NULL;
+    dtype = (cups_ptype_t)0;
+    dmask = CUPS_PRINTER_CLASS;
   }
   else if (strncmp(resource, "/classes", 8) == 0 && strlen(resource) <= 9)
   {
     dest  = NULL;
     dtype = CUPS_PRINTER_CLASS;
+    dmask = CUPS_PRINTER_CLASS;
   }
   else if ((dest = ValidateDest(host, resource, &dtype)) == NULL)
   {
@@ -2921,6 +2930,8 @@ get_jobs(client_t        *con,		/* I - Client connection */
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
+  else
+    dmask = CUPS_PRINTER_CLASS;
 
  /*
   * See if the "which-jobs" attribute have been specified; if so, return
@@ -2980,10 +2991,12 @@ get_jobs(client_t        *con,		/* I - Client connection */
 
     DEBUG_printf(("get_jobs: job->id = %d\n", job->id));
 
-    if ((dest != NULL && strcmp(job->dest, dest) != 0))
+    if ((dest != NULL && strcmp(job->dest, dest) != 0) &&
+        (job->printer == NULL || dest == NULL ||
+	 strcmp(job->printer->name, dest) != 0))
       continue;
-    if (job->dtype != dtype &&
-        (username[0] == '\0' || strncmp(resource, "/jobs", 5) != 0))
+    if ((job->dtype & dmask) != dtype &&
+        (job->printer == NULL || (job->printer->type & dmask) != dtype))
       continue;
     if (username[0] != '\0' && strcmp(username, job->username) != 0)
       continue;
@@ -5671,5 +5684,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.7 2002/01/29 03:10:19 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.8 2002/01/31 13:00:26 mike Exp $".
  */

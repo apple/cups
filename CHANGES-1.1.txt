@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.13
 
+	- The lpstat command did not report jobs submitted to
+	  regular printer classes.
 	- The texttops filter didn't use sufficient precision
 	  when positioning text with some values of cpi and lpi.
 	  This could cause the alignment of text to stray.
