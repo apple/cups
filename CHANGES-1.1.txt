@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.13
 
+	- The pstops filter did not stop processing when a line
+	  containing a CTRL-D is seen.
 	- The scheduler no longer replaces the JobSheets values
 	  from the printers.conf and classes.conf files with the
 	  classification level, if set.  This way the original
