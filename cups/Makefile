@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.71 2002/05/14 01:14:27 mike Exp $"
+# "$Id: Makefile,v 1.72 2002/05/23 17:54:13 mike Exp $"
 #
 #   Support library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -185,9 +185,10 @@ testhttp:	testhttp.o libcups.a
 # testppd
 #
 
-testppd:	testppd.o ppd-debug.o language.o mark.o page.o
+testppd:	testppd.o ppd-debug.o language.o mark.o page.o string.o
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testppd.o ppd-debug.o language.o mark.o page.o
+	$(CC) $(LDFLAGS) -o $@ testppd.o ppd-debug.o language.o mark.o page.o \
+		string.o
 
 ppd-debug.o:	ppd.c ppd.h string.h ../config.h language.h debug.h
 	echo Compiling $< with debugging...
@@ -202,5 +203,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.71 2002/05/14 01:14:27 mike Exp $".
+# End of "$Id: Makefile,v 1.72 2002/05/23 17:54:13 mike Exp $".
 #
