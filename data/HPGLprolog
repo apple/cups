@@ -1,6 +1,6 @@
 %%BeginResource: procset hpgltops 1.0 0
 %
-% "$Id: HPGLprolog,v 1.3 1999/05/11 19:45:39 mike Exp $"
+% "$Id: HPGLprolog,v 1.4 1999/11/02 20:39:18 mike Exp $"
 %
 %   HP-GL/2 filter procset for the Common UNIX Printing System (CUPS).
 %
@@ -33,30 +33,4 @@
 /ST { stroke } bind def
 /CP { closepath } bind def
 /MP { newpath } bind def
-%
-% If you have more than 8 pens defined for your HP-GL/2 output you'll
-% need to add P# definitions (# = pen number) to set the appropriate color.
-% If you don't you'll get errors.  The default 8 pens cover the primary
-% colors (white, black, red, green, yellow, blue, magenta, cyan).  Ditto
-% for pen widths (W#).
-%
-% PC and PW commands in the input stream will define/redefine these
-% appropriately, but some packages don't generate them...
-%
-/P0 { 1.0 1.0 1.0 setrgbcolor } bind def
-/P1 { 0.0 0.0 0.0 setrgbcolor } bind def
-/P2 { 1.0 0.0 0.0 setrgbcolor } bind def
-/P3 { 0.0 1.0 0.0 setrgbcolor } bind def
-/P4 { 1.0 1.0 0.0 setrgbcolor } bind def
-/P5 { 0.0 0.0 1.0 setrgbcolor } bind def
-/P6 { 1.0 0.0 1.0 setrgbcolor } bind def
-/P7 { 0.0 1.0 1.0 setrgbcolor } bind def
-/W0 { DefaultPenWidth PenScaling mul setlinewidth } bind def
-/W1 { DefaultPenWidth PenScaling mul setlinewidth } bind def
-/W2 { DefaultPenWidth PenScaling mul setlinewidth } bind def
-/W3 { DefaultPenWidth PenScaling mul setlinewidth } bind def
-/W4 { DefaultPenWidth PenScaling mul setlinewidth } bind def
-/W5 { DefaultPenWidth PenScaling mul setlinewidth } bind def
-/W6 { DefaultPenWidth PenScaling mul setlinewidth } bind def
-/W7 { DefaultPenWidth PenScaling mul setlinewidth } bind def
 %%EndResource

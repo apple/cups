@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.17 1999/10/18 18:11:40 mike Exp $"
+ * "$Id: auth.c,v 1.18 1999/11/02 20:39:23 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -270,6 +270,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 		hostlen;	/* Length of hostname */
   struct passwd	*pw;		/* User password data */
   struct group	*grp;		/* Group data */
+  char		*pass;		/* Encrypted password */
 #ifdef HAVE_SHADOW_H
   struct spwd	*spw;		/* Shadow password data */
 #endif /* HAVE_SHADOW_H */
@@ -421,7 +422,11 @@ IsAuthorized(client_t *con)	/* I - Connection */
   endspent();
 
   if (spw == NULL && strcmp(pw->pw_passwd, "x") == 0)
+  {					/* Don't allow blank passwords! */
+    LogMessage(LOG_WARN, "IsAuthorized: Username \"%s\" has no shadow password; access denied.",
+               con->username);
     return (HTTP_UNAUTHORIZED);		/* No such user or bad shadow file */
+  }
 
 #    ifdef DEBUG
   if (spw != NULL)
@@ -447,7 +452,10 @@ IsAuthorized(client_t *con)	/* I - Connection */
   DEBUG_printf(("IsAuthorized: pw_passwd = %s, crypt = %s\n",
 		pw->pw_passwd, crypt(con->password, pw->pw_passwd)));
 
-  if (strcmp(pw->pw_passwd, crypt(con->password, pw->pw_passwd)) != 0)
+  pass = crypt(con->password, pw->pw_passwd);
+
+  if (pass == NULL ||
+      strcmp(pw->pw_passwd, crypt(con->password, pw->pw_passwd)) != 0)
   {
 #  ifdef HAVE_SHADOW_H
     if (spw != NULL)
@@ -455,7 +463,10 @@ IsAuthorized(client_t *con)	/* I - Connection */
       DEBUG_printf(("IsAuthorized: sp_pwdp = %s, crypt = %s\n",
 		    spw->sp_pwdp, crypt(con->password, spw->sp_pwdp)));
 
-      if (strcmp(spw->sp_pwdp, crypt(con->password, spw->sp_pwdp)) != 0)
+      pass = crypt(con->password, spw->sp_pwdp);
+
+      if (pass == NULL ||
+          strcmp(spw->sp_pwdp, crypt(con->password, spw->sp_pwdp)) != 0)
 	return (HTTP_UNAUTHORIZED);
     }
     else
@@ -708,5 +719,5 @@ pam_func(int                      num_msg,	/* I - Number of messages */
 
 
 /*
- * End of "$Id: auth.c,v 1.17 1999/10/18 18:11:40 mike Exp $".
+ * End of "$Id: auth.c,v 1.18 1999/11/02 20:39:23 mike Exp $".
  */
