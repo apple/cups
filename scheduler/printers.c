@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.70 2000/08/30 22:00:37 mike Exp $"
+ * "$Id: printers.c,v 1.71 2000/08/30 22:04:17 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1388,7 +1388,7 @@ ValidateDest(const char   *hostname,	/* I - Host name */
 		*sptr;			/* Pointer into server name */
 
 
-  printf("ValidateDest(\"%s\", \"%s\", %p)\n", hostname, resource, dtype);
+  DEBUG_printf(("ValidateDest(\"%s\", \"%s\", %p)\n", hostname, resource, dtype));
 
  /*
   * See if the resource is a class or printer...
@@ -1466,7 +1466,7 @@ ValidateDest(const char   *hostname,	/* I - Host name */
     }
   }
 
-  printf("localized hostname is \"%s\"...\n", localname);
+  DEBUG_printf(("localized hostname is \"%s\"...\n", localname));
 
  /*
   * Find a matching printer or class...
@@ -1531,5 +1531,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.70 2000/08/30 22:00:37 mike Exp $".
+ * End of "$Id: printers.c,v 1.71 2000/08/30 22:04:17 mike Exp $".
  */
