@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The IPP backend did not correctly execute the
+	  pictwpstops filter on OSX (STR #210)
 	- The LPD backend did not set the banner class when the
 	  "banner=yes" option was specified in the device URI
 	  (STR #209)

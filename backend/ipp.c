@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.38.2.27 2003/04/16 19:36:31 mike Exp $"
+ * "$Id: ipp.c,v 1.38.2.28 2003/07/30 17:04:38 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -55,6 +55,9 @@
  */
 
 static char	tmpfilename[1024] = "";	/* Temporary spool file name */
+#ifdef __APPLE__
+static char	pstmpname[1024] = "";	/* Temporary PostScript file name */
+#endif /* __APPLE__ */
 
 
 /*
@@ -98,7 +101,7 @@ const char	*password_cb(const char *);
 int		report_printer_state(ipp_t *ipp);
 
 #ifdef __APPLE__
-int		run_pictwps_filter(char **argv, char *filename, int length);
+int		run_pictwps_filter(char **argv, const char *filename);
 #endif /* __APPLE__ */
 static void	sigterm_handler(int sig);
 
@@ -633,8 +636,10 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	* so convert the document to PostScript...
 	*/
 
-	if (run_pictwps_filter(argv, filename, sizeof(filename)))
+	if (run_pictwps_filter(argv, filename))
 	  return (1);
+
+        filename = pstmpname;
 
        /*
 	* Change the MIME type to application/postscript...
@@ -892,11 +897,16 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     ippDelete(supported);
 
  /*
-  * Remove the temporary file if necessary...
+  * Remove the temporary file(s) if necessary...
   */
 
   if (tmpfilename[0])
     unlink(tmpfilename);
+
+#ifdef __APPLE__
+  if (pstmpname[0])
+    unlink(pstmpname);
+#endif /* __APPLE__ */
 
  /*
   * Return the queue status...
@@ -1045,9 +1055,8 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
  */
 
 int						/* O - Exit status of filter */
-run_pictwps_filter(char **argv,			/* I - Command-line arguments */
-                   char *filename,		/* I - Filename buffer */
-		   int  length)			/* I - Size of filename buffer */
+run_pictwps_filter(char       **argv,		/* I - Command-line arguments */
+                   const char *filename)	/* I - Filename */
 {
   struct stat	fileinfo;			/* Print file information */
   const char	*ppdfile;			/* PPD file for destination printer */
@@ -1085,7 +1094,7 @@ run_pictwps_filter(char **argv,			/* I - Command-line arguments */
   * Then create a temporary file for printing...
   */
 
-  if ((fd = cupsTempFd(filename, length)) < 0)
+  if ((fd = cupsTempFd(pstmpname, sizeof(pstmpname))) < 0)
   {
     fprintf(stderr, "ERROR: Unable to create temporary file - %s.\n",
             strerror(errno));
@@ -1099,7 +1108,18 @@ run_pictwps_filter(char **argv,			/* I - Command-line arguments */
   * as...
   */
 
-  stat(argv[6], &fileinfo);
+  if (argv[6])
+    stat(argv[6], &fileinfo);
+  else
+  {
+   /*
+    * Use the OSX defaults, as an up-stream filter created the PICT
+    * file...
+    */
+
+    fileinfo.st_uid = 1;
+    fileinfo.st_gid = 80;
+  }
 
   if (ppdfile)
     chown(ppdfile, fileinfo.st_uid, fileinfo.st_gid);
@@ -1132,7 +1152,7 @@ run_pictwps_filter(char **argv,			/* I - Command-line arguments */
     }
 
     execlp("pictwpstops", printer, argv[1], argv[2], argv[3], argv[4], argv[5],
-           argv[6], NULL);
+           filename, NULL);
     perror("ERROR: Unable to exec pictwpstops");
     return (errno);
   }
@@ -1203,16 +1223,21 @@ sigterm_handler(int sig)		/* I - Signal */
   (void)sig;	/* remove compiler warnings... */
 
  /*
-  * Remove the temporary file if necessary...
+  * Remove the temporary file(s) if necessary...
   */
 
   if (tmpfilename[0])
     unlink(tmpfilename);
+
+#ifdef __APPLE__
+  if (pstmpname[0])
+    unlink(pstmpname);
+#endif /* __APPLE__ */
 
   exit(1);
 }
 
 
 /*
- * End of "$Id: ipp.c,v 1.38.2.27 2003/04/16 19:36:31 mike Exp $".
+ * End of "$Id: ipp.c,v 1.38.2.28 2003/07/30 17:04:38 mike Exp $".
  */
