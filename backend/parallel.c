@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c,v 1.10 2000/01/26 02:42:46 mike Exp $"
+ * "$Id: parallel.c,v 1.11 2000/01/29 23:08:01 mike Exp $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -223,7 +223,7 @@ list_devices(void)
     if ((fd = open(device, O_WRONLY)) >= 0)
     {
       close(fd);
-      fprintf(stderr, "parallel parallel:%s \"\" "
+      fprintf(stderr, "direct parallel:%s \"\" "
                       "\"Parallel Port #%d\"\n", device, i + 1);
     }
     else
@@ -232,7 +232,7 @@ list_devices(void)
       if ((fd = open(device, O_WRONLY)) >= 0)
       {
 	close(fd);
-	fprintf(stderr, "parallel parallel:%s \"\" "
+	fprintf(stderr, "direct parallel:%s \"\" "
                 	"\"Parallel Port #%d\"\n", device, i + 1);
       }
     }
@@ -247,5 +247,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c,v 1.10 2000/01/26 02:42:46 mike Exp $".
+ * End of "$Id: parallel.c,v 1.11 2000/01/29 23:08:01 mike Exp $".
  */

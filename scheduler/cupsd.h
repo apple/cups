@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h,v 1.18 2000/01/04 13:46:09 mike Exp $"
+ * "$Id: cupsd.h,v 1.19 2000/01/29 23:08:01 mike Exp $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -143,7 +143,9 @@ VAR ipp_t		*Devices	VALUE(NULL),
  * Prototypes...
  */
 
+extern void	LoadDevices(const char *d);
+extern void	LoadPPDs(const char *d);
 
 /*
- * End of "$Id: cupsd.h,v 1.18 2000/01/04 13:46:09 mike Exp $".
+ * End of "$Id: cupsd.h,v 1.19 2000/01/29 23:08:01 mike Exp $".
  */

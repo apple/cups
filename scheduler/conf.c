@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.41 2000/01/27 03:38:34 mike Exp $"
+ * "$Id: conf.c,v 1.42 2000/01/29 23:08:01 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -208,6 +208,18 @@ ReadConfiguration(void)
     TempDir[sizeof(TempDir) - 1] = '\0';
   }
 
+  if (Devices)
+  {
+    ippDelete(Devices);
+    Devices = NULL;
+  }
+
+  if (PPDs)
+  {
+    ippDelete(PPDs);
+    PPDs = NULL;
+  }
+
  /*
   * Find the default system group: "sys", "system", or "root"...
   */
@@ -347,11 +359,19 @@ ReadConfiguration(void)
   mimeMerge(MimeDatabase, ServerRoot);
 
  /*
-  * Load printers, classes, and jobs...
+  * Load printers and classes...
   */
 
   LoadAllPrinters();
   LoadAllClasses();
+
+ /*
+  * Load devices and PPDs...
+  */
+
+  sprintf(directory, "%s/backend", ServerBin);
+  LoadDevices(directory);
+  LoadPPDs(CUPS_DATADIR "/model");
 
  /*
   * Add a default browser if browsing is enabled and no browser addresses
@@ -976,5 +996,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.41 2000/01/27 03:38:34 mike Exp $".
+ * End of "$Id: conf.c,v 1.42 2000/01/29 23:08:01 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: testmime.c,v 1.1 2000/01/25 03:50:49 mike Exp $"
+ * "$Id: testmime.c,v 1.2 2000/01/29 23:08:01 mike Exp $"
  *
  *   MIME test program for the Common UNIX Printing System (CUPS).
  *
@@ -104,7 +104,7 @@ main(int  argc,				/* I - Number of command-line args */
     case 3 :
         src = mimeFileType(mime, argv[1]);
 
-	sscanf(argv[2], "%15[^/]/31%s", super, type);
+	sscanf(argv[2], "%15[^/]/%31s", super, type);
         dst = mimeType(mime, super, type);
 
         filters = mimeFilter(mime, src, dst, &num_filters);
@@ -195,5 +195,5 @@ print_rules(mime_magic_t *rules)	/* I - Rules to print */
 
 
 /*
- * End of "$Id: testmime.c,v 1.1 2000/01/25 03:50:49 mike Exp $".
+ * End of "$Id: testmime.c,v 1.2 2000/01/29 23:08:01 mike Exp $".
  */

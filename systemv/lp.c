@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.16 2000/01/21 20:28:00 mike Exp $"
+ * "$Id: lp.c,v 1.17 2000/01/29 23:08:02 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -71,6 +71,9 @@ main(int  argc,		/* I - Number of command-line arguments */
   int		priority;	/* Job priority (1-100) */
   int		num_copies;	/* Number of copies per file */
   int		num_files;	/* Number of files printed */
+  int		num_dests;	/* Number of destinations */
+  cups_dest_t	*dests,		/* Destinations */
+		*destptr;	/* Selected destination */
   int		num_options;	/* Number of options */
   cups_option_t	*options;	/* Options */
   int		silent;		/* Silent or verbose output? */
@@ -327,5 +330,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.16 2000/01/21 20:28:00 mike Exp $".
+ * End of "$Id: lp.c,v 1.17 2000/01/29 23:08:02 mike Exp $".
  */
