@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c,v 1.3 2000/01/04 13:45:37 mike Exp $"
+ * "$Id: usersys.c,v 1.4 2000/03/10 16:32:25 mike Exp $"
  *
  *   User, system, and password routines for the Common UNIX Printing
  *   System (CUPS).
@@ -24,6 +24,9 @@
  *
  * Contents:
  *
+ *   cupsUser()        - Return the current users name.
+ *   cupsGetPassword() - Get a password from the user...
+ *   cupsServer()      - Return the hostname of the default server...
  */
 
 /*
@@ -120,7 +123,7 @@ cupsGetPassword(const char *prompt)	/* I - Prompt string */
 const char *				/* O - Server name */
 cupsServer(void)
 {
-  FILE		*fp;			/* cupsd.conf file */
+  FILE		*fp;			/* client.conf file */
   char		*server;		/* Pointer to server name */
   static char	line[1024];		/* Line from file */
 
@@ -133,14 +136,14 @@ cupsServer(void)
     return (server);
 
  /*
-  * Next check to see if we have a cupsd.conf file...
+  * Next check to see if we have a client.conf file...
   */
 
-  if ((fp = fopen(CUPS_SERVERROOT "/conf/cupsd.conf", "r")) == NULL)
+  if ((fp = fopen(CUPS_SERVERROOT "/client.conf", "r")) == NULL)
     return ("localhost");
 
  /*
-  * Read the cupsd.conf file and look for a ServerName line...
+  * Read the client.conf file and look for a ServerName line...
   */
 
   while (fgets(line, sizeof(line), fp) != NULL)
@@ -157,7 +160,10 @@ cupsServer(void)
       for (server = line + 11; isspace(*server); server ++);
 
       if (*server)
+      {
+        fclose(fp);
         return (server);
+      }
     }
 
  /*
@@ -171,5 +177,5 @@ cupsServer(void)
 
 
 /*
- * End of "$Id: usersys.c,v 1.3 2000/01/04 13:45:37 mike Exp $".
+ * End of "$Id: usersys.c,v 1.4 2000/03/10 16:32:25 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.45 2000/01/21 20:33:16 mike Exp $"
+ * "$Id: util.c,v 1.46 2000/03/10 16:32:25 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -494,12 +494,15 @@ cupsGetClasses(char ***classes)	/* O - Classes */
 const char *			/* O - Default printer or NULL */
 cupsGetDefault(void)
 {
+  FILE		*fp;		/* cupsd.conf file */
+  char		*printer;	/* Pointer to server name */
+  char		line[1024];	/* Line from file */
   ipp_t		*request,	/* IPP Request */
 		*response;	/* IPP Response */
   ipp_attribute_t *attr;	/* Current attribute */
   cups_lang_t	*language;	/* Default language */
   const char	*var;		/* Environment variable */
-  static char	def_printer[64];/* Default printer */
+  static char	def_printer[256];/* Default printer */
 
 
  /*
@@ -513,6 +516,43 @@ cupsGetDefault(void)
     return (var);
   else if ((var = getenv("PRINTER")) != NULL && strcmp(var, "lp") != 0)
     return (var);
+
+ /*
+  * Next check to see if we have a client.conf file...
+  */
+
+  if ((fp = fopen(CUPS_SERVERROOT "/client.conf", "r")) != NULL)
+  {
+   /*
+    * Read the client.conf file and look for a DefaultPrinter line...
+    */
+
+    while (fgets(line, sizeof(line), fp) != NULL)
+      if (strncmp(line, "DefaultPrinter ", 15) == 0)
+      {
+       /*
+	* Got it!  Drop any trailing newline and find the name...
+	*/
+
+	printer = line + strlen(line) - 1;
+	if (*printer == '\n')
+          *printer = '\0';
+
+	for (printer = line + 15; isspace(*printer); printer ++);
+
+	if (*printer)
+	{
+	  strncpy(def_printer, printer, sizeof(def_printer) - 1);
+	  def_printer[sizeof(def_printer) - 1] = '\0';
+
+	  fclose(fp);
+
+          return (def_printer);
+	}
+      }
+
+    fclose(fp);
+  }
 
  /*
   * Try to connect to the server...
@@ -1226,5 +1266,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.45 2000/01/21 20:33:16 mike Exp $".
+ * End of "$Id: util.c,v 1.46 2000/03/10 16:32:25 mike Exp $".
  */
