@@ -1,5 +1,5 @@
 /*
- * "$Id: http-addr.c,v 1.3 2002/12/17 18:56:41 swdev Exp $"
+ * "$Id: http-addr.c,v 1.4 2003/01/14 14:33:43 mike Exp $"
  *
  *   HTTP host/address routines for the Common UNIX Printing System (CUPS).
  *
@@ -64,7 +64,7 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
 
  /*
   * This function is needed because some operating systems have a
-  * buggy implementation of httpGetHostByName() that does not support
+  * buggy implementation of gethostbyname() that does not support
   * IP addresses.  If the first character of the name string is a
   * number, then sscanf() is used to extract the IP components.
   * We then pack the components into an IPv4 address manually,
@@ -114,5 +114,5 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
 
 
 /*
- * End of "$Id: http-addr.c,v 1.3 2002/12/17 18:56:41 swdev Exp $".
+ * End of "$Id: http-addr.c,v 1.4 2003/01/14 14:33:43 mike Exp $".
  */
