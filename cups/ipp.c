@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.14 1999/04/22 20:19:21 mike Exp $"
+ * "$Id: ipp.c,v 1.15 1999/04/30 15:42:39 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -40,6 +40,7 @@
  *   ippDelete()         - Delete an IPP request.
  *   ippFindAttribute()  - Find a named attribute in a request...
  *   ippLength()         - Compute the length of an IPP request.
+ *   ippPort()           - Return the default IPP port number.
  *   ippRead()           - Read data for an IPP request.
  *   ippTimeToDate()     - Convert from UNIX time to RFC 1903 format.
  *   ippWrite()          - Write data for an IPP request.
@@ -1371,13 +1372,16 @@ ippWrite(http_t *http,		/* I - HTTP data */
  * 'ippPort()' - Return the default IPP port number.
  */
 
-int			/* O - Port number */
+int				/* O - Port number */
 ippPort(void)
 {
-  struct servent *port;	/* Port number info */  
+  char		*server_port;	/* SERVER_PORT environment variable */
+  struct servent *port;		/* Port number info */  
 
 
-  if ((port = getservbyname("ipp", NULL)) == NULL)
+  if ((server_port = getenv("SERVER_PORT")) != NULL)
+    return (atoi(server_port));
+  else if ((port = getservbyname("ipp", NULL)) == NULL)
     return (IPP_PORT);
   else
     return (ntohs(port->s_port));
@@ -1450,5 +1454,5 @@ ipp_read(http_t *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.14 1999/04/22 20:19:21 mike Exp $".
+ * End of "$Id: ipp.c,v 1.15 1999/04/30 15:42:39 mike Exp $".
  */
