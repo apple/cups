@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.34.2.10 2002/08/14 04:10:55 mike Exp $"
+ * "$Id: texttops.c,v 1.34.2.11 2002/09/24 18:33:44 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -204,8 +204,7 @@ WriteProlog(const char *title,		/* I - Title of job */
   strftime(curdate, sizeof(curdate), CUPS_STRFTIME_FORMAT, curtm);
 
   puts("%!PS-Adobe-3.0");
-  printf("%%%%BoundingBox: %.0f %.0f %.0f %.0f\n", PageLeft, PageBottom,
-         PageRight, PageTop);
+  printf("%%%%BoundingBox: 0 0 %.0f %.0f\n", PageWidth, PageLength);
   printf("%%cupsRotation: %d\n", (Orientation & 3) * 90);
   puts("%%Creator: texttops/" CUPS_SVERSION);
   printf("%%%%CreationDate: %s\n", curdate);
@@ -892,17 +891,24 @@ WriteProlog(const char *title,		/* I - Title of job */
 
     puts("/n {");
     puts("\t20 string cvs % convert page number to string");
-    puts("\tdup length % get length");
-    puts("\tdup 2 mul string /P exch def % P = string twice as long");
-    puts("\t0 1 2 index 1 sub { % loop through each character in the page number");
-    puts("\t\tdup 3 index exch get % get character N from the page number");
-    puts("\t\texch 2 mul dup % compute offset in P");
-    puts("\t\tP exch 0 put % font 0");
-    puts("\t\t1 add P exch 2 index put % character");
-    puts("\t\tpop % discard character");
-    puts("\t} for % do for loop");
-    puts("\tpop pop % discard string and length");
-    puts("\tP % put string on stack");
+    if (NumFonts > 1)
+    {
+     /*
+      * Convert a number to double-byte chars...
+      */
+
+      puts("\tdup length % get length");
+      puts("\tdup 2 mul string /P exch def % P = string twice as long");
+      puts("\t0 1 2 index 1 sub { % loop through each character in the page number");
+      puts("\t\tdup 3 index exch get % get character N from the page number");
+      puts("\t\texch 2 mul dup % compute offset in P");
+      puts("\t\tP exch 0 put % font 0");
+      puts("\t\t1 add P exch 2 index put % character");
+      puts("\t\tpop % discard character");
+      puts("\t} for % do for loop");
+      puts("\tpop pop % discard string and length");
+      puts("\tP % put string on stack");
+    }
     puts("} bind def");
 
     printf("/T");
@@ -914,7 +920,7 @@ WriteProlog(const char *title,		/* I - Title of job */
     puts("def");
 
     puts("/H {");
-    puts("gsave");
+    puts("\tgsave");
     puts("\t0.9 setgray");
 
     if (Duplex)
@@ -1293,5 +1299,5 @@ write_text(const char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c,v 1.34.2.10 2002/08/14 04:10:55 mike Exp $".
+ * End of "$Id: texttops.c,v 1.34.2.11 2002/09/24 18:33:44 mike Exp $".
  */

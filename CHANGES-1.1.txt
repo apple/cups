@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The texttops filter incorrectly converted the page
+	  numbers in the prettyprint header to double-byte
+	  characters when printing a non-Unicode text file. This
+	  caused an extra space to appear between each digit in
+	  the page number.
 	- The scheduler did not use a case-insensitive
 	  comparison when adding filters for a printer.
 	- Upgraded the pdftops filter to Xpdf 1.01.
