@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c,v 1.16 1999/04/16 17:10:51 mike Exp $"
+ * "$Id: imagetoraster.c,v 1.17 1999/04/19 21:14:45 mike Exp $"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -704,6 +704,7 @@ main(int  argc,		/* I - Number of command-line arguments */
             r0 = z->rows[z->row];
             r1 = z->rows[1 - z->row];
 
+#if 0
             switch (header.cupsColorSpace)
 	    {
 	      case CUPS_CSPACE_W :
@@ -747,6 +748,51 @@ main(int  argc,		/* I - Number of command-line arguments */
 		                yerr0, yerr1, r0, r1);
 		  break;
 	    }
+#else
+            switch (header.cupsColorSpace)
+	    {
+	      case CUPS_CSPACE_W :
+	          format_W(&header, row, y, plane, z->xsize, z->ysize,
+		           yerr1, yerr0, r0, r1);
+		  break;
+	      case CUPS_CSPACE_RGB :
+	          format_RGB(&header, row, y, plane, z->xsize, z->ysize,
+		             yerr1, yerr0, r0, r1);
+		  break;
+	      case CUPS_CSPACE_RGBA :
+	          format_RGBA(&header, row, y, plane, z->xsize, z->ysize,
+		              yerr1, yerr0, r0, r1);
+		  break;
+	      case CUPS_CSPACE_K :
+	          format_K(&header, row, y, plane, z->xsize, z->ysize,
+		           yerr1, yerr0, r0, r1);
+		  break;
+	      case CUPS_CSPACE_CMY :
+	          format_CMY(&header, row, y, plane, z->xsize, z->ysize,
+		             yerr1, yerr0, r0, r1);
+		  break;
+	      case CUPS_CSPACE_YMC :
+	          format_YMC(&header, row, y, plane, z->xsize, z->ysize,
+		             yerr1, yerr0, r0, r1);
+		  break;
+	      case CUPS_CSPACE_CMYK :
+	          format_CMYK(&header, row, y, plane, z->xsize, z->ysize,
+		              yerr1, yerr0, r0, r1);
+		  break;
+	      case CUPS_CSPACE_YMCK :
+	          format_YMCK(&header, row, y, plane, z->xsize, z->ysize,
+		              yerr1, yerr0, r0, r1);
+		  break;
+	      case CUPS_CSPACE_KCMY :
+	          format_KCMY(&header, row, y, plane, z->xsize, z->ysize,
+		              yerr1, yerr0, r0, r1);
+		  break;
+	      case CUPS_CSPACE_KCMYcm :
+	          format_KCMYcm(&header, row, y, plane, z->xsize, z->ysize,
+		                yerr1, yerr0, r0, r1);
+		  break;
+	    }
+#endif /* 0 */
 
            /*
 	    * Write the raster data to the driver...
@@ -4048,5 +4094,5 @@ make_lut(ib_t  *lut,		/* I - Lookup table */
 
 
 /*
- * End of "$Id: imagetoraster.c,v 1.16 1999/04/16 17:10:51 mike Exp $".
+ * End of "$Id: imagetoraster.c,v 1.17 1999/04/19 21:14:45 mike Exp $".
  */
