@@ -2,8 +2,9 @@ gziptoany
 hpgltops
 imagetops
 imagetoraster
+libcupsimage.2.dylib
 libcupsimage.a
-libcupsimage.dylib.2
+libcupsimage.dylib
 libcupsimage.sl.2
 libcupsimage.so.2
 libcupsimage_s.a

@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.40 2003/07/20 02:07:45 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.41 2003/07/25 20:39:36 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -244,9 +244,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if ((val = cupsGetOption("page-border", num_options, options)) != NULL)
   {
-    if (strcasecmp(val, "none"))
+    if (!strcasecmp(val, "none"))
       Border = BORDER_NONE;
-    else if (strcasecmp(val, "single"))
+    else if (!strcasecmp(val, "single"))
       Border = BORDER_SINGLE;
     else if (!strcasecmp(val, "single-thick"))
       Border = BORDER_SINGLE2;
@@ -1886,5 +1886,5 @@ start_nup(int number,			/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.40 2003/07/20 02:07:45 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.41 2003/07/25 20:39:36 mike Exp $".
  */
