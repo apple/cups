@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c,v 1.23 2004/06/17 14:43:44 mike Exp $"
+ * "$Id: listen.c,v 1.24 2004/06/29 03:27:35 mike Exp $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -16,9 +16,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -254,5 +254,5 @@ StopListening(void)
 
 
 /*
- * End of "$Id: listen.c,v 1.23 2004/06/17 14:43:44 mike Exp $".
+ * End of "$Id: listen.c,v 1.24 2004/06/29 03:27:35 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.58 2004/04/28 19:19:13 mike Exp $"
+ * "$Id: classes.c,v 1.59 2004/06/29 03:27:35 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -721,5 +721,5 @@ UpdateImplicitClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.58 2004/04/28 19:19:13 mike Exp $".
+ * End of "$Id: classes.c,v 1.59 2004/06/29 03:27:35 mike Exp $".
  */

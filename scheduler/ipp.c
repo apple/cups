@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.230 2004/06/01 14:42:12 mike Exp $"
+ * "$Id: ipp.c,v 1.231 2004/06/29 03:27:35 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -15,9 +15,9 @@
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636-3142 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
@@ -6867,5 +6867,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.230 2004/06/01 14:42:12 mike Exp $".
+ * End of "$Id: ipp.c,v 1.231 2004/06/29 03:27:35 mike Exp $".
  */
