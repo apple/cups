@@ -1,5 +1,5 @@
 /*
- * "$Id: policy.c,v 1.1.2.7 2004/06/30 18:24:18 mike Exp $"
+ * "$Id: policy.c,v 1.1.2.8 2004/06/30 21:18:31 mike Exp $"
  *
  *   Policy routines for the Common UNIX Printing System (CUPS).
  *
@@ -214,19 +214,28 @@ CheckPolicy(policy_t   *p,		/* I - Policy */
     authenticated = 0;
   }
 
+  LogMessage(L_DEBUG2, "CheckPolicy: op=%04x, name=\"%s\", authenticated=%d, owner=\"%s\"",
+             op, name, authenticated, owner ? owner : "");
+
  /*
   * Find a match for the operation...
   */
 
   if ((po = FindPolicyOp(p, op)) == NULL)
+  {
+    LogMessage(L_DEBUG2, "CheckPolicy: No matching operation, returning 0!");
     return (0);
+  }
 
  /*
   * Check the policy against the current user, etc.
   */
 
   if (po->authenticate && !authenticated)
+  {
+    LogMessage(L_DEBUG2, "CheckPolicy: Operation requires authentication, returning 0!");
     return (0);
+  }
 
   switch (status = po->order_type)
   {
@@ -249,6 +258,8 @@ CheckPolicy(policy_t   *p,		/* I - Policy */
  /*
   * Return the status of the check...
   */
+
+  LogMessage(L_DEBUG2, "CheckPolicy: Returning %d...", !status);
 
   return (!status);
 }
@@ -522,5 +533,5 @@ check_op(policyop_t *po,		/* I - Policy operation */
 
 
 /*
- * End of "$Id: policy.c,v 1.1.2.7 2004/06/30 18:24:18 mike Exp $".
+ * End of "$Id: policy.c,v 1.1.2.8 2004/06/30 21:18:31 mike Exp $".
  */

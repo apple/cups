@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.4.2.21 2004/06/29 20:16:30 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.4.2.22 2004/06/30 21:18:32 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -215,6 +215,11 @@ Deny from all
 Allow from 127.0.0.1
 Require valid-user
 </Location>
+<Policy default>
+<Limit All>
+Order Deny,Allow
+</Limit>
+</Policy>
 EOF
 
 touch /tmp/$user/classes.conf
@@ -495,5 +500,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.4.2.21 2004/06/29 20:16:30 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.4.2.22 2004/06/30 21:18:32 mike Exp $"
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.57 2004/06/30 17:19:51 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.58 2004/06/30 21:18:31 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -661,7 +661,7 @@ ReadConfiguration(void)
 			 "Renew-Subscription Cancel-Subscription "
 			 "Get-Notifications Reprocess-Job Cancel-Current-Job "
 			 "Suspend-Current-Job Resume-Job CUPS-Move-Job>");
-      LogMessage(L_INFO, "Order Deny,Allow");
+      LogMessage(L_INFO, "Order Allow,Deny");
       LogMessage(L_INFO, "Allow @OWNER");
 
       po = AddPolicyOp(p, NULL, IPP_SEND_DOCUMENT);
@@ -705,7 +705,7 @@ ReadConfiguration(void)
 			 "CUPS-Add-Class CUPS-Delete-Class "
 			 "CUPS-Accept-Jobs CUPS-Reject-Jobs "
 			 "CUPS-Set-Default CUPS-Add-Device CUPS-Delete-Device>");
-      LogMessage(L_INFO, "Order Deny,Allow");
+      LogMessage(L_INFO, "Order Allow,Deny");
       LogMessage(L_INFO, "Authenticate yes");
 
       po = AddPolicyOp(p, NULL, IPP_PAUSE_PRINTER);
@@ -745,8 +745,8 @@ ReadConfiguration(void)
 
       LogMessage(L_INFO, "</Limit>");
 
-      LogMessage(L_INFO, "<Limit Any>");
-      LogMessage(L_INFO, "Order Allow,Deny");
+      LogMessage(L_INFO, "<Limit All>");
+      LogMessage(L_INFO, "Order Deny,Allow");
 
       po = AddPolicyOp(p, NULL, IPP_ANY_OPERATION);
       po->order_type = POLICY_ALLOW;
@@ -2262,7 +2262,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
       return (linenum);
     }
-    else if (!strncasecmp(name, "<Limit ", 7) && !op)
+    else if (!strcasecmp(name, "<Limit") && !op)
     {
      /*
       * Scan for IPP operation names...
@@ -2353,9 +2353,9 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
       */
 
       if (!strncasecmp(value, "deny", 4))
-        op->order_type = AUTH_ALLOW;
+        op->order_type = POLICY_ALLOW;
       else if (!strncasecmp(value, "allow", 5))
-        op->order_type = AUTH_DENY;
+        op->order_type = POLICY_DENY;
       else
         LogMessage(L_ERROR, "Unknown Order value %s on line %d.",
 	           value, linenum);
@@ -2880,5 +2880,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.57 2004/06/30 17:19:51 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.58 2004/06/30 21:18:31 mike Exp $".
  */
