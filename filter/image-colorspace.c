@@ -1,5 +1,5 @@
 /*
- * "$Id: image-colorspace.c,v 1.22.2.6 2002/04/29 15:58:06 mike Exp $"
+ * "$Id: image-colorspace.c,v 1.22.2.7 2003/01/07 16:55:30 mike Exp $"
  *
  *   Colorspace conversions for the Common UNIX Printing System (CUPS).
  *
@@ -1107,12 +1107,29 @@ rgb_to_xyz(ib_t *val)	/* IO - Color value */
   ciez = 0.019334 * r + 0.119193 * g + 0.950227 * b;
 
  /*
-  * Output 8-bit value...
+  * Output 8-bit values...
   */
 
-  val[0] = (int)(ciex * 255.0 + 0.5);
-  val[1] = (int)(ciey * 255.0 + 0.5);
-  val[2] = (int)(ciez * 255.0 + 0.5);
+  if (ciex < 0.0)
+    val[0] = 0;
+  else if (ciex < 255.0)
+    val[0] = (int)ciex;
+  else
+    val[0] = 255;
+
+  if (ciey < 0.0)
+    val[1] = 0;
+  else if (ciey < 255.0)
+    val[1] = (int)ciey;
+  else
+    val[1] = 255;
+
+  if (ciez < 0.0)
+    val[2] = 0;
+  else if (ciez < 255.0)
+    val[2] = (int)ciez;
+  else
+    val[2] = 255;
 }
 
 
@@ -1162,37 +1179,43 @@ rgb_to_lab(ib_t *val)	/* IO - Color value */
   else
     ciel = 903.3 * ciey_yn;
 
+  ciel = ciel;
   ciea = 500 * (cielab(ciex, D65_X) - cielab(ciey, D65_Y));
   cieb = 200 * (cielab(ciey, D65_Y) - cielab(ciez, D65_Z));
 
  /*
-  * Output 8-bit value...
+  * Scale the L value and bias the a and b values by 128 so that all
+  * numbers are from 0 to 255.
+  */
+
+  ciel *= 2.55;
+  ciea += 128;
+  cieb += 128;
+
+ /*
+  * Output 8-bit values...
   */
 
   if (ciel < 0.0)
     val[0] = 0;
   else if (ciel < 255.0)
-    val[0] = (int)(ciel + 0.5);
+    val[0] = (int)ciel;
   else
     val[0] = 255;
 
-  if (ciea < -127.0)
+  if (ciea < 0.0)
     val[1] = 128;
-  else if (ciea < 0.0)
-    val[1] = (int)(ciea + 256.5);
-  else if (ciea > 127.0)
-    val[1] = 127;
+  else if (ciea < 255.0)
+    val[1] = (int)ciea;
   else
-    val[1] = (int)(ciea + 0.5);
+    val[1] = 255;
 
-  if (cieb < -127.0)
+  if (cieb < 0.0)
     val[2] = 128;
-  else if (cieb < 0.0)
-    val[2] = (int)(cieb + 256.5);
-  else if (cieb > 127.0)
-    val[2] = 127;
+  else if (cieb < 255.0)
+    val[2] = (int)cieb;
   else
-    val[2] = (int)(cieb + 0.5);
+    val[2] = 255;
 }
 
 
@@ -1481,5 +1504,5 @@ zshear(float mat[3][3],	/* I - Matrix */
 
 
 /*
- * End of "$Id: image-colorspace.c,v 1.22.2.6 2002/04/29 15:58:06 mike Exp $".
+ * End of "$Id: image-colorspace.c,v 1.22.2.7 2003/01/07 16:55:30 mike Exp $".
  */

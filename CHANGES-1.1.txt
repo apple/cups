@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- Fixed the CIE colorspace support code in the image and
+	  PS RIPs.
 	- The job-quota-period, job-page-limit, and job-k-limit
 	  attributes were not flagged as integers, so setting
 	  quotas would not work.

@@ -1,10 +1,10 @@
 /*
- * "$Id: gdevcups.c,v 1.43.2.15 2002/10/04 19:54:09 mike Exp $"
+ * "$Id: gdevcups.c,v 1.43.2.16 2003/01/07 16:55:31 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 1993-2002 by Easy Software Products.
+ *   Copyright 1993-2003 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1629,21 +1629,21 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
           if (ciex > 1.0)
 	    ic = 255;
 	  else if (ciex > 0.0)
-	    ic = (int)(ciex * 255.0 + 0.5);
+	    ic = (int)(ciex * 255.0);
 	  else
 	    ic = 0;
 
           if (ciey > 1.0)
 	    im = 255;
 	  else if (ciey > 0.0)
-	    im = (int)(ciey * 255.0 + 0.5);
+	    im = (int)(ciey * 255.0);
 	  else
 	    im = 0;
 
           if (ciez > 1.0)
 	    iy = 255;
 	  else if (ciez > 0.0)
-	    iy = (int)(ciez * 255.0 + 0.5);
+	    iy = (int)(ciez * 255.0);
 	  else
 	    iy = 0;
 	}
@@ -1660,35 +1660,44 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 	  else
 	    ciel = 903.3 * ciey_yn;
 
-          if (ciel < 0.0)
-	    ic = 0;
-	  else if (ciel < 255.0)
-	    ic = (int)(ciel + 0.5);
-	  else
-	    ic = 255;
-
 	  ciea = 500 * (cups_map_cielab(ciex, D65_X) -
 	                cups_map_cielab(ciey, D65_Y));
 	  cieb = 200 * (cups_map_cielab(ciey, D65_Y) -
 	                cups_map_cielab(ciez, D65_Z));
 
-          if (ciea < -127.0)
-	    im = 128;
-	  else if (ciea < 0.0)
-	    im = (int)(ciea + 256.5);
-	  else if (ciea > 127.0)
-	    im = 127;
-	  else
-	    im = (int)(ciea + 0.5);
+         /*
+	  * Scale the L value and bias the a and b values by 128
+	  * so that all values are in the range of 0 to 255.
+	  */
 
-          if (cieb < -127.0)
-	    iy = 128;
-	  else if (cieb < 0.0)
-	    iy = (int)(cieb + 256.5);
-	  else if (cieb > 127.0)
-	    iy = 127;
+	  ciel *= 2.55;
+	  ciea += 128;
+	  cieb += 128;
+
+         /*
+	  * Convert to 8-bit values...
+	  */
+
+          if (ciel < 0.0)
+	    ic = 0;
+	  else if (ciel < 255.0)
+	    ic = ciel;
 	  else
-	    iy = (int)(cieb + 0.5);
+	    ic = 255;
+
+          if (ciea < 0.0)
+	    im = 0;
+	  else if (ciea < 255.0)
+	    im = ciea;
+	  else
+	    im = 255;
+
+          if (cieb < 0.0)
+	    iy = 0;
+	  else if (cieb < 255.0)
+	    iy = cieb;
+	  else
+	    iy = 255;
 	}
 
        /*
@@ -3640,5 +3649,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.43.2.15 2002/10/04 19:54:09 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.43.2.16 2003/01/07 16:55:31 mike Exp $".
  */
