@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c,v 1.18.2.26 2003/07/22 18:23:11 mike Exp $"
+ * "$Id: usb.c,v 1.18.2.27 2003/08/30 23:13:00 mike Exp $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -232,17 +232,21 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * do this while we write data to the printer, however at least some
   * Linux kernels have buggy USB drivers which don't like to be
   * queried while sending data to the printer...
+  *
+  * Also, we're using the 8255 constants instead of the ones that are
+  * supposed to be used, as it appears that the USB driver also doesn't
+  * follow standards...
   */
 
   if (ioctl(fd, LPGETSTATUS, &status) == 0)
   {
     fprintf(stderr, "DEBUG: LPGETSTATUS returned a port status of %02X...\n", status);
 
-    if (status & LP_NOPA)
+    if (!(status & LP_POUTPA))
       fputs("WARNING: Media tray empty!\n", stderr);
-    else if (status & LP_ERR)
+    else if (!(status & LP_PERRORP)
       fputs("WARNING: Printer fault!\n", stderr);
-    else if (status & LP_OFFL)
+    else if (!(status & LP_PSELECD))
       fputs("WARNING: Printer off-line.\n", stderr);
   }
 #endif /* __linux */
@@ -287,6 +291,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 	nbytes -= wbytes;
 	bufptr += wbytes;
       }
+
+      if (wbytes < 0)
+        break;
 
       if (argc > 6)
 	fprintf(stderr, "INFO: Sending print file, %lu bytes...\n",
@@ -791,5 +798,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb.c,v 1.18.2.26 2003/07/22 18:23:11 mike Exp $".
+ * End of "$Id: usb.c,v 1.18.2.27 2003/08/30 23:13:00 mike Exp $".
  */
