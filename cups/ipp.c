@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.80 2003/01/14 22:08:33 mike Exp $"
+ * "$Id: ipp.c,v 1.81 2003/01/15 21:03:36 mike Exp $"
  *
  *   Internet Printing Protocol object functions for the Common UNIX
  *   Printing System (CUPS).
@@ -124,7 +124,7 @@ ippAddBooleans(ipp_t      *ipp,		/* I - IPP request */
   DEBUG_printf(("ippAddBooleans(%p, %02x, \'%s\', %d, %p)\n", ipp,
                 group, name, num_values, values));
 
-  if (ipp == NULL || name == NULL)
+  if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
   if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
@@ -224,7 +224,7 @@ ippAddIntegers(ipp_t      *ipp,		/* I - IPP request */
   ipp_value_t		*value;		/* Current value */
 
 
-  if (ipp == NULL || name == NULL)
+  if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
   if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
@@ -323,7 +323,7 @@ ippAddStrings(ipp_t      *ipp,		/* I - IPP request */
   ipp_value_t		*value;		/* Current value */
 
 
-  if (ipp == NULL || name == NULL)
+  if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
   if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
@@ -413,7 +413,7 @@ ippAddRanges(ipp_t      *ipp,		/* I - IPP request */
   ipp_value_t		*value;		/* Current value */
 
 
-  if (ipp == NULL || name == NULL)
+  if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
   if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
@@ -486,7 +486,7 @@ ippAddResolutions(ipp_t      *ipp,	/* I - IPP request */
   ipp_value_t		*value;		/* Current value */
 
 
-  if (ipp == NULL || name == NULL)
+  if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
   if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
@@ -1915,7 +1915,7 @@ _ipp_add_attr(ipp_t *ipp,	/* I - IPP request */
 
   DEBUG_printf(("_ipp_add_attr(%p, %d)\n", ipp, num_values));
 
-  if (ipp == NULL || num_values < 0)
+  if (ipp == NULL || num_values < 1)
     return (NULL);
 
   attr = calloc(sizeof(ipp_attribute_t) +
@@ -2098,5 +2098,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.80 2003/01/14 22:08:33 mike Exp $".
+ * End of "$Id: ipp.c,v 1.81 2003/01/15 21:03:36 mike Exp $".
  */
