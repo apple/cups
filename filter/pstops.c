@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.15 2002/05/14 16:24:22 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.16 2002/05/15 20:49:56 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -361,6 +361,12 @@ main(int  argc,			/* I - Number of command-line arguments */
 	   Duplex ? " duplex" : "");
   else if (Duplex)
     puts("%%%%Requirements: duplex\n");
+
+ /*
+  * Apple uses RBI comments for various non-PPD options...
+  */
+
+  printf("%%%%RBINumCopies: %d\n", Copies);
 
  /*
   * Figure out if we should use ESPshowpage or not...
@@ -1088,11 +1094,11 @@ do_setup(ppd_file_t *ppd,		/* I - PPD file */
 
   if (copies > 1 && (!collate || !slowcollate))
   {
-    printf("%%ESPBeginNonPPDFeature: *NumCopies %d\n", copies);
+    printf("%%RBIBeginNonPPDFeature: *NumCopies %d\n", copies);
     printf("%d/languagelevel where{pop languagelevel 2 ge}{false}ifelse{1 dict begin"
 	    "/NumCopies exch def currentdict end " 
 	    "setpagedevice}{userdict/#copies 3 -1 roll put}ifelse\n", copies);
-    printf("%%ESPEndNonPPDFeature\n");
+    printf("%%RBIEndNonPPDFeature\n");
   }
 
  /*
@@ -1587,5 +1593,5 @@ start_nup(int number,		/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.15 2002/05/14 16:24:22 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.16 2002/05/15 20:49:56 mike Exp $".
  */
