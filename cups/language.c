@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.24 2002/02/12 18:47:12 mike Exp $"
+ * "$Id: language.c,v 1.25 2002/02/13 21:53:58 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -252,7 +252,7 @@ cupsLangGet(const char *language) /* I - Language or locale */
   if ((localedir = getenv("LOCALEDIR")) == NULL)
     localedir = CUPS_LOCALEDIR;
 
-  do
+  for (fp = NULL; fp == NULL;)
   {
     snprintf(filename, sizeof(filename), "%s/%s/cups_%s", localedir,
              real, real);
@@ -263,9 +263,10 @@ cupsLangGet(const char *language) /* I - Language or locale */
         *realptr = '\0';
       else if ((realptr = strchr(real, '_')) != NULL)
         *realptr = '\0';
+      else
+        break;
     }
   }
-  while (fp == NULL && strchr(real, '_') != NULL && strchr(real, '.') != NULL);
 
  /*
   * OK, we have an open messages file; the first line will contain the
@@ -426,5 +427,5 @@ cupsLangGet(const char *language) /* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.24 2002/02/12 18:47:12 mike Exp $".
+ * End of "$Id: language.c,v 1.25 2002/02/13 21:53:58 mike Exp $".
  */
