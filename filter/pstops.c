@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.26 2002/08/27 16:20:16 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.27 2002/09/25 18:23:40 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -443,13 +443,13 @@ main(int  argc,			/* I - Number of command-line arguments */
 	fputs(line, stdout);
         level --;
       }
-      else if (strncmp(line, "%cupsRotation:", 13) == 0 && level == 0)
+      else if (strncmp(line, "%cupsRotation:", 14) == 0 && level == 0)
       {
        /*
         * Reset orientation of document?
 	*/
 
-        int orient = (atoi(line + 13) / 90) & 3;
+        int orient = (atoi(line + 14) / 90) & 3;
 
         if (orient != Orientation)
 	{
@@ -1667,5 +1667,5 @@ start_nup(int number,		/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.26 2002/08/27 16:20:16 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.27 2002/09/25 18:23:40 mike Exp $".
  */
