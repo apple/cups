@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.180 2002/12/17 19:00:16 swdev Exp $"
+ * "$Id: job.c,v 1.181 2003/01/24 21:11:51 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -50,6 +50,8 @@
  *   StopAllJobs()        - Stop all print jobs.
  *   StopJob()            - Stop a print job.
  *   UpdateJob()          - Read a status update from a job's filters.
+ *   ipp_length()         - Compute the size of the buffer needed to hold 
+ *		            the textual IPP attributes.
  *   ipp_read_file()      - Read an IPP request from a file.
  *   ipp_write_file()     - Write an IPP request to a file.
  *   start_process()      - Start a background process.
@@ -67,6 +69,7 @@
  * Local functions...
  */
 
+static int		ipp_length(ipp_t *ipp);
 static ipp_state_t	ipp_read_file(const char *filename, ipp_t *ipp);
 static ipp_state_t	ipp_write_file(const char *filename, ipp_t *ipp);
 static void		set_time(job_t *job, const char *name);
@@ -1294,15 +1297,10 @@ StartJob(int       id,		/* I - Job ID */
   * for the moment we need to pass strings for command-line args and
   * not IPP attribute pointers... :)
   *
-  * First allocate/reallocate the option buffer as needed...  Using
-  * twice the raw length of the IPP attributes provides enough space for
-  * all options that are encoded as text, as we only need 1 byte of
-  * overhead for normal attributes and 6 bytes for boolean attributes,
-  * and each attribute has at least 5 bytes of overhead in the IPP
-  * message...
+  * First allocate/reallocate the option buffer as needed...
   */
 
-  i = 2 * ippLength(current->attrs);
+  i = ipp_length(current->attrs);
 
   if (i > optlength)
   {
@@ -2148,6 +2146,128 @@ UpdateJob(job_t *job)		/* I - Job to check */
       }
     }
   }
+}
+
+
+/*
+ * 'ipp_length()' - Compute the size of the buffer needed to hold 
+ *		    the textual IPP attributes.
+ */
+
+int				/* O - Size of buffer to hold IPP attributes */
+ipp_length(ipp_t *ipp)		/* I - IPP request */
+{
+  int			bytes; 	/* Number of bytes */
+  int			i;	/* Looping var */
+  ipp_attribute_t	*attr;  /* Current attribute */
+
+
+ /*
+  * Loop through all attributes...
+  */
+
+  bytes = 0;
+
+  for (attr = ipp->attrs; attr != NULL; attr = attr->next)
+  {
+   /*
+    * Skip attributes that won't be sent to filters...
+    */
+
+    if (attr->value_tag == IPP_TAG_MIMETYPE ||
+	attr->value_tag == IPP_TAG_NAMELANG ||
+	attr->value_tag == IPP_TAG_TEXTLANG ||
+	attr->value_tag == IPP_TAG_URI ||
+	attr->value_tag == IPP_TAG_URISCHEME)
+      continue;
+
+    if (strncmp(attr->name, "time-", 5) == 0)
+      continue;
+
+   /*
+    * Add space for a leading space and commas between each value.
+    * For the first attribute, the leading space isn't used, so the
+    * extra byte can be used as the nul terminator...
+    */
+
+    bytes ++;				/* " " separator */
+    bytes += attr->num_values;		/* "," separators */
+
+   /*
+    * Boolean attributes appear as "foo,nofoo,foo,nofoo", while
+    * other attributes appear as "foo=value1,value2,...,valueN".
+    */
+
+    if (attr->value_tag != IPP_TAG_BOOLEAN)
+      bytes += strlen(attr->name);
+    else
+      bytes += attr->num_values * strlen(attr->name);
+
+   /*
+    * Now add the size required for each value in the attribute...
+    */
+
+    switch (attr->value_tag)
+    {
+      case IPP_TAG_INTEGER :
+      case IPP_TAG_ENUM :
+         /*
+	  * Minimum value of a signed integer is -2147483647, or 11 digits.
+	  */
+
+	  bytes += attr->num_values * 11;
+	  break;
+
+      case IPP_TAG_BOOLEAN :
+         /*
+	  * Add two bytes for each false ("no") value...
+	  */
+
+          for (i = 0; i < attr->num_values; i ++)
+	    if (!attr->values[i].boolean)
+	      bytes += 2;
+	  break;
+
+      case IPP_TAG_RANGE :
+         /*
+	  * A range is two signed integers separated by a hyphen, or
+	  * 23 characters max.
+	  */
+
+	  bytes += attr->num_values * 23;
+	  break;
+
+      case IPP_TAG_RESOLUTION :
+         /*
+	  * A resolution is two signed integers separated by an "x" and
+	  * suffixed by the units, or 26 characters max.
+	  */
+
+	  bytes += attr->num_values * 26;
+	  break;
+
+      case IPP_TAG_STRING :
+      case IPP_TAG_TEXT :
+      case IPP_TAG_NAME :
+      case IPP_TAG_KEYWORD :
+      case IPP_TAG_CHARSET :
+      case IPP_TAG_LANGUAGE :
+         /*
+	  * Strings can contain characters that need quoting.  We need
+	  * at least 2 * len + 2 characters to cover the quotes and
+	  * any backslashes in the string.
+	  */
+
+          for (i = 0; i < attr->num_values; i ++)
+	    bytes += 2 * strlen(attr->values[i].string.text) + 2;
+	  break;
+
+       default :
+	  break; /* anti-compiler-warning-code */
+    }
+  }
+
+  return (bytes);
 }
 
 
@@ -3256,5 +3376,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.180 2002/12/17 19:00:16 swdev Exp $".
+ * End of "$Id: job.c,v 1.181 2003/01/24 21:11:51 mike Exp $".
  */
