@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h,v 1.21 2000/01/26 00:03:25 mike Exp $"
+ * "$Id: cups.h,v 1.22 2000/01/26 02:43:23 mike Exp $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -81,13 +81,13 @@ enum					/* Not a typedef'd enum so we can OR */
 
 typedef struct				/**** Printer Options ****/
 {
-  char		*name;			/* Name of option */
-  char		*value;			/* Value of option */
+  char		*name,			/* Name of option */
+		*value;			/* Value of option */
 } cups_option_t;
 
 typedef struct				/**** Destination ****/
 {
-  char		*name;			/* Printer or class name */
+  char		*name,			/* Printer or class name */
 		*instance;		/* Local instance name */
   int		is_default;		/* Is this printer the default? */
   int		num_options;		/* Number of options */
@@ -142,5 +142,5 @@ extern const char	*cupsUser(void);
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.21 2000/01/26 00:03:25 mike Exp $".
+ * End of "$Id: cups.h,v 1.22 2000/01/26 02:43:23 mike Exp $".
  */
