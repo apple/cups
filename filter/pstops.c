@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.57 2001/05/13 00:42:08 mike Exp $"
+ * "$Id: pstops.c,v 1.58 2001/05/21 21:14:12 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -327,12 +327,20 @@ main(int  argc,			/* I - Number of command-line arguments */
 	*/
 
         tbytes = atoi(strchr(line, ':') + 1);
+	fputs(line, stdout);
+
 	while (tbytes > 0)
 	{
 	  if (tbytes > sizeof(line))
 	    nbytes = fread(line, 1, sizeof(line), fp);
 	  else
 	    nbytes = fread(line, 1, tbytes, fp);
+
+          if (nbytes < 1)
+	  {
+	    perror("ERROR: Early end-of-file while reading binary data");
+	    return (1);
+	  }
 
 	  fwrite(line, 1, nbytes, stdout);
 	  tbytes -= nbytes;
@@ -354,10 +362,19 @@ main(int  argc,			/* I - Number of command-line arguments */
         level --;
       else if (strcmp(line, "\004") == 0)
         continue;
-      else if (strncmp(line, "%%EOF", 5) == 0 && level == 0)
+      else if (strncmp(line, "%%EOF", 5) == 0)
       {
-        fputs("DEBUG: Saw EOF!\n", stderr);
-        saweof = 1;
+       /*
+        * Use EOF comment to end non-conforming EPS files...
+	*/
+
+        if (level > 0)
+	  level --;
+	else
+	{
+          fputs("DEBUG: Saw EOF!\n", stderr);
+          saweof = 1;
+	}
 	break;
       }
       else if (strncmp(line, "%%Page:", 7) == 0 && level == 0)
@@ -408,6 +425,12 @@ main(int  argc,			/* I - Number of command-line arguments */
 	*/
 
         tbytes = atoi(strchr(line, ':') + 1);
+
+	if (!sloworder)
+	  fputs(line, stdout);
+	if (slowcollate || sloworder)
+	  fputs(line, temp);
+
 	while (tbytes > 0)
 	{
 	  if (tbytes > sizeof(line))
@@ -415,11 +438,17 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  else
 	    nbytes = fread(line, 1, tbytes, fp);
 
+          if (nbytes < 1)
+	  {
+	    perror("ERROR: Early end-of-file while reading binary data");
+	    return (1);
+	  }
+
           if (!sloworder)
 	    fwrite(line, 1, nbytes, stdout);
 
           if (slowcollate || sloworder)
-	    fwrite(line, 1, nbytes, stdout);
+	    fwrite(line, 1, nbytes, temp);
 
 	  tbytes -= nbytes;
 	}
@@ -562,12 +591,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
 
-    while (psgets(line, sizeof(line), fp) != NULL)
+    saweof = 1;
+
+    while ((nbytes = fread(line, 1, sizeof(line), fp)) > 0)
     {
-      fputs(line, stdout);
+      fwrite(line, 1, nbytes, stdout);
 
       if (slowcollate)
-	fputs(line, temp);
+	fwrite(line, 1, nbytes, temp);
     }
 
     if (UseESPsp)
@@ -707,7 +738,7 @@ copy_bytes(FILE   *fp,		/* I - File to read from */
 
   while (nleft > 0 || length == 0)
   {
-    if (nleft > sizeof(buffer))
+    if (nleft > sizeof(buffer) || length == 0)
       nbytes = sizeof(buffer);
     else
       nbytes = nleft;
@@ -963,5 +994,5 @@ start_nup(int number)	/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.57 2001/05/13 00:42:08 mike Exp $".
+ * End of "$Id: pstops.c,v 1.58 2001/05/21 21:14:12 mike Exp $".
  */
