@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: ipacked.h,v 1.2 2000/03/08 23:15:14 mike Exp $ */
+/*$Id: ipacked.h,v 1.3 2001/02/14 17:20:55 mike Exp $ */
 /* Packed array format for Ghostscript */
 
 #ifndef ipacked_INCLUDED
@@ -104,18 +104,41 @@ typedef enum {
     pt_executable_name = 7
 } packed_type;
 
+/*
+ * Hackery on top of hackery.
+ *
+ * I'll note in the beginning that this whole packed mechanism is not
+ * strictly conforming, so it's not surprising at all that it runs
+ * into problems somewhere.
+ *
+ * This is used where its pref operand may be a ref_packed, not necessarily
+ * aligned as strictly as a full-size ref.  The DEC C compiler, and possibly
+ * others, may compile code assuming that pref is ref-aligned.  Therefore, we
+ * explicitly cast the pointer to a less-strictly-aligned type.  In order to
+ * convince the compiler, we have to do the cast before indexing into the
+ * structure.
+ */
+#ifdef __GNUC__
+/* GCC looks through the cast as if it weren't there.  It turns out that
+   copying the value to a properly declared variable is convincing.  Use
+   a bit of other GCC magic to make this transparent.  */
+#define PACKED(pref)    ({ const ushort *_T_ = (const ushort *)(pref); _T_; })
+#else
+#define PACKED(pref)    ((const ushort *)(pref))
+#endif
+
 #define packed_per_ref (sizeof(ref) / sizeof(ref_packed))
 #define align_packed_per_ref\
   (arch_align_ref_mod / arch_align_short_mod)
 #define pt_tag(pt) ((ref_packed)(pt) << r_packed_type_shift)
 #define packed_value_mask ((1 << r_packed_value_bits) - 1)
 #define packed_max_value packed_value_mask
-#define r_is_packed(rp)  (*(const ref_packed *)(rp) >= pt_tag(pt_min_packed))
+#define r_is_packed(rp)  (*PACKED(rp) >= pt_tag(pt_min_packed))
 /* Names */
-#define r_packed_is_name(prp) (*(prp) >= pt_tag(pt_min_name))
-#define r_packed_is_exec_name(prp) (*(prp) >= pt_tag(pt_min_exec_name))
+#define r_packed_is_name(prp) (*PACKED(prp) >= pt_tag(pt_min_name))
+#define r_packed_is_exec_name(prp) (*PACKED(prp) >= pt_tag(pt_min_exec_name))
 #define packed_name_max_index packed_max_value
-#define packed_name_index(prp) (*(prp) & packed_value_mask)
+#define packed_name_index(prp) (*PACKED(prp) & packed_value_mask)
 /* Integers */
 #define packed_min_intval (-(1 << (r_packed_value_bits - 1)))
 #define packed_max_intval ((1 << (r_packed_value_bits - 1)) - 1)
@@ -124,10 +147,10 @@ typedef enum {
 /* Packed ref marking */
 #define lp_mark_shift 12
 #define lp_mark (1 << lp_mark_shift)
-#define r_has_pmark(rp) (*(rp) & lp_mark)
-#define r_set_pmark(rp) (*(rp) |= lp_mark)
-#define r_clear_pmark(rp) (*(rp) &= ~lp_mark)
-#define r_store_pmark(rp,pm) (*(rp) = (*(rp) & ~lp_mark) | (pm))
+#define r_has_pmark(rp) (*PACKED(rp) & lp_mark)
+#define r_set_pmark(rp) (*PACKED(rp) |= lp_mark)
+#define r_clear_pmark(rp) (*PACKED(rp) &= ~lp_mark)
+#define r_store_pmark(rp,pm) (*PACKED(rp) = (*PACKED(rp) & ~lp_mark) | (pm))
 
 /* Advance to the next element in a packed array. */
 #define packed_next(prp)\

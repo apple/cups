@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: zmisc.c,v 1.2 2000/03/08 23:15:40 mike Exp $ */
+/*$Id: zmisc.c,v 1.3 2001/02/14 17:20:55 mike Exp $ */
 /* Miscellaneous operators */
 #include "errno_.h"
 #include "memory_.h"
@@ -80,7 +80,7 @@ zbind(os_ptr op)
 	    r_dec_size(bsp, 1);
 	    if (r_is_packed(tp)) {
 		/* Check for a packed executable name */
-		ushort elt = *(ushort *) tp;
+		ushort elt = *PACKED(tp);
 
 		if (r_packed_is_exec_name(&elt)) {
 		    ref nref;
@@ -92,7 +92,7 @@ zbind(os_ptr op)
 			r_is_ex_oper(pvalue)
 			)
 			/* Note: can't undo this by restore! */
-			*(ushort *) tp =
+			*PACKED(tp) =
 			    pt_tag(pt_executable_operator) +
 			    op_index(pvalue);
 		}

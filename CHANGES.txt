@@ -1,4 +1,4 @@
-CHANGES.txt - 02/13/2001
+CHANGES.txt - 02/14/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.6-3
@@ -34,6 +34,7 @@ CHANGES IN CUPS V1.1.6-3
 	- Caldera fix: lpq didn't recognize BSD lpq "-a" option.
 	- Caldera fix: lpr didn't recognize BSD lpr "-1", "-2",
 	  "-3", "-4", "-q", or "-U" options.
+	- RedHat fixes: patches to GNU Ghostscript
 	- SuSE fix: Exit from child if setgid() or setuid()
 	  fails.
 	- SuSE fix: Added setgroups() calls after setgid() and

@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: igcref.c,v 1.2 2000/03/08 23:15:11 mike Exp $ */
+/*$Id: igcref.c,v 1.3 2001/02/14 17:20:55 mike Exp $ */
 /* ref garbage collector for Ghostscript */
 #include "memory_.h"
 #include "ghost.h"
@@ -546,15 +546,16 @@ igc_reloc_ref_ptr(const ref_packed * prp, gc_state_t * ignored)
 				 * each such unmarked packed ref we pass over,
 				 * we have to decrement the final relocation.
 				 */
-	    rputc((*rp & lp_mark ? '1' : '0'));
-	    if (!(*rp & lp_mark)) {
-		if (*rp != pt_tag(pt_integer) + packed_max_value) {	/* This is a stored relocation value. */
-		    rputc('\n');
-		    return print_reloc(prp, "ref",
-				       (ref_packed *)
-				       ((const char *)prp -
-					(*rp & packed_value_mask) + dec));
-		}
+		rputc((*PACKED(rp) & lp_mark ? '1' : '0'));
+		if (!(*PACKED(rp) & lp_mark)) {
+			if (*PACKED(rp) != pt_tag(pt_integer) + packed_max_value) {
+				/* This is a stored reloacation value. */
+				rputc('\n');
+				return print_reloc(prp, "ref",
+						(ref_packed *)
+						((const char *)prp -
+						 (*rp & packed_value_mask) + dec));
+			}
 		/*
 		 * We know this is the first of an aligned block
 		 * of packed refs.  Skip over the entire block,
@@ -622,7 +623,7 @@ refs_compact(obj_header_t * pre, obj_header_t * dpre, uint size)
 	    if (r_has_pmark(src)) {
 		if_debug2('8', "  [8]packed ref 0x%lx copied to 0x%lx\n",
 			  (ulong) src, (ulong) dest);
-		*dest++ = *src & ~lp_mark;
+		*dest++ = *PACKED(src) & ~lp_mark;
 	    }
 	    src++;
 	} else {		/* full-size ref */

@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gsdparam.c,v 1.7 2000/09/10 16:46:41 mike Exp $ */
+/*$Id: gsdparam.c,v 1.8 2001/02/14 17:20:54 mike Exp $ */
 /* Default device parameters for Ghostscript library */
 #include "memory_.h"		/* for memcpy */
 #include "string_.h"		/* for strlen */
@@ -370,12 +370,12 @@ private int param_check_bool(P4(gs_param_list *, gs_param_name, bool, bool));
 #endif /****** not used ***** */
 private int param_check_long(P4(gs_param_list *, gs_param_name, long, bool));
 
-#define param_check_int(plist, pname, ival, defined)\
-  param_check_long(plist, pname, (long)(ival), defined)
+#define param_check_int(plist, pname, ival, isdefined)\
+  param_check_long(plist, pname, (long)(ival), isdefined)
 private int param_check_bytes(P5(gs_param_list *, gs_param_name, const byte *, uint, bool));
 
-#define param_check_string(plist, pname, str, defined)\
-  param_check_bytes(plist, pname, (const byte *)str, strlen(str), defined)
+#define param_check_string(plist, pname, strg, isdefined)\
+  param_check_bytes(plist, pname, (const byte *)strg, strlen(strg), isdefined)
 
 /* Set the device parameters. */
 /* If the device was open and the put_params procedure closed it, */

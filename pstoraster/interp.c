@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: interp.c,v 1.2 2000/03/08 23:15:14 mike Exp $ */
+/*$Id: interp.c,v 1.3 2001/02/14 17:20:55 mike Exp $ */
 /* Ghostscript language interpreter */
 #include "memory_.h"
 #include "string_.h"
@@ -1263,7 +1263,7 @@ interp(ref * pref /* object to interpret */ , ref * perror_object)
 	    {
 		uint index;
 
-		switch (*(const ushort *)iref >> r_packed_type_shift) {
+		switch (*PACKED(iref) >> r_packed_type_shift) {
 		    case pt_full_ref:
 		    case pt_full_ref + 1:
 			if (iosp >= ostop)
@@ -1276,7 +1276,7 @@ interp(ref * pref /* object to interpret */ , ref * perror_object)
 			ref_assign_inline(iosp, iref);
 			next();
 		    case pt_executable_operator:
-			index = *(const ushort *)iref & packed_value_mask;
+			index = *PACKED(iref) & packed_value_mask;
 			if (--ticks_left <= 0) {	/* The following doesn't work, */
 			    /* and I can't figure out why. */
 /****** goto sst_short; ******/
@@ -1357,12 +1357,12 @@ interp(ref * pref /* object to interpret */ , ref * perror_object)
 			    return_with_stackoverflow_iref();
 			++iosp;
 			make_int(iosp,
-				 (*(const short *)iref & packed_int_mask) +
+				 (*PACKED(iref) & packed_int_mask) +
 				 packed_min_intval);
 			next_short();
 		    case pt_literal_name:
 			{
-			    uint nidx = *(const ushort *)iref & packed_value_mask;
+			    uint nidx = *PACKED(iref) & packed_value_mask;
 
 			    if (iosp >= ostop)
 				return_with_stackoverflow_iref();
@@ -1373,7 +1373,7 @@ interp(ref * pref /* object to interpret */ , ref * perror_object)
 		    case pt_executable_name:
 			{
 			    uint nidx =
-			    (uint) * (const ushort *)iref & packed_value_mask;
+			    (uint) * PACKED(iref) & packed_value_mask;
 
 			    pvalue = name_index_ptr_inline(int_nt, nidx)->pvalue;
 			    if (!pv_valid(pvalue)) {

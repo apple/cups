@@ -22,7 +22,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: iref.h,v 1.2 2000/03/08 23:15:15 mike Exp $ */
+/*$Id: iref.h,v 1.3 2001/02/14 17:20:55 mike Exp $ */
 /* Object structure and type definitions for Ghostscript */
 
 #ifndef iref_INCLUDED
@@ -351,17 +351,11 @@ struct ref_s {
   t_operator : r_type(rp))
 #define r_type_xe_shift (r_type_shift - 2)
 #define type_xe_(tas) ((tas) >> r_type_xe_shift)	/* internal use only */
-/*
- * The r_type_xe macro is used in (and only in) the main interpreter loop,
+/* The r_type_xe macro is used in (and only in) the main interpreter loop,
  * where its rp operand may be a ref_packed, not necessarily aligned as
- * strictly as a full-size ref.  The DEC C compiler, and possibly others,
- * may compile code assuming that rp is ref-aligned.  Therefore, we
- * explicitly cast the pointer to a less-strictly-aligned type.
- * In order to convince the compiler, we have to do the cast before
- * indexing into the structure.
- */
+ * strictly as a full-size ref.  */
 #define r_type_xe(rp)\
-  type_xe_(((const ushort *)(rp))[offset_of(ref, tas.type_attrs) / sizeof(ushort)])
+  type_xe_(PACKED(rp)[offset_of(ref, tas.type_attrs) / sizeof(ushort)])
 #define type_xe_value(t,xe) type_xe_(((t) << r_type_shift) + (xe))
 #define r_type_attrs(rp) ((rp)->tas.type_attrs)		/* reading only */
 #define r_has_attrs(rp,mask) !(~r_type_attrs(rp) & (mask))
