@@ -3,8 +3,9 @@ hpgltops
 images
 imagetops
 imagetoraster
+libcupsimage.2.dylib
 libcupsimage.a
-libcupsimage.dylib.2
+libcupsimage.dylib
 libcupsimage_s.a
 libcupsimage.sl.2
 libcupsimage.so.2

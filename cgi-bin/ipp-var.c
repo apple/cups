@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c,v 1.36 2003/07/20 03:35:04 mike Exp $"
+ * "$Id: ipp-var.c,v 1.37 2003/07/25 20:38:28 mike Exp $"
  *
  *   IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -150,7 +150,7 @@ ippGetAttributes(ipp_t      *request,	/* I - IPP request */
   if (num_attrs > 0)
   {
     ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-                  "requested-attributes", num_attrs, NULL, attrs);
+                  "requested-attributes", num_attrs, NULL, (const char **)attrs);
 
     for (i = 0; i < num_attrs; i ++)
       free(attrs[i]);
@@ -506,5 +506,5 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
- * End of "$Id: ipp-var.c,v 1.36 2003/07/20 03:35:04 mike Exp $".
+ * End of "$Id: ipp-var.c,v 1.37 2003/07/25 20:38:28 mike Exp $".
  */
