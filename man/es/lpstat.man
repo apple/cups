@@ -1,0 +1,126 @@
+.\" 
+.\" "$Id: lpstat.man,v 1.1 2004/10/20 18:00:54 mike Exp $"
+.\" 
+.\" lpstat man page for the Common UNIX Printing System (CUPS).
+.\" 
+.\" Copyright 1997-2004 by Easy Software Products.
+.\" 
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Easy Software Products and are protected by Federal
+.\" copyright law.  Distribution and use rights are outlined in the file
+.\" "LICENSE.txt" which should have been included with this file.  If this
+.\" file is missing or damaged please contact Easy Software Products
+.\" at:
+.\" 
+.\" Attn: CUPS Licensing Information
+.\" Easy Software Products
+.\" 44141 Airport View Drive, Suite 204
+.\" Hollywood, Maryland 20636-3142 USA
+.\" 
+.\" Voice: (301) 373-9600
+.\" EMail: cups-info@cups.org
+.\" WWW: http://www.cups.org
+.\" 
+.TH "lpstat" "1" "Common UNIX Printing System" "3 de Enero de 2003" "Easy Software Products"
+.SH "NOMBRE"
+lpstat \- imprime la información de estado de cups
+.SH "SINOPSIS"
+.B lpstat
+[ \-E ] [ \-h
+.I servidor
+] [ \-l ] [ \-W
+.I que\-trabajos
+] [ \-a [
+.I destino(s)
+] ] [ \-c [
+.I clase(s)
+] [ \-d ] [ \-o [
+.I destino(s)
+] ] [ \-p [
+.I impresora(s)
+] ] [ \-r ] [ \-R ] [ \-s ] [ \-t ] [ \-u [
+.I usuario(s)
+] ] [ \-v [
+.I impresora(s)
+] ]
+.SH "DESCRIPCIÓN"
+\fBlpstat\fR visualiza la información de estado sobre las clases, trabajos, e impresoras actuales. Cuando es ejecutado sin argumentos, \fBlpstat\fR listará los trabajos puestos en cola por el usuario. Otras opciones son:
+.TP 5
+\-E
+.br 
+Hace que se use encriptación en la conexión con el servidor.
+.TP 5
+\-a [\fIimpresora(s)\fR]
+.br 
+Muestra el estado de aceptación de las colas de las impresoras. Si no se especifican impresoras, se listan todas.
+.TP 5
+\-c [\fIclase(s)\fR]
+.br 
+Muestra las clases de impresoras y las impresoras que pertenecen a ella. Si no se especifican clases, se listan todas.
+.TP 5
+\-d
+.br 
+Muestra el destino predeterminado actual.
+.TP 5
+\-h \fIservidor\fR
+.br 
+Especifica el servidor CUPS con el que comunicar.
+.TP 5
+\-l
+.br 
+Muestra un listado detallado de impresoras, clases o trabajos.
+.TP 5
+\-o [\fIdestino(s)\fR]
+.br 
+Muestra la cola de trabajos en los destinos especificados. Si no se especifica destino, se muestran todos los trabajos.
+.TP 5
+\-p [\fIimpresora(s)\fR]
+.br 
+Muestra las impresoras y si están activas para imprimir. Si no se especifican impresoras, se listan todas.
+.TP 5
+\-r
+.br 
+Muestra si el servidor CUPS está en funcionamiento.
+.TP 5
+\-R
+.br 
+Muestra la clasificación de los trabajos de impresión.
+.TP 5
+\-s
+.br 
+Muestra un resúmen de estado, incluyendo el destino predeterminado, una lista de clases y las impresoras miembros que las forman, y una lista de impresoras y sus dispositivos asociados. Esto es equivalente a usar las opciones "\-d", "\-c",
+y "\-p".
+.TP 5
+\-t
+.br 
+Muestra toda la información de estado. Es equivalente a usar las opciones "\-r",
+"\-d", "\-c", "\-d", "\-v", "\-a", "\-p", y "\-o".
+.TP 5
+\-u [\fIusuario(s)\fR]
+.br 
+Muestra una lista de trabajos de impresión puestos en cola por los usuarios especificados. Si no se especifican usuarios, lista los trabajos puestos en cola por el usuario actual.
+.TP 5
+\-v [\fIimpresora(s)\fR]
+.br 
+Muestra las impresoras y los dispositivos a los que están conectadas. Si no se especifican impresoras, se listan todas.
+.TP 5
+\-W [\fIque\-trabajos\fR]
+.br 
+Especifica qué trabajos mostrar, \fIcompleted\fR (completados) o \fInot\-completed\fR (no completados) (predeterminado). Esta opción \fBdebe\fR aparecer antes de la opción \fI\-o\fR y/o de cualquier nombre de impresora, porque si no el valor predeterminado (not\-completed) será usado en la petición al planificador de tareas.
+.SH "COMPATIBILIDAD"
+A diferencia del sistema de impresión System V, CUPS permite que los nombres de impresoras contengan cualquier carácter imprimible excepto ESPACIO y TAB. También, en  los nombres de clases e impresoras \fIno\fR hay distinción entre mayúsculas y minúsculas.
+.LP 
+Las opciones "\-h" y "\-W" son exclusivas de CUPS.
+.LP 
+Las opciones "\-f", "\-P", y "\-S" de Solaris se ignoran silenciosamente.
+.SH "VÉASE TAMBIÉN"
+cancel(1), lp(1),
+Manual de usuario de CUPS,
+http://localhost:631/documentation.html
+.SH "DERECHOS DE COPIA"
+Los derechos de copia 1993\-2004 son de Easy Software Products. Todos los derechos reservados.
+.SH "TRADUCCIÓN"
+Juan Pablo González Riopedre <riopedre@tiscali.es>
+.\"
+.\" End of "$Id: lpstat.man,v 1.1 2004/10/20 18:00:54 mike Exp $".
+.\"

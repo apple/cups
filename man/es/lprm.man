@@ -1,0 +1,52 @@
+.\" 
+.\" "$Id: lprm.man,v 1.1 2004/10/20 18:00:54 mike Exp $"
+.\" 
+.\" lprm man page for the Common UNIX Printing System (CUPS).
+.\" 
+.\" Copyright 1997-2004 by Easy Software Products.
+.\" 
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Easy Software Products and are protected by Federal
+.\" copyright law.  Distribution and use rights are outlined in the file
+.\" "LICENSE.txt" which should have been included with this file.  If this
+.\" file is missing or damaged please contact Easy Software Products
+.\" at:
+.\" 
+.\" Attn: CUPS Licensing Information
+.\" Easy Software Products
+.\" 44141 Airport View Drive, Suite 204
+.\" Hollywood, Maryland 20636-3142 USA
+.\" 
+.\" Voice: (301) 373-9600
+.\" EMail: cups-info@cups.org
+.\" WWW: http://www.cups.org
+.\" 
+.TH "lprm" "1" "Common UNIX Printing System" "23 de Enero de 2001" "Easy Software Products"
+.SH "NOMBRE"
+lprm \- cancela trabajos de impresión
+.SH "SINOPSIS"
+.B lprm
+[ \-E ] [ \- ] [ \-P
+.I destino
+] [
+.I ID trabajo(s)
+]
+.SH "DESCRIPCIÓN"
+\fBlprm\fR cancela trabajos de impresión que han sido puestos en cola para ser impresos. La opción \fI\-P\fR especifica la impresora o clase destino.
+.LP 
+Si no se especifican argumentos, se cancela el trabajo actual en el destino predeterminado. Puede especificar uno o más número ID de trabajos para que sean cancelados, o usar la opción \fI\-\fR para cancelar todos los trabajos.
+.LP 
+La opción \fI\-E\fR hace que se use encriptación en la conexión con el servidor.
+.SH "COMPATIBILIDAD"
+La versión de CUPS de \fIlprm\fR es compatible con el comando estandar \fIlprm\fR de Berkeley.
+.SH "VÉASE TAMBIÉN"
+cancel(1), lp(1), lpstat(1), lpr(1),
+Manual de usuario de CUPS,
+http://localhost:631/documentation.html
+.SH "DERECHOS DE COPIA"
+Los derechos de copia 1993\-2004 son de Easy Software Products. Todos los derechos reservados.
+.SH "TRADUCCIÓN"
+Juan Pablo González Riopedre <riopedre@tiscali.es>
+.\"
+.\" End of "$Id: lprm.man,v 1.1 2004/10/20 18:00:54 mike Exp $".
+.\"

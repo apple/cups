@@ -1,0 +1,61 @@
+.\" 
+.\" "$Id: lpinfo.man,v 1.1 2004/10/20 18:00:54 mike Exp $"
+.\" 
+.\" lpinfo man page for the Common UNIX Printing System (CUPS).
+.\" 
+.\" Copyright 1997-2004 by Easy Software Products.
+.\" 
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Easy Software Products and are protected by Federal
+.\" copyright law.  Distribution and use rights are outlined in the file
+.\" "LICENSE.txt" which should have been included with this file.  If this
+.\" file is missing or damaged please contact Easy Software Products
+.\" at:
+.\" 
+.\" Attn: CUPS Licensing Information
+.\" Easy Software Products
+.\" 44141 Airport View Drive, Suite 204
+.\" Hollywood, Maryland 20636-3142 USA
+.\" 
+.\" Voice: (301) 373-9600
+.\" EMail: cups-info@cups.org
+.\" WWW: http://www.cups.org
+.\" 
+.TH "lpinfo" "8" "Common UNIX Printing System" "23 de Enero de 2001" "Easy Software Products"
+.SH "NOMBRE"
+lpinfo \- muestra los dispositivos o controladores disponibles
+.SH "SINOPSIS"
+.B lpinfo
+[ \-E ] [ \-l ] [ \-m ] [ \-v ]
+.SH "DESCRIPCIÓN"
+\fBlpinfo\fR lista los dispositivos disponibles o los controladores conocidos por el servidor CUPS. Para conseguir algo, se debe especificar una de las opciones \fI\-m\fR o \fI\-v\fR:
+.TP 5
+\-E
+.br 
+Hace que se use encriptación en la conexión con el servidor.
+.TP 5
+\-l
+.br 
+Muestra un listado "amplio" de dispositivos o controladores.
+.TP 5
+\-m
+.br 
+Muestra los controladores de impresoras disponibles en el sistema.
+.TP 5
+\-v
+.br 
+Muestra los dispositivos de impresoras disponibles en el sistema.
+.SH "COMPATIBILIDAD"
+El comando \fBlpinfo\fR es específico de CUPS.
+.SH "VÉASE TAMBIÉN"
+lpadmin(8),
+Manual de administrador de CUPS,
+http://localhost:631/documentation.html
+.SH "DERECHOS DE COPIA"
+Los derechos de copia 1993\-2004 son de Easy Software Products. Todos los derechos reservados.
+
+.SH "TRADUCCIÓN"
+Juan Pablo González Riopedre <riopedre@tiscali.es>
+.\"
+.\" End of "$Id: lpinfo.man,v 1.1 2004/10/20 18:00:54 mike Exp $".
+.\"

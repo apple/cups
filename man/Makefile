@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.26 2004/06/29 03:44:52 mike Exp $"
+# "$Id: Makefile,v 1.27 2004/10/20 18:00:54 mike Exp $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -30,7 +30,7 @@ include Makefile.common
 # Other languages...
 #
 
-LANGDIRS =	fr
+LANGDIRS =	es fr
 
 
 #
@@ -117,5 +117,5 @@ install:	all
 
 
 #
-# End of "$Id: Makefile,v 1.26 2004/06/29 03:44:52 mike Exp $".
+# End of "$Id: Makefile,v 1.27 2004/10/20 18:00:54 mike Exp $".
 #

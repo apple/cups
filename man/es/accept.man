@@ -1,0 +1,57 @@
+.\" 
+.\" "$Id: accept.man,v 1.1 2004/10/20 18:00:54 mike Exp $"
+.\" 
+.\" accept/reject man page for the Common UNIX Printing System (CUPS).
+.\" 
+.\" Copyright 1997-2004 by Easy Software Products.
+.\" 
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Easy Software Products and are protected by Federal
+.\" copyright law.  Distribution and use rights are outlined in the file
+.\" "LICENSE.txt" which should have been included with this file.  If this
+.\" file is missing or damaged please contact Easy Software Products
+.\" at:
+.\" 
+.\" Attn: CUPS Licensing Information
+.\" Easy Software Products
+.\" 44141 Airport View Drive, Suite 204
+.\" Hollywood, Maryland 20636-3142 USA
+.\" 
+.\" Voice: (301) 373-9600
+.\" EMail: cups-info@cups.org
+.\" WWW: http://www.cups.org
+.\" 
+.TH "accept" "8" "Common UNIX Printing System" "23  de Enero de 2001" "Easy Software Products"
+.SH "NOMBRE"
+accept/reject \- acepta/rechaza los trabajos enviados a un determinado destino
+.SH "SINOPSIS"
+.B accept
+destino(s)
+.br 
+.B reject
+[ \-E ] [ \-h
+.I servidor
+] [ \-r
+.I razón
+]
+destino(s)
+.SH "DESCRIPCIÓN"
+\fIaccept\fR da la orden al sistema de impresión para que acepte los trabajos de impresión enviados hacia el destino especificado.
+.LP 
+\fIreject\fR da la orden al sistema de impresión para que rechace los trabajos de impresión enviados hacia el destino especificado. La opción \fI\-r\fR permite especificar la razón por la que se deben rechazar los trabajos de impresión. Si no se especifica, la razón predeterminada es "Razón desconocida".
+.LP 
+La opción \fI\-E\fR hace que se use encriptación en la conexión con el servidor.
+.SH "COMPATIBILIDAD"
+La versión de CUPS de \fIaccept\fR y \fIreject\fR puede que pregunten al usuario una palabra de acceso dependiendo de la configuración del sistema de impresión. Esto difiere de las versiones System V que requieren que sea el usuario root el que ejecute estos comandos.
+
+.SH "VÉASE TAMBIÉN"
+cancel(1), disable(8), enable(8), lp(1), lpadmin(8), lpstat(1),
+Manual de administrador de CUPS,
+http://localhost:631/documentation.html
+.SH "DERECHOS DE COPIA"
+Los derechos de copia 1993\-2004 son de Easy Software Products. Todos los derechos reservados.
+.SH "TRADUCCIÓN"
+Juan Pablo González Riopedre <riopedre@tiscali.es>
+.\"
+.\" End of "$Id: accept.man,v 1.1 2004/10/20 18:00:54 mike Exp $".
+.\"

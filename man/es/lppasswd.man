@@ -1,0 +1,52 @@
+.\" 
+.\" "$Id: lppasswd.man,v 1.1 2004/10/20 18:00:54 mike Exp $"
+.\" 
+.\" lpadmin man page for the Common UNIX Printing System (CUPS).
+.\" 
+.\" Copyright 1997-2004 by Easy Software Products.
+.\" 
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Easy Software Products and are protected by Federal
+.\" copyright law.  Distribution and use rights are outlined in the file
+.\" "LICENSE.txt" which should have been included with this file.  If this
+.\" file is missing or damaged please contact Easy Software Products
+.\" at:
+.\" 
+.\" Attn: CUPS Licensing Information
+.\" Easy Software Products
+.\" 44141 Airport View Drive, Suite 204
+.\" Hollywood, Maryland 20636-3142 USA
+.\" 
+.\" Voice: (301) 373-9600
+.\" EMail: cups-info@cups.org
+.\" WWW: http://www.cups.org
+.\" 
+.TH "lppasswd" "1" "Common UNIX Printing System" "7 de Junio de 2001" "Easy Software Products"
+.SH "NOMBRE"
+lppasswd \- añade, cambia, o borra las palabras de acceso
+.SH "SINOPSIS"
+.B lppasswd
+[ \-a ] [ \-g
+.I nombre_grupo
+] [ \-x ] [
+.I nombre_usuario
+]
+.SH "DESCRIPCIÓN"
+\fIlppasswd\fR añade, cambia, o borra palabras de acceso en el archivo de palabras de acceso de CUPS \fIpasswd.md5\fR. Cuando es ejecutado por un usuario normal, \fIlppasswd\fR pedirá la palabra de acceso antigua y la nueva. Cuando es ejecutado por el super\-usuario, \fIlppasswd\fR puede añadir nuevas cuentas (\fI\-a nombre_usuario\fR), cambiar cuentas existentes (\fInombre_usuario\fR), o borrar cuentas (\fI\-x nombre_usuario\fR) en el archivo de palabras de acceso. Los nombre de usuario no tienen por qué coincidir con los nombres de usuario locales de UNIX, pero con los programas clientes de CUPS (\fIlp(1)\fR, \fIlpr(1)\fR, etc.) sólo funcionan nombres de usuario de UNIX.
+.LP 
+La opción  \fI\-g\fR especifica otro grupo diferente del grupo de sistema \- "sys",
+"system", o "root", dependiendo del sistema operativo.
+.SH "PROBLEMAS DE SEGURIDAD"
+El comando \fIlppasswd\fR se instala con "setuid" a root. Aunque cada intento se hace para asegurarlo contra cualquier usuario sin privilegios que quiera conseguir privilegios de super\-usuario, administradores de sistema paranoicos pueden querer deshabilitar o cambiar el propietario del programa a una cuenta sin privilegios.
+.SH "VÉASE TAMBIÉN"
+lp(1), lpr(1),
+Manual de administrador de CUPS,
+Manual de usuario de CUPS,
+http://localhost:631/documentation.html
+.SH "DERECHOS DE COPIA"
+Los derechos de copia 1993\-2004 son de Easy Software Products. Todos los derechos reservados.
+.SH "TRADUCCIÓN"
+Juan Pablo González Riopedre <riopedre@tiscali.es>
+.\"
+.\" End of "$Id: lppasswd.man,v 1.1 2004/10/20 18:00:54 mike Exp $".
+.\"

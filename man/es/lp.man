@@ -1,0 +1,165 @@
+.\" 
+.\" "$Id: lp.man,v 1.1 2004/10/20 18:00:54 mike Exp $"
+.\" 
+.\" lp/cancel man page for the Common UNIX Printing System (CUPS).
+.\" 
+.\" Copyright 1997-2004 by Easy Software Products.
+.\" 
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Easy Software Products and are protected by Federal
+.\" copyright law.  Distribution and use rights are outlined in the file
+.\" "LICENSE.txt" which should have been included with this file.  If this
+.\" file is missing or damaged please contact Easy Software Products
+.\" at:
+.\" 
+.\" Attn: CUPS Licensing Information
+.\" Easy Software Products
+.\" 44141 Airport View Drive, Suite 204
+.\" Hollywood, Maryland 20636-3142 USA
+.\" 
+.\" Voice: (301) 373-9600
+.\" EMail: cups-info@cups.org
+.\" WWW: http://www.cups.org
+.\" 
+.TH "lp" "1" "Common UNIX Printing System" "1 de Mayo de 2003" "Easy Software Products"
+.SH "NOMBRE"
+lp \- imprime archivos
+.br 
+cancel \- cancela trabajos
+.SH "SINOPSIS"
+.B lp
+[ \-E ] [ \-c ] [ \-d
+.I destino
+] [ \-h
+.I servidor
+] [ \-m ] [ \-n
+.I num\-copias
+[ \-o
+.I opción
+] [ \-q
+.I prioridad
+] [ \-s ] [ \-t
+.I título
+] [ \-H
+.I manejo
+] [ \-P
+.I lista\-páginas
+] [
+.I archivos(s)
+]
+.br 
+.B lp
+[ \-E ] [ \-c ] [ \-h
+.I servidor
+] [ \-i
+.I id\-trabajo
+] [ \-n
+.I num\-copias
+[ \-o
+.I opción
+] [ \-q
+.I prioridad
+] [ \-t
+.I título
+] [ \-H
+.I manejo
+] [ \-P
+.I lista\-páginas
+]
+.br 
+.B cancel
+[ \-a ] [ \-h
+.I servidor
+] [ \-u 
+.I usuario
+] [
+.I id
+] [
+.I destino
+] [
+.I id\-destino
+]
+.SH "DESCRIPCIÓN"
+\fBlp\fR realiza la impresión de un archivo o modifica un trabajo de impresión pendiente. Use el nombre de archivo "\-" para imprimir desde la entrada estandar.
+.LP 
+\fBcancel\fR cancela los trabajos de impresión existentes. La opción \fI\-a\fR cancela todos los trabajos del destino especificado.
+.SH "OPCIONES"
+\fBlp\fR reconoce las siguientes opciones:
+.TP 5
+\-E
+.br 
+Hace que se use encriptación en la conexión con el servidor.
+.TP 5
+\-c
+.br 
+Esta opción funciona sólamente por motivos de compatibilidad. En sistemas que la soportan, obliga a que el archivo de impresión se copie al directorio spool antes de ser impreso. En CUPS, los archivos impresos se envían siempre al planificador de tareas via IPP, lo cual tiene el mismo efecto.
+.TP 5
+\-d \fIdestino\fR
+.br 
+Imprime archivos en la impresora especificada.
+.TP 5
+\-h \fIservidor\fR
+.br 
+Especifica el nombre del servidor de impresión. Por omisión es "localhost" o el valor de la variable de entorno CUPS_SERVER.
+.TP 5
+\-i \fIid\-trabajo\fR
+.br 
+Especifica el trabajo existente que se va a modificar.
+.TP 5
+\-m
+.br 
+Envía un correo cuando se ha impreso el trabajo (no soportado en CUPS 1.1.)
+.TP 5
+\-n \fIcopias\fR
+.br 
+Especifica el número de copias a imprimir de 1 a 100.
+.TP 5
+\-o \fIopción\fR
+.br 
+Especifica una opción para el trabajo.
+.TP 5
+\-q \fIprioridad\fR
+.br 
+Especifica la prioridad del trabajo de 1 (la más baja) a 100 (la más alta). La prioridad predeterminada es 50.
+.TP 5
+\-s
+.br 
+No informa del ID del trabajo resultante (modo silencioso).
+.TP 5
+\-t \fInombre\fR
+.br 
+Especifica el nombre del trabajo.
+.TP 5
+\-u \fIusuario\fR
+.br 
+Cancela los trabajos pertenecientes a \fIusuario\fR.
+.TP 5
+\-H \fImanejo\fR
+.br 
+Especifica cuando debe ser impreso el trabajo. Un valor de 
+\fIimmediate\fR imprimirá el archivo inmediatamente, un valor de 
+\fIhold\fR retendrá el trabajo indefinidamente, y un valor de tiempo 
+(HH:MM) retendrá el trabajo hasta la hora especificada. Use el valor de  \fIresume\fR con la opción \fI\-i\fR para reanudar un trabajo retenido. Use un valor de \fIrestart\fR con la opción \fI\-i\fR para reiniciar un trabajo completado.
+.TP 5
+\-P \fIlista\-páginas\fR
+.br 
+Especifica qué páginas imprimir del documento. La lista puede contener una lista de números y rangos (#\-#) separados por comas (p.e. 1,3\-5,16).
+.SH "COMPATIBILIDAD"
+A diferencia del sistema de impresión System V, CUPS permite que los nombres de impresoras contengan cualquier carácter imprimible excepto ESPACIO y TAB. También, en  los nombres de clases e impresoras \fBno\fR hay distinción entre mayúsculas y minúsculas. 
+.LP 
+La opción "m" no funciona en CUPS 1.1.
+.LP 
+La opción "q" acepta un rango diferente de valores que el comando lp de Solaris, igualando los valores de prioridad de IPP (1\-100) en vez de los valores de Solaris (0\-39).
+.SH "NOTAS"
+Los administradores que deseen impedir cancelaciones no autorizadas de trabajos mediante la opción \fI\-u\fR deben proteger con una palabra de acceso el directorio donde se almacenan los trabajos (véase la opción en \fIcupsd.conf(5)\fR).
+.SH "VÉASE TAMBIÉN"
+lpstat(1),
+Manual de usuario de CUPS,
+http://localhost:631/documentation.html
+.SH "DERECHOS DE COPIA"
+Los derechos de copia 1993\-2004 son de Easy Software Products. Todos los derechos reservados.
+.SH "TRADUCCIÓN"
+Juan Pablo González Riopedre <riopedre@tiscali.es>
+.\"
+.\" End of "$Id: lp.man,v 1.1 2004/10/20 18:00:54 mike Exp $".
+.\"

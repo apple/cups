@@ -1,0 +1,93 @@
+.\" 
+.\" "$Id: mime.types.man,v 1.1 2004/10/20 18:00:54 mike Exp $"
+.\" 
+.\" mime.types man page for the Common UNIX Printing System (CUPS).
+.\" 
+.\" Copyright 1997-2004 by Easy Software Products.
+.\" 
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Easy Software Products and are protected by Federal
+.\" copyright law.  Distribution and use rights are outlined in the file
+.\" "LICENSE.txt" which should have been included with this file.  If this
+.\" file is missing or damaged please contact Easy Software Products
+.\" at:
+.\" 
+.\" Attn: CUPS Licensing Information
+.\" Easy Software Products
+.\" 44141 Airport View Drive, Suite 204
+.\" Hollywood, Maryland 20636-3142 USA
+.\" 
+.\" Voice: (301) 373-9600
+.\" EMail: cups-info@cups.org
+.\" WWW: http://www.cups.org
+.\" 
+.TH "mime.types" "5" "Common UNIX Printing System" "22 de Junio de 2000" "Easy Software Products"
+.SH "NOMBRE"
+mime.types \- archivo de descripción de tipos mime para cups
+.SH "DESCRIPCIÓN"
+El archivo \fImime.types\fR define los tipos de archivo reconocidos.
+.LP 
+Se pueden añadir tipos de archivo adicionales a \fImime.types\fR o a archivos adicionales en el directorio de configuración \fB/etc/cups\fR con la extensión ".types".
+.LP 
+Cada línea en el archivo \fImime.types\fR puede ser un comentario, una línea en blanco o una línea con una regla. Las líneas de comentario comienzan con el carácter #. Las líneas con una regla comienzan con el nombre del tipo MIME y opcionalmente sigue una serie de reglas de reconocimiento de archivos que se usan para identificar automáticamente los archivos de impresión y de páginas web:
+.br 
+.nf 
+
+    super/tipo regla [ ... reglaN]
+.fi 
+Las reglas pueden ser agrupadas usando paréntesis, unidas usando "+" para hacer un  AND (Y) lógico y "," o espacio en blanco para un OR (O) lógico, y negadas usando "!".
+.SH "REGLAS"
+Las reglas tienen dos formas \- una extensión de archivo por si misma y funciones con valores de prueba entre paréntesis. Están disponibles las siguientes funciones:
+.TP 5
+match("patrón")
+.br 
+El patrón coincide con el nombre de archivo
+.TP 5
+ascii(desplazamiento,longitud)
+.br 
+Verdadero si los bytes son caracteres imprimibles ASCII (CR, NL, TAB, BS, 32\-126)
+.TP 5
+printable(desplazamiento,longitud)
+.br 
+Verdadero si los bytes son caracteres imprimibles de 8\-bits (CR, NL, TAB, BS, 32\-126, 128\-254)
+.TP 5
+string(desplazamiento,"cadena")
+.br 
+Verdadero si los bytes son identicos a cadena
+.TP 5
+istring(desplazamiento,"cadena")
+.br 
+Verdadero si una comparación, sin distinción de mayúsculas y minúsculas, de los bytes es idéntica
+.TP 5
+char(desplazamiento,valor)
+.br 
+Verdadero si byte es idéntico
+.TP 5
+short(desplazamiento,valor)
+.br 
+Verdadero si el número entero de 16\-bits es idéntico
+.TP 5
+int(desplazamiento,valor)
+.br 
+Verdadero si el número entero de 32\-bits es idéntico
+.TP 5
+locale("cadena")
+.br 
+Verdadero si la ubicacion actual coincide con cadena
+.TP 5
+contains(desplazamiento,rango,"cadena")
+.br 
+Verdadero si el rango contiene la cadena
+.SH "CADENAS DE CARACTERES"
+Las constantes de cadenas de caracteres que contengan espacios en blanco, pueden ser especificadas entre comillas ("") y paréntesis de ángulo (<>) para cadenas hexadecimales.
+.SH "VÉASE TAMBIÉN"
+classes.conf(5), cupsd(8), cupsd.conf(5), mime.convs(5), printers.conf(5),
+Manual de administrador de CUPS,
+http://localhost:631/documentation.html
+.SH "DERECHOS DE COPIA"
+Los derechos de copia 1993\-2004 son de Easy Software Products. Todos los derechos reservados.
+.SH "TRADUCCIÓN"
+Juan Pablo González Riopedre <riopedre@tiscali.es>
+.\"
+.\" End of "$Id: mime.types.man,v 1.1 2004/10/20 18:00:54 mike Exp $".
+.\"

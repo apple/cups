@@ -1,0 +1,70 @@
+.\" 
+.\" "$Id: classes.conf.man,v 1.1 2004/10/20 18:00:54 mike Exp $"
+.\" 
+.\" classes.conf man page for the Common UNIX Printing System (CUPS).
+.\" 
+.\" Copyright 1997-2004 by Easy Software Products.
+.\" 
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Easy Software Products and are protected by Federal
+.\" copyright law.  Distribution and use rights are outlined in the file
+.\" "LICENSE.txt" which should have been included with this file.  If this
+.\" file is missing or damaged please contact Easy Software Products
+.\" at:
+.\" 
+.\" Attn: CUPS Licensing Information
+.\" Easy Software Products
+.\" 44141 Airport View Drive, Suite 204
+.\" Hollywood, Maryland 20636-3142 USA
+.\" 
+.\" Voice: (301) 373-9600
+.\" EMail: cups-info@cups.org
+.\" WWW: http://www.cups.org
+.TH "classes.conf" "5" "Common UNIX Printing System" "22  de Junio de 2000" "Easy Software Products"
+.SH "NOMBRE"
+classes.conf \- archivo de configuración de clases para cups
+.SH "DESCRIPCIÓN"
+El archivo \fIclasses.conf\fR define las clases de impresoras locales disponibles. Normalmente se encuentra en el directorio \fI/etc/cups\fR y es generado automáticamente por el programa \fIcupsd(8)\fR cuando se añaden o borran clases de impresora.
+.LP 
+Cada línea del archivo puede ser o una directiva de configuración, o una línea en blanco, o un comentario. Las líneas de comentario comienzan con el caracter #.
+
+.SH "DIRECTIVAS"
+.TP 5
+<Class name> ... </Class>
+.br 
+Define una clase de impresora específica.
+.TP 5
+Accepting
+.br 
+Especifica si la clase de impresora acepta o no nuevos trabajos.
+.TP 5
+Info
+.br 
+Especifica una descripción para la clase de impresora.
+.TP 5
+Location
+.br 
+Especifica una descripción de la ubicación de la clase de impresora.
+.TP 5
+Printer
+.br 
+Especifica una impresora que es miembro de la clase de impresora.
+.TP 5
+State
+.br 
+Especifica el estado inicial de la clase de impresora: Idle (inactiva) o Stopped (parada).
+.TP 5
+StateMessage
+.br 
+Especifica el mensaje asociado con el estado.
+.SH "VÉASE TAMBIÉN"
+cupsd(8), cupsd.conf(5), mime.convs(5), mime.types(5), printers.conf(5),
+Manual de administrador de CUPS,
+http://localhost:631/documentation.html
+.SH "DERECHOS DE COPIA"
+Los derechos de copia 1993\-2004 son de Easy Software Products. Todos los derechos reservados.
+.SH "TRADUCCIÓN"
+Juan Pablo González Riopedre <riopedre@tiscali.es>
+.\"
+.\" End of "$Id: classes.conf.man,v 1.1 2004/10/20 18:00:54 mike Exp $".
+.\"

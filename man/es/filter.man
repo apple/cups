@@ -1,0 +1,110 @@
+.\" 
+.\" "$Id: filter.man,v 1.1 2004/10/20 18:00:54 mike Exp $"
+.\" 
+.\" filter man page for the Common UNIX Printing System (CUPS).
+.\" 
+.\" Copyright 1997-2004 by Easy Software Products.
+.\" 
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Easy Software Products and are protected by Federal
+.\" copyright law.  Distribution and use rights are outlined in the file
+.\" "LICENSE.txt" which should have been included with this file.  If this
+.\" file is missing or damaged please contact Easy Software Products
+.\" at:
+.\" 
+.\" Attn: CUPS Licensing Information
+.\" Easy Software Products
+.\" 44141 Airport View Drive, Suite 204
+.\" Hollywood, Maryland 20636-3142 USA
+.\" 
+.\" Voice: (301) 373-9600
+.\" EMail: cups-info@cups.org
+.\" WWW: http://www.cups.org
+.\" 
+.TH "filter" "1" "Common UNIX Printing System" "22 de Junio de 2000" "Easy Software Products"
+.SH "NOMBRE"
+filter \- interfaces de filtros para la conversión de archivos de cups
+.SH "SINOPSIS"
+.B filter
+trabajo usuario título num\-copias opciones [
+.I archivo
+]
+.SH "DESCRIPCIÓN"
+La interface de filtro de CUPS proporciona un método estandar para poder añadir que se puedan usar nuevos tipos de documentos en CUPS. Cada filtro es capaz de convertir desde uno o más formatos de entrada a otro formato que puede ser directamente impreso o,  mediante una tubería (pipe), introducido en otro filtro para conseguir un formato imprimible.
+.LP 
+Los filtros deben ser capaces de leer desde un archivo especificado en la línea de comandos o desde la entrada estandar, copiando ésta a un archivo temporal si es requerido por el formato del archivo. Todas las salidas deben ser enviadas a la salida estandar.
+.LP 
+El nombre del comando (argv[0]) es el nombre de la impresora destino.
+.SH "VARIABLES DE ENTORNO"
+Las siguientes variables de entorno son definidas por el servidor CUPS cuando se ejecuta cada filtro:
+.TP 5
+CHARSET
+.br 
+El juego de caracteres predeterminado (normalmente us\-ascii o iso\-8859\-1).
+.TP 5
+CLASS
+.br 
+Cuando se envía un trabajo a una clase de impresora, contiene el nombre de la clase de impresora destino. Esta variable no se define si el destino no es una clase.
+.TP 5
+CONTENT_TYPE
+.br 
+El tipo MIME asociado con el archivo (p. ej. application/postscript).
+.TP 5
+CUPS_DATADIR
+.br 
+El directorio donde se pueden encontrar los archivos de datos.
+.TP 5
+CUPS_SERVERROOT
+.br 
+El directorio raíz del servidor.
+.TP 5
+DEVICE_URI
+.br 
+La URI del dispositivo asociada con la impresora
+.TP 5
+LANG
+.br 
+EL idioma predeterminado (normalmente C o en).
+.TP 5
+PATH
+.br 
+El directorio de ejecución predeterminado para los programas externos que puedan ser ejecutados por el filtro.
+.TP 5
+PPD
+.br 
+El camino completo del archivo PPD (PostScript Printer Description) para esta impresora.
+.TP 5
+PRINTER
+.br 
+El nombre de la impresora; esto sirve para guiones del intérprete de comandos que no pueden leer el argumento argv[0].
+.TP 5
+RIP_CACHE
+.br 
+La cantidad de memoria recomendada para usar RIPs (Raster Image Processors).
+.TP 5
+SOFTWARE
+.br 
+El nombre y la versión del servidor (normalmente CUPS/1.1).
+.TP 5
+TZ
+.br 
+La zona horaria (timezone) del servidor.
+.TP 5
+USER
+.br 
+El usuario con el que se ejecuta el filtro, normalmente lp; lo establecido  actualmente se encuentra en el archivo cupsd.conf.
+.SH "COMPATIBILIDAD"
+Aunque la interfaz del filtro es compatible con la interfaz de los guiones System V, sólo funcionará con éstos como un filtro único. Normalmente el guión de interfaz se obtiene con el comando \fBlpadmin(8)\fR usando la opción \fI\-i\fR.
+.SH "VÉASE TAMBIÉN"
+backend(1), cupsd(8),
+Descripción del diseño de la interface de CUPS,
+Manual de administrador de CUPS,
+Manual del programador de software de CUPS,
+http://localhost:631/documentation.html
+.SH "DERECHOS DE COPIA"
+Los derechos de copia 1993\-2004 son de Easy Software Products. Todos los derechos reservados.
+.SH "TRADUCCIÓN"
+Juan Pablo González Riopedre <riopedre@tiscali.es>
+.\"
+.\" End of "$Id: filter.man,v 1.1 2004/10/20 18:00:54 mike Exp $".
+.\"

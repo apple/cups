@@ -1,0 +1,75 @@
+.\" 
+.\" "$Id: lpc.man,v 1.1 2004/10/20 18:00:54 mike Exp $"
+.\" 
+.\" lpc man page for the Common UNIX Printing System (CUPS).
+.\" 
+.\" Copyright 1997-2004 by Easy Software Products.
+.\" 
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Easy Software Products and are protected by Federal
+.\" copyright law.  Distribution and use rights are outlined in the file
+.\" "LICENSE.txt" which should have been included with this file.  If this
+.\" file is missing or damaged please contact Easy Software Products
+.\" at:
+.\" 
+.\" Attn: CUPS Licensing Information
+.\" Easy Software Products
+.\" 44141 Airport View Drive, Suite 204
+.\" Hollywood, Maryland 20636-3142 USA
+.\" 
+.\" Voice: (301) 373-9600
+.\" EMail: cups-info@cups.org
+.\" WWW: http://www.cups.org
+.\" 
+.TH "lpc" "8" "Common UNIX Printing System" "22 de Septiembre de 1999" "Easy Software Products"
+.SH "NOMBRE"
+lpc \- programa de control de impresora
+.SH "SINOPSIS"
+.B lpc
+[
+.I comando
+[
+.I parámetro(s)
+] ]
+.SH "DESCRIPCIÓN"
+\fIlpc\fR proporciona un control limitado sobre colas de impresoras y clases proporcionadas por CUPS. También puede ser usado para conocer el estado de las colas.
+.LP 
+Si no se especifica ningún comando en la línea de comandos, \fRlpc\fR visualizará un indicador y aceptará comandos de la entrada estandar.
+.SH "COMANDOS"
+El programa \fIlpc\fR acepta un subconjunto de los comandos aceptados por el programa del mismo nombre de Berkeley:
+.TP 5
+\fIexit
+.br 
+Sale del intérprete de comandos.
+.TP 5
+help \fI[comando]\fR
+.br 
+Visualiza un breve mensaje de ayuda.
+.TP 5
+quit
+.br 
+Sale del intérprete de comandos.
+.TP 5
+status \fI[cola]\fR
+.br 
+Visualiza el estado de una o más colas de clases o impresoras.
+.TP 5
+? \fI[comando]\fR
+.br 
+Visualiza un breve mensaje de ayuda.
+.SH "LIMITACIONES"
+Ya que \fIlpc\fR está hecho para el sistema de impresión de Berkeley, no se puede usar \fIlpc\fR para configurar las colas de clases o impresoras proporcionadas por CUPS. Para ello debe usar el comando \fIlpadmin(8)\fR u otro cliente compatible CUPS con esa funcionalidad.
+.SH "COMPATIBILIDAD"
+La versión de CUPS de \fIlpc\fR no implementa todos los comandos estandar de  Berkeley.
+.SH "VÉASE TAMBIÉN"
+accept(8), cancel(1), disable(8), enable(8), lp(1), lpr(1), lprm(1),
+lpstat(1), reject(8),
+Manual de administrador de CUPS,
+http://localhost:631/documentation.html
+.SH "DERECHOS DE COPIA"
+Los derechos de copia 1993\-2004 son de Easy Software Products. Todos los derechos reservados.
+.SH "TRADUCCIÓN"
+Juan Pablo González Riopedre <riopedre@tiscali.es>
+.\"
+.\" End of "$Id: lpc.man,v 1.1 2004/10/20 18:00:54 mike Exp $".
+.\"
