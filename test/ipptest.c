@@ -1,5 +1,5 @@
 /*
- * "$Id: ipptest.c,v 1.8.2.4 2002/04/20 20:04:46 mike Exp $"
+ * "$Id: ipptest.c,v 1.8.2.5 2002/05/09 03:31:08 mike Exp $"
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
@@ -387,8 +387,8 @@ do_tests(const char *uri,		/* I - URI to connect on */
     * Submit the IPP request...
     */
 
-    request->header.op.operation_id = op;
-    request->header.op.request_id   = 1;
+    request->request.op.operation_id = op;
+    request->request.op.request_id   = 1;
 
     printf("    %-60.60s [    ]", name);
     fflush(stdout);
@@ -416,15 +416,15 @@ do_tests(const char *uri,		/* I - URI to connect on */
         job_id = attrptr->values[0].integer;
 
       for (i = 0; i < num_statuses; i ++)
-        if (response->header.status.status_code == statuses[i])
+        if (response->request.status.status_code == statuses[i])
 	  break;
 
       if (i == num_statuses && num_statuses > 0)
       {
 	printf("\b\b\b\b\bFAIL]\n");
-        printf("        STATUS %x\n", response->header.status.status_code);
+        printf("        STATUS %x\n", response->request.status.status_code);
         printf("        (%s)\n",
-	       ippErrorString(response->header.status.status_code));
+	       ippErrorString(response->request.status.status_code));
 	printf("        (%lu bytes in response)\n",
 	       (unsigned long)ippLength(response));
 
@@ -456,7 +456,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	{
 	  puts("        RECEIVED");
 	  printf("        status-code = %04x\n",
-	         response->header.status.status_code);
+	         response->request.status.status_code);
 
 	  for (attrptr = response->attrs; attrptr != NULL; attrptr = attrptr->next)
 	    print_attr(attrptr);
@@ -807,5 +807,5 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 
 
 /*
- * End of "$Id: ipptest.c,v 1.8.2.4 2002/04/20 20:04:46 mike Exp $".
+ * End of "$Id: ipptest.c,v 1.8.2.5 2002/05/09 03:31:08 mike Exp $".
  */
