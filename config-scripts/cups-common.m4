@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.10 2001/10/29 21:52:19 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.11 2001/10/31 21:32:41 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -129,9 +129,17 @@ dnl Checks for wait functions.
 AC_CHECK_FUNCS(waitpid)
 AC_CHECK_FUNCS(wait3)
 
+dnl See if the tm structure has the tm_gmtoff member...
+AC_MSG_CHECKING(for tm_gmtoff member in tm structure)
+AC_TRY_COMPILE([#include <time.h>],[struct tm t;
+  int o = t.tm_gmtoff;],
+  AC_MSG_RESULT(yes)
+  AC_DEFINE(HAVE_TM_GMTOFF),
+  AC_MSG_RESULT(no))
+
 dnl Flags for "ar" command...
 case $uname in
-        Darwin*)
+        Darwin* | *BSD*)
                 ARFLAGS="-rcv"
                 ;;
         *)
@@ -142,5 +150,5 @@ esac
 AC_SUBST(ARFLAGS)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.10 2001/10/29 21:52:19 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.11 2001/10/31 21:32:41 mike Exp $".
 dnl

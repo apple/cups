@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.20 2001/10/07 12:16:10 mike Exp $"
+ * "$Id: log.c,v 1.21 2001/10/31 21:32:41 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -94,11 +94,11 @@ GetDateTime(time_t t)		/* I - Time value */
   snprintf(s, sizeof(s), "[%02d/%s/%04d:%02d:%02d:%02d %+03ld%02ld]",
 	   date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
 	   date->tm_hour, date->tm_min, date->tm_sec,
-#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__APPLE__)
+#ifdef HAVE_TM_GMTOFF
            -date->tm_gmtoff / 3600, (date->tm_gmtoff / 60) % 60);
 #else
            -timezone / 3600, (timezone / 60) % 60);
-#endif /* __*BSD__ || __APPLE__ */
+#endif /* HAVE_TM_GMTOFF */
  
   return (s);
 }
@@ -436,5 +436,5 @@ check_log_file(FILE       **log,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c,v 1.20 2001/10/07 12:16:10 mike Exp $".
+ * End of "$Id: log.c,v 1.21 2001/10/31 21:32:41 mike Exp $".
  */
