@@ -1,4 +1,4 @@
-CHANGES.txt - 01/23/2001
+CHANGES.txt - 01/24/2001
 ------------------------
 
 CHANGES IN CUPS V1.1.6
@@ -54,6 +54,12 @@ CHANGES IN CUPS V1.1.6
 	  OPTIONS request when switching to secure mode.
 	- The scheduler did not output a Content-Length field
 	  when responding to an OPTIONS request.
+	- Added documentation on using cups-lpd with xinetd
+	  to the man page.
+	- The socket backend now starts retries at 5 seconds and
+	  increases the interval to 30 seconds.  This should
+	  provide faster printing when multiple jobs/files are
+	  queued for a printer.
 
 
 CHANGES IN CUPS V1.1.5-2

@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c,v 1.15 2001/01/22 15:03:20 mike Exp $"
+ * "$Id: socket.c,v 1.16 2001/01/24 15:33:55 mike Exp $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -69,6 +69,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   FILE		*fp;		/* Print file */
   int		copies;		/* Number of copies to print */
   int		port;		/* Port number */
+  int		delay;		/* Delay for retries... */
   int		fd;		/* AppSocket */
   int		error;		/* Error code (if any) */
   struct sockaddr_in addr;	/* Socket address */
@@ -152,7 +153,7 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
   while (copies > 0)
   {
-    for (;;)
+    for (delay = 5;;)
     {
       if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
       {
@@ -168,13 +169,16 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 	if (error == ECONNREFUSED)
 	{
-	  fprintf(stderr, "INFO: Network host \'%s\' is busy; will retry in 30 seconds...\n",
-                  hostname);
-	  sleep(30);
+	  fprintf(stderr, "INFO: Network host \'%s\' is busy; will retry in %d seconds...\n",
+                  hostname, delay);
+	  sleep(delay);
+
+	  if (delay < 30)
+	    delay += 5;
 	}
 	else
 	{
-	  perror("ERROR: Unable to connect to printer");
+	  perror("ERROR: Unable to connect to printer (retrying in 30 seconds)");
 	  sleep(30);
 	}
       }
@@ -277,5 +281,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c,v 1.15 2001/01/22 15:03:20 mike Exp $".
+ * End of "$Id: socket.c,v 1.16 2001/01/24 15:33:55 mike Exp $".
  */
