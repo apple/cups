@@ -76,6 +76,12 @@ XRef::XRef(BaseStream *strA, GString *ownerPassword, GString *userPassword) {
 
   // trailer is ok - read the xref table
   } else {
+    if (size*sizeof(XRefEntry)/sizeof(XRefEntry) != size) {
+      error(-1, "Invalid 'size' inside xref table.");
+      ok = gFalse;
+      errCode = errDamaged;
+      return;
+    }
     entries = (XRefEntry *)gmalloc(size * sizeof(XRefEntry));
     for (i = 0; i < size; ++i) {
       entries[i].offset = 0xffffffff;
@@ -285,6 +291,10 @@ GBool XRef::readXRef(Guint *pos) {
     // table size
     if (first + n > size) {
       newSize = first + n;
+      if (newSize*sizeof(XRefEntry)/sizeof(XRefEntry) != newSize) {
+        error(-1, "Invalid 'newSize'");
+        goto err2;
+      }
       entries = (XRefEntry *)grealloc(entries, newSize * sizeof(XRefEntry));
       for (i = size; i < newSize; ++i) {
 	entries[i].offset = 0xffffffff;
@@ -435,6 +445,10 @@ GBool XRef::constructXRef() {
 	    if (!strncmp(p, "obj", 3)) {
 	      if (num >= size) {
 		newSize = (num + 1 + 255) & ~255;
+	        if (newSize*sizeof(XRefEntry)/sizeof(XRefEntry) != newSize) {
+	          error(-1, "Invalid 'obj' parameters.");
+	          return gFalse;
+	        }
 		entries = (XRefEntry *)
 		            grealloc(entries, newSize * sizeof(XRefEntry));
 		for (i = size; i < newSize; ++i) {
@@ -456,6 +470,11 @@ GBool XRef::constructXRef() {
     } else if (!strncmp(p, "endstream", 9)) {
       if (streamEndsLen == streamEndsSize) {
 	streamEndsSize += 64;
+        if (streamEndsSize*sizeof(int)/sizeof(int) != streamEndsSize) {
+          error(-1, "Invalid 'endstream' parameter.");
+          return gFalse;
+        }
+
 	streamEnds = (Guint *)grealloc(streamEnds,
 				       streamEndsSize * sizeof(int));
       }
