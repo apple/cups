@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.73 2002/09/18 14:49:18 mike Exp $"
+ * "$Id: ipp.c,v 1.74 2002/09/18 14:54:24 mike Exp $"
  *
  *   Internet Printing Protocol object functions for the Common UNIX
  *   Printing System (CUPS).
@@ -1508,7 +1508,10 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		  * value.
 		  */
 
-                  n = strlen(value->string.text);
+                  if (value->string.text != NULL)
+                    n = strlen(value->string.text);
+		  else
+		    n = 0;
 
                   if (n > (sizeof(buffer) - 2))
 		    return (IPP_ERROR);
@@ -1534,8 +1537,12 @@ ippWrite(http_t *http,		/* I - HTTP data */
 
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
-		  memcpy(bufptr, value->string.text, n);
-		  bufptr += n;
+
+		  if (n > 0)
+		  {
+		    memcpy(bufptr, value->string.text, n);
+		    bufptr += n;
+		  }
 		}
 		break;
 
@@ -1721,9 +1728,13 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		  * the trailing nul.
 		  */
 
-                  n = strlen(value->string.charset) +
-		      strlen(value->string.text) +
-		      4;
+                  n = 4;
+
+		  if (value->string.charset != NULL)
+                    n += strlen(value->string.charset);
+
+		  if (value->string.text != NULL)
+                    n += strlen(value->string.text);
 
                   if (n > (sizeof(buffer) - 2))
 		    return (IPP_ERROR);
@@ -1744,22 +1755,36 @@ ippWrite(http_t *http,		/* I - HTTP data */
 		  *bufptr++ = n;
 
                  /* Length of charset */
-                  n = strlen(value->string.charset);
+		  if (value->string.charset != NULL)
+		    n = strlen(value->string.charset);
+		  else
+		    n = 0;
+
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
 
                  /* Charset */
-		  memcpy(bufptr, value->string.charset, n);
-		  bufptr += n;
+		  if (n > 0)
+		  {
+		    memcpy(bufptr, value->string.charset, n);
+		    bufptr += n;
+		  }
 
                  /* Length of text */
-                  n = strlen(value->string.text);
+                  if (value->string.text != NULL)
+		    n = strlen(value->string.text);
+		  else
+		    n = 0;
+
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
 
                  /* Text */
-		  memcpy(bufptr, value->string.text, n);
-		  bufptr += n;
+		  if (n > 0)
+		  {
+		    memcpy(bufptr, value->string.text, n);
+		    bufptr += n;
+		  }
 		}
 		break;
 
@@ -2038,5 +2063,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.73 2002/09/18 14:49:18 mike Exp $".
+ * End of "$Id: ipp.c,v 1.74 2002/09/18 14:54:24 mike Exp $".
  */
