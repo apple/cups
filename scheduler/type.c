@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.11.2.5 2002/05/16 14:00:16 mike Exp $"
+ * "$Id: type.c,v 1.11.2.6 2002/05/24 15:36:21 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,13 +23,13 @@
  *
  * Contents:
  *
- *   mimeAddType()  - Add a MIME type to a database.
- *   mimeAddRule()  - Add a detection rule for a file type.
- *   mimeFileType() - Determine the type of a file.
- *   mimeType()     - Lookup a file type.
- *   compare()      - Compare two MIME super/type names.
- *   checkrules()   - Check each rule in a list.
- *   patmatch()     - Pattern matching...
+ *   mimeAddType()      - Add a MIME type to a database.
+ *   mimeAddTypeRule()  - Add a detection rule for a file type.
+ *   mimeFileType()     - Determine the type of a file.
+ *   mimeType()         - Lookup a file type.
+ *   compare()          - Compare two MIME super/type names.
+ *   checkrules()       - Check each rule in a list.
+ *   patmatch()         - Pattern matching...
  */
 
 /*
@@ -125,7 +125,7 @@ mimeAddType(mime_t     *mime,	/* I - MIME database */
 
 
 /*
- * 'mimeAddRule()' - Add a detection rule for a file type.
+ * 'mimeAddTypeRule()' - Add a detection rule for a file type.
  */
 
 int					/* O - 0 on success, -1 on failure */
@@ -1092,5 +1092,5 @@ patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.11.2.5 2002/05/16 14:00:16 mike Exp $".
+ * End of "$Id: type.c,v 1.11.2.6 2002/05/24 15:36:21 mike Exp $".
  */
