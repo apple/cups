@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.h,v 1.10 2000/03/11 15:31:28 mike Exp $"
+ * "$Id: dirsvc.h,v 1.11 2000/06/27 20:04:56 mike Exp $"
  *
  *   Directory services definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -52,6 +52,8 @@ typedef struct
 
 VAR int			Browsing	VALUE(TRUE),
 					/* Whether or not browsing is enabled */
+			BrowseShortNames VALUE(TRUE),
+					/* Short names for remote printers? */
 			BrowseSocket	VALUE(-1),
 					/* Socket for browsing */
 			BrowsePort	VALUE(IPP_PORT),
@@ -90,5 +92,5 @@ extern void	StopPolling(void);
 
 
 /*
- * End of "$Id: dirsvc.h,v 1.10 2000/03/11 15:31:28 mike Exp $".
+ * End of "$Id: dirsvc.h,v 1.11 2000/06/27 20:04:56 mike Exp $".
  */

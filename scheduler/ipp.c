@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.73 2000/06/03 14:11:20 mike Exp $"
+ * "$Id: ipp.c,v 1.74 2000/06/27 20:04:56 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -498,6 +498,7 @@ add_class(client_t        *con,		/* I - Client connection */
   cups_ptype_t		dtype;		/* Destination type */
   const char		*dest;		/* Printer or class name */
   ipp_attribute_t	*attr;		/* Printer attribute */
+  int			modify;		/* Non-zero if we just modified */
 
 
  /*
@@ -556,7 +557,43 @@ add_class(client_t        *con,		/* I - Client connection */
     */
 
     pclass = AddClass(resource + 9);
+    modify = 0;
   }
+  else if (pclass->type & CUPS_PRINTER_IMPLICIT)
+  {
+   /*
+    * Rename the implicit class to "AnyClass"...
+    */
+
+    snprintf(pclass->name, sizeof(pclass->name), "Any%s", resource + 10);
+    SortPrinters();
+
+   /*
+    * Add the class as a new local class...
+    */
+
+    pclass = AddClass(resource + 10);
+    modify = 0;
+  }
+  else if (pclass->type & CUPS_PRINTER_REMOTE)
+  {
+   /*
+    * Rename the remote class to "Class@server"...
+    */
+
+    snprintf(pclass->name, sizeof(pclass->name), "%s@%s", resource + 10,
+             pclass->hostname);
+    SortPrinters();
+
+   /*
+    * Add the class as a new local class...
+    */
+
+    pclass = AddClass(resource + 10);
+    modify = 0;
+  }
+  else
+    modify = 1;
 
  /*
   * Look for attributes and copy them over as needed...
@@ -678,8 +715,12 @@ add_class(client_t        *con,		/* I - Client connection */
   SaveAllClasses();
   CheckJobs();
 
-  LogMessage(L_INFO, "New class \'%s\' added by \'%s\'.", pclass->name,
-             con->username);
+  if (modify)
+    LogMessage(L_INFO, "Class \'%s\' modified by \'%s\'.", pclass->name,
+               con->username);
+  else
+    LogMessage(L_INFO, "New class \'%s\' added by \'%s\'.", pclass->name,
+               con->username);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -818,6 +859,7 @@ add_printer(client_t        *con,	/* I - Client connection */
   char			line[1024];	/* Line from file... */
   char			srcfile[1024],	/* Source Script/PPD file */
 			dstfile[1024];	/* Destination Script/PPD file */
+  int			modify;		/* Non-zero if we are modifying */
 
 
  /*
@@ -876,7 +918,43 @@ add_printer(client_t        *con,	/* I - Client connection */
     */
 
     printer = AddPrinter(resource + 10);
+    modify  = 0;
   }
+  else if (printer->type & CUPS_PRINTER_IMPLICIT)
+  {
+   /*
+    * Rename the implicit printer to "AnyPrinter"...
+    */
+
+    snprintf(printer->name, sizeof(printer->name), "Any%s", resource + 10);
+    SortPrinters();
+
+   /*
+    * Add the printer as a new local printer...
+    */
+
+    printer = AddPrinter(resource + 10);
+    modify  = 0;
+  }
+  else if (printer->type & CUPS_PRINTER_REMOTE)
+  {
+   /*
+    * Rename the remote printer to "Printer@server"...
+    */
+
+    snprintf(printer->name, sizeof(printer->name), "%s@%s", resource + 10,
+             printer->hostname);
+    SortPrinters();
+
+   /*
+    * Add the printer as a new local printer...
+    */
+
+    printer = AddPrinter(resource + 10);
+    modify  = 0;
+  }
+  else
+    modify = 1;
 
  /*
   * Look for attributes and copy them over as needed...
@@ -1089,8 +1167,12 @@ add_printer(client_t        *con,	/* I - Client connection */
 
   CheckJobs();
 
-  LogMessage(L_INFO, "New printer \'%s\' added by \'%s\'.", printer->name,
-             con->username);
+  if (modify)
+    LogMessage(L_INFO, "Printer \'%s\' modified by \'%s\'.", printer->name,
+               con->username);
+  else
+    LogMessage(L_INFO, "New printer \'%s\' added by \'%s\'.", printer->name,
+               con->username);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -4849,5 +4931,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.73 2000/06/03 14:11:20 mike Exp $".
+ * End of "$Id: ipp.c,v 1.74 2000/06/27 20:04:56 mike Exp $".
  */

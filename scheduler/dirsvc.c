@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.55 2000/05/31 13:47:47 mike Exp $"
+ * "$Id: dirsvc.c,v 1.56 2000/06/27 20:04:56 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -365,7 +365,35 @@ UpdateBrowseList(void)
     else
       return;
 
-    if ((p = FindClass(name)) == NULL)
+    if ((p = FindClass(name)) == NULL && BrowseShortNames)
+      if ((p = FindClass(resource + 9)) != NULL)
+      {
+        if (strcasecmp(p->hostname, host) != 0)
+	{
+	 /*
+	  * Nope, this isn't the same host; if the hostname isn't the local host,
+	  * add it to the other class and then find a class using the full host
+	  * name...
+	  */
+
+	  if (p->type & CUPS_PRINTER_REMOTE)
+	  {
+            strcat(p->name, "@");
+	    strcat(p->name, p->hostname);
+	    SetPrinterAttrs(p);
+	    SortPrinters();
+	  }
+
+          p = NULL;
+	}
+      }
+      else
+      {
+        strncpy(name, resource + 9, sizeof(name) - 1);
+        name[sizeof(name) - 1] = '\0';
+      }
+
+    if (p == NULL)
     {
      /*
       * Class doesn't exist; add it...
@@ -402,7 +430,35 @@ UpdateBrowseList(void)
     else
       return;
 
-    if ((p = FindPrinter(name)) == NULL)
+    if ((p = FindPrinter(name)) == NULL && BrowseShortNames)
+      if ((p = FindPrinter(resource + 10)) != NULL)
+      {
+        if (strcasecmp(p->hostname, host) != 0)
+	{
+	 /*
+	  * Nope, this isn't the same host; if the hostname isn't the local host,
+	  * add it to the other printer and then find a printer using the full host
+	  * name...
+	  */
+
+	  if (p->type & CUPS_PRINTER_REMOTE)
+	  {
+            strcat(p->name, "@");
+	    strcat(p->name, p->hostname);
+	    SetPrinterAttrs(p);
+	    SortPrinters();
+	  }
+
+          p = NULL;
+	}
+      }
+      else
+      {
+        strncpy(name, resource + 10, sizeof(name) - 1);
+        name[sizeof(name) - 1] = '\0';
+      }
+
+    if (p == NULL)
     {
      /*
       * Printer doesn't exist; add it...
@@ -730,5 +786,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.55 2000/05/31 13:47:47 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.56 2000/06/27 20:04:56 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.49 2000/03/21 18:35:38 mike Exp $"
+ * "$Id: conf.c,v 1.50 2000/06/27 20:04:56 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -97,6 +97,7 @@ static var_t	variables[] =
   { "KeepAliveTimeout",	&KeepAliveTimeout,	VAR_INTEGER,	0 },
   { "ImplicitClasses",	&ImplicitClasses,	VAR_BOOLEAN,	0 },
   { "Browsing",		&Browsing,		VAR_BOOLEAN,	0 },
+  { "BrowseShortNames",	&BrowseShortNames,	VAR_BOOLEAN,	0 },
   { "BrowsePort",	&BrowsePort,		VAR_INTEGER,	0 },
   { "BrowseInterval",	&BrowseInterval,	VAR_INTEGER,	0 },
   { "BrowseTimeout",	&BrowseTimeout,		VAR_INTEGER,	0 },
@@ -296,6 +297,7 @@ ReadConfiguration(void)
       free(Relays[i].from.mask.name.name);
 
   Browsing         = TRUE;
+  BrowseShortNames = TRUE;
   BrowsePort       = ippPort();
   BrowseInterval   = DEFAULT_INTERVAL;
   BrowseTimeout    = DEFAULT_TIMEOUT;
@@ -1387,5 +1389,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.49 2000/03/21 18:35:38 mike Exp $".
+ * End of "$Id: conf.c,v 1.50 2000/06/27 20:04:56 mike Exp $".
  */
