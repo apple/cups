@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.144 2003/02/11 16:23:55 mike Exp $"
+ * "$Id: client.c,v 1.145 2003/03/07 19:24:53 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2750,13 +2750,13 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 #ifdef HAVE_SIGSET
   sighold(SIGTERM);
-  sighold(SIGCHLD);
 #elif defined(HAVE_SIGACTION)
   sigemptyset(&newmask);
   sigaddset(&newmask, SIGTERM);
-  sigaddset(&newmask, SIGCHLD);
   sigprocmask(SIG_BLOCK, &newmask, &oldmask);
 #endif /* HAVE_SIGSET */
+
+  IgnoreChildSignals();
 
  /*
   * Then execute the command...
@@ -2824,10 +2824,8 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 #ifdef HAVE_SIGSET
     sigset(SIGTERM, SIG_DFL);
-    sigset(SIGCHLD, SIG_DFL);
 
     sigrelse(SIGTERM);
-    sigrelse(SIGCHLD);
 #elif defined(HAVE_SIGACTION)
     memset(&action, 0, sizeof(action));
 
@@ -2835,14 +2833,11 @@ pipe_command(client_t *con,		/* I - Client connection */
     action.sa_handler = SIG_DFL;
 
     sigaction(SIGTERM, &action, NULL);
-    sigaction(SIGCHLD, &action, NULL);
 
     sigprocmask(SIG_SETMASK, &oldmask, NULL);
 #else
     signal(SIGTERM, SIG_DFL);
-    signal(SIGCHLD, SIG_DFL);
 #endif /* HAVE_SIGSET */
-
 
    /*
     * Execute the pipe program; if an error occurs, exit with status 1...
@@ -2881,10 +2876,11 @@ pipe_command(client_t *con,		/* I - Client connection */
 
 #ifdef HAVE_SIGSET
   sigrelse(SIGTERM);
-  sigrelse(SIGCHLD);
 #elif defined(HAVE_SIGACTION)
   sigprocmask(SIG_SETMASK, &oldmask, NULL);
 #endif /* HAVE_SIGSET */
+
+  CatchChildSignals();
 
   return (pid);
 }
@@ -2939,5 +2935,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.144 2003/02/11 16:23:55 mike Exp $".
+ * End of "$Id: client.c,v 1.145 2003/03/07 19:24:53 mike Exp $".
  */

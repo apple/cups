@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.187 2003/02/28 20:18:08 mike Exp $"
+ * "$Id: job.c,v 1.188 2003/03/07 19:24:54 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -3279,13 +3279,13 @@ start_process(const char *command,	/* I - Full path to command */
 
 #ifdef HAVE_SIGSET
   sighold(SIGTERM);
-  sighold(SIGCHLD);
 #elif defined(HAVE_SIGACTION)
   sigemptyset(&newmask);
   sigaddset(&newmask, SIGTERM);
-  sigaddset(&newmask, SIGCHLD);
   sigprocmask(SIG_BLOCK, &newmask, &oldmask);
 #endif /* HAVE_SIGSET */
+
+  IgnoreChildSignals();
 
   if ((*pid = fork()) == 0)
   {
@@ -3358,7 +3358,6 @@ start_process(const char *command,	/* I - Full path to command */
     sigset(SIGCHLD, SIG_DFL);
 
     sigrelse(SIGTERM);
-    sigrelse(SIGCHLD);
 #elif defined(HAVE_SIGACTION)
     memset(&action, 0, sizeof(action));
 
@@ -3366,12 +3365,10 @@ start_process(const char *command,	/* I - Full path to command */
     action.sa_handler = SIG_DFL;
 
     sigaction(SIGTERM, &action, NULL);
-    sigaction(SIGCHLD, &action, NULL);
 
     sigprocmask(SIG_SETMASK, &oldmask, NULL);
 #else
     signal(SIGTERM, SIG_DFL);
-    signal(SIGCHLD, SIG_DFL);
 #endif /* HAVE_SIGSET */
 
    /*
@@ -3398,15 +3395,16 @@ start_process(const char *command,	/* I - Full path to command */
 
 #ifdef HAVE_SIGSET
   sigrelse(SIGTERM);
-  sigrelse(SIGCHLD);
 #elif defined(HAVE_SIGACTION)
   sigprocmask(SIG_SETMASK, &oldmask, NULL);
 #endif /* HAVE_SIGSET */
+
+  CatchChildSignals();
 
   return (*pid);
 }
 
 
 /*
- * End of "$Id: job.c,v 1.187 2003/02/28 20:18:08 mike Exp $".
+ * End of "$Id: job.c,v 1.188 2003/03/07 19:24:54 mike Exp $".
  */
