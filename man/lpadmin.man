@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpadmin.man,v 1.9 2002/12/17 18:59:57 swdev Exp $"
+.\" "$Id: lpadmin.man,v 1.10 2003/01/31 20:09:23 mike Exp $"
 .\"
 .\"   lpadmin man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -101,6 +101,11 @@ pages that can be printed; double-sided pages are counted as two pages.
 Sets the accounting period for per-user quotas. The value is an integer number
 of seconds; 86,400 seconds are in one day.
 .TP 5
+\-o \fIprotocol=name\fR
+.br
+Sets the binary communications protocol to use when printing,
+None, BCP, or TBCP. The default protocol is None.
+.TP 5
 \-r \fIclass\fR
 .br
 Removes the named \fIprinter\fR from \fIclass\fR.  If the resulting class
@@ -153,5 +158,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2003 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpadmin.man,v 1.9 2002/12/17 18:59:57 swdev Exp $".
+.\" End of "$Id: lpadmin.man,v 1.10 2003/01/31 20:09:23 mike Exp $".
 .\"

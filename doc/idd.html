@@ -371,15 +371,19 @@ source/type cost program
 <P>The destination type is assumed to the printer's type. If a printer
  supports the source type directly the special filter program &quot;-&quot; may be
  specified.</P>
-<H4>3.5.2.2 cupsManualCopies</H4>
+<H4>3.5.2.2 cupsFlipDuplex</H4>
+<P>This boolean attribute notifies the RIP filters that the destination
+ printer requires an upside-down image for the back page. The default
+ value is false.</P>
+<H4>3.5.2.3 cupsManualCopies</H4>
 <P>This boolean attribute notifies the RIP filters that the destination
  printer does not support copy generation in hardware. The default value
  is false.</P>
-<H4>3.5.2.3 cupsModelNumber</H4>
+<H4>3.5.2.4 cupsModelNumber</H4>
 <P>This integer attribute specifies a printer-specific model number.
  This number can be used by a filter program to adjust the output for a
  specific model of printer.</P>
-<H4>3.5.2.4 cupsProfile</H4>
+<H4>3.5.2.5 cupsProfile</H4>
 <P>This string attribute specifies a color profile of the form:</P>
 <UL>
 <PRE>
@@ -399,7 +403,12 @@ f(x) = density * x<SUP>gamma</SUP>
 <P>The<I> m00</I> through<I> m22</I> values define a 3x3 transformation
  matrix for the CMY color values. The density function is applied<I>
  after</I> the CMY transformation.</P>
-<H4>3.5.2.5 cupsVersion</H4>
+<H4>3.5.2.6 cupsProtocol</H4>
+<P>This optional attribute describes which binary communication protocol
+ to use when printing binary PostScript data. The strings &quot;None&quot;, &quot;BCP&quot;,
+ and &quot;TBCP&quot; are recognized, corresponding to no encoding, BCP, and TBCP
+ respectively.</P>
+<H4>3.5.2.7 cupsVersion</H4>
 <P>This required attribute describes which version of the CUPS IDD was
  used for the PPD file extensions. Currently it must be the string &quot;1.0&quot;
  or &quot;1.1&quot;.</P>
