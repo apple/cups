@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.2 2003/10/16 19:13:41 mike Exp $"
+ * "$Id: auth.c,v 1.3 2003/11/19 18:05:55 mike Exp $"
  *
  *   Authentication functions for the Common UNIX Printing System (CUPS).
  *
@@ -92,7 +92,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
   * Nope, see if we should retry the current digest password...
   */
 
-  if (strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5) == 0 ||
+  if (strncasecmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5) == 0 ||
       http->digest_tries > 1 || !http->userpass[0])
   {
    /*
@@ -121,7 +121,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
   * Got a password; encode it for the server...
   */
 
-  if (strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5) == 0)
+  if (strncasecmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5) == 0)
   {
    /*
     * Basic authentication...
@@ -234,5 +234,5 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: auth.c,v 1.2 2003/10/16 19:13:41 mike Exp $".
+ * End of "$Id: auth.c,v 1.3 2003/11/19 18:05:55 mike Exp $".
  */

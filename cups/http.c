@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.126 2003/11/05 18:13:56 mike Exp $"
+ * "$Id: http.c,v 1.127 2003/11/19 18:05:55 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -1776,6 +1776,7 @@ httpEncode64(char       *out,	/* I - String to write to */
     if (*in == '\0')
     {
       *outptr ++ = '=';
+      *outptr ++ = '=';
       break;
     }
 
@@ -1783,12 +1784,14 @@ httpEncode64(char       *out,	/* I - String to write to */
 
     in ++;
     if (*in == '\0')
+    {
+      *outptr ++ = '=';
       break;
+    }
 
     *outptr ++ = base64[in[0] & 63];
   }
 
-  *outptr ++ = '=';
   *outptr = '\0';
 
  /*
@@ -2417,5 +2420,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.126 2003/11/05 18:13:56 mike Exp $".
+ * End of "$Id: http.c,v 1.127 2003/11/19 18:05:55 mike Exp $".
  */

@@ -3,6 +3,12 @@ CHANGES.txt - 11/19/2003
 
 CHANGES IN CUPS V1.1.20
 
+	- The HTTP code did not use a case-insensitive
+	  comparison when checking for the Basic authentication
+	  method (STR #407)
+	- The httpEncode() function always added a trailing "="
+	  character, which is not required by the Base64
+	  encoding specification (STR #407)
 	- The signal handlers did not need to call sigset();
 	  this caused a recursion problem on some versions of
 	  IRIX (STR #422)
