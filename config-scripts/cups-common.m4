@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4,v 1.42 2004/02/26 16:52:00 mike Exp $"
+dnl "$Id: cups-common.m4,v 1.43 2004/06/29 02:44:47 mike Exp $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -152,7 +152,10 @@ esac
 dnl Checks for mkstemp and mkstemps functions.
 AC_CHECK_FUNCS(mkstemp mkstemps)
 
-dnl Checks for vsyslog function.
+dnl Check for geteuid function.
+AC_CHECK_FUNCS(geteuid)
+
+dnl Check for vsyslog function.
 AC_CHECK_FUNCS(vsyslog)
 
 dnl Checks for signal functions.
@@ -202,5 +205,5 @@ AC_SUBST(BACKLIBS)
 AC_SUBST(COMMONLIBS)
 
 dnl
-dnl End of "$Id: cups-common.m4,v 1.42 2004/02/26 16:52:00 mike Exp $".
+dnl End of "$Id: cups-common.m4,v 1.43 2004/06/29 02:44:47 mike Exp $".
 dnl
