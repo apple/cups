@@ -3,6 +3,11 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- The scheduler now preserves the default options of PPD
+	  files when modifying/upgrading an existing PPD file.
+	  When installing a new printer, the scheduler sets the
+	  default media size to Letter or A4 as appropriate for
+	  your locale.
 	- The scheduler no longer limits the number of
 	  BrowseAddress, BrowsePoll, BrowseRelay, Listen, Port,
 	  SSLListen, and SSLPort directives to 10.
