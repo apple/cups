@@ -7,6 +7,8 @@ CHANGES IN CUPS V1.1.11
 	  files.
 	- Added support for PostScript functions in PDF
 	  files.
+	- Added new "cupsaddsmb" utility for exporting
+	  CUPS printer drivers to SAMBA/Windows clients.
 	- The scheduler could crash when BrowseShortNames
 	  was set to "No".
 	- The scheduler did not prevent MaxClients from being

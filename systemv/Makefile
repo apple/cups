@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.27 2001/08/17 14:22:55 mike Exp $"
+# "$Id: Makefile,v 1.28 2001/09/18 19:14:47 mike Exp $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -24,10 +24,10 @@
 
 include ../Makedefs
 
-TARGETS	=	accept cancel lp lpadmin lpinfo lpmove lpoptions lppasswd \
-		lpstat
-OBJS	=	accept.o cancel.o lp.o lpadmin.o lpinfo.o lpmove.o \
-		lpoptions.o lppasswd.o lpstat.o
+TARGETS	=	accept cancel cupsaddsmb lp lpadmin lpinfo lpmove \
+		lpoptions lppasswd lpstat
+OBJS	=	accept.o cancel.o cupsaddsmb.o lp.o lpadmin.o \
+		lpinfo.o lpmove.o lpoptions.o lppasswd.o lpstat.o
 
 
 #
@@ -54,6 +54,7 @@ install:
 	$(INSTALL_BIN) accept $(SBINDIR)
 	$(RM) $(SBINDIR)/reject
 	$(LN) accept $(SBINDIR)/reject
+	$(INSTALL_BIN) cupsaddsmb $(SBINDIR)
 	$(INSTALL_BIN) lpadmin $(SBINDIR)
 	$(INSTALL_BIN) lpinfo $(SBINDIR)
 	$(INSTALL_BIN) lpmove $(SBINDIR)
@@ -92,6 +93,17 @@ cancel:	cancel.o ../cups/$(LIBCUPS)
 	$(CC) $(LDFLAGS) -o cancel cancel.o $(LIBS)
 
 cancel.o:	../cups/cups.h
+
+
+#
+# cupsaddsmb
+#
+
+cupsaddsmb:	cupsaddsmb.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o cupsaddsmb cupsaddsmb.o $(LIBS)
+
+cupsaddsmb.o:	../cups/cups.h ../cups/string.h
 
 
 #
@@ -174,5 +186,5 @@ lpstat.o:	../cups/cups.h
 $(OBJS):	../Makedefs
 
 #
-# End of "$Id: Makefile,v 1.27 2001/08/17 14:22:55 mike Exp $".
+# End of "$Id: Makefile,v 1.28 2001/09/18 19:14:47 mike Exp $".
 #
