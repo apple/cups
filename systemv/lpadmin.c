@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.22.2.10 2002/06/27 20:19:08 mike Exp $"
+ * "$Id: lpadmin.c,v 1.22.2.11 2002/06/28 20:14:47 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -1822,7 +1822,7 @@ validate_name(const char *name)	/* I - Name to check */
   for (ptr = name; *ptr; ptr ++)
     if (*ptr == '@')
       break;
-    else if ((*ptr >= 0 && *ptr <= ' ') || *ptr == 127)
+    else if ((*ptr >= 0 && *ptr <= ' ') || *ptr == 127 || *ptr == '/')
       return (0);
 
  /*
@@ -1834,5 +1834,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.22.2.10 2002/06/27 20:19:08 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.22.2.11 2002/06/28 20:14:47 mike Exp $".
  */
