@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c,v 1.10 2000/05/11 14:19:16 mike Exp $"
+ * "$Id: lpq.c,v 1.11 2000/09/05 20:14:42 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -68,6 +68,9 @@ main(int  argc,		/* I - Number of command-line arguments */
   int		id,		/* Desired job ID */
 		interval,	/* Reporting interval */
 		longstatus;	/* Show file details */
+  int		num_dests;	/* Number of destinations */
+  cups_dest_t	*dests;		/* Destinations */
+
 
  /*
   * Connect to the scheduler...
@@ -79,11 +82,17 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Check for command-line options...
   */
 
-  dest       = cupsGetDefault();
+  dest       = NULL;
   user       = NULL;
   id         = 0;
   interval   = 0;
   longstatus = 0;
+
+  num_dests = cupsGetDests(&dests);
+
+  for (i = 0; i < num_dests; i ++)
+    if (dests[i].is_default)
+      dest = dests[i].name;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '+')
@@ -108,6 +117,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 	default :
 	    fputs("Usage: lpq [-P dest] [-l] [+interval]\n", stderr);
+	    httpClose(http);
+            cupsFreeDests(num_dests, dests);
 	    return (1);
       }
     }
@@ -140,6 +151,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   * Close the connection to the server and return...
   */
 
+  cupsFreeDests(num_dests, dests);
   httpClose(http);
 
   return (0);
@@ -497,5 +509,5 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpq.c,v 1.10 2000/05/11 14:19:16 mike Exp $".
+ * End of "$Id: lpq.c,v 1.11 2000/09/05 20:14:42 mike Exp $".
  */

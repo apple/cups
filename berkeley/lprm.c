@@ -1,5 +1,5 @@
 /*
- * "$Id: lprm.c,v 1.10 2000/01/04 13:45:33 mike Exp $"
+ * "$Id: lprm.c,v 1.11 2000/09/05 20:14:42 mike Exp $"
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
@@ -55,6 +55,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   ipp_t		*response;	/* IPP response */
   ipp_op_t	op;		/* Operation */
   cups_lang_t	*language;	/* Language */
+  int		num_dests;	/* Number of destinations */
+  cups_dest_t	*dests;		/* Destinations */
 
 
  /*
@@ -63,9 +65,15 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   op       = IPP_CANCEL_JOB;
   job_id   = 0;
-  dest     = cupsGetDefault();
+  dest     = NULL;
   response = NULL;
   http     = NULL;
+
+  num_dests = cupsGetDests(&dests);
+
+  for (i = 0; i < num_dests; i ++)
+    if (dests[i].is_default)
+      dest = dests[i].name;
 
  /*
   * Open a connection to the server...
@@ -74,6 +82,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   if ((http = httpConnect(cupsServer(), ippPort())) == NULL)
   {
     fputs("lprm: Unable to contact server!\n", stderr);
+    cupsFreeDests(num_dests, dests);
     return (1);
   }
 
@@ -97,6 +106,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	default :
 	    fprintf(stderr, "lprm: Unknown option \'%c\'!\n", argv[i][1]);
+            cupsFreeDests(num_dests, dests);
+	    httpClose(http);
 	    return (1);
       }
     else
@@ -196,6 +207,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       else
       {
         fputs("lprm: Unable to cancel job(s)!\n", stderr);
+        cupsFreeDests(num_dests, dests);
+        httpClose(http);
 	return (1);
       }
     }
@@ -209,13 +222,18 @@ main(int  argc,			/* I - Number of command-line arguments */
     if (!cupsCancelJob(dest, 0))
     {
       fputs("lprm: Unable to cancel job(s)!\n", stderr);
+      cupsFreeDests(num_dests, dests);
+      httpClose(http);
       return (1);
     }
+
+  cupsFreeDests(num_dests, dests);
+  httpClose(http);
 
   return (0);
 }
 
 
 /*
- * End of "$Id: lprm.c,v 1.10 2000/01/04 13:45:33 mike Exp $".
+ * End of "$Id: lprm.c,v 1.11 2000/09/05 20:14:42 mike Exp $".
  */
