@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.20 1999/06/18 18:36:45 mike Exp $"
+ * "$Id: conf.c,v 1.21 1999/06/21 19:43:49 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -83,6 +83,7 @@ static var_t	variables[] =
   { "DefaultCharset",	DefaultCharset,		VAR_STRING,	sizeof(DefaultCharset) },
   { "DefaultLanguage",	DefaultLanguage,	VAR_STRING,	sizeof(DefaultLanguage) },
   { "RIPCache",		RIPCache,		VAR_STRING,	sizeof(RIPCache) },
+  { "TempDir",		TempDir,		VAR_STRING,	sizeof(TempDir) },
   { "HostNameLookups",	&HostNameLookups,	VAR_BOOLEAN,	0 },
   { "Timeout",		&Timeout,		VAR_INTEGER,	0 },
   { "KeepAlive",	&KeepAlive,		VAR_BOOLEAN,	0 },
@@ -185,6 +186,10 @@ ReadConfiguration(void)
   strcpy(DefaultLanguage, DEFAULT_LANGUAGE);
   strcpy(DefaultCharset, DEFAULT_CHARSET);
   strcpy(RIPCache, "32m");
+  if (getenv("TMPDIR") == NULL)
+    strcpy(TempDir, "/var/tmp");
+  else
+    strcpy(TempDir, getenv("TMPDIR"));
 
   User             = DEFAULT_UID;
   Group            = DEFAULT_GID;
@@ -353,7 +358,7 @@ LogRequest(client_t      *con,	/* I - Request to log */
   * Write a log of the request in "common log format"...
   */
 
-  date = gmtime(&(con->start));
+  date = localtime(&(con->start));
 
   fprintf(AccessFile, "%s - %s [%02d/%s/%04d:%02d:%02d:%02d +0000] \"%s %s HTTP/%d.%d\" %d %d\n",
           con->http.hostname, con->username[0] != '\0' ? con->username : "-",
@@ -451,7 +456,7 @@ LogMessage(int  level,		/* I - Log level */
     */
 
     dtime = time(NULL);
-    date  = gmtime(&dtime);
+    date  = localtime(&dtime);
 
     fprintf(ErrorFile, "%c [%02d/%s/%04d:%02d:%02d:%02d +0000] ",
             levels[level],
@@ -547,7 +552,7 @@ LogPage(job_t *job,		/* I - Job being printed */
   */
 
   dtime = time(NULL);
-  date  = gmtime(&dtime);
+  date  = localtime(&dtime);
 
   fprintf(PageFile, "%s %s %d [%02d/%s/%04d:%02d:%02d:%02d +0000] %s\n",
           job->printer->name, job->username, job->id,
@@ -1133,5 +1138,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.20 1999/06/18 18:36:45 mike Exp $".
+ * End of "$Id: conf.c,v 1.21 1999/06/21 19:43:49 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.22 1999/06/19 12:30:11 mike Exp $"
+ * "$Id: main.c,v 1.23 1999/06/21 19:43:50 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -101,10 +101,9 @@ main(int  argc,			/* I - Number of command-line arguments */
     }
 
  /*
-  * Set the timezone to GMT...
+  * Set the timezone info...
   */
 
-  putenv("TZ=GMT");
   tzset();
 
 #ifndef DEBUG
@@ -419,5 +418,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.22 1999/06/19 12:30:11 mike Exp $".
+ * End of "$Id: main.c,v 1.23 1999/06/21 19:43:50 mike Exp $".
  */

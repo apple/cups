@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.24 1999/06/19 12:30:09 mike Exp $"
+ * "$Id: client.c,v 1.25 1999/06/21 19:43:48 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1338,7 +1338,7 @@ pipe_command(client_t *con,	/* I - Client connection */
   static char	server_name[1024];	/* Default listen hostname */
   static char	remote_host[1024];	/* REMOTE_HOST env variable */
   static char	remote_user[1024];	/* REMOTE_HOST env variable */
-
+  static char	tmpdir[1024];		/* TMPDIR env variable */
 
  /*
   * Copy the command string...
@@ -1400,22 +1400,24 @@ pipe_command(client_t *con,	/* I - Client connection */
   sprintf(server_name, "SERVER_NAME=%s", hostname);
   sprintf(remote_host, "REMOTE_HOST=%s", con->http.hostname);
   sprintf(remote_user, "REMOTE_USER=%s", con->username);
+  sprintf(tmpdir, "TMPDIR=%s", TempDir);
 
-  envp[0] = "PATH=/bin:/usr/bin";
-  envp[1] = "SERVER_SOFTWARE=CUPS/1.0";
-  envp[2] = "GATEWAY_INTERFACE=CGI/1.1";
-  envp[3] = "SERVER_PROTOCOL=HTTP/1.1";
-  envp[4] = server_name;
-  envp[5] = server_port;
-  envp[6] = remote_host;
-  envp[7] = remote_user;
-  envp[8] = lang;
-  envp[9] = "TZ=GMT";
+  envp[0]  = "PATH=/bin:/usr/bin";
+  envp[1]  = "SERVER_SOFTWARE=CUPS/1.0";
+  envp[2]  = "GATEWAY_INTERFACE=CGI/1.1";
+  envp[3]  = "SERVER_PROTOCOL=HTTP/1.1";
+  envp[4]  = server_name;
+  envp[5]  = server_port;
+  envp[6]  = remote_host;
+  envp[7]  = remote_user;
+  envp[8]  = lang;
+  envp[9]  = "TZ=GMT";
+  envp[10] = tmpdir;
 
   if (con->operation == HTTP_GET)
   {
-    envp[10] = "REQUEST_METHOD=GET";
-    envp[11] = NULL;
+    envp[11] = "REQUEST_METHOD=GET";
+    envp[12] = NULL;
   }
   else
   {
@@ -1423,10 +1425,10 @@ pipe_command(client_t *con,	/* I - Client connection */
     sprintf(content_type, "CONTENT_TYPE=%s",
             con->http.fields[HTTP_FIELD_CONTENT_TYPE]);
 
-    envp[10] = "REQUEST_METHOD=POST";
-    envp[11] = content_length;
-    envp[12] = content_type;
-    envp[13] = NULL;
+    envp[11] = "REQUEST_METHOD=POST";
+    envp[12] = content_length;
+    envp[13] = content_type;
+    envp[14] = NULL;
   }
 
  /*
@@ -1495,5 +1497,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.24 1999/06/19 12:30:09 mike Exp $".
+ * End of "$Id: client.c,v 1.25 1999/06/21 19:43:48 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.28 1999/06/19 12:30:10 mike Exp $"
+ * "$Id: job.c,v 1.29 1999/06/21 19:43:49 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -298,12 +298,13 @@ StartJob(int       id,		/* I - Job ID */
 				/* Job title string */
 		copies[255],	/* # copies string */
 		options[16384],	/* Full list of options */
-		*envp[11],	/* Environment variables */
+		*envp[12],	/* Environment variables */
 		language[255],	/* LANG environment variable */
 		charset[255],	/* CHARSET environment variable */
 		ppd[1024],	/* PPD environment variable */
 		root[1024],	/* SERVER_ROOT environment variable */
-		cache[255];	/* RIP_MAX_CACHE environment variable */
+		cache[255],	/* RIP_MAX_CACHE environment variable */
+		tmpdir[1024];	/* TMPDIR environment variable */
 
 
   DEBUG_printf(("StartJob(%d, %08x)\n", id, printer));
@@ -494,6 +495,7 @@ StartJob(int       id,		/* I - Job ID */
       sprintf(ppd, "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
       sprintf(root, "SERVER_ROOT=%s", ServerRoot);
       sprintf(cache, "RIP_MAX_CACHE=%s", RIPCache);
+      sprintf(tmpdir, "TMPDIR=%s", TempDir);
 
       envp[0]  = "PATH=/bin:/usr/bin";
       envp[1]  = "SOFTWARE=CUPS/1.0";
@@ -505,7 +507,8 @@ StartJob(int       id,		/* I - Job ID */
       envp[7]  = ppd;
       envp[8]  = root;
       envp[9]  = cache;
-      envp[10] = NULL;
+      envp[10] = tmpdir;
+      envp[11] = NULL;
 
       DEBUG_puts(envp[0]);
       DEBUG_puts(envp[1]);
@@ -517,6 +520,7 @@ StartJob(int       id,		/* I - Job ID */
       DEBUG_puts(envp[7]);
       DEBUG_puts(envp[8]);
       DEBUG_puts(envp[9]);
+      DEBUG_puts(envp[10]);
 
      /*
       * Now create processes for all of the filters...
@@ -909,5 +913,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.28 1999/06/19 12:30:10 mike Exp $".
+ * End of "$Id: job.c,v 1.29 1999/06/21 19:43:49 mike Exp $".
  */
