@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c,v 1.17 2000/01/21 20:28:00 mike Exp $"
+ * "$Id: lpstat.c,v 1.18 2000/02/24 02:18:57 mike Exp $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -580,7 +580,7 @@ show_classes(http_t     *http,	/* I - HTTP connection to server */
 
   if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
-    DEBUG_puts("show_devices: request succeeded...");
+    DEBUG_puts("show_classes: request succeeded...");
 
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
@@ -881,7 +881,7 @@ show_devices(http_t     *http,	/* I - HTTP connection to server */
       * See if we have everything needed...
       */
 
-      if (printer == NULL || device == NULL)
+      if (printer == NULL)
       {
         if (attr == NULL)
 	  break;
@@ -943,7 +943,9 @@ show_devices(http_t     *http,	/* I - HTTP connection to server */
 
       if (match)
       {
-        if (strncmp(device, "file:", 5) == 0)
+        if (device == NULL)
+          printf("device for %s: /dev/null\n", printer);
+        else if (strncmp(device, "file:", 5) == 0)
           printf("device for %s: %s\n", printer, device + 5);
         else
           printf("device for %s: %s\n", printer, device);
@@ -1462,5 +1464,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c,v 1.17 2000/01/21 20:28:00 mike Exp $".
+ * End of "$Id: lpstat.c,v 1.18 2000/02/24 02:18:57 mike Exp $".
  */
