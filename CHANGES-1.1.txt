@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- The lpadmin command did not send the right URI to the
+	  scheduler when setting options on classes.  This
+	  caused a client-error-bad-request error.
 	- The CUPS API convenience functions would attempt to
 	  connect to the remote server name in a
 	  "printer@server" printer name instead of dealing with

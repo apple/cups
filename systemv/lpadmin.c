@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.22.2.11 2002/06/28 20:14:47 mike Exp $"
+ * "$Id: lpadmin.c,v 1.22.2.12 2002/08/15 19:48:37 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -45,10 +45,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <cups/string.h>
+#include <ctype.h>
 #include <cups/cups.h>
+#include <cups/string.h>
 #include <cups/language.h>
 #include <cups/debug.h>
+#include <config.h>
 #ifdef HAVE_LIBZ
 #  include <zlib.h>
 #endif /* HAVE_LIBZ */
@@ -85,7 +87,6 @@ main(int  argc,			/* I - Number of command-line arguments */
   http_t	*http;		/* Connection to server */
   char		*printer,	/* Destination printer */
 		*pclass,	/* Printer class name */
-		*host,		/* Pointer to hostname */
 		*val;		/* Pointer to allow/deny value */
   int		num_options;	/* Number of options */
   cups_option_t	*options;	/* Options */
@@ -358,22 +359,6 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      fputs("lpadmin: Printer name can only contain printable characters!\n", stderr);
 	      return (1);
 	    }
-
-	    if ((host = strchr(printer, '@')) != NULL)
-	    {
-	     /*
-	      * printer@host - reconnect to the named host...
-	      */
-
-	      httpClose(http);
-
-              *host++ = '\0';
-              if ((http = httpConnectEncrypt(host, ippPort(), encryption)) == NULL)
-	      {
-		perror("lpadmin: Unable to connect to server");
-		return (1);
-	      }
-	    }
 	    break;
 
         case 'r' : /* Remove printer from class */
@@ -515,22 +500,6 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    {
 	      fputs("lpadmin: Printer name can only contain printable characters!\n", stderr);
 	      return (1);
-	    }
-
-	    if ((host = strchr(printer, '@')) != NULL)
-	    {
-	     /*
-	      * printer@host - reconnect to the named host...
-	      */
-
-	      httpClose(http);
-
-              *host++ = '\0';
-              if ((http = httpConnectEncrypt(host, ippPort(), encryption)) == NULL)
-	      {
-		perror("lpadmin: Unable to connect to server");
-		return (1);
-	      }
 	    }
 
             delete_printer(http, printer);
@@ -828,7 +797,7 @@ add_printer_to_class(http_t *http,	/* I - Server connection */
     attr->values[i].string.text = strdup(uri);
   }
   else
-    ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_URI, "member-uris", NULL, uri);
+    attr = ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_URI, "member-uris", NULL, uri);
 
  /*
   * Then send the request...
@@ -1669,7 +1638,9 @@ set_printer_options(http_t        *http,	/* I - Server connection */
 {
   ipp_t		*request,		/* IPP Request */
 		*response;		/* IPP Response */
+  ipp_attribute_t *attr;		/* IPP attribute */
   cups_lang_t	*language;		/* Default language */
+  ipp_op_t	op;			/* Operation to perform */
   const char	*val,			/* Option value */
 		*ppdfile;		/* PPD filename */
   char		uri[HTTP_MAX_URI],	/* URI for printer/class */
@@ -1685,9 +1656,64 @@ set_printer_options(http_t        *http,	/* I - Server connection */
   DEBUG_printf(("set_printer_options(%p, \"%s\", %d, %p)\n", http, printer,
                 num_options, options));
 
+  language = cupsLangDefault();
+
+  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
+
  /*
-  * Build a CUPS_ADD_PRINTER request, which requires the following
+  * Build a GET_PRINTER_ATTRIBUTES request, which requires the following
   * attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  *    printer-uri
+  *    requested-attributes
+  */
+
+  request = ippNew();
+
+  request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+  request->request.op.request_id   = 1;
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
+               "printer-uri", NULL, uri);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+               "requested-attributes", NULL, "printer-type");
+
+ /*
+  * Do the request...
+  */
+
+  op = CUPS_ADD_PRINTER;
+
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
+  {
+   /*
+    * See what kind of printer or class it is...
+    */
+
+    if ((attr = ippFindAttribute(response, "printer-type", IPP_TAG_ENUM)) != NULL)
+    {
+      if (attr->values[0].integer & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
+      {
+        op = CUPS_ADD_CLASS;
+        snprintf(uri, sizeof(uri), "ipp://localhost/classes/%s", printer);
+      }
+    }
+
+    ippDelete(response);
+  }
+
+ /*
+  * Build a CUPS_ADD_PRINTER or CUPS_ADD_CLASS request, which requires
+  * the following attributes:
   *
   *    attributes-charset
   *    attributes-natural-language
@@ -1695,14 +1721,10 @@ set_printer_options(http_t        *http,	/* I - Server connection */
   *    other options
   */
 
-  snprintf(uri, sizeof(uri), "ipp://localhost/printers/%s", printer);
-
   request = ippNew();
 
-  request->request.op.operation_id = CUPS_ADD_PRINTER;
+  request->request.op.operation_id = op;
   request->request.op.request_id   = 1;
-
-  language = cupsLangDefault();
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
                "attributes-charset", NULL, cupsLangEncoding(language));
@@ -1719,7 +1741,12 @@ set_printer_options(http_t        *http,	/* I - Server connection */
 
   cupsEncodeOptions(request, num_options, options);
 
-  if ((ppdfile = cupsGetPPD(printer)) != NULL)
+  if (op == CUPS_ADD_PRINTER)
+    ppdfile = cupsGetPPD(printer);
+  else
+    ppdfile = NULL;
+
+  if (ppdfile != NULL)
   {
    /*
     * Set default options in the PPD file...
@@ -1788,16 +1815,18 @@ set_printer_options(http_t        *http,	/* I - Server connection */
   }
 
  /*
-  * Do the request and get back a response...
+  * Check the response...
   */
 
   if (response == NULL)
-    fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+    fprintf(stderr, "lpadmin: %s failed: %s\n",
+            op == CUPS_ADD_PRINTER ? "add-printer" : "add-class",
             ippErrorString(cupsLastError()));
   else
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
-      fprintf(stderr, "lpadmin: add-printer failed: %s\n",
+      fprintf(stderr, "lpadmin: %s failed: %s\n",
+              op == CUPS_ADD_PRINTER ? "add-printer" : "add-class",
               ippErrorString(response->request.status.status_code));
 
     ippDelete(response);
@@ -1834,5 +1863,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.22.2.11 2002/06/28 20:14:47 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.22.2.12 2002/08/15 19:48:37 mike Exp $".
  */
