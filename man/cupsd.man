@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsd.man,v 1.3 2000/07/20 17:10:56 mike Exp $"
+.\" "$Id: cupsd.man,v 1.4 2000/10/19 13:16:37 mike Exp $"
 .\"
 .\"   cupsd man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,18 +21,23 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsd 8 "Common UNIX Printing System" "22 June 2000" "Easy Software Products"
+.TH cupsd 8 "Common UNIX Printing System" "19 October 2000" "Easy Software Products"
 .SH NAME
 cupsd \- common unix printing system daemon
 .SH SYNOPSIS
 .B cupsd
-.I [ \-c config-file ]
+[ \-c
+.I config-file
+] [ \-f ]
 .SH DESCRIPTION
 \fIcupsd\fR is the scheduler for the Common UNIX Printing System. It
 implements a printing system based upon the Internet Printing Protocol,
 version 1.1.  If no options are specified on the command-line then the
 default configuration file (usually \fI/etc/cups/cupsd.conf\fR) will be
 used.
+.PP
+The \fI-f\fR option forces \fIcupsd\fR to run in the foreground; the
+default is to run in the background as a "daemon".
 .SH COMPATIBILITY
 \fIcupsd\fR implements all of the required IPP/1.1 attributes and
 operations. It also implements several CUPS-specific administation
@@ -47,5 +52,5 @@ http://localhost:631/documentation.html
 .SH COPYRIGHT
 Copyright 1993-2000 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupsd.man,v 1.3 2000/07/20 17:10:56 mike Exp $".
+.\" End of "$Id: cupsd.man,v 1.4 2000/10/19 13:16:37 mike Exp $".
 .\"
