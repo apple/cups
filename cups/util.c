@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.81.2.13 2002/05/27 14:47:13 mike Exp $"
+ * "$Id: util.c,v 1.81.2.14 2002/05/31 13:03:05 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -823,10 +823,10 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
       size            = 0;
       priority        = 50;
       state           = IPP_JOB_PENDING;
-      user            = NULL;
+      user            = "unknown";
       dest            = NULL;
-      format          = NULL;
-      title           = NULL;
+      format          = "application/octet-stream";
+      title           = "untitled";
       creation_time   = 0;
       completed_time  = 0;
       processing_time = 0;
@@ -878,16 +878,13 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
       * See if we have everything needed...
       */
 
-      if (dest == NULL || title == NULL || user == NULL || id == 0)
+      if (dest == NULL || id == 0)
       {
         if (attr == NULL)
 	  break;
 	else
           continue;
       }
-
-      if (format == NULL)
-        format = "application/octet-stream";
 
      /*
       * Allocate memory for the job...
@@ -1684,5 +1681,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.81.2.13 2002/05/27 14:47:13 mike Exp $".
+ * End of "$Id: util.c,v 1.81.2.14 2002/05/31 13:03:05 mike Exp $".
  */
