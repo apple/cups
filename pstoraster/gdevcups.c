@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.36 2000/10/13 01:04:39 mike Exp $"
+ * "$Id: gdevcups.c,v 1.37 2000/11/18 17:29:30 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -940,9 +940,8 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
                    gx_color_value b)		/* I - Blue value */
 {
   gx_color_index	i;			/* Temporary index */
-  gx_color_value	ic, im, iy, ik, mk;	/* Integral CMYK values */
+  gx_color_value	ic, im, iy, ik;		/* Integral CMYK values */
   int			tc, tm, ty;		/* Temporary color values */
-  float			kscale;			/* K scaling value */
 
 
 #ifdef DEBUG
@@ -1125,13 +1124,6 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 	iy = gx_max_color_value - b;
         ik = min(ic, min(im, iy));
 
-        mk = max(ic, max(im, iy));
-        if (mk > ik)
-	{
-	  kscale = (float)ik / (float)mk;
-	  ik = ik * kscale * kscale;
-	}
-
         ic = lut_rgb_color[ic - ik];
         im = lut_rgb_color[im - ik];
         iy = lut_rgb_color[iy - ik];
@@ -1165,13 +1157,6 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 	im = gx_max_color_value - g;
 	iy = gx_max_color_value - b;
         ik = min(ic, min(im, iy));
-
-        mk = max(ic, max(im, iy));
-        if (mk > ik)
-	{
-	  kscale = (float)ik / (float)mk;
-	  ik = ik * kscale * kscale;
-	}
 
         ic = lut_rgb_color[ic - ik];
         im = lut_rgb_color[im - ik];
@@ -1231,13 +1216,6 @@ cups_map_rgb_color(gx_device      *pdev,	/* I - Device info */
 	im = gx_max_color_value - g;
 	iy = gx_max_color_value - b;
         ik = min(ic, min(im, iy));
-
-        mk = max(ic, max(im, iy));
-        if (mk > ik)
-	{
-	  kscale = (float)ik / (float)mk;
-	  ik = ik * kscale * kscale;
-	}
 
         ic = lut_rgb_color[ic - ik];
         im = lut_rgb_color[im - ik];
@@ -2759,5 +2737,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.36 2000/10/13 01:04:39 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.37 2000/11/18 17:29:30 mike Exp $".
  */

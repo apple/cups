@@ -1,5 +1,5 @@
 /*
- * "$Id: image-colorspace.c,v 1.19 2000/08/29 21:23:08 mike Exp $"
+ * "$Id: image-colorspace.c,v 1.20 2000/11/18 17:29:30 mike Exp $"
  *
  *   Colorspace conversions for the Common UNIX Printing System (CUPS).
  *
@@ -320,8 +320,7 @@ ImageRGBToCMYK(const ib_t *in,	/* I - Input pixels */
                ib_t       *out,	/* I - Output pixels */
                int        count)/* I - Number of pixels */
 {
-  int	c, m, y, k,		/* CMYK values */
-	km;			/* Maximum K value */
+  int	c, m, y, k;		/* CMYK values */
   int	cc, cm, cy;		/* Calibrated CMY values */
 
 
@@ -332,9 +331,6 @@ ImageRGBToCMYK(const ib_t *in,	/* I - Input pixels */
       m = 255 - *in++;
       y = 255 - *in++;
       k = min(c, min(m, y));
-
-      if ((km = max(c, max(m, y))) > k)
-        k = k * k * k / km / km;
 
       c -= k;
       m -= k;
@@ -382,9 +378,6 @@ ImageRGBToCMYK(const ib_t *in,	/* I - Input pixels */
       m = 255 - *in++;
       y = 255 - *in++;
       k = min(c, min(m, y));
-
-      if ((km = max(c, max(m, y))) > k)
-        k = k * k / km;
 
       c -= k;
       m -= k;
@@ -878,5 +871,5 @@ zshear(float mat[3][3],	/* I - Matrix */
 
 
 /*
- * End of "$Id: image-colorspace.c,v 1.19 2000/08/29 21:23:08 mike Exp $".
+ * End of "$Id: image-colorspace.c,v 1.20 2000/11/18 17:29:30 mike Exp $".
  */

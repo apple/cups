@@ -122,6 +122,9 @@ CHANGES IN CUPS V1.1.5
 	  child signals while loading devices.
 	- Added quota and allow/deny user support for printers
 	  and classes.
+	- Removed black/CMY adjustment code from the PS and
+	  image file RIPs; it was interfering with some CUPS
+	  driver dithering code.
 
 
 CHANGES IN CUPS v1.1.4
