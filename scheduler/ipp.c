@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.72 2000/06/02 13:51:49 mike Exp $"
+ * "$Id: ipp.c,v 1.73 2000/06/03 14:11:20 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -452,7 +452,11 @@ accept_jobs(client_t        *con,	/* I - Client connection */
   * Accept jobs sent to the printer...
   */
 
-  printer = FindPrinter(name);
+  if (dtype == CUPS_PRINTER_CLASS)
+    printer = FindClass(name);
+  else
+    printer = FindPrinter(name);
+
   printer->accepting        = 1;
   printer->state_message[0] = '\0';
 
@@ -4845,5 +4849,5 @@ validate_job(client_t        *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.72 2000/06/02 13:51:49 mike Exp $".
+ * End of "$Id: ipp.c,v 1.73 2000/06/03 14:11:20 mike Exp $".
  */
