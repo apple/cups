@@ -103,6 +103,15 @@ CHANGES IN CUPS v1.1.3
 	  verbose debugging information at the "debug" level.
 	- The scheduler would crash if you stopped a printer
 	  that was currently printing a job.
+	- The scheduler incorrectly allowed jobs in the cancelled,
+	  aborted, or completed state to be cancelled.
+	- The image filters did not load TIFF images properly
+	  for bottom-to-top and right-to-left orientations.
+	- Added new cupsEncodeOptions() function to encode
+	  CUPS options as IPP job attributes.
+	- The IPP backend, LPD mini-daemon, client commands,
+	  and CUPS API did not properly encode multiple
+	  option values separated by commas.
 
 
 CHANGES IN CUPS v1.1.2

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.28 2000/07/10 13:52:54 mike Exp $"
+ * "$Id: ipp.c,v 1.29 2000/09/13 18:46:59 mike Exp $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -53,11 +53,6 @@ int			/* O - Exit status */
 main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
      char *argv[])	/* I - Command-line arguments */
 {
-  int		i;		/* Looping var */
-  int		n, n2;		/* Attribute values */
-  char		*option,	/* Name of option */
-		*s;		/* Pointer into option value */
-  const char	*val;		/* Pointer to option value */
   int		num_options;	/* Number of printer options */
   cups_option_t	*options;	/* Printer options */
   char		method[255],	/* Method in URI */
@@ -91,6 +86,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
   if (argc == 1)
   {
+    char *s;
+
     if ((s = strrchr(argv[0], '/')) != NULL)
       s ++;
     else
@@ -439,119 +436,15 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     options     = NULL;
     num_options = cupsParseOptions(argv[5], 0, &options);
 
-    if (cupsGetOption("raw", num_options, options) ||
-        ((content_type = getenv("CONTENT_TYPE")) != NULL &&
-         strcasecmp(content_type, "application/vnd.cups-raw") == 0))
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
-        	   NULL, "application/vnd.cups-raw");
-    else if ((val = cupsGetOption("document-format", num_options, options)) != NULL)
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
-        	   NULL, val);
-    else
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
-        	   NULL, "application/octet-stream");
+    if ((content_type = getenv("CONTENT_TYPE")) != NULL &&
+        strcasecmp(content_type, "application/vnd.cups-raw") == 0)
+      num_options = cupsAddOption("raw", "", num_options, &options);
 
     if (copies_sup)
       ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies", atoi(argv[4]));
 
-    for (i = 0; i < num_options; i ++)
-    {
-     /*
-      * Skip the "raw" option - handled above...
-      */
-
-      if (strcasecmp(options[i].name, "raw") == 0 ||
-          strcasecmp(options[i].name, "document-format") == 0)
-	continue;
-
-     /*
-      * See what the option value is; for compatibility with older interface
-      * scripts, we have to support single-argument options as well as
-      * option=value, option=low-high, and option=MxN.
-      */
-
-      option = options[i].name;
-      val    = options[i].value;
-
-      if (*val == '\0')
-	val = NULL;
-
-      if (val != NULL)
-      {
-	if (strcasecmp(val, "true") == 0 ||
-            strcasecmp(val, "on") == 0 ||
-	    strcasecmp(val, "yes") == 0)
-	{
-	 /*
-	  * Boolean value - true...
-	  */
-
-	  n   = 1;
-	  val = "";
-	}
-	else if (strcasecmp(val, "false") == 0 ||
-        	 strcasecmp(val, "off") == 0 ||
-		 strcasecmp(val, "no") == 0)
-	{
-	 /*
-	  * Boolean value - false...
-	  */
-
-	  n   = 0;
-	  val = "";
-	}
-
-	n = strtol(val, &s, 0);
-      }
-      else
-      {
-	if (strncasecmp(option, "no", 2) == 0)
-	{
-	  option += 2;
-	  n      = 0;
-	}
-	else
-          n = 1;
-
-	s = "";
-      }
-
-      if (*s != '\0' && *s != '-' && (*s != 'x' || s == val))
-       /*
-	* String value(s)...
-	*/
-	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, option, NULL, val);
-      else if (val != NULL)
-      {
-       /*
-	* Numeric value, range, or resolution...
-	*/
-
-	if (*s == '-')
-	{
-          n2 = strtol(s + 1, NULL, 0);
-          ippAddRange(request, IPP_TAG_JOB, option, n, n2);
-	}
-	else if (*s == 'x')
-	{
-          n2 = strtol(s + 1, &s, 0);
-
-	  if (strcasecmp(s, "dpc") == 0)
-            ippAddResolution(request, IPP_TAG_JOB, option, IPP_RES_PER_CM, n, n2);
-          else if (strcasecmp(s, "dpi") == 0)
-            ippAddResolution(request, IPP_TAG_JOB, option, IPP_RES_PER_INCH, n, n2);
-          else
-            ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, option, NULL, val);
-	}
-	else
-          ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, option, n);
-      }
-      else
-       /*
-	* Boolean value...
-	*/
-	ippAddBoolean(request, IPP_TAG_JOB, option, (char)n);
-    }
+    cupsEncodeOptions(request, num_options, options);
+    cupsFreeOptions(num_options, options);
 
    /*
     * Now fill in the HTTP request stuff...
@@ -717,5 +610,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: ipp.c,v 1.28 2000/07/10 13:52:54 mike Exp $".
+ * End of "$Id: ipp.c,v 1.29 2000/09/13 18:46:59 mike Exp $".
  */

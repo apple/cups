@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h,v 1.28 2000/08/24 16:45:21 mike Exp $"
+ * "$Id: cups.h,v 1.29 2000/09/13 18:46:59 mike Exp $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -29,8 +29,8 @@
  * Include necessary headers...
  */
 
-#  include <cups/ipp.h>
-#  include <cups/ppd.h>
+#  include "ipp.h"
+#  include "ppd.h"
 
 
 /*
@@ -46,7 +46,7 @@ extern "C" {
  * Constants...
  */
 
-#  define CUPS_VERSION		1.0100
+#  define CUPS_VERSION		1.0103
 #  define CUPS_DATE_ANY		-1
 
 
@@ -75,6 +75,7 @@ enum					/* Not a typedef'd enum so we can OR */
   CUPS_PRINTER_LARGE = 0x4000,		/* Can do D/E/A1/A0 */
   CUPS_PRINTER_VARIABLE = 0x8000,	/* Can do variable sizes */
   CUPS_PRINTER_IMPLICIT = 0x10000,	/* Implicit class */
+  CUPS_PRINTER_DEFAULT = 0x20000,	/* Default printer on network */
   CUPS_PRINTER_OPTIONS = 0xfffc		/* ~(CLASS | REMOTE | IMPLICIT) */
 };
 
@@ -125,6 +126,8 @@ extern void		cupsSetDests(int num_dests, cups_dest_t *dests);
 
 extern int		cupsAddOption(const char *name, const char *value,
 			              int num_options, cups_option_t **options);
+extern void		cupsEncodeOptions(ipp_t *ipp, int num_options,
+					  cups_option_t *options);
 extern void		cupsFreeOptions(int num_options, cups_option_t *options);
 extern const char	*cupsGetOption(const char *name, int num_options,
 			               cups_option_t *options);
@@ -147,5 +150,5 @@ extern const char	*cupsUser(void);
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.28 2000/08/24 16:45:21 mike Exp $".
+ * End of "$Id: cups.h,v 1.29 2000/09/13 18:46:59 mike Exp $".
  */

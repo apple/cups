@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c,v 1.11 2000/08/29 21:23:12 mike Exp $"
+ * "$Id: cups-lpd.c,v 1.12 2000/09/13 18:47:01 mike Exp $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -242,11 +242,6 @@ print_file(const char    *name,		/* I - Printer or class name */
            int           num_options,	/* I - Number of options */
 	   cups_option_t *options)	/* I - Options */
 {
-  int		i;			/* Looping var */
-  int		n, n2;			/* Attribute values */
-  char		*option,		/* Name of option */
-		*s;			/* Pointer into option value */
-  const char	*val;			/* Pointer to option value */
   http_t	*http;			/* Connection to server */
   ipp_t		*request;		/* IPP request */
   ipp_t		*response;		/* IPP response */
@@ -294,20 +289,6 @@ print_file(const char    *name,		/* I - Printer or class name */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
 
- /*
-  * Handle raw print files...
-  */
-
-  if ((val = cupsGetOption("document-format", num_options, options)) != NULL)
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
-        	 NULL, val);
-  else if (cupsGetOption("raw", num_options, options))
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
-        	 NULL, "application/vnd.cups-raw");
-  else
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
-        	 NULL, "application/octet-stream");
-
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
                NULL, user);
 
@@ -320,110 +301,7 @@ print_file(const char    *name,		/* I - Printer or class name */
   * Then add all options on the command-line...
   */
 
-  for (i = 0; i < num_options; i ++)
-  {
-   /*
-    * Skip the "raw" option - handled above...
-    */
-
-    if (strcasecmp(options[i].name, "raw") == 0 ||
-        strcasecmp(options[i].name, "document-format") == 0)
-      continue;
-
-   /*
-    * See what the option value is; for compatibility with older interface
-    * scripts, we have to support single-argument options as well as
-    * option=value, option=low-high, and option=MxN.
-    */
-
-    option = options[i].name;
-    val    = options[i].value;
-
-    if (*val == '\0')
-      val = NULL;
-
-    if (val != NULL)
-    {
-      if (strcasecmp(val, "true") == 0 ||
-          strcasecmp(val, "on") == 0 ||
-	  strcasecmp(val, "yes") == 0)
-      {
-       /*
-	* Boolean value - true...
-	*/
-
-	n   = 1;
-	val = "";
-      }
-      else if (strcasecmp(val, "false") == 0 ||
-               strcasecmp(val, "off") == 0 ||
-	       strcasecmp(val, "no") == 0)
-      {
-       /*
-	* Boolean value - false...
-	*/
-
-	n   = 0;
-	val = "";
-      }
-
-      n = strtol(val, &s, 0);
-    }
-    else
-    {
-      if (strncasecmp(option, "no", 2) == 0)
-      {
-	option += 2;
-	n      = 0;
-      }
-      else
-        n = 1;
-
-      s = "";
-    }
-
-    if (*s != '\0' && *s != '-' && (*s != 'x' || s == val))
-    {
-     /*
-      * String value(s)...
-      */
-
-      ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, option, NULL, val);
-    }
-    else if (val != NULL)
-    {
-     /*
-      * Numeric value, range, or resolution...
-      */
-
-      if (*s == '-')
-      {
-        n2 = strtol(s + 1, NULL, 0);
-        ippAddRange(request, IPP_TAG_JOB, option, n, n2);
-      }
-      else if (*s == 'x')
-      {
-        n2 = strtol(s + 1, &s, 0);
-
-	if (strcasecmp(s, "dpc") == 0)
-          ippAddResolution(request, IPP_TAG_JOB, option, IPP_RES_PER_CM, n, n2);
-        else if (strcasecmp(s, "dpi") == 0)
-          ippAddResolution(request, IPP_TAG_JOB, option, IPP_RES_PER_INCH, n, n2);
-        else
-          ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, option, NULL, val);
-      }
-      else
-        ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, option, n);
-    }
-    else
-    {
-     /*
-      * Boolean value...
-      */
-
-      ippAddBoolean(request, IPP_TAG_JOB, option, (char)n);
-    }
-  }
+  cupsEncodeOptions(request, num_options, options);
 
  /*
   * Do the request...
@@ -1189,5 +1067,5 @@ remove_jobs(const char *dest,		/* I - Destination */
 
 
 /*
- * End of "$Id: cups-lpd.c,v 1.11 2000/08/29 21:23:12 mike Exp $".
+ * End of "$Id: cups-lpd.c,v 1.12 2000/09/13 18:47:01 mike Exp $".
  */

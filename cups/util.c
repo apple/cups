@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.58 2000/08/04 02:06:00 mike Exp $"
+ * "$Id: util.c,v 1.59 2000/09/13 18:47:00 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -188,7 +188,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     return (NULL);
   }
 
-  DEBUG_printf(("cupsDoFileRequest(%08x, %08s, \'%s\', \'%s\')\n",
+  DEBUG_printf(("cupsDoFileRequest(%p, %08s, \'%s\', \'%s\')\n",
                 http, request, resource, filename ? filename : "(null)"));
 
  /*
@@ -1028,7 +1028,7 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
               int           num_options,/* I - Number of options */
 	      cups_option_t *options)	/* I - Options */
 {
-  DEBUG_printf(("cupsPrintFile(\'%s\', \'%s\', %d, %08x)\n",
+  DEBUG_printf(("cupsPrintFile(\'%s\', \'%s\', %d, %p)\n",
                 printer, filename, num_options, options));
 
   return (cupsPrintFiles(name, 1, &filename, title, num_options, options));
@@ -1048,9 +1048,6 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
 	       cups_option_t *options)	/* I - Options */
 {
   int		i;			/* Looping var */
-  int		n, n2;			/* Attribute values */
-  char		*option,		/* Name of option */
-		*s;			/* Pointer into option value */
   const char	*val;			/* Pointer to option value */
   ipp_t		*request;		/* IPP request */
   ipp_t		*response;		/* IPP response */
@@ -1062,7 +1059,7 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
   int		jobid;			/* New job ID */
 
 
-  DEBUG_printf(("cupsPrintFiles(\'%s\', %d, %p, %d, %08x)\n",
+  DEBUG_printf(("cupsPrintFiles(\'%s\', %d, %p, %d, %p)\n",
                 printer, num_files, files, num_options, options));
 
   if (name == NULL || num_files < 1 || files == NULL)
@@ -1106,20 +1103,6 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
 
- /*
-  * Handle raw print files...
-  */
-
-  if (cupsGetOption("raw", num_options, options))
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
-        	 NULL, "application/vnd.cups-raw");
-  else if ((val = cupsGetOption("document-format", num_options, options)) != NULL)
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
-        	 NULL, val);
-  else
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
-        	 NULL, "application/octet-stream");
-
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
                NULL, cupsUser());
 
@@ -1127,129 +1110,10 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL, title);
 
  /*
-  * Then add all options on the command-line...
+  * Then add all options...
   */
 
-  for (i = 0; i < num_options; i ++)
-  {
-   /*
-    * Skip the "raw" option - handled above...
-    */
-
-    if (strcasecmp(options[i].name, "raw") == 0 ||
-        strcasecmp(options[i].name, "document-format") == 0)
-      continue;
-
-   /*
-    * See what the option value is; for compatibility with older interface
-    * scripts, we have to support single-argument options as well as
-    * option=value, option=low-high, and option=MxN.
-    */
-
-    option = options[i].name;
-    val    = options[i].value;
-
-    if (*val == '\0')
-      val = NULL;
-
-    if (val != NULL)
-    {
-      if (strcasecmp(val, "true") == 0 ||
-          strcasecmp(val, "on") == 0 ||
-	  strcasecmp(val, "yes") == 0)
-      {
-       /*
-	* Boolean value - true...
-	*/
-
-	n   = 1;
-	val = "";
-      }
-      else if (strcasecmp(val, "false") == 0 ||
-               strcasecmp(val, "off") == 0 ||
-	       strcasecmp(val, "no") == 0)
-      {
-       /*
-	* Boolean value - false...
-	*/
-
-	n   = 0;
-	val = "";
-      }
-
-      n = strtol(val, &s, 0);
-    }
-    else
-    {
-      if (strncasecmp(option, "no", 2) == 0)
-      {
-	option += 2;
-	n      = 0;
-      }
-      else
-        n = 1;
-
-      s = "";
-    }
-
-    if (*s != '\0' && *s != '-' && (*s != 'x' || s == val))
-    {
-     /*
-      * String value(s)...
-      */
-
-      DEBUG_printf(("cupsPrintFile: Adding string option \'%s\' with value \'%s\'...\n",
-                    option, val));
-
-      ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, option, NULL, val);
-    }
-    else if (val != NULL)
-    {
-     /*
-      * Numeric value, range, or resolution...
-      */
-
-      if (*s == '-')
-      {
-        n2 = strtol(s + 1, NULL, 0);
-        ippAddRange(request, IPP_TAG_JOB, option, n, n2);
-
-	DEBUG_printf(("cupsPrintFile: Adding range option \'%s\' with value %d-%d...\n",
-                      option, n, n2));
-      }
-      else if (*s == 'x')
-      {
-        n2 = strtol(s + 1, &s, 0);
-
-	if (strcasecmp(s, "dpc") == 0)
-          ippAddResolution(request, IPP_TAG_JOB, option, IPP_RES_PER_CM, n, n2);
-        else if (strcasecmp(s, "dpi") == 0)
-          ippAddResolution(request, IPP_TAG_JOB, option, IPP_RES_PER_INCH, n, n2);
-        else
-          ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, option, NULL, val);
-
-	DEBUG_printf(("cupsPrintFile: Adding resolution option \'%s\' with value %s...\n",
-                      option, val));
-      }
-      else
-      {
-        ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, option, n);
-
-	DEBUG_printf(("cupsPrintFile: Adding integer option \'%s\' with value %d...\n",
-                      option, n));
-      }
-    }
-    else
-    {
-     /*
-      * Boolean value...
-      */
-
-      DEBUG_printf(("cupsPrintFile: Adding boolean option \'%s\' with value %d...\n",
-                    option, n));
-      ippAddBoolean(request, IPP_TAG_JOB, option, (char)n);
-    }
-  }
+  cupsEncodeOptions(request, num_options, options);
 
  /*
   * Do the request...
@@ -1411,7 +1275,7 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
     * Format a string using the hex time values...
     */
 
-    snprintf(filename, len, "%s/%08x%05x", tmpdir,
+    snprintf(filename, len, "%s/%p%05x", tmpdir,
              curtime.tv_sec, curtime.tv_usec);
 
    /*
@@ -1563,5 +1427,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.58 2000/08/04 02:06:00 mike Exp $".
+ * End of "$Id: util.c,v 1.59 2000/09/13 18:47:00 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.31 2000/08/24 16:45:21 mike Exp $"
+ * "$Id: ipp.h,v 1.32 2000/09/13 18:47:00 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -30,7 +30,7 @@
  * Include necessary headers...
  */
 
-#  include <cups/http.h>
+#  include "http.h"
 
 
 /*
@@ -358,5 +358,5 @@ extern void		_ipp_free_attr(ipp_attribute_t *);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.31 2000/08/24 16:45:21 mike Exp $".
+ * End of "$Id: ipp.h,v 1.32 2000/09/13 18:47:00 mike Exp $".
  */
