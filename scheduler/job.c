@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.129 2001/05/07 15:35:00 mike Exp $"
+ * "$Id: job.c,v 1.130 2001/06/05 17:49:34 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1447,9 +1447,6 @@ StartJob(int       id,		/* I - Job ID */
   current->status = 0;
   memset(current->procs, 0, sizeof(current->procs));
 
-  if (num_filters > 0 && strcmp(filters[num_filters - 1].filter, "-") == 0)
-    num_filters --;
-
   filterfds[1][0] = open("/dev/null", O_RDONLY);
   filterfds[1][1] = -1;
 
@@ -1458,8 +1455,8 @@ StartJob(int       id,		/* I - Job ID */
 
   for (i = 0; i < num_filters; i ++)
   {
-    if (i == 1)
-      argv[6] = NULL;
+    if (strcmp(filters[i].filter, "-") == 0)
+      continue; /* Skip nul filter... */
 
     if (filters[i].filter[0] != '/')
       snprintf(command, sizeof(command), "%s/filter/%s", ServerBin,
@@ -1503,13 +1500,12 @@ StartJob(int       id,		/* I - Job ID */
                filters[i].filter, strerror(errno));
       return;
     }
-    else
-    {
-      current->procs[i] = pid;
 
-      LogMessage(L_INFO, "Started filter %s (PID %d) for job %d.",
-                 command, pid, current->id);
-    }
+    current->procs[i] = pid;
+
+    LogMessage(L_INFO, "Started filter %s (PID %d) for job %d.",
+               command, pid, current->id);
+    argv[6] = NULL;
   }
 
   if (filters != NULL)
@@ -1525,8 +1521,6 @@ StartJob(int       id,		/* I - Job ID */
     snprintf(command, sizeof(command), "%s/backend/%s", ServerBin, method);
 
     argv[0] = printer->device_uri;
-    if (num_filters)
-      argv[6] = NULL;
 
     filterfds[i & 1][0] = -1;
     filterfds[i & 1][1] = open("/dev/null", O_WRONLY);
@@ -2871,5 +2865,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.129 2001/05/07 15:35:00 mike Exp $".
+ * End of "$Id: job.c,v 1.130 2001/06/05 17:49:34 mike Exp $".
  */
