@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh,v 1.20 2003/07/22 18:21:28 mike Exp $"
+# "$Id: run-stp-tests.sh,v 1.21 2003/11/19 19:56:42 mike Exp $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -91,6 +91,15 @@ user=`whoami`
 port=8631
 cwd=`pwd`
 root=`dirname $cwd`
+
+#
+# Make sure that the LPDEST and PRINTER environment variables are
+# not included in the environment that is passed to the tests.  These
+# will usually cause tests to fail erroneously...
+#
+
+typeset +x LPDEST
+typeset +x PRINTER
 
 #
 # See if we want to use valgrind...
@@ -456,5 +465,5 @@ echo "    $pdffile"
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh,v 1.20 2003/07/22 18:21:28 mike Exp $"
+# End of "$Id: run-stp-tests.sh,v 1.21 2003/11/19 19:56:42 mike Exp $"
 #
