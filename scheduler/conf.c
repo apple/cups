@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.24 1999/07/09 14:23:03 mike Exp $"
+ * "$Id: conf.c,v 1.25 1999/08/23 15:19:56 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -187,7 +187,6 @@ ReadConfiguration(void)
   sprintf(ServerAdmin, "root@%s", ServerName);
   strcpy(ServerRoot, CUPS_SERVERROOT);
   strcpy(DocumentRoot, CUPS_DATADIR "/doc");
-  strcpy(SystemGroup, DEFAULT_GROUP);
   strcpy(AccessLog, "logs/access_log");
   strcpy(ErrorLog, "logs/error_log");
   strcpy(DefaultLanguage, DEFAULT_LANGUAGE);
@@ -197,6 +196,23 @@ ReadConfiguration(void)
     strcpy(TempDir, "/var/tmp");
   else
     strcpy(TempDir, getenv("TMPDIR"));
+
+ /*
+  * Find the default system group: "sys", "system", or "root"...
+  */
+
+  if (getgrnam("sys") != NULL)
+    strcpy(SystemGroup, "sys");
+  else
+  {
+    endgrent();
+    if (getgrnam("system") != NULL)
+      strcpy(SystemGroup, "system");
+    else
+      strcpy(SystemGroup, "root");
+  }
+
+  endgrent();
 
   User             = DEFAULT_UID;
   Group            = DEFAULT_GID;
@@ -1169,5 +1185,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.24 1999/07/09 14:23:03 mike Exp $".
+ * End of "$Id: conf.c,v 1.25 1999/08/23 15:19:56 mike Exp $".
  */
