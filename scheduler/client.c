@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.117 2002/08/21 02:04:02 mike Exp $"
+ * "$Id: client.c,v 1.118 2002/08/21 17:19:54 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2426,12 +2426,15 @@ pipe_command(client_t *con,		/* I - Client connection */
   * Block signals before forking...
   */
 
-#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+#ifdef HAVE_SIGSET
+  sighold(SIGTERM);
+  sighold(SIGCHLD);
+#elif defined(HAVE_SIGACTION)
   sigemptyset(&newmask);
   sigaddset(&newmask, SIGTERM);
   sigaddset(&newmask, SIGCHLD);
   sigprocmask(SIG_BLOCK, &newmask, &oldmask);
-#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+#endif /* HAVE_SIGSET */
 
  /*
   * Then execute the command...
@@ -2512,7 +2515,7 @@ pipe_command(client_t *con,		/* I - Client connection */
 
     close(fds[0]);
     close(fds[1]);
-    return (0);
+    pid = 0;
   }
   else
   {
@@ -2526,16 +2529,19 @@ pipe_command(client_t *con,		/* I - Client connection */
 
     *outfile = fds[0];
     close(fds[1]);
-
-#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-    sigprocmask(SIG_SETMASK, &oldmask, NULL);
-#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
-
-    return (pid);
   }
+
+#ifdef HAVE_SIGSET
+  sigrelse(SIGTERM);
+  sigrelse(SIGCHLD);
+#elif defined(HAVE_SIGACTION)
+  sigprocmask(SIG_SETMASK, &oldmask, NULL);
+#endif /* HAVE_SIGSET */
+
+  return (pid);
 }
 
 
 /*
- * End of "$Id: client.c,v 1.117 2002/08/21 02:04:02 mike Exp $".
+ * End of "$Id: client.c,v 1.118 2002/08/21 17:19:54 mike Exp $".
  */
