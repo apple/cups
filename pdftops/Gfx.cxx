@@ -2584,7 +2584,7 @@ void Gfx::doImage(Object *ref, Stream *str, GBool inlineImg) {
     dict->lookup("BPC", &obj1);
   }
   if (obj1.isInt()) {
-  bits = obj1.getInt();
+    bits = obj1.getInt();
   } else if (mask) {
     bits = 1;
   } else {
