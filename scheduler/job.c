@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.15 1999/04/29 19:28:46 mike Exp $"
+ * "$Id: job.c,v 1.16 1999/05/07 14:46:02 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -39,6 +39,7 @@
  * Include necessary headers...
  */
 
+#define DEBUG
 #include "cupsd.h"
 
 
@@ -847,5 +848,5 @@ start_process(char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.15 1999/04/29 19:28:46 mike Exp $".
+ * End of "$Id: job.c,v 1.16 1999/05/07 14:46:02 mike Exp $".
  */
