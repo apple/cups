@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.80 2001/06/21 21:22:20 mike Exp $"
+ * "$Id: conf.c,v 1.81 2001/06/21 22:00:54 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -188,7 +188,7 @@ ReadConfiguration(void)
   if (NumMimeTypes)
   {
     for (i = 0; i < NumMimeTypes; i ++)
-      free(MimeTypes[i]);
+      free((void *)MimeTypes[i]);
 
     free(MimeTypes);
   }
@@ -1669,5 +1669,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.80 2001/06/21 21:22:20 mike Exp $".
+ * End of "$Id: conf.c,v 1.81 2001/06/21 22:00:54 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.135 2001/06/21 21:22:21 mike Exp $"
+ * "$Id: ipp.c,v 1.136 2001/06/21 22:00:54 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -94,7 +94,8 @@ static void	add_queued_job_count(client_t *con, printer_t *p);
 static void	cancel_all_jobs(client_t *con, ipp_attribute_t *uri);
 static void	cancel_job(client_t *con, ipp_attribute_t *uri);
 static int	check_quotas(client_t *con, printer_t *p);
-static void	copy_attribute(ipp_t *to, ipp_attribute_t *attr);
+static void	copy_attribute(ipp_t *to, ipp_attribute_t *attr,
+		               int quickcopy);
 static void	copy_attrs(ipp_t *to, ipp_t *from, ipp_attribute_t *req,
 		           ipp_tag_t group);
 static int	copy_banner(client_t *con, job_t *job, const char *name);
@@ -1835,7 +1836,8 @@ check_quotas(client_t  *con,	/* I - Client connection */
 
 static void
 copy_attribute(ipp_t           *to,	/* O - Destination request/response */
-               ipp_attribute_t *attr)	/* I - Attribute to copy */
+               ipp_attribute_t *attr,	/* I - Attribute to copy */
+               int             quickcopy)/* I - Do a quick copy? */
 {
   int			i;		/* Looping var */
   ipp_attribute_t	*toattr;	/* Destination attribute */
@@ -1878,12 +1880,19 @@ copy_attribute(ipp_t           *to,	/* O - Destination request/response */
     case IPP_TAG_LANGUAGE :
     case IPP_TAG_MIMETYPE :
         toattr = ippAddStrings(to, attr->group_tag,
-	                       (ipp_tag_t)(attr->value_tag | IPP_TAG_COPY),
-	                       attr->name, attr->num_values, NULL,
-			       NULL);
+	                       (ipp_tag_t)(attr->value_tag | quickcopy),
+	                       attr->name, attr->num_values, NULL, NULL);
 
-        for (i = 0; i < attr->num_values; i ++)
-	  toattr->values[i].string.text = attr->values[i].string.text;
+        if (quickcopy)
+	{
+          for (i = 0; i < attr->num_values; i ++)
+	    toattr->values[i].string.text = attr->values[i].string.text;
+        }
+	else
+	{
+          for (i = 0; i < attr->num_values; i ++)
+	    toattr->values[i].string.text = strdup(attr->values[i].string.text);
+	}
         break;
 
     case IPP_TAG_DATE :
@@ -1918,13 +1927,30 @@ copy_attribute(ipp_t           *to,	/* O - Destination request/response */
     case IPP_TAG_TEXTLANG :
     case IPP_TAG_NAMELANG :
         toattr = ippAddStrings(to, attr->group_tag,
-	                       (ipp_tag_t)(attr->value_tag | IPP_TAG_COPY),
+	                       (ipp_tag_t)(attr->value_tag | quickcopy),
 	                       attr->name, attr->num_values, NULL, NULL);
 
-        for (i = 0; i < attr->num_values; i ++)
+        if (quickcopy)
 	{
-          toattr->values[i].string.charset = attr->values[i].string.charset;
-	  toattr->values[i].string.text    = attr->values[i].string.text;
+          for (i = 0; i < attr->num_values; i ++)
+	  {
+            toattr->values[i].string.charset = attr->values[i].string.charset;
+	    toattr->values[i].string.text    = attr->values[i].string.text;
+          }
+        }
+	else
+	{
+          for (i = 0; i < attr->num_values; i ++)
+	  {
+	    if (!i)
+              toattr->values[i].string.charset =
+	          strdup(attr->values[i].string.charset);
+	    else
+              toattr->values[i].string.charset =
+	          toattr->values[0].string.charset;
+
+	    toattr->values[i].string.text = strdup(attr->values[i].string.text);
+          }
         }
         break;
 
@@ -1993,7 +2019,7 @@ copy_attrs(ipp_t           *to,		/* I - Destination request */
         continue;
     }
 
-    copy_attribute(to, fromattr);
+    copy_attribute(to, fromattr, IPP_TAG_COPY);
   }
 }
 
@@ -4936,7 +4962,7 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
       * Then copy the attribute...
       */
 
-      copy_attribute(job->attrs, attr);
+      copy_attribute(job->attrs, attr, 0);
 
      /*
       * See if the job-name or job-hold-until is being changed.
@@ -4982,7 +5008,7 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
       * Add new option by copying it...
       */
 
-      copy_attribute(job->attrs, attr);
+      copy_attribute(job->attrs, attr, 0);
     }
   }
 
@@ -5383,5 +5409,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.135 2001/06/21 21:22:21 mike Exp $".
+ * End of "$Id: ipp.c,v 1.136 2001/06/21 22:00:54 mike Exp $".
  */

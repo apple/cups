@@ -106,6 +106,13 @@ CHANGES IN CUPS V1.1.9
 	  clients to not send the local file type (such as
 	  application/vnd.cups-raw for raw print files) and the
 	  corresponding bad output in some cases.
+	- The scheduler did not fully copy attributes from a
+	  set-job-attributes request - string attributes were
+	  only referenced, which could cause cupsd to crash
+	  or behave irratically.
+	- The lp command didn't send the right value for the
+	  job-hold-until attribute when "-H resume" was
+	  specified.
 
 
 CHANGES IN CUPS V1.1.8

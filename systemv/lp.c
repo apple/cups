@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c,v 1.30 2001/05/06 00:11:26 mike Exp $"
+ * "$Id: lp.c,v 1.31 2001/06/21 22:00:55 mike Exp $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -375,8 +375,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    if (strcmp(val, "hold") == 0)
               num_options = cupsAddOption("job-hold-until", "indefinite",
 	                                  num_options, &options);
-	    if (strcmp(val, "resume") == 0)
-              num_options = cupsAddOption("job-hold-until", "none",
+	    else if (strcmp(val, "resume") == 0 ||
+	             strcmp(val, "release") == 0)
+              num_options = cupsAddOption("job-hold-until", "no-hold",
 	                                  num_options, &options);
 	    else if (strcmp(val, "immediate") == 0)
               num_options = cupsAddOption("job-priority", "100",
@@ -650,5 +651,5 @@ sighandler(int s)	/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c,v 1.30 2001/05/06 00:11:26 mike Exp $".
+ * End of "$Id: lp.c,v 1.31 2001/06/21 22:00:55 mike Exp $".
  */
