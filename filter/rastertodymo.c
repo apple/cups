@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertodymo.c,v 1.13 2004/05/11 20:13:30 mike Exp $"
+ * "$Id: rastertodymo.c,v 1.14 2004/05/11 20:20:13 mike Exp $"
  *
  *   Label printer filter for the Common UNIX Printing System (CUPS).
  *
@@ -503,7 +503,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Eject the page...
     */
 
-    EndPage();
+    EndPage(&header);
 
     if (Cancelled)
       break;
@@ -531,5 +531,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertodymo.c,v 1.13 2004/05/11 20:13:30 mike Exp $".
+ * End of "$Id: rastertodymo.c,v 1.14 2004/05/11 20:20:13 mike Exp $".
  */
