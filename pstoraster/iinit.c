@@ -212,6 +212,7 @@ make_initial_dict(const char *iname, uint namelen, ref idicts[])
 	 * but not in initial_dictionaries.
 	 */
 	gs_abort();
+	return (NULL);
 }
 
 /* Initialize objects other than operators.  In particular, */

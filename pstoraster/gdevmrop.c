@@ -119,7 +119,7 @@ mem_mono_strip_copy_rop(gx_device *dev,
   const gx_strip_bitmap *textures, const gx_color_index *tcolors,
   int x, int y, int width, int height,
   int phase_x, int phase_y, gs_logical_operation_t lop)
-{	gs_rop3_t rop = lop & lop_rop_mask;
+{	gs_rop3_t rop = (gs_rop3_t)(lop & lop_rop_mask);
 	gx_strip_bitmap no_texture;
 	bool invert;
 	uint draster = mdev->raster;
@@ -163,17 +163,17 @@ mem_mono_strip_copy_rop(gx_device *dev,
 	 */
 
 	if ( invert )
-	  rop = byte_reverse_bits[rop] ^ 0xff;
+	  rop = (gs_rop3_t)(byte_reverse_bits[rop] ^ 0xff);
 
 	/* Modify the raster operation according to the source palette. */
 	if ( scolors != 0 )
 	{	/* Source with palette. */
 		switch ( (int)((scolors[1] << 1) + scolors[0]) )
 		{
-		case 0: rop = rop3_know_S_0(rop); break;
-		case 1: rop = rop3_invert_S(rop); break;
+		case 0: rop = (gs_rop3_t)rop3_know_S_0(rop); break;
+		case 1: rop = (gs_rop3_t)rop3_invert_S(rop); break;
 		case 2: break;
-		case 3: rop = rop3_know_S_1(rop); break;
+		case 3: rop = (gs_rop3_t)rop3_know_S_1(rop); break;
 		}
 	}
 
@@ -182,10 +182,10 @@ mem_mono_strip_copy_rop(gx_device *dev,
 	{	/* Texture with palette. */
 		switch ( (int)((tcolors[1] << 1) + tcolors[0]) )
 		{
-		case 0: rop = rop3_know_T_0(rop); break;
-		case 1: rop = rop3_invert_T(rop); break;
+		case 0: rop = (gs_rop3_t)rop3_know_T_0(rop); break;
+		case 1: rop = (gs_rop3_t)rop3_invert_T(rop); break;
 		case 2: break;
-		case 3: rop = rop3_know_T_1(rop); break;
+		case 3: rop = (gs_rop3_t)rop3_know_T_1(rop); break;
 		}
 	}
 
@@ -367,7 +367,7 @@ mem_gray8_rgb24_strip_copy_rop(gx_device *dev,
   const gx_strip_bitmap *textures, const gx_color_index *tcolors,
   int x, int y, int width, int height,
   int phase_x, int phase_y, gs_logical_operation_t lop)
-{	gs_rop3_t rop = lop & lop_rop_mask;
+{	gs_rop3_t rop = (gs_rop3_t)(lop & lop_rop_mask);
 	gx_color_index const_source = gx_no_color_index;
 	gx_color_index const_texture = gx_no_color_index;
 	uint draster = mdev->raster;
@@ -386,9 +386,9 @@ mem_gray8_rgb24_strip_copy_rop(gx_device *dev,
 	{	/* Constant source */
 		const_source = scolors[0];
 		if ( const_source == 0 )
-		  rop = rop3_know_S_0(rop);
+		  rop = (gs_rop3_t)rop3_know_S_0(rop);
 		else if ( const_source == all_ones )
-		  rop = rop3_know_S_1(rop);
+		  rop = (gs_rop3_t)rop3_know_S_1(rop);
 	}
 	else if ( !rop3_uses_S(rop) )
 	  const_source = 0;		/* arbitrary */
@@ -398,9 +398,9 @@ mem_gray8_rgb24_strip_copy_rop(gx_device *dev,
 	{	/* Constant texture */
 		const_texture = tcolors[0];
 		if ( const_texture == 0 )
-		  rop = rop3_know_T_0(rop);
+		  rop = (gs_rop3_t)rop3_know_T_0(rop);
 		else if ( const_texture == all_ones )
-		  rop = rop3_know_T_1(rop);
+		  rop = (gs_rop3_t)rop3_know_T_1(rop);
 	}
 	else if ( !rop3_uses_T(rop) )
 	  const_texture = 0;		/* arbitrary */
@@ -684,7 +684,7 @@ gx_real_default_strip_copy_rop(gx_device *dev,
 	 * pixels, the memory device implementation to do the operation,
 	 * and copy_color to write the pixels back.
 	 */
-	gs_rop3_t rop = lop & lop_rop_mask;
+	gs_rop3_t rop = (gs_rop3_t)(lop & lop_rop_mask);
 	int depth = dev->color_info.depth;
 	const gx_device_memory *mdproto = gdev_mem_device_for_bits(depth);
 	gx_device_memory mdev;
@@ -1006,8 +1006,8 @@ gs_transparent_rop(gs_rop3_t rop, bool source_transparent,
 #define So rop3_not(rop3_S)
 #define Po rop3_not(rop3_T)
 	gs_rop3_t mask =
-	  (source_transparent ?
-	   (pattern_transparent ? So & Po : So) :
-	   (pattern_transparent ? ~So | Po : rop3_1));
-	return (rop & mask) | (rop3_D & ~mask);
+	  (gs_rop3_t)(source_transparent ?
+		      (pattern_transparent ? So & Po : So) :
+		      (pattern_transparent ? ~So | Po : rop3_1));
+	return (gs_rop3_t)((rop & mask) | (rop3_D & ~mask));
 }

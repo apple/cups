@@ -1046,7 +1046,8 @@ sti:			state_slot =
 				  color_set_pure(&devc, state.colors[1]);
 				  code = (*dev_proc(tdev, begin_image))
 				    (tdev, &imager_state, &image,
-				     gs_image_format_chunky, shape,
+				     gs_image_format_chunky,
+				     (gs_image_shape_t)shape,
 				     &devc, pcpath, mem, &image_info);
 				  if ( code < 0 )
 				    goto out;

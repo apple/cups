@@ -744,7 +744,6 @@ end_comment:		retcode = scan_comment(comment_line, daptr, true);
 			  goto sret;
 			goto top;
 		      }
-		    break;
 		  }
 #undef comment_line
 		/*NOTREACHED*/

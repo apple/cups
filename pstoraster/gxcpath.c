@@ -56,7 +56,7 @@ private ENUM_PTRS_BEGIN(clip_path_enum_ptrs) ;
 	    return ret;
 	  }
 	return (*st_path.enum_ptrs)(&cptr->path, sizeof(cptr->path), index - st_clip_list_max_ptrs, pep);
-ENUM_PTRS_END
+} }
 private RELOC_PTRS_BEGIN(clip_path_reloc_ptrs) {
 	clip_list_reloc_ptrs(&cptr->list, sizeof(gx_clip_list), gcst);
 	(*st_path.reloc_ptrs)(&cptr->path, sizeof(gx_path), gcst);

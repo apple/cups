@@ -51,7 +51,7 @@ private_st_cached_char_ptr_elt();
 /* We do all the work in font_dir_enum/reloc_ptrs in gsfont.c. */
 /* See gxfcache.h for details. */
 private ENUM_PTRS_BEGIN(cc_ptr_enum_ptrs) return 0;
-ENUM_PTRS_END
+} }
 private RELOC_PTRS_BEGIN(cc_ptr_reloc_ptrs) {
 } RELOC_PTRS_END
 

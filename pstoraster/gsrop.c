@@ -40,7 +40,7 @@ gs_setrasterop(gs_state *pgs, gs_rop3_t rop)
 /* currentrasterop */
 gs_rop3_t
 gs_currentrasterop(const gs_state *pgs)
-{	return pgs->log_op & lop_rop_mask;
+{	return (gs_rop3_t)(pgs->log_op & lop_rop_mask);
 }
 
 /* setsourcetransparent */

@@ -342,7 +342,7 @@ private ENUM_PTRS_BEGIN(dc_binary_masked_enum_ptrs) {
 	}
 	case 0:
 	  return dc_masked_enum_ptrs(vptr, size, index, pep);
-ENUM_PTRS_END
+} }
 private RELOC_PTRS_BEGIN(dc_binary_masked_reloc_ptrs) {
 	dc_masked_reloc_ptrs(vptr, size, gcst);
 	(*gx_dc_procs_ht_binary.reloc_ptrs)(vptr, size, gcst);

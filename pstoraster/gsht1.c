@@ -70,7 +70,7 @@ private ENUM_PTRS_BEGIN(halftone_component_enum_ptrs) return 0;
 		if ( hptr->type != ht_type_threshold )
 		  return 0;
 		ENUM_RETURN_CONST_STRING_PTR(gs_halftone_component, params.threshold.thresholds);
-ENUM_PTRS_END
+} }
 
 private RELOC_PTRS_BEGIN(halftone_component_reloc_ptrs) {
 	if ( hptr->type == ht_type_threshold )

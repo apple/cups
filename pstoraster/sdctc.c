@@ -34,7 +34,7 @@ public_st_DCT_state();
 /* GC procedures */
 private ENUM_PTRS_BEGIN(dct_enum_ptrs) return 0;
 	ENUM_CONST_STRING_PTR(0, stream_DCT_state, Markers);
-ENUM_PTRS_END
+} }
 private RELOC_PTRS_BEGIN(dct_reloc_ptrs) {
 	RELOC_CONST_STRING_PTR(stream_DCT_state, Markers);
 } RELOC_PTRS_END

@@ -88,7 +88,6 @@ dict_int_null_param(const ref *pdict, const char _ds *kstr, int minval,
 			break;
 		case t_null:
 			return 2;
-			break;
 		default:
 			return_error(e_typecheck);
 		}

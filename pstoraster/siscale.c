@@ -399,7 +399,7 @@ top:	while ( ss->src_y > ss->dst_last_index )
 		zoom_y(row, ss->sizeofPixelOut, ss->MaxValueOut, ss->tmp,
 		       ss->WidthOut, ss->tmp_width, ss->Colors,
 		       &ss->dst_next_list, ss->dst_items);
-		if ( row != ss->dst )	/* no buffering */
+		if ( row != (byte *)ss->dst )	/* no buffering */
 		  goto adv;
 	      }
 	    { /* We're delivering a buffered output row. */

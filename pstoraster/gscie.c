@@ -96,7 +96,7 @@ public_st_const_string_element();
 #define sptr ((gs_const_string *)vptr)
 private ENUM_PTRS_BEGIN(const_string_enum_ptrs) return 0;
 	case 0: *pep = (void *)sptr; return ptr_const_string_type;
-ENUM_PTRS_END
+} }
 private RELOC_PTRS_BEGIN(const_string_reloc_ptrs) {
 	gs_reloc_const_string(sptr, gcst);
 } RELOC_PTRS_END

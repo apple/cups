@@ -139,7 +139,7 @@ gs_image_init(gs_image_enum *pie, const gs_image_t *pim, bool multi,
 	code = (*dev_proc(dev, begin_image))
 	  (dev, (const gs_imager_state *)pgs, &image,
 	   (multi ? gs_image_format_component_planar : gs_image_format_chunky),
-	   gs_image_shape_rows | gs_image_shape_split_row,
+	   (gs_image_shape_t)(gs_image_shape_rows | gs_image_shape_split_row),
 	   pgs->dev_color, pgs->clip_path, pie->memory, &pie->info);
 	if ( code < 0 )
 	  return code;

@@ -164,7 +164,7 @@ private_st_SFD_state();
 /* GC procedures */
 private ENUM_PTRS_BEGIN(sfd_enum_ptrs) return 0;
 	ENUM_CONST_STRING_PTR(0, stream_SFD_state, eod);
-ENUM_PTRS_END
+} }
 private RELOC_PTRS_BEGIN(sfd_reloc_ptrs) ;
 	RELOC_CONST_STRING_PTR(stream_SFD_state, eod);
 RELOC_PTRS_END

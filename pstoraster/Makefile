@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.9 1999/05/26 20:03:26 mike Exp $"
+# "$Id: Makefile,v 1.10 1999/06/21 18:49:07 mike Exp $"
 #
 #   GNU Ghostscript makefile for the Common UNIX Printing System (CUPS).
 #
@@ -129,8 +129,10 @@ install:	$(TARGETS)
 #
 
 genarch:	genarch.o
+	echo Linking $<...
 	$(CC) $(LDFLAGS) -o genarch genarch.o
 arch.h:		genarch
+	echo Generating $<...
 	./genarch arch.h
 
 #
@@ -138,6 +140,7 @@ arch.h:		genarch
 #
 
 pstoraster:	$(OBJS) ../Makedefs ../cups/libcups.a
+	echo Linking $<...
 	$(CC) $(LDFLAGS) -o pstoraster $(OBJS) $(IMGLIBS) 
 
 gdevcups.o:	../cups/raster.h
@@ -145,5 +148,5 @@ $(OBJS):	arch.h ../config.h ../Makedefs
 gconf.o iconf.o gscdef.o:	gconfig.h
 
 #
-# End of "$Id: Makefile,v 1.9 1999/05/26 20:03:26 mike Exp $".
+# End of "$Id: Makefile,v 1.10 1999/06/21 18:49:07 mike Exp $".
 #

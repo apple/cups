@@ -185,7 +185,7 @@ fill_with_rule(gs_state *pgs, int rule)
 	/* into the parent's path. */
 	if ( pgs->in_charpath )
 	  code = gx_path_add_char_path(pgs->show_gstate->path, pgs->path,
-				       pgs->in_charpath);
+				       (gs_char_path_mode)pgs->in_charpath);
 	else
 	{	int abits, acode;
 
@@ -231,7 +231,7 @@ gs_stroke(gs_state *pgs)
 	/* into the parent's path. */
 	if ( pgs->in_charpath )
 	  code = gx_path_add_char_path(pgs->show_gstate->path, pgs->path,
-				       pgs->in_charpath);
+				       (gs_char_path_mode)pgs->in_charpath);
 	else
 	{	int abits, acode;
 		float orig_width;

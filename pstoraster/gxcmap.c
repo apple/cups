@@ -44,7 +44,7 @@ private ENUM_PTRS_BEGIN(device_color_enum_ptrs) {
 	if ( proc == 0 )
 	  return 0;
 	return (*proc)(vptr, size, index, pep);
-} ENUM_PTRS_END
+} } }
 private RELOC_PTRS_BEGIN(device_color_reloc_ptrs) {
 	struct_proc_reloc_ptrs((*proc)) = cptr->type->reloc_ptrs;
 	if ( proc != 0 )

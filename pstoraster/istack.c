@@ -48,7 +48,7 @@ private ENUM_PTRS_BEGIN(ref_stack_enum_ptrs) return 0;
 	case 0:
 		*pep = &sptr->current;
 		return ptr_ref_type;
-ENUM_PTRS_END
+} }
 private RELOC_PTRS_BEGIN(ref_stack_reloc_ptrs) {
 #if stacks_are_segmented
 	/* In a segmented environment, the top block can't move, */

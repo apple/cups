@@ -1057,7 +1057,7 @@ clist_strip_copy_rop(gx_device *dev,
   const gx_strip_bitmap *textures, const gx_color_index *tcolors,
   int x, int y, int width, int height,
   int phase_x, int phase_y, gs_logical_operation_t lop)
-{	gs_rop3_t rop = lop & lop_rop_mask;
+{	gs_rop3_t rop = (gs_rop3_t)(lop & lop_rop_mask);
 	gx_strip_bitmap tile_with_id;
 	const gx_strip_bitmap *tiles = textures;
 
