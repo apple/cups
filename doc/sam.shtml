@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2001, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.1.9">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SAM-1.1.10">
 	<META NAME="Author" CONTENT="Easy Software Products">
 	<TITLE>CUPS Software Administrators Manual</TITLE>
 </HEAD>
@@ -11,7 +11,7 @@
 
 <P>This software administrators manual provides printer administration
 information for the Common UNIX Printing System<SUP>TM</SUP>
-("CUPS<SUP>TM</SUP>"), version 1.1.9.
+("CUPS<SUP>TM</SUP>"), version 1.1.10.
 
 <EMBED SRC="system-overview.shtml">
 
@@ -844,7 +844,6 @@ can use your favorite text editor to make changes to it.
 determine how the server operates:
 
 <UL>
-
 <TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0">
 <TR>
 <TD VALIGN="TOP">
@@ -862,18 +861,18 @@ determine how the server operates:
 	<LI><A HREF="#BrowseOrder"><CODE>BrowseOrder</CODE></A>
 	<LI><A HREF="#BrowsePoll"><CODE>BrowsePoll</CODE></A>
 	<LI><A HREF="#BrowsePort"><CODE>BrowsePort</CODE></A>
+	<LI><A HREF="#BrowseProtocols"><CODE>BrowseProtocols</CODE></A>
 	<LI><A HREF="#BrowseRelay"><CODE>BrowseRelay</CODE></A>
 	<LI><A HREF="#BrowseShortNames"><CODE>BrowseShortNames</CODE></A>
 	<LI><A HREF="#BrowseTimeout"><CODE>BrowseTimeout</CODE></A>
 	<LI><A HREF="#Browsing"><CODE>Browsing</CODE></A>
 	<LI><A HREF="#Classification"><CODE>Classification</CODE></A>
+	<LI><A HREF="#ClassifyOverride"><CODE>ClassifyOverride</CODE></A>
 	<LI><A HREF="#DataDir"><CODE>DataDir</CODE></A>
 	<LI><A HREF="#DefaultCharset"><CODE>DefaultCharset</CODE></A>
 	<LI><A HREF="#DefaultLanguage"><CODE>DefaultLanguage</CODE></A>
 	<LI><A HREF="#Deny"><CODE>Deny</CODE></A>
 	<LI><A HREF="#DocumentRoot"><CODE>DocumentRoot</CODE></A>
-	<LI><A HREF="#Encryption"><CODE>Encryption</CODE></A>
-	<LI><A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A>
 
 </TD>
 <TD VALIGN="TOP">
@@ -881,6 +880,8 @@ determine how the server operates:
 </TD>
 <TD VALIGN="TOP">
 
+	<LI><A HREF="#Encryption"><CODE>Encryption</CODE></A>
+	<LI><A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A>
 	<LI><A HREF="#FilterLimit"><CODE>FilterLimit</CODE></A>
 	<LI><A HREF="#FontPath"><CODE>FontPath</CODE></A>
 	<LI><A HREF="#Group"><CODE>Group</CODE></A>
@@ -1333,6 +1334,39 @@ used for browse packets. The default port number is 631.
 </TR>
 </TABLE></CENTER>
 
+<!-- NEED 3in -->
+<H3><A NAME="BrowseProtocols">BrowseProtocols</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+BrowseProtocols CUPS
+BrowseProtocols SLP
+BrowseProtocols CUPS SLP
+BrowseProtocols all
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>BrowseProtocols</CODE> directive specifies the protocols to
+use when collecting and distributing shared printers on the local network.
+The default protocol is <CODE>CUPS</CODE>, which is a broadcast-based
+protocol.
+
+<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
+<TR>
+	<TD>
+	<B>NOTE:</B>
+
+	<P>When using the <CODE>SLP</CODE> protocol, you must have at least
+	one Directory Agent (DA) server on your network. Otherwise the
+	CUPS scheduler (<CODE>cupsd</CODE>) will not respond to client
+	requests for several seconds while polling the network.
+	</TD>
+</TR>
+</TABLE></CENTER>
+
 <!-- NEED 4in -->
 <H3><A NAME="BrowseRelay">BrowseRelay</A></H3>
 <HR>
@@ -1458,6 +1492,29 @@ Classification unclassified
 on the server. When this option is set, at least one of the banner pages
 is forced to the classification level, and the classification is placed
 on each page of output. The default is no classification level.
+
+<!-- NEED 3in -->
+<H3><A NAME="ClassifyOverride">ClassifyOverride</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+ClassifyOverride Yes
+ClassifyOverride No
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>ClassifyOverride</CODE> directive specifies whether users
+can override the default classification level on the server. When the
+server classification is set, users can change the classification using
+the <CODE>job-sheets</CODE> option and can choose to only print one
+security banner before or after the job. If the <CODE>job-sheets</CODE>
+option is set to <CODE>none</CODE> then the server default classification
+is used.
+
+<P>The default is to not allow classification overrides.
 
 <!-- NEED 3in -->
 <H3><A NAME="DataDir">DataDir</A></H3>
