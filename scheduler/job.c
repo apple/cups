@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.70 2003/05/01 18:00:17 mike Exp $"
+ * "$Id: job.c,v 1.124.2.71 2003/05/12 15:10:12 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -626,7 +626,15 @@ LoadAllJobs(void)
 	close(fd);
       }
 
-      job->state = ippFindAttribute(job->attrs, "job-state", IPP_TAG_ENUM);
+      if ((job->state = ippFindAttribute(job->attrs, "job-state", IPP_TAG_ENUM)) == NULL)
+      {
+        LogMessage(L_ERROR, "LoadAllJobs: Missing or bad job-state attribute in control file \"%s\"!",
+	           filename);
+	ippDelete(job->attrs);
+	free(job);
+	unlink(filename);
+	continue;
+      }
 
       if ((attr = ippFindAttribute(job->attrs, "job-printer-uri", IPP_TAG_URI)) == NULL)
       {
@@ -2758,5 +2766,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.70 2003/05/01 18:00:17 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.71 2003/05/12 15:10:12 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.127.2.67 2003/05/09 15:11:52 mike Exp $"
+ * "$Id: ipp.c,v 1.127.2.68 2003/05/12 15:10:07 mike Exp $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -114,8 +114,8 @@ static void	add_queued_job_count(client_t *con, printer_t *p);
 static void	cancel_all_jobs(client_t *con, ipp_attribute_t *uri);
 static void	cancel_job(client_t *con, ipp_attribute_t *uri);
 static int	check_quotas(client_t *con, printer_t *p);
-static void	copy_attribute(ipp_t *to, ipp_attribute_t *attr,
-		               int quickcopy);
+static ipp_attribute_t	*copy_attribute(ipp_t *to, ipp_attribute_t *attr,
+		                        int quickcopy);
 static void	copy_attrs(ipp_t *to, ipp_t *from, ipp_attribute_t *req,
 		           ipp_tag_t group, int quickcopy);
 static int	copy_banner(client_t *con, job_t *job, const char *name);
@@ -2008,7 +2008,7 @@ check_quotas(client_t  *con,	/* I - Client connection */
  * 'copy_attribute()' - Copy a single attribute.
  */
 
-static void
+static ipp_attribute_t *		/* O - New attribute */
 copy_attribute(ipp_t           *to,	/* O - Destination request/response */
                ipp_attribute_t *attr,	/* I - Attribute to copy */
                int             quickcopy)/* I - Do a quick copy? */
@@ -2159,6 +2159,8 @@ copy_attribute(ipp_t           *to,	/* O - Destination request/response */
 	}
         break; /* anti-compiler-warning-code */
   }
+
+  return (toattr);
 }
 
 
@@ -6029,6 +6031,12 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
              uri->values[0].string.text);
 
  /*
+  * Start with "everything is OK" status...
+  */
+
+  con->response->request.status.status_code = IPP_OK;
+
+ /*
   * See if we have a job URI or a printer URI...
   */
 
@@ -6121,25 +6129,125 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
     if (attr->group_tag != IPP_TAG_JOB || !attr->name)
       continue;
 
-    if (strcmp(attr->name, "job-originating-host-name") == 0 ||
-        strcmp(attr->name, "job-originating-user-name") == 0 ||
-	strcmp(attr->name, "job-media-sheets-completed") == 0 ||
-	strcmp(attr->name, "job-k-octets") == 0 ||
-	strcmp(attr->name, "job-id") == 0 ||
-	strcmp(attr->name, "job-sheets") == 0 ||
-	strncmp(attr->name, "time-at-", 8) == 0)
-      continue; /* Read-only attrs */
-
-    if (strcmp(attr->name, "job-priority") == 0 &&
-        attr->value_tag == IPP_TAG_INTEGER &&
-	job->state->values[0].integer != IPP_JOB_PROCESSING)
+    if (!strcmp(attr->name, "attributes-charset") ||
+	!strcmp(attr->name, "attributes-natural-language") ||
+	!strcmp(attr->name, "document-compression") ||
+	!strcmp(attr->name, "document-format") ||
+	!strcmp(attr->name, "job-detailed-status-messages") ||
+	!strcmp(attr->name, "job-document-access-errors") ||
+	!strcmp(attr->name, "job-id") ||
+	!strcmp(attr->name, "job-k-octets") ||
+        !strcmp(attr->name, "job-originating-host-name") ||
+        !strcmp(attr->name, "job-originating-user-name") ||
+	!strcmp(attr->name, "job-printer-up-time") ||
+	!strcmp(attr->name, "job-printer-uri") ||
+	!strcmp(attr->name, "job-sheets") ||
+	!strcmp(attr->name, "job-state-message") ||
+	!strcmp(attr->name, "job-state-reasons") ||
+	!strcmp(attr->name, "job-uri") ||
+	!strcmp(attr->name, "number-of-documents") ||
+	!strcmp(attr->name, "number-of-intervening-jobs") ||
+	!strcmp(attr->name, "output-device-assigned") ||
+	!strncmp(attr->name, "date-time-at-", 13) ||
+	!strncmp(attr->name, "job-impressions", 15) ||
+	!strncmp(attr->name, "job-k-octets", 12) ||
+	!strncmp(attr->name, "job-media-sheets", 16) ||
+	!strncmp(attr->name, "time-at-", 8))
     {
      /*
-      * Change the job priority
+      * Read-only attrs!
       */
 
-      SetJobPriority(jobid, attr->values[0].integer);
+      send_ipp_error(con, IPP_ATTRIBUTES_NOT_SETTABLE);
+
+      if ((attr2 = copy_attribute(con->response, attr, 0)) != NULL)
+        attr2->group_tag = IPP_TAG_UNSUPPORTED_GROUP;
+
+      continue;
     }
+
+    if (!strcmp(attr->name, "job-priority"))
+    {
+     /*
+      * Change the job priority...
+      */
+
+      if (attr->value_tag != IPP_TAG_INTEGER)
+      {
+	send_ipp_error(con, IPP_REQUEST_VALUE);
+
+	if ((attr2 = copy_attribute(con->response, attr, 0)) != NULL)
+          attr2->group_tag = IPP_TAG_UNSUPPORTED_GROUP;
+      }
+      else if (job->state->values[0].integer >= IPP_JOB_PROCESSING)
+      {
+	send_ipp_error(con, IPP_NOT_POSSIBLE);
+	return;
+      }
+      else if (con->response->request.status.status_code == IPP_OK)
+        SetJobPriority(jobid, attr->values[0].integer);
+    }
+    else if (!strcmp(attr->name, "job-state"))
+    {
+     /*
+      * Change the job state...
+      */
+
+      if (attr->value_tag != IPP_TAG_ENUM)
+      {
+	send_ipp_error(con, IPP_REQUEST_VALUE);
+
+	if ((attr2 = copy_attribute(con->response, attr, 0)) != NULL)
+          attr2->group_tag = IPP_TAG_UNSUPPORTED_GROUP;
+      }
+      else
+      {
+        switch (attr->values[0].integer)
+	{
+	  case IPP_JOB_PENDING :
+	  case IPP_JOB_HELD :
+	      if (job->state->values[0].integer > IPP_JOB_HELD)
+	      {
+		send_ipp_error(con, IPP_NOT_POSSIBLE);
+		return;
+	      }
+              else if (con->response->request.status.status_code == IPP_OK)
+		job->state->values[0].integer = attr->values[0].integer;
+	      break;
+
+	  case IPP_JOB_PROCESSING :
+	  case IPP_JOB_STOPPED :
+	      if (job->state->values[0].integer != attr->values[0].integer)
+	      {
+		send_ipp_error(con, IPP_NOT_POSSIBLE);
+		return;
+	      }
+	      break;
+
+	  case IPP_JOB_CANCELLED :
+	  case IPP_JOB_ABORTED :
+	  case IPP_JOB_COMPLETED :
+	      if (job->state->values[0].integer > IPP_JOB_PROCESSING)
+	      {
+		send_ipp_error(con, IPP_NOT_POSSIBLE);
+		return;
+	      }
+              else if (con->response->request.status.status_code == IPP_OK)
+	      {
+                CancelJob(job->id, 0);
+
+		if (JobHistory)
+		{
+                  job->state->values[0].integer = attr->values[0].integer;
+		  SaveJob(job->id);
+		}
+	      }
+	      break;
+	}
+      }
+    }
+    else if (con->response->request.status.status_code != IPP_OK)
+      continue;
     else if ((attr2 = ippFindAttribute(job->attrs, attr->name, IPP_TAG_ZERO)) != NULL)
     {
      /*
@@ -6232,12 +6340,6 @@ set_job_attrs(client_t        *con,	/* I - Client connection */
   */
 
   CheckJobs();
-
- /*
-  * Return with "everything is OK" status...
-  */
-
-  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -6621,5 +6723,5 @@ validate_user(client_t   *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.127.2.67 2003/05/09 15:11:52 mike Exp $".
+ * End of "$Id: ipp.c,v 1.127.2.68 2003/05/12 15:10:07 mike Exp $".
  */
