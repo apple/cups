@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.130 2003/03/31 16:45:38 mike Exp $"
+ * "$Id: conf.c,v 1.131 2003/04/10 12:57:43 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -82,6 +82,11 @@ cups_hstrerror(int error)			/* I - Error number */
   else
     return (errors[error]);
 }
+#elif defined(_AIX)
+/*
+ * AIX doesn't provide a prototype but does provide the function...
+ */
+extern const char *hstrerror(int);
 #endif /* !HAVE_HSTRERROR */
 
 
@@ -2124,5 +2129,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.130 2003/03/31 16:45:38 mike Exp $".
+ * End of "$Id: conf.c,v 1.131 2003/04/10 12:57:43 mike Exp $".
  */

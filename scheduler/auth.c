@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.69 2003/03/30 19:50:33 mike Exp $"
+ * "$Id: auth.c,v 1.70 2003/04/10 12:57:43 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -96,9 +96,9 @@ static void		to64(char *s, unsigned long v, int n);
  * Local globals...
  */
 
-#ifdef __hpux
+#if defined(__hpux) && defined(HAVE_LIBPAM)
 static client_t		*auth_client;	/* Current client being authenticated */
-#endif /* __hpux */
+#endif /* __hpux && HAVE_LIBPAM */
 
 
 /*
@@ -1643,5 +1643,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.69 2003/03/30 19:50:33 mike Exp $".
+ * End of "$Id: auth.c,v 1.70 2003/04/10 12:57:43 mike Exp $".
  */

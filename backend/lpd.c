@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.50 2003/03/24 20:51:00 mike Exp $"
+ * "$Id: lpd.c,v 1.51 2003/04/10 12:57:40 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -91,6 +91,11 @@ cups_hstrerror(int error)			/* I - Error number */
   else
     return (errors[error]);
 }
+#elif defined(_AIX)
+/*
+ * AIX doesn't provide a prototype but does provide the function...
+ */
+extern const char *hstrerror(int);
 #endif /* !HAVE_HSTRERROR */
 
 
@@ -1015,5 +1020,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: lpd.c,v 1.50 2003/03/24 20:51:00 mike Exp $".
+ * End of "$Id: lpd.c,v 1.51 2003/04/10 12:57:40 mike Exp $".
  */
