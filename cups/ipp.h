@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.45 2002/12/17 18:56:42 swdev Exp $"
+ * "$Id: ipp.h,v 1.46 2003/01/24 20:39:40 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -400,7 +400,7 @@ extern ipp_attribute_t	*ippAddResolution(ipp_t *ipp, ipp_tag_t group, const char
 extern ipp_attribute_t	*ippAddResolutions(ipp_t *ipp, ipp_tag_t group, const char *name, int num_values, ipp_res_t units, const int *xres, const int *yres);
 extern ipp_attribute_t	*ippAddSeparator(ipp_t *ipp);
 extern ipp_attribute_t	*ippAddString(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, const char *name, const char *charset, const char *value);
-extern ipp_attribute_t	*ippAddStrings(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, const char *name, int num_values, const char *charset, const char **values);
+extern ipp_attribute_t	*ippAddStrings(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, const char *name, int num_values, const char *charset, const char * const *values);
 extern time_t		ippDateToTime(const ipp_uchar_t *date);
 extern void		ippDelete(ipp_t *ipp);
 extern const char	*ippErrorString(ipp_status_t error);
@@ -430,5 +430,5 @@ extern void		_ipp_free_attr(ipp_attribute_t *);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.45 2002/12/17 18:56:42 swdev Exp $".
+ * End of "$Id: ipp.h,v 1.46 2003/01/24 20:39:40 mike Exp $".
  */

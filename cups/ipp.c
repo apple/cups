@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.81 2003/01/15 21:03:36 mike Exp $"
+ * "$Id: ipp.c,v 1.82 2003/01/24 20:39:40 mike Exp $"
  *
  *   Internet Printing Protocol object functions for the Common UNIX
  *   Printing System (CUPS).
@@ -309,18 +309,18 @@ ippAddString(ipp_t      *ipp,		/* I - IPP request */
  * 'ippAddStrings()' - Add language-encoded strings to an IPP request.
  */
 
-ipp_attribute_t *			/* O - New attribute */
-ippAddStrings(ipp_t      *ipp,		/* I - IPP request */
-              ipp_tag_t  group,		/* I - IPP group */
-	      ipp_tag_t  type,		/* I - Type of attribute */
-	      const char *name,		/* I - Name of attribute */
-	      int        num_values,	/* I - Number of values */
-	      const char *charset,	/* I - Character set */
-	      const char **values)	/* I - Values */
+ipp_attribute_t *				/* O - New attribute */
+ippAddStrings(ipp_t              *ipp,		/* I - IPP request */
+              ipp_tag_t          group,		/* I - IPP group */
+	      ipp_tag_t          type,		/* I - Type of attribute */
+	      const char         *name,		/* I - Name of attribute */
+	      int                num_values,	/* I - Number of values */
+	      const char         *charset,	/* I - Character set */
+	      const char * const *values)	/* I - Values */
 {
-  int			i;		/* Looping var */
-  ipp_attribute_t	*attr;		/* New attribute */
-  ipp_value_t		*value;		/* Current value */
+  int			i;			/* Looping var */
+  ipp_attribute_t	*attr;			/* New attribute */
+  ipp_value_t		*value;			/* Current value */
 
 
   if (ipp == NULL || name == NULL || num_values < 1)
@@ -2098,5 +2098,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.81 2003/01/15 21:03:36 mike Exp $".
+ * End of "$Id: ipp.c,v 1.82 2003/01/24 20:39:40 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.104 2003/01/15 04:15:47 mike Exp $"
+ * "$Id: util.c,v 1.105 2003/01/24 20:39:41 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -744,7 +744,7 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
 		*title,			/* job-name */
 		*user;			/* job-originating-user-name */
   char		uri[HTTP_MAX_URI];	/* URI for jobs */
-  static const char *attrs[] =		/* Requested attributes */
+  static const char * const attrs[] =	/* Requested attributes */
 		{
 		  "job-id",
 		  "job-priority",
@@ -1003,8 +1003,8 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   char		prompt[1024];		/* Prompt string */
   int		digest_tries;		/* Number of tries with Digest */
   static char	filename[HTTP_MAX_URI];	/* Local filename */
-  static const char *requested_attrs[] =/* Requested attributes */
-		{
+  static const char * const requested_attrs[] =
+		{			/* Requested attributes */
 		  "printer-uri-supported",
 		  "printer-type",
 		  "member-uris"
@@ -1787,5 +1787,5 @@ cups_local_auth(http_t *http)	/* I - Connection */
 
 
 /*
- * End of "$Id: util.c,v 1.104 2003/01/15 04:15:47 mike Exp $".
+ * End of "$Id: util.c,v 1.105 2003/01/24 20:39:41 mike Exp $".
  */

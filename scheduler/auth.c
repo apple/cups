@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.66 2003/01/15 04:15:48 mike Exp $"
+ * "$Id: auth.c,v 1.67 2003/01/24 20:39:43 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -658,7 +658,7 @@ FindBest(const char   *path,	/* I - Resource path */
 		*best;		/* Best match for location so far */
   int		bestlen;	/* Length of best match */
   int		limit;		/* Limit field */
-  static int	limits[] =	/* Map http_status_t to AUTH_LIMIT_xyz */
+  static const int limits[] =	/* Map http_status_t to AUTH_LIMIT_xyz */
 		{
 		  AUTH_LIMIT_ALL,
 		  AUTH_LIMIT_OPTIONS,
@@ -834,7 +834,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
   struct spwd	*spw;		/* Shadow password data */
 #  endif /* HAVE_SHADOW_H */
 #endif /* HAVE_LIBPAM */
-  static const char *states[] =	/* HTTP client states... */
+  static const char * const states[] =	/* HTTP client states... */
 		{
 		  "WAITING",
 		  "OPTIONS",
@@ -1627,5 +1627,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.66 2003/01/15 04:15:48 mike Exp $".
+ * End of "$Id: auth.c,v 1.67 2003/01/24 20:39:43 mike Exp $".
  */

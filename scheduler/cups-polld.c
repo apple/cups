@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-polld.c,v 1.14 2003/01/23 16:26:38 mike Exp $"
+ * "$Id: cups-polld.c,v 1.15 2003/01/24 20:39:44 mike Exp $"
  *
  *   Polling daemon for the Common UNIX Printing System (CUPS).
  *
@@ -175,7 +175,7 @@ poll_server(http_t      *http,		/* I - HTTP connection */
   ipp_pstate_t		state;		/* printer-state */
   struct sockaddr_in	addr;		/* Broadcast address */
   char			packet[1540];	/* Data packet */
-  static const char	*attrs[] =	/* Requested attributes */
+  static const char * const attrs[] =	/* Requested attributes */
 			{
 			  "printer-info",
 			  "printer-location",
@@ -379,5 +379,5 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: cups-polld.c,v 1.14 2003/01/23 16:26:38 mike Exp $".
+ * End of "$Id: cups-polld.c,v 1.15 2003/01/24 20:39:44 mike Exp $".
  */

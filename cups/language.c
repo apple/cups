@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c,v 1.29 2002/12/17 18:56:42 swdev Exp $"
+ * "$Id: language.c,v 1.30 2003/01/24 20:39:41 mike Exp $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -48,8 +48,8 @@
  */
 
 static cups_lang_t	*lang_cache = NULL;	/* Language string cache */
-static char		*lang_blank = "";	/* Blank constant string */
-static char		*lang_encodings[] =	/* Encoding strings */
+static const char	lang_blank[] = "";	/* Blank constant string */
+static const char * const lang_encodings[] =	/* Encoding strings */
 			{
 			  "us-ascii",
 			  "iso-8859-1",
@@ -79,7 +79,7 @@ static char		*lang_encodings[] =	/* Encoding strings */
 			  "koi8-r",
 			  "koi8-u"
 			};
-static char		*lang_default[] =	/* Default POSIX locale */
+static const char * const lang_default[] =	/* Default POSIX locale */
 			{
 #include "cups_C.h"
 			  NULL
@@ -95,9 +95,9 @@ char *					/* O - Character encoding */
 cupsLangEncoding(cups_lang_t *lang)	/* I - Language data */
 {
   if (lang == NULL)
-    return (lang_encodings[0]);
+    return ((char*)lang_encodings[0]);
   else
-    return (lang_encodings[lang->encoding]);
+    return ((char*)lang_encodings[lang->encoding]);
 }
 
 
@@ -337,7 +337,7 @@ cupsLangGet(const char *language) /* I - Language or locale */
     if (lang->messages[i] != NULL && lang->messages[i] != lang_blank)
       free(lang->messages[i]);
 
-    lang->messages[i] = lang_blank;
+    lang->messages[i] = (char*)lang_blank;
   }
 
  /*
@@ -423,5 +423,5 @@ cupsLangGet(const char *language) /* I - Language or locale */
 
 
 /*
- * End of "$Id: language.c,v 1.29 2002/12/17 18:56:42 swdev Exp $".
+ * End of "$Id: language.c,v 1.30 2003/01/24 20:39:41 mike Exp $".
  */

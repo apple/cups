@@ -1,5 +1,5 @@
 /*
- * "$Id: http-addr.c,v 1.4 2003/01/14 14:33:43 mike Exp $"
+ * "$Id: http-addr.c,v 1.5 2003/01/24 20:39:40 mike Exp $"
  *
  *   HTTP host/address routines for the Common UNIX Printing System (CUPS).
  *
@@ -55,9 +55,10 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
   static char		*packed_ptr[2];	/* Pointer to packed address */
   static struct hostent	host_ip;	/* Host entry for IP address */
 
+
 #if defined(__APPLE__)
   /* OS X hack to avoid it's ocassional long delay in lookupd */
-  static char sLoopback[] = "127.0.0.1";
+  static const char sLoopback[] = "127.0.0.1";
   if (strcmp(name, "localhost") == 0)
     name = sLoopback;
 #endif /* __APPLE__ */
@@ -114,5 +115,5 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
 
 
 /*
- * End of "$Id: http-addr.c,v 1.4 2003/01/14 14:33:43 mike Exp $".
+ * End of "$Id: http-addr.c,v 1.5 2003/01/24 20:39:40 mike Exp $".
  */

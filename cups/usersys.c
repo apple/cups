@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c,v 1.20 2002/12/17 18:56:43 swdev Exp $"
+ * "$Id: usersys.c,v 1.21 2003/01/24 20:39:41 mike Exp $"
  *
  *   User, system, and password routines for the Common UNIX Printing
  *   System (CUPS).
@@ -80,7 +80,7 @@ cupsEncryption(void)
   FILE		*fp;			/* client.conf file */
   char		*encryption;		/* CUPS_ENCRYPTION variable */
   const char	*home;			/* Home directory of user */
-  static char	line[1024];		/* Line from file */
+  char		line[1024];		/* Line from file */
 
 
  /*
@@ -196,7 +196,7 @@ cupsServer(void)
   FILE		*fp;			/* client.conf file */
   char		*server;		/* Pointer to server name */
   const char	*home;			/* Home directory of user */
-  static char	line[1024];		/* Line from file */
+  char		line[1024];		/* Line from file */
 
 
  /*
@@ -456,5 +456,5 @@ cups_get_line(char *buf,	/* I - Line buffer */
 
 
 /*
- * End of "$Id: usersys.c,v 1.20 2002/12/17 18:56:43 swdev Exp $".
+ * End of "$Id: usersys.c,v 1.21 2003/01/24 20:39:41 mike Exp $".
  */

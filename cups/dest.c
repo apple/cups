@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c,v 1.32 2002/12/17 18:56:41 swdev Exp $"
+ * "$Id: dest.c,v 1.33 2003/01/24 20:39:39 mike Exp $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -668,7 +668,7 @@ cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
   cups_lang_t	*language;		/* Default language */
   const char	*name;			/* printer-name attribute */
   char		job_sheets[1024];	/* job-sheets option */
-  static const char	*pattrs[] =	/* Attributes we're interested in */
+  static const char * const pattrs[] =	/* Attributes we're interested in */
 		{
 		  "printer-name",
 		  "job-sheets-default"
@@ -794,5 +794,5 @@ cups_get_sdests(ipp_op_t    op,		/* I - get-printers or get-classes */
 
 
 /*
- * End of "$Id: dest.c,v 1.32 2002/12/17 18:56:41 swdev Exp $".
+ * End of "$Id: dest.c,v 1.33 2003/01/24 20:39:39 mike Exp $".
  */

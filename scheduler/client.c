@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.139 2003/01/24 19:16:32 mike Exp $"
+ * "$Id: client.c,v 1.140 2003/01/24 20:39:44 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -59,7 +59,8 @@
 static int		check_if_modified(client_t *con,
 			                  struct stat *filestats);
 static void		decode_auth(client_t *con);
-static char		*get_file(client_t *con, struct stat *filestats);
+static char		*get_file(client_t *con, struct stat *filestats, 
+			          char *filename, int len);
 static http_status_t	install_conf_file(client_t *con);
 static int		pipe_command(client_t *con, int infile, int *outfile,
 			             char *command, char *options);
@@ -671,6 +672,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
   ipp_state_t   ipp_state;	/* State of IPP transfer */
   int		bytes;		/* Number of bytes to POST */
   char		*filename;	/* Name of file for GET/HEAD */
+  char		buf[1024];	/* Buffer for real filename */
   struct stat	filestats;	/* File information */
   mime_type_t	*type;		/* MIME type of file */
   printer_t	*p;		/* Printer */
@@ -1117,7 +1119,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	      * Serve a file...
 	      */
 
-              if ((filename = get_file(con, &filestats)) == NULL)
+              if ((filename = get_file(con, &filestats, buf,
+	                               sizeof(buf))) == NULL)
 	      {
 		if (!SendError(con, HTTP_NOT_FOUND))
 		{
@@ -1391,7 +1394,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 
 	      break;
 	    }
-	    else if ((filename = get_file(con, &filestats)) == NULL)
+	    else if ((filename = get_file(con, &filestats, buf,
+	                                  sizeof(buf))) == NULL)
 	    {
 	      if (!SendHeader(con, HTTP_NOT_FOUND, "text/html"))
 	      {
@@ -2301,13 +2305,14 @@ decode_auth(client_t *con)		/* I - Client to decode to */
  * 'get_file()' - Get a filename and state info.
  */
 
-static char *			/* O - Real filename */
-get_file(client_t    *con,	/* I - Client connection */
-         struct stat *filestats)/* O - File information */
+static char *			/* O  - Real filename */
+get_file(client_t    *con,	/* I  - Client connection */
+         struct stat *filestats,/* O  - File information */
+         char        *filename,	/* IO - Filename buffer */
+         int         len)	/* I  - Buffer length */
 {
   int		status;		/* Status of filesystem calls */
   char		*params;	/* Pointer to parameters in URI */
-  static char	filename[1024];	/* Filename buffer */
 
 
  /*
@@ -2315,14 +2320,14 @@ get_file(client_t    *con,	/* I - Client connection */
   */
 
   if (strncmp(con->uri, "/ppd/", 5) == 0)
-    snprintf(filename, sizeof(filename), "%s%s", ServerRoot, con->uri);
+    snprintf(filename, len, "%s%s", ServerRoot, con->uri);
   else if (strncmp(con->uri, "/admin/conf/", 12) == 0)
-    snprintf(filename, sizeof(filename), "%s%s", ServerRoot, con->uri + 11);
+    snprintf(filename, len, "%s%s", ServerRoot, con->uri + 11);
   else if (con->language != NULL)
-    snprintf(filename, sizeof(filename), "%s/%s%s", DocumentRoot, con->language->language,
+    snprintf(filename, len, "%s/%s%s", DocumentRoot, con->language->language,
             con->uri);
   else
-    snprintf(filename, sizeof(filename), "%s%s", DocumentRoot, con->uri);
+    snprintf(filename, len, "%s%s", DocumentRoot, con->uri);
 
   if ((params = strchr(filename, '?')) != NULL)
     *params = '\0';
@@ -2341,7 +2346,7 @@ get_file(client_t    *con,	/* I - Client connection */
     if (strncmp(con->uri, "/ppd/", 5) != 0 &&
         strncmp(con->uri, "/admin/conf/", 12) != 0)
     {
-      snprintf(filename, sizeof(filename), "%s%s", DocumentRoot, con->uri);
+      snprintf(filename, len, "%s%s", DocumentRoot, con->uri);
 
       status = stat(filename, filestats);
     }
@@ -2354,9 +2359,9 @@ get_file(client_t    *con,	/* I - Client connection */
   if (!status && S_ISDIR(filestats->st_mode))
   {
     if (filename[strlen(filename) - 1] == '/')
-      strlcat(filename, "index.html", sizeof(filename));
+      strlcat(filename, "index.html", len);
     else
-      strlcat(filename, "/index.html", sizeof(filename));
+      strlcat(filename, "/index.html", len);
 
     status = stat(filename, filestats);
   }
@@ -2927,5 +2932,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: client.c,v 1.139 2003/01/24 19:16:32 mike Exp $".
+ * End of "$Id: client.c,v 1.140 2003/01/24 20:39:44 mike Exp $".
  */
