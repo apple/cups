@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.95 2001/06/22 19:21:47 mike Exp $"
+dnl "$Id: configure.in,v 1.96 2001/06/26 20:11:08 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -45,23 +45,25 @@ CXXFLAGS="${CXXFLAGS:=}"
 DSOFLAGS="${DSOFLAGS:=}"
 AC_SUBST(DSOFLAGS)
 
-AC_ARG_ENABLE(debug, [  --enable-debug        turn on debugging [default=no]],[if eval "test x$enable_debug = xyes"; then
-	OPTIM="-g"
-fi])
+AC_ARG_ENABLE(debug, [  --enable-debug        turn on debugging [default=no]],
+	[if test x$enable_debug = xyes; then
+		OPTIM="-g"
+	fi])
 AC_ARG_ENABLE(shared, [  --enable-shared        turn on shared libraries [default=yes]])
-AC_ARG_ENABLE(ssl, [  --enable-ssl           turn on SSL/TLS support [default=no]])
+AC_ARG_ENABLE(ssl, [  --enable-ssl           turn on SSL/TLS support [default=yes]])
 AC_ARG_ENABLE(libtool_unsupported, [  --enable-libtool-unsupported=LIBTOOL_PATH
-                          turn on building with libtool (UNSUPPORTED!) [default=no]],[if eval "test x$enable_libtool_unsupported != xno"; then
-	LIBTOOL="$enable_libtool_unsupported"
-	enable_shared=no
-	echo "WARNING: libtool is not supported or endorsed by Easy Software Products."
-	echo "         WE DO NOT PROVIDE TECHNICAL SUPPORT FOR LIBTOOL PROBLEMS."
-	echo "         (even if you have a support contract)"
-else
-	LIBTOOL=""
-fi])
+                          turn on building with libtool (UNSUPPORTED!) [default=no]],
+	[if test x$enable_libtool != xno; then
+		LIBTOOL="$enable_libtool"
+		enable_shared=no
+		echo "WARNING: libtool is not supported or endorsed by Easy Software Products."
+		echo "         WE DO NOT PROVIDE TECHNICAL SUPPORT FOR LIBTOOL PROBLEMS."
+		echo "         (even if you have a support contract)"
+	else
+		LIBTOOL=""
+	fi])
 
-if test "$enable_shared" != "no"; then
+if test x$enable_shared != xno; then
 	case "$uname" in
 		SunOS* | UNIX_S*)
 			LIBCUPS="libcups.so.2"
@@ -94,12 +96,10 @@ if test "$enable_shared" != "no"; then
 			DSOFLAGS="$DSOFLAGS -soname \$@ -shared \$(OPTIM)"
 			;;
 		AIX*)
-			AC_MSG_WARN(Shared library support for AIX not available yet - defaulting to static)
-			enable_shared=no
-			PICFLAG=0
-			LIBCUPS="libcups.a"
-			LIBCUPSIMAGE="libcupsimage.a"
-			DSO=":"
+			LIBCUPS="libcups.so.2"
+			LIBCUPSIMAGE="libcupsimage.so.2"
+			DSO="ld"
+			DSOFLAGS="$DSOFLAGS -G -o \$@"
 			;;
 		*)
 			echo "Warning: shared libraries may not be supported.  Trying -shared"
@@ -117,7 +117,7 @@ else
 	DSO=":"
 fi
 
-if test "$LIBTOOL" != ""; then
+if test x$LIBTOOL != x; then
 	LIBCUPS="libcups.la"
 	LIBCUPSIMAGE="libcupsimage.la"
 	LINKCUPS="../cups/\$(LIBCUPS)"
@@ -128,7 +128,7 @@ else
 	LINKCUPS="-L../cups -lcups"
 	LINKCUPSIMAGE="-L../filter -lcupsimage"
 
-	if test $enable_shared = no; then
+	if test x$enable_shared = xno; then
 		LINKCUPS="$LINKCUPS \$(SSLLIBS)"
 	fi
 fi
@@ -727,5 +727,5 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$fontpath")
 AC_OUTPUT(Makedefs cups.sh)
 
 dnl
-dnl End of "$Id: configure.in,v 1.95 2001/06/22 19:21:47 mike Exp $".
+dnl End of "$Id: configure.in,v 1.96 2001/06/26 20:11:08 mike Exp $".
 dnl
