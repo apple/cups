@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20
 
+	- Updated the user/group configure checks for MacOS X
+	  10.3 (STR #270)
+	- Fixed an offset bug in the PDF filter (STR #284)
 	- The cupsDoRequest() and cupsDoFileRequest() functions
 	  did not map several HTTP status codes to their IPP
 	  counterparts. This made detecting certain conditions
