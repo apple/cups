@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.68 2000/09/07 20:33:20 mike Exp $"
+ * "$Id: client.c,v 1.69 2000/09/12 18:35:00 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -125,7 +125,7 @@ AcceptClient(listener_t *lis)	/* I - Listener socket */
   else
     strncpy(con->http.hostname, host->h_name, sizeof(con->http.hostname) - 1);
 
-  LogMessage(L_DEBUG, "accept() %d from %s:%d.", con->http.fd,
+  LogMessage(L_DEBUG, "AcceptClient() %d from %s:%d.", con->http.fd,
              con->http.hostname, ntohs(con->http.hostaddr.sin_port));
 
  /*
@@ -600,8 +600,8 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  * so check the length against any limits that are set...
 	  */
 
-          LogMessage(L_DEBUG, "POST %s", con->uri);
-	  LogMessage(L_DEBUG, "CONTENT_TYPE = %s", con->http.fields[HTTP_FIELD_CONTENT_TYPE]);
+          LogMessage(L_DEBUG2, "POST %s", con->uri);
+	  LogMessage(L_DEBUG2, "CONTENT_TYPE = %s", con->http.fields[HTTP_FIELD_CONTENT_TYPE]);
 
           if (con->http.fields[HTTP_FIELD_CONTENT_LENGTH][0] &&
 	      atoi(con->http.fields[HTTP_FIELD_CONTENT_LENGTH]) > MaxRequestSize &&
@@ -664,7 +664,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	    if (con->options[0] == '/')
 	      con->options ++;
 
-            LogMessage(L_DEBUG, "ReadClient() %d command=\"%s\", options = \"%s\"",
+            LogMessage(L_DEBUG2, "ReadClient() %d command=\"%s\", options = \"%s\"",
 	               con->http.fd, con->command, con->options);
 
 	    if (con->http.version <= HTTP_1_0)
@@ -800,7 +800,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
         break;
 
     case HTTP_POST_RECV :
-        LogMessage(L_DEBUG, "ReadClient() %d con->data_encoding = %s, con->data_remaining = %d, con->file = %d",
+        LogMessage(L_DEBUG2, "ReadClient() %d con->data_encoding = %s, con->data_remaining = %d, con->file = %d",
 		   con->http.fd,
 		   con->http.data_encoding == HTTP_ENCODE_CHUNKED ? "chunked" : "length",
 		   con->http.data_remaining, con->file);
@@ -836,7 +836,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  fchmod(con->file, 0640);
 	  fchown(con->file, User, Group);
 
-          LogMessage(L_DEBUG, "ReadClient() %d REQUEST %s", con->http.fd,
+          LogMessage(L_DEBUG2, "ReadClient() %d REQUEST %s", con->http.fd,
 	             con->filename);
 
 	  if (con->file < 0)
@@ -860,7 +860,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
 	  {
 	    con->bytes += bytes;
 
-            LogMessage(L_DEBUG, "ReadClient() %d writing %d bytes",
+            LogMessage(L_DEBUG2, "ReadClient() %d writing %d bytes",
 	               con->http.fd, bytes);
 
             if (write(con->file, line, bytes) < bytes)
@@ -1220,7 +1220,7 @@ WriteClient(client_t *con)		/* I - Client connection */
 	  *bufptr++ = '\0';
 
 	  httpPrintf(HTTP(con), "%s\r\n", buf);
-	  LogMessage(L_DEBUG, "WriteClient() %d %s", con->http.fd, buf);
+	  LogMessage(L_DEBUG2, "WriteClient() %d %s", con->http.fd, buf);
 
          /*
 	  * Update buffer...
@@ -1322,7 +1322,7 @@ WriteClient(client_t *con)		/* I - Client connection */
   }
 
   if (bytes >= 1024)
-    LogMessage(L_DEBUG, "WriteClient() %d %d bytes", con->http.fd, bytes);
+    LogMessage(L_DEBUG2, "WriteClient() %d %d bytes", con->http.fd, bytes);
 
   con->http.activity = time(NULL);
 
@@ -1350,7 +1350,7 @@ check_if_modified(client_t    *con,		/* I - Client connection */
   if (*ptr == '\0')
     return (1);
 
-  LogMessage(L_DEBUG, "check_if_modified() %d If-Modified-Since=\"%s\"",
+  LogMessage(L_DEBUG2, "check_if_modified() %d If-Modified-Since=\"%s\"",
              con->http.fd, ptr);
 
   while (*ptr != '\0')
@@ -1374,7 +1374,7 @@ check_if_modified(client_t    *con,		/* I - Client connection */
     }
   }
 
-  LogMessage(L_DEBUG, "check_if_modified() %d sizes=%d,%d dates=%d,%d",
+  LogMessage(L_DEBUG2, "check_if_modified() %d sizes=%d,%d dates=%d,%d",
              con->http.fd, size, filestats->st_size, date, filestats->st_mtime);
 
   return ((size != filestats->st_size && size != 0) ||
@@ -1529,7 +1529,7 @@ get_file(client_t    *con,	/* I - Client connection */
     status = stat(filename, filestats);
   }
 
-  LogMessage(L_DEBUG, "get_file() %d filename=%s size=%d",
+  LogMessage(L_DEBUG2, "get_file() %d filename=%s size=%d",
              con->http.fd, filename, status ? -1 : filestats->st_size);
 
   if (status)
@@ -1784,5 +1784,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.68 2000/09/07 20:33:20 mike Exp $".
+ * End of "$Id: client.c,v 1.69 2000/09/12 18:35:00 mike Exp $".
  */

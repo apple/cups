@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.56 2000/09/06 18:31:30 mike Exp $"
+ * "$Id: conf.c,v 1.57 2000/09/12 18:35:00 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -984,7 +984,9 @@ read_configuration(FILE *fp)		/* I - File to read from */
       * Amount of logging to do...
       */
 
-      if (strcmp(value, "debug") == 0)
+      if (strcmp(value, "debug2") == 0)
+        LogLevel = L_DEBUG2;
+      else if (strcmp(value, "debug") == 0)
         LogLevel = L_DEBUG;
       else if (strcmp(value, "info") == 0)
         LogLevel = L_INFO;
@@ -1414,5 +1416,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.56 2000/09/06 18:31:30 mike Exp $".
+ * End of "$Id: conf.c,v 1.57 2000/09/12 18:35:00 mike Exp $".
  */

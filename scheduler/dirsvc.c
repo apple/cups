@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.59 2000/09/12 18:18:28 mike Exp $"
+ * "$Id: dirsvc.c,v 1.60 2000/09/12 18:35:01 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -293,7 +293,7 @@ UpdateBrowseList(void)
     return;
   }
 
-  LogMessage(L_DEBUG, "UpdateBrowseList: (%d bytes from %s) %s", bytes, srcname,
+  LogMessage(L_DEBUG2, "UpdateBrowseList: (%d bytes from %s) %s", bytes, srcname,
              packet);
 
  /*
@@ -876,5 +876,5 @@ StopPolling(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.59 2000/09/12 18:18:28 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.60 2000/09/12 18:35:01 mike Exp $".
  */

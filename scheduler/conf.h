@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.29 2000/09/06 18:31:30 mike Exp $"
+ * "$Id: conf.h,v 1.30 2000/09/12 18:35:00 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -27,12 +27,13 @@
  * Log levels...
  */
 
-#define L_PAGE	-1	/* Used internally for page logging */
-#define L_NONE	0
-#define L_ERROR	1
-#define L_WARN	2
-#define L_INFO	3
-#define L_DEBUG	4
+#define L_PAGE		-1	/* Used internally for page logging */
+#define L_NONE		0
+#define L_ERROR		1
+#define L_WARN		2
+#define L_INFO		3
+#define L_DEBUG		4
+#define L_DEBUG2	5
 
 
 /*
@@ -125,5 +126,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.29 2000/09/06 18:31:30 mike Exp $".
+ * End of "$Id: conf.h,v 1.30 2000/09/12 18:35:00 mike Exp $".
  */
