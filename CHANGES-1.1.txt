@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.13
 
+	- The scheduler did not setup a status pipe for polling
+	  processes, so error messages went to whatever file
+	  descriptor 2 was pointing to when they were started.
 	- The httpMD5Final() function didn't put a colon between
 	  the password and nonce strings.
 	- The pstops filter did not default to Binary data for

@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.5 2002/01/02 18:05:01 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.6 2002/01/14 19:15:04 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -31,6 +31,7 @@
  *   StopBrowsing()      - Stop sending and receiving broadcast information.
  *   StopPolling()       - Stop polling servers as needed.
  *   UpdateCUPSBrowse()  - Update the browse lists using the CUPS protocol.
+ *   UpdatePolling()     - Read status messages from the poll daemons.
  *   RegReportCallback() - Empty SLPRegReport.
  *   SendSLPBrowse()     - Register the specified printer with SLP.
  *   SLPDeregPrinter()   - SLPDereg() the specified printer
@@ -689,7 +690,13 @@ StartPolling(void)
   char		sport[10];	/* Server port */
   char		bport[10];	/* Browser port */
   char		interval[10];	/* Poll interval */
+  int		statusfds[2];	/* Status pipe */
+  int		fd;		/* Current file descriptor */
 
+
+ /*
+  * Setup string arguments for port and interval options.
+  */
 
   sprintf(bport, "%d", BrowsePort);
 
@@ -697,6 +704,24 @@ StartPolling(void)
     sprintf(interval, "%d", BrowseInterval);
   else
     strcpy(interval, "30");
+
+ /*
+  * Create a pipe that receives the status messages from each
+  * polling daemon...
+  */
+
+  if (pipe(statusfds))
+  {
+    LogMessage(L_ERROR, "Unable to create polling status pipes - %s.",
+	       strerror(errno));
+    return;
+  }
+
+  PollPipe = statusfds[0];
+
+ /*
+  * Run each polling daemon, redirecting stderr to the polling pipe...
+  */
 
   for (i = 0, poll = Polled; i < NumPolled; i ++, poll ++)
   {
@@ -728,6 +753,23 @@ StartPolling(void)
       setgroups(0, NULL);
 
      /*
+      * Redirect stdin and stdout to /dev/null, and stderr to the
+      * status pipe.  Close all other files.
+      */
+
+      close(0);
+      open("/dev/null", O_RDONLY);
+
+      close(1);
+      open("/dev/null", O_WRONLY);
+
+      close(2);
+      dup(statusfds[1]);
+
+      for (fd = 3; fd < MaxFDs; fd ++)
+	close(fd);
+
+     /*
       * Execute the polling daemon...
       */
 
@@ -749,6 +791,17 @@ StartPolling(void)
                  poll->hostname, poll->port, pid);
     }
   }
+
+  close(statusfds[1]);
+
+ /*
+  * Finally, add the pipe to the input selection set...
+  */
+
+  LogMessage(L_DEBUG2, "StartPolling: Adding fd %d to InputSet...",
+             PollPipe);
+
+  FD_SET(PollPipe, &InputSet);
 }
 
 
@@ -807,6 +860,17 @@ StopPolling(void)
   int		i;		/* Looping var */
   dirsvc_poll_t	*poll;		/* Current polling server */
 
+
+  if (PollPipe)
+  {
+    close(PollPipe);
+
+    LogMessage(L_DEBUG2, "StopPolling: removing fd %d from InputSet.",
+               PollPipe);
+    FD_CLR(PollPipe, &InputSet);
+
+    PollPipe = 0;
+  }
 
   for (i = 0, poll = Polled; i < NumPolled; i ++, poll ++)
     if (poll->pid)
@@ -1072,6 +1136,71 @@ UpdateCUPSBrowse(void)
   */
 
   ProcessBrowseData(uri, type, state, location, info, make_model);
+}
+
+
+/*
+ * 'UpdatePolling()' - Read status messages from the poll daemons.
+ */
+
+void
+UpdatePolling(void)
+{
+  int		bytes;		/* Number of bytes read */
+  char		*lineptr;	/* Pointer to end of line in buffer */
+  static int	bufused = 0;	/* Number of bytes used in buffer */
+  static char	buffer[1024];	/* Status buffer */
+
+
+  if ((bytes = read(PollPipe, buffer + bufused,
+                    sizeof(buffer) - bufused - 1)) > 0)
+  {
+    bufused += bytes;
+    buffer[bufused] = '\0';
+    lineptr = strchr(buffer, '\n');
+  }
+  else if (bytes < 0 && errno == EINTR)
+    return;
+  else
+  {
+    lineptr    = buffer + bufused;
+    lineptr[1] = 0;
+  }
+
+  while (lineptr != NULL)
+  {
+   /*
+    * Terminate each line and process it...
+    */
+
+    *lineptr++ = '\0';
+
+    LogMessage(L_ERROR, "%s", buffer);
+
+   /*
+    * Copy over the buffer data we've used up...
+    */
+
+    strcpy(buffer, lineptr);
+    bufused -= lineptr - buffer;
+
+    if (bufused < 0)
+      bufused = 0;
+
+    lineptr = strchr(buffer, '\n');
+  }
+
+  if (bytes < 0)
+  {
+    LogMessage(L_ERROR, "UpdatePolling: all polling processes have exited!");
+    close(PollPipe);
+
+    LogMessage(L_DEBUG2, "UpdatePolling: removing fd %d from InputSet.",
+               PollPipe);
+    FD_CLR(PollPipe, &InputSet);
+
+    PollPipe = 0;
+  }
 }
 
 
@@ -1584,5 +1713,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.5 2002/01/02 18:05:01 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.6 2002/01/14 19:15:04 mike Exp $".
  */

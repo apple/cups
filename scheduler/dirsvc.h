@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.h,v 1.12.2.3 2002/01/02 18:05:01 mike Exp $"
+ * "$Id: dirsvc.h,v 1.12.2.4 2002/01/14 19:15:05 mike Exp $"
  *
  *   Directory services definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -97,6 +97,8 @@ VAR int			NumPolled	VALUE(0);
 					/* Number of polled servers */
 VAR dirsvc_poll_t	Polled[MAX_BROWSERS];
 					/* Polled servers */
+VAR int			PollPipe	VALUE(0);
+					/* Status pipe for pollers */
 
 #ifdef HAVE_LIBSLP
 VAR SLPHandle		BrowseSLPHandle	VALUE(NULL);
@@ -121,9 +123,10 @@ extern void	StartPolling(void);
 extern void	StopBrowsing(void);
 extern void	StopPolling(void);
 extern void	UpdateCUPSBrowse(void);
+extern void	UpdatePolling(void);
 extern void	UpdateSLPBrowse(void);
 
 
 /*
- * End of "$Id: dirsvc.h,v 1.12.2.3 2002/01/02 18:05:01 mike Exp $".
+ * End of "$Id: dirsvc.h,v 1.12.2.4 2002/01/14 19:15:05 mike Exp $".
  */
