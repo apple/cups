@@ -3,6 +3,9 @@ CHANGES.txt - 04/25/2003
 
 CHANGES IN CUPS V1.1.19rc3
 
+	- The scheduler did not put the
+	  job-originating-host-name attribute in the job
+	  attributes group.
 	- The text filter did not default to wrapping text as
 	  defined by the IPP implementation document.
 	- Scan backends first, PPDs second (STR #37)
