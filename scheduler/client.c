@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.29 1999/07/09 14:23:02 mike Exp $"
+ * "$Id: client.c,v 1.30 1999/07/21 20:29:59 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1239,10 +1239,10 @@ decode_basic_auth(client_t *con)	/* I - Client to decode to */
 
   httpDecode64(value, s);
 
-  LogMessage(LOG_DEBUG, "decode_basic_auth() %d Authorization=\"%s\"",
-             con->http.fd, value);
-
   sscanf(value, "%[^:]:%[^\n]", con->username, con->password);
+
+  LogMessage(LOG_DEBUG, "decode_basic_auth() %d username=\"%s\"",
+             con->http.fd, con->username);
 }
 
 
@@ -1505,5 +1505,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.29 1999/07/09 14:23:02 mike Exp $".
+ * End of "$Id: client.c,v 1.30 1999/07/21 20:29:59 mike Exp $".
  */
