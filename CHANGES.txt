@@ -23,6 +23,11 @@ CHANGES IN CUPS v1.1.3
 	  held/pending when the job-hold-until attribute was
 	  specified.
 	- set-job-attributes didn't save the new job attributes.
+	- Now change the "requesting-user-name" attribute in
+	  requests from remote systems to "root-remote" when
+	  an unauthenticated "root" user is sent.
+	- The cancel-job, hold-job, release-job, and restart-job
+	  operations didn't log the authenticated username.
 
 
 CHANGES IN CUPS v1.1.2
