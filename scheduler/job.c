@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.115 2001/02/23 19:30:11 mike Exp $"
+ * "$Id: job.c,v 1.116 2001/02/23 20:07:50 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -565,6 +565,8 @@ LoadAllJobs(void)
 	prev->next = job;
       else
 	Jobs = job;
+
+      NumJobs ++;
     }
 
  /*
@@ -1752,6 +1754,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
 
       StopJob(job->id);
       job->state->values[0].integer = IPP_JOB_PENDING;
+      SaveJob(job->id);
     }
     else if (job->status > 0)
     {
@@ -1766,7 +1769,10 @@ UpdateJob(job_t *job)		/* I - Job to check */
         CancelJob(job->id, 0);
 
         if (JobHistory)
+	{
           job->state->values[0].integer = IPP_JOB_ABORTED;
+	  SaveJob(job->id);
+	}
 
         CheckJobs();
       }
@@ -1786,8 +1792,11 @@ UpdateJob(job_t *job)		/* I - Job to check */
       {
 	CancelJob(job->id, 0);
 
-	if (JobHistory)
+        if (JobHistory)
+	{
           job->state->values[0].integer = IPP_JOB_COMPLETED;
+	  SaveJob(job->id);
+	}
 
 	CheckJobs();
       }
@@ -2775,5 +2784,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.115 2001/02/23 19:30:11 mike Exp $".
+ * End of "$Id: job.c,v 1.116 2001/02/23 20:07:50 mike Exp $".
  */
