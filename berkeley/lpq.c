@@ -1,9 +1,9 @@
 /*
- * "$Id: lpq.c,v 1.19 2001/10/31 01:49:12 mike Exp $"
+ * "$Id: lpq.c,v 1.20 2002/01/02 17:58:35 mike Exp $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2001 by Easy Software Products.
+ *   Copyright 1997-2002 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -538,5 +538,5 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpq.c,v 1.19 2001/10/31 01:49:12 mike Exp $".
+ * End of "$Id: lpq.c,v 1.20 2002/01/02 17:58:35 mike Exp $".
  */

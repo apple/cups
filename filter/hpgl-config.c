@@ -1,9 +1,9 @@
 /*
- * "$Id: hpgl-config.c,v 1.30 2001/01/22 15:03:37 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.31 2002/01/02 17:58:57 mike Exp $"
  *
  *   HP-GL/2 configuration routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2001 by Easy Software Products.
+ *   Copyright 1993-2002 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -637,5 +637,5 @@ SC_scale(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.30 2001/01/22 15:03:37 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.31 2002/01/02 17:58:57 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: image.c,v 1.29 2001/10/07 12:16:10 mike Exp $"
+ * "$Id: image.c,v 1.30 2002/01/02 17:58:59 mike Exp $"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2001 by Easy Software Products.
+ *   Copyright 1993-2002 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -769,5 +769,5 @@ flush_tile(image_t *img)	/* I - Image */
 
 
 /*
- * End of "$Id: image.c,v 1.29 2001/10/07 12:16:10 mike Exp $".
+ * End of "$Id: image.c,v 1.30 2002/01/02 17:58:59 mike Exp $".
  */

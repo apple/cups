@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.13 2001/07/19 20:17:56 mike Exp $"
+# "$Id: Makefile,v 1.14 2002/01/02 17:59:08 mike Exp $"
 #
 #   PPD file makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1993-2001 by Easy Software Products.
+#   Copyright 1993-2002 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -59,5 +59,5 @@ install:
 
 
 #
-# End of "$Id: Makefile,v 1.13 2001/07/19 20:17:56 mike Exp $".
+# End of "$Id: Makefile,v 1.14 2002/01/02 17:59:08 mike Exp $".
 #

@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2001 by Easy Software Products.
+  Copyright 1993-2002 by Easy Software Products.
   Copyright 1990, 1995, 1996, 1997, 1998 Aladdin Enterprises.  All rights reserved.
 
   This file is part of GNU Ghostscript.
@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gdevprn.c,v 1.13 2001/03/27 15:45:20 mike Exp $ */
+/*$Id: gdevprn.c,v 1.14 2002/01/02 17:59:09 mike Exp $ */
 /* Generic printer driver support */
 #include "ctype_.h"
 #include "gdevprn.h"

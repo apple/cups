@@ -1,4 +1,4 @@
-/*Copyright 1993-2001 by Easy Software Products.
+/*Copyright 1993-2002 by Easy Software Products.
   Copyright 1993, 1995, 1996, 1998 Aladdin Enterprises.  All rights reserved.
 
   This file is part of GNU Ghostscript.
@@ -23,7 +23,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: gp_unifs.c,v 1.6 2001/03/02 17:35:03 mike Exp $ */
+/*$Id: gp_unifs.c,v 1.7 2002/01/02 17:59:10 mike Exp $ */
 /* "Unix-like" file system platform routines for Ghostscript */
 #include "memory_.h"
 #include "string_.h"

@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2001 by Easy Software Products.
+  Copyright 1993-2002 by Easy Software Products.
   Copyright 1993, 1997, 1998 Aladdin Enterprises.  All rights reserved.
 
   This file is part of GNU Ghostscript.
@@ -24,7 +24,7 @@
   GNU software to build or run it.
 */
 
-/*$Id: dirent_.h,v 1.5 2001/01/22 15:03:54 mike Exp $ */
+/*$Id: dirent_.h,v 1.6 2002/01/02 17:59:09 mike Exp $ */
 /* Generic substitute for Unix dirent.h */
 
 #ifndef dirent__INCLUDED

@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2001 by Easy Software Products.
+  Copyright 1993-2002 by Easy Software Products.
   Copyright 1994, 1997, 1998 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
@@ -26,7 +26,7 @@
 #include <config.h>
 #ifdef HAVE_LIBJPEG
 
-/*$Id: zfdctd.c,v 1.6 2001/01/22 15:03:57 mike Exp $ */
+/*$Id: zfdctd.c,v 1.7 2002/01/02 17:59:12 mike Exp $ */
 /* DCTDecode filter creation */
 #include "memory_.h"
 #include "stdio_.h"		/* for jpeglib.h */

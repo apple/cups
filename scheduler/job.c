@@ -1,9 +1,9 @@
 /*
- * "$Id: job.c,v 1.141 2001/11/13 18:49:36 mike Exp $"
+ * "$Id: job.c,v 1.142 2002/01/02 17:59:16 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2001 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -2989,5 +2989,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.141 2001/11/13 18:49:36 mike Exp $".
+ * End of "$Id: job.c,v 1.142 2002/01/02 17:59:16 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: devices.c,v 1.15 2001/12/18 03:13:22 mike Exp $"
+ * "$Id: devices.c,v 1.16 2002/01/02 17:59:15 mike Exp $"
  *
  *   Device scanning routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2001 by Easy Software Products.
+ *   Copyright 1997-2002 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -478,5 +478,5 @@ sigalrm_handler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: devices.c,v 1.15 2001/12/18 03:13:22 mike Exp $".
+ * End of "$Id: devices.c,v 1.16 2002/01/02 17:59:15 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: auth.c,v 1.54 2002/01/02 17:33:10 mike Exp $"
+ * "$Id: auth.c,v 1.55 2002/01/02 17:59:13 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2001 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1494,5 +1494,5 @@ to64(char          *s,	/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c,v 1.54 2002/01/02 17:33:10 mike Exp $".
+ * End of "$Id: auth.c,v 1.55 2002/01/02 17:59:13 mike Exp $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: ppds.c,v 1.21 2001/11/13 18:49:36 mike Exp $"
+ * "$Id: ppds.c,v 1.22 2002/01/02 17:59:17 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2001 by Easy Software Products.
+ *   Copyright 1997-2002 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -893,5 +893,5 @@ ppd_gets(buf_t *fp,		/* I - File to read from */
 
 
 /*
- * End of "$Id: ppds.c,v 1.21 2001/11/13 18:49:36 mike Exp $".
+ * End of "$Id: ppds.c,v 1.22 2002/01/02 17:59:17 mike Exp $".
  */

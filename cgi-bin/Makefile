@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.17 2001/07/19 20:17:51 mike Exp $"
+# "$Id: Makefile,v 1.18 2002/01/02 17:58:36 mike Exp $"
 #
 #   CGI makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2001 by Easy Software Products.
+#   Copyright 1997-2002 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -117,5 +117,5 @@ $(OBJS):	../Makedefs
 
 
 #
-# End of "$Id: Makefile,v 1.17 2001/07/19 20:17:51 mike Exp $".
+# End of "$Id: Makefile,v 1.18 2002/01/02 17:58:36 mike Exp $".
 #

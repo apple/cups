@@ -1,11 +1,11 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: stcolor2.ppd,v 1.1 2001/06/06 20:40:26 mike Exp $"
+*% "$Id: stcolor2.ppd,v 1.2 2002/01/02 17:59:09 mike Exp $"
 *%
 *%   Sample EPSON Stylus Color driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
 *%
-*%   Copyright 1997-2001 by Easy Software Products.
+*%   Copyright 1997-2002 by Easy Software Products.
 *%
 *%   These coded instructions, statements, and computer programs are the
 *%   property of Easy Software Products and are protected by Federal
@@ -128,5 +128,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: stcolor2.ppd,v 1.1 2001/06/06 20:40:26 mike Exp $".
+*% End of "$Id: stcolor2.ppd,v 1.2 2002/01/02 17:59:09 mike Exp $".
 *%

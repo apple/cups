@@ -1,10 +1,10 @@
 /*
- * "$Id: ipp.c,v 1.64 2001/12/18 03:43:07 mike Exp $"
+ * "$Id: ipp.c,v 1.65 2002/01/02 17:58:39 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 1997-2001 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -2024,5 +2024,5 @@ ipp_read(http_t        *http,	/* I - Client connection */
 
 
 /*
- * End of "$Id: ipp.c,v 1.64 2001/12/18 03:43:07 mike Exp $".
+ * End of "$Id: ipp.c,v 1.65 2002/01/02 17:58:39 mike Exp $".
  */

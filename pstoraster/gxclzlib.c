@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2001 by Easy Software Products
+  Copyright 1993-2002 by Easy Software Products
   Copyright (C) 1997 Aladdin Enterprises.  All rights reserved.
   
   This file is part of GNU Ghostscript.
@@ -25,7 +25,7 @@
 */
 
 #include <config.h>
-/*$Id: gxclzlib.c,v 1.4 2001/01/22 15:03:55 mike Exp $ */
+/*$Id: gxclzlib.c,v 1.5 2002/01/02 17:59:11 mike Exp $ */
 /* zlib filter initialization for RAM-based band lists */
 /* Must be compiled with -I$(ZSRCDIR) */
 #include "std.h"

@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile,v 1.28 2001/07/24 19:56:41 mike Exp $"
+# "$Id: Makefile,v 1.29 2002/01/02 17:58:33 mike Exp $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2001 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2002 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -137,5 +137,5 @@ usb.o:	../cups/cups.h ../Makedefs
 
 
 #
-# End of "$Id: Makefile,v 1.28 2001/07/24 19:56:41 mike Exp $".
+# End of "$Id: Makefile,v 1.29 2002/01/02 17:58:33 mike Exp $".
 #

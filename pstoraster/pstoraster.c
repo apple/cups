@@ -1,10 +1,10 @@
 /*
- * "$Id: pstoraster.c,v 1.20 2001/08/02 15:28:19 mike Exp $"
+ * "$Id: pstoraster.c,v 1.21 2002/01/02 17:59:11 mike Exp $"
  *
  *   PostScript RIP filter main entry for the Common UNIX Printing System
  *   (CUPS).
  *
- *   Copyright 1993-2001 by Easy Software Products.
+ *   Copyright 1993-2002 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -249,5 +249,5 @@ define_string(const char *name,	/* I - Variable to set */
 
 
 /*
- * End of "$Id: pstoraster.c,v 1.20 2001/08/02 15:28:19 mike Exp $".
+ * End of "$Id: pstoraster.c,v 1.21 2002/01/02 17:59:11 mike Exp $".
  */

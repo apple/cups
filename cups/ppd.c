@@ -1,9 +1,9 @@
 /*
- * "$Id: ppd.c,v 1.57 2001/08/14 19:25:44 mike Exp $"
+ * "$Id: ppd.c,v 1.58 2002/01/02 17:58:40 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2001 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -2002,5 +2002,5 @@ ppd_fix(char *string)		/* IO - String to fix */
 
 
 /*
- * End of "$Id: ppd.c,v 1.57 2001/08/14 19:25:44 mike Exp $".
+ * End of "$Id: ppd.c,v 1.58 2002/01/02 17:58:40 mike Exp $".
  */

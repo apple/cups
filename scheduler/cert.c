@@ -1,10 +1,10 @@
 /*
- * "$Id: cert.c,v 1.9 2001/06/22 19:47:18 mike Exp $"
+ * "$Id: cert.c,v 1.10 2002/01/02 17:59:13 mike Exp $"
  *
  *   Authentication certificate routines for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 1997-2001 by Easy Software Products.
+ *   Copyright 1997-2002 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -271,5 +271,5 @@ InitCerts(void)
 
 
 /*
- * End of "$Id: cert.c,v 1.9 2001/06/22 19:47:18 mike Exp $".
+ * End of "$Id: cert.c,v 1.10 2002/01/02 17:59:13 mike Exp $".
  */

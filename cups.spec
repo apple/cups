@@ -1,11 +1,11 @@
 #
-# "$Id: cups.spec,v 1.41 2001/12/18 17:34:06 mike Exp $"
+# "$Id: cups.spec,v 1.42 2002/01/02 17:58:33 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
 #   Original version by Jason McMullan <jmcc@ontv.com>.
 #
-#   Copyright 1999-2001 by Easy Software Products, all rights reserved.
+#   Copyright 1999-2002 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -224,5 +224,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/pstoraster/*
 
 #
-# End of "$Id: cups.spec,v 1.41 2001/12/18 17:34:06 mike Exp $".
+# End of "$Id: cups.spec,v 1.42 2002/01/02 17:58:33 mike Exp $".
 #

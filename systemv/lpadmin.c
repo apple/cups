@@ -1,9 +1,9 @@
 /*
- * "$Id: lpadmin.c,v 1.27 2001/07/20 21:12:58 mike Exp $"
+ * "$Id: lpadmin.c,v 1.28 2002/01/02 17:59:19 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2001 by Easy Software Products.
+ *   Copyright 1997-2002 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1852,5 +1852,5 @@ validate_name(const char *name)	/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.27 2001/07/20 21:12:58 mike Exp $".
+ * End of "$Id: lpadmin.c,v 1.28 2002/01/02 17:59:19 mike Exp $".
  */

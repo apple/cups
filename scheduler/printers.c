@@ -1,9 +1,9 @@
 /*
- * "$Id: printers.c,v 1.107 2002/01/02 16:09:18 mike Exp $"
+ * "$Id: printers.c,v 1.108 2002/01/02 17:59:17 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2001 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1803,5 +1803,5 @@ write_printcap(void)
 
 
 /*
- * End of "$Id: printers.c,v 1.107 2002/01/02 16:09:18 mike Exp $".
+ * End of "$Id: printers.c,v 1.108 2002/01/02 17:59:17 mike Exp $".
  */
