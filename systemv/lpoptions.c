@@ -1,5 +1,5 @@
 /*
- * "$Id: lpoptions.c,v 1.5 2000/07/07 18:13:48 mike Exp $"
+ * "$Id: lpoptions.c,v 1.6 2000/08/29 18:23:33 mike Exp $"
  *
  *   Printer option program for the Common UNIX Printing System (CUPS).
  *
@@ -59,8 +59,9 @@ main(int  argc,			/* I - Number of command-line arguments */
   cups_dest_t	*dests;		/* Destinations */
   cups_dest_t	*dest;		/* Current destination */
   char		*printer,	/* Printer name */
-		*instance;	/* Instance name */ 
- 
+		*instance,	/* Instance name */ 
+ 		*option;	/* Current option */
+
 
  /*
   * Loop through the command-line arguments...
@@ -81,21 +82,6 @@ main(int  argc,			/* I - Number of command-line arguments */
     {
       switch (argv[i][1])
       {
-	case 'h' : /* -h server */
-	    if (argv[i][2])
-	      snprintf(server, sizeof(server), "CUPS_SERVER=%s", argv[i] + 2);
-	    else
-	    {
-	      i ++;
-	      if (i >= argc)
-	        usage();
-
-	      snprintf(server, sizeof(server), "CUPS_SERVER=%s", argv[i]);
-	    }
-
-            putenv(server);
-	    break;
-
         case 'd' : /* -d printer */
 	    if (argv[i][2])
 	      printer = argv[i] + 2;
@@ -137,6 +123,36 @@ main(int  argc,			/* I - Number of command-line arguments */
 	                                  num_options, &options);
 	    break;
 
+	case 'h' : /* -h server */
+	    if (argv[i][2])
+	      snprintf(server, sizeof(server), "CUPS_SERVER=%s", argv[i] + 2);
+	    else
+	    {
+	      i ++;
+	      if (i >= argc)
+	        usage();
+
+	      snprintf(server, sizeof(server), "CUPS_SERVER=%s", argv[i]);
+	    }
+
+            putenv(server);
+	    break;
+
+	case 'o' : /* -o option[=value] */
+	    if (argv[i][2])
+	      num_options = cupsParseOptions(argv[i] + 2, num_options, &options);
+	    else
+	    {
+	      i ++;
+	      if (i >= argc)
+	        usage();
+
+	      num_options = cupsParseOptions(argv[i], num_options, &options);
+	    }
+
+	    changes = 1;
+	    break;
+
 	case 'p' : /* -p printer */
 	    if (argv[i][2])
 	      printer = argv[i] + 2;
@@ -173,17 +189,32 @@ main(int  argc,			/* I - Number of command-line arguments */
 	                                  num_options, &options);
 	    break;
 
-	case 'o' : /* -o option[=value] */
+	case 'r' : /* -r option (remove) */
 	    if (argv[i][2])
-	      num_options = cupsParseOptions(argv[i] + 2, num_options, &options);
+	      option = argv[i] + 2;
 	    else
 	    {
 	      i ++;
 	      if (i >= argc)
 	        usage();
 
-	      num_options = cupsParseOptions(argv[i], num_options, &options);
+	      option = argv[i];
 	    }
+
+            for (j = 0; j < num_options; j ++)
+	      if (strcasecmp(options[j].name, option) == 0)
+	      {
+	       /*
+	        * Remove this option...
+		*/
+
+	        num_options --;
+
+		if (j < num_options)
+		  memcpy(options + j, options + j + 1,
+		         sizeof(cups_option_t) * (num_options - j));
+		break;
+              }
 
 	    changes = 1;
 	    break;
@@ -304,5 +335,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpoptions.c,v 1.5 2000/07/07 18:13:48 mike Exp $".
+ * End of "$Id: lpoptions.c,v 1.6 2000/08/29 18:23:33 mike Exp $".
  */
