@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.11 1999/04/21 14:49:50 mike Exp $"
+ * "$Id: util.c,v 1.12 1999/04/22 15:02:44 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -88,7 +88,7 @@ cupsCancelJob(char *name,	/* I - Name of printer or class */
   */
 
   if (!cups_connect(name, printer, hostname))
-    return (NULL);
+    return (0);
 
  /*
   * Build an IPP_CANCEL_JOB request, which requires the following
@@ -271,7 +271,7 @@ cupsGetClasses(char ***classes)	/* O - Classes */
   */
 
   if (!cups_connect("default", NULL, NULL))
-    return (NULL);
+    return (0);
 
  /*
   * Build a CUPS_GET_CLASSES request, which requires the following
@@ -507,7 +507,7 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
   */
 
   if (!cups_connect("default", NULL, NULL))
-    return (NULL);
+    return (0);
 
  /*
   * Build a CUPS_GET_PRINTERS request, which requires the following
@@ -910,5 +910,5 @@ cups_connect(char *name,	/* I - Destination (printer[@host]) */
 
 
 /*
- * End of "$Id: util.c,v 1.11 1999/04/21 14:49:50 mike Exp $".
+ * End of "$Id: util.c,v 1.12 1999/04/22 15:02:44 mike Exp $".
  */

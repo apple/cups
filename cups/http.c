@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.25 1999/04/21 21:19:32 mike Exp $"
+ * "$Id: http.c,v 1.26 1999/04/22 15:02:38 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -196,7 +196,16 @@ httpInitialize(void)
   if (!initialized)
     WSAStartup(MAKEWORD(1,1), &winsockdata);
 #else
-  sigset(SIGPIPE, SIG_IGN);
+  struct sigaction	action;	/* POSIX sigaction data */
+
+
+ /*
+  * Ignore SIGPIPE signals...
+  */
+
+  memset(&action, 0, sizeof(action));
+  action.sa_handler = SIG_IGN;
+  sigaction(SIGPIPE, &action, NULL);
 #endif /* WIN32 || __EMX__ */
 }
 
@@ -1358,5 +1367,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.25 1999/04/21 21:19:32 mike Exp $".
+ * End of "$Id: http.c,v 1.26 1999/04/22 15:02:38 mike Exp $".
  */

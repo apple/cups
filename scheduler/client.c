@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.13 1999/04/22 13:53:05 mike Exp $"
+ * "$Id: client.c,v 1.14 1999/04/22 15:02:45 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1028,12 +1028,6 @@ StartListening(void)
     if (WSAStartup(MAKEWORD(1,1), &wsadata) != 0)
       exit(1);
   }
-#else
- /*
-  * Setup a 'broken pipe' signal handler for lost clients.
-  */
-
-  sigset(SIGPIPE, SIG_IGN);
 #endif /* !WIN32 */
 
  /*
@@ -1558,5 +1552,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.13 1999/04/22 13:53:05 mike Exp $".
+ * End of "$Id: client.c,v 1.14 1999/04/22 15:02:45 mike Exp $".
  */

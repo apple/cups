@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.11 1999/04/21 21:19:37 mike Exp $"
+ * "$Id: main.c,v 1.12 1999/04/22 15:02:46 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -64,6 +64,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   listener_t		*lis;		/* Current listener */
   time_t		activity;	/* Activity timer */
   struct timeval	timeout;	/* select() timeout */
+  struct sigaction	action;		/* Actions for signals */
 
 
  /*
@@ -103,11 +104,19 @@ main(int  argc,			/* I - Number of command-line arguments */
   tzset();
 
  /*
-  * Catch hangup and child signals...
+  * Catch hangup and child signals and ignore broken pipes...
   */
 
-  sigset(SIGHUP, sighup_handler);
-  sigset(SIGCHLD, sigcld_handler);
+  memset(&action, 0, sizeof(action));
+
+  action.sa_handler = sighup_handler;
+  sigaction(SIGHUP, &action, NULL);
+
+  action.sa_handler = sigcld_handler;
+  sigaction(SIGCLD, &action, NULL);
+
+  action.sa_handler = SIG_IGN;
+  sigaction(SIGPIPE, &action, NULL);
 
  /*
   * Loop forever...
@@ -325,8 +334,6 @@ sigcld_handler(int sig)	/* I - Signal number */
 	break;
       }
     }
-
-  sigset(SIGCLD, sigcld_handler);
 }
 
 
@@ -356,5 +363,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.11 1999/04/21 21:19:37 mike Exp $".
+ * End of "$Id: main.c,v 1.12 1999/04/22 15:02:46 mike Exp $".
  */
