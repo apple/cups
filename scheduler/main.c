@@ -1,7 +1,7 @@
 /*
- * "$Id: main.c,v 1.14 1999/04/22 21:14:45 mike Exp $"
+ * "$Id: main.c,v 1.15 1999/04/29 19:28:47 mike Exp $"
  *
- *   for the Common UNIX Printing System (CUPS).
+ *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
  *
@@ -23,10 +23,10 @@
  *
  * Contents:
  *
- *   main()           - Main entry for the CUPS scheduler.
- *   sigcld_handler() - Handle 'child' signals from old processes.
- *   sighup_handler() - Handle 'hangup' signals to reconfigure the scheduler.
- *   usage()          - Show scheduler usage.
+ *   main()            - Main entry for the CUPS scheduler.
+ *   sigchld_handler() - Handle 'child' signals from old processes.
+ *   sighup_handler()  - Handle 'hangup' signals to reconfigure the scheduler.
+ *   usage()           - Show scheduler usage.
  */
 
 /*
@@ -41,7 +41,7 @@
  * Local functions...
  */
 
-static void	sigcld_handler(int sig);
+static void	sigchld_handler(int sig);
 static void	sighup_handler(int sig);
 static void	usage(void);
 
@@ -64,7 +64,9 @@ main(int  argc,			/* I - Number of command-line arguments */
   listener_t		*lis;		/* Current listener */
   time_t		activity;	/* Activity timer */
   struct timeval	timeout;	/* select() timeout */
-  struct sigaction	action;		/* Actions for signals */
+#ifdef HAVE_SIGACTION
+  struct sigaction	action;		/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION */
 
 
  /*
@@ -107,16 +109,31 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Catch hangup and child signals and ignore broken pipes...
   */
 
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+  sigset(SIGHUP, sighup_handler);
+  sigset(SIGCHLD, sigchld_handler);
+  sigset(SIGPIPE, SIG_IGN);
+#elif defined(HAVE_SIGACTION)
   memset(&action, 0, sizeof(action));
 
+  sigemptyset(&action.sa_mask);
+  sigaddset(&action.sa_mask, SIGHUP);
   action.sa_handler = sighup_handler;
   sigaction(SIGHUP, &action, NULL);
 
-  action.sa_handler = sigcld_handler;
-  sigaction(SIGCLD, &action, NULL);
+  sigemptyset(&action.sa_mask);
+  sigaddset(&action.sa_mask, SIGCHLD);
+  action.sa_handler = sigchld_handler;
+  sigaction(SIGCHLD, &action, NULL);
 
+  sigemptyset(&action.sa_mask);
   action.sa_handler = SIG_IGN;
   sigaction(SIGPIPE, &action, NULL);
+#else
+  signal(SIGHUP, sighup_handler);
+  signal(SIGCLD, sigchld_handler);	/* No, SIGCLD isn't a typo... */
+  signal(SIGPIPE, SIG_IGN);
+#endif /* HAVE_SIGSET */
 
  /*
   * Loop forever...
@@ -277,75 +294,89 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * 'sigcld_handler()' - Handle 'child' signals from old processes.
+ * 'sigchld_handler()' - Handle 'child' signals from old processes.
  */
 
 static void
-sigcld_handler(int sig)	/* I - Signal number */
+sigchld_handler(int sig)	/* I - Signal number */
 {
-  int	status;		/* Exit status of child */
-  int	pid;		/* Process ID of child */
-  job_t	*job;		/* Current job */
-  int	i;		/* Looping var */
+  int		status;		/* Exit status of child */
+  int		pid;		/* Process ID of child */
+  job_t		*job;		/* Current job */
+  int		i;		/* Looping var */
 
 
   (void)sig;
 
-  pid = wait(&status);
-  DEBUG_printf(("sigcld_handler: pid = %d, status = %d\n", pid, status));
+#ifdef HAVE_WAITPID
+  while ((pid = waitpid(-1, &status, WNOHANG)) > 0)
+#elif defined(HAVE_WAIT3)
+  while ((pid = wait3(&status, WNOHANG, NULL)) > 0)
+#else
+  if ((pid = wait(&status)) > 0)
+#endif /* HAVE_WAITPID */
+  {
+    DEBUG_printf(("sigcld_handler: pid = %d, status = %d\n", pid, status));
 
-  for (job = Jobs; job != NULL; job = job->next)
-    if (job->state == IPP_JOB_PROCESSING)
-    {
-      for (i = 0; job->procs[i]; i ++)
-        if (job->procs[i] == pid)
-	  break;
-
-      if (job->procs[i])
+    for (job = Jobs; job != NULL; job = job->next)
+      if (job->state == IPP_JOB_PROCESSING)
       {
-       /*
-        * OK, this process has gone away; what's left?
-	*/
+	for (i = 0; job->procs[i]; i ++)
+          if (job->procs[i] == pid)
+	    break;
 
-        job->procs[i] = -pid;
-
-        if (status)
+	if (job->procs[i])
 	{
 	 /*
-	  * A fatal error occurred, so stop the printer until the problem
-	  * can be resolved...
+          * OK, this process has gone away; what's left?
 	  */
 
-	  StopPrinter(job->printer);
+          job->procs[i] = -pid;
+
+          if (status)
+	  {
+	   /*
+	    * A fatal error occurred, so stop the printer until the problem
+	    * can be resolved...
+	    */
+
+	    StopPrinter(job->printer);
+	  }
+	  else
+	  {
+	   /*
+	    * OK return status; see if all processes are complete...
+	    */
+
+            for (i = 0; job->procs[i]; i ++)
+	      if (job->procs[i] > 0)
+		break;
+
+            if (job->procs[i])
+	      return; /* Still have active processes left */
+
+	   /*
+            * OK, this was the last process; cancel the job...
+	    */
+
+            DEBUG_printf(("sigcld_handler: job %d is completed.\n", job->id));
+
+            job->printer->state_message[0] = '\0';
+
+            CancelJob(job->id);
+	    CheckJobs();
+	  }
+
+	  break;
 	}
-	else
-	{
-	 /*
-	  * OK return status; see if all processes are complete...
-	  */
-
-          for (i = 0; job->procs[i]; i ++)
-	    if (job->procs[i] > 0)
-	      break;
-
-          if (job->procs[i])
-	    return; /* Still have active processes left */
-
-	 /*
-          * OK, this was the last process; cancel the job...
-	  */
-
-          DEBUG_printf(("sigcld_handler: job %d is completed.\n", job->id));
-
-          job->printer->state_message[0] = '\0';
-
-          CancelJob(job->id);
-	  CheckJobs();
-	}
-
-	break;
       }
-    }
+  }
+
+#ifdef HAVE_SIGSET
+  sigset(SIGCHLD, sigchld_handler);
+#elif !defined(HAVE_SIGACTION)
+  signal(SIGCLD, sigchld_handler);
+#endif /* HAVE_SIGSET */
 }
 
 
@@ -375,5 +406,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.14 1999/04/22 21:14:45 mike Exp $".
+ * End of "$Id: main.c,v 1.15 1999/04/29 19:28:47 mike Exp $".
  */

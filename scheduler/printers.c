@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.13 1999/04/22 20:20:52 mike Exp $"
+ * "$Id: printers.c,v 1.14 1999/04/29 19:28:47 mike Exp $"
  *
  *   for the Common UNIX Printing System (CUPS).
  *
@@ -298,7 +298,10 @@ LoadAllPrinters(void)
     else if (strcmp(name, "</Printer>") == 0)
     {
       if (p != NULL)
+      {
+        set_printer_attrs(p);
         p = NULL;
+      }
       else
       {
         LogMessage(LOG_ERROR, "Syntax error on line %d of printers.conf.",
@@ -708,5 +711,5 @@ set_printer_attrs(printer_t *p)	/* I - Printer to setup */
 
 
 /*
- * End of "$Id: printers.c,v 1.13 1999/04/22 20:20:52 mike Exp $".
+ * End of "$Id: printers.c,v 1.14 1999/04/29 19:28:47 mike Exp $".
  */
