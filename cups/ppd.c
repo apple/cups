@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.101 2003/02/28 21:06:08 mike Exp $"
+ * "$Id: ppd.c,v 1.102 2003/04/11 13:06:57 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -667,6 +667,24 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	            sizeof(option->defchoice));
 	    break;
 	  }
+
+        if (strcmp(keyword, "PageSize") == 0)
+	  strlcpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_SIZE),
+                  sizeof(option->text));
+	else if (strcmp(keyword, "MediaType") == 0)
+	  strlcpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_TYPE),
+                  sizeof(option->text));
+	else if (strcmp(keyword, "InputSlot") == 0)
+	  strlcpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_SOURCE),
+                  sizeof(option->text));
+	else if (strcmp(keyword, "ColorModel") == 0)
+	  strlcpy(option->text, cupsLangString(language, CUPS_MSG_OUTPUT_MODE),
+                  sizeof(option->text));
+	else if (strcmp(keyword, "Resolution") == 0)
+	  strlcpy(option->text, cupsLangString(language, CUPS_MSG_RESOLUTION),
+                  sizeof(option->text));
+        else
+	  strlcpy(option->text, keyword, sizeof(option->text));
       }
     }
 
@@ -2974,5 +2992,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.101 2003/02/28 21:06:08 mike Exp $".
+ * End of "$Id: ppd.c,v 1.102 2003/04/11 13:06:57 mike Exp $".
  */
