@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.12 2002/01/29 20:28:08 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.13 2002/01/29 21:18:16 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1580,7 +1580,13 @@ SetPrinterState(printer_t    *p,	/* I - Printer to change */
   p->state_time  = time(NULL);
 
   if (old_state != s)
+  {
     p->browse_time = 0;
+
+#ifdef __sgi
+    write_irix_state(p);
+#endif /* __sgi */
+  }
 
  /*
   * Save the printer configuration if a printer goes from idle or processing
@@ -2013,5 +2019,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.12 2002/01/29 20:28:08 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.13 2002/01/29 21:18:16 mike Exp $".
  */

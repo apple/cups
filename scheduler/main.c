@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.57.2.5 2002/01/28 19:10:25 mike Exp $"
+ * "$Id: main.c,v 1.57.2.6 2002/01/29 21:14:05 mike Exp $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -245,6 +245,17 @@ main(int  argc,			/* I - Number of command-line arguments */
   signal(SIGTERM, sigterm_handler);
 #endif /* HAVE_SIGSET */
 
+ /*
+  * Read configuration...
+  */
+
+  if (!ReadConfiguration())
+  {
+    syslog(LOG_LPR, "Unable to read configuration file \'%s\' - exiting!",
+           ConfigurationFile);
+    return (1);
+  }
+
 #ifdef __sgi
  /*
   * Try to create a fake lpsched lock file if one is not already there.
@@ -268,17 +279,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 #endif /* __sgi */
 
  /*
-  * Read configuration...
+  * Initialize authentication certificates...
   */
 
-  if (!ReadConfiguration())
-  {
-    syslog(LOG_LPR, "Unable to read configuration file \'%s\' - exiting!",
-           ConfigurationFile);
-    return (1);
-  }
-
   InitCerts();
+
+ /*
+  * Load all the jobs...
+  */
 
   LoadAllJobs();
 
@@ -790,5 +798,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c,v 1.57.2.5 2002/01/28 19:10:25 mike Exp $".
+ * End of "$Id: main.c,v 1.57.2.6 2002/01/29 21:14:05 mike Exp $".
  */
