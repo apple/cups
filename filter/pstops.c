@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.90 2002/09/25 18:23:09 mike Exp $"
+ * "$Id: pstops.c,v 1.91 2002/12/11 18:38:51 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -886,6 +886,9 @@ main(int  argc,			/* I - Number of command-line arguments */
     puts("%%Trailer");
     printf("%%%%Pages: %d\n", page - 1);
 
+    if (UseESPsp)
+      puts("userdict/showpage/ESPshowpage load put\n");
+
     while (psgets(line, sizeof(line), fp) != NULL)
     {
       if (strcmp(line, "\004") != 0 &&
@@ -1667,5 +1670,5 @@ start_nup(int number,		/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.90 2002/09/25 18:23:09 mike Exp $".
+ * End of "$Id: pstops.c,v 1.91 2002/12/11 18:38:51 mike Exp $".
  */
