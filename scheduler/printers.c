@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.35 2003/02/05 21:20:08 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.36 2003/02/14 20:09:33 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1409,7 +1409,15 @@ SetPrinterAttrs(printer_t *p)		/* I - Printer to setup */
       }
       else if (access(filename, 0) == 0)
       {
+        int		pline;			/* PPD line number */
+	ppd_status_t	pstatus;		/* PPD load status */
+
+
+        pstatus = ppdLastError(&pline);
+
 	LogMessage(L_ERROR, "PPD file for %s cannot be loaded!", p->name);
+	LogMessage(L_ERROR, "%s on line %d.", ppdErrorString(pstatus),
+	           pline);
 
 	AddPrinterFilter(p, "application/vnd.cups-postscript 0 -");
       }
@@ -2142,5 +2150,5 @@ write_irix_state(printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.35 2003/02/05 21:20:08 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.36 2003/02/14 20:09:33 mike Exp $".
  */
