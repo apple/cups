@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-openssl.m4,v 1.4.2.9 2003/01/28 13:36:47 mike Exp $"
+dnl "$Id: cups-openssl.m4,v 1.4.2.10 2003/09/17 19:36:07 mike Exp $"
 dnl
 dnl   OpenSSL/GNUTLS stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -34,6 +34,7 @@ AC_ARG_WITH(openssl-includes, [  --with-openssl-includes set directory for OpenS
     CXXFLAGS="-I$withval $CXXFLAGS"
     CPPFLAGS="-I$withval $CPPFLAGS",)
 
+SSLFLAGS=""
 SSLLIBS=""
 
 if test x$enable_ssl != xno; then
@@ -57,7 +58,8 @@ if test x$enable_ssl != xno; then
 	        "-lcrypto -lRSAglue -lrsaref"
 	    do
 		AC_CHECK_LIB(ssl,SSL_new,
-		    [SSLLIBS="-lssl $libcrypto"
+		    [SSLFLAGS="-DOPENSSL_DISABLE_OLD_DES_SUPPORT"
+		     SSLLIBS="-lssl $libcrypto"
 		     AC_DEFINE(HAVE_SSL)
 		     AC_DEFINE(HAVE_LIBSSL)],,
 		    $libcrypto)
@@ -98,6 +100,7 @@ if test x$enable_ssl != xno; then
     fi
 fi
 
+AC_SUBST(SSLFLAGS)
 AC_SUBST(SSLLIBS)
 
 EXPORT_SSLLIBS="$SSLLIBS"
@@ -105,5 +108,5 @@ AC_SUBST(EXPORT_SSLLIBS)
 
 
 dnl
-dnl End of "$Id: cups-openssl.m4,v 1.4.2.9 2003/01/28 13:36:47 mike Exp $".
+dnl End of "$Id: cups-openssl.m4,v 1.4.2.10 2003/09/17 19:36:07 mike Exp $".
 dnl

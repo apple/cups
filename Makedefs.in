@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in,v 1.36.2.18 2003/06/14 13:35:49 mike Exp $"
+# "$Id: Makedefs.in,v 1.36.2.19 2003/09/17 19:36:06 mike Exp $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -85,7 +85,7 @@ LIBZ		=	@LIBZ@
 
 ARFLAGS		=	@ARFLAGS@
 BACKLIBS	=	@BACKLIBS@
-CFLAGS		=	$(RC_CFLAGS) @CPPFLAGS@ @CFLAGS@ -I.. $(OPTIONS)
+CFLAGS		=	$(RC_CFLAGS) $(SSLFLAGS) @CPPFLAGS@ @CFLAGS@ -I.. $(OPTIONS)
 COMMONLIBS	=	@COMMONLIBS@
 CXXFLAGS	=	$(RC_CFLAGS) @CPPFLAGS@ @CXXFLAGS@ -I.. $(OPTIONS)
 CXXLIBS		=	@CXXLIBS@
@@ -100,6 +100,7 @@ NETLIBS		=	@NETLIBS@
 OPTIM		=	@OPTIM@
 OPTIONS		=
 PAMLIBS		=	@PAMLIBS@
+SSLFLAGS	=	@SSLFLAGS@
 SSLLIBS		=	@SSLLIBS@
 
 #
@@ -183,5 +184,5 @@ MAN8DIR		=	@MAN8DIR@
 
 
 #
-# End of "$Id: Makedefs.in,v 1.36.2.18 2003/06/14 13:35:49 mike Exp $"
+# End of "$Id: Makedefs.in,v 1.36.2.19 2003/09/17 19:36:06 mike Exp $"
 #
