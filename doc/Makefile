@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.16 2000/02/08 20:38:48 mike Exp $"
+# "$Id: Makefile,v 1.17 2000/02/29 14:47:28 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -101,14 +101,14 @@ clean:
 #
 
 install:
-	-$(MKDIR) $(DOCDIR)/doc
-	$(CP) $(WEBPAGES) $(DOCDIR)/doc
-	$(CP) overview.html overview.pdf $(DOCDIR)/doc
-	$(CP) $(DOCUMENTS:.shtml=.html) $(DOCDIR)/doc
-	$(CP) $(DOCUMENTS:.shtml=.pdf) $(DOCDIR)/doc
-	-$(MKDIR) $(DOCDIR)/doc/images
-	$(CP) $(WEBIMAGES) $(DOCDIR)/doc/images
-	$(CP) $(DOCIMAGES) $(DOCDIR)/doc/images
+	-$(MKDIR) $(DOCDIR)
+	$(CP) $(WEBPAGES) $(DOCDIR)
+	$(CP) overview.html overview.pdf $(DOCDIR)
+	$(CP) $(DOCUMENTS:.shtml=.html) $(DOCDIR)
+	$(CP) $(DOCUMENTS:.shtml=.pdf) $(DOCDIR)
+	-$(MKDIR) $(DOCDIR)/images
+	$(CP) $(WEBIMAGES) $(DOCDIR)/images
+	$(CP) $(DOCIMAGES) $(DOCDIR)/images
 
 #
 # The overview, admin manual, programmers manual, and users manual get

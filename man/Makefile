@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.6 2000/02/22 20:45:14 mike Exp $"
+# "$Id: Makefile,v 1.7 2000/02/29 14:47:29 mike Exp $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -33,9 +33,9 @@ CAT5	=	classes.conf.5 cupsd.conf.5 mime.convs.5 mime.types.5 \
 		printers.conf.5
 CAT8	=	accept.8 cupsd.8 enable.8 lpadmin.8 lpc.8
 
-MAN1	=	$(MAN1:.1=.man)
-MAN5	=	$(MAN5:.5=.man)
-MAN8	=	$(MAN8:.8=.man)
+MAN1	=	$(CAT1:.1=.man)
+MAN5	=	$(CAT5:.5=.man)
+MAN8	=	$(CAT8:.8=.man)
 
 
 #
@@ -61,9 +61,11 @@ install:
 	for file in $(MAN1); do \
 		$(CP) $$file $(MANDIR)/man1/`basename $$file man`1; \
 	done
+	$(RM) $(MANDIR)/man1/cancel.1
 	$(LN) lp.1 $(MANDIR)/man1/cancel.1
 	-$(MKDIR) $(MANDIR)/cat1
 	$(CP) $(CAT1) $(MANDIR)/cat1
+	$(RM) $(MANDIR)/cat1/cancel.1
 	$(LN) lp.1 $(MANDIR)/cat1/cancel.1
 	-$(MKDIR) $(MANDIR)/man5
 	for file in $(MAN5); do \
@@ -75,13 +77,17 @@ install:
 	for file in $(MAN8); do \
 		$(CP) $$file $(MANDIR)/man8/`basename $$file man`8; \
 	done
+	$(RM) $(MANDIR)/man8/reject.8
 	$(LN) accept.8 $(MANDIR)/man8/reject.8
+	$(RM) $(MANDIR)/man8/disable.8
 	$(LN) enable.8 $(MANDIR)/man8/disable.8
 	-$(MKDIR) $(MANDIR)/cat8
 	$(CP) $(CAT8) $(MANDIR)/cat8
+	$(RM) $(MANDIR)/cat8/reject.8
 	$(LN) accept.8 $(MANDIR)/cat8/reject.8
+	$(RM) $(MANDIR)/cat8/disable.8
 	$(LN) enable.8 $(MANDIR)/cat8/disable.8
 
 #
-# End of "$Id: Makefile,v 1.6 2000/02/22 20:45:14 mike Exp $".
+# End of "$Id: Makefile,v 1.7 2000/02/29 14:47:29 mike Exp $".
 #
