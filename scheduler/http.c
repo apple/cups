@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.2 1998/10/12 15:31:08 mike Exp $"
+ * "$Id: http.c,v 1.3 1998/10/13 18:24:15 mike Exp $"
  *
  *   HTTP server test code for CUPS.
  *
@@ -15,6 +15,7 @@
  *   SendError()          - Send an error message via HTTP.
  *   SendFile()           - Send a file via HTTP.
  *   SendHeader()         - Send an HTTP header.
+ *   IsAuthorized()       - Check to see if the user is authorized...
  *   conprintf()          - Do a printf() to a connection...
  *   decode_basic_auth()  - Decode a Basic authorization string.
  *   decode_digest_auth() - Decode an MD5 Digest authorization string.
@@ -29,7 +30,12 @@
  * Revision History:
  *
  *   $Log: http.c,v $
- *   Revision 1.2  1998/10/12 15:31:08  mike
+ *   Revision 1.3  1998/10/13 18:24:15  mike
+ *   Added activity timeout code.
+ *   Added Basic authorization code.
+ *   Fixed problem with main loop that would cause a core dump.
+ *
+ *   Revision 1.2  1998/10/12  15:31:08  mike
  *   Switched from stdio files to file descriptors.
  *   Added FD_CLOEXEC flags to all non-essential files.
  *   Added pipe_command() function.
@@ -45,6 +51,21 @@
 
 #include "cupsd.h"
 #include <stdarg.h>
+#include <pwd.h>
+#include <grp.h>
+#ifdef HAVE_SHADOW_H
+#  include <shadow.h>
+#endif /* HAVE_SHADOW_H */
+#include <crypt.h>
+
+
+/*
+ * Local globals...
+ */
+
+static char	*days[7] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+static char	*months[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+		                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
 
 /*
@@ -53,7 +74,7 @@
 
 static int	conprintf(connection_t *con, char *format, ...);
 static void	decode_basic_auth(connection_t *con, char *line);
-static void	decode_digest_auth(connection_t *con, char *line);
+static void	decode_if_modified(connection_t *con, char *line);
 static char	*get_datetime(time_t t);
 static char	*get_extension(char *filename);
 static char	*get_file(connection_t *con, struct stat *filestats);
@@ -179,6 +200,7 @@ AcceptConnection(void)
   con = Connection + NumConnections;
 
   memset(con, 0, sizeof(connection_t));
+  con->activity = time(NULL);
 
  /*
   * Accept the connection and get the remote address...
@@ -207,7 +229,7 @@ AcceptConnection(void)
   NumConnections ++;
 
  /*
-  * Temporarily suspect accept()'s until we lose a client...
+  * Temporarily suspend accept()'s until we lose a client...
   */
 
   if (NumConnections == MAX_CLIENTS)
@@ -313,7 +335,9 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
         * Clear other state variables...
 	*/
 
+        con->activity        = time(NULL);
         con->version         = HTTP_1_0;
+	con->keep_alive      = 0;
 	con->data_encoding   = HTTP_DATA_SINGLE;
 	con->data_length     = 0;
 	con->file            = 0;
@@ -324,6 +348,8 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 	con->password[0]     = '\0';
 	con->uri[0]          = '\0';
 	con->content_type[0] = '\0';
+	con->remote_time     = 0;
+	con->remote_size     = 0;
 
 	strcpy(con->language, "en");
 
@@ -344,7 +370,10 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 	      sscanf(version, "HTTP/%d.%d", &major, &minor);
 
 	      if (major == 1 && minor == 1)
-	        con->version = HTTP_1_1;
+	      {
+	        con->version    = HTTP_1_1;
+		con->keep_alive = 1;
+	      }
 	      else if (major == 1 && minor == 0)
 	        con->version = HTTP_1_0;
 	      else if (major == 0 && minor == 9)
@@ -506,8 +535,6 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 
 	  if (strcmp(value, "Basic") == 0)
 	    decode_basic_auth(con, valptr);
-	  else if (strcmp(value, "Digest") == 0)
-	    decode_digest_auth(con, valptr);
 	  else
 	  {
 	    SendError(con, HTTP_NOT_IMPLEMENTED);
@@ -539,6 +566,19 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 	  strncpy(con->host, value, sizeof(con->host) - 1);
 	  con->host[sizeof(con->host) - 1] = '\0';
 	}
+	else if (strcmp(name, "Connection") == 0)
+	{
+	  if (strcmp(value, "Keep-Alive") == 0)
+	    con->keep_alive = 1;
+	}
+	else if (strcmp(name, "If-Modified-Since") == 0)
+	{
+	  valptr = strchr(line, ':') + 1;
+	  while (*valptr == ' ' || *valptr == '\t')
+	    valptr ++;
+	  
+	  decode_if_modified(con, valptr);
+	}
 	break;
   }
 
@@ -550,21 +590,51 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
     switch (con->state)
     {
       case HTTP_GET :
-          if (strncmp(con->uri, "/printers", 9) == 0)
+          if (host[0] == '\0' && con->version >= HTTP_1_0)
 	  {
-	   /*
-	    * Do a command...
-	    */
-
-	    if (strlen(con->uri) > 9)
-	      sprintf(line, "lpstat -p %s -o %s", con->uri + 10, con->uri + 10);
-	    else
-	      strcpy(line, "lpstat -d -p -o");
-
-	    if (!SendCommand(con, HTTP_OK, line, "text/plain"))
+	    if (!SendError(con, HTTP_BAD_REQUEST))
 	    {
 	      CloseConnection(con);
 	      return (0);
+	    }
+	  }
+	  else if (strncmp(con->uri, "/printers", 9) == 0)
+	  {
+	   /*
+	    * Check authorization...
+	    */
+
+	    if (!IsAuthorized(con, 1))
+	    {
+	      if (!SendError(con, HTTP_UNAUTHORIZED))
+	      {
+	        CloseConnection(con);
+		return (0);
+	      }
+	    }
+	    else
+	    {
+	     /*
+	      * Do a command...
+	      */
+
+	      if (strlen(con->uri) > 9)
+		sprintf(line, "lpstat -p %s -o %s", con->uri + 10, con->uri + 10);
+	      else
+		strcpy(line, "lpstat -d -p -o");
+
+	      if (!SendCommand(con, HTTP_OK, line, "text/plain"))
+	      {
+		CloseConnection(con);
+		return (0);
+	      }
+
+              con->state = HTTP_GET_DATA;
+
+	      if (con->data_length == 0 &&
+	          con->data_encoding == HTTP_DATA_SINGLE &&
+		  con->version <= HTTP_1_0)
+		con->keep_alive = 0;
 	    }
 	  }
 	  else
@@ -581,6 +651,23 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 		return (0);
 	      }
 	    }
+	    else if (filestats.st_size == con->remote_size &&
+	             filestats.st_mtime == con->remote_time)
+            {
+              if (!SendHeader(con, HTTP_NOT_MODIFIED, NULL))
+	      {
+		CloseConnection(con);
+		return (0);
+	      }
+
+	      if (conprintf(con, "\r\n") < 0)
+	      {
+		CloseConnection(con);
+		return (0);
+	      }
+
+              con->state = HTTP_WAITING;
+	    }
 	    else
             {
 	      extension = get_extension(filename);
@@ -591,10 +678,10 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 		CloseConnection(con);
 		return (0);
 	      }
+
+              con->state = HTTP_GET_DATA;
 	    }
 	  }
-
-          con->state ++;
           break;
 
       case HTTP_PUT :
@@ -608,15 +695,49 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 	  return (0);
 
       case HTTP_HEAD :
-          if (strncmp(con->uri, "/printers/", 10) == 0)
+          if (host[0] == '\0' && con->version >= HTTP_1_0)
 	  {
-	   /*
-	    * Do a command...
-	    */
-
-            if (!SendHeader(con, HTTP_OK, "text/plain"))
+	    if (!SendError(con, HTTP_BAD_REQUEST))
 	    {
 	      CloseConnection(con);
+	      return (0);
+	    }
+	  }
+	  else if (strncmp(con->uri, "/printers/", 10) == 0)
+	  {
+	    if (!IsAuthorized(con, 1))
+	    {
+	      if (!SendError(con, HTTP_UNAUTHORIZED))
+	      {
+	        CloseConnection(con);
+		return (0);
+	      }
+	    }
+	    else
+	    {
+	     /*
+	      * Do a command...
+	      */
+
+              if (!SendHeader(con, HTTP_OK, "text/plain"))
+	      {
+		CloseConnection(con);
+		return (0);
+	      }
+
+	      if (conprintf(con, "\r\n") < 0)
+	      {
+		CloseConnection(con);
+		return (0);
+	      }
+	    }
+	  }
+	  else if (filestats.st_size == con->remote_size &&
+	           filestats.st_mtime == con->remote_time)
+          {
+            if (!SendHeader(con, HTTP_NOT_MODIFIED, NULL))
+	    {
+              CloseConnection(con);
 	      return (0);
 	    }
 
@@ -672,7 +793,7 @@ ReadConnection(connection_t *con)	/* I - Connection to read from */
 	    return (0);
 	  }
 
-          if (con->version <= HTTP_1_0)
+          if (!con->keep_alive)
 	  {
 	    CloseConnection(con);
 	    return (0);
@@ -765,7 +886,7 @@ WriteConnection(connection_t *con)
 
     close(con->file);
 
-    if (con->version <= HTTP_1_0)
+    if (!con->keep_alive)
     {
       CloseConnection(con);
       return (0);
@@ -775,6 +896,8 @@ WriteConnection(connection_t *con)
   }
 
   fprintf(stderr, "cupsd: SEND %d bytes to #%d\n", bytes, con->fd);
+
+  con->activity = time(NULL);
 
   return (1);
 }
@@ -822,12 +945,25 @@ int
 SendError(connection_t *con,
           int          code)
 {
+  char		*filename;
   struct stat	filestats;
 
 
   sprintf(con->uri, "/errors/%d.html", code);
-  return (SendFile(con, code, get_file(con, &filestats), "text/html",
-                   &filestats));
+  filename = get_file(con, &filestats);
+
+  if (filename != NULL)
+    return (SendFile(con, code, filename, "text/html", &filestats));
+
+  if (!SendHeader(con, code, NULL))
+    return (0);
+  if (code == HTTP_UNAUTHORIZED)
+    if (conprintf(con, "WWW-Authenticate: Basic realm=\"CUPS\"\r\n") < 0)
+      return (0);
+  if (conprintf(con, "\r\n") < 0)
+    return (0);
+
+  return (0);
 }
 
 
@@ -846,20 +982,23 @@ SendFile(connection_t *con,
 
   fprintf(stderr, "cupsd: filename=\'%s\', file = %d\n", filename, con->file);
 
-  if (con->file == 0)
+  if (con->file <= 0)
     return (0);
 
   fcntl(con->file, F_SETFD, fcntl(con->file, F_GETFD) | FD_CLOEXEC);
 
   con->pipe_pid = 0;
 
-  if (!SendHeader(con, HTTP_OK, type))
+  if (!SendHeader(con, code, type))
     return (0);
 
   if (conprintf(con, "Last-Modified: %s\r\n", get_datetime(filestats->st_mtime)) < 0)
     return (0);
   if (conprintf(con, "Content-Length: %d\r\n", filestats->st_size) < 0)
     return (0);
+  if (code == HTTP_UNAUTHORIZED)
+    if (conprintf(con, "WWW-Authenticate: Basic realm=\"CUPS\"\r\n") < 0)
+      return (0);
   if (conprintf(con, "\r\n") < 0)
     return (0);
 
@@ -895,6 +1034,9 @@ SendHeader(connection_t *con,	/* I - Connection to send to */
     case HTTP_NO_CONTENT :
         message = "NO CONTENT";
 	break;
+    case HTTP_NOT_MODIFIED :
+        message = "NOT MODIFIED";
+	break;
     case HTTP_BAD_REQUEST :
         message = "BAD REQUEST";
 	break;
@@ -921,16 +1063,114 @@ SendHeader(connection_t *con,	/* I - Connection to send to */
 	break;
   }
 
-  if (conprintf(con, "HTTP/1.%d %d %s\r\n", con->version == HTTP_1_1, code, message) < 0)
+  if (conprintf(con, "HTTP/%d.%d %d %s\r\n", con->version / 100,
+                con->version % 100, code, message) < 0)
     return (0);
   if (conprintf(con, "Date: %s\r\n", get_datetime(time(NULL))) < 0)
     return (0);
   if (conprintf(con, "Server: CUPS/1.0\r\n") < 0)
     return (0);
-  if (conprintf(con, "Content-Type: %s\r\n", type) < 0)
-    return (0);
+  if (con->keep_alive && con->version == HTTP_1_0)
+  {
+    if (conprintf(con, "Connection: Keep-Alive\r\n") < 0)
+      return (0);
+    if (conprintf(con, "Keep-Alive: timeout=30, max=100\r\n") < 0)
+      return (0);
+  }
+  if (type != NULL)
+    if (conprintf(con, "Content-Type: %s\r\n", type) < 0)
+      return (0);
 
   return (1);
+}
+
+
+/*
+ * 'IsAuthorized()' - Check to see if the user is authorized...
+ */
+
+int				/* O - 1 if authorized, 0 otherwise */
+IsAuthorized(connection_t *con,	/* I - Connection */
+             int          level)/* I - Access level required */
+{
+  int		i;		/* Looping var */
+  struct passwd	*pw;		/* User password data */
+#ifdef HAVE_SHADOW_H
+  struct spwd	*spw;		/* Shadow password data */
+#endif /* HAVE_SHADOW_H */
+  struct group	*grp;		/* Group data */
+
+
+  if (level == 0)
+    return (1);
+
+  if (con->username[0] == '\0' || con->password[0] == '\0')
+    return (0);
+
+ /*
+  * Check the user's password...
+  */
+
+  pw = getpwnam(con->username);	/* Get the current password */
+  endpwent();			/* Close the password file */
+
+  if (pw == NULL)		/* No such user... */
+    return (0);
+
+  if (pw->pw_passwd[0] == '\0')
+    return (0);			/* Don't allow blank passwords! */
+
+#ifdef HAVE_SHADOW_H
+  spw = getspnam(con->username);
+  endspent();
+
+  if (spw == NULL)		/* No such user or damaged shadow file */
+    return (0);
+
+  if (spw->sp_pwdp[0] == '\0')	/* Don't allow blank passwords! */
+    return (0);
+#endif /* HAVE_SHADOW_H */
+
+ /*
+  * OK, the password isn't blank, so compare with what came from the client...
+  */
+
+  if (strcmp(pw->pw_passwd, crypt(con->password, pw->pw_passwd)) != 0)
+  {
+#ifdef HAVE_SHADOW_H
+    if (spw != NULL)
+    {
+      if (strcmp(spw->sp_pwdp, crypt(con->password, spw->sp_pwdp)) != 0)
+        return (0);
+    }
+    else
+#endif /* HAVE_SHADOW_H */
+      return (0);
+  }
+
+ /*
+  * OK, the password is good.  See if we need normal user access, or group
+  * sys access...
+  */
+
+  if (level == 1)
+    return (1);
+
+ /*
+  * Check to see if this user is in the "sys" group...
+  */
+
+  grp = getgrgid(0);
+  endgrent();
+
+  if (grp == NULL)		/* No sys group??? */
+    return (0);
+
+  for (i = 0; grp->gr_mem[i] != NULL; i ++)
+    if (strcmp(con->username, grp->gr_mem[i]) == 0)
+      return (1);
+
+  return (0);
 }
 
 
@@ -956,6 +1196,8 @@ conprintf(connection_t *con,	/* I - Connection to write to */
   if (buf[bytes - 1] != '\n')
     putc('\n', stderr);
 
+  con->activity = time(NULL);
+
   return (send(con->fd, buf, bytes, 0));
 }
 
@@ -965,20 +1207,145 @@ conprintf(connection_t *con,	/* I - Connection to write to */
  */
 
 static void
-decode_basic_auth(connection_t *con,
-                  char         *line)
+decode_basic_auth(connection_t *con,	/* I - Connection to decode to */
+                  char         *line)	/* I - Line to decode */
 {
+  int	pos,				/* Bit position */
+	base64;				/* Value of this character */
+  char	value[1024],			/* Value string */
+	*valptr;			/* Pointer into value string */
+
+
+  for (valptr = value, pos = 0; *line != '\0'; line ++)
+  {
+   /*
+    * Decode this character into a number from 0 to 63...
+    */
+
+    if (*line >= 'A' && *line <= 'Z')
+      base64 = *line - 'A';
+    else if (*line >= 'a' && *line <= 'z')
+      base64 = *line - 'a' + 26;
+    else if (*line >= '0' && *line <= '9')
+      base64 = *line - '0' + 52;
+    else if (*line == '+')
+      base64 = 62;
+    else if (*line == '/')
+      base64 = 63;
+    else if (*line == '=')
+      break;
+    else
+      continue;
+
+   /*
+    * Store the result in the appropriate chars...
+    */
+
+    switch (pos)
+    {
+      case 0 :
+          *valptr = base64 << 2;
+	  pos ++;
+	  break;
+      case 1 :
+          *valptr++ |= (base64 >> 4) & 3;
+	  *valptr = (base64 << 4) & 255;
+	  pos ++;
+	  break;
+      case 2 :
+          *valptr++ |= (base64 >> 2) & 15;
+	  *valptr = (base64 << 6) & 255;
+	  pos ++;
+	  break;
+      case 3 :
+          *valptr++ |= base64;
+	  pos = 0;
+	  break;
+    }
+  }
+
+ /*
+  * OK, done decoding the string; pull the username and password out...
+  */
+
+  *valptr = '\0';
+
+  fprintf(stderr, "cupsd: Decoded authorization string = %s\n", value);
+
+  sscanf(value, "%[^:]:%[^\n]", con->username, con->password);
+
+  fprintf(stderr, "cupsd: username = %s, password = %s\n",
+          con->username, con->password);
 }
 
 
 /*
- * 'decode_digest_auth()' - Decode an MD5 Digest authorization string.
+ * 'decode_if_modified()' - Decode an "If-Modified-Since" line.
  */
 
 static void
-decode_digest_auth(connection_t *con,
+decode_if_modified(connection_t *con,
                    char         *line)
 {
+  int		i;			/* Looping var */
+  char		*valptr,
+		value[1024],
+		month[16];
+  struct tm	date;
+
+
+  memset(&date, 0, sizeof(date));
+
+  while (*line != '\0')
+  {
+    for (valptr = value; *line != '\0' && *line != ' ' && *line != '-';)
+      *valptr++ = *line++;
+    *valptr = '\0';
+
+    while (*line == ' ' || *line == '-')
+      line ++;
+
+    if (valptr == value)
+      continue;
+
+    valptr --;
+    if (*valptr == ',')
+      *valptr = '\0';
+
+    if (strchr(value, ':') != NULL)
+      sscanf(value, "%d:%d:%d", &(date.tm_hour), &(date.tm_min), &(date.tm_sec));
+    else if (isdigit(value[0]))
+    {
+      i = atoi(value);
+
+      if (date.tm_mday == 0 && i > 0 && i < 32)
+        date.tm_mday = i;
+      else if (i > 100)
+        date.tm_year = i - 1900;
+      else
+        date.tm_year = i;
+    }
+    else if (strncmp(value, "length=", 7) == 0)
+      con->remote_size = atoi(value + 7);
+    else
+    {
+      for (i = 0; i < 7; i ++)
+        if (strncasecmp(days[i], value, 3) == 0)
+	{
+	  date.tm_wday = i;
+	  break;
+	}
+
+      for (i = 0; i < 12; i ++)
+        if (strncasecmp(months[i], value, 3) == 0)
+	{
+	  date.tm_mon = i;
+	  break;
+	}
+    }
+  }
+
+  con->remote_time = mktime(&date);
 }
 
 
@@ -1326,5 +1693,5 @@ signal_handler(int sig)	/* I - Signal number */
 
 
 /*
- * End of "$Id: http.c,v 1.2 1998/10/12 15:31:08 mike Exp $".
+ * End of "$Id: http.c,v 1.3 1998/10/13 18:24:15 mike Exp $".
  */

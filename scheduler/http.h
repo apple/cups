@@ -1,12 +1,17 @@
 /*
- * "$Id: http.h,v 1.2 1998/10/12 15:31:08 mike Exp $"
+ * "$Id: http.h,v 1.3 1998/10/13 18:24:15 mike Exp $"
  *
  *   HTTP test program definitions for CUPS.
  *
  * Revision History:
  *
  *   $Log: http.h,v $
- *   Revision 1.2  1998/10/12 15:31:08  mike
+ *   Revision 1.3  1998/10/13 18:24:15  mike
+ *   Added activity timeout code.
+ *   Added Basic authorization code.
+ *   Fixed problem with main loop that would cause a core dump.
+ *
+ *   Revision 1.2  1998/10/12  15:31:08  mike
  *   Switched from stdio files to file descriptors.
  *   Added FD_CLOEXEC flags to all non-essential files.
  *   Added pipe_command() function.
@@ -62,7 +67,7 @@
 #define MAX_CLIENTS		100	/* Maximum number of simultaneous clients */
 #define MAX_BUFFER		8192	/* Network buffer size */
 
-#define IPP_PORT		367	/* Port number for ipp: services */
+#define IPP_PORT		631	/* Port number for ipp: services */
 
 
 /*
@@ -95,6 +100,8 @@
 #define HTTP_ACCEPTED		202	/* DELETE command was successful */
 #define HTTP_NO_CONTENT		204	/* Successful command, no new data */
 
+#define HTTP_NOT_MODIFIED	304	/* File not modified */
+
 #define HTTP_BAD_REQUEST	400	/* Bad request */
 #define HTTP_UNAUTHORIZED	401	/* Unauthorized to access host */
 #define HTTP_FORBIDDEN		403	/* Forbidden to access this URI */
@@ -112,10 +119,12 @@
 typedef struct	/**** Network connection data ****/
 {
   int			fd;		/* File descriptor for this connection */
+  time_t		activity;	/* Time since last read/write */
   struct sockaddr_in	local,		/* Address of local interface */
 			remote;		/* Address of remote interface */
   int			state,		/* State of connection */
-			version;	/* Protocol version */
+			version,	/* Protocol version */
+			keep_alive;	/* Keep-alive supported? */
   char			host[256],	/* Host: line */
 			user_agent[128],/* User-Agent: line */
 			username[16],	/* Username from Authorization: line */
@@ -123,6 +132,8 @@ typedef struct	/**** Network connection data ****/
 			uri[1024],	/* Localized URL/URI for GET/PUT */
 			content_type[64],/* Content-Type: line */
 			language[16];	/* Accept-Language: line (first available) */
+  time_t		remote_time;	/* Remote file time */
+  int			remote_size;	/* Remote file size */
   int			data_encoding,	/* Chunked or not */
 			data_length;	/* Content-Length: or chunk length line */
   int			file;		/* Input/output file */
@@ -155,18 +166,19 @@ VAR fd_set		InputSet,
  * Prototypes...
  */
 
-extern void	StartListening(void);
 extern void	AcceptConnection(void);
 extern void	CloseConnection(connection_t *con);
+extern int	IsAuthorized(connection_t *con, int level);
 extern int	ReadConnection(connection_t *con);
-extern int	WriteConnection(connection_t *con);
 extern int	SendCommand(connection_t *con, int code, char *command, char *type);
 extern int	SendError(connection_t *con, int code);
 extern int	SendFile(connection_t *con, int code, char *filename,
 		         char *type, struct stat *filestats);
 extern int	SendHeader(connection_t *con, int code, char *type);
+extern void	StartListening(void);
+extern int	WriteConnection(connection_t *con);
 
 
 /*
- * End of "$Id: http.h,v 1.2 1998/10/12 15:31:08 mike Exp $".
+ * End of "$Id: http.h,v 1.3 1998/10/13 18:24:15 mike Exp $".
  */

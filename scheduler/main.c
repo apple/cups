@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c,v 1.2 1998/10/12 15:31:08 mike Exp $"
+ * "$Id: main.c,v 1.3 1998/10/13 18:24:15 mike Exp $"
  *
  *   Main entry for the CUPS test program.
  *
@@ -10,7 +10,12 @@
  * Revision History:
  *
  *   $Log: main.c,v $
- *   Revision 1.2  1998/10/12 15:31:08  mike
+ *   Revision 1.3  1998/10/13 18:24:15  mike
+ *   Added activity timeout code.
+ *   Added Basic authorization code.
+ *   Fixed problem with main loop that would cause a core dump.
+ *
+ *   Revision 1.2  1998/10/12  15:31:08  mike
  *   Switched from stdio files to file descriptors.
  *   Added FD_CLOEXEC flags to all non-essential files.
  *   Added pipe_command() function.
@@ -41,8 +46,16 @@ main(int  argc,			/* I - Number of command-line arguments */
   fd_set		input,		/* Input set for select() */
 			output;		/* Output set for select() */
   connection_t		*con;		/* Current connection */
+  time_t		activity;	/* Activity timer */
   struct timeval	timeout;	/* select() timeout */
 
+
+ /*
+  * Set the timezone to GMT...
+  */
+
+  putenv("TZ=GMT");
+  tzset();
 
  /*
   * Initialize 'ipp' socket for external connections...
@@ -121,11 +134,25 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       if (FD_ISSET(con->fd, &output) ||
           FD_ISSET(con->file, &output))
-        if (!WriteConnection(Connection + i))
+        if (!WriteConnection(con))
 	{
 	  con --;
 	  i --;
+	  continue;
 	}
+
+     /*
+      * Check the activity and close old connections...
+      */
+
+      activity = time(NULL) - 30;
+      if (con->activity < activity)
+      {
+        CloseConnection(con);
+        con --;
+        i --;
+        continue;
+      }
     }
   }
 
@@ -147,5 +174,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 }
 
 /*
- * End of "$Id: main.c,v 1.2 1998/10/12 15:31:08 mike Exp $".
+ * End of "$Id: main.c,v 1.3 1998/10/13 18:24:15 mike Exp $".
  */
