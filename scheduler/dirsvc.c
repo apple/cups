@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c,v 1.73.2.54 2004/07/17 02:44:49 mike Exp $"
+ * "$Id: dirsvc.c,v 1.73.2.55 2004/07/28 14:19:09 mike Exp $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1820,7 +1820,7 @@ SLPDeregPrinter(printer_t *p)
   char	srvurl[HTTP_MAX_URI];	/* Printer service URI */
 
 
-  LogMessage(L_DEBUG, "SLPDeregPrinter: printer=\"%s\"", printer->name);
+  LogMessage(L_DEBUG, "SLPDeregPrinter: printer=\"%s\"", p->name);
 
   if((p->type & CUPS_PRINTER_REMOTE) == 0)
   {
@@ -2109,5 +2109,5 @@ UpdateSLPBrowse(void)
 
 
 /*
- * End of "$Id: dirsvc.c,v 1.73.2.54 2004/07/17 02:44:49 mike Exp $".
+ * End of "$Id: dirsvc.c,v 1.73.2.55 2004/07/28 14:19:09 mike Exp $".
  */
