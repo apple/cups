@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.44 2003/08/11 18:40:58 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.45 2003/08/28 14:36:53 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -230,7 +230,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   }
 
   if ((val = cupsGetOption("Collate", num_options, options)) != NULL &&
-      !strcasecmp(val, "True"))
+      (!strcasecmp(val, "true") ||!strcasecmp(val, "on") ||
+       !strcasecmp(val, "yes")))
     Collate = 1;
 
   if ((val = cupsGetOption("OutputOrder", num_options, options)) != NULL &&
@@ -281,7 +282,8 @@ main(int  argc,			/* I - Number of command-line arguments */
     b = atoi(val) * 0.01f;
 
   if ((val = cupsGetOption("mirror", num_options, options)) != NULL &&
-      !strcasecmp(val, "True"))
+      (!strcasecmp(val, "true") ||!strcasecmp(val, "on") ||
+       !strcasecmp(val, "yes")))
     Flip = 1;
 
  /*
@@ -1890,5 +1892,5 @@ start_nup(int number,			/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.44 2003/08/11 18:40:58 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.45 2003/08/28 14:36:53 mike Exp $".
  */

@@ -1746,7 +1746,14 @@ void PSOutputDev::startPage(int pageNum, GfxState *state) {
   int imageWidth, imageHeight;
   int left, bottom, right, top;
 
-  globalParams->getPSImageableArea(left, bottom, right, top);
+  if (globalParams->getPSFit()) {
+    globalParams->getPSImageableArea(left, bottom, right, top);
+  } else {
+    left = bottom = 0;
+    right = globalParams->getPSPaperWidth();
+    top = globalParams->getPSPaperHeight();
+  }
+
   imageWidth  = right - left;
   imageHeight = top - bottom;
 
@@ -1755,7 +1762,7 @@ void PSOutputDev::startPage(int pageNum, GfxState *state) {
   case psModePS:
     writePSFmt("%%%%Page: %d %d\n", pageNum, seqPage);
 
-    // rotate, translate, and scale page
+    // possibly rotate, translate, and scale page
     x1 = (int)(state->getX1() + 0.5);
     y1 = (int)(state->getY1() + 0.5);
     x2 = (int)(state->getX2() + 0.5);
@@ -1766,14 +1773,15 @@ void PSOutputDev::startPage(int pageNum, GfxState *state) {
     writePS("%%BeginPageSetup\n");
     width = x2 - x1;
     height = y2 - y1;
+    tx = 0;
+    ty = 0;
     if (width > height && width > imageWidth) {
       landscape = gTrue;
       writePSFmt("%%%%PageOrientation: %s\n",
 		 state->getCTM()[0] ? "Landscape" : "Portrait");
       writePS("pdfStartPage\n");
       writePS("90 rotate\n");
-      tx = -x1;
-      ty = -(y1 + imageWidth);
+      ty = -globalParams->getPSPaperWidth();
       t = width;
       width = height;
       height = t;
@@ -1782,8 +1790,10 @@ void PSOutputDev::startPage(int pageNum, GfxState *state) {
       writePSFmt("%%%%PageOrientation: %s\n",
 		 state->getCTM()[0] ? "Portrait" : "Landscape");
       writePS("pdfStartPage\n");
-      tx = -x1;
-      ty = -y1;
+    }
+    if (globalParams->getPSFit()) {
+      tx -= x1;
+      ty -= y1;
     }
     tx += left;
     ty += bottom;
@@ -1796,7 +1806,7 @@ void PSOutputDev::startPage(int pageNum, GfxState *state) {
     if (tx != 0 || ty != 0) {
       writePSFmt("%g %g translate\n", tx, ty);
     }
-    if (width > imageWidth || height > imageHeight) {
+    if ((width > imageWidth || height > imageHeight) && globalParams->getPSFit()) {
       xScale = (double)imageWidth / (double)width;
       yScale = (double)imageHeight / (double)height;
       if (yScale < xScale) {

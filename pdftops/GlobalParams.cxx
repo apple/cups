@@ -967,6 +967,15 @@ GBool GlobalParams::getPSDuplex() {
   return d;
 }
 
+GBool GlobalParams::getPSFit() {
+  GBool d;
+
+  globalParamsLock;
+  d = psFit;
+  globalParamsUnlock;
+  return d;
+}
+
 PSLevel GlobalParams::getPSLevel() {
   PSLevel level;
 
@@ -1287,6 +1296,12 @@ void GlobalParams::setPSPaperHeight(int height) {
 void GlobalParams::setPSDuplex(GBool duplex) {
   globalParamsLock;
   psDuplex = duplex;
+  globalParamsUnlock;
+}
+
+void GlobalParams::setPSFit(GBool fit) {
+  globalParamsLock;
+  psFit = fit;
   globalParamsUnlock;
 }
 

@@ -3,6 +3,16 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The PDF filter always scaled and offset pages; this
+	  caused problems under MacOS X, so now the "fitplot"
+	  option controls whether PDF files are scaled to fit
+	  within the printable area of the page (STR #250)
+	- The LPD backend did not support the port number in a
+	  URI (STR #247)
+	- Some filters didn't properly support boolean options
+	  (STR #249)
+	- Landscape PDF files were not always offset by the
+	  correct amount when rotating (STR #243)
 	- The scheduler could hang in a call to localtime() when
 	  logging messages from the signal handler (STR #242)
 	- The PDF filter no longer prints form widgets; this

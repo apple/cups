@@ -1,5 +1,5 @@
 //
-// "$Id: pdftops.cxx,v 1.6.2.6 2003/07/25 20:26:21 mike Exp $"
+// "$Id: pdftops.cxx,v 1.6.2.7 2003/08/28 14:36:57 mike Exp $"
 //
 //   PDF to PostScript filter front-end for the Common UNIX Printing
 //   System (CUPS).
@@ -62,26 +62,28 @@ int					// O - Exit status
 main(int  argc,				// I - Number of command-line args
      char *argv[])			// I - Command-line arguments
 {
-  PDFDoc	*doc;
-  GString	*fileName;
-  GString	*psFileName;
-  PSLevel	level;
-  PSOutputDev	*psOut;
-  int		num_options;
-  cups_option_t	*options;
-  const char	*val;
-  ppd_file_t	*ppd;
-  ppd_size_t	*size;
-  FILE		*fp;
-  const char	*server_root;
-  char		tempfile[1024];
-  char		buffer[8192];
-  int		bytes;
-  int		width, length;
+  PDFDoc	*doc;			// Input file
+  GString	*fileName;		// Input filename
+  GString	*psFileName;		// Output filename
+  PSLevel	level;			// PostScript level
+  PSOutputDev	*psOut;			// Output device
+  int		num_options;		// Number of options
+  cups_option_t	*options;		// Options
+  const char	*val;			// Option value
+  ppd_file_t	*ppd;			// Current PPD
+  ppd_size_t	*size;			// Current media size
+  FILE		*fp;			// Copy file
+  const char	*server_root;		// Location of config files
+  char		tempfile[1024];		// Temporary file
+  char		buffer[8192];		// Copy buffer
+  int		bytes;			// Bytes copied
+  int		width, length;		// Size in points
   int		left, bottom, right, top;
-  int		orientation;
-  int		temp;
-  int		duplex;
+					// Imageable area in points
+  int		orientation;		// Orientation
+  int		temp;			// Temporary var
+  int		duplex;			// Duplex the output?
+  int		fit;			// Fit the pages to the output
 
 
   // Make sure status messages are not buffered...
@@ -122,6 +124,7 @@ main(int  argc,				// I - Number of command-line args
   length = 792;
   level  = psLevel2;
   duplex = 0;
+  fit    = 0;
 
   // Get PPD and initialize options as needed...
   num_options = cupsParseOptions(argv[5], 0, &options);
@@ -224,6 +227,11 @@ main(int  argc,				// I - Number of command-line args
 	break;
   }
 
+  if ((val = cupsGetOption("fitplot", num_options, options)) != NULL &&
+      strcasecmp(val, "no") && strcasecmp(val, "off") &&
+      strcasecmp(val, "false"))
+    fit = 1;
+
   if ((val = cupsGetOption("sides", num_options, options)) != NULL &&
       strncasecmp(val, "two-", 4) == 0)
     duplex = 1;
@@ -269,6 +277,7 @@ main(int  argc,				// I - Number of command-line args
   globalParams->setPSPaperHeight(length);
   globalParams->setPSImageableArea(left, bottom, right, top);
   globalParams->setPSDuplex(duplex);
+  globalParams->setPSFit(fit);
   globalParams->setPSLevel(level);
   globalParams->setPSASCIIHex(level == psLevel1);
   globalParams->setPSEmbedType1(1);
@@ -318,5 +327,5 @@ main(int  argc,				// I - Number of command-line args
 
 
 //
-// End of "$Id: pdftops.cxx,v 1.6.2.6 2003/07/25 20:26:21 mike Exp $".
+// End of "$Id: pdftops.cxx,v 1.6.2.7 2003/08/28 14:36:57 mike Exp $".
 //

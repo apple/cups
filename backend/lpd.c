@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c,v 1.28.2.23 2003/07/29 12:53:01 mike Exp $"
+ * "$Id: lpd.c,v 1.28.2.24 2003/08/28 14:36:51 mike Exp $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -119,8 +119,9 @@ extern int	rresvport(int *port);
  */
 
 static int	lpd_command(int lpd_fd, int timeout, char *format, ...);
-static int	lpd_queue(char *hostname, char *printer, char *filename,
-		          char *user, char *title, int copies,
+static int	lpd_queue(const char *hostname, int port, const char *printer,
+		          const char *filename,
+		          const char *user, const char *title, int copies,
 			  int banner, int format, int order, int reserve,
 			  int manual_copies, int timeout);
 static void	lpd_timeout(int sig);
@@ -424,7 +425,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       copies        = atoi(argv[4]);
     }
 
-    status = lpd_queue(hostname, resource + 1, filename,
+    status = lpd_queue(hostname, port, resource + 1, filename,
                        argv[2] /* user */, title, copies,
 		       banner, format, order, reserve, manual_copies, timeout);
 
@@ -432,7 +433,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       fprintf(stderr, "PAGE: 1 %d\n", atoi(argv[4]));
   }
   else
-    status = lpd_queue(hostname, resource + 1, filename,
+    status = lpd_queue(hostname, port, resource + 1, filename,
                        argv[2] /* user */, title, 1,
 		       banner, format, order, reserve, 1, timeout);
 
@@ -517,24 +518,25 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
  */
 
 static int				/* O - Zero on success, non-zero on failure */
-lpd_queue(char *hostname,		/* I - Host to connect to */
-          char *printer,		/* I - Printer/queue name */
-	  char *filename,		/* I - File to print */
-          char *user,			/* I - Requesting user */
-	  char *title,			/* I - Job title */
-	  int  copies,			/* I - Number of copies */
-	  int  banner,			/* I - Print LPD banner? */
-          int  format,			/* I - Format specifier */
-          int  order,			/* I - Order of data/control files */
-	  int  reserve,			/* I - Reserve ports? */
-	  int  manual_copies,		/* I - Do copies by hand... */
-	  int  timeout)			/* I - Timeout... */
+lpd_queue(const char *hostname,		/* I - Host to connect to */
+          int        port,		/* I - Port to connect on */
+          const char *printer,		/* I - Printer/queue name */
+	  const char *filename,		/* I - File to print */
+          const char *user,		/* I - Requesting user */
+	  const char *title,		/* I - Job title */
+	  int        copies,		/* I - Number of copies */
+	  int        banner,		/* I - Print LPD banner? */
+          int        format,		/* I - Format specifier */
+          int        order,		/* I - Order of data/control files */
+	  int        reserve,		/* I - Reserve ports? */
+	  int        manual_copies,	/* I - Do copies by hand... */
+	  int        timeout)		/* I - Timeout... */
 {
   FILE			*fp;		/* Job file */
   char			localhost[255];	/* Local host name */
   int			error;		/* Error number */
   struct stat		filestats;	/* File statistics */
-  int			port;		/* LPD connection port */
+  int			lport;		/* LPD connection local port */
   int			fd;		/* LPD socket */
   char			control[10240],	/* LPD control 'file' */
 			*cptr;		/* Pointer into control file string */
@@ -589,9 +591,9 @@ lpd_queue(char *hostname,		/* I - Host to connect to */
     memset(&addr, 0, sizeof(addr));
     memcpy(&(addr.sin_addr), hostaddr->h_addr, hostaddr->h_length);
     addr.sin_family = hostaddr->h_addrtype;
-    addr.sin_port   = htons(515);	/* LPD/printer service */
+    addr.sin_port   = htons(port);
 
-    for (port = 732;;)
+    for (lport = 732;;)
     {
       if (getuid() || !reserve)
       {
@@ -605,16 +607,16 @@ lpd_queue(char *hostname,		/* I - Host to connect to */
           return (1);
 	}
 
-	port = 515;
+        lport = 0;
       }
       else
       {
        /*
 	* We're running as root and want to comply with RFC 1179.  Reserve a
-	* priviledged port between 721 and 732...
+	* priviledged lport between 721 and 732...
 	*/
 
-	if ((fd = rresvport(&port)) < 0)
+	if ((fd = rresvport(&lport)) < 0)
 	{
 	  perror("ERROR: Unable to reserve port");
 	  sleep(30);
@@ -651,7 +653,9 @@ lpd_queue(char *hostname,		/* I - Host to connect to */
 	break;
     }
 
-    fprintf(stderr, "INFO: Connected from port %d...\n", port);
+    fprintf(stderr, "INFO: Connected to %s...\n", hostname);
+    fprintf(stderr, "DEBUG: Connected on ports %d (local %d)...\n", port,
+            lport);
 
    /*
     * Next, open the print file and figure out its size...
@@ -1022,5 +1026,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: lpd.c,v 1.28.2.23 2003/07/29 12:53:01 mike Exp $".
+ * End of "$Id: lpd.c,v 1.28.2.24 2003/08/28 14:36:51 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: http-support.c,v 1.1.2.3 2003/02/04 05:10:17 mike Exp $"
+ * "$Id: http-support.c,v 1.1.2.4 2003/08/28 14:36:52 mike Exp $"
  *
  *   HTTP support routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -224,6 +224,8 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
       *port = 443;
     else if (strcasecmp(method, "ipp") == 0)
       *port = ippPort();
+    else if (strcasecmp(method, "lpd") == 0)
+      *port = 515;
     else if (strcasecmp(method, "socket") == 0)	/* Not registered yet... */
       *port = 9100;
     else
@@ -264,5 +266,5 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
 
 
 /*
- * End of "$Id: http-support.c,v 1.1.2.3 2003/02/04 05:10:17 mike Exp $".
+ * End of "$Id: http-support.c,v 1.1.2.4 2003/08/28 14:36:52 mike Exp $".
  */
