@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.28 2000/06/12 15:51:49 mike Exp $"
+ * "$Id: texttops.c,v 1.29 2000/06/28 18:35:24 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -129,6 +129,7 @@ WriteProlog(char       *title,	/* I - Title of job */
   char		*charset;	/* Character set string */
   char		filename[1024];	/* Glyph filenames */
   FILE		*fp;		/* Glyph files */
+  const char	*datadir;	/* CUPS_DATADIR environment variable */
   char		line[1024],	/* Line from file */
 		*lineptr,	/* Pointer into line */
 		*valptr;	/* Pointer to value in line */
@@ -147,6 +148,13 @@ WriteProlog(char       *title,	/* I - Title of job */
 		  "cupsItalic"
 		};
 
+
+ /*
+  * Get the data directory...
+  */
+
+  if ((datadir = getenv("CUPS_DATADIR")) == NULL)
+    datadir = CUPS_DATADIR;
 
  /*
   * Allocate memory for the page...
@@ -203,7 +211,9 @@ WriteProlog(char       *title,	/* I - Title of job */
   * set definition...
   */
 
-  if ((fp = fopen(CUPS_DATADIR "/data/psglyphs", "r")) != NULL)
+  snprintf(filename, sizeof(filename), "%s/data/psglyphs", datadir);
+
+  if ((fp = fopen(filename, "r")) != NULL)
   {
     while (fscanf(fp, "%x%63s", &unicode, glyph) == 2)
       Glyphs[unicode] = strdup(glyph);
@@ -212,7 +222,8 @@ WriteProlog(char       *title,	/* I - Title of job */
   }
   else
   {
-    perror("ERROR: Unable to open " CUPS_DATADIR "/data/psglyphs");
+    fprintf(stderr, "ERROR: Unable to open \"%s\" - %s\n", filename,
+            strerror(errno));
     exit(1);
   }
 
@@ -223,7 +234,7 @@ WriteProlog(char       *title,	/* I - Title of job */
   charset = getenv("CHARSET");
   if (charset != NULL && strcmp(charset, "us-ascii") != 0)
   {
-    snprintf(filename, sizeof(filename), CUPS_DATADIR "/charsets/%s", charset);
+    snprintf(filename, sizeof(filename), "%s/charsets/%s", datadir, charset);
 
     if ((fp = fopen(filename, "r")) == NULL)
     {
@@ -703,7 +714,7 @@ WriteProlog(char       *title,	/* I - Title of job */
 
       printf("%%%%BeginResource: font %s\n", fonts[i]);
 
-      snprintf(filename, sizeof(filename), CUPS_DATADIR "/fonts/%s", fonts[i]);
+      snprintf(filename, sizeof(filename), "%s/fonts/%s", datadir, fonts[i]);
       if ((fp = fopen(filename, "rb")) != NULL)
       {
         while (fgets(line, sizeof(line), fp) != NULL)
@@ -1259,5 +1270,5 @@ write_text(char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c,v 1.28 2000/06/12 15:51:49 mike Exp $".
+ * End of "$Id: texttops.c,v 1.29 2000/06/28 18:35:24 mike Exp $".
  */

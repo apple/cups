@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c,v 1.26 2000/06/16 20:20:33 mike Exp $"
+ * "$Id: hpgl-prolog.c,v 1.27 2000/06/28 18:35:24 mike Exp $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
@@ -48,6 +48,8 @@ OutputProlog(char  *title,	/* I - Job title */
 {
   FILE		*prolog;	/* Prolog file */
   char		line[255];	/* Line from prolog file */
+  const char	*datadir;	/* CUPS_DATADIR environment variable */
+  char		filename[1024];	/* Name of prolog file */
   time_t	curtime;	/* Current time */
   struct tm	*curtm;		/* Current date */
 
@@ -79,9 +81,15 @@ OutputProlog(char  *title,	/* I - Job title */
   else if (!ColorDevice)	/* Greyscale */
     puts("/setrgbcolor { 0.08 mul exch 0.61 mul add exch 0.31 mul add setgray } bind def\n");
 
-  if ((prolog = fopen(CUPS_DATADIR "/data/HPGLprolog", "r")) == NULL)
+  if ((datadir = getenv("CUPS_DATADIR")) == NULL)
+    datadir = CUPS_DATADIR;
+
+  snprintf(filename, sizeof(filename), "%s/data/HPGLprolog", datadir);
+
+  if ((prolog = fopen(filename, "r")) == NULL)
   {
-    perror("ERROR: Unable to open HPGL prolog \"" CUPS_DATADIR "/data/HPGLprolog\" for reading");
+    fprintf(stderr, "ERROR: Unable to open HPGL prolog \"%s\" for reading - %s\n",
+            filename, strerror(errno));
     exit(1);
   }
 
@@ -395,5 +403,5 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
- * End of "$Id: hpgl-prolog.c,v 1.26 2000/06/16 20:20:33 mike Exp $".
+ * End of "$Id: hpgl-prolog.c,v 1.27 2000/06/28 18:35:24 mike Exp $".
  */
