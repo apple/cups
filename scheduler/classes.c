@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c,v 1.34.2.24 2004/06/29 18:54:17 mike Exp $"
+ * "$Id: classes.c,v 1.34.2.25 2004/06/30 17:19:51 mike Exp $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -391,8 +391,8 @@ LoadAllClasses(void)
     * Decode the directive...
     */
 
-    if (strcmp(name, "<Class") == 0 ||
-        strcmp(name, "<DefaultClass") == 0)
+    if (!strcasecmp(name, "<Class") ||
+        !strcasecmp(name, "<DefaultClass"))
     {
      /*
       * <Class name> or <DefaultClass name>
@@ -408,7 +408,7 @@ LoadAllClasses(void)
 	p->accepting = 1;
 	p->state     = IPP_PRINTER_IDLE;
 
-        if (strcmp(name, "<DefaultClass") == 0)
+        if (!strcasecmp(name, "<DefaultClass"))
 	  DefaultPrinter = p;
       }
       else
@@ -418,7 +418,7 @@ LoadAllClasses(void)
         return;
       }
     }
-    else if (strcmp(name, "</Class>") == 0)
+    else if (!strcasecmp(name, "</Class>"))
     {
       if (p != NULL)
       {
@@ -439,11 +439,11 @@ LoadAllClasses(void)
       return;
     }
     
-    else if (strcmp(name, "Info") == 0)
+    else if (!strcasecmp(name, "Info"))
       SetString(&p->info, value);
-    else if (strcmp(name, "Location") == 0)
+    else if (!strcasecmp(name, "Location"))
       SetString(&p->location, value);
-    else if (strcmp(name, "Printer") == 0)
+    else if (!strcasecmp(name, "Printer"))
     {
       if ((temp = FindPrinter(value)) == NULL)
       {
@@ -473,18 +473,18 @@ LoadAllClasses(void)
       if (temp)
         AddPrinterToClass(p, temp);
     }
-    else if (strcmp(name, "State") == 0)
+    else if (!strcasecmp(name, "State"))
     {
      /*
       * Set the initial queue state...
       */
 
-      if (strcasecmp(value, "idle") == 0)
+      if (strcasecmp(value, "idle"))
         p->state = IPP_PRINTER_IDLE;
-      else if (strcasecmp(value, "stopped") == 0)
+      else if (strcasecmp(value, "stopped"))
         p->state = IPP_PRINTER_STOPPED;
     }
-    else if (strcmp(name, "StateMessage") == 0)
+    else if (!strcasecmp(name, "StateMessage"))
     {
      /*
       * Set the initial queue state message...
@@ -495,18 +495,20 @@ LoadAllClasses(void)
 
       strlcpy(p->state_message, value, sizeof(p->state_message));
     }
-    else if (strcmp(name, "Accepting") == 0)
+    else if (!strcasecmp(name, "Accepting"))
     {
      /*
       * Set the initial accepting state...
       */
 
-      if (strcasecmp(value, "yes") == 0)
+      if (strcasecmp(value, "yes") ||
+          !strcasecmp(value, "on") ||
+          !strcasecmp(value, "true"))
         p->accepting = 1;
       else
         p->accepting = 0;
     }
-    else if (strcmp(name, "JobSheets") == 0)
+    else if (!strcasecmp(name, "JobSheets"))
     {
      /*
       * Set the initial job sheets...
@@ -532,22 +534,26 @@ LoadAllClasses(void)
 	SetString(&p->job_sheets[1], value);
       }
     }
-    else if (strcmp(name, "AllowUser") == 0)
+    else if (!strcasecmp(name, "AllowUser"))
     {
       p->deny_users = 0;
       AddPrinterUser(p, value);
     }
-    else if (strcmp(name, "DenyUser") == 0)
+    else if (!strcasecmp(name, "DenyUser"))
     {
       p->deny_users = 1;
       AddPrinterUser(p, value);
     }
-    else if (strcmp(name, "QuotaPeriod") == 0)
+    else if (!strcasecmp(name, "QuotaPeriod"))
       p->quota_period = atoi(value);
-    else if (strcmp(name, "PageLimit") == 0)
+    else if (!strcasecmp(name, "PageLimit"))
       p->page_limit = atoi(value);
-    else if (strcmp(name, "KLimit") == 0)
+    else if (!strcasecmp(name, "KLimit"))
       p->k_limit = atoi(value);
+    else if (!strcasecmp(name, "OpPolicy"))
+      SetString(&p->op_policy, value);
+    else if (!strcasecmp(name, "ErrorPolicy"))
+      SetString(&p->error_policy, value);
     else
     {
      /*
@@ -663,6 +669,9 @@ SaveAllClasses(void)
       cupsFilePrintf(fp, "%sUser %s\n", pclass->deny_users ? "Deny" : "Allow",
         	     pclass->users[i]);
 
+    cupsFilePrintf(fp, "OpPolicy %s\n", pclass->op_policy);
+    cupsFilePrintf(fp, "ErrorPolicy %s\n", pclass->error_policy);
+
     cupsFilePuts(fp, "</Class>\n");
   }
 
@@ -700,5 +709,5 @@ UpdateImplicitClasses(void)
 
 
 /*
- * End of "$Id: classes.c,v 1.34.2.24 2004/06/29 18:54:17 mike Exp $".
+ * End of "$Id: classes.c,v 1.34.2.25 2004/06/30 17:19:51 mike Exp $".
  */

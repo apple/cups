@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c,v 1.93.2.61 2004/06/29 18:54:17 mike Exp $"
+ * "$Id: printers.c,v 1.93.2.62 2004/06/30 17:19:51 mike Exp $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -110,6 +110,9 @@ AddPrinter(const char *name)	/* I - Name of printer */
 
   SetString(&p->job_sheets[0], "none");
   SetString(&p->job_sheets[1], "none");
+
+  SetString(&p->error_policy, "");
+  SetString(&p->op_policy, DefaultPolicy);
  
   if (MaxPrinterHistory)
     p->history = calloc(MaxPrinterHistory, sizeof(ipp_t *));
@@ -306,6 +309,7 @@ CreateCommonData(void)
 {
   int		i;			/* Looping var */
   ipp_attribute_t *attr;		/* Attribute data */
+  printer_t	*p;			/* Current printer */
   static const int nups[] =		/* number-up-supported values */
 		{ 1, 2, 4, 6, 9, 16 };
   static const ipp_orient_t orients[4] =/* orientation-requested-supported values */
@@ -493,6 +497,13 @@ CreateCommonData(void)
 	attr->values[i + 1].string.text = strdup(Banners[i].name);
     }
   }
+
+ /*
+  * Loop through the printers and update the op_policy_ptr values...
+  */
+
+  for (p = Printers; p; p = p->next)
+    p->op_policy_ptr = FindPolicy(p->op_policy);
 }
 
 
@@ -660,6 +671,8 @@ DeletePrinter(printer_t *p,		/* I - Printer to delete */
   ClearString(&p->job_sheets[0]);
   ClearString(&p->job_sheets[1]);
   ClearString(&p->device_uri);
+  ClearString(&p->op_policy);
+  ClearString(&p->error_policy);
 
   free(p);
 
@@ -860,8 +873,8 @@ LoadAllPrinters(void)
     * Decode the directive...
     */
 
-    if (strcmp(name, "<Printer") == 0 ||
-        strcmp(name, "<DefaultPrinter") == 0)
+    if (!strcasecmp(name, "<Printer") ||
+        !strcasecmp(name, "<DefaultPrinter"))
     {
      /*
       * <Printer name> or <DefaultPrinter name>
@@ -885,7 +898,7 @@ LoadAllPrinters(void)
         * Set the default printer as needed...
 	*/
 
-        if (strcmp(name, "<DefaultPrinter") == 0)
+        if (strcasecmp(name, "<DefaultPrinter") == 0)
 	  DefaultPrinter = p;
       }
       else
@@ -895,7 +908,7 @@ LoadAllPrinters(void)
         return;
       }
     }
-    else if (strcmp(name, "</Printer>") == 0)
+    else if (!strcasecmp(name, "</Printer>"))
     {
       if (p != NULL)
       {
@@ -916,24 +929,24 @@ LoadAllPrinters(void)
 	         linenum);
       return;
     }
-    else if (strcmp(name, "Info") == 0)
+    else if (!strcasecmp(name, "Info"))
       SetString(&p->info, value);
-    else if (strcmp(name, "Location") == 0)
+    else if (!strcasecmp(name, "Location"))
       SetString(&p->location, value);
-    else if (strcmp(name, "DeviceURI") == 0)
+    else if (!strcasecmp(name, "DeviceURI"))
       SetString(&p->device_uri, value);
-    else if (strcmp(name, "State") == 0)
+    else if (!strcasecmp(name, "State"))
     {
      /*
       * Set the initial queue state...
       */
 
-      if (strcasecmp(value, "idle") == 0)
+      if (!strcasecmp(value, "idle"))
         p->state = IPP_PRINTER_IDLE;
-      else if (strcasecmp(value, "stopped") == 0)
+      else if (!strcasecmp(value, "stopped"))
         p->state = IPP_PRINTER_STOPPED;
     }
-    else if (strcmp(name, "StateMessage") == 0)
+    else if (!strcasecmp(name, "StateMessage"))
     {
      /*
       * Set the initial queue state message...
@@ -944,18 +957,20 @@ LoadAllPrinters(void)
 
       strlcpy(p->state_message, value, sizeof(p->state_message));
     }
-    else if (strcmp(name, "Accepting") == 0)
+    else if (!strcasecmp(name, "Accepting"))
     {
      /*
       * Set the initial accepting state...
       */
 
-      if (strcasecmp(value, "yes") == 0)
+      if (!strcasecmp(value, "yes") ||
+          !strcasecmp(value, "on") ||
+          !strcasecmp(value, "true"))
         p->accepting = 1;
       else
         p->accepting = 0;
     }
-    else if (strcmp(name, "JobSheets") == 0)
+    else if (!strcasecmp(name, "JobSheets"))
     {
      /*
       * Set the initial job sheets...
@@ -981,22 +996,26 @@ LoadAllPrinters(void)
 	SetString(&p->job_sheets[1], value);
       }
     }
-    else if (strcmp(name, "AllowUser") == 0)
+    else if (!strcasecmp(name, "AllowUser"))
     {
       p->deny_users = 0;
       AddPrinterUser(p, value);
     }
-    else if (strcmp(name, "DenyUser") == 0)
+    else if (!strcasecmp(name, "DenyUser"))
     {
       p->deny_users = 1;
       AddPrinterUser(p, value);
     }
-    else if (strcmp(name, "QuotaPeriod") == 0)
+    else if (!strcasecmp(name, "QuotaPeriod"))
       p->quota_period = atoi(value);
-    else if (strcmp(name, "PageLimit") == 0)
+    else if (!strcasecmp(name, "PageLimit"))
       p->page_limit = atoi(value);
-    else if (strcmp(name, "KLimit") == 0)
+    else if (!strcasecmp(name, "KLimit"))
       p->k_limit = atoi(value);
+    else if (!strcasecmp(name, "OpPolicy"))
+      SetString(&p->op_policy, value);
+    else if (!strcasecmp(name, "ErrorPolicy"))
+      SetString(&p->error_policy, value);
     else
     {
      /*
@@ -1124,6 +1143,9 @@ SaveAllPrinters(void)
     for (i = 0; i < printer->num_users; i ++)
       cupsFilePrintf(fp, "%sUser %s\n", printer->deny_users ? "Deny" : "Allow",
               printer->users[i]);
+
+    cupsFilePrintf(fp, "OpPolicy %s\n", printer->op_policy);
+    cupsFilePrintf(fp, "ErrorPolicy %s\n", printer->error_policy);
 
     cupsFilePuts(fp, "</Printer>\n");
 
@@ -2429,5 +2451,5 @@ write_irix_state(printer_t *p)		/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c,v 1.93.2.61 2004/06/29 18:54:17 mike Exp $".
+ * End of "$Id: printers.c,v 1.93.2.62 2004/06/30 17:19:51 mike Exp $".
  */

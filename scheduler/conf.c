@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.77.2.56 2004/06/30 05:15:51 mike Exp $"
+ * "$Id: conf.c,v 1.77.2.57 2004/06/30 17:19:51 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -102,6 +102,7 @@ static var_t	variables[] =
   { "DataDir",			&DataDir,		VAR_STRING },
   { "DefaultCharset",		&DefaultCharset,	VAR_STRING },
   { "DefaultLanguage",		&DefaultLanguage,	VAR_STRING },
+  { "DefaultPolicy",		&DefaultPolicy,		VAR_STRING },
   { "DocumentRoot",		&DocumentRoot,		VAR_STRING },
   { "ErrorLog",			&ErrorLog,		VAR_STRING },
   { "FaxRetryLimit",		&FaxRetryLimit,		VAR_INTEGER },
@@ -408,6 +409,8 @@ ReadConfiguration(void)
   MaxJobsPerUser      = 0;
   MaxCopies           = 100;
 
+  ClearString(&DefaultPolicy);
+
  /*
   * Read the configuration file...
   */
@@ -623,6 +626,135 @@ ReadConfiguration(void)
 
   LogMessage(L_INFO, "Allowing up to %d client connections per host.",
              MaxClientsPerHost);
+
+ /*
+  * Update the default policy, as needed...
+  */
+
+  if (DefaultPolicy)
+    DefaultPolicyPtr = FindPolicy(DefaultPolicy);
+  else
+    DefaultPolicyPtr = NULL;
+
+  if (!DefaultPolicyPtr)
+  {
+    policy_t	*p;			/* New policy */
+    policyop_t	*po;			/* New policy operation */
+    char	groupname[255];		/* Group name */
+
+
+    if (DefaultPolicy)
+      LogMessage(L_ERROR, "Default policy \"%s\" not found!", DefaultPolicy);
+
+    if ((DefaultPolicyPtr = FindPolicy("default")) != NULL)
+      LogMessage(L_INFO, "Using policy \"default\" as the default!");
+    else
+    {
+      LogMessage(L_INFO, "Creating CUPS default administrative policy:");
+
+      DefaultPolicyPtr = p = AddPolicy("default");
+
+      LogMessage(L_INFO, "<Policy default>");
+      LogMessage(L_INFO, "<Limit Send-Document Send-URI Cancel-Job Hold-Job "
+                         "Release-Job Restart-Job Purge-Jobs "
+			 "Set-Job-Attributes Create-Job-Subscription "
+			 "Renew-Subscription Cancel-Subscription "
+			 "Get-Notifications Reprocess-Job Cancel-Current-Job "
+			 "Suspend-Current-Job Resume-Job CUPS-Move-Job>");
+      LogMessage(L_INFO, "Order Deny,Allow");
+      LogMessage(L_INFO, "Allow @OWNER");
+
+      po = AddPolicyOp(p, NULL, IPP_SEND_DOCUMENT);
+      po->order_type = POLICY_DENY;
+
+      AddPolicyOpName(po, POLICY_ALLOW, "@OWNER");
+
+      for (i = 0; i < NumSystemGroups; i ++)
+      {
+        snprintf(groupname, sizeof(groupname), "@%s", SystemGroups[i]);
+	AddPolicyOpName(po, POLICY_ALLOW, groupname);
+	LogMessage(L_INFO, "Allow %s", groupname);
+      }
+
+      AddPolicyOp(p, po, IPP_SEND_URI);
+      AddPolicyOp(p, po, IPP_CANCEL_JOB);
+      AddPolicyOp(p, po, IPP_HOLD_JOB);
+      AddPolicyOp(p, po, IPP_RELEASE_JOB);
+      AddPolicyOp(p, po, IPP_RESTART_JOB);
+      AddPolicyOp(p, po, IPP_PURGE_JOBS);
+      AddPolicyOp(p, po, IPP_SET_JOB_ATTRIBUTES);
+      AddPolicyOp(p, po, IPP_CREATE_JOB_SUBSCRIPTION);
+      AddPolicyOp(p, po, IPP_RENEW_SUBSCRIPTION);
+      AddPolicyOp(p, po, IPP_CANCEL_SUBSCRIPTION);
+      AddPolicyOp(p, po, IPP_GET_NOTIFICATIONS);
+      AddPolicyOp(p, po, IPP_REPROCESS_JOB);
+      AddPolicyOp(p, po, IPP_CANCEL_CURRENT_JOB);
+      AddPolicyOp(p, po, IPP_SUSPEND_CURRENT_JOB);
+      AddPolicyOp(p, po, IPP_RESUME_JOB);
+      AddPolicyOp(p, po, CUPS_MOVE_JOB);
+
+      LogMessage(L_INFO, "</Limit>");
+
+      LogMessage(L_INFO, "<Limit Pause-Printer Resume-Printer "
+                         "Set-Printer-Attributes Enable-Printer "
+			 "Disable-Printer Pause-Printer-After-Current-Job "
+			 "Hold-New-Jobs Release-Held-New-Jobs Deactivate-Printer "
+			 "Activate-Printer Restart-Printer Shutdown-Printer "
+			 "Startup-Printer Promote-Job Schedule-Job-After "
+			 "CUPS-Add-Printer CUPS-Delete-Printer "
+			 "CUPS-Add-Class CUPS-Delete-Class "
+			 "CUPS-Accept-Jobs CUPS-Reject-Jobs "
+			 "CUPS-Set-Default CUPS-Add-Device CUPS-Delete-Device>");
+      LogMessage(L_INFO, "Order Deny,Allow");
+      LogMessage(L_INFO, "Authenticate yes");
+
+      po = AddPolicyOp(p, NULL, IPP_PAUSE_PRINTER);
+      po->order_type   = POLICY_DENY;
+      po->authenticate = 1;
+
+      for (i = 0; i < NumSystemGroups; i ++)
+      {
+        snprintf(groupname, sizeof(groupname), "@%s", SystemGroups[i]);
+	AddPolicyOpName(po, POLICY_ALLOW, groupname);
+	LogMessage(L_INFO, "Allow %s", groupname);
+      }
+
+      AddPolicyOp(p, po, IPP_RESUME_PRINTER);
+      AddPolicyOp(p, po, IPP_SET_PRINTER_ATTRIBUTES);
+      AddPolicyOp(p, po, IPP_ENABLE_PRINTER);
+      AddPolicyOp(p, po, IPP_DISABLE_PRINTER);
+      AddPolicyOp(p, po, IPP_PAUSE_PRINTER_AFTER_CURRENT_JOB);
+      AddPolicyOp(p, po, IPP_HOLD_NEW_JOBS);
+      AddPolicyOp(p, po, IPP_RELEASE_HELD_NEW_JOBS);
+      AddPolicyOp(p, po, IPP_DEACTIVATE_PRINTER);
+      AddPolicyOp(p, po, IPP_ACTIVATE_PRINTER);
+      AddPolicyOp(p, po, IPP_RESTART_PRINTER);
+      AddPolicyOp(p, po, IPP_SHUTDOWN_PRINTER);
+      AddPolicyOp(p, po, IPP_STARTUP_PRINTER);
+      AddPolicyOp(p, po, IPP_PROMOTE_JOB);
+      AddPolicyOp(p, po, IPP_SCHEDULE_JOB_AFTER);
+      AddPolicyOp(p, po, CUPS_ADD_PRINTER);
+      AddPolicyOp(p, po, CUPS_DELETE_PRINTER);
+      AddPolicyOp(p, po, CUPS_ADD_CLASS);
+      AddPolicyOp(p, po, CUPS_DELETE_CLASS);
+      AddPolicyOp(p, po, CUPS_ACCEPT_JOBS);
+      AddPolicyOp(p, po, CUPS_REJECT_JOBS);
+      AddPolicyOp(p, po, CUPS_SET_DEFAULT);
+      AddPolicyOp(p, po, CUPS_ADD_DEVICE);
+      AddPolicyOp(p, po, CUPS_DELETE_DEVICE);
+
+      LogMessage(L_INFO, "</Limit>");
+
+      LogMessage(L_INFO, "<Limit Any>");
+      LogMessage(L_INFO, "Order Allow,Deny");
+
+      po = AddPolicyOp(p, NULL, IPP_ANY_OPERATION);
+      po->order_type = POLICY_ALLOW;
+
+      LogMessage(L_INFO, "</Limit>");
+      LogMessage(L_INFO, "</Policy>");
+    }
+  }
 
  /*
   * If we are doing a full reload or the server root has changed, flush
@@ -2575,44 +2707,74 @@ get_operation(const char *name)		/* I - Operating name */
   int		i;			/* Looping var */
   static const char * const ipp_ops[] =	/* List of standard operations */
 		{
-		  "all",
-		  "",
-		  "print-job",
-		  "print-uri",
-		  "validate-job",
-		  "create-job",
-		  "send-document",
-		  "send-uri",
-		  "cancel-job",
-		  "get-job-attributes",
-		  "get-jobs",
-		  "get-printer-attributes",
-		  "hold-job",
-		  "release-job",
-		  "restart-job",
-		  "",
-		  "pause-printer",
-		  "resume-printer",
-		  "purge-jobs",
-		  "set-printer-attributes",
-		  "set-job-attributes",
-		  "get-printer-supported-values"
+		  /* 0x0000 */ "all",
+		  /* 0x0001 */ "",
+		  /* 0x0002 */ "print-job",
+		  /* 0x0003 */ "print-uri",
+		  /* 0x0004 */ "validate-job",
+		  /* 0x0005 */ "create-job",
+		  /* 0x0006 */ "send-document",
+		  /* 0x0007 */ "send-uri",
+		  /* 0x0008 */ "cancel-job",
+		  /* 0x0009 */ "get-job-attributes",
+		  /* 0x000a */ "get-jobs",
+		  /* 0x000b */ "get-printer-attributes",
+		  /* 0x000c */ "hold-job",
+		  /* 0x000d */ "release-job",
+		  /* 0x000e */ "restart-job",
+		  /* 0x000f */ "",
+		  /* 0x0010 */ "pause-printer",
+		  /* 0x0011 */ "resume-printer",
+		  /* 0x0012 */ "purge-jobs",
+		  /* 0x0013 */ "set-printer-attributes",
+		  /* 0x0014 */ "set-job-attributes",
+		  /* 0x0015 */ "get-printer-supported-values",
+		  /* 0x0016 */ "create-printer-subscription",
+		  /* 0x0017 */ "create-job-subscription",
+		  /* 0x0018 */ "get-subscription-attributes",
+		  /* 0x0019 */ "get-subscriptions",
+		  /* 0x001a */ "renew-subscription",
+		  /* 0x001b */ "cancel-subscription",
+		  /* 0x001c */ "get-notifications",
+		  /* 0x001d */ "send-notifications",
+		  /* 0x001e */ "",
+		  /* 0x001f */ "",
+		  /* 0x0020 */ "",
+		  /* 0x0021 */ "get-print-support-files",
+		  /* 0x0022 */ "enable-printer",
+		  /* 0x0023 */ "disable-printer",
+		  /* 0x0024 */ "pause-printer-after-current-job",
+		  /* 0x0025 */ "hold-new-jobs",
+		  /* 0x0026 */ "release-held-new-jobs",
+		  /* 0x0027 */ "deactivate-printer",
+		  /* 0x0028 */ "activate-printer",
+		  /* 0x0029 */ "restart-printer",
+		  /* 0x002a */ "shutdown-printer",
+		  /* 0x002b */ "startup-printer",
+		  /* 0x002c */ "reprocess-job",
+		  /* 0x002d */ "cancel-current-job",
+		  /* 0x002e */ "suspend-current-job",
+		  /* 0x002f */ "resume-job",
+		  /* 0x0030 */ "promote-job",
+		  /* 0x0031 */ "schedule-job-after"
 		},
 		*cups_ops[] =		/* List of CUPS operations */
 		{
-		  "cups-get-default",
-		  "cups-get-printers",
-		  "cups-add-printer",
-		  "cups-delete-printer",
-		  "cups-get-classes",
-		  "cups-add-class",
-		  "cups-delete-class",
-		  "cups-accept-jobs",
-		  "cups-reject-jobs",
-		  "cups-set-default",
-		  "cups-get-devices",
-		  "cups-get-ppds",
-		  "cups-move-job"
+		  /* 0x4001 */ "cups-get-default",
+		  /* 0x4002 */ "cups-get-printers",
+		  /* 0x4003 */ "cups-add-printer",
+		  /* 0x4004 */ "cups-delete-printer",
+		  /* 0x4005 */ "cups-get-classes",
+		  /* 0x4006 */ "cups-add-class",
+		  /* 0x4007 */ "cups-delete-class",
+		  /* 0x4008 */ "cups-accept-jobs",
+		  /* 0x4009 */ "cups-reject-jobs",
+		  /* 0x400a */ "cups-set-default",
+		  /* 0x400b */ "cups-get-devices",
+		  /* 0x400c */ "cups-get-ppds",
+		  /* 0x400d */ "cups-move-job",
+		  /* 0x400e */ "cups-add-device",
+		  /* 0x400f */ "cups-delete-device"
 		};
 
 
@@ -2718,5 +2880,5 @@ CDSAGetServerCerts(void)
 
 
 /*
- * End of "$Id: conf.c,v 1.77.2.56 2004/06/30 05:15:51 mike Exp $".
+ * End of "$Id: conf.c,v 1.77.2.57 2004/06/30 17:19:51 mike Exp $".
  */

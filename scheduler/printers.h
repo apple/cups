@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h,v 1.22.2.17 2004/06/29 13:15:11 mike Exp $"
+ * "$Id: printers.h,v 1.22.2.18 2004/06/30 17:19:51 mike Exp $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -92,8 +92,13 @@ VAR int			NumPrinters	VALUE(0);
 					/* Number of printers */
 VAR printer_t		*Printers	VALUE(NULL);
 					/* Printer list */
-VAR printer_t		*DefaultPrinter VALUE(NULL);
+VAR printer_t		*DefaultPrinter	VALUE(NULL);
 					/* Default printer */
+VAR char		*DefaultPolicy	VALUE(NULL);
+					/* Default policy name */
+VAR policy_t		*DefaultPolicyPtr
+					VALUE(NULL);
+					/* Pointer to default policy */
 
 
 /*
@@ -131,5 +136,5 @@ extern void		WritePrintcap(void);
 
 
 /*
- * End of "$Id: printers.h,v 1.22.2.17 2004/06/29 13:15:11 mike Exp $".
+ * End of "$Id: printers.h,v 1.22.2.18 2004/06/30 17:19:51 mike Exp $".
  */
