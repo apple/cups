@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.65 2002/06/14 19:39:17 mike Exp $"
+# "$Id: Makefile,v 1.66 2002/07/30 19:09:27 mike Exp $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -45,7 +45,7 @@ OBJS	=	$(HPGLOBJS) $(IMAGEOBJS) $(FORMOBJS) \
 # Make all targets...
 #
 
-all:	$(TARGETS)
+all:	$(TARGETS) libcupsimage.a
 
 
 #
@@ -85,6 +85,10 @@ install:	all installhdrs
 		$(RM) $(LIBDIR)/libcupsimage.dylib; \
 		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/libcupsimage.dylib; \
 	fi
+	-if test $(LIBCUPSIMAGE) != "libcupsimage.a"; then \
+		$(INSTALL_LIB) libcupsimage.a $(LIBDIR); \
+	fi
+	$(RANLIB) $(LIBDIR)/libcupsimage.a
 
 installhdrs:
 	$(INSTALL_DIR) $(INCLUDEDIR)/cups
@@ -245,5 +249,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile,v 1.65 2002/06/14 19:39:17 mike Exp $".
+# End of "$Id: Makefile,v 1.66 2002/07/30 19:09:27 mike Exp $".
 #
