@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.h,v 1.8 1999/04/07 14:44:13 mike Exp $"
+ * "$Id: raster.h,v 1.9 1999/05/26 19:37:09 mike Exp $"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -129,8 +129,13 @@ typedef enum
   CUPS_CSPACE_CMYK,			/* Cyan, magenta, yellow, black */
   CUPS_CSPACE_YMCK,			/* Yellow, magenta, cyan, black */
   CUPS_CSPACE_KCMY,			/* Black, cyan, magenta, yellow */
-  CUPS_CSPACE_KCMYcm			/* Black, cyan, magenta, yellow, *
+  CUPS_CSPACE_KCMYcm,			/* Black, cyan, magenta, yellow, *
 					 * light-cyan, light-magenta     */
+  CUPS_CSPACE_GMCK,			/* Gold, magenta, yellow, black */
+  CUPS_CSPACE_GMCS,			/* Gold, magenta, yellow, silver */
+  CUPS_CSPACE_WHITE,			/* White ink (as black) */
+  CUPS_CSPACE_GOLD,			/* Gold foil */
+  CUPS_CSPACE_SILVER			/* Silver foil */
 } cups_cspace_t;
 
 
@@ -224,5 +229,5 @@ extern unsigned		cupsRasterWritePixels(cups_raster_t *r,
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h,v 1.8 1999/04/07 14:44:13 mike Exp $".
+ * End of "$Id: raster.h,v 1.9 1999/05/26 19:37:09 mike Exp $".
  */
