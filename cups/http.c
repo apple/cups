@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.95 2002/03/01 19:53:28 mike Exp $"
+ * "$Id: http.c,v 1.96 2002/04/09 19:27:06 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1152,7 +1152,7 @@ httpRead(http_t *http,			/* I - HTTP data */
   char		len[32];		/* Length string */
 
 
-  DEBUG_printf(("httpRead(%08x, %08x, %d)\n", http, buffer, length));
+  DEBUG_printf(("httpRead(%p, %p, %d)\n", http, buffer, length));
 
   if (http == NULL || buffer == NULL)
     return (-1);
@@ -1288,6 +1288,38 @@ httpRead(http_t *http,			/* I - HTTP data */
     }
   }
 
+#ifdef DEBUG
+  {
+    int i, j, ch;
+    printf("httpRead: Read %d bytes:\n", bytes);
+    for (i = 0; i < bytes; i += 16)
+    {
+      printf("   ");
+
+      for (j = 0; j < 16 && (i + j) < bytes; j ++)
+        printf(" %02X", buffer[i + j] & 255);
+
+      while (j < 16)
+      {
+        printf("   ");
+	j ++;
+      }
+
+      printf("    ");
+      for (j = 0; j < 16 && (i + j) < bytes; j ++)
+      {
+        ch = buffer[i + j] & 255;
+
+	if (ch < ' ' || ch == 127)
+	  ch = '.';
+
+        putchar(ch);
+      }
+      putchar('\n');
+    }
+  }
+#endif /* DEBUG */
+
   return (bytes);
 }
 
@@ -1381,8 +1413,37 @@ httpWrite(http_t     *http,		/* I - HTTP data */
       http->state = HTTP_WAITING;
   }
 
-  DEBUG_printf(("httpWrite: wrote %d bytes...\n", tbytes));
+#ifdef DEBUG
+  {
+    int i, j, ch;
+    printf("httpWrite: wrote %d bytes: \n", tbytes);
+    for (i = 0, buffer -= tbytes; i < tbytes; i += 16)
+    {
+      printf("   ");
 
+      for (j = 0; j < 16 && (i + j) < tbytes; j ++)
+        printf(" %02X", buffer[i + j] & 255);
+
+      while (j < 16)
+      {
+        printf("   ");
+	j ++;
+      }
+
+      printf("    ");
+      for (j = 0; j < 16 && (i + j) < tbytes; j ++)
+      {
+        ch = buffer[i + j] & 255;
+
+	if (ch < ' ' || ch == 127)
+	  ch = '.';
+
+        putchar(ch);
+      }
+      putchar('\n');
+    }
+  }
+#endif /* DEBUG */
   return (tbytes);
 }
 
@@ -1402,7 +1463,7 @@ httpGets(char   *line,			/* I - Line to read into */
   int	bytes;				/* Number of bytes read */
 
 
-  DEBUG_printf(("httpGets(%08x, %d, %08x)\n", line, length, http));
+  DEBUG_printf(("httpGets(%p, %d, %p)\n", line, length, http));
 
   if (http == NULL || line == NULL)
     return (NULL);
@@ -1691,7 +1752,7 @@ httpUpdate(http_t *http)		/* I - HTTP data */
 #endif /* HAVE_LIBSSL */
 
 
-  DEBUG_printf(("httpUpdate(%08x)\n", http));
+  DEBUG_printf(("httpUpdate(%p)\n", http));
 
  /*
   * If we haven't issued any commands, then there is nothing to "update"...
@@ -1966,7 +2027,7 @@ httpEncode64(char       *out,	/* I - String to write to */
 int				/* O - Content length */
 httpGetLength(http_t *http)	/* I - HTTP data */
 {
-  DEBUG_printf(("httpGetLength(%08x)\n", http));
+  DEBUG_printf(("httpGetLength(%p)\n", http));
 
   if (strcasecmp(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked") == 0)
   {
@@ -2219,5 +2280,5 @@ http_upgrade(http_t *http)	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.95 2002/03/01 19:53:28 mike Exp $".
+ * End of "$Id: http.c,v 1.96 2002/04/09 19:27:06 mike Exp $".
  */

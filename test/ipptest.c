@@ -1,5 +1,5 @@
 /*
- * "$Id: ipptest.c,v 1.13 2002/04/05 15:37:19 mike Exp $"
+ * "$Id: ipptest.c,v 1.14 2002/04/09 19:27:07 mike Exp $"
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
@@ -111,6 +111,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
          const char *testfile)		/* I - Test file to use */
 {
   int		i;			/* Looping var */
+  int		version;		/* IPP version number to use */
   http_t	*http;			/* HTTP connection to server */
   char		method[HTTP_MAX_URI],	/* URI method */
 		userpass[HTTP_MAX_URI],	/* username:password */
@@ -166,8 +167,9 @@ do_tests(const char *uri,		/* I - URI to connect on */
   */
 
   printf("\"%s\":\n", testfile);
-  pass   = 1;
-  job_id = 0;
+  pass    = 1;
+  job_id  = 0;
+  version = 1;
 
   while (get_token(fp, token, sizeof(token)) != NULL)
   {
@@ -215,6 +217,15 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	*/
 
 	get_token(fp, name, sizeof(name));
+      }
+      else if (strcasecmp(token, "VERSION") == 0)
+      {
+       /*
+        * IPP version number for test...
+	*/
+
+	get_token(fp, temp, sizeof(temp));
+	sscanf(temp, "%*d.%d", &version);
       }
       else if (strcasecmp(token, "RESOURCE") == 0)
       {
@@ -387,6 +398,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
     * Submit the IPP request...
     */
 
+    request->request.op.version[1]   = version;
     request->request.op.operation_id = op;
     request->request.op.request_id   = 1;
 
@@ -810,5 +822,5 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 
 
 /*
- * End of "$Id: ipptest.c,v 1.13 2002/04/05 15:37:19 mike Exp $".
+ * End of "$Id: ipptest.c,v 1.14 2002/04/09 19:27:07 mike Exp $".
  */
