@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.94 2003/02/19 18:08:10 mike Exp $"
+ * "$Id: ppd.c,v 1.95 2003/02/19 22:02:39 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -566,7 +566,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
     if (option == NULL)
     {
       for (i = 0; i < (int)(sizeof(ui_keywords) / sizeof(ui_keywords[0])); i ++)
-        if (!strcmp(name, ui_keywords[i]))
+        if (!strcmp(keyword, ui_keywords[i]))
 	  break;
 
       if (i < (int)(sizeof(ui_keywords) / sizeof(ui_keywords[0])))
@@ -577,14 +577,17 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
         ui_keyword = 1;
 
+        DEBUG_printf(("**** FOUND ADOBE UI KEYWORD %s WITHOUT OPENUI!\n",
+	              keyword));
+
         if (!group)
 	{
-          if (strcmp(name, "Collate") && strcmp(name, "Duplex") &&
-              strcmp(name, "InputSlot") && strcmp(name, "ManualFeed") &&
-              strcmp(name, "MediaType") && strcmp(name, "MediaColor") &&
-              strcmp(name, "MediaWeight") && strcmp(name, "OutputBin") &&
-              strcmp(name, "OutputMode") && strcmp(name, "OutputOrder") &&
-	      strcmp(name, "PageSize") && strcmp(name, "PageRegion"))
+          if (strcmp(keyword, "Collate") && strcmp(keyword, "Duplex") &&
+              strcmp(keyword, "InputSlot") && strcmp(keyword, "ManualFeed") &&
+              strcmp(keyword, "MediaType") && strcmp(keyword, "MediaColor") &&
+              strcmp(keyword, "MediaWeight") && strcmp(keyword, "OutputBin") &&
+              strcmp(keyword, "OutputMode") && strcmp(keyword, "OutputOrder") &&
+	      strcmp(keyword, "PageSize") && strcmp(keyword, "PageRegion"))
 	    group = ppd_get_group(ppd, "Extra",
 	                          cupsLangString(language, CUPS_MSG_EXTRA));
 	  else
@@ -611,11 +614,11 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	  }
 
           DEBUG_printf(("Adding to group %s...\n", group->text));
-          option = ppd_get_option(group, name);
+          option = ppd_get_option(group, keyword);
 	  group  = NULL;
 	}
 	else
-          option = ppd_get_option(group, name);
+          option = ppd_get_option(group, keyword);
 
 	if (option == NULL)
 	{
@@ -640,7 +643,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	* Now fill in the initial information for the option...
 	*/
 
-	if (!strncmp(name, "JCL", 3))
+	if (!strncmp(keyword, "JCL", 3))
           option->section = PPD_ORDER_JCL;
 	else
           option->section = PPD_ORDER_ANY;
@@ -651,6 +654,16 @@ ppdOpen(FILE *fp)			/* I - File to read from */
           option->ui = PPD_UI_BOOLEAN;
 	else
           option->ui = PPD_UI_PICKONE;
+
+        for (j = 0; j < ppd->num_attrs; j ++)
+	  if (!strncmp(ppd->attrs[j]->name, "Default", 7) &&
+	      !strcmp(ppd->attrs[j]->name + 7, keyword) &&
+	      ppd->attrs[j]->value)
+	  {
+	    strlcpy(option->defchoice, ppd->attrs[j]->value,
+	            sizeof(option->defchoice));
+	    break;
+	  }
       }
     }
 
@@ -1330,6 +1343,16 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 	return (NULL);
       }
 
+      for (j = 0; j < ppd->num_attrs; j ++)
+	if (!strncmp(ppd->attrs[j]->name, "Default", 7) &&
+	    !strcmp(ppd->attrs[j]->name + 7, name) &&
+	    ppd->attrs[j]->value)
+	{
+	  strlcpy(option->defchoice, ppd->attrs[j]->value,
+	          sizeof(option->defchoice));
+	  break;
+	}
+
       if (text[0])
       {
         strlcpy(option->text, text, sizeof(option->text));
@@ -1464,6 +1487,16 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 
 	return (NULL);
       }
+
+      for (j = 0; j < ppd->num_attrs; j ++)
+	if (!strncmp(ppd->attrs[j]->name, "Default", 7) &&
+	    !strcmp(ppd->attrs[j]->name + 7, name) &&
+	    ppd->attrs[j]->value)
+	{
+	  strlcpy(option->defchoice, ppd->attrs[j]->value,
+	          sizeof(option->defchoice));
+	  break;
+	}
 
       strlcpy(option->text, text, sizeof(option->text));
 
@@ -2949,5 +2982,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.94 2003/02/19 18:08:10 mike Exp $".
+ * End of "$Id: ppd.c,v 1.95 2003/02/19 22:02:39 mike Exp $".
  */
