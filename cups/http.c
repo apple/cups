@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.15 1999/02/09 17:12:08 mike Exp $"
+ * "$Id: http.c,v 1.16 1999/02/09 22:01:24 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -686,7 +686,7 @@ httpWrite(http_t *http,			/* I - HTTP data */
 
   http->activity = time(NULL);
 
-  if (http->version == HTTP_1_1 &&
+  if (http->data_encoding == HTTP_ENCODE_CHUNKED &&
       (http->state == HTTP_GET_SEND || http->state == HTTP_POST_RECV ||
        http->state == HTTP_POST_SEND || http->state == HTTP_PUT_RECV))
   {
@@ -839,7 +839,7 @@ httpPrintf(http_t     *http,		/* I - HTTP data */
   bytes = vsprintf(buf, format, ap);
   va_end(ap);
 
-  return (httpWrite(http, buf, bytes));
+  return (send(http->fd, buf, bytes, 0));
 }
 
 
@@ -968,6 +968,7 @@ httpUpdate(http_t *http)		/* I - HTTP data */
   while (httpGets(line, sizeof(line), http) != NULL)
   {
     puts(line);
+
     if (line[0] == '\0')
     {
      /*
@@ -1299,5 +1300,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.15 1999/02/09 17:12:08 mike Exp $".
+ * End of "$Id: http.c,v 1.16 1999/02/09 22:01:24 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: testhttp.c,v 1.4 1999/02/05 17:40:56 mike Exp $"
+ * "$Id: testhttp.c,v 1.5 1999/02/09 22:01:25 mike Exp $"
  *
  *   HTTP test program for the Common UNIX Printing System (CUPS).
  *
@@ -49,18 +49,20 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		bytes;		/* Number of bytes read */
   FILE		*out;		/* Output file */
 
+#define HOST "localhost"
+#define PORT 8631
 
-  puts("Connecting to dns.easysw.com...");
+  puts("Connecting to " HOST "...");
 
   httpInitialize();
-  http = httpConnect("dns.easysw.com", 80);
+  http = httpConnect(HOST, PORT);
   if (http == NULL)
   {
-    puts("Unable to connect to dns.easysw.com!");
+    puts("Unable to connect to " HOST "!");
     return (1);
   }
 
-  puts("Connected to dns.easysw.com...");
+  puts("Connected to " HOST "...");
 
   out = stdout;
 
@@ -75,6 +77,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     printf("Requesting file \"%s\"...\n", argv[i]);
     httpClearFields(http);
+    httpSetField(http, HTTP_FIELD_ACCEPT_LANGUAGE, "en");
     httpGet(http, argv[i]);
     status = httpUpdate(http);
 
@@ -102,5 +105,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testhttp.c,v 1.4 1999/02/05 17:40:56 mike Exp $".
+ * End of "$Id: testhttp.c,v 1.5 1999/02/09 22:01:25 mike Exp $".
  */
