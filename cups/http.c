@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.114 2003/03/03 17:59:56 mike Exp $"
+ * "$Id: http.c,v 1.115 2003/03/13 05:44:22 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -29,6 +29,7 @@
  *                          default HTTP proxy (if any).
  *   httpCheck()          - Check to see if there is a pending response from
  *                          the server.
+ *   httpClearCookie()    - Clear the cookie value(s).
  *   httpClose()          - Close an HTTP connection...
  *   httpConnect()        - Connect to a HTTP server.
  *   httpConnectEncrypt() - Connect to a HTTP server using encryption.
@@ -45,6 +46,7 @@
  *   httpTrace()          - Send an TRACE request to the server.
  *   httpFlush()          - Flush data from a HTTP connection.
  *   httpRead()           - Read data from a HTTP connection.
+ *   httpSetCookie()      - Set the cookie value(s)...
  *   httpWait()           - Wait for data available on a connection.
  *   httpWrite()          - Write data to a HTTP connection.
  *   httpGets()           - Get a line of text from a HTTP connection.
@@ -261,6 +263,24 @@ httpCheck(http_t *http)		/* I - HTTP connection */
 
 
 /*
+ * 'httpClearCookie()' - Clear the cookie value(s).
+ */
+
+void
+httpClearCookie(http_t *http)			/* I - Connection */
+{
+  if (!http)
+    return;
+
+  if (http->cookie)
+  {
+    free(http->cookie);
+    http->cookie = NULL;
+  }
+}
+
+
+/*
  * 'httpClose()' - Close an HTTP connection...
  */
 
@@ -272,6 +292,9 @@ httpClose(http_t *http)		/* I - Connection to close */
 
   if (http->input_set)
     free(http->input_set);
+
+  if (http->cookie)
+    free(http->cookie);
 
 #ifdef HAVE_SSL
   if (http->tls)
@@ -1013,6 +1036,27 @@ httpRead(http_t *http,			/* I - HTTP data */
 
 
 /*
+ * 'httpSetCookie()' - Set the cookie value(s)...
+ */
+
+void
+httpSetCookie(http_t     *http,			/* I - Connection */
+              const char *cookie)		/* I - Cookie string */
+{
+  if (!http)
+    return;
+
+  if (http->cookie)
+    free(http->cookie);
+
+  if (cookie)
+    http->cookie = strdup(cookie);
+  else
+    http->cookie = NULL;
+}
+
+
+/*
  * 'httpWait()' - Wait for data available on a connection.
  */
 
@@ -1595,13 +1639,29 @@ httpUpdate(http_t *http)		/* I - HTTP data */
       * Be tolerants of servers that send unknown attribute fields...
       */
 
-      if ((field = http_field(line)) == HTTP_FIELD_UNKNOWN)
+      if (!strcasecmp(line, "expect"))
+      {
+       /*
+        * "Expect: 100-continue" or similar...
+	*/
+
+        http->expect = (http_status_t)atoi(value);
+      }
+      else if (!strcasecmp(line, "cookie"))
+      {
+       /*
+        * "Cookie: name=value[; name=value ...]" - replaces previous cookies...
+	*/
+
+        httpSetCookie(http, value);
+      }
+      else if ((field = http_field(line)) == HTTP_FIELD_UNKNOWN)
       {
         DEBUG_printf(("httpUpdate: unknown field %s seen!\n", line));
         continue;
       }
-
-      httpSetField(http, field, value);
+      else
+        httpSetField(http, field, value);
     }
     else
     {
@@ -2287,5 +2347,5 @@ CDSAWriteFunc(SSLConnectionRef connection,	/* I  - SSL/TLS connection */
 
 
 /*
- * End of "$Id: http.c,v 1.114 2003/03/03 17:59:56 mike Exp $".
+ * End of "$Id: http.c,v 1.115 2003/03/13 05:44:22 mike Exp $".
  */
