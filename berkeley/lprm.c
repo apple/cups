@@ -1,5 +1,5 @@
 /*
- * "$Id: lprm.c,v 1.17 2002/01/02 17:58:35 mike Exp $"
+ * "$Id: lprm.c,v 1.18 2002/06/05 20:13:12 mike Exp $"
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
@@ -32,10 +32,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
 
 #include <cups/cups.h>
 #include <cups/language.h>
+#include <cups/string.h>
 
 
 /*
@@ -263,5 +263,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lprm.c,v 1.17 2002/01/02 17:58:35 mike Exp $".
+ * End of "$Id: lprm.c,v 1.18 2002/06/05 20:13:12 mike Exp $".
  */

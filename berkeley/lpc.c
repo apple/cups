@@ -1,5 +1,5 @@
 /*
- * "$Id: lpc.c,v 1.13 2002/01/02 17:58:35 mike Exp $"
+ * "$Id: lpc.c,v 1.14 2002/06/05 20:13:12 mike Exp $"
  *
  *   "lpc" command for the Common UNIX Printing System (CUPS).
  *
@@ -40,6 +40,7 @@
 #include <cups/cups.h>
 #include <cups/language.h>
 #include <cups/debug.h>
+#include <cups/string.h>
 
 
 /*
@@ -477,5 +478,5 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpc.c,v 1.13 2002/01/02 17:58:35 mike Exp $".
+ * End of "$Id: lpc.c,v 1.14 2002/06/05 20:13:12 mike Exp $".
  */
