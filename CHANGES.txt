@@ -1,6 +1,275 @@
 CHANGES.txt - 03/13/2000
 ------------------------
 
+CHANGES IN CUPS v1.1b5
+
+	- Documentation updates.
+	- The pstoraster filter didn't compile without the JPEG library.
+	- The cupsd server didn't support the HTTP OPTIONS request
+	  method.
+	- Dropped the "CLOSE" method supported by the cupsd server.
+	  (not defined in HTTP specification)
+	- Makefile/configure script fixes.
+	- Missing the job-restart template.
+	- Added IPP test suite for testing.
+	- Missing IPP documentation from binary distributions.
+	- Fixed multiple-document handling code when last-document
+	  not specified.
+	- Added more checks to IPP requests to prevent bad requests
+	  from getting through.
+	- Not all of the Ghostscript error output was being sent to
+	  stderr.
+	- The PostScript filter now added PJL commands to set the
+	  job name and display string, if supported.
+	- The scheduler would crash if the browse socket could not
+	  be bound. Now disables browsing if port 631 (reserved for
+	  IPP) is being used by a misbehaving daemon.
+	- The USB backend now looks for the older Linux 2.2.x USB
+	  printer device filenames as well as the newer ones.
+	- The IPP backend now uses the UTF-8 charset exclusively,
+	  since apparently only CUPS handles more than US-ASCII and
+	  UTF-8...
+	- Wasn't quoting ( in PostScript banners...
+	- Send-document requests with no document-format attribute
+	  could cause cupsd to crash.
+	- Old jobs in the spool directory might cause cupsd to
+	  crash.
+	- CUPS now supports all of the recommended job-hold-until
+	  keywords as well as name values of the form "HH:MM" and
+	  "HH:MM:SS".
+	- Added placeholder pointer for TLS encryption to the HTTP
+	  connection structure.
+	- Fixed the "fast poll" bug reported by DISA - the
+	  status pipe wasn't being closed for multi-file jobs.
+	- Revamped put_params code in pstoraster to fix bitmap
+	  allocation bug with FrameMaker output.
+	- Ripped out filename, etc. code from pstoraster as it
+	  is a potential security hole.
+	- Added support for RIP_CACHE environment variable in the
+	  new pstoraster.
+	- Fixed USB device filenames for Linux; now support new
+	  pre-2.4 devices (/dev/usb/lp#) and 2.2 devices
+	  (/dev/usblp#)
+	- Fixed accept-jobs crash with classes.
+	- Didn't include dot-matrix EPSON drivers in previous
+	  release.
+
+
+CHANGES IN CUPS v1.1b4
+
+	- Documentation updates.
+
+	- Many makefile and configuration script fixes (should
+	  now compile better under *BSD.)
+
+	- The MediaPosition attribute was being mishandled by
+	  GhostScript, causing the RIP to fail whenever a paper
+	  tray was selected.
+
+	- The scheduler now logs the final line of log information
+	  from a filter, even if it doesn't end with a newline; this
+	  primarily affects GhostScript error output.
+
+	- The scheduler was saving implicit classes, so after a few
+	  restarts you'll end up with AnyPrinter, AnyAnyPrinter, etc.
+
+	- The JPEG autodetection didn't work with some JPEG files that
+	  came from digital cameras (JPEG but not JFIF); the new
+	  magic types should work with all images that the JPEG library
+	  can handle.
+
+	- Fixed a bug in the new contains() MIME type rule that could
+	  cause cupsd to crash.
+
+	- Switched to using strtol() in the MIME type code so that you
+	  can use hex, octal, or decimal constants as desired in the
+	  mime.types file.
+
+	- Banner files are now treated as templates, allowing any type
+	  of file to be used as a banner.
+
+	- Added a 30-second timeout to backend device reports so that a
+	  hung backend will not prevent the scheduler from starting.
+
+	- Backends are once again terminated when jobs are stopped; the
+	  CUPS-supplied backends will stay alive until the downstream
+	  filters have had a chance to clear out old page data.
+
+	- The charset lookup in the CUPS localization support was wrong
+	  (iso8859-x instead of iso-8859-x)
+
+	- Changed the "cpNNNN" code page files to "windows-NNNN" to match
+	  the IANA registrations.
+
+	- New PostScript banner pages.
+
+	- Added Windows BMP and Alias PIX image file support to the image
+	  filter.
+
+	- The PNG reading coded didn't free all of its buffers.
+
+	- Added Digest authentication support to the client and server
+	  code.
+
+	- Added Solaris options to System V commands.
+
+	- Now support the output-bin job template attribute.
+
+	- Now log the job-billing attribute in the page_log file, and
+	  keep track of the total number of pages in the
+	  job-media-sheets-completed attribute.
+
+	- The penwidth option is now in micrometers to support more
+	  accurate width specification.
+
+	- The image filters now support interlaced and transparent PNG
+	  files.
+
+	- Didn't handle Keep-Alive for HTTP/1.0 clients.
+
+	- The BrowsePoll support didn't handle when BrowseInterval
+	  was set to 0 (now uses 30 seconds if BrowseInterval is 0)
+
+	- The DeskJet driver now supports 600 DPI color for printers
+	  that support it.
+
+	- New lpinfo and lpmove commands.
+
+	- The lpq command now supports the Digital UNIX output format.
+
+	- The LPD mini-daemon now supports all required LPD operations.
+
+	- Implemented timeouts for multi-file documents.
+
+	- New cupsPrintFiles() function in the CUPS API library to
+	  print multiple files using create-job and send-document
+	  requests (1 job ID for multiple files)
+
+	- The lp command now sends multiple files as a single job,
+	  matching the behavior of the System V command.
+
+	- The "cancel -a" command now purges job history files.
+
+
+CHANGES IN CUPS v1.1b3
+
+	- Documentation updates.
+
+	- The startup script redirected stderr before stdout,
+	  which caused problems with some versions of Bourne
+	  shell and Bash.
+
+	- Fixed a bug in the scheduler's PPD language reading
+	  code.
+
+	- Fixed a bug in the scheduler's check for the
+	  manufacturer in the PPD.
+
+	- The pstoraster filter didn't allow some input and
+	  output attributes to be set.
+
+	- Added banner page support.
+
+	- Added missing PAM configuration file.
+
+	- Configuration script fixes for Linux and *BSD.
+
+	- The log file code was using the wrong sign for the
+	  timezone offset.
+
+	- The default printcap file is now empty (no printcap
+	  file is generated).
+
+	- The scheduler did not start jobs destined for remote
+	  printers when they became available.
+
+	- The scheduler now sends jobs to remote printers
+	  immediately. (when sending jobs to a class, the remote
+	  printer is only used when it becomes available)
+
+	- The scheduler now supports printing of banner pages
+	  via the job-sheets attribute (banner files go in
+	  /usr/share/cups/banners)
+
+	- The cupsd process now forks itself into the background
+	  (override with -f)
+
+	- Added several *BSD enhancements.
+
+	- Added UNSUPPORTED libtool option to configuration
+	  script to allow the use of libtool.  Note that this is
+	  UNSUPPORTED by us, but added by request of the *BSD
+	  folks.
+
+	- The parallel, serial, and usb backends now retry the
+	  opening of their ports.  This allows multiple print
+	  queues to be associated with a single physical port,
+	  and will allow CUPS to support several types of
+	  parallel port auto-switches in the near future.
+
+	- Set-Job-Attributes now supports adding, changing, and
+	  deleting job template attributes, and no longer allows
+	  job-printer-uri to be set (see CUPS-Move-Job)
+
+	- Added CUPS-Move-Job operation to support moving of jobs.
+
+	- The CGI template functionality now supports multiple
+	  languages (still only have templates for English)
+
+	- The CUPS-Get-Printers and CUPS-Get-Classes operations
+	  now support filtering as defined in the IDD.
+
+	- The Get-Jobs, CUPS-Get-Printers, and CUPS-Get-Classes
+	  operations no longer limit themselves to 1000 jobs,
+	  printers, or classes (believe it or not, this is
+	  needed for some sites)
+
+	- The web interfaces now support language-specific
+	  templates.
+
+	- The web admin interface now supports class management.
+
+	- The web admin interface now shows a list of
+	  manufacturers before selecting the PPD/driver for a
+	  specific printer.
+
+	- The web admin interface now supports configuration of
+	  the default printer options in the PPD file.
+
+	- The web interface now uses printer/class
+	  authentication for the test page instead of admin
+	  authentication.
+
+	- Updated the RPM spec file for the current release.
+
+	- Updated language support for Windows code pages.
+
+	- 8-bit character set files can now use multiple fonts
+	  (needed for Arabic, Greek, Hebrew, etc.)
+
+	- Added basic right-to-left text support in the text
+	  filter.
+
+	- The POSIX locale now uses ISO-8859-1 instead of
+	  US-ASCII.
+
+	- Fixed PDF printing problems.
+
+	- Fixed PostScript RIP page device dictionary elements
+	  that weren't getting passed in cups_get_params().
+
+	- Added a new "contains" rule for the magic file typing.
+
+	- The "printable" rule now accepts characters from 128 to 255
+	  (needed for Microsoft character sets)
+
+	- Added support for ~/.cupsrc as well as /etc/cups/client.conf
+	  so that the default server can be configured on a per-user
+	  basis without environment variables.
+
+	- Added LPD mini-daemon to support incoming LPD jobs.
+
+
 CHANGES IN CUPS v1.1b2
 
 	- Documentation updates.
