@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in,v 1.26 1999/12/08 12:45:57 mike Exp $"
+dnl "$Id: configure.in,v 1.27 1999/12/15 20:09:06 mike Exp $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -136,6 +136,7 @@ AC_CHECK_LIB(c,crypt,LIBS="$LIBS",AC_CHECK_LIB(crypt,crypt))
 AC_CHECK_HEADER(crypt.h, AC_DEFINE(HAVE_CRYPT_H))
 AC_CHECK_LIB(sec,getspent)
 if test "$enable_pam" != "no"; then
+	AC_CHECK_LIB(dl,dlopen)
 	AC_CHECK_LIB(pam,pam_start)
 fi
 
@@ -154,6 +155,11 @@ else
 	echo "Not using -lnsl since you are running IRIX."
 fi)
 
+dnl Save the current libraries since we don't want the image libraries
+dnl included with every program...
+SAVELIBS="$LIBS"
+
+dnl Check for image libraries...
 LIBJPEG=""
 LIBPNG=""
 LIBTIFF=""
@@ -164,15 +170,15 @@ AC_SUBST(LIBPNG)
 AC_SUBST(LIBTIFF)
 AC_SUBST(LIBZ)
 
-dnl AC_CHECK_HEADER(jpeglib.h,
 AC_CHECK_LIB(jpeg, jpeg_destroy_decompress,
     AC_DEFINE(HAVE_LIBJPEG)
-    LIBJPEG="-ljpeg")
+    LIBJPEG="-ljpeg"
+    LIBS="$LIBS -ljpeg")
 
-dnl AC_CHECK_HEADER(zlib.h,
-AC_CHECK_LIB(z, deflateInit,
+AC_CHECK_LIB(z, deflate,
     AC_DEFINE(HAVE_LIBZ)
-    LIBZ="-lz")
+    LIBZ="-lz"
+    LIBS="$LIBS -lz")
 
 dnl PNG library uses math library functions...
 AC_CHECK_LIB(m, pow)
@@ -186,6 +192,9 @@ dnl AC_CHECK_HEADER(tiff.h,
 AC_CHECK_LIB(tiff, TIFFReadScanline,
     AC_DEFINE(HAVE_LIBTIFF)
     LIBTIFF="-ltiff")
+
+dnl Restore original LIBS settings...
+LIBS="$SAVELIBS"
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -208,7 +217,7 @@ AC_CHECK_FUNCS(waitpid)
 AC_CHECK_FUNCS(wait3)
 
 dnl Update compiler options...
-if test -n "$GXX"; then
+if test -n "$GXX" -o $uname = Linux; then
 	if test -z "$OPTIM"; then
 	       	OPTIM="-O2"
 	fi
@@ -329,5 +338,5 @@ AC_SUBST(CUPS_DATADIR)
 AC_OUTPUT(Makedefs)
 
 dnl
-dnl End of "$Id: configure.in,v 1.26 1999/12/08 12:45:57 mike Exp $".
+dnl End of "$Id: configure.in,v 1.27 1999/12/15 20:09:06 mike Exp $".
 dnl
