@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.35 1999/10/10 15:40:25 mike Exp $"
+ * "$Id: util.c,v 1.36 1999/10/21 20:51:57 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -57,7 +57,8 @@
  * Local globals...
  */
 
-static http_t	*cups_server = NULL;
+static http_t		*cups_server = NULL;
+static ipp_status_t	last_error = IPP_OK;
 
 
 /*
@@ -98,6 +99,7 @@ cupsCancelJob(const char *name,	/* I - Name of printer or class */
   *    attributes-natural-language
   *    printer-uri
   *    job-id
+  *    [requesting-user-name]
   */
 
   request = ippNew();
@@ -120,15 +122,25 @@ cupsCancelJob(const char *name,	/* I - Name of printer or class */
 
   ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-id", job);
 
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+               NULL, cupsUser());
+
  /*
   * Do the request...
   */
 
   if ((response = cupsDoRequest(cups_server, request, "/jobs/")) == NULL)
+  {
+    last_error = IPP_BAD_REQUEST;
     return (0);
+  }
+  else
+  {
+    last_error = response->request.status.status_code;
+    ippDelete(response);
 
-  ippDelete(response);
-  return (1);
+    return (1);
+  }
 }
 
 
@@ -392,6 +404,8 @@ cupsGetClasses(char ***classes)	/* O - Classes */
 
   if ((response = cupsDoRequest(cups_server, request, "/classes/")) != NULL)
   {
+    last_error = response->request.status.status_code;
+
     for (attr = response->attrs; attr != NULL; attr = attr->next)
       if (strcmp(attr->name, "printer-name") == 0 &&
           attr->value_tag == IPP_TAG_NAME)
@@ -413,6 +427,8 @@ cupsGetClasses(char ***classes)	/* O - Classes */
 
     ippDelete(response);
   }
+  else
+    last_error = IPP_BAD_REQUEST;
 
   return (n);
 }
@@ -474,8 +490,10 @@ cupsGetDefault(void)
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(cups_server, request, "/printers/")) != NULL)
+  if ((response = cupsDoRequest(cups_server, request, "/")) != NULL)
   {
+    last_error = response->request.status.status_code;
+
     if ((attr = ippFindAttribute(response, "printer-name", IPP_TAG_NAME)) != NULL)
     {
       strncpy(def_printer, attr->values[0].string.text, sizeof(def_printer) - 1);
@@ -486,6 +504,8 @@ cupsGetDefault(void)
 
     ippDelete(response);
   }
+  else
+    last_error = IPP_BAD_REQUEST;
 
   return (NULL);
 }
@@ -624,6 +644,8 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
 
   if ((response = cupsDoRequest(cups_server, request, "/printers/")) != NULL)
   {
+    last_error = response->request.status.status_code;
+
     for (attr = response->attrs; attr != NULL; attr = attr->next)
       if (strcmp(attr->name, "printer-name") == 0 &&
           attr->value_tag == IPP_TAG_NAME)
@@ -645,8 +667,21 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
 
     ippDelete(response);
   }
+  else
+    last_error = IPP_BAD_REQUEST;
 
   return (n);
+}
+
+
+/*
+ * 'cupsLastError()' - Return the last IPP error that occurred.
+ */
+
+ipp_status_t		/* O - IPP error code */
+cupsLastError(void)
+{
+  return (last_error);
 }
 
 
@@ -955,7 +990,10 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
 
   if (name == NULL)
+  {
+    last_error = IPP_BAD_REQUEST;
     return (NULL);
+  }
 
   if (sscanf(name, "%1023[^@]@%1023s", printerbuf, hostbuf) == 1)
   {
@@ -988,12 +1026,15 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
   }
 
   if ((cups_server = httpConnect(hostname, ippPort())) == NULL)
+  {
+    last_error = IPP_SERVICE_UNAVAILABLE;
     return (NULL);
+  }
   else
     return (printer);
 }
 
 
 /*
- * End of "$Id: util.c,v 1.35 1999/10/10 15:40:25 mike Exp $".
+ * End of "$Id: util.c,v 1.36 1999/10/21 20:51:57 mike Exp $".
  */
