@@ -3,6 +3,10 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.20rc1
 
+	- The scheduler did not reset the group list when
+	  running CGI and filter processes (STR #185)
+	- The scheduler no longer calls malloc and free from the
+	  signal handlers (STR #190)
 	- The USB backend now uses the manufacturer and model
 	  strings if the description string is not available
 	  (STR #174)

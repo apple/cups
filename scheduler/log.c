@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c,v 1.19.2.12 2003/04/10 20:15:54 mike Exp $"
+ * "$Id: log.c,v 1.19.2.13 2003/07/19 21:57:49 mike Exp $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -108,15 +108,14 @@ GetDateTime(time_t t)		/* I - Time value */
  * 'LogMessage()' - Log a message to the error log file.
  */
 
-int				/* O - 1 on success, 0 on error */
-LogMessage(int        level,	/* I - Log level */
-           const char *message,	/* I - printf-style message string */
-	   ...)			/* I - Additional args as needed */
+int					/* O - 1 on success, 0 on error */
+LogMessage(int        level,		/* I - Log level */
+           const char *message,		/* I - printf-style message string */
+	   ...)				/* I - Additional args as needed */
 {
-  int		len;		/* Length of message */
-  char		line[1024];	/* Line for output file */
-  va_list	ap;		/* Argument pointer */
-  static const char levels[] =	/* Log levels... */
+  int		len;			/* Length of message */
+  va_list	ap;			/* Argument pointer */
+  static const char levels[] =		/* Log levels... */
 		{
 		  ' ',
 		  'X',
@@ -130,7 +129,7 @@ LogMessage(int        level,	/* I - Log level */
 		  'd'
 		};
 #ifdef HAVE_VSYSLOG
-  static const int syslevels[] =/* SYSLOG levels... */
+  static const int syslevels[] =	/* SYSLOG levels... */
 		{
 		  0,
 		  LOG_EMERG,
@@ -144,6 +143,8 @@ LogMessage(int        level,	/* I - Log level */
 		  LOG_DEBUG
 		};
 #endif /* HAVE_VSYSLOG */
+  static int	linesize = 0;		/* Size of line for output file */
+  static char	*line = NULL;		/* Line for output file */
 
 
  /*
@@ -194,17 +195,53 @@ LogMessage(int        level,	/* I - Log level */
   */
 
   va_start(ap, message);
-  len = vsnprintf(line, sizeof(line), message, ap);
+  len = vsnprintf(line, linesize, message, ap);
   va_end(ap);
+
+  if (len >= linesize && !SignalCount)
+  {
+    len ++;
+
+    if (len < 8192)
+      len = 8192;
+    else if (len > 65536)
+      len = 65536;
+
+    if (!linesize)
+      line = malloc(len);
+    else
+      line = realloc(line, len);
+
+    if (line)
+      linesize = len;
+    else
+    {
+      cupsFilePrintf(ErrorFile,
+                     "ERROR: Unable to allocate memory for line - %s\n",
+                     strerror(errno));
+      cupsFileFlush(ErrorFile);
+
+      ReleaseSignals();
+
+      return (0);
+    }
+
+    va_start(ap, message);
+    len = vsnprintf(line, linesize, message, ap);
+    va_end(ap);
+  }
 
  /*
   * Then a newline...
   */
 
+  if (len >= linesize)
+    len = linesize - 1;
+
+  cupsFilePuts(ErrorFile, line);
+
   if (len > 0 && line[len - 1] != '\n')
-    cupsFilePrintf(ErrorFile, "%s\n", line);
-  else
-    cupsFilePuts(ErrorFile, line);
+    cupsFilePutChar(ErrorFile, '\n');
 
   cupsFileFlush(ErrorFile);
 
@@ -371,10 +408,10 @@ check_log_file(cups_file_t **log,	/* IO - Log file */
 
 
  /*
-  * See if we have a log file to check...
+  * See if we have a log file to check or we are handling a signal...
   */
 
-  if (log == NULL || logname == NULL || !logname[0])
+  if (log == NULL || logname == NULL || !logname[0] || SignalCount)
     return (1);
 
  /*
@@ -485,5 +522,5 @@ check_log_file(cups_file_t **log,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c,v 1.19.2.12 2003/04/10 20:15:54 mike Exp $".
+ * End of "$Id: log.c,v 1.19.2.13 2003/07/19 21:57:49 mike Exp $".
  */
