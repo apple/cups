@@ -1,5 +1,5 @@
 /*
- * "$Id: job.h,v 1.20 2000/06/02 13:51:49 mike Exp $"
+ * "$Id: job.h,v 1.21 2000/08/18 14:30:29 mike Exp $"
  *
  *   Print job definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -44,6 +44,7 @@ typedef struct job_str
   mime_type_t	**filetypes;		/* File types */
   ipp_t		*attrs;			/* Job attributes */
   int		pipe;			/* Status pipe for this job */
+  int		cost;			/* Filtering cost */
   int		procs[MAX_FILTERS + 2];	/* Process IDs, 0 terminated */
   int		status;			/* Status code from filters */
   printer_t	*printer;		/* Printer this job is assigned to */
@@ -87,5 +88,5 @@ extern const char *ValidateDest(const char *resource, cups_ptype_t *dtype);
 
 
 /*
- * End of "$Id: job.h,v 1.20 2000/06/02 13:51:49 mike Exp $".
+ * End of "$Id: job.h,v 1.21 2000/08/18 14:30:29 mike Exp $".
  */

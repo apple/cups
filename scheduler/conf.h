@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h,v 1.26 2000/07/21 15:39:30 mike Exp $"
+ * "$Id: conf.h,v 1.27 2000/08/18 14:30:28 mike Exp $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -93,8 +93,12 @@ VAR int			User			VALUE(1),
 					/* Support the Keep-Alive option? */
 			KeepAliveTimeout	VALUE(DEFAULT_KEEPALIVE),
 					/* Timeout between requests */
-			ImplicitClasses		VALUE(TRUE);
+			ImplicitClasses		VALUE(TRUE),
 					/* Are classes implicitly created? */
+			FilterLimit		VALUE(0),
+					/* Max filter cost at any time */
+			FilterLevel		VALUE(0);
+					/* Current filter level */
 VAR FILE		*AccessFile		VALUE(NULL),
 					/* Access log file */
 			*ErrorFile		VALUE(NULL),
@@ -117,5 +121,5 @@ extern int	LogPage(job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h,v 1.26 2000/07/21 15:39:30 mike Exp $".
+ * End of "$Id: conf.h,v 1.27 2000/08/18 14:30:28 mike Exp $".
  */

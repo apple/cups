@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.81 2000/08/03 16:30:47 mike Exp $"
+ * "$Id: job.c,v 1.82 2000/08/18 14:30:28 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -966,25 +966,12 @@ StartJob(int       id,		/* I - Job ID */
   }
 
  /*
-  * Update the printer and job state to "processing"...
-  */
-
-  DEBUG_puts("StartJob: found job in list.");
-
-  current->state->values[0].integer = IPP_JOB_PROCESSING;
-  current->status  = 0;
-  current->printer = printer;
-  printer->job     = current;
-  SetPrinterState(printer, IPP_PRINTER_PROCESSING);
-
-  set_time(current, "time-at-processing");
-
- /*
   * Figure out what filters are required to convert from
   * the source to the destination type...
   */
 
-  num_filters = 0;
+  num_filters   = 0;
+  current->cost = 0;
 
   if (printer->type & CUPS_PRINTER_REMOTE)
   {
@@ -1010,7 +997,45 @@ StartJob(int       id,		/* I - Job ID */
       CancelJob(current->id, 0);
       return;
     }
+
+    for (i = 0; i < num_filters; i ++)
+      current->cost += filters[i].cost;
   }
+
+ /*
+  * See if the filter cost is too high...
+  */
+
+  if ((FilterLevel + current->cost) > FilterLimit && FilterLevel > 0)
+  {
+   /*
+    * Don't print this job quite yet...
+    */
+
+    if (filters != NULL)
+      free(filters);
+
+    LogMessage(L_DEBUG, "StartJob(): Postponing job ID %d: "
+                        "cost is %d, level is %d, limit is %d",
+               id, current->cost, FilterLevel, FilterLimit);
+    return;
+  }
+
+  FilterLevel += current->cost;
+
+ /*
+  * Update the printer and job state to "processing"...
+  */
+
+  DEBUG_puts("StartJob: found job in list.");
+
+  current->state->values[0].integer = IPP_JOB_PROCESSING;
+  current->status  = 0;
+  current->printer = printer;
+  printer->job     = current;
+  SetPrinterState(printer, IPP_PRINTER_PROCESSING);
+
+  set_time(current, "time-at-processing");
 
  /*
   * Building the options string is harder than it needs to be, but
@@ -1430,6 +1455,8 @@ StopJob(int id)			/* I - Job ID */
       if (current->state->values[0].integer == IPP_JOB_PROCESSING)
       {
         DEBUG_puts("StopJob: job state is \'processing\'.");
+
+        FilterLevel -= current->cost;
 
         if (current->status < 0)
 	  SetPrinterState(current->printer, IPP_PRINTER_STOPPED);
@@ -2568,5 +2595,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.81 2000/08/03 16:30:47 mike Exp $".
+ * End of "$Id: job.c,v 1.82 2000/08/18 14:30:28 mike Exp $".
  */

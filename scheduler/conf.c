@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.53 2000/07/31 16:51:03 mike Exp $"
+ * "$Id: conf.c,v 1.54 2000/08/18 14:30:28 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -106,7 +106,8 @@ static var_t	variables[] =
   { "MaxLogSize",	&MaxLogSize,		VAR_INTEGER,	0 },
   { "MaxRequestSize",	&MaxRequestSize,	VAR_INTEGER,	0 },
   { "PreserveJobHistory", &JobHistory,		VAR_BOOLEAN,	0 },
-  { "PreserveJobFiles",	&JobFiles,		VAR_BOOLEAN,	0 }
+  { "PreserveJobFiles",	&JobFiles,		VAR_BOOLEAN,	0 },
+  { "FilterLimit",	&FilterLimit,		VAR_INTEGER,	0 }
 };
 #define NUM_VARS	(sizeof(variables) / sizeof(variables[0]))
 
@@ -288,9 +289,9 @@ ReadConfiguration(void)
   KeepAlive        = TRUE;
   KeepAliveTimeout = DEFAULT_KEEPALIVE;
   ImplicitClasses  = TRUE;
-
+  FilterLimit      = 0;
+  FilterLevel      = 0;
   MaxClients       = 100;
-
   MaxLogSize       = 1024 * 1024;
   MaxRequestSize   = 0;
 
@@ -1409,5 +1410,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.53 2000/07/31 16:51:03 mike Exp $".
+ * End of "$Id: conf.c,v 1.54 2000/08/18 14:30:28 mike Exp $".
  */
