@@ -3,7 +3,7 @@
 dest.o: cups.h ipp.h http.h md5.h ppd.h language.h string.h ../config.h
 emit.o: ppd.h string.h ../config.h
 encode.o: cups.h ipp.h http.h md5.h ppd.h string.h ../config.h debug.h
-http.o: string.h ../config.h http.h md5.h debug.h
+http.o: string.h ../config.h http.h md5.h http-private.h debug.h
 http-addr.o: string.h ../config.h http.h md5.h
 http-support.o: string.h ../config.h http.h md5.h ipp.h
 ipp.o: string.h ../config.h language.h ipp.h http.h md5.h debug.h
@@ -23,4 +23,3 @@ util.o: cups.h ipp.h http.h md5.h ppd.h language.h string.h ../config.h
 util.o: debug.h
 testhttp.o: http.h md5.h
 testlang.o: language.h
-testppd.o: cups.h ipp.h http.h md5.h ppd.h string.h ../config.h
