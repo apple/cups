@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c,v 1.124.2.71 2003/05/12 15:10:12 mike Exp $"
+ * "$Id: job.c,v 1.124.2.72 2003/06/11 23:17:28 mike Exp $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -840,7 +840,7 @@ MoveJob(int        id,		/* I - Job ID */
 
       SetString(&current->dest, dest);
       current->dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_REMOTE |
-                                  CUPS_PRINTER_IMPLICIT | CUPS_PRINTER_FAX);
+                                  CUPS_PRINTER_IMPLICIT);
 
       if ((attr = ippFindAttribute(current->attrs, "job-printer-uri", IPP_TAG_URI)) != NULL)
       {
@@ -2088,7 +2088,8 @@ StopJob(int id,			/* I - Job ID */
         FilterLevel -= current->cost;
 
         if (current->status < 0 &&
-	    !(current->dtype & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT)))
+	    !(current->dtype & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT)) &&
+	    !(current->printer->type & CUPS_PRINTER_FAX))
 	  SetPrinterState(current->printer, IPP_PRINTER_STOPPED, 1);
 	else if (current->printer->state != IPP_PRINTER_STOPPED)
 	  SetPrinterState(current->printer, IPP_PRINTER_IDLE, 0);
@@ -2181,6 +2182,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
 		*message;	/* Pointer to message text */
   int		loglevel;	/* Log level for message */
   int		job_history;	/* Did CancelJob() keep the job? */
+  cups_ptype_t	ptype;		/* Printer type (color, small, etc.) */
 
 
   if ((bytes = read(job->status_pipe, job->buffer + job->bufused,
@@ -2380,6 +2382,8 @@ UpdateJob(job_t *job)		/* I - Job to check */
       * Backend had errors; stop it...
       */
 
+      ptype = job->printer->type;
+
       StopJob(job->id, 0);
       job->state->values[0].integer = IPP_JOB_PENDING;
       SaveJob(job->id);
@@ -2391,7 +2395,7 @@ UpdateJob(job_t *job)		/* I - Job to check */
 
       if (job->dtype & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
         CheckJobs();
-      else if (job->dtype & CUPS_PRINTER_FAX)
+      else if (ptype & CUPS_PRINTER_FAX)
       {
        /*
         * See how many times we've tried to send the job; if more than
@@ -2766,5 +2770,5 @@ start_process(const char *command,	/* I - Full path to command */
 
 
 /*
- * End of "$Id: job.c,v 1.124.2.71 2003/05/12 15:10:12 mike Exp $".
+ * End of "$Id: job.c,v 1.124.2.72 2003/06/11 23:17:28 mike Exp $".
  */
