@@ -33,6 +33,9 @@ CHANGES IN CUPS v1.1.1
 	  documents if they don't have it.
 	- The cupsGetPPD() function didn't work with remote
 	  printers lacking the @server in the name.
+	- The configure script didn't work right when only
+	  --prefix was specified.
+
 
 CHANGES IN CUPS v1.1
 
