@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in,v 1.13.2.12 2003/01/08 17:56:57 mike Exp $"
+# "$Id: cups.list.in,v 1.13.2.13 2003/03/19 15:37:44 mike Exp $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -303,6 +303,7 @@ d 0555 root sys $DOCDIR -
 f 0444 root sys $DOCDIR doc/*.css
 f 0444 root sys $DOCDIR doc/*.html
 f 0444 root sys $DOCDIR doc/*.pdf
+f 0444 root sys $DOCDIR/robots.txt doc/robots.txt
 d 0555 root sys $DOCDIR/images -
 f 0444 root sys $DOCDIR/images doc/images/*.gif
 
@@ -387,5 +388,5 @@ f 0444 root sys $AMANDIR/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.man
 i 0555 root sys cups cups.sh
 
 #
-# End of "$Id: cups.list.in,v 1.13.2.12 2003/01/08 17:56:57 mike Exp $".
+# End of "$Id: cups.list.in,v 1.13.2.13 2003/03/19 15:37:44 mike Exp $".
 #

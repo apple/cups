@@ -1,5 +1,5 @@
 #
-# "$Id: robots.txt,v 1.1 2003/03/19 15:37:30 mike Exp $"
+# "$Id: robots.txt,v 1.1.2.1 2003/03/19 15:37:44 mike Exp $"
 #
 #   This file tells search engines not to index your CUPS server.
 #
@@ -26,6 +26,6 @@ User-agent: *
 Disallow: /
 
 #
-# End of "$Id: robots.txt,v 1.1 2003/03/19 15:37:30 mike Exp $".
+# End of "$Id: robots.txt,v 1.1.2.1 2003/03/19 15:37:44 mike Exp $".
 #
 

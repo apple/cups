@@ -3,6 +3,8 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.19
 
+	- Added a robots.txt file to the standard install to
+	  prevent search engines from indexing the CUPS server.
 	- Added support for STATE: messages
 	  (printer-state-reasons), printer-state-history, and
 	  printer-state-time to the scheduler.
