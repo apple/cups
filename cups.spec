@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec,v 1.75 2004/05/27 15:37:34 mike Exp $"
+# "$Id: cups.spec,v 1.76 2004/05/27 18:51:30 mike Exp $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -186,16 +186,16 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/cat8
 /usr/share/man/cat8/*
 %dir /usr/share/man/man1
-/usr/share/man/man1/backend.1
-/usr/share/man/man1/cupstestppd.1
-/usr/share/man/man1/filter.1
-/usr/share/man/man1/lp.1
-/usr/share/man/man1/lpoptions.1
-/usr/share/man/man1/lppasswd.1
-/usr/share/man/man1/lpq.1
-/usr/share/man/man1/lpr.1
-/usr/share/man/man1/lprm.1
-/usr/share/man/man1/lpstat.1
+/usr/share/man/man1/backend.1.gz
+/usr/share/man/man1/cupstestppd.1.gz
+/usr/share/man/man1/filter.1.gz
+/usr/share/man/man1/lp.1.gz
+/usr/share/man/man1/lpoptions.1.gz
+/usr/share/man/man1/lppasswd.1.gz
+/usr/share/man/man1/lpq.1.gz
+/usr/share/man/man1/lpr.1.gz
+/usr/share/man/man1/lprm.1.gz
+/usr/share/man/man1/lpstat.1.gz
 %dir /usr/share/man/man5
 /usr/share/man/man5/*
 %dir /usr/share/man/man8
@@ -217,16 +217,16 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/fr/cat8
 /usr/share/man/fr/cat8/*
 %dir /usr/share/man/fr/man1
-/usr/share/man/fr/man1/backend.1
-/usr/share/man/fr/man1/cupstestppd.1
-/usr/share/man/fr/man1/filter.1
-/usr/share/man/fr/man1/lp.1
-/usr/share/man/fr/man1/lpoptions.1
-/usr/share/man/fr/man1/lppasswd.1
-/usr/share/man/fr/man1/lpq.1
-/usr/share/man/fr/man1/lpr.1
-/usr/share/man/fr/man1/lprm.1
-/usr/share/man/fr/man1/lpstat.1
+/usr/share/man/fr/man1/backend.1.gz
+/usr/share/man/fr/man1/cupstestppd.1.gz
+/usr/share/man/fr/man1/filter.1.gz
+/usr/share/man/fr/man1/lp.1.gz
+/usr/share/man/fr/man1/lpoptions.1.gz
+/usr/share/man/fr/man1/lppasswd.1.gz
+/usr/share/man/fr/man1/lpq.1.gz
+/usr/share/man/fr/man1/lpr.1.gz
+/usr/share/man/fr/man1/lprm.1.gz
+/usr/share/man/fr/man1/lpstat.1.gz
 %dir /usr/share/man/fr/man5
 /usr/share/man/fr/man5/*
 %dir /usr/share/man/fr/man8
@@ -241,9 +241,9 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/fr/cat1
 /usr/share/man/fr/cat1/cups-config.1
 %dir /usr/share/man/man1
-/usr/share/man/man1/cups-config.1
+/usr/share/man/man1/cups-config.1.gz
 %dir /usr/share/man/fr/man1
-/usr/share/man/fr/man1/cups-config.1
+/usr/share/man/fr/man1/cups-config.1.gz
 /usr/bin/cups-config
 %dir /usr/include/cups
 /usr/include/cups/*
@@ -253,5 +253,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/*.so*
 
 #
-# End of "$Id: cups.spec,v 1.75 2004/05/27 15:37:34 mike Exp $".
+# End of "$Id: cups.spec,v 1.76 2004/05/27 18:51:30 mike Exp $".
 #
