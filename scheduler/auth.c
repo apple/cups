@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c,v 1.14 1999/08/06 16:48:42 mike Exp $"
+ * "$Id: auth.c,v 1.15 1999/10/15 20:41:42 mike Exp $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -51,6 +51,10 @@
 #ifdef HAVE_CRYPT_H
 #  include <crypt.h>
 #endif /* HAVE_CRYPT_H */
+#ifdef HAVE_LIBPAM
+#  include <security/pam_appl.h>
+#endif /* HAVE_LIBPAM */
+
 
 /*
  * Local functions...
@@ -60,6 +64,10 @@ static authmask_t	*add_allow(location_t *loc);
 static authmask_t	*add_deny(location_t *loc);
 static int		check_auth(unsigned ip, char *name, int namelen,
 				   int num_masks, authmask_t *masks);
+#ifdef HAVE_LIBPAM
+static int		pam_func(int, const struct pam_message **,
+			         struct pam_response **, void *);
+#endif /* HAVE_LIBPAM */
 
 
 /*
@@ -260,10 +268,15 @@ IsAuthorized(client_t *con)	/* I - Connection */
   int		bestlen,	/* Length of best match */
 		hostlen;	/* Length of hostname */
   struct passwd	*pw;		/* User password data */
+  struct group	*grp;		/* Group data */
 #ifdef HAVE_SHADOW_H
   struct spwd	*spw;		/* Shadow password data */
 #endif /* HAVE_SHADOW_H */
-  struct group	*grp;		/* Group data */
+#ifdef HAVE_LIBPAM
+  pam_handle_t	*pamh;		/* PAM authentication handle */
+  int		pamerr;		/* PAM error code */
+  struct pam_conv pamdata;	/* PAM conversation data */
+#endif /* HAVE_LIBPAM */
 
 
  /*
@@ -348,7 +361,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 		con->username, con->password));
 
   if (con->username[0] == '\0' || con->password[0] == '\0')
-    return (HTTP_UNAUTHORIZED);		/* Non-anonymous needed user/pass */
+    return (HTTP_UNAUTHORIZED);		/* Non-anonymous needs user/pass */
 
  /*
   * Check the user's password...
@@ -364,36 +377,67 @@ IsAuthorized(client_t *con)	/* I - Connection */
     return (HTTP_UNAUTHORIZED);
   }
 
-  if (pw->pw_passwd[0] == '\0')		/* Don't allow blank passwords! */
+#ifdef HAVE_LIBPAM
+  /*
+   * Only use PAM to do authentication.  This allows MD5 passwords, among
+   * other things...
+   */
+
+  pamdata.conv        = pam_func;
+  pamdata.appdata_ptr = con;
+
+  pamerr = pam_start("cups", con->username, &pamdata, &pamh);
+  if (pamerr != PAM_SUCCESS)
   {
-    LogMessage(LOG_WARN, "IsAuthorized: Username \"%s\" has no password; access denied.",
-               con->username);
+    LogMessage(LOG_ERROR, "IsAuthorized: pam_start() returned %d (%s)!\n",
+               pamerr, pam_strerror(pamerr));
+    pam_end(pamh, 0);
     return (HTTP_UNAUTHORIZED);
   }
 
-  DEBUG_printf(("pw->pw_passwd = \"%s\"\n", pw->pw_passwd));
+  pam_error = pam_authenticate(pamh, PAM_SILENT);
+  if (pamerr != PAM_SUCCESS)
+  {
+    LogMessage(LOG_ERROR, "IsAuthorized: pam_authenticate() returned %d (%s)!\n",
+               pamerr, pam_strerror(pamerr));
+    pam_end(pamh, 0);
+    return (HTTP_UNAUTHORIZED);
+  }
 
-#ifdef HAVE_SHADOW_H
+  pam_error = pam_acct_mgmt(pamh, PAM_SILENT);
+  if (pamerr != PAM_SUCCESS)
+  {
+    LogMessage(LOG_ERROR, "IsAuthorized: pam_acct_mgmt() returned %d (%s)!\n",
+               pamerr, pam_strerror(pamerr));
+    pam_end(pamh, 0);
+    return (HTTP_UNAUTHORIZED);
+  }
+
+  pam_end(pamh, PAM_SUCCESS);
+#else
+#  ifdef HAVE_SHADOW_H
   spw = getspnam(con->username);
   endspent();
 
   if (spw == NULL && strcmp(pw->pw_passwd, "x") == 0)
     return (HTTP_UNAUTHORIZED);		/* No such user or bad shadow file */
 
-#  ifdef DEBUG
+#    ifdef DEBUG
   if (spw != NULL)
     printf("spw->sp_pwdp = \"%s\"\n", spw->sp_pwdp);
   else
     puts("spw = NULL");
-#  endif /* DEBUG */
+#    endif /* DEBUG */
 
-  if (spw != NULL && spw->sp_pwdp[0] == '\0')
+  if (spw != NULL && spw->sp_pwdp[0] == '\0' && pw->pw_passwd[0] == '\0')
+#  else
+  if (pw->pw_passwd[0] == '\0')		/* Don't allow blank passwords! */
+#  endif /* HAVE_SHADOW_H */
   {					/* Don't allow blank passwords! */
     LogMessage(LOG_WARN, "IsAuthorized: Username \"%s\" has no password; access denied.",
                con->username);
     return (HTTP_UNAUTHORIZED);
   }
-#endif /* HAVE_SHADOW_H */
 
  /*
   * OK, the password isn't blank, so compare with what came from the client...
@@ -404,7 +448,7 @@ IsAuthorized(client_t *con)	/* I - Connection */
 
   if (strcmp(pw->pw_passwd, crypt(con->password, pw->pw_passwd)) != 0)
   {
-#ifdef HAVE_SHADOW_H
+#  ifdef HAVE_SHADOW_H
     if (spw != NULL)
     {
       DEBUG_printf(("IsAuthorized: sp_pwdp = %s, crypt = %s\n",
@@ -414,9 +458,10 @@ IsAuthorized(client_t *con)	/* I - Connection */
 	return (HTTP_UNAUTHORIZED);
     }
     else
-#endif /* HAVE_SHADOW_H */
+#  endif /* HAVE_SHADOW_H */
       return (HTTP_UNAUTHORIZED);
   }
+#endif /* HAVE_LIBPAM */
 
  /*
   * OK, the password is good.  See if we need normal user access, or group
@@ -597,6 +642,70 @@ check_auth(unsigned   ip,	/* I - Client address */
 }
 
 
+#ifdef HAVE_LIBPAM
 /*
- * End of "$Id: auth.c,v 1.14 1999/08/06 16:48:42 mike Exp $".
+ * 'pam_func()' - PAM conversation function.
+ */
+
+static int					/* O - Success or failure */
+PAM_conv(int                      num_msg,	/* I - Number of messages */
+         const struct pam_message **msg,	/* I - Messages */
+         struct pam_response      **resp,	/* O - Responses */
+         void                     *appdata_ptr)	/* I - Pointer to connection */
+{
+  int			i;			/* Looping var */
+  struct pam_response	*replies;		/* Replies */
+  client_t		*client;		/* Pointer client connection */
+
+
+ /*
+  * Allocate memory for the responses...
+  */
+
+  if ((replies = malloc(sizeof(struct pam_response) * num_msg)) == NULL)
+    return (PAM_CONV_ERR);
+
+ /*
+  * Answer all of the messages...
+  */
+
+  client = (client_t *)appdata_ptr;
+
+  for (i = 0; i < num_msg; i ++)
+    switch (msg[i]->msg_style)
+    {
+      case PAM_PROMPT_ECHO_ON:
+          replies[i].resp_retcode = PAM_SUCCESS;
+          replies[i].resp         = strdup(client->username);
+          break;
+
+      case PAM_PROMPT_ECHO_OFF:
+          replies[i].resp_retcode = PAM_SUCCESS;
+          replies[i].resp         = strdup(client->password);
+          break;
+
+      case PAM_TEXT_INFO:
+      case PAM_ERROR_MSG:
+          replies[i].resp_retcode = PAM_SUCCESS;
+          replies[i].resp         = NULL;
+          break;
+
+      default:
+          free(replies);
+          return (PAM_CONV_ERR);
+    }
+
+ /*
+  * Return the responses back to PAM...
+  */
+
+  *resp = replies;
+
+  return (PAM_SUCCESS);
+}
+#endif /* HAVE_LIBPAM */
+
+
+/*
+ * End of "$Id: auth.c,v 1.15 1999/10/15 20:41:42 mike Exp $".
  */
