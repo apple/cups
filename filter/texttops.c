@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c,v 1.19 2000/01/04 13:45:49 mike Exp $"
+ * "$Id: texttops.c,v 1.20 2000/01/25 15:41:28 mike Exp $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -198,7 +198,7 @@ WriteProlog(char       *title,	/* I - Title of job */
     {
       memset(chars, 0, sizeof(chars));
 
-      snprintf(filename, sizeof(filename), CUPS_DATADIR "/%s", charset + 4);
+      snprintf(filename, sizeof(filename), CUPS_DATADIR "/data/%s", charset + 4);
 
       if ((fp = fopen(filename, "r")) != NULL)
       {
@@ -206,6 +206,15 @@ WriteProlog(char       *title,	/* I - Title of job */
           chars[ch] = unicode;
 
         fclose(fp);
+      }
+      else
+      {
+       /*
+        * Fall back to ISO-8859-1...
+	*/
+
+        for (ch = 0; ch < 256; ch ++)
+	  chars[ch] = ch;
       }
     }
     else
@@ -564,5 +573,5 @@ write_string(int     col,	/* I - Start column */
 
 
 /*
- * End of "$Id: texttops.c,v 1.19 2000/01/04 13:45:49 mike Exp $".
+ * End of "$Id: texttops.c,v 1.20 2000/01/25 15:41:28 mike Exp $".
  */

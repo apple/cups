@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-config.c,v 1.22 2000/01/04 13:45:44 mike Exp $"
+ * "$Id: hpgl-config.c,v 1.23 2000/01/25 15:41:27 mike Exp $"
  *
  *   HP-GL/2 configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -510,7 +510,7 @@ PS_plot_size(int     num_params,	/* I - Number of parameters */
 {
   switch (num_params)
   {
-    case 0 :
+    case 0 : /* PS ; */
         if (Rotation == 0 || Rotation == 180)
         {
           PlotSize[0] = PageWidth;
@@ -522,7 +522,7 @@ PS_plot_size(int     num_params,	/* I - Number of parameters */
           PlotSize[1] = PageWidth;
 	}
         break;
-    case 1 :
+    case 1 : /* PS length ; */
         if (Rotation == 0 || Rotation == 180)
         {
           PlotSize[1] = 72.0f * params[0].value.number / 1016.0f;
@@ -534,16 +534,30 @@ PS_plot_size(int     num_params,	/* I - Number of parameters */
           PlotSize[1] = 0.75f * PlotSize[0];
         }
         break;
-    case 2 :
+    case 2 : /* PS length, width ; */
+       /*
+        * Unfortunately, it appears that NO application correctly
+	* sends a two-argument PS command as documented in the
+	* HP-GL/2 Reference Manual from HP.  Instead, applications
+	* send the width before the length, which causes all sorts
+	* of problems.
+	*
+	* Rather than fight it, we now look for them as width,length
+	* instead of length,width.
+	*
+	* Don't like it?  Send mail to the folks that make Ideas, Pro/E,
+	* AutoCAD, etc.
+	*/
+
         if (Rotation == 0 || Rotation == 180)
-        {
-          PlotSize[0] = 72.0f * params[1].value.number / 1016.0f;
-          PlotSize[1] = 72.0f * params[0].value.number / 1016.0f;
-        }
-        else
         {
           PlotSize[0] = 72.0f * params[0].value.number / 1016.0f;
           PlotSize[1] = 72.0f * params[1].value.number / 1016.0f;
+        }
+        else
+        {
+          PlotSize[0] = 72.0f * params[1].value.number / 1016.0f;
+          PlotSize[1] = 72.0f * params[0].value.number / 1016.0f;
         }
         break;
   }
@@ -620,5 +634,5 @@ SC_scale(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-config.c,v 1.22 2000/01/04 13:45:44 mike Exp $".
+ * End of "$Id: hpgl-config.c,v 1.23 2000/01/25 15:41:27 mike Exp $".
  */
