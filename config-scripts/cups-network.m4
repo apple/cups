@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-network.m4,v 1.1.2.9 2003/04/14 19:56:02 mike Exp $"
+dnl "$Id: cups-network.m4,v 1.1.2.10 2003/08/28 15:16:25 mike Exp $"
 dnl
 dnl   Networking stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -36,13 +36,24 @@ AC_CHECK_HEADER(sys/sockio.h,AC_DEFINE(HAVE_SYS_SOCKIO_H))
 
 AC_SUBST(NETLIBS)
 
-maxfiles=4096
+if test "$uname" = "SunOS"; then
+	case "$uversion" in
+		55* | 56*)
+			maxfiles=1024
+			;;
+		*)
+			maxfiles=4096
+			;;
+	esac
+else
+	maxfiles=4096
+fi
 
-AC_ARG_WITH(maxfiles, [  --with-maxfiles=N       set maximum number of file descriptors for CUPS. ],
+AC_ARG_WITH(maxfiles, [  --with-maxfiles=N       set maximum number of file descriptors for scheduler ],
 	maxfiles=$withval)
 
 AC_DEFINE_UNQUOTED(CUPS_MAX_FDS, $maxfiles)
 
 dnl
-dnl End of "$Id: cups-network.m4,v 1.1.2.9 2003/04/14 19:56:02 mike Exp $".
+dnl End of "$Id: cups-network.m4,v 1.1.2.10 2003/08/28 15:16:25 mike Exp $".
 dnl
