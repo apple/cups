@@ -1,5 +1,5 @@
 /*
- * "$Id: devices.c,v 1.4 2000/03/21 04:03:34 mike Exp $"
+ * "$Id: devices.c,v 1.5 2000/04/27 12:18:13 mike Exp $"
  *
  *   Device scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -60,6 +60,7 @@ static dev_info_t	*devs;		/* Device info */
  */
 
 static int	compare_devs(const dev_info_t *p0, const dev_info_t *p1);
+static void	sigalrm_handler(int sig);
 
 
 /*
@@ -70,6 +71,7 @@ void
 LoadDevices(const char *d)	/* I - Directory to scan */
 {
   int		i;		/* Looping var */
+  int		count;		/* Number of devices from backend */
   FILE		*fp;		/* Pipe to device backend */
   DIR		*dir;		/* Directory pointer */
   DIRENT	*dent;		/* Directory entry */
@@ -80,6 +82,9 @@ LoadDevices(const char *d)	/* I - Directory to scan */
 		info[128],	/* Device info */
 		make_model[256];/* Make and model */
   dev_info_t	*dev;		/* Current device */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;	/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
  /*
@@ -136,8 +141,35 @@ LoadDevices(const char *d)	/* I - Directory to scan */
     snprintf(filename, sizeof(filename), "%s/%s", d, dent->d_name);
     if ((fp = popen(filename, "r")) != NULL)
     {
+     /*
+      * Set an alarm for the first read from the backend; this avoids
+      * problems when a backend is hung getting device information.
+      */
+
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+      sigset(SIGALRM, sigalrm_handler);
+#elif defined(HAVE_SIGACTION)
+      memset(&action, 0, sizeof(action));
+
+      sigemptyset(&action.sa_mask);
+      sigaddset(&action.sa_mask, SIGALRM);
+      action.sa_handler = sigalrm_handler;
+      sigaction(SIGALRM, &action, NULL);
+#else
+      signal(SIGALRM, sigalrm_handler);
+#endif /* HAVE_SIGSET */
+
+      alarm(30);
+      count = 0;
+
       while (fgets(line, sizeof(line), fp) != NULL)
       {
+       /*
+        * Reset the alarm clock...
+	*/
+
+        alarm(30);
+
        /*
         * Each line is of the form:
 	*
@@ -164,7 +196,7 @@ LoadDevices(const char *d)	/* I - Directory to scan */
 	  if (num_devs >= alloc_devs)
 	  {
 	   /*
-	    * Allocate (more) memory for the PPD files...
+	    * Allocate (more) memory for the devices...
 	    */
 
 	    if (alloc_devs == 0)
@@ -174,7 +206,7 @@ LoadDevices(const char *d)	/* I - Directory to scan */
 
 	    if (dev == NULL)
 	    {
-              LogMessage(L_ERROR, "load_devs: Ran out of memory for %d devices!",
+              LogMessage(L_ERROR, "LoadDevices: Ran out of memory for %d devices!",
 	        	 alloc_devs + 16);
               closedir(dir);
 	      return;
@@ -195,10 +227,55 @@ LoadDevices(const char *d)	/* I - Directory to scan */
 	  strncpy(dev->device_uri, uri, sizeof(dev->device_uri) - 1);
 
           LogMessage(L_DEBUG, "LoadDevices: Added device \"%s\"...", uri);
+	  count ++;
 	}
       }
 
       pclose(fp);
+
+     /*
+      * Hack for backends that don't support the CUPS 1.1 calling convention:
+      * add a network device with the method == backend name.
+      */
+
+      if (count == 0)
+      {
+	if (num_devs >= alloc_devs)
+	{
+	 /*
+	  * Allocate (more) memory for the devices...
+	  */
+
+	  if (alloc_devs == 0)
+            dev = malloc(sizeof(dev_info_t) * 16);
+	  else
+            dev = realloc(devs, sizeof(dev_info_t) * (alloc_devs + 16));
+
+	  if (dev == NULL)
+	  {
+            LogMessage(L_ERROR, "LoadDevices: Ran out of memory for %d devices!",
+	               alloc_devs + 16);
+            closedir(dir);
+	    return;
+	  }
+
+	  devs = dev;
+	  alloc_devs += 16;
+	}
+
+	dev = devs + num_devs;
+	num_devs ++;
+
+	memset(dev, 0, sizeof(dev_info_t));
+	strcpy(dev->device_class, "network");
+	snprintf(dev->device_info, sizeof(dev->device_info),
+	         "Unknown Network Device (%s)", dent->d_name);
+	strcpy(dev->device_make_and_model, "Unknown");
+	strncpy(dev->device_uri, dent->d_name, sizeof(dev->device_uri) - 1);
+
+        LogMessage(L_DEBUG, "LoadDevices: Compatibility device \"%s\"...",
+	           dent->d_name);
+      }
     }
     else
       LogMessage(L_WARN, "LoadDevices: Unable to execute \"%s\" backend: %s",
@@ -368,5 +445,17 @@ compare_devs(const dev_info_t *d0,	/* I - First PPD file */
 
 
 /*
- * End of "$Id: devices.c,v 1.4 2000/03/21 04:03:34 mike Exp $".
+ * 'sigalrm_handler()' - Handle alarm signals for backends that get hung
+ *                       trying to list the available devices...
+ */
+
+static void
+sigalrm_handler(int sig)	/* I - Signal number */
+{
+  LogMessage(L_WARN, "LoadDevices: Backend did not respond within 30 seconds!");
+}
+
+
+/*
+ * End of "$Id: devices.c,v 1.5 2000/04/27 12:18:13 mike Exp $".
  */
