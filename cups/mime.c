@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c,v 1.9 1999/02/26 22:00:51 mike Exp $"
+ * "$Id: mime.c,v 1.10 1999/03/01 20:51:53 mike Exp $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -33,6 +33,9 @@
  * Revision History:
  *
  *   $Log: mime.c,v $
+ *   Revision 1.10  1999/03/01 20:51:53  mike
+ *   Code cleanup - removed extraneous semi-colons...
+ *
  *   Revision 1.9  1999/02/26 22:00:51  mike
  *   Added more debug statements.
  *
@@ -134,7 +137,7 @@ mimeDelete(mime_t *mime)	/* I - MIME database */
   {
     delete_rules(mime->types[i]->rules);
     free(mime->types[i]);
-  };
+  }
 
  /*
   * Free the types and filters arrays, and then the MIME database structure.
@@ -354,7 +357,7 @@ load_types(mime_t *mime,		/* I - MIME database */
     {
       line[linelen - 1] = '\0';
       linelen --;
-    };
+    }
 
     while (line[linelen - 1] == '\\')
     {
@@ -369,9 +372,9 @@ load_types(mime_t *mime,		/* I - MIME database */
 	{
 	  line[linelen - 1] = '\0';
 	  linelen --;
-	};
-      };
-    };
+	}
+      }
+    }
 
    /*
     * Skip blank lines and lines starting with a #...
@@ -411,7 +414,7 @@ load_types(mime_t *mime,		/* I - MIME database */
 
     typeptr = mimeAddType(mime, super, type);
     mimeAddTypeRule(typeptr, lineptr);
-  };
+  }
 }
 
 
@@ -579,10 +582,10 @@ delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
     free(rules);
     rules = next;
-  };
+  }
 }
 
 
 /*
- * End of "$Id: mime.c,v 1.9 1999/02/26 22:00:51 mike Exp $".
+ * End of "$Id: mime.c,v 1.10 1999/03/01 20:51:53 mike Exp $".
  */

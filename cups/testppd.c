@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c,v 1.5 1999/02/05 17:40:57 mike Exp $"
+ * "$Id: testppd.c,v 1.6 1999/03/01 20:51:54 mike Exp $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -63,7 +63,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   {
     fputs("Usage: ppdtest filename1.ppd [... filenameN.ppd]\n", stderr);
     return (1);
-  };
+  }
 
   for (i = 1; i < argc; i ++)
   {
@@ -71,7 +71,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     {
       fprintf(stderr, "Unable to open \'%s\' as a PPD file!\n", argv[i]);
       continue;
-    };
+    }
 
     printf("FILE: %s\n", argv[i]);
     printf("    language_level = %d\n", ppd->language_level);
@@ -96,7 +96,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       default :
           puts("    colorspace = <unknown>");
 	  break;
-    };
+    }
 
     printf("    num_emulations = %d\n", ppd->num_emulations);
     for (j = 0; j < ppd->num_emulations; j ++)
@@ -112,7 +112,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	   k > 0;
 	   k --, choice ++)
 	printf("            %s (%s)\n", choice->choice, choice->text);
-    };
+    }
 
     printf("    lang_encoding = %s\n", ppd->lang_encoding);
     printf("    lang_version = %s\n", ppd->lang_version);
@@ -145,7 +145,7 @@ main(int  argc,			/* I - Number of command-line arguments */
           else
 	    printf("            %s (%s) = %.2fx%.2fin\n", choice->choice,
 	           choice->text, size->width / 72.0, size->length / 72.0);
-        };
+        }
       }
       else
       {
@@ -153,8 +153,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	     k > 0;
 	     k --, choice ++)
 	  printf("            %s (%s)\n", choice->choice, choice->text);
-      };
-    };
+      }
+    }
 
     printf("    num_groups = %d\n", ppd->num_groups);
     for (j = 0, group = ppd->groups; j < ppd->num_groups; j ++, group ++)
@@ -170,16 +170,16 @@ main(int  argc,			/* I - Number of command-line arguments */
 	     m > 0;
 	     m --, choice ++)
 	  printf("                %s (%s)\n", choice->choice, choice->text);
-      };
-    };
+      }
+    }
 
     ppdClose(ppd);
-  };
+  }
 
   return (0);
 }
 
 
 /*
- * End of "$Id: testppd.c,v 1.5 1999/02/05 17:40:57 mike Exp $".
+ * End of "$Id: testppd.c,v 1.6 1999/03/01 20:51:54 mike Exp $".
  */

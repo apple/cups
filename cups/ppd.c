@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.6 1999/02/05 17:40:54 mike Exp $"
+ * "$Id: ppd.c,v 1.7 1999/03/01 20:51:53 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -118,10 +118,10 @@ ppdClose(ppd_file_t *ppd)	/* I - PPD file record */
     {
       free(emul->start);
       free(emul->stop);
-    };
+    }
 
     free(ppd->emulations);
-  };
+  }
 
  /*
   * Free any JCLs...
@@ -133,7 +133,7 @@ ppdClose(ppd_file_t *ppd)	/* I - PPD file record */
       ppd_free_option(option);
 
     free(ppd->jcls);
-  };
+  }
 
  /*
   * Free any UI groups, subgroups, and options...
@@ -145,7 +145,7 @@ ppdClose(ppd_file_t *ppd)	/* I - PPD file record */
       ppd_free_group(group);
 
     free(ppd->groups);
-  };
+  }
 
  /*
   * Free any Non-UI options...
@@ -157,7 +157,7 @@ ppdClose(ppd_file_t *ppd)	/* I - PPD file record */
       ppd_free_option(option);
 
     free(ppd->nonuis);
-  };
+  }
 
  /*
   * Free any page sizes...
@@ -183,7 +183,7 @@ ppdClose(ppd_file_t *ppd)	/* I - PPD file record */
       free(*font);
 
     free(ppd->fonts);
-  };
+  }
 
  /*
   * Free the whole record...
@@ -213,7 +213,7 @@ ppd_free_group(ppd_group_t *group)	/* I - Group to free */
       ppd_free_option(option);
 
     free(group->options);
-  };
+  }
 
   if (group->num_subgroups > 0)
   {
@@ -223,7 +223,7 @@ ppd_free_group(ppd_group_t *group)	/* I - Group to free */
       ppd_free_group(subgroup);
 
     free(group->subgroups);
-  };
+  }
 }
 
 
@@ -246,7 +246,7 @@ ppd_free_option(ppd_option_t *option)	/* I - Option to free */
       free(choice->code);
 
     free(option->choices);
-  };
+  }
 }
 
 
@@ -302,7 +302,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       free(string);
 
     return (NULL);
-  };
+  }
 
   if (string != NULL)
     free(string);
@@ -345,7 +345,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
         printf(", string = %08x", string);
       else
         printf(", string = \"%s\"", string);
-    };
+    }
 
     puts("");
 #endif /* DEBUG */
@@ -442,7 +442,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	  count ++;
 	  while (*sptr == ' ')
 	    sptr ++;
-	};
+	}
 
       ppd->num_emulations = count;
       ppd->emulations     = calloc(sizeof(ppd_emul_t), count);
@@ -509,7 +509,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
       {
         ppdClose(ppd);
 	return (NULL);
-      };
+      }
 
       if (subgroup != NULL)
       {
@@ -524,7 +524,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	  ppdClose(ppd);
 	  free(string);
 	  return (NULL);
-	};
+	}
 
         subgroup->options = option;
 	option += subgroup->num_options;
@@ -543,7 +543,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	  ppdClose(ppd);
 	  free(string);
 	  return (NULL);
-	};
+	}
 
         group->options = option;
 	option += group->num_options;
@@ -579,7 +579,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	    ppdClose(ppd);
 	    free(string);
 	    return (NULL);
-	  };
+	  }
 
 	  ppd->groups = group;
 	  group += ppd->num_groups;
@@ -588,7 +588,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	  memset(group, 0, sizeof(ppd_group_t));
 
 	  strcpy((char *)group->text, "Printer");
-        };
+        }
 
         if (group->num_options == 0)
 	  option = malloc(sizeof(ppd_option_t));
@@ -601,7 +601,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	  ppdClose(ppd);
 	  free(string);
 	  return (NULL);
-	};
+	}
 
         group->options = option;
 	option += group->num_options;
@@ -621,12 +621,12 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	  ppdClose(ppd);
 	  free(string);
 	  return (NULL);
-	};
+	}
 
         ppd->options = option;
 	option += ppd->num_options;
 	ppd->num_options ++;
-      };
+      }
 
      /*
       * Now fill in the initial information for the option...
@@ -666,7 +666,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	ppdClose(ppd);
 	free(string);
 	return (NULL);
-      };
+      }
 
       ppd->jcls = option;
       option += ppd->num_jcls;
@@ -704,7 +704,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
         ppdClose(ppd);
 	free(string);
 	return (NULL);
-      };
+      }
 
       if (strchr((char *)string, '/') != NULL)	/* Just show human readable text */
         strcpy((char *)string, strchr((char *)string, '/') + 1);
@@ -720,7 +720,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	ppdClose(ppd);
 	free(string);
 	return (NULL);
-      };
+      }
 
       ppd->groups = group;
       group += ppd->num_groups;
@@ -743,7 +743,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
         ppdClose(ppd);
 	free(string);
 	return (NULL);
-      };
+      }
 
       if (group->num_subgroups == 0)
 	subgroup = malloc(sizeof(ppd_group_t));
@@ -756,7 +756,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	ppdClose(ppd);
 	free(string);
 	return (NULL);
-      };
+      }
 
       group->subgroups = subgroup;
       subgroup += group->num_subgroups;
@@ -776,7 +776,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
         ppdClose(ppd);
 	free(string);
 	return (NULL);
-      };
+      }
 
       if (keyword[0] == '*')
         strcpy(keyword, keyword + 1);
@@ -806,13 +806,13 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	    ppd->nonuis[i].section = section;
 	    ppd->nonuis[i].order   = order;
 	    break;
-	  };
+	  }
       }
       else
       {
         option->section = section;
 	option->order   = order;
-      };
+      }
     }
     else if (strncmp(keyword, "Default", 7) == 0)
     {
@@ -827,7 +827,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	  {
 	    strcpy(ppd->nonuis[i].defchoice, (char *)string);
 	    break;
-	  };
+	  }
       }
       else
         strcpy(option->defchoice, (char *)string);
@@ -846,7 +846,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	ppdClose(ppd);
 	free(string);
 	return (NULL);
-      };
+      }
 
       ppd->consts = constraint;
       constraint += ppd->num_consts;
@@ -897,7 +897,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	    if (constraint->option2[0] == '*')
   	      strcpy(constraint->option2, constraint->option2 + 1);
 	    break;
-      };
+      }
     }
     else if (strcmp(keyword, "PaperDimension") == 0)
     {
@@ -930,7 +930,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	  ppdClose(ppd);
 	  free(string);
 	  return (NULL);
-	};
+	}
 
         ppd->sizes = size;
 	size += ppd->num_sizes;
@@ -939,7 +939,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
         memset(size, 0, sizeof(ppd_size_t));
 
 	strcpy(size->name, name);
-      };
+      }
 
      /*
       * Add the option choice...
@@ -956,7 +956,7 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 	ppdClose(ppd);
 	free(string);
 	return (NULL);
-      };
+      }
 
       option->choices = choice;
       choice += option->num_choices;
@@ -981,11 +981,11 @@ ppdOpen(FILE *fp)		/* I - File to read from */
 
       choice->code = string;
       string = NULL;			/* Don't free this string below */
-    };
+    }
 
     if (string != NULL)
       free(string);
-  };
+  }
 
 #ifdef DEBUG
   if (!feof(fp))
@@ -1134,7 +1134,7 @@ ppd_read(FILE          *fp,	/* I - File to read from */
 	    break;
 	  if (ch != 0x0a)
 	    ungetc(ch, fp);
-	};
+	}
 
 	*lineptr++ = '\n';
 
@@ -1151,8 +1151,8 @@ ppd_read(FILE          *fp,	/* I - File to read from */
 
 	if (ch == '\"')
           endquote = !endquote;
-      };
-    };
+      }
+    }
 
     if (lineptr > line && lineptr[-1] == '\n')
       lineptr --;
@@ -1231,8 +1231,8 @@ ppd_read(FILE          *fp,	/* I - File to read from */
 	ppd_decode(text);
 
 	mask |= PPD_TEXT;
-      };
-    };
+      }
+    }
 
     if (*lineptr == ':')
     {
@@ -1253,11 +1253,11 @@ ppd_read(FILE          *fp,	/* I - File to read from */
 	  *strptr++ = *lineptr++;
 	else
 	  lineptr ++;
-      };
+      }
 
       *strptr = '\0';
       mask |= PPD_STRING;
-    };
+    }
   }
   while (mask == 0);
 
@@ -1303,7 +1303,7 @@ ppd_decode(unsigned char *string)	/* I - String to decode */
 
 	inptr ++;
 	outptr ++;
-      };
+      }
 
       while (*inptr != '>' && *inptr != '\0')
 	inptr ++;
@@ -1320,5 +1320,5 @@ ppd_decode(unsigned char *string)	/* I - String to decode */
 
 
 /*
- * End of "$Id: ppd.c,v 1.6 1999/02/05 17:40:54 mike Exp $".
+ * End of "$Id: ppd.c,v 1.7 1999/03/01 20:51:53 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: filter.c,v 1.4 1999/02/05 17:40:51 mike Exp $"
+ * "$Id: filter.c,v 1.5 1999/03/01 20:51:51 mike Exp $"
  *
  *   File type conversion routines for the Common UNIX Printing System (CUPS).
  *
@@ -31,6 +31,9 @@
  * Revision History:
  *
  *   $Log: filter.c,v $
+ *   Revision 1.5  1999/03/01 20:51:51  mike
+ *   Code cleanup - removed extraneous semi-colons...
+ *
  *   Revision 1.4  1999/02/05 17:40:51  mike
  *   Added IPP client read/write code.
  *
@@ -113,7 +116,7 @@ mimeAddFilter(mime_t      *mime,	/* I - MIME database */
     {
       temp->cost = cost;
       strcpy(temp->filter, filter);
-    };
+    }
   }
   else
   {
@@ -145,7 +148,7 @@ mimeAddFilter(mime_t      *mime,	/* I - MIME database */
     if (mime->num_filters > 1)
       qsort(mime->filters, mime->num_filters, sizeof(mime_filter_t),
             (int (*)(const void *, const void *))compare);
-  };
+  }
 
  /*
   * Return the new/updated filter...
@@ -202,7 +205,7 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
     memcpy(filters, temp, sizeof(mime_filter_t));
     *num_filters = 1;
     return (filters);
-  };
+  }
 
  /*
   * OK, now look for filters from the source type to any other type...
@@ -231,7 +234,7 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
       {
         *num_filters = 0;
         continue;
-      };
+      }
 
       memmove(filters + 1, filters, *num_filters * sizeof(mime_filter_t));
       memcpy(filters, current, sizeof(mime_filter_t));
@@ -239,7 +242,7 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
       (*num_filters) ++;
 
       return (filters);
-    };
+    }
 
   return (NULL);
 }
@@ -290,5 +293,5 @@ lookup(mime_t      *mime,	/* I - MIME database */
 
 
 /*
- * End of "$Id: filter.c,v 1.4 1999/02/05 17:40:51 mike Exp $".
+ * End of "$Id: filter.c,v 1.5 1999/03/01 20:51:51 mike Exp $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h,v 1.5 1999/02/26 15:10:24 mike Exp $"
+ * "$Id: ipp.h,v 1.6 1999/03/01 20:51:52 mike Exp $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -177,7 +177,6 @@ typedef enum			/**** IPP operations... ****/
   IPP_GET_JOBS,
   IPP_GET_PRINTER_ATTRIBUTES,
   IPP_PRIVATE = 0x4000,
-  CUPS_GET_DEFAULT,
   CUPS_GET_PRINTERS,
   CUPS_ADD_PRINTER,
   CUPS_DELETE_PRINTER,
@@ -332,5 +331,5 @@ extern int		ippPort(void);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h,v 1.5 1999/02/26 15:10:24 mike Exp $".
+ * End of "$Id: ipp.h,v 1.6 1999/03/01 20:51:52 mike Exp $".
  */

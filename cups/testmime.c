@@ -1,5 +1,5 @@
 /*
- * "$Id: testmime.c,v 1.4 1999/02/05 17:40:56 mike Exp $"
+ * "$Id: testmime.c,v 1.5 1999/03/01 20:51:54 mike Exp $"
  *
  *   MIME test program for the Common UNIX Printing System (CUPS).
  *
@@ -68,7 +68,7 @@ main(int  argc,				/* I - Number of command-line args */
     printf("\t%s/%s: ", (*types)->super, (*types)->type);
     print_rules((*types)->rules);
     puts("");
-  };
+  }
 
   puts("");
 
@@ -99,7 +99,7 @@ main(int  argc,				/* I - Number of command-line args */
 	{
 	  printf("%s: unknown\n", argv[1]);
 	  return (1);
-	};
+	}
 
     case 3 :
         src = mimeFileType(mime, argv[1]);
@@ -123,8 +123,8 @@ main(int  argc,				/* I - Number of command-line args */
 	      puts(filters[i].filter);
 
           return (0);
-	};
-  };
+	}
+  }
 }
 
 
@@ -184,16 +184,16 @@ print_rules(mime_magic_t *rules)	/* I - Rules to print */
 	    putchar('(');
 	    print_rules(rules->child);
 	    putchar(')');
-	  };
+	  }
 	  break;
-    };
+    }
 
     rules = rules->next;
-  };
+  }
 }
 
 
 
 /*
- * End of "$Id: testmime.c,v 1.4 1999/02/05 17:40:56 mike Exp $".
+ * End of "$Id: testmime.c,v 1.5 1999/03/01 20:51:54 mike Exp $".
  */

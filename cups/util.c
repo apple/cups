@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c,v 1.3 1999/02/26 22:00:52 mike Exp $"
+ * "$Id: util.c,v 1.4 1999/03/01 20:51:55 mike Exp $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -81,6 +81,10 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
 	      cups_option_t *options)	/* I - Options */
 {
   int			i;			/* Looping var */
+  int			n, n2;			/* Attribute values */
+  char			*name,			/* Name of option */
+			*val;			/* Pointer to option value */
+			*s;			/* Pointer into option value */
   http_t		*http;			/* HTTP connection */
   ipp_t			*request;		/* IPP request */
   ipp_t			*response;		/* IPP response */
@@ -92,7 +96,7 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
   char			buffer[8192];		/* Copy buffer */
   http_status_t		status;			/* HTTP status of request */
   int			jobid;			/* New job ID */
-
+  
 
   DEBUG_printf(("cupsPrintFile(\'%s\', \'%s\', %d, %08x)\n",
                 printer, filename, num_options, options));
@@ -167,17 +171,116 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
                       "application/octet-stream");
   attr->value_tag = IPP_TAG_MIMETYPE;
 
- /**** ADD USERNAME ****/
+  attr = ippAddString(request, IPP_TAG_JOB, "requesting-user-name",
+                      cuserid(NULL));
+  attr->value_tag = IPP_TAG_NAME;
 
  /*
   * Then add all options on the command-line...
   */
 
-#if 0
   for (i = 0; i < num_options; i ++)
   {
+   /*
+    * Ignore option names that don't start with a letter...
+    */
+
+    if (!isalpha(options[i].name[0]))
+      continue;
+
+   /*
+    * See what the option value is; for compatibility with older interface
+    * scripts, we have to support single-argument options, option SPACE value,
+    * option=value, and option=low-high.
+    */
+
+    name = options[i].name;
+    val  = options[i].value;
+
+    if (val == NULL || *val == '\0')
+    {
+      if ((i + 1) < num_options &&
+          !isalpha(options[i + 1].name[0]))
+      {
+        i ++;
+
+        val = options[i].name;
+      }
+      else
+        val = NULL;
+    }
+
+    if (val != NULL)
+    {
+      if (strcasecmp(val, "true") == 0 ||
+          strcasecmp(val, "on") == 0 ||
+	  strcasecmp(val, "yes") == 0)
+      {
+       /*
+	* Boolean value - true...
+	*/
+
+	n   = 1;
+	val = "";
+      }
+      else if (strcasecmp(val, "false") == 0 ||
+               strcasecmp(val, "off") == 0 ||
+	       strcasecmp(val, "no") == 0)
+      {
+       /*
+	* Boolean value - false...
+	*/
+
+	n   = 0;
+	val = "";
+      }
+
+      n = strtol(val, &s, 0);
+    }
+    else
+    {
+      if (strncmp(name, "no", 2) == 0)
+      {
+	name += 2;
+	n    = 0;
+      }
+      else
+        n = 1;
+
+      s = "";
+    }
+
+    if (*s != '\0' && *s != '-')
+    {
+     /*
+      * String value(s)...
+      */
+
+      attr = ippAddString(request, IPP_TAG_JOB, name, val);
+    }
+    else if (val != NULL)
+    {
+     /*
+      * Numeric value or range...
+      */
+
+      if (*s == '-')
+      {
+        n2   = strtol(s + 1, NULL, 0);
+        attr = ippAddRange(request, IPP_TAG_JOB, name, n, n2);
+      }
+      else
+        attr = ippAddInteger(request, IPP_TAG_JOB, name, n);
+    }
+    else
+    {
+     /*
+      * Boolean value...
+      */
+
+      attr = ippAddBoolean(request, IPP_TAG_JOB, name, n);
+    }
   }
-#endif /* 0 */
 
  /*
   * Setup the necessary HTTP fields...
@@ -259,5 +362,5 @@ cupsPrintFile(char          *printer,	/* I - Printer or class name */
 
 
 /*
- * End of "$Id: util.c,v 1.3 1999/02/26 22:00:52 mike Exp $".
+ * End of "$Id: util.c,v 1.4 1999/03/01 20:51:55 mike Exp $".
  */

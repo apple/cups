@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c,v 1.5 1999/02/26 22:00:52 mike Exp $"
+ * "$Id: type.c,v 1.6 1999/03/01 20:51:54 mike Exp $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -34,6 +34,9 @@
  * Revision History:
  *
  *   $Log: type.c,v $
+ *   Revision 1.6  1999/03/01 20:51:54  mike
+ *   Code cleanup - removed extraneous semi-colons...
+ *
  *   Revision 1.5  1999/02/26 22:00:52  mike
  *   Added more debug statements.
  *
@@ -133,7 +136,7 @@ mimeAddType(mime_t *mime,	/* I - MIME database */
   {
     free(temp);
     return (NULL);
-  };
+  }
 
   mime->types = types;
   types += mime->num_types;
@@ -273,7 +276,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	  {
 	    current->parent = temp;
 	    current         = current->prev;
-	  };
+	  }
 
           current->parent = temp;
           temp->op        = MIME_MAGIC_AND;
@@ -288,8 +291,8 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	  */
 
 	  current = current->parent;
-	};
-      };
+	}
+      }
 
       logic = MIME_MAGIC_OR;
       rule ++;
@@ -370,7 +373,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 		}
 		else
 	          return (-1);
-	      };
+	      }
 
               if (*rule == '>')
 	        rule ++;
@@ -379,7 +382,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	    }
 	    else
 	      *ptr++ = *rule++;
-	  };
+	  }
 
           *ptr = '\0';
 	  length[num_values] = ptr - value[num_values];
@@ -388,7 +391,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	    break;
 
           rule ++;
-	};
+	}
 
         if (*rule != ')')
 	  return (-1);
@@ -427,7 +430,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	sprintf(value[0], "*.%s", name);
 	num_values = 1;
 	op         = MIME_MAGIC_MATCH;
-      };
+      }
 
      /*
       * Add a rule for this operation.
@@ -462,7 +465,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 
 	temp  = temp->child;
         logic = MIME_MAGIC_OR;
-      };
+      }
 
      /*
       * Fill in data for the rule...
@@ -514,11 +517,11 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 
 	    strcpy(temp->value.localev, value[0]);
 	    break;
-      };
+      }
     }
     else
       break;
-  };
+  }
 
   return (0);
 }
@@ -703,7 +706,7 @@ checkrules(char         *filename,	/* I - Filename */
             fseek(fp, rules->offset, SEEK_SET);
 	    buflength = fread(buffer, 1, sizeof(buffer), fp);
 	    bufoffset = rules->offset;
-	  };
+	  }
 
          /*
 	  * Test for ASCII printable characters plus standard control chars.
@@ -744,7 +747,7 @@ checkrules(char         *filename,	/* I - Filename */
             fseek(fp, rules->offset, SEEK_SET);
 	    buflength = fread(buffer, 1, sizeof(buffer), fp);
 	    bufoffset = rules->offset;
-	  };
+	  }
 
          /*
 	  * Test for ASCII printable characters plus standard control chars.
@@ -787,7 +790,7 @@ checkrules(char         *filename,	/* I - Filename */
             fseek(fp, rules->offset, SEEK_SET);
 	    buflength = fread(buffer, 1, sizeof(buffer), fp);
 	    bufoffset = rules->offset;
-	  };
+	  }
 
          /*
 	  * Compare the buffer against the string.  If the file is too
@@ -815,7 +818,7 @@ checkrules(char         *filename,	/* I - Filename */
             fseek(fp, rules->offset, SEEK_SET);
 	    buflength = fread(buffer, 1, sizeof(buffer), fp);
 	    bufoffset = rules->offset;
-	  };
+	  }
 
 	 /*
 	  * Compare the character values; if the file is too short, it
@@ -843,7 +846,7 @@ checkrules(char         *filename,	/* I - Filename */
             fseek(fp, rules->offset, SEEK_SET);
 	    buflength = fread(buffer, 1, sizeof(buffer), fp);
 	    bufoffset = rules->offset;
-	  };
+	  }
 
 	 /*
 	  * Compare the short values; if the file is too short, it
@@ -857,7 +860,7 @@ checkrules(char         *filename,	/* I - Filename */
 	    bufptr = buffer + rules->offset - bufoffset;
 	    shortv = (bufptr[0] << 8) | bufptr[1];
 	    result = (shortv == rules->value.shortv);
-	  };
+	  }
 	  break;
 
       case MIME_MAGIC_INT :
@@ -875,7 +878,7 @@ checkrules(char         *filename,	/* I - Filename */
             fseek(fp, rules->offset, SEEK_SET);
 	    buflength = fread(buffer, 1, sizeof(buffer), fp);
 	    bufoffset = rules->offset;
-	  };
+	  }
 
 	 /*
 	  * Compare the int values; if the file is too short, it
@@ -890,7 +893,7 @@ checkrules(char         *filename,	/* I - Filename */
 	    intv   = (((((bufptr[0] << 8) | bufptr[1]) << 8) | bufptr[2]) << 8) |
 	             bufptr[3];;
 	    result = (intv == rules->value.intv);
-	  };
+	  }
 	  break;
 
       case MIME_MAGIC_LOCALE :
@@ -903,7 +906,7 @@ checkrules(char         *filename,	/* I - Filename */
 	  else
 	    result = 0;
 	  break;
-    };
+    }
 
    /*
     * If the logic is inverted, invert the result...
@@ -927,7 +930,7 @@ checkrules(char         *filename,	/* I - Filename */
     */
 
     rules = rules->next;
-  };
+  }
 
   return (result);
 }
@@ -975,7 +978,7 @@ patmatch(char *s,	/* I - String to match against */
 	  return (1);
 
 	s ++;
-      };
+      }
     }
     else if (*pat == '?')
     {
@@ -1018,7 +1021,7 @@ patmatch(char *s,	/* I - String to match against */
       */
 
       pat ++;
-    };
+    }
 
    /*
     * Stop if the pattern and string don't match...
@@ -1026,7 +1029,7 @@ patmatch(char *s,	/* I - String to match against */
 
     if (*pat++ != *s++)
       return (0);
-  };
+  }
 
  /*
   * Done parsing the pattern and string; return 1 if the last character matches
@@ -1038,5 +1041,5 @@ patmatch(char *s,	/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c,v 1.5 1999/02/26 22:00:52 mike Exp $".
+ * End of "$Id: type.c,v 1.6 1999/03/01 20:51:54 mike Exp $".
  */

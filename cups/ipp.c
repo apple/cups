@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.6 1999/02/26 15:10:24 mike Exp $"
+ * "$Id: ipp.c,v 1.7 1999/03/01 20:51:52 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -570,7 +570,7 @@ ippLength(ipp_t *ipp)		/* I - IPP request */
     {
       bytes ++;	/* Group tag */
       group = attr->group_tag;
-    };
+    }
 
     DEBUG_printf(("attr->name = %s, attr->num_values = %d, bytes = %d\n",
                   attr->name, attr->num_values, bytes));
@@ -1326,5 +1326,5 @@ add_attr(ipp_t *ipp,			/* I - IPP request */
 
 
 /*
- * End of "$Id: ipp.c,v 1.6 1999/02/26 15:10:24 mike Exp $".
+ * End of "$Id: ipp.c,v 1.7 1999/03/01 20:51:52 mike Exp $".
  */

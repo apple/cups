@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c,v 1.20 1999/02/26 22:00:51 mike Exp $"
+ * "$Id: http.c,v 1.21 1999/03/01 20:51:51 mike Exp $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -314,7 +314,7 @@ httpReconnect(http_t *http)	/* I - HTTP data */
 #endif
 
     return (-1);
-  };
+  }
 
   httpBlocking(http, http->blocking);
 
@@ -1336,5 +1336,5 @@ http_send(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c,v 1.20 1999/02/26 22:00:51 mike Exp $".
+ * End of "$Id: http.c,v 1.21 1999/03/01 20:51:51 mike Exp $".
  */

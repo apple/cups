@@ -1,5 +1,5 @@
 /*
- * "$Id: string.c,v 1.1 1999/02/05 17:40:55 mike Exp $"
+ * "$Id: string.c,v 1.2 1999/03/01 20:51:53 mike Exp $"
  *
  *   String functions for the Common UNIX Printing System (CUPS).
  *
@@ -75,7 +75,7 @@ strcasecmp(const char *s,	/* I - First string */
 
     s ++;
     t ++;
-  };
+  }
 
   if (*s == '\0' && *t == '\0')
     return (0);
@@ -106,7 +106,7 @@ strncasecmp(const char *s,	/* I - First string */
     s ++;
     t ++;
     n --;
-  };
+  }
 
   if (n == 0)
     return (0);
@@ -121,5 +121,5 @@ strncasecmp(const char *s,	/* I - First string */
 
 
 /*
- * End of "$Id: string.c,v 1.1 1999/02/05 17:40:55 mike Exp $".
+ * End of "$Id: string.c,v 1.2 1999/03/01 20:51:53 mike Exp $".
  */
