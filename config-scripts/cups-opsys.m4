@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-opsys.m4,v 1.5.2.2 2001/12/29 00:28:15 mike Exp $"
+dnl "$Id: cups-opsys.m4,v 1.5.2.3 2002/01/02 18:50:23 mike Exp $"
 dnl
 dnl   Operating system stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2001 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2002 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -86,5 +86,5 @@ AC_DEFINE_UNQUOTED(CUPS_DEFAULT_USER, "$CUPS_USER")
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_GROUP, "$CUPS_GROUP")
 
 dnl
-dnl "$Id: cups-opsys.m4,v 1.5.2.2 2001/12/29 00:28:15 mike Exp $"
+dnl "$Id: cups-opsys.m4,v 1.5.2.3 2002/01/02 18:50:23 mike Exp $"
 dnl
