@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c,v 1.14 2000/06/28 18:44:52 mike Exp $"
+ * "$Id: lpadmin.c,v 1.15 2000/07/10 15:02:25 mike Exp $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -33,6 +33,8 @@
  *   set_printer_file()          - Set the interface script or PPD file.
  *   set_printer_info()          - Set the printer description string.
  *   set_printer_location()      - Set the printer location string.
+ *   validate_name()             - Make sure the printer name only contains
+ *                                 letters, numbers, and the underscore...
  */
 
 /*
@@ -64,6 +66,7 @@ static void	set_printer_device(http_t *, char *, char *);
 static void	set_printer_file(http_t *, char *, char *);
 static void	set_printer_info(http_t *, char *, char *);
 static void	set_printer_location(http_t *, char *, char *);
+static int	validate_name(const char *);
 
 
 /*
@@ -75,8 +78,9 @@ main(int  argc,		/* I - Number of command-line arguments */
      char *argv[])	/* I - Command-line arguments */
 {
   int		i;		/* Looping var */
-  http_t	 *http;		/* Connection to server */
+  http_t	*http;		/* Connection to server */
   char		*printer,	/* Destination printer */
+		*pclass,	/* Printer class name */
 		*host,		/* Pointer to hostname */
 		filename[1024];	/* Model filename */
   const char	*datadir;	/* CUPS_DATADIR env variable */
@@ -112,11 +116,24 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    }
 
 	    if (argv[i][2])
-	      add_printer_to_class(http, printer, argv[i] + 2);
+	      pclass = argv[i] + 2;
 	    else
 	    {
 	      i ++;
-	      add_printer_to_class(http, printer, argv[i]);
+
+	      if (i >= argc)
+	      {
+		fputs("lpadmin: Expected class name after \'-c\' option!\n", stderr);
+		return (1);
+	      }
+
+	      pclass = argv[i];
+	    }
+
+            if (!validate_name(pclass))
+	    {
+	      fputs("lpadmin: Class name can only contain letters, numbers, and the underscore!\n", stderr);
+	      return (1);
 	    }
 	    break;
 
@@ -137,7 +154,20 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    else
 	    {
 	      i ++;
+
+	      if (i >= argc)
+	      {
+		fputs("lpadmin: Expected printer name after \'-d\' option!\n", stderr);
+		return (1);
+	      }
+
 	      printer = argv[i];
+	    }
+
+            if (!validate_name(printer))
+	    {
+	      fputs("lpadmin: Printer name can only contain letters, numbers, and the underscore!\n", stderr);
+	      return (1);
 	    }
 
             default_printer(http, printer);
@@ -156,7 +186,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        fputs("Error: need hostname after \'-h\' option!\n", stderr);
+	        fputs("lpadmin: Expected hostname after \'-h\' option!\n", stderr);
 		return (1);
               }
 	      else
@@ -194,6 +224,13 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    else
 	    {
 	      i ++;
+
+	      if (i >= argc)
+	      {
+		fputs("lpadmin: Expected interface after \'-i\' option!\n", stderr);
+		return (1);
+	      }
+
 	      set_printer_file(http, printer, argv[i]);
 	    }
 	    break;
@@ -245,6 +282,13 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    else
 	    {
 	      i ++;
+
+	      if (i >= argc)
+	      {
+		fputs("lpadmin: Expected model after \'-m\' option!\n", stderr);
+		return (1);
+	      }
+
 	      snprintf(filename, sizeof(filename), "%s/model/%s", datadir,
 	               argv[i]);
 	    }
@@ -269,7 +313,20 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    else
 	    {
 	      i ++;
+
+	      if (i >= argc)
+	      {
+		fputs("lpadmin: Expected printer after \'-p\' option!\n", stderr);
+		return (1);
+	      }
+
 	      printer = argv[i];
+	    }
+
+            if (!validate_name(printer))
+	    {
+	      fputs("lpadmin: Printer name can only contain letters, numbers, and the underscore!\n", stderr);
+	      return (1);
 	    }
 
 	    if ((host = strchr(printer, '@')) != NULL)
@@ -309,12 +366,27 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    }
 
 	    if (argv[i][2])
-	      delete_printer_from_class(http, printer, argv[i] + 2);
+	      pclass = argv[i] + 2;
 	    else
 	    {
 	      i ++;
-	      delete_printer_from_class(http, printer, argv[i]);
+
+	      if (i >= argc)
+	      {
+		fputs("lpadmin: Expected class after \'-r\' option!\n", stderr);
+		return (1);
+	      }
+
+	      pclass = argv[i];
 	    }
+
+            if (!validate_name(pclass))
+	    {
+	      fputs("lpadmin: Class name can only contain letters, numbers, and the underscore!\n", stderr);
+	      return (1);
+	    }
+
+            delete_printer_from_class(http, printer, pclass);
 	    break;
 
         case 'v' : /* Set the device-uri attribute */
@@ -341,6 +413,13 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    else
 	    {
 	      i ++;
+
+	      if (i >= argc)
+	      {
+		fputs("lpadmin: Expected device URI after \'-v\' option!\n", stderr);
+		return (1);
+	      }
+
 	      set_printer_device(http, printer, argv[i]);
 	    }
 	    break;
@@ -362,7 +441,20 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    else
 	    {
 	      i ++;
+
+	      if (i >= argc)
+	      {
+		fputs("lpadmin: Expected printer or class after \'-x\' option!\n", stderr);
+		return (1);
+	      }
+
 	      printer = argv[i];
+	    }
+
+            if (!validate_name(printer))
+	    {
+	      fputs("lpadmin: Printer name can only contain letters, numbers, and the underscore!\n", stderr);
+	      return (1);
 	    }
 
 	    if ((host = strchr(printer, '@')) != NULL)
@@ -409,6 +501,13 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    else
 	    {
 	      i ++;
+
+	      if (i >= argc)
+	      {
+		fputs("lpadmin: Expected description after \'-D\' option!\n", stderr);
+		return (1);
+	      }
+
 	      set_printer_info(http, printer, argv[i]);
 	    }
 	    break;
@@ -437,6 +536,13 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    else
 	    {
 	      i ++;
+
+	      if (i >= argc)
+	      {
+		fputs("lpadmin: Expected location after \'-L\' option!\n", stderr);
+		return (1);
+	      }
+
 	      set_printer_location(http, printer, argv[i]);
 	    }
 	    break;
@@ -465,6 +571,13 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    else
 	    {
 	      i ++;
+
+	      if (i >= argc)
+	      {
+		fputs("lpadmin: Expected PPD after \'-P\' option!\n", stderr);
+		return (1);
+	      }
+
 	      set_printer_file(http, printer, argv[i]);
 	    }
 	    break;
@@ -1333,5 +1446,25 @@ set_printer_location(http_t *http,	/* I - Server connection */
 
 
 /*
- * End of "$Id: lpadmin.c,v 1.14 2000/06/28 18:44:52 mike Exp $".
+ * 'validate_name()' - Make sure the printer name only contains letters,
+ *                     numbers, and the underscore...
+ */
+
+static int			/* O - 0 if name is no good, 1 if name is good */
+validate_name(const char *name)	/* I - Name to check */
+{
+  while (*name)
+    if (*name == '@')
+      return (1);
+    else if (!isalnum(*name) && *name != '_')
+      return (0);
+    else
+      name ++;
+
+  return (1);
+}
+
+
+/*
+ * End of "$Id: lpadmin.c,v 1.15 2000/07/10 15:02:25 mike Exp $".
  */
