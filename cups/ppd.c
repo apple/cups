@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c,v 1.79 2003/01/28 15:37:35 mike Exp $"
+ * "$Id: ppd.c,v 1.80 2003/01/28 20:20:19 mike Exp $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -99,11 +99,10 @@ static ppd_size_t	*ppd_add_size(ppd_file_t *ppd, const char *name);
 static int		ppd_compare_groups(ppd_group_t *g0, ppd_group_t *g1);
 static int		ppd_compare_options(ppd_option_t *o0, ppd_option_t *o1);
 static void		ppd_decode(char *string);
-#ifdef __APPLE__
-#  define ppd_fix(s)
-#else
 static void		ppd_fix(char *string);
-#endif /* __APPLE__ */
+#else
+#  define ppd_fix(s)
+#endif /* !__APPLE__ */
 static void		ppd_free_group(ppd_group_t *group);
 static void		ppd_free_option(ppd_option_t *option);
 static ppd_group_t	*ppd_get_group(ppd_file_t *ppd, const char *name,
@@ -1708,7 +1707,6 @@ ppd_add_attr(ppd_file_t *ppd,		/* I - PPD file data */
 
   return (temp);
 }
-#endif /* !__APPLE__ */
 
 
 /*
@@ -2331,5 +2329,5 @@ ppd_read(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c,v 1.79 2003/01/28 15:37:35 mike Exp $".
+ * End of "$Id: ppd.c,v 1.80 2003/01/28 20:20:19 mike Exp $".
  */
