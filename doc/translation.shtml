@@ -1,0 +1,406 @@
+<HTML>
+<HEAD>
+	<META NAME="COPYRIGHT" CONTENT="Copyright 2001-2002, All Rights Reserved">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-TRANS-1.1">
+	<META NAME="Author" CONTENT="Easy Software Products">
+	<TITLE>CUPS Translation Guide</TITLE>
+</HEAD>
+<BODY>
+
+<H1>Scope</H1>
+
+<H2>Identification</H2>
+
+<P>This translation guide provides instructions for creating
+translations of the CUPS message catalogs and web pages for the
+Common UNIX Printing System ("CUPS") Version 1.1 software.
+
+<EMBED SRC="system-overview.shtml">
+
+<H2>Document Overview</H2>
+
+<P>This translation guide is organized into the following
+sections:
+
+<UL>
+	<LI>1 - Scope</LI>
+	<LI>2 - References</LI>
+	<LI>3 - Character Sets</LI>
+	<LI>4 - Message Catalogs</LI>
+	<LI>5 - Web Interfaces</LI>
+	<LI>A - Glossary</LI>
+</UL>
+
+<EMBED SRC="references.shtml">
+
+
+<H1>Character Sets</H1>
+
+<P>CUPS uses character set files to define the mapping of local
+character sets to Unicode code points, as well as the fonts that
+should be used for different ranges of characters.
+
+
+
+<H1>Message Catalogs</H1>
+
+
+
+
+<H1>Web Interfaces</H1>
+
+<P>The CUPS scheduler provides a web interface that can be used
+to do many common printing and administration tasks. The built-in
+web server supports localization of web pages through the use of
+subdirectories for each locale, e.g. "fr" for French, "de" for
+German, "fr_ca" for French in Canada, and so forth.
+
+
+<H2>Template Files</H2>
+
+<P>The CUPS CGI programs (<CODE>admin.cgi</CODE>,
+<CODE>classes.cgi</CODE>, <CODE>jobs.cgi</CODE>, and
+<CODE>printers.cgi</CODE>) are responsible for providing dynamic
+content for the web interface. To facilitate this process, a
+series of HTML template files are used that build the final
+output page. Template files are installed in the
+<VAR>/usr/share/cups/templates</VAR> directory by default.  
+
+<P>Translated versions of the template files should be installed
+in the appropriate subdirectories under
+<VAR>/usr/share/cups/templates</VAR>. Template files consist of
+HTML with variable substitutions for named inside curley braces
+"{name}". See the next section for a complete description of the
+syntax. Variable names are generally the IPP attribute names
+with the hyphen ("-") replaced by the underscore ("_")
+character.
+
+<H3>What Are Templates?</H3>
+
+<P>Templates are HTML files with special formatting characters in them
+that allow substition of variables and arrays.</P>
+
+<BLOCKQUOTE>
+<B>Note:</B> LIBCGI doesn't actually care if the template file is HTML or
+not. You can just as easily use a plain text file, XML file, or any other
+type of text file with the template code.
+</BLOCKQUOTE>
+
+<H3>How Do I Use a Template?</H3>
+
+<P>LIBCGI provides a single template function called
+<CODE>cgiCopyTemplateFile()</CODE>.</P>
+
+<H3>void cgiCopyTemplateFile(FILE *out, const char *filename)</H3>
+
+<P>The <CODE>cgiCopyTemplateFile()</CODE> function copies the template file
+(<CODE>filename</CODE>) to the output file (<CODE>out</CODE>.)</P>
+
+<P>The <CODE>out</CODE> argument is usually <CODE>stdout</CODE> for CGI
+programs, however you can write to any file or pipe with this function.</P>
+
+<P>If <CODE>cgiCopyTemplateFile()</CODE> is unable to open the specified
+file then no output is produced.</P>
+
+<H3>Special Characters</H3>
+
+<P>LIBCGI uses the curley braces ("{" and "}") to indicate
+substitutions, and the backslash ("\") character for quoting. To insert
+any of these special characters as-is you need to use the HTML
+<CODE>&amp;name;</CODE> mechanism or prefix each special character with
+the backslash ("\".)</P>
+
+<H3>Variable Substititions</H3>
+
+<P>You substitute the value of a variable using <CODE>{NAME}</CODE> in your
+template file. If the variable is undefined then the <CODE>{NAME}</CODE>
+string is output as-is.</P>
+
+<P>To substitute an empty string if the variable is undefined, use
+<CODE>{?NAME}</CODE> instead.</P>
+
+<H3>Array Substitutions</H3>
+
+<P>The number of array elements can be inserted using <CODE>{#NAME}</CODE>.
+If the array is undefined then 0 is output. The current array element (starting
+at 1) is inserted with <CODE>{#}</CODE>.</P>
+
+<P>Arrays are handled using <CODE>{[NAME]</CODE> at the beginning of a
+section and <CODE>}</CODE> at the end. The information between the closing
+bracket ("]") and closing brace ("}") is repeated for as many elements as
+are in the named array. For example, the following template would display
+an invoice for each item defined in the <CODE>ITEM</CODE> array:</P>
+
+<UL><PRE>
+&lt;TABLE&gt;
+&lt;TR&gt;
+	&lt;TH&gt;Quantity&lt;/TH&gt;
+	&lt;TH&gt;Item&lt;/TH&gt;
+	&lt;TH&gt;Price&lt;/TH&gt;
+	&lt;TH&gt;Amount&lt;/TH&gt;
+&lt;/TR&gt;
+
+{[ITEM]
+&lt;TR&gt;
+	&lt;TD&gt;{?QUANTITY}&lt;/TD&gt;
+	&lt;TD&gt;{?ITEM}&lt;/TD&gt;
+	&lt;TD&gt;{?PRICE}&lt;/TD&gt;
+	&lt;TD&gt;{?AMOUNT}&lt;/TD&gt;
+&lt;/TR&gt;
+}
+
+&lt;TR&gt;
+	&lt;TD COLSPAN="3" ALIGN="RIGHT"&gt;Total&lt;/TD&gt;
+	&lt;TD&gt;{?TOTAL}&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;/TABLE&gt;
+</PRE></UL>
+
+<P>Arrays can be nested, however all elements within the curley braces
+("{" and "}") are indexed using the innermost array.</P>
+
+<H3>Tests</H3>
+
+<P>Templates can also test variables against specific values and conditionally
+include text in the template. The format is:
+
+<UL><PRE>
+{<I>variable</I>?<I>true</I>:<I>false</I>}
+{<I>variable</I>=<I>value</I>?<I>true</I>:<I>false</I>}
+{<I>variable</I>!<I>value</I>?<I>true</I>:<I>false</I>}
+{<I>variable</I>&lt;<I>value</I>?<I>true</I>:<I>false</I>}
+{<I>variable</I>><I>value</I>?<I>true</I>:<I>false</I>}
+</PRE></UL>
+
+<P>where <VAR>true</VAR> is the text that is included if the condition is true and
+<VAR>false</VAR> is the text that is included if the condition is false. A
+value of <CODE>#</CODE> is replaced with the current element number (starting
+at 1.)
+
+<P>The character after the variable name specifies the condition to test:
+
+<CENTER><TABLE BORDER="1">
+<TR>
+	<TH WIDTH="5%">Char</TH>
+	<TH WIDTH="50%">Condition</TH>
+</TR>
+<TR>
+	<TD>?</TD>
+	<TD>True if <VAR>variable</VAR> exists.</TD>
+</TR>
+<TR>
+	<TD>=</TD>
+	<TD>True if <VAR>variable</VAR> is equal to <VAR>value</VAR>.</TD>
+</TR>
+<TR>
+	<TD>!</TD>
+	<TD>True if <VAR>variable</VAR> is not equal to <VAR>value</VAR>.</TD>
+</TR>
+<TR>
+	<TD>&lt;</TD>
+	<TD>True if <VAR>variable</VAR> is less than <VAR>value</VAR>.</TD>
+</TR>
+<TR>
+	<TD>></TD>
+	<TD>True if <VAR>variable</VAR> is greater than <VAR>value</VAR>.</TD>
+</TR>
+</TABLE></CENTER>
+
+
+<H3>Template Files</H3>
+
+<P>The following template files are used by the web interface:
+
+<DL>
+
+
+<DT>add-class.tmpl
+
+	<DD>This is the initial form that is shown to add a new
+	printer class.
+
+<DT>add-printer.tmpl
+
+        <DD>This is the initial form that is shown to add a new
+	printer.
+
+<DT>admin-op.tmpl
+
+        <DD>This is the template that is used to display an error
+	message when the admin interface sees an undefined
+	operation name.
+
+<DT>admin.tmpl
+
+        <DD>This is the template that shows the initial menu of
+	operations (add a class, manage classes, etc.)
+
+<DT>choose-device.tmpl
+
+        <DD>This is the form that shows the list of available
+	devices.
+
+<DT>choose-make.tmpl
+
+        <DD>This is the form that shows the list of available
+	manufacturers.
+
+<DT>choose-members.tmpl
+
+        <DD>This is the form that shows the list of available
+	printers that can be added to a class.
+
+<DT>choose-model.tmpl
+
+        <DD>This is the form that shows the list of available
+	printer models/drivers.
+
+<DT>choose-serial.tmpl
+
+        <DD>This is the form that allows the user to choose
+	a serial port and any options.
+
+<DT>choose-uri.tmpl
+
+        <DD>This is the form that allows the user to enter
+	a device URI for network printers.
+
+<DT>class-added.tmpl
+
+        <DD>This template shows the "class added" message.
+
+<DT>class-confirm.tmpl
+
+        <DD>This is the template used to confirm the
+	deletion of a class.
+
+<DT>class-deleted.tmpl
+
+        <DD>This template shows the "class deleted" message.
+
+<DT>classes.tmpl
+
+        <DD>This template shows one or more printer classes.
+
+<DT>class-modified.tmpl
+
+        <DD>This template shows the "class modified" message.
+
+<DT>config-printer2.tmpl
+
+	<DD>
+
+<DT>config-printer.tmpl
+
+	<DD>
+
+<DT>error.tmpl
+
+	<DD>
+
+<DT>header.tmpl
+
+	<DD>
+
+<DT>job-cancel.tmpl
+
+	<DD>
+
+<DT>job-hold.tmpl
+
+	<DD>
+
+<DT>job-release.tmpl
+
+	<DD>
+
+<DT>job-restart.tmpl
+
+	<DD>
+
+<DT>jobs.tmpl
+
+	<DD>
+
+<DT>modify-class.tmpl
+
+	<DD>
+
+<DT>modify-printer.tmpl
+
+	<DD>
+
+<DT>option-boolean.tmpl
+
+	<DD>
+
+<DT>option-header.tmpl
+
+	<DD>
+
+<DT>option-pickmany.tmpl
+
+	<DD>
+
+<DT>option-pickone.tmpl
+
+	<DD>
+
+<DT>option-trailer.tmpl
+
+	<DD>
+
+<DT>printer-accept.tmpl
+
+	<DD>
+
+<DT>printer-added.tmpl
+
+	<DD>
+
+<DT>printer-configured.tmpl
+
+	<DD>
+
+<DT>printer-confirm.tmpl
+
+	<DD>
+
+<DT>printer-deleted.tmpl
+
+	<DD>
+
+<DT>printer-modified.tmpl
+
+	<DD>
+
+<DT>printer-reject.tmpl
+
+	<DD>
+
+<DT>printer-start.tmpl
+
+	<DD>
+
+<DT>printers.tmpl
+
+	<DD>
+
+<DT>printer-stop.tmpl
+
+	<DD>
+
+<DT>test-page.tmpl
+
+	<DD>
+
+<DT>trailer.tmpl
+
+	<DD>
+
+</DL>
+
+<EMBED SRC="glossary.shtml">
+
+</BODY>
+</HTML>

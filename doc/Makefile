@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.36 2002/01/02 17:58:45 mike Exp $"
+# "$Id: Makefile,v 1.37 2002/02/13 22:08:31 mike Exp $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -48,7 +48,7 @@ include ../Makedefs
 
 DOCUMENTS	=	cmp.shtml idd.shtml ipp.shtml sam.shtml sdd.shtml \
 			spm.shtml sps.shtml ssr.shtml stp.shtml sum.shtml \
-			svd.shtml
+			svd.shtml translation.shtml
 DOCIMAGES	=	images/cups-block-diagram.gif images/cups-large.gif \
 			images/cups-medium.gif images/cups-small.gif
 WEBPAGES	=	cups.css cupsdoc.css index.html documentation.html
