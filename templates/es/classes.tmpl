@@ -25,23 +25,25 @@
 	<A HREF="{printer_uri_supported}?op=print-test-page">
 	<IMG SRC="/images/print-test-page.gif" ALT="Imprimir p&aacute;gina de prueba" BORDER="0"></A>
 	{printer_state=5?
-	<A HREF="/admin/?op=start-printer&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=start-printer&printer_name={printer_name}">
 	<IMG SRC="/images/start-class.gif" ALT="Iniciar clase" BORDER="0"></A>
 	:
-	<A HREF="/admin/?op=stop-printer&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=stop-printer&printer_name={printer_name}">
 	<IMG SRC="/images/stop-class.gif" ALT="Detener clase" BORDER="0"></A>
 	}
 	{printer_is_accepting_jobs=0?
-	<A HREF="/admin/?op=accept-jobs&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=accept-jobs&printer_name={printer_name}">
 	<IMG SRC="/images/accept-jobs.gif" ALT="Aceptar trabajos" BORDER="0"></A>
 	:
-	<A HREF="/admin/?op=reject-jobs&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=reject-jobs&printer_name={printer_name}">
 	<IMG SRC="/images/reject-jobs.gif" ALT="Rechazar trabajos" BORDER="0"></A>
 	}
-	<A HREF="/admin/?op=modify-class&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=modify-class&printer_name={printer_name}">
 	<IMG SRC="/images/modify-class.gif" ALT="Modificar clase" BORDER="0"></A>
-	<A HREF="/admin/?op=delete-class&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=delete-class&printer_name={printer_name}">
 	<IMG SRC="/images/delete-class.gif" ALT="Borrar clase" BORDER="0"></A>
+	<A HREF="{admin_uri}?op=set-as-default&printer_name={printer_name}">
+	<IMG SRC="/images/set-as-default.gif" ALT="Poner como predeterminada" BORDER="0"></A>
 	</TD>
 </TR>
 }

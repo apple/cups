@@ -31,7 +31,8 @@ CHANGES IN CUPS V1.1.21rc2
 	- Added support for quoted system group names (STR #784)
 	- Added "version" option to IPP backend to workaround
 	  serious bug in Linksys's IPP implementation (STR #767)
-	- Added Spanish translation of web interface (STR #772)
+	- Added Spanish translation of web interface (STR #772,
+	  STR #802)
 	- The LPD backend now uses geteuid() instead of getuid()
 	  when it is available (STR #752)
 	- The IPP backend did not report the printer state if

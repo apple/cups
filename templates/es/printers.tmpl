@@ -19,7 +19,7 @@
 	<TD VALIGN="TOP">Descripci&oacute;n: {printer_info}<BR>
 	Ubicaci&oacute;n: {printer_location}<BR>
 	Estado de la impresora: {printer_state=3?inactiva:{printer_state=4?procesando:parada}},
-	{printer_is_accepting_jobs=0?rechazando trabajos:aceptando trabajos}.
+	{printer_is_accepting_jobs=0?rechazando trabajos:aceptando trabajo}.
 	{?printer_state_message=?:<BR><I>"{printer_state_message}"</I>}
 	{?printer_state_history2.printer_state_message=?:<BR><I>"{printer_state_history2.printer_state_message}"</I>}
 	{?printer_state_history3.printer_state_message=?:<BR><I>"{printer_state_history3.printer_state_message}"</I>}
@@ -30,25 +30,27 @@
 	<A HREF="{printer_uri_supported}?op=print-test-page">
 	<IMG SRC="/images/print-test-page.gif" ALT="Imprimir p&aacute;gina de prueba" BORDER="0"></A>
 	{printer_state=5?
-	<A HREF="/admin/?op=start-printer&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=start-printer&printer_name={printer_name}">
 	<IMG SRC="/images/start-printer.gif" ALT="Iniciar impresora" BORDER="0"></A>
 	:
-	<A HREF="/admin/?op=stop-printer&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=stop-printer&printer_name={printer_name}">
 	<IMG SRC="/images/stop-printer.gif" ALT="Detener impresora" BORDER="0"></A>
 	}
 	{printer_is_accepting_jobs=0?
-	<A HREF="/admin/?op=accept-jobs&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=accept-jobs&printer_name={printer_name}">
 	<IMG SRC="/images/accept-jobs.gif" ALT="Aceptar trabajos" BORDER="0"></A>
 	:
-	<A HREF="/admin/?op=reject-jobs&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=reject-jobs&printer_name={printer_name}">
 	<IMG SRC="/images/reject-jobs.gif" ALT="Rechazar trabajos" BORDER="0"></A>
 	}
-	<A HREF="/admin/?op=modify-printer&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=modify-printer&printer_name={printer_name}">
 	<IMG SRC="/images/modify-printer.gif" ALT="Modificar impresora" BORDER="0"></A>
-	<A HREF="/admin/?op=config-printer&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=config-printer&printer_name={printer_name}">
 	<IMG SRC="/images/config-printer.gif" ALT="Configurar impresora" BORDER="0"></A>
-	<A HREF="/admin/?op=delete-printer&printer_name={printer_name}">
+	<A HREF="{admin_uri}?op=delete-printer&printer_name={printer_name}">
 	<IMG SRC="/images/delete-printer.gif" ALT="Borrar impresora" BORDER="0"></A>
+	<A HREF="{admin_uri}?op=set-as-default&printer_name={printer_name}">
+	<IMG SRC="/images/set-as-default.gif" ALT="Poner como predeterminada" BORDER="0"></A>
 	</TD>
 </TR>
 <TR>
