@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsaddsmb.c,v 1.3.2.9 2002/08/26 20:30:03 mike Exp $"
+ * "$Id: cupsaddsmb.c,v 1.3.2.10 2002/09/27 11:50:07 mike Exp $"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
@@ -470,6 +470,8 @@ export_dest(const char *dest)		/* I - Destination to export */
     * Do the rpcclient commands needed for the Adobe Win9x drivers...
     */
 
+    snprintf(command, sizeof(command), "rpcclient %s", SAMBAServer);
+
     snprintf(subcmd, sizeof(subcmd),
 	     "adddriver \"Windows 4.0\" \"%s:ADOBEPS4.DRV:%s.PPD:NULL:ADOBEPS4.HLP:PSMON.DLL:RAW:"
 	     "ADOBEPS4.DRV:%s.PPD,ADOBEPS4.HLP,PSMON.DLL,ADFONTS.MFM,DEFPRTR2.PPD,ICONLIB.DLL\"",
@@ -489,6 +491,8 @@ export_dest(const char *dest)		/* I - Destination to export */
  /*
   * Finally, associate the drivers we just added with the queue...
   */
+
+  snprintf(command, sizeof(command), "rpcclient %s", SAMBAServer);
 
   snprintf(subcmd, sizeof(subcmd), "setdriver %s %s", dest, dest);
 
@@ -524,5 +528,5 @@ usage()
 
 
 /*
- * End of "$Id: cupsaddsmb.c,v 1.3.2.9 2002/08/26 20:30:03 mike Exp $".
+ * End of "$Id: cupsaddsmb.c,v 1.3.2.10 2002/09/27 11:50:07 mike Exp $".
  */
