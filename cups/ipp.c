@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c,v 1.55.2.15 2002/05/09 03:07:59 mike Exp $"
+ * "$Id: ipp.c,v 1.55.2.16 2002/06/14 12:31:15 mike Exp $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -1457,7 +1457,12 @@ ippWriteIO(void       *dst,	/* I - Destination */
 
     case IPP_HEADER :
        /*
-        * Send the request header...
+	* Send the request header:
+	*
+	*                 Version = 2 bytes
+	*   Operation/Status Code = 2 bytes
+	*              Request ID = 4 bytes
+	*                   Total = 8 bytes
 	*/
 
         bufptr = buffer;
@@ -1476,6 +1481,11 @@ ippWriteIO(void       *dst,	/* I - Destination */
 	  DEBUG_puts("ippWrite: Could not write IPP header...");
 	  return (IPP_ERROR);
 	}
+
+       /*
+	* Reset the state engine to point to the first attribute
+	* in the request/response, with no current group.
+	*/
 
         ipp->state   = IPP_ATTRIBUTE;
 	ipp->current = ipp->attrs;
@@ -1507,7 +1517,7 @@ ippWriteIO(void       *dst,	/* I - Destination */
           if (ipp->curtag != attr->group_tag)
 	  {
 	   /*
-	    * Send a group operation tag...
+	    * Send a group tag byte...
 	    */
 
 	    ipp->curtag = attr->group_tag;
@@ -1519,17 +1529,35 @@ ippWriteIO(void       *dst,	/* I - Destination */
 	    *bufptr++ = attr->group_tag;
 	  }
 
-          if ((n = strlen(attr->name)) > (sizeof(buffer) - 3))
+         /*
+	  * Get the length of the attribute name, and make sure it won't
+	  * overflow the buffer...
+	  */
+
+          if ((n = strlen(attr->name)) > (sizeof(buffer) - 4))
 	    return (IPP_ERROR);
 
           DEBUG_printf(("ippWrite: writing value tag = %x\n", attr->value_tag));
           DEBUG_printf(("ippWrite: writing name = %d, \'%s\'\n", n, attr->name));
+
+         /*
+	  * Write the attribute tag and name.  The current implementation
+	  * does not support the extension value tags above 0x7f, so all
+	  * value tags are 1 byte.
+	  *
+	  * The attribute name length does not include the trailing nul
+	  * character in the source string.
+	  */
 
           *bufptr++ = attr->value_tag;
 	  *bufptr++ = n >> 8;
 	  *bufptr++ = n;
 	  memcpy(bufptr, attr->name, n);
 	  bufptr += n;
+
+         /*
+	  * Now write the attribute value(s)...
+	  */
 
 	  switch (attr->value_tag & ~IPP_TAG_COPY)
 	  {
@@ -1561,6 +1589,13 @@ ippWriteIO(void       *dst,	/* I - Destination */
 		    *bufptr++ = 0;
 		    *bufptr++ = 0;
 		  }
+
+		 /*
+	          * Integers and enumerations are both 4-byte signed
+		  * (twos-complement) values.
+		  *
+		  * Put the 2-byte length and 4-byte value into the buffer...
+		  */
 
 	          *bufptr++ = 0;
 		  *bufptr++ = 4;
@@ -1598,6 +1633,12 @@ ippWriteIO(void       *dst,	/* I - Destination */
 		    *bufptr++ = 0;
 		    *bufptr++ = 0;
 		  }
+
+                 /*
+		  * Boolean values are 1-byte; 0 = false, 1 = true.
+		  *
+		  * Put the 2-byte length and 1-byte value into the buffer...
+		  */
 
 	          *bufptr++ = 0;
 		  *bufptr++ = 1;
@@ -1647,7 +1688,7 @@ ippWriteIO(void       *dst,	/* I - Destination */
 
                   n = strlen(value->string.text);
 
-                  if (n > sizeof(buffer))
+                  if (n > (sizeof(buffer) - 2))
 		    return (IPP_ERROR);
 
                   DEBUG_printf(("ippWrite: writing string = %d, \'%s\'\n", n,
@@ -1663,6 +1704,16 @@ ippWriteIO(void       *dst,	/* I - Destination */
 
 		    bufptr = buffer;
 		  }
+
+		 /*
+		  * All simple strings consist of the 2-byte length and
+		  * character data without the trailing nul normally found
+		  * in C strings.  Also, strings cannot be longer than 32767
+		  * bytes since the 2-byte length is a signed (twos-complement)
+		  * value.
+		  *
+		  * Put the 2-byte length and string characters in the buffer.
+		  */
 
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
@@ -1699,6 +1750,14 @@ ippWriteIO(void       *dst,	/* I - Destination */
 		    *bufptr++ = 0;
 		  }
 
+                 /*
+		  * Date values consist of a 2-byte length and an
+		  * 11-byte date/time structure defined by RFC 1903.
+		  *
+		  * Put the 2-byte length and 11-byte date/time
+		  * structure in the buffer.
+		  */
+
 	          *bufptr++ = 0;
 		  *bufptr++ = 11;
 		  memcpy(bufptr, value->date, 11);
@@ -1733,6 +1792,15 @@ ippWriteIO(void       *dst,	/* I - Destination */
 		    *bufptr++ = 0;
 		    *bufptr++ = 0;
 		  }
+
+                 /*
+		  * Resolution values consist of a 2-byte length,
+		  * 4-byte horizontal resolution value, 4-byte vertical
+		  * resolution value, and a 1-byte units value.
+		  *
+		  * Put the 2-byte length and resolution value data
+		  * into the buffer.
+		  */
 
 	          *bufptr++ = 0;
 		  *bufptr++ = 9;
@@ -1776,6 +1844,14 @@ ippWriteIO(void       *dst,	/* I - Destination */
 		    *bufptr++ = 0;
 		  }
 
+                 /*
+		  * Range values consist of a 2-byte length,
+		  * 4-byte lower value, and 4-byte upper value.
+		  *
+		  * Put the 2-byte length and range value data
+		  * into the buffer.
+		  */
+
 	          *bufptr++ = 0;
 		  *bufptr++ = 8;
 		  *bufptr++ = value->range.lower >> 24;
@@ -1818,11 +1894,20 @@ ippWriteIO(void       *dst,	/* I - Destination */
 		    *bufptr++ = 0;
 		  }
 
-                  n = strlen(value->string.charset) +
-		      strlen(value->string.text) +
-		      4;
+                 /*
+		  * textWithLanguage and nameWithLanguage values consist
+		  * of a 2-byte length for both strings and their
+		  * individual lengths, a 2-byte length for the
+		  * character string, the character string without the
+		  * trailing nul, a 2-byte length for the character
+		  * set string, and the character set string without
+		  * the trailing nul.
+		  */
 
-                  if (n > sizeof(buffer))
+                  n = 2 + strlen(value->string.charset) +
+		      2 + strlen(value->string.text);
+
+                  if (n > (sizeof(buffer) - 2))
 		    return (IPP_ERROR);
 
                   if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
@@ -1888,9 +1973,16 @@ ippWriteIO(void       *dst,	/* I - Destination */
 		    *bufptr++ = 0;
 		  }
 
+                 /*
+		  * An unknown value might some new value that a
+		  * vendor has come up with. It consists of a
+		  * 2-byte length and the bytes in the unknown
+		  * value buffer.
+		  */
+
                   n = value->unknown.length;
 
-                  if (n > sizeof(buffer))
+                  if (n > (sizeof(buffer) - 2))
 		    return (IPP_ERROR);
 
                   if ((sizeof(buffer) - (bufptr - buffer)) < (n + 2))
@@ -2241,5 +2333,5 @@ ipp_write_mem(ipp_mem_t   *m,		/* I - Memory buffer */
 
 
 /*
- * End of "$Id: ipp.c,v 1.55.2.15 2002/05/09 03:07:59 mike Exp $".
+ * End of "$Id: ipp.c,v 1.55.2.16 2002/06/14 12:31:15 mike Exp $".
  */

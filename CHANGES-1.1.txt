@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.16
 
+	- Increased the size of the IPP write buffer to 32k to
+	  allow for larger attribute values and to provide more
+	  efficient output of large numbers of attributes.
 	- The polling daemon now retries the initial connection
 	  to the remote server; this fixes a problem when the
 	  remote server is unavailable when the scheduler starts
