@@ -1,5 +1,5 @@
 /*
- * "$Id: gdevcups.c,v 1.44 2001/05/31 13:55:06 mike Exp $"
+ * "$Id: gdevcups.c,v 1.45 2001/07/06 19:57:47 mike Exp $"
  *
  *   GNU Ghostscript raster output driver for the Common UNIX Printing
  *   System (CUPS).
@@ -324,8 +324,8 @@ cups_get_matrix(gx_device *pdev,	/* I - Device info */
     fprintf(stderr, "DEBUG: cups->ppd->flip_duplex = %d\n", cups->ppd->flip_duplex);
   }
 
-  if (cups->header.Duplex && cups->ppd && cups->ppd->flip_duplex &&
-      !(cups->page & 1))
+  if (cups->header.Duplex && !cups->header.Tumble &&
+      cups->ppd && cups->ppd->flip_duplex && !(cups->page & 1))
   {
     pmat->xx = (float)cups->header.HWResolution[0] / 72.0;
     pmat->xy = 0.0;
@@ -1984,11 +1984,13 @@ cups_print_chunked(gx_device_printer *pdev,	/* I - Printer device */
   int		flip;				/* Flip scanline? */
 
 
-  if (cups->header.Duplex && cups->ppd && cups->ppd->flip_duplex &&
-      !(cups->page & 1))
+  if (cups->header.Duplex && !cups->header.Tumble &&
+      cups->ppd && cups->ppd->flip_duplex && !(cups->page & 1))
     flip = 1;
   else
     flip = 0;
+
+  fprintf(stderr, "DEBUG: cups_print_chunked - flip = %d\n", flip);
 
  /*
   * Loop through the page bitmap and write chunked pixels, reversing as
@@ -2130,11 +2132,13 @@ cups_print_banded(gx_device_printer *pdev,	/* I - Printer device */
   int		flip;				/* Flip scanline? */
 
 
-  if (cups->header.Duplex && cups->ppd && cups->ppd->flip_duplex &&
-      !(cups->page & 1))
+  if (cups->header.Duplex && !cups->header.Tumble &&
+      cups->ppd && cups->ppd->flip_duplex && !(cups->page & 1))
     flip = 1;
   else
     flip = 0;
+
+  fprintf(stderr, "DEBUG: cups_print_banded - flip = %d\n", flip);
 
  /*
   * Loop through the page bitmap and write banded pixels...  We have
@@ -3045,5 +3049,5 @@ cups_print_planar(gx_device_printer *pdev,	/* I - Printer device */
 
 
 /*
- * End of "$Id: gdevcups.c,v 1.44 2001/05/31 13:55:06 mike Exp $".
+ * End of "$Id: gdevcups.c,v 1.45 2001/07/06 19:57:47 mike Exp $".
  */
