@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h,v 1.9 1999/04/22 20:19:21 mike Exp $"
+ * "$Id: cups.h,v 1.10 1999/04/27 19:57:08 mike Exp $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -38,9 +38,9 @@
  * C++ magic...
  */
 
-#  ifdef _cplusplus
+#  ifdef __cplusplus
 extern "C" {
-#  endif /* _cplusplus */
+#  endif /* __cplusplus */
 
 
 /*
@@ -123,12 +123,12 @@ extern int		cupsParseOptions(char *arg, int num_options,
 extern int		cupsMarkOptions(ppd_file_t *ppd, int num_options,
 			                cups_option_t *options);
 
-#  ifdef _cplusplus
+#  ifdef __cplusplus
 }
-#  endif /* _cplusplus */
+#  endif /* __cplusplus */
 
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h,v 1.9 1999/04/22 20:19:21 mike Exp $".
+ * End of "$Id: cups.h,v 1.10 1999/04/27 19:57:08 mike Exp $".
  */
