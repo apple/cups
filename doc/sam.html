@@ -173,6 +173,7 @@ Copyright 1997-2002, All Rights Reserved<BR>
 <LI><A HREF="#RequestRoot">RequestRoot</A></LI>
 <LI><A HREF="#Require">Require</A></LI>
 <LI><A HREF="#RIPCache">RIPCache</A></LI>
+<LI><A HREF="#RootCertDuration">RootCertDuration</A></LI>
 <LI><A HREF="#RunAsUser">RunAsUser</A></LI>
 <LI><A HREF="#Satisfy">Satisfy</A></LI>
 <LI><A HREF="#ServerAdmin">ServerAdmin</A></LI>
@@ -1312,6 +1313,7 @@ HREF="#CLIENT_SETUP"> Chapter 5, &quot;Client Setup&quot;</A> for more
 <LI><A HREF="#RequestRoot"><CODE>RequestRoot</CODE></A></LI>
 <LI><A HREF="#Require"><CODE>Require</CODE></A></LI>
 <LI><A HREF="#RIPCache"><CODE>RIPCache</CODE></A></LI>
+<LI><A HREF="#RootCertDuration"><CODE>RootCertDuration</CODE></A></LI>
 <LI><A HREF="#RunAsUser"><CODE>RunAsUser</CODE></A></LI>
 <LI><A HREF="#Satisfy"><CODE>Satisfy</CODE></A></LI>
 <LI><A HREF="#ServerAdmin"><CODE>ServerAdmin</CODE></A></LI>
@@ -2718,6 +2720,23 @@ RIPCache 2048k
 imagetoraster</CODE> and <CODE>pstoraster</CODE>. The size can be
  suffixed with a &quot;k&quot; for kilobytes, &quot;m&quot; for megabytes, or &quot;g&quot; for
  gigabytes. The default cache size is &quot;8m&quot;, or 8 megabytes.
+<!-- NEED 3in -->
+</P>
+<H3><A NAME="RootCertDuration">RootCertDuration</A></H3>
+<HR>
+<H4>Examples</H4>
+<UL>
+<PRE>
+RootCertDuration 300
+RootCertDuration 0
+</PRE>
+</UL>
+<H4>Description</H4>
+<P>The <CODE>RootCertDuration</CODE> directive controls the interval
+ between updates of the root authentication certificate. The default is <CODE>
+300</CODE> seconds which updates the root certificate approximately once
+ every 5 minutes. Set the interval to 0 to disable certificate updates
+ entirely.
 <!-- NEED 3in -->
 </P>
 <H3><A NAME="RunAsUser">RunAsUser</A></H3>

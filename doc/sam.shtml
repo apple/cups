@@ -1125,6 +1125,7 @@ determine how the server operates:
 	<LI><A HREF="#RequestRoot"><CODE>RequestRoot</CODE></A>
 	<LI><A HREF="#Require"><CODE>Require</CODE></A>
 	<LI><A HREF="#RIPCache"><CODE>RIPCache</CODE></A>
+	<LI><A HREF="#RootCertDuration"><CODE>RootCertDuration</CODE></A>
 	<LI><A HREF="#RunAsUser"><CODE>RunAsUser</CODE></A>
 	<LI><A HREF="#Satisfy"><CODE>Satisfy</CODE></A>
 	<LI><A HREF="#ServerAdmin"><CODE>ServerAdmin</CODE></A>
@@ -2804,6 +2805,26 @@ cache used by Raster Image Processor ("RIP") filters such as
 <CODE>imagetoraster</CODE> and <CODE>pstoraster</CODE>. The size can
 be suffixed with a "k" for kilobytes, "m" for megabytes, or
 "g" for gigabytes. The default cache size is "8m", or 8 megabytes.
+
+<!-- NEED 3in -->
+<H3><A NAME="RootCertDuration">RootCertDuration</A></H3>
+<HR>
+
+<H4>Examples</H4>
+
+<UL><PRE>
+RootCertDuration 300
+RootCertDuration 0
+</PRE></UL>
+
+<H4>Description</H4>
+
+<P>The <CODE>RootCertDuration</CODE> directive controls the
+interval between updates of the root authentication certificate.
+The default is <CODE>300</CODE> seconds which updates the root
+certificate approximately once every 5 minutes. Set the interval
+to 0 to disable certificate updates entirely.
+
 
 <!-- NEED 3in -->
 <H3><A NAME="RunAsUser">RunAsUser</A></H3>
