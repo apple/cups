@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c,v 1.28 1999/09/17 19:28:53 mike Exp $"
+ * "$Id: conf.c,v 1.29 1999/09/18 12:08:05 mike Exp $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -715,7 +715,12 @@ read_configuration(FILE *fp)	/* I - File to read from */
       {
         if (get_address(value, INADDR_ANY, IPP_PORT,
 	                &(Listeners[NumListeners].address)))
+        {
+          LogMessage(LOG_INFO, "Listening to %s:%d\n",
+                     inet_ntoa(Listeners[NumListeners].address.sin_addr),
+                     ntohs(Listeners[NumListeners].address.sin_port));
 	  NumListeners ++;
+        }
 	else
           LogMessage(LOG_ERROR, "Bad %s address %s at line %d.", name,
 	             value, linenum);
@@ -733,7 +738,12 @@ read_configuration(FILE *fp)	/* I - File to read from */
       if (NumBrowsers < MAX_BROWSERS)
       {
         if (get_address(value, INADDR_NONE, BrowsePort, Browsers + NumBrowsers))
+        {
+          LogMessage(LOG_INFO, "Sending browsing info to %s:%d\n",
+                     inet_ntoa(Browsers[NumBrowsers].sin_addr),
+                     ntohs(Browsers[NumBrowsers].sin_port));
 	  NumBrowsers ++;
+        }
 	else
           LogMessage(LOG_ERROR, "Bad BrowseAddress %s at line %d.", value,
 	             linenum);
@@ -1191,5 +1201,5 @@ get_address(char               *value,		/* I - Value string */
 
 
 /*
- * End of "$Id: conf.c,v 1.28 1999/09/17 19:28:53 mike Exp $".
+ * End of "$Id: conf.c,v 1.29 1999/09/18 12:08:05 mike Exp $".
  */
