@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c,v 1.47 2000/01/27 03:38:34 mike Exp $"
+ * "$Id: client.c,v 1.48 2000/02/01 17:55:56 mike Exp $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -477,7 +477,7 @@ ReadClient(client_t *con)	/* I - Client to read from */
             if (strncmp(con->uri, "/admin", 6) == 0)
 	    {
 	      snprintf(command, sizeof(command), "%s/cgi-bin/admin.cgi", ServerBin);
-	      options = con->uri + 9;
+	      options = con->uri + 6;
 	    }
             else if (strncmp(con->uri, "/printers", 9) == 0)
 	    {
@@ -1570,5 +1570,5 @@ pipe_command(client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c,v 1.47 2000/01/27 03:38:34 mike Exp $".
+ * End of "$Id: client.c,v 1.48 2000/02/01 17:55:56 mike Exp $".
  */

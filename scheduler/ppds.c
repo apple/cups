@@ -1,5 +1,5 @@
 /*
- * "$Id: ppds.c,v 1.1 2000/01/30 13:11:08 mike Exp $"
+ * "$Id: ppds.c,v 1.2 2000/02/01 17:55:56 mike Exp $"
  *
  *   PPD scanning routines for the Common UNIX Printing System (CUPS).
  *
@@ -162,7 +162,10 @@ load_ppds(const char *d,		/* I - Actual directory */
 
     if (strncmp(line, "*PPD-Adobe:", 11) != 0)
     {
-      // Nope, close the file and continue...
+     /*
+      * Nope, close the file and continue...
+      */
+
 #ifdef HAVE_LIBZ
       gzclose(fp);
 #else
@@ -172,7 +175,10 @@ load_ppds(const char *d,		/* I - Actual directory */
       continue;
     }
 
-    // Now read until we get the NickName field...
+   /*
+    * Now read until we get the NickName field...
+    */
+
     make_model[0]   = '\0';
     manufacturer[0] = '\0';
     strcpy(language, "en");
@@ -251,7 +257,10 @@ load_ppds(const char *d,		/* I - Actual directory */
       else
 	strcpy(manufacturer, "Other");
 
-      // Hack for various vendors...
+     /*
+      * Hack for various vendors...
+      */
+
       if (strcasecmp(manufacturer, "XPrint") == 0)
 	strcpy(manufacturer, "Xerox");
       else if (strcasecmp(manufacturer, "Eastman") == 0)
@@ -307,5 +316,5 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * End of "$Id: ppds.c,v 1.1 2000/01/30 13:11:08 mike Exp $".
+ * End of "$Id: ppds.c,v 1.2 2000/02/01 17:55:56 mike Exp $".
  */
