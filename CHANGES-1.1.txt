@@ -3,6 +3,9 @@ CHANGES-1.1.txt
 
 CHANGES IN CUPS V1.1.21rc1
 
+	- The pstops filter did not write the PostScript header
+	  line if the file began with a PJL escape sequence (STR
+	  #574)
 	- The printer-is-accepting-jobs status of remote
 	  printers was not sent to clients via browsing or
 	  polling (STR #571)

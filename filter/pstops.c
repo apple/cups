@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c,v 1.54.2.46 2003/11/24 15:39:04 mike Exp $"
+ * "$Id: pstops.c,v 1.54.2.47 2004/02/24 20:16:42 mike Exp $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -381,8 +381,6 @@ main(int  argc,			/* I - Number of command-line arguments */
     return (1);
   }
 
-  fwrite(line, 1, len, stdout);
-
  /*
   * Handle leading PJL fun...
   */
@@ -420,6 +418,8 @@ main(int  argc,			/* I - Number of command-line arguments */
  /*
   * Start sending the document with any commands needed...
   */
+
+  fwrite(line, 1, len, stdout);
 
   saweof      = 0;
   sent_espsp  = 0;
@@ -1892,5 +1892,5 @@ start_nup(int number,			/* I - Page number */
 
 
 /*
- * End of "$Id: pstops.c,v 1.54.2.46 2003/11/24 15:39:04 mike Exp $".
+ * End of "$Id: pstops.c,v 1.54.2.47 2004/02/24 20:16:42 mike Exp $".
  */
