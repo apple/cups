@@ -1,5 +1,5 @@
 /*
- * "$Id: lpoptions.c,v 1.4 2000/03/09 19:47:34 mike Exp $"
+ * "$Id: lpoptions.c,v 1.5 2000/07/07 18:13:48 mike Exp $"
  *
  *   Printer option program for the Common UNIX Printing System (CUPS).
  *
@@ -52,6 +52,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 {
   int		i, j;		/* Looping vars */
   char		server[1024];	/* Print server */
+  int		changes;	/* Did we make changes? */
   int		num_options;	/* Number of options */
   cups_option_t	*options;	/* Options */
   int		num_dests;	/* Number of destinations */
@@ -73,6 +74,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   dests       = NULL;
   num_options = 0;
   options     = NULL;
+  changes     = 0;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -128,6 +130,11 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    dest->is_default = 1;
 
 	    cupsSetDests(num_dests, dests);
+
+	    for (j = 0; j < dest->num_options; j ++)
+	      num_options = cupsAddOption(dest->options[j].name,
+	                                  dest->options[j].value,
+	                                  num_options, &options);
 	    break;
 
 	case 'p' : /* -p printer */
@@ -159,6 +166,11 @@ main(int  argc,			/* I - Number of command-line arguments */
 		return (1);
 	      }
 	    }
+
+	    for (j = 0; j < dest->num_options; j ++)
+	      num_options = cupsAddOption(dest->options[j].name,
+	                                  dest->options[j].value,
+	                                  num_options, &options);
 	    break;
 
 	case 'o' : /* -o option[=value] */
@@ -172,6 +184,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      num_options = cupsParseOptions(argv[i], num_options, &options);
 	    }
+
+	    changes = 1;
 	    break;
 
         case 'x' : /* -x printer */
@@ -235,7 +249,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   if (dest == NULL)
     return (0);
 
-  if (num_options > 0)
+  if (changes)
   {
    /*
     * Set printer options...
@@ -290,5 +304,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpoptions.c,v 1.4 2000/03/09 19:47:34 mike Exp $".
+ * End of "$Id: lpoptions.c,v 1.5 2000/07/07 18:13:48 mike Exp $".
  */
